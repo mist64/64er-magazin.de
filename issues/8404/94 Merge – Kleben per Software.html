@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+	<title>Merge – Kleben per Software</title>
+	<meta charset="UTF-8">
+	<link rel="stylesheet" href="../style.css">
+	<meta name="author" content="Heinz Böffel">
+	<meta name="64er.issue" content="4/84">
+	<meta name="64er.pages" content="94-95">
+	<meta name="64er.toc_title" content="Merge: kleben per Computer">
+	<meta name="64er.toc_category" content="Programme zum Abtippen|Tips &amp; Tricks">
+	<meta name="64er.index_title" content="Kleben per Software – Merge">
+	<meta name="64er.index_category" content="Programme zum Abtippen|Tips &amp; Tricks|Merge">
+	<meta name="64er.id" content="merge">
+</head>
+
+<body>
+	<article>
+		<h1>Merge – Kleben per Software</h1>
+
+		<p class="intro">Wenn Sie ein Unterprogramm haben – zum Beispiel ein Formatierungsprogramm zum Erstellen von Tabellen – und sie möchten es an ein vorhandes Basicprogramm anhängen, ohne es extra eintippen zu müssen – mit Merge eine einfache Sache!</p>
+
+		<p>Sie müssen lediglich das Ende des Basic-Programms finden (3 Bytes 0) und die Adresse der zweiten Null in den Zeiger für Basic-Anfang einschreiben. Dann können Sie ein zweites Programm laden und modifizieren, ohne daß das erste Programm beeinflußt wird. Wenn sie anschließend wieder die ursprüngliche Startadresse in den Basic-Pointer schreiben, haben Sie ein einziges Programm.</p>
+
+		<p>Leider ist es eine langwierige Angelegenheit, das Ende eines Programms zu suchen, die gefundene Adresse in den Basic-Pointer einzupoken..... Das Programm Merge übernimmt diese Arbeit – und das Rücksetzen des Basic-Pointers auch.</p>
+
+		<p>Wenn Sie ein Programm geladen haben so brauchen sie nur SYS 50000 einzugeben und das »Kuppelprogramm« Merge meldet sich mit</p>
+
+		<pre>
+***MERGE 1.1***
+VON HEINZ BOEFFEL
+PROGRAMM ON HOLD!
+</pre>
+
+		<p>Dann können Sie ein weiteres Programm (nur mit höheren Zeilennummern als das erste!) laden.</p>
+
+		<p>Das kann auch beispielsweise das Directory einer Diskette sein oder irgendwas, was Sie gerade ausprobieren Möchten, sein. Mit NEW läßt sich dieses gleich wieder löschen.</p>
+
+		<p>Geben Sie dann wieder SYS 50000 ein und Merge meldet sich mit</p>
+
+		<pre>
+***MERGE 1.1***
+VON HEINZ BOEFFEL
+
+PROGRAMMS MERGED!
+</pre>
+
+		<p>Falls Sie das zweite Programm nicht durch NEW gelöscht haben, so ist aus den beiden Programmen ein einziges geworden. Haben Sie allerdings das zweite Programm vor dem Befehl 50000 gelöscht, so erhalten Sie wieder den Ausgangszustand.</p>
+
+		<p>Merge ist vollständig in Maschinensprache geschrieben – daher beträgt die Ablaufzeit nur wenige Augenblicke.</p>
+
+		<p>Somit stellt Merge ein nützliches Hilfsmittel dar, das viele einzelne Eingaben (vor allem bei immer wieder verwendeten Unterprogrammen oder beim »Stricken« längerer Programme, die Sie zunächst abschnittweise abspeichern) erspart.</p>
+
+		<address class="author">(Heinz Böffel)</address>
+
+		<figure>
+			<pre>
+1 rem  *************************
+2 rem  *                       *
+3 rem  *  merge 1.1     11/83  *
+4 rem  *                       *
+5 rem  *   von heinz boeffel   *
+6 rem  *    kantstrasse  12    *
+7 rem  *  6680 neunkirchen  7  *
+8 rem  *                       *
+9 rem  *************************
+10 print chr$(14);chr$(147)
+30 print"          *** merge 1.1 ***"
+40 print"          von heinz boeffel";chr$(13);chr$(13)
+50 print"Das Programm MERGE setzt den Zeiger"
+60 print"fuer Basic-Anfang unmittelbar hinter"
+70 print"das im Speicher befindliche Programm.";chr$(13)
+80 print"Somit kann ein weiteres Programm hinter"
+90 print"das bestehende geladen werden.";chr$(13)
+100 print"Geben sie hierzu den Befehl SYS 50000"
+110 print"ein. Das nachgeladene Programm kann"
+120 print"genau wie das erstgeladene behandelt"
+130 print"werden.";chr$(13)
+150 print"Um den Basic-Zeiger wieder zurueck-"
+160 print"zusetzen, geben Sie wieder SYS 50000"
+170 print"ein. Die beiden Programme ergeben nun"
+180 print"zusammen ein einziges Programm.";chr$(13)
+190 print "Zum Laden bitte Leertaste druecken!"
+200 get g$:if g$&lt;&gt;" " then 200
+210 print chr$(147);chr$(142)
+220 for i=50000 to 50264:read q:poke i,q:next i
+230 new
+10000 data 169,255,133,2,165,43,201,1,208,13
+10010 data 133,251,165,44,201,8,208,5,133,252
+10020 data 76,125,195,165,251,133,43,165,252,133
+10030 data 44,162,0,189,0,196,240,6,32,22
+10040 data 231,232,208,245,96,160,0,177,43,208
+10050 data 12,200,177,43,208,7,200,177,43,208
+10060 data 2,133,2,230,43,208,2,230,44,165
+10070 data 2,208,228,162,0,189,167,195,240,6
+10080 data 32,22,231,232,208,245,96,13,13,32
+10090 data 32,32,32,32,32,32,32,32,32,42
+10100 data 42,42,32,77,69,82,71,69,32,49
+10110 data 46,49,32,42,42,42,13,32,32,32
+10120 data 32,32,32,32,32,32,32,86,79,78
+10130 data 32,72,69,73,78,90,32,66,79,69
+10140 data 70,70,69,76,13,13,32,32,32,32
+10150 data 32,32,32,32,32,32,80,82,79,71
+10160 data 82,65,77,77,32,79,78,32,72,79
+10170 data 76,68,33,13,0,0,13,13,32,32
+10180 data 32,32,32,32,32,32,32,32,42,42
+10190 data 42,32,77,69,82,71,69,32,49,46
+10200 data 49,32,42,42,42,13,32,32,32,32
+10210 data 32,32,32,32,32,32,86,79,78,32
+10220 data 72,69,73,78,90,32,66,79,69,70
+10230 data 70,69,76,13,13,32,32,32,32,32
+10240 data 32,32,32,32,32,80,82,79,71,82
+10250 data 65,77,77,83,32,77,69,82,71,69
+10260 data 68,33,13,0,0,0,0,0,0,0
+			</pre>
+		</figure>
+	</article>
+
+	<aside class="downloads">
+		<a href="prg/merge.prg">Merge</a>
+	</aside>
+
+</body>
+
+</html>

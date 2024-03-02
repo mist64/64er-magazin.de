@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+	<title>Tips und Tricks für den Commodore 64</title>
+	<meta charset="UTF-8">
+	<link rel="stylesheet" href="../style.css">
+	<meta name="author" content="Volker Mücke">
+	<meta name="64er.issue" content="4/84">
+	<meta name="64er.pages" content="108-109">
+	<meta name="64er.head1" content="Tips &amp; Tricks">
+	<meta name="64er.head2" content="C 64">
+	<meta name="64er.toc_title" content="Unbekannte PEEKs und POKEs: Interessanten Adressen auf der Spur – Tips und Tricks für den Commodore 64">
+	<meta name="64er.toc_category" content="Programme zum Abtippen|Tips &amp; Tricks">
+	<meta name="64er.index_title" content="Tips &amp; Tricks für den C 64">
+	<meta name="64er.index_category" content="Programme zum Abtippen|Tips &amp; Tricks|Tips &amp; Tricks">
+	<meta name="64er.id" content="tips_tricks">
+</head>
+
+<body>
+	<article>
+		<h1>Tips und Tricks für den Commodore 64</h1>
+
+		<p class="intro">Die hier vorgestellten Tips und Tricks wurden von Volker Mücke gesammelt. Wenn Sie selbst einige unbekannte Peeks und Pokes gefunden haben, so sind wir gerne bereit, diese zu veröffentlichen.</p>
+
+		<h3>Umgang mit Floppy/Drucker:</h3>
+
+		<p>Der Drucker VC 1515 ist eigentlich nur für den VC 20 gedacht. Will man ihn für den C64 benutzen, so funktioniert dies nicht ohne weiteres. Dazu benötigt man zwei spezielle POKE-Befehle:</p>
+
+		<p>Vor dem Ansprechen des Druckers muß man POKE 53265,11 und nach Beendigung des Druckvorgangs POKE 53265,27 eingeben. Nachteilig ist allerdings, daß während des Druckens die Schrift auf dem Bildschirm verschwindet.</p>
+
+		<p>Das gleiche Problem ergibt sich beim Gebrauch der Floppy VC 1540 zusammen mit dem C 64. Auch hier braucht man die beiden POKE-Befehle. Allerdings müssen sie anders gehandhabt werden: Man gibt, wenn man laden will, folgendes im Direktmodus ein:</p>
+
+		<pre>POKE 53265,11:POKE 53266,27:LOAD "NAME", 8 (bzw.8,1)</pre>
+
+		<p>So, und nun lädt der C 64 auch von der Floppy VC1540.</p>
+
+		<h3>Joystickabfrage:</h3>
+
+		<p>Auch die Joystickabfrage ist beim C 64 nicht ganz einfach. Dabei hilft folgendes Hilfsprogramm:</p>
+
+		<pre>
+10 POKE 56322,224
+20 JO = PEEK(56320)
+30 IF (JO AND 1)=0 THENPRINT"OBEN"
+40 IF (JO AND 2)=0 THENPRINT"UNTEN"
+50 IF (JO AND 4)=0 THENPRINT"LINKS"
+60 IF (JO AND 8)=0 THENPRINT"RECHTS"
+70 IF (JO AND 16)=0 THENPRINT "FEUER"
+</pre>
+
+		<p>Dieses Programm gilt für eine Joystickabfrage am Controlport 2.</p>
+
+		<h3>Die Funktion FRE(X):</h3>
+
+		<p>Um bei der Abfrage PRINT FRE(X) die richtige Ausgabe zu erhalten, muß man folgendes noch hinzufügen:</p>
+		<pre>PRINT FRE(X) + 65538.</pre>
+		<p>Nun gibt der Computer die tatsächlichen freien Bytes aus.</p>
+
+		<h3>Listschutz</h3>
+
+		<p>Wenn man ein Programm hat, welches irgendeinen Listschutz hat, so will der Benutzer doch versuchen, dieses Programm zu »knacken«. Wenn zum Beispiel die Commodore-Taste ausgeschaltet wurde, so kann man beim C 64 – anders als beim VC 20 – die Control-Taste benutzen, zum Beispiel:<br>
+			CTRL + "N" = Kleinschrift<br>
+			CTRL + "M" = RETURN<br>
+			CTRL + "S" = HOME<br>
+			CTRL + ";" = Cursor rechts<br>
+			CTRL + "=" = Cursor blinkt<br>
+			CTRL + "Q" = Cursor unten<br>
+			CTRL + "T" = Cursor links</p>>
+
+		<h3>Reset-Auslöser:</h3>
+
+		<p>SYS 64738 bewirkt beim C 64 einen System-Reset.</p>
+
+		<h3>Einige Peeks und Pokes</h3>
+
+		<pre>?ST oder ?PEEK(144)</pre>
+		<p>: Statusabfrage</p>
+
+		<pre>POKE 207,X [1 < = X < = 255]:</pre>
+		<p>Bestimmung der Schnelligkeit der Blinkphase des Cursors</p>
+
+		<pre>PRINT PEEK(214):</pre>
+		<p> gibt die Zeile an, in der der Cursor gerade ist.</p>
+
+		<pre>PRINT PEEK(202):</pre>
+		<p>gibt die Spalte an, in der der Cursor im Augenblick ist.</p>
+
+		<pre>POKE 214,Х [1 < = X < = 23]:</pre>
+		<p> versetzt den Cursor an die Zeile x</p>
+
+		<pre>PRINT PEEK(647):</pre>
+		<p> gibt die Farbe unter dem Cursor an.</p>
+
+		<pre>POKE 647,X:</pre>
+		<p> Farbenwechsel unter dem Cursor.</p>
+
+		<pre>PRINT PEEK(215):</pre>
+		<p> gibt die letzte gedrückte Taste im Characterwert aus</p>
+
+		<pre>PRINT PEEK(213):</pre>
+		<p> gibt die Länge der momentanen Zeile auf dem Bildschirm an.</p>
+
+		<h3>Rund um den OUTPUT:</h3>
+
+		<pre>PRINT PEEK (183):</pre>
+		<p> Ausgabe der Länge des Filenamens.</p>
+		<pre>PRINT PEEK (184):</pre>
+		<p> Ausgabe der laufenden Filenummer.</p>
+		<pre>PRINT PEEK (185):</pre>
+		<p> gibt die laufende Sekundäradresse an.</p>
+		<pre>PRINT PEEK (186):</pre>
+		<p> gibt die laufende Primäradresse an.</p>
+
+		<h3>Weitere nützliche Peeks und Pokes</h3>
+
+		<pre>POKE 652, X [1 < = X < = 255]:</pre>
+		<p>verzögert die Repeat-Funktion</p>
+
+		<pre>SYS 65499:</pre>
+		<p> Der Systembefehl bewirkt, daß TI$ auf 0 gesetzt wird.</p>
+
+		<pre>PRINT PEEK (36870):</pre>
+		<p> Ausgabe der Lichtgriffel Horizontal-Position.</p>
+
+
+		<pre>PRINT PEEK (36871):</pre>
+		<p> Ausgabe der Lichtgriffel Vertikal-Position.</p>
+
+		<pre>0 POKE 199,1:PRINT"Volker Muecke":</pre>
+		<p> Diese Zeile bewirkt, daß die PRINT-Anweisung den Text invers ausgibt.</p>
+
+		<pre>0 POKE 199,0: PRINT"Volker Muecke":</pre>
+		<p> dagegen gibt den Text wieder normal aus.</p>
+
+		<pre>PRINTPEEK(10) oder PEEK (147):</pre>
+		<p> Ist dieser Wert = 0, so wurde als letzter Device-Befehl ein LOAD eingegeben, wenn der Wert = 1 ist, wurde VERIFY eingegeben.</p>
+
+		<h3>Zerstörungsbefehle</h3>
+
+		<p>Code-Wörter sind – gegen Unbefugte – sehr nützlich. Allerdings muß auch bei Falsch-Eingabe die geeignete Reaktion vom Computer aus folgen.</p>
+
+		<p>Hier ein Beispiel:</p>
+
+		<pre>
+10 INPUT "Code-Wort" ??"; A$
+20 IF A$="Volker Muecke"THENPRINT"Programm zugänglich !":END
+30 POKE 776,1
+</pre>
+
+		<p>Erklärung: In Zeile 10 wird der Anwender gebeten, das Code-Wort einzugeben. Ist die Überprüfung richtig, so kann er mit dem Programm arbeiten. Stimmt die Eingabe nicht mit dem Code-Wort überein, so wird das Programm in Zeile 30 zerstört.</p>
+
+		<p>Nun könnte man natürlich das Programm einfach auflisten und nachsehen, welches das richtige Code-Wort ist. Das heißt, man müßte versuchen, das Code-Wort und den Zerstörungsbefehl »unsichtbar« zu machen, so daß er beim Auflisten nicht mehr zu sehen ist. Dazu hilft folgendes Zusatzprogramm, welches in das bestehende Programm eingefügt wird:</p>
+
+		<pre>
+60000 H=44:L=43:X=PEEK(H)*256+PEEK(L):INPUT"Zeilennummer:";Z
+60020 Y=PEEK(X+1)*256+PEEK(X)
+60030 IF PEEK (X+3)*256+PEEK(X+2)=Z THEN POKE X+4,0:PRINT "OK-OK":END
+60040 IF PEEK (X+1)*256+PEEK(X)= 0 THEN PRINT"Zeile nicht gefunden !":END
+60050 X=Y: GOTO 60020
+</pre>
+
+		<p>Bevor man dieses Unterprogramm nun starten kann, muß man folgendes machen: Man setzt nach der Zeilennummer der Zeile, die verschwinden soll, fünf '+'-Zeichen.</p>
+
+		<p>In unserem Fall wäre das:</p>
+		<pre>20 +++++IF A$="Volker Muecke"</pre>
+		<p>....und so weiter und</p>
+		<pre>30 +++++POKE 776,1</pre>
+
+		<p>So, nun startet man das Unterprogramm mit RUN 60000. Dieses Programm macht alles nach den gewünschten Zeilennummer unsichtbar, so daß da steht:</p>
+		<pre>
+20
+30
+</pre>
+		<p>obwohl das Programm noch korrekt läuft.</p>
+
+		<p>Hier noch einige Zerstörungsbefehle und ihre Auswirkungen:</p>
+
+		<pre>POKE 776,1:</pre>
+		<p>Dieser Befehl bewirkt, daß das ganze Programm mit undefinierbaren Zeichen vollgeschrieben wird.</p>
+
+		<pre>POKE 777,1:</pre>
+		<p>Hier wird kein Befehl mehr ausgeführt. Der Cursor springt jeweils in die Ecke links oben.</p>
+
+		<pre>POKE 770,0:</pre>
+		<p>Das ist auch ein sehr schöner Zerstörungsbefehl. Er bewirkt, daß eine READY-Ausgabe unendlich oft erfolgt. Will man nun das Programm laufen lassen, besteht keine weitere Möglichkeit mehr, als den Computer auszuschalten.</p>
+
+		<p>Hat man aber nach einiger Zeit sein eigenes Code-Wort vergessen, so besteht auch noch eine Möglichkeit, dieses Code-Wort zu finden, indem man die unsichtbaren Zeilen eben wieder sichtbar machen muß. Dies geschieht mit folgender Routine, die an das eigentliche Programm angehängt wird:</p>
+
+		<pre>
+60000 AN=PEEK(43)+PEEK(44)*256
+60010 P=PEEK(AN)+256*PEEK(AN+1)
+60020 IF P=0 THEN PRINT "Fertig!":END
+60030 IF PEEK (P+4) THEN 60050
+60040 POKE P+4,32:POKE P+5,32:POKE P+6,32: POKE P+7,32:POKE P+8,32
+60050 P=PEEK(P)+256*PEEK(P+1): GOTO 60020
+</pre>
+
+		<p>Selbstverständlich soll man nach jeder »Operation« den Codierer beziehungsweise Decodierer aus dem Hauptprogramm nehmen, damit niemand dies dazu ausnutzen könnte, das Programm zu »knacken«. Viel Spaß beim Decodieren!</p>
+
+		<p>In der nächsten Ausgabe gibt es weitere PEEK und POKES.</p>
+
+		<aside class="fehlerteufelchen">
+			<h2>Fehlerteufelchen</h2>
+			<p>Die Joystickabfrage ist für einen korrekten Lauf durch folgende Zeile zu ergänzen: 80 GOTO 20</p>
+			<p class="author">(Herget Ursula)</p>
+			<!-- 64'er 5/1984 -->
+		</aside>
+
+	</article>
+
+</body>
+
+</html>

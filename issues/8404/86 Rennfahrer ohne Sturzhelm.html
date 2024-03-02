@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+	<title>Rennfahrer ohne Sturzhelm</title>
+	<meta charset="UTF-8">
+	<link rel="stylesheet" href="../style.css">
+	<meta name="author" content="Andreas Lerch">
+	<meta name="64er.issue" content="4/84">
+	<meta name="64er.pages" content="86-87">
+	<meta name="64er.head1" content="Rennfahrer">
+	<meta name="64er.head2" content="VC 20 Grundversion">
+	<meta name="64er.toc_title" content="Rennfahrer ohne Sturzhelm">
+	<meta name="64er.toc_category" content="Programme zum Abtippen|Spiele">
+	<meta name="64er.index_title" content="Rennfahrer ohne Sturzhelm">
+	<meta name="64er.index_category" content="Programme zum Abtippen|Spiel|Simulation">
+	<meta name="64er.id" content="auto">
+</head>
+
+<body>
+	<article>
+		<h1>Rennfahrer ohne Sturzhelm</h1>
+
+		<p class="intro">Wie auf dem Hockenheimring fühlt man sich bei dem Spielprogramm »Auto« für die Grundversion des VC 20. Es dokumentiert wieder einmal, daß man auch reine Basicprogramme sehr schnell machen kann.</p>
+
+		<figure>
+			<img src="86-1.png" alt="">
+			<figcaption>Ab geht die Post. Bei der Spielstärke 1 muß man sehr viel Fingerfertigkeit besitzen, um über die Runden zu kommen</figcaption>
+		</figure>
+
+		<p>Das ausgesprochene Spielprogramm »Auto« läuft nur auf der Grundversion des VC 20. Außer seiner guten Grafik (mit selbstdefiniertem Zeichensatz) und realistischem Sound ist das Spiel sehr schnell, obwohl es vollständig in Basic geschrieben ist. Dies liegt daran, daß der Hauptprogrammteil sehr knapp bemessen ist (Tastaturabfrage, (Errechnung der nächsten Bildschirmposition, Ton).</p>
+
+		<p>Am Anfang des Spieles kann man eine Spielstärke von 1 bis 9 eingeben, wobei »1« sehr schnell und »9« sehr langsam ist.</p>
+
+		<p>Ziel des Spieles ist es, auf der Rennstrecke möglichst lange zu fahren. Dazu hat man am Anfang fünf Wagen zur Verfügung.</p>
+
+		<p>Man verliert einen Wagen, wenn man an die Abgrenzung der Strecke kommt oder über fünf Runden nicht zur Tankstelle gefahren ist.</p>
+
+		<h2>Im Eifer des Gefechts das Tanken nicht vergessen</h2>
+
+		<p>Als kleine Hilfe wird man jede fünfte Runde akustisch in Kenntnis gesetzt, daß man tanken muß. Zur Tankstelle kommt man, wenn man in die erste Einbiegung auf der linken Seite fährt (siehe Bild).</p>
+
+		<h2>Zwei Tasten sind genug</h2>
+
+		<p>Gesteuert wird der Wagen über 'R' wie rechts und 'L' wie links.</p>
+
+		<p>In der Mitte des Bildschirms sieht man, wieviele Wagen man noch hat und wieviele Runden man gefahren ist.</p>
+
+		<p>Am Ende des Spiels wird der eigene Score und der Highscore angezeigt, welcher im Kassettenpuffer abgelegt wird. Es erfolgt die Frage nach einem weiteren Spiel, die mit »J« (Ja) oder »N« (Nein) zu beantworten ist.</p>
+
+		<p>Viel Spaß beim Spielen wünscht</p>
+
+		<address class="author">(Andreas Lerch)</address>
+
+		<figure>
+			<table>
+				<tbody>
+					<tr>
+						<td>G,I,T</td>
+						<td>Zählvariablen für Sound- und Grafikbefehle</td>
+					</tr>
+					<tr>
+						<td>A$</td>
+						<td>Variable für Tastaturabfrage</td>
+					</tr>
+					<tr>
+						<td>Y,N</td>
+						<td>Variablen für Erzeugung der verschiedenen Spielstärken</td>
+					</tr>
+					<tr>
+						<td>PL%,H%,Y</td>
+						<td>Variablen für Erzeugung des neuen Zeichensatzes</td>
+					</tr>
+					<tr>
+						<td>W</td>
+						<td>Variablen für Anzahl der Wagen</td>
+					</tr>
+					<tr>
+						<td>R</td>
+						<td>Variable für Anzahl der Runden</td>
+					</tr>
+					<tr>
+						<td>S</td>
+						<td>Variable für Bildschirmposition des Wagens</td>
+					</tr>
+					<tr>
+						<td>M(1),M(2),M(3),M(4)</td>
+						<td>Variablen für die Anzahl der Bildschirmposition, die der Richtung entspricht</td>
+					</tr>
+					<tr>
+						<td>D</td>
+						<td>Variable zur Unterscheidung, ob es der erste oder ein anderer Spieldurchlauf ist</td>
+					</tr>
+					<tr>
+						<td>E</td>
+						<td>Laufvariable für M(1) bis M(4)</td>
+					</tr>
+					<tr>
+						<td>Z</td>
+						<td>Variable für Benzininhalt</td>
+					</tr>
+					<tr>
+						<td>A</td>
+						<td>Datavariable</td>
+					</tr>
+				</tbody>
+			</table>
+			<figcaption>Variablendefinition zu »Auto«</figcaption>
+		</figure>
+
+		<figure>
+			<pre>
+1 REM BY ANDREAS LERCH
+10 POKE52,28:POKE56,28:CLR
+20 PRINT"{CLR}{RVON}{DOWN}{DOWN}"CHR$(8);:POKE36879,25
+30 FORI=1TO21
+40 POKE646,RND(1)*6+2:PRINT" ";
+50 NEXT
+60 PRINT"{BLK}{DOWN}{DOWN}{RGHT}{RGHT}{RGHT}{RGHT}{RGHT}{RGHT}{RGHT}{RGHT}{RVON}        "
+70 PRINT"{RGHT}{RGHT}{RGHT}{RGHT}{RGHT}{RGHT}{RGHT}{RVON}  VC-20 "
+80 PRINT"{RGHT}{RGHT}{RGHT}{RGHT}{RGHT}{RGHT}{RGHT}{RVON}        "
+90 PRINT"{RGHT}{RGHT}{RGHT}{RGHT}{RGHT}{RGHT}{RGHT}{RVON}  AUTO  "
+100 PRINT"{RGHT}{RGHT}{RGHT}{RGHT}{RGHT}{RGHT}{RGHT}{RVON}        "
+110 PRINT"{RVON}{DOWN}{DOWN}"CHR$(8);:POKE3679,25
+120 FORI=1TO21
+130 POKE646,RND(1)*6+2:PRINT" ";
+140 NEXT
+150 POKE36878,13:FORT=255TO128STEP-1:POKE36875,T:NEXTT:POKE36875,0
+160 PRINT"{BLK}{DOWN}{DOWN}{RGHT}{RGHT}{RGHT}{RGHT}{RGHT}SPIELSTAERKE?"
+170 PRINT"{DOWN}{RGHT}{RGHT}{RGHT}{RGHT}{RGHT}{RGHT}{RGHT}{RGHT}(1-9)"
+180 GETA$:IFA$=""THEN180
+190 N=(VAL(A$)-1)*10
+200 POKE36879,25:PRINT"{CLR}{BLK}{DOWN}{DOWN}{DOWN}{DOWN}{DOWN}{DOWN}{DOWN}{DOWN}{DOWN}{DOWN}{DOWN}{RGHT}****BITTE WARTEN****"
+210 PL%=7168:H%=7176
+220 RESTORE
+230 FORI=0TO511:POKEPL%+I,PEEK(32768+I):NEXT
+240 FORY=1TO5
+250 FORI=0TO7:READA:POKEH%+I,A:NEXTI
+260 H%=H%+8:NEXTY
+270 DATA0,204,204,254,205,254,204,204
+280 DATA8,20,127,127,20,20,127,127
+290 DATA51,51,127,179,127,51,51,0
+300 DATA254,254,40,40,254,254,40,16
+310 DATA63,33,127,191,140,156,172,76
+320 POKE36869,255
+330 E=1:W=5:Z=6
+340 S=8112
+350 POKE36879,25
+360 PRINT"{CLR}{RVON}U{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}I         ";
+370 PRINT"{RVON}{SHIFT--}           {SHIFT--}"
+380 PRINT"{RVON}{SHIFT--}           {SHIFT--}"
+390 PRINT"{RVON}{SHIFT--}  U{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}I  J{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}I";
+400 PRINT"{SHIFT--}  {SHIFT--}     {SHIFT--}           {SHIFT--}";
+410 PRINT"{SHIFT--}  {SHIFT--}     {SHIFT--}           {SHIFT--}";
+420 PRINT"{SHIFT--}  {SHIFT--}     J{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}I  {SHIFT--}";
+430 PRINT"{SHIFT--}  {SHIFT--}              {SHIFT--}  {SHIFT--}";
+440 PRINT"{SHIFT--}  {SHIFT--}              {SHIFT--}  {SHIFT--}";
+450 PRINT"{SHIFT--}  J{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{CBM-R}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}I{SHIFT--}  {SHIFT--}";
+460 PRINT"{SHIFT--}         {SHIFT--}      {SHIFT--}{SHIFT--}  {SHIFT--}";
+470 PRINT"{SHIFT--}         {SHIFT--}      {SHIFT--}{SHIFT--}  {SHIFT--}";
+480 PRINT"{SHIFT--}  U{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{CBM-E}{SHIFT-*}{SHIFT-*}{SHIFT-*}I  {SHIFT--}{SHIFT--}  {SHIFT--}";
+490 PRINT"{SHIFT--}  {SHIFT--}          {SHIFT--}  {SHIFT--}{SHIFT--}  {SHIFT--}";
+500 PRINT"{SHIFT--}  {SHIFT--}    U{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}K  {SHIFT--}{SHIFT--}  {SHIFT--}";
+510 PRINT"{SHIFT--}  J{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}K{$A0}       {SHIFT--}{SHIFT--}  {SHIFT--}";
+520 PRINT"{SHIFT--}                {SHIFT--}{SHIFT--}  {SHIFT--}";
+530 PRINT"{SHIFT--}         U{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}K{SHIFT--}  {SHIFT--}";
+540 PRINT"J{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}I  J{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}K  {SHIFT--}";
+550 PRINT"       {SHIFT--}     I       {SHIFT--}";
+560 PRINT"       {SHIFT--}     I       {SHIFT--}";
+570 PRINT"       J{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}K";
+580 POKE7856+7,5:POKE7856+9,5:POKE7856+11,5
+590 E=1
+600 S=8112
+610 REM
+620 PRINT"{HOME}{DOWN}"
+630 PRINT"{DOWN}{DOWN}{DOWN}{DOWN}{DOWN}{RGHT}{RGHT}{RGHT}{RGHT}{RVON}WAGEN :"W
+640 PRINT"{DOWN}{DOWN}{RGHT}{RGHT}{RGHT}{RGHT}{RVON}RUNDEN:"R
+650 IFD=1THENRETURN
+660 POKES,E
+670 M(1)=1:M(2)=-22:M(3)=-1:M(4)=22
+680 M(E)=1
+690 GETA$
+700 FORY=1TON:NEXTY
+710 IFA$="L"THENGOSUB790
+720 IFA$="R"THENGOSUB810
+730 IFPEEK(S+M(E))=160THENGOTO750
+740 GOTO830
+750 S=S+M(E)
+760 POKES,E:POKES-M(E),160
+770 POKE36878,10:POKE36876,200:POKE36876,0
+780 GOTO690
+790 E=E+1:IFE=5THENE=1
+800 RETURN
+810 E=E-1:IFE=0THENE=4
+820 RETURN
+830 IFPEEK(S+M(E))&lt;&gt;137THEN870
+840 POKE36878,14:FORI=1TO2:POKE36876,235:FORT=1TO9:NEXT:POKE36876,231:FORT=1TO9:NEXTT,I
+850 R=R+1:POKE36878,0:POKE36876,0:GOSUB1130:Z=Z-1:IFZ=0THENGOTO940
+860 GOTO930
+870 IFS+M(E)=7910ORS+M(E)=7932THENGOTO1230
+880 GOSUB910
+890 POKE36878,13:FORT=150TO220
+900 POKE36877,T:FORG=1TO5:NEXTG,T:POKE36877,0:POKE36878,0:GOTO920
+910 POKES,32+128:           POKES+M(E),73:RETURN
+920 W=W-1:IFW=0THENGOTO940
+930 D=0:POKE198,0:GOTO350
+940 PRINT"{CLR}":POKE36878,14:FORT=128TO255:POKE36876,T:NEXT:POKE36876,0:
+950 POKE36869,240
+960 IFPEEK(828)&lt;RTHENPOKE828,R
+970 POKE36879,8
+980 PRINT"{RVON}{DOWN}{DOWN}"CHR$(8);:POKE3679,8
+990 FORI=1TO21
+1000 POKE646,RND(1)*6+2:PRINT" ";
+1010 NEXT
+1020 PRINT"{RVOF}{DOWN}{RGHT}{RGHT}{WHT}DEIN SCORE:"R
+1030 PRINT"{DOWN}{DOWN}{RGHT}HIGHSCORE:";PEEK(828)
+1040 PRINT"{RVON}{DOWN}{DOWN}"CHR$(8);:POKE3679,8
+1050 FORI=1TO21
+1060 POKE646,RND(1)*6+2:PRINT" ";
+1070 NEXT
+1080 PRINT"{DOWN}{DOWN}{RGHT}{RGHT}{RGHT}{RGHT}{WHT}NOCH EIN SPIEL?"
+1090 PRINT"{DOWN}{RGHT}{RGHT}{RGHT}{RGHT}{RGHT}{RGHT}{RGHT}{RGHT}{RGHT}(J/N)"
+1100 GETA$:IFA$="J"THEND=0:R=0:PRINT"{CLR}":SC=0:GOTO200
+1110 IFA$="N"THENEND
+1120 GOTO1100
+1130 IFR/5&lt;&gt;INT(R/5)THENRETURN
+1140 POKE36878,13
+1150 FORI=1TO4
+1160 F=195:GOSUB1180:F=207:GOSUB1180:F=251:GOSUB1180:F=225:GOTO1200
+1180 POKE36876,F:GOSUB1220:RETURN
+1200 NEXTI
+1210 POKE36876,0:POKE36878,0:RETURN
+1220 FORY=1TO20:NEXTY:RETURN
+1230 Z=6:FORT=1TO4500:NEXT:POKES,96+128:S=S+2:POKES,E:POKES-1,221:GOTO690
+			</pre>
+			<figcaption>Listings des Basicprogramms »Auto«</figcaption>
+		</figure>
+
+	</article>
+
+	<aside class="downloads">
+		<a href="prg/auto.prg">Auto</a>
+	</aside>
+
+</body>
+
+</html>

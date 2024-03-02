@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+	<title>Erste Hilfe</title>
+	<meta charset="UTF-8">
+	<link rel="stylesheet" href="../style.css">
+	<meta name="author" content="Helmut Welke">
+	<meta name="64er.issue" content="4/84">
+	<meta name="64er.pages" content="88-91">
+	<meta name="64er.toc_title" content="Erste Hilfe: gelöschte Programme retten">
+	<meta name="64er.toc_category" content="Programme zum Abtippen|Tips &amp; Tricks">
+	<meta name="64er.index_title" content="Erste Hilfe (VC 20)">
+	<meta name="64er.index_category" content="Programme zum Abtippen|Tips &amp; Tricks|Rotten">
+	<meta name="64er.id" content="erste_hilfe">
+</head>
+
+<body>
+	<article>
+		<h1>Erste Hilfe</h1>
+
+		<p class="intro">Wem wäre das noch nicht passiert: NEW. Nur drei Buchstaben, aber die Arbeit von Stunden oder gar Tagen ist verloren, wenn das Programm noch nicht gespeichert war. Da hilft dann nur noch eines: das VC 20-Programm »Erste Hilfe«. Laden, starten – und schon ist das gelöschte Programm wieder da. Wie neu!</p>
+
+		<figure>
+			<img src="88-1.png" alt="">
+			<figcaption>Flußdiagramm von »Erste Hilfe»</figcaption>
+		</figure>
+
+		<p>Das grenzt nicht etwa an Zauberei, sondern ist möglich, weil ein Basic-Programm im Speicher des VC 20 mit dem Befehl NEW gar nicht gelöscht wird. Obwohl es nicht den Anschein hat, es ist weiterhin vorhanden. NEW setzt lediglich alle Zeiger zurück und schreibt in die beiden ersten Adressen je eine Null. Will man dem Speicher das nun im Verborgenen liegende Programm wieder entlocken, müssen diese Parameter rekonstruiert werden.</p>
+
+		<p>Da wären zunächst die beiden Nullen am Beginn. Sie besagen nichts anderes, als daß sich hier das Programmende befindet. Bei noch vorhandenem Programm enthalten diese Zellen die Koppeladresse zur zweiten Zeile, das heißt, die Speicheradresse, an der diese beginnt. Um sie zu finden, muß in der ersten Programmzeile nach der Null gesucht werden, die das Zeilenende markiert. Plus 1 und die Koppeladresse, zerlegt in Low- und Highbyte, kann wieder am angestammten Platz abgelegt werden. Der zweite Schritt besteht darin, das Programmende wiederzufinden. Mit Hilfe jener Koppeladressen am Beginn jeder Zeile ist auch das relativ einfach. Die erste verrät, wo die zweite steht, diese zeigt auf die dritte und so weiter. Das Programmende ist erreicht, wenn das Highbyte der Koppeladresse eine Null ist. Eine Speicherstelle weiter beginnt dann der Sektor, in dem die Variablen abgelegt werden. Diese Adresse wird dem Computer in den Speicherstellen 45 und 46 mitgeteilt. Der Befehl CLR paßt dann alle übrigen Parameter diesem Wert an. Damit ist das gelöschte Programm wieder da und kann gelistet, bearbeitet, gestartet oder abgespeichert werden.</p>
+
+		<p>Da eine solche Rekonstruktion von Hand ein recht mühsames Unterfangen ist, nimmt »Erste Hilfe« dem Anwender diese Arbeit ab. Nicht allein aus Gründen der Geschwindigkeit handelt es sich dabei um ein Maschinenprogramm. Vor allem muß es so in den Speicher gebracht werden, daß es das zu rettende Programm nicht überschreibt und dadurch vollends zerstört. Es ist daher in einem Bereich angesiedelt, in dem sich kein Basic-Programm befinden kann, der aber auch — unabhängig von der gerade verwendeten Speichererweiterung — in jedem Rechner vorhanden ist: die vom System nicht benutzten Adressen von 678 bis 767 auf der Speicherseite 1.</p>
+
+		<p>»Erste Hilfe« wirkt immer, selbst bei manipulierter Basic-Untergrenze. Aus den Adressen 43 und 44 ($2B/2C) erfährt das Programm, wo das reparaturbedürftige Obekt beginnt. Das Verfahren nutzt eine Spezialität des 6502-Prozessors: die indirekt-nachindizierte Adressierung. Dabei werden zwei Adressen auf der Zero-Page sozusagen als ein »Briefkasten« benutzt, in dem ein Zeiger auf eine Speicherstelle deponiert wird, deren Inhalt auf diesem (Um-)Weg geladen werden kann. Das geht sehr schnell: Sekundenbruchteile nach dem Start listet sich das wiedererstandene Programm selbst auf dem Bildschirm auf.</p>
+
+		<p>Das Programm prüft nicht, ob tatsächlich eine Löschung erfolgt ist. Man kann seine Funktionsfähigkeit also auch an einem intakten Basic-File erproben. Er wird zwar wie ein gelöschter behandelt, aber nicht verändert, da alle Werte so rekonstruiert werden, wie sie im Normalfall auch vorhanden sind. Sollte das aufgelistete Ergebnis Abweichungen vom Urzustand aufweisen, dann sind diese auf irreparable Zerstörungen zurückzuführen. Nach dem versehentlichen Löschen sollten keine Manipulationen mehr vorgenommen werden. Ein LIST-Versuch schadet nicht, aber jede von nun an verwendete Variable überschreibt den ungeschützt im Speicher liegenden File. »Erste Hilfe« kann natürlich nicht erkennen, wenn solche Veränderungen bereits eingetreten sind. Ein Aussprung unter Anzeige eines »Syntax Errors« erfolgt nur, wenn in der ersten Programmzeile nach der maximal zulässigen Zahl von 88 Bytes noch keine End-Null vorgefunden, wurde. So kann es vorkommen, daß sich der Computer in einem weitgehend zerstörten File verirrt und festläuft. Der Verlust durch das notwendige Abschalten ist dann kein allzu großer, denn ein solches Programm wäre ohnehin nicht mehr zu retten gewesen.</p>
+
+		<p>Störungen des Programms »Erste Hilfe« sind bisher nur vom Commodore-Modul »Super-Erweiterung« (VC1211A) bekannt. Vor dem Laden des Maschinenprogramms muß dieses Modul durch den im Direktmodus eingegebenen Befehl SYS 64818 abgeschaltet werden, wobei zu beachten ist, daß dadurch ein eventuell heraufgesetzter Basic-Start normalisiert wird und gegebenenfalls wieder angepaßt werden muß, bevor »Erste Hilfe« zur Anwendung kommt.</p>
+
+		<p>Assembler-Programmierer können das Maschinen Programm nach dem dokumentierten Listing 1 eingeben und vom Monitor aus abspeichern. Für Basic-Programmierer stehen zwei verschiedene Versionen zur Auswahl. Das als »Kassettenversion« bezeichnete Listing 2 kann auch für die Diskette benutzt werden, wenn die Zeile 110 abgeändert wird in POKE 186,8. Hier wird die Gerätenummer hinterlegt. Die Adressen 187 und 188 enthalten die Adresse des Namens, unter dem das Programm abgespeichert werden soll. Dieser Name ist in der REM-Zeile mit der Nummer 0 abgelegt. Sie ist deshalb unbedingt erforderlich, weil gezielt danach gesucht wird. Die Speicherstelle 183 weist die Länge des Filenamens aus, 185 die Sekundäradresse 1, die dafür sorgt, daß das Programm nicht wie gewöhnlich an den Basic-Start, sondern nach Adresse 678 geladen wird. Von dort aus wird auch abgespeichert: 193/194 enthalten die Startadresse, 174/175 die Endadresse plus 1.</p>
+
+		<p>Bei Verwendung einer Diskette kann man sich die vielen POKEs jedoch sparen und die Bytes in Form von ASCII-Codes direkt auf die Floppy schreiben (siehe Listing 3). Dieses Verfahren ist ausschließlich für die Diskette geeignet. Der DATA-Block (Listing 4) ist in beiden Fällen derselbe. Gespeichert werden sollte der File unter dem angegebenen Namen, der die Startadresse enthält, die dadurch nicht in Vergessenheit geraten kann. Für das Laden von Diskette ist LOAD "H*",8,1 einzugeben. Vorteilhafter ist hier das Laden von der Kassette, weil ein einfaches LOAD ohne weitere Angaben genügt. Die Sekundäradresse ist nicht erforderlich, da das Betriebssystem des VC 20 im Bandheader das absolut zu ladende Maschinenprogramm erkennt. Mit SYS 6789 wird dann umgehend »Erste Hilfe« geleistet.</p>
+
+		<address class="author">(Helmut Welke)</address>
+
+		<figure>
+			<pre>
+02A6  A5 2B     LDA $2B      ;Basic-Programmstart Lowbyte
+0208  18        CLC
+02A9  69 04     ADC #$04
+020B  85 FD     STA $FD      ;Zeiger auf Start + 4 setzen
+020D  A5 2C     LDA $2C      ;Highbyte
+020F  69 00     ADC #$00     ;Carry addieren
+02B1  85 FE     STA $FE
+02B3  A0 00     LDY #$00     ;Zaehler initialisieren
+02B5  B1 FD     LDA ($FD),Y  ;Byte holen
+02B7  F0 08     BEQ $02C1    ;Null = Zeilenende?
+02B9  C8        INY
+02BA  C0 58     CPY #$58     ;88 Bytes geprueft?
+02BC  D0 F7     BNE $02B5
+02BE  4C 08 CF  JMP $CF08    ;Aussprung mit 'SYNTAX ERROR' (SYS 53000)
+02C1  C8        INY
+02C2  98        TYA
+02C3  A0 00     LDY #$00
+02C5  18        CLC
+02C6  65 FD     ADC $FD      ;Zaehler + 1 zur Starta.dresse
+02C8  91 2B     STA ($2B),Y  ;neue Koppeladresse setzen
+02CA  85 FD     STA $FD      ;Zeiger auf 2. Programmzeile
+02CC  90 02     BCC $02D0    ;Carry?
+02CE  E6 FE     INC $FE      ;Highbyte korrigieren
+02D0  A5 FE     LDA $FE
+02D2  C8        INY
+02D3  91 2B     STA ($2B),Y  ;Koppeladresse high
+02D5  88        DEY          ;Zaehler auf Null
+02D6  B1 FD     LDA ($FD),Y  ;Koppeladresse zur naechsten Zeile holen
+02D8  AA        TAX          ;und retten
+02D9  C8        INY
+02DA  B1 FD     LDA ($FD),Y  ;Adresse high holen
+02DC  F0 07     BEQ $02E5    ;Null = Programmende?
+02DE  85 FE     STA $FE      ;Zeiger auf naechste Zeile setzen
+02E0  86 FD     STX $FD
+02E2  4C D5 02  JMP $02D5    ; und weitermachen
+02E5  A5 FD     LDA $FD
+02E7  18        CLC
+02E8  69 02     ADC #$02
+02EA  85 2D     STA $2D      ;Endadresse + 1 = Variablenbeginn
+02EC  A5 FE     LDA $FE      ;Highbyte holen
+02EE  20 55 C6  JSR $C655    ;Teil des NEW-Befehls (SVS 50754):
+                             ;Carry addieren
+                             ;Highbyte Variablenspeicher setzen
+                             ;CHRGET-Routine auf Programmbeginn setzen
+                             ;und Variablen loeschen (CLR: SVS 50782)
+02F1  4C 9C C6  JMP $C69C    ;Aussprung mit LIST (SYS 50844)
+			</pre>
+			<figcaption>Listing 1. Assemblerprogramm »Erste Hilfe»</figcaption>
+		</figure>
+
+		<figure>
+			<pre>
+0 REM HELP SYS 678
+10 PRINTCHR$(147)CHR$(31)
+20 FORA=678TO755:READB
+30 POKEA,B:X=X+B:NEXT
+40 IFX&gt;&lt;10962THENF$="IN DATAS!":GOTO90
+50 A=PEEK(43)+256*PEEK(44)+4
+60 IFPEEK(A)&gt;&lt;143GOTO80
+70 A=A+2:IFPEEK(A)=72GOTO100
+80 F$="IM KOPF!"
+90 PRINT"FEHLER "F$:END
+100 PRINT"ALLES OK!":PRINT
+110 POKE186,1:REM*** KASSETTE ***
+120 POKE187,AAND255:POKE188,A/256
+130 POKE193,166:POKE194,2
+140 POKE174,244:POKE175,2
+150 POKE183,12:POKE185,1
+500 POKE157,128:SYS63106
+			</pre>
+			<figcaption>Listing 2. Basic-Lader für die Kassettenversion</figcaption>
+		</figure>
+		<figure>
+			<pre>
+10 PRINTCHR$(147)CHR$(31)
+20 FORA=678TO755:READB
+30 POKEA,B:X=X+B
+40 NEXT:IFX=10962GOTO90
+50 PRINT"FEHLER IN DATAS!"
+60 END
+90 PRINT"ALLES OK!"
+100 OPEN1,8,1,"HELP SYS 678"
+110 PRINT#1,CHR$(166)CHR$(2);
+200 FORA=678TO755:B=PEEK(A)
+210 PRINT#1,CHR$(B);
+250 NEXT:CLOSE1
+			</pre>
+			<figcaption>Listing 3. Basic-Lader für die Diskettenversion</figcaption>
+		</figure>
+		<figure>
+			<pre>
+1000 DATA165,43,24,105,4
+1001 DATA133,253,165,44,105
+1002 DATA0,133,254,160,0
+1003 DATA177,253,240,8,200
+1004 DATA192,88,208,247,76
+1005 DATA8,207,200,152,160
+1006 DATA0,24,101,253,145
+1007 DATA43,133,253,144,2
+1008 DATA230,254,165,254,200
+1009 DATA145,43,136,177,253
+1010 DATA170,200,177,253,240
+1011 DATA7,133,254,134,253
+1012 DATA76,213,2,165,253
+1013 DATA24,105,2,133,45
+1014 DATA165,254,32,85,198
+1015 DATA76,156,198
+			</pre>
+			<figcaption>Listing 4. Die gemeinsamen DATA-Werte für die beiden Lader</figcaption>
+		</figure>
+
+	</article>
+
+	<aside class="downloads">
+		<a href="prg/erste hilfe cass.prg">Erste Hilfe (Kassettenversion)</a>
+		<a href="prg/erste hilfe disk.prg">Erste Hilfe (Diskettenversion)</a>
+	</aside>
+
+</body>
+
+<!--
+* Die Korrektheit von Listing 1 in dieser Version wurde verifiziert,
+  indem es in einen Maschinensprache-Monitor eingetippt und die
+	Hex-Codes verglichen wurden.
+* In 84XX/8404.D64 auf der 64'er CD-ROM befinden sich die Dateien
+  "ERSTE HILFE DISK" und "ERSTE HILFE CASS", welche auch hier zum
+	Download angeboten werden. Listings 2 bis 4 sind Ausschnitte aus
+	diesen Dateien.
+-->
+
+</html>

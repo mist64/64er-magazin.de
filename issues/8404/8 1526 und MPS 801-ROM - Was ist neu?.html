@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+	<title>1526 und MPS 801-ROM: Was ist neu?</title>
+	<meta charset="UTF-8">
+	<link rel="stylesheet" href="../style.css">
+	<meta name="author" content="aa">
+	<meta name="64er.issue" content="4/84">
+	<meta name="64er.pages" content="8-9">
+	<meta name="64er.toc_title" content="1526 und MPS 801-ROM: Was ist neu?">
+	<meta name="64er.toc_category" content="Aktuell">
+	<meta name="64er.id" content="1526_801_rom">
+</head>
+
+<body>
+	<article>
+		<img src="8-2.png" alt="Aktuell" title="Aktuell" class="headline">
+
+		<h1>1526 und MPS 801-ROM: Was ist neu?</h1>
+
+		<p class="intro">Wie mittlerweile hinlänglich bekannt, wurden die ersten Versionen der Commodore-Drucker VC 1526 und MPS 801 mit etwas anderen Betriebssystemen als die neueren Modelle geliefert. Was hat sich nun geändert, und inwieweit sind Programme, die für die älteren Systeme erstellt wurden, zu modifizieren?</p>
+
+		<p>Im neuen Betriebssystem des Druckers VC 1526 sind zum einen die Fehler des alten behoben und zum anderen ist eine zweite Betriebsart (die des 1525) implementiert worden. Das mitgelieferte Handbuch bezieht sich auf die zweite Betriebsart des Druckers, die aber nur hardwaremäßig eingestellt werden kann Dies geschieht etwas umständlich, indem man PIN 16 von U4D auf Masse legt. In folgenden Punkten unterscheidet sich die standardmäßige Betriebsart (die beim Einschalten des Druckers vorliegt) von den Steuerbefehlen, die im Druckerhandbuch aufgeführt sind.</p>
+
+		<ul>
+			<li>
+				<p>Die Breitschrift wird mit CHR$(14) ein- und mit CHR$(15) ausgeschaltet.</p>
+			</li>
+			<li>
+				<p>Es ist ein neuer Steuerbefehl hinzugekommen. Mit CHR$(16) wird der Tabulator auf eine bestimmte Spalte gestellt.
+					<br>Beispiel:
+				</p>
+				<pre>
+100 OPEN4,4
+200 PRINT# 4,CHR$(16)"08"
+300 PRINT# 4, "64'er — Das Magazin für Computer-Fans"
+400 CLOSE4
+</pre>
+				<p>Durch die Zeile 200 wird der Druckstart auf die achte Spalte festgelegt.</p>
+			</li>
+
+			<li>
+				<p>Die Funkion der Sekundäradresse 7 als Schalter wurde aufgegeben. Stattdessen werden die Daten über die Sekundäradresse 7 ausgegeben.
+					<br>Beispiel:
+				</p>
+				<pre>
+100 OPEN 7,4,7
+200 PRINT# 7, "Das 64'er bietet alle Informationen für den Commodore-Anwender"
+300 CLOSE7
+</pre>
+			</li>
+			<li>
+				<p>Durch diese letzte Änderung entfällt die Sekundäradresse 8 vollständig. Will man nun im Grafikmodus (Großbuchstaben und Grafikzeichen) drucken, so müssen die Daten über die Sekundäradresse 0 ausgegeben werden.
+					<br>Beispiel:
+				</p>
+				<pre>
+100 OPEN4,4
+200 PRINT# 4, "commodore"
+300 CLOSE4
+</pre>
+			</li>
+		</ul>
+
+		<p>Commodore selbst weist noch einmal darauf hin, daß der Drucker VC 1526 nicht grafikfähig sei und daher ein Hardcopy-Befehl mit Simons Basic (High Resolution) nicht ausgeführt werden kann. In bezug auf die Grafikfähigkeit hat die 64'er-Redaktion anderslautende Aussagen von 1526-Anwendern gehört. Wir möchten unsere Leser aufrufen, sofern sie eine funktionierende Hardcopy-Routine entwickelt haben, diese mit einer ausreichenden Beschreibung an uns zu schicken. Die besten und schnellsten werden prämiert und veröffentlicht.</p>
+
+		<p>Was hat sich nun bei der Änderung im Betriebssystem des jüngsten Mitglieds der Commodore Druckerfamilie, dem MPS 801 (MPS steht übrigens für Matrix Printer System) ergeben?</p>
+
+		<ul>
+			<li>Nur die Sekundäradressen 0 und 7 haben ihre Bedeutung beibehalten, alle anderen Sekundäradressen sind entfallen.</li>
+			<li>CHR$(141) hat jetzt die Funktion »Sperrschrift ein« übernommen.</li>
+			<li>Der Character-Code für »Bit-Muster aus« und für »Sperrschrift aus« wurde durch CHR$(18) für »Standard-Zeichensatz ein« ersetzt.</li>
+			<li>CHR$(141) für »CR ohne Zeilenvorschub« entfiel vollständig.</li>
+		</ul>
+
+		<p>Durch diese Änderungen sind natürlich die Programmbeispiele in den Druckerhandbüchern nicht mehr up-to-date. Sollten Ihnen noch weitere Änderungen bekannt geworden sein, so lassen Sie es uns wissen.</p>
+
+		<address class="author">(aa)</address>
+
+	</article>
+
+</body>
+
+</html>
