@@ -17,7 +17,8 @@ def filter_rss_entries(input_file, output_file):
         # Parse the publication date of the current item
         pubDate = item.find('pubDate').text
         # Convert the pubDate string to a datetime object
-        pubDate_datetime = datetime.strptime(pubDate, '%a, %d %b %Y %H:%M:%S %z GMT')
+        pubDate_datetime = datetime.strptime(pubDate, '%a, %d %b %Y %H:%M:%S GMT')
+        pubDate_datetime = pubDate_datetime.replace(tzinfo=pytz.utc)
 
         # Remove the item if its publication date is in the future
         if pubDate_datetime > current_datetime:

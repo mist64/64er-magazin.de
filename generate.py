@@ -893,7 +893,7 @@ def generate_rss_feed(db, out_directory):
         pubdate = issue_data['pubdate']
         # Add index as half-days to the date
         pubdate += timedelta(hours=12 * article['index'])
-        pub_date = pubdate.strftime("%a, %d %b %Y %H:%M:%S %z") + " GMT"
+        pub_date = pubdate.strftime("%a, %d %b %Y %H:%M:%S %z")[:-5] + "GMT"
 
         rss_item_template = '''<item>
     <title>{title}</title>
