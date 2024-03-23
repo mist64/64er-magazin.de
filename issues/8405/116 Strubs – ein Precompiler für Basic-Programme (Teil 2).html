@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+	<title>Strubs – ein Precompiler für Basic-Programme (Teil 2)</title>
+	<meta charset="UTF-8">
+	<link rel="stylesheet" href="../style.css">
+	<meta name="author" content="Matthias Törk">
+	<meta name="64er.issue" content="5/84">
+	<meta name="64er.pages" content="116-121,126">
+	<meta name="64er.toc_title" content="Precompiler bauen – Strubs – ein Precompiler für Basic-Programme (Teil 2)">
+	<meta name="64er.toc_category" content="Kurse">
+	<meta name="64er.index_title" content="Strubs – ein Precompiler für Basic-Programme (Teil 2)">
+	<meta name="64er.index_category" content="Kurse|Precompiler">
+	<meta name="64er.id" content="strubs">
+</head>
+
+<body>
+	<article>
+		<h1>Strubs – ein Precompiler für Basic-Programme (Teil 2)</h1>
+
+		<p class="intro">In der letzten Ausgabe haben Sie den Unterschied zwischen einem Compiler und einem Interpreter erfahren und sich kurz über die Vorteile von Strubs informieren können. Hier nun werden die in Strubs implementierten Befehlsstrukturen erläutert und das Objektprogramm von Strubs selbst vorgestellt.</p>
+
+		<p>An anderer Stelle in dieser Zeitschrift (oder auch in den unten aufgeführten Büchern) können Sie sich ausführlich über die Grundlagen der strukturierten Programmierung informieren. Aus diesem Grund werden wir uns hier darauf beschränken, einige Aspekte kurz anzusprechen und im übrigen vorzustellen, was Strubs in dieser Hinsicht zu bieten hat.</p>
+
+		<p>Gehören Sie auch zu denjenigen, die sich manchmal ein Programm aus einer Zeitschrift vornehmen, um zu analysieren, wie es arbeitet oder um eventuell Teile des Programms für eigene Programmprojekte zu verwenden? Dann erinnern Sie sich bestimmt an Programme, bei denen Sie sich verzweifelt von Sprung zu Sprung bewegen und nach nicht allzu langer Zeit vollkommen den Überblick verlieren. Oder vielleicht kennen Sie folgende Situation: Sie schreiben ein Programm und erinnern sich angesichts eines bestimmten Problems, daß Sie ein ganz ähnliches Problem schon einmal in einem anderen Programm gelöst haben. Aber sobald Sie sich den alten Programmtext vornehmen, um den entsprechenden Programmteil in ihr neues Programm zu übernehmen, müssen Sie enttäuscht feststellen, daß diese spezielle Problemlösung so sehr in das Programmgeflecht verwoben ist, daß es Ihnen weitaus einfacher scheint, den entsprechenden Programmteil vollkommen neu zu entwickeln.</p>
+
+		<p>Die Ursache für solche Erscheinungen liegt zum Teil darin, daß viele Basic-Programme mehr oder weniger aus der Sicht des Computer der »Basic-Maschine« — direkt am Computer nach dem Verfahren von Versuch und Irrtum entwickelt werden. Das kann in Einzelfällen sogar soweit führen, daß man zum Schluß zwar sieht, daß das Programm läuft, aber selbst nicht so recht weiß, warum eigentlich und wie es funktioniert. Der Hauptgrund für solche Unübersichtlichkeit aber liegt in der Verwendung zahlreicher wilder Sprünge und ausgefallener Programmier-Tricks. (Daß die Verwendung von GOTO-Anweisungen den mathematischen Beweis für die Korrektheit von Programmen praktisch unmöglich macht, ist für den Informatiker interessant, braucht uns hier aber nicht zu interessieren).</p>
+
+		<p>Den entgegengesetzten Weg geht die strukturierte Programmierung. Sie bedeutet vor allem sorgfältige Planung und den Verzicht auf GOTOs und unübersichtliche Programmiertricks. Hier steht die systematische Analyse des Problems im Vordergrund. Die eigentliche Codierung, das heißt die Formulierung des Programmtextes in einer bestimmten Programmiersprache, spielt nur eine untergeordnete Rolle.</p>
+
+		<p>In der Problemanalyse geht es darum, ein gegebenes Problem in relativ selbständige Teilprobleme zu zerlegen und deren Beziehungen zueinander festzulegen. Den Aufbau des Programms Strubs mit den jeweiligen Zeilennummern können Sie Bild 1 entnehmen. Das komplette Objektprogramm ist ebenfalls abgedruckt (siehe Listing).</p>
+
+		<figure>
+			<!-- TODO -->
+			<figcaption>Bild 1. Aufbau von Strubs</figcaption>
+		</figure>
+
+		<p>Entsprechend setzt sich das strukturierte Programm aus einer Reihe möglichst selbständiger Programmeinheiten zusammen. Dieses Vorgehen spiegelt sich im Konzept der Blöcke und Module.</p>
+
+		<p>Em Block ist eine Anweisung oder eine Folge von Anweisungen mit genau einem Eingang und genau einem Ausgang. Das heißt man darf weder in einen solchen Block hineinspringen, noch aus diesem Block herausspringen. Solche Blöcke können entweder aneinander gereiht oder beliebig tief ineinander geschachtelt werden; sie dürfen sich aber nicht überschneiden. In letzterer Hinsicht verhält es sich mit diesen Blöcken also genauso, wie bei den bekannten FOR-Schleifen in Basic.</p>
+
+		<p>Ein strukturiertes Programm besteht nun ausschließlich aus einer geordneten Hierarchie solcher Blöcke. Der kleinste mögliche Block besteht aus einer einzelnen Anweisung, wie zum Beispiel PRINT "Text". Der größte, umfassendste Block besteht aus dem Programm selbst.</p>
+
+		<p>Da ist zunächst einmal die einfache IF-Anweisung, die schon von Basic her bekannt ist. Dieses normale Basic-IF kann natürlich wie alle Basic-Befehle weiterhin benutzt werden. Zusätzlich bietet Strubs aber eine erweiterte Form, bei welcher der THEN-Teil nicht auf den Rest einer Programmzeile begrenzt ist, sondern beliebig viele Zeilen umfassen kann, die durch den Befehl '!FI' — einfach ein umgedrehtes IF — abgeschlossen werden. Ein Beispiel:</p>
+
+		<pre>
+10 ! IF X=Y THEN
+20 :    PRINT "X und Y"
+30 :    PRINT SIND GLEICH"
+...
+99 !FI
+</pre>
+
+		<p>Ist die Bedingung hinter IF erfüllt, so werden die Zeilen zwischen der IF- und der FI-Anweisung ausgeführt, ansonsten wird das Programm sofort hinter der FI-Zeile fortgesetzt.</p>
+
+		<p>Daneben existiert selbstverständlich auch die vollständige Form</p>
+
+		<pre>
+10 !IF X=Y THEN
+20:     PRINT "GLEICH’
+50 !ELSE
+60 :    PRINT "UNGLEICH"
+99 !FI
+</pre>
+
+		<p>Ist die Bedingung erfüllt, dann wird der Block zwischen IF und ELSE ausgeführt, sonst der Block zwischen ELSE und FI.</p>
+
+		<p>Für den Fall, daß mehr als nur zwei Fälle zu unterscheiden sind, bietet Strubs die CASE-Anweisung:</p>
+
+		<pre>
+10 !CASEOF X&lt;0 THEN
+15 :    PRINT "KLEINER ALS 0”
+...
+40 ! OF X=0 THEN
+45 :    PRINT "GLEICH 0"
+...
+60 ! OF X&gt;0 AND Y&lt;XTHEN
+65 : PRINT "X&gt;0 UND Y&lt;X"
+...
+80 ! ELSE
+85 :    PRINT "KEINER DER FÄLLE TRIFFT ZU"
+99 ! ECASE
+</pre>
+
+		<p>Mit dieser Struktur können beliebig viele Fälle unterschieden werden, wobei jedes OF mit einerbeliebigen Bedingung verbunden werden kann. Es sollte aber darauf geachtet werden, daß sich die Bedingungen gegenseitig ausschließen (sonst wird das erste Auftreten einer erfüllten Bedingung gewählt). Nach der Bearbeitung des entsprechenden Falles wird das Programm immer hinter ECASE fortgesetzt. Die Möglichkeit, daß keiner der Fälle zutrifft, kann mit Hilfe der ELSE-Anweisung behandelt werden. Ist dies nicht erforderlich, kann der ELSE-Teil auch entfallen.</p>
+
+		<p>Damit kommen wir nun zu den Schleifen. Die FOR-Schleife kann wie bisher benutzt werden. Die WHILE-Schleife wird durchlaufen, solange die Bedingung erfüllt ist. Anschließend wird das Programm hinter EWHILE fortgesetzt. Da die Bedingung am Anfang der Schleife abgefragt wird, kann es vorkommen, daß die Schleife auch überhaupt nicht durchlaufen wird. Ein Beispiel:</p>
+
+		<pre>
+10 ! WHILE X&lt;5 !DO
+20 :  PRINT "IMMER NOCH KLEINER ALS 5"
+30 : X = X + 1
+...
+99 !EWHILE
+</pre>
+
+		<p>Von der WHILE-Schleife unterscheidet sich die REPEAT-Schleife in zwei Punkten: Erstens wird die Schleife durchlaufen, bis die Bedingung erfüllt ist, also solange sie nicht erfüllt ist. Zweitens wird die Bedingung erst am Ende der Schleife abgefragt, so daß die Schleife immer mindestens einmal durchlaufen wird. In diesem wie im nächsten Beispiel bezieht sich die Zeile 30 auf den Fall, daß X beim Eintritt in die Schleife größer als 5 ist:</p>
+
+		<pre>
+10 ! REPEAT
+20 :  PRINT "X KLEINER ALS 5"
+30 : PRINT "VIELLEICHT ABER AUCH NICHT"
+40 : X = X+1
+...
+99 ! UNTIL X >= 5
+</pre>
+
+		<p>Eine weniger weit verbreitete, aber sehr mächtige Schleifenstruktur stellt die LOOP-Schleife dar (sie befindet sich zum Beispiel in der Programmiersprache ADA):</p>
+
+		<pre>
+10 ! LOOP
+30 :  PRINT "EVENTUELL GROESSER ALS 5"
+40 :  IF X>=5 THEN !EXIT
+50 :  PRINT"KLEINER ALS 5"
+60 :  X = X+1
+99 !ELOOP
+</pre>
+
+		<h2>Verlassen einer Endlosschleife</h2>
+
+		<p>Es handelt sich dabei um eine Endlosschleife, welche mit Hilfe des Befehls EXIT verlassen werden kann. Diese Schleife bietet im wesentlichen zwei Vorteile: Zum einen muß die Bedingung nicht entweder am Anfang oder am Ende der Schleife stehen, sondern kann an jeder beliebigen Stelle innerhalb des Blockes abgefragt werden. Darüber hinaus ist das Beenden der Schleife nicht nur von einer Bedingung abhängig, sondern die LOOP-Schleife kann beliebig viele EXIT-Anweisungen enthalten (dadurch wird nicht die oben erwähnte Forderung nach nur einem Ausgang verletzt, da das Programm in allen Fällen hinter dem ELOOP fortgesetzt wird). Damit eignet sich diese Konstruktion insbesondere gut für die Behandlung von Ausnahmen wie zum Beispiel von Eingabebefehlen etc. (eine Angelegenheit, die zum Beispiel in Pascal recht umständlich sein kann, falls man auf GOTOs verzichten will oder muß).</p>
+
+		<p>In Bild 2 (das Zeichen ' kennzeichnet Kommentare) sehen Sie ein Beispiel für geschachtelte LOOP-Schleifen. Die Ausführung einer EXIT-Anweisung bewirkt die Fortsetzung des Programms bei der ersten Zeile hinter derjenigen Schleife, welch© diese EXIT-Anweisung am nächsten umschließt. Im Beispiel enthält die äußere Schleife zwei EXIT-Anweisungen — eine davon vor, die andere hinter der inneren Schleife. Die innere Schleife enthält eine EXIT-Anweisung. Grafisch lassen sich blockstrukturierte Programme am besten durch Struktogramme — anstelle der verbreiteten Flußdiagramme — darstellen. Das Struktogramm für die LOOP Schleifen finden Sie in Bild 3. Über die Diagramme der anderen Strukturen und den Umgang mit Struktogrammen können Sie sich an anderer Stelle in dieser Zeitschrift oder in den unten aufgeführten Büchern informieren. Kommen wir nun zu den Modulen. Dabei handelt es sich um besondere Blöcke, die ein bestimmtes Teilproblem — beispielsweise das Zeichnen einer Linie in einem Grafikprogramm — unter möglichst weitgehender Unabhängigkeit vom restlichen Programmtext bearbeiten. Stellen Sie sich vor, Sie finden in einer Zeitschrift ein Pascal-Programm zur Einstellung von Grafiken. Dieses Programm benutzt zum Beispiel die Anweisung PLOT (X,Y) zum Zeichnen eines Punktes mit den Koordinaten X und Y. Ihr Freund möge eine Sprache Super-Pascal besitzen, die diese Anweisung standardmäßig enthält. Er tippt das Programm ein, es läuft — fertig. Sie selbst besitzen aber nur ein mageres Mini-Pascal, das diesen Befehl nicht kennt. Nun, mit Pascal ist das kein Problem: Sie schreiben sich eine Procedur PLOT (X,Y) fügen diese in das Programm ein — fertig. An dem Programmtext selbst brauchen Sie nicht die geringste Änderung vorzunehmen. Ja, brauchen ihn nicht einmal näher anzusehen. Woran liegt das?</p>
+
+		<figure>
+			<!-- TODO -->
+			<figcaption>Bild 2. Geschachtelte Loop-Schleife</figcaption>
+		</figure>
+
+		<figure>
+			<!-- TODO -->
+			<figcaption>Bild 3. Struktogramm der Loop-Schleife</figcaption>
+		</figure>
+
+		<p>Vom Problem her — dem Erstellen einer Grafik — ist das Zeichnen eines Punktes das Zeichnen eines Punktes. Das einzige, was interessiert, ist, daß dazuzwei Koordinaten erforderlich sind. Dieser Tatsache trägt die Sprache Pascal dadurch Rechnung, daß sie keinen Unterschied macht zwischen dem Aufruf von vorgegebenen Standardanweisungen und selbst definierten Prozeduren.</p>
+
+		<p>Wenn Sie in einem Basic-Programm irgendwo eine Zeile PRINT "TEXT” stehen haben, erwarten Sie selbstverständlich, daß dadurch nicht 50 Zeilen weiter der Wert der Variablen A verändert wird. Entsprechend sorgt nun Pascal dafür, daß eine selbst definierte Prozedur genausowenig Auswirkungen auf andere Programmteile hat wie der Aufruf einer Standard-Anweisung. Die interne Arbeitsweise einer solchen Prozedur wird vor der Programmumgebung genauso versteckt, wie dies bei der internen Arbeitsweise von im Sprachumfang enthaltenen Anweisungen der Fall ist. Entsprechend nennt man dieses Konzept auch »Information Hiding«. Programmiersprachen wie ADA, MODULA oder SIMULA bieten in dieser Hinsicht noch sehr viel weitergehende Möglichkeiten als Pascal.</p>
+
+		<h3>Schnittstellen:</h3>
+
+		<p>Der Datenaustausch mit der Umgebung eines Moduls erfolgt über genau definierte Schnittstellen. Bei einer solchen Schnittstelle handelt es sich um eine Menge derjenigen Annahmen, die die Programmumgebung über ein Modul macht — das heißt welche Daten es als Eingabe erwartet, welche Daten es daraufhin wieder ausgibt und welche anderen Module es seinerseits benötigt.</p>
+
+		<h3>Modulbibliothek:</h3>
+
+		<p>Die relative Eigenständigkeit solcher Module sorgt nun nicht nur für einfache Änderbarkeit und Erweiterbarkeit, sondern ermöglicht auch das Anlegen einer sogenannten Modulbibliothek. Eine solche Bibliothek enthält eine Reihe von Programmbausteinen, die je nach Bedarf in zu entwickelnde Programme eingefügt werden können. Dabei kann es sich um Sortierroutinen, Grafik-Routinen, mathematische und statistische Routinen und so weiter handeln. Aber auch die Entwicklung von Spielen läßt sich auf diese Weise vereinfachen: Man kann Bibliotheken fertiger Sprites, von eigenen Zeichensätzen oder von diversen Soundroutinen anlegen.</p>
+
+		<p>Das wichtigste Hilfsmittel zur Unterstützung modularer Programmentwicklung stellen sicherlich die lokalen Variablen dar. Leider gibt es solche nicht in Basic und auch Strubs kann keine lokalen Variablen bieten. So ist es auch weiterhin erforderlich, beim Einsetzen oder Ändern eines Moduls darauf zu achten, ob und an welchen Stellen Variablen des Moduls in anderen Programmteilen benutzt werden, und gegebenenfalls Umbenennungen vorzunehmen. Der zweite große Nachteil von Basic — die leidigen Zeilennummern — braucht uns dagegen nur noch wenig zu beschäftigen. Strubs bietet alle Möglichkeiten, die erforderlich sind, um ein Programm vollkommen unabhängig von Zeilennummern zu schreiben Als erstes sind da natürlich die oben besprochenen Kontrollstrukturen zu nennen. Darüber hinaus können bei allen Sprüngen Zeilennummern durch Labels (Marken) ersetzt werden. Solche Labels werden durch das Zeichen »£« gekennzeichnet und abgeschlossen durch em Leerzeichen, Doppelpunkt, Komma oder Zeilenende. Die dürfen zwar reservierte Basic-Worte enthalten, dann können sich aber wegen der in der letzten Folge erwähnten Tokens bei der Ausgabe der Markentabelle seltsame Effekte ergeben. Die Labels werden definiert, indem sie an den Anfang einer Zeile gesetzt werden und können beliebig lang sein:</p>
+
+		<pre>
+10   AUSGEBEN:
+20 : PRINT "X:";X
+30   RETURN
+...
+200 X=1:GOSUB £X-AUSGEBEN
+210 X=2:GOSUB £X-AUSGEBEN
+</pre>
+
+		<p>Schließlich bietet Strubs noch die Möglichkeit relativer Sprünge. Diese dienen vor allem dazu, kurze Schleifen innerhalb einer einzigen Zeile zu konstruieren, ohne dafür extra ein Label zu definieren:</p>
+
+		<p>90 NC=NC+1:C=PEEK(NC):IF C>0 THEN Z$+CHR$(C): GOTO £THIS</p>
+
+		<p>Der Befehl GOTO £THIS bewirkt einen Sprung an den Anfang derjenigen Zeile, in der dieser Befehl steht.</p>
+
+		<p>Da bei der Arbeit mit Strubs Quellprogramme in der Regel weit umfangreicher als die Objektprogramme sind, bietet Strubs die EXTERN-DEKLARATION, die es ermöglicht, Module und Programmteile getrennt zu übersetzen und erst auf der Objektprogrammebene zusammenzufügen. Hierbei müssen die einzelnen Programmteile allerdings verschiedene Zeilennummern belegen. In der Extern-Deklaration wird ein Name vereinbart, unter dem ein Programm ein externes Modul ansprechen kann. Diesen Namen wird die Einsprungadresse (bei Maschinenprogrammen) beziehungsweise die Zeilennummer bei Basic-Routinen zugewiesen:</p>
+
+		<pre>
+20 REM VEREINBARUNG:
+30 ! EXT: £MAPRO:740,£PLOT: 50000
+...
+90 REM AUFRUF:
+99 SYS £MAPRO: X=13:Y=90:GOSUB £PLOT
+</pre>
+
+		<p>Kommen wir abschließend zur Dokumentation: Vom Hobby-Programmierer kann kein Mensch erwarten, daß er Berge von Dokumentationsmaterial anlegt, die den Umfang des Programmtextes um ein Vielfaches übersteigen. Deshalb ist es gerade hier wichtig, Programme weitgehend selbstdokumentierend zu schreiben. Im Gegensatz zu höheren Programmiersprachen mit ihren zahlreichen Deklarationspflichten ist der Basic-Programmierer nahezu ausschließlich auf Kommentare angewiesen. Da Strubs Kommentare bei der Übersetzung eleminiert, stehlen diese weder Speicherplatz noch Laufzeit. Der Programmierer kann also ohne Bedenken einen exzessiven Gebrauch von Kommentaren machen.</p>
+
+		<p>Kommentare werden gekennzeichnet durch das Zeichen »'«. Steht dieses Zeichen direkt am Zeilenanfang, so wird die ganze Zeile gelöscht. Sonst wird derProgrammtext bis zum zweiten »'« oder bis zum Zeilenende überlesen. Außer innerhalb von Befehls- und Markennamen können Kommentare an jeder beliebigen Programmstelle eingefügt werden. Kommentare, die in das Objektprogramm übernommen werden sollen, können wie bisher mit REM in den Programmtext eingefügt werden. Beispiel:</p>
+
+		<pre>
+10 'DIESE ZEILE WIRD VOLLSTÄNDIG GELÖSCHT
+20 A'US'G'ABE'$="ENTSPRICHT AG$" 'KOMMENTAR
+</pre>
+
+		<p>Die Lesbarkeit von strukturierten Programmen wird verbessert durch das Einrücken von Zeilen entsprechend der Blockstruktur. Hierzu dient der Tabulator (Bild 2): Ein Doppelpunkt am Zeilenanfang gefolgt von Leerzeichen. Für die Ungeduldigen ist das Opjektprogramm von Strubs bereits abgedruckt (Listing). In der nächsten Ausgabe werden wir auf die praktische Programmentwicklung mit Hilfe von Strubs eingehen.</p>
+
+		<address class="author">(Matthias Törk)</address>
+
+		<p class="literatur">Literatur<br>
+			* N. Wirth: Systematisches Programmieren, Teubner, Stuttgart 1978<br>
+			* Kimm, R./Koch,W./Simonsmeier,W./Tontsch,F.: Einführung in Software Engineering, De Gruyter, Berlin, New York 1979<br>
+			* Schnupp, P./FLoyd, C.: Software: Programmentwicklung und Projektorganisation, De Gruyter, Berlin, New York 1976<br>
+			* Nagl, M.: Einführung in die Programmiersprache ADA, Vieweg, Braunschweig, Wiesbaden 1982
+		</p>
+
+
+		<figure>
+			<!-- TODO -->
+			<figcaption>Dies Änderung sind für die Anpassung von Strubs an den VC 20 (mit mindestens 16 KByte Erweiterung) erforderlich.</figcaption>
+		</figure>
+
+		<figure>
+			<!-- TODO -->
+			<figcaption>Listing. Das Objektprogramm Strubs</figcaption>
+		</figure>
+
+	</article>
+
+</body>
+
+</html>
