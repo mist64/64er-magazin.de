@@ -55,13 +55,14 @@ if LANG == "de":
   LABEL_DOWNLOAD = "Download"
   LABEL_NEWER = "← Neuer"
   LABEL_OLDER = "Älter →"
+  LABEL_PREVIOUS_ARTICLE = "← Vorheriger Artikel"
+  LABEL_NEXT_ARTICLE = "Nächster Artikel →"
   LABEL_ALL_ISSUES = "Alle Ausgaben"
   LABEL_ALL_ARTICLES = "Alle Artikel"
   LABEL_ALL_LISTINGS = "Alle Listings"
   LABEL_CURRENT_ISSUE = "Das aktuelle Magazin"
   LABEL_LATEST_LISTINGS = "Neueste Listings"
   LABEL_TOC_ISSUE = "Inhalt Ausgabe"
-  LABEL_ALL_ISSUES = "Alle Ausgaben"
   LABEL_CATEGORY = "Kategorie"
   LABEL_ARTICLE = "Artikel"
   LABEL_DOWNLOADS = "Downloads"
@@ -118,7 +119,6 @@ elif LANG == "en":
   LABEL_CONTACT = "Contact"
   LABEL_IMPRINT = "Imprint"
   LABEL_PRIVACY = "Privacy"
-  LABEL_ALL_ISSUES = "All Issues"
   LABEL_CATEGORY = "Category"
   LABEL_ISSUE = "Issue"
   LABEL_PAGE = "p."
@@ -127,7 +127,8 @@ elif LANG == "en":
   LABEL_DOWNLOAD = "Download"
   LABEL_NEWER = "← Newer"
   LABEL_OLDER = "Older →"
-  LABEL_ALL_ISSUES = "All Issues"
+  LABEL_PREVIOUS_ARTICLE = "← Previous Article"
+  LABEL_NEXT_ARTICLE = "Next Article →"
   LABEL_ALL_ARTICLES = "All Articles"
   LABEL_ALL_LISTINGS = "All Listings"
   LABEL_CURRENT_ISSUE = "Current Issue"
@@ -956,7 +957,7 @@ def convert_and_copy_image(img_path, issue_dest_path):
     except subprocess.CalledProcessError as e:
         print(f"Error running {IMAGE_CONVERSION_TOOL} for image {img_path}: {e}")
 
-def copy_and_modify_html(article, html_dest_path, pdf_path):
+def copy_and_modify_html(article, html_dest_path, pdf_path, prev_page_link, next_page_link):
     """Modifies, and writes an HTML file directly to the destination."""
     soup = article['html']
     issue_number = article['issue']
@@ -990,6 +991,20 @@ def copy_and_modify_html(article, html_dest_path, pdf_path):
 </div>'''
     download_pdf_soup = BeautifulSoup(download_pdf_html, 'html.parser')
     body.append(download_pdf_soup)
+
+    nav_parts = []
+    nav_parts.append("<div class=\"article_navigation\">\n")
+    if prev_page_link:
+        # prev_page_link = index_filename(i-1)
+        nav_parts.append(f"<a href='{prev_page_link}'>{LABEL_PREVIOUS_ARTICLE}</a>")
+    if next_page_link:
+        # next_page_link = index_filename(i+1)
+        nav_parts.append(f"<a href='{next_page_link}'>{LABEL_NEXT_ARTICLE}</a>")
+
+    nav_parts.append("</div>")
+    nav_soup = BeautifulSoup(''.join(nav_parts), 'html.parser')
+    body.append(nav_soup)
+
     body_html = str(soup.body)
     body_html = body_html[6:-7] # remove '<body>' and '</body>'
     title = f"{article['title']} | {MAGAZINE_NAME}"
@@ -1039,6 +1054,7 @@ def copy_articles_and_assets(db, in_directory, out_directory):
 
         # Copy all images of all articles of the issue and downloads
         articles = [article for article in db.articles if article['issue_key'] == issue_key]
+        article_index = 0
         for article in articles:
             # Copy images found in article metadata
             img_srcs = article.get('src_img_urls', [])
@@ -1064,9 +1080,19 @@ def copy_articles_and_assets(db, in_directory, out_directory):
             if EXTRACT_PDF_PAGES:
                 extract_pages_from_pdf(source_pdf_path, dest_pdf_path, pages)
 
+            if article_index > 0:
+                prev_page_link = articles[article_index - 1]['target_filename']
+            else:
+                prev_page_link = None
+            if article_index < len(articles) - 1:
+                next_page_link = articles[article_index + 1]['target_filename']
+            else:
+                next_page_link = None
+
             # Process and copy HTML files with navigation header etc.
             html_dest_path = os.path.join(issue_dest_path, article['target_filename'])
-            copy_and_modify_html(article, html_dest_path, pdf_path)
+            copy_and_modify_html(article, html_dest_path, pdf_path, prev_page_link, next_page_link)
+            article_index += 1
 
 def html_to_text_preserve_paragraphs(soup):
     block_tags = ['p', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'div', 'li', 'tr', 'td']
