@@ -782,7 +782,7 @@ def generate_all_issues_with_tocs_html(db, out_directory):
 def generate_issues_toc_html(db, issue_key, out_directory):
     body_html = html_generate_toc(db, issue_key, 1, False)
     issue_dest_path = os.path.join(out_directory, db.issues[issue_key]['issue_dir_name'])
-    write_full_html_file(db, os.path.join(issue_dest_path, 'index.html'), f'{LABEL_TOC_ISSUE} {issue_key} | {MAGAZINE_NAME}', 'title.jpg', body_html, 'eine_ausgabe')
+    write_full_html_file(db, os.path.join(issue_dest_path, 'index.html'), f'{LABEL_TOC_ISSUE} {issue_key} | {MAGAZINE_NAME}', 'title.jpg', body_html, 'eine_ausgabe', True)
 
 def generate_issues_tocs_html(db, out_directory):
     for issue_key in sorted(db.issues.keys(), key=lambda x: key_to_datetime(x), reverse=True):
