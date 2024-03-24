@@ -99,7 +99,7 @@ function renderSearchResults(query, results) {
     search_html = count_str + results_li;
   }
   document.querySelector(".main_content").innerHTML = search_html;
-  document.body.className = "suche";
+  document.body.className = "search";
 }
 
 function createSearchResultBlurb(query, pageContent) {

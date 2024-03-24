@@ -476,8 +476,8 @@ def html_generate_latest_issue(db):
 <a href="{issue_dir_name}">
     <img src="{latest_title_image}">
 </a>
-<p class="current-issue-download">Ausgabe {latest_issue_key}</p>\n
-<p><a href="{issue_dir_name}" class="download-button">{LABEL_DOWNLOAD}</a></p>'''
+<p class="current_issue_download">Ausgabe {latest_issue_key}</p>\n
+<p><a href="{issue_dir_name}" class="download_button">{LABEL_DOWNLOAD}</a></p>'''
     return latest_html
 
 def html_generate_latest_downloads(db):
@@ -762,36 +762,35 @@ def write_full_html_file(db, path, title, preview_img, body_html, body_class, co
     <script src="/{BASE_DIR}search.js"></script>
     {isso_html1}
 </head>
+
 <body class="{body_class}">
-<div class="header">
-  <div class="logo-container">
+<header class="page_navigation">
+  <div class="logo_container">
     <a href="/{BASE_DIR}index.html">
-        <img src="/{BASE_DIR}logo.png" alt="Logo" class="logo">
+      <img src="/{BASE_DIR}logo.png" alt="Logo" class="logo_image">
     </a>
   </div>
-  <div class="nav-container">
-<div class="top-nav">
-  <nav class="nav-links1">
-    <a href="/{BASE_DIR}{FILENAME_ISSUES}.html">{LABEL_ISSUES}</a>
-    <a href="/{BASE_DIR}{FILENAME_ARTICLES}.html">{LABEL_ARTICLES}</a>
-    <a href="/{BASE_DIR}{FILENAME_LISTINGS}.html">{LABEL_LISTINGS}</a>
-  </nav>
-  <div class="top-right-container">
-    <a href="{mastodon_link}">
-      <img src="/{BASE_DIR}mastodon.svg" alt="Mastodon" class="rss_img">
-    </a>
-    <a href="/{BASE_DIR}64er.rss">
-      <img src="/{BASE_DIR}rss.svg" alt="RSS" class="rss_img">
-    </a>
-  <form id="search-form" name="searchForm" onsubmit="return false">
-    <input autocomplete="off" placeholder="{LABEL_SEARCH}" id="search" class="search-input" aria-label="Search site" type="text" name="q">
-  </form>
-
-
-  </div>
-</div>
-    <div class="bottom-nav">
-      <nav class="nav-links2">
+  <div class="nav_container">
+    <div class="overview_container">
+      <nav class="links_overview">
+        <a href="/{BASE_DIR}{FILENAME_ISSUES}.html">{LABEL_ISSUES}</a>
+        <a href="/{BASE_DIR}{FILENAME_ARTICLES}.html">{LABEL_ARTICLES}</a>
+        <a href="/{BASE_DIR}{FILENAME_LISTINGS}.html">{LABEL_LISTINGS}</a>
+      </nav>
+      <div class="social_and_search">
+        <a href="{mastodon_link}">
+          <img src="/{BASE_DIR}mastodon.svg" alt="Mastodon" class="social_image">
+        </a>
+        <a href="/{BASE_DIR}64er.rss">
+          <img src="/{BASE_DIR}rss.svg" alt="RSS" class="social_image">
+        </a>
+        <form id="search-form" name="searchForm" onsubmit="return false">
+          <input autocomplete="off" placeholder="{LABEL_SEARCH}" id="search" class="search-input" aria-label="Search site" type="text" name="q">
+        </form>
+      </div>
+    </div>
+    <div class="topics_container">
+      <nav class="links_topics">
         <a href="/{BASE_DIR}{FILENAME_NEWS}.html">{LABEL_NEWS}</a>
         <a href="/{BASE_DIR}{FILENAME_HARDWARE}.html">{LABEL_HARDWARE}</a>
         <a href="/{BASE_DIR}{FILENAME_TESTS}.html">{LABEL_TESTS}</a>
@@ -803,19 +802,21 @@ def write_full_html_file(db, path, title, preview_img, body_html, body_class, co
       </nav>
     </div>
   </div>
-</div>
+</header>
+
 <div class="main_content">
 {body_html}
 {isso_html2}
 </div>
-<div class="sub-bar">
-  <span class="left-text">© 1984 Markt & Technik Verlag Aktiengesellschaft</span>
-  <nav class="right-nav">
+
+<footer class="page_footer">
+  <span class="left_text">© 1984 Markt & Technik Verlag Aktiengesellschaft</span>
+  <nav class="right_nav">
     <a href="https://github.com/mist64/64er-magazin.de">{LABEL_CONTACT}</a>
     <a href="/{BASE_DIR}{impressum_path}">{LABEL_IMPRINT}</a>
     <a href="/{BASE_DIR}{FILENAME_PRIVACY}.html">{LABEL_PRIVACY}</a>
   </nav>
-</div>
+</footer>
 </body>
 </html>"""
     with open(path, 'w', encoding='utf-8') as f:
@@ -824,12 +825,12 @@ def write_full_html_file(db, path, title, preview_img, body_html, body_class, co
 
 def generate_all_issues_with_tocs_html(db, out_directory):
     body_html = html_generate_tocs_all_issues(db)
-    write_full_html_file(db, os.path.join(out_directory, f'{FILENAME_ISSUES}.html'), f'{LABEL_ALL_ISSUES} | {MAGAZINE_NAME}', None, body_html, 'alle_ausgaben')
+    write_full_html_file(db, os.path.join(out_directory, f'{FILENAME_ISSUES}.html'), f'{LABEL_ALL_ISSUES} | {MAGAZINE_NAME}', None, body_html, 'all_issues')
 
 def generate_issues_toc_html(db, issue_key, out_directory):
     body_html = html_generate_toc(db, issue_key, 1, False)
     issue_dest_path = os.path.join(out_directory, db.issues[issue_key]['issue_dir_name'])
-    write_full_html_file(db, os.path.join(issue_dest_path, 'index.html'), f'{LABEL_TOC_ISSUE} {issue_key} | {MAGAZINE_NAME}', 'title.jpg', body_html, 'eine_ausgabe', True)
+    write_full_html_file(db, os.path.join(issue_dest_path, 'index.html'), f'{LABEL_TOC_ISSUE} {issue_key} | {MAGAZINE_NAME}', 'title.jpg', body_html, 'one_issue', True)
 
 def generate_issues_tocs_html(db, out_directory):
     for issue_key in sorted(db.issues.keys(), key=lambda x: key_to_datetime(x), reverse=True):
@@ -837,7 +838,7 @@ def generate_issues_tocs_html(db, out_directory):
 
 def generate_all_topics_html(db, out_directory):
     body_html = html_generate_all_articles_by_category(db)
-    write_full_html_file(db, os.path.join(out_directory, f'{FILENAME_ARTICLES}.html'), f'{LABEL_ALL_ARTICLES} | {MAGAZINE_NAME}', None, body_html, 'alle_artikel')
+    write_full_html_file(db, os.path.join(out_directory, f'{FILENAME_ARTICLES}.html'), f'{LABEL_ALL_ARTICLES} | {MAGAZINE_NAME}', None, body_html, 'all_articles')
 
 def generate_topic_htmls(db, out_directory):
     for topic, toc_topics in TOPICS:
@@ -855,11 +856,11 @@ def generate_topic_htmls(db, out_directory):
         html_parts.append(f"</main>\n")
 
         body_html = ''.join(html_parts)
-        write_full_html_file(db, os.path.join(out_directory, filename), f'{topic} | {MAGAZINE_NAME}', None, body_html, 'ein_thema')
+        write_full_html_file(db, os.path.join(out_directory, filename), f'{topic} | {MAGAZINE_NAME}', None, body_html, 'one_topic')
 
 def generate_all_downloads_html(db, out_directory):
     body_html = html_generate_all_downloads(db)
-    write_full_html_file(db, os.path.join(out_directory, f'{FILENAME_LISTINGS}.html'), f'{LABEL_ALL_LISTINGS} | {MAGAZINE_NAME}', None, body_html, 'alle_listings')
+    write_full_html_file(db, os.path.join(out_directory, f'{FILENAME_LISTINGS}.html'), f'{LABEL_ALL_LISTINGS} | {MAGAZINE_NAME}', None, body_html, 'all_listings')
 
 def index_filename(i):
     if i == 1:
@@ -897,10 +898,10 @@ def generate_all_article_links_html(db, out_directory, articles_per_page):
 
 
         html_parts.append("<div class=\"column2\">\n")
-        html_parts.append("<div class=\"current-sidebox\">\n");
+        html_parts.append("<div class=\"current_sidebox\">\n");
         html_parts.append(html_generate_latest_issue(db))
         html_parts.append("</div>")
-        html_parts.append("<div class=\"listings-sidebox\">\n");
+        html_parts.append("<div class=\"listings_sidebox\">\n");
         html_parts.append(html_generate_latest_downloads(db))
         html_parts.append("</div>")
         html_parts.append("</div>") # Closing div for 'column2'
@@ -915,7 +916,7 @@ def generate_all_article_links_html(db, out_directory, articles_per_page):
 def generate_privacy_page(db, out_directory):
         html_dest_path = os.path.join(out_directory, f"{FILENAME_PRIVACY}.html")
         title = LABEL_PRIVACY
-        write_full_html_file(db, html_dest_path, title, None, HTML_PRIVACY, 'datenschutz')
+        write_full_html_file(db, html_dest_path, title, None, HTML_PRIVACY, 'privacy')
 
 def generate_404_page(db, out_directory):
         html_dest_path = os.path.join(out_directory, f"{FILENAME_404}.html")
@@ -1080,7 +1081,7 @@ def copy_and_modify_html(article, html_dest_path, pdf_path, prev_page_link, next
     preview_img = next((url for url in article.get('img_urls', [])), None)
 
 
-    write_full_html_file(db, html_dest_path, title, preview_img, body_html, 'ein_artikel', True)
+    write_full_html_file(db, html_dest_path, title, preview_img, body_html, 'one_article', True)
 
 def copy_articles_and_assets(db, in_directory, out_directory):
     if not os.path.exists(out_directory):
