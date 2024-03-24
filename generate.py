@@ -476,8 +476,8 @@ def html_generate_latest_issue(db):
 <a href="{issue_dir_name}">
     <img src="{latest_title_image}">
 </a>
-<p class="current-issue-download">Ausgabe {latest_issue_key}</p>\n
-<p><a href="{issue_dir_name}" class="download-button">{LABEL_DOWNLOAD}</a></p>'''
+<p class="current_issue_download">Ausgabe {latest_issue_key}</p>\n
+<p><a href="{issue_dir_name}" class="download_button">{LABEL_DOWNLOAD}</a></p>'''
     return latest_html
 
 def html_generate_latest_downloads(db):
@@ -810,8 +810,8 @@ def write_full_html_file(db, path, title, preview_img, body_html, body_class, co
 </div>
 
 <footer class="page_footer">
-  <span class="left-text">© 1984 Markt & Technik Verlag Aktiengesellschaft</span>
-  <nav class="right-nav">
+  <span class="left_text">© 1984 Markt & Technik Verlag Aktiengesellschaft</span>
+  <nav class="right_nav">
     <a href="https://github.com/mist64/64er-magazin.de">{LABEL_CONTACT}</a>
     <a href="/{BASE_DIR}{impressum_path}">{LABEL_IMPRINT}</a>
     <a href="/{BASE_DIR}{FILENAME_PRIVACY}.html">{LABEL_PRIVACY}</a>
