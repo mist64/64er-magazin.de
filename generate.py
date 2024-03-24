@@ -26,8 +26,8 @@ OUT_DIRECTORY = 'out'
 SERVER = 'www.64er-magazin.de'
 IMAGE_CONVERSION_TOOL = 'imagemagick' # 'guetzli'
 EXTRACT_PDF_PAGES = True # disable for speed when testing
-ARTICLES_PER_PAGE = 20
 NEW_DOWNLOADS = 15
+HOURS_PER_ARTICLE = 12
 
 #
 # Parse arguments
@@ -471,6 +471,13 @@ def share_on_mastodon_link(title, url):
     mastodon_message = quote(f"{title}\n{url}\n{MASTODON_HASHTAGS}")
     return f"/{BASE_DIR}tootpick.html#text={mastodon_message}"
 
+def article_pubdate(issue_data, article):
+    pubdate = issue_data['pubdate']
+    # Add index as half-days to the date
+    pubdate += timedelta(hours=HOURS_PER_ARTICLE * article['index'])
+    return pubdate
+
+
 ### Reusable HTML generation
 
 def html_generate_latest_issue(db):
@@ -693,7 +700,8 @@ def html_generate_article_preview(db, article):
     issue_dir_name = issue_data['issue_dir_name']
     pages = article['pages']
     img_src = next((url for url in article.get('img_urls', [])), None)
-    html_parts.append(f"<div class=\"article_link\">\n")
+    pubdate_unix = int(article_pubdate(issue_data, article).timestamp())
+    html_parts.append(f"<div class=\"article_link\" data-pubdate=\"{pubdate_unix}\">\n")
     if img_src:
         img_src = os.path.join(issue_dir_name, img_src)
         link_img = article_link(db, article, f"<img src='{img_src}'>\n", True)
@@ -870,56 +878,39 @@ def generate_all_downloads_html(db, out_directory):
     body_html = html_generate_all_downloads(db)
     write_full_html_file(db, os.path.join(out_directory, f'{FILENAME_LISTINGS}.html'), f'{LABEL_ALL_LISTINGS} | {MAGAZINE_NAME}', None, body_html, 'all_listings')
 
-def index_filename(i):
-    if i == 1:
-        return 'index.html'
-    else:
-        return f'new{i}.html'
-
-def generate_all_article_links_html(db, out_directory, articles_per_page):
+def generate_landing_html(db, out_directory):
     html_articles = html_generate_all_article_previews(db)
 
-    html_article_chunks = [html_articles[i:i + articles_per_page] for i in range(0, len(html_articles), articles_per_page)]
+    html_parts = []
+    html_parts.append(f"<main>\n")
 
-    for i, article_link_html in enumerate(html_article_chunks, start=1):
-        html_parts = []
-        html_parts.append(f"<main>\n")
+    html_parts.append("<div class=\"column1\">\n")
+    html_parts.append(''.join(html_articles))
 
-        html_parts.append("<div class=\"column1\">\n")
-        html_parts.append(''.join(article_link_html))
+    # Navigation links
+    html_parts.append("<div class=\"article_navigation\">\n")
+    html_parts.append(f"<a href=\"\" id=\"link_newer\">{LABEL_NEWER}</a>")
+    html_parts.append(f"<a href=\"\" id=\"link_older\">{LABEL_OLDER}</a>")
+    html_parts.append("</div>")
 
-        # Navigation links
-        if i > 1 or i < len(html_article_chunks): # There is a need for Navigation
-            html_parts.append("<div class=\"article_navigation\">\n")
-
-        if i > 1:  # There's a previous page
-            prev_page_link = index_filename(i-1)
-            html_parts.append(f"<a href='{prev_page_link}'>{LABEL_NEWER}</a>")
-        if i < len(html_article_chunks):  # There's a next page
-            next_page_link = index_filename(i+1)
-            html_parts.append(f"<a href='{next_page_link}'>{LABEL_OLDER}</a>")
-
-        if i > 1 or i < len(html_article_chunks): # There is a need for Navigation
-            html_parts.append("</div>")
-
-        html_parts.append("</div>") # Closing div for 'column1'
+    html_parts.append("</div>") # Closing div for 'column1'
 
 
-        html_parts.append("<div class=\"column2\">\n")
-        html_parts.append("<div class=\"current_sidebox\">\n");
-        html_parts.append(html_generate_latest_issue(db))
-        html_parts.append("</div>")
-        html_parts.append("<div class=\"listings_sidebox\">\n");
-        html_parts.append(html_generate_latest_downloads(db))
-        html_parts.append("</div>")
-        html_parts.append("</div>") # Closing div for 'column2'
+    html_parts.append("<div class=\"column2\">\n")
+    html_parts.append("<div class=\"current_sidebox\">\n");
+    html_parts.append(html_generate_latest_issue(db))
+    html_parts.append("</div>")
+    html_parts.append("<div class=\"listings_sidebox\">\n");
+    html_parts.append(html_generate_latest_downloads(db))
+    html_parts.append("</div>")
+    html_parts.append("</div>") # Closing div for 'column2'
 
-        html_parts.append(f"</main>\n")
+    html_parts.append(f"</main>\n")
 
 
-        body_html = ''.join(html_parts)
+    body_html = ''.join(html_parts)
 
-        write_full_html_file(db, os.path.join(out_directory, index_filename(i)), MAGAZINE_NAME_FULL, None, body_html, 'landing_pages')
+    write_full_html_file(db, os.path.join(out_directory, 'index_all.html'), MAGAZINE_NAME_FULL, None, body_html, 'landing_pages')
 
 def generate_privacy_page(db, out_directory):
         html_dest_path = os.path.join(out_directory, f"{FILENAME_PRIVACY}.html")
@@ -956,18 +947,16 @@ def generate_rss_feed(db, out_directory):
         else:
             description = ""
 
-        pubdate = issue_data['pubdate']
-        # Add index as half-days to the date
-        pubdate += timedelta(hours=12 * article['index'])
-        pub_date = pubdate.strftime("%a, %d %b %Y %H:%M:%S %z")[:-5] + "GMT"
+        pubdate = article_pubdate(issue_data, article)
+        pubdate = pubdate.strftime("%a, %d %b %Y %H:%M:%S %z")[:-5] + "GMT"
 
         rss_item_template = '''<item>
     <title>{title}</title>
     <link>{link}</link>
     <description>{description}</description>
-    <pubDate>{pub_date}</pubDate>
+    <pubDate>{pubdate}</pubDate>
 </item>'''
-        rss_items.append(rss_item_template.format(title=title, link=link, description=description, pub_date=pub_date))
+        rss_items.append(rss_item_template.format(title=title, link=link, description=description, pubdate=pubdate))
 
     rss_base_url = RSS_BASE_URL + BASE_DIR
 
@@ -1073,10 +1062,8 @@ def copy_and_modify_html(article, html_dest_path, pdf_path, prev_page_link, next
     nav_parts = []
     nav_parts.append("<div class=\"article_navigation\">\n")
     if prev_page_link:
-        # prev_page_link = index_filename(i-1)
         nav_parts.append(f"<a href='{prev_page_link}'>{LABEL_PREVIOUS_ARTICLE}</a>")
     if next_page_link:
-        # next_page_link = index_filename(i+1)
         nav_parts.append(f"<a href='{next_page_link}'>{LABEL_NEXT_ARTICLE}</a>")
 
     nav_parts.append("</div>")
@@ -1107,6 +1094,7 @@ def copy_articles_and_assets(db, in_directory, out_directory):
     shutil.copy(os.path.join(in_directory, 'search.js'), out_directory)
     shutil.copy(os.path.join(in_directory, 'lunr.js'), out_directory)
     shutil.copy('filter_rss.py', out_directory)
+    shutil.copy('filter_index.py', out_directory)
     shutil.copy('tootpick.html', out_directory)
 
     # Copy the complete "fonts" folder
@@ -1239,11 +1227,16 @@ if __name__ == '__main__':
     generate_all_topics_html(db, out_directory)
     generate_topic_htmls(db, out_directory)
     generate_all_downloads_html(db, out_directory)
-    generate_all_article_links_html(db, out_directory, ARTICLES_PER_PAGE)
+    generate_landing_html(db, out_directory)
     generate_rss_feed(db, out_directory)
     generate_privacy_page(db, out_directory)
     generate_404_page(db, out_directory)
     generate_search_json(db, out_directory)
+
+    print("*** Filtering")
+    dir = f"{OUT_DIRECTORY}/{BASE_DIR}"
+    subprocess.run(['python3', f'filter_rss.py'], cwd=dir)
+    subprocess.run(['python3', f'filter_index.py'], cwd=dir)
 
     if DEPLOY == "upload":
         print("*** Uploading")
