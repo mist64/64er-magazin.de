@@ -86,6 +86,7 @@ if LANG == "de":
   LABEL_CONTACT = "Kontakt"
   LABEL_IMPRINT = "Impressum"
   LABEL_PRIVACY = "Datenschutzerklärung"
+  LABEL_404 = "404 - Seite nicht gefunden"
   LABEL_ISSUE = "Ausgabe"
   LABEL_PAGE = "S."
   LABEL_DOWNLOAD_ISSUE_PDF = "PDF Downloaden"
@@ -117,6 +118,7 @@ if LANG == "de":
   FILENAME_TUTORIALS = "kurse"
   FILENAME_IN_PRACTICE = "praxis"
   FILENAME_PRIVACY = "datenschutz"
+  FILENAME_404 = "404"
   FILENAME_IMPRINT = "impressum"
   CATEGORY_TYPE_IN = "Programme zum Abtippen"
   TOPICS = [
@@ -139,6 +141,14 @@ if LANG == "de":
     </ul>
     </main>
     """
+
+  HTML_404 = """
+    <main class="fehlerteufelchen">
+    <h1>Seite nicht gefunden</h1>
+    <img src="fehlerteufelchen.svg" alt="Fehlerteufelchen">
+    </main>
+  """
+    
 elif LANG == "en":
   IN_DIRECTORY = 'en'
   MAGAZINE_NAME = "64'er Magazine"
@@ -158,6 +168,7 @@ elif LANG == "en":
   LABEL_CONTACT = "Contact"
   LABEL_IMPRINT = "Imprint"
   LABEL_PRIVACY = "Privacy"
+  LABEL_404 = "404 - Page Not Found"
   LABEL_CATEGORY = "Category"
   LABEL_ISSUE = "Issue"
   LABEL_PAGE = "p."
@@ -188,6 +199,7 @@ elif LANG == "en":
   FILENAME_TUTORIALS = "tutorials"
   FILENAME_IN_PRACTICE = "practice"
   FILENAME_PRIVACY = "privacy"
+  FILENAME_404 = "404"
   FILENAME_IMPRINT = "imprint"
   CATEGORY_TYPE_IN = "Type-in Programs"
   TOPICS = [
@@ -208,6 +220,13 @@ elif LANG == "en":
     <li>The search runs locally in the browser. The search input is not transmitted to the server.</li>
     <li>When submitting a comment, the entered data is stored on a server in the EU.</li>
     </ul>
+    </main>
+    """
+
+  HTML_404 = """
+    <main class="fehlerteufelchen">
+    <h1>Page Not Found</h1>
+    <img src="fehlerteufelchen.svg" alt="Error Devil">
     </main>
     """
 
@@ -896,6 +915,11 @@ def generate_privacy_page(db, out_directory):
         title = LABEL_PRIVACY
         write_full_html_file(db, html_dest_path, title, None, HTML_PRIVACY, 'datenschutz')
 
+def generate_404_page(db, out_directory):
+        html_dest_path = os.path.join(out_directory, f"{FILENAME_404}.html")
+        title = LABEL_404
+        write_full_html_file(db, html_dest_path, title, None, HTML_404, 'page404')
+
 ### RSS
 
 def generate_rss_feed(db, out_directory):
@@ -1207,6 +1231,7 @@ if __name__ == '__main__':
     generate_all_article_links_html(db, out_directory, ARTICLES_PER_PAGE)
     generate_rss_feed(db, out_directory)
     generate_privacy_page(db, out_directory)
+    generate_404_page(db, out_directory)
     generate_search_json(db, out_directory)
 
     if DEPLOY == "upload":
