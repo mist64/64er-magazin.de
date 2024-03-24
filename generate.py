@@ -715,6 +715,7 @@ def write_full_html_file(db, path, title, preview_img, body_html, body_class, co
     <meta charset="UTF-8">
     <meta property="og:title" content="{title}" />
     <meta property="og:image" content="{preview_img}" />
+    <meta name="viewport" content="width=720, initial-scale=1.0">
     <title>{title}</title>
     <link rel="stylesheet" href="/{BASE_DIR}style.css">
     <script>
