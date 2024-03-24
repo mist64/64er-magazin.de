@@ -5,20 +5,25 @@ import time
 import os
 
 GROUP_SIZE = 2
-input_file_path = 'out/test/i21_delayed_index/index_all.html'
-output_dir_path = '/tmp/'
+input_file_path = 'index_all.html'
+
+def filename(i):
+    if i == 0:
+        return 'index.html'
+    else:
+        return f'index{i+1}.html'
 
 def update_navigation(soup, prev_file_name, next_file_name):
     newer_link = soup.find(id="link_newer")
     older_link = soup.find(id="link_older")
 
     if prev_file_name:
-        newer_link['href'] = os.path.join(output_dir_path, prev_file_name)
+        newer_link['href'] = prev_file_name
     else:
         newer_link.decompose()
 
     if next_file_name:
-        older_link['href'] = os.path.join(output_dir_path, next_file_name)
+        older_link['href'] = next_file_name
     else:
         older_link.decompose()
 
@@ -53,11 +58,11 @@ for i in range(num_files):
             tag.decompose()
 
     # Update navigation links
-    prev_file_name = f'article_group_{i}.html' if i > 0 else None
-    next_file_name = f'article_group_{i+2}.html' if i < num_files - 1 else None
+    prev_file_name = filename(i-1) if i > 0 else None
+    next_file_name = filename(i+1) if i < num_files - 1 else None
     update_navigation(iter_soup, prev_file_name, next_file_name)
 
     # Save the new HTML file
-    output_file_path = os.path.join(output_dir_path, f'article_group_{i+1}.html')
+    output_file_path = filename(i)
     with open(output_file_path, 'w') as file:
         file.write(str(iter_soup))

@@ -1094,6 +1094,7 @@ def copy_articles_and_assets(db, in_directory, out_directory):
     shutil.copy(os.path.join(in_directory, 'search.js'), out_directory)
     shutil.copy(os.path.join(in_directory, 'lunr.js'), out_directory)
     shutil.copy('filter_rss.py', out_directory)
+    shutil.copy('filter_index.py', out_directory)
     shutil.copy('tootpick.html', out_directory)
 
     # Copy the complete "fonts" folder
