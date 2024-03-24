@@ -910,7 +910,7 @@ def generate_landing_html(db, out_directory):
 
     body_html = ''.join(html_parts)
 
-    write_full_html_file(db, os.path.join(out_directory, 'index.html'), MAGAZINE_NAME_FULL, None, body_html, 'landing_pages')
+    write_full_html_file(db, os.path.join(out_directory, 'index_all.html'), MAGAZINE_NAME_FULL, None, body_html, 'landing_pages')
 
 def generate_privacy_page(db, out_directory):
         html_dest_path = os.path.join(out_directory, f"{FILENAME_PRIVACY}.html")
