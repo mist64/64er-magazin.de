@@ -4,7 +4,8 @@ from bs4 import BeautifulSoup
 import time
 import os
 
-GROUP_SIZE = 2
+FILTER_BY_DATE = False
+GROUP_SIZE = 20
 input_file_path = 'index_all.html'
 
 def filename(i):
@@ -29,14 +30,13 @@ def update_navigation(soup, prev_file_name, next_file_name):
 
 # Load the HTML content
 with open(input_file_path, 'r') as file:
-    html_content = file.read()
-
-soup = BeautifulSoup(html_content, 'html.parser')
+    soup = BeautifulSoup(file.read(), 'html.parser')
 
 # Filter out 'article_link' tags in the future
-for tag in soup.find_all(class_='article_link'):
-    if int(tag['data-pubdate']) > time.time():
-        tag.decompose()
+if FILTER_BY_DATE:
+    for tag in soup.find_all(class_='article_link'):
+        if int(tag['data-pubdate']) > time.time():
+            tag.decompose()
 
 # Create a list of valid 'article_link' tags (those that are left)
 valid_article_links = soup.find_all(class_='article_link')
@@ -63,6 +63,5 @@ for i in range(num_files):
     update_navigation(iter_soup, prev_file_name, next_file_name)
 
     # Save the new HTML file
-    output_file_path = filename(i)
-    with open(output_file_path, 'w') as file:
+    with open(filename(i), 'w') as file:
         file.write(str(iter_soup))
