@@ -1203,13 +1203,17 @@ if __name__ == '__main__':
         command = f"rsync -Pa {OUT_DIRECTORY}/* local@{SERVER}:/var/www/html/"
         print("    " + command)
         ret = subprocess.run(command, check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, shell=True)
-        print(f"https://{SERVER}/{BASE_DIR}")
+        url = f"https://{SERVER}/{BASE_DIR}"
+        print(url)
+        subprocess.run(f"open {url}", check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, shell=True)
     elif DEPLOY == "local":
         PORT = 8000
         class Handler(http.server.SimpleHTTPRequestHandler):
             def __init__(self, *args, **kwargs):
                 super().__init__(*args, directory=OUT_DIRECTORY, **kwargs)
         with socketserver.TCPServer(("", PORT), Handler) as httpd:
-            print(f"http://localhost:{PORT}/{BASE_DIR}")
+            url = f"http://localhost:{PORT}/{BASE_DIR}"
+            print(url)
+            subprocess.run(f"open {url}", check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, shell=True)
             httpd.serve_forever()
 
