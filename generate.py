@@ -148,7 +148,7 @@ if LANG == "de":
     <img src="fehlerteufelchen.svg" alt="Fehlerteufelchen">
     </main>
   """
-    
+
 elif LANG == "en":
   IN_DIRECTORY = 'en'
   MAGAZINE_NAME = "64'er Magazine"
@@ -329,6 +329,7 @@ class ArticleDatabase:
         issue_path = issue_directory_path  # Capture the issue directory path
         issue_dir_name = os.path.basename(issue_directory_path)
         issue_key = None
+        pubdate = None
 
         for root, dirs, files in os.walk(issue_directory_path):
             for file in files:
@@ -349,14 +350,17 @@ class ArticleDatabase:
                     pdf_path = os.path.join(root, file)
                     pdf_filename = os.path.basename(pdf_path)
 
-        return {
-            'articles_metadata': articles_metadata,
-            'toc_order': toc_order,
-            'pubdate': pubdate,
-            'pdf_filename': pdf_filename,
-            'issue_dir_name': issue_dir_name,
-            'issue_key': issue_key
-        }
+        if pubdate:
+            return {
+                'articles_metadata': articles_metadata,
+                'toc_order': toc_order,
+                'pubdate': pubdate,
+                'pdf_filename': pdf_filename,
+                'issue_dir_name': issue_dir_name,
+                'issue_key': issue_key
+            }
+        else:
+            return None
 
     def __init__(self, in_directory):
         self.issues = {}  # Change to dictionary
@@ -365,6 +369,9 @@ class ArticleDatabase:
             issue_dir_path = os.path.join(in_directory, issue_dir_name)
             if os.path.isdir(issue_dir_path) and re.match(r'^\d{4}$', issue_dir_name):
                 issue_data = self.__extract_issue_data(issue_dir_path)
+                if not issue_data:
+                    continue
+
                 # Map issue key to issue data
                 self.issues[issue_data['issue_key']] = {
                     'issue_dir_name': issue_dir_name,
