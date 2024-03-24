@@ -958,27 +958,32 @@ def copy_and_modify_html(article, html_dest_path, pdf_path, prev_page_link, next
     body.insert(0, custom_div_soup)
 
     download_pdf_html = f'''
-<div class="download_pdf">
+<div class="article_action">
 <a href="{pdf_path}">
 <img src="/{BASE_DIR}pdf.svg" alt="PDF">
 {LABEL_DOWNLOAD_ARTICLE_PDF}
 </a>
 </div>'''
-    download_pdf_soup = BeautifulSoup(download_pdf_html, 'html.parser')
-    body.append(download_pdf_soup)
 
     url = RSS_BASE_URL + html_dest_path.removeprefix(OUT_DIRECTORY)[1:] # hack :(
 
     mastodon_link = share_on_mastodon_link(article['title'], url)
     mastodon_html = f'''
-<div class="download_pdf">
+<div class="article_action">
 <a href="{mastodon_link}">
 <img src="/{BASE_DIR}mastodon_blue.svg" alt="Mastodon">
 {LABEL_SHARE_ON_MASTODON}
 </a>
 </div>'''
-    mastodon_soup = BeautifulSoup(mastodon_html, 'html.parser')
-    body.append(mastodon_soup)
+
+    article_actions_html = f'''
+<div class="actions">
+{download_pdf_html}
+{mastodon_html}
+</div>'''
+
+    article_actions_soup = BeautifulSoup(article_actions_html, 'html.parser')
+    body.append(article_actions_soup) # pdf download and mastodon
 
     nav_parts = []
     nav_parts.append("<div class=\"article_navigation\">\n")
