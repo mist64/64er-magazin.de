@@ -1,3 +1,6 @@
+#!/usr/bin/env python3
+
+import sys
 import re
 import os
 import shutil
@@ -5,6 +8,9 @@ import pprint
 import subprocess
 import json
 import html
+import subprocess
+import http.server
+import socketserver
 from collections import defaultdict
 from bs4 import BeautifulSoup, NavigableString
 from urllib.parse import quote
@@ -12,23 +18,55 @@ from datetime import datetime, timedelta, timezone
 from dateutil.relativedelta import relativedelta
 from PyPDF2 import PdfReader, PdfWriter
 
-RSS_BASE_URL = "https://www.64er-magazin.de/"
-#RSS_BASE_URL = "http://localhost:8000/"
-
-BASE_DIR = ''
-#BASE_DIR = 'pre/'
-
+#
+# Settings
+#
+LANG='de'
 OUT_DIRECTORY = 'out'
+SERVER = 'www.64er-magazin.de'
+IMAGE_CONVERSION_TOOL = 'imagemagick' # 'guetzli'
+EXTRACT_PDF_PAGES = True # disable for speed when testing
+ARTICLES_PER_PAGE = 20
+NEW_DOWNLOADS = 15
 
-LANG="de"
+#
+# Parse arguments
+#
+DEPLOY=None
+if len(sys.argv) > 1:
+    if sys.argv[1] == "local":
+        DEPLOY = "local"
+    elif sys.argv[1] == "upload":
+        DEPLOY = "upload"
+    else:
+        print("Unknown command.")
+        exit()
 
-#IMAGE_CONVERSION_TOOL = 'guetzli'
-IMAGE_CONVERSION_TOOL = 'imagemagick'
+#
+# if we're on "main", we will deploy to production, otherwise into a subdirectory
+#
+branch_name = subprocess.check_output(["git", "rev-parse", "--abbrev-ref", "HEAD"]).decode("utf-8").strip()
+RELEASE = branch_name == "main"
+if RELEASE:
+    BASE_DIR = ''
+else:
+    BASE_DIR = 'test/' + branch_name + '/'
+if LANG != "de":
+    BASE_DIR += '/' + LANG
 
-EXTRACT_PDF_PAGES = True
+if RELEASE and DEPLOY == "upload":
+    response = input("Deploy to production? [Y/N]: ").strip()
+    if response.lower() != 'y':
+        print("Exiting.")
+        exit()
 
-MASTODON_HASHTAGS = "#c64 #retrocomputing"
+RSS_BASE_URL = "https://www.64er-magazin.de/"
+MASTODON_HASHTAGS = "#c64 #retrocomputing #64er"
+TITLE_IMAGE_NAME = "title.jpg"
 
+#
+# Localization
+#
 if LANG == "de":
   IN_DIRECTORY = 'issues'
   MAGAZINE_NAME = "64'er Magazin"
@@ -52,6 +90,7 @@ if LANG == "de":
   LABEL_PAGE = "S."
   LABEL_DOWNLOAD_ISSUE_PDF = "PDF Downloaden"
   LABEL_DOWNLOAD_ARTICLE_PDF = "Diesen Artikel als PDF herunterladen"
+  LABEL_SHARE_ON_MASTODON = "Diesen Artikel auf Mastodon teilen"
   LABEL_DOWNLOAD = "Download"
   LABEL_NEWER = "← Neuer"
   LABEL_OLDER = "Älter →"
@@ -124,6 +163,7 @@ elif LANG == "en":
   LABEL_PAGE = "p."
   LABEL_DOWNLOAD_ISSUE_PDF = "Download PDF"
   LABEL_DOWNLOAD_ARTICLE_PDF = "Download this article in PDF format"
+  LABEL_SHARE_ON_MASTODON = "Share this article on Mastodon"
   LABEL_DOWNLOAD = "Download"
   LABEL_NEWER = "← Newer"
   LABEL_OLDER = "Older →"
@@ -170,11 +210,6 @@ elif LANG == "en":
     </ul>
     </main>
     """
-
-ARTICLES_PER_PAGE = 20
-NEW_DOWNLOADS = 15
-
-TITLE_IMAGE_NAME = "title.jpg"
 
 LOGO = f'<img src="/{BASE_DIR}logo.svg" alt="{MAGAZINE_NAME}">'
 
@@ -405,6 +440,10 @@ def toc_title(article):
   title = article['title']
   return toc_title if toc_title else title
 
+def share_on_mastodon_link(title, url):
+    mastodon_message = quote(f"{title}\n{url}\n{MASTODON_HASHTAGS}")
+    return f"/{BASE_DIR}tootpick.html#text={mastodon_message}"
+
 ### Reusable HTML generation
 
 def html_generate_latest_issue(db):
@@ -599,37 +638,6 @@ def html_generate_all_downloads(db):
 
     return '<main>' + html_table + '</main>'
 
-
-
-#    articles_with_downloads = db.articles_with_downloads()
-#    articles_sorted = sorted(articles_with_downloads, key=lambda x: (x['issue_key'], #first_page_number(x['pages'])), reverse=True)
-#
-#    html_parts = []
-#    html_parts.append(f"<main>\n")
-#    html_parts.append(f"<h1>{LABEL_LISTINGS}</h1>\n")
-#
-#    current_issue = None
-#    for article in articles_sorted:
-#        if article['issue_key'] != current_issue:
-#            if current_issue is not None:
-#                html_parts.append("</table>\n")
-#            current_issue = article['issue_key']
-#            html_parts.append(f"<h2>{LABEL_ISSUE} {current_issue}</h2>\n")
-#            html_parts.append("<table class=\"all_downloads\">\n")
-#
-#        article_title = article.get('title', 'Untitled')
-#        issue_data = db.issues[article['issue_key']]
-#        link = article_link(db, article, index_title(article), True)
-#        category = article['index_category']
-#        html_parts.append(f"<tr><td><h3>{link}</h3>{category}</td><td><ul>\n")
-#        for download in article['downloads']:
-#            link = prg_link(issue_data, download)
-#            html_parts.append(f"<li>{link}</li>\n")
-#        html_parts.append("</ul></td></tr>\n")
-#    html_parts.append("</table>\n")
-#    html_parts.append(f"</main>\n")
-#    return ''.join(html_parts)
-
 def html_generate_article_preview(db, article):
     html_parts = []
     link_title = article_link(db, article, index_title(article), True)
@@ -698,7 +706,7 @@ def write_full_html_file(db, path, title, preview_img, body_html, body_class, co
       if not preview_img:
         preview_img = "logo.png"
 
-    mastodon_message = quote(f"{title}\n{url}\n{MASTODON_HASHTAGS}")
+    mastodon_link = share_on_mastodon_link(title, url)
 
     full_html = f"""
 <!DOCTYPE html>
@@ -731,7 +739,7 @@ def write_full_html_file(db, path, title, preview_img, body_html, body_class, co
     <a href="/{BASE_DIR}{FILENAME_LISTINGS}.html">{LABEL_LISTINGS}</a>
   </nav>
   <div class="top-right-container">
-    <a href="/{BASE_DIR}tootpick.html#text={mastodon_message}">
+    <a href="{mastodon_link}">
       <img src="/{BASE_DIR}mastodon.svg" alt="Mastodon" class="rss_img">
     </a>
     <a href="/{BASE_DIR}64er.rss">
@@ -983,14 +991,32 @@ def copy_and_modify_html(article, html_dest_path, pdf_path, prev_page_link, next
     body.insert(0, custom_div_soup)
 
     download_pdf_html = f'''
-<div class="download_pdf">
+<div class="article_action">
 <a href="{pdf_path}">
 <img src="/{BASE_DIR}pdf.svg" alt="PDF">
 {LABEL_DOWNLOAD_ARTICLE_PDF}
 </a>
 </div>'''
-    download_pdf_soup = BeautifulSoup(download_pdf_html, 'html.parser')
-    body.append(download_pdf_soup)
+
+    url = RSS_BASE_URL + html_dest_path.removeprefix(OUT_DIRECTORY)[1:] # hack :(
+
+    mastodon_link = share_on_mastodon_link(article['title'], url)
+    mastodon_html = f'''
+<div class="article_action">
+<a href="{mastodon_link}">
+<img src="/{BASE_DIR}mastodon_blue.svg" alt="Mastodon">
+{LABEL_SHARE_ON_MASTODON}
+</a>
+</div>'''
+
+    article_actions_html = f'''
+<div class="actions">
+{download_pdf_html}
+{mastodon_html}
+</div>'''
+
+    article_actions_soup = BeautifulSoup(article_actions_html, 'html.parser')
+    body.append(article_actions_soup) # pdf download and mastodon
 
     nav_parts = []
     nav_parts.append("<div class=\"article_navigation\">\n")
@@ -1022,6 +1048,7 @@ def copy_articles_and_assets(db, in_directory, out_directory):
     shutil.copy(os.path.join(in_directory, 'logo.png'), out_directory)
     shutil.copy(os.path.join(in_directory, 'fehlerteufelchen.svg'), out_directory)
     shutil.copy(os.path.join(in_directory, 'mastodon.svg'), out_directory)
+    shutil.copy(os.path.join(in_directory, 'mastodon_blue.svg'), out_directory)
     shutil.copy(os.path.join(in_directory, 'rss.svg'), out_directory)
     shutil.copy(os.path.join(in_directory, 'pdf.svg'), out_directory)
     shutil.copy(os.path.join(in_directory, 'style.css'), out_directory)
@@ -1144,6 +1171,8 @@ def generate_search_json(db, out_directory):
         json.dump(articles_info, f, ensure_ascii=False, indent=4)
 
 if __name__ == '__main__':
+    print("*** Generating")
+
     db = ArticleDatabase(IN_DIRECTORY)
 
     if os.path.exists(OUT_DIRECTORY):
@@ -1162,3 +1191,23 @@ if __name__ == '__main__':
     generate_rss_feed(db, out_directory)
     generate_privacy_page(db, out_directory)
     generate_search_json(db, out_directory)
+
+    if DEPLOY == "upload":
+        print("*** Uploading")
+        command = f"rsync -Pa {OUT_DIRECTORY}/* local@{SERVER}:/var/www/html/"
+        print("    " + command)
+        ret = subprocess.run(command, check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, shell=True)
+        url = f"https://{SERVER}/{BASE_DIR}"
+        print(url)
+        subprocess.run(f"open {url}", check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, shell=True)
+    elif DEPLOY == "local":
+        PORT = 8000
+        class Handler(http.server.SimpleHTTPRequestHandler):
+            def __init__(self, *args, **kwargs):
+                super().__init__(*args, directory=OUT_DIRECTORY, **kwargs)
+        with socketserver.TCPServer(("", PORT), Handler) as httpd:
+            url = f"http://localhost:{PORT}/{BASE_DIR}"
+            print(url)
+            subprocess.run(f"open {url}", check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, shell=True)
+            httpd.serve_forever()
+
