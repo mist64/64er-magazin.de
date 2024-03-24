@@ -825,12 +825,12 @@ def write_full_html_file(db, path, title, preview_img, body_html, body_class, co
 
 def generate_all_issues_with_tocs_html(db, out_directory):
     body_html = html_generate_tocs_all_issues(db)
-    write_full_html_file(db, os.path.join(out_directory, f'{FILENAME_ISSUES}.html'), f'{LABEL_ALL_ISSUES} | {MAGAZINE_NAME}', None, body_html, 'alle_ausgaben')
+    write_full_html_file(db, os.path.join(out_directory, f'{FILENAME_ISSUES}.html'), f'{LABEL_ALL_ISSUES} | {MAGAZINE_NAME}', None, body_html, 'all_issues')
 
 def generate_issues_toc_html(db, issue_key, out_directory):
     body_html = html_generate_toc(db, issue_key, 1, False)
     issue_dest_path = os.path.join(out_directory, db.issues[issue_key]['issue_dir_name'])
-    write_full_html_file(db, os.path.join(issue_dest_path, 'index.html'), f'{LABEL_TOC_ISSUE} {issue_key} | {MAGAZINE_NAME}', 'title.jpg', body_html, 'eine_ausgabe', True)
+    write_full_html_file(db, os.path.join(issue_dest_path, 'index.html'), f'{LABEL_TOC_ISSUE} {issue_key} | {MAGAZINE_NAME}', 'title.jpg', body_html, 'one_issue', True)
 
 def generate_issues_tocs_html(db, out_directory):
     for issue_key in sorted(db.issues.keys(), key=lambda x: key_to_datetime(x), reverse=True):
@@ -838,7 +838,7 @@ def generate_issues_tocs_html(db, out_directory):
 
 def generate_all_topics_html(db, out_directory):
     body_html = html_generate_all_articles_by_category(db)
-    write_full_html_file(db, os.path.join(out_directory, f'{FILENAME_ARTICLES}.html'), f'{LABEL_ALL_ARTICLES} | {MAGAZINE_NAME}', None, body_html, 'alle_artikel')
+    write_full_html_file(db, os.path.join(out_directory, f'{FILENAME_ARTICLES}.html'), f'{LABEL_ALL_ARTICLES} | {MAGAZINE_NAME}', None, body_html, 'all_articles')
 
 def generate_topic_htmls(db, out_directory):
     for topic, toc_topics in TOPICS:
@@ -856,11 +856,11 @@ def generate_topic_htmls(db, out_directory):
         html_parts.append(f"</main>\n")
 
         body_html = ''.join(html_parts)
-        write_full_html_file(db, os.path.join(out_directory, filename), f'{topic} | {MAGAZINE_NAME}', None, body_html, 'ein_thema')
+        write_full_html_file(db, os.path.join(out_directory, filename), f'{topic} | {MAGAZINE_NAME}', None, body_html, 'one_topic')
 
 def generate_all_downloads_html(db, out_directory):
     body_html = html_generate_all_downloads(db)
-    write_full_html_file(db, os.path.join(out_directory, f'{FILENAME_LISTINGS}.html'), f'{LABEL_ALL_LISTINGS} | {MAGAZINE_NAME}', None, body_html, 'alle_listings')
+    write_full_html_file(db, os.path.join(out_directory, f'{FILENAME_LISTINGS}.html'), f'{LABEL_ALL_LISTINGS} | {MAGAZINE_NAME}', None, body_html, 'all_listings')
 
 def index_filename(i):
     if i == 1:
@@ -916,7 +916,7 @@ def generate_all_article_links_html(db, out_directory, articles_per_page):
 def generate_privacy_page(db, out_directory):
         html_dest_path = os.path.join(out_directory, f"{FILENAME_PRIVACY}.html")
         title = LABEL_PRIVACY
-        write_full_html_file(db, html_dest_path, title, None, HTML_PRIVACY, 'datenschutz')
+        write_full_html_file(db, html_dest_path, title, None, HTML_PRIVACY, 'privacy')
 
 def generate_404_page(db, out_directory):
         html_dest_path = os.path.join(out_directory, f"{FILENAME_404}.html")
@@ -1081,7 +1081,7 @@ def copy_and_modify_html(article, html_dest_path, pdf_path, prev_page_link, next
     preview_img = next((url for url in article.get('img_urls', [])), None)
 
 
-    write_full_html_file(db, html_dest_path, title, preview_img, body_html, 'ein_artikel', True)
+    write_full_html_file(db, html_dest_path, title, preview_img, body_html, 'one_article', True)
 
 def copy_articles_and_assets(db, in_directory, out_directory):
     if not os.path.exists(out_directory):
