@@ -180,6 +180,7 @@ elif LANG == "en":
   LABEL_OLDER = "Older →"
   LABEL_PREVIOUS_ARTICLE = "← Previous Article"
   LABEL_NEXT_ARTICLE = "Next Article →"
+  LABEL_ALL_ISSUES = "All Issues"
   LABEL_ALL_ARTICLES = "All Articles"
   LABEL_ALL_LISTINGS = "All Listings"
   LABEL_CURRENT_ISSUE = "Current Issue"
