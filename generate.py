@@ -27,7 +27,7 @@ IMAGE_CONVERSION_TOOL = 'imagemagick'
 
 EXTRACT_PDF_PAGES = True
 
-MASTODON_HASHTAGS = "#c64 #retrocomputing"
+MASTODON_HASHTAGS = "#c64 #retrocomputing #64er"
 
 if LANG == "de":
   IN_DIRECTORY = 'issues'
@@ -52,6 +52,7 @@ if LANG == "de":
   LABEL_PAGE = "S."
   LABEL_DOWNLOAD_ISSUE_PDF = "PDF Downloaden"
   LABEL_DOWNLOAD_ARTICLE_PDF = "Diesen Artikel als PDF herunterladen"
+  LABEL_SHARE_ON_MASTODON = "Diesen Artikel auf Mastodon teilen"
   LABEL_DOWNLOAD = "Download"
   LABEL_NEWER = "← Neuer"
   LABEL_OLDER = "Älter →"
@@ -124,6 +125,7 @@ elif LANG == "en":
   LABEL_PAGE = "p."
   LABEL_DOWNLOAD_ISSUE_PDF = "Download PDF"
   LABEL_DOWNLOAD_ARTICLE_PDF = "Download this article in PDF format"
+  LABEL_SHARE_ON_MASTODON = "Share this article on Mastodon"
   LABEL_DOWNLOAD = "Download"
   LABEL_NEWER = "← Newer"
   LABEL_OLDER = "Older →"
@@ -405,6 +407,10 @@ def toc_title(article):
   title = article['title']
   return toc_title if toc_title else title
 
+def share_on_mastodon_link(title, url):
+    mastodon_message = quote(f"{title}\n{url}\n{MASTODON_HASHTAGS}")
+    return f"/{BASE_DIR}tootpick.html#text={mastodon_message}"
+
 ### Reusable HTML generation
 
 def html_generate_latest_issue(db):
@@ -599,37 +605,6 @@ def html_generate_all_downloads(db):
 
     return '<main>' + html_table + '</main>'
 
-
-
-#    articles_with_downloads = db.articles_with_downloads()
-#    articles_sorted = sorted(articles_with_downloads, key=lambda x: (x['issue_key'], #first_page_number(x['pages'])), reverse=True)
-#
-#    html_parts = []
-#    html_parts.append(f"<main>\n")
-#    html_parts.append(f"<h1>{LABEL_LISTINGS}</h1>\n")
-#
-#    current_issue = None
-#    for article in articles_sorted:
-#        if article['issue_key'] != current_issue:
-#            if current_issue is not None:
-#                html_parts.append("</table>\n")
-#            current_issue = article['issue_key']
-#            html_parts.append(f"<h2>{LABEL_ISSUE} {current_issue}</h2>\n")
-#            html_parts.append("<table class=\"all_downloads\">\n")
-#
-#        article_title = article.get('title', 'Untitled')
-#        issue_data = db.issues[article['issue_key']]
-#        link = article_link(db, article, index_title(article), True)
-#        category = article['index_category']
-#        html_parts.append(f"<tr><td><h3>{link}</h3>{category}</td><td><ul>\n")
-#        for download in article['downloads']:
-#            link = prg_link(issue_data, download)
-#            html_parts.append(f"<li>{link}</li>\n")
-#        html_parts.append("</ul></td></tr>\n")
-#    html_parts.append("</table>\n")
-#    html_parts.append(f"</main>\n")
-#    return ''.join(html_parts)
-
 def html_generate_article_preview(db, article):
     html_parts = []
     link_title = article_link(db, article, index_title(article), True)
@@ -698,7 +673,7 @@ def write_full_html_file(db, path, title, preview_img, body_html, body_class, co
       if not preview_img:
         preview_img = "logo.png"
 
-    mastodon_message = quote(f"{title}\n{url}\n{MASTODON_HASHTAGS}")
+    mastodon_link = share_on_mastodon_link(title, url)
 
     full_html = f"""
 <!DOCTYPE html>
@@ -731,7 +706,7 @@ def write_full_html_file(db, path, title, preview_img, body_html, body_class, co
     <a href="/{BASE_DIR}{FILENAME_LISTINGS}.html">{LABEL_LISTINGS}</a>
   </nav>
   <div class="top-right-container">
-    <a href="/{BASE_DIR}tootpick.html#text={mastodon_message}">
+    <a href="{mastodon_link}">
       <img src="/{BASE_DIR}mastodon.svg" alt="Mastodon" class="rss_img">
     </a>
     <a href="/{BASE_DIR}64er.rss">
@@ -992,6 +967,19 @@ def copy_and_modify_html(article, html_dest_path, pdf_path, prev_page_link, next
     download_pdf_soup = BeautifulSoup(download_pdf_html, 'html.parser')
     body.append(download_pdf_soup)
 
+    url = RSS_BASE_URL + html_dest_path.removeprefix(OUT_DIRECTORY)[1:] # hack :(
+
+    mastodon_link = share_on_mastodon_link(article['title'], url)
+    mastodon_html = f'''
+<div class="download_pdf">
+<a href="{mastodon_link}">
+<img src="/{BASE_DIR}mastodon_blue.svg" alt="Mastodon">
+{LABEL_SHARE_ON_MASTODON}
+</a>
+</div>'''
+    mastodon_soup = BeautifulSoup(mastodon_html, 'html.parser')
+    body.append(mastodon_soup)
+
     nav_parts = []
     nav_parts.append("<div class=\"article_navigation\">\n")
     if prev_page_link:
@@ -1022,6 +1010,7 @@ def copy_articles_and_assets(db, in_directory, out_directory):
     shutil.copy(os.path.join(in_directory, 'logo.png'), out_directory)
     shutil.copy(os.path.join(in_directory, 'fehlerteufelchen.svg'), out_directory)
     shutil.copy(os.path.join(in_directory, 'mastodon.svg'), out_directory)
+    shutil.copy(os.path.join(in_directory, 'mastodon_blue.svg'), out_directory)
     shutil.copy(os.path.join(in_directory, 'rss.svg'), out_directory)
     shutil.copy(os.path.join(in_directory, 'pdf.svg'), out_directory)
     shutil.copy(os.path.join(in_directory, 'style.css'), out_directory)
