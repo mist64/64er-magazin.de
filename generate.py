@@ -1233,6 +1233,11 @@ if __name__ == '__main__':
     generate_404_page(db, out_directory)
     generate_search_json(db, out_directory)
 
+    print("*** Filtering")
+    dir = f"{OUT_DIRECTORY}/{BASE_DIR}"
+    subprocess.run(['python3', f'filter_rss.py'], cwd=dir)
+    subprocess.run(['python3', f'filter_index.py'], cwd=dir)
+
     if DEPLOY == "upload":
         print("*** Uploading")
         command = f"rsync -Pa {OUT_DIRECTORY}/* local@{SERVER}:/var/www/html/"
