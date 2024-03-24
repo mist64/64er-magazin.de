@@ -1,3 +1,6 @@
+#!/usr/bin/env python3
+
+import sys
 import re
 import os
 import shutil
@@ -5,6 +8,9 @@ import pprint
 import subprocess
 import json
 import html
+import subprocess
+import http.server
+import socketserver
 from collections import defaultdict
 from bs4 import BeautifulSoup, NavigableString
 from urllib.parse import quote
@@ -12,23 +18,55 @@ from datetime import datetime, timedelta, timezone
 from dateutil.relativedelta import relativedelta
 from PyPDF2 import PdfReader, PdfWriter
 
-RSS_BASE_URL = "https://www.64er-magazin.de/"
-#RSS_BASE_URL = "http://localhost:8000/"
-
-BASE_DIR = ''
-#BASE_DIR = 'pre/'
-
+#
+# Settings
+#
+LANG='de'
 OUT_DIRECTORY = 'out'
+SERVER = 'www.64er-magazin.de'
+IMAGE_CONVERSION_TOOL = 'imagemagick' # 'guetzli'
+EXTRACT_PDF_PAGES = True # disable for speed when testing
+ARTICLES_PER_PAGE = 20
+NEW_DOWNLOADS = 15
 
-LANG="de"
+#
+# Parse arguments
+#
+DEPLOY=None
+if len(sys.argv) > 1:
+    if sys.argv[1] == "local":
+        DEPLOY = "local"
+    elif sys.argv[1] == "upload":
+        DEPLOY = "upload"
+    else:
+        print("Unknown command.")
+        exit()
 
-#IMAGE_CONVERSION_TOOL = 'guetzli'
-IMAGE_CONVERSION_TOOL = 'imagemagick'
+#
+# if we're on "main", we will deploy to production, otherwise into a subdirectory
+#
+branch_name = subprocess.check_output(["git", "rev-parse", "--abbrev-ref", "HEAD"]).decode("utf-8").strip()
+RELEASE = branch_name == "main"
+if RELEASE:
+    BASE_DIR = ''
+else:
+    BASE_DIR = 'test/' + branch_name + '/'
+if LANG != "de":
+    BASE_DIR += '/' + LANG
 
-EXTRACT_PDF_PAGES = True
+if RELEASE and DEPLOY == "upload":
+    response = input("Deploy to production? [Y/N]: ").strip()
+    if response.lower() != 'y':
+        print("Exiting.")
+        exit()
 
+RSS_BASE_URL = "https://www.64er-magazin.de/"
 MASTODON_HASHTAGS = "#c64 #retrocomputing #64er"
+TITLE_IMAGE_NAME = "title.jpg"
 
+#
+# Localization
+#
 if LANG == "de":
   IN_DIRECTORY = 'issues'
   MAGAZINE_NAME = "64'er Magazin"
@@ -172,11 +210,6 @@ elif LANG == "en":
     </ul>
     </main>
     """
-
-ARTICLES_PER_PAGE = 20
-NEW_DOWNLOADS = 15
-
-TITLE_IMAGE_NAME = "title.jpg"
 
 LOGO = f'<img src="/{BASE_DIR}logo.svg" alt="{MAGAZINE_NAME}">'
 
@@ -1138,6 +1171,8 @@ def generate_search_json(db, out_directory):
         json.dump(articles_info, f, ensure_ascii=False, indent=4)
 
 if __name__ == '__main__':
+    print("*** Generating")
+
     db = ArticleDatabase(IN_DIRECTORY)
 
     if os.path.exists(OUT_DIRECTORY):
@@ -1156,3 +1191,23 @@ if __name__ == '__main__':
     generate_rss_feed(db, out_directory)
     generate_privacy_page(db, out_directory)
     generate_search_json(db, out_directory)
+
+    if DEPLOY == "upload":
+        print("*** Uploading")
+        command = f"rsync -Pa {OUT_DIRECTORY}/* local@{SERVER}:/var/www/html/"
+        print("    " + command)
+        ret = subprocess.run(command, check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, shell=True)
+        url = f"https://{SERVER}/{BASE_DIR}"
+        print(url)
+        subprocess.run(f"open {url}", check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, shell=True)
+    elif DEPLOY == "local":
+        PORT = 8000
+        class Handler(http.server.SimpleHTTPRequestHandler):
+            def __init__(self, *args, **kwargs):
+                super().__init__(*args, directory=OUT_DIRECTORY, **kwargs)
+        with socketserver.TCPServer(("", PORT), Handler) as httpd:
+            url = f"http://localhost:{PORT}/{BASE_DIR}"
+            print(url)
+            subprocess.run(f"open {url}", check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, shell=True)
+            httpd.serve_forever()
+
