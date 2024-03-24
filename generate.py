@@ -553,10 +553,13 @@ def html_generate_tocs_all_issues(db):
     html_parts.append(f"</main>\n")
     return ''.join(html_parts)
 
-def html_generate_articles_for_categories(db, toc_categories, issue_key=None, append_issue_number=False):
+def html_generate_articles_for_categories(db, toc_categories, alphabetical, issue_key=None, append_issue_number=False):
     articles = db.articles_by_toc_categories(toc_categories, issue_key)
     if not articles:
         return None
+    if alphabetical:
+        articles = sorted(articles, key=lambda article: index_title(article).lower())
+
     html_parts = []
     html_parts.append(f"<ul>\n")
     for article in articles:
@@ -590,10 +593,24 @@ def html_generate_all_articles_by_category(db):
     html_parts = []
     html_parts.append(f"<main>\n")
 
+    last_h2_title = None
+
     for toc_category in category_order:
-        html = html_generate_articles_for_categories(db, [toc_category], None, True)
+        if '|' in toc_category:
+            h2_title, h3_title = toc_category.split('|', 1)  # Split into h2 and h3 titles
+        else:
+            h2_title, h3_title = toc_category, None
+
+        html = html_generate_articles_for_categories(db, [toc_category], True, None, True)
         if html:
-            html_parts.append(f"<h2>{toc_category}</h2>\n")
+            if h2_title != last_h2_title or h3_title is not None:
+                if h2_title != last_h2_title:
+                    html_parts.append(f"<h2>{h2_title}</h2>\n")
+                    last_h2_title = h2_title  # Update last <h2> title used
+
+                # Add <h3> if there's a specific title for it
+                if h3_title:
+                    html_parts.append(f"<h3>{h3_title}</h3>\n")
             html_parts.append(html)
 
     html_parts.append(f"</main>\n")
@@ -810,7 +827,7 @@ def generate_topic_htmls(db, out_directory):
         html_parts.append(f"<h1>{topic}</h1>\n")
 
         for issue_key in sorted(db.issues.keys(), key=lambda x: key_to_datetime(x), reverse=True):
-            html = html_generate_articles_for_categories(db, toc_topics, issue_key);
+            html = html_generate_articles_for_categories(db, toc_topics, False, issue_key);
             if html:
                 html_parts.append(f"<h2>{LABEL_ISSUE} {issue_key}</h2>\n")
                 html_parts.append(html)
