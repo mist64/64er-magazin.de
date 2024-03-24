@@ -762,36 +762,35 @@ def write_full_html_file(db, path, title, preview_img, body_html, body_class, co
     <script src="/{BASE_DIR}search.js"></script>
     {isso_html1}
 </head>
+
 <body class="{body_class}">
-<div class="header">
-  <div class="logo-container">
+<header class="page_navigation">
+  <div class="logo_container">
     <a href="/{BASE_DIR}index.html">
-        <img src="/{BASE_DIR}logo.png" alt="Logo" class="logo">
+      <img src="/{BASE_DIR}logo.png" alt="Logo" class="logo_image">
     </a>
   </div>
-  <div class="nav-container">
-<div class="top-nav">
-  <nav class="nav-links1">
-    <a href="/{BASE_DIR}{FILENAME_ISSUES}.html">{LABEL_ISSUES}</a>
-    <a href="/{BASE_DIR}{FILENAME_ARTICLES}.html">{LABEL_ARTICLES}</a>
-    <a href="/{BASE_DIR}{FILENAME_LISTINGS}.html">{LABEL_LISTINGS}</a>
-  </nav>
-  <div class="top-right-container">
-    <a href="{mastodon_link}">
-      <img src="/{BASE_DIR}mastodon.svg" alt="Mastodon" class="rss_img">
-    </a>
-    <a href="/{BASE_DIR}64er.rss">
-      <img src="/{BASE_DIR}rss.svg" alt="RSS" class="rss_img">
-    </a>
-  <form id="search-form" name="searchForm" onsubmit="return false">
-    <input autocomplete="off" placeholder="{LABEL_SEARCH}" id="search" class="search-input" aria-label="Search site" type="text" name="q">
-  </form>
-
-
-  </div>
-</div>
-    <div class="bottom-nav">
-      <nav class="nav-links2">
+  <div class="nav_container">
+    <div class="overview_container">
+      <nav class="links_overview">
+        <a href="/{BASE_DIR}{FILENAME_ISSUES}.html">{LABEL_ISSUES}</a>
+        <a href="/{BASE_DIR}{FILENAME_ARTICLES}.html">{LABEL_ARTICLES}</a>
+        <a href="/{BASE_DIR}{FILENAME_LISTINGS}.html">{LABEL_LISTINGS}</a>
+      </nav>
+      <div class="social_and_search">
+        <a href="{mastodon_link}">
+          <img src="/{BASE_DIR}mastodon.svg" alt="Mastodon" class="social_image">
+        </a>
+        <a href="/{BASE_DIR}64er.rss">
+          <img src="/{BASE_DIR}rss.svg" alt="RSS" class="social_image">
+        </a>
+        <form id="search-form" name="searchForm" onsubmit="return false">
+          <input autocomplete="off" placeholder="{LABEL_SEARCH}" id="search" class="search-input" aria-label="Search site" type="text" name="q">
+        </form>
+      </div>
+    </div>
+    <div class="topics_container">
+      <nav class="links_topics">
         <a href="/{BASE_DIR}{FILENAME_NEWS}.html">{LABEL_NEWS}</a>
         <a href="/{BASE_DIR}{FILENAME_HARDWARE}.html">{LABEL_HARDWARE}</a>
         <a href="/{BASE_DIR}{FILENAME_TESTS}.html">{LABEL_TESTS}</a>
@@ -803,19 +802,21 @@ def write_full_html_file(db, path, title, preview_img, body_html, body_class, co
       </nav>
     </div>
   </div>
-</div>
+</header>
+
 <div class="main_content">
 {body_html}
 {isso_html2}
 </div>
-<div class="sub-bar">
+
+<footer class="page_footer">
   <span class="left-text">© 1984 Markt & Technik Verlag Aktiengesellschaft</span>
   <nav class="right-nav">
     <a href="https://github.com/mist64/64er-magazin.de">{LABEL_CONTACT}</a>
     <a href="/{BASE_DIR}{impressum_path}">{LABEL_IMPRINT}</a>
     <a href="/{BASE_DIR}{FILENAME_PRIVACY}.html">{LABEL_PRIVACY}</a>
   </nav>
-</div>
+</footer>
 </body>
 </html>"""
     with open(path, 'w', encoding='utf-8') as f:
@@ -897,10 +898,10 @@ def generate_all_article_links_html(db, out_directory, articles_per_page):
 
 
         html_parts.append("<div class=\"column2\">\n")
-        html_parts.append("<div class=\"current-sidebox\">\n");
+        html_parts.append("<div class=\"current_sidebox\">\n");
         html_parts.append(html_generate_latest_issue(db))
         html_parts.append("</div>")
-        html_parts.append("<div class=\"listings-sidebox\">\n");
+        html_parts.append("<div class=\"listings_sidebox\">\n");
         html_parts.append(html_generate_latest_downloads(db))
         html_parts.append("</div>")
         html_parts.append("</div>") # Closing div for 'column2'
