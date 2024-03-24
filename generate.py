@@ -733,7 +733,9 @@ def write_full_html_file(db, path, title, preview_img, body_html, body_class, co
     <link rel="stylesheet" href="/isso/css/isso.css" />
 """
       isso_html2 = f"""
-<div id="isso-thread" data-isso-id="{isso_id}"></div>
+      <div class="comments">
+        <div id="isso-thread" data-isso-id="{isso_id}"></div>
+      </div>
 """
     else:
       isso_html1 = ""
