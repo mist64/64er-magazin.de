@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>Reise durch die Wunderwelt der Grafik – Teil 5</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="XXX">
+    <meta name="64er.issue" content="5/84">
+    <meta name="64er.pages" content="142-150">
+    <meta name="64er.toc_category" content="XXX">
+    <meta name="64er.id" content="XXX">
+</head>
+
+<body>
+    <article>
+        <p>Reise durch die Wunderwelt der Grafik – Teil 5</p>
+
+        <p class="intro">Nachdem wir sie in den ersten vier Folgen kaum erwähnt haben, sind sie heute dran: die Sprites. Sie müssen einfach in jeder Reise durch die Grafik unseres C 64 auftauchen.</p>
+
+        <figure>
+            <!-- TODO -->
+            <img src="142-1.png" alt="">
+            <figcaption>Bild 1. Ein Drudenfuß oder Pentagramm</figcaption>
+        </figure>
+
+        <figure>
+            <!-- TODO -->
+            <figcaption>Bild 2. Die Sprite-Organisation im VIC-II-Chip</figcaption>
+        </figure>
+
+        <figure>
+            <!-- TODO -->
+            <img src="142-3.png" alt="">
+            <figcaption>Bild 3. Das Pentagramm im Sprite-Bitraster</figcaption>
+        </figure>
+        <figure>
+            <!-- TODO -->
+            <img src="142-3.png" alt="">
+            <figcaption>Bild 4. Sprite-Koordinatensystem</figcaption>
+        </figure>
+        <figure>
+            <!-- TODO -->
+            <img src="142-4.png" alt="">
+            <figcaption>Bild 4. Sprite-Koordinatensystem</figcaption>
+        </figure>
+        <figure>
+            <!-- TODO -->
+            <img src="142-5.png" alt="">
+            <figcaption>Bild 5. Das Pentagramm im Modemfarbenmodus</figcaption>
+        </figure>
+        <figure>
+            <!-- TODO -->
+            <img src="142-6.png" alt="">
+            <figcaption>Bild 6. Ein Trickfilm-Bewegungsablauf</figcaption>
+        </figure>
+        <figure>
+            <!-- TODO -->
+            <img src="142-7.png" alt="">
+            <figcaption>Bild 7. Sprite 1 überdeckt Sprite 2</figcaption>
+        </figure>
+
+
+
+        <p>Sprite heißt auf deutsch soviel wie »Kobold«, »Gespenst«. Wie richtige Kobolde können sie sowohl in Dornröschens Schloß (also im Bit-Map-Modus) als auch außerhalb (nämlich im Normalmodus) über den Bildschirm geistern — anscheinend dabei allen bisher gelernten Regeln über die Grafik widersprechen. Wir werden in dieser Folge zwar lernen, mit ihnen umzugehen, sogar sie zu beherrschen — aber ihre genaue Funktion und Herkunft wird weiterhin im dunkeln bleiben: Meines Wissens gibt es noch kein Listing des Spriteunterstützenden Maschinenprogramms, das wohl im tiefsten Dunkel des VIC-II-Chip verborgen liegt: Denn der VIC-II-Chip belegt ja die Speicherplätze 53248 bis 54271. Im erreichbaren Teil dieses Zauberschlosses (53248 bis 53294) liegen die bisher viel von uns begangenen 47 Register (siehe 1. Folge, Tabelle 1), aber wo ist die Geheimtür zu den anderen 978 Bytes? Alles recht romantisch, werden Sie sagen. Nun — ganz so mysteriös ist die Sache nun auch wieder nicht, wie uns der Name Sprite = Kobold, Gespenst einreden will. Gehörig entschleiert wird das Geheimnis schon durch den anderen englischen Ausdruck für diese Dinger: MOBs. Das bedeutet: Movable Object Blocks, also bewegliche Blöcke von Objekten (Bildern, Darstellungen). Sie werden sehen, wenn wir mit dem MOBs umgehen können, ist das verbleibende Geheimnis eigentlich keines mehr, sondern verwandelt sich nur noch in eine Herausforderung für einen Maschinensprache-Programmierer.</p>
+
+        <p>Wir werden zunächst einmal schöpferisch tätig und erschaffen ein Sprite. Der erste Schritt dazu ist kreativ: Wie soll das Ding aussehen? Da bietet sich ja zum Beispiel der aus der Magie bekannte Drudenfuß an, auch Pentagramm genannt, weil wir ja schließlich diese Sprite-Geister bannen wollen (siehe Bild 1).</p>
+
+        <p>Jetzt müssen wir diese Zeichnung in eine Form bringen, die unser Computer versteht, also in Bytes. Wie auch schon bei den Buchstaben und der hochauflösenden Grafik sind hier wieder gesetzte und gelöschte Bits in den Bytes die Anzeige für »Punkt sichtbar« oder »Punkt nicht sichtbar«. Das im VIC-II-Chip organisierte Sprite-Programm nimmt die Bytes in der im Bild 2 gezeigten Anordnung wahr.</p>
+
+        <p>Den so gebildeten Block verwaltet es in genau dieser Anordnung als ein Sprite. Deswegen müssen wir uns nun die Mühe machen, unser Pentagramm in so ein Bit-Raster einzufügen. Das ist in Bild 3 geschehen.</p>
+
+        <p>Nun muß dieses Bild in einen Zahlencode übersetzt werden. Überall dort, wo ein Bitfeld ausgefüllt ist, steht bei der Binärzahl eine 1, sonst eine Null. Demnach ergeben sich die Kennzahlen in der Tabelle 1.</p>
+
+        <p>Dieser Wust an Zahlen legt also unser Sprite fest. Diese doch recht aufwendige Rechnerei und Planerei ist, wenn sie aufmerkamer Leser von Computerliteratur sind — meist nicht mehr nötig. Obwohl es sicher gut ist, das Planen eines MOBs auch von Hand zu beherrschen (wie wir jetzt!), kann man sich die Arbeit doch mächtig erleichtern durch Eintippen eines der vielen Sprite-Editor-Programme, die es in fast allen Fachzeitschriften wie Sand am Meer gibt. Weil hier nicht der 1001. Sprite-Editor abgedruckt werden soll, dient das anliegende Programm »Sprity« anderen Zwecken. (Ein nettes kurzes Listing von H. Kunz finden Sie zum Beispiel in der Zeitschrift Computer persönlich Nr. 21, 1983 auf Seite 120). Jetzt müssen wir noch dafür sorgen, daß der C 64 diese Zahlen irgendwo zugreifbar hat, mit anderen Worten: Sie müssen in den Speicher gePOKEd werden. Im allgemeinen verwendet man dazu eine kleine FOR-NEXT-Schleife in der die in DATA-Zeilen abgelegten Zahlen gelesen und eingePOKEd werden. Wohin packt man die Kennzahlen? Im Prinzip kann man sie überall — wo sie nicht gerade lebenswichtige Computerfunktionen oder Basicprogramme stören — unterbringen. Es gibt lediglich zwei Dinge, die zu beachten sind:<br>
+            a) Die Startadresse muß durch 64 glatt teilbar sein. (Zum Beispiel 896 = 14 mal 64 etc.)<br>
+            b) Aus Gründen, auf die wir noch zu sprechen kommen werden, sollten die Sprite-Daten im gleichen 16 KByte-Speicherabschnitt (siehe vorangegangene Folge) abgelegt werden, in dem sich das Video-RAM befindet, welches bei der Sprite-Nutzung angeschaltet ist.</p>
+
+        <p>Damit gibt es im Prinzip 256 Orte pro Speicherabschnitt, in denen die Sprite-Daten gespeichert werden können. Allerdings sind einige Stellen zum Beispiel im Abschnitt 0 (mit dem normalen Bildschirm) bei der Verwendung von nur wenigen Sprites besonders bevorzugt, weil man keinen Basicspeicher wegnimmt und deshalb auch keine Schutz-POKEs nötig sind:<br>
+            1) 704 — 767 ungenutzte Adressen<br>
+            2) 832 — 895 Kassettenpuffer<br>
+            3) 896 — 959 Kassettenpuffer<br>
+            4) 960 — 1023 restlicher Kassettenpuffer und freier Platz.</p>
+
+        <p>Für weitere MOBs muß dann Basicspeicher verwendet und dieser dann vor dem Überschreiben durch Programmtext, Variablen oder Strings — wie in Folge 2 gezeigt — geschützt werden. Dem Erfindungsreichtum sind allerdings keine Grenzen gesetzt. So könnte man beispielsweise (siehe vorangegangene Folge) den Bildschirm an den oberen Rand des Abschnittes 2 verschieben und darunter oder darüber Sprite-Daten ablegen. Man muß dann zwar auch den Speicherschutz einPOKEn, hat aber trotzdem meistens noch mehr als genug Basicspeicherplatz. Wenn man nur vier Sprites gleichzeitig verwendet, insgesamt aber mehrere definiert hat, kann man sie alle im 4 KByte-Bereich ab $C000 abspeichern und bei Bedarf den Sprite, der dran ist, mit einer kleinen FOR-NEXT-Schleife in einen der vier Speicherbereiche (704 &hellip;. und so weiter) umladen. Sicher fallen Ihnen noch mehr Möglichkeiten ein. Wir werden uns im nachfolgenden einfach mit drei Sprites begnügen und uns nur im normalen Abschnitt 0 bewegen.</p>
+
+        <p>Legen wir also nun zunächst unser Pentagramm in den Bereich 704 bis 767 und nach 832 bis 895:<br>
+            10 FOR I = 0 TO 62:READ A:POKE 704 + I,A:POKE 832 + I,A:NEXT I<br>
+            30 DATA hier werden jetzt unsere 63 Kennzahlen eingegeben.<br>
+            bis 60 DATA</p>
+
+        <p>Noch ignoriert der C 64 unsere Sprites völlig. Es interessiert ihn überhaupt nicht, was wir an Arbeit zum Füllen seiner Speicherbauches aufgewendet haben. Wir müssen ihm noch mitteilen, wo der VIC-II-Chip die Sprite-Daten finden kann. Weil dieser Chip dazu eingerichtet ist, gleichzeitig 8 MOBs zu verwalten, gibt es acht Speicherzellen, die sogenannte Sprite-Zeiger enthalten.</p>
+
+        <h2>Na, wo ist er denn? Sprite-Zeiger</h2>
+
+        <p>Sie befinden sich immer im gleichen 1 KByte-Bereich, in dem auch der Bildschirmspeicher liegt. Weil dieser Video-RAM nur 1000 Bytes benötigt, sind oberhalb desselben noch 24 Bytes frei, von denen die obersten 8 als Sprite-Zeiger dienen. Wenn also im Normalfall der Bildschirmspeicher von 1024 bis 2023 geht, dann liegen die Sprite-Zeiger von 2040 bis 2047. Verschiebt man den Bildschirm, dann werden die Sprite-Zeiger mit verschoben. In diese Sprite-Zeiger-Bytes POKEn wir die Zahlen ein, die mit 64 multipliziert die Startadresse der Sprite-Daten ergeben. In unserem Beispiel also: 704/64 = 11 und 832/64 = 13.</p>
+
+        <p>Wenn wir diese Sprite-Zeiger eingeben, nehmen wir automatisch gleichzeitig auch die Numerierung vor. Dabei gehört zu<br>
+            Sprite Nr. 0 der Sprite-Zeiger 2040<br>
+            Sprite Nr. 1 der Sprite-Zeiger 2041<br>
+            Sprite Nr. 2 der Sprite-Zeiger 2042<br>
+            und so weiter.</p>
+
+        <p>Nennen wir also einfach den Sprite, dessen Daten von 704 bis 767 liegen, Nummer 0 und den anderen Nummer 1, dann müssen wir also eingeben:<br>
+            70 POKE 2040,11:POKE 2041,13<br>
+            Damit sind die Sprite-Zeiger gesetzt.</p>
+
+        <h2>Anschalten der Sprites</h2>
+
+        <p>Wenn Sie jetzt freudig RUN (RETURN) eingetippt haben, um unsere Drudenfüsse zu sehen, werden Sie ein langes Gesicht gemacht haben: Nix zu sehen! Aber das ist wie bei einer Lampe: Sie haben den Lampenschirm, die Glühbirne, den Stecker eingesteckt und sie leuchtet nicht! Deswegen schalten wir sie jetzt ein, die Sprites. Der Schalter dafür sitzt im Sprite-Kontrollregister 53269 (siehe Folge 1 Tabelle der VIC-II-Chip-Register). Dort gibt es für jedes MOB ein Bit. Also Sprite Nummer 0 entspricht Bit Nummer 0 und so weiter. Ein Sprite ist eingeschaltet, wenn sein Bit auf 1 gesetzt ist. Wie man einzelne Bits setzt oder löscht, kennen wir noch aus der zweiten Folge. Spielen wir das hier nochmal an unserem Beispiel durch: Wir wollen Sprite Nummer 0 und Sprite Nummer 1 einschalten, müssen also die Bits 0 und 1 auf den Wert 1 setzen. Da gab es doch die OR-Funktion und eine sogenannte Maske:</p>
+
+        <p>XXXXXXXX irgendein binärer Inhalt von 53269<br>
+            OR 00000011 Maske (= dezimal 3)</p>
+
+        <p>XXXXXX11 Ergebnis (Bits 0 und 1 sind = 1)<br>
+            Das ergäbe die Programmzeile:<br>
+            80 POKE 53269,PEEK(53269) OR 3</p>
+
+        <p>Will man einzelne MOBs mit der Nummer N einschalten, dann empfiehlt sich folgender Befehl:<br>
+            POKE 53269,PEEK(53269) OR (2↑N)</p>
+
+        <p>Das Ausschalten geschieht durch die AND-Funktion. Jedes Bit, das mit 0 AND-verknüpft wird, wird dadurch gelöscht. Wenn wir also Sprite Nummer 1 ausschalten wollen, verwenden wir wieder eine Maske:</p>
+
+        <p>XXXXXX11 PEEK(53269), Sprite 0 und 1 eingeschaltet<br>
+            AND 11111101 Maske (dezimal = 253)</p>
+
+        <p>XXXXXX01 Ergebnis: Bit 1 = 0, Sprite 1 ausgeschaltet,<br>
+            Bit 0 = 1, Sprite 0 eingeschaltet.</p>
+
+        <p>Allgemein kann man einzelne Sprites also abschalten mit POKE 53269, PEEK(53269) AND (255-2tN), wobei wieder N die Sprite-Nummer ist.</p>
+
+        <p>Ach, Ihre Geduld wird schon auf eine harte Probe gestellt. Wenn Sie nämlich bis jetzt alle Programmzeilen brav eingegeben und gestartet haben, sehen Sie immer noch kein Sprite! Aber Sie müssen dem MOB noch sagen, wo er erscheinen soll!</p>
+
+        <h2>Schon wieder ein Koordinatensystem: Ort der Sprites</h2>
+
+        <p>Vor den Erfolg haben auch die Commodore-Softwareplaner den Schweiß gesetzt! Denn nicht genug damit, daß wir den Bildschirm schon im Normalmodus in X-Richtung, in Y-Richtung in 25 Positionen und im Bit-Map-Modus in X-Richtung in 320, in Y-Richtung in 200 Positionen aufgeteilt finden, jetzt kommt noch eine Einteilung, die sogar noch über den sichtbaren Bildschirm hinausreicht! In Bild 4 sehen wir diese Aufteilung in 512 horizontale und 256 vertikale Koordinaten.</p>
+
+        <p>Für den Ort eines Sprites ist — wie in Bild angedeutet — die linke obere Ecke des Spritedefinitionsfeldes entscheidend. Also auch dann, wenn diese Ecke (wie in unserem Pentagramm) unsichtbar. So hat das im Bild gezeigte MOB die X-Koordinate 128 und die Y-Koordinate 120. Diese X-und Y-Werte muß man nun in die zur Sprite-Nummer gehörigen Register einPOKEn. Dabei handelt es sich um folgende Speicherstellen:<br>
+            X-Position von Sprite 0 : 53248<br>
+            Y-Position von Sprite 0 : 53249<br>
+            <br>
+            X-Position von Sprite 1 : 53250<br>
+            Y-Position von Sprite 1 : 53251<br>
+            <br>
+            und so weiter bis<br>
+            X-Position von Sprite 7 : 53262<br>
+            Y-Position von Sprite 7 : 53263
+        </p>
+
+        <p>Um nun also endlich unser Sprite Nummer 0 sichtbar zu machen, geben wir ein:<br>
+            100 POKE 53248,128:POKE 53249,120<br>
+            So! Jetzt tippen Sie ein RUN RETURN) und endlich: Da ist unser Pentagramm. Gefällt es Ihnen? Sprite 1, das zweite Pentagramm, soll am rechten Bildschirmrand auftauchen, also ungefähr bei X = 266 und bei Y = 130. Deswegen müßten wir aber in die entsprechende X-Positions-Speicherstelle für Sprite 1 eine Zahl größer als 255 einPOKEn! Wenn Sie’s versuchen, meldet der Computer natürlich einen ILLEGAL QUANTITY ERROR. Geht also nicht! Anscheinend war das bisher noch nicht verzwickt genug. Jetzt müssen wir nämlich mal wieder das Hexadezimalsystem bemühen (die Sechzehnfingerlinge, erinnern Sie sich: Folge 2).</p>
+
+        <p>Dezimal 266 ist hexadezimal $010A. Jetzt zerteilen wir diese Zahl wieder in das LSB und das MSB:</p>
+
+        <table>
+            <tr>
+                <td>$01</td>
+                <td>0A</td>
+            </tr>
+            <tr>
+                <td>MSB</td>
+                <td>LSB</td>
+            </tr>
+            <tr>
+                <td>=1</td>
+                <td>=0A</td>
+            </tr>
+        </table>
+
+
+        <p>und rechnen wieder zurück ins Dezimalsystem:<br>
+            MSB = 1<br>
+            LSB = 10</p>
+
+        <p>Rechnen Sie mal nach: Das MSB kann auch bei der höchsten X-Position nie größer als 1 werden. Es gibt also nur zwei Fälle: Ist die X-Position größer als 256, dann ist das MSB 1, sonst ist es 0.</p>
+
+        <p>Deswegen speichert man die MSBs aller 8 Sprites in nur einem Byte. Ebenso wie beim Kontrollregister für das An- und Ausschalten gehört auch hier zu jedem Sprite ein Bit, also: Bit 1 gehört zu Sprite 1 und so weiter. Wenn nun also die X-Koordinate von Sprite 1 266 ist, dann ergibt die Aufspaltung, wie oben gezeigt, MSB = 1 und LSB = 10. Das Register für die MSBs ist Speicherstelle 53264. Die 10 (das LSB) wird also in die normale Speicherstelle für die X-Position gePOKEt. Das MSB ( = l ) ist also Bit 1 (weil Sprite 1) von Speicherstelle 53264. Hier ist also wieder eine OR-Operation nötig. Die Y-Position wird ganz normal eingegeben. Es ergibt sich also die Programmzeile:<br>
+            110 POKE 53250,10:POKE 53264, PEEK(53264)OR(2↑l):<br>
+            POKE 53251,130</p>
+
+        <p>Wenn Sie jetzt einen Schwarzweiß-Monitor haben, sehen Sie nach RUN (RETURN) trotzdem nur unser Sprite Nummer 0. Farbmonitor-Eigner bewundern schon jetzt Sprite Nummer 1. Warum, das wird uns gleich noch beschäftigen.</p>
+
+        <p>Welche Koordinaten eines Sprites sind eigentlich möglich, und was sieht man dann? Um das zu erforschen, bauen wir uns ein Primitiv-Sprite:<br>
+            20 FOR I = 0TO 62:POKE I+896, 255:NEXT I:POKE 2042,14:</p>
+
+        <p>REM SPRITE NR. 2</p>
+
+        <p>Dann schalten wir ein:<br>
+            90 POKE 53269,PEEK(53269) OR (↑2)<br>
+            und bauen eine Abfrage ein für die Position:<br>
+            130 INPUT"SPRITE 2:X,Y=&ldquo;;X,Y:IF X=-1THENEND<br>
+            Für die X-Position soll der Computer noch die Umrechnung in LSB und MSB für uns durchführen:<br>
+            140 X1=INT(X/256):X2 = X-256*X1<br>
+            Dann POKEn wir diese Koordinaten ein:<br>
+            150 POKE 53252,X2:POKE 5253,Y:<br>
+            IF X1=1 THEN POKE 53264,PEEK (53264)OR(2↑2)</p>
+
+        <p>Wenn die X-Koordinaten kleiner als 256 sind, also das MSB = 0 ist, muß es natürlich gelöscht werden:<br>
+            160 IF X1=0 THEN POKE 53264,PEEK(53264)AND(255-2↑27)</p>
+
+        <p>Schließlich lassen wir uns außer dem Sprite Nummer 2 auch noch die eingegebenen Koordinaten zeigen und kehren zur Abfrage zurück:<br>
+            170PRINTCHR$(147), &ldquo;x = "x, "y = "y: GOTO 130</p>
+
+        <p>Wenn Sie jetzt starten, können Sie alle möglichen Positionen für X und Y eingeben. Versuchen Sie doch mal X = 265, Y = 130. Da ist auch für die Schwarzweiß-Seher (ich bin auch einer) unser Sprite Nummer 1 zu erkennen. Warum, dazu kommen wir noch. Wenn Sie genug ausprobiert haben, dann geben Sie für X jetzt -1 und irgendeinen Y-Wert ein und das Programm ist beendet. Vermutlich haben auch Sie festgestellt, daß man unseren Testsprite ganz allmählich über den sichtbaren Bildschirmrand hinauswandern lassen kann. Es ergeben sich so die Grenzkoordinaten in Tabelle 2:</p>
+
+        <p>Die in der Tabelle 2 angegebenen Werte gelten allerdings nur für die normalen Sprites. Also gibt es auch noch anormale Sprites? Ja, die gibt’s auch. Aber wir wollen der Reihe nach vorgehen. Wir können jetzt Sprites entwerfen, Sprite-Zeiger setzen, MOBs an- und wieder abschalten und sie an die richtige Stelle setzen.</p>
+
+        <h2>Mal wieder Farbe: Diesmal die von Sprites.</h2>
+
+        <p>Eines haben wir bisher total vergessen: Welche Farbe soll unser Sprite haben und wie geben wir sie ihm? Auch hierfür gibt es natürlich wieder Register, die Sprite-Farben-Register und zwar die in der Tabelle 3.</p>
+
+        <p>In diese Register POKEt man die Farbe (Kennzahlen 0 bis 15) ein, in der der MOB erscheinen soll. Testen Sie mal: Ändern wir Zeile 130. Dort soll in der IF-THEN-Anweisung nach THEN anstelle von END jetzt stehen 180. Diese Zeile 180 schaltet das vorerst ausgediente Sprite 2 aus:<br>
+            180 POKE 53269,PEEK(53269) AND (255-2↑2)</p>
+
+        <p>Damit eröffnen wir uns die Farbeingabemöglichkeit mit:<br>
+            190 PRINT CHR$(147):INPUT"SPRITE 0,SPRITE 1 FARBEN";
+            F1,F2:IF F1=-1THEN210</p>
+
+        <p>Schließlich POKEn wir die Farben in die zu den Sprites gehörigen Register:</p>
+
+        <p>200 POKE 53287,F1:POKE53288, F2:GOTO190<br>
+            210 END</p>
+
+        <p>Jetzt können Sie, bis Sie schließlich für F1 mal -1 eingeben, allerlei Farben durchprobieren. Wir erkennen nun auch, daß bislang Sprite 1 für Schwarzweiß-Seher nicht erkennbar war, weil seine Farbe keinen Kontrast zur Hintergrundfarbe gebildet hat.</p>
+
+        <p>Wem&rsquo;s noch nicht bunt genug war bisher, der hat auch hier bei den Sprites die Möglichkeit, den Mehrfarben-Modus zu verwenden. Während im bisher gebrauchten Modus jedes Sprite-Definitions-Bit entweder 0 (= Hintergrundfarbe oder 1 (Farbe des zum Sprite gehörigen Sprite-Farb-Registers) sein konnte, zählen - wie auch sonst im Mehrfarbenmodus - wieder Bit-Paare. Dabei stammt dann die jeweilige Farbe aus den in Tabelle 4 an-gegebenen Registern.</p>
+
+        <p>Unser Drudenfuß sieht somit dann aus wie in Bild 5 gezeigt.</p>
+
+        <p>Das wollen wir noch einmal auf dem Bildschirm ansehen. Wir schreiben ab Zeile 190 neu:<br>
+            190 PRINT CHR$(147): INPUT"MOB1, MOB2,MULTCOL1,MULTCOL2";F1,F2,F3,F4:IFF1=—1THEN 220<br>
+            200 POKE 53287,F1:POKE53288,F2: POKE 53285,F3:POKE 53286,F4<br>
+            220 END</p>
+
+        <p>So läuft natürlich noch nichts Neues, denn der Mehrfarben-Modus muß noch angeschaltet werden. Auch dazu gibt es wieder ein Register: 53276. Wie bei einigen anderen Sprite-Registern gehört auch wieder zu jedem MOB das entsprechende Bit, also zu Sprite 1 das Bit 1 und so weiter. Wenn dieses Bit auf 1 gesetzt ist, ist für das dazugehörige
+            Sprite der Mehrfarb-Modus angeschaltet. Man kann sie also einzeln oder zusammen - ganz wie&rsquo;s beliebt - im Normal-Modus oder im Muticolor-Modus betrachten. Wir schalten Sprite 0 und Sprite 1 in den Mehrfarb-Modus mit Zeile<br>
+            210 POKE 53276,PEEK(53276)OR3: GOTO 190<br></p>
+
+        <p>Will man nur Sprite Nummer N umschalten, dann verwendet man wie gehabt: POKE 53276, PEEK(53276)OR(2↑N).</p>
+
+        <p>Das Zurückschalten in den Normalmodus geschieht dann durch Löschen der entsprechenden Bits:<br>
+            РОКЕ 53276,PEEK(53276)AND (255-21N).</p>
+
+        <p>Auch hier habe ich das Programm so gebaut, daß man durch Eingabe von -1 und irgendwelchen drei anderen Zahlen aussteigen kann. Im Verlauf des Probierens werden Sie bestimmt gemerkt haben, daß man Sprites, die für den Mehrfarben-Modus gedacht sind, speziell konstruieren sollte unter Berücksichtigung der Bit-Paar-Zusammenstellungen. Unser Drudenfuß gefällt mir im Normal-Modus jedenfalls besser.</p>
+
+        <p>Deswegen schalten wir in Zeile 220 lieber den Mehrfarben-Modus aus:<br>
+            220 POKE 53276,PEEK(53276) AND 252</p>
+
+        <h2>Anormale Sprites? Gequetschte und gezerrte MOBS</h2>
+
+        <p>Die normalen Sprites bestehen aus 24 x 21 Bildpunkten und haben auf dem Bildschirm eine Ausdehnung von zirka drei Zeilen mal drei Spalten. Für einige Effekte ist es ganz nett, sie in ihrer Größe verändern zu können. Genau das ist möglich, und zwar in X-Richtung, in Y-Richtung oder in beide Richtungen gleichzeitig. Das Merkwürdige an diese Sache ist - außer dem manchmal recht verzerrten Aussehen -, daß die gleiche 24 mal 21 Pixel abgebildet werden, nur jedes Pixel ist vergrößert. Wenn sowohl in X-als auch in Y-Richtung vergrößert wurde, ist einfach jeder Bildpunkt viermal so groß wie vorher. Auch hier geschieht das natürlich wieder über Kontrollregister, von denen jedes Bit wieder zu einem Sprite gleicher Nummer gehört. Die Verdoppelung in X-Richtung wird durch eine 1 im zum Sprite gehörigen Bit des Registers 53277, die in Y-Richtung auf die gleiche Weise im Register 53271 geschaltet. Wenn wir also unser Sprite Nummer 0 in X-Richtung verdoppeln wollen, dann geben wir noch ein:<br>
+            230 POKE 53277,PEEK(53277)OR1: FOR I=0TO2000:NEXT I</p>
+
+        <p>Dann sehen wir uns das nach einer kleinen Pause noch in Y-Richtung an:<br>
+            240 POKE 53277,PEEK(53277)AND 254:POKE53271,PEEK(53271)OR1: FORI=O TO 2000:NEXT I</p>
+
+        <p>Jetzt vergrößern wir noch in beide Richtungen:<br>
+            250 POKE 53277,PEEK(53277) OR 1</p>
+
+        <p>Wie Sie sich denken können, stimmt jetzt die Positionierung dieser vergrößerten Sprites auf dem sichtbaren Bildschirmteil nicht mehr. Um das zu testen, bemühen wir wieder unser Testsprite Nummer 2 und vergrößern in beide Richtungen:<br>
+            120 POKE 53277,PEEK(53277)OR4: POKE53271,PEEK(53271)OR4</p>
+
+        <p>Wenn wir nun das Programm mit RUN (RETURN) starten, taucht unser Test-Sprite in vergrößterter Form auf und wir können es wieder an verschiedene Orte auf dem Bildschirm packen. Für dieses in beide Richtungen verdoppelte MOB findet man dann die Grenzwerte in Tabelle 5.</p>
+
+        <p>Will man also ein solchermaßen vergrößertes Sprite langsam aus dem Bildschirm ziehen lassen, dann ist das nicht nach links möglich, weil selbst bei X = 0 der Sprite noch teilweise sichtbar ist.</p>
+
+        <p>Jetzt wissen wir eigentlich fast alles, was mit dem einzelnen Sprite zusammenhängt. Wenn Sie ein sich veränderndes Sprite darstellen wollen, so ist das zum Beispiel möglich, indem alle zu zeigenden Bewegungsphasen als Spritemuster im Speicher abgelegt werden und dann per Programm der Sprite-Zeiger auf den jeweils aktuellen Bewegungszustand umgeschaltet wird. So könnte man wie in Bild 6 die Abläufe A bis G im Speicher ablegen und zum Beispiel den Sprite-Zeiger für Sprite 3 zuerst auf das Muster A, dann nach entsprechender Verzögerung auf Muster B, dann C, D, E, F, G und schließlich wieder A richten. Wenn die einzelnen Spritemuster gut gemacht und die Verzögerungsschleifen richtig abgestimmt sind, kann so eine Art Zeichentrickfilm ablaufen, der nun auch noch durch die anderen bisher gelernten Sprite-Eigenheiten (Vergrößern, Position, Farbe etc.) veränderbar ist. Wie Sie unschwer erkennen, sind Ihrer Phantasie keine Grenzen gesetzt, und ich würde mich freuen, von Ihnen mal so einen witzigen Trickablauf sehen zu können. Auf einem ähnlichen Prinzip basiert auch ein Programm von Hans Grigat in Happy-Computer, Ausgabe Nummer 11 (1983), Seite 99 ff. Überhaupt lohnt es sich, sich dieses Programm mal genau anzusehen, weil hier die anfangs erwähnte Möglichkeit der Sprite-Daten-Verschiebung genutzt wurde.</p>
+
+        <h2>Wer hat Vorfahrt? Prioritäten</h2>
+
+        <p>Wir wollen uns jetzt noch um die Beziehung von Sprites zu ihrer Umwelt (also zu anderen Sprites und/oder zu Zeichen auf dem Bildschirm) kümmern. Sie erinnern sich vielleicht an unseren Versuch, unser kleines Test-Sprite über den Bildschirm zu bewegen und an ein Ergebnis davon, nämlich, daß auch Schwarzweiß-Sehern plötzlich bei Eingabe der abgedruckten Bildschirmposition das Sprite Nummer 1 sichtbar war. Wenn also — wie in diesem Fall — zwei Sprites sich überdecken, welches von beiden wird dann gezeigt? Siehe dazu das Bild 7, auf dem die Situation abgebildet ist. Wir sehen da: an den Stellen, wo Sprite 1 Bits mit dem Wert 0 vorliegen hat, ist Sprite 2 zu sehen. Wo aber der Bitwert des Sprite 1 gleich 1 ist, wird Sprite 2 durch Sprite 1 verdeckt. Das MOB 1 hat eine höhere Priorität als MOB 2. Der VIC-II-Chip organisiert die Prioritäten von Sprites untereinander also in folgender Weise: Höchste Priorität hat Sprite 0, dann folgt Sprite 1, Sprite 2 und so weiter bis zum Schlußlicht Sprite 7.</p>
+
+        <p>Wenn Sie also Programme planen, in denen Sprites aneinander vorbeiziehen sollen, denken Sie daran, daß an diese Vorfahrtsregelung nichts zu ändern ist. Unter Umständen muß man dann die Sprite-Zeiger umwechseln, um die Prioritäten umzukehren: Man macht dann beispielsweise für den Augenblick der Überschneidung aus Sprite 7 zum Beispiel Sprite 1 und umgekehrt.</p>
+
+        <p>Eine andere Vorfahrtsregelung gilt, wenn Sprites und Bildschirmzeilen (oder Bit-Map-Darstellungen) aufeinandertreffen. Hier haben wir ein Kontrollregister zur Hand (mal wieder eines!), Speicherstelle 53275, wo wieder jedem Sprite ein Bit entspricht (also Bit 0 entspricht Sprite 0 und so weiter). Wenn nun dieses Bit den Wert 0 hat, steht das dazugehörige MOB vor den Bildschirmdarstellungen, andernfalls verkrümelt es sich dahinter.</p>
+
+        <p>Das wollen wir uns mal ansehen! Starten Sie das Programm nochmal und wenn Sie an die Farbabfrage kommen, geben Sie dem Sprite 0 die Farbe 0 (= schwarz). Beenden Sie das Programm in der angegebenen Weise und wenn sich READY gemeldet hat. LISTen Sie das ganze. Jetzt steht unser schwarzes Pentagramm vor dem Listing. Geben sie nun im Direktmodus ein:<br>
+            POKE 53275,1 (RETURN). Siehe da: Sprite 0 versteckt sich hinter dem Listing.</p>
+
+        <p>Wir können also zusammenfassen: Überall dort, wo auf dem Bildschirm (durch Buchstaben oder andere Zeichen) ein Bit gesetzt ist, verschwindet dahinter ein gegebenenfalls vorhandener Sprite-Bildpunkt (wenn natürlich das zum Sprite gehörige Bit im Register 53275 gesetzt ist). Nur dort, wo auf dem Bildschirm ein Bit nicht gesetzt ist (also 0 ist), sieht man einen dort vorhandenen Sprite-Bildpunkt.</p>
+
+        <p>Etwas komplizierter liegen die Verhältnisse, wenn wir das MOB im Mehrfarben-Modus vorliegen haben. Hier werden nämlich auch Bildschirmbitpaare 01 (von Zeichen oder Bit-Map-Darstellungen) genauso behandelt wie Bitpaare 00. Das heißt, auch an solchen Stellen wird ein eventuell vorhandenes Sprite-Bitpaar dargestellt.</p>
+
+        <h2>Zusammenstöße: Kollisionsregister</h2>
+
+        <p>Erfreulicherweise haben die Software-Planer des C 64 auch zwei Möglichkeiten vorgesehen, Zusammenstöße in Registern abzufragen. Weil es zwei Sorten von Zusammenstöße gibt (Sprite kollidiert mit Sprite und Sprite kollidiert mit Zeichen), kann man zwei Register abfragen.</p>
+
+        <p>Da hätten wir zunächst das Sprite-Sprite-Kollisions-Register 53278. Auch hier gehört zu jedem Bit ein Sprite, wie bei den anderen Kontroll-Registern. Von einem Zusammenstoß spricht man in Sprite-Kreisen immer dann, wenn undurchsichtige Teile der MOBs aufeinandertreffen. Überlappen sich nur die Teile, deren Bits bei der Sprite-Definition auf 0 gesetzt wurden, so zählt das nicht als Kollision. Die Bits der Sprites, die in den Zusammenstoß verwickelt sind, werden auf 1 gesetzt, zum Beispiel erzeugt ein Zusammenstoß von Sprite 0 mit Sprite 1 folgenden Inhalt des Registers 53278: 00000011 = dezimal 3.</p>
+
+        <p>Wenn in einem Supercrash acht Sprites kollidieren, steht im Sprite-Sprite-Kollisionsregister 255. Übrigens werden auch Zusammenstöße registriert, die außerhalb des sichtbaren Bildschirms liegen (siehe Bild 4).</p>
+
+        <p>Wenn ein Sprite mit Bildschirmdarstellungen (Zeichen und so weiter) zusammenstößt, wird in Register 53279 das zu ihm gehörende Bit gesetzt. Stößt also Sprite Nummer 1 mit zum Beispiel einem A zusammen, dann liest man aus dem Register 53279: 00000010 = dezimal 2. Apropos lesen: Die Register 53278 und 53279 sind so gestaltet, daß sie nach dem Herauslesen (PEEKen) gelöscht sind! Deswegen empfiehlt es sich, wenn man diese Inhalte danach noch braucht, sie in Variablen abzulegen. Auch bei dieser Sorte Zusammenstößen zählen nur diejenigen, bei denen undurchsichtige Sprite-Teile kollidieren. Wenn übrigens Bildschirminhalte horizontal aus dem sichtbaren Bereich »herausgescrollt« worden sind (zum »Scrollen« kommen wir in der nächsten Folge), und dabei ein Zusammenstoß mit einem Sprite geschieht, wird ebenfalls ein Bit in 53279 gesetzt.</p>
+
+        <p>Manfred Thoma hat das anliegende Programm »Sprity« geschrieben, mit dem Sie einige Sprite-Eigenschaften und die dazugehörigen Registerveränderungen beobachtet werden können.</p>
+
+        <p>Obwohl es zu den MOBs noch einiges zu sagen gäbe (wie kommen sie auf den Bildschirm, schnelles Steuern und so weiter), soll das Thema hiermit abgeschlossen sein. Ich denke, daß wir in dieser Folge die kleinen Kobolde schon weitgehend entzaubern konnten mit Hilfe unserer Pentagramme. Zu den Sprites gibt es mehr Literatur als zu vielen anderen C 64-Themen. Hier eine kleine Auswahl:</p>
+
+        <ul>
+            <li>Zwei Artikel wurden schon genannt (von H. Grigat und H. Kunz)</li>
+            <li>Herbert Kunz hat auch schon etwas über schnelles Bewegen von MOBs geschrieben im 64’er, Ausgabe 4/83 auf Seite 70f.</li>
+            <li>Einen Überblick vor allem über die Anwendung von Sprites in Spielen geben Schneider und Ebert in den Bänden 1 und 3 des Commodore 64-Buches. Erschienen 1984 in Haar bei München im Markt &amp; Technik Verlag. Diese beiden Bände sind auch von den sehr gut überschaubaren Programmbeispielen her zu empfehlen.</li>
+        </ul>
+
+        <address class="author">(Heimo Ponnath/aa)</address>
+
+        <figure>
+            <!-- TODO -->
+            <figcaption>Tabelle 1. Kennzahlen für die Berechnung von Sprites</figcaption>
+        </figure>
+        <figure>
+            <!-- TODO -->
+            <figcaption>Tabelle 2. Grenzposition normaler Sprites</figcaption>
+        </figure>
+        <figure>
+            <!-- TODO -->
+            <figcaption>Tabelle 3. Zuordnung der Sprite-Farben-Register</figcaption>
+        </figure>
+        <figure>
+            <!-- TODO -->
+            <figcaption>Tabelle 4. Herkunft der Bitpaar-Farben im Multicolor-Modus</figcaption>
+        </figure>
+        <figure>
+            <!-- TODO -->
+            <figcaption>Tabelle 5. Grenzposition doppelt gedehnter Sprites</figcaption>
+        </figure>
+        <figure>
+            <!-- TODO -->
+            <figcaption>Das Programm »Sprity«</figcaption>
+        </figure>
+
+    </article>
+
+</body>
+
+</html>
