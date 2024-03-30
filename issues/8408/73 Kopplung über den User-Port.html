@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>Kopplung über den User-Port</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="Johannes Mockenhaupt, rg">
+    <meta name="64er.issue" content="5/84">
+    <meta name="64er.pages" content="73-76">
+    <meta name="64er.toc_category" content="XXX">
+    <meta name="64er.id" content="XXX">
+</head>
+
+<body>
+    <article>
+        <h1>Kopplung über den User-Port</h1>
+
+        <p class="intro">In der letzten Ausgabe brachten wir zwei VC 20 dazu, gegeneinander zu spielen. Nun lassen wir zwei C 64, oder einen VC 20 und einen C 64, Daten ohne Jegliches Interface über den User-Port austauschen.</p>
+
+        <p>Seit einigen Monaten betreibe ich zwei gekoppelte C 64, die sich zu meiner vollen Zufriedenheit die Befehle eines fünfstimmigen Synthesizer-Programms teilen. Während es für meine speziellen Anforderungen bereits genügt, ein einzelnes Byte rasch zu transportieren, können die vorhandenen Routinen ohne viel Mühe so erweitert werden, daß man</p>
+
+        <p>a) Basicprogramme<br />
+            b) Variablen,<br />
+            c) Arrays und<br />
+            d) Maschinenprogramme überträgt und gegebenenfalls ausführt.</p>
+
+        <p>In diesem Artikel erläutere ich Ihnen die Grundroutinen anhand der Basicprogrammübertragung.</p>
+
+        <p>Neben der eingebauten seriellen Schnittstelle hat der C 64 wie alle Computer von Commodore einen programmierbaren User-Port, der eine Verbindung nach »draußen« darstellt und entsprechend genutzt werden kann. Die Adresse des User-Ports liegt beim C 64 auf 56577 ($dd01). Eine Abfrage mit PEEK (56577) zeigt den Wert 255. Ein POKE-Befehl ändert daran nichts, weil das Betriebssystem beim Initialisieren den User-Port als Eingang definiert und sich unbeschaltete Eingänge als logisch »1« verhalten. Bevor man den User-Port als Ausgang definiert, müssen einige Sicherheitsvorkehrungen getroffen werden, denn der User-Port des einen Computers wird Draht für Draht mit dem des anderen verbunden. Dabei darf immer nur ein Computer den User-Port als Ausgang betreiben, sonst kommt es zur Zerstörung der Port-Bausteine. Die Adresse des Richtungsregisters ist 56579 ($ddO3). In diesem Register definiert ein gesetztes Bit das entsprechende User-Bit als Ausgang. Dadurch wird ein gemischter Betrieb möglich, der in meinem Programm jedoch nicht vorkommt.</p>
+
+        <p>Als Voraussetzung muß eine physikalische Verbindung in Form von Drähten und zwei User-Port-Steckern geschaffen werden.</p>
+
+        <p>Es sind insgesamt 11 Drähte, welche die beiden Computer verbinden. Ich habe die Verbindung mit einer 4 m langen, sorgfältig verlöteten Flachleitung realisiert und bisher keine Störung bemerkt.</p>
+
+        <p>Auf Seite 143 des C 64 Handbuchs ist die Kontaktbelegung des User-Port-Steckers aufgeführt.</p>
+
+        <p>Die Daten-Bit-Kontakte PBO bis PB7 liegen genau in der Mitte des Steckers und werden »Bit für Bit« verbunden, also »C« an »C«, »D« an »D« und so weiter.</p>
+
+        <p>Auch die Masse-Leitungen »A« werden miteinander verbunden.</p>
+
+        <p>Die beiden übrigen Kontakte »B« und »M« werden gekreuzt, so daß »B« mit »M« verbunden ist und umgekehrt.</p>
+
+        <p>Das Programm ist ausführlich erklärt. Eine Besonderheit ist die Speicherbereichswahl. Jeder Autor glaubt, der $c-Block sei ganz frei und warte auf genau sein Programm.</p>
+
+        <p>Um hier eine bequeme Übernahmemöglichkeit in eigene Routinen zu bieten, lädt sich der Maschinenteil des Programms an das obere verfügbare RAM-Ende, schützt das Segment vor den Strings und löscht sich letztlich selbst. Die SYS-Adressen werden auf dem Bildschirm angezeigt. Dann können im Direkt-Modus Basicprogramme hin- und hergeschoben werden, oderaus Maschinenroutinen einzelne Bytes transportiert werden. Die Basicprogramm-Übertragung hat die angenehme Eigenschaft, das transportierte Programm an das bereits im Speicher befindliche Programm anzuhängen, es handelt sich also um eine Art Merge-Funktion. Der »NEW«-Befehl schafft wieder leere Verhältnisse, wenn’s mal zu voll geworden ist.</p>
+
+        <h2>Programmerklärung</h2>
+
+        <p>Die Punkte »..« im Basicprogramm sind Platzhalter für die $-Seite, in die das Maschinenprogramm geladen wurde. Im folgenden gehe ich von Seite $ 7f aus. $7f00 = sys 32512 überträgt ein Basicprogramm vom Sender zum Empfänger, wo es an das im Speicher befindliche Programm angehängt wird. Zunächst wird der User-Port des Senders als Ausgang definiert. Dann wird ein Zeiger in $58 eingerichtet, der von Basic-Start ($2b) bis Basic-Ende ($2d) alle Bytes der Byte-Sende-Routine mit »jsr 7f5e« übergibt. Nach Übertragung des letzten Bytes wird der User-Port wieder als Eingang geschaltet (= Sicherheitsfall).</p>
+
+        <p>Mit sys 32551 ($7f27) wird ein Basicprogramm empfangen. Durch Subtraktion von 2 vom Basic-Zeiger wird die Koppeladresse gewonnen, ab der die empfangenen Bytes gespeichert werden sollen. Die Byte-Empfangs-Routine steht ab $7f7c. Der Empfänger erkennt das Basicprogramm-Ende an drei folgenden Nullen ($#00), wonach er den Empfang abbricht, durch einen CLR-Befehl ($a660) die Basic-Zeiger neu setzt, durch $a533 die Programmzeilen neu bindet und schließlich in die Basicwarteschleife nach $e385 springt.</p>
+
+        <p>$7f5e ist die Byte-Sende-Routine. Der Akkumulator des Prozessors wird in das Datenregister des User-Ports geschrieben, anschließend wird das dritte Bit in Register $ddOO auf »0« gesetzt. Nun bleibt das fünfte Bit in Register $ddOd des anderen Computers solange »1«, bis es gelesen wird. Durch den Lesevorgang wird es gleichzeitig gelöscht. Diesen Mechanismus kann man einfach zur Übertragungskontrolle nutzen. Das dritte Bit von $dd00 ist die VALID-Flagge. Wenn sie gesetzt ist, sind die Daten gültig. Damit der Sender weiß, wann er das Byte übertragen ansehen kann, sendet der Empfänger ein QUITTUNGs-Signal. Dieses kommt im fünften Bit des Registers $dd0d beim Sender an. Auch hier wird durch das Lesen gleichzeitig gelöscht. Braucht der Empfänger zu lange, um das Byte anzunehmen, zum Beispiel dann, wenn er gar nicht eingeschaltet ist, bricht der Sender nach zirka 1,8 Millisekunden Wartezeit den Sendevorgang ab und schaltet den USER-Port wieder auf Eingangs-Modus. Dadurch soll verhindert werden, daß die beiden Computer gleichzeitig senden, was der Hardware schaden würde. Nach erfolgter Übertragung wird das dritte Bit in $ddOO wieder auf »1« gesetzt, dabei ändert sich in $ddOd des anderen Computers nichts, es ist halt notwendig, um es wieder auf »0« setzen zu können.</p>
+
+        <p>$7f7c ist die Byte-Empfangs-Routine. Hier wartet der Empfänger solange in der VALID-Schleife, bis die Daten gültig sind. Wird nichts gesendet, so wartet der Empfänger fortwährend und merkt nichts. Zum Abbruch muß man dann die RUN/STOP- und die RESTORE-Taste gleichzeitig drücken. Sind die Daten gültig, so werden sie in den Akkumulator des Prozessors geladen. Der Empfänger quittiert durch einmaliges Nullen des dritten Bits von $dd00.</p>
+
+        <p>$7f8f definiert den User-Port als Eingang, $7f92 definiert den User-Port als Ausgang. Der Trick mit »BIT mmnn« fand auch hier Anwendung. Man spart immerhin ein Byte.</p>
+
+        <p>$7f9d initialisiert den User-Port. Zwar setzt das Betriebssystem den User-Port als Eingang, nimmt aber nicht die Flag in $ddOd weg, wodurch es direkt nach dem Einschalten zu einer VALID-Meldung kommt, die eine richtige Übertragung verhindert. Die VALID-Schleife in $7f9d liest so lange VALID-Flags, bis keine mehr kommen, und springt dann zur Eingangs-Richtungs-Routine.</p>
+
+        <h2>Praktische Ausführung</h2>
+
+        <ul>
+            <li>Verbindungsleitung löten (1:1).</li>
+            <li>Programm erfassen, SAVEn und RUNnen.</li>
+        </ul>
+
+
+        <p>Soll zum Beispiel von Computer A ein Programm zu Computer B übertragen werden, so muß zuerst Computer B mit »sys 32551« vorbereitet werden, dann wird Computer A mit »sys 32512« zum Senden veranlaßt. Im umgekehrten Fall beschwert sich Computer A mit der Meldung »device not present error«, welche aus dem Basicinterpreter für diesen Zweck entliehen wurde. Die Übertragungsrate liegt bei etwa 11 000 Bytes pro Sekunde.</p>
+
+        <address class="author">(Johannes Mockenhaupt/rg)</address>
+
+        <figure>
+            <!-- TODO -->
+            <figcaption>Listing zur Übertragung von Basicprogrammen zwischen zwei C 64.</figcaption>
+        </figure>
+
+        <figure>
+            <img src="73-1.png" alt="">
+            <figcaption>Die Verbindung von User-Port zu User-Port</figcaption>
+        </figure>
+
+    </article>
+
+</body>
+
+</html>
