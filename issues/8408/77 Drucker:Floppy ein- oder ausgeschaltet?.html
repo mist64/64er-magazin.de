@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>Drucker/Floppy ein- oder ausgeschaltet?</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="Werner Pfeil, gk">
+    <meta name="64er.issue" content="5/84">
+    <meta name="64er.pages" content="77">
+    <meta name="64er.toc_category" content="XXX">
+    <meta name="64er.id" content="XXX">
+</head>
+
+<body>
+    <article>
+        <h1>Drucker/Floppy ein- oder ausgeschaltet?</h1>
+
+        <p class="intro">Diese Prüfroutine verhindert wirkungsvoll die Fehlermeldung: DEVICE NOT PRESENT ERROR und hilft, ein Programm absturzsicher zu machen.</p>
+
+        <p>Bei der Prüfroutine handelt es sich um ein Unterprogramm, das mit GOSUB 10080 aufgerufen wird. Vor dem Aufruf der Routine muß festgelegt werden, welches Gerät überprüft werden soll (Gerätenummer DN%: 4 für Drucker, 8 für Floppy). Die Auswertung derVariablen DR% (0 = aus, 1 = ein) ermöglicht eine Aussage über den Einschaltzustand.<br><br />
+            <b>Prüfroutine</b><br>
+            Zeile 10080:<br><br />
+            Um die Maschinenroutine nicht bei jedem Aufruf des Unterprogramms einzulesen, wird sie nur beim ersten Aufruf eingelesen.<br><br />
+            Zeile 10090 und 10100:<br><br />
+            In die vom Computer nicht benutzte Speicherstelle 2 der Zeropage wird die Device-Nummer DN% (4 für Drucker, 8 für Floppy) gePOKEt, das Maschinenprogramm aufgerufen und anschließend der Inhalt der Speicherstelle 2 überprüft. War das Carry-Bit gesetzt, ist das entsprechende Gerät ausgeschaltet. Die Variable DR% wird entsprechend dem Einschaltzustand 1 (= ein) oder 0 (= aus) gesetzt.<br><br />
+            Zeile 10140 bis 10170:<br><br />
+            Basic-Lader der Maschinenroutine
+        </p>
+
+        <p>Nach dem Löschen des Bildschirms wird der Variablen DN% die entsprechende Geräte-Nummer (4 für Drucker, 8 für Floppy) zugewiesen und die Prüfroutine aufgerufen. Die Abfrage der Variablen DR% (Device ready) ermöglicht es, eine Aussage über den Einschaltzustand (0 = aus, 1 = ein) des entsprechenden Gerätes zu machen.</p>
+
+        <p>Wird die Prüfroutine beim Diskettenlaufwerk angewendet (DN%=8), so muß nach dem Aufruf der Routine der Fehlerkanal der Floppy gelöscht werden, da durch die Prüfung ein Syntax Error (31) vom DOS gemeldet wird (Ansprung des NMI-Vektors in Zeile 160).</p>
+
+        <address class="author">(Werner Pfeil/gk)</address>
+
+        <figure>
+            <!-- TODO -->
+            <figcaption>Ein Demo-Programm. Die Prüfroutine befindet sich ab Zeile 10000</figcaption>
+        </figure>
+
+        <figure>
+            <!-- TODO -->
+            <figcaption>Der Inhalt der DATA-Zeilen mit zugehörigem Assembler-Listing</figcaption>
+        </figure>
+
+    </article>
+
+</body>
+
+</html>
