@@ -27,15 +27,15 @@
 
         <p>Diese Anordnung dürfte auch für viele Bastelzwecke sehr interessant sein. Für den Analogeingang wurde mit dem IC LM311 ein Spannungs-Frequenzwandler gebaut. Die Frequenz des erzeugten Rechtecksignals wurde über eine einadrige Schirmleitung mit Ader auf PIN6 = CNT-2 des Userports und Schirm auf PIN1 = GND zur Frequenzmessung eingegeben. Diese Anwendung ist prinzipiell in [1] beschrieben, allerdings mit dem kleinen Schönheitsfehler, daß die Sache so nicht funktioniert. Trotzdem ist das erwähnte Buch sehr empfehlenswert wegen seiner Vielfalt und Verständlichkeit. Im folgenden wird zunächst ein funktionsfähiges Programm gezeigt und anschließend werden wesentliche Verbesserungen unter Verwendung einer Assembler-Routine geschildert. Ein Studium der Literatur [1 bis 4] zeigt, daß für eine einfache Frequenzmessung bis hinauf zu etwas mehr als 20 kHz der im CIA 6526 (Complex Interface-Adapter-IC) eingebaute Zähler und die Systemuhr Tl als Zeitbasis in Frage kommen. Wer einen Rechteckgenerator zur Hand hat, kann diesauch gleich (TTL-Pegel 5 V einstellen) mal ausprobieren! Geben sie das folgende Basic-Programm ein und schließen Sie den Generator — wie beschrieben — an CNT-2 an.</p>
 
-        <p>Es wurden folgende Adressen verwendet<br><br />
-            Dez. 56590 Hex DD0E Kontrollregister für Zähler 1<br><br />
-            Dez. 56580 Hex DD04 Zähler 1 Low-Byte T1L<br><br />
+        <p>Es wurden folgende Adressen verwendet<br>
+            Dez. 56590 Hex DD0E Kontrollregister für Zähler 1<br>
+            Dez. 56580 Hex DD04 Zähler 1 Low-Byte T1L<br>
             Dez. 56581 Hex DD05 Zähler 1 High-Byte T1H</p>
 
         <p>In Zeile 100 wird das Kontrollregister für den Zähler 1 so programmiert, daß dieser in der gewünschten Art arbeitet und zunächst im STOP-Zustand ist. In Zeile 110 wird der Zähler mit HB = 255 und LB = 255 geladen; er hat die Eigenschaft, diese zwei Byte nach dem Start herunterzuzählen (Dez. 65535 bis 0). Der Zähler kann nun aber nicht, wie in [1] erwähnt, mit dem Setzen des High-Byte von T1 (T1H) gestartet werden, sondern durch den Befehl Roke 56590, 241, bei dem Bit 0 im Kontrollregister auf 1 = START gesetzt wird. Die Tl-Uhr wird bei diesem Programm »im Vorübergehen« gelesen, die beiden IF Abfragen geben den Start- und den Auslesebefehl für den Zähler.</p>
 
-        <p>Im Kontrollregister haben nur Bit 0 und 5 wichtige Funktionen:<br><br />
-            11110001 = Dez. 241 → Zähler Start<br><br />
+        <p>Im Kontrollregister haben nur Bit 0 und 5 wichtige Funktionen:<br>
+            11110001 = Dez. 241 → Zähler Start<br>
             11110000 = Dez. 240 → Zähler Stop</p>
 
         <p>Die anderen Bits sind als »Dauermaske« aufzufassen.</p>
@@ -56,9 +56,9 @@
 
         <p>Die Schaltung funktioniert sehr gut und recht genau! Für die »Stellenwertausgabe« wurde mit dem 8-Bit-D-A-Wandler ZN428 folgende Schaltung aufgebaut:</p>
 
-        <p>Die Ausgabe über den Userport erfolgt mit Hilfe folgender Befehle:<br><br />
-            Poke 56579, 255 (Datenleitungen PBO bis PB7 auf Ausgabe)<br><br />
-            Poke 56577, x (x = Dez.-Wert der Ausgabe)<br><br />
+        <p>Die Ausgabe über den Userport erfolgt mit Hilfe folgender Befehle:<br>
+            Poke 56579, 255 (Datenleitungen PBO bis PB7 auf Ausgabe)<br>
+            Poke 56577, x (x = Dez.-Wert der Ausgabe)<br>
             Der Wandler erzeugt dann eine zu x proportionale Spannung.</p>
 
         <p>Dem Nachteil einer V/f-Wandler-Zeit von ≈ 0,5 s steht der Vorteil gegenüber, daß keine Ein-Ausgabeleitungs-Umschaltung erforderlich ist, die Signale stehen stetig am Port zur Verfügung. Eine mehrkanalige Ausführung des Eingangs durch Multiplexen ist denkbar. Beim Ausgang ist dies sicher etwas schwieriger.</p>
