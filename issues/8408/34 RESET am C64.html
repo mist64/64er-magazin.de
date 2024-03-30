@@ -73,8 +73,61 @@
 
         <p>Selbstverständlich arbeitet das OLD-Programm auch ohne die RESET-Taste, zum Beispiel nach einem irrtümlichen NEW-Befehl und stellt somit eine Basic-Erweiterung dar, die nicht nur in Verbindung mit der RESET-Taste ihre Anwendung findet.</p>
 
-
         <address class="author">(A. Wängler/rg)</address>
+
+        <figure>
+            <pre>
+.,  033c   a5  2b       lda $2b
+.,  033e   a4  2c       ldy $2c
+.,  0340   85  22       sta $22
+.,  0342   84  23       sty $23
+.,  0344   a0  03       ldy #$03
+.,  0346   c8           iny
+.,  0347   b1  22       lda ($22),y
+.,  0349   d0  fb       bne $0346
+.,  034b   c8           iny
+.,  034c   98           tya
+.,  034d   18           clc
+.,  034e   65  22       adc $22
+.,  0350   a0  00       ldy #$00
+.,  0352   91  2b       sta ($2b),y
+.,  0354   a5  23       lda $23
+.,  0356   69  00       adc #$00
+.,  0358   c8           iny
+.,  0359   91  2b       sta ($2b),y
+.,  035b   88           dey
+.,  035c   a2  03       ldx #$03
+.,  035e   e6  22       inc $22
+.,  0360   d0  02       bne $0364
+.,  0362   e6  23       inc $23
+.,  0364   b1  22       lda ($22),y
+.,  0366   d0  f4       bne $035c
+.,  0368   ca           dex
+.,  0369   d0  f3       bne $035e
+.,  036b   a5  22       lda $22
+.,  036d   69  02       adc #$02
+.,  036f   85  2d       sta $2d
+.,  0371   a5  23       lda $23
+.,  0373   69  00       adc #$00
+.,  0375   85  2e       sta $2e
+.,  0377   60           rts
+.
+.
+</pre>
+            <figcaption>Listing 1. Assemblerlisting des OLD-Programms</figcaption>
+        </figure>
+
+        <figure>
+            <pre>
+0 data165,43,164,44,133,34,132,35,160,3,200,177,34,208,251,200,152,24,101
+1 data34,160,0,145,43,165,35,105,0,200,145,43,136,162,3,230,34,208,2,230
+2 data35,177,34,208,244,202,208,243,165,34,105,2,133,45,165,35,105,0,133
+3 data46,96
+10 forx=49152to49211:reada:pokex,a:next
+</pre>
+            <figcaption>Listing 2. Basic-Lader des OLD-Programms</figcaption>
+        </figure>
+
     </article>
 
 </body>
