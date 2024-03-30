@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>Tips &amp; Tricks</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="64er.issue" content="5/84">
+    <meta name="64er.pages" content="105">
+    <meta name="64er.toc_category" content="XXX">
+    <meta name="64er.id" content="XXX">
+</head>
+
+<body>
+    <article>
+        <h1>Tips &amp; Tricks</h1>
+
+        <h2>MERGE für C 64 / VC 20</h2>
+
+        <p>Hier ist eine einfache MERGE-Routine zum Verbinden zweier Basic-Programme. Sie kann sowohl für die Floppy als auch für die Datasette (auch mit Turbo-Tape) verwendet werden. Einzige Voraussetzung: Das zweite Programm muß höhere Zeilennummern haben als das erste.</p>
+
+        <p>Und so wird’s gemacht:</p>
+
+        <ol>
+            <li>Sie laden das erste Programm. Dann geben Sie im Direktmodus ein: PRINT PEEK(43), PEEK(44) Diese beide Zahlen schreiben Sie sich auf.</li>
+            <li>Sie geben ein: POKE 43, (PEEK(45) + 256 * PEEK(46) - 2) AND 255 (Return) POKE 44, (PEEK(45) + 256 * PEEK(46) - 2) / 256 (Return)</li>
+        </ol>
+
+        <p>Laden Sie nun das zweite Programm. Danach geben Sie ein: POKE 43, (erste Zahl): POKE 44, (zweite Zahl) (Return) Nun befinden sich beide Programme hintereinander im Speicher.</p>
+
+        <address class="author">(Michael Keukert)</address>
+
+        <h2>Funktionstastenbelegung</h2>
+
+        <p>Simons Basic bietet ja bekanntlich die Möglichkeit, die Funktionstasten mit beliebigen Zeichenketten zu belegen. Um nun die Funktionstasten nicht jedesmal nach dem Einschalten neu belegen zu müssen, wäre es sinnvoll, die Belegung auf Floppy abspeichern zu können.</p>
+
+        <p>Die Funktionstastenbelegung ist bei Simons Basic in dem von Basic nicht erreichbaren Speicherbereich $C64D bis $C74B (50765 bis 51019 dezimal) abgelegt. Mit dem folgenden kleinen Programm wird dieser Speicherbereich als Maschinenprogramm abgespeichert:</p>
+
+        <pre>
+10 INPUT »Filename»; X$
+20 OPEN 5, 8, 5, X$ + »,P,W«
+30 A = 50765 : E = 51019
+40 H = INT(A / 256) : L = A AND 255
+50 PRINT#5, CHR$(L); CHR$(H);
+60 FOR I = A TO E
+70 PRINT#5, CHR$(PEEK(I));
+80 NEXT I : CLOSE5
+</pre>
+
+
+        <p>Mit LOAD &ldquo;Name&rdquo;,8,1 kann die Funktionstastenbelegung nun jederzeit geladen werden, ohne ein eventuell vorhandenes Basicprogramm zu zerstören.</p>
+
+        <address class="author">(Uwe Schwarz)</address>
+
+        <h2>Hilfe für »Turbo Tape«</h2>
+
+        <p>Das Programm »Turbo Tape« ist ja ein Segen für alle diejenigen, die sich keine Floppy leisten können oder wollen. Es gibt allerdings einige Maschinenprogramme, die nach dem Gebrauch von »Turbo Tape« abstürzen.</p>
+
+        <p>Abhilfe: Nach dem Laden das Programm LISTen und den SYS-Befehl zu Anfang notieren. Nun SYS 64738 und danach den notierten SYS-Befehl eingeben — und schon läuft das Programm.</p>
+
+        <address class="author">(Andreas Klofanda)</address>
+
+        <h2>Basicprogramme retten</h2>
+
+        <p>Ein durch NEW oder durch einen RESET gelöschtes Basicprogramm kann durch Eingabe folgender Zeilen im Direktmodus wieder zurückgeholt werden:</p>
+
+        <pre>
+POKE 46, PEEK(56) - 1 : POKE 45, PEEK(55) + 247 : CLR (Return)
+POKE PEEK(44) * 256 + PEEK(43) + 1, PEEK(44) (Return) 63999 (Return)
+FOR I = PEEK(44) * 256 + PEEK(43) TO PEEK(46) * 256 + PEEK(45) : IF PEEK(I) OR PEEK(I + 1) OR PEEK(I + 2) THEN NEXT (Return)
+POKE 45, (I + 3) AND 255 : POKE 46, (I + 3) / 256 : CLR (Return)
+</pre>
+
+
+        <p>Diese »Rettungsmaßnahme« funktioniert sowohl beim VC 20 wie auch beim C 64.</p>
+
+        <address class="author">(Ralf Berle)</address>
+
+        <h2>Cursor steuern</h2>
+
+        <p>Das Betriebssystem des C 64 enthält eine Routine, die man benutzen kann, um den Cursor an eine beliebige Stelle zu setzen. Geben Sie doch mal folgendes ein:</p>
+
+        <pre>
+POKE 214, (Zeile): POKE 211, (Spalte): SYS 58640 : PRINT "TEXT"
+</pre>
+
+        <address class="author">(Michael Keukert)</address>
+
+        <h2>Und noch ein Tip</h2>
+
+        <p>Der FORMULAR TOO COMPLEX - Error ist sehr unangenehm, da sich das Programm danach oft nicht mehr listen läßt. Nach Eingabe von POKE 24,0 verhält sich der Computer aber wieder normal.</p>
+
+        <address class="author">(Roger Limberg)</address>
+    </article>
+
+</body>
+
+</html>
