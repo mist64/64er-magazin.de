@@ -1,0 +1,160 @@
+   10 rem **************************
+   20 rem *** fahr - simulator   ***
+   30 rem *** by 0. barke 1/ 84  ***
+   40 rem **************************
+  100 rem ton vorbereiten
+  110 si=54272:poke si+24,15
+  120 poke si+1,248:poke si+8 ,6:poke si+15,9
+  130 poke si+5,154:poke s1+12,9:poke si+19,9
+  200 cl=6:gosub 6200
+  210 print chr$(142);chr$(8)
+  220 print"{clr}{yel}","{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}"
+  230 print,"{rvon} fahr - simulator "
+  270 gosub 5000
+  300 if peek(12800)=120 then 330
+  310 c=0:for a=12800 to 13229:read b:poke a,b:c=c+b:next a
+  315 if c<>49567 then print "pruefsummenfehler!":stop
+  320 for a=704 to 766:read b:poke a,b:next a
+  330 poke 251,102:poke 883,8
+  340 print:print "{down} weiter ? ";
+  350 gosub 6000
+  360 if x$<>"j" and x$<>"y" then 350
+  400 cl=6:gosub 6200
+  410 print"{clr}{cyn} *** schwierigkeitsgrad ***"
+  420 print"{down}{down} {wht}taste{yel}   fuer"
+  430 print"{down}   {wht}a{yel}  :  anfaenger"
+  440 print"{down}   {wht}b{yel}  :  fortgeschrittene"
+  450 print"{down}   {wht}c{yel}  :  langjaehrige autofahrer"
+  460 print"{down}   {wht}d{yel}  :  profi"
+  470 print"{down}   {wht}e{yel}  :  selbstmoerder"
+  480 print"{down}{down}fahrbahnbreite  {wht}(a-e){yel} : ";
+  490 gosub 6000:br$=x$
+  500 br=70-asc(x$):if br<1 or br>5 then 490
+  510 print br$
+  520 :
+  530 print"{down}{down}geschwindigkeit {wht}(a-e){yel} : ";
+  540 gosub 6000:ge$=x$:if x$="@" then gosub 6400:goto 530
+  550 ge=70-asc(x$):if ge<1 or ge>5 then 540
+  560 print ge$
+  570 poke 252,br*3+6:poke 253,ge*2.5
+  580 for a=1 to 800:next a
+  600 rem *** vorbereitung
+  610 print"{clr}{wht}"
+  620 cr=0:sy=peek(251):poke 881,3
+  630 sys 13094
+  640 rem *** coutown
+  650 for a=9 to 0 step -1
+  660 print "{home}";a
+  670 for b=1 to 300:next b,a
+  680 print "{home}  "
+  700 rem *** start
+  710 sys 12800
+  720 if peek(881)=255 then 1000:rem im ziel
+  730 rem *** crash
+  740 cr=cr+1
+  750 print"{home}{wht}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}"spc(15)"{rvon}*crash*{up}"
+  760 si=54272
+  770 poke si+4,129:poke si+11,129:poke si+18,129:rem *** ton
+  780 for a=1 to 10:poke 53294,4:b=1^1:poke 53294,1:next a
+  800 for b=1 to 10:print spc(15)"*crash*{up}"
+  810 for a=1 to 120:next a
+  820 print spc(15)"{rvon}*crash*{up}"
+  830 for a=1 to 120:next a,b
+  840 print spc(15)"       {yel}{home}"
+  850 poke si+4,0:poke si+11,0:poke si+18,0
+  860 if peek(197)=46 then 400
+  870 :
+  880 x=peek(870)+5+br*1.5
+  890 poke 53262,x*8 and 255
+  900 poke 53264,-(x*8>255)*128
+  910 for a=1 to 2000:next a
+  920 goto 700
+  930 :
+ 1000 rem *** spielende
+ 1010 print"{home}{wht}","{rvon} spiel beendet "
+ 1020 for a=1 to 1500:next a
+ 1100 rem *** auswertung
+ 1110 poke53269,0
+ 1120 print "{clr}","{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}"
+ 1130 print,"{rvon} resultat: {down}"
+ 1140 if cr then cl=7:gosub 6220
+ 1150 if cr>15 then print"{lred}";
+ 1200 print"{down} fahrbahnbreite : ";br$
+ 1210 print"{down} geschwindigkeit: ";ge$
+ 1220 print"{down}{down} crashes        : ";cr
+ 1250 p=int((7-ge)^4*(7-br)^3/2^cr)*100
+ 1260 if cr>15 then p=0
+ 1270 if p>55 then cl=5:gosub 6200
+ 1280 print"{down}{down}";p;"punkte.{down}{down}{down}{down}"
+ 1300 rem
+ 1310 for a=1 to 1000:next a
+ 1320 if p=0 then print" trotzdem";
+ 1330 print" noch einmal ? ";
+ 1340 gosub 6000
+ 1350 if x$="n" then poke 54296,0:cl=6:gosub 6200:print:end
+ 1360 if x$<>"j" and x$<>"y" then 1340
+ 1370 cl=6:gosub 6200:goto 400
+ 1380 :
+ 5000 rem *** anleitung
+ 5060 print"{down} versuchen sie ihr fahrzeug"
+ 5080 print"{down} unfallfrei bis zum ziel zu steuern."
+ 5100 print"{down}{down} mit den beiden {rvon}crsr{rvof}-tasten koennen"
+ 5120 print"{down} sie nach links oder rechts lenken."
+ 5170 print"{down}{down} {lred}cashes ergeben minuspunkte !{yel}"
+ 5180 return
+ 6000 rem *** get-routine
+ 6010 poke 53269,0
+ 6020 get x$:get x$
+ 6030 for a=1 to 4
+ 6040 print mid$("N-MT",a,1);"{left}";
+ 6050 get x$
+ 6060 if x$<>"" then print" {left}";:return
+ 6070 b=1^1^1
+ 6080 next:goto 6030
+ 6200 rem *** farbe setzen
+ 6210 poke53281,cl
+ 6220 poke53280,cl
+ 6230 return
+ 6400 rem *** fahrbahncharakter uno -symbol
+ 6410 print"{clr}{down}{down}{down} charakter (1-9) ? "; .
+ 6420 gosub 6000:x=val(x$):if x=0 then 6420
+ 6430 print x$:poke 883,(x-1)*10
+ 6450 print"{home}{down}{down}{down}{down}{down}{down} symbol ? ";
+ 6460 gosub 6000
+ 6470 if x$="{rvon}" then print x$;:goto 6460
+ 6480 if x$=chr$(13) then print:return
+ 6490 print x$:sy=peek(1274)
+ 6500 if sy=32 or sy=96 then 6450
+ 6510 poke 251,sy
+ 6520 for a=1 to 500:next:return
+ 6530 :
+ 8000 rem *** maschinenprogramm
+ 8010 data 120,169,245,141,24,208,32,119,50,169,21,141,24,208,173,31,208,32,116
+ 8020 data 50,14,31,208,176,40,32,67,50,14,31,208,176,32,32,243,50,32,67,50,32
+ 8030 data 230,50,14,31,208,176,18,32,230,50,14,31,208,176,10,206,112,3,208,197
+ 8040 data 206,113,3,16,192,88,96,162,0,142,0,220,174,14,208,173,1,220
+ 8050 data 201,127,240,15,201,251,208,23,138,24,105,2,144,14,110,16,208
+ 8060 data 208,9,138,56,233,2,176,3,14,16,208,141,14,208,162,127,142,0
+ 8070 data 220,96,0,162,60,44,162,4,134,101,232,232,232,134,98,134,100,160
+ 8080 data 152,132,97,160,192,132,99,169,32,160,39,145,99,136,16,251,162,24,24
+ 8090 data 169,32,188,80,3,145,97,200,145,97,165,251,145,99,136,145,99,152,101
+ 8100 data 252,168,169,32,145,97,200,145,97,165,251,145,99,136,145,99,202,56,165
+ 8110 data 97,233,40,133,97,176,3,198,98,56,165,99,233,40,133,99,176,199,198
+ 8120 data 100,165,100,197,101,176,191,201,59,208,11,162,24,189,80,3,157,81
+ 8130 data 3,202,16,247,96,164,253,162,0,202,208,253,136,208,250,76,67,50,174
+ 8140 data 80,3,240,21,232,236,114,3,202,176,14,173,115,3,205,4,220,176,6,36
+ 8150 data 88,48,13,16,5,44,4,220,80,6,232,236,114,3,144,3,202,48,247,138,56
+ 8160 data 237,80,3,142,80,3,133,88,96,169,0,133,88,234,141,112,3,169,13,162
+ 8170 data 24,157,80,3,202,16,250,165,252,201,22,144,4,169,20,133,252,169,39
+ 8180 data 56,229,252,141,114,3,165,252,74,24,105,15,10,10,10,141,14,208,162
+ 8190 data 0,169,1,157,0,216,157,0,217,157,0,218,157,0,219,169,32,157,0,60,157
+ 8200 data 0,61,157,0,62,157,0,63,202,208,225,169,216,141,15,208,162,0,142,16
+ 8210 data 208,142,23,208,142,27,208,142,28,208,142,29,208,142,21,208,160,11
+ 8220 data 140,255,7,140,255,63,160,1,140,46,208,32,119,50,32,116,50,162,128
+ 8230 data 142,21,208,162,0,142,31,208,96
+ 8240 :
+ 8400 rem *** sprite
+ 8410 data 0,0,0,0,60,0,0,60,0,0,126,0,6,126,96,6,126,96,7,255
+ 8420 data 224,6,126,96,6,126,96,0,255,0,0,255,0,0,255,0,1,255
+ 8430 data 128,1,255,128,29,255,184,29,255,184,31,255,248,29
+ 8440 data 255,184,29,255,184,0,255,0,0,126,0
