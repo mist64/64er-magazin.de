@@ -762,6 +762,19 @@ def write_full_html_file(db, path, title, preview_img, body_html, body_class, co
 
     mastodon_link = share_on_mastodon_link(title, url)
 
+    if DEPLOY == "local" or DEPLOY == None:
+      fav_icon_html = f"""
+        <link rel="icon" href="/{BASE_DIR}favicon-dev.ico" sizes="32x32">
+        <link rel="icon" href="/{BASE_DIR}fav/icon-dev.svg" type="image/svg+xml">
+        <link rel="apple-touch-icon" href="/{BASE_DIR}fav/apple-touch-icon-dev.png">
+      """
+    else:
+      fav_icon_html = f"""
+          <link rel="icon" href="/{BASE_DIR}favicon.ico" sizes="32x32">
+          <link rel="icon" href="/{BASE_DIR}fav/icon.svg" type="image/svg+xml">
+          <link rel="apple-touch-icon" href="/{BASE_DIR}fav/apple-touch-icon.png">
+      """
+
     full_html = f"""
 <!DOCTYPE html>
 <html lang="{LANG}">
@@ -770,6 +783,9 @@ def write_full_html_file(db, path, title, preview_img, body_html, body_class, co
     <meta property="og:title" content="{title}" />
     <meta property="og:image" content="{preview_img}" />
     <title>{title}</title>
+    
+    {fav_icon_html}
+       
     <link rel="stylesheet" href="/{BASE_DIR}style.css">
     <script>
       const BASE_DIR = '{BASE_DIR}';
@@ -1090,6 +1106,22 @@ def copy_articles_and_assets(db, in_directory, out_directory):
     shutil.copy(os.path.join(in_directory, 'style.css'), out_directory)
     shutil.copy(os.path.join(in_directory, 'search.js'), out_directory)
     shutil.copy(os.path.join(in_directory, 'lunr.js'), out_directory)
+    
+    fav_path = os.path.join(in_directory,'fav')
+    fav_path_out = os.path.join(out_directory,'fav')
+    
+    if not os.path.exists(fav_path_out):
+        os.makedirs(fav_path_out)
+
+    if DEPLOY == "local" or DEPLOY == None:
+        shutil.copy(os.path.join(in_directory, 'favicon-dev.ico'), out_directory)
+        shutil.copy(os.path.join(fav_path, 'apple-touch-icon-dev.png'), fav_path_out)
+        shutil.copy(os.path.join(fav_path, 'icon-dev.svg'), fav_path_out)
+    else:
+        shutil.copy(os.path.join(in_directory, 'favicon.ico'), out_directory)
+        shutil.copy(os.path.join(fav_path, 'apple-touch-icon.png'), fav_path_out)
+        shutil.copy(os.path.join(fav_path, 'icon.svg'), fav_path_out)
+      
     shutil.copy('filter_rss.py', out_directory)
     shutil.copy('filter_index.py', out_directory)
     shutil.copy('tootpick.html', out_directory)
