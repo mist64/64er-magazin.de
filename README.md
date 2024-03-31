@@ -19,6 +19,16 @@ Auf der modernen Homepage gibt es
 
 Alle Artikel sind mit dem Text im gedruckten Magazin identisch, Schreibfehler und sachliche Fehler sind also unverändert. Errata aus späteren Ausgaben ("Fehlerteufelchen") werden den Artikeln allerdings angehängt, und später dokumentierte Fehler in Software sind in den Downloads bereits behoben.
 
+## generate.py
+
+Prerequisites (macOS):
+```
+brew install imagemagick     # to convert PNG to JPG
+pip3 install bs4             # to work with HTML
+pip3 install python-dateutil # to work with dates
+pip3 PyPDF2                  # to cut PDFs
+```
+
 ## Autoren
 
 * Michael Steil <mist64@mac.com>
