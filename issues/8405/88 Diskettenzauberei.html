@@ -162,12 +162,68 @@
 		</figure>
 
 		<figure>
-			<!-- TODO -->
+			<pre>
+1 rem" *********************************************************************
+2 rem" ++++++                  diskettenname andern                   ++++++
+3 rem" ++++++                  --------------------                   ++++++
+4 rem" *********************************************************************
+5 rem" ++++++                 copyright (c) 1983  by                  ++++++
+6 rem" ++++++      uwe repplinger, kaiserstr. 30, 1000 berlin 42      ++++++
+7 rem" *********************************************************************
+8 :
+9 :
+1000 print"{clr}{rvon}   =-=   diskettenname andern   =-=   "
+1010 print"{rvon}         (c) by  uwe repplinger         "
+1020 input"{down}richtige diskette eingelegt   j{left}{left}{left}";w$
+1030 ifw$<>"j"thenprint"{down}cont{up}{up}{up}":end
+1040 print"{down}diskname:";spc(19);"disk id:":printtab(10);"{up}{rvon}";
+1050 open1,8,15:print#1,"i0"
+1060 open8,8,8,"#"
+1070 print#1,"u1:";8;0;18;0
+1080 print#1,"b-p:";8;144
+1090 fori=1to16
+1100 get#8,ch$:printch$;
+1110 nexti
+1120 print#1,"b-p:";8;162
+1130 get#8,c1$,c2$
+1140 printspc(11);c1$;c2$
+1150 input"{down}{down}soll der name geandert werden   j{left}{left}{left}";w$:g%=0
+1160 ifw$<>"j"then1210
+1170 input"{down}neuer diskettenname ";dn$
+1180 dn$=left$(dn$+"                ",16)
+1190 print#1,"b-p:";8;144
+1200 print#8,dn$;:g%=1
+1210 input"{down}{down}soll die disk id geandert werden   n{left}{left}{left}";w$
+1220 ifw$<>"j"then1270
+1230 input"{down}neue disk id ";id$
+1240 id$=left$(id$+"  ",2)
+1250 print#1,"b-p:";8;162
+1260 print#8,id$;:g%=1
+1270 ifg%=1thenprint#1,"u2:";8;0;18;0
+1280 print#1,"i0":close8:close1
+1290 print"{down}{down}{rvon}";:ifg%=1thenprint" diskette geandert  -=-";
+1300 print"  programmende  "
+1310 end
+</pre>
 			<figcaption>Programm, mit dem der Name und/oder die ID einer Diskette geändert werden kann</figcaption>
 		</figure>
+
+		<aside class="fehlerteufelchen">
+			<h2>Fehlerteufelchen</h2>
+			<p>Dort gelangen mir gleich 4 Fehler:<br>
+				Zeile 1120: Hinter PRINT #1 muß ein Komma stehen.<br>
+				Zeile 1200 und 1260: Schreiben Sie vor dem Doppelpunkt ein Semikolon.<br>
+				Zeile 1250: Hinter B-P muß ein Doppelpunkt stehen.<br>
+				Zeile 1260: Schreiben Sie G% anstatt R%</p>
+			<!-- 64'er 6/1984 -->
+		</aside>
 
 	</article>
 
 </body>
 
 </html>
+
+<!-- 
+	Listing eingetippt von Endurion, goloMAK.
+ -->
