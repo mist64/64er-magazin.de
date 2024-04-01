@@ -992,10 +992,7 @@ def extract_pages_from_pdf(source_pdf_path, dest_pdf_path, page_descriptions):
     with open(dest_pdf_path, 'wb') as out_pdf:
         writer.write(out_pdf)
 
-def convert_and_copy_image(img_path, issue_dest_path):
-    dest_img_name = os.path.splitext(os.path.basename(img_path))[0] + '.jpg'
-    dest_img_path = os.path.join(issue_dest_path, dest_img_name)
-
+def convert_and_copy_image(img_path, dest_img_path):
     try:
         if IMAGE_CONVERSION_TOOL == 'guetzli':
             # Guetzli for optimizing JPG images
@@ -1114,7 +1111,11 @@ def copy_articles_and_assets(db, in_directory, out_directory):
         os.makedirs(issue_dest_path_prg)
 
         # Copy title image
-        shutil.copy(os.path.join(issue_source_path, TITLE_IMAGE_NAME), issue_dest_path)
+        title_image_path = os.path.join(issue_source_path, TITLE_IMAGE_NAME)
+        if os.path.exists(title_image_path):
+            shutil.copy(title_image_path, issue_dest_path)
+        else:
+            convert_and_copy_image(os.path.join(issue_source_path, 'title.png'), os.path.join(issue_dest_path, 'title.jpg'))
 
         # Copy full PDF
         shutil.copy(os.path.join(issue_source_path, issue_data['pdf_filename']), issue_dest_path)
@@ -1128,7 +1129,9 @@ def copy_articles_and_assets(db, in_directory, out_directory):
             for img_src in img_srcs:
                 img_path = os.path.join(issue_source_path, img_src)
                 if os.path.exists(img_path):
-                    convert_and_copy_image(img_path, issue_dest_path)
+                    dest_img_name = os.path.splitext(os.path.basename(img_path))[0] + '.jpg'
+                    dest_img_path = os.path.join(issue_dest_path, dest_img_name)
+                    convert_and_copy_image(img_path, dest_img_path)
 
             # Copy files from the downloads
             downloads = article['downloads']
