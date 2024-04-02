@@ -142,13 +142,17 @@ if LANG == "de":
     </main>
     """
 
-  HTML_404 = """
-    <main class="fehlerteufelchen">
-    <h1>Seite nicht gefunden</h1>
-    <img src="fehlerteufelchen.svg" alt="Fehlerteufelchen">
-    </main>
+  HTML_IMG_FEHLERTEUFELCHEN= f"""
+    <img src="/{BASE_DIR}fehlerteufelchen.svg" alt="Fehlerteufelchen">
   """
 
+  HTML_404 = f"""
+    <main class="fehlerteufelchen">
+    <h1>Seite nicht gefunden</h1>
+    {HTML_IMG_FEHLERTEUFELCHEN}
+    </main>
+  """
+  
 elif LANG == "en":
   IN_DIRECTORY = 'en'
   MAGAZINE_NAME = "64'er Magazine"
@@ -224,13 +228,17 @@ elif LANG == "en":
     </main>
     """
 
-  HTML_404 = """
-    <main class="fehlerteufelchen">
-    <h1>Page Not Found</h1>
-    <img src="fehlerteufelchen.svg" alt="Error Devil">
-    </main>
+  HTML_IMG_FEHLERTEUFELCHEN=f"""
+    <img src="/{BASE_DIR}fehlerteufelchen.svg" alt="Error Devil">
     """
 
+  HTML_404 = f"""
+    <main class="fehlerteufelchen">
+    <h1>Page Not Found</h1>
+    {HTML_IMG_FEHLERTEUFELCHEN}
+    </main>
+    """
+  
 LOGO = f'<img src="/{BASE_DIR}logo.svg" alt="{MAGAZINE_NAME}">'
 
 ###
@@ -1041,6 +1049,7 @@ def convert_and_copy_image(img_path, dest_img_path):
     except subprocess.CalledProcessError as e:
         print(f"Error running {IMAGE_CONVERSION_TOOL} for image {img_path}: {e}")
 
+                
 def copy_and_modify_html(article, html_dest_path, pdf_path, prev_page_link, next_page_link):
     """Modifies, and writes an HTML file directly to the destination."""
     soup = article['html']
@@ -1066,6 +1075,14 @@ def copy_and_modify_html(article, html_dest_path, pdf_path, prev_page_link, next
     custom_div_soup = BeautifulSoup(custom_div_html, 'html.parser')
     body.insert(0, custom_div_soup)
 
+    # Augment the Fehlerteufelchen <asides> with a full size Fehlerteufelchen
+    asides = soup.find_all("aside", class_="fehlerteufelchen") 
+    if asides:
+      for aside in asides:
+        ft_tag = BeautifulSoup(HTML_IMG_FEHLERTEUFELCHEN, 'html.parser')
+        aside.insert(0, ft_tag)
+        
+    # Insert actions for downloading the pdf and tooting to mastooton 
     download_pdf_html = f'''
 <div class="article_action">
 <a href="{pdf_path}">
