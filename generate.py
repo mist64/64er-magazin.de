@@ -249,6 +249,26 @@ def key_to_datetime(issue_key):
     year += 1900 if year >= 50 else 2000
     return datetime(year, month, 1)  # Assuming the first of the month
 
+# converts an img tag into a picture tag with WebP and a JPEG fallback
+def webp_picture_tag(soup, img_src):
+    # Create the <picture> tag
+    picture_tag = soup.new_tag('picture')
+
+    # Create the <source> tag for WebP and add it to <picture>
+    source_tag = soup.new_tag('source', srcset=img_src[:-4] + '.webp', type='image/webp')
+    picture_tag.insert(0, source_tag)
+
+    # Create a new <img> tag for the JPEG version
+    new_img_tag = soup.new_tag('img')
+    # Update the src attribute to the JPEG version
+    new_img_tag['src'] = img_src[:-4] + '.jpg'
+
+    # Append the new <img> tag to the <picture> tag
+    picture_tag.append(new_img_tag)
+
+    return picture_tag
+
+
 class ArticleDatabase:
     @staticmethod
     def __read_html(html_file_path):
@@ -292,11 +312,11 @@ class ArticleDatabase:
         src_img_urls = [img['src'] for img in soup.find_all('img') if img.get('src')]
         metadata['src_img_urls'] = src_img_urls
 
-        # In the HTML, change all img src paths from PNG to JPG
+        # In the HTML, change all img src paths from PNG to WebP, with a JPEG fallback
         for img_tag in soup.find_all('img'):
             img_src = img_tag['src']
             if img_src.lower().endswith('.png'):
-                img_tag['src'] = img_src[:-4] + '.jpg'
+                img_tag.replace_with(webp_picture_tag(soup, img_tag['src']))
 
         metadata['html'] = soup
         metadata['txt'] = html_to_text_preserve_paragraphs(soup.body);
@@ -704,7 +724,9 @@ def html_generate_article_preview(db, article):
     html_parts.append(f"<div class=\"article_link\" data-pubdate=\"{pubdate_unix}\">\n")
     if img_src:
         img_src = os.path.join(issue_dir_name, img_src)
-        link_img = article_link(db, article, f"<img src='{img_src}'>\n", True)
+        soup = BeautifulSoup('', 'html.parser')
+        picture_tag = webp_picture_tag(soup, img_src)
+        link_img = article_link(db, article, picture_tag, True)
         html_parts.append(link_img)
     html_parts.append(f"<h2>{link_title}</h2>\n")
     html_parts.append(f"<hr>\n")
@@ -762,6 +784,19 @@ def write_full_html_file(db, path, title, preview_img, body_html, body_class, co
 
     mastodon_link = share_on_mastodon_link(title, url)
 
+    if DEPLOY == "local" or DEPLOY == None:
+      fav_icon_html = f"""
+        <link rel="icon" href="/{BASE_DIR}favicon-dev.ico" sizes="32x32">
+        <link rel="icon" href="/{BASE_DIR}fav/icon-dev.svg" type="image/svg+xml">
+        <link rel="apple-touch-icon" href="/{BASE_DIR}fav/apple-touch-icon-dev.png">
+      """
+    else:
+      fav_icon_html = f"""
+          <link rel="icon" href="/{BASE_DIR}favicon.ico" sizes="32x32">
+          <link rel="icon" href="/{BASE_DIR}fav/icon.svg" type="image/svg+xml">
+          <link rel="apple-touch-icon" href="/{BASE_DIR}fav/apple-touch-icon.png">
+      """
+
     full_html = f"""
 <!DOCTYPE html>
 <html lang="{LANG}">
@@ -770,6 +805,9 @@ def write_full_html_file(db, path, title, preview_img, body_html, body_class, co
     <meta property="og:title" content="{title}" />
     <meta property="og:image" content="{preview_img}" />
     <title>{title}</title>
+    
+    {fav_icon_html}
+       
     <link rel="stylesheet" href="/{BASE_DIR}style.css">
     <script>
       const BASE_DIR = '{BASE_DIR}';
@@ -1090,6 +1128,22 @@ def copy_articles_and_assets(db, in_directory, out_directory):
     shutil.copy(os.path.join(in_directory, 'style.css'), out_directory)
     shutil.copy(os.path.join(in_directory, 'search.js'), out_directory)
     shutil.copy(os.path.join(in_directory, 'lunr.js'), out_directory)
+    
+    fav_path = os.path.join(in_directory,'fav')
+    fav_path_out = os.path.join(out_directory,'fav')
+    
+    if not os.path.exists(fav_path_out):
+        os.makedirs(fav_path_out)
+
+    if DEPLOY == "local" or DEPLOY == None:
+        shutil.copy(os.path.join(in_directory, 'favicon-dev.ico'), out_directory)
+        shutil.copy(os.path.join(fav_path, 'apple-touch-icon-dev.png'), fav_path_out)
+        shutil.copy(os.path.join(fav_path, 'icon-dev.svg'), fav_path_out)
+    else:
+        shutil.copy(os.path.join(in_directory, 'favicon.ico'), out_directory)
+        shutil.copy(os.path.join(fav_path, 'apple-touch-icon.png'), fav_path_out)
+        shutil.copy(os.path.join(fav_path, 'icon.svg'), fav_path_out)
+      
     shutil.copy('filter_rss.py', out_directory)
     shutil.copy('filter_index.py', out_directory)
     shutil.copy('tootpick.html', out_directory)
@@ -1129,6 +1183,9 @@ def copy_articles_and_assets(db, in_directory, out_directory):
             for img_src in img_srcs:
                 img_path = os.path.join(issue_source_path, img_src)
                 if os.path.exists(img_path):
+                    dest_img_name = os.path.splitext(os.path.basename(img_path))[0] + '.webp'
+                    dest_img_path = os.path.join(issue_dest_path, dest_img_name)
+                    convert_and_copy_image(img_path, dest_img_path)
                     dest_img_name = os.path.splitext(os.path.basename(img_path))[0] + '.jpg'
                     dest_img_path = os.path.join(issue_dest_path, dest_img_name)
                     convert_and_copy_image(img_path, dest_img_path)
