@@ -19,6 +19,30 @@ Auf der modernen Homepage gibt es
 
 Alle Artikel sind mit dem Text im gedruckten Magazin identisch, Schreibfehler und sachliche Fehler sind also unverändert. Errata aus späteren Ausgaben ("Fehlerteufelchen") werden den Artikeln allerdings angehängt, und später dokumentierte Fehler in Software sind in den Downloads bereits behoben.
 
+## CMS
+
+Das Projekt verwendet ein einfaches in Python geschriebenes "CMS". Es nimmt HTMLs (mit zusätzlichen Metadaten) und ein paar andere Dateien und erstellt eine vollständig statische Seite.
+
+* Für lokale Kommentare verwenden wir [Isso](https://isso-comments.de).
+* Die lokale Suche ist [Lunr](https://lunrjs.com).
+
+Das Skript braucht (macOS):
+```
+brew install imagemagick     # to convert PNG to JPG
+pip3 install bs4             # to work with HTML
+pip3 install python-dateutil # to work with dates
+pip3 install pytz            # ...and timezones
+pip3 install PyPDF2          # to cut PDFs
+```
+
+Die Eingabe-Ausgaben werden aus `issues` gelesen, die Website wird nach `out` geschrieben. Befindet man sich gerade auf einem git-Branch (außer `main`), ist die Website in `out/pre/<Name des Branches>`.
+
+* `/generate.py` generiert nur die Website.
+* `./generate.py local` startet zudem einen lokalen Webserver.
+* `./generate.py upload` lädt die Website auf den Server. Befindet man sich auf einem Branch, wird nach `/pre/<Name des Branches>` hochgeladen.
+
+`local` und `upload` öffnen danach ein Browserfenster mit der Seite (nur macOS).
+
 ## Autoren
 
 * Michael Steil <mist64@mac.com>
