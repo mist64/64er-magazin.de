@@ -1080,7 +1080,7 @@ def copy_and_modify_html(article, html_dest_path, pdf_path, prev_page_link, next
     if asides:
       for aside in asides:
         ft_tag = BeautifulSoup(HTML_IMG_FEHLERTEUFELCHEN, 'html.parser')
-        aside.h2.insert_before(ft_tag)
+        aside.insert(0, ft_tag)
         
     # Insert actions for downloading the pdf and tooting to mastooton 
     download_pdf_html = f'''
