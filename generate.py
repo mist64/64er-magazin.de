@@ -11,6 +11,7 @@ import html
 import subprocess
 import http.server
 import socketserver
+import hashlib
 from collections import defaultdict
 from bs4 import BeautifulSoup, NavigableString
 from urllib.parse import quote
@@ -23,8 +24,8 @@ from PyPDF2 import PdfReader, PdfWriter
 #
 LANG='de'
 OUT_DIRECTORY = 'out'
+CACHE_DIRECTORY = 'cache'
 SERVER = 'www.64er-magazin.de'
-IMAGE_CONVERSION_TOOL = 'imagemagick' # 'guetzli'
 EXTRACT_PDF_PAGES = True # disable for speed when testing
 NEW_DOWNLOADS = 15
 HOURS_PER_ARTICLE = 12
@@ -152,7 +153,7 @@ if LANG == "de":
     {HTML_IMG_FEHLERTEUFELCHEN}
     </main>
   """
-  
+
 elif LANG == "en":
   IN_DIRECTORY = 'en'
   MAGAZINE_NAME = "64'er Magazine"
@@ -238,7 +239,7 @@ elif LANG == "en":
     {HTML_IMG_FEHLERTEUFELCHEN}
     </main>
     """
-  
+
 LOGO = f'<img src="/{BASE_DIR}logo.svg" alt="{MAGAZINE_NAME}">'
 
 ###
@@ -257,13 +258,13 @@ def key_to_datetime(issue_key):
     year += 1900 if year >= 50 else 2000
     return datetime(year, month, 1)  # Assuming the first of the month
 
-# converts an img tag into a picture tag with WebP and a JPEG fallback
-def webp_picture_tag(soup, img_src, attrs=None):
+# converts an img tag into a picture tag with AVIF and a JPEG fallback
+def avif_picture_tag(soup, img_src, attrs=None):
     # Create the <picture> tag
     picture_tag = soup.new_tag('picture')
 
-    # Create the <source> tag for WebP and add it to <picture>
-    source_tag = soup.new_tag('source', srcset=img_src[:-4] + '.webp', type='image/webp')
+    # Create the <source> tag for AVIF and add it to <picture>
+    source_tag = soup.new_tag('source', srcset=img_src[:-4] + '.avif', type='image/avif')
     picture_tag.insert(0, source_tag)
 
     # Create a new <img> tag for the JPEG version
@@ -279,6 +280,13 @@ def webp_picture_tag(soup, img_src, attrs=None):
     picture_tag.append(new_img_tag)
 
     return picture_tag
+
+def calculate_sha1(filepath):
+    sha1 = hashlib.sha1()
+    with open(filepath, 'rb') as f:
+        while chunk := f.read(8192):
+            sha1.update(chunk)
+    return sha1.hexdigest()
 
 
 class ArticleDatabase:
@@ -324,11 +332,11 @@ class ArticleDatabase:
         src_img_urls = [img['src'] for img in soup.find_all('img') if img.get('src')]
         metadata['src_img_urls'] = src_img_urls
 
-        # In the HTML, change all img src paths from PNG to WebP, with a JPEG fallback
+        # In the HTML, change all img src paths from PNG to AVIF, with a JPEG fallback
         for img_tag in soup.find_all('img'):
             img_src = img_tag['src']
             if img_src.lower().endswith('.png'):
-                img_tag.replace_with(webp_picture_tag(soup, img_tag['src'], img_tag.attrs))
+                img_tag.replace_with(avif_picture_tag(soup, img_tag['src'], img_tag.attrs))
 
         metadata['html'] = soup
         metadata['txt'] = html_to_text_preserve_paragraphs(soup.body);
@@ -737,7 +745,7 @@ def html_generate_article_preview(db, article):
     if img_src:
         img_src = os.path.join(issue_dir_name, img_src)
         soup = BeautifulSoup('', 'html.parser')
-        picture_tag = webp_picture_tag(soup, img_src)
+        picture_tag = avif_picture_tag(soup, img_src)
         link_img = article_link(db, article, picture_tag, True)
         html_parts.append(link_img)
     html_parts.append(f"<h2>{link_title}</h2>\n")
@@ -1027,33 +1035,49 @@ def generate_rss_feed(db, out_directory):
 ###
 
 def extract_pages_from_pdf(source_pdf_path, dest_pdf_path, page_descriptions):
-    reader = PdfReader(source_pdf_path)
-    writer = PdfWriter()
+    cache_path = os.path.join(CACHE_DIRECTORY, calculate_sha1(source_pdf_path) + os.path.basename(dest_pdf_path))
+    if os.path.exists(cache_path):
+        shutil.copy(cache_path, dest_pdf_path)
+    else:
+        print(f"Not cached: {dest_pdf_path}")
+        reader = PdfReader(source_pdf_path)
+        writer = PdfWriter()
 
-    for part in page_descriptions.split(','):
-        if '-' in part:  # Range of pages
-            start_page, end_page = map(int, part.split('-'))
-            for page in range(start_page - 1, end_page):  # Convert to 0-based index
+        for part in page_descriptions.split(','):
+            if '-' in part:  # Range of pages
+                start_page, end_page = map(int, part.split('-'))
+                for page in range(start_page - 1, end_page):  # Convert to 0-based index
+                    writer.add_page(reader.pages[page])
+            else:  # Single page
+                page = int(part) - 1  # Convert to 0-based index
                 writer.add_page(reader.pages[page])
-        else:  # Single page
-            page = int(part) - 1  # Convert to 0-based index
-            writer.add_page(reader.pages[page])
 
-    with open(dest_pdf_path, 'wb') as out_pdf:
-        writer.write(out_pdf)
+        with open(dest_pdf_path, 'wb') as out_pdf:
+            writer.write(out_pdf)
+        shutil.copy(dest_pdf_path, cache_path)
+
+def is_bilevel_image(file_path):
+    with Image.open(file_path) as img:
+        return img.mode == '1'
 
 def convert_and_copy_image(img_path, dest_img_path):
-    try:
-        if IMAGE_CONVERSION_TOOL == 'guetzli':
-            # Guetzli for optimizing JPG images
-            subprocess.run(['guetzli', '--quality', '84', img_path, dest_img_path], check=True)
-        elif IMAGE_CONVERSION_TOOL == 'imagemagick':
-            # ImageMagick for converting and/or optimizing images
-            subprocess.run(['convert', img_path, '-quality', '85', dest_img_path], check=True)
-    except subprocess.CalledProcessError as e:
-        print(f"Error running {IMAGE_CONVERSION_TOOL} for image {img_path}: {e}")
+    _, file_extension = os.path.splitext(dest_img_path)
+    cache_path = os.path.join(CACHE_DIRECTORY, calculate_sha1(img_path) + file_extension)
+    if os.path.exists(cache_path):
+        shutil.copy(cache_path, dest_img_path)
+    else:
+        print(f"Not cached: {dest_img_path}")
+        try:
+            if file_extension == ".jpg":
+                quality = '80'
+            elif file_extension == ".avif":
+                quality = '60'
+            subprocess.run(['convert', img_path, '-quality', quality, dest_img_path], check=True)
+        except subprocess.CalledProcessError as e:
+            print(f"Error running {IMAGE_CONVERSION_TOOL} for image {img_path}: {e}")
+        shutil.copy(dest_img_path, cache_path)
 
-                
+
 def copy_and_modify_html(article, html_dest_path, pdf_path, prev_page_link, next_page_link):
     """Modifies, and writes an HTML file directly to the destination."""
     soup = article['html']
@@ -1080,13 +1104,13 @@ def copy_and_modify_html(article, html_dest_path, pdf_path, prev_page_link, next
     body.insert(0, custom_div_soup)
 
     # Augment the Fehlerteufelchen <asides> with a full size Fehlerteufelchen
-    asides = soup.find_all("aside", class_="fehlerteufelchen") 
+    asides = soup.find_all("aside", class_="fehlerteufelchen")
     if asides:
       for aside in asides:
         ft_tag = BeautifulSoup(HTML_IMG_FEHLERTEUFELCHEN, 'html.parser')
         aside.insert(0, ft_tag)
-        
-    # Insert actions for downloading the pdf and tooting to mastooton 
+
+    # Insert actions for downloading the pdf and tooting to mastooton
     download_pdf_html = f'''
 <div class="article_action">
 <a href="{pdf_path}">
@@ -1204,7 +1228,7 @@ def copy_articles_and_assets(db, in_directory, out_directory):
             for img_src in img_srcs:
                 img_path = os.path.join(issue_source_path, img_src)
                 if os.path.exists(img_path):
-                    dest_img_name = os.path.splitext(os.path.basename(img_path))[0] + '.webp'
+                    dest_img_name = os.path.splitext(os.path.basename(img_path))[0] + '.avif'
                     dest_img_path = os.path.join(issue_dest_path, dest_img_name)
                     convert_and_copy_image(img_path, dest_img_path)
                     dest_img_name = os.path.splitext(os.path.basename(img_path))[0] + '.jpg'
@@ -1299,6 +1323,8 @@ if __name__ == '__main__':
     if os.path.exists(OUT_DIRECTORY):
         shutil.rmtree(OUT_DIRECTORY)
     os.makedirs(OUT_DIRECTORY)
+    if not os.path.exists(CACHE_DIRECTORY):
+        os.makedirs(CACHE_DIRECTORY)
 
     out_directory = os.path.join(OUT_DIRECTORY, BASE_DIR)
 
