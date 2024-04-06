@@ -26,7 +26,6 @@ LANG='de'
 OUT_DIRECTORY = 'out'
 CACHE_DIRECTORY = 'cache'
 SERVER = 'www.64er-magazin.de'
-USE_GUETZLI_FOR_JPEG = False
 EXTRACT_PDF_PAGES = True # disable for speed when testing
 NEW_DOWNLOADS = 15
 HOURS_PER_ARTICLE = 12
@@ -1036,20 +1035,30 @@ def generate_rss_feed(db, out_directory):
 ###
 
 def extract_pages_from_pdf(source_pdf_path, dest_pdf_path, page_descriptions):
-    reader = PdfReader(source_pdf_path)
-    writer = PdfWriter()
+    cache_path = os.path.join(CACHE_DIRECTORY, calculate_sha1(source_pdf_path) + os.path.basename(dest_pdf_path))
+    if os.path.exists(cache_path):
+        shutil.copy(cache_path, dest_pdf_path)
+    else:
+        print(f"Not cached: {dest_pdf_path}")
+        reader = PdfReader(source_pdf_path)
+        writer = PdfWriter()
 
-    for part in page_descriptions.split(','):
-        if '-' in part:  # Range of pages
-            start_page, end_page = map(int, part.split('-'))
-            for page in range(start_page - 1, end_page):  # Convert to 0-based index
+        for part in page_descriptions.split(','):
+            if '-' in part:  # Range of pages
+                start_page, end_page = map(int, part.split('-'))
+                for page in range(start_page - 1, end_page):  # Convert to 0-based index
+                    writer.add_page(reader.pages[page])
+            else:  # Single page
+                page = int(part) - 1  # Convert to 0-based index
                 writer.add_page(reader.pages[page])
-        else:  # Single page
-            page = int(part) - 1  # Convert to 0-based index
-            writer.add_page(reader.pages[page])
 
-    with open(dest_pdf_path, 'wb') as out_pdf:
-        writer.write(out_pdf)
+        with open(dest_pdf_path, 'wb') as out_pdf:
+            writer.write(out_pdf)
+        shutil.copy(dest_pdf_path, cache_path)
+
+def is_bilevel_image(file_path):
+    with Image.open(file_path) as img:
+        return img.mode == '1'
 
 def convert_and_copy_image(img_path, dest_img_path):
     _, file_extension = os.path.splitext(dest_img_path)
@@ -1059,16 +1068,11 @@ def convert_and_copy_image(img_path, dest_img_path):
     else:
         print(f"Not cached: {dest_img_path}")
         try:
-            if file_extension == ".jpg" and USE_GUETZLI_FOR_JPEG:
-                # Guetzli for optimized JPG images
-                subprocess.run(['guetzli', '--quality', '84', img_path, dest_img_path], check=True)
-            else:
-                # ImageMagick
-                if file_extension == ".jpg":
-                    quality = '80'
-                elif file_extension == ".avif":
-                    quality = '60'
-                subprocess.run(['convert', img_path, '-quality', quality, dest_img_path], check=True)
+            if file_extension == ".jpg":
+                quality = '80'
+            elif file_extension == ".avif":
+                quality = '60'
+            subprocess.run(['convert', img_path, '-quality', quality, dest_img_path], check=True)
         except subprocess.CalledProcessError as e:
             print(f"Error running {IMAGE_CONVERSION_TOOL} for image {img_path}: {e}")
         shutil.copy(dest_img_path, cache_path)
