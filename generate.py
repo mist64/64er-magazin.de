@@ -26,7 +26,6 @@ LANG='de'
 OUT_DIRECTORY = 'out'
 CACHE_DIRECTORY = 'cache'
 SERVER = 'www.64er-magazin.de'
-USE_GUETZLI_FOR_JPEG = False
 EXTRACT_PDF_PAGES = True # disable for speed when testing
 NEW_DOWNLOADS = 15
 HOURS_PER_ARTICLE = 12
@@ -1051,6 +1050,10 @@ def extract_pages_from_pdf(source_pdf_path, dest_pdf_path, page_descriptions):
     with open(dest_pdf_path, 'wb') as out_pdf:
         writer.write(out_pdf)
 
+def is_bilevel_image(file_path):
+    with Image.open(file_path) as img:
+        return img.mode == '1'
+
 def convert_and_copy_image(img_path, dest_img_path):
     _, file_extension = os.path.splitext(dest_img_path)
     cache_path = os.path.join(CACHE_DIRECTORY, calculate_sha1(img_path) + file_extension)
@@ -1059,16 +1062,11 @@ def convert_and_copy_image(img_path, dest_img_path):
     else:
         print(f"Not cached: {dest_img_path}")
         try:
-            if file_extension == ".jpg" and USE_GUETZLI_FOR_JPEG:
-                # Guetzli for optimized JPG images
-                subprocess.run(['guetzli', '--quality', '84', img_path, dest_img_path], check=True)
-            else:
-                # ImageMagick
-                if file_extension == ".jpg":
-                    quality = '80'
-                elif file_extension == ".avif":
-                    quality = '60'
-                subprocess.run(['convert', img_path, '-quality', quality, dest_img_path], check=True)
+            if file_extension == ".jpg":
+                quality = '80'
+            elif file_extension == ".avif":
+                quality = '60'
+            subprocess.run(['convert', img_path, '-quality', quality, dest_img_path], check=True)
         except subprocess.CalledProcessError as e:
             print(f"Error running {IMAGE_CONVERSION_TOOL} for image {img_path}: {e}")
         shutil.copy(dest_img_path, cache_path)
