@@ -152,7 +152,7 @@ if LANG == "de":
     {HTML_IMG_FEHLERTEUFELCHEN}
     </main>
   """
-  
+
 elif LANG == "en":
   IN_DIRECTORY = 'en'
   MAGAZINE_NAME = "64'er Magazine"
@@ -238,7 +238,7 @@ elif LANG == "en":
     {HTML_IMG_FEHLERTEUFELCHEN}
     </main>
     """
-  
+
 LOGO = f'<img src="/{BASE_DIR}logo.svg" alt="{MAGAZINE_NAME}">'
 
 ###
@@ -257,13 +257,13 @@ def key_to_datetime(issue_key):
     year += 1900 if year >= 50 else 2000
     return datetime(year, month, 1)  # Assuming the first of the month
 
-# converts an img tag into a picture tag with WebP and a JPEG fallback
-def webp_picture_tag(soup, img_src, attrs=None):
+# converts an img tag into a picture tag with AVIF and a JPEG fallback
+def avif_picture_tag(soup, img_src, attrs=None):
     # Create the <picture> tag
     picture_tag = soup.new_tag('picture')
 
-    # Create the <source> tag for WebP and add it to <picture>
-    source_tag = soup.new_tag('source', srcset=img_src[:-4] + '.webp', type='image/webp')
+    # Create the <source> tag for AVIF and add it to <picture>
+    source_tag = soup.new_tag('source', srcset=img_src[:-4] + '.avif', type='image/avif')
     picture_tag.insert(0, source_tag)
 
     # Create a new <img> tag for the JPEG version
@@ -324,11 +324,11 @@ class ArticleDatabase:
         src_img_urls = [img['src'] for img in soup.find_all('img') if img.get('src')]
         metadata['src_img_urls'] = src_img_urls
 
-        # In the HTML, change all img src paths from PNG to WebP, with a JPEG fallback
+        # In the HTML, change all img src paths from PNG to AVIF, with a JPEG fallback
         for img_tag in soup.find_all('img'):
             img_src = img_tag['src']
             if img_src.lower().endswith('.png'):
-                img_tag.replace_with(webp_picture_tag(soup, img_tag['src'], img_tag.attrs))
+                img_tag.replace_with(avif_picture_tag(soup, img_tag['src'], img_tag.attrs))
 
         metadata['html'] = soup
         metadata['txt'] = html_to_text_preserve_paragraphs(soup.body);
@@ -737,7 +737,7 @@ def html_generate_article_preview(db, article):
     if img_src:
         img_src = os.path.join(issue_dir_name, img_src)
         soup = BeautifulSoup('', 'html.parser')
-        picture_tag = webp_picture_tag(soup, img_src)
+        picture_tag = avif_picture_tag(soup, img_src)
         link_img = article_link(db, article, picture_tag, True)
         html_parts.append(link_img)
     html_parts.append(f"<h2>{link_title}</h2>\n")
@@ -1053,7 +1053,7 @@ def convert_and_copy_image(img_path, dest_img_path):
     except subprocess.CalledProcessError as e:
         print(f"Error running {IMAGE_CONVERSION_TOOL} for image {img_path}: {e}")
 
-                
+
 def copy_and_modify_html(article, html_dest_path, pdf_path, prev_page_link, next_page_link):
     """Modifies, and writes an HTML file directly to the destination."""
     soup = article['html']
@@ -1080,13 +1080,13 @@ def copy_and_modify_html(article, html_dest_path, pdf_path, prev_page_link, next
     body.insert(0, custom_div_soup)
 
     # Augment the Fehlerteufelchen <asides> with a full size Fehlerteufelchen
-    asides = soup.find_all("aside", class_="fehlerteufelchen") 
+    asides = soup.find_all("aside", class_="fehlerteufelchen")
     if asides:
       for aside in asides:
         ft_tag = BeautifulSoup(HTML_IMG_FEHLERTEUFELCHEN, 'html.parser')
         aside.insert(0, ft_tag)
-        
-    # Insert actions for downloading the pdf and tooting to mastooton 
+
+    # Insert actions for downloading the pdf and tooting to mastooton
     download_pdf_html = f'''
 <div class="article_action">
 <a href="{pdf_path}">
@@ -1204,7 +1204,7 @@ def copy_articles_and_assets(db, in_directory, out_directory):
             for img_src in img_srcs:
                 img_path = os.path.join(issue_source_path, img_src)
                 if os.path.exists(img_path):
-                    dest_img_name = os.path.splitext(os.path.basename(img_path))[0] + '.webp'
+                    dest_img_name = os.path.splitext(os.path.basename(img_path))[0] + '.avif'
                     dest_img_path = os.path.join(issue_dest_path, dest_img_name)
                     convert_and_copy_image(img_path, dest_img_path)
                     dest_img_name = os.path.splitext(os.path.basename(img_path))[0] + '.jpg'
