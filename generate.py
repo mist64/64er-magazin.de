@@ -142,13 +142,17 @@ if LANG == "de":
     </main>
     """
 
-  HTML_404 = """
-    <main class="fehlerteufelchen">
-    <h1>Seite nicht gefunden</h1>
-    <img src="fehlerteufelchen.svg" alt="Fehlerteufelchen">
-    </main>
+  HTML_IMG_FEHLERTEUFELCHEN= f"""
+    <img src="/{BASE_DIR}fehlerteufelchen.svg" alt="Fehlerteufelchen">
   """
 
+  HTML_404 = f"""
+    <main class="fehlerteufelchen">
+    <h1>Seite nicht gefunden</h1>
+    {HTML_IMG_FEHLERTEUFELCHEN}
+    </main>
+  """
+  
 elif LANG == "en":
   IN_DIRECTORY = 'en'
   MAGAZINE_NAME = "64'er Magazine"
@@ -224,13 +228,17 @@ elif LANG == "en":
     </main>
     """
 
-  HTML_404 = """
-    <main class="fehlerteufelchen">
-    <h1>Page Not Found</h1>
-    <img src="fehlerteufelchen.svg" alt="Error Devil">
-    </main>
+  HTML_IMG_FEHLERTEUFELCHEN=f"""
+    <img src="/{BASE_DIR}fehlerteufelchen.svg" alt="Error Devil">
     """
 
+  HTML_404 = f"""
+    <main class="fehlerteufelchen">
+    <h1>Page Not Found</h1>
+    {HTML_IMG_FEHLERTEUFELCHEN}
+    </main>
+    """
+  
 LOGO = f'<img src="/{BASE_DIR}logo.svg" alt="{MAGAZINE_NAME}">'
 
 ###
@@ -250,7 +258,7 @@ def key_to_datetime(issue_key):
     return datetime(year, month, 1)  # Assuming the first of the month
 
 # converts an img tag into a picture tag with WebP and a JPEG fallback
-def webp_picture_tag(soup, img_src):
+def webp_picture_tag(soup, img_src, attrs=None):
     # Create the <picture> tag
     picture_tag = soup.new_tag('picture')
 
@@ -260,6 +268,10 @@ def webp_picture_tag(soup, img_src):
 
     # Create a new <img> tag for the JPEG version
     new_img_tag = soup.new_tag('img')
+    # Copy all attributes from the original <img> tag to the new one
+    if attrs:
+        for attr, value in attrs.items():
+            new_img_tag[attr] = value
     # Update the src attribute to the JPEG version
     new_img_tag['src'] = img_src[:-4] + '.jpg'
 
@@ -316,7 +328,7 @@ class ArticleDatabase:
         for img_tag in soup.find_all('img'):
             img_src = img_tag['src']
             if img_src.lower().endswith('.png'):
-                img_tag.replace_with(webp_picture_tag(soup, img_tag['src']))
+                img_tag.replace_with(webp_picture_tag(soup, img_tag['src'], img_tag.attrs))
 
         metadata['html'] = soup
         metadata['txt'] = html_to_text_preserve_paragraphs(soup.body);
@@ -805,9 +817,9 @@ def write_full_html_file(db, path, title, preview_img, body_html, body_class, co
     <meta property="og:title" content="{title}" />
     <meta property="og:image" content="{preview_img}" />
     <title>{title}</title>
-    
+
     {fav_icon_html}
-       
+
     <link rel="stylesheet" href="/{BASE_DIR}style.css">
     <script>
       const BASE_DIR = '{BASE_DIR}';
@@ -1041,6 +1053,7 @@ def convert_and_copy_image(img_path, dest_img_path):
     except subprocess.CalledProcessError as e:
         print(f"Error running {IMAGE_CONVERSION_TOOL} for image {img_path}: {e}")
 
+                
 def copy_and_modify_html(article, html_dest_path, pdf_path, prev_page_link, next_page_link):
     """Modifies, and writes an HTML file directly to the destination."""
     soup = article['html']
@@ -1066,6 +1079,14 @@ def copy_and_modify_html(article, html_dest_path, pdf_path, prev_page_link, next
     custom_div_soup = BeautifulSoup(custom_div_html, 'html.parser')
     body.insert(0, custom_div_soup)
 
+    # Augment the Fehlerteufelchen <asides> with a full size Fehlerteufelchen
+    asides = soup.find_all("aside", class_="fehlerteufelchen") 
+    if asides:
+      for aside in asides:
+        ft_tag = BeautifulSoup(HTML_IMG_FEHLERTEUFELCHEN, 'html.parser')
+        aside.insert(0, ft_tag)
+        
+    # Insert actions for downloading the pdf and tooting to mastooton 
     download_pdf_html = f'''
 <div class="article_action">
 <a href="{pdf_path}">
@@ -1128,10 +1149,10 @@ def copy_articles_and_assets(db, in_directory, out_directory):
     shutil.copy(os.path.join(in_directory, 'style.css'), out_directory)
     shutil.copy(os.path.join(in_directory, 'search.js'), out_directory)
     shutil.copy(os.path.join(in_directory, 'lunr.js'), out_directory)
-    
+
     fav_path = os.path.join(in_directory,'fav')
     fav_path_out = os.path.join(out_directory,'fav')
-    
+
     if not os.path.exists(fav_path_out):
         os.makedirs(fav_path_out)
 
@@ -1143,7 +1164,7 @@ def copy_articles_and_assets(db, in_directory, out_directory):
         shutil.copy(os.path.join(in_directory, 'favicon.ico'), out_directory)
         shutil.copy(os.path.join(fav_path, 'apple-touch-icon.png'), fav_path_out)
         shutil.copy(os.path.join(fav_path, 'icon.svg'), fav_path_out)
-      
+
     shutil.copy('filter_rss.py', out_directory)
     shutil.copy('filter_index.py', out_directory)
     shutil.copy('tootpick.html', out_directory)
