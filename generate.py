@@ -1035,20 +1035,26 @@ def generate_rss_feed(db, out_directory):
 ###
 
 def extract_pages_from_pdf(source_pdf_path, dest_pdf_path, page_descriptions):
-    reader = PdfReader(source_pdf_path)
-    writer = PdfWriter()
+    cache_path = os.path.join(CACHE_DIRECTORY, calculate_sha1(source_pdf_path) + os.path.basename(dest_pdf_path))
+    if os.path.exists(cache_path):
+        shutil.copy(cache_path, dest_pdf_path)
+    else:
+        print(f"Not cached: {dest_pdf_path}")
+        reader = PdfReader(source_pdf_path)
+        writer = PdfWriter()
 
-    for part in page_descriptions.split(','):
-        if '-' in part:  # Range of pages
-            start_page, end_page = map(int, part.split('-'))
-            for page in range(start_page - 1, end_page):  # Convert to 0-based index
+        for part in page_descriptions.split(','):
+            if '-' in part:  # Range of pages
+                start_page, end_page = map(int, part.split('-'))
+                for page in range(start_page - 1, end_page):  # Convert to 0-based index
+                    writer.add_page(reader.pages[page])
+            else:  # Single page
+                page = int(part) - 1  # Convert to 0-based index
                 writer.add_page(reader.pages[page])
-        else:  # Single page
-            page = int(part) - 1  # Convert to 0-based index
-            writer.add_page(reader.pages[page])
 
-    with open(dest_pdf_path, 'wb') as out_pdf:
-        writer.write(out_pdf)
+        with open(dest_pdf_path, 'wb') as out_pdf:
+            writer.write(out_pdf)
+        shutil.copy(dest_pdf_path, cache_path)
 
 def is_bilevel_image(file_path):
     with Image.open(file_path) as img:
