@@ -11,6 +11,7 @@ import html
 import subprocess
 import http.server
 import socketserver
+import hashlib
 from collections import defaultdict
 from bs4 import BeautifulSoup, NavigableString
 from urllib.parse import quote
@@ -23,8 +24,9 @@ from PyPDF2 import PdfReader, PdfWriter
 #
 LANG='de'
 OUT_DIRECTORY = 'out'
+CACHE_DIRECTORY = 'cache'
 SERVER = 'www.64er-magazin.de'
-IMAGE_CONVERSION_TOOL = 'imagemagick' # 'guetzli'
+USE_GUETZLI_FOR_JPEG = False
 EXTRACT_PDF_PAGES = True # disable for speed when testing
 NEW_DOWNLOADS = 15
 HOURS_PER_ARTICLE = 12
@@ -279,6 +281,13 @@ def avif_picture_tag(soup, img_src, attrs=None):
     picture_tag.append(new_img_tag)
 
     return picture_tag
+
+def calculate_sha1(filepath):
+    sha1 = hashlib.sha1()
+    with open(filepath, 'rb') as f:
+        while chunk := f.read(8192):
+            sha1.update(chunk)
+    return sha1.hexdigest()
 
 
 class ArticleDatabase:
@@ -1043,15 +1052,26 @@ def extract_pages_from_pdf(source_pdf_path, dest_pdf_path, page_descriptions):
         writer.write(out_pdf)
 
 def convert_and_copy_image(img_path, dest_img_path):
-    try:
-        if IMAGE_CONVERSION_TOOL == 'guetzli':
-            # Guetzli for optimizing JPG images
-            subprocess.run(['guetzli', '--quality', '84', img_path, dest_img_path], check=True)
-        elif IMAGE_CONVERSION_TOOL == 'imagemagick':
-            # ImageMagick for converting and/or optimizing images
-            subprocess.run(['convert', img_path, '-quality', '85', dest_img_path], check=True)
-    except subprocess.CalledProcessError as e:
-        print(f"Error running {IMAGE_CONVERSION_TOOL} for image {img_path}: {e}")
+    _, file_extension = os.path.splitext(dest_img_path)
+    cache_path = os.path.join(CACHE_DIRECTORY, calculate_sha1(img_path) + file_extension)
+    if os.path.exists(cache_path):
+        shutil.copy(cache_path, dest_img_path)
+    else:
+        print(f"Not cached: {dest_img_path}")
+        try:
+            if file_extension == ".jpg" and USE_GUETZLI_FOR_JPEG:
+                # Guetzli for optimized JPG images
+                subprocess.run(['guetzli', '--quality', '84', img_path, dest_img_path], check=True)
+            else:
+                # ImageMagick
+                if file_extension == ".jpg":
+                    quality = '80'
+                elif file_extension == ".avif":
+                    quality = '60'
+                subprocess.run(['convert', img_path, '-quality', quality, dest_img_path], check=True)
+        except subprocess.CalledProcessError as e:
+            print(f"Error running {IMAGE_CONVERSION_TOOL} for image {img_path}: {e}")
+        shutil.copy(dest_img_path, cache_path)
 
 
 def copy_and_modify_html(article, html_dest_path, pdf_path, prev_page_link, next_page_link):
@@ -1299,6 +1319,8 @@ if __name__ == '__main__':
     if os.path.exists(OUT_DIRECTORY):
         shutil.rmtree(OUT_DIRECTORY)
     os.makedirs(OUT_DIRECTORY)
+    if not os.path.exists(CACHE_DIRECTORY):
+        os.makedirs(CACHE_DIRECTORY)
 
     out_directory = os.path.join(OUT_DIRECTORY, BASE_DIR)
 
