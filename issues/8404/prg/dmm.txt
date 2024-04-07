@@ -1,0 +1,187 @@
+
+
+;dmm.prg ==0801==
+  100 poke53281,0:poke53280,0:print"{clr}{down}{down}{down}{down}{down}{down}{lred}      d m m - p r o g r a m m  "
+  110 print"{yel}{down}{down}{down}          copyrights by
+  120 print"{down}{down}{down}{grn}         volker ritzhaupt
+  130 print"{down}{down}{down}{lblu}               1983":wait203,63:getx$:a=27:b=17
+  140 print"{clr}{yel}":poke53281,6:poke53280,6:gosub850:input"zeit (format:hhmmss)";ti$
+  150 datatsg 78 heidelberg,tsv schoenau,vfb gaggenau
+  160 datalag obere murg,lsg saarbr.sulzbachtal
+  170 datatsg akus weinheim,stv singet,tv lahr,tv gengenbach,tv radolphzell
+  180 data----------,tg oetigheim,usc freiburg,tv zunsweier
+  190 datausc heidelberg,lav rala ludwigshafen
+  200 datatv lahr,tsg akus weinheim,tv eppelheim,tsv mannheim,sv waldkirch
+  210 data----------,tg oetigheim,---------,usc freiburg,ts ottersdorf
+  220 datalg coop kurpfalz
+  230 dima$(a),a(a),b$(b),c(a,b,3),e$(a),e(a,b)
+  240 fori=1toa:reada$(i):next:fori=1toa:e$(i)="0":next:c$="{down}{down}{down}{down}":f$="{clr}{down}{down}{down}"
+  250 print"{clr}{down}{down}     welche gruppe ?
+  260 g$(1)="bundesliga maenner
+  270 print"{down}  1 "g$(1)
+  280 g$(2)="landesliga maenner
+  290 print"{down}  2 "g$(2)
+  300 g$(3)="bezirksliga maenner
+  310 print"{down}  3 "g$(3)
+  320 g$(4)="bundesliga frauen
+  330 print"{down}  4 "g$(4)
+  340 g$(5)="landesliga frauen
+  350 print"{down}  5 "g$(5)
+  360 g$(6)="bezirksliga frauen
+  370 print"{down}  6 "g$(6)
+  380 print"{down}  7 abspeichern":print"{down}  8 einlesen
+  390 print"{down}  9 programmende
+  400 gosub1650
+  410 x1=val(x$):ifx1<1then400
+  420 ifx1=9thenprint"{clr}":end
+  430 onx1gosub1050,1110,1170,1220,1290,1350,1510,1580
+  440 ifp0=1thenp0=0:goto250
+  450 x=0:d=0:print"{clr}{blk} "g$(x1):print"{lred}":fori=ftog:printi" "a$(i):next
+  460 print"{down}{gry3} z  zwischenergebnis":print" a  anfang":print" k  kontrolle
+  470 print"{down}{cyn}geben sie die nr.des vereins ein":d$=""
+  480 inputx$:ifx$="a"then250
+  490 ifx$="z"then700
+  500 ifx$="k"thenk0=1:print"vereinsnummer zur kontrolle":goto480
+  510 x=val(x$):ifx<f orx>gthenprint"{up}{up}{lred}":goto480
+  520 print"{clr}{pur}":fori=1toh:printb$(i):next:print"{down}{blk}geben sie nr. der disziplin";
+  530 print" (0)=ausstieg"
+  540 inputd$:ifd$=""orval(d$)<0orval(d$)>hthenprint"{up}{up}{lred}":goto540
+  550 d=val(d$):ifd=0then450
+  560 ifk0=1thenk0=0:goto950
+  570 ife(x,d)=1then870
+  580 e(x,d)=1
+  590 print"{clr}{lred}eingabe "a$(x)
+  600 print"{down}disziplin: "b$(d)
+  610 print:fori=1to3:print"{down}{yel}ergebnis nr.:"i:inputc(x,d,i):next
+  620 fori=1to2:forj=i+1to3:ifc(x,d,j)<=c(x,d,i)then640
+  630 ri=c(x,d,i):c(x,d,i)=c(x,d,j):c(x,d,j)=ri
+  640 nextj,i
+  650 print"{clr}{lblu}sortierte ergebnisse:{grn}{down}{down}":printc(x,d,1):printc(x,d,2):print"{lred}"
+  660 printc(x,d,3):a(x)=a(x)+c(x,d,1)+c(x,d,2)
+  670 print"{down}{down}{blk}total "a$(x)":"a(x):print"{down}{orng}taste druecken"
+  680 gosub1650
+  690 goto450
+  700 gosub830:fori=ftog-1:forj=i+1tog:ife$(j)<=e$(i)then720
+  710 ri$=e$(i):e$(i)=e$(j):e$(j)=ri$
+  720 nextj,i:print"{home}"c$c$c$c$"{down}{cyn}ausgefuehrte disziplinen:"
+  730 v=0:fori=1tob:forj=ftog:ife(j,i)<>0thenv1=v1+1
+  740 nextj:ifv1=g1thenprintright$(b$(i),len(b$(i))-4),:v=v+1
+  750 v1=0:nexti
+  760 print"{pur}{home}"c$:fori=ftog:printe$(i):next:print"{yel}"
+  770 ifv=1thenprint"{down}stand nach der ersten disziplin":goto800
+  780 ifv=0thenprint"{down}noch keine disziplin komplett!":goto800
+  790 print"{down}stand nach"v" disziplinen!{down}"
+  800 print"{orng}taste druecken!":print"(d fuer ausgabe auf drucker)
+  810 gosub1650:ifx$="d"thengosub3000
+  820 goto450
+  830 print"{clr}{gry3}zwischenergebnis:":print"{blk}"g$(x1):fori=ftog
+  840 e1$="      "+str$(a(i)):e$(i)=right$(e1$,7)+" "+a$(i):next:return
+  850 s1=54272:poke54296,15
+  860 pokes1+3,8:pokes1+6,240:t=64:return
+  870 print"{lred}{clr}"c$c$"      wurde schon eingegeben!!!"
+  880 pokes1+1,40:pokes1,80:fori=1to5:pokes1+4,t+1:forj=1to50:next
+  890 pokes1+4,t:forj=1to30:nextj,i:pokes1+1,0:pokes1,0
+  900 print"{down}{down}{down}    wollen sie neu eingeben? (j/n)"
+  910 gety$:ify$=""then910
+  920 ify$="j"then940
+  930 goto540
+  940 fori=1to2:a(x)=a(x)-c(x,d,i):next:goto580
+  950 print"{clr}{blk}"g$(x1):print"{down}{lred}verein:"a$(x)
+  960 print"{down}{cyn}disziplin:"right$(b$(d),len(b$(d))-4)
+  970 print:fori=1to3:print"{yel}ergebnis"i" :"c(x,d,i):next
+  980 print"{down}{orng}taste druecken"
+  990 print"{down}nr. des ergebnisses fuer korrektur"
+ 1000 getx$:ifx$=""then1000
+ 1010 ifx$="1"orx$="2"orx$="3"then1030
+ 1020 goto450
+ 1030 i=val(x$):a(x)=a(x)-c(x,d,1)-c(x,d,2)
+ 1040 print"neues ergebnis"i;;:inputc(x,d,i):goto620
+ 1050 h=b:f=1:g=5:g1=g-f+1:b$(1)=" 1  100m":b$(2)=" 2  200m":b$(3)=" 3  400m"
+ 1060 b$(4)=" 4  800m":b$(5)=" 5  1500m":b$(6)=" 6  5000m"
+ 1070 b$(7)=" 7  110m h":b$(8)=" 8  400m h":b$(9)=" 9  4V100m"
+ 1080 b$(10)="10  hoch":b$(11)="11  stabhoch":b$(12)="12  weit"
+ 1090 b$(13)="13  drei":b$(14)="14  kugel":b$(15)="15  diskus"
+ 1100 b$(16)="16  hammer":b$(17)="17  speer":return
+ 1110 h=9:f=6:g=10:g1=g-f+1:b$(1)=" 1  100m":b$(2)=" 2  400m"
+ 1120 b$(3)=" 3  800m":b$(4)=" 4  5000m"
+ 1130 b$(5)=" 5  4V100m"
+ 1140 b$(6)=" 6  hoch":b$(7)=" 7  weit"
+ 1150 b$(8)=" 8  kugel":b$(9)=" 9  diskus"
+ 1160 return
+ 1170 h=4:f=11:g=14:g1=g-f+1:b$(1)=" 1  100m"
+ 1180 b$(2)=" 2  4V100m"
+ 1190 b$(3)=" 3  weit"
+ 1200 b$(4)=" 4  kugel"
+ 1210 return
+ 1220 h=12:f=15:g=16:g1=g-f+1:b$(1)=" 1  100m":b$(2)=" 2  200m":b$(3)=" 3  400m"
+ 1230 b$(4)=" 4  800m":b$(5)=" 5  3000m"
+ 1240 b$(6)=" 6  100m h":b$(7)=" 7  4V100m"
+ 1250 b$(8)=" 8  hoch":b$(9)=" 9  weit"
+ 1260 b$(10)="10  kugel":b$(11)="11  diskus"
+ 1270 b$(12)="12  speer"
+ 1280 return
+ 1290 h=7:f=17:g=22:g1=g-f+1:b$(1)=" 1  100m"
+ 1300 b$(2)=" 2  800m"
+ 1310 b$(3)=" 3  4V100m"
+ 1320 b$(4)=" 4  hoch":b$(5)=" 5  weit"
+ 1330 b$(6)=" 6  kugel":b$(7)=" 7  diskus"
+ 1340 return
+ 1350 h=4:f=23:g=27:g1=g-f+1:b$(1)=" 1 100m"
+ 1360 b$(2)=" 2  4V100m"
+ 1370 b$(3)=" 3  weit"
+ 1380 b$(4)=" 4  kugel"
+ 1390 return
+ 1510 gosub1680:ifp$="e"then250
+ 1520 ifp$="d"then1740
+ 1530 open1,1,1,"daten
+ 1540 fori=1toa:print#1,a(i):printi,:next
+ 1550 fori=1toa:forj=1tob:fork=1to3:print#1,c(i,j,k):printi,:nextk,j,i
+ 1560 fori=1toa:forj=1tob:print#1,e(i,j):printi,:nextj,i
+ 1570 close1:p0=1:return
+ 1580 gosub1680:ifp$="e"then250
+ 1590 ifp$="d"then1830
+ 1600 open1,1,0,"daten
+ 1610 fori=1toa:input#1,a(i):printi,:next
+ 1620 fori=1toa:forj=1tob:fork=1to3:input#1,c(i,j,k):printi,:nextk,j,i
+ 1630 fori=1toa:forj=1tob:input#1,e(i,j):printi,:nextj,i
+ 1640 close1:p0=1:return
+ 1650 getx$:t1$=left$(ti$,2)+":":t2$=mid$(ti$,3,2)+":":t3$=right$(ti$,2)
+ 1660 print"{home}"tab(30)t1$t2$t3$:ifx$=""then1650
+ 1670 return
+ 1680 printf$"{yel}bitte die kassette fertigmachen
+ 1690 print"{down}{down}und dann taste druecken
+ 1700 print"{down}{down}{cyn}e-fuer ausstieg eingeben
+ 1710 print"{down}{down}{lred}d-fuer diskette eingeben
+ 1720 getp$:ifp$=""then1720
+ 1730 return
+ 1740 print"{clr}{lblu}existiert bereits eine datei":print"{down}auf der diskette ? (j/n)
+ 1750 getx$:ifx$=""then1750
+ 1760 ifx$="n"thengosub1880
+ 1770 ifx$<>"n"andx$<>"j"then1750
+ 1780 open1,8,1,"@0:dmm-daten,s,w"
+ 1790 fori=1toa:print#1,a(i):printi,:next
+ 1800 fori=1toa:forj=1tob:fork=1to3:print#1,c(i,j,k):printi,:nextk,j,i
+ 1810 fori=1toa:forj=1tob:print#1,e(i,j):printi,:nextj,i
+ 1820 close1:p0=1:return
+ 1830 open1,8,0,"dmm-daten,s,r"
+ 1840 fori=1toa:input#1,a(i):printi,:next
+ 1850 fori=1toa:forj=1tob:fork=1to3:input#1,c(i,j,k):printi,:nextk,j,i
+ 1860 fori=1toa:forj=1tob:input#1,e(i,j):printi,:nextj,i
+ 1870 close1:p0=1:return
+ 1880 open1,8,1,"dmm-daten,s,w":print#1,"fuer daten reserviert!"
+ 1890 close1:return
+ 3000 open1,4:print#1:print#1:print#1,"stand "left$(ti$,2)" uhr "mid$(t$,3,2)
+ 3005 print#1:gosub4000:fori=ftog-1:forj=i+1tog:ife$(j)<=e$(i)then3020
+ 3010 ri$=e$(i):e$(i)=e$(j):e$(j)=ri$
+ 3020 nextj,i:print#1,"ausgefuehrte disziplinen:"
+ 3030 v=0:fori=1tob:forj=ftog:ife(j,i)<>0thenv1=v1+1
+ 3040 nextj:ifv1=g1thenprint#1,right$(b$(i),len(b$))-4),:v=v+1
+ 3050 v1=0:nexti:print#1
+ 3060 print#1:fori=ftog:print#1,e$(i):next
+ 3070 ifv=1thenprint#1,"stand nach der ersten disziplin":goto3100
+ 3080 ifv=0thenprint#1,"noch keine disziplin komplett!":goto3100
+ 3090 print#1,"stand nach"v" disziplinen!"
+ 3100 close1:return
+ 4000 print#1,"zwischenergebnis:":print#1,chr$(1)g$(x1):fori=ftog
+ 4010 e1$="      "+str$(a(i)):e$(i)=right$(e1$,7)+" "+a$(i):next:print#1:return
+

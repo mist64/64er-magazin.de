@@ -291,7 +291,7 @@ def calculate_sha1(filepath):
 
 class ArticleDatabase:
     @staticmethod
-    def __read_html(html_file_path):
+    def __read_html(html_file_path, listings):
         """Parses an HTML file for article metadata and includes the filename."""
         with open(html_file_path, 'r', encoding='utf-8') as file:
             contents = file.read()
@@ -313,6 +313,31 @@ class ArticleDatabase:
         }
 
         metadata['target_filename'] = os.path.basename(metadata['id']) + '.html'
+
+        # Put listings into <pre> tags
+        a_tags = []
+        pre_tags = soup.find_all("pre")
+        for tag in pre_tags:
+            data_filename = tag.get("data-filename")
+            data_name = tag.get("data-name")
+            if data_filename:
+                # remove ';', empty lines and leading spaces
+                listing = listings[data_filename]
+                listing = [line.lstrip() for line in listing.splitlines() if line.strip() and not line.lstrip().startswith(';')]
+                listing = "\n".join(listing)
+                tag.string = listing
+
+                a_tag = soup.new_tag("a", href=f"prg/{data_filename}.prg")
+                a_tag.string = data_name
+                a_tags.append(a_tag)
+
+        # and make a "downloads" aside
+        if a_tags:
+            aside_tag = soup.new_tag("aside", attrs={"class": "downloads"})
+            for a_tag in a_tags:
+                aside_tag.append(a_tag)
+            article_tag = soup.find("article")
+            article_tag.append(aside_tag)
 
         # Extract downloads information
         downloads_div = soup.find('aside', class_='downloads')
@@ -371,11 +396,21 @@ class ArticleDatabase:
         issue_key = None
         pubdate = None
 
+        # read all listings in petcat format
+        listings = {}
+        prg_path = os.path.join(issue_directory_path, 'prg')
+        for root, _, files in os.walk(prg_path):
+            for file in files:
+                if file.endswith('.txt'):
+                    file_path = os.path.join(root, file)
+                    with open(file_path, 'r') as file_obj:
+                        listings[os.path.splitext(file)[0]] = file_obj.read()
+
         for root, dirs, files in os.walk(issue_directory_path):
             for file in files:
                 if file.endswith('.html'):
                     article_path = os.path.join(root, file)
-                    article_metadata = cls.__read_html(article_path)
+                    article_metadata = cls.__read_html(article_path, listings)
                     article_metadata['path'] = article_path  # Include full path in metadata
                     articles_metadata.append(article_metadata)
                     if not issue_key:
@@ -397,7 +432,8 @@ class ArticleDatabase:
                 'pubdate': pubdate,
                 'pdf_filename': pdf_filename,
                 'issue_dir_name': issue_dir_name,
-                'issue_key': issue_key
+                'issue_key': issue_key,
+                'listings': listings
             }
         else:
             return None
@@ -417,7 +453,8 @@ class ArticleDatabase:
                     'issue_dir_name': issue_dir_name,
                     'toc_order': issue_data['toc_order'],
                     'pubdate': issue_data['pubdate'],
-                    'pdf_filename': issue_data['pdf_filename']
+                    'pdf_filename': issue_data['pdf_filename'],
+                    'listings': issue_data['listings']
                 }
 
                 # Sort articles by page number within this issue before assigning indexes
@@ -1222,6 +1259,26 @@ def copy_articles_and_assets(db, in_directory, out_directory):
         # Copy full PDF
         shutil.copy(os.path.join(issue_source_path, issue_data['pdf_filename']), issue_dest_path)
 
+        # Create .PRG from Petcat listings
+        listings = issue_data['listings']
+        for key, value in listings.items():
+            # Prepare the output file name
+            output_file_name = os.path.join(issue_dest_path, 'prg', f"{key}.prg")
+
+            # Prepare the command
+            command = ['petcat', '-w2', '-o', output_file_name]
+
+            # Execute the command, piping the value into it
+            process = subprocess.Popen(command, stdin=subprocess.PIPE, text=True)
+            process.communicate(input=value)
+
+            # Check if petcat executed successfully
+            if process.returncode == 0:
+                print(f"Successfully processed: {key}")
+            else:
+                print(f"Failed to process: {key}")
+
+
         # Copy all images of all articles of the issue and downloads
         articles = [article for article in db.articles if article['issue_key'] == issue_key]
         article_index = 0
@@ -1239,11 +1296,11 @@ def copy_articles_and_assets(db, in_directory, out_directory):
                     convert_and_copy_image(img_path, dest_img_path)
 
             # Copy files from the downloads
-            downloads = article['downloads']
-            for _, download_url in downloads:
-                # Assuming download_url is a relative path; adjust logic if it's a URL
-                download_path = os.path.join(issue_source_path, download_url)
-                shutil.copy(download_path, issue_dest_path_prg)
+#            downloads = article['downloads']
+#            for _, download_url in downloads:
+#                # Assuming download_url is a relative path; adjust logic if it's a URL
+#                download_path = os.path.join(issue_source_path, download_url)
+#                shutil.copy(download_path, issue_dest_path_prg)
 
             pages = article['pages']
 
