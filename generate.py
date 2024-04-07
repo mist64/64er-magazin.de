@@ -320,10 +320,22 @@ class ArticleDatabase:
         for tag in pre_tags:
             data_filename = tag.get("data-filename")
             data_name = tag.get("data-name")
+            data_version = tag.get("data-version")
+            data_range = tag.get("data-range")
             if data_filename:
                 # remove ';', empty lines and leading spaces
                 listing = listings[data_filename]
                 listing = [line.lstrip() for line in listing.splitlines() if line.strip() and not line.lstrip().startswith(';')]
+
+                if data_range:
+                    start_range, end_range = map(int, data_range.split('-'))
+                    filtered_lines = []
+                    for line in listing:
+                        leading_number = int(line.split(' ')[0])
+                        if start_range <= leading_number <= end_range:
+                            filtered_lines.append(line)
+                    listing = filtered_lines
+
                 listing = "\n".join(listing)
                 tag.string = listing
 
