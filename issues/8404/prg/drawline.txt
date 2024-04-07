@@ -1,0 +1,64 @@
+
+
+;drawline.prg ==0801==
+  100 rem             drawline
+  110 rem diese routine berechnet die koordinaten
+  120 rem der punkte einer strecke, die durch ihre
+  130 rem endpunkte gegeben ist. mit einer ge-
+  140 rem eigneten 'setpoint'-routine kann der
+  150 rem bildschirm oder ein plotter angesteuert
+  160 rem werden. die grenzen der werte fuer x und
+  170 rem y entsprechen den werten fuer den hi-res
+  180 rem bildschirm des commodore 64.
+  190 rem
+  200 rem das original dieses programmes von mike
+  210 rem higgins ist in byte heft 8/81 auf den
+  220 rem seiten 414 - 416 erschienen.
+  230 rem
+  240 rem michael bauer  aindorferstr. 86  8 muenchen 21
+  250 rem
+  260 rem get & check x0/y0
+  270 input"koordinaten 1. punkt";x0,y0
+  280 ifx0>319ory0>199then270
+  290 ifx0<0ory0<0then270
+  300 rem get & check x1/y1
+  310 input"koordinaten 2. punkt";x1,y1
+  320 ifx1>319ory1>199then310
+  330 ifx1<0ory1<0then310
+  340 rem initialisiere variable
+  350 ay=0:iy=1:ix=1:ax=0
+  360 rem pruefe steigung
+  370 ifx1=>x0thendx=x1-x0:goto400
+  380 ix=-1
+  390 dx=x0-x1
+  400 ify1=>y0thendy=y1-y0:goto440
+  410 dy=y0-y1
+  420 iy=-1
+  430 rem steigung > 1?
+  440 ifdx=>dythen530
+  450 ct=dx:rem vertausche dx und dy
+  460 dx=dy
+  470 dy=ct
+  480 ay=ix
+  490 ix=0
+  500 ax=iy
+  510 iy=0
+  520 rem berechne approximationswert
+  530 of=dx/2
+  540 ct=1:rem schleifenzaehler
+  550 goto660:rem plotte ursprungspunkt
+  560 rem ******** approximationsschleife
+  570 x0=x0+ix
+  580 y0=y0+ax
+  590 of=of+dy
+  600 ct=ct+1
+  610 rem y0 erhoehen ?
+  620 ifof<=dxthen660
+  630 of=of-dx
+  640 x0=x0+ay
+  650 y0=y0+iy
+  660 printx0,y0
+  670 rem letzter punkt ?
+  680 ifdx=>ctthen570
+  690 end
+
