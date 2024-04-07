@@ -314,7 +314,7 @@ class ArticleDatabase:
 
         metadata['target_filename'] = os.path.basename(metadata['id']) + '.html'
 
-        # Put listings into <pre> tags
+        # Put listings into <pre> tags and collect downloads
         downloads = []
         a_tags = []
         pre_tags = soup.find_all("pre")
@@ -340,7 +340,8 @@ class ArticleDatabase:
                 listing = "\n".join(listing)
                 tag.string = listing
 
-                downloads.append((data_name, f"prg/{data_filename}.prg"))
+                if not any(item[0] == data_name for item in downloads): # duplicates
+                    downloads.append((data_name, f"prg/{data_filename}.prg"))
         metadata['downloads'] = downloads
 
         # and make a "downloads" aside
