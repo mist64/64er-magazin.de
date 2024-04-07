@@ -315,6 +315,7 @@ class ArticleDatabase:
         metadata['target_filename'] = os.path.basename(metadata['id']) + '.html'
 
         # Put listings into <pre> tags
+        downloads = []
         a_tags = []
         pre_tags = soup.find_all("pre")
         for tag in pre_tags:
@@ -339,27 +340,19 @@ class ArticleDatabase:
                 listing = "\n".join(listing)
                 tag.string = listing
 
-                a_tag = soup.new_tag("a", href=f"prg/{data_filename}.prg")
-                a_tag.string = data_name
-                a_tags.append(a_tag)
+                downloads.append((data_name, f"prg/{data_filename}.prg"))
+        metadata['downloads'] = downloads
 
         # and make a "downloads" aside
-        if a_tags:
+        if downloads:
             aside_tag = soup.new_tag("aside", attrs={"class": "downloads"})
-            for a_tag in a_tags:
+            for (label, url) in downloads:
+                a_tag = soup.new_tag("a", href=url)
+                a_tag.string = label
+                a_tags.append(a_tag)
                 aside_tag.append(a_tag)
             article_tag = soup.find("article")
             article_tag.append(aside_tag)
-
-        # Extract downloads information
-        downloads_div = soup.find('aside', class_='downloads')
-        downloads = []
-        if downloads_div:
-            for a in downloads_div.find_all('a', href=True):
-                label = a.text.strip()
-                url = a['href'].strip()
-                downloads.append((label, url))
-        metadata['downloads'] = downloads
 
         # Extract article description
         intro_div = soup.find('p', {"class": "intro"})
