@@ -1,0 +1,248 @@
+;prg.datei.prg ==0801==
+;Eingetippt von Drachen
+
+    0 rem*****************
+    1 rem* prg.datei 250 *
+    2 rem*****************
+    3 rem*dico-soft-prog.*
+    4 rem*****(c)1983*****
+    5 poke36879,8:poke646,1
+    6 :
+    7 :
+    8 rem** menue **
+    9 printchr$(147)"    {rvon}=============={rvof}        {rvon}programm-datei{rvof}        {rvon}=============={rvof}"
+   10 print"{down}{down}{rvon}>>> programm-menue <<<"
+   11 print"{down}{down}dateneingabe......<f1>"
+   12 print"{down}datenausgabe......<f3>"
+   13 print"{down}datenaenderung....<f7>"
+   14 :
+   15 :
+   16 geta$
+   17 ifa$=chr$(133)then24
+   18 ifa$=chr$(134)then105
+   19 ifa$=chr$(136)then126
+   20 goto16
+   21 :
+   22 :
+   23 rem*dat.oeffnen**
+   24 print"{clr}{down}{down}{down}{down}{down}{down}{rght}{rght} bitte warten !! "
+   25 x$="                 "
+   26 open1,8,2,"programm-datei,l,"+chr$(137)
+   27 open2,8,15
+   28 print#2,"p"+chr$(2)+chr$(250)+chr$(0)+chr$(1)
+   29 print#1,chr$(255)
+   30 restore:input"{rvon}{down}{down}{down}{down}{rght}{rght}recordnummer:";yn
+   31 gosub134:gosub147:gosub185
+   32 :
+   33 :
+   34 rem*dateneingabe*
+   35 input"{home}{down}{down}{down}{rght}{rvon}";u1$
+   36 u1$=left$(u1$,16)
+   37 poke37955,0:goto187
+   38 input"{down}{down}{rght}{rght}{rght}{rght}{rght}{rvon}";u2$
+   39 u2$=left$(u2$,11)
+   40 poke38025,0:goto189
+   41 input"{rght}{rght}{rght}{rght}{rght}{rvon}";u3$
+   42 u3$=left$(u3$,11)
+   43 poke38047,0:goto191
+   44 input"{down}{down}{rght}{rght}{rght}{rght}{rvon}";u4$
+   45 u4$=left$(u4$,13)
+   46 poke38112,0:goto194
+   47 input"{down}{down}{rght}{rght}{rght}{rght}{rvon}";u5$
+   48 u5$=left$(u5$,5)
+   49 poke38178,0:goto195
+   50 input"{down}{down}{rght}{rvon}";u6$
+   51 u6$=left$(u6$,18)
+   52 poke38241,0:goto196
+   53 input"{rght}{rvon}";u7$
+   54 u7$=left$(u7$,18)
+   55 poke38263,0:goto197
+   56 input"{rght}{rvon}";u8$
+   57 u8$=left$(u8$,18)
+   58 poke38285,0:goto198
+   59 input"{rght}{rvon}";u9$:poke38307,0
+   60 u9$=left$(u9$,18)
+   61 poke38307,0:goto199
+   62 input"{down}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rvon}";uu$
+   63 uu$=left$(u9$,9)
+   64 poke38359,0
+   65 :
+   66 :
+   67 rem**t.-schrift**
+   68 s=4127:s1=37919:pokes,6:pokes1,7:gosub228
+   69 pokes+1,49:pokes1+1,7:gosub228
+   70 pokes+2,46:pokes1+2,7:gosub228
+   71 pokes+3,6:pokes1+3,7:gosub228
+   72 pokes+4,53:pokes1+4,7:gosub228
+   73 pokes+5,47:pokes1+5,7:gosub228
+   74 pokes+6,6:pokes1+6,7:gosub228
+   75 pokes+7,55:pokes1+7,7:gosub228
+   76 :
+   77 :
+   78 rem* tasten **
+   79 geta$
+   80 ifa$=chr$(133)then100
+   81 ifa$=chr$(135)thengosub229:goto87
+   82 ifa$=chr$(136)thengosub163:gosub229:goto87
+   83 goto79
+   84 :
+   85 :
+   86 rem*speichern*
+   87 z$=u1$+left(x$,16-len(u1$))
+   88 z$=z$+u2$+left$(x$,11-len(u2$))
+   89 z$=z$+u3$+left$(x$,11-len(u3$))
+   90 z$=z$+u4$+left$(x$,13-len(u4$))
+   91 z$=z$+u5$+left$(x$,5-len(u5$))
+   92 z$=z$+u6$+left$(x$,18-len(u6$))
+   93 z$=z$+u7$+left$(x$,18-len(u7$))
+   94 z$=z$+u8$+left$(x$,18-len(u8$))
+   95 z$=z$+u9$+left$(x$,18-len(u9$))
+   96 z$=z$+uu$+left$(x$,9-len(uu$))
+   97 forb=0to3:readk:poke4135+b,k:poke37927+b,7:gosub228:nextb
+   98 print#2,"p"+chr$(2)+chr$(yn)+chr$(0)+chr$(1)
+   99 print#1,z$
+  100 close1:close2
+  101 goto9
+  102 :
+  103 :
+  104 rem* einlesen *
+  105 open1,8,2,"programm-datei,l,"+chr$(137)
+  106 open2,8,15
+  107 printchr$(147):input"{rvon}{down}{down}{down}{down}{down}{down}{rght}{rght} recordnummer:";yn
+  108 print#2,"p"+chr$(2)+chr$(yn)+chr$(0)+chr$(1)
+  109 z$=""
+  110 fori=1to137:get#1,o$:z$=z$+o$:nexti
+  111 u1$=mid$(z$,1,16)
+  112 u2$=mid$(z$,17,11)
+  113 u3$=mid$(z$,28,11)
+  114 u4$=mid$(z$,39,13)
+  115 u5$=mid$(z$,52,5)
+  116 u6$=mid$(z$,57,18)
+  117 u7$=mid$(z$,75,18)
+  118 u8$=mid$(z$,93,18)
+  119 u9$=mid$(z$,111,18)
+  120 uu$=mid$(z$,129,9)
+  121 close1:close2
+  122 goto203
+  123 :
+  124 :
+  125 rem* aendern *
+  126 gosub105
+  127 gosub163
+  128 open1,8,2,"programm/datei,l,"+chr$(137)
+  129 open2,8,15
+  130 goto87
+  131 :
+  132 :
+  133 rem** rahmen **
+  134 print"{clr}":forra=4097to4116:pokera,64:nextra
+  135 forra=4581to4600:pokera,64:nextra
+  136 forra=4118to4558step22:pokera,93:nextra
+  137 forra=4139to4579step22:pokera,93:nextra
+  138 poke4096,112:poke4117,110:poke4580,109:poke4601,125
+  139 forra=4185to4204:pokera,64:nextra
+  140 forra=4273to4292:pokera,64:nextra
+  141 forra=4339to4358:pokera,64:nextra
+  142 forra=4405to4424:pokera,64:nextra
+  143 forra=4537to4556:pokera,64:nextra:return
+  144 :
+  145 :
+  146 rem** schrift **
+  147 printchr$(14):v1=4118
+  148 forb=0to5:reada:pokev1+1,a:gosub228:forws=0to5:nextws:v1=v1+1:nextb
+  149 forb=0to14:readc:pokev1-5+22*4,c:gosub228:forws=0to5:nextws:v1=v1+1:nextb
+  150 forb=0to3:readd:pokev1+2+22*4,d:gosub228:forws=0to5:nextws:v1=v1+1:nextb
+  151 poke4240,45
+  152 forb=0to3:reade:pokev1-2+22*5,e:gosub228:forws=0to5:nextws:v1=v1+1:nextb
+  153 poke4262,45
+  154 forb=0to11:readf:pokev1-6+22*7,f:gosub228:forws=0to5:nextws:v1=v1+1:nextb
+  155 poke4331,47
+  156 forb=0to14:readg:pokev1-18+22*10,g:gosub228:forws=0to5:nextws:v1=v1+1:nextb
+  157 forb=0to4:readh:pokev1-22+22*11,h:gosub228:forws=0to5:nextws:v1=v1+1:nextb
+  158 forb=0to11:readi:pokev1-38+22*13,i:gosub228:forws=0to5:nextws:v1=v1+1:nextb
+  159 forb=0to7:readj:pokev1-50+22*19,j:gosub228:forws=0to5:nextws:v1=v1+1:nextb:return
+  160 :
+  161 :
+  162 rem** korrektur der eingabe **
+  163 input"{home}{down}{down}{down}{rght}{rvon}";u1$:poke37955,0
+  164 u1$=left$(u1$,16)
+  165 input"{down}{down}{rght}{rght}{rght}{rght}{rght}{rvon}";u2$:poke38025,0
+  166 u2$=left$(u2$,11)
+  167 input"{rght}{rght}{rght}{rght}{rght}{rvon}";u3$:poke38047,0
+  168 u3$=left$(u3$,11)
+  169 input"{down}{down}{rght}{rght}{rght}{rght}{rvon}";u4$:poke38112,0
+  170 u4$=left$(u4$,13)
+  171 input"{down}{down}{rght}{rght}{rght}{rght}{rvon}";u5$:poke38178,0
+  172 u5$=left$(u5$,5)
+  173 input"{down}{down}{rght}{rvon}";u6$:poke38241,0
+  174 u6$=left$(u6$,18)
+  175 input"{rght}{rvon}";u7$:poke38263,0
+  176 u7$=left$(u7$,18)
+  177 input"{rght}{rvon}";u8$:poke38285,0
+  178 u8$=left$(u8$,18)
+  179 input"{rght}{rvon}";u9$:poke38307,0
+  180 u9$=left$(u9$,18)
+  181 input"{down}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rvon}";uu$:poke38359,0
+  182 uu$=left$(u9$,9):return
+  183 :
+  184 :
+  185 rem** r. striche **
+  186 forf=4165to4180:pokef,45:pokef+33792,2:nextf:goto 35
+  187 forf=4235to4238:pokef,45:pokef+33792,2:nextf
+  188 forf=4242to4245:pokef,45:pokef+33792,2:nextf:goto 38
+  189 forf=4257to4260:pokef,45:pokef+33792,2:nextf
+  190 forf=4264to4267:pokef,45:pokef+33792,2:nextf:goto 41
+  191 forf=4322to4324:pokef,45:pokef+33792,2:nextf
+  192 forf=4326to4330:pokef,45:pokef+33792,2:nextf
+  193 forf=4332to4334:pokef,45:pokef+33792,2:nextf:goto 44
+  194 forf=4388to4392:pokef,45:pokef+33792,2:nextf:goto 47
+  195 forf=4451to4468:pokef,45:pokef+33792,2:nextf:goto 50
+  196 forf=4473to4490:pokef,45:pokef+33792,2:nextf:goto 53
+  197 forf=4495to4512:pokef,45:pokef+33792,2:nextf:goto 56
+  198 forf=4517to4534:pokef,45:pokef+33792,2:nextf:goto 59
+  199 forf=4569to4577:pokef,45:pokef+33792,2:nextf:goto 62:return
+  200 :
+  201 :
+  202 rem** bildschirmausgabe nach einlesen **
+  203 restore:gosub134:gosub147:print"{home}{down}{down}{down}{rght}{rght}{rght}{rvon}";u1$
+  204 print"{down}{down}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rvon}";u2$
+  205 print"{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rvon}";u3$
+  206 print"{down}{down}{rght}{rght}{rght}{rght}{rght}{rght}{rvon}";u4$
+  207 print"{down}{down}{rght}{rght}{rght}{rght}{rght}{rght}{rvon}";u5$
+  208 print"{down}{down}{rght}{rght}{rght}{rvon}";u6$
+  209 print"{rght}{rght}{rght}{rvon}";u7$
+  210 print"{rght}{rght}{rght}{rvon}";u8$
+  211 print"{rght}{rght}{rght}{rvon}";u9$
+  212 print"{down}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rvon}";uu$
+  213 s=4127:s1=37919:pokes,6:pokes1,7:gosub228
+  214 pokes+1,49:pokes1+1,7:gosub228
+  215 pokes+2,47:pokes1+2,7:gosub228
+  216 pokes+3,6:pokes1+3,7:gosub228
+  217 pokes+4,55:pokes1+4,7:gosub228
+  218 :
+  219 :
+  220 rem** tasten **
+  221 geta$
+  222 ifa$=chr$(133)then9
+  223 ifa$=chr$(136)thengosub230:goto127
+  224 goto221
+  225 :
+  226 :
+  227 rem** ton **
+  228 poke36878,15:poke36876,220:forws=0to5:nextws:poke36876,0:return
+  229 forx=0to10:pokes1+x,0:nextx:return
+  230 forx=0to5:pokes1+x,0:nextx:return
+  231 :
+  232 :
+  233 rem** data's **
+  234 data84,73,84,69,76,58
+  235 data75,79,80,73,69,82,65,68,82,69,83,83,69,78,58
+  236 data82,79,77,58
+  237 data82,65,77,58
+  238 data83,84,65,82,84,66,69,70,69,72,76,58
+  239 data80,82,79,71,82,65,77,77,76,65,69,78,71,69,58
+  240 data66,89,84,69,83
+  241 data66,69,77,69,82,75,85,78,71,69,78,58
+  242 data66,69,82,69,73,67,72,58
+  243 data83,65,86,69
+
