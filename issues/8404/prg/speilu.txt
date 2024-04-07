@@ -1,0 +1,62 @@
+
+
+;speilu.prg ==0801==
+    1 rem**************************************************************************
+    2 rem*                                                                        *
+    3 rem*                                                                        *
+    4 rem*                             s p e i l u                                *
+    5 rem*                                                                        *
+    6 rem*                                                                        *
+    7 rem*   manfred thoma  +  heimo ponnath  2102 hamburg 93  veringstrasse 82   *
+    8 rem*                                                                        *
+    9 rem**************************************************************************
+   10 poke52,48:poke56,48:poke53280,6:poke53281,6:poke646,1
+   20 te$=" adresse  dez. hexa   binaer    grafik"
+  100 printchr$(147)"  darstellung von zeichen und speicher"
+  105 print:printchr$(18);tab(10);"====================="
+  110 printchr$(18);tab(10)"thoma/ponnath hamburg"
+  115 printchr$(18);tab(10);"====================="
+  120 print:print:print"     (1) einsehen in einen speicher"
+  130 print:print"     (2) darstellung eines zeichens"
+  150 print:print:print"       bitte kennziffer waehlen !"
+  160 geta$:ifa$=""then160
+  170 a=val(a$):ifa<0ora>2then160
+  180 onagosub1000,2000
+  190 goto100
+ 1000 printchr$(147);chr$(18);tab(2);"darstellung eines speicherplatzes:"
+ 1010 print:print"  speicheradresse (0-65535) eingeben"
+ 1020 input"adresse :";ad:ifad<0orad>65535thenreturn
+ 1040 de=peek(ad):print:print:gosub10000:gosub20000:printte$:print:gosub30000
+ 1050 print:print:goto1010
+ 2000 printchr$(147);chr$(18);tab(3);"zeichen-darstellung (character)"
+ 2010 ifts=0thengosub40000
+ 2020 print:print"     gebe den 'bildschirm code' des"
+ 2030 print"      darzustellenden zeichens ein"
+ 2040 print"   = siehe handbuch seite 133 - 134 ="
+ 2050 print:print"  zurueck mit zahl ausserhalb 0 und 511":print
+ 2060 print,:input"code :";a:ifa<0ora>511thenreturn
+ 2070 print:printte$:print
+ 2080 forad=12288+8*ato12288+8*a+7
+ 2100 de=peek(ad):gosub10000:gosub20000:gosub30000:nextad
+ 2110 geta$:ifa$=""then2110
+ 2120 return
+ 10000 he$="":h$="0123456789abcdef":d=int(de/16):he$=mid$(h$,d+1,1):d=de-d*16
+ 10010 he$=he$+mid$(h$,d+1,1):return
+ 20000 bi$="":di=de
+ 20010 di=di/2:d$="0":ifdi<>int(di)thend$="1"
+ 20020 di=int(di):bi$=d$+bi$:ifdi>0then20010
+ 20030 iflen(bi$)<8thenbi$="0"+bi$:goto20030
+ 20040 return
+ 30000 printtab(7-len(str$(ad)))ad;tab(13-len(str$(de)))de;tab(16)he$;tab(21)bi$;
+ 30010 fori=1to8:w$=mid$(bi$,i,1)
+ 30020 ifw$="1"thenprinttab(30+i)chr$(18);" ";chr$(146);:goto30040
+ 30030 printtab(30+i)".";
+ 30040 nexti
+ 30050 print: return
+ 40000 print:print"kopieren der zeichen ins ram (ab 12288)"
+ 40010 print"            bitte warten"
+ 40020 poke56334,peek(56334)and254:poke1,peek(1)and251
+ 40030 fori=0to4095:poke12288+i,peek(53248+i):nexti
+ 40040 poke1,peek(1)or4:poke56334,peek(56334)or1
+ 40050 poke53272,(peek(53272)and240)+12:ts=1:return
+
