@@ -321,7 +321,6 @@ class ArticleDatabase:
         for tag in pre_tags:
             data_filename = tag.get("data-filename")
             data_name = tag.get("data-name")
-            data_version = tag.get("data-version")
             data_range = tag.get("data-range")
             if data_filename:
                 # remove ';', empty lines and leading spaces
@@ -1267,24 +1266,29 @@ def copy_articles_and_assets(db, in_directory, out_directory):
 
         # Create .PRG from Petcat listings
         listings = issue_data['listings']
-        for key, value in listings.items():
+        for key, listing in listings.items():
             # Prepare the output file name
             output_file_name = os.path.join(issue_dest_path, 'prg', f"{key}.prg")
 
             regex = r"^;.*==([0-9A-Fa-f]{4})=="
-            load_address = re.findall(regex, value, re.MULTILINE)
+            load_address = re.findall(regex, listing, re.MULTILINE)
             if load_address:
                 load_address = load_address[0]
             else:
                 load_address = '0801'
-            print(load_address)
+
+            pattern = r"^;version=(.*)$"
+            match = re.search(pattern, listing, re.MULTILINE)
+            version = match.group(1) if match else None
+            if not version:
+                version = '2'
 
             # Prepare the command
-            command = ['petcat', '-w2', '-l', load_address, '-o', output_file_name]
+            command = ['petcat', '-w2', '-l', load_address, f'-{version}', '-o', output_file_name]
 
-            # Execute the command, piping the value into it
+            # Execute the command, piping the listing into it
             process = subprocess.Popen(command, stdin=subprocess.PIPE, text=True)
-            process.communicate(input=value)
+            process.communicate(input=listing)
 
             # Check if petcat executed successfully
             if process.returncode == 0:
