@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/python3
 
 import sys
 import re
@@ -1345,8 +1345,8 @@ if __name__ == '__main__':
 
     print("*** Filtering")
     dir = f"{OUT_DIRECTORY}/{BASE_DIR}"
-    subprocess.run(['python3', f'filter_rss.py'], cwd=dir)
-    subprocess.run(['python3', f'filter_index.py'], cwd=dir)
+    subprocess.run(['./filter_rss.py'], cwd=dir)
+    subprocess.run(['./filter_index.py'], cwd=dir)
 
     if DEPLOY == "upload":
         print("*** Uploading")
