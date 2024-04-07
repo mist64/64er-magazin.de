@@ -1291,11 +1291,9 @@ def copy_articles_and_assets(db, in_directory, out_directory):
             process.communicate(input=listing)
 
             # Check if petcat executed successfully
-            if process.returncode == 0:
-                print(f"Successfully processed: {key}")
-            else:
+            if process.returncode != 0:
                 print(f"Failed to process: {key}")
-
+                exit()
 
         # Copy all images of all articles of the issue and downloads
         articles = [article for article in db.articles if article['issue_key'] == issue_key]
