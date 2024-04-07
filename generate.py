@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/python3
 
 import sys
 import re
@@ -1070,11 +1070,14 @@ def convert_and_copy_image(img_path, dest_img_path):
         try:
             if file_extension == ".jpg":
                 quality = '80'
+                bg_color = 'wheat'
+                subprocess.run(['convert', img_path, '-quality', quality, '-background', bg_color, '-alpha', 'remove',  '-alpha', 'off', dest_img_path], check=True)
             elif file_extension == ".avif":
                 quality = '60'
-            subprocess.run(['convert', img_path, '-quality', quality, dest_img_path], check=True)
+                subprocess.run(['convert', img_path, '-quality', quality, dest_img_path], check=True)
+
         except subprocess.CalledProcessError as e:
-            print(f"Error running {IMAGE_CONVERSION_TOOL} for image {img_path}: {e}")
+            print(f"Error running convert for image {img_path}: {e}")
         shutil.copy(dest_img_path, cache_path)
 
 
@@ -1342,8 +1345,8 @@ if __name__ == '__main__':
 
     print("*** Filtering")
     dir = f"{OUT_DIRECTORY}/{BASE_DIR}"
-    subprocess.run(['python3', f'filter_rss.py'], cwd=dir)
-    subprocess.run(['python3', f'filter_index.py'], cwd=dir)
+    subprocess.run(['./filter_rss.py'], cwd=dir)
+    subprocess.run(['./filter_index.py'], cwd=dir)
 
     if DEPLOY == "upload":
         print("*** Uploading")
