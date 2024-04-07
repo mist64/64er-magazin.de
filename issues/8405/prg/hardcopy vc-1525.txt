@@ -1,0 +1,74 @@
+;hardcopy vc-1525.prg ==0801==
+;Eingetippt von Endurion
+
+   10 rem*********************************
+   20 rem*  hardcopy fuer vc-1525  v1.0  *
+   30 rem*                               *
+   40 rem*  by stefan tramm              *
+   50 rem*     bosdorf 45                *
+   60 rem*     2724 hellwege             *
+   70 rem*********************************
+   75 poke53280,6:poke53281,6:print"{lblu}":rem farben setzen(blau,blau,hellblau)
+   80 print"{clr}{rvon}         hardcopy fuer vc-1526          {rvof}"
+  100 print"startadresse des ml-programms  49152";:input"{left}{left}{left}{left}{left}{left}{left}";ad
+  110 print"{down}startadresse der hires-grafik  8192";:input"{left}{left}{left}{left}{left}{left}";hi
+  120 h=hi/4096:hi=int(hi/4096)
+  130 ifhi<>horhi<1orhi>14thenprint"das kann keine richtig angabe sein!":goto110
+  140 print"{down}tabulator des druckbildes (0..40)   0";:input"{left}{left}{left}";ta
+  150 ifta>40orta<0thenprint"denk doch mal nach!":goto140
+  160 print"{down}auf cassette(1) o. floppy(8) saven  8";:input"{left}{left}{left}";ge
+  170 ifge<>1andge<>8thenprint"{up}{up}{up}":goto160
+  180 print"{down}bitte warten, ich hab zu tun ..."
+  200 :
+  510 fora=0to341
+  520 readb:c=c+b
+  530 pokead+a,b
+  540 next
+  550 ifc<>45897thenprint"{down}{down}{rvon}programmfehler!!{rvon}":end
+  560 :
+  600 rem hires startadresse
+  610 pokead+91,hi*16:pokead+297,hi*16+32
+  620 rem tabellen-zeiger
+  630 t=ad+334:th=int(t/256):tl=t-th*256
+  640 pokead+115,tl:pokead+116,th
+  650 pokead+129,tl:pokead+130,th
+  660 rem tabulator
+  670 pokead+83,ta:pokead+274,ta+40:pokead+278,ta
+  680 :
+  700 rem abspeichern
+  710 n$=chr$(34)+"hc1526/"+mid$(str$(ad),2)+"/"+mid$(str$(ta),2)+chr$(34)
+  720 ah=int(ad/256):al=ad-ah*256:eh=int((ad+343)-256):el=ad+343-eh*256
+  725 print"{blu}";:rem dunkelblau = hintergrund
+  730 print"pO43,"al":pO45,"el":pO46,"eh":clr"
+  735 print"{down}{down}sA"n$","ge",1"
+  740 print"{down}{down}{down}pO43,"peek(43)":pO44,"peek(44)":pO45,"peek(45)":pO46,"peek(46);
+  750 print":run770"
+  760 print"{up}{up}{up}{up}{up}{up}{up}{up}";:poke631,13:poke632,13:poke633,13:poke198,3:rem 3*'return'
+  765 end:rem kontrolle an tastaturpuffer
+  770 print"{lblu}":rem hellblau
+  775 print"{up}{up}{up}{up}{up}{up}{up}{up}{up}{rvon} es ist geschafft!! {rvof}"
+  780 poke198,0:end
+  790 :
+  999 data 169,127,162,004
+ 1000 data160,006,032,186,255,162,000,032,189,255,032,192,255,169,126,162
+ 1001 data004,160,005,032,186,255,162,000,032,189,255,032,192,255,169,125
+ 1002 data162,004,160,000,032,186,255,162,000,032,189,255,032,192,255,162
+ 1003 data127,032,201,255,169,020,032,210,255,169,013,032,210,255,032,204
+ 1004 data255,162,125,032,201,255,169,013,032,210,255,032,204,255,169,000
+ 1005 data133,254,169,000,133,251,169,032,133,252,169,000,133,253,162,007
+ 1006 data169,000,157,008,001,202,016,250,162,000,160,000,177,251,061,195
+ 1007 data194,240,020,169,128,133,253,138,072,073,007,170,185,195,194,029
+ 1008 data008,001,157,008,001,104,170,200,192,008,048,224,160,000,232,224
+ 1009 data008,048,217,138,024,101,251,133,251,144,002,230,252,165,253,208,018
+ 1010 data162,125,032,201,255,169,032,032,210,255,032,204,255,024,144,088
+ 1011 data048,167,162,008,202,048,068,189,008,001,221,000,001,240,245,162
+ 1012 data007,189,008,001,157,000,001,202,016,247,162,125,032,201,255,169
+ 1013 data141,032,210,255,166,254,240,008,169,032,032,210,255,202,016,246
+ 1014 data032,204,255,162,126,032,201,255,162,007,189,008,001,032,210,255
+ 1015 data202,016,247,169,013,032,210,255,032,204,255,162,125,032,201,255
+ 1016 data169,254,032,210,255,032,204,255,230,254,165,254,201,040,048,017
+ 1017 data169,000,133,254,162,125,032,201,255,169,013,032,210,255,032,204
+ 1018 data255,165,252,201,064,048,137,162,127,032,201,255,169,034,032,210
+ 1019 data255,169,013,032,210,255,032,204,255,162,125,032,195,255,162,126,032
+ 1020 data195,255,162,127,032,195,255,096,128,064,032,016,008,004,002,001
+
