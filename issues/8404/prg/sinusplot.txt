@@ -1,0 +1,57 @@
+
+
+;sinusplot.prg ==0801==
+  100 print"{clr}"tab(10)"{rvon}sinusplot - demo{down}
+  110 print"es wird ein achsenkreuz und dann
+  120 print"eine sinusfunktion in hochauf-
+  130 print"loesender grafik geplottet.
+  140 print"{down}es werden die zeiten zuerst fuer
+  150 print"eine reine basic-version und dann
+  160 print"fuer eine version, die die maschinen-
+  170 print"sprachen grafikaid benuetzt, gemessen.{down}
+  180 print"bitte eine taste druecken !{left}";
+  190 poke198,0:poke204,0:wait198,1:poke204,1:getx$
+  200 print" ":ti$="000000"
+  210 v=53248:ad=8192:rem demo aus 64 intern seite 91 - 92
+  220 a1=peek(v+17):a2=peek(v+24)
+  230 pokev+17,59
+  240 pokev+24,24
+  250 fori=1024to2023:pokei,1:next
+  260 fori=8192to16383:pokei,0:next
+  270 y=100:forx=0to319:gosub360:next
+  280 x=160:fory=0to199:gosub360:next
+  290 x=0
+  300 fori=-3.14159265to3.14159265step.0196349541
+  310 y=100+99*sin(i):gosub360:x=x+1:next
+  320 t1$=ti$:fori=1to1000:next
+  330 pokev+17,a1:pokev+24,a2
+  340 print"{clr}{down}das war das reine basicprogramm.{down}
+  350 print"es dauerte ";:x$=t1$:gosub620:goto390
+  360 oy=320*int(y/8)+(yand7):ox=8*int(x/8)
+  370 ma=2^((7-x)and7):av=ad+oy+ox
+  380 pokeav,peek(av)orma:return
+  390 print"{down}bitte eine taste druecken !{left}";
+  400 poke198,0:poke204,0:wait198,1:poke204,1:getx$
+  410 print" ":ti$="000000"
+  420 sys49152:sys49155:sys49158,16
+  430 y=100:sys49170,y:x=160:sys49176,x
+  440 x=0
+  450 fori=-3.14159265to3.14159265step.0196349541
+  460 y=100+99*sin(i):sys49164,x,y:x=x+1:next
+  470 t2$=ti$:fori=1to1000:next
+  480 sys49194
+  490 print"{clr}{down}das war das programm mit grafikaid.{down}
+  500 print"es dauerte ";:x$=t2$:gosub620
+  510 print"im gegensatz zum 1. beispiel mit":x$=t1$:gosub620
+  520 print"{down}die linienzuege werden jetzt geloescht!
+  530 print"{down}bitte eine taste druecken !{left}";
+  540 poke198,0:poke204,0:wait198,1:poke204,1:getx$
+  550 print" ":sys49152:sys49158,10
+  560 x=0
+  570 fori=-3.14159265to3.14159265step.0196349541
+  580 y=100+99*sin(i):sys49167,x,y:x=x+1:next
+  590 y=100:sys49173,y:x=160:sys49179,x
+  600 fori=1to1000:next
+  610 sys49194:end
+  620 printmid$(x$,3,2)" min und "mid$(x$,5)" sek":return
+
