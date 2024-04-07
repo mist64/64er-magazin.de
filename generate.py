@@ -1265,8 +1265,16 @@ def copy_articles_and_assets(db, in_directory, out_directory):
             # Prepare the output file name
             output_file_name = os.path.join(issue_dest_path, 'prg', f"{key}.prg")
 
+            regex = r"^;.*==([0-9A-Fa-f]{4})=="
+            load_address = re.findall(regex, value, re.MULTILINE)
+            if load_address:
+                load_address = load_address[0]
+            else:
+                load_address = '0801'
+            print(load_address)
+
             # Prepare the command
-            command = ['petcat', '-w2', '-o', output_file_name]
+            command = ['petcat', '-w2', '-l', load_address, '-o', output_file_name]
 
             # Execute the command, piping the value into it
             process = subprocess.Popen(command, stdin=subprocess.PIPE, text=True)
