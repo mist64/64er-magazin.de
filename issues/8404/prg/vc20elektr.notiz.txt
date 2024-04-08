@@ -1,0 +1,249 @@
+;vc20elektr.notiz.prg ==1201==
+;Quelle: 64'er CD-ROM 84XX/8404.D64
+
+   10 rem programmvorbereitungen
+   20 dimm$(13),m(12),h(13,7),s(415),n$(415)
+   30 gosub1580
+   40 print"{clr}{down} k a l e n d e r":print"{down}{rvon}                      {rvof}":print:print:print
+   50 input"jahr";ja
+   60 input"{down}{down}anfangsmonat";am
+   70 print"{down}zahl der auszudrucken-den monate"
+   80 inputw
+   90 w=w-1
+  100 ifw+am>12thenprint"{down}kalenderausdruck geht nur bis dezember"ja:goto60
+  110 gosub1690:gosub2230
+  120 rem dateneingabe
+  130 print"{clr}{down}dateneingabe{down}"
+  140 print"{rvon}                      {rvof}"
+  150 print"{down}1 - dateneingabe"
+  160 print"{down}2 - zusaetzlich spei-     cherung auf band"
+  170 print"{down}3 - einlesen von daten    auf band"
+  180 print"{down}4 - ende der eingabe"
+  190 print"{down}bitte waehlen"
+  200 getx$:ifx$=""then200
+  210 ifval(x$)<1orval(x$)>5then200
+  220 onval(x$)goto230,280,420,840
+  230 rem dateneingabe nur in arbeitsspeicher
+  240 gosub720
+  250 iffd=1then120
+  260 gosub530
+  270 goto230
+  280 rem dateneingabe + abspeicherung
+  290 print"{down}filename"
+  300 input nf$
+  310 open2,1,1
+  320 print#2,nf$
+  330 gosub720
+  340 print#2,tm
+  350 iffd=1thenclose2:goto120
+  360 print#2,x$+e$
+  370 gosub530
+  380 ifde=0then410
+  390 print"neue eingabe wird     dennoch abgespeichert!"
+  400 fori=1to3000:next
+  410 goto330
+  420 rem daten vom band einlesen
+  430 print"{down}filename"
+  440 inputnf$
+  450 open2,1,0
+  460 input#2,x$
+  470 ifnf$<>x$then450
+  480 input#2,tm                   
+  490 iftm=0thenclose2:goto120
+  500 input#2,e$
+  510 gosub530
+  520 goto480
+  530 rem doppeleintrag-pruefung  up 7
+  540 de=0
+  550 ifn$(tm)=""thenn$(tm)=e$:return
+  560 m=int(tm/32):t=tm-32*m
+  570 print"{clr}{down}doppeleintrag fest-   gestellt am"            
+  580 printt"."m"."ja
+  590 print"{rvon}                      {rvof}"
+  600 print"{down}alte eingabe (1):{down}"
+  610 printn$(tm)
+  620 print"{down}{down}neue eingabe (2):{down}"
+  630 printe$
+  640 print"{down}{down}welche eingabe soll   uebernommen werden 1/2"
+  650 getx$:ifx$=""then650
+  660 ifx$="1"thende=1:return
+  670 ifx$="2"thenn$(tm)=e$:return
+  680 goto650
+  690 rem fehlermeldung
+  700 print"{down}{down}{down}{down}eingabe- f e h l e r"
+  710 fori=1to3000:next
+  720 rem dateneingabe  up 6
+  730 fd=0:x$=""
+  740 print"{clr}{down}dateneingabe ende->0,0"
+  750 print"{rvon}                      {rvof}"
+  760 print"tag und monat durch   komma getrennt ein-   geben."
+  770 inputt,m:tm=m*32+t
+  780 ift=0andm=0thenfd=1:e$="":return
+  790 ifm<1orm>12ort<1ort>m(m)then690
+  800 print"{down}{down}{down}einzutragende notiz   bis 50 zeichen"
+  810 inpute$
+  820 ifleft$(e$,1)="*"thene$=right$(e$,len(e$)-1):s(tm)=1
+  830 return
+  840 rem kalenderausdruck
+  850 print"{up}  w  a  i  t       "
+  860 poke36879,8
+  870 gosub1930
+  880 ifam=1thenja=ja-1:am=13:aj=1
+  890 ifam=12thenzj=1
+  900 m=1:t=1
+  910 gosub2100
+  920 ifm<>am-1thengosub2270:goto920
+  930 poke36879,27
+  940 print"{up}  druckvorgang"
+  950 rem kastenkalender
+  960 forx=1to13
+  970 fory=1to7
+  980 h(x,y)=0
+  990 nexty,x
+ 1000 t=1:x=1
+ 1010 fory=wtto7
+ 1020 h(x,y)=t
+ 1030 t=t+1
+ 1040 ift>m(m)then1080
+ 1050 next
+ 1060 wt=1:x=x+1
+ 1070 goto1010
+ 1080 if flthen1170
+ 1090 ifajthenja=ja+1:gosub2230
+ 1100 x=x+2:wt=y+1:m=m+1:tw=wt
+ 1110 ifm=13thenm=1:am=1
+ 1120 wt=m(m)-7*int(m(m)/7)+wt
+ 1130 ifwt>7thenwt=wt-7
+ 1140 t=1:m=m+1:fl=1
+ 1150 ifm=13thenm=1
+ 1160 goto1010
+ 1170 rem ausdruck kastenkalender
+ 1180 open1,4
+ 1190 print#1," "spc(23)m$(am-1)ja-aj;spc(4)m$(am+1)ja+zj
+ 1200 fl=0:aj=0:zj=0
+ 1210 fory=1to7
+ 1220 print#1,"{$a0}"spc(10)t$(y)"  ";
+ 1230 forx=1to13
+ 1240 x$=str$(h(x,y))
+ 1250 ifx$=" 0"thenx$="{$a0}{$a0}"
+ 1260 ifh(x,y)<10thenx$=" "+x$
+ 1270 print#1,x$;
+ 1280 nextx
+ 1290 print#1
+ 1300 nexty
+ 1310 print#1:print#1:print#1:close1
+ 1320 wt=tw:t=1:m=am:gosub2320
+ 1330 rem monat ausdrucken
+ 1340 open1,4
+ 1350 print#1,chr$(14)m$(m):print#1,"= = = = =":print#1,chr$(15)
+ 1360 ift<10thentt$=" "+str$(t)+". "
+ 1370 ift>9thentt$=str$(t)+". "
+ 1380 th$=t$(wt)
+ 1390 ifs(m*32+t)=1thenth$="{rvon}"+th$+"{rvof}"
+ 1400 print#1,chr$(15)th$;tt$;m$(m);
+ 1410 s$=n$(m*32+t):x=len(s$)
+ 1420 ifx=0thens$=".  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .":goto1470
+ 1430 s$=s$+"   ":s$=left$(s$,3+3*int(x/3)):x=len(s$)
+ 1440 fori=xto51step3
+ 1450 s$=s$+".  "
+ 1460 next
+ 1470 print#1,s$;chr$(8)
+ 1480 print#1,chr$(8)
+ 1490 gosub2270
+ 1500 ifm<am+1then1360
+ 1510 fori=m(m-1)to37
+ 1520 print#1
+ 1530 next
+ 1540 rem wiederholung
+ 1550 close1
+ 1560 ifw>0thenam=am+1:w=w-1:goto840
+ 1570 print"{clr}":end
+ 1580 rem felder einlesen  up 1
+ 1590 fori=1to7:readf$(i):next
+ 1600 fori=1to7:readf(i):next
+ 1610 readt,m,e$
+ 1620 ifleft$(e$,1)="*"thene$=right$(e$,len(e$)-1):s(m*32+t)=1
+ 1630 n$(m*32+t)=e$
+ 1640 ift>0andm>0then1610
+ 1650 fori=1to7:readt$(i):next:rem wochentage einlesen
+ 1660 fori=0to13:readm$(i):next:rem monatsnamen einlesen
+ 1670 fori=1to12:readm(i):next
+ 1680 return
+ 1690 rem feiertag-berechnung  up 2
+ 1700 ifja<1800thenreturn
+ 1710 ifja>=1800thenr=23:s=4
+ 1720 ifja>=1900thenr=24:s=5
+ 1730 ifja>=2100thenr=24:s=6
+ 1740 ifja>=2200thenr=25:s=0
+ 1750 ifja>=2300thenreturn
+ 1760 f1=r+19*(ja-19*int(ja/19))
+ 1770 f=f1-30*int(f1/30)
+ 1780 g1=ja-4*int(ja/4)
+ 1790 g2=ja-7*int(ja/7)
+ 1800 g3=2*g1+4*g2+6*f+s
+ 1810 g=f+g3-7*int(g3/7)
+ 1820 ifg=35theng=28
+ 1830 ifg=34andf=28andja-19*int(ja/19)>10theng=27
+ 1840 fori=1to7
+ 1850 x=g-f(i)
+ 1860 ifx<=1thenx=x+30.9
+ 1870 ifx<=1thenx=x+29.9
+ 1880 x=320*x-319*int(x)
+ 1890 x=int(x+0.5)
+ 1900 n$(x)=f$(i):s(x)=1
+ 1910 nexti
+ 1920 return
+ 1930 rem jahreszahlausdruck  up 3
+ 1940 za=32768:pokeza,240
+ 1950 open1,4:print#1,chr$(14);
+ 1960 forj=1to4
+ 1970 z=val(mid$(str$(ja),j+1,1))
+ 1980 zz(j)=za+8*(48+z)
+ 1990 nextj
+ 2000 fori=0to7:rem zeile
+ 2010 print#1:print#1,"   ";
+ 2020 forj=1to4:rem zahl
+ 2030 fork=7to0step-1:rem spalte
+ 2040 if2^k and peek(zz(j)+i)thenprint#1,"{CBM-+}";:goto2060
+ 2050 print#1," ";
+ 2060 nextk,j,i
+ 2070 print#1,chr$(15):print#1:print#1:print#1           
+ 2080 close1
+ 2090 return
+ 2100 rem berechnung wochentag 1.januar  up 4
+ 2110 x1=ja-28*int(ja/28)
+ 2120 ifx1=0thenx1=28
+ 2130 ifx1>14.5thenx2=x1-14:goto2150
+ 2140 onx1goto2220,2160,2170,2180,2200,2210,2220,2160,2180,2190,2200,2210,2160,2170
+ 2150 onx2goto2180,2190,2210,2220,2160,2170,2190,2200,2210,2220,2170,2180,2190,2200
+ 2160 wt=1:goto2230
+ 2170 wt=2:goto2230
+ 2180 wt=3:goto2230
+ 2190 wt=4:goto2230
+ 2200 wt=5:goto2230
+ 2210 wt=6:goto2230
+ 2220 wt=7:goto2230
+ 2230 rem schaltjahrberechnung
+ 2240 m(2)=28
+ 2250 ifja/4<>int(ja/4)thenreturn
+ 2255 ifja/100<>int(ja/100)or(ja/100=int(ja/100)andja/400=int(ja/400))thenm(2)=m(2)+1
+ 2260 return
+ 2270 rem tag-monat-berechnung  up 5
+ 2280 rem wt+t aus up
+ 2290 ift=m(m)thent=0:m=m+1
+ 2300 t=t+1
+ 2310 wt=wt+1
+ 2320 ifwt=8thenwt=1
+ 2330 return
+ 2340 dataostern,karfreitag,ostermontag,himmelfahrt,pfingsten,pfingstmontag,fronleichnam
+ 2350 data8.6,10.6,7.6,30.4,20.4,19.4,9.4
+ 2360 data1,1,*neujahr,1,5,*maifeiertag,17,6,*gesetzl.feiertag,1,11,*allerheiligen
+ 2370 data24,12,heilig abend,25,12,*1.weihnachtstag,26,12,*2.weihnachtstag
+ 2380 data21,3,fruehlingsanfang,22,6,sommeranfang,23,9,herbstanfang
+ 2390 data22,12,winteranfang,0,0,
+ 2400 datamontag    ,dienstag  ,mittwoch  ,donnerstag
+ 2410 data freitag   ,samstag   ,"{rvon}sonntag   {rvof}"
+ 2420 data dezember ,januar   ,februar  ,maerz    ,april    ,mai      ,"juni     "
+ 2430 data juli     ,august   ,september,oktober  ,november ,dezember ,"januar   "
+ 2440 data 31,28,31,30,31,30,31,31,30,31,30,31
+
