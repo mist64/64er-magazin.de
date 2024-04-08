@@ -328,12 +328,18 @@ class ArticleDatabase:
                 listing = [line.lstrip() for line in listing.splitlines() if line.strip() and not line.lstrip().startswith(';')]
 
                 if data_range:
-                    start_range, end_range = map(int, data_range.split('-'))
+                    ranges = [(int(part.split('-')[0]), int(part.split('-')[-1])) for part in data_range.split(',')]
                     filtered_lines = []
+                    blank_line_added = True
                     for line in listing:
                         leading_number = int(line.split(' ')[0])
-                        if start_range <= leading_number <= end_range:
+                        if any(start <= leading_number <= end for start, end in ranges):
                             filtered_lines.append(line)
+                            blank_line_added = False
+                        else:
+                            if not blank_line_added:
+                                filtered_lines.append('')
+                            blank_line_added = True
                     listing = filtered_lines
 
                 listing = "\n".join(listing)
