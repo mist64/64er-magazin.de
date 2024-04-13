@@ -1,35 +1,51 @@
-<h1>Koppling zwischen zwei VC 20</h1>
+<!DOCTYPE html>
+<html lang="de">
 
-<p class="intro">Wenn Sie auf ein größeres System umsteigen, dann verschleudern Sie nicht Ihren alten VC 20. Nutzen Sie statt dessen seine experimentellen Möglichkeiten, beispielsweise für die bitparallele Datenübertragung. Der folgende Artikel bringt dazu einige Anregungen und eine über zwei VC 20 zu spielende Knobelei.</p>
+<head>
+    <title>XXX</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="XXX">
+    <meta name="64er.issue" content="5/84">
+    <meta name="64er.pages" content="XXX">
+    <meta name="64er.toc_category" content="XXX">
+    <meta name="64er.id" content="XXX">
+</head>
 
-<p>Auf der Rückseite des VC 20 befindet sich unter anderem der sogenannte USER-PORT mit seinen 24 Anschlüssen. Die Pin-Belegung mit Blick auf den Port zeigt Bild 1. Für die folgenden Experimente werden neben einem (beliebigen) Masseanschluß (GND) und der herausgeführten Betriebsspannung von + 5 V (Pin 2) die acht Ein- beziehungsweise Ausgänge des Ports B, das heißt die Anschlüsse C bis L benötigt. Die übrigen Anschlüsse sind zum Teil nicht beliebig für Experimente frei, da sie für andere Zwecke mit benötigt werden. So führen die Pins 4 bis 6 zum Joystickanschluß, Pin 7 ist für den Lichtgriffel, Pin 8 für den Kassettenschalter und Pin 9 ist ein gepufferter Serienausgang. Zwei weitere Anschlüsse, Pin B und M mit den Bezeichnungen CB 1 und CB 2 sind sogenannte quittierende Leitungen (Handshake-Leitungen).</p>
+<body>
+    <article>
+        <h1>Koppling zwischen zwei VC 20</h1>
 
-<p>Über Port B kann ein 8 Bit breites Wort ausgegeben beziehungsweise eingelesen werden. Die Kontrolle des Ports erfolgt über den Baustein 6522, der unter anderem die Richtung des Datenflusses mit Hilfe des Datenrichtungsregisters (37138) festlegt. Nach dem Einschalten des Computers sind alle Leitungen von Port B Eingänge.</p>
+        <p class="intro">Wenn Sie auf ein größeres System umsteigen, dann verschleudern Sie nicht Ihren alten VC 20. Nutzen Sie statt dessen seine experimentellen Möglichkeiten, beispielsweise für die bitparallele Datenübertragung. Der folgende Artikel bringt dazu einige Anregungen und eine über zwei VC 20 zu spielende Knobelei.</p>
 
-<p>Beim Ausgeben soll der Computer an die Pins C bis L (mit den Bezeichnungen PB 0 bis PB 7) eine logische 1 (entspricht +5 Volt) beziehungsweise eine Null (0 Volt) legen. Dazu sind zwei Schritte notwendig:<br><br/>
-a) Der ganze Port beziehungsweise einzelne Leitungen von ihm müssen als Ausgänge programmiert werden. Der entsprechende Basic-Befehl heißt POKE 37138,X.<br><br/>
-X = 1 : PB 0 ist Ausgang<br><br/>
-X = 2 : PB 1 ist Ausgang<br><br/>
-X = 4 : PB 2 ist Ausgang (und so weiter bis X = 128)<br><br/>
-X = 3 : PB 0 und PB 1 sind Ausgänge<br><br/>
-X = 5 : PB 0 und PB 2 sind Ausgänge (und so weiter bis X = 255).</p>
+        <p>Auf der Rückseite des VC 20 befindet sich unter anderem der sogenannte USER-PORT mit seinen 24 Anschlüssen. Die Pin-Belegung mit Blick auf den Port zeigt Bild 1. Für die folgenden Experimente werden neben einem (beliebigen) Masseanschluß (GND) und der herausgeführten Betriebsspannung von + 5 V (Pin 2) die acht Ein- beziehungsweise Ausgänge des Ports B, das heißt die Anschlüsse C bis L benötigt. Die übrigen Anschlüsse sind zum Teil nicht beliebig für Experimente frei, da sie für andere Zwecke mit benötigt werden. So führen die Pins 4 bis 6 zum Joystickanschluß, Pin 7 ist für den Lichtgriffel, Pin 8 für den Kassettenschalter und Pin 9 ist ein gepufferter Serienausgang. Zwei weitere Anschlüsse, Pin B und M mit den Bezeichnungen CB 1 und CB 2 sind sogenannte quittierende Leitungen (Handshake-Leitungen).</p>
 
-<p>b) Auf die als Ausgänge vorprogrammierten Leitungen wird 1 beziehungsweise 0 gegeben. Der entsprechende Befehl heißt POKE 37136,Y.<br><br/>
-Y = 0 : auf allen Leitungen liegt 0.<br><br/>
-Y = 1 : nur auf PB 0 liegt 1<br><br/>
-Y = 2 : nur auf PB 1 liegt 1<br><br/>
-Y = 4 : nur auf PB 2 liegt 1 (und so weiter bis Y = 128)<br><br/>
-Y = 3 : auf PB 0 und PB 1 liegt 1 (und so weiter bis Y = 255).</p>
+        <p>Über Port B kann ein 8 Bit breites Wort ausgegeben beziehungsweise eingelesen werden. Die Kontrolle des Ports erfolgt über den Baustein 6522, der unter anderem die Richtung des Datenflusses mit Hilfe des Datenrichtungsregisters (37138) festlegt. Nach dem Einschalten des Computers sind alle Leitungen von Port B Eingänge.</p>
 
-<p>Auch das Einlesen von Port B erfolgt in zwei Schritten:<br><br/>
-a) Es muß darauf geachtet werden, daß die anzusprechenden Leitungen nicht als Ausgänge geschaltet sind. Der entsprechende Befehl heißt ebenfalls POKE 37138,X. Für X ist jedoch die zu 255 komplementäre Binärzahl einzusetzen:<br><br/>
-X = 255 : keine Leitung ist Eingang (das heißt alle sind Ausgänge)<br><br/>
-X = 254 : nur PB 0 ist Eingang<br><br/>
-X = 240 : PB 0 &hellip; PB 3 sind Eingänge (Rest Ausgänge)<br><br/>
-X = 15 : PB 4 &hellip; PB 7 sind Eingänge X = 0: alle Leitungen sind Eingänge.<br><br/>
-b) Das gesamte angelegte Wort (einschließlich eventuell ausgegebener Einsen) wird eingelesen. Der entsprechende Basic-Befehl heißt PEEK (37136). Dies ergibt Zahlenwerte zwischen 0 und 255. Der Wert 255 bedeutet, daß an allen acht Pins eine logische 1, das heißt + 5 V liegt. Sollen einzelne Leitungen abgefragt werden, so gewinnt man ihre Werte durch logischen Vergleich, den man am besten in einem Unterprogramm durchführt:</p>
+        <p>Beim Ausgeben soll der Computer an die Pins C bis L (mit den Bezeichnungen PB 0 bis PB 7) eine logische 1 (entspricht +5 Volt) beziehungsweise eine Null (0 Volt) legen. Dazu sind zwei Schritte notwendig:<br><br />
+            a) Der ganze Port beziehungsweise einzelne Leitungen von ihm müssen als Ausgänge programmiert werden. Der entsprechende Basic-Befehl heißt POKE 37138,X.<br><br />
+            X = 1 : PB 0 ist Ausgang<br><br />
+            X = 2 : PB 1 ist Ausgang<br><br />
+            X = 4 : PB 2 ist Ausgang (und so weiter bis X = 128)<br><br />
+            X = 3 : PB 0 und PB 1 sind Ausgänge<br><br />
+            X = 5 : PB 0 und PB 2 sind Ausgänge (und so weiter bis X = 255).</p>
 
-<pre>
+        <p>b) Auf die als Ausgänge vorprogrammierten Leitungen wird 1 beziehungsweise 0 gegeben. Der entsprechende Befehl heißt POKE 37136,Y.<br><br />
+            Y = 0 : auf allen Leitungen liegt 0.<br><br />
+            Y = 1 : nur auf PB 0 liegt 1<br><br />
+            Y = 2 : nur auf PB 1 liegt 1<br><br />
+            Y = 4 : nur auf PB 2 liegt 1 (und so weiter bis Y = 128)<br><br />
+            Y = 3 : auf PB 0 und PB 1 liegt 1 (und so weiter bis Y = 255).</p>
+
+        <p>Auch das Einlesen von Port B erfolgt in zwei Schritten:<br><br />
+            a) Es muß darauf geachtet werden, daß die anzusprechenden Leitungen nicht als Ausgänge geschaltet sind. Der entsprechende Befehl heißt ebenfalls POKE 37138,X. Für X ist jedoch die zu 255 komplementäre Binärzahl einzusetzen:<br><br />
+            X = 255 : keine Leitung ist Eingang (das heißt alle sind Ausgänge)<br><br />
+            X = 254 : nur PB 0 ist Eingang<br><br />
+            X = 240 : PB 0 &hellip; PB 3 sind Eingänge (Rest Ausgänge)<br><br />
+            X = 15 : PB 4 &hellip; PB 7 sind Eingänge X = 0: alle Leitungen sind Eingänge.<br><br />
+            b) Das gesamte angelegte Wort (einschließlich eventuell ausgegebener Einsen) wird eingelesen. Der entsprechende Basic-Befehl heißt PEEK (37136). Dies ergibt Zahlenwerte zwischen 0 und 255. Der Wert 255 bedeutet, daß an allen acht Pins eine logische 1, das heißt + 5 V liegt. Sollen einzelne Leitungen abgefragt werden, so gewinnt man ihre Werte durch logischen Vergleich, den man am besten in einem Unterprogramm durchführt:</p>
+
+        <pre>
 1000 P = PEEK (37136)
 1010 P0 = -((P AND 1) = 1)
 1020 P1 = -((P AND 2) = 2)
@@ -39,42 +55,42 @@ b) Das gesamte angelegte Wort (einschließlich eventuell ausgegebener Einsen) wi
 </pre>
 
 
-<p>Das Unterprogramm führt bitweise einen logischen UND-Vergleich durch und prüft, ob das jeweilige Bit mit 1 oder 0 belegt ist.</p>
+        <p>Das Unterprogramm führt bitweise einen logischen UND-Vergleich durch und prüft, ob das jeweilige Bit mit 1 oder 0 belegt ist.</p>
 
-<p>Anmerkung: In den folgenden Programmen steht P 0 statt PB 0 und so weiter.</p>
+        <p>Anmerkung: In den folgenden Programmen steht P 0 statt PB 0 und so weiter.</p>
 
-<p>Für die folgenden Experimente empfiehlt es sich, eine einfache Ein-/Ausgabeplatine zu bauen, die das lästige Messen mit Spannungsmesser beziehungsweise Logiktester ersetzt. Einen entsprechenden Schaltungsvorschlag zeigt Bild 2.</p>
+        <p>Für die folgenden Experimente empfiehlt es sich, eine einfache Ein-/Ausgabeplatine zu bauen, die das lästige Messen mit Spannungsmesser beziehungsweise Logiktester ersetzt. Einen entsprechenden Schaltungsvorschlag zeigt Bild 2.</p>
 
-<p>Die Schaltung ist so ausgelegt, daß die vier Leitungen PB 0 bis PB 3 als Äusgänge und die vier Leitungen PB 4 bis PB 7 als Eingänge für den Computer verwendet werden. Selbstverständlich sind andere Aufteilungen möglich.</p>
+        <p>Die Schaltung ist so ausgelegt, daß die vier Leitungen PB 0 bis PB 3 als Äusgänge und die vier Leitungen PB 4 bis PB 7 als Eingänge für den Computer verwendet werden. Selbstverständlich sind andere Aufteilungen möglich.</p>
 
-<p>Der Anzeigeteil der Platine (entspricht dem Ausgabeteil des Computers) ist mit vier roten LEDs mit Vorwiderstand bestückt. Bei 200 Ohm bleibt selbst bei acht LEDs der Gesamtstrom unter den zulässigen 100 mA.</p>
+        <p>Der Anzeigeteil der Platine (entspricht dem Ausgabeteil des Computers) ist mit vier roten LEDs mit Vorwiderstand bestückt. Bei 200 Ohm bleibt selbst bei acht LEDs der Gesamtstrom unter den zulässigen 100 mA.</p>
 
-<p>Im Ausgabeteil der Platine (Eingabeteil des Computers) legen Taster beziehungsweise Schalter die Eingänge auf + 5 V. Bei offenen Tastern taucht ein Problem auf, da der Computer ebenfalls eine 1 einliest. Deshalb wird durch die 1 kOhm-Widerstände das Potential auf logisch 0, das heißt auf zirka 0 V herabgezogen.</p>
+        <p>Im Ausgabeteil der Platine (Eingabeteil des Computers) legen Taster beziehungsweise Schalter die Eingänge auf + 5 V. Bei offenen Tastern taucht ein Problem auf, da der Computer ebenfalls eine 1 einliest. Deshalb wird durch die 1 kOhm-Widerstände das Potential auf logisch 0, das heißt auf zirka 0 V herabgezogen.</p>
 
-<p>Für den Aufbau eignet sich fast jede Experimentierplatine im Europaformat mit Ätzinseln. Die Taster sollten prellfrei sein. Für den User-Port empfiehlt sich der Doppelstecker CINCH 251-12-90-160 Typ 50 24 EE-30 (erhältlich zum Beispiel bei Hofacker). Für die Zwischenverbindungen genügen bei kurzen Strecken ein mehradriges Band beziehungsweise 10 Einzeldrähte. Bei größeren Entfernungen (ab zirka 2 m) empfiehlt sich ein abgeschirmtes Kabel (Mantel auf GND). Bild 3 zeigt zwei verschiedene Baumuster der Platine.</p>
+        <p>Für den Aufbau eignet sich fast jede Experimentierplatine im Europaformat mit Ätzinseln. Die Taster sollten prellfrei sein. Für den User-Port empfiehlt sich der Doppelstecker CINCH 251-12-90-160 Typ 50 24 EE-30 (erhältlich zum Beispiel bei Hofacker). Für die Zwischenverbindungen genügen bei kurzen Strecken ein mehradriges Band beziehungsweise 10 Einzeldrähte. Bei größeren Entfernungen (ab zirka 2 m) empfiehlt sich ein abgeschirmtes Kabel (Mantel auf GND). Bild 3 zeigt zwei verschiedene Baumuster der Platine.</p>
 
-<h2>Software zur Ein-/Ausgabe</h2>
+        <h2>Software zur Ein-/Ausgabe</h2>
 
-<p>Einen Programmvorschlag für das Ausgeben beziehungsweise Einlesen zeigt Listing 1. Da im obigen Beispiel P 0 bis P 3 als Ausgänge und P 4 bis P7 als Eingänge geschaltet werden sollen, wird zunächst der Befehle POKE 37138, 15 gegeben werden (15 = 8 + 4 + 2 + 1), das heißt Bit 1 bis 4 sind Ausgänge, der Rest Eingänge.</p>
+        <p>Einen Programmvorschlag für das Ausgeben beziehungsweise Einlesen zeigt Listing 1. Da im obigen Beispiel P 0 bis P 3 als Ausgänge und P 4 bis P7 als Eingänge geschaltet werden sollen, wird zunächst der Befehle POKE 37138, 15 gegeben werden (15 = 8 + 4 + 2 + 1), das heißt Bit 1 bis 4 sind Ausgänge, der Rest Eingänge.</p>
 
-<p>Das Programm bietet in einem MenüzweiTeilprogramme an: Beim Ausgeben wird durch Betätigen der Tasten Z, X, C, V jeweils eine einzelne 1 auf den Computerport gegeben, was durch das Leuchten der entsprechenden LED angezeigt wird.</p>
+        <p>Das Programm bietet in einem MenüzweiTeilprogramme an: Beim Ausgeben wird durch Betätigen der Tasten Z, X, C, V jeweils eine einzelne 1 auf den Computerport gegeben, was durch das Leuchten der entsprechenden LED angezeigt wird.</p>
 
-<p>Beim Einlesen können einzelne oder alle Taster betätigt werden. Der Computer zeigt sowohl PEEK (37136) als Summe als auch die einzelnen Bitwerte an.</p>
+        <p>Beim Einlesen können einzelne oder alle Taster betätigt werden. Der Computer zeigt sowohl PEEK (37136) als Summe als auch die einzelnen Bitwerte an.</p>
 
-<h2>Kopplung von zwei VC 20</h2>
+        <h2>Kopplung von zwei VC 20</h2>
 
-<p>Will man statt der beschriebenen Ein-/Ausgabeplatinen einen zweiten Computer verwenden, so muß er mit einer neunadrigen Leitung (für 8 Bit und GND) angeschlossen werden. Mit Rücksicht auf das später zu beschreibende Spiel sind im folgenden vier Leitungen für die eine Datenrichtung, die vier anderen für die umgekehrte Richtung vorgesehen. Außerdem sind die Leitungen untereinander gekreuzt (das heißt Bit 1 von Computer A ist verbunden mit Bit 8 vom Computer B). Dies erlaubt es später, für das Computerspiel in beiden Computern das exakt gleiche Programm verwenden zu können.</p>
+        <p>Will man statt der beschriebenen Ein-/Ausgabeplatinen einen zweiten Computer verwenden, so muß er mit einer neunadrigen Leitung (für 8 Bit und GND) angeschlossen werden. Mit Rücksicht auf das später zu beschreibende Spiel sind im folgenden vier Leitungen für die eine Datenrichtung, die vier anderen für die umgekehrte Richtung vorgesehen. Außerdem sind die Leitungen untereinander gekreuzt (das heißt Bit 1 von Computer A ist verbunden mit Bit 8 vom Computer B). Dies erlaubt es später, für das Computerspiel in beiden Computern das exakt gleiche Programm verwenden zu können.</p>
 
-<p>Die komplette Verbindung zeigt Bild 4. Es werden die gleichen Stecker und Leitungen wie oben benutzt. Für Testzwecke kann das Programm von Listing 2 benützt wer-<br/>
-den, wenn wechselweise der Programmteil Einlesen beziehungsweise Ausgeben gewählt wird. Es kann jedoch auch (nach POKE 37138, X mit POKE 37136, X ausgegeben und mit PRINT PEEK (37136) im Direktmode gearbeitet werden.<br/>
-Knobelspiel Schere/Stein/Papier<br/>
-Das Spiel, das zwischen zwei Spielern über zwei miteinander verkoppelte Computer gespielt wird, soll neben seinem Unterhaltungswert den Datenaustausch zwischen zwei Computern zeigen. Weiterhin zeigt es das Arbeiten mit dem logischen Befehlen AND und OR.</p>
+        <p>Die komplette Verbindung zeigt Bild 4. Es werden die gleichen Stecker und Leitungen wie oben benutzt. Für Testzwecke kann das Programm von Listing 2 benützt wer-<br />
+            den, wenn wechselweise der Programmteil Einlesen beziehungsweise Ausgeben gewählt wird. Es kann jedoch auch (nach POKE 37138, X mit POKE 37136, X ausgegeben und mit PRINT PEEK (37136) im Direktmode gearbeitet werden.<br />
+            Knobelspiel Schere/Stein/Papier<br />
+            Das Spiel, das zwischen zwei Spielern über zwei miteinander verkoppelte Computer gespielt wird, soll neben seinem Unterhaltungswert den Datenaustausch zwischen zwei Computern zeigen. Weiterhin zeigt es das Arbeiten mit dem logischen Befehlen AND und OR.</p>
 
-<p>Üblicherweise wird das Knobelspiel nach folgenden Regeln gespielt: Die beiden Spielpartner zeigen auf Kommando zwei ausgestreckte Finger, bedeutet Schere, oder die flache Hand (Papier), oder die geballte Faust (Stein). Es gewinnt Schere gegen Papier (die Schere schneidet das Papier), Stein gegen Schere (der Stein schleift die Schere) und Papier gegen Stein (das Papier hüllt den Stein ein). Damit sind Sieg, Unentschieden und Niederlagen möglich. Gesamtsieger ist, wer zuerst drei Einzelspiele gewonnen hat.</p>
+        <p>Üblicherweise wird das Knobelspiel nach folgenden Regeln gespielt: Die beiden Spielpartner zeigen auf Kommando zwei ausgestreckte Finger, bedeutet Schere, oder die flache Hand (Papier), oder die geballte Faust (Stein). Es gewinnt Schere gegen Papier (die Schere schneidet das Papier), Stein gegen Schere (der Stein schleift die Schere) und Papier gegen Stein (das Papier hüllt den Stein ein). Damit sind Sieg, Unentschieden und Niederlagen möglich. Gesamtsieger ist, wer zuerst drei Einzelspiele gewonnen hat.</p>
 
-<p>Die logische Struktur des Spiels zeigt Bild 5. Man erkennt einen recht großen Aufwand an UND- beziehungsweise ODER-Schaltungen. Dabei ist bei der gezeigten Schaltung noch nicht verhindert, daß ein Spieler gleichzeitig mehrere Eingaben wählt. Außerdem fehlen noch die Zählschaltungen und ein Taktgeber. Wegen des hohen Aufwandes an Logikbausteinen bietet sich eine Computerschaltung mit entsprechendem Programm an. Die Grundstruktur mit den logischen Befehlen statt den UND-Verknüpfungen sieht folgendermaßen aus:</p>
+        <p>Die logische Struktur des Spiels zeigt Bild 5. Man erkennt einen recht großen Aufwand an UND- beziehungsweise ODER-Schaltungen. Dabei ist bei der gezeigten Schaltung noch nicht verhindert, daß ein Spieler gleichzeitig mehrere Eingaben wählt. Außerdem fehlen noch die Zählschaltungen und ein Taktgeber. Wegen des hohen Aufwandes an Logikbausteinen bietet sich eine Computerschaltung mit entsprechendem Programm an. Die Grundstruktur mit den logischen Befehlen statt den UND-Verknüpfungen sieht folgendermaßen aus:</p>
 
-<pre>
+        <pre>
 610 IF A1=1 AND B1=1 THEN 710 (Schere A — Schere B)
 620 IF A2=1 AND B2=1 THEN 710 (Stein A — Stein B)
 640 IF A1=1 AND B3=1 THEN 740 (Schere A — Papier B)
@@ -85,11 +101,11 @@ Das Spiel, das zwischen zwei Spielern über zwei miteinander verkoppelte Compute
 </pre>
 
 
-<p>Die bei den statischen Verknüpfungsgliedern folgenden ODER-Schaltungen werden im Computerprogramm dadurch realisiert, daß von drei Stellen aus an die entsprechende Einsprungstelle gesprungen wird.</p>
+        <p>Die bei den statischen Verknüpfungsgliedern folgenden ODER-Schaltungen werden im Computerprogramm dadurch realisiert, daß von drei Stellen aus an die entsprechende Einsprungstelle gesprungen wird.</p>
 
-<p>Der logische Befehl OR wird an anderer Stelle benötigt. Die Zeilen</p>
+        <p>Der logische Befehl OR wird an anderer Stelle benötigt. Die Zeilen</p>
 
-<pre>
+        <pre>
 510 GOSUB 1000 : REM EINLESEN
 520 IF B1 = 1 OR B2 = 1 OR B3 = 1 THEN 540
 530 GOTO510
@@ -97,20 +113,25 @@ Das Spiel, das zwischen zwei Spielern über zwei miteinander verkoppelte Compute
 </pre>
 
 
-<p>erlauben ein Weitergehen im Programm, wenn der Spielpartner B eine beliebige Eingabe, Schere oder Stein oder Papier, gemacht hat.</p>
+        <p>erlauben ein Weitergehen im Programm, wenn der Spielpartner B eine beliebige Eingabe, Schere oder Stein oder Papier, gemacht hat.</p>
 
-<p>Anmerkung: Für A 1 bis B 3 steht im Listing P 1 bis P 6 (nach Bild 4).</p>
+        <p>Anmerkung: Für A 1 bis B 3 steht im Listing P 1 bis P 6 (nach Bild 4).</p>
 
-<p>Vorausgesetzt wurde, daß für beide Computer (als A und B bezeichnet) das exakt gleiche Programm verwendet werden soll (also kein Master- beziehungsweise Slave-Programm). Die jeweilige Ausgabe Schere/Stein/Papier soll als logische 1 über die Ausgänge P 1, P 2 und P 3 ausgegeben werden beziehungsweise vom entgegengesetzten Computer über die Eingänge P 4, P 5 und P 6 eingelesen werden. Um das Spiel synchron zu halten, wird das »o.k.«-Signal benutzt, das über P0 ausgegeben beziehungsweise über P 7 eingelesen wird. Hat zum Beispiel Spielpartner A die o.k.-Taste betätigt, so läuft das Programm erst weiter, wenn auch B sein o.k. signalisiert hat. A kann jetzt Schere, Stein oder Papier wählen. Wieder muß gewartet werden, bis auch B seine Wahl getroffen hat. Der synchrone Verlauf des Spiels wird durch akustische Signale unterstützt. Das vollständige Strukturdiagramm zeigt Bild 6.</p>
+        <p>Vorausgesetzt wurde, daß für beide Computer (als A und B bezeichnet) das exakt gleiche Programm verwendet werden soll (also kein Master- beziehungsweise Slave-Programm). Die jeweilige Ausgabe Schere/Stein/Papier soll als logische 1 über die Ausgänge P 1, P 2 und P 3 ausgegeben werden beziehungsweise vom entgegengesetzten Computer über die Eingänge P 4, P 5 und P 6 eingelesen werden. Um das Spiel synchron zu halten, wird das »o.k.«-Signal benutzt, das über P0 ausgegeben beziehungsweise über P 7 eingelesen wird. Hat zum Beispiel Spielpartner A die o.k.-Taste betätigt, so läuft das Programm erst weiter, wenn auch B sein o.k. signalisiert hat. A kann jetzt Schere, Stein oder Papier wählen. Wieder muß gewartet werden, bis auch B seine Wahl getroffen hat. Der synchrone Verlauf des Spiels wird durch akustische Signale unterstützt. Das vollständige Strukturdiagramm zeigt Bild 6.</p>
 
-<p>Das Programm beginnt mit zwei vorgeschalteten Blöcken, nämlich einer Überprüfung der Hardware und einer Kurzbeschreibung des Spieles. Nach der Aufforderung, die o.k.-Taste zu drücken, geht es weiter, wenn beide Spielpartner dies getan haben.</p>
+        <p>Das Programm beginnt mit zwei vorgeschalteten Blöcken, nämlich einer Überprüfung der Hardware und einer Kurzbeschreibung des Spieles. Nach der Aufforderung, die o.k.-Taste zu drücken, geht es weiter, wenn beide Spielpartner dies getan haben.</p>
 
-<p>Es folgt die Aufforderung, eine Taste, bedeutet Schere oder Stein oder Papier, zu wählen. Haben beide Spieler dies getan, so überprüft jeder Computer, wer gewonnen hat beziehungsweise ob das Einzelspiel unentschieden endete. Zwischenergebnis und Zwischenstand werden angezeigt. Jeder Computer addiert für sich die Siegpunkte von Spieler A beziehungsweise B. Nach Erreichen von drei Siegpunkten endet das Programm je nachdem mit einer aufsteigenden beziehungsweise abfallenden Tonfolge. Auf Wunsch kann das Spiel (ohne die Einleitung) wiederholt werden. Drei Hardcopys aus dem Spielverlauf zeigt Bild 7. Das vollständige Programm zeigt Listing 1.</p>
+        <p>Es folgt die Aufforderung, eine Taste, bedeutet Schere oder Stein oder Papier, zu wählen. Haben beide Spieler dies getan, so überprüft jeder Computer, wer gewonnen hat beziehungsweise ob das Einzelspiel unentschieden endete. Zwischenergebnis und Zwischenstand werden angezeigt. Jeder Computer addiert für sich die Siegpunkte von Spieler A beziehungsweise B. Nach Erreichen von drei Siegpunkten endet das Programm je nachdem mit einer aufsteigenden beziehungsweise abfallenden Tonfolge. Auf Wunsch kann das Spiel (ohne die Einleitung) wiederholt werden. Drei Hardcopys aus dem Spielverlauf zeigt Bild 7. Das vollständige Programm zeigt Listing 1.</p>
 
-<p>— Für die Eingabe o.k., Schere, Stein beziehungsweise Papier sind im Programm die Funktionstasten F1 &hellip; F 4 vorgesehen. Dabei ist zu beachten, daß diese Tasten nicht schon anderweitig belegt sind (zum Beispiel beim Programmierhilfemodul). Eine Umprogrammierung auf andere Tasten ist leicht möglich.</p>
+        <p>— Für die Eingabe o.k., Schere, Stein beziehungsweise Papier sind im Programm die Funktionstasten F1 &hellip; F 4 vorgesehen. Dabei ist zu beachten, daß diese Tasten nicht schon anderweitig belegt sind (zum Beispiel beim Programmierhilfemodul). Eine Umprogrammierung auf andere Tasten ist leicht möglich.</p>
 
-<p>— Das Programm kann notfalls auch mit Hilfe der eingangs beschriebe- nen Ein-/Ausgabe-Platine auf richtigen Ablauf getestet werden.</p>
+        <p>— Das Programm kann notfalls auch mit Hilfe der eingangs beschriebe- nen Ein-/Ausgabe-Platine auf richtigen Ablauf getestet werden.</p>
 
-<p>— Das Knobelprogramm benötigt in der vorliegenden Form mindestens die 3-KByte-Erweiterung. Bei Verzicht auf die REM-Zeichen und Verwendung von Doppelbefehlen genügt die Grundausführung des VC 20.</p>
+        <p>— Das Knobelprogramm benötigt in der vorliegenden Form mindestens die 3-KByte-Erweiterung. Bei Verzicht auf die REM-Zeichen und Verwendung von Doppelbefehlen genügt die Grundausführung des VC 20.</p>
 
-<address class="author">(Albrecht Langenstein)</address>
+        <address class="author">(Albrecht Langenstein)</address>
+    </article>
+
+</body>
+
+</html>
