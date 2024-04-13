@@ -45,13 +45,13 @@
 
         <p>Das Programm ist mit 87 Byte Länge sehr kurz und kann damit im Kassetten-Puffer ($033C bis $03FB), oder wie hier im sonst ungenutzten Bereich ($02A7 bis $02FF) untergebracht werden. Es wirkt wie folgt: Die Standard-Zeichenausgaberoutine des Betriebssystems, CHROUT, wird durch einen geänderten Vektor in das Erweiterungsprogramm umgeleitet. Dieses überprüft, ob die Ausgabe über Gerätenummer 4 (Standardnummer für Drucker) erfolgen soll. Wenn nicht, springt es sofort in das Betriebssystem zurück. Ansonsten wird das zu übertragende Byte an CIA2 Port B gelegt und über einen Strobe-Impuls über Port A, Bit 2 dem Drucker mitgeteilt, daß die anliegenden Daten gültig sind. Der Drucker quittiert den Datenempfang über das Acknowledge-Signal. Dieses setzt am C 64 über den FLAG-2-Eingang Bit 4 des Interrupt-Registers von CIA 2. Der CIA wird so programmiert, daß dadurch aber kein Interrupt ausgelöst wird. Das Programm wartet vielmehr, bis dieses Bit gesetzt ist, löscht es beim Auslesen automatisch und springt erst dann in das rufende Hauptprogramm zurück. Damit ist ein voller Handshake gewährleistet.</p>
 
-        <p>Aus dem Assemblerlisting (Bild 4) geht eine Gliederung in drei Abschnitte hervor:<br><br>
-            1. Zeile 190-280<br><br>
-            Abfrage, ob Ausgabe über Gerätenummer 4 erfolgen soll<br><br>
-            Bei ASCII-Code 13 (Carriage Return) wird automatisch noch ein ASCII-Code 10 (Line Feed) gesendet. Durch Weglassen der Zeilen 250 bis 280 wird kein automatischer Line Feed gesendet.<br><br>
-            2. Zeile 320-420<br><br>
-            Ausgabe eines Byte<br><br>
-            3. Zeile 500-670<br><br>
+        <p>Aus dem Assemblerlisting (Bild 4) geht eine Gliederung in drei Abschnitte hervor:<br>
+            1. Zeile 190-280<br>
+            Abfrage, ob Ausgabe über Gerätenummer 4 erfolgen soll<br>
+            Bei ASCII-Code 13 (Carriage Return) wird automatisch noch ein ASCII-Code 10 (Line Feed) gesendet. Durch Weglassen der Zeilen 250 bis 280 wird kein automatischer Line Feed gesendet.<br>
+            2. Zeile 320-420<br>
+            Ausgabe eines Byte<br>
+            3. Zeile 500-670<br>
             Programmierung des CIA2 für die Ausgabe. Umstellen des Ausgabevektors auf den Programmteil 1</p>
 
         <h2>Die praktischen Anwendungen</h2>
