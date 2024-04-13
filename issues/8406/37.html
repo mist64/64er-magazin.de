@@ -2,7 +2,7 @@
 <html lang="de">
 
 <head>
-    <title>XXX</title>
+    <title>Reise durch die Wunderwelt der Grafik</title>
     <meta charset="UTF-8">
     <link rel="stylesheet" href="../style.css">
     <meta name="author" content="XXX">
@@ -66,8 +66,8 @@ Bit 3 ist gesetzt
 </pre>
 
 
-        <p>Der Farbcode bewirkt also zweierlei:<br><br />
-            a) Er gibt an, ob ein Zeichen im Mehrfarbmodus dargestellt wird, und<br><br />
+        <p>Der Farbcode bewirkt also zweierlei:<br><br>
+            a) Er gibt an, ob ein Zeichen im Mehrfarbmodus dargestellt wird, und<br><br>
             b) er verleiht den Bit-Paaren »11« die Farbe.</p>
 
         <p>Zur Demonstration können Sie ja mal folgendes Programm eingeben:</p>
@@ -103,13 +103,13 @@ POKE 53265,PEEK(53265)AND 191
 
         <p>Die Zeichenfarbe bleibt von der ganzen Umstellung unberührt. Man kann sie auf die nun schon bekannte Weise jederzeit ändern.</p>
 
-        <p>Warum kann man eigentlich in diesem Modus nur 64 Zeichen darstellen? Die Antwort darauf liegt darin, daß nur die Bits 0 und 5 für den Zeichencode zur Verfügung stehen, also<br><br />
-            von 00 0000 ≙»@«<br><br />
-            bis 11 1111 ≙»?«<br><br />
+        <p>Warum kann man eigentlich in diesem Modus nur 64 Zeichen darstellen? Die Antwort darauf liegt darin, daß nur die Bits 0 und 5 für den Zeichencode zur Verfügung stehen, also<br><br>
+            von 00 0000 ≙»@«<br><br>
+            bis 11 1111 ≙»?«<br><br>
             mit Hintergrundfarbe aus 53281</p>
 
-        <p>Jede weitere Erhöhung beeinflußt die Bits 7 und 6, wird aber in den unteren 6 Bits nicht mehr wahrgenommen. Dort beginnt einfach die Zählung wieder ab 0:<br><br />
-            (1)00 0000 = 64,<br><br />
+        <p>Jede weitere Erhöhung beeinflußt die Bits 7 und 6, wird aber in den unteren 6 Bits nicht mehr wahrgenommen. Dort beginnt einfach die Zählung wieder ab 0:<br><br>
+            (1)00 0000 = 64,<br><br>
             das bedeutet Zeichen 0 (@) mit Hintergrundfarbe aus 53282.</p>
 
         <p>Ganz nett wäre es ja eigentlich, wenn man sowohl den Modus mit erweiterten Hintergrundfarben als auch dem Mehrfarbzeichenmodus miteinander kombinieren könnte. Jeder Versuch, das zu tun, endet mit einem schwarzen Bildschirm ohnejegliches Zeichen. An diese Möglichkeit haben die Schöpfer des VIC-II-Chip offenbar nicht gedacht.</p>
@@ -229,7 +229,7 @@ MSN LSN
 </pre>
 
 
-        <p>Also ändern wir in der Zeile 40 den ersten POKE-Befehl um in POKE 1024,16. Es klappt! Nach dem Starten (wie immer in diesem Programm nach einigem geduldigen Warten) erscheint ein weißer Strich auf schwarzem Grund. Nun können wir dieses triste Schwarz gezielt entfernen und von vornherein bestimmen, welche Farbe unsere Punkte bekommen sollen und welche der Hintergrund, indem wir in die Bildschirmzellen den Dezimalwert unserer Binärzahl eingeben. Damit Sie nicht jedesmal umrechnen müssen, hier eine nützliche Formel:<br><br />
+        <p>Also ändern wir in der Zeile 40 den ersten POKE-Befehl um in POKE 1024,16. Es klappt! Nach dem Starten (wie immer in diesem Programm nach einigem geduldigen Warten) erscheint ein weißer Strich auf schwarzem Grund. Nun können wir dieses triste Schwarz gezielt entfernen und von vornherein bestimmen, welche Farbe unsere Punkte bekommen sollen und welche der Hintergrund, indem wir in die Bildschirmzellen den Dezimalwert unserer Binärzahl eingeben. Damit Sie nicht jedesmal umrechnen müssen, hier eine nützliche Formel:<br><br>
             Farbkennziffer (F) = Zeichenfarbe (ZF) x 16 + Hintergrundfarbe (HF)</p>
 
         <p>Zum Ausprobieren ändern wir unser Programm um:</p>
@@ -255,41 +255,41 @@ MSN LSN
 
         <p>Die Speicherzellen der Bit-Map sind also angeordnet wie ein vollgeschriebener Bildschirm. Dort hatte ja jeder Buchstabe seine 8 Byte im Punktemuster. Aus der Anordnung ergibt sich außerdem, daß wir in der Y-Richtung 200 mögliche Positionen (0 bis 199) und in der X-Richtung 320 (0 bis 319) finden. Wir haben somit Bildschirmkoordinaten (Bild 6) und können Punkte definieren, zum Beispiel im Bild 6 den Punkt P mit den Koordinaten X = 110 und Y=100.</p>
 
-        <p>Wir wissen nur noch nicht, in welchem Byte wir welches Bit setzen müssen, um diesen Punkt zu sehen. Betrachten wir dazu Bild 5 genauer. Die 25 Bildschirmzeilen und die 40 Spalten sind noch erhalten. Jeder solche Bildschirmplatz besteht aus acht Byte mit je acht Bit. Stellen wir zunächst einmal fest, um welche Zeile es sich handelt:<br><br />
-            Z=INT(Y/8)<br><br />
-            Beispiel: Z=INT(100/8)=12<br><br />
+        <p>Wir wissen nur noch nicht, in welchem Byte wir welches Bit setzen müssen, um diesen Punkt zu sehen. Betrachten wir dazu Bild 5 genauer. Die 25 Bildschirmzeilen und die 40 Spalten sind noch erhalten. Jeder solche Bildschirmplatz besteht aus acht Byte mit je acht Bit. Stellen wir zunächst einmal fest, um welche Zeile es sich handelt:<br><br>
+            Z=INT(Y/8)<br><br>
+            Beispiel: Z=INT(100/8)=12<br><br>
             (Zeile 12)</p>
 
-        <p>Dann ermitteln wir die Spalte, in der unser Punkt liegt:<br><br />
-            S=INT(X/8)<br><br />
-            Beispiel: S=INT(110/8)=13<br><br />
+        <p>Dann ermitteln wir die Spalte, in der unser Punkt liegt:<br><br>
+            S=INT(X/8)<br><br>
+            Beispiel: S=INT(110/8)=13<br><br>
             (Spalte 13)</p>
 
-        <p>In unserem Beispiel muß der Punkt in Zeile 12 an Spaltenplatz 13 stehen. Weil in jeder Zeile 320 Byte (8x40) und an jedem Platz 8 Byte vorhanden sind, fängt unser Bildschirmfeld bei Byte Nr.<br><br />
+        <p>In unserem Beispiel muß der Punkt in Zeile 12 an Spaltenplatz 13 stehen. Weil in jeder Zeile 320 Byte (8x40) und an jedem Platz 8 Byte vorhanden sind, fängt unser Bildschirmfeld bei Byte Nr.<br><br>
             Z<em>320 + S</em>8 = 12<em>320 + 13</em>8 = 3944 an (siehe Bild 7).</p>
 
-        <p>Nun müssen wir feststellen, um welches Byte in diesem Feld es sich handelt. Wir haben vorhin beim Feststellen der Zeile einfach gleich INT(Y/8) berechnet. Wenn wir nun nur Y/8 berechnen, kommen wir in unserem Beispiel auf Y/8 = 100/8 = 12.5. Ziehen wir davon INT(Y/8) ab: Y/8-INT(Y/8 = 12.5-12 = 0.5 und multiplizieren das Ergebnis mit 8:<br><br />
+        <p>Nun müssen wir feststellen, um welches Byte in diesem Feld es sich handelt. Wir haben vorhin beim Feststellen der Zeile einfach gleich INT(Y/8) berechnet. Wenn wir nun nur Y/8 berechnen, kommen wir in unserem Beispiel auf Y/8 = 100/8 = 12.5. Ziehen wir davon INT(Y/8) ab: Y/8-INT(Y/8 = 12.5-12 = 0.5 und multiplizieren das Ergebnis mit 8:<br><br>
             80<em>(Y/8-INT(Y/8))=8</em>0.5=4</p>
 
-        <p>Genau das ist unser gesuchtes Byte: Nr. 4 von oben. Das sieht komplizierter aus, als es ist. Aus alledem ergibt sich jetzt, in welchem Byte der Bit-Map ein Bit zu setzen ist:<br><br />
+        <p>Genau das ist unser gesuchtes Byte: Nr. 4 von oben. Das sieht komplizierter aus, als es ist. Aus alledem ergibt sich jetzt, in welchem Byte der Bit-Map ein Bit zu setzen ist:<br><br>
             BYTE=Z<em>320 + S</em>8 + 8*(Y/8-INT(Y/ 8))</p>
 
         <p>In unserem Beispiel ist es dann also das Byte 3948 der Bit-Map. Nun müssen wir noch herauskriegen, welches Bit in diesem Byte zu setzen ist (siehe Bild 8).</p>
 
-        <p>Auch hier haben wir vorhin bei der Berechnung der Spalte einfach gerechnet INT(X/8). Jetzt rechnen wir:<br><br />
+        <p>Auch hier haben wir vorhin bei der Berechnung der Spalte einfach gerechnet INT(X/8). Jetzt rechnen wir:<br><br>
             X-8<em>INT(X/8)=110-8</em>INT(110/8)</p>
 
-        <p>Das ergibt 6. Wenn wir das von 7 abziehen (Nummer des höchstwertigen Bit), erhalten wir:<br><br />
+        <p>Das ergibt 6. Wenn wir das von 7 abziehen (Nummer des höchstwertigen Bit), erhalten wir:<br><br>
             BIT = 7-(X-8*INT(X/8))</p>
 
         <h2>Die Zauberformeln</h2>
 
-        <p>In unserem Beispiel ist BIT = 1. Es muß also Bit 1 gesetzt werden. Damit haben wir jetzt folgende Formeln zur Verfügung:<br><br />
-            BYTE=INT(Y/8)<em>320 + INT(X/8)</em>8 + 8<em>(Y/8-INT(Y/8))<br><br />
-                und<br><br />
+        <p>In unserem Beispiel ist BIT = 1. Es muß also Bit 1 gesetzt werden. Damit haben wir jetzt folgende Formeln zur Verfügung:<br><br>
+            BYTE=INT(Y/8)<em>320 + INT(X/8)</em>8 + 8<em>(Y/8-INT(Y/8))<br><br>
+                und<br><br>
                 BIT=7-(X-8</em>INT(X/8))</p>
 
-        <p>Den ersten Ausdruck für Byte kann man noch etwas vereinfachen:<br><br />
+        <p>Den ersten Ausdruck für Byte kann man noch etwas vereinfachen:<br><br>
             BYTE = 8<em>(39</em>INT(Y/8) + INT(X/8) + Y/8)</p>
 
         <p>Die genaue Speicherzelle ergibt sich durch Addieren der Bit-Map-Startadresse (8192) zu BYTE. Um also einen Punkt zu setzen, gibt man das Kommando:</p>
