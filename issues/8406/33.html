@@ -1,0 +1,180 @@
+<h1>Veränderungen am 64-Basic</h1>
+
+<p>Eine der merkwürdigsten Effekte am Commodore 64 ist, wenn man unmittelbar nach dem Einschalten den Speicher abfragt, also eingibt</p>
+
+<pre>
+PRINT FRE(0)
+</pre>
+
+
+<p>Man erhält nämlich eine negative Zahl als Antwort. Man kann dies korrigieren, indem man bei einer negativen Antwort den Wert 65536 addiert. Im folgenden soll diese Merkwürdigkeit etwas näher beleuchtet und ein Weg zur Korrektur dargestellt werden.</p>
+
+<p>Die Funktion FRE(0) liefert den noch verfügbaren, also freien Speicher. Dazu wird der Speicher aufgeräumt (Garbage-Collection), das heißt, die nicht mehr benötigten Strings werden entfernt und der gesamte String-Bereich folglich geordnet. Der freie Bereich ergibt sich dann als: Untere Grenze der Strings minus obere Grenze der Arrays.</p>
+
+<p>Der Inhalt der folgenden Adressen muß also voneinander abgezogen werden<br><br/>
+33/34 Untergrenze Strings<br><br/>
+31/32 Ende Arrays<br><br/>
+also<br><br/>
+Inhalt von 33 minus Inhalt von 31<br><br/>
+Ergebnis nach 63<br><br/>
+Inhalt von 34 minus Inhalt von 32<br><br/>
+Ergebnis nach 62.</p>
+
+<p>Das Ergebnis ist also vom Typ INTEGER. Allerdings arbeitet der Interpreter intern nicht mit Integer-Zahlen, sondern mit REAL-Zahlen (Gleitkommazahlen), das Ergebnis muß also gewandelt werden. Bei der Wandlung wird ein Bit (von 16, die für die Darstellung der Integer benötigt werden) als Vorzeichen betrachtet. Ist der Inhalt von Zelle 62 größer oder gleich $80 = 128, so wird die Zahl bei der Wandlung als negative Zahl angesehen. Der Inhalt von 62 wird dann größer oder gleich $80 sein, wenn der freie Bereich größer 32 767 Byte ist.</p>
+
+<p>Aus diesen Gründen taucht gelegentlich eine negative Zahl als freier Speicherplatz auf. Wie kann man dies ändern?</p>
+
+<p>Im Interpreter gibt es vier Wandlungsroutinen.</p>
+
+<ol>
+<li>Wandle REAL-Zahl nach INTEGER.<br>
+Dabei wird die Integer-Zahl mit 15 Bit + 1 Bit für das Vorzeichen verschlüsselt, darstellbar sind also als Integer ganze Zahlen von -32 767 bis +32 767.</li>
+<li>Wandle INTEGER-Zahl nach REAL<br>
+Dies ist die Umkehrung von 1).</li>
+<li>Wandle REAL nach INTEGER.<br>
+Dabei wird eine Integer-Zahl mit 16 Bit (kein Vorzeichen!) verschlüsselt, darstellbar sind also Zahlen von 0 bis 65535. Diese Routine wird für die interne Darstellung der Zeilennummern des Basic-Programms benötigt (Wandlung von ASCII nach REAL, von dort nach INTEGER).</li>
+<li>Wandle INTEGER nach REAL.<br>
+Dies ist die Umkehrung von 3). Diese Routine wird zum Beispiel für die Ausgabe der Fehlermeldungen benötigt (...ERROR in (Zeile)).</li>
+</ul>
+
+Bei der FRE-Funktion müßte also nach der Berechnung des freien Platzes die Routine 4) aufgerufen werden. Aufgerufen wird aber die Routine 2). Im Interpreter steht JMP $BC44 (an der Adresse $B39B).
+
+Dort müßte aber eigentlich stehen
+
+<pre>
+SEC
+JMP $BC49
+</pre>
+
+Die Frage ist jetzt nur noch, wie kann man dies ersetzen?
+
+Dabei tauchen folgende Probleme auf
+
+<ol>
+<li>Der Interpreter wird im ROM gespeichert.</li>
+<li>Man muß 3 Byte durch 4 Byte ersetzen.</li>
+</ol>
+
+Im Commodore 64 kann man bestimmte Bereiche, die durch ROM belegt sind, ausblenden und dafür RAM einblenden. Das folgende Programm kopiert den Interpreter vom ROM ins RAM
+
+<pre>
+10 FOR 1 = 10*16*256 TO 12*16*256-1
+20 POKE I,PEEK(I)
+30 NEXT I
+</pre>
+
+Dabei wird ausgenutzt, daß der Computer zwar über PEEK(I) aus dem ROM liest, aber mit dem Befehl POKE ins RAM schreibt (dies ist intern gelöst).
+
+Man müßte jetzt nur noch das RAM einblenden, vorher sollen aber noch die notwendigen Veränderungen vorgenommen werden.
+
+So einfach kann man natürlich nicht drei Byte durch vier Byte ersetzen. Die Lösung besteht darin, die Routine in einen freien Bereich umzuleiten und dort die notwendigen Befehle einzufügen (sogenannte Patches). Also anstelle von<br>
+JMP $BC44 an der Adresse $B39B<br>
+sollte stehen<br>
+JMP $C000 in den freien Bereich.
+
+Dies erreicht man durch<br>
+40 POKE 11*16*256 + 3*256 + 9*16 + 12, 0<br>
+(ersetzt $44 = 44*16 + 4)
+50 POKE 11*16*256 + 3*256 + 9*16 + 13, 12*16<br>
+(ersetzt $BC = 11*16 + 12).
+
+An der Stelle $C000 ff. solte dann stehen
+
+<pre>
+SEC
+JMP $BC49
+</pre>
+
+Also wird wieder gePOKET<br>
+60 POKE 12*16*256   , 3*16 + 8 (=SEC)<br>
+70 POKE 12*16*256 + 1, 4*16*12 (=JMP)<br>
+80 POKE 12*16*256 + 2, 4*16 + 9 (=$49 Teil der Adresse)<br>
+90 POKE 12*16*256 + 3, 11*16 + 12 (=$BC Teil der Adresse).
+
+Jetzt muß man nur noch das RAM einschalten<br>
+100 POKE 1 , PEEK(1) AND 254 (Einschalten)<br>
+( POKE 1 , PEEK(1) OR 1 (Ausschalten) ).
+
+Im Speicherplatz 1 wird im Bit 0(= Wertigkeit 1) hinterlegt, wo die Speicherplätze von $A000 bis $BFFF sind.
+
+Und nun, lassen Sie Ihren Computer doch mal den Befehl
+
+<pre>PRINT FRE(0)
+</pre>
+
+ausführen. Wenn Sie keinen Fehler gemacht haben, wird er Ihnen diese Frage ab sofort korrekt beantworten.
+
+Zusammenfassend kann man sagen, daß der beschriebene Effekt unschön und der Aufwand zur Änderung gering gewesen wäre. Der hier beschriebene Aufwand wurde dadurch groß, daß die Änderung nachträglich vorgenommen werden mußte.
+
+(Dr. August Quint)
+
+---
+
+# In den Untergrund mit dem VC 20
+
+> Underground so der Onginalitel, ist nicht irgend ein Spiel. sondern eine Kombination aus Action- und Abenteuerspiel. Für den VC 20 mit mindestens 16 KByte Erweiterung geschrieben ist Underground mit einigen überraschenden Eigenschaften ausgestattet.
+
+## 2000 Mark für den Untergrund
+
+Ich hatte letztes Jahr zwischen den Abiprüfungen irgendwann mal eine Woche Zeit, um etwas Längeres zu programmieren. Da ich zu der Zeit gerade eine gute Labyrinth-Routine in Maschinensprache geschrieben hatte, die mich damals einigermaßen faszinierte, war das Grundthema eines Spiels eigentlich schon vorgegeben.
+
+Es sollte ein mit Joystick steuerbares, nicht aggressives Spiel werden, bei dem Action und Überlegung in etwa eine gleiche Rolle spielen sollten. Zu dem Zweck habe ich mir erst einmal ein Männchen definiert, das mittels Joystick einigermaßen realistisch bewegt werden konnte. Beim Testen des Bewegungsablaufes dieses Männchens kam dann die Idee, den Ablauf des Spiels in den Untergrund einer Stadt zu legen, und so entstand dann der kleine Vorspann.
+
+Das Zahlenlabyrinth schwirrte mir eigentlich schon seit einiger Zeit im Kopf herum, und die Programmierung gestaltete sich relativ einfach. Als ich mir überlegte, noch ein wenig Action in das Spiel hineinzubringen, entstanden die beiden Aufzugsszenen. Das Schlußbild ergab sich aus der Überlegung, ein einfach zu berechnendes, aber trotzdem schwer zu spielendes Bild zu schaffen, bei dem ich auch die Labyrinthroutine noch ein wenig benutzen konnte.
+
+Aufgrund dieser Szenen entstand dann das eigentliche Spiel UNDERGROUND.
+
+(Oliver Joppich)
+
+Das Ziel des Spiels ist es, in möglichst kurzer Zeit aus dem Untergrundsystem von New York zu entkommen und dabei alle gestellten Aufgaben richtig zu lösen.
+
+Das Spiel besteht aus insgesamt fünf verschiedenen Spielszenen und einer kleinen Vorgeschichte, in deren Verlauf man durch einen offenen Schacht in das unterirdische System von New York stürzt. Durch Drücken der Feuertaste am Joystick ist es jetzt möglich, in die erste Spielszene zu gelangen.
+
+In dieser ersten Szene (Bild 2) geht es darum, ohne Berührung der Wände von der linken auf die rechte Seite zu gelangen. Um dies zu erreichen, gilt es, die Aufzüge, die sich von unten nach oben bewegen, geschickt zu benutzen.
+
+## Die wilden Zahlen
+
+Nach diesem ersten, noch recht einfachen Bild gelangt man in das Labyrinth der wilden Zahlen(Bild 3). Hier geht es darum, in möglichst kurzer Zeit (maximal 1 Minute) die Zahlen des Labyrinthes in ihrer Reihenfolge aufzusammeln. Damit diese Arbeit ein wenig erschwert wird, tauschen die Zahlen alle sieben Schritte ihre Position in zufälliger Folge. Um diese kleine Gemeinheit aber ein wenig auszugleichen, kann auch der Spieler die Position der Zahlen verändern, indem er den Schußknopf betätigt. Auch dann tauschen zwei zufällig ausgewählte Zahlen ihre Position auf dem Spielfeld. Wenn alle Zahlen aufgesammelt sind, muß man sich zum Ausgang auf der rechten unteren Seite begeben.
+
+Man kann dieses Bild auch verlassen, wenn man nicht alle Zahlen aufgesammelt hat. Dadurch ist es möglich, sich auch die folgenden Spielszenen anzuschauen. Allerdings gelangt man zum Schluß des Spiels leider nicht wieder an die Oberfläche der Stadt, sondern muß nochmal von vorn anfangen.
+
+## Die Piplips
+
+In der nächsten Szene (Bild 4) besteht die Aufgabe darin, alle Piplips aufzusammeln, das sind die kleinen schwarzen Wesen, die überall im Bild verteilt sind und danach zum Ausgang rechts unten zu gelangen. Die Schwierigkeit dieses Bildes besteht darin, daß man nur eine bestimmte Anzahl von Schritten zur Verfügung hat, um von einem Pipip zum anderen zu gelangen. Jedesmal, wenn man eines der Wesen aufgesammelt hat, erscheint sofort ein neuer Irrgarten mit anders verteilten Piplips. Tip: 1. Erst in Ruhe das Labyrinth anschauen und dann lossausen. 2. Auch dieses Bild kann man ohne alle Piplips verlassen, allerdings gelten auch hier dieselben Einschränkungen wie bei den Zahlen.
+
+## Aufzüge und Labyrinth
+
+Als nächstes kommt jetzt wieder ein Bild mit Aufzügen, allerdings um einiges schneller und mit kleineren Fahrstühlen. Auch hier muß man möglichst die Nerven behalten und von links nach rechts zum Ausgang gelangen.
+
+Und nun zur letzten Szene (Bild 5): Auf den ersten Blick vielleicht ein simples Labyrinth mit zwei regelmäßig umherfliegenden Objekten (eine Namensgebung sei diesmal jedem selbst überlassen). Die Aufgabe besteht darin, zum Ausgang zu gelangen, ohne mit den fliegenden Objekten zusammenzustoßen. Sollte es aus Versehen doch zu einem Zusammenstoß kommen, wird man leider in das vorletzte Bild zurückgeschleudert und muß erst mal wieder die Aufzüge überwinden.
+
+Die Schwierigkeit bei diesem Bild besteht darin, daß nach einmaligem Losgehen in eine bestimmte Richtung die Bewegung nicht mehr gestoppt werden kann, bis man an einer Wandbegrenzung zum Stillstand kommt. Werjetzt immer noch glaubt, daß dieses Bild leicht zu schaffen sei, möge bitte das Programm abtippen, zu einem Joystick greifen und anschließend spielen.
+
+## Das Eintippen
+
+Um Underground auf möglichst einfache Art und Weise vom Papier in den Computer zu bringen, ist das Programm in drei Teile unterteilt:<br>
+Listing 1: Lader.
+
+Dieser dient dazu, den Maschinen- und Basic-Teil von Underground von Kassette/Diskette zu laden. Um dieses Programm benutzen zu können, muß noch der Teil 2 sowie der Teil 3 eingegeben werden.<br>
+Listing 2: Maschinensprache/Grafik.
+
+In diesem Teil befinden sich die Maschinenroutinen und die Grafik des Spiels. Nach dem Eintippen sollte man das Programm zwar aus Sicherheitsgründen abspeichern, aber es wird bei der lauffähigen Version nicht mehr gebraucht, da es den notwendigen Programmteil selbst auf Kassette/Diskette ablegt.<br>
+Listing 3: Basic.
+
+Hier ist das Hauptprogramm des Spiels in Basic abgelegt.
+
+### Vorgehensweise:
+
+<ul>
+<li>Lader abtippen und abspeichern</li>
+<li>POKE44,32:POKE8192,0: NEW eingeben./li>
+<li>Maschinensprache/Grafik abtippen und abspeichern/li>
+<li>Maschinensprache/Grafik mit RUN laufen lassen (erstellt Maschinenspracheteil des Programms) und danach abspeichern, indem man auf die obere Zeile geht und <RETURN> drückt./li>
+<li>Computer kurz ausschalten und wieder einschalten (wegen der verbogenen Pointer)/li>
+<li>Basic-Teil abtippen und abspeichern mit SAVE"UG. BAS” (,8 bei Floppy)./li>
+<li>Wenn man Besitzer einer Floppy ist, war das alles und man kann das Spiel laden und starten mit »LOAD”LADER",8und RUN)./li>
+<li>Als Besitzer einer Datasette empfiehlt es sich, den Lader, den Maschinenteil und den Basic-Teil in dieser Reihenfolge auf Kassette zu bringen und dann durch Laden und Starten des Laders zu beginnen./li>
+</ol>
+
+
+<address class="author">(Oliver Joppich)</address>
