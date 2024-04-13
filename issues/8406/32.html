@@ -1,0 +1,37 @@
+<h1>Tips und Tricks für den VC 20</h1>
+
+<p class="intro">Nützliche ROM- und RAM-Adressen für den VC 20 wurden schon mehrfach veröffentlicht. Dieser Artikel bringt nun Beispiele, wie diese auch sinnvoll eingesetzt werden können. Denn was nützt das beste ROM-Adressenlisting mit den tollsten Erläuterungen, wenn man keinen Anwendungszweck findet?</p>
+
+<p>Beginnen wir mit der Tonerzeugung. Mancher VC 20-Besitzer hat das möglicherweise schon so oft gelesen, daß er in der Nacht von den Adressen träumt. Tongenerator 1 bis 3: 36874 bis 36876, Generator für weißes Rauschen: 36877, Lautstärke: 36878. Doch die wenigsten wissen, daß man mit der Lautstärke auch den Klang eines Tones entscheidend beeinflussen kann, indem man ihn langsam auf- oder abschwellen läßt.</p>
+
+<p>In der Praxis sieht das so aus, daß man einen bestimmten Ton wählt, dann die Lautstärke langsam aufdreht, eine Weile hält und schließlich wieder langsam abdreht. Wenn man den Ton sofort voll aufdreht und gleich danach langsam abschwellen läßt, klingt es, als ob man auf einem Instrument einen Ton anschlägt, der dann langsam ausklingt. Listing 1 zeigt ein Beispielprogramm mit einer bekannten Melodie.</p>
+
+<p>Die bekannteste Nutzungsmöglichkeit der Lautstärke dürfte wohl die Explosion sein. Man wählt ein tiefes Rauschen und läßt es langsam leiser werden. Das so entstehende Explosionsgeräusch kann sehr gut für Spiele verwendet werden. Das kleine Programm in Listing 2 erzeugt zum Beispiel bei jedem Tastendruck ein anderes Explosionsgeräusch.</p>
+
+<h2>Farbige Anleitung</h2>
+
+<p>Da wir gerade von Spielen sprechen: Zu einem Spiel gehört auch eine Spielanleitung (auf dem Bildschirm). Und wenn man da einmal etwas ganz besonderes haben will, gibt es die Möglichkeit, innerhalb eines Buchstabens mehrere Farben zu verwenden. Wie geht das? In der Speicheradresse 646 steht die momentan benutzte Farbe. Zulässig sind Werte von 0 bis 7. Addiert man zu einem dieser Werte 8, so wird auf Vierfarbenmodus umgeschaltet und es entstehen bunte, verzerrte Buchstaben.</p>
+
+<p>Diese lassen sich zwar schlechter lesen, ergeben aber zum Beispiel bei Spielprogrammen einen interessanten Effekt (für Textverarbeitung sind sie weniger geeignet).</p>
+
+<h2>Save-Schutz</h2>
+
+<p>Die Buchstaben setzen sich aus vier Farben zusammen: Aus Hintergrundfarbe, Rahmenfarbe, Hilfsfarbe und der gewählten Zeichenfarbe aus der Adresse 646. Die Hilfsfarbe wird mit den Bits 4 bis 7 aus 36878 definiert. Es ist unbedingt notwendig, daß die Hintergrundfarbe nur einmal dabei vorkommt. Ist nämlich eine dieser Farben gleich der Hintergrundfarbe, so entstehen Lücken in den Buchstaben, und der Text wird so stark verstümmelt, daß er sich nicht mehr lesen läßt. Das Rücksetzen erfolgt einfach durch Umschalten der Zeichenfarbe mit der CTRL-Taste.</p>
+
+<p>Doch nun zu einem anderen Thema: Im VC 20 gibt es einen Vektor, der jedesmal bei der Ausführung des SAVE-Befehls benutzt wird. Er steht in 818/819 und zeigt auf die SAVE-Routine des VC 20. Durch Ändern dieses Vektors kann man die Ausführung des SAVE-Befehls und damit eventuell das unerlaubte Kopieren eines Programms, verhindern. Zum Beispiel kann dieser Vektor durch POKE 818,116:POKE 819,196 auf $C474 gesetzt werden. Nach Eingabe des SAVE-Befehls erscheint dann immer direkt READY, ohne daß etwas passiert. Eine andere Möglichkeit ist, eine Fehlermeldung auszugeben. Dies geschieht durch POKE 818,53:POKE 819,196, wodurch der Zeiger auf $C435 gesetzt wird. Nach der Eingabe von SAVE erscheint »OUT OF MEMORY ERROR«.</p>
+
+<p>Doch die wirksamste Möglichkeit wird wohl die sein, das Programm durch den SAVE-Befehl zu löschen, indem man den SAVE-Vektor auf $FD22 setzt. Dies geschieht durch POKE 818,34: POKE 819,253. Nach Eingabe des SAVE-Befehls erscheint die Einschaltmeldung, und das Programm ist gelöscht.</p>
+
+<p>Leider ist es mit diesen zwei POKE-Befehlen nicht getan. Denn durch gleichzeitiges Drücken der STOP- und RESTORE-Taste werden sie sofort wieder rückgängig gemacht. Es muß also zusätzlich noch die RESTORE-Taste abgestellt werden. Das geht einfach mit POKE 37150,2. Danach hat die RESTORE-Taste keine Funktion mehr. Wenn nötig, kann sie durch POKE 37150,130 wieder eingeschaltet werden. Dieser POKE-Befehl schreibt in das Interrupt-Enable-Register des VIA 6522 # 1 des VC 20, der für den NMI zuständig ist.</p>
+
+<p>Doch nun wollen wir keine Tasten außer Betrieb setzen, sondern welche abfragen. Oft steht man vor dem Problem, mehrere Funktionen gleichzeitig zu steuern. Leider kann man in Basic immer nur eine Taste auf einmal abfragen, weitere gedrückte Tasten werden normalerweise nicht erkannt.</p>
+
+<h2>Zehn Tasten gleichzeitig abfragen</h2>
+
+<p>Aber glücklicherweise gibt es beim VC 20 eine Möglichkeit, sieben Tasten auf einmal abzufragen. Die Bits 1 bis 7 der Speicherstelle 145 entsprechen folgenden Tasten: Der linken Shift-Taste, X, V, N, ≠, ? und Cursor up/down. Die Taste ist gedrückt, wenn das entsprechende Bit gelöscht ist.</p>
+
+<p>Nun läßt sich das ganze mit der Speicherzelle 653 noch erweitern. Bit 0 entspricht den Shift-Tasten, Bit 1 der Commodore-Taste und Bit 2 der CTRL-Taste. Im Gegensatz zu den sieben anderen Tasten sind hier jedoch die entsprechenden Bits bei Tastendruck gesetzt.</p>
+
+<p>Der Computer unterscheidet übrigens zwischen der rechten und der linken Shift-Taste. Mit der Abfrage PEEK (145) AND 2 OR PEEK (653) AND 1 kann man zwischen beiden Shift-Tasten unterscheiden. Sie ergibt normalerweise 2, beim Drücken der linken Shift-Taste 1 und beim Drücken der rechten Shift-Taste 3. Shift lock entspricht der linken Shift-Taste.</p>
+
+<address class="author">(Thomas Gruber/ev)</address>

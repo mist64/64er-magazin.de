@@ -1,0 +1,141 @@
+<h1>Synthetische Steuerzeichen</h1>
+
+<p class="intro">Mit den »synthetischen Steuerzeichen« stehen Ihnen Möglichkeiten offen, die Sie bisher nicht für möglich gehalten haben. Ein neuartiger Listschutz ist dabei nur ein Teilaspekt.</p>
+
+<p>Mach dem Einschalten des VC 20 oder des C 64 und der »READY«-Meldung des Computers kann man sich nach Herzenslust auf dem Bildschirm austoben — zunächst ohne Programm. Sie können vorab Texte gestalten, Grafiken entwerfen, dabei die Farben wechseln, hier Zeichen ergänzen und da Stellen abändern. Komfortabel wird dieses Austesten der Möglichkeiten auf der »elektronischen Tafel« jedoch erst durch die Cursor-Steuertasten CLR/ HOME, INST/DEL, RVS ON/OFF sowie durch die Farbwahltasten. Man erreicht damit ein hohes Maß an Flexibilität im Ansteuern jeder beliebigen Bildschirmstelle.</p>
+
+<p>Schreibt man nun unversehens ein Anführungszeichen (engl.: quote) auf den Schirm, so verhält sich der Computer plötzlich anders: die Cursor-Tasten wirken nicht mehr — man kommt mit ihnen nicht mehr aus der Zeile heraus. Auch die Farbumschaltung mißlingt, das Bildschirmlöschen mit CLR/HOME versagt, lediglich DEL funktioniert noch. Und dies alles in voller Absicht! Warum? Statt der Ausführung der Steuerbefehle zieht es der Computer vor, sich die Anweisungen in Form reverser Steuerzeichen zu »merken«. Wozu? Nun, um Steuerbefehle dieser Art programmierbar zu machen. (Man stelle sich nur einmal vor, der Cursor sei nicht per Software steuerbar. Verfolgen wir diesen Gedanken lieber nicht weiter.) Zurück zum Thema: Nach dem ersten Anführungszeichen befindet sich der Computer offenbar in einem anderen Verarbeitungsmodus, genannt Quote-Modus, in dem er (mit Ausnahme von DEL) alle Steuerbefehle als Reverszeichen »speichert« und damit zur späteren Ausführung bereitstellt. Der Quote-Modus wird verlassen, sobald das zweite Anführungszeichen eingetippt oder die RETURN-Taste betätigt wird. Da die Steuerzeichen — eingeschachtelt in Gänsefüßchen — vom Computer wie Texte behandelt werden, können sie in Programmen auch als solche verarbeitet werden. Dazu stehen alle Stringoperationen zur Verfügung, die auch bei »normalen« Texten verwendet werden. Wirkung zeigen Steuerzeichen jedoch erst dann, wenn man sie mittels PRINT aktiviert. Fazit: Ein Basic-Listing kann normalerweise keine reversen Zeichen enthalten — es sei denn, es handelt sich um Steuerzeichen in Strings.</p>
+
+<h2>Steuerbefehle ohne »Gänsefüßchen«</h2>
+
+<p>Wir haben uns als Commodore-Anwender sicherlich schon längst an das reverse Q für CURSOR UP oder an das Herzchen für CLR/HOME gewöhnt. Doch es geht auch anders. Das muß es auch, wenn der Drucker zum Beispiel keine Steuerzeichen ausgeben kann. In diesem Fall bedient man sich der CHR$-Funktion, die durch die Befehlsfolge</p>
+
+<pre>
+PRINT CHR$(X)
+</pre>
+
+
+<p>aktiviert wird. Mit X = 147 wird beispielsweise ebenfalls der Bildschirm gelöscht. Wie kommt das? Tippen Sie bitte ein:</p>
+
+<pre>
+PRINT ASC(”{CLR/HOME}”)
+</pre>
+
+
+<p>Bitte tippen Sie die Ausdrücke, die in den geschweiften Klammern stehen, nicht als Buchstabenfolge ein, sondern zum Beispiel für PRINT ASC (&ldquo;{CLR/ HOME}”) nach dem ersten Gänsefüßchen die Control-Taste und dann gleichzeitig die CLR/HOME-Taste. Verfahren Sie bei den folgenden Beispielen dementsprechend.</p>
+
+<p>Nach erfolgtem RETURN lesen Sie: 147. Das reverse Herzchen wird vom Computer also als Zeichen interpretiert, das den ASCII- beziehungsweise CHR$-Code 147 trägt. Ein weiteres Beispiel: Die Zeilen</p>
+
+<pre>
+PRINT "{/RV ON}TEST"</pre>
+
+
+<p>und</p>
+
+<pre>
+PRINT CHR$(18)”TEST”
+</pre>
+
+
+<p>bewirken dasselbe, weil</p>
+
+<pre>PRINT ASC(”{CTRL RVS ON}”)
+</pre>
+
+
+<p>zeigt, daß der CHR$-Code des reversen R eben 18 ist.</p>
+
+<p>Ausgehend von der Tatsache, daß jedem Steuerzeichen ein bestimmter Code in der CHR$-Liste (siehe Handbuch) zugeordnet ist, wurde die Idee geboren, daß diese Zuordnung — um es mathematisch auszudrücken — umkehrbar eindeutig sein müsse. Das heißt, zu jedem Steuerbefehl müßte auch ein entsprechendes reverses Steuerzeichen gehören, das denselben Zweck erfüllt.</p>
+
+<p>Nun gibt es zum Beispiel die Möglichkeit, über PRINT CHR$(14) auf Kleinbuchstaben umzuschalten. Gibt es dafür auch ein Steuerzeichen? Auf konventionellem Weg hieße die Antwort klipp und klar: nein. Aber&hellip;</p>
+
+<p>Zu Beginn war alles nur Spielerei, bis sich die erstaunlichen Möglichkeiten und Anwendungen häuften. Deshalb: spielen Sie nun bitte mit!</p>
+
+<h2>Steuerzeichen auf illegalem Weg</h2>
+
+<p>Bevor wir das große Geheimnis lüften, wollen wir erst einmal an ganz und gar legalen Steuerzeichen üben, wie man sie illegal eingibt. Halten Sie sich bitte zunächst streng an das angegebene Rezept, auch wenn es noch andere Eingabeformen gibt. Das gilt auch für die späteren Beispiele. Unsere erste Übung soll darin bestehen, den Bildschirm ohne CHR$(147) und ohne die Taste CLR/HOME zu löschen — im Direktmodus, versteht sich. Dazu geben Sie bitte hintereinander in einer Zeile ein:<br><br/>
+1. Schritt:</p>
+
+<p>PRINT<br><br/>
+2. Schritt:</p>
+
+<p>Erstes Anführungszeichen setzen. Jetzt befinden wir uns im Quote-Modus, den wir sofort wieder verlassen wollen. Daher:<br><br/>
+3. Schritt:</p>
+
+<p>Zweites Anführungszeichen setzen.<br><br/>
+4. Schritt:</p>
+
+<p>Mit DEL eine Stelle zurückgehen. Dabei wird das zweite Anführungszeichen gelöscht. Da wir uns nicht mehr im Quote-Modus befinden, reagiert der Computer auf Steuerbefehle.<br><br/>
+5. Schritt:</p>
+
+<p>Mit CTRL RVS ON auf Revers-Modus schalten. Das ist notwendig, da wir ja ein reverses Steuerzeichen quasi künstlich erzeugen wollen!<br><br/>
+6. Schritt:</p>
+
+<p>SHIFT S eingeben. Beim geSHIFTeten S bekommen wir eines der S-Taste zugeordneten Grafikzeichen, in diesem Fall das gewünschte Herzchen. Nun verlassen wir den Revers-Modus:<br><br/>
+7. Schritt:</p>
+
+<p>CTRL RVS OFF. Wenn Sie wollen, können Sie noch ein Anführungszeichen zur optischen Abrundung anhängen.</p>
+
+<p>Was jetzt auf dem Bildschirm steht, sieht so aus, als hätten wir nie den legalen Pfad verlassen, als hätten wir immer mit der CLR/HOME-Taste gearbeitet. Dieses Steuerzeichen ist jedoch künstlich entstanden — wird es auch wirken wie ein »echtes«? Das Drücken der RETURN-Taste überzeugt uns schnell davon, daß der Computer uns diese umständliche Manipulation nicht übel genommen hat: es funktioniert tatsächlich!</p>
+
+<p>Bedenken Sie bei der Eingabe, daß nur zwei Anführungszeichen auf dem Schirm erscheinen, obwohl insgesamt drei eingegeben wurden. Der Computer befindet sich also nach dem dritten Gänsefüßchen wieder im Quote-Modus.</p>
+
+<p>An der Stelle, an der soeben mit SHIFT S das Steuerzeichen für CLR/HOME generiert wurde, kann nun jedes beliebige reverse Zeichen erzeugt werden. Diejenigen davon, die auch eine Steuerfunktion ausüben, aber nicht auf normalem Wege über direkte Tastendrücke erzeugt werden können, wollen wir im folgenden »synthetische Steuerzeichen« nennen.</p>
+
+<h2>Die Synthetischen kommen</h2>
+
+<p>Wenn es — und das war die Frage, die alles ins Rollen brachte — anstelle der Umschaltung auf Kleinbuchstaben mit CHR$(14) ein äquivalentes Steuerzeichen gibt, dann muß es zwischem dem reversen E für WHT (Code 5) und dem reversen Q für CURSOR DOWN (Code 17) zu suchen sein. Numeriert man das Alphabet entsprechend durch, so findet man den Buchstaben N unter der Codezahl 14. Das reverse N müßte demnach das Steuerzeichen für die Umschaltung auf Kleinbuchstaben sein. Probieren wir es aus:</p>
+
+<pre>
+? ” ” DEL RVS ON
+N RVS OFF  RETURN
+</pre>
+
+
+<p>Es klappt! Der Computer schluckt diesen ungewöhnlichen Befehl und führt ihn aus.</p>
+
+<p>Dieser Erfolg motivierte eine Suche nach allen verfügbaren synthetischen Steuerzeichen; die Ausbeute fiel jedoch zunächst recht mager aus. Die nachfolgende Tabelle zeigt Ihnen die synthetischen Zeichen und ihre Wirkungen bei Bildschirmausgaben (beim Drucker sieht’s etwas anders aus — dazu aber später mehr).</p>
+
+<p>Es sei nochmals darauf hingewiesen, daß die Zeichen dieser Tabelle als reverse Zeichen nach obigem Verfahren erzeugt werden müssen (Ausnahmen: T für DEL und SHIFT T für INS können auch direkt erzeugt werden; sie sind im eigentlichen Sinn keine synthetischen Steuerzeichen.)</p>
+
+<p>Auch wenn die Eingabe der synthetischen Steuerzeichen umständlich erscheint, man wird sich schnell daran gewöhnt haben und auf ihre Vorteile nicht mehr verzichten wollen — nicht nur, weil sie gegenüber der CHR$-Funktion Speicherplatz sparen.</p>
+
+<p>So unscheinbar und unwichtig das SHIFT RETURN ist, so gewaltig sind die Möglichkeiten, die uns das zugehörige synthetische Steuerzeichen eröffnet. Es handelt sich um das reverse, geshiftete M (Code 141).</p>
+
+<h2>Das Super-Steuerzeichen</h2>
+
+<p>Gibt man ? ” ”{DEL}(TEST {CTRL RVS ON} {SHIFT M} {CTRL RVS OFF}LAUF” ein, so zeigt sich nach dem Drücken der RETURN-Taste, daß der Computer nach dem Teilstring »TEST« einen Wagenrücklauf (carriage return) mit Zeilenvorschub (line feed) durchführt und »LAUF« direkt darunter ausgibt. Genau dieses Verhalten erwartet man von SHIFT RETURN. {SHIFT M} kann jedoch mehr — viel mehr! Das nächste Beispiel soll es beweisen:</p>
+
+<pre>
+10 ? ””{DEL} TEST {CRTL RVS ON} {SHIFT M} R {CRTL RVS OFF} LAUF”
+</pre>
+
+
+<p>Geben Sie bitte dieses einzeilige Programm ein und starten Sie es. Wie erwartet erscheint »TEST« und darunter revers »LAUF«. Nun listen Sie bitte dieses Programm. Erstaunt? Das ist tatsächlich neu! Das Steuerzeichen für die Umschaltung in den Revers-Modus erscheint nicht im Listing, sondern wird entgegen aller bisherigen Kenntnisse ausgeführt. »LAUF« wird im Listing revers ausgegeben. Durch das SHIFT-RETURN-Zeichen wird der Basic-Interpreter offenbar veranlaßt, nachgestellte Steuerzeichen auch im Listing wirksam werden zu lassen. Es zeigt sich, daß diese Schlüsselfunktion alle Steuerbefehle, seien es Farbumschaltungen oder Cursor-Bewegungen, aktiviert. Ungeahnte Möglichkeiten eröffnen sich nun zur optischen Aufbereitung, das heißt Strukturierung und Gestaltung von Listings auf dem Bildschirm. Einige Beispiele sollen dies verdeutlichen.</p>
+
+<h3>Beispiel 1:</h3>
+
+<p>Reverse REM-Zeile ohne sichtbares REM-Statement und ohne Zeilennummer</p>
+
+<pre>
+10 REM ” ”{DEL} {CRTL RVS ON} {SHIFT M} {SHIFT Q} R {CRTL RVS OFF} TESTLAUF
+20 FORI=1 TO 10
+30 PRINT”TESTLAUF”:NEXT
+</pre>
+
+
+<p>Die Zeilen 20 und 30 sind Beiwerk, damit die REM-Zeile nicht so allein dasteht. Listen Sie das Programm bitte. Sie sehen die reverse Überschrift »TESTLAUF« ohne REM und ohne Zeilennummer und darunter wie gewohnt die Programmzeilen 20 und 30. Wie funktioniert dieser Trick? Das reverse {SHIFT M} bewirkt einen Sprung zum Anfang der nächsten Zeile und gibt die nachfolgenden Steuerzeichen zur Ausführung frei. Mit dem reversen {SHIFT Q} geht der Cursor eine Zeile nach oben, also auf »1« der Zeilennummer 10. Reverses R schaltet auf reverse Zeichen um, in denen dann der REM-Text »TESTLAUF« ausgegeben wird. Dabei überschreibt der Computer die Zeilennummer sowie das REM-Statement. Das alles vollzieht sich so schnell, daß es sich der Beobachtung entzieht. Der Anwender sieht nur noch die reverse Überschrift und kann demzufolge an dieser Zeile auch nichts mehr ändern.</p>
+
+<p>Sollten Sie die Original-REM-Zeile noch auf dem Bildschirm haben, so hängen Sie an das »F« von »TESTLAUF« noch das Steuerzeichen für CURSOR DOWN an. Sie werden sehen, daß beim Listen sogar eine Leerzeile zwischen Überschrift und Programm entsteht. Selbstverständlich können derartige REM-Zeilen beliebig im Programm verstreut sein. Wirkung: Im Programmlauf werden unter der reversen Überschrift »Quadratzahlen« die Ergebnisse ausgegeben, während beim Listen des Programms der PRINT-Befehl verschwiegen wird und man eine REM-Zeile wie in Beispiel 1 vermutet. Damit trägt eine PRINT-Zeile zur optischen Strukturierung eines Listings bei — ein Effekt, der bislang in dieser Form unmöglich schien.</p>
+
+<p>Beispiel 2. Farbige REM-Zeile (ändern Sie nur Zeile 10).</p>
+
+<p>Beispiel 3. Wirkung: Grüne Überschrift ohne Zeilennummer und ohne REM, gelbes Listing.</p>
+
+<p>Beispiel 4. Wirkung: Die bekannten Herzchen sorgen nach dem Listen jeder Zeile für ein Löschen des Bildschirms, so daß die beiden Programmzeilen weder einzeln noch insgesamt sichtbar bleiben und die Codezahlen A und B dem Anwender vorenthalten werden.</p>
+
+<p>Mit diesen Beispielen sollen Sie, die Leser vom 64’er, nun an Ihre Computer entlassen werden. Sie werden sicherlich Spaß an der Vielseitigkeit dieser neuen Methode gewinnen und eine Vielzahl von Anwendungen austüfteln.</p>
+
+<p>In der nächsten Folge erfahren Sie dann alles über synthetische Steuerzeichen für den Drucker.</p>
+
+<address class="author">(Jürgen Wagner)</address>
