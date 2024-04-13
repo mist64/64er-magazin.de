@@ -2,7 +2,7 @@
 <html lang="de">
 
 <head>
-    <title>XXX</title>
+    <title>Koppling zwischen zwei VC 20</title>
     <meta charset="UTF-8">
     <link rel="stylesheet" href="../style.css">
     <meta name="author" content="XXX">
@@ -22,27 +22,27 @@
 
         <p>Über Port B kann ein 8 Bit breites Wort ausgegeben beziehungsweise eingelesen werden. Die Kontrolle des Ports erfolgt über den Baustein 6522, der unter anderem die Richtung des Datenflusses mit Hilfe des Datenrichtungsregisters (37138) festlegt. Nach dem Einschalten des Computers sind alle Leitungen von Port B Eingänge.</p>
 
-        <p>Beim Ausgeben soll der Computer an die Pins C bis L (mit den Bezeichnungen PB 0 bis PB 7) eine logische 1 (entspricht +5 Volt) beziehungsweise eine Null (0 Volt) legen. Dazu sind zwei Schritte notwendig:<br><br />
-            a) Der ganze Port beziehungsweise einzelne Leitungen von ihm müssen als Ausgänge programmiert werden. Der entsprechende Basic-Befehl heißt POKE 37138,X.<br><br />
-            X = 1 : PB 0 ist Ausgang<br><br />
-            X = 2 : PB 1 ist Ausgang<br><br />
-            X = 4 : PB 2 ist Ausgang (und so weiter bis X = 128)<br><br />
-            X = 3 : PB 0 und PB 1 sind Ausgänge<br><br />
+        <p>Beim Ausgeben soll der Computer an die Pins C bis L (mit den Bezeichnungen PB 0 bis PB 7) eine logische 1 (entspricht +5 Volt) beziehungsweise eine Null (0 Volt) legen. Dazu sind zwei Schritte notwendig:<br><br>
+            a) Der ganze Port beziehungsweise einzelne Leitungen von ihm müssen als Ausgänge programmiert werden. Der entsprechende Basic-Befehl heißt POKE 37138,X.<br><br>
+            X = 1 : PB 0 ist Ausgang<br><br>
+            X = 2 : PB 1 ist Ausgang<br><br>
+            X = 4 : PB 2 ist Ausgang (und so weiter bis X = 128)<br><br>
+            X = 3 : PB 0 und PB 1 sind Ausgänge<br><br>
             X = 5 : PB 0 und PB 2 sind Ausgänge (und so weiter bis X = 255).</p>
 
-        <p>b) Auf die als Ausgänge vorprogrammierten Leitungen wird 1 beziehungsweise 0 gegeben. Der entsprechende Befehl heißt POKE 37136,Y.<br><br />
-            Y = 0 : auf allen Leitungen liegt 0.<br><br />
-            Y = 1 : nur auf PB 0 liegt 1<br><br />
-            Y = 2 : nur auf PB 1 liegt 1<br><br />
-            Y = 4 : nur auf PB 2 liegt 1 (und so weiter bis Y = 128)<br><br />
+        <p>b) Auf die als Ausgänge vorprogrammierten Leitungen wird 1 beziehungsweise 0 gegeben. Der entsprechende Befehl heißt POKE 37136,Y.<br><br>
+            Y = 0 : auf allen Leitungen liegt 0.<br><br>
+            Y = 1 : nur auf PB 0 liegt 1<br><br>
+            Y = 2 : nur auf PB 1 liegt 1<br><br>
+            Y = 4 : nur auf PB 2 liegt 1 (und so weiter bis Y = 128)<br><br>
             Y = 3 : auf PB 0 und PB 1 liegt 1 (und so weiter bis Y = 255).</p>
 
-        <p>Auch das Einlesen von Port B erfolgt in zwei Schritten:<br><br />
-            a) Es muß darauf geachtet werden, daß die anzusprechenden Leitungen nicht als Ausgänge geschaltet sind. Der entsprechende Befehl heißt ebenfalls POKE 37138,X. Für X ist jedoch die zu 255 komplementäre Binärzahl einzusetzen:<br><br />
-            X = 255 : keine Leitung ist Eingang (das heißt alle sind Ausgänge)<br><br />
-            X = 254 : nur PB 0 ist Eingang<br><br />
-            X = 240 : PB 0 &hellip; PB 3 sind Eingänge (Rest Ausgänge)<br><br />
-            X = 15 : PB 4 &hellip; PB 7 sind Eingänge X = 0: alle Leitungen sind Eingänge.<br><br />
+        <p>Auch das Einlesen von Port B erfolgt in zwei Schritten:<br><br>
+            a) Es muß darauf geachtet werden, daß die anzusprechenden Leitungen nicht als Ausgänge geschaltet sind. Der entsprechende Befehl heißt ebenfalls POKE 37138,X. Für X ist jedoch die zu 255 komplementäre Binärzahl einzusetzen:<br><br>
+            X = 255 : keine Leitung ist Eingang (das heißt alle sind Ausgänge)<br><br>
+            X = 254 : nur PB 0 ist Eingang<br><br>
+            X = 240 : PB 0 &hellip; PB 3 sind Eingänge (Rest Ausgänge)<br><br>
+            X = 15 : PB 4 &hellip; PB 7 sind Eingänge X = 0: alle Leitungen sind Eingänge.<br><br>
             b) Das gesamte angelegte Wort (einschließlich eventuell ausgegebener Einsen) wird eingelesen. Der entsprechende Basic-Befehl heißt PEEK (37136). Dies ergibt Zahlenwerte zwischen 0 und 255. Der Wert 255 bedeutet, daß an allen acht Pins eine logische 1, das heißt + 5 V liegt. Sollen einzelne Leitungen abgefragt werden, so gewinnt man ihre Werte durch logischen Vergleich, den man am besten in einem Unterprogramm durchführt:</p>
 
         <pre>
@@ -81,9 +81,9 @@
 
         <p>Will man statt der beschriebenen Ein-/Ausgabeplatinen einen zweiten Computer verwenden, so muß er mit einer neunadrigen Leitung (für 8 Bit und GND) angeschlossen werden. Mit Rücksicht auf das später zu beschreibende Spiel sind im folgenden vier Leitungen für die eine Datenrichtung, die vier anderen für die umgekehrte Richtung vorgesehen. Außerdem sind die Leitungen untereinander gekreuzt (das heißt Bit 1 von Computer A ist verbunden mit Bit 8 vom Computer B). Dies erlaubt es später, für das Computerspiel in beiden Computern das exakt gleiche Programm verwenden zu können.</p>
 
-        <p>Die komplette Verbindung zeigt Bild 4. Es werden die gleichen Stecker und Leitungen wie oben benutzt. Für Testzwecke kann das Programm von Listing 2 benützt wer-<br />
-            den, wenn wechselweise der Programmteil Einlesen beziehungsweise Ausgeben gewählt wird. Es kann jedoch auch (nach POKE 37138, X mit POKE 37136, X ausgegeben und mit PRINT PEEK (37136) im Direktmode gearbeitet werden.<br />
-            Knobelspiel Schere/Stein/Papier<br />
+        <p>Die komplette Verbindung zeigt Bild 4. Es werden die gleichen Stecker und Leitungen wie oben benutzt. Für Testzwecke kann das Programm von Listing 2 benützt wer-<br>
+            den, wenn wechselweise der Programmteil Einlesen beziehungsweise Ausgeben gewählt wird. Es kann jedoch auch (nach POKE 37138, X mit POKE 37136, X ausgegeben und mit PRINT PEEK (37136) im Direktmode gearbeitet werden.<br>
+            Knobelspiel Schere/Stein/Papier<br>
             Das Spiel, das zwischen zwei Spielern über zwei miteinander verkoppelte Computer gespielt wird, soll neben seinem Unterhaltungswert den Datenaustausch zwischen zwei Computern zeigen. Weiterhin zeigt es das Arbeiten mit dem logischen Befehlen AND und OR.</p>
 
         <p>Üblicherweise wird das Knobelspiel nach folgenden Regeln gespielt: Die beiden Spielpartner zeigen auf Kommando zwei ausgestreckte Finger, bedeutet Schere, oder die flache Hand (Papier), oder die geballte Faust (Stein). Es gewinnt Schere gegen Papier (die Schere schneidet das Papier), Stein gegen Schere (der Stein schleift die Schere) und Papier gegen Stein (das Papier hüllt den Stein ein). Damit sind Sieg, Unentschieden und Niederlagen möglich. Gesamtsieger ist, wer zuerst drei Einzelspiele gewonnen hat.</p>
