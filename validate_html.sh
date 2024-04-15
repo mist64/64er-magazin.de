@@ -4,7 +4,7 @@
 
 
 DIRECTORY_PATH="out"
-REGEXP=".*(Trailing.slash|character.in.path.segment..space.is.not.allowed|Consider.adding.a..lang.|Consider.using.the..h1..element.as.a.top.level.heading.only).*"
+REGEXP=".*(Trailing.slash|Consider.adding.a..lang.|Consider.using.the..h1..element.as.a.top.level.heading.only).*"
 
 # show info/warnings and errors
 PARAMS='--format gnu --asciiquotes '$DIRECTORY_PATH

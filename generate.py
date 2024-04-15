@@ -12,6 +12,7 @@ import subprocess
 import http.server
 import socketserver
 import hashlib
+import urllib.parse
 from collections import defaultdict
 from bs4 import BeautifulSoup, NavigableString
 from urllib.parse import quote
@@ -345,7 +346,8 @@ class ArticleDatabase:
                 tag.string = listing
 
                 if not any(item[0] == data_name for item in downloads): # duplicates
-                    downloads.append((data_name, f"prg/{data_filename}.prg"))
+                    data_filename_escaped = urllib.parse.quote(data_filename)
+                    downloads.append((data_name, f"prg/{data_filename_escaped}.prg"))
         metadata['downloads'] = downloads
 
         # and make a "downloads" aside
