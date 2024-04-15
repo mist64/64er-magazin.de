@@ -596,12 +596,13 @@ def html_generate_title_image(db, issue_key, width, prepend_issue_dir=False):
     issue_dir = issue_data['issue_dir_name'] if prepend_issue_dir else None
     if issue_dir:
         title_jpg_path = os.path.join(issue_dir, title_jpg_path)
-    return f"<img src=\"{title_jpg_path}\" width=\"{width}\" alt='{MAGAZINE_NAME} {issue_key}>\n"
+    return f"<img src=\"{title_jpg_path}\" width=\"{width}\" alt=\"{MAGAZINE_NAME} {issue_key}\">\n"
 
 
 def html_generate_toc(db, issue_key, heading_level=1, prepend_issue_dir=False):
     html_parts = []
-    html_parts.append(f"<main>\n")
+    if heading_level == 1:
+        html_parts.append(f"<main>\n")
     html_parts.append(f"<h{heading_level}>{LABEL_ISSUE} {issue_key}</h{heading_level}>\n")
     pdf_filename = db.issues[issue_key]['pdf_filename']
     issue_data = db.issues[issue_key]
@@ -613,12 +614,10 @@ def html_generate_toc(db, issue_key, heading_level=1, prepend_issue_dir=False):
 <div class="download_full_pdf">
     <a href="{pdf_filename}">
         {title_image}
-        <p>
-            <div class=\"download_full_pdf_button\">
-                <img src="/{BASE_DIR}pdf.svg" alt="PDF">
-                {LABEL_DOWNLOAD_ISSUE_PDF}
-            </div>
-        </p>
+        <div class=\"download_full_pdf_button\">
+            <img src="/{BASE_DIR}pdf.svg" alt="PDF">
+            {LABEL_DOWNLOAD_ISSUE_PDF}
+        </div>
     </a>
 </div>\n
 """
@@ -642,7 +641,9 @@ def html_generate_toc(db, issue_key, heading_level=1, prepend_issue_dir=False):
               link = article_link(db, article, toc_title(article), prepend_issue_dir)
               html_parts.append(f"<li>{link}</li>\n")
           html_parts.append("</ul>\n")
-    html_parts.append(f"</main>\n")
+
+    if heading_level == 1:
+        html_parts.append(f"</main>\n")
     return ''.join(html_parts)
 
 ### HTML file content creation
@@ -830,7 +831,7 @@ def write_full_html_file(db, path, title, preview_img, body_html, body_class, co
       data-isso-lang="{LANG}"
       src="/isso/js/embed.min.js"
     ></script>
-    <link rel="stylesheet" href="/isso/css/isso.css" />
+    <link rel="stylesheet" href="/isso/css/isso.css">
 """
       isso_html2 = f"""
       <div class="comments">
@@ -864,8 +865,8 @@ def write_full_html_file(db, path, title, preview_img, body_html, body_class, co
 <html lang="{LANG}">
 <head>
     <meta charset="UTF-8">
-    <meta property="og:title" content="{title}" />
-    <meta property="og:image" content="{preview_img}" />
+    <meta property="og:title" content="{title}">
+    <meta property="og:image" content="{preview_img}">
     <title>{title}</title>
 
     {fav_icon_html}
@@ -1037,7 +1038,7 @@ def generate_rss_feed(db, out_directory):
         img_src = article['img_urls'][0] if article['img_urls'] else None
         if img_src:
             img_src = full_url(os.path.join(issue_data['issue_dir_name'], img_src))
-            img = f"<img src='{img_src}'/><br/>"
+            img = f"<img src='{img_src}'><br>"
             if description:
                 description = img + description
             else:
