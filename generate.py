@@ -273,9 +273,14 @@ def avif_picture_tag(soup, img_src, attrs=None):
     if attrs:
         for attr, value in attrs.items():
             new_img_tag[attr] = value
+
+    # add an empty alt for now if there is none
+    if 'alt' not in new_img_tag.attrs:
+        new_img_tag['alt'] = ""
+    
     # Update the src attribute to the JPEG version
     new_img_tag['src'] = img_src[:-4] + '.jpg'
-
+    
     # Append the new <img> tag to the <picture> tag
     picture_tag.append(new_img_tag)
 
@@ -571,7 +576,7 @@ def html_generate_latest_issue(db):
 <h2>{LABEL_CURRENT_ISSUE}</h2>\n
 <hr>
 <a href="{issue_dir_name}">
-    <img src="{latest_title_image}">
+    <img src="{latest_title_image}" alt="">
 </a>
 <p class="current_issue_download">Ausgabe {latest_issue_key}</p>\n
 <p><a href="{issue_dir_name}" class="download_button">{LABEL_DOWNLOAD}</a></p>'''
