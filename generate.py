@@ -632,7 +632,8 @@ def html_generate_toc(db, issue_key, heading_level=1, prepend_issue_dir=False):
         if len(entry['articles']):
           category, subcategory = (entry['category'].split('|', 1) + [None])[:2] if '|' in entry['category'] else (entry['category'], None)
           if category != last_category:
-              html_parts.append(f"<h3>{category}</h3>\n")
+              if category != "":
+                  html_parts.append(f"<h3>{category}</h3>\n")
               last_category = category
           if subcategory:
               html_parts.append(f"<h4>{subcategory}</h4>\n")
