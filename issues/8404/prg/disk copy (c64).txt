@@ -1,0 +1,95 @@
+
+
+;disk copy (c64).prg ==0801==
+  100 rem *** initialisierung ***
+  110 poke56,peek(46)+14:clr:rb=255-peek(56):pa=1:an=0:bl=0:nf$=""
+  120 pe=peek(45)+256*peek(46):mr=pe-135:mw=pe-79:md=pe-24
+  130 dimnf$(140),cf%(140),bl%(140),p%(10),al%(90),ah%(90)
+  140 p%(0)=0:al%(0)=0:ah%(0)=peek(56)-1
+  150 :
+  160 rem *** menue ***
+  170 print"{clr}{down}"tab(9)"***** disk copy *****":printtab(10)"von d.weineck 2/84"
+  180 print"{down}{down}{down}{down}{rght}{rght}1.  directory
+  190 print"{down}{rght}{rght}2.  kopieren
+  200 print"{down}{rght}{rght}3.  formatieren
+  210 print"{down}{rght}{rght}4.  ende
+  220 printspc(212)"{rvon}bitte waehlen sie
+  230 getdc$:dc=val(dc$):ifdc<1ordc>4then230
+  240 ondcgoto910,270,700,670
+  250 :
+  260 rem *** kopieren ***
+  270 print"{clr}{down}{rvon}originaldiskette einlegen"
+  280 gosub990
+  290 rem *** files einlesen ***
+  300 open1,8,0,"$0"
+  310 gosub760:ifnf$<>""then340
+  320 ifst=0then310
+  330 goto350
+  340 bl%(an)=asc(bl$+chr$(0)):nf$(an)=nf$:ifst=0thenan=an+1:nf$="":goto310
+  350 close1:an=an-1:ifan=0thenprint"{down}{down}{rvon}leere diskette{rvof}":gosub990:run
+  360 rem *** kopierauswahl ***
+  370 print"{clr}{down}antworten sie mit j/n{down}"
+  380 fori=1toan:printbl%(i);tab(5)nf$(i)" ? ";:poke198,0
+  390 wait198,1:geta$:ifa$="j"thencf%(i)=-1:bl=bl+bl%(i):printtab(30)"{rvon} ja {rvof}":goto420
+  400 cf%(i)=0:ifa$<>"n"then390
+  410 printtab(30)"nein"
+  420 ifbl>rbthenp%(pa)=i-1:pa=pa+1:bl=bl%(i)
+  430 nexti:p%(pa)=an
+  440 ifbl=0then640
+  450 rem *** kopie ***
+  460 print"{clr}{rvon}kopie in arbeit{down}"
+  470 fori=1topa
+  480 forrw=0to1:nr=0:ifrw=1thenprint"{rvon}{down}zieldisk einlegen":gosub990
+  490 forj=p%(i-1)+1top%(i)
+  500 ifnotcf%(j)thennextj:goto540
+  510 nf$=nf$(j):printbl%(j);tab(5)nf$:gosub570:ifst=0orst=64then530
+  520 gosub880:run
+  530 nextj
+  540 nextrw:ifi=pathen640
+  550 print"{rvon}{down}originaldisk einlegen":gosub990
+  560 nexti:run
+  570 ifrw=1then610
+  580 open1,8,5,nf$+",r":poke252,0:poke253,ah%(nr)+1
+  590 sysmr:nr=nr+1:al%(nr)=peek(254):ah%(nr)=peek(255)
+  600 close1:return
+  610 open1,8,5,nf$+",w":poke252,0:poke253,ah%(nr)+1
+  620 poke254,al%(nr+1):poke255,ah%(nr+1):sysmw
+  630 nr=nr+1:close1:return
+  640 print"{down}{down}{down}{rvon}kopie fertig !
+  650 gosub990:run
+  660 rem *** ende ***
+  670 poke56,160:end
+  680 :
+  690 rem *** formatieren ***
+  700 input"{clr}{down}{down}{down}diskname";fo$:id$="":input"{down}disk-id";id$:ifid$<>""thenid$=","+id$
+  710 fo$=fo$+id$
+  720 print"{down}{rvon}bitte zieldiskette einlegen"
+  730 gosub990
+  740 open1,8,15,"n:"+fo$:close1
+  750 gosub880:goto170
+  760 rem directory einlesen
+  770 get#1,a$,b$
+  780 get#1,bl$,b$
+  790 get#1,a$
+  800 get#1,b$:ifst<>0thenreturn
+  810 ifb$<>chr$(34)then800
+  820 get#1,b$:ifb$<>chr$(34)thennf$=nf$+b$:goto820
+  830 get#1,b$:ifb$=chr$(32)then830
+  840 nf$=nf$+","+b$:fori=0to1:get#1,b$:nf$=nf$+b$:next
+  850 get#1,b$:ifb$<>""then850
+  860 return
+  870 rem *** fehler-ausgabe ***
+  880 open15,8,15:input#15,a,b$,c,d:printa;b$;c;d:close15:gosub990:return
+  890 :
+  900 rem *** directory ***
+  910 print"{clr}"
+  920 open3,8,0,"$0":get#3,a$,a$
+  930 get#3,a$,a$,bl$,bh$
+  940 ifa$=""thenclose3:goto980
+  950 bl$=bl$+chr$(0):bh$=bh$+chr$(0)
+  960 print256*asc(bh$)+asc(bl$);
+  970 sysmd:goto930
+  980 gosub 990:goto170
+  990 printspc(69)"{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}":printspc(29)"{rvon}*taste*{rvof}"
+ 1000 poke198,0:wait198,1:geta$:return
+
