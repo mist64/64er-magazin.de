@@ -1,0 +1,293 @@
+
+
+;invaders.prg ==0801==
+;version=simons
+ 1000 rem*******************************
+ 1010 rem***     i n v a d e r s     ***
+ 1020 rem***                         ***
+ 1030 rem***    fuer c 64 + 1541     ***
+ 1040 rem***                         ***
+ 1050 rem***   (c) m.friese 1983     ***
+ 1060 rem*******************************
+ 1070 :
+ 1080 :
+ 1090 rem  "{down}" = cursor down
+ 1100 rem  "{clr}" = clear home
+ 1110 rem  "{home}" = home
+ 1120 rem  "{rvon}" = revers on
+ 1130 rem  "{rvof}" = revers off
+ 1140 :
+ 1150 :
+ 1160 rem*******************************
+ 1170 rem*** computer initialisieren ***
+ 1180 rem*******************************
+ 1190 :
+ 1200 poke56,124:clr:poke785,0:poke786,124:poke53281,0:printchr$(5)
+ 1210 for  index=0 to 910
+ 1220 :    read wert:poke31744+index,wert
+ 1230 :    summe=summe+wert
+ 1240 next index
+ 1250 if summe<>104201 then print"daten fehler !":end
+ 1260 exec read table
+ 1270 exec def figure
+ 1280 :
+ 1290 rem*******************************
+ 1300 rem***      hauptprogramm      ***
+ 1310 rem*******************************
+ 1320 :
+ 1330 exec text
+ 1340 proc neu
+ 1350 punkte=0:attack=1
+ 1360 proc start
+ 1370 print"{clr}"
+ 1380 for zeile=2 to 12 step2
+ 1390 :   for spalte=0 to 20 step2
+ 1400 :       fill zeile+attack-1,spalte,1,1,64+int((zeile-1)/4)*2,1
+ 1410 :   next spalte
+ 1420 next zeile
+ 1430 fcol0,0,40,25,1
+ 1440 treffer=usr(0):if treffer=66 then call ueberlebt
+ 1450 punkte=punkte+treffer*10^attack
+ 1460 call tot
+ 1470 :
+ 1480 :
+ 1490 :
+ 1500 proc ueberlebt
+ 1510 print"{clr}{down}{down}{down}      angriff";attack;"beendet{down}{down}{down}"
+ 1520 punkte=punkte+1234*10^(attack-1)
+ 1530 print"sie haben";punkte;"punkte"
+ 1540 pause "{down}{down}{down}weiter mit <return> ",9999
+ 1550 attack=attack+1:call start
+ 1560 :
+ 1570 :
+ 1580 :
+ 1590 proc def figure
+ 1600 :
+ 1610 rem*******************************
+ 1620 rem*** definiert alle im       ***
+ 1630 rem*** programm verwendeten    ***
+ 1640 rem*** symbole (basis,invader, ***
+ 1650 rem*** explosion,schuss,bombe) ***
+ 1660 rem*******************************
+ 1670 :
+ 1680 mem:design2,$e000+8*64:rem invader 1a
+ 1690 @...bb...
+ 1700 @..bbbb..
+ 1710 @.bbbbbb.
+ 1720 @bbbbbbbb
+ 1730 @.bbbbbb.
+ 1740 @..b..b..
+ 1750 @.b....b.
+ 1760 @b......b
+ 1770 design2,$e000+8*65   :rem invader 1b
+ 1780 @...bb...
+ 1790 @..b..b..
+ 1800 @.b....b.
+ 1810 @b......b
+ 1820 @.bbbbbb.
+ 1830 @..b..b..
+ 1840 @..b..b..
+ 1850 @.b....b.
+ 1860 design2,$e000+8*66   :rem invader 2a
+ 1870 @........
+ 1880 @bbbbbbbb
+ 1890 @b.bbbb.b
+ 1900 @bbbbbbbb
+ 1910 @bb....bb
+ 1920 @b.bbbb.b
+ 1930 @bbbbbbbb
+ 1940 @........
+ 1950 design2,$e000+8*67   :rem invader 2b
+ 1960 @........
+ 1970 @bbbbbbbb
+ 1980 @b.bbbb.b
+ 1990 @bbb..bbb
+ 2000 @bbbbbbbb
+ 2010 @bb....bb
+ 2020 @bbbbbbbb
+ 2030 @........
+ 2040 design2,$e000+8*68   :rem invader 3a
+ 2050 @..b..b..
+ 2060 @b..bb..b
+ 2070 @b.bbbb.b
+ 2080 @bbbbbbbb
+ 2090 @..bbbb..
+ 2100 @..bbbb..
+ 2110 @.b....b.
+ 2120 @b......b
+ 2130 design2,$e000+8*69   :rem invader 3b
+ 2140 @..b..b..
+ 2150 @...bb...
+ 2160 @..bbbb..
+ 2170 @bbbbbbbb
+ 2180 @b.bbbb.b
+ 2190 @b.bbbb.b
+ 2200 @..b..b..
+ 2210 @.b....b.
+ 2220 design2,$e000+8*70   :rem basis
+ 2230 @........
+ 2240 @........
+ 2250 @........
+ 2260 @...bb...
+ 2270 @...bb...
+ 2280 @.bbbbbb.
+ 2290 @bbbbbbbb
+ 2300 @bbbbbbbb
+ 2310 design2,$e000+8*71   :rem bombe
+ 2320 @b.b..b.b
+ 2330 @.b.bb.b.
+ 2340 @........
+ 2350 @..b..b..
+ 2360 @........
+ 2370 @...bb...
+ 2380 @..bbbb..
+ 2390 @...bb...
+ 2400 design2,$e000+8*72   :rem schuss
+ 2410 @...b....
+ 2420 @...b....
+ 2430 @..bbb...
+ 2440 @..bbb...
+ 2450 @..bbb...
+ 2460 @..bbb...
+ 2470 @..bbb...
+ 2480 @..bbb...
+ 2490 design2,$e000+8*73   :rem explosion
+ 2500 @b..b...b
+ 2510 @.b.b..b.
+ 2520 @..b..b..
+ 2530 @......bb
+ 2540 @bb......
+ 2550 @..b..b..
+ 2560 @.b..b.b.
+ 2570 @b...b..b
+ 2580 end proc
+ 2590 :
+ 2600 :
+ 2610 :
+ 2620 proc text
+ 2630 :
+ 2640 rem*******************************
+ 2650 rem* druckt titelbild/anleitung  *
+ 2660 rem*******************************
+ 2670 :
+ 2680 print"{clr}          invaders"
+ 2690 print"         -========-"
+ 2700 print"{down}sie sind kommandant einer basis"
+ 2710 print"auf der erde. eine feindliche kultur"
+ 2720 print"hat beschlossen die rueckstaendige"
+ 2730 print"erde zum schutz des weltall's"
+ 2740 print"zu vernichten !"
+ 2750 print"{down}als vertreter der imperialistischen"
+ 2760 print"erde verteidigen sie ihre heimat."
+ 2770 print"{down}fuer jeden abgeschossenen invader"
+ 2780 print"erhalten sie punkte ."
+ 2790 print"{down}{down}   steuerung:":print" [1] basis links"
+ 2800 print" [2] feuer":print" [3] basis rechts"
+ 2810 print"{down}{down}start?"
+ 2820 proc warte
+ 2830 geta$:ifa$<>"j"then call warte
+ 2840 end proc
+ 2850 :
+ 2860 :
+ 2870 :
+ 2880 rem*******************************
+ 2890 rem***    tabellenverwaltung   ***
+ 2900 rem*******************************
+ 2910 :
+ 2920 proc read table
+ 2930 open15,8,15:open2,8,2,"tab invaders,s,r"
+ 2940 input#15,fehler:if fehler=62 then call no table
+ 2950 for index=0 to 9
+ 2960 :   input#2,punkte(index)
+ 2970 :   input#2,name$(index)
+ 2980 next:close2:close15:end proc
+ 2990 proc no table
+ 3000 for index=0 to 9
+ 3010 :   punkte(index)=500:name$(index)="***"
+ 3020 next:close2:close15:end proc
+ 3030 :
+ 3040 proc tot
+ 3050 print"{clr}{down}{down}{down}*** sie erreichten" punkte "punkte ***":pause5
+ 3060 rang=10
+ 3070 for index=0 to 9
+ 3080 if punkte(index)<punkte and rang=10 then rang=index
+ 3090 next:if rang=10 then call print table
+ 3100 for index=9 to rang step-1
+ 3110 :   name$(index+1)=name$(index)
+ 3120 :   punkte(index+1)=punkte(index)
+ 3130 next
+ 3140 print"{clr}{down}{down}{down}name (max.19) ";
+ 3150 fetch"{home} ",19,name$(rang):punkte(rang)=punkte
+ 3160 if name$(rang)="" then name$(rang)="***"
+ 3170 proc print table
+ 3180 print"{clr}{rvon}*** rekorde ***{rvof}{down}{down}"
+ 3190 for index=0 to 9
+ 3200 :   if index=rang thenprint"{rvon}";
+ 3210 :   print index+1,punkte(index),name$(index);"{rvof}{down}"
+ 3220 next index
+ 3230 print"{down}{rvon}noch einmal ?{rvof} ";
+ 3240 proc wait
+ 3250 geta$:if a$<>"j" and a$<>"n" then call wait
+ 3260 printa$;:if a$="j" then call neu
+ 3270 open2,8,2,"@0:tab invaders,s,w"
+ 3280 for index=0 to 9
+ 3290 :   print#2,punkte(index)
+ 3300 :   print#2,name$(index)
+ 3310 next
+ 3320 close2
+ 3330 :
+ 3340 :
+ 3350 :
+ 3360 rem*******************************
+ 3370 rem***   maschinenprogramm     ***
+ 3380 rem*******************************
+ 3390 :
+ 3400 data32,164,124,169,207,133,101,169,210,133,100,32,182,124,169,70
+ 3410 data160,0,145,20,32,173,124,169,12,133,252,169,0,133,102,133,110,133,108
+ 3420 data133,2,133,251,165,251,201,66,240,110,165,2,240,8,198,2,32,246,126
+ 3430 data76,122,124,160,0,177,20,201,73,208,7,169,32,145,20,76,82,124,32,4
+ 3440 data125,224,0,240,3,32,26,125,32,5,126,32,225,124,165,20,201,0,208,219
+ 3450 data165,21,201,204,208,213,56,169,66,229,251,74,74,74,133,2,32,102,127
+ 3460 data32,57,125,32,207,125,32,43,126,32,85,126,32,190,126,32,173,124,165
+ 3470 data97,240,5,56,233,3,133,97,24,105,128,141,24,212,165,108,201,1,208,143
+ 3480 data32,34,127,32,17,125,164,251,32,162,179,96,165,20,133,98,165,21,133
+ 3490 data99,96,169,255,133,20,169,207,133,21,96,165,100,133,20,165,101,133
+ 3500 data21,96,165,105,133,20,165,106,133,21,96,165,20,133,100,165,21,133,101
+ 3510 data96,165,20,133,105,165,21,133,106,96,230,20,208,2,230,21,96,198,20
+ 3520 data166,20,224,255,208,2,198,21,96,165,20,24,105,40,144,2,230,21,133,20
+ 3530 data96,165,20,56,233,40,176,2,198,21,133,20,96,162,0,201,64,48,6,201,70
+ 3540 data16,2,162,1,96,165,98,133,20,165,99,133,21,96,73,1,166,102,208,13,32
+ 3550 data218,124,145,20,169,32,32,225,124,145,20,96,72,169,32,145,20,32,225
+ 3560 data124,104,145,20,96,32,179,125,165,102,201,1,240,4,169,39,133,20,169
+ 3570 data0,133,107,177,20,32,4,125,224,1,240,13,32,236,124,166,107,232,134
+ 3580 data107,224,23,208,235,96,165,102,73,1,133,102,32,173,124,177,20,133,109
+ 3590 data32,4,125,224,1,208,14,32,236,124,165,109,145,20,32,248,124,169,32
+ 3600 data145,20,32,225,124,165,20,201,0,208,222,165,21,201,204,208,216,32,179
+ 3610 data125,162,23,32,236,124,202,208,250,162,40,134,107,32,218,124,177,20
+ 3620 data32,4,125,224,1,208,2,134,108,198,107,208,238,96,169,0,133,20,169,204
+ 3630 data133,21,96,169,128,141,18,212,169,143,141,24,212,169,1,141,15,212,173
+ 3640 data27,212,96,32,179,125,162,4,32,188,125,24,101,20,133,20,144,2,230,21
+ 3650 data202,208,241,177,20,32,4,125,224,1,208,24,32,236,124,177,20,201,32
+ 3660 data208,4,169,71,145,20,201,70,208,7,169,1,133,108,76,245,125,96,177,20
+ 3670 data201,71,208,24,169,32,145,20,32,236,124,177,20,201,32,208,4,169,71
+ 3680 data145,20,201,70,240,4,32,248,124,96,169,1,133,108,76,24,126,32,182,124
+ 3690 data32,188,125,41,15,240,246,133,107,32,248,124,198,107,208,249,177,20
+ 3700 data32,4,125,224,1,208,13,32,236,124,177,20,201,32,208,4,169,71,145,20
+ 3710 data96,32,182,124,32,159,255,160,0,165,203,201,59,208,17,165,110,201,1
+ 3720 data240,10,32,209,124,32,6,127,169,1,133,110,96,201,56,208,30,169,32,145
+ 3730 data20,32,225,124,165,20,201,191,208,3,32,218,124,177,20,201,71,240,43
+ 3740 data169,70,145,20,32,200,124,96,201,8,240,1,96,169,32,145,20,32,218,124
+ 3750 data165,20,201,232,208,3,32,225,124,177,20,201,71,240,8,169,70,145,20
+ 3760 data32,200,124,96,169,1,133,108,96,165,110,208,1,96,32,191,124,177,20
+ 3770 data201,72,208,4,169,32,145,20,32,248,124,177,20,201,32,208,8,169,72,145
+ 3780 data20,32,209,124,96,32,4,125,224,0,240,5,230,251,32,77,127,169,73,145
+ 3790 data20,169,0,133,110,96,169,8,133,21,32,225,124,165,20,208,249,165,21
+ 3800 data208,245,96,169,0,141,11,212,141,0,212,169,18,133,97,169,100,141,1
+ 3810 data212,169,129,141,4,212,169,240,141,6,212,96,169,7,141,1,212,169,15
+ 3820 data141,24,212,169,0,141,11,212,141,18,212,141,4,212,141,5,212,169,252
+ 3830 data141,6,212,169,129,141,4,212,32,246,126,169,128,141,4,212,96,169,7
+ 3840 data141,1,212,169,18,133,97,169,129,141,4,212,169,240,141,6,212,169,0
+ 3850 data141,11,212,96,165,252,56,233,2,201,2,208,2,169,10,141,8,212,133,252
+ 3860 data169,15,133,97,169,240,141,13,212,169,143,141,24,212,169,0,141,4,212
+ 3870 data169,33,141,11,212,96
+
