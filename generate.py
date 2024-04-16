@@ -12,6 +12,7 @@ import subprocess
 import http.server
 import socketserver
 import hashlib
+import urllib.parse
 from collections import defaultdict
 from bs4 import BeautifulSoup, NavigableString
 from urllib.parse import quote
@@ -273,9 +274,14 @@ def avif_picture_tag(soup, img_src, attrs=None):
     if attrs:
         for attr, value in attrs.items():
             new_img_tag[attr] = value
+
+    # add an empty alt for now if there is none
+    if 'alt' not in new_img_tag.attrs:
+        new_img_tag['alt'] = ""
+    
     # Update the src attribute to the JPEG version
     new_img_tag['src'] = img_src[:-4] + '.jpg'
-
+    
     # Append the new <img> tag to the <picture> tag
     picture_tag.append(new_img_tag)
 
@@ -346,7 +352,8 @@ class ArticleDatabase:
                 tag.string = listing
 
                 if not any(item[0] == data_name for item in downloads): # duplicates
-                    downloads.append((data_name, f"prg/{data_filename}.prg"))
+                    data_filename_escaped = urllib.parse.quote(data_filename)
+                    downloads.append((data_name, f"prg/{data_filename_escaped}.prg"))
         metadata['downloads'] = downloads
 
         # and make a "downloads" aside
@@ -577,7 +584,7 @@ def html_generate_latest_issue(db):
 <h2>{LABEL_CURRENT_ISSUE}</h2>\n
 <hr>
 <a href="{issue_dir_name}">
-    <img src="{latest_title_image}">
+    <img src="{latest_title_image}" alt="">
 </a>
 <p class="current_issue_download">Ausgabe {latest_issue_key}</p>\n
 <p><a href="{issue_dir_name}" class="download_button">{LABEL_DOWNLOAD}</a></p>'''
@@ -602,12 +609,13 @@ def html_generate_title_image(db, issue_key, width, prepend_issue_dir=False):
     issue_dir = issue_data['issue_dir_name'] if prepend_issue_dir else None
     if issue_dir:
         title_jpg_path = os.path.join(issue_dir, title_jpg_path)
-    return f"<img src=\"{title_jpg_path}\" width=\"{width}\" alt='{MAGAZINE_NAME} {issue_key}>\n"
+    return f"<img src=\"{title_jpg_path}\" width=\"{width}\" alt=\"{MAGAZINE_NAME} {issue_key}\">\n"
 
 
 def html_generate_toc(db, issue_key, heading_level=1, prepend_issue_dir=False):
     html_parts = []
-    html_parts.append(f"<main>\n")
+    if heading_level == 1:
+        html_parts.append(f"<main>\n")
     html_parts.append(f"<h{heading_level}>{LABEL_ISSUE} {issue_key}</h{heading_level}>\n")
     pdf_filename = db.issues[issue_key]['pdf_filename']
     issue_data = db.issues[issue_key]
@@ -619,12 +627,11 @@ def html_generate_toc(db, issue_key, heading_level=1, prepend_issue_dir=False):
 <div class="download_full_pdf">
     <a href="{pdf_filename}">
         {title_image}
-        <p>
-            <div class=\"download_full_pdf_button\">
-                <img src="/{BASE_DIR}pdf.svg" alt="PDF">
-                {LABEL_DOWNLOAD_ISSUE_PDF}
-            </div>
-        </p>
+        <br>
+        <div class=\"download_full_pdf_button\">
+            <img src="/{BASE_DIR}pdf.svg" alt="PDF">
+            {LABEL_DOWNLOAD_ISSUE_PDF}
+        </div>
     </a>
 </div>\n
 """
@@ -639,7 +646,8 @@ def html_generate_toc(db, issue_key, heading_level=1, prepend_issue_dir=False):
         if len(entry['articles']):
           category, subcategory = (entry['category'].split('|', 1) + [None])[:2] if '|' in entry['category'] else (entry['category'], None)
           if category != last_category:
-              html_parts.append(f"<h3>{category}</h3>\n")
+              if category != "":
+                  html_parts.append(f"<h3>{category}</h3>\n")
               last_category = category
           if subcategory:
               html_parts.append(f"<h4>{subcategory}</h4>\n")
@@ -648,7 +656,9 @@ def html_generate_toc(db, issue_key, heading_level=1, prepend_issue_dir=False):
               link = article_link(db, article, toc_title(article), prepend_issue_dir)
               html_parts.append(f"<li>{link}</li>\n")
           html_parts.append("</ul>\n")
-    html_parts.append(f"</main>\n")
+
+    if heading_level == 1:
+        html_parts.append(f"</main>\n")
     return ''.join(html_parts)
 
 ### HTML file content creation
@@ -836,7 +846,7 @@ def write_full_html_file(db, path, title, preview_img, body_html, body_class, co
       data-isso-lang="{LANG}"
       src="/isso/js/embed.min.js"
     ></script>
-    <link rel="stylesheet" href="/isso/css/isso.css" />
+    <link rel="stylesheet" href="/isso/css/isso.css">
 """
       isso_html2 = f"""
       <div class="comments">
@@ -870,8 +880,8 @@ def write_full_html_file(db, path, title, preview_img, body_html, body_class, co
 <html lang="{LANG}">
 <head>
     <meta charset="UTF-8">
-    <meta property="og:title" content="{title}" />
-    <meta property="og:image" content="{preview_img}" />
+    <meta property="og:title" content="{title}">
+    <meta property="og:image" content="{preview_img}">
     <title>{title}</title>
 
     {fav_icon_html}
@@ -1043,7 +1053,7 @@ def generate_rss_feed(db, out_directory):
         img_src = article['img_urls'][0] if article['img_urls'] else None
         if img_src:
             img_src = full_url(os.path.join(issue_data['issue_dir_name'], img_src))
-            img = f"<img src='{img_src}'/><br/>"
+            img = f"<img src='{img_src}'><br>"
             if description:
                 description = img + description
             else:
