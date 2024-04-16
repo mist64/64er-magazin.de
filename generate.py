@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/python3
 
 import sys
 import re
@@ -11,6 +11,8 @@ import html
 import subprocess
 import http.server
 import socketserver
+import hashlib
+import urllib.parse
 from collections import defaultdict
 from bs4 import BeautifulSoup, NavigableString
 from urllib.parse import quote
@@ -23,8 +25,8 @@ from PyPDF2 import PdfReader, PdfWriter
 #
 LANG='de'
 OUT_DIRECTORY = 'out'
+CACHE_DIRECTORY = 'cache'
 SERVER = 'www.64er-magazin.de'
-IMAGE_CONVERSION_TOOL = 'imagemagick' # 'guetzli'
 EXTRACT_PDF_PAGES = True # disable for speed when testing
 NEW_DOWNLOADS = 15
 HOURS_PER_ARTICLE = 12
@@ -142,10 +144,14 @@ if LANG == "de":
     </main>
     """
 
-  HTML_404 = """
+  HTML_IMG_FEHLERTEUFELCHEN= f"""
+    <img src="/{BASE_DIR}fehlerteufelchen.svg" alt="Fehlerteufelchen">
+  """
+
+  HTML_404 = f"""
     <main class="fehlerteufelchen">
     <h1>Seite nicht gefunden</h1>
-    <img src="fehlerteufelchen.svg" alt="Fehlerteufelchen">
+    {HTML_IMG_FEHLERTEUFELCHEN}
     </main>
   """
 
@@ -224,10 +230,14 @@ elif LANG == "en":
     </main>
     """
 
-  HTML_404 = """
+  HTML_IMG_FEHLERTEUFELCHEN=f"""
+    <img src="/{BASE_DIR}fehlerteufelchen.svg" alt="Error Devil">
+    """
+
+  HTML_404 = f"""
     <main class="fehlerteufelchen">
     <h1>Page Not Found</h1>
-    <img src="fehlerteufelchen.svg" alt="Error Devil">
+    {HTML_IMG_FEHLERTEUFELCHEN}
     </main>
     """
 
@@ -249,9 +259,45 @@ def key_to_datetime(issue_key):
     year += 1900 if year >= 50 else 2000
     return datetime(year, month, 1)  # Assuming the first of the month
 
+# converts an img tag into a picture tag with AVIF and a JPEG fallback
+def avif_picture_tag(soup, img_src, attrs=None):
+    # Create the <picture> tag
+    picture_tag = soup.new_tag('picture')
+
+    # Create the <source> tag for AVIF and add it to <picture>
+    source_tag = soup.new_tag('source', srcset=img_src[:-4] + '.avif', type='image/avif')
+    picture_tag.insert(0, source_tag)
+
+    # Create a new <img> tag for the JPEG version
+    new_img_tag = soup.new_tag('img')
+    # Copy all attributes from the original <img> tag to the new one
+    if attrs:
+        for attr, value in attrs.items():
+            new_img_tag[attr] = value
+
+    # add an empty alt for now if there is none
+    if 'alt' not in new_img_tag.attrs:
+        new_img_tag['alt'] = ""
+    
+    # Update the src attribute to the JPEG version
+    new_img_tag['src'] = img_src[:-4] + '.jpg'
+    
+    # Append the new <img> tag to the <picture> tag
+    picture_tag.append(new_img_tag)
+
+    return picture_tag
+
+def calculate_sha1(filepath):
+    sha1 = hashlib.sha1()
+    with open(filepath, 'rb') as f:
+        while chunk := f.read(8192):
+            sha1.update(chunk)
+    return sha1.hexdigest()
+
+
 class ArticleDatabase:
     @staticmethod
-    def __read_html(html_file_path):
+    def __read_html(html_file_path, listings):
         """Parses an HTML file for article metadata and includes the filename."""
         with open(html_file_path, 'r', encoding='utf-8') as file:
             contents = file.read()
@@ -274,15 +320,46 @@ class ArticleDatabase:
 
         metadata['target_filename'] = os.path.basename(metadata['id']) + '.html'
 
-        # Extract downloads information
-        downloads_div = soup.find('aside', class_='downloads')
+        # Put listings into <pre> tags and collect downloads
         downloads = []
-        if downloads_div:
-            for a in downloads_div.find_all('a', href=True):
-                label = a.text.strip()
-                url = a['href'].strip()
-                downloads.append((label, url))
+        a_tags = []
+        pre_tags = soup.find_all("pre")
+        for tag in pre_tags:
+            data_filename = tag.get("data-filename")
+            data_name = tag.get("data-name")
+            data_range = tag.get("data-range")
+            if data_filename:
+                # remove ';', empty lines and leading spaces
+                listing = listings[data_filename]
+                listing = [line.lstrip() for line in listing.splitlines() if line.strip() and not line.lstrip().startswith(';')]
+
+                if data_range:
+                    start_range, end_range = map(int, data_range.split('-'))
+                    filtered_lines = []
+                    for line in listing:
+                        leading_number = int(line.split(' ')[0])
+                        if start_range <= leading_number <= end_range:
+                            filtered_lines.append(line)
+                    listing = filtered_lines
+
+                listing = "\n".join(listing)
+                tag.string = listing
+
+                if not any(item[0] == data_name for item in downloads): # duplicates
+                    data_filename_escaped = urllib.parse.quote(data_filename)
+                    downloads.append((data_name, f"prg/{data_filename_escaped}.prg"))
         metadata['downloads'] = downloads
+
+        # and make a "downloads" aside
+        if downloads:
+            aside_tag = soup.new_tag("aside", attrs={"class": "downloads"})
+            for (label, url) in downloads:
+                a_tag = soup.new_tag("a", href=url)
+                a_tag.string = label
+                a_tags.append(a_tag)
+                aside_tag.append(a_tag)
+            article_tag = soup.find("article")
+            article_tag.append(aside_tag)
 
         # Extract article description
         intro_div = soup.find('p', {"class": "intro"})
@@ -292,11 +369,11 @@ class ArticleDatabase:
         src_img_urls = [img['src'] for img in soup.find_all('img') if img.get('src')]
         metadata['src_img_urls'] = src_img_urls
 
-        # In the HTML, change all img src paths from PNG to JPG
+        # In the HTML, change all img src paths from PNG to AVIF, with a JPEG fallback
         for img_tag in soup.find_all('img'):
             img_src = img_tag['src']
             if img_src.lower().endswith('.png'):
-                img_tag['src'] = img_src[:-4] + '.jpg'
+                img_tag.replace_with(avif_picture_tag(soup, img_tag['src'], img_tag.attrs))
 
         metadata['html'] = soup
         metadata['txt'] = html_to_text_preserve_paragraphs(soup.body);
@@ -331,11 +408,21 @@ class ArticleDatabase:
         issue_key = None
         pubdate = None
 
+        # read all listings in petcat format
+        listings = {}
+        prg_path = os.path.join(issue_directory_path, 'prg')
+        for root, _, files in os.walk(prg_path):
+            for file in files:
+                if file.endswith('.txt'):
+                    file_path = os.path.join(root, file)
+                    with open(file_path, 'r') as file_obj:
+                        listings[os.path.splitext(file)[0]] = file_obj.read()
+
         for root, dirs, files in os.walk(issue_directory_path):
             for file in files:
                 if file.endswith('.html'):
                     article_path = os.path.join(root, file)
-                    article_metadata = cls.__read_html(article_path)
+                    article_metadata = cls.__read_html(article_path, listings)
                     article_metadata['path'] = article_path  # Include full path in metadata
                     articles_metadata.append(article_metadata)
                     if not issue_key:
@@ -357,7 +444,8 @@ class ArticleDatabase:
                 'pubdate': pubdate,
                 'pdf_filename': pdf_filename,
                 'issue_dir_name': issue_dir_name,
-                'issue_key': issue_key
+                'issue_key': issue_key,
+                'listings': listings
             }
         else:
             return None
@@ -377,7 +465,8 @@ class ArticleDatabase:
                     'issue_dir_name': issue_dir_name,
                     'toc_order': issue_data['toc_order'],
                     'pubdate': issue_data['pubdate'],
-                    'pdf_filename': issue_data['pdf_filename']
+                    'pdf_filename': issue_data['pdf_filename'],
+                    'listings': issue_data['listings']
                 }
 
                 # Sort articles by page number within this issue before assigning indexes
@@ -489,7 +578,7 @@ def html_generate_latest_issue(db):
 <h2>{LABEL_CURRENT_ISSUE}</h2>\n
 <hr>
 <a href="{issue_dir_name}">
-    <img src="{latest_title_image}">
+    <img src="{latest_title_image}" alt="">
 </a>
 <p class="current_issue_download">Ausgabe {latest_issue_key}</p>\n
 <p><a href="{issue_dir_name}" class="download_button">{LABEL_DOWNLOAD}</a></p>'''
@@ -514,12 +603,13 @@ def html_generate_title_image(db, issue_key, width, prepend_issue_dir=False):
     issue_dir = issue_data['issue_dir_name'] if prepend_issue_dir else None
     if issue_dir:
         title_jpg_path = os.path.join(issue_dir, title_jpg_path)
-    return f"<img src=\"{title_jpg_path}\" width=\"{width}\" alt='{MAGAZINE_NAME} {issue_key}>\n"
+    return f"<img src=\"{title_jpg_path}\" width=\"{width}\" alt=\"{MAGAZINE_NAME} {issue_key}\">\n"
 
 
 def html_generate_toc(db, issue_key, heading_level=1, prepend_issue_dir=False):
     html_parts = []
-    html_parts.append(f"<main>\n")
+    if heading_level == 1:
+        html_parts.append(f"<main>\n")
     html_parts.append(f"<h{heading_level}>{LABEL_ISSUE} {issue_key}</h{heading_level}>\n")
     pdf_filename = db.issues[issue_key]['pdf_filename']
     issue_data = db.issues[issue_key]
@@ -531,12 +621,11 @@ def html_generate_toc(db, issue_key, heading_level=1, prepend_issue_dir=False):
 <div class="download_full_pdf">
     <a href="{pdf_filename}">
         {title_image}
-        <p>
-            <div class=\"download_full_pdf_button\">
-                <img src="/{BASE_DIR}pdf.svg" alt="PDF">
-                {LABEL_DOWNLOAD_ISSUE_PDF}
-            </div>
-        </p>
+        <br>
+        <div class=\"download_full_pdf_button\">
+            <img src="/{BASE_DIR}pdf.svg" alt="PDF">
+            {LABEL_DOWNLOAD_ISSUE_PDF}
+        </div>
     </a>
 </div>\n
 """
@@ -551,7 +640,8 @@ def html_generate_toc(db, issue_key, heading_level=1, prepend_issue_dir=False):
         if len(entry['articles']):
           category, subcategory = (entry['category'].split('|', 1) + [None])[:2] if '|' in entry['category'] else (entry['category'], None)
           if category != last_category:
-              html_parts.append(f"<h3>{category}</h3>\n")
+              if category != "":
+                  html_parts.append(f"<h3>{category}</h3>\n")
               last_category = category
           if subcategory:
               html_parts.append(f"<h4>{subcategory}</h4>\n")
@@ -560,7 +650,9 @@ def html_generate_toc(db, issue_key, heading_level=1, prepend_issue_dir=False):
               link = article_link(db, article, toc_title(article), prepend_issue_dir)
               html_parts.append(f"<li>{link}</li>\n")
           html_parts.append("</ul>\n")
-    html_parts.append(f"</main>\n")
+
+    if heading_level == 1:
+        html_parts.append(f"</main>\n")
     return ''.join(html_parts)
 
 ### HTML file content creation
@@ -704,7 +796,9 @@ def html_generate_article_preview(db, article):
     html_parts.append(f"<div class=\"article_link\" data-pubdate=\"{pubdate_unix}\">\n")
     if img_src:
         img_src = os.path.join(issue_dir_name, img_src)
-        link_img = article_link(db, article, f"<img src='{img_src}'>\n", True)
+        soup = BeautifulSoup('', 'html.parser')
+        picture_tag = avif_picture_tag(soup, img_src)
+        link_img = article_link(db, article, picture_tag, True)
         html_parts.append(link_img)
     html_parts.append(f"<h2>{link_title}</h2>\n")
     html_parts.append(f"<hr>\n")
@@ -746,7 +840,7 @@ def write_full_html_file(db, path, title, preview_img, body_html, body_class, co
       data-isso-lang="{LANG}"
       src="/isso/js/embed.min.js"
     ></script>
-    <link rel="stylesheet" href="/isso/css/isso.css" />
+    <link rel="stylesheet" href="/isso/css/isso.css">
 """
       isso_html2 = f"""
       <div class="comments">
@@ -762,14 +856,30 @@ def write_full_html_file(db, path, title, preview_img, body_html, body_class, co
 
     mastodon_link = share_on_mastodon_link(title, url)
 
+    if DEPLOY == "local" or DEPLOY == None:
+      fav_icon_html = f"""
+        <link rel="icon" href="/{BASE_DIR}favicon-dev.ico" sizes="32x32">
+        <link rel="icon" href="/{BASE_DIR}fav/icon-dev.svg" type="image/svg+xml">
+        <link rel="apple-touch-icon" href="/{BASE_DIR}fav/apple-touch-icon-dev.png">
+      """
+    else:
+      fav_icon_html = f"""
+          <link rel="icon" href="/{BASE_DIR}favicon.ico" sizes="32x32">
+          <link rel="icon" href="/{BASE_DIR}fav/icon.svg" type="image/svg+xml">
+          <link rel="apple-touch-icon" href="/{BASE_DIR}fav/apple-touch-icon.png">
+      """
+
     full_html = f"""
 <!DOCTYPE html>
 <html lang="{LANG}">
 <head>
     <meta charset="UTF-8">
-    <meta property="og:title" content="{title}" />
-    <meta property="og:image" content="{preview_img}" />
+    <meta property="og:title" content="{title}">
+    <meta property="og:image" content="{preview_img}">
     <title>{title}</title>
+
+    {fav_icon_html}
+
     <link rel="stylesheet" href="/{BASE_DIR}style.css">
     <script>
       const BASE_DIR = '{BASE_DIR}';
@@ -937,7 +1047,7 @@ def generate_rss_feed(db, out_directory):
         img_src = article['img_urls'][0] if article['img_urls'] else None
         if img_src:
             img_src = full_url(os.path.join(issue_data['issue_dir_name'], img_src))
-            img = f"<img src='{img_src}'/><br/>"
+            img = f"<img src='{img_src}'><br>"
             if description:
                 description = img + description
             else:
@@ -977,34 +1087,51 @@ def generate_rss_feed(db, out_directory):
 ###
 
 def extract_pages_from_pdf(source_pdf_path, dest_pdf_path, page_descriptions):
-    reader = PdfReader(source_pdf_path)
-    writer = PdfWriter()
+    cache_path = os.path.join(CACHE_DIRECTORY, calculate_sha1(source_pdf_path) + os.path.basename(dest_pdf_path))
+    if os.path.exists(cache_path):
+        shutil.copy(cache_path, dest_pdf_path)
+    else:
+        print(f"Not cached: {dest_pdf_path}")
+        reader = PdfReader(source_pdf_path)
+        writer = PdfWriter()
 
-    for part in page_descriptions.split(','):
-        if '-' in part:  # Range of pages
-            start_page, end_page = map(int, part.split('-'))
-            for page in range(start_page - 1, end_page):  # Convert to 0-based index
+        for part in page_descriptions.split(','):
+            if '-' in part:  # Range of pages
+                start_page, end_page = map(int, part.split('-'))
+                for page in range(start_page - 1, end_page):  # Convert to 0-based index
+                    writer.add_page(reader.pages[page])
+            else:  # Single page
+                page = int(part) - 1  # Convert to 0-based index
                 writer.add_page(reader.pages[page])
-        else:  # Single page
-            page = int(part) - 1  # Convert to 0-based index
-            writer.add_page(reader.pages[page])
 
-    with open(dest_pdf_path, 'wb') as out_pdf:
-        writer.write(out_pdf)
+        with open(dest_pdf_path, 'wb') as out_pdf:
+            writer.write(out_pdf)
+        shutil.copy(dest_pdf_path, cache_path)
 
-def convert_and_copy_image(img_path, issue_dest_path):
-    dest_img_name = os.path.splitext(os.path.basename(img_path))[0] + '.jpg'
-    dest_img_path = os.path.join(issue_dest_path, dest_img_name)
+def is_bilevel_image(file_path):
+    with Image.open(file_path) as img:
+        return img.mode == '1'
 
-    try:
-        if IMAGE_CONVERSION_TOOL == 'guetzli':
-            # Guetzli for optimizing JPG images
-            subprocess.run(['guetzli', '--quality', '84', img_path, dest_img_path], check=True)
-        elif IMAGE_CONVERSION_TOOL == 'imagemagick':
-            # ImageMagick for converting and/or optimizing images
-            subprocess.run(['convert', img_path, '-quality', '85', dest_img_path], check=True)
-    except subprocess.CalledProcessError as e:
-        print(f"Error running {IMAGE_CONVERSION_TOOL} for image {img_path}: {e}")
+def convert_and_copy_image(img_path, dest_img_path):
+    _, file_extension = os.path.splitext(dest_img_path)
+    cache_path = os.path.join(CACHE_DIRECTORY, calculate_sha1(img_path) + file_extension)
+    if os.path.exists(cache_path):
+        shutil.copy(cache_path, dest_img_path)
+    else:
+        print(f"Not cached: {dest_img_path}")
+        try:
+            if file_extension == ".jpg":
+                quality = '80'
+                bg_color = 'wheat'
+                subprocess.run(['convert', img_path, '-quality', quality, '-background', bg_color, '-alpha', 'remove',  '-alpha', 'off', dest_img_path], check=True)
+            elif file_extension == ".avif":
+                quality = '60'
+                subprocess.run(['convert', img_path, '-quality', quality, dest_img_path], check=True)
+
+        except subprocess.CalledProcessError as e:
+            print(f"Error running convert for image {img_path}: {e}")
+        shutil.copy(dest_img_path, cache_path)
+
 
 def copy_and_modify_html(article, html_dest_path, pdf_path, prev_page_link, next_page_link):
     """Modifies, and writes an HTML file directly to the destination."""
@@ -1031,6 +1158,14 @@ def copy_and_modify_html(article, html_dest_path, pdf_path, prev_page_link, next
     custom_div_soup = BeautifulSoup(custom_div_html, 'html.parser')
     body.insert(0, custom_div_soup)
 
+    # Augment the Fehlerteufelchen <asides> with a full size Fehlerteufelchen
+    asides = soup.find_all("aside", class_="fehlerteufelchen")
+    if asides:
+      for aside in asides:
+        ft_tag = BeautifulSoup(HTML_IMG_FEHLERTEUFELCHEN, 'html.parser')
+        aside.insert(0, ft_tag)
+
+    # Insert actions for downloading the pdf and tooting to mastooton
     download_pdf_html = f'''
 <div class="article_action">
 <a href="{pdf_path}">
@@ -1093,6 +1228,22 @@ def copy_articles_and_assets(db, in_directory, out_directory):
     shutil.copy(os.path.join(in_directory, 'style.css'), out_directory)
     shutil.copy(os.path.join(in_directory, 'search.js'), out_directory)
     shutil.copy(os.path.join(in_directory, 'lunr.js'), out_directory)
+
+    fav_path = os.path.join(in_directory,'fav')
+    fav_path_out = os.path.join(out_directory,'fav')
+
+    if not os.path.exists(fav_path_out):
+        os.makedirs(fav_path_out)
+
+    if DEPLOY == "local" or DEPLOY == None:
+        shutil.copy(os.path.join(in_directory, 'favicon-dev.ico'), out_directory)
+        shutil.copy(os.path.join(fav_path, 'apple-touch-icon-dev.png'), fav_path_out)
+        shutil.copy(os.path.join(fav_path, 'icon-dev.svg'), fav_path_out)
+    else:
+        shutil.copy(os.path.join(in_directory, 'favicon.ico'), out_directory)
+        shutil.copy(os.path.join(fav_path, 'apple-touch-icon.png'), fav_path_out)
+        shutil.copy(os.path.join(fav_path, 'icon.svg'), fav_path_out)
+
     shutil.copy('filter_rss.py', out_directory)
     shutil.copy('filter_index.py', out_directory)
     shutil.copy('tootpick.html', out_directory)
@@ -1114,10 +1265,45 @@ def copy_articles_and_assets(db, in_directory, out_directory):
         os.makedirs(issue_dest_path_prg)
 
         # Copy title image
-        shutil.copy(os.path.join(issue_source_path, TITLE_IMAGE_NAME), issue_dest_path)
+        title_image_path = os.path.join(issue_source_path, TITLE_IMAGE_NAME)
+        if os.path.exists(title_image_path):
+            shutil.copy(title_image_path, issue_dest_path)
+        else:
+            convert_and_copy_image(os.path.join(issue_source_path, 'title.png'), os.path.join(issue_dest_path, 'title.jpg'))
 
         # Copy full PDF
         shutil.copy(os.path.join(issue_source_path, issue_data['pdf_filename']), issue_dest_path)
+
+        # Create .PRG from Petcat listings
+        listings = issue_data['listings']
+        for key, listing in listings.items():
+            # Prepare the output file name
+            output_file_name = os.path.join(issue_dest_path, 'prg', f"{key}.prg")
+
+            regex = r"^;.*==([0-9A-Fa-f]{4})=="
+            load_address = re.findall(regex, listing, re.MULTILINE)
+            if load_address:
+                load_address = load_address[0]
+            else:
+                load_address = '0801'
+
+            pattern = r"^;version=(.*)$"
+            match = re.search(pattern, listing, re.MULTILINE)
+            version = match.group(1) if match else None
+            if not version:
+                version = '2'
+
+            # Prepare the command
+            command = ['petcat', '-w2', '-l', load_address, f'-{version}', '-o', output_file_name]
+
+            # Execute the command, piping the listing into it
+            process = subprocess.Popen(command, stdin=subprocess.PIPE, text=True)
+            process.communicate(input=listing)
+
+            # Check if petcat executed successfully
+            if process.returncode != 0:
+                print(f"Failed to process: {key}")
+                exit()
 
         # Copy all images of all articles of the issue and downloads
         articles = [article for article in db.articles if article['issue_key'] == issue_key]
@@ -1128,14 +1314,19 @@ def copy_articles_and_assets(db, in_directory, out_directory):
             for img_src in img_srcs:
                 img_path = os.path.join(issue_source_path, img_src)
                 if os.path.exists(img_path):
-                    convert_and_copy_image(img_path, issue_dest_path)
+                    dest_img_name = os.path.splitext(os.path.basename(img_path))[0] + '.avif'
+                    dest_img_path = os.path.join(issue_dest_path, dest_img_name)
+                    convert_and_copy_image(img_path, dest_img_path)
+                    dest_img_name = os.path.splitext(os.path.basename(img_path))[0] + '.jpg'
+                    dest_img_path = os.path.join(issue_dest_path, dest_img_name)
+                    convert_and_copy_image(img_path, dest_img_path)
 
             # Copy files from the downloads
-            downloads = article['downloads']
-            for _, download_url in downloads:
-                # Assuming download_url is a relative path; adjust logic if it's a URL
-                download_path = os.path.join(issue_source_path, download_url)
-                shutil.copy(download_path, issue_dest_path_prg)
+#            downloads = article['downloads']
+#            for _, download_url in downloads:
+#                # Assuming download_url is a relative path; adjust logic if it's a URL
+#                download_path = os.path.join(issue_source_path, download_url)
+#                shutil.copy(download_path, issue_dest_path_prg)
 
             pages = article['pages']
 
@@ -1218,6 +1409,8 @@ if __name__ == '__main__':
     if os.path.exists(OUT_DIRECTORY):
         shutil.rmtree(OUT_DIRECTORY)
     os.makedirs(OUT_DIRECTORY)
+    if not os.path.exists(CACHE_DIRECTORY):
+        os.makedirs(CACHE_DIRECTORY)
 
     out_directory = os.path.join(OUT_DIRECTORY, BASE_DIR)
 
@@ -1235,8 +1428,8 @@ if __name__ == '__main__':
 
     print("*** Filtering")
     dir = f"{OUT_DIRECTORY}/{BASE_DIR}"
-    subprocess.run(['python3', f'filter_rss.py'], cwd=dir)
-    subprocess.run(['python3', f'filter_index.py'], cwd=dir)
+    subprocess.run(['./filter_rss.py'], cwd=dir)
+    subprocess.run(['./filter_index.py'], cwd=dir)
 
     if DEPLOY == "upload":
         print("*** Uploading")
