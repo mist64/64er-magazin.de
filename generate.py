@@ -29,7 +29,7 @@ CACHE_DIRECTORY = 'cache'
 SERVER = 'www.64er-magazin.de'
 EXTRACT_PDF_PAGES = True # disable for speed when testing
 NEW_DOWNLOADS = 15
-HOURS_PER_ARTICLE = 12
+HOURS_PER_ARTICLE = 16
 
 #
 # Parse arguments
@@ -278,10 +278,10 @@ def avif_picture_tag(soup, img_src, attrs=None):
     # add an empty alt for now if there is none
     if 'alt' not in new_img_tag.attrs:
         new_img_tag['alt'] = ""
-    
+
     # Update the src attribute to the JPEG version
     new_img_tag['src'] = img_src[:-4] + '.jpg'
-    
+
     # Append the new <img> tag to the <picture> tag
     picture_tag.append(new_img_tag)
 

@@ -4,7 +4,7 @@ from bs4 import BeautifulSoup
 import time
 import os
 
-FILTER_BY_DATE = False
+FILTER_BY_DATE = True
 GROUP_SIZE = 20
 input_file_path = 'index_all.html'
 
