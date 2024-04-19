@@ -565,7 +565,10 @@ def index_title(article):
   index_title = article.get('index_title')
   toc_title = article.get('toc_title')
   title = article['title']
-  return index_title if index_title else toc_title if toc_title else title
+  ret = index_title if index_title else toc_title if toc_title else title
+  if article.get('id') == 'editorial':
+      ret = f"Editorial: {ret}"
+  return ret
 
 def toc_title(article):
   toc_title = article.get('toc_title')
