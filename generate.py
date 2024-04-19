@@ -369,7 +369,17 @@ class ArticleDatabase:
 
         # Extract article description
         intro_div = soup.find('p', {"class": "intro"})
-        metadata['description'] = intro_div.text.strip() if intro_div else None
+        if intro_div:
+            metadata['description'] = intro_div.text.strip()
+        else:
+            first_p = soup.find('p')
+            if first_p:
+                # Extract text, split into words, take the first 64, and join them back into a string
+                words = first_p.text.split()
+                metadata['description'] = ' '.join(words[:64]) + '...'
+            else:
+                metadata['description'] = ''
+
 
         # Extract all image URLs with their *source* names
         src_img_urls = [img['src'] for img in soup.find_all('img') if img.get('src')]
@@ -817,10 +827,9 @@ def html_generate_article_preview(db, article):
 
 def html_generate_all_article_previews(db):
     articles = sorted(db.articles, key=lambda x: (x['issue_key'], first_page_number(x['pages'])), reverse=True)
-    # skip articles without category or description
-    articles = [article for article in articles if article.get('toc_category')]
-    articles = [article for article in articles if article.get('description')]
-    articles = [article for article in articles if article['title'] != "Vorschau"] #XXX
+    # skip some article types (XXX)
+    articles = [article for article in articles if article['title'] != "Impressum"]
+    articles = [article for article in articles if article['title'] != "Vorschau"]
 
     html_articles = []
 
