@@ -494,6 +494,8 @@ class ArticleDatabase:
                     article['out_filename'] = article['id'] + '.html'
                     # Assign an index based on sorted order
                     article['index'] = index
+                    # Assign a pubdate for RSS
+                    article['pubdate'] = article_pubdate(issue_data, article)
                     self.articles.append(article)
 
     def latest_issue_key(self):
@@ -812,7 +814,7 @@ def html_generate_article_preview(db, article):
     issue_dir_name = issue_data['issue_dir_name']
     pages = article['pages']
     img_src = next((url for url in article.get('img_urls', [])), None)
-    pubdate_unix = int(article_pubdate(issue_data, article).timestamp())
+    pubdate_unix = int(article['pubdate'].timestamp())
     html_parts.append(f"<div class=\"article_link\" data-pubdate=\"{pubdate_unix}\">\n")
     if img_src:
         img_src = os.path.join(issue_dir_name, img_src)
@@ -830,10 +832,11 @@ def html_generate_article_preview(db, article):
 
 
 def html_generate_all_article_previews(db):
-    articles = sorted(db.articles, key=lambda x: (x['issue_key'], first_page_number(x['pages'])), reverse=True)
-    # skip some article types (XXX)
-    articles = [article for article in articles if article['title'] != "Impressum"]
-    articles = [article for article in articles if article['title'] != "Vorschau"]
+    # Filter out specific articles
+    articles = [article for article in db.articles if article['title'] not in ["Impressum", "Vorschau"]]
+
+    # Sort by 'pubdate'
+    articles = sorted(articles, key=lambda x: x['pubdate'], reverse=True)
 
     html_articles = []
 
@@ -1056,7 +1059,7 @@ def generate_404_page(db, out_directory):
 def generate_rss_feed(db, out_directory):
     rss_items = []
 
-    sorted_articles = db.articles # XXX
+    sorted_articles = sorted(db.articles, key=lambda x: x['pubdate'], reverse=False)
 
     for article in sorted_articles:
         title = html.escape(index_title(article))
@@ -1076,8 +1079,7 @@ def generate_rss_feed(db, out_directory):
         else:
             description = ""
 
-        pubdate = article_pubdate(issue_data, article)
-        pubdate = pubdate.strftime("%a, %d %b %Y %H:%M:%S %z")[:-5] + "GMT"
+        pubdate = article['pubdate'].strftime("%a, %d %b %Y %H:%M:%S %z")[:-5] + "GMT"
 
         rss_item_template = '''<item>
     <title>{title}</title>
