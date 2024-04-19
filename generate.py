@@ -1058,7 +1058,7 @@ def generate_rss_feed(db, out_directory):
     sorted_articles = db.articles # XXX
 
     for article in sorted_articles:
-        title = article['title']
+        title = html.escape(index_title(article))
         issue_data = db.issues[article['issue_key']]
         link = full_url(article_path(issue_data, article, True))
         description = article['description']
