@@ -13,7 +13,7 @@ import http.server
 import socketserver
 import hashlib
 import urllib.parse
-from collections import defaultdict
+from collections import defaultdict, OrderedDict
 from bs4 import BeautifulSoup, NavigableString
 from urllib.parse import quote
 from datetime import datetime, timedelta, timezone
@@ -537,7 +537,8 @@ class ArticleDatabase:
             articles_by_category[category] = sorted(articles_list,
                                                     key=lambda x: (x['issue'],  first_page_number(x['pages'])))
 
-        return dict(articles_by_category)
+        sorted_categories = sorted(articles_by_category.items(), key=lambda x: x[0])
+        return OrderedDict(sorted_categories)
 
 ### Helpers
 
