@@ -43,10 +43,17 @@ Die Eingabe-Ausgaben werden aus `issues` gelesen, die Website wird nach `out` ge
 
 `local` und `upload` öffnen danach ein Browserfenster mit der Seite (nur macOS).
 
-## Autoren
+## Credits
 
-* Michael Steil <mist64@mac.com>
-* [https://github.com/ellduin](https://github.com/ellduin)
+* Script, HTML, CSS, Scan, Bildbearbeitung, OCR:
+    * Michael Steil <mist64@mac.com>
+    * [https://github.com/ellduin](ellduin)
+* Abtippen der Listings aus Ausgabe 5/84:
+    * [goloMAK](https://www.forum64.de/wcf/index.php?user/28439-golomak/)
+    * [Endurion](https://www.forum64.de/wcf/index.php?user/1964-endurion/)
+    * [Drachen](https://www.forum64.de/wcf/index.php?user/9125-drachen/)
+
+
 
 ![](screenshot1.png)
 
