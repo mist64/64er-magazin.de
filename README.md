@@ -47,7 +47,7 @@ Die Eingabe-Ausgaben werden aus `issues` gelesen, die Website wird nach `out` ge
 
 * Script, HTML, CSS, Scan, Bildbearbeitung, OCR:
     * Michael Steil <mist64@mac.com>
-    * [https://github.com/ellduin](ellduin)
+    * [ellduin](https://github.com/ellduin)
 * Abtippen der Listings aus Ausgabe 5/84:
     * [goloMAK](https://www.forum64.de/wcf/index.php?user/28439-golomak/)
     * [Endurion](https://www.forum64.de/wcf/index.php?user/1964-endurion/)
