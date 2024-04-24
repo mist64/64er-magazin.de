@@ -658,6 +658,8 @@ def html_generate_toc(db, issue_key, heading_level=1, prepend_issue_dir=False):
 
     last_category = None
     
+    html_parts.append('<div class="toc">')
+
     for entry in toc_entries:
         if len(entry['articles']):
           category, subcategory = (entry['category'].split('|', 1) + [None])[:2] if '|' in entry['category'] else (entry['category'], None)
@@ -667,7 +669,7 @@ def html_generate_toc(db, issue_key, heading_level=1, prepend_issue_dir=False):
               last_category = category
           if subcategory:
               html_parts.append(f"<h4>{subcategory}</h4>\n")
-          html_parts.append('<ul class="toc-list">\n')
+          html_parts.append('<ul>\n')
           for article in entry['articles']:
 
               #link = article_link(db, article, toc_title(article), prepend_issue_dir)
@@ -684,7 +686,8 @@ def html_generate_toc(db, issue_key, heading_level=1, prepend_issue_dir=False):
 
               html_parts.append(f"<li>{link}</li>\n")
           html_parts.append("</ul>\n")
-    
+    html_parts.append("</div>")
+
     if heading_level == 1:
         html_parts.append(f"</main>\n")
     return ''.join(html_parts)
