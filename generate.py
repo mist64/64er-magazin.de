@@ -651,6 +651,7 @@ def html_generate_toc(db, issue_key, heading_level=1, prepend_issue_dir=False):
     </a>
 </div>\n
 """
+    html_parts.append('<div class="toc_container">')
     html_parts.append(title_image)
 
     issue_data = db.issues[issue_key]
@@ -686,7 +687,8 @@ def html_generate_toc(db, issue_key, heading_level=1, prepend_issue_dir=False):
 
               html_parts.append(f"<li>{link}</li>\n")
           html_parts.append("</ul>\n")
-    html_parts.append("</div>")
+    html_parts.append("</div>\n")
+    html_parts.append("</div>\n")
 
     if heading_level == 1:
         html_parts.append(f"</main>\n")
