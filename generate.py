@@ -645,8 +645,8 @@ def html_generate_toc(db, issue_key, heading_level=1, prepend_issue_dir=False):
         {title_image}
         <br>
         <div class=\"download_full_pdf_button\">
-            <img src="/{BASE_DIR}pdf.svg" alt="PDF">
-            {LABEL_DOWNLOAD_ISSUE_PDF}
+          <div class="download_icon"><img src="/{BASE_DIR}pdf.svg" alt="PDF"></div>
+          <div class="download_label">{LABEL_DOWNLOAD_ISSUE_PDF}</div>
         </div>
     </a>
 </div>\n
