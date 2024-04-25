@@ -340,12 +340,15 @@ class Issue:
                   pdf_filename = os.path.basename(pdf_path)
   
       if pubdate:
+          # used directly after init and then never again
           self.articles_metadata = articles_metadata
+          self.issue_key = issue_key
+
+          # used later on
           self.toc_order = toc_order
           self.pubdate = pubdate
           self.pdf_filename = pdf_filename
           self.issue_dir_name = issue_dir_name
-          self.issue_key = issue_key
           self.listings = listings
 
       else:
