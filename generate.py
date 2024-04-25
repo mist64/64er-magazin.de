@@ -303,7 +303,7 @@ class Article:
     def __init__(self, metadata):
         self.dict = metadata
         
-#         self.title = metadata['title']
+        self.title = metadata['title']
 #         self.issue = metadata['issue']        
 #         self.pages = metadata['pages']
 #         self.id = metadata['id']
@@ -625,7 +625,7 @@ def prg_link(issue, download):
 def index_title(article):
   index_title = article.dict.get('index_title')
   toc_title = article.dict.get('toc_title')
-  title = article.dict['title']
+  title = article.title
   ret = index_title if index_title else toc_title if toc_title else title
   if article.dict.get('id') == 'editorial':
       ret = f"Editorial: {ret}"
@@ -633,7 +633,7 @@ def index_title(article):
 
 def toc_title(article):
   toc_title = article.dict.get('toc_title')
-  title = article.dict['title']
+  title = article.title
   return toc_title if toc_title else title
 
 def share_on_mastodon_link(title, url):
@@ -908,7 +908,7 @@ def html_generate_article_preview(db, article):
 
 def html_generate_all_article_previews(db):
     # Filter out specific articles
-    articles = [article for article in db.articles if article.dict['title'] not in ["Impressum", "Vorschau"]]
+    articles = [article for article in db.articles if article.title not in ["Impressum", "Vorschau"]]
 
     # Sort by 'pubdate'
     articles = sorted(articles, key=lambda x: x.dict['pubdate'], reverse=True)
@@ -1272,7 +1272,7 @@ def copy_and_modify_html(article, html_dest_path, pdf_path, prev_page_link, next
 
     url = RSS_BASE_URL + html_dest_path.removeprefix(OUT_DIRECTORY)[1:] # hack :(
 
-    mastodon_link = share_on_mastodon_link(article.dict['title'], url)
+    mastodon_link = share_on_mastodon_link(article.title, url)
     mastodon_html = f'''
 <div class="article_action">
 <a href="{mastodon_link}">
@@ -1303,7 +1303,7 @@ def copy_and_modify_html(article, html_dest_path, pdf_path, prev_page_link, next
 
     body_html = str(soup.body)
     body_html = body_html[6:-7] # remove '<body>' and '</body>'
-    title = f"{article.dict['title']} | {MAGAZINE_NAME}"
+    title = f"{article.title} | {MAGAZINE_NAME}"
     preview_img = next((url for url in article.dict.get('img_urls', [])), None)
 
 
