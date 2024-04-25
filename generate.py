@@ -342,8 +342,8 @@ class Issue:
       if pubdate:
           self.articles_metadata = articles_metadata
           self.toc_order = toc_order
+          self.pubdate = pubdate
           self.dict = {
-              'pubdate': pubdate,
               'pdf_filename': pdf_filename,
               'issue_dir_name': issue_dir_name,
               'issue_key': issue_key,
@@ -496,7 +496,7 @@ class ArticleDatabase:
                     # Assign an index based on sorted order
                     article['index'] = index
                     # Assign a pubdate for RSS
-                    article['pubdate'] = article_pubdate(issue_data, article)
+                    article['pubdate'] = article_pubdate(issue, article)
                     self.articles.append(article)
 
     def latest_issue_key(self):
@@ -585,8 +585,8 @@ def share_on_mastodon_link(title, url):
     mastodon_message = quote(f"{title}\n{url}\n{MASTODON_HASHTAGS}")
     return f"/{BASE_DIR}tootpick.html#text={mastodon_message}"
 
-def article_pubdate(issue_data, article):
-    pubdate = issue_data['pubdate']
+def article_pubdate(issue, article):
+    pubdate = issue.pubdate
     # Add index as half-days to the date
     pubdate += timedelta(hours=HOURS_PER_ARTICLE * article['index'])
     return pubdate
