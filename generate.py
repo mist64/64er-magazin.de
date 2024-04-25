@@ -341,8 +341,8 @@ class Issue:
   
       if pubdate:
           self.articles_metadata = articles_metadata
+          self.toc_order = toc_order
           self.dict = {
-              'toc_order': toc_order,
               'pubdate': pubdate,
               'pdf_filename': pdf_filename,
               'issue_dir_name': issue_dir_name,
@@ -507,10 +507,10 @@ class ArticleDatabase:
         return sorted(filtered_articles, key=lambda x: first_page_number(x['pages']))
 
     def toc_with_articles(self, issue_key):
-        issue_data = self.issues[issue_key].dict
+        issue = self.issues[issue_key]
         toc_entries = []
 
-        toc_order = [""] + issue_data['toc_order'] # prepend empty category
+        toc_order = [""] + issue.toc_order # prepend empty category
         for toc in toc_order:
             articles = self.articles_by_toc_categories([toc], issue_key)
             articles_sorted = sorted(articles, key=lambda x: first_page_number(x['pages']))
