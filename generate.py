@@ -304,7 +304,12 @@ class Article:
         self.dict = metadata
         
         self.title = metadata['title']
-#         self.issue = metadata['issue']        
+        self.issue = metadata['issue']
+        
+        # remove
+        del self.dict['title']
+        del self.dict['issue']
+        
 #         self.pages = metadata['pages']
 #         self.id = metadata['id']
 # 
@@ -598,7 +603,7 @@ class ArticleDatabase:
         # Sort articles in each category by issue and then by first page number
         for category, articles_list in articles_by_category.items():
             articles_by_category[category] = sorted(articles_list,
-                                                    key=lambda x: (x.dict['issue'],  first_page_number(x.dict['pages'])))
+                                                    key=lambda x: (x.issue, first_page_number(x.dict['pages'])))
 
         sorted_categories = sorted(articles_by_category.items(), key=lambda x: x[0])
         return OrderedDict(sorted_categories)
@@ -788,7 +793,7 @@ def html_generate_articles_for_categories(db, toc_categories, alphabetical, issu
     html_parts.append(f"<ul>\n")
     for article in articles:
         if append_issue_number:
-            issue_number = f" [{article.dict['issue']}]"
+            issue_number = f" [{article.issue}]"
         else:
             issue_number = ""
         link = article_link(db, article, index_title(article), True)
@@ -1232,7 +1237,7 @@ def convert_and_copy_image(img_path, dest_img_path):
 def copy_and_modify_html(article, html_dest_path, pdf_path, prev_page_link, next_page_link):
     """Modifies, and writes an HTML file directly to the destination."""
     soup = article.dict['html']
-    issue_number = article.dict['issue']
+    issue_number = article.issue
     head1 = article.dict.get('head1')
     head2 = article.dict.get('head2')
     pages = article.dict.get('pages')
