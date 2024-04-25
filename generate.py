@@ -875,7 +875,7 @@ def html_generate_article_preview(db, article):
     link_title = article_link(db, article, index_title(article), True)
     title = index_title(article)
     description = article.description if article.description else ''
-    category = article.toc_category if article.toc_category else '' # 'Uncategorized' # todo: translate and use uncategorized?
+    category = article.toc_category if article.toc_category else '' # 'Uncategorized'
     issue_key = article.issue_key
     issue = db.issues[issue_key]
     issue_dir_name = issue.issue_dir_name
