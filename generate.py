@@ -261,6 +261,10 @@ def key_to_datetime(issue_key):
 
 # converts an img tag into a picture tag with AVIF and a JPEG fallback
 def avif_picture_tag(soup, img_src, attrs=None):
+    # svg is unchanged
+    if img_src[-4:] == '.svg':
+        return soup.new_tag('img', src=img_src)
+
     # Create the <picture> tag
     picture_tag = soup.new_tag('picture')
 
@@ -278,10 +282,10 @@ def avif_picture_tag(soup, img_src, attrs=None):
     # add an empty alt for now if there is none
     if 'alt' not in new_img_tag.attrs:
         new_img_tag['alt'] = ""
-    
+
     # Update the src attribute to the JPEG version
     new_img_tag['src'] = img_src[:-4] + '.jpg'
-    
+
     # Append the new <img> tag to the <picture> tag
     picture_tag.append(new_img_tag)
 
@@ -658,7 +662,7 @@ def html_generate_toc(db, issue_key, heading_level=1, prepend_issue_dir=False):
     toc_entries = db.toc_with_articles(issue_key)
 
     last_category = None
-    
+
     html_parts.append('<div class="toc">')
 
     for entry in toc_entries:
@@ -678,7 +682,7 @@ def html_generate_toc(db, issue_key, heading_level=1, prepend_issue_dir=False):
               path = article_path(issue_data, article, prepend_issue_dir)
               title = toc_title(article)
               first_page = first_page_number(article['pages'])
-              
+
               link = f"""
               <a href='{path}'>
               <span class="title">{title}<span class="leaders" aria-hidden="true"></span></span> <span class="page"><span class="visually-hidden">Page&nbsp;</span>{first_page}</span>
@@ -1352,12 +1356,18 @@ def copy_articles_and_assets(db, in_directory, out_directory):
             for img_src in img_srcs:
                 img_path = os.path.join(issue_source_path, img_src)
                 if os.path.exists(img_path):
-                    dest_img_name = os.path.splitext(os.path.basename(img_path))[0] + '.avif'
-                    dest_img_path = os.path.join(issue_dest_path, dest_img_name)
-                    convert_and_copy_image(img_path, dest_img_path)
-                    dest_img_name = os.path.splitext(os.path.basename(img_path))[0] + '.jpg'
-                    dest_img_path = os.path.join(issue_dest_path, dest_img_name)
-                    convert_and_copy_image(img_path, dest_img_path)
+                    _, file_extension = os.path.splitext(img_path)
+                    if file_extension == ".svg":
+                        dest_img_name = os.path.basename(img_path)
+                        dest_img_path = os.path.join(issue_dest_path, dest_img_name)
+                        shutil.copy(img_path, dest_img_path)
+                    else:
+                        dest_img_name = os.path.splitext(os.path.basename(img_path))[0] + '.avif'
+                        dest_img_path = os.path.join(issue_dest_path, dest_img_name)
+                        convert_and_copy_image(img_path, dest_img_path)
+                        dest_img_name = os.path.splitext(os.path.basename(img_path))[0] + '.jpg'
+                        dest_img_path = os.path.join(issue_dest_path, dest_img_name)
+                        convert_and_copy_image(img_path, dest_img_path)
 
             # Copy files from the downloads
 #            downloads = article['downloads']
