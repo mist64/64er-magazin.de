@@ -309,7 +309,7 @@ class Article:
         self.id = metadata['id']
         self.issue_key = metadata['issue_key']
         self.out_filename = metadata['out_filename']
-#         self.index = metadata['index']
+        self.index = metadata['index']
 #         self.pubdate = metadata['pubdate']
 # 
 #         self.head1 = metadata['head1']        
@@ -339,6 +339,7 @@ class Article:
         del self.dict['id']
         del self.dict['issue_key']
         del self.dict['out_filename']
+        del self.dict['index']
 
         
                 
