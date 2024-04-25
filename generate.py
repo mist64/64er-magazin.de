@@ -278,10 +278,10 @@ def avif_picture_tag(soup, img_src, attrs=None):
     # add an empty alt for now if there is none
     if 'alt' not in new_img_tag.attrs:
         new_img_tag['alt'] = ""
-
+    
     # Update the src attribute to the JPEG version
     new_img_tag['src'] = img_src[:-4] + '.jpg'
-
+    
     # Append the new <img> tag to the <picture> tag
     picture_tag.append(new_img_tag)
 
@@ -645,18 +645,21 @@ def html_generate_toc(db, issue_key, heading_level=1, prepend_issue_dir=False):
         {title_image}
         <br>
         <div class=\"download_full_pdf_button\">
-            <img src="/{BASE_DIR}pdf.svg" alt="PDF">
-            {LABEL_DOWNLOAD_ISSUE_PDF}
+          <div class="download_icon"><img src="/{BASE_DIR}pdf.svg" alt="PDF"></div>
+          <div class="download_label">{LABEL_DOWNLOAD_ISSUE_PDF}</div>
         </div>
     </a>
 </div>\n
 """
+    html_parts.append('<div class="toc_container">')
     html_parts.append(title_image)
 
     issue_data = db.issues[issue_key]
     toc_entries = db.toc_with_articles(issue_key)
 
     last_category = None
+    
+    html_parts.append('<div class="toc">')
 
     for entry in toc_entries:
         if len(entry['articles']):
@@ -667,11 +670,25 @@ def html_generate_toc(db, issue_key, heading_level=1, prepend_issue_dir=False):
               last_category = category
           if subcategory:
               html_parts.append(f"<h4>{subcategory}</h4>\n")
-          html_parts.append("<ul>\n")
+          html_parts.append('<ul>\n')
           for article in entry['articles']:
-              link = article_link(db, article, toc_title(article), prepend_issue_dir)
+
+              #link = article_link(db, article, toc_title(article), prepend_issue_dir)
+              issue_data = db.issues[article['issue_key']]
+              path = article_path(issue_data, article, prepend_issue_dir)
+              title = toc_title(article)
+              first_page = first_page_number(article['pages'])
+              
+              link = f"""
+              <a href='{path}'>
+              <span class="title">{title}<span class="leaders" aria-hidden="true"></span></span> <span class="page"><span class="visually-hidden">Page&nbsp;</span>{first_page}</span>
+              </a>
+              """
+
               html_parts.append(f"<li>{link}</li>\n")
           html_parts.append("</ul>\n")
+    html_parts.append("</div>\n")
+    html_parts.append("</div>\n")
 
     if heading_level == 1:
         html_parts.append(f"</main>\n")
