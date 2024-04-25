@@ -316,7 +316,7 @@ class Article:
         self.toc_title = metadata['toc_title']
         self.toc_category = metadata['toc_category']
         self.index_title = metadata['index_title']
-#         self.index_category = metadata['index_category']
+        self.index_category = metadata['index_category']
 #         self.category = metadata['category']
 #         self.target_filename = metadata['target_filename']
 #         
@@ -345,6 +345,7 @@ class Article:
         del self.dict['toc_title']
         del self.dict['toc_category']
         del self.dict['index_title']
+        del self.dict['index_category']
 
         
                 
@@ -596,7 +597,7 @@ class ArticleDatabase:
         return toc_entries
 
     def articles_with_downloads(self):
-        return [article for article in self.articles if article.dict.get('index_category') and article.dict.get('index_category').startswith(CATEGORY_TYPE_IN + '|') and article.dict['downloads']]
+        return [article for article in self.articles if article.index_category and article.index_category.startswith(CATEGORY_TYPE_IN + '|') and article.dict['downloads']]
 
     def all_type_in_articles_grouped_by_index_category(self):
         # Initialize a dictionary to hold articles by category
@@ -604,7 +605,7 @@ class ArticleDatabase:
 
         # Filter articles with downloads and organize them
         for article in self.articles:
-            index_category = article.dict.get('index_category')
+            index_category = article.index_category
             if index_category and index_category.startswith(CATEGORY_TYPE_IN + '|') and article.dict.get('downloads'):
                 index_category = index_category[index_category.find('|') + 1:]
                 articles_by_category[index_category].append(article)
