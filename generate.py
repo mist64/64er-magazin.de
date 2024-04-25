@@ -362,14 +362,28 @@ class Issue:
 
       soup = BeautifulSoup(contents, 'html.parser')
   
-      def find_meta(name, alternate=None):
-          return soup.find('meta', attrs={'name': name})['content'] if soup.find('meta', attrs={'name': name}) else alternate
-        
+      def find_meta(name, is_optional=True): # panic if non optional
+          meta_tag = soup.find('meta', attrs={'name': name})
+          if meta_tag:
+              return meta_tag['content']
+          elif is_optional:
+              return None
+          else:
+              raise SystemExit(f'\n---\nMetaDataError: "{name}" meta tag is missing\n   File: "{html_file_path}"')
+      
+      def find_title(): # panic if no title
+          title_tag = soup.find('title')
+          if title_tag:
+              return title_tag.text
+          else:
+              raise SystemExit(f'\n---\nMetaDataError: title tag is missing\n   File: "{html_file_path}"')
+
       metadata = {
           'filename': os.path.basename(html_file_path), # XXX old
-          'title': soup.find('title').text if soup.find('title') else 'No Title',
-          'issue': find_meta('64er.issue', 'No Issue'),
-          'pages': find_meta('64er.pages', 'No Pages'),
+          'title': find_title(),
+          'issue': find_meta('64er.issue', False),
+          'pages': find_meta('64er.pages', False),
+          'id': find_meta('64er.id', False),
           'head1': find_meta('64er.head1'),
           'head2': find_meta('64er.head2'),
           'toc_title': find_meta('64er.toc_title'),
@@ -377,7 +391,6 @@ class Issue:
           'index_title': find_meta('64er.index_title'),
           'index_category': find_meta('64er.index_category'),
           'category': find_meta('64er.category'),
-          'id': find_meta('64er.id'),
       }
   
       metadata['target_filename'] = os.path.basename(metadata['id']) + '.html'
