@@ -313,7 +313,7 @@ class Article:
         self.pubdate = metadata['pubdate']
         self.head1 = metadata['head1']
         self.head2 = metadata['head2']
-#         self.toc_title = metadata['toc_title']
+        self.toc_title = metadata['toc_title']
 #         self.toc_category = metadata['toc_category']
 #         self.index_title = metadata['index_title']
 #         self.index_category = metadata['index_category']
@@ -342,6 +342,7 @@ class Article:
         del self.dict['pubdate']
         del self.dict['head1']
         del self.dict['head2']
+        del self.dict['toc_title']
 
         
                 
@@ -635,7 +636,7 @@ def prg_link(issue, download):
 
 def index_title(article):
   index_title = article.dict.get('index_title')
-  toc_title = article.dict.get('toc_title')
+  toc_title = article.toc_title
   title = article.title
   ret = index_title if index_title else toc_title if toc_title else title
   if article.id == 'editorial':
@@ -643,7 +644,7 @@ def index_title(article):
   return ret
 
 def toc_title(article):
-  toc_title = article.dict.get('toc_title')
+  toc_title = article.toc_title
   title = article.title
   return toc_title if toc_title else title
 
