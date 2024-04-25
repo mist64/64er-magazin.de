@@ -322,7 +322,7 @@ class Article:
         
         self.downloads = metadata['downloads']
         self.description = metadata['description']
-#         self.src_img_urls = metadata['src_img_urls']
+        self.src_img_urls = metadata['src_img_urls']
 #         
 #         self.html = metadata['html']
 #         self.txt = metadata['txt']
@@ -350,6 +350,7 @@ class Article:
         del self.dict['target_filename']
         del self.dict['downloads']
         del self.dict['description']
+        del self.dict['src_img_urls']
 
         
                 
@@ -1426,7 +1427,7 @@ def copy_articles_and_assets(db, in_directory, out_directory):
         article_index = 0
         for article in articles:
             # Copy images found in article metadata
-            img_srcs = article.dict.get('src_img_urls', [])
+            img_srcs = article.src_img_urls if article.src_img_urls else []
             for img_src in img_srcs:
                 img_path = os.path.join(issue_source_path, img_src)
                 if os.path.exists(img_path):
