@@ -343,8 +343,8 @@ class Issue:
           self.articles_metadata = articles_metadata
           self.toc_order = toc_order
           self.pubdate = pubdate
+          self.pdf_filename = pdf_filename
           self.dict = {
-              'pdf_filename': pdf_filename,
               'issue_dir_name': issue_dir_name,
               'issue_key': issue_key,
               'listings': listings,
@@ -636,8 +636,9 @@ def html_generate_toc(db, issue_key, heading_level=1, prepend_issue_dir=False):
     if heading_level == 1:
         html_parts.append(f"<main>\n")
     html_parts.append(f"<h{heading_level}>{LABEL_ISSUE} {issue_key}</h{heading_level}>\n")
+    issue = db.issues[issue_key]
+    pdf_filename = issue.pdf_filename
     issue_data = db.issues[issue_key].dict
-    pdf_filename = issue_data['pdf_filename']
     issue_dir = issue_data['issue_dir_name'] if prepend_issue_dir else None
     if issue_dir:
         pdf_filename = os.path.join(issue_dir, pdf_filename)
@@ -1296,7 +1297,8 @@ def copy_articles_and_assets(db, in_directory, out_directory):
         shutil.copytree(fonts_source_path, fonts_dest_path, dirs_exist_ok=True)
 
     for issue_key in db.issues.keys():
-        issue_data = db.issues[issue_key].dict
+        issue = db.issues[issue_key]
+        issue_data = issue.dict
         issue_source_path = os.path.join(in_directory, issue_data['issue_dir_name'])
         issue_dest_path = os.path.join(out_directory, issue_data['issue_dir_name'])
         issue_dest_path_prg = os.path.join(issue_dest_path, 'prg')
@@ -1313,7 +1315,8 @@ def copy_articles_and_assets(db, in_directory, out_directory):
             convert_and_copy_image(os.path.join(issue_source_path, 'title.png'), os.path.join(issue_dest_path, 'title.jpg'))
 
         # Copy full PDF
-        shutil.copy(os.path.join(issue_source_path, issue_data['pdf_filename']), issue_dest_path)
+        pdf_filename = issue.pdf_filename
+        shutil.copy(os.path.join(issue_source_path, pdf_filename), issue_dest_path)
 
         # Create .PRG from Petcat listings
         listings = issue_data['listings']
@@ -1378,7 +1381,6 @@ def copy_articles_and_assets(db, in_directory, out_directory):
             pages = article['pages']
 
             # create PDF with just the article
-            pdf_filename = issue_data['pdf_filename']
             source_pdf_path = os.path.join(issue_source_path, pdf_filename)
             pdf_path = pdf_filename[:-4] + '_' + pages + '.pdf'
             dest_pdf_path = os.path.join(issue_dest_path, pdf_path)
