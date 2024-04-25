@@ -299,7 +299,7 @@ def calculate_sha1(filepath):
     return sha1.hexdigest()
 
 class Issue:
-  def __init__(self, issue_directory_path): #__extract_issue_data
+  def __init__(self, issue_directory_path):
       """Extracts all relevant data from an issue directory, including HTML file paths."""
       articles_metadata = []
       toc_order = []
@@ -346,8 +346,10 @@ class Issue:
           self.pdf_filename = pdf_filename
           self.issue_dir_name = issue_dir_name
           self.issue_key = issue_key
+          self.listings = listings
+
           self.dict = {
-              'listings': listings,
+            "todo" : "exception"
           }
       else:
           self.dict = None
@@ -477,7 +479,7 @@ class ArticleDatabase:
         for issue_dir_name in os.listdir(in_directory):
             issue_dir_path = os.path.join(in_directory, issue_dir_name)
             if os.path.isdir(issue_dir_path) and re.match(r'^\d{4}$', issue_dir_name):
-                issue = Issue(issue_dir_path) #__extract_issue_data
+                issue = Issue(issue_dir_path)
                 
                 # todo: exception in the init and exception handler here
                 if not issue.dict:
@@ -730,7 +732,6 @@ def html_generate_articles_for_categories(db, toc_categories, alphabetical, issu
     html_parts = []
     html_parts.append(f"<ul>\n")
     for article in articles:
-        issue_data = db.issues[article['issue_key']].dict
         if append_issue_number:
             issue_number = f" [{article['issue']}]"
         else:
@@ -1296,7 +1297,6 @@ def copy_articles_and_assets(db, in_directory, out_directory):
 
     for issue_key in db.issues.keys():
         issue = db.issues[issue_key]
-        issue_data = issue.dict
         issue_source_path = os.path.join(in_directory, issue.issue_dir_name)
         issue_dest_path = os.path.join(out_directory, issue.issue_dir_name)
         issue_dest_path_prg = os.path.join(issue_dest_path, 'prg')
@@ -1317,7 +1317,7 @@ def copy_articles_and_assets(db, in_directory, out_directory):
         shutil.copy(os.path.join(issue_source_path, pdf_filename), issue_dest_path)
 
         # Create .PRG from Petcat listings
-        listings = issue_data['listings']
+        listings = issue.listings
         for key, listing in listings.items():
             # Prepare the output file name
             output_file_name = os.path.join(issue_dest_path, 'prg', f"{key}.prg")
