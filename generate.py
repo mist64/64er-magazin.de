@@ -319,8 +319,8 @@ class Article:
         self.index_category = metadata['index_category']
         self.category = metadata['category'] # unused?
         self.target_filename = metadata['target_filename']
-#         
-#         self.downloads = metadata['downloads']
+        
+        self.downloads = metadata['downloads']
 #         self.description = metadata['description']
 #         self.src_img_urls = metadata['src_img_urls']
 #         
@@ -348,6 +348,7 @@ class Article:
         del self.dict['index_category']
         del self.dict['category']
         del self.dict['target_filename']
+        del self.dict['downloads']
 
         
                 
@@ -599,7 +600,7 @@ class ArticleDatabase:
         return toc_entries
 
     def articles_with_downloads(self):
-        return [article for article in self.articles if article.index_category and article.index_category.startswith(CATEGORY_TYPE_IN + '|') and article.dict['downloads']]
+        return [article for article in self.articles if article.index_category and article.index_category.startswith(CATEGORY_TYPE_IN + '|') and article.downloads]
 
     def all_type_in_articles_grouped_by_index_category(self):
         # Initialize a dictionary to hold articles by category
@@ -608,7 +609,7 @@ class ArticleDatabase:
         # Filter articles with downloads and organize them
         for article in self.articles:
             index_category = article.index_category
-            if index_category and index_category.startswith(CATEGORY_TYPE_IN + '|') and article.dict.get('downloads'):
+            if index_category and index_category.startswith(CATEGORY_TYPE_IN + '|') and article.downloads:
                 index_category = index_category[index_category.find('|') + 1:]
                 articles_by_category[index_category].append(article)
 
@@ -872,7 +873,7 @@ def html_generate_all_downloads(db):
 
             # Construct the list of downloads
             downloads_list = ""
-            for download in article.dict['downloads']:
+            for download in article.downloads:
                 downloads_list += f"<li>{prg_link(issue, download)}</li>\n"
 
             # Add a row to the table for this article
@@ -1442,7 +1443,7 @@ def copy_articles_and_assets(db, in_directory, out_directory):
                         convert_and_copy_image(img_path, dest_img_path)
 
             # Copy files from the downloads
-#            downloads = article.dict['downloads']
+#            downloads = article.downloads
 #            for _, download_url in downloads:
 #                # Assuming download_url is a relative path; adjust logic if it's a URL
 #                download_path = os.path.join(issue_source_path, download_url)
