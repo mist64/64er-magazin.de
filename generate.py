@@ -311,9 +311,8 @@ class Article:
         self.out_filename = metadata['out_filename']
         self.index = metadata['index']
         self.pubdate = metadata['pubdate']
-# 
-#         self.head1 = metadata['head1']        
-#         self.head2 = metadata['head2']
+        self.head1 = metadata['head1']
+        self.head2 = metadata['head2']
 #         self.toc_title = metadata['toc_title']
 #         self.toc_category = metadata['toc_category']
 #         self.index_title = metadata['index_title']
@@ -341,6 +340,8 @@ class Article:
         del self.dict['out_filename']
         del self.dict['index']
         del self.dict['pubdate']
+        del self.dict['head1']
+        del self.dict['head2']
 
         
                 
@@ -1243,8 +1244,8 @@ def copy_and_modify_html(article, html_dest_path, pdf_path, prev_page_link, next
     """Modifies, and writes an HTML file directly to the destination."""
     soup = article.dict['html']
     issue_number = article.issue
-    head1 = article.dict.get('head1')
-    head2 = article.dict.get('head2')
+    head1 = article.head1
+    head2 = article.head2
     pages = article.pages
 
     # Parse navigation HTML and prepare for insertion
