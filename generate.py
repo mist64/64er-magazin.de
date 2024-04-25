@@ -317,7 +317,7 @@ class Article:
         self.toc_category = metadata['toc_category']
         self.index_title = metadata['index_title']
         self.index_category = metadata['index_category']
-#         self.category = metadata['category']
+        self.category = metadata['category'] # unused?
 #         self.target_filename = metadata['target_filename']
 #         
 #         self.downloads = metadata['downloads']
@@ -346,6 +346,7 @@ class Article:
         del self.dict['toc_category']
         del self.dict['index_title']
         del self.dict['index_category']
+        del self.dict['category']
 
         
                 
