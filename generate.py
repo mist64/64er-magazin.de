@@ -298,6 +298,42 @@ def calculate_sha1(filepath):
             sha1.update(chunk)
     return sha1.hexdigest()
 
+class Article:
+
+    def __init__(self, metadata):
+        self.dict = metadata
+        
+#         self.title = metadata['title']
+#         self.issue = metadata['issue']        
+#         self.pages = metadata['pages']
+#         self.id = metadata['id']
+# 
+#         self.issue_key = metadata['issue_key']
+#         self.out_filename = metadata['out_filename']
+#         self.index = metadata['index']
+#         self.pubdate = metadata['pubdate']
+# 
+#         self.head1 = metadata['head1']        
+#         self.head2 = metadata['head2']
+#         self.toc_title = metadata['toc_title']
+#         self.toc_category = metadata['toc_category']
+#         self.index_title = metadata['index_title']
+#         self.index_category = metadata['index_category']
+#         self.category = metadata['category']
+#         self.target_filename = metadata['target_filename']
+#         
+#         self.downloads = metadata['downloads']
+#         self.description = metadata['description']
+#         self.src_img_urls = metadata['src_img_urls']
+#         
+#         self.html = metadata['html']
+#         self.txt = metadata['txt']
+#         
+#         self.img_urls = metadata['img_urls']
+#         
+#         self.path = metadata['path']
+        
+                
 class Issue:
   def __init__(self, issue_directory_path):
       """Extracts all relevant data from an issue directory, including HTML file paths."""
@@ -519,14 +555,16 @@ class ArticleDatabase:
                     article['index'] = index
                     # Assign a pubdate for RSS
                     article['pubdate'] = article_pubdate(issue, article)
-                    self.articles.append(article)
+                    
+                    article_obj = Article(article)
+                    self.articles.append(article_obj)
 
     def latest_issue_key(self):
         return max(self.issues.keys(), key=key_to_datetime)
 
     def articles_by_toc_categories(self, toc_categories, issue_key=None):
-        filtered_articles = [article for article in self.articles if article.get('toc_category') in toc_categories and (issue_key is None or article['issue_key'] == issue_key)]
-        return sorted(filtered_articles, key=lambda x: first_page_number(x['pages']))
+        filtered_articles = [article for article in self.articles if article.dict.get('toc_category') in toc_categories and (issue_key is None or article.dict['issue_key'] == issue_key)]
+        return sorted(filtered_articles, key=lambda x: first_page_number(x.dict['pages']))
 
     def toc_with_articles(self, issue_key):
         issue = self.issues[issue_key]
@@ -535,7 +573,7 @@ class ArticleDatabase:
         toc_order = [""] + issue.toc_order # prepend empty category
         for toc in toc_order:
             articles = self.articles_by_toc_categories([toc], issue_key)
-            articles_sorted = sorted(articles, key=lambda x: first_page_number(x['pages']))
+            articles_sorted = sorted(articles, key=lambda x: first_page_number(x.dict['pages']))
             toc_entries.append({
                 'category': toc,
                 'articles': articles_sorted
@@ -544,7 +582,7 @@ class ArticleDatabase:
         return toc_entries
 
     def articles_with_downloads(self):
-        return [article for article in self.articles if article.get('index_category') and article.get('index_category').startswith(CATEGORY_TYPE_IN + '|') and article['downloads']]
+        return [article for article in self.articles if article.dict.get('index_category') and article.dict.get('index_category').startswith(CATEGORY_TYPE_IN + '|') and article.dict['downloads']]
 
     def all_type_in_articles_grouped_by_index_category(self):
         # Initialize a dictionary to hold articles by category
@@ -552,15 +590,15 @@ class ArticleDatabase:
 
         # Filter articles with downloads and organize them
         for article in self.articles:
-            index_category = article.get('index_category')
-            if index_category and index_category.startswith(CATEGORY_TYPE_IN + '|') and article.get('downloads'):
+            index_category = article.dict.get('index_category')
+            if index_category and index_category.startswith(CATEGORY_TYPE_IN + '|') and article.dict.get('downloads'):
                 index_category = index_category[index_category.find('|') + 1:]
                 articles_by_category[index_category].append(article)
 
         # Sort articles in each category by issue and then by first page number
         for category, articles_list in articles_by_category.items():
             articles_by_category[category] = sorted(articles_list,
-                                                    key=lambda x: (x['issue'],  first_page_number(x['pages'])))
+                                                    key=lambda x: (x.dict['issue'],  first_page_number(x.dict['pages'])))
 
         sorted_categories = sorted(articles_by_category.items(), key=lambda x: x[0])
         return OrderedDict(sorted_categories)
@@ -571,11 +609,11 @@ def full_url(path):
     return RSS_BASE_URL + quote(BASE_DIR + path)
 
 def article_path(issue, article, prepend_issue_dir=False):
-    article_path = optional_issue_prefix(article['out_filename'], issue, prepend_issue_dir)
+    article_path = optional_issue_prefix(article.dict['out_filename'], issue, prepend_issue_dir)
     return article_path
 
 def article_link(db, article, title, prepend_issue_dir=False):
-    issue = db.issues[article['issue_key']]
+    issue = db.issues[article.dict['issue_key']]
     path = article_path(issue, article, prepend_issue_dir)
     return f"<a href='{path}'>{title}</a>"
 
@@ -585,27 +623,27 @@ def prg_link(issue, download):
     return f"<a href='{url}'>{label}</a>"
 
 def index_title(article):
-  index_title = article.get('index_title')
-  toc_title = article.get('toc_title')
-  title = article['title']
+  index_title = article.dict.get('index_title')
+  toc_title = article.dict.get('toc_title')
+  title = article.dict['title']
   ret = index_title if index_title else toc_title if toc_title else title
-  if article.get('id') == 'editorial':
+  if article.dict.get('id') == 'editorial':
       ret = f"Editorial: {ret}"
   return ret
 
 def toc_title(article):
-  toc_title = article.get('toc_title')
-  title = article['title']
+  toc_title = article.dict.get('toc_title')
+  title = article.dict['title']
   return toc_title if toc_title else title
 
 def share_on_mastodon_link(title, url):
     mastodon_message = quote(f"{title}\n{url}\n{MASTODON_HASHTAGS}")
     return f"/{BASE_DIR}tootpick.html#text={mastodon_message}"
 
-def article_pubdate(issue, article):
+def article_pubdate(issue, article_dict):
     pubdate = issue.pubdate
     # Add index as half-days to the date
-    pubdate += timedelta(hours=HOURS_PER_ARTICLE * article['index'])
+    pubdate += timedelta(hours=HOURS_PER_ARTICLE * article_dict['index'])
     return pubdate
 
 
@@ -634,7 +672,7 @@ def html_generate_latest_issue(db):
 
 def html_generate_latest_downloads(db):
     articles_with_downloads = db.articles_with_downloads()
-    sorted_articles = sorted(articles_with_downloads, key=lambda x: (x['issue_key'], first_page_number(x['pages'])), reverse=True)[:NEW_DOWNLOADS]
+    sorted_articles = sorted(articles_with_downloads, key=lambda x: (x.dict['issue_key'], first_page_number(x.dict['pages'])), reverse=True)[:NEW_DOWNLOADS]
     html_parts = [f"<h2>{LABEL_LATEST_LISTINGS}</h2><hr><ul>"]
 
     for article in sorted_articles:
@@ -694,10 +732,10 @@ def html_generate_toc(db, issue_key, heading_level=1, prepend_issue_dir=False):
           for article in entry['articles']:
 
               #link = article_link(db, article, toc_title(article), prepend_issue_dir)
-              issue = db.issues[article['issue_key']]
+              issue = db.issues[article.dict['issue_key']]
               path = article_path(issue, article, prepend_issue_dir)
               title = toc_title(article)
-              first_page = first_page_number(article['pages'])
+              first_page = first_page_number(article.dict['pages'])
 
               link = f"""
               <a href='{path}'>
@@ -750,7 +788,7 @@ def html_generate_articles_for_categories(db, toc_categories, alphabetical, issu
     html_parts.append(f"<ul>\n")
     for article in articles:
         if append_issue_number:
-            issue_number = f" [{article['issue']}]"
+            issue_number = f" [{article.dict['issue']}]"
         else:
             issue_number = ""
         link = article_link(db, article, index_title(article), True)
@@ -812,12 +850,12 @@ def html_generate_all_downloads(db):
     for index_category, articles_list in articles_by_category.items():
         for article in articles_list:
             link = article_link(db, article, index_title(article), True)
-            issue_key = article['issue_key']
+            issue_key = article.dict['issue_key']
             issue = db.issues[issue_key]
 
             # Construct the list of downloads
             downloads_list = ""
-            for download in article['downloads']:
+            for download in article.dict['downloads']:
                 downloads_list += f"<li>{prg_link(issue, download)}</li>\n"
 
             # Add a row to the table for this article
@@ -844,14 +882,14 @@ def html_generate_article_preview(db, article):
     html_parts = []
     link_title = article_link(db, article, index_title(article), True)
     title = index_title(article)
-    description = article.get('description', '')
-    category = article.get('toc_category', 'Uncategorized')
-    issue_key = article['issue_key']
+    description = article.dict.get('description', '')
+    category = article.dict.get('toc_category', 'Uncategorized')
+    issue_key = article.dict['issue_key']
     issue = db.issues[issue_key]
     issue_dir_name = issue.issue_dir_name
-    pages = article['pages']
-    img_src = next((url for url in article.get('img_urls', [])), None)
-    pubdate_unix = int(article['pubdate'].timestamp())
+    pages = article.dict['pages']
+    img_src = next((url for url in article.dict.get('img_urls', [])), None)
+    pubdate_unix = int(article.dict['pubdate'].timestamp())
     html_parts.append(f"<div class=\"article_link\" data-pubdate=\"{pubdate_unix}\">\n")
     if img_src:
         img_src = os.path.join(issue_dir_name, img_src)
@@ -870,10 +908,10 @@ def html_generate_article_preview(db, article):
 
 def html_generate_all_article_previews(db):
     # Filter out specific articles
-    articles = [article for article in db.articles if article['title'] not in ["Impressum", "Vorschau"]]
+    articles = [article for article in db.articles if article.dict['title'] not in ["Impressum", "Vorschau"]]
 
     # Sort by 'pubdate'
-    articles = sorted(articles, key=lambda x: x['pubdate'], reverse=True)
+    articles = sorted(articles, key=lambda x: x.dict['pubdate'], reverse=True)
 
     html_articles = []
 
@@ -1096,14 +1134,14 @@ def generate_404_page(db, out_directory):
 def generate_rss_feed(db, out_directory):
     rss_items = []
 
-    sorted_articles = sorted(db.articles, key=lambda x: x['pubdate'], reverse=False)
+    sorted_articles = sorted(db.articles, key=lambda x: x.dict['pubdate'], reverse=False)
 
     for article in sorted_articles:
         title = html.escape(index_title(article))
-        issue = db.issues[article['issue_key']]
+        issue = db.issues[article.dict['issue_key']]
         link = full_url(article_path(issue, article, True))
-        description = article['description']
-        img_src = article['img_urls'][0] if article['img_urls'] else None
+        description = article.dict['description']
+        img_src = article.dict['img_urls'][0] if article.dict['img_urls'] else None
         if img_src:
             img_src = full_url(os.path.join(issue.issue_dir_name, img_src))
             img = f"<img src='{img_src}'><br>"
@@ -1116,7 +1154,7 @@ def generate_rss_feed(db, out_directory):
         else:
             description = ""
 
-        pubdate = article['pubdate'].strftime("%a, %d %b %Y %H:%M:%S %z")[:-5] + "GMT"
+        pubdate = article.dict['pubdate'].strftime("%a, %d %b %Y %H:%M:%S %z")[:-5] + "GMT"
 
         rss_item_template = '''<item>
     <title>{title}</title>
@@ -1193,11 +1231,11 @@ def convert_and_copy_image(img_path, dest_img_path):
 
 def copy_and_modify_html(article, html_dest_path, pdf_path, prev_page_link, next_page_link):
     """Modifies, and writes an HTML file directly to the destination."""
-    soup = article['html']
-    issue_number = article['issue']
-    head1 = article.get('head1')
-    head2 = article.get('head2')
-    pages = article.get('pages')
+    soup = article.dict['html']
+    issue_number = article.dict['issue']
+    head1 = article.dict.get('head1')
+    head2 = article.dict.get('head2')
+    pages = article.dict.get('pages')
 
     # Parse navigation HTML and prepare for insertion
     body = soup.find('body')
@@ -1234,7 +1272,7 @@ def copy_and_modify_html(article, html_dest_path, pdf_path, prev_page_link, next
 
     url = RSS_BASE_URL + html_dest_path.removeprefix(OUT_DIRECTORY)[1:] # hack :(
 
-    mastodon_link = share_on_mastodon_link(article['title'], url)
+    mastodon_link = share_on_mastodon_link(article.dict['title'], url)
     mastodon_html = f'''
 <div class="article_action">
 <a href="{mastodon_link}">
@@ -1265,8 +1303,8 @@ def copy_and_modify_html(article, html_dest_path, pdf_path, prev_page_link, next
 
     body_html = str(soup.body)
     body_html = body_html[6:-7] # remove '<body>' and '</body>'
-    title = f"{article['title']} | {MAGAZINE_NAME}"
-    preview_img = next((url for url in article.get('img_urls', [])), None)
+    title = f"{article.dict['title']} | {MAGAZINE_NAME}"
+    preview_img = next((url for url in article.dict.get('img_urls', [])), None)
 
 
     write_full_html_file(db, html_dest_path, title, preview_img, body_html, 'one_article', True)
@@ -1365,11 +1403,11 @@ def copy_articles_and_assets(db, in_directory, out_directory):
                 exit()
 
         # Copy all images of all articles of the issue and downloads
-        articles = [article for article in db.articles if article['issue_key'] == issue_key]
+        articles = [article for article in db.articles if article.dict['issue_key'] == issue_key]
         article_index = 0
         for article in articles:
             # Copy images found in article metadata
-            img_srcs = article.get('src_img_urls', [])
+            img_srcs = article.dict.get('src_img_urls', [])
             for img_src in img_srcs:
                 img_path = os.path.join(issue_source_path, img_src)
                 if os.path.exists(img_path):
@@ -1387,13 +1425,13 @@ def copy_articles_and_assets(db, in_directory, out_directory):
                         convert_and_copy_image(img_path, dest_img_path)
 
             # Copy files from the downloads
-#            downloads = article['downloads']
+#            downloads = article.dict['downloads']
 #            for _, download_url in downloads:
 #                # Assuming download_url is a relative path; adjust logic if it's a URL
 #                download_path = os.path.join(issue_source_path, download_url)
 #                shutil.copy(download_path, issue_dest_path_prg)
 
-            pages = article['pages']
+            pages = article.dict['pages']
 
             # create PDF with just the article
             source_pdf_path = os.path.join(issue_source_path, pdf_filename)
@@ -1403,16 +1441,16 @@ def copy_articles_and_assets(db, in_directory, out_directory):
                 extract_pages_from_pdf(source_pdf_path, dest_pdf_path, pages)
 
             if article_index > 0:
-                prev_page_link = articles[article_index - 1]['target_filename']
+                prev_page_link = articles[article_index - 1].dict['target_filename']
             else:
                 prev_page_link = None
             if article_index < len(articles) - 1:
-                next_page_link = articles[article_index + 1]['target_filename']
+                next_page_link = articles[article_index + 1].dict['target_filename']
             else:
                 next_page_link = None
 
             # Process and copy HTML files with navigation header etc.
-            html_dest_path = os.path.join(issue_dest_path, article['target_filename'])
+            html_dest_path = os.path.join(issue_dest_path, article.dict['target_filename'])
             copy_and_modify_html(article, html_dest_path, pdf_path, prev_page_link, next_page_link)
             article_index += 1
 
@@ -1449,15 +1487,15 @@ def generate_search_json(db, out_directory):
     articles_info = []
 
     for article in db.articles:
-        issue_key = article['issue_key']
+        issue_key = article.dict['issue_key']
         issue = db.issues[issue_key]
         issue_dir_name = issue.issue_dir_name
         title = index_title(article)
         article_dict = {
-            'categories': article.get('toc_category'),
-            'content': article['txt'],
-            'href': f"/{BASE_DIR}{issue_dir_name}/{article['id']}.html",  # Construct link with issue ID and filename
-            'title': f"{title} [64'er {article['issue_key']}]"
+            'categories': article.dict.get('toc_category'),
+            'content': article.dict['txt'],
+            'href': f"/{BASE_DIR}{issue_dir_name}/{article.dict['id']}.html",  # Construct link with issue ID and filename
+            'title': f"{title} [64'er {article.dict['issue_key']}]"
         }
         articles_info.append(article_dict)
 
