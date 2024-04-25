@@ -344,8 +344,8 @@ class Issue:
           self.toc_order = toc_order
           self.pubdate = pubdate
           self.pdf_filename = pdf_filename
+          self.issue_dir_name = issue_dir_name
           self.dict = {
-              'issue_dir_name': issue_dir_name,
               'issue_key': issue_key,
               'listings': listings,
           }
@@ -549,9 +549,8 @@ def full_url(path):
     return RSS_BASE_URL + quote(BASE_DIR + path)
 
 def article_path(issue, article, prepend_issue_dir=False):
-    issue_data = issue.dict
     article_path = article['out_filename']
-    issue_dir = issue_data['issue_dir_name'] if prepend_issue_dir else None
+    issue_dir = issue.issue_dir_name if prepend_issue_dir else None
     if issue_dir:
         article_path = os.path.join(issue_dir, article_path)
     return article_path
@@ -562,9 +561,8 @@ def article_link(db, article, title, prepend_issue_dir=False):
     return f"<a href='{path}'>{title}</a>"
 
 def prg_link(issue, download):
-    issue_data = issue.dict
     label, url = download
-    url = os.path.join(issue_data['issue_dir_name'], url)
+    url = os.path.join(issue.issue_dir_name, url)
     return f"<a href='{url}'>{label}</a>"
 
 def index_title(article):
@@ -596,8 +594,8 @@ def article_pubdate(issue, article):
 
 def html_generate_latest_issue(db):
     latest_issue_key = db.latest_issue_key()
-    latest_issue_data = db.issues[latest_issue_key].dict
-    issue_dir_name = os.path.basename(latest_issue_data['issue_dir_name'])
+    latest_issue = db.issues[latest_issue_key]
+    issue_dir_name = os.path.basename(latest_issue.issue_dir_name)
     latest_title_image = os.path.join(issue_dir_name, "title.jpg")
     latest_html = f'''
 <h2>{LABEL_CURRENT_ISSUE}</h2>\n
@@ -623,9 +621,9 @@ def html_generate_latest_downloads(db):
     return ''.join(html_parts)
 
 def html_generate_title_image(db, issue_key, width, prepend_issue_dir=False):
-    issue_data = db.issues[issue_key].dict
+    issue = db.issues[issue_key]
     title_jpg_path = "title.jpg"
-    issue_dir = issue_data['issue_dir_name'] if prepend_issue_dir else None
+    issue_dir = issue.issue_dir_name if prepend_issue_dir else None
     if issue_dir:
         title_jpg_path = os.path.join(issue_dir, title_jpg_path)
     return f"<img src=\"{title_jpg_path}\" width=\"{width}\" alt=\"{MAGAZINE_NAME} {issue_key}\">\n"
@@ -638,8 +636,8 @@ def html_generate_toc(db, issue_key, heading_level=1, prepend_issue_dir=False):
     html_parts.append(f"<h{heading_level}>{LABEL_ISSUE} {issue_key}</h{heading_level}>\n")
     issue = db.issues[issue_key]
     pdf_filename = issue.pdf_filename
-    issue_data = db.issues[issue_key].dict
-    issue_dir = issue_data['issue_dir_name'] if prepend_issue_dir else None
+    issue = db.issues[issue_key]
+    issue_dir = issue.issue_dir_name if prepend_issue_dir else None
     if issue_dir:
         pdf_filename = os.path.join(issue_dir, pdf_filename)
     title_image = html_generate_title_image(db, issue_key, 300, prepend_issue_dir)
@@ -658,7 +656,6 @@ def html_generate_toc(db, issue_key, heading_level=1, prepend_issue_dir=False):
     html_parts.append('<div class="toc_container">')
     html_parts.append(title_image)
 
-    issue_data = db.issues[issue_key].dict
     toc_entries = db.toc_with_articles(issue_key)
 
     last_category = None
@@ -709,7 +706,7 @@ def html_generate_tocs_all_issues(db):
     # top: all issue title images
     for issue_key in sorted(db.issues.keys(), key=lambda x: key_to_datetime(x), reverse=True):
         title_image = html_generate_title_image(db, issue_key, 200, True)
-        issue_dir = db.issues[issue_key].dict['issue_dir_name']
+        issue_dir = db.issues[issue_key].issue_dir_name
         html_parts.append(f"<a href=\"{issue_dir}\">{title_image}</a>\n")
 
     html_parts.append("<hr>\n")
@@ -831,8 +828,8 @@ def html_generate_article_preview(db, article):
     description = article.get('description', '')
     category = article.get('toc_category', 'Uncategorized')
     issue_key = article['issue_key']
-    issue_data = db.issues[issue_key].dict
-    issue_dir_name = issue_data['issue_dir_name']
+    issue = db.issues[issue_key]
+    issue_dir_name = issue.issue_dir_name
     pages = article['pages']
     img_src = next((url for url in article.get('img_urls', [])), None)
     pubdate_unix = int(article['pubdate'].timestamp())
@@ -869,7 +866,7 @@ def html_generate_all_article_previews(db):
 ### Write full HTML files
 
 def write_full_html_file(db, path, title, preview_img, body_html, body_class, comments=False):
-    latest_issue_path = db.issues[db.latest_issue_key()].dict['issue_dir_name']
+    latest_issue_path = db.issues[db.latest_issue_key()].issue_dir_name
     impressum_path = os.path.join(latest_issue_path, f"{FILENAME_IMPRINT}.html")
 
     isso_id = path.removeprefix(OUT_DIRECTORY) # hack :(
@@ -998,7 +995,7 @@ def generate_all_issues_with_tocs_html(db, out_directory):
 
 def generate_issues_toc_html(db, issue_key, out_directory):
     body_html = html_generate_toc(db, issue_key, 1, False)
-    issue_dest_path = os.path.join(out_directory, db.issues[issue_key].dict['issue_dir_name'])
+    issue_dest_path = os.path.join(out_directory, db.issues[issue_key].issue_dir_name)
     write_full_html_file(db, os.path.join(issue_dest_path, 'index.html'), f'{LABEL_TOC_ISSUE} {issue_key} | {MAGAZINE_NAME}', 'title.jpg', body_html, 'one_issue', True)
 
 def generate_issues_tocs_html(db, out_directory):
@@ -1089,7 +1086,7 @@ def generate_rss_feed(db, out_directory):
         description = article['description']
         img_src = article['img_urls'][0] if article['img_urls'] else None
         if img_src:
-            img_src = full_url(os.path.join(issue.dict['issue_dir_name'], img_src))
+            img_src = full_url(os.path.join(issue.issue_dir_name, img_src))
             img = f"<img src='{img_src}'><br>"
             if description:
                 description = img + description
@@ -1299,8 +1296,8 @@ def copy_articles_and_assets(db, in_directory, out_directory):
     for issue_key in db.issues.keys():
         issue = db.issues[issue_key]
         issue_data = issue.dict
-        issue_source_path = os.path.join(in_directory, issue_data['issue_dir_name'])
-        issue_dest_path = os.path.join(out_directory, issue_data['issue_dir_name'])
+        issue_source_path = os.path.join(in_directory, issue.issue_dir_name)
+        issue_dest_path = os.path.join(out_directory, issue.issue_dir_name)
         issue_dest_path_prg = os.path.join(issue_dest_path, 'prg')
 
         # Create sub-folder for each issue
@@ -1435,8 +1432,8 @@ def generate_search_json(db, out_directory):
 
     for article in db.articles:
         issue_key = article['issue_key']
-        issue_data = db.issues[issue_key].dict
-        issue_dir_name = issue_data['issue_dir_name']
+        issue = db.issues[issue_key]
+        issue_dir_name = issue.issue_dir_name
         title = index_title(article)
         article_dict = {
             'categories': article.get('toc_category'),
