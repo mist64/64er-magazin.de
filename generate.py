@@ -348,11 +348,8 @@ class Issue:
           self.issue_key = issue_key
           self.listings = listings
 
-          self.dict = {
-            "todo" : "exception"
-          }
       else:
-          self.dict = None
+          raise Exception(f"- [{issue_directory_path}] does not contain expected data")
   
   @staticmethod
   def __read_html(html_file_path, listings):
@@ -479,12 +476,14 @@ class ArticleDatabase:
         for issue_dir_name in os.listdir(in_directory):
             issue_dir_path = os.path.join(in_directory, issue_dir_name)
             if os.path.isdir(issue_dir_path) and re.match(r'^\d{4}$', issue_dir_name):
-                issue = Issue(issue_dir_path)
-                
-                # todo: exception in the init and exception handler here
-                if not issue.dict:
-                    continue
+              
+                try:
+                    issue = Issue(issue_dir_path)
 
+                except Exception as error:
+                    print(error)
+                    continue
+                
                 # Map issue key to issue data
                 issue_key = issue.issue_key
                 self.issues[issue_key] = issue
