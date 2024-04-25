@@ -323,8 +323,8 @@ class Article:
         self.downloads = metadata['downloads']
         self.description = metadata['description']
         self.src_img_urls = metadata['src_img_urls']
-#         
-#         self.html = metadata['html']
+        
+        self.html = metadata['html']
 #         self.txt = metadata['txt']
 #         
 #         self.img_urls = metadata['img_urls']
@@ -351,6 +351,7 @@ class Article:
         del self.dict['downloads']
         del self.dict['description']
         del self.dict['src_img_urls']
+        del self.dict['html']
 
         
                 
@@ -1251,7 +1252,7 @@ def convert_and_copy_image(img_path, dest_img_path):
 
 def copy_and_modify_html(article, html_dest_path, pdf_path, prev_page_link, next_page_link):
     """Modifies, and writes an HTML file directly to the destination."""
-    soup = article.dict['html']
+    soup = article.html
     issue_number = article.issue
     head1 = article.head1
     head2 = article.head2
