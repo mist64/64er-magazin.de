@@ -314,7 +314,7 @@ class Article:
         self.head1 = metadata['head1']
         self.head2 = metadata['head2']
         self.toc_title = metadata['toc_title']
-#         self.toc_category = metadata['toc_category']
+        self.toc_category = metadata['toc_category']
 #         self.index_title = metadata['index_title']
 #         self.index_category = metadata['index_category']
 #         self.category = metadata['category']
@@ -343,6 +343,7 @@ class Article:
         del self.dict['head1']
         del self.dict['head2']
         del self.dict['toc_title']
+        del self.dict['toc_category']
 
         
                 
@@ -575,7 +576,7 @@ class ArticleDatabase:
         return max(self.issues.keys(), key=key_to_datetime)
 
     def articles_by_toc_categories(self, toc_categories, issue_key=None):
-        filtered_articles = [article for article in self.articles if article.dict.get('toc_category') in toc_categories and (issue_key is None or article.issue_key == issue_key)]
+        filtered_articles = [article for article in self.articles if article.toc_category in toc_categories and (issue_key is None or article.issue_key == issue_key)]
         return sorted(filtered_articles, key=lambda x: first_page_number(x.pages))
 
     def toc_with_articles(self, issue_key):
@@ -895,7 +896,7 @@ def html_generate_article_preview(db, article):
     link_title = article_link(db, article, index_title(article), True)
     title = index_title(article)
     description = article.dict.get('description', '')
-    category = article.dict.get('toc_category', 'Uncategorized')
+    category = article.toc_category if article.toc_category else '' # 'Uncategorized' # todo: translate and use uncategorized?
     issue_key = article.issue_key
     issue = db.issues[issue_key]
     issue_dir_name = issue.issue_dir_name
@@ -1504,7 +1505,7 @@ def generate_search_json(db, out_directory):
         issue_dir_name = issue.issue_dir_name
         title = index_title(article)
         article_dict = {
-            'categories': article.dict.get('toc_category'),
+            'categories': article.toc_category,
             'content': article.dict['txt'],
             'href': f"/{BASE_DIR}{issue_dir_name}/{article.id}.html",  # Construct link with issue ID and filename
             'title': f"{title} [64'er {issue_key}]"
