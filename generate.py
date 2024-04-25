@@ -298,177 +298,178 @@ def calculate_sha1(filepath):
             sha1.update(chunk)
     return sha1.hexdigest()
 
+class Issue:
+  def __init__(self, issue_directory_path): #__extract_issue_data
+      """Extracts all relevant data from an issue directory, including HTML file paths."""
+      articles_metadata = []
+      toc_order = []
+      pdf_path = None
+      pdf_filename = None
+      issue_path = issue_directory_path  # Capture the issue directory path
+      issue_dir_name = os.path.basename(issue_directory_path)
+      issue_key = None
+      pubdate = None
+  
+      # read all listings in petcat format
+      listings = {}
+      prg_path = os.path.join(issue_directory_path, 'prg')
+      for root, _, files in os.walk(prg_path):
+          for file in files:
+              if file.endswith('.txt'):
+                  file_path = os.path.join(root, file)
+                  with open(file_path, 'r') as file_obj:
+                      listings[os.path.splitext(file)[0]] = file_obj.read()
+  
+      for root, dirs, files in os.walk(issue_directory_path):
+          for file in files:
+              if file.endswith('.html'):
+                  article_path = os.path.join(root, file)
+                  article_metadata = Issue.__read_html(article_path, listings)
+                  article_metadata['path'] = article_path  # Include full path in metadata
+                  articles_metadata.append(article_metadata)
+                  if not issue_key:
+                      issue_key = article_metadata['issue']
+                  else:
+                      assert(issue_key == article_metadata['issue'])
+              elif file == 'toc.txt':
+                  toc_order = Issue.__read_toc_order(os.path.join(root, file))
+              elif file == 'pubdate.txt':
+                  pubdate = Issue.__read_pubdate(os.path.join(root, file))
+              elif file.endswith('.pdf'):
+                  pdf_path = os.path.join(root, file)
+                  pdf_filename = os.path.basename(pdf_path)
+  
+      if pubdate:
+          self.dict = {
+              'articles_metadata': articles_metadata,
+              'toc_order': toc_order,
+              'pubdate': pubdate,
+              'pdf_filename': pdf_filename,
+              'issue_dir_name': issue_dir_name,
+              'issue_key': issue_key,
+              'listings': listings,
+          }
+      else:
+          self.dict = None
+  
+  @staticmethod
+  def __read_html(html_file_path, listings):
+      """Parses an HTML file for article metadata and includes the filename."""
+      with open(html_file_path, 'r', encoding='utf-8') as file:
+          contents = file.read()
+      soup = BeautifulSoup(contents, 'html.parser')
+  
+      metadata = {
+          'filename': os.path.basename(html_file_path), # XXX old
+          'title': soup.find('title').text if soup.find('title') else 'No Title',
+          'issue': soup.find('meta', attrs={'name': '64er.issue'})['content'] if soup.find('meta', attrs={'name': '64er.issue'}) else 'No Issue',
+          'pages': soup.find('meta', attrs={'name': '64er.pages'})['content'] if soup.find('meta', attrs={'name': '64er.pages'}) else 'No Pages',
+          'head1': soup.find('meta', attrs={'name': '64er.head1'})['content'] if soup.find('meta', attrs={'name': '64er.head1'}) else None,
+          'head2': soup.find('meta', attrs={'name': '64er.head2'})['content'] if soup.find('meta', attrs={'name': '64er.head2'}) else None,
+          'toc_title': soup.find('meta', attrs={'name': '64er.toc_title'})['content'] if soup.find('meta', attrs={'name': '64er.toc_title'}) else None,
+          'toc_category': soup.find('meta', attrs={'name': '64er.toc_category'})['content'] if soup.find('meta', attrs={'name': '64er.toc_category'}) else None,
+          'index_title': soup.find('meta', attrs={'name': '64er.index_title'})['content'] if soup.find('meta', attrs={'name': '64er.index_title'}) else None,
+          'index_category': soup.find('meta', attrs={'name': '64er.index_category'})['content'] if soup.find('meta', attrs={'name': '64er.index_category'}) else None,
+          'category': soup.find('meta', attrs={'name': '64er.category'})['content'] if soup.find('meta', attrs={'name': '64er.category'}) else None,
+          'id': soup.find('meta', attrs={'name': '64er.id'})['content'] if soup.find('meta', attrs={'name': '64er.id'}) else None,
+      }
+  
+      metadata['target_filename'] = os.path.basename(metadata['id']) + '.html'
+  
+      # Put listings into <pre> tags and collect downloads
+      downloads = []
+      a_tags = []
+      pre_tags = soup.find_all("pre")
+      for tag in pre_tags:
+          data_filename = tag.get("data-filename")
+          data_name = tag.get("data-name")
+          data_range = tag.get("data-range")
+          if data_filename:
+              # remove ';', empty lines and leading spaces
+              listing = listings[data_filename]
+              listing = [line.lstrip() for line in listing.splitlines() if line.strip() and not line.lstrip().startswith(';')]
+  
+              if data_range:
+                  ranges = [(int(part.split('-')[0]), int(part.split('-')[-1])) for part in data_range.split(',')]
+                  filtered_lines = []
+                  blank_line_added = True
+                  for line in listing:
+                      leading_number = int(line.split(' ')[0])
+                      if any(start <= leading_number <= end for start, end in ranges):
+                          filtered_lines.append(line)
+                          blank_line_added = False
+                      else:
+                          if not blank_line_added:
+                              filtered_lines.append('')
+                          blank_line_added = True
+                  listing = filtered_lines
+  
+              listing = "\n".join(listing)
+              tag.string = listing
+  
+              if not any(item[0] == data_name for item in downloads): # duplicates
+                  data_filename_escaped = urllib.parse.quote(data_filename)
+                  downloads.append((data_name, f"prg/{data_filename_escaped}.prg"))
+      metadata['downloads'] = downloads
+  
+      # and make a "downloads" aside
+      if downloads:
+          aside_tag = soup.new_tag("aside", attrs={"class": "downloads"})
+          for (label, url) in downloads:
+              a_tag = soup.new_tag("a", href=url)
+              a_tag.string = label
+              a_tags.append(a_tag)
+              aside_tag.append(a_tag)
+          article_tag = soup.find("article")
+          article_tag.append(aside_tag)
+  
+      # Extract article description
+      intro_div = soup.find('p', {"class": "intro"})
+      if intro_div:
+          metadata['description'] = intro_div.text.strip()
+      else:
+          first_p = soup.find('p')
+          if first_p:
+              # Extract text, split into words, take the first 64, and join them back into a string
+              words = first_p.text.split()
+              metadata['description'] = ' '.join(words[:64]) + '...'
+          else:
+              metadata['description'] = ''
+  
+  
+      # Extract all image URLs with their *source* names
+      src_img_urls = [img['src'] for img in soup.find_all('img') if img.get('src')]
+      metadata['src_img_urls'] = src_img_urls
+  
+      # In the HTML, change all img src paths from PNG to AVIF, with a JPEG fallback
+      for img_tag in soup.find_all('img'):
+          img_src = img_tag['src']
+          if img_src.lower().endswith('.png'):
+              img_tag.replace_with(avif_picture_tag(soup, img_tag['src'], img_tag.attrs))
+  
+      metadata['html'] = soup
+      metadata['txt'] = html_to_text_preserve_paragraphs(soup.body);
+  
+      # Extract all image URLs with their *destination* names
+      img_urls = [img['src'] for img in soup.find_all('img') if img.get('src')]
+      metadata['img_urls'] = img_urls
+  
+      return metadata
+  
+  @staticmethod
+  def __read_toc_order(toc_file_path):
+      """Reads the TOC order from toc.txt file."""
+      with open(toc_file_path, 'r', encoding='utf-8') as file:
+          toc_order = [line.strip() for line in file.readlines() if line.strip()]
+      return toc_order
+  
+  def __read_pubdate(file_path):
+      with open(file_path, 'r') as file:
+          date_str = file.readline().strip()
+      return datetime.strptime(date_str, "%Y-%m-%d").replace(tzinfo=timezone.utc)
+            
 
 class ArticleDatabase:
-    @staticmethod
-    def __read_html(html_file_path, listings):
-        """Parses an HTML file for article metadata and includes the filename."""
-        with open(html_file_path, 'r', encoding='utf-8') as file:
-            contents = file.read()
-        soup = BeautifulSoup(contents, 'html.parser')
-
-        metadata = {
-            'filename': os.path.basename(html_file_path), # XXX old
-            'title': soup.find('title').text if soup.find('title') else 'No Title',
-            'issue': soup.find('meta', attrs={'name': '64er.issue'})['content'] if soup.find('meta', attrs={'name': '64er.issue'}) else 'No Issue',
-            'pages': soup.find('meta', attrs={'name': '64er.pages'})['content'] if soup.find('meta', attrs={'name': '64er.pages'}) else 'No Pages',
-            'head1': soup.find('meta', attrs={'name': '64er.head1'})['content'] if soup.find('meta', attrs={'name': '64er.head1'}) else None,
-            'head2': soup.find('meta', attrs={'name': '64er.head2'})['content'] if soup.find('meta', attrs={'name': '64er.head2'}) else None,
-            'toc_title': soup.find('meta', attrs={'name': '64er.toc_title'})['content'] if soup.find('meta', attrs={'name': '64er.toc_title'}) else None,
-            'toc_category': soup.find('meta', attrs={'name': '64er.toc_category'})['content'] if soup.find('meta', attrs={'name': '64er.toc_category'}) else None,
-            'index_title': soup.find('meta', attrs={'name': '64er.index_title'})['content'] if soup.find('meta', attrs={'name': '64er.index_title'}) else None,
-            'index_category': soup.find('meta', attrs={'name': '64er.index_category'})['content'] if soup.find('meta', attrs={'name': '64er.index_category'}) else None,
-            'category': soup.find('meta', attrs={'name': '64er.category'})['content'] if soup.find('meta', attrs={'name': '64er.category'}) else None,
-            'id': soup.find('meta', attrs={'name': '64er.id'})['content'] if soup.find('meta', attrs={'name': '64er.id'}) else None,
-        }
-
-        metadata['target_filename'] = os.path.basename(metadata['id']) + '.html'
-
-        # Put listings into <pre> tags and collect downloads
-        downloads = []
-        a_tags = []
-        pre_tags = soup.find_all("pre")
-        for tag in pre_tags:
-            data_filename = tag.get("data-filename")
-            data_name = tag.get("data-name")
-            data_range = tag.get("data-range")
-            if data_filename:
-                # remove ';', empty lines and leading spaces
-                listing = listings[data_filename]
-                listing = [line.lstrip() for line in listing.splitlines() if line.strip() and not line.lstrip().startswith(';')]
-
-                if data_range:
-                    ranges = [(int(part.split('-')[0]), int(part.split('-')[-1])) for part in data_range.split(',')]
-                    filtered_lines = []
-                    blank_line_added = True
-                    for line in listing:
-                        leading_number = int(line.split(' ')[0])
-                        if any(start <= leading_number <= end for start, end in ranges):
-                            filtered_lines.append(line)
-                            blank_line_added = False
-                        else:
-                            if not blank_line_added:
-                                filtered_lines.append('')
-                            blank_line_added = True
-                    listing = filtered_lines
-
-                listing = "\n".join(listing)
-                tag.string = listing
-
-                if not any(item[0] == data_name for item in downloads): # duplicates
-                    data_filename_escaped = urllib.parse.quote(data_filename)
-                    downloads.append((data_name, f"prg/{data_filename_escaped}.prg"))
-        metadata['downloads'] = downloads
-
-        # and make a "downloads" aside
-        if downloads:
-            aside_tag = soup.new_tag("aside", attrs={"class": "downloads"})
-            for (label, url) in downloads:
-                a_tag = soup.new_tag("a", href=url)
-                a_tag.string = label
-                a_tags.append(a_tag)
-                aside_tag.append(a_tag)
-            article_tag = soup.find("article")
-            article_tag.append(aside_tag)
-
-        # Extract article description
-        intro_div = soup.find('p', {"class": "intro"})
-        if intro_div:
-            metadata['description'] = intro_div.text.strip()
-        else:
-            first_p = soup.find('p')
-            if first_p:
-                # Extract text, split into words, take the first 64, and join them back into a string
-                words = first_p.text.split()
-                metadata['description'] = ' '.join(words[:64]) + '...'
-            else:
-                metadata['description'] = ''
-
-
-        # Extract all image URLs with their *source* names
-        src_img_urls = [img['src'] for img in soup.find_all('img') if img.get('src')]
-        metadata['src_img_urls'] = src_img_urls
-
-        # In the HTML, change all img src paths from PNG to AVIF, with a JPEG fallback
-        for img_tag in soup.find_all('img'):
-            img_src = img_tag['src']
-            if img_src.lower().endswith('.png'):
-                img_tag.replace_with(avif_picture_tag(soup, img_tag['src'], img_tag.attrs))
-
-        metadata['html'] = soup
-        metadata['txt'] = html_to_text_preserve_paragraphs(soup.body);
-
-        # Extract all image URLs with their *destination* names
-        img_urls = [img['src'] for img in soup.find_all('img') if img.get('src')]
-        metadata['img_urls'] = img_urls
-
-        return metadata
-
-    @staticmethod
-    def __read_toc_order(toc_file_path):
-        """Reads the TOC order from toc.txt file."""
-        with open(toc_file_path, 'r', encoding='utf-8') as file:
-            toc_order = [line.strip() for line in file.readlines() if line.strip()]
-        return toc_order
-
-    def __read_pubdate(file_path):
-        with open(file_path, 'r') as file:
-            date_str = file.readline().strip()
-        return datetime.strptime(date_str, "%Y-%m-%d").replace(tzinfo=timezone.utc)
-
-    @classmethod
-    def __extract_issue_data(cls, issue_directory_path):
-        """Extracts all relevant data from an issue directory, including HTML file paths."""
-        articles_metadata = []
-        toc_order = []
-        pdf_path = None
-        pdf_filename = None
-        issue_path = issue_directory_path  # Capture the issue directory path
-        issue_dir_name = os.path.basename(issue_directory_path)
-        issue_key = None
-        pubdate = None
-
-        # read all listings in petcat format
-        listings = {}
-        prg_path = os.path.join(issue_directory_path, 'prg')
-        for root, _, files in os.walk(prg_path):
-            for file in files:
-                if file.endswith('.txt'):
-                    file_path = os.path.join(root, file)
-                    with open(file_path, 'r') as file_obj:
-                        listings[os.path.splitext(file)[0]] = file_obj.read()
-
-        for root, dirs, files in os.walk(issue_directory_path):
-            for file in files:
-                if file.endswith('.html'):
-                    article_path = os.path.join(root, file)
-                    article_metadata = cls.__read_html(article_path, listings)
-                    article_metadata['path'] = article_path  # Include full path in metadata
-                    articles_metadata.append(article_metadata)
-                    if not issue_key:
-                        issue_key = article_metadata['issue']
-                    else:
-                        assert(issue_key == article_metadata['issue'])
-                elif file == 'toc.txt':
-                    toc_order = cls.__read_toc_order(os.path.join(root, file))
-                elif file == 'pubdate.txt':
-                    pubdate = cls.__read_pubdate(os.path.join(root, file))
-                elif file.endswith('.pdf'):
-                    pdf_path = os.path.join(root, file)
-                    pdf_filename = os.path.basename(pdf_path)
-
-        if pubdate:
-            return {
-                'articles_metadata': articles_metadata,
-                'toc_order': toc_order,
-                'pubdate': pubdate,
-                'pdf_filename': pdf_filename,
-                'issue_dir_name': issue_dir_name,
-                'issue_key': issue_key,
-                'listings': listings
-            }
-        else:
-            return None
 
     def __init__(self, in_directory):
         self.issues = {}  # Change to dictionary
@@ -476,13 +477,15 @@ class ArticleDatabase:
         for issue_dir_name in os.listdir(in_directory):
             issue_dir_path = os.path.join(in_directory, issue_dir_name)
             if os.path.isdir(issue_dir_path) and re.match(r'^\d{4}$', issue_dir_name):
-                issue_data = self.__extract_issue_data(issue_dir_path)
+                issue = Issue(issue_dir_path) #__extract_issue_data
+                issue_data = issue.dict
+                
                 if not issue_data:
                     continue
 
                 # Map issue key to issue data
                 self.issues[issue_data['issue_key']] = {
-                    'issue_dir_name': issue_dir_name,
+                    'issue_dir_name': issue_data['issue_dir_name'],
                     'toc_order': issue_data['toc_order'],
                     'pubdate': issue_data['pubdate'],
                     'pdf_filename': issue_data['pdf_filename'],
