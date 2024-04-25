@@ -318,7 +318,7 @@ class Article:
         self.index_title = metadata['index_title']
         self.index_category = metadata['index_category']
         self.category = metadata['category'] # unused?
-#         self.target_filename = metadata['target_filename']
+        self.target_filename = metadata['target_filename']
 #         
 #         self.downloads = metadata['downloads']
 #         self.description = metadata['description']
@@ -347,6 +347,7 @@ class Article:
         del self.dict['index_title']
         del self.dict['index_category']
         del self.dict['category']
+        del self.dict['target_filename']
 
         
                 
@@ -1457,16 +1458,16 @@ def copy_articles_and_assets(db, in_directory, out_directory):
                 extract_pages_from_pdf(source_pdf_path, dest_pdf_path, pages)
 
             if article_index > 0:
-                prev_page_link = articles[article_index - 1].dict['target_filename']
+                prev_page_link = articles[article_index - 1].target_filename
             else:
                 prev_page_link = None
             if article_index < len(articles) - 1:
-                next_page_link = articles[article_index + 1].dict['target_filename']
+                next_page_link = articles[article_index + 1].target_filename
             else:
                 next_page_link = None
 
             # Process and copy HTML files with navigation header etc.
-            html_dest_path = os.path.join(issue_dest_path, article.dict['target_filename'])
+            html_dest_path = os.path.join(issue_dest_path, article.target_filename)
             copy_and_modify_html(article, html_dest_path, pdf_path, prev_page_link, next_page_link)
             article_index += 1
 
