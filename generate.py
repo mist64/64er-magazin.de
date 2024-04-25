@@ -325,8 +325,7 @@ class Article:
         self.html = metadata['html']
         self.txt = metadata['txt']
         self.img_urls = metadata['img_urls']
-#         
-#         self.path = metadata['path']
+        self.path = metadata['path'] # unused?
 
         # remove
         del self.dict['title']
@@ -351,6 +350,7 @@ class Article:
         del self.dict['html']
         del self.dict['txt']
         del self.dict['img_urls']
+        del self.dict['path']
 
         
                 
