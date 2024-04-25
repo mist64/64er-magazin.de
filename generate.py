@@ -340,8 +340,8 @@ class Issue:
                   pdf_filename = os.path.basename(pdf_path)
   
       if pubdate:
+          self.articles_metadata = articles_metadata
           self.dict = {
-              'articles_metadata': articles_metadata,
               'toc_order': toc_order,
               'pubdate': pubdate,
               'pdf_filename': pdf_filename,
@@ -484,16 +484,10 @@ class ArticleDatabase:
                     continue
 
                 # Map issue key to issue data
-                self.issues[issue_data['issue_key']] = {
-                    'issue_dir_name': issue_data['issue_dir_name'],
-                    'toc_order': issue_data['toc_order'],
-                    'pubdate': issue_data['pubdate'],
-                    'pdf_filename': issue_data['pdf_filename'],
-                    'listings': issue_data['listings']
-                }
+                self.issues[issue_data['issue_key']] = issue
 
                 # Sort articles by page number within this issue before assigning indexes
-                sorted_articles = sorted(issue_data['articles_metadata'], key=lambda x: first_page_number(x['pages']))
+                sorted_articles = sorted(issue.articles_metadata, key=lambda x: first_page_number(x['pages']))
 
                 for index, article in enumerate(sorted_articles):
                     # Modify to include issue key directly
@@ -513,7 +507,7 @@ class ArticleDatabase:
         return sorted(filtered_articles, key=lambda x: first_page_number(x['pages']))
 
     def toc_with_articles(self, issue_key):
-        issue_data = self.issues[issue_key]
+        issue_data = self.issues[issue_key].dict
         toc_entries = []
 
         toc_order = [""] + issue_data['toc_order'] # prepend empty category
@@ -554,7 +548,8 @@ class ArticleDatabase:
 def full_url(path):
     return RSS_BASE_URL + quote(BASE_DIR + path)
 
-def article_path(issue_data, article, prepend_issue_dir=False):
+def article_path(issue, article, prepend_issue_dir=False):
+    issue_data = issue.dict
     article_path = article['out_filename']
     issue_dir = issue_data['issue_dir_name'] if prepend_issue_dir else None
     if issue_dir:
@@ -562,11 +557,12 @@ def article_path(issue_data, article, prepend_issue_dir=False):
     return article_path
 
 def article_link(db, article, title, prepend_issue_dir=False):
-    issue_data = db.issues[article['issue_key']]
-    path = article_path(issue_data, article, prepend_issue_dir)
+    issue = db.issues[article['issue_key']]
+    path = article_path(issue, article, prepend_issue_dir)
     return f"<a href='{path}'>{title}</a>"
 
-def prg_link(issue_data, download):
+def prg_link(issue, download):
+    issue_data = issue.dict
     label, url = download
     url = os.path.join(issue_data['issue_dir_name'], url)
     return f"<a href='{url}'>{label}</a>"
@@ -600,7 +596,7 @@ def article_pubdate(issue_data, article):
 
 def html_generate_latest_issue(db):
     latest_issue_key = db.latest_issue_key()
-    latest_issue_data = db.issues[latest_issue_key]
+    latest_issue_data = db.issues[latest_issue_key].dict
     issue_dir_name = os.path.basename(latest_issue_data['issue_dir_name'])
     latest_title_image = os.path.join(issue_dir_name, "title.jpg")
     latest_html = f'''
@@ -627,7 +623,7 @@ def html_generate_latest_downloads(db):
     return ''.join(html_parts)
 
 def html_generate_title_image(db, issue_key, width, prepend_issue_dir=False):
-    issue_data = db.issues[issue_key]
+    issue_data = db.issues[issue_key].dict
     title_jpg_path = "title.jpg"
     issue_dir = issue_data['issue_dir_name'] if prepend_issue_dir else None
     if issue_dir:
@@ -640,8 +636,8 @@ def html_generate_toc(db, issue_key, heading_level=1, prepend_issue_dir=False):
     if heading_level == 1:
         html_parts.append(f"<main>\n")
     html_parts.append(f"<h{heading_level}>{LABEL_ISSUE} {issue_key}</h{heading_level}>\n")
-    pdf_filename = db.issues[issue_key]['pdf_filename']
-    issue_data = db.issues[issue_key]
+    issue_data = db.issues[issue_key].dict
+    pdf_filename = issue_data['pdf_filename']
     issue_dir = issue_data['issue_dir_name'] if prepend_issue_dir else None
     if issue_dir:
         pdf_filename = os.path.join(issue_dir, pdf_filename)
@@ -661,7 +657,7 @@ def html_generate_toc(db, issue_key, heading_level=1, prepend_issue_dir=False):
     html_parts.append('<div class="toc_container">')
     html_parts.append(title_image)
 
-    issue_data = db.issues[issue_key]
+    issue_data = db.issues[issue_key].dict
     toc_entries = db.toc_with_articles(issue_key)
 
     last_category = None
@@ -681,8 +677,8 @@ def html_generate_toc(db, issue_key, heading_level=1, prepend_issue_dir=False):
           for article in entry['articles']:
 
               #link = article_link(db, article, toc_title(article), prepend_issue_dir)
-              issue_data = db.issues[article['issue_key']]
-              path = article_path(issue_data, article, prepend_issue_dir)
+              issue = db.issues[article['issue_key']]
+              path = article_path(issue, article, prepend_issue_dir)
               title = toc_title(article)
               first_page = first_page_number(article['pages'])
 
@@ -712,7 +708,7 @@ def html_generate_tocs_all_issues(db):
     # top: all issue title images
     for issue_key in sorted(db.issues.keys(), key=lambda x: key_to_datetime(x), reverse=True):
         title_image = html_generate_title_image(db, issue_key, 200, True)
-        issue_dir = db.issues[issue_key]['issue_dir_name']
+        issue_dir = db.issues[issue_key].dict['issue_dir_name']
         html_parts.append(f"<a href=\"{issue_dir}\">{title_image}</a>\n")
 
     html_parts.append("<hr>\n")
@@ -735,7 +731,7 @@ def html_generate_articles_for_categories(db, toc_categories, alphabetical, issu
     html_parts = []
     html_parts.append(f"<ul>\n")
     for article in articles:
-        issue_data = db.issues[article['issue_key']]
+        issue_data = db.issues[article['issue_key']].dict
         if append_issue_number:
             issue_number = f" [{article['issue']}]"
         else:
@@ -800,12 +796,12 @@ def html_generate_all_downloads(db):
         for article in articles_list:
             link = article_link(db, article, index_title(article), True)
             issue_key = article['issue_key']
-            issue_data = db.issues[issue_key]
+            issue = db.issues[issue_key]
 
             # Construct the list of downloads
             downloads_list = ""
             for download in article['downloads']:
-                downloads_list += f"<li>{prg_link(issue_data, download)}</li>\n"
+                downloads_list += f"<li>{prg_link(issue, download)}</li>\n"
 
             # Add a row to the table for this article
             html_table += f"""
@@ -834,7 +830,7 @@ def html_generate_article_preview(db, article):
     description = article.get('description', '')
     category = article.get('toc_category', 'Uncategorized')
     issue_key = article['issue_key']
-    issue_data = db.issues[issue_key]
+    issue_data = db.issues[issue_key].dict
     issue_dir_name = issue_data['issue_dir_name']
     pages = article['pages']
     img_src = next((url for url in article.get('img_urls', [])), None)
@@ -872,7 +868,7 @@ def html_generate_all_article_previews(db):
 ### Write full HTML files
 
 def write_full_html_file(db, path, title, preview_img, body_html, body_class, comments=False):
-    latest_issue_path = db.issues[db.latest_issue_key()]['issue_dir_name']
+    latest_issue_path = db.issues[db.latest_issue_key()].dict['issue_dir_name']
     impressum_path = os.path.join(latest_issue_path, f"{FILENAME_IMPRINT}.html")
 
     isso_id = path.removeprefix(OUT_DIRECTORY) # hack :(
@@ -1001,7 +997,7 @@ def generate_all_issues_with_tocs_html(db, out_directory):
 
 def generate_issues_toc_html(db, issue_key, out_directory):
     body_html = html_generate_toc(db, issue_key, 1, False)
-    issue_dest_path = os.path.join(out_directory, db.issues[issue_key]['issue_dir_name'])
+    issue_dest_path = os.path.join(out_directory, db.issues[issue_key].dict['issue_dir_name'])
     write_full_html_file(db, os.path.join(issue_dest_path, 'index.html'), f'{LABEL_TOC_ISSUE} {issue_key} | {MAGAZINE_NAME}', 'title.jpg', body_html, 'one_issue', True)
 
 def generate_issues_tocs_html(db, out_directory):
@@ -1087,12 +1083,12 @@ def generate_rss_feed(db, out_directory):
 
     for article in sorted_articles:
         title = html.escape(index_title(article))
-        issue_data = db.issues[article['issue_key']]
-        link = full_url(article_path(issue_data, article, True))
+        issue = db.issues[article['issue_key']]
+        link = full_url(article_path(issue, article, True))
         description = article['description']
         img_src = article['img_urls'][0] if article['img_urls'] else None
         if img_src:
-            img_src = full_url(os.path.join(issue_data['issue_dir_name'], img_src))
+            img_src = full_url(os.path.join(issue.dict['issue_dir_name'], img_src))
             img = f"<img src='{img_src}'><br>"
             if description:
                 description = img + description
@@ -1300,7 +1296,7 @@ def copy_articles_and_assets(db, in_directory, out_directory):
         shutil.copytree(fonts_source_path, fonts_dest_path, dirs_exist_ok=True)
 
     for issue_key in db.issues.keys():
-        issue_data = db.issues[issue_key]
+        issue_data = db.issues[issue_key].dict
         issue_source_path = os.path.join(in_directory, issue_data['issue_dir_name'])
         issue_dest_path = os.path.join(out_directory, issue_data['issue_dir_name'])
         issue_dest_path_prg = os.path.join(issue_dest_path, 'prg')
@@ -1437,7 +1433,7 @@ def generate_search_json(db, out_directory):
 
     for article in db.articles:
         issue_key = article['issue_key']
-        issue_data = db.issues[issue_key]
+        issue_data = db.issues[issue_key].dict
         issue_dir_name = issue_data['issue_dir_name']
         title = index_title(article)
         article_dict = {
