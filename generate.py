@@ -359,21 +359,25 @@ class Issue:
       """Parses an HTML file for article metadata and includes the filename."""
       with open(html_file_path, 'r', encoding='utf-8') as file:
           contents = file.read()
+
       soup = BeautifulSoup(contents, 'html.parser')
   
+      def find_meta(name, alternate=None):
+          return soup.find('meta', attrs={'name': name})['content'] if soup.find('meta', attrs={'name': name}) else alternate
+        
       metadata = {
           'filename': os.path.basename(html_file_path), # XXX old
           'title': soup.find('title').text if soup.find('title') else 'No Title',
-          'issue': soup.find('meta', attrs={'name': '64er.issue'})['content'] if soup.find('meta', attrs={'name': '64er.issue'}) else 'No Issue',
-          'pages': soup.find('meta', attrs={'name': '64er.pages'})['content'] if soup.find('meta', attrs={'name': '64er.pages'}) else 'No Pages',
-          'head1': soup.find('meta', attrs={'name': '64er.head1'})['content'] if soup.find('meta', attrs={'name': '64er.head1'}) else None,
-          'head2': soup.find('meta', attrs={'name': '64er.head2'})['content'] if soup.find('meta', attrs={'name': '64er.head2'}) else None,
-          'toc_title': soup.find('meta', attrs={'name': '64er.toc_title'})['content'] if soup.find('meta', attrs={'name': '64er.toc_title'}) else None,
-          'toc_category': soup.find('meta', attrs={'name': '64er.toc_category'})['content'] if soup.find('meta', attrs={'name': '64er.toc_category'}) else None,
-          'index_title': soup.find('meta', attrs={'name': '64er.index_title'})['content'] if soup.find('meta', attrs={'name': '64er.index_title'}) else None,
-          'index_category': soup.find('meta', attrs={'name': '64er.index_category'})['content'] if soup.find('meta', attrs={'name': '64er.index_category'}) else None,
-          'category': soup.find('meta', attrs={'name': '64er.category'})['content'] if soup.find('meta', attrs={'name': '64er.category'}) else None,
-          'id': soup.find('meta', attrs={'name': '64er.id'})['content'] if soup.find('meta', attrs={'name': '64er.id'}) else None,
+          'issue': find_meta('64er.issue', 'No Issue'),
+          'pages': find_meta('64er.pages', 'No Pages'),
+          'head1': find_meta('64er.head1'),
+          'head2': find_meta('64er.head2'),
+          'toc_title': find_meta('64er.toc_title'),
+          'toc_category': find_meta('64er.toc_category'),
+          'index_title': find_meta('64er.index_title'),
+          'index_category': find_meta('64er.index_category'),
+          'category': find_meta('64er.category'),
+          'id': find_meta('64er.id'),
       }
   
       metadata['target_filename'] = os.path.basename(metadata['id']) + '.html'
