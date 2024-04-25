@@ -325,7 +325,7 @@ class Article:
         self.src_img_urls = metadata['src_img_urls']
         
         self.html = metadata['html']
-#         self.txt = metadata['txt']
+        self.txt = metadata['txt']
 #         
 #         self.img_urls = metadata['img_urls']
 #         
@@ -352,6 +352,7 @@ class Article:
         del self.dict['description']
         del self.dict['src_img_urls']
         del self.dict['html']
+        del self.dict['txt']
 
         
                 
@@ -1514,7 +1515,7 @@ def generate_search_json(db, out_directory):
         title = index_title(article)
         article_dict = {
             'categories': article.toc_category,
-            'content': article.dict['txt'],
+            'content': article.txt,
             'href': f"/{BASE_DIR}{issue_dir_name}/{article.id}.html",  # Construct link with issue ID and filename
             'title': f"{title} [64'er {issue_key}]"
         }
