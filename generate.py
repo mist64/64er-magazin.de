@@ -321,7 +321,7 @@ class Article:
         self.target_filename = metadata['target_filename']
         
         self.downloads = metadata['downloads']
-#         self.description = metadata['description']
+        self.description = metadata['description']
 #         self.src_img_urls = metadata['src_img_urls']
 #         
 #         self.html = metadata['html']
@@ -349,6 +349,7 @@ class Article:
         del self.dict['category']
         del self.dict['target_filename']
         del self.dict['downloads']
+        del self.dict['description']
 
         
                 
@@ -900,7 +901,7 @@ def html_generate_article_preview(db, article):
     html_parts = []
     link_title = article_link(db, article, index_title(article), True)
     title = index_title(article)
-    description = article.dict.get('description', '')
+    description = article.description if article.description else ''
     category = article.toc_category if article.toc_category else '' # 'Uncategorized' # todo: translate and use uncategorized?
     issue_key = article.issue_key
     issue = db.issues[issue_key]
@@ -1158,7 +1159,7 @@ def generate_rss_feed(db, out_directory):
         title = html.escape(index_title(article))
         issue = db.issues[article.issue_key]
         link = full_url(article_path(issue, article, True))
-        description = article.dict['description']
+        description = article.description
         img_src = article.dict['img_urls'][0] if article.dict['img_urls'] else None
         if img_src:
             img_src = full_url(os.path.join(issue.issue_dir_name, img_src))
