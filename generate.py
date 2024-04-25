@@ -302,15 +302,11 @@ class Article:
 
     def __init__(self, metadata):
         self.dict = metadata
-        
+
         self.title = metadata['title']
         self.issue = metadata['issue']
+        self.pages = metadata['pages']
         
-        # remove
-        del self.dict['title']
-        del self.dict['issue']
-        
-#         self.pages = metadata['pages']
 #         self.id = metadata['id']
 # 
 #         self.issue_key = metadata['issue_key']
@@ -337,6 +333,12 @@ class Article:
 #         self.img_urls = metadata['img_urls']
 #         
 #         self.path = metadata['path']
+
+        # remove
+        del self.dict['title']
+        del self.dict['issue']
+        del self.dict['pages']
+
         
                 
 class Issue:
@@ -569,7 +571,7 @@ class ArticleDatabase:
 
     def articles_by_toc_categories(self, toc_categories, issue_key=None):
         filtered_articles = [article for article in self.articles if article.dict.get('toc_category') in toc_categories and (issue_key is None or article.dict['issue_key'] == issue_key)]
-        return sorted(filtered_articles, key=lambda x: first_page_number(x.dict['pages']))
+        return sorted(filtered_articles, key=lambda x: first_page_number(x.pages))
 
     def toc_with_articles(self, issue_key):
         issue = self.issues[issue_key]
@@ -578,7 +580,7 @@ class ArticleDatabase:
         toc_order = [""] + issue.toc_order # prepend empty category
         for toc in toc_order:
             articles = self.articles_by_toc_categories([toc], issue_key)
-            articles_sorted = sorted(articles, key=lambda x: first_page_number(x.dict['pages']))
+            articles_sorted = sorted(articles, key=lambda x: first_page_number(x.pages))
             toc_entries.append({
                 'category': toc,
                 'articles': articles_sorted
@@ -603,7 +605,7 @@ class ArticleDatabase:
         # Sort articles in each category by issue and then by first page number
         for category, articles_list in articles_by_category.items():
             articles_by_category[category] = sorted(articles_list,
-                                                    key=lambda x: (x.issue, first_page_number(x.dict['pages'])))
+                                                    key=lambda x: (x.issue, first_page_number(x.pages)))
 
         sorted_categories = sorted(articles_by_category.items(), key=lambda x: x[0])
         return OrderedDict(sorted_categories)
@@ -677,7 +679,7 @@ def html_generate_latest_issue(db):
 
 def html_generate_latest_downloads(db):
     articles_with_downloads = db.articles_with_downloads()
-    sorted_articles = sorted(articles_with_downloads, key=lambda x: (x.dict['issue_key'], first_page_number(x.dict['pages'])), reverse=True)[:NEW_DOWNLOADS]
+    sorted_articles = sorted(articles_with_downloads, key=lambda x: (x.dict['issue_key'], first_page_number(x.pages)), reverse=True)[:NEW_DOWNLOADS]
     html_parts = [f"<h2>{LABEL_LATEST_LISTINGS}</h2><hr><ul>"]
 
     for article in sorted_articles:
@@ -740,7 +742,7 @@ def html_generate_toc(db, issue_key, heading_level=1, prepend_issue_dir=False):
               issue = db.issues[article.dict['issue_key']]
               path = article_path(issue, article, prepend_issue_dir)
               title = toc_title(article)
-              first_page = first_page_number(article.dict['pages'])
+              first_page = first_page_number(article.pages)
 
               link = f"""
               <a href='{path}'>
@@ -892,7 +894,7 @@ def html_generate_article_preview(db, article):
     issue_key = article.dict['issue_key']
     issue = db.issues[issue_key]
     issue_dir_name = issue.issue_dir_name
-    pages = article.dict['pages']
+    pages = article.pages
     img_src = next((url for url in article.dict.get('img_urls', [])), None)
     pubdate_unix = int(article.dict['pubdate'].timestamp())
     html_parts.append(f"<div class=\"article_link\" data-pubdate=\"{pubdate_unix}\">\n")
@@ -1240,7 +1242,7 @@ def copy_and_modify_html(article, html_dest_path, pdf_path, prev_page_link, next
     issue_number = article.issue
     head1 = article.dict.get('head1')
     head2 = article.dict.get('head2')
-    pages = article.dict.get('pages')
+    pages = article.pages
 
     # Parse navigation HTML and prepare for insertion
     body = soup.find('body')
@@ -1436,7 +1438,7 @@ def copy_articles_and_assets(db, in_directory, out_directory):
 #                download_path = os.path.join(issue_source_path, download_url)
 #                shutil.copy(download_path, issue_dest_path_prg)
 
-            pages = article.dict['pages']
+            pages = article.pages
 
             # create PDF with just the article
             source_pdf_path = os.path.join(issue_source_path, pdf_filename)
