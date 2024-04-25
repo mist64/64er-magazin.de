@@ -306,8 +306,7 @@ class Article:
         self.title = metadata['title']
         self.issue = metadata['issue']
         self.pages = metadata['pages']
-        
-#         self.id = metadata['id']
+        self.id = metadata['id']
 # 
 #         self.issue_key = metadata['issue_key']
 #         self.out_filename = metadata['out_filename']
@@ -338,6 +337,7 @@ class Article:
         del self.dict['title']
         del self.dict['issue']
         del self.dict['pages']
+        del self.dict['id']
 
         
                 
@@ -554,17 +554,17 @@ class ArticleDatabase:
                 # Sort articles by page number within this issue before assigning indexes
                 sorted_articles = sorted(issue.articles_metadata, key=lambda x: first_page_number(x['pages']))
 
-                for index, article in enumerate(sorted_articles):
+                for index, article_dict in enumerate(sorted_articles):
                     # Modify to include issue key directly
-                    article['issue_key'] = issue_key
-                    article['out_filename'] = article['id'] + '.html'
+                    article_dict['issue_key'] = issue_key
+                    article_dict['out_filename'] = article_dict['id'] + '.html'
                     # Assign an index based on sorted order
-                    article['index'] = index
+                    article_dict['index'] = index
                     # Assign a pubdate for RSS
-                    article['pubdate'] = article_pubdate(issue, article)
+                    article_dict['pubdate'] = article_pubdate(issue, article_dict)
                     
-                    article_obj = Article(article)
-                    self.articles.append(article_obj)
+                    article = Article(article_dict)
+                    self.articles.append(article)
 
     def latest_issue_key(self):
         return max(self.issues.keys(), key=key_to_datetime)
@@ -634,7 +634,7 @@ def index_title(article):
   toc_title = article.dict.get('toc_title')
   title = article.title
   ret = index_title if index_title else toc_title if toc_title else title
-  if article.dict.get('id') == 'editorial':
+  if article.id == 'editorial':
       ret = f"Editorial: {ret}"
   return ret
 
@@ -1501,7 +1501,7 @@ def generate_search_json(db, out_directory):
         article_dict = {
             'categories': article.dict.get('toc_category'),
             'content': article.dict['txt'],
-            'href': f"/{BASE_DIR}{issue_dir_name}/{article.dict['id']}.html",  # Construct link with issue ID and filename
+            'href': f"/{BASE_DIR}{issue_dir_name}/{article.id}.html",  # Construct link with issue ID and filename
             'title': f"{title} [64'er {article.dict['issue_key']}]"
         }
         articles_info.append(article_dict)
