@@ -571,10 +571,7 @@ def full_url(path):
     return RSS_BASE_URL + quote(BASE_DIR + path)
 
 def article_path(issue, article, prepend_issue_dir=False):
-    article_path = article['out_filename']
-    issue_dir = issue.issue_dir_name if prepend_issue_dir else None
-    if issue_dir:
-        article_path = os.path.join(issue_dir, article_path)
+    article_path = optional_issue_prefix(article['out_filename'], issue, prepend_issue_dir)
     return article_path
 
 def article_link(db, article, title, prepend_issue_dir=False):
@@ -612,6 +609,12 @@ def article_pubdate(issue, article):
     return pubdate
 
 
+def optional_issue_prefix(path, issue, prepend_issue_dir=False):
+    if prepend_issue_dir:
+        issue_dir = issue.issue_dir_name
+        path = os.path.join(issue_dir, path)
+    return path
+
 ### Reusable HTML generation
 
 def html_generate_latest_issue(db):
@@ -642,13 +645,9 @@ def html_generate_latest_downloads(db):
 
     return ''.join(html_parts)
 
-def html_generate_title_image(db, issue_key, width, prepend_issue_dir=False):
-    issue = db.issues[issue_key]
-    title_jpg_path = "title.jpg"
-    issue_dir = issue.issue_dir_name if prepend_issue_dir else None
-    if issue_dir:
-        title_jpg_path = os.path.join(issue_dir, title_jpg_path)
-    return f"<img src=\"{title_jpg_path}\" width=\"{width}\" alt=\"{MAGAZINE_NAME} {issue_key}\">\n"
+def html_generate_title_image(db, issue, width, prepend_issue_dir=False):
+    title_jpg_path = optional_issue_prefix("title.jpg", issue, prepend_issue_dir)
+    return f"<img src=\"{title_jpg_path}\" width=\"{width}\" alt=\"{MAGAZINE_NAME} {issue.issue_key}\">\n"
 
 
 def html_generate_toc(db, issue_key, heading_level=1, prepend_issue_dir=False):
@@ -656,13 +655,11 @@ def html_generate_toc(db, issue_key, heading_level=1, prepend_issue_dir=False):
     if heading_level == 1:
         html_parts.append(f"<main>\n")
     html_parts.append(f"<h{heading_level}>{LABEL_ISSUE} {issue_key}</h{heading_level}>\n")
+
     issue = db.issues[issue_key]
-    pdf_filename = issue.pdf_filename
-    issue = db.issues[issue_key]
-    issue_dir = issue.issue_dir_name if prepend_issue_dir else None
-    if issue_dir:
-        pdf_filename = os.path.join(issue_dir, pdf_filename)
-    title_image = html_generate_title_image(db, issue_key, 300, prepend_issue_dir)
+    pdf_filename = optional_issue_prefix(issue.pdf_filename, issue, prepend_issue_dir)
+    title_image = html_generate_title_image(db, issue, 300, prepend_issue_dir)
+
     title_image = f"""
 <div class="download_full_pdf">
     <a href="{pdf_filename}">
@@ -727,8 +724,9 @@ def html_generate_tocs_all_issues(db):
 
     # top: all issue title images
     for issue_key in sorted(db.issues.keys(), key=lambda x: key_to_datetime(x), reverse=True):
-        title_image = html_generate_title_image(db, issue_key, 200, True)
-        issue_dir = db.issues[issue_key].issue_dir_name
+        issue = db.issues[issue_key]
+        title_image = html_generate_title_image(db, issue, 200, True)
+        issue_dir = issue.issue_dir_name
         html_parts.append(f"<a href=\"{issue_dir}\">{title_image}</a>\n")
 
     html_parts.append("<hr>\n")
