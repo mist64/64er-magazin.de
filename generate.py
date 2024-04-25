@@ -345,8 +345,8 @@ class Issue:
           self.pubdate = pubdate
           self.pdf_filename = pdf_filename
           self.issue_dir_name = issue_dir_name
+          self.issue_key = issue_key
           self.dict = {
-              'issue_key': issue_key,
               'listings': listings,
           }
       else:
@@ -478,20 +478,21 @@ class ArticleDatabase:
             issue_dir_path = os.path.join(in_directory, issue_dir_name)
             if os.path.isdir(issue_dir_path) and re.match(r'^\d{4}$', issue_dir_name):
                 issue = Issue(issue_dir_path) #__extract_issue_data
-                issue_data = issue.dict
                 
-                if not issue_data:
+                # todo: exception in the init and exception handler here
+                if not issue.dict:
                     continue
 
                 # Map issue key to issue data
-                self.issues[issue_data['issue_key']] = issue
+                issue_key = issue.issue_key
+                self.issues[issue_key] = issue
 
                 # Sort articles by page number within this issue before assigning indexes
                 sorted_articles = sorted(issue.articles_metadata, key=lambda x: first_page_number(x['pages']))
 
                 for index, article in enumerate(sorted_articles):
                     # Modify to include issue key directly
-                    article['issue_key'] = issue_data['issue_key']
+                    article['issue_key'] = issue_key
                     article['out_filename'] = article['id'] + '.html'
                     # Assign an index based on sorted order
                     article['index'] = index
