@@ -308,7 +308,7 @@ class Article:
         self.pages = metadata['pages']
         self.id = metadata['id']
         self.issue_key = metadata['issue_key']
-#         self.out_filename = metadata['out_filename']
+        self.out_filename = metadata['out_filename']
 #         self.index = metadata['index']
 #         self.pubdate = metadata['pubdate']
 # 
@@ -338,6 +338,7 @@ class Article:
         del self.dict['pages']
         del self.dict['id']
         del self.dict['issue_key']
+        del self.dict['out_filename']
 
         
                 
@@ -616,7 +617,7 @@ def full_url(path):
     return RSS_BASE_URL + quote(BASE_DIR + path)
 
 def article_path(issue, article, prepend_issue_dir=False):
-    article_path = optional_issue_prefix(article.dict['out_filename'], issue, prepend_issue_dir)
+    article_path = optional_issue_prefix(article.out_filename, issue, prepend_issue_dir)
     return article_path
 
 def article_link(db, article, title, prepend_issue_dir=False):
