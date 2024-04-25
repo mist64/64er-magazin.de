@@ -310,7 +310,7 @@ class Article:
         self.issue_key = metadata['issue_key']
         self.out_filename = metadata['out_filename']
         self.index = metadata['index']
-#         self.pubdate = metadata['pubdate']
+        self.pubdate = metadata['pubdate']
 # 
 #         self.head1 = metadata['head1']        
 #         self.head2 = metadata['head2']
@@ -340,6 +340,7 @@ class Article:
         del self.dict['issue_key']
         del self.dict['out_filename']
         del self.dict['index']
+        del self.dict['pubdate']
 
         
                 
@@ -898,7 +899,7 @@ def html_generate_article_preview(db, article):
     issue_dir_name = issue.issue_dir_name
     pages = article.pages
     img_src = next((url for url in article.dict.get('img_urls', [])), None)
-    pubdate_unix = int(article.dict['pubdate'].timestamp())
+    pubdate_unix = int(article.pubdate.timestamp())
     html_parts.append(f"<div class=\"article_link\" data-pubdate=\"{pubdate_unix}\">\n")
     if img_src:
         img_src = os.path.join(issue_dir_name, img_src)
@@ -920,7 +921,7 @@ def html_generate_all_article_previews(db):
     articles = [article for article in db.articles if article.title not in ["Impressum", "Vorschau"]]
 
     # Sort by 'pubdate'
-    articles = sorted(articles, key=lambda x: x.dict['pubdate'], reverse=True)
+    articles = sorted(articles, key=lambda x: x.pubdate, reverse=True)
 
     html_articles = []
 
@@ -1143,7 +1144,7 @@ def generate_404_page(db, out_directory):
 def generate_rss_feed(db, out_directory):
     rss_items = []
 
-    sorted_articles = sorted(db.articles, key=lambda x: x.dict['pubdate'], reverse=False)
+    sorted_articles = sorted(db.articles, key=lambda x: x.pubdate, reverse=False)
 
     for article in sorted_articles:
         title = html.escape(index_title(article))
@@ -1163,7 +1164,7 @@ def generate_rss_feed(db, out_directory):
         else:
             description = ""
 
-        pubdate = article.dict['pubdate'].strftime("%a, %d %b %Y %H:%M:%S %z")[:-5] + "GMT"
+        pubdate = article.pubdate.strftime("%a, %d %b %Y %H:%M:%S %z")[:-5] + "GMT"
 
         rss_item_template = '''<item>
     <title>{title}</title>
