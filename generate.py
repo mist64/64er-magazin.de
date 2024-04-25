@@ -319,15 +319,12 @@ class Article:
         self.index_category = metadata['index_category']
         self.category = metadata['category'] # unused?
         self.target_filename = metadata['target_filename']
-        
         self.downloads = metadata['downloads']
         self.description = metadata['description']
         self.src_img_urls = metadata['src_img_urls']
-        
         self.html = metadata['html']
         self.txt = metadata['txt']
-#         
-#         self.img_urls = metadata['img_urls']
+        self.img_urls = metadata['img_urls']
 #         
 #         self.path = metadata['path']
 
@@ -353,6 +350,7 @@ class Article:
         del self.dict['src_img_urls']
         del self.dict['html']
         del self.dict['txt']
+        del self.dict['img_urls']
 
         
                 
@@ -910,7 +908,7 @@ def html_generate_article_preview(db, article):
     issue = db.issues[issue_key]
     issue_dir_name = issue.issue_dir_name
     pages = article.pages
-    img_src = next((url for url in article.dict.get('img_urls', [])), None)
+    img_src = next((url for url in (article.img_urls if article.img_urls else [])), None)
     pubdate_unix = int(article.pubdate.timestamp())
     html_parts.append(f"<div class=\"article_link\" data-pubdate=\"{pubdate_unix}\">\n")
     if img_src:
@@ -1163,7 +1161,7 @@ def generate_rss_feed(db, out_directory):
         issue = db.issues[article.issue_key]
         link = full_url(article_path(issue, article, True))
         description = article.description
-        img_src = article.dict['img_urls'][0] if article.dict['img_urls'] else None
+        img_src = article.img_urls[0] if article.img_urls else None
         if img_src:
             img_src = full_url(os.path.join(issue.issue_dir_name, img_src))
             img = f"<img src='{img_src}'><br>"
@@ -1326,7 +1324,7 @@ def copy_and_modify_html(article, html_dest_path, pdf_path, prev_page_link, next
     body_html = str(soup.body)
     body_html = body_html[6:-7] # remove '<body>' and '</body>'
     title = f"{article.title} | {MAGAZINE_NAME}"
-    preview_img = next((url for url in article.dict.get('img_urls', [])), None)
+    preview_img = next((url for url in (article.img_urls if article.img_urls else [])), None)
 
 
     write_full_html_file(db, html_dest_path, title, preview_img, body_html, 'one_article', True)
