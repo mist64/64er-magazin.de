@@ -301,8 +301,6 @@ def calculate_sha1(filepath):
 class Article:
 
     def __init__(self, metadata):
-        self.dict = metadata
-
         self.title = metadata['title']
         self.issue = metadata['issue']
         self.pages = metadata['pages']
@@ -327,33 +325,7 @@ class Article:
         self.img_urls = metadata['img_urls']
         self.path = metadata['path'] # unused?
 
-        # remove
-        del self.dict['title']
-        del self.dict['issue']
-        del self.dict['pages']
-        del self.dict['id']
-        del self.dict['issue_key']
-        del self.dict['out_filename']
-        del self.dict['index']
-        del self.dict['pubdate']
-        del self.dict['head1']
-        del self.dict['head2']
-        del self.dict['toc_title']
-        del self.dict['toc_category']
-        del self.dict['index_title']
-        del self.dict['index_category']
-        del self.dict['category']
-        del self.dict['target_filename']
-        del self.dict['downloads']
-        del self.dict['description']
-        del self.dict['src_img_urls']
-        del self.dict['html']
-        del self.dict['txt']
-        del self.dict['img_urls']
-        del self.dict['path']
 
-        
-                
 class Issue:
   def __init__(self, issue_directory_path):
       """Extracts all relevant data from an issue directory, including HTML file paths."""
