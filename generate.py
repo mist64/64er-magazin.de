@@ -306,177 +306,225 @@ def calculate_sha1(filepath):
             sha1.update(chunk)
     return sha1.hexdigest()
 
+class Article:
+
+    def __init__(self, metadata):
+        self.title = metadata['title']
+        self.issue = metadata['issue']
+        self.pages = metadata['pages']
+        self.id = metadata['id']
+        self.issue_key = metadata['issue_key']
+        self.out_filename = metadata['out_filename']
+        self.index = metadata['index']
+        self.pubdate = metadata['pubdate']
+        self.head1 = metadata['head1']
+        self.head2 = metadata['head2']
+        self.toc_title = metadata['toc_title']
+        self.toc_category = metadata['toc_category']
+        self.index_title = metadata['index_title']
+        self.index_category = metadata['index_category']
+        self.category = metadata['category'] # unused?
+        self.target_filename = metadata['target_filename']
+        self.downloads = metadata['downloads']
+        self.description = metadata['description']
+        self.src_img_urls = metadata['src_img_urls']
+        self.html = metadata['html']
+        self.txt = metadata['txt']
+        self.img_urls = metadata['img_urls']
+        self.path = metadata['path'] # unused?
+
+
+class Issue:
+  def __init__(self, issue_directory_path):
+      """Extracts all relevant data from an issue directory, including HTML file paths."""
+      articles_metadata = []
+      toc_order = []
+      pdf_path = None
+      pdf_filename = None
+      issue_path = issue_directory_path  # Capture the issue directory path
+      issue_dir_name = os.path.basename(issue_directory_path)
+      issue_key = None
+      pubdate = None
+  
+      # read all listings in petcat format
+      listings = {}
+      prg_path = os.path.join(issue_directory_path, 'prg')
+      for root, _, files in os.walk(prg_path):
+          for file in files:
+              if file.endswith('.txt'):
+                  file_path = os.path.join(root, file)
+                  with open(file_path, 'r') as file_obj:
+                      listings[os.path.splitext(file)[0]] = file_obj.read()
+  
+      for root, dirs, files in os.walk(issue_directory_path):
+          for file in files:
+              if file.endswith('.html'):
+                  article_path = os.path.join(root, file)
+                  article_metadata = Issue.__read_html(article_path, listings)
+                  article_metadata['path'] = article_path  # Include full path in metadata
+                  articles_metadata.append(article_metadata)
+                  if not issue_key:
+                      issue_key = article_metadata['issue']
+                  else:
+                      assert(issue_key == article_metadata['issue'])
+              elif file == 'toc.txt':
+                  toc_order = Issue.__read_toc_order(os.path.join(root, file))
+              elif file == 'pubdate.txt':
+                  pubdate = Issue.__read_pubdate(os.path.join(root, file))
+              elif file.endswith('.pdf'):
+                  pdf_path = os.path.join(root, file)
+                  pdf_filename = os.path.basename(pdf_path)
+  
+      if pubdate:
+          # used directly after init and then never again
+          self.articles_metadata = articles_metadata
+          self.issue_key = issue_key
+
+          # used later on
+          self.toc_order = toc_order
+          self.pubdate = pubdate
+          self.pdf_filename = pdf_filename
+          self.issue_dir_name = issue_dir_name
+          self.listings = listings
+
+      else:
+          raise Exception(f"- [{issue_directory_path}] does not contain expected data")
+  
+  @staticmethod
+  def __read_html(html_file_path, listings):
+      """Parses an HTML file for article metadata and includes the filename."""
+      with open(html_file_path, 'r', encoding='utf-8') as file:
+          contents = file.read()
+
+      soup = BeautifulSoup(contents, 'html.parser')
+  
+      def find_meta(name, is_optional=True): # panic if non optional
+          meta_tag = soup.find('meta', attrs={'name': name})
+          if meta_tag:
+              return meta_tag['content']
+          elif is_optional:
+              return None
+          else:
+              raise SystemExit(f'\n---\nMetaDataError: "{name}" meta tag is missing\n   File: "{html_file_path}"')
+      
+      def find_title(): # panic if no title
+          title_tag = soup.find('title')
+          if title_tag:
+              return title_tag.text
+          else:
+              raise SystemExit(f'\n---\nMetaDataError: title tag is missing\n   File: "{html_file_path}"')
+
+      metadata = {
+          'filename': os.path.basename(html_file_path), # XXX old
+          'title': find_title(),
+          'issue': find_meta('64er.issue', False),
+          'pages': find_meta('64er.pages', False),
+          'id': find_meta('64er.id', False),
+          'head1': find_meta('64er.head1'),
+          'head2': find_meta('64er.head2'),
+          'toc_title': find_meta('64er.toc_title'),
+          'toc_category': find_meta('64er.toc_category'),
+          'index_title': find_meta('64er.index_title'),
+          'index_category': find_meta('64er.index_category'),
+          'category': find_meta('64er.category'),
+      }
+  
+      metadata['target_filename'] = os.path.basename(metadata['id']) + '.html'
+  
+      # Put listings into <pre> tags and collect downloads
+      downloads = []
+      a_tags = []
+      pre_tags = soup.find_all("pre")
+      for tag in pre_tags:
+          data_filename = tag.get("data-filename")
+          data_name = tag.get("data-name")
+          data_range = tag.get("data-range")
+          if data_filename:
+              # remove ';', empty lines and leading spaces
+              listing = listings[data_filename]
+              listing = [line.lstrip() for line in listing.splitlines() if line.strip() and not line.lstrip().startswith(';')]
+  
+              if data_range:
+                  ranges = [(int(part.split('-')[0]), int(part.split('-')[-1])) for part in data_range.split(',')]
+                  filtered_lines = []
+                  blank_line_added = True
+                  for line in listing:
+                      leading_number = int(line.split(' ')[0])
+                      if any(start <= leading_number <= end for start, end in ranges):
+                          filtered_lines.append(line)
+                          blank_line_added = False
+                      else:
+                          if not blank_line_added:
+                              filtered_lines.append('')
+                          blank_line_added = True
+                  listing = filtered_lines
+  
+              listing = "\n".join(listing)
+              tag.string = listing
+  
+              if not any(item[0] == data_name for item in downloads): # duplicates
+                  data_filename_escaped = urllib.parse.quote(data_filename)
+                  downloads.append((data_name, f"prg/{data_filename_escaped}.prg"))
+      metadata['downloads'] = downloads
+  
+      # and make a "downloads" aside
+      if downloads:
+          aside_tag = soup.new_tag("aside", attrs={"class": "downloads"})
+          for (label, url) in downloads:
+              a_tag = soup.new_tag("a", href=url)
+              a_tag.string = label
+              a_tags.append(a_tag)
+              aside_tag.append(a_tag)
+          article_tag = soup.find("article")
+          article_tag.append(aside_tag)
+  
+      # Extract article description
+      intro_div = soup.find('p', {"class": "intro"})
+      if intro_div:
+          metadata['description'] = intro_div.text.strip()
+      else:
+          first_p = soup.find('p')
+          if first_p:
+              # Extract text, split into words, take the first 64, and join them back into a string
+              words = first_p.text.split()
+              metadata['description'] = ' '.join(words[:64]) + '...'
+          else:
+              metadata['description'] = ''
+  
+  
+      # Extract all image URLs with their *source* names
+      src_img_urls = [img['src'] for img in soup.find_all('img') if img.get('src')]
+      metadata['src_img_urls'] = src_img_urls
+  
+      # In the HTML, change all img src paths from PNG to AVIF, with a JPEG fallback
+      for img_tag in soup.find_all('img'):
+          img_src = img_tag['src']
+          if img_src.lower().endswith('.png'):
+              img_tag.replace_with(avif_picture_tag(soup, img_tag['src'], img_tag.attrs))
+  
+      metadata['html'] = soup
+      metadata['txt'] = html_to_text_preserve_paragraphs(soup.body);
+  
+      # Extract all image URLs with their *destination* names
+      img_urls = [img['src'] for img in soup.find_all('img') if img.get('src')]
+      metadata['img_urls'] = img_urls
+  
+      return metadata
+  
+  @staticmethod
+  def __read_toc_order(toc_file_path):
+      """Reads the TOC order from toc.txt file."""
+      with open(toc_file_path, 'r', encoding='utf-8') as file:
+          toc_order = [line.strip() for line in file.readlines() if line.strip()]
+      return toc_order
+  
+  def __read_pubdate(file_path):
+      with open(file_path, 'r') as file:
+          date_str = file.readline().strip()
+      return datetime.strptime(date_str, "%Y-%m-%d").replace(tzinfo=timezone.utc)
+            
 
 class ArticleDatabase:
-    @staticmethod
-    def __read_html(html_file_path, listings):
-        """Parses an HTML file for article metadata and includes the filename."""
-        with open(html_file_path, 'r', encoding='utf-8') as file:
-            contents = file.read()
-        soup = BeautifulSoup(contents, 'html.parser')
-
-        metadata = {
-            'filename': os.path.basename(html_file_path), # XXX old
-            'title': soup.find('title').text if soup.find('title') else 'No Title',
-            'issue': soup.find('meta', attrs={'name': '64er.issue'})['content'] if soup.find('meta', attrs={'name': '64er.issue'}) else 'No Issue',
-            'pages': soup.find('meta', attrs={'name': '64er.pages'})['content'] if soup.find('meta', attrs={'name': '64er.pages'}) else 'No Pages',
-            'head1': soup.find('meta', attrs={'name': '64er.head1'})['content'] if soup.find('meta', attrs={'name': '64er.head1'}) else None,
-            'head2': soup.find('meta', attrs={'name': '64er.head2'})['content'] if soup.find('meta', attrs={'name': '64er.head2'}) else None,
-            'toc_title': soup.find('meta', attrs={'name': '64er.toc_title'})['content'] if soup.find('meta', attrs={'name': '64er.toc_title'}) else None,
-            'toc_category': soup.find('meta', attrs={'name': '64er.toc_category'})['content'] if soup.find('meta', attrs={'name': '64er.toc_category'}) else None,
-            'index_title': soup.find('meta', attrs={'name': '64er.index_title'})['content'] if soup.find('meta', attrs={'name': '64er.index_title'}) else None,
-            'index_category': soup.find('meta', attrs={'name': '64er.index_category'})['content'] if soup.find('meta', attrs={'name': '64er.index_category'}) else None,
-            'category': soup.find('meta', attrs={'name': '64er.category'})['content'] if soup.find('meta', attrs={'name': '64er.category'}) else None,
-            'id': soup.find('meta', attrs={'name': '64er.id'})['content'] if soup.find('meta', attrs={'name': '64er.id'}) else None,
-        }
-
-        metadata['target_filename'] = os.path.basename(metadata['id']) + '.html'
-
-        # Put listings into <pre> tags and collect downloads
-        downloads = []
-        a_tags = []
-        pre_tags = soup.find_all("pre")
-        for tag in pre_tags:
-            data_filename = tag.get("data-filename")
-            data_name = tag.get("data-name")
-            data_range = tag.get("data-range")
-            if data_filename:
-                # remove ';', empty lines and leading spaces
-                listing = listings[data_filename]
-                listing = [line.lstrip() for line in listing.splitlines() if line.strip() and not line.lstrip().startswith(';')]
-
-                if data_range:
-                    ranges = [(int(part.split('-')[0]), int(part.split('-')[-1])) for part in data_range.split(',')]
-                    filtered_lines = []
-                    blank_line_added = True
-                    for line in listing:
-                        leading_number = int(line.split(' ')[0])
-                        if any(start <= leading_number <= end for start, end in ranges):
-                            filtered_lines.append(line)
-                            blank_line_added = False
-                        else:
-                            if not blank_line_added:
-                                filtered_lines.append('')
-                            blank_line_added = True
-                    listing = filtered_lines
-
-                listing = "\n".join(listing)
-                tag.string = listing
-
-                if not any(item[0] == data_name for item in downloads): # duplicates
-                    data_filename_escaped = urllib.parse.quote(data_filename)
-                    downloads.append((data_name, f"prg/{data_filename_escaped}.prg"))
-        metadata['downloads'] = downloads
-
-        # and make a "downloads" aside
-        if downloads:
-            aside_tag = soup.new_tag("aside", attrs={"class": "downloads"})
-            for (label, url) in downloads:
-                a_tag = soup.new_tag("a", href=url)
-                a_tag.string = label
-                a_tags.append(a_tag)
-                aside_tag.append(a_tag)
-            article_tag = soup.find("article")
-            article_tag.append(aside_tag)
-
-        # Extract article description
-        intro_div = soup.find('p', {"class": "intro"})
-        if intro_div:
-            metadata['description'] = intro_div.text.strip()
-        else:
-            first_p = soup.find('p')
-            if first_p:
-                # Extract text, split into words, take the first 64, and join them back into a string
-                words = first_p.text.split()
-                metadata['description'] = ' '.join(words[:64]) + '...'
-            else:
-                metadata['description'] = ''
-
-
-        # Extract all image URLs with their *source* names
-        src_img_urls = [img['src'] for img in soup.find_all('img') if img.get('src')]
-        metadata['src_img_urls'] = src_img_urls
-
-        # In the HTML, change all img src paths from PNG to AVIF, with a JPEG fallback
-        for img_tag in soup.find_all('img'):
-            img_src = img_tag['src']
-            if img_src.lower().endswith('.png'):
-                img_tag.replace_with(avif_picture_tag(soup, img_tag['src'], img_tag.attrs))
-
-        metadata['html'] = soup
-        metadata['txt'] = html_to_text_preserve_paragraphs(soup.body);
-
-        # Extract all image URLs with their *destination* names
-        img_urls = [img['src'] for img in soup.find_all('img') if img.get('src')]
-        metadata['img_urls'] = img_urls
-
-        return metadata
-
-    @staticmethod
-    def __read_toc_order(toc_file_path):
-        """Reads the TOC order from toc.txt file."""
-        with open(toc_file_path, 'r', encoding='utf-8') as file:
-            toc_order = [line.strip() for line in file.readlines() if line.strip()]
-        return toc_order
-
-    def __read_pubdate(file_path):
-        with open(file_path, 'r') as file:
-            date_str = file.readline().strip()
-        return datetime.strptime(date_str, "%Y-%m-%d").replace(tzinfo=timezone.utc)
-
-    @classmethod
-    def __extract_issue_data(cls, issue_directory_path):
-        """Extracts all relevant data from an issue directory, including HTML file paths."""
-        articles_metadata = []
-        toc_order = []
-        pdf_path = None
-        pdf_filename = None
-        issue_path = issue_directory_path  # Capture the issue directory path
-        issue_dir_name = os.path.basename(issue_directory_path)
-        issue_key = None
-        pubdate = None
-
-        # read all listings in petcat format
-        listings = {}
-        prg_path = os.path.join(issue_directory_path, 'prg')
-        for root, _, files in os.walk(prg_path):
-            for file in files:
-                if file.endswith('.txt'):
-                    file_path = os.path.join(root, file)
-                    with open(file_path, 'r') as file_obj:
-                        listings[os.path.splitext(file)[0]] = file_obj.read()
-
-        for root, dirs, files in os.walk(issue_directory_path):
-            for file in files:
-                if file.endswith('.html'):
-                    article_path = os.path.join(root, file)
-                    article_metadata = cls.__read_html(article_path, listings)
-                    article_metadata['path'] = article_path  # Include full path in metadata
-                    articles_metadata.append(article_metadata)
-                    if not issue_key:
-                        issue_key = article_metadata['issue']
-                    else:
-                        assert(issue_key == article_metadata['issue'])
-                elif file == 'toc.txt':
-                    toc_order = cls.__read_toc_order(os.path.join(root, file))
-                elif file == 'pubdate.txt':
-                    pubdate = cls.__read_pubdate(os.path.join(root, file))
-                elif file.endswith('.pdf'):
-                    pdf_path = os.path.join(root, file)
-                    pdf_filename = os.path.basename(pdf_path)
-
-        if pubdate:
-            return {
-                'articles_metadata': articles_metadata,
-                'toc_order': toc_order,
-                'pubdate': pubdate,
-                'pdf_filename': pdf_filename,
-                'issue_dir_name': issue_dir_name,
-                'issue_key': issue_key,
-                'listings': listings
-            }
-        else:
-            return None
 
     def __init__(self, in_directory):
         self.issues = {}  # Change to dictionary
@@ -484,47 +532,48 @@ class ArticleDatabase:
         for issue_dir_name in os.listdir(in_directory):
             issue_dir_path = os.path.join(in_directory, issue_dir_name)
             if os.path.isdir(issue_dir_path) and re.match(r'^\d{4}$', issue_dir_name):
-                issue_data = self.__extract_issue_data(issue_dir_path)
-                if not issue_data:
-                    continue
+              
+                try:
+                    issue = Issue(issue_dir_path)
 
+                except Exception as error:
+                    print(error)
+                    continue
+                
                 # Map issue key to issue data
-                self.issues[issue_data['issue_key']] = {
-                    'issue_dir_name': issue_dir_name,
-                    'toc_order': issue_data['toc_order'],
-                    'pubdate': issue_data['pubdate'],
-                    'pdf_filename': issue_data['pdf_filename'],
-                    'listings': issue_data['listings']
-                }
+                issue_key = issue.issue_key
+                self.issues[issue_key] = issue
 
                 # Sort articles by page number within this issue before assigning indexes
-                sorted_articles = sorted(issue_data['articles_metadata'], key=lambda x: first_page_number(x['pages']))
+                sorted_articles = sorted(issue.articles_metadata, key=lambda x: first_page_number(x['pages']))
 
-                for index, article in enumerate(sorted_articles):
+                for index, article_dict in enumerate(sorted_articles):
                     # Modify to include issue key directly
-                    article['issue_key'] = issue_data['issue_key']
-                    article['out_filename'] = article['id'] + '.html'
+                    article_dict['issue_key'] = issue_key
+                    article_dict['out_filename'] = article_dict['id'] + '.html'
                     # Assign an index based on sorted order
-                    article['index'] = index
+                    article_dict['index'] = index
                     # Assign a pubdate for RSS
-                    article['pubdate'] = article_pubdate(issue_data, article)
+                    article_dict['pubdate'] = article_pubdate(issue, article_dict)
+                    
+                    article = Article(article_dict)
                     self.articles.append(article)
 
     def latest_issue_key(self):
         return max(self.issues.keys(), key=key_to_datetime)
 
     def articles_by_toc_categories(self, toc_categories, issue_key=None):
-        filtered_articles = [article for article in self.articles if article.get('toc_category') in toc_categories and (issue_key is None or article['issue_key'] == issue_key)]
-        return sorted(filtered_articles, key=lambda x: first_page_number(x['pages']))
+        filtered_articles = [article for article in self.articles if article.toc_category in toc_categories and (issue_key is None or article.issue_key == issue_key)]
+        return sorted(filtered_articles, key=lambda x: first_page_number(x.pages))
 
     def toc_with_articles(self, issue_key):
-        issue_data = self.issues[issue_key]
+        issue = self.issues[issue_key]
         toc_entries = []
 
-        toc_order = [""] + issue_data['toc_order'] # prepend empty category
+        toc_order = [""] + issue.toc_order # prepend empty category
         for toc in toc_order:
             articles = self.articles_by_toc_categories([toc], issue_key)
-            articles_sorted = sorted(articles, key=lambda x: first_page_number(x['pages']))
+            articles_sorted = sorted(articles, key=lambda x: first_page_number(x.pages))
             toc_entries.append({
                 'category': toc,
                 'articles': articles_sorted
@@ -533,7 +582,7 @@ class ArticleDatabase:
         return toc_entries
 
     def articles_with_downloads(self):
-        return [article for article in self.articles if article.get('index_category') and article.get('index_category').startswith(CATEGORY_TYPE_IN + '|') and article['downloads']]
+        return [article for article in self.articles if article.index_category and article.index_category.startswith(CATEGORY_TYPE_IN + '|') and article.downloads]
 
     def all_type_in_articles_grouped_by_index_category(self):
         # Initialize a dictionary to hold articles by category
@@ -541,15 +590,15 @@ class ArticleDatabase:
 
         # Filter articles with downloads and organize them
         for article in self.articles:
-            index_category = article.get('index_category')
-            if index_category and index_category.startswith(CATEGORY_TYPE_IN + '|') and article.get('downloads'):
+            index_category = article.index_category
+            if index_category and index_category.startswith(CATEGORY_TYPE_IN + '|') and article.downloads:
                 index_category = index_category[index_category.find('|') + 1:]
                 articles_by_category[index_category].append(article)
 
         # Sort articles in each category by issue and then by first page number
         for category, articles_list in articles_by_category.items():
             articles_by_category[category] = sorted(articles_list,
-                                                    key=lambda x: (x['issue'],  first_page_number(x['pages'])))
+                                                    key=lambda x: (x.issue, first_page_number(x.pages)))
 
         sorted_categories = sorted(articles_by_category.items(), key=lambda x: x[0])
         return OrderedDict(sorted_categories)
@@ -559,54 +608,57 @@ class ArticleDatabase:
 def full_url(path):
     return RSS_BASE_URL + quote(BASE_DIR + path)
 
-def article_path(issue_data, article, prepend_issue_dir=False):
-    article_path = article['out_filename']
-    issue_dir = issue_data['issue_dir_name'] if prepend_issue_dir else None
-    if issue_dir:
-        article_path = os.path.join(issue_dir, article_path)
+def article_path(issue, article, prepend_issue_dir=False):
+    article_path = optional_issue_prefix(article.out_filename, issue, prepend_issue_dir)
     return article_path
 
 def article_link(db, article, title, prepend_issue_dir=False):
-    issue_data = db.issues[article['issue_key']]
-    path = article_path(issue_data, article, prepend_issue_dir)
+    issue = db.issues[article.issue_key]
+    path = article_path(issue, article, prepend_issue_dir)
     return f"<a href='{path}'>{title}</a>"
 
-def prg_link(issue_data, download):
+def prg_link(issue, download):
     label, url = download
-    url = os.path.join(issue_data['issue_dir_name'], url)
+    url = os.path.join(issue.issue_dir_name, url)
     return f"<a href='{url}'>{label}</a>"
 
 def index_title(article):
-  index_title = article.get('index_title')
-  toc_title = article.get('toc_title')
-  title = article['title']
+  index_title = article.index_title
+  toc_title = article.toc_title
+  title = article.title
   ret = index_title if index_title else toc_title if toc_title else title
-  if article.get('id') == 'editorial':
+  if article.id == 'editorial':
       ret = f"Editorial: {ret}"
   return ret
 
 def toc_title(article):
-  toc_title = article.get('toc_title')
-  title = article['title']
+  toc_title = article.toc_title
+  title = article.title
   return toc_title if toc_title else title
 
 def share_on_mastodon_link(title, url):
     mastodon_message = quote(f"{title}\n{url}\n{MASTODON_HASHTAGS}")
     return f"/{BASE_DIR}tootpick.html#text={mastodon_message}"
 
-def article_pubdate(issue_data, article):
-    pubdate = issue_data['pubdate']
+def article_pubdate(issue, article_dict):
+    pubdate = issue.pubdate
     # Add index as half-days to the date
-    pubdate += timedelta(hours=HOURS_PER_ARTICLE * article['index'])
+    pubdate += timedelta(hours=HOURS_PER_ARTICLE * article_dict['index'])
     return pubdate
 
+
+def optional_issue_prefix(path, issue, prepend_issue_dir=False):
+    if prepend_issue_dir:
+        issue_dir = issue.issue_dir_name
+        path = os.path.join(issue_dir, path)
+    return path
 
 ### Reusable HTML generation
 
 def html_generate_latest_issue(db):
     latest_issue_key = db.latest_issue_key()
-    latest_issue_data = db.issues[latest_issue_key]
-    issue_dir_name = os.path.basename(latest_issue_data['issue_dir_name'])
+    latest_issue = db.issues[latest_issue_key]
+    issue_dir_name = os.path.basename(latest_issue.issue_dir_name)
     latest_title_image = os.path.join(issue_dir_name, "title.jpg")
     latest_html = f'''
 <h2>{LABEL_CURRENT_ISSUE}</h2>\n
@@ -620,7 +672,7 @@ def html_generate_latest_issue(db):
 
 def html_generate_latest_downloads(db):
     articles_with_downloads = db.articles_with_downloads()
-    sorted_articles = sorted(articles_with_downloads, key=lambda x: (x['issue_key'], first_page_number(x['pages'])), reverse=True)[:NEW_DOWNLOADS]
+    sorted_articles = sorted(articles_with_downloads, key=lambda x: (x.issue_key, first_page_number(x.pages)), reverse=True)[:NEW_DOWNLOADS]
     html_parts = [f"<h2>{LABEL_LATEST_LISTINGS}</h2><hr><ul>"]
 
     for article in sorted_articles:
@@ -631,13 +683,9 @@ def html_generate_latest_downloads(db):
 
     return ''.join(html_parts)
 
-def html_generate_title_image(db, issue_key, width, prepend_issue_dir=False):
-    issue_data = db.issues[issue_key]
-    title_jpg_path = "title.jpg"
-    issue_dir = issue_data['issue_dir_name'] if prepend_issue_dir else None
-    if issue_dir:
-        title_jpg_path = os.path.join(issue_dir, title_jpg_path)
-    return f"<img src=\"{title_jpg_path}\" width=\"{width}\" alt=\"{MAGAZINE_NAME} {issue_key}\">\n"
+def html_generate_title_image(db, issue, width, prepend_issue_dir=False):
+    title_jpg_path = optional_issue_prefix("title.jpg", issue, prepend_issue_dir)
+    return f"<img src=\"{title_jpg_path}\" width=\"{width}\" alt=\"{MAGAZINE_NAME} {issue.issue_key}\">\n"
 
 
 def html_generate_toc(db, issue_key, heading_level=1, prepend_issue_dir=False):
@@ -645,12 +693,11 @@ def html_generate_toc(db, issue_key, heading_level=1, prepend_issue_dir=False):
     if heading_level == 1:
         html_parts.append(f"<main>\n")
     html_parts.append(f"<h{heading_level}>{LABEL_ISSUE} {issue_key}</h{heading_level}>\n")
-    pdf_filename = db.issues[issue_key]['pdf_filename']
-    issue_data = db.issues[issue_key]
-    issue_dir = issue_data['issue_dir_name'] if prepend_issue_dir else None
-    if issue_dir:
-        pdf_filename = os.path.join(issue_dir, pdf_filename)
-    title_image = html_generate_title_image(db, issue_key, 300, prepend_issue_dir)
+
+    issue = db.issues[issue_key]
+    pdf_filename = optional_issue_prefix(issue.pdf_filename, issue, prepend_issue_dir)
+    title_image = html_generate_title_image(db, issue, 300, prepend_issue_dir)
+
     title_image = f"""
 <div class="download_full_pdf">
     <a href="{pdf_filename}">
@@ -666,7 +713,6 @@ def html_generate_toc(db, issue_key, heading_level=1, prepend_issue_dir=False):
     html_parts.append('<div class="toc_container">')
     html_parts.append(title_image)
 
-    issue_data = db.issues[issue_key]
     toc_entries = db.toc_with_articles(issue_key)
 
     last_category = None
@@ -686,10 +732,10 @@ def html_generate_toc(db, issue_key, heading_level=1, prepend_issue_dir=False):
           for article in entry['articles']:
 
               #link = article_link(db, article, toc_title(article), prepend_issue_dir)
-              issue_data = db.issues[article['issue_key']]
-              path = article_path(issue_data, article, prepend_issue_dir)
+              issue = db.issues[article.issue_key]
+              path = article_path(issue, article, prepend_issue_dir)
               title = toc_title(article)
-              first_page = first_page_number(article['pages'])
+              first_page = first_page_number(article.pages)
 
               link = f"""
               <a href='{path}'>
@@ -716,8 +762,9 @@ def html_generate_tocs_all_issues(db):
 
     # top: all issue title images
     for issue_key in sorted(db.issues.keys(), key=lambda x: key_to_datetime(x), reverse=True):
-        title_image = html_generate_title_image(db, issue_key, 200, True)
-        issue_dir = db.issues[issue_key]['issue_dir_name']
+        issue = db.issues[issue_key]
+        title_image = html_generate_title_image(db, issue, 200, True)
+        issue_dir = issue.issue_dir_name
         html_parts.append(f"<a href=\"{issue_dir}\">{title_image}</a>\n")
 
     html_parts.append("<hr>\n")
@@ -740,9 +787,8 @@ def html_generate_articles_for_categories(db, toc_categories, alphabetical, issu
     html_parts = []
     html_parts.append(f"<ul>\n")
     for article in articles:
-        issue_data = db.issues[article['issue_key']]
         if append_issue_number:
-            issue_number = f" [{article['issue']}]"
+            issue_number = f" [{article.issue}]"
         else:
             issue_number = ""
         link = article_link(db, article, index_title(article), True)
@@ -804,13 +850,13 @@ def html_generate_all_downloads(db):
     for index_category, articles_list in articles_by_category.items():
         for article in articles_list:
             link = article_link(db, article, index_title(article), True)
-            issue_key = article['issue_key']
-            issue_data = db.issues[issue_key]
+            issue_key = article.issue_key
+            issue = db.issues[issue_key]
 
             # Construct the list of downloads
             downloads_list = ""
-            for download in article['downloads']:
-                downloads_list += f"<li>{prg_link(issue_data, download)}</li>\n"
+            for download in article.downloads:
+                downloads_list += f"<li>{prg_link(issue, download)}</li>\n"
 
             # Add a row to the table for this article
             html_table += f"""
@@ -836,14 +882,14 @@ def html_generate_article_preview(db, article):
     html_parts = []
     link_title = article_link(db, article, index_title(article), True)
     title = index_title(article)
-    description = article.get('description', '')
-    category = article.get('toc_category', 'Uncategorized')
-    issue_key = article['issue_key']
-    issue_data = db.issues[issue_key]
-    issue_dir_name = issue_data['issue_dir_name']
-    pages = article['pages']
-    img_src = next((url for url in article.get('img_urls', [])), None)
-    pubdate_unix = int(article['pubdate'].timestamp())
+    description = article.description if article.description else ''
+    category = article.toc_category if article.toc_category else '' # 'Uncategorized'
+    issue_key = article.issue_key
+    issue = db.issues[issue_key]
+    issue_dir_name = issue.issue_dir_name
+    pages = article.pages
+    img_src = next((url for url in (article.img_urls if article.img_urls else [])), None)
+    pubdate_unix = int(article.pubdate.timestamp())
     html_parts.append(f"<div class=\"article_link\" data-pubdate=\"{pubdate_unix}\">\n")
     if img_src:
         img_src = os.path.join(issue_dir_name, img_src)
@@ -862,10 +908,10 @@ def html_generate_article_preview(db, article):
 
 def html_generate_all_article_previews(db):
     # Filter out specific articles
-    articles = [article for article in db.articles if article['title'] not in ["Impressum", "Vorschau"]]
+    articles = [article for article in db.articles if article.title not in ["Impressum", "Vorschau"]]
 
     # Sort by 'pubdate'
-    articles = sorted(articles, key=lambda x: x['pubdate'], reverse=True)
+    articles = sorted(articles, key=lambda x: x.pubdate, reverse=True)
 
     html_articles = []
 
@@ -877,7 +923,7 @@ def html_generate_all_article_previews(db):
 ### Write full HTML files
 
 def write_full_html_file(db, path, title, preview_img, body_html, body_class, comments=False):
-    latest_issue_path = db.issues[db.latest_issue_key()]['issue_dir_name']
+    latest_issue_path = db.issues[db.latest_issue_key()].issue_dir_name
     impressum_path = os.path.join(latest_issue_path, f"{FILENAME_IMPRINT}.html")
 
     isso_id = path.removeprefix(OUT_DIRECTORY) # hack :(
@@ -1006,7 +1052,7 @@ def generate_all_issues_with_tocs_html(db, out_directory):
 
 def generate_issues_toc_html(db, issue_key, out_directory):
     body_html = html_generate_toc(db, issue_key, 1, False)
-    issue_dest_path = os.path.join(out_directory, db.issues[issue_key]['issue_dir_name'])
+    issue_dest_path = os.path.join(out_directory, db.issues[issue_key].issue_dir_name)
     write_full_html_file(db, os.path.join(issue_dest_path, 'index.html'), f'{LABEL_TOC_ISSUE} {issue_key} | {MAGAZINE_NAME}', 'title.jpg', body_html, 'one_issue', True)
 
 def generate_issues_tocs_html(db, out_directory):
@@ -1088,16 +1134,16 @@ def generate_404_page(db, out_directory):
 def generate_rss_feed(db, out_directory):
     rss_items = []
 
-    sorted_articles = sorted(db.articles, key=lambda x: x['pubdate'], reverse=False)
+    sorted_articles = sorted(db.articles, key=lambda x: x.pubdate, reverse=False)
 
     for article in sorted_articles:
         title = html.escape(index_title(article))
-        issue_data = db.issues[article['issue_key']]
-        link = full_url(article_path(issue_data, article, True))
-        description = article['description']
-        img_src = article['img_urls'][0] if article['img_urls'] else None
+        issue = db.issues[article.issue_key]
+        link = full_url(article_path(issue, article, True))
+        description = article.description
+        img_src = article.img_urls[0] if article.img_urls else None
         if img_src:
-            img_src = full_url(os.path.join(issue_data['issue_dir_name'], img_src))
+            img_src = full_url(os.path.join(issue.issue_dir_name, img_src))
             img = f"<img src='{img_src}'><br>"
             if description:
                 description = img + description
@@ -1108,7 +1154,7 @@ def generate_rss_feed(db, out_directory):
         else:
             description = ""
 
-        pubdate = article['pubdate'].strftime("%a, %d %b %Y %H:%M:%S %z")[:-5] + "GMT"
+        pubdate = article.pubdate.strftime("%a, %d %b %Y %H:%M:%S %z")[:-5] + "GMT"
 
         rss_item_template = '''<item>
     <title>{title}</title>
@@ -1185,11 +1231,11 @@ def convert_and_copy_image(img_path, dest_img_path):
 
 def copy_and_modify_html(article, html_dest_path, pdf_path, prev_page_link, next_page_link):
     """Modifies, and writes an HTML file directly to the destination."""
-    soup = article['html']
-    issue_number = article['issue']
-    head1 = article.get('head1')
-    head2 = article.get('head2')
-    pages = article.get('pages')
+    soup = article.html
+    issue_number = article.issue
+    head1 = article.head1
+    head2 = article.head2
+    pages = article.pages
 
     # Parse navigation HTML and prepare for insertion
     body = soup.find('body')
@@ -1226,7 +1272,7 @@ def copy_and_modify_html(article, html_dest_path, pdf_path, prev_page_link, next
 
     url = RSS_BASE_URL + html_dest_path.removeprefix(OUT_DIRECTORY)[1:] # hack :(
 
-    mastodon_link = share_on_mastodon_link(article['title'], url)
+    mastodon_link = share_on_mastodon_link(article.title, url)
     mastodon_html = f'''
 <div class="article_action">
 <a href="{mastodon_link}">
@@ -1257,8 +1303,8 @@ def copy_and_modify_html(article, html_dest_path, pdf_path, prev_page_link, next
 
     body_html = str(soup.body)
     body_html = body_html[6:-7] # remove '<body>' and '</body>'
-    title = f"{article['title']} | {MAGAZINE_NAME}"
-    preview_img = next((url for url in article.get('img_urls', [])), None)
+    title = f"{article.title} | {MAGAZINE_NAME}"
+    preview_img = next((url for url in (article.img_urls if article.img_urls else [])), None)
 
 
     write_full_html_file(db, html_dest_path, title, preview_img, body_html, 'one_article', True)
@@ -1305,9 +1351,9 @@ def copy_articles_and_assets(db, in_directory, out_directory):
         shutil.copytree(fonts_source_path, fonts_dest_path, dirs_exist_ok=True)
 
     for issue_key in db.issues.keys():
-        issue_data = db.issues[issue_key]
-        issue_source_path = os.path.join(in_directory, issue_data['issue_dir_name'])
-        issue_dest_path = os.path.join(out_directory, issue_data['issue_dir_name'])
+        issue = db.issues[issue_key]
+        issue_source_path = os.path.join(in_directory, issue.issue_dir_name)
+        issue_dest_path = os.path.join(out_directory, issue.issue_dir_name)
         issue_dest_path_prg = os.path.join(issue_dest_path, 'prg')
 
         # Create sub-folder for each issue
@@ -1322,10 +1368,11 @@ def copy_articles_and_assets(db, in_directory, out_directory):
             convert_and_copy_image(os.path.join(issue_source_path, 'title.png'), os.path.join(issue_dest_path, 'title.jpg'))
 
         # Copy full PDF
-        shutil.copy(os.path.join(issue_source_path, issue_data['pdf_filename']), issue_dest_path)
+        pdf_filename = issue.pdf_filename
+        shutil.copy(os.path.join(issue_source_path, pdf_filename), issue_dest_path)
 
         # Create .PRG from Petcat listings
-        listings = issue_data['listings']
+        listings = issue.listings
         for key, listing in listings.items():
             # Prepare the output file name
             output_file_name = os.path.join(issue_dest_path, 'prg', f"{key}.prg")
@@ -1356,11 +1403,11 @@ def copy_articles_and_assets(db, in_directory, out_directory):
                 exit()
 
         # Copy all images of all articles of the issue and downloads
-        articles = [article for article in db.articles if article['issue_key'] == issue_key]
+        articles = [article for article in db.articles if article.issue_key == issue_key]
         article_index = 0
         for article in articles:
             # Copy images found in article metadata
-            img_srcs = article.get('src_img_urls', [])
+            img_srcs = article.src_img_urls if article.src_img_urls else []
             for img_src in img_srcs:
                 img_path = os.path.join(issue_source_path, img_src)
                 if os.path.exists(img_path):
@@ -1378,16 +1425,15 @@ def copy_articles_and_assets(db, in_directory, out_directory):
                         convert_and_copy_image(img_path, dest_img_path)
 
             # Copy files from the downloads
-#            downloads = article['downloads']
+#            downloads = article.downloads
 #            for _, download_url in downloads:
 #                # Assuming download_url is a relative path; adjust logic if it's a URL
 #                download_path = os.path.join(issue_source_path, download_url)
 #                shutil.copy(download_path, issue_dest_path_prg)
 
-            pages = article['pages']
+            pages = article.pages
 
             # create PDF with just the article
-            pdf_filename = issue_data['pdf_filename']
             source_pdf_path = os.path.join(issue_source_path, pdf_filename)
             pdf_path = pdf_filename[:-4] + '_' + pages + '.pdf'
             dest_pdf_path = os.path.join(issue_dest_path, pdf_path)
@@ -1395,16 +1441,16 @@ def copy_articles_and_assets(db, in_directory, out_directory):
                 extract_pages_from_pdf(source_pdf_path, dest_pdf_path, pages)
 
             if article_index > 0:
-                prev_page_link = articles[article_index - 1]['target_filename']
+                prev_page_link = articles[article_index - 1].target_filename
             else:
                 prev_page_link = None
             if article_index < len(articles) - 1:
-                next_page_link = articles[article_index + 1]['target_filename']
+                next_page_link = articles[article_index + 1].target_filename
             else:
                 next_page_link = None
 
             # Process and copy HTML files with navigation header etc.
-            html_dest_path = os.path.join(issue_dest_path, article['target_filename'])
+            html_dest_path = os.path.join(issue_dest_path, article.target_filename)
             copy_and_modify_html(article, html_dest_path, pdf_path, prev_page_link, next_page_link)
             article_index += 1
 
@@ -1441,15 +1487,15 @@ def generate_search_json(db, out_directory):
     articles_info = []
 
     for article in db.articles:
-        issue_key = article['issue_key']
-        issue_data = db.issues[issue_key]
-        issue_dir_name = issue_data['issue_dir_name']
+        issue_key = article.issue_key
+        issue = db.issues[issue_key]
+        issue_dir_name = issue.issue_dir_name
         title = index_title(article)
         article_dict = {
-            'categories': article.get('toc_category'),
-            'content': article['txt'],
-            'href': f"/{BASE_DIR}{issue_dir_name}/{article['id']}.html",  # Construct link with issue ID and filename
-            'title': f"{title} [64'er {article['issue_key']}]"
+            'categories': article.toc_category,
+            'content': article.txt,
+            'href': f"/{BASE_DIR}{issue_dir_name}/{article.id}.html",  # Construct link with issue ID and filename
+            'title': f"{title} [64'er {issue_key}]"
         }
         articles_info.append(article_dict)
 
