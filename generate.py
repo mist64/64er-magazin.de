@@ -374,20 +374,21 @@ class Issue:
                   pdf_path = os.path.join(root, file)
                   pdf_filename = os.path.basename(pdf_path)
   
-      if pubdate:
-          # used directly after init and then never again
+      if not pubdate:
+          raise Exception(f"- [{issue_directory_path}] does not contain expected data")
+
+      else:
+          # XXX used directly after init and then never again
           self.articles_metadata = articles_metadata
           self.issue_key = issue_key
 
-          # used later on
+          # XXX used later on
           self.toc_order = toc_order
           self.pubdate = pubdate
           self.pdf_filename = pdf_filename
           self.issue_dir_name = issue_dir_name
           self.listings = listings
 
-      else:
-          raise Exception(f"- [{issue_directory_path}] does not contain expected data")
   
   @staticmethod
   def __read_html(html_file_path, listings):
