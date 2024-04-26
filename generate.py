@@ -313,7 +313,6 @@ class Article:
         self.pages = metadata['pages']
         self.id = metadata['id']
         self.issue_key = metadata['issue_key']
-        self.out_filename = metadata['out_filename']
         self.index = metadata['index']
         self.pubdate = metadata['pubdate']
         self.head1 = metadata['head1']
@@ -334,6 +333,10 @@ class Article:
 
     def first_page_number(self):
         return first_page_number(self.pages)
+        
+    def out_filename(self):
+        return self.id + '.html'
+
 
 class Issue:
   def __init__(self, issue_directory_path):
@@ -552,7 +555,6 @@ class ArticleDatabase:
                 for index, article_metadata in enumerate(sorted_articles):
                     # Modify to include issue key directly
                     article_metadata['issue_key'] = issue_key
-                    article_metadata['out_filename'] = article_metadata['id'] + '.html'
                     # Assign an index based on sorted order
                     article_metadata['index'] = index
                     # Assign a pubdate for RSS
@@ -611,7 +613,7 @@ def full_url(path):
     return RSS_BASE_URL + quote(BASE_DIR + path)
 
 def article_path(issue, article, prepend_issue_dir=False):
-    article_path = optional_issue_prefix(article.out_filename, issue, prepend_issue_dir)
+    article_path = optional_issue_prefix(article.out_filename(), issue, prepend_issue_dir)
     return article_path
 
 def article_link(db, article, title, prepend_issue_dir=False):
