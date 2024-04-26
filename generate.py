@@ -27,7 +27,6 @@ LANG='de'
 OUT_DIRECTORY = 'out'
 CACHE_DIRECTORY = 'cache'
 SERVER = 'www.64er-magazin.de'
-EXTRACT_PDF_PAGES = True # disable for speed when testing
 NEW_DOWNLOADS = 15
 HOURS_PER_ARTICLE = 16
 
@@ -1437,8 +1436,8 @@ def copy_articles_and_assets(db, in_directory, out_directory):
             source_pdf_path = os.path.join(issue_source_path, pdf_filename)
             pdf_path = pdf_filename[:-4] + '_' + pages + '.pdf'
             dest_pdf_path = os.path.join(issue_dest_path, pdf_path)
-            if EXTRACT_PDF_PAGES:
-                extract_pages_from_pdf(source_pdf_path, dest_pdf_path, pages)
+
+            extract_pages_from_pdf(source_pdf_path, dest_pdf_path, pages)
 
             if article_index > 0:
                 prev_page_link = articles[article_index - 1].target_filename
