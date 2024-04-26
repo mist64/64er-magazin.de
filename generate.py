@@ -386,18 +386,18 @@ class Issue:
               assert(issue_key == article.issue_key)
     
       if not pubdate:
+          # no system exit as this also triggers for empty folders (eg. after branch change)
           raise Exception(f"- [{issue_directory_path}] does not contain expected data")
 
-      else:
-          # XXX used directly after init and then never again
-          self.articles = articles          
-          self.issue_key = issue_key
+      # XXX used directly after init and then never again
+      self.articles = articles          
+      self.issue_key = issue_key
 
-          self.toc_order = toc_order
-          self.pubdate = pubdate
-          self.pdf_filename = pdf_filename
-          self.issue_dir_name = issue_dir_name
-          self.listings = listings
+      self.toc_order = toc_order
+      self.pubdate = pubdate
+      self.pdf_filename = pdf_filename
+      self.issue_dir_name = issue_dir_name
+      self.listings = listings
 
   
   @staticmethod
