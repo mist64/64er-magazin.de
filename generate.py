@@ -332,6 +332,8 @@ class Article:
         self.img_urls = metadata['img_urls']
         self.path = metadata['path'] # XXX unused?
 
+    def first_page_number(self):
+        return first_page_number(self.pages)
 
 class Issue:
   def __init__(self, issue_directory_path):
@@ -564,7 +566,7 @@ class ArticleDatabase:
 
     def articles_by_toc_categories(self, toc_categories, issue_key=None):
         filtered_articles = [article for article in self.articles if article.toc_category in toc_categories and (issue_key is None or article.issue_key == issue_key)]
-        return sorted(filtered_articles, key=lambda x: first_page_number(x.pages))
+        return sorted(filtered_articles, key=lambda article: article.first_page_number())
 
     def toc_with_articles(self, issue_key):
         issue = self.issues[issue_key]
@@ -573,7 +575,7 @@ class ArticleDatabase:
         toc_order = [""] + issue.toc_order # prepend empty category
         for toc in toc_order:
             articles = self.articles_by_toc_categories([toc], issue_key)
-            articles_sorted = sorted(articles, key=lambda x: first_page_number(x.pages))
+            articles_sorted = sorted(articles, key=lambda article: article.first_page_number())
             toc_entries.append({
                 'category': toc,
                 'articles': articles_sorted
@@ -598,7 +600,7 @@ class ArticleDatabase:
         # Sort articles in each category by issue and then by first page number
         for category, articles_list in articles_by_category.items():
             articles_by_category[category] = sorted(articles_list,
-                                                    key=lambda x: (x.issue, first_page_number(x.pages)))
+                                                    key=lambda article: (article.issue, article.first_page_number()))
 
         sorted_categories = sorted(articles_by_category.items(), key=lambda x: x[0])
         return OrderedDict(sorted_categories)
@@ -671,7 +673,7 @@ def html_generate_latest_issue(db):
 
 def html_generate_latest_downloads(db):
     articles_with_downloads = db.articles_with_downloads()
-    sorted_articles = sorted(articles_with_downloads, key=lambda x: (x.issue_key, first_page_number(x.pages)), reverse=True)[:NEW_DOWNLOADS]
+    sorted_articles = sorted(articles_with_downloads, key=lambda article: article.first_page_number(), reverse=True)[:NEW_DOWNLOADS]
     html_parts = [f"<h2>{LABEL_LATEST_LISTINGS}</h2><hr><ul>"]
 
     for article in sorted_articles:
@@ -734,7 +736,7 @@ def html_generate_toc(db, issue_key, heading_level=1, prepend_issue_dir=False):
               issue = db.issues[article.issue_key]
               path = article_path(issue, article, prepend_issue_dir)
               title = toc_title(article)
-              first_page = first_page_number(article.pages)
+              first_page = article.first_page_number()
 
               link = f"""
               <a href='{path}'>
