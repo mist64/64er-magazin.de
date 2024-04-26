@@ -662,7 +662,7 @@ def html_generate_latest_issue(db):
 
 def html_generate_latest_downloads(db):
     articles_with_downloads = db.articles_with_downloads()
-    sorted_articles = sorted(articles_with_downloads, key=lambda x: x.first_page_number(), reverse=True)[:NEW_DOWNLOADS]
+    sorted_articles = sorted(articles_with_downloads, key=lambda x: (x.issue_key, x.first_page_number()), reverse=True)[:NEW_DOWNLOADS]
     html_parts = [f"<h2>{LABEL_LATEST_LISTINGS}</h2><hr><ul>"]
 
     for article in sorted_articles:
