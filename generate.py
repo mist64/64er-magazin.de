@@ -246,12 +246,6 @@ LOGO = f'<img src="/{BASE_DIR}logo.svg" alt="{MAGAZINE_NAME}">'
 ### DATABASE
 ###
 
-def first_page_number(pages_str):
-    try:
-        return int(pages_str.split(',')[0].split('-')[0])
-    except ValueError:
-        return float('inf')
-
 def key_to_datetime(issue_key):
     month, year = map(int, issue_key.split('/'))
     # Handle century break properly if necessary
@@ -331,7 +325,10 @@ class Article:
         self.sort_index = None # set later, after sorting all articles
 
     def first_page_number(self):
-        return first_page_number(self.pages)
+        try:
+            return int(self.pages.split(',')[0].split('-')[0])
+        except ValueError:
+            return float('inf')
         
     def out_filename(self):
         return self.id + '.html'
