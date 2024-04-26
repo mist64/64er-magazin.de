@@ -327,7 +327,7 @@ class Article:
         try:
             return int(self.pages.split(',')[0].split('-')[0])
         except ValueError:
-            return float('inf')
+            raise SystemExit(f'\n---\nMetaDataError: pages tag is "{self.pages}"\n   File: "{self.path}"')
         
     def out_filename(self):
         return self.id + '.html'
