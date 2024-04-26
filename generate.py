@@ -1362,8 +1362,7 @@ def copy_articles_and_assets(db, in_directory, out_directory):
         shutil.copy(os.path.join(issue_source_path, pdf_filename), issue_dest_path)
 
         # Create .PRG from Petcat listings
-        listings = issue.listings
-        for key, listing in listings.items():
+        for key, listing in issue.listings.items():
             # Prepare the output file name
             output_file_name = os.path.join(issue_dest_path, 'prg', f"{key}.prg")
 
@@ -1415,8 +1414,7 @@ def copy_articles_and_assets(db, in_directory, out_directory):
                         convert_and_copy_image(img_path, dest_img_path)
 
             # Copy files from the downloads
-#            downloads = article.downloads
-#            for _, download_url in downloads:
+#            for _, download_url in article.downloads:
 #                # Assuming download_url is a relative path; adjust logic if it's a URL
 #                download_path = os.path.join(issue_source_path, download_url)
 #                shutil.copy(download_path, issue_dest_path_prg)
