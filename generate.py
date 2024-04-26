@@ -649,8 +649,7 @@ def article_pubdate(issue, article_dict):
 
 def optional_issue_prefix(path, issue, prepend_issue_dir=False):
     if prepend_issue_dir:
-        issue_dir = issue.issue_dir_name
-        path = os.path.join(issue_dir, path)
+        path = os.path.join(issue.issue_dir_name, path)
     return path
 
 ### Reusable HTML generation
@@ -764,8 +763,7 @@ def html_generate_tocs_all_issues(db):
     for issue_key in sorted(db.issues.keys(), key=lambda x: key_to_datetime(x), reverse=True):
         issue = db.issues[issue_key]
         title_image = html_generate_title_image(db, issue, 200, True)
-        issue_dir = issue.issue_dir_name
-        html_parts.append(f"<a href=\"{issue_dir}\">{title_image}</a>\n")
+        html_parts.append(f"<a href=\"{issue.issue_dir_name}\">{title_image}</a>\n")
 
     html_parts.append("<hr>\n")
 
@@ -886,13 +884,12 @@ def html_generate_article_preview(db, article):
     category = article.toc_category if article.toc_category else '' # XXX 'Uncategorized'
     issue_key = article.issue_key
     issue = db.issues[issue_key]
-    issue_dir_name = issue.issue_dir_name
     pages = article.pages
     img_src = next((url for url in (article.img_urls if article.img_urls else [])), None)
     pubdate_unix = int(article.pubdate.timestamp())
     html_parts.append(f"<div class=\"article_link\" data-pubdate=\"{pubdate_unix}\">\n")
     if img_src:
-        img_src = os.path.join(issue_dir_name, img_src)
+        img_src = os.path.join(issue.issue_dir_name, img_src)
         soup = BeautifulSoup('', 'html.parser')
         picture_tag = avif_picture_tag(soup, img_src)
         link_img = article_link(db, article, picture_tag, True)
@@ -1489,12 +1486,11 @@ def generate_search_json(db, out_directory):
     for article in db.articles:
         issue_key = article.issue_key
         issue = db.issues[issue_key]
-        issue_dir_name = issue.issue_dir_name
         title = index_title(article)
         article_dict = {
             'categories': article.toc_category,
             'content': article.txt,
-            'href': f"/{BASE_DIR}{issue_dir_name}/{article.id}.html",  # Construct link with issue ID and filename
+            'href': f"/{BASE_DIR}{issue.issue_dir_name}/{article.id}.html",  # Construct link with issue ID and filename
             'title': f"{title} [64'er {issue_key}]"
         }
         articles_info.append(article_dict)
