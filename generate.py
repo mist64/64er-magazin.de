@@ -372,17 +372,18 @@ class Issue:
                   pdf_path = os.path.join(root, file)
                   pdf_filename = os.path.basename(pdf_path)
   
-      # sort articles for RSS, check issue_key for all, create Article objects
+      # sort articles by page number
       sorted_articles = sorted(articles, key=lambda x: x.first_page_number())      
       for index, article in enumerate(sorted_articles):
-          # Assign an index based on sorted order
           article.sort_index = index
-          # get the issue key from the articles and check that all of them are the same at the same time
+      articles = sorted_articles
+
+      # get the issue key from the articles and check that all of them match
+      for article in articles:
           if not issue_key:
               issue_key = article.issue_key
           else:
               assert(issue_key == article.issue_key)
-      articles = sorted_articles
     
       if not pubdate:
           raise Exception(f"- [{issue_directory_path}] does not contain expected data")
