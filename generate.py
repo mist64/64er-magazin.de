@@ -340,11 +340,8 @@ class Article:
 class Issue:
   def __init__(self, issue_directory_path):
       """Extracts all relevant data from an issue directory, including HTML file paths."""
-      articles_metadata = []
       toc_order = []
-      pdf_path = None
       pdf_filename = None
-      issue_path = issue_directory_path  # Capture the issue directory path
       issue_dir_name = os.path.basename(issue_directory_path)
       issue_key = None
       pubdate = None
