@@ -309,7 +309,7 @@ class Article:
 
     def __init__(self, metadata):
         self.title = metadata['title']
-        self.issue = metadata['issue']
+#        self.issue = metadata['issue'] # XXX
         self.pages = metadata['pages']
         self.id = metadata['id']
         self.issue_key = metadata['issue_key']
@@ -374,9 +374,9 @@ class Issue:
                   article_metadata['path'] = article_path  # Include full path in metadata
                   articles_metadata.append(article_metadata)
                   if not issue_key:
-                      issue_key = article_metadata['issue']
+                      issue_key = article_metadata['issue_key']
                   else:
-                      assert(issue_key == article_metadata['issue'])
+                      assert(issue_key == article_metadata['issue_key'])
               elif file == 'toc.txt':
                   toc_order = Issue.__read_toc_order(os.path.join(root, file))
               elif file == 'pubdate.txt':
@@ -428,7 +428,7 @@ class Issue:
       metadata = {
           'filename': os.path.basename(html_file_path), # XXX old
           'title': find_title(),
-          'issue': find_meta('64er.issue', False),
+          'issue_key': find_meta('64er.issue', False),
           'pages': find_meta('64er.pages', False),
           'id': find_meta('64er.id', False),
           'head1': find_meta('64er.head1'),
@@ -605,8 +605,7 @@ class ArticleDatabase:
 
         # Sort articles in each category by issue and then by first page number
         for category, articles_list in articles_by_category.items():
-            articles_by_category[category] = sorted(articles_list,
-                                                    key=lambda article: (article.issue, article.first_page_number()))
+            articles_by_category[category] = sorted(articles_list, key=lambda x: (x.issue_key, x.first_page_number()))
 
         sorted_categories = sorted(articles_by_category.items(), key=lambda x: x[0])
         return OrderedDict(sorted_categories)
@@ -790,7 +789,7 @@ def html_generate_articles_for_categories(db, toc_categories, alphabetical, issu
     html_parts.append(f"<ul>\n")
     for article in articles:
         if append_issue_number:
-            issue_number = f" [{article.issue}]"
+            issue_number = f" [{article.issue_key}]"
         else:
             issue_number = ""
         link = article_link(db, article, index_title(article), True)
@@ -1226,7 +1225,7 @@ def convert_and_copy_image(img_path, dest_img_path):
 def copy_and_modify_html(article, html_dest_path, pdf_path, prev_page_link, next_page_link):
     """Modifies, and writes an HTML file directly to the destination."""
     soup = article.html
-    issue_number = article.issue
+    issue_number = article.issue_key
     head1 = article.head1
     head2 = article.head2
     pages = article.pages
