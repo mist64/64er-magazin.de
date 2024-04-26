@@ -547,16 +547,16 @@ class ArticleDatabase:
                 # Sort articles by page number within this issue before assigning indexes
                 sorted_articles = sorted(issue.articles_metadata, key=lambda x: first_page_number(x['pages']))
 
-                for index, article_dict in enumerate(sorted_articles):
+                for index, article_metadata in enumerate(sorted_articles):
                     # Modify to include issue key directly
-                    article_dict['issue_key'] = issue_key
-                    article_dict['out_filename'] = article_dict['id'] + '.html'
+                    article_metadata['issue_key'] = issue_key
+                    article_metadata['out_filename'] = article_metadata['id'] + '.html'
                     # Assign an index based on sorted order
-                    article_dict['index'] = index
+                    article_metadata['index'] = index
                     # Assign a pubdate for RSS
-                    article_dict['pubdate'] = article_pubdate(issue, article_dict)
+                    article_metadata['pubdate'] = article_pubdate(issue, article_metadata)
                     
-                    article = Article(article_dict)
+                    article = Article(article_metadata)
                     self.articles.append(article)
 
     def latest_issue_key(self):
@@ -640,10 +640,10 @@ def share_on_mastodon_link(title, url):
     mastodon_message = quote(f"{title}\n{url}\n{MASTODON_HASHTAGS}")
     return f"/{BASE_DIR}tootpick.html#text={mastodon_message}"
 
-def article_pubdate(issue, article_dict):
+def article_pubdate(issue, article_metadata):
     pubdate = issue.pubdate
     # Add index as half-days to the date
-    pubdate += timedelta(hours=HOURS_PER_ARTICLE * article_dict['index'])
+    pubdate += timedelta(hours=HOURS_PER_ARTICLE * article_metadata['index'])
     return pubdate
 
 
