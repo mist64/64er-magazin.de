@@ -313,7 +313,6 @@ class Article:
         self.toc_category = metadata['toc_category']
         self.index_title = metadata['index_title']
         self.index_category = metadata['index_category']
-        self.category = metadata['category'] # XXX unused?
         self.target_filename = metadata['target_filename']
         self.downloads = metadata['downloads']
         self.description = metadata['description']
@@ -442,7 +441,6 @@ class Issue:
           'toc_category': find_meta('64er.toc_category'),
           'index_title': find_meta('64er.index_title'),
           'index_category': find_meta('64er.index_category'),
-          'category': find_meta('64er.category'),
           'path' : html_file_path,  # Include full path in metadata
       }
   
