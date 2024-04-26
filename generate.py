@@ -261,9 +261,26 @@ def key_to_datetime(issue_key):
 
 # converts an img tag into a picture tag with AVIF and a JPEG fallback
 def avif_picture_tag(soup, img_src, attrs=None):
+
+    def image_tag(tag_src=img_src):
+        img_tag = soup.new_tag('img')
+    
+        # Copy all attributes from the original <img> tag to the new one
+        if attrs:
+            for attr, value in attrs.items():
+                img_tag[attr] = value
+    
+        # add an empty alt for now if there is none
+        if 'alt' not in img_tag.attrs:
+            img_tag['alt'] = ""
+        
+        img_tag['src'] = tag_src
+        return img_tag
+        
     # svg is unchanged
     if img_src[-4:] == '.svg':
-        return soup.new_tag('img', src=img_src)
+        svg_tag = image_tag()
+        return svg_tag
 
     # Create the <picture> tag
     picture_tag = soup.new_tag('picture')
@@ -273,23 +290,14 @@ def avif_picture_tag(soup, img_src, attrs=None):
     picture_tag.insert(0, source_tag)
 
     # Create a new <img> tag for the JPEG version
-    new_img_tag = soup.new_tag('img')
-    # Copy all attributes from the original <img> tag to the new one
-    if attrs:
-        for attr, value in attrs.items():
-            new_img_tag[attr] = value
-
-    # add an empty alt for now if there is none
-    if 'alt' not in new_img_tag.attrs:
-        new_img_tag['alt'] = ""
-
     # Update the src attribute to the JPEG version
-    new_img_tag['src'] = img_src[:-4] + '.jpg'
+    jpg_src = img_src[:-4] + '.jpg'
+    new_img_tag =  image_tag(jpg_src)
 
     # Append the new <img> tag to the <picture> tag
     picture_tag.append(new_img_tag)
-
     return picture_tag
+
 
 def calculate_sha1(filepath):
     sha1 = hashlib.sha1()
