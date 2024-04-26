@@ -323,7 +323,7 @@ class Article:
         self.toc_category = metadata['toc_category']
         self.index_title = metadata['index_title']
         self.index_category = metadata['index_category']
-        self.category = metadata['category'] # unused?
+        self.category = metadata['category'] # XXX unused?
         self.target_filename = metadata['target_filename']
         self.downloads = metadata['downloads']
         self.description = metadata['description']
@@ -331,7 +331,7 @@ class Article:
         self.html = metadata['html']
         self.txt = metadata['txt']
         self.img_urls = metadata['img_urls']
-        self.path = metadata['path'] # unused?
+        self.path = metadata['path'] # XXX unused?
 
 
 class Issue:
@@ -731,7 +731,7 @@ def html_generate_toc(db, issue_key, heading_level=1, prepend_issue_dir=False):
           html_parts.append('<ul>\n')
           for article in entry['articles']:
 
-              #link = article_link(db, article, toc_title(article), prepend_issue_dir)
+              # link = article_link(db, article, toc_title(article), prepend_issue_dir) # XXX remove
               issue = db.issues[article.issue_key]
               path = article_path(issue, article, prepend_issue_dir)
               title = toc_title(article)
@@ -883,7 +883,7 @@ def html_generate_article_preview(db, article):
     link_title = article_link(db, article, index_title(article), True)
     title = index_title(article)
     description = article.description if article.description else ''
-    category = article.toc_category if article.toc_category else '' # 'Uncategorized'
+    category = article.toc_category if article.toc_category else '' # XXX 'Uncategorized'
     issue_key = article.issue_key
     issue = db.issues[issue_key]
     issue_dir_name = issue.issue_dir_name
@@ -926,8 +926,8 @@ def write_full_html_file(db, path, title, preview_img, body_html, body_class, co
     latest_issue_path = db.issues[db.latest_issue_key()].issue_dir_name
     impressum_path = os.path.join(latest_issue_path, f"{FILENAME_IMPRINT}.html")
 
-    isso_id = path.removeprefix(OUT_DIRECTORY) # hack :(
-    url = RSS_BASE_URL + isso_id[1:]           # hack :(
+    isso_id = path.removeprefix(OUT_DIRECTORY) # XXX hack :(
+    url = RSS_BASE_URL + isso_id[1:]           # XXX hack :(
 
     if comments:
       isso_html1 = f"""
@@ -1270,7 +1270,7 @@ def copy_and_modify_html(article, html_dest_path, pdf_path, prev_page_link, next
 </a>
 </div>'''
 
-    url = RSS_BASE_URL + html_dest_path.removeprefix(OUT_DIRECTORY)[1:] # hack :(
+    url = RSS_BASE_URL + html_dest_path.removeprefix(OUT_DIRECTORY)[1:] # XXX hack :(
 
     mastodon_link = share_on_mastodon_link(article.title, url)
     mastodon_html = f'''
