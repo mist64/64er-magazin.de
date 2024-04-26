@@ -314,7 +314,6 @@ class Article:
         self.id = metadata['id']
         self.issue_key = metadata['issue_key']
         self.index = metadata['index']
-        self.pubdate = metadata['pubdate']
         self.head1 = metadata['head1']
         self.head2 = metadata['head2']
         self.toc_title = metadata['toc_title']
@@ -337,6 +336,13 @@ class Article:
     def out_filename(self):
         return self.id + '.html'
 
+    def article_pubdate(self):
+        issue = db.issues[self.issue_key]
+
+        # Calculate a pubdate for RSS:
+        # Add index as "half-days" to the date
+        pubdate = issue.pubdate + timedelta(hours=HOURS_PER_ARTICLE * self.index)
+        return pubdate
 
 class Issue:
   def __init__(self, issue_directory_path):
@@ -557,8 +563,6 @@ class ArticleDatabase:
                     article_metadata['issue_key'] = issue_key
                     # Assign an index based on sorted order
                     article_metadata['index'] = index
-                    # Assign a pubdate for RSS
-                    article_metadata['pubdate'] = article_pubdate(issue, article_metadata)
                     
                     article = Article(article_metadata)
                     self.articles.append(article)
@@ -644,11 +648,7 @@ def share_on_mastodon_link(title, url):
     mastodon_message = quote(f"{title}\n{url}\n{MASTODON_HASHTAGS}")
     return f"/{BASE_DIR}tootpick.html#text={mastodon_message}"
 
-def article_pubdate(issue, article_metadata):
-    pubdate = issue.pubdate
-    # Add index as half-days to the date
-    pubdate += timedelta(hours=HOURS_PER_ARTICLE * article_metadata['index'])
-    return pubdate
+
 
 
 def optional_issue_prefix(path, issue, prepend_issue_dir=False):
@@ -890,7 +890,7 @@ def html_generate_article_preview(db, article):
     issue = db.issues[issue_key]
     pages = article.pages
     img_src = next((url for url in (article.img_urls if article.img_urls else [])), None)
-    pubdate_unix = int(article.pubdate.timestamp())
+    pubdate_unix = int(article.article_pubdate().timestamp())
     html_parts.append(f"<div class=\"article_link\" data-pubdate=\"{pubdate_unix}\">\n")
     if img_src:
         img_src = os.path.join(issue.issue_dir_name, img_src)
@@ -912,7 +912,7 @@ def html_generate_all_article_previews(db):
     articles = [article for article in db.articles if article.title not in ["Impressum", "Vorschau"]]
 
     # Sort by 'pubdate'
-    articles = sorted(articles, key=lambda x: x.pubdate, reverse=True)
+    articles = sorted(articles, key=lambda x: x.article_pubdate(), reverse=True)
 
     html_articles = []
 
@@ -1135,7 +1135,7 @@ def generate_404_page(db, out_directory):
 def generate_rss_feed(db, out_directory):
     rss_items = []
 
-    sorted_articles = sorted(db.articles, key=lambda x: x.pubdate, reverse=False)
+    sorted_articles = sorted(db.articles, key=lambda x: x.article_pubdate(), reverse=False)
 
     for article in sorted_articles:
         title = html.escape(index_title(article))
@@ -1148,7 +1148,7 @@ def generate_rss_feed(db, out_directory):
             img = f"<img src='{img_src}'><br>"
             description = img + description
         description = html.escape(description)
-        pubdate = article.pubdate.strftime("%a, %d %b %Y %H:%M:%S %z")[:-5] + "GMT"
+        pubdate = article.article_pubdate().strftime("%a, %d %b %Y %H:%M:%S %z")[:-5] + "GMT"
 
         rss_item_template = '''<item>
     <title>{title}</title>
