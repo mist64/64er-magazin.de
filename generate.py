@@ -355,6 +355,7 @@ class Issue:
       issue_dir_name = os.path.basename(issue_directory_path)
       issue_key = None
       pubdate = None
+      articles = []
   
       # read all listings in petcat format
       listings = {}
@@ -372,10 +373,6 @@ class Issue:
                   article_path = os.path.join(root, file)
                   article_metadata = Issue.__read_html(article_path, listings)
                   articles_metadata.append(article_metadata)
-                  if not issue_key:
-                      issue_key = article_metadata['issue_key']
-                  else:
-                      assert(issue_key == article_metadata['issue_key'])
               elif file == 'toc.txt':
                   toc_order = Issue.__read_toc_order(os.path.join(root, file))
               elif file == 'pubdate.txt':
@@ -384,15 +381,27 @@ class Issue:
                   pdf_path = os.path.join(root, file)
                   pdf_filename = os.path.basename(pdf_path)
   
+      # sort articles for RSS, check issue_key for all, create Article objects
+      sorted_articles = sorted(articles_metadata, key=lambda x: first_page_number(x['pages']))      
+      for index, article_metadata in enumerate(sorted_articles):
+          # Assign an index based on sorted order
+          article_metadata['index'] = index
+          articles.append(Article(article_metadata))
+
+          # get the issue key from the articles and check that all of them are the same at the same time
+          if not issue_key:
+              issue_key = article_metadata['issue_key']
+          else:
+              assert(issue_key == article_metadata['issue_key'])
+    
       if not pubdate:
           raise Exception(f"- [{issue_directory_path}] does not contain expected data")
 
       else:
           # XXX used directly after init and then never again
-          self.articles_metadata = articles_metadata
+          self.articles = articles
           self.issue_key = issue_key
 
-          # XXX used later on
           self.toc_order = toc_order
           self.pubdate = pubdate
           self.pdf_filename = pdf_filename
@@ -554,18 +563,7 @@ class ArticleDatabase:
                 # Map issue key to issue data
                 issue_key = issue.issue_key
                 self.issues[issue_key] = issue
-
-                # Sort articles by page number within this issue before assigning indexes
-                sorted_articles = sorted(issue.articles_metadata, key=lambda x: first_page_number(x['pages']))
-
-                for index, article_metadata in enumerate(sorted_articles):
-                    # Modify to include issue key directly
-                    article_metadata['issue_key'] = issue_key
-                    # Assign an index based on sorted order
-                    article_metadata['index'] = index
-                    
-                    article = Article(article_metadata)
-                    self.articles.append(article)
+                self.articles.extend(issue.articles)
 
     def latest_issue_key(self):
         return max(self.issues.keys(), key=key_to_datetime)
