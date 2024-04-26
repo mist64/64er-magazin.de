@@ -334,9 +334,6 @@ class Article:
 
     def article_pubdate(self):
         issue = db.issues[self.issue_key]
-
-        # Calculate a pubdate for RSS:
-        # Add index as "half-days" to the date
         pubdate = issue.pubdate + timedelta(hours=HOURS_PER_ARTICLE * self.sort_index)
         return pubdate
 
