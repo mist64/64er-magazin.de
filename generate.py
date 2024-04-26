@@ -1137,20 +1137,13 @@ def generate_rss_feed(db, out_directory):
         title = html.escape(index_title(article))
         issue = db.issues[article.issue_key]
         link = full_url(article_path(issue, article, True))
-        description = article.description
+        description = article.description if article.description else ''
         img_src = article.img_urls[0] if article.img_urls else None
         if img_src:
             img_src = full_url(os.path.join(issue.issue_dir_name, img_src))
             img = f"<img src='{img_src}'><br>"
-            if description:
-                description = img + description
-            else:
-                description = img
-        if description:
-            description = html.escape(description)
-        else:
-            description = ""
-
+            description = img + description
+        description = html.escape(description)
         pubdate = article.pubdate.strftime("%a, %d %b %Y %H:%M:%S %z")[:-5] + "GMT"
 
         rss_item_template = '''<item>
