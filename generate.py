@@ -309,11 +309,10 @@ class Article:
 
     def __init__(self, metadata):
         self.title = metadata['title']
-#        self.issue = metadata['issue'] # XXX
+#        self.issue = metadata['issue'] # XXX should we reference the issue directly?
         self.pages = metadata['pages']
         self.id = metadata['id']
         self.issue_key = metadata['issue_key']
-        self.index = metadata['index']
         self.head1 = metadata['head1']
         self.head2 = metadata['head2']
         self.toc_title = metadata['toc_title']
@@ -328,7 +327,8 @@ class Article:
         self.html = metadata['html']
         self.txt = metadata['txt']
         self.img_urls = metadata['img_urls']
-        self.path = metadata['path'] # XXX unused?
+        self.path = metadata['path'] # nice for debugging
+        self.sort_index = None # set later, after sorting all articles
 
     def first_page_number(self):
         return first_page_number(self.pages)
@@ -341,7 +341,7 @@ class Article:
 
         # Calculate a pubdate for RSS:
         # Add index as "half-days" to the date
-        pubdate = issue.pubdate + timedelta(hours=HOURS_PER_ARTICLE * self.index)
+        pubdate = issue.pubdate + timedelta(hours=HOURS_PER_ARTICLE * self.sort_index)
         return pubdate
 
 class Issue:
@@ -372,7 +372,8 @@ class Issue:
               if file.endswith('.html'):
                   article_path = os.path.join(root, file)
                   article_metadata = Issue.__read_html(article_path, listings)
-                  articles_metadata.append(article_metadata)
+                  articles.append(Article(article_metadata))
+
               elif file == 'toc.txt':
                   toc_order = Issue.__read_toc_order(os.path.join(root, file))
               elif file == 'pubdate.txt':
@@ -382,24 +383,23 @@ class Issue:
                   pdf_filename = os.path.basename(pdf_path)
   
       # sort articles for RSS, check issue_key for all, create Article objects
-      sorted_articles = sorted(articles_metadata, key=lambda x: first_page_number(x['pages']))      
-      for index, article_metadata in enumerate(sorted_articles):
+      sorted_articles = sorted(articles, key=lambda x: x.first_page_number())      
+      for index, article in enumerate(sorted_articles):
           # Assign an index based on sorted order
-          article_metadata['index'] = index
-          articles.append(Article(article_metadata))
-
+          article.sort_index = index
           # get the issue key from the articles and check that all of them are the same at the same time
           if not issue_key:
-              issue_key = article_metadata['issue_key']
+              issue_key = article.issue_key
           else:
-              assert(issue_key == article_metadata['issue_key'])
+              assert(issue_key == article.issue_key)
+      articles = sorted_articles
     
       if not pubdate:
           raise Exception(f"- [{issue_directory_path}] does not contain expected data")
 
       else:
           # XXX used directly after init and then never again
-          self.articles = articles
+          self.articles = articles          
           self.issue_key = issue_key
 
           self.toc_order = toc_order
@@ -570,7 +570,7 @@ class ArticleDatabase:
 
     def articles_by_toc_categories(self, toc_categories, issue_key=None):
         filtered_articles = [article for article in self.articles if article.toc_category in toc_categories and (issue_key is None or article.issue_key == issue_key)]
-        return sorted(filtered_articles, key=lambda article: article.first_page_number())
+        return sorted(filtered_articles, key=lambda x: x.first_page_number())
 
     def toc_with_articles(self, issue_key):
         issue = self.issues[issue_key]
@@ -579,7 +579,7 @@ class ArticleDatabase:
         toc_order = [""] + issue.toc_order # prepend empty category
         for toc in toc_order:
             articles = self.articles_by_toc_categories([toc], issue_key)
-            articles_sorted = sorted(articles, key=lambda article: article.first_page_number())
+            articles_sorted = sorted(articles, key=lambda x: x.first_page_number())
             toc_entries.append({
                 'category': toc,
                 'articles': articles_sorted
@@ -672,7 +672,7 @@ def html_generate_latest_issue(db):
 
 def html_generate_latest_downloads(db):
     articles_with_downloads = db.articles_with_downloads()
-    sorted_articles = sorted(articles_with_downloads, key=lambda article: article.first_page_number(), reverse=True)[:NEW_DOWNLOADS]
+    sorted_articles = sorted(articles_with_downloads, key=lambda x: x.first_page_number(), reverse=True)[:NEW_DOWNLOADS]
     html_parts = [f"<h2>{LABEL_LATEST_LISTINGS}</h2><hr><ul>"]
 
     for article in sorted_articles:
@@ -781,7 +781,7 @@ def html_generate_articles_for_categories(db, toc_categories, alphabetical, issu
     if not articles:
         return None
     if alphabetical:
-        articles = sorted(articles, key=lambda article: index_title(article).lower())
+        articles = sorted(articles, key=lambda x: index_title(x).lower())
 
     html_parts = []
     html_parts.append(f"<ul>\n")
@@ -1395,7 +1395,7 @@ def copy_articles_and_assets(db, in_directory, out_directory):
         # Copy all images of all articles of the issue and downloads
         articles = [article for article in db.articles if article.issue_key == issue_key]
         article_index = 0
-        for article in articles:
+        for article in sorted(articles, key=lambda x: x.sort_index):
             # Copy images found in article metadata
             img_srcs = article.src_img_urls if article.src_img_urls else []
             for img_src in img_srcs:
