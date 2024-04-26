@@ -371,7 +371,6 @@ class Issue:
               if file.endswith('.html'):
                   article_path = os.path.join(root, file)
                   article_metadata = Issue.__read_html(article_path, listings)
-                  article_metadata['path'] = article_path  # Include full path in metadata
                   articles_metadata.append(article_metadata)
                   if not issue_key:
                       issue_key = article_metadata['issue_key']
@@ -438,6 +437,7 @@ class Issue:
           'index_title': find_meta('64er.index_title'),
           'index_category': find_meta('64er.index_category'),
           'category': find_meta('64er.category'),
+          'path' : html_file_path,  # Include full path in metadata
       }
   
       metadata['target_filename'] = os.path.basename(metadata['id']) + '.html'
