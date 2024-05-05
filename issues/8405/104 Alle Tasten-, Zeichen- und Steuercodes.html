@@ -1,0 +1,1023 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>Alle Tasten-, Zeichen- und Steuercodes</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="Dr. Helmut Hauck">
+    <meta name="64er.issue" content="5/84">
+    <meta name="64er.pages" content="104-108,135">
+	<meta name="64er.head1" content="Alle Codes">
+	<meta name="64er.head2" content="C 64/VC 20">
+    <meta name="64er.toc_title" content="Alle Tasten-, Zeichen- und Steuercodes (Teil 2)">
+    <meta name="64er.toc_category" content="Kurse">
+    <meta name="64er.index_category" content="Kurse|Codes">
+    <meta name="64er.id" content="codes">
+</head>
+
+<body>
+    <article>
+        <h1>Alle Tasten-, Zeichen- und Steuercodes</h1>
+
+        <p class="intro">Hier lesen Sie, wie man eine vollständige Tabelle der ASCII-Codes vom VC 20 und Commodore 64 erstellt. Außerdem werden Sie erfahren, daß die beiden Systeme wesentlich mehr Funktionstasten bieten als Sie bisher vielleicht angenommen haben.</p>
+
+        <p>Im ersten Teil habe ich Ihnen gezeigt, wie alle Tasten des VC 20 beziehungsweise des C 64 in einer Matrix angeordnet sind. Sobald eine Taste gedrückt wird, steht eine spezielle, nur dieser einen Taste zugeteilte Code-Zahl im Register 37152 des VC 20. Das entsprechende Register des C 64 ist 56320.</p>
+
+        <p>Ich habe auch erklärt, wie die Code-Zahlen zustande kommen. In einem kleinen Demonstrationsprogramm haben wir dann durch Abfragen dieses Registers mit PEEK bestimmte Programmschritte mit Tastendruck gesteuert.</p>
+
+        <h2>Ein kurzer Rückblick</h2>
+
+        <p>Wir haben auch herausgefunden, daß das Betriebssystem des Computers bei Verwendung von Basic eine Abfrage von nur acht Tasten zuläßt. Die Abfrage aller Tasten, auch mehrerer Tasten gleichzeitig, mit einem Programm in Maschinencode habe ich Ihnen für den Schluß versprochen.</p>
+
+        <p>Wir sind aber noch einen Schritt weitergegangen und haben herausgefunden, daß diese Code-Zahlen der 64 Tasten umgerechnet und für Zeichen- und Steuertasten getrennt in die Speicherzellen 203 und 653 gebracht werden.</p>
+
+        <p>Mit dem folgenden kleinen Programm haben wir dann diese beiden Speicherzellen abgefragt und eine Tabelle angefertigt.</p>
+
+        <p>Tippen Sie ein:</p>
+        <pre>
+100 PRINT PEEK(203),PEEK(653)
+200 GOTO 100</pre>
+
+        <p>Für diejenigen Leser, die Teil 1 nicht gelesen oder keine Tabelle angefertigt haben, habe ich diesmal die Tabelle dabei. Der Grund, daß die Zahlen für die beiden Computer, trotz gleicher Tastatur, verschieden sind, liegt darin, daß die elektrische Anordnung der Tasten, in einer 8 x 8-Matrix (die ich das letzte Mal für den VC 20 gezeigt habe), beim C 64 anders sind.</p>
+
+        <p>Im Gedenken an diesen Spruch meines Latein-Lehrers zeige ich noch einmal die Anwendung dieser Code-Zahlen in dem folgendem Programm l. Zeilen in (), wie gesagt, sind für den C 64, aber nur dort, wo er sich vom VC 20 unterscheidet.</p>
+
+        <h2>Die Wiederholung ist die Mutter der Weisheit</h2>
+
+        <p>Natürlich wähle ich wieder die Funktionstasten und am besten auch noch eine andere Tastenkombination. Zweck der kleinen Demonstration soll das Umschalten auf verschiedene Bildschirmrahmen- und Hintergrundfarben sein. Ich schlage vor, Sie nehmen wie üblich die Zeitschrift zum Computer und lesen tippend weiter. Es folgt nun das Programm 1 zur Tastaturabfrage.</p>
+
+        <pre>10 PRINT CHR$(147)</pre>
+
+        <p>Diese Befehlsfolge löscht den Bildschirm. Die Code-Zahlen der Funktion CHR$ werde ich noch erklären.</p>
+
+        <p>Die Zeilen 20 und 30 erleichtern die Tipperei und machen übrigens das Programm ein bißchen schneller. Sie ordnen den Variablen A und B den Inhalt der Speicherzellen 203 und 653 — die wir ja abfragen wollen — zu.</p>
+
+        <pre>
+20 A = PEEK(203)
+30 B = PEEK(653)</pre>
+
+        <p>Jetzt geht's los mit der Fragerei. Die Taste f1, mit der wir die Farbkombination Blau/Gelb schalten wollen, hat folgende Code-Zahlen:</p>
+
+        <pre>
+40 IF A=39 AND B=0 THEN POKE 36879,126
+(40 IF A=4 AND B=0 THEN POKE 53280,6:POKE 53281,7 )</pre>
+
+        <p>f2 ist dieselbe Taste, aber geSHIFTet (B=1). Die Farben sollen jetzt Rot/Grün sein:</p>
+
+        <pre>
+50 IF A=39 AND B=1 THEN POKE 36879,45
+(50 IF A=4 AND B=1 THEN POKE 53280,5: POKE 53281,2)
+60 IF A=47 AND B=4 THEN POKE 36879,25
+(60 IF A=5 AND B=4 THEN POKE 53280,1: POKE 53281,1)</pre>
+
+        <p>Zeile 60 bestimmt ebenfalls eine Funktionstaste und zwar f3. Allerdings habe ich sie willkürlich mit der CTRL-Taste kombiniert, nicht, um Sie zu verwirren, sondern um zu zeigen, daß wir mit den f-Tasten mehr als acht Funktionen festlegen können, nämlich 32! (Vier f-Tasten mal acht Steuertasten-Kombinationen).'</p>
+
+        <p>Mit dem Klammeraffen »@« schalten wir die Farben in den Normalzustand zurück.</p>
+
+        <pre>
+70 IF A=53 AND B=0 THEN POKE 36879,27
+(70 IF A=46 AND B=0 THEN POKE 53280,3: POKE 53281,1)</pre>
+
+        <p>Zeile 80 laßt das Programm im Kreis laufen, so daß die Funktionstasten beliebig oft ausprobiert werden können. S</p>
+
+        <pre>80 GOT020</pre>
+
+        <p>Funktionstasten im Überfluß</p>
+
+        <p>So, jetzt kommt der absolute Hit dieser Methode!</p>
+
+        <p>Ich habe gerade vorher gesagt, daß wir nicht acht, sondern 32 mögliche Funktionstasten haben, nämlich durch Verwendung der vier f-Tasten mit den acht Steuertasten-Codes in Speicherzellen 653.</p>
+
+        <p>Dasselbe gilt für jede andere Taste natürlich auch!</p>
+
+        <p>Der Computer benützt allerdings einige davon, zum Beispiel die 1 (SHIFT) für die Zeichen über den Zahlen beziehungweise rechts unten auf den Tasten, die 2 (C=) für die Zeichen links unten auf den Tasten und die 4 (CTRL) fur die Farben.</p>
+
+        <p>Wir können daher mit den vom Computer benutzten Zahlen 3, 5, 6 und 7 aus Zelle 653 in Kombination mit allen 55 Tasten eine riesige Anzahl verschiedener »Funktionstasten« erfinden und sie in unseren Programmen einsetzen.</p>
+
+        <p>Der Computer geht bei der Abfrage noch einen Schritt weiter</p>
+
+        <p>Aber auch die 4 der CTRL-Taste, die ja nur die obere Reihe der Tasten beeinflußt, hat einen praktischen Wert, meiner Meinung nach sogar einen sehr großen, da sie ja nur einen einzigen Tastendruck erfordert und nicht eine Kombination.</p>
+
+        <p>Die CTRL-Taste kombiniert mit den 35 Tasten der unteren drei Reihen der Tastatur gibt uns mehr »Funktionstasten« als wir wahrscheinlich jemals brauchen werden.</p>
+
+        <p>Mehrere handelsübliche Zusatzmodule und -programme verwenden diese Methode, zum Beispiel auch die »Programmierhilfe« von Commodore. Verwenden Sie’s doch auch! Das Kochrezept dazu steht oben in den Zeilen 50 bis 80.</p>
+
+        <p>Um das Ergebnis eines Tastendrucks weiter zu verarbeiten, wäre dem Computer die Abfrage zweier Speicherzellen zu langsam. Außerdem entsprechen diese Tastencodes keiner internationalen Norm, was in Verbindung mit anderen Geräten sehr lästig wäre.</p>
+
+        <p>Es gibt den international anerkannten ASCII-Code (American Standard Code for Information Interchange), der ursprünglich für die Zeichenübertragung von Fernschreibern erfunden wurde. Er besteht aus Dualzahlen mit einer Länge von 8 Bit oder falls Sie Dualzahlen nicht kennen (eine erste Einführung ins Dualsystem steht im Grafikkurs) aus Zahlen von 0 bis 255.</p>
+
+        <p>In diesen ASCII-Code wandelt der Computer nun die oben verwendeten Codezahlen der Tasten um. Die Umwandlung ist denkbar einfach.</p>
+
+        <p>Umrechnung des Tastatur-Codes in den ASCII-Code</p>
+
+        <p>Im nicht löschbaren Speicher (ROM) des Betriebssystems stehen vier Tabellen mit Zahlen.</p>
+
+        <p>Wenn man nun die Code-Zahl einer Taste zur Anfangsadresse der Tabellen addiert, erhält man eine Adresse, in der die ASCII-Codezahl gespeichert ist, Einfach, nicht wahr?</p>
+
+        <p>Probieren geht über studieren. Die Tabelle der ungeSHIFTeten Zeichen, also der Zahlen und Großbuchstaben, beginnt beim VC 20 ab Speicherzelle 60510, beim C 64 ab 60289.</p>
+
+        <p>Nehmen wir das »G«, sein Tatencode aus der Tabelle ist 19 (26).</p>
+
+        <p>Zu 60510 (60289) dazugezählt ergibt das 60529 (60315). Nun wollen wir mal nachschauen, was in dieser Zelle steht.</p>
+
+        <p>Geben Sie »direkt«, (das heißt ohne Zeilenzahl) ein:</p>
+
+        <pre>
+für VC 20: PRINT PEEK (60529)
+für C 64: PRINT PEEK (60315)</pre>
+
+        <p>Das Resultat ist 71. Ein Blick auf die ASCII-Liste des Handbuches (oder in jede andere ASCII-Tabelle) zeigt uns die Richtigkeit dieser Aktion. Der ASCII-Code des Zeichens »G« ist 71.</p>
+
+        <p>Um alle ASCII-Codes abfragen zu können, schreiben wir wieder ein kleines Programm.</p>
+
+        <pre>
+110 A=PEEK (203)
+120 Z=60510
+(120 Z=60289)
+170 C=PEEK(Z+A)</pre>
+
+        <p>Bitte verwenden Sie meine Zeilennummern, ich möchte nämlich später noch andere Zeilen einschieben.</p>
+
+        <p>Diese drei Zeilen sollten Ihnen klar sein. Zur Erinnerung: 60510 ist die Anfangsadresse der Code-Tabelle beim VC 20. Die 64er müssen also ihre eigene Adresse (60289) nehmen.</p>
+
+        <p>Als Ergebnis wollen wir noch den Tastaturcode (Zeile 110) und den ASCII-Code(Zeile 170) nebeneinander ausdrucken:</p>
+
+        <pre>
+200 PRINT A;C
+220 GOTO 110</pre>
+
+        <p>Damit die beiden Zahlenbänder nicht zu schnell laufen, fügen wir noch eine Verzögerungsschleife ein.</p>
+
+        <pre>210 FOR T=1 TO 200: NEXT</pre>
+
+        <p>Dieser Programmablauf, der mit RUN 110 gestartet wird, reagiert jetzt auf jeden Tastendruck, links mit dem Tastencode, rechts mit ASCII. Worauf er aber nicht reagiert, sind geSHIFTete Zeichen, solche mit der Commodore-Taste »C« und die Farben (mit CTRL).</p>
+
+        <p>Sie wissen, warum? Natürlich, denn wir fragen ja nur die Speicherzellen 203 ab und nicht zusätzlich auch 653.</p>
+
+        <p>Jetzt muß ich noch schnell erwähnen, daß auch der Computer diese Zellen abfragt.</p>
+
+        <p>Wo steht was?</p>
+
+        <p>Erinnern Sie sich, ich habe oben gesagt, daß im ROM Tabellen stehen:<br>
+            (1) ab 60510 (60289) für normale Zeichen<br>
+            (2) ab 60575 (60354) für Zeichen mit SHIFT<br>
+            (3) ab 60640 (60419) für Zeichen mit C=<br>
+            (4) ab 60835 (64632) für Zeichen (Farben) mit CTRL</p>
+
+        <p>Das bauen wir jetzt in das Programm ein:<br>
+            Zeile 120 ändern wir ab. Sie fragt jetzt die Speicherzelle 653 nach den Steuertasten ab. In den Zeilen 130 bis 160 springen wir auf die vier Tabellenanfänge. Der Ausdruck in Zeile 200 schließlich wird mit der Codezahl aus 653 erweitert, nämlich B.</p>
+
+        <pre>
+120 B=PEEK(653)
+130 IF B=0 THEN Z=60510 (60289)
+140 IF B=1 THEN Z=60757 (60354)
+150 IF B=2 THEN Z=60640 (60419)
+160 IF B=4 THEN Z=60835 (64632)
+200 PRINT A;B;C</pre>
+
+        <p>Die Reihenfolge der Zahlenbänder auf dem Bildschirm — entsprechend der Zeile 200 — ist jetzt von links Zeichentaste, Steuertaste, ASCII-Code.</p>
+
+        <p>Der ASCII-Code wird im Tastatur-Puffer abgelegt</p>
+
+        <p>Ehrlich gesagt, das Verfahren der Tastaturabfrage in dem vorherigen Programm ist immer noch recht kompliziert. Eine direkte Abfrage des ASCII-Codes einer Taste wäre viel besser.</p>
+
+        <p>Und in der Tat, der Computer bietet sie uns. Er bringt nämlich jeden ASCII-Wert in einen Speicher zur Zwischenlagerung, bis er von einem Programmschritt gebraucht wird.</p>
+
+        <p>Dieser Speicher heißt »Tastatur-Puffer« und liegt von Speicherzelle 631 bis einschließlich 640.</p>
+
+        <p>Es können also maximal zehn Werte gespeichert werden. Das erste Zeichen steht immer m 631, alle anderen werden der Reihe nach in die folgenden Zellen gebracht.</p>
+
+        <p>Als erstes wird das Zeichen aus 631 ausgelesen und alle anderen rücken nach.</p>
+
+        <p>Wenn das Programm die ASCII-Werte aus dem Tastaturpuffer auslesen kann, dann können wir das natürlich auch. Das folgende kleine Programm soll es beweisen.</p>
+
+        <pre>
+310 PRINT CHR$(147)
+330 A=PEEK(631)</pre>
+
+        <p>Sie sehen, wir wollen ganz einfach in Zelle 631 des Tastaturpuffers nachschauen, welcher ASCII-Wert nach Drücken einer Taste dort steht (Zeile 330). In Zeile 340 drucken wir den Wert aus und springen dann zum PEEK-Befehl zurück.</p>
+
+        <pre>
+340 PRINT A
+350 GOTO 330</pre>
+
+        <p>Wenn Sie dieses Programm mit RUN 310 laufen lassen, werden Sie merken, daß es nicht geht, ich will sagen; noch nicht geht. Den Grund dafür habe ich kurz vorher schon angedeutet.</p>
+
+        <p>Wo sind die Computer-Detektive? Haben Sie's gemerkt?</p>
+
+        <p>Nun, ich habe erklärt, daß die ASCII-Werte der gedrückten Tasten der Reihe nach im Tastaturpuffer gespeichert werden und dann, wenn ein Wert aus 631 ausgelesen wird, nachrücken. Das ist der springende Punkt: durch PEEKen lesen wir nicht aus, wir schauen nur nach!</p>
+
+        <p>Es gibt zwei Lösungen für dieses Problem:<br>
+            1) Wir verwenden einen Befehl, der den Wert herausholt; das ist GET oder INPUT.<br>
+            2) Wir gaukeln dem Computer vor, daß der Tastaturpuffer nur aus einer einzigen Speicherzelle besteht.</p>
+
+        <p>Die Methode 2 ist exotischer, deshalb zeige ich Sie Ihnen zuerst. Es gibt eine Speicherzelle 198. In dieser Zelle steht eine Zahl, die angibt, wieviele Zeichen im Tastaturpuffer Platz haben. Normalerweise steht da eine 10 (schauen Sie nach).</p>
+
+        <p>Diese Zelle kann mit kleineren Zahlen gePOKEt werden, auch mit einer 0. Die 0 löscht sozusagen den Puffer. Das machen wir jetzt in unserem Programm vor dem PEEKen:</p>
+
+        <p>320 POKE 198,0
+            350 GOTO 320</p>
+
+        <p>Jetzt läuft’s.</p>
+
+        <p>Die Zeile 340 gibt uns also den ASCII-Code der gerade gedrückten Taste auf dem Bildschirm aus, zum Beispiel die Zahl 84 für das »T«, 163 für das »–« (T mit C=) und so weiter.</p>
+
+        <p>Unter Verwendung von GET würde unser Programm so aussehen:</p>
+
+        <p>310 PRINT CHR$(147) 320 GET A$
+            330 IF A$="" THEN 320
+            340 PRINT ASC(A$)
+            350 GOTO 320</p>
+
+        <p>Neu ist die Verwendung der Funktion ASC. Sie bildet den ASCII-Wert des Zeichens A$.</p>
+
+        <p>Für diejenigen, die es noch nicht kennen: Zeile 330 nach dem GET ist erforderlich, da der GET-Befehl nicht auf das Drücken einer Taste wartet, sondern gleich weiterläuft. Solange aber keine Taste gedrückt ist, geht die Schleife nach 320 zurück.</p>
+
+        <p>Mit INPUT geht’s noch kürzer, nur ist die Bedienung etwas umständlicher.</p>
+
+        <p>310 PRINT CHR$(147)
+            320 INPUT A$
+            340 PRINT ASC(A$)
+            350 GOTO 320</p>
+
+        <p>Der Umstand liegt daran, daß INPUT im Gegensatz zu GET auf einen Tastendruck wartet, der zusätzlich mit RETURN abgeschlossen werden muß.</p>
+
+        <p>Nach diesen Erklärungen und Versuchen müßten Sie eigentlich in der Lage sein, Programm 1 so umzuschreiben, daß statt der Abfrage der Speicherzellen 203 und 653 der Tastaturpuffer abgefragt wird. Ich schlage Ihnen vor, daß Sie das jetzt selbst ausprobieren, sozusagen als Hausaufgabe. Die Lösung, das Programm Nummer 4, ist an anderer Stelle in dieser Ausgabe versteckt.</p>
+
+        <p>Das einzige, was ich Ihnen verraten will, wissen Sie eigentlich schon, nämlich, daß Sie sich die ASCII-Werte für die f-Tasten und den Klammeraffen »@« besorgen müssen. Aber wozu haben Sie Programm 3 gleich in drei Versionen?</p>
+
+        <p>Ich hoffe, daß Sie nach dieser Übung einsehen, daß Sie eine vollständige Liste aller ASCII-Codezahlen und ihrer Bedeutung unbedingt brauchen. Halt, werden Sie jetzt sagen, die Liste steht ja in jedem Handbuch — sogar in dem von Commodore.</p>
+
+        <p>Das stimmt, nur sind die meisten Listen nicht komplett.</p>
+
+        <p>Erinnern Sie sich? Ich habe vorher mal gesagt, daß der ASCII-Code die Werte von 0 bis 255 hat. Diese werden von den Commodore-Computern in nicht immer ganz der Norm entsprechender Weise für alle möglichen Zeichen und Sonderfunktionen verwendet, wie zum Beispiel die Farben, die Sonderzeichen auf den Tasten, Zeichenumschaltung und so weiter.</p>
+
+        <p>Auch die Funktion »Bildschirm löschen und Cursor auf HOME-Position« (das heißt die CLR/HOME-Taste) ist dabei — mit dem Codewert 147. Merken Sie was? Schauen Sie mal die jeweiligen 10er-Zeilen der Programme bisher an!</p>
+
+        <p>Es lohnt sich also schon, alle Code-Werte und die dazugehörigen Zeichen und Funktionen anzusehen.</p>
+
+        <p>Ihnen die Liste einfach abzudrucken wäre zu simpel. Sie sollen ja durch Experimentieren Ihren Computer besser kennenlernen. Ich liefere Ihnen die Versuchsanordnung dazu.</p>
+
+        <p>Vorher aber brauchen wir noch ein Hilfsmittel, welches uns erlaubt, aus einem ASCII-Wert das Zeichen beziehungsweise die Funktion zu ermitteln. Es ist die Umkehrung der in Programm 3 verwendeten ASC-Funktion. Sie kommt ebenfalls aus Basic und heißt CHR$(x).</p>
+
+        <p>Dieser Befehl liefert uns das Zeichen oder die Funktion des ASCII-Codes x.</p>
+
+        <p>Der Befehl PRINT CHR$(x) bringt Zeichen auf den Bildschirm. (Mit dem Befehl PRINT# a,CHR$ wird das Zeichen an ein beliebiges, mit der Nummer a bezeichnetes Peripheriegerät gebracht. Doch das will ich hier nicht weiter verfolgen.) Jetzt aber zurück zu dem Hilfsmittel</p>
+
+        <p>Ergänzen Sie bitte in Programm 3 die Zeile 340 auf:</p>
+
+        <pre>340 PRINT A, CHR$(A)</pre>
+
+        <p>Jetzt druckt das Programm nach Start mit RUN 310neben dem ASCII-Code auch das Zeichen, welches natürlich mit der gedrückten Taste identisch ist, auf den Bildschirm. Funktionen kann man allerdings nicht ausdrucken, sondern nur ihre Auswirkungen feststellen.</p>
+
+        <p>Doch nun zum Kochrezept. Der entscheidende Teil steht in Zeile 570.</p>
+
+        <pre>570 PRINT I;"["CHR$(I)"]";... "AAA"</pre>
+
+        <p>I ist die ASCII-Codezahl, die in einer FOR-NEXT-Schleife von 0 bis 255 hochgezählt wird. Die beiden Klammern [ und ] stehen in Anführungszeichen, damit sie ausgedruckt werden. Zwischen ihnen soll das zum Wert I gehörige Zeichen stehen.</p>
+
+        <p>In den Fällen, wo der ASCII-Code nicht ein Zeichen, sondern eine Funktion bedeutet, bleibt die Klammer leer. Aber der Code wirkt sich durch die Form PRINT CHR$(I) auf die 3 As aus (die Punkte ... stellen drei Leertasten dar). Zum Beispiel erscheinen sie nach I=28 in roter Farbe, bei I=17 (Cursor Down) eine Zeile tiefer.</p>
+
+        <p>Das Hochzählen von I in Zeile 520 wollen wir aber ein bißchen beeinflussen, und das natürlich mit Drücken von Funktionstasten und solchen, die wir dazu verdonnern.</p>
+
+        <p>In Zeile 600 werden daher solche Tasten abgefragt, mit der »alten« Methode in Zelle 203. Das ist reine Willkür beziehungsweise Sentimentalität von mir, die »neue« Methode über Zelle 631 geht genauso gut.</p>
+
+        <p>Wenn in 203 eine 64 steht (keine Taste gedrückt), dann wartet das Programm durch Rücksprung auf die Zeile 600.</p>
+
+        <p>Falls wir die f1-Taste drücken, schaltet Zeile 620 den Hintergrund auf Schwarz und geht wieder in Wartestellung. Diese und die beiden anderen Farbumschaltungen mit f3 (Zeile 630) auf weiß und mit f5 auf hellorange (Zeile 640) sind dann sehr nützlich, wenn die Farbe der drei As gegen den Hintergrund nur schlecht oder überhaupt nicht lesbar sind.</p>
+
+        <p>Zeile 650 gibt uns die Möglichkeit, mit der Minus-Taste in der Liste um 1 zurückzuschalten. Zeile 530 erlaubt ein Zurückschalten über die 0 nach 25. Erst wenn irgendeine beliebige Taste gedrückt wird, springt das Programm auf Zeile 660, wo nach kurzer Zeitverzögerung der Bildschirm gelöscht (70) und I weitergezählt wird (680 und 690).</p>
+
+        <p>So können Sie sich bequem alle 256 Werte des ASCII-Codes und ihre Wirkung anschauen.</p>
+
+        <p>Ich möchte Sie hier noch auf folgende Codewerte aufmerksam machen, deren Funktion Sie in diesem Programm entweder nicht sehen könnnen oder deren Funktion den Ablauf stören:</p>
+
+        <table>
+            <tr>
+                <th>Code</th>
+                <th>Funktionen</th>
+            </tr>
+            <tr>
+                <td>3</td>
+                <td>entspricht der ungeSHIFTeten STOP/RUN-Taste</td>
+            </tr>
+            <tr>
+                <td>8</td>
+                <td>setzt die Umschaltung (mit SHIFT und C=) auf den 2. Zeichensatz außer Betrieb (ausprobieren!)</td>
+            </tr>
+            <tr>
+                <td>9</td>
+                <td>hebt die Sperre wieder auf</td>
+            </tr>
+            <tr>
+                <td>13</td>
+                <td>entspricht der RETURN-Taste</td>
+            </tr>
+            <tr>
+                <td>14</td>
+                <td>schaltet den 2. Zeichensatz per Programm ein (ich empfehle, danach wieder auf den »normalen« Zeichensatz zurückzuschalten)</td>
+            </tr>
+            <tr>
+                <td>131</td>
+                <td>entspricht LOAD/RUN (geSHIFTete STOP/RUN-Taste)</td>
+            </tr>
+            <tr>
+                <td>133-140</td>
+                <td>Funktionstasten f1 bis f8</td>
+            </tr>
+            <tr>
+                <td>141</td>
+                <td>geSHIFTete RETURN-Taste</td>
+            </tr>
+            <tr>
+                <td>142</td>
+                <td>schaltet den 1. Zeichensatz ein (Umkehrung von 14)</td>
+            </tr>
+            <tr>
+                <td>146</td>
+                <td>REVERSE-OFF (Taste 0 mit CTRL)</td>
+            </tr>
+            <tr>
+                <td>160</td>
+                <td>geSHIFTete SPACE-Taste (ja, ja, das gibt es auch!)</td>
+            </tr>
+        </table>
+
+        <p>Ich empfehle Ihnen, mit diesem Programm 5 zu experimentieren. Versuchen Sie, besonders die Funktionen zu identifizieren, es ist nicht schwer. Zusätzlich sollten Sie alle sinnvollen ASCII-Werte mit den Ihnen zur Verfügung stehenden ASCII-Listen vergleichen. Verbessern und vervollständigen Sie diese Listen. Sie gehören zu Ihrem wichtigsten Handwerkszeug.</p>
+
+        <p>Im nächsten und zugleich letzten Teil werde ich Ihnen die Zusammenhänge zwischen dem ASCII-Code, dem Bildschirm-Code und dem PRINTen in Anführungszeichen erklären, natürlich wieder mit Kochrezepten.</p>
+
+        <p>Und schließlich will ich mein Versprechen einlösen, endlich die Methode der Abfrage von mehreren gleichzeitig gedrückten Tasten zu zeigen.</p>
+
+        <p>Übrigens, wenn Sie Fragen haben, scheuen Sie sich nicht, an den Verlag beziehungsweise über den Verlag an mich zu schreiben. Ich versuche mein Bestes.</p>
+
+        <address class="author">(Dr. Helmut Hauck)</address>
+
+        <figure>
+            <table>
+                <tr>
+                    <td rowspan="2">TASTE</td>
+                    <td colspan="2">VC-20</td>
+                    <td colspan="2">C-64</td>
+                </tr>
+                <tr>
+                    <td>203</td>
+                    <td>653</td>
+                    <td>203</td>
+                    <td>653</td>
+                </tr>
+                <tr>
+                    <td>nichts</td>
+                    <td>64</td>
+                    <td>0</td>
+                    <td>64</td>
+                    <td>0</td>
+                </tr>
+                <tr>
+                    <td>f-1</td>
+                    <td>39</td>
+                    <td>0</td>
+                    <td>4</td>
+                    <td>0</td>
+                </tr>
+                <tr>
+                    <td>f-3</td>
+                    <td>47</td>
+                    <td>0</td>
+                    <td>5</td>
+                    <td>0</td>
+                </tr>
+                <tr>
+                    <td>f-5</td>
+                    <td>55</td>
+                    <td>0</td>
+                    <td>6</td>
+                    <td>0</td>
+                </tr>
+                <tr>
+                    <td>f-7</td>
+                    <td>63</td>
+                    <td>0</td>
+                    <td>3</td>
+                    <td>0</td>
+                </tr>
+                <tr>
+                    <td>A</td>
+                    <td>17</td>
+                    <td>0</td>
+                    <td>10</td>
+                    <td>0</td>
+                </tr>
+                <tr>
+                    <td>B</td>
+                    <td>35</td>
+                    <td>0</td>
+                    <td>28</td>
+                    <td>0</td>
+                </tr>
+                <tr>
+                    <td>C</td>
+                    <td>34</td>
+                    <td>0</td>
+                    <td>20</td>
+                    <td>0</td>
+                </tr>
+                <tr>
+                    <td>D</td>
+                    <td>18</td>
+                    <td>0</td>
+                    <td>18</td>
+                    <td>0</td>
+                </tr>
+                <tr>
+                    <td>E</td>
+                    <td>49</td>
+                    <td>0</td>
+                    <td>14</td>
+                    <td>0</td>
+                </tr>
+                <tr>
+                    <td>F</td>
+                    <td>42</td>
+                    <td>0</td>
+                    <td>11</td>
+                    <td>0</td>
+                </tr>
+                <tr>
+                    <td>G</td>
+                    <td>19</td>
+                    <td>0</td>
+                    <td>26</td>
+                    <td>0</td>
+                </tr>
+                <tr>
+                    <td>H</td>
+                    <td>43</td>
+                    <td>0</td>
+                    <td>29</td>
+                    <td>0</td>
+                </tr>
+                <tr>
+                    <td>I</td>
+                    <td>12</td>
+                    <td>0</td>
+                    <td>33</td>
+                    <td>0</td>
+                </tr>
+                <tr>
+                    <td>J</td>
+                    <td>20</td>
+                    <td>0</td>
+                    <td>34</td>
+                    <td>0</td>
+                </tr>
+                <tr>
+                    <td>K</td>
+                    <td>44</td>
+                    <td>0</td>
+                    <td>37</td>
+                    <td>0</td>
+                </tr>
+                <tr>
+                    <td>L</td>
+                    <td>21</td>
+                    <td>0</td>
+                    <td>42</td>
+                    <td>0</td>
+                </tr>
+                <tr>
+                    <td>M</td>
+                    <td>36</td>
+                    <td>0</td>
+                    <td>36</td>
+                    <td>0</td>
+                </tr>
+                <tr>
+                    <td>N</td>
+                    <td>28</td>
+                    <td>0</td>
+                    <td>39</td>
+                    <td>0</td>
+                </tr>
+                <tr>
+                    <td>O</td>
+                    <td>52</td>
+                    <td>0</td>
+                    <td>38</td>
+                    <td>0</td>
+                </tr>
+                <tr>
+                    <td>P</td>
+                    <td>13</td>
+                    <td>0</td>
+                    <td>41</td>
+                    <td>0</td>
+                </tr>
+                <tr>
+                    <td>Q</td>
+                    <td>48</td>
+                    <td>0</td>
+                    <td>62</td>
+                    <td>0</td>
+                </tr>
+                <tr>
+                    <td>R</td>
+                    <td>10</td>
+                    <td>0</td>
+                    <td>17</td>
+                    <td>0</td>
+                </tr>
+                <tr>
+                    <td>S</td>
+                    <td>41</td>
+                    <td>0</td>
+                    <td>13</td>
+                    <td>0</td>
+                </tr>
+                <tr>
+                    <td>T</td>
+                    <td>50</td>
+                    <td>0</td>
+                    <td>22</td>
+                    <td>0</td>
+                </tr>
+                <tr>
+                    <td>U</td>
+                    <td>51</td>
+                    <td>0</td>
+                    <td>30</td>
+                    <td>0</td>
+                </tr>
+                <tr>
+                    <td>V</td>
+                    <td>27</td>
+                    <td>0</td>
+                    <td>31</td>
+                    <td>0</td>
+                </tr>
+                <tr>
+                    <td>W</td>
+                    <td>9</td>
+                    <td>0</td>
+                    <td>9</td>
+                    <td>0</td>
+                </tr>
+                <tr>
+                    <td>X</td>
+                    <td>26</td>
+                    <td>0</td>
+                    <td>23</td>
+                    <td>0</td>
+                </tr>
+                <tr>
+                    <td>Y</td>
+                    <td>11</td>
+                    <td>0</td>
+                    <td>25</td>
+                    <td>0</td>
+                </tr>
+                <tr>
+                    <td>Z</td>
+                    <td>33</td>
+                    <td>0</td>
+                    <td>12</td>
+                    <td>0</td>
+                </tr>
+                <tr>
+                    <td>1</td>
+                    <td>0</td>
+                    <td>0</td>
+                    <td>56</td>
+                    <td>0</td>
+                </tr>
+                <tr>
+                    <td>2</td>
+                    <td>56</td>
+                    <td>0</td>
+                    <td>58</td>
+                    <td>0</td>
+                </tr>
+                <tr>
+                    <td>3</td>
+                    <td>1</td>
+                    <td>0</td>
+                    <td>8</td>
+                    <td>0</td>
+                </tr>
+                <tr>
+                    <td>4</td>
+                    <td>57</td>
+                    <td>0</td>
+                    <td>11</td>
+                    <td>0</td>
+                </tr>
+                <tr>
+                    <td>5</td>
+                    <td>2</td>
+                    <td>0</td>
+                    <td>16</td>
+                    <td>0</td>
+                </tr>
+                <tr>
+                    <td>6</td>
+                    <td>58</td>
+                    <td>0</td>
+                    <td>19</td>
+                    <td>0</td>
+                </tr>
+                <tr>
+                    <td>7</td>
+                    <td>3</td>
+                    <td>0</td>
+                    <td>24</td>
+                    <td>0</td>
+                </tr>
+                <tr>
+                    <td>8</td>
+                    <td>59</td>
+                    <td>0</td>
+                    <td>27</td>
+                    <td>0</td>
+                </tr>
+                <tr>
+                    <td>9</td>
+                    <td>4</td>
+                    <td>0</td>
+                    <td>32</td>
+                    <td>0</td>
+                </tr>
+                <tr>
+                    <td>0</td>
+                    <td>60</td>
+                    <td>0</td>
+                    <td>35</td>
+                    <td>0</td>
+                </tr>
+                <tr>
+                    <td>+</td>
+                    <td>5</td>
+                    <td>0</td>
+                    <td>40</td>
+                    <td>0</td>
+                </tr>
+                <tr>
+                    <td>-</td>
+                    <td>61</td>
+                    <td>0</td>
+                    <td>43</td>
+                    <td>0</td>
+                </tr>
+                <tr>
+                    <td>*</td>
+                    <td>14</td>
+                    <td>0</td>
+                    <td>49</td>
+                    <td>0</td>
+                </tr>
+                <tr>
+                    <td>/</td>
+                    <td>30</td>
+                    <td>0</td>
+                    <td>55</td>
+                    <td>0</td>
+                </tr>
+                <tr>
+                    <td>=</td>
+                    <td>46</td>
+                    <td>0</td>
+                    <td>53</td>
+                    <td>0</td>
+                </tr>
+                <tr>
+                    <td>↑</td>
+                    <td>54</td>
+                    <td>0</td>
+                    <td>54</td>
+                    <td>0</td>
+                </tr>
+                <tr>
+                    <td>←</td>
+                    <td>8</td>
+                    <td>0</td>
+                    <td>57</td>
+                    <td>0</td>
+                </tr>
+                <tr>
+                    <td>.</td>
+                    <td>37</td>
+                    <td>0</td>
+                    <td>44</td>
+                    <td>0</td>
+                </tr>
+                <tr>
+                    <td>:</td>
+                    <td>45</td>
+                    <td>0</td>
+                    <td>45</td>
+                    <td>0</td>
+                </tr>
+                <tr>
+                    <td>,</td>
+                    <td>29</td>
+                    <td>0</td>
+                    <td>47</td>
+                    <td>0</td>
+                </tr>
+                <tr>
+                    <td>;</td>
+                    <td>22</td>
+                    <td>0</td>
+                    <td>50</td>
+                    <td>0</td>
+                </tr>
+                <tr>
+                    <td>£</td>
+                    <td>6</td>
+                    <td>0</td>
+                    <td>48</td>
+                    <td>0</td>
+                </tr>
+                <tr>
+                    <td>@</td>
+                    <td>53</td>
+                    <td>0</td>
+                    <td>46</td>
+                    <td>0</td>
+                </tr>
+                <tr>
+                    <td>CRSR←</td>
+                    <td>23</td>
+                    <td>0</td>
+                    <td>2</td>
+                    <td>0</td>
+                </tr>
+                <tr>
+                    <td>CRSR↑</td>
+                    <td>31</td>
+                    <td>0</td>
+                    <td>7</td>
+                    <td>0</td>
+                </tr>
+                <tr>
+                    <td>DEL</td>
+                    <td>7</td>
+                    <td>0</td>
+                    <td>0</td>
+                    <td>0</td>
+                </tr>
+                <tr>
+                    <td>HOME</td>
+                    <td>62</td>
+                    <td>0</td>
+                    <td>51</td>
+                    <td>0</td>
+                </tr>
+                <tr>
+                    <td>STOP</td>
+                    <td>24</td>
+                    <td>0</td>
+                    <td>63</td>
+                    <td>0</td>
+                </tr>
+                <tr>
+                    <td>RETURN</td>
+                    <td>15</td>
+                    <td>0</td>
+                    <td>1</td>
+                    <td>0</td>
+                </tr>
+                <tr>
+                    <td>SPACE</td>
+                    <td>32</td>
+                    <td>0</td>
+                    <td>60</td>
+                    <td>0</td>
+                </tr>
+                <tr>
+                    <td>SHIFT</td>
+                    <td>64</td>
+                    <td>1</td>
+                    <td>64</td>
+                    <td>1</td>
+                </tr>
+                <tr>
+                    <td>C=</td>
+                    <td>64</td>
+                    <td>2</td>
+                    <td>64</td>
+                    <td>2</td>
+                </tr>
+                <tr>
+                    <td>CTRL</td>
+                    <td>64</td>
+                    <td>4</td>
+                    <td>64</td>
+                    <td>4</td>
+                </tr>
+                <tr>
+                    <td>SHIFT
+                        u. C=</td>
+                    <td>64</td>
+                    <td>3</td>
+                    <td>64</td>
+                    <td>3</td>
+                </tr>
+                <tr>
+                    <td>SHIFT u. CTRL</td>
+                    <td>64</td>
+                    <td>5</td>
+                    <td>64</td>
+                    <td>5</td>
+                </tr>
+                <tr>
+                    <td>C= u.
+                        CTRL</td>
+                    <td>64</td>
+                    <td>6</td>
+                    <td>64</td>
+                    <td>6</td>
+                </tr>
+                <tr>
+                    <td>SHIFT u. C= u. CTRL</td>
+                    <td>64</td>
+                    <td>7</td>
+                    <td>64</td>
+                    <td>7</td>
+                </tr>
+            </table>
+            <figcaption>Bild 1: Tabelle des Tastencodes in den Register 203 und 653</figcaption>
+        </figure>
+
+        <figure>
+            <pre>
+5 REM*** VC-20 PROGRAMM 1 **********
+6 REM TASTENABFRAGE IN 203 UND 653 *
+7 REM*******************************
+10 PRINT CHR$(147)
+20 A=PEEK(203)
+30 B=PEEK(653)
+40 IF A=39 AND B=0 THEN POKE 36879,126
+50 IF A=39 AND B=1 THEN POKE 36879,45
+60 IF A=37 AND B=4 THEN POKE 36879,25
+70 IF A=53 AND B=0 THEN POKE 36879,27
+80 GOTO 20
+
+105 REM*** VC-20 PROGRAMM 2 *********
+106 REM UMRECHNUNG DES TASTEN-CODES *
+107 REM        IN ASCII-CODE        *
+108 REM******************************
+110 A=PEEK(203)
+120 B=PEEK(653)
+130 IF B=0 THEN Z=60510
+140 IF B=1 THEN Z=60575
+150 IF B=2 THEN Z=60640
+160 IF B=4 THEN Z=60835
+170 C=PEEK(Z+A)
+200 PRINT A;B;C
+210 FOR T=1 TO 200:NEXT
+220 GOTO 110
+
+305 REM*** VC-20 PROGRAMM 3 *********
+306 REM   ABFRAGE DES ASCII-CODES   *
+307 REM   AUS DEM TASTATURPUFFER    *
+308 REM******************************
+310 PRINT CHR$(147)
+320 POKE 198,0
+330 A=PEEK(631)
+340 PRINT A
+350 GOTO 320</pre>
+            <figcaption>Bild 2: Die im Text erklärten Programme für den VC 20</figcaption>
+        </figure>
+
+        <figure>
+            <pre>
+5 REM****** C64 PROGRAMM 1**********
+6 REM TASTENABFRAGE IN 203 UND 653 *
+7 REM*******************************
+10 PRINT CHR$(147)
+20 A=PEEK(203)
+30 B=PEEK(653)
+40 IF A=4 AND B=0 THEN POKE 53280,6: POKE53281,2
+50 IF A=4 AND B=1 THEN POKE 53280,5: POKE 53281,2
+60 IF A=5 AND B=4 THEN POKE 53280,1: POKE 53281,1
+70 IF A=46 AND B=0 THEN POKE 53280,3: POKE 53281,1
+80 GOTO 20
+
+105 REM****** C64 PROGRAMM 2 ********
+106 REM UMRECHNUNG DES TASTEN-CODES *
+107 REM        IN ASCII-CODE        *
+108 REM******************************
+110 A=PEEK(203)
+120 B=PEEK(653)
+130 IF B=0 THEN Z=60289
+140 IF B=1 THEN Z=60354
+150 IF B=2 THEN Z=60419
+160 IF B=4 THEN Z=64632
+170 C=PEEK(Z+A)
+200 PRINT A;B;C
+210 FOR T=1 TO 200:NEXT
+220 GOTO 110
+
+305 REM****** C64 PROGRAMM 3 ********
+306 REM   ABFRAGE DES ASCII-CODES   *
+307 REM   AUS DEM TASTATURPUFFER    *
+308 REM******************************
+310 PRINT CHR$(147)
+320 POKE 198,0
+330 A=PEEK(631)
+340 PRINT A
+350 GOTO 320</pre>
+            <figcaption>Bild 3: Die im Text erklärten Programme für den C 64</figcaption>
+        </figure>
+
+        <figure>
+            <pre>
+505 REM *** Programm 5 ***************
+506 REM DER VOLLSTAENDIGE ASCII-CODE *
+507 REM ******************************
+510 PRINT CHR$(147)
+520 FOR I=0 TO 255
+530 IF I&lt;0 THEN I=255
+540 PRINT:PRINT:PRINT:PRINT:PRINT
+550 PRINT"--------------"
+560 PRINT
+570 PRINT I;"[" CHR$(I);"]";"...AAA"
+580 PRINT
+590 PRINT"--------------"
+600 Z=PEEK(203)
+
+VC 20
+610 IF Z=64 THEN 600
+620 IF Z=39 THEN POKE 36879,11:GOTO 600
+630 IF Z=47 THEN POKE 36879,27:GOTO 600
+640 IF Z=55 THEN POKE 36879,155: GOTO 600
+650 IF Z=61 THEN I=I-2
+
+C 64
+610 IF Z=64 THEN 600
+620 IF Z=4 THEN POKE 53280,3: POKE 53281,0: GOTO 600
+630 IF Z=5 THEN POKE 53280,3: POKE 53281,1:GOTO 600
+640 IF Z=6 THEN POKE 53280,3: POKE 53281,10: GOTO 600
+650 IF Z=43 THEN I=1-2
+
+660 FOR T=1 TO 100:NEXT T
+670 PRINT CHR$(147)
+680 NEXT I
+690 GOTO 520
+</pre>
+            <figcaption>Bild 4: Programm zur Bestimmung des Kompletten ASCII-Codes</figcaption>
+        </figure>
+
+        <aside>
+            <figure>
+                <pre>
+405 REM**** C 64 PROGRAMM 4 *********
+406 REM TASTENABFRAGE AUS T.-PUFFER *
+407 REM******************************
+410 PRINT CHR$(147)
+420 POKE 198,0
+430 A=PEEK(631)
+440 IF A=133 THEN POKE 53280,6: POKE 53281,7
+450 IF A=137 THEN POKE 53280,5: POKE 53281,2
+460 IF A=134 THEN POKE 53280,1: POKE 53281,1
+470 IF A=64 THEN POKE 53280,3: POKE 53281,1
+480 GOTO 420
+
+405 REM*** VC 20 PROGRAMM 4 *********
+406 REM TASTENABFRAGE AUS T.-PUFFER *
+407 REM******************************
+410 PRINT CHR$(147)
+420 POKE 198,0
+430 A=PEEK(631)
+440 IF A=133 THEN POKE 36879,126
+450 IF A=137 THEN POKE 36879,45
+460 IF A=134 THEN POKE 36879,24
+470 IF A=64 THEN POKE 36879,27
+480 GOTO 420
+</pre>
+                <figcaption>Programm zur Tastenabfrage aus dem Tastaturpuffer</figcaption>
+            </figure>
+
+            <p>Sie haben natürlich gemerkt, daß die Abfrage der 13-Taste kombiniert mit CTRL aus dem Tastaturpuffer nicht geht. Der Grund dafür ist, daß diese Kombination keinen eigenen ASCII-Code hat. Die so laut gepriesenen 32 Funktionstasten sind also nur bei einer Abfrage der Speicherzellen 203 und 253 möglich. In Zeile 460 des Programms 4 habe ich daher reumütig die f3-Taste allein verwendet.</p>
+
+        </aside>
+
+        <aside class="fehlerteufelchen">
+            <h2>Fehlerteufelchen</h2>
+
+            <p>Unter »Wo steht was?« hat sich ein Fehler eingeschlichen. Unter Punkt (4) muß stehen:<br>
+                60536 für 64632<br>
+                Dasselbe gilt für Zeile 160.<br>
+                64632 = $ FC78<br>
+                60536 = $ EC78<br>
+                Der Fehler ist also schon in der Programmerstellung entstanden, als sich für ein E ein F eingeschlichen hat.</p>
+            <address class="author">(Willi Heusser)</address>
+            <!-- 64'er 8/1984 -->
+        </aside>
+
+    </article>
+
+</body>
+
+</html>
