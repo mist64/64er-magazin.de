@@ -22,6 +22,23 @@
 
         <p class="intro">In dieser Folge werden wir die ersten Schritte in das Reich der hochauflösenden Grafik wagen. Doch zunächst soll die Grafik etwas farbiger werden. Das heißt, wir erzeugen mehrfarbige Zeichen und variieren die Hintergrundfarbe.</p>
 
+        <p>Bevor wir die dritte Etappe auf dem Weg zur hochauflösenden Grafik beginnen, soll noch eine kurze Rückschau auf den in der letzten Folge bewältigten Weg gehalten werden: Wir können jetzt mit dem Binär- und dem Hexadezimalsystem umgehen und haben gelernt, wie man Zahlen darin ausdrückt. Wir haben gesehen, wie der Computer sich Adressen merkt und konnten mit diesem Wissen RAM-Bereiche schützen. Wir haben wichtige Zeiger in unserem Computer kennengelernt. Das Setzen oder Löschen von beliebigen Bits in einem Byte beherrschen wir ebenso wie die Definition und Benutzung eigener Zeichen. Wenn Sie seit der letzten Folge viel ausprobiert und so Übung gewonnen haben, dann kennen Sie Ihren Computer schon ganz gut.</p>
+
+        <p>Heute werden wir zunächst etwas mehr Farbe ins Spiel bringen, indem wir mehrfarbige Zeichen oder Zeichen mit einem anderen Hintergrund benutzen. Dann betreten wir das Gemach von Dornröschen (der hochauflösenden Grafik) und küssen es wach — im übertragenen Sinne natürlich. Nach dieser Ankündigung sind die ersten schon aufgebrochen. Also gehen wir auch los.</p>
+
+        <p>Erinnern Sie sich bitte an Bild 11 aus der letzten oder an Bild 8 aus der ersten Folge. Egal, ob es sich um Zeichen aus dem Zeichen-ROM oder um selbstdefinierte Zeichen handelt, eines haben sie gemeinsam: Überall dort, wo sich im Bit-Muster des Zeichens eine 1 befindet, also ein Bit gesetzt ist, taucht bei der Darstellung auf dem Bildschirm ein Punkt in der Zeichenfarbe auf, die im Bildschirmfarbspeicher angegeben ist. Diese Farbe haben wir entweder im Direktmodus durch Drücken der »CTRL«- oder »COMMODORE«-Taste in Kombination mit einer Zifferntaste festgelegt oder durch ein »POKE 646, Zeichenfarbe« oder auch durch POKEn eines Farbcodes in die entsprechende Stelle des Bildschirmfarbspeichers.</p>
+
+        <p>Überall dort, wo im Bitmuster des Zeichens eine 0 ist, taucht bei der Darstellung auf dem Bildschirm nichts auf, das heißt dort erscheint die Farbe des Bildschirmhintergrundes. Jedes Bit aus dem Bit-Muster wird also im Normalbetrieb und auch bei selbstdefinierten Zeichen einzeln interpretiert. Es gibt nun auch andere Möglichkeiten der Interpretation des Bit-Musters, und eine davon wird im Mehrfarbenmodus angewendet. Hier sind die Bits des Zeichens zu Paaren zusammengefaßt (Bild 1).</p>
+
+        <figure>
+            <img src="132-1.png" alt="">
+            <figcaption>Bild 1. Der Buchstabe A, dargestellt im Mehrfarbenmodus</figcaption>
+        </figure>
+
+        <p>Das ist der Buchstabe »A« mit paarweise zusammengefaßten Bits. Es ergeben sich vier verschiedene Möglichkeiten der Bit-Kombination: 00, 01, 10, 11</p>
+
+        <p>Erinnern Sie sich an die Binärzahlen, dann erkennen Sie, daß diese vier Möglichkeiten den Zahlen 0, 1, 2, 3 entsprechen. Sie wirken wie Zeiger, die in verschiedene Register des VIC-II-Chip deuten (Tabelle 1; siehe auch Registerübersicht in der ersten Folge).</p>
+
         <figure>
             <table>
                 <tr>
@@ -57,6 +74,66 @@
 
             <figcaption>Tabelle 1. Bedeutung von Bit-Kombinationen im Mehrfarbenmodus</figcaption>
         </figure>
+
+        <p>Dort also, wo ein Bitpaar 00 steht, wird es in der Farbe des Bildschirmhintergrundes angezeigt, wie bisher im Normalmodus mit einem Bit 0 geschehen. In Adresse 53281 haben wir bisher ja immer schon die Bildschirmfarbe festgelegt. Hinzu kommen die Register 34 und 35 des VIC-II-Chips entsprechend den Adressen 53282 und 53283. Hier können wir nun weitere Farben eingeben, die an den Stellen auf dem Bildschirm gezeigt werden, an denen die dazugehörige Bit-Kombination (01 oder 10) steht. Erlaubt sind alle Farben (0 bis 15).</p>
+
+        <p>Nun sind es noch zwei Voraussetzungen, die uns vom Mehrfarben-Zeichen trennen: Dem Computer muß mitgeteilt werden, daß er das Bit-Muster in Paaren statt einzeln interpretieren soll. Das geschieht dadurch, daß man im Register 22 (Adresse 53270) das Bit 4 auf 1 setzt. Falls Sie sich nicht mehr so genau erinnern, wie wir sowas in der letzten Folge gemacht haben — hier ist es nochmal gezeigt (Bild 2).</p>
+
+        <figure>
+            <img src="132-2.png" alt="">
+            <figcaption>Bild 2. Das Setzen einzelner Datenbits mittels logischer OR-Verknüpfung</figcaption>
+        </figure>
+
+        <p>Es muß also eingegeben werden:</p>
+
+        <pre>
+POKE 53270,PEEK(53270) OR 16
+</pre>
+
+
+        <p>Dieses Byte 53270 im VIC-II-Chip ist ein Beispiel dafür, wie sorgfältig man auf das richtige Setzen oder Löschen von Bits achten sollte. Wenn Sie sich die Registerübersicht in der 1. Folge und dort besonders dieses Byte ansehen, stellen Sie fest, daß fast jedes Bit eine andere Funktion zu erfüllen hat.</p>
+
+        <p>Sollten Sie die obige Basic-Zeile im Direktmodus eingegeben haben, dann verwandeln Sie alle Buchstaben auf dem Bildschirm in mehrfarbige Zeichen. Auf einem Schwarzweiß-Gerät sind sie dann kaum mehr zu erkennen. Hier stellt man auch den Unterschied zwischen einem Farbfernseher und einem Farbmonitor fest. Der letztere trennt die unterschiedlichen Farben deutlich voneinander, während auf dem Fernsehschirm häufig Farbmischungen auftreten. Deswegen sollte die Farbgebung in die Register 34 und 35 individuell ausfallen: Probieren, probieren &hellip;</p>
+
+        <p>Das Ausschalten des Mehrfarb-Zeichen-Modus geschieht durch Löschen des Bit 4 in 53270 mit</p>
+
+        <pre>
+POKE 53270, PEEK(53270) AND 239.
+</pre>
+
+
+        <p>Falls Sie vorhin beim Anschalten des Mehrfarb-Modus nicht die normale Zeichenfarbe (Code 14), sondern eine zwischen 0 und 7 vorliegen hatten, dann haben Sie keine Veränderung bemerkt.</p>
+
+        <p>Und damit sind wir bei der zweiten Voraussetzung: Es kommt nämlich auch noch auf den Inhalt jeder Bildschirmfarbspeicherstelle an (55296 bis 56295). Erst wenn für eine solche Zelle das Bit 3 gesetzt ist (= 1), findet man Zeichen im dazugehörigen Bildschirmplatz in der Mehrfarbdarstellung. Sehen wir uns dazu noch einige Farbcodes an:</p>
+
+        <pre>
+1 = bin. 0001
+7 = bin. 0111
+Bit 3 ist gelöscht
+8 = bin. 1000
+15 = bin. 1111
+Bit 3 ist gesetzt
+</pre>
+
+
+        <p>Der Farbcode bewirkt also zweierlei:<br>
+            a) Er gibt an, ob ein Zeichen im Mehrfarbmodus dargestellt wird, und<br>
+            b) er verleiht den Bit-Paaren »11« die Farbe.</p>
+
+        <p>Zur Demonstration können Sie ja mal folgendes Programm eingeben:</p>
+
+        <p>Wenn dieses Programm mit Zeile 110 beendet ist, befinden Sie sich weiterhin im Mehrfarbenmodus und können nach Herzenslust durch POKE 646, »Zeichenfarbe«, oder mit »CTRL«-beziehungsweise »COMMODORE«-Taste und einer Zifferntaste die Zeichenfarbe ändern und den Effekt beobachten. Übrigens ist der Cursor unterhalb der READY-Meldung noch da — was Sie durch eine Änderung der Zeichenfarbe sofort feststellen können. Sollten Sie genug von diesem Modus haben, dann geben Sie ein CONT »RETURN« und das Programm schaltet wieder den Normalmodus ein.</p>
+
+        <p>Sollten Sie zufällig mal durch</p>
+
+        <pre>
+PRINT PEEK(53281),PEEK(53282), PEEK(53283)
+</pre>
+
+
+        <p>in die Hintergrundfarbregister sehen, dann werden Sie dort nicht — wie im Programm veranlaßt — die Ziffern 6,1,0 sehen, sondern 246,241,240. Das liegt daran, daß die Bits 4 bis 7 dieser Register für die Farbgebung nicht benutzt werden und vom Betriebssystem auf 1 gehalten werden. Die Binärzahl 1111 0000 entspricht dem Dezimalwert 240. Deswegen muß man zur Farbcodezahl diese 240 addieren, um den Speicherinhalt zu erhalten.</p>
+
+        <p>Wieder eine andere Art der Interpretation findet man beim Modus für erweiterte (oder veränderte) Hintergrundfarben. Damit kann man zum Beispiel ein grünes Zeichen mit rotem Hintergrund auf einem gelben Bildschirm darstellen. Hier wird der Bildschirmcode des Zeichens auf eine vom Normalmodus unterschiedliche Weise gelesen. Bit 7 und Bit 6 der Bildschirmcodezahl geben nämlich jetzt einen Zeiger auf Farbregister ab. Das geschieht in der Weise, wie in der Tabelle 2 gezeigt wird.</p>
 
         <figure>
             <p>Beispiel »A«</p>
@@ -114,91 +191,6 @@
             <figcaption>Tabelle 2. Bildschirmcode und Mehrfarbenmodus</figcaption>
         </figure>
 
-        <figure>
-            <table>
-                <tr>
-                    <td>Bit 3 von 53272</td>
-                    <td>Ort der Bit-Map (Adressenbereich)</td>
-                </tr>
-                <tr>
-                    <td>0</td>
-                    <td>0 - 7999</td>
-                </tr>
-                <tr>
-                    <td>1</td>
-                    <td>8192 - 16191</td>
-                </tr>
-            </table>
-            <figcaption>Tabelle 3. Mögliche Bereiche des Bit-Map</figcaption>
-        </figure>
-
-        <p>Bevor wir die dritte Etappe auf dem Weg zur hochauflösenden Grafik beginnen, soll noch eine kurze Rückschau auf den in der letzten Folge bewältigten Weg gehalten werden: Wir können jetzt mit dem Binär- und dem Hexadezimalsystem umgehen und haben gelernt, wie man Zahlen darin ausdrückt. Wir haben gesehen, wie der Computer sich Adressen merkt und konnten mit diesem Wissen RAM-Bereiche schützen. Wir haben wichtige Zeiger in unserem Computer kennengelernt. Das Setzen oder Löschen von beliebigen Bits in einem Byte beherrschen wir ebenso wie die Definition und Benutzung eigener Zeichen. Wenn Sie seit der letzten Folge viel ausprobiert und so Übung gewonnen haben, dann kennen Sie Ihren Computer schon ganz gut.</p>
-
-        <p>Heute werden wir zunächst etwas mehr Farbe ins Spiel bringen, indem wir mehrfarbige Zeichen oder Zeichen mit einem anderen Hintergrund benutzen. Dann betreten wir das Gemach von Dornröschen (der hochauflösenden Grafik) und küssen es wach — im übertragenen Sinne natürlich. Nach dieser Ankündigung sind die ersten schon aufgebrochen. Also gehen wir auch los.</p>
-
-        <p>Erinnern Sie sich bitte an Bild 11 aus der letzten oder an Bild 8 aus der ersten Folge. Egal, ob es sich um Zeichen aus dem Zeichen-ROM oder um selbstdefinierte Zeichen handelt, eines haben sie gemeinsam: Überall dort, wo sich im Bit-Muster des Zeichens eine 1 befindet, also ein Bit gesetzt ist, taucht bei der Darstellung auf dem Bildschirm ein Punkt in der Zeichenfarbe auf, die im Bildschirmfarbspeicher angegeben ist. Diese Farbe haben wir entweder im Direktmodus durch Drücken der »CTRL«- oder »COMMODORE«-Taste in Kombination mit einer Zifferntaste festgelegt oder durch ein »POKE 646, Zeichenfarbe« oder auch durch POKEn eines Farbcodes in die entsprechende Stelle des Bildschirmfarbspeichers.</p>
-
-        <p>Überall dort, wo im Bitmuster des Zeichens eine 0 ist, taucht bei der Darstellung auf dem Bildschirm nichts auf, das heißt dort erscheint die Farbe des Bildschirmhintergrundes. Jedes Bit aus dem Bit-Muster wird also im Normalbetrieb und auch bei selbstdefinierten Zeichen einzeln interpretiert. Es gibt nun auch andere Möglichkeiten der Interpretation des Bit-Musters, und eine davon wird im Mehrfarbenmodus angewendet. Hier sind die Bits des Zeichens zu Paaren zusammengefaßt (Bild 1).</p>
-
-        <p>Das ist der Buchstabe »A« mit paarweise zusammengefaßten Bits. Es ergeben sich vier verschiedene Möglichkeiten der Bit-Kombination: 00, 01, 10, 11</p>
-
-        <p>Erinnern Sie sich an die Binärzahlen, dann erkennen Sie, daß diese vier Möglichkeiten den Zahlen 0, 1, 2, 3 entsprechen. Sie wirken wie Zeiger, die in verschiedene Register des VIC-II-Chip deuten (Tabelle 1; siehe auch Registerübersicht in der ersten Folge).</p>
-
-        <p>Dort also, wo ein Bitpaar 00 steht, wird es in der Farbe des Bildschirmhintergrundes angezeigt, wie bisher im Normalmodus mit einem Bit 0 geschehen. In Adresse 53281 haben wir bisher ja immer schon die Bildschirmfarbe festgelegt. Hinzu kommen die Register 34 und 35 des VIC-II-Chips entsprechend den Adressen 53282 und 53283. Hier können wir nun weitere Farben eingeben, die an den Stellen auf dem Bildschirm gezeigt werden, an denen die dazugehörige Bit-Kombination (01 oder 10) steht. Erlaubt sind alle Farben (0 bis 15).</p>
-
-        <p>Nun sind es noch zwei Voraussetzungen, die uns vom Mehrfarben-Zeichen trennen: Dem Computer muß mitgeteilt werden, daß er das Bit-Muster in Paaren statt einzeln interpretieren soll. Das geschieht dadurch, daß man im Register 22 (Adresse 53270) das Bit 4 auf 1 setzt. Falls Sie sich nicht mehr so genau erinnern, wie wir sowas in der letzten Folge gemacht haben — hier ist es nochmal gezeigt (Bild 2).</p>
-
-        <p>Es muß also eingegeben werden:</p>
-
-        <pre>
-POKE 53270,PEEK(53270) OR 16
-</pre>
-
-
-        <p>Dieses Byte 53270 im VIC-II-Chip ist ein Beispiel dafür, wie sorgfältig man auf das richtige Setzen oder Löschen von Bits achten sollte. Wenn Sie sich die Registerübersicht in der 1. Folge und dort besonders dieses Byte ansehen, stellen Sie fest, daß fast jedes Bit eine andere Funktion zu erfüllen hat.</p>
-
-        <p>Sollten Sie die obige Basic-Zeile im Direktmodus eingegeben haben, dann verwandeln Sie alle Buchstaben auf dem Bildschirm in mehrfarbige Zeichen. Auf einem Schwarzweiß-Gerät sind sie dann kaum mehr zu erkennen. Hier stellt man auch den Unterschied zwischen einem Farbfernseher und einem Farbmonitor fest. Der letztere trennt die unterschiedlichen Farben deutlich voneinander, während auf dem Fernsehschirm häufig Farbmischungen auftreten. Deswegen sollte die Farbgebung in die Register 34 und 35 individuell ausfallen: Probieren, probieren &hellip;</p>
-
-        <p>Das Ausschalten des Mehrfarb-Zeichen-Modus geschieht durch Löschen des Bit 4 in 53270 mit</p>
-
-        <pre>
-POKE 53270, PEEK(53270) AND 239.
-</pre>
-
-
-        <p>Falls Sie vorhin beim Anschalten des Mehrfarb-Modus nicht die normale Zeichenfarbe (Code 14), sondern eine zwischen 0 und 7 vorliegen hatten, dann haben Sie keine Veränderung bemerkt.</p>
-
-        <p>Und damit sind wir bei der zweiten Voraussetzung: Es kommt nämlich auch noch auf den Inhalt jeder Bildschirmfarbspeicherstelle an (55296 bis 56295). Erst wenn für eine solche Zelle das Bit 3 gesetzt ist (= 1), findet man Zeichen im dazugehörigen Bildschirmplatz in der Mehrfarbdarstellung. Sehen wir uns dazu noch einige Farbcodes an:</p>
-
-        <pre>
-1 = bin. 0001
-7 = bin. 0111
-Bit 3 ist gelöscht
-8 = bin. 1000
-15 = bin. 1111
-Bit 3 ist gesetzt
-</pre>
-
-
-        <p>Der Farbcode bewirkt also zweierlei:<br>
-            a) Er gibt an, ob ein Zeichen im Mehrfarbmodus dargestellt wird, und<br>
-            b) er verleiht den Bit-Paaren »11« die Farbe.</p>
-
-        <p>Zur Demonstration können Sie ja mal folgendes Programm eingeben:</p>
-
-        <p>Wenn dieses Programm mit Zeile 110 beendet ist, befinden Sie sich weiterhin im Mehrfarbenmodus und können nach Herzenslust durch POKE 646, »Zeichenfarbe«, oder mit »CTRL«-beziehungsweise »COMMODORE«-Taste und einer Zifferntaste die Zeichenfarbe ändern und den Effekt beobachten. Übrigens ist der Cursor unterhalb der READY-Meldung noch da — was Sie durch eine Änderung der Zeichenfarbe sofort feststellen können. Sollten Sie genug von diesem Modus haben, dann geben Sie ein CONT »RETURN« und das Programm schaltet wieder den Normalmodus ein.</p>
-
-        <p>Sollten Sie zufällig mal durch</p>
-
-        <pre>
-PRINT PEEK(53281),PEEK(53282), PEEK(53283)
-</pre>
-
-
-        <p>in die Hintergrundfarbregister sehen, dann werden Sie dort nicht — wie im Programm veranlaßt — die Ziffern 6,1,0 sehen, sondern 246,241,240. Das liegt daran, daß die Bits 4 bis 7 dieser Register für die Farbgebung nicht benutzt werden und vom Betriebssystem auf 1 gehalten werden. Die Binärzahl 1111 0000 entspricht dem Dezimalwert 240. Deswegen muß man zur Farbcodezahl diese 240 addieren, um den Speicherinhalt zu erhalten.</p>
-
-        <p>Wieder eine andere Art der Interpretation findet man beim Modus für erweiterte (oder veränderte) Hintergrundfarben. Damit kann man zum Beispiel ein grünes Zeichen mit rotem Hintergrund auf einem gelben Bildschirm darstellen. Hier wird der Bildschirmcode des Zeichens auf eine vom Normalmodus unterschiedliche Weise gelesen. Bit 7 und Bit 6 der Bildschirmcodezahl geben nämlich jetzt einen Zeiger auf Farbregister ab. Das geschieht in der Weise, wie in der Tabelle 2 gezeigt wird.</p>
-
         <p>Es zeigt sich, daß nur 64 Zeichen dargestellt werden können — also keine Grafikzeichen. Verwendet man das normale A (Bildschirmcode 1), dann zeigen die Bits 7 und 6 auf das normale Hintergrundregister 53281. Verwendet man das geshiftete A (Bildschirmcode 65), verändert sich die Hintergrundfarbe des A (nicht das Zeichen selber) auf den Farbcode, der in 53282 steht. Ähnlich verläuft es mit dem reversen A (Bildschirmcode 129) und dem reversen geshifteten A (Bildschirmcode 193). In die Register 53281 bis 53284 können alle Farbcodes eingegeben werden.</p>
 
         <p>Damit der Computer die Codes in dieser besonderen Weise liest, muß ihm das angezeigt werden, indem man im Byte 53265 das Bit 6 auf 1 setzt. Das sollten Sie schon können:</p>
@@ -238,7 +230,17 @@ POKE 53265,PEEK(53265)AND 191
 
         <p>Es ist soweit! Wir stehen an der Schwelle zur hochauflösenden Grafik. Wenn wir bisher mit Zeichen aller Art auf dem Bildschirm gearbeitet haben, waren diese immer durch acht Bytes definiert: entweder durch das Zeichen-ROM oder durch einen von uns erstellten alternativen Zeichensatz im RAM. Jeder Aufruf eines Zeichencodes füllte einen Bildschirmspeicherplatz, zum Beispiel 1024 mit diesem Zeichen, also mit 8 Byte. Zugriff auf einzelne Byte hatten wir nur beim Selbstdefinieren, aber dieser Zugriff legte dann eben in der Anwendung auch wieder 8 Byte auf einmal fest. Wenn es nun eine Möglichkeit gäbe, ständig Zugriff auf einzelne Bytes zu haben und die Punktmuster jedes Bytes verändern zu können, dann hätten wir ganz andere Aussichten (Bild 3).</p>
 
+        <figure>
+            <img src="132-3.png" alt="">
+            <figcaption>Bild 3. Normal- und Grafikmodus</figcaption>
+        </figure>
+
         <p>Überlegen wir mal: Statt 1000 Byte (40 x 25) hätten wir dann 8000 Byte (40 x 25 x 8) zu je 8 Bit, also insgesamt 64000 Bildpunkte, die ansprechbar wären! Genau das geschieht beim sogenannten Bit-Mapping. Der Computer legt sich gewissermaßen eine Landkarte dieser 8000 Byte an und bildet ihren Inhalt auf dem Bildschirm ab. Auf dem Bildschirm können wir mit dieser Karte nun (siehe Bild 3) in der Senkrechten (y) 25 x 8 = 200 Positionen und in der Waagerechten (x) 40 x 8 = 320 Positionen ansprechen. Immer dann, wenn ein Bit in der Bit-Map gesetzt (= 1) ist, erzeugt das automatisch das Aufleuchten eines der 64000 Bildpunkte auf dem Bildschirm. Ist ein Bit gelöscht (= 0), dann ist der Bildpunkt leer (siehe Bild 4).</p>
+
+        <figure>
+            <img src="132-4.png" alt="">
+            <figcaption>Bild 4. Bit-Mapping</figcaption>
+        </figure>
 
         <h2>Dornröschen erwacht</h2>
 
@@ -250,6 +252,24 @@ POKE 53265,PEEK(53265)OR 32
 
 
         <p>eingeben. Danach sieht der Bildschirm allerdings recht merkwürdig aus. Das ist auch kein Wunder, denn wie gesagt wird jetzt der Inhalt der Bit-Map dargestellt, und wir haben dem Computer noch nicht mitgeteilt, wo die Bit-Map zu finden ist. Das geschieht durch Setzen des Bit 3 des VIC-II-Registers mit der Adresse 53272 auf den Wert 0 oder 1. Dabei gelten die Zusammenhänge nach Tabelle 3.</p>
+
+        <figure>
+            <table>
+                <tr>
+                    <td>Bit 3 von 53272</td>
+                    <td>Ort der Bit-Map (Adressenbereich)</td>
+                </tr>
+                <tr>
+                    <td>0</td>
+                    <td>0 - 7999</td>
+                </tr>
+                <tr>
+                    <td>1</td>
+                    <td>8192 - 16191</td>
+                </tr>
+            </table>
+            <figcaption>Tabelle 3. Mögliche Bereiche des Bit-Map</figcaption>
+        </figure>
 
         <p>Der normale Inhalt von Byte 53272 ist 21 (das kennen wir noch aus der letzten Folge). Binär ausgedrückt ist das: 0001 0101</p>
 
@@ -367,7 +387,17 @@ MSN LSN
 
         <p>Wir sind es jetzt leid, immer einen fast leeren Bildschirm anzusehen. Ob er nun schwarz oder blau ist: Wir wollen nun auch mal etwas darauf sehen! Die Schwierigkeit liegt gar nicht darin, daß wir nicht wüßten, wie wir Punkte auf den Bildschirm kriegen. Wir müssen ja nur ein Byte im Bereich von 8192 bis 16191 mit ein paar gesetzten Bits versehen, zum Beispiel durch POKE 12000,1, und schon sehen wir einen Punkt. Das Problem liegt vielmehr darin, daß wir einen Weg finden, gezielt Punkte an bestimmte Orte des Bildschirms zu setzen. Dazu müssen wir den Aufbau der Bit-Map kennen und und ihren Zusammenhang mit dem Bildschirm. Das Prinzip ist in Bild 5 gezeigt.</p>
 
+        <figure>
+            <img src="132-5.png" alt="">
+            <figcaption>Bild 5. Zusammenhang zwischen Bildschirm und Bit-Map</figcaption>
+        </figure>
+
         <p>Die Speicherzellen der Bit-Map sind also angeordnet wie ein vollgeschriebener Bildschirm. Dort hatte ja jeder Buchstabe seine 8 Byte im Punktemuster. Aus der Anordnung ergibt sich außerdem, daß wir in der Y-Richtung 200 mögliche Positionen (0 bis 199) und in der X-Richtung 320 (0 bis 319) finden. Wir haben somit Bildschirmkoordinaten (Bild 6) und können Punkte definieren, zum Beispiel im Bild 6 den Punkt P mit den Koordinaten X = 110 und Y=100.</p>
+
+        <figure>
+            <img src="132-6.png" alt="">
+            <figcaption>Bild 6. Bildschirmkoordinaten bei hochauflösender Grafik</figcaption>
+        </figure>
 
         <p>Wir wissen nur noch nicht, in welchem Byte wir welches Bit setzen müssen, um diesen Punkt zu sehen. Betrachten wir dazu Bild 5 genauer. Die 25 Bildschirmzeilen und die 40 Spalten sind noch erhalten. Jeder solche Bildschirmplatz besteht aus acht Byte mit je acht Bit. Stellen wir zunächst einmal fest, um welche Zeile es sich handelt:<br>
             Z=INT(Y/8)<br>
@@ -382,6 +412,11 @@ MSN LSN
         <p>In unserem Beispiel muß der Punkt in Zeile 12 an Spaltenplatz 13 stehen. Weil in jeder Zeile 320 Byte (8x40) und an jedem Platz 8 Byte vorhanden sind, fängt unser Bildschirmfeld bei Byte Nr.<br>
             Z<em>320 + S</em>8 = 12<em>320 + 13</em>8 = 3944 an (siehe Bild 7).</p>
 
+        <figure>
+            <img src="132-7.png" alt="">
+            <figcaption>Bild 7. Hier wird die Byte-Adresse zum Punkt (110,100) ermittelt ...</figcaption>
+        </figure>
+
         <p>Nun müssen wir feststellen, um welches Byte in diesem Feld es sich handelt. Wir haben vorhin beim Feststellen der Zeile einfach gleich INT(Y/8) berechnet. Wenn wir nun nur Y/8 berechnen, kommen wir in unserem Beispiel auf Y/8 = 100/8 = 12.5. Ziehen wir davon INT(Y/8) ab: Y/8-INT(Y/8 = 12.5-12 = 0.5 und multiplizieren das Ergebnis mit 8:<br>
             80<em>(Y/8-INT(Y/8))=8</em>0.5=4</p>
 
@@ -389,6 +424,11 @@ MSN LSN
             BYTE=Z<em>320 + S</em>8 + 8*(Y/8-INT(Y/ 8))</p>
 
         <p>In unserem Beispiel ist es dann also das Byte 3948 der Bit-Map. Nun müssen wir noch herauskriegen, welches Bit in diesem Byte zu setzen ist (siehe Bild 8).</p>
+
+        <figure>
+            <img src="132-8.png" alt="">
+            <figcaption>Bild 8. ... und hier die Bit-Adresse</figcaption>
+        </figure>
 
         <p>Auch hier haben wir vorhin bei der Berechnung der Spalte einfach gerechnet INT(X/8). Jetzt rechnen wir:<br>
             X-8<em>INT(X/8)=110-8</em>INT(110/8)</p>
