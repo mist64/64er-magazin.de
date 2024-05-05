@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>Tips und Tricks für Commodore 64</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="Volker Mücke">
+    <meta name="64er.issue" content="5/84">
+    <meta name="64er.pages" content="86-87">
+	<meta name="64er.head1" content="Tips & Tricks">
+	<meta name="64er.head2" content="C 64">
+    <meta name="64er.toc_title" content="Unbekannte PEEKs und POKEs (C 64)">
+    <meta name="64er.toc_category" content="Programme zum Abtippen|Tips & Tricks">
+    <meta name="64er.index_title" content="Diverse Tips und Tricks für C 64">
+    <meta name="64er.index_category" content="Programme zum Abtippen|Tips & Tricks|Tips & Tricks">
+    <meta name="64er.id" content="tips">
+</head>
+
+<body>
+    <article>
+        <h1>Tips und Tricks für Commodore 64</h1>
+
+        <p class="intro">Bei diesen Tips geht es hauptsächlich um eine schöne optische Aufbereitung von Text auf dem Bildschirm.</p>
+
+        <p>Wer schon mal ein Programm geschrieben hat, legt sicher auch Wert auf sein Copyright. Dieses Programm lenkt die Aufmerksamkeit des Betrachters auf den Copyright-Vermerk!</p>
+
+        <p>Nun näheres zur Grafik: Der Computer umrahmt das Geschriebene fünf mal, so daß auf dem Bildschirm später — um das Geschriebene herum — ein Rahmen entsteht.<br>
+            Nun einige Erklärungen zum Programm:<br>
+            Zeile 10:<br>
+            Rahmen- und Hintergrundfarbe einstellen<br>
+            Zeile 90:<br>
+            Bildschirm löschen<br>
+            Zeile 10000:<br>
+            POKE I,81 bedeutet, daß auf dem Bildschirm das Zeichen mit dem Bildschirmcode 81 (Bällchen) ausgegeben wird. Dieses Zeichen kann beliebig verändert werden (siehe im Handbuch Seite 133).<br>
+            Zeile 10000:<br>
+            POKE I+54272,2, wobei die 2 die Farbe angibt.<br>
+            Zeile 20000:<br>
+            PRINT"⟨BLU⟩⟨HOME⟩⟨2*CRSR DOWN⟨⟩6*CRSR RIGHT⟩...."<br>
+            Zeile 20010:<br>
+            PRINT "⟨7*CRSR RIGHT⟩⟨CRSR DOWN⟩...."<br>
+            Zeile 20020/30/40:<br>
+            PRINT "⟨7*CRSR RIGHT⟩....”<br>
+            Zeile 20050:<br>
+            siehe Zeile 20010.</p>
+
+        <figure>
+            <pre data-filename="rahmen" data-name="Rahmen"></pre>
+        </figure>
+
+        <h3>Verschiedene POKES</h3>
+
+        <p>Tastaturfunktionen:<br>
+            POKE 650,255:<br>
+            Ab jetzt haben alle Tasten eine REPEAT-Funktion, das heißt Dauerfunktion.<br>
+            POKE 650,0:<br>
+            Rücksetzung in den Normalzustand<br>
+            POKE 650,127:<br>
+            Dauerfunktion der Cursortasten ausschalten.<br>
+            POKE 657,128:<br>
+            Dieser Befehl macht die Umschaltung von der Tastatur her auf Groß- und Kleinschreibung unmöglich.<br>
+            POKE 788,49:<br>
+            Dieser Befehl hebt die Wirkung der STOP-Taste auf!<br>
+            POKE 649,0:<br>
+            Hierbei gibt der Computer die gedrückten Tasten beziehungsweise deren Zeichen nicht auf dem Bildschirm aus.<br>
+            POKE 649,10:<br>
+            Rücksetzung normal:</p>
+
+        <h3>Weitere POKES:</h3>
+
+        <p>POKE 40,1: POKE 41,8: POKE 2048,0: NEW (RETURN)<br>
+            LOAD (RETURN)<br>
+            Mit Hilfe dieser Befehle, die im Direktmodus eingegeben werden müssen, kann man ein C-64 Programm von einer Kassette in einem, CBM-Computer laden.<br>
+            POKE 792,34: POKE 793,253: wirkt wie ein RESET beim Drücken der Restore-Taste<br>
+            PRINT PEEK(43) + PEEK(44)*256: Mit dieser Befehlszeile, erfährt man die aktuelle Startadresse Basic. Wenn man die Startadresse verändern will, so muß man nur die Speicherzellen 43 und 44 ändern.<br>
+            10 POKE 198,0:WAIT 198,1: Warten auf eine gedrückte Taste.</p>
+
+        <h3>Verschiedene PEEKS:</h3>
+
+        <p>PRINT PEEK (203): Gibt an, welche Taste gedrückt wurde und zwar im Charactermodus (siehe Tabelle im Handbuch), wobei 64 bedeutet, daß keine Taste gedrückt wurde.<br>
+            PRINT PEEK (57): Dieser Befehl zeigt nach einer Programmunterbrechung an, an welcher Zeilennummer das Programm gestoppt wurde.<br>
+            PRINT PEEK (152): Gibt die Anzahl der geöffneten Dateien bekannt.<br>
+            PRINT PEEK (182): Dieser Befehl gibt die Anzahl der Zeichenlesefehler aus.</p>
+
+        <h3>Verschiedenes:</h3>
+
+        <p>PRINT CHR$ (14): Umschaltung auf Groß- und Kleinschrift<br>
+            PRINT CHR$ (142): Rücksetzung normal<br>
+            SYS 65511: Dieser Befehl schließt alle zu diesem Zeitpunkt offenen Files.<br></p>
+
+        <h3>Wörter werfen</h3>
+
+        <p>Das nachfolgende Programm habe ich »Wörter werfen« genannt, Es schreibt zuerst in die erste Zeile den Text (immer nur 1 Zeile) und wirft ihn dann buchstabenweise den »Bildschirm hinunter«, so daß der Text dann im unteren Drittel des Bildschirms ist, der dann wiederum, diesmal aber als Ganzes nach oben wandert.</p>
+
+        <p>Dabei kommen verschiedene Farbkombinationen zur Geltung: Zuerst ist der Satz rot, dann blau und im letzten Statdium grün. Dieses Programm eignet sich wegen seiner schönen Trickgrafik sehr gut für Programmbeschreibungen und ähnliches.</p>
+
+        <p>Der Text wird ab Zeile 30 in DATAs eingetragen. Die FOR-NEXT-Schleife in Zeile 160 muß auf die Anzahl der DATAs eingestellt sein (siehe Beispiel). Dabei bitte die Dimensionierung in Zeile 30 nicht vergessen! Eingabehilfen (zu Sonderzeichen):<br>
+            Zeile 100:<br>
+            A$(8) = "⟨RVS ON⟩ Volker Mücke ⟨RVS OFF⟩"<br>
+            Zeile l80:<br>
+            PRINT "⟨CLR⟩⟨RED⟩"...<br>
+            Zeile 240:<br>
+            B$="24*⟨CRSR DOWN⟩"<br>
+            Zeile 250:<br>
+            PRINT "⟨HOME⟩"..."⟨BLU⟩⟨40*Space⟩⟨2*CRSR UP⟩"<br>
+            Zeile 260:<br>
+            PRINT "⟨CLR⟩⟨40*Space⟩"</p>
+
+        <address class="author">(Volker Mücke)</address>
+
+        <figure>
+            <pre data-filename="woerter werfen" data-name="Wörter werfen"></pre>
+        </figure>
+
+        <h3>Trick 175</h3>
+
+        <p>Das folgende Programm habe ich Trick 17 genannt. Es erweist sich besonders beim Gestalten von Anleitungen sehr hilfreich.</p>
+
+        <p>Das Programm schreibt die Wörter buchstabenweise auf den Bildschirm, das heißt, der Computer schreibt wie man liest, Buchstabe für Buchstabe und druckt nicht den ganzen Text auf einmal auf den Bildschirm.</p>
+
+        <p>Hier aber noch einige Erklärungen zum Umgang mit diesem Programm:</p>
+
+        <p>In den Zeilen ab 200, finden Sie in der Variablen AN, die Anzahl der Zeilen wieder, die Sie auf eine Bildschirmseite haben wollen. Sie können diese Variable beliebig verändern, sie sollte aber nicht größer als 10 sein, da sonst der Bildschirm »überläuft«.</p>
+
+        <p>In den Zeilen ab 380 definieren Sie die einzelnen Zeichen mit Hilfe von DATAs. Die Anzahl der Datas soll gleich der Summe der Werte für AN sein, das heißt in diesem Fall ist die Summe von AN=10 und wir haben auch 10 DATAs. Wollen Sie eine Leerzeile ausgeben, so können Sie einfach — wie im Programm — zwei Anführungszeichen hintereinander setzen.</p>
+
+        <p>Auch alle Cursorzeichen, das heißt ⟨CRSR DOWN⟩...⟨RVS ON⟩ etc. können benutzt werden.</p>
+
+        <figure>
+            <pre data-filename="trick 17" data-name="Trick 17"></pre>
+        </figure>
+
+        <aside class="fehlerteufelchen" id="fehlerteufelchen">
+            <h2>Fehlerteufelchen</h2>
+            <p><b>Wörter werfen</b>: In Zeile 260 müssen die 42 mal Space nicht hinter dem Ausführungszeichen stehen, sondern direkt nach dem reversen Herz, innerhalb der Anführungszeichen.</p>
+            <!-- 64'er 6/1984 -->
+        </aside>
+
+
+    </article>
+
+</body>
+
+</html>
