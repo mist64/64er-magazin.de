@@ -123,7 +123,8 @@ if LANG == "de":
   FILENAME_PRIVACY = "datenschutz"
   FILENAME_404 = "404"
   FILENAME_IMPRINT = "impressum"
-  CATEGORY_TYPE_IN = "Programme zum Abtippen"
+  CATEGORY_TYPE_IN_1 = "Programme zum Abtippen"
+  CATEGORY_TYPE_IN_2 = "Listings zum Abtippen"
   TOPICS = [
       (LABEL_NEWS, ["Aktuell"]),
       (LABEL_HARDWARE, ["Hardware"]),
@@ -209,7 +210,8 @@ elif LANG == "en":
   FILENAME_PRIVACY = "privacy"
   FILENAME_404 = "404"
   FILENAME_IMPRINT = "imprint"
-  CATEGORY_TYPE_IN = "Type-in Programs"
+  CATEGORY_TYPE_IN_1 = "Type-in Programs"
+  CATEGORY_TYPE_IN_2 = "Type-in Listings"
   TOPICS = [
     (LABEL_NEWS, ["News"]),
     (LABEL_HARDWARE, ["Hardware"]),
@@ -333,6 +335,15 @@ class Article:
         self.txt = metadata['txt']
         self.img_urls = metadata['img_urls']
         self.path = metadata['path'] # unused?
+
+    def is_category_listings(self):
+        if not self.index_category:
+            return False
+        if not self.index_category.startswith(CATEGORY_TYPE_IN_1 + '|') and not self.index_category.startswith(CATEGORY_TYPE_IN_2 + '|'):
+            return False
+        if not self.downloads:
+            return False
+        return True
 
 
 class Issue:
@@ -586,7 +597,7 @@ class ArticleDatabase:
         return toc_entries
 
     def articles_with_downloads(self):
-        return [article for article in self.articles if article.index_category and article.index_category.startswith(CATEGORY_TYPE_IN + '|') and article.downloads]
+        return [article for article in self.articles if article.is_category_listings()]
 
     def all_type_in_articles_grouped_by_index_category(self):
         # Initialize a dictionary to hold articles by category
@@ -594,8 +605,9 @@ class ArticleDatabase:
 
         # Filter articles with downloads and organize them
         for article in self.articles:
+            print(article.issue_key, article.index_category)
             index_category = article.index_category
-            if index_category and index_category.startswith(CATEGORY_TYPE_IN + '|') and article.downloads:
+            if article.is_category_listings():
                 index_category = index_category[index_category.find('|') + 1:]
                 articles_by_category[index_category].append(article)
 
