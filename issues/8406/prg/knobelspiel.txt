@@ -1,0 +1,175 @@
+
+;knobelspiel.prg ==1201==
+;Eingetippt von Endurion
+   10 rem knobelspiel
+   20 print"{clr}"
+   30 print"     {red}knobelspiel{blu}"
+   40 print:print" schere stein papier ":print:print
+   50 print:print"       autor           albrecht langenstein
+   60 fort=1to8000:next
+   70 poke37138,15
+   80 poke37136,0
+   90 a=0:b=0
+  100 rem vorbereitung
+  110 print"achtung!"
+  115 print"--------"
+  120 print"pruefen sie,ob das verbindungskabel steckt.":print
+  130 print"sonst erst {rvon}beide{rvof}  ":print
+  135 print"- rechner {rvon}ausschalten{rvof}"
+  140 print"- kabel einstecken   "
+  145 print"- programm {rvon}neu laden.{rvof}":print
+  150 print"monitor geeignet auf- stellen!":print
+  155 print"bei bildstreifen evt. uhf-modulatoren drehen"
+  160 print"lautstaerke einstellen"
+  165 poke36878,15:poke36875,219
+  170 print"   wenn alles ok,       {rvon}leertaste{rvof} druecken!"
+  180 geta$:ifa$=""then180
+  190 ifa$=" "then200
+  195 goto170
+  200 rem anweisung
+  205 print"{clr}":print"spielanweisung:"
+  210 print"---------------"
+  220 print"waehlen sie schere,   stein oder papier!":print
+  230 print"schere gewinnt gegen  papier.":print
+  240 print"papier gewinnt gegen  stein.":print
+  250 print"stein  gewinnt gegen  schere.":print
+  260 print"sonst unentschieden.":print
+  270 print"gesamtsieger ist,wer .zuerst 3 einzelspiele gewonnen hat!"
+  300 rem start
+  305 poke36878,0
+  310 p0=0:p1=0:p2=0:p3=0
+  315 print
+  320 print"wenn ok,taste f1 "
+  330 geta$:ifa$=""then330
+  340 ifa$=chr$(133)then350
+  345 goto320
+  350 poke36878,15:poke36875,237
+  352 fort=1to150:next
+  355 poke36878,0
+  360 p0=1:x=1:poke37136,x
+  365 print"{clr}":print"auf gegner warten!"
+  370 gosub1000
+  380 ifp7=1then400
+  390 goto370
+  400 rem wahl a
+  410 print"{clr}"
+  415 print:print"   bitte waehlen!!":print:print
+  420 print"     f3...schere ":print:print
+  422 print"     f5...stein  ":print:print
+  424 print"     f7...papier ":print:print
+  426 print:print"entspr.taste druecken!"
+  430 geta$:ifa$=""then430
+  435 ifa$=chr$(134)then460
+  440 ifa$=chr$(135)then470
+  445 ifa$=chr$(136)then480
+  450 goto400
+  460 p1=1:x=2:p$="schere"
+  465 poke37136,x:goto500
+  470 p2=1:x=4:p$="stein "
+  475 poke37136,x:goto500
+  480 p3=1:x=8:p$="papier"
+  485 poke37136,x:goto500
+  500 rem ein b
+  505 poke36878,15:poke36875,219
+  510 gosub1000
+  520 ifp4=1 or p5=1 or p6=1 then 540
+  530 goto510
+  540 poke36878,0
+  600 rem vergleich
+  601 ifp6=1then605
+  602 ifp5=1then606
+  603 ifp4=1then607
+  605 q$="schere":goto610
+  606 q$="stein ":goto610
+  607 q$="papier":goto610
+  610 ifp1=1andp6=1then710:rem remis
+  620 ifp2=1andp5=1then710
+  630 ifp3=1andp4=1then710
+  640 ifp1=1andp4=1then740:rem sieg a
+  650 ifp2=1andp6=1then740
+  660 ifp3=1andp5=1then740
+  670 ifp1=1andp5=1then770:rem sieg b
+  680 ifp2=1andp4=1then770
+  690 ifp3=1andp6=1then770
+  700 rem ergebnis
+  710 rem remis
+  712 print"{clr}":print"sie hatten ";p$
+  714 print:print"ihr gegner ";q$
+  720 print:print" also unentschieden"
+  730 goto800
+  740 rem sieger selbst
+  742 print"{clr}":print"sie hatten ";p$
+  744 print:print"ihr gegner ";q$
+  750 print:print"sie haben gewonnen! "
+  760 a=a+1:goto800
+  770 rem sieger gegner
+  772 print"{clr}":print"sie hatten ";p$
+  774 print:print"ihr gegner ";q$
+  780 print:print"gegner hat gewonnen!"
+  790 b=b+1:goto800
+  800 rem zaehlen
+  801 ifa=bthen805
+  802 ifa>bthen806
+  803 ifa<bthen807
+  805 s$=" unentschieden.":goto810
+  806 s$=" fuer sie!     ":goto810
+  807 s$=" fuer gegner!  ":goto810
+  810 print:print:print"spielstand:":print
+  820 printa;":";b;s$
+  850 ifa=3then900
+  860 ifb=3then930
+  870 goto300
+  900 rem gesamtsieg
+  910 print:print"sie haben das spiel":print
+  915 print"mit";a;":";b;"gewonnen!"
+  920 gosub1100
+  925 goto950
+  930 print:print"sie haben das spiel":print
+  935 print"mit";a;":";b;"verloren!"
+  940 gosub1200
+  945 goto950
+  950 print:print
+  952 print:print:print"  noch einmal? j/n "
+  955 print:print" j oder n eingeben !"
+  960 geta$:ifa$=""then960
+  965 ifa$="j"then980
+  970 ifa$="n"then1300
+  975 goto950
+  980 print"{clr}"
+  985 a=0:b=0
+  990 goto300
+ 1000 rem peek in
+ 1010 p=peek(37136)
+ 1020 p4=-((p and  16)= 16)
+ 1030 p5=-((p and  32)= 32)
+ 1040 p6=-((p and  64)= 64)
+ 1050 p7=-((p and 128)=128)
+ 1060 return
+ 1100 rem music a
+ 1110 poke36878,15
+ 1115 forl=1to10
+ 1120 form=180to235step2
+ 1125 poke36875,m
+ 1130 forn=1to10
+ 1135 nextn
+ 1140 nextm
+ 1145 poke36875,0
+ 1150 form=1to100
+ 1155 nextm
+ 1160 nextl
+ 1165 poke36878,0
+ 1190 return
+ 1200 rem music b
+ 1210 poke36878,15
+ 1220 form=240to127step-1
+ 1230 poke36875,m
+ 1240 fort=1to80:next
+ 1250 nextm
+ 1260 poke36878,0
+ 1290 return
+ 1300 rem schluss
+ 1310 print"{clr}"
+ 1320 print"  ich bedanke mich!":print:print
+ 1330 print" auf wiederspielen!! "
+ 1350 end
+
