@@ -605,7 +605,6 @@ class ArticleDatabase:
 
         # Filter articles with downloads and organize them
         for article in self.articles:
-            print(article.issue_key, article.index_category)
             index_category = article.index_category
             if article.is_category_listings():
                 index_category = index_category[index_category.find('|') + 1:]
