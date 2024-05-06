@@ -327,27 +327,21 @@ class Article:
         try:
             return int(self.pages.split(',')[0].split('-')[0])
         except ValueError:
-            return float('inf')
+            raise SystemExit(f'\n---\nMetaDataError: pages tag is "{self.pages}"\n   File: "{self.path}"')
         
     def out_filename(self):
         return self.id + '.html'
 
     def article_pubdate(self):
         issue = db.issues[self.issue_key]
-
-        # Calculate a pubdate for RSS:
-        # Add index as "half-days" to the date
         pubdate = issue.pubdate + timedelta(hours=HOURS_PER_ARTICLE * self.sort_index)
         return pubdate
 
 class Issue:
   def __init__(self, issue_directory_path):
       """Extracts all relevant data from an issue directory, including HTML file paths."""
-      articles_metadata = []
       toc_order = []
-      pdf_path = None
       pdf_filename = None
-      issue_path = issue_directory_path  # Capture the issue directory path
       issue_dir_name = os.path.basename(issue_directory_path)
       issue_key = None
       pubdate = None
@@ -378,31 +372,32 @@ class Issue:
                   pdf_path = os.path.join(root, file)
                   pdf_filename = os.path.basename(pdf_path)
   
-      # sort articles for RSS, check issue_key for all, create Article objects
+      # sort articles by page number
       sorted_articles = sorted(articles, key=lambda x: x.first_page_number())      
       for index, article in enumerate(sorted_articles):
-          # Assign an index based on sorted order
           article.sort_index = index
-          # get the issue key from the articles and check that all of them are the same at the same time
+      articles = sorted_articles
+
+      # get the issue key from the articles and check that all of them match
+      for article in articles:
           if not issue_key:
               issue_key = article.issue_key
           else:
               assert(issue_key == article.issue_key)
-      articles = sorted_articles
     
       if not pubdate:
+          # no system exit as this also triggers for empty folders (eg. after branch change)
           raise Exception(f"- [{issue_directory_path}] does not contain expected data")
 
-      else:
-          # XXX used directly after init and then never again
-          self.articles = articles          
-          self.issue_key = issue_key
+      # XXX used directly after init and then never again
+      self.articles = articles          
+      self.issue_key = issue_key
 
-          self.toc_order = toc_order
-          self.pubdate = pubdate
-          self.pdf_filename = pdf_filename
-          self.issue_dir_name = issue_dir_name
-          self.listings = listings
+      self.toc_order = toc_order
+      self.pubdate = pubdate
+      self.pdf_filename = pdf_filename
+      self.issue_dir_name = issue_dir_name
+      self.listings = listings
 
   
   @staticmethod
@@ -667,7 +662,7 @@ def html_generate_latest_issue(db):
 
 def html_generate_latest_downloads(db):
     articles_with_downloads = db.articles_with_downloads()
-    sorted_articles = sorted(articles_with_downloads, key=lambda x: x.first_page_number(), reverse=True)[:NEW_DOWNLOADS]
+    sorted_articles = sorted(articles_with_downloads, key=lambda x: (x.issue_key, x.first_page_number()), reverse=True)[:NEW_DOWNLOADS]
     html_parts = [f"<h2>{LABEL_LATEST_LISTINGS}</h2><hr><ul>"]
 
     for article in sorted_articles:
