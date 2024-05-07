@@ -8,11 +8,11 @@
     <meta name="author" content="Heimo Ponnath">
     <meta name="64er.issue" content="6/84">
     <meta name="64er.pages" content="132-137">
-	<meta name="64er.head1" content="Grafik Grundlagen">
-	<meta name="64er.head2" content="C 64">
+    <meta name="64er.head1" content="Grafik Grundlagen">
+    <meta name="64er.head2" content="C 64">
     <meta name="64er.toc_category" content="Kurse">
-	<meta name="64er.toc_title" content="Reise durch die Wunderwelt der Grafik (3)">
-	<meta name="64er.index_title" content="Reise durch die Wunderwelt der Grafik (Teil 3)">
+    <meta name="64er.toc_title" content="Reise durch die Wunderwelt der Grafik (3)">
+    <meta name="64er.index_title" content="Reise durch die Wunderwelt der Grafik (Teil 3)">
     <meta name="64er.index_category" content="Kurse|Grafik">
     <meta name="64er.id" content="grafik">
 </head>
@@ -123,7 +123,20 @@ Bit 3 ist gesetzt
 
         <p>Zur Demonstration können Sie ja mal folgendes Programm eingeben:</p>
 
-        <pre>TODO</pre>
+        <pre>10 PRINT CHR$(147)
+20 POKE 53281,6:POKE 53282,1:POKE 53283,0:REM LADEN DER 3 FARBREGISTER
+30 POKE 53270,PEEK(53270)OR 16:REM ANSCHALTEN DES MEHRFARBEN-MODUS
+40 POKE 646,0:REM ZEICHENFARBE AUF 0(BLK)
+50 PRINT CHR$(17)"JETZT IST DER MEHRFARBENMODUS":PRINT "EINGESCHALTET"
+60 PRINT CHR$(17)"IN DIE BILDSCHIRMFARBZEILEN IST ABER DIE";:PRINT"0 EINGEGEBEN"
+70 PRINT CHR$(17)"DESWEGEN IST DIE ZEICHENDARSTELLUNG";:PRINT"NORMAL"
+80 POKE 646,14:REM ZEICHENFARBE AUF 14(HBLU)
+90 PRINTCHR$(17)"DER FARBCODE IST JETZT 14"
+100 PRINT CHR$(17)"DER MEHRFARBEN-MODUS IST SICHTBAR"
+110 END
+120 POKE 53270,PEEK(53270)AND239:REM AUSSCHALTEN DES MEHRFARBEN-MODUS
+130 END
+</pre>
 
         <p>Wenn dieses Programm mit Zeile 110 beendet ist, befinden Sie sich weiterhin im Mehrfarbenmodus und können nach Herzenslust durch POKE 646, »Zeichenfarbe«, oder mit »CTRL«-beziehungsweise »COMMODORE«-Taste und einer Zifferntaste die Zeichenfarbe ändern und den Effekt beobachten. Übrigens ist der Cursor unterhalb der READY-Meldung noch da — was Sie durch eine Änderung der Zeichenfarbe sofort feststellen können. Sollten Sie genug von diesem Modus haben, dann geben Sie ein CONT »RETURN« und das Programm schaltet wieder den Normalmodus ein.</p>
 
@@ -148,7 +161,6 @@ PRINT PEEK(53281),PEEK(53282), PEEK(53283)
                     <td rowspan="2">Code, binär<br>76543210</td>
                     <td rowspan="2">Bit 6/7</td>
                     <td colspan="2">Hintergrundfarbregister</td>
-                    </td>
                 </tr>
                 <tr>
                     <td>Nr.</td>
@@ -224,6 +236,8 @@ POKE 53265,PEEK(53265)AND 191
         <p>Ganz nett wäre es ja eigentlich, wenn man sowohl den Modus mit erweiterten Hintergrundfarben als auch dem Mehrfarbzeichenmodus miteinander kombinieren könnte. Jeder Versuch, das zu tun, endet mit einem schwarzen Bildschirm ohnejegliches Zeichen. An diese Möglichkeit haben die Schöpfer des VIC-II-Chip offenbar nicht gedacht.</p>
 
         <p>Betrachten Sie jetzt doch einmal das nachfolgende Demonstrationsprogramm. Vor der Eingabe schalten Sie bitte durch gleichzeitiges Drücken der »COMMODORE«- und »SHIFT«-Tasten den Kleinschriftmodus ein.</p>
+
+        <pre>TODO</pre>
 
         <p>Ebenso wie beim vorigen Programm können Sie nach dem ersten END in Zeile 80 noch mit den verschiedenen Kombinationen von Zeichenfarbe und Zeichencode herumexperimentieren. Wenn Sie genug davon haben, erreicht ein CONT »RETURN« die Rückkehr in den Normalzustand.</p>
 
@@ -488,6 +502,27 @@ POKE 51,255:POKE 52,31:POKE 55,255:POKE 56,31
         <h2>Es ist geschafft: Die erste Grafik</h2>
 
         <p>Alles, was wir bis jetzt über die Hochauflösungsgrafik gelernt haben, soll hier nochmal als kleines Demonstrationsprogramm zusammengefaßt werden. Also NEW eingeben und dann:</p>
+
+        <pre>10 POKE51,255:POKE52,31:POKE55,255:POKE56,31
+20 ZF=0:HF=6:F=16*ZF+HF
+30 DEFFNA(X)=50*SIN(X/30)+100
+40 PRINTCHR$(147)
+50 POKE53265,PEEK(53265)OR32
+60 POKE53272,PEEK(53272)OR8
+70 B=8192:FORI=0TO7999:POKEB+I,0:NEXTI
+80 FORI=1024TO2023:POKEI,F:NEXTI
+90 FORX=0TO319:Y=FNA(X)
+100 BY=(XAND504)+40*(YAND248)+(YAND7):BI=7-(XAND7)
+110 POKEB+BY,PEEK(B+BY)OR(2{$EE}{CBM-U}{YEL}BI):NEXTX
+120 GETA$:IFA$=""THEN120
+130 POKE53272,PEEK(53272)AND(255-8)
+140 POKE53265,PEEK(53265)AND(255-32)
+150 PRINTCHR$(147)
+</pre>
+<!--
+    Im gedruckten Magazin hieß es
+    10 POKE52,255:POKE52,31:POKE55,255:POKE56,31
+-->
 
         <p>Dieses Programm setzt 320 Punkte nach der Form einer Sinus-Funktion. Zur Erläuterung sei noch bemerkt, daß in Zeile 100 eine etwas elegantere Lösung der Berechnung von BYTE und BIT angeführt ist. Sie können aber genauso gut die bisher verwendete benutzen. In Zeile 150 wird der Bildschirm nochmal gelöscht, denn bei der Eingabe der Farben haben wir ja die Bildschirmzellen mit einem Zeichencode belegt, der im Normalmodus immer unter dem Cursor sichtbar wäre.</p>
 
