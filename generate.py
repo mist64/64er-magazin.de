@@ -30,7 +30,7 @@ SERVER = 'www.64er-magazin.de'
 NEW_DOWNLOADS = 15
 HOURS_PER_ARTICLE = 16
 # enable this if there's there's a missing PDF
-NO_PDF = True
+NO_PDF = False
 
 #
 # Parse arguments
