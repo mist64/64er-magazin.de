@@ -257,19 +257,19 @@ def avif_picture_tag(soup, img_src, attrs=None):
 
     def image_tag(tag_src=img_src):
         img_tag = soup.new_tag('img')
-    
+
         # Copy all attributes from the original <img> tag to the new one
         if attrs:
             for attr, value in attrs.items():
                 img_tag[attr] = value
-    
+
         # add an empty alt for now if there is none
         if 'alt' not in img_tag.attrs:
             img_tag['alt'] = ""
-        
+
         img_tag['src'] = tag_src
         return img_tag
-        
+
     # svg is unchanged
     if img_src[-4:] == '.svg':
         svg_tag = image_tag()
@@ -328,7 +328,7 @@ class Article:
             return int(self.pages.split(',')[0].split('-')[0])
         except ValueError:
             raise SystemExit(f'\n---\nMetaDataError: pages tag is "{self.pages}"\n   File: "{self.path}"')
-        
+
     def out_filename(self):
         return self.id + '.html'
 
@@ -346,7 +346,7 @@ class Issue:
       issue_key = None
       pubdate = None
       articles = []
-  
+
       # read all listings in petcat format
       listings = {}
       prg_path = os.path.join(issue_directory_path, 'prg')
@@ -356,7 +356,7 @@ class Issue:
                   file_path = os.path.join(root, file)
                   with open(file_path, 'r') as file_obj:
                       listings[os.path.splitext(file)[0]] = file_obj.read()
-  
+
       for root, dirs, files in os.walk(issue_directory_path):
           for file in files:
               if file.endswith('.html'):
@@ -371,9 +371,9 @@ class Issue:
               elif file.endswith('.pdf'):
                   pdf_path = os.path.join(root, file)
                   pdf_filename = os.path.basename(pdf_path)
-  
+
       # sort articles by page number
-      sorted_articles = sorted(articles, key=lambda x: x.first_page_number())      
+      sorted_articles = sorted(articles, key=lambda x: x.first_page_number())
       for index, article in enumerate(sorted_articles):
           article.sort_index = index
       articles = sorted_articles
@@ -384,13 +384,13 @@ class Issue:
               issue_key = article.issue_key
           else:
               assert(issue_key == article.issue_key)
-    
+
       if not pubdate:
           # no system exit as this also triggers for empty folders (eg. after branch change)
           raise Exception(f"- [{issue_directory_path}] does not contain expected data")
 
       # XXX used directly after init and then never again
-      self.articles = articles          
+      self.articles = articles
       self.issue_key = issue_key
 
       self.toc_order = toc_order
@@ -399,7 +399,7 @@ class Issue:
       self.issue_dir_name = issue_dir_name
       self.listings = listings
 
-  
+
   @staticmethod
   def __read_html(html_file_path, listings):
       """Parses an HTML file for article metadata and includes the filename."""
@@ -407,7 +407,7 @@ class Issue:
           contents = file.read()
 
       soup = BeautifulSoup(contents, 'html.parser')
-  
+
       def find_meta(name, is_optional=True): # panic if non optional
           meta_tag = soup.find('meta', attrs={'name': name})
           if meta_tag:
@@ -416,7 +416,7 @@ class Issue:
               return None
           else:
               raise SystemExit(f'\n---\nMetaDataError: "{name}" meta tag is missing\n   File: "{html_file_path}"')
-      
+
       def find_title(): # panic if no title
           title_tag = soup.find('title')
           if title_tag:
@@ -438,9 +438,9 @@ class Issue:
           'index_category': find_meta('64er.index_category'),
           'path' : html_file_path,  # Include full path in metadata
       }
-  
+
       metadata['target_filename'] = os.path.basename(metadata['id']) + '.html'
-  
+
       # Put listings into <pre> tags and collect downloads
       downloads = []
       a_tags = []
@@ -453,7 +453,7 @@ class Issue:
               # remove ';', empty lines and leading spaces
               listing = listings[data_filename]
               listing = [line.lstrip() for line in listing.splitlines() if line.strip() and not line.lstrip().startswith(';')]
-  
+
               if data_range:
                   ranges = [(int(part.split('-')[0]), int(part.split('-')[-1])) for part in data_range.split(',')]
                   filtered_lines = []
@@ -468,15 +468,15 @@ class Issue:
                               filtered_lines.append('')
                           blank_line_added = True
                   listing = filtered_lines
-  
+
               listing = "\n".join(listing)
               tag.string = listing
-  
+
               if not any(item[0] == data_name for item in downloads): # duplicates
                   data_filename_escaped = urllib.parse.quote(data_filename)
                   downloads.append((data_name, f"prg/{data_filename_escaped}.prg"))
       metadata['downloads'] = downloads
-  
+
       # and make a "downloads" aside
       if downloads:
           aside_tag = soup.new_tag("aside", attrs={"class": "downloads"})
@@ -487,7 +487,7 @@ class Issue:
               aside_tag.append(a_tag)
           article_tag = soup.find("article")
           article_tag.append(aside_tag)
-  
+
       # Extract article description
       intro_div = soup.find('p', {"class": "intro"})
       if intro_div:
@@ -500,39 +500,39 @@ class Issue:
               metadata['description'] = ' '.join(words[:64]) + '...'
           else:
               metadata['description'] = ''
-  
-  
+
+
       # Extract all image URLs with their *source* names
       src_img_urls = [img['src'] for img in soup.find_all('img') if img.get('src')]
       metadata['src_img_urls'] = src_img_urls
-  
+
       # In the HTML, change all img src paths from PNG to AVIF, with a JPEG fallback
       for img_tag in soup.find_all('img'):
           img_src = img_tag['src']
           if img_src.lower().endswith('.png'):
               img_tag.replace_with(avif_picture_tag(soup, img_tag['src'], img_tag.attrs))
-  
+
       metadata['html'] = soup
       metadata['txt'] = html_to_text_preserve_paragraphs(soup.body);
-  
+
       # Extract all image URLs with their *destination* names
       img_urls = [img['src'] for img in soup.find_all('img') if img.get('src')]
       metadata['img_urls'] = img_urls
-  
+
       return metadata
-  
+
   @staticmethod
   def __read_toc_order(toc_file_path):
       """Reads the TOC order from toc.txt file."""
       with open(toc_file_path, 'r', encoding='utf-8') as file:
           toc_order = [line.strip() for line in file.readlines() if line.strip()]
       return toc_order
-  
+
   def __read_pubdate(file_path):
       with open(file_path, 'r') as file:
           date_str = file.readline().strip()
       return datetime.strptime(date_str, "%Y-%m-%d").replace(tzinfo=timezone.utc)
-            
+
 
 class ArticleDatabase:
 
@@ -542,14 +542,14 @@ class ArticleDatabase:
         for issue_dir_name in os.listdir(in_directory):
             issue_dir_path = os.path.join(in_directory, issue_dir_name)
             if os.path.isdir(issue_dir_path) and re.match(r'^\d{4}$', issue_dir_name):
-              
+
                 try:
                     issue = Issue(issue_dir_path)
 
                 except Exception as error:
                     print(error)
                     continue
-                
+
                 # Map issue key to issue data
                 issue_key = issue.issue_key
                 self.issues[issue_key] = issue
@@ -1200,10 +1200,11 @@ def convert_and_copy_image(img_path, dest_img_path):
             if file_extension == ".jpg":
                 quality = '80'
                 bg_color = 'wheat'
-                subprocess.run(['convert', img_path, '-quality', quality, '-background', bg_color, '-alpha', 'remove',  '-alpha', 'off', dest_img_path], check=True)
+                subprocess.run(['magick', img_path, '-quality', quality, '-background', bg_color, '-alpha', 'remove',  '-alpha', 'off', dest_img_path], check=True)
             elif file_extension == ".avif":
                 quality = '60'
-                subprocess.run(['convert', img_path, '-quality', quality, dest_img_path], check=True)
+                subprocess.run(['magick', img_path, '-quality', quality, dest_img_path], check=True)
+            subprocess.run(['exiftool', '-all=', dest_img_path], check=True)
 
         except subprocess.CalledProcessError as e:
             print(f"Error running convert for image {img_path}: {e}")
