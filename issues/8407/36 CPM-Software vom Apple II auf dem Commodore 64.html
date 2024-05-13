@@ -1,0 +1,61 @@
+<h1>CPM-Software vom Apple II auf dem Commodore 64</h1>
+
+<p class="intro">Konnten Sie bisher mit Ihrem CP/M-Modul wenig anfangen? Versuchten Sie vergeblich Programme dafür zu kaufen? Dieser Bericht zeigt Ihnen einen Weg zur Welt der CP/M-Software.</p>
+
+<p>Stellen Sie sich vor, Sie schalten den Commodore 64 an, laden ein Programm und Ihr Computer meldet sich mit »WORDSTAR release 3.25«. Der C 64 als Computer für Programme, die für wesentliche größere (und teurere) Systeme entwickelt wurden! Oder möchten Sie in Fortran, Cobol, PL1 oder Algol programmieren? Warum nicht? Das zur Verfügung stehende Potential an CP/M-Software ist beinahe unerschöpflich.</p>
+
+<p>Aber woher ist diese Software zu beziehen? Diese Frage ist berechtigt. Wer einmal versucht hat, in einem Fachgeschäft, oder einem Softwarehaus CP/M-Programme im Diskettenformat der 1541-Floppys zu kaufen, wurde wahrscheinlich enttäuscht.</p>
+
+<p>Eigentlich schade, denn eine Umfrage bei einigen Münchener Computerfachgeschäften erbrachte, daß nach dem Steckmodul häufig gefragt wurde. Erhältlich war das Modul aber nur in einem einzigen Geschäft. Dort wurde es, der eigenen Stellung wohl bewußt, nur zögernd unter dem Ladentisch hervorgezogen. Erst nach mehrmaligem Betonen der Dringlichkeit des Kaufs, konnte sich der Verkäufer zum Tausch des Moduls gegen Geld entschließen. Ein Markt, der einfach brachliegt, beziehungsweise einfallsreichen Bastlern überlassen wird (der Diplomkaufmann in mir regt sich).</p>
+
+<p>Nutzen wir die Zeit, bis es eigene C 64-CP/M-Software gibt, mit einer gar nicht so schlechten Behelfslösung. Wir koppeln einen Apple II mit dem Commodore. Dabei geht man wie folgt vor:<br>
+Punkt 1: Sie bauen oder kaufen sich ein Verbindungskabel zwischen einem Apple II und dem Commodore 64.<br>
+Punkt 2: Sie kaufen sich die gewünschte CP/M-Software im Apple II Format.<br>
+Punkt 3: Sie suchen einen Apple-II-Besitzer, (zum Beispiel über eine Anzeige).<br>
+Punkt 4: Sie schreiben sich, oder was leichter ist, sie kaufen sich Software zur Übertragung.<br>
+Punkt 5: Sie koppeln die beiden Computer, und überspielen die gekauften Programme.</p>
+
+<p>Dieses Verfahren ist so einfach, wie wirkungsvoll.</p>
+
+<p>Zum Test verwendete ich das Transferpaket von Bieling und machte mich an die Arbeit. Das Kabel wird auf der Apple-Seite in den Spieleanschluß gesteckt und beim Commodore natürlich in den User-Port. Nach dem Laden der Transfersoftware kann das Übertragen beginnen. »Schon« nach 18 Minuten war eine gesamte Diskette übertragen. Mit dem DOS im Floppy 1541 lassen sich leider ohne größeren Aufwand keine höheren Transferraten erreichen. Aber immerhin, es geht.</p>
+
+<p>Eines sei bei aller Freude über diese Quelle wirklich guter Software angefügt: Da Computer und Programme immer jenseits von Gut und Böse stehen und somit nicht fähig sind, Urheberrechten und ähnlichem Beachtung zu schenken, obliegt Ihnen diese Pflicht. Erkundigen Sie sich lieber vorher, ob es Einwände von seiten der Lizenzgeber gegen die Übertragung gibt.</p>
+
+<p>Was passiert aber, wenn es Ihnen gelungen ist, ein Programm zu kopieren. Läuft es einwandfrei oder sind da und dort noch kleine Änderungen vorzunehmen? Das erste Hindernis, dem sie auf Ihrer Erkundungsreise durch die CP/M-Software begegnen werden, ist deren Verlangen nach einer Darstellung von 80 Zeichen auf dem Bildschirm.</p>
+
+<p>Hier empfiehlt es sich, die Anschaffung einer 80-Zeichen-Karte in Erwägung zu ziehen. Alle mir bekannten Softwarelösungen liefern ein unbefriedigendes Ergebnis.</p>
+
+<p>Ein wesentlich schwerwiegenderes Problem liegt im BIOS (Basic-Input/Output-System) des Commodore-CP/M. Dieses ist bekanntlich für nur ein Laufwerk konzipiert worden. Viele CP/M-Programme setzen ihrerseits aber ein Doppellaufwerk voraus. Eine Lösung ist nur durch eine Abänderung des BIOS zu erzielen. Dazu ist es notwendig, dieses näher zu betrachten. In dem Bereich $0B97 bis $0BCB befindet sich eine Routine, die zum Initialisieren des Laufwerkes, sowie zum Eröffnen einer Direktzugriffsdatei dient. Ferner wird in den Speicherstellen $0B9E und $0BB8 die Geräteadresse in das X-Register geladen. Damit liegt es nahe, diese Routine jedesmal, wenn die Laufwerksnummer (0 oder 1) gewechselt wird, anzuspringen und vorher das Argument LDX der Laufwerksnummer entsprechend auf 8 oder 9 zu setzen. Die Stelle, die die Laufwerksnummer überprüft, liegt im BIOS bei $0AF5. Dort wird die Diskettennummer ausgelesen, in ASCII-Code umgewandelt und gespeichert. Hier ersetzt man den Sprung in die ASCII-Wandelroutine durch den in eine Erweiterungsroutine zwischen $0C98 bis $0CBB. Falls die Laufwerksnummer 0 war, wird dort überprüft, ob das Argument von LDX 8 ist. Wenn ja, erfolgt ein Rücksprung. Wenn nein, wird es in 8 geändert und die Initialisierungsroutine angesprungen. Das gleiche gilt für den umgekehrten Fall.</p>
+
+<p>Am komfortabelsten läßt sich diese Änderung mit dem Basic-Programm vornehmen (Programm laden, CP/M-Diskette in das Laufwerk einlegen, Programm starten). Vor dem Booten des CP/M-Ladeprogramms ist natürlich dafür zu sorgen, daß eines der Laufwerke die Geräteadresse 9 hat. Außerdem muß nach dem Starten des CP/M mit dem Programm Config (ist auf der Systemdiskette) die Anzahl der Laufwerke auf zwei erhöht werden. Nach dem Verlassen dieses Programms können Sie mit Ihren beiden Laufwerken wie mit einem Doppellaufwerk unter CP/M arbeiten.</p>
+
+<p>Beispielsweise mit Wordstar, einem sehr beliebten und oft verkauften Textverarbeitungsprogramm.</p>
+
+<p>Da ich die meisten meiner Berichte auf einem IBM-PC mit Wordstar schreibe, war ich natürlich sehr gespannt, wie das gleiche Programm auf dem Commodore 64 aussieht. Die erste Einschränkung, die ich machen mußte, war der Anspruch auf schnelle Diskettenoperationen. Viele der komfortablen Befehle des Wordstar gehen durch die langsame Ladegeschwindigkeit der Floppy verloren oder verlieren ihren Sinn.</p>
+
+<p>Auch mit zwei Laufwerken bleibt das Laden, Speichern und Booten eine langwierige, Geduld erfordernde Angelegenheit. Zusätzlich fiel mir auf, daß eine Ausgabe auf den Drucker nur mit einem am seriellen Bus angeschlossenen Gerät möglich war. Wer aber beispielsweise einen Epson-Drucker mit einer Softwareschnittstelle betreibt, wird in den meisten Fällen keinen Buchstaben auf das Papier bekommen. Beachtet man den Preis, den man für eine Wordstar-Diskette im Apple-Format bezahlen muß, addiert dazu die Kosten für eine 80-Zeichen-Karte und das Modul, so lohnt sich fast schon die Anschaffung eines anderen Systems.</p>
+
+<p>Die schon aus dem Handbuch zum Commodore 64 bekannte spärliche Dokumentation findet im Beipackzettel zum CP/M-Modul eine Steigerung. Mit den Hinweisen kann jeder Anwender etwa soviel anfangen, wie ein Fernsehzuschauer mit dem Pogramm der letzten Woche — nämlich nichts. Dabei werden auf der dem Modul beiliegenden Systemdiskette einige recht interessante Hilfsprogramme mitgeliefert. Außer einem lapidaren Hinweis auf etwa zur Verfügung stehende (und extra zu bezahlende) Literatur wird der frischgebackene Modulbesitzer mit einem windigen Blättchen Papier alleingelassen.</p>
+
+<p>Obwohl es nicht die Aufgabe einer Zeitschrift ist, fehlende Handbücher nachzuliefern, sollen diese Dienstprogramme hier kurz vorgestellt werden:</p>
+
+<p>TODO</p>
+
+<ol>
+<li><b>MOVCPM</b> Mit diesem Programm können Sie Ihr Betriebssystem ändern, zum Beispiel an einen anderen Platz im Speicher verlegen. Die Routine kann dazu verwendet werden, eine 48 KByte-Version zu erzeugen, und mit SYSGEN direkt auf die CP/M-Spuren zu schreiben. Leider funktioniert dieses Dienstprogramm nicht fehlerfrei, denn es tritt ein Synchronisationsfehler auf. Wahrscheinlich stimmen die Versionen von CP/M und MOVCPM nicht überein. Eine 48-KByte-Version sollte immer dann konstruiert werden, wenn der Drucker und die Floppy am seriellen Bus angeschlossen ist. Für das Arbeiten mit einem IEEE-Interface muß man aber eine 44-KByte-CP/M-Version benutzen.</li>
+<li><b>DDT</b>. Diese sehr wichtige Routine dient der Kontrolle neuer Programme, deren sicheres »Laufen« noch ungewiß ist. Im einzelnen lassen sich damit Dateien lesen, Speicherinhalte anschauen und verändern sowie das Programmverhalten untersuchen.</li>
+<li><b>SUBMIT</b> Ein Programm, das für oft wiederkehrende Aufgabenstellungen sehr nützlich sein kann. Die Formulierung der Aufgabe mit dem Editor (ED) ist ausreichend; die Abarbeitung der Befehle wird dem Computer überlassen. Eine noch höhere Automatisierung ist mit dem Programm XSUB zu erreichen. Damit ist es möglich, die aufgerufenen Programme durch die Aufgabendatei zu bedienen.</li>
+<li><b>ED</b> Der Editor, ein unglaublich vielfältiges Programm, das beim Arbeiten mit CP/M oft gebraucht wird. Mit dem Editor ist es möglich, dem Computer Zeichen einzugeben, ohne daß diese als Befehl aufgefaßt und sofort ausgeführt werden. So ist beispielsweise eine einfache Textverarbeitung mit dem Editor möglich. Aber auch zur Erstellung, Veränderung und Korrektur von Programmen ist er einsetzbar.</li>
+<li><b>SYSGEN</b> ist ein Dienstprogramm mit dem sich das Betriebssystem auf jede formatierte Diskette überspielen läßt.</li>
+<li><b>CONFIG</b> dient der Zusammenstellung der Hardwarekonfiguration. Es kann gewählt werden zwischen den folgenden Einstellungsmöglichkeiten: Anzahl der Laufwerke, Druckertyp, Schriftmodus und Belegung der Funktionstasten.</li>
+<li><b>DUMP</b> zeigt den Inhalt einer Datei in den binären Werten seiner Bytes. (Hexdump).</li>
+<li><b>PIP</b> unterstützt den Datenaustausch mit den angeschlossenen Peripheriegeräten, wie dem Drucker, der Floppy und als Überbleibsel aus der Entstehungszeit von CP/M, mit Lochstreifenlesern und Fernschreibern. So können Dateien ausgedruckt oder kopiert werden; auch läßt sich aus mehreren Einzeldateien eine neue kreieren.</li>
+<li><b>COPY</b> ist ein speziell für Commodore hinzugefügtes Diskettenhilfsprogramm. Mit COPY lassen sich Disketten formatieren und kopieren. Der Backup einer gesamten Diskette dauert (auch mit zwei Laufwerken) immer noch zirka 15 Minuten.</li>
+<li><b>ASM</b> ist ein Assembler, mit dem sich in mnemonischer Schreibweise verfaßte Programme übersetzen lassen. Neben ASM wird hierzu auch das Programm LOAD verwendet, das die durch das Assemblieren entstandene HEX Datei in eine COM Datei umwandelt. Durch diesen Prozeß werden die Daten so aufbereitet, daß sie direkt aufrufbar sind und ausgeführt werden können.</li>
+</ol>
+
+
+<p>Eigentlich eine ganze Menge, was eine Systemdiskette alles ermöglicht: einfache Textverarbeitung, Programmierung und Datenübertragung, wenn auch in einer unkomfortablen Form. Würde man vergleichbare Programme für den Commodore 64 kaufen, um mit ihm in seiner eigenen Sprache zu kommunizieren, müßte man wahrscheinlich mehr ausgeben als für das CP/M-Modul. So gesehen lohnt sich die Anschaffung auf jeden Fall.</p>
+
+<p>(Arnd Wängler)</p>
+
