@@ -1,245 +1,272 @@
-<h1>Reise durch die Wunderwelt der Grafik (Teil 4)</h1>
+<!DOCTYPE html>
+<html lang="de">
 
-<p class="intro">Nachdem in den ersten drei Folgen unseres Grafikkurses alle Grundlagen geschaffen wurden, nähern wir uns endlich mit Riesenschritten unserem Ziel: Die hochauflösende Grafik des Commodore 64, die von uns endlich aus ihrem Dornröschenschlaf geweckt wurde, gezielt in unseren Basic-Programmen einzusetzen. Die nötigen Hilfsmittel, wie zum Beispiel eine kleine Bibliothek von Grafik-Unterprogrammen, werden in dieser Folge vorgestellt.</p>
+<head>
+    <title>XXX</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="XXX">
+    <meta name="64er.issue" content="7/84">
+    <meta name="64er.pages" content="XXX">
+    <meta name="64er.head1" content="XXX">
+    <meta name="64er.head2" content="XXX">
+    <meta name="64er.toc_title" content="XXX">
+    <meta name="64er.toc_category" content="XXX">
+    <meta name="64er.index_title" content="XXX">
+    <meta name="64er.index_category" content="XXX">
+    <meta name="64er.id" content="xxx">
+</head>
 
-<p>Sie können bisher Zeichen im Mehrfarbenmodus und (aber nicht gleichzeitig) mit veränderten Hintergrundfarben darstellen. Das Prinzip der Bit-Map ist Ihnen vertraut und Sie wissen, wie man dem Computer sagt, daß er nun seine Bildschirminformationen aus dieser Bit-Map holt. Sie können in diesem Modus die Farben bestimmen und schließlich auch Punkte exakt in die Bit-Map setzen. Wenn Ihnen der Inhalt der Bit-Map nicht mehr gefällt, können Sie sie löschen.</p>
+<body>
+    <article>
+        <h1>Reise durch die Wunderwelt der Grafik (Teil 4)</h1>
 
-<p>In dieser vierten Folge werden wir lernen, wie man die Speicher des Commodore 64 für Grafikanwendungen umkrempelt. Wir werden »Dornröschen« in mehreren Farben erleben und schließen diesen Teil der hochauflösenden Grafik mit einer kleinen Unterprogrammbibliothek ab. Der einleitenden Worte sind genug gesagt, Dornröschen wartet.</p>
+        <p class="intro">Nachdem in den ersten drei Folgen unseres Grafikkurses alle Grundlagen geschaffen wurden, nähern wir uns endlich mit Riesenschritten unserem Ziel: Die hochauflösende Grafik des Commodore 64, die von uns endlich aus ihrem Dornröschenschlaf geweckt wurde, gezielt in unseren Basic-Programmen einzusetzen. Die nötigen Hilfsmittel, wie zum Beispiel eine kleine Bibliothek von Grafik-Unterprogrammen, werden in dieser Folge vorgestellt.</p>
 
-<h2>Wir krempeln den Commodore 64 um: Speicherveränderungen für hochauflösende Grafik</h2>
+        <p>Sie können bisher Zeichen im Mehrfarbenmodus und (aber nicht gleichzeitig) mit veränderten Hintergrundfarben darstellen. Das Prinzip der Bit-Map ist Ihnen vertraut und Sie wissen, wie man dem Computer sagt, daß er nun seine Bildschirminformationen aus dieser Bit-Map holt. Sie können in diesem Modus die Farben bestimmen und schließlich auch Punkte exakt in die Bit-Map setzen. Wenn Ihnen der Inhalt der Bit-Map nicht mehr gefällt, können Sie sie löschen.</p>
 
-<p>Wenn Sie als stolzer Besitzer eines C 64 früher auch mal ebenso stolzer Besitzer eines VC 20 waren, dann ist Ihnen sicherlich in wehmütiger Erinnerung, was Sie sehen, wenn Sie durch die POKE-Kommandos<br>
-POKE 51,255:POKE 52, 31:POKE 55,255:POKE 56,31<br>
-in der letzten Folge die Bit-Map vor dem Überschreiben durch Basic geschützt haben und dann mal mit PRINT FRE (1) nach dem freien Basic-Speicher fragten: Da zeigte sich: 6144 (ohne Programm)!</p>
+        <p>In dieser vierten Folge werden wir lernen, wie man die Speicher des Commodore 64 für Grafikanwendungen umkrempelt. Wir werden »Dornröschen« in mehreren Farben erleben und schließen diesen Teil der hochauflösenden Grafik mit einer kleinen Unterprogrammbibliothek ab. Der einleitenden Worte sind genug gesagt, Dornröschen wartet.</p>
 
-<p>Geht das Ringen um jedes Byte nun wieder los? Wie soll denn in diese 6 KByte ein besseres Spiel mit Hochauflösungsgrafik — ganz zu schweigen von anspruchsvolleren Programmen, zum Beispiel einer Kurvendiskussion — hineinpassen? Nun, keine Sorge: Wozu haben wir im C 64 denn 64 KByte RAM? Wir müßten nur wissen, wie wir sie nutzen können.</p>
+        <h2>Wir krempeln den Commodore 64 um: Speicherveränderungen für hochauflösende Grafik</h2>
 
-<p>Dazu sehen wir uns nochmal den VIC-II-Chip an. Im Gegensatz zur CPU (unserem Prozessor 6510), die über 16 Adressenleitungen verfügen kann, stehen beim VIC-II-Chip lediglich 14 zur Disposition. Während man also mit 16 Leitungen alle Adressen<br>
-von 0 bis 1111 1111 1111 1111 = 65535<br>
-ansteuern kann, ist bei 14 Leitungen ein Maximum<br>
-von 11 1111 1111 1111 = 16383Adressen möglich, also 16 KByte.</p>
+        <p>Wenn Sie als stolzer Besitzer eines C 64 früher auch mal ebenso stolzer Besitzer eines VC 20 waren, dann ist Ihnen sicherlich in wehmütiger Erinnerung, was Sie sehen, wenn Sie durch die POKE-Kommandos<br>
+            POKE 51,255:POKE 52, 31:POKE 55,255:POKE 56,31<br>
+            in der letzten Folge die Bit-Map vor dem Überschreiben durch Basic geschützt haben und dann mal mit PRINT FRE (1) nach dem freien Basic-Speicher fragten: Da zeigte sich: 6144 (ohne Programm)!</p>
 
-<p>Der gesamte Speicherraum des C 64 ist in vier solche 16 KByte-Blöcke aufteilbar und wie wir wissen, blickt der VIC-II-Chip im Normalfall auf den ersten 16 KByte-Block (siehe Bild 1). Nun kann man dem VIC-II-Chip mitteilen, daß er seine Aufmerksamkeit auf die anderen Speicherviertel richten möge. Das erfordert die Mitarbeit des »Portiers« CIA 2 (siehe Folge 1). Er hat im Gebäude 56576 zwei Zimmer (Bits 0 und 1), aus denen dem VIC-II-Chip die Anweisungen gegeben werden, um welches Viertel unseres Speichers er sich kümmern soll. Auf welche Weise diese Bits den VIC-II-Chip-Zugriff regeln, sehen Sie aus Tabelle 1.</p>
+        <p>Geht das Ringen um jedes Byte nun wieder los? Wie soll denn in diese 6 KByte ein besseres Spiel mit Hochauflösungsgrafik — ganz zu schweigen von anspruchsvolleren Programmen, zum Beispiel einer Kurvendiskussion — hineinpassen? Nun, keine Sorge: Wozu haben wir im C 64 denn 64 KByte RAM? Wir müßten nur wissen, wie wir sie nutzen können.</p>
 
-<p>Commodore empfiehlt nun noch sicherzustellen, daß die zu dieser Abschnittsauswahl gehörigen Bits des Datenrichtungsregisters Port A im CIA 2 (Speicherstelle 56578) auf 1, also auf Ausgabe, gestellt werden. In allen Programmen, die ich bisher verwendet habe, wäre das eigentlich nicht nötig gewesen, jedenfalls habe ich nichts bemerkt, als ich das nicht getan habe.</p>
+        <p>Dazu sehen wir uns nochmal den VIC-II-Chip an. Im Gegensatz zur CPU (unserem Prozessor 6510), die über 16 Adressenleitungen verfügen kann, stehen beim VIC-II-Chip lediglich 14 zur Disposition. Während man also mit 16 Leitungen alle Adressen<br>
+            von 0 bis 1111 1111 1111 1111 = 65535<br>
+            ansteuern kann, ist bei 14 Leitungen ein Maximum<br>
+            von 11 1111 1111 1111 = 16383Adressen möglich, also 16 KByte.</p>
 
-<p>Trotzdem gebe ich hier diese Empfehlung weiter, falls in Ihren Programmen diese Maßnahme notwendig wird. Falls Sie vergessen haben sollten (Folge 2), wie man Bits setzt oder löscht, hier die nötigen Programmzeilen dazu:<br>
-20 POKE 56576, (PEEK(56576) AND 252) OR I<br>
-30 POKE 56578, PEEK(56578) OR 3</p>
+        <p>Der gesamte Speicherraum des C 64 ist in vier solche 16 KByte-Blöcke aufteilbar und wie wir wissen, blickt der VIC-II-Chip im Normalfall auf den ersten 16 KByte-Block (siehe Bild 1). Nun kann man dem VIC-II-Chip mitteilen, daß er seine Aufmerksamkeit auf die anderen Speicherviertel richten möge. Das erfordert die Mitarbeit des »Portiers« CIA 2 (siehe Folge 1). Er hat im Gebäude 56576 zwei Zimmer (Bits 0 und 1), aus denen dem VIC-II-Chip die Anweisungen gegeben werden, um welches Viertel unseres Speichers er sich kümmern soll. Auf welche Weise diese Bits den VIC-II-Chip-Zugriff regeln, sehen Sie aus Tabelle 1.</p>
 
-<p>I ist dabei der in Tabelle 1 gezeigte Dezimalwert der Bits 0 und 1.</p>
+        <p>Commodore empfiehlt nun noch sicherzustellen, daß die zu dieser Abschnittsauswahl gehörigen Bits des Datenrichtungsregisters Port A im CIA 2 (Speicherstelle 56578) auf 1, also auf Ausgabe, gestellt werden. In allen Programmen, die ich bisher verwendet habe, wäre das eigentlich nicht nötig gewesen, jedenfalls habe ich nichts bemerkt, als ich das nicht getan habe.</p>
 
-<p>Der VIC-II-Chip managt auch den Bildschirm. Im Einschaltzustand packt er den Bildschirmspeicher — wie wir schon wissen — in den Bereich 1024 und 2023. Wenn wir nun einen anderen 16 KByte-Abschnitt wählen, legt er den Bildschirm an die entsprechende Stelle dieses Abschnittes, also:<br>
-In Abschnitt 0: Bildschirm von 1024 bis 2023<br>
-in Abschnitt 1: Bildschirm von 16384 + 1024 = 17408<br>
-bis 16384 + 2023 = 18407<br>
-in Abschnitt 2: Bildschirm von 32768 + 1024 = 33792<br>
-bis 32768 + 2023 = 34791<br>
-in Abschnitt 3: Bildschirm von 49152 + 1024 = 50176<br>
-bis 49152 + 2023 = 51175.</p>
+        <p>Trotzdem gebe ich hier diese Empfehlung weiter, falls in Ihren Programmen diese Maßnahme notwendig wird. Falls Sie vergessen haben sollten (Folge 2), wie man Bits setzt oder löscht, hier die nötigen Programmzeilen dazu:<br>
+            20 POKE 56576, (PEEK(56576) AND 252) OR I<br>
+            30 POKE 56578, PEEK(56578) OR 3</p>
 
-<p>Damit brauchen wir uns aber nicht zufrieden geben.</p>
+        <p>I ist dabei der in Tabelle 1 gezeigte Dezimalwert der Bits 0 und 1.</p>
 
-<h2>Multivisio — unter 64 Bildschirm wählen</h2>
+        <p>Der VIC-II-Chip managt auch den Bildschirm. Im Einschaltzustand packt er den Bildschirmspeicher — wie wir schon wissen — in den Bereich 1024 und 2023. Wenn wir nun einen anderen 16 KByte-Abschnitt wählen, legt er den Bildschirm an die entsprechende Stelle dieses Abschnittes, also:<br>
+            In Abschnitt 0: Bildschirm von 1024 bis 2023<br>
+            in Abschnitt 1: Bildschirm von 16384 + 1024 = 17408<br>
+            bis 16384 + 2023 = 18407<br>
+            in Abschnitt 2: Bildschirm von 32768 + 1024 = 33792<br>
+            bis 32768 + 2023 = 34791<br>
+            in Abschnitt 3: Bildschirm von 49152 + 1024 = 50176<br>
+            bis 49152 + 2023 = 51175.</p>
 
-<p>Im 16 KByte-Speicherabschnitt hat der Bildschirmspeicher ja 16mal Platz und wir können ihn ohne weiteres an eine andere Stelle schieben. Damit kehren wir nochmal zur schon oft besungenen Speicherstelle 53272 zurück. Die Bits 4 bis 7 geben dem VIC-II-Chip den Ort des Bildschirmspeichers an. Durch Verändern dieser 4 Bits können wir tatsächlich die 16 Bildschirme pro 16 KByte-Abschnitt einrichten. Der Zusammenhang zwischen den Bits 4 bis 7 von Adresse 53272 und dem Ort des Bildschirmspeichers im Abschnitt 0 (und entsprechend parallelverschoben in den anderen Abschnitten) ist in Tabelle 2 gezeigt.<br>
-Um die entsprechende Bitanordnung zu erreichen, müssen wir also eingeben:<br>
-40 POKE 53272, (PEEK(53272) AND 15) OR W<br>
-Dabei ist W der Dezimalwert der Bits 4 bis 7 aus Tabelle 2.</p>
+        <p>Damit brauchen wir uns aber nicht zufrieden geben.</p>
 
-<p>Das Betriebssystem muß auch noch erfahren, daß der Bildschirmspeicher verlegt worden ist. Man kann es ihm mitteilen, indem man die Pagenummer der Bildschirmstartadresse in Speicherstelle 648 einPOKEd. Also ist zum Beispiel der normale Inhalt von Speicher 648: 1024/256 = 4. Auf Page 4 beginnt der Bildschirm ja im Einschaltzustand. Die Pagenummer ergibt sich aus I und W (siehe Tabelle 1 und 2) durch folgende Rechnung:<br>
-50P = (W/16<em>1024 + 16384</em>(3-I))/256<br>
-und wird dann eingePOKEd:<br>
-55 POKE 648,P<br>
-So! Jetzt können wir theoretisch 64 Bildschirme erzeugen. Um uns das in der Praxis mal anzusehen, ergänzen wir die bisher verwendeten Programmzeilen (die Sie hoffentlich noch nicht mit RUN gestartet haben, das wäre nämlich mit etwas Glück eine gute Methode, den Rechner abstürzen zu lassen!) noch um folgendes:<br>
-10INPUT"I,W";I,W:PRINTCHR$(147)<br>
-60 PRINT CHR$(147)I,W:END<br>
-65 PRINT CHR$(147)<br>
-70 POKE 56576,151:POKE 56578,63: POKE 53272,21:POKE 648,4<br>
-80 I = 3:W=16:PRINT CHR$(147)I,W<br>
-90 END</p>
+        <h2>Multivisio — unter 64 Bildschirm wählen</h2>
 
-<p>Bevor Sie das starten, sollten Sie bitten daran denken, daß einige I,W-Kombinationen den Computer zum totalen Black-Out führen: Zum Beispiel I = 3,W= 0 legt den Bildschirmstart direkt in die Zeropage, ist also nicht empfehlenswert. I = 3 ,W = 32 zerstört unser Programm, das genau bei 2048 anfängt. Am besten speichern Sie das Programm vor dem Starten ab.</p>
+        <p>Im 16 KByte-Speicherabschnitt hat der Bildschirmspeicher ja 16mal Platz und wir können ihn ohne weiteres an eine andere Stelle schieben. Damit kehren wir nochmal zur schon oft besungenen Speicherstelle 53272 zurück. Die Bits 4 bis 7 geben dem VIC-II-Chip den Ort des Bildschirmspeichers an. Durch Verändern dieser 4 Bits können wir tatsächlich die 16 Bildschirme pro 16 KByte-Abschnitt einrichten. Der Zusammenhang zwischen den Bits 4 bis 7 von Adresse 53272 und dem Ort des Bildschirmspeichers im Abschnitt 0 (und entsprechend parallelverschoben in den anderen Abschnitten) ist in Tabelle 2 gezeigt.<br>
+            Um die entsprechende Bitanordnung zu erreichen, müssen wir also eingeben:<br>
+            40 POKE 53272, (PEEK(53272) AND 15) OR W<br>
+            Dabei ist W der Dezimalwert der Bits 4 bis 7 aus Tabelle 2.</p>
 
-<p>Jeweils nach RUN und Eingabe der Werte I und W, zum Beispiel I = 3, W = 48, wird der Bildschirm gelöscht und in der obersten Zeile wird der I- und der W-Wert angegeben. Danach meldet sich READY und ein Cursor. Jetzt befinden wir uns im neuen Bildschirm (unser Beispiel also 3072 bis 4071) und können damit herumexperimentieren.</p>
+        <p>Das Betriebssystem muß auch noch erfahren, daß der Bildschirmspeicher verlegt worden ist. Man kann es ihm mitteilen, indem man die Pagenummer der Bildschirmstartadresse in Speicherstelle 648 einPOKEd. Also ist zum Beispiel der normale Inhalt von Speicher 648: 1024/256 = 4. Auf Page 4 beginnt der Bildschirm ja im Einschaltzustand. Die Pagenummer ergibt sich aus I und W (siehe Tabelle 1 und 2) durch folgende Rechnung:<br>
+            50P = (W/16<em>1024 + 16384</em>(3-I))/256<br>
+            und wird dann eingePOKEd:<br>
+            55 POKE 648,P<br>
+            So! Jetzt können wir theoretisch 64 Bildschirme erzeugen. Um uns das in der Praxis mal anzusehen, ergänzen wir die bisher verwendeten Programmzeilen (die Sie hoffentlich noch nicht mit RUN gestartet haben, das wäre nämlich mit etwas Glück eine gute Methode, den Rechner abstürzen zu lassen!) noch um folgendes:<br>
+            10INPUT"I,W";I,W:PRINTCHR$(147)<br>
+            60 PRINT CHR$(147)I,W:END<br>
+            65 PRINT CHR$(147)<br>
+            70 POKE 56576,151:POKE 56578,63: POKE 53272,21:POKE 648,4<br>
+            80 I = 3:W=16:PRINT CHR$(147)I,W<br>
+            90 END</p>
 
-<h2>Bildschirm-Experimente</h2>
+        <p>Bevor Sie das starten, sollten Sie bitten daran denken, daß einige I,W-Kombinationen den Computer zum totalen Black-Out führen: Zum Beispiel I = 3,W= 0 legt den Bildschirmstart direkt in die Zeropage, ist also nicht empfehlenswert. I = 3 ,W = 32 zerstört unser Programm, das genau bei 2048 anfängt. Am besten speichern Sie das Programm vor dem Starten ab.</p>
 
-<p>Wenn wir jetzt (falls keine Programmänderung in der Zwischenzeit durchgeführt wurde) CONT eingeben, wird der Ursprungszustand (Bildschirm bei 1024) wieder hergestellt und dies durch die Angabe der I- und W-Werte 3 und 16 angezeigt.</p>
+        <p>Jeweils nach RUN und Eingabe der Werte I und W, zum Beispiel I = 3, W = 48, wird der Bildschirm gelöscht und in der obersten Zeile wird der I- und der W-Wert angegeben. Danach meldet sich READY und ein Cursor. Jetzt befinden wir uns im neuen Bildschirm (unser Beispiel also 3072 bis 4071) und können damit herumexperimentieren.</p>
 
-<p>Wenn Sie mit diesem Programm in den Bereich 4096 bis 8191 vorstoßen, werden Sie feststellen, daß hier kein normaler Bildschirm möglich ist. Hier stören die mehrfach schon beschworenen Geisterbilder des Zeichen-ROM, die in diesem Bereich liegen. Es kann sogar passieren, daß der Rechner nach der Eingabe von CONT nur noch SYNTAX ERRORs meldet und nicht mehr in den Normalzustand zurückzuführen ist. Ab 8192 bis 15360 (jeweils Start des Bildschirmes) kann man wieder ohne Störung Bildschirme einrichten. Wenn Sie jetzt mal I = 2 und verschiedene W-Werte versuchen, sehen Sie nur Nonsens oder gar nichts auf dem Bildschirm, dasselbe geschieht bei I = 0.</p>
+        <h2>Bildschirm-Experimente</h2>
 
-<p>Das ist wieder eine Besonderheit des VIC-II-Chip. Er ist so strukturiert, daß der (im Normalfall) in diesen beiden Abschnitten keinen Zugang zu den normalen Zeichenspeichern hat. Dafür gibt es in Abschnitt 1 (I = 2) keine Störung durch die Zeichen-Geisterbilder, ebenso in Abschnitt 3 (I = 0). In Abschnitt 2 (I = 1) begegnen wir zwischen 36864 und 40959 wieder den hier ein zweites Mal vorhandenen Zeichen-Gespenstern. Unterhalb von 36864 läßt sich der neue Bildschirm gut verwenden.</p>
+        <p>Wenn wir jetzt (falls keine Programmänderung in der Zwischenzeit durchgeführt wurde) CONT eingeben, wird der Ursprungszustand (Bildschirm bei 1024) wieder hergestellt und dies durch die Angabe der I- und W-Werte 3 und 16 angezeigt.</p>
 
-<h2>Der verborgene Speicher — RAM-Bereiche unter dem ROM</h2>
+        <p>Wenn Sie mit diesem Programm in den Bereich 4096 bis 8191 vorstoßen, werden Sie feststellen, daß hier kein normaler Bildschirm möglich ist. Hier stören die mehrfach schon beschworenen Geisterbilder des Zeichen-ROM, die in diesem Bereich liegen. Es kann sogar passieren, daß der Rechner nach der Eingabe von CONT nur noch SYNTAX ERRORs meldet und nicht mehr in den Normalzustand zurückzuführen ist. Ab 8192 bis 15360 (jeweils Start des Bildschirmes) kann man wieder ohne Störung Bildschirme einrichten. Wenn Sie jetzt mal I = 2 und verschiedene W-Werte versuchen, sehen Sie nur Nonsens oder gar nichts auf dem Bildschirm, dasselbe geschieht bei I = 0.</p>
 
-<p>Ein Problem stellt sich hier und auch im obersten Abschnitt aber noch auf andere Weise: Wenn wir den Bildschirm zum Beispiel mit I = 1 und W=128 nach 40960 legen (tun Sie es bitte nicht!), dann erhalten wir bei jeder Eingabe nur noch »SYNTAX ERRORs« und können den Computer nur durch Aus- und Einschalten wieder zu normaler Tätigkeit bewegen. Was ist da los? Die Erklärung ist, daß von 40960 bis 49151 das Basic-ROM und von 57344 bis 65535 das Betriebssystem dem RAM überlagert sind. Wenn man in diese Regionen hineinPOKEd, landet die Information natürlich im darunterliegenden RAM. Das was auf dem Bildschirm erscheint wenn wir aus dem Programm-Modus aussteigen, ist allerdings — leider — der Inhalt des darüberliegenden ROM. Ersetzen Sie aber mal das »END« in Zeile 60 durch die folgenden Zeilen:<br>
-60 PRINT CHR$(147)I,W:PRINT" BILDSCHIRM LIEGT UNTER DEM ROM«<br>
-65 GET A$:IF A$ = ” ”THEN 65<br>
-Siehe da! Es funktioniert also im Programm-Modus (zum Beispiel mit I = 1 und W= 128). Wir können daher unter das Basic-ROM auf diese Weise acht Bildschirme legen. Unter das Betriebssystem lassen sich so auch Bildschirme legen, nur können wir hier den Text nicht lesen, weil der VIC-II-Chip — wie gesagt — hier keinen Zugriff zum Zeichen-ROM hat. So legt zum Beispiel I = 0 und W=240 den Bildschirm nach 64512, was leicht nachprüfbar ist durch die Zeile:<br>
-62 POKE 65000, 1:POKE 55784,1.</p>
+        <p>Das ist wieder eine Besonderheit des VIC-II-Chip. Er ist so strukturiert, daß der (im Normalfall) in diesen beiden Abschnitten keinen Zugang zu den normalen Zeichenspeichern hat. Dafür gibt es in Abschnitt 1 (I = 2) keine Störung durch die Zeichen-Geisterbilder, ebenso in Abschnitt 3 (I = 0). In Abschnitt 2 (I = 1) begegnen wir zwischen 36864 und 40959 wieder den hier ein zweites Mal vorhandenen Zeichen-Gespenstern. Unterhalb von 36864 läßt sich der neue Bildschirm gut verwenden.</p>
 
-<p>Damit wenden wir uns nun dem kritischen Bereich zwischen 53248 und 57343 zu. Hier liegen ja das Zeichen-ROM und die Ein- und Ausgabebausteine. Normalerweise — wie man auch durch unsere POKE in diesen Bereich erkennen kann — sind hier die Ein- und Ausgabe- Bausteine eingeschaltet. Wenn wir hierher Bildschirme legen, kann alles mögliche passieren, weil wir Register des VIC-II-Chip, des SID und CIAs beeinflussen. Hier sollte man mit viel Vorsicht und gegebenenfalls nur in Maschinensprache operieren.</p>
+        <h2>Der verborgene Speicher — RAM-Bereiche unter dem ROM</h2>
 
-<p>Was wir durch die Programmzeile 62 noch erkennen können: Das Bildschirmfarben-RAM verschiebt sich nicht, egal, welches Speicherviertel wir wählen und wohin wir den Bildschirm auch legen: Das Farb-RAM liegt immer von 55296 bis 56295.</p>
+        <p>Ein Problem stellt sich hier und auch im obersten Abschnitt aber noch auf andere Weise: Wenn wir den Bildschirm zum Beispiel mit I = 1 und W=128 nach 40960 legen (tun Sie es bitte nicht!), dann erhalten wir bei jeder Eingabe nur noch »SYNTAX ERRORs« und können den Computer nur durch Aus- und Einschalten wieder zu normaler Tätigkeit bewegen. Was ist da los? Die Erklärung ist, daß von 40960 bis 49151 das Basic-ROM und von 57344 bis 65535 das Betriebssystem dem RAM überlagert sind. Wenn man in diese Regionen hineinPOKEd, landet die Information natürlich im darunterliegenden RAM. Das was auf dem Bildschirm erscheint wenn wir aus dem Programm-Modus aussteigen, ist allerdings — leider — der Inhalt des darüberliegenden ROM. Ersetzen Sie aber mal das »END« in Zeile 60 durch die folgenden Zeilen:<br>
+            60 PRINT CHR$(147)I,W:PRINT" BILDSCHIRM LIEGT UNTER DEM ROM«<br>
+            65 GET A$:IF A$ = ” ”THEN 65<br>
+            Siehe da! Es funktioniert also im Programm-Modus (zum Beispiel mit I = 1 und W= 128). Wir können daher unter das Basic-ROM auf diese Weise acht Bildschirme legen. Unter das Betriebssystem lassen sich so auch Bildschirme legen, nur können wir hier den Text nicht lesen, weil der VIC-II-Chip — wie gesagt — hier keinen Zugriff zum Zeichen-ROM hat. So legt zum Beispiel I = 0 und W=240 den Bildschirm nach 64512, was leicht nachprüfbar ist durch die Zeile:<br>
+            62 POKE 65000, 1:POKE 55784,1.</p>
 
-<h2>Wohin mit der Bit-Map?</h2>
+        <p>Damit wenden wir uns nun dem kritischen Bereich zwischen 53248 und 57343 zu. Hier liegen ja das Zeichen-ROM und die Ein- und Ausgabebausteine. Normalerweise — wie man auch durch unsere POKE in diesen Bereich erkennen kann — sind hier die Ein- und Ausgabe- Bausteine eingeschaltet. Wenn wir hierher Bildschirme legen, kann alles mögliche passieren, weil wir Register des VIC-II-Chip, des SID und CIAs beeinflussen. Hier sollte man mit viel Vorsicht und gegebenenfalls nur in Maschinensprache operieren.</p>
 
-<p>Nun aber zum großen Speicherfresser: Zur Bit-Map. Mit ihren 8000 Byte paßt sie im Prinzip achtmal in unseren Computer. Im ersten Viertel (0 bis 16383) haben wir sie schon gehabt und das als unbefriedigend empfunden. Nun wollen wir uns andere Möglichkeiten ansehen und dabei noch bedenken, daß wir auf den normalen Zeichensatz verzichten können (wir stellen ja hochauflösende Grafik dar!). Zu diesem Zweck werden wir das bisher verwendete Bildschirmtestprogramm um einen Hochauflösungsteil erweitern (Listing 1). Um die leidige Eintipperei minimal zu halten, wurde auf Schönheit und erläuternde REM-Zeilen verzichtet. Der Hochauflösungsteil stimmt weitgehend mit dem Programm aus der letzten Folge überein. Geben Sie also jetzt das Listing 1 ein, speichern Sie es möglichst gleich ab und probieren Sie es aus.</p>
+        <p>Was wir durch die Programmzeile 62 noch erkennen können: Das Bildschirmfarben-RAM verschiebt sich nicht, egal, welches Speicherviertel wir wählen und wohin wir den Bildschirm auch legen: Das Farb-RAM liegt immer von 55296 bis 56295.</p>
 
-<p>In Bild 2 sind alle möglichen Positionen der Bit-Map und des Bildschirmes angegeben.</p>
+        <h2>Wohin mit der Bit-Map?</h2>
 
-<p>Wie man sehen kann, scheiden die Kombinationen Nummer 1 und Nummer 7 von vornherein aus, weil wir mit dem Löschen der Bit-Map auch das Lebenslicht unseres Rechners ausblasen. Die Kombination Nummer 2 kennen wir schon: So haben wir in der letzten Folge hochauflösende Grafik betrieben und waren enttäuscht über den geringen verbliebenen Basic-Speicher. Bei Nummer 5 funken uns die Zeichen-Spiegelbilder in die Bit-Map, diese Kombination scheidet also auch aus. Nett sieht es aus, wenn wir die Kombinationen Nummer 6 und Nummer 8 testen. Hier machen sich die ROM-Inhalte grafisch zwar ganz interessant aus, aber mit dem Sinn unserer hochauflösenden Grafik hat das nichts mehr zu tun. Für uns brauchbar sind die Positionen im Abschnitt 1: Kombinationen Nummer 3 und Nummer 4. Ein Maximum an Basic-Speicher findet man bei der letzten gezeigten Kombination Nummer 9, wo ab 23552 der Bildschirm und ab 24576 die Bit-Map liegen. Wenn Sie den Basic-Speicher für diese Anordnung schützen, mit POKE 55,0:POKE 56,92:POKE 52,92 und den Computer dann mit PRINT FRE(I) nach dem freien Speicherplatz fragen, dann erhalten Sie als Antwort immerhin satte 21501 freie Byte.</p>
+        <p>Nun aber zum großen Speicherfresser: Zur Bit-Map. Mit ihren 8000 Byte paßt sie im Prinzip achtmal in unseren Computer. Im ersten Viertel (0 bis 16383) haben wir sie schon gehabt und das als unbefriedigend empfunden. Nun wollen wir uns andere Möglichkeiten ansehen und dabei noch bedenken, daß wir auf den normalen Zeichensatz verzichten können (wir stellen ja hochauflösende Grafik dar!). Zu diesem Zweck werden wir das bisher verwendete Bildschirmtestprogramm um einen Hochauflösungsteil erweitern (Listing 1). Um die leidige Eintipperei minimal zu halten, wurde auf Schönheit und erläuternde REM-Zeilen verzichtet. Der Hochauflösungsteil stimmt weitgehend mit dem Programm aus der letzten Folge überein. Geben Sie also jetzt das Listing 1 ein, speichern Sie es möglichst gleich ab und probieren Sie es aus.</p>
 
-<p>Der Idealfall wäre es, wenn man die Bit-Map unter das ROM legen könnte (Kombinationen 6 oder 8). Das geht natürlich auch! Von Basic aus wird ein Programm dann allerdings noch langsamer, weil man für jeden Punkt ähnliche Operationen vornehmen müßte, wie wir sie in der zweiten Folge beim Kopieren des Zeichen-ROM ins RAM verwendet haben. Auch so ist die ganze Hochauflösungsgrafik schon ziemlich langsam. Wir werden aber in kommenden Folgen einige Routinen in Maschinensprache kennenlernen, die uns mehr Möglichkeiten eröffnen.</p>
+        <p>In Bild 2 sind alle möglichen Positionen der Bit-Map und des Bildschirmes angegeben.</p>
 
-<h2>Die Grafik bekennt Farbe: Der Bit-Map-Mehrfarben-Modus</h2>
+        <p>Wie man sehen kann, scheiden die Kombinationen Nummer 1 und Nummer 7 von vornherein aus, weil wir mit dem Löschen der Bit-Map auch das Lebenslicht unseres Rechners ausblasen. Die Kombination Nummer 2 kennen wir schon: So haben wir in der letzten Folge hochauflösende Grafik betrieben und waren enttäuscht über den geringen verbliebenen Basic-Speicher. Bei Nummer 5 funken uns die Zeichen-Spiegelbilder in die Bit-Map, diese Kombination scheidet also auch aus. Nett sieht es aus, wenn wir die Kombinationen Nummer 6 und Nummer 8 testen. Hier machen sich die ROM-Inhalte grafisch zwar ganz interessant aus, aber mit dem Sinn unserer hochauflösenden Grafik hat das nichts mehr zu tun. Für uns brauchbar sind die Positionen im Abschnitt 1: Kombinationen Nummer 3 und Nummer 4. Ein Maximum an Basic-Speicher findet man bei der letzten gezeigten Kombination Nummer 9, wo ab 23552 der Bildschirm und ab 24576 die Bit-Map liegen. Wenn Sie den Basic-Speicher für diese Anordnung schützen, mit POKE 55,0:POKE 56,92:POKE 52,92 und den Computer dann mit PRINT FRE(I) nach dem freien Speicherplatz fragen, dann erhalten Sie als Antwort immerhin satte 21501 freie Byte.</p>
 
-<p>Hochauflösende Grafik in Farbe: Kann das der C 64 überhaupt? Die Antwort lautet Ja und Nein. Ja, weil der bislang von uns verwendete Bit-Map-Modus anstelle der zwei bisher benutzten auch mit vier Farben ablaufen kann. Nein, weil die Punkteauflösung dann eigentlich nicht mehr die Bezeichnung »hochauflösend« verdient. Die horizontale Auflösung geschieht hier nämlich nur noch in 160 Positionen anstelle der bisher ansprechbaren 320. Meine persönliche Meinung dazu ist, ernsthafte hochauflösende Grafik sollte sich im bisher besprochenen Bit-Map-Modus abspielen, denn ein Bildschirm mit 64000 Bildpunkten ist schon eine Minimalanforderung. 32000 Bildschirmpositionen sind allenfalls für Spielereien ganz nett, wenn auch etwas teuer, denn ohne Farbmonitor haben Sie von der Farbe nicht viel und über den Unterschied zwischen Farbfernseher und Farbmonitor haben wir im Verlauf dieser Serie schon etwas erfahren.</p>
+        <p>Der Idealfall wäre es, wenn man die Bit-Map unter das ROM legen könnte (Kombinationen 6 oder 8). Das geht natürlich auch! Von Basic aus wird ein Programm dann allerdings noch langsamer, weil man für jeden Punkt ähnliche Operationen vornehmen müßte, wie wir sie in der zweiten Folge beim Kopieren des Zeichen-ROM ins RAM verwendet haben. Auch so ist die ganze Hochauflösungsgrafik schon ziemlich langsam. Wir werden aber in kommenden Folgen einige Routinen in Maschinensprache kennenlernen, die uns mehr Möglichkeiten eröffnen.</p>
 
-<p>Nach dieser etwas desillusionierenden Vorrede widmen wir uns also der mehrfarbigen Bit-Map-Grafik. Es handelt sich um eine Kombination aus der bisher bekannten Bit-Map-Grafik und dem Mehrfarben-Modus, den wir schon bei den mehrfarbigen Zeichen kennengelernt haben. Auf dem Bildschirm wird der Inhalt der Bit-Map wiedergegeben, aber die Farben der Zeichnungen sind abhängig von Bit-Paaren. Welche Farben Sie bei welcher Paarung sehen, darüber gibt Tabelle 3 Aufschluß.</p>
+        <h2>Die Grafik bekennt Farbe: Der Bit-Map-Mehrfarben-Modus</h2>
 
-<p>Es existiert also eine Hintergrundfarbe für den gesamten Bildschirm, die überall dort auftaucht, wo in der Bit-Map ein Bit-Paar 00 vorhanden ist. Diese Hintergrundfarbe ist durch den Zahlenwert in Register 53281 bestimmt. Die anderen drei Farben treten jeweils in den 8 x 8-Bit-Bildschirmfeldern auf, in die das Video-RAM, beziehungsweise der Bildschirmfarbspeicher aufgeteilt sind.</p>
+        <p>Hochauflösende Grafik in Farbe: Kann das der C 64 überhaupt? Die Antwort lautet Ja und Nein. Ja, weil der bislang von uns verwendete Bit-Map-Modus anstelle der zwei bisher benutzten auch mit vier Farben ablaufen kann. Nein, weil die Punkteauflösung dann eigentlich nicht mehr die Bezeichnung »hochauflösend« verdient. Die horizontale Auflösung geschieht hier nämlich nur noch in 160 Positionen anstelle der bisher ansprechbaren 320. Meine persönliche Meinung dazu ist, ernsthafte hochauflösende Grafik sollte sich im bisher besprochenen Bit-Map-Modus abspielen, denn ein Bildschirm mit 64000 Bildpunkten ist schon eine Minimalanforderung. 32000 Bildschirmpositionen sind allenfalls für Spielereien ganz nett, wenn auch etwas teuer, denn ohne Farbmonitor haben Sie von der Farbe nicht viel und über den Unterschied zwischen Farbfernseher und Farbmonitor haben wir im Verlauf dieser Serie schon etwas erfahren.</p>
 
-<p>Wir ergänzen unser Programm 1 für den Mehrfarben-Modus: Außer dem Bit-Map-Modus muß hier also noch der Mehrfarb-Modus eingeschaltet werden. Das haben wir in der letzten Folge kennengelernt: 145 POKE 53270,PEEK(53270) OR 16 Weiterhin ändern wir noch die Zeile 5 und schreiben anstelle von F=6 jetzt GOSUB 300. Folgende Zeilen kommen neu hinzu:<br>
-300 PRINT CHR$(147)CHR$(17)&ldquo; FARBENWAHL:”<br>
-310 PRINT CHR$ (17)"HINTER-GRUNDFARBE"TAB (30);:INPUT F0<br>
-320 PRINT "BITS 4-7 VIDEOMATRIX"TAB(30);:INPUT F1<br>
-330 PRINT "BITS 0-3 VIDEOMATRIX"TAB(30);:INPUT F2<br>
-340 PRINT ’’BILDSCHIRMFARBSPEICHER"TAB(30);:INPUT F3<br>
-350 POKE 53281,F0:F=16*Fl+F2: FOR I = 55296 TO 56295:POKE I,F: NEXTI<br>
-360 PRINT CHR$(147):RETURN</p>
+        <p>Nach dieser etwas desillusionierenden Vorrede widmen wir uns also der mehrfarbigen Bit-Map-Grafik. Es handelt sich um eine Kombination aus der bisher bekannten Bit-Map-Grafik und dem Mehrfarben-Modus, den wir schon bei den mehrfarbigen Zeichen kennengelernt haben. Auf dem Bildschirm wird der Inhalt der Bit-Map wiedergegeben, aber die Farben der Zeichnungen sind abhängig von Bit-Paaren. Welche Farben Sie bei welcher Paarung sehen, darüber gibt Tabelle 3 Aufschluß.</p>
 
-<p>Um des Effektes willen ändern wir noch die Zeile 220, in der die Videomatrix mit den Farbzahlen belegt wird:<br>
-220 FOR J = 0TO 998 STEP 2:POKE J,F:NEXT J:FOR J = lTO 999 STEP 2:POKE J,F+l:NEXTJ</p>
+        <p>Es existiert also eine Hintergrundfarbe für den gesamten Bildschirm, die überall dort auftaucht, wo in der Bit-Map ein Bit-Paar 00 vorhanden ist. Diese Hintergrundfarbe ist durch den Zahlenwert in Register 53281 bestimmt. Die anderen drei Farben treten jeweils in den 8 x 8-Bit-Bildschirmfeldern auf, in die das Video-RAM, beziehungsweise der Bildschirmfarbspeicher aufgeteilt sind.</p>
 
-<p>Starten Sie dieses Programm nach dem Abspeichern mit RUN, probieren Sie alle möglichen Farbkennzahlen aus. Sie werden fast immer bemerken, daß die Hoch- und Tiefpunkte der Kurve nicht mitgezeichnet werden. Das liegt daran, daß unter Verfahren der Berechnung, welches Bit in welchem Byte gesetzt werden soll, noch auf einzelne Bits und nicht die paarweise Verwendung abgestimmt ist. Es gibt zwei Möglichkeiten: Entweder ändert man das Berechnungsverfahren in Zeile 240, um an die richtige Stelle die passenden Bit-Paare zu bekommen, oder wir ändern die Programmzeile 230 zu:<br>
-230 FOR I = 0 TO 319 STEP 2:Y= FNA(X)</p>
+        <p>Wir ergänzen unser Programm 1 für den Mehrfarben-Modus: Außer dem Bit-Map-Modus muß hier also noch der Mehrfarb-Modus eingeschaltet werden. Das haben wir in der letzten Folge kennengelernt: 145 POKE 53270,PEEK(53270) OR 16 Weiterhin ändern wir noch die Zeile 5 und schreiben anstelle von F=6 jetzt GOSUB 300. Folgende Zeilen kommen neu hinzu:<br>
+            300 PRINT CHR$(147)CHR$(17)&ldquo; FARBENWAHL:”<br>
+            310 PRINT CHR$ (17)"HINTER-GRUNDFARBE"TAB (30);:INPUT F0<br>
+            320 PRINT "BITS 4-7 VIDEOMATRIX"TAB(30);:INPUT F1<br>
+            330 PRINT "BITS 0-3 VIDEOMATRIX"TAB(30);:INPUT F2<br>
+            340 PRINT ’’BILDSCHIRMFARBSPEICHER"TAB(30);:INPUT F3<br>
+            350 POKE 53281,F0:F=16*Fl+F2: FOR I = 55296 TO 56295:POKE I,F: NEXTI<br>
+            360 PRINT CHR$(147):RETURN</p>
 
-<p>Das ist zwar mal wieder etwas primitiv, aber — wie gesagt — sind meine Ambitionen zur Mehrfarben-»Hochauflösung« sowieso nicht so stark. Wer Lust hat, kann sich ja gerne mal mit der korrekten Weise der neuen Berechnungherumschlagen. Das Wissen, diese Aufgabe zu bewältigen, haben Sie jetzt. Auf dem Schwarzweiß-Monitor sieht zum Beispiel folgende Zahlenkombination ganz gut aus:<br>
-Hintergrundfarbe: 7<br>
-Bits 4 bis 7: 5<br>
-Bits 0 bis 3: 1<br>
-Bildschirmspeicher: 0<br>
-Außerdem natürlich noch: I = 2, W=112, B = 1.</p>
+        <p>Um des Effektes willen ändern wir noch die Zeile 220, in der die Videomatrix mit den Farbzahlen belegt wird:<br>
+            220 FOR J = 0TO 998 STEP 2:POKE J,F:NEXT J:FOR J = lTO 999 STEP 2:POKE J,F+l:NEXTJ</p>
 
-<p>Mit dem hier folgenden Abschnitt soll zunächst einmal die hochauflösende Grafik beiseite gelegt werden. Dornröschen ist erwacht und genesen, allerdings noch nicht voll bei Kräften. Das wird in einer späteren Folge noch anders werden. Davor wollen wir aber noch weitere Grafik-Besonderheiten des C 64 behandeln. An dieser Stelle wollen wir jedoch einen Zwischenhalt einlegen und eine kleine Sammlung von Basic-Unterprogrammen zur Grafik-Programmierung vorstellen. In Listing 2 sind diese Grafik-Unterprogramme, in Listing 3 ein Beispiel-Aufrufprogramm abgedruckt. Beim Eintippen beider Programme können Sie die REM-Zeilen ohne Schaden weglassen.</p>
+        <p>Starten Sie dieses Programm nach dem Abspeichern mit RUN, probieren Sie alle möglichen Farbkennzahlen aus. Sie werden fast immer bemerken, daß die Hoch- und Tiefpunkte der Kurve nicht mitgezeichnet werden. Das liegt daran, daß unter Verfahren der Berechnung, welches Bit in welchem Byte gesetzt werden soll, noch auf einzelne Bits und nicht die paarweise Verwendung abgestimmt ist. Es gibt zwei Möglichkeiten: Entweder ändert man das Berechnungsverfahren in Zeile 240, um an die richtige Stelle die passenden Bit-Paare zu bekommen, oder wir ändern die Programmzeile 230 zu:<br>
+            230 FOR I = 0 TO 319 STEP 2:Y= FNA(X)</p>
 
-<h3>Erläuterungen zu Listing 2 (Zeilenbereich 49990 bis 51500)</h3>
+        <p>Das ist zwar mal wieder etwas primitiv, aber — wie gesagt — sind meine Ambitionen zur Mehrfarben-»Hochauflösung« sowieso nicht so stark. Wer Lust hat, kann sich ja gerne mal mit der korrekten Weise der neuen Berechnungherumschlagen. Das Wissen, diese Aufgabe zu bewältigen, haben Sie jetzt. Auf dem Schwarzweiß-Monitor sieht zum Beispiel folgende Zahlenkombination ganz gut aus:<br>
+            Hintergrundfarbe: 7<br>
+            Bits 4 bis 7: 5<br>
+            Bits 0 bis 3: 1<br>
+            Bildschirmspeicher: 0<br>
+            Außerdem natürlich noch: I = 2, W=112, B = 1.</p>
 
-<h3>Sprungtabelle:</h3>
+        <p>Mit dem hier folgenden Abschnitt soll zunächst einmal die hochauflösende Grafik beiseite gelegt werden. Dornröschen ist erwacht und genesen, allerdings noch nicht voll bei Kräften. Das wird in einer späteren Folge noch anders werden. Davor wollen wir aber noch weitere Grafik-Besonderheiten des C 64 behandeln. An dieser Stelle wollen wir jedoch einen Zwischenhalt einlegen und eine kleine Sammlung von Basic-Unterprogrammen zur Grafik-Programmierung vorstellen. In Listing 2 sind diese Grafik-Unterprogramme, in Listing 3 ein Beispiel-Aufrufprogramm abgedruckt. Beim Eintippen beider Programme können Sie die REM-Zeilen ohne Schaden weglassen.</p>
 
-<p>Das ist in Basic im allgemeinen nicht üblich, sondern wird häufiger bei Maschinensprache-Programmen verwendet. Trotzdem hat es auch hier seine Vorteile. Es kann ja sein, daß Sie einige Änderungen oder Ergänzungen in den Unterprogrammen vornehmen wollen. Sie müßten dann auch immer die Adressen in den jeweils aufzurufenden Hauptprogrammen umschreiben. Mit der Sprungtabelle ist das nicht mehr nötig, denn die GOSUB-Adressen im Hauptprogramm bleiben unverändert, nur die neuen GOTO-Adressen im Unterprogramm sind einzusetzen.</p>
+        <h3>Erläuterungen zu Listing 2 (Zeilenbereich 49990 bis 51500)</h3>
 
-<h3>HIRES an</h3>
+        <h3>Sprungtabelle:</h3>
 
-<p>Hier machen wir uns die Erkenntnisse dieser Folge zunutze und legen den Bildschirm nach 23552 und die Bit-Map nach 24576. Beides müssen wir — wie gehabt — vor dem Überschreiben durch Basic schützen mit:<br>
-POKE 52,92:POKE 56,92.</p>
+        <p>Das ist in Basic im allgemeinen nicht üblich, sondern wird häufiger bei Maschinensprache-Programmen verwendet. Trotzdem hat es auch hier seine Vorteile. Es kann ja sein, daß Sie einige Änderungen oder Ergänzungen in den Unterprogrammen vornehmen wollen. Sie müßten dann auch immer die Adressen in den jeweils aufzurufenden Hauptprogrammen umschreiben. Mit der Sprungtabelle ist das nicht mehr nötig, denn die GOSUB-Adressen im Hauptprogramm bleiben unverändert, nur die neuen GOTO-Adressen im Unterprogramm sind einzusetzen.</p>
 
-<p>Am besten packt man diese POKE-Befehle gleich in die ersten Zeilen des aufrufenden Hauptprogramms.</p>
+        <h3>HIRES an</h3>
 
-<h3>Bit-Map-Löschen</h3>
+        <p>Hier machen wir uns die Erkenntnisse dieser Folge zunutze und legen den Bildschirm nach 23552 und die Bit-Map nach 24576. Beides müssen wir — wie gehabt — vor dem Überschreiben durch Basic schützen mit:<br>
+            POKE 52,92:POKE 56,92.</p>
 
-<p>Hierzu gibt es nichts mehr zu sagen, außer, daß I als Laufvariable dient.</p>
+        <p>Am besten packt man diese POKE-Befehle gleich in die ersten Zeilen des aufrufenden Hauptprogramms.</p>
 
-<h3>Farbgebung</h3>
+        <h3>Bit-Map-Löschen</h3>
 
-<p>Bevor dieses Unterprogramm aufgerufen wird, müssen im Hauptprogramm<br>
-F1 = Zeichenfarbe und<br>
-F2 = Hintergrundfarbe<br>
-definiert sein. An Variablen treten noch auf:<br>
-F = Farbcodezahle auf Fl und F2<br>
-I = Laufvariable</p>
+        <p>Hierzu gibt es nichts mehr zu sagen, außer, daß I als Laufvariable dient.</p>
 
-<h3>HIRES aus</h3>
+        <h3>Farbgebung</h3>
 
-<p>Dieses Programm stellt die ursprüngliche Speicherorganisation wieder her (Bildschirm- und Zeichenspeicher) und schaltet in den Normalmodus zurück.</p>
+        <p>Bevor dieses Unterprogramm aufgerufen wird, müssen im Hauptprogramm<br>
+            F1 = Zeichenfarbe und<br>
+            F2 = Hintergrundfarbe<br>
+            definiert sein. An Variablen treten noch auf:<br>
+            F = Farbcodezahle auf Fl und F2<br>
+            I = Laufvariable</p>
 
-<h3>Punkt setzen</h3>
+        <h3>HIRES aus</h3>
 
-<p>Auch hier müssen vor dem Aufruf des Unterprogramms im Hauptspeicher die<br>
-Punktkoordinaten X,Y<br>
-definiert sein (siehe Bild 3) sowie die<br>
-L — Löschmarke</p>
+        <p>Dieses Programm stellt die ursprüngliche Speicherorganisation wieder her (Bildschirm- und Zeichenspeicher) und schaltet in den Normalmodus zurück.</p>
 
-<p>Wenn L = 0 ist, wird der Punkt gesetzt (Zeile 50930), so, wie wir das schon kennen. Ist L = 1, dann wird ein vorhandener Punkt gelöscht (Zeile 50920).</p>
+        <h3>Punkt setzen</h3>
 
-<p>Die Zeile 50905 achtet darauf, daß keine Punktkoordinate außerhalb des Bildschirms liegt, was unter Umständen ein Aussteigen mit Fehlermeldung im Hochauflösungsverfahren zur Folge hätte. Das ist hier zwar nicht so tragisch, weil man durch Eingeben von GOTO 50030 »RETURN« schnell wieder in den Normalmodus gelangen kann (eventuell muß vorher noch »SHIFT« + »CLR/ HOME« gedrückt werden). Trotzdem ist es dumm, wenn inmitten all dieser zeitraubenden Grafiktätigkeiten auch noch der Rechner aussteigt. Eine Grenzüberschreitung der Koordinaten ist um so leichter möglich, als die Punkt-Routine von allen folgenden Unterprogrammen aufgerufen wird. Außer X,Y und L tauchen noch die Variablen BY und BI auf, die wir schon kennengelernt haben als das Byte, in dem ein Bit zu setzen oder zu löschen ist.</p>
+        <p>Auch hier müssen vor dem Aufruf des Unterprogramms im Hauptspeicher die<br>
+            Punktkoordinaten X,Y<br>
+            definiert sein (siehe Bild 3) sowie die<br>
+            L — Löschmarke</p>
 
-<h3>Punkt löschen</h3>
+        <p>Wenn L = 0 ist, wird der Punkt gesetzt (Zeile 50930), so, wie wir das schon kennen. Ist L = 1, dann wird ein vorhandener Punkt gelöscht (Zeile 50920).</p>
 
-<p>Hier geschieht nichts anderes, als die Löschmarke L auf 1 zu setzen und dann in die Punkt-Setz-Routine zu springen. Deswegen gilt für dieses Unterprogramm dasselbe wie für das vorangegangene.</p>
+        <p>Die Zeile 50905 achtet darauf, daß keine Punktkoordinate außerhalb des Bildschirms liegt, was unter Umständen ein Aussteigen mit Fehlermeldung im Hochauflösungsverfahren zur Folge hätte. Das ist hier zwar nicht so tragisch, weil man durch Eingeben von GOTO 50030 »RETURN« schnell wieder in den Normalmodus gelangen kann (eventuell muß vorher noch »SHIFT« + »CLR/ HOME« gedrückt werden). Trotzdem ist es dumm, wenn inmitten all dieser zeitraubenden Grafiktätigkeiten auch noch der Rechner aussteigt. Eine Grenzüberschreitung der Koordinaten ist um so leichter möglich, als die Punkt-Routine von allen folgenden Unterprogrammen aufgerufen wird. Außer X,Y und L tauchen noch die Variablen BY und BI auf, die wir schon kennengelernt haben als das Byte, in dem ein Bit zu setzen oder zu löschen ist.</p>
 
-<h3>Strecke zeichnen</h3>
+        <h3>Punkt löschen</h3>
 
-<p>Vor dem Aufruf müssen dem Rechner schon<br>
-der Startpunkt (X1,Y1) und<br>
-der Endpunkt (X2,Y2) der Strecke<br>
-bekannt gemacht sein (siehe Bild 4).</p>
+        <p>Hier geschieht nichts anderes, als die Löschmarke L auf 1 zu setzen und dann in die Punkt-Setz-Routine zu springen. Deswegen gilt für dieses Unterprogramm dasselbe wie für das vorangegangene.</p>
 
-<p>Den mathematisch Versierten wird es bei der Betrachtung der Zeilen 51120 beziehungsweise 51160 schon aufgefallen sein, daß zur Berechnung der Punkte, aus denen sich die Strecke zusammensetzt, die sogenannte 2-Punkte-Form der Geradengleichung verwendet wurde:</p>
+        <h3>Strecke zeichnen</h3>
 
-<p>YY1 = Y2-Y1 X-X1 X2-X1 TODO</p>
+        <p>Vor dem Aufruf müssen dem Rechner schon<br>
+            der Startpunkt (X1,Y1) und<br>
+            der Endpunkt (X2,Y2) der Strecke<br>
+            bekannt gemacht sein (siehe Bild 4).</p>
 
-<p>Den mit Mathematik nicht so vertrauten Lesern sei gesagt, daß es sich um eine Formel aus der sogenannten analytischen Geometrie handelt. Das ist ein Gebiet der Mathematik, das für die Grafik auf Computern eine nicht unerhebliche Rolle spielt.</p>
+        <p>Den mathematisch Versierten wird es bei der Betrachtung der Zeilen 51120 beziehungsweise 51160 schon aufgefallen sein, daß zur Berechnung der Punkte, aus denen sich die Strecke zusammensetzt, die sogenannte 2-Punkte-Form der Geradengleichung verwendet wurde:</p>
 
-<p>Die Punkte (XI, Y1) und (X2, Y2) dürfen auch außerhalb des Bildschirmsystems liegen. Im ersten Teil des Unterprogramms dient die Übergabevariable X auch gleichzeitig als Laufvariable während Y berechnet wird. Wenn allerdings der Absolutbetrag von X2-X1 kleiner als 5 wird, verkehren sich die Verhältnisse: Y wird Laufvariable und X berechnet. Das beschleunigt das Zeichnen von Senkrechten und verhindert außerdem eine Division durch Null. Der Wert von 5 ist dabei ziemlich willkürlich gewählt. L ist wieder die Löschmarke.</p>
+        <p>YY1 = Y2-Y1 X-X1 X2-X1 TODO</p>
 
-<h3>Strecke löschen</h3>
+        <p>Den mit Mathematik nicht so vertrauten Lesern sei gesagt, daß es sich um eine Formel aus der sogenannten analytischen Geometrie handelt. Das ist ein Gebiet der Mathematik, das für die Grafik auf Computern eine nicht unerhebliche Rolle spielt.</p>
 
-<p>Es gilt dasselbe wie für das Unterprogramm Strecke zeichnen, nur daß hier wieder die Löschmarke gesetzt wird.</p>
+        <p>Die Punkte (XI, Y1) und (X2, Y2) dürfen auch außerhalb des Bildschirmsystems liegen. Im ersten Teil des Unterprogramms dient die Übergabevariable X auch gleichzeitig als Laufvariable während Y berechnet wird. Wenn allerdings der Absolutbetrag von X2-X1 kleiner als 5 wird, verkehren sich die Verhältnisse: Y wird Laufvariable und X berechnet. Das beschleunigt das Zeichnen von Senkrechten und verhindert außerdem eine Division durch Null. Der Wert von 5 ist dabei ziemlich willkürlich gewählt. L ist wieder die Löschmarke.</p>
 
-<h3>Ellipse zeichnen</h3>
+        <h3>Strecke löschen</h3>
 
-<p>Vor dem Aufruf müssen folgende Werte schon definiert sein (siehe auch Bild 5):<br>
-(XM,YM) = Mittelpunktkoordinaten<br>
-HX = Halbmesser in X-Richtung<br>
-HY = Halbmesser in Y-Richtung<br>
-WU,WO = Der zu zeichnende Ellipsenbogen beginnt beim Winkel WU und endet beim Winkel<br>
-WO (Gradmaß)</p>
+        <p>Es gilt dasselbe wie für das Unterprogramm Strecke zeichnen, nur daß hier wieder die Löschmarke gesetzt wird.</p>
 
-<p>Eine volle Ellipse wird also gezeichnet, wenn WU = 0 und WO = 360 ist. Der Kreis ist ein Sonderfall der Ellipse. Dann muß nur HX = HY sein.</p>
+        <h3>Ellipse zeichnen</h3>
 
-<p>Für mathematisch Interessierte: Es werden die Parametergleichungen der Ellipse verwendet:<br>
-X = XM + HX<em>COS(WB) und Y=YM + HX</em> SIN(WB)</p>
+        <p>Vor dem Aufruf müssen folgende Werte schon definiert sein (siehe auch Bild 5):<br>
+            (XM,YM) = Mittelpunktkoordinaten<br>
+            HX = Halbmesser in X-Richtung<br>
+            HY = Halbmesser in Y-Richtung<br>
+            WU,WO = Der zu zeichnende Ellipsenbogen beginnt beim Winkel WU und endet beim Winkel<br>
+            WO (Gradmaß)</p>
 
-<p>Auch hier gibt es keine Einschränkung wie beim Strecken-Zeichnen m der Größe von XM, YM, HX, WU, WO.</p>
+        <p>Eine volle Ellipse wird also gezeichnet, wenn WU = 0 und WO = 360 ist. Der Kreis ist ein Sonderfall der Ellipse. Dann muß nur HX = HY sein.</p>
 
-<p>W ist eine Laufvariable (ein Winkel) der in WB (gleicher Winkel im Bogenmaß) umgerechnet wird. L ist wieder die Löschmarke.</p>
+        <p>Für mathematisch Interessierte: Es werden die Parametergleichungen der Ellipse verwendet:<br>
+            X = XM + HX<em>COS(WB) und Y=YM + HX</em> SIN(WB)</p>
 
-<h3>Ellipse löschen</h3>
+        <p>Auch hier gibt es keine Einschränkung wie beim Strecken-Zeichnen m der Größe von XM, YM, HX, WU, WO.</p>
 
-<p>Bis auf das Setzen der Löschmarke gilt dasselbe wie für das Zeichnen der Ellipse.</p>
+        <p>W ist eine Laufvariable (ein Winkel) der in WB (gleicher Winkel im Bogenmaß) umgerechnet wird. L ist wieder die Löschmarke.</p>
 
-<h3>Kombination</h3>
+        <h3>Ellipse löschen</h3>
 
-<p>Erfordert schon definierte Farbkennzahlen F1 und F2 (siehe Farbgebung) und schaltet dann die Hochauflösung an, löscht die Bit-Map und sorgt für die Farbe.</p>
+        <p>Bis auf das Setzen der Löschmarke gilt dasselbe wie für das Zeichnen der Ellipse.</p>
 
-<p>Soweit die Unterprogramme in Listing 2.</p>
+        <h3>Kombination</h3>
 
-<h2>Ein Beispiel für die Möglichkeiten der Grafik-Bibliothek</h2>
+        <p>Erfordert schon definierte Farbkennzahlen F1 und F2 (siehe Farbgebung) und schaltet dann die Hochauflösung an, löscht die Bit-Map und sorgt für die Farbe.</p>
 
-<p>Als ein Beispiel für die Möglichkeiten der Unterprogramm-Sammlung habe ich (ohne nun besonders auf Schönheit zu achten — das sind Sie ja von mir schon gewohnt), noch ein Hauptprogramm angefügt, mit dem Sie etwas herumprobieren können (Listing 3). Das Listing ist ausführlich kommentiert, so daß hier nur wenige Erläuterungen folgen müssen.</p>
+        <p>Soweit die Unterprogramme in Listing 2.</p>
 
-<p>Beim Eintippen müssen Sie für einige Zeilen die Abkürzungen (siehe Handbuch Seite 130 ff) der Basic-Befehle eingeben, da die Zeilen sonst länger als 80 Zeichen werden.</p>
+        <h2>Ein Beispiel für die Möglichkeiten der Grafik-Bibliothek</h2>
 
-<p>Nach »RUN« sehen Sie ein Menü, das alle Möglichkeiten der Grafik-Unterprogramme ansteuert. Die Optionen 8 (Strecke zeichnen) bis B (Ellipse löschen) sowie 4 (Farbgebung) und 5 (Kombinationen) erfordern Eingaben. Es ist daher sinnvoll, diese Optionen nur im Normalmodus anzuwählen. Der Normalmodus ist immer dann zu erreichen, wenn Zeichenoperationen im Hochauflösungsmodus abgeschlossen sind. Drücken Sie dann &ldquo;2', sind Sie wieder im normalen Rechnerbetrieb.<br>
-Sollten Sie durch irgendeinen Umstand (zum Beispiel durch Drücken der »RUN/STOP«-Taste) im Hochauflösungsmodus aus dem Programm fallen, dann hilft der folgende Weg:</p>
+        <p>Als ein Beispiel für die Möglichkeiten der Unterprogramm-Sammlung habe ich (ohne nun besonders auf Schönheit zu achten — das sind Sie ja von mir schon gewohnt), noch ein Hauptprogramm angefügt, mit dem Sie etwas herumprobieren können (Listing 3). Das Listing ist ausführlich kommentiert, so daß hier nur wenige Erläuterungen folgen müssen.</p>
 
-<ol>
-<li>»SHIFT« + »CLEAR/HOME«</li>
-<li>»RUN« »RETURN«</li>
-<li>dann »2« eingeben</li>
-</ol>
+        <p>Beim Eintippen müssen Sie für einige Zeilen die Abkürzungen (siehe Handbuch Seite 130 ff) der Basic-Befehle eingeben, da die Zeilen sonst länger als 80 Zeichen werden.</p>
 
+        <p>Nach »RUN« sehen Sie ein Menü, das alle Möglichkeiten der Grafik-Unterprogramme ansteuert. Die Optionen 8 (Strecke zeichnen) bis B (Ellipse löschen) sowie 4 (Farbgebung) und 5 (Kombinationen) erfordern Eingaben. Es ist daher sinnvoll, diese Optionen nur im Normalmodus anzuwählen. Der Normalmodus ist immer dann zu erreichen, wenn Zeichenoperationen im Hochauflösungsmodus abgeschlossen sind. Drücken Sie dann &ldquo;2', sind Sie wieder im normalen Rechnerbetrieb.<br>
+            Sollten Sie durch irgendeinen Umstand (zum Beispiel durch Drücken der »RUN/STOP«-Taste) im Hochauflösungsmodus aus dem Programm fallen, dann hilft der folgende Weg:</p>
 
-<p>Die Option »C« zeigt eine kleine Demonstration von Möglichkeiten der Grafik-Unterprogramme. Allerdings sollten Sie ein bißchen Zeit mitbringen, wenn Sie C anwählen: Das ganze dauert zirka 25 Minuten.</p>
+        <ol>
+            <li>»SHIFT« + »CLEAR/HOME«</li>
+            <li>»RUN« »RETURN«</li>
+            <li>dann »2« eingeben</li>
+        </ol>
 
-<p>Option 6 (Punkte zeichnen) ist so eingerichtet, daß 320 Punkte in Form einer Sinus-Funktion gezeichnet und mit Option 7 (Punkte löschen) teilweise wieder gelöscht werden.</p>
 
-<h3>Ausblicke — schnellere Grafik durch Maschinensprache</h3>
+        <p>Die Option »C« zeigt eine kleine Demonstration von Möglichkeiten der Grafik-Unterprogramme. Allerdings sollten Sie ein bißchen Zeit mitbringen, wenn Sie C anwählen: Das ganze dauert zirka 25 Minuten.</p>
 
-<p>Diese Folge soll nicht beendet werden, ohne einen kleinen tröstlichen Ausblick. Wie Sie — besonders im letzten Programm — feststellen konnten, braucht man schon einiges Sitzfleisch für hochauflösende Grafik in Basic. Wenn Sie aber ein kommerzielles Grafik-Programm laufen sehen, geht das alles erheblich schneller. Was ist der Unterschied? Da wäre zunächst einmal die Programmiersprache: Unser C 64 kann eigentlich gar kein Basic. Er braucht den Basic-Interpreter, der zunächst jeden Befehl liest und dann in Maschinensprache übersetzt. Die versteht unser Rechner zwar, die Übersetzung und das Lesen dauern jedoch lange Zeit. Eine starke Beschleunigung der Grafik ist möglich durch Programmieren in Maschinensprache. Einige solche Maschinenspracheprogramme zur beschleunigten Grafik werden in den nächsten Folgen gezeigt. Allerdings stoßen wir da bald an die Grenzen unseres Commodore. Ein 8-Bit-Computer mit zirka 1 Megahertz Taktfrequenz wie unser C 64 ist beispielsweise in der Fließkomma-Arithmetik (wie sie für das Zeichnen von Ellipsen nötig ist) zeitlich gehandicapt, und deswegen sind der Geschwindigkeit bei komplexerer Grafik doch einige Grenzen gesetzt.</p>
+        <p>Option 6 (Punkte zeichnen) ist so eingerichtet, daß 320 Punkte in Form einer Sinus-Funktion gezeichnet und mit Option 7 (Punkte löschen) teilweise wieder gelöscht werden.</p>
 
-<p>(Heino Ponnath)</p>
+        <h3>Ausblicke — schnellere Grafik durch Maschinensprache</h3>
 
+        <p>Diese Folge soll nicht beendet werden, ohne einen kleinen tröstlichen Ausblick. Wie Sie — besonders im letzten Programm — feststellen konnten, braucht man schon einiges Sitzfleisch für hochauflösende Grafik in Basic. Wenn Sie aber ein kommerzielles Grafik-Programm laufen sehen, geht das alles erheblich schneller. Was ist der Unterschied? Da wäre zunächst einmal die Programmiersprache: Unser C 64 kann eigentlich gar kein Basic. Er braucht den Basic-Interpreter, der zunächst jeden Befehl liest und dann in Maschinensprache übersetzt. Die versteht unser Rechner zwar, die Übersetzung und das Lesen dauern jedoch lange Zeit. Eine starke Beschleunigung der Grafik ist möglich durch Programmieren in Maschinensprache. Einige solche Maschinenspracheprogramme zur beschleunigten Grafik werden in den nächsten Folgen gezeigt. Allerdings stoßen wir da bald an die Grenzen unseres Commodore. Ein 8-Bit-Computer mit zirka 1 Megahertz Taktfrequenz wie unser C 64 ist beispielsweise in der Fließkomma-Arithmetik (wie sie für das Zeichnen von Ellipsen nötig ist) zeitlich gehandicapt, und deswegen sind der Geschwindigkeit bei komplexerer Grafik doch einige Grenzen gesetzt.</p>
+
+        <p>(Heino Ponnath)</p>
+
+
+    </article>
+
+</body>
+
+</html>

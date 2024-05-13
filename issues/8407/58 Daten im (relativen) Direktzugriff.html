@@ -1,123 +1,154 @@
-<h1>Daten im (relativen) Direktzugriff</h1>
+<!DOCTYPE html>
+<html lang="de">
 
-<p class="intro">In diesem Bericht werden die Unterschiede zwischen der relativen und der sequentiellen Datei aufgezeigt und anhand eines Beispielprogramms die Programmierung einer relativen Datei erklärt.</p>
+<head>
+    <title>XXX</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="XXX">
+    <meta name="64er.issue" content="7/84">
+    <meta name="64er.pages" content="XXX">
+    <meta name="64er.head1" content="XXX">
+    <meta name="64er.head2" content="XXX">
+    <meta name="64er.toc_title" content="XXX">
+    <meta name="64er.toc_category" content="XXX">
+    <meta name="64er.index_title" content="XXX">
+    <meta name="64er.index_category" content="XXX">
+    <meta name="64er.id" content="xxx">
+</head>
 
-<p>Kommen wir gleich zu den Vor- und Nachteilen. Der Hauptvorteil der relativen Datei ist der schnelle Zugriff auf Daten. Ein weiterer Vorteil ist, daß eigentlich nur wenig Speicherplatz des Computers notwendig ist, nämlich nur so viel, wie das Programm selbst benötigt. Deshalb ist eine sinnvolle Anwendung dieser Dateiform auch mit dem VC 20 in der Grundversion möglich. Allerdings ist ein Diskettenlaufwerk unbedingt notwendig. Die sequentielle Datei hingegen benötigt viel Speicherplatz im Computer, und ein schneller Zugriff auf Daten ist nicht einfach zu realisieren, zumindest muß die gesamte Datei erst in den Speicher des Computers geladen werden, bevor man sinnvoll mit ihr arbeiten kann. Jedoch ist nicht unbedingt ein Diskettenlaufwerk notwendig, die Datasette tut&rsquo;s auch, wenn auch erheblich langsamer. Der Nachteil der relativen Datei ist die Art des Zugriffs auf bestimmte Daten. Er ist nämlich nur über die Datensatznummer möglich. Das heißt: Angenommen, wir haben uns eine Adressendatei aufgebaut und auch schon eine Anzahl Adressen eingegeben. Wenn wir uns jetzt die Adresse von Anton Huber ausgeben lassen wollen, so ist das nicht möglich, indem wir den Namen »Huber« eingeben und dann das Ergebnis, seine Adresse, auf einen Schlag vor uns haben. Dazu müßten wir seine Satznummer kennen. Vereinfacht kann man sagen, daß die Satznummer angibt, die wievielte Adresse gemeint ist. Satznummer 14 bedeutet also die 14. Adresse. Diese Adresse findet der Computer, weil er vom Dateianfang ausgeht, den er sich merkt, und dann 13 Datensätze überspringt (auf den nächsten Datensatz positioniert), umdirektden 14. Datensatzzu lesen (daher der Name relative Datei: relativ zum Dateianfang).</p>
+<body>
+    <article>
+        <h1>Daten im (relativen) Direktzugriff</h1>
 
-<p>Dazu ist eine Voraussetzung notwendig: Die Datensätze müssen alle die gleiche Länge haben. Wie das realisiert wird, erkläre ich noch.</p>
+        <p class="intro">In diesem Bericht werden die Unterschiede zwischen der relativen und der sequentiellen Datei aufgezeigt und anhand eines Beispielprogramms die Programmierung einer relativen Datei erklärt.</p>
 
-<p>Um einer möglichen Frustration vorzubeugen, sei gesagt, daß auch eine direkte Suche über einen Namen möglich ist, indem man die Vorteile der relativen Datei mit der der sequentiellen Datei verknüpft.</p>
+        <p>Kommen wir gleich zu den Vor- und Nachteilen. Der Hauptvorteil der relativen Datei ist der schnelle Zugriff auf Daten. Ein weiterer Vorteil ist, daß eigentlich nur wenig Speicherplatz des Computers notwendig ist, nämlich nur so viel, wie das Programm selbst benötigt. Deshalb ist eine sinnvolle Anwendung dieser Dateiform auch mit dem VC 20 in der Grundversion möglich. Allerdings ist ein Diskettenlaufwerk unbedingt notwendig. Die sequentielle Datei hingegen benötigt viel Speicherplatz im Computer, und ein schneller Zugriff auf Daten ist nicht einfach zu realisieren, zumindest muß die gesamte Datei erst in den Speicher des Computers geladen werden, bevor man sinnvoll mit ihr arbeiten kann. Jedoch ist nicht unbedingt ein Diskettenlaufwerk notwendig, die Datasette tut&rsquo;s auch, wenn auch erheblich langsamer. Der Nachteil der relativen Datei ist die Art des Zugriffs auf bestimmte Daten. Er ist nämlich nur über die Datensatznummer möglich. Das heißt: Angenommen, wir haben uns eine Adressendatei aufgebaut und auch schon eine Anzahl Adressen eingegeben. Wenn wir uns jetzt die Adresse von Anton Huber ausgeben lassen wollen, so ist das nicht möglich, indem wir den Namen »Huber« eingeben und dann das Ergebnis, seine Adresse, auf einen Schlag vor uns haben. Dazu müßten wir seine Satznummer kennen. Vereinfacht kann man sagen, daß die Satznummer angibt, die wievielte Adresse gemeint ist. Satznummer 14 bedeutet also die 14. Adresse. Diese Adresse findet der Computer, weil er vom Dateianfang ausgeht, den er sich merkt, und dann 13 Datensätze überspringt (auf den nächsten Datensatz positioniert), umdirektden 14. Datensatzzu lesen (daher der Name relative Datei: relativ zum Dateianfang).</p>
 
-<p>Eine relative Datei besteht im Prinzip aus 3 Teilen:</p>
+        <p>Dazu ist eine Voraussetzung notwendig: Die Datensätze müssen alle die gleiche Länge haben. Wie das realisiert wird, erkläre ich noch.</p>
 
-<pre><code>1. Einrichten einer Datei
+        <p>Um einer möglichen Frustration vorzubeugen, sei gesagt, daß auch eine direkte Suche über einen Namen möglich ist, indem man die Vorteile der relativen Datei mit der der sequentiellen Datei verknüpft.</p>
+
+        <p>Eine relative Datei besteht im Prinzip aus 3 Teilen:</p>
+
+        <pre><code>1. Einrichten einer Datei
 2. Speichern (Schreiben) eines Datensatzes
 3. Lesen eines Datensatzes
 </code></pre>
 
-<p>Gehen wir diese Teile Schritt für Schritt durch. Anhand des Listings können Sie diese Schritte mitverfolgen.</p>
+        <p>Gehen wir diese Teile Schritt für Schritt durch. Anhand des Listings können Sie diese Schritte mitverfolgen.</p>
 
-<p><b>1. Einrichten einer relativen Datei</b></p>
+        <p><b>1. Einrichten einer relativen Datei</b></p>
 
-<p>Um mit einer relativen Datei arbeiten zu können, müssen 2 Kanäle zur Floppy geöffnet werden. Zum ersten ist das der Kommandokanal (Kanal 15) und zweitens ein beliebiger anderer Kanal. Der Kommandokanal ist notwendig um den Positionierbefehl zu übertragen. Mit dem anderen Kanal wird die Datei eröffnet und bearbeitet.</p>
+        <p>Um mit einer relativen Datei arbeiten zu können, müssen 2 Kanäle zur Floppy geöffnet werden. Zum ersten ist das der Kommandokanal (Kanal 15) und zweitens ein beliebiger anderer Kanal. Der Kommandokanal ist notwendig um den Positionierbefehl zu übertragen. Mit dem anderen Kanal wird die Datei eröffnet und bearbeitet.</p>
 
-<p><b>1.a) Öffnen des Kommandokanals<br>130 CLOSE 15:0PEN 15,8,15</b></p>
+        <p><b>1.a) Öffnen des Kommandokanals<br>130 CLOSE 15:0PEN 15,8,15</b></p>
 
-<p>Sicherheitshalber sollte man vor jedem OPEN ein CLOSE setzen, um eine eventuelle Fehlermeldung »FILE OPEN ERROR» zu verhindern.</p>
+        <p>Sicherheitshalber sollte man vor jedem OPEN ein CLOSE setzen, um eine eventuelle Fehlermeldung »FILE OPEN ERROR» zu verhindern.</p>
 
-<p><b>1.b) Eröffnen der Datei und Festsetzen der Datensatzlänge</b></p>
+        <p><b>1.b) Eröffnen der Datei und Festsetzen der Datensatzlänge</b></p>
 
-<p>Wie schon erwähnt, ist ein Merkmal der relativen Datei, daß jeder Datensatz die gleiche Länge besitzen muß. Diese Angabe muß beim Einrichten der Datei angegeben werden. Das geschieht mit folgendem Befehl:<br>
-<b>OPEN lfn,ga,kanal,”dateiname,L,” + CHR$(datensatzlänge)</b>
-(im Listing Zeile 140 und 11120)<br>
-lfn = logische filenummer<br>
-ga = Geräteadresse (normalerweise 8)<br>
-kanal (2-14)<br>
-dateiname = Name der Datei, wird so im Directory abgelegt, im Beispiel »ADR.REL«.<br>
-L = Kennzeichen für eine relative Datei<br>
-datensatzlänge = Summe aller Feldlängen (1-254)</p>
+        <p>Wie schon erwähnt, ist ein Merkmal der relativen Datei, daß jeder Datensatz die gleiche Länge besitzen muß. Diese Angabe muß beim Einrichten der Datei angegeben werden. Das geschieht mit folgendem Befehl:<br>
+            <b>OPEN lfn,ga,kanal,”dateiname,L,” + CHR$(datensatzlänge)</b>
+            (im Listing Zeile 140 und 11120)<br>
+            lfn = logische filenummer<br>
+            ga = Geräteadresse (normalerweise 8)<br>
+            kanal (2-14)<br>
+            dateiname = Name der Datei, wird so im Directory abgelegt, im Beispiel »ADR.REL«.<br>
+            L = Kennzeichen für eine relative Datei<br>
+            datensatzlänge = Summe aller Feldlängen (1-254)
+        </p>
 
-<p>Der Buchstabe »L« sagt dem DOS, daß eine relative Datei eröffnet wird. Diesem Buchstaben muß die Angabe der Datensatzlänge folgen. Sie wird mit dem CHR$ gesandt. Im Beispiel setzt sich ein Datensatz folgendermaßen zusammen:</p>
+        <p>Der Buchstabe »L« sagt dem DOS, daß eine relative Datei eröffnet wird. Diesem Buchstaben muß die Angabe der Datensatzlänge folgen. Sie wird mit dem CHR$ gesandt. Im Beispiel setzt sich ein Datensatz folgendermaßen zusammen:</p>
 
-<p>TODO<br>
-NAME    = 15 Buchstaben<br>
-VORNAME = 15Buchstaben<br>
-STRASSE =   20 Buchstaben<br>
-POSTLZ  =   4   Buchstaben<br>
-ORT =   15  Buchstaben<br>
-TELEFON =   12 Buchstaben</p>
+        <p>TODO<br>
+            NAME = 15 Buchstaben<br>
+            VORNAME = 15Buchstaben<br>
+            STRASSE = 20 Buchstaben<br>
+            POSTLZ = 4 Buchstaben<br>
+            ORT = 15 Buchstaben<br>
+            TELEFON = 12 Buchstaben</p>
 
-<p>Das ergibt insgesamt 81 Buchstaben pro Datensatz, Da jeder Datensatz (auch RECORD genannt) mit einem RETURN abgeschlossen wird, erhöht sich die Datensatzlänge auf insgesamt 82 Zeichen.</p>
+        <p>Das ergibt insgesamt 81 Buchstaben pro Datensatz, Da jeder Datensatz (auch RECORD genannt) mit einem RETURN abgeschlossen wird, erhöht sich die Datensatzlänge auf insgesamt 82 Zeichen.</p>
 
-<p><b>1.c) Positionieren</b></p>
+        <p><b>1.c) Positionieren</b></p>
 
-<p>Der Computer findet einen bestimmten Datensatz über die Datensatznummer, indem er sich den Dateianfang merkt und die entsprechende Anzahl Datensätze überspringt. Genauer gesagt, er positioniert auf diesen Datensatz. Und das wird mit dem Positionierbefehl erledigt. Dieses Kommando wird über den Kommandokanal (15) der Diskette gesandt. Seine Form ist:<br>
-<b>PRINT #lfn,&ldquo;P&rdquo;+CHR$(kanal+ CHR$(low)+CHR$(high)+CHR$(byte)</b>
-(siehe dazu Zeile 11130 - 11190)</p>
+        <p>Der Computer findet einen bestimmten Datensatz über die Datensatznummer, indem er sich den Dateianfang merkt und die entsprechende Anzahl Datensätze überspringt. Genauer gesagt, er positioniert auf diesen Datensatz. Und das wird mit dem Positionierbefehl erledigt. Dieses Kommando wird über den Kommandokanal (15) der Diskette gesandt. Seine Form ist:<br>
+            <b>PRINT #lfn,&ldquo;P&rdquo;+CHR$(kanal+ CHR$(low)+CHR$(high)+CHR$(byte)</b>
+            (siehe dazu Zeile 11130 - 11190)
+        </p>
 
-<p>Die Parameter »low« und »high« geben die Datensatz(=Record)nummer an. Da ein Byte maximal den Wert 255 annehmen kann, die Recordnummer aber höher sein darf, muß sie aufgeteilt werden in ein Low-Byte und ein High-Byte. Das geschieht einfach mit den Anweisungen<br>
-<b>HB=INT(RN/256)<br>LB=RN-HB*256</b>
-RN = Recordnummer<br>
-HB = Höherwertiges Byte<br>
-LB = Niederwertiges Byte</p>
+        <p>Die Parameter »low« und »high« geben die Datensatz(=Record)nummer an. Da ein Byte maximal den Wert 255 annehmen kann, die Recordnummer aber höher sein darf, muß sie aufgeteilt werden in ein Low-Byte und ein High-Byte. Das geschieht einfach mit den Anweisungen<br>
+            <b>HB=INT(RN/256)<br>LB=RN-HB*256</b>
+            RN = Recordnummer<br>
+            HB = Höherwertiges Byte<br>
+            LB = Niederwertiges Byte
+        </p>
 
-<p>Der letzte Parameter (Byte) positioniert auf eine bestimmte Stelle innerhalb eines Records. Beispiel:<br>
-<b>PRINT#</b>15,&ldquo;P&rdquo; + CHR$(2) + CHR$(12) + CHR$(l) + CHR$(8)</p>
+        <p>Der letzte Parameter (Byte) positioniert auf eine bestimmte Stelle innerhalb eines Records. Beispiel:<br>
+            <b>PRINT#</b>15,&ldquo;P&rdquo; + CHR$(2) + CHR$(12) + CHR$(l) + CHR$(8)
+        </p>
 
-<p>Hier wird auf das 8. Byte des 268. Records positioniert. Die 268 ist die Recordnummer und wird aufgeteilt in ein Low-Byte(12) und ein High-Byte(1). (HighByte*256 + Low-Byte = Recordnummer). Beim Schreiben eines Records muß jedoch immer auf das erste Byte positioniert werden.</p>
+        <p>Hier wird auf das 8. Byte des 268. Records positioniert. Die 268 ist die Recordnummer und wird aufgeteilt in ein Low-Byte(12) und ein High-Byte(1). (HighByte*256 + Low-Byte = Recordnummer). Beim Schreiben eines Records muß jedoch immer auf das erste Byte positioniert werden.</p>
 
-<p>Zum Schluß wird die Datei freigegeben.</p>
+        <p>Zum Schluß wird die Datei freigegeben.</p>
 
-<p><b>1.d) Freigeben der Datei<br>PRINT#15,CHR$(255)</b></p>
+        <p><b>1.d) Freigeben der Datei<br>PRINT#15,CHR$(255)</b></p>
 
-<p>Diese Anweisung bewirkt, daß alle Records, die unter der angegebenen Recordnummer liegen, mit CHR$(255) beschrieben werden, sofern sie noch nicht anders belegt wurden. Das dauert seine Zeit. Je mehr Datensätze eingerichtet (freigegeben) werden, desto mehr Zeit beansprucht diese Arbeit. Aber erst diese Prozedur erlaubt ein fehlerfreies Lesen und schnelles Schreiben von Datensätzen. Wollen Sie einen Record beschreiben, der oberhalb des zuletzt freigegebenen Records liegt, so werden automatisch alle Records, die zwischen dem letzten und dem gerade beschriebenen Record liegen, freigegeben, das heißt, mit CHR$(255) beschrieben. Um diese Prozedur zu vermeiden, sollten Sie nur das erste Mal, beim Einrichten der Datei, die maximal zu erwartende Anzahl Records freigeben. Die Fehlermeldung »RECORD NOT PRESENT«, die dann im Floppy-Fehlerkanal erscheint, kann ignoriert werden, da dieser Record nur beschrieben (freigegeben) wird.</p>
+        <p>Diese Anweisung bewirkt, daß alle Records, die unter der angegebenen Recordnummer liegen, mit CHR$(255) beschrieben werden, sofern sie noch nicht anders belegt wurden. Das dauert seine Zeit. Je mehr Datensätze eingerichtet (freigegeben) werden, desto mehr Zeit beansprucht diese Arbeit. Aber erst diese Prozedur erlaubt ein fehlerfreies Lesen und schnelles Schreiben von Datensätzen. Wollen Sie einen Record beschreiben, der oberhalb des zuletzt freigegebenen Records liegt, so werden automatisch alle Records, die zwischen dem letzten und dem gerade beschriebenen Record liegen, freigegeben, das heißt, mit CHR$(255) beschrieben. Um diese Prozedur zu vermeiden, sollten Sie nur das erste Mal, beim Einrichten der Datei, die maximal zu erwartende Anzahl Records freigeben. Die Fehlermeldung »RECORD NOT PRESENT«, die dann im Floppy-Fehlerkanal erscheint, kann ignoriert werden, da dieser Record nur beschrieben (freigegeben) wird.</p>
 
-<p><b>2. Speichern (Schreiben) eines Datensatzes</b></p>
+        <p><b>2. Speichern (Schreiben) eines Datensatzes</b></p>
 
-<p>Zum Speichern eines Datensatzes sind folgende Funktionen durchzuführen:</p>
+        <p>Zum Speichern eines Datensatzes sind folgende Funktionen durchzuführen:</p>
 
-<p><b>2.a) Eingabe der Recordnummer</b> und Aufteilung in Low- und High-Byte (siehe oben).</p>
+        <p><b>2.a) Eingabe der Recordnummer</b> und Aufteilung in Low- und High-Byte (siehe oben).</p>
 
-<p><b>2.b) Eingabe der Daten</b> (zum Beispiel über Input). Hier wird auch sichergestellt, daß die einzelnen Felder nicht länger werden, als vorher geplant wurde.</p>
+        <p><b>2.b) Eingabe der Daten</b> (zum Beispiel über Input). Hier wird auch sichergestellt, daß die einzelnen Felder nicht länger werden, als vorher geplant wurde.</p>
 
-<p><b>2.c) maximale Datensatzlänge bilden.</b></p>
+        <p><b>2.c) maximale Datensatzlänge bilden.</b></p>
 
-<p>Das wird im Beispiel (siehe Listing) in Zeile 7000 bis 7999 durchgeführt. Es wird ein String mit der maximalen Länge (im Beispiel 81) gebildet. Dazu wird vorher eine Variable (im Listing BL$) definiert, mit der Anzahl Leerstellen, die das längste Feld unseres Datensatzes besitzt (im Beispiel das Feld »STRASSE« mit 20 Zeichen, also enthält BL$ 20 Leerstellen). Jedes Feld unseres Datensatzes wird entsprechend seiner vorher festgelegten Länge und abhängig von der wirklichen Länge bei der Eingabe mit den notwendigen Leerstellen aufgefüllt. Im Beispiel hat die Variable RC$ dann die Länge von 81 Zeichen und sie enthält den vollständigen Datensatz.</p>
+        <p>Das wird im Beispiel (siehe Listing) in Zeile 7000 bis 7999 durchgeführt. Es wird ein String mit der maximalen Länge (im Beispiel 81) gebildet. Dazu wird vorher eine Variable (im Listing BL$) definiert, mit der Anzahl Leerstellen, die das längste Feld unseres Datensatzes besitzt (im Beispiel das Feld »STRASSE« mit 20 Zeichen, also enthält BL$ 20 Leerstellen). Jedes Feld unseres Datensatzes wird entsprechend seiner vorher festgelegten Länge und abhängig von der wirklichen Länge bei der Eingabe mit den notwendigen Leerstellen aufgefüllt. Im Beispiel hat die Variable RC$ dann die Länge von 81 Zeichen und sie enthält den vollständigen Datensatz.</p>
 
-<p><b>2.d) Speichern</b></p>
+        <p><b>2.d) Speichern</b></p>
 
-<p>Das Speichern dieses Datensatzes ist dann schnell geschehen: Es wird auf die vorher (in 2.a) angegebene Recordnummer positioniert und danach mit PRINT#1,RC$ gespeichert.<br>
-Mit PRINT # kann man jedoch nur Datensätze abspeichern, die nicht länger als 88 Zeichen sind. Sonst muß man die Daten Zeichen für Zeichen mittels einer GET# -Schleife schreiben und lesen.</p>
+        <p>Das Speichern dieses Datensatzes ist dann schnell geschehen: Es wird auf die vorher (in 2.a) angegebene Recordnummer positioniert und danach mit PRINT#1,RC$ gespeichert.<br>
+            Mit PRINT # kann man jedoch nur Datensätze abspeichern, die nicht länger als 88 Zeichen sind. Sonst muß man die Daten Zeichen für Zeichen mittels einer GET# -Schleife schreiben und lesen.</p>
 
-<p><b>3. Lesen eines Datensatzes</b></p>
+        <p><b>3. Lesen eines Datensatzes</b></p>
 
-<p>Hier erfolgt die Reihenfolge fast umgekehrt wie beim Schreiben. Zuerst muß jedoch auch hier die Nummer des gesuchten Datensatzes eingegeben werden. Nach entsprechender Aufteilung in Low- und High-Byte wird auf den Record positioniert und anschließend mit INPUT#1, RC$ von der Disk gelesen.</p>
+        <p>Hier erfolgt die Reihenfolge fast umgekehrt wie beim Schreiben. Zuerst muß jedoch auch hier die Nummer des gesuchten Datensatzes eingegeben werden. Nach entsprechender Aufteilung in Low- und High-Byte wird auf den Record positioniert und anschließend mit INPUT#1, RC$ von der Disk gelesen.</p>
 
-<p><b>3.a) Eingabe Recordnummer</b> und Aufteilung in Low- und High-Byte.</p>
+        <p><b>3.a) Eingabe Recordnummer</b> und Aufteilung in Low- und High-Byte.</p>
 
-<p><b>3.b) Lesen des Datensatzes</b></p>
+        <p><b>3.b) Lesen des Datensatzes</b></p>
 
-<p><b>3.c) Aufteilen des Datensatzes</b></p>
+        <p><b>3.c) Aufteilen des Datensatzes</b></p>
 
-<p>Dieser Vorgang muß umgekehrt dem Verketten (2.c) geschehen. Es wird ja lediglich der komplette Datensatz in die Variable RC$ gelesen. In Zeile 5000 bis 5999 werden wieder die einzelnen Felder gebildet. Danach fehlt nur noch die</p>
+        <p>Dieser Vorgang muß umgekehrt dem Verketten (2.c) geschehen. Es wird ja lediglich der komplette Datensatz in die Variable RC$ gelesen. In Zeile 5000 bis 5999 werden wieder die einzelnen Felder gebildet. Danach fehlt nur noch die</p>
 
-<p><b>3.d) Anzeige des Datensatzes</b></p>
+        <p><b>3.d) Anzeige des Datensatzes</b></p>
 
-<p>Das wars auch schon. Wenn Sie sich einmal alles gut durch den Kopf gehen lassen und die Problematik am Beispiel durchgehen und ausprobieren, können Sie in Zukunft Ihre eigene relative Datei programmieren.</p>
+        <p>Das wars auch schon. Wenn Sie sich einmal alles gut durch den Kopf gehen lassen und die Problematik am Beispiel durchgehen und ausprobieren, können Sie in Zukunft Ihre eigene relative Datei programmieren.</p>
 
-<p>Es ist gar nicht so schwierig, wie es auf den ersten Blick aussehen mag. Sie können auch Teile dieses Programms in Ihre eigenen einbauen. Schließlich ist das der Vorteil eines strukturierten Programmablaufs.</p>
+        <p>Es ist gar nicht so schwierig, wie es auf den ersten Blick aussehen mag. Sie können auch Teile dieses Programms in Ihre eigenen einbauen. Schließlich ist das der Vorteil eines strukturierten Programmablaufs.</p>
 
-<p>Zum Schluß möchte ich Sie noch auf einige Besonderheiten im Listing hinweisen.</p>
+        <p>Zum Schluß möchte ich Sie noch auf einige Besonderheiten im Listing hinweisen.</p>
 
-<p>Zeile 11110: Löschen einer eventuell bestehenden relativen Datei.</p>
+        <p>Zeile 11110: Löschen einer eventuell bestehenden relativen Datei.</p>
 
-<p>Zeile 11200-11220: Lesen des Fehlerkanals. Wenn der Fehler 52 gemeldet wird, bedeutet dies, daß die Anzahl Datensätze, die Sie angegeben haben, die Speicherkapazität der Diskette sprengen würde. Der Fehler 50 (RECORD NOT PRESENT, siehe auch Zeile 9050) bedeutet, daß Sie einen Datensatz lesen wollen, der nicht freigegeben wurde. Beim Schreiben braucht diese Fehlermeldung nicht beachtet werden (siehe 1.d).</p>
+        <p>Zeile 11200-11220: Lesen des Fehlerkanals. Wenn der Fehler 52 gemeldet wird, bedeutet dies, daß die Anzahl Datensätze, die Sie angegeben haben, die Speicherkapazität der Diskette sprengen würde. Der Fehler 50 (RECORD NOT PRESENT, siehe auch Zeile 9050) bedeutet, daß Sie einen Datensatz lesen wollen, der nicht freigegeben wurde. Beim Schreiben braucht diese Fehlermeldung nicht beachtet werden (siehe 1.d).</p>
 
-<p>Zeile 3060: Wenn ein gelesener Datensatz den Wert CHR$(255) besitzt, wird davon ausgegangen, daß er noch nicht beschrieben wurde. Deshalb wäre es auch sinnlos, Ihn anzeigen zu wollen. Dieser Vergleich wird in Zeile 9120-9130 nocheinmal in anderer Form durchgeführt, kann dort jedoch weggelassen werden.</p>
+        <p>Zeile 3060: Wenn ein gelesener Datensatz den Wert CHR$(255) besitzt, wird davon ausgegangen, daß er noch nicht beschrieben wurde. Deshalb wäre es auch sinnlos, Ihn anzeigen zu wollen. Dieser Vergleich wird in Zeile 9120-9130 nocheinmal in anderer Form durchgeführt, kann dort jedoch weggelassen werden.</p>
 
-<p>Zeile 1170: Wenn das Programm beendet werden soll, muß der zur Positionierung notwendige Kanal 15 wieder geschlossen werden.</p>
+        <p>Zeile 1170: Wenn das Programm beendet werden soll, muß der zur Positionierung notwendige Kanal 15 wieder geschlossen werden.</p>
 
-<p>Anzumerken ist noch, daß nicht mehr als eine relative Datei gleichzeitig geöffnet werden kann. Es ist lediglich möglich, noch eine zusätzliche sequentielle Datei zur gleichen Zeit zu nutzen. Und diese Möglichkeit erlaubt uns, auch komfortablere Suchkriterien als über die Recordnummer einzusetzen. Doch darüber mehr in der übernächsten Ausgabe des 64'er Magazins.</p>
+        <p>Anzumerken ist noch, daß nicht mehr als eine relative Datei gleichzeitig geöffnet werden kann. Es ist lediglich möglich, noch eine zusätzliche sequentielle Datei zur gleichen Zeit zu nutzen. Und diese Möglichkeit erlaubt uns, auch komfortablere Suchkriterien als über die Recordnummer einzusetzen. Doch darüber mehr in der übernächsten Ausgabe des 64'er Magazins.</p>
 
-<p>(gk)</p>
+        <p>(gk)</p>
 
+
+    </article>
+
+</body>
+
+</html>
