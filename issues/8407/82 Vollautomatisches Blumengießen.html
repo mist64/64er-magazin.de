@@ -1,24 +1,51 @@
-<h1>Vollautomatisches Blumengießen</h1>
+<!DOCTYPE html>
+<html lang="de">
 
-<p class="intro">Sie kennen sicher auch das leidige Problem: Der Urlaub steht vor der Tür und keiner der Nachbarn will die Blumen versorgen, da sie just in der gleichen Zeit Urlaubsgefühle verspüren. Der Computer schafft Abhilfe.</p>
+<head>
+    <title>XXX</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="XXX">
+    <meta name="64er.issue" content="7/84">
+    <meta name="64er.pages" content="XXX">
+    <meta name="64er.head1" content="XXX">
+    <meta name="64er.head2" content="XXX">
+    <meta name="64er.toc_title" content="XXX">
+    <meta name="64er.toc_category" content="XXX">
+    <meta name="64er.index_title" content="XXX">
+    <meta name="64er.index_category" content="XXX">
+    <meta name="64er.id" content="xxx">
+</head>
 
-<p>Die Idee war, mit einer kleinen Tauchpumpe (Campingartikelbedarf) und einem verzweigten Schlauchsystem die Blumen täglich mit dem kostbaren Naß zu versorgen (Bild 1). Diese kleinen Pumpen haben eine Förderleistung von etwa 14 l/min., was für die minimalen Ein- und Ausschaltzeiten mechanischer Schaltuhren von 30 Minuten viel zu viel ist. Elektronische Schaltuhren, die individuelle Schaltzyklen zulassen, waren wiederum viel zu teuer.</p>
+<body>
+    <article>
+        <h1>Vollautomatisches Blumengießen</h1>
 
-<p>Die Idee, meinen 64er zum Blumengießen herzunehmen, reifte. Denn schließlich besitzt er einen User-Port, der für solche Aufgaben wie geschaffen ist.</p>
+        <p class="intro">Sie kennen sicher auch das leidige Problem: Der Urlaub steht vor der Tür und keiner der Nachbarn will die Blumen versorgen, da sie just in der gleichen Zeit Urlaubsgefühle verspüren. Der Computer schafft Abhilfe.</p>
 
-<h2>Der User-Port, eine Verbindung zur Außenwelt</h2>
+        <p>Die Idee war, mit einer kleinen Tauchpumpe (Campingartikelbedarf) und einem verzweigten Schlauchsystem die Blumen täglich mit dem kostbaren Naß zu versorgen (Bild 1). Diese kleinen Pumpen haben eine Förderleistung von etwa 14 l/min., was für die minimalen Ein- und Ausschaltzeiten mechanischer Schaltuhren von 30 Minuten viel zu viel ist. Elektronische Schaltuhren, die individuelle Schaltzyklen zulassen, waren wiederum viel zu teuer.</p>
 
-<p>Der User-Port ist eine Schnittstelle, mit der der Anwender auf einfache Art und Weise Kontakt zwischen dem Commodore und der Außenwelt herstellen kann. Mit ihm ist es unter anderem möglich, Geräte an- und auszuschalten. Da der User-Port eine 8 Bit breite Datenleitung besitzt (PB0-PB7, siehe Bild 2), können ohne weiteres Klimmzüge bis zu 8 Verbraucher geschaltet werden. Dazu ist jedoch etwas zusätzliche Hardware nötig. Um einen Stromverbraucher zu steuern (in unserem Fall eine kleine Pumpe), benötigt man ein Schaltinterface. Denn die Pumpe braucht mehr Strom als der User-Port zur Verfügung stellt. In meinem Fall baute ich mir ein Interface, das direkt an das normale 220-Volt-Netz angeschlossen werden kann. Mit ihm lassen sich grundsätzlich alle Elektrogeräte schalten. Den Aufbau dieses einfachen Schaltinterfaces zeigt Bild 3. Zusätzlich benötigt man noch eine Verbindung vom Interface zum User-Port. Ein geeigneter Stecker zum Anschluß an den User-Port ist der Cardcon-Stecker von TRW (Nr. 251-12-50-170) (Bild 4).</p>
+        <p>Die Idee, meinen 64er zum Blumengießen herzunehmen, reifte. Denn schließlich besitzt er einen User-Port, der für solche Aufgaben wie geschaffen ist.</p>
 
-<p>Zur Absicherung des User-Ports wurde zwischen der eigentlichen Schaltung und dem Port ein 6fach-Inverter eingefügt.</p>
+        <h2>Der User-Port, eine Verbindung zur Außenwelt</h2>
 
-<h3>Das Programm: eine Uhr</h3>
+        <p>Der User-Port ist eine Schnittstelle, mit der der Anwender auf einfache Art und Weise Kontakt zwischen dem Commodore und der Außenwelt herstellen kann. Mit ihm ist es unter anderem möglich, Geräte an- und auszuschalten. Da der User-Port eine 8 Bit breite Datenleitung besitzt (PB0-PB7, siehe Bild 2), können ohne weiteres Klimmzüge bis zu 8 Verbraucher geschaltet werden. Dazu ist jedoch etwas zusätzliche Hardware nötig. Um einen Stromverbraucher zu steuern (in unserem Fall eine kleine Pumpe), benötigt man ein Schaltinterface. Denn die Pumpe braucht mehr Strom als der User-Port zur Verfügung stellt. In meinem Fall baute ich mir ein Interface, das direkt an das normale 220-Volt-Netz angeschlossen werden kann. Mit ihm lassen sich grundsätzlich alle Elektrogeräte schalten. Den Aufbau dieses einfachen Schaltinterfaces zeigt Bild 3. Zusätzlich benötigt man noch eine Verbindung vom Interface zum User-Port. Ein geeigneter Stecker zum Anschluß an den User-Port ist der Cardcon-Stecker von TRW (Nr. 251-12-50-170) (Bild 4).</p>
 
-<p>Das Gießprogramm besteht im wesentlichen aus der Programmierung der Echtzeituhr im CIA 1. Dieses Programm entstammt dem Data Becker-Buch 64-intern.</p>
+        <p>Zur Absicherung des User-Ports wurde zwischen der eigentlichen Schaltung und dem Port ein 6fach-Inverter eingefügt.</p>
 
-<p>In Zeile 100 bis 270 wird die Uhr gestellt, in Zeile 280 bis 480 die laufende Uhr programmiert. In Zeile 440 wird abgefragt, ob der Zeitpunkt zum Gießen erreicht ist. Wenn dies der Fall ist, wird in die Subroutine 1000 verzweigt. In diesem Unterprogramm wird das Datenrichtungsregister auf Ausgang geschaltet und mit POKE 56577,1 die PB0-Leitung auf High gelegt. In Zeile 1030 schließlich wartet das Programm 20 Sekunden und schaltet in Zeile 1050 die Pumpe wieder aus. Die Warteschleife in Zeile 1030 kann dem jeweiligen Anwendungsfall angepaßt werden.</p>
+        <h3>Das Programm: eine Uhr</h3>
 
-<p>Das Programm läßt sich natürlich für beliebige Schaltzyklen und Schaltzeiten abändern.</p>
+        <p>Das Gießprogramm besteht im wesentlichen aus der Programmierung der Echtzeituhr im CIA 1. Dieses Programm entstammt dem Data Becker-Buch 64-intern.</p>
 
-<p>(Klaus Michael)</p>
+        <p>In Zeile 100 bis 270 wird die Uhr gestellt, in Zeile 280 bis 480 die laufende Uhr programmiert. In Zeile 440 wird abgefragt, ob der Zeitpunkt zum Gießen erreicht ist. Wenn dies der Fall ist, wird in die Subroutine 1000 verzweigt. In diesem Unterprogramm wird das Datenrichtungsregister auf Ausgang geschaltet und mit POKE 56577,1 die PB0-Leitung auf High gelegt. In Zeile 1030 schließlich wartet das Programm 20 Sekunden und schaltet in Zeile 1050 die Pumpe wieder aus. Die Warteschleife in Zeile 1030 kann dem jeweiligen Anwendungsfall angepaßt werden.</p>
 
+        <p>Das Programm läßt sich natürlich für beliebige Schaltzyklen und Schaltzeiten abändern.</p>
+
+        <p>(Klaus Michael)</p>
+
+
+    </article>
+
+</body>
+
+</html>

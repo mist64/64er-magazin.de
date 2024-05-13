@@ -1,180 +1,207 @@
-<h1>Strubs – Ein Precompiler für Basic-Programme (Teil 4)</h1>
+<!DOCTYPE html>
+<html lang="de">
 
-<p class="intro">In der heutigen letzten Folge wollen wir einige Teite des Programmes Strubs genauer ansehen und untersuchen, wie man das Programm um zusätzliche Funktionen erweitern kann. Dabei werden wir sehen, daß ein solches Übersetzungsprogramm auch für ganz andere Aufgaben eingesetzt werden kann.</p>
+<head>
+    <title>XXX</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="XXX">
+    <meta name="64er.issue" content="7/84">
+    <meta name="64er.pages" content="XXX">
+    <meta name="64er.head1" content="XXX">
+    <meta name="64er.head2" content="XXX">
+    <meta name="64er.toc_title" content="XXX">
+    <meta name="64er.toc_category" content="XXX">
+    <meta name="64er.index_title" content="XXX">
+    <meta name="64er.index_category" content="XXX">
+    <meta name="64er.id" content="xxx">
+</head>
 
-<p>In den vorausgehenden Folgen wurde bereits erwähnt, daß die strukturierte Programmierung vor allem Vorteile in bezug auf Wartung, Änderungen und Erweiterbarkeit von Programmen bietet. Dies gilt auch für das Programm Strubs. Um in den Genuß dieser Vorteile zu gelangen, ist allerdings der Zugang zum Quellprogramm erforderlich. Wenn Sie sich das in Heft 5 abgedruckte Objektprogramm ansehen, werden Sie feststellen, daß es auch nicht viel aussagekräftiger als ein unkommentiertes Assemblerlisting ist. Wenn Sie an der Entwicklung eigener Programmerweiterungen interessiert sind, sollten Sie sich deshalb beim Verlag das Quellprogramm besorgen. Da ich hier davon ausgehen muß, daß die meisten Leser das Quellprogramm nicht besitzen, lohnt es sich gar nicht erst, systematisch die einzelnen Programmteile vorzustellen.</p>
+<body>
+    <article>
+        <h1>Strubs – Ein Precompiler für Basic-Programme (Teil 4)</h1>
 
-<p>Statt dessen wollen wir nur die für Programmerweiterungen wichtigsten Programmelemente vorstellen und anhand einiger exemplarischer Erweiterungen, die auch, ohne sich weitere Gedanken zu machen, einfach eingetippt werden können, aufzeigen, wie man Erweiterungen implementieren kann und was dabei zu beachten ist. Aus dem gleichen Grund geben wir nur die Änderungen an, die im Objektprogramm vorzunehmen sind. Eine Anpassung an das Quellprogramm dürfte keine Probleme bereiten.</p>
+        <p class="intro">In der heutigen letzten Folge wollen wir einige Teite des Programmes Strubs genauer ansehen und untersuchen, wie man das Programm um zusätzliche Funktionen erweitern kann. Dabei werden wir sehen, daß ein solches Übersetzungsprogramm auch für ganz andere Aufgaben eingesetzt werden kann.</p>
 
-<p>Achten Sie bei allen Programmänderungen darauf, daß das geänderte Programm abgespeichert wird, bevor es zum ersten Mal gestartet wird, da das Programm den Zeiger auf das Programmende verstellt. Sollte das Programm durch Erweiterungen so lang werden, daß es in den Editbereich hineinreicht, kann der Anfang des Editbereichs in Schritten zu 256 Byte nach oben verschoben werden, um Platz zu schaffen. Dazu ist in den Zeilen 70 bis 80 die Zahl 40 überall, wo sie auftaucht, durch eine größere Zahl (jeweils 4 für jedes Kilobyte) zu ersetzen (vgl. auch den Schluß der 3. Folge).</p>
+        <p>In den vorausgehenden Folgen wurde bereits erwähnt, daß die strukturierte Programmierung vor allem Vorteile in bezug auf Wartung, Änderungen und Erweiterbarkeit von Programmen bietet. Dies gilt auch für das Programm Strubs. Um in den Genuß dieser Vorteile zu gelangen, ist allerdings der Zugang zum Quellprogramm erforderlich. Wenn Sie sich das in Heft 5 abgedruckte Objektprogramm ansehen, werden Sie feststellen, daß es auch nicht viel aussagekräftiger als ein unkommentiertes Assemblerlisting ist. Wenn Sie an der Entwicklung eigener Programmerweiterungen interessiert sind, sollten Sie sich deshalb beim Verlag das Quellprogramm besorgen. Da ich hier davon ausgehen muß, daß die meisten Leser das Quellprogramm nicht besitzen, lohnt es sich gar nicht erst, systematisch die einzelnen Programmteile vorzustellen.</p>
 
-<h2>Die wichtigsten Programmelemente</h2>
+        <p>Statt dessen wollen wir nur die für Programmerweiterungen wichtigsten Programmelemente vorstellen und anhand einiger exemplarischer Erweiterungen, die auch, ohne sich weitere Gedanken zu machen, einfach eingetippt werden können, aufzeigen, wie man Erweiterungen implementieren kann und was dabei zu beachten ist. Aus dem gleichen Grund geben wir nur die Änderungen an, die im Objektprogramm vorzunehmen sind. Eine Anpassung an das Quellprogramm dürfte keine Probleme bereiten.</p>
 
-<p>Eine grobe Übersicht über den Aufbau des Programms haben wir bereits in der 2. Folge gegeben. Bevor wir uns nun mit einzelnen Erweiterungen beschäftigen, wollen wir zunächst einmal die wichtigsten Programmelemente vorstellen, die man für Änderungen und Erweiterungen des Programms benötigt. Wie bereits erwähnt, liest Strubs das Quellprogramm zweimal vom Anfang bis zum Ende durch. Um Zeit zu sparen, wird im 1. Lauf nur jeweils der Anfang einer Zeile untersucht. Deshalb müssen alle Befehle, die bereits im 1. Lauf zu behandeln sind, auch am Anfang einer Zeile stehen, während Befehle, die nur im 2. Lauf behandelt werden, überall stehen können. Ein Beispiel:</p>
+        <p>Achten Sie bei allen Programmänderungen darauf, daß das geänderte Programm abgespeichert wird, bevor es zum ersten Mal gestartet wird, da das Programm den Zeiger auf das Programmende verstellt. Sollte das Programm durch Erweiterungen so lang werden, daß es in den Editbereich hineinreicht, kann der Anfang des Editbereichs in Schritten zu 256 Byte nach oben verschoben werden, um Platz zu schaffen. Dazu ist in den Zeilen 70 bis 80 die Zahl 40 überall, wo sie auftaucht, durch eine größere Zahl (jeweils 4 für jedes Kilobyte) zu ersetzen (vgl. auch den Schluß der 3. Folge).</p>
 
-<p>Die Definition von Marken muß am Zeilenanfang erfolgen, während der Aufruf von Marken an jeder Stelle erfolgen kann. Die Aufgabe des 1. Laufs besteht darin, verschiedene Tabellen anzulegen, mit deren Hilfe dann im 2. Lauf das endgültige Objektprogramm erzeugt wird.</p>
+        <h2>Die wichtigsten Programmelemente</h2>
 
-<p>Jede dieser Tabellen besteht aus einem oder mehreren Array(s), einer Variablen, deren zweiter Buchstabe ein »M« für »Maximal« ist und die Dimension, das heißt die maximale Zahl von Einträgen festlegt, und aus einer Variablen, deren zweiter Buchstabe ein »P« für »Pointer« ist und die auf den jeweils nächsten freien Listenplatz zeigt. Bei Speicherplatzproblemen brauchen nur die Werte der Dimensionsvariablen im Init-Teil geändert zu werden. Möchte man zum Beispiel mehr als 99 Marken (die jetzige Maximalzahl) benutzen, dann schreibt man in Zeile 45060 zum Beispiel »MM = 150:&hellip;«.</p>
+        <p>Eine grobe Übersicht über den Aufbau des Programms haben wir bereits in der 2. Folge gegeben. Bevor wir uns nun mit einzelnen Erweiterungen beschäftigen, wollen wir zunächst einmal die wichtigsten Programmelemente vorstellen, die man für Änderungen und Erweiterungen des Programms benötigt. Wie bereits erwähnt, liest Strubs das Quellprogramm zweimal vom Anfang bis zum Ende durch. Um Zeit zu sparen, wird im 1. Lauf nur jeweils der Anfang einer Zeile untersucht. Deshalb müssen alle Befehle, die bereits im 1. Lauf zu behandeln sind, auch am Anfang einer Zeile stehen, während Befehle, die nur im 2. Lauf behandelt werden, überall stehen können. Ein Beispiel:</p>
 
-<p>Die Tabellen werden in den Zeilen 45050 bis 45200 definiert (Bild 1). Die Dimension des Stacks bestimmt die mögliche Schachtelungstiefe. Dazu kommen die Tabellen der neuen Befehle (Zeile 45260 bis 45274) und der Fehlermeldungen (Zeile 45480 bis 45514).</p>
+        <p>Die Definition von Marken muß am Zeilenanfang erfolgen, während der Aufruf von Marken an jeder Stelle erfolgen kann. Die Aufgabe des 1. Laufs besteht darin, verschiedene Tabellen anzulegen, mit deren Hilfe dann im 2. Lauf das endgültige Objektprogramm erzeugt wird.</p>
 
-<p>Dem schrittweisen Lesen des Quellprogramms dienen die Variablen C und NC. Die Variable C enthält den Code des jeweils zuletzt gelesenen Zeichens, wobei der Wert 0 ein Zeilenende markiert. Die Variable NC enthält die Adresse des nächsten zu lesenden Zeichens. Im 2. Lauf wird zeilenweise das Objektprogramm erzeugt, wobei die jeweils aktuelle Zeile in der Variablen Z$ aufgebaut wird. Dabei enthalten die beiden ersten Zeichen von Z$ Low- und Highbyte der Zeilennummer (so wie sie später im Speicher steht), und das letzte Zeichen der fertigen Zeile besteht aus dem Zeichen CHR$(0).</p>
+        <p>Jede dieser Tabellen besteht aus einem oder mehreren Array(s), einer Variablen, deren zweiter Buchstabe ein »M« für »Maximal« ist und die Dimension, das heißt die maximale Zahl von Einträgen festlegt, und aus einer Variablen, deren zweiter Buchstabe ein »P« für »Pointer« ist und die auf den jeweils nächsten freien Listenplatz zeigt. Bei Speicherplatzproblemen brauchen nur die Werte der Dimensionsvariablen im Init-Teil geändert zu werden. Möchte man zum Beispiel mehr als 99 Marken (die jetzige Maximalzahl) benutzen, dann schreibt man in Zeile 45060 zum Beispiel »MM = 150:&hellip;«.</p>
 
-<p>Die relevanten Zeichencodes, auf die Strubs reagiert, werden in den Zeilen 45240 bis 45254 definiert (Bild 2). Die Variable ZA enthält die Adresse des Anfangs der Zeile, die gerade bearbeitet wird. In EA steht die Startadresse des Editbereichs.</p>
+        <p>Die Tabellen werden in den Zeilen 45050 bis 45200 definiert (Bild 1). Die Dimension des Stacks bestimmt die mögliche Schachtelungstiefe. Dazu kommen die Tabellen der neuen Befehle (Zeile 45260 bis 45274) und der Fehlermeldungen (Zeile 45480 bis 45514).</p>
 
-<p>Damit kommen wir zu den für Erweiterungen wichtigen Modulen von Strubs. Die Prozedur »NEXT-CHAR« sucht ab Adresse NC das nächste relevante Zeichen des Quellprogrammtextes und liefert dessen Code in der Variablen C. Dabei werden Leerzeichen (Zeile 250) und Kommentare (Zeile 280-295) überlesen. Strings werden direkt in die Ausgabezeile Z$ übertragen (Zeile 350). Der Zeiger NC wird auf das nächste zu lesende Zeichen gesetzt. Die Prozedur »HOLNAME« (Zeile 750-830) liest ab aktueller Adresse NC einen Namen (zum Beispiel Befehl, Label) und zwar bis eines der Trennzeichen »:«, »,«, Blank oder Zeilenende erscheint. Der Name wird in der Variablen T$ ausgegeben, C enthält das erste relevante Zeichen hinter dem Namen (das ist außer beim Blank das Trennzeichen), und NC zeigt auf das nächste Zeichen.</p>
+        <p>Dem schrittweisen Lesen des Quellprogramms dienen die Variablen C und NC. Die Variable C enthält den Code des jeweils zuletzt gelesenen Zeichens, wobei der Wert 0 ein Zeilenende markiert. Die Variable NC enthält die Adresse des nächsten zu lesenden Zeichens. Im 2. Lauf wird zeilenweise das Objektprogramm erzeugt, wobei die jeweils aktuelle Zeile in der Variablen Z$ aufgebaut wird. Dabei enthalten die beiden ersten Zeichen von Z$ Low- und Highbyte der Zeilennummer (so wie sie später im Speicher steht), und das letzte Zeichen der fertigen Zeile besteht aus dem Zeichen CHR$(0).</p>
 
-<p>Die Prozedur »SCHREIBZEILE« (Zeile 550-580) generiert auf der Diskette aus den nacheinander eingegebenen Zeilen Z$ das zusammenhängende Objektprogramm und gibt die Nummer der aktuellen Zeile auf dem Bildschirm aus. Die Variable AA (Linkadresse) darf außerhalb dieser Routine nicht verändert werden!</p>
+        <p>Die relevanten Zeichencodes, auf die Strubs reagiert, werden in den Zeilen 45240 bis 45254 definiert (Bild 2). Die Variable ZA enthält die Adresse des Anfangs der Zeile, die gerade bearbeitet wird. In EA steht die Startadresse des Editbereichs.</p>
 
-<p>Die Prozedur »ERROR« (Zeile 8050 bis 8099) erwartet als Eingabe einen Fehlercode ER. Dabei handelt es sich um den Index der Fehlermeldung in der Tabelle der Fehlermeldungen. Die Zeilennummer und die Fehlermeldung werden auf dem Bildschirm ausgegeben und zugleich in eine Fehlertabelle eingetragen, die man sich nach der Übersetzung auf Bildschirm oder Drucker ausgeben lassen kann. Zusätzlich wird die Fehlermeldung in die Ausgabezeile Z$ geschrieben, so daß sie auch im Objektprogramm erscheint. Die Übersetzung wird mit der folgenden Zeile fortgesetzt.</p>
+        <p>Damit kommen wir zu den für Erweiterungen wichtigen Modulen von Strubs. Die Prozedur »NEXT-CHAR« sucht ab Adresse NC das nächste relevante Zeichen des Quellprogrammtextes und liefert dessen Code in der Variablen C. Dabei werden Leerzeichen (Zeile 250) und Kommentare (Zeile 280-295) überlesen. Strings werden direkt in die Ausgabezeile Z$ übertragen (Zeile 350). Der Zeiger NC wird auf das nächste zu lesende Zeichen gesetzt. Die Prozedur »HOLNAME« (Zeile 750-830) liest ab aktueller Adresse NC einen Namen (zum Beispiel Befehl, Label) und zwar bis eines der Trennzeichen »:«, »,«, Blank oder Zeilenende erscheint. Der Name wird in der Variablen T$ ausgegeben, C enthält das erste relevante Zeichen hinter dem Namen (das ist außer beim Blank das Trennzeichen), und NC zeigt auf das nächste Zeichen.</p>
 
-<p>Die Prozedur »ABBRUCH« (Zeile 50000 bis 50030) sorgt für einen kontrollierten Abbruch der Übersetzung. Sie erwartet ebenfalls als Eingabe den Fehlercode ER und gibt die entsprechende Fehlermeldung aus. Danach wird die Tabelle der bisher bemerkten Fehler ausgegeben, offene Files ordnungsgemäß geschlossen und Strubs neu gestartet.</p>
+        <p>Die Prozedur »SCHREIBZEILE« (Zeile 550-580) generiert auf der Diskette aus den nacheinander eingegebenen Zeilen Z$ das zusammenhängende Objektprogramm und gibt die Nummer der aktuellen Zeile auf dem Bildschirm aus. Die Variable AA (Linkadresse) darf außerhalb dieser Routine nicht verändert werden!</p>
 
-<p>Die Prozedur »WARTEN« (Zeile 49550 bis 49570) fordert den Benutzer auf, eine Taste zu drücken und wartet auf den Tastendruck.</p>
+        <p>Die Prozedur »ERROR« (Zeile 8050 bis 8099) erwartet als Eingabe einen Fehlercode ER. Dabei handelt es sich um den Index der Fehlermeldung in der Tabelle der Fehlermeldungen. Die Zeilennummer und die Fehlermeldung werden auf dem Bildschirm ausgegeben und zugleich in eine Fehlertabelle eingetragen, die man sich nach der Übersetzung auf Bildschirm oder Drucker ausgeben lassen kann. Zusätzlich wird die Fehlermeldung in die Ausgabezeile Z$ geschrieben, so daß sie auch im Objektprogramm erscheint. Die Übersetzung wird mit der folgenden Zeile fortgesetzt.</p>
 
-<p>Die Prozedur »INIT« (Zeile 45050 bis 45999) enthält die Definition der Variablen und Tabellen sowie die Interpretererweiterung.</p>
+        <p>Die Prozedur »ABBRUCH« (Zeile 50000 bis 50030) sorgt für einen kontrollierten Abbruch der Übersetzung. Sie erwartet ebenfalls als Eingabe den Fehlercode ER und gibt die entsprechende Fehlermeldung aus. Danach wird die Tabelle der bisher bemerkten Fehler ausgegeben, offene Files ordnungsgemäß geschlossen und Strubs neu gestartet.</p>
 
-<p>Im »MENÜ« (Zeile 40050 bis 40495) können die verschiedenen Funktionen angewählt werden.</p>
+        <p>Die Prozedur »WARTEN« (Zeile 49550 bis 49570) fordert den Benutzer auf, eine Taste zu drücken und wartet auf den Tastendruck.</p>
 
-<p>Die Prozeduren »BEFEHLE IM 1. LAUF« (Zeile 1550-2497) und »BEFEHLE IM 2. LAUF« (Zeile 2550-3640) werden von Strubs aufgerufen, sobald im Quellprogramm das Erkennungszeichen »!« für Befehle (Code in der Variablen BE) entdeckt wird. Sie holen den Namen des Befehls, suchen diesen in der Befehlstabelle und rufen entsprechend dem Index (+1) des Befehls in dieser Tabelle em Unterprogramm auf. Falls der Befehl nicht in der Tabelle gefunden wird, wird eine entsprechende Fehlermeldung ausgegeben. Im 1. Lauf kommt noch die Ausgabe der Blockstruktur hinzu. Hierzu dient die Variable In (für Indentmodus). IN = 0 bedeutet, auf der gleichen Schachtelungsebene zu bleiben.</p>
+        <p>Die Prozedur »INIT« (Zeile 45050 bis 45999) enthält die Definition der Variablen und Tabellen sowie die Interpretererweiterung.</p>
 
-<p>Damit haben wir nun das notwendige Wissen zusammen, um an dem Programm Strubs einige Änderungen und Erweiterungen vorzunehmen.</p>
+        <p>Im »MENÜ« (Zeile 40050 bis 40495) können die verschiedenen Funktionen angewählt werden.</p>
 
-<h2>Andere Anwendungen</h2>
+        <p>Die Prozeduren »BEFEHLE IM 1. LAUF« (Zeile 1550-2497) und »BEFEHLE IM 2. LAUF« (Zeile 2550-3640) werden von Strubs aufgerufen, sobald im Quellprogramm das Erkennungszeichen »!« für Befehle (Code in der Variablen BE) entdeckt wird. Sie holen den Namen des Befehls, suchen diesen in der Befehlstabelle und rufen entsprechend dem Index (+1) des Befehls in dieser Tabelle em Unterprogramm auf. Falls der Befehl nicht in der Tabelle gefunden wird, wird eine entsprechende Fehlermeldung ausgegeben. Im 1. Lauf kommt noch die Ausgabe der Blockstruktur hinzu. Hierzu dient die Variable In (für Indentmodus). IN = 0 bedeutet, auf der gleichen Schachtelungsebene zu bleiben.</p>
 
-<p>Bei den Programmtexten, die Strubs übersetzt, handelt es sich zwar um erweiterte Basicprogramme, aber nichtsdestoweniger um Basicprogramme. Deshalb ist es relativ einfach, Strubs auch zur Bearbeitung ganz normaler Basic-Programme einzusetzen. Zwei sinnvolle Möglichkeiten wollen wir im folgenden vorstellen.</p>
+        <p>Damit haben wir nun das notwendige Wissen zusammen, um an dem Programm Strubs einige Änderungen und Erweiterungen vorzunehmen.</p>
 
-<ol>
-<li>Ein SPEED-UP-Programm, um normale Basicprogramme schneller zu machen.</li>
-<li>Ein Programm, das besser lesbare Listings erstellt.</li>
-</ol>
+        <h2>Andere Anwendungen</h2>
 
+        <p>Bei den Programmtexten, die Strubs übersetzt, handelt es sich zwar um erweiterte Basicprogramme, aber nichtsdestoweniger um Basicprogramme. Deshalb ist es relativ einfach, Strubs auch zur Bearbeitung ganz normaler Basic-Programme einzusetzen. Zwei sinnvolle Möglichkeiten wollen wir im folgenden vorstellen.</p>
 
-<p>Dabei ist zu beachten, daß die Änderungen, die wir dazu vornehmen, nicht wie die Makro-Funktion eine Erweiterung des eigentlichen Programmes Strubs und seiner Funktion darstellen, sondern daß wir zwei völlig neue Programme mit völlig neuen Aufgaben erhalten. Deshalb sollten auch die erhaltenen Programme unter neuen Namen, beispielsweise »SPEED-UP« und »LISTER«, abgespeichert werden. Das Arbeiten mit diesen Programmen unterscheidet sich nicht von der Arbeit mit dem »normalen« Strubs-Programm.</p>
+        <ol>
+            <li>Ein SPEED-UP-Programm, um normale Basicprogramme schneller zu machen.</li>
+            <li>Ein Programm, das besser lesbare Listings erstellt.</li>
+        </ol>
 
-<h2>Schnelleres Basic</h2>
 
-<p>Zunächst wollen wir Strubs so ändern, daß es normale Basicprogramme in Programme übersetzt, die keine Leerzeichen und Kommentare mehr enthalten und dadurch schneller ablaufen. Wie Sie sich erinnern werden, benutzt Strubs für Kommentare, die gelöscht werden sollen, ein eigenes Zeichen »'«. Kommentare, die mit REM gekennzeichnet werden, bleiben im Objektprogramm erhalten. Da Strubs bereits alle Blanks entfernt (außer in Strings), brauchen wir nur noch dafür zu sorgen, daß Strubs auf das REM-Token reagiert wie bisher auf das Kommentarzeichen »’«. Die relevanten Zeichencodes, auf die Strubs reagiert, werden in den Zeilen 45250 bis 45254 definiert (Bild 2). Wir brauchen nur in Zeile 45250 das KO = ASC(» ’«) durch KO = 143 (143 ist das REM-Token) ersetzen und schon ist das Speed-Up-Programm fertig. Genauso können Sie die Erkennungszeichen für Label und die neuen Befehle ändern. Dies ist, um Konflikte zu vermeiden, für den Fall sinnvoll, daß Sie mit Strubs Programme für Interpretererweiterungen übersetzen, die ihrerseits »!« oder das Pfundzeichen als Erkennungszeichen für ihre neuen Befehle benutzen.</p>
+        <p>Dabei ist zu beachten, daß die Änderungen, die wir dazu vornehmen, nicht wie die Makro-Funktion eine Erweiterung des eigentlichen Programmes Strubs und seiner Funktion darstellen, sondern daß wir zwei völlig neue Programme mit völlig neuen Aufgaben erhalten. Deshalb sollten auch die erhaltenen Programme unter neuen Namen, beispielsweise »SPEED-UP« und »LISTER«, abgespeichert werden. Das Arbeiten mit diesen Programmen unterscheidet sich nicht von der Arbeit mit dem »normalen« Strubs-Programm.</p>
 
-<h2>Listings</h2>
+        <h2>Schnelleres Basic</h2>
 
-<p>Wollen Sie im »64’er« eigene Programme veröffentlichen? Dann können Sie den Lesern viel Ärger ersparen, wenn Sie das Listing vorher mit dem Programm »LISTER« aufbereiten. »LISTER« übersetzt Basic-Programme in Programmtexte, in denen die schwer entzifferbaren Steuer- und Grafikzeichen innerhalb von Strings durch lesbare Worte »&lt;CDOWN&gt;« oder »&lt;HOME&gt;« ersetzt sind (Bild 3).</p>
+        <p>Zunächst wollen wir Strubs so ändern, daß es normale Basicprogramme in Programme übersetzt, die keine Leerzeichen und Kommentare mehr enthalten und dadurch schneller ablaufen. Wie Sie sich erinnern werden, benutzt Strubs für Kommentare, die gelöscht werden sollen, ein eigenes Zeichen »'«. Kommentare, die mit REM gekennzeichnet werden, bleiben im Objektprogramm erhalten. Da Strubs bereits alle Blanks entfernt (außer in Strings), brauchen wir nur noch dafür zu sorgen, daß Strubs auf das REM-Token reagiert wie bisher auf das Kommentarzeichen »’«. Die relevanten Zeichencodes, auf die Strubs reagiert, werden in den Zeilen 45250 bis 45254 definiert (Bild 2). Wir brauchen nur in Zeile 45250 das KO = ASC(» ’«) durch KO = 143 (143 ist das REM-Token) ersetzen und schon ist das Speed-Up-Programm fertig. Genauso können Sie die Erkennungszeichen für Label und die neuen Befehle ändern. Dies ist, um Konflikte zu vermeiden, für den Fall sinnvoll, daß Sie mit Strubs Programme für Interpretererweiterungen übersetzen, die ihrerseits »!« oder das Pfundzeichen als Erkennungszeichen für ihre neuen Befehle benutzen.</p>
 
-<p>Dazu ändern wir eine Zeile innerhalb der Prozedur »NEXTCHAR«. In Zeile 350 werden gelesene Zeichen mit dem ASCII-Code C innerhalb von Strings direkt in die Ausgabezeile Z$ übertragen. Wenn wir nun in Zeile 350 Z$=Z$+CHR$&copy; durch Z$=Z$+C$&copy; ersetzen, dann können wir ein Array C$(255) definieren, das in jedem ASCII-Wert den String enthält, der dafür im Objektprogramm erscheinen soll. Die Definition dieses Arrays gehört in das Modul »INITIALISIERUNG«:<br>
-45300 DIM C$(255):FOR I = 0 TO 255:C$(I) = CHR$(I):NEXT</p>
+        <h2>Listings</h2>
 
-<p>Damit haben wir zugleich unser Array mit den normalen Werten vorbesetzt. Jetzt bleiben nur noch die Ersetzungen:<br>
-45310 C$(17)= &ldquo;(CDOWN)&rdquo;:C$(19)=&ldquo;&lt;HOME&gt;&rdquo;<br>
-45312 C$(28) = &ldquo;&lt;ROT&gt;&rdquo;:C$(31)=&ldquo;&lt;BLAU&gt;&rdquo;<br>
-&hellip; usw.</p>
+        <p>Wollen Sie im »64’er« eigene Programme veröffentlichen? Dann können Sie den Lesern viel Ärger ersparen, wenn Sie das Listing vorher mit dem Programm »LISTER« aufbereiten. »LISTER« übersetzt Basic-Programme in Programmtexte, in denen die schwer entzifferbaren Steuer- und Grafikzeichen innerhalb von Strings durch lesbare Worte »&lt;CDOWN&gt;« oder »&lt;HOME&gt;« ersetzt sind (Bild 3).</p>
 
-<p>Hier können Sie nun jedem Zeichen ein beliebiges Wort zuordnen: Den ASCII-Code der einzelnen Zeichen finden Sie im C-64 Handbuch auf S. 135 oder Sie können ihn einfach durch Eingabe von<br>
-PRINT ASC(&ldquo;X&rdquo;)<br>
-feststellen, wobei »X« für das interessierende Zeichen steht. Bei sehr vielen Zeichen innerhalb eines Strings kann es allerdings vorkommen, daß die Zeilen zu lang werden. Deshalb sollten die Worte möglichst kurz gewählt werden.</p>
+        <p>Dazu ändern wir eine Zeile innerhalb der Prozedur »NEXTCHAR«. In Zeile 350 werden gelesene Zeichen mit dem ASCII-Code C innerhalb von Strings direkt in die Ausgabezeile Z$ übertragen. Wenn wir nun in Zeile 350 Z$=Z$+CHR$&copy; durch Z$=Z$+C$&copy; ersetzen, dann können wir ein Array C$(255) definieren, das in jedem ASCII-Wert den String enthält, der dafür im Objektprogramm erscheinen soll. Die Definition dieses Arrays gehört in das Modul »INITIALISIERUNG«:<br>
+            45300 DIM C$(255):FOR I = 0 TO 255:C$(I) = CHR$(I):NEXT</p>
 
-<h2>Makros</h2>
+        <p>Damit haben wir zugleich unser Array mit den normalen Werten vorbesetzt. Jetzt bleiben nur noch die Ersetzungen:<br>
+            45310 C$(17)= &ldquo;(CDOWN)&rdquo;:C$(19)=&ldquo;&lt;HOME&gt;&rdquo;<br>
+            45312 C$(28) = &ldquo;&lt;ROT&gt;&rdquo;:C$(31)=&ldquo;&lt;BLAU&gt;&rdquo;<br>
+            &hellip; usw.</p>
 
-<p>An einem etwas umfangreicheren Beispiel wollen wir nun zeigen, wie man neue Strubs-Befehle implementiert und wie man die Prozeduren von Strubs benutzen kann. Dies soll am Beispiel einer Makro-Funktion demonstriert werden.</p>
+        <p>Hier können Sie nun jedem Zeichen ein beliebiges Wort zuordnen: Den ASCII-Code der einzelnen Zeichen finden Sie im C-64 Handbuch auf S. 135 oder Sie können ihn einfach durch Eingabe von<br>
+            PRINT ASC(&ldquo;X&rdquo;)<br>
+            feststellen, wobei »X« für das interessierende Zeichen steht. Bei sehr vielen Zeichen innerhalb eines Strings kann es allerdings vorkommen, daß die Zeilen zu lang werden. Deshalb sollten die Worte möglichst kurz gewählt werden.</p>
 
-<p>Makros, vor allem von Assemblern her bekannt, stellen so etwas wie Abkürzungen für kurze Programmausschnitte dar. Dadurch verringert sich die Tipparbeit und vor allem werden die Quellprogramme übersichtlicher.</p>
+        <h2>Makros</h2>
 
-<p>In der Makro-Definition wird ein Makro-Name definiert und diesem ein Programmstück zugeordnet. Überall, wo nun im Quellprogramm ein Makro aufgerufen wird, erscheint im Objektprogramm an dieser Stelle das entsprechende Programmstück. Ein einmal definiertes Makro kann wie ein Label beliebig oft aufgerufen werden.</p>
+        <p>An einem etwas umfangreicheren Beispiel wollen wir nun zeigen, wie man neue Strubs-Befehle implementiert und wie man die Prozeduren von Strubs benutzen kann. Dies soll am Beispiel einer Makro-Funktion demonstriert werden.</p>
 
-<p>Für die Definition eines Makros wollen wir den Befehl »IDMAKRO« und für den Aufruf eines Makros den Befehl »!M« wählen. Ein Beispiel mag die Wirkungsweise der neuen Befehle demonstrieren:<br>
-10 !DMAKRO:NAME SYS 833:X= PEEK (878)<br>
-&hellip;<br>
-200 PRINT X:!M,NAME:PRINT X</p>
+        <p>Makros, vor allem von Assemblern her bekannt, stellen so etwas wie Abkürzungen für kurze Programmausschnitte dar. Dadurch verringert sich die Tipparbeit und vor allem werden die Quellprogramme übersichtlicher.</p>
 
-<p>Die Definitionszeile 10 wird gelöscht, da sie nur für die Übersetzung notwendige Informationen enthält. Die Zeile 200 mit dem Makro-Aufruf sieht im Objektprogramm folgendermaßen aus:<br>
-200 PRINTX:SYS833:X=PEEK(878): PRINTX</p>
+        <p>In der Makro-Definition wird ein Makro-Name definiert und diesem ein Programmstück zugeordnet. Überall, wo nun im Quellprogramm ein Makro aufgerufen wird, erscheint im Objektprogramm an dieser Stelle das entsprechende Programmstück. Ein einmal definiertes Makro kann wie ein Label beliebig oft aufgerufen werden.</p>
 
-<p>Einige Beispiele für Makros und deren korrekte Benutzung sowie das sich ergebende Objektprogramm zeigt Bild 4. Vor allem ist darauf zu achten, daß Makronamen wie alle Befehls- und Labelnamen mit einem der Trennzeichen abgeschlossen werden müssen. Insbesondere darf bei der Makrodefinition und beim Aufruf mit nachfolgenden Parametern (Spritemakros in Zeile 120 und 130) nicht das Blank hinter dem Makronamen vergessen werden! Jede Makrodefinition benötigt eine eigene Zeile. Eine Übergabe von Parametern an ein Makro ist nicht möglich. Achten Sie bei der Arbeit mit Makros darauf, daß die entstehenden Zeilen des Objektprogramms nicht zu lang werden. Zeilen, die länger als 80 Zeichen sind, lassen sich nicht mehr editieren. Zeilen, die länger als 256 Zeichen werden, führen zum unkontrollierten Abbruch der Übersetzung mit »String too long error«. In diesem Fall kann man mit »GOTO 50000« die Nummer der verantwortlichen Zeile erfahren und offene Files schließen.</p>
+        <p>Für die Definition eines Makros wollen wir den Befehl »IDMAKRO« und für den Aufruf eines Makros den Befehl »!M« wählen. Ein Beispiel mag die Wirkungsweise der neuen Befehle demonstrieren:<br>
+            10 !DMAKRO:NAME SYS 833:X= PEEK (878)<br>
+            &hellip;<br>
+            200 PRINT X:!M,NAME:PRINT X</p>
 
-<p>Um die Übersetzung zu ermöglichen, muß im 1. Lauf eine Tabelle der Makronamen und der zugehörigen Programmausschnitte angelegt werden. Im 2. Lauf werden dann alle Aufrufe durch den zugehörigen Text ersetzt. Die Verteilung auf zwei Läufe bietet den Vorteil, daß ein Makro (ebenso wie Labels) auch schon vor der Definition aufgerufen werden kann.</p>
+        <p>Die Definitionszeile 10 wird gelöscht, da sie nur für die Übersetzung notwendige Informationen enthält. Die Zeile 200 mit dem Makro-Aufruf sieht im Objektprogramm folgendermaßen aus:<br>
+            200 PRINTX:SYS833:X=PEEK(878): PRINTX</p>
 
-<p>Zur Implementation sind folgende Schritte erforderlich: Zunächst muß dem Übersetzungsprogramm mitgeteilt werden, daß es zwei neue Befehle gibt. Dann müssen wir die notwendige Tabelle definieren und auch entsprechende Fehlermeldungen vorsehen. Diese Erweiterungen gehören in den INIT-Teil.</p>
+        <p>Einige Beispiele für Makros und deren korrekte Benutzung sowie das sich ergebende Objektprogramm zeigt Bild 4. Vor allem ist darauf zu achten, daß Makronamen wie alle Befehls- und Labelnamen mit einem der Trennzeichen abgeschlossen werden müssen. Insbesondere darf bei der Makrodefinition und beim Aufruf mit nachfolgenden Parametern (Spritemakros in Zeile 120 und 130) nicht das Blank hinter dem Makronamen vergessen werden! Jede Makrodefinition benötigt eine eigene Zeile. Eine Übergabe von Parametern an ein Makro ist nicht möglich. Achten Sie bei der Arbeit mit Makros darauf, daß die entstehenden Zeilen des Objektprogramms nicht zu lang werden. Zeilen, die länger als 80 Zeichen sind, lassen sich nicht mehr editieren. Zeilen, die länger als 256 Zeichen werden, führen zum unkontrollierten Abbruch der Übersetzung mit »String too long error«. In diesem Fall kann man mit »GOTO 50000« die Nummer der verantwortlichen Zeile erfahren und offene Files schließen.</p>
 
-<p>Schließlich muß noch dafür gesorgt werden, daß Strubs weiß, wie es im 1. und 2. Lauf auf die neuen Befehle zu reagieren hat.</p>
+        <p>Um die Übersetzung zu ermöglichen, muß im 1. Lauf eine Tabelle der Makronamen und der zugehörigen Programmausschnitte angelegt werden. Im 2. Lauf werden dann alle Aufrufe durch den zugehörigen Text ersetzt. Die Verteilung auf zwei Läufe bietet den Vorteil, daß ein Makro (ebenso wie Labels) auch schon vor der Definition aufgerufen werden kann.</p>
 
-<p>Die Befehlstabelle wird in Zeile 45265 definiert. Hier erhöhen wir die Zahl der Befehle um 2 und fügen dann noch eine DATA-Zeile mit den beiden neuen Befehlsnamen ein:<br>
-45265 BM = 15:&hellip;<br>
-45275 DATA DMAKRO,M</p>
+        <p>Zur Implementation sind folgende Schritte erforderlich: Zunächst muß dem Übersetzungsprogramm mitgeteilt werden, daß es zwei neue Befehle gibt. Dann müssen wir die notwendige Tabelle definieren und auch entsprechende Fehlermeldungen vorsehen. Diese Erweiterungen gehören in den INIT-Teil.</p>
 
-<p>Wählt man Befehlsnamen, die reservierte Basic-Worte enthalten, dann müssen die Tokens berücksichtigt werden (wie dies für IF in der Zeile 45271 geschieht). Für einen Befehl »DEFMAKRO« wäre zum Beispiel<br>
-BE$(14) = CHR$(150) + &ldquo;MAKRO” zu setzen (150=DEF-Token).</p>
+        <p>Schließlich muß noch dafür gesorgt werden, daß Strubs weiß, wie es im 1. und 2. Lauf auf die neuen Befehle zu reagieren hat.</p>
 
-<p>Für die Tabelle wählen wir ein Array NA$(NM,1), da der Name M bereits für die Markentabelle vergeben ist. Die Dimension (..,0) soll die Namen und die Dimension (..,1) den zugehörigen Text aufnehmen.<br>
-45155 NM = 40:DIM NA$(NM,1): NP = 0</p>
+        <p>Die Befehlstabelle wird in Zeile 45265 definiert. Hier erhöhen wir die Zahl der Befehle um 2 und fügen dann noch eine DATA-Zeile mit den beiden neuen Befehlsnamen ein:<br>
+            45265 BM = 15:&hellip;<br>
+            45275 DATA DMAKRO,M</p>
 
-<p>Damit können 41 Makros definiert werden. Indem wir die Zahl der Fehlermeldungen von 9 auf 11 erhöhen, erhalten wir die beiden neuen Fehlercodes 10 und 11 für »zu viele Makros« und »undefiniertes Makro«.<br>
-45480 EM = ll:DIM&hellip;<br>
-45500 FOR I = 0 TO EM:READ &hellip;<br>
-45515 DATA &ldquo;ZU VIELE MAKROS”, ’’UNDEFINIERTES MAKRO”</p>
+        <p>Wählt man Befehlsnamen, die reservierte Basic-Worte enthalten, dann müssen die Tokens berücksichtigt werden (wie dies für IF in der Zeile 45271 geschieht). Für einen Befehl »DEFMAKRO« wäre zum Beispiel<br>
+            BE$(14) = CHR$(150) + &ldquo;MAKRO” zu setzen (150=DEF-Token).</p>
 
-<p>Nun müssen wir in die beiden Module »BEFEHLE IM 1. LAUF« beziehungsweise »BEFEHLE IM 2. LAUF« jeweils zwei Routinen für die neuen Befehle einfügen. Da die beiden Verteilerzeilen bereits voll sind, legen wir zwei neue Verteilerzeilen, an, die dann aber auch gleich für 10 weitere neue Befehle Platz bieten:<br>
-1571 IF I>14 THEN ON I-14 GOSUB 2350,2380<br>
-für den 1. Lauf und<br>
-2571 IF I>14 THEN ON I-14 GOSUB 3700,3750<br>
-für den 2. Lauf.</p>
+        <p>Für die Tabelle wählen wir ein Array NA$(NM,1), da der Name M bereits für die Markentabelle vergeben ist. Die Dimension (..,0) soll die Namen und die Dimension (..,1) den zugehörigen Text aufnehmen.<br>
+            45155 NM = 40:DIM NA$(NM,1): NP = 0</p>
 
-<p>Die Routine für »IDMAKRO« im 1. Lauf soll zunächst prüfen, ob noch Platz in unserer Makro-Tabelle ist und, falls nicht, mit entsprechendem Fehlercode die Abbruch-Routine anspringen:<br>
-2350 IF NP>NM THEN ER = 10: GOTO 50000</p>
+        <p>Damit können 41 Makros definiert werden. Indem wir die Zahl der Fehlermeldungen von 9 auf 11 erhöhen, erhalten wir die beiden neuen Fehlercodes 10 und 11 für »zu viele Makros« und »undefiniertes Makro«.<br>
+            45480 EM = ll:DIM&hellip;<br>
+            45500 FOR I = 0 TO EM:READ &hellip;<br>
+            45515 DATA &ldquo;ZU VIELE MAKROS”, ’’UNDEFINIERTES MAKRO”</p>
 
-<p>Jetzt können wir mit Hilfe der Prozedur »HOLNAME« den Makro-Namen lesen und in unserer Tabelle speichern:<br>
-2355 Z$ = &ldquo; &rdquo;:GOSUB750:NA$(NP,0) =T$</p>
+        <p>Nun müssen wir in die beiden Module »BEFEHLE IM 1. LAUF« beziehungsweise »BEFEHLE IM 2. LAUF« jeweils zwei Routinen für die neuen Befehle einfügen. Da die beiden Verteilerzeilen bereits voll sind, legen wir zwei neue Verteilerzeilen, an, die dann aber auch gleich für 10 weitere neue Befehle Platz bieten:<br>
+            1571 IF I>14 THEN ON I-14 GOSUB 2350,2380<br>
+            für den 1. Lauf und<br>
+            2571 IF I>14 THEN ON I-14 GOSUB 3700,3750<br>
+            für den 2. Lauf.</p>
 
-<p>Nun übertragen wir den Rest der Definitionszeile mit Hilfe von »NEXT-CHAR« nach Z$ (dadurch werden auch Strings mit übertragen. Als Ausgabezeile dient Z$ ja erst im 2. Lauf).<br>
-2360    Z$ = Z$ + CHR$&copy;:GOSUB<br>
-250:IFC&lt;&gt;0THEN 2360</p>
+        <p>Die Routine für »IDMAKRO« im 1. Lauf soll zunächst prüfen, ob noch Platz in unserer Makro-Tabelle ist und, falls nicht, mit entsprechendem Fehlercode die Abbruch-Routine anspringen:<br>
+            2350 IF NP>NM THEN ER = 10: GOTO 50000</p>
 
-<p>Nun brauchen wir nur noch den Text in die Tabelle aufzunehmen, den Zeiger zu erhöhen und den Indentmodus angeben.<br>
-2370 NA$(NP,l) = Z$:NP = NP + l:IN = 0<br>
-2375 RETURN</p>
+        <p>Jetzt können wir mit Hilfe der Prozedur »HOLNAME« den Makro-Namen lesen und in unserer Tabelle speichern:<br>
+            2355 Z$ = &ldquo; &rdquo;:GOSUB750:NA$(NP,0) =T$</p>
 
-<p>Der Aufruf eines Makros interessiert im 1. Lauf nicht, also:<br>
-2380 IN=0:RETURN</p>
+        <p>Nun übertragen wir den Rest der Definitionszeile mit Hilfe von »NEXT-CHAR« nach Z$ (dadurch werden auch Strings mit übertragen. Als Ausgabezeile dient Z$ ja erst im 2. Lauf).<br>
+            2360 Z$ = Z$ + CHR$&copy;:GOSUB<br>
+            250:IFC&lt;&gt;0THEN 2360</p>
 
-<p>Im 2. Lauf soll die Definitionszeile gelöscht werden. Dazu löschen wir den Ausgabestring und weisen C den Code für Zeilenende zu:<br>
-3700 Z$ = ””:C = 0:RETURN</p>
+        <p>Nun brauchen wir nur noch den Text in die Tabelle aufzunehmen, den Zeiger zu erhöhen und den Indentmodus angeben.<br>
+            2370 NA$(NP,l) = Z$:NP = NP + l:IN = 0<br>
+            2375 RETURN</p>
 
-<p>Beim Aufruf eines Makros mit »!M« holen wir zunächst den Namen des Makros mit »HOLNAME« und suchen ihn in der Tabelle:<br>
-3750 GOSUB 750<br>
-3755 FOR I = 0 TO NP: IF NA$(I,0) &lt;&gt;T$ THEN NEXT</p>
+        <p>Der Aufruf eines Makros interessiert im 1. Lauf nicht, also:<br>
+            2380 IN=0:RETURN</p>
 
-<p>Falls der Name nicht gefunden wird, erfolgt ein Sprung zur Error-Routine mit dem Code für »undefiniertes Makro«:<br>
-3760 IF I>NP THEN ER=11: GOTO 8050</p>
+        <p>Im 2. Lauf soll die Definitionszeile gelöscht werden. Dazu löschen wir den Ausgabestring und weisen C den Code für Zeilenende zu:<br>
+            3700 Z$ = ””:C = 0:RETURN</p>
 
-<p>Nun ist nur noch das definierte Programmstück in die Ausgabezeile zu übertragen:<br>
-3760 Z$ = Z$ + NA$(I,l):RETURN</p>
+        <p>Beim Aufruf eines Makros mit »!M« holen wir zunächst den Namen des Makros mit »HOLNAME« und suchen ihn in der Tabelle:<br>
+            3750 GOSUB 750<br>
+            3755 FOR I = 0 TO NP: IF NA$(I,0) &lt;&gt;T$ THEN NEXT</p>
 
-<p>Dadurch, daß diese Makro-Erweiterung Zeile für Zeile besprochen wurde, um zu zeigen, wie man die von Strubs vorgegebenen Prozeduren benutzen kann, ist vielleicht der Eindruck entstanden, eine solche Erweiterung sei relativ kompliziert. Wenn Sie sich aber das Ganze noch einmal genauer ansehen, können Sie feststellen, daß für die Implementation neuer Befehle im Prinzip nur drei Schritte erforderlich sind:</p>
+        <p>Falls der Name nicht gefunden wird, erfolgt ein Sprung zur Error-Routine mit dem Code für »undefiniertes Makro«:<br>
+            3760 IF I>NP THEN ER=11: GOTO 8050</p>
 
-<ol>
-<li>Eintrag der neuen Befehlsnamen in die Befehlstabelle</li>
-<li>Einfügen der entsprechenden Routinen</li>
-<li>Eintrag der Adressen dieser Routinen in die beiden Verteilerzeilen</li>
-</ol>
+        <p>Nun ist nur noch das definierte Programmstück in die Ausgabezeile zu übertragen:<br>
+            3760 Z$ = Z$ + NA$(I,l):RETURN</p>
 
+        <p>Dadurch, daß diese Makro-Erweiterung Zeile für Zeile besprochen wurde, um zu zeigen, wie man die von Strubs vorgegebenen Prozeduren benutzen kann, ist vielleicht der Eindruck entstanden, eine solche Erweiterung sei relativ kompliziert. Wenn Sie sich aber das Ganze noch einmal genauer ansehen, können Sie feststellen, daß für die Implementation neuer Befehle im Prinzip nur drei Schritte erforderlich sind:</p>
 
-<p>Die ganze Arbeit des Suchens und Decodierens übernimmt Strubs automatisch.</p>
+        <ol>
+            <li>Eintrag der neuen Befehlsnamen in die Befehlstabelle</li>
+            <li>Einfügen der entsprechenden Routinen</li>
+            <li>Eintrag der Adressen dieser Routinen in die beiden Verteilerzeilen</li>
+        </ol>
 
-<p>Wie neue Funktionen (beispielsweise die Ausgabe der Makro-Tabelle) in das Menü aufgenommen werden können, haben sie bereits in der letzten Folge am Beispiel der RENUMBER-Funktion gesehen.</p>
 
-<p>Eine Zusammenstellung der oben besprochenen Erweiterungen finden Sie in Bild 5.</p>
+        <p>Die ganze Arbeit des Suchens und Decodierens übernimmt Strubs automatisch.</p>
 
-<h2>Strubs und Interpretererweiterungen</h2>
+        <p>Wie neue Funktionen (beispielsweise die Ausgabe der Makro-Tabelle) in das Menü aufgenommen werden können, haben sie bereits in der letzten Folge am Beispiel der RENUMBER-Funktion gesehen.</p>
 
-<p>Wollen Sie mit Strubs Programme für Interpretererweiterungen bearbeiten, dann sind einige weitere Dinge zu beachten. Entfernen Sie zunächst wie in Folge 3 beschrieben die Interpretererweiterung von Strubs.</p>
+        <p>Eine Zusammenstellung der oben besprochenen Erweiterungen finden Sie in Bild 5.</p>
 
-<p>Falls die Erweiterung, die Sie benutzen wollen, nicht in den Editor ingreift, sondern ihre neuen Befehle durch besondere Zeichen (meistens »!«) gekennzeichnet werden, dann ändern Sie wie bereits oben beschrieben die entsprechenden Erkennungszeichen, die Strubs benutzt.</p>
+        <h2>Strubs und Interpretererweiterungen</h2>
 
-<p>Bei Erweiterungen wie Simon’s Basic, die in den Editor eingreifen und die neuen Befehle wie der Basic-Interpreter durch eigene Tokens darstellen, ist es am einfachsten, den Strubs-Befehlen, deren Namen solche Befehle enthalten, neue Namen zu geben. Im Fall von Simon&rsquo;s Basic sind davon beispielsweise Strubs-Befehle wie »!REPEAT«, »!UNTIL« oder »!ELSE« etc. betroffen.</p>
+        <p>Wollen Sie mit Strubs Programme für Interpretererweiterungen bearbeiten, dann sind einige weitere Dinge zu beachten. Entfernen Sie zunächst wie in Folge 3 beschrieben die Interpretererweiterung von Strubs.</p>
 
-<p>Dazu sind nur die Namen in den DATA-Zeilen 45272 bis 45274 zu ändern. Sie können die betroffenen Strubs-Befehle aber auch wie oben am Beispiel von »DEFMAKRO« beschrieben aus den Tokens zusammensetzen. Dabei ist aber zu berücksichtigen, daß die Tokens von Simon’s Basic aus zwei Zeichen und nicht wie die normalen Tokens aus nur einem Zeichen bestehen.</p>
+        <p>Falls die Erweiterung, die Sie benutzen wollen, nicht in den Editor ingreift, sondern ihre neuen Befehle durch besondere Zeichen (meistens »!«) gekennzeichnet werden, dann ändern Sie wie bereits oben beschrieben die entsprechenden Erkennungszeichen, die Strubs benutzt.</p>
 
-<p>Eine Liste der von Strubs benutzten Variablen bietet Bild 6. Dabei kennzeichnet das Zeichen »*« Zeilennummern, in denen eine Wertzuweisung an die Variable erfolgt.</p>
+        <p>Bei Erweiterungen wie Simon’s Basic, die in den Editor eingreifen und die neuen Befehle wie der Basic-Interpreter durch eigene Tokens darstellen, ist es am einfachsten, den Strubs-Befehlen, deren Namen solche Befehle enthalten, neue Namen zu geben. Im Fall von Simon&rsquo;s Basic sind davon beispielsweise Strubs-Befehle wie »!REPEAT«, »!UNTIL« oder »!ELSE« etc. betroffen.</p>
 
-<p>Zum Abschluß hoch einige Berichtigungen zu den ersten Folgen: Die abgedruckte Programmversion wird nicht wie behauptet mit einem Kaltstart, sondern mit normalem »END« (Zeile 40190) beendet. Bei den in Teil 2 auf S. 121 angeführten Beispielen für Markendefinition und Externdeklaration haben sich Fehler eingeschlichen. Die korrekte Form entnehmen Sie bitte Bild 7.</p>
+        <p>Dazu sind nur die Namen in den DATA-Zeilen 45272 bis 45274 zu ändern. Sie können die betroffenen Strubs-Befehle aber auch wie oben am Beispiel von »DEFMAKRO« beschrieben aus den Tokens zusammensetzen. Dabei ist aber zu berücksichtigen, daß die Tokens von Simon’s Basic aus zwei Zeichen und nicht wie die normalen Tokens aus nur einem Zeichen bestehen.</p>
 
-<p>(Matthias Törk)</p>
+        <p>Eine Liste der von Strubs benutzten Variablen bietet Bild 6. Dabei kennzeichnet das Zeichen »*« Zeilennummern, in denen eine Wertzuweisung an die Variable erfolgt.</p>
 
+        <p>Zum Abschluß hoch einige Berichtigungen zu den ersten Folgen: Die abgedruckte Programmversion wird nicht wie behauptet mit einem Kaltstart, sondern mit normalem »END« (Zeile 40190) beendet. Bei den in Teil 2 auf S. 121 angeführten Beispielen für Markendefinition und Externdeklaration haben sich Fehler eingeschlichen. Die korrekte Form entnehmen Sie bitte Bild 7.</p>
+
+        <p>(Matthias Törk)</p>
+
+
+    </article>
+
+</body>
+
+</html>
