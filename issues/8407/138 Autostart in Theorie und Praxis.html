@@ -1,0 +1,47 @@
+<h1>Autostart in Theorie und Praxis</h1>
+
+<p class="intro">Welcher Anwender hat sich nicht schon immer gewünscht, seine Programme »so einfach wie möglich« in den Computer zu bringen. Geräte der oberen Preis-/Leistungsklasse sind zu diesem Zweck mit einem Autostart-Mechanismus ausgerüstet. Dabei wird das Programm ohne weiteres Zutun nach dem Anschalten des Gerätes vom Massenspeicher (Floppy) in den Computer geladen. Hier soll jetzt die Realisierung eines solchen Autostarts auf einem C 64, beginnend mit der dazu nötigen Theorie, beschrieben werden.</p>
+
+<p>Es gibt beim C 64 mehrere Möglichkeiten, einen Autostart herbeizuführen. Ich will Ihnen hier eine weniger bekannte Methode vorstellen:</p>
+
+<p>Die Stack-Manipulation.</p>
+
+<p>Der Stack belegt beim C 64 den Bereich $0100 bis $01ff (256 bis 511). Er wird unter anderem zum Ablegen von Rücksprungadressen benutzt. Nach Beendigung einer Routine sucht sich der Prozessor vom Stack zwei Bytes (nämlich die Rücksprungadresse in das Hauptprogramm) und springt die Adresse, die sich aus diesen beiden Bytes ergibt, an. Eigentlich ist daraus schon zu ersehen, was zu tun ist: Man müßte diese Rücksprungadresse so ändern, daß das Programm nicht an die eigentliche Rücksprungstelle springt, sondern auf eine eigene Routine. Jetzt jedoch tauchen schon die ersten Probleme auf; Wie soll der Stack geändert werden, ohne daß man dafür ein Extra-Programm braucht? Wie soll sich das Programm nach dem Ladevorgang automatisch starten?</p>
+
+<h2>Die Theorie</h2>
+
+<p>Auf beide Fragen gibt es eine Antwort: Da sich der Stack beim Ladevorgang ändern soll, ist es das einfachste, den (manipulierten) Stack einfach mit abzuspeichern! Damit hätten wir dann auch den von uns gewünschten Inhalt des Stacks geladen. Dann aber tauchen schon die nächsten Fragen auf: Woher wissen wir, aus welchem Stack-Bereich der Prozessor seine Rücksprungadresse holt? Die Antwort ist: Wir wissen es nicht! Unsere einzige Möglichkeit ist, den ganzen Stack mit der von uns gewünschten Rücksprungadresse zu belegen. Das Programm, auf das unsere Adresse zeigt (ein Maschinenprogramm), hängen wir direkt an den Stack an. Von dieser Startroutine wird nun das eigentliche Hauptprogramm, das wiederum hinter der Routine liegt, angesprungen. Die Reihenfolge der Programmteile und des benötigten Speichers ist in Bild 1 zusammengefaßt:</p>
+
+<p>Der Ladevorgang unseres Autostart-Programms muß mit »LOAD ”xxx”,8,l« erfolgen, damit das Programm nicht ab der Adresse $0801 (normaler Basic-Speicher), sondern ab $0100 geladen wird. Schauen wir uns nun noch einmal an, was im einzelnen beim Ladevorgang passiert:</p>
+
+<ol>
+<li>Laden des Programms von Diskette oder Kassette mit »LOAD ”xxx”,8,l«.</li>
+<li>Nach Beendigung des Ladevorgangs will sich der Prozessor vom Stack die Rücksprungadresse ins Basic holen, findet aber die (soeben geladene) Adresse auf unser eigenes Startprogramm und springt dies an.</li>
+<li>Unser Startprogramm springt jetzt das eigentliche Hauptprogramm an, das irgendwo ab $0801 stehen sollte.</li>
+</ol>
+
+
+<p>Nachdem also das Programm mit »LOAD ”xxx”,8,l« geladen wurde, startet es sich selbst sofort.</p>
+
+<p>Zum Abschluß sei noch gesagt, daß einige Vorgänge zur besseren Verständlichkeit vereinfacht werden mußten. Bei eigenen Experimenten sei geraten, das abgedruckte Demo-Programm zu modifizieren. Außer einigen saftigen Abstürzen kann eigentlich nichts passieren.</p>
+
+<h2>Die Praxis</h2>
+
+<p>Das abgedruckte Demo-Programm läuft ohne Änderungen auf einem C 64 mit einer 1541-Floppy (Gerätenummer 8). Die Anpassung an andere Gerätenummern dürfte keine Schwierigkeit darstellen. Lediglich in den Zeilen 110, 112, 120 und 180 ist die 8 durch eine 9 zu ersetzen. Die Beschreibung der einzelnen Programmteile ist in Bild 2 zusammengefaßt.</p>
+
+<p>Nun zum Programm selbst: Das Programm Autostart-Maker gibt dem Benutzer die Möglichkeit, ein beliebiges Programm mit einem Autostart zu versehen. Dabei muß folgende Bedingung erfüllt werden: Das Programm muß mindestens eine Basic-Zeile enthalten. Dies ist notwendig, da der vom Autostart-Maker generierte Autostart das Hauptprogramm mit dem RUN-Befehl startet. Zu diesem Zweck prüft der Autostart-Maker die Startadresse des gewünschten Programms und wirft eine Fehlermeldung aus, falls diese ungleich $0801 (Basic-Start) ist.</p>
+
+<p>Wenn aber alles in Ordnung ist, so arbeitet das Programm eine Weile mit der Diskette, bis es eine Ende-Meldung ausgibt. Sollte ein Diskettenfehler auftreten, so macht sich das Programm optisch und akustisch bemerkbar. Danach hat der Benutzer die Wahl: das Programm zu beenden oder einen neuen Start zu versuchen.</p>
+
+<p>Im Programm sind folgende Unterroutinen enthalten:<br>
+10000 Fehlerkanal lesen und auswerten<br>
+20000 Gong ausgeben (wird von Fehler-Routine aufgerufen)</p>
+
+<p>In den Zeilen 30000- stehen die DATAs für das Startprogramm, das das eigentliche Hauptprogramm anspringen soll. Die Bedeutung einzelner Zeilen läßt sich auch den REM-Statements des Programms entnehmen.</p>
+
+<p>Ein mit diesem Autostart versehenes Programm ist auch in gewissem Sinne geschützt. Es läßt sich weder mit RUN/STOP noch mit RESTORE abbrechen. Wird extern ein RESET-Impuls erzeugt, so wird der ganze Speicher gelöscht, bevor in die normale RESET-Routine verzweigt wird. Diese Eigenschaften gehen auf den Aufbau unseres Startprogramms zurück.</p>
+
+<p>Geladen wird das neue Programm mit »LOAD ”name”,8,l«. Der Name entspricht dem des Ursprungprogramms mit dem Zusatz »/a«. Noch ein Tip: Wenn Sie im Besitz eines Basic-Compilers sind, so sollten Sie den Autostart-Maker compilieren. Und nun viel Spaß mit dem Autostart-Maker. Wenden Sie ihn doch am besten gleich mal bei Ihrem Programm an.</p>
+
+<p>(Andreas Wurf)</p>
+

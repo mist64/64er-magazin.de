@@ -1,0 +1,83 @@
+<h1>Vergleichstest Centronics-Schnittstellen</h1>
+
+<p class="intro">Ein Interface muß die richtige Verbindung herstellen, um einen Drucker mit Centronics-Eingang am Commodore 64 zu betreiben. Mittlerweile werden einige solcher, auch Schnittstellen genannte, Erweiterungen auf dem Markt angeboten. Doch nicht alle leisten und kosten das gleiche. Welches Interface ist das beste?</p>
+
+<p>Die Tatsache, daß sich bisher kaum ein Hersteller von Heimcomputern zu einer Normung der Verbindungsports durchgerungen hat, ist sicher jedem C 64-Besitzer bekannt. Wer einmal versucht hat, einen anderen, als einen Commodore-Drucker an seinen Computer anzuschließen, wird fest-<br>
+gestellt haben, daß dies nicht ganz unproblematisch ist. Weder am Drucker, noch am C 64 befindet sich ein Ausgang, der dem anderen auch nur im entferntesten ähnelt. Da aber gerade die Drucker von Fremdherstellern oft mit überlegenen Leistungen aufwarten können, ist ein ständig wachsender Markt von Schnittstellen verschiedenster Konstruktionsweisen entstanden. Das Hauptunterscheidungsmerkmal bei diesen Schnittstellen ist die Art der Datenübertragung und -anpassung. Zum einen werden sogenannte Softwarelösungen angeboten, bei denen die Anpassungen der Daten mit Hilfe von ladbarer beziehungsweise auf Eproms steckbarer Software im Computer selbst vorgenommen und über den User-Port zum Drucker gesendet wird. Zum anderen gibt es die Hardwarelösungen (Bild 1), die, mit eigenem Prozessor versehen, die Datenanpassung auf einer externen Platine durchführen und ausnahmslos den seriellen Bus zur Datenübertragung verwenden.</p>
+
+<h2>Der Testablauf</h2>
+
+<p>Getestet wurden natürlich sowohl Hard- als auch Softwareschnittstellen (Bild 2). Die Vertreter der Hardwareseite waren das Görlitz-Interface, zwei ungleiche Versionen von Wiesemann und das weit verbreitete Data Becker-Interface. Auf der Softwareseite traten die Eprom-Versionen von Kalawsky, Bockstaller und die Diskettenversion der in diesem Heft beschriebenen Schnittstelle unseres Lesers Helmut Eyssele, zum Test an.</p>
+
+<p>Erstes Testkriterium waren alle in den zugehörigen Bedienungsanleitungen angegebenen Funktionen. Zusätzlich mußten die Kandidaten noch zwei Sonderprüfungen ablegen: Ihre Verträglichkeit mit einer Reihe von bekannten Textverarbeitungsprogrammen (siehe Bild 3) und ihre Fähigkeiten bei der Erstellung einer Hardcopy vom Bildschirminhalt (was noch für Überraschungen sorgte). Da die einzelnen Testteilnehmer über die verschiedensten Befehle zur Ansteuerung ihrer Funktionen verfügen, war es nicht sinnvoll, ein einheitliches Testprogramm zu schreiben. Es wurde aber trotzdem versucht, ähnliche Funktionen zu vergleichen.</p>
+
+<h2>Der Alleskönner</h2>
+
+<p>Mit zirka 340 Mark nicht gerade das billigste, stellte sich das Görlitz-Interface zum Test. Diese Hardwarelösung ist zum Einbau in einen Epson MX/RX/FX 80-Drucker vorgesehen. Der Einbau ist, auch für technische Laien, problemlos, denn die Platine (Bild 1) wird lediglich in den geöffneten Drucker eingesteckt und ist sofort betriebsbereit. Der Epson wird fortan wie ein Commodore-Drucker angesprochen. Die Commodore-eigenen Steuerzeichen werden dabei, wie gewohnt, als reverse Grafiksymbole ausgedruckt. Dies deutet darauf hin, daß auch die Grafikzeichen dem Drucker keine Schwierigkeiten bereiten. Der eingebaute Selbsttest (nicht der des Druckers) zeigt den gesamten neuen Zeichensatz. Wem das aber immer noch zu wenig ist, hat die Gelegenheit den gesamten CBM-Zeichensatz in bis zu vierzig Variationen aus doppelter Breite, doppelter Höhe und reverser Darstellung auszudrucken. Ferner verfügt das Görlitz-Interface über einen Grafik-Modus, in dem alle Zeichen, deren Code größer als 127 ist, als senkrechte Punktreihe aufgefaßt werden. Durch Aneinanderreihen vieler dieser Reihen können beliebige Zeichen gedruckt werden. Daß die Steuer- und Formatierungsbefehle, wie sie im Epson-Handbuch beschrieben sind, in jedem Modus erhalten bleiben, gefiel beim Test besonders.</p>
+
+<p>Die letzte Station unserer Testreihe, der Bildschirmausdruck, wurde mit besonderer Spannung erwartet. Die Aufgabe lautete: Mit den in der Data Becker-Supergrafik und Simons Basic enthaltenen Hardcopyroutinen in möglichst kurzer Zeit einen genauen Abdruck des Bildschirms auf das Papier zu bringen. Nach der Vorbereitung des Interfaces durch die folgenden Basic-Zeilen:</p>
+
+<pre>
+100 OPEN 1,4 :REM Druckerkanal öffnen
+110 PRINT#1,CHR$(27)"V":REM VCEI Grafic
+120 PRINT#1,CHR$(08):REM 7-Nadel Einzelp.
+130 OPEN9,4,9,"7":REM Zeilenabst. auf 0
+140 Copy:REM Simons Basic Hardcopy
+150CLOSE1:CLOSE9:REM Druckerkan.schl.
+160 END
+</pre>
+
+
+<p>konnte der Ausdruck beginnen. Ein kleines Testprogramm erstellte die auszudruckende hochauflösende Grafik und der Drucker begann seine Arbeit. Nach zirka 40 Sekunden war der Bildschirminhalt auf Papier verewigt, allerdings war der Ausdruck etwas klein. Aber auch hier bietet das Görlitz VCEI eine Veränderungsmöglichkeit an: Durch Einfügen einer zusätzlichen Zeile ist eine variable Breite des Ausdrucks möglich. Bei dieser Fülle von Anwendungsmöglichkeiten erscheint es fast schon selbstverständlich, daß auch bei der Konzeption der Platine an den Anwender gedacht wurde. So ist beispielsweise der serielle Bus am Interface doppelt vorhanden, damit der Drucker nicht das letzte angeschlossene Gerät sein muß. Die mögliche Abschaltbarkeit der Schnittstelle ist dann sinnvoll, wenn der Drucker auch noch an anderen Computern eingesetzt werden soll. Man erspart sich so den Ausbau des Interfaces. Eine Besonderheit, mit der sonst keine andere der im Test befindlichen Schnittstellen aufwarten konnte, ist der eingebaute Pufferspeicher von zwei KByte. Dies ist besonders angenehm beim Arbeiten mit Textverarbeitungsprogrammen, da bereits weitergeschrieben werden kann, während der Drucker noch arbeitet. Beim Test der Kooperation mit den Textverarbeitungsprogrammen gab es in keinem Fall Probleme beim Ausdrucken der Texte.</p>
+
+<p>Insgesamt machte das Görlitz-Interface einen hervorragenden Eindruck. Beim ständigen Arbeiten mit dem Drucker vergißt man nach einiger Zeit vollkommen, daß der Epson FX 80 eigentlich nicht speziell für den Commodore 64 konzipiert wurde.</p>
+
+<h2>Die Düsseldorfer Lösung</h2>
+
+<p>Für den Einbau des VCI von Data Becker gilt das gleiche, wie für das Görlitz-Interface. Leider hat man bei Data Becker vergessen, den seriellen Bus durchzuführen, so daß der Drucker das letzte Gerät sein muß. Wie aus Bild 3 ersichtlich ist, sind Listing-Modus, Grafik- und reverse Zeichen sowie der Direkt-Modus verfügbar und über Sekundäradressen einzustellen. Auch ein spezieller Grafikmodus. Die Frage, ob diese Grafikfähigkeit aber auch für einen Bildschirmausdruck genügend war, ließ die Redaktion voller Erwartungen an den Hardcopytest herangehen. Naheliegend war es natürlich, das Hilfsprogramm aus dem gleichen Hause, die Supergrafik, zu verwenden. Getreulich den Worten der Anleitung folgend, versuchten wir mit dem Befehl für Acht-Nadel-Drucker, ein Bild zu kopieren. Das Ergebnis war ernüchternd, denn der Drucker regte sich zwar, aber das was er druckte, sah aus wie Nebel über London. Erst als wir es mit dem Sieben-Nadel-Hardcopybefehl versuchten, hatten wir Erfolg. Von diesem Erlebnis angespornt versuchten wir es auch noch mit Simons Basic. Nach dem Eingeben des folgenden kleinen Programms klappte es auf Anhieb.</p>
+
+<pre>
+100 OPEN l,4:REM Druckerkanal öffnen
+110 PRINT#1,CHR$(8):REM Grafik Modus
+120 PRINT#1,CHR$(26):REM Grafik Byte wiederh.
+130 Copy: REM Simons Basic Hardcopy
+140 CLOSEl:REM Druckerkanal schließen
+</pre>
+
+
+<p>Was wir nicht erwartet hatten: Es gab bei den Zeitmessungen für die Hardcopyausdrucke enorme Unterschiede zwischen den einzelnen Schnittstellen. Für das gleiche Bild benötigte das Data Becker-Interface sechsmal länger (zirka 4 Minuten) als das Görlitz-Interface. Dies ist wahrscheinlich damit zu erklären, daß durch das VCI ein Commodore 1526 simuliert wird (ohne dabei auf die Vorzüge des Epson-Druckers zu verzichten), der aber selbst mit neuem ROM nur ein frei definierbares Zeichen besitzt. Das Zusammenspiel mit den ausgewählten Textverarbeitungsprogrammen funktionierte auch mit dem VCI einwandfrei. Wer aber lieber eigene Texte eingeben, beziehungsweise in seine Programme einbauen will, wird die Funktion »Festlegen der Druckposition« des VCI bald nicht mehr missen wollen. Durch diese Funktion ist es möglich, die Punktposition, ab der ein Text auf dem Papier gedruckt werden soll, festzulegen.</p>
+
+<p>Bis auf die etwas langsame Hardcopy ist dem Data Becker-Interface wenig Negatives nachzusagen, wenn es auch nicht ganz die Möglichkeiten der Görlitz-Schnittstelle bietet. Dafür ist es aber mit 298 Mark auch um 40 Mark billiger als das Görlitz-Pendant. Das ist natürlich immer noch ein stolzer Preis.</p>
+
+<h2>Zwei ungleiche Brüder</h2>
+
+<p>Die nächsten beiden Testgeräte von Wiesemann sehen zwar äußerlich vollkommen gleich aus, in ihren Leistungsmerkmalen unterscheiden sie sich aber erheblich. Das intelligentere der beiden hat den Namen VC 20/CBM 64-Interface Typ 9200 NEC und ist für NEC und kompatible Drucker vorgesehen. Sein Bruder verzichtet auf den Zusatz NEC im Namen und auch auf so manche Fähigkeit. Er ist für die Ansteuerung eines Epson-Druckers vorgesehen. Die Installation dieser Schnittstellen ist vorbildlich einfach, denn sie werden nur in den Eingang des Druckers, beziehungsweise den seriellen Ausgang des C 64 eingesteckt. Lediglich bei der Version für Epson-Drucker ist für die notwendige Stromversorgung des Interfaces zu sorgen. Dafür eignet sich am besten das gegen Aufpreis erhältliche Netzteil. Wer aber mit Lötkolben und Meßgeräten vertraut ist, wird in der Bedienungsanleitung des Interfaces noch auf eine zweite Möglichkeit hingewiesen: die Entnahme der Versorgungsspannung von der Druckerplatine. Dieser Eingriff erfordert allerdings größte Vorsicht. Denn ein falscher Anschluß kann den »Tod« einer ganzen IC-Familie bedeuten.</p>
+
+<p>Die Merkmale der Epson-Version sind rasch beschrieben, da sie sich lediglich auf die Ausgabe von Texten beschränken. Hierfür ist diese Schnittstelle mit Groß- und Kleinschriftmodus, sowie einigen Textformatierungsbefehlen ausgerüstet. Durch die Bauweise als Hardwareschnittstelle tauchten keine Probleme mit den zur Verfügung stehenden Textverarbeitungsprogrammen auf. Die Darstellung von Grafik- und Steuerzeichen ist leider nicht möglich. In diesem Bereich bietet das 9200 (NEC) die gleichen Funktionen wie das Data Becker VCI, kaum verwunderlich, wenn man weiß, wer der Hersteller des VCI ist: Wiesemann. Der auffallendste Unterschied vom 9200 NEC zum VCI ist die Möglichkeit, den Drucker in einen 6-Punkt-Modus zu schalten. Dadurch bleiben Programme, die für den 1515 Commodore-Drucker entwickelt wurden, weiterhin verwendbar.</p>
+
+<p>Im wesentlichen gilt für das 9200 NEC-Interface das gleiche wie für das Data Becker-VCI. Lediglich auf den Einbau in den Drucker kann verziehet werden.</p>
+
+<p>Die Epson-Version des 9200 eignet sich vor allem für jenen Computerbesitzer, die sich auf das problemlose Ausdrucken von Texten beschränken wollen. Allerdings liegt der Preis mit 248 ohne und 298 Mark mit Netzteil unverhältnismäßig hoch.</p>
+
+<h2>Der Außenseiter</h2>
+
+<p>Besonders gespannt waren wir auf das Abschneiden der Schnittstelle unseres Lesers H.Eyssele im Vergleich zu den professionellen. Wie die Verbindung zwischen dem Computer und dem Drucker hergestellt wird, braucht sicher nicht mehr erklärt werden, da dies genauestens in einem eigenen Bericht beschrieben ist. Ganz besonders gefallen haben uns die Möglichkeiten des Listingausdrucks. Die Umwandlung der Steuerzeichen in Klarschrift ist eine Funktion, die kein anderes Interface anbietet. Dadurch spart man sich beim Eintippen oder Korrigieren eines Listings das Nachschlagen der Steuercodes in der Vergleichstabelle. Die vorliegende Version der Schnittstelle funktionierte zwar nur in Verbindung mit Vizawrite, kann aber sicherlich ohne großen Aufwand an andere Programme angepaßt werden. Eine Hardcopy war leider noch nicht möglich. Hier geht der Aufruf an alle Programmierer, dies etwa als Teil unseres Programmierwettbewerbs »Programmbibliothek« zu ergänzen. (Die Redaktion wartet gespannt darauf).</p>
+
+<p>Zum Preis von zirka 50 Mark (für das Kabel) bietet dieses Interface Leistungsmerkmale, wie sie eigentlich nur von professionellen Schnittstellen zu erwarten sind. Damit sicherte sich diese Lösung einen der vorderen Plätze der Bewertung.</p>
+
+<h2>Der Hardcopyspezialist</h2>
+
+<p>Die Kalawsky-Schnittstelle, deren Software nicht von Diskette, sondern durch ein Steckmodul in den C 64 eingeladen wird, überraschte durch eine komfortable Hardcopyroutine. Ein beliebiger Bildschirminhalt kann durch einfachen Tastendruck (CTRL-) auf den Drucker übertragen werden. Das Hardcopy benötigt etwa die gleiche Zeit wie das Görlitz-Interface mit Simons Basic. Ein Drücken der Tasten CTRL und x ermöglicht sogar ein großes Hardcopy auf die gesamte Blattbreite. Da manche Bilder als inverser Ausdruck besser aussehen, kann das Hardcopy auch in dieser Form ausgegeben werden. Natürlich ist auch die Textausgabe mit der Kalawsky Schnittstelle möglich. Dafür sollte man allerdings am besten ein Textverarbeitungsprogramm verwenden, da bei der direkten Ausgabe von Print-Zeilen im Groß/Kleinschriftmodus des C 64 Großbuchstaben als kursive Zeichen gedruckt werden. Dadurch leidet die Lesbarkeit doch stark. Mit 85 Mark für das Eprom, wo noch die Kosten für ein Verbindungskabel (zirka 45 Mark) hinzukommen, liegt der Preis sicher nicht in unerschwinglichen Höhen.</p>
+
+<p>Für jeden, der sowohl Texte verarbeiten, als auch Hardcopys von beliebigen Bildern anfertigen möchte, ist dieses Interface ein nützliches Instrument.</p>
+
+<p>Der äußeren Form des Kalawsky-Interface ähnlich präsentiert sich das Bockstaller-Interface. Die Bestandteile sind eine Epromplatine und ein Verbindungskabel. Diese Lösung macht sowohl Textausgaben von Basic aus, als auch mit dem Textverarbeitungsprogramm Vizawrite möglich. Der Groß/Kleinschriftmodus bleibt in jedem Fall erhalten. Für die Ausgabe von Grafiken und Hardcopys ist diese Schnittstelle allerdings weniger geeignet. Mit diesen Leistungen ist sie bei einem Preis von zirka 130 Mark zwar etwa gleich teuer wie das Kalawsky-Interface, besitzt aber nicht deren komfortable Hardcopyroutine.</p>
+
+<h2>Die Bewertung</h2>
+
+<p>Der Test hat gezeigt, daß jede Schnittstelle mit besonderen Fähigkeiten und Vorzügen aufwarten kann. An der Spitze des Testfeldes plazierten sich unserer Meinung nach die drei Hardwarelösungen von Görlitz, Data Becker und Wiesemann (NEC). Dabei belegte das Görlitz-Interface wegen seiner universellen Anwendbarkeit und dem vorbildlichen Aufbau der Platine den ersten Platz. Zwischen den beiden Interfaces von Data Becker und Wiesemann war der Unterschied nur gering. So wurde salomonisch beschlossen, diesen beiden Schnittstellen den zweiten Platz gemeinsam anzuerkennen. Für die Überraschung sorgte der Außenseiter: Der dritte Platz konnte an die Lösung unseres Lesers vergeben werden, und das lag nicht nur an dem unübertroffenen Preis-Leistungsverhältnis. Knapp geschlagen plazierte sich das Kalawsky-Interface auf dem vierten Platz. Mit seiner Hardcopyroutine auf Tastendruck und der Möglichkeit der Textverarbeitung bietet es zu einem annehmbaren Preis eine gute Leistung. Die Schlußlichter des Testes bildeten das Wiesemann (Epson) und das Bockstaller-Interface. Obwohl sich das 9200 (Epson) zur reinen Textverarbeitung hervorragend eignet, ist es mit einem Preis von zirka 298 Mark doch etwas teuer geraten. Das Bockstaller-Interface ist eine Lösung für alle, die ohne große finanzielle Ausgabe Texte ausdrucken wollen und sich die Zeit zum Laden der Software sparen wollen.</p>
+
+<p>Sicherlich muß jeder potentielle Käufer eines Interfaces sich über seine eigenen Anwendungszwecke im Klaren sein. Auch spielt der zur Verfügung stehende Geldbetrag eine wesentliche Rolle. Die Entscheidung für eines der getesteten Interfaces ist deshalb immer eine individuelle, bei der nicht vergessen werden sollte, daß die Ansprüche an den Drucker mit der Zeit bestimmt nicht geringer werden.</p>
+
+<p>(Arnd Wängler)</p>
+

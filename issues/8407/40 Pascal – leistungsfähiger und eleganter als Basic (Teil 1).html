@@ -1,0 +1,135 @@
+<h1>Pascal – leistungsfähiger und eleganter als Basic (Teil 1)</h1>
+
+<blockquote>Für den Commodore 64 gibt es bereits einige Versionen der Programmiersprache Pascal. Dieser Bericht stellt wichtige Elemente der Sprache vor und vergleicht sie mit äquivalenten Basic-Lösungen.
+
+<p>Wie lange besitzen Sie schon den Commodore 64? Wenn Sie ihn wie ich schon längere Zeit und einige Gehversuche in Basic schon hinter sich haben, die Phase der Spielsucht und des Programme-Scheffelns überstanden haben, dann werden Sie sich wohl wieder dem Programmieren in Basic zuwenden, nur diesmal ungleich intensiver. Jetzt stellt sich jedoch heraus: das eingebaute Basic hält den gewachsenen Anforderungen nicht stand.</p>
+
+<p>Eine neue Sprache, gut, aber welche? Da gibt’s ja eine Unmenge davon, zum Beispiel Forth, Cobol, Algol, Fortran, Pascal, Modula und Assembler, die nur »ehrfürchtig« genannt wird, da Assembler angeblich nur von absoluten Spitzenkönnern beherrscht wird. Zu den Könnern zählt man sich im allgemeinen noch nicht und läßt eben die Maschinensprache beiseite (weshalb eigentlich?) und sucht sich eine sogenannte »höhere« Programmiersprache. Die Wahl dürfte wahrscheinlich auf Pascal fallen, weil Forth zu fremd, Fortran zu antiquiert, Cobol zu »geschäftig«, Algol zu wissenschaftlich und Modula zu neu ist. Nun, Pascal hat schon einiges zu bieten, was Basic nicht hat. Die Schlagwörter sind: — Strukturierte Programmierung — Blockorientierte Programmierung</p>
+
+<ul>
+<li>Operatoren auf Mengen</li>
+<li>Lokale Parameter</li>
+<li>Möglichkeit für Rekursionen</li>
+<li>eigene Typendefinitionen</li>
+<li>Records etc.</li>
+</ul>
+
+
+<p>Über Schlagworte läßt sich bekanntlich streiten, aber ich möchte beweisen, daß sie für Pascal wirklich zutreffen.</p>
+
+<p>Niklaus Wirth, der diese Sprache aus den beiden Hauptlinien Algol 68 und Fortran beziehungsweise PL/1 1971 an der ETH Zürich entwickelte, hat sie Pascal genannt, zu Ehren des französischen Mathematikers und Philosophen Blaise Pascal (zirka 1650). Man kann deshalb von einem Wirth-Standard im Gegensatz zum UCSD-Pascal sprechen. Das UCSD-Pascal entstand in Kalifornien und enthält nun auch den Typ »STRING« sowie Operatoren auf diesen Typ wie man es von Basic her gewöhnt ist. Ansonsten ist der Unterschied nicht annähernd so groß, wie derjenige zwischen Basicdialekten.</p>
+
+<p>Pascal ist wegen seiner Klarheit im Aufbau und seiner enormen Leistungsfähigkeit zur wichtigsten, wissenschaftlichen Programmiersprache geworden.</p>
+
+<p>Ein äußerlicher Unterschied gegenüber Basic besteht darin, daß Pascal vollkommen formatfrei ist, das heißt es gibt keine Zeilennummerierung. Man darf daher eine Befehlssequenz (statements) über eine Bildschirmzeile hinaus auf der nächsten fortsetzen, denn, als gültigen Statementstrenner gibt es nur das Semikolon (;). Pascal kennt daher den Befehl »GOTO/GOSUB Zeilennummer« nicht. Aber dafür ist Pascal sehr stark blockorientiert. Ein Block ist im einfachsten Fall entweder ein Befehl oder eine mit »BEGIN« und »END« umschlossene Befehlssequenz. Andere Blocks sind »PROCEDURE«, eine Art Unterprogramm, und »FUNCTION«, auch eine Art Unterprogramm, aber mit dem Unterschied, daß man einer »FUNCTION« einen Wert zuweisen kann. Darauf komme ich später zurück. Ein Beispiel dazu:<br>
+FOR i := 10 DOWNTO 3 DO statement</p>
+
+<p>Diesem Statement entspricht in Basic die folgende Sequenz:<br>
+FOR i = 10 TO 3 STEP -1: befehle: NEXT</p>
+
+<p>Diese ganze Schleife ist ein Statement. Obwohl sie mehrere Befehlswörter enthält, muß man sie nicht mit »BEGIN« und »END« umklammern. Ebenfalls als ein Statement gilt eine Wertzuweisung der Form:<br>
+i := i + 1;</p>
+
+<p>Der Operator &lsquo;:=’ weist der links davon stehenden Variablen den Wert des rechten Ausdrucks (expression) zu. Er ersetzt nicht den Vergleichsoperator ’=’. Diesen braucht man in Pascal korrekterweise nur für Vergleiche wie »IF i = 5 THEN&hellip;.«</p>
+
+<p>Wenn ich schon bei Vergleichsstatements bin, kann ich die drei ebenfalls »mehrwortigen« Statements besprechen, die Pascal für bedingte Abarbeitung eines Blocks besitzt, wobei eine Bedingung (condition) von der Form ist »variable = , &lt;&gt;, &lt;=, =&gt;, &lt;, &gt; expression«:</p>
+
+<ul>
+<li>IF condition THEN statements ELSE statements</li>
+<li>WHILE condition DO statement</li>
+<li>REPEAT statements UNTIL condition</li>
+</ul>
+
+
+<p>Das erste Statement existiert fast in identischer Form in Basic, außer der Tatsache, daß »ELSE« im Basic des Commodore 64 natürlich fehlt. Die unteren beiden haben einen Schleifencharakter. Wofür nun aber zwei Schleifen, die sich doch fast nicht unterscheiden? Nun, bei näherer Betrachtung finden Sie sehr wohl einen interessanten Unterschied: Die »WHILE«-Schleife testet eine Bedingung bevor eine Befehlssequenz ausgeführt wird (Solange wie&hellip;wiederhole&hellip;), die »REPEAT«-Schleife hingegen testet erst nach der Ausführung (Wiederhole&hellip;bis&hellip;). Sie werden vielleicht sagen, das sei doch nun wirklich nur Haarspalterei. Mitnichten! In den folgenden zwei Beispielen sehen Sie, wie man damit elegant iterative Probleme mit Bedingungen programmieren kann. Kümmern Sie sich vorerst nicht um die anderen Statements, die in den beiden Progrämmchen sonst noch vorkommen, sondern konzentrieren Sie sich bitte nur auf die Schleifen.</p>
+
+<p>Beide Programme (Listing 1 und Listing 2) berechnen die Quadratwurzel einer Zahl:</p>
+
+<p>Die unterstrichenen Worte sind reservierte »Steuerworte« in Pascal, die nicht anders gebraucht werden dürfen. Die übrigen Worte sind Standardprozeduren. Man erkennt sie auch daran, daß sie ein oder mehrere Argumente in Klammern annehmen können. Ein Statement kann aus Steuerworten und Prozeduren bestehen, was man leicht erkennen kann, weil nach &lsquo;WHILE-&rsquo;..&lsquo;DO&rsquo; bekanntlich nur ein Statement folgen darf, denn sonst müßte man ein Ende der »WHILE«-Schleife definieren. »PROGRAM«&hellip; sind die Programmköpfe, »VAR«&hellip; die Deklarationsteile, auf die ich bald eingehen werde und innerhalb »BEGIN« und »END.« befindet sich das eigentliche Programm. »WRITE« beziehungsweise »WRITELN« entsprechen im Commodore-Basic »PRINT;« beziehungsweise »PRINT«, »READLN« dem »INPUT«. »SORT« entspricht »SQR« und berechnet die Quadratwurzel.</p>
+
+<p>Nun zur Routine selbst: Wie Sie wissen, kann man nur aus Zahlen > = 0 reelle Quadratwurzeln ziehen, deshalb muß man vor der Berechnung jeweils testen, ob die mit »READLN« gelesene Zahl > = 0 ist. Dies geht natürlich sehr elegant mit der »WHILE«-Schleife, die ja vor der Ausführung den Test durchführt. In der »REPEAT«-Schleife muß hingegen unbedingt ein Test mit »IF« gemacht werden. Weshalb wird aber die Eingabe zweimal geschrieben? Nun, erstens enthalten Variablen in Pascal, nachdem sie ins Leben gerufen wurden, keinen bestimmten Wert und zweitens muß der erstmalige Test in der »WHILE«-Schleife etwas »Wohldefiniertes« zum Testen haben. Man sieht auch gleich, daß der ganze Inhalt der »WHILE«-Schleife übersprungen wird, falls die erste Eingabe &lt; 0 ist. Hätte man nun in der »WHILE«-Schleife keine Gelegenheit mehr, »z« zu verändern, käme man niemals mehr aus ihr heraus. In der »REPEAT«-Schleife verhält es sich diesbezüglich ähnlich. Nun noch schnell das äquivalente Basicprogramm:</p>
+
+<p>In dem äquivalenten Basic-Programm (Listing 3) entsprechen der kleinen Standardprozedur »READLN« die Zeilen 30 und 40. Es ist sehr schön zu sehen, daß man in Basic nicht ohne das »GOTO« auskommt und daß das Programm jetzt schon schlechter ist, als dasjenige in Pascal. Stellen Sie sich schon jetzt mal vor, wie es sich erst mit längeren bis sehr langen Programmen verhält, bei denen man nicht so schnell sieht, was alles wiederholt wird, weil zwischen der angesprungenen Zeile und dem entsprechenden »GOTO« eventuell mehr als 100 Zeilen liegen.</p>
+
+<p>Ein weiteres Pascal-Statement, von dem man sagen könnte, daß es irgend etwas teste, ist das »CASE«-Statement. Es lautet:</p>
+
+<pre>
+CASE selektor OF
+  marke 1 : STATEMENT;
+  marke 2 : STATEMENT;
+  marke 3 : STATEMENT;
+  ....... : .........
+  ....... : .........
+  marke n : STATEMENT
+END:
+</pre>
+
+
+<p>Mit ihm kann man eine aus mehreren Möglichkeiten auswählen, je nachdem welcher Marke der Selektor entspricht. Es entspricht den »ON x GOTO« und »ON x GOSUB«-Verteilern. Aber »CASE« ist dagegen ungleich vielseitiger. Bekanntlich darf »x« in Basic weder ein Ausdruck noch ein alphanumerisches Zeichen sein. In Pascal darf der Selektor ein beliebiges Zeichen sein. Listing 4 zeigt dies.</p>
+
+<p>Je nachdem, welchen Wert »tagnr« hat, werden der Variablen »tag« die entsprechenden 3 Buchstaben zugewiesen. Stimmt der Selektor mit keiner der Marken überein, so ist im Standardpascal nicht definiert, was dann geschieht. In UCSD-Pascal hingegen wird einfach beim nächsten Statement fortgefahren. Hier folgt nun noch das kleine äquivalente Basicprogramm dazu (Listing 5). Da im Basic des Commodore 64 dem »IF&hellip;THEN«-Befehl das »ELSE« fehlt und weil eine Basiczeile nicht mehr als 80 Zeichen zuläßt, muß man auf die Konstruktion verschachtelter »IF&hellip;THEN&hellip;ELSE IF&hellip;THEN&hellip; ELSE IF&hellip;’s zur Emulation von »CASE« verzichten. Man sieht, daß man zur Emulation dieses Statements in Basic sehr redundant programmieren muß.</p>
+
+<p>Es ist dies sicher nicht die einzige und schon gar nicht die eleganteste Lösung, aber wahrscheinlich diejenige, die einem zuerst in den Sinn kommt. Eine weitere bevorzugte Verwendung von »CASE« ist die Menüsteuerung, wie Listing 6 zeigt.</p>
+
+<p>Zu Listing 6 ist nicht viel zu sagen, außer daß man sieht, daß der Selektor (Variable »w«) auch ein alphanumerisches Zeichen sein kann und daß den Marken (»A«, »B«, »C«) mehrere Statements folgen können. Hier also Zuweisungen und Prozeduren. Hinzu kommt noch eine neue Standardprozedur genannt »PAGE«. Sie produziert einen Seitenvorschub auf einer Text-Ausgabedatei, weshalb dieser Prozedur ein Dateiname folgen muß. »PAGE (OUTPUT)« produziert also einen Seitenvorschub auf dem Bildschirm, der sich als Löschen des Schirms äußert.</p>
+
+<h2>Blockstruktur, lokale und globale Variablen</h2>
+
+<p>Nun komme ich endlich zu demjenigen Punkt, welchen ich bisher immer vor mir herschob, Ihnen aber schon vier mal in den Programmen vorgesetzt habe: Es ist dies der Programmkopf mit dem wichtigen Deklarationsteil. Die Blockstruktur ist ein Hauptmerkmal von Pascal. Man kann sich eine Ebene vorstellen, die bezeichnet wird mit »PROGRAM name«. In ihr sind überall und jederzeit alle Konstanten und Variablen verfügbar und änderbar, die in dem zu dieser Ebene gehörigen Deklarationsteil angegeben werden müssen. Ein Programm, das völlig ohne Prozeduren und Funktionen auskommt, liegt in dieser Ebene, und somit leben alle Variablen in ihm (das heißt sie sind gültig), eben weil sie im Deklarationsteil dieser Ebene stehen. Im Deklarationsteil, der zu dieser Ebene gehört, wird nun gesagt, ob und welche Konstanten, Typen und Variablen in dieser Ebene gebraucht werden. Man muß also alle in dieser Ebene verwendeten Variablen deklarieren. Wenn man nun ein Unterprogramm, genannt Prozedur, einführt, so bildet man eine neue Ebene, die jetzt auf derjenigen liegt, die »PROGRAM« genannt wurde (es entsteht mit der Zeit eine Art Relief, indem Ebene auf Ebene zu liegen kommt). Will man die Variablen aus der Hauptebene (»PROGRAM«) benützen, so kann man das bedenkenlos tun.</p>
+
+<p>Man kann aber auch Konstanten, Typen und Variablen definieren, die nur in dieser und jeder daraufliegenden Ebene leben, das heißt man kann von der Hauptebene diese Variablen nicht ansprechen, weil sie für die Hauptebene nicht existieren, da sie nicht in deren Deklarationsteil verzeichnet sind. Daraus ergibt sich, daß man die gleichen Variablennamen verwenden darf, die eigentlich schon in der Hauptebene verteilt worden sind. Obwohl, gleich benannt, beeinflussen sie einander in keiner Weise. Beide Inhalte bleiben erhalten. Je nachdem, in welchem Block man sich befindet, sind gerade die Variablen von dessen Deklarationsteil aktiv. Man kann also, indem man in der Prozedur einen Deklarationsteil hat, eine Sperre aufbauen, die ein Verändern einer gleichlautenden Variable aus einer tieferliegenden Ebene verhindern kann. Aus dieser Tatsache entstand der Begriff der »Lokalen Variablen«. Ein typisches Anwendungsbeispiel dazu ist das »FOR i: = x TO y DO«-Statement. Da man mit diesem Statement oft Indices verändert, heißt die Laufvariable meistens »i« für Index, und so hat es sich eingebürgert, daß man sie wenn möglich immer »i« nennt. Damit nun niemals irgendwelche Komplikationen auftreten können, deklariert man diese Variable »i« meistens in jeder Ebene und zwar vom Typ »INTEGER«. Ich hoffe, daß dies am nächsten Beispiel (Listing 7) ein bißchen klarer wird:</p>
+
+<p>In Listing 7 gibt es zum ersten Mal einen fast ausgelasteten Deklarationsteil. Er ist strikt gegliedert und die Teile der Deklaration müssen immer in derselben Reihenfolge auftreten. Im Standardpascal lautet die Abfolge folgendermaßen:</p>
+
+<p>TODO</p>
+
+<p>In UCSD-PascaI gibt es zwar den LabelteiI, aber das »GOTO«-Statement nur bedingt. Man darf daher nicht ein Label anspringen, welches außerhalb des aktuellen Blockes liegt. Ein Aussteigen aus dem gerade bearbeiteten Block ist nur mit »EXIT procedure p« möglich. Der aktuelle Block wird verlassen und die Prozedur »p« wird ausgeführt. Eine Labeldeklaration geschähe dann wie folgt:<br>
+LABEL 0,27,56,876,9999<br>
+Damit hätte ich 5 Labels deklariert, die irgendwo im betreffenden Block stehen können. Die Zahlen haben nichts mit irgendwelchen Zeilennummern zu tun (man kann sie natürlich so verwenden).</p>
+
+<p>Die Konstantendeklaration:<br>
+CONST name = wert;<br>
+Die Typendeklaration:<br>
+TYPE name = Definition des Typs;<br>
+Die Variablendeklaration:<br>
+VAR name : Typenzugehörigkeit;<br>
+Die Prozeduren- und Funktionendeklaration:<br>
+PROCEDURE name (Übergabeparameter);<br>
+Definition der Prozedur<br>
+FUNCTION name (Übergabeparameter);<br>
+Definition der Funktion</p>
+
+<p>Nun ist zwar endlich klar, was ein Deklarationsteil ist, aber die Typenarten, von denen ich schon zwei in den Beispielprogrämmchen benutzt habe, sind noch immer nicht klar. Nun, es gibt einmal vordefinierte Typen, diese sind:</p>
+
+<p>TODO</p>
+
+<p>Eine ebenfalls vordefinierte Abänderung der Standardtypen erhält man, indem man schreibt: »FILE OF standard typ«. So deklariert man eine sequentielle Datei, deren Elemente einem der Standardtypen angehören. Eine ungeheure Flexibilität erreicht Pascal nun, indem man eigene Typen definieren kann. Im letzten Beispiel habe ich auch einen eigenen Typen definiert, nämlich den Typ »matrix«. Er ist definiert als ein zweidimensionales Feld der Größe »m« * »n« Elemente des Standardtyps »INTEGER«. In der Typendeklaration hat man fast unbeschränkte Möglichkeiten der Typengenerierung. Da nun der Typ definiert ist, darf ich ihn im Variablendeklarationsteil verwenden. Auch das habe ich gemacht: Es sei »a« vom Typ »matrix«. Im Konstantenteil hat man nur die Standardtypen zur Auswahl, da die Typendeklaration erst später folgt. Einen großen Nachteil hat die Sache mit dem Deklarationsteil: Da man nur Variablen benutzen darf, die man deklariert hat, kann man die Reservation von Speicherplatz für die Variablen nicht optimieren. Man sieht das sehr deutlich an der Variablen »a«. Die Größe der Matrix ist bestimmt durch die Konstanten »m« und »n«, die ich aber schon vorher deklarieren mußte. Ob ich nun wirklich die ganze Größe voll ausnutze oder nicht, ich muß die Array-Grenzen angeben. Unter Umständen verschleudere ich sehr viel Speicherplatz, eventuell reicht er aber nicht einmal. In Basic dagegen kann man schreiben:<br>
+10 INPUT &ldquo;WIEVIELE ZEILEN, SPALTEN&rdquo;;m,n<br>
+20 DIM matrix(m,n)</p>
+
+<p>In Pascal geht es nicht so bequem, aber es ist möglich. Es werden noch einige Beispiele folgen, in denen andere Typen gebraucht werden. Das Beispiel (Listing 7) zeigt, daß neben- und nacheinander zwei Variablen »i« leben können, die einander nicht zerstören. Die eine ist global, weil sie im Programmkopf deklariert worden ist, die andere ist lokal, da sie erst in der Prozedur deklariert wird. Man muß aber klar erkennen, daß man zu keinem Zeitpunkt die Werte beider Variablen zugleich ausgeben kann. Zu den Prozeduren ist zu sagen: Jede Prozedur hat einen Namen. Man kann ihr Werte übergeben, indem man hinter dem Namen eine Klammer öffnet und die Variablennamen sowie deren Typenzugehörigkeit eingibt. Man kann nun aber auf zwei Arten Werte übergeben. Dies soll am Beispiel zweier Prozeduren (Listing 8) gezeigt werden:</p>
+
+<p>Man erkennt sofort, daß an die Prozedur »IN« zwei Werte übergeben werden, fragt sich nur, wo der Unterschied der zwei Übergabearten liegt. Dies ist schnell geklärt:</p>
+
+<p>Die Parameter in Klammern bei der Prozedur »IN (i: INTEGER; VAR j: INTEGER)« sind sogenannte »formale Parameter«, diejenigen aber im Prozedurenaufruf »IN(a,b)« nennt man »aktuelle Parameter«. Die formalen Parameter zeigen an, daß (hier zwei) Parameter übergeben werden, die in der betreffenden Prozedur »i« und »j« heißen werden. Die aktuellen Parameter dagegen beinhalten die Werte, die tatsächlich übergeben werden. In unserem Beispiel heißt das, daß die aktuellen Parameter »a« beziehungsweise »b« den formalen Parametern »i« beziehungsweise »j« entsprechen. Nun, einen kleinen Unterschied gibt es aber doch, wie die Notation der formalen Parameter vermuten läßt:</p>
+
+<p>Dem formalen Parameter »j« wird der Inhalt des aktuellen Parameters »a« übergeben.</p>
+
+<p>Dem formalen Parameter »j« jedoch wird die Speicherplatzadresse des aktuellen Parameters »b« übergeben. Ein kleiner aber wichtiger Unterschied.</p>
+
+<p>Wenn nämlich die Prozedur »IN (i: INTEGER; VARj: INTEGER)« ausgeführt wird, wird der Inhalt von »a« in die Variable »i« kopiert. Der Inhalt von »a« wird in dieser Prozedur nicht verändert. Dagegen wird beim Aufruf von »IN(i: INTEGER; VARj: INTEGER)« nicht der Inhalt von »b« nach »j«, sondern deren Adresse zur Adresse von »j« kopiert. Das hat eine konsequenzenreiche Auswirkung: Alle Veränderungen von »j« in der Prozedur »IN« beeinflussen auch den Inhalt der globalen Variablen »b«, weil »j« nun ja einfach nur ein anderer Name für die Variable »b« ist. Die erste Methode der Parameterübergabe nennt man daher »call by value«, die zweite hingegen »call by reference«. Die Variablen sind nun in der betreffenden Prozedur sowie jeder weiteren darin verschachtelten Prozedur lokal bekannt. Man hat nur darauf zu achten, daß man bei der Übergabe keinen Typenkonflikt verursacht und daß beim Aufruf ebenso viele Parameter stehen wie beim Prozedurenkopf.</p>
+
+<p>Diese Art der Parameterübergabe eignet sich besonders dazu, eigene Programmodule für eine Programmroutinenbibliothek bereitzustellen. Ein weiteres Beispiel dazu mit einer »FUNKTION«, für eine ganz bestimmte Anwendung, nämlich einer Vergleichsfunktion: Gegeben sei folgende Deklaration:<br>
+CONST max = 10000;<br>
+TYPE zahlenmenge = ARRAY (1..max) OF BOOLEAN;</p>
+
+<p>Eine Variable vom Typ »zahlenmenge« kann man auffassen als die Darstellung einer Menge von Zahlen zwischen »1« und »max«, wobei für jede solche Zahl der entsprechende Boolean-Wert im Array angibt, ob sie Element der Menge ist oder nicht (das heißt ob der korrespondierende Wert im Array »1« oder »0« ist).</p>
+
+<p>Gesucht ist nun eine Pascal Funktion, die das Enthaltensein einer Menge »ml« in einer Menge »m2« (beide vom obigen Typ) prüft. Eine mögliche Lösung zeigt Listing 9.</p>
+
+<p>Diese Funktion übernimmt nun aus dem Umfeld der Funktion zwei Variablen vom Typ »zahlenmenge« und weist sie den formalen Parametern »ml« und »m2« mittels der »call by value«-Methode zu. Neu bei der Funktion ist nun, daß hinter der Klammer noch deklariert werden muß, welchen Typs das Resultat der Funktion sein wird. Die Funktion ist ein wichtiger Bestandteil von Pascal. Ihr entspricht in Basic teilweise der Befehl »DEF FN name (variable) = expression«, außer daß er in Basic nur eine mathematische Formel definieren und nur eine numerische Variable übernehmen kann. Man kann mit ihm keinerlei Operationen definieren, die als Resultat einen String oder einen Charakter ausgeben.</p>
+
+<p>Der zweite Teil erscheint in der nächsten Ausgabe und beschreibt die Programmierung mit Funktionen, dem Mengentyp, Aufzählungs- und Auszähltyp sowie die Definition von Datensätzen und den Einsatz von Zeigern (POINTER). Kurz erläutert werden Befehle zur Dateibearbeitung. Den Abschluß bildet eine kritische Auseinandersetzung mit vier Pascal-Versionen, die alle auf dem Commodore 64 lauffähig sind.</p>
+
+<p>(Martin Baur)</p>
+

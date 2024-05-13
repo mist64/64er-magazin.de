@@ -1,0 +1,293 @@
+<h1>Alle Tasten-, Zeichen- und Steuercodes (Teil 3)</h1>
+
+<p>Das ist der dritte Teil einer Serie über die Abfragemethoden für Tasten und ihre verschiedenen Codes. Alle Angaben gelten für den VC 20 und den C 64 gleichermaßen. Wo Unterschiede auftreten, sind die Werte für den Commodore 64 in Klammern gesetzt.</p>
+
+<p>Ich habe im zweiten Teil dieser Reihe versucht, Sie zum Experimentieren mit den ASCII-Codes anzuregen. Heute habe ich für Sie die vollständige Liste aller 255 Codewerte vorbereitet und zwar in einer Art, die sicher einiger Erklärungen bedarf.</p>
+
+<h2>ASCII-Codes, die von Commodore verschwiegen werden</h2>
+
+<p>Ich habe nämlich noch ein paar zusätzliche Überraschungen parat, auf die man nur durch Zufall kommt oder durch Studium des Betriebssystems oder aber, wenn man den Aufsatz von G. Urbanczyk in Computer persönlich vom 19.10.1983, Seite 76, gelesen hat.</p>
+
+<p>Tippen Sie bitte das Programm Nummer 3 aus dem 64’er Mai-Heft, Seite 107, ein, nämlich eine der drei Versionen zur Tastaturpuffer-Abfrage. (Ich verwende unten die GET-Version).<br>
+310 PRINT CHR$(147)<br>
+320 GET A$<br>
+330IFA$= ” &ldquo;THEN320<br>
+340 PRINT ASC(A$)<br>
+350 GOTO 320</p>
+
+<p>Auf beiden, VC 20 und C 64 erhalten Sie nach RUN 310 und Drücken der RETURN-Taste (natürlich) den ASCII-Code 82. Wenn Sie zuerst die CTRL-Taste drücken und halten und dann erst das R drücken, dürfte eigentlich nichts passieren, denn die CTRL-Taste gilt ja angeblich nur für die Farben. Ja, denkste! Wir erhalten nämlich die Zahl 18. Ein Blick in die ASCII-Tabelle zeigt uns für 18 die Funktion »REVERSE-ON«.</p>
+
+<p>Versuchen Sie dasselbe mit CTRL und der TODO-Taste. Wir erhalten die 6, und nicht 95, wie es eigentlich sein sollte.</p>
+
+<p>Für den VC 20 ist das alles. Aber immerhin, wir haben sozusagen noch zwei zusätzliche Funktionstasten gefunden.</p>
+
+<p>Beim C 64 aber geht es erst richtig los:</p>
+
+<p>Der Versuch wird Ihnen zeigen, daß alle Buchstaben, von A bis Z, zusammen mit CTRL gedrückt, einen anderen ASCII-Wert, nämlich 1 bis 26, ergeben, als allein gedrückt.</p>
+
+<p>Desweiteren biete ich Ihnen noch:<br>
+CTRL - t = 30<br>
+CTRL - = = 31<br>
+CTRL - £ = 28<br>
+CTRL - : = 27<br>
+CTRL - ; = 29</p>
+
+<p>Das heißt aber, daß einige ASCII-Codezahlen zwei Bedeutungen haben. Oder umgekehrt, zwei verschiedene Tasten (kombiniert) haben denselben ASCII-Code.</p>
+
+<p>Schwierigkeiten dadurch, daß einige ASCII-Werte zwei Bedeutungen haben, gibt es deswegen nicht, weil die Kombination mit CTRL nicht PRINT-bar ist (PRINT CHR$(19) schickt immer den Cursor »home«, mit dem »S« passiert gar nichts).</p>
+
+<p>Andersherum kann es allerdings vorkommen, daß eine Tastenabfrage, zum Beispiel<br>
+GET A$:IF A$ = CHR$(19) THEN &hellip;&hellip;<br>
+sowohl auf die Taste »HOME« als auch auf »CTRL-S« reagiert. Da ist sicher etwas Vorsicht angebracht. Aber ein Blick in meine ASCII-Tabelle zeigt Ihnen ja die Doppeldeutigkeiten.</p>
+
+<p>An dieser Stelle erwarte ich eigentlich einige Einsprüche, wie: »Wozu das alles, die acht Funktionstasten, oder gar erweitert auf 32, reichen doch völlig aus!« Für den Hausbeziehungsweise Spielgebrauch ist das sicher richtig. Aber bei professioneller Software, welche benutzerfreundlich aufgebaut ist, kann es oft gar nicht genügend Funktionstasten — besonders solche, die eine optische Buchstabenbeziehung zu der Abfrage haben sollen — geben. Wenn in einem Programm gefragt wird, ob Sie »LOADen« oder »SAVEn« wollen, ist CTRL-L oder CTRL-S halt klarer, als f-1 oder f-3.</p>
+
+<p>Ich finde es schade, daß diese großartige Möglichkeit nur auf dem C 64 gegeben ist. Hier zeigt sich deutlich, daß dieser Computer doch professioneller ist als der VC 20.</p>
+
+<h2>Die vollständige ASCII-Tabelle</h2>
+
+<p>So, jetzt können Sie meine ASCII-Tabelle erst richtig interpretieren (Tabelle 1).</p>
+
+<p>Leere Kästchen haben keine Bedeutung für die betreffende Codezahl.</p>
+
+<p>Jeweils zwei Zeichen nebeneinander mit derselben Codezahl stellen die beiden Zeichensätze dar, in die mit C = SHIFT (Commodore-Taste) umgeschaltet werden kann. Wo nur ein Zeichen steht, ist es in beiden Zeichensätzen identisch.</p>
+
+<p>Die Funktionen der Codezahlen 129 und 149 bis 155 gelten nur für den C 64. Interessant ist übrigens, daß die 4. und 7. Spalte identisch ist, ebenso die 6. und 8. Spalte (außer dem Zeichen für 255).</p>
+
+<p>Ich möchte jetzt gern die Szene wechseln, ohne aber den ASCII-Code aus den Augen zu verlieren. Wir haben den ASCII-Code bisher verwendet, um Tasten abzufragen oder Funktionen auszuführen. PRINT CHR$(66) druckt zum Beispiel den Buchstaben B auf den Bildschirm.</p>
+
+<p>Welche Methoden kennen Sie noch, mit denen das gleiche erzielt werden kann?</p>
+
+<p>Die erste, die jeder aus dem Handbuch lernt, ist PRINT ”B”.<br>
+Die komplizierteste ist:<br>
+POKE 7680,2: POKE 38400,7<br>
+(POKE 1024,2: POKE 55296,7)</p>
+
+<p>Diese beiden Vorgehensweisen wollen wir uns näher anschauen und prüfen, ob wir sie in Analogie zu dem ASCII-Code für Tastenabfragen einsetzen können.</p>
+
+<p>Es ist sicher viel bequemer, längere Buchstabenreihen oder gar Texte zwischen Gänsefüße gestellt einzutippen, als eine Serie von CHR$-Werten, ganz abgesehen vom erforderlichen Speicherplatz.</p>
+
+<p>Nicht ganz so bequem ist der Gänsefuß-Modus bei Steuerzeichen, wie zum Beispiel Cursor-Bewegungen, besonders, wenn man diese herbeiführen will, aber statt dessen die reversen Darstellungen auf dem Bildschirm erzeugt.</p>
+
+<h2>Der Gänsefuß-Modus</h2>
+
+<p>Geben Sie es zu. Sie haben deswegen auch schon herzhaft geflucht. Auch jeder Redakteur bittet um Listings mit CHR$-Darstellung anstelle der reversen Zeichen, die bei der Druckwiedergabe oft zu Schwierigkeiten führen.</p>
+
+<p>Jetzt wissen Sie, warum ich bei meinen Progrämmchen immer PRINT CHR$(147) statt PRINT” verwende.</p>
+
+<p>Genauso austauschbar wie bei PRINT ist der ASCII-Code mit dem Gänsefuß-Modus bei der Tastenabfrage.<br>
+Statt:<br>
+10 GET A$<br>
+20 IF A$&lt;&gt;CHR$(65) THEN 10<br>
+30 PRINT CHR$(88)<br>
+können wir schreiben:<br>
+10 GET A$<br>
+20 IF A$&lt;&gt;”A” THEN 10<br>
+30 PRINT ”X”</p>
+
+<p>Beide Programme sind gleichwertig. Nach RUN rührt sich gar nichts. Erst, wenn die A-Taste gedrückt wird (Zeile 20), druckt Zeile 30 den Buchstaben X.</p>
+
+<p>In Zeile 20 können wir natürlich statt des A jeden beliebigen Buchstaben, Zahl oder Zeichen nehmen.</p>
+
+<p>LISTen Sie einfach die 2. Version der drei Zeilen, fahren mit dem Cursor auf das A und verändern Sie es Ihren Wünschen entsprechend. Wie ich Sie einschätze, machen Sie das sicher auch mit den Funktionstasten.</p>
+
+<p>Nein? Dann machen Sie es mal. Sie haben nämlich Pech, so geht es nicht. Aber es geht, wenn Sie sich mit Absicht in die Lage begeben, die wie vorhin beschrieben, Flüche auslöst. Fahren Sie mit dem Cursor auf den 1. Gänsefuß, tippen Sie ihn noch einmal ein und drücken Sie dann eine Funktionstaste. Siehe da, es erscheint ein reverses Zeichen. Mit RETURN wird es »fixiert«, nach RUN wird das X erst mit der verwendeten Funktionstaste ausgelöst.</p>
+
+<p>Der Trick besteht also darin, durch eine ungerade Anzahl von Gänsefuß-Eingaben diesen Modus herbeizuführen. Es geht ebenso durch Drücken der INSERT(INST)-Taste, allerdings nur für soviele Zeichen, wie oft sie gedrückt worden ist.</p>
+
+<h2>Im Gänsefuß-Modus erscheinen alle Steuer- und Funktionstasten in reverser Darstellung</h2>
+
+<p>Sie haben oben ein reverses Zeichen für die Funktionstasten erhalten. Die Zeichen für die Farben und Cursorbewegungen, also alle »gängigen« Funktionen, kennen Sie inzwischen sicher schon. Aber alle Steuer- und Funktionstasten?</p>
+
+<p>Es gibt zwei Möglichkeiten, diese Zeichen zu finden:</p>
+
+<p>Die 1. Methode verwendet entweder ganz primitiv im Direkt-Modus den Befehl: PRINT ” mit nachfolgendem Drücken der Steuer- oder Funktionstaste oder sehr elegant den Dreizeiler<br>
+10 GET A$: IF A$ = &ldquo;"THEN 10<br>
+20 PRINT CHR$(34) A$ CHR$(34) ASC(A$)<br>
+30 GOTO 10<br>
+Auch hier ist ein kleiner Pfiff drin. In Zeile 20 wird zuerst ein Gänsefuß (34) gedrückt, wodurch wir in dem danach benannten Modus sind. Das nachfolgende A$ erscheint im Fall einer Steuertaste als reverses Zeichen, nach dem abschließenden 2. Gänsefuß gibt uns die ASC- Funktion noch den ASCII-Code der gedrückten Taste.</p>
+
+<p>Mit Gänsefüßen statt CHR$ hätten wir lediglich die beiden Zeichen A und $ auf den Bildschirm gedruckt. Mit dieser Methode erhalten Sie zum Beispiel für:<br>
+ASCII-Code 17 = Cursor Down &hellip;. TODO<br>
+ASCII-Code 147 = CLR &hellip;. TODO</p>
+
+<p>Die 2. Methode ist viel einfacher. Schauen Sie in meine ASCII-Tabelle (Tabelle 1). Sie ist in Spalten zu je 32 Zeichen angeordnet. Die Steuerzeichen und die Farben stehen alle in Spalte 1 und 5.</p>
+
+<p>Da finden Sie zum Beispiel über der Codezahl 17 die Funktion »Cursor-Down«. Wenn Sie jetzt in die 3. Spalte waagrecht rübergehen — also den Wert um 64 erhöhen — steht da das TODO . Oder: In Spalte 5 ist der Taste CLR die Codezahl 147 zugeordnet. Zwei Spalten weiter (64 höher) steht das TODO.</p>
+
+<p>Wenn Sie die Ergebnisse der 1. Methode oben mit den durch Spaltenhüpfen gefundenen Zeichen vergleichen, sehen Sie, daß es dieselben Zeichen sind, halt nur reversiert.<br>
+Machen wir die Probe:</p>
+
+<p>Mit Methode 1 erhalten wir für »Rot« das reverse Pfund-Zeichen Q TODO . In der ASCII-Tabelle finden wir »Rot« unter 28. Zwei Spalten weiter, unter 28 + 64 = 92, steht dasselbe Zeichen.</p>
+
+<p>Das gilt auch für alle CTRL-Kombinationen, nicht nur für die der Farben. Bei beiden Computern entspricht dem CTRL-TODO das TODO, beim C 64 erzeugt CTRL-TODO ein TODO. Alle Kombinationen der Buchstaben mit CTRL erzeugen diese Buchstaben in reverser Darstellung.</p>
+
+<p>Um das in einer kleinen praktischen Anwendung zu verdeutlichen, schlage ich vor, dieselbe Aufgabenstellung, die in Heft 5/84 sowohl mit Tastencode-Abfrage (Programm Nummer 1 auf Seite 104/105) als auch mit Tastaturpuffer-Abfrage (Programm Nummer 4 auf Seite 135) gelöst wurde, noch einmal zu verwenden, jetzt aber die Gänsefuß-Methode einzusetzen.</p>
+
+<p>Um beim Eintippen des Programms unten sicherzustellen, daß alles klappt, habe ich statt der reversen Zeichen die Tasten angegeben beziehungsweise umrahmt, die nach dem 1. Gänsefuß gedrückt werden müssen.</p>
+
+<p>Das Programm schaltet, wie die beiden anderen Versionen auch, die Bildschirm-Farben mit f-1, f-2, f-3 und @ um.</p>
+
+<h3>Programm 1. Abfrage mit Gänsefuß</h3>
+
+<p><pre>
+410 PRINT &ldquo;SHIFT und CLR/HOME &rdquo;<br>
+420 GET A$ 430IFA$= ’"’THEN 420<br>
+440 IF A$= ” f-1 &ldquo; THEN POKE 36879,126<br>
+450 IF A$= ” f-2 ” THEN POKE 36879,45<br>
+460 IF A$= ” f-3 ” THEN POKE 36879,25<br>
+470 IF A$= ” TODO ” THEN POKE 36879,27<br>
+480 GOTO 420<br>
+</pre></p>
+
+<p>Für den C 64 gelten in den Zeilen 440 bis 470 andere POKE-Adressen:<br>
+440     POKE 53280,6:POKE 53281,7<br>
+450     POKE 53280,5:POKE 53281,2<br>
+460     POKE 53280,l:POKE 53281,1<br>
+470     POKE 53280,3:POKE 53281,1</p>
+
+<p>Ein letztes Problem bleibt uns noch. Wie schaffen wir es, daß wir im Gänsefuß-Modus auch Funktionen einsetzen können, die entweder keine eigene Taste haben (zum Beispiel 14 = Text, 8 = Lock) oder die beim Eintippen sofort die Funktion auslösen (zum Beispiel 13 = RETURN, 20 = DELete)?</p>
+
+<p>Hier müssen wir eine Methode anwenden, die meine Kinder und ich »finkeln« getauft haben und zwar deswegen, weil wir sie zum ersten und einzigen Mal vom Commodore-Software-Spezialisten Andy Finkel im amerikanischen Handbuch gefunden haben.</p>
+
+<p>Sein Trick besteht darin, daß er in einer ASCII-Tabelle das entsprechende Zeichen für die Funktion heraussucht und es in mehreren Schritten an seinen vorgesehenen Platz bringt.</p>
+
+<p>Ich will Ihnen zeigen, was ich damit meine:</p>
+
+<p>Bitte, versuchen Sie mit der Gänsefuß-Methode die DELete-Taste in eine PRINT-Anweisung zu bringen<br>
+10 PRINT ” INST/DEL ”</p>
+
+<p>Sie werden es nicht schaffen, da die DEL-Taste, statt ein reverses Zeichen zu drucken, ihrer Funktion nachgeht und das vorherige Zeichen löscht.</p>
+
+<p>Jetzt »finkeln« wir:</p>
+
+<h3>1.Schritt:</h3>
+
+<p>10 PRINT ” &ldquo; (mit RETURN abschließen)</p>
+
+<h3>2. Schritt:</h3>
+
+<p>Mit dem Cursor auf die Leerstelle zwischen den Gänsefüßen fahren.</p>
+
+<h3>3. Schritt:</h3>
+
+<p>Aus der ASCII-Tabelle das Zeichen der DEL-Taste holen (T).</p>
+
+<h3>4. Schritt:</h3>
+
+<p>Die reverse Darstellung mit CTRL-REV.ON einschalten (der Cursor bleibt auf seiner Stelle) und das T drücken, mit RETURN abschließen. Jetzt steht das Zeichen drin und das Programm läuft.</p>
+
+<p>Um Ihnen den Schritt 3 für alle widerborstigen Funktionen zu erleichtern, habe ich sie alle in der Tabelle 2 zusammengefaßt.</p>
+
+<p>Da ich hoffe, daß Sie in Zukunft fleißig finkeln werden, muß ich Sie noch über einen lästigen Nebeneffekt aufklären, der bei ein paar Finkeleien auftritt. Einige der Funktionen, nämlich RETURN, DELete (schon wieder) und das SHIFT-RETURN wirken nicht nur im Programmablauf wie vorgesehen, sondern auch beim LISTen, was lästig sein kann. (Allerdings ergeben sich dadurch auch ungeahnte Möglichkeiten — siehe Artikel »Synthetische Steuerzeichen«. Das geSHIFTete RETURN (ASCII-Code 14) ist sehr nützlich bei Platz- und Speichermangel. Sie können nämlich mit ” 0 &ldquo; in einer langen Programmzeile den Cursor mit nur drei Zeichen auf den Anfang der nächsten Zeile bringen, mit CHR$(141) bräuchten Sie schon neun Zeichen, mit SPC(&hellip;) müssen Sie sehr genau die Cursorposition berechnen, mit einer entsprechenden Anzahl von »Cursor-Rechts«-Zeichen geht es auch nur mühsam. Also, nützlich ist SHIFT-RETURN durchaus!</p>
+
+<p>Nur: Beim LISTen wird es auch ausgeführt und die Zeile, in der es steht, sieht recht blöd aus. Zusätzlich kann eine derart geLISTete Zeile nicht mehr geändert werden, sondern muß bei Verbesserungen völlig neu geschrieben und gefinkelt werden. Alles Gute hat seinen Preis!</p>
+
+<p>Soviel sei zur Methode gesagt. Jetzt wollen wir zur Erholung und zur Übung ein kleines Spiel programmieren, in dem wir (fast) alles Gelernte auch anwenden.</p>
+
+<p>Eine kleine Seltenheit ist bemerkenswert: Das Programm ist für VC 20 und C 64 identisch!</p>
+
+<p>Die Spielaufgabe soll darin bestehen, die ersten sieben Buchstaben des Alphabets möglichst in der richtigen Reihenfolge auf den Bildschirm zu bringen.</p>
+
+<h2>Das Finkel-System</h2>
+
+<p>Klingt einfach, aber die Buchstaben sollen in zufälliger Reihenfolge auftauchen. Zusätzlich hat der Spieler, falls der Buchstabe nicht der Reihenfolge entspricht, lediglich die Möglichkeit, ihn mit der DEL-Taste zurückzuweisen, wenn er schnell genug ist. Das Programm zählt die Felder und zeigt am Schluß das Ergebnis an.</p>
+
+<p>Wir brauchen dazu:</p>
+
+<ul>
+<li>Einen Zufalls-Buchstaben-Erzeuger von A bis G (ASCII-Code 65 bis 71)</li>
+<li>einen Buchstaben-Drucker</li>
+<li>einen Buchstaben-Reihenfolgezähler</li>
+<li>eine Möglichkeit, die DEL-Taste zu drücken und damit den gedruckten Buchstaben rückgängig zu machen</li>
+<li>einen Fehlerzähler</li>
+<li>eine Prüfung, ob der letzte Buchstabe (71) erreicht ist.</li>
+</ul>
+
+
+<p>Normalerweise müßte ich jetzt ein Flußdiagramm zeichnen und »strukturiert« vorgehen, so wie die ausgezeichnete Serie in diesem Heft lehrt. Man möge mir aber verzeihen, daß ich aus Erklärungsgründen in einzelnen Schritten vorgehe, welche uns erlauben, jederzeit Zwischenresultate mit Probeläufen zu überprüfen (Programm 2, siehe Listing). Auf geht’s!</p>
+
+<p>Den Buchstaben-Erzeuger und -drucker erhalten wir durch Zeile 50, welche für eine Variable A zufällige ASCII-Codes zwischen 65 und 71 erzeugt, sowie durch Zeile 70, die das Zeichen für den ASCII-Code ausdruckt.<br>
+50 A=INT(RND(0)*7) + 65<br>
+70 PRINT CHR$(A);</p>
+
+<p>Für weniger Versierte sei gesagt, daß RND(0) eine Zufallszahl zwischen 0 und 0,99 erzeugt, mit 7 multipliziert gibt das eine Zahl zwischen 0 bis 6,93. Die Funktion INT macht daraus eine ganze Zahl, zwischen 0 und 6, mit 65 addiert letztlich eine Zahl zwischen 65 und 71 — ASCII-Werte der Buchstaben A bis G.</p>
+
+<p>Den Ausdruck der Buchstaben nebeneinander erreichen wir durch das Semikolon in Zeiel 70, die laufende Wiederholung durch einen Rücksprung in Zeile 320.<br>
+320 GOTO 50</p>
+
+<p>Damit es nicht zu schnell geht, verzögern wir das Ganze mit einer Warteschleife in Zeile 80.<br>
+80 FOR T = 1 TO 1000:NEXT T</p>
+
+<p>Probieren Sie es mit RUN aus. Zeile 80 übrigens erlaubt Ihnen später den Schwierigkeitsgrad zu verändern.</p>
+
+<p>Die geforderte richtige Reihenfolge der Buchstaben A, ich nenne sie hier R, setzen wir am Anfang auf 65 und erhöhen sie schrittweise um 1.<br>
+30 R = 65<br>
+310 R = R+1</p>
+
+<p>In Zeile 60 prüfen wir, ob die Endzahl 71 für das G überschritten ist. Wenn ja, springen wir auf Zeile 400, mit der wir das Spielende anzeigen.<br>
+60 IF R > 71 THEN 400<br>
+400 PRINT”TODO SPIELENDE'&lsquo;**&ldquo;&rdquo;</p>
+
+<p>Bitte RUNnen Sie das Fragment wieder zur Probe.</p>
+
+<p>Jetzt kommt die Beeinflussung der Reihenfolge mit der DEL-Taste. Wie gelernt fragen wir diese Taste mit einer GET-Schleife ab (Zeilen 100,110), ihre Lösch-Wirkung erreichen wir in Zeile 120 durch einen PRINT-Befehl (mit Semikolon!). Nach Drücken der DEL-Taste darf der Reihenfolge-Zähler der Zeile 310 natürlich nicht wirken, deshalb springen wir schon vorher aus der Zeile 210 zurück.<br>
+100 GET A$<br>
+110 IF A$&lt;&gt;&ldquo;TODO&rdquo; THEN 300<br>
+120 PRINT ”TODO";<br>
+210 GOTO 50</p>
+
+<p>Sie sehen oben, daß ich für die Abfrage der DEL-Taste die Finkel-Methode vorschlage. Die anderen Methoden gehen natürlich auch.</p>
+
+<p>Nach RUN springt das Programm auf die noch nicht existierende Zeile 300 (was prompt zur Fehlermeldung führt), es sei denn, Sie drücken rechtzeitig die DEL-Taste.</p>
+
+<p>In der Zeile 300 wollen wir prüfen, ob ein Fehler gemacht wurde, das heißt ob A mit der Reihenfolge R übereinstimmt. Im Fehlerfall wird die Fehlerzahl F um 1 erhöht. Vorher aber muß F auf 0 gesetzt werden.<br>
+20 F=0<br>
+300 IF A&lt;&gt;R THEN F = F+1</p>
+
+<p>Sie können jetzt schon das Spiel üben. Aber es fehlen noch ein paar Feinheiten.<br>
+10 PRINT CHR$(147)<br>
+410 PRINT F &ldquo;Fehler”</p>
+
+<p>Zeile 10 ist klar, Zeile 410 druckt am Spielende die Fehlerzahl F aus.</p>
+
+<p>Aber es gibt noch einen Fehler des Spielers, nämlich wenn er aus Versehen einen richtigen Buchstaben zurückweist. Deshalb fragen wir nach erfolgtem Drücken der DEL-Taste in den Zeilen 100 bis 120 nach, ob der Buchstabe tatsächlich falsch war. Wenn nicht, wird die Fehlerzahl F um 1 erhöht.<br>
+200 IFA = RTHENF=F+1</p>
+
+<p>Damit uns nach RUN der erste Buchstabe nicht überrascht, verzögern wir sein Erscheinen mit<br>
+40 FOR T= 1 TO 600: NEXT T</p>
+
+<p>Zum Finkeln-Üben arrangieren wir die Anzeige des Spielendes und der Fehler etwas um. Alle Anweisungen sollen in nur einer Zeile stehen. Löschen Sie bitte die Zeile 410. In Zeile 400 wird gefinkelt und zwar mit dem Zeichen für SHIFT RETURN, welches laut Tabelle 2 mit SHIFT M erzeugt wird.</p>
+
+<p>400 PRINT &ldquo;TODO DAS SPIEL IST ZU ENDE&rdquo;;&ldquo;TODO F "FEHLER”.</p>
+
+<p>Bei LIST und bei Ausdruck mit einem Drucker sehen die gefinkelten Zeilen 110, 120 und 400 natürlich kurios aus und wie gesagt, sie lassen sich bei einem Tippfehler nicht korrigieren, sondern müssen neu geschrieben werden.</p>
+
+<h2>Der Bildschirm-Code</h2>
+
+<p>Der Vollständigkeit halber will ich noch die letzte der vorher genannten drei Methoden, ein Zeichen auf den Bildschirm zu bringen, erwähnen, insbesondere, weil der dabei verwendete Bildschirm-Code (auch Video-Code genannt) oft zu Verwechslungen mit dem ASCII-Code führt.</p>
+
+<p>Auf Anhieb ist es auch nicht einzusehen, warum Commodore einen anderen Code verwendet, wenn ein Zeichen direkt auf den Bildschirm — oder genauer gesagt in den Bildschirm-Speicher — gePOKEt werden soll.</p>
+
+<p>Der Grund dafür liegt darin, daß dem ASCII-Code nicht nur Zeichen zugeordnet sind, sondern auch Farben und Funktionen. Außerdem sind im ASCII-Code die reversen Zeichen nicht enthalten, sondern müssen — wie Sie ja inzwischen wissen —jeweils umgeschaltet werden. Das alles ist für ein Betriebssystem viel zu kompliziert.</p>
+
+<p>Es ist viel einfacher, im Festspeicher (ROM) alle Zeichen der zwei Zeichensätze fest zu verankern, von wo sie das Betriebssystem herausholen und auf den Bildschirm bringen kann.</p>
+
+<p>Die Reihenfolge der Zeichen und ihr Code sehen Sie in der Tabelle 3. Sie ähnelt in mehreren Bereichen der ASCII-Reihenfolge, einige Spalten sind sogar identisch. Das macht eine Umrechnung — auch für das Betriebssystem — sehr einfach.</p>
+
+<p>Folgende Blöcke der beiden Codearten entsprechen einander:</p>
+
+<p>Ein Programm zur Umrechnung von ASCII-Code in Bildschirm-Code sieht dementsprechend aus wie in Programm 3 (VC 20 und C 64).</p>
+
+<p>Dabei habe ich als Variable gewählt:</p>
+
+<ul>
+<li>ACII = ASCII-Code</li>
+<li>Bild = Bildschirm-Code</li>
+</ul>
+
+
+<p>Im Hinblick darauf, daß unser Hauptthema die Abfrage der Tastatur ist, soll uns dieser Ausflug genügen.</p>
+
+<p>(Dr. Helmut Hauck)</p>
+
