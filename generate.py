@@ -30,6 +30,8 @@ SERVER = 'www.64er-magazin.de'
 NEW_DOWNLOADS = 15
 HOURS_PER_ARTICLE = 16
 
+EXTRACT_PDF_PAGES = True # disable if there is no PDF yet
+
 #
 # Parse arguments
 #
@@ -121,7 +123,8 @@ if LANG == "de":
   FILENAME_PRIVACY = "datenschutz"
   FILENAME_404 = "404"
   FILENAME_IMPRINT = "impressum"
-  CATEGORY_TYPE_IN = "Programme zum Abtippen"
+  CATEGORY_TYPE_IN_1 = "Programme zum Abtippen"
+  CATEGORY_TYPE_IN_2 = "Listings zum Abtippen"
   TOPICS = [
       (LABEL_NEWS, ["Aktuell"]),
       (LABEL_HARDWARE, ["Hardware"]),
@@ -207,7 +210,8 @@ elif LANG == "en":
   FILENAME_PRIVACY = "privacy"
   FILENAME_404 = "404"
   FILENAME_IMPRINT = "imprint"
-  CATEGORY_TYPE_IN = "Type-in Programs"
+  CATEGORY_TYPE_IN_1 = "Type-in Programs"
+  CATEGORY_TYPE_IN_2 = "Type-in Listings"
   TOPICS = [
     (LABEL_NEWS, ["News"]),
     (LABEL_HARDWARE, ["Hardware"]),
@@ -337,6 +341,15 @@ class Article:
         pubdate = issue.pubdate + timedelta(hours=HOURS_PER_ARTICLE * self.sort_index)
         return pubdate
 
+    def is_category_listings(self):
+        if not self.index_category:
+            return False
+        if not self.index_category.startswith(CATEGORY_TYPE_IN_1 + '|') and not self.index_category.startswith(CATEGORY_TYPE_IN_2 + '|'):
+            return False
+        if not self.downloads:
+            return False
+        return True
+
 class Issue:
   def __init__(self, issue_directory_path):
       """Extracts all relevant data from an issue directory, including HTML file paths."""
@@ -346,6 +359,11 @@ class Issue:
       issue_key = None
       pubdate = None
       articles = []
+
+      if EXTRACT_PDF_PAGES:
+        pdf_filename = None
+      else:
+        pdf_filename = "dummy.pdf"
 
       # read all listings in petcat format
       listings = {}
@@ -578,7 +596,7 @@ class ArticleDatabase:
         return toc_entries
 
     def articles_with_downloads(self):
-        return [article for article in self.articles if article.index_category and article.index_category.startswith(CATEGORY_TYPE_IN + '|') and article.downloads]
+        return [article for article in self.articles if article.is_category_listings()]
 
     def all_type_in_articles_grouped_by_index_category(self):
         # Initialize a dictionary to hold articles by category
@@ -587,7 +605,7 @@ class ArticleDatabase:
         # Filter articles with downloads and organize them
         for article in self.articles:
             index_category = article.index_category
-            if index_category and index_category.startswith(CATEGORY_TYPE_IN + '|') and article.downloads:
+            if article.is_category_listings():
                 index_category = index_category[index_category.find('|') + 1:]
                 articles_by_category[index_category].append(article)
 
@@ -1349,9 +1367,10 @@ def copy_articles_and_assets(db, in_directory, out_directory):
         else:
             convert_and_copy_image(os.path.join(issue_source_path, 'title.png'), os.path.join(issue_dest_path, 'title.jpg'))
 
-        # Copy full PDF
         pdf_filename = issue.pdf_filename
-        shutil.copy(os.path.join(issue_source_path, pdf_filename), issue_dest_path)
+        if EXTRACT_PDF_PAGES:
+            # Copy full PDF
+            shutil.copy(os.path.join(issue_source_path, pdf_filename), issue_dest_path)
 
         # Create .PRG from Petcat listings
         for key, listing in issue.listings.items():
@@ -1418,7 +1437,8 @@ def copy_articles_and_assets(db, in_directory, out_directory):
             pdf_path = pdf_filename[:-4] + '_' + pages + '.pdf'
             dest_pdf_path = os.path.join(issue_dest_path, pdf_path)
 
-            extract_pages_from_pdf(source_pdf_path, dest_pdf_path, pages)
+            if EXTRACT_PDF_PAGES:
+                extract_pages_from_pdf(source_pdf_path, dest_pdf_path, pages)
 
             if article_index > 0:
                 prev_page_link = articles[article_index - 1].target_filename
