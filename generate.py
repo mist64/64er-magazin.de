@@ -27,10 +27,9 @@ LANG='de'
 OUT_DIRECTORY = 'out'
 CACHE_DIRECTORY = 'cache'
 SERVER = 'www.64er-magazin.de'
+EXTRACT_PDF_PAGES = True # disable for speed when testing
 NEW_DOWNLOADS = 15
 HOURS_PER_ARTICLE = 16
-# enable this if there's there's a missing PDF
-NO_PDF = False
 
 #
 # Parse arguments
@@ -123,8 +122,7 @@ if LANG == "de":
   FILENAME_PRIVACY = "datenschutz"
   FILENAME_404 = "404"
   FILENAME_IMPRINT = "impressum"
-  CATEGORY_TYPE_IN_1 = "Programme zum Abtippen"
-  CATEGORY_TYPE_IN_2 = "Listings zum Abtippen"
+  CATEGORY_TYPE_IN = "Programme zum Abtippen"
   TOPICS = [
       (LABEL_NEWS, ["Aktuell"]),
       (LABEL_HARDWARE, ["Hardware"]),
@@ -210,8 +208,7 @@ elif LANG == "en":
   FILENAME_PRIVACY = "privacy"
   FILENAME_404 = "404"
   FILENAME_IMPRINT = "imprint"
-  CATEGORY_TYPE_IN_1 = "Type-in Programs"
-  CATEGORY_TYPE_IN_2 = "Type-in Listings"
+  CATEGORY_TYPE_IN = "Type-in Programs"
   TOPICS = [
     (LABEL_NEWS, ["News"]),
     (LABEL_HARDWARE, ["Hardware"]),
@@ -267,19 +264,19 @@ def avif_picture_tag(soup, img_src, attrs=None):
 
     def image_tag(tag_src=img_src):
         img_tag = soup.new_tag('img')
-
+    
         # Copy all attributes from the original <img> tag to the new one
         if attrs:
             for attr, value in attrs.items():
                 img_tag[attr] = value
-
+    
         # add an empty alt for now if there is none
         if 'alt' not in img_tag.attrs:
             img_tag['alt'] = ""
-
+        
         img_tag['src'] = tag_src
         return img_tag
-
+        
     # svg is unchanged
     if img_src[-4:] == '.svg':
         svg_tag = image_tag()
@@ -336,15 +333,6 @@ class Article:
         self.img_urls = metadata['img_urls']
         self.path = metadata['path'] # unused?
 
-    def is_category_listings(self):
-        if not self.index_category:
-            return False
-        if not self.index_category.startswith(CATEGORY_TYPE_IN_1 + '|') and not self.index_category.startswith(CATEGORY_TYPE_IN_2 + '|'):
-            return False
-        if not self.downloads:
-            return False
-        return True
-
 
 class Issue:
   def __init__(self, issue_directory_path):
@@ -352,15 +340,12 @@ class Issue:
       articles_metadata = []
       toc_order = []
       pdf_path = None
+      pdf_filename = None
       issue_path = issue_directory_path  # Capture the issue directory path
       issue_dir_name = os.path.basename(issue_directory_path)
       issue_key = None
       pubdate = None
-      if NO_PDF:
-        pdf_filename = "dummy.pdf"
-      else:
-        pdf_filename = None
-
+  
       # read all listings in petcat format
       listings = {}
       prg_path = os.path.join(issue_directory_path, 'prg')
@@ -370,7 +355,7 @@ class Issue:
                   file_path = os.path.join(root, file)
                   with open(file_path, 'r') as file_obj:
                       listings[os.path.splitext(file)[0]] = file_obj.read()
-
+  
       for root, dirs, files in os.walk(issue_directory_path):
           for file in files:
               if file.endswith('.html'):
@@ -389,7 +374,7 @@ class Issue:
               elif file.endswith('.pdf'):
                   pdf_path = os.path.join(root, file)
                   pdf_filename = os.path.basename(pdf_path)
-
+  
       if pubdate:
           # used directly after init and then never again
           self.articles_metadata = articles_metadata
@@ -404,7 +389,7 @@ class Issue:
 
       else:
           raise Exception(f"- [{issue_directory_path}] does not contain expected data")
-
+  
   @staticmethod
   def __read_html(html_file_path, listings):
       """Parses an HTML file for article metadata and includes the filename."""
@@ -412,7 +397,7 @@ class Issue:
           contents = file.read()
 
       soup = BeautifulSoup(contents, 'html.parser')
-
+  
       def find_meta(name, is_optional=True): # panic if non optional
           meta_tag = soup.find('meta', attrs={'name': name})
           if meta_tag:
@@ -421,7 +406,7 @@ class Issue:
               return None
           else:
               raise SystemExit(f'\n---\nMetaDataError: "{name}" meta tag is missing\n   File: "{html_file_path}"')
-
+      
       def find_title(): # panic if no title
           title_tag = soup.find('title')
           if title_tag:
@@ -443,9 +428,9 @@ class Issue:
           'index_category': find_meta('64er.index_category'),
           'category': find_meta('64er.category'),
       }
-
+  
       metadata['target_filename'] = os.path.basename(metadata['id']) + '.html'
-
+  
       # Put listings into <pre> tags and collect downloads
       downloads = []
       a_tags = []
@@ -458,7 +443,7 @@ class Issue:
               # remove ';', empty lines and leading spaces
               listing = listings[data_filename]
               listing = [line.lstrip() for line in listing.splitlines() if line.strip() and not line.lstrip().startswith(';')]
-
+  
               if data_range:
                   ranges = [(int(part.split('-')[0]), int(part.split('-')[-1])) for part in data_range.split(',')]
                   filtered_lines = []
@@ -473,15 +458,15 @@ class Issue:
                               filtered_lines.append('')
                           blank_line_added = True
                   listing = filtered_lines
-
+  
               listing = "\n".join(listing)
               tag.string = listing
-
+  
               if not any(item[0] == data_name for item in downloads): # duplicates
                   data_filename_escaped = urllib.parse.quote(data_filename)
                   downloads.append((data_name, f"prg/{data_filename_escaped}.prg"))
       metadata['downloads'] = downloads
-
+  
       # and make a "downloads" aside
       if downloads:
           aside_tag = soup.new_tag("aside", attrs={"class": "downloads"})
@@ -492,7 +477,7 @@ class Issue:
               aside_tag.append(a_tag)
           article_tag = soup.find("article")
           article_tag.append(aside_tag)
-
+  
       # Extract article description
       intro_div = soup.find('p', {"class": "intro"})
       if intro_div:
@@ -505,39 +490,39 @@ class Issue:
               metadata['description'] = ' '.join(words[:64]) + '...'
           else:
               metadata['description'] = ''
-
-
+  
+  
       # Extract all image URLs with their *source* names
       src_img_urls = [img['src'] for img in soup.find_all('img') if img.get('src')]
       metadata['src_img_urls'] = src_img_urls
-
+  
       # In the HTML, change all img src paths from PNG to AVIF, with a JPEG fallback
       for img_tag in soup.find_all('img'):
           img_src = img_tag['src']
           if img_src.lower().endswith('.png'):
               img_tag.replace_with(avif_picture_tag(soup, img_tag['src'], img_tag.attrs))
-
+  
       metadata['html'] = soup
       metadata['txt'] = html_to_text_preserve_paragraphs(soup.body);
-
+  
       # Extract all image URLs with their *destination* names
       img_urls = [img['src'] for img in soup.find_all('img') if img.get('src')]
       metadata['img_urls'] = img_urls
-
+  
       return metadata
-
+  
   @staticmethod
   def __read_toc_order(toc_file_path):
       """Reads the TOC order from toc.txt file."""
       with open(toc_file_path, 'r', encoding='utf-8') as file:
           toc_order = [line.strip() for line in file.readlines() if line.strip()]
       return toc_order
-
+  
   def __read_pubdate(file_path):
       with open(file_path, 'r') as file:
           date_str = file.readline().strip()
       return datetime.strptime(date_str, "%Y-%m-%d").replace(tzinfo=timezone.utc)
-
+            
 
 class ArticleDatabase:
 
@@ -547,14 +532,14 @@ class ArticleDatabase:
         for issue_dir_name in os.listdir(in_directory):
             issue_dir_path = os.path.join(in_directory, issue_dir_name)
             if os.path.isdir(issue_dir_path) and re.match(r'^\d{4}$', issue_dir_name):
-
+              
                 try:
                     issue = Issue(issue_dir_path)
 
                 except Exception as error:
                     print(error)
                     continue
-
+                
                 # Map issue key to issue data
                 issue_key = issue.issue_key
                 self.issues[issue_key] = issue
@@ -570,7 +555,7 @@ class ArticleDatabase:
                     article_dict['index'] = index
                     # Assign a pubdate for RSS
                     article_dict['pubdate'] = article_pubdate(issue, article_dict)
-
+                    
                     article = Article(article_dict)
                     self.articles.append(article)
 
@@ -597,7 +582,7 @@ class ArticleDatabase:
         return toc_entries
 
     def articles_with_downloads(self):
-        return [article for article in self.articles if article.is_category_listings()]
+        return [article for article in self.articles if article.index_category and article.index_category.startswith(CATEGORY_TYPE_IN + '|') and article.downloads]
 
     def all_type_in_articles_grouped_by_index_category(self):
         # Initialize a dictionary to hold articles by category
@@ -606,7 +591,7 @@ class ArticleDatabase:
         # Filter articles with downloads and organize them
         for article in self.articles:
             index_category = article.index_category
-            if article.is_category_listings():
+            if index_category and index_category.startswith(CATEGORY_TYPE_IN + '|') and article.downloads:
                 index_category = index_category[index_category.find('|') + 1:]
                 articles_by_category[index_category].append(article)
 
@@ -1382,10 +1367,9 @@ def copy_articles_and_assets(db, in_directory, out_directory):
         else:
             convert_and_copy_image(os.path.join(issue_source_path, 'title.png'), os.path.join(issue_dest_path, 'title.jpg'))
 
+        # Copy full PDF
         pdf_filename = issue.pdf_filename
-        if not NO_PDF:
-            # Copy full PDF
-            shutil.copy(os.path.join(issue_source_path, pdf_filename), issue_dest_path)
+        shutil.copy(os.path.join(issue_source_path, pdf_filename), issue_dest_path)
 
         # Create .PRG from Petcat listings
         listings = issue.listings
@@ -1453,7 +1437,7 @@ def copy_articles_and_assets(db, in_directory, out_directory):
             source_pdf_path = os.path.join(issue_source_path, pdf_filename)
             pdf_path = pdf_filename[:-4] + '_' + pages + '.pdf'
             dest_pdf_path = os.path.join(issue_dest_path, pdf_path)
-            if not NO_PDF:
+            if EXTRACT_PDF_PAGES:
                 extract_pages_from_pdf(source_pdf_path, dest_pdf_path, pages)
 
             if article_index > 0:
