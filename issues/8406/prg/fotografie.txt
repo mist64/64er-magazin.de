@@ -1,0 +1,413 @@
+;fotografie.prg ==0801==
+;Eingetippt von goloMAK
+    1 rem fotografisches fachrechnen
+    2 rem
+    3 rem (c) 1984 by
+    4 rem wolf-d.robrahn
+    5 rem beethovenstr. 18
+    6 rem 2200 elmshorn
+    7 rem
+    8 rem
+   10 poke36879,174:printchr$(144),chr$(14):poke657,128
+   20 data1.4,2,2.8,4,5.6,8,11,16,22,32,45,64,90,128
+   99 rem **** menu ****
+  100 print"{clr}{rvon}    fotografisches          Fachrechnen     "
+  105 clr
+  110 print"{rght}1. Berechnung der"
+  120 print"{rght}{rght}{rght}{rght}Bildgroesse"
+  130 print"{down}{rght}2. Berechnung der"
+  140 print"{rght}{rght}{rght}{rght}Gegenstandsgroes."
+  150 print"{down}{rght}3. Verwendung von"
+  160 print"{rght}{rght}{rght}{rght}Vorsatzlinsen"
+  170 print"{down}{rght}4. Berech.der Bildw."
+  180 print"{rght}{rght}{rght}{rght}Brennw.& Enfern."
+  190 print"{down}{rght}5. Berechnung der"
+  200 print"{rght}{rght}{rght}{rght}Belichtungszeit"
+  210 print"{down}{rght}6. Berechnung der"
+  220 print"{rght}{rght}{rght}{rght}Tiefenschaerfe"
+  230 print"{rght}{rght}{rvon}{down}Code-Zahl eingeben"
+  239 rem **** code-eingabe ***
+  240 geta$
+  250 ifa$="1"then1000
+  260 ifa$="2"then2000
+  270 ifa$="3"then3000
+  280 ifa$="4"then4000
+  290 ifa$="5"then5000
+  295 ifa$="6"then6000
+  300 goto240
+ 1000 print"{clr}{rvon} *** BILDGROESSE ***  "
+ 1005 gosub11000
+ 1010 input"{down}{rvon}Bildweite{rvof}";a1$
+ 1012 gosub12000:ifq=1then1010
+ 1015 gosub10000
+ 1017 a=zw
+ 1020 input"{down}{rvon}Brennweite{rvof}";a1$
+ 1022 gosub12000:ifq=1then1020
+ 1025 gosub10000
+ 1027 f=zw
+ 1030 input"{down}{rvon}Gegenstandsgr.{rvof}";a1$
+ 1031 gosub12000:ifq=1then1030
+ 1033 gosub10000
+ 1034 g=zw
+ 1036 input"{rvon}{down}Entfernung{rvof}";a1$
+ 1037 gosub12000:ifq=1then1036
+ 1040 gosub10000
+ 1045 e=zw
+ 1050 ifa<>0ande<>0andg<>0thenb=(a*g)/e:goto1200
+ 1060 iff<>0andg<>0ande<>0thenb=(f*g)/(e-f):goto1200
+ 1063 ifa=0andf>0then1080
+ 1064 ifa=0andf=0then1080
+ 1065 ifa<fthen60000
+ 1066 ifa=fthen60500
+ 1070 ifa<>0andg<>0andf<>0thenb=((a-f)*g)/f:goto1200
+ 1080 gosub61000
+ 1085 clr
+ 1090 goto1010
+ 1200 b=int(100*b)/100
+ 1210 ifb<100thenm$="mm"
+ 1220 ifb=>100thenb=b/10:m$="cm"
+ 1230 iff=0thenf=int(100*((e*a)/(e+a)))/100:print"{down}Brennweite"f"mm"
+ 1240 ifa=0thena=int(100*((e*f)/(e-f)))/100:print"{down}Bildweite"a"mm"
+ 1250 ife=0thene=int(100*((a*f)/(a-f)))/100:print"{down}Entfernung"e"mm"
+ 1260 print"{down}BILDGROESSE"b;m$
+ 1270 print"{down}{rght}{rght}{rvon}RETURN{rvof} wenn weiter"
+ 1280 geta$:ifa$<>chr$(13)then1280
+ 1290 goto100
+ 2000 print"{clr}{rvon}* GEGENSTANDSGROESSE *"
+ 2005 gosub11000
+ 2010 input"{down}{down}{rvon}Bildgroesse{rvof}";a1$
+ 2020 gosub12000:ifq=1then2010
+ 2030 gosub10000
+ 2040 b=zw
+ 2050 input"{down}{rvon}Bildweite{rvof}";a1$
+ 2060 gosub12000:ifq=1then2050
+ 2070 gosub10000
+ 2080 a=zw
+ 2090 input"{down}{rvon}Entfernung{rvof}";a1$
+ 2100 gosub12000:ifq=1then2090
+ 2110 gosub10000
+ 2120 e=zw
+ 2140 input"{down}{rvon}Brennweite{rvof}";a1$
+ 2150 gosub12000:ifq=1then2140
+ 2160 gosub10000
+ 2170 f=zw
+ 2180 ifa<>0ande<>0andb<>0theng=(e*b)/a:goto2300
+ 2185 ifa=0andf>0then2220
+ 2190 ifa=0andf=0then2240
+ 2200 ifa<fthen60000
+ 2210 ifa=fthen60500
+ 2220 ife<>0andb<>0andf<>0theng=((e-f)*b)/f:goto2300
+ 2230 iff<>0andb<>0anda<>0theng=(f*b)/(a-f):goto2300
+ 2240 gosub61000
+ 2250 clr:goto2010
+ 2300 g=int(100*g)/100
+ 2310 ifg<100thenm$="mm"
+ 2320 ifg>=100theng=g/10:m$="cm"
+ 2330 iff=0thenf=int(100*((e*a)/(e+a)))/100:print"{down}Brennweite"f"mm"
+ 2340 ifa=0thena=int(100*((e*f)/(e-f)))/100:print"{down}Bildweite"a"mm"
+ 2350 ife=0thene=int(100*((a*f)/(a-f)))/1000:print"{down}Entfernung"e"cm"
+ 2360 print"{down}GEGENSTANDSGR."g;m$
+ 2370 print"{down}{rght}{rght}{rvon}RETURN{rvof} wenn weiter"
+ 2380 geta$:ifa$<>chr$(13)then2380
+ 2390 goto100
+ 3000 print"{clr}{rvon} *** VORSATZLINSEN ***"
+ 3010 gosub11000
+ 3020 input"{down}{rvon}Brennweite alt{rvof}";a1$
+ 3030 gosub12000:ifq=1then3020
+ 3040 gosub10000
+ 3050 f1=zw/10
+ 3060 input"{down}{rvon}Brennweite neu{rvof}";a1$
+ 3070 gosub12000:ifq=1then3060
+ 3080 gosub10000
+ 3090 f2=zw/10
+ 3100 input"{down}{rvon}Dioptrien{rvof}";di
+ 3105 iff1<>0andf2<>0anddi<>0thengosub61000:goto3010
+ 3110 iff1<>0andf2<>0thendi=(100/f2)-(100/f1):di=int(10*di)/10
+ 3120 iff1<>0andf2<>0thenprint"{down}{down}DIOPTRIEN:"di:goto3150
+ 3125 iff2=0anddi=0thendi=int(10*(100/f1))/10:print"{down}{down}DIOPTRIEN:"di:goto3150
+ 3126 iff1=0andf2=0thenf=int(10*(100/di)):print"{down}{down}BRENNWEITE:"f"mm":goto3150
+ 3130 iff1<>0anddi<>0thenf2=(100*f1)/(100+(di*f1)):f2=int(10*f2)
+ 3140 iff1<>0anddi<>0thenprint"{down}{down}BRENNWEITE NEU"f2"mm"
+ 3150 print"{down}{rght}{rght}{rvon}RETURN{rvof} wenn weiter"
+ 3160 geta$:ifa$<>chr$(13)then3160
+ 3170 goto100
+ 4000 print"{clr}{rvon} Berechnung von A,f,E "
+ 4010 gosub11000
+ 4020 input"{down}{rvon}Bildgroesse{rvof}";a1$
+ 4030 gosub12000:ifq=1then4020
+ 4040 gosub10000
+ 4050 b=zw
+ 4060 input"{down}{rvon}Bildweite{rvof}";a1$
+ 4070 gosub12000:ifq=1then4060
+ 4080 gosub10000
+ 4090 a=zw
+ 4100 input"{down}{rvon}Brennweite{rvof}";a1$
+ 4110 gosub12000:ifq=1then4100
+ 4120 gosub10000
+ 4130 f=zw
+ 4140 input"{down}{rvon}Gegenstandsgr.{rvof}";a1$
+ 4150 gosub12000:ifq=1then4140
+ 4160 gosub10000
+ 4170 g=zw
+ 4180 input"{down}{rvon}Entfernung{rvof}";a1$
+ 4190 gosub12000:ifq=1then4180
+ 4200 gosub10000
+ 4210 e=zw
+ 4220 ifa<fanda<>0andf<>0then60000
+ 4230 ifa=fanda<>0andf<>0then60500
+ 4300 iff=0ande<>0anda<>0then4500
+ 4310 iff=0anda<>0andb<>0andg<>0then4550
+ 4320 iff=0ande<>0andb<>0andg<>0then4600
+ 4330 ifa=0andf<>0andb<>0andg<>0then4700
+ 4340 ifa=0ande<>0andf<>0then4720
+ 4350 ifa=0andb<>0andg<>0ande<>0then4750
+ 4360 ife=0andf<>0andb<>0andg<>0then4850
+ 4370 ife=0anda<>0andf<>0then4860
+ 4380 ife=0andg<>0andb<>0anda<>0then4870
+ 4390 ifx=0thengosub61000:clr:goto4020
+ 4450 print"{down}{rght}{rght}{rvon}RETURN{rvof} wenn weiter"
+ 4460 geta$:ifa$<>chr$(13)then4460
+ 4470 goto100
+ 4500 f=(e*a)/(e+a):goto4650
+ 4550 f=a/((b/g)+1):goto4650
+ 4600 f=e/((g/b)+1)
+ 4650 f=int(f):print"{down}BRENNWEITE"f"mm":x=1:f=0:goto4330
+ 4700 a=f*((b/g)+1):goto4800
+ 4720 a=(e*f)/(e-f):goto4800
+ 4750 a=(b*e)/g
+ 4800 a=int(a)/10:print"{down}BILDWEITE"a"cm":x=1:a=0:goto4360
+ 4850 e=f*((g/b)+1):goto4900
+ 4860 e=(a*f)/(a-f):goto4900
+ 4870 e=(g*a)/b
+ 4900 e=int(e)/10:print"{down}ENTFERNUNG"e"cm":x=1:e=0:goto4450
+ 5000 print"{clr}{rvon} ** BELICHTUNGSZEIT **"
+ 5005 gosub11000
+ 5007 dimbl(15)
+ 5010 input"{down}{rvon}Blende{rvof}";a1$:a2$=a1$
+ 5011 restore:forz=1to14
+ 5012 readp:bl(z)=p
+ 5013 ifval(a1$)=pthenzz=1
+ 5014 next
+ 5015 ifzz=0thenprint"keine gueltige Blende!":goto5010
+ 5017 gosub62000
+ 5020 input"{down}{rvon}Brennweite{rvof}";a1$
+ 5030 gosub12000:ifq=1then5020
+ 5040 gosub10000
+ 5050 f=zw
+ 5060 input"{down}{rvon}Bildweite{rvof}";a1$
+ 5070 gosub12000:ifq=1then5060
+ 5080 gosub10000
+ 5090 a=zw
+ 5095 ifa<fthen60000
+ 5100 input"{down}{rvon}Bel. Zeit{rvof}";a1$:a3$=a1$
+ 5110 ifleft$(a1$,2)="1/"thena1$=right$(a1$,len(a1$)-2):t=1/val(a1$):goto5200
+ 5120 t=val(a1$)
+ 5200 fa=(a*a)/(f*f)
+ 5210 t=t*fa:fa=sqr(fa):ift<1thent$=str$(int(1/t)):t$=right$(t$,len(t$)-1):t$="1/"+t$
+ 5220 ift>=1thent$=str$(int(10*t)/10)
+ 5230 n=n/fa
+ 5240 forz=1to13
+ 5250 ifn=bl(z)thenbl$=str$(bl(z)):goto5500
+ 5260 ifn>bl(z)andn<bl(z+1)thengosub62500:goto5500
+ 5270 next
+ 5500 print"{down}{rvon}******{rvof}Belichtung{rvon}******{rvof}":print"Blende: "a2$
+ 5510 print"{down}Bel. Zeit:"t$" sec"
+ 5520 print"{rvon}{down}oder..."
+ 5530 print"{down}Blende:"bl$
+ 5540 print"{down}Bel. Zeit: "a3$" sec"
+ 5550 print"{down}{rght}{rght}{rvon}RETURN{rvof} wenn weiter"
+ 5560 geta$:ifa$<>chr$(13)then5560
+ 5570 goto100
+ 6000 print"{clr}{rvon} ** TIEFENSCHAERFE ** "
+ 6010 print"Bitte geben Sie Ihr   Filmformat ein!"
+ 6020 print"{rvon}Bei Verwendung von    Schmalfilmen:"
+ 6030 print"{down}16 mm    = 16"
+ 6040 print"{down}Super 8  = s8"
+ 6050 print"{down}Normal 8 = n8"
+ 6055 print"{down}{rght}{rght}{rght}{rght}{rght}{rght}Beispiel:"
+ 6056 print"{down}{rvon}Format:{rvof}? 24x36 mm"
+ 6057 print"{CBM-POUND}{CBM-POUND}{CBM-POUND}{CBM-POUND}{CBM-POUND}{CBM-POUND}{CBM-POUND}{CBM-POUND}{CBM-POUND}{CBM-POUND}{CBM-POUND}{CBM-POUND}{CBM-POUND}{CBM-POUND}{CBM-POUND}{CBM-POUND}{CBM-POUND}{CBM-POUND}{CBM-POUND}{CBM-POUND}{CBM-POUND}{CBM-POUND}"
+ 6060 input"{rvon}{rght}Format:{rvof}";a1$:a2$=a1$
+ 6065 ifa1$=""then6620
+ 6070 ifa1$="s8"ora1$="n8"thensz=4e-03:goto6300
+ 6080 ifa1$="16"thensz=8e-03:goto6300
+ 6090 gosub12000:ifq=1then6060
+ 6100 a1$=left$(a1$,len(a1$)-2)
+ 6105 a$=""
+ 6110 forz=1tolen(a1$)
+ 6120 a$=a$+mid$(a1$,z,1)
+ 6130 ifmid$(a1$,z+1,1)="x"then6150
+ 6140 next
+ 6150 b$=right$(a1$,len(a1$)-(z+1))
+ 6160 a1$=a$+right$(a2$,2)
+ 6170 gosub10000
+ 6180 a1=zw
+ 6190 a1$=b$+right$(a2$,2)
+ 6200 gosub10000
+ 6210 b1=zw
+ 6220 c=sqr((a1*a1)+(b1*b1)):sz=c/1500
+ 6300 sz=int(1000*sz)/1000
+ 6305 sz$=str$(sz):sz$=right$(sz$,len(sz$)-1)
+ 6310 forz=1len(sz$)
+ 6320 ifmid$(sz$,z,1)=chr$(69)then6340
+ 6330 next
+ 6335 goto6500
+ 6340 sz$=".00"+left$(sz$,1)
+ 6500 print"{down}Toleranz: "sz$" mm"
+ 6505 forz=1to500:next
+ 6600 a2$="":z=0:a$="":b$="":a1=0:b1=0:c=0:sz$=""
+ 6610 print"{down}{down}Wenn mit errechneter  Toleranz einverstandenbitte nur {rvon}RETURN"
+ 6620 input"{down}{rvon}Toleranz{rvof}";sz
+ 6625 dimbl(15):restore:forz=1to14:readp:bl(z)=p:next
+ 6629 rem **** 2. menu ***
+ 6630 print"{clr}{rvon}     moeglichen         Berechnungsarten   "
+ 6640 print"{down}{down}{rght}1. Tiefensch. bei"
+ 6645 print"{rght}{rght}{rght}{rght}{rvon}Einstell. Unendl."
+ 6650 print"{rght}{down}{down}2. Tiefensch. bis"
+ 6655 print"{rght}{rght}{rght}{rght}{rvon}Unendlich"
+ 6660 print"{down}{down}{rght}3. Tiefensch. von"
+ 6665 print"{rght}{rght}{rght}{rght}{rvon}endl.Nahpunkt{rvof} bis"
+ 6670 print"{rght}{rght}{rght}{rght}{rvon}endl.Fernpunkt"
+ 6675 print"{down}{down}{down}{rght}{rght}{rvon}Code-Zahl eingeben"
+ 6679 rem **** code-eingabe ****
+ 6680 geta$
+ 6685 ifval(a$)=1then7000
+ 6690 ifval(a$)=2then7500
+ 6695 ifval(a$)=3then8000
+ 6699 goto6680
+ 7000 print"{clr}{rvon}Einstellung  UNENDLICH"
+ 7010 input"{down}{rvon}Brennweite{rvof}";a1$
+ 7015 gosub12000:ifq=1then7010
+ 7020 gosub10000
+ 7025 f=zw
+ 7030 input"{down}{rvon}Blende{rvof}";a1$:zz=0
+ 7031 ifa1$="0"thenn=0:goto7400
+ 7032 restore:forz=1to14:readp
+ 7034 ifval(a1$)=pthenzz=1
+ 7035 next
+ 7040 ifzz=0thenprint"keine gueltige Blende!":goto7030
+ 7050 gosub62000
+ 7090 np=((f*f)/(sz*n*10))
+ 7100 ifnp>=1000thennp=int(np)/100:m$="m":goto7300
+ 7110 ifnp>=100thennp=int(np):m$="cm":goto7300
+ 7120 ifnp<100thennp=int(10*np)/10:m$="cm"
+ 7300 ifx=0thenprint"{down}Schaerfe von"np;m$:print"{down}bis Unendlich"
+ 7400 goto63000
+ 7500 print"{clr}{rvon}Nahpunkt bis Unendlich"
+ 7505 input"{down}{rvon}Brennweite{rvof}";a1$
+ 7510 gosub12000:ifq=1then7505
+ 7515 gosub10000
+ 7520 f=zw
+ 7525 input"{down}{rvon}Blende{rvof}";a1$:zz=0
+ 7530 ifa1$="0"thenn=0:goto7550
+ 7532 restore:forz=1to14:readp
+ 7533 ifval(a1$)=pthenzz=1
+ 7535 next
+ 7540 ifzz=0thenprint"keine gueltige Blende!"goto7525
+ 7545 gosub62000
+ 7550 input"{down}{rvon}Nahpunkt{rvof}";a1$
+ 7555 gosub12000:ifq=1then7550
+ 7560 gosub10000
+ 7565 np=zw
+ 7570 ifn=0then7700
+ 7580 np=(f*f)/(2*sz*n*10)
+ 7590 ifnp>=100thennp=int(np)/100:m$="m":goto7600
+ 7595 ifnp<100thennp=int(10*np)/10:m$="cm"
+ 7600 print"{down}Schaerfe von"np;m$
+ 7610 print"{down}bis Unendlich."
+ 7620 print"{down}{down}EINSTELLUNG"2*np;m$
+ 7630 goto63000
+ 7700 n=(f*f)/(2*sz*np)
+ 7705 forz=1to13
+ 7710 ifn=bl(z)thenbl$=str$(bl(z)):goto7730
+ 7715 ifn>bl(z)andn<bl(z+1)thengosub62500:goto7730
+ 7720 next
+ 7730 print"{down}noetige Blende"bl$
+ 7740 goto63000
+ 8000 print"{clr}{rvon}NAHPUNKT bis FERNPUNKT"
+ 8010 input"{down}{rvon}Nahpunkt{rvof}";a1$
+ 8014 gosub12000:ifq=1then8010
+ 8016 gosub10000
+ 8018 np=zw
+ 8020 input"{down}{rvon}Fernpunkt{rvof}";a1$
+ 8025 gosub12000:ifq=1then8020
+ 8030 gosub10000
+ 8035 fp=zw
+ 8040 input"{down}{rvon}Brennweite{rvof}";a1$
+ 8045 gosub12000:ifq=1then8040
+ 8050 gosub10000
+ 8060 f=zw
+ 8080 ifnp<>0andfp<>0then9000
+ 8100 input"{down}{rvon}Blende{rvof}";a1$:zz=0
+ 8110 restore:forz=1to14:readp
+ 8120 ifval(a1$)=pthenzz=1
+ 8130 next
+ 8140 ifzz=0thenprint"keine gueltige Blende!":goto8100
+ 8150 gosub62000
+ 8160 input"{down}{rvon}Einstellung{rvof}";a1$
+ 8165 gosub12000:ifq=1then8060
+ 8170 gosub10000
+ 8180 e=zw:e=e/10
+ 8190 nu=(f*f)/(sz*n*10)
+ 8195 np=(nu*e)/(nu+e)
+ 8196 ifnu<=ethenm1$="{left}{left}Unendlich":goto8230
+ 8200 fp=(nu*e)/(nu-e)
+ 8210 iffp<100thenfp=int(10*fp)/10:m1$="cm"
+ 8220 iffp>=100thenfp=int(fp)/100:m1$=" m"
+ 8230 ifnp<100thennp=int(10*np)/10:m$="cm"
+ 8240 ifnp>=100thennp=int(np)/100:m$="m"
+ 8250 print"{down}NAHPUNKT:"np;m$
+ 8260 print"{down}FERNPUNKT:"fp;m1$
+ 8270 goto63000
+ 9000 e=(2*np*fp)/(np+fp)
+ 9010 n=((f*f)*(fp-np))/(2*sz*np*fp)
+ 9020 forz=1to13
+ 9025 ifn=bl(z)thenbl$=str$(bl(z)):goto9045
+ 9030 ifn>bl(z)andn<bl(z+1)thengosub62500:goto9045
+ 9040 next
+ 9045 ife>=1000thene=int(e/10)/100:m$="m":goto9060
+ 9050 ife>=100thene=int(e)/10:m$="cm":goto9060
+ 9055 ife<100thene=int(10*e)/10:m$="mm"
+ 9060 print"{down}EINSTELLUNG"e;m$
+ 9070 print"{down}noetige BLENDE"bl$
+ 9080 goto63000
+ 9999 rem **** wandeln in millimeter ****
+10000 ifright$(a1$,2)=" m"thenzw=val(a1$)*1000
+10010 ifright$(a1$,2)="cm"thenzw=val(a1$)*10
+10020 ifright$(a1$,2)="mm"thenzw=val(a1$)
+10030 return
+11000 print"Geben Sie folgende    Werte ein:"
+11010 return
+11999 rem **** ueberpruefen ob einheit ****
+12000 q=0:ifright$(a1$,1)<chr$(76)thenq=1:print"Einheit vergessen"
+12010 return
+60000 print"{down}{down}Die Rechnung ist unzu-laessig, da die       Abbildung vor der"
+60010 print"1. Brennweite liegen  wuerde.{down}{down}"
+60020 print"{down}{rght}{rght}{rvon}RETURN{rvof} wenn weiter"
+60030 geta$:ifa$<>chr$(13)then60030
+60040 goto100
+60500 print"{down}Die Berechnung ergibt {rvon}UNENDLICH{rvof}.Wenn moeg-  lich statt Bildweite die ";
+60510 print"Entfernung ein-   geben!"
+60520 print"{down}{rght}{rght}{rvon}RETURN{rvof} wenn weiter"
+60530 geta$:ifa$<>chr$(13)then60530
+60540 goto100
+61000 print"{down}{rvon} ungenuegende Angaben                        BITTE UEBERPRUEFEN"
+61010 return
+61999 rem **** berechnung d. blende in dezimal ****
+62000 n=val(a1$):ifright$(a1$,3)="1/2"thenn=n*1.2
+62010 return
+62499 rem **** umwandlung d. dezimalen blende ****
+62500 x1=n-bl(z):x2=bl(z+1)-n:ifx1>=x2then62600
+62510 ifx2>x1then62700
+62600 bl=bl(z)*1.2:x1=n-bl
+62610 ifx1>x2thenbl$=str$(bl(z+1)):goto62800
+62620 ifx2>=x1thenbl$=str$(bl(z))+"*1/2":goto62800
+62700 bl=bl(z)*1.2:x2=bl-n
+62710 ifx1>x2thenbl$=str$(bl(z))+"*1/2":goto62800
+62720 ifx2>=x1thenbl$=str$(bl(z))
+62800 return
+63000 print"{down}{rght}{rght}{rvon}M{rvof}enu oder {rvon}w{rvof}eiter"
+63010 geta$:ifa$<>"m"anda$<>"w"then63010
+63020 ifa$="m"then100
+63030 clr:goto6620
+
