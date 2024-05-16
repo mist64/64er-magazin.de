@@ -1266,7 +1266,7 @@ def copy_and_modify_html(article, html_dest_path, pdf_path, prev_page_link, next
     body.insert(0, custom_div_soup)
 
     # Augment the Fehlerteufelchen <asides> with a full size Fehlerteufelchen
-    asides = soup.find_all("aside", class_="fehlerteufelchen")
+    asides = soup.find_all("aside", { "class" : "fehlerteufelchen" } )
     if asides:
       for aside in asides:
         ft_tag = BeautifulSoup(HTML_IMG_FEHLERTEUFELCHEN, 'html.parser')
