@@ -502,7 +502,7 @@ class Issue:
           data_source = tag.get("data-source")
           data_filename_escaped = urllib.parse.quote(data_filename)
           downloads.append((f"{data_name} ({data_source})", f"prg/{data_filename_escaped}"))
-          #tag.decompose()
+          tag.decompose()
 
       metadata['downloads'] = downloads
 
