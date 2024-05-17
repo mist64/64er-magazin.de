@@ -1,0 +1,323 @@
+;ug.bas.prg ==2001==
+;Quelle: http://www.vic20listings.freeolamail.com/mag_64er.html
+;        mit kleinen Fixes mit Hilfe der Version von der
+;        Programmservicediskette (was eine leicht andere Version
+;        ist, und nach einem RENUMBER)
+
+   10 rem                 u n d e r g r o u n d
+   20 rem written by
+   30 rem oliver joppich
+   40 rem celler str.52
+   50 rem 3300 bs
+   60 :
+   70 clr:poke36879,8:print"{clr}{wht}":poke36869,205:printchr$(8):co=37888:sc=4096:po=sc:le=0
+   80 jo=4864:rem joystickroutine
+   81 lo=60:poke7645,96
+   90 oj$(0)="{rvof} OJO {CBM-Z} SOFT{$a0}PRESENTS{up}":oj$(1)="{rvof}{up}THE{$a0} ADVENTURE GAME
+  100 oj$(2)="{rvof}  U{down}N{down}D{down}E{down}R{up}GR{down}OU{up}ND
+  110 oj$(3)="{rvof}{down}ALL{$a0}RIGHTS{$a0}RESERVED":oj$(4)="{rvof}{down}HAPPY{$a0}PLAYING {CBM-K}{CBM-K}{CBM-K}{CBM-K}{CBM-K}{CBM-K}{CBM-K}
+  120 am$="jklm{down}{left}{left}{left}{left}z[\]{left}{left}{left}{up}":poke0,0:rem braucht jemand 'nen krankenwagen
+  130 poke36876,220:poke36877,254:fort=0to500:next:poke36876,0
+  135 :
+  136 rem titelbild 1
+  137 :
+  140 fory=1to19step4:
+  150 forx=0to20:poke646,rnd(1)*7+1
+  160 sysjo:ifpeek(1001)=1then850
+  170 gosub200:printmid$(oj$(y/4),x+1,1);:poke36878,15:poke36878,0
+  180 next:print:print"{down}{down} ";:next
+  190 fort=0to3000:next:goto270
+  197 :
+  198 rem bewegung des maennchens
+  199 :
+  200 pokepo,32:pokepo+1,32:pokepo+22,32:pokepo+23,32
+  210 fa=co+x+y*22:a=4:pokefa,a:pokefa+1,a:pokefa+22,a:pokefa+23,a
+  220 po=sc+x+y*22:pokepo,2:pokepo+1,3:pokepo+22,18:pokepo+23,19
+  230 fort=0tolo:next
+  240 po=sc+x+y*22:pokepo,0:pokepo+1,1:pokepo+22,16:pokepo+23,17
+  250 fort=0tolo:next:
+  260 return
+  265 :
+  266 rem titel 2
+  267 :
+  270 print"{clr}{down}{wht}YOU{$a0}ARE{$a0}ON{$a0}HOLIDAY{$a0}IN{$a0}{down}{down}{down}{yel} {CBM-+}{CBM-+}{red} NEW{$a0}YORK{$a0}CITY {yel}{CBM-+}{CBM-+}
+  275 print"{down}{down}{down}{down}{grn} YOU{$a0}WALK{$a0}THROUGH{$a0}THE{$a0}{$a0}{down}{down}{down}{blu}";
+  280 TOWN{$a0}WHEN{$a0}IT{$a0}HAPPENS{$a0}{$a0}{$a0}{$a0}{$a0}{$a0}{$a0}{$a0}{down}{down}{down}{cyn}{CBM-S}{CBM-S}{CBM-S}{CBM-S}{CBM-S}{CBM-S}{CBM-S}
+  290 fort=0to9999:next
+  297 :
+  298 rem scene 1 in new york
+  299 :
+  300 print"{clr}{blk}   n      n    n n  o
+  310 print"n o_  n   _ n  ^ _ o_ ";
+  320 print"^ ^_nn^  o_ ^  ^o_ ^_n";
+  330 print"^o^__^^no__n^no^^_n^__";
+  340 print"^_^__^^_^___^^_^^_^^__";
+  350 print"^_^__^^_^___^^_^^_^^__";
+  360 foree=37888to37888+22:e1=rnd(1)*7+1:pokeee,e1:pokeee+22,e1:pokeee+44,e1:pokeee+66,e1
+  370 :pokeee+88,e1:pokeee+110,e1:next
+  380 print"{home}{wht}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{wht}NEW{wht}{rght}{wht}YORK{rght}{rght}{rght}{rght}{rght}{rght}{rght}{down}{down}{down}{down}{down}";
+  390 print"{red}{down}{down}<<<<<<<<<<<<<<<<<<<<<<";:fort=0to7:print"<<<<<<<<<<<<<<<<  <<<<";
+  400 next
+  410 print"{down}{down}{down}<<<<<<<<<<<<<<<<<<<<<<":rem "22 * <"
+  420 po=828:forx=0to15:y=6:gosub200:poke36878,15:poke36878,0:next
+  430 pokepo,32:pokepo+1,32:pokepo+22,32:pokepo+23,32
+  440 fory=6to15:lo=70:a=0
+  450 fa=co+x+y*22:a=4:pokefa,a:pokefa+1,a:pokefa+22,a:pokefa+23,a
+  460 po=sc+x+y*22:pokepo,8:pokepo+1,9:pokepo+22,24:pokepo+23,25
+  470 ify>8thenpokefa-22,2:pokefa-21,2:pokepo-22,60:pokepo-21,60
+  480 pokepo,32:pokepo+1,32:pokepo+22,32:pokepo+23,32
+  490 poke36878,9:foree=240to242:poke36877,ee:next:next
+  491 print"{up}{up}{up}{left}                 {rvof}";:rem 17 spaces
+  500 pokefa,2:pokefa+1,2:pokepo,60:pokepo+1,60
+  510 print"{up}de{left}{left}{down}tu";
+  520 poke36877,150:fort=15to0step-1:poke36878,t:next
+  530 pokefa+22,2:pokefa+23,2:pokepo+22,60:pokepo+23,60
+  540 print"{pur}{up}{left}{left}  {down}{left}{left}vw";
+  550 :poke36877,220:fort=10to0step-1:poke36878,t:next
+  560 fort=0to1500:next
+  570 print"{pur}{up}{left}{left}de{down}{left}{left}tu";
+  580 fort=0to1499:next
+  590 print"{pur}{up}{left}{left}  {down}{left}{left}vw";
+  600 fort=0to1499:next
+  610 print"{pur}{left}{left}{up}de{down}{left}{left}tu";
+  620 fort=0to1499:next
+  630 print"{pur}{left}{left}{up}@a{down}{left}{left}pq";
+  640 fort=0to999:next
+  650 print:print"{down}{blu}YOU{$a0}ARE{$a0}IN {$a0}NEW{$a0}YORKS {$a0} UNDERGROUND{$a0}SYSTEM ";
+  660 fort=0to5000:next
+  670 print"{up}{up}{rght} TRY{$a0}TO{$a0}ESCAPE{$a0}TO{$a0}THE          CITY        ";
+  680 y=y+2:po=832:gosub200:poke36878,15:poke36878,0
+  690 lo=70:fortt=0to3:x=x+1:gosub200:poke36878,15:poke36878,0:next
+  700 forx=19to0step-1:gosub710:poke36878,15:poke36878,0:next:goto770
+  710 pokepo,32:pokepo+1,32:pokepo+22,32:pokepo+23,32
+  720 fa=co+x+y*22:a=4:pokefa,a:pokefa+1,a:pokefa+22,a:pokefa+23,a
+  730 po=sc+x+y*22:pokepo,36:pokepo+1,35:pokepo+22,52:pokepo+23,51
+  740 fort=0tolo:next
+  750 po=sc+x+y*22:pokepo,34:pokepo+1,33:pokepo+22,50:pokepo+23,49
+  760 fort=0tolo:next:return
+  770 print"{up}{up}{rght}      PRESS{$a0}FIRE                        ";
+  780 forx=0to20:gosub200:sys7392:poke36878,15:poke36878,0
+  790 sysjo:ifpeek(1001)=1thenx=x+1:goto830
+  800 next:forx=20to0step-1:gosub710:sys7392:poke36878,5:poke36878,0
+  810 sysjo:ifpeek(1001)=1then830
+  820 next:goto780
+  830 if(peek(38228)and1)=0thensys7392
+  840 lo=10:forx=xto20:gosub200:poke36877,250:poke36878,15:poke36878,0:next
+  845 :
+  846 rem jetzt gehts ab in den ersten aufzug
+  847 :
+  850 ti$="000100":le=0
+  860 poke36879,8:poke4953,2:sys7360
+  870 fort=2to20step2:aa=int(rnd(1)*18):aa=4096+t+aa*22
+  880 pokeaa,32:pokeaa+1,32:pokeaa+22,32:pokeaa+23,32:pokeaa+44,32:pokeaa+45,32
+  890 pokeaa+66,32:pokeaa+67,32:next
+  900 poke36877,0:poke36876,0:poke36875,0:poke36874,0:lo=50
+  910 y=19:x=0:po=832:gosub200:poke7256,150
+  920 sysjo:ifpeek(1000)<>22thengosub2540:goto920
+  930 po=sc+x+y*22:x=x+2
+  940 ifpeek(po+2)<>32orpeek(po+24)<>32then:x=x-2:goto980
+  950 x=x-1:gosub200:x=x+1:gosub200:poke36878,15:poke36878,0:poke7256,peek(7256)-6
+  960 ifx=20then1000
+  970 goto920
+  980 print"{clr}":poke36879,8:poke36877,150:fort=15to0step-.3:poke36878,t:next:
+  990 poke198,0:goto850
+  995 :
+  996 rem achtung wilde zahlen !!!!
+  997 :
+ 1000 gosub2700
+ 1010 poke36879,25:print"{clr}{red}{SHIFT-+}{SHIFT-+}{SHIFT-+}{SHIFT-+}{SHIFT-+}{SHIFT-+}{SHIFT-+}{SHIFT-+}{SHIFT-+}{SHIFT-+}{SHIFT-+}{SHIFT-+}{SHIFT-+}{SHIFT-+}{SHIFT-+}{SHIFT-+}{SHIFT-+}{SHIFT-+}{SHIFT-+}{SHIFT-+}{SHIFT-+}{SHIFT-+}";
+ 1020 print"{SHIFT-+}                    {SHIFT-+}";
+ 1030 print"{SHIFT-+}                    {SHIFT-+}";
+ 1040 print"{SHIFT-+}  {SHIFT-+}{SHIFT-+}{SHIFT-+}{SHIFT-+}{SHIFT-+}{SHIFT-+}{SHIFT-+}{SHIFT-+}{SHIFT-+}{SHIFT-+}{SHIFT-+}{SHIFT-+}{SHIFT-+}{SHIFT-+}{SHIFT-+}{SHIFT-+}  {SHIFT-+}";
+ 1050 print"{SHIFT-+}  {SHIFT-+}              {SHIFT-+}  {SHIFT-+}";
+ 1060 print"{SHIFT-+}  {SHIFT-+}              {SHIFT-+}  {SHIFT-+}";
+ 1070 print"{SHIFT-+}  {SHIFT-+}  {SHIFT-+}{SHIFT-+}{SHIFT-+}{SHIFT-+}  {SHIFT-+}{SHIFT-+}{SHIFT-+}{SHIFT-+}  {SHIFT-+}  {SHIFT-+}";
+ 1080 print"{SHIFT-+}  {SHIFT-+}{SHIFT-+}{SHIFT-+}          {SHIFT-+}{SHIFT-+}{SHIFT-+}  {SHIFT-+}";
+ 1090 print"{SHIFT-+}                    {SHIFT-+}";
+ 1100 print"{SHIFT-+}       {SHIFT-+}{SHIFT-+}  {SHIFT-+}{SHIFT-+}       {SHIFT-+}";
+ 1110 print"{SHIFT-+}  {SHIFT-+}{SHIFT-+}{SHIFT-+}{SHIFT-+}{SHIFT-+}      {SHIFT-+}{SHIFT-+}{SHIFT-+}{SHIFT-+}{SHIFT-+}  {SHIFT-+}";
+ 1120 print"{SHIFT-+}      {SHIFT-+}      {SHIFT-+}      {SHIFT-+}";
+ 1130 print"{SHIFT-+}      {SHIFT-+}  {SHIFT-+}{SHIFT-+}  {SHIFT-+}      {SHIFT-+}";
+ 1140 print"{SHIFT-+}{SHIFT-+}{SHIFT-+}{SHIFT-+}{SHIFT-+}{SHIFT-+}{SHIFT-+}{SHIFT-+}  {SHIFT-+}{SHIFT-+}  {SHIFT-+}{SHIFT-+}{SHIFT-+}{SHIFT-+}{SHIFT-+}{SHIFT-+}{SHIFT-+}{SHIFT-+}";
+ 1150 print"{SHIFT-+}     {SHIFT-+}        {SHIFT-+}     {SHIFT-+}";
+ 1160 print"{SHIFT-+}     {SHIFT-+}        {SHIFT-+}     {SHIFT-+}";
+ 1170 print"{SHIFT-+}  {SHIFT-+}  {SHIFT-+}  {SHIFT-+}  {SHIFT-+}  {SHIFT-+}  {SHIFT-+}  {SHIFT-+}";
+ 1180 print"{SHIFT-+}  {SHIFT-+}     {SHIFT-+}  {SHIFT-+}     {SHIFT-+}  {SHIFT-+}";
+ 1190 print"{SHIFT-+}  {SHIFT-+}     {SHIFT-+}  {SHIFT-+}     {SHIFT-+}  {SHIFT-+}";
+ 1200 print"{SHIFT-+}  {SHIFT-+}{SHIFT-+}{SHIFT-+}{SHIFT-+}{SHIFT-+}{SHIFT-+}{SHIFT-+}  {SHIFT-+}{SHIFT-+}{SHIFT-+}{SHIFT-+}{SHIFT-+}{SHIFT-+}{SHIFT-+}  {SHIFT-+}";
+ 1210 print"                     <";
+ 1220 print"                     <";
+ 1230 print"{SHIFT-+}{SHIFT-+}{SHIFT-+}{SHIFT-+}{SHIFT-+}{SHIFT-+}{SHIFT-+}{SHIFT-+}{SHIFT-+}{SHIFT-+}{SHIFT-+}{SHIFT-+}{SHIFT-+}{SHIFT-+}{SHIFT-+}{SHIFT-+}{SHIFT-+}{SHIFT-+}{SHIFT-+}{SHIFT-+}{SHIFT-+}";:poke4601,91:poke38393,2
+ 1240 x=0:y=20:gosub210:lo=15:a$=ti$:ti$="000000"
+ 1250 ze=1:fort=1to5
+ 1260 a=rnd(1)*70+(t-1)*90+sc:ifpeek(a)<>32then1260
+ 1270 a(t)=a:pokea,112+t:pokea+33792,rnd(1)*5+2:next
+ 1280 poke37898,0:poke37899,0
+ 1290 poke4107,val(right$(ti$,1))+112:poke4106,val(mid$(ti$,5,1))+112
+ 1300 ifti>3600then2720
+ 1310 sysjo:jw=peek(1000):ifpeek(1001)=1then1340
+ 1320 ifjw=23then1290
+ 1330 z5=-notz5and15:ifz5<>0then1390
+ 1340 poke36878,15:poke36876,244:poke36877,0:poke36875,0:poke36874,0
+ 1350 z1=int(rnd(1)*5+1):ifpeek(a(z1))<112orpeek(a(z1))>121then1380
+ 1360 z2=int(rnd(1)*5+1):ifz2=z1orpeek(a(z2))<112orpeek(a(z2))>121then1380
+ 1370 z3=peek(a(z1)):pokea(z1),peek(a(z2)):pokea(z2),z3
+ 1380 poke36878,0:poke36876,0
+ 1390 xx=0:yy=0:p2=0:sp=sc+x+y*22+23-peek(1000):ifjw=22thenp1=1:p2=23:xx=1:ju=1
+ 1400 ifjw=24thenp1=0:p2=22:xx=-1:ju=2
+ 1410 ifjw=1thenp1=22:p2=23:yy=1:ju=3
+ 1420 ifjw=45thenp1=0:p2=1:yy=-1:ju=4
+ 1430 ifp2=0then1290
+ 1440 p3=peek(sp+p1):p4=peek(sp+p2):ifp3=91orp4=91then1290
+ 1450 qw=11:ifp3>91orp4>91thengosub1530
+ 1460 ifqw=0then1290
+ 1470 x=xx+x:y=yy+y:ifx=20thenti$=a$:goto1580
+ 1480 ifx=20thenx=x-1:goto1290
+ 1490 ify<1theny=1:goto1290
+ 1500 onjugosub200,710,2580,2640
+ 1510 poke36878,15:poke36878,0:goto1290
+ 1520 goto1290
+ 1530 qw=0
+ 1540 ifp3=ze+112orp4=ze+112thenze=ze+1:qw=1
+ 1550 ifqw=1thenpoke36878,15:poke36876,220:fort=180to240:poke36876,t:next:poke36876,0:poke36878,0
+ 1560 ifze=9thenqw=2
+ 1570 return
+ 1580 poke36877,234:fort=0to15step.2:poke36878,t:poke38371,t/2:poke38349,t/2:next
+ 1590 fort=0to1000:next:gosub200:fort=0to22:poke4602+t,160:next:po=4140
+ 1595 :
+ 1596 rem catch the piplips !!!
+ 1597 :
+ 1600 le=1:gosub2700:zq=6
+ 1610 poke36878,0:poke36876,0:poke36879,8:sys7424:poke36879,24:poke36877,0
+ 1611 zq=zq-1
+ 1620 cp=4117:ifzq<1then1660
+ 1630 fort=1tozq
+ 1640 pi=sc+rnd(1)*505:ifpeek(pi)<>32then1640
+ 1650 pokepi,103:pokepi+33792,0:next
+ 1660 pokepo,106:pokepo+33792,4:poke36878,15:poke4601,102:poke38393,2:poke4600,32
+ 1670 sysjo:we=peek(1000):ifwe=23then1670
+ 1680 cc=cc+1and3:ifcc=0thenpokecp,160:cp=cp+22:poke36877,240:poke36878,15
+ 1690 ifcp>4579then1770
+ 1700 ifcc=1thenpoke36877,0
+ 1710 pokepo,32:po=po+23-we:ifpeek(po)<>32andpeek(po)<>103andpeek(po)<>102thenpo=po-23+we
+ 1720 ifpeek(po)=103thenpoke36877,0:poke36878,15:fortt=0to5:fort=233to239
+ 1721 poke36876,t
+ 1730 ifpeek(po)=103thenpokepo+33792,rnd(1)*8:next:next:goto1610
+ 1740 ifpeek(po)=102then1800
+ 1750 pokepo,106:pokepo+33792,4:poke36878,15:poke36878,0
+ 1760 fort=0to000:next:goto1670
+ 1770 poke36879,8:print"{clr}{down}{down}{down}{down}{down}{down}{down}{down}{wht}     TIME IS OUT":print"{down}     START AGAIN":le=0
+ 1780 poke36876,220:poke36877,0:poke36878,0:fort=0to224:poke36878,t:next
+ 1781 poke36876,0
+ 1790 fort=0to2000:next:goto1600
+ 1795 :
+ 1796 rem der aufzuege zweiter teil
+ 1797 :
+ 1800 pokepo,106:pokepo+33792,4:sys5000:fort=0to500:next:gosub2700
+ 1810 poke36879,30:poke4953,2:sys7360
+ 1820 fort=2to20step2:aa=int(rnd(1)*18):aa=4096+t+aa*22
+ 1830 pokeaa,32:pokeaa+1,32:pokeaa+22,32:pokeaa+23,32:pokeaa+44,32:pokeaa+45,32
+ 1840 ift/4=int(t/4)thenpokeaa+66,32:pokeaa+67,32
+ 1850 next:poke36877,0:poke36876,0:poke36875,0:poke36874,0:lo=50
+ 1860 y=19:x=0:po=832:gosub200:poke7256,110
+ 1870 sysjo:ifpeek(1000)<>22thengosub2540:goto1870
+ 1880 po=sc+x+y*22:x=x+2
+ 1890 ifpeek(po+2)<>32orpeek(po+24)<>32then:x=x-2:goto1930
+ 1900 x=x-1:gosub200:x=x+1:gosub200:poke36878,15:poke36878,0:poke7256,peek(7256)-10
+ 1910 ifx=20then1950
+ 1920 goto1870
+ 1930 print"{clr}":poke36879,8:poke36877,150:fort=15to0step-.3:poke36878,t:next:
+ 1940 goto1810
+ 1950 fort=0to200:next:gosub2700
+ 1955 :
+ 1956 rem jetzt kommt die glibberbahn
+ 1957 :
+ 1960 poke7645,234:sys7424:poke36879,26:df=4101:poke36877,0:poke36876,0
+ 1961 poke36878,15
+ 1970 print"{home}{pur}                      ":fort=4117to4608step22:poket,32:next:rem 22 spaces
+ 1971 poket-23,32
+ 1980 poke7645,96:po=4140:pokepo,106:pokepo+33792,4:poke36876,0:poke4096,102
+ 1990 poke37888,2:ew=23
+ 2000 ifpeek(df)=106orpeek(8693-df)=106thenpokepo,95:goto2080
+ 2010 poke36877,(df-4096)/8+188:pokedf,95:pokedf-44,32:df=df+44:
+ 2020 poke8737-df,95:poke8781-df,32
+ 2030 ifdf>4629thendf=4101
+ 2040 poke36877,0
+ 2050 ifew=23thensysjo:we=peek(1000):ifwe=23thenwe=ew
+ 2060 ew=we:pokepo,32:po=po+23-we
+ 2070 ifpeek(po)<>32andpeek(po)<>95andpeek(po)<>102thenpo=po-23+we:ew=23
+ 2080 ifpeek(po)=95thenpoke36879,8:poke36877,220:fort=15to0step-.5:poke36878,t
+ 2090 ifpeek(po)=95thennext:le=2:goto1800
+ 2100 ifpeek(po)=102then2120
+ 2110 pokepo,106:pokepo+33792,4:goto2000
+ 2120 gosub2700:print"{clr}":x=20:y=20:gosub710:gosub2740
+ 2130 print"{home}{blu}THE{$a0}END{$a0}IS{$a0}NEAR":gosub2740
+ 2140 print"{down}{down}{down}{yel}YOU HAVE":print"{down}{down}{grn} {CBM-Z}     NUMBERS":poke4255,111+ze:ifze<6then2450
+ 2150 gosub2740:ifzq=6thenprint"{down}{down}{down}{cyn} {CBM-Z}  NO";:goto2490
+ 2160 print"{down}{down}{down}{cyn} {CBM-Z}   ";:fort=1to5-zq:print"{red}{CBM-M}";:next:ifzq<>0then2490
+ 2170 print"{yel} PIPLIPS":gosub2740
+ 2180 fort=0to110:poke36878,15:poke646,rnd(1)*7+1
+ 2181 print"{home}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down} YOU{$a0}SOLVED{$a0}THE GAME
+ 2190 poke36874,212+t/3:poke36875,t/2+191:poke36876,127+t:next:poke36878,0
+ 2191 poke36877,0
+ 2200 poke36876,0:poke36875,0:poke36874,0:poke36877,254:fort=15to0step-.2
+ 2201 poke36878,t
+ 2210 next:poke36878,0:poke36877,0
+ 2220 print"{clr}{pur}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}          <<<<<<<<<<<<";
+ 2230 lo=70:y=17:forx=20to10step-1:gosub710:poke36878,15:poke36878,0
+ 2240 pokesc+x+y*22+46,32:next
+ 2250 fortq=0to10:sys7168:fortt=0to100:next:next
+ 2260 print"{home}{wht}{down}{down}{down}{down}{down}{down}{down}{down}<<<<<<<<<<<<<<<<<<<<<<
+ 2270 print"{home}{blk}   n      n    n n  o
+ 2280 print"n o_  n   _ n  ^ _ o_ ";
+ 2290 print"^ ^_nn^  o_ ^  ^o_ ^_n";
+ 2300 print"^o^__^^no__n^no^^_n^__";
+ 2310 print"^_^__^^_^___^^_^^_^^__";
+ 2320 print"^_^__^^_^___^^_^^_^^__";
+ 2330 foree=37888to37888+22:e1=rnd(1)*7+1:pokeee,e1:pokeee+22,e1:pokeee+44,e1
+ 2331 pokeee+66,e1
+ 2340 :pokeee+88,e1:pokeee+110,e1:next
+ 2350 print"{home}{wht}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down} YOU{$a0}ARE{$a0}NOW {$a0}BACK{$a0}IN{$a0}{$a0}{$a0}{$a0}  {$a0}{$a0}{red}{down}{down}NEW{$a0}YORK
+ 2360 print"{down}{down}{grn}YOUR TIME {CBM-Z}{pur}   {grn}";
+ 2370 a$=ti$:fort=3to4:poke4478+t,asc(mid$(a$,t,1))+64:next:print"MINUTES
+ 2380 fort=5to6:poke4498+t,asc(mid$(a$,t,1))+64:next:print"{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}SECONDS
+ 2390 po=828
+ 2400 poke646,rnd(1)*8+1:print"{home}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}  FIRE FOR NEW GAME":
+ 2410 sysjo:ifpeek(1001)=1then850
+ 2420 x=x+1:y=6:ifx=21thenx=0
+ 2430 gosub200:poke36878,15:poke36878,0:goto2400
+ 2440 end
+ 2450 print"{down}{down}{down}{down}{down}{wht}THERE ARE MORE NUMBERS{down}{down}{down}{wht}START AGAIN   {CBM-K}{CBM-K}{CBM-K}{CBM-K}{CBM-K}{CBM-K}"
+ 2460 print"{down}{down}{red}     PRESS{$a0}FIRE"
+ 2470 sysjo:ifpeek(1001)=0then2470
+ 2480 goto850
+ 2490 print" PIPLIPS":gosub2740
+ 2491 print"{down}{down}{down}{wht}THERE{$a0}ARE{$a0}MORE{$a0}PIPLIPS{down}{down}{wht}START{$a0}AGAIN{$a0}  {CBM-K}{CBM-K}{CBM-K}{CBM-K}{CBM-K}{CBM-K}"
+ 2500 print"{down}{down}{red}     PRESS{$a0}FIRE"
+ 2510 sysjo:ifpeek(1001)=0then2510
+ 2520 goto850
+ 2530 goto2530
+ 2540 sys7168
+ 2550 ifpeek(sc+x+y*22)<>0theny=y-1
+ 2560 ify<0theny=21
+ 2570 return
+ 2580 pokepo,32:pokepo+1,32:pokepo+22,32:pokepo+23,32
+ 2590 fa=co+x+y*22:a=4:pokefa,a:pokefa+1,a:pokefa+22,a:pokefa+23,a
+ 2600 po=sc+x+y*22:pokepo,163:pokepo+1,164:pokepo+22,179:pokepo+23,180
+ 2610 fort=0tolo:next
+ 2620 po=sc+x+y*22:pokepo,161:pokepo+1,162:pokepo+22,177:pokepo+23,178
+ 2630 return
+ 2640 pokepo,32:pokepo+1,32:pokepo+22,32:pokepo+23,32
+ 2650 fa=co+x+y*22:a=4:pokefa,a:pokefa+1,a:pokefa+22,a:pokefa+23,a
+ 2660 po=sc+x+y*22:pokepo,161:pokepo+1,162:pokepo+22,177:pokepo+23,178
+ 2670 fort=0tolo:next
+ 2680 po=sc+x+y*22:pokepo,163:pokepo+1,164:pokepo+22,179:pokepo+23,180
+ 2690 return
+ 2700 poke36879,8:le=le+1:print"{clr}{down}{down}{down}{down}{down}{down}{down}{down}{down}{red}YOU   HAVE  {$a0}MASTERED {down}{down}{down}LEVEL   ";:fort=1tole
+ 2710 print"{yel}{CBM-+}";:sys7296:next:fort=0to3000:next:return
+ 2720 poke36879,8:print"{clr}{down}{down}{down}{down}{down}{down}{wht}TIME{$a0}IS{$a0}OUT":print"{down}{down}{red}TRY{$a0}AGAIN{$a0}LEVEL {yel}{CBM-+}";:le=0:sys7296
+ 2730 fort=0to3000:next:goto850
+ 2740 poke36876,0:poke36877,0:fort=15to0step-.2:poke36878,t:poke36876,230-t:next
+ 2750 return
+ 2760 goto2760
+
