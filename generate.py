@@ -493,6 +493,17 @@ class Issue:
               if not any(item[0] == data_name for item in downloads): # duplicates
                   data_filename_escaped = urllib.parse.quote(data_filename)
                   downloads.append((data_name, f"prg/{data_filename_escaped}.prg"))
+      
+      ## additional binary downloads from the Servicediskette or similar 
+      div_downloads = soup.find_all("div", { "class" : "binary_download" } )
+      for tag in div_downloads:
+          data_filename = tag.get("data-filename")
+          data_name = tag.get("data-name")
+          data_source = tag.get("data-source")
+          data_filename_escaped = urllib.parse.quote(data_filename)
+          downloads.append((f"{data_name} ({data_source})", f"prg/{data_filename_escaped}"))
+          tag.decompose()
+
       metadata['downloads'] = downloads
 
       # and make a "downloads" aside
@@ -1255,7 +1266,7 @@ def copy_and_modify_html(article, html_dest_path, pdf_path, prev_page_link, next
     body.insert(0, custom_div_soup)
 
     # Augment the Fehlerteufelchen <asides> with a full size Fehlerteufelchen
-    asides = soup.find_all("aside", class_="fehlerteufelchen")
+    asides = soup.find_all("aside", { "class" : "fehlerteufelchen" } )
     if asides:
       for aside in asides:
         ft_tag = BeautifulSoup(HTML_IMG_FEHLERTEUFELCHEN, 'html.parser')
