@@ -467,6 +467,7 @@ class Issue:
           data_filename = tag.get("data-filename")
           data_name = tag.get("data-name")
           data_range = tag.get("data-range")
+          data_availability = tag.get("data-availability")
           if data_filename:
               # remove ';', empty lines and leading spaces
               listing = listings[data_filename]
@@ -491,17 +492,17 @@ class Issue:
               tag.string = listing
 
               if not any(item[0] == data_name for item in downloads): # duplicates
-                  data_filename_escaped = urllib.parse.quote(data_filename)
-                  downloads.append((data_name, f"prg/{data_filename_escaped}.prg"))
+                  if data_availability != "local":
+                      data_filename_escaped = urllib.parse.quote(data_filename)
+                      downloads.append((data_name, f"prg/{data_filename_escaped}.prg"))
       
-      ## additional binary downloads from the Servicediskette or similar 
+      ## additional binary downloads from the Programmservicediskette
       div_downloads = soup.find_all("div", { "class" : "binary_download" } )
       for tag in div_downloads:
           data_filename = tag.get("data-filename")
           data_name = tag.get("data-name")
-          data_source = tag.get("data-source")
           data_filename_escaped = urllib.parse.quote(data_filename)
-          downloads.append((f"{data_name} ({data_source})", f"prg/{data_filename_escaped}"))
+          downloads.append((data_name, f"prg/{data_filename_escaped}"))
           tag.decompose()
 
       metadata['downloads'] = downloads
