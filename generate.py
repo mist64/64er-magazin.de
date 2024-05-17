@@ -365,8 +365,10 @@ class Issue:
       else:
         pdf_filename = "dummy.pdf"
 
-      # read all listings in petcat format
+      # todo: XXX get listings and binaries from the articles instead of the prg folder
+      # read all listings in petcat format (and other binaries)
       listings = {}
+      binaries = []
       prg_path = os.path.join(issue_directory_path, 'prg')
       for root, _, files in os.walk(prg_path):
           for file in files:
@@ -374,7 +376,10 @@ class Issue:
                   file_path = os.path.join(root, file)
                   with open(file_path, 'r') as file_obj:
                       listings[os.path.splitext(file)[0]] = file_obj.read()
-
+              elif file.endswith('.seq') or file.endswith('.prg'):
+                  file_path = os.path.join('prg', file)
+                  binaries.append(file_path)
+                    
       for root, dirs, files in os.walk(issue_directory_path):
           for file in files:
               if file.endswith('.html'):
@@ -416,6 +421,7 @@ class Issue:
       self.pdf_filename = pdf_filename
       self.issue_dir_name = issue_dir_name
       self.listings = listings
+      self.binaries = binaries
 
 
   @staticmethod
@@ -1420,6 +1426,12 @@ def copy_articles_and_assets(db, in_directory, out_directory):
             if process.returncode != 0:
                 print(f"Failed to process: {key}")
                 exit()
+                
+        for binary_path in issue.binaries:
+            input_file_name = os.path.join(issue_source_path, binary_path)
+            output_file_name = os.path.join(issue_dest_path, binary_path)
+            shutil.copy(input_file_name, output_file_name)
+
 
         # Copy all images of all articles of the issue and downloads
         articles = [article for article in db.articles if article.issue_key == issue_key]
