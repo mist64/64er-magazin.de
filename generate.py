@@ -1059,11 +1059,18 @@ def generate_topic_htmls(db, out_directory):
         html_parts.append(f"<main>\n")
         html_parts.append(f"<h1>{topic}</h1>\n")
 
-        for issue_key in sorted(db.issues.keys(), key=lambda x: key_to_datetime(x), reverse=True):
-            html = html_generate_articles_for_categories(db, toc_topics, False, issue_key);
-            if html:
-                html_parts.append(f"<h2>{LABEL_ISSUE} {issue_key}</h2>\n")
-                html_parts.append(html)
+        if topic == LABEL_TUTORIALS:
+          html = html_generate_articles_for_categories(db, toc_topics, True, append_issue_number=True);
+          if html:
+              html_parts.append(html)
+
+        else:
+          for issue_key in sorted(db.issues.keys(), key=lambda x: key_to_datetime(x), reverse=True):
+              html = html_generate_articles_for_categories(db, toc_topics, False, issue_key);
+              if html:
+                  html_parts.append(f"<h2>{LABEL_ISSUE} {issue_key}</h2>\n")
+                  html_parts.append(html)
+
         html_parts.append(f"</main>\n")
 
         body_html = ''.join(html_parts)
