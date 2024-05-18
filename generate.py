@@ -607,8 +607,17 @@ class ArticleDatabase:
         return max(self.issues.keys(), key=key_to_datetime)
 
     def articles_by_index_categories(self, index_categories, issue_key=None):
-        index_categories = tuple(index_categories)
-        filtered_articles = [ article for article in self.articles if article.index_category and article.index_category.startswith(index_categories) and (issue_key is None or article.issue_key == issue_key)]
+        # toc_category hacks for Rubriken and Aktuell
+        if index_categories == ["Aktuell|"]:
+          filtered_articles = [ article for article in self.articles if ((not article.index_category and article.toc_category and article.toc_category == "Aktuell") or (article.index_category and article.index_category.startswith("Aktuell"))) and (issue_key is None or article.issue_key == issue_key)]
+          
+        elif index_categories == ["Rubriken|"]:
+            filtered_articles = [ article for article in self.articles if article.toc_category and article.toc_category == "Rubriken" and (issue_key is None or article.issue_key == issue_key)]
+
+        else:
+            index_categories = tuple(index_categories)
+            filtered_articles = [ article for article in self.articles if article.index_category and article.index_category.startswith(index_categories) and (issue_key is None or article.issue_key == issue_key)]
+          
         return sorted(filtered_articles, key=lambda x: x.first_page_number())
 
     def articles_by_toc_categories(self, toc_categories, issue_key=None):
@@ -839,7 +848,7 @@ def html_generate_articles_for_categories(db, index_categories, alphabetical, is
     return ''.join(html_parts)
 
 def html_generate_all_articles_by_category(db):
-    category_order = [ # related to TOPICS
+    category_order = [ # related to TOPICS #TODO XXX translate
         "Aktuell|",
         "Listings zum Abtippen|Anwendung|", 
         "Listings zum Abtippen|Grafik|",
@@ -852,6 +861,7 @@ def html_generate_all_articles_by_category(db):
         "So machen's andere|",
         "Software-Test|",
         "Software|",
+        "Rubriken|" #! toc_category
     ]
 
     html_parts = []
@@ -860,10 +870,11 @@ def html_generate_all_articles_by_category(db):
     last_h2_title = None
 
     for index_category in category_order:
-        if '|' in index_category[:-1]:
-            h2_title, h3_title = index_category.split('|', 1)  # Split into h2 and h3 titles
+        index_category_title = index_category[:-1] #remove trailing |
+        if '|' in index_category_title:
+            h2_title, h3_title = index_category_title.split('|', 1)  # Split into h2 and h3 titles
         else:
-            h2_title, h3_title = index_category, None
+            h2_title, h3_title = index_category_title, None
 
         html = html_generate_articles_for_categories(db, [index_category], True, None, True)
         if html:
