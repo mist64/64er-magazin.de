@@ -125,15 +125,20 @@ if LANG == "de":
   FILENAME_IMPRINT = "impressum"
   CATEGORY_TYPE_IN_1 = "Programme zum Abtippen"
   CATEGORY_TYPE_IN_2 = "Listings zum Abtippen"
-  TOPICS = [
-      (LABEL_NEWS, ["Aktuell"]),
-      (LABEL_HARDWARE, ["Hardware"]),
-      (LABEL_TESTS, ["Test", "Spiele-Test"]),
-      (LABEL_SOFTWARE, ["Software"]),
-      (LABEL_GAMES, ["Programme zum Abtippen|Spiele"]),
-      (LABEL_PROGRAMS, ["Programme zum Abtippen|Anwendungen", "Programme zum Abtippen|Grafik", "Programme zum Abtippen|Tips & Tricks"]),
-      (LABEL_TUTORIALS, ["Kurse"]),
-      (LABEL_IN_PRACTICE, ["So machen's andere"]),
+  
+  TOPICS = [ # Title + used prefix # these are the values used with "64er.index_category" for sorting the topics by prefix
+      (LABEL_NEWS, ["Aktuell|"]),
+      (LABEL_HARDWARE, ["Hardware|"]),
+      (LABEL_TESTS, [ "Hardware-Test|",
+                      "Software-Test|",
+                      "Spiele-Test|"]),
+      (LABEL_SOFTWARE, ["Software|"]),
+      (LABEL_GAMES, ["Listings zum Abtippen|Spiel|"]),
+      (LABEL_PROGRAMS, ["Listings zum Abtippen|Anwendung|", 
+                        "Listings zum Abtippen|Grafik|",
+                        "Listings zum Abtippen|Tips & Tricks|"]),
+      (LABEL_TUTORIALS, ["Kurse|"]),
+      (LABEL_IN_PRACTICE, ["So machen's andere|"]),
   ]
   HTML_PRIVACY = """
     <main>
@@ -212,16 +217,23 @@ elif LANG == "en":
   FILENAME_IMPRINT = "imprint"
   CATEGORY_TYPE_IN_1 = "Type-in Programs"
   CATEGORY_TYPE_IN_2 = "Type-in Listings"
-  TOPICS = [
-    (LABEL_NEWS, ["News"]),
-    (LABEL_HARDWARE, ["Hardware"]),
-    (LABEL_TESTS, ["Test", "Game Tests"]),
-    (LABEL_SOFTWARE, ["Software"]),
-    (LABEL_GAMES, ["Type-in Programs|Games"]),
-    (LABEL_PROGRAMS, ["Type-in Programs|Applications", "Type-in Programs|Graphics", "Type-in Programs|Tips & Tricks"]),
-    (LABEL_TUTORIALS, ["Tutorials"]),
-    (LABEL_IN_PRACTICE, ["How Others Do It"]),
-    ]
+  
+  # TODO XXX translate
+  TOPICS = [ # Title + used prefix # these are the values used with "64er.index_category" for sorting the topics by prefix
+      (LABEL_NEWS, ["Aktuell|"]),
+      (LABEL_HARDWARE, ["Hardware|"]),
+      (LABEL_TESTS, [ "Hardware-Test|",
+                      "Software-Test|",
+                      "Spiele-Test|"]),
+      (LABEL_SOFTWARE, ["Software|"]),
+      (LABEL_GAMES, ["Listings zum Abtippen|Spiel|"]),
+      (LABEL_PROGRAMS, ["Listings zum Abtippen|Anwendung|", 
+                        "Listings zum Abtippen|Grafik|",
+                        "Listings zum Abtippen|Tips & Tricks|"]),
+      (LABEL_TUTORIALS, ["Kurse|"]),
+      (LABEL_IN_PRACTICE, ["So machen's andere|"]),
+  ]
+
   HTML_PRIVACY = """
     <main>
     <h1>Privacy Policy</h1>
@@ -594,6 +606,20 @@ class ArticleDatabase:
     def latest_issue_key(self):
         return max(self.issues.keys(), key=key_to_datetime)
 
+    def articles_by_index_categories(self, index_categories, issue_key=None):
+        # toc_category hacks for Rubriken and Aktuell
+        if index_categories == ["Aktuell|"]:
+          filtered_articles = [ article for article in self.articles if ((not article.index_category and article.toc_category and article.toc_category == "Aktuell") or (article.index_category and article.index_category.startswith("Aktuell"))) and (issue_key is None or article.issue_key == issue_key)]
+          
+        elif index_categories == ["Rubriken|"]:
+            filtered_articles = [ article for article in self.articles if article.toc_category and article.toc_category == "Rubriken" and (issue_key is None or article.issue_key == issue_key)]
+
+        else:
+            index_categories = tuple(index_categories)
+            filtered_articles = [ article for article in self.articles if article.index_category and article.index_category.startswith(index_categories) and (issue_key is None or article.issue_key == issue_key)]
+          
+        return sorted(filtered_articles, key=lambda x: x.first_page_number())
+
     def articles_by_toc_categories(self, toc_categories, issue_key=None):
         filtered_articles = [article for article in self.articles if article.toc_category in toc_categories and (issue_key is None or article.issue_key == issue_key)]
         return sorted(filtered_articles, key=lambda x: x.first_page_number())
@@ -802,8 +828,8 @@ def html_generate_tocs_all_issues(db):
     html_parts.append(f"</main>\n")
     return ''.join(html_parts)
 
-def html_generate_articles_for_categories(db, toc_categories, alphabetical, issue_key=None, append_issue_number=False):
-    articles = db.articles_by_toc_categories(toc_categories, issue_key)
+def html_generate_articles_for_categories(db, index_categories, alphabetical, issue_key=None, append_issue_number=False):
+    articles = db.articles_by_index_categories(index_categories, issue_key)
     if not articles:
         return None
     if alphabetical:
@@ -822,20 +848,20 @@ def html_generate_articles_for_categories(db, toc_categories, alphabetical, issu
     return ''.join(html_parts)
 
 def html_generate_all_articles_by_category(db):
-    category_order = [
-        "Aktuell",
-        "Hardware",
-        "Test",
-        "Software",
-        "Spiele-Test",
-        "Programme zum Abtippen|Anwendungen",
-        "Programme zum Abtippen|Grafik",
-        "Programme zum Abtippen|Spiele",
-        "Programme zum Abtippen|Tips & Tricks",
-        "Kurse",
-        "Wettbewerbe",
-        "So machen's andere",
-        "Rubriken"
+    category_order = [ # related to TOPICS #TODO XXX translate
+        "Aktuell|",
+        "Listings zum Abtippen|Anwendung|", 
+        "Listings zum Abtippen|Grafik|",
+        "Listings zum Abtippen|Spiel|",
+        "Listings zum Abtippen|Tips & Tricks|",
+        "Hardware-Test|",
+        "Hardware|",
+        "Kurse|",
+        "Spiele-Test|",
+        "So machen's andere|",
+        "Software-Test|",
+        "Software|",
+        "Rubriken|" #! toc_category
     ]
 
     html_parts = []
@@ -843,13 +869,14 @@ def html_generate_all_articles_by_category(db):
 
     last_h2_title = None
 
-    for toc_category in category_order:
-        if '|' in toc_category:
-            h2_title, h3_title = toc_category.split('|', 1)  # Split into h2 and h3 titles
+    for index_category in category_order:
+        index_category_title = index_category[:-1] #remove trailing |
+        if '|' in index_category_title:
+            h2_title, h3_title = index_category_title.split('|', 1)  # Split into h2 and h3 titles
         else:
-            h2_title, h3_title = toc_category, None
+            h2_title, h3_title = index_category_title, None
 
-        html = html_generate_articles_for_categories(db, [toc_category], True, None, True)
+        html = html_generate_articles_for_categories(db, [index_category], True, None, True)
         if html:
             if h2_title != last_h2_title or h3_title is not None:
                 if h2_title != last_h2_title:
@@ -1088,7 +1115,7 @@ def generate_all_topics_html(db, out_directory):
     write_full_html_file(db, os.path.join(out_directory, f'{FILENAME_ARTICLES}.html'), f'{LABEL_ALL_ARTICLES} | {MAGAZINE_NAME}', None, body_html, 'all_articles')
 
 def generate_topic_htmls(db, out_directory):
-    for topic, toc_topics in TOPICS:
+    for topic, index_topics in TOPICS:
         filename = topic.lower() + ".html"
 
         html_parts = []
@@ -1096,13 +1123,13 @@ def generate_topic_htmls(db, out_directory):
         html_parts.append(f"<h1>{topic}</h1>\n")
 
         if topic == LABEL_TUTORIALS:
-          html = html_generate_articles_for_categories(db, toc_topics, True, append_issue_number=True);
+          html = html_generate_articles_for_categories(db, index_topics, True, append_issue_number=True);
           if html:
               html_parts.append(html)
 
         else:
           for issue_key in sorted(db.issues.keys(), key=lambda x: key_to_datetime(x), reverse=True):
-              html = html_generate_articles_for_categories(db, toc_topics, False, issue_key);
+              html = html_generate_articles_for_categories(db, index_topics, False, issue_key);
               if html:
                   html_parts.append(f"<h2>{LABEL_ISSUE} {issue_key}</h2>\n")
                   html_parts.append(html)
