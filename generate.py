@@ -125,7 +125,7 @@ if LANG == "de":
   FILENAME_IMPRINT = "impressum"
   CATEGORY_TYPE_IN_1 = "Programme zum Abtippen"
   CATEGORY_TYPE_IN_2 = "Listings zum Abtippen"
-  
+
   TOPICS = [ # Title + used prefix # these are the values used with "64er.index_category" for sorting the topics by prefix
       (LABEL_NEWS, ["Aktuell|"]),
       (LABEL_HARDWARE, ["Hardware|"]),
@@ -134,7 +134,7 @@ if LANG == "de":
                       "Spiele-Test|"]),
       (LABEL_SOFTWARE, ["Software|"]),
       (LABEL_GAMES, ["Listings zum Abtippen|Spiel|"]),
-      (LABEL_PROGRAMS, ["Listings zum Abtippen|Anwendung|", 
+      (LABEL_PROGRAMS, ["Listings zum Abtippen|Anwendung|",
                         "Listings zum Abtippen|Grafik|",
                         "Listings zum Abtippen|Tips & Tricks|"]),
       (LABEL_TUTORIALS, ["Kurse|"]),
@@ -217,7 +217,7 @@ elif LANG == "en":
   FILENAME_IMPRINT = "imprint"
   CATEGORY_TYPE_IN_1 = "Type-in Programs"
   CATEGORY_TYPE_IN_2 = "Type-in Listings"
-  
+
   # TODO XXX translate
   TOPICS = [ # Title + used prefix # these are the values used with "64er.index_category" for sorting the topics by prefix
       (LABEL_NEWS, ["Aktuell|"]),
@@ -227,7 +227,7 @@ elif LANG == "en":
                       "Spiele-Test|"]),
       (LABEL_SOFTWARE, ["Software|"]),
       (LABEL_GAMES, ["Listings zum Abtippen|Spiel|"]),
-      (LABEL_PROGRAMS, ["Listings zum Abtippen|Anwendung|", 
+      (LABEL_PROGRAMS, ["Listings zum Abtippen|Anwendung|",
                         "Listings zum Abtippen|Grafik|",
                         "Listings zum Abtippen|Tips & Tricks|"]),
       (LABEL_TUTORIALS, ["Kurse|"]),
@@ -391,7 +391,7 @@ class Issue:
               elif file.endswith('.seq') or file.endswith('.prg'):
                   file_path = os.path.join('prg', file)
                   binaries.append(file_path)
-                    
+
       for root, dirs, files in os.walk(issue_directory_path):
           for file in files:
               if file.endswith('.html'):
@@ -513,7 +513,7 @@ class Issue:
                   if data_availability != "local":
                       data_filename_escaped = urllib.parse.quote(data_filename)
                       downloads.append((data_name, f"prg/{data_filename_escaped}.prg"))
-      
+
       ## additional binary downloads from the Programmservicediskette
       div_downloads = soup.find_all("div", { "class" : "binary_download" } )
       for tag in div_downloads:
@@ -610,14 +610,14 @@ class ArticleDatabase:
         # toc_category hacks for Rubriken and Aktuell
         if index_categories == ["Aktuell|"]:
           filtered_articles = [ article for article in self.articles if ((not article.index_category and article.toc_category and article.toc_category == "Aktuell") or (article.index_category and article.index_category.startswith("Aktuell"))) and (issue_key is None or article.issue_key == issue_key)]
-          
+
         elif index_categories == ["Rubriken|"]:
             filtered_articles = [ article for article in self.articles if article.toc_category and article.toc_category == "Rubriken" and (issue_key is None or article.issue_key == issue_key)]
 
         else:
             index_categories = tuple(index_categories)
             filtered_articles = [ article for article in self.articles if article.index_category and article.index_category.startswith(index_categories) and (issue_key is None or article.issue_key == issue_key)]
-          
+
         return sorted(filtered_articles, key=lambda x: x.first_page_number())
 
     def articles_by_toc_categories(self, toc_categories, issue_key=None):
@@ -684,8 +684,6 @@ def index_title(article):
   toc_title = article.toc_title
   title = article.title
   ret = index_title if index_title else toc_title if toc_title else title
-  if article.id == 'editorial':
-      ret = f"Editorial: {ret}"
   return ret
 
 def toc_title(article):
@@ -850,7 +848,7 @@ def html_generate_articles_for_categories(db, index_categories, alphabetical, is
 def html_generate_all_articles_by_category(db):
     category_order = [ # related to TOPICS #TODO XXX translate
         "Aktuell|",
-        "Listings zum Abtippen|Anwendung|", 
+        "Listings zum Abtippen|Anwendung|",
         "Listings zum Abtippen|Grafik|",
         "Listings zum Abtippen|Spiel|",
         "Listings zum Abtippen|Tips & Tricks|",
@@ -1453,7 +1451,7 @@ def copy_articles_and_assets(db, in_directory, out_directory):
             if process.returncode != 0:
                 print(f"Failed to process: {key}")
                 exit()
-                
+
         for binary_path in issue.binaries:
             input_file_name = os.path.join(issue_source_path, binary_path)
             output_file_name = os.path.join(issue_dest_path, binary_path)
