@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>Logic Disassembler</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="Fred Hammer">
+    <meta name="64er.issue" content="6/84">
+    <meta name="64er.pages" content="108-109">
+	<meta name="64er.head1" content="Logic Disassembler">
+    <meta name="64er.toc_category" content="Programme zum Abtippen|Tips & Tricks">
+	<meta name="64er.toc_title" content="Logic Disassembler (VC 20/64)">
+    <meta name="64er.index_title" content="Logic Disassembler (VC 20)">
+    <meta name="64er.index_category" content="Listings zum Abtippen|Tips & Tricks|Disassembler">
+    <meta name="64er.id" content="disassembler">
+</head>
+
+<body>
+    <article>
+        <h1>Logic Disassembler</h1>
+
+        <p class="intro">Wer hat nicht schon nach einem guten Einstieg in das Betriebssystem oder in ein selbstgeschriebenes Assembler-Programm gesucht, um dem Verlauf der Programmlogik folgen zu können?</p>
+
+        <p>Mit diesem ganz in Basic geschriebenen Programm besteht nun die Möglichkeit, bei einer beliebigen Startadresse einzusteigen und von dort aus das Programm zu verfolgen.<br>
+            Auch mit einem kompletten Disassembler-Listing war dies bisher eine äußerst aufwendige und zeitraubende Angelegenheit. Bei je dem Sprung-Befehl (sei es BRANCH, JSR oder JMP) ging das große Blättern los. Das Verfolgen von mehrstufigen Unterroutinen mit unterschiedlichen Ausstiegsmöglichkeiten ist schon ganz unmöglich.</p>
+
+        <p>Der Logic-Disassembler hingegen wartet bei jedem Sprungbefehl auf die Eingabe von Y, N oder X. Y steht für »yes«, das heißt dem Sprungbefehl folgen, N steht für »no«, also zum Beispiel eine bekannte Unterroutine einfach zu übergehen, damit das Listing nicht zu unübersichtlich wird. X schließlich steht für »exit«, wodurch der Disassembler bei einer neuen Adresse gestartet werden kann.</p>
+
+        <p>Das Listing der Basic-Routine »NEW« (Bild 1) zeigt als Beispiel, wie ein solcher Disassembler-Lauf vor sich geht.</p>
+
+        <figure>
+            <img src="108-1.png" alt="">
+            <figcaption>Bild 1. Logische Disassemblierung der Basic-Routine »NEW«</figcaption>
+        </figure>
+
+        <p>Die Einsprungadresse liegt bei $C642.</p>
+
+        <p>In Zeile 1 wird der BNE-Befehl mit der Eingabe von »N« übergangen. Der JSR-Befehl in Zeile 14 wird mit »Y« verfolgt, und es erfolgt eine Verzweigung in die Routine $C68E. Mit der Anzeige von STACK 0 wird über die Tiefe der Unterprogramm-Verschachtelung informiert. Bei Erreichen von RTS in Zeile 22 wird in das Hauptprogramm (STACK 0) zurückgesprungen und dieses ab der Adresse $C65C fortgeführt.</p>
+
+        <p>Der darauffolgende BRANCH-Befehl in Zeile 24 wird wieder mit der Eingabe von »N« übergangen. In Zeile 25 folgt dann ein RTS, und da der STACK auf 0 steht (man befindet sich also im Hauptprogramm), wird der Disassembler-Vorgang beendet und auf die erneute Eingabe einer Startadresse gewartet.</p>
+
+        <p>Bei der Eingabe von »END« statt einer Startadresse wird das Programm beendet.</p>
+
+        <p>Dabei wird jede Stackänderung angezeigt.</p>
+
+        <p>Es können alle Sprungbefehle verfolgt werden, sogar solche, die sich auf eine indirekte Adressierung beziehen. Als Beispiel hierfür kann das Disassembler-Protokoll der Abfrage der Stop-Taste dienen (Bild 2).</p>
+
+        <figure>
+            <img src="108-2.png" alt="">
+            <figcaption>Bild 2. Die Betriebssystemroutine zur Abfrage der STOP-Taste disassembliert.</figcaption>
+        </figure>
+
+        <p>In der Zeile 1 ist der Befehl JMP ($0328) gefunden worden, jetzt wird der Inhalt der Speicherstelle $0328 und $0329 ausgelesen und die Sprungadresse errechnet. Dann erfolgt ein Speichertest an der errechneten Sprungadresse, und erst, wenn dieser Test positiv verläuft, wird ab dieser Adresse weiter disassembliert. Verläuft der Test jedoch negativ, erfolgt ein »LOGIC FLOW ERROR«, und es wird zum Ende der Disassemblierung gesprungen.</p>
+
+        <p>Das Programm »Logic-Disassembler« ist in der vorliegenden Form für den VC 20 geschrieben, es ist jedoch nach Änderung der Zeilen 100 und 530 (die POKE-Befehle ändern lediglich die Farben des Bildschirms) sofort auf dem Commodore 64 und den anderen CBM-Computern lauffähig.</p>
+
+        <address class="author">(Fred Hammer)</address>
+
+        <figure>
+            <table>
+                <tr>
+                    <td>A$</td>
+                    <td>Tabelle für Sprungadressen</td>
+                </tr>
+                <tr>
+                    <td>AC%</td>
+                    <td>Tabelle für 6502-Mnemonics</td>
+                </tr>
+                <tr>
+                    <td>SS%</td>
+                    <td>Tabelle für Stack</td>
+                </tr>
+                <tr>
+                    <td>SS%</td>
+                    <td>Index für Stack</td>
+                </tr>
+                <tr>
+                    <td>I</td>
+                    <td>Index für Mnemonic-Tabelle</td>
+                </tr>
+                <tr>
+                    <td>H$</td>
+                    <td>Werte für Hexa-Umrechnung</td>
+                </tr>
+                <tr>
+                    <td>FE$</td>
+                    <td>Zwischenspeicher für Anfangsadresse</td>
+                </tr>
+                <tr>
+                    <td>A$</td>
+                    <td>Startadresse in Hexa</td>
+                </tr>
+                <tr>
+                    <td>X$</td>
+                    <td>Hexa-Wert bei Umrechnung</td>
+                </tr>
+                <tr>
+                    <td>DE</td>
+                    <td>Dezimal-Wert bei Umrechnung</td>
+                </tr>
+                <tr>
+                    <td>Z0<br>N0<br>Z1</td>
+                    <td>Indexfelder für Umrechnung</td>
+                </tr>
+                <tr>
+                    <td>A</td>
+                    <td>Anfangsadresse ln Dezimal</td>
+                </tr>
+                <tr>
+                    <td>AN$</td>
+                    <td>KZ für Druckerausgabe</td>
+                </tr>
+                <tr>
+                    <td>N</td>
+                    <td>Zeilennummer</td>
+                </tr>
+                <tr>
+                    <td>AD</td>
+                    <td>aktuelle Adresse bei der Disassemblierung</td>
+                </tr>
+                <tr>
+                    <td>P</td>
+                    <td>Zwischenspeicher für Adreßrechnung</td>
+                </tr>
+                <tr>
+                    <td>EA</td>
+                    <td>Dezimal-Wert des laufenden Befhles</td>
+                </tr>
+                <tr>
+                    <td>S$</td>
+                    <td>Hexa-Werte der laufenden Disassembler-Zeile</td>
+                </tr>
+                <tr>
+                    <td>MN$</td>
+                    <td>laufende Disassembler Zeile</td>
+                </tr>
+                <tr>
+                    <td>K</td>
+                    <td>Anzahl der Bytes für das Befehlswort</td>
+                </tr>
+                <tr>
+                    <td>AA$</td>
+                    <td>Eingabefeld bei Sprungbefehlen</td>
+                </tr>
+                <tr>
+                    <td>FF$</td>
+                    <td>Überschrift bei Druckerausgabe</td>
+                </tr>
+                <tr>
+                    <td>A1</td>
+                    <td>Arbeitsfeld zur Adreßberechnung bei JMP ind.</td>
+                </tr>
+                <tr>
+                    <td>A2</td>
+                    <td>wie A1, jedoch zur Kontrolle ob Memory vorhanden</td>
+                </tr>
+            </table>
+            <figcaption>Variablen-Liste vom »Logic Disassembler«</figcaption>
+        </figure>
+
+        <figure>
+            <table>
+                <tr>
+                    <td>100-250</td>
+                    <td>Programmstart und Tabelleninitialisierung</td>
+                </tr>
+                <tr>
+                    <td>260-290</td>
+                    <td>Umrechnung Hexa in Dezimal</td>
+                </tr>
+                <tr>
+                    <td>300-350</td>
+                    <td>Umrechnung Dezimal in Hexa</td>
+                </tr>
+                <tr>
+                    <td>360-510</td>
+                    <td>DATA-Satements mit den 6502-Mnemonics</td>
+                </tr>
+                <tr>
+                    <td>520-550</td>
+                    <td>Eingabe der Startadresse</td>
+                </tr>
+                <tr>
+                    <td>560-620</td>
+                    <td>Abfrage auf Druckerausgabe</td>
+                </tr>
+                <tr>
+                    <td>630-870</td>
+                    <td>Disassembler—Schleife</td>
+                </tr>
+                <tr>
+                    <td>880-970</td>
+                    <td>BRANCH-Befehle</td>
+                </tr>
+                <tr>
+                    <td>980-1040</td>
+                    <td>Eingabe (Y)es, (N)o, e(X)it</td>
+                </tr>
+                <tr>
+                    <td>1050-1080</td>
+                    <td>RTS-Befehl mit Stack-Abfrage</td>
+                </tr>
+                <tr>
+                    <td>1090-1170</td>
+                    <td>JSR-Befehl mit Stack-Erhoehung</td>
+                </tr>
+                <tr>
+                    <td>1180-1200</td>
+                    <td>JMP-Befehl absolut</td>
+                </tr>
+                <tr>
+                    <td>1210-1250</td>
+                    <td>JMP-Befehl indirekt</td>
+                </tr>
+                <tr>
+                    <td>1260-1300</td>
+                    <td>Ende</td>
+                </tr>
+            </table>
+            <figcaption>Die wichtigsten Programmteile vom »Logic Disassembler«</figcaption>
+        </figure>
+
+		<figure>
+            <pre data-filename="logic disassembl" data-name="Logic Disassembler"></pre>
+			<figcaption>Listing zum »Logic Disassembler«</figcaption>
+		</figure>
+    </article>
+
+</body>
+
+</html>

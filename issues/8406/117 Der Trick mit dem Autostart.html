@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>Der Trick mit dem Autostart</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="Martin Heinz, Andreas von Lepel">
+    <meta name="64er.issue" content="6/84">
+    <meta name="64er.pages" content="117">
+    <meta name="64er.toc_category" content="Programme zum Abtippen|Tips & Tricks">
+    <meta name="64er.toc_title" content="Der Trick mit dem Autostart (C 64)">
+    <meta name="64er.index_category" content="Listings zum Abtippen|Tips & Tricks|Autostart">
+    <meta name="64er.id" content="autostart">
+</head>
+
+<body>
+    <article>
+        <h1>Der Trick mit dem Autostart</h1>
+
+        <p class="intro">Oft ist es beim Laden von Maschinenprogrammen lästig, sich die verschiedenen SYS-Adressen zum Start zu merken oder sie in dem Berg von Notizen ausfindig zu machen. Da empfiehlt sich ein Starter, der mit »LOAD"name",8,1« geladen wird, sich selbst startet, das Maschinenprogramm auf die richtige Adresse lädt und ebenfalls startet.</p>
+
+        <p>Dazu muß man wissen, daß das Betriebssystem nach Ausführung der Loadroutine ($FFD5) indirekt in den Basic-Warmstart springt ($0302/$0303). Also wird dieser Vektor auf die Startadresse des Ladeprogramms gesetzt. Um auf der Diskette nur einen Block für den Lader zu belegen, wählt man für ihn den Bereich, der für Sprite 11 reserviert ist ($02C0-$02FE).</p>
+
+        <p>Dieses einfache Maschinenprogramm erfüllt die geforderten Bedingungen als Lader für das Programm »HESMON« mit Start $Cff8. Der Anwender muß für ein anderes Hauptprogramm nur die Länge des Namens ändern ($02Cl); den Zeiger auf den Filenamen ($02Cf/ $02D2), den Namen und die Adresse des Hauptprogramms ($02D7/$02DC &amp; $02E7/$02E8). Dann wird der Bereich von $02C0 bis $0303 vom Monitor aus abgespeichert: »S”LOADER”08 02C0 0303«.</p>
+
+        <p>Zum Test des Programms vollziehe man nun einen Kaltstart, und nach »LOAD”LOADER”,8,1« erscheint SEARCHING FOR LOADER, LOADING, SEARCHING FOR HESMON, LOADING, dann erfolgt der Start des Programms »HESMON«.</p>
+
+        <p>Der Teil des oben genannten Laders, der als Vorbereitung der Loadroutine die Zeropage beschreibt, kann auch durch die Routinen $FFBA und $FFBD ersetzt werden.</p>
+
+        <p>Der Basic-Lader POKEd das Maschinenprogramm direkt in die zugehörigen Speicherzellen. Achtung: Nach Ablauf des Basic-Laders startet das Maschinencode-Programm direkt. Das Programm wandelt die Hex-DATAs in Dezimalzahlen um und POKEd diese. Das Programm, das geladen werden soll, bestimmt man durch Umändern der jeweiligen Speicherzellen, wie oben beschrieben.</p>
+
+        <address class="author">(Martin Heinz und Andreas von Lepel)</address>
+
+        <figure>
+            <img src="117-1.png" alt="">
+            <figcaption>Der Monitorauszug und der disassemblierte Lader für den Autostart von Hesmon</figcaption>
+        </figure>
+
+        <figure>
+            <pre data-filename="autostart" data-name="Autostart"></pre>
+            <figcaption>Der Basic-Lader</figcaption>
+        </figure>
+
+        <aside class="futureteufelchen">
+            <h2>Futureteufelchen</h2>
+
+            <img alt="Fehlerteufelchen" src="futureteufelchen.svg" width="119" height="200" class="inline">
+
+            <p>Die folgenden Fehler wurden im Basic-Lader behoben:</p>
+
+            <ul>
+                <li>Zeile 150: Im Original wurde X<>71 verglichen, es gibt jedoch keine Variable X. Stattdessen vergleichen wir die aktuelle Adresse AD mit 704+72.</li>
+                <li>Zeile 1000: Die letzte Hex-Zahl war B9, im Hex-Dump sowie im Disassembly ist es jedoch eine B8, was mehr Sinn ergibt (STA $B8).</li>
+            </ul>
+
+            <address class="author">(Endurion, goloMAK)</address>
+
+		</aside>
+    </article>
+
+</body>
+
+</html>

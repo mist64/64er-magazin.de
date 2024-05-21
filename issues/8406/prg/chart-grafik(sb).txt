@@ -1,0 +1,398 @@
+
+;chart-grafik(sb) ==0801==
+;version=simons
+;Quelle: "1984-06.d64", zur Verfügung gestellt von von BJ64
+;        https://www.forum64.de/index.php?thread/145873-64er-magazin-monatlich-online/&postID=2127851#post2127851
+   35 rem*******************************
+   40 rem****   chart 1 ****************
+   70 rem*******************************
+   75 poke53280,10:poke53281,12:print"{red}"
+   80 dimx(22),a(22),b(22),c(22),f(22)
+  100 print"{clr}"at(12,8)">>> chart 1 <<<"
+  130 printat(7,11)"programm zur graphischen"
+  160 printat(11,13)"zahlendarstellung"
+  170 pause3
+  220 print"{clr}{rvon}           darstellungsformen           {rvof}"
+  250 printat(5,5)"kuchengraphik..........1"
+  280 printat(5,7)"balkengraphik..........2"
+  310 printat(5,9)"diagramm...............3"
+  320 printat(5,11)"letzte graphik.........4"
+  340 printat(5,15)"bitte waehlen sie >>>"
+  350 printat(5,19)"ende...................e"
+  370 gete$:ife$=""then370
+  375 ife$="e"thenprint"{clr}":end
+  377 ife$="4"thengoto 9100
+  380 ife$<"1"ore$>"3"then370
+  400 printat(28,15)e$
+  430 e=val(e$)
+  440 pause1
+  450 gosub5000
+  460 onegoto1000,2000,4000
+ 1000 rem******************************
+ 1010 rem******    kuchen     *********
+ 1020 rem******************************
+ 1100 i=360/mc:max=-10^38
+ 1110 hires0,14
+ 1111 low col1,14,14
+ 1112 circle160,110,80,40,1
+ 1114 arc160,130,90,270,5,80,40,1
+ 1116 line80,110,80,130,1
+ 1118 line240,110,240,130,1
+ 1120 hi col:s=0:w1=0
+ 1122 ford=1toa:f(d)=int(abs(x(d))+.5):nextd
+ 1130 ford=1toa
+ 1140 s=s+f(d)
+ 1150 w1=((s*i)/180)*~
+ 1152 w3=(((f(d)/2)*i)/180)*~
+ 1155 low col1,14,14
+ 1160 angl160,110,s*i,80,40,1
+ 1161 if(s*i)<270and(s*i)>90thengosub1900
+ 1163 hi col
+ 1164 j=115:k=67
+ 1165 ifa>10thenj=120
+ 1166 ifx(d)<0thenlow col 2,14,14
+ 1167 ifx(d)=0then1180
+ 1168 ifmc/abs(x(d))>75then1180
+ 1169 d$=left$(str$(x(d)),3)
+ 1170 text155-cos((w1-w3)+(~/2))*j,110-sin((w1-w3)+(~/2))*k,d$,1,1,8
+ 1180 ifx(d)<0thenhi col
+ 1181 nextd
+ 1183 w1=0:w2=0:w3=0:s=0
+ 1184 ford=1toa
+ 1185 ifx(d)>maxthenmax=x(d)
+ 1186 nextd
+ 1187 w1=0:w2=0:w3=0:s=0
+ 1188 ford=1toa
+ 1189 s=s+f(d)
+ 1190 low col 1,14,14
+ 1191 w2=((s*i)/180)*~:w3=(((f(d)/2)*i)/180)*~
+ 1193 ifx(d)=maxandx(d)=x(d+1)then1199
+ 1195 ifx(d)=maxthen paint160-cos((w2-w3)+~/2)*20,110-sin((w2-w3)+~/2)*20,1
+ 1198 nextd
+ 1199 hi col
+ 1200 gosub1925
+ 1207 low col11,14,14
+ 1210 text10, 6,"{CTRL-A}"+t$,1,2,12
+ 1215 ifleft$(m$,1)<>"j"then1400
+ 1220 text10,25,"{CTRL-A}mittelwert = "+str$(mw),1,1,8
+ 1230 text10,33,"{CTRL-A}summe = "+str$(mb),1,1,8
+ 1240 hi col
+ 1400 h$=" {rvon}Menue=M  Balken=B  Diagramm=D  Copy=C{rvof}"
+ 1450 low col 13,14,14
+ 1500 text3,190,"{CTRL-B}"+h$,1,1,8
+ 1550 hi col
+ 1700 getz$:ifz$=""then1700
+ 1730 ifz$<>"m"andz$<>"b"andz$<>"d"andz$<>"c"then1700
+ 1760 ifz$="m"thencset0:goto220
+ 1790 ifz$="d"thengoto4000
+ 1820 ifz$="b"thengoto2000
+ 1850 ifz$="c"thencopy:goto1700
+ 1880 end
+ 1900 d1=160-cos(w1+~/2)*80:d2=110-sin(w1+~/2)*40:d3=d2+20
+ 1910 lined1,d2,d1,d3,1
+ 1920 return
+ 1925 i=360/mc:s=0:low col1,14,14
+ 1930 ford=1toa
+ 1931 s=s+f(d)
+ 1932 ifx(d)=maxandx(d)=x(d+1)thenreturn
+ 1933 w2=((s*i)/180)*~:w3=(((f(d)/2)*i)/180)*~:w4=(((s-f(d))*i)/180)*~
+ 1935 ifs*i<90and(s-f(d))*i<90andx(d)=maxthen1968
+ 1938 ifs*i>265and(s-f(d))*i>265andx(d)=maxthen1968
+ 1941 ifs*i<270and(s-f(d))*i>90andx(d)=maxthen1942:else:goto1944
+ 1942 paint160-cos((w2-w3)+~/2)*80,115-sin((w2-w3)+~/2)*40,1:goto1968
+ 1944 ifs*i>93and(s-f(d))*i<90andx(d)=maxthen1945:else:goto1947
+ 1945 paint161-cos(w2+~/2)*80,115-sin(w2+~/2)*40,1:goto1968
+ 1947 ifs*i>=270and(s-f(d))*i<265andx(d)=maxthen1948:else:goto1968
+ 1948 paint159-cos(w4+~/2)*80,115-sin(w4+~/2)*40,1:goto1968
+ 1950 ifs*i>270and(s-f(d))*i<90andx(d)=maxthen1952:else:goto 1968
+ 1952 paint160-cos((w2-w3)+~/2)*80,115-sin((w2-w3)+~/2)*40,1:goto1968
+ 1968 nextd
+ 1970 hi col
+ 1980 return
+ 1990 end
+ 2000 rem******************************
+ 2010 rem*********  balkengraphik *****
+ 2040 rem******************************
+ 2050 y=0:z=0:c=0
+ 2070 ford=1toa
+ 2100 a(d)=x(d)
+ 2130 next
+ 2230 ford=1toa
+ 2240 ifabs(a(d))>ytheny=abs(a(d))
+ 2250 nextd
+ 2252 gh=abs(y)/100
+ 2255 ifmc<>mbanda<=10thenc=50:gh=2*gh
+ 2256 ford=1toa:a(d)=a(d)/gh:nextd
+ 2260 ifa<=10then2300
+ 2290 ifa>10then2800
+ 2300 rem****** max 10 werte **********
+ 2310 hires0,14
+ 2312 low col 15,14,14
+ 2315 text10,5,"{CTRL-A}"+t$,1,2,10
+ 2317 ifleft$(m$,1)="j"thentext10,23,"{CTRL-A}mittelwert = "+str$(mw),1,1,8
+ 2318 ifleft$(m$,1)="j"thentext10,31,"{CTRL-A}summe = "+str$(mb),1,1,8
+ 2319 hi col
+ 2320 line40,160-c,(40+a*26)+10,160-c,1
+ 2322 line(40+a*26)+5,158-c,(40+a*26)+10,160-c,1
+ 2324 line(40+a*26)+5,162-c,(40+a*26)+10,160-c,1
+ 2340 line40,160,40,50,1
+ 2342 line42,55,40,50,1
+ 2344 line38,55,40,50,1
+ 2350 q=0
+ 2360 forf=140-(c*(4/5))to60step((-20)+(.2*c))
+ 2380 line38,f,41,f,1
+ 2390 q=q+20
+ 2395 low col 9,14,14
+ 2400 text 0,f-6,str$(q),1,1,8
+ 2402 hi col
+ 2405 nextf
+ 2410 char10,155,37,1,1
+ 2430 ford=1toa
+ 2432 h1=40+d*26
+ 2435 ifx(d)<0thenlow col2,14,14
+ 2436 ifa(d)<0thenv=110:else:v=110-a(d)
+ 2437 ifmc=mbthenv=160-a(d)
+ 2440 rech1-18,v,14,abs(a(d)),1
+ 2560 lineh1-18,v,h1-12,v-6,1
+ 2570 lineh1-4,160-a(d)-c,h1+2,154-a(d)-c,1
+ 2580 lineh1-4,160-c,h1+2,154-c,1
+ 2590 lineh1+2,v-6,h1-12,v-6,1
+ 2600 lineh1+2,154-a(d)-c,h1+2,154-c,1
+ 2605 ifx(d)=0then2615
+ 2607 ifx(d)<0thenpainth1,108,1
+ 2610 painth1-3,v+1,1
+ 2615 ifx(d)<0thenhi col
+ 2620 next d
+ 2625 t=-1
+ 2626 loop
+ 2628 t=t+2
+ 2630 b(t)=int(x(t)+.5)
+ 2631 b(t+1)=int(x(t+1)+.5)
+ 2632 ifx(t)=0then2635
+ 2634 p=105-a(t)-(a(t))/abs(a(t))*10
+ 2635 ifx(t+1)=0then2637
+ 2636 q=105-a(t+1)-(a(t+1))/abs(a(t+1))*10
+ 2637 ifmb=mcthenp=165:q=174
+ 2638 ifa(t)<0thenlow col 2,14,14
+ 2639 ifx(t)=0then2642
+ 2640 text(40+t*26)-23,p,left$(str$(b(t)),3),1,1,7
+ 2642 exit ift>=a
+ 2645 ifa(t+1)<0thenlow col 2,14,14
+ 2648 ifx(t+1)=0then2655
+ 2650 text(40+(t+1)*26)-23,q,left$(str$(b(t+1)),3),1,1,7
+ 2655 exit if t+1>=a
+ 2660 ifa(t)<0thenhi col
+ 2662 ifa(t+1)<0thenhi col
+ 2670 end loop
+ 2690 goto3800
+ 2800 rem********* max 20 werte ********
+ 2820 hires0,14
+ 2825 low col 1,14,14
+ 2830 text10,03,"{CTRL-A}"+t$,1,2,10
+ 2840 ifleft$(m$,1)="j"thentext10,20,"{CTRL-A}mittelwert = "+str$(mw),1,1,8
+ 2845 ifleft$(m$,1)="j"thentext10,28,"{CTRL-A}summe = "+str$(mb),1,1,8
+ 2847 hi col
+ 2850 line40,150,40,40,1
+ 2860 line315,150,315,40,1
+ 2870 line40,150,315,150,1
+ 2880 line38,45,40,40,1
+ 2890 line42,45,40,40,1
+ 2900 line313,45,315,40,1
+ 2910 line317,45,315,40,1
+ 2915 q=0
+ 2920 forf=130to50step-20
+ 2930 line38,f,41,f,1
+ 2940 line314,f,317,f,1
+ 2945 q=q+20
+ 2947 low col 7,14,14
+ 2950 text0,f-6,str$(q),1,1,8
+ 2955 char10,145,37,1,1
+ 2960 hi col
+ 2965 next
+ 2970 ford=1toa:a(d)=abs(a(d)):nextd
+ 3000 iffrac(a/2)<>0thenb=(int(a/2))+1:else:b=(a/2)
+ 3010 ford=b+1toa
+ 3015 h2=50+(d-b)*25
+ 3020 rech2-16,156-a(d),12,a(d),1
+ 3030 lineh2-15,150,h2-5,150,0
+ 3040 lineh2-16,156-a(d),h2-10,150-a(d),1
+ 3050 lineh2-4,156-a(d),h2+2,150-a(d),1
+ 3060 lineh2-4,156,h2+2,150,1
+ 3070 lineh2+2,150,h2+2,150-a(d),1
+ 3080 lineh2-10,150-a(d),h2+2,150-a(d),1
+ 3090 lineh2-3,150,h2+1,150,0
+ 3092 ifa(d)=0then3340
+ 3095 if(y/a(d))>75then3340
+ 3097 ifx(d)=0then3340
+ 3100 painth2-15,157-a(d),1
+ 3110 painth2-9,155-a(d),1
+ 3120 painth2-3,154,1
+ 3130 ifx(d)<0thenlow col 2,14,14
+ 3140 texth2-20,40,left$(str$(x(d)),3),1,1,8
+ 3330 ifx(d)<0thenhi col
+ 3340 next
+ 3410 ford=1tob
+ 3415 h3=50+d*25
+ 3420 rech3-26,178-a(d),12,a(d),2
+ 3440 lineh3-26,178-a(d),h3-20,172-a(d),2
+ 3450 lineh3-14,178-a(d),h3-8,172-a(d),2
+ 3460 lineh3-14,178,h3-8,172,2
+ 3470 lineh3-8,172,h3-8,172-a(d),2
+ 3480 lineh3-20,172-a(d),h3-8,172-a(d),2
+ 3500 ifx(d)<0thenlow col 2,14,14
+ 3510 texth3-35,181,left$(str$(x(d)),3),1,1,8
+ 3520 ifx(d)<0thenhi col
+ 3540 next
+ 3800 h$=" {rvon}Menue=M  Kuchen=K  Diagramm=D  Copy=C{rvof}"
+ 3810 low col11,14,14
+ 3820 text3,191,"{CTRL-B}"+h$,1,1,8
+ 3830 hi col
+ 3900 getz$:ifz$=""then3900
+ 3930 ifz$<>"m"andz$<>"k"andz$<>"d"andz$<>"c"then3900
+ 3940 ifz$="m"thencset0:goto220
+ 3950 ifz$="d"thengoto4000
+ 3960 ifz$="k"thengoto1000
+ 3970 ifz$="c"thencopy:goto3900
+ 3980 end
+ 4000 rem ****************************
+ 4030 rem ******* diagramm ***********
+ 4060 rem ****************************
+ 4090 y=0
+ 4120 ford=1toa
+ 4150 ifabs(x(d))>ytheny=abs(x(d))
+ 4180 next
+ 4210 gh=y/90
+ 4270 hires1,14
+ 4280 low col11,14,14
+ 4300 text10,10,"{CTRL-A}"+t$,1,2,10
+ 4330 ifleft$(m$,1)="j"thentext10,30,"{CTRL-A}mittelwert = "+str$(mw),1,1,8
+ 4340 ifleft$(m$,1)="j"thentext10,38,"{CTRL-A}summe = "+str$(mb),1,1,8
+ 4345 hi col
+ 4350 ifmb<>mcthenc=55:gh=gh*2
+ 4357 ford=1toa:c(d)=x(d)/gh:nextd
+ 4360 line50,150,50,50,1
+ 4365 fori=142to54step-8:line49,i,51,i,1:nexti
+ 4380 line48,55,50,50,1:line52,55,50,50,1
+ 4390 fori=60to240step 10:linei,149-c,i,151-c,1:nexti
+ 4420 line50,150-c,250,150-c,1
+ 4440 line245,148-c,250,150-c,1:line245,152-c,250,150-c,1
+ 4450 fori=20to100step20
+ 4452 low col 9,14,14
+ 4455 ifmb<>mcthen4470
+ 4459 z=0
+ 4460 fori=135to55step-20:z=z+20:text10,i,str$(z),1,1,8:nexti:char20,150,37,1,1
+ 4465 goto4640
+ 4470 z=-120
+ 4480 fori=140to45step-9:z=z+20:text10,i,str$(z),1,1,8:nexti:char20,155,37,1,1
+ 4640 hi col
+ 4650 ford=1toa-1
+ 4660 line(50+d*10)-10,150-c(d)-c,(50+d*10),150-c(d+1)-c,1
+ 4770 next
+ 4780 d=-1
+ 4790 ifmc<>mbthenll=2:else:ll=3
+ 4800 loop
+ 4805 low col3,14,14
+ 4810 d=d+2
+ 4815 ifx(d)<0thenlow col2,14,14
+ 4820 text27+d*10,160,left$(str$(x(d)),ll),1,1,8
+ 4822 ifx(d)<0thenhi col
+ 4824 exit if d>=a
+ 4826 low col3,14,14
+ 4828 ifx(d+1)<0thenlow col 2,14,14
+ 4830 text27+(d+1)*10,172,left$(str$(x(d+1)),ll),1,1,8
+ 4832 ifx(d+1)<0thenhi col
+ 4834 exit if d+1>=a
+ 4840 hi col
+ 4850 end loop
+ 4900 h$=" {rvon}Menue=M  Kuchen=K  Balken=B  Copy=C{rvof}"
+ 4902 low col 6,14,14
+ 4905 text3,188,"{CTRL-B}"+h$,1,1,8
+ 4907 hi col
+ 4910 getz$:ifz$=""then4910
+ 4930 ifz$<>"m"andz$<>"k"andz$<>"b"andz$<>"c"then4910
+ 4940 ifz$="m"thencset0:goto220
+ 4950 ifz$="b"thengoto2000
+ 4960 ifz$="k"thengoto1000
+ 4970 ifz$="c"thencopy:goto4910
+ 4980 end
+ 5000 rem*******************************
+ 5010 rem*****  werteeingabe    ********
+ 5020 rem*******************************
+ 5030 print"{clr}{rvon}        werteeingabe                    {rvof}"
+ 5060 printat(5,5)"titel der tabelle"
+ 5090 input"{up}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}";t$
+ 5100 ift$=""then5030
+ 5120 printat(5,8)"mittelwert und summe"
+ 5150 input"{up}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}";m$
+ 5160 ifleft$(m$,1)<>"j"andleft$(m$,1)<>"n"then5120
+ 5180 printat(5,11)"anzahl der werte"
+ 5210 input"{up}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}";a$
+ 5240 a=val(a$)
+ 5270 ifa<2ora>20thenprintat(6,13)"maximal 20 werte":goto5180
+ 5330 ford=1toa:x(d)=100*x(d):x(d)=int(x(d)):x(d)=x(d)/100
+ 5360 printat(5,17)"wert";d;"   ="
+ 5390 input"{up}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}";x(d)
+ 5420 nextd
+ 5500 print"{clr}{rvon}        wertetabelle                    {rvof}"
+ 5530 printat(5,3)t$
+ 5550 print"{down}"
+ 5560 ford=1toastep2:x(d)=100*x(d):x(d)=int(x(d)):x(d)=x(d)/100
+ 5570 x(d+1)=100*x(d+1):x(d+1)=int(x(d+1)):x(d+1)=x(d+1)/100
+ 5590 print" wert"(d)"="left$(str$(x(d)),7)
+ 5600 print"                   {up} wert"(d+1)"="left$(str$(x(d+1)),7)
+ 5620 next
+ 5640 printat(6,17)"werte in ordnung ?"
+ 5650 getw$:ifw$=""then5650
+ 5652 ifleft$(w$,1)<>"j"andleft$(w$,1)<>"n"then5640
+ 5655 printat(26,17)w$
+ 5660 ifleft$(w$,1)="n"thenprintat(6,17)"                        ":goto5330
+ 5700 goto8000
+ 5720 printat(6,19)"mittelwert = ";mw
+ 5730 printat(6,20)"summe = ";mb
+ 5800 printat(6,22)"wertetabelle ausdrucken"
+ 5830 input"{up}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}";v$
+ 5860 ifleft$(v$,1)<>"j"andleft$(v$,1)<>"n"then5800
+ 5880 ifleft$(v$,1)="j"thenhrdcpy
+ 5900 ifleft$(v$,1)="n"then5910
+ 5910 printat(6,23)"wertetabelle speichern"
+ 5930 input"{up}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}";s$
+ 5960 ifleft$(s$,1)<>"j"andleft$(s$,1)<>"n"then5910
+ 5980 ifleft$(s$,1)="j"thenscrsv2,8,2,"@:"+t$+",s,w":gosub9000:return
+ 6000 ifleft$(s$,1)="n"thenreturn
+ 7999 end
+ 8000 rem******************************
+ 8030 rem**** summe und mittelwert  ***
+ 8060 rem******************************
+ 8120 mb=0
+ 8125 ford=1toa:mc=mc+abs(x(d)):next
+ 8130 ford=1toa:mb=mb+(x(d)):next
+ 8180 mw=mb/a
+ 8190 mw=mw*1000:mw=int(mw):mw=mw/1000
+ 8195 mb=mb*1000:mb=int(mb):mb=mb/1000
+ 8197 mc=mc*1000:mc=int(mc):mc=mc/1000
+ 8200 ifm$="n"then5800
+ 8210 goto5720
+ 8300 end
+ 9000 rem **** fehlerkanal ***********
+ 9010 open15,8,15
+ 9020 input#15,aa,bb$,cc,dd
+ 9025 ifbb=0thenclose15:return
+ 9030 print"{clr}";aa,bb$,cc,dd
+ 9040 geta$:ifa$=""then9040
+ 9045 close15
+ 9050 return
+ 9090 rem ***************************
+ 9100 rem *** letzte graphik ********
+ 9110 rem ***************************
+ 9120 cset 2
+ 9140 getz$:ifz$=""then9140
+ 9141 ifmc=0then9160
+ 9142 ifz$<>"m"andz$<>"b"andz$<>"d"andz$<>"c"andz$<>"k"then9140
+ 9144 ifz$="m"thencset0:goto220
+ 9146 ifz$="d"thengoto4000
+ 9148 ifz$="b"thengoto2000
+ 9150 ifz$="k"thengoto1000
+ 9152 ifz$="c"thencopy:goto9140
+ 9160 cset0:goto220
+ 9180 end
+
