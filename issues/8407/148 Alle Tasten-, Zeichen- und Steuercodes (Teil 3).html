@@ -32,13 +32,13 @@
         <p>Tippen Sie bitte das Programm Nummer 3 aus dem 64’er Mai-Heft, Seite 107, ein, nämlich eine der drei Versionen zur Tastaturpuffer-Abfrage. (Ich verwende unten die GET-Version).<br>
             310 PRINT CHR$(147)<br>
             320 GET A$<br>
-            330IFA$= ” &ldquo;THEN320<br>
+            330 IFA$="" THEN 320<br>
             340 PRINT ASC(A$)<br>
             350 GOTO 320</p>
 
         <p>Auf beiden, VC 20 und C 64 erhalten Sie nach RUN 310 und Drücken der RETURN-Taste (natürlich) den ASCII-Code 82. Wenn Sie zuerst die CTRL-Taste drücken und halten und dann erst das R drücken, dürfte eigentlich nichts passieren, denn die CTRL-Taste gilt ja angeblich nur für die Farben. Ja, denkste! Wir erhalten nämlich die Zahl 18. Ein Blick in die ASCII-Tabelle zeigt uns für 18 die Funktion »REVERSE-ON«.</p>
 
-        <p>Versuchen Sie dasselbe mit CTRL und der TODO-Taste. Wir erhalten die 6, und nicht 95, wie es eigentlich sein sollte.</p>
+        <p>Versuchen Sie dasselbe mit CTRL und der ←-Taste. Wir erhalten die 6, und nicht 95, wie es eigentlich sein sollte.</p>
 
         <p>Für den VC 20 ist das alles. Aber immerhin, wir haben sozusagen noch zwei zusätzliche Funktionstasten gefunden.</p>
 
@@ -47,7 +47,7 @@
         <p>Der Versuch wird Ihnen zeigen, daß alle Buchstaben, von A bis Z, zusammen mit CTRL gedrückt, einen anderen ASCII-Wert, nämlich 1 bis 26, ergeben, als allein gedrückt.</p>
 
         <p>Desweiteren biete ich Ihnen noch:<br>
-            CTRL - t = 30<br>
+            CTRL - ↑ = 30<br>
             CTRL - = = 31<br>
             CTRL - £ = 28<br>
             CTRL - : = 27<br>
@@ -129,19 +129,19 @@
             Auch hier ist ein kleiner Pfiff drin. In Zeile 20 wird zuerst ein Gänsefuß (34) gedrückt, wodurch wir in dem danach benannten Modus sind. Das nachfolgende A$ erscheint im Fall einer Steuertaste als reverses Zeichen, nach dem abschließenden 2. Gänsefuß gibt uns die ASC- Funktion noch den ASCII-Code der gedrückten Taste.</p>
 
         <p>Mit Gänsefüßen statt CHR$ hätten wir lediglich die beiden Zeichen A und $ auf den Bildschirm gedruckt. Mit dieser Methode erhalten Sie zum Beispiel für:<br>
-            ASCII-Code 17 = Cursor Down &hellip;. TODO<br>
-            ASCII-Code 147 = CLR &hellip;. TODO</p>
+            ASCII-Code 17 = Cursor Down <span class="inverted">Q</span><br>
+            ASCII-Code 147 = CLR <span class="inverted">♥︎</span></p>
 
         <p>Die 2. Methode ist viel einfacher. Schauen Sie in meine ASCII-Tabelle (Tabelle 1). Sie ist in Spalten zu je 32 Zeichen angeordnet. Die Steuerzeichen und die Farben stehen alle in Spalte 1 und 5.</p>
 
-        <p>Da finden Sie zum Beispiel über der Codezahl 17 die Funktion »Cursor-Down«. Wenn Sie jetzt in die 3. Spalte waagrecht rübergehen — also den Wert um 64 erhöhen — steht da das TODO . Oder: In Spalte 5 ist der Taste CLR die Codezahl 147 zugeordnet. Zwei Spalten weiter (64 höher) steht das TODO.</p>
+        <p>Da finden Sie zum Beispiel über der Codezahl 17 die Funktion »Cursor-Down«. Wenn Sie jetzt in die 3. Spalte waagrecht rübergehen — also den Wert um 64 erhöhen — steht da das <span class="inverted">Q</span> . Oder: In Spalte 5 ist der Taste CLR die Codezahl 147 zugeordnet. Zwei Spalten weiter (64 höher) steht das <span class="inverted">♥︎</span>.</p>
 
         <p>Wenn Sie die Ergebnisse der 1. Methode oben mit den durch Spaltenhüpfen gefundenen Zeichen vergleichen, sehen Sie, daß es dieselben Zeichen sind, halt nur reversiert.<br>
             Machen wir die Probe:</p>
 
-        <p>Mit Methode 1 erhalten wir für »Rot« das reverse Pfund-Zeichen Q TODO . In der ASCII-Tabelle finden wir »Rot« unter 28. Zwei Spalten weiter, unter 28 + 64 = 92, steht dasselbe Zeichen.</p>
+        <p>Mit Methode 1 erhalten wir für »Rot« das reverse Pfund-Zeichen <span class="inverted">£</span>. In der ASCII-Tabelle finden wir »Rot« unter 28. Zwei Spalten weiter, unter 28 + 64 = 92, steht dasselbe Zeichen.</p>
 
-        <p>Das gilt auch für alle CTRL-Kombinationen, nicht nur für die der Farben. Bei beiden Computern entspricht dem CTRL-TODO das TODO, beim C 64 erzeugt CTRL-TODO ein TODO. Alle Kombinationen der Buchstaben mit CTRL erzeugen diese Buchstaben in reverser Darstellung.</p>
+        <p>Das gilt auch für alle CTRL-Kombinationen, nicht nur für die der Farben. Bei beiden Computern entspricht dem CTRL-← das <span class="inverted">F</span>, beim C 64 erzeugt CTRL-: ein <span class="inverted">C</span>. Alle Kombinationen der Buchstaben mit CTRL erzeugen diese Buchstaben in reverser Darstellung.</p>
 
         <p>Um das in einer kleinen praktischen Anwendung zu verdeutlichen, schlage ich vor, dieselbe Aufgabenstellung, die in Heft 5/84 sowohl mit Tastencode-Abfrage (Programm Nummer 1 auf Seite 104/105) als auch mit Tastaturpuffer-Abfrage (Programm Nummer 4 auf Seite 135) gelöst wurde, noch einmal zu verwenden, jetzt aber die Gänsefuß-Methode einzusetzen.</p>
 
@@ -153,12 +153,13 @@
 
         <p>
         <pre>
-410 PRINT &ldquo;SHIFT und CLR/HOME &rdquo;<br>
-420 GET A$ 430IFA$= ’"’THEN 420<br>
-440 IF A$= ” f-1 &ldquo; THEN POKE 36879,126<br>
-450 IF A$= ” f-2 ” THEN POKE 36879,45<br>
-460 IF A$= ” f-3 ” THEN POKE 36879,25<br>
-470 IF A$= ” TODO ” THEN POKE 36879,27<br>
+410 PRINT "SHIFT und CLR/HOME"<br>
+420 GET A$
+430 IFA$= "" THEN 420<br>
+440 IF A$= "f-1" THEN POKE 36879,126<br>
+450 IF A$= "f-2" THEN POKE 36879,45<br>
+460 IF A$= "f-3" THEN POKE 36879,25<br>
+470 IF A$= "@" THEN POKE 36879,27<br>
 480 GOTO 420<br>
 </pre>
         </p>
@@ -250,14 +251,14 @@
 
         <p>In Zeile 60 prüfen wir, ob die Endzahl 71 für das G überschritten ist. Wenn ja, springen wir auf Zeile 400, mit der wir das Spielende anzeigen.<br>
             60 IF R > 71 THEN 400<br>
-            400 PRINT”TODO SPIELENDE'&lsquo;**&ldquo;&rdquo;</p>
+            400 PRINT”<span class="inverted">Q</span><span class="inverted">Q</span><span class="inverted">Q</span>SPIELENDE"</p>
 
         <p>Bitte RUNnen Sie das Fragment wieder zur Probe.</p>
 
         <p>Jetzt kommt die Beeinflussung der Reihenfolge mit der DEL-Taste. Wie gelernt fragen wir diese Taste mit einer GET-Schleife ab (Zeilen 100,110), ihre Lösch-Wirkung erreichen wir in Zeile 120 durch einen PRINT-Befehl (mit Semikolon!). Nach Drücken der DEL-Taste darf der Reihenfolge-Zähler der Zeile 310 natürlich nicht wirken, deshalb springen wir schon vorher aus der Zeile 210 zurück.<br>
             100 GET A$<br>
-            110 IF A$&lt;&gt;&ldquo;TODO&rdquo; THEN 300<br>
-            120 PRINT ”TODO";<br>
+            110 IF A$&lt;&gt"<span class="inverted">T</span>" THEN 300<br>
+            120 PRINT ”<span class="inverted">T</span>";<br>
             210 GOTO 50</p>
 
         <p>Sie sehen oben, daß ich für die Abfrage der DEL-Taste die Finkel-Methode vorschlage. Die anderen Methoden gehen natürlich auch.</p>
@@ -282,7 +283,7 @@
 
         <p>Zum Finkeln-Üben arrangieren wir die Anzeige des Spielendes und der Fehler etwas um. Alle Anweisungen sollen in nur einer Zeile stehen. Löschen Sie bitte die Zeile 410. In Zeile 400 wird gefinkelt und zwar mit dem Zeichen für SHIFT RETURN, welches laut Tabelle 2 mit SHIFT M erzeugt wird.</p>
 
-        <p>400 PRINT &ldquo;TODO DAS SPIEL IST ZU ENDE&rdquo;;&ldquo;TODO F "FEHLER”.</p>
+        <p>400 PRINT "<span class="inverted">Q</span><span class="inverted">Q</span><span class="inverted">Q</span><span class="inverted">Q</span>DAS SPIEL IST ZU ENDE";"<span class="inverted">Q</span><span class="inverted">Q</span><span class="inverted">Q</span><span class="inverted">Q</span>" F "FEHLER”.</p>
 
         <p>Bei LIST und bei Ausdruck mit einem Drucker sehen die gefinkelten Zeilen 110, 120 und 400 natürlich kurios aus und wie gesagt, sie lassen sich bei einem Tippfehler nicht korrigieren, sondern müssen neu geschrieben werden.</p>
 
