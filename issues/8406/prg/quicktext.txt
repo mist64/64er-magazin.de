@@ -1,0 +1,360 @@
+;quicktext.prg ==0801==
+;Eingetippt von Endurion, thierer
+
+   10 print"{clr}":poke53280,0:poke53281,0:poke53272,23:poke788,peek(788)+3:poke650,128
+   20 dimz$(500),e$(61)
+   30 ae$=chr$(4)+chr$(10)+chr$(170)+chr$(0)+chr$(42)+chr$(0)+chr$(170)+chr$(30)+chr$(2)
+   40 oe$=chr$(0)+chr$(28)+chr$(162)+chr$(0)+chr$(34)+chr$(0)+chr$(162)+chr$(28)+chr$(0)
+   50 ue$=chr$(0)+chr$(60)+chr$(130)+chr$(0)+chr$(2)+chr$(0)+chr$(130)+chr$(60)+chr$(0)
+   60 ga$=chr$(6)+chr$(140)+chr$(20)+chr$(32)+chr$(68)+chr$(32)+chr$(20)+chr$(140)+chr$(6)
+   70 gi$=chr$(28)+chr$(162)+chr$(34)+chr$(0)+chr$(34)+chr$(0)+chr$(34)+chr$(162)+chr$(28)
+   80 gu$=chr$(60)+chr$(130)+chr$(2)+chr$(0)+chr$(2)+chr$(0)+chr$(2)+chr$(130)+chr$(60)
+   90 ss$=chr$(126)+chr$(128)+chr$(0)+chr$(146)+chr$(0)+chr$(146)+chr$(146)+chr$(108)+chr$(0)
+  100 fr=fre(0):goto10000
+  200 print"{CBM-@}{left}";
+  205 gett$:ift$=""then205
+  210 t=asc(t$):ift=20andw=1andz<=1andlen(tt$)=0thent$="":print"{clr}";:z=1:goto200
+  215 ifw=2andt=20andlen(tt$)=0thent$="":goto205
+  220 ift=164ort=167ort=170ort=173ort=188ort=189ort=190ort=172ort=191thenu=u+1
+  222 ift=171ort=179ort=187ort=177thenu=u+1
+  225 ift=13thenprint" ";:p1=0:p2=0:p3=0:p4=0:u=u2:goto335
+  230 ift>13andt<20ort>20andt<32ort>128andt<133ort>144andt<160thent$="":goto205
+  235 ift=95thenp1=0:p2=0:p3=0:p4=0:u=u2:return
+  240 ift=34thent$="'"
+  250 ift=190ort=191ort=170ort=167thenp1=len(tt$):p4=1
+  260 ift=164andp4=1thenp2=len(tt$):p3=p2-p1:u=u-p3
+  270 ift<>20andlen(t$)=1thenprintt$;
+  280 ift<>20then355
+  290 iflen(tt$)=1then315
+  300 iflen(tt$)=0andw=1thenz=z-1:tt$=z$(z):goto325
+  305 ifw=1then310
+  309 iflen(tt$)=0andw=0thene=e-1:tt$=e$(e):goto325
+  310 tt$=left$(tt$,len(tt$)-1):printchr$(20);:goto200
+  315 l=l-len(tt$):tt$="":print" {left}";chr$(20);:ifw=1thenz$(z)="":z=z-1:ifz=0thenz=1
+  318 ifw=1thentt$=z$(z)
+  320 ifw=0thene=e-1:ife=0thene=1
+  323 ifw=0thentt$=e$(e)
+  324 ifw=2thentt$="":goto205
+  325 iflen(tt$)>38thenprint" {up}{left}";
+  330 print" {left}{up}";tt$;:goto200
+  335 iflen(tt$)<40thenx=218+peek(214):pokex,(peek(x)or128)
+  340 printchr$(13);:q=0:l=l+len(tt$):ifl>.9*frthengosub400:return
+  345 return
+  355 ifq=0andlen(tt$)>u-3andt$=" "then370
+  360 tt$=tt$+t$:iflen(tt$)=80then370
+  365 iflen(tt$)<u+2then200
+  370 p1=0:p2=0:p3=0:p4=0:u=u2:goto340
+  400 print"{clr}Freier Speicherplatz in Bytes:";int(fr)"
+  405 print"{down}Die Eingaberoutine wird abgebrochen.":forx=1to1000:next:t$="_":return
+ 2000 w=1:print"{clr}{yel}{rvon}1-{rvof} Weiterschreiben"spc(62)"{rvon}2-{rvof} Neuen Text eingeben{down}{down}{down}Eingabe >
+ 2020 getx$:x=val(x$):ifx<1orx>2then2020
+ 2030 onxgoto2100,2600
+ 2100 print"{clr}{blu}";:gosub8100:z=z+1:gosub200
+ 2105 ift$="_"thenz$(z)=tt$:tt$="":t$="":w=0:gosub8000:return
+ 2110 z$(z)=tt$:z=z+1:tt$="":gosub200
+ 2120 ift$="_"thenz$(z)=tt$:tt$="":t$="":w=0:gosub8000:return
+ 2130 goto2110
+ 2200 print"{clr}{blu}";:forx=1toz:z$(x)="":next:z=1:gosub8100:gosub200
+ 2210 ift$="_"thenz$(z)=tt$:tt$="":t$="":w=0:gosub8000:return
+ 2220 z$(z)=tt$:z=z+1:tt$="":gosub200
+ 2230 ift$="_"thenz$(z)=tt$:tt$="":t$="":w=0:gosub8000:return
+ 2240 goto2220
+ 2600 print"{clr}Geben Sie nun die maximale Zeilen-{down}":print"laenge (10-70) ein ";
+ 2610 inputu:ifu<10oru>70thenprint"{up}{up}":goto2610
+ 2620 u2=u:print"{down}Wagenruecklauf zwischen"u-3"und"u+2:forx=1to1000:next:goto2200
+ 3000 print"{clr}Geben Sie nun die Zeilen ein, die Sie   sehen moechten. (Irrtum = 0)
+ 3010 input"{down}Die kleinere Zahl: ";a:ifa>500thenprint"{up}{up}":goto3010
+ 3015 ifa=0thenreturn
+ 3020 input"{down}Die hoehere Zahl: ";b:ifb<aorb>500thenprint"{up}{up}":goto3020
+ 3100 print"{clr}":c=b-a:forx=atobstep2:print"{rvon}{pur}";x;"{left}.:{rvof}{yel}";tab(7);z$(x)
+ 3107 print"{rvon}{pur}";x+1;"{left}.:{rvof}{grn}";tab(7);z$(x+1):next
+ 3110 poke214,20:print:print:print"{cyn}{rvon}A{rvof}endern     {rvon}L{rvof}oeschen {rvon}E{rvof}infuegen  {rvon}T{rvof}ausch
+ 3115 poke214,21:print:print:print"{rvon}B{rvof}locktausch {rvon}+{rvof} vor    {rvon}-{rvof} zurueck  {rvon}_{rvof} Menue
+ 3120 getk$:ifk$=""then3120
+ 3125 ifk$="a"then3200
+ 3130 ifk$="l"then3300
+ 3135 ifk$="e"then3400
+ 3140 ifk$="t"then3600
+ 3142 ifk$="b"then3800
+ 3145 ifk$="-"thena=a-1-c:b=a+c:ifa<1thena=1:b=a+c
+ 3155 ifk$="+"thena=b+1:b=b+1+c:ifb+1+c>500thenb=500:a=b-c
+ 3165 ifk$="_"thena=0:b=0:return
+ 3170 goto3100
+ 3200 input"{down}{yel}{rvon}AENDERUNG{rvof} Zeile ";kk:w=2:ifkk<aorkk>bthen3100
+ 3220 print"{clr}"spc(2)chr$(34)z$(kk):print"{home}{up}";:inputz$(kk):goto3100
+ 3300 input"{down}{yel}{rvon}LOESCHEN{rvof} (Irrtum =0) ";kk:ifkk=0orkk>zthen3100
+ 3310 forx=kktoz:z$(x)=z$(x+1):next:z$(z)="":z=z-1:kk=0:goto3100
+ 3400 print"{down}{yel}{rvon}EINFUEGEN{rvof} vor Zeile (Irrtum = 0)";:inputkk:ifkk>zorkk<0then3100
+ 3407 ifkk=0then3100
+ 3410 w=0:e=0:print"Es koennen maximal 60 Zeilen eingefuegt werden."
+ 3415 forx=1to1000:next:print"{clr}":e=1:ifz+1>=500then3100
+ 3420 gosub200:ift$="_"thene$(e)=tt$:tt$="":t$="":goto3500
+ 3425 e$(e)=tt$:tt$="":t$="":e=e+1:ife=61then3500
+ 3430 ifz+e=500then3500
+ 3435 gosub200
+ 3440 ift$="_"thene$(e)=tt$:tt$="":t$="":goto3500
+ 3445 goto3425
+ 3500 z=z+e:forx=ztokk+e-1step-1::z$(x)=z$(x-e):next
+ 3505 f=0:forx=kktokk+e-1:f=f+1:z$(x)=e$(f):e$(f)="":next:kk=0:e=1
+ 3510 goto3100
+ 3600 print"{clr}{yel}{rvon} TAUSCH {rvof}":input"{down}Altes Wort";t$:ift$=""then3600
+ 3605 input"{down}Neues Wort";at$:ifat$=""then3605
+ 3610 print"{down}TEXTBEREICH (alle Zeilen = 0)"
+ 3615 input"{down}Die kleinere Zeile";kk:ifkk>zthenprint"{up}{up}{up}":goto3615
+ 3620 ifkk=0thenkk=1:km=z:goto3630
+ 3625 input"{down}Die hoehere Zeile:";km:ifkm<kkorkm>zthenprint"{up}{up}{up}":goto3625
+ 3630 forf=kktokm:l=len(t$):m=len(z$(f)):forq=1tom-l+1
+ 3635 ifmid$(z$(f),q,l)<>t$then3660
+ 3640 a$=left$(z$(f),q-1):b$=right$(z$(f),len(z$(f))+1-(q+l))
+ 3645 c$=mid$(z$(f),q+l,1):goto3670
+ 3655 z$(f)=a$+at$+b$
+ 3660 nextq:nextf:a$="":b$="":t$="":at$="":q=0:f=0:forp=1to1000:next:goto3100
+ 3670 print"{clr}"f,a$"{rvon}"t$"{rvof}"b$:print"{down}Austausch ? (j/n){down}"
+ 3675 getx$:ifx$=""then3675
+ 3680 ifx$="j"then3655
+ 3685 ifx$="n"then3660
+ 3690 goto3675
+ 3800 input"{yel}{down}{rvon}BLOCKTAUSCH{rvof} (Irrtum=0) von Zeile";aa:ifaa=0then3100
+ 3805 ifaa<1oraa>zthenprint"{up}{up}{up}":goto3800
+ 3810 printspc(23):input"bis Zeile";bb:ifbb<aaorbb>zthenprint"{up}{up}":goto3810
+ 3820 print"{rvon}EINFUEGEN{rvof}"spc(14)"vor Zeile";:inputcc:ifcc<1orcc>zthenprint"{up}{up}":goto3820
+ 3830 dd=bb+1-aa:ifdd>60thenprint"Block zu gross":goto3100
+ 3835 e=0:e$=""::ford=aatobb:e=e+1:e$(e)=z$(d):next
+ 3840 z=z+dd+1:ford=ztocc+dd-1step-1:z$(d)=z$(d-dd):next:d=0:e=0
+ 3845 ford=cctocc+dd-1:e=e+1:z$(d)=e$(e):next:x=0
+ 3850 print"{rvon}LOESCHEN{rvof} von Block 1 (j/n)?"
+ 3855 getx$:ifx$=""then3855
+ 3860 ifx$="j"then3875
+ 3865 ifx$="n"then3100
+ 3870 goto3855
+ 3875 forx=aatoz:z$(x)=z$(x+dd):next:z=z-dd:goto3100
+ 4000 print"{cyn}{clr}Der Text wird auf";u+2;"Zeichen/Zeile for- matiert.{down}":ifz=0thenreturn
+ 4100 print"{rvon}Bitte warten Sie.":v=u+2:m5=0:forx=1toz:l=len(z$(x)):tt=0
+ 4105 ifl<v-5orl=0andx<zthennextx:goto4500
+ 4106 ifl>vthen4600
+ 4110 v=v+m5:forj=lto1step-1:ifl=vthenj=1:goto4150
+ 4130 ifmid$(z$(x),j,1)<>" "then4150
+ 4140 tt=1:z$(x)=left$(z$(x),j)+" "+right$(z$(x),l-j):l=l+1
+ 4150 nextj:v=u+2:m5=0:nextx:return
+ 4500 ifx>=zthenreturn
+ 4600 fort5=lto1step-1:o=asc(mid$(z$(x),t5,1))
+ 4610 ifo=173oro=189oro=188oro=190oro=191oro=170oro=167oro=164oro=171thenm5=m5+1
+ 4615 ifo=179oro=177oro=172oro=187thenm5=m5+1
+ 4620 o=0:nextt5:goto4110
+ 5000 print"{red}{clr}{rvon}Ausdruck:":print"{down}{down} {rvon}A{rvof}usdruck"spc(72)"{rvon}_{rvof} Menue
+ 5020 getx$:ifx$=""then5020
+ 5030 ifx$="a"then5060
+ 5040 ifx$="_"thenreturn
+ 5050 goto5020
+ 5060 print"{clr}Briefkopf drucken ? (j/n)
+ 5070 getw$:ifw$=""then5070
+ 5075 ifw$="n"orw$="j"then5080
+ 5077 goto5070
+ 5080 print"{down}Geben Sie bitte den Zeilenabstand ein:{down}
+ 5090 input"{rvon} 1 {rvof} , {rvon} 1.5 {rvof} , {rvon} 2 {rvof} ";za
+ 5100 ifza=1orza=1.5orza=2then5105
+ 5102 print"{up}{up}":goto5090
+ 5105 ifza=1thenza=36
+ 5107 ifza=1.5thenza=54
+ 5109 ifza=2thenza=72
+ 5110 zb=za
+ 5120 print"{down}Linker Randabstand (max."78-u")";:inputp:ifp+u+2>80thenprint"{up}{up}{up}":goto5120
+ 5140 print"{down}Seitennumerierung (j/n)?
+ 5150 getab$:ifab$=""then5150
+ 5160 ifab$="j"orab$="n"then5180
+ 5170 print"{clr}":goto5140
+ 5180 print"{down}{rvon}B{rvof}latteinzug   {rvon}E{rvof}ndlospapier
+ 5182 getf2$:iff2$=""then5182
+ 5184 iff2$="b"orf2$="e"then5190
+ 5186 print"{clr}":goto5180
+ 5190 print"{down}Welche Zeilen sollen ausgedruckt werden?0=Alle
+ 5200 input"{down}Die kleinere Zahl:";a:ifa=0thena=1:b=z:j=1:goto5230
+ 5210 ifa<0ora>zthenprint"{up}{up}{up}":goto5200
+ 5220 input"{down}Die hoehere Zeile:";b:ifb<aorb>zthenprint"{up}{up}":goto5220
+ 5230 ifw$="j"thenprint"{clr}Briefkopf wird abgedruckt
+ 5240 ifw$="n"thenprint"{clr}Briefkopf wird nicht abgedruckt
+ 5260 print"{down}Zeilenabstand ";:ifza=36thenprint"{rvon} 1 {rvof}
+ 5270 ifza=54thenprint"{rvon} 1.5 {rvof}
+ 5280 ifza=72thenprint"{rvon} 2 {rvof}
+ 5290 print"{down}Linker Randabstand {rvon}"p"{rvof}
+ 5300 ifj=1thenprint"{down}Ausdruck aller Zeilen":goto5320
+ 5310 print"{down}Ausdruck von Zeile"a" bis Zeile"b
+ 5320 ifab$="j"thenprint"{down}Seitennumerierung
+ 5330 ifab$="n"thenprint"{down}Keine Seitennumerierung
+ 5340 iff2$="b"thenprint"{down}Einzelblatteinzug
+ 5350 iff2$="e"thenprint"{down}Endlospapier
+ 5360 print"{down}{down}Alle Eingaben richtig? (j/n)
+ 5370 getf1$:iff1$=""then5370
+ 5380 iff1$="j"thenprint"{clr}Ausdruck erfolgt. Bitte warten Sie.":goto5400
+ 5390 iff1$="n"thenp=0:a=0:b=0:f$="":goto5000
+ 5395 goto5370
+ 5400 open1,4,1:open2,4,7:print#1,chr$(27)"d"chr$(p)chr$(0);:ifw$="n"then5600
+ 5410 print#1,chr$(27)"e"spc(6)w1$spc(64-(len(w1$)))w4$
+ 5420 print#1,spc(6)w2$spc(64-(len(w2$)))w5$
+ 5430 print#1,spc(6)w3$spc(64-(len(w3$)))w6$:print#1,spc(6)w8$
+ 5440 ifa$(1)<>""then5470
+ 5450 print#1,chr$(13)chr$(27)"f":print#1,spc(73)w7$
+ 5460 forx=1to3:print#1,chr$(13):next:goto5600
+ 5470 forx=1to2:print#1,chr$(13):next:print#1,chr$(27)"f"
+ 5480 print#1,chr$(15)spc(15)w1$" * "w4$" * "w5$chr$(18):print#1,spc(8);
+ 5490 fort=1to40:print#2,"E";:next
+ 5500 print#1,chr$(13)
+ 5510 forp=1to5:ifa$(p)=""then5540
+ 5520 ifp=5thenprint#1,chr$(13)spc(8)a$(p):goto5560
+ 5530 print#1,spc(8)a$(p)
+ 5540 nextp
+ 5560 fory=1to3:print#1,chr$(13):next:print#1,spc(74)w7$:print#1,chr$(13)
+ 5600 ma=0:u1=1:ifza=36thenr8=4
+ 5603 ifza=54thenr8=3
+ 5606 ifza=72thenr8=2
+ 5610 iff2$="e"andab$="n"thenr8=r8+1
+ 5620 ifw$="n"then5650
+ 5630 ifw$="j"anda$(1)=""then5640
+ 5635 ifza=36thent=41
+ 5636 ifza=54thent=27
+ 5637 ifza=72thent=20
+ 5638 gosub5800:a=x+1:goto5700
+ 5640 ifza=36thent=51
+ 5641 ifza=54thent=34
+ 5642 ifza=72thent=26
+ 5643 gosub5800:a=x+1:goto5700
+ 5650 ifza=36thent=64
+ 5651 ifza=54thent=43
+ 5652 ifza=72thent=32
+ 5653 gosub5800:a=x+1:goto5700
+ 5700 ma=0:u1=u1+1
+ 5710 iff2$="b"thenprint"{clr}Seite"u1" eingelegt?(j/n)";:inputf3$:iff3$<>"j"then5710
+ 5720 iff2$="e"thenforr9=1tor8:print#1,chr$(13):nextr9
+ 5730 ifab$="j"thenprint#1,spc(35)"-"u1"-"chr$(13)
+ 5740 ifzb=36thent=62
+ 5741 ifzb=54thent=41
+ 5742 ifzb=72thent=30
+ 5750 gosub5800:a=x+1:goto5700
+ 5800 forx=atob:print#1,chr$(8);:forzz=1tolen(z$(x)):ip$=mid$(z$(x),zz,1)
+ 5805 ifip$=" "orip$=""then5830
+ 5808 ip=asc(mid$(z$(x),zz,1))
+ 5810 ifip=176orip=185orip=184orip=91orip=168orip=93orip=174then9000
+ 5820 ifip=173orip=189orip=188orip=190orip=191orip=170orip=167orip=164then9035
+ 5825 ifip=172orip=187orip=171orip=179orip=177then9035
+ 5830 print#1,chr$(27)"3"chr$(za);:print#2,ip$;:nextzz:print#2:ma=ma+1:print#1,chr$(27)"3"chr$(za);
+ 5840 ifma=int(t)thenreturn
+ 5850 nextx:print#1:close1:close2:print"{clr}Noch ein Druck (j/n)?"
+ 5860 gety$:ify$=""then5860
+ 5870 ify$="j"thena=0:x=0:t=0:goto5060
+ 5880 ify$="n"thenma=0:goto10000
+ 6000 print"{pur}{clr}Textprogramm {rvon}QUICKTEXT"spc(100)"Diskettenverwaltung{rvof}{down}{down}
+ 6010 printspc(11)"{rvon}1-{rvof} Text speichern"spc(63)"{rvon}2-{rvof} Text einlesen"spc(64)
+ 6020 print"{rvon}3-{rvof} Text loeschen"spc(64)"{rvon}4-{rvof} Neuer Dateiname"spc(62)
+ 6030 print"{rvon}5-{rvof} Directory lesen"spc(62)"{rvon}6-{rvof} Texte verketten"spc(62)
+ 6035 print"{rvon}7-{rvof} Hauptmenue{down}{down}{down}{rght}{rght}{rght}Eingabe >
+ 6040 getx$:x=val(x$):ifx<1orx>7then6040
+ 6050 ifx=7then10000
+ 6060 onxgosub6200,6400,6600,6800,7000,7200
+ 6070 goto10000
+ 6200 print"{clr}SPEICHERN{down}":open15,8,15:print#15,"i0":gosub9100:input"{rvon}Dateiname: {rvof}";cb$
+ 6205 ifz=0thenclose15:return
+ 6210 db$="0:"+cb$+",s,w":goto9200
+ 6220 open2,8,2,db$:print"{down}Datei {rvon}"cb$"{rvof} wird gespeichert."
+ 6230 print#2,z:print#2,u:forx=1toz:ifz$(x)=""thenz$(x)="_"
+ 6240 print#2,chr$(34);z$(x):ifz$(x)="_"thenz$(x)=""
+ 6250 next:close2:close15:return
+ 6400 print"{clr}EINLESEN{down}":open15,8,15:print#15,"i0":gosub9100:input"{rvon}Dateiname: {rvof}";cb$
+ 6405 db$="0:"+cb$+",s,r
+ 6410 gosub9100:open2,8,2,db$:gosub9100:print"{down}Datei {rvon}"cb$"{rvof} wird eingelesen.
+ 6420 ifw$<>"ok"thenclose2:close15:goto10000
+ 6430 input#2,z:input#2,u:u2=u:forx=1to500
+ 6440 input#2,z$(x)
+ 6445 ifz$(x)=""then6460
+ 6447 ifz$(x)="_"thenz$(x)=""
+ 6450 nextx
+ 6460 close2:close15:return
+ 6600 print"{clr}LOESCHEN{down}{down}":open15,8,15:print#15,"i0":gosub9100
+ 6610 print"{rvon}Dateiname?{rvof}":inputcb$:db$="s0:"+cb$
+ 6620 print"{down}{down}Datei {rvon}"cb$"{rvof} wird geloescht.":print#15,db$:close15:return
+ 6800 print"{clr}NEUER  DATEINAME{down}{down}
+ 6810 open15,8,15:print#15,"i0":gosub9100:input"{rvon}Alter Dateiname: {rvof}";cb$
+ 6820 input"{down}{down}{rvon}Neuer Dateiname: {rvof}";cf$:db$="r0:"+cf$+"="+cb$:print#15,db$:close15:return
+ 7000 print"{clr}":open15,8,15:print#15,"i0":gosub9100:close15
+ 7010 open1,8,0,"$":a=0:b$="":c$="":fori=1to6:get#1,a$:next
+ 7020 fori=7to25:print"{rvon}";:get#1,a$:b$=b$+a$:next:printtab(10)b$:b$=""
+ 7030 fori=25to38:get#1,a$:next:fori=1to500:forj=1to18
+ 7040 get#1,a$:ifa$<>chr$(34)thenc$=c$+a$
+ 7050 nextj
+ 7060 forj=1to5:get#1,a$:ifa$<>chr$(32)thenb$=b$+a$
+ 7070 next
+ 7080 ifc$="GGGGGGGGGGGGGGGGGG"thenclose1:print"Bitte Taste druecken!":wait198,1:return
+ 7090 close15:close2
+ 7100 printa,c$tab(33)b$:a=a+1:c$="":b$="":forj=1to9:get#1,a$:next:next
+ 7200 print"{clr}TEXTE VERKETTEN"spc(26)"{down}{down}Wieviele Dateien (max. 4)? Irrtum > 1
+ 7210 getx$:x=val(x$):ifx<1orx>4then7210
+ 7215 ifx=1thenreturn
+ 7220 input"{down}{down}Neuer Dateiname?";db$:open15,8,15
+ 7230 fors=1tox:print"{down}Datei #"s;:inputd$(s):nexts
+ 7260 print"{down}{down}{rvon}Dateien werden verkettet.
+ 7270 onxgosub5,7300,7400,7500
+ 7280 return
+ 7300 da$="c0:"+db$+"=0:"+d$(1)+",0:"+d$(2):goto7600
+ 7400 da$="c0:"+db$+"=0:"+d$(1)+",0:"+d$(2)+",0:"+d$(3):goto7600
+ 7500 da$="c0:"+db$+"=0:"+d$(1)+",0:"+d$(2)+",0:"+d$(3)+",0:"+d$(4):goto7600
+ 7600 print#15,da$:gosub9100:close15:return
+ 8000 poke53280,0:poke53281,0:return
+ 8100 poke53280,12:poke53281,12:return
+ 8500 ifzb=36andza=54thent=t-.3
+ 8510 ifzb=36andza=72thent=t-.6
+ 8520 ifzb=54andza=36thent=t+.3
+ 8530 ifzb=54andza=72thent=t-.3
+ 8540 ifzb=72andza=36thent=t+.6
+ 8550 ifzb=72andza=54thent=t+.3
+ 8560 return
+ 9000 ifip=176thenma$=ae$
+ 9002 ifip=185thenma$=oe$
+ 9004 ifip=184thenma$=ue$
+ 9006 ifip=91thenma$=ga$
+ 9008 ifip=168thenma$=gi$
+ 9010 ifip=93thenma$=gu$
+ 9012 ifip=174thenma$=ss$
+ 9030 print#1,chr$(27)"l"chr$(11);chr$(0);:print#1,ma$+chr$(0)+chr$(0);:ip$="":goto5830
+ 9035 ifip=173thenprint#1,chr$(27)"-"chr$(1);:ip$=""
+ 9040 ifip=189thenprint#1,chr$(27)"e";:ip$=""
+ 9045 ifip=188thenprint#1,chr$(27)"e"chr$(27)"-"chr$(1);:ip$=""
+ 9050 ifip=190thenip$=chr$(14)
+ 9055 ifip=191thenprint#1,chr$(27)"-"chr$(1);:ip$=chr$(14)
+ 9060 ifip=170thenprint#1,chr$(27)"e";:ip$=chr$(14)
+ 9065 ifip=167thenprint#1,chr$(27)"e"chr$(27)"-"chr$(1);:ip$=chr$(14)
+ 9067 ifip=164thenprint#1,chr$(27)"f"chr$(27)"t"chr$(27)"h"chr$(27)"-"chr$(0);:ip$=chr$(20)
+ 9070 ifip=171thenza=36:ip$=""
+ 9072 ifip=179thenza=54:ip$=""
+ 9074 ifip=177thenza=72:ip$=""
+ 9076 ifip=172thenprint#1,chr$(27)"s"chr$(0);:ip$=""
+ 9078 ifip=187thenprint#1,chr$(27)"s"chr$(1);:ip$=""
+ 9090 ifzb<>zathengosub8500
+ 9092 goto5830
+ 9100 input#15,v$,w$,x$,y$:ifval(v$)<>0thenprint"{down}"v$,w$,x$,y$"{down}
+ 9110 return
+ 9200 open2,8,2,db$:gosub9100:ifval(v$)<>63thenclose2:print#15,"s0:"+cb$:goto6220
+ 9210 ifval(v$)=63thenprint"Datei ueberschreiben {rvon}(j/n)
+ 9220 getz$:ifz$=""then9220
+ 9230 ifz$="n"thenclose2:close15:goto6200
+ 9240 ifz$="j"thenclose2:print#15,"s0:"+cb$:gosub9100:goto6220
+ 9250 goto9220
+ 10000 x$="":x=0:q=0:w=0:print"{clr}{grn}Textprogramm {rvon}QUICKTEXT{rvof}{down}{down}
+ 10010 print"  Menue:"spc(34)"{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{down}{down}{rght}{rght}{rvon}1-{rvof} Text eingeben"spc(64)
+ 10020 print"{rvon}2-{rvof} Text korrigieren"spc(61)"{rvon}3-{rvof} Text formatieren"spc(61)
+ 10030 print"{rvon}4-{rvof} Text ausdrucken"spc(62)"{rvon}5-{rvof} Diskettenverwaltung"spc(58)
+ 10040 print"{rvon}6-{rvof} Briefkopf eingeben"spc(59)"{rvon}7-{rvof} Ende{down}{down}{down}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}Eingabe >
+ 10060 getx$:x=val(x$):ifx<1orx>7then10060
+ 10070 ifx=7thenpoke788,49:print"{clr}";:end
+ 10075 ifx=5then6000
+ 10080 onxgosub2000,3000,4000,5000,,11000:goto10000
+ 11000 print"{blu}{clr}Geben Sie bitte den Text des Briefkopfesein: (Irrtum = 0)
+ 11010 input"{down}Zeile 1 li:";w1$:ifw1$="0"thenreturn
+ 11015 input"{down}Zeile 2 li:";w2$
+ 11020 input"{down}Zeile 3 li:";w3$:input"{down}Zeile 4 li:";w8$
+ 11030 input"{down}Strasse:";w4$:input"{down}PLZ/Wohnort/PA:";w5$
+ 11050 input"{down}Telefon:";w6$:input"{down}Datum:";w7$
+ 11060 print"{down}Anschrift eingeben? (j/n)
+ 11070 gety$:ify$=""then11070
+ 11080 ify$="n"thenreturn
+ 11090 ify$="j"then11110
+ 11100 goto11070
+ 11110 print"{clr}":forp=1to5:print"{down}Zeile"p":";:inputa$(p):nextp:return
