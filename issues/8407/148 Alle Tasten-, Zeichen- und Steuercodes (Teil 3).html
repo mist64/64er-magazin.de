@@ -75,6 +75,11 @@
 
         <p>Die Funktionen der Codezahlen 129 und 149 bis 155 gelten nur für den C 64. Interessant ist übrigens, daß die 4. und 7. Spalte identisch ist, ebenso die 6. und 8. Spalte (außer dem Zeichen für 255).</p>
 
+        <figure>
+            TODO
+            <figcaption>Tabelle 1. ASCII-Code</figcaption>
+        </figure>
+
         <p>Ich möchte jetzt gern die Szene wechseln, ohne aber den ASCII-Code aus den Augen zu verlieren. Wir haben den ASCII-Code bisher verwendet, um Tasten abzufragen oder Funktionen auszuführen. PRINT CHR$(66) druckt zum Beispiel den Buchstaben B auf den Bildschirm.</p>
 
         <p>Welche Methoden kennen Sie noch, mit denen das gleiche erzielt werden kann?</p>
@@ -151,18 +156,16 @@
 
         <h3>Programm 1. Abfrage mit Gänsefuß</h3>
 
-        <p>
         <pre>
-410 PRINT "SHIFT und CLR/HOME"<br>
+410 PRINT "SHIFT und CLR/HOME"
 420 GET A$
-430 IFA$= "" THEN 420<br>
-440 IF A$= "f-1" THEN POKE 36879,126<br>
-450 IF A$= "f-2" THEN POKE 36879,45<br>
-460 IF A$= "f-3" THEN POKE 36879,25<br>
-470 IF A$= "@" THEN POKE 36879,27<br>
-480 GOTO 420<br>
+430 IFA$= "" THEN 420
+440 IF A$= "f-1" THEN POKE 36879,126
+450 IF A$= "f-2" THEN POKE 36879,45
+460 IF A$= "f-3" THEN POKE 36879,25
+470 IF A$= "@" THEN POKE 36879,27
+480 GOTO 420
 </pre>
-        </p>
 
         <p>Für den C 64 gelten in den Zeilen 440 bis 470 andere POKE-Adressen:<br>
             440 POKE 53280,6:POKE 53281,7<br>
@@ -202,6 +205,61 @@
         <p>Die reverse Darstellung mit CTRL-REV.ON einschalten (der Cursor bleibt auf seiner Stelle) und das T drücken, mit RETURN abschließen. Jetzt steht das Zeichen drin und das Programm läuft.</p>
 
         <p>Um Ihnen den Schritt 3 für alle widerborstigen Funktionen zu erleichtern, habe ich sie alle in der Tabelle 2 zusammengefaßt.</p>
+
+        <figure>
+            <table>
+                <tr>
+                    <td>BEDEUTUNG</td>
+                    <td>ASCII-CODE</td>
+                    <td>REVERSE DARSTELLUNG</td>
+                    <td>FINKELN</td>
+                </tr>
+                <tr>
+                    <td>LOCK<br>(Sperre der Zeichen-satz-Umschaltung</td>
+                    <td>8</td>
+                    <td><span class="inverted">H</span></td>
+                    <td>H</td>
+                </tr>
+                <tr>
+                    <td>UNLOCK<br>(Sperre aufheben)</td>
+                    <td>9</td>
+                    <td><span class="inverted">I</span></td>
+                    <td>I</td>
+                </tr>
+                <tr>
+                    <td>RETURN</td>
+                    <td>13</td>
+                    <td><span class="inverted">M</span></td>
+                    <td>M</td>
+                </tr>
+                <tr>
+                    <td>TEXT<br>(2. Zeichensatz)</td>
+                    <td>14</td>
+                    <td><span class="inverted">N</span></td>
+                    <td>N</td>
+                </tr>
+                <tr>
+                    <td>DEL<br>(Zeichen löschen)</td>
+                    <td>20</td>
+                    <td><span class="inverted">T</span></td>
+                    <td>T</td>
+                </tr>
+                <tr>
+                    <td>SHIFT RETURN<br>(Cursor auf Anfang der nächsten Zeile)</td>
+                    <td>141</td>
+                    <td><span class="inverted">&#x2572;</span></td>
+                    <td>SHIFT M</td>
+                </tr>
+                <tr>
+                    <td>GRAF<br>(1. Zeichensatz)</td>
+                    <td>142</td>
+                    <td><span class="inverted">&#x2571;</span></td>
+                    <td>SHIFT N</td>
+                </tr>
+            </table>
+
+            <figcaption>Tabelle 2. Funktionen, die im Gänsefuß-Modus nur durch »Finkein« eingetippt werden können</figcaption>
+        </figure>
 
         <p>Da ich hoffe, daß Sie in Zukunft fleißig finkeln werden, muß ich Sie noch über einen lästigen Nebeneffekt aufklären, der bei ein paar Finkeleien auftritt. Einige der Funktionen, nämlich RETURN, DELete (schon wieder) und das SHIFT-RETURN wirken nicht nur im Programmablauf wie vorgesehen, sondern auch beim LISTen, was lästig sein kann. (Allerdings ergeben sich dadurch auch ungeahnte Möglichkeiten — siehe Artikel »Synthetische Steuerzeichen«. Das geSHIFTete RETURN (ASCII-Code 14) ist sehr nützlich bei Platz- und Speichermangel. Sie können nämlich mit ” 0 &ldquo; in einer langen Programmzeile den Cursor mit nur drei Zeichen auf den Anfang der nächsten Zeile bringen, mit CHR$(141) bräuchten Sie schon neun Zeichen, mit SPC(&hellip;) müssen Sie sehr genau die Cursorposition berechnen, mit einer entsprechenden Anzahl von »Cursor-Rechts«-Zeichen geht es auch nur mühsam. Also, nützlich ist SHIFT-RETURN durchaus!</p>
 
@@ -300,6 +358,42 @@
         <p>Die Reihenfolge der Zeichen und ihr Code sehen Sie in der Tabelle 3. Sie ähnelt in mehreren Bereichen der ASCII-Reihenfolge, einige Spalten sind sogar identisch. Das macht eine Umrechnung — auch für das Betriebssystem — sehr einfach.</p>
 
         <p>Folgende Blöcke der beiden Codearten entsprechen einander:</p>
+
+        <table>
+            <tr>
+                <td>ASCII-CODE</td>
+                <td>BILDSCHIRM-CODE</td>
+            </tr>
+            <tr>
+                <td>0- 31</td>
+                <td>entspricht keinem Zeichen</td>
+            </tr>
+            <tr>
+                <td>32 - 64</td>
+                <td>32 - 64</td>
+            </tr>
+            <tr>
+                <td>64 - 95</td>
+                <td>0 - 31</td>
+            </tr>
+            <tr>
+                <td>96 - 127<br>192 - 223</td>
+                <td>64 - 95</td>
+            </tr>
+            <tr>
+                <td>128 - 159</td>
+                <td>entspricht keinem Zeichen</td>
+            </tr>
+            <tr>
+                <td>160 - 191<br>224 - 255</td>
+                <td>96 - 127</td>
+            </tr>
+            <tr>
+                <td>entspricht keinem ASCII-Code</td>
+                <td>128 - 255</td>
+            </tr>
+        </table>
+
 
         <p>Ein Programm zur Umrechnung von ASCII-Code in Bildschirm-Code sieht dementsprechend aus wie in Programm 3 (VC 20 und C 64).</p>
 
