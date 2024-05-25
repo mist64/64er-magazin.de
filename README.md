@@ -29,10 +29,20 @@ Das Projekt verwendet ein einfaches in Python geschriebenes "CMS". Es nimmt HTML
 Das Skript braucht (macOS):
 ```
 brew install imagemagick     # to convert PNG to JPG
-pip3 install bs4             # to work with HTML
-pip3 install python-dateutil # to work with dates
-pip3 install pytz            # ...and timezones
-pip3 install PyPDF2          # to cut PDFs
+brew install vice            # to generate PRG from TXT (via petcat)
+
+python3 -m pip install -r requirements.txt
+# pip3 install beautifulsoup4    # to work with HTML
+# pip3 install python-dateutil   # to work with dates
+# pip3 install pytz              # ...and timezones
+# pip3 install PyPDF2            # to cut PDFs
+```
+
+Die Python-Packages können auch in eine virtuelle Umgebung installiert werden:
+```
+python3 -m venv .venv                       # create a virtual environment
+source .venv/bin/activate                   # activate it 
+python3 -m pip install -r requirements.txt  # install the required packages
 ```
 
 Die Eingabe-Ausgaben werden aus `issues` gelesen, die Website wird nach `out` geschrieben. Befindet man sich gerade auf einem git-Branch (außer `main`), ist die Website in `out/pre/<Name des Branches>`.
