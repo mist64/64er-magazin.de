@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>Epson für Commodore 64</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="A. Wängler, T. Krätzig">
+    <meta name="64er.issue" content="6/84">
+    <meta name="64er.pages" content="34-36">
+	<meta name="64er.head1" content="Centronics-Schnittstelle">
+	<meta name="64er.head2" content="C 64">
+    <meta name="64er.toc_category" content="Hardware">
+	<meta name="64er.toc_title" content="Drucker für Anspruchsvolle: Der Epson am C 64">
+    <meta name="64er.index_title" content="Centronics-Schnittstelle für Epson FX-80 (mit Kabel)">
+    <meta name="64er.index_category" content="Hardware|Schnittstellen">
+    <meta name="64er.id" content="epson">
+</head>
+
+<body>
+    <article>
+        <h1>Epson für Commodore 64</h1>
+
+        <p class="intro">Ein Beweis für die Vielseitigkeit des User-Ports ist seine Programmierung als Centronics-Schnittstelle. Daß dies mit wenig Material, einem Lötkolben und einer Stunde Zeit zu realisieren ist, zeigt dieser Bericht am Beispiel der Epson-Drucker.</p>
+
+        <figure>
+            <table>
+                <tr>
+                    <th colspan="2">Drucker</th>
+                    <th colspan="2">User-Port</th>
+                </tr>
+                <tr>
+                    <th>Pin Nummer</th>
+                    <th>Bezeichnung</th>
+                    <th>Bezeichnung</th>
+                    <th>Pin Nummer</th>
+                </tr>
+                <tr>
+                    <td>1</td>
+                    <td>STROBE</td>
+                    <td>PA2</td>
+                    <td>M</td>
+                </tr>
+                <tr>
+                    <td>2</td>
+                    <td>DATA 1</td>
+                    <td>PB0</td>
+                    <td>C</td>
+                </tr>
+                <tr>
+                    <td>3</td>
+                    <td>DATA 2</td>
+                    <td>PB1</td>
+                    <td>D</td>
+                </tr>
+                <tr>
+                    <td>4</td>
+                    <td>DATA 3</td>
+                    <td>PB2</td>
+                    <td>E</td>
+                </tr>
+                <tr>
+                    <td>5</td>
+                    <td>DATA 4</td>
+                    <td>PB3</td>
+                    <td>F</td>
+                </tr>
+                <tr>
+                    <td>6</td>
+                    <td>DATA 5</td>
+                    <td>PB4</td>
+                    <td>H</td>
+                </tr>
+                <tr>
+                    <td>7</td>
+                    <td>DATA 6</td>
+                    <td>PB5</td>
+                    <td>J</td>
+                </tr>
+                <tr>
+                    <td>8</td>
+                    <td>DATA 7</td>
+                    <td>PB6</td>
+                    <td>K</td>
+                </tr>
+                <tr>
+                    <td>9</td>
+                    <td>DATA 8</td>
+                    <td>PB7</td>
+                    <td>L</td>
+                </tr>
+                <tr>
+                    <td>10</td>
+                    <td>ACKNLG</td>
+                    <td>FLAG2</td>
+                    <td>B</td>
+                </tr>
+                <tr>
+                    <td>16</td>
+                    <td>GND</td>
+                    <td>GND</td>
+                    <td>A</td>
+                </tr>
+            </table>
+
+        </figure>
+
+        <p>Für den Anschluß eines Druckers an den C 64 ist zunächst nur der serielle Bus, an dem auch das Diskettenlaufwerk angeschlossen ist, vorgesehen. Dieses Konzept, mehrere Geräte an einer Schnittstelle zu betreiben, hält zum einen die Anzahl der Anschlüsse am Computer in Grenzen, zum anderen genügt für die Verbindung ein einfaches Kabel. Des weiteren kann man sich auf ein einheitliches Protokoll zur Datenübertragung von und zu den Geräten beschränken (bei Commodore mittels OPEN, CLOSE, CMD, PRINT mit logischer Datei- und Gerätenummer).</p>
+
+        <p>Der Nachteil dabei ist, daß man nur die von Commodore angebotene Peripherie direkt anschließen kann, wie zum Beispiel die Drucker 1526, 1525, 1520 oder den MPS 801. Möchte man aber einen Drucker eines anderen Herstellers wie zum Beispiel einen Epson MX/RX und FX-80 (Bild 1) anschließen, ist es mit einer einfachen Kabelverbindung oft nicht mehr getan. Standard bei Druckern ist nicht der serielle Bus von Commodore, sondern die Centronics- und die RS232-Schnittstelle. Die Epson-Drucker sind dabei in der Regel mit einer Centronics- Schnittstelle ausgestattet.</p>
+
+        <figure>
+            <img src="34-1.png" alt="">
+            <figcaption>Bild 1. Der Epson-FX-80-Drucker</figcaption>
+        </figure>
+
+        <p>Die Lösung dieses Anschlußproblems ist auf zwei verschiedenen Wegen möglich. Entweder wird ein vergleichsweise teures Interface zwischen C 64 und dem Epson zwischengeschaltet beziehungsweise in den Drucker eingebaut, oder, was preiswerter und flexibler ist, es wird der User-Port als Centronics-Schnittstelle programmiert.</p>
+
+        <p>Voraussetzung dafür ist allerdings, daß der User-Port nicht anderweitig benötigt wird (EPROM-Brenner, Modem, RS232 etc.). Von der elektronischen Seite gibt es gegen eine Direktverbindung keine Einwände, solange der Eingang am Drucker den mit dem User-Port verbundenen CIA nicht mehr als mit den im Datenblatt spezifizierten 3.2 mA im Low-Zustand pro Signalleitung belastet. Wir haben an einem Epson-FX-80-Drucker einen Eingangs-Kurzschlußstrom von 1,6 mA gemessen, womit ein sicherer Betrieb des CIA garantiert ist. Außer dem beschriebenen Kabel ist keine weitere Hardware erforderlich.</p>
+
+        <p>Man benötigt nun einen 24poligen User-Port-Stecker (zum Beispiel TRW 251-12-50-17081/350-4SN-9) sowie einen 36poligen Centronics-Stecker (zum Beispiel Amphenol 57-30360). Die Centronics-Konvention verlangt ein abgeschirmtes Kabel und schreibt vor, daß alle Signalleitungen mit einer eigenen Signalmasse-Leitung verdrillt werden müssen. Unser C 64 arbeitet aber trotz Verzicht auf diesen Aufwand bisher fehlerfrei mit einem FX-80 zusammen.</p>
+
+        <p>Das Kabel (Bild 2 und 3): Es müssen elf Verbindungen hergestellt werden (Flach- und Rundkabel).</p>
+
+        <figure>
+            <img src="34-2.png" alt="">
+            <figcaption>Bild 2. Das Verbindungskabel vom User-Port zur Centronics-Schnittstelle</figcaption>
+        </figure>
+        <figure>
+            <img src="34-3.png" alt="">
+            <figcaption>Bild 3. Der Verkabelungsplan</figcaption>
+        </figure>
+
+        <h2>Die Treibersoftware</h2>
+
+        <p>Die Software arbeitet einwandfrei mit Programmen zusammen, die eine ASCII-Ausgabe-Option besitzen, wie dies bei den meisten Textverarbeitungsprogrammen der Fall ist. Es soll hier auch lediglich der Hard- und Software-Kern der Schnittstelle dargestellt werden.</p>
+
+        <p>Das Programm ist mit 87 Byte Länge sehr kurz und kann damit im Kassetten-Puffer ($033C bis $03FB), oder wie hier im sonst ungenutzten Bereich ($02A7 bis $02FF) untergebracht werden. Es wirkt wie folgt: Die Standard-Zeichenausgaberoutine des Betriebssystems, CHROUT, wird durch einen geänderten Vektor in das Erweiterungsprogramm umgeleitet. Dieses überprüft, ob die Ausgabe über Gerätenummer 4 (Standardnummer für Drucker) erfolgen soll. Wenn nicht, springt es sofort in das Betriebssystem zurück. Ansonsten wird das zu übertragende Byte an CIA2 Port B gelegt und über einen Strobe-Impuls über Port A, Bit 2 dem Drucker mitgeteilt, daß die anliegenden Daten gültig sind. Der Drucker quittiert den Datenempfang über das Acknowledge-Signal. Dieses setzt am C 64 über den FLAG-2-Eingang Bit 4 des Interrupt-Registers von CIA 2. Der CIA wird so programmiert, daß dadurch aber kein Interrupt ausgelöst wird. Das Programm wartet vielmehr, bis dieses Bit gesetzt ist, löscht es beim Auslesen automatisch und springt erst dann in das rufende Hauptprogramm zurück. Damit ist ein voller Handshake gewährleistet.</p>
+
+        <p>Aus dem Assemblerlisting (Bild 4) geht eine Gliederung in drei Abschnitte hervor:<br>
+            1. Zeile 190-280<br>
+            Abfrage, ob Ausgabe über Gerätenummer 4 erfolgen soll<br>
+            Bei ASCII-Code 13 (Carriage Return) wird automatisch noch ein ASCII-Code 10 (Line Feed) gesendet. Durch Weglassen der Zeilen 250 bis 280 wird kein automatischer Line Feed gesendet.<br>
+            2. Zeile 320-420<br>
+            Ausgabe eines Byte<br>
+            3. Zeile 500-670<br>
+            Programmierung des CIA2 für die Ausgabe. Umstellen des Ausgabevektors auf den Programmteil 1</p>
+
+        <figure>
+            <img src="34-4.png" alt="">
+            <figcaption>Bild 4. Das Assemblerlisting</figcaption>
+        </figure>
+
+        <h2>Die praktischen Anwendungen</h2>
+
+        <p>Der Umgang mit dieser Schnittstelle gestaltet sich im praktischen Betrieb recht einfach und problemlos. Das Programm wird in der vorliegenden Form in den Bereich $02A7 bis $02FD geladen und durch Aufruf des Initialisierungsteils JSR $02D4 beziehungsweise SYS 724) für die Druckausgabe vorbereitet. Das kann zum Beispiel der angefügte Basic-Lader (Bild 5) übernehmen. Man kann dann zum Beispiel ein Basic-Programm mit folgender Sequenz listen:</p>
+
+        <pre>
+OPEN 1,4 : CMD 1 : LIST
+</pre>
+
+
+        <p>Damit werden sämtliche Daten über den Drucker ausgegeben und nach:</p>
+
+        <pre>
+PRINT # 1 : CLOSE 1
+</pre>
+
+
+        <p>werden die Daten wieder auf den Bildschirm ausgegeben.</p>
+
+		<figure>
+            <pre data-filename="centronics" data-name="Centronics"></pre>
+			<figcaption>Bild 5. Der Basic-Lader</figcaption>
+		</figure>
+
+        <p>Man beachte, daß nach Drücken der Kombination RUN/STOP RESTORE (non maskable Interrupt) sämtliche Zeiger auf ihre Standardwerte zurückgestellt sind. Deshalb muß die Schnittstelle durch SYS 724 wieder neu initialisiert werden.</p>
+
+        <p>Die Möglichkeiten, einen Drucker wie den Epson MX/FX-80 mit einer solchen Schnittstelle zu betreiben, sind beinahe unbegrenzt. So ist es beispielsweise möglich, ein Hardcopyprogramm zu schreiben, mit dem Ausdrucke in der Form des Bildes 6 ausgedruckt werden können. Ein Epson FX-80 braucht für ein solches Bild etwa 32, in doppelter Größe zirka 70 Sekunden. Auch ist es möglich, im Grafik-Modus einen neuen Zeichensatz mit near-Letter-Quality zu entwerfen. Dieser druckt dann, zwar deutlich langsamer, aber dafür wesentlich schöner, zum Beispiel wichtige Briefe, aus.</p>
+
+        <figure>
+            <img src="34-6.png" alt="">
+            <figcaption>Bild 6. Probeausdruck einer Hardcopy</figcaption>
+        </figure>
+
+        <p>Die Nachteile dieser Lösung sind natürlich immer im Verhältnis zum finanziellen Aufwand zu sehen. So ist es mit dem abgebildeten Basicprogramm nicht möglich, die Steuer- und Grafikzeichen des Commodore 64 auszudrucken. Auch der gezeigte Hardcopyausdruck ist nur mit einem zusätzlichen Programm zu realisieren.</p>
+
+        <p>Bei weiterem Interesse können Sie sich an die Autoren wenden.</p>
+
+        <address class="author">(A. Wängler/T. Krätzig)</address>
+    </article>
+
+</body>
+
+</html>

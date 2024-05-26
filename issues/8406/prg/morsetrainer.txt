@@ -1,0 +1,212 @@
+;morsetrainer ==0801==
+;Quelle: "1984-06.d64", zur Verfügung gestellt von von BJ64
+;        https://www.forum64.de/index.php?thread/145873-64er-magazin-monatlich-online/&postID=2127851#post2127851
+    0 rem *****************************
+    1 rem *                           *
+    2 rem * morsetrainer + dolmetcher *
+    3 rem * c by jens martens und     *
+    4 rem *     stefan ingenhorst     *
+    5 rem *                           *
+    6 rem *****************************
+    7 rem ******andromat software******
+    8 rem *****************************
+    9 gosub20000
+   10 poke55,200:poke56,47:clr:m$="":fori=54272to54300:pokei,0:next
+   20 rem ********************************
+   25 rem * neue zeichen;77-kurz,78-lang *
+   30 rem ********************************
+   40 poke56334,peek(56334)and254:poke1,peek(1)and251
+   50 fori=0to2048:ifi=iithengosub10000
+   60 poke12288+i,peek(53248+i):next
+   70 poke1,peek(1)or4:poke56334,peek(56334)or1
+   80 poke53272,(peek(53272)and240)or12
+   90 reada:ifa=-1then160
+  100 forj=0to7:readb:poke12288+a*8+j,b:next:goto90
+  110 data 77,0,0,0,24,24,0,0,0
+  120 data 78,0,0,0,126,126,0,0,0
+  130 data-1
+  140 rem ***************
+  150 rem ** set sound **
+  155 rem ***************
+  160 w=54276:poke54277,32:poke54278,242
+  170 poke54272,157:poke54273,69
+  180 poke54296,15
+  190 rem **********************
+  200 rem ** morsedaten lesen **
+  201 rem **********************
+  205 dimm$(255)
+  210 readm:ifm=-1then300
+  220 readm$:m$(m)=m$:goto210
+  290 rem ***********
+  291 rem ** menue **
+  292 rem ***********
+  300 print"{clr}"tab(13)"{orng}{down}{rvon}* m e n u e *{rvof}"
+  320 print"{yel}{down}{down}{down}{down}{rght}{rght}{rvon}1{rvof} computer morst zufallstext"
+  330 print"{down}{down}{rght}{rght}{rvon}2{rvof} computer morst eingegebenen text"
+  340 print"{down}{down}{rght}{rght}{rvon}3{rvof} computer empfaengt"
+  350 print"{down}{down}{rght}{rght}{rvon}4{rvof} morsezeichen auflisten"
+  360 print"{down}{down}{rght}{rght}{rvon}5{rvof} programm beenden"
+  370 input"{down}{down}{down}{rght}{rght}bitte waehlen ";m:ifm<1orm>5then300
+  380 onmgoto1000,2000,3000,4000,5000
+  990 rem ***************************
+  991 rem ** zufallstextgeneration **
+  992 rem ***************************
+ 1000 print"{clr}{down}{down}{down}{down}{rght}{rght}bitte geschwindigkeit waehlen"
+ 1010 input"{down}{rght}{rght}(in worten pro minute) ";g
+ 1020 m$="":fori=1to40:m$=m$+" ":forj=1to5
+ 1030 a=int(65*rnd(1))+34:ifm$(a)=""then1030
+ 1040 m$=m$+chr$(a):nextj,i
+ 1050 print:print:print
+ 1060 form=1to252step36:printmid$(m$,m,36):next
+ 1070 goto2500
+ 1997 rem ******************
+ 1998 rem ** eigener text **
+ 1999 rem ******************
+ 2000 print"{clr}{down}{down}{down}{rght}{rght}bitte text eingeben !"
+ 2020 print"{down}{down}{rght}{rght}wenn fertig, 'f1' druecken ."
+ 2030 m$=""
+ 2040 getz$:ifz$=""then2040
+ 2050 ifasc(z$)=133then2100
+ 2060 ifasc(z$)=20thenm$=left$(m$,len(m$)-1):goto2080
+ 2065 ifm$(asc(z$))=""then2040
+ 2070 m$=m$+z$:iflen(m$)>254then2100
+ 2080 print"{home}{down}{down}{down}{down}{down}{down}{down}{down}{rght}{rght}"m$"  "
+ 2090 goto2040
+ 2100 print"{home}":fork=1to8:printchr$(17):next:print"{rght}{rght}{orng}text uebernommen .{yel}"
+ 2110 print"{down}{rght}{rght}welche geschwindigkeit"
+ 2120 input"{down}{rght}{rght}(in worten/minute){up}{up}{rght}{rght}{rght}{rght}{rght}";g
+ 2497 rem *****************
+ 2498 rem ** uebersetzen **
+ 2499 rem *****************
+ 2500 g=20/g*46
+ 2510 fori=1tolen(m$):a=asc(mid$(m$,i,1))
+ 2515 ifa=32thengoto2900
+ 2520 forj=1tolen(m$(a)):b=asc(mid$(m$(a),j,1))
+ 2530 ifb=205thengosub2700
+ 2540 ifb=206thengosub2800
+ 2550 nextj:fork=1tog:nextk
+ 2560 nexti
+ 2565 print"{down}{rght}{rght}bitte taste druecken "
+ 2570 poke198,0:wait198,1:poke198,0:goto300
+ 2700 pokew,33:fork=1tog:next:pokew,32:fork=1tog:next:return
+ 2800 pokew,33:fork=1to3*g:next:pokew,32:fork=1tog:next:return
+ 2900 fork=1to3*g:next:goto2560
+ 2997 rem **************************
+ 2998 rem * morsezeichen empfangen *
+ 2999 rem **************************
+ 3000 print"{clr}{down}geben sie jetzt ihre morse-zeichen ueber{down}die taste 'f7' ein !"
+ 3005 print"{down}wenn fertig, ca. 5 sec warten und danach{down}taste erneut druecken"
+ 3030 print"{down}{down}{rvon}{lblu}alles roger{rvof}{yel} es kann jetzt losgehen !"
+ 3100 w=54276:i=49152
+ 3110 poke198,0:wait198,1:poke198,0
+ 3120 ifpeek(203)<>64then3200
+ 3160 pokew,32:sys65499
+ 3170 ifpeek(203)=64then3170
+ 3180 goto3330
+ 3200 pokew,33:sys65499
+ 3210 ifpeek(203)<>64then3210
+ 3330 ifti>255then3500
+ 3340 pokei,ti:i=i+1:goto3120
+ 3497 rem ********************
+ 3498 rem * morse-auswertung *
+ 3499 rem ********************
+ 3500 print"{down}{down}es folgt die auswertung":print"{down}{orng}":m=0:m$=""
+ 3510 forii=49152toi-1:m=m+peek(ii):next
+ 3520 m=m/(i-49152)
+ 3530 forii=49152toi-1:n=peek(ii)
+ 3540 ifn>mand(ii/2<>int(ii/2))thengosub3600:m$=""
+ 3550 ifn<mand(ii/2=int(ii/2))thenm$=m$+chr$(205)
+ 3560 ifn>mand(ii/2=int(ii/2))thenm$=m$+chr$(206)
+ 3570 next:gosub3600
+ 3580 print:print"{yel}{down}{down}bitte taste druecken"
+ 3590 poke198,0:wait198,1:poke198,0:goto300
+ 3600 forj=32to90
+ 3610 ifm$=m$(j)thenprintchr$(j);
+ 3620 next
+ 3630 ifn>m*3thenprintchr$(32);
+ 3640 return
+ 3997 rem ******************
+ 3998 rem * zeichentabelle *
+ 3999 rem ******************
+ 4000 m=0:n=0:print"{clr}":fori=1to100:ifm$(i)=""then4100
+ 4010 m$=m$(i):ifi=32then4100
+ 4020 printtab(m*15)chr$(i)" = "m$:n=n+1:ifn=19thenprint"{home}":n=0:m=m+1
+ 4100 next
+ 4200 print"{home}{rght}{rght}":fork=1to11:printchr$(17):next:print"bitte taste druecken"
+ 4300 poke198,0:wait198,1:poke198,0:goto300
+ 4997 rem **********
+ 4998 rem * abgang *
+ 4999 rem **********
+ 5000 print"{clr}"spc(11)"{down}{down}{down}{down}ok, das war's"
+ 5010 fori=1to2000:next:sys64738
+ 9998 rem **************
+ 10000 poke214,22:print:poke211,ii/100
+ 10010 print" {rvon}{lblu} bitte warten {rvof}{yel}"
+ 10015 ii=ii+100
+ 10020 return
+ 19997 rem *************
+ 19998 rem * titelbild *
+ 19999 rem *************
+ 20000 poke53280,0:poke53281,0
+ 20010 print"{clr}{yel}"spc(7)"W   W"spc(20)"{red}{rvon}{SHIFT-POUND} {rvof}{SHIFT-POUND}{yel}"
+ 20020 printspc(8)"{CBM-B} {CBM-D}{CBM-V}"spc(19)"{red}{rvon}{SHIFT-POUND} {rvof}{SHIFT-POUND}{yel}"
+ 20030 printspc(9)"{CBM-B}{CBM-V}"spc(19)"{red}{rvon}{SHIFT-POUND} {rvof}{SHIFT-POUND}{yel}"
+ 20040 printspc(8)"{CBM-D}{CBM-V}{CBM-B}    {CBM-*}"spc(13)"{red}{rvon}{SHIFT-POUND} {rvof}{SHIFT-POUND}{yel}"
+ 20050 printspc(7)"W{CBM-V}  {CBM-B}   {CBM-D}"spc(12)"{red}{rvon}{SHIFT-POUND}    {rvof}{SHIFT-POUND}{yel}"
+ 20060 printspc(12)"{CBM-B}  {CBM-D}"spc(14)"{red}{rvon}{SHIFT-POUND} {rvof}{SHIFT-POUND}{yel}"
+ 20070 printspc(13)"{CBM-B} {CBM-D}"spc(13)"{red}{rvon}{SHIFT-POUND} {rvof}{SHIFT-POUND}{yel}"
+ 20080 printspc(14)"{CBM-B}{CBM-V}"spc(11)"{red}{rvon}{CBM-*}{SHIFT-POUND} {rvof}{SHIFT-POUND}{yel}"
+ 20090 printspc(10)"{rvon}{CBM-*}{rvof}{CBM-F}{CBM-F}{CBM-F}{CBM-V}{CBM-V}"spc(11)"{red}{rvon}  {rvof}{SHIFT-POUND}"
+ 20100 printspc(27)"{red}{rvon}  {CBM-*}{rvof}"
+ 20110 printspc(11)"{yel}{down}{down}{down}morsezeichen"
+ 20120 printspc(7)"{gry3}{down}{down}{rvon}c{rvof} by jens martens und":printtab(14)"{down}stefan ingenhorst"
+ 20130 print"{yel}{down}{down}{rght}{rght}{rght}{rght}{rvon}a n d r o m a t - s o f t w a r e{rvof}"
+ 20140 return
+ 29997 rem ********************
+ 29998 rem ** morse-alphabet **
+ 29999 rem ********************
+ 30000 data32," "
+ 30010 data34,"MNMMNM",39,"MNNNNM"
+ 30020 data40,"NMNNM",41,"NMNNMN"
+ 30030 data43,"MNMNM",45,"NMMMMN"
+ 30040 data46,"MNMNMN",47,"NMMNM"
+ 30050 data48,"NNNNN",49,"MNNNN"
+ 30060 data50,"MMNNN",51,"MMMNN"
+ 30070 data52,"MMMMN",53,"MMMMM"
+ 30080 data54,"NMMMM",55,"NNMMM"
+ 30090 data56,"NNNMM",57,"NNNNM"
+ 30100 data44,"NNMMNN",61,"NMMMN"
+ 30110 data63,"MMNNMM",65,"MN"
+ 30120 data66,"NMMM",67,"NMNM"
+ 30130 data68,"NMM",69,"M"
+ 30140 data70,"MMNM",71,"NNM"
+ 30150 data72,"MMMM",58,"NNNMMM"
+ 30160 data73,"MM",74,"MNNN"
+ 30170 data75,"NMN",76,"MNMM"
+ 30180 data77,"NN",78,"NM"
+ 30190 data79,"NNN",80,"MNNM"
+ 30200 data81,"NNMN",82,"MNM"
+ 30210 data83,"MMM",84,"N"
+ 30220 data85,"MMN",86,"MMMN"
+ 30230 data87,"MNN",88,"NMMN"
+ 30240 data89,"NMNN",90,"NNMM",-1
+ 35000 rem ***************************
+ 35010 rem sys 65499 <=>  ti$="000000"
+ 35020 rem sys 64738 <=>  system reset
+ 35030 rem ***************************
+ 35040 rem     variablentabelle
+ 35050 rem ***************************
+ 35060 rem m$(x) <=> morsezeichen zu x
+ 35070 rem g  <=> morsegeschwindigkeit
+ 35080 rem m$,z$  <=> hilfs-string
+ 35090 rem w  <=>si:voice i: waveform
+ 35100 rem a,b,i,ii,k <=> hilfszaehler
+ 35110 rem ti <=> timer in sec/60
+ 35120 rem ****************************
+ 35130 rem abspeicherung der timerwerte
+ 35140 rem zum entschluesseln der morse
+ 35150 rem zeichen ab 49152 (dez.)
+ 35160 rem ****************************
+ 35170 rem neuer zeichensatz ab 12228
+ 35180 rem ****************************
+

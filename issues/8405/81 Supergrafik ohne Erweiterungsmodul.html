@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+	<title>Supergrafik ohne Erweiterungsmodul</title>
+	<meta charset="UTF-8">
+	<link rel="stylesheet" href="../style.css">
+	<meta name="author" content="Rudolf Dörr">
+	<meta name="64er.issue" content="5/84">
+	<meta name="64er.pages" content="81">
+	<meta name="64er.head1" content="Supergrafik">
+	<meta name="64er.head2" content="VC 20">
+	<meta name="64er.toc_title" content="Supergrafik ohne Erweiterungsmodul (VC 20)">
+	<meta name="64er.toc_category" content="Programme zum Abtippen|Grafik">
+	<meta name="64er.index_title" content="Supergrafik ohne Erweiterungsmodul">
+	<meta name="64er.index_category" content="Listings zum Abtippen|Grafik|Auflösung">
+	<meta name="64er.id" content="supergrafik">
+</head>
+
+<body>
+	<article>
+		<h1>Supergrafik ohne Erweiterungsmodul</h1>
+
+		<p class="intro">Bekanntlich benötigt man für den VC 20 das Erweiterungsmodul, um hochauflösende Grafik darzustellen. Die Auflösung beträgt damit 160 mal 160 Punkte. Das abgedruckte Basicprogramm liefert aber eine Auflösung von 176 mal 184 Punkten.</p>
+
+		<p>Nun eine knappe Erläuterung des Programms:</p>
+
+		<p>Die Idee besteht darin, den Zugriff des Zeichengenerators in den freien RAM-Bereich zu legen. Immer wenn in eines der 22 x 23 = 506 Kästchen ein erster Punkt gesetzt werden soll, wird dieses Kästchen mit einem neuen Bildschirm-Code belegt. Damit können 256 der 506 Kästchen angesprochen werden, was wohl für die allermeisten Anwendungen ausreicht, insbesondere für das Erstellen von Funktionsgrafen. In Zeile 10 wird der neue Bereich für die Zeichen (5120 bis 7167) vor Basic geschützt. Die DATA-Zeilen 20 und 22 beinhalten ein kleines Maschinen-Programm, das den Bereich von 5120 bis 7167 vor jedem Programmlauf löscht (eine Basic-Routine würde dazu lästige Sekunden benötigen). In Zeile 135 wird nun der Zugriff des Zeichengenerators auf den freien RAM-Bereich bewerkstelligt.</p>
+
+		<p>In den Zeilen 300 bis 999 können Programmteile für die Bereitstellung der X und Y-Koordinaten eines Punktes untergebracht werden. Die Koordinate X darf Werte zwischen 0 und 175, die Koordinate Y Werte zwischen 0 und 183 annehmen. Das abgedruckte Programm generiert eine Sinuslinie.</p>
+
+		<p>Nach Ablauf des Programms wartet der VC 20 auf einen Tastendruck und schaltet dann in den Normal-Modus zurück.</p>
+
+		<p>Der eigentliche Grafikteil steht im Unterprogramm ab Zeile 4000. Zunächst werden aus X und Y die Koordinaten XS und YS eines der 506 Kästchen errechnet, danach das anzusprechende Byte BY und das Bit BI. Nach Feststellung des zu verwendenden Bildschirm-Codes in Zeile 4040 wird der Inhalt der entsprechenden Adresse im Zeichengeneratorbereich mit einer geeignet gewählten Zahl codiert. Dies führt dann zur Entstehung eines Punktes an der Stelle X, Y. Zusätzlichen Erweiterungen des Programms setzt nur der Speicher Grenzen.</p>
+
+		<address class="author">(Rudolf Dörr)</address>
+
+		<figure>
+            <pre data-filename="supergraphik" data-name="Supergraphik"></pre>
+			<figcaption>Listing, um Grafiken mit 176 und 184 Punkten darzustellen</figcaption>
+		</figure>
+
+        <aside class="fehlerteufelchen" id="fehlerteufelchen">
+			<h2>Fehlerteufelchen</h2>
+			<p>In Zeile 4030 muß es heißen ... THEN BC=BC+1: ....</p>
+			<!-- 64'er 6/1984 -->
+		</aside>
+
+	</article>
+
+</body>
+
+</html>

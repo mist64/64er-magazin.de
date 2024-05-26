@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>Diskettenzauberei</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="Uwe Repplinger">
+    <meta name="64er.issue" content="5/84">
+    <meta name="64er.pages" content="88-89">
+    <meta name="64er.head1" content="Tips & Tricks">
+    <meta name="64er.head2" content="C 64/VC 20">
+    <meta name="64er.toc_title" content="Diskettenzauberei: Name und ID ändern (C 64)">
+    <meta name="64er.toc_category" content="Programme zum Abtippen|Tips & Tricks">
+    <meta name="64er.index_title" content="Diskettenzauberei">
+    <meta name="64er.index_category" content="Listings zum Abtippen|Tips & Tricks|Floppy">
+    <meta name="64er.id" content="diskettenname">
+</head>
+
+<body>
+    <article>
+        <h1>Diskettenzauberei</h1>
+
+        <p class="intro">Wenn Sie über eine reichhaltige Diskettensammlung verfügen, ist sicherlich schon der Wunsch aufgetaucht, den Namen und/oder die ID einer bestimmten Diskette zu ändert, ohne dabei den Disketteninhalt zu zerstören. Wir zeigen Ihnen, wie es geht.</p>
+
+        <p>Mit dem DOS-Befehl »RENAME« ist es möglich, bestehenden Dateien einen neuen Namen zu geben. Dieser Befehl wirkt leider nur auf Dateiebene und nicht auch auf Diskettenebene, das heißt, es ist nicht möglich, den Diskettennamen und/oder die ID zu verändern. Dazu existiert der DOS-Befehl »NEW«, der den manchmal unerwünschten Nebeneffekt hat, daß sämtliche Programme und Dateien auf der Diskette gelöscht werden. Diesen Nachteil behebt das nachfolgend beschriebene Programm (siehe Listing).</p>
+
+        <p>Mit diesem Programm ist es möglich, den Namen und/oder die ID einer Diskette zu ändern, ohne daß der Disketteninhalt gelöscht wird. Es läuft auf jedem Commodore-Computer mit minimal 40 Zeichen pro Zeile. Durch kleine Änderungen bei der Bildschirmausgabe kann es auch auf einem VC 20 verwendet werden. Es können alle Floppys mit DOS 2A (also 1540, 1541, 4031, 4040) verwendet werden, wobei darauf zu achten ist, daß sich bei Doppelfloppys die zu ändernde Diskette in Drive 0 befindet.</p>
+
+        <p>Programmbedienung</p>
+
+        <p>Nachdem das Programm von Diskette oder Kassette geladen und mit RUN gestartet wurde, erscheint zuerst die Frage, ob die zu ändernde Diskette eingelegt ist. Ist dies nicht der Fall, kann das Programm gegebenenfalls durch Eingabe von »N« unterbrochen und durch Drücken der RETURN-Taste fortgesetzt werden. Als nächstes erscheint der Name und die ID der eingelegten Diskette auf dem Bildschirm.</p>
+
+        <p>Beantwortet man die Frage, ob der Name geändert werden soll, mit »J«, besteht die Möglichkeit, den neuen Diskettennamen einzugeben. Falls der eingegebene Name länger als 16 Zeichen ist, werden automatisch nur die ersten 16 verwendet. Gleiches gilt auch für die Eingabe der ID, deren maximale Länge 2 Zeichen beträgt.</p>
+
+        <p>Danach wird die Diskette geändert. Das Ende dieses Vorganges wird durch die Ausgabe von »DISKETTE GEÄNDERT -=- PROGRAMMENDE« angezeigt. Die Diskette ist nun mit dem neuen Namen versehen. Doch wie kam es dazu? Um diese Frage beantworten zu können, sollte man sich die Datenstruktur auf der Diskette etwas näher betrachten.</p>
+
+        <p>Die Diskette ist in 35 konzentrische Spuren aufgeteilt, die aus mehreren Sektoren bestehen. Jeder Sektor ist 256 Byte lang. Damit sich der Computer auch später noch zurechtfindet, wird ein Inhaltsverzeichnis angelegt (das sogenannte DIRECTORY). In diesem Inhaltsverzeichnis befindet sich eine Liste der belegten und freien Sektoren, der Diskettenname, die ID und eine Liste der auf der Diskette gespeicherten Programme und Dateien.</p>
+
+        <p>Der hier interessierende Teil — Diskettenname und ID — ist auf Spur 18, Sektor 0 gespeichert. Der Name belegt in diesem Sektor die Bytes 144 bis 161, die ID 162 und 163. Nun stellt sich die Frage, wie diese Byte geändert werden können. Zu diesem Zwecke stellt das DOS sogenannte Direkt-Zugriffsbefehle zur Verfügung. Von besonderer Bedeutung sind hier:<br>
+            BLOCK-READ (Abkürzung: U1): liest den Inhalt eines Sektors in den Pufferspeicher der Floppy.<br>
+            BLOCK-WRITE (Abkürzung: U2): schreibt einen Datenblock aus dem Pufferspeicher in den angegebenen Sektor.<br>
+            BUFFER-POINTER (Abkürzung: B-P): setzt einen Zeiger auf jenes Byte im Pufferspeicher, auf das zugegriffen werden soll.</p>
+
+        <p>Zum Ändern des Namens geschieht nun folgendes:</p>
+
+        <ol>
+            <li>Das Directory wird in den Pufferspeicher gelesen.</li>
+            <li>Der alte Name wird durch den neuen ersetzt.</li>
+            <li>Die ID wird geändert.</li>
+            <li>Das geänderte Directory wird aus dem Pufferspeicher auf die Diskette übertragen.</li>
+        </ol>
+
+        <p>Zur Übermittlung der Befehle muß zuerst der Befehlskanal mit OPEN 1,8,15 geöffnet werden. Bevor nun etwas in den Pufferspeicher geladen werden kann, muß ein Kanal für diesen Puffer angelegt werden. Dies geschieht mit OPEN 8,8,8,"#".<br>
+            Das Lesen des Directory erfolgt mit PRINT #1, "U1:";8;0;18;0. Dadurch wird ein Datenblock von Laufwerk 0, Spur 18, Sektor 0 in dem Kanal 8 zugeordneten Puffer gelesen. Nun muß der Zeiger auf das erste Byte des Diskettennamens gesetzt werden: PRINT#l,»B-P«;8;144. Jetzt kann der alte Name überschrieben werden. Dies geschieht mit der PRINT#8,DN$, wobei in DN$ der neue Diskettenname gespeichert ist. DN$ muß genau 16 Byte lang sein, Das gleiche muß zum Ändern der ID gemacht werden (Zeile 1260, 1270).</p>
+
+        <p>Der geänderte Name steht nun im Pufferspeicher, er muß jetzt nur noch zurück auf die Diskette gebracht werden, dies geschieht durch PRINT#,"U2:";8;0;18;0 (schreibt den Inhalt des Pufferspeichers, der Kanal 8 zugeordnet ist, auf Spur 18, Sektor 0 der in Laufwerk 0 befindlichen Diskette). Die Diskette ist somit geändert.</p>
+
+        <address class="author">(Uwe Repplinger)</address>
+
+        <figure>
+            <table class="nobreak0">
+                <tr>
+                    <th>Programmzeile</th>
+                    <th>Erläuterung</th>
+                </tr>
+                <tr>
+                    <td>1050</td>
+                    <td>Befehlskanal eröffnen und Disk initialisieren</td>
+                </tr>
+                <tr>
+                    <td>1060</td>
+                    <td>Öffnen des Datenkanals</td>
+                </tr>
+                <tr>
+                    <td>1070</td>
+                    <td>Directory in den Pufferspeicher lesen</td>
+                </tr>
+                <tr>
+                    <td>1080</td>
+                    <td>Zeiger auf Diskettennamen setzen</td>
+                </tr>
+                <tr>
+                    <td>1090-1110</td>
+                    <td>Diskettennamen lesen und ausgeben</td>
+                </tr>
+                <tr>
+                    <td>1120</td>
+                    <td>Zeiger auf ID setzen</td>
+                </tr>
+                <tr>
+                    <td>1130-1140</td>
+                    <td>ID lesen und ausgeben</td>
+                </tr>
+                <tr>
+                    <td>1180</td>
+                    <td>Diskettenname auf 16 Zeichen formatieren</td>
+                </tr>
+                <tr>
+                    <td>1190</td>
+                    <td>Zeiger auf Diskettennamen setzen</td>
+                </tr>
+                <tr>
+                    <td>1200</td>
+                    <td>Neuen Diskettennamen in den Puffer schreiben</td>
+                </tr>
+                <tr>
+                    <td>1240</td>
+                    <td>ID auf 2 Zeichen formatieren</td>
+                </tr>
+                <tr>
+                    <td>1250-1260</td>
+                    <td>Zeiger auf ID setzen und neue ID in den Puffer schreiben</td>
+                </tr>
+                <tr>
+                    <td>1270</td>
+                    <td>Geändertes Directory auf Diskette speichern</td>
+                </tr>
+                <tr>
+                    <td>1280</td>
+                    <td>Diskette initialisieren, Daten- und Befehlskanal schließen</td>
+                </tr>
+            </table>
+            <figcaption>Programmbeschreibung anhand der Zeilennummern</figcaption>
+        </figure>
+        <figure>
+
+            <table>
+                <tr>
+                    <th>Name</th>
+                    <th>Belegung</th>
+                </tr>
+                <tr>
+                    <td>W$</td>
+                    <td>Benutzereingabe</td>
+                </tr>
+                <tr>
+                    <td>CH$</td>
+                    <td>Alter Diskettenname</td>
+                </tr>
+                <tr>
+                    <td>C1$</td>
+                    <td>Erstes Zeichen der alten ID</td>
+                </tr>
+                <tr>
+                    <td>C2$</td>
+                    <td>Zweites Zeichen der alten ID</td>
+                </tr>
+                <tr>
+                    <td>DN$</td>
+                    <td>Neuer Diskettenname</td>
+                </tr>
+                <tr>
+                    <td>ID$</td>
+                    <td>Neue ID</td>
+                </tr>
+                <tr>
+                    <td>G%</td>
+                    <td>G%=1 : Diskette wurde geändert<br>
+                        G%=0 : Diskette wurde nicht geändert</td>
+                </tr>
+            </table>
+            <figcaption>Variablendefinition</figcaption>
+        </figure>
+
+        <figure>
+            <pre data-filename="diskettenname" data-name="Diskettenname"></pre>
+            <figcaption>Programm, mit dem der Name und/oder die ID einer Diskette geändert werden kann</figcaption>
+        </figure>
+
+        <aside class="fehlerteufelchen" id="fehlerteufelchen">
+            <h2>Fehlerteufelchen</h2>
+            <p>Den größten Erfolg hatte ich im Programm <b>Diskettenzauberei</b>. Dort gelangen mir gleich 4 Fehler:<br>
+                Zeile 1120: Hinter PRINT #1 muß ein Komma stehen.<br>
+                Zeile 1200 und 1260: Schreiben Sie vor dem Doppelpunkt ein Semikolon.<br>
+                Zeile 1250: Hinter B-P muß ein Doppelpunkt stehen.<br>
+                Zeile 1260: Schreiben Sie G% anstatt R%</p>
+            <!-- 64'er 6/1984 -->
+        </aside>
+
+    </article>
+
+</body>
+
+</html>

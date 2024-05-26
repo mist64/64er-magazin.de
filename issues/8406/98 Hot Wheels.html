@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>Hot Wheels</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="Bernd Günther">
+    <meta name="64er.issue" content="6/84">
+    <meta name="64er.pages" content="98-101">
+	<meta name="64er.head1" content="Hot Wheels">
+	<meta name="64er.head2" content="C 64">
+    <meta name="64er.toc_category" content="Programme zum Abtippen|Spiele">
+	<meta name="64er.toc_title" content="Hot Wheels (C 64)">
+    <meta name="64er.index_title" content="Hot Wheels">
+    <meta name="64er.index_category" content="Listings zum Abtippen|Spiel|Simulation">
+    <meta name="64er.id" content="hotwheels">
+</head>
+
+<body>
+    <article>
+        <h1>Hot Wheels</h1>
+
+        <p class="intro">Brausen Sie mit dem »Feuerstuhl« über die Landstraße. Das Einlegen des Ganges ist einem richtigen Motorrad nach-empfunden. Ein schnelles Spiel für den<br>
+            Commodore 64.</p>
+
+        <figure>
+            <img src="98-1.png" alt="">
+            <figcaption>Es gehört schon viel Geschick dazu, in den höheren Spielstufen alle Kurven sauber zu nehmen. Wenn dann auch noch ab und zu Hindernisse auf der Fahrbahn auftauchen, kann man meistens nur noch auf die Qualität seines Sturzhelms vertrauen.</figcaption>
+        </figure>
+
+        <p>Ziel des Spiels ist es, mit einem Motorrad möglichst unfallfrei eine Straße entlang zu fahren und dabei soweit wie möglich zu kommen. Dies wird durch Steine auf der Fahrbahn und Straßensperren erschwert.</p>
+
+        <p>Nach Erreichen von 2000 Punkten gelangt man in die nächste Schwierigkeitsstufe, die dann schon etwas mehr Geschicklichkeit verlangt. Die Anzahl der Hindernisse und die Geschwindigkeit steigen von Spielstufe zu Spielstufe, wobei maximal drei Stufen durchfahren werden können.</p>
+
+        <p>Ein Bewegen des Joysticks in Richtung »vorwärts« erhöht die Geschwindigkeit, die bei Richtung »zurück« wieder gedrosselt wird. Der Punktestand steigt natürlich proportional zur Geschwindigkeit. Eine einprogrammierte Mindestgeschwindigkeit verhindert dabei das Aufkommen von Langeweile.</p>
+
+        <p>Der Kern des Spiels ist vollständig in Maschinensprache programmiert, wodurch eine Spielgeschwindigkeit erzielt wird, die mit Basic nicht zu erreichen wäre. Lediglich Start und Ende einer Spielstufe sind in Basic geschrieben.</p>
+
+        <p>Während des Spiels ist der Bildschirm in zwei Teile geteilt; der obere Teil stellt den Horizont sowie den Spielstand dar, während im unteren Teil das Bild ständig durch das Maschinenprogramm nach unten gescrollt wird. Der Verlauf der Straße wird durch einen Zufallszahlengenerator bestimmt, ebenso das Auftreten der verschiedenen Hindernisse. Doch damit genug der Vorrede. Sie können das Programm jetzt eintippen, aber vergewissern Sie sich vor dem Starten bitte vom ordnungsgemäßen Sitz Ihres Sturzhelms!</p>
+
+        <address class="author">(Bernd Günther)</address>
+
+        <figure>
+            <table>
+                <tr>
+                    <td>1000-1040</td>
+                    <td>Einlesen des Sprites</td>
+                </tr>
+                <tr>
+                    <td>1050-1580</td>
+                    <td>Einlesen des Maschinenspracheteils:</td>
+                </tr>
+                <tr>
+                    <td>$C000</td>
+                    <td>Hauptschleife, hier wird ununterbrochen die Straße erzeugt.</td>
+                </tr>
+                <tr>
+                    <td>$C003</td>
+                    <td>Bewirkt einen Scroll-Down der unteren Bildschirmhälfte.</td>
+                </tr>
+                <tr>
+                    <td>$C009</td>
+                    <td>Hier wird der Punktestand proportional zur Geschwindigkeit erhöht und dann ausgedruckt. Wenn die Score-Grenze für den nächsten Level erreicht ist, wird ins Basic-Programm zurückgesprungen.</td>
+                </tr>
+                <tr>
+                    <td>$C079</td>
+                    <td>Hier wird das Motorrad entsprechend der Bewegung der Joysticks gesteuert, ebenso die Frequenzen des Motorgeräusches.</td>
+                </tr>
+                <tr>
+                    <td>$C063</td>
+                    <td>Straße einen Schritt geradeaus.</td>
+                </tr>
+                <tr>
+                    <td>$C120</td>
+                    <td>Straße einen Schritt links.</td>
+                </tr>
+                <tr>
+                    <td>$C147</td>
+                    <td>Straße einen Schritt rechts.</td>
+                </tr>
+                <tr>
+                    <td>$C168</td>
+                    <td>Hier wird das Haus ausgedruckt, das immer zufällig erscheint.</td>
+                </tr>
+                <tr>
+                    <td>$C30D</td>
+                    <td>Verzögerung.</td>
+                </tr>
+                <tr>
+                    <td>$C328</td>
+                    <td>Erzeugen verschiedener Hindernisse mit Zufallsgenerator im SID.</td>
+                </tr>
+                <tr>
+                    <td>1590-1600</td>
+                    <td>Einlesen der Schlußmelodie.</td>
+                </tr>
+                <tr>
+                    <td>1610-1860</td>
+                    <td>Kaltstart.</td>
+                </tr>
+                <tr>
+                    <td>1870-2080</td>
+                    <td>Warmstart.</td>
+                </tr>
+                <tr>
+                    <td>2090</td>
+                    <td>Einsprung ins Maschinenprogramm.</td>
+                </tr>
+                <tr>
+                    <td>2100-2130</td>
+                    <td>Test auf Kollosion oder nächsten Level.</td>
+                </tr>
+                <tr>
+                    <td>2140-2220</td>
+                    <td>Initialisierung des SID.</td>
+                </tr>
+                <tr>
+                    <td>ab 2230</td>
+                    <td>Spielende mit Schlußmelodie, Laufschrift bei Highscore, Sprung an den Programmanfang.</td>
+                </tr>
+            </table>
+            <figcaption>Die einzelnen Programmteile von »Hot Wheels«</figcaption>
+        </figure>
+
+        <figure>
+            <table>
+                <tr>
+                    <td>A1(), A2()</td>
+                    <td>Low Byte und High Byte der Noten der Schlußmelodie</td>
+                </tr>
+                <tr>
+                    <td>V</td>
+                    <td>Startadresse des VIC</td>
+                </tr>
+                <tr>
+                    <td>SI</td>
+                    <td>Startadresse des SID</td>
+                </tr>
+                <tr>
+                    <td>LE</td>
+                    <td>Momentaner Level</td>
+                </tr>
+                <tr>
+                    <td>MR</td>
+                    <td>Momentane Anzahl der Motorräder</td>
+                </tr>
+                <tr>
+                    <td>HI</td>
+                    <td>Highscore</td>
+                </tr>
+                <tr>
+                    <td>A$</td>
+                    <td>Text für Laufschrift oder Tastaturabfrage</td>
+                </tr>
+                <tr>
+                    <td>I, J,K</td>
+                    <td>Laufvariablen</td>
+                </tr>
+            </table>
+            <figcaption>Speicherbelegung des Maschinenspracheprogramms</figcaption>
+        </figure>
+        <figure>
+            <table>
+                <tr>
+                    <td>832</td>
+                    <td>Farbe des Straßenrandes</td>
+                </tr>
+                <tr>
+                    <td>833</td>
+                    <td>Momentane Position der linken Straßenecke</td>
+                </tr>
+                <tr>
+                    <td>834</td>
+                    <td>Zwischenspeicher für Joystickabfrage</td>
+                </tr>
+                <tr>
+                    <td>835</td>
+                    <td>Flag für Feuerknopf (betätigt bei »0«)</td>
+                </tr>
+                <tr>
+                    <td>836</td>
+                    <td>Joystick rechts</td>
+                </tr>
+                <tr>
+                    <td>837</td>
+                    <td>Joystick links</td>
+                </tr>
+                <tr>
+                    <td>838</td>
+                    <td>Joystick unten</td>
+                </tr>
+                <tr>
+                    <td>839</td>
+                    <td>Joystick oben</td>
+                </tr>
+                <tr>
+                    <td>841-848</td>
+                    <td>Zwischenspeicher für Scroll-Routine</td>
+                </tr>
+                <tr>
+                    <td>850-852</td>
+                    <td>Zwischenspeicher für Tonfrequenzen</td>
+                </tr>
+                <tr>
+                    <td>853</td>
+                    <td>Zähler für Hauptschleife</td>
+                </tr>
+                <tr>
+                    <td>855</td>
+                    <td>Zähler für Haus-Grafik</td>
+                </tr>
+                <tr>
+                    <td>860-862</td>
+                    <td>Zwischenspeicher für Verzögerungszähler</td>
+                </tr>
+                <tr>
+                    <td>870,871</td>
+                    <td>Score-Grenze für nächsten Level</td>
+                </tr>
+                <tr>
+                    <td>872</td>
+                    <td>Häufigkeit für das Auftreten von Hindernissen</td>
+                </tr>
+                <tr>
+                    <td>880,881</td>
+                    <td>Momentaner Punktestand</td>
+                </tr>
+            </table>
+            <figcaption>Variablenliste des Basicprogramms</figcaption>
+        </figure>
+
+		<figure>
+            <pre data-filename="hot wheels" data-name="Hot Wheels"></pre>
+			<figcaption>Listing von »Hot Wheels«</figcaption>
+		</figure>
+    </article>
+
+</body>
+
+</html>

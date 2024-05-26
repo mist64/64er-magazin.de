@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+	<title>Adreß- und Telefonregister</title>
+	<meta charset="UTF-8">
+	<link rel="stylesheet" href="../style.css">
+	<meta name="author" content="Arne Weitzel">
+	<meta name="64er.issue" content="5/84">
+	<meta name="64er.pages" content="64-68">
+	<meta name="64er.head1" content="Adreß- und Telefonregister">
+	<meta name="64er.head2" content="C 64">
+	<meta name="64er.toc_title" content="Adreß- und Telefonregister (C 64)">
+	<meta name="64er.toc_category" content="Programme zum Abtippen|Anwendungen">
+	<meta name="64er.index_title" content="Adreß- und Telefonregister">
+	<meta name="64er.index_category" content="Listings zum Abtippen|Anwendung|Datei">
+	<meta name="64er.id" content="personendatei">
+</head>
+
+<body>
+	<article>
+		<h1>Adreß- und Telefonregister</h1>
+
+		<p class="intro">Machen Sie Schluß mit der Zettelwirtschaft! Wozu haben Sie einen Commodore 64 mit Floppy? Im Zeitafter der Elektronik verwaltet man seine Adressen mit dem Computer.</p>
+
+		<figure>
+            <img src="64-1.png" alt="">
+		</figure>
+
+		<p>Dieses Programm bietet eine komfortable Möglichkeit, Adressen und Telefonnummern auf Diskette abzuspeichern. Man kann Adressen und Telefonnummern</p>
+
+		<ul>
+			<li>eingeben</li>
+			<li>auf dem Bildschirm ausgeben lassen</li>
+			<li>löschen</li>
+			<li>ändern</li>
+			<li>suchen</li>
+			<li>auf Diskette abspeichern</li>
+			<li>von Diskette einlesen.</li>
+		</ul>
+
+		<h2>Menüsteuerung</h2>
+
+		<p>Vom Menü aus kann man in die Programmteile »Eingabe«, »Ausgabe«, »Suchen«, »Daten speichern«, »Daten einlesen« und »Datei vorbereiten« springen (Funktionstasten). Der Programmteil »Datei vorbereiten« dient zur Eröffnung einer Datei und braucht daher nur einmal bei der ersten Benutzung des Programms ausgeführt werden. Jedesmal, nachdem Datensätze eingegeben, gelöscht oder geändert wurden, muß die Datei natürlich wieder mit »f2« abgespeichert werden.</p>
+
+		<h2>Eingabe</h2>
+
+		<p>Bei der Eingabe (mit »f3«) werden Name, Vorname, Geburtstag, Wohnort, Postleitzahl, Straße, Hausnummer, Telefon und Vorwahl eingetippt. Dabei kann »DEL« zum Löschen benutzt werden. Ist ein Name, Vorname etc. vollständig eingegeben, wird mit »RETURN« abgeschlossen, und der Cursor springt zum nächsten Eingabekriterium (wenn über die gesamte Linie geschrieben wird, springt der Cursor automatisch weiter).</p>
+
+		<p>Bei der Ausgabe kann unter »sortiert« und »physikalisch« ausgewählt werden, das heißt, die Datensätze werden entweder nach Name und Vorname sortiert ausgegeben oder in der Reihenfolge wie sie eingegeben wurden.</p>
+
+		<p>Beim Suchen wird zunächst abgefragt, wonach gesucht werden soll. Wird ein entsprechender Datensatz gefunden, so wird dieser dann ausgegeben. Danach kann nach dem gleichen Suchkriterium sofort weitergesucht werden. Im Such- und Ausgabemodus (hierbei nur in der sortierten Ausgabe) kann der gerade angezeigte Datensatz gelöscht oder geändert werden.</p>
+
+		<p>Beim Verändern der Daten muß auf jeden Fall der gesamte Teil, wie bei der Eingabe, neu überschrieben werden (GET-Schleife, kein INPUT). Soll ein Teil nicht geändert werden, so ist »f7« zu drücken und der Cursor springt weiter. Verändern lassen sich alle elf Datensatzteile, außer Name und Vorname.</p>
+
+		<h2>Beliebig viele Daten</h2>
+
+		<p>Die Datei ist für 100 Datensätze angelegt. Bei mehr als 100 Datensätzen ist die DIM-Anweisung für F$ in Zeile 100 entsprechend zu ändern. Die Datei selbst wird unter »ADR.-DATEI« auf Diskette abgespeichert und ist als verkettete Liste organisiert, das heißt, in jedem Datensatz ist notiert, wo sich der nächste Satz befindet. Dadurch lassen sich neu eingegebene Daten schnell einsortieren und in der Ausgabe kann zwischen »sortiert« und »physikalisch« unterschieden werden.</p>
+
+		<p>Alle Eingaben werden überprüft, so daß keine Fehlermeldungen (zum Beispiel »REDO FROM START«) auftreten können.</p>
+
+		<address class="author">(Arne Weitzel)</address>
+
+		<figure>
+			<table>
+				<tr>
+					<td>F$(i,j) (i:0-100;j:0-11)</td>
+					<td>100 Datensätze (0 nicht belegt) mit jeweils 12 Daten (für mehr als 100 Datensätze ist in Zeile 100 zu ändern!)</td>
+				</tr>
+				<tr>
+					<td>SU$(j) (j:1-11):</td>
+					<td>Vergleichsstring beim Suchen</td>
+				</tr>
+				<tr>
+					<td>MO :</td>
+					<td>Modus (Eingabe, Ausgabe etc.)</td>
+				</tr>
+				<tr>
+					<td>L :</td>
+					<td>maximale Länge einer Eingabe</td>
+				</tr>
+				<tr>
+					<td>ll :</td>
+					<td>Aktuelle Länge eines Eingabestrings während einer Eingabe</td>
+				</tr>
+				<tr>
+					<td>SP :</td>
+					<td>Spaltenposition des Cursors</td>
+				</tr>
+				<tr>
+					<td>ZE :</td>
+					<td>Zeilenposition des Cursors</td>
+				</tr>
+				<tr>
+					<td>MA, MB :</td>
+					<td>Nummer der vorherigen Datensätze (für Einsortieren und Löschen von Datensätzen)</td>
+				</tr>
+				<tr>
+					<td>AN :</td>
+					<td>Anzahl der Datensätze</td>
+				</tr>
+				<tr>
+					<td>MO$:</td>
+					<td>Titel des Modi (»Ausgabe«, »Eingabe« etc.)</td>
+				</tr>
+				<tr>
+					<td>Z :</td>
+					<td>Nummer des Datensatzes</td>
+				</tr>
+			</table>
+			<figcaption>Die wichtigsten Variablen</figcaption>
+		</figure>
+
+		<figure>
+			<table class="nobreak0">
+				<tr>
+					<th>Zeilen</th>
+					<th></th>
+				</tr>
+				<tr>
+					<td>100</td>
+					<td>Dimensionierung der Felder und Ausschalten von RUN/STOP</td>
+				</tr>
+				<tr>
+					<td>110-140</td>
+					<td>Variablenzuweisungen</td>
+				</tr>
+				<tr>
+					<td>150-340</td>
+					<td>Menü anzeigen und Menüeingabe</td>
+				</tr>
+				<tr>
+					<td>360-430</td>
+					<td>Eingabe von Datensätzen</td>
+				</tr>
+				<tr>
+					<td>450-510</td>
+					<td>Auswahl zwischen sortierter und physikalischer Ausgabe</td>
+				</tr>
+				<tr>
+					<td>520-580</td>
+					<td>Physikalische Ausgabe</td>
+				</tr>
+				<tr>
+					<td>590-600</td>
+					<td>Sortierte Ausgabe</td>
+				</tr>
+				<tr>
+					<td>610-620</td>
+					<td>'Keine weiteren Personen erfasst !'</td>
+				</tr>
+				<tr>
+					<td>630-660</td>
+					<td>Routine zur Ausgabe eines Datensatzes</td>
+				</tr>
+				<tr>
+					<td>680-810</td>
+					<td>GET-Schleife zur Eingabe eines Strings</td>
+				</tr>
+				<tr>
+					<td>830-950</td>
+					<td>Zeichnen der Maske</td>
+				</tr>
+				<tr>
+					<td>970</td>
+					<td>Zeichnen der Linien bei der Eingabe</td>
+				</tr>
+				<tr>
+					<td>980-1030</td>
+					<td>Einlesen der Datei von Diskette</td>
+				</tr>
+				<tr>
+					<td>1050-1090</td>
+					<td>Speichern der Datei auf Diskette</td>
+				</tr>
+				<tr>
+					<td>1110-1160</td>
+					<td>Einsortieren eines neu eingegebenen Datensatzes</td>
+				</tr>
+				<tr>
+					<td>1180-1310</td>
+					<td>Auswahl des Suchkriteriums</td>
+				</tr>
+				<tr>
+					<td>1330-1360</td>
+					<td>Eingabe des gesuchten Strings</td>
+				</tr>
+				<tr>
+					<td>1370-1330</td>
+					<td>'Eingabe zu lang !'</td>
+				</tr>
+				<tr>
+					<td>1400-1470</td>
+					<td>Suchen des Strings</td>
+				</tr>
+				<tr>
+					<td>(1420-1450</td>
+					<td>nicht gefunden）</td>
+				</tr>
+				<tr>
+					<td>1480</td>
+					<td>Ausgabe des gefundenen Strings</td>
+				</tr>
+				<tr>
+					<td>1490-1560</td>
+					<td>Weiter / Ändern / Löschen oder Ende ?</td>
+				</tr>
+				<tr>
+					<td>1580-1620</td>
+					<td>Löschen eines Datensstzes</td>
+				</tr>
+				<tr>
+					<td>1640-1708</td>
+					<td>Erzeugen des Tons</td>
+				</tr>
+				<tr>
+					<td>1720-1730</td>
+					<td>Ausgabe des Datensatzes im 'AENDERN'-Modus</td>
+				</tr>
+				<tr>
+					<td>1740-1760</td>
+					<td>Überschreiben des Strings (bzw. nicht verändern)</td>
+				</tr>
+				<tr>
+					<td>1770-1798</td>
+					<td>'Änderungen korrekt ?'</td>
+				</tr>
+				<tr>
+					<td>1810-1840</td>
+					<td>Weiter ?</td>
+				</tr>
+				<tr>
+					<td>1860-1980</td>
+					<td>Festlegen der Cursorposition und der max. Länge eines Strings</td>
+				</tr>
+				<tr>
+					<td>1998-2010</td>
+					<td>Festlegen der Farben fuer Bildschirm sowie Titel für verschiedene Modi</td>
+				</tr>
+				<tr>
+					<td>2020-2070</td>
+					<td>Datei vorbereiten</td>
+				</tr>
+			</table>
+			<figcaption>Aufschlüsselung des Adreß- und Telefonregisterprogramms nach Zeilennummer</figcaption>
+		</figure>
+
+		<figure>
+            <pre data-filename="adressregister" data-name="Adreß- und Telefonregister"></pre>
+			<figcaption>Listing des Basic-Programms für das Adreß- und Telefonregister</figcaption>
+		</figure>
+
+		<aside class="fehlerteufelchen">
+		    <h2>Fehlerteufelchen</h2>
+
+            <p>Zeile 1060 muß lauten: 1060 FORI=0TOAN</p>
+            <hr>
+		    <p>In Zeile 1840 sollte nicht GOTO 610, sondern GOTO 510 stehen.</p>
+		    <address class="author">(Gert Marx)</address>
+		    <!-- 64'er 10/1984 -->
+		</aside>
+	</article>
+
+</body>
+
+</html>

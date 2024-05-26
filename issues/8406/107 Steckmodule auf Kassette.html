@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>Steckmodule auf Kassette</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="Jörg Grohne">
+    <meta name="64er.issue" content="6/84">
+    <meta name="64er.pages" content="107">
+	<meta name="64er.head2" content="VC 20">
+    <meta name="64er.toc_category" content="Programme zum Abtippen|Tips & Tricks">
+	<meta name="64er.toc_title" content="Steckmodule auf Kassette (VC 20)">
+    <meta name="64er.index_title" content="Steckmodule auf Kassette (VC 20)">
+    <meta name="64er.index_category" content="Listings zum Abtippen|Tips & Tricks|Module">
+    <meta name="64er.id" content="steckmodule">
+</head>
+
+<body>
+    <article>
+        <h1>Steckmodule auf Kassette</h1>
+
+        <p class="intro">Vielleicht kennen Sie das Problem. Sie haben einen VC 20, eine Vollerweiterung und ein Programmierhilfemodul, aber keine Modulbox. Sie können das Programmierhilfemodul nur in der Grundversion einsetzen, möchten aber auch gerne bei 16 KByte damit arbeiten. Hier wird nun die Methode vorgestellt, das Modul auf Kassette zu kopieren und dann bei Vollerweiterung in den jeweiligen Speicherbereich zu laden.</p>
+
+        <figure>
+            <img src="107-1.png" alt="">
+            <figcaption>Dieses Bild zeigt, wo Sie am geöffneten VC 20 eingreifen können, um einen Modulschalter anzubringen.</figcaption>
+        </figure>
+
+        <p>Anhand der SYS-Adresse, mit der Sie das Programm starten, sehen Sie, in welchem 16- oder 8-KByte-Block das Modul liegt. Zum Beispiel Start mit SYS 32592, das Modul befindet sich also im Bereich von 16 384 bis 32 768.</p>
+
+        <h2>Kopieren auf Band</h2>
+
+        <p>Stecken Sie das Modul in den Erweiterungsport und schalten Sie den VC 20 ein. Legen Sie eine Kassette in den Recorder und tippen Sie</p>
+
+        <pre>
+POKE 43,0:POKE 44,64: POKE 45,0:POKE 46,128: Save”(Name)”,1
+</pre>
+
+
+        <p>ein, wenn das Modul ab 16384 liegt, oder</p>
+
+        <pre>
+POKE 43,0:POKE 44,160: POKE 45,0:POKE 46,192: Save”(Name)”,1
+</pre>
+
+
+        <p>wenn das Programm ab 40960 gespeichert ist.</p>
+
+        <p>Stecken Sie die für das Modul benötigte 16- oder 8- KByte-Erweiterung in den Port, legen Sie die Kassette ein und laden Sie das Programm mit »Load«. So einfach ist das. Nach dem Laden starten Sie das Modul mit der gewohnten SYS-Adresse.</p>
+
+        <h2>Der Autostart bei Modulen&hellip;</h2>
+
+        <p>Module, die im Bereich von 40960 liegen, werden beim Einschalten selbst gestartet, wenn die Anfangsadressen folgendermaßen belegt sind:</p>
+
+        <table>
+            <tr>
+                <td>40960</td>
+                <td>Startadresse des Programms low</td>
+            </tr>
+            <tr>
+                <td>40961</td>
+                <td>Startadresse des Programms high</td>
+            </tr>
+            <tr>
+                <td>40962</td>
+                <td>Adresse bei Restore low</td>
+            </tr>
+            <tr>
+                <td>40963</td>
+                <td>Adresse bei Restore high</td>
+            </tr>
+            <tr>
+                <td>40964</td>
+                <td>65 = a</td>
+            </tr>
+            <tr>
+                <td>40965</td>
+                <td>48 = 0</td>
+            </tr>
+            <tr>
+                <td>40966</td>
+                <td>195 = C</td>
+            </tr>
+            <tr>
+                <td>40967</td>
+                <td>194 = B</td>
+            </tr>
+            <tr>
+                <td>40968</td>
+                <td>205 = M</td>
+            </tr>
+        </table>
+
+        <p>Während eines Kaltstartes werden die Adressen von 40964 bis 40968 nach der Zeichenfolge &ldquo;a0CBM” abgesucht und das Programm gegebenenfalls gestartet.</p>
+
+        <p>Wenn Sie über eine Speichererweiterung in diesem Bereich verfügen, manipulieren Sie doch einmal diese Adressen, lassen Sie die Startadresse auf ein Maschinenprogramm zeigen und tippen Sie SYS 64802 (Kaltstart) ein. Sie werden sehen, daß das Maschinenprogramm gestartet wird.</p>
+
+        <h2>&hellip; und seine Überlistung</h2>
+
+        <p>Da der Computer die Adressen für den Autostart nur beim Kaltstart absucht, könnte man den Computer einschalten und dann das Modul einstecken. Mit viel Glück könnte es klappen, aber es können auch erhebliche Schäden am Computer oder am Modul auftreten.</p>
+
+        <p>Softwaremäßig gibt es keine Lösung, den Autostart zu verhindern. Ein kleiner Eingriff in die Hardware macht’s aber doch möglich. Auf Seite 150 des VC 20-Handbuches ist die Hauptspeicher-Erweiterung beschrieben. Uns interessiert Pin 21 (+ 5 V). Wenn Sie Ihren VC 20 öffnen, sehen Sie die Anordnung entsprechend dem Bild.</p>
+
+        <p>Kneifen Sie den Draht von Pin 21 durch und löten Sie zwei nicht zu dünne, isolierte Kabel an. Die Kabel verbinden Sie mit einem Schalter, den Sie im Gehäuse einbauen oder nach außen legen können. Mittels dieses Schalters können Sie Module ein- und ausschalten!</p>
+
+        <p>Also, wir stecken das Modul bei ausgeschaltetem Computer in den Port und unterbrechen Pin 21 mit unserem Schalter. Dann schalten wir den VC 20 ein, der Computer findet in den betreffenden Adressen kein a0CBM und meldet sich mit dem üblichen Bild. Jetzt drücken wir unseren Schalter, der Strom fließt, aber es wird kein Autostart mehr ausgeführt. Wir können das Modul jetzt mit</p>
+
+        <pre>
+POKE 43,0:POKE 44,160:POKE 45,0:POKE 46,192: SAVE”(Name)”,1
+</pre>
+
+
+        <p> auf Kassette abspeichern oder mit SYS 64802 (Kaltstart, wir erinnern uns) starten.</p>
+
+        <address class="author">(Jörg Grohne)</address>
+    </article>
+
+</body>
+
+</html>

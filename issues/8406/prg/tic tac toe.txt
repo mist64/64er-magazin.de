@@ -1,0 +1,123 @@
+;tic tac toe.prg ==0801==
+;Eingetippt von goloMAK
+   10 rem *******************************
+   20 rem *  kreuz und quer             *
+   30 rem *******************************
+   90 print"{clr}"
+  100 dimss(9):dimbw(8)
+  110 gosub1000:rem spielfeld initialisieren
+  120 gosub2000:rem anzeigen
+  130 gosub3000:rem zug holen
+  140 gosub2000:rem anzeigen
+  150 gosub4000:rem auf spielende pruefen
+  160 gosub5000:rem computerzug
+  170 gosub2000:rem anzeigen
+  180 gosub4000:rem auf spielende pruefen
+  190 goto130
+ 1000 rem------------------------------
+ 1010 rem initialisierung
+ 1020 :
+ 1100 forp=1to9
+ 1110 :ss(p)=0
+ 1120 nextp
+ 1130 return
+ 2000 rem------------------------------
+ 2010 rem anzeigeroutine
+ 2020 :
+ 2030 forp=1to9
+ 2110 :ifss(p)=1thenprint"x";
+ 2120 :ifss(p)=-1thenprint"o";
+ 2130 :ifss(p)=0thenprint".";
+ 2140 :ifint(p/3)=p/3thenprint
+ 2150 nextp
+ 2160 print:print
+ 2170 return
+ 3000 rem------------------------------
+ 3010 rem spielerzug
+ 3020 :
+ 3040 input"gib zug ein ";p
+ 3050 ifss(p)<>0thenprint"dieses quadrat ist besetzt":goto3000
+ 3060 ss(p)=1
+ 3070 return
+ 3090 :
+ 4000 rem------------------------------
+ 4010 rem  auf spielende pruefen
+ 4020 :
+ 4040 gosub6000
+ 4050 forp=1to8
+ 4060 :ifbw(p)=-3thenprint"ich gewinne":end
+ 4070 :ifbw(p)=3thenprint"du gewinnst":end
+ 4080 nextp
+ 4090 forp=1to9
+ 4100 :ifss(p)=0thenreturn
+ 4110 nextp
+ 4120 print"unentschieden":end
+ 4130 :
+ 5000 rem------------------------------
+ 5010 rem computerzug
+ 5020 :
+ 5030 gosub6000
+ 5040 mt=0
+ 5050 forp=1to8
+ 5060 :ifbw(p)=-2thengosub7000:return
+ 5070 :ifbw(p)=2thenmt=mt+1
+ 5080 nextp
+ 5090 ifmt=2thenprint"auch gut. angeber!":end
+ 5100 ifmt=1thengosub8000:return
+ 5110 gosub9000
+ 5120 return
+ 5130 :
+ 6000 rem------------------------------
+ 6010 rem spielfeld bewerten
+ 6020 :
+ 6030 :
+ 6040 bw(1)=ss(1)+ss(2)+ss(3)
+ 6050 bw(2)=ss(4)+ss(5)+ss(6)
+ 6060 bw(3)=ss(7)+ss(8)+ss(9)
+ 6070 bw(4)=ss(1)+ss(4)+ss(7)
+ 6080 bw(5)=ss(2)+ss(5)+ss(8)
+ 6090 bw(6)=ss(3)+ss(6)+ss(9)
+ 6100 bw(7)=ss(1)+ss(5)+ss(9)
+ 6110 bw(8)=ss(3)+ss(5)+ss(7)
+ 6120 return
+ 6130 :
+ 7000 rem------------------------------
+ 7010 rem siegzug
+ 7020 :
+ 7040 gosub9000
+ 7050 gosub6000
+ 7060 forp=1to8
+ 7070 :ifbw(p)=-3thenreturn
+ 7080 nextp
+ 7090 gosub10000
+ 7100 goto7000
+ 7110 :
+ 7120 :
+ 8000 rem------------------------------
+ 8010 rem sperren
+ 8030 :
+ 8040 gosub9000
+ 8050 gosub6000
+ 8060 f=0
+ 8070 forp=1to8
+ 8080 :ifbw(p)=2thenf=1
+ 8090 nextp
+ 8100 iff=0thenreturn
+ 8110 gosub10000
+ 8120 goto8000
+ 8130 :
+ 9000 rem------------------------------
+ 9010 rem zufallszug
+ 9020 :
+ 9040 cm=9*rnd(0)+1
+ 9050 ifss(cm)<>0then9000
+ 9060 ss(cm)=-1
+ 9070 return
+ 9080 :
+ 9090 :
+10000 rem------------------------------
+10010 rem zuruecknehmen
+10030 :
+10040 ss(cm)=0
+10050 return
+
