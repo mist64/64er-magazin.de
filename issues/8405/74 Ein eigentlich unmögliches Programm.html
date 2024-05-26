@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+	<title>Ein eigentlich unmögliches Programm</title>
+	<meta charset="UTF-8">
+	<link rel="stylesheet" href="../style.css">
+	<meta name="author" content="Stefan Tramm">
+	<meta name="64er.issue" content="5/84">
+	<meta name="64er.pages" content="74-75">
+	<meta name="64er.head1" content="Hardcopy">
+	<meta name="64er.head2" content="C 64">
+	<meta name="64er.toc_title" content="Ein eigentlich unmögliches Programm – Hardcopy mit VC 1526">
+	<meta name="64er.toc_category" content="Programme zum Abtippen|Grafik">
+	<meta name="64er.index_title" content="Ein eigentlich unmögliches Programm (1526)">
+	<meta name="64er.index_category" content="Listings zum Abtippen|Grafik|Hardcopy">
+	<meta name="64er.id" content="1526">
+</head>
+
+<body>
+	<article>
+		<h1>Ein eigentlich unmögliches Programm</h1>
+
+		<p class="intro">Der Drucker VC 1526 ist entgegen allen Behauptungen doch grafikfähig! Es ist nur nicht so einfach wie bei anderen Matrix-Druckern, eine hübsche Grafik zu erzeugen. Das hier vorgesteifte Programm bietet die Möglichkeit, mit dem Commodore 64 erzeugte Grafiken als Hardcopy auszudrucken. Es läuft in Verbindung mit einem VC 1526-Drucker, der jedoch noch nicht mit den neuen ROMs bestückt sein darf.</p>
+
+		<figure>
+            <img src="74-1a.png" alt="">
+            <img src="74-1b.png" alt="">
+            <img src="74-1c.png" alt="">
+			<figcaption>Diese Hardcopys erstellt der VC 1526</figcaption>
+		</figure>
+
+		<p>Der VC 1526 bietet die Möglichkeit, ein vom Benutzer definierbares Zeichen pro Zeile auszudrucken. Zusätzlich ist ein Wagenrücklauf ohne Zeilenvorschub vorhanden. Das ist alles, reicht aber schon vollkommen aus.</p>
+
+		<p>Der Algorithmus besteht darin, die hochauflösende Grafik in 40 x 25 = 1000 Blöcke zu je 8 x 8 = 64 Punkte zu zerlegen und in eine für den Drucker verständliche Form umzuwandeln.</p>
+
+		<p>Beim Druck geschieht nun folgendes: Ein 64 Punkteblock (= 8 Byte) wird als selbstdefiniertes Zeichen an den Drucker gesendet, gedruckt und schließlich ein Wagenrücklauf ohne Zeilenvorschub erzwungen, damit das Zeichen auch auf dem Papier erscheint. Da der Druckkopf dabei an den Zeilenbeginn zurückfährt, muß er anschließend durch eine Folge von Leerschritten auf die der alten Druckposition folgende Spalte gesetzt werden. Sodann wiederholt sich der Vorgang.</p>
+
+		<p>Bei der Programmierung sind noch einige Features zur Geschwindigkeitsoptimierung hinzugekommen. Diese brauchen hier jedoch nicht weiter erläutert werden; wer will, kann sich aber schriftlich an mich wenden.</p>
+
+		<p>Ein Basic-Programm würde übrigens etwa 2 bis 5 Stunden für eine Hardcopy benötigen, das Maschinenprogramm braucht nur 2 bis 5 Minuten. Damit ist der VC 1526 genauso schnell wie ein GP 100 VC, nur mit dem Unterschied, daß er genauer ist (siehe die Hardcopy-Beispiele).</p>
+
+		<p>Hinweise zum Maschinenprogramm:</p>
+
+		<ul>
+			<li>Die Dateien # 125, # 126 und # 127 werden auf dem Drucker eröffnet.</li>
+			<li>Es können nur Grafiken ausgegeben werden, die nicht vom ROM oder vom I/O-Bereich überdeckt werden, was zum Beispiel bei Simons Basic der Fall ist.</li>
+			<li>Die Speicherzellen 07H, FBH — 10FH werden verändert.</li>
+		</ul>
+
+		Hinweise zur Implementierung:
+
+		<ul>
+			<li>Das Basic-Programm eingeben, abspeichern und dann laufen lassen.</li>
+			<li>Die restlichen Angaben werden vom Benutzer erfragt.</li>
+			<li>Für verschiedene Speicherkonfigurationen können verschiedene Hardcopy-Unterprogramme angelegt werden.</li>
+			<li>Das Hardcopy-Unterprogramm wird mit:<br>
+				»LOAD "HC1526/xxxx/yy",8,1« beziehungsweise mit »LOAD ”HC1526/xxxx/yy”, 1,1«<br>
+				geladen und mit »SYS xxxxx« gestartet. Der Drucker muß dabei bereits eingeschaltet sein.</li>
+		</ul>
+
+		<address class="author">(Stefan Tramm)</address>
+
+		<figure>
+            <pre data-filename="hardcopy vc-1525" data-name="Hardcopy für VC-1525"></pre>
+			<figcaption>Listing zu »Hardcopy für VC 1526«</figcaption>
+		</figure>
+
+	</article>
+
+</body>
+
+</html>

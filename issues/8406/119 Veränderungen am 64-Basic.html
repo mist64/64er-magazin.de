@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>Veränderungen am 64-Basic</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="Dr. August Quint">
+    <meta name="64er.issue" content="6/84">
+    <meta name="64er.pages" content="119">
+	<meta name="64er.head1" content="Tips & Tricks">
+	<meta name="64er.head2" content="C 64">
+    <meta name="64er.toc_category" content="Programme zum Abtippen|Tips & Tricks">
+	<meta name="64er.toc_title" content="Veränderungen am Basic (C 64)">
+    <meta name="64er.index_category" content="Listings zum Abtippen|Tips & Tricks|FRE">
+    <meta name="64er.id" content="basic">
+</head>
+
+<body>
+    <article>
+        <h1>Veränderungen am 64-Basic</h1>
+
+        <p>Eine der merkwürdigsten Effekte am Commodore 64 ist, wenn man unmittelbar nach dem Einschalten den Speicher abfragt, also eingibt</p>
+
+        <pre>
+PRINT FRE(0)
+</pre>
+
+
+        <p>Man erhält nämlich eine negative Zahl als Antwort. Man kann dies korrigieren, indem man bei einer negativen Antwort den Wert 65536 addiert. Im folgenden soll diese Merkwürdigkeit etwas näher beleuchtet und ein Weg zur Korrektur dargestellt werden.</p>
+
+        <p>Die Funktion FRE(0) liefert den noch verfügbaren, also freien Speicher. Dazu wird der Speicher aufgeräumt (Garbage-Collection), das heißt, die nicht mehr benötigten Strings werden entfernt und der gesamte String-Bereich folglich geordnet. Der freie Bereich ergibt sich dann als: Untere Grenze der Strings minus obere Grenze der Arrays.</p>
+
+        <p>Der Inhalt der folgenden Adressen muß also voneinander abgezogen werden<br>
+            33/34 Untergrenze Strings<br>
+            31/32 Ende Arrays<br>
+            also<br>
+            Inhalt von 33 minus Inhalt von 31<br>
+            Ergebnis nach 63<br>
+            Inhalt von 34 minus Inhalt von 32<br>
+            Ergebnis nach 62.</p>
+
+        <p>Das Ergebnis ist also vom Typ INTEGER. Allerdings arbeitet der Interpreter intern nicht mit Integer-Zahlen, sondern mit REAL-Zahlen (Gleitkommazahlen), das Ergebnis muß also gewandelt werden. Bei der Wandlung wird ein Bit (von 16, die für die Darstellung der Integer benötigt werden) als Vorzeichen betrachtet. Ist der Inhalt von Zelle 62 größer oder gleich $80 = 128, so wird die Zahl bei der Wandlung als negative Zahl angesehen. Der Inhalt von 62 wird dann größer oder gleich $80 sein, wenn der freie Bereich größer 32 767 Byte ist.</p>
+
+        <p>Aus diesen Gründen taucht gelegentlich eine negative Zahl als freier Speicherplatz auf. Wie kann man dies ändern?</p>
+
+        <p>Im Interpreter gibt es vier Wandlungsroutinen.</p>
+
+        <ol>
+            <li>Wandle REAL-Zahl nach INTEGER.<br>
+                Dabei wird die Integer-Zahl mit 15 Bit + 1 Bit für das Vorzeichen verschlüsselt, darstellbar sind also als Integer ganze Zahlen von -32 767 bis +32 767.</li>
+            <li>Wandle INTEGER-Zahl nach REAL<br>
+                Dies ist die Umkehrung von 1).</li>
+            <li>Wandle REAL nach INTEGER.<br>
+                Dabei wird eine Integer-Zahl mit 16 Bit (kein Vorzeichen!) verschlüsselt, darstellbar sind also Zahlen von 0 bis 65535. Diese Routine wird für die interne Darstellung der Zeilennummern des Basic-Programms benötigt (Wandlung von ASCII nach REAL, von dort nach INTEGER).</li>
+            <li>Wandle INTEGER nach REAL.<br>
+                Dies ist die Umkehrung von 3). Diese Routine wird zum Beispiel für die Ausgabe der Fehlermeldungen benötigt (...ERROR in (Zeile)).</li>
+        </ol>
+
+        Bei der FRE-Funktion müßte also nach der Berechnung des freien Platzes die Routine 4) aufgerufen werden. Aufgerufen wird aber die Routine 2). Im Interpreter steht JMP $BC44 (an der Adresse $B39B).
+
+        Dort müßte aber eigentlich stehen
+
+        <pre>
+SEC
+JMP $BC49
+</pre>
+
+        Die Frage ist jetzt nur noch, wie kann man dies ersetzen?
+
+        Dabei tauchen folgende Probleme auf
+
+        <ol>
+            <li>Der Interpreter wird im ROM gespeichert.</li>
+            <li>Man muß 3 Byte durch 4 Byte ersetzen.</li>
+        </ol>
+
+        Im Commodore 64 kann man bestimmte Bereiche, die durch ROM belegt sind, ausblenden und dafür RAM einblenden. Das folgende Programm kopiert den Interpreter vom ROM ins RAM
+
+        <pre>
+10 FOR 1 = 10*16*256 TO 12*16*256-1
+20 POKE I,PEEK(I)
+30 NEXT I
+</pre>
+
+        Dabei wird ausgenutzt, daß der Computer zwar über PEEK(I) aus dem ROM liest, aber mit dem Befehl POKE ins RAM schreibt (dies ist intern gelöst).
+
+        Man müßte jetzt nur noch das RAM einblenden, vorher sollen aber noch die notwendigen Veränderungen vorgenommen werden.
+
+        So einfach kann man natürlich nicht drei Byte durch vier Byte ersetzen. Die Lösung besteht darin, die Routine in einen freien Bereich umzuleiten und dort die notwendigen Befehle einzufügen (sogenannte Patches). Also anstelle von<br>
+        JMP $BC44 an der Adresse $B39B<br>
+        sollte stehen<br>
+        JMP $C000 in den freien Bereich.
+
+        Dies erreicht man durch<br>
+        40 POKE 11*16*256 + 3*256 + 9*16 + 12, 0<br>
+        (ersetzt $44 = 44*16 + 4)
+        50 POKE 11*16*256 + 3*256 + 9*16 + 13, 12*16<br>
+        (ersetzt $BC = 11*16 + 12).
+
+        An der Stelle $C000 ff. solte dann stehen
+
+        <pre>
+SEC
+JMP $BC49
+</pre>
+
+        Also wird wieder gePOKET<br>
+        60 POKE 12*16*256 , 3*16 + 8 (=SEC)<br>
+        70 POKE 12*16*256 + 1, 4*16*12 (=JMP)<br>
+        80 POKE 12*16*256 + 2, 4*16 + 9 (=$49 Teil der Adresse)<br>
+        90 POKE 12*16*256 + 3, 11*16 + 12 (=$BC Teil der Adresse).
+
+        Jetzt muß man nur noch das RAM einschalten<br>
+        100 POKE 1 , PEEK(1) AND 254 (Einschalten)<br>
+        ( POKE 1 , PEEK(1) OR 1 (Ausschalten) ).
+
+        Im Speicherplatz 1 wird im Bit 0(= Wertigkeit 1) hinterlegt, wo die Speicherplätze von $A000 bis $BFFF sind.
+
+        Und nun, lassen Sie Ihren Computer doch mal den Befehl
+
+        <pre>PRINT FRE(0)
+</pre>
+
+        ausführen. Wenn Sie keinen Fehler gemacht haben, wird er Ihnen diese Frage ab sofort korrekt beantworten.
+
+        Zusammenfassend kann man sagen, daß der beschriebene Effekt unschön und der Aufwand zur Änderung gering gewesen wäre. Der hier beschriebene Aufwand wurde dadurch groß, daß die Änderung nachträglich vorgenommen werden mußte.
+        <address class="author">(Dr. August Quint)</address>
+
+
+    </article>
+
+</body>
+
+</html>

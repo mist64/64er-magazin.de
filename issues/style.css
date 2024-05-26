@@ -1,9 +1,8 @@
 /* Using CSS features that require:
 
-Google Chrome 49 (Released 2 March 2016)
-Microsoft Edge 15 (Released 5 April 2017)
-Mozilla Firefox 31 (Released 22 July 2014)
-Apple Safari 9.1 (Released 21 March 2016)
+https://caniuse.com/?search=grid
+https://caniuse.com/?search=flex
+https://caniuse.com/?search=woff2
 
 https://caniuse.com/
 
@@ -159,6 +158,12 @@ p {
 	margin-bottom: 0px;
 }
 
+section,
+aside {
+	clear: both;
+}
+
+
 /* Link Styling */
 
 a {
@@ -312,35 +317,40 @@ aside.downloads a {
 	text-align: center;
 }
 
+
+/* Article Action Buttons */
+
 .actions {
 	background: var(--pdf-bg);
 	border-top: 1px black solid;
 	border-bottom: 1px  dimgray solid;
 	padding: 0.2em 0.1em;
+	
+	display: flex;
+	
+	flex-direction: row;
+	justify-content: center;
+	align-items: center;
+	column-gap: 0.3em;
 }
 
-.article_action {
-	display: inline-block;
-	padding: .1em .2em .0em .2em;
-}
-
-.article_action:not(:first-child) {
-	border-left: dimgray 3px double;
-}
-
-.article_action img,
-.download_full_pdf_button img {
+.article_action img {
 	height: 1.5em;
 	width: auto;
 	vertical-align: middle;
-	padding-left: 0.4em;
-	padding-right: 0.4em;
-	padding-bottom: 0.2em;
+	padding: .1em .4em .2em .4em;
 }
+
 .article_action a {
 	font-family: 'SC';
 	font-weight: normal;
 	vertical-align: middle;
+
+	display: block;
+	border: var(--main-color) 1px solid;
+	background: #EDFFFF;
+	border-radius: 4px;
+	padding: .1em .3em;
 }
 
 .article_action a:link,
@@ -350,25 +360,58 @@ aside.downloads a {
 	color: black;
 }
 
-.download_full_pdf {
-	float: right;
+.article_action a:hover {
+	text-decoration: none;
+	background-color: #CFF3FF;
 }
+
+
+/* Download PDF button in TOC */
+
+.download_full_pdf a {
+	display: block;
+	border-bottom: solid 2px #b0b7bd;
+}
+
+.download_full_pdf a:link,
+.download_full_pdf a:visited,
+.download_full_pdf a:active {
+	color: white;
+}
+
+.download_full_pdf a:hover {
+	text-decoration: none;
+	border-bottom-color: #ea551e;
+}
+
 .download_full_pdf_button {
 	font-family: "SC", sans-serif;
 	font-weight: bold;
 	font-size: 18pt;
 	background-color: var(--main-color);
-	margin: .4em;
-	padding: .4em 1.4em;
-	display: inline-block;
+	text-align: center;
+	
+	padding: .2em 1em;
+	
+	display: flex;
+	flex-direction: row;
+	
+	align-items: center;
+	justify-content: center;
 }
 
-.download_full_pdf a:link,
-.download_full_pdf a:visited,
-.download_full_pdf a:hover,
-.download_full_pdf a:active {
-	color: white;
+.download_label {}
+
+.download_icon {
+	flex: none;
 }
+
+.download_icon img {
+	height: 1.5em;
+	width: auto;
+	padding: .2em .4em 0 0;
+}
+
 
 /* Figure */
 
@@ -570,9 +613,8 @@ Issue: Logo + Issue + Page Nos
 }
 
 .logo_container {
-	/* Ensure the logo container does not head- or shrink */
-	flex-shrink: 0;
-	flex-grow: 0;
+	/* Ensure the logo container does not grow or shrink */
+	flex: none;
 	width: 200px;
 	height: 75px;
 
@@ -895,6 +937,7 @@ a.download_button:active {
 
 .comments {
 	margin: 0em 1em;
+	clear: both;
 }
 
 /* 404 */
@@ -906,6 +949,83 @@ a.download_button:active {
 	max-width: 400px;
 	height: auto;
 }
+
+
+/* TOC */
+
+.toc_container {
+	display: flex;
+	flex-direction: row;
+}
+
+.download_full_pdf {
+	order: 2;
+	flex: 0 auto;
+}
+
+.toc {
+	order: 1;
+	flex: auto;
+}
+
+.visually-hidden {
+	clip: rect(0 0 0 0);
+	clip-path: inset(100%);
+	height: 1px;
+	overflow: hidden;
+	position: absolute;
+	width: 1px;
+	white-space: nowrap;
+}
+
+.toc ul {
+	list-style: none;
+	padding-inline-start: 2ch;
+	padding-inline-end: 2ch;
+}
+
+.toc li > a {
+	display: grid;
+	grid-template-columns: auto max-content;
+	align-items: end;
+	padding-inline-start: .1ch;
+	padding-inline-end: .1ch;
+}
+
+.toc li > a:hover {
+	background: var(--aside-bg);
+	text-decoration: none;
+}
+
+.toc li > a > .title {
+	position: relative;
+	overflow: hidden;
+}
+
+.toc li > a .leaders::after {
+	color: grey;
+	position: absolute;
+	padding-inline-start: 0.5ch;
+	content: " . . . . . . . . . . . . . . . . . . . "
+		". . . . . . . . . . . . . . . . . . . . . . . "
+		". . . . . . . . . . . . . . . . . . . . . . . "
+		". . . . . . . . . . . . . . . . . . . . . . . "
+		". . . . . . . . . . . . . . . . . . . . . . . "
+		". . . . . . . . . . . . . . . . . . . . . . . "
+		". . . . . . . . . . . . . . . . . . . . . . . "
+		". . . . . . . . . . . . . . . . . . . . . . . "
+		". . . . . . . . . . . . . . . . . . . . . . . "
+		". . . . . . . . . . . . . . . . . . . . . . . "
+		". . . . . . . . . . . . . . . . . . . . . . . ";
+	text-align: right;
+}
+
+.toc li > a > .page {
+	min-width: 3.5ch;
+	font-variant-numeric: tabular-nums;
+	text-align: right;
+}
+
 
 @media print {
 	.page_navigation,

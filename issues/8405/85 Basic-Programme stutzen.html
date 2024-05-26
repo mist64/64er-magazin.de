@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+	<title>Basic-Programme stutzen</title>
+	<meta charset="UTF-8">
+	<link rel="stylesheet" href="../style.css">
+	<meta name="author" content="Fred Behringer">
+	<meta name="64er.issue" content="5/84">
+	<meta name="64er.pages" content="85">
+	<meta name="64er.head1" content="Tips & Tricks">
+	<meta name="64er.head2" content="VC 20">
+	<meta name="64er.toc_title" content="Basic-Programme stutzen (VC 20)">
+	<meta name="64er.toc_category" content="Programme zum Abtippen|Tips & Tricks">
+	<meta name="64er.index_title" content="Basic-Programme stutzen (VC 20)">
+	<meta name="64er.index_category" content="Listings zum Abtippen|Tips & Tricks|Basic">
+	<meta name="64er.id" content="stutzen">
+</head>
+
+<body>
+	<article>
+		<h1>Basic-Programme stutzen</h1>
+
+		<p class="intro">Es kommt nicht selten vor, daß man Teile eines umfangreichen Basic-Programms für eine Neuentwicklung verwenden möchte, während andere Teile als überflüssig weggeschnitten werden sollen. Eine kleine Routine hilft dabei.</p>
+
+		<p>Exbasic Level II kennt den im VC20-Basic nicht vorhandenen Befehl DELETE, genauer: DEL-b, DELa-b, DELa-, wobei a und b explizit vorgegebene Zeilennummern sind. Das im folgenden vorgeschlagene Basic-Programm simuliert den Befehl DELa-, genauer: DEL X-, wobei der (gegebenenfalls erst vom Hauptprogramm zu berechnende) aktuelle Wert von X diejenige Basic-Zeile angibt, ab welcher (inklusiv) das im Basic-Speicher befindliche Programm gekürzt werden soll. Wir beschränken uns auf DEL X-. DEL-X und DEL X-Y lassen sich nach ähnlichem Muster aufbauen (Kopieren geeigneter Teile des Interpreters in den Kassettenpuffer und dortiges Abändern durch einige wenige POKE-Befehle), erfordern aber einen etwa doppelt so großen Aufwand.</p>
+
+		<p>Zunächst wird das Maschinenprogramm 50707 des Interpreters in den Kassettenpuffer kopiert. Dieses Programm 50707 berechnet die Adresse derjenigen Basic-Zeile, deren Zeilennummer in 20/21 eingegeben wird, nennen wir sie ADRX. Da 20/21 beim Abarbeiten des Programms durch die Adressenberechnung bei SYS828 in Zeile 560 gestört wird, wird die Zeilennummer-Übergabestelle in der 50707-Kopie nach 1/2 verlegt. An die 50707-Kopie im Kassettenpuffer wird eine (anschließend mit 5 POKE-Befehlen abgeänderte) Kopie eines für unsere Zwecke geeigneten Teilstücks des Maschinenunterprogramms 50756 vom Interpreters gelegt. Dieses speichert in ADRX und ADRX+1 den Wert 0 (Signal für Basic-Programmende) und setzt den Zeiger 45/46 (Variablenanfang) auf ADRX + 2. Das Gesamtmaschinenprogramm im Kassettenpuffer wird per SYS828 angesprungen, und ein CLR sorgt nach Rückkehr in Basic für ein Angleichen der restlichen Basic-Zeiger.</p>
+
+		<p>Das Programm (das sich als ein bei Bedarf einzugebendes oder bei Neuentwicklungen schon vorsorglich vorzusehendes Hilfsprogramm (Utility) versteht) kennt keine Fehlermeldungen. Ist die Basic-Zeile X nicht vorhanden, wird der Programmrest ab der nächsten verfügbaren auf X folgenden Basic-Zeile weggeschnitten. Selbstverständlich kann sich das Hilfsprogramm auch selbst (ganz oder teilweise) stutzen. Gibt esweder die Basic-Zeile X noch eine Basic-Zeile mit höherer Nummer, so bleibt alles so, wie es ist.</p>
+
+		<p>Das Beispielsprogramm schneidet die Zeile 700 und alle darauffolgenden Zeilen weg. Bei X = 690 in Zeile 100 würde es ebenfalls Zeile 700 und alle folgenden wegschneiden. Bei X = 720 würde alles so bleiben, wie es ist. Bei X = 200 bliebe nur die Zeile 100 stehen.</p>
+
+		<p>Wird das Hilfsprogramm mehrfach verwendet, so reicht es zur Ablaufbeschleunigung, in Zeile 100 nach 550 zu springen. Der Teil 500 bis 540 generiert das Maschinenprogramm im Kassettenpuffer, welches natürlich solange zur Verfügung steht, wie der Kassettenpuffer nicht benötigt wird (SAVE, LOAD, VERIFY).</p>
+
+		<address class="author">(Fred Behringer)</address>
+
+		<figure>
+			<table>
+				<tr>
+					<th>Zeile</th>
+					<th></th>
+				</tr>
+				<tr>
+					<td>100</td>
+					<td>X mit Zeilennummer laden, ab welcher das Gesamtprogramm gekürzt werden soll.</td>
+				</tr>
+				<tr>
+					<td>510</td>
+					<td>Kopieren des Interpreter-Unterprogramms 50707 in den Kassettenpuffer.</td>
+				</tr>
+				<tr>
+					<td>520</td>
+					<td>Verlegen der Parameter-Eingabestellen 20/21 in der 50707-Kopie nach 1/2, da 20/21 auch von der Adressenberechnung in SYS828 (Zeile 560) benötigt wird.</td>
+				</tr>
+				<tr>
+					<td>530</td>
+					<td>Kopieren eines geeigneten Teilstücks des Interpreter-Unterprogramms 50756 in den Kassettenpuffer und</td>
+				</tr>
+				<tr>
+					<td>540</td>
+					<td>geeignetes Abändern, so daß in die von der 50707-Kopie in 95/96 gelieferte Anfangsadresse der Basic-Zeile X (oder, bei Nichtvorhandensein von X, der nächstmöglichen Basic-Zeile), sagen wir ADRX, und in ADRX+1 der Wert 0 (Basic-Ende) und in 45/46 die Adresse ADRX+2 (Variablenanfang) gelegt wird.</td>
+				</tr>
+				<tr>
+					<td>550</td>
+					<td>Aufspalten der in X vorgegebenen Basic-Zeilennummer in Low Byte und High Byte und Übergabe an 1/2.</td>
+				</tr>
+				<tr>
+					<td>560</td>
+					<td>Abarbeiten des Maschinenprogramms und anschließendes Nachstellen der restlichen Basic-Zeiger.</td>
+				</tr>
+			</table>
+			<figcaption>Programmbeschreibung zu »DELETE X«</figcaption>
+		</figure>
+
+		<figure>
+            <pre data-filename="delete x" data-name="DELETE X"></pre>
+			<figcaption>Listing zu »DELETE X«</figcaption>
+		</figure>
+
+	</article>
+
+</body>
+
+</html>

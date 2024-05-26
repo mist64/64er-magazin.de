@@ -1,0 +1,383 @@
+;lehrerkalender ==0801==
+;Quelle: "1984-06.d64", zur Verfügung gestellt von von BJ64
+;        https://www.forum64.de/index.php?thread/145873-64er-magazin-monatlich-online/&postID=2127851#post2127851
+  100 rem ****************************
+  101 rem *                          *
+  102 rem *  elektr.                 *
+  103 rem *        lehrerkalender    *
+  104 rem *                          *
+  105 rem *  von                     *
+  106 rem *        dirk schwerdfeger *
+  107 rem *        heitlandstr. 20   *
+  108 rem *        4800 bielefeld 1  *
+  109 rem *                          *
+  110 rem *                          *
+  111 rem *  vers.:10/83/1.          *
+  112 rem *        03/84/2.          *
+  113 rem ****************************
+  299 rem ***titelbild***
+  300 poke53280,2:poke53281,2:print"{blk}"
+  310 print"{clr}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}elektronischer"
+  320 print"{down}{down}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}lehrerkalender"
+  330 fori=0to2000:nexti
+  400 poke53280,11:poke53281,11:print"{orng}"
+  489 rem ***speicher fuer liste freimachen***
+  490 dima$(36):dima(36,7)
+  499 rem ***hauptmenu***
+  500 print"{clr}{down}{down}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}menu"
+  510 print"{down}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rvon}1{rvof}   liste schreiben"
+  520 print"{down}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rvon}2{rvof}   uebersicht ausgeben"
+  530 print"{down}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rvon}3{rvof}   benotung festlegen"
+  540 print"{down}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rvon}4{rvof}   klassenspiegel"
+  550 print"{down}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rvon}5{rvof}   liste erweitern"
+  555 print"{down}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rvon}6{rvof}   arbeiten loeschen"
+  560 print"{down}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rvon}7{rvof}   drucken"
+  565 print"{down}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rvon}8{rvof}   beenden"
+  570 print"{down}{down}{rght}{rght}{rght}{rght}{rght}{rght}{down}{rvon}*** bitte ziffer waehlen ***{rvof}"
+  600 getz$:ifz$=""then600
+  610 ifasc(z$)<49orasc(z$)>56then600
+  620 z=val(z$):onzgoto1000,1900,3000,4000,5000,6000,7000,10000
+  999 rem ***liste schreiben***
+ 1000 ifx2=1then500:rem *ueberschreibschutz*
+ 1005 print"{clr}{down}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}klassenliste schreiben"
+ 1010 print"{down}bitte nach jeder eingabe":print"return' druecken."
+ 1020 input"klasse       : ";kl$
+ 1030 input"fach         : ";fa$
+ 1040 input"halbj-beginn : ";sj$
+ 1060 print"{clr}fach:";fa$,"klasse:";kl$
+ 1070 print"halbj-beginn: ";sj$
+ 1080 print"{down}{down}{down}bitte jetzt namen eingeben,die nicht "
+ 1090 print"laenger als 10 zeichen sind."
+ 1095 print"beispiel: schwerdf.d"
+ 1100 print"{down}{down}um die liste zu schliessen,als letzten"
+ 1110 print"namen '*' eingeben."
+ 1120 n=n+1
+ 1130 input"name ";a$(n)
+ 1135 rem **namenslaenge pruefen**
+ 1140 iflen(a$(n))>10thenprint"zuviele zeichen!":goto1130
+ 1150 ifa$(n)="*"orn>35thengoto1170
+ 1151 rem *namen$ auf 10 zeichen bringen*
+ 1152 l1=len(a$(n)):ifl1=10then1160
+ 1154 l2=10-l1:forj=1tol2:a$(n)=a$(n)+" ":nextj
+ 1160 goto1120
+ 1170 print"{down}{rght}{rght}{rght}liste geschlossen{down}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{rvon}zurueck mit einer taste":y=1
+ 1180 getz$:ifz$=""then1180
+ 1190 ifz$<>""thenx2=1:goto500
+ 1899 rem ***uebersicht ausgeben***
+ 1900 ify=0thengosub15000:x2=1
+ 2000 print"{clr}klasse:";kl$,,"fach:";fa$
+ 2015 print"halbj-beginn:";sj$
+ 2020 fori=1to10
+ 2030 print"{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}P{CBM-Y}{CBM-Y}{CBM-Y}P{CBM-Y}{CBM-Y}{CBM-Y}P{CBM-Y}{CBM-Y}{CBM-Y}P{CBM-Y}{CBM-Y}{CBM-Y}P{CBM-Y}{CBM-Y}{CBM-Y}P{CBM-Y}{CBM-Y}{CBM-Y}P{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}";
+ 2040 print"          {CBM-N}   {CBM-N}   {CBM-N}   {CBM-N}   {CBM-N}   {CBM-N}   {CBM-N}     ";
+ 2050 nexti:s=1:t=10
+ 2052 print"{home}{down}":fori=stot
+ 2055 ifi=nori>35then2090
+ 2060 gosub16000
+ 2069 print"{down}";
+ 2070 printa$(i)
+ 2071 printtab(11)"{up}"a(i,1)
+ 2072 printtab(15)"{up}"a(i,2)
+ 2073 printtab(19)"{up}"a(i,3)
+ 2074 printtab(23)"{up}"a(i,4)
+ 2075 printtab(27)"{up}"a(i,5)
+ 2076 printtab(31)"{up}"a(i,6)
+ 2077 printtab(35)"{up}    {left}{left}{left}{left}"
+ 2078 ifa(i,7)=int(a(i,7))thenprinttab(35)"{up}"a(i,7):rem *zeilenausgleich*
+ 2079 ifa(i,7)<>int(a(i,7))thenprinttab(35)"{up}"a(i,7);:rem *zeilenausgleich*
+ 2080 nexti:ifs>1then2100
+ 2090 print"{home}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{stop}{rvon}weiter mit '1'/ zurueck mit '2'"
+ 2100 getz$:ifz$=""then2100
+ 2110 ifasc(z$)<49orasc(z$)>50then2100
+ 2120 ifz$="1"thens=s+10:t=t+10:goto2052
+ 2130 ifz$="2"then500
+ 2999 rem ***notenverteilung***
+ 3000 ify=0thengosub15000:x2=1
+ 3005 print"{clr}{down}{down}{down}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rvon}notenverteilung{rvof}"
+ 3010 input"{down}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}arbeit nr.: ";t
+ 3020 input"{down}{rght}{rght}{rght}gesamtpunktzahl: ";gp
+ 3025 rem ***vert. berechnen***
+ 3030 print"{down}{rvon}standardverteilung:{rvof}"
+ 3040 z1=int(gp*.98+.5):z2=int(gp*.85+.5):z3=int(gp*.7+.5):z4=int(gp*.5+.5)
+ 3050 z5=int(gp*.25+.5)
+ 3060 print"{down}{rght}sehr gut:"gp"-"z1
+ 3070 print"{down}{rght}     gut:"z1-1"-"z2
+ 3080 print"{down}{rght}befried.:"z2-1"-"z3
+ 3090 print"{down}{rght}ausrrei.:"z3-1"-"z4
+ 3100 print"{down}{rght}mangelh.:"z4-1"-"z5
+ 3110 print"{down}{rght}ungenue.:"z5-1"- 0"
+ 3120 print"{down}{rvon}moechten sie eine andere wertung?(j/n){rvof}"
+ 3130 getz$:ifz$=""then3130
+ 3140 ifz$="n"thenprint"{up}{rvon}diese wertung werde ich anwenden      {rvof}":goto3145
+ 3142 goto3150
+ 3145 fori=0to3000:next:goto3300
+ 3150 ifz$="j"then3170
+ 3160 goto3130
+ 3165 rem ***eigenwertung eingeben***
+ 3170 print"{home}{down}{down}{down}{down}{down}{down}{down}{down}{down}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{yel}eigenwertung:{orng}"
+ 3180 print"{down}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}"gp"-";:inputz1
+ 3190 print"{down}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}"z1-1"-";:inputz2
+ 3200 print"{down}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}"z2-1"-";:inputz3
+ 3210 print"{down}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}"z3-1"-";:inputz4
+ 3220 print"{down}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}"z4-1"-";:inputz5
+ 3230 print"{down}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}"z5-1"-  0"
+ 3240 print"{down}{rvon}ihre wertung werde ich anwenden        {rvof}"
+ 3250 fori=0to3000:next
+ 3299 rem ***noten berechnung***
+ 3300 print"{clr}{down}{rght}{rght}arbeit nr.:";t
+ 3310 print"{down}{rght}{rght}ges-punkte :";gp
+ 3320 print"{down}{rght}{rght}{rght}{rght}{rght}name:{rght}{rght}{rght}{rght}err.punkte:{rght}{rght}{rght}{rght}{rght}{rght}note:"
+ 3340 print
+ 3350 k=k+1:inputb$:ifb$="*"ork=nthen500
+ 3360 input"{up}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}";ep
+ 3370 ifep>=z1thenen=1
+ 3380 ifep>=z2andep<z1thenen=2
+ 3390 ifep>=z3andep<z2thenen=3
+ 3400 ifep>=z4andep<z3thenen=4
+ 3410 ifep>=z5andep<z4thenen=5
+ 3420 ifep<z5thenen=6
+ 3499 rem ***namen-such-routine***
+ 3500 forj=1ton
+ 3510 iflen(b$)=4then3530
+ 3511 l1=len(b$):ifl1=10then3520
+ 3512 l2=10-l1:foro=1tol2:b$=b$+" ":nexto
+ 3520 ifb$=a$(j)thenm=j:a(m,t)=en:j=n:goto3550
+ 3530 ifleft$(a$(j),4)=b$thenm=j:a(m,t)=en:j=n:goto3550
+ 3540 ifj=n thenprint"{up}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}nicht gefunden              ":xy=1
+ 3550 nextj
+ 3555 ifxy=1then3610
+ 3560 print"{up}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}"a(m,t)
+ 3610 xy=0:goto3350
+ 3999 rem ***klassenspiegel***
+ 4000 ify=0thengosub15000:x2=1
+ 4005 print"{clr}{down}{down}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rvon}klassenspiegel{rvof}"
+ 4010 print"{down}{rght}{rght}den klassenspiegel welcher arbeit "
+ 4020 print"{down}{rght}{rght}wollen sie sehen? {rvon}(1-6){rvof}"
+ 4030 getz$:ifz$=""then4030
+ 4040 ifasc(z$)<49orasc(z$)>54then4030
+ 4050 z=val(z$)
+ 4210 print"{down}{down}{down}{down}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}"z"{left}.arbeit"
+ 4250 print"{down}{rght}{rght}{rght}{rght}{rght}{rght}{rght}i {CBM-N}ii {CBM-N}iii{CBM-N}iv {CBM-N}v  {CBM-N}vi "
+ 4260 print"{rght}{rght}{rght}{rght}{rght}{rght}{rght}{CBM-Y}{CBM-Y}P{CBM-Y}{CBM-Y}{CBM-Y}P{CBM-Y}{CBM-Y}{CBM-Y}P{CBM-Y}{CBM-Y}{CBM-Y}P{CBM-Y}{CBM-Y}{CBM-Y}P{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}"
+ 4270 print"{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{CBM-N}{rght}{rght}{rght}{CBM-N}{rght}{rght}{rght}{CBM-N}{rght}{rght}{rght}{CBM-N}{rght}{rght}{rght}{CBM-N}   "
+ 4280 j=z:gosub17000
+ 4299 rem **verteilung ausgeben**
+ 4300 print"{up}"tab(6)ks
+ 4310 print"{up}"tab(10)kg
+ 4320 print"{up}"tab(14)kb
+ 4330 print"{up}"tab(18)ka
+ 4340 print"{up}"tab(22)km
+ 4350 print"{up}"tab(26)ku
+ 4400 print"{down}{down}{down}{rght}{rght}{rvon}weiter mit'1'/ zurueck mit'2'{rvof}"
+ 4410 getx$:ifx$=""then4410
+ 4420 ifasc(x$)<49orasc(x$)>50then4410
+ 4430 ifx$="2"then500
+ 4440 ifx$="1"then4000
+ 4999 rem ***liste erweitern***
+ 5000 ify=0thengosub15000:x2=1
+ 5010 print"{clr}fach:";fa$,"klasse:";kl$
+ 5020 print"halbj-beginn: ";sj$
+ 5030 print"{down}{down}{down}bitte jetzt neue namen eingeben."
+ 5040 print"{down}(max. laenge : 10 zeichen)"
+ 5050 print"{down} '*' schliesst die liste."
+ 5060 n=n-1
+ 5070 n=n+1
+ 5080 input"name";a$(n)
+ 5090 iflen(a$(n))>10thenprint"zuviele zeichen!":goto5080
+ 5100 ifa$(n)="*"then5150
+ 5110 l1=len(a$(n)):ifl1=10then5140
+ 5120 l2=10-l1:forj=1tol2:a$(n)=a$(n)+" ":nextj
+ 5140 goto5070
+ 5150 print"{down}{rght}{rght}{rght}liste geschlossen{down}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{rvon}zurueck mit einer taste":y=1
+ 5160 getz$:ifz$=""then5160
+ 5170 goto500
+ 5999 rem ***arbeiten loeschen***
+ 6000 ify=0thengosub15000:x2=1
+ 6010 print"{clr}welche arbeit soll geloescht werden?"
+ 6020 print:input"{rvon} (1-6) {rvof} ";w
+ 6030 print"{down}{down}{down}{down}{rght}{rght}{rvon}1{rvof}  einzelne arbeiten"
+ 6035 print"{down}{rght}{rght}{rvon}2{rvof}  alle arbeiten der nr.:";w
+ 6040 print"{down}{rght}{rght}{rvon}3{rvof}  zurueck ins menu"
+ 6050 getz$:ifz$=""then6050
+ 6060 ifasc(z$)<49orasc(z$)>51then6050
+ 6070 z=val(z$):onzgoto6100,6500,500
+ 6099 rem ***schuelera. loeschen***
+ 6100 print"{clr}bitte namen des schuelers eingeben,"
+ 6110 print"{down}dessen arbeit geloescht werden soll."
+ 6120 print"{down}{down}{rght}{rght}":input"name";b$
+ 6130 forj=1ton
+ 6140 iflen(b$)=4then6180
+ 6150 l1=len(b$):ifl1=10then6170
+ 6160 l2=10-l1:foro=1tol2:b$=b$+" ":nexto
+ 6170 ifb$=a$(j)thenm=j:a(m,w)=0:goto6190
+ 6180 ifleft$(a$(j),4)=b$thenm=j:a(m,w)=0
+ 6190 nextj
+ 6200 print"{down}{down}die arbeit von "a$(m)
+ 6210 print"{down}wurde geloescht.":foru=0to999:nextu:goto500
+ 6499 rem ***arb.-nr.x loeschen***
+ 6500 print"{clr}die arbeit nr.:"w" wird geloescht."
+ 6510 fori=1ton
+ 6520 a(i,w)=0
+ 6530 nexti
+ 6540 foru=1to500:nextu
+ 6550 goto500
+ 6999 rem ***ausdruck***
+ 7000 ify=0thengosub15000:x2=1
+ 7010 print"{clr}{down}{down}{down}{down}{down}die klassenliste der"kl$"wird"
+ 7020 print"{down}nun ausgedruckt."
+ 7030 print"{down}{down}{rvon} ist der drucker bereit ? {rvof}(j/n)"
+ 7040 getq$:ifq$=""then7040
+ 7050 ifq$<>"j"then500
+ 7060 print"{up} bitte etwas geduld.                   "
+ 7065 rem ***druck-routine***
+ 7070 open4,4,0
+ 7075 print#4,"klasse:"kl$,,"fach:"fa$
+ 7077 print#4,"halbj-beginn:"sj$
+ 7080 print#4,"{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}P{CBM-Y}{CBM-Y}{CBM-Y}P{CBM-Y}{CBM-Y}{CBM-Y}P{CBM-Y}{CBM-Y}{CBM-Y}P{CBM-Y}{CBM-Y}{CBM-Y}P{CBM-Y}{CBM-Y}{CBM-Y}P{CBM-Y}{CBM-Y}{CBM-Y}P{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}"
+ 7090 fori=1ton-1:gosub16000
+ 7100 print#4,a$(i)"{CBM-N}"a(i,1)"{CBM-N}"a(i,2)"{CBM-N}"a(i,3)"{CBM-N}"a(i,4)"{CBM-N}"a(i,5)"{CBM-N}"a(i,6)"{CBM-N}"a(i,7)
+ 7110 nexti
+ 7120 print#4,"{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{SHIFT-@}{CBM-@}{CBM-@}{CBM-@}{SHIFT-@}{CBM-@}{CBM-@}{CBM-@}{SHIFT-@}{CBM-@}{CBM-@}{CBM-@}{SHIFT-@}{CBM-@}{CBM-@}{CBM-@}{SHIFT-@}{CBM-@}{CBM-@}{CBM-@}{SHIFT-@}{CBM-@}{CBM-@}{CBM-@}{SHIFT-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}"
+ 7200 close4
+ 7500 print"{clr}sollen die klassenspiegel auch "
+ 7600 print"{down}ausgedruckt werden ? (j/n)"
+ 7610 getq$:ifq$=""then7610
+ 7620 ifq$="n"then500
+ 7630 ifq$="j"then7700
+ 7640 goto7610
+ 7700 print"{clr}{down}{down}{down}{down}{down}nun werden die klassenspiegel"
+ 7710 print"{down}ausgedruckt.":f=6
+ 7800 open4,4
+ 7805 print#4,"klassenspiegel"
+ 7810 forj=1tof:gosub17000
+ 7820 ifks=0andkg=0andkb=0andka=0andkm=0andku=0thenf=j:goto7890
+ 7830 print#4,j".arbeit"
+ 7840 print#4,"{rght}{rght}{rght}{rght}{rght}{rght}i  {CBM-M} ii {CBM-M} iii{CBM-M} iv {CBM-M} v  {CBM-M} vi  "
+ 7850 print#4,"{rght}{rght}{rght}{rght}{rght}{CBM-Y}{CBM-Y}{CBM-Y}P{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}P{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}P{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}P{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}P{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}"
+ 7860 print#4,ks;tab(2)kg;tab(2)kb;tab(2)ka;tab(2)km;tab(2)ku
+ 7890 nextj
+ 7900 close4:goto500
+ 9999 rem ***beenden***
+ 10000 print"{clr}{down}{down}{down}{rght}bevor das programm endet,muessen"
+ 10010 print"{down}{rght}zunaechst alle daten abgespeichert"
+ 10020 print"{down}{rght}werden."
+ 10030 print"{down}{down}{down}{rght}{rght}{rght}{rvon}1{rvof} auf kassette speichern"
+ 10040 print"{down}{rght}{rght}{rght}{rvon}2{rvof} auf diskette speichern"
+ 10045 print"{down}{down}{down}{down}{down}{rght}{rght}{rght}{rvon}*bitte ziffer waehlen*{rvof}"
+ 10050 getz$:ifz$=""then10050
+ 10060 ifasc(z$)<49orasc(z$)>50then10050
+ 10070 z=val(z$):onzgoto10100,11000
+ 10099 rem ***data-save / tape***
+ 10100 print"{clr}{down}{down}{rght}bitte kassette auf freien "
+ 10110 print"{down}{rght}speicherplatz vorspulen."
+ 10120 print"{down}{down}{down}{rght}haben sie das band positioniert? (j/n)"
+ 10130 getz$:ifz$=""then10130
+ 10140 ifz$="j"then10200
+ 10150 ifz$="n"then10100
+ 10160 ifz$<>"j"andz$<>"n"then10130
+ 10200 print"{clr}{down}{rght}die daten werden nun gespeichert."
+ 10210 print"{down}{rght}etwas geduld bitte.":fi$=kl$+fa$
+ 10220 open1,1,1,fi$
+ 10230 print#1,kl$
+ 10240 print#1,fa$
+ 10250 print#1,sj$
+ 10260 fori=1ton
+ 10270 print#1,a$(i)
+ 10280 nexti
+ 10290 fori=1ton
+ 10300 forj=1to6
+ 10310 print#1,a(i,j)
+ 10320 nextj
+ 10330 nexti
+ 10415 print#1,y
+ 10420 close1:goto12000
+ 10999 rem ***data-save / disk***
+ 11000 print"{clr}{down}{rght}die daten werden nun gespeichert."
+ 11010 print"{down}{rght}etwas geduld bitte.":fi$="@:"+kl$+fa$+",s,w"
+ 11020 open2,8,2,fi$
+ 11030 print#2,kl$
+ 11040 print#2,fa$
+ 11050 print#2,sj$
+ 11060 fori=1ton
+ 11070 print#2,a$(i)
+ 11080 nexti
+ 11090 fori=1ton
+ 11100 forj=1to6
+ 11110 print#2,a(i,j)
+ 11120 nextj
+ 11130 nexti
+ 11215 print#2,y
+ 11220 close2:goto12000
+ 11999 rem ***schlussbild***
+ 12000 print"{clr}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}"
+ 12010 print"{down}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}tschuess!"
+ 12020 print"{down}{down}{down}{down}{down}{down}{down}{down}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}ihr bozlo von schwereg":end
+ 14999 rem ***daten laden***
+ 15000 print"{clr}{down}um das programm bearbeiten zu koennen,"
+ 15010 print"{down}muessen zuvor die daten eingelesen"
+ 15020 print"{down}werden."
+ 15022 input"{down}klasse: ";kl$
+ 15024 input"{down}fach  : ";fa$
+ 15026 fi$=kl$+fa$
+ 15030 print"{down}{down}{down}{down}{down}{rght}{rght}{rght}{rght} {rvon}1{rvof} von kassette"
+ 15040 print"{down}{rght}{rght}{rght}{rght} {rvon}2{rvof} von diskette"
+ 15050 print"{down}{down}{down}{down}{down}{down}{rght}{rght}{rght}{rght}{rght}{rvon}*bitte ziffer waehlen*{rvof}"
+ 15060 getz$:ifz$=""then15060
+ 15070 ifasc(z$)<49orasc(z$)>50then15060
+ 15075 print"{clr}{down}{down}{down}{down}{down}{down}die daten werden eingelesen."
+ 15077 print"{down}{down}{down}{down}bitte etwas geduld."
+ 15080 z=val(z$):onzgoto15200,15600
+ 15099 rem ***data-load / tape***
+ 15200 open1,1,0,fi$
+ 15210 input#1,kl$
+ 15220 input#1,fa$
+ 15230 input#1,sj$
+ 15240 n=n+1
+ 15250 input#1,a$:a$(n)=a$
+ 15260 ifa$(n)="*"then15280
+ 15270 goto15240
+ 15280 fori=1ton
+ 15290 forj=1to6
+ 15300 input#1,a(i,j)
+ 15310 nextj:nexti
+ 15400 input#1,y
+ 15410 close1
+ 15500 return
+ 15599 rem ***data-load / disk***
+ 15600 fi$=fi$+",s,r": open2,8,2,fi$
+ 15610 input#2,kl$
+ 15620 input#2,fa$
+ 15630 input#2,sj$
+ 15640 n=n+1
+ 15650 input#2,a$:a$(n)=a$
+ 15660 ifa$(n)="*"then15680
+ 15670 goto15640
+ 15680 fori=1ton
+ 15690 forj=1to6
+ 15700 input#2,a(i,j)
+ 15710 nextj:nexti
+ 15800 input#2,y
+ 15810 close2
+ 15900 return
+ 15999 rem ***durchschnitt berechnen***
+ 16000 dn=0:az=0
+ 16010 forj=1to6
+ 16020 dn=dn+a(i,j)
+ 16030 ifa(i,j)=0then16050
+ 16040 az=az+1
+ 16050 ifj=6andaz=0thenaz=1:rem **div.durch 0 verhindern**
+ 16060 nextj
+ 16070 a(i,7)=int((dn/az)*10+.5)/10
+ 16080 return
+ 16999 rem ***kl.-spiegel berechnen***
+ 17000 ks=0:kg=0:kb=0:ka=0:km=0:ku=0
+ 17010 fori=1ton
+ 17020 ifa(i,j)=1thenks=ks+1
+ 17030 ifa(i,j)=2thenkg=kg+1
+ 17040 ifa(i,j)=3thenkb=kb+1
+ 17050 ifa(i,j)=4thenka=ka+1
+ 17060 ifa(i,j)=5thenkm=km+1
+ 17070 ifa(i,j)=6thenku=ku+1
+ 17080 nexti
+ 17090 return
+

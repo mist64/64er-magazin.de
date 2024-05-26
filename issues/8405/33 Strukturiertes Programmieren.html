@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+	<title>Strukturiertes Programmieren</title>
+	<meta charset="UTF-8">
+	<link rel="stylesheet" href="../style.css">
+	<meta name="author" content="gk"> <!-- taken from 6/84 -->
+	<meta name="64er.issue" content="5/84">
+	<meta name="64er.pages" content="33">
+	<meta name="64er.head1" content="Strukturiertes Programmieren">
+	<meta name="64er.toc_category" content="Software">
+	<meta name="64er.index_title" content="Strukturiertes Programmieren (Teil 1)">
+	<meta name="64er.index_category" content="Software|Grundlagen">
+	<meta name="64er.id" content="strukturiert">
+</head>
+
+<body>
+	<article>
+		<h1>Strukturiertes Programmieren</h1>
+
+		<p class="intro">Strukturiertes Programmieren ist keineswegs so schwierig wie es sich anhört. Neben etwas Theorie wollen wir ein kleines aber ausbaufähiges Spiel entwerfen.</p>
+
+		<figure>
+            <img src="33-1a.png" alt="">
+            <img src="33-1b.png" alt="">
+            <img src="33-1c.png" alt="">
+			<figcaption>Bild 1a, b, c. Das Spielfeld wird eine typische Spielsituation</figcaption>
+		</figure>
+
+		<p>Im letzten Heft gab ich Ihnen einige Regeln, die das Strukturieren des Programmcodes betreffen. Eigentlich war dieser Bericht zu früh dran. Denn bevor man sich an seinen Computer setzt und das Programm eintippt, ist eine Menge Vorarbeit zu leisten. Die wichtigste Arbeit besteht dabei im Nachdenken. Nachdenken vor allem darüber, was das Programm, das man schreiben will, eigentlich tun soll, wie man es am effektivsten aufbaut. Und dabei werden die meisten und verhängnisvollsten Fehler gemacht. Diese Fehler ziehen sich durch das gesamte »Software-Projekt« hindurch und entscheiden später über den Erfolg oder Mißerfolg des Programms. Und je später ein Fehler endeckt wird, desto größer wird der Aufwand, den man betreiben muß, um diesen Fehler zu beheben. Das bedeutet ganz einfach, daß man am Anfang sehr aufmerksam sein muß, und jeden Schritt, jede Idee lieber einmal mehr als einmal zu wenig überdenken sollte.</p>
+
+		<p>Gerade dann, wenn das Programm wahrscheinlich etwas größer wird, tut man gut daran, es in kleinere Einheiten aufzuteilen. Diese Einheiten werden auch Module genannt. Gebräuchlich sind auch die Begriffe »Unterprogramm«, »Subroutine« oder auch »Prozeduren« (zum Beispiel in Pascal). Gemeint ist in der Regel immer das gleiche.</p>
+
+		<p>Bei großen und komplexen Programmpaketen besteht eine der wichtigsten Aufgaben in der Modularisierung eines Programms. Das heißt aber auch, daß, wenn diese Aufgabe erste einmal gelöst ist, der Rest um so einfacher und schneller von der Hand geht.</p>
+
+		<h2>Wie ein Spiel entsteht</h2>
+
+		<p>Wenden wir uns jetzt einem neuen Beispiel zu. Ich möchte mit Ihnen ein kleines und einfaches Spiel entwerfen. Die Spielregeln sind sehr einfach. Wir wollen den Computer veranlassen, gegen uns zu spielen. In ein Spielfeld von 3 x 3 Feldern setzen die Spieler (der Computer und wir) abwechselnd eine Null oder ein X. Wir setzen die X. Wer als erster drei Zeichen in einer Reihe hat, hat gewonnen. Eine Reihe heißt hier senkrecht, waagerecht oder diagonal. Das Spielfeld und eine typische Spielsituation sind in Bild 1a und 1b zu sehen.</p>
+
+		<p>Wir wollen unser Spielfeld jetzt numerieren, jedes Feld erhält eine Nummer (Bild 1c).
+			Jetzt schreiben wir uns auf, was in jedem Feld steht:</p>
+
+		<pre>
+1 x     2 0     3 -
+4 x     5 -     6 x
+7 0     8 -     9 -</pre>
+
+		<p>Ein Strich bedeutet hier ein leeres Feld.</p>
+
+		<pre>
+Ersetze x durch 1
+        0 durch —1
+        — durch 0</pre>
+
+		<p>Der Grund dafür, daß wir gerade diese Zahlen nehmen, ist jetzt noch nicht so klar, im Moment ist es einfach ein Gefühl für Symmetrie. Wir werden aber sehen, daß diese Wahl zweckmäßig ist.</p>
+
+		<p>Damit können wir den Spielstand so beschreiben:</p>
+
+		<table>
+			<caption>Array SS (Spielstand)</caption>
+			<tr>
+				<th>Feld</th>
+				<th>Inhalt</th>
+			</tr>
+			<tr>
+				<td>1</td>
+				<td>1</td>
+			</tr>
+			<tr>
+				<td>2</td>
+				<td>-1</td>
+			</tr>
+			<tr>
+				<td>3</td>
+				<td>0</td>
+			</tr>
+			<tr>
+				<td>4</td>
+				<td>1</td>
+			</tr>
+			<tr>
+				<td>5</td>
+				<td>0</td>
+			</tr>
+			<tr>
+				<td>6</td>
+				<td>1</td>
+			</tr>
+			<tr>
+				<td>7</td>
+				<td>-1</td>
+			</tr>
+			<tr>
+				<td>8</td>
+				<td>0</td>
+			</tr>
+			<tr>
+				<td>9</td>
+				<td>0</td>
+			</tr>
+		</table>
+
+		<p>Diesen (und auch jeden anderen) Spielstand legen wir in einem Array SS ab (SS steht für Spielstand). So oft sich also der Spielstand ändert, ändert sich auch der Inhalt des Arrays SS. SS(5) enthält also immer den Inhalt des mittleren Feldes, eine 1, wenn wir einen Stein (x) auf das Feld gesetzt haben, eine —1, wenn der Computer seinen Spielstein darauf gesetzt hat, oder eine 0, wenn das Feld noch nicht besetzt ist.</p>
+
+		<p>Jetzt können wir (und vor allem der Computer) herausfinden, welches Feld besetzt ist, und auch, durch wen es besetzt wurde, aber wir müssen den Compuer ja noch dazu bringen, einen vernünftigen Spielzug zu machen. Das bedeutet, er muß sperren, wenn wir schon zwei Felder einer Reihe besetzt haben, und er soll auch erkennen, wenn er schon zwei Felder einer Reihe besetzt hat, wo er seinen Siegzug hinzusetzen hat. Wir brauchen also eine Methode, um den Spielstand zu bewerten.</p>
+
+		<p>Dazu schaffen wir ein zweites Array, das wir BW nennen (BW steht für Bewertung). BW enthält die Summen jeder Reihe, der waagerechten, der senkrechten und der diagonalen. Insgesamt haben wir acht Reihen, so daß auch BW nicht größer zu sein braucht. Und so wird jedes Element von BW berechnet:</p>
+
+		<table>
+			<tr>
+				<td>1</td>
+				<td>0</td>
+				<td>= SS(1) + SS(2) + SS(3)</td>
+				<td>oberste Reihe</td>
+			</tr>
+			<tr>
+				<td>2</td>
+				<td>2</td>
+				<td>= SS(4) + SS(5) + SS(6)</td>
+				<td>zweite Reihe</td>
+			</tr>
+			<tr>
+				<td>3</td>
+				<td>-1</td>
+				<td>= SS(7) + SS(8) + SS(9)</td>
+				<td>dritte Reihe</td>
+			</tr>
+			<tr>
+				<td>4</td>
+				<td>1</td>
+				<td>= SS(1) + SS(4) + SS(7)</td>
+				<td>linke Spalte</td>
+			</tr>
+			<tr>
+				<td>5</td>
+				<td>-1</td>
+				<td>= SS(2) + SS(5) + SS(8)</td>
+				<td>mittlere Spalte</td>
+			</tr>
+			<tr>
+				<td>6</td>
+				<td>1</td>
+				<td>= SS(3) + SS(6) + SS(9)</td>
+				<td>rechte Spalte</td>
+			</tr>
+			<tr>
+				<td>7</td>
+				<td>1</td>
+				<td>= SS(1) + SS(5) + SS(9)</td>
+				<td>vordere Diagonale</td>
+			</tr>
+			<tr>
+				<td>8</td>
+				<td>-1</td>
+				<td>= SS(3) + SS(5) + SS(7)</td>
+				<td>hintere Diagonale</td>
+			</tr>
+		</table>
+
+		<p>Diese Werte geben selbstverständlich nur den oben im Beispiel vorgegebenen Spielstand wieder. Aber wir können jetzt erkennen, daß das Array BW uns Informationen über die aktuelle Spielsituation liefert: Immer, wenn ein Element von BW den Wert 2 hat, erkennt der Computer, daß für ihn Gefahr im Verzuge ist. Die 2 bedeutet nämlich, daß in einer Reihe schon zweimal ein Sein gesetzt wurde. Damit dürfte die nächste Aufgabe des Computers schon klar sein: Er muß seinen nächsten Stein in das dritte Feld der fast kompletten Reihe setzen! Doch wie soll er das freie Feld finden? Wir machen es uns einfach: Er soll so lange einen Stein in ein freies Feld setzen, bis eine erneute Überprüfung des Arrays BW ergibt, daß kein Element mehr den Wert 2 hat. Und wirklich, wenn der Computer zufällig das richtige Feld erwischt hat, wird ja dieses Feld mit einer —1 belegt. Dadurch wird in dem BW-Feld, in dem eine 2 steht, —1 hinzuaddiert, also 1 abgezogen. Damit existiert in diesem Moment keine gefährliche Situation mehr, jedenfalls nicht für den Computer. Ich sagte gerade, daß der Computer ganz zufällig irgendein freies Feld belegt, um dann nachzuprüfen, ob sich dadurch eine Entschärfung der für ihn gefährlichen Situation ergibt. Falls er ein Feld belegt hat, das nicht zu einer Lösung führt (das heißt die 2 im Feld BW wird nicht verändert), müssen wir natürlich dafür sogen, daß diser Zug wieder zurückgenommen wird. In diesem Fall braucht also dieses Feld nur wieder mit einer 0 belegt zu werden. Aber warum meinte ich »zufällig«? Nun, wir könnten das Spielfeld systematisch druchsuchen lassen, aber dann wäre jeder Zug vorhersehbar und bei einem Spiel wäre das nicht besonders interessant.</p>
+
+		<h2>Die Funktionen</h2>
+
+		<p>Wir legen jetzt also fest, daß der Computer nur dann zu sperren braucht, wenn sich eine für ihn gefährliche Situation ergibt, wenn also zwei Felder in einer Reihe durch ein X besetzt sind. Alle anderen Fälle interessieren ihn nicht besonders, in diesen Fällen setzt er seine Steine ganz zufällig auf ein freies Feld. Selbstverständlich bemerkt er auch, wenn er selbst zwei Felder besetzt hat. Dann versucht er natürlich, daß dritte Feld auch zu belegen. Und last not least, erkennen soll der Computer auch, wenn er oder wir gewonnen haben. Und das erkennt er dann, wenn die Summe einer Reihe +/-3 ergibt.</p>
+
+		<p>So, mit diesen Ideen können wir schon etwas anfangen. Wir versuchen jetzt, die einzelnen Funktionen des Programms festzulegen. In welche Teilaufgaben können wir das Problem zerlegen? Als erstes brauchen wir eine Initialisierung der Variablen. Das Spielfeld soll auch angezeigt werden, das ist ein weiterer Teil. Dann gibt es einmal den Computerzug und auch unseren Spielzug. Und auch die Überprüfung auf Spielende darf nicht fehlen.</p>
+
+		<p>Daraus ergibt sich:</p>
+
+		<table>
+			<tr>
+				<th>Funktion</th>
+				<th>Beginn einer Zeile</th>
+			</tr>
+			<tr>
+				<td>Hauptprogramm</td>
+				<td>10</td>
+			</tr>
+			<tr>
+				<td>Initialisierung des Spielfeldes</td>
+				<td>1000</td>
+			</tr>
+			<tr>
+				<td>Anzeigen des Spielfeldes</td>
+				<td>2000</td>
+			</tr>
+			<tr>
+				<td>Zug holen</td>
+				<td>3000</td>
+			</tr>
+			<tr>
+				<td>Auf Spielende prüfen</td>
+				<td>4000</td>
+			</tr>
+			<tr>
+				<td>Computerzug</td>
+				<td>5000</td>
+			</tr>
+		</table>
+
+		<p>In der Reihenfolge wie sie Bild 2 zeigt, werden die einzelnen Module aufgerufen. Deshalb nennt man dies auch ein Ablaufdiagramm. Manche dieser Module müssen noch weiter unterteilt werden. Zum Beispiel der Modul SPIELENDE (4000): Um ein Spielende zu erreichen, gibt es mindestens zwei Möglichkeiten: Entweder ist eine Reihe mit drei gleichen Steinen besetzt oder aber das Spielfeld ist voll. Dann gibt es ein Unentschieden.</p>
+
+		<figure>
+            <img src="33-2.png" alt="">
+			<figcaption>Bild 2. Das Ablaufdiagramm</figcaption>
+		</figure>
+
+		<p>Um das herauszufinden, erstellen wir eine Routine zum BEWERTEN (6000) des Spielfeldes. In diesem Modul wird das Array BW erzeugt (siehe oben).</p>
+
+		<p>Wie steht es nun mit dem Modul COMPUTERZUG (5000)?</p>
+
+		<p>Ganz klar, auch der Computer muß wissen, wie das Spielfeld jetzt aussieht. Deswegen rufen wir auch hier den Modul BEWERTEN auf. Aus dieser Bewertung heraus können sich drei Möglichkeiten ergeben:</p>
+
+		<ol>
+			<li>Der Computer hat schon eine Reihe mit zwei Steinen besetzt und das dritte Feld ist noch frei (das heißt ein Element von BW hat den Wert —2). Dann führt er einen SIEGZUG (7000) aus. Da wir schon vorhin davon sprachen, daß der Computer seinen Stein zufällig setzt, müssen wir hier den Modul ZURÜCKNEHMEN (10000) berücksichtigen</li>
+
+			<li>Die Gegner — also wir — haben schon zwei Steine in einer Reihe. Wenn das dritte Feld dieser Reihe noch frei ist, ärgert uns der Computer, indem er dieses Feld versucht zu SPERREN (8000).</li>
+
+			<li>Im dritten Fall ergibt sich weder das eine noch das andere, und der Computer macht einen ZUFALLSZUG (9000).</li>
+		</ol>
+
+		<p>Selbst wenn wir die Frechheit besitzen, den Computer auszutricksen, in dem wir zwei Reihen mit je zwei Steinen und einem freien Feld erspielen können, merkt er das und verabschiedet sich nachtragend.</p>
+
+		<p>Damit wäre auch diese Ebene definiert.</p>
+
+		<p>Unser Programm sieht jetzt so aus:</p>
+
+		<table>
+			<tr>
+				<td>0</td>
+				<td>HAUPTPROGRAMM</td>
+				<td>10</td>
+			</tr>
+			<tr>
+				<td>1.1.</td>
+				<td>INITIALISIERUNG</td>
+				<td>1000</td>
+			</tr>
+			<tr>
+				<td>1.2.</td>
+				<td>ANZEIGE</td>
+				<td>2000</td>
+			</tr>
+			<tr>
+				<td>1.3.</td>
+				<td>ZUG HOLEN</td>
+				<td>3000</td>
+			</tr>
+			<tr>
+				<td>1.4.</td>
+				<td>SPIELENDE</td>
+				<td>4000</td>
+			</tr>
+			<tr>
+				<td>1.5.</td>
+				<td>COMPUTERZUG</td>
+				<td>5000</td>
+			</tr>
+			<tr>
+				<td>2.1.</td>
+				<td>BEWERTEN</td>
+				<td>6000</td>
+			</tr>
+			<tr>
+				<td>2.2.</td>
+				<td>SIEGZUG</td>
+				<td>7000</td>
+			</tr>
+			<tr>
+				<td>2.3.</td>
+				<td>SPERREN</td>
+				<td>8000</td>
+			</tr>
+			<tr>
+				<td>2.4.</td>
+				<td>ZUFALLSZUG</td>
+				<td>9000</td>
+			</tr>
+			<tr>
+				<td>3.1.</td>
+				<td>ZURÜCKNEHMEN</td>
+				<td>10000</td>
+			</tr>
+		</table>
+
+		<p>Jetzt haben wir alle notwendigen Module benannt. Daraus erstellen wir ein Übersichtsprogramm. In diesem Übersichtsprogramm werden alle Module grafisch dargestellt und zwar in ihren Abhängigkeiten voneinander (siehe Bild 3).</p>
+
+		<figure>
+            <img src="33-3.png" alt="">
+			<figcaption>Bild 3. Das Übersichtsdiagramm</figcaption>
+		</figure>
+
+		<p>Die Beziehung zwischen den einzelnen Unterprogrammen ist: »ruft auf«. Das Hauptprogramm also ruft auf: INITIALISIERUNG, ANZEIGEN, ZUG HOLEN, SPIELENDE PRÜFEN und COMPUTERZUG. Manche der anderen Module werden nur nach einer bedingten Verzweigung (IF ... THEN GOSUB ...) durchlaufen. Das spielt bei dieser Übersicht jedoch keine Rolle.</p>
+
+		<p>So, jetzt sind wir so weit, daß wir uns die einzelnen Teile etwas genauer anschauen können. Fangen wir wieder mit dem Hauptprogramm an. Oben im Ablaufdiagramm ist es eigentlich schon vollständig beschrieben. Hier könnten wir schon sofort das Coding hinschreiben (Listing 1).</p>
+
+		<figure>
+<pre>
+10 REM *******************************
+20 REM * KREUZ UND QUER              *
+30 REM *******************************
+90 PRINT"{CLR}"
+100 DIMSS(9):DIMBW(8)
+110 GOSUB1000:REM SPIELFELD INITIALISIEREN
+120 GOSUB2000:REM ANZEIGEN
+130 GOSUB3000:REM ZUG HOLEN
+140 GOSUB2000:REM ANZEIGEN
+150 GOSUB4000:REM AUF SPIELENDE PRUEFEN
+160 GOSUB5000:REM COMPUTERZUG
+170 GOSUB2000:REM ANZEIGEN
+180 GOSUB4000:REM AUF SPIELENDE PRUEFEN
+190 GOTO130
+</pre>
+			<figcaption>Listing 1. Das Hauptprogramm unseres Beispiels</figcaption>
+		</figure>
+
+		<p>Wenn Sie dieses Listing mit dem Ablaufdiagramm (Bild 2) vergleichen, sehen Sie die direkte Umsetzung unserer Überlegungen. Lediglich der Programmkopf, das Löschen des Bildschirms (Zeile 90) und die Dimensionierung unserer Arrays (Zeile 100) kommt noch hinzu. Diese Zeile ist in unserem Beispiel zwar nicht notwendig (der C 64 läßt Arrays bis 11 Elemente zu ohne sie dimensionieren zu müssen), aber da wir ja weiterdenken, bereiten wir unser Programm schon für spätere Erweiterungen vor (es könnte ja sein, daß unser Spielfeld vergrößert werden soll). Außerdem erkennen wir schon im Hauptspeicher, welche Variablen für das ganze Programm benötigt werden. Man spricht hier auch von »globalen Variablen«, im Gegensatz zu »lokalen Variablen«, die nur innerhalb eines Moduls wichtig sind.</p>
+
+		<p>Jetzt, nachdem unser Hauptprogramm »steht«, knöpfen wir uns das nächste Modul vor.<br>
+			INITIALISIERUNG<br>
+			In diesem Modul wollen wir die Felder unseres Spielfeldes löschen. Das bedeutet, wir löschen Array SS (Listing 2).</p>
+
+		<figure>
+<pre>
+1000 REM----------------
+1010 REM INITIALISIERUNG
+1020 :
+1100 FORP=1TO3
+1110 :SS(P)=0
+1120 NEXTP
+1130 RETURN
+</pre>
+			<figcaption>Listing 2. Initialisierung des Feldes ss</figcaption>
+		</figure>
+
+		<p>Ich will für einige der folgenden Module das Struktprogramm erstellen. Die Umsetzung in ein ablauffähiges Programm überlasse ich Ihnen. Eine Ausnahme werde ich machen mit den Modulen COMPUTERZUG, SPIELFELD BEWERTEN und ZURÜCKNEHMEN.<br>
+			Modul SPIELFELD ANZEIGEN (2000/) (Bild 4)<br>
+			Modul SPIELERZUG (3000/) (Bild 5)<br>
+			Modul SPIELENDE PRÜFEN (4000/) (Bild 6)<br>
+			Modul COMPUTERZUG (5000/) (Bild 7)<br>
+			Und dann der versprochene Code<br>
+			dazu: (Listing 3)</p>
+
+		<figure>
+<pre>
+5000 REM------------------------------
+5010 REM COMPUTERZUG
+5020
+5030 GOSUB6000
+5040 MT=0
+5050 FORP=1TO8
+5060 :IFBW(P)=-2THENGOSUB7000:RETURN
+5070 :IFBW(P)=2THENMT=MT+1
+5080 NEXTP
+5090 IFMT=2THENPRINT "AUCH GUT. ANGEBER!":END
+5100 IFMT=1THENGOSUB8000:RETURN
+5110 GOSUB9000
+5120 RETURN
+5130 :
+</pre>
+			<figcaption>Listing 3. Computerzug</figcaption>
+		</figure>
+
+		<p>Modul SPIELFELD BEWERTEN (6000)</p>
+
+		<p>Hier wird das Array BW definiert. Man könnte dieses Modul natürlich mit einer Schleife lösen, aber eigentlich lohnt sich der Aufwand nicht (Listing 4).<br>
+			Der Modul SIEGZUG (7000) ist auch schnell gelöst (Bild 8).<br>
+			Modul SPERREN (8000/) (Bild 9)<br>
+			Modul ZUFALLSZUG (9000/) (Bild 10)<br>
+			Modul ZURÜCKNEHMEN (100000)<br>
+			Und dies ist die einfachste Routine, ein Zweizeiler:</p>
+
+		<pre>
+10000 REM -------------------------------------
+10010 REM ZURÜCKNEHMEN
+10030 :
+10040 SS(CM) = 0
+10050 RETURN
+</pre>
+
+		<figure>
+<pre>
+6000 REM--------------------
+6010 REM SPIELFELD BEWERTEN
+6020 :
+6030 :
+6040 BW(1)=SS(1)+SS(2)+SS(3)
+6050 BW(2)=SS(4)+SS(5)+SS(6)
+6060 BW(3)=SS(7)+SS(8)+SS(9)
+6070 BW(4)=SS(1)+SS(4)+SS(7)
+6080 BW(5)=SS(2)+SS(5)+SS(8)
+6090 BW(6)=SS(3)+SS(6)+SS(9)
+6100 BW(7)=SS(1)+SS(5)+SS(9)
+6110 BW(8)=SS(3)+SS(5)+SS(7)
+6120 RETURN
+6130 :
+</pre>
+			<figcaption>Listing 4. Spielfeld bewerten</figcaption>
+		</figure>
+
+		<p>So, daß war das ganze Programm! Eigentlich sollte es Ihnen gelingen, anhand der Struktogramme das Programm zu schreiben. Aber Sie sehen schon jetzt, daß eine Änderung des Programms ganz einfach ist. Man kann sich jeden Modul einzeln vornehmen und ihn je nach Wunsch ändern oder erweitern. Dazu bietet sich zum Beispiel der Modul SPIELFELD ANZEIGEN (2000) an (Bild 4). Man kann die Bildschirmdarstellung sehr gut verbessern, ohne die Programmstruktur zu ändern. Man könnte auch die Strategie des Computers im Modul COMPUTERZUG (5000) verbessern (Bild 7), zum Beispiel soll er zuerst das Feld 5 besetzen (wenn es noch frei ist). Das bringt Spielvorteile (vorausgesetzt, es besteht keine Bedrohung oder eine Gewinnposition ...). Auch könnte man abwechselnd den Computer oder den Mitspieler anfangen lassen zu spielen. Ändern Sie das Programm so ab, daß auch mehrere Spiele durchgeführt werden können und das darüber Buch geführt wird. Sie werden feststellen, daß Änderungen durch die Modularisierung relativ einfach gemacht werden können. Erkennen Sie den Vorteil dieser Programmstrukturierung?</p>
+
+		<figure>
+            <img src="33-4.png" alt="">
+			<figcaption>Bild 4. Nassi-Schneidermann-Diagramm: Spiel- feldanzeigen</figcaption>
+		</figure>
+
+		<figure>
+            <img src="33-5.png" alt="">
+			<figcaption>Bild 5. Modul Spielzeug</figcaption>
+		</figure>
+
+		<figure>
+            <img src="33-6.png" alt="">
+			<figcaption>Bild 6. Auf Spielende prüfen</figcaption>
+		</figure>
+
+		<figure>
+            <img src="33-7.png" alt="">
+			<figcaption>Bild 7. Computerzug</figcaption>
+		</figure>
+
+		<figure>
+            <img src="33-8.png" alt="">
+			<figcaption>Bild 8. Modul Spielzug</figcaption>
+		</figure>
+
+		<figure>
+            <img src="33-9.png" alt="">
+			<figcaption>Bild 9. Modul Sperren</figcaption>
+		</figure>
+
+		<figure>
+            <img src="33-10.png" alt="">
+			<figcaption>Bild 10. Zufallszug</figcaption>
+		</figure>
+
+		<p>Was wir hier gemacht haben, ist ein Top-down-Entwurf. Wir haben bei dem Modul an der Spitze der Hierarchie angefangen (beim Steuermodul oder Hauptprogramm) und entwickelten dann die weiteren Module. Es gibt noch eine andere Methode. Sie nennt man Bottom-up-Methode. Bei dieser Methode ist es genau umgekehrt: Hier fängt man an der untersten Hierarchiestufe an und endet an der obersten.</p>
+
+		<p>Im nächsten Heft stelle ich Ihnen die Elemente der Flußdiagramme und auch die Struktogramme ausführlich vor. Und wenn Sie Lust haben, schicken Sie uns doch Ihre Lösungsvorschläge des Programms. Ich könnte mir vorstellen, daß wir einige interessante Lösungen erhalten werden.</p>
+
+		<p>(Dieses Beispiel ist zum Teil entnommen aus dem Buch Commodore 64, Programmieren leicht gemacht, aus dem Birkhäuser Verlag (siehe auch unsere Buchbesprechung)).</p>
+
+		<h3>TOP-DOWN-Vorgehensweise</h3>
+
+		<p>Top-Down ist eine bestimmte Vorgehensweise bei der Entwicklung und beim Test von Programmen. Sie basiert auf hierarchischen Strukturen und dient als sinnvolle Ergänzung zur strukturierten Programmierung. Zuerst werden die im Sinne der Hierarchie obersten Programmteile entworfen, codiert und getestet, ehe zu Programmteilen der nächst niedrigeren Hierarchiestufe übergegangen wird. Dadurch sind Programmierobjekte besser überschaubar, allgemeine Anforderungen können zuerst, Details später hinzugefügt werden. Weil man sich bei diesem Vorgehen am Anfang mehr Mühe machen muß, wird durch die Betrachtung des Gesamtsystems das frühzeitige Erkennen von Entwurfsfehlern erleichtert. Der Einbau von Entwurfsänderungen ist in den meisten Fällen problemlos.</p>
+
+		<h3>BOTTOM-UP</h3>
+
+		<p>Im Gegensatz zum TOP-DOWN-Entwurf fängt man in einer hierarchischen Programmstruktur auf der untersten Stufe an, entwickelt die einzelnen Komponenten, testet sie einzeln. Ist der Test erfolgreich verlaufen, geht man zur nächsten, höheren Hierarchiestufe weiter und setzt die Arbeit ähnlich fort. So wird ein Programm stufenweise von unten nach oben entwickelt und getestet. Diese Vorgehensweise hat zweifellos Vorteile, man darf jedoch ihre Nachteile nicht übersehen:</p>
+
+		<p>Je höher die Integrationsstufe, also je höher man in der Hierarchie gestiegen ist, um so schwieriger ist die Ursache von Fehlern zu entdecken.</p>
+
+		<p>Änderungen »in der letzten Minute« verursachen wiederum neue Fehler und verschlechtern die Qualität gut konzipierter Programme.</p>
+
+		<p>Zusammenhängende Ergebnisse werden während der ganzen Entwicklungsphase nicht sichtbar.</p>
+
+	</article>
+
+</body>
+
+</html>

@@ -29,10 +29,20 @@ Das Projekt verwendet ein einfaches in Python geschriebenes "CMS". Es nimmt HTML
 Das Skript braucht (macOS):
 ```
 brew install imagemagick     # to convert PNG to JPG
-pip3 install bs4             # to work with HTML
-pip3 install python-dateutil # to work with dates
-pip3 install pytz            # ...and timezones
-pip3 install PyPDF2          # to cut PDFs
+brew install vice            # to generate PRG from TXT (via petcat)
+
+python3 -m pip install -r requirements.txt
+# pip3 install beautifulsoup4    # to work with HTML
+# pip3 install python-dateutil   # to work with dates
+# pip3 install pytz              # ...and timezones
+# pip3 install PyPDF2            # to cut PDFs
+```
+
+Die Python-Packages können auch in eine virtuelle Umgebung installiert werden:
+```
+python3 -m venv .venv                       # create a virtual environment
+source .venv/bin/activate                   # activate it 
+python3 -m pip install -r requirements.txt  # install the required packages
 ```
 
 Die Eingabe-Ausgaben werden aus `issues` gelesen, die Website wird nach `out` geschrieben. Befindet man sich gerade auf einem git-Branch (außer `main`), ist die Website in `out/pre/<Name des Branches>`.
@@ -43,10 +53,21 @@ Die Eingabe-Ausgaben werden aus `issues` gelesen, die Website wird nach `out` ge
 
 `local` und `upload` öffnen danach ein Browserfenster mit der Seite (nur macOS).
 
-## Autoren
+## Credits
 
-* Michael Steil <mist64@mac.com>
-* [https://github.com/ellduin](https://github.com/ellduin)
+* Script, HTML, CSS, Scan, Bildbearbeitung, OCR:
+    * Michael Steil <mist64@mac.com>
+    * [ellduin](https://github.com/ellduin)
+* Abtippen der Listings aus Ausgabe 5/84:
+    * [goloMAK](https://www.forum64.de/wcf/index.php?user/28439-golomak/)
+    * [Endurion](https://www.forum64.de/wcf/index.php?user/1964-endurion/)
+    * [Drachen](https://www.forum64.de/wcf/index.php?user/9125-drachen/)
+* Abtippen der Listings aus Ausgabe 6/84:
+    * [goloMAK](https://www.forum64.de/wcf/index.php?user/28439-golomak/)
+    * [Endurion](https://www.forum64.de/wcf/index.php?user/1964-endurion/)
+    * [thierer](https://www.forum64.de/wcf/index.php?user/26370-thierer/)
+
+
 
 ![](screenshot1.png)
 

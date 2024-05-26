@@ -5,12 +5,13 @@
 
 DIRECTORY_PATH="out"
 REGEXP=".*(Trailing.slash|Consider.adding.a..lang.|Consider.using.the..h1..element.as.a.top.level.heading.only).*"
+#REGEXP="" # no filter, all errors/warnings
 
 # show info/warnings and errors
 PARAMS='--format gnu --asciiquotes '$DIRECTORY_PATH
 
 # only show errors
-PARAMS='--errors-only '$PARAMS
+#PARAMS='--errors-only '$PARAMS
 
 HTML_PARAMS='--filterpattern '$REGEXP' '$PARAMS
 

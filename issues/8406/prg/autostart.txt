@@ -1,0 +1,32 @@
+;autostart.prg ==0801==
+;Eingetippt von Endurion, goloMAK
+;
+;Die folgenden Fehler wurden behoben:
+;* Zeile 150: Im Original wurde x<>71 verglichen,
+;  es gibt jedoch keine Variable x
+;* Zeile 1000: Die letzte Hex-Zahl war b9, im
+;  Hex-Dump sowie im Disassembly ist es jedoch
+;  eine b8, was mehr Sinn ergibt (sta $b8).
+;
+   10 rem *** martin heinz und andreas von lepel ***
+  100 ad=704
+  110 read qp$
+  120 gosub 500
+  130 poke ad,qp
+  140 ad=ad+1
+  150 if ad<>(704+72) then goto 110
+  160 end
+  500 ql$=left$(qp$,1):qr$=right$(qp$,1)
+  510 ql=val(ql$):if ql=0 and ql$<>"0" then ql=asc(ql$)-55
+  520 qr=val(qr$):if qr=0 and qr$<>"0" then qr=asc(qr$)-55
+  530 qp=ql*16+qr:return
+ 1000 data a9,06,85,b7,a9,01,85,b8
+ 1010 data 85,b9,a9,08,85,ba,a9,f8
+ 1020 data 85,bb,a9,02,85,bc,a9,d8
+ 1030 data 8d,02,03,a9,cf,8d,03,03
+ 1040 data a9,00,a8,20,d5,ff,4c,d8
+ 1050 data cf,00,00,00,00,00,00,00
+ 1060 data 00,00,00,00,00,00,00,00
+ 1070 data 48,45,53,4d,4f,4e,00,00
+ 1080 data 8b,e3,c0,02,7c,a5,1a,a7
+
