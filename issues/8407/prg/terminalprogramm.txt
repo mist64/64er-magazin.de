@@ -1,0 +1,116 @@
+;terminalprogramm.prg ==0801==
+;Eingetippt von Endurion
+
+   10 print"{clr}  einen moment bitte "
+   20 forx=16384to16995:ready:ds=ds+y:pokex,y:next
+   30 ifds<>68997thenprint"fehler in datas: soll=68997 ist="ds:stop
+   40 poke51,0:poke52,64:poke55,0:poke56,64:clr:f=0:goto130
+   50 poke53280,5:poke53281,5 :print"{blk}"
+   60 open2,2,0,chr$(6+32    )+chr$(32+64+128):get#2,a$
+   70 printchr$(14):print"{clr}":print"      datenbankdialog mit dem c64"
+   80 sys16394
+   90 close2:  poke53280,5:poke53281,5:print"{blk}":f=1:  goto130
+  100 open2,2,0,chr$(6+32    )+chr$(32+64+128):get#2,a$:print"{clr}":print" neustart !"
+  110 sys16416
+  120 goto90
+  130 printchr$(14):print"{clr}{down}{down}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}menue"
+  140 print"{down}{down}{rght}{rght}{rght}{rght}1 = bedeutung der funktionstasten"
+  150 iff=0then170
+  160 print"{down}{rght}{rght}{rght}{rght}2 = zurueck ins terminalprogramm":goto180
+  170 print"{down}{rght}{rght}{rght}{rght}2 = terminal programm  starten":goto180
+  180 print"{down}{rght}{rght}{rght}{rght}3 = empfangene und gespeicherte             daten drucken
+  190 print"{down}{rght}{rght}{rght}{rght}4 = empfangene und gespeicherte             programme aufbere";
+  200 print"iten"
+  210 print"{down}{rght}{rght}{rght}{rght}5 = empfangene und gespeicherte             daten auf disk. ";
+  220 print"speichern"
+  230 print"{down}{rght}{rght}{rght}{rght}6 = daten von disk. in den speicher         schreiben       "
+  240 print"{down}{rght}{rght}{rght} bitte waehlen 1-6 "
+  250 geta$:ifa$=""then250
+  260 ifa$="1"then340
+  270 ifa$="2"andf=1then100
+  280 ifa$="2"thenf=1:goto50
+  290 ifa$="3"then520
+  300 ifa$="4"then570
+  310 ifa$="5"then650
+  320 ifa$="6"then730
+  330 goto250
+  340 print"{clr}{rght}{rght} {rght}{rght}{down}bedeutung der funktionstasten"
+  350 print"{down}{down}{rght}{rght}{rght}{rght}f1 = empfangene date speichern"
+  360 print"{down}{rght}{rght}{rght}{rght}f3 = abspeichern beenden"
+  370 print"{down}{rght}{rght}{rght}{rght}f5 = gespeicherte daten ansehen              ( anfang )"
+  380 print"{down}{rght}{rght}{rght}{rght}f7 = gespeicherte daten ansehen              ( weiter )"
+  390 print"{down}{rght}{rght}{rght}{rght}f2 = text vorschreiben "
+  400 print"{down}{rght}{rght}{rght}{rght}f4 = vorschreiben beenden "
+  410 print"{down}{rght}{rght}{rght}{rght}f6 = gespeicherte daten aussenden            ( anfang )"
+  420 print"{down}{rght}{rght}{rght}{rght}f8 = gespeicherte daten aussenden            ( weiter )"
+  430 print"{down}{rght}{rght}{rght}{rght}weiter mit return"
+  440 geta$:ifa$=""then440
+  450 print"{clr}":print"   die _ taste bewirkt einen rueck-        sprung ins menue"
+  460 print:
+  470 print"   mit run/stop kann das programm          abgebrochen werden":print
+  480 print"   beim vorschreiben kann mit der          del-taste geloescht werden,
+  490 print"{down}{down}{down}   weiter mit return"
+  500 geta$:ifa$=""then500
+  510 goto130
+  520 open1,4,7:rem drucker vc1526
+  530 e=peek(16387)+peek(16388)*256
+  540 fori=20480toe-1
+  550 print#1,chr$(peek(i));:next
+  560 close1:goto130
+  570 print"{clr}{rght}{rght}{rght}{rght}{down}{down}automatisches wandeln oder              manuelles wandeln ?"
+  580 print"{rght}{rght}{rght}{rght}{down}{down}bitte waehlen  ( a oder m )"
+  590 print"{rght}{rght}{rght}{rght}{down}{down}mit return kommen sie zurueck           in das menue"
+  600 geta$:ifa$=""then600
+  610 ifa$="a"thenload"wandler 2",8:run
+  620 ifa$="m"thenload"wandler",8:run
+  630 ifa$=chr$(13)then130
+  640 goto600
+  650 print"{clr}":input"{rght}{rght}{rght}{rght}{down}{down}dateiname";d$:print"{clr}"
+  660 print"{rght}{rght}{rght}{rght}{down}{down}datei: ";d$;" wird auf                   diskette gespeichert"
+  670 close2:open1,8,2,d$+",s,w"
+  680 e=peek(16387)+peek(16388)*256
+  690 fori=20480toe-1
+  700 print#1,chr$(peek(i));:next
+  710 print"{clr}":print"{rght}{rght}{rght}{rght}{down}{down}daten sind auf diskette gespeichert":fori=1to2000:next
+  720 close1:goto130
+  730 print"{clr}":input"{rght}{rght}{rght}{rght}{down}{down}dateiname";d$:print"{clr}"
+  740 open1,8,2,d$+",s,r":i=20480
+  750 print"{rght}{rght}{rght}{rght}{down}{down}datei: ";d$;" wird von                   diskette geladen"
+  760 get#1,a$
+  770 pokei,(asc(a$)):i=i+1
+  780 ifst=64thenclose1:goto810
+  790 ifst<>0thenclose1:print"{clr}{rght}{rght}{down}{down}diskstatus ";st;"!":for i=1to5000:next:goto130
+  800 goto760
+  810 poke16387,(i-int(i/256)*256):poke16388,(i/256):goto130
+  820 data0,0,0,0,0,0,0,0,0,0,169,0,141,1,64,141,3,64,141,4,64,133,251,169
+  830 data80,133,252,169,194,141,5,64,32,228,255,201,0,240,85,201,20,240,3
+  840 data76,49,64,169,8,234,201,3,240,126,201,133,240,125,201,134,240,124
+  850 data201,135,240,123,201,136,240,122,201,137,240,121,201,138,240,120,201
+  860 data139,240,119,201,140,240,118,201,95,240,117,201,65,144,23,176,0,201
+  870 data96,176,3,76,109,64,201,192,176,8,76,116,64,105,32,76,116,64,233,128
+  880 data32,90,66,234,234,234,234,234,32,134,240,201,0,240,157,201,13,240
+  890 data17,201,2,240,43,201,3,240,42,201,32,144,233,201,128,176,229,234,201
+  900 data65,144,16,176,1,234,201,96,176,7,24,105,128,76,172,64,234,233,32
+  910 data72,32,210,255,76,220,64,76,88,66,76,212,64,76,54,65,76,190,65,76
+  920 data196,65,76,65,65,76,54,65,76,2,66,76,11,66,76,51,65,0,0,0,169,1,141
+  930 data1,64,76,32,64,169,1,205,1,64,240,12,104,24,72,169,245,141,32,208
+  940 data104,76,32,64,104,72,169,249,141,32,208,104,32,0,65,76,32,64,0,0,0
+  950 data160,0,145,251,230,251,208,2,230,252,24,165,251,141,3,64,201,255,240
+  960 data7,165,252,141,4,64,24,96,165,252,141,4,64,201,159,240,2,24,96,169
+  970 data42,32,210,255,32,210,255,32,210,255,198,251,96,0,0,169,0,141,1,64
+  980 data76,32,64,0,0,0,169,1,141,1,64,32,228,255,201,0,240,249,201,13,240
+  990 data24,201,20,240,20,201,32,144,237,201,145,240,233,201,157,240,229,201
+ 1000 data147,240,225,201,138,240,28,32,210,255,201,20,240,3,76,127,65,198
+ 1010 data251,208,2,198,252,24,76,70,65,0,0,32,0,65,76,70,65,76,54,65,0,0,0
+ 1020 data0,0,169,0,133,251,169,80,133,252,165,252,205,4,64,240,3,76,174,65
+ 1030 data165,251,205,3,64,240,3,76,174,65,24,76,215,65,0,160,0,177,251,230
+ 1040 data251,208,2,230,252,24,234,234,234,234,96,32,141,65,32,210,255,32,149
+ 1050 data65,32,210,255,201,13,240,3,76,196,65,76,32,64,0,0,0,32,38,65,169
+ 1060 data13,96,0,0,0,201,65,144,23,176,0,201,96,176,3,76,244,65,201,192,176
+ 1070 data8,76,251,65,105,32,76,251,65,233,128,32,90,66,96,0,0,0,32,141,65
+ 1080 data32,210,255,32,224,65,32,149,65,32,210,255,32,224,65,201,13,240,185
+ 1090 data76,11,66,76,32,64,0,201,65,144,23,176,0,201,96,176,3,76,51,66,201
+ 1100 data192,176,8,76,58,66,105,32,76,62,66,233,128,32,210,255,96,233,31,76
+ 1110 data58,66,0,32,141,65,32,31,66,32,149,65,32,31,66,201,13,240,3,76,74
+ 1120 data66,96,96,0,133,158,32,8,242,96,96,0,0,0
+
