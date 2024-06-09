@@ -42,6 +42,12 @@
 
         <p>Der gesamte Speicherraum des C 64 ist in vier solche 16 KByte-Blöcke aufteilbar und wie wir wissen, blickt der VIC-II-Chip im Normalfall auf den ersten 16 KByte-Block (siehe Bild 1). Nun kann man dem VIC-II-Chip mitteilen, daß er seine Aufmerksamkeit auf die anderen Speicherviertel richten möge. Das erfordert die Mitarbeit des »Portiers« CIA 2 (siehe Folge 1). Er hat im Gebäude 56576 zwei Zimmer (Bits 0 und 1), aus denen dem VIC-II-Chip die Anweisungen gegeben werden, um welches Viertel unseres Speichers er sich kümmern soll. Auf welche Weise diese Bits den VIC-II-Chip-Zugriff regeln, sehen Sie aus Tabelle 1.</p>
 
+        <figure>
+            TODO
+            <img src="162-1.png" alt="">
+            <figcaption>Bild 1. Der VIC-II-Chip hat im Normalfall Zugriff auf Abschnitt 0</figcaption>
+        </figure>
+
         <p>Commodore empfiehlt nun noch sicherzustellen, daß die zu dieser Abschnittsauswahl gehörigen Bits des Datenrichtungsregisters Port A im CIA 2 (Speicherstelle 56578) auf 1, also auf Ausgabe, gestellt werden. In allen Programmen, die ich bisher verwendet habe, wäre das eigentlich nicht nötig gewesen, jedenfalls habe ich nichts bemerkt, als ich das nicht getan habe.</p>
 
         <p>Trotzdem gebe ich hier diese Empfehlung weiter, falls in Ihren Programmen diese Maßnahme notwendig wird. Falls Sie vergessen haben sollten (Folge 2), wie man Bits setzt oder löscht, hier die nötigen Programmzeilen dazu:<br>
@@ -232,6 +238,11 @@
 
         <p>In Bild 2 sind alle möglichen Positionen der Bit-Map und des Bildschirmes angegeben.</p>
 
+        <figure>
+            <img src="162-2.png" alt="">
+            <figcaption>Bild 2. Die Speicherbelegung des Commodore 64 und die möglichen Positionen von Bildschirm und Bit-Map</figcaption>
+        </figure>
+
         <p>Wie man sehen kann, scheiden die Kombinationen Nummer 1 und Nummer 7 von vornherein aus, weil wir mit dem Löschen der Bit-Map auch das Lebenslicht unseres Rechners ausblasen. Die Kombination Nummer 2 kennen wir schon: So haben wir in der letzten Folge hochauflösende Grafik betrieben und waren enttäuscht über den geringen verbliebenen Basic-Speicher. Bei Nummer 5 funken uns die Zeichen-Spiegelbilder in die Bit-Map, diese Kombination scheidet also auch aus. Nett sieht es aus, wenn wir die Kombinationen Nummer 6 und Nummer 8 testen. Hier machen sich die ROM-Inhalte grafisch zwar ganz interessant aus, aber mit dem Sinn unserer hochauflösenden Grafik hat das nichts mehr zu tun. Für uns brauchbar sind die Positionen im Abschnitt 1: Kombinationen Nummer 3 und Nummer 4. Ein Maximum an Basic-Speicher findet man bei der letzten gezeigten Kombination Nummer 9, wo ab 23552 der Bildschirm und ab 24576 die Bit-Map liegen. Wenn Sie den Basic-Speicher für diese Anordnung schützen, mit POKE 55,0:POKE 56,92:POKE 52,92 und den Computer dann mit PRINT FRE(I) nach dem freien Speicherplatz fragen, dann erhalten Sie als Antwort immerhin satte 21501 freie Byte.</p>
 
         <p>Der Idealfall wäre es, wenn man die Bit-Map unter das ROM legen könnte (Kombinationen 6 oder 8). Das geht natürlich auch! Von Basic aus wird ein Programm dann allerdings noch langsamer, weil man für jeden Punkt ähnliche Operationen vornehmen müßte, wie wir sie in der zweiten Folge beim Kopieren des Zeichen-ROM ins RAM verwendet haben. Auch so ist die ganze Hochauflösungsgrafik schon ziemlich langsam. Wir werden aber in kommenden Folgen einige Routinen in Maschinensprache kennenlernen, die uns mehr Möglichkeiten eröffnen.</p>
@@ -310,6 +321,11 @@
             definiert sein (siehe Bild 3) sowie die<br>
             L — Löschmarke</p>
 
+        <figure>
+            <img src="162-3.png" alt="">
+            <figcaption>Bild 3. Ein Punkt (X,Y) im Bildschirmkoordinatensystem (0 ≤ X ≤ 319, 0 ≤ Y ≤ 199)</figcaption>
+        </figure>
+
         <p>Wenn L = 0 ist, wird der Punkt gesetzt (Zeile 50930), so, wie wir das schon kennen. Ist L = 1, dann wird ein vorhandener Punkt gelöscht (Zeile 50920).</p>
 
         <p>Die Zeile 50905 achtet darauf, daß keine Punktkoordinate außerhalb des Bildschirms liegt, was unter Umständen ein Aussteigen mit Fehlermeldung im Hochauflösungsverfahren zur Folge hätte. Das ist hier zwar nicht so tragisch, weil man durch Eingeben von GOTO 50030 »RETURN« schnell wieder in den Normalmodus gelangen kann (eventuell muß vorher noch »SHIFT« + »CLR/ HOME« gedrückt werden). Trotzdem ist es dumm, wenn inmitten all dieser zeitraubenden Grafiktätigkeiten auch noch der Rechner aussteigt. Eine Grenzüberschreitung der Koordinaten ist um so leichter möglich, als die Punkt-Routine von allen folgenden Unterprogrammen aufgerufen wird. Außer X,Y und L tauchen noch die Variablen BY und BI auf, die wir schon kennengelernt haben als das Byte, in dem ein Bit zu setzen oder zu löschen ist.</p>
@@ -324,6 +340,11 @@
             der Startpunkt (X1,Y1) und<br>
             der Endpunkt (X2,Y2) der Strecke<br>
             bekannt gemacht sein (siehe Bild 4).</p>
+
+        <figure>
+            <img src="162-4.png" alt="">
+            <figcaption>Bild 4: Eine Strecke (X1,Y1) bis (X2,Y2) im Bildschirmkoordinatensystem</figcaption>
+        </figure>
 
         <p>Den mathematisch Versierten wird es bei der Betrachtung der Zeilen 51120 beziehungsweise 51160 schon aufgefallen sein, daß zur Berechnung der Punkte, aus denen sich die Strecke zusammensetzt, die sogenannte 2-Punkte-Form der Geradengleichung verwendet wurde:</p>
 
@@ -345,6 +366,11 @@
             HY = Halbmesser in Y-Richtung<br>
             WU,WO = Der zu zeichnende Ellipsenbogen beginnt beim Winkel WU und endet beim Winkel<br>
             WO (Gradmaß)</p>
+
+        <figure>
+            <img src="162-5.png" alt="">
+            <figcaption>Bild 5: Ellipsenbogen der Ellipse mit Mittelpunkt (XM,YM), Halbmessern HX und HY, von Winkel WU bis WO im System der Bildschirmkoordinaten</figcaption>
+        </figure>
 
         <p>Eine volle Ellipse wird also gezeichnet, wenn WU = 0 und WO = 360 ist. Der Kreis ist ein Sonderfall der Ellipse. Dann muß nur HX = HY sein.</p>
 
