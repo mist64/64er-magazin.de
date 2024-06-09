@@ -1,0 +1,116 @@
+;grafik2.prg ==0801==
+;Eingetippt von Endurion
+
+ 49990 rem -----------------
+ 49991 rem --unterprogramme-
+ 49992 rem -----------------
+ 49993 rem
+ 49996 rem -----------------
+ 49997 rem --sprungtabelle--
+ 49998 rem -----------------
+ 49999 rem
+ 50000 goto50500:rem hires an
+ 50010 goto50600:rem bit-map-loeschen
+ 50020 goto50700:rem farbgebung
+ 50030 goto50800:rem hires aus
+ 50040 goto50900:rem punkt setzen
+ 50050 goto51000:rem punkt loeschen
+ 50060 goto51100:rem strecke zeichnen
+ 50070 goto51200:rem strecke loeschen
+ 50080 goto51300:rem ellipse zeichnen
+ 50090 goto51400:rem ellipse loeschen
+ 50100 goto51500:rem kombiniertes hires an
+ 50490 rem
+ 50491 rem -----------------
+ 50492 rem ----hires an-----
+ 50493 rem -----------------
+ 50494 rem
+ 50500 poke56576,(peek(56576)and252)or2
+ 50510 poke56578,peek(56578)or3
+ 50520 poke53272,120:poke648,92
+ 50530 poke53265,peek(53265)or32
+ 50540 return
+ 50590 rem
+ 50591 rem -------------------
+ 50592 rem -bit-map-loeschen--
+ 50593 rem -------------------
+ 50594 rem
+ 50600 fori=24576to32575:pokei,0:nexti
+ 50610 return
+ 50690 rem
+ 50691 rem --------------------
+ 50692 rem -----farbgebung-----
+ 50693 rem --------------------
+ 50694 rem
+ 50700 f=16*f1+f2
+ 50710 fori=23552to24551:pokei,f:nexti
+ 50720 return
+ 50790 rem
+ 50791 rem -------------------
+ 50792 rem -----hires aus-----
+ 50793 rem -------------------
+ 50794 rem
+ 50800 poke53265,27:poke53272,21:poke648,4
+ 50810 poke56578,63:poke56576,151
+ 50820 return
+ 50890 rem
+ 50891 rem ----------------------
+ 50892 rem -----punkt setzen-----
+ 50893 rem ----------------------
+ 50894 rem
+ 50900 l=0
+ 50905 ifx<0orx>319ory<0ory>199then50940
+ 50910 by=(xand504)+40*(yand248)+(yand7):bi=7-(xand7)
+ 50920 ifl=1thenpoke24576+by,peek(24576+by)andnot(2^bi):goto50940
+ 50930 poke24576+by,peek(24576+by)or(2^bi)
+ 50940 return
+ 50990 rem
+ 50991 rem -----------------------
+ 50992 rem -----punkt loeschen----
+ 50993 rem -----------------------
+ 50994 rem
+ 51000 l=1:goto50905
+ 51090 rem
+ 51091 rem ------------------------
+ 51092 rem ----strecke zeichnen----
+ 51093 rem ------------------------
+ 51094 rem
+ 51100 l=0
+ 51110 ifabs(x2-x1)<5then51150
+ 51115 forx=x1tox2step(x2-x1)/319
+ 51120 y=(y2-y1)/(x2-x1)*(x-x1)+y1
+ 51130 gosub50905:nextx
+ 51140 return
+ 51150 fory=y1toy2step(y2-y1)/199
+ 51160 x=(x2-x1)/(y2-y1)*(y-y1)+x1
+ 51170 gosub50905:nexty
+ 51180 return
+ 51190 rem
+ 51191 rem -------------------------
+ 51192 rem ----strecke loeschen-----
+ 51193 rem -------------------------
+ 51194 rem
+ 51200 l=1:goto51110
+ 51290 rem
+ 51291 rem --------------------------
+ 51292 rem -----ellipse zeichnen-----
+ 51293 rem --------------------------
+ 51294 rem
+ 51300 l=0
+ 51310 forw=wutowo:wb=w*~/180
+ 51320 x=xm+hx*cos(wb):y=ym+hy*sin(wb)
+ 51330 gosub50905
+ 51340 nextw:return
+ 51390 rem
+ 51391 rem --------------------------
+ 51392 rem -----ellipse loeschen-----
+ 51393 rem --------------------------
+ 51394 rem
+ 51400 l=1:goto51310
+ 51490 rem
+ 51491 rem --------------------------
+ 51492 rem --kombiniertes hires an---
+ 51493 rem --------------------------
+ 51494 rem
+ 51500 gosub50000:gosub50010:goto50020
+
