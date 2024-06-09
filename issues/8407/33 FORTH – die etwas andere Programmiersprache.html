@@ -51,6 +51,11 @@
 
         <p> 3 5 + 2 * . (man beachte den Punkt !)</p>
 
+        <figure>
+            <img src="33-1.png" alt="">
+            <figcaption>Bild 1. Die Stapelveränderungen während der Ausführung einer einfachen Befehlsfolge. Die Operationen »+« und »*« verknüpfen jeweils die beiden obersten Elemente des Stacks miteinander und legen das Ergebnis wieder ab. Mit ».« wird der TOS ausgedruckt und steht danach nicht mehr zur Verfügung.</figcaption>
+        </figure>
+
         <p>Die Berechnung geht also genauso vor sich, wie man auch im Kopf rechnen würde: Zunächst nimmt man die beiden Zahlen in der Klammer, weil diese zuerst berechnet werden. Dann werden die Zahlen addiert, schließlich holt man sich die »2« und multipliziert sie mit dem ersten Zwischenergebnis. Forth legt also generell erst die für einen Befehl benötigten Operanden auf den Stack, und der Befehl greift anschließend darauf zu. Das gilt nicht nur für arithmetische Operationen, sondern ist ein Kennzeichen für die gesamte Sprachstruktur von Forth. Nehmen wir etwa den Punkt am Ende der Beispielrechnung oben. Er ist das Forth-Äquivalent zum PRINT-Befehl in Basic.</p>
 
         <p>Beachten Sie bitte, daß der PRINT-Befehl immer vor den auszudruckenden Daten steht, der Punkt in Forth jedoch immer dahinter. Mit dem Punkt-Befehl wird stets der oberste Zahlenwert auf dem Stack ausgedruckt. Der wesentliche Unterschied zu anderen Programmiersprachen, wie zum Beispiel Basic, liegt nun darin, daß der Operand zum Zeitpunkt des Erreichens des Punkt-Befehls bereits bekannt ist. Der Basic-Interpreter, der auf einen PRINT-Befehl stößt, weiß zu diesem Zeitpunkt ja noch gar nicht, was er ausdrucken soll. Also muß die Information, daß gedruckt werden soll, irgendwo abgespeichert werden. Basic und alle anderen höheren Programmiersprachen bedienen sich dazu eines internen Stacks, der ähnlich wie der Datenstack von Forth konstruiert ist.</p>
@@ -170,6 +175,11 @@
         <p>: DRUCKE . ;</p>
 
         <p>Nun kann man überall DRUCKE statt ».« schreiben. Wenn man es wieder leid ist, ständig sechs Buchstaben statt einem schreiben zu müssen, teilt man dem Forth-System einfach mit, daß es das Wort DRUCKE vergessen soll. Der dazu nötige Befehl lautet FORGET DRUCKE. Allerdings löscht dieser Befehl nicht nur die Definition von DRUCKE, sondern auch alle anderen eventuell noch danach erfolgten Definitionen. Das hängt damit zusammen, daß Forth alle Definitionen in einer verketteten Liste abspeichert, dem sogenannten Wörterbuch (Bild 2).</p>
+
+        <figure>
+            <img src="33-2.png" alt="">
+            <figcaption>Bild 2. Vereinfachte Darstellung des Forth-Wörterbuchs im Speicher. Das Namensfeld enthält den Wortnamen, das Codefeld beinhaltet Information über die Art des folgenden Parameterfeldes, das die Definition des Wortes enthält. Ein Wort kann als Maschinenspracheabschnitt, als Variable oder Konstante oder - der häufigste Fall - durch andere Befehlsworte definiert sein (Colon-Definition). Das Link-Feld schließlich verkettet die Wortdefinitionen in Forth zu einer Liste, die bei der Interpretation oder Compilation von Worten durchsucht wird.</figcaption>
+        </figure>
 
         <h2>Strukturiert Programmieren</h2>
 
