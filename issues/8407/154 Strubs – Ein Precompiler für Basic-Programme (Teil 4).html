@@ -84,7 +84,7 @@
 
         <h2>Schnelleres Basic</h2>
 
-        <p>Zunächst wollen wir Strubs so ändern, daß es normale Basicprogramme in Programme übersetzt, die keine Leerzeichen und Kommentare mehr enthalten und dadurch schneller ablaufen. Wie Sie sich erinnern werden, benutzt Strubs für Kommentare, die gelöscht werden sollen, ein eigenes Zeichen »'«. Kommentare, die mit REM gekennzeichnet werden, bleiben im Objektprogramm erhalten. Da Strubs bereits alle Blanks entfernt (außer in Strings), brauchen wir nur noch dafür zu sorgen, daß Strubs auf das REM-Token reagiert wie bisher auf das Kommentarzeichen »’«. Die relevanten Zeichencodes, auf die Strubs reagiert, werden in den Zeilen 45250 bis 45254 definiert (Bild 2). Wir brauchen nur in Zeile 45250 das KO = ASC(» ’«) durch KO = 143 (143 ist das REM-Token) ersetzen und schon ist das Speed-Up-Programm fertig. Genauso können Sie die Erkennungszeichen für Label und die neuen Befehle ändern. Dies ist, um Konflikte zu vermeiden, für den Fall sinnvoll, daß Sie mit Strubs Programme für Interpretererweiterungen übersetzen, die ihrerseits »!« oder das Pfundzeichen als Erkennungszeichen für ihre neuen Befehle benutzen.</p>
+        <p>Zunächst wollen wir Strubs so ändern, daß es normale Basicprogramme in Programme übersetzt, die keine Leerzeichen und Kommentare mehr enthalten und dadurch schneller ablaufen. Wie Sie sich erinnern werden, benutzt Strubs für Kommentare, die gelöscht werden sollen, ein eigenes Zeichen »'«. Kommentare, die mit REM gekennzeichnet werden, bleiben im Objektprogramm erhalten. Da Strubs bereits alle Blanks entfernt (außer in Strings), brauchen wir nur noch dafür zu sorgen, daß Strubs auf das REM-Token reagiert wie bisher auf das Kommentarzeichen »’«. Die relevanten Zeichencodes, auf die Strubs reagiert, werden in den Zeilen 45250 bis 45254 definiert (Bild 2). Wir brauchen nur in Zeile 45250 das KO = ASC(»’«) durch KO = 143 (143 ist das REM-Token) ersetzen und schon ist das Speed-Up-Programm fertig. Genauso können Sie die Erkennungszeichen für Label und die neuen Befehle ändern. Dies ist, um Konflikte zu vermeiden, für den Fall sinnvoll, daß Sie mit Strubs Programme für Interpretererweiterungen übersetzen, die ihrerseits »!« oder das Pfundzeichen als Erkennungszeichen für ihre neuen Befehle benutzen.</p>
 
         <h2>Listings</h2>
 
@@ -95,11 +95,11 @@
             <figcaption>Bild 3. Beispiellister</figcaption>
         </figure>
 
-        <p>Dazu ändern wir eine Zeile innerhalb der Prozedur »NEXTCHAR«. In Zeile 350 werden gelesene Zeichen mit dem ASCII-Code C innerhalb von Strings direkt in die Ausgabezeile Z$ übertragen. Wenn wir nun in Zeile 350 Z$=Z$+CHR$&copy; durch Z$=Z$+C$&copy; ersetzen, dann können wir ein Array C$(255) definieren, das in jedem ASCII-Wert den String enthält, der dafür im Objektprogramm erscheinen soll. Die Definition dieses Arrays gehört in das Modul »INITIALISIERUNG«:<br>
+        <p>Dazu ändern wir eine Zeile innerhalb der Prozedur »NEXTCHAR«. In Zeile 350 werden gelesene Zeichen mit dem ASCII-Code C innerhalb von Strings direkt in die Ausgabezeile Z$ übertragen. Wenn wir nun in Zeile 350 Z$=Z$+CHR$(C); durch Z$=Z$+C$(C); ersetzen, dann können wir ein Array C$(255) definieren, das in jedem ASCII-Wert den String enthält, der dafür im Objektprogramm erscheinen soll. Die Definition dieses Arrays gehört in das Modul »INITIALISIERUNG«:<br>
             45300 DIM C$(255):FOR I = 0 TO 255:C$(I) = CHR$(I):NEXT</p>
 
         <p>Damit haben wir zugleich unser Array mit den normalen Werten vorbesetzt. Jetzt bleiben nur noch die Ersetzungen:<br>
-            45310 C$(17)= &ldquo;(CDOWN)&rdquo;:C$(19)=&ldquo;&lt;HOME&gt;&rdquo;<br>
+            45310 C$(17)= &ldquo;&lt;CDOWN&gt;&rdquo;:C$(19)=&ldquo;&lt;HOME&gt;&rdquo;<br>
             45312 C$(28) = &ldquo;&lt;ROT&gt;&rdquo;:C$(31)=&ldquo;&lt;BLAU&gt;&rdquo;<br>
             &hellip; usw.</p>
 
@@ -164,8 +164,7 @@
             2355 Z$ = &ldquo; &rdquo;:GOSUB750:NA$(NP,0) =T$</p>
 
         <p>Nun übertragen wir den Rest der Definitionszeile mit Hilfe von »NEXT-CHAR« nach Z$ (dadurch werden auch Strings mit übertragen. Als Ausgabezeile dient Z$ ja erst im 2. Lauf).<br>
-            2360 Z$ = Z$ + CHR$&copy;:GOSUB<br>
-            250:IFC&lt;&gt;0THEN 2360</p>
+            2360 Z$ = Z$ + CHR$(C);:GOSUB250:IFC&lt;&gt;0THEN 2360</p>
 
         <p>Nun brauchen wir nur noch den Text in die Tabelle aufzunehmen, den Zeiger zu erhöhen und den Indentmodus angeben.<br>
             2370 NA$(NP,l) = Z$:NP = NP + l:IN = 0<br>
