@@ -33,7 +33,37 @@
         <p>Auf beide Fragen gibt es eine Antwort: Da sich der Stack beim Ladevorgang ändern soll, ist es das einfachste, den (manipulierten) Stack einfach mit abzuspeichern! Damit hätten wir dann auch den von uns gewünschten Inhalt des Stacks geladen. Dann aber tauchen schon die nächsten Fragen auf: Woher wissen wir, aus welchem Stack-Bereich der Prozessor seine Rücksprungadresse holt? Die Antwort ist: Wir wissen es nicht! Unsere einzige Möglichkeit ist, den ganzen Stack mit der von uns gewünschten Rücksprungadresse zu belegen. Das Programm, auf das unsere Adresse zeigt (ein Maschinenprogramm), hängen wir direkt an den Stack an. Von dieser Startroutine wird nun das eigentliche Hauptprogramm, das wiederum hinter der Routine liegt, angesprungen. Die Reihenfolge der Programmteile und des benötigten Speichers ist in Bild 1 zusammengefaßt:</p>
 
         <figure>
-            TODO
+            <p>Startadresse des Programms auf Disk/Kas.: $0100</p>
+            <table>
+                <tr>
+                    <td>$0100 – $01ff</td>
+                    <td>Stack, Lowbyte-1 und Highbyte der Startadresse unseres Startprogramms ($02)</td>
+                </tr>
+                <tr>
+                    <td>$0200 – $0202</td>
+                    <td>Normaler Inhalt (unverändert)</td>
+                </tr>
+                <tr>
+                    <td>$0203 – $0276</td>
+                    <td>Bereich für unser Startprogramm (technisch bedingt, immer gleich)</td>
+                </tr>
+                <tr>
+                    <td>$0277 – $03ff</td>
+                    <td>Normaler Inhalt (unverändert)</td>
+                </tr>
+                <tr>
+                    <td>$0400 – $07ff</td>
+                    <td>Bildschirmbereich, sollte Leerzeichen ($20) enthalten.</td>
+                </tr>
+                <tr>
+                    <td>$0800</td>
+                    <td>Muß ein Null-Byte ($00) enthalten, damit der RUN-Befehl arbeiten kann.</td>
+                </tr>
+                <tr>
+                    <td>$0801 – $xxxx</td>
+                    <td>Eigentliches Hauptprogramm, das vom Startprogramm angesprungen wird.</td>
+                </tr>
+            </table>
             <figcaption>Bild 1. Programmadressen</figcaption>
         </figure>
 
@@ -55,7 +85,44 @@
         <p>Das abgedruckte Demo-Programm läuft ohne Änderungen auf einem C 64 mit einer 1541-Floppy (Gerätenummer 8). Die Anpassung an andere Gerätenummern dürfte keine Schwierigkeit darstellen. Lediglich in den Zeilen 110, 112, 120 und 180 ist die 8 durch eine 9 zu ersetzen. Die Beschreibung der einzelnen Programmteile ist in Bild 2 zusammengefaßt.</p>
 
         <figure>
-            TODO
+            <table>
+                <thead>
+                    <tr>
+                        <th>Zeilennr.</th>
+                        <th>Funktion</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>0 – 50</td>
+                        <td>Copyright & Ausgabe der Kopfzeile</td>
+                    </tr>
+                    <tr>
+                        <td>60 – 61</td>
+                        <td>Eingabe des Programmnames und Kürzen auf 16 Zeichen</td>
+                    </tr>
+                    <tr>
+                        <td>70 – 95</td>
+                        <td>Warteschleife auf einen Tastendruck</td>
+                    </tr>
+                    <tr>
+                        <td>100</td>
+                        <td>Zusammensetzen des neuen Names</td>
+                    </tr>
+                    <tr>
+                        <td>110 – 165</td>
+                        <td>Generieren des Programmteils, der den Autostart enthält, auf Diskette ($0100-$0800)</td>
+                    </tr>
+                    <tr>
+                        <td>170 – 300</td>
+                        <td>Verbinden (Linken) des Autostart-Zusatzes und des eigentlichen Hauptprogramms</td>
+                    </tr>
+                    <tr>
+                        <td>310</td>
+                        <td>Ladeinstruktionen für das neu generierte, mit Autostart versehene Programm</td>
+                    </tr>
+                </tbody>
+            </table>
             <figcaption>Bild 2. Programmbeschreibung</figcaption>
         </figure>
 
@@ -76,7 +143,33 @@
         <address class="author">(Andreas Wurf)</address>
 
         <figure>
-            TODO
+            <p>Liste der verwendeten Variablen</p>
+            <table>
+                <tr>
+                    <td>na$</td>
+                    <td>Name des zu modifizierenden Programms</td>
+                </tr>
+                <tr>
+                    <td>t$, a$ – d$</td>
+                    <td>Variablen für diverse Zwecke</td>
+                </tr>
+                <tr>
+                    <td>nw$</td>
+                    <td>Name des fertigen Autostart-Programms</td>
+                </tr>
+                <tr>
+                    <td>a</td>
+                    <td>Variable für DATA-Elemente</td>
+                </tr>
+                <tr>
+                    <td>si</td>
+                    <td>Startadresse des SID-Chips</td>
+                </tr>
+                <tr>
+                    <td>i</td>
+                    <td>Schleifenvariable für diverse Zwecke</td>
+                </tr>
+            </table>
             <figcaption>Variablenliste »Autostart«</figcaption>
         </figure>
 
