@@ -1,0 +1,108 @@
+;grafik3.prg ==0801==
+;Eingetippt von Endurion
+
+    1 rem *******************************
+    2 rem *  grafik test programm von   *
+    3 rem *  h.ponnath 1984 verbrochen  *
+    4 rem *******************************
+    5 poke52,92:poke56,92:deffna(x)=50*sin(x/30)+100
+    7 rem *******************************
+    8 rem *     menue-guten appetit     *
+    9 rem *******************************
+   10 printchr$(147)chr$(17)"unterprogramme grafik test"chr$(17)
+   20 printtab(2)"nur hires an"tab(25)"1"
+   30 printtab(2)"nur hires aus"tab(25)"2"
+   40 printtab(2)"bit map loeschen"tab(25)"3"
+   50 printtab(2)"farbgebung"tab(25)"4"
+   60 printtab(2)"kombination"tab(25)"5"
+   62 printtab(2)"punkte setzen",tab(25)"6"
+   64 printtab(2)"punkte loeschen"tab(25)"7"
+   66 printtab(2)"strecke zeichnen"tab(25)"8"
+   68 printtab(2)"strecke loeschen"tab(25)"9"
+   70 printtab(2)"ellipse zeichnen"tab(25)"a"
+   72 printtab(2)"ellipse loeschen"tab(25)"b"
+   74 printtab(2)"demonstration"tab(25)"c"
+   76 printtab(1)"menue"tab(25)"m"
+   78 printtab(1)"aussteigen"tab(25)"_"
+   80 geta$:ifa$=""then80
+   90 ifa$="_"thenend
+   92 ifa$="a"thena$="10"
+   94 ifa$="b"thena$="11"
+   96 ifa$="c"thena$="12"
+   98 ifa$="m"then10
+  100 onval(a$)gosub50000,50030,50010,200,300,400,500,600,700,800,900,1000
+  110 goto80
+  190 rem ***************************
+  191 rem *     farbgebung          *
+  192 rem ***************************
+  200 input"zeichenfarbe,hintergrundfarbe=";f1,f2:goto50020
+  290 rem ***************************
+  291 rem * farbe fuer kombination  *
+  292 rem ***************************
+  300 input"zeichenfarbe,hintergrundfarbe=";f1,f2:goto50100
+  390 rem ***************************
+  391 rem * beispiel punkte setzen  *
+  392 rem ***************************
+  400 gosub50000:forx=0to319:y=fna(x):gosub50040:nextx
+  410 return
+  490 rem ***************************
+  491 rem * beispiel punkte loeschen*
+  492 rem ***************************
+  500 gosub50000:forx=20to250:y=fna(x):gosub50050:nextx
+  510 return
+  590 rem ***************************
+  591 rem * aufrufprogramm fuer     *
+  592 rem * strecke zeichnen        *
+  593 rem ***************************
+  600 print"{rvon}strecke{rvof} von (x1,y1) bis (x2,y2)":input"x1,y1,x2,y2=";x1,y1,x2,y2
+  610 gosub50000:goto50060
+  690 rem ***************************
+  691 rem * aufrufprogramm fuer     *
+  692 rem * strecke loeschen        *
+  693 rem ***************************
+  700 print"{rvon}strecke{rvof} von (x1,y1) bis (x2,y2)":input"x1,y1,x2,y2=";x1,y1,x2,y2
+  710 gosub50000:goto50070
+  790 rem ***************************
+  791 rem * aufrufprogramm fuer     *
+  792 rem * ellipse zeichnen        *
+  793 rem ***************************
+  800 print"{rvon}ellipse{rvof} mit mittelpunkt (xm,ym),":printtab(1)"halbmessern hx und hy"
+  810 printtab(1)"zeichnen von winkel wu":printtab(1)"bis winkel wo (gradmass)"
+  820 input"xm,ym,hx,hy,wu,wo=";xm,ym,hx,hy,wu,wo:gosub50000:goto50080
+  890 rem ***************************
+  891 rem * aufrufprogramm fuer     *
+  892 rem * ellipse loeschen        *
+  893 rem ***************************
+  900 print"{rvon}ellipse{rvof} mit mittelpunkt (xm,ym),":printtab(1)"halbmessern hx und hy"
+  910 printtab(1)"loeschen von winkel wu":printtab(1)"bis winkel wo (gradmass)"
+  920 input"xm,ym,hx,hy,wu,wo=";xm,ym,hx,hy,wu,wo:gosub50000:goto50090
+  990 rem ***************************
+  991 rem * aufrufprogramm fuer     *
+  992 rem * demonstration           *
+  993 rem ***************************
+ 1000 gosub50030:printchr$(147):fori=1to10:printchr$(17);:nexti
+ 1010 printtab(8)"bitte etwas geduld":printtab(5)"die bit-map wird geloescht"
+ 1020 gosub50010:printtab(5)"und mit farbe versehen":fori=1to1000:nexti
+ 1030 f1=7:f2=6:gosub50000:gosub50020:fori=1to500:next:gosub50030
+ 1040 printchr$(147):fori=1to10:printchr$(17);:nexti
+ 1050 printtab(5)"zeichen von strecken":fori=1to500:nexti
+ 1060 gosub50000:fori=0to12
+ 1070 x1=30+i*10:y1=180-i*14.17:x2=150+i*13.3:y2=10+i*14.583
+ 1080 gosub50060:nexti:fork=0to9:f1=k:f2=k+1:gosub50020:forj=1to500:nextj:nextk
+ 1090 gosub50030:print:printtab(5)"strecken loeschen"
+ 1100 fori=1to500:nexti:gosub50000:x1=30:y1=180:x2=150:y2=10:gosub50070
+ 1110 x1=310:y1=185:gosub50070:fori=1to500:nexti:gosub50030
+ 1120 print:printtab(5)"ellipsen zeichnen":fori=1to500:nexti:gosub50000
+ 1130 xm=170:ym=150
+ 1140 fori=0to16:wu=i*90:wo=wu+90
+ 1150 hx=20+8*int((3+i)/4):hy=10+8*int((2+i)/4)
+ 1160 gosub50080:nexti:x1=0:y1=0:x2=319:y2=0:gosub50060
+ 1170 x2=0:y2=199:gosub50060:x1=319:y1=199:gosub50060:x2=319:y2=0:gosub50060
+ 1180 x1=100:y1=0:x2=100:y2=80:gosub50060:x1=0:y1=80:gosub50060
+ 1190 forx=0to100:y=40+25*sin(x/15):gosub50040:nextx
+ 1200 x1=219:y1=0:x2=219:y2=80:gosub50060:x1=319:y1=80:gos50060
+ 1210 xm=249:ym=40:hx=20:hy=30:wu=0:wo=360:gosub50080
+ 1220 x1=279:y1=10:x2=279:y2=70:gosub50060:y1=40:x2=309:y2=10:gosub50060
+ 1230 y2=70:gosub50060
+ 2000 return
+

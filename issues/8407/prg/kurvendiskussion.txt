@@ -1,0 +1,363 @@
+;kurvendiskussion.prg ==0801==
+;Eingetippt von marvin, thierer
+
+    0 rem
+    1 rem    dieses programm wurde 1983 er-
+    2 rem    stellt von:
+    3 rem           *****************
+    4 rem           *jan schaefer   *
+    5 rem           *in der lohn 9  *
+    6 rem           *               *
+    7 rem           *5100 aachen 1  *
+    8 rem           *tel.02408/3640 *
+    9 rem           *****************
+   10 poke53280,14:poke53281,6:poke646,1
+   11 print"{clr}{down}     k u r v e n d i s k u s s i o n"
+   12 print"{down}            von jan schaefer"
+   13 input"{down}funktion f(x)=";a$
+   14 ifa$=""thena$="1"
+   15 poke646,6
+   16 print"{down}{down}20deffna(x)=";a$
+   17 print"21a$="chr$(34)a$chr$(34)"
+   18 print"run20{up}{up}{up}{up}";
+   19 poke631,13:poke632,13:poke633,13:poke634,13:poke198,4:end
+   20 deffna(x)=x^2
+   21 a$="x^2"
+   22 poke646,1:print"{up}{up}{up}{up}{up}":c$="                                       "
+   23 fori=1to6:printc$:next
+   24 print"{up}{up}{up}{up}{up}{up}{up}{up}"
+   25 input"{down}intervall der x-achse (x1,x2)";i1,i2
+   26 ifi2<=i1thenprint"{up}{up}{up}":goto25
+   27 input"{down}einheiten der x-achse";ex
+   28 ifex=0thenex=i2-i1
+   29 input"{down}einheiten der y-achse";ey
+   30 print"{down}soll die funktion gedruckt werden (j/n)"
+   31 getd$:ifd$=""then31
+   32 print"{up}{up}{up}":fori=1to3:printc$:next:print"{up}{up}{up}{up}"
+   33 ifd$="j"then35
+   34 goto57
+   35 pd=1:e$="die funktion wird"
+   36 print"{down}soll die funktion in x-richtung ver-"
+   37 print"{down}groessert werden (j/n)?"
+   38 getd$:ifd$=""then38
+   39 ifd$="n"then41
+   40 e$=e$+" in x-richtung":vx=1
+   41 print"{up}{up}{up}{up}{up}":fori=1to5:printc$:next:print"{up}{up}{up}{up}{up}{up}"
+   42 print"{down}soll die funktion in y-richtung ver-"
+   43 print"{down}groessert werden (j/n)?"
+   44 getd$:ifd$=""then44
+   45 ifd$="n"then49
+   46 ifvx=0thene$=e$+" in y-richtung":goto48
+   47 e$=e$+" und":f$="in y-richtung "
+   48 vy=255:ar=51
+   49 ifvx=1orvy=255thenf$=f$+"vergroessert geplottet.":goto51
+   50 e$=e$+" geplottet."
+   51 print"{up}{up}{up}{up}"
+   52 ifvy=0thenar=25
+   53 fori=0to3:printc$:next
+   54 print"{up}{up}{up}{up}"e$
+   55 iff$=""then57
+   56 print"{down}"f$
+   57 input"{down}hoechster y-wert";hx
+   58 ifhx=0thenhx=100
+   59 ifey=0theney=hx
+   60 print"{down}sind alle eingaben korrekt (j/n)"
+   61 getd$:ifd$=""then61
+   62 ifd$="n"then11
+   63 print"{up}"c$
+   64 rem     poken der maschinenroutine
+   65 ifmp=1then71
+   66 fori=0to64:reada:poke828+i,a:next
+   67 fori=0to651:reada:poke49152+i,a:next
+   68 poke768,87:poke769,168
+   69 rem     errechnen der position
+   70 rem          der geraden
+   71 ib=i2-i1:ifi1>0thenya=0:goto73
+   72 ya=int(319/ib*abs(i1)+.5)
+   73 n=ib/319
+   74 dimk(325):dimnu(321):dimnr(100):dimre(321):dimrr(100):dimrm(321)
+   75 wi=1e+38:wa=-wi
+   76 fori=i1toi2+nstepn
+   77 j=j+1:k(j)=fna(i)
+   78 ifk(j)>wathenwa=k(j):ma=i
+   79 ifk(j)<withenwi=k(j):mi=i
+   80 next
+   81 ifwa>hxthenwa=hx
+   82 ifwi<-hxthenwi=-hx
+   83 ih=wa-wi
+   84 ifwi>0thenxa=199:ih=wa:wi=0:goto88
+   85 ifwa<0thenxa=0:ih=abs(wi):goto88
+   86 xa=int(199/ih*abs(wa)+.5)
+   87 rem     starten des bitmap-mode
+   88 v=53248:ad=8192:sys828:poke16701,vy:pokev+17,59:pokev+24,24:poke53280,1
+   89 rem     zeichnen der geraden
+   90 ifya>319thenya=319
+   91 ifya<0thenya=0
+   92 x=ya:y=0:gosub318:poke16704,peek(16722):sys49575
+   93 ifxa>199thenxa=199
+   94 ifxa<0thenxa=0
+   95 y=xa:x=0:gosub318:sys49604
+   96 rem     zeichnen der pfeilspitzen
+   97 fori=-7to7:y=xa+i:x=319-abs(i):gosub318:next
+   98 fori=-7to7:y=abs(i):x=ya+i:gosub318:next
+   99 rem     zeichnen der einheiten
+  100 rem          der x-achse
+  101 d=(ex*319)/ib:ifd<10then106
+  102 fori=yato310stepd:foru=-4to4:y=xa+u:x=i+.5:gosub318:nextu,i
+  103 fori=yato10step-d:foru=-4to4:y=xa+u:x=i+.5:gosub318:nextu,i
+  104 rem     zeichnen der einheiten
+  105 rem          y-achse
+  106 d=(ey*199)/ih:ifd<6then110
+  107 fori=xato195stepd:foru=-3to3:y=i+.5:x=ya+u:gosub318:nextu,i
+  108 fori=xato5step-d:foru=-3to3:y=i+.5:x=ya+u:gosub318:nextu,i
+  109 rem     zeichnen der funktion
+  110 e=-199/ih:f=abs(wi)*e+199
+  111 fori=1to319:x=i-1:y=k(i)*e+f
+  112 fl=fl+abs(k(i)):ro=ro+k(i)^2:rv=rv+k(i)*k(i+1)
+  113 ify>201ory<0then115
+  114 sys49629,y+.5,x/8,xand255:sys49744,2^peek(16722)
+  115 ifi<2thennext
+  116 a=int(y+.5):d=k(i-1)*e+f:b=int(d+.5)
+  117 ifb<xaanda>=xaorb=>xaanda=<xathenm=m+1:nu(m)=i*n+i1-n
+  118 c=k(i+1)*e+f:ify>dandy=>cthent=t+1:re(t)=i*n+i1-n:rm(t)=1:goto120
+  119 ify<dandy=<cthent=t+1:re(t)=i*n+i1-n:rm(t)=0
+  120 next
+  121 rem     plotten der funktion
+  122 ifpd=0then154
+  123 open5,4,5:open4,4:open6,4,6:sys49152
+  124 print#6,chr$(20)
+  125 print#4
+  126 print#4,chr$(14)chr$(14)"    kurvendiskussion"
+  127 print#4
+  128 print#4,chr$(14)"           von jan schaefer"
+  129 print#4
+  130 fori=0toar:print#6,chr$(20):print#4:print#6,chr$(0)
+  131 foru=0to39
+  132 i$="":ifpeek(16705)=255then141
+  133 forj=0to7:a=peek(16709+j):i$=i$+chr$(a):nextj
+  134 j$="":c$=""
+  135 print#5,i$
+  136 fork=0tou:j$=j$+c$:c$=" ":nextk
+  137 ifvx=0then140
+  138 print#4,chr$(14)j$chr$(254)
+  139 goto141
+  140 print#4,j$chr$(254)
+  141 b=0:sys49160:nextu,i
+  142 print#6,chr$(20)
+  143 print#4,
+  144 print#4,
+  145 print#4,"f(x)="a$
+  146 print#4,
+  147 print#4,"intervall von "i1" bis "i2
+  148 print#4,
+  149 print#4,"die einheiten der x-achse sind im abstand von"ex"gesetzt worden."
+  150 print#4,
+  151 print#4,"die einheiten der y-achse sind im abstand von"ey"gesetzt worden."
+  152 print#4
+  153 print#4,"der hoechste y-wert ist"hx"."
+  154 getd$:ifd$=""then154
+  155 print"{clr}":pokev+17,27:pokev+24,21:poke53280,6:poke53281,9
+  156 print"f(x)="a$
+  157 print"{down}intervall von"i1"bis"i2
+  158 print"{down}einheiten der x-achse :"ex
+  159 print"{down}einheiten der y-achse :"ey
+  160 print"{down}der hoechste y-wert ist"hx"."
+  161 print"{down}1  die funktion nochmal sehen"
+  162 print"{down}2  graphische daten der funktion"
+  163 print"{down}3  neue funktion eingeben"
+  164 print"{down}4  programmende"
+  165 getd$:ifd$=""then165
+  166 a=val(d$)
+  167 onagoto169,172,170,171
+  168 goto165
+  169 poke251,0:sys862:pokev+17,59:pokev+24,24:poke53280,1:goto154
+  170 clr:poke768,139:poke769,227:mp=1:goto10
+  171 poke768,139:poke769,227:end
+  172 poke53281,2:poke53280,3:print"{clr}";
+  173 print"{down}1  nullstellen
+  174 print"{down}2  relative extremwerte
+  175 print"{down}3  absolute extremwerte
+  176 print"{down}4  flaeche unter dem graphen
+  177 print"{down}5  volumen des rotationskoerpers
+  178 print"{down}6  spezieller funktionswert
+  179 print"{down}7  ruecksprung ins hauptmenue
+  180 print"{home}";
+  181 getd$:ifd$=""then181
+  182 a=val(d$):poke53280,1:poke53281,14:onagoto184,215,247,286,295,303,155
+  183 poke53281,2:poke53280,3:goto181
+  184 rem     nullstellenberechnung
+  185 r=0:print"{clr}{down}              nullstellen"
+  186 ifpd=1thenprint#4:print#4,"              nullstellen"
+  187 ifm=0andpd=1thenprint#4:print#4,"keine nullstellen"
+  188 ifm=0thenprint"{down}keine nullstellen":goto212
+  189 fori=1tom
+  190 n1=nu(i)
+  191 foru=1to10
+  192 s=(fna(nu(i)+(10^-8))-fna(nu(i)))/10^-8
+  193 ifabs(s)<1e-38then195
+  194 nu(i)=nu(i)-(fna(nu(i)))/s
+  195 ifabs(n1-nu(i))>norn1=nu(i)thennu(i)=-1000:goto197
+  196 nextu
+  197 nexti
+  198 forj=1toi:foru=j+1toi
+  199 ifj=ithen204
+  200 ifabs(nu(j)-nu(u))<nthennu(u)=-1000
+  201 nextu
+  202 ifnu(j)=-1000then204
+  203 r=r+1:nr(r)=nu(j)
+  204 nextj
+  205 ifr=0andpd=1thenprint#4:print#4,"keine nullstellen"
+  206 ifr=0thenprint"{down}keine nullstellen":goto212
+  207 fori=1tor
+  208 nr(i)=int(nr(i)*100+.5)/100
+  209 ifpd=1thenprint#4:print#4,i". fuer x="nr(i)
+  210 print"{down}"i". fuer x="nr(i)
+  211 next
+  212 getd$:ifd$=""then212
+  213 goto172
+  214 rem     relative extremwerte
+  215 ifpd=1thenprint#4:print#4,"          relative extremwerte"
+  216 print"{clr}{down}          relative extremwerte"
+  217 ift=0andpd=1thenprint#4:print#4,"keine relativen extremwerte"
+  218 ift=0thenprint"{down}keine relativen extremwerte":goto212
+  219 ts=t:fori=1tot
+  220 a=fna(re(i))
+  221 b=fna(re(i)-n)
+  222 c=fna(re(i)+n)
+  223 ifabs(a-b)>ih/4thents=ts-1:re(i)=-1000
+  224 ifabs(a-c)>ih/4thents=ts-1:re(i)=-1000
+  225 next
+  226 ifts=0thent=0:goto217
+  227 fori=1tot
+  228 ifre(i)=-1000then230
+  229 tt=tt+1:re(tt)=re(i)
+  230 next:t=tt:iftt=0then217
+  231 fori=1tot:foru=0to6
+  232 b=n/10^u
+  233 forj=1to10
+  234 d=fna(re(i)+b)
+  235 e=fna(re(i))
+  236 ifd>eandrm(i)=0thenre(i)=re(i)+b:nextj
+  237 ifd<eandrm(i)=0thenre(i)=re(i)-b:nextj
+  238 ifd<eandrm(i)=1thenre(i)=re(i)+b:nextj
+  239 ifd>eandrm(i)=1thenre(i)=re(i)-b:nextj
+  240 nextu,i
+  241 fori=1tot
+  242 a=fna(re(i))
+  243 a=int(a*1000+.5)/1000:re(i)=int(re(i)*1000+.5)/1000
+  244 print"{down}"i". fuer f("re(i)")="a
+  245 ifpd=1thenprint#4:print#4,i". fuer f("re(i)")="a
+  246 next:goto212
+  247 rem     absolute extremwerte
+  248 print"{clr}{down}          absolute extremwerte"
+  249 ifpd=1thenprint#4:print#4,"          absolute extremwerte"
+  250 ae(1)=ma:ae(2)=mi
+  251 fori=1to2:foru=1to6
+  252 b=n/10^u
+  253 forj=1to10
+  254 d=fna(ae(i)+b)
+  255 e=fna(ae(i))
+  256 ifd<eandi=1thenae(i)=ae(i)-b:nextj
+  257 ifd>eandi=1thenae(i)=ae(i)+b:nextj
+  258 ifd<eandi=2thenae(i)=ae(i)+b:nextj
+  259 ifd>eandi=2thenae(i)=ae(i)-b:nextj
+  260 nextu,i
+  261 ifae(1)>i2thenae(1)=i2
+  262 ifae(1)<i1thenae(1)=i1
+  263 ifae(2)<i1thenae(2)=i1
+  264 ifae(2)>i2thenae(2)=i2
+  265 fori=1to2
+  267 a(i)=fna(ae(i))
+  268 a(i)=int(a(i)*1000+.5)/1000:ae(i)=int(ae(i)*1000+.5)/1000
+  269 next
+  270 ifabs(a(1))>hxthenprint"{down}das absolute maximum kann nicht bestimmt{down}werden."
+  271 ifabs(a(1))>hxandpd=1thenprint#4,
+  272 ifabs(a(1))>hxandpd=1thenprint#4,"das absolute maximum kann nicht bestimmt werden."
+  273 ifabs(a(1))>hxthen277
+  274 print"{down}das absolute maximum liegt bei"
+  275 print"{down}f("ae(1)")="a(1)
+  276 ifpd=1thenprint#4:print#4,"das absolute maximum liegt bei f("ae(1)")="a(1)
+  277 ifabs(a(2))>hxthenprint"{down}das absolute minimum kann nicht bestimmt{down}werden."
+  278 ifabs(a(2))>hxandpd=1thenprint#4
+  279 ifabs(a(2))>hxandpd=1thenprint#4,"das absolute minimum kann nicht bestimmt werden."
+  280 ifabs(a(2))>hxthen212
+  281 print"{down}das absolute minimum liegt bei"
+  282 print"{down}f("ae(2)")="a(2)
+  283 ifpd=1thenprint#4:print#4,"das absolute minimum liegt bei f("ae(2)")="a(2)
+  284 goto212
+  285 rem     flaechenberechnung
+  286 print"{clr}{down}       flaeche unter dem graphen"
+  287 ifpd=1thenprint#4:print#4,"       flaeche unter dem graphen"
+  288 fl=fl-k(1)
+  289 f1=(k(1)+k(321))/2
+  290 f2=(f1+fl)*n:f2=int(100*f2+.5)/100
+  291 print"{down} a="f2
+  292 ifpd=1thenprint#4:print#4," a="f2
+  293 goto212
+  294 rem     rotationskoerperberechnung
+  295 print"{clr}{down}     volumen des rotationskoerpers"
+  296 ifpd=1thenprint#4:print#4,"     volumen des rotationskoerpers"
+  297 ro=(ro-k(1)^2)/2+(k(321)^2+k(1)^2)/4+(rv)/2
+  298 ro=ro*~*n
+  299 ro=int(ro*100+.5)/100
+  300 print"{down} v="ro
+  301 ifpd=1thenprint#4:print#4," v="ro
+  302 goto212
+  303 rem     spezielle funktionswerte
+  304 print"{clr}{down}        spezielle funktionswerte"
+  305 ifpd=1thenprint#4:print#4,"        spezielle funktionswerte"
+  306 print"{down}fuer welchen punkt soll der funktions-"
+  307 input"{down}wert errechnet werden";a
+  308 b=fna(a):b=int(1000*b+.5)/1000
+  309 print"{down} f("a")="b
+  310 ifpd=1thenprint#4:print#4," f("a")="b
+  311 print"{down}noch einen ?"
+  312 getd$:ifd$=""then312
+  313 ifd$="n"then172
+  314 print"{up}{up}{up}":fori=0to2:printc$:next:print"{up}{up}{up}":goto306
+  315 print"{down}in dem punkt"a"kann kein funktionswert bestimmt werden !"
+  316 ifpd=1thenprint#4:print#4,"in dem punkt"a"kann kein funktionswert bestimmt werden !"
+  317 goto311
+  318 ify>201ory<0orx<0orx>319thenreturn
+  319 sys49629,y,x/8,xand255:sys49744,2^peek(16722):return
+  320 data169,32,133,252,169,0,133,251,169,0,162,0,160,255,145,251,136,145,251
+  321 data240,3,76,76,3,230,252,232,224,34,240,3,76,72,3,169,4,133,252,169,1,162
+  322 data0,160,255,145,251,136,145,251,240,3,76,106,3,230,252,232,224,4,240,3
+  323 data76,102,3,96
+  324 data169,32,133,252,169,0,133,251,160,8,169,0,153,68,65,136,208,250,160
+  325 data0,162,8,177,251,141,60,65,173,60,65,74,141,60,65,144,9,189,68,65,24
+  326 data105,128,157,68,65,202,208,235,174,61,65,224,255,240,1,200,162,8,177
+  327 data251,141,60,65,173,60,65,74,141,60,65,144,9,189,68,65,24,105,64,157
+  328 data68,65,202,208,235,200,162,8,177,251,141,60,65,173,60,65,74,141,60,65
+  329 data144,9,189,68,65,24,105,32,157,68,65,202,208,235,174,61,65,224,255,240
+  330 data1,200,162,8,177,251,141,60,65,173,60,65,74,141,60,65,144,9,189,68,65
+  331 data24,105,16,157,68,65,202,208,235,200,162,8,177,251,141,60,65,173,60
+  332 data65,74,141,60,65,144,9,189,68,65,24,105,8,157,68,65,202,208,235,174
+  333 data61,65,224,255,240,1,200,162,8,177,251,141,60,65,173,60,65,74,141,60
+  334 data65,144,9,189,68,65,24,105,4,157,68,65,202,208,235,200,162,8,177,251
+  335 data141,60,65,173,60,65,74,141,60,65,144,9,189,68,65,24,105,2,157,68,65
+  336 data202,208,235,174,61,65,224,255,240,1,200,162,8,177,251,141,60,65,173
+  337 data60,65,74,141,60,65,144,9,189,68,65,24,105,1,157,68,65,202,208,235,24
+  338 data165,251,105,8,133,251,165,252,105,0,133,252,174,61,65,224,255,240,3
+  339 data76,141,193,174,62,65,224,255,240,11,169,0,133,253,133,254,169,255,141
+  340 data62,65,24,165,253,105,8,133,253,165,254,105,0,133,254,166,253,224,64
+  341 data208,58,166,254,224,1,208,52,56,165,251,233,60,133,251,165,252,233,1
+  342 data133,252,169,0,133,253,133,254,174,63,65,224,255,208,21,169,0,141,63
+  343 data65,24,165,251,105,56,133,251,165,252,105,1,133,252,76,141,193,169,255
+  344 data141,63,65
+  345 data160,8,136,185,69,65,201,0,208,10,192,0,208,244,169,255,141,65,65,96
+  346 data169,0,141,65,65,96
+  347 data162,25,173,64,65,160,8,136,145,251,208,251,24,165,251,105,64,133,251
+  348 data165,252,105,1,133,252,202,208,230,96
+  349 data162,40,160,0,169,255,145,251,24,165,251,105,8,133,251,165,252,105,0
+  350 data133,252,202,208,236,96
+  351 data32,253,174,32,158,183,142,76,65,32,253,174,32,158,183,142,77,65,32
+  352 data253,174,32,158,183,142,82,65,173,76,65,41,248,141,78,65,169,40,141
+  353 data79,65,32,99,194,173,76,65,41,7,24,109,80,65,133,251,173,81,65,105,0
+  354 data133,252,173,77,65,141,78,65,169,8,141,79,65,32,99,194,24
+  355 data173,80,65,101,251,133,251,173,81,65,101,252
+  356 data133,252,24,165,252,105,32,133
+  357 data252,173,82,65,41,7,141,82,65,169,7,56,237,82,65,141,82,65,96,32,253
+  358 data174,32,158,183,142,82,65,160,0,177,251,13,82,65,145,251,96,169,0,141
+  359 data80,65,141,81,65,162,9,24,202,110,81,65,110,80,65,224,0,240,18,110,78
+  360 data65,144,240,173,81,65,24,109,79,65,141,81,65,76,110,194,96

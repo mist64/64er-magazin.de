@@ -1,0 +1,314 @@
+;softwarekatalog.prg ==0801==
+;Eingetippt von Endurion
+
+   99 goto10000
+  100 geta$:ifa$=""then100
+  110 return
+  150 geta$:ifa$<>chr$(13)then150
+  160 return
+  400 printck$
+  410 sysau,11,10,ww$"Diskette einlegen"
+  420 sysau,13,14,"dann "an$r$"<RETURN>":rem  <return>
+  430 gosub150
+  440 return
+  500 printck$
+  505 sysau,3,9,g$"Diskette mit Namenliste einlegen"
+  510 sysau,12,14,"dann  "an$bl$"<RETURN>":rem <return>
+  515 gosub100:ifa$<>chr$(13)then515
+  517 return
+  700 printcg$
+  710 sysau,7,10,an$r$"keine namen gespeichert !"
+  720 gosub100:goto1000
+ 1000 rem"        UCCCCCI
+ 1001 rem"        BmenueB
+ 1002 rem"        JCCCCCK
+ 1010 printck$chr$(8)
+ 1020 printmb$
+ 1030 sysau,17,8,g$"Menue"
+ 1035 sysau,17,9,"{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}"
+ 1040 sysau,6,12,ww$"1. Inhaltsverzeichnis lesen.."
+ 1045 sysau,6,14,"2. Alphabetisch sortieren...."
+ 1050 sysau,6,16,"3. Programmliste saven......."
+ 1060 sysau,6,18,"4. Programme loeschen........"
+ 1070 sysau,6,20,"5. Programme listen.........."
+ 1100 gosub100
+ 1110 ifa$<>"1"anda$<>"2"anda$<>"3"anda$<>"4"anda$<>"5"then1100
+ 1120 a=val(a$):onagoto3000,3600,2500,7000,5000
+ 2000 rem"     UCCCCCCCCCCCCCCCCCCCCCI
+ 2001 rem"     Bdaten aus datei lesenB
+ 2002 rem"     JCCCCCCCCCCCCCCCCCCCCCK
+ 2010 gosub500
+ 2020 close2:open2,8,2,"namenliste,s,r"
+ 2030 input#2,po
+ 2040 ifpo=0then2100
+ 2050 forn=1topo-1
+ 2060 input#2,wr$(n)
+ 2070 nextn
+ 2080 close2:goto1000
+ 2100 rem"     UCCCCCCCCCCCCCCCCCCCCI
+ 2101 rem"     Bneue datei eroeffnenB
+ 2102 rem"     JCCCCCCCCCCCCCCCCCCCCK
+ 2110 sysau,9,20,an$r$"Neue Datei eroeffnen ?"
+ 2120 gosub100:ifa$<>"j"anda$<>"n"then2120
+ 2130 ifa$="n"thengoto2000
+ 2140 po=1:close2
+ 2150 open2,8,2,"@:namenliste,s,w"
+ 2160 print#2,po
+ 2170 close2
+ 2200 goto1000
+ 2500 rem"     UCCCCCCCCCCCCCI
+ 2501 rem"     Bnamen absavenB
+ 2502 rem"     JCCCCCCCCCCCCCK
+ 2505 ifpo<2thengoto700
+ 2510 gosub500
+ 2520 open2,8,2,"@:namenliste,s,w"
+ 2530 print#2,po
+ 2540 forn=1topo-1
+ 2550 print#2,wr$(n)
+ 2560 next
+ 2570 close2:goto1000
+ 3000 rem"     UCCCCCCCCCCCCCCCCCCCCCCCCI
+ 3001 rem"     Binhaltsverzeichnis ladenB
+ 3002 rem"     JCCCCCCCCCCCCCCCCCCCCCCCCK
+ 3005 r=0
+ 3010 gosub400
+ 3015 printcg$
+ 3020 sysau,3,3,g$"einlesen des inhaltsverzeichnisses":print:pr=p0
+ 3025 close15:open15,8,15,"io":close2:open2,8,0,"$"
+ 3030 fort=0to12:get#2,a$,b$:next
+ 3035 get#2,a$,a$:ifstthenclose2:goto3120
+ 3040 get#2,a$,a$
+ 3050 get#2,a$:ifa$=""then3035
+ 3060 ifa$<>cc$then3050
+ 3070 c$="":r=r+1:c$(r)="":p$(r)="":fl=0
+ 3080 fort=0to16:get#2,a$:ifa$<>cc$andfl=0thenc$(r)=c$(r)+a$:next:goto3100
+ 3090 fl=1:next
+ 3100 ifint(r/2)=r/2thenprint:prints$c$(r-1)tab(20)c$(r);
+ 3105 printtab(37)p$(r)g$;
+ 3110 get#2,a$,p$(r):goto3050
+ 3111 rem"     UCCCCCCCCCCCCCCCCCCCCCCCCCCCCI
+ 3112 rem"     Bnamen in datei uebernehmen ?B
+ 3113 rem"     JCCCCCCCCCCCCCCCCCCCCCCCCCCCCK
+ 3120 printcg$:printg$"uebernehmen ?"
+ 3121 ifr=0then1000
+ 3125 fort=1torstep2:print:printc$(t)tab(17)p$(t)tab(20)c$(t+1);
+ 3130 printtab(37)p$(t+1);:next:poke198,0
+ 3135 r2=1
+ 3150 fort=1to3:p=t*20+55396:fortt=0to19
+ 3160 pokep+tt,0:next
+ 3170 gosub100
+ 3180 ifa$<>"n"anda$<>"j"then3170
+ 3190 ifa$="j"thenwr$(po)=" "+c$(t):po=po+1:f1=1:goto3300
+ 3200 ifa$="n"thenf1=12:goto3300
+ 3300 fortt=0to18:pokep+tt,f1:next:next
+ 3400 rem"     UCCCCCCCCCCCCCCCCCI
+ 3401 rem"     Bwelche spielart ?B
+ 3402 rem"     JCCCCCCCCCCCCCCCCCK
+ 3403 ifpo=prthen1000
+ 3405 printcg$
+ 3408 sysau,1,1,an$r$"g"au$g$"ame/"an$r$"h"au$g$"ilfsprg/";
+ 3410 printan$r$"s"au$g$"prachprg/"an$r$"a"au$g$"llgemein"
+ 3412 print:print
+ 3415 forn=prtopo-1
+ 3417 iflen(wr$(n))>19then3425
+ 3420 w=len(wr$(n)):form=wto18:wr$(n)=wr$(n)+" ":nextm
+ 3425 printright$(wr$(n),len(wr$(n))-1);
+ 3430 gosub100:ifa$<>"g"anda$<>"a"anda$<>"s"anda$<>"h"then3430
+ 3440 ifa$="g"thenprinttab(20)"spiel
+ 3450 ifa$="a"thenprinttab(20)"allgemein
+ 3460 ifa$="s"thenprinttab(20)"sprach
+ 3470 ifa$="h"thenprinttab(20)"hilfe
+ 3480 b$=mid$(wr$(n),2,len(wr$(n))):a$=a$+b$:wr$(n)=a$:next
+ 3500 print:print:printan$r$"ok"au$" ?"
+ 3510 gosub100:ifa$<>"j"anda$<>"n"then3510
+ 3520 ifa$="n"then3400
+ 3525 goto1000
+ 3600 rem"     UCCCCCCCCCCCCCCCCCCCCCCCCCCCCI
+ 3601 rem"     Bfiles loeschen falls doppeltB
+ 3602 rem"     JCCCCCCCCCCCCCCCCCCCCCCCCCCCCK
+ 3603 printcg$
+ 3604 sysau,13,11,r$"bitte warten !"
+ 3605 ifpo=2then1000
+ 3610 forn=1topo-1
+ 3620 form=1topo-1:ifm<>nthenifwr$(n)=wr$(m)thengoto3700
+ 3630 nextm:nextn:goto3800
+ 3700 forq=mtopo-1
+ 3710 wr$(q)=wr$(q+1)
+ 3720 nextq
+ 3730 po=po-1:wr$(po)="":wr$(po+1)="":goto3630
+ 3800 rem"     UCCCCCCCCCCCCCCCCCCCCCCI
+ 3801 rem"     Balphabetisch sortierenB
+ 3802 rem"     JCCCCCCCCCCCCCCCCCCCCCCK
+ 3805 printcg$
+ 3810 sysau,13,11,r$"bitte warten !!"
+ 3820 foro=1topo-2
+ 3830 a$=wr$(o):b$=wr$(o+1)
+ 3840 ifa$<b$thennext:goto3900
+ 3850 wr$(o+1)=a$:wr$(o)=b$
+ 3860 nexto
+ 3900 forn=1topo-2
+ 3910 ifwr$(n)<wr$(n+1)thennext:goto1000
+ 3920 goto3820
+ 5000 rem"     UCCCCCCCCCCCCCCCCI
+ 5001 rem"     Bprogramme listenB
+ 5002 rem"     JCCCCCCCCCCCCCCCCK
+ 5005 ifpo<2thengosub700
+ 5007 ifdrthenclose1
+ 5008 printck$
+ 5010 sysau,12,4,bl$"Programme Listen"
+ 5015 sysau,12,5,"{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}"g$
+ 5020 sysau,10,7,"1. alle{$a0}Programme..."
+ 5030 sysau,10,9,"2. nur ALLGEM. Prg..":rem          allgem. prg
+ 5040 sysau,10,11,"3. nur HILFS-Prg....":rem         hilfs-prg
+ 5050 sysau,10,13,"4. nur SPIELE.......":rem         spiele
+ 5060 sysau,10,15,"5. nur SPRACHEN.....":rem         sprachen
+ 5070 sysau,11,17,"auf "an$s$"D"au$g$"rucker: ";:rem drucker
+ 5080 ifdrthenprint" "bl$"ja  "
+ 5085 ifnotdrthenprint" "bl$"nein"
+ 5090 sysau,10,20,r$"<RETURN>"g$"  zum "s$" Menue":rem <return> , menue
+ 5100 gosub100:e$=a$
+ 5110 ife$="1"ore$="2"ore$="3"ore$="4"ore$=chr$(13)ore$="d"ore$="5"then5120
+ 5115 goto5100
+ 5120 ife$=chr$(13)thendr=0:close1:goto1000
+ 5130 ife$="d"thendr=notdr:goto5000
+ 5140 ifnotdrthen5200
+ 5150 close1:open1,4,1:print#1,chr$(14);
+ 5160 print#1,"       programmliste commodore 64
+ 5170 close1:open1,4
+ 5180 print#1,"             {CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}
+ 5190 cmd1
+ 5200 ife$="2"thene$="a"
+ 5205 r=0
+ 5210 ife$="3"thene$="h"
+ 5220 ife$="4"thene$="g"
+ 5230 ife$="5"thene$="s"
+ 5240 ife$<>"1"then5300
+ 5250 ifnotdrthen5300
+ 5260 gosub5800
+ 5300 w=1:ifnotdrthenprintcg$
+ 5310 forn=1topo-1
+ 5330 ife$="1"then5370
+ 5340 ife$<>left$(wr$(n),1)thennext:goto5450
+ 5370 gosub5900
+ 5380 ifint(w/2)=w/2anddrthenprint
+ 5430 w=w+1
+ 5440 next
+ 5450 ifw<>1thengosub100
+ 5470 goto5000
+ 5750 return
+ 5800 lo=int((po-1)/2):ifint(lo/2)=lo/2thenlo=lo+1
+ 5805 fort=1to(po-1)/2:n=t:w=n
+ 5810 gosub5900
+ 5815 n=n+lo:w=n
+ 5820 gosub5900
+ 5825 n=n-lo:w=n
+ 5835 next
+ 5840 ifint(po/2)=po/2thenn=n+1:w=w+1:gosub5900
+ 5850 print#1
+ 5860 dr=0:goto5000
+ 5900 z$=left$(wr$(n),1)
+ 5901 ifw<100thenprint" ";
+ 5902 ifw<10thenprint" ";
+ 5905 w$=str$(w):printg$w$")"tab(3)right$(wr$(n),len(wr$(n))-1);
+ 5910 ifz$="a"thenprintbl$"allg.-prg.    ";
+ 5920 ifz$="g"thenprintww$"spiel         ";
+ 5930 ifz$="h"thenprintr$"hilfs-prg.    ";
+ 5940 ifz$="s"thenprints$"sprach-prg.   ";
+ 5950 ifnotdrthenifw/23=int(w/23)andnotdrthengosub100:printcg$;
+ 5965 ifnotdrthenprint
+ 5970 return
+ 7000 rem"     UCCCCCCCCCCCCCCCCCCI
+ 7001 rem"     Bprorgamme loeschenB
+ 7002 rem"     JCCCCCCCCCCCCCCCCCCK
+ 7003 ifpo<2thengosub700
+ 7004 printck$
+ 7005 sysau,11,7,bl$"Programme loeschen"
+ 7008 sysau,11,8,"{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}"
+ 7010 sysau,9,11,g$"1. Files umbenennen..":rem  files
+ 7020 sysau,9,13,"2.  Files loeschen...."
+ 7040 sysau,11,167,r$"<RETURN>"g$" zum "s$"Menue":rem <return>,menue
+ 7050 gosub100:ifa$<>"1"anda$<>"2"anda$<>chr$(13)then7050
+ 7060 ifa$=chr$(13)then1000
+ 7070 u$="":n$=""
+ 7080 a=val(a$):onagoto7100,7500
+ 7100 gosub7400
+ 7110 print:u$="":inputu$:ifu$=""then7000
+ 7120 iflen(u$)>16then7100
+ 7125 forn=len(u$)to17:u$=u$+" ":next
+ 7130 gosub7400:sysau,14,10,s$u$g$
+ 7140 gosub7450
+ 7150 n$="":inputn$:ifn$=""then7000
+ 7160 iflen(n$)>16then7130
+ 7170 gosub7400:sysau,14,10,s$u$:gosub7450:sysau,14,14,s$n$
+ 7180 sysau,1,18,r$" ok ?"
+ 7190 forn=len(n$)to17:n$=n$+" ":next
+ 7200 :gosub100:ifa$<>"j"anda$<>"n"then7200
+ 7210 ifa$="n"then7100
+ 7220 forn=1topo-1
+ 7230 ifu$=right$(wr$(n),len(wr$(n))-1)thenwr$(n)=left$(wr$(n),1)+n$:goto7000
+ 7240 next
+ 7250 print:print:print" "u$" nicht gespeichert !"
+ 7260 forn=1to4000:next
+ 7270 goto7000
+ 7400 rem"     UCCCCCCCCCCCCCCCCI
+ 7401 rem"     Bfiles umbenennenB
+ 7402 rem"     JCCCCCCCCCCCCCCCCK
+ 7405 printcg$
+ 7410 sysau,12,5,bl$"files umbenennen:"
+ 7420 sysau,8,9,g$"zu loeschendes programm:"
+ 7430 return
+ 7450 sysau,8,13,g$"neuer name des programms:"
+ 7460 return
+ 7500 rem"     UCCCCCCCCCCCCCCI
+ 7501 rem"     Bfiles loeschenB
+ 7502 rem"     JCCCCCCCCCCCCCCK
+ 7510 printcg$
+ 7520 gosub7800
+ 7530 n$="":inputn$:ifn$=""then7000
+ 7540 iflen(n$)>16then7500
+ 7550 printcg$
+ 7554 gosub7800:sysau,13,14,s$n$
+ 7556 sysau,2,18,r$"ok ?"
+ 7560 gosub100:ifa$<>"j"anda$<>"n"then7560
+ 7570 ifa$="n"then7500
+ 7575 forn=len(n$)to17:n$=n$+" ":next
+ 7580 forn=1topo-1:ifright$(wr$(n),len(wr$(n))-1)<>n$thennextn:goto7600
+ 7590 fort=ntopo-1:wr$(t)=wr$(t+1):next:po=po-1:goto7000
+ 7600 print:print:print" "n$" nicht gespeichert !"
+ 7700 forn=1to4000:next:goto7000
+ 7750 sysau,10,21,r$u$" nicht gespeichert !"
+ 7760 forn=1to4000:next:goto7000
+ 7800 sysau,13,8,bl$"files loeschen"
+ 7810 sysau,13,9,"EEEEEEEEEEEEEE"
+ 7820 sysau,0,12,g$"welches programm soll geloescht werden ?"s$:print
+ 7830 return
+ 10000 rem"     UCCCCCCCCCCCCCCCI
+ 10001 rem"     BinitialisierungB
+ 10002 rem"     JCCCCCCCCCCCCCCCK
+ 10010 mb$="{clr}{down}           {blu}Programm Verwaltung         "
+ 10020 mb$=mb$+"            {CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}"
+ 10030 mb$=mb$+"{down}          {red}By Michael Boerner  6719 Weisenheim/Berg      "
+ 10040 rem"{clr}"=shift+clr-home; "{down}"=crsr-down; "{blu}"=ctrl-7; "{blk}"=ctrl+1; "{red}"=ctrl+3
+ 10050 dimc$(70):dimp$(70):cc$=chr$(34):rem variablen fuer inhaltsverzeichnis
+ 10060 dimwr$(500):rem       programm-file $
+ 10070 cg$="{clr}"+chr$(142):rem clear-gross
+ 10080 ck$="{clr}"+chr$(14):rem  clear-klein
+ 10090 r$=chr$(28):rem       rot$
+ 10100 g$=chr$(158):rem      gelb$
+ 10110 bl$=chr$(31):rem      blau$
+ 10120 s$=chr$(144):rem      schwarz$
+ 10130 ww$=chr$(5):rem       weiss$
+ 10140 an$=chr$(18):rem      invers an$
+ 10150 au$=chr$(146):rem     invers aus$
+ 10160 poke53281,12:rem      hintergrundfarbe=grau 2
+ 10170 poke53280,11:rem      rahmenfarbe     =grau 1
+ 10180 poke650,128:rem       autorepeat auf allen tasten
+ 10190 au=49152:rem          startaresse fuer hilfsroutine
+ 10200 forn=autoau+25:rem    hilfsroutine
+ 10210 readwe:poken,we:next
+ 10220 data32,253,174,32,158,183,138
+ 10230 data72,32,253,174,32,158,183
+ 10240 data104,168,24,32,240,255,32
+ 10250 data253,174,76,164,170
+ 11111 goto2000
+

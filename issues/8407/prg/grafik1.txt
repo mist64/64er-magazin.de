@@ -1,0 +1,38 @@
+;grafik1.prg ==0801==
+;Eingetippt von Endurion
+
+    1 rem *************************
+    2 rem *    programm  1        *
+    3 rem *************************
+    5 f=6:deffna(x)=50*sin(x/30)+100
+   10 printchr$(147)chr$(17)"eingabe der werte"chr$(17)
+   20 printchr$(17)"i(siehe tab.1) abschnitt-kennziffer"chr$(17)
+   30 print"w(siehe tab.2) bildschirm-kennziffer"chr$(17)
+   40 print"b=0,bit-map im unteren abschnitt-bereich"
+   50 print" =1,bit-map im oberen abschnitt-bereich"chr$(17)
+   60 printchr$(17):input"i,w,b=";i,w,b:a1=3-i:a2=w/16*1024+a1*16384:a3=a1*16384+b*8192
+   70 p=a2/256:printchr$(17)chr$(17)"mit diesen eingaben haben sie"
+   80 print"den abschnitt "a1" gewaehlt."
+   90 print"ihr bildschirm startet bei "a2
+  100 print"und ihre bit-map bei "a3
+  110 printchr$(17)"ist das so in ordnung?(j/n)"
+  120 geta$:ifa$=""then120
+  130 ifa$="n"then10
+  140 printchr$(147)
+  145 rem **** neuer speicher ****
+  150 poke56576,(peek(56576)and252)ori
+  160 poke56578,peek(56578)or3
+  170 poke53272,(peek(53272)and15)orw
+  180 poke648,p
+  190 poke53265,peek(53265)or32
+  200 poke53272,peek(53272)or(8*b)
+  210 forj=0to7999:pokea3+j,0:nextj
+  220 forj=0to999:pokea2+j,f:nextj
+  230 forx=0to319:y=fna(x)
+  240 by=(xand504)+40*(yand248)+(yand7):bi=7-(xand7)
+  250 pokea3+by,peek(a3+by)or(2^bi):nextx
+  260 geta$:ifa$=""then260
+  265 rem **** alter speicher ****
+  270 poke53272,21:poke53265,27:poke648,4:poke56578,63:poke56576,151
+  280 printchr$(147):end
+
