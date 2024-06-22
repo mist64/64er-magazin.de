@@ -1,0 +1,420 @@
+;crown no. 1.prg ==4001==
+;Gefunden von Endurion; https://gb64.com/game.php?id=9074
+
+    0 rem =================================
+    1 rem erst poke44,64:poke16384,0 eingeben
+   10 rem =    c r o w n  n o. 1          =
+   20 rem =                               =
+   30 rem =       (c) 1984  by            =
+   40 rem =                               =
+   50 rem = claus vigelius & ralf gutjahr =
+   60 rem =================================
+   70 poke53280,9:poke53281,9:sy=49152:ge=11:print"{yel}"
+   80 print"{clr}{down}{down}{rght}{rght}{yel}geben sie bitte ihr startkapital ein{down}{down}"
+   90 print"{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{lgrn} -- nach der eingabe bitte warten -- "
+  100 input"{home}{down}{down}{down}{down}{down}{down}{down}{down}{rght}{rght}";ge
+  110 ifge<.3orge>30then80
+  120 fort=0to600:next:print"{clr}"
+  130 gosub2830: rem--zeichendatas------
+  140 gosub340: rem--einl.  ma.datas---
+  150 gosub350: rem--einl.scheibenfol.-
+  160 gosub2560: rem--aufbau------------
+  170 gosub 210: rem--sprites-----------
+  180 gosub1710: rem--ausspielen--------
+  190 gosub480: rem--gewinnueberprfg.--
+  200 goto180
+  210 rem ---sprite animation-----
+  220 vh=53248:pokevh+21,31:fort=vh+40tovh+45:poket,13:next
+  230 poke2040,13:fort=0to62:readql:poke832+t,ql:next:pokevh,168:pokevh+1,126
+  240 poke2041,14:fort=0to62:readql:poke896+t,ql:next:pokevh+2,130:pokevh+3,155
+  250 poke2042,33:fort=0to62:readql:poke2112+t,ql:next:pokevh+4,154:pokevh+5,155
+  260 poke2043,11:fort=0to62:readql:poke704+t,ql:next:pokevh+6,178:pokevh+7,155
+  270 poke2044,34:fort=0to62:readql:poke2176+t,ql:next:pokevh+8,202:pokevh+9,155
+  280 return
+  290 geta$:ifa$="{rght}"thenc=c+1
+  300 ifa$="{left}"thenc=c-1
+  310 ifa$="{up}"theng=g-1
+  320 ifa$="{down}"theng=g+1
+  330 pokevh+4,c:pokevh+5,g:goto290
+  340 fort=sytosy+25:reada:poket,a:next:return
+  350 rem ---- einlesen ------
+  360 dimaz%(23,5):dimaw(23):dimbz%(13,5):dimbw(13)
+  370 fore1=0to23
+  380 fore2=0to5
+  390 readv:az%(e1,e2)=v
+  400 nexte2:nexte1
+  410 fore1=0to13
+  420 fore2=0to5
+  430 readv:bz%(e1,e2)=v
+  440 nexte2:nexte1
+  450 fore1=0to23:readv:aw(e1)=v:nexte1
+  460 fore1=0to13:readv:bw(e1)=v:nexte1
+  470 return
+  480 rem --- gewinn ueberpruefung ---
+  490 ifso>0then610
+  500 ifm1<>.3then550
+  510 ifv2=w2andv2=.3thengosub1140:gosub700:goto690
+  520 ifv1=w1andw1<3.5thengw=v1:gosub700:goto570
+  530 ifv2=w2thengw=v2:gosub700:goto570
+  540 gw=.3:gosub700:goto570
+  550 ifv1=w1andv1=m1andv1<4thengw=m1:gosub700:goto570
+  560 ifv2=w2andv2=m1thengw=m1:gosub700:goto570
+  570 ifv1=w1andv1=7andgr<2thengr=gr+1:gosub1590
+  580 ifv1=w1andv1=5andgg<2thengg=gg+1:gosub1550
+  590 ifsd=0andv1=w1andv1=m1and(m1=7orm1=5)thense=1:gosub1520:goto690
+  600 goto690
+  610 ifzz=0andm1=.3andv2=m1andw2=m1thengosub1140:goto690
+  620 ifso=5orso=7thenifm1=.3thengosub1140:goto690
+  630 ifso=1andm1<1thengw=3:gosub700:goto690
+  640 ifso=1andm1=v1andm1=w1thengw=3:gosub700:goto690
+  650 ifso=1andm1=v2andm1=w2thengw=3:gosub700:goto690
+  660 ifm1<1thengw=3:goto690
+  670 ifm1=v1andm1=w1thengw=3:goto690
+  680 ifm1=v2andm1=w2thengw=3:goto690
+  690 return
+  700 rem ----- risiko ------
+  710 p3=0:he=0:poke198,0:bt=0:au=0
+  720 df$="{yel}EFGH{lblu}{up}{up}":syssy,6,24,df$:syssy,29,24,df$
+  730 cf$="{yel}!#$%{lblu}":cl$="{lblu}!#$%"
+  740 ifso>0thengs=gg:gg=0:gm=gr:gr=0:goto790
+  750 ifgr=1andau=29thengosub1670:gr=0:bt=1
+  760 ifgr=2andau=29thengosub1670:gr=1:bt=1
+  770 ifgg=1andau=6thengosub1630:gg=0:bt=1
+  780 ifgg=2andau=6thengosub1630:gg=1:bt=1
+  790 ifgw=.3thenr1$="0.30":r3$="0.60":p2=20:p3=.6:au=29:goto1010
+  800 ifgw=.6thenr1$="0.60":r3$="1.20":p2=18:p3=1.2:au=29:goto1010
+  810 ifgw=1.2thenr1$="1.20":r3$="2.40":p2=16:p3=2.4:au=29:goto1010
+  820 ifgw=2.4thenr1$="2.40":r3$="  3 ":p2=14:p3=3:au=29:goto1010
+  830 ifzo=3thenr1$="  3 ":r3$="  6 ":p2=12:p3=6:au=29:goto1010
+  840 ifzo=6thenr1$="  6 ":r3$=" 12 ":p2=10:p3=12:au=29:goto1010
+  850 ifzo=12thenr1$=" 12 ":r3$=" 24 ":p2=8:p3=24:au=29:goto1010
+  860 ifzo=24thenr1$=" 24 ":r3$=" 50 ":p2=6:p3=50:au=29:goto1010
+  870 ifzo=50thensn=1:syssy,29,4,"{wht} 50 {lblu}":rem--- melodie ---
+  880 ifsn=1thensn=0:syssy,29,4,"{lblu} 50 ":so=so+50:return
+  890 rem------------------------------
+  900 ifgw=.4thenr1$="0.40":r3$="0.80":p2=20:p3=.8:au=6:goto1010
+  910 ifgw=.8thenr1$="0.80":r3$="1.60":p2=18:p3=1.6:au=6:goto1010
+  920 ifgw=1.6thenr1$="1.60":r3$="3.00":p2=16:p3=3:au=6:goto1010
+  930 ifgw=3thenr1$="3.00":r3$="  5 ":p2=14:p3=5:au=6:goto1010
+  940 ifzo=5thenr1$="  5 ":r3$=" 10 ":p2=12:p3=10:au=6:goto1010
+  950 ifzo=10thenr1$=" 10 ":r3$=" 20 ":p2=10:p3=20:au=6:goto1010
+  960 ifzo=20thenr1$=" 20 ":r3$=" 40 ":p2=8:p3=40:au=6:goto1010
+  970 ifzo=40thenr1$=" 40 ":r3$="100 ":p2=6:p3=100:au=6:goto1010
+  980 ifzo=100thensn=1:syssy,6,4,"{wht}100 {lblu}"
+  990 ifsn=1thensn=0:syssy,6,4,"{lblu}100 ":so=so+100
+ 1000 return
+ 1010 :
+ 1020 zy$="{wht}"+r1$:syssy,au,p2,zy$:hg$="{lblu}"+r1$
+ 1030 syssy,au,22,cf$
+ 1040 ifpeek(198)>0andbt<>1thengw=0:zo=0:syssy,au,p2,hg$:fort=1to999:next
+ 1050 syssy,au,22,cl$:ifgw=0andzo=0thenpoke198,0:return
+ 1060 ax$="{yel}"+r3$:syssy,au,p2-2,ax$:fort=0to30:next:ifpeek(198)=0andbt<>1then1100
+ 1070 bt=0:ifp3>2.5andau=29thenzo=p3:gw=0:poke198,0
+ 1080 ifp3>3.5andau=6thenzo=p3:gw=0:poke198,0
+ 1090 gw=p3:syssy,au,p2,hg$:he=0:fort=1to300:next:poke198,0
+ 1100 ax$="{lblu}"+r3$:syssy,au,p2-2,ax$:he=he+1
+ 1110 ifhe=35thenhe=0:syssy,au,p2,hg$:ge=gw+ge:so=so+zo+1:zo=0:gw=0
+ 1120 ifhe=0thengg=gm:gr=gs:gm=0:gs=0:return
+ 1130 goto750
+ 1140 rem-----a u s w a h l-----------
+ 1150 ge=ge+1.2
+ 1160 ifap=8thenap=0:goto1480
+ 1170 ii=int(rnd(1)*54):poke198,0
+ 1180 ifii=1thenl$="{wht}":gosub1360:po=100:gosub1460:l$="{blk}":gosub1360:goto1160
+ 1190 ifii=2thenl$="{wht}":gosub1370:po=50:gosub1460:l$="{blk}":gosub1370:goto1160
+ 1200 ifii=3thenl$="{wht}":gosub1380:po=40:gosub1460:l$="{blk}":gosub1380:goto1160
+ 1210 ifii>3andii<=5thenl$="{wht}":gosub1390:po=24:gosub1460:l$="{blk}":xz=6
+ 1220 ifxz=6thengosub1390:xz=0:goto1160
+ 1230 ifii>5andii<=8thenl$="{wht}":gosub1400:po=20:gosub1460:l$="{blk}":xz=5
+ 1240 ifxz=5thengosub1400:xz=0:goto1160
+ 1250 ifii>8andii<=13thenl$="{wht}":gosub1410:po=12:gosub1460:l$="{blk}":xz=7
+ 1260 ifxz=7thengosub1410:xz=0:goto1160
+ 1270 ifii>13andii<=19thenl$="{wht}":gosub1420:po=10:gosub1460:l$="{blk}":xz=2
+ 1280 ifxz=2thengosub1420:xz=0:goto1160
+ 1290 ifii>19andii<=29thenl$="{wht}":gosub1430:po=6:gosub1460:l$="{blk}":xz=9
+ 1300 ifxz=9thengosub1430:xz=0:goto1160
+ 1310 ifii>29andii<=39thenl$="{wht}":gosub1440:po=5:gosub1460:l$="{blk}":xz=1
+ 1320 ifxz=1thengosub1440:xz=0:goto1160
+ 1330 ifii>39andii<=54thenl$="{wht}":gosub1450:po=3:gosub1460:l$="{blk}":xz=8
+ 1340 ifxz=8thengosub1450:xz=0:goto1160
+ 1350 goto1160
+ 1360 m$=l$+"100":syssy,13,18,m$:return
+ 1370 m$=l$+"50":syssy,21,20,m$:return
+ 1380 m$=l$+"40":syssy,19,18,m$:return
+ 1390 m$=l$+"24":syssy,24,18,m$:return
+ 1400 m$=l$+"20":syssy,15,20,m$:return
+ 1410 m$=l$+"12":syssy,18,20,m$:return
+ 1420 m$=l$+"10":syssy,24,20,m$:return
+ 1430 m$=l$+"6":syssy,17,18,m$:return
+ 1440 m$=l$+"5":syssy,13,20,m$:return
+ 1450 m$=l$+"3":syssy,22,18,m$:return
+ 1460 ep=peek(198):ifep>0thenap=8:poke198,0:fort=1to2000:next
+ 1470 return
+ 1480 ifsd=1thensd=0:fort=0to220:geta$:ifa$<>""thense=14:gosub1520:goto1140
+ 1490 ifso=0thenprint"{home}{lblu}";:zo=po:gosub700:po=0:ap=0
+ 1500 ifso>0thenso=so+po
+ 1510 return
+ 1520 rem --- starter leuchten  ---
+ 1530 poke56273,se:poke56274,se:poke56275,se
+ 1540 poke56276,se:poke56277,se:return
+ 1550 rem ----- gelbe gewinnst. -----
+ 1560 ifgg=1thensyssy,6,2,"{wht}L+*L{lblu}"
+ 1570 ifgg=2thensyssy,6,1,"{wht}L+^L{lblu}"
+ 1580 return
+ 1590 rem ----- ($64){ensh}e  gewinnst. -----
+ 1600 ifgr=1thensyssy,29,2,"{wht}L+*L{lblu}"
+ 1610 ifgr=2thensyssy,29,1,"{wht}L+^L{lblu}"
+ 1620 return
+ 1630 rem -----l gelbe gewinnst. -----
+ 1640 ifgg=2thensyssy,6,1," =2 "
+ 1650 ifgg=1thensyssy,6,2," =1 "
+ 1660 return
+ 1670 rem -----l ($64){ensh}e  gewinnst. -----
+ 1680 ifgr=2thensyssy,29,1," =2 "
+ 1690 ifgr=1thensyssy,29,2," =1 "
+ 1700 return
+ 1710 ze=100:gosub2090:gosub2200:gosub2300
+ 1720 zu=int(rnd(1)*23):ifzu/2<>int(zu/2)then1710
+ 1730 w1=aw(zu):zx=zu+1:wx=w1+1:w2=aw(zx)
+ 1740 poke1237,az%(zu,0):poke1238,az%(zu,1):poke1239,az%(zu,2)
+ 1750 poke1277,az%(zu,3):poke1278,az%(zu,4):poke1279,az%(zu,5)
+ 1760 poke1437,az%(zx,0):poke1438,az%(zx,1):poke1439,az%(zx,2)
+ 1770 poke1477,az%(zx,3):poke1478,az%(zx,4):poke1479,az%(zx,5)
+ 1780 ifff=0thengosub 2420
+ 1790 ifff=1thenff=0:fort=1to500:next:goto 1850
+ 1800 poke56268,1:poke56269,1:poke56270,1
+ 1810 fort=1to100
+ 1820 ab=peek(203):ifab<>64thenff=1:ze=200:gosub2360:gosub2090:goto1710
+ 1830 next
+ 1840 :gosub2360:fort=1to500:next
+ 1850 rem  -----2.scheibe-------
+ 1860 fort=1to500:next
+ 1870 gosub2370
+ 1880 fort=1to100
+ 1890 ab=peek(197):ifab<>64thengosub2380:goto1920
+ 1900 next:gosub2380
+ 1910 fort=1to500:next
+ 1920 zu=int(rnd(1)*23):ifzu/2<>int(zu/2)then1920
+ 1930 v1=aw(zu):zx=zu+1:v2=aw(zx)
+ 1940 poke1247,az%(zu,0):poke1248,az%(zu,1):poke1249,az%(zu,2)
+ 1950 poke1287,az%(zu,3):poke1288,az%(zu,4):poke1289,az%(zu,5)
+ 1960 poke1447,az%(zx,0):poke1448,az%(zx,1):poke1449,az%(zx,2)
+ 1970 poke1487,az%(zx,3):poke1488,az%(zx,4):poke1489,az%(zx,5)
+ 1980 fort=1to1000:next
+ 1990 rem ---3. scheibe----
+ 2000 zu=int(rnd(1)*13):ifzu/2=int(zu/2)thengf=1:lp=7:gosub2390
+ 2010 m1=bw(zu):gosub2370
+ 2020 fort=1to100
+ 2030 ab=peek(197):ifab<>64thengosub2380:goto2050
+ 2040 next:gosub2380
+ 2050 poke1282,bz%(zu,0):poke1283,bz%(zu,1):poke1284,bz%(zu,2)
+ 2060 poke1322,bz%(zu,3):poke1323,bz%(zu,4):poke1324,bz%(zu,5)
+ 2070 fort=0to1000:next
+ 2080 return
+ 2090 rem --loesche 1. scheibe-----
+ 2100 fd$="{lblu}EFGH{up}{up}":syssy,6,24,fd$:syssy,29,24,fd$
+ 2110 poke1237,32:poke1238,32:poke1239,32
+ 2120 poke1277,32:poke1278,32:poke1279,32
+ 2130 poke55509,14:poke55510,14:poke55511,14
+ 2140 poke55549,14:poke55550,14:poke55551,14
+ 2150 poke1437,32:poke1438,32:poke1439,32
+ 2160 poke1477,32:poke1478,32:poke1479,32
+ 2170 poke55709,14:poke55710,14:poke55711,14
+ 2180 poke55749,14:poke55750,14:poke55751,14
+ 2190 fort=1toze:next:return
+ 2200 rem --loesche 2. scheibe------
+ 2210 poke1247,32:poke1248,32:poke1249,32
+ 2220 poke1287,32:poke1288,32:poke1289,32
+ 2230 poke55519,14:poke55520,14:poke55521,14
+ 2240 poke55559,14:poke55560,14:poke55561,14
+ 2250 poke1447,32:poke1448,32:poke1449,32
+ 2260 poke1487,32:poke1488,32:poke1489,32
+ 2270 poke55719,14:poke55720,14:poke55721,14
+ 2280 poke55759,14:poke55760,14:poke55761,14
+ 2290 fort=1toze:next:return
+ 2300 rem--loesche mittelscheibe------
+ 2310 poke1282,32:poke1283,32:poke1284,32
+ 2320 poke1322,32:poke1323,32:poke1324,32
+ 2330 poke55554,14:poke55555,14:poke55556,14
+ 2340 poke55594,14:poke55595,14:poke55596,14
+ 2350 fort=1toze:next:return
+ 2360 poke56268,14:poke56269,14:poke56270,14:return
+ 2370 poke56280,1:poke56281,1:poke56282,1:return
+ 2380 poke56280,14:poke56281,14:poke56282,14:return
+ 2390 rem goldenes feld ------
+ 2400 poke55554,lp:poke55555,lp:poke55556,lp:poke55594,lp:poke55595,lp
+ 2410 poke 55596,lp:return
+ 2420 rem kapital - 30 pf.
+ 2430 ifge<.3thenrun
+ 2440 ge=ge+gw:ge=ge-.3:ge=int(ge*10+.5)/10:gw=0:print"{lblu}";
+ 2450 ifge<10thenpq=21
+ 2460 ifge<1thenpq=22
+ 2470 ifge>=10thenpq=20
+ 2480 ifge=int(ge)thensyssy,24,1,"0"
+ 2490 syssy,pq,1,ge::syssy,20,1,"{SHIFT--}"
+ 2500 rem printen sondersp.zahl ----
+ 2510 ifso>=1thenso=so-1
+ 2520 ifso>=100thensyssy,12,1,so:goto2550
+ 2530 ifso>=10thensyssy,13,1,so:syssy,13,1,"0"
+ 2540 ifso<10thensyssy,14,1,so:syssy,13,1,"00"
+ 2550 syssy,12,1,"{SHIFT--}":return
+ 2560 print"{clr}{lblu}";
+ 2570 print"     U\\\\I {lred}U\\\I   U\\\\\I{lblu} U\\\\I      ";
+ 2580 print"     {SHIFT--} =2 {SHIFT--} {lred}{SHIFT--}{lblu}   {lred}{SHIFT--}{lblu}   {lred}{SHIFT--}{lblu}  . 0{lred}{SHIFT--}{lblu} {SHIFT--} =2 {SHIFT--}      ";
+ 2590 print"     {SHIFT--} =1 {SHIFT--} {lred}J\\\K   J\\\\\K {lblu}{SHIFT--} =1 {SHIFT--}      ";
+ 2600 print"     {SHIFT--}----{SHIFT--}                 {SHIFT--}----{SHIFT--}      ";
+ 2610 print"     {SHIFT--}100 {SHIFT--} U\\\I     U\\\I {SHIFT--} 50 {SHIFT--}      ";
+ 2620 print"     {SHIFT--}    {SHIFT--} {SHIFT--}   {SHIFT--}U\\\I{SHIFT--}   {SHIFT--} {SHIFT--}    {SHIFT--}      ";
+ 2630 print"     {SHIFT--} 40 {SHIFT--} {SHIFT--}   {SHIFT--}{SHIFT--}   {SHIFT--}{SHIFT--}   {SHIFT--} {SHIFT--} 24 {SHIFT--}      ";
+ 2640 print"     {SHIFT--}    {SHIFT--} J\\\K{SHIFT--}   {SHIFT--}J\\\K {SHIFT--}    {SHIFT--}      ";
+ 2650 print"     {SHIFT--} 20 {SHIFT--}      J\\\K      {SHIFT--} 12 {SHIFT--}      ";
+ 2660 print"     {SHIFT--}    {SHIFT--} U\\\I     U\\\I {SHIFT--}    {SHIFT--}      ";
+ 2670 print"     {SHIFT--} 10 {SHIFT--} {SHIFT--}   {SHIFT--}     {SHIFT--}   {SHIFT--} {SHIFT--}  6 {SHIFT--}      ";
+ 2680 print"     {SHIFT--}    {SHIFT--} {SHIFT--}   {SHIFT--}     {SHIFT--}   {SHIFT--} {SHIFT--}    {SHIFT--}      ";
+ 2690 print"     {SHIFT--}  5 {SHIFT--} J\\\K     J\\\K {SHIFT--}  3 {SHIFT--}      ";
+ 2700 print"     {SHIFT--}    {SHIFT--}                 {SHIFT--}    {SHIFT--}      ";
+ 2710 print"     {SHIFT--}3.00{SHIFT--}                 {SHIFT--}2.40{SHIFT--}      ";
+ 2720 print"     {SHIFT--}    {SHIFT--}                 {SHIFT--}    {SHIFT--}      ";
+ 2730 print"     {SHIFT--}1.60{SHIFT--}{lgrn}U\\\\\\\\\\\\\\\I{lblu}{SHIFT--}1.20{SHIFT--}      ";
+ 2740 print"     {SHIFT--}    {SHIFT--}{lgrn}{SHIFT--}               {SHIFT--}{lblu}{SHIFT--}    {SHIFT--}      ";
+ 2750 print"     {SHIFT--}0.80{SHIFT--}{lgrn}{SHIFT--} {blk}100 6 40 3 24{lgrn} {SHIFT--}{lblu}{SHIFT--}0.60{SHIFT--}      ";
+ 2760 print"     {SHIFT--}    {SHIFT--}{lgrn}{SHIFT--}               {SHIFT--}{lblu}{SHIFT--}    {SHIFT--}      ";
+ 2770 print"     {SHIFT--}0.40{SHIFT--}{lgrn}{SHIFT--} {blk}5 20 12 50 10{lgrn} {SHIFT--}{lblu}{SHIFT--}0.30{SHIFT--}      ";
+ 2780 print"     {SHIFT--}    {SHIFT--}{lgrn}{SHIFT--}               {SHIFT--}{lblu}{SHIFT--}    {SHIFT--}      ";
+ 2790 print"     {SHIFT--}!#$%{SHIFT--}{lgrn}J\\\\\\\\\\\\\\\K{lblu}{SHIFT--}!#$%{SHIFT--}      ";
+ 2800 print"     J\\\\K                 J\\\\K      ";
+ 2810 print"      EFGH  {CBM-F}{CBM-C}{CBM-X}  {SHIFT-*}ABCD  {CBM-V}{CBM-B}@  EFGH      ";
+ 2820 return
+ 2830 rem neue zeichen
+ 2840 rem fort=0to684:readl:next:return
+ 2850 poke56334,peek(56334)and254:poke1,peek(1)and251
+ 2860 fori=0to1022:poke12288+i,peek(53248+i):next
+ 2870 poke1,peek(1)or4:poke56334,peek(56334)or1
+ 2880 poke53272,(peek(53272)and240)or12
+ 2890 reada:ifa=-1thenreturn
+ 2900 forj=0to7:readb:poke12288+a*8+j,b:next::x=x+1:goto 2890
+ 2910 data48,126,102,102,102,102,118,126,0
+ 2920 data49,6,6,6,14,14,14,14,0
+ 2930 data50,126,14,6,126,112,112,126,0
+ 2940 data51,126,6,6,30,14,6,126,0
+ 2950 data52,70,70,102,126,14,14,14,0
+ 2960 data53,126,96,96,126,14,14,126,0
+ 2970 data54,126,96,96,126,114,114,126,0
+ 2980 data55,126,6,6,30,14,14,14,0
+ 2990 data56,126,102,102,126,118,102,126,0
+ 3000 data57,126,102,102,126,14,14,126,0
+ 3010 data64,62,48,48,62,62,6,6,62
+ 3020 data65,249,123,51,51,51,51,51,51
+ 3030 data66,206,109,109,238,238,109,109,45
+ 3040 data67,124,61,25,25,25,25,25,24
+ 3050 data68,239,205,141,238,206,141,173,205
+ 3060 data69,0,231,146,146,226,194,162,151
+ 3070 data70,0,121,64,64,120,8,8,121
+ 3080 data71,0,201,138,140,140,140,138,201
+ 3090 data72,0,60,44,36,36,36,52,60
+ 3100 data76,255,255,255,255,255,255,255,255
+ 3110 data77,0,0,12,12,12,12,12,14
+ 3120 data78,0,0,1,3,3,3,67,195
+ 3130 data79,0,0,224,176,48,48,48,48
+ 3140 data80,15,7,0,0,0,0,0,0
+ 3150 data81,243,243,195,195,195,193,0,0
+ 3160 data82,48,48,48,48,112,224,0,0
+ 3170 data83,0,0,8,12,14,9,8,8
+ 3180 data84,0,0,24,60,24,24,165,66
+ 3190 data86,0,0,16,48,112,144,16,16
+ 3200 data87,8,9,11,9,12,15,0,0
+ 3210 data88,24,60,189,36,0,255,0,0
+ 3220 data89,16,144,208,144,48,240,0,0
+ 3230 data90,0,0,15,0,0,0,0,15
+ 3240 data91,0,0,244,117,55,49,113,240
+ 3250 data92,0,0,112,80,208,80,112,0
+ 3260 data93,24,24,24,24,24,24,24,24
+ 3270 data94,14,12,12,12,14,15,0,0
+ 3280 data95,15,0,0,0,0,240,0,0
+ 3290 data96,240,0,0,0,0,0,0,0
+ 3300 data97,0,0,7,6,6,6,6,6
+ 3310 data98,0,0,255,6,12,25,51,102
+ 3320 data99,0,0,224,96,224,224,96,96
+ 3330 data 100 , 6, 7, 3, 1, 0, 0, 0, 0
+ 3340 data101,204,152,48,225,195,126,0,0
+ 3350 data102,96,96,192,128,0,0,0,0
+ 3360 data103,0,0,7,7,7,7,7,6
+ 3370 data104,0,0,255,255,224,240,248,252
+ 3380 data105,0,0,224,224,96,96,96,96
+ 3390 data106,6,6,3,1,0,0,0,0
+ 3400 data107,126,63,31,15,255,126,0,0
+ 3410 data108,96,224,192,128,0,0,0,0
+ 3420 data109,0,0,1,3,7,13,9,1
+ 3430 data110,0,0,190,176,190,178,190,128
+ 3440 data111,0,0,240,176,176,176,240,0
+ 3450 data112,1,1,1,1,3,7,0,0
+ 3460 data113,191,128,128,128,192,224,0,0
+ 3470 data114,0,0,3,6,12,8,1,3
+ 3480 data115,0,0,158,214,214,214,158,0
+ 3490 data116,3,1,8,12,6,3,0,0
+ 3500 data117,31,128,192,192,192,128,0,0
+ 3510 data118,0,0,3,7,6,6,6,7
+ 3520 data119,0,0,241,227,3,3,3,227
+ 3530 data120,7,6,6,6,7,3,0,0
+ 3540 data121,243,51,51,51,243,225,0,0
+ 3550 data122,0,0,158,130,158,144,158,128
+ 3560 data123,0,247,129,129,241,17,17,241
+ 3570 data124,0,222,18,18,30,18,18,18
+ 3580 data125,0,239,146,146,226,162,146,138
+ 3590 data126,0,121,64,64,120,8,8,120
+ 3600 data127,0,243,66,66,66,66,66,67
+ 3610 data0,0,206,73,73,78,72,72,200
+ 3620 data28,0,0,0,255,255,0,0,0
+ 3630 data33,141,205,205,229,181,157,205,197
+ 3640 data35,156,178,176,176,176,176,178,156
+ 3650 data36,203,201,201,249,233,201,201,201
+ 3660 data37,223,152,144,159,131,129,159,159
+ 3670 data42,249,249,249,241,241,241,241,255
+ 3680 data30,129,241,249,129,143,143,129,255
+ 3690 data43,255,187,215,239,215,187,255,255
+ 3700 data61,0,68,40,16,40,68,0,0
+ 3710 data-1
+ 3720 data32,253,174,32,158,183,138,72,32,253,174,32,158,183,104,168,24,32,240
+ 3730 data255,32,253,174,76,164,170
+ 3740 rem-------aeussere scheibe-----
+ 3750 data109,122,111,112,113,96,83,84,86,87,88,89:rem 1.20 + krone
+ 3760 data103,104,105,106,107,108,77,78,79,80,81,82 :rem rotes wap. + 0.40
+ 3770 data109,110,111,112,113,96,118,119,79,120,121,82:rem 1.60 +0.60
+ 3780 data90,91,92,94,95,96,118,119,79,120,121,82 :rem 2.40 +0.60
+ 3790 data114,115,111,116,117,96,77,78,79,80,81,82 :rem 3.00 + 0.40
+ 3800 data109,122,111,112,113,96,83,84,86,87,88,89:rem 1.20 + krone
+ 3810 data103,104,105,106,107,108,77,78,79,80,81,82 :rem rotes wap. + 0.40
+ 3820 data97,98,99,100,101,102,77,78,79,80,81,82 :rem gel.wap. + 0.40
+ 3830 data109,110,111,112,113,96,118,119,79,120,121,82:rem 1.60 +0.60
+ 3840 data90,91,92,94,95,96,118,119,79,120,121,82 :rem 2.40 +0.60
+ 3850 data97,98,99,100,101,102,77,78,79,80,81,82 :rem gel.wap. + 0.40
+ 3860 data109,122,111,112,113,96,83,84,86,87,88,89:rem 1.20 + krone
+ 3870 rem -------innere scheibe--------
+ 3880 data83,84,86,87,88,89,109,122,111,112,113,96 :rem krone + 1.20
+ 3890 data118,119,79,120,121,82,90,91,92,94,95,96 :rem 0.60 + 2.40
+ 3900 data77,78,79,80,81,82,103,104,105,106,107,108 :rem 0.40 + rotes wap.
+ 3910 data118,119,79,120,121,82,109,110,111,112,113,96 :rem 0.60 +1.60
+ 3920 data77,78,79,80,81,82,97,98,99,100,101,102 :rem 0.40 + gel.wap.
+ 3930 data118,119,79,120,121,82,114,115,111,116,117,96 :rem 0.60 + 3.00
+ 3940 data77,78,79,80,81,82,109,110,111,112,113,96 :rem 0.40 + 1.60
+ 3950 rem---gewinnwerte aussere s.----
+ 3960 data1.2,.3,5,.4,1.6,.6,2.4,.6,3,.4,1.2,.3,5,.4,7,.4,1.6,.6,2.4,.6
+ 3970 data7,.4,1.2,.3
+ 3980 rem---gewinnwerte innere sch.---
+ 3990 data.3,1.2,.6,2.4,.4,5,.6,1.6,.4,7,.6,3,.4,1.6
+ 4000 data0,16,0,0,16,0,0,124,0,0,16,0,0,16,0,0,56,0,0,108,0,0,56,0,15,255,224
+ 4010 data31,255,240,62,16,248,124,16,124,120,16,60,112,16,28,112,56,28,62,124
+ 4020 data248,31,57,240,15,147,224,13,255,96,31,255,240,7,255,192
+ 4030 data0,96,0,0,112,64,0,255,192,1,255,128,63,255,0,127,78,0,253,0,0,240,128
+ 4040 data0,224,64,0,224,64,0,224,64,0,224,128,0,224,128,19,227,128,63,224,192
+ 4050 data121,240,0,122,120,2,88,63,244,24,31,252,26,15,254,124,0,0,0
+ 4060 data0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+ 4070 data0,3,1,18,60,130,247,28,204,255,12,98,145,8,98,200,24,226,177,8,198
+ 4080 data146,7,143,206,0,0,0
+ 4090 data0,0,2,0,0,2,0,0,7,0,0,31,0,0,57,0,0,49,0,0,17,0,0,17,0,0,1,0,0,1,0,0
+ 4100 data1,0,0,1,2,192,1,7,64,1,14,48,3,15,248,3,134,112,6,6,48,100,14,56,60,4
+ 4110 data112,24,0,0,0
+ 4120 data7,0,16,14,0,48,52,0,48,204,0,112,140,0,248,134,1,248,131,131,184,130
+ 4130 data113,56,134,144,56,198,144,40,198,144,40,198,80,40,198,144,40,140,96
+ 4140 data40,12,16,40,12,224,40,6,128,40,2,0,40,3,192,101,1,1,254,0,0,0
+
