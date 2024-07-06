@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>Mehr über SYS</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="Rolf Zweifel">
+    <meta name="64er.issue" content="7/84">
+    <meta name="64er.pages" content="131">
+    <meta name="64er.head1" content="Tips & Tricks">
+    <meta name="64er.head2" content="C 64/VC 20">
+    <meta name="64er.toc_title" content="Mehr über SYS (C 64/VC 20)">
+    <meta name="64er.toc_category" content="Programme zum Abtippen|Tips & Tricks">
+    <meta name="64er.index_title" content="Mehr über SYS">
+    <meta name="64er.index_category" content="Listings zum Abtippen|Tips & Tricks|SYS">
+    <meta name="64er.id" content="sys">
+</head>
+
+<body>
+    <article>
+        <h1>Mehr über SYS</h1>
+
+        <p class="intro">Der SYS-Befehl beim C 64 und VC 20 leistet wesentlich mehr, als das Commodore-Handbuch zugeben will. Er bietet zum Beispiel eine einfache Möglichkeit, Parameter an Maschinenprogramme zu übergeben.</p>
+
+        <p>Der SYS-Befehl hat folgendes Format:<br>
+            SYS &lt;Adreßausdruck&gt; [, &lt; Parameterausdrücke &gt; ]</p>
+
+        <p>SYS ruft das Maschinensprachprogramm auf, das bei »Adreßausdruck« logisch beginnt. »Adreßausdruck« steht für eine RAM-Adresse im Bereich von 0 bis 65535.</p>
+
+        <p>Die wahlweise anzugebenden Übergabeparameter werden nicht von SYS bearbeitet, vielmehr müssen diese Angaben in geeigneter Weise vom aufgerufenen Maschinenprogramm ausgewertet werden. Hierzu sind natürlich genauere Kenntnisse in Assembler-Programmierung erforderlich.</p>
+
+        <p>Es kann jedoch eine andere Übergabeform gewählt werden, auch wenn dies im VC 20-Programmierhandbuch verschwiegen und im Handbuch das Gegenteil behauptet wird.</p>
+
+        <p>Diese Form der Parameter-Übergabe besteht darin, Akkumulator, X- und Y-Register sowie den Prozessorstatus vorzugeben.</p>
+
+        <p>Wie soll das vom Basic aus geschehen? Wenn nicht direkt, dann eben über die Speicherstellen, die SYS als oben genannte Register aufnimmt, bevor ins Maschinenprogramm verzweigt wird, und in die SYS nach Rückkehr (RTS) aus dem Maschinenprogramm die aktuellen Registerinhalte ablegt.</p>
+
+        <p>Es gibt also eine Kommunikationsmöglichkeit mit dem Maschinenprogramm vor und nach der Abarbeitung, sie muß nur genutzt werden.</p>
+
+        <p>Die vier Speicherbytes nach Bild 1 sind die Schnittstellen zu den Prozessor-Registern.</p>
+
+        <figure>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Bezeichnung</th>
+                        <th>hex.-Adr.</th>
+                        <th>dez.</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Akkumulator</td>
+                        <td>030C</td>
+                        <td>780</td>
+                    </tr>
+                    <tr>
+                        <td>X-Register</td>
+                        <td>030D</td>
+                        <td>781</td>
+                    </tr>
+                    <tr>
+                        <td>Y-Register</td>
+                        <td>030E</td>
+                        <td>782</td>
+                    </tr>
+                    <tr>
+                        <td>Proz.-Status</td>
+                        <td>030F</td>
+                        <td>783</td>
+                    </tr>
+                </tbody>
+            </table>
+            <figcaption>Bild 1. Die Schnittstelle zu den Prozessor-Registern</figcaption>
+        </figure>
+
+        <p>Der Prozessor-Status wird dabei durch das Flag-Register dargestellt. Die Bedeutung der einzelnen Bits im Flag-Register geht aus Bild 2 hervor.</p>
+
+        <figure>
+            <img src="131-1.png" alt="">
+            <figcaption>Bild 2. Das Flag-Register beim 6502</figcaption>
+        </figure>
+
+        <p>Hier nun eine Anwendung der Kommunikation mit Maschinen-Unterprogrammen.</p>
+
+        <p>Die Betriebssystem-Routine »Plot« soll genutzt werden, um den Cursor auf eine bestimmte Position zu setzen, ab der dann eine Ein-/Ausgabe erfolgen kann, beziehungsweise es soll abgefragt werden, wo sich der Cursor gerade befindet, wo also die nächste Ein-/Ausgabe erfolgen würde.</p>
+
+        <p>Bild 3 zeigt das kleine Beispiel-Listing. In den Zeilen 100 bis 150 wird der Cursor auf Zeile 10, Spalte 5 gesetzt. Anschließend wird zur Demonstration ein kleiner Text ausgedruckt und in den Zeilen 200 bis 260 die aktuelle Cursorposition gelesen.</p>
+
+        <address class="author">(Rolf Zweifel)</address>
+
+		<figure>
+            <pre data-filename="cursorposition" data-name="Cursorposition"></pre>
+			<figcaption>Bild 3. Listing Cursorposition setzen/lesen</figcaption>
+		</figure>
+    </article>
+
+</body>
+
+</html>

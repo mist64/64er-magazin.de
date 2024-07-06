@@ -1,0 +1,180 @@
+;relativedateien.prg ==0801==
+;Eingetippt von Endurion
+
+  100 rem  ******************************
+  110 rem  * adressendatei 64'er/7 rel  *
+  120 rem  ******************************
+  130 close 15:open 15,8,15
+  140 close 1:open 1,8,2,"adr.rel,l,"+chr$(82)
+ 1000 rem ----------------------------
+ 1010 rem -  auswahl                 -
+ 1020 rem ----------------------------
+ 1030 :
+ 1040 print "{clr}    relative datei 64'er 7"
+ 1050 print :print :print
+ 1060 print "  1 = datei einrichten"
+ 1070 print "  2 = daten eingeben"
+ 1080 print "  3 = suchen und anzeigen"
+ 1090 print
+ 1100 print "  x = programmende"
+ 1110 print :print
+ 1120 print "waehle"
+ 1130 get r$:if r$="" then 1130
+ 1140 if r$="1" then gosub 11000
+ 1150 if r$="2" then gosub 4000
+ 1160 if r$="3" then gosub 3000
+ 1170 if r$="x" then close 1:close 15:end
+ 1180 goto 1000
+ 2000 rem  ------------------------------
+ 2010 rem  - bildschirmanzeige
+ 2020 rem  ------------------------------
+ 2030 :
+ 2040 print "{clr}    anzeige datensatz"
+ 2050 print
+ 2060 print " nummer ";rn:print
+ 2070 print
+ 2080 print " name    : "nv$" "nn$
+ 2090 print " strasse : "sr$
+ 2100 print " plz/ort : "pl$" "ot$
+ 2110 print " telefon : "te$
+ 2120 print :print :print
+ 2130 return
+ 2140 :
+ 3000 rem ----------------------------
+ 3010 rem - suchen
+ 3020 rem ----------------------------
+ 3030 :
+ 3040 gosub 13000:rem  datensatznr.eingabe
+ 3050 gosub 9000:rem  lesen
+ 3060 if rc$<>chr$(255) then 3120
+ 3070 print "{clr}"
+ 3080 print :print :print
+ 3090 print " nocht nicht beschrieben"
+ 3100 print :print
+ 3110 goto 3140
+ 3120 gosub 5000:rem  aufteilen
+ 3130 gosub 2000:rem  anzeigen
+ 3140 print " druecke taste"
+ 3150 get r$:if r$="" then 3150
+ 3160 r$=""
+ 3170 return
+ 3180 :
+ 4000 rem -----------------------------
+ 4010 rem -       eingabe             -
+ 4020 rem -----------------------------
+ 4030 :
+ 4040 gosub 13000:rem  datensatznr.
+ 4050 gosub 6000:rem  eingabe
+ 4060 gosub 7000:rem  verketten
+ 4070 gosub 8000:rem  speichern
+ 4080 return
+ 4090 :
+ 5000 rem ------------------------------
+ 5010 rem -aufteilen datensatz in felder
+ 5020 rem ------------------------------
+ 5030 :
+ 5040 nv$=left$(rc$,15)
+ 5050 nn$=mid$(rc$,16,15)
+ 5060 sr$=mid$(rc$,31,20)
+ 5070 pl$=mid$(rc$,51,4)
+ 5080 ot$=mid$(rc$,55,15)
+ 5090 te$=mid$(rc$,70,12)
+ 5100 return
+ 6000 rem ------------------------------
+ 6010 rem - eingabe neue daten         -
+ 6020 rem ------------------------------
+ 6030 :
+ 6040 print "{clr}"
+ 6050 print "    eingabe neue daten"
+ 6060 print :print
+ 6070 print "    nummer ";rn
+ 6080 print :print
+ 6090 input "nachname ";nn$:nn$=left$(nn$,15)
+ 6100 input "vorname  ";nv$:nv$=left$(nv$,15)
+ 6110 input "strasse  ";sr$:sr$=left$(sr$,20)
+ 6120 input "postlz.  ";pl$:pl$=left$(pl$,4)
+ 6130 input "ort      ";ot$:ot$=left$(ot$,15)
+ 6140 input "telefon  ";te$:te$=left$(te$,12)
+ 6150 print :print
+ 6160 print "  adresse ok (j/n) ?"
+ 6170 get r$:if r$="" then 6170
+ 6180 if r$="n" then 6040
+ 6190 if r$<>"j" then 6170
+ 6200 return
+ 6210 :
+ 7000 rem ----------------------------
+ 7010 rem -   verketten der felder   -
+ 7020 rem ----------------------------
+ 7030 :
+ 7040 bl$="                    "
+ 7050 rc$=nv$+left$(bl$,15-len(nv$))
+ 7060 rc$=rc$+nn$+left$(bl$,15-len(nn$))
+ 7070 rc$=rc$+sr$+left$(bl$,20-len(sr$))
+ 7080 rc$=rc$+pl$+left$(bl$,4-len(pl$))
+ 7090 rc$=rc$+ot$+left$(bl$,15-len(ot$))
+ 7100 rc$=rc$+te$+left$(bl$,12-len(te$))
+ 7110 return
+ 7120 :
+ 8000 rem  ----------------------------
+ 8010 rem  - speichern daten auf disk -
+ 8020 rem  ----------------------------
+ 8030 :
+ 8040 print# 15,"p"+chr$(2)+chr$(lb)+chr$(hb)+chr$(1)
+ 8050 print# 1,rc$
+ 8060 return
+ 8070 :
+ 9000 rem  ----------------------------
+ 9010 rem  - lesen datensatz von disk -
+ 9020 rem  ----------------------------
+ 9030 f=0
+ 9040 print# 15,"p"+chr$(2)+chr$(lb)+chr$(hb)+chr$(1)
+ 9050 input# 15,er:rem  fehlerkanal
+ 9060 if er<>50 then 9110:rem  record not present-error
+ 9070 print "{clr} datensatznummer zu hoch"
+ 9080 print :print " druecken sie eine taste"
+ 9090 get r$:if r$="" then 9090
+ 9100 run
+ 9110 input# 1,rc$
+ 9120 if asc(rc$)<>255 then 9140
+ 9130 rem  datensatz ist noch frei
+ 9140 return
+ 11000 rem  --------------------------
+ 11010 rem   - neue datei anlegen
+ 11020 rem  --------------------------
+ 11030 print "{clr}  achtung, eine bestehende datei mit"
+ 11040 print :print "   dem namen 'adr.rel' wird geloescht"
+ 11050 print
+ 11060 print " (w)eiter  (z)urueck"
+ 11070 get r$:if r$="" then 11070
+ 11080 if r$<>"w" then return
+ 11090 print
+ 11100 print :print "bitte warten"
+ 11110 close 15:open 15,8,15,"s:adr.rel"
+ 11120 close 1:open 1,8,2,"adr.rel,l,"+chr$(82)
+ 11130 print "wieviele datensaetze soll die datei "
+ 11140 print "verwalten? ";
+ 11150 input rn
+ 11160 hb=int(rn/256)
+ 11170 lb=rn-hb*256
+ 11180 print :print" bitte warten"
+ 11190 print# 15,"p"+chr$(2)+chr$(lb)+chr$(hb)+chr$(1)
+ 11200 input# 15,er:rem  fehlerkanal
+ 11210 if er<>52 then 11250:rem  datei zu gross
+ 11220 print "     datei  zu gross"
+ 11230 print :print " druecken sie eine taste"
+ 11240 get r$:if r$="" then 11270
+ 11250 print# 1,chr$(255)
+ 11260 close 1:close 15
+ 11270 run
+ 13000 rem ----------------------------
+ 13010 rem - eingabe datensatznummer
+ 13020 rem ----------------------------
+ 13030 :
+ 13040 print "{clr}"
+ 13050 print :print :print
+ 13060 print " eingabe der datensatznummer"
+ 13070 input rn
+ 13080 hb=int(rn/256)
+ 13090 lb=rn-hb*256
+ 13100 return
+

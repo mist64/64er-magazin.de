@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>Vollautomatisches Blumengießen</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="Klaus Michael">
+    <meta name="64er.issue" content="7/84">
+    <meta name="64er.pages" content="82-84">
+    <meta name="64er.head1" content="Anwendung des Monats">
+    <meta name="64er.head2" content="C 64">
+    <meta name="64er.toc_category" content="Anwendung des Monats">
+    <meta name="64er.index_title" content="Blumen gießen mit dem C 64 (AdM)">
+    <meta name="64er.index_category" content="Listings zum Abtippen|Anwendung|User-Port">
+    <meta name="64er.id" content="blumengießen">
+</head>
+
+<body>
+    <article>
+        <h1>Vollautomatisches Blumengießen</h1>
+
+        <p class="intro">Sie kennen sicher auch das leidige Problem: Der Urlaub steht vor der Tür und keiner der Nachbarn will die Blumen versorgen, da sie just in der gleichen Zeit Urlaubsgefühle verspüren. Der Computer schafft Abhilfe.</p>
+
+        <p>Die Idee war, mit einer kleinen Tauchpumpe (Campingartikelbedarf) und einem verzweigten Schlauchsystem die Blumen täglich mit dem kostbaren Naß zu versorgen (Bild 1). Diese kleinen Pumpen haben eine Förderleistung von etwa 14 l/min., was für die minimalen Ein- und Ausschaltzeiten mechanischer Schaltuhren von 30 Minuten viel zu viel ist. Elektronische Schaltuhren, die individuelle Schaltzyklen zulassen, waren wiederum viel zu teuer.</p>
+
+        <figure>
+            <img src="82-1.png" alt="">
+            <figcaption>Bild 1. Das Interface steht links neben dem Commodore. Die Pumpe liegt im Eimer, der mit Wasser gefüllt ist. Durch die unterschiedlichen Schlauchdurchmesser kann jede Blume individuell mit der für sie notwendigen Wassermenge beliefert werden.</figcaption>
+        </figure>
+
+        <p>Die Idee, meinen 64er zum Blumengießen herzunehmen, reifte. Denn schließlich besitzt er einen User-Port, der für solche Aufgaben wie geschaffen ist.</p>
+
+        <h2>Der User-Port, eine Verbindung zur Außenwelt</h2>
+
+        <p>Der User-Port ist eine Schnittstelle, mit der der Anwender auf einfache Art und Weise Kontakt zwischen dem Commodore und der Außenwelt herstellen kann. Mit ihm ist es unter anderem möglich, Geräte an- und auszuschalten. Da der User-Port eine 8 Bit breite Datenleitung besitzt (PB0-PB7, siehe Bild 2), können ohne weiteres Klimmzüge bis zu 8 Verbraucher geschaltet werden. Dazu ist jedoch etwas zusätzliche Hardware nötig. Um einen Stromverbraucher zu steuern (in unserem Fall eine kleine Pumpe), benötigt man ein Schaltinterface. Denn die Pumpe braucht mehr Strom als der User-Port zur Verfügung stellt. In meinem Fall baute ich mir ein Interface, das direkt an das normale 220-Volt-Netz angeschlossen werden kann. Mit ihm lassen sich grundsätzlich alle Elektrogeräte schalten. Den Aufbau dieses einfachen Schaltinterfaces zeigt Bild 3. Zusätzlich benötigt man noch eine Verbindung vom Interface zum User-Port. Ein geeigneter Stecker zum Anschluß an den User-Port ist der Cardcon-Stecker von TRW (Nr. 251-12-50-170) (Bild 4).</p>
+
+        <figure>
+            <table>
+                <tr>
+                    <td>Pin</td>
+                    <td>Signal</td>
+                    <td>Bemerkung</td>
+                </tr>
+                <tr>
+                    <td>1</td>
+                    <td>GND</td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td>2</td>
+                    <td>+5V</td>
+                    <td>MAX. 100 mA</td>
+                </tr>
+                <tr>
+                    <td>3</td>
+                    <td><span style="text-decoration: overline;">RESET</span></td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td>4</td>
+                    <td>CNT1</td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td>5</td>
+                    <td>SP1</td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td>6</td>
+                    <td>CNT2</td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td>7</td>
+                    <td>SP2</td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td>8</td>
+                    <td><span style="text-decoration: overline;">PC2</span></td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td>9</td>
+                    <td>SER. ATN IN</td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td>10</td>
+                    <td>9 VAC</td>
+                    <td>MAX. 100 mA</td>
+                </tr>
+                <tr>
+                    <td>11</td>
+                    <td>9 VAC</td>
+                    <td>MAX. 100 mA</td>
+                </tr>
+                <tr>
+                    <td>12</td>
+                    <td>GND</td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td>A</td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td>B</td>
+                    <td><span style="text-decoration: overline;">FLAG2</span></td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td>C</td>
+                    <td>PBO</td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td>D</td>
+                    <td>PB1</td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td>E</td>
+                    <td>PB2</td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td>F</td>
+                    <td>PB3</td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td>H</td>
+                    <td>PB4</td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td>J</td>
+                    <td>PB5</td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td>K</td>
+                    <td>PB6</td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td>L</td>
+                    <td>PB7</td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td>M</td>
+                    <td>PA2</td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td>N</td>
+                    <td>GND</td>
+                    <td></td>
+                </tr>
+            </table>
+            <img src="82-2.png" alt="">
+            <figcaption>Bild 2. Pinbelegung des User-Ports. Benötigt wurden nur die Anschlüsse 2, A und C.</figcaption>
+        </figure>
+
+        <figure>
+            <img src="82-3.png" alt="">
+            <figcaption>Bild 3. Der Aufbau des einfachen Schaltinterfaces. Die Bauteile entnehmen Sie der Tabelle.</figcaption>
+        </figure>
+        <figure>
+            <img src="82-4.png" alt="">
+            <figcaption>Bild 4. Dieser Stecker ist im Elektronikfachversand oder -handel erhältlich.</figcaption>
+        </figure>
+
+        <figure>
+            <table>
+                <tr>
+                    <td>Bauteile</td>
+                    <td>Bezeichnung</td>
+                </tr>
+                <tr>
+                    <td>Tauchpumpe und dazu passende Schläuche</td>
+                    <td>Campingartikel</td>
+                </tr>
+                <tr>
+                    <td>Stecker zum Anschluß an den User-Port</td>
+                    <td>Cardcon-Stecker der Firma TRW (Nr. 251-12-50-170)</td>
+                </tr>
+                <tr>
+                    <td>elektronische Bauteile:</td>
+                </tr>
+                <tr>
+                    <td>IC</td>
+                    <td>6fach-Inverter ITT 7404</td>
+                </tr>
+                <tr>
+                    <td>R1</td>
+                    <td>Widerstand 1 kOhm</td>
+                </tr>
+                <tr>
+                    <td>T1</td>
+                    <td>Transistor BC 337</td>
+                </tr>
+                <tr>
+                    <td>D1</td>
+                    <td>Diode 1N 4001</td>
+                </tr>
+                <tr>
+                    <td>Rel</td>
+                    <td>Relais 12 V</td>
+                </tr>
+                <tr>
+                    <td>C1</td>
+                    <td>Kondensator 470 mikro Farad</td>
+                </tr>
+                <tr>
+                    <td>Gleichrichter</td>
+                    <td>8027</td>
+                </tr>
+                <tr>
+                    <td colspan="2">Kosten:</td>
+                </tr>
+                <tr>
+                    <td>Tauchpumpe und Schläuche</td>
+                    <td>zirka 20 Mark</td>
+                </tr>
+                <tr>
+                    <td>Interface und Stecker</td>
+                    <td>zirka 50 Mark</td>
+                </tr>
+            </table>
+        </figure>
+
+        <p>Zur Absicherung des User-Ports wurde zwischen der eigentlichen Schaltung und dem Port ein 6fach-Inverter eingefügt.</p>
+
+        <h3>Das Programm: eine Uhr</h3>
+
+        <p>Das Gießprogramm besteht im wesentlichen aus der Programmierung der Echtzeituhr im CIA 1. Dieses Programm entstammt dem Data Becker-Buch 64-intern.</p>
+
+        <p>In Zeile 100 bis 270 wird die Uhr gestellt, in Zeile 280 bis 480 die laufende Uhr programmiert. In Zeile 440 wird abgefragt, ob der Zeitpunkt zum Gießen erreicht ist. Wenn dies der Fall ist, wird in die Subroutine 1000 verzweigt. In diesem Unterprogramm wird das Datenrichtungsregister auf Ausgang geschaltet und mit POKE 56577,1 die PB0-Leitung auf High gelegt. In Zeile 1030 schließlich wartet das Programm 20 Sekunden und schaltet in Zeile 1050 die Pumpe wieder aus. Die Warteschleife in Zeile 1030 kann dem jeweiligen Anwendungsfall angepaßt werden.</p>
+
+        <p>Das Programm läßt sich natürlich für beliebige Schaltzyklen und Schaltzeiten abändern.</p>
+
+        <address class="author">(Klaus Michael)</address>
+
+        <figure>
+            <img src="82-0.png" alt="">
+            <figcaption>Klaus Michael gönnt seinem C 64 keinen Urlaub</figcaption>
+        </figure>
+
+        <figure>
+            <pre data-filename="blumengiessen" data-name="Blumengießen"></pre>
+            <figcaption>Das Listing zu Blumengießen</figcaption>
+        </figure>
+
+        <aside class="fehlerteufelchen">
+            <h2>Fehlerteufelchen</h2>
+            <p>1. Der Minuspol vom Netzteil muß mit der Masse (GND) vom User-Port verbunden sein, da die Ansteuerung von T1 sonst nicht klappt.<br>
+                2. Der Pfeil im Schaltzeichen von T1 ist umzudrehen.<br>
+                3. C1 muß aufgrund seiner Größe ein Elco sein. Im Schaltzeichen muß daher ein
+                + am Pluspol des Gleichrichters eingezeichnet sein.<br>
+                4. In einer Zeitschrift für Software-Anwender ist der Hinweis, daß 220 Volt, vor allem im Zusammenhang mit Wasser, auch für Hardware-Bastler tödlich sein können, sicherlich angebracht.</p>
+            <p>Die Software-Spezialisten danken dem Hardware-Profi und Leser Michael Scharf für diese Hinweise.</p>
+            <!-- 64'er 9/1984 -->
+        </aside>
+
+    </article>
+
+</body>
+
+</html>

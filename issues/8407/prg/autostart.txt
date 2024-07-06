@@ -1,0 +1,66 @@
+;autostart.prg ==0801==
+;Eingetippt von Dekay
+
+    0 rem" ******************************
+    1 rem" **   Autostart - Maker II   **
+    2 rem" *     Copyright (c) by       *
+    3 rem" *      Andreas Wurf          *
+    4 rem" *     2000 Hamburg 73        *
+    5 rem" *     Tabenstieg 10 b        *
+    6 rem" *  Tel.: (040) 647 40 28     *
+    7 rem" **     Version C64           *
+    8 rem" ******************************
+    9 :
+   10 print chr$(9)+chr$(14)+chr$(8)  "{clr}{rvon}         Autostart - Maker II+         {rvof}"
+   20 print"{up}{rvon}     copyright (c) 1983 Andreas Wurf    {rvof}"
+   30 print"{up}{rvon}          Commodore 64 - Version        {rvof}"
+   40 print"{down}{down}(Note:  Your Program must have a BAS-"
+   50 print"Start, such as '10 SYS (xxxx)' !!)"
+   60 print"{down}{down}Enter Name of Prog.: ";:open 1,0:input#1,na$:close 1:print
+   61 na$=left$(na$,16):rem "Kuerzen auf 16 Stellen"
+   70 print"{down}{down}Enter Prog's Disk and press a key !"
+   80 for i=0 to 20:get a$:if a$<>"" then 100
+   85 next:print"{up}{rvon}Enter Prog's Disk and press a key !{rvof}{up}{up}{up}"
+   90 for i=0 to 20:get a$:if a$<>"" then 100
+   95 next:goto70
+  100 nw$=left$(na$,14)+"/a":rem" Name des neuen programms
+  110 open15,8,15:print
+  112 open 1,8,0,na$:gosub 10000:close 1
+  120 open 1,8,5,nw$+",p,w":print"{down}{down}- Generate Autostart":gosub 10000
+  130 print#1,chr$(0)+chr$(1);:rem" Programmstart := $0100
+  140 for i=256 to 514:print#1,chr$(2);:next:rem" low-1 / Highbyte des Startpgms.
+  150 restore:for i=515 to 606:read a:print#1,chr$(a);:next:rem" Startprogramm
+  160 for i=607 to 1023:print#1,chr$(peek(i));:next:rem" Formaler Inhalt
+  164 for i=1024 to 2047:print#1,chr$(32);:next:rem " Bildschirm mit leerzeichen
+  165 print#1,chr$(0);:gosub 10000:close 1
+  170 print"- link together both files"
+  180 open 1,8,0,na$:gosub 10000:open 2,8,5,nw$+",p,a":gosub 10000
+  190 get#1,a$:a$=a$+chr$(0):get#1,b$:b$=b$+chr$(0):rem" Startadresse des Pgms.
+  200 if asc(a$)=1 and asc(b$)=8 then 250:rem" Test auf BASIC-Programm
+  210 print"{down}Start-Adr. of Source-Pgm is not unique"
+  220 print"to $0801. I can't use it."close 1:close 2:close 15:gosub 20000:end
+  250 get#1,a$:if a$="" then a$=chr$(0)
+  260 if st then print#2,a$;:goto 300
+  270 print#2,a$;:goto 250
+  300 gosub 10000:close 1:close 2:close 15
+  310 print"{down}{rvon}Ok. Type 'LOAD"chr$(34)+nw$+chr$(34)",8,1' to load.":end
+  400 :
+  410 rem"   Routinen und DATA's
+  420 :
+ 10000 input#15,a$,b$,c$,d$:if val(a$)=0 then return
+ 10010 print"{down}{rvon}IFO - Error# "a$": "b$" on "c$","d$:gosub 20000
+ 10020 print"{down}   {rvon}q{rvof}uit or {rvon}r{rvof}estart ?"
+ 10030 get t$:if t$<>"q" and t$<>"r" then 10030
+ 10040 close 1:close 2:close 15:if t$="r" then run
+ 10050 end
+ 20000 si=54272:poke si+5,9:poke si+6,0:poke si+24,15
+ 20010 poke si,30:poke si+1,30:poke si+4,17:for i=0 to 300:next:poke si+4,0
+ 20020 poke si,20:poke si+1,20:poke si+4,17:for i=0 to 600:next:poke si+4,0
+ 20030 poke si+24,0:return
+ 30000 data 169,52,162,193,141,20,3,142,24,3,162,4,189,16,253,157,4,128,202
+ 30010 data 16,247,169,57,162,2,141,0,128,141,2,128,142,1,128,142,3,128
+ 30020 data 165,174,166,175,133,45,134,46,32,99,166,32,142,166,76,174,167
+ 30030 data 169,0,162,8,133,158,134,159,160,0,169,0,145,158,200,208,251,230
+ 30040 data 159,165,159,201,208,208,239,169,0,162,9,157,0,128,202,16,250
+ 30050 data 76,226,252
+

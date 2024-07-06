@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>Kopierprogramm für relative Files</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="Bernward Bretthauer">
+    <meta name="64er.issue" content="7/84">
+    <meta name="64er.pages" content="132-134">
+    <meta name="64er.head1" content="Kopieren von relativen">
+    <meta name="64er.head2" content="C 64">
+    <meta name="64er.toc_title" content="Kopierprogramm für relative Files (C 64)">
+    <meta name="64er.toc_category" content="Programme zum Abtippen|Tips & Tricks">
+    <meta name="64er.index_title" content="Kopierprogramm für relative Files">
+    <meta name="64er.index_category" content="Listings zum Abtippen|Tips & Tricks|Floppy">
+    <meta name="64er.id" content="relcopy">
+</head>
+
+<body>
+    <article>
+        <h1>Kopierprogramm für relative Files</h1>
+
+        <p class="intro">Nicht jedes Kopierprogramm ist in der Lage, relative Dateien zu kopieren. Diese Arbeit übernimmt das folgende Programm. Aus Geschwindigkeitsgründen wurde es vollständig in Maschinensprache geschrieben.</p>
+
+        <p>Nach dem Starten des Programms erfolgen zunächst einige Abfragen:</p>
+
+        <ol>
+            <li>
+                <p>Sind alle Erweiterungen ausgeschaltet? Damit ist zum Beispiel DOS 5.1 oder Simons Basic gemeint. Wird die Frage mit ja beantwortet, so steht der gesamte freie RAM (zirka 60 KByte) als Puffer zum Kopieren zur Verfügung. Andernfalls wird die Pufferobergrenze auf $ 8000 (32768) gesetzt, so daß zirka 28 KByte zur Verfügung stehen. In beiden Fällen können jedoch beliebig große Files kopiert werden.</p>
+            </li>
+            <li>
+                <p>Angabe der Gerätenummer und der Drivenummer von Ausgangslaufwerk und Ziellaufwerk. Zulässig sind die Gerätenummern 8 und 9 sowie die Drivenummern 0 und 1, bei anderen Nummern erscheint eine Fehlermeldung. Es wird die Gerätenummer 8 und die Drivenummer 0 auf dem Bildschirm vorgegeben, so daß bei Verwendung eines VC-1541-Laufwerks nur vier mal RETURN gedrückt werden muß.</p>
+            </li>
+            <li>
+                <p>Angabe des Filenamen der zu kopierenden relativen Datei. Beim Filenamen für das neue File wird der alte Filenamen vorgegeben, er kann natürlich mit den üblichen Tasten geändert werden.</p>
+            </li>
+            <li>
+                <p>Eingabe der maximalen Satzlänge des neuen Files. (Zulässig ist 1 bis 254). Sie muß nicht notwendigerweise mit der Satzlänge des alten Files übereinstimmen, sollte aber so lang sein wie der längste Satz im alten File. Andernfalls kommt es zu Datenverlust. Aus Geschwindigkeitsgründen wird übrigens der Fehlerkanal während des Kopierens nicht abgefragt, so daß der Fehler »overflow in record« nicht erkannt wird!</p>
+            </li>
+        </ol>
+
+
+        <p>Nachdem alle Eingaben erledigt sind, beginnt das Kopieren. Das Programm gibt jeweils auf dem Bildschirm an, welche Diskette einzulegen ist, bei Diskettenwechsel und am Programmende wird zusätzlich ein Tonsignal erzeugt. Ist der Diskettenwechsel durchgeführt, so muß die SHIFT-Taste gedrückt werden, damit es weitergeht. Beim Arbeiten mit zwei Laufwerken oder einem Doppellaufwerk sowie beim Kopieren auf die gleiche Diskette kann die SHIFT-LOCK-Taste eingerastet werden, sobald alle benötigten Disketten im richtigen Laufwerk liegen. Es wird dann ohne Pause kopiert.</p>
+
+        <p>Ist das Kopieren beendet, startet das Programm von vorn. Es kann abgebrochen werden, indem als Gerätenummer »q« eingegeben wird. Der Rechner meldet sich dann wieder mit »READY« im Basic-Modus. Übrigens ist während des gesamten Kopierens (ab Eingabe der ersten Gerätenummer) die Stoptaste funktionsfähig. Wird sie gedrückt, so werden die offenen Files geschlossen und das Programm startet von vorn. Da während des Kopierens der augenblicklich kopierte Satz auf dem Bildschirm angezeigt wird, ist es damit auch möglich, ein File nur teilweise zu kopieren. Es ist normal, daß beim Schreiben die erste Satznummer erst nach längerer Zeit erscheint, da die Floppy das File zuerst einmal einrichten muß.</p>
+
+        <p>Folgende Fehlermeldungen werden vom Programm ausgegeben: ?? falsches Laufwerk oder Drive ??: Gerätenummer ungleich 8 oder 9 beziehungsweise Drivenummer ungleich 0 oder 1 ?? Unzulässige Satzlänge ??: Satzlänge größer 254 oder kleiner 1<br>
+            ?? Gerät nicht bereit ??: Das angesprochene Laufwerk ist nicht eingeschaltet oder angeschlossen.<br>
+            Abbruch !: Die Stoptaste wurde gedrückt.<br>
+            Zusätzlich werden Fehlermeldungen der Floppy ausgegeben, falls sie auftreten (Außer RECORD NOT PRESENT). FILE TOO LARGE bedeutet, daß kein Platz mehr auf der Diskette ist.</p>
+
+        <h3>Arbeitsweise des Programms:</h3>
+
+        <p>Die Abfrage der Stoptaste geschieht mit Hilfe der Interruptroutine des Rechners, die 60 mal pro Sekunde durchlaufen wird und automatisch die Tastatur abfragt. In diese Interruptroutine wird eine zusätzliche Routine eingebunden, welche die Stoptaste abfragt. Ist die Stoptaste gedrückt, so wird zuerst ein eventuelles Tonsignal ausgeschaltet und alle Files werden geschlossen. Außerdem wird der Stackpointer zurückgesetzt, da der Abbruch ja in jeder Unterprogrammebene erfolgen kann. Danach erfolgt ein Neustart. Als Zwischenspeicher für die Filenamen wird der Kassettenpuffer, als Arbeitsbereich der Speicher für Sprite 11 (ab Adresse 704) verwendet. Die Sätze des Files werden in kompakter, sequentieller Form im RAM des Rechners untergebracht. Es wird zunächst die aktuelle Satzlänge +1 gespeichert und danach die Bytes des Satzes. Dadurch nehmen kurze Sätze auch nur wenig Platz im RAM ein während sie auf der Diskette den gesamten Platz entsprechend der maximalen Satzlänge des Files belegen).</p>
+
+        <h3>Eingabe des Programms:</h3>
+
+        <p>Der Basic-Lader bildet nach jeweils fünf DATA-Zeilen eine Prüfsumme, so daß nahezu alle Eingabefehler erkannt werden. Nicht erkannt werden vergessene Nullen und überschüssige Kommata. Wenn alle Prüfsummen korrekt sind, fordert der Lader zum Einlegen einer Diskette auf. Das Programmfile »rel kopierer« wird dann direkt auf Diskette erzeugt. Das erzeugte Programm kann dann wie ein Basicprogramm geladen, kopiert und mit RUN gestartet werden.</p>
+
+        <address class="author">(Bernward Bretthauer)</address>
+
+		<figure>
+            <pre data-filename="relkopierer" data-name="Kopieren von relativen Files"></pre>
+			<figcaption>Listing. Kopieren von relativen Files</figcaption>
+		</figure>
+    </article>
+
+</body>
+
+</html>
