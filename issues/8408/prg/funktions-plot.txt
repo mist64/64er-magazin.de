@@ -1,0 +1,43 @@
+
+
+;/Users/mist/Downloads/1984-08-vic20-funktionsplot.prg ==1001==
+  100 clr:input"{clr}{rvon} wertebereich";x1,x2
+  110 u=80:o=183:l=0:r=175:d=r-l:k=10000
+  120 gnew:gon:dim y(d):if x1=x2 then 100
+  130 for a=l to r:plot a,u:plot a,0:next
+  140 for a=u to o:plot l,a:plot r,a:next
+  150 if x1>x2 then z=x1:x1=x2:x2=z
+  160 :
+  170 sx=(x2-x1)/d:x=x1:mi=1e38:p=mi:ma=-mi
+  180 for a=0 to d
+  190 y=sin(x)+sin(2*x)
+  200 if y>ma then ma=y
+  210 if y<mi then mi=y
+  220 if abs(y)<p then p=abs(y):n=a
+  230 y(a)=y:x=x+sx:next:sy=(ma-mi)/(o-u-5)
+  240 :
+  250 mi=int(mi*k)/k:ma=int(ma*k)/k:k=0
+  260 print"{home}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{rght}  ";:t1=k
+  270 t2=len(str$(x1))-len(str$(mi))
+  280 if t2<k then t1=-t2:t2=k
+  290 print "y=sin(x)*sin(2*x)"
+  300 print tab(t1);"{rvon}{down}";x1;"<x<";x2
+  310 print tab(t2);"{rvon}" ;mi;"<y<";ma
+  320 if mi>=k and ma>=k or mi<=k and ma<=k then 340
+  330 p=u+3+int((y(n)-mi)/sy):for a=l to r:plot a,p:next
+  340 if x1>=k and x2>=k or x1<=k and x2 <=k then 360
+  350 p=int(abs(x1)/sx):for a=u to 0:plot p,a:next
+  360 :
+  370 for a=l to r:p=u+3+int((y(a-l)-mi)/sy)
+  380 plot a,p:if peek(k) then next
+  390 poke 198,0:wait 198,1:get a$
+  400 print"{clr}{rvon} f => funktion"
+  410 print"{rvon} w => wertebereich"
+  420 wait 198,1:get a$
+  430 if a$= "w" then 100
+  440 if a$<>"f" then 420
+  450 copy:input "{clr} funktion";a$:print "{clr} 190";a$
+  460 print"290 ?";chr$(34);a$;chr$(34)
+  470 print "run ":poke 198,6:poke 631,19
+  480 for i=632 to 636:poke i,13:next:end
+
