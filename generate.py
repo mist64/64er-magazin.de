@@ -418,6 +418,8 @@ class Issue:
           if not issue_key:
               issue_key = article.issue_key
           else:
+              if issue_key != article.issue_key:
+                print("BAD", issue_key, article.issue_key)
               assert(issue_key == article.issue_key)
 
       if not pubdate:
