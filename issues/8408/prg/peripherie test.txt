@@ -1,0 +1,39 @@
+
+
+;peripherie test ==0801==
+   10 print"{clr}       werner pfeil"
+   20 print"       am malzbuechel 4"
+   30 print"  5000 koeln 1"
+   40 print"       0221/24 25 53"
+   50 print:print"               eingang: 21.5.84"
+   51 print"serieller bus - test":print
+   52 print"ueberpruefung ob drucker oder
+   53 print"floppy ein/ausgeschaltet sind"
+   60 print:print:print"     taste"
+   70 poke198,0:wait198,1
+  100 rem * dem-programm *
+  110 :
+  120 print chr$(147)
+  130 dn%=4:gosub 10080:rem drucker
+  140 if dr%=1thenprint"drucker eingeschaltet"
+  150 if dr%=0thenprint"drucker ausgeschaltet"
+  160 dn%=8:gosub 10080:if dr%=1 then open1,8,15,"ui:":close 1:rem floppy
+  170 if dr%=1thenprint"floppy  eingeschaltet"
+  180 if dr%=0thenprint"floppy  ausgeschaltet"
+  190 end
+  200 :
+  210 :
+  220 :
+10000 rem * pruefroutine device ein? *
+10070 :
+10080 if ft%=0 then ft%=1:gosub 10140:rem routine nur beim 1. mal einlesen
+10090 poke 2,dn%:sys49152:if peek(2)=0 thendr%=1:return:rem device 'ein'
+10100 dr%=0:return:                             rem device 'aus'
+10110 :
+10120 rem * maschinenroutine einlesen *
+10130 :
+10140 for ad=49152to49185:read a:poke ad,a:next ad
+10150 data169,1,160,192,162,33,32,189,255,169,1,160,15,166,2,32,186,255,32
+10160 data192,255,176,2,169,0,133,2,169,1,32,195,255,96,32
+10170 return
+

@@ -346,127 +346,32 @@ RUN
             <figcaption>Tabelle 3. Prüfsummen zum Grafikprogramm</figcaption>
         </figure>
         <figure>
-            <pre>
-10 REM ******* BILD ZENTRIEREN ********
-15 :
-20 H=12       : V=38
-25 POKE 198,0 : WAIT 198,1 : GET A$
-30 IF A$=CHR$( 13)           THEN 60
-35 IF A$=CHR$( 17) AND V&lt;255 THEN V=V+1
-40 IF A$=CHR$(145) AND V&gt;0   THEN V=V-1
-45 IF A$=CHR$( 29) AND H&lt;23  THEN H=H+1
-50 IF A$=CHR$(157) AND H&gt;1   THEN H=H-1
-55 POKE 36864,H :POKE 36865,V:GOTO 25
-60 POKE 36864,12:POKE 36865, 38
-65 PRINT "POKE 36864 ,";H
-70 PRINT "POKE 36865 ,";V
-            </pre>
+            <pre data-filename="zentrieren" data-name="Bild zentrieren"></pre>
             <figcaption>Listing 1. »Bild zentrieren«</figcaption>
         </figure>
         <figure>
-            <pre>
-10 REM ******* BILDSCHIRM-FORMAT *******
-15 :
-20 V=46       : H=22+128
-25 POKE 198,0 : WAIT 198,1 : GET A$
-30 IF A$=CHR$( 13)           THEN 60
-35 IF A$=CHR$( 17) AND V&lt;100 THEN V=V+2
-40 IF A$=CHR$(145) AND V&gt;2   THEN V=V-2
-45 IF A$=CHR$( 29) AND H&lt;155 THEN H=H+1
-50 IF A$=CHR$(157) AND H&gt;128 THEN H=H-1
-55 POKE 36866,H :POKE 36867,V  :GOTO 25
-60 POKE 36867,46:POKE 36866,160
-65 PRINT "POKE 36866 ,";H
-70 PRINT "POKE 36867 ,";V
-            </pre>
+            <pre data-filename="format" data-name="Bildschirmformat"></pre>
             <figcaption>Listing 2. »Bildschirmformat«</figcaption>
         </figure>
         <figure>
-            <!-- TODO -->
-            <figcaption>Listing 3</figcaption>
+            <pre data-filename="bild-ram" data-name="Bild-RAM"></pre>
+            <figcaption>Listing 3. »Bild-RAM« - Umschalten zwischen zwei Bildschirmseiten</figcaption>
         </figure>
         <figure>
-            <!-- TODO -->
-            <figcaption>Listing 4</figcaption>
+            <pre data-filename="zeichensatz" data-name="Programmierbarer Zeichensatz"></pre>
+            <figcaption>Listing 4. »Programmierbarer Zeichensatz«</figcaption>
         </figure>
         <figure>
-            <pre>
-10 FOR I=4096 TO 9999:IF PEEK(I)&lt;&gt;42THEN NEXT
-12 A=I:FOR I=0 TO 896:READ A$:D=0:PRINT"";I
-14 FOR L=1 TO 2:IF LEN(A$)&lt;2THEN A$="0"+A$
-16 W$=MID$(A$,L,1):W=0:IF W$=""THEN 18
-18 W=ASC(W$)-48   :IF W>9 THEN W=W-7
-20 :
-22 D=D+W*16^(2-L) :NEXT:POKE I+A,D:NEXT
-24 FOR I=0 TO 896:D=PEEK(A+I):POKE 6272+I,D:NEXT
-26 POKE 51,128 : POKE 52,24
-28 POKE 55,128 : POKE 56,24  :NEW
-30 :
-32 REM **********
-50 DATA EA,EA,EA,78,A9,BC,8D,14,3,A9,18,8D,15,3,A9,18,8D,8,3,A9,19,8D,9
-51 DATA 3,A9,11,85,1,A9,1B,85,2,8D,F2,1B,58,60,78,A9,BF,8D,14,3,A9,EA,8D
-52 DATA 15,3,A9,E4,8D,8,3,A9,C7,8D,9,3,58,60,AD,F2,1B,F0,D,CE,F2,1B,A4,D3
-53 DATA B1,D1,8D,F1,1B,8D,F0,1B,A9,18,48,A9,DB,48,8,8,8,8,4C,BF,EA,AE,5
-54 DATA 90,E8,D0,0,A4,D3,A6,CC,D0,2E,AD,F1,1B,F0,8,8E,F1,1B,B1,D1,8D,F0
-55 DATA 1B,A5,C6,F0,E,A5,CB,C9,1B,F0,5,EE,F2,1B,D0,9,EE,F1,1B,A9,E6,A6,CF
-56 DATA D0,3,AD,F0,1B,D1,D1,F0,2,91,D1,4C,18,EB,A9,7,85,58,A9,0,48,AA,CA
-57 DATA A0,0,C8,E8,BD,AB,1B,F0,F,D1,7A,F0,F5,18,68,69,8,C6,58,D0,E8,4C,E4
-58 DATA C7,68,88,98,18,65,7A,85,7A,90,2,E6,7B,BD,AC,1B,85,F7,BD,AD,1B,85
-59 DATA F8,20,55,19,4C,18,19,6C,F7,0,A2,FF,D0,2,A2,F0,8E,5,90,60,A0,0,A2
-60 DATA 2,84,62,84,64,A9,80,85,63,A9,1C,85,65,B1,62,91,64,C8,D0,F9,E6,63
-61 DATA E6,65,CA,D0,F2,60,AD,2,90,29,7F,8D,F5,1B,A,A,A,8D,F4,1B,AD,3,90
-62 DATA 29,7E,A,A,8D,F3,1B,CE,F3,1B,A9,1C,85,63,A9,1E,85,65,A0,0,84,62,84
-63 DATA 64,A2,1,A9,0,91,62,B1,64,30,4,A9,A0,91,64,C8,D0,F1,E6,63,E6,65,CA
-64 DATA 10,EA,A2,3F,86,0,A2,7F,A9,0,9D,50,3,CA,10,FA,60,A2,0,2C,A2,2,2C
-65 DATA A2,4,BD,E0,1B,8D,40,3,BD,E1,1B,8D,41,3,20,73,0,20,8A,CD,20,F7,D7
-66 DATA A0,58,A6,15,D0,29,8E,43,3,A5,14,8D,42,3,CD,F4,1B,B0,1C,20,79,0,20
-67 DATA FD,CE,20,8A,CD,20,F7,D7,A5,15,D0,8,AD,F3,1B,38,E5,14,B0,17,A9,59
-68 DATA D0,2,A9,58,20,D2,FF,A9,2D,20,D2,FF,20,7A,C6,C8,A9,6B,4C,67,C4,AA
-69 DATA 20,98,1B,8E,45,3,A9,1E,85,5B,A9,0,C0,0,F0,B,18,6D,F5,1B,90,2,E6
-70 DATA 5B,88,D0,F5,85,5A,AE,42,3,20,98,1B,AD,43,3,F0,5,98,18,69,20,A8,A9
-71 DATA 0,E8,38,6A,CA,D0,FC,86,FD,8D,44,3,B1,5A,8D,47,3,30,15,C5,0,90,11
-72 DATA AA,BD,50,3,D0,6,B1,5A,C5,0,B0,3A,DE,50,3,E6,FD,A5,FB,F0,9,C6,FB
-73 DATA A6,FB,BD,E8,3,D0,11,A5,0,D0,B,58,A9,E6,A0,1B,20,1E,CB,4C,22,1A,C6
-74 DATA 0,91,5A,AA,A5,5A,18,69,0,85,58,A5,5B,69,78,85,59,AD,86,2,91,58,8A
-75 DATA 78,85,FC,8C,46,3,A2,0,86,59,A,26,59,A,26,59,A,26,59,18,69,0,85,58
-76 DATA A5,59,69,1C,85,59,A5,FD,F0,24,A9,0,85,5E,AD,47,3,A,26,5E,A,26,5E
-77 DATA A,26,5E,18,69,0,85,5D,A5,5E,69,1C,85,5E,A0,7,B1,5D,91,58,88,10,F9
-78 DATA AC,45,3,AD,44,3,20,8A,1B,91,58,58,6C,1,0,60,78,A0,7,84,FD,B1,58
-79 DATA 99,E0,3,D0,2,C6,FD,88,10,F4,E6,FD,D0,4,A9,A0,D0,24,A9,1E,85,5E,A9
-80 DATA 0,85,5D,A2,40,D0,42,A0,7,E4,FC,F0,3C,E4,0,F0,48,B1,5D,D9,E0,3,D0
-81 DATA 31,88,10,F6,FE,50,3,8A,AC,46,3,91,5A,A6,FC,BD,50,3,F0,3,DE,50,3
-82 DATA 8A,E6,0,C5,0,F0,9,C6,0,A6,FB,9D,E8,3,E6,FB,A0,7,A9,0,91,58,88,10
-83 DATA FB,30,10,A5,5D,38,E9,8,B0,2,C6,5E,85,5D,CA,E4,0,D0,AE,58,60,6C,40
-84 DATA 3,11,58,60,51,58,60,49,FF,31,58,60,A0,0,8A,10,4,A0,10,29,7F,AA,38
-85 DATA E9,8,90,3,C8,D0,F7,60,50,4C,4F,54,0,D1,19,0,54,55,52,4E,0,D4,19
-86 DATA 0,43,4C,45,41,52,0,D7,19,43,4F,50,59,0,62,19,0,CB,4E,0,58,19,0,0
-87 DATA 0,CB,46,46,0,5C,19,0,0,47,A2,0,81,19,8D,1B,90,1B,93,1B,43,48,41
-88 DATA 52,41,43,54,45,52,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-            </pre>
+            <pre data-filename="befehlserweiter" data-name="Befehlserweiterung"></pre>
             <figcaption>Listing 5. Basic-Ladeprogramm zur Befehlserweiterung</figcaption>
         </figure>
         <figure>
-            <pre>
-10 REM ********* PRUEFSUMME **********
-12 ZD=50:A=I:FOR I=0 TO 896:READ A$
-14 ZL=PEEK(60)+PEEK(61)*256:D=0
-16 IF ZL=ZD THEN 20
-18 PRINT "ZEILE";ZD;C : ZD=ZL : C=0
-20 FOR L=1 TO 2: IF LEN(A$)&lt;2THEN A$="0"+A$
-22 W$=MID$(A$,L,1):W=0:IF W$=""THEN 24
-24 W=ASC(W$)-48   :IF W>9 THEN W=W-7
-26 :
-28 D=D+W*16^(2-L) :NEXT : C=C+D : S=S+1
-30 NEXT : PRINT "ZEILE";ZD,C    : END
-32 :
-32 REM **********
-50 DATA EA,EA,EA,78,A9,BC,8D,14,3,A9...
-</pre>
+            <pre data-filename="pruefsumme" data-name="Prüfsummenprogramm"></pre>
             <figcaption>Listing 6. Prüfsummenprogramm zum Basic-Lader aus Listing 5. Das Zeichen »^« in Zeile 28 ist der Hochpfeil (»↑«)</figcaption>
         </figure>
         <figure>
-            <!-- TODO -->
-            <figcaption>Listing 7</figcaption>
+            <pre data-filename="funktions-plot" data-name="Funktions-Plot"></pre>
+            <figcaption>Listing 7. Basicprogramm »Funktions-Plot« zur Demonstration der neuen Grafikbefehle</figcaption>
         </figure>
 
     </article>
