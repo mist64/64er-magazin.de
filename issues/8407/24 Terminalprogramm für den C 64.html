@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>Terminalprogramm für den C 64</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="Manfred Wyrwas">
+    <meta name="64er.issue" content="7/84">
+    <meta name="64er.pages" content="24-26">
+    <meta name="64er.head1" content="Modem und Akustikkoppler">
+    <meta name="64er.head2" content="C 64">
+    <meta name="64er.toc_category" content="Software">
+    <meta name="64er.index_title" content="Terminalprogramm für den C 64">
+    <meta name="64er.index_category" content="Listings zum Abtippen|Anwendung|DFÜ">
+    <meta name="64er.id" content="terminal">
+</head>
+
+<body>
+    <article>
+        <h1>Terminalprogramm für den C 64</h1>
+
+        <p class="intro">Dieses Programm ermöglicht es Ihnen, über eine RS232-Schnittstelle und Akustikkoppler oder Modem mit anderen Computern in Verbindung zu treten. Der Austausch von Daten, Nachrichten und ganzen Programmen ist möglich - ebenso die Abfrage von Datenbanken. Wir haben dieses Programm mit der Software-Expreß-Schnittstelle und dem Epson CX-21-Akustikkoppler getestet und waren von Anfang an begeistert.</p>
+
+        <p>Das Terminalprogramm bietet folgende Möglichkeiten:</p>
+
+        <ol>
+            <li>Die mit der Tastatur eingegebenen Zeichen werden über die RS232-Schnittstelle zur Gegenstelle gesandt.</li>
+            <li>Die von der Gegenstelle empfangenen Daten werden auf dem Bildschirm angezeigt.</li>
+            <li>Die von der Gegenstelle empfangenen Daten können zur weiteren Bearbeitung in den »Terminal-Speicher« geschrieben werden.</li>
+            <li>Diese gespeicherten Daten können dann wieder ausgesandt, auf den Bildschirm oder Drucker ausgegeben, beziehungsweise auf Diskette gespeichert werden.</li>
+            <li>Dateien können von der Diskette, zur weiteren Bearbeitung, in den »Terminal-Speicher« geladen werden.</li>
+            <li>Empfangene und im »Terminal-Speicher« befindliche Programme (als ASCII-Datei
+                gespeichert) können über eine »Wandler«-Software aufbereitet werden. Hierbei besteht eine Kontroll- und Editiermöglichkeit der einzelnen Programmzeilen.</li>
+            <li>Die Übertragungsparameter sind dem Standard entsprechend eingestellt. Durch Änderung der beiden CHR$-Befehle in den »OPEN«-Anweisungen können andere Parameter eingestellt werden. Die entsprechenden »OPEN«-Anweisungen befinden sich in Basic-Zeilennummer 10 + 50. Die Werte für das Kontroll- und Befehlsregister (1. und 2. CHR$ Befehl) sind im Commodore Programmier-Handbuch aufgeführt.</li>
+        </ol>
+
+
+        <p>Der »Terminal-Speicher« belegt den Adressenbereich Hex 5000-9FFF.</p>
+
+        <p>Der Basic-Speicher endet bei Hex 3FFF.</p>
+
+        <p>Das Terminalprogramm wird mit Load »terminal«, 8 geladen und anschließend mit Run gestartet. Nach einer kurzen Wartezeit, während der Maschinenspracheteil angelegt wird, erscheint das Menü auf dem Bildschirm.</p>
+
+        <p>Über das Menü und mit Hilfe der Funktionstasten werden alle Programmabläufe gesteuert.</p>
+
+        <p>Menüpunkt 1 erklärt die Bedeutung der Funktionstasten Fl bis F8, der ←Taste und der RUN/Stop Taste.<br>
+            Funktionstaste F1:</p>
+
+        <p>Durch Betätigung werden empfangene Daten als ASCll-Datei in den »Terminal-Speicher« geschrieben. Ein empfangenes Hex 02-Zeichen (Start of Text) bewirkt ebenfalls ein Abspeichern. Zur Erinnerung ändert sich die Rahmenfarbe des Bildschirmes in Braun.<br>
+            Funktionstaste F3:</p>
+
+        <p>Die Betätigung beziehungsweise ein empfangenes Hex 03-Zeichen (End of Text) beendet das Abspeichern. Die Bildschirm-Rahmenfarbe wird wieder grün.<br>
+            Funktionstaste F5:</p>
+
+        <p>Mit dieser Taste wird an den Anfang des »Terminal-Speichers« zurückgesetzt und die erste Zeile (bis zum Return-Zeichen) auf den Bildschirm übertragen.<br>
+            Funktionstaste F7:</p>
+
+        <p>Ein wiederholtes Drücken dieser Taste führt schrittweise bis ans Ende des Textes. Das Textende ist durch + + + gekennzeichnet. Ein Speicherplatzende wird ebenfalls durch + + + angezeigt.<br>
+            Funktionstaste F2:</p>
+
+        <p>Mit dieser Taste wird ein Vorschreiben in den »Terminal-Speicher« eingeleitet. Die Zeichen werden gleichzeitig auf dem Bildschirm angezeigt. Hierbei sind die Cursor-Tasten außer Funktion. Falsch eingegebene Zeichen können mit der Del-Taste gelöscht werden.<br>
+            Funktionstaste F4:</p>
+
+        <p>Diese Taste beendet das Vorschreiben.<br>
+            Funktionstaste F6:</p>
+
+        <p>Durch Betätigung dieser Taste wird wieder an den Anfang des »Terminal-Speichers« zurückgesetzt. Bis zum ersten Return-Zeichen werden die Daten über die RS232-Schnittstelle ausgegeben und gleichzeitig auf dem Bildschirm angezeigt.<br>
+            Funktionstaste F8:</p>
+
+        <p>Ein wiederholtes Drücken dieser Taste setzt den Sendebetrieb schrittweise bis zum Dateiende fort. Das Ende wird wieder durch + + + angezeigt.<br>
+            Die ← Taste</p>
+
+        <p>Mit dieser Taste wird der Rücksprung in das Menü eingeleitet.<br>
+            Die Run/Stop Taste</p>
+
+        <p>Das Terminalprogramm kann mit Run/Stop unterbrochen werden.</p>
+
+        <p><b>Menüpunkt 2</b> startet das eigentliche Terminalprogramm. Zum Datenaustausch ist hinzuzufügen, daß einige Steuerzeichen ausgefiltert werden, um ein einwandfreies Arbeiten mit anderen Datenbanken zu ermöglichen. Weiterhin wird eine Code-Wandlung zwischen CPM und ASCII durchgeführt. Beim Betätigen der Del-Taste wird ein Backspace (ein Zeichen zurück) zur Gegenstelle gesandt. Da die Cursor-Steuertasten ihre Funktion verloren haben, wurde auf die Anzeige des Cursors verzichtet.</p>
+
+        <p><b>Menüpunkt 3</b> bewirkt die Ausgabe der im »Terminal-Speicher« befindlichen Daten auf einen angeschlossenen Drucker</p>
+
+        <p><b>Menüpunkt 4</b> verläßt das Programm und lädt das »Wandler-Programm«. Mit diesem »Wandler« ist es möglich, ein empfangenes und im »Terminal-Speicher« abgelegtes Programm (als ASCII-Datei) in ein lauffähiges Programm zu wandeln und in den Basic-Speicher zu schreiben. Es kann dann benutzt oder auf Diskette gespeichert werden. Das »Wandler-Programm« startet selbstätig und auf dem Bildschirm erscheint: ready. »......Erste Programmzeile.......«run 60020. Der Cursor blinkt in der ersten Programmzeile. Sind in dieser Zeile keine Fehler vorhanden, so kann diese durch Betätigen der Return-Taste in den Basic-Arbeitsspeicher übernommen werden. Jetzt steht der Cursor in der Zeile »run 60020«. Ein nochmaliges Drücken der Return-Taste bringt die nächste Programmzeile auf den Bildschirm. In gleicher Weise kann bis zum Programmende fortgefahren werden. Ist die Änderung einer Programmzeile erforderlich, so kann dieses mit den üblichen Editiermöglichkeiten geschehen. Soll eine Zeile nicht übernommen werden, so wird der Cursor manuell in die Zeile »run 60020« gesteuert und mit )Return( weitergearbeitet. Zu beachten ist, daß die Programmzeile nicht länger als 80 Zeichen ist. Der Menüpunkt 4 bietet zusätzlich eine Auswahlmöglichkeit zwischen »automatischer Wandlung« und »manueller Wandlung«. Die »manuelle Wandlung« wurde beschrieben. Bei der »automatischen Wandlung« läuft das Programm selbstätig ab. Wird aber eine fehlerhafte Zeile erkannt, so bricht das Programm ab. Nach der Editierung kann mit »run 60020« weitergearbeitet werden.</p>
+
+        <p><b>Menüpunkt 5</b> speichert alle im »Terminalspeicher« befindlichen Daten als sequentielle Datei auf eine Diskette. Vor dem Abspeichern muß der Datei-Name eingegeben werden.</p>
+
+        <p><b>Menüpunkt 6</b> lädt eine sequentielle Datei von der Diskette in den »Terminal-Speicher«.</p>
+
+        <p>Soll ein Basic-Programm zur Gegenstelle gesandt werden, so sind einige Besonderheiten zu beachten.</p>
+
+        <ol>
+            <li>Das Programm sollte nur »reine ASCII-Daten« erhalten. Bildschirm-Steuerzeichen sowie Grafikzeichen werden nicht übertragen.</li>
+            <li>Das Programm muß als sequentielle Datei vorliegen und nicht wie sonst üblich als Programm-Datei.</li>
+        </ol>
+
+
+        <p>Die Wandlung einer Programm-Datei in eine sequentielle Datei wird folgendermaßen durchgeführt.</p>
+
+        <ol>
+            <li>Das Programm wird wie üblich mit LOAD »NAME«, 8 in den Basic-Speicher des C 64 geladen.</li>
+            <li>Im Direktmodus wird folgende Zeile eingegeben: OPEN 1,8,2,»Name,S,W«:CMD1:LIST</li>
+        </ol>
+
+
+        <p>Jetzt wird das Programm als sequentielle Datei auf die Diskette geschrieben und kann später vom Terminalprogramm aufgerufen werden. Anschließend wird mit CLOSE 1 das eröffnete File geschlossen.</p>
+
+        <address class="author">(Manfred Wyrwas)</address>
+
+        <p>In der nächsten Ausgabe das entsprechende Treiber-Programm für den VC 20.</p>
+
+        <figure>
+            <pre data-filename="terminalprogramm" data-name="Terminalprogramm"></pre>
+            <figcaption>»Terminalprogramm«</figcaption>
+        </figure>
+
+        <aside class="fehlerteufelchen">
+            <h2>Fehlerteufelchen</h2>
+            <p>Leider sind bei diesem Programm die beiden »Wandler-Programme« nicht mit abgedruckt worden. Hier nun die Ergänzung.</p>
+            <figure>
+                <pre data-filename="wandler" data-name="Wandler"></pre>
+                <figcaption>»Wandler«</figcaption>
+            </figure>
+            <figure>
+                <pre data-filename="wandler2" data-name="Wandler 2"></pre>
+                <figcaption>»Wandler 2«</figcaption>
+            </figure>
+            <!-- 64'er 8/1984 -->
+        </aside>
+
+    </article>
+
+</body>
+
+</html>

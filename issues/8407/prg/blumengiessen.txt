@@ -1,0 +1,50 @@
+;blumengiessen.prg ==0801==
+;Eingetippt von Endurion
+
+  100 rem ***** uhr stellen *****
+  110 c=56328:rem basisadresse  der uhr in cia 1
+  120 pokec+7,peek(c+7)and 127
+  130 pokec+6,peek(c+6)or 128
+  140 input"zeit im format hhmmss eingeben";a$
+  150 if len(a$)<>6 then 140
+  160 h=val(left$(a$,2))
+  170 m=val(mid$(a$,3,2))
+  180 s=val(right$(a$,2))
+  190 if h>23 then 140
+  200 if h>11 then h=h+68
+  210 pokec+3,16*int(h/10)+h-int(h/10)*10
+  220 if m>59 then 140
+  230 pokec+2,16*int(m/10)+m-int(m/10)*10
+  240 ifs>59 then 140
+  250 pokec+1,16*int(s/10)+s-int(s/10)*10
+  260 pokec,0
+  270 print""
+  280 rem ***** uhr laeuft *****
+  290 h=peek(c+3):m=peek(c+2):s=peek(c+1):t=peek(c)
+  300 fl=1
+  310 if h>32 then h=h-128:fl=0
+  320 h=int(h/16)*10+h-int(h/16)*16:on fl goto 350
+  330 if h=12 then 360
+  340 h=h+12
+  350 if h=12 then h=0
+  360 m=int(m/16)*10+m-int(m/16)*16
+  370 s=int(s/16)*10+s-int(s/16)*16
+  380 t$=str$(t)
+  390 h$=str$(h):if len(h$)=2 then h$=" 0"+right$(h$,1)
+  400 m$=str$(m):if len(m$)=2 then m$=" 0"+right$(m$,1)
+  410 s$=str$(s):if len(s$)=2 then s$=" 0"+right$(s$,1)
+  420 gi$=right$(h$,2)+right$(m$,2)+right$(s$,2)
+  430 rem **** zeitpunkt zum giessen erreicht? ****
+  440 ifval(gi$)=205500thengosub1000
+  450 print"";
+  460 print right$(h$,2)":"right$(m$,2)":"right$(s$,2)":0";
+  470 print right$(t$,1)
+  480 goto 290
+ 1000 rem ***** schaltunterprogramm *****
+ 1010 rem **** pumpe einschalten ****
+ 1020 poke56579,1:poke56577,1
+ 1030 fori=1to17500:next:rem pumpe 20 sec eingeschaltet
+ 1040 rem **** pumpe ausschalten ****
+ 1050 poke56577,0
+ 1060 return
+

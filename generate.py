@@ -1592,10 +1592,10 @@ if __name__ == '__main__':
         print("*** Uploading")
         command = f"rsync -Pa {OUT_DIRECTORY}/* local@{SERVER}:/var/www/html/"
         print("    " + command)
-        ret = subprocess.run(command, check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, shell=True)
+        ret = subprocess.run(command, check=True, text=True, shell=True)
         url = f"https://{SERVER}/{BASE_DIR}"
         print(url)
-        subprocess.run(f"open {url}", check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, shell=True)
+        subprocess.run(f"open {url}", check=True, text=True, shell=True)
     elif DEPLOY == "local":
         PORT = 8000
         class Handler(http.server.SimpleHTTPRequestHandler):
@@ -1604,6 +1604,6 @@ if __name__ == '__main__':
         with socketserver.TCPServer(("", PORT), Handler) as httpd:
             url = f"http://localhost:{PORT}/{BASE_DIR}"
             print(url)
-            subprocess.run(f"open {url}", check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, shell=True)
+            subprocess.run(f"open {url}", check=True, text=True, shell=True)
             httpd.serve_forever()
 

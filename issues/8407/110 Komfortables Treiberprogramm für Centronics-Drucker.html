@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>Komfortables Treiberprogramm für Centronics-Drucker</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="H.Eyssele">
+    <meta name="64er.issue" content="7/84">
+    <meta name="64er.pages" content="110-112">
+    <meta name="64er.head1" content="Commodore Grafik auf Epson">
+    <meta name="64er.head2" content="C 64">
+    <meta name="64er.toc_title" content="Komfortables Treiber-programm für Centronics-Drucker (C 64)">
+    <meta name="64er.toc_category" content="Programme zum Abtippen|Grafik">
+    <meta name="64er.index_title" content="Komfortables Treiberprogramm für Centronics-Drucker">
+    <meta name="64er.index_category" content="Listings zum Abtippen|Tips & Tricks|Schnittstellen">
+    <meta name="64er.id" content="centronics_treiber">
+</head>
+
+<body>
+    <article>
+        <h1>Komfortables Treiberprogramm für Centronics-Drucker</h1>
+
+        <p class="intro">Viele Anwender des Commodore 64 möchten anstelle eines Commodore-Druckers lieber den Drucker eines anderen Herstellers erwerben. Um diesen an ihren Computer anzuschließen, müssen sie entweder ein Hardwareinterface oder eine Softwarelösung kaufen. Dieser Artikel stellt die Softwarelösung für den Anschluß von Druckern am Userport des C 64 vor.</p>
+
+        <p>Es handelt sich hierbei um ein Maschinenspracheprogramm mit 726 Byte Länge, das den Adreßbereich CB57-CBD1 (dezimal: 51456 bis 52182) belegt. Damit kann zum Beispiel das DOS 5.1 auf der Demodiskette ohne Probleme zusätzlich geladen werden.</p>
+
+        <p>Das Programm ist ohne Einschränkung für alle Centronics-kompatiblen Drucker anwendbar, die über einen Bitmustermodus verfügen. Dieser Modus wird für die Ausgabe der Commodore-eigenen Grafikzeichen benötigt. Das Programm besteht aus mehreren Programmteilen, von denen die meisten Erweiterungen bestehender Ein-/Ausgaberoutinen des Betriebssystems sind und bei der Initialisierung in diese eingebunden werden. Dadurch können schon bestehende Basicbefehle wie OPEN und PRINT# zum Drucken benutzt, und Programme müssen nicht umgeschrieben werden. Zur Ansteuerung verschiedener Druckmodi wurden jedoch zusätzliche Gerätenummern definiert, deren Bedeutungen in Bild 1 erklärt sind. Gerätenummer 16 realisiert einen sogenannten Direktmodus, mit dem die internen Commodorezeichencodes ohne Wandlung an den Drucker gelangen. Der Direktmodus ist zur Ausgabe von Steuerzeichen oder bei der Verwendung des Druckers als Plotter zur Einzelnadelsteuerung beziehungsweise zur Ausgabe von Bitmustern geeignet. Der Textmodus (Groß- und Kleinschreibung) ist unter Gerätenummer 18 und, weil er wohl am häufigsten bei bereits bestehenden Programmen benutzt ist, unter Gerätenummer 4 ansprechbar. Die Gerätenummer 19 realisiert den Großschrift/Grafik-Modus, wie er beim C 64 gleich nach dem Einschalten voreingestellt ist. Der wichtige Modus zum Listen von Programmen wurde mit Gerätenummer 17 realisiert. Es läßt sich über die Sekundäradresse, wie in dem Musterlisting (Bild 4) gezeigt, noch zwischen vier Fällen unterscheiden. Einmal kann ausgewählt werden, ob das Listing, wie vom Bildschirm her gewohnt, mit Großbuchstaben und Grafikzeichen oder im Textmodus mit großen und kleinen Buchstaben gedruckt wird. Zum anderen kann man auswählen, ob die Steuerzeichen wie bei der Bildschirmausgabe als inverse Zeichen oder durch Abkürzungen wie (CRD) (Cursor down) im Klartext gedruckt werden. Durch all diese Möglichkeiten kann der Anwender zum einen auf seinem Drucker Ausgaben erzeugen, wie man sie von Commodore-Druckern her gewohnt ist, zum anderen auch alle Möglichkeiten seines Druckers voll nutzen.</p>
+
+        <figure>
+            <table>
+                <tr>
+                    <td>GERÄTENUMMER 16</td>
+                    <td>=</td>
+                    <td>DIREKTMODUS</td>
+                </tr>
+                <tr>
+                    <td>GERÄTENUMMER 18,4</td>
+                    <td>=</td>
+                    <td>TEXTMODUS</td>
+                </tr>
+                <tr>
+                    <td>GERÄTENUMMER 19</td>
+                    <td>=</td>
+                    <td>LIST-MODUS</td>
+                </tr>
+                </tr>
+                <tr>
+                    <td>GERÄTENUMMER 17</td>
+                    <td>=</td>
+                    <td>DIREKTMODUS</td>
+                </tr>
+            </table>
+            <table>
+                <thead>
+                    <tr>
+                        <th>SEK-ADR.</th>
+                        <th>MODUS</th>
+                        <th>STEUERZEICHEN</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>0</td>
+                        <td>NORMAL</td>
+                        <td>NORMAL</td>
+                    </tr>
+                    <tr>
+                        <td>1</td>
+                        <td>KLEIN</td>
+                        <td>NORMAL</td>
+                    </tr>
+                    <tr>
+                        <td>2</td>
+                        <td>NORMAL</td>
+                        <td>ERKLÄRT</td>
+                    </tr>
+                    <tr>
+                        <td>3</td>
+                        <td>KLEIN</td>
+                        <td>ERKLÄRT</td>
+                    </tr>
+                </tbody>
+            </table>
+            <figcaption>Bild 1. Die Bedeutungen der Gerätenummern</figcaption>
+        </figure>
+
+        <h2>Commodore-eigene Grafikzeichen</h2>
+
+        <p>Die Ausgabe von Grafikzeichen erfolgt in der Routine OUTGEN ab Adresse $CAC4. Zu diesem Zweck wird der Zeichengenerator des C 64 ausgelesen. Die Zeichen, die aus einer 8 x 8 Punktmatrix bestehen, sind dort in je 8 Byte abgelegt. Jedes Byte repräsentiert das Punktmuster einer Zeile der Matrix. Ein Matrixdrucker druckt die Zeichen, indem er sie ebenso als Muster von matrixartig angeordneten Punkten zu Papier bringt. Jedoch gibt er die Punktmatrix nicht wie der Bildschirm zeilenweise sondern spaltenweise aus. Deshalb wird in OUTGEN die im Zeichengenerator in 8 Zeilenbyte gespeicherte Zeichenmatrix zunächst in 8 Spaltenbyte umorganisiert. Nach Umschalten des Druckers in den sogenannten Bitmustermodus, in dem er jedes ankommende Datenbyte nicht mehr als ASCII-Zeichen sondern als Musterbyte für eine Matrixspalte interpretiert, gibt OUTGEN die acht geänderten Zeichenbyte an den Drucker aus. Dieser fügt sie wieder zu einem 8 x 8 Punktmatrixzeichen zusammen. So ist es möglich, auf einem Matrixdrucker exakte Kopien der C 64-Bildschirmzeichen herzustellen, obwohl dieser nicht über den entsprechenden Zeichensatz verfügt.</p>
+
+        <h2>Handhabung des Programms</h2>
+
+        <p>Die etwas Konzentration fordernde Methode der Programmeingabe besteht im Eintippen des abgebildeten Basicprogramms (Bild 2), in dem das Treiberprogramm in DATA-Zeilen steht. Ein eingebauter Quersummentest deckt hoffentlich Eingabefehler auf.</p>
+
+        <figure>
+            <pre data-filename="centronics" data-name="Centronics"></pre>
+            <figcaption>Bild 2. Basic-Lader für das Treiberprogramm</figcaption>
+        </figure>
+
+        <p>Zur Herstellung des Verbindungskabels zwischen Userport und Drucker ist in Bild 3 eine Verbindungstabelle angegeben. Das Kabel sollte für eine störungsfreie Funktion nicht länger als ein Meter lang sein und aus einem abgeschirmten, mehradrigen Steuerkabel bestehen, das man in (fast) jedem Elektronik-Bastelgeschäft findet. Dort sind auch meist der Centronicsstecker und der Stecker für den Userport erhältlich.</p>
+
+        <figure>
+            <table>
+                <tr>
+                    <td>A</td>
+                    <td>GND</td>
+                    <td>16</td>
+                </tr>
+                <tr>
+                    <td>B</td>
+                    <td>FLAG – BUSY</td>
+                    <td>11</td>
+                </tr>
+                <tr>
+                    <td>C</td>
+                    <td>DO</td>
+                    <td>2</td>
+                </tr>
+                <tr>
+                    <td>D</td>
+                    <td>D1</td>
+                    <td>3</td>
+                </tr>
+                <tr>
+                    <td>E</td>
+                    <td>D2</td>
+                    <td>4</td>
+                </tr>
+                <tr>
+                    <td>F</td>
+                    <td>D3</td>
+                    <td>5</td>
+                </tr>
+                <tr>
+                    <td>H</td>
+                    <td>D4</td>
+                    <td>6</td>
+                </tr>
+                <tr>
+                    <td>J</td>
+                    <td>D5</td>
+                    <td>7</td>
+                </tr>
+                <tr>
+                    <td>K</td>
+                    <td>D6</td>
+                    <td>8</td>
+                </tr>
+                <tr>
+                    <td>L</td>
+                    <td>D7</td>
+                    <td>9</td>
+                </tr>
+                <tr>
+                    <td>M</td>
+                    <td>PA2 – STROBE</td>
+                    <td>1</td>
+                </tr>
+            </table>
+            <figcaption>Bild 3. Der Verkabelungsplan</figcaption>
+        </figure>
+
+        <p>Initialisiert wird die geladene Treiberroutine mit<br>
+            SYS 12*4096 + 9*256 beziehungsweise SYS 51456</p>
+
+        <p>Hierbei wird die Routine in das Betriebssystem eingebunden. Jedoch Vorsicht: Nach einem Break, zum Beispiel durch die Betätigung der Tasten RUN/STOP und RESTORE ausgelöst, muß die Routine erneut initialisiert werden, da die I/O-Vektoren vom Betriebssystem zurückgesetzt wurden. Die einzelnen Druckmodi spricht man mit den üblichen Basicbefehlen an. Geöffnet wird der Ausgabekanal mit:<br>
+            OPEN log. Dateinummer, Geräteadr. [,Sekundäradr.]<br>
+            Die eckigen Klammern kennzeichnen optionale Angaben. So dann kann auf den geöffneten Kanal mit PRINT # log. Dateinummer ausgegeben werden. Ein Programmlisting wird zum Beispiel erzeugt mit (Bild 4) den Befehlen<br>
+            OPEN 17,17 [Sekundäradr.]:CMD17: LIST<br>
+            PRINT#17 : CLOSE 17</p>
+
+        <figure>
+            <img src="110-4.png" alt="">
+            <figcaption>Bild 4. Musterlisting, erstellt auf einem Epson FX-80</figcaption>
+        </figure>
+
+        <p>Der PRINT-Befehl vor dem CLOSE ist notwendig, damit der CMD-Modus aufgehoben wird.</p>
+
+        <h2>Umstellen auf beliebige Drucker mit Centronics-Schnittstelle</h2>
+
+        <p>Das Programm wurde für einen Epson-Drucker geschrieben. Unverändert ist es für jeden anderen Drucker verwendbar, sofern auf die Ausgabe von commodoreeigenen Grafikzeichen verzichtet wird. Für diese Funktion muß der Drucker jedoch vorübergehend in den Bitmustermodus umgeschaltet werden, was während einer normalen Textausgabe möglich sein muß. Diese Umschaltung erfolgt im Programm in der Schleife ab Adresse $CB10. Die Anzahl der auszugebenden Steuerzeichen ist unter Adresse $CB18 gespeichert und die Steuerzeichen selbst stehen ab Adresse $CBD2 am Ende des Programms. Für einen Epson-Drucker wird die Folge:<br>
+            ESC »*« 4 8 0<br>
+            ausgegeben, wobei mit vier der Bitmustermodus »CRT-Grafik« ausgewählt wird, 8 das niederwertige Byte und 0 das höherwertige Byte der Anzahl auszugebender Punktmatrixspalten darstellt. Der Epson-Drucker kehrt nach der Ausgabe der spezifizierten Anzahl Musterbytes wieder in den Textmodus zurück.</p>
+
+        <address class="author">(H.Eyssele)</address>
+
+        <aside class="fehlerteufelchen">
+            <h2>Fehlerteufelchen</h2>
+            <p>Ein Leserbrief hat ergeben, daß der Drucker NEC 8032 im Bitmustermodus das niederwertige Bit nicht wie der Epson-Drucker unten sondern oben druckt. Damit stehen alle ausgedruckten Bildschirmzeichen bei Verwendung meines Treiberprogramms auf dem Kopf. Bei diesem Drucker müssen deshalb im Programm 2 Byte geändert werden. In Zeile 260 das 2. Datum in 128 und in Zeile 264 das 3. Datum in 70.</p>
+            <address class="author">(Helmut Eyssele)</address>
+            <!-- 64'er 8/1984 -->
+        </aside>
+    </article>
+
+</body>
+
+</html>

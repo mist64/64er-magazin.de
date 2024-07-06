@@ -1,0 +1,57 @@
+;hardcopy 1520.prg ==0801==
+;Eingetippt von Endurion
+
+    1 rem
+    2 rem
+    3 rem* sprung hauptprogr. *
+    4 rem
+    5 rem
+    6 goto200
+   10 rem
+   20 rem
+   30 rem*   sub routine    *
+   40 rem*   byte aufloesen *
+   50 rem
+   60 rem
+   70 forsc=7to0step-1
+   80 :ifa-2^sc<0thenb(7-sc)=0:goto100
+   90 :b(7-sc)=1:a=a-2^sc
+  100 nextsc
+  110 return
+  200 rem
+  210 rem
+  220 rem* einlesen von bytes *
+  230 rem* haupt-algorithmus  *
+  240 rem
+  250 rem
+  256 forsc=1024to2023:pokesc,16:next:poke53265,59:poke53272,24
+  257 c=8192
+  260 dimb(9):rem* konstante *
+  270 open1,6,1:rem* 1520 auf x/y plot *
+  275 forsq=l2tol2+7:l=l+1
+  280 :forsw=c+sqtoc+sq+312step8
+  290 :a=peek(sw):ifa=0then320
+  295 :gosub70
+  300 :gosub450
+  320 :z=0:nextsw
+  325 nextsq
+  330 l2=l2+320:ifl2<7680then275
+  340 rem
+  350 rem* ende *
+  360 rem
+  370 close1:open4,6:rem* 1520 auf ascii *
+  380 forsc=1to3:print#4,""
+  390 nextsc:close4:end:rem**************** vorschub des 1520 *
+  400 rem
+  410 rem
+  420 rem* ausdrucken auf printer/plotter
+  430 rem* 1520 in hires *
+  440 rem
+  450 rem
+  452 ifb(z)=1then460
+  454 z=z+1:ifz<8then452
+  456 return
+  460 x=sw-c-sq+z+70:y=-l:print#1,"m",x,y
+  510 ifb(z+1)=0thenprint#1,"d",x+1,y:goto454
+  520 z=z+1:x=x+1:goto510
+
