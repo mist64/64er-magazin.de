@@ -5,6 +5,13 @@ Zum 40jährigen Jubiläum des *64'er Magazins* präsentieren wir das Kunstprojek
 * 4/84: 20. März 2024 (Erstausgabe)
 * 5/84: 19. April 2024
 * 6/84: 18. Mai 2024
+* 7/84: 22. Juni 2024
+* 8/84: 20. Juli 2024
+* 9/84: 17. August 2024
+* 10/84: 21. September 2024
+* 11/84: 19. Oktober 2024
+* 12/84: 16. November 2024
+* 01/85: 14. Dezember 2024
 * usw.
 
 Auf der modernen Homepage gibt es
@@ -58,14 +65,26 @@ Die Eingabe-Ausgaben werden aus `issues` gelesen, die Website wird nach `out` ge
 * Script, HTML, CSS, Scan, Bildbearbeitung, OCR:
     * Michael Steil <mist64@mac.com>
     * [ellduin](https://github.com/ellduin)
-* Abtippen der Listings aus Ausgabe 5/84:
-    * [goloMAK](https://www.forum64.de/wcf/index.php?user/28439-golomak/)
-    * [Endurion](https://www.forum64.de/wcf/index.php?user/1964-endurion/)
-    * [Drachen](https://www.forum64.de/wcf/index.php?user/9125-drachen/)
-* Abtippen der Listings aus Ausgabe 6/84:
-    * [goloMAK](https://www.forum64.de/wcf/index.php?user/28439-golomak/)
-    * [Endurion](https://www.forum64.de/wcf/index.php?user/1964-endurion/)
-    * [thierer](https://www.forum64.de/wcf/index.php?user/26370-thierer/)
+* Ausgabe 5/84:
+    * Abtippen der Listings
+        * [goloMAK](https://www.forum64.de/wcf/index.php?user/28439-golomak/)
+        * [Endurion](https://www.forum64.de/wcf/index.php?user/1964-endurion/)
+        * [Drachen](https://www.forum64.de/wcf/index.php?user/9125-drachen/)
+* Ausgabe 6/84:
+    * Abtippen der Listings
+        * [goloMAK](https://www.forum64.de/wcf/index.php?user/28439-golomak/)
+        * [Endurion](https://www.forum64.de/wcf/index.php?user/1964-endurion/)
+        * [thierer](https://www.forum64.de/wcf/index.php?user/26370-thierer/)
+* Ausgabe 7/84:
+    * Erfassen diverser Tabellen, Eintragen der Index-Kategorien und -Titel
+    * Abtippen der Listings
+        * [Dekay](https://www.forum64.de/wcf/index.php?user/1038-dekay/)
+        * [Endurion](https://www.forum64.de/wcf/index.php?user/1964-endurion/)
+        * [goloMAK](https://www.forum64.de/wcf/index.php?user/28439-golomak/)
+        * [marvin](https://www.forum64.de/wcf/index.php?user/10141-marvin/)
+        * [pgeorgi](https://www.forum64.de/wcf/index.php?user/28405-pgeorgi/)
+        * [thierer](https://www.forum64.de/wcf/index.php?user/26370-thierer/)
+        * [vicjack](https://www.forum64.de/wcf/index.php?user/15999-vicjack/)
 
 
 

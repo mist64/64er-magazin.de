@@ -1,0 +1,708 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>Der Volkscomputer und der große Bruder: Adressenvergleich VC 20 - C 64</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="ev">
+    <meta name="64er.issue" content="7/84">
+    <meta name="64er.pages" content="52-55">
+    <meta name="64er.head1" content="Software">
+    <meta name="64er.head2" content="C 64/VC 20">
+    <meta name="64er.toc_title" content="Adressenvergleich VC 20 - C 64">
+    <meta name="64er.toc_category" content="Software">
+    <meta name="64er.index_title" content="Adressenvergleich VC 20-C 64">
+    <meta name="64er.index_category" content="Listings zum Abtippen|Tips & Tricks|Transfer">
+    <meta name="64er.id" content="adressen">
+</head>
+
+<body>
+    <article>
+        <h1>Der Volkscomputer und der große Bruder: Adressenvergleich VC 20 - C 64</h1>
+
+        <p class="intro">Der Commodore 64 wird oft als der »große Bruder» des VC 20 bezeichnet. Tatsächlich sind zum Beispiel Betriebssystem, Basicinterpreter und Schnittstellen weitgehend identisch. Daher können Basicprogramme, in denen keine Befehle und Funktionen wie POKE, PEEK, SYS und USR vorkommen, praktisch unverändert übertragen werden.</p>
+
+        <p>Leider wird man derartige Programme nur sehr selten finden, da beide Computer Grundlegendes gemeinsam haben: Die Hardwareeigenschaften werden von der Software — sprich vom Basic — kaum unterstützt. Immer dann, wenn die grafischen oder musikalischen Fähigkeiten von C 64 und VC 20 angesprochen werden, geschieht dies durch POKE-Befehle, auch wenn es nur darum geht, zum Beispiel die Farbe des Bildschirmrahmens einzustellen.</p>
+
+        <p>Das allein wäre ja noch nicht so schlimm. Nun ist aber die entsprechende Hardware, also Video- und Soundchip, bei beiden Computern grundlegend verschieden aufgebaut und belegt zudem noch völlig unterschiedliche Adressen im Speicher. So ist es kein Wunder, wenn das Umschreiben von C 64-Programmen auf den VC 20 (und umgekehrt) in der Regel mit erheblichen Schwierigkeiten verbunden ist. Wir wollen im folgenden versuchen, eine ganze Reihe dieser Schwierigkeiten aus dem Weg zu räumen. Als erste grobe Übersicht soll dabei die Tabelle 1 dienen. Auf weitere Einzelheiten wird im folgenden näher eingegangen.</p>
+
+        <figure>
+
+            <table>
+                <tr>
+                    <td></td>
+                    <td>
+                        C64</td>
+                    <td>
+                        VC20 (Grundversion)</td>
+                    <td>
+                        VC20 (ab 8 K-Erw.)</td>
+                    <td>
+                        VC20</td>
+                </tr>
+                <tr>
+                    <td>
+                        Video RAM</td>
+                    <td>
+                        1&nbsp;024</td>
+                    <td>
+                        7&nbsp;680</td>
+                    <td>
+                        4&nbsp;096</td>
+                    <td>
+                        Video-RAM</td>
+                </tr>
+                <tr>
+                    <td>
+                        freier RAM-Bereich</td>
+                    <td>
+                        2&nbsp;048</td>
+                    <td>
+                        4&nbsp;096</td>
+                    <td>
+                        4&nbsp;608</td>
+                    <td>
+                        freier RAM-Bereich</td>
+                </tr>
+                <tr>
+                    <td>
+                        Zeichengenerator
+                        ROM</td>
+                    <td>
+                        53&nbsp;248</td>
+                    <td>
+                        32&nbsp;768</td>
+                    <td>
+                        32&nbsp;768</td>
+                    <td>
+                        Zeichengenerator
+                        ROM</td>
+                </tr>
+                <tr>
+                    <td>
+                        Video-Chip (VIC)</td>
+                    <td>
+                        53&nbsp;248</td>
+                    <td>
+                        36&nbsp;864</td>
+                    <td>
+                        36&nbsp;864</td>
+                    <td>
+                        Video &amp;&nbsp;Sound Chip</td>
+                </tr>
+                <tr>
+                    <td>
+                        Syntheziser Chip (SID)</td>
+                    <td>
+                        54&nbsp;272</td>
+                    <td>
+                        —</td>
+                    <td>
+                        —</td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td>
+                        I/O 1 (CIA#1)</td>
+                    <td>
+                        56&nbsp;320</td>
+                    <td>
+                        37&nbsp;136</td>
+                    <td>
+                        37&nbsp;136</td>
+                    <td>
+                        I/O 1 (VIA#1)</td>
+                </tr>
+                <tr>
+                    <td>
+                        I/O 2 (CIA#2)</td>
+                    <td>
+                        56&nbsp;576</td>
+                    <td>
+                        37&nbsp;152</td>
+                    <td>
+                        37&nbsp;152</td>
+                    <td>
+                        I/O 2 (VIA#2)</td>
+                </tr>
+                <tr>
+                    <td>
+                        FARB-RAM</td>
+                    <td>
+                        55&nbsp;296</td>
+                    <td>
+                        38&nbsp;400</td>
+                    <td>
+                        37&nbsp;888</td>
+                    <td>
+                        Farb-RAM</td>
+                </tr>
+                <tr>
+                    <td>
+                        Basic-ROM</td>
+                    <td>
+                        40&nbsp;960</td>
+                    <td>
+                        49&nbsp;152</td>
+                    <td>
+                        49&nbsp;152</td>
+                    <td>
+                        Basic-ROM</td>
+                </tr>
+            </table>
+            <figcaption>Tabelle 1. Die Basisadressen wichtiger Speicher- und Registerbereiche</figcaption>
+        </figure>
+
+        <p>Bevor man daran gehen kann, für den jeweils anderen Computer geschriebene Software an den eigenen C 64 oder VC 20 anzupassen, müssen die Programme erst einmal in den Speicher gebracht werden. Ein Blick auf die Modulschächte beider Computer verrät sofort, daß es mit dem Austausch von Steckmodulen nicht allzu weit her sein kann: Das Modulformat ist völlig unterschiedlich.</p>
+
+        <p>Leider ist auch der Softwareaustausch per Programmkassette nur über einen Umweg zu realisieren. Zwar ist das Aufzeichnungsformat auf Cassette bei beiden Computern gleich, dennoch kann der eine Computer die Aufzeichnungen des anderen in den meisten Fällen nicht lesen. Der Grund hierfür liegt darin, daß der VC 20 eine höhere Taktfrequenz als der C 64 hat (VC 20-Programme sind um einiges schneller als entsprechende C 64-Programme). Dadurch gerät beim Lesen einer fremden Kassette die Synchronisation völlig aus den Fugen. Den einzigen Ausweg in dieser Situation bietet die Verwendung eines »großen« CBM der Serien 30xx oder 40xx als Vermittler. Die Taktfrequenz dieser CBM-Rechner liegt zwischen der des C 64 und der des VC 20, wodurch es zum Beispiel möglich ist, VC 20 Programme zunächst mit dem CBM zu laden, dann wieder abzuspeichern und nun wiederum mit dem C 64 zu laden.</p>
+
+        <p>Beim Programmaustausch per Floppy-Disk treten solche Probleme nicht auf. Hier kann man nach Herzenslust VC 20-Software in den C 64 laden oder auch umgekehrt. Hat man allerdings keine Floppy oder liegt das interessierende Programm nicht auf Diskette vor, dann bleibt in der Regel nur noch eins zu tun: Die Zähne zusammenbeißen und das Programm vom Listing abtippen. Dabei kann man dann auch gleich alle nötigen Programmänderungen vornehmen.</p>
+
+        <p>Leider gibt es viele Programme sowohl für den VC 20 als auch für den C 64, die man nicht durch Ändern einiger POKE-Adressen und kleinen Korrekturen am Bildschirmlayout an den jeweils anderen Computer anpassen kann.</p>
+
+        <p>Dazu gehören generell alle Programme, die hochauflösende Grafik verwenden. Die Prinzipien, nach dem die hochauflösende Grafik auf den beiden Computern realisiert ist, sind völlig unterschiedlich. Außerdem ist es natürlich von vorne herein völlig aussichtslos, ein C 64-Programm, das Sprites und Synthesizereffekte einsetzt, für den VC 20 umschreiben zu wollen. Umgekehrt gibt es eine solche Einschränkung allerdings nicht — der VC 20 kennt keine Sprites und sein Tongenerator läßt sich mit dem Synthesizer des C 64 allemal simulieren.</p>
+
+        <p>Sehr viel Vorsicht ist geboten, wenn das Programm längere Abschnitte in Maschinensprache enthält. Oftmals müssen diese Maschinenspracheroutinen in andere Speicherbereiche verschoben werden, um gemeinsam mit dem Basic-Programm laufen zu können. Wir wollen uns an dieser Stelle aber nur mit den Anpassungen bei Basic-Programmen beschäftigen.</p>
+
+        <h2>POKE-Befehle für Farbe und Bildschirm</h2>
+
+        <p>Selbst die einfachsten Programme enthalten in der Regel Befehle, um Rahmen- und Hintergrundfarbe des Bildschirms einzustellen. Beim VC 20 werden beide Einstellungen gleichzeitig mit einem einzigen POKE-Befehl in Register 36879 durchgeführt (Tabelle 2). Der C 64 verwendet zwei getrennte Register, nämlich 53280 für die Rahmenfarbe und 53281 für die Hintergrundfarbe. Jeweils 16 Farben sind möglich (Tabelle 3). Zum Beispiel erzeugt der Befehl POKE 36879,95 beim VC 20 einen gelben Bildschirmrahmen und einen grünen Hintergrund. Mit POKE 53280,7 : POKE 53281,5 wird dasselbe am C 64 erreicht.</p>
+
+        <figure>
+            <table>
+                <tr>
+                    <td></td>
+                    <td>BLK</td>
+                    <td>WHT</td>
+                    <td>RED</td>
+                    <td>CYAN</td>
+                    <td>PUR</td>
+                    <td>GRN</td>
+                    <td>BLU</td>
+                    <td>YEL</td>
+                </tr>
+                <tr>
+                    <td>Hintergrund</td>
+                    <td>SCHW</td>
+                    <td>WEISS</td>
+                    <td>ROT</td>
+                    <td>TÜRKIS</td>
+                    <td>VIOLETT</td>
+                    <td>GRÜN</td>
+                    <td>BLAU</td>
+                    <td>GELB</td>
+                </tr>
+                <tr>
+                    <td>SCHWARZ</td>
+                    <td>8</td>
+                    <td>9</td>
+                    <td>10</td>
+                    <td>11</td>
+                    <td>12</td>
+                    <td>13</td>
+                    <td>14</td>
+                    <td>15</td>
+                </tr>
+                <tr>
+                    <td>WEISS</td>
+                    <td>24</td>
+                    <td>25</td>
+                    <td>26</td>
+                    <td>27</td>
+                    <td>28</td>
+                    <td>29</td>
+                    <td>30</td>
+                    <td>31</td>
+                </tr>
+                <tr>
+                    <td>ROT</td>
+                    <td>40</td>
+                    <td>41</td>
+                    <td>42</td>
+                    <td>43</td>
+                    <td>44</td>
+                    <td>45</td>
+                    <td>46</td>
+                    <td>47</td>
+                </tr>
+                <tr>
+                    <td>TÜRKIS</td>
+                    <td>56</td>
+                    <td>57</td>
+                    <td>58</td>
+                    <td>59</td>
+                    <td>60</td>
+                    <td>61</td>
+                    <td>62</td>
+                    <td>63</td>
+                </tr>
+                <tr>
+                    <td>VIOLETT</td>
+                    <td>72</td>
+                    <td>73</td>
+                    <td>74</td>
+                    <td>75</td>
+                    <td>76</td>
+                    <td>77</td>
+                    <td>78</td>
+                    <td>79</td>
+                </tr>
+                <tr>
+                    <td>GRÜN</td>
+                    <td>88</td>
+                    <td>89</td>
+                    <td>90</td>
+                    <td>91</td>
+                    <td>92</td>
+                    <td>93</td>
+                    <td>94</td>
+                    <td>95</td>
+                </tr>
+                <tr>
+                    <td>BLAU</td>
+                    <td>104</td>
+                    <td>105</td>
+                    <td>106</td>
+                    <td>107</td>
+                    <td>108</td>
+                    <td>109</td>
+                    <td>110</td>
+                    <td>111</td>
+                </tr>
+                <tr>
+                    <td>GELB</td>
+                    <td>120</td>
+                    <td>121</td>
+                    <td>122</td>
+                    <td>123</td>
+                    <td>124</td>
+                    <td>125</td>
+                    <td>126</td>
+                    <td>127</td>
+                </tr>
+                <tr>
+                    <td>ORANGE</td>
+                    <td>136</td>
+                    <td>137</td>
+                    <td>138</td>
+                    <td>139</td>
+                    <td>140</td>
+                    <td>141</td>
+                    <td>142</td>
+                    <td>143</td>
+                </tr>
+                <tr>
+                    <td>HELLORAN.</td>
+                    <td>152</td>
+                    <td>153</td>
+                    <td>154</td>
+                    <td>155</td>
+                    <td>156</td>
+                    <td>157</td>
+                    <td>158</td>
+                    <td>159</td>
+                </tr>
+                <tr>
+                    <td>ROSA</td>
+                    <td>168</td>
+                    <td>169</td>
+                    <td>170</td>
+                    <td>171</td>
+                    <td>172</td>
+                    <td>173</td>
+                    <td>174</td>
+                    <td>175</td>
+                </tr>
+                <tr>
+                    <td>HELLTÜRKIS</td>
+                    <td>184</td>
+                    <td>185</td>
+                    <td>186</td>
+                    <td>187</td>
+                    <td>188</td>
+                    <td>189</td>
+                    <td>190</td>
+                    <td>191</td>
+                </tr>
+                <tr>
+                    <td>HELLVIOL.</td>
+                    <td>200</td>
+                    <td>201</td>
+                    <td>202</td>
+                    <td>203</td>
+                    <td>204</td>
+                    <td>205</td>
+                    <td>206</td>
+                    <td>207</td>
+                </tr>
+                <tr>
+                    <td>HELLGRÜN</td>
+                    <td>216</td>
+                    <td>217</td>
+                    <td>218</td>
+                    <td>219</td>
+                    <td>220</td>
+                    <td>221</td>
+                    <td>222</td>
+                    <td>223</td>
+                </tr>
+                <tr>
+                    <td>HELLBLAU</td>
+                    <td>232</td>
+                    <td>233</td>
+                    <td>234</td>
+                    <td>235</td>
+                    <td>236</td>
+                    <td>237</td>
+                    <td>238</td>
+                    <td>239</td>
+                </tr>
+                <tr>
+                    <td>HELLGELB</td>
+                    <td>248</td>
+                    <td>249</td>
+                    <td>250</td>
+                    <td>251</td>
+                    <td>252</td>
+                    <td>253</td>
+                    <td>254</td>
+                    <td>255</td>
+                </tr>
+            </table>
+            <figcaption>Tabelle 2. Farbkombinationen für Bildschirmrahmen und Hintergrund beim VC 20</figcaption>
+        </figure>
+
+        <figure>
+            <table>
+                <tr>
+                    <td colspan="3">
+                        VC 20 und C 64</td>
+                    <td>nur C 64</td>
+                </tr>
+                <tr>
+                    <td>0</td>
+                    <td>schwarz</td>
+                    <td>8</td>
+                    <td>orange</td>
+                </tr>
+                <tr>
+                    <td>1</td>
+                    <td>weiß</td>
+                    <td>9</td>
+                    <td>braun</td>
+                </tr>
+                <tr>
+                    <td>2</td>
+                    <td>rot</td>
+                    <td>10</td>
+                    <td>hellrot</td>
+                </tr>
+                <tr>
+                    <td>3</td>
+                    <td>türkis</td>
+                    <td>11</td>
+                    <td>grau 1</td>
+                </tr>
+                <tr>
+                    <td>4</td>
+                    <td>violett</td>
+                    <td>12</td>
+                    <td>grau 2</td>
+                </tr>
+                <tr>
+                    <td>5</td>
+                    <td>grün</td>
+                    <td>13</td>
+                    <td>hellgrün</td>
+                </tr>
+                <tr>
+                    <td>6</td>
+                    <td>blau</td>
+                    <td>14</td>
+                    <td>hellblau</td>
+                </tr>
+                <tr>
+                    <td>7</td>
+                    <td>gelb</td>
+                    <td>15</td>
+                    <td>grau 3</td>
+                </tr>
+            </table>
+
+            <figcaption>Tabelle 3. Farbwerte bei C 64 und VC 20</figcaption>
+        </figure>
+
+        <p>Beim C 64 enthält der Bildschirm 25 Zeilen zu je 40 Zeichen; der Bildschirmspeicher belegt die Adressen 1024 bis 2023. Der zugehörige Farbspeicher geht von 55296 bis 56295. Mit POKE 1024, 1 : POKE 55296, 2 erscheint zum Beispiel ein rotes »A« in der linken oberen Bildschirmecke. Der für den Anwender verfügbare RAM-Bereich beginnt bei Adresse 2048 (Bild 1).</p>
+
+        <figure>
+            <img src="52-1.png" alt="">
+            <figcaption>Bild 1. Speicherbelegung des Commodore 64 im Grundzustand. Im Bereich $D000 bis $DFFF sind zusätzlich 4 KByte Zeichengenerator-ROM überlagert</figcaption>
+        </figure>
+
+        <p>Beim VC 20 wird die Angelegenheit etwas komplizierter. Die Anfangsadressen von Bildschirm- und Farbspeicher sind nämlich je nach Speicherausbau unterschiedlich (Bild 2). In der Grundversion und mit der 3-KByte-Erweiterung beginnt das Video-RAM bei Adresse 7680 und geht bis Adresse 8185. Das Farb-RAM belegt dann den Bereich von 38400 bis 38905. In dieser Konfiguration liegt der Bildschirmspeicher oberhalb des für den Anwender verfügbaren RAM-Bereiches, der ab Adresse 4096 (Grundversion) beziehungsweise 1024 (3-KByte-Erweiterung) beginnt. Sobald jedoch eine Speichererweiterung von mindestens 8 KBytes eingesteckt ist, wandert das Video-RAM nach »unten» und beginnt dann ab Adresse 4096. Dies geschieht, um für Basic-Programme einen zusammenhängenden Speicherbereich von der Adresse 4608 an aufwärts zu schaffen. Eine eventuell zusätzlich vorhandene 3-KByte-Erweiterung kann in diesem Fall nicht für Basic-Programme genutzt werden. Schließlich verändert auch noch das Farb-RAM seine Lage und startet jetzt bei Adresse 37888.</p>
+
+        <figure>
+            <img src="52-2.png" alt="">
+            <figcaption>Bild 2. Speicherbelegung des VC 20 bis 3-KByte-Erweiterung (links) und ab 8-KByte-Erweiterung (rechts)</figcaption>
+        </figure>
+
+        <p>Der Bildschirm des VC 20 ist aufgeteilt in 23 Zeilen zu je 22 Zeichen. Insgesamt sind also 506 Bildschirmstellen vorhanden, das sind etwa halb soviele wie beim C 64. Eine Anpassung des Bildschirmlayouts ist also in fast allen Fällen erforderlich. In der Regel dürfte das kein Problem darstellen. Bei der Anpassung von VC 20-Programmen an den C 64 wird man des öfteren PRINT-Anweisungen zusammenfassen, da eine Bildschirmzeile beim C 64 fast doppelt soviele Zeichen wie eine entsprechende VC 20-Zeile aufnehmen kann. Im umgekehrten Fall ist das Einfügen von PRINT-Befehlen sinnvoll, um eine übersichtliche Bildschirmdarstellung zu erhalten. Ernste Schwierigkeiten kann es nur bei der Ausgabe von Tabellen auf dem Bildschirm geben. Eine sechsspaltige Zahlentabelle zum Beispiel läßt sich auf dem C 64 ganz gut darstellen, beim VC 20 wird man bei derartigen Versuchen unangenehm an die arg begrenzte Zeilenbreite erinnert. In solchen Fällen kann man versuchen, weniger interessante Spalten der Tabelle einfach fortzulassen. Wenn das nicht erwünscht oder möglich ist, hilft nur noch der CMD-Befehl, um die Ausgabe der entsprechenden Tabelle auf den Drucker umzuleiten.</p>
+
+        <p>Das Betriebssystem von C 64 und VC 20 ist weitgehend identisch. Natürlich gibt es einige Unterschiede bei den Ein-/Ausgabeoperationen, bedingt schon alleine durch das unterschiedliche Bildschirmformat. Fast alle nutzbaren Adressen in der Zeropage oder in den anderen vom Betriebssystem benutzten Speicherbereichen haben jedoch die gleiche Bedeutung. So befindet sich zum Beispiel bei beiden Computern der Kassettenpuffer zwischen den Adressen 828 und 1019 und mit »? PEEK(43) + 256 * PEEK(44)« erhält man beidesmal die Anfangsadresse des Basic-Programms.</p>
+
+        <p>Eine wichtige Ausnahme von dieser Regel ist der USR-Vektor. Beim VC 20 befindet er sich in den Speicherstellen 1 und 2 am Anfang der Zeropage, in Adresse 0 steht immer ein »JMP«-Befehl. Jedesmal bei der Ausführung der USR-Funktion verzweigt das Basic zur Adresse 0 und aufgrund des dort stehenden »JMP« sofort weiter zur Adresse, die in sich in den Speicherzellen 1 und 2 befindet. Beim C 64 befinden sich dagegen am Anfang der Zeropage zwei Register des 6510-Mikroprozessors, so daß der USR-Vektor hier in die Adressen 785 und 786 verlegt wurde. Bei Programmen, welche die USR-Funktion verwenden, müssen diese unterschiedlichen Adressen unbedingt beachtet werden.</p>
+
+        <p>Wie aus den Bildern 1 und 2 hervorgeht, liegt der Basic-Interpreter beim C 64 in einem anderen Adreßbereich als beim VC 20. Da die Routinen aber bis auf Ausnahmen (USR-Funktion) völlig gleich sind, kann man die Adressen sehr einfach umrechnen: VC 20-Adressen zwischen $C000 und $DFFC entsprechen den C 64 Adressen zwischen $A000 und $BFFC, die Differenz ist also gerade $2000 oder dezimal 8192. In Adresse $BFFD steht beim C 64 ein Sprung nach $E000, um den RAM-und I/O-Bereich zwischen $C000 und $DFFF zu überbrücken. Durch diesen Sprungbefehl entsteht im folgenden eine Adressendifferenz um drei Bytes. Von allen C 64-Adressen zwischen $E000 und $E37A müssen daher diese drei Bytes abgezogen werden, um die entsprechenden VC 20-Adressen zu erhalten.</p>
+
+        <p>Einige häufig vorkommende POKE-Adressen wurden bisher noch nicht erwähnt. Gemeint sind die zur Programmierung von Musik und Geräuscheffekten benutzten Register. Leider ist die Art und Weise der Tonerzeugung bei beiden Computern völlig unterschiedlich, so daß sich keine äquivalenten POKE-Befehle angeben lassen.</p>
+
+        <p>Der C 64 verfügt nämlich über einen vollwertigen Synthesizer-Baustein, während der VC 20 nur »normale« Tongeneratoren besitzt. Tabelle 4 enthält für alle VC 20 Besitzer eine Übersicht über die beim C 64 zur Tonerzeugung benutzten Register. Diese Tabelle dient allerdings wirklich nur zur Orientierung, welche POKE-Befehle beim C 64 zur Tonerzeugung dienen. Eine Simulation des C 64-Synthesizers ist mit dem VC 20 nicht möglich. Es empfiehlt sich daher, bei der Programmanpassung zunächst einmal alle derartigen POKE-Befehle fortzulassen und später eigene Sound-Routinen einzufügen.</p>
+
+        <figure>
+            <table>
+                <tr>
+                    <td colspan="3">
+                        Adresse</td>
+                    <td>Inhalt</td>
+                </tr>
+                <tr>
+                    <td>Stimme 1</td>
+                    <td>Stimme 2</td>
+                    <td>Stimme 3</td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td>54272</td>
+                    <td>54279 &nbsp;</td>
+                    <td>54286</td>
+                    <td>Tonfrequenz (Low-Byte)</td>
+                </tr>
+                <tr>
+                    <td>54273</td>
+                    <td>5428Q &nbsp;&nbsp;&nbsp;</td>
+                    <td>54287</td>
+                    <td>Tonfrequenz (High-Byte)</td>
+                </tr>
+                <tr>
+                    <td>54274</td>
+                    <td>54281</td>
+                    <td>54288</td>
+                    <td>Tastaturverhältnis Rechteckgenerator (Low)</td>
+                </tr>
+                <tr>
+                    <td>54275</td>
+                    <td>54282</td>
+                    <td>54289</td>
+                    <td>Tastaturverhältnis Rechteckgenerator (High)</td>
+                </tr>
+                <tr>
+                    <td>54276</td>
+                    <td>54283</td>
+                    <td>54290</td>
+                    <td>Wellenform</td>
+                </tr>
+                <tr>
+                    <td>54277</td>
+                    <td>54284</td>
+                    <td>54291</td>
+                    <td>Anschlag/Abschwellen</td>
+                </tr>
+                <tr>
+                    <td>54278</td>
+                    <td>54285</td>
+                    <td>54292</td>
+                    <td>Halten/Ausklingen</td>
+                </tr>
+                <tr>
+                    <td colspan="3" align="center">54296</td>
+                    <td>Lautstärke</td>
+                </tr>
+                <tr>
+                    <td colspan="4">
+                        Mögliche Wellenformen: Dreieck (17), Sägezahn (33), Rechteck (65), Rauschen (129)</td>
+                </tr>
+            </table>
+            <figcaption>Tabelle 4. Die wichtigsten Register des C 64-Soundchips</figcaption>
+        </figure>
+
+        <p>C 64-Besitzer haben es hier etwas besser: Mit etwas Geschick und einem guten Handbuch zur Musikprogrammierung können sie dem C 64 auch alle VC 20-Töne entlocken. Als Referenz hierzu kann Tabelle 5 mit den Daten zu den Tongeneratoren des VC 20 dienen. Im Zweifelsfalle sollte man aber auch hier eher auf originalgetreue Tonuntermalung verzichten und sich damit eine ganze Menge Arbeit sparen.</p>
+
+        <figure>
+            <table>
+                <tr>
+                    <td>NOTE</td>
+                    <td>WERT</td>
+                    <td>NOTE</td>
+                    <td>WERT</td>
+                </tr>
+                <tr>
+                    <td>C</td>
+                    <td>135</td>
+                    <td>G</td>
+                    <td>215</td>
+                </tr>
+                <tr>
+                    <td>C#</td>
+                    <td>143</td>
+                    <td>A<sup>b</sup></td>
+                    <td>217</td>
+                </tr>
+                <tr>
+                    <td>D</td>
+                    <td>147</td>
+                    <td>A</td>
+                    <td>219</td>
+                </tr>
+                <tr>
+                    <td>E<sup>b</sup></td>
+                    <td>151</td>
+                    <td>B</td>
+                    <td>221</td>
+                </tr>
+                <tr>
+                    <td>E</td>
+                    <td>159</td>
+                    <td>H</td>
+                    <td>223</td>
+                </tr>
+                <tr>
+                    <td>F</td>
+                    <td>163</td>
+                    <td>C</td>
+                    <td>225</td>
+                </tr>
+                <tr>
+                    <td>F#</td>
+                    <td>167</td>
+                    <td>C#</td>
+                    <td>227</td>
+                </tr>
+                <tr>
+                    <td>G</td>
+                    <td>175</td>
+                    <td>D</td>
+                    <td>228</td>
+                </tr>
+                <tr>
+                    <td>A<sup>b</sup></td>
+                    <td>179</td>
+                    <td>E<sup>b</sup></td>
+                    <td>229</td>
+                </tr>
+                <tr>
+                    <td>A</td>
+                    <td>183</td>
+                    <td>E</td>
+                    <td>231</td>
+                </tr>
+                <tr>
+                    <td>B</td>
+                    <td>187</td>
+                    <td>F</td>
+                    <td>232</td>
+                </tr>
+                <tr>
+                    <td>H</td>
+                    <td>191</td>
+                    <td>F#</td>
+                    <td>233</td>
+                </tr>
+                <tr>
+                    <td>C</td>
+                    <td>195</td>
+                    <td>G</td>
+                    <td>235</td>
+                </tr>
+                <tr>
+                    <td>C#</td>
+                    <td>199</td>
+                    <td>A<sup>b</sup></td>
+                    <td>236</td>
+                </tr>
+                <tr>
+                    <td>D</td>
+                    <td>201</td>
+                    <td>A</td>
+                    <td>237</td>
+                </tr>
+                <tr>
+                    <td>E<sup>b</sup></td>
+                    <td>203</td>
+                    <td>B</td>
+                    <td>238</td>
+                </tr>
+                <tr>
+                    <td>E</td>
+                    <td>207</td>
+                    <td>H</td>
+                    <td>239</td>
+                </tr>
+                <tr>
+                    <td>F</td>
+                    <td>209</td>
+                    <td>C</td>
+                    <td>240</td>
+                </tr>
+                <tr>
+                    <td>F#</td>
+                    <td>212</td>
+                    <td>C#</td>
+                    <td>241</td>
+                </tr>
+            </table>
+
+            <table>
+                <tr>
+                    <td>Stimmlagen-Befehle</td>
+                    <td>x=</td>
+                    <td>Funktion</td>
+                </tr>
+                <tr>
+                    <td>POKE 36878,X</td>
+                    <td>0 bis 15</td>
+                    <td>setzt die Lautstärke</td>
+                </tr>
+                <tr>
+                    <td>POKE 36874,X</td>
+                    <td>128 bis 255</td>
+                    <td>spielt Note</td>
+                </tr>
+                <tr>
+                    <td>POKE 36875,X</td>
+                    <td>128 bis 255</td>
+                    <td>spielt Note</td>
+                </tr>
+                <tr>
+                    <td>POKE 36876,X</td>
+                    <td>128 bis 255</td>
+                    <td>spielt Note</td>
+                </tr>
+                <tr>
+                    <td>POKE 36877,X</td>
+                    <td>128 bis 255</td>
+                    <td>Geräuscheffekte</td>
+                </tr>
+            </table>
+
+            <figcaption>Tabelle 5. Notenwerte und Tongeneratoradressen beim VC 20</figcaption>
+
+        </figure>
+
+        <p>Und noch ein Punkt, wo der VC 20 hardwäremäßig benachteiligt ist: Der C 64 verfügt nämlich gleich über zwei Joystickports (mit den Adressen 56320 und 56321), während der VC 20 sich mit einem Anschluß zufrieden geben muß, der zu allem Überfluß auch noch ein recht kompliziertes Abfrageprogramm erfordert. Der Feuerknopf und die Schalter 0, 1 und 2 des Joysticks werden nämlich beim VC 20 über VIA #1 gelesen, während der Zustand von Schalter 3 über VIA # 2 abgefragt wird. Normalerweise sind Joystickabfragen in Programmen leicht zu finden. Halten Sie beim VC 20 nach PEEKs in die Speicherstellen 37137 und 37152 Ausschau und beim C 64 nach entsprechenden Abfragen der Adressen 56320 und 56321. Anschließend muß die gesamte Joystickroutine für den jeweiligen Rechner neu geschrieben werden, da die Art der Abfrage einfach zu unterschiedlich ist.</p>
+
+        <p>Bei der Steuerung mittels Drehreglern (sogenannten Paddles) ist die Anpassung wesentlich einfacher zu realisieren. Die Paddle-Werte werden beim C 64 aus den Registern 54297 und 54298 ausgelesen. Beim VC 20 sind es die Register 36872 und 36873. Das Umschreiben besteht hier also lediglich im Einsetzen der entsprechenden Adressen in die PEEK-Befehle.</p>
+
+        <h2>Wo sich das Umschreiben lohnt</h2>
+
+        <p>An dieser Stelle muß noch einmal deutlich darauf hingewiesen werden, daß die Zahl derjenigen Programme, die mit vertretbarem Aufwand vom C 64 zum VC 20 oder umgekehrt übertragen werden können, doch verhältnismäßig gering ist. Bei Spielprogrammen ist in der Regel äußerste Vorsicht geboten, da hier aus Geschwindigkeitsgründen zumeist mit Routinen in Maschinensprache gearbeitet wird. Außerdem ist bei Spielen in der Regel das Bildschirmlayout fest vorgegeben, so daß wegen der unterschiedlichen Bildschirmkapazität beider Computer sehr wahrscheinlich größere Probleme auftreten werden. Von Sprites und hochauflösender Grafik einmal ganz zu schweigen.</p>
+
+        <p>Dagegen gibt es viele Anwendungsprogramme, welche den Computer nicht zu einer hochspezialisierten Spielmaschine machen, sondern ganz einfach Problemlösungen in Basic anbieten. Dabei kann es sich beispielsweise um ein Textverarbeitungsprogramm, eine Lagerverwaltung oder ganz einfach um ein Programm zum Ausdrucken eines Jahreskalenders handeln. Für fast alle derartigen Programme sollte es möglich sein, eine Anpassung mit Hilfe der hier abgedruckten Tabellen und Adressenvergleiche vorzunehmen.</p>
+
+        <address class="author">(ev)</address>
+    </article>
+
+</body>
+
+</html>

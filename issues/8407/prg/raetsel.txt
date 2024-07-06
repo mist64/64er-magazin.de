@@ -1,0 +1,149 @@
+;raetsel.prg ==1201==
+;Source: http://www.vic20listings.freeolamail.com/mag_64er.html
+
+    1 rem"{clr}"=clear home    "{home}"=corsor home
+    2 rem"{up}"cursor hoch    "{down}"=cursor runter
+    3 rem"{rght}"=cursor rechts "{left}"=cursor links
+    4 rem "{blk}"=schwarz "{wht}"=weiss "{red}"=rot
+   10 rem woertersuche im buchstabensalat
+   15 rem juergen curdt,kessemeierweg 5, 493 detmold,tel 67264
+   20 poke36879,93:print"{clr}{wht}";:fori=0to439:printchr$(rnd(1)*26+65);:next
+   25 print"{home}{blk}i{down}c{down}h{rght}{rght}{rght}verstecke{rght}{down}f{down}{left}u{down}{left}e{down}{left}r{down}{left}":print"{rght}{up}{up}{up}{up}dich{down}{down}kreuz{rght}{rght}und{up}{up}{left}{left}{left}{left}{left}{left}{left}{left}q{down}{left}u{down}{down}{left}r"
+   30 print"woerter{rght}a{down}u{down}c{down}h":print"{down}{down}{down}{down}{rght}{rght}{rght}{rght}{rght}d{up}i{up}a{up}g{up}o{up}n{up}a{up}l{home}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}"
+   35 print" zahl der versteckten  woerter (2-20)";:inputk$
+   40 poke1000,val(right$(k$,2))
+   45 k=peek(1000):dimf$(22,20):dimff%(22,20):dimn$(k+1):dimnv$(20)
+   50 fori=1tok+1:n$(i)="0":next
+   55 le$="{home}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}                                            {up}{up}{up}"
+   60 printle$"{down}{down} bitte etwas warten !{home}";
+   65 rem einsprung in die woerterliste
+   70 fori=0toint(rnd(1)*50):readn$:ifn$="***"thenrestore:goto70
+   75 next
+   80 rem woerter waehlen - n$ - und in das feld -n$,x,y- schreiben
+   85 kl=kl+1
+   90 ifkl>kthen520
+   95 fori=0toint(rnd(1)*5):readn$:ifn$="***"thenrestore:goto95
+  100 next:n$(kl)=n$:ln=len(n$):onint(rnd(1)*4+1)goto110,130:goto130
+  105 rem wort herumdrehe
+  110 fori=1toln:nv$(i)=mid$(n$,i,1):next
+  115 n$=""
+  120 fori=lnto1step-1:n$=n$+nv$(i):next
+  125 rem waagerecht,senkrecht oder diagonal
+  130 onint(rnd(1)*6+1)goto 135,210,285,365,440,480
+  135 rem spalten abw.
+  140 i=int(rnd(1)*22):j=0
+  145 iff$(i,j)=""andj<19thenj=j+1:goto145
+  150 ifj=>lnthend=j-ln:an=int(rnd(1)*d):goto195
+  155 rem kreuzung suchen
+  160 l=1:v1$=f$(i,j)
+  165 v2$=mid$(n$,l,1):ifv1$<>v2$thenl=l+1:goto175
+  170 j1=j+1:goto185
+  175 ifl<lnthen165
+  180 goto95
+  185 iff$(i,j1)=""andj1<19thenj1=j1+1:goto185
+  190 an=j-l+1:ifan<0orj1-an<lnthen95
+  195 forj=antoan+ln-1
+  200 f$(i,j)=mid$(n$,(j-an)+1,1):ff%(i,j)=kl:next
+  205 goto80
+  210 rem spalten aufw.
+  215 i=int(rnd(1)*22):j=19
+  220 iff$(i,j)=""andj>0thenj=j-1:goto220
+  225 if19-j>=lnthend=20-j-ln:an=int(rnd(1)*d)+j+1:goto270
+  230 rem kreuzung suchen
+  235 l=1:v1$=f$(i,j)
+  240 v2$=mid$(n$,l,1):ifv1$<>v2$thenl=l+1:goto250
+  245 j1=j-1:goto260
+  250 ifl<lnthen240
+  255 goto95
+  260 iff$(i,j1)=""andj1>0thenj1=j1-1:goto260
+  265 an=j-l+1:ifan<0oran+ln>19orj-j1<lthen95
+  270 forj=antoan+ln-1
+  275 f$(i,j)=mid$(n$,(j-an)+1,1):ff%(i,j)=kl:next
+  280 goto80
+  285 rem zeilen n.r.
+  290 j=int(rnd(1)*19):i=0
+  295 iff$(i,j)=""andi<21theni=i+1:goto295
+  300 ifi=>lnthend=i-ln:an=int(rnd(1)*d):goto350
+  305 rem kreuzung suchen
+  310 l=1:v1$=f$(i,j)
+  315 v2$=mid$(n$,l,1):ifv1$<>v2$thenl=l+1:goto325
+  320 goto335
+  325 ifl<lnthen315
+  330 goto95
+  335 i1=i+1
+  340 iff$(i1,j)=""andi1<21theni1=i1+1:goto340
+  345 an=i-l+1:ifan<0ori1-an<lnthen95
+  350 fori=antoan+ln-1
+  355 f$(i,j)=mid$(n$,(i-an)+1,1):ff%(i,j)=kl:next
+  360 goto80
+  365 rem zeilen n.l.
+  370 j=int(rnd(1)*20):i=21
+  375 iff$(i,j)=""andi>0theni=i-1:goto375
+  380 if21-i>=lnthend=22-l-ln:an=int(rnd(1)*d)+i+1:goto425
+  385 rem kreuzung suchen
+  390 l=1:v1$=f$(i,j)
+  395 v2$=mid$(n$,l,1):ifv1$<>v2$thenl=l+1:goto405
+  400 j1=i-1:goto415
+  405 ifl<lnthen395
+  410 goto95
+  415 iff$(j1,j)=""andj1>0thenj1=j1-1:goto415
+  420 an=i-l+1:ifan<0oran+ln>21ori-j1<lthen95
+  425 fori=antoan+ln-1
+  430 f$(i,j)=mid$(n$,(i-an)+1,1):ff%(i,j)=kl:next
+  435 goto80
+  440 rem diag.lu-ro
+  445 j=int(rnd(1)*(19-ln))+ln:an=int(rnd(1)*(23-ln)):j2=j:i2=an
+  450 ifj2>0andi2<22andf$(i2,j2)=""thenj2=j2-1:i2=i2+1:goto450
+  455 ifj-j2<lnthen135
+  460 fori=antoan+ln-1
+  465 f$(i,j)=mid$(n$,i-an+1,1):ff%(i,j)=kl:j=j-1
+  470 next
+  475 goto80
+  480 rem diag.lo-ru
+  485 j=int(rnd(1)*(20-ln)):an=int(rnd(1)*(23-ln)):j2=j:i2=an
+  490 ifj2<20andi2<22andf$(i2,j2)=""thenj2=j2+1:i2=i2+1:goto490
+  495 ifj2-j<lnthen285
+  500 fori=antoan+ln-1
+  505 f$(i,j)=mid$(n$,i-an+1,1):ff%(i,j)=kl:j=j+1
+  510 next
+  515 goto80
+  520 rem raetsel ausgeben
+  525 print"{home}{wht}";:forj=0to19:fori=0to21
+  530 iff$(i,j)=""thenf$(i,j)=chr$(rnd(1)*26+65)
+  535 printf$(i,j);
+  540 nexti,j
+  545 rem eingabe abwarten
+  550 printle$"{down} {blk}suche"k"woerter      und tippe sie ein!{home}";:poke198,0
+  555 ei$="":wait198,1:printle$
+  560 gete$:ife$=""then560
+  565 ife$=chr$(13)then585
+  570 ife$="*"then665
+  575 ife$=chr$(20)thenei$=left$(ei$,len(ei$)-1):print"{left} {left}";:goto560
+  580 ei$=ei$+e$:printe$;:goto560
+  585 forkl=1tok:ifei$<>n$(kl)thennext:goto595
+  590 goto605
+  595 printle$:print" leider nicht richtig  loesung............*";
+  600 goto555
+  605 r=r+1
+  610 rem gefundenes wort schwarz schreiben
+  615 print"{home}";:forj=0to19:fori=0to21
+  620 ifff%(i,j)=klthenprintf$(i,j);:goto630
+  625 print"{rght}";
+  630 nexti,j:ifr=kthen645
+  635 printle$:printr+1;"{left}. wort?{home}";
+  640 n$(kl)="":goto555
+  645 printle$" *** fein gemacht ***      neues spiel ?";
+  650 poke198,0:wait198,1
+  660 printle$;:run45
+  665 rem loesung geben
+  670 print"{home}{blk}";:forj=0to19:fori=0to21
+  675 ifff%(i,j)>0thenprintf$(i,j);:goto685
+  680 print"{rght}";
+  685 nexti,j
+  690 print" neues spiel ?         taste druecken !";
+  695 goto650
+  700 dataregenwurm,ueberfluss,vorgarten,apfelsaft,feuerwehr,morgenstern,abendrot
+  705 dataaffenhaus,poltergeist,logisch,dorfplatz,gasthaus,steinkohle,regenschirm
+ 1000 data"***"
+ 1010 rem zwischen 700 und 999 koennen beliebige woerter eingefuegt werden
+
