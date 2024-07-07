@@ -1,0 +1,88 @@
+;usertastatur.prg ==0801==
+;Quelle: 1984-08-09-10.d64
+
+  100 rem"{CBM-A}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{CBM-S}
+  110 rem"{SHIFT--}userport und funktionstasten {SHIFT--}
+  120 rem"{SHIFT--}belegung fuer den c 64   von {SHIFT--}
+  130 rem"{SHIFT--}martin kloss   duesseldorf   {SHIFT--}
+  140 rem"{CBM-Q}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{CBM-W}
+  150 rem"{SHIFT--}nn,mm  :laufvariable         {SHIFT--}
+  160 rem"{SHIFT--}q1,q2  :read,aenderungsvar.  {SHIFT--}
+  170 rem"{SHIFT--}q1$,q2$:loesch,antwortvar.   {SHIFT--}
+  180 rem"{SHIFT--}q2$( ) :befehlsfeld          {SHIFT--}
+  190 rem"{CBM-Q}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{CBM-W}
+  200 rem"{SHIFT--}anschluss einer tastatur mit {SHIFT--}
+  210 rem"{SHIFT--}4*5 matrix am userport       {SHIFT--}
+  220 rem"{SHIFT--}4 zeilen auf pb0-pb3         {SHIFT--}
+  230 rem"{SHIFT--}5 spalten auf pb4-pb7 u. pa2 {SHIFT--}
+  240 rem"{SHIFT--}20 programmierbare tasten    {SHIFT--}
+  250 rem"{CBM-Q}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{CBM-W}
+  260 rem"{SHIFT--}belegung der funktionstasten {SHIFT--}
+  270 rem"{SHIFT--}mit strings bis 9 byte laenge{SHIFT--}
+  280 rem"{SHIFT--}frei programmierbar          {SHIFT--}
+  290 rem"{CBM-Z}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{CBM-X}
+  300 print"{clr}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}"spc(10)"{CBM-O}{CBM-O}{CBM-O}{CBM-O}{CBM-O}{CBM-O}{CBM-O}{CBM-O}{CBM-O}{CBM-O}{CBM-O}{CBM-O}{CBM-O}{CBM-O}{CBM-O}{CBM-O}{CBM-O}{CBM-O}"
+  310 printspc(10)"{rvon} userporttastatur "
+  320 printspc(10)"{rvon}                  "
+  330 printspc(10)"{rvon} by martin kloss  "
+  340 printspc(10)"{rvon}{CBM-O}{CBM-O}{CBM-O}{CBM-O}{CBM-O}{CBM-O}{CBM-O}{CBM-O}{CBM-O}{CBM-O}{CBM-O}{CBM-O}{CBM-O}{CBM-O}{CBM-O}{CBM-O}{CBM-O}{CBM-O}"
+  350 b=0:fornn=49152to49527:reada:b=b+a:pokenn,a:nextnn:sys49152
+  360 ifb<>43253thenprintspc(10)"{down}{down}{down}{down}{down}dataerror ":stop
+  370 fornn=0to7:readq2$(nn):nextnn:print"{clr}":q1$="{up}*                 "
+  380 printspc(5)"{CBM-O}{CBM-O}{CBM-O}{CBM-O}{CBM-O}{CBM-O}{CBM-O}{CBM-O}{CBM-O}{CBM-O}{CBM-O}{CBM-O}{CBM-O}{CBM-O}{CBM-O}{CBM-O}{CBM-O}{CBM-O}{CBM-O}{CBM-O}{CBM-O}{CBM-O}{CBM-O}{CBM-O}{CBM-O}"
+  390 printspc(5)"{rvon} funktionstastenbelegung "
+  400 printspc(5)"{rvon}{CBM-O}{CBM-O}{CBM-O}{CBM-O}{CBM-O}{CBM-O}{CBM-O}{CBM-O}{CBM-O}{CBM-O}{CBM-O}{CBM-O}{CBM-O}{CBM-O}{CBM-O}{CBM-O}{CBM-O}{CBM-O}{CBM-O}{CBM-O}{CBM-O}{CBM-O}{CBM-O}{CBM-O}{CBM-O}"
+  410 printspc(5)"{down}{down}{down}jetzige belegung{down}"
+  420 fornn=0to7:readq1:printspc(5)"f"q1"   "q2$(nn):nextnn
+  430 gosub670
+  440 ifq3$<>"j"thenpoke58,255:goto530
+  450 print"{clr}":fornn=0to7:readq1
+  460 printspc(3)"funktionstaste "q1" "q2$(nn):print"{up}"tab(20);
+  470 inputq2$(nn):iflen(q2$(nn))>9thenprinttab(20)q1$:print"{up}"tab(20);:goto470
+  480 next nn
+  490 printspc(3)"{down}eingaben korrekt (j)";:inputq3$:ifq3$<>"j"then run
+  500 q2=49420:fornn=0to7:formm=1tolen(q2$(nn))
+  510 pokeq2+mm,asc(mid$(q2$(nn),mm,1)):nextmm
+  520 formm=len(q2$(nn))+1to9:pokeq2+mm,0:nextmm:q2=q2+10:nextnn:poke58,255
+  530 print"{clr}{down}{down}"spc(5)"{CBM-O}{CBM-O}{CBM-O}{CBM-O}{CBM-O}{CBM-O}{CBM-O}{CBM-O}{CBM-O}{CBM-O}{CBM-O}{CBM-O}{CBM-O}{CBM-O}{CBM-O}{CBM-O}{CBM-O}{CBM-O}{CBM-O}{CBM-O}{CBM-O}{CBM-O}{CBM-O}{CBM-O}{CBM-O}"
+  540 printspc(5)"{rvon}  tastaturblockbelegung  "
+  550 printspc(5)"{rvon}{CBM-O}{CBM-O}{CBM-O}{CBM-O}{CBM-O}{CBM-O}{CBM-O}{CBM-O}{CBM-O}{CBM-O}{CBM-O}{CBM-O}{CBM-O}{CBM-O}{CBM-O}{CBM-O}{CBM-O}{CBM-O}{CBM-O}{CBM-O}{CBM-O}{CBM-O}{CBM-O}{CBM-O}{CBM-O}"
+  560 gosub670:ifq3$<>"j"then680
+  570 printspc(5)"{down}{down}bitte taste die geaendert               werden soll druecken"
+  580 q2=peek(49402):ifq2=239then580
+  590 q3=peek(49501+q2):printspc(5)"{down}taste belegt mit chr$("q3") ";:
+  600 ifq3<128andq3>32thenprint" = "chr$(q3);
+  610 ifpeek(49404)=q3thengetq3$:goto610
+  620 print:fornn=0to20:getq3$:next
+  630 printspc(5)"{down}welchen asc 2 wert soll die":input"     taste erhalten";q3$
+  640 ifval(q3$)>255thenprintspc(5)"kein asc 2 zeichen ":goto630
+  650 poke(49501+q2),val(q3$)
+  660 printspc(3)"{down}weitere{up}{left}{left}{left}{left}";:goto560
+  670 printspc(5)"{down}aenderung erwuenscht (j)";:inputq3$:return
+  680 print"{clr}{down}{down}"spc(5)"soll die geaenderte version als         maschienenprogramm"
+  690 printspc(5)"auf disk abgespeichert werden";:inputq3$:ifq3$<>"j"thenend
+  700 printspc(5)"{down}dateiname ";:inputq3$
+  710 open8,8,1,"@:"+q3$+",p,w"
+  720 print#8,chr$(0);:print#8,chr$(192);
+  730 fornn=49152to49527:print#8,chr$(peek(nn));:nextnn:close8:end
+  740 data120,169,15,141,3,221,173,2,221,9,4,141,2,221,169,219,141,0,3,169
+  750 data192,141,1,3,169,36,141,20,3,169,192,141,21,3,88,96,36,157,16,48,169
+  760 data133,141,248,192,165,215,141,247,192,173,247,192,205,248,192,240,12
+  770 data238,248,192,173,248,192,201,141,240,20,208,236,56,173,247,192,233
+  780 data133,10,170,189,254,192,168,189,253,192,32,30,171,169,254,141,250
+  790 data192,162,4,56,169,0,141,251,192,173,250,192,141,1,221,173,1,221,205
+  800 data1,221,208,248,141,249,192,24,160,4,14,249,192,144,35,136,208,248
+  810 data169,4,141,251,192,173,0,221,41,4,240,20,169,0,141,251,192,56,46,250
+  820 data192,202,208,198,169,0,141,252,192,76,49,234,142,249,192,140,250,192
+  830 data173,251,192,109,250,192,141,250,192,174,249,192,240,15,173,250,192
+  840 data105,5,141,250,192,206,249,192,208,238,240,236,174,250,192,189,93
+  850 data193,205,252,192,240,207,141,252,192,170,32,33,235,24,144,197,176
+  860 data195,120,169,15,141,3,221,173,2,221,9,4,141,2,221,169,36,141,20,3
+  870 data169,192,141,21,3,88,76,139,227,69,141,112,239,0,0,13,193,23,193,33
+  880 data193,43,193,53,193,63,193,73,193,83,193,82,85,78,0,0,0,0,0,0,0,76
+  890 data73,83,84,0,0,0,0,0,0,76,79,65,68,0,0,0,0,0,0,68,65,84,65,0,0,0,0
+  900 data0,0,86,69,82,73,70,89,0,0,0,0,83,65,86,69,0,0,0,0,0,0,67,76,79,83
+  910 data69,0,0,0,0,0,79,80,69,78,0,0,0,0,0,0,85,86,87,88,89,90,20,44,48,69
+  920 data67,49,50,51,70,13,52,53,54,46,66,55,56,57,65,68,0,run,list,load,data
+  930 dataverify,save,close,open,1,3,5,7,2,4,6,8,1,3,5,7,2,4,6,8
+
