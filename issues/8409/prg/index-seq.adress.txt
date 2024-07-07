@@ -1,0 +1,388 @@
+;index-seq.adress.prg ==0801==
+;Quelle: 1984-08-09-10.d64
+
+  100 rem ******************************
+  110 rem * adressendatei 64'er/9      *
+  120 rem * index-sequentiell          *
+  130 rem ******************************
+  140 :
+  150 :
+  160 gosub30000:rem init
+  170 close1:open1,8,2,fr$+",l,"+chr$(dl)
+  180 close3:open3,8,3,fi$+",s,r"
+  190 gosub10000:rem:diskfehler
+  200 ifa1<>0thenrun
+  210 input#3,in$:mx$=left$(in$,15)
+  220 mx=val(mx$)
+  230 :
+  240 in$(0)=in$
+  250 print"{clr}"
+  260 print:print:print
+  270 print"           information"
+  280 print:print
+  290 print"  bisherige dateigroesse: ";mx
+  300 print:print
+  310 print"       bitte warten"
+  320 i=0
+  330 i=i+1
+  340 :input#3,in$(i):print""i;mx;in$(i)
+  350 ifst<>64then330
+  360 print:print
+  370 print"  druecken sie eine taste"
+  380 poke198,0:wait198,1
+  390 rem ---------------------------
+ 1000 rem - menue                   -
+ 1010 rem ---------------------------
+ 1020 :
+ 1030 print"{clr}"
+ 1040 print:print
+ 1050 print"       adressendatei"
+ 1060 print"  relativ und sequentiell"
+ 1070 print:print
+ 1080 print"{rvon} x = programmende"
+ 1090 print
+ 1100 print"   g = anzeigen gesamte datei
+ 1110 print
+ 1120 print"   s = suchen"
+ 1130 print
+ 1140 print"   n = neue adressen eingeben"
+ 1150 print
+ 1160 print"   ! = neue datei anlegen"
+ 1170 print:print:print:print
+ 1180 print"waehlen sie ";
+ 1190 poke198,0
+ 1200 getr$:ifr$=""then1200
+ 1210 ifr$="x"thenclose1:gosub15000:close15:end
+ 1220 ifr$="g"thengosub3500:rem anz.
+ 1230 ifr$="s"thengosub2570:rem such
+ 1240 ifr$="n"thengosub1800:rem neueing.
+ 1250 ifr$="!"thengosub11000:rem neudatei
+ 1260 goto390
+ 1800 rem----------------------------
+ 1810 rem schreiben /eingabe seq/rel-
+ 1820 rem----------------------------
+ 1825 nn$=".":nv$=".":ot$=".":te$=".":pl$=".":sr$="."
+ 1830 gosub2000:rem ausgabe 1 datensatz
+ 1840 gosub6000:rem eingabe
+ 1850 gosub7000:rem verketten
+ 1860 rem bestimmung satznummer
+ 1870 lz$="    ":lz=4
+ 1880 i=0
+ 1890 i=i+1
+ 1900 :
+ 1910 ifin$(i)<>"*"then1890
+ 1920 i$=str$(i)
+ 1930 i$=mid$(i$,2)+left$(lz$,lz-len(i$)+1)
+ 1940 in$(i)=i$+nn$
+ 1950 rn$=str$(i)
+ 1960 gosub14000:rem satznr.aufteilen
+ 1970 gosub8000:rem speichern
+ 1980 ifi>=mxthenprint"{clr} datei voll":goto11500
+ 1990 return
+ 2000 rem  ------------------------------
+ 2010 rem - ausgabe  1 datensatz
+ 2020 rem ------------------------------
+ 2030 :
+ 2040 print"{clr}{down}    anzeige datensatz";rn+1
+ 2050 print:print:print:print
+ 2060 print" nachname   "nn$
+ 2070 print" vorname    "nv$
+ 2080 print" strasse    "sr$
+ 2090 print" plz        "pl$
+ 2100 print" ort        "ot$
+ 2110 print" telefon    "te$
+ 2120 print:print:print
+ 2130 return
+ 2140 :
+ 2500 rem----------------------------
+ 2510 rem    drucken
+ 2520 rem----------------------------
+ 2530 :
+ 2540 print"{up}{up} {rvon}  noch nicht definiert     ":print
+ 2550 forj=1to500:next
+ 2560 return
+ 2570 rem--------------------------
+ 3000 rem suchen seq/rel
+ 3010 rem--------------------------
+ 3020 n$=""
+ 3030 print"{clr}":print:print
+ 3040 print"     suchen"
+ 3050 print:print
+ 3060 input" nachname";n$
+ 3070 n=len(n$)
+ 3080 s1=1
+ 3090 fori=s1tomx
+ 3100 :ifin$(i)="*"then3120
+ 3110 :ifmid$(in$(i),5,n)=n$then3180
+ 3120 nexti
+ 3130 ifs1>1thenprint"{up}{rvon} suche beendet{down}":goto3150
+ 3140 print:printn$" nicht gefunden"
+ 3150 print:print"druecke taste"
+ 3160 getr$:ifr$=""then3160
+ 3170 return
+ 3180 rn$=left$(in$(i),4)
+ 3190 gosub14000:rem satznr.aufteilen
+ 3200 gosub9000:rem lesen
+ 3210 gosub5000:rem aufteilen
+ 3220 gosub2000:rem anzeigen
+ 3230 print:print
+ 3240 w$="                    waehle  "
+ 3250 print"(w)eitersuchen  (z)urueck"
+ 3260 print"(a)endern       (l)oeschen"
+ 3270 print"(d)rucken                 "
+ 3280 printw$
+ 3290 getr$:ifr$=""then3290
+ 3300 w$="                    warten  "
+ 3310 print"{up} "w$"{down}"
+ 3320 ifr$="z"then3170
+ 3330 ifr$="w"thens1=i+1:goto3090
+ 3340 ifr$="a"thengosub11430:goto3240
+ 3350 ifr$="l"thengosub3670:goto3220
+ 3360 ifr$="d"thengosub2500
+ 3370 print"{up}{up}{up}{up}{up}";:goto3240
+ 3500 rem----------------------------
+ 3510 rem- lesen gesamte datei
+ 3520 rem----------------------------
+ 3530 rn=0
+ 3540 rn=rn+1
+ 3550 :hb=int(rn/256)
+ 3560 :lb=rn-hb*256
+ 3570 :gosub9000:rem lesen
+ 3580 :ifer=50thenprint"{clr}   datei ende {down}{down}{down}":goto3620
+ 3590 :iff=2thenprint"{home}{rvon} nicht belegt:  datensatz-nr. ";rn;"{left}  ":goto3540
+ 3600 :gosub5000:rem aufteilen
+ 3610 :gosub2000:rem anzeigen
+ 3620 :print"druecke taste"
+ 3630 :getr$:ifr$=""then3630
+ 3640 :r$=""
+ 3650 ifer<>50then3540
+ 3660 return
+ 4000 rem------------------------------
+ 4010 rem loeschen  datensatz
+ 4020 rem------------------------------
+ 4030 :
+ 4040 in$(i)="*"
+ 4050 rc$="~"
+ 4060 gosub8000:rem speichern
+ 4070 nn$=".":nv$=".":ot$=".":te$=".":pl$=".":sr$="."
+ 4080 :
+ 4100 return
+ 5000 rem------------------------------
+ 5010 rem aufteilen datensatz in felder
+ 5020 rem------------------------------
+ 5030 :
+ 5050 nn$=mid$(rc$,1,15)
+ 5060 nv$=mid$(rc$,16,15)
+ 5070 sr$=mid$(rc$,31,20)
+ 5080 pl$=mid$(rc$,51,4)
+ 5090 ot$=mid$(rc$,55,15)
+ 5100 te$=mid$(rc$,70,12)
+ 5110 return
+ 6000 rem------------------------------
+ 6010 rem- eingabe neue daten         -
+ 6020 rem------------------------------
+ 6030 :
+ 6050 print"{home}"
+ 6060 print"    eingabe           "
+ 6070 print:print:print:print
+ 6080 input" nachname ";nn$:nn$=left$(nn$,15)
+ 6090 input" vorname  ";nv$:nv$=left$(nv$,15)
+ 6100 input" strasse  ";sr$:sr$=left$(sr$,20)
+ 6110 input" plz      ";pl$:pl$=left$(pl$,4)
+ 6120 input" ort      ";ot$:ot$=left$(ot$,15)
+ 6130 input" telefon  ";te$:te$=left$(te$,12)
+ 6140 print:print
+ 6150 print"  adresse ok (j/n) ?"
+ 6160 getr$:ifr$=""then6160
+ 6170 ifr$="n"then6050
+ 6175 ifr$<>"j"then6160
+ 6180 return
+ 6190 :
+ 7000 rem----------------------------
+ 7010 rem    verketten der felder   -
+ 7020 rem----------------------------
+ 7030 :
+ 7040 bl$="                    "
+ 7050 rc$=nn$+left$(bl$,15-len(nn$))
+ 7060 rc$=rc$+nv$+left$(bl$,15-len(nv$))
+ 7070 rc$=rc$+sr$+left$(bl$,20-len(sr$))
+ 7080 rc$=rc$+pl$+left$(bl$,4-len(pl$))
+ 7090 rc$=rc$+ot$+left$(bl$,15-len(ot$))
+ 7100 rc$=rc$+te$+left$(bl$,12-len(te$))
+ 7110 return
+ 7120 :
+ 8000 rem ----------------------------
+ 8010 rem - speichern daten auf disk -
+ 8020 rem ----------------------------
+ 8030 :
+ 8080 print#15,"p"+chr$(2)+chr$(lb)+chr$(hb)+chr$(1)
+ 8100 print#1,rc$
+ 8110 fs=1:rem flag fuer speichern
+ 8170 return
+ 8180 :
+ 9000 rem ----------------------------
+ 9010 rem - lesen datensatz von disk -
+ 9020 rem ----------------------------
+ 9030 f=0
+ 9040 print#15,"p"+chr$(2)+chr$(lb)+chr$(hb)+chr$(1)
+ 9050 input#15,er
+ 9060 ifer=50then9110
+ 9070 input#1,rc$
+ 9080 ifrc$<>"~"thenf=1:goto9110
+ 9090 f=2:rem freier datensatz
+ 9100 :
+ 9110 return
+10000 rem ----------------------------
+10010 rem - diskettenfehler          -
+10020 rem ----------------------------
+10030 print"{clr}"
+10040 input#15,a1,a2$,a3,a4
+10050 ifa1=0then10180
+10060 ifa1=62thengosub10200:goto10180
+10070 print
+10080 printa1,a2$;a3;a4
+10090 print:print
+10100 print"        diskettenfehler"
+10110 print:print
+10120 print"     beheben sie den fehler "
+10130 print"        und druecken sie"
+10140 print
+10150 print"            >> f <<"
+10160 getr$:ifr$=""then10160
+10170 print"{clr}"
+10180 return
+10190 :
+10200 print"{clr}"
+10210 print:print:print:print
+10220 print" die datei        "fr$
+10230 print
+10240 print" oder             "fi$
+10250 print
+10260 print" existieren nicht!"
+10270 print:print
+10280 print"  l = datendisk einlegen"
+10290 print
+10300 print"  n = datei neu anlegen"
+10310 getr$:ifr$=""then10310
+10320 ifr$="l"thenreturn
+10330 ifr$="n"thengoto11000
+10340 goto10310
+11000 rem------------------------------
+11010 rem  - neue datei anlegen
+11020 rem ---------------------------
+11030 :
+11040 print"{clr}":print
+11050 ifa1=0then11070
+11060 print" "
+11070 print"  achtung, die gesamte diskette wird  "
+11080 print"  geloescht ! "
+11090 print:print
+11100 print" n = neue datei  x = ende"
+11110 getr$:ifr$=""then11110
+11120 ifr$="x"then close1:gosub15000:close15:end
+11130 ifr$<>"n"then11110
+11140 print:print"      bitte warten"
+11150 print#15,"n:relative datei"
+11160 clr:gosub30000:rem init
+11170 close1:open1,8,2,fr$+",l,"+chr$(dl)
+11180 print"wieviele datensaetze soll die datei "
+11190 print"verwalten? ";
+11200 inputrn$:rn=abs(int(val(rn$)))
+11210 ifrn<=mxthen11180
+11220 hb=int(rn/256)
+11230 lb=rn-hb*256
+11240 print"bitte warten"
+11250 print#15,"p"+chr$(2)+chr$(lb)+chr$(hb)+chr$(1)
+11260 print#1,chr$(255)
+11270 mx=rn
+11280 mx$=str$(rn)
+11290 close1
+11300 :
+11310 print"{home}                                      "
+11320 fori=am+1tomx
+11330 :in$(i)="*"
+11340 print"{home}         "mx;i,in$(i)
+11350 nexti
+11360 fi$="@:"+fr$+"index"
+11370 close3:open3,8,3,fi$+",s,w"
+11380 in$(0)=mx$
+11390 fori=0tomx:print#3,in$(i):next
+11400 close3
+11420 run
+11430 :
+11500 rem----------------------------
+11510 rem datei erweitern
+11520 rem----------------------------
+11530 am=mx
+11540 mx=mx+50
+11550 print:print"  erweitern der datei"
+11560 print:print"  bisherige groesse= "am
+11570 print:print"  neue gr0esse     = "mx
+11580 rn=mx
+11590 goto11220
+12000 rem------------------------------
+12010 rem aendern  datensatz
+12020 rem------------------------------
+12030 gosub2000:rem anzeige datensatz
+12040 gosub6000:rem eingabe neue daten
+12050 lz$="    ":lz=4
+12060 i$=str$(i)
+12070 i$=mid$(i$,2)+left$(lz$,lz-len(i$)+1)
+12080 in$(i)=i$+nn$
+12090 gosub7000:rem verketten
+12100 gosub8000:rem speichern
+12110 return
+12120 :
+14000 rem ----------------------------
+14010 rem - aufteilen datensatznummer
+14020 rem ----------------------------
+14030 :
+14080 rn=abs(int(val(rn$)))
+14100 hb=int(rn/256)
+14110 lb=rn-hb*256
+14130 return
+14140 return
+14150 :
+15000 rem-----------------------
+15010 rem speichern seq datei  -
+15020 rem-----------------------
+15030 iffs<>1then15120
+15040 close3:open3,8,3,"@:"+fi$+",s,w"
+15050 gosub10000:rem fehlerkanal
+15060 ifa1<>0then15040
+15070 fori=0tomx
+15080 :print#3,in$(i)
+15090 :print"{home}"i;mx;in$(i)
+15100 nexti
+15110 close3
+15120 return
+15130 :
+15500 rem-----------------------
+15510 rem lesen     seq datei  -
+15520 rem-----------------------
+15530 close3:open3,8,3,"@:"+fi$+",s,r"
+15540 gosub10000:rem fehlerkanal
+15550 ifa1<>0then15530
+15560 fori=1tomx
+15570 :print#3,in$(i)
+15580 :print" "i;mx;in$(i)
+15590 nexti
+15600 close3
+15610 return
+15620 :
+30000 rem----------------------------
+30010 rem initialisierung
+30020 rem----------------------------
+30030 :
+30040 dl=82:rem datensatzlaenge
+30050 rn=1
+30060 close15:open15,8,15
+30070 bl$="                    "
+30080 bl=len(bl$)
+30090 print"{cyn}":poke53281,0:poke53280,0
+30100 fr$="adr.rel"
+30110 fi$=fr$+"index"
+30120 dimin$(2000)
+30130 return
+30140 stop
+

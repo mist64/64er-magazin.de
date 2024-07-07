@@ -1,0 +1,45 @@
+;synth.steuerzei..prg ==0801==
+;Quelle: 1984-08-09-10.d64
+
+    1 rem \ = pfund zeichen
+    2 rem ^ = pfeil nach oben
+    3 rem _ = pfeil nach links
+    4 rem @ = klammeraffe
+   10 rem        *  steuerzeichen   *
+   20 rem         *  fuer den cbm-64 *
+   30 rem          *  engin  guelen   *
+   40 rem           *  postweg     2   *
+   50 rem            *  4192 kalkar 1   *
+   60 poke53280,0:poke53281,0
+   70 dimas(3,63)
+   80 rem anfangsadresseen der
+   90 rem tastaturdekodiertabellen
+  100 data60289,60354,60419,60536
+  110 fori=0to3:reada(i):next
+  120 fori=0to3:forj=0to63
+  130 as(i,j)=peek(a(i)+j)
+  140 nextj,i
+  150 rem tastaturmatrix
+  160 datadel,return,crsr(right),f7,f1,f3,f5,crsr(down)
+  170 data3,w,a,4,z,s,e,shift(l)
+  180 data5,r,d,6,c,f,t,x
+  190 data7,y,g,8,b,h,u,v
+  200 data9,i,j,0,m,k,o,n
+  210 data+,p,l,-,.,doppelpunkt,@,komma
+  220 data\,*,;,home,shift(r),=,^,/
+  230 data1,_,ctrl,2,space,c=,q,run/stop
+  240 dimta$(64):fori=0to63:readta$(i):nexti
+  250 data-----,shift,c=   ,ctrl ,
+  260 fori=0to3:reada$(i):next
+  270 input"{clr}{yel}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rvon} ascii-kode ";as%
+  280 ifas%<0oras%>255then270
+  290 print:print:fori=0to3:forj=0to63
+  300 ifas%=as(i,j)thenprint"{wht}"a$(i),:goto320
+  310 goto340
+  320 ifleft$(ta$(j),2)=left$(a$(i),2)thenprint:goto340
+  330 print"{cyn}"ta$(j)
+  340 nextj,i
+  350 printspc(193)"{rvon}{grn} taste "
+  360 geta$:ifa$=""then360
+  370 goto270
+
