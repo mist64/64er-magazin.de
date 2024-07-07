@@ -1,0 +1,451 @@
+;sprite aid +.prg ==0801==
+;Quelle: 1984-08-09-10.d64
+
+    0 rem ...............................
+    1 rem .                             .
+    2 rem .     s p r i t e a i d +     .
+    3 rem .                             .
+    4 rem . written by andreas koelbach .
+    5 rem .            stadtwaldstr. 5  .
+    6 rem .            3550 marburg/l.  .
+    7 rem .                             .
+    8 rem ...............................
+    9 rem
+   10 v=53248:ifpeek(53280)<>246thenpoke53280,6:gosub345
+   11 cd$="{home}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}"
+   12 f=55296:c=33792:sn=32768:a=0:o$="    "
+   13 fori=0to7:poke53287+i,7:pokec+1016+i,i:next
+   14 poke650,128:pokev+28,0:pokev+23,0:pokev+29,0
+   15 deffna(a)=a+x+y*40
+   16 gosub24
+   17 pokev+33,6:print"{clr}{wht}.spriteaid+.{lblu}"
+   18 print"             {rvon}        8       6       4 {rvof}"
+   19 fori=1to20step2
+   20 print"             {rvon} {rvof}........................{rvon} {rvof}"
+   21 print"             {rvon}-{rvof}........................{rvon}-{rvof}":next
+   22 print"             {rvon} {rvof}........................{rvon} {rvof}"
+   23 print"             {rvon}        8       6       4 {rvof}":gosub172:goto68
+   24 pokev+21,0:fori=0to7:s(i)=1:sn$(i)=".":next:return
+   25 rem******* calculate dot  ***********
+   26 ca=x-14:cb=y-2:h=int(ca/8):by=sn+3*cb+h:bi=2^(7-ca+h*8)
+   27 ifzl=46thenpokeby,peek(by)and255-bi:return
+   28 pokeby,peek(by)orbi:return
+   29 rem ******** get subroutine *********
+   30 poke204,0:poke198,0:wait198,1:geta$:a=asc(a$)
+   31 ifpeek(207)then31
+   32 poke204,1:return
+   33 poke198,0:wait198,1:geta$:a=asc(a$):return
+   34 rem ********* reproduction **********
+   35 print"{home}"tab(13)"{blk}- repro -{lblu}":ca=0:bi=0
+   36 forby=sntosn+62:b=peek(by):fori=7to0step-1:ca=ca+1
+   37 ifband2^ithenpokec+93+ca,42:goto39
+   38 pokec+93+ca,46:geta$:ifa$<>""theni=0:by=sn+62
+   39 nexti:bi=bi+1:ifbi=3thenbi=0:ca=ca+16
+   40 nextby:return
+   41 rem ********* multimatrix ***********
+   42 a=0:goto44
+   43 a=14
+   44 ifmf(s)=0thenreturn
+   45 fori=55389to56213step40:forj=1to24step4:pokei+j,a:pokei+j+1,a:nextj,i:return
+   46 rem ********** clear sprite *********
+   47 pokefna(c),zl:pokefna(f),fl
+   48 printleft$(cd$,14)"{wht}sure ? {lblu}";:gosub30:ifa<>89anda<>13then52
+   49 mf(s)=1:gosub183
+   50 print"{home}{down}{down}";:fori=1to21:printtab(14)"........................":next
+   51 fori=sntosn+62:pokei,0:next
+   52 printleft$(cd$,14)"      ":gosub43:goto68
+   53 rem********* set cursor *************
+   54 pokefna(c),zl:pokefna(f),fl
+   55 ifx+r<38andx-l>13andy-u>1andy+d<23then60
+   56 iflthenx=38:goto60
+   57 ifutheny=23:goto60
+   58 ifdtheny=1:goto60
+   59 ifrthenx=13
+   60 x=x+r-l:y=y+d-u
+   61 zl=peek(fna(c)):fl=peek(fna(f))
+   62 pokefna(c),43:pokefna(f),1
+   63 r=0:l=0:d=0:u=0:return
+   64 rem ********** slip sprite **********
+   65 fori=sn+62tosnstep-1:pokei,peek(i-3):next:return
+   66 fori=sntosn+62:pokei,peek(i+3):next:return
+   67 rem ******** main menu **************
+   68 print"{home}"tab(13)"            "
+   69 printleft$(cd$,13)
+   70 print"             "
+   71 print"             "
+   72 print"             "
+   73 print"             "
+   74 print"{rvon} space {rvof} for"
+   75 print"command list "
+   76 print"             "
+   77 print"             "
+   78 print"             "
+   79 print"             ":print"            "
+   80 printleft$(cd$,24)"input no.? ";
+   81 gosub30
+   82 ifa>47anda<56then105:rem on/off
+   83 ifa=67then192:rem color
+   84 ifa=73then111:rem incr.
+   85 ifa=77thengosub183:goto80:rem multi
+   86 ifa=82thengosub35:goto68:rem repro
+   87 ifa=81then154:rem exit
+   88 ifa=133thengosub42:goto242:rem work
+   89 ifa=136thengosub65:goto80:rem slip
+   90 ifa=140thengosub66:goto80:rem slip
+   91 ifa=134thengosub103:rem back color
+   92 ifa=72thengosub24:goto411:rem handle
+   93 ifa=83then145:rem screendat
+   94 ifa=80then221:rem printer
+   95 ifa=70thengosub24:goto276:rem floppy
+   96 ifa=68then362:rem dataline
+   97 ifa=75thengosub24:goto439:rem kill
+   98 ifa=36then120:rem $
+   99 ifa=64then374:rem @
+  100 ifa=32then387:rem command list
+  101 goto80
+  102 rem ******** background *************
+  103 pokev+33,peek(v+33)+1and15:return
+  104 rem ******** sprite on/off **********
+  105 s=a-48:sn=32768+s*64
+  106 ifs(s)=0thens(s)=1:sn$(s)=".":pokev+21,peek(v+21)and255-2^s:gosub172:goto80
+  107 s(s)=0:sn$(s)=right$(str$(s),1):gosub172:pokev+2*s,56:pokev+1+2*s,92
+  108 pokev+21,peek(v+21)or2^s:iffi(s)=0then80
+  109 fi(s)=fi(s)-1
+  110 rem********* increased *************
+  111 gosub162:iffi(s)then113
+  112 fi(s)=1:pokev+23,peek(v+23)or2^s:goto80
+  113 iffi(s)>1then115
+  114 fi(s)=2:pokev+29,peek(v+29)or2^s:goto80
+  115 iffi(s)>2then117
+  116 fi(s)=3:pokev+23,peek(v+23)and255-2^s:goto80
+  117 pokev+29,peek(v+29)and255-2^s
+  118 gosub172:fi(s)=0:goto80
+  119 rem ********* directory ************
+  120 gosub24:print"{clr}{wht}.directory.{lblu}{down}":i=0
+  121 open2,8,15:open1,8,0,"$"
+  122 get#1,a$,b$
+  123 get#1,a$,b$
+  124 get#1,a$,b$:i=i+1
+  125 b=0:ifa$<>""thenb=asc(a$)
+  126 ifb$<>""thenb=b+asc(b$)*256
+  127 printmid$(str$(b),2);tab(5);
+  128 get#1,b$:ifstthen138
+  129 ifb$<>chr$(34)then128
+  130 get#1,b$:ifb$<>chr$(34)thenprintb$;:goto130
+  131 get#1,b$:ifb$=chr$(32)then131
+  132 printtab(21);:c$=""
+  133 c$=c$+b$:get#1,b$:ifb$<>""then133
+  134 print"  "left$(c$,5)
+  135 gett$:ift$="{f1}"then142
+  136 ifi=20then139
+  137 ifst=0then123
+  138 print"{rvon} blocks free {rvof}":close1:close2:gosub141:goto16
+  139 print"{down}    press any key ...":gosub141
+  140 print"{clr}{wht}.directory.{lblu}{down}":i=0:goto123
+  141 gett$:ift$=""then141
+  142 ift$="{f1}"thenclose1:close2:goto16
+  143 return
+  144 rem ******* give out decimal *******
+  145 gosub24:gosub156:print"{down}{blk} adr.";sn;"{lblu}":fori=sntosn+62step3
+  146 a1$=str$(peek(i)):a2$=str$(peek(i+1)):a3$=str$(peek(i+2))
+  147 a1$=left$(o$,4-len(a1$))+mid$(a1$,1,4)
+  148 a2$=left$(o$,4-len(a2$))+mid$(a2$,1,4)
+  149 a3$=left$(o$,4-len(a3$))+mid$(a3$,1,4)
+  150 print"{left}";a1$;a2$;a3$:next
+  151 gosub159:poke198,0:wait198,1
+  152 gosub156:gosub172:goto68
+  153 rem ************* exit *************
+  154 print"{home}{down}";:end
+  155 rem ****** clear display area ******
+  156 print"{home}"
+  157 fori=1to23:print"             ":next:print"{home}";
+  158 rem ****** screen line msb *********
+  159 fori=0to6:poke217+i,132:poke230+i,134:next
+  160 fori=0to5:poke224+i,133:poke237+i,135:next:return
+  161 rem*********************************
+  162 print"{home}{down}{down}{down}{down}{rght}{rght}{rght}U{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}I"
+  163 print"{rght}{rght}{rght}B      B"
+  164 print"{rght}{rght}{rght}B      B"
+  165 print"{rght}{rght}{rght}B      B"
+  166 print"{rght}{rght}{rght}B      B"
+  167 print"{rght}{rght}{rght}B      B"
+  168 print"{rght}{rght}{rght}B      B"
+  169 print"{rght}{rght}{rght}J{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}K"
+  170 return
+  171 rem*********************************
+  172 print"{home}{down}{down}  ";:fori=0to7:ifi=sthenprint"{wht}";
+  173 printsn$(i)"{lblu}";:next:print
+  174 print"{down}   U{SHIFT-*}{SHIFT-*}{SHIFT-*}I   "
+  175 print"   B   B   "
+  176 print"   B   B   "
+  177 print"   B   B   "
+  178 print"   J{SHIFT-*}{SHIFT-*}{SHIFT-*}K   "
+  179 print"           "
+  180 print"           "
+  181 print"           ":return
+  182 rem ********** multi mode **********
+  183 ifmf(s)then185
+  184 pokev+28,peek(v+28)or2^s:mf(s)=1:goto186
+  185 pokev+28,peek(v+28)and255-2^s:mf(s)=0
+  186 printleft$(cd$,13);
+  187 print"mlt:";
+  188 fori=0to7:ifmf(i)thenprintright$(str$(i),1);:goto190
+  189 print".";
+  190 next:print:return
+  191 rem ********** set color ***********
+  192 a=peek(v+37):c$(0)=str$(a-240)
+  193 a=peek(v+38):c$(1)=str$(a-240)
+  194 a=peek(v+39+s):c$(2)=str$(a-240)
+  195 printleft$(cd$,16);
+  196 print"colors  reg. "
+  197 print"{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}  {CBM-T}{CBM-T}{CBM-T}{CBM-T} "
+  198 print"         37  "
+  199 print"             "
+  200 print"         38  "
+  201 print"             "
+  202 print"        {rvon}"str$(39+s)" {rvof} "
+  203 print"             "
+  204 print"             "
+  205 printleft$(cd$,18)" "c$(0)" "
+  206 print"{down}{rght}"c$(1)" ":print"{down}{rght}"c$(2)" "
+  207 printleft$(cd$,16)
+  208 i=0:gosub212:pokev+37,b
+  209 i=1:gosub212:pokev+38,b
+  210 i=2:gosub212:pokev+39+s,b
+  211 goto68
+  212 print"{down}  ";:b$=""
+  213 gosub30:ifa=13then217
+  214 ifa<48ora>57then213
+  215 b$=b$+a$:printa$;:iflen(b$)=2then218
+  216 goto213
+  217 ifb$=""thenprint:goto219
+  218 c$(i)=b$:print" "
+  219 b=val(left$(c$(i),3)):return
+  220 rem ********** printer out *********
+  221 printleft$(cd$,25);
+  222 print"name (20chr.) ?                     {up}":printtab(16);:b$=""
+  223 gosub30:goto225
+  224 gosub33
+  225 ifa=20andb$<>""thenb$=left$(b$,len(b$)-1):printchr$(20);:goto224
+  226 ifa=133then16
+  227 ifa=13then231
+  228 ifa=<32ora>127then224
+  229 b$=b$+a$:iflen(b$)>20then231
+  230 printa$" {left}";:goto224
+  231 printleft$(cd$,11)tab(17)"  {wht}printer on ?{lblu}   {left}{left}";
+  232 gosub30
+  233 ifa=78then221
+  234 ifa=133then16
+  235 ifa<>13anda<>89then231
+  236 open1,4:cmd1:printb$
+  237 fori=sntosn+62step3:
+  238 printpeek(i);peek(i+1);peek(i+2)
+  239 next:print
+  240 close1:goto16
+  241 rem ********* work routine *********
+  242 print"{home}"tab(14)"{blk}- work -{lblu}"
+  243 printleft$(cd$,15);
+  244 print"             "
+  245 print"dot(*)='*'   "
+  246 print"       '@'   "
+  247 print"spc(.)='='   "
+  248 print"       ';'   "
+  249 print"             "
+  250 print"{blk}menu  ='f1'  {lblu}"
+  251 print"             "
+  252 print"{rvon}  use'crsr' "
+  253 print"{rvon}  to move ! {rvof}{home}";
+  254 x=0:y=0:d=1:r=14:zl=46:fl=1
+  255 gosub54
+  256 poke198,0:wait198,1:geta$:a=asc(a$)
+  257 ifa=145thenu=1:goto255
+  258 ifa=157thenl=1:goto255
+  259 ifa=17thend=1:goto255
+  260 ifa=29thenr=1:goto255
+  261 ifpeek(654)then269
+  262 ifa=42thenr=1:zl=42:gosub26:goto255
+  263 ifa=64thend=1:zl=42:gosub26:goto255
+  264 ifa=59thend=1:zl=46:gosub26:goto255
+  265 ifa=61thenr=1:zl=46:gosub26:goto255
+  266 ifa=13thenl=x-14:goto255
+  267 ifa=133thenpokefna(c),zl:pokefna(f),fl:gosub43:goto68
+  268 ifa=19thenl=x-14:u=y-2:goto255
+  269 ifa=192thenl=1:zl=42:gosub26:goto255
+  270 ifa=93thenu=1:zl=46:gosub26:goto255
+  271 ifa=186thenu=1:zl=42:gosub26:goto255
+  272 ifa=61thenl=1:zl=46:gosub26:goto255
+  273 ifa=147then47
+  274 goto256
+  275 rem ******** floppy ****************
+  276 pokev+21,0:print"{clr}"left$(cd$,25)"{blk}          - 'f1'=exit -{lblu}";
+  277 fori=0to7:sp(i)=0:next
+  278 print"{home}{wht}.floppy disk controller.{lblu}"
+  279 print"{down}{yel}r{lblu}ead or {yel}w{lblu}rite ?"
+  280 gosub33
+  281 ifa=133then16
+  282 ifa$="r"thenm=0:b$="{yel}read{lblu}":c$="":b=7:goto285
+  283 ifa$="w"thenm=1:b$="{yel}write{lblu}":c$="s":b=0:goto285
+  284 goto278
+  285 print"{up}mode :         {up}":printtab(8)b$:ifm=0thenb$="replace"
+  286 print"{down}input sprite"c$" you want to "b$:b$="":print"{down}> ";
+  287 gosub33
+  288 ifa=133then276
+  289 ifa=13then292
+  290 ifa<48ora>55then287
+  291 a=val(a$):printa;:sp(a)=1:b=b+1:ifb<8then287
+  292 print" <{down}"
+  293 f$="":print"filename : ";
+  294 gosub33:ifa=20andlen(f$)>0thenf$=left$(f$,len(f$)-1):printa$;
+  295 ifa=13then300
+  296 ifa<32ora>127then294
+  297 printa$;:f$=f$+a$
+  298 iflen(f$)>16thenprint"{del}";:goto300
+  299 goto294
+  300 iff$<>""thenfi$=f$:goto302
+  301 printfi$;:iffi$=""thenfi$="data"
+  302 fori=0to7:fi(i)=0:next:pokev+23,0:pokev+29,0:x=0:y=0:ifmthen321
+  303 rem ********** read ****************
+  304 gosub339:gosub33:ifa<>13anda<>89then276
+  305 b$="{lred}>>> reading <<<{lblu}":gosub343:no=0
+  306 rem ********** input ***************
+  307 open15,8,15:open2,8,2,fi$+",s,r"
+  308 input#15,a,b$:ifathengosub318:goto276
+  309 printtab(3)"{down}no.:"no:no=no+1
+  310 fori=adtoad+62:input#2,b
+  311 pokei,b:nexti
+  312 ifst=64thenb$="{wht} end of data ! {lblu}":gosub343:gosub33:goto316
+  313 b$="  {wht}take over ?  {lblu}":gosub343
+  314 gosub33:ifa=133then316
+  315 ifa<>13anda<>89thenb$="{lred}>>> reading <<<{lblu}":gosub343:goto309
+  316 pokev+21,0:close2:close15:goto276
+  317 rem ********** errors **************
+  318 printleft$(cd$,25)tab(3)b$" - press any key";:gosub33
+  319 close2:close15:return
+  320 rem *********** write **************
+  321 fork=0to7:ifsp(k)=0then325
+  322 gosub339:gosub33:ifa<>13anda<>89thensp(k)=0:goto324
+  323 sp(k)=2:x=1
+  324 b$="         ":gosub343
+  325 nextk:ifx=0then276
+  326 open15,8,15:open2,8,2,fi$+",s,w":x=0
+  327 input#15,a,b$:ifa=63thenclose2:open2,8,2,fi$+",s,a":x=1
+  328 input#15,a,b$:ifathengosub318:goto276
+  329 fork=0to7:s=k:ifsp(k)=0then336
+  330 geta$:ifa$="{f1}"thenk=7:goto336
+  331 sp(k)=1:y=1:gosub339:y=0
+  332 b$="{grn}<<< writing >>>{lblu}":gosub343
+  333 ifxthenb$="{down}    {lred}append !{lblu}":gosub343
+  334 forj=adtoad+62:b=peek(j):print#2,b:nextj
+  335 b$="{down}{down}                ":gosub343
+  336 sp(s)=0:nextk
+  337 close2:close15:goto276
+  338 rem ********** ask ok ? ************
+  339 fori=0to7:s=i:ad=32768+64*s:ifsp(i)=1theni=7
+  340 nexti:pokev+2*s,56:pokev+2*s+1,150:pokev+21,2^s
+  341 printleft$(cd$,12)"    {rvon}"s"{left} {rvof}     ":ifythenreturn
+  342 b$="{wht}   o.k. ?      {lblu}"
+  343 printleft$(cd$,16)"             "b$:return
+  344 rem *********** intro *************
+  345 poke56576,5:poke648,132:poke56,124:rem screen nach 33792 - characterrom!!
+  346 print"{clr}{down}{down}{down}{down}{down}{down}     {wht}.............................."
+  347 print"     .                            ."
+  348 print"     .    s p r i t e a i d +     ."
+  349 print"     .                            ."
+  350 print"     .               {CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}  ."
+  351 print"     .  written  by  {rvon} m a t a n {rvof}  ."
+  352 print"     .      marburg (1984)        ."
+  353 print"     .                            ."
+  354 print"     .    {lred} no copyrights !!  {wht}     ."
+  355 print"     .                            ."
+  356 print"     ..............................{lblu}"
+  357 fori=32768to33344:pokei,0:next
+  358 print"{home}{down}{down}{down}{down}{down}{down}{down}{down}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}";:fori=1to19:print" ";:forii=1to100:nextii,i
+  359 print"{home}{down}{down}{down}{down}{down}{down}{down}{down}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{wht}press any key.{lblu}"
+  360 goto33
+  361 rem ******** data lines ************
+  362 pokev+21,0:print"{clr}{wht}.data generator.{lblu}"
+  363 print"{down}begin with line (*10000) ? ";:gosub30
+  364 ifa<49ora>54then16
+  365 print"{clr}"left$(cd$,24)"{wht}  generate data lines -  w a i t !"
+  366 zn=(a-48)*10000:t=0:poke646,peek(v+33):fori=1to2000:next
+  367 ift=8then10
+  368 ad=32768+64*t:print"{clr}"zn"rem sprite"t
+  369 forii=0to6:zn=zn+1:printzn"{left}data";:fori=0to8
+  370 printmid$(str$(peek(ad+i+ii*9)),2,3)",";:nexti
+  371 printchr$(20):nextii
+  372 print"zn="zn+1":t="t+1":goto367";:goto447
+  373 rem******* send disk command *******
+  374 gosub24:print"{clr}{wht}.send disk command.{lblu}{down}{down}":i=0
+  375 i=i+1:printleft$(cd$,2*i+1)"=>";:c$=""
+  376 gosub33:ifa=20andlen(c$)>0thenprinta$;:c$=left$(c$,len(c$)-1):goto376
+  377 ifa=13then382
+  378 ifa=133then16
+  379 ifa<32ora>127then376
+  380 c$=c$+a$:printa$;
+  381 goto376
+  382 open1,8,15,c$:input#1,a,b$,c$:ifa=1thenprintleft$(cd$,25)c$;
+  383 gosub318:close1:ifa=133then16
+  384 printleft$(cd$,25)"                                       ";:ifi<8then375
+  385 goto374
+  386 rem ******* command list ***********
+  387 gosub24:gosub156
+  388 print"{home}{down}{wht}command list{lblu}"left$(cd$,3)
+  389 print"{rvon}sprites {rvof}     "
+  390 print"{rvon}on/off  {rvof}=0-7 "
+  391 print"incr.   = i  "
+  392 print"multi   = m  "
+  393 print"color   = c  "
+  394 print"repro   = r  "
+  395 print"{rvon} work {rvof}  = f1 "
+  396 print"slip dwn= f7 "
+  397 print"slip up = f8 "
+  398 print"backcol.= f3 "
+  399 print"handle  = h  "
+  400 print"screen  = s  "
+  401 print"printer = p  "
+  402 print"dataline= d  "
+  403 print"{down}floppy  = f  "
+  404 print"show $  = $  "
+  405 print"disk-cmd= @  {down}"
+  407 print"kill    = k  "
+  408 print"quit    = q  "
+  409 gosub33:gosub156:gosub172:goto68
+  410 rem ********* handle ***************
+  411 pokev+21,0:print"{clr}{wht}.handle sprites.{lblu}":z=1:fori=0to7:s(i)=0:next
+  412 print"{down}0-3  = select sprite"
+  413 print"'f7' = fast move."
+  414 print"{down}use 'crsr' to move !"
+  415 gosub33:print"{clr}{wht}      : x=          y=":goto418
+  416 print"{home}"tab(10)peek(x)+255*sgn(peek(v+16)and2^s)"{left}  "tab(22)peek(y)"{left}  "
+  417 gosub33
+  418 ifa<48ora>55then424
+  419 s=val(a$):print"{home}no."s
+  420 x=v+2*s:y=v+2*s+1
+  421 ifs(s)then423
+  422 pokev+21,peek(v+21)or2^s:s(s)=1:goto416
+  423 pokev+21,peek(v+21)and255-2^s:s(s)=0:goto416
+  424 ifa=134thengosub103:goto416
+  425 ifa=17thenpokey,peek(y)+zand255:goto416
+  426 ifa=145thenpokey,peek(y)-zand255:goto416
+  427 ifa=29then434
+  428 ifa=157then436
+  429 ifa<>136then432
+  430 ifz=1thenz=5:goto416
+  431 z=1:goto416
+  432 ifa<>133then416
+  433 pokev+21,0:pokev+16,0:goto16
+  434 ifpeek(x)>=256-zthenpokev+16,peek(v+16)or2^s:pokex,0
+  435 pokex,peek(x)+zand255:goto416
+  436 ifpeek(x)<=0+z-1thenpokev+16,peek(v+16)and255-2^s:pokex,255
+  437 pokex,peek(x)-zand255:goto416
+  438 rem *********** kill ***************
+  439 print"{clr}{wht}.clear program.{lblu}"
+  440 print"{down}are you sure ? ";:gosub30
+  441 ifa<>89anda<>13then16
+  442 print"{clr}"left$(cd$,24)"{wht}      clear program except data !!"
+  443 poke646,peek(v+33):t=0
+  444 print"{home}";:fori=ttot+7:printi:next
+  445 ift>439thenprint"poke 646,14:end":goto447
+  446 print"t="i":goto444"
+  447 poke631,19:fori=1to9:poke631+i,13:next:poke198,10:end
+
