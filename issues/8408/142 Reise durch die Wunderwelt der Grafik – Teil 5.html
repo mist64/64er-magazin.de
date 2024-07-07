@@ -17,7 +17,7 @@
 
 <body>
     <article>
-        <p>Reise durch die Wunderwelt der Grafik – Teil 5</p>
+        <h1>Reise durch die Wunderwelt der Grafik – Teil 5</h1>
 
         <p class="intro">Nachdem wir sie in den ersten vier Folgen kaum erwähnt haben, sind sie heute dran: die Sprites. Sie müssen einfach in jeder Reise durch die Grafik unseres C 64 auftauchen.</p>
 
@@ -106,7 +106,7 @@
         <p>XXXXXX01 Ergebnis: Bit 1 = 0, Sprite 1 ausgeschaltet,<br>
             Bit 0 = 1, Sprite 0 eingeschaltet.</p>
 
-        <p>Allgemein kann man einzelne Sprites also abschalten mit POKE 53269, PEEK(53269) AND (255-2tN), wobei wieder N die Sprite-Nummer ist.</p>
+        <p>Allgemein kann man einzelne Sprites also abschalten mit POKE 53269, PEEK(53269) AND (255-2↑N), wobei wieder N die Sprite-Nummer ist.</p>
 
         <p>Ach, Ihre Geduld wird schon auf eine harte Probe gestellt. Wenn Sie nämlich bis jetzt alle Programmzeilen brav eingegeben und gestartet haben, sehen Sie immer noch kein Sprite! Aber Sie müssen dem MOB noch sagen, wo er erscheinen soll!</p>
 
@@ -133,7 +133,7 @@
 
         <p>Um nun also endlich unser Sprite Nummer 0 sichtbar zu machen, geben wir ein:<br>
             100 POKE 53248,128:POKE 53249,120<br>
-            So! Jetzt tippen Sie ein RUN RETURN) und endlich: Da ist unser Pentagramm. Gefällt es Ihnen? Sprite 1, das zweite Pentagramm, soll am rechten Bildschirmrand auftauchen, also ungefähr bei X = 266 und bei Y = 130. Deswegen müßten wir aber in die entsprechende X-Positions-Speicherstelle für Sprite 1 eine Zahl größer als 255 einPOKEn! Wenn Sie’s versuchen, meldet der Computer natürlich einen ILLEGAL QUANTITY ERROR. Geht also nicht! Anscheinend war das bisher noch nicht verzwickt genug. Jetzt müssen wir nämlich mal wieder das Hexadezimalsystem bemühen (die Sechzehnfingerlinge, erinnern Sie sich: Folge 2).</p>
+            So! Jetzt tippen Sie ein RUN (RETURN) und endlich: Da ist unser Pentagramm. Gefällt es Ihnen? Sprite 1, das zweite Pentagramm, soll am rechten Bildschirmrand auftauchen, also ungefähr bei X = 266 und bei Y = 130. Deswegen müßten wir aber in die entsprechende X-Positions-Speicherstelle für Sprite 1 eine Zahl größer als 255 einPOKEn! Wenn Sie’s versuchen, meldet der Computer natürlich einen ILLEGAL QUANTITY ERROR. Geht also nicht! Anscheinend war das bisher noch nicht verzwickt genug. Jetzt müssen wir nämlich mal wieder das Hexadezimalsystem bemühen (die Sechzehnfingerlinge, erinnern Sie sich: Folge 2).</p>
 
         <p>Dezimal 266 ist hexadezimal $010A. Jetzt zerteilen wir diese Zahl wieder in das LSB und das MSB:</p>
 
@@ -159,7 +159,7 @@
 
         <p>Rechnen Sie mal nach: Das MSB kann auch bei der höchsten X-Position nie größer als 1 werden. Es gibt also nur zwei Fälle: Ist die X-Position größer als 256, dann ist das MSB 1, sonst ist es 0.</p>
 
-        <p>Deswegen speichert man die MSBs aller 8 Sprites in nur einem Byte. Ebenso wie beim Kontrollregister für das An- und Ausschalten gehört auch hier zu jedem Sprite ein Bit, also: Bit 1 gehört zu Sprite 1 und so weiter. Wenn nun also die X-Koordinate von Sprite 1 266 ist, dann ergibt die Aufspaltung, wie oben gezeigt, MSB = 1 und LSB = 10. Das Register für die MSBs ist Speicherstelle 53264. Die 10 (das LSB) wird also in die normale Speicherstelle für die X-Position gePOKEt. Das MSB ( = l ) ist also Bit 1 (weil Sprite 1) von Speicherstelle 53264. Hier ist also wieder eine OR-Operation nötig. Die Y-Position wird ganz normal eingegeben. Es ergibt sich also die Programmzeile:<br>
+        <p>Deswegen speichert man die MSBs aller 8 Sprites in nur einem Byte. Ebenso wie beim Kontrollregister für das An- und Ausschalten gehört auch hier zu jedem Sprite ein Bit, also: Bit 1 gehört zu Sprite 1 und so weiter. Wenn nun also die X-Koordinate von Sprite 1 266 ist, dann ergibt die Aufspaltung, wie oben gezeigt, MSB = 1 und LSB = 10. Das Register für die MSBs ist Speicherstelle 53264. Die 10 (das LSB) wird also in die normale Speicherstelle für die X-Position gePOKEt. Das MSB ( = 1 ) ist also Bit 1 (weil Sprite 1) von Speicherstelle 53264. Hier ist also wieder eine OR-Operation nötig. Die Y-Position wird ganz normal eingegeben. Es ergibt sich also die Programmzeile:<br>
             110 POKE 53250,10:POKE 53264, PEEK(53264)OR(2↑l):<br>
             POKE 53251,130</p>
 
@@ -244,7 +244,7 @@
         <p>Will man nur Sprite Nummer N umschalten, dann verwendet man wie gehabt: POKE 53276, PEEK(53276)OR(2↑N).</p>
 
         <p>Das Zurückschalten in den Normalmodus geschieht dann durch Löschen der entsprechenden Bits:<br>
-            РОКЕ 53276,PEEK(53276)AND (255-21N).</p>
+            POKE 53276,PEEK(53276)AND (255-21N).</p>
 
         <p>Auch hier habe ich das Programm so gebaut, daß man durch Eingabe von -1 und irgendwelchen drei anderen Zahlen aussteigen kann. Im Verlauf des Probierens werden Sie bestimmt gemerkt haben, daß man Sprites, die für den Mehrfarben-Modus gedacht sind, speziell konstruieren sollte unter Berücksichtigung der Bit-Paar-Zusammenstellungen. Unser Drudenfuß gefällt mir im Normal-Modus jedenfalls besser.</p>
 
