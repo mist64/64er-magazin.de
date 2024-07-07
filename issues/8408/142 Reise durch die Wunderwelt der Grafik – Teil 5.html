@@ -41,12 +41,16 @@
         <p>Den so gebildeten Block verwaltet es in genau dieser Anordnung als ein Sprite. Deswegen müssen wir uns nun die Mühe machen, unser Pentagramm in so ein Bit-Raster einzufügen. Das ist in Bild 3 geschehen.</p>
 
         <figure>
-            <!-- TODO -->
             <img src="142-3.png" alt="">
             <figcaption>Bild 3. Das Pentagramm im Sprite-Bitraster</figcaption>
         </figure>
 
         <p>Nun muß dieses Bild in einen Zahlencode übersetzt werden. Überall dort, wo ein Bitfeld ausgefüllt ist, steht bei der Binärzahl eine 1, sonst eine Null. Demnach ergeben sich die Kennzahlen in der Tabelle 1.</p>
+
+        <figure>
+            <!-- TODO -->
+            <figcaption>Tabelle 1. Kennzahlen für die Berechnung von Sprites</figcaption>
+        </figure>
 
         <p>Dieser Wust an Zahlen legt also unser Sprite fest. Diese doch recht aufwendige Rechnerei und Planerei ist, wenn sie aufmerkamer Leser von Computerliteratur sind — meist nicht mehr nötig. Obwohl es sicher gut ist, das Planen eines MOBs auch von Hand zu beherrschen (wie wir jetzt!), kann man sich die Arbeit doch mächtig erleichtern durch Eintippen eines der vielen Sprite-Editor-Programme, die es in fast allen Fachzeitschriften wie Sand am Meer gibt. Weil hier nicht der 1001. Sprite-Editor abgedruckt werden soll, dient das anliegende Programm »Sprity« anderen Zwecken. (Ein nettes kurzes Listing von H. Kunz finden Sie zum Beispiel in der Zeitschrift Computer persönlich Nr. 21, 1983 auf Seite 120). Jetzt müssen wir noch dafür sorgen, daß der C 64 diese Zahlen irgendwo zugreifbar hat, mit anderen Worten: Sie müssen in den Speicher gePOKEd werden. Im allgemeinen verwendet man dazu eine kleine FOR-NEXT-Schleife in der die in DATA-Zeilen abgelegten Zahlen gelesen und eingePOKEd werden. Wohin packt man die Kennzahlen? Im Prinzip kann man sie überall — wo sie nicht gerade lebenswichtige Computerfunktionen oder Basicprogramme stören — unterbringen. Es gibt lediglich zwei Dinge, die zu beachten sind:<br>
             a) Die Startadresse muß durch 64 glatt teilbar sein. (Zum Beispiel 896 = 14 mal 64 etc.)<br>
@@ -112,7 +116,6 @@
         <p>Vor den Erfolg haben auch die Commodore-Softwareplaner den Schweiß gesetzt! Denn nicht genug damit, daß wir den Bildschirm schon im Normalmodus in X-Richtung, in Y-Richtung in 25 Positionen und im Bit-Map-Modus in X-Richtung in 320, in Y-Richtung in 200 Positionen aufgeteilt finden, jetzt kommt noch eine Einteilung, die sogar noch über den sichtbaren Bildschirm hinausreicht! In Bild 4 sehen wir diese Aufteilung in 512 horizontale und 256 vertikale Koordinaten.</p>
 
         <figure>
-            <!-- TODO -->
             <img src="142-4.png" alt="">
             <figcaption>Bild 4. Sprite-Koordinatensystem</figcaption>
         </figure>
@@ -186,11 +189,21 @@
 
         <p>Wenn Sie jetzt starten, können Sie alle möglichen Positionen für X und Y eingeben. Versuchen Sie doch mal X = 265, Y = 130. Da ist auch für die Schwarzweiß-Seher (ich bin auch einer) unser Sprite Nummer 1 zu erkennen. Warum, dazu kommen wir noch. Wenn Sie genug ausprobiert haben, dann geben Sie für X jetzt -1 und irgendeinen Y-Wert ein und das Programm ist beendet. Vermutlich haben auch Sie festgestellt, daß man unseren Testsprite ganz allmählich über den sichtbaren Bildschirmrand hinauswandern lassen kann. Es ergeben sich so die Grenzkoordinaten in Tabelle 2:</p>
 
+        <figure>
+            <!-- TODO -->
+            <figcaption>Tabelle 2. Grenzposition normaler Sprites</figcaption>
+        </figure>
+
         <p>Die in der Tabelle 2 angegebenen Werte gelten allerdings nur für die normalen Sprites. Also gibt es auch noch anormale Sprites? Ja, die gibt’s auch. Aber wir wollen der Reihe nach vorgehen. Wir können jetzt Sprites entwerfen, Sprite-Zeiger setzen, MOBs an- und wieder abschalten und sie an die richtige Stelle setzen.</p>
 
         <h2>Mal wieder Farbe: Diesmal die von Sprites.</h2>
 
         <p>Eines haben wir bisher total vergessen: Welche Farbe soll unser Sprite haben und wie geben wir sie ihm? Auch hierfür gibt es natürlich wieder Register, die Sprite-Farben-Register und zwar die in der Tabelle 3.</p>
+
+        <figure>
+            <!-- TODO -->
+            <figcaption>Tabelle 3. Zuordnung der Sprite-Farben-Register</figcaption>
+        </figure>
 
         <p>In diese Register POKEt man die Farbe (Kennzahlen 0 bis 15) ein, in der der MOB erscheinen soll. Testen Sie mal: Ändern wir Zeile 130. Dort soll in der IF-THEN-Anweisung nach THEN anstelle von END jetzt stehen 180. Diese Zeile 180 schaltet das vorerst ausgediente Sprite 2 aus:<br>
             180 POKE 53269,PEEK(53269) AND (255-2↑2)</p>
@@ -206,12 +219,16 @@
 
         <p>Jetzt können Sie, bis Sie schließlich für F1 mal -1 eingeben, allerlei Farben durchprobieren. Wir erkennen nun auch, daß bislang Sprite 1 für Schwarzweiß-Seher nicht erkennbar war, weil seine Farbe keinen Kontrast zur Hintergrundfarbe gebildet hat.</p>
 
-        <p>Wem&rsquo;s noch nicht bunt genug war bisher, der hat auch hier bei den Sprites die Möglichkeit, den Mehrfarben-Modus zu verwenden. Während im bisher gebrauchten Modus jedes Sprite-Definitions-Bit entweder 0 (= Hintergrundfarbe oder 1 (Farbe des zum Sprite gehörigen Sprite-Farb-Registers) sein konnte, zählen - wie auch sonst im Mehrfarbenmodus - wieder Bit-Paare. Dabei stammt dann die jeweilige Farbe aus den in Tabelle 4 an-gegebenen Registern.</p>
+        <p>Wem&rsquo;s noch nicht bunt genug war bisher, der hat auch hier bei den Sprites die Möglichkeit, den Mehrfarben-Modus zu verwenden. Während im bisher gebrauchten Modus jedes Sprite-Definitions-Bit entweder 0 (= Hintergrundfarbe oder 1 (Farbe des zum Sprite gehörigen Sprite-Farb-Registers) sein konnte, zählen - wie auch sonst im Mehrfarbenmodus - wieder Bit-Paare. Dabei stammt dann die jeweilige Farbe aus den in Tabelle 4 angegebenen Registern.</p>
+
+        <figure>
+            <!-- TODO -->
+            <figcaption>Tabelle 4. Herkunft der Bitpaar-Farben im Multicolor-Modus</figcaption>
+        </figure>
 
         <p>Unser Drudenfuß sieht somit dann aus wie in Bild 5 gezeigt.</p>
 
         <figure>
-            <!-- TODO -->
             <img src="142-5.png" alt="">
             <figcaption>Bild 5. Das Pentagramm im Modemfarbenmodus</figcaption>
         </figure>
@@ -251,12 +268,16 @@
 
         <p>Wenn wir nun das Programm mit RUN (RETURN) starten, taucht unser Test-Sprite in vergrößterter Form auf und wir können es wieder an verschiedene Orte auf dem Bildschirm packen. Für dieses in beide Richtungen verdoppelte MOB findet man dann die Grenzwerte in Tabelle 5.</p>
 
+        <figure>
+            <!-- TODO -->
+            <figcaption>Tabelle 5. Grenzposition doppelt gedehnter Sprites</figcaption>
+        </figure>
+
         <p>Will man also ein solchermaßen vergrößertes Sprite langsam aus dem Bildschirm ziehen lassen, dann ist das nicht nach links möglich, weil selbst bei X = 0 der Sprite noch teilweise sichtbar ist.</p>
 
         <p>Jetzt wissen wir eigentlich fast alles, was mit dem einzelnen Sprite zusammenhängt. Wenn Sie ein sich veränderndes Sprite darstellen wollen, so ist das zum Beispiel möglich, indem alle zu zeigenden Bewegungsphasen als Spritemuster im Speicher abgelegt werden und dann per Programm der Sprite-Zeiger auf den jeweils aktuellen Bewegungszustand umgeschaltet wird. So könnte man wie in Bild 6 die Abläufe A bis G im Speicher ablegen und zum Beispiel den Sprite-Zeiger für Sprite 3 zuerst auf das Muster A, dann nach entsprechender Verzögerung auf Muster B, dann C, D, E, F, G und schließlich wieder A richten. Wenn die einzelnen Spritemuster gut gemacht und die Verzögerungsschleifen richtig abgestimmt sind, kann so eine Art Zeichentrickfilm ablaufen, der nun auch noch durch die anderen bisher gelernten Sprite-Eigenheiten (Vergrößern, Position, Farbe etc.) veränderbar ist. Wie Sie unschwer erkennen, sind Ihrer Phantasie keine Grenzen gesetzt, und ich würde mich freuen, von Ihnen mal so einen witzigen Trickablauf sehen zu können. Auf einem ähnlichen Prinzip basiert auch ein Programm von Hans Grigat in Happy-Computer, Ausgabe Nummer 11 (1983), Seite 99 ff. Überhaupt lohnt es sich, sich dieses Programm mal genau anzusehen, weil hier die anfangs erwähnte Möglichkeit der Sprite-Daten-Verschiebung genutzt wurde.</p>
 
         <figure>
-            <!-- TODO -->
             <img src="142-6.png" alt="">
             <figcaption>Bild 6. Ein Trickfilm-Bewegungsablauf</figcaption>
         </figure>
@@ -266,7 +287,6 @@
         <p>Wir wollen uns jetzt noch um die Beziehung von Sprites zu ihrer Umwelt (also zu anderen Sprites und/oder zu Zeichen auf dem Bildschirm) kümmern. Sie erinnern sich vielleicht an unseren Versuch, unser kleines Test-Sprite über den Bildschirm zu bewegen und an ein Ergebnis davon, nämlich, daß auch Schwarzweiß-Sehern plötzlich bei Eingabe der abgedruckten Bildschirmposition das Sprite Nummer 1 sichtbar war. Wenn also — wie in diesem Fall — zwei Sprites sich überdecken, welches von beiden wird dann gezeigt? Siehe dazu das Bild 7, auf dem die Situation abgebildet ist. Wir sehen da: an den Stellen, wo Sprite 1 Bits mit dem Wert 0 vorliegen hat, ist Sprite 2 zu sehen. Wo aber der Bitwert des Sprite 1 gleich 1 ist, wird Sprite 2 durch Sprite 1 verdeckt. Das MOB 1 hat eine höhere Priorität als MOB 2. Der VIC-II-Chip organisiert die Prioritäten von Sprites untereinander also in folgender Weise: Höchste Priorität hat Sprite 0, dann folgt Sprite 1, Sprite 2 und so weiter bis zum Schlußlicht Sprite 7.</p>
 
         <figure>
-            <!-- TODO -->
             <img src="142-7.png" alt="">
             <figcaption>Bild 7. Sprite 1 überdeckt Sprite 2</figcaption>
         </figure>
@@ -304,26 +324,6 @@
 
         <address class="author">(Heimo Ponnath/aa)</address>
 
-        <figure>
-            <!-- TODO -->
-            <figcaption>Tabelle 1. Kennzahlen für die Berechnung von Sprites</figcaption>
-        </figure>
-        <figure>
-            <!-- TODO -->
-            <figcaption>Tabelle 2. Grenzposition normaler Sprites</figcaption>
-        </figure>
-        <figure>
-            <!-- TODO -->
-            <figcaption>Tabelle 3. Zuordnung der Sprite-Farben-Register</figcaption>
-        </figure>
-        <figure>
-            <!-- TODO -->
-            <figcaption>Tabelle 4. Herkunft der Bitpaar-Farben im Multicolor-Modus</figcaption>
-        </figure>
-        <figure>
-            <!-- TODO -->
-            <figcaption>Tabelle 5. Grenzposition doppelt gedehnter Sprites</figcaption>
-        </figure>
         <figure>
             <!-- TODO -->
             <figcaption>Das Programm »Sprity«</figcaption>

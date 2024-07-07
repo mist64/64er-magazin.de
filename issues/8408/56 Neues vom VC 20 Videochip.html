@@ -166,9 +166,19 @@
 
         <p>Die Tabelle 1 zeigt die für unsere Zwecke wichtigsten Register des Video-Chips sowie deren Funktion.</p>
 
+        <figure>
+            <!-- TODO -->
+            <figcaption>Tabelle 1. Einige wenig bekannte, aber recht nützliche Register des VIC-Chips.</figcaption>
+        </figure>
+
         <p>Die folgende Tabelle 2 verdeutlicht, wie die Register verändert werden können. Mit dem PEEK-Befehl wird der Inhalt der Speicheradresse abgefragt. Der AND-Befehl löscht nun einen Teilbereich und mit OR X wird zuletzt ein neuer Wert angeknüpft.</p>
 
         <p>Außerdem gibt die Tabelle 2 die Originalwerte für die Variable X an, sowie — in Klammern — den zulässigen Zahlenbereich.</p>
+
+        <figure>
+            <!-- TODO -->
+            <figcaption>Tabelle 2. So können die Register aus Tabelle 1 verändert werden</figcaption>
+        </figure>
 
         <p>Die Adressen 36864/36865 zentrieren die Bilddarstellung auf dem Fernsehgerät oder Monitor. Mit dem Basicprogramm »BILD ZENTRIEREN« (Listing 1) können Sie dies testen. Der Bildausschnitt wird mit den Cursor-Tasten verschoben. Falls Sie die RETURN-Taste drücken, zeigt das Programm die notwendigen POKE-Befehle für die letzte Einstellung und setzt den Bildschirm zuletzt wieder in den Ausgangszustand zurück.</p>
 
@@ -200,82 +210,6 @@
 
         <p>Nach der Theorie nun ein praktisches Grafikbeispiel. Das abschreckend lange Basic-Ladeprogramm (Listing 5) erweitert den Basic-Befehlssatz des VC 20 (ohne Speichererweiterung) um sieben weitere Anweisungen (COPY, GNEW, GON, GOFF, PLOT, TURN und CLEAR). Beim Eintippen sollten Sie jedoch die Zeilen 10 bis 32 durch das Programm »Prüfsumme« (Listing 6) ersetzen. Nach RUN können Sie mit Hilfe der Tabelle 3 überprüfen, ob Sie die Daten fehlerfrei eingegeben haben. Die Prüfsummen gelten jeweils für eine DATA-Zeile.</p>
 
-        <p>Nachdem Sie das Ladeprogramm (Zeile 10 bis 32) hinzugenommen haben, muß das Programm unbedingt abgespeichert werden. Nach RUN sucht das Programm die Zeile 32 (also nicht weglassen) und überträgt die Daten ab dieser Adresse in den Speicher. In den Programmzeilen 22 bis 24 wird das Maschinenprogramm zuletzt in den oberen RAM-Bereich übertragen und durch die folgenden POKE-Befehle geschützt. Der NEW-Befehl löscht zuletzt das — ohnehin zerstörte — Programm.</p>
-
-        <p>Mit SYS 6273 können die Befehle jetzt eingeschaltet werden. Bei 2173 BYTES FREE nähert man sich natürlich gefährlich dem »Sinclair-Syndrom«.</p>
-
-        <p>Nach dem Einschalten fällt zuerst ein neuer Cursor auf. In der invertierten Blinkphase des Cursors wird ein »graues« Viereck (COMMODORE-SHIFT »+«) gedruckt. Dies ist notwendig, da der Zeichensatz keine invertierten Zeichen mehr umfaßt und deshalb der Cursor nicht mehr blinken würde. Durch das Grafikprogramm werden alle 64 umgeshifteten Zeichen programmierbar. Der Zeichensatzspeicher beginnt — wie in dem kleinen Textprogramm »PROG. ZEICHENSATZ« (Listing 4) — an der Adresse 7168. Mit dem Befehl »COPY« wird der Originalzeichensatz aus dem ROM in diesen Bereich kopiert.</p>
-
-        <p>Der Befehl »GON« schaltet nun den Grafik-Modus ein. Da zuvor der Originalzeichensatz ins RAM kopiert wurde, werden sich die ersten 64 Zeichen nicht verändern. Falls invertierte Zeichen auf dem Bildschirm stehen, werden diese jetzt nichtinvertiert wiedergegeben. Nur bei den geshifteten Zeichen (außer den invertierten) gibt es einen Totalausfall, aber bei 3,5 KByte Speicherraum muß man schon gewisse Mängel in Kauf nehmen. Mit »GOFF« wird der Zeichensatz wieder ins ROM verlegt, so daß alle Zeichen sichtbar werden.</p>
-
-        <p>Die drei Befehle PLOT/CLEAR/TURN setzen, löschen oder invertieren einen Bildpunkt. Natürlich muß hinter den Befehlen eine X- und Y-Koordinate angegeben werden. Beispielsweise »PLOT 176,1«; allerdings führt diese Eingabe zu der Fehlermeldung X-ERROR (IN&hellip;), da der zulässige Wertebereich für die X-Koordinate 0 bis 175 (22 Zeichen * 8 — 1), und für die Y-Koordinate 0 bis 183 (23 Zeichen * 8 — 1) beträgt.</p>
-
-        <p>Der Wertebereich für die Koordinatenangabe wird durch den letzten Befehl »GNEW« ermittelt, da das Bildschirmformat — wie zuvor beschrieben — per Software geändert werden kann. Bei einer Einstellung mit beispielsweise 25 Zeichen pro Zeile kann der Wert für X zwischen 0 und 199 variieren.</p>
-
-        <p>Außerdem löscht der GNEW-Befehl die 64 programmierbaren Zeichen sowie alle nichtinvertierten Zeichen auf dem Bildschirm. Da sich eine Grafik jedoch aus genau solchen Zeichen zusammensetzt, wird — falls sich eine Zeichnung auf dem Bildschirm befindet — diese gelöscht. Invertierte Zeichen werden hingeben nicht verändert, so daß Texte oder Beschriftungen erhalten bleiben.</p>
-
-        <p>Doch nun ein Beispiel:</p>
-
-        <pre>
-10 PRINT CHR$(147);CHR$(18);
-20 PRINT »TEST-PROGRAMM«
-30 GNEW
-40 GON
-50 FORI = 0 TO 111
-60 : PLOT I,I
-70 NEXT
-80 POKE 198,0:WAIT 198,1
-90 GOFF
-</pre>
-
-
-        <p>In den Zeilen 10 bis 20 wird der Bildschirm gelöscht und der invertierte Text »TEXT-PROGRAMME« geschrieben. Der Befehl »GNEW« löscht den Grafikspeicher und den Bildschirm, wobei der invertierte Text unverändert bleibt. GON schaltet dann die Grafik ein und in der Schleife wird eine Linie von links unten nach rechts oben (in der augenblicklichen Schriftfarbe) gezeichnet. Sobald Sie eine Taste drücken, wird die Grafik wieder abgeschaltet und Sie sehen eine schräge Linie aus Fragezeichen.</p>
-
-        <p>Das Maschinenprogramm schreibt ein programmierbares Zeichen auf den Bildschirm und ändert den Grafikinhalt dieses Zeichens. Anschließend wird geprüft, ob schon ein Zeichen mit genau dieser Grafik umdefiniert wurde. Ist dies der Fall, so wird das gefundene Zeichen auf den Bildschirm gebracht und das alte Zeichen ist wieder frei. Wegen dieser Optimierungs-Routine »verbraucht« das Beispielprogramm nur ein Zeichen aus dem schmalen Vorrat von 64 programmierbaren Zeichen.</p>
-
-        <p>Da diese Optimierung über einen Vektor verläuft, kann sie durch »POKE 1,PEEK(1)-1« abgeschaltet werden. Lassen Sie das Testprogramm erneut laufen und sehen Sie sich das neue Ergebnis an. Mit »POKE 1,PEEK(1)+1« optimiert das Programm wieder, wird aber auch etwas langsamer.</p>
-
-        <p>Durch »PEEK(0)« können Sie außerdem abfragen, wie viele Zeichen noch frei sind. Hierdurch kann die Fehlermeldung »CHARACTER-ERROR (IN&hellip;)« verhindert werden. Falls PEEK(0) den Wert Null ergibt, sollten keine Grafikbefehle mehr folgen.</p>
-
-        <p>Andern Sie nun die Zeile 60 des Testprogramms in »60 TURN I,I« und erweitern Sie folgende Zeile mit »GOTO 50«.</p>
-
-        <p>Das Programm wird jetzt eine Linie ziehen, anschließend löschen und so fort, da die Bildpunkte jetzt fortlaufend invertiert werden. Falls Sie in der Zeile 40 den Befehle »GON« durch »GOFF« ersetzen, können Sie anschaulich verfolgen, wie das Programm — und speziell die Optimierung — arbeitet.</p>
-
-        <p>Eine Besonderheit müssen Sie jedoch unbedingt beachten. Die neuen Basicbefehle können nicht direkt hinter einer THEN-Anweisung stehen. Am einfachsten ist es, die beiden Befehle dann durch einen Doppelpunkt (&hellip;THEN : COPY) zu trennen.</p>
-
-        <p>Zuletzt eine Grafik-Anwendung. Die Bilder 3 und 4 zeigen, welche Ergebnisse mit der Grafik-Erweiterung möglich sind. Das Basicprogramm »FUNKTIONS-PLOT« (Listing 7) vereinfacht das programmierte Plotten von Funktionen doch erheblich.</p>
-
-        <p>Nachdem Sie das Programm eingegeben und gestartet haben, werden Sie nach dem Wertebereich gefragt. Anschließend wird die Bildumrahmung gezeichnet. Die Größe sowie die Position des Diagramms auf dem Bildschirm ist durch die Variablen Unten, Oben, Rechts und Links (U,O,R,L) in der Zeile 110 festgelegt. Die Zeilen 170 bis 230 berechnen nun das Minimum sowie das Maximum der Funktion. Außerdem werden die Werte in das Feld Y(A) übertragen. Die Variablen MI und MA werden in Zeile 250 auf vier Nachkommastellen begrenzt. Diese Werte sowie die Funktion selbst werden nun (invertiert) im unteren Bildteil gedruckt. Nachdem die Funktion grafisch dargestellt wurde, läuft das Programm in Zeile 390 in einer Warteschleife.</p>
-
-        <p>Drücken Sie jetzt eine Taste, so gelangen Sie in ein Mini-Menü. Sie können nun eine neue Funktion eingeben oder die alte mit neuen Werten untersuchen.</p>
-
-        <p>Eine neue Funktion wird in der Zeile 450 mit INPUT A$ übergeben. Salopp gesagt, programmiert sich der Copmputer in den folgenden Zeilen selbst. Wie das?</p>
-
-        <p>Zuerst wird der Bildschirm gelöscht und in der obersten Zeile die Zeilennummer 190 und der String A$, der die neue Funktion enthält, gedruckt. Die Zeile 460 druckt darunter die Nummer 190 und einen PRINT-Befehl. Anschließend folgt ein Anführungszeichen, dann die Funktion und schließlich wieder ein Anführungszeichen. Zuletzt wird in der dritten Bildschirmzeile der Befehl »RUN« gedruckt. Jetzt könnte auf dem Bildschirm der folgende Text stehen:</p>
-
-        <pre>
-190 Y=COS(X)
-290 ?"Y=COS(X)"
-RUN
-</pre>
-
-
-        <p>Wäre das Programm hier zu Ende, so müßten Sie nur die HOME-Taste drücken und der Cursor würde auf der Zeile 190 stehen. Drückt man jetzt RETURN, so wird diese Zeile einprogrammiert. Ein erneuertes RETURN übernimmt die Zeile 290 in das Programm und beim dritten RETURN wird der Befehl RUN ausgeführt. Da sich der Computer bis zu neun Tastatureingaben »merken« kann, brauchen Sie diesen Ablauf nicht »von Hand« einzugeben. Der erste POKE-Befehl in der Zeile 470 sagt dem Computer, daß — angeblich — sechs Tasten gedrückt worden sind. Zuerst »CURSOR HOME« (POKE 631,19), und dann fünfmal »RETURN« (Zeile 480). Nach dem END-Befehl führt er diese — untergeschobenen — Eingaben aus, programmiert die beiden Programmzeilen ein und startet sich zuletzt wieder mit dem RUN-Befehl.</p>
-
-        <p>Dieses Verfahren ist übrigens sehr praktisch, falls man ein Maschinenprogramm in DATA-Zeilen umwandeln muß. Vorausgesetzt das notwendige Programm ist fehlerfrei, kann man eigentlich sicher sein, daß es der Basic-Lader anschließend auch ist.</p>
-
-        <p>Wie Sie an dem Funktions-Plotter sehen können, ermöglicht die Grafikhilfe die Programmierung auch komplexerer Grafiken in einfacher und überschaubarer Form. Da die Erstellung der Grafik recht schnell erfolgt, ist eine große Vielfalt von Anwendungen denkbar.</p>
-
-        <address class="author">(Heino Verder/ev)</address>
-
-        <figure>
-            <!-- TODO -->
-            <figcaption>Tabelle 1. Einige wenig bekannte, aber recht nützliche Register des VIC-Chips.</figcaption>
-        </figure>
-        <figure>
-            <!-- TODO -->
-            <figcaption>Tabelle 2. So können die Register aus Tabelle 1 verändert werden</figcaption>
-        </figure>
         <figure>
             <table>
                 <tr>
@@ -345,6 +279,75 @@ RUN
             </table>
             <figcaption>Tabelle 3. Prüfsummen zum Grafikprogramm</figcaption>
         </figure>
+
+        <p>Nachdem Sie das Ladeprogramm (Zeile 10 bis 32) hinzugenommen haben, muß das Programm unbedingt abgespeichert werden. Nach RUN sucht das Programm die Zeile 32 (also nicht weglassen) und überträgt die Daten ab dieser Adresse in den Speicher. In den Programmzeilen 22 bis 24 wird das Maschinenprogramm zuletzt in den oberen RAM-Bereich übertragen und durch die folgenden POKE-Befehle geschützt. Der NEW-Befehl löscht zuletzt das — ohnehin zerstörte — Programm.</p>
+
+        <p>Mit SYS 6273 können die Befehle jetzt eingeschaltet werden. Bei 2173 BYTES FREE nähert man sich natürlich gefährlich dem »Sinclair-Syndrom«.</p>
+
+        <p>Nach dem Einschalten fällt zuerst ein neuer Cursor auf. In der invertierten Blinkphase des Cursors wird ein »graues« Viereck (COMMODORE-SHIFT »+«) gedruckt. Dies ist notwendig, da der Zeichensatz keine invertierten Zeichen mehr umfaßt und deshalb der Cursor nicht mehr blinken würde. Durch das Grafikprogramm werden alle 64 umgeshifteten Zeichen programmierbar. Der Zeichensatzspeicher beginnt — wie in dem kleinen Textprogramm »PROG. ZEICHENSATZ« (Listing 4) — an der Adresse 7168. Mit dem Befehl »COPY« wird der Originalzeichensatz aus dem ROM in diesen Bereich kopiert.</p>
+
+        <p>Der Befehl »GON« schaltet nun den Grafik-Modus ein. Da zuvor der Originalzeichensatz ins RAM kopiert wurde, werden sich die ersten 64 Zeichen nicht verändern. Falls invertierte Zeichen auf dem Bildschirm stehen, werden diese jetzt nichtinvertiert wiedergegeben. Nur bei den geshifteten Zeichen (außer den invertierten) gibt es einen Totalausfall, aber bei 3,5 KByte Speicherraum muß man schon gewisse Mängel in Kauf nehmen. Mit »GOFF« wird der Zeichensatz wieder ins ROM verlegt, so daß alle Zeichen sichtbar werden.</p>
+
+        <p>Die drei Befehle PLOT/CLEAR/TURN setzen, löschen oder invertieren einen Bildpunkt. Natürlich muß hinter den Befehlen eine X- und Y-Koordinate angegeben werden. Beispielsweise »PLOT 176,1«; allerdings führt diese Eingabe zu der Fehlermeldung X-ERROR (IN&hellip;), da der zulässige Wertebereich für die X-Koordinate 0 bis 175 (22 Zeichen * 8 — 1), und für die Y-Koordinate 0 bis 183 (23 Zeichen * 8 — 1) beträgt.</p>
+
+        <p>Der Wertebereich für die Koordinatenangabe wird durch den letzten Befehl »GNEW« ermittelt, da das Bildschirmformat — wie zuvor beschrieben — per Software geändert werden kann. Bei einer Einstellung mit beispielsweise 25 Zeichen pro Zeile kann der Wert für X zwischen 0 und 199 variieren.</p>
+
+        <p>Außerdem löscht der GNEW-Befehl die 64 programmierbaren Zeichen sowie alle nichtinvertierten Zeichen auf dem Bildschirm. Da sich eine Grafik jedoch aus genau solchen Zeichen zusammensetzt, wird — falls sich eine Zeichnung auf dem Bildschirm befindet — diese gelöscht. Invertierte Zeichen werden hingeben nicht verändert, so daß Texte oder Beschriftungen erhalten bleiben.</p>
+
+        <p>Doch nun ein Beispiel:</p>
+
+        <pre>
+10 PRINT CHR$(147);CHR$(18);
+20 PRINT »TEST-PROGRAMM«
+30 GNEW
+40 GON
+50 FORI = 0 TO 111
+60 : PLOT I,I
+70 NEXT
+80 POKE 198,0:WAIT 198,1
+90 GOFF
+</pre>
+
+
+        <p>In den Zeilen 10 bis 20 wird der Bildschirm gelöscht und der invertierte Text »TEXT-PROGRAMME« geschrieben. Der Befehl »GNEW« löscht den Grafikspeicher und den Bildschirm, wobei der invertierte Text unverändert bleibt. GON schaltet dann die Grafik ein und in der Schleife wird eine Linie von links unten nach rechts oben (in der augenblicklichen Schriftfarbe) gezeichnet. Sobald Sie eine Taste drücken, wird die Grafik wieder abgeschaltet und Sie sehen eine schräge Linie aus Fragezeichen.</p>
+
+        <p>Das Maschinenprogramm schreibt ein programmierbares Zeichen auf den Bildschirm und ändert den Grafikinhalt dieses Zeichens. Anschließend wird geprüft, ob schon ein Zeichen mit genau dieser Grafik umdefiniert wurde. Ist dies der Fall, so wird das gefundene Zeichen auf den Bildschirm gebracht und das alte Zeichen ist wieder frei. Wegen dieser Optimierungs-Routine »verbraucht« das Beispielprogramm nur ein Zeichen aus dem schmalen Vorrat von 64 programmierbaren Zeichen.</p>
+
+        <p>Da diese Optimierung über einen Vektor verläuft, kann sie durch »POKE 1,PEEK(1)-1« abgeschaltet werden. Lassen Sie das Testprogramm erneut laufen und sehen Sie sich das neue Ergebnis an. Mit »POKE 1,PEEK(1)+1« optimiert das Programm wieder, wird aber auch etwas langsamer.</p>
+
+        <p>Durch »PEEK(0)« können Sie außerdem abfragen, wie viele Zeichen noch frei sind. Hierdurch kann die Fehlermeldung »CHARACTER-ERROR (IN&hellip;)« verhindert werden. Falls PEEK(0) den Wert Null ergibt, sollten keine Grafikbefehle mehr folgen.</p>
+
+        <p>Andern Sie nun die Zeile 60 des Testprogramms in »60 TURN I,I« und erweitern Sie folgende Zeile mit »GOTO 50«.</p>
+
+        <p>Das Programm wird jetzt eine Linie ziehen, anschließend löschen und so fort, da die Bildpunkte jetzt fortlaufend invertiert werden. Falls Sie in der Zeile 40 den Befehle »GON« durch »GOFF« ersetzen, können Sie anschaulich verfolgen, wie das Programm — und speziell die Optimierung — arbeitet.</p>
+
+        <p>Eine Besonderheit müssen Sie jedoch unbedingt beachten. Die neuen Basicbefehle können nicht direkt hinter einer THEN-Anweisung stehen. Am einfachsten ist es, die beiden Befehle dann durch einen Doppelpunkt (&hellip;THEN : COPY) zu trennen.</p>
+
+        <p>Zuletzt eine Grafik-Anwendung. Die Bilder 3 und 4 zeigen, welche Ergebnisse mit der Grafik-Erweiterung möglich sind. Das Basicprogramm »FUNKTIONS-PLOT« (Listing 7) vereinfacht das programmierte Plotten von Funktionen doch erheblich.</p>
+
+        <p>Nachdem Sie das Programm eingegeben und gestartet haben, werden Sie nach dem Wertebereich gefragt. Anschließend wird die Bildumrahmung gezeichnet. Die Größe sowie die Position des Diagramms auf dem Bildschirm ist durch die Variablen Unten, Oben, Rechts und Links (U,O,R,L) in der Zeile 110 festgelegt. Die Zeilen 170 bis 230 berechnen nun das Minimum sowie das Maximum der Funktion. Außerdem werden die Werte in das Feld Y(A) übertragen. Die Variablen MI und MA werden in Zeile 250 auf vier Nachkommastellen begrenzt. Diese Werte sowie die Funktion selbst werden nun (invertiert) im unteren Bildteil gedruckt. Nachdem die Funktion grafisch dargestellt wurde, läuft das Programm in Zeile 390 in einer Warteschleife.</p>
+
+        <p>Drücken Sie jetzt eine Taste, so gelangen Sie in ein Mini-Menü. Sie können nun eine neue Funktion eingeben oder die alte mit neuen Werten untersuchen.</p>
+
+        <p>Eine neue Funktion wird in der Zeile 450 mit INPUT A$ übergeben. Salopp gesagt, programmiert sich der Copmputer in den folgenden Zeilen selbst. Wie das?</p>
+
+        <p>Zuerst wird der Bildschirm gelöscht und in der obersten Zeile die Zeilennummer 190 und der String A$, der die neue Funktion enthält, gedruckt. Die Zeile 460 druckt darunter die Nummer 190 und einen PRINT-Befehl. Anschließend folgt ein Anführungszeichen, dann die Funktion und schließlich wieder ein Anführungszeichen. Zuletzt wird in der dritten Bildschirmzeile der Befehl »RUN« gedruckt. Jetzt könnte auf dem Bildschirm der folgende Text stehen:</p>
+
+        <pre>
+190 Y=COS(X)
+290 ?"Y=COS(X)"
+RUN
+</pre>
+
+
+        <p>Wäre das Programm hier zu Ende, so müßten Sie nur die HOME-Taste drücken und der Cursor würde auf der Zeile 190 stehen. Drückt man jetzt RETURN, so wird diese Zeile einprogrammiert. Ein erneuertes RETURN übernimmt die Zeile 290 in das Programm und beim dritten RETURN wird der Befehl RUN ausgeführt. Da sich der Computer bis zu neun Tastatureingaben »merken« kann, brauchen Sie diesen Ablauf nicht »von Hand« einzugeben. Der erste POKE-Befehl in der Zeile 470 sagt dem Computer, daß — angeblich — sechs Tasten gedrückt worden sind. Zuerst »CURSOR HOME« (POKE 631,19), und dann fünfmal »RETURN« (Zeile 480). Nach dem END-Befehl führt er diese — untergeschobenen — Eingaben aus, programmiert die beiden Programmzeilen ein und startet sich zuletzt wieder mit dem RUN-Befehl.</p>
+
+        <p>Dieses Verfahren ist übrigens sehr praktisch, falls man ein Maschinenprogramm in DATA-Zeilen umwandeln muß. Vorausgesetzt das notwendige Programm ist fehlerfrei, kann man eigentlich sicher sein, daß es der Basic-Lader anschließend auch ist.</p>
+
+        <p>Wie Sie an dem Funktions-Plotter sehen können, ermöglicht die Grafikhilfe die Programmierung auch komplexerer Grafiken in einfacher und überschaubarer Form. Da die Erstellung der Grafik recht schnell erfolgt, ist eine große Vielfalt von Anwendungen denkbar.</p>
+
+        <address class="author">(Heino Verder/ev)</address>
+
         <figure>
             <pre data-filename="zentrieren" data-name="Bild zentrieren"></pre>
             <figcaption>Listing 1. »Bild zentrieren«</figcaption>
