@@ -1,0 +1,87 @@
+
+;4 personen vc20.prg ==1001==
+;Eingetippt von Endurion
+
+    0 rem****************
+    1 rem** spiel fuer **
+    2 rem** 4 personen **
+    3 rem****************
+    4 rem
+    5 rem
+    6 rem****************
+    7 rem*** eingabe ****
+    8 rem**maschinencode*
+    9 rem****************
+   10 print chr$(147)
+   20 poke 51,235
+   30 poke 52,29
+   40 poke 55,235
+   50 poke 56,29
+  100 data 169,0,141,32,145,173,33,145,141,255,29,96
+  110 for k=1 to 12
+  120 read x
+  130 poke 7660+k,x
+  140 next k
+  199 rem*************
+  200 rem*anweisungen*
+  205 rem*************
+  210 print chr$(147)
+  215 poke830,0
+  220 print"{down}{down}spieler 1:(w) taste
+  230 print"{down}spieler 2:(z)taste
+  240 print"{down}spieler 3:(del)taste
+  250 print"{down}spieler 4:(crsr_)taste
+  260 print tab(125)"{rvon}{yel}space{rvof}{blu}"
+  270 get a$:if a$=""then 270
+  280 print chr$(147)
+  300 poke36879,8
+  310 print"{down}{down}wer sieht als erster
+  320 print"{down}den buchstaben
+  330 bu = int(rnd(0)*10)+1
+  340 poke 7808,bu
+  350 poke 38528,7
+  360 print"{down}{down}und drueckt seine      {down}taste ?
+  370 print tab(165)"{rvon}{yel}space{rvon}{blu}"
+  380 get a$:if a$="" then 380
+  390 print chr$(147)
+  400 for t=1 to 800:next t
+  490 rem**************
+  495 rem* buchstaben *
+  500 rem** wuerfeln **
+  510 rem**************
+  520 vb=int(rnd(0)*10)+1
+  530 if vb=bu then poke830,250
+  540 c=int(rnd(1)*505)
+  550 poke 7680+c,vb
+  560 poke 38400+c,1
+  590 rem**************
+  595 rem** abfrage ***
+  600 rem* der tasten *
+  605 rem**************
+  610 for z=1 to 15
+  620 poke 7662,253
+  630 sys 7661
+  640 if peek(7679)=253 and peek(830)=250 then 810
+  650 poke 7662,239
+  660 sys 7661
+  670 if peek(7679)=253 and peek(830)=250 then 820
+  680 poke 7662,254
+  690 sys 7661
+  700 if peek(7679)=127 and peek(830)=250 then 830
+  710 poke 7662,251
+  720 sys 7661
+  730 if peek(7679)=127 and peek(830)=250 then 830
+  740 next z
+  750 goto 500: rem (neuer buchstabe)
+  799 rem**************
+  800 rem** ergebnis **
+  805 rem**************
+  810 print"{clr}{down}{down}{down}spieler 1 ist sieger":goto 860
+  820 print"{clr}{down}{down}{down}spieler 2 ist sieger":goto 860
+  830 print"{clr}{down}{down}{down}spieler 3 ist sieger":goto860
+  840 print"{clr}{down}{down}{down}spieler 4 ist sieger":goto 860
+  860 print"{down}{down}{down}noch einmal ?  (j/n)
+  870 geta$:if a$="j" then 200
+  880 if a$="n" then end
+  890 goto 870
+
