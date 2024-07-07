@@ -32,7 +32,17 @@
         <p>Diese Anordnung dürfte auch für viele Bastelzwecke sehr interessant sein. Für den Analogeingang wurde mit dem IC LM311 ein Spannungs-Frequenzwandler gebaut. Die Frequenz des erzeugten Rechtecksignals wurde über eine einadrige Schirmleitung mit Ader auf PIN6 = CNT-2 des Userports und Schirm auf PIN1 = GND zur Frequenzmessung eingegeben. Diese Anwendung ist prinzipiell in [1] beschrieben, allerdings mit dem kleinen Schönheitsfehler, daß die Sache so nicht funktioniert. Trotzdem ist das erwähnte Buch sehr empfehlenswert wegen seiner Vielfalt und Verständlichkeit. Im folgenden wird zunächst ein funktionsfähiges Programm gezeigt und anschließend werden wesentliche Verbesserungen unter Verwendung einer Assembler-Routine geschildert. Ein Studium der Literatur [1 bis 4] zeigt, daß für eine einfache Frequenzmessung bis hinauf zu etwas mehr als 20 kHz der im CIA 6526 (Complex Interface-Adapter-IC) eingebaute Zähler und die Systemuhr Tl als Zeitbasis in Frage kommen. Wer einen Rechteckgenerator zur Hand hat, kann diesauch gleich (TTL-Pegel 5 V einstellen) mal ausprobieren! Geben sie das folgende Basic-Programm ein und schließen Sie den Generator — wie beschrieben — an CNT-2 an.</p>
 
         <figure>
-            <!-- TODO -->
+            <pre>90 rem****basic-programm frequenzmessung************
+100 poke56590,240
+110 poke56580,255:poke56581,255
+120 t=ti
+130 ift=tithen130
+140 poke56590,241
+150 ifti<>t+60then150
+160 a=peek(56581):b=peek(56580)
+170 print65535-(256*a+b)
+180 goto100:rem !!dauerschleife!
+</pre>
             <figcaption>Listing »Frequenzmessung«</figcaption>
         </figure>
 
@@ -52,7 +62,17 @@
         <p>Das Basicprogramm zeigt jedoch leider bei der praktischen Anwendung Anzeigeschwankungen von etwa 2 Prozent und manchmal weit darüber. Schuld daran ist sicher die Programmsprache Basic, welche zum Beispiel aufgrund von zu langsamen Bearbeitungszeiten des Basic-Interpreters in den IF Abfragen ziemliche Fehler in der Zeitbasis zu verursachen scheint. Gelegentlich kommt die ganze Messung aber auch noch stärker »aus dem Tritt«. Geht man dazu über, die Uhr Tl nicht »im Vorübergehen« abzulesen, dann kann man schon eine etwas bessere Genauigkeit erreichen.</p>
 
         <figure>
-            <!-- TODO -->
+            <pre>90 rem****basic-programm frequenzmessung************
+100 poke56590,240
+110 poke56580,255:poke56581,255
+120 t=ti
+130 ift=tithen130
+140 poke56590,241
+150 ifti<>t+60then150
+160 a=peek(56581):b=peek(56580)
+170 print65535-(256*a+b)
+180 goto100:rem !!dauerschleife!
+</pre>
             <figcaption>Listing »Frequenzmessung« 2</figcaption>
         </figure>
 
@@ -61,18 +81,50 @@
         <p>Ausgehend von diesem Programm wurde das folgende Assembler-Programm geschrieben, das im Prinzip den gleichen Ablauf hat, bei dem aber die Startbefehle für Zähler und Uhr Tl sowie der Stop-Befehl für den Zähler und vor allem die Zeitabfrage und das Ablesen »blitzschnell« ablaufen:</p>
 
         <figure>
-            <!-- TODO -->
+            <pre>DD0E              100 CRA   =    $DD0E
+DD04              110 T1L   =    $DD04
+DD05              120 T1H   =    $DD05
+00A2              130 TIM   =    $A2
+00A0              131 TY1   =    $A0
+00A1              132 TY2   =    $A1
+C000              140       *=    $C000
+C000  A9 F0       150       LDA   #$F0
+C002  8D 0E DD    160       STA   CRA
+C005  A9 00       220       LDA   #$00
+C007  85 A0       221       STA   *TY1
+C009  85 A1       222       STA   *TY2
+C00B  85 A2       230       STA   *TIM
+C00D  A9 F1       240       LDA   #$F1
+C00F  8D 0E DD    250       STA   CRA
+C012  A5 A2       260 MA    LDA   *TIM
+C014  C9 3C       270       CMP   #$3C
+C016  D0 FA       280       BNE   MA
+C018  AE 05 DD    290       LDX   T1H
+C01B  AC 04 DD    300       LDY   T1L
+C01E  60          320       RTS
+                  330       .EN</pre>
             <figcaption>Listing »Frequenzmessung Maschinensprache«</figcaption>
         </figure>
         <figure>
-            <!-- TODO -->
+            <pre>100 for i = 49152 to 49182
+110 read x:pokei,x:s=s+x:next
+120 data169,240,141, 14,221,169,  0,133,160,133,161,133
+130 data162,169,241,141, 14,221,165,162,201, 60,208,250
+140 data174,  5,221,172,  4,221, 96
+150 ifs<> 4561 then print"fehler in datas":end
+160 print"ok"
+</pre>
             <figcaption>Listing »Basiclader«</figcaption>
         </figure>
 
         <p>Nach einmaligem RUN-Lauf kann dieses Programm immer mit SYS 49152 aufgerufen werden, der Basiclader kann dann gelöscht werden (vorher natürlich speichern!). Das Programm arbeitet einen Durchlauf des Meßzyklus ab und kehrt dann nach Basic zurück, zuvor hat es jedoch HB und LB des Zählers, T1H und T1L, nach Adresse Dez 781 und 782 abgelegt. Aus diesem »Briefkasten« können die Werte mit PEEK geholt werden. Als Beispiel ein Miniprogramm zur dauernden Frequenzanzeige in Hz:</p>
 
         <figure>
-            <!-- TODO -->
+            <pre>100 sys49152
+110 a=peek(781):b=peek(782)
+120 print65535-(256*a+b)
+130 goto100:rem !!dauerschleife!
+</pre>
             <figcaption>Listing »Frequenzanzeige«</figcaption>
         </figure>
 
