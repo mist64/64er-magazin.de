@@ -31,6 +31,11 @@
 
         <p>Diese Anordnung dürfte auch für viele Bastelzwecke sehr interessant sein. Für den Analogeingang wurde mit dem IC LM311 ein Spannungs-Frequenzwandler gebaut. Die Frequenz des erzeugten Rechtecksignals wurde über eine einadrige Schirmleitung mit Ader auf PIN6 = CNT-2 des Userports und Schirm auf PIN1 = GND zur Frequenzmessung eingegeben. Diese Anwendung ist prinzipiell in [1] beschrieben, allerdings mit dem kleinen Schönheitsfehler, daß die Sache so nicht funktioniert. Trotzdem ist das erwähnte Buch sehr empfehlenswert wegen seiner Vielfalt und Verständlichkeit. Im folgenden wird zunächst ein funktionsfähiges Programm gezeigt und anschließend werden wesentliche Verbesserungen unter Verwendung einer Assembler-Routine geschildert. Ein Studium der Literatur [1 bis 4] zeigt, daß für eine einfache Frequenzmessung bis hinauf zu etwas mehr als 20 kHz der im CIA 6526 (Complex Interface-Adapter-IC) eingebaute Zähler und die Systemuhr Tl als Zeitbasis in Frage kommen. Wer einen Rechteckgenerator zur Hand hat, kann diesauch gleich (TTL-Pegel 5 V einstellen) mal ausprobieren! Geben sie das folgende Basic-Programm ein und schließen Sie den Generator — wie beschrieben — an CNT-2 an.</p>
 
+        <figure>
+            <!-- TODO -->
+            <figcaption>Listing »Frequenzmessung«</figcaption>
+        </figure>
+
         <p>Es wurden folgende Adressen verwendet<br>
             Dez. 56590 Hex DD0E Kontrollregister für Zähler 1<br>
             Dez. 56580 Hex DD04 Zähler 1 Low-Byte T1L<br>
@@ -46,13 +51,30 @@
 
         <p>Das Basicprogramm zeigt jedoch leider bei der praktischen Anwendung Anzeigeschwankungen von etwa 2 Prozent und manchmal weit darüber. Schuld daran ist sicher die Programmsprache Basic, welche zum Beispiel aufgrund von zu langsamen Bearbeitungszeiten des Basic-Interpreters in den IF Abfragen ziemliche Fehler in der Zeitbasis zu verursachen scheint. Gelegentlich kommt die ganze Messung aber auch noch stärker »aus dem Tritt«. Geht man dazu über, die Uhr Tl nicht »im Vorübergehen« abzulesen, dann kann man schon eine etwas bessere Genauigkeit erreichen.</p>
 
+        <figure>
+            <!-- TODO -->
+            <figcaption>Listing »Frequenzmessung« 2</figcaption>
+        </figure>
+
         <p>In diesem Programm wird in Zeile 120/130 durch EinPOKEn von 0 in die drei TI-Register 160, 161, 162 die Uhr Tl jedesmal neu gestartet, wobei Register 162 des »schnellsten Rädchens« zuletzt genullt wird. Hierdurch entfällt die erste IF Schleife des Starts. Benützt wird im Prinzip nur Regsiter 162, in welchem die Uhr von 0 bis 255 in Schritten von 1/60 s (Jiffies) läuft. Die beiden anderen Register werden nur zur Sicherheit genullt.</p>
 
         <p>Ausgehend von diesem Programm wurde das folgende Assembler-Programm geschrieben, das im Prinzip den gleichen Ablauf hat, bei dem aber die Startbefehle für Zähler und Uhr Tl sowie der Stop-Befehl für den Zähler und vor allem die Zeitabfrage und das Ablesen »blitzschnell« ablaufen:</p>
 
+        <figure>
+            <!-- TODO -->
+            <figcaption>Listing »Frequenzmessung Maschinensprache«</figcaption>
+        </figure>
+        <figure>
+            <!-- TODO -->
+            <figcaption>Listing »Basiclader«</figcaption>
+        </figure>
+
         <p>Nach einmaligem RUN-Lauf kann dieses Programm immer mit SYS 49152 aufgerufen werden, der Basiclader kann dann gelöscht werden (vorher natürlich speichern!). Das Programm arbeitet einen Durchlauf des Meßzyklus ab und kehrt dann nach Basic zurück, zuvor hat es jedoch HB und LB des Zählers, T1H und T1L, nach Adresse Dez 781 und 782 abgelegt. Aus diesem »Briefkasten« können die Werte mit PEEK geholt werden. Als Beispiel ein Miniprogramm zur dauernden Frequenzanzeige in Hz:</p>
 
-        <p>TODO</p>
+        <figure>
+            <!-- TODO -->
+            <figcaption>Listing »Frequenzanzeige«</figcaption>
+        </figure>
 
         <p>Mit diesem Programm wurde eine Genauigkeit von deutlich besser als 1 Prozent erhalten. Versuche zeigten, daß selbst im praktischen Betrieb mit einem Spannungs-Frequenzwandler die Meßdauer ohne Verschlechterung des Ergebnisses auf 30 x 1/60 s + 0,5 s verkürzt werden kann. Dies kann man im Basiclader dadurch bewerkstelligen, daß in Zeile 130 die Zahl 60 in 30 geändert wird.</p>
 
@@ -75,27 +97,6 @@
             [3] Floegel E., »Hardware-Erweiterungen für Commodore 64«, Hofacker-Verlag, Holzkirchen<br>
             [4] Brückmann, »Der Commodore 64 und der Rest der Welt«; Data-Becker, Düsseldorf<br>
             [5] National-Semiconductor, Daten-Blatt zu LM 131/231/331</p>
-
-        <figure>
-            <!-- TODO -->
-            <figcaption>Listing »Frequenzmessung«</figcaption>
-        </figure>
-        <figure>
-            <!-- TODO -->
-            <figcaption>Listing »Frequenzmessung« 2</figcaption>
-        </figure>
-        <figure>
-            <!-- TODO -->
-            <figcaption>Listing »Frequenzmessung Maschinensprache«</figcaption>
-        </figure>
-        <figure>
-            <!-- TODO -->
-            <figcaption>Listing »Basiclader«</figcaption>
-        </figure>
-        <figure>
-            <!-- TODO -->
-            <figcaption>Listing »Frequenzanzeige«</figcaption>
-        </figure>
 
         <figure>
             <img src="78-2.png" alt="">
