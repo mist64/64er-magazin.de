@@ -129,12 +129,12 @@ WHILE c IN ('0'..'9','+','-','/','*') DO
             <tr>
                 <td>TYPE</td>
                 <td>farbe</td>
-                <td>= (ROT,BLAU, GRÜN,GELB, BRAUN,WEIß, SCHWARZ);</td>
+                <td>= (ROT,BLAU,GRÜN,GELB,BRAUN,WEIß,SCHWARZ);</td>
             </tr>
             <tr>
                 <td></td>
-                tag</td>
-                = (MON,DIE, MIT,DON,FRE,SAM,SON);</td>
+                <td>tag</td>
+                <td>= (MON,DIE,MIT,DON,FRE-,SAM,SON);</td>
             </tr>
             <tr>
                 <td></td>
@@ -351,17 +351,17 @@ END;
 
         <p>Ziemlich am Anfang wurde festgestellt, daß Pascal eine statische Speicherverwaltung besitzt. Das stimmt nur bedingt. Es gibt in Pascal dynamische Speicherverwaltung, die sogar dynamischer ist, als diejenige in Basic. In Basic ist es bekanntermaßen nicht erlaubt, ein Feld mit »DIM« ein zweites Mal zu dimensionieren. In Pascal kann man dies erreichen, man muß nur anstelle der Arrays »Dynamische Variablen« verwenden. Man überläßt damit dem Computer die Verwaltung des Speicherplatzes jeder einzelnen Variablen, die dafür überall im Speicher verteilt sein können, zum Beispiel Variable »a« bei 3508, »b« bei 26876 etc. Anstelle von Indizes benützt man dann eben sogenannte »Zeiger« (pointers). Der Computer verwaltet alle diese Zeiger selbst, man kann die Werte dieser Zeiger somit niemals auslesen. Mit dieser Methode machen wir unsere Adreßverwaltung dynamisch. Das heißt man sollte problemlos löschen, sortieren, ändern und vor allem erweitern können. Es ist leicht ersichtlich, daß dies natürlich mit solchen Zeigern sehr einfach ist, weil man nicht die Datensätze verschieben, sondern nur die Zeiger ändern muß. Eine Variable wird zum Zeiger, indem man dem Typennamen, auf den er zeigen soll, ein »"« voranstellt. In unserem Beispiel:</p>
 
-        <pre>
-TYPE maske     = RECORD
+        <figure><pre>
+TYPE maske      = RECORD
                  (* SIEHE OBEN *)
-               END;
-   maskzeiger  = ^maske;
-VAR adr1,adr2  : maskzeiger;
-    j          : ^INTEGER;
-</pre>
+                END;
+     maskzeiger = ^maske;
+VAR  adr1,adr2  : maskzeiger;
+     j          : ^INTEGER;
+</pre></figure>
 
 
-        <p>Eine Deklaration schafft aber noch keinen Platz, da die Zeiger zuerst noch nicht definiert sind. Um nun wirklich im Speicher Platz für die dynamische Variable zu bekommen, gibt es die Standardprozedur »NEW (adrl) sucht Platz für den dynamischen Record »maske«, NEW (j) für die dynamische Variable »j«. Durch</p>
+        <p>Eine Deklaration schafft aber noch keinen Platz, da die Zeiger zuerst noch nicht definiert sind. Um nun wirklich im Speicher Platz für die dynamische Variable zu bekommen, gibt es die Standardprozedur »NEW (adr1) sucht Platz für den dynamischen Record »maske«, NEW (j) für die dynamische Variable »j«. Durch</p>
 
         <pre>
 adr1^.VORNAME := »PETER«;
@@ -377,9 +377,9 @@ j^:= 9;
 
         <p><b>»adr1«</b> bezeichnet eine Zeigervariable auf ein Objekt vom Typ »maske«.</p>
 
-        <p><b>»adrl^«</b> bezeichnet eine ganze dynamische Variable vom Typ »maske«, das heißt einen ganzen dynamischen Record.</p>
+        <p><b>»adr1^«</b> bezeichnet eine ganze dynamische Variable vom Typ »maske«, das heißt einen ganzen dynamischen Record.</p>
 
-        <p><b>»adrl^.feld«</b> bezeichnet ein Feld des dynamischen Records, auf den »adrl« zeigt.</p>
+        <p><b>»adrl^.feld«</b> bezeichnet ein Feld des dynamischen Records, auf den »adr1« zeigt.</p>
 
         <p>Wenn man im Record ein Feld einführt, das selbst ein Zeiger ist, kann man sehr leicht verkettete Listen aufbauen etc. Speziell für diese Anwendung gibt es das Statement »NIL«. Wenn man nämlich einen Zeiger hat, der auf das Ende einer Liste zeigt, so darf er ja nichts mehr enthalten. Um diesen »Nichts«-Zustand genau zu definieren, kann man einem Zeiger den Wert »NIL« zuweisen. Die Verkettung beginnt mit einem Zeiger und endet mit »NIL«. Wenn man nun eine Sortierung der Datensätze durchführen will, so hat man im Wesentlichen »nur« die Zeiger neu zu berechnen, damit die Verkettung gemäß den Kriterien richtig verläuft. Es lassen sich so alle Arten von Datenstrukturen verwirklichen zum Beispiel Baum- oder Sternstrukturen.</p>
 
@@ -431,7 +431,7 @@ j^:= 9;
 
         <h2>Oxford Pascal</h2>
 
-        <p>Über dieses Pascal waren mir zu diesem Zeitpunkt erst diejenigen Informationen bekannt, die man einem englischen, nicht allzu umfangreichen Handbuch entnehmen kann. Es unterstützt alle 35 reservierten Pascalstatements und alle 40 Pascal-Standardprozeduren, alle .Standardtypen (außer &lsquo;STRING&rsquo;, der aber leicht simuliert werden kann, siehe oben) sowie Mathematikfunktionen und Bitmanipulationen, auch auf Integern. Mengenoperationen sowie sogar variante Records(!) werden unterstützt. Darüber hinaus ist es auch an die Fähigkeiten des Commodore 64 angepaßt, was bedeutet, daß es Grafik und Sound unterstützt. Dazu besitzt es sehr komfortable Befehle, welche zum Beispiel in der Grafik Linien ziehen beziehungsweise löschen, Flächen ausfüllen beziehungsweise leeren und Punkte setzen beziehungsweise löschen oder prüfen können. Für den normalen Bildschirm gibt es die Prozedur »VDU«, die ein Zeichen an jeder beliebigen Stelle des Schirms ausgibt. Für den Sound gibt es die Prozedur »ENVEL«, die die Hüllkurve bestimmt, und für Frequenz, Wellenform und Dauer die Prozedur »VOICE« sowie eine eigene Prozedur »VOLUME«. Es unterstützt PEEK und POKE und erlaubt, in Pascal Maschinenprogramme zu editieren und als Pascalprozedur abzuspeicher. Weitere Features: Restore-Taste blockieren, Zugriff auf die Time Of Day-Clock, sedezimale Zahlenein- und -ausgabe, externe, linkbare Programm-Module, Forwarddeklarationen, Übergabeparameter dürfen auch Prozeduren und Funktionen sein, Prozeduren »PACK« und »UNPACK«, n-dimensionale Arrays. Es erzeugt Maschinencode. Es besitzt einen eigenen Editor, der im wesentlichen dem eingebauten Full-Screen-Editor entspricht, der aber um so nützliche Hilfen wie AUTO, DISK, NUMBER, FIND CHANGE, DELETE, PUT, GET, HEX, DECIMAL, DUMP, EX, LINK, COMPILE und einige Basicbefehle erweitert ist. Es gibt zwei Compiler. Der eine ist resident und compiliert und führt ein Programm sofort aus, was das Oxford Pascal vor allem für den Einsteiger, neben dem G-Pascal, sehr interessant macht. Der zweite Compiler ist ein Diskettencompiler, das heißt er liest und compiliert von beziehungsweise auf Diskette mit der Möglichkeit, externe Programm-Module einzubinden. Der Befehl »LOCATE« erzeugt danach ein ohne Hilfsmittel ablauffähiges Programm. Fehlermeldungen werden im englischen Klartext ausgegeben mit Angabe über die ungefähre Stelle im Listing.</p>
+        <p>Über dieses Pascal waren mir zu diesem Zeitpunkt erst diejenigen Informationen bekannt, die man einem englischen, nicht allzu umfangreichen Handbuch entnehmen kann. Es unterstützt alle 35 reservierten Pascalstatements und alle 40 Pascal-Standardprozeduren, alle Standardtypen (außer &lsquo;STRING&rsquo;, der aber leicht simuliert werden kann, siehe oben) sowie Mathematikfunktionen und Bitmanipulationen, auch auf Integern. Mengenoperationen sowie sogar variante Records(!) werden unterstützt. Darüber hinaus ist es auch an die Fähigkeiten des Commodore 64 angepaßt, was bedeutet, daß es Grafik und Sound unterstützt. Dazu besitzt es sehr komfortable Befehle, welche zum Beispiel in der Grafik Linien ziehen beziehungsweise löschen, Flächen ausfüllen beziehungsweise leeren und Punkte setzen beziehungsweise löschen oder prüfen können. Für den normalen Bildschirm gibt es die Prozedur »VDU«, die ein Zeichen an jeder beliebigen Stelle des Schirms ausgibt. Für den Sound gibt es die Prozedur »ENVEL«, die die Hüllkurve bestimmt, und für Frequenz, Wellenform und Dauer die Prozedur »VOICE« sowie eine eigene Prozedur »VOLUME«. Es unterstützt PEEK und POKE und erlaubt, in Pascal Maschinenprogramme zu editieren und als Pascalprozedur abzuspeicher. Weitere Features: Restore-Taste blockieren, Zugriff auf die Time Of Day-Clock, sedezimale Zahlenein- und -ausgabe, externe, linkbare Programm-Module, Forwarddeklarationen, Übergabeparameter dürfen auch Prozeduren und Funktionen sein, Prozeduren »PACK« und »UNPACK«, n-dimensionale Arrays. Es erzeugt Maschinencode. Es besitzt einen eigenen Editor, der im wesentlichen dem eingebauten Full-Screen-Editor entspricht, der aber um so nützliche Hilfen wie AUTO, DISK, NUMBER, FIND CHANGE, DELETE, PUT, GET, HEX, DECIMAL, DUMP, EX, LINK, COMPILE und einige Basicbefehle erweitert ist. Es gibt zwei Compiler. Der eine ist resident und compiliert und führt ein Programm sofort aus, was das Oxford Pascal vor allem für den Einsteiger, neben dem G-Pascal, sehr interessant macht. Der zweite Compiler ist ein Diskettencompiler, das heißt er liest und compiliert von beziehungsweise auf Diskette mit der Möglichkeit, externe Programm-Module einzubinden. Der Befehl »LOCATE« erzeugt danach ein ohne Hilfsmittel ablauffähiges Programm. Fehlermeldungen werden im englischen Klartext ausgegeben mit Angabe über die ungefähre Stelle im Listing.</p>
 
         <h2>Nur drei Versionen brauchbar</h2>
 

@@ -41,25 +41,25 @@
             <li>Ein besonderer Vorzug von »Kudiplo« ist schließlich, daß das Programm unzulässige Werte erkennt und unberücksichtigt läßt SQR(X) führt darum bei Werten von X &lt; 0 ebensowenig zum Abbruch des Programms wie 1/X bei X = 0.</li>
         </ul>
 
-        <p>Die Gebrauchsanleitung für den Benutzer wird Über den Bildschirm angegeben. Unlogische Eingaben werden zurückgewiesen.</p>
+        <p>Die Gebrauchsanleitung für den Benutzer wird über den Bildschirm angegeben. Unlogische Eingaben werden zurückgewiesen.</p>
 
         <p>Das Programm erfragt zuerst den Bereich, in welchem die Funktion dargestellt wird (Zeilen 470 bis 540). Die entsprechenden Werte werden in den Variablen XU, XO, YU und YO gespeichert. Aus diesen Werten wird die Lage des Nullpunktes auf beiden Achsen (XN und YN) und die Maßeinheit für die Skalierung der Achsen (XE und YE) berechnet. Weiter wird anschließend die darzustellende Funktion in den Zeilen 585 bis 620 erfragt.</p>
 
-        <p>Die folgende Routine dient dazu, die Funktion In das Programm zu übernehmen, indem sie zusammen mit Ihrer Ableitung in die Programmzellen 65 bis 80 und 205 geschrieben wird. Die Routine bedient sich dabei des bekannten Verfahrens der Eingabe über Bildschirmspeicher und Tastaturpuffer:</p>
+        <p>Die folgende Routine dient dazu, die Funktion in das Programm zu übernehmen, indem sie zusammen mit ihrer Ableitung in die Programmzeilen 65 bis 80 und 205 geschrieben wird. Die Routine bedient sich dabei des bekannten Verfahrens der Eingabe über Bildschirmspeicher und Tastaturpuffer:</p>
 
-        <p>Die zu verändernden Zeilen werden auf den Bildschirm geschrieben, dann wird der Tastaturpuffer mit der erforderlichen Zahl von »RETURNs« gefüllt Bei dem dann folgenden Programmabbruch (Zeile 660) arbeitet der Computer die Befehle im Tastaturpuffer ab Damit bei der hiermit bewirkten Änderung des Programmes die zuvor gewählten Parameter nicht verloren gehen, werden auch diese (mit Eingabe In die Zeilen 45 und 50) gerettet. Damit diese Routine funktioniert, dürfen die Zeilennummem 45, 50, 65, 70 und 205 nicht verändert werden!!</p>
+        <p>Die zu verändernden Zeilen werden auf den Bildschirm geschrieben, dann wird der Tastaturpuffer mit der erforderlichen Zahl von »RETURNs« gefüllt Bei dem dann folgenden Programmabbruch (Zeile 660) arbeitet der Computer die Befehle im Tastaturpuffer ab Damit bei der hiermit bewirkten Änderung des Programmes die zuvor gewählten Parameter nicht verloren gehen, werden auch diese (mit Eingabe in die Zeilen 45 und 50) gerettet. Damit diese Routine funktioniert, dürfen die Zeilennummem 45, 50, 65, 70 und 205 nicht verändert werden!!</p>
 
         <p>Nachdem sich das Programm durch »GOTO 45« selbst wieder gestartet hat, werden zunächst die Parameter aus den Zeilen 45 bis 55 und aus den Zeilen 65 bis 80 die definierten Funktionen eingelesen.</p>
 
         <p>Nun endlich kann der Plotter in Funktion treten. Er zeichnet die X-Achse (Zeilen 100 bis 140) und die Y-Achse (Zellen 145 bis 165) in der Größe von 400 x 400 Druckersteps (= 8 x 8 cm).</p>
 
-        <p>Es folgt in den Zeilen 195 bis 225 die Berechnung der Funktionswerte, beginnend mit dem niedrigsten Wert von X und mit der Schrittweite J von normalerweise 1/400 des Gesamtbereichs. Wer die Ausgabe (auf Kosten der Auflösung) beschleunigen möchte erreicht dies durch Zuweisung eines höheren Wertes für J.</p>
+        <p>Es folgt in den Zeilen 195 bis 225 die Berechnung der Funktionswerte, beginnend mit dem niedrigsten Wert von X und mit der Schrittweite J von normalerweise 1/400 des Gesamtbereichs. Wer die Ausgabe (auf Kosten der Auflösung) beschleunigen möchte, erreicht dies durch Zuweisung eines höheren Wertes für J.</p>
 
         <p>Die Zeilen 185 bis 195 bedürfen einer etwas ausführlichen Erklärung: Normalerweise würde das Auftreten unzulässiger Werte in der Funktion von X zum Abbruch des Programmes führen, so zum Beispiel wenn der Logarithmus von Werten X&lt;0 gebildet werden oder durch X=0 dividiert werden soll. Die Verarbeitung solcher Funktionen erfordert einen Eingriff ins Betriebssystem: Der Zeiger für die Fehlerbehandlungs-Routine (Speicherplätze $0300 und $0301) wird so (mit Zeile 190) verbogen, daß er jetzt auf einen in den Kassettenpuffer gePOKEten (Zeile 185) Sprungbefehl zeigt.</p>
 
-        <p>Infolge dieses Eingriffs gibt nun das Betriebssystem bei Auftreten eines Fehlers nicht mehr Alarm, sondern beginnt mit der Abarbeitung der nächsten (!) Zeile Restliche Statements in der fehlerträchtigen Zeile werden also nicht mehr beachtet.</p>
+        <p>Infolge dieses Eingriffs gibt nun das Betriebssystem bei Auftreten eines Fehlers nicht mehr Alarm, sondern beginnt mit der Abarbeitung der nächsten (!) Zeile. Restliche Statements in der fehlerträchtigen Zeile werden also nicht mehr beachtet.</p>
 
-        <p>Mit diesem Trick wird bewirkt, daß der Sprungbefehl am Ende derZeile 205 normalerweise ausgeführt wird, bei Auftreten eines Fehlers aber die Zeilen 210 bis 215 abgearbeitet werden. Hier wird je nach Art des Fehlers die Null-Fehler-Flag FE gesetzt oder der unzulässige Wert von X in der Variablen XW festgehalten. Diese Werte sind im weiteren Programmablauf behilflich, unzulässige Werte von X zu vermeiden.</p>
+        <p>Mit diesem Trick wird bewirkt, daß der Sprungbefehl am Ende der Zeile 205 normalerweise ausgeführt wird, bei Auftreten eines Fehlers aber die Zeilen 210 bis 215 abgearbeitet werden. Hier wird je nach Art des Fehlers die Null-Fehler-Flag FE gesetzt oder der unzulässige Wert von X in der Variablen XW festgehalten. Diese Werte sind im weiteren Programmablauf behilflich, unzulässige Werte von X zu vermeiden.</p>
 
         <p>Nach Berechnung aller Werte von X und Ausdruck der entsprechenden Punkte der Funktion (X;Y) in Zeile 220 wird mit den POKE-Befehlen der Zeile 225 der Zeiger für die Fehlerausgabe wieder in den Normalzustand gebracht. Die eingegebene Funktion ist damit fertig geplottet. Das Papier wird vorgeschoben, damit das Ergebnis besichtigt werden kann (Zeile 235). Auf dem Bildschirm erscheint zugleich das Menü (Zeilen 665 bis 720). Abhängig von der Eingabe verzweigt das Programm nun entweder<br>
             1) zur Eingabe einer Funktion, die in die gleichen Koordinaten geplotten werden soll, oder<br>
