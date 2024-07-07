@@ -43,7 +43,31 @@
         </figure>
 
         <figure>
-            <!-- TODO -->
+            <pre>                0010            ; *****************************
+                0020            ; *   ASSEMBLER-LISTING DER   *
+                0030            ; * PRUEFROUTINE DEVICE EIN ? *
+                0040            ; *  GESCHRIEBEN FUER  C- 64  *
+                0050            ; * (C) 1984 BY  WERNER PFEIL *
+                0060            ; *****************************
+                0070            ;
+                0100            .BA $C000
+C000- A9 01     0110            lda #$01              ; LAENGE
+C002- A0 C0     0120            ldy #$C0              ; ADRESSE HIGH
+C006- A2 21     0130            ldx #$21              ; ADRESSE LOW
+C006- 20 BD FF  0140            JSR $FFBD             ; PARAMETER FUER FILENAMEN
+C009- A9 01     0150            LDA #$01              ; FILE-NR.
+C00B- A0 0F     0160            LDY #$0F              ; SEKUNDAERADRESSE
+C00D- A6 02     0170            LDX $02               ; DEVICE-NR.
+C00F- 20 BA FF  0180            JSR $FFBA             ; FILEPARAMETER SETZEN
+C012- 20 C0 FF  0190            JSR $FFC0             ; OPEN
+C015- B0 02     0200            BCS $C019             ; WENN AUSGESCHALTET, DANN
+C017- A9 00     0210            LDA #$00
+C019- 85 02     0220            STA $02               ; ERGEBNIS DER PRUEFUNG
+C01B- A9 01     0230            LDA #$01              ; FILE-NR.
+C01D- 20 C3 FF  0240            JSR $FFC3             ; CLOSE
+C020- 60        0250            RTS
+C021- 20        0260            .BY $20
+                0270            .EN</pre>
             <figcaption>Der Inhalt der DATA-Zeilen mit zugehörigem Assembler-Listing</figcaption>
         </figure>
 
