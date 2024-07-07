@@ -1,0 +1,156 @@
+;Zinseszinsrechnu.prg ==0801==
+;Quelle: 1984-08-09-10.d64
+
+    7 poke45,peek(174):poke46,peek(175):clr
+    8 rem (c) by klaus kloeker
+    9 clr:dima$(19),a(19),ba$(4):goto1000
+   10 z1=2:z2=10:s=13:rem * maskeloeschen *
+   20 forz=z1toz2:gosub80:print"                          ":next:ifc=0thenreturn
+   30 z1=12:z2=20:c=0:goto20
+   40 s=0:forz=12to20:gosub80:print"           ":next:return
+   50 a$(a)=str$(int(a(a)*100+.5)):rem * runden
+   60 ab$=left$(a$(a),len(a$(a))-2)+"."+right$(a$(a),2):return
+   70 load"menue",8:rem *
+   80 poke214,z:poke211,s:sys58732:return:rem * cursorposition
+   90 a=55869:fori=1597to1622:pokei,100:pokea,1:a=a+1:next:return
+  100 rem * auswahlroutine
+  110 gosub80:print"{rvon}           {rvof}":fori=1to75:next
+  120 gosub80:print"{rvon}"a$(y)"{rvof}":fori=1to125:next
+  130 getg$:ifg$<>chr$(133)andg$<>chr$(134)andg$<>chr$(135)andg$<>chr$(13)then110
+  140 ifg$=chr$(133)andcthenc=0:return
+  150 ifg$=chr$(13)thengosub80:print"{rvon}>{rvof}";:return
+  160 ifg$=chr$(135)then190
+  170 z=z+sw:y=y+1:ifz>z2thenz=z1:y=y1
+  180 goto110
+  190 z=z-sw:y=y-1:ifz<z1thenz=z2:y=y2
+  195 goto110
+  200 rem * wahl-fusszeile:s=0
+  210 z=23:gosub80:print"{rvon}          {rvof}";:fori=1to75:next
+  220 gosub80:print"{rvon}"ba$(y)"{rvof}";:fori=1to175:next
+  230 getg$:ifg$<>chr$(134)andg$<>chr$(135)andg$<>chr$(13)then210
+  240 ifg$=chr$(13)thengosub80:print"{rvon}>{rvof}";:return
+  250 ifg$=chr$(135)then280
+  260 s=s+10:y=y+1:ifs>30thens=0:y=1
+  270 goto210
+  280 s=s-10:y=y-1:ifs<0thens=30:y=4
+  290 goto210
+  300 rem * eingaberoutine
+  310 gosub80
+  315 in$=""
+  320 print"{CBM-I}{left}";
+  330 getg$:ifg$=""then330
+  340 g=asc(g$):ifg=13then460
+  360 ifg<48org>57then410
+  370 in$=in$+g$:in=len(in$)
+  380 printg$;
+  390 ifin>nthenfori=1toin:printchr$(20);:next:goto310
+  400 goto320
+  410 ifg=46then370
+  420 ifg$=chr$(133)then9
+  430 ifg<>20then320
+  440 ifin<1then320
+  450 in$=left$(in$,in-1):goto380
+  460 pn$="":fori=1to(10-len(in$)):pn$=pn$+".":next:printpn$
+  470 iflen(in$)<1then310
+  480 return
+  999 :
+ 1000 rem * zinseszinsrechnung
+ 1010 gosub5000:printma$
+ 1020 a=55388:fori=1076to1906step40:pokei,101:pokea,1:a=a+40:next
+ 1030 a=55736:fori=1464to1474:pokei,100:pokea,1:a=a+1:next
+ 1040 a=55749:fori=1477to1502:pokei,100:pokea,1:a=a+1:next
+ 1050 z=23:s=0:gosub80:printmb$
+ 1060 z=2:gosub80:print"Auswahl :":print"{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}"
+ 1070 z=4:fori=1to5:gosub80:print"{rvon}"a$(i)"{rvof}":z=z+1:next
+ 1080 z=4:z1=z:z2=8:s=0:y=1:y1=y:y2=5:sw=1:c=0:gosub100:f=y:iff=5then70
+ 1090 iff=1thena$(9)=ko$:a$(10)=p$:a$(11)=n$:k=1
+ 1100 iff=2thena$(9)=kn$:a$(10)=p$:a$(11)=n$:k=1
+ 1110 iff=3thena$(9)=ko$:a$(10)=kn$:a$(11)=n$:k=0
+ 1120 iff=4thena$(9)=ko$:a$(10)=kn$:a$(11)=p$:k=2
+ 2000 rem * eingabemaske
+ 2010 z=2:s=13:gosub80:print"Eingabe :":z=3:gosub80:print"{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}"
+ 2020 z=4:fori=9to12:s=13:gosub80:print"{rvon}"a$(i)"{rvof} : ";pm$:z=z+2:next
+ 2030 z=23:s=0:gosub80:printmc$;
+ 2040 z=4:s=27:n=10:gosub300:a(9)=val(in$)
+ 2050 z=6:gosub300:a(10)=val(in$)
+ 2060 z=8:gosub300:a(11)=val(in$)
+ 2065 z=10:n=9:gosub300:a(12)=val(in$)
+ 2070 z=13:s=13:gosub80:print"Eingabe korrekt ? (j/n):":gosub90
+ 2080 z=13:s=38:gosub80:print"{CBM-I}{left}";
+ 2090 getg$:ifg$<>"j"andg$<>"n"then2090
+ 2100 printg$:ifg$="j"theny=1
+ 2110 ifg$="n"theny=0
+ 2120 geti$:ifi$<>chr$(13)andi$<>chr$(20)then2120
+ 2130 ifi$=chr$(20)then2080
+ 2140 c=1:gosub10:ify=0then2010
+ 3000 rem * rechnung
+ 3010 iff=1thena(16)=a(9)*(1+(a(10)/(a(12)*100)))^(a(11)*a(12))
+ 3020 iff=1thena(19)=100*((1+(a(10)/(a(12)*100)))^a(12)-1):d=1
+ 3030 iff=2thena(16)=a(9)/(1+(a(10)/(a(12)*100)))^(a(11)*a(12)):d=0
+ 3040 iff=3thena(16)=((a(10)/a(9))^(1/(a(11)*a(12)))-1)*100:d=0
+ 3050 iff=4thena(16)=(log(a(10)/a(9))/log(1+(a(11)/(a(12)*100))))/a(12):d=0
+ 3500 rem * screen
+ 3510 z=2:s=13:gosub80:print"Eingabe :":z=3:gosub80:print"{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}"
+ 3520 z=4:fori=9to12:gosub80:printa$(i)" :"a(i):z=z+2:next
+ 3530 z=13:gosub80::print"Resultat :":z=14:gosub80:print"{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}":a=16:gosub50
+ 3540 z=15:gosub80:print"{rvon}"a$(f)"{rvof} :"tab(38-len(ab$));ab$
+ 3550 printtab(39-len(ab$));:fori=1tolen(ab$)-1:print"=";:next
+ 3560 z=20:gosub80:ifk=1thenprint"Ausdruck in DM !":goto3580
+ 3570 ifk=0thenprint"Ausdruck in Prozent !"
+ 3580 ifd=0then3620
+ 3590 z=13:s=0:gosub80::print"{rvon}"a$(17)"{rvof}":print"{rvon}"a$(18)"{rvof}"
+ 3600 z=17:s=1:gosub80:a=19:gosub50:printab$" %"
+ 3610 printtab(7-len(ab$));:fori=1tolen(ab$)+1:print"=";:next
+ 3620 z=23:s=0:gosub80:fori=1to4:print"{rvon}"ba$(i)"{rvof}";:next
+ 3630 y=1:gosub200:ify=4then70
+ 3640 ify=3then1010
+ 3650 ify=2then4500
+ 4000 rem * aenderung
+ 4010 c=1:gosub10:ifdthengosub40
+ 4020 z=2:s=13:gosub80::print"Aenderung :":z=3:gosub80:print"{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}"
+ 4030 z=4:s=13::fori=9to12:gosub80:print"{rvon}"a$(i)"{rvof} :";a(i):z=z+2:next
+ 4040 z=23:s=0:gosub80:printmd$;
+ 4050 z=4:z1=z:z2=10:s=13:y=9:y1=y:y2=12:sw=2:c=1:gosub100
+ 4060 ifc=0thengosub10:goto3000
+ 4070 z=13:s=13:gosub80:print"{rvon}"a$(y)"{rvof} : ";pm$:gosub90
+ 4080 z=23:s=0:gosub80:printmc$;:z=13:s=27:gosub300:a(y)=val(in$):goto4010
+ 4500 rem * printer
+ 4505 ta$=chr$(10):tb$=chr$(16)
+ 4510 open4,4,7:print#4,chr$(14);tb$"25ZINSESZINSRECHNUNG"
+ 4520 print#4,tb$"25-----------------"ta$
+ 4530 fori=9to12:print#4,chr$(15)tb$"10*** "a$(i)" : "a(i):next
+ 4540 a=16:gosub50:print#4,ta$;tb$"14"a$(f)" : "ab$
+ 4550 print#4,tb$"15";:fori=1to2+len(a$(f)+ab$):print#4,"=";:next
+ 4560 print#4,chr$(13):ifdthengosub4620
+ 4565 print#4,ta$;ta$;ta$
+ 4570 print#4,chr$(13);tb$"10***  Kapital und Zinssatz werden";
+ 4580 print#4," in ' DM ' ausgedruckt,"
+ 4590 print#4,tb$"16Zinssatz und Jahreszins (falls vorhanden) in ' %{$a0}' !"
+ 4600 print#4:fori=1to40:print#4,"==";:next:print#4,ta$;ta$;ta$
+ 4610 close4:fori=56176to56215:pokei,0:next:goto3620
+ 4620 ifdthenprint#4,ta$;tb$"15"a$(17)" "a$(18)" : ";
+ 4630 a=19:gosub50:print#4,ab$
+ 4640 print#4,tb$"15";:fori=1tolen(a$(18)+a$(19)+ab$)+10:print#4,"=";:next
+ 4650 return
+ 5000 rem * variablen
+ 5010 ma$="{clr}{rvon}  Z{$a0}I{$a0}N{$a0}S{$a0}E{$a0}S{$a0}Z{$a0}I{$a0}N{$a0}S{$a0}R{$a0}E{$a0}C{$a0}H{$a0}N{$a0}U{$a0}N{$a0}G{$a0}{$a0}{rvof}"
+ 5020 mb$="{rvon} F3 u. F5 - Wahl ! 'RETURN' - Eingabe !{rvof}"
+ 5030 mc$="{rvon}  F1 - Neu !      Geben Sie ein !      {rvof}"
+ 5040 md$="{rvon} F1 - Resultat !     F3 u. F5 - Wahl ! {rvof}"
+ 5050 ko$=" An.kapital":p$="  Zinssatz ":kn$=" Endkapital"
+ 5060 n$="  Jahre    ":a$(12)=" Zinsper./a":pm$=".........."
+ 5100 ba$(1)="  Aendern "
+ 5110 ba$(2)="  Kopie   "
+ 5120 ba$(3)="  Neu     "
+ 5130 ba$(4)=" Menue    "
+ 5500 a$(1)=kn$
+ 5510 a$(2)=ko$
+ 5520 a$(3)=p$
+ 5530 a$(4)="  Laufzeit "
+ 5540 a$(5)="  Menue    "
+ 5600 a$(13)="  Aendern  "
+ 5610 a$(14)="  Resultat "
+ 5620 a$(15)="  Menue    "
+ 5630 a$(17)="Effektiver"
+ 5640 a$(18)="Jahreszins":return
+

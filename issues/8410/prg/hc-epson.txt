@@ -1,0 +1,48 @@
+;hc-epson.prg ==0801==
+;Quelle: 1984-07-10.d64
+
+    0 open1,4,1:print#1,chr$(27);"l";chr$(64);chr$(1);
+    2 dim s(7,7):l=0:q=8192
+    3 a=128:b=64:c=32:d=16:e=8:f=4:g=2:h=1
+    4 forl=1to25
+    6 forr=qtoq+320step8
+    8 forn=0to7
+   10 m=r+n
+   11 printm:print"{up}{up}"
+   12 x=peek(m)
+   28 if x>=a then x=x-a:gosub 1000:s(n,0)=1:goto 30
+   29 gosub 2000:s(n,0)=0
+   30 if x>=b then x=x-b:gosub 1000:s(n,1)=1:goto 50
+   40 gosub 2000:s(n,1)=0
+   50 if x>=c then x=x-c:gosub 1000:s(n,2)=1:goto 70
+   60 gosub 2000:s(n,2)=0
+   70 if x>=d then x=x-d:gosub 1000:s(n,3)=1:goto 90
+   80 gosub 2000:s(n,3)=0
+   90 if x>=e then x=x-e:gosub 1000:s(n,4)=1:goto110
+  100 gosub 2000:s(n,4)=0
+  110 if x>=f then x=x-f:gosub 1000:s(n,5)=1:goto130
+  120 gosub 2000:s(n,5)=0
+  130 if x>=g then x=x-g:gosub 1000:s(n,6)=1:goto150
+  140 gosub 2000:s(n,6)=0
+  150 if x=hthen gosub 1000:s(n,7)=1:goto3000
+  160 gosub 2000:s(n,7)=0
+  180 nextn:goto3000:rem*** wenn mehr datas dann goto4! ***
+ 1000 rem print"*";
+ 1010 return
+ 2000 remprint".";
+ 2010 return
+ 3000 a=0 :rem *** umwandlung der wertikalen datas in horizontaldatas ***
+ 4001 rem *** umwandlung der horizonalen datas in epson datas ***
+ 4010 forn=oto7
+ 4011 j=s(0,n)*128+(s(1,n)*64)+(s(2,n)*32)+(s(3,n)*16+s(4,n)*8)
+ 4015 k(n)=j+(s(5,n)*4)+(s(6,n)*2)+s(7,n)
+ 4020 print#1,chr$(k(n));
+ 4030 nextn:nextr:
+ 4040 q=q+320:print#1,chr$(13);chr$(27);"l";chr$(64);chr$(1);:nextl
+ 4050 rem *** basic hardcopy    ***
+ 4060 rem *** by mark zimmermann ***
+ 4070 rem *** postfach 22 00 44 ***
+ 4080 rem *** stadtwaldwende 20 ***
+ 4090 rem *** d - 4300 essen 01 ***
+ 5000 rem *** for  c=64 & epson ***
+
