@@ -673,13 +673,9 @@ Oft muß der Commodore 64 die Aufgaben eines Personal Computers übernehmen. So 
 Sinnvolles Arbeiten ist mit solchen Programmen nur dann möglich, wenn einige Grundvoraussetzungen erfüllt werden:
 
 — Ein deutscher Zeichensatz auf dem Bildschirm, leicht zu handhabende, deutsche Benutzerführung — Umfangreiche Textformatierungsbefehle für den Ausdruck und den Bildschirm
-
 — Die Möglichkeit zur Diskettenverwaltung
-
 — Umfangreiche Anpassungsmöglichkeiten an verschiedene Drucker.
-
 — Verschiebe,- Ersetz,- und Kopierfunktionen.
-
 — und möglichst eine Schnittstelle zu einem Datenverwaltungsprogramm.
 
 Alle diese Anforderungen zu erfüllen, verspricht der Textomat. Seine Geschichte ist eigentlich einen eigenen Artikel wert, denn angeboten wird das Programm schon seit über einem Jahr. In dieser Zeit reifte der Textomat von Version zu Version — nicht immer zur Freude der Käufer. Zum Test stand aber die bislang neueste Auflage dieses Programms zur Verfügung.
