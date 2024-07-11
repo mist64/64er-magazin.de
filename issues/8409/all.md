@@ -17,7 +17,7 @@ Michael Pauly, Chefredakteur
 
 > Eine Floppy, auf der mehr als ein MegaByte gespeichert werden kann und die zirka viermal schneller ist als die VC 1541, ist ein Traum für viele C 64/VC 20-Besitzer. Die neue Floppy SFD 1002 von Commodore hat jedoch auch ihre Schattenseiten.
 
-Commodore hat ein neues Floppy-Laufwerk herausgebracht. Ihr Name ist SFD 1002. Eigentlich ist sie ja nichts Neues. Wenn man die große CBM 8250 in zwei Hälften teilt, und in ein anderes Gehäuse hineinsteckt, kommt die SFD 1002heraus. Genauergesagt, die SFD 1001. Der Unterschied zwischen SFD 1002 und SFD 1001 besteht lediglich darin, daß die SFD 1001 mit einem zusätzlichem IEEE -488 Interface geliefert wird, das den C 64 mit der 1001 verbindet. Doch kommen wir zu einigen interessanten technischen Daten der SFD 1001/ 1002.
+Commodore hat ein neues Floppy-Laufwerk herausgebracht. Ihr Name ist SFD 1002. Eigentlich ist sie ja nichts Neues. Wenn man die große CBM 8250 in zwei Hälften teilt, und in ein anderes Gehäuse hineinsteckt, kommt die SFD 1002 heraus. Genauergesagt, die SFD 1001. Der Unterschied zwischen SFD 1002 und SFD 1001 besteht lediglich darin, daß die SFD 1001 mit einem zusätzlichem IEEE -488 Interface geliefert wird, das den C 64 mit der 1001 verbindet. Doch kommen wir zu einigen interessanten technischen Daten der SFD 1001/1002.
 
 Nach dem Formatieren einer Diskette meldet die 1001/1002 fantastische 4133 freie Blöcke. Das entspricht umgerechnet 1033,25 KByte freiem Speicherplatz! Daten werden auf 77 Spuren bei 23 bis 29 Sektoren pro Spur gespeichert. Die Übertragungsgeschwindigkeit beträgt 1,2 KByte/sec (VC 1541 : 0,4 KByte/sec) Auch die Anzahl der gleichzeitig geöffneten Dateien ist gegenüber der VC 1541 höher. Es können gleichzeitig fünf sequentielle oder drei relative oder zwei sequentielle und zwei relative oder drei sequentielle und eine relative Datei geöffnet sein.
 
@@ -39,19 +39,19 @@ Alles in allem kann ich dieses neue Gerät nicht bedingungslos empfehlen. Die An
 
 Bei COMPUmask handelt es sich um eine Schablone, die auf den C 64 oder den VC 20 gelegt wird. Auf dieser abtrieb- und reinigungsmittelfesten Schablone sind die am häufigsten vorkommenden Daten, Funktionen, Befehle, Zeichen, POKEs, Tabellen und vieles mehr aufgeführt. Die Oberseite ist zweifarbig, wobei die auf den Bildschirm bezogenen Teile farbig unterlegt sind. So sind über 80 Basic-Befehle, Drucker- und Floppyoperationen, POKEs, Bildschirmausgabezeichen und 3 Demoprogramme zu finden. Diese kleine Übersicht kann nicht alles aufführen, was die Schablone beinhaltet. Für den Preis von 29,80 Mark dürfte die Schablone so für manchen C 64- oder VC 20-Neuling interessant sein, (rg)
 
-Info: IDEE-SOFT, I.Dinkler, Am Schneider-haus 7, 5760 Arnsberg 1, Tel. 02932/32947
+Info: IDEE-SOFT, I.Dinkler, Am Schneiderhaus 7, 5760 Arnsberg 1, Tel. 02932/32947
 
 # Komfort-Makroassembler für CBM und VC20/C 64
 
-Für die Commodore-Geräte 3032, 4032, 8032, C 64 und VC20 ist das Makroassembler-Paket ASSI/M und AS-SI/MC erhältlich. Es besteht aus drei Programmen, dem Fullscreen-Editor FSE, einem Makroassembler ASM für den 6502 oder — im Paket ASSI/MC - die CMOS CPU 65C02 und dem Debugger DEMON beziehungsweise DEMON/C sowie zwei Makrobibliotheken.
+Für die Commodore-Geräte 3032, 4032, 8032, C 64 und VC20 ist das Makroassembler-Paket ASSI/M und ASSI/MC erhältlich. Es besteht aus drei Programmen, dem Fullscreen-Editor FSE, einem Makroassembler ASM für den 6502 oder — im Paket ASSI/MC - die CMOS CPU 65C02 und dem Debugger DEMON beziehungsweise DEMON/C sowie zwei Makrobibliotheken.
 
 Der Assembler übersetzt von Floppy nach Floppy oder von der Floppy direkt in den Speicher, akzeptiert beliebig lange Sourcefiles (mit Verkettung und include) und kann das Listing auf ein beliebiges Gerät ausgeben oder ganz unterdrücken. Im Gegensatz zu anderen Assemblern kann man (wie zum Beispiel bei Pascal) eine Blockstruktur verwenden. Der ASM unterstützt rekursive Makroaufrufe beliebiger Tiefe sowie bis zu 255 Ebenen der Schachtelung bei bedingter Assemblierung. Weitere Eigenschaften: formatfreie Eingabe, lange Symbol-Namen, 23 Klartext-Fehlermeldungen und eine sehr umfangreiche Arithmetik. Der ASM kann Assemblerprogramme verarbeiten, die vom Basic-Compiler BASS der Firma gmb-Soft erzeugt wurden.
 
-Der Editor FSE verwendet keine Zeilennummern, sondern erlaubt Textmanipulationen wie bei Textverarbeitungssystemen mit 2-Rich-tungs-Scroll, Blättern, frei definierbarem Tabulator und Rändern, Statuszeile, Such- und Austauschbefehlen mit vielen Optionen, Merker, Blockbefehle, arbeitet mit beliebiger Peripherie, auch Kassette, zusammen und bietet noch viele weitere Möglichkeiten.
+Der Editor FSE verwendet keine Zeilennummern, sondern erlaubt Textmanipulationen wie bei Textverarbeitungssystemen mit 2-Richtungs-Scroll, Blättern, frei definierbarem Tabulator und Rändern, Statuszeile, Such- und Austauschbefehlen mit vielen Optionen, Merker, Blockbefehle, arbeitet mit beliebiger Peripherie, auch Kassette, zusammen und bietet noch viele weitere Möglichkeiten.
 
 Der Debugger DEMON bietet Line-Assemblierung, Disassemblierung, Single-Step (auch durch ROM-Bereiche), überwachte Ausführung ohne Anzeige der einzelnen Schritte, fünf Breakpoints, vollständige Kontrolle bei Trace durch frei programmierbare Überwachungsroutine, Arithmetik und Zahlenumwandlungen, Analyse von Programmen auf Verwendung von Zero-Page-Adressen, Verschiebbarkeit von Programmen und ist selbst voll verschieblich.
 
-Die Makrobibliotheken erlauben die Verwendung von Befehlen für strukturierte Programmierung wie if/ then/else, repeat/until, whi-le/endwhile und switch/ case/default/endswitch sowie von 16-Bit-Befehlen. Das Paket ist auf Disketten im Format 8050 oder 1541/4040 lieferbar und kostet 220 Mark für den 6502 und 250 Mark für den 65C02.
+Die Makrobibliotheken erlauben die Verwendung von Befehlen für strukturierte Programmierung wie if/ then/else, repeat/until, while/endwhile und switch/ case/default/endswitch sowie von 16-Bit-Befehlen. Das Paket ist auf Disketten im Format 8050 oder 1541/4040 lieferbar und kostet 220 Mark für den 6502 und 250 Mark für den 65C02.
 
 Info: D. Zabel, Stresemannstr. 50, 1000 Berlin 61,Tel. (0 30) 8 22 52 27
 
@@ -59,7 +59,7 @@ Info: D. Zabel, Stresemannstr. 50, 1000 Berlin 61,Tel. (0 30) 8 22 52 27
 
 > Auf dem Markt der 5¼-Zoll-Floppylaufwerke für den C 64 und den VC 20 ist ein neuer Konkurrent aufgetaucht. Er heißt YL-55SU-CM. Auch ein neues Kassettenlaufwerk wird angeboten.
 
-Diese neue Floppy ist mit einem Teac-Laufwerk ausgestattet, das für seine Zuverlässigkeit bekannt ist. Es ist voll kompatibel zur VC 1541. Das bedeutet, daß mit derVC 1541 bespielte Disketten auch von der neuen Floppy gelesen werden können. Die Geschwindigkeit, die mit diesem Laufwerk erreicht werden könnte, würde das Herz eines jeden VC 1541-Geschädigten höher schlagen lassen. Wenn da nicht noch das Commodore-kompatible DOS wäre. So bringt diese neue Floppy in diesem Punkt keinen Vorteil gegenüber der VC 1541. Laut Hersteller wird aber daran gearbeitet, die Geschwindigkeit, mit der das Laufwerk arbeitet, zu verbessern. Diejenigen, die sich die neue Floppy schon jetzt kaufen möchten, können später das alte DOS gegen einen geringen Aufpreis austauschen lassen. Doch die Übertragungsgeschwindigkeit bei einer Floppy ist nicht alles. Wer die Reparaturanfälligkeit der Commodore-Floppy kennt, wird ein zuverlässigeres Laufwerk schätzen. Der empfohlene Verkaufspreis liegt bei 798 Mark.
+Diese neue Floppy ist mit einem Teac-Laufwerk ausgestattet, das für seine Zuverlässigkeit bekannt ist. Es ist voll kompatibel zur VC 1541. Das bedeutet, daß mit der VC 1541 bespielte Disketten auch von der neuen Floppy gelesen werden können. Die Geschwindigkeit, die mit diesem Laufwerk erreicht werden könnte, würde das Herz eines jeden VC 1541-Geschädigten höher schlagen lassen. Wenn da nicht noch das Commodore-kompatible DOS wäre. So bringt diese neue Floppy in diesem Punkt keinen Vorteil gegenüber der VC 1541. Laut Hersteller wird aber daran gearbeitet, die Geschwindigkeit, mit der das Laufwerk arbeitet, zu verbessern. Diejenigen, die sich die neue Floppy schon jetzt kaufen möchten, können später das alte DOS gegen einen geringen Aufpreis austauschen lassen. Doch die Übertragungsgeschwindigkeit bei einer Floppy ist nicht alles. Wer die Reparaturanfälligkeit der Commodore-Floppy kennt, wird ein zuverlässigeres Laufwerk schätzen. Der empfohlene Verkaufspreis liegt bei 798 Mark.
 
 ## 99-Mark-Recorder
 
@@ -69,7 +69,7 @@ Info: Bezugsquelle: WM-Computer, St.-Anton-Str.31, 4150 Krefeld 1, 02151/801300 
 
 # Commodore-Messe in Frankfurt
 
-Vom 4. bis 8. September findet in der Halle 1 des Frankfurter Messegeländes die vierte »Internationale Commodore-Fachausstellung (CFA)« statt. Etwa 120 Aussteller präsentieren Hard- und Software rund um den Commodore. Laut Commodore werden beide Schwerpunkte berücksichtigt: kommerziell/professio-nelle Anwendungen und der Hobby-Bereich. Für »Freaks« gebe es eine spezielle Hard-und Softwarebörse, auf der Commodore-Computer und -Programme verkauft oder getauscht werden können. Übrigens: Die Redaktion des 64’er-Magazins steht während der CFA für Gespräche ihren Lesern zur Verfügung (Stand: Markt & Technik).
+Vom 4. bis 8. September findet in der Halle 1 des Frankfurter Messegeländes die vierte »Internationale Commodore-Fachausstellung (CFA)« statt. Etwa 120 Aussteller präsentieren Hard- und Software rund um den Commodore. Laut Commodore werden beide Schwerpunkte berücksichtigt: kommerziell/professionelle Anwendungen und der Hobby-Bereich. Für »Freaks« gebe es eine spezielle Hard- und Softwarebörse, auf der Commodore-Computer und -Programme verkauft oder getauscht werden können. Übrigens: Die Redaktion des 64’er-Magazins steht während der CFA für Gespräche ihren Lesern zur Verfügung (Stand: Markt & Technik).
 
 (kg)
 
@@ -88,24 +88,36 @@ Bezugsquelle: Software Express, Hugo-Vichoff-Str. 84, 4000 Düsseldorf 30
 # Leserforum
 
 Probleme mit Datasette?
+
 Ich habe andauernd »LOAD ERROR« trotz Kassettenwechsel und einwandfrei justiertem Lese- und Aufnahmekopf der Datasette. Kann es am C 64 liegen? Wer kann helfen?
+
 Peter Ritter
 
 Schwierigkeiten mit Farbfernsehen und Interface?
 Ich besitze einen C 64 und das Kassetteninterface von K. Jeschke. Früher hatte ich einen Schwarzweiß-Fernseher und das Interface arbeitete einwandfrei. Seit kurzem besitze ich einen kleinen Farbfernseher, doch jetzt tritt ein Problem auf. Das Speichern funktioniert weiterhin einwandfrei, doch beim Laden muß ich jetzt immer erst den Antennenstecker aus dem C 64 ziehen und Programme blind einladen, weil bei angeschlossenem Fernseher das Relais im Interface verrückt spielt und das Einladen nicht funktioniert. Woran kann die Unverträglichkeit zwischen Fernseher und Interface beim Laden liegen?
+
 Andreas Heine
 
-Das Problem liegt wahrscheinlich in einer mangelhaften Abschirmung des HF-Si-gnals in Ihrem Fernseher. Mögliche Abhilfe: Standort des Interfaces verlagern, Anschlußkabel verdrillen. Besser abgeschirmtes Kabel vom Fernseher zum C 64 verwenden (75 Ohm Antennenkabel).
+Das Problem liegt wahrscheinlich in einer mangelhaften Abschirmung des HF-Signals in Ihrem Fernseher. Mögliche Abhilfe: Standort des Interfaces verlagern, Anschlußkabel verdrillen. Besser abgeschirmtes Kabel vom Fernseher zum C 64 verwenden (75 Ohm Antennenkabel).
 
 Probleme mit unseren Listings?
-Was bedeuten im 64’er, Ausgabe 5, Seite 112 in Zeilennum-mer50000 dasZeichen »~« und in Ausgabe 7 auf Seite 70 (Super-voc) in Zeile 420 IFA$=»T« das reverse T und wie gibt man dieses Zeichen ein? Gibt es einen Ersatz dafür? Stefan Rolfes
-Leider haben wir unseren Epson FX80 noch nicht dazu gebracht, sämtliche Zeichen des Commodore zu drucken. Vor allem bei dem Pfeil nach oben und Pfeil nach links weigert er sich bisher, sie richtig auf das Papier zu bringen. Der A bedeutet also Pfeil nach oben.
-Das oben erwähnte reverse T steht für die DEL-Taste. Man kann das Zeichen so eingeben: ””(DEL)(INST) (DEL)". Also zuerst zwei Anführungszeichen, danach die DELete-Taste, die In-sert(INST)-Taste, wiederum die DELete-Taste und zum Schluß noch einmal ein Anführungszeichen. Allerdings kann man die DEL-Taste auch so abfragen: IF A$ = CHR$(20)THEN...
+
+Was bedeuten im 64’er, Ausgabe 5, Seite 112 in Zeilennummer 50000 das Zeichen »^« und in Ausgabe 7 auf Seite 70 (Supervoc) in Zeile 420 IFA$=»T« das reverse T und wie gibt man dieses Zeichen ein? Gibt es einen Ersatz dafür?
+
+Stefan Rolfes
+
+Leider haben wir unseren Epson FX80 noch nicht dazu gebracht, sämtliche Zeichen des Commodore zu drucken. Vor allem bei dem Pfeil nach oben und Pfeil nach links weigert er sich bisher, sie richtig auf das Papier zu bringen. Der »^« bedeutet also Pfeil nach oben.
+
+Das oben erwähnte reverse T steht für die DEL-Taste. Man kann das Zeichen so eingeben: ""(DEL)(INST)(DEL)". Also zuerst zwei Anführungszeichen, danach die DELete-Taste, die In-sert(INST)-Taste, wiederum die DELete-Taste und zum Schluß noch einmal ein Anführungszeichen. Allerdings kann man die DEL-Taste auch so abfragen: IF A$ = CHR$(20) THEN...
 
 Programme direkt vom Fernseher?
-Wie kann man die Datasette VC 1530 für direkte Aufnahme von Computer-Programmen vom Fernseher (Video-Recorder) umrüsten (siehe Computer-Club-Sendungen und so weiter)? Wölfgang Schulte
+
+Wie kann man die Datasette VC 1530 für direkte Aufnahme von Computer-Programmen vom Fernseher (Video-Recorder) umrüsten (siehe Computer-Club-Sendungen und so weiter)?
+
+Wölfgang Schulte
 
 Daten speichern ohne Datei zu laden?
+
 Wie kann ich Daten auf Diskette speichern, ohne die Datei zu laden, umzuändern und neu zu speichern (das ist mir zu umständlich)?
 
 The Dynamike, Emden
@@ -114,16 +126,18 @@ Mit einer relativen Datei ist das ohne Schwierigkeiten möglich. In Ausgabe 6/84
 
 Rechenungenauigkeiten beim C 64?
 Warum gibt der C 64 als Ergebnis der Aufgabe PRINT INT(3/0.03) nicht 100, sondern 99 an? Das gilt auch, wenn man schreibt A%=INT(3/0.03) und dann PRINTA%.
+
 Oliver Treiber
 
 Hardcopies mit MPS 802 und Simons-Basic?
-Wir haben den C 64 und den Drucker MPS 802 (Nachfolge-gerät vom VC 1526), dazu Simons Basic. Ist es möglich, im Hires- beziehungsweise Low-col-Modus eine Kopie des Bildschirms zu erstellen?
+
+Wir haben den C 64 und den Drucker MPS 802 (Nachfolgegerät vom VC 1526), dazu Simons Basic. Ist es möglich, im Hires- beziehungsweise Low-col-Modus eine Kopie des Bildschirms zu erstellen?
 Gerhard Schief
 Das könnten Sie ja eigentlich selbst ausprobieren. Aber wenn Sie mit dem Befehl HRDCPY keine Hardcopy des normalauflösenden Bildschirms erhalten sollten, könnte der Drucker defekt sein. Eine Hardcopy des hochauflösenden Grafikbildschirms hingegen ist mit dem Simons-Basicbefehl COPY nicht möglich. Das gilt auch für den weitgehend baugleichen VC 1526.
 
 Apple Joystick an C 64?
 
-Gibt es ein Interface, das es ermöglicht, Apple-Joysticks an den Commodore 64 anschließen zu können?AIle Spiele, die für die Ports 1 und 2 geschrieben worden sind, sollten steuerbar sein.
+Gibt es ein Interface, das es ermöglicht, Apple-Joysticks an den Commodore 64 anschließen zu können? Alle Spiele, die für die Ports 1 und 2 geschrieben worden sind, sollten steuerbar sein.
 
 Frank Zündorff
 
@@ -140,7 +154,6 @@ Darf man überhaupt eine Diskette in das Laufwerk legen?
 Als wir uns mit dem deutschen und dem englischen Handbuch zur 1541 befaßten, stießen wir auf einige Widersprüche in bezug auf die Handhabung:
 
 1.	Im englischen Handbuch wird auf Seite 8 unten ausdrücklich darauf hingewiesen, daß beim Leuchten der grünen LED nie eine Diskette ins Laufwerk hineingeschoben oder aus ihm hinausgenommen werden darf. Im deutschen Gegenstück ist jedoch auf Seite 5 Mitte zu lesen, daß auch im ausgeschalteten Zustand der Floppy keine Diskette darin sein darf.
-
 2.	In der deutschen Fassung des Handbuches wird gesagt, daß erst der Computer, dann das Laufwerk eingeschaltet werden soll. Die Autoren des englischen Handbuches vermerken ausdrücklich auf Seite 7, daß man nie den Computer zuerst anschalten darf, da sonst nicht »everything OK« ist. Deshalb unsere Fragen:
 
 a) Darf man überhaupt eine Disk ins Laufwerk legen?
@@ -156,14 +169,16 @@ Manche Leserfrage zeigt deutlich, daß man doch von Zeit zu Zeit einen Blick in 
 
 Wenn das Gerät auf dem grauen Markt gekauft wurde, dürfte sich das schwieriger gestalten. Ein Computer ist eben kein Gebrauchtwagen, der in jeder Hinterhofwerkstatt getestet werden kann. Hier hilft nur eines: Auf dem schnellsten Weg zum Fachhändler zu gehen und zu hoffen, daß der auch nicht bei ihm gekaufte Geräte einstellt (Selbstversuche rächen sich gerade beim HF-Modulator). Ebenso schnell sollte R. Morgenthaler das Handbuch zum VC 20 oder ein anderes Begleitbuch (die von Data Becker sind hilfreich, das von Hofacker weniger) anschaffen.
 
-Die beiden anderen Fragen kann man zusammen beantworten. Der VC 20 läßt sich an einem gewöhnlichen Farb- oder S/W-Fernseher ohne Scart-Buchse nur mit dem HF-Modulator betreiben. Für den Betrieb mit einem Monitor oder einen Fernseher mit Spezial-(Scart)Anschluß braucht man ein Monitor-Kabel, das es für den Commodore-Farbmonitor bei jedem Systemhändler gibt. Da ich den Nordmende-Anschluß nicht kenne, kann ich nur den Rat geben, bei einem der Hardware-Drittanbieter (Data Becker oder Kingsoft etc.) oder bei Commodore Deutschland (Lyoner Str. 38, 6000 Frank-furt/M 71) anzufragen. Dort wird man gerne weiterhelfen. Ich bin gerne bereit, anderen VC 20-Anwendern — soweit ich kann — weiterzuhelfen. Meine Adresse: Adenauerallee 19, 5300 Bonn 1. Wer mir schreiben will, muß allerdings einen frankierten Rückumschlag beilegen.
+Die beiden anderen Fragen kann man zusammen beantworten. Der VC 20 läßt sich an einem gewöhnlichen Farb- oder S/W-Fernseher ohne Scart-Buchse nur mit dem HF-Modulator betreiben. Für den Betrieb mit einem Monitor oder einen Fernseher mit Spezial-(Scart)Anschluß braucht man ein Monitor-Kabel, das es für den Commodore-Farbmonitor bei jedem Systemhändler gibt. Da ich den Nordmende-Anschluß nicht kenne, kann ich nur den Rat geben, bei einem der Hardware-Drittanbieter (Data Becker oder Kingsoft etc.) oder bei Commodore Deutschland (Lyoner Str. 38, 6000 Frankfurt/M 71) anzufragen. Dort wird man gerne weiterhelfen. Ich bin gerne bereit, anderen VC 20-Anwendern — soweit ich kann — weiterzuhelfen. Meine Adresse: Adenauerallee 19, 5300 Bonn 1. Wer mir schreiben will, muß allerdings einen frankierten Rückumschlag beilegen.
 
 Hans Altmeyer
 
-Zur Frage von Günther Kyora: DerAnschluß von Commodore VC 20 und C64 an Fernseh-Empfänger mit Scartbuchse oder Videobuchse nach DIN ist nach folgendem Schaltplan vorzunehmen: VC 20:
-Zu der punktierten Leitung: Manche Fernseh-Geräte haben einen Schalter zum Umschalten aufMonitorbetrieb (siehe Bedienanleitung). In diesem Fall kann die Verbindung entfallen. Andernfalls ist eine Schaltspannung von zirka 12 V zum Umschalten erforderlich. Dazu ist eine kleine Änderung im Computer erforderlich.
+Zur Frage von Günther Kyora: Der Anschluß von Commodore VC 20 und C64 an Fernseh-Empfänger mit Scartbuchse oder Videobuchse nach DIN ist nach folgendem Schaltplan vorzunehmen: VC 20:
+
+Zu der punktierten Leitung: Manche Fernseh-Geräte haben einen Schalter zum Umschalten auf Monitorbetrieb (siehe Bedienanleitung). In diesem Fall kann die Verbindung entfallen. Andernfalls ist eine Schaltspannung von zirka 12 V zum Umschalten erforderlich. Dazu ist eine kleine Änderung im Computer erforderlich.
 
 Am VC 20: Durch Umlöten von zwei Lötbrücken (E1-E3 unterbrechen, E1-E2 verbinden) wird Pin 1 des Video-Audio-Ports mit zirka 10 V belegt (vorher 5 V). Der Modulator kann nun nicht mehr ohne Änderung benutzt werden (5 V Regulator einbauen).
+
 Am Commodore 64: Bei neueren Geräten ist eine 8polige DIN-Buchse als Video-Audio-Port eingebaut. Pin 6 bis 8 sind nicht belegt. Hier kann ein freier Anschluß (zum Beispiel 7) mit dem Ausgang des 12-V-Regulators Vr 1 des Computers verbunden werden. Bei Geräten mit 5poliger Buchse muß die Leitung direkt herausgeführt werden.
 
 Manfred Lösch
@@ -180,11 +195,11 @@ Wenn ich ein Spielprogramm von Kassette geladen habe, starte ich es normalerweis
 
 3.	Eingabe von SYS mit Adreßzahl, die nicht im Listing steht (wie kann ich diese finden, wenn ich sie nicht kenne oder vergessen habe?)
 
-4.	Löschen derProgrammzeilen mit SYS-Angaben.
+4.	Löschen der Programmzeilen mit SYS-Angaben.
 
 5.	Drücken derRUN/STOP- und RESTORE-Taste.
 
-Mich interessiert, wie diese Startroutinen zu erklären sind und ob sie bei einem neuen Abspeichern des Programmes zu eliminieren sind. Häufig kann man aus einem Spielprogramm nicht in den Normalzustand zurückkehren. Mir bleibt dann nichts anderes übrig, als den Commodore ab- und wieder einzuschalten. In manchen Fällen erscheint nach Drücken von RUN/STOP und RESTORE auf leerem Bildschirm das Wört READY und darunter der blinkende Cursor, aber nach Eingabe von Befehlen wie LOAD oder RUN wird nur die Eingabe gelöscht, und der Cursor springt zurück. Was bedeutet das? Wie kann ich hier den Commodore wieder zu sinnvoller Reaktion veranlassen?
+Mich interessiert, wie diese Startroutinen zu erklären sind und ob sie bei einem neuen Abspeichern des Programmes zu eliminieren sind. Häufig kann man aus einem Spielprogramm nicht in den Normalzustand zurückkehren. Mir bleibt dann nichts anderes übrig, als den Commodore ab- und wieder einzuschalten. In manchen Fällen erscheint nach Drücken von RUN/STOP und RESTORE auf leerem Bildschirm das Wort READY und darunter der blinkende Cursor, aber nach Eingabe von Befehlen wie LOAD oder RUN wird nur die Eingabe gelöscht, und der Cursor springt zurück. Was bedeutet das? Wie kann ich hier den Commodore wieder zu sinnvoller Reaktion veranlassen?
 Manchmal passiert mir folgendes: Ich möchte ein Spielprogramm von Kassette auf einer anderen Kassette abspeichern. Obwohl das Programm mit Namen auf der Kassette ist, kann ich es mit diesem Namen nicht saven. Der Commodore zeigt einen Error an. Lasse ich den Namen weg, funktioniert das Abspeichern einwandfrei. Wie ist das zu erklären und wie kann ich in solchen Fällen den Namen doch mitspeichern?
 
 Werner Kiefert
@@ -196,20 +211,30 @@ Zu den Fragen zum Starten von Programmen:
 2.	Wenn man erst mit SYS 64738 den Computer in den Einschaltzustand bringt und dann den entsprechenden SYS-Befehl aus dem Listing eingibt, müßte eigentlich das gleiche herauskommen, wie wenn man den SYS 64738 wegläßt. Hier hat Ihnen jemand Humbug erzählt oder Ihnen ein ziemlich verpfuschtes Programm gegeben.
 
 3.	Hier wurde ein Maschinenspracheprogramm abgespeichert, ohne eine Basic-Zeile mit dem entsprechenden SYS-Befehl vornedranzuhängen. Die Adresse für den Start des Programms läßt sich am besten so finden:
-— Maschinensprache lernen
-— Maschinensprache-Monitor laden
-- SUCHEN
+
+  * Maschinensprache lernen
+  * Maschinensprache-Monitor laden
+  * SUCHEN
+
 4.	Ist uns nicht bekannt.
+
 5.	Der sogenannte Restore-Vektor wurde vom Programmierer geändert, das heißt bei Drücken von RUN/STOP-RESTORE wird nicht mehr die normale Betriebssystem-Routine gestartet, sondern es wird zu der Adresse gesprungen, die der Programmierer angewählt hat, in diesem Fall die Startadresse des Programms.
+
 Zur Frage, die das Zurückkehren aus Spielprogrammen in den Normalmodus betrifft:
+
 Das war offensichtlich Absicht der Programmierer der Spiele (aus welchem Grund auch immer). Hier hilft meistens wirklich nur das Aus- und Anschalten des Computers.
+
 Antwort auf die Frage, die das Speichern von Programmen betrifft:
-Hier reicht offensichtlich der Speicher nicht mehr aus, um den Namen dort abzulegen. (Der Fehler ist dann wohl ein OUT OF MEMORY ERROR.) Man kann sich jedoch manchmal abhelfen, indem man den Variablenspei-cher in einen freien Speicherbereich verlegt:
+
+Hier reicht offensichtlich der Speicher nicht mehr aus, um den Namen dort abzulegen. (Der Fehler ist dann wohl ein OUT OF MEMORY ERROR.) Man kann sich jedoch manchmal abhelfen, indem man den Variablenspeicher in einen freien Speicherbereich verlegt:
 LOAD »Programm«
 POKE 56,207
 CLR
 SAVE»Name«
-Für das Funktionieren dieser Maßnahme kann nicht garantiert werden, da es doch immer sehr auf das einzelne Programm ankommt.	(gk)
+
+Für das Funktionieren dieser Maßnahme kann nicht garantiert werden, da es doch immer sehr auf das einzelne Programm ankommt.
+
+(gk)
 
 
 
