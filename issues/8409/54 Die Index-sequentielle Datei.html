@@ -1,0 +1,72 @@
+<h1>Die Index-sequentielle Datei</h1>
+
+<p class="intro">Das Arbeiten mit einer relativen Datei ist gar nicht so komfortabel wie man es eigentlich möchte. Der Zugriff auf Datensätze nur über die Datensatznummer ist nicht besonders benutzerfreundlich und in der Regel auch praxisfremd. Unter Zuhilfenahme einer sequentiellen Datei wird dieser Nachteil jedoch aufgehoben.</p>
+
+<p>In den letzten beiden Ausgaben des 64’er wurden Ihnen die Grundzüge der sequentiellen und der relativen Datei vorgestellt und erläutert. Ich deutete auch schon an, daß erst die Verbindung dieser beiden Dateiformen zu einer befriedigenden Lösung führt. Aber auch hier muß man Abstriche machen. Durch diese Vermischung werden leider nicht nur die Vorteile, sondern auch ein Teil der Nachteile mit übernommen. Ich möchte diese noch einmal kurz anreißen.</p>
+
+<p>Das Wesen der sequentiellen Datei liegt in der aufeinanderfolgenden (eben sequentiellen) Anordnung der Daten. Um mit dieser Datei arbeiten zu können, muß sie vollkommen in den Speicher des Computers geladen werden. Bei großen Datenbeständen kann das eine ganze Zeit lang dauern. Andererseits wird die maximale Größe durch den zu Verfügung stehenden Speicherplatz im Computer selbst bestimmt. Sind jedoch alle Datensätze erst einmal geladen, ist ein Bearbeiten der Daten sehr einfach und auch schnell. Dann können alle Änderungen, Ergänzungen und sonstige Manipulationen im Computer selbst durchgeführt werden. Und für zeitkritische Funktionen wie Sortieren und Suchen kann man die Maschinensprache sehr wirkungsvoll einsetzen.</p>
+
+<p>Die relative Datei hingegen benötigt außer dem eigentlichen Programm nur sehr wenig Speicherplatz, nämlich nur noch denjenigen für die internen Variablen und für einen Datensatz. Der Rest aller Daten befindet sich auf Diskette. Und dort stehen einem fast 170 KByte zur Verfügung. Allerdings ist das Arbeiten mit einer rein relativen Datei nur in speziellen Fällen sinnvoll und praktisch, da bei ihr ein Datensatz nur über die Datensatznummer angesprochen werden kann. Ein weiteres Merkmal ist, daß die Datensatzlänge vorher festgelegt werden muß und eine Floppy unbedingt notwendig ist.</p>
+
+<h2>Indizierung als Lösung</h2>
+
+<p>Durch die Verbindung einer relativen Datei mit einer sequentiellen wird ein Kompromiß geschlossen. Einerseits wird die Suche nach einem Datensatz, beispielsweise nach einer Adresse, jetzt direkt über den Namen möglich. Andererseits muß gleich nach dem Programmstart die sequentielle Datei geladen und am Ende wieder gespeichert werden. Allerdings fällt sie wesentlich kürzer aus. In ihr braucht lediglich ein Feld der Datensätze enthalten zu sein, nämlich das Indexfeld, im Beispiel die Nachnamen, und nicht, wie bei der puren sequentiellen Form, alle Felder.</p>
+
+<p>Gehen wir einmal von folgender Voraussetzung aus: Auf der Diskette sind bereits eine Anzahl von Adressen gespeichert. Im RAM des Computers befindet sich das Programm und in einem eindimensionalen Feld (im Beispiel die Variable IN$) alle bisher eingegebenen Nachnamen. Indem wir diese Variable mittels einer FOR-NEXT-Schleife durchsuchen, können wir auch einen gespeicherten Namen finden. Allerdings kommen wir damit noch nicht an seine Adresse heran, da diese ja in diesem Moment nicht im Computer sondern auf Diskette gespeichert steht. Mit einem kleinen Kniff schaffen wir aber auch diese Hürde. Wir speichern bei der Eingabe einer neuen Adresse einfach die Datensatznummer vor dem Nachnamen in die Variable IN$. Und zwar reservieren wir vor jedem Nachnamen vier Stellen für die zugehörige Datensatznummer. Ab der 5. Stelle beginnt also der jeweilige Nachname. Wollen wir nun einen Namen suchen, so müssen wir mit der MID$-Funktion die Feldvariable IN$ ab dem fünften Buchstaben durchkämmen. Sobald der gesuchte Name gefunden wurde, trennen wir die ersten vier Zeichen ab und erhalten damit die zugehörige Datensatznummer. Mit dieser Nummer können wir jetzt direkt auf die relative Datei auf der Diskette zugreifen und holen uns die komplette Adresse.</p>
+
+<h2>&hellip; und so wird’s gemacht</h2>
+
+<p>Anhand eines Beispiels soll das noch einmal gezeigt werden:<br/>
+Inhalt der ersten Elemente von IN$:<br/>
+IN$(1) =»1&hellip; MEIER«<br/>
+IN$(2) =»2&hellip; MUELLER«<br/>
+IN$(3) =»3&hellip; ANDERMANN«<br/>
+IN$(4) =»*«</p>
+
+<p>Gesuchter Name = Mueller, er steht in der Variablen N$ (Zeile 3060)<br/>
+3060 INPUT"NACHNAME";N$<br/>
+3070 N = LEN(N$) Länge des eingegebenen Namens</p>
+
+<p>Die folgenden Programmzeilen suchen den Namen.<br/>
+3090 FOR 1 = 1 TO DATEIENDE<br/>
+3100 IF IN$(I) = ”*” THEN 3120<br/>
+3110 IF MID$(IN$(I),5,N)=N$ THEN gefunden<br/>
+3120 NEXT I</p>
+
+<p>Zur Zeile 3100 kommen wir später noch. Angenommen, wir haben nicht den ganzen Namen eingegeben, sondern lediglich die ersten drei Buchstaben MUE. Dann werden in der Variable IN$ nur die 5.,6. und 7. Zeichen, das entspricht den ersten drei Buchstaben eines jeden Namens, verglichen. Dafür sorgt die Zeile 3070 und in 3110 das »,N« als letzter Parameter der MID$-Funktion. Somit könnte mit dieser Eingabe auch der Name MUECKE gefunden werden. Im Extremfall, wenn nichts eingegeben, also RETURN gedrückt wird, findet diese Funktion jeden Namen. Das heißt, man kann mit der Suchfunktion sich nicht nur einzelne Adressen holen, sondern auch die gesamte Datei, oder zum Beispiel alle Adressen, die mit M anfangen. Damit würde der Menüpunkt »G = Anzeigen gesamte Datei« überflüssig. Ich habe ihn nicht entfernt, da hier unabhängig von der sequentiellen Datei alle Datensätze direkt von der Diskette aus der relativen Datei gelesen werden. Man könnte diese Funktion benutzen, um eine eventuell (zum Beispiel durch Stromausfall) teilweise zerstörte sequentielle Datei zu reorganisieren.</p>
+
+<p>Die Zeile 3100 wird dann verständlich, wenn man sich den Programmteil »Neue Datei anlegen« ab 11000 anschaut. In den Zeilen 11320 bis 11350 wird jedes Element der Variablen IN$ mit einem »<em>« vorbesetzt. Der Stern kennzeichnet einen leeren Datensatz. Damit kommen wir auch gleich zum Programmteil »Löschen Datensatz« ab 4000. Auch dort wird ein zu löschender Datensatz in IN$ mit einem »</em>« gekennzeichnet und zusätzlich der entsprechende Datensatz auf der Diskette mit Hex FF (= Dezimal 255 = das Zeichen PI). Auch das wollen wir uns anhand eines kleinen Beispiels näher betrachten:</p>
+
+<p>Wir wollen den Herrn Mueller aus unserer Datei entfernen. Nachdem wir seine Adresse mit der Suchfunktion gefunden haben, geben wir ein »L« für Löschen ein. Danach springt das Programm nach 4000, schreibt in die Variable IN$ das »<em>« , überschreibt den Datensatz auf der Diskette mit CHR$(255)(=PI), löscht die einzelnen Datensatzfelder (NN$, NV$, und so weiter) und springt zurück nach 3350. Die Variable IN$ sieht jetzt so aus:<br/>
+IN$(1) =»1&hellip; MAIER«<br/>
+IN$(2) =»</em>«<br/>
+IN$(3) =»3&hellip; ANDERMANN«»<br/>
+IN$(4) =»*«</p>
+
+<p>Der zweite Datensatz ist nun mit »*« als gelöscht und leer gekennzeichnet. Das bedeutet auch, daß er wieder mit einer neuen Adresse belegt werden kann. Sehen wir uns dazu den Programmteil »Neueingabe Adresse« ab 1800 an.</p>
+
+<p>Nachdem wir eine neue Adresse eingegeben haben (die einzelnen Programmteile, die in 1830 bis 1850 aufgerufen werden, kennen Sie ja bereits aus den letzten beiden 64'er Ausgaben), muß jetzt ein leerer Platz gefunden werden, auf dem wir die neue Adresse abspeichern können. Wichtig sind jetzt die Zeilen 1880 bis 1910. In diesem Abschnitt wird IN$ so lange durchsucht, bis ein mit »<em>« gekennzeichnetes Element gefunden wird (1910). In unserem Beispiel ist das bereits das zweite Element (IN$(I) = »</em>«, bei I = 2). Somit wird die neue Adresse als zweiter Datensatz auf Diskette gespeichert. In Zeile 1930 und 1940 wird die Variable IN$ auf den neuesten Stand gebracht. Zuerst wird die Datensatznummer (I) in einen String umgewandelt (1920). Dabei wird immer das (unsichtbare positive) Vorzeichen mit berücksichtigt. Da wir dieses nicht brauchen, wird es abgeschnitten (MID$(I$,2) und die Zahl mit Leerstellen auf insgesamt vier Zeichen Länge erweitert. Zeile 1940 verbindet dann die Datensatznummer mit dem Namen.</p>
+
+<p>Vielleicht ein Wort noch zur MID$-Funktion. Normalerweise gehören zu dieser Funktion drei Parameter. So steht es auch kurz erläutert im Commodore-Handbuch. Der letzte Parameter gibt an, wieviele Zeichen ab einer definierten Stelle des Strings genommen werden sollen. Wird dieser Parameter weggelassen, werden ab der definierten Stelle alle restlichen Zeichen des Strings übernommen.</p>
+
+<h2>Probleme, dfe sich ergeben können</h2>
+
+<p>Es könnte sein, daß Ihnen die Dateistruktur nicht gefällt. Zum Beispiel möchten Sie die Länge der Datenfelder ändern. Das dürfen Sie nur machen, wenn die Datei neu eingerichtet werden soll. Bei einer bestehenden geht es nicht! Beim Verkürzen gibt es keine Probleme, auch keine beim Verlängern bis zu 88 Zeichen. Zu verändern sind dann die Zeile 30040 sowie die Längenangaben zwischen den Zeilen 5000 und 7100. Bedenken Sie dabei, daß die Variable BL$ mindestens so viele Leerstellen haben muß, wie das längste Datenfeld.</p>
+
+<p>Schwieriger wird es, wenn Sie infolge einer Vergrößerung der Datensatzlänge über 88 Zeichen hinwegkommen. Das Problem hierbei ist der INPUT#-Befehl. Mit ihm kann man nämlich nur maximal 88 Zeichen aus einer Datei lesen. Es gibt zwei Methoden, diese Hürde zu überwinden. Erstens eine Maschinensprache-Routine, die den INPUT#-Befehl erweitert, so daß auch Datensätze mit bis zu 255 Zeichen gelesen werden können (schauen Sie doch einmal in das Floppy-Buch von Data Becker, dort finden Sie eine entsprechende Routine). Die zweite Möglichkeit ist die Verwendung des GET#-Befehls anstelle des INPUT#-Befehls. Dann ist die Zeile 9070 INPUT#1,RC$ durch folgende Zeilen zu ersetzen:<br/>
+9068 RC$ = &ldquo; &rdquo;<br/>
+9070 GET#1,W$<br/>
+9072 RC$ = RC$+W$<br/>
+9074 IF W$ = CHR$(255) THEN 9090<br/>
+9076 IF W$ = CHR$(13) THEN 9070</p>
+
+<p>Den GET#-Befehl kann man natürlich auch dann einsetzen, wenn die Satzlänge kleiner als 88 Zeichen ist. Dann werden die Zeichen jedoch um einiges langsamer eingelesen als mit dem INPUT#-Befehl. Aber es ist mit dem GET#-Befehl möglich, bis zu 255 Zeichen in eine Variable einzulesen.</p>
+
+<p>Ein Problem ganz anderer Art kann auftauchen, wenn Sie eine Floppy besitzen, die vor Dezember 1983 gekauft beziehungsweise hergestellt wurde und gleichzeitig mit einem VC 1526 drucken. Es kann möglich sein, daß bei Benutzung einer relativen Datei Fehler auftauchen, sobald dieser Drucker eingeschaltet ist. Probieren Sie das vorher aus! Abhilfe schafft meines Wissens nur ein neues DOS für die alte VC 1541.</p>
+
+<h2>Anregungen für Programmierer</h2>
+
+<p>Dieses Programm ist — bis auf die Druckerroutine, die sich jeder für seinen eigenen Drucker selber schreiben sollte — komplett und funktionsfähig. Sicherlich lassen sich noch eine ganze Reihe von Schönheitsreparaturen machen. Auch eine Erweiterung des Programms ist durchaus sinnvoll. Zum Beispiel könnte man ein Unterprogramm schreiben, das, ähnlich einem professionellen Dateiprogramm, es ermöglicht, sich die Datenfelder selbst zu definieren. Auch die Suche nach mehr als einem Feld ist durchaus sinnvoll. Wenn erwünscht, kann auch eine Sortierroutine eingefügt werden. Der modulare Aufbau erlaubt dies ohne Schwierigkeiten. So kann sich jeder, der etwas Programmiererfahrung hat, eine Dateiverwaltung aufbauen, die sogar professionellen Programmen etwas voraus hat: Sie ist auf die persönlichen Bedürfnisse abgestimmt und läßt sich auch jederzeit ändern. Wer das Programm kompiliert, kann auch bei sehr großen Dateien noch mit guten Suchgeschwindigkeiten rechnen. Dieses Beispielprogramm enthält alle Voraussetzungen für eigene Erweiterungen. Ich selbst habe obengenannte Funktionen für meine eigene Dateiverwaltung bereits realisiert.</p>
+
+<p>(gk)</p>
+
