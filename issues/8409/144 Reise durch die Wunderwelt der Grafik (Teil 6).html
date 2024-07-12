@@ -158,13 +158,13 @@
             Y1 = (YO-Y1')/(YO-YU)*199</p>
 
         <p>Es empfiehlt sich, diese beiden sogenannten Transformationsgleichungen als Basicfunktionen zu definieren:<br />
-            DEFFNX(X)=(X-XU)/(XO-XU)<em>319<br />
-                DEFFNY(Y)=(YO-Y)/(YO-YU)</em>199</p>
+            DEFFNX(X)=(X-XU)/(XO-XU)*319<br />
+            DEFFNY(Y)=(YO-Y)/(YO-YU)*199</p>
 
         <p>Nun können wir ein kleines Aufrufprogramm schreiben, welches sich wieder der Unterprogrammsammlung aus Folge vier bedient. Laden Sie also zuerst (die hoffentlich damals gespeicherten!) Unterprogramme und tippen Sie dann ein:<br />
             5 POKE 52,92:POKE 56,92<br />
-            100 DEFFNX(X)=(X-XU)/(XO-XU)<em>319<br />
-                110 DEFFNY(Y) = (YO-Y)/)YO-YU)</em>199<br />
+            100 DEFFNX(X)=(X-XU)/(XO-XU)*319<br />
+            110 DEFFNY(Y) = (YO-Y)/)YO-YU)*199<br />
             120 REM +++++ BEISPIELFUNKTION +++++<br />
             140 DEFFNA(X) = SIN(X)<br />
             150 PRINTCHR$(147)CHR$(17): INPUT"XU,XO,YU,YO = &ldquo;;XU,XO,YU,Y0<br />
@@ -215,7 +215,7 @@
         <p>Dieser Trick ist sehr vielseitig anwendbar. Man muß nur beachten, daß durch das RUN alle Variablen, die bis dahin definiert wurden, gelöscht werden. Das ist ja auch sinnvoll, weil wir das Basicprogramm verändert haben und so unter Umständen Variable überschrieben wurden. Sollte es nicht möglich sein, alle Variablen nach dem Neustart zu definieren, dann läßt sich ein ähnlicher Kniff anwenden, wie wir ihn in Zeile 15 verwendet haben. Probieren Sie das Programm mal mit folgenden Eingaben:</p>
 
         <p>Y= SIN(X) mit XU = -1,XO = 10,YU = -2,YO = 2<br />
-            oder Y=EXP(-X/10)<em>COS(X) mit XU = -18,XO = 10,YU=-5,YO = 5 oder Y=2</em>SIN(X) + SIN(2*X + 2) mit XU = -6,XO = 15,YU = -3,YO = 3<br />
+            oder Y=EXP(-X/10)*COS(X) mit XU = -18,XO = 10,YU=-5,YO = 5 oder Y=2*SIN(X) + SIN(2*X + 2) mit XU = -6,XO = 15,YU = -3,YO = 3<br />
             Ihrer Phantasie sind keine Grenzen gesetzt.</p>
 
         <h2>Flacher Raum: 3D-Grafik, wie funktioniert das?</h2>
@@ -251,31 +251,32 @@
             ist und im Dreieck DEF gilt<br />
             SIN(α) = ΔY/Z1<br />
             Daraus ergibt sich dann:<br />
-            ΔX = Z1<em>COS(α)<br />
-                ΔY = Z1</em>SIN(α)</p>
+            ΔX = Z1*COS(α)<br />
+            ΔY = Z1*SIN(α)</p>
 
         <p>Weil außerdem noch nach unserer anfänglichen Vereinbarung a = 45° beträgt und die Z-Achse auf die Hälfte verkürzt ist und weil schließlich<br />
             SIN(45°) = COS(45°) = 1/√2 ist, ergibt sich:<br />
-            ΔX = Z1'/(2<em>SQR(2))<br />
-                ΔY = Z1'/(2</em>SQR(2))</p>
+            ΔX = Z1'/(2*SQR(2))<br />
+            ΔY = Z1'/(2*SQR(2))</p>
 
-        <p>Beide sind also gleich und für unser eigenes Koordinatensystem hat der Punkt P die Koordinaten: X1 = X1' + Z1'/(2<em>SQR(2))<br />
-                Y1 = Y1' + Z1'/(2</em>SQR(2))</p>
+        <p>Beide sind also gleich und für unser eigenes Koordinatensystem hat der Punkt P die Koordinaten:<br/>X1 = X1' + Z1'/(2*SQR(2))<br />
+                Y1 = Y1' + Z1'/(2*SQR(2))</p>
 
         <p>Damit ist unser Problem gelöst. Denn XF, YT und Z1' sind die vorgegebenen Koordinaten und X1,Y1 können jetzt mit unseren Transformationen X = FNX(X1),Y=FNY(Y1) in Bildschirmkoordinaten umgerechnet werden. Wir verschachteln nun zwei Schleifen ineinander wie in Bild 12 und lassen uns damit Kurve für Kurve zeichnen.</p>
 
         <p>Nun wollen wir auch für die 3D-Grafik ein Programm entwerfen. Tippen Sie also NEW ein, laden Sie die Grafik-Unterprogramme und erwecken Sie unser 3D-Dornröschen mit dem nachfolgenden Aufrufprogramm.</p>
 
         <p>5 POKE 52,92:POKE 56,92<br />
-            100 DEFFNX(X) = (X-XU)/(XO-XU) <em>319<br />
-                105 DEFFNY(Y) = (YO-Y)/(YO-YU) </em>199<br />
-            110 DEFFNZ(Z) = Z/(2<em>SQR(2))<br />
-                140 DEFFNA(X) = SIN(Z)</em>COS(X)<br />
+            100 DEFFNX(X) = (X-XU)/(XO-XU) *319<br />
+            105 DEFFNY(Y) = (YO-Y)/(YO-YU) *199<br />
+            110 DEFFNZ(Z) = Z/(2*SQR(2))<br />
+            140 DEFFNA(X) = SIN(Z)*COS(X)<br />
             150 PRINTCHR$(147)CHR$(17)CHR$ (18)&ldquo;UNSER SYSTEM:"CHR$(146): PRINT:PRINT<br />
             160 INPUT"XU,XO = &rdquo;;XU,XO:INPUT ”YU,YO = ”;YU,YO</p>
 
         <p>Jetzt wird es ein bißchen kompliziert, weil wir darauf achten müssen, daß die Z-Achse noch auf dem Bildschirm paßt. Wir lassen uns berechnen und anzeigen, wie groß ZO höchstens sein darf und wie klein ZU:<br />
-            162 Z3 = 2<em>XO</em>SQR(2):Z4 = 2<em>YO</em> SQR(2):IF Z3<Z4 THEN PRINT "ZO MAXIMAL = " Z/3:GOTO 166 164 PRINT"ZO MAXIMAL="Z4 166 Z5 = 2*XU*SQR(2):Z6 = 2*YU* SQR(2):IF Z5>Z6 THEN PRINT ”ZU MINIMAL = &ldquo;Z5:GOTO170<br/>
+            162 Z3 = 2*XO*SQR(2):Z4 = 2*YO* SQR(2):IF Z3&lt;Z4 THEN PRINT "ZO MAXIMAL = "Z/3:GOTO 166<br/>
+            164 PRINT"ZO MAXIMAL = "Z4 166 Z5 = 2*XU*SQR(2):Z6 = 2*YU* SQR(2):IF Z5&gt;Z6 THEN PRINT ”ZU MINIMAL = "Z5:GOTO170<br/>
 168 PRINT" ZU MINIMAL="Z6<br/>
 170 PRINT:INPUT" ZU,ZO=&lsquo;&rsquo;;ZU,ZO: Z1=FNZ(ZO):Z2=FNZ(ZU)</p>
 
