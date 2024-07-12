@@ -1,0 +1,44 @@
+<h1>Das macht den »Kleinen« größer</h1>
+
+<p class="intro">Wer mit dem minimalen Speicher des VC 20 (3,5 KByte) nicht zufrieden ist, wird sich früher oder später eine Speichererweiterung zulegen. Unter der großen Auswahl von solchen Erweiterungen gibt es seit einiger Zeit auch 64-KByte-RAM-Karten.</p>
+
+<p>Eine Frage, die sich wohl ein jeder stellt: Kann ich eine 64-KByte-RAM-Karte überhaupt voll ausnutzen oder reicht schon eine 16-KByte- oder 32-KByte-Karte? Es ist bekannt, daß der VC 20 maximal 27,5 KByte Basicspeicher adressieren kann. Weiterhin können noch 8 KByte ($A000-$BFFF) für Maschinenprogramme oder Spielmodule adressiert werden. So wird hier maximal die Hälfte der 64-KByte-Karte genutzt. Wofür braucht man nun die anderen 32 KByte? Dieser Speicherplatz bleibt natürlich nicht ungenutzt. Er kann je nach Bedarf zum Speichern von Daten verwendet werden. Zuvor ein paar Bemerkungen zum VC 20-RAM-Speicher. In der VC 20-Grundversion ist der Adreßbereich von $0400 bis $OFFF für eine 3-KByte-RAM-Erweiterung vorgesehen. Der Bereich $2000-$7FFF bietet Platz für 24 KByte. Diesen Bereich kann man in Blöcken zu je 8 KByte unterteilen:<br/>
+1)  $2000-$3FFF<br/>
+2)  $4000-$5FFF<br/>
+3)  $6000-$7FFF</p>
+
+<p>Für Toolkits, Erweiterungen von Betriebssystemen und Modulspiele ist der Adreßbereich von $A000-$BFFF reserviert. Mit Hilfe von Dil-Schaltern (Dil bedeutet Dual in line) auf beiden 64-KByte-Karten lassen sich beliebige Speicherkombinationen einstellen:<br/>
+1)  Grundversion<br/>
+2)  3 KByte RAM-Erweiterung<br/>
+3)  8 KByte RAM-Erweiterung<br/>
+4)  16 KByte RAM-Erweiterung<br/>
+5)  24 KByte RAM-Erweiterung</p>
+
+<p>Zu diesen fünf Möglichkeiten kann jeweils noch der Modulbereich belegt werden.</p>
+
+<p>Die Dil-Schalter sind auf beiden Platinen (in Bild 1 die von Kalawsky, in Bild 2 die von Roos Elektronik) so ungünstig angebracht, daß diese beim Einstecken in den Hauptspeichererweiterungs-Slot des VC 20 ganz im Gerät verschwinden. So muß jedesmal beim Umschalten die Karte aus dem Gerät gezogen werden. Um den anderen Teil der 64-KByte-RAM-Karte zu nutzen, wird bei dem Modul von Kalawsky die Möglichkeit des »Banking« eingesetzt. Durch die Einteilung der 64 KByte in acht Blöcke mit je 8 KByte, die man per Software (POKE I/O 2,X = > POKE 39000,X) auswählen kann, ist es tatsächlich möglich, 64 KByte für den VC 20 nutzbar zu machen. Falls I/O 2 schon für zum Beispiel einen IEC-Bus oder eine 40/ 80-Zeichenkarte benötigt wird, so kann der RAM-Master durch Löten einer Zinnbrücke auf I/O 3 gelegt werden. Die POKE-Adresse ändert sich dann von 39000 auf 40000. »Banking« kann in den Bereichen $6000-$7FFF oder $A000-$BFFF realisiert werden. So können maximal 8 Banks durch Umschalten genutzt werden. Die gesamte 64-KByte-RAM-Karte läßt sich zusätzlich noch durch einen Schreibschutz sichern. Mit einer externen Stromversorgung der Karte kann man dann sogar noch nach Ausschalten des Computers Programme, die sich im Speicher der RAM-Karte befinden, erhalten. Weiterhin kann man damit ein unbeabsichtigtes Überschreiben des Speichers vermeiden.</p>
+
+<p>Wer eine Modulbox besitzt, kann bei dieser Karte sogar seine eventuell vorhandenen Speichererweiterungen wie zum Beispiel 3-KByte-Karte, Superexpander oder 16-KByte-Karte verwenden, falls er die 64-KByte-Karte ausschließlich für Banking benutzt. Es können auch zwei 64-KByte-RAM-Master-Karten verwendet werden.</p>
+
+<p>Zusammenfassung der Anwendungsmöglichkeiten:<br/>
+1)  64-KByte-RAM durch Banking im Bereich $6000-$7FFF beziehungsweise $A000-$BFFF<br/>
+2)  Vollausbau des VC 20 und Banking<br/>
+3)  Mischung aus 1. und 2., falls weitere Erweiterungen vorhanden sind.<br/>
+4)  Kombination von zwei 64-KByte-RAM-Master-Karten.</p>
+
+<p>Weiterhin ist bei Kalawsky ein Programm erhältlich, das die 64-KByte-RAM-Master-Karte voll ausnutzt und die Banking-Eigenschaften anschaulich vorführt: »Bankingshow«</p>
+
+<p>ROOS Elektronik benützt hingegen eine andere Art der Datenspeicherung für ihre 64-KByte-RAM-Karte. Die Karte ist mit einem nützlichen EPROM bestückt. Die mitgelieferte Software im EPROM muß vor Gebrauch erst einmal mit SYS 43008 aktiviert werden. Durch diese Software gelangen die folgenden sechs Basicbefehle zu einer größeren Bedeutung: OPEN, PRINT#, INPUT#, GET#, SAVE und LOAD.</p>
+
+<p>Man erhält zusätzlich acht Gerätenummern (DEVICE NUMBER 200 bis 207), die in Verbindung mit den erwähnten sechs Basicbefehlen einen superschnellen Datenaustausch zwischen RAM-Speicher und 64-KByte-RAM-Karte ermöglichen.</p>
+
+<p>Ein weiterer Vorteil bei der mitgelieferten Software aus dem EPROM ist, daß kein Filename angegeben werden muß (aber kann). Die Files unterscheiden sich ja durch die verschiedenen Gerätenummern (200 bis 207). Bei sequentiellen Files muß nach OPEN&hellip; und PRINT#&hellip; ein CLOSE&hellip; folgen. Erst damit gehen die zu diesem Zeitpunkt im Puffer stehenden Zeichen nicht verloren. Für den Fall, daß der Speicher der 64-KByte-RAM-Karte voll ist, gibt der Computer die Fehlermeldung »TOO MANY FILES« aus. Die 64-KByte-RAM-Karte von ROOS Elektronik hat wohl zwei mehr oder weniger große Nachteile im Vergleich zur 64-KByte-RAM-Karte von Kalawsky:</p>
+
+<p>Das EPROM benutzt den Adreßbereich von $A000-$AFFF, während die Karte von Kalawsky keinen Speicherbereich des VC 20 belegt. Weiterhin dürfen bei der Roos Elektronik-Karte vorläufig keine anderen Speichererweiterungen (Superexpander, 16-KByte-Karte und so weiter) benutzt werden. Die Karte von ROOS Elektronik wird dafür nach Angaben des Herstellers demnächst in eine Box eingebaut. Auch der Dil-Schalter soll dann an einer zugänglicheren Stelle plaziert sein.</p>
+
+<p>40/80-Zeichenkarte oder IEC-Bus können bei beiden 64-RAM-Karten verwendet werden. In Bild 3 sind die beiden Karten gegenübergestellt.</p>
+
+<p>Beide 64-KByte-RAM-Karten sind wohl, je nach Anwendungsgebiet, gleich gut. Wer sich aufgrund dieses Tests eine dieser 64-KByte-RAM-Karten zulegen möchte, muß sich wohl in erster Linie im klaren sein, ob er Speicherverwaltung durch »Banking« oder durch erweiterte Basicbefehle bevorzugt. Der Sinn von 64-KByte-RAM-Karten für den VC 20 liegt wohl in der Verwendung als Pseudo-Floppy. Dabei lassen sich beispielsweise Daten einer Adreßverwaltung von der Floppy oder der Datasette in diese Pseudo-Floppy einlesen und wesentlich schneller abarbeiten. Nach den durchgeführten Arbeitsvorgängen wie Ändern, Einfügen oder Sortieren werden diese Daten wieder auf die physikalischen Speichermedien transferiert. Das führt zu einer, oft nicht unerheblichen, Zeitersparnis.</p>
+
+<p>(Christian Quirin Spitzner/aa)</p>
+
