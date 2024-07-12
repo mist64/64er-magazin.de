@@ -658,7 +658,7 @@ Ein hervorragender Einfall der Waveform-Leute war, zirka 50 Tonleitern aus allen
 
 Leider wurde nicht berücksichtigt, daß nicht alle Völker mit unserem Intervallsystem arbeiten. Es hat eigentlich nicht sehr viel Sinn, einen der indischen Musikphilosophie entstammenden Raga Todi in unser Intervallsystem zu pressen. Waveform sollte in einer späteren Softwareerweiterung auch die unterschiedlichen Intonationen mit berücksichtigen. Dann wäre das System perfekt.
 
-Zwanzig der erstellten Keyboardlayouts lassen sich zu einer sogenannten Scratch-Page zusammenfassen. Ein Presetmit 20 verschiedenen Keyboard-Belegungen gewissermaßen. Aus diesem Scratch-Page können wir dann ohne Diskettenoperationen einzelne Layouts abrufen, studieren beziehungsweise spielen. Diese Zusammenstellungen sind natürlich editierbar.
+Zwanzig der erstellten Keyboardlayouts lassen sich zu einer sogenannten Scratch-Page zusammenfassen. Ein Preset mit 20 verschiedenen Keyboard-Belegungen gewissermaßen. Aus diesem Scratch-Page können wir dann ohne Diskettenoperationen einzelne Layouts abrufen, studieren beziehungsweise spielen. Diese Zusammenstellungen sind natürlich editierbar.
 
 Musicalc ist ein Programmsystem für den Anspruchsvollen unter den Commodore 64-Musikern. Da man jeweils nur eine Stimme auf der Tastatur spielen kann, eignet es sich nicht zum polyphonen Spiel. Es ist mehr als Kompositions- und Abspielsystem gedacht. Bisher ein Novum: Es unterstützt den, der seinen Computer zusammen mit anderen Rhythmusinstrumenten beziehungsweise einem oder mehrerer weiterer C 64 synchron betreiben will. Sollte demnächst auch der Notenausdruck funktionieren, ist Musicalc in meinen Augen, momentan jedenfalls, eines der bestdurchdachten Musik-Software-Pakete.
 
