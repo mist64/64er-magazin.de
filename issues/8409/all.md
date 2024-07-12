@@ -1668,1264 +1668,1433 @@ Seite 3 : 44032 bis 45031
 
 (Harald Soyka/rg)
 
+# Tips & Tricks
 
+## Verstimmter C 64?
 
+Benutzt man für ein Musikstück die im Commodore 64-Handbuch angegebenen High- und Low-Bytes, um die Töne zu POKEn, dann klingen sie häufig unrein oder »verstimmt«. Das vermeidet man, indem man die Low-Bytes neu festlegt. Man kann sie nach der folgenden Formel berechnen:
 
+Low-Byte = Frequenz * 17 -High-Byte * 256
 
+Ist das Ergebnis negativ, dann nimmt man ersatzweise diese Formel:
 
+Low-Byte = Frequenz * 17 -(High-Byte - 1) * 256
 
+(Roger Limberg)
 
+# VC 20 - Tips
 
+Umschalten des VC 20 auf die Grundversion bei eingesteckter Speichererweiterung:
 
+POKE 642,16 : POKE 644,30 : POKE 648,30 : SYS 64824
 
+Mit POKE 55,30 : SAVE »(Name)« kann ein SAVE-Schutz umgangen werden, mit dem viele Programme geschützt sind.
 
+Der Befehl POKE 36867,48 erzeugt eine zusätzliche Zeile unterhalb des normalen Bildschirms, die während des gesamten Programms stehen bleibt und nur über POKE-Befehle zugänglich ist.
 
+(Frank Pachollek)
 
+## »Fort Apocalypse« bezwungen
 
+Fort Apocalypse, eines der interessantesten und schwierigsten Spiele für den Commodore 64, wurde bislang nur von ausgefuchsten Spezialisten bezwungen. Der Grund dafür ist, daß zur Bewältigung der vielen Hürden und Aufgaben nur sechs Hubschrauber zur Verfügung stehen.
 
+Dies kann man aber grundlegend ändern, indem man nach dem Laden den folgenden Befehl eingibt:
+POKE 36339,153
 
+Jetzt das Programm starten, und schon hat man 98 (!) Hubschrauber zur Verfügung. Da kann doch kaum noch was schiefgehen ...
 
+(Klaus Kierblewski)
 
+## Basic-Programme retten
 
+Ein versehentlich mit »NEW« oder durch einen RESET gelöschtes Programm kann beim VC 20 durch Eingabe der folgenden Befehle im Direktmodus wieder zurückgeholt werden:
 
+POKE 46, PEEK(56) - 1 : POKE 45, PEEK(55) + 247 : CLR »Return«
 
+POKE PEEK(44) * 256 + PEEK(43) + 1, PEEK(44) »Return«
 
+63999 »Return«
 
+FOR I = PEEK(44) * 256 + PEEK(43) TO PEEK(46) * 256 + PEEK(45) : IF PEEK(I) OR PEEK (I + 1) OR PEEK(I + 2) THEN NEXT »Return«
 
+POKE 45, (I + 3) AND 255 : POKE 46, (I + 3) / 256: CLR »Return«
 
+Unter Umständen erhält man jetzt eine Fehlermeldung, aber das Programm ist jedenfalls wieder da.
 
+(Ralf Berle)
 
+# Fehlersuche leicht gemacht
 
+> Fehlersuche in Programmen ist nicht einfach. Der LIST-Befehl des C 64 bietet dabei auch nicht gerade eine große Erleichterung. Dieses Programm schafft Abhilfe.
 
+Wen ärgert es nicht, wenn man nach mühseliger Abtipperei eines Programmlistings feststellen muß, daß es nach »RUN« nicht richtig läuft? Nun geht es an die Fehlersuche und die ist mit dem normalen LIST-Befehl nicht gerade einfach. Wenn man keine gute Reaktion an den Tag legt, sind einige Zeilen oben aus dem Bildschirm verschwunden, bevor man »RUN/STOP« gedrückt hat. Und hat man erst einmal RUN/STOP gedrückt, dann muß man wieder einen neuen LIST-Befehl mit Zeilennummer eingeben, um weiter aufzulisten. Auch die »CTRL«-Taste bringt keinen besonderen Vorteil, denn so oft ich mich auch bemüht habe, das Rennen gegen den C 64 zu gewinnen, bis heute ist es mir noch nicht gelungen, ein gedrucktes Listing mit dem des C 64 so zu vergleichen, daß ich ohne RUN/STOP ausgekommen wäre. Dies gilt im verstärkten Maße, wenn DATA-Zeilen mit im Spiel sind.
 
+Um nun dieses Problem zu lösen, habe ich das LIST-STOP-Programm entwickelt. Mit diesem ist es möglich, ein Listing zu kontrollieren oder zu vergleichen, ohne in Zeitnot zu geraten oder jedesmal erneut einen LIST-Befehl einzugeben.
 
+Ist das Programm aktiviert, dann wird die Routine mit »Pfeil links« und dann RETURN — entspricht CHR$ (95) und CHR$ (13) — aufgerufen. Es wird jetzt solange aufgelistet, bis ein Bildschirm voll ist. Hat der C 64 gestoppt, so ist er wieder im Eingabemodus und man kann alle Editiermöglichkeiten in Anspruch nehmen, um Fehler zu korrigieren, Zeilen einzufügen oder zu entfernen.
 
+Will man nun das Listen weiterlaufen lassen, braucht man nur CHR$ (133) beziehungsweise F1 zu drücken und es geht bei derZeilennummer weiter, bei der vorher gestoppt wurde (auch wenn etwas verbessert wurde!), so lange, bis wieder ein Bildschirm voll ist.
 
+Zu beachten ist, daß der neue LIST-STOP-Befehl einen LIST-Befehl simuliert und man ihn auch als solchen behandeln kann. Um bestimmteZeilennummern aufzulisten, kann folgende Eingabe verwendet werden:
+»Pfeil links« 20 -130, RETURN.
 
+Jetzt werden nur die Zeilen zwischen 20 und 130 mit der LIST-STOP-Routine behandelt.
 
+Der normale LIST-Befehl kann weiterhin benutzt werden. Die zwei Zeichen, die mehrfach zu sehen sind (CHR$ (113) und CHR$ (64), ≙ geschlossener Kreis und »Klammeraffe«), sind Steuerzeichen für das Programm (keine Fehler).
 
+Der Grund dafür, daß CHR$ (95) »Pfeil links« als Basic-Befehl erkannt wird, liegt darin, daß mit dem Aufruf des Programms durch SYS 40704 der Vektor für die Basic-Befehlsadresse auf meine eigene Abfrageroutine gesetzt wird. Erkennt diese Routine das Zeichen, wird der LIST-Befehl ausgeführt.
 
+## Programmierhinweis
 
+Nachdem das Programm abgetippt wurde, sollte man es unbedingt vor dem ersten Lauf abspeichern, da sich das Basicprogramm selbsttätig löscht, nachdem LIST-STOP aktiviert wurde.
 
+Ist ein Fehler in den DATA-Zeilen so meldet der Computer den Fehler und bricht das Programm ab, damit man den Fehler beheben kann. Als Erleichterung habe ich für jede DATA-Zeile die Summe aufgeführt. Das Maschinenprogramm ist ab dez. 40704 abgelegt und wird durch Zeile 10 vor dem Überschreiben geschützt.
 
+(Manfred Selke/rg)
 
+# Haben Sie den Bogen raus?
 
+> Wenn Sie mit Hilfe von Simons Basic Halb- und Viertelkreise, sowie Rauten, Dreiecke, Fünfecke und so weiter zeichnen wollen, müssen Sie den ARC-Befehl völlig durchschaut haben. Um aber den ARC-Befehl wirklich zu verstehen, sollte man mit CIRCLE beginnen.
 
+Wie Sie wissen, gehen wir bei HIRES von einem Grid aus, das aus 64000 Einzelpunkten besteht. Da das »erste« beim C 64 immer Null heißt, lauten die Adressen:
+waagerecht (x-Achse): 0 - 319
+senkrecht (y-Achse): 0 -199
 
+Bei HIRES/MULTI hingegen ist jeder der 32000 Punkte doppelt so breit, so daß die Adressen (x-Achse) dann 0 - 159 lauten.
 
+Als erstes brauchen wir die Koordinaten x, y, welche den Mittelpunkt des Kreises bestimmen. Laut Handbuch von Simons Basic stellt der »Kreis eine Sonderform der Ellipse dar«, so daß der CIRCLE-Befehl auch für »ovale Kreise« benutzt werden kann. Daher müssen wir zwei Radien angeben (das ist eine gedachte Linie vom Kreismittelpunkt zum Kreisrand), und zwar einen waagerechten (x1) und einen senkrechten (y1). Somit sieht das Format nun so aus:
+CIRCLE x,y,x1,y1,...
 
+Aber, nach y1 fehlt noch eine Angabe. Wir haben noch nicht gesagt, wie die Figur gezeichnet werden soll! Es gibt drei Möglichkeiten:
 
+a)	Hintergrundfarbe (zum Beispiel wenn wir in einen Block nachträglich hineinzeichnen möchten),
+b)	Zeichenfarbe (bei HIRES nur eine, bei MULTI können wir unter drei wählen), oder
+c)	Invertiert (das heißt: wo bereits ein Punkt gesetzt ist, zum Beispiel durch eine mit PAINT gefüllte Fläche, wird jetzt gelöscht; wo keiner ist, wird einer gesetzt).
 
+Der Parameter, der die Entscheidung über den Zeichenmodus trägt, heißt: Zeichentyp. Die Tabelle (Bild 1) faßt alle möglichen Zeichentyp-Zahlen zusammen. Jetzt ist unser CIRCLE-Befehl vollständig:
+CIRCLE x,y,x1,y1,ZT
 
+Wenn Sie ein wenig herumprobieren, dann werden Sie feststellen: Um einen »richtigen« Kreis zu bekommen, muß bei HIRES x1 gleich y1 sein! Da bei MULTI jeder Punkt doppelt so breit ist, muß der x-Radius (x1) die Hälfte von y1 betragen.
 
+Nun wollen wir mit dem Experimentieren anfangen. Als erstes ein START-Programm:
+10 COLOUR 14,14: HIRES 0,14
+(Jetzt wird mit schwarz auf hellblau gezeichnet.)
+15 REC 0,0,319,199,1
 
+Dieses REChteck zeichnet einen Rahmen um den gesamten Bildschirm.
 
+Aber noch können wir nichts sehen, weil das Bild zu schnell verschwindet. Testen Sie dies einmal durch RUN. Deshalb gebe ich von Anfang an immer eine Programmzeile mit höherer Nummer ein:
+90 WAIT 653,2
 
+Dies ist ein normaler C 64-Befehl; er bewirkt ein Warten, bis jemand die CBM (C=)-Taste drückt. Durch diesen Befehl können Sie Ihre derzeitigen Versuche immer am Bildschirm betrachten und dann am Programm weiterarbeiten! Wenn Sie jetzt noch einmal RUN eintippen, dann sehen Sie das Rahmen-REC! Jetzt können wir weitermachen:
+20 CIRCLE 159,99,50,50,1
 
+Bitte versuchen Sie, ehe Sie jetzt RUN eintippen, vor Ihrem geistigen Auge sich vorzustellen, was gleich zu sehen sein wird. Erstens: Wo ist der Kreis? Zweitens: Ist es ein »richtiger« Kreis oder eine Ellipse? Wenn Sie sich ein »Bild« machen können, dann erst durch RUN Ihren Eindruck überprüfen:
 
+Aha! Es ist ein Kreis in der Mitte des Bildschirms. Da wir HIRES mit gleichen Längen bei x1 und y1 haben, ist es ein »echter« Kreis.
 
+Jetzt probieren Sie bitte weiter:
 
+a)	Verlängern Sie x1, das heißt den waagerechten Radius! Resultat: Ein »Kreis«, der breiter wird, also eine waagerechte Ellipse!
+b)	Verlängern Sie y1, machen Sie also eine senkrecht stehende Ellipse daraus!
 
+Jetzt geben Sie in Zeile 10 noch einen Doppelpunkt plus MULTI 0,6,0 ein.
+Frage: Was wird mit unserem Rahmen-REC passieren, nachdem wir auf MULTI umgeschaltet haben? Bitte testen Sie dies durch RUN!
 
+Da wir bei MULTI ja nur 160 doppelt so breite Punkte wie bei HIRES haben und da der letzte Punkt auf der x-Achse 159 heißt: Wie muß jetzt der REC-Befehl verändert werden, damit Sie wieder einen kompletten Rahmen erhalten?
 
+Richtig: 319 muß in 159 umgewandelt werden.
 
+Lassen Sie jetzt beide CIRCLE-Kombinationen von oben nochmal mit MULTI laufen: Die erste ergibt natürlich keinen »richtigen« Kreis mehr, denn 50 Punkte auf jeder Achse bedeuten ja 50 doppelt-breite Punkte bei x1, daher muß dies zu einer Ellipse führen!
 
+Da die Erklärungen für ARC davon ausgehen, daß Sie den CIRCLE-Befehl voll und ganz verstanden haben, sollten Sie im Zweifelsfall noch ein wenig herumspielen, ehe Sie weiterlesen!
 
+ARC heißt »Bogen« (vgl. ARC de Triomphe in Paris: Triumph-Bogen). Der ARC-Befehl zeichnet verschiedene Figuren, deren Außenlinie wirals Bogen verstehen müssen. Beginnen wir mit einem Kreis:
 
+Als erstes brauchen wir x,y (wie bei CIRCLE). Als nächstes müssen wir zwei Angaben machen, die beim CIRCLE-Befehl bereits »eingebaut« sind, nämlich zwei Winkelangaben:
+a) einen START-Winkel und
+b) einen END-Winkel.
 
+Wir beginnen unser Experiment mit den bei CIRCLE automatisch festgelegten Werten, nämlich
+a)	START-Winkel gleich 0
+b)	END-Winkel gleich 360
 
+Eine solche Figur wird immer eine ganze Figur werden, also in unserem Beispiel zunächst ein ganzer Kreis. Veränderungen bei START- und END-Winkel werden auch Halb- oder Viertelfiguren liefern. Aber zunächst, weiter mit SW 0 und EW 360. Bis jetzt haben wir festgelegt:
+ARC x,y,SW,EW,...
 
+Die nun folgende Zahl ist immens wichtig: Sie bestimmt den ABSTAND der einzelnen Punkte auf der Bogenlinie. Beginnen wir mit 3, das heißt alle drei Punkte »weit« wird auf unserer Bogenlinie ein Punkt gesetzt:
+ARC x,y,SW,EW,3,...
+Nun fehlen nur noch:
+a)	Radius x-Achse (x1),
+b)	Radius y-Achse (y1) sowie
+c)	ZT = Zeichentyp.
 
+Die drei Parameter kennen Sie von CIRCLE her ja sehr gut!
 
+Somit können wir beginnen. Nehmen Sie das kleine START-Programm von vorhin. Legen Sie den MULTI-Befehl durch ein vorgeschaltetes REM vorläufig »auf Eis« und geben dann ein:
+20 CIRCLE 90,99,35,35,1
+25 ARC 190,99,0,360,3,35,35,1
 
+Es folgt RUN und erhöhte Aufmerksamkeit: Denn, wiewohl beide Befehle einen Kreis zeichnen, gibt es einen wichtigen Unterschied, den Sie am Bildschirm beobachten können. Welchen?
 
+Nun, haben Sie es gemerkt? Der ARC-Kreis wurde viel langsamer gezeichnet. Warum? Weil wir einen ABSTAND von drei gewählt hatten. Beim CIRCLE-Befehl ist nämlich ein ABSTAND von zwölf bereits »eingebaut«, deshalb ist der CIRCLE-Kreis schneller erstellt. Denn wennjeder dritte Punktvom Computer berechnet und gezeichnet werden muß, dann sind dies viel mehr Punkte auf der Gesamtfigur, als wenn nur jeder zwölfte Punkt gefordert wird!
 
+Jetzt kommt ein ganz wesentliches Experiment: Bitte ändern Sie Ihr Programm um: Erstens löschen Sie den CIRCLE-Befehl, zweitens addieren Sie:
+5 INPUT "ABSTAND”; AB
 
+In Zeile 25 ändern Sie den ABSTANDs-Parameter von 3 in AB um. Spielen Sie jetzt bitte mit folgenden ABSTANDs-Zahlen:
+12 (wie beim CIRCLE-Befehl)
+18 (noch Kreis-artig!)
+36 (noch immer ein Kreis?)
+40 (Resultat?)
+60 (Resultat?)
+72 (Resultat?)
+90 (Resultat?)
+120 (Wer hätte das gedacht?)
 
+(Bild 2 zeigt die wichtigsten ABSTANDs-Werte, zum Nachschlagen.)
 
+Sie sehen also: Der ARC-Befehl ist einer der interessantesten Befehle! Aber noch immer haben wir ihn kaum zu nutzen begonnen. Nehmen wir im folgenden einen ABSTAND von 90 (Raute) und spielen ein wenig weiter. Wenn Sie also die Zeile fünf und sechs wie folgt verändern:
+5 INPUT"X-RADIUS";X1
+6 INPUT”Y-RADIUS”;Y1
 
+In Zeile 25 tauschen Sie AB durch 90 aus und setzen an die Stelle von x1 den Variablen-Namen X1 und an die Stelle von y1 den Variablen-Namen Y1:
+25 ARC 190,99,0,360,90,X1,Y1,1
 
+Jetzt können Sie Rauten produzieren, die schmal und breit oder schmal und lang sind! (Bild 3)
 
+Aber auch das ist noch nicht alles! Geben Sie statt ABSTAND 90 mal 120 ein und probieren wieder per INPUT mit verschiedenen Radius-Zahlen!
 
+Und zuletzt beginnen wir, die START- und END-Winkel-Zahlen zu verändern! Denn: START 0 und END 360 ergibtja eine voller Figur. Was aber, wenn Sie einen Halbkreis oder eine Halb-Raute wollen? Obere oder untere Hälfte? Waagerecht oder senkrecht »zerschnitten«? Bitte ändern Sie unser Programm ein letztes Mal:
+5 INPUT”START-WINKEL’;SW
+6 INPUT”END-WINKEL’;EW
+25 ARC 199,90,SW,EW,12,35,35,1
 
+ABSTAND 12 ergibt wieder einen Kreis, zwei gleiche Radien bedeuten einen »richtigen« Kreis. Wenn Sie jetzt ein Gefühl für die Möglichkeiten, welche Ihnen die START- und END-Winkel-Zahlen bieten, gewonnen haben( siehe Bild 4), dann:
+a)	Verändern Sie den ABSTAND wieder (siehe Bild 5)
+b)	Verändern Sie den x-Radius (x1)
+c)	Verändern Sie den y-Radius (y1)
 
+Dadurch, daß Sie immer nur einen Parameter verändern, bekommen Sie für jeden einzelnen dieser Parameter ein »Gefühl«; somit werden Sie den ARC-Befehl durchs Ausprobieren wirklich in den Griff bekommen!
 
+In Verbindung mit REC für den Rahmen und Text-Befehlen, kann mit ARC in Null-Komma-Nix sogar »ernstlich« gearbeitet werden: Visitenkarten, Briefbögen, Übersichten, Einladungen (Bild 6) und so weiter. Wenn Sie einen Drucker haben, der den COPY-Befehl des Simons Basic unterstützt, oder aber mit einem Maschinenprogramm per SYS-Befehl Ihre Bildschirme auf Papier überträgt, dann steht Ihren »Fotosatz«-Experimen-ten nichts mehr im Wege!
 
+(Vera F. Birkenbihl/aa)
 
+# Die RS232-Schnittstelle am VC 20
 
+> Der VC 20 enthält im Betriebssystem bereits alle notwendigen Routinen zur Verwaltung einer RS232-Schnittstelle. Für den Anschluß von Peripheriegeräten wird auf den User-Port nur noch eine Erweiterungsplatine zur Anpassung der Signalpegel gesteckt.
 
+Auf dem Markt erhältlich sind sowohl Schaltungen nach der V.24-Norm als auch nach der TTY-Norm (20 mA). Nach dem richtigen elektrischen Verbinden der Geräte ist die Einstellung der Parameter für die Zeichenübertragung im Computer dem angeschlossenen Gerät entsprechend vorzunehmen.
 
+Eingestellt werden müssen die Baudrate, die Anzahl der Datenbits, die Anzahl der Stoppbits, die Art der Paritätsüberprüfung und das Rückmeldeverhalten. Im VC 20, wo diese Schnittstelle unter der Gerätenummer 2 verwaltet wird, müssen beim Öffnen des Übertragungskanals in zwei Registern, dem Kontrollregister und dem Befehlsregister, Zahlen zur Einstellung der Betriebsart übergeben werden. Es ist stets eine mühsame und fehlerträchtige Arbeit, derartige Zahlen aus Tabellen zusammenzusuchen und richtig zu verknüpfen.
 
+Das hier vorgestellte Programm nimmt dem Anwender die Suche nach den Zahlen und ihre Verknüpfung ab. In einem Bildschirmdialog werden mögliche Einstellungen der Betriebsart angeboten und ausgewählt. Dabei werden die aktuellen Werte der beiden Register stets angezeigt. Nach der Einstellung beginnt ein Übertragungstest. Zuerst werden dieZeichen »Leerzeichen« bis »Rückpfeil« auf den Bildschirm geschrieben und an das Gerät gesendet. Dann wird noch ein Testsatz übertragen. Danach kann mit über die Tastatur eingegebenen Zeichen weiter getestet werden. In das Einstellungsmenü wird durch Drücken der » ← «-Taste zurückgesprungen.
 
+Soll das Programm erst einmal ohne ein Peripheriegerät getestet werden, so genügt es, an den User-Port einen Teststecker anzuschließen. Dieser muß nur eine Brücke zwischen Pin »M« (Senden) und den Pins »C« und »B« (Empfangen) enthalten. Beim Öffnen des Files für Adresse zwei werden automatisch ein Sende- und ein Empfangspuffer mit einer Kapazität von je 256 Zeichen bereitgestellt. Über die Kurzschlußbrücke werden die gesendeten Daten in den Empfangspuffer übertragen. Dort können sie ausgelesen und weiter verarbeitet werden. In diesem Programm werden sie einfach auf den Bildschirm geschrieben.
 
+## So arbeitet des Testprogramm
 
+In Zeile 140 werden Anfangswerte in die Variable K(I) für die veränderlichen Parameter der Schnittstelle eingegeben. Die Datazeilen 150 bis 240 enthalten Textblöcke für den Bildschirmdialog. Nach dem Einschalten der Repeat-Funktion für alle Tasten in Zeile 250 beginnt der Dialogabschnitt in Zeile 280 mit der Übernahme der Textblöcke in Stringvariable bis Zeile 300.
 
+In den Zeilen 310 bis 340 werden die Menüs zur Parametereinstellung (Unterprogramm ab Zeile 520) angewählt und die errechneten Registerinhalte (UP 680) angezeigt Nachdem die gewünschte Einstellung erfolgt ist, wird diese Schleife verlassen und die Testroutine ab Zeile 370 begonnen.
 
+Darin wird zuerst der Bildschirm vorbereitet (UP 710), dann werden die aktuellen Werte von K(I) gerettet (UP 690) und gewartet, bis der Sendepuffer einer eventuell noch laufenden Übertragung ausgeschrieben ist (UP 660). Danach wird das File geschlossen. Dabei wird der RAM-Bereich der beiden Puffer für Basic wieder freigegeben. Weil hierbei ein CLR-Befehl ausgeführt wird, müssen die vorweg geretteten Parameter zurückgeholt (UP 700) und die Registerinhalte berechnet werden (UP 680). Darauf wird das File mit den neuen Parametern eröffnet, der Bereich wieder für Basic gesperrt und die dabei erneut gelöschten Parameter zurückgeholt (UP 700).
 
+In Zeile 390 wird der Puffer initialisiert. Darauf (410 bis 420) wird ein Zeichensatz übertragen und gleichzeitig invertiert auf den Bildschirm geschrieben. In Zeile 430 wird ein weiterer Testsatz gesendet. Zur Vorbereitung des weiteren Tests mit Zeichen von der Tastatur her wird der Cursor auf Blinken geschaltet (440).
 
+In den Zeilen 450 bis 490 liegt die Sende- und Empfangsschleife. Sind alle Zeichen aus dem Empfangspuffer verarbeitet, dann erfolgt gleich der Sprung zur Tastaturabfrage (nach 480). Ein dort eingegebener Rückpfeil beendet den Test und läßt zum Einstellungsmenü verzweigen. Andere Zeichen gehen in den Sendepuffer. Wurde ein Zeichen in Zeile 450 empfangen, dann wird, falls es ein Steuerzeichen ist, gewartet, bis der blinkende Cursor wegschaltet (470), sonst wird das Blinken auch bei aktivem Cursor ausgeschaltet, das Zeichen geschrieben und das Blinken wieder eingeschaltet.
 
+Im Unterprogramm ab Zeile 520 werden sowohl die einzelnen Gruppen als auch die veränderlichen Parameter dieser Gruppen angezeigt, durch Cursor-up- und Cursor-down-Tasten verändert und durch »RETURN« übernommen.
 
+In diesem Testprogramm konnte auf die Statusabfrage der RS232-Schnittstelle verzichtet werden, bei einerAnwendung in einem regulären Treiberprogramm sollte sie aber benutzt werden.
 
+(Hans-Jürgen Kellermann/ev)
 
+# Erste Hilfe für den C 64: RENEW
 
+> Manchmal läuft auch alles schief! Da waren die Finger wieder einmal schneller als die Gedanken. Man hat NEW eingetippt und erst nach dem Drücken der RETURN-Taste wird einem der angerichtete, ungewollte Schaden klar: Das Programm ist weg! Oder?
 
+Die VC 20-Besitzer können jetzt nur lächeln — wenn sie die Ausgabe 4 kennen. Dort ist nämlich ein Programm abgedruckt, daß ein mit NEW gelöschtes Programm wieder sichtbar macht. Hier ist die angepaßte Version für den C 64.
 
+Eine Programmbeschreibung erübrigt sich, da in der Ausgabe 4 Helmut Welke dies bereits sehr ausführlich gemacht hat. Es sind auch nur sehr kleine Änderungen zu machen. Im Originallisting für den VC 20 (4/84 Seite 89) sind in Zeile 1005 der Wert207 durch 175und in Zeile 1O15derWert198durch 166 zu ersetzen und schon läuft’s auch im C 64. Bei diesem hilft dieses RENEW auch nach einem Reset oder SYS 64738. Auch dieses Programm kann selbstverständlich mit dem DATA-WANDLER abgespeichert werden.
 
+# Datawandler
 
+> Mit dem Datawandler ist es auch dem »Nur-Basicprogrammierer« möglich, Maschinensprachprogramme (oder Teile davon), die in Form eines Basic-Laders (also über DATAs und POKE-Befehle) eingetippt wurden, als Maschinensprache abzuspeichern. Dadurch ergibt sich auf der Diskette eine Platz-, beim Laden eine Zeitersparnis.
 
+»Bitte warten — ich lese Daten« — so oder ähnlich wird der »Basicprogrammierer« nach dem Programmstart darauf aufmerksam gemacht, daß beijedem RUN eines Basicprogramms die Maschinenspracheteile DATA für DATA in die Speicherzellen gePOKEt werden. Warum also nicht die DATAs gleich wieder als Maschinensprache abspeichern! Aber es ergibt sich nicht nur eine Zeitersparnis beim Programmlauf, sondern auch beim Laden, da auf der Diskette oder Kassette weniger Speicherplatz benötigt wird (zum Vergleich: der Schatzsucher aus der Ausgabe 6 belegt auf der Diskette als Basicprogramm 72 Blöcke, als Kombination Basic/Maschinensprache nur noch 44 — außerdem startet dieses Programm dann in Sekundenbruchteilen).
 
+Darüber hinaus bestehen viele Hilfsprogramme, die auf Maschinenroutinen zurückzugreifen, nur aus der Zeile »FORI=xTOxx:READx:POKEI,x:NEXTI« und vielen, vielen DATAs. Derartige Programme bieten sich für den Datawandler von selbst an, da sie nach der Umformung geladen werden können, ohne ein eventuell im Basicspeicher stehendes Programm zu zerstören.
 
+<b>Zum Programm selbst</b>
+Vor dem Start des Datawandlers müssen die Daten im Speicher stehen — falls sie nur in Form von DATA-Zeilen vorhanden sind, wird in Zeile 60130 eingefügt:
+60130 FORI=AA TO EA:READX:POKEI,X:NEXTI
+In den Zeilen 60030 — 60040 wird (in dezimaler Form) die Anfangs- und Endadresse abgefragt, unter der die DATAs »abgelegt« sind und den Variablen AA beziehungsweise EA zugeordnet. Die Zeilen 60050 bis 60100 dienen der Abklärung, ob das abzuspeichernde Programm auch wieder an die Adresse geladen werden soll, wo derzeit die DATA stehen (durch das Verschieben der Ladeadresse ist auch ein leichteres Experimentieren in den Autostartbereichen möglich, die dem Programmierer gelegentlich nach den ersten »POKEs« das Konzept aus der Hand nehmen).
 
+Wird die Abfrage mit »N« beantwortet, so wird nach dieser späteren Ladeabdresse gefragt — lautet die Antwort »J«, so wird die Ladeadresse = derzeitige Anfangsadresse (LA=AA) und nach dem Namen gefragt, unter dem das Programm nun abgespeichert werden soll (Zeile 60120).
+Zeile 60130 — siehe oben.
 
+So dann wird der Floppykanal geöffnet (Zeile 60140), die dezimalen Eingaben auf »Diskettenformat« gebracht (Zeile 60150), damit die ersten beiden Bytes auf der Diskette als Ladeadresse geschrieben werden können (Zeile 60160). In den Zeilen 60170 bis 60190 werden schließlich die Daten ausgelesen und direkt auf die Diskette geschrieben. Die übrigen Zeilen dienen der Abfrage des Fehlerkanals der Floppy beziehungsweise schließlich der »Fertig«-Meldung.
 
+<b>Weitere Hinweise:</b>
+1)	Das Programm ist in dieser Form sowohl für den VC 20 als auch für den C 64 verwendbar.
+2)	Bei entsprechender Abänderung des OPEN-Befehls sollte auch die Abspeicherung auf Kassette möglich sein (die Zeilen 60200 bis 60240 entfallen dann).
+3)	Vor dem Abspeichern sollten die DATAs natürlich korrekt sein, da nach dem Abspeichern eine Überprüfung noch schwieriger ist.
+Bei Basicprogrammen sollten deshalb der Basicteil und die DATAs zunächst unabhängig voneinander eingegeben, zum Probelauf mit »MERGE« zusammengefügt und bei Fehlerlosigkeit der DATA-Teil dann entsprechend abgespeichert werden.
+4) Die »eigenständigen« Maschinenprogamme werden dann mit LOAD’xy’,8,1 geladen und mit dem SYS-Befehl gestartet. Bei Basicprogrammen sollte dann (sofern nicht ein Autostartprogramm zum Laden aller Teile verwendet wird), die erste Programmzeile lauten:
+IFA=0THENA=1: LOAD »Name des Maschinensprache-teils«,8,1
+— das klingt zwar paradox, aber es funktioniert: nach dem RUN wird dann geladen und gestartet.
+Daß in einem solchen Basicprogramm alle READ-Befehle etc. ausgebaut werden müssen, versteht sich wohl von selbst.
 
+(Uwe Christian Parpart/gk)
 
+# Simons Basic: Befehle, die nicht im Handbuch stehen
 
+> Als Ergänzung zu den Artikeln über Simons Basic in den Ausgaben 4/84 und 5/84 wollen wir in dieser Ausgabe noch einige Befehle und Besonderheiten aufführen, die nicht in jedem Handbuch stehen.
 
+Zunächst die zusätzlichen Befehle in alphabetischer Reihenfolge:
+*BCKGNDS*
+Syntax: BCKGNDSf1,f2,f3,f4
+— f1: normale Hintergrundfarbe
+— f2: Hintergrundfarbe der Zeichen mit SHIFTTaste
+— f3: Hintergrundfarbe der REVERS-Zeichen und des Cursors (nicht der Schriftfarbe)
+— f4: Hintergrundfarbe für Zeichen mit SHIFTTaste im REVERS-Mode
+Semantik: BCKGNDS legt die Hintergrundfarben fest und schaltet auf ECM (Extended-Color-Mode), dabei werden von jedem Zeichen zwei Bit vom ASCII-Code abgezweigt: es steht somit nicht mehr der gesamte Zeichensatz zur Verfügung. NRM macht BCKGNDS rückgängig
+*COLOUR*
+Syntax: COLOUR, rf, hf
+— rf: Rahmenfarbe
+— hf: Hintergrundfarbe
+Semantik: COLOUR setzt Rahmen- und Hintergrundfarbe und erspart somit das lästige POKE 53280,rf: POKE 53281,hf.
+*DISABLE*
+Syntax: DISABLE
+Semantik: Setzt ON KEY-Anweisung außer Kraft
+*GRAPHICS:*
+Syntax: GRAPHICS
+Semantik: Liefert Konstante $D000 = 53248; Adresse VIC
+*NRM*
+Syntax: NRM
+Semantik: NRM macht MEM und BCKGNDS rückgängig.
+*ON KEY*
+Syntax: ON KEY Stringausdruck, diverse Anweisungen Semantik: Wird eine Taste gedrückt, die im Stringausdruck des ON KEY-Befehls enthalten ist, so wird in den Anweisungsteil verzweigt. Die Tastatur wird dabei vorjedem Befehl abgefragt. Ein unbedingter Sprung erfolgt, wenn im Stringausdruck eine »eckige Klammer zu« ($5D) enthalten ist.
+*RESUME*
+Syntax: RESUME
+Semantik: RESUMEfunktioniertnurnach ON KEY. Bei RESUME wird das Programm beim ursprünglichen Befehl fortgesetzt. RESUME entspricht somit dem RETURN bei GOSUB.
+*SOUND*
+Syntax: SOUND
+Semantik: Liefert Konstante $D400 = 53972; Adresse SID
 
+## Punkte, die besonders zu beachten sind
 
+*AT*
+ist auch als Zuweisung möglich. Beispiel A$ = AT (Spalte, Zeile) B$. Die Cursorpositionierung erfolgt schon während der Zuweisung.
+*DUMP*
+Matritzen werden nicht angezeigt.
+*NO ERROR, OUT*
+NO ERROR schaltet nur ON ERROR ab, OUT gibt die Standardfehlermeldung aus.
+*OLD*
+Die Variablenwerte gehen verloren.
+*REPEAT, LOOP, EXEC*
+Für jede dieser Anweisungen existiert ein eigener Stack, der bis zu fünf Werte aufnehmen kann.
+SCRSV, SCRLD, COPY, HRDCPY,
+schließen Datei 1.
+*TRACE*
+Der TRACE-Befehl funktioniert nicht nach MEM.
+Mehr über Simons Basic in: Das Commodore 64-Buch, Band 5.
 
+(Hans Lorenz Schneider/aa)
 
+# Die Suche nach den Synthtischen
 
+> Das Programm ermöglicht die systematische Suche nach allen vom Betriebssystem unterstützten Steuerzeichen. Man ist nun nicht mehr angewiesen auf zum Teil lückenhafte Tabellen synthetischer Steuerzeichen, sondern kann sich stattdessen selbst auf die Suche begeben.
 
+Von den so sagenumwobenen »synthetischen Steuerzeichen« war in früheren Ausgaben dieser Zeitschrift schon die Rede. Jedoch erhielt der Leser bislang noch kein einigermaßen handfestes »Kochrezept« zur erfolgreichen Suche nach ihnen. Mit dem folgenden Programm soll diese Lücke geschlossen werden.
 
+Es gibt nach Eingabe des gewünschten ASCII-Wertes alle Tastenkombinationen aus, deren Betätigung die Tastaturdecodierroutine dazu veranlaßt, den entsprechenden ASCII-Wert in den Tastaturpuffer zu schreiben.
 
+Es werden allerdings auch solche Kombinationen aufgeführt, deren »ASCII-Werte« zwar in den Decodiertabellen (die ab $EB81 im Betriebssystem beginnen) an entsprechender Stelle aufgeführt sind, jedoch NICHT im Tastaturpuffer erscheinen (zum Beispiel die »2« bei Betätigung der SHIFTTaste). Der Leser wird diese jedoch schnell von der ersten Gruppe unterscheiden können.
 
+Zum Schluß noch zwei Bemerkungen:
 
+1)	Bei gleichzeitigem Erscheinen von zwei oder mehreren Tastenkombinationen für einen bestimmten ASCII-Code kann oft — jedoch nicht immer — eine Kombination gegen eine andere ausgetauscht werden, ohne das Endresultat zu verändern (Beispiel für eine Ausnahme: Sowohl die RUN/STOP-Taste wie auch die CTRL C-Kombination belegen gemäß der Decodiertabellen den ASCII-Wert »3«, jedoch kann mit »CTRL C« kein Programm abgestoppt werden, da für die Abfrage der RUN/STOP-Taste eine gesonderte Routine zuständig ist, die nur diese Taste erkennt).
 
+2)	Alle »synthetischen Steuerzeichen«, für deren Erzeugung der Basic-Interpreter zuständig ist, kann dieses Programm nicht erkennen, da es lediglich auf die Tastaturdecodiertabellen im Kernal Bezug nimmt.
 
+Da das Programm lediglich die Tastaturdecodiertabellen des Betriebssystems benötigt (und die dort aufgeführten ASCII-Werte in ein ARRAY einliest) kann es leicht durch entsprechende Abänderung der in Zeile 20 enthaltenen Anfangsadressen in eine auch auf dem VC 20 laufende Version umgeschrieben werden.
 
+(Engin Gülen/gk)
 
+# Slamball – der ellenlange Flipper
 
+> In der Flipper-Familie ist »Slamball« ein Außenseiter. Sein Spielfeld ist so groß, daß es gar nicht auf einmal auf den Bildschirm paßt.
 
+Wer in seiner Jugend etliche Markstücke in die klingelnden und klappernden Flipperautomaten gesteckt hat, hat sich oft gewünscht, eine dieser Maschinen zu besitzen. Doch leider waren sie zu teuer. Heute geht das einfacher und auch billiger. Auf Diskette oder Kassette ist das Programm »Slamball«, das den Heimcomputer in eine lustige Flippermaschine verwandelt, zu haben.
 
+Daß sich dieser Computerflipper in manchen Dingen doch von einem richtigen Flipper unterscheidet, wird gleich nach dem Laden klar. Das Rollfeld der Kugel ist nicht vollständig abgebildet, sondern läuft zum oberen Rand hin aus. Auch wird nicht mit den Flipperbacken, sondern mit dem Joystick gespielt. Ein immer wieder interessantes Bild: Wie von einer Rakete abgeschossen, jagt der Ball nach dem Start an die Spitze des Flippers. Dabei schiebt sich das gesamte Spielfeld von unten nach oben über den Bildschirm. Damit der Ball, dem ein Gesicht aufgemalt wurde, möglichst lang in Bewegung bleibt, stehen mehrere Paare Flipperbacken zur Verfügung.
 
+Hat man genug Übung, kann ein gewiefter Spieler den Ball mit dem Joystick ähnlich wie bei einem richtigen Flipper manipulieren.
 
+Doch Vorsicht, der »Tilt« funktioniert auch!
 
+Ewig läßt sich die Kugel aber nicht im Spiel halten. Nicht etwa, daß sie einfach aus dem Bild verschwindet. Sie wird, fast brutal, von zwei Schmiedehämmern zerstampft.
 
+Insgesamt ist »Slamball« mehr ein Spiel, als eine echte Flippersimulation. Kaum ein Flipper hat eine lächelnde Kugel, die bei Spielende zerstampft wird oder einen Joystick, um die Flipperbacken zu steuern. Einemjüngeren Spieler wird »Slamball« sicher eine Menge Unterhaltung bieten. Die Älteren wollen wahrscheinlich nicht auf das »hautnahe« Gefühl der rollenden und anschlagenden Kugel eines echten Flippers verzichten.
 
+(Arnd Wängler)
 
+# Lock-Ruf: Hacker, meldet Euch
 
+Ist Ihre Telefonrechnung in letzter Zeit sprunghaft angestiegen? Besitzen Sie eine Liste von Telefonnummern, bei denen sich am anderen Ende der Leitung keine menschliche Stimme meldet? Kommen Sie manchmal übernächtigt im Büro oder in der Schule an, obwohl sie nicht durchgefeiert haben? Zeigt man Verständnis, wenn Sie leise vor sich hinträllern: »Mal kommste rein, mal fliegste raus«?
 
+Genau Sie werden von uns gesucht — melden Sie sich doch bei uns. Anruf oder Postkarte genügt.
 
+Für alle, die bis jetzt ratlos geblieben sind: Wir suchen Hacker. Wir wollen wissen, wie das ist — das Stöbern in fremden Datenbanken. Wir suchen Hacker, die die »Szene« kennen. Keine Angst, nach dem Gesetz ist Hacken nicht verboten.
 
+Und jetzt einmal ohne Modem oder Akustikkoppler telefonieren: 089-4613-269; ich freue mich über jeden Anruf—übrigens, ich heiße Karin Gößlinghoff. Wer lieber schreibt, sollte seine Nachricht an folgende Adresse schicken:
+Redaktion
+Computer persönlich
+Karin Gößlinghoff
+Hans-Pinsel-Str. 2
+8013 Haar bei München
 
+# Fantasy-Spiele – Geschichten von Galaxien, Gnomen und Giganten
 
+> Sie heißen Hobbit, Voodoo Castle, Ultima, Enchanter oder Sorcerer. Die Zahl der Fantasy-Rollenspiele wächst täglich, und für manche benötigt selbst der Routinier rund 300 Stunden, um zum Ziel zu kommen.
 
+Ein Androide kämpft auf einem fernen Planeten ums Überleben. Der griechische Sagenheld Odysseus schlägt sich mit Kameraden durch das Mittelmeer. Astronauten entdecken ferne Galaxien, und stolze Helden durchstreifen mystische Welten.
 
+Abenteuer, die jeden Abend über Tausende von Bildschirmen flimmern und in keinem Fernsehprogramm stehen. Die sogenannten Abenteuerspiele oder Adventures und Fantasy-Spiele haben den üblichen Fernseh- und Kinofilmen etwas voraus: Der Zuschauer ist gleichzeitig der Hauptakteur, der Held der Geschichte. Der Computer macht’s möglich.
 
+Dabei hatte es vor rund zehn Jahren ohne Computer und Flimmerkiste angefangen. Der Amerikaner Gary Gygax träumte in seiner Jugend (jetzt übrigens auch noch) gerne von Fantasiewelten, was ihn auch dazu brachte, alle klassischen Sagen Europas zu lesen. Als er all diese Sagen gelesen hatte, fand er das Ganze einfach unvollendet: Ihm fehlte die Fortsetzung, die Gary Gygax in Form von Fantasyspielen schreiben wollte. Die ersten »weiterführenden Kapitel« zur Geschichte der Fantasy-Rollenspiele schrieb er schon im Sandkasten. Dort spielte er ein Taktikspiel namens »Chainmail« mit seinen Freunden.
 
+Der nächst Schritt war die Entwicklung des ersten Rollenspiels, »Tunnels and Trolls« (der deutsche Titel ist »Schwerter und Dämonen«). Weitere Rollenspiele sind Runequest, Dungeons& Dragons (die bekannteste Variante), und diverse andere (vom Bereich Science Fiction bis zu James Bond). Später, als die ersten besseren Homecomputer auf den Markt kamen, versuchte man, die in USA sehr populären Rollenspielsysteme auf dem Computer zu realisieren. Teilweise sind diese Versuche mit fesselnden Abenteuerspielen gelungen, aber oft wurden sie auch zu kläglichen Beweisen für die Einfallslosigkeit der Programmierer. Beispiele für gute Rollenspiele am Computer sind zum Beispiel Ultima II, Gateway to Apshai, Exodus, Enchanter, The Hobbit, Blade of Blackpool, und viele andere.
 
+Doch was ist eigentlich ein Rollenspiel? Der Begriff erklärt sich daraus, daß bei dieser Kategorie von Spielen der Spieler die Rolle einer bestimmten Figur übernimmt, den sogenannten »Character«. Durch das Übernehmen des Charakters oder Wesens einer Figur wird man also Zauberer, Abenteurer, Kämpfer, Dieb oder ein ähnliches Wesen. Im Rollenspiel muß man mit den Fähigkeiten dieser Figur (Stärke, Weisheit, Intelligenz, Charisma, Konstitution) und ihren Mitteln (Waffen, Rüstungen, Zaubersprüche, Diebeswerkzeug und ähnliches) eine bestimmte Aufgabe lösen. Bei den Computern kann diese Aufgabe darin bestehen, in den höchsten Level zu kommen (wie bei Gateway to Apshai), oder man muß eine Gegend durchforschen und dabei möglichst viel Erfahrung sammeln. Spielt man die »computerlosen« Rollenspiele, dann hat man zwar in jedem Abenteuer eine Aufgabe (Gegend durchforschen, Feinde bekämpfen, Erfahrung sammeln, Schätze suchen), kann aber mit seinem Character ohne festes Ziel von Abenteuer zu Abenteuer wechseln und beim nächsten Adventure mit seinen vorher erworbenen Erfahrungen, Waffen, Goldmünzen, und so weiterspielen. Solche Rollenspiele sind also endlos (außer, wenn das Wesen, dessen Rolle man übernommen hat, stirbt). Gerade diese Tatsache ist einer der größten Unterschiede zwischen den Rollenspielen mit und ohne Computer. Hat man beispielsweise ein Computer-Ad-venture zu Ende gespielt, dann ist es aus — für immer.
 
+Die Autoren dieses Berichts spielen selbst gerne Computer-Fantasy, aber auch das computerfreie Spiel »Advanced Dungeons & Dragons«. Die Spielregeln für dieses Spiel, das abgekürzt auch AD&D genannt wird, sind in einem zirka 350 Seiten starken PLAYER’S HANDBOOK zusammengefaßt. Der Leiter eines solchen Spiels hat ein noch weit umfangreicheres, sogenanntes DUNGEON MASTER'S GUIDE als Nachschlagewerk. Das bedeutet natürlich nicht, daß man all dies auswendiglernen muß, um ein solches Spiel spielen zu können, aber diese Zahlen sollen Ihnen nur die Komplexität der Spielregeln und die zahlreichen Möglichkeiten eines AD&D-Spiels zeigen. Die Feinde, auf die man in einem Abenteuer stoßen kann, sind auch vielfältiger Natur: Das MONSTER MANUAL gibt Auskunft über mehr als 350 verschiedene Monster. Das Buch beschreibt beispielsweise, wieviel Schaden man einem Monster zufügen muß, um es zu vernichten, welche geistigen Fähigkeiten das Monster hat, und so weiter.
 
+Was den Spieler selbst betrifft: Seine Fähigkeiten werden ausgewürfelt. Danach kann er sich den Charakter aussuchen. Bei hoher Geschicklichkeit wird er natürlich die Rolle eines Diebes übernehmen, um seine Fähigkeiten optimal ausnutzen zu können. Hohe Weisheit gibt gute Voraussetzungen für die Rolle des sogenannten »Cleric« (weil hohe Weisheit einen Zauberspruchbonus für Kleriker gibt), etc.
 
+Der Spielhergang läßt sich natürlich nicht in Kürze erklären. Es sei hier jedoch gesagt Wenn ein bestimmter Vorgang in einem Abenteuer nicht vorgesehen ist, kann der Spielleiter (Dungeon Master) selbst noch entscheiden, wie es weitergeht. Bei Computerspielen trifft der Computer leider keine eigenen Entscheidungen.
 
+Die Treffer und deren Stärke beim Kampf gegen Feinde werden ebenfalls ausgewürfelt. Würfel (4seitige, 6-seitige, 8-, 10- und 20-seitige), sogenannte »Module« (die einzelnen Abenteuer), sowie Bücher dazu gibt es im Fachhandel (bessere Spielwarenläden, Fantasy-Büchershops und so weiter). Fantasy-Rollenspiel-Adventures ohne Computer, wie zum Beispiel Dungeons & Dragons, werden von der Firma FSV vertrieben.
 
+## Rollenspiele am Computer
 
+Die Rollenspiele auf dem Computer werden von ihren amerikanischen Herstellern »D&D-type-Games« genannt. Ihr großer Nachteil: Sie erlauben dem Spieler nur das, was der jeweilige Programmierer in sein Spiel eingebaut hat.
 
+So ist denn auch kein Wunder, wenn viele Abenteuerspiele nur eine sture Reihenfolge von ganz bestimmten Zügen erlauben. Diese Spiele kann man jedoch nicht mehr unbedingt als Abenteuerspiel bezeichnen, denn hier durchlebt man kein Abenteuer, sondern knobelt meist nur aus, welche Worte der Computer versteht und welche er nicht akzeptiert. Bei vielen gut gelungenen Fantasyspielen fällt dem Spieler jedoch meistens nicht mehr auf, daß er durch die Programmie-,rung eingeschränkt ist. Als Beispiel möchten wir hier die Spiele ULTIMA II und EXODUS angeben: In ihnen sind derartig große und komplexe Welten aufgebaut, daß der Spieler gar nicht mehr merkt, daß irgendwo ein Ende der großen weiten Phantasiewelt besteht.
 
+## Arten der Computer-Fantasy
 
+Man kann die Rollenspiele mit Computern in zwei große Gruppen aufteilen: Die joystick- und tastaturgelenkten Spiele (wie KAIV, GATEWAY TO APSHAI, ULTIMA II/III) sowie die textorientierten Spiele, bei denen man wiederum Text/Grafik-Abenteuer und reine Textadventures unterscheiden kann. Die joystick- und tastaturgesteuerten Spiele sehen meist so aus, daß der Spieler seine Figur(en) mit dem Steuerknüppel durch Phantasiewelten, Dungeons, oder »sonstwas« lenkt, wobei er noch zusätzliche Tasten zum Ausführen von Funktionen drücken darf. Diese Funktionen können zum Beispiel sein: Fallen suchen, Zaubersprüche aussprechen, Waffen wechseln, ein Gespräch beginnen, und, und, und...
 
+Die textorientierten Programme akzeptieren Texte als Befehle und reagieren entsprechend. Das Repertoire reicht von primitiven Ein-Wort-Kommando-Adventures bis hin zu komplexen Riesen-Abenteuerspielen, die vollständige Sätze verstehen. Oft sind diese Spiele durch eindrucksvolle Grafik illustriert.
 
+Als kleines Nebenprodukt der Rollenspiele gibt es die sogenannte »Action-Fantasy«. Die Hersteller solcher Spiele nennen sie zwar Fantasy-Spiele, aber eigentlich handelt es sich nur um reine Actionspiele, die durch ein Fantasy-Thema aufgereichert wurden, wie zum Beispiel das Commodore-Spiel DRAGONS-DEN.
 
+Hier nun eine kleine Marktübersicht über Fantasy-Rollenspiel-Adventures auf dem C 64:
 
+## Fantasy auf dem C 64
 
+Wenden wir uns erst den joystick- und tastaturgelenkten Spielen zu:
 
+### ULTIMA II:
 
+Dieses Programm ist eines der umfangreichsten Spiele, die es für den C 64 gibt. Ziel des Spieles ist es, den bösen »Minax« zu töten. Um dies zu schaffen, muß man viel Zeit und Geduld haben und etliche Kämpfe durchstehen.
 
+Tastaturgesteuert (fast alle Tasten sind belegt).
 
+Herstellerfirma: Sierra-On-Line
 
+### GATEWAY TO APSHAI:
 
+Bei diesem Spielt heißt es, den höchstmöglichen Level zu erreichen. Dies gelingt nur mit viel Erfahrung, die man in diversen joystickgelenkten Kämpfen sammelt.
 
+Hersteller: Epyx.
 
+### Die WARRIORS OF RAS-Serie:
 
+In dieser Serie erschienen Spiele wie KAIV, DUNZHIN, und so weiter. Sie sind jedoch nur dem zu empfehlen, der schon einmal Fantasy-Rollenspiele (ohne Computer) gespielt und viel Zeit und vor allem Geduld hat. Auf Grafik wird in diesen Spielen nicht viel Wert gelegt, das Spielerische dominiert.
 
+Herstellerfirma: Screenplay.
 
+### TELENGARD:
 
+Dieses Realtime-Abenteuer ist nur dem Profi zu empfehlen. Man muß sehr schnell denken, um im richtigen Augenblick die richtige Taste zu drücken. Beim Durchforschen der Dungeons stößt man oft auf Drachen und ähnliche Wesen, die sehr schwer zu besiegen sind.
 
+Herstellerfirma: Avalon Hill.
 
+### EXODUS - ULTIMA III:
 
+Exodus ähnelt dem Spiel »Dungeons and Dragons« wohl am meisten. Ziel ist es, Exodus zu finden. Ein Test dieses Spiels erfolgt eventuell in Ausgabe 11 von 64’er. Zu EXODUS werden sehr umfangreiche Anleitungen mitgeliefert, so beispielsweise eine auf Stoff gedruckte (farbige) Landkarte, ein Zauberspruchbuch, eine Spielanleitung etc., zum Teil auf alten Pergamentschriftrollen gedruckt. Die durchschnittliche Spielzeit bis zur endgültigen Lösung des Rätsels dürfte bei 200 bis 300 Stunden liegen.
 
+Herstellerfirma: Origin Systems.
 
+Schreiten wir nun zu den textorientierten Fantasy-Spielen, zu den sogenannten »Adventures«:
 
+## Reine Textadventures
 
+### INFOCOM-ADVENTURES:
 
+Diese Abenteuerspiele sind wohl die besten Textadventures, die es derzeit auf dem Markt gibt. Sie haben einen Wortschatz von über 800 Worten und verstehen ganze Sätze (wie zum Beispiel »Go to the north, then look around and open the green door«). Das Spektrum der Spielthemen geht vom Mittelalter über Detektivspiel bis hin zu Science Fiction oder »20000 Meilen unter dem Meer«-Abenteuern. Die Spiele werden in pompösen Packungen geliefert: Der Inhalt besteht je nach Spiel aus altertümlichen Schriftrol-len, Postkarten aus der Galaxis, kleinen Identifikations-Magnetkarten, Spielbrettern, Karten mit Geheimschrift, Weltraumkarten, und, und, und... Die Infocom-Abenteuer sind trotz des relativ hohen Preises sehr empfehlenswert. Spielnamen: WITNESS, DEADLINE, ENCHANTER, SUSPENDED, ZORK I/II/III, PLANETFALL, SORCERER und SEAS-TALKER.
 
+Herstellerfirma: Infocom.
 
+### CYBORG:
 
+Hier ist man der menschliche Teil eines Wesens, das halb Roboter, halb Mensch ist. Um seine Abenteuer zu bestehen, muß man sich mit dem Robotergehirn koordinieren. CYBORG versteht ganze englische Sätze.
 
+## Grafik-Abenteuer
 
+### Sirius-Adventures:
 
+BLADE OF BLACKPOOL hat altertümliche Komponenten; Ziel des Spiels ist es, das »Schwert des Blackpool« zu finden. CRITICAL MASS liegt mehr in der Gegenwart: Man muß die Atombomben finden, die ein Bösewicht in fünf großen Weltstädten versteckt hat. GRUDS IN SPACE bezieht sich mehr auf die Zukunft. Das Ziel des Spiels erscheint auf einem Bildschirm, den man durch die Eingabe »press green but-ton« aktiviert. Diese Spiele begeistern vor allem durch ihren Einfallsreichtum, ihre sehr gute Grafik und durch ihren Spielwitz.
 
+Herstellerfirma: Sirius-Software.
 
+### Die Scott-Adams-Abenteuer:
 
+Diese »Adventure Games«, die es schon auf dem VC 20 als Textversion gab, gibt es jetzt für den Commodore 64 in Grafikversion. Der Text ist etwas knapper gehalten als in der reinen Textversion, was aber nicht weiter stört, weil die Grafik (die übrigens klein aber oho ist) die Umgebung ja auch umschreibt. Es handelt sich um VOODOO CASTLE, PIRATE ADVENTURE, MISSION IMPOSSIBLE und THE COUNT.
 
+Außerdem hat die Firma Adventure International die Rechte zu einigen Superhelden-Stories aus dem amerikanischen Marvel-Comic-Imperium aufgekauft. Von diesen Marvel-Comic-Adventures ist bereits das Spiel »THE INCREDIBLE HULK« erhältlich (Grafik sehr gut, Spiel zu schwer). Spiderman und diverse andere sollen noch folgen.
 
+Hersteller: Adventure-International.
 
+### THE HOBBIT:
 
+Es geht darum, einen von einem Drachen bewachten Schatz zurückzubringen. Die Story entspricht im Großen und Ganzen dem Buch »The Hobbit« von Tolkien. Das besondere an diesem Abenteuer ist die sogenannte »Animaction« (so nennt es der Hersteller), das heißt, daß die Wesen, die in diesem Abenteuer vorkommen, sich bei jedem Spiel anders verhalten, und man sich mit ihnen (»Talk to Name Text«) arrangieren muß, um das Adventure zu lösen. Sehr schwer zu spielen, aber sehr unterhaltsam.
 
+Hersteller: Melbourne House.
 
+### DALLAS-QUEST:
 
+Ein Spiel, das für fortgeschrittene Abenteuerer nicht geeignet ist, da es recht schnell zu lösen ist. Dieses Abenteuerspiel bietet jedoch die beste Grafik, die bisher auf einem Commodore 64-Adventure zu sehen war. Sehr überzeugend ist auch der Reichtum an humorvollen Ideen. Dieses Spiel ist also für einen Anfänger-Abenteuerer sehr zu empfehlen.
 
+Hersteller: Datasoft.
 
+### Abenteuerspiele von Sierra-On-Line:
 
+Die Spiele MISSION ASTEROID und WIZARD & PRINCESS sind ebenfalls als Anfänger-Abenteuer zu bezeichnen. Sie haben zwar einen kleinen Wortschatz, können aber nach einiger Übung auch von ungeübten Spielern gelöst werden. Ein umfangreicheres Grafikadventure ist »Ulysses and the golden Fleece«, in dem man die Rolle von Odysseus übernehmen muß. Nach einiger Anlaufzeit macht dieses Spiel sehr viel Spaß.
+Natürlich können wir in dieser Übersicht nicht alle Fantasy-Spiele beschreiben. Aber wir hoffen, Ihnen einen kleinen Überblick über die bestehende Computer-Fantasy gegeben zu haben. Die versprochenen Lösungshinweise zu »Blade of Blackpool« und »The Hobbit« werden in der nächsten Ausgabe gebracht.
 
+(M. Kohlen/F. Wlodarzcyk)
 
 
+## Anmerkungen
 
+Wer sich für Rollenspiele (ohne Computer) interessiert, wendet sich an Ferdinand Wlodarczyk, Prager Str. 26, 8000 München 45.
 
+Rollenspielsets zum Beispiel D&D-Basis-Set) gibt es in besseren Spielwarenhandlungen zu kaufen.
 
+Computer-Fantasy-Spiele gibt es natürlich in Computerläden und im Versandhandel.
 
+# Das macht den »Kleinen« größer
 
+> Wer mit dem minimalen Speicher des VC 20 (3,5 KByte) nicht zufrieden ist, wird sich früher oder später eine Speichererweiterung zulegen. Unter der großen Auswahl von solchen Erweiterungen gibt es seit einiger Zeit auch 64-KByte-RAM-Karten.
 
+Eine Frage, die sich wohl ein jeder stellt: Kann ich eine 64-KByte-RAM-Karte überhaupt voll ausnutzen oder reicht schon eine 16-KByte- oder 32-KByte-Karte? Es ist bekannt, daß der VC 20 maximal 27,5 KByte Basicspeicher adressieren kann. Weiterhin können noch 8 KByte ($A000-$BFFF) für Maschinenprogramme oder Spielmodule adressiert werden. So wird hier maximal die Hälfte der 64-KByte-Karte genutzt. Wofür braucht man nun die anderen 32 KByte? Dieser Speicherplatz bleibt natürlich nicht ungenutzt. Er kann je nach Bedarf zum Speichern von Daten verwendet werden. Zuvor ein paar Bemerkungen zum VC 20-RAM-Speicher. In der VC 20-Grundversion ist der Adreßbereich von $0400 bis $OFFF für eine 3-KByte-RAM-Erweiterung vorgesehen. Der Bereich $2000-$7FFF bietet Platz für 24 KByte. Diesen Bereich kann man in Blöcken zu je 8 KByte unterteilen:
+1)	$2000-$3FFF
+2)	$4000-$5FFF
+3)	$6000-$7FFF
 
+Für Toolkits, Erweiterungen von Betriebssystemen und Modulspiele ist der Adreßbereich von $A000-$BFFF reserviert. Mit Hilfe von Dil-Schaltern (Dil bedeutet Dual in line) auf beiden 64-KByte-Karten lassen sich beliebige Speicherkombinationen einstellen:
+1)	Grundversion
+2)	3 KByte RAM-Erweiterung
+3)	8 KByte RAM-Erweiterung
+4)	16 KByte RAM-Erweiterung
+5)	24 KByte RAM-Erweiterung
 
+Zu diesen fünf Möglichkeiten kann jeweils noch der Modulbereich belegt werden.
 
+Die Dil-Schalter sind auf beiden Platinen (in Bild 1 die von Kalawsky, in Bild 2 die von Roos Elektronik) so ungünstig angebracht, daß diese beim Einstecken in den Hauptspeichererweiterungs-Slot des VC 20 ganz im Gerät verschwinden. So muß jedesmal beim Umschalten die Karte aus dem Gerät gezogen werden. Um den anderen Teil der 64-KByte-RAM-Karte zu nutzen, wird bei dem Modul von Kalawsky die Möglichkeit des »Banking« eingesetzt. Durch die Einteilung der 64 KByte in acht Blöcke mit je 8 KByte, die man per Software (POKE I/O 2,X = > POKE 39000,X) auswählen kann, ist es tatsächlich möglich, 64 KByte für den VC 20 nutzbar zu machen. Falls I/O 2 schon für zum Beispiel einen IEC-Bus oder eine 40/ 80-Zeichenkarte benötigt wird, so kann der RAM-Master durch Löten einer Zinnbrücke auf I/O 3 gelegt werden. Die POKE-Adresse ändert sich dann von 39000 auf 40000. »Banking« kann in den Bereichen $6000-$7FFF oder $A000-$BFFF realisiert werden. So können maximal 8 Banks durch Umschalten genutzt werden. Die gesamte 64-KByte-RAM-Karte läßt sich zusätzlich noch durch einen Schreibschutz sichern. Mit einer externen Stromversorgung der Karte kann man dann sogar noch nach Ausschalten des Computers Programme, die sich im Speicher der RAM-Karte befinden, erhalten. Weiterhin kann man damit ein unbeabsichtigtes Überschreiben des Speichers vermeiden.
 
 
+Wer eine Modulbox besitzt, kann bei dieser Karte sogar seine eventuell vorhandenen Speichererweiterungen wie zum Beispiel 3-KByte-Karte, Superexpander oder 16-KByte-Karte verwenden, falls er die 64-KByte-Karte ausschließlich für Banking benutzt. Es können auch zwei 64-KByte-RAM-Master-Karten verwendet werden.
 
+Zusammenfassung der Anwendungsmöglichkeiten:
+1)	64-KByte-RAM durch Banking im Bereich $6000-$7FFF beziehungsweise $A000-$BFFF
+2)	Vollausbau des VC 20 und Banking
+3)	Mischung aus 1. und 2., falls weitere Erweiterungen vorhanden sind.
+4)	Kombination von zwei 64-KByte-RAM-Master-Karten.
 
+Weiterhin ist bei Kalawsky ein Programm erhältlich, das die 64-KByte-RAM-Master-Karte voll ausnutzt und die Banking-Eigenschaften anschaulich vorführt: »Bankingshow«
 
+ROOS Elektronik benützt hingegen eine andere Art der Datenspeicherung für ihre 64-KByte-RAM-Karte. Die Karte ist mit einem nützlichen EPROM bestückt. Die mitgelieferte Software im EPROM muß vor Gebrauch erst einmal mit SYS 43008 aktiviert werden. Durch diese Software gelangen die folgenden sechs Basicbefehle zu einer größeren Bedeutung: OPEN, PRINT#, INPUT#, GET#, SAVE und LOAD.
 
+Man erhält zusätzlich acht Gerätenummern (DEVICE NUMBER 200 bis 207), die in Verbindung mit den erwähnten sechs Basicbefehlen einen superschnellen Datenaustausch zwischen RAM-Speicher und 64-KByte-RAM-Karte ermöglichen.
 
+Ein weiterer Vorteil bei der mitgelieferten Software aus dem EPROM ist, daß kein Filename angegeben werden muß (aber kann). Die Files unterscheiden sich ja durch die verschiedenen Gerätenummern (200 bis 207). Bei sequentiellen Files muß nach OPEN... und PRINT#... ein CLOSE... folgen. Erst damit gehen die zu diesem Zeitpunkt im Puffer stehenden Zeichen nicht verloren. Für den Fall, daß der Speicher der 64-KByte-RAM-Karte voll ist, gibt der Computer die Fehlermeldung »TOO MANY FILES« aus. Die 64-KByte-RAM-Karte von ROOS Elektronik hat wohl zwei mehr oder weniger große Nachteile im Vergleich zur 64-KByte-RAM-Karte von Kalawsky:
 
+Das EPROM benutzt den Adreßbereich von $A000-$AFFF, während die Karte von Kalawsky keinen Speicherbereich des VC 20 belegt. Weiterhin dürfen bei der Roos Elektronik-Karte vorläufig keine anderen Speichererweiterungen (Superexpander, 16-KByte-Karte und so weiter) benutzt werden. Die Karte von ROOS Elektronik wird dafür nach Angaben des Herstellers demnächst in eine Box eingebaut. Auch der Dil-Schalter soll dann an einer zugänglicheren Stelle plaziert sein.
 
+40/80-Zeichenkarte oder IEC-Bus können bei beiden 64-RAM-Karten verwendet werden. In Bild 3 sind die beiden Karten gegenübergestellt.
 
+Beide 64-KByte-RAM-Karten sind wohl, je nach Anwendungsgebiet, gleich gut. Wer sich aufgrund dieses Tests eine dieser 64-KByte-RAM-Karten zulegen möchte, muß sich wohl in erster Linie im klaren sein, ob er Speicherverwaltung durch »Banking« oder durch erweiterte Basicbefehle bevorzugt. Der Sinn von 64-KByte-RAM-Karten für den VC 20 liegt wohl in der Verwendung als Pseudo-Floppy. Dabei lassen sich beispielsweise Daten einer Adreßverwaltung von der Floppy oder der Datasette in diese Pseudo-Floppy einlesen und wesentlich schneller abarbeiten. Nach den durchgeführten Arbeitsvorgängen wie Ändern, Einfügen oder Sortieren werden diese Daten wieder auf die physikalischen Speichermedien transferiert. Das führt zu einer, oft nicht unerheblichen, Zeitersparnis.
 
+(Christian Quirin Spitzner/aa)
 
+# Ihr Akkustikkoppler wird zum Modem und der C 64 zur Mailbox
 
+> Die Anregung zu der Entwicklung der Schaltung entstand aus dem Ärgernis, daß jeder Besitzer eines Akustikkopplers, wenn er eine Mailbox betreiben will, bei jedem Anruf aufspringen und dann die Anfrage an den Computer weiterleiten muß. Mit Hilfe meiner Schaltung ist es nun möglich, daß der Mailbox-Computer auf einen Anruf reagiert und selbständig die Verbindung herstellt.
 
+Bei einem Anruf wird von der Vermittlungsstelle ein Rufwechselstrom zum Teilnehmer gesendet. Dieser Strom steuert die Leuchtdiode des Optokopplers und der Kopplertransistor wird niederohmig und zieht den BC 547 nach Masse, so daß dieser im Takt des Rufwechselstroms den Eingang (Port H) des C 64 ebenfalls taktet. Wird nun der Port getaktet, so reagiert der Computer und der Pegel am Ausgang (Port F) wird auf 5 V (High) gesetzt. Durch die positive Spannung leitet nun der Relaistransistor, das Relais zieht an und stellt die Verbindung zum Fernsprechapparat her. Nun kann der Computer mit der Datenkommunikation über den Koppler beginnen.
 
+## Aufbau der Hardware
 
+Die Schaltung kann problemlos auf einer Experimentierkarte aufgebaut werden. Wichtig ist nur die galvanische Trennung von Fernsprechleitung und Computer-Hardware.
 
+Die Bauteile sind handelsüblich und meist sogar in jeder Bestelliste vorhanden. Wichtig für die Funktion der Schaltung ist nur die Tatsache, daß das Relais bei 5 V sicher schaltet und einen Strom von weniger als 50 mA zieht.
 
+Die Schaltung kann anschlußfertig mit Mailbox-Software beim Autor bezogen werden.
 
+Die DIN-Bezeichnungen entsprechen dem Günther-Dil-Relais 3570 1301 051. Der Anschluß der Schaltung an den C 64 erfolgt über den Userport. Der Koppler wird über den RS232-Stecker (25polig) angeschlossen. Der Anschluß ans Telefonnetz erfolgt folgendermaßen:
 
+Die Leitung a (La) wird von der Anschlußdose getrennt und auf den Anschluß 7 des Interfaces gelegt. Der Anschluß 4 wird parallel auf die Lb aufgelegt. Anschluß 7 wird auf den Anschluß La der Dose geklemmt.
 
+Für die weitere Benutzung des Apparates sollte man parallel zu den Relaiskontakten (1,7) einen Schalter legen, der diese Kontakte überbrückt.
 
+### Funktionen
 
+1.	Umsetzung des Rufsignals 60 V 25 Hz aufTTL-Pegel zur Auswertung durch den Computer (Auswertung des Rufs durch Computer)
+2.	V.24-5-Schnittstelle für Akustikkoppler (Datenkommunikation)
+3.	Anschalten des Fernsprechapparates durch Signal vom Computer (automatisches Abheben)
+4.	Wahlmöglichkeit für den Benutzer (automatische Wahl)
 
+### Bedienungsanleitung
 
+Für die Benutzung der Funktionen 3 bis 4 ist der Schalter in die Stellung »Modem« zu bringen und danach das entsprechende Programm in den Computer zu laden, das heißt, wenn nur die Wahlfunktion genutzt wird, zum Beispiel das Programm Wählautomat. Für den Betrieb einer Mailbox das entsprechende Mailbox-Programm. Der weitere Ablauf ist im Programm beschrieben. Die Funktionen 1 bis 2 sind unabhängig von der Schalterstellung.
 
+<font color="red">Achtung! Diese Schaltung darf nur an Hausanlagen angeschlossen werden, die nicht mit dem öffentlichen Telefonnetz verbunden sind!</font>
 
+Zu Beginn fragt das Programm, ob der Apparat an einer Nebenstellenanlage angeschlossen ist. Ist dies der Fall, so geben Sie bitte »j« ein und geben dann anschließend die Nummer für die Anwahl einer Amtsleitung ein. Diese Nummer wird dann der Telefon-Rufnummer vor-angestellt.
 
+## Das Programm »Wählautomat«
 
+Nach RETURN gelangen Sie ins Hauptmenü. Mit den Tasten f 1 und f 3 wählen Sie den Menüpunkt an. Ist er gefunden, so drücken Sie bitte RETURN.
 
+### Neue Adressen
 
+Geben Sie bitte in die Eingabemaske die entsprechenden Angaben ein und drücken RETURN. Danach gehen Sie in die Zeile mit dem einzelnen Strich und drücken RETURN. Falls Sie noch etwas ändern wollen, so geben Sie bei den Sicherheitsabfragen »n« ein.
 
+### Adresse ändern oder löschen
 
+Nachdem Sie mit dem Cursor und den Tasten f 1 und f 3 die gewünschte Adresse gefunden haben, drücken Sie f 5.
 
+Danach können Sie auswählen, ob Sie ändern, löschen oder wieder ins Hauptmenü wollen. Wenn Sie die Daten ändern, gehen Sie bitte nach dem Abschnitt »Neue Adressen« vor. Vor dem Löschen von Daten werden Sie jeweils zur Sicherheit gefragt, ob Sie diese wirklich löschen wollen.
 
+### Adresse anwählen
 
+Hier können Sie sich Ihren Gesprächspartner mit den Tasten f 1 und f 3 aussuchen. Danach drücken Sie f 5. Darauf erscheinen die Daten des Teilnehmers und ein weiteres Menü. Drücken Sie bitte gemäß Ihres Wunsches die revers angezeigte Taste. Danach gehen Sie bitte entsprechend dem Menü vor. Für eine Direktwahl drücken Sie f 7.
 
+## Der Anschluß
 
+### 1. extern
 
+Die ankommende Leitung a wird mit dem Anschluß 1 (grau gekennzeichnet) verbunden. Die Leitung a des Telefons wird mit dem Anschluß 2 (isoliert ohne Kennzeichnung) verbunden. Anschluß 3 (Abschirmung) wird parallel auf die Leitung b geklemmt.
 
+### 2. intern im Apparat: (dazu Deckel abschrauben)
 
+Stecker des Nummernschalters oder Tastwahlblockes abziehen. Anschluß 1 (grau gekennzeichnet) mit Anschluß 1 der 4polige Buchse verbinden. 2 (isoliert ohne Kennzeichnung) mit 2 der Buchse. Abschirmung (Anschluß 3) mit 4 der Buchse. Deckel wieder zuschrauben.
 
+(Rudolf Möllenbeck/rg)
 
+# Steckbrief: Wer kennt Computer-Seminare?
 
+Wer lernt schon gern allein? In der Gruppe ist der »Schüler« doch viel besser aufgehoben.
+»Kurse und Seminare rund um den Computer« heißt das Thema in einer unserer nächsten Ausgaben. Wir möchten Sie informieren, wo welche Kurse zu welchem Preis angeboten werden, und wir möchten berichten, wie es Kursteilnehmern ergeht, beziehungsweise ergangen ist.
+Dazu brauchen wir Sie.
+Schreiben Sie uns, welche Computer-Seminare Sie anbieten oder welche Sie besucht haben. Anbieter und Teilnehmer — wir sammeln Erfahrungen und Informationen von beiden Seiten. Übrigens, nicht nur »Programmieren in Basic, Pascal« und so weiter ist interessant, sondern alles, was man rund um den Computer mit anderen zusammen lernen kann. Ihre Zuschriften senden Sie bitte an:
+Redaktion
+Computer persönlich
+Karin Gößlinghoff
+Hans-Pinsel-Str. 2
+8013 Haar bei München
 
+# Bücher
 
+## Einstieg in Simon’s Basic
 
+Fast jedes Buch, das sich an den Computerneuling wendet, nimmt für sich in Anspruch, verständlich, stufenweise aufbauend und lerngerecht zu sein. Dieses Buch ist es. Der Autorin ist es gelungen, ihre Erfahrungen aus dem Bereich der Lernpsychologie in das Buch »Einstieg in Simon’s Basic« sinnvoll einfließen zu lassen. Das Ergebnis ist verblüffend, denn vom Vorgang des Lernens beziehungsweise Verstehens merkt der Leser nichts. In verständlichen Erklärungen und vielen hilfreichen Zeichnungen sind die Informationen zum schnellen Erlernen des Simon’s Basic untergebracht. Dabei wird nicht darauf verzichtet, den Leser zum ständigen Ausprobieren anzuhalten.
 
+Wesentlicher Bestandteil dieses Buches ist es, dem Leser das Wissen auf möglichst vielen Wegen zu übertragen. Die Autorin nennt diese Methode »gehirngerechte« Aufbereitung des Lernstoffes. So wird beispielsweise viel Wert darauf gelegt, die geschriebenen Worte mit Bildern zu unterlegen. Der Computer eignet sich hier als Hilfsmittel hervorragend, denn jedes der kleinen Beispielprogramme wird nicht nur erklärt und abgebildet, sondern kann auch gleich ausprobiert werden. Die Funktion eines Befehls in Simon’s Basic zu lesen, im Buch abgebildet zu sehen und auch sofort auszuprobieren ist in der Regel mit »gelernt« gleichzusetzen. Wer also das Buch neben dem Computer liegend, Stück für Stück ausprobiert, wird bald das Gefühl haben, immer schon in Simon’s Basic firm gewesen zu sein. Die erreichte Lerntiefe ist so groß, daß auch nach längeren Pausen noch große Teile des Wissens vorhanden sind (Radfahren verlernt man ja auch nicht). Die Lerninhalte des Buches haben ihren Schwerpunkt in den Grafikbefehlen des Simon’s Basic. Gleichwohl werden natürlich auch die anderen Befehle erläutert sowie eine große Anzahl nützlicher Hinweise gegeben, die nicht nur mit Simon’s Basic anwendbar sind. Das Buch »Einstieg in das Simon’s Basic« stellt die augenblicklich gelungenste Anleitung zum Selbststudium dieser Basicerweiterung dar. Der echte Profi wird aber, obwohl uninteressanter zu lesen, sicherlich ein Buch im herkömmlichen Stil verwenden. Bleibt zu bemerken, daß alle Programme im Buch, bis auf das erste, bei dem die Farbgebung verändert werden muß, fehlerfrei funktionieren. Als Sonderservice werden übrigens die wichtigsten Programme aus dem Buch und einige längere nicht abgedruckte Programme auch auf einer Diskette (68 Mark) angeboten. Es ist zu hoffen, daß diese Methode Wissenswertes zu vermitteln auch in zukünftigen Büchern vermehrt anzutreffen ist.
 
+(Arnd Wängler)
 
+Vera F. Birkenbihl, Einstieg in Simon’s Basic, 201 Seiten, IWT-Verlag GmbH, Vaterstetten bei München, ISBN 3-88322-056-6, Preis 44 Mark.
 
+### Das Musikbuch zum Commodore 64
 
+Mittlerweile scheint es sich auch in den oberen Etagen der Soft- und Hardwareindustrie herumgesprochen zu haben, daß zunehmend mehr Computerfreaks mit wachsender Begeisterung auf ihren Computern Musik machen. Es ist auch wahrlich erstaunlich, was für Möglichkeiten sich hier mittlerweile auftun.
 
+Besonders der Commodore 64 entwickelt sich, zumindest hier bei uns in »Good old Germany«, zum absoluten Renner, was die Beliebtheit bei Computermusik-Freaks angeht. So verwundert es auch nicht, daß, zwar relativ spät, dafür aber gleich von zwei Verlagen fast gleichzeitig, Musikbücher zum Commodore 64 erscheinen.
 
+Die inzwischen schon sehr umfangreiche Data Becker-Bibliothek zum Commodore 64 wurde um »Das Musikbuch zum Commodore 64« erweitert. In altbebekannter Data Becker-Aufmachung werden hier, frisch aus dem Computerdrucker und gänzlich ohne schmückendes Beiwerk, viele wichtige Details für den ernsthaften Anwender präsentiert. Als Autor gewann man Thomas Dachsel, der, selbst Musiker, auch das Musikprogramm »Synthimat« entwickelt hat.
 
+Neben einer kurzen Einführung in die Computermusik enthält das Buch auch ein kleines »Lexikon zur Computermusik« und sehr viele Listings von teilweise so bekannten Songs wie »Let it be«, »Hey Jude« und »Yesterday« von den Beatles. Anhand dieser Listings erklärt Dachsel die Feinheiten von ein-bis schließlich dreistimmigen Basic-Musikprogrammen, wobei natürlich Grundkenntnisse der Programmierkunst vorausgesetzt werden. Anschließend folgt ein Kapitel über den verwendeten SID (Sound Interface Device Chip) mit ausführlicher Beschreibung aller Sound-Register und so grundlegender Dinge der Synthesizertechnik wie Oszillator, Filter, ADSR, Synchronisation und Ringmodulation. Nachdem man dann die Grenzen der Musikprogrammierung in Basic erfährt, macht das »Musikbuch zum Commodore 64« schließlich auch nicht Halt vor der Assembler-Programmierung von Musikstücken. Im Anhang finden sich Hinweise zum Anschluß des C 64 an die Stereoanlage und zur Kopplung mit zusätzlicher Hardware.
 
+Alles in allem ein lesenswertes Buch für alle, die vorhaben, ernsthaft mit dem C 64 Musik zu machen.
 
+(ai)
 
+Thomas Dachsel: Das Commodore Musikbuch, 208 Seiten, Data Becker GmbH 1984, ISBN 3-89011-012-6; Preis 39 Mark
 
+## Commodore 64 Musik-Buch
 
+Fast gleichzeitig erschien im Birkhäuser Verlag, Basel, in der Reihe »Computershop« mit dem Band Nr. 14 die deutschsprachige Version des bereits 1983 in Boston erschienenen »The Commodore 64 Music Book«. Die Autoren James Vogel und Nevin B. Scrimshaw haben sich viel Mühe mit der grafischen Gestaltung gegeben, viele Bilder von Musikmaschinen aus grauer Vorzeit lockern die gut gegliederte Lektüre immer wieder auf. Dieses Buch wendet sich mehr an die Einsteiger, mit weniger oder gar keiner Programmiererfahrung. Es beginnt mit der Erklärung von Schall und Schwingung, Frequenz, Tonhöhe, Kurvenformen, ADSR, Filter, I Ringmodulation und Synchronisation, so leicht verständlich dargeboten, daß man praktisch ohne Kenntnisse des Programmierens beziehungsweise der Musik zu lesen beginnen kann. Im zweiten Kapitel lernt man mit POKEs umzugehen und dem C 64 erstmals Töne zu entlocken. Hat man das alles intus, geht’s ans Programmieren ein- oder mehrstimmiger Melodien mittels READ/DATA-Anweisungen. Abschnitt 5 führt in die Welt der I »Magic Effects«. Sirenengeheul, Raketenstart und Lokomotive — der Einsatz von Ringmodulation und Synchronisation, von Filter und Frequenzmodulation wird vor Ort erprobt. Im vorletzten Kapitel eine Einführung in die Musikprogrammierung mit dem Array-Format und schließlich programmiert man eine Orgeltastatur auf seinem C 64 — Echtzeitmusik! Sehr nützlich: Eine herausnehmbare, plastifizierte Tafel, mit einer Tabelle der SID-Tonwerte und den Soundregistern des SID-Chips, die neben den C 64 gelegt viel mühsames Blättern in einem Buch erspart.
 
+Das »Commodore 64 Musik-Buch« ist eine sehr leicht verständliche Einführung in die musikalischen Fähigkeiten des C 64 und vor allem all denen zu empfehlen, die sich noch nicht zu den absoluten Profiprogrammierern zählen.
 
+(ai)
 
+James Vogel und Nevin B. Scrimshaw: Commodore 64 Musik-Buch, 131 Seiten, Birkhäuser-Verlag (Computer Shop Bd. 14) 1984, ISBN 3-7643-1590-3; Preis 29,80 Mark
 
+# Assembler ist keine Alchimie
 
+> Die meisten Leser haben auf den Mitmach-Karten den Wunsch nach einem Maschinensprachkursus geäußert. Voilà, hier ist er. Dieser Kurs kann kein Buch über Maschinensprache ersetzen, er wird Ihnen jedoch helfen, diese Sprache wesentlich leichter zu verstehen. Sowohl der 6502-Prozessor im VC 20 als auch der 6510-Prozessor im C 64 werden behandelt.
 
+Vermutlich hat es Ihnen auch schon ab und zu in den Fingern gejuckt, wenn Sie von Wunderdingen gelesen haben, die man per Maschinensprache mit dem Computer machen kann. Vielleicht haben Sie sogar schon mal nichtsahnend angefangen einzutippen, was Sie als Assemblerlisting sahen. Doch schon nach dem ersten »C000 LDA # $00« und RETURN weigerte sich der Computer mit einem lapidaren »SYNTAX ERROR«. Wieso, werden Sie sich gefragt haben, das ist doch nun die Sprache unserer Maschine, nämlich Maschinensprache, was habe ich falsch gemacht?
 
+Dann sind Sie sicherlich mal auf diese merkwürdigen Basic-Pro-gramme gestoßen, in denen ein langer Wurm von DATA-Zeilen mit einem kleinen FOR..NEXT..POKE-Kopf vorne und einem SYS-Schwanz hinten enthalten ist, und die man Basic-Lader nennt. Sie haben fleißig Zahlen eingetippt — das ganze hoffentlich sofort abgespeichert-, vorschriftsmäßig mit dem SYS-Befehl gestartet und auf einen scheintoten Computer geschaut, der nur noch durch Aus- und Einschalten wiederzubeleben war. Wenn Sie dann nach langer Fehlersuche den irrtümlich eingetippten Punkt durch ein Komma ersetzen, (oft finden Sie auch keinen Fehler, denn bei langen DATA-Sequenzen schlägt der Druckfehlerteufel mit Vorliebe zu), werden Sie sich gefragt haben, warum in aller Welt dieses kleine Mißgeschick den ganzen Computer abstürzen läßt. Sie merken vermutlich schon, daß mir das alles und noch mehr (worüber ich schamhaft schweige) passiert ist. Die Konsequenz war, daß ich los ging, um ein schlaues Buch zu erwerben. Aber merkwürdig, damals tauchte der Begriff »Maschinensprache« in keinem Titel auf. Irgendwann begriff ich, daß Assembler und Maschinensprache irgend etwas miteinander zu tun haben.
 
+Aber da fing das ganze Elend erst richtig an: Da gab es 6502-, Z80-, 8080-, 8085-, 6800-Assembler, da waren irgendwelche Schaltpläne, anscheinend, wie man wo was hinlötet – für mich als Nichtelektroniker eine Art moderner Kunst-, da war von CPU, Bussen, negativen Flanken, Zweiphasentakten die Rede.
 
+Ich habe mich furchtbar geärgert über die Geheimsprache, die es dem Uneingeweihten verwehrt, etwas zu verstehen. Seither hat sich einiges verändert. Die Geheimnisse sind keine mehr und ich werde Ihnen in dieser Serie ohne verschlüsselte Sprache die magischen Zirkel der Assembler-Alchimisten offenbaren. Heute gibt es auch Bücher über »Maschinensprache auf dem Commodore 64« und es sei Ihnen angeraten, ruhig auch das eine oder andere durchzuarbeiten. Sie werden allerdings feststellen, daß die meisten davon gerade dort aufhören, wo es anfängt, spannend zu werden: Bei der Benutzung von Routinen des Betriebssystems und des Interpreters. Deswegen soll der Schwerpunkt dieser Serie anders liegen:
 
+Wir werden das notwendige Grundwissen über die Hardware nur ganz knapp behandeln, dann das Vokabular des 65xx-Assembler kennenlernen. Den Hauptteil der Serie verbringen wir aber mit Dingen, über die es kaum Literatur gibt, nämlich wie man für eine Unzahl von Programmieraufgaben nicht nochmal das Rad erfinden muß, weil es schon längst in unserem Computer existiert.
 
+Bevor wir loslegen, will ich Ihnen noch etwas Literatur empfehlen:
+a) Wenn wir über Speicheraufbau, das binäre und das hexadezimale Zahlensystem reden, werde ich voraussetzen, daß Sie die Serie »Reise durch das Wunderland der Grafik« gelesen haben, die in dieser Zeitschrift in den Folgen 1 und 2 (Ausgaben 4/84 und 5/84) diese Themen grundlegend behandelt hat.
+b)	Als Nachschlagebuch sehr wertvoll ist das Buch von Rodney Zaks: Programmierung des 6502. Das ist gewissermaßen ein Klassiker.
+c)	Später wird Ihnen dieses Buch fast unentbehrlich vorkommen: R. Babel, M. Krause, A. Dripke: Systemhandbuch zum Commodore 64 (und VC 20), München 1983
 
+Weitere Literaturempfehlungen werde ich Ihnen von Fall zu Fall geben. Gerade zu unserem Computer erscheint fast jeden Monat ein neues Buch und es ist nicht einfach, die Spreu vom Weizen zu trennen.
 
+## Einige BegriffsMärongen
 
+Zunächst einmal muß ich Sie enttäuschen: Ich glaube kaum, daß Sie mit Ihrem Computer je einmal in Maschinensprache verkehren werden! Maschinensprache, das ist die einzige, die der Computer direkt versteht, das sind vorhandene oder nicht vorhandene Stromimpulse oder Magnetisierungszustände, die bei unserem Computer durch 8-Bit-Binärzahlen auszudrücken sind. Was wir mit unserem Computer reden werden ist Assembler. Mit dem Computer sprechen soll heißen: Mit dem Gehirn unseres Computers, dem Prozessor, oft auch CPU (von Central Processing Unit=Zentraler Arbeitsbaustein) genannt, verkehren, also ihm Befehle zu geben. Solche CPUs werden bei verschiedenen Firmen hergestellt, sind daher unterschiedlich aufgebaut und auch unterschiedlich ansprechbar. Ein weit verbreiteter Prozessortyp ist der 6502, der das Gehirn des C 64 und auch des VC 20 ist. Genau genommen ist das Gehirn des C 64 allerdings der 6510, ein dem 6502 fast identischer Prozessor. Auf den kleinen Unterschied werden wir noch zu sprechen kommen. Beide (6502 und 6510) sind in 6502-Assembler zu programmieren und wenn wir diese Sprache sprechen, sind für uns alle 6502-Computer zugänglich: Commodore, Apple, Atari und einige andere. Nun wissen Sie aber immer noch nicht, was Assembler eigentlich ist. Das englische Wort »assemble« heißt auf deutsch etwa montieren, zusammenstellen. Es handelt sich also um eine Programmiersprache und weil sie sehr eng am Computer orientiert ist, spricht man von einer »maschinenorientierten« Programmsprache im Gegensatz zu »problemorientierten« Programmsprachen wie Basic, Pascal, Cobol etc., die — so sollte es jedenfalls sein — auf jedem Computertyp gleich aussehen.
 
+Ein Assembler ist aber noch etwas anderes, nämlich ein Software-Instrument, das einen in Assembler geschriebenen Befehl in die Maschinensprache übersetzt. Man spricht vom Vorgang des Assemblierens. Das umgekehrte leistet ein Disassembler, welcher uns Maschinensprache durch Rückübersetzung lesen hilft. Um die Verwirrung noch etwas zu steigern, sage ich Ihnen auch noch, was ein Monitor ist. In diesem Zusammenhang ist kein Bildschirmgerät damit gemeint, sondern ebenfalls ein Software-Instrument, das den Einblick in die Register und Speicher des Computers gewährt.
 
+Damit Sie nun den Überblick noch völlig verlieren, sei abschließend zu diesem Sprachenwirrwarr noch erzählt, daß Software-Pakete, die sowohl Assembler als auch Disassembler als auch Monitor enthalten und noch eine Menge anderer brauchbarer Dinge, oft als »Assembler« angeboten werden. Das ist ein alter Trick der Alchimisten, verschiedenen Dingen den gleichen Namen zu geben!
 
+## Basic contra Assembler
 
+Um das Nachfolgende deutlich zu machen, schalten Sie bitte Ihren Computer an und tippen die beiden folgenden Programme ein, die beide genau dasselbe tun: Das obere Viertel unseres Bildschirmes mit dem Buchstaben A zu füllen (beim VC 20 ist es die obere Hälfte). Zunächst einmal in Basic:
+10 FOR I = 1024 + 255 TO 1024 STEP-1
+20 POKE I, 1:POKE 1 + 54272,14
+30 NEXT I
 
+Für den VC 20 (Grundversion und 3-KByte-Erweiterung) ist zu setzen: Anstelle von 1024 jetzt 7680, statt 54272 jetzt 30208 und statt 14 die 6. Wenn Sie mehr als die 6,5 KByte im VC 20 haben, dann setzen Sie statt 1024 jetzt 4096, statt 54272 jetzt 34304 und ebenfalls statt 14 die 6. Das Programm braucht 55 Byte + 7 Byte für die Variable I, macht zusammen 62 Byte Speicherplatz. Es geht ganz schnell und wenn Sie es schaffen, können Sie ja mal mitstoppen, wie lange es von RUN bis READY braucht: Zirka 4 Sekunden.
 
+Jetzt dasselbe in Assembler. Weil wir aber noch nicht soweit sind, erst mal als Basiclader, der uns das Programm in den Speicher bringt (wir kommen dazu gleich noch). Geben Sie also NEW ein und dann:
+10 FORI = 7000 TO 7000 + 16
+20 READ A:POKE I,A:NEXT I :END
+30 DATA 160,255,162,14,169,1,153,255, 3,138,153,255,215,136,208,244,96
 
+Beim VC 20 geben Sie bitte statt der 14 (Zeile 30,4.Zahl) eine 6 ein. Starten Sie den Basiclader mit RUN und nach dem READY geben Sie NEW und CLR ein: wir brauchen ihn den Basiclader nicht mehr. Ab Speicherstelle 7000 steht jetzt unser Assemblerprogramm als Maschinencode. Daß es wirklich dasselbe tut wie das Basicprogramm erfahren Sie durch SYS 7000. Da hatten Sie vermutlich gar keine Zeit mehr, auf die Stoppuhr zu drücken! (5,4 Millisekunden etwa dauert das ohne die Zeit, die der Basicinterpreter für den Befehl SYS benötigt). Außerdem braucht das Programm 17 Byte Speicherplatz.
 
+Genau das ist es, was die Assemblerprogrammierung so reizvoll macht: Der Speicher faßt mehr an Programm und die Ausführung des Programmes geht fast 1000mal so schnell! Dazu kommen natürlich noch einige andere Kriterien, denn viele Probleme sind zum Beispiel in Basic nicht lösbar, sondern nur mit dem vielseitigeren Assembler.
 
+Unser Computer ist darauf vorbereitet, daß wir ihn in Basic ansprechen. Er enthält im Normalfall sofort nach dem Einschalten ein stets präsentes Übersetzungsprogramm, den Interpreter, welcher unsere Basicanweisungen für ihn verständlich interpretiert. Auch das ist ein Unterschied zu Assemblerprogrammen: Ist ein solches Programm erst einmal assembliert (also als Maschinensprache im Speicher vorhanden), braucht man kein Übersetzungsprogramm mehr. Basicprogramme dagegen müssen bei jedem Durchlauf von vorne bis hinten ständig übersetzt werden, sie laufen nicht ohne vorhandenen Interpreter. Wie so ein Interpreter im Prinzip arbeitet und was ihn von einem sogenannten Compiler unterscheidet, sollten Sie mal in der April-Ausgabe der Zeitschrift 64’er im Artikel ab Seite 110 von M. Törk über seinen Strubs-Precompiler nachlesen.
 
+Dort sehen Sie dann auch, daß ein Compiler zwar ein Basicprogramm enorm beschleunigen kann, aber bei weitem nicht an die Geschwindigkeit reiner Assemblerprogramme heranreicht, vom Speicherplatzbedarf ganz zu schweigen.
 
+## Wie sag ich’s meinem Computer?
 
+Leider haben weder der C 64 noch der VC 20 einen Assembler implementiert. (Sie merken, daß jetzt von dem Software-Paket die Rede ist!). Es gibt einen etwas mühseligen Weg, dieses Handicap zu umgehen: Den Basiclader. Wie ist also der Weg, mit einem solchen Lader eigene Maschinenprogramme in den Computer zu bekommen?
 
+a)	Erstellen des Assemblerprogrammes. Das zu lernen ist die Hauptaufgabe in der Serie. Das Ergebnis wird eine Kette von Befehlen sein, zu denen zum Beispiel der Befehl RTS gehört. 
+b)	Jedem Befehl in Assembler entspricht in Maschinensprache ein Binärcode in einer Speicherstelle. Diese Codes sind in Listen nachschlagbar: RTS entspricht dem Binärcode 0110 0000.
 
+c)	Der Code muß in eine Speicherstelle eingegeben werden. Das geschieht von Basic aus mit dem POKE-Befehl. Weil aber Basic keine Binärzahlen kennt, muß der Code ins Dezimalsystem umgerechnet werden. Glücklicherweise sind in den Tabellen meist schon die Codes als Dezimal- oder wenigstens als Hexadezimalzahlen enthalten. RTS ist dezimal 96 (oder hex.60, das auch $ 60 geschrieben werden kann). Man POKEt nun an die richtige Adresse den Wert 96, also zum Beispiel POKE 7016,96
 
+d)	Auf diese Weise wird Byte für Byte in der Programmabfolge verfahren. Das reine POKEn geschieht dann eben in der Form wie im oben gezeigten Basiclader. Mühsam, mühsam! Auch kann man leider nur mit dem PEEK-Kommando nachsehen, was denn nun im Speicher steht (PEEK (7016) gibt uns den Wert 96, entsprechend RTS).
 
+Ein anderer Weg ist der Kauf eines Assembler-Moduls oder einer entsprechenden Programm-Kassette oder Diskette. Sehr preiswert ist es sicherlich, in Fachzeitschriften Umschau zu halten nach abgedruckten Assemblern. Sehr gut finde ich beispielsweise den von U. Roller in Chip Nummer 1 (1984), aber auch im 64'er wird während des Verlaufs dieser Serie ein gut verwendbares Programm vorgestellt.
 
+Assembler (das Software-Paket) gibt es in den unterschiedlichsten Ausführungen. Es gibt beispielsweise Direkt-Assembler, die jede Programmzeile sofort nach dem RETURN assemblieren, aber auch 2-Pass-Assembler, bei denen das erst nach Abschluß des Programms insgesamt durch einen Befehl (zum Beispiel ASSEMBLE) geschieht. Bei einigen kann man (ähnlich wie bei Basic mit REM) Kommentare anfügen, bestimmten Programmstellen Namen geben (sogenannte LABELS), ganze Programmabschnittte mit einem Merknamen aufrufen (sogenannte MAKROS) und so weiter. Was Sie für sich bevorzugen, bleibt Ihnen natürlich überlassen. Die in dieser Serie geschriebenen Programme werden auf diese schönen Erleichterungen verzichten, es wird sozusagen der nackte Assembler verwendet und solange in dieser Zeitschrift noch kein Software-Paket dafür veröffentlicht ist, werde ich jedes Programm, das wir zusammen entwickeln, als Basiclader angeben. Was Sie aber außer dem reinen Assembler noch brauchen, ist ein Disassembler und ein Monitor (ich habe schon erklärt, welchen ich meine), damit wir unseren Computer (fast) immer im Griff haben.
 
+## Wie funktioniert unser Computer?
 
+Weil das Programmieren in Assembler einen viel engeren Kontakt zu technischen Einzelheiten unseres Computers erfordert, ist es notwendig, ein wenig über diese Innereien und ihre Funktion zu wissen. Sehen Sie sich dazu bitte das Bild 1 an.
 
+Da sehen wir zunächst unseren Mikroprozessor, der meist eine Menge Funktionen in sich vereinigt (dazu kommen wir noch). Im Prinzip ist das unsere CPU (Zentraler Arbeitsbaustein). Der Prozessor steht über eine Reihe von Leitungen mit dem Rest des Computers in Verbindung. Diese Leitungen werden im Fachjargon BUSSE genannt. Da ist zunächst einmal der sogenannte Adreßbus, auf dem 16-Bit-Adressen transportiert werden, die der Prozessor erzeugt, und die die Herkunft oder auch das Ziel von Daten festlegen, die über den Datenbus laufen. Dieser kann 8-Bit-Daten transportieren, und zwar schreibend oder lesend, also zum Beispiel vom Prozessor zum RAM (schreibend), vom RAM zum Prozessor (lesend) und so weiter. Außerdem gibt es da noch einen Steuerbus, der verschiedene Synchronisationsaufgaben durchführen hilft. Links vom Prozessor ist ein Taktgeber angedeutet. Damit nichts durcheinander kommt, läuft alles im Computer sozusagen im Gleichschritt. Diese Uhr ist gewissermaßen der Trommler, den Sie vielleicht von den alten Ruder-Galeeren kennen. Dann sehen Sie rechts einen ROM-Bereich, also einen Nur-Lese-Speicher (Read Only Memory). Daß man hier nur herauslesen kann, ist durch den Pfeil zum Datenbus gekennzeichnet. Doppelpfeile finden wir aber beim RAM (Random Access Memory), einem Speicher für beliebigen Zugriff, also lesend und schreibend, und bei den Ein- und Ausgabebausteinen, die den Kontakt des Computers mit der übrigen Welt erlauben, also auch mit uns. Dieses Aufbauprinzip finden wir bei allen 8-Bit-Computern.
 
+## Das Innenleben eines Mikroprozessors
 
+Um es gleich nochmal zu sagen: Was hier erzählt wird, ist nicht dazu geeignet, Elektronik-Freaks den totalen Durchblick zu geben. Wenn Sie das aber gerne möchten, dann sehen Sie sich zum Beispiel die Blockschaltbilder an im »Programmer's Reference Guide« für den Commodore 64 auf Seite 404 oder im »MOS-Hardware-Handbuch« auf Seite 34. Auch Rodney Zaks in dem anfangs schon erwähnten Buch »Programmierung des 6502« ist zu empfehlen. Er hat sich viel Mühe gegeben, sich verständlich auszudrücken. Mirkommt es nur auf den allgemeinen Überblick an. Den sollen Sie bekommen, wenn wir uns jetzt zusammen Bild 2 betrachten.
 
+Da sehen Sie zunächst als Herzstück des Prozessors, die ALU (Arithmetik Logical Unit), also den arithmetisch-logischen Baustein. Die ALU hat die Fähigkeit, Rechenoperationen auszuführen mit Daten, die sie über den Datenbus und normalerweise vom Akkumulator erhält. Das Ergebnis wird ebenfalls im Akkumulator abgelegt (daher auch der Name: von akkumulieren, etwa ansammeln). Der Akkumulator ist das Register, das uns als Programmierer am häufigsten beschäftigen wird. Er ist die Sammel- aber auch die Verteilerstelle für fast alle Daten, die wir hin- und herschieben wollen. Sowohl der Akku (so werde ich, mit der Hoffnung auf Ihr wohlwollendes Verständnis, künftig bezeichnen) als auch alle anderen Register, das heißt, die höchste Zahl, die darin bearbeitet werden kann, ist 255 (binär 11111111). Nahezu ebenso oft wie den Akku werden wir die beiden sogenannten Index-Register X und Y benutzen. Warum man sie Index-Register nennt, sehen Sie noch im Verlauf der Serie. Als nächstes zum Prozessor-Statusflaggen-Register (hier P genannt). Man findet hier angezeigt, ob eine Rechenoperation ein negatives Ergebnis hatte oder ob eine Null aufgetaucht ist oder ob ein Übertrag stattgefunden hat. Auch dieses Register wird uns noch häufig begegnen. Das Stapelregister, auch Stackpointer (Stapelzeiger) genannt, gibt uns Auskunft über den Füllungsgrad eines 256 Byte großen speziellen Speichers, der vom Prozessor direkt verwaltet wird. Auch damit werden wir noch oft zu tun haben. Schließlich kommen wir zur vorhin erwähnten Ausnahme, zum Programmzähler (PCL, PCH). Das ist ein 16-Bit-Register, das sich aus zwei 8-Bit-Registern (PCL für das LSB und PCH für das MSB) zusammensetzt und daher alle 65535 Speicherplätze ansprechen kann. Hier ist immer die Adresse des nächsten abzuarbeitenden Befehls enthalten.
 
+Ich will an dieser Stelle nicht in die Einzelheiten der Befehlsabarbeitung einsteigen (das können Sie auch bei Rodney Zaks nachlesen, wenn Sie’s genau wissen wollen). Es soll nur gesagt sein, daß sich die Verarbeitung in drei Schritte unterteilen läßt:
+a) den nächsten Befehl holen
+b) den Befehl decodieren
+c) den Befehl ausführen
 
+Zu c) ist noch zu sagen, daß es Befehle gibt, die der Prozessor ohne weitere Angaben ausführen kann. Für andere müssen erst noch weitere Daten aus dem Speicher geholt oder dort abgelegt werden. Deswegen brauchen die Befehle unterschiedliche Zeiten zur Ausführung. Die Zeit wird als Anzahl von sogenannten Taktzyklen in den Befehlstabellen angegeben. Unser Computer hat eine Taktfrequenz von rund 1 MHz, was bedeutet, daß ein Taktzyklus etwa eine Mikrosekunde (10-6 Sekunden) dauert. Auf diese Weise wurde die Zeitdauer für unser kleines Demonstrationsprogramm zu Anfang berechnet. Auch das werden Sie noch lernen.
 
+## Der Speicher unseres Computers: Eine Straße mit 65536 Hausnummern
 
+Diese Serie ist für den VC 20 und den C 64 geschrieben. Den Speicheraufbau des Commodore 64 finden Sie in der April-Ausgabe dieser Zeitschrift ab Seite 119. Deswegen soll hier nur der des VC 20 gezeigt werden. Man muß beim VC 20 zwei Konfigurationen unterscheiden — sehr zum Leidwesen der Benutzer. In Bild 3 ist die Aufteilung gezeigt, die in der Grund- und der um 3 KByte erweiterten Version vorliegt.
 
+In Bild 4 sehen Sie die Speicheraufteilung, die bei mehr als 6,5 KByte eingestecktem Speicher gültig ist.
 
+Wenn Sie die VC 20 Speicherarchitekturen mit der des C 64 vergleichen, werden Sie eine Reihe von Unterschieden feststellen. Genau besehen gibt es an den wichtigen Punkten aber eine Menge Gemeinsamkeiten! Der VC 20 kennt nur Speicher-Häuser mit Erdgeschoß, im Gegensatz zum C 64, wo manche Bereiche sogar zwei Etagen haben (soll heißen: mehrfach belegt sind). Durch die Eigenart des C 64 aber, im Normalfall das Basic-ROM, die Ein- und Ausgabebausteine und das Betriebssystem eingeschaltet zu haben, kann man ihn eigentlich genauso behandeln wie einen VC 20, bei dem die genannten ROM-Bausteine, — und zwar das Basic-ROM —, um 8 KByte verschoben sind. Die Unterschiede der ROM-Inhalte sind fast vernachlässigbar. Wir werden im Einzelfall darauf zu sprechen kommen. Bei den Ein- und Ausgabebausteinen liegen allerdings größere Unterschiede.
 
+Die Seiten 0 bis 3 (eine Seite oder auch page enthält 256 Byte und man zählt oft auch in diesen Seiten, wenn vom Speicher die Rede ist), sind sich ebenfalls sehr ähnlich und die wenigen Unterschiede werden uns ebenfalls noch beschäftigen. Der Bildschirm liegt bei der Grundversion und der mit der 3-KByte-Erweiterung von 7680 bis 8191, in der Version mit mehr als 6,5 KByte von 4096 bis 4607 und beim C 64 von 1024 bis 2047. Der Bildschirmfarbspeicher liegt — bei gleicher Reihenfolge — von 37888 bis 38399, beziehungsweise von 38400 bis 38911 und schließlich von 55296 bis 56295. Der Basic-RAM-Bereich beginnt beim C 64 im Normalfall bei 2048 und endet bei 40959. Beim VC 20 ist das natürlich wieder von der jeweiligen Erweiterung abhängig (Tabelle 1).
 
+Dies gilt — wie Sie leicht auch aus Bild 4 sehen können — auch dann, wenn zu den 8 KByte/16 KByte/24-KByte-Erweiterungen noch die 3-KByte-Erweiterung und die 'KByte-Erweiterung im hohen Speicherbereich (40960 bis 49151) verwendet werden. Diese letztgenannten Adressenbereiche sind dann gut als geschützte RAM-Bereiche für Maschinensprache zu verwenden, ebenso wie beim C 64 der Speicherabschnitt von 49152 bis 53247.
 
+Damit schließen wir zunächst mal den Hardware-Überblick ab. In der nächsten Folge stelle ich Ihnen dann die ersten Assembler-Befehle vor, und wir beginnen zu programmieren. Sie gehören nun zum 1. Grad der Assembler-Alchimisten.
 
+(Heimo Ponnath/aa)
 
+# Reise durch die Wunderwelt der Grafik (Teil 6)
 
+> Nachdem wir in der letzten Folge die Sprites, einen Leckerbissen unseres Computers, kennengelernt haben, wenden wir uns — nach zwei anderen Grafikeigenheiten des C 64 — wieder der hochauflösenden Grafik zu, die wir einige Zeit sträflich vernachlässigt haben. Diese nützen wir dann für zwei- und dreidimensionale Darstellungen auf dem Bildschirm aus.
 
+Zunächst aber ein leichtes und ein schwierigeres Thema:
 
+Wenn Sie an Ihrem Computer eine Kassettenstation verwenden, dann kennen Sie das ja zur Genüge. Sie geben irgendeinen Kassettenbefehl ein, der Computer fordert zum Beispiel PRESS RECORD & PLAY. Sobald Sie dieser Aufforderung nachgekommen sind, ist der Bildschirm total leer. Dieses üble Verhalten — wir sehen ja nun einige Meldungen nicht mehr — hat seinen Grund. Die Kassettenoperationen können etwas schneller laufen. Überhaupt beschleunigt ein abgeschalteter Bildschirm einen Programmablauf. Im allgemeinen nützt uns das nicht viel, denn wir reden ja mit unserem Computer per Bildschirm und wenn der Gesprächspartner einen »black-out« hat, kann nicht miteinander verkehrt werden. Manchmal gibt es aber Situationen, wo dieses Abschalten für kurze Zeit ganz angenehm sein kann. Wenn wir zum Beispiel ein kompliziertes Titelbild aufbauen, mögen viele nicht zuschauen. Sondern nach einem leeren Bildschirm soll sofort das fertige Titelbild auftauchen.
 
+Was passiert beim Abschalten des Bildschirmes? Das ist optisch eigentlich gar nicht so aufregend, denn der ganze Bildschirm nimmt die Farbe des Rahmens ein. Er wird also genau genommen nicht abgeschaltet. Geschaltet wird etwas, das wir nicht sehen können. Nämlich eine ganz bestimmte Fähigkeit unseres Prozessors, auf den Systembus anders als im Normalbetrieb zuzugreifen. Diese Art des Zugriffs birgt eine versteckte, mögliche Fehlerquelle: Wenn während Kassettenoperationen Sprites angeschaltet bleiben, können Störungen beim Zugriff auf Daten auftreten. Falls Sie die erste Folge dieser Artikelserie noch vorliegen haben, dann können Sie in Tabelle 1 nachsehen (Registerübersicht). In Register 17 (Adresse 53265) dient das Bit 4 als Schaltbild für Bildschirm »aus« oder »an«. Wenn wir dieses Bit auf 0 setzen, erblindet der Monitor. (Da hatte sich in die Tabelle 1 ein Fehler eingeschlichen: Dort steht's genau umgekehrt). Wie Sie noch aus den anderen Folgen wissen, ist dieses Register 17 ein ziemlich komplexes Ding. Wir müssen also darauf achten, daß nur Bit 4 gesetzt oder gelöscht wird. Ich hoffe, daß Sie noch wissen, wie das ging. Zur Erinnerung:
+Normaler Inhalt von 53265:
+XXX1 XXXX
+AND 239:
+1110 1111
+Jetzt ist Bit 4 gelöscht:
+XXX0 XXXX
+Das entspricht dem Befehl:
+POKE 53265,PEEK(53265)AND239
+Nun noch zum Wiedereinschalten des Bildschirmes:
+Mit gelöschten Bit 4:
+XXX0 XXXX
+OR 16:
+0001 0000
 
+Normaler Inhalt wieder hergestellt:
+XXXI XXXX
+In Basic ist das dann:
+POKE53265,PEEK(53265)OR16.
 
+Zum Ausprobieren ein kleiner Dreizeiler:
+10 POKE 198,0:WAIT 198,1:POKE 53265,PEEK(53265)AND 239
+15 PRINTCHR$(147):POKE 211,15:POKE 214,10:SYS 58640:PRINT "HALLO”
+20 POKE 198,0:WAIT 198,1:POKE 53265,PEEK(53265)OR16
 
+Nach RUN wartet das Programm auf einen Tastendruck, auf den hin dann der Bildschirm »ausgeschaltet« wird. Ein weiterer Tastendruck macht das Bild dann wieder sichtbar.
 
+Nebenbei bemerkt: Falls Sie einige POKEs und das SYS-Kommando nicht kennen, hier die Erklärung: 198 ist das Byte, in dem die Anzahl gedrückter Tasten gespeichert wird. Deswegen kann man mit WAIT 198,1 und vorher erfolgtem Nullsetzen dieses Bytes dasselbe erreichen, wie mit der häufig benutzten GET-Abfrage. SYS 58640 ist ein Einsprung in die Betriebssystemroutine, die den Cursor setzt. Die gewünschte Spalte wird in Byte 211, die Zeile in 214 eingePOKEt. Damit erspart man sich den Wust an Cursorsteuerzeichen, die dem Drucker Kopfschmerzen bereiten können.
 
+## Das sogenannte Scrollen: Bildverschiebung
 
+Wir kennen jetzt fast alle Register des VIC-II-Chips. Zwei Bytes, nämlich 53265 und 53270, bergen noch Geheimnisse, die wir nun lüften wollen. Zunächst die Bits 3. Sie enthalten normalerweise den Wert 1. Jetzt ändern wir das mal in 53265:
+POKE 53265,PEEK(53265)AND247 (RETURN)
 
+Haben Sie's bemerkt? Wenn nicht, dann zählen Sie mal die Zeilen auf dem Bildschirm nach: Es sind nur noch 24 zu sehen. Rückgängig können Sie das wieder machen durch Setzen des Bit 3:
+POKE 53265,PEEK(53265)OR8 (RETURN)
 
+Probieren wir dasselbe mit der Speicherstelle 53270:
+POKE 53270,PEEK(53270)AND247 (RETURN)
+Unsere Kommandos sehen jetzt etwas merkwürdig aus und auch der Cursor. Wir haben nicht mehr 40 Spalten, sondern nur noch 38 zur Verfügung. Zurück in den Normalzustand:
+POKE 53270,PEEK(53270)GR8 (RETURN)
 
+Beim Eingeben dieser Zeile werden Sie bemerkt haben, daß trotzdem noch der ganze 40-Zeichen-Bereich zur Verfügung steht, nur sind die erste und letzte Spalte verdeckt. Der Rahmen ist breiter geworden und versteckt gewissermaßen den Rand des Bildschirmes.
 
+Nun kommen wir zum Scrollen. Das englische Wort »scroll« heißt auf Deutsch etwa Rolle oder Schriftrolle. Wenn wir ein längeres Programm listen oder mit dem Cursor an den unteren Bildrand fahren, rollt der C 64 den Bildschirminhalt nach oben. Das ist ein zeilenweises Scrollen. Der VIC-II-Chip gestattet aber auch eine andere Art des Scrollens, die im englischen als »smooth scrolling«, etwa »fließendes« Scrollen bezeichnet wird. Wie Sie sich sicherlich erinnern, ist jedes Zeichen aus 8 Bytes zusammengesetzt. Während beim erstgenannten Scrollen alle 8 Bytes (also ein Zeichen) auf einmal nach oben springen, geht das beim fließenden Scrollen Byte für Byte. Dazu dienen die Bits 0 bis 2 der Register 53265 und 53270. Sehen wir uns das mal in Einzelschritten an. Der Maximalwert in den 3 Bits (0,1,2) kann 7 sein (binär 111). Alle anderen Bits müssen geschützt sein. Normalerweise steht in 53265 in den Bits 0 bis 2 der Wert 3 und an derselben Stelle in 53270 der Wert 0. Folgendes Kurzprogramm soll diese Werte mit jedem Tastendruck verändern:
+5 PRINT CHR$(147)CHR$(166)
+10 FOR I = 0 TO 7
+20 POKE 53265,(PEEK(53265)AND 248)OR I
+30 GETA$:IFA$ = ""THEN30
+40 NEXTI
+50 POKE 53265,(PEEK(53265)AND 248)OR3
 
+Wenn Sie dieses Programm starten, wandelt das Grafikzeichen bei jedem Tastendruck Byte für Byte herunter. Wenn Sie jetzt noch einfügen:
+7 POKE 53265,PEEK(53265)AND 247
+das war ja das Einführen des 24-Zeilen-Modus, dann ist das Grafikzeichen zu Anfang fast versteckt. Wir sollten dann aber auch noch den Normalzustand wiederherstellen am Programmende:
+60 POKE 53265,PEEK(53265)OR8
 
+Auf diese Weise geschieht das fließende Scrollen nach unten. Verändern wir Zeile 10:
+10 FOR I = 7 TO 0 STEP —1
+dann erfolgt Scrollen nach oben.
 
+Das gleiche Programm können wir mit kleinen Änderungen für horizontales Scrollen verwenden. Wir müssen nur überall dort, wo 53265 steht, jetzt 53270 und in Zeile 50 anstelle von OR3 jetzt ORO einsetzen. Wenn Sie Zeile 10 mit der Rückwärtsschleife belassen haben, scrollt der Bildschirminhalt nach links. Ändern Sie dagegen Zeile 10 wieder zur ursprünglichen Vorwärtsschleife, dann erfolgt ein Scrollen nach rechts. Sie werden jetzt sagen, daß das alles ja ganz nett ist, aber was kann man damit tun? Damit kann man Laufschriften erzeugen, die in beliebiger Richtung über den Bildschirm sausen oder schleichen — je nachdem. Leider, leider kommen wir hier langsam aber sicher an die Grenzen von Basic. Denn jetzt taucht ein Problem auf, dessen Lösung — in Basic als auch in Maschinensprache — gleich ein zweites nach sich zieht. Sehen wir uns zunächst Problem Nummer 1 an:
 
+In dem Moment, wo man das Zeichen geduldig Byte für Byte aus dem Versteck herausgeholt hat, also 7 in die Bits 0 bis 2 von 53265 oder 53270 eingegeben hat, muß man ja dafür sorgen, daß
+1)	der Bildschirminhalt um ein Zeichen weitergeschoben wird,
+2)	im Versteck (am Rand) ein nächstes Zeichen parat liegt.
 
+Dazu können wir uns zum Beispiel des ohnehin schon eingebauten Zeilen-Scrolls bedienen, wie im nachfolgenden Programm:
+10 POKE 53265,PEEK(53265)AND 247
+20 PRINTCHR$(147):FOR I = 1 TO 24:PRINTCHR$(17);:NEXT I
+30 POKE 53265,(PEEK(53265)AND 248)OR7
+40 PRINT"SCROLLING NACH OBEN”
+50 FORI = 6TOOSTEP-1
+60 POKE53265,(PEEK(53265)AND-248)OR I:FORJ=1TO 50:NEXT J
+70 NEXTI:GOTO30
 
+Wenn Sie dieses Programm gestartet haben, können Sie mit RUN/ STOP und RESTORE den Normalzustand wiederherstellen. Haben Sie etwas bemerkt? Ein Flackern des Bildes trat auf. Das ist das zweite Problem, auf das wir gleich kommen werden.
 
+Ein Beispiel für das horizontale Scrollen gibt das Programm von H. Gehrmann in Happv-Computer, Ausgabe 4/84, Seite 108f. H. Gehrmann hat es geschafft, in Basic tatsächlich fließendes Scrollen ohne Bildschirmflackern zu erzeugen. In Zeile 36 seines Programms ist ein Teil seiner Lösung für Problem Nummer 2 zu finden. Dort steht:
+36 IF PEEK(53265) < > 155 THEN 36
 
+Erst danach druckt er an den oberen Bildschirmrand die zu scrollende Textzeile und scrollt dann, wie wir es bisher kennengelernt haben. Was ist denn nun dieses zweite Problem? Sehen wir dazu zunächst einmal in die Speicherstelle 53265 hinein. Geben Sie (nach NEW) mal die folgende Textzeile ein:
+10 PRINT PEEK(53265):GOTO10
 
+Nach RUN sehen Sie eine Reihe aus 27 und ab und zu taucht 155 auf. Wenn Sie jetzt mit RUN/STOP und RESTORE dieses Testprogramm angehalten haben, sehen wir uns diese Zahlen mal binär an:
+27 = binär 0001 1011
+155 = binär 1001 1011
 
+Alle Bits kennen wir schon, außer Bit 7, welches sich verändert hat. Es handelt sich um das msb des Rasterzeilen-Registers. Das LSB davon findet sich in Speicherzelle 53266. Wir haben es hier mit einer 9stelligen Binärzahl zu tun, von der 8 Stellen (die Bits 0 bis 7) in 53266 und die 9. Stelle als Bit 7 in 53265 zu finden sind. Gezählt werden ständig in diesen neun Bits die Rasterzeilen. Sie werden sich fragen, was das soll, hier ist die Antwort:
 
+An der Entstehung eines Fernsehbildes ist ein Elektronenstrahl beteiligt. Er tastet Punktzeile für Punktzeile von oben nach unten den Bildschirm ab und erzeugt dabei das Bild. 20 mal in der Sekunde baut er ein neues Bild auf, und in welcher Punktzeile (Rasterzeile) er gerade ist, das zählt der Computer mit in diesem Rasterzeilenregister. Er muß deshalb mitzählen, weil er dem Elektronenstrahl einige Informationen übergeben muß, nämlich ob ein Punkt sichtbar sein soll oder nicht. Der Zeilenstrahl überstreicht den gesamten Bildschirm, also auch Bereiche, die außerhalb des lesbaren Textfenstersliegen. Deswegenmüs-sen wir auch weiter als bis 255 Rasterzeilen zählen. Weil aber in ein Byte (hier nun 53266) nur bis 255 gezählt werden kann, kommt noch das Bit 7 von 53265 als msb dazu.
 
+Jedesmal, wenn der Zeilenstrahl über die 255. Rasterzeile hinaus-huscht, wird dieses Bit gleich 1. Das Problem Nummer zwei läßt sich also jetzt so ausdrücken: Wenn eine Bildänderung stattfindet, während der Zeilenstrahl über die Änderungsstelle hinwegstreicht, kommt es zu Zuckungen des Bildes. Man muß dafür sorgen, daß man diesem Flitzer nicht ins Gehege kommt. H. Gehrmann hat das in seinem Programm so gemanagt, daß er den Bildinhalt verändert, während der Rasterstrahl außerhalb des sichtbaren Bereiches arbeitet. Trotzdem gibt es hier aber noch Schwierigkeiten. Ein ganzer Bildschirm besteht aus 280 Rasterzeilen. Wenn man nun nachrechnet, braucht der Elektronenstrahl zirka 180 Microsekunden zum Überstreichen einer Rasterzeile, das heißt, er ist in sehr kurzer Zeit wieder im sichtbaren Bereich! Bis dahin muß die Bildveränderung abgeschlossen sein. Normalerweise ist das eine Aufgabe für Maschinenprogramme, von denen Sie einige in der nachfolgend genannten Literatur finden:
 
+— R. Babel, M. Krause, A. Dripke: Das Interface Age Systemhandbuch zum Commodore 64, München 1983, S. 63-64,
+— A. Plenge: Das Grafikbuch zum Commodore 64, Düsseldorf 1984, S. 272ff.
 
+## Dornröschen ist wieder dran: 2D-Grafik besser
 
+Von nun an kümmern wir uns wieder um Dornröschen, die hochauflösende Grafik. Wie Sie wohl spätestens in Folge 4 bemerkt haben, ist das Koordinatensystem, das unser Commodore 64 auf dem Bildschirm einrichtet, reichlich unüblich. Zur Erinnerung sehen Sie sich mal Bild 1 an.
 
+Wie Sie aus der Schule vielleicht noch wissen, ist die normale Darstellung eines Koordinatensystems aber so wie in Bild 2 gezeigt.
 
+Im Listing 3 der 4. Folge mußte deshalb eine einfache Sinus-Funktion so verändert werden, daß man sie von der Formel her kaum mehr erkennen kann (Zeile 5). Bleiben wir beim Beispiel der Sinus-Kurve. Die sieht so aus wie in Bild 3 gezeigt.
 
+Wie groß oder klein X also auch immer wird, Y bewegt sich nur zwischen +1 und -1 hin und her. Wenn wir aber die normale Sinus-Gleichung (Y=SIN(X)) auf unserem Bildschirmsystem zeichnen lassen, werden wir gar nichts oder kaum etwas sehen (Bild 4).
 
+Wir müssen also einen Weg finden, ein uns genehmes Koordinatensystem anstelle des Bildschirmsystems zu verwenden. Dazu soll uns die Mathematik helfen. Man nennt das, was wir jetzt tun werden, eine Transformation! Keine Angst, es wird nicht zu schwierig!
 
+In Bild 5 sind zwei Koordinatensysteme abgebildet.
 
+1)	Das Bildschirmsystem X, Y mit Nullpunkt 0
 
+2)	Das von uns gewünschte System X', Y', mit Nullpunkt O', welches rot gezeichnet ist.
 
+Außerdem ist der Punkt P1 zu sehen. Je nach dem, auf welches Koordinatensystem er bezogen wird, hat er die Koordinaten
 
+1)	XI, Y1 oder
 
+2)	XI', Y1'.
 
+Unser eigenes System soll vom unteren Wert XU bis zum oberen X-Wert XO reichen und vom unteren Y-Wert YU bis zum oberen YO. Am Beispiel unserer Sinus-Kurve wäre es sinnvoll, die X-Werte von XU=-1 bis XO = 10 und die Y-Werte von YU=-2 bis YO= +2 abzubilden. Die Entfernung von XU bis XO (also XO-XU) erstreckt sich auf 319 Bildpunkte. Man kann nun ein Verhältnis bilden, denn XI muß sich zu (Xl-XU)(das ist die Länge der Strecke von XU bis X1') genauso verhalten wie 319 zur Gesamtentfernung(XO-XU). Als Formel sieht das so aus:
 
+X1 / (X1' - XU) = 319 / (XO - XU)
 
+Das einzige in dieser Formel, was wir nicht kennen (X1' ist ja unsere Eingabe, die auf unser eigenes Koordinatensystem bezogen ist) ist nun X1, also die X-Koordinate unseres Punktes P1 im Bildschirmsystem. Man kann diese Verhältnisgleichung nach X1 auflösen:
+X1 = (X1' - XU)/(XO - XU)*319
 
+So ähnlich geht das auch bei der Y-Koordinate. Es ist nur zu beachten, daß im Bildschirmsystem die Y-Achse nach unten, in unserem System aber nach oben zeigt. Deswegen ist die Entfernung von YO nach Y1': YO-Y1'. Das Verhältnis hat hier also die Formel:
 
+Y1 / (YO - Y1') = 199 / (YO - YU)
 
+Nach Y1 aufgelöst ergibt sich:
+Y1 = (YO-Y1')/(YO-YU)*199
 
+Es empfiehlt sich, diese beiden sogenannten Transformationsgleichungen als Basicfunktionen zu definieren:
+DEFFNX(X)=(X-XU)/(XO-XU)*319
+DEFFNY(Y)=(YO-Y)/(YO-YU)*199
 
+Nun können wir ein kleines Aufrufprogramm schreiben, welches sich wieder der Unterprogrammsammlung aus Folge vier bedient. Laden Sie also zuerst (die hoffentlich damals gespeicherten!) Unterprogramme und tippen Sie dann ein:
+5 POKE 52,92:POKE 56,92
+100 DEFFNX(X)=(X-XU)/(XO-XU)*319
+110 DEFFNY(Y) = (YO-Y)/)YO-YU)*199
+120 REM +++++ BEISPIELFUNKTION +++++
+140 DEFFNA(X) = SIN(X)
+150 PRINTCHR$(147)CHR$(17): INPUT"XU,XO,YU,YO = ";XU,XO,YU,Y0
+160 INPUT"ZEICHEN- UND HINTERGRUNDFARBE = '';F1,F2
+170 GOSUB 50100:FOR I = XU TO XO STEP(XO-XU)/319
+180 X = FNX(I):Y=FNY(FNA(I)):GOSUB 50040
+190 NEXT I:X1 = FNX(XU):Y1 = FNY(O):X2 = FNX(XO):Y2=Y1
+GOSBUB 50060
+195 X1 = FNX(O):Y1 = FNY(YU):X2 = X1:Y2 = FNY(YO):GOSUB 50060
+200 GET A$:IF A$=""THEN 200
+210 GOSUB 50030
+220 END
 
+Nach RUN und mit der erforderlichen Geduld (kennen Sie ja schon) zeichnet der Computer eine ganz normale Sinuskurve in das von Ihnen durch XU,XO,YU und YO angegebene Koordinatensystem. In die Zeile 140 können Sie jetzt jede beliebige Funktion eingeben. Allerdings ist es unglücklich, daß man jedesmal das Programm ändern muß, nämlich Zeile 140, wenn man eine neue Funktion sehen will. Es gibt da einen Trick, der mit dem Tastaturpuffer arbeitet (Speicherstellen 631-640) und den ich Ihnen nun zeigen möchte. Zunächst fügen wir noch eine Zeile 130 ein:
+130 F$ = "SIN(X)"
 
+Wenn das Programm startet, soll man zunächst einmal erfahren, welche Funktion überhaupt in Zeile 140 steht. Deswegen also:
+10 PRINTCHR$(147):POKE211,5:POKE214,10:SYS58640:
+PRINT"FUNKTION IM PROGRAMM:”
+20 PRINT:PRINTTAB(3)"Y= ”F$
 
+Wenn wir das so laufen lassen, wird keine Funktion erscheinen, weil diese dem Computer erst in Zeile 130 mitgeteilt wird. Der Computer muß also vorher nachsehen, als was F$ definiert ist. Deswegen führen wir ein:
+15 K=1:GOSUB 130:K = 0
+und
+145 IFK=1 THEN RETURN
 
+Jetzt druckt das Programm uns die Funktion aus. Als nächstes soll der Computer erfahren, ob die Funktion zu verändern ist:
+30 PRINT:PRINTTAB(5)CHR$(18)”A” CHR$(146)"LTE ODER”
+CHR$(18)"N"CHR$(146)"EUE FUNKTION?”
+35 GET A$:IFA$<>"A" AND A$<>"N" THEN 35
 
+Wenn die alte Funktion gewählt wurde, dann kann alles wie bisher ablaufen:
+40 IF A$="A" THEN 100
 
+Ansonsten wollen wir jetzt unseren Trick anwenden. Zunächst das Eingeben der neuen Funktion:
+45 PRINT:PRINTTAB (3);:INPUT "Y=";F$
+Dann:
+50 PRINTCHR$(147)CHR$(17)CHR$ (17)” 130F$ = "CHR$(34)F$CHR$(34)
+55 PRINT”140DEFFNA(X) = ”F$
+60 PRINT"RUN 100":PRINTCHR$ (19);
+65 POKE 631,13:POKE 632,13:POKE 633,13:POKE 198,3:END
 
+Tippen Sie’s ein und fügen Sie in Zeile 100 noch ein STOP ein, damit Sie sehen können, was mit diesen Zeilen passiert. Sie sehen, daß der Bildschirm zunächst frei gemacht wird (CHR$(147) in Zeile 50) und dann zwei Programmzeilen 130 und 140 gedruckt werden mit der neuen Funktion, danach noch die RUN-Anweisung. Der Cursor springt dann wieder in die Ecke links oben (CHR$(19) in Zeile 60). Jetzt arbeitet unser Computer den Inhalt des Tastaturpuffers ab, der aus drei RE-TURNs (die 13) besteht. Die Anzahl 3 muß in Speicherstelle 198 festgehalten sein. Die Tatsache, daß der Tastaturpuffer abgearbeitet wird, haben wir dem END zu verdanken. Weil aber ein RETURN nach RUN 100 folgt, startet das Programm sofort wieder selbständig ab Zeile 100. Wenn Sie jetzt mal Zeile 130 und 140 listen lassen, steht dort die neue Funktion. Weil sie sich im Programmablauf störend auswirken, sollen die zu druckenden Zeilen unsichtbar werden. Deswegen fügen wir in Zeile 45 noch an:
+:POKE 646,6
+und ab Zeile 100 soll wieder sichtbar werden, was zu drucken ist, weshalb wir dort anfügen:
+:PRINTCHR$(147):POKE 646,14
 
+Dieser Trick ist sehr vielseitig anwendbar. Man muß nur beachten, daß durch das RUN alle Variablen, die bis dahin definiert wurden, gelöscht werden. Das ist ja auch sinnvoll, weil wir das Basicprogramm verändert haben und so unter Umständen Variable überschrieben wurden. Sollte es nicht möglich sein, alle Variablen nach dem Neustart zu definieren, dann läßt sich ein ähnlicher Kniff anwenden, wie wir ihn in Zeile 15 verwendet haben. Probieren Sie das Programm mal mit folgenden Eingaben:
 
+Y= SIN(X) mit XU = -1,XO = 10,YU = -2,YO = 2
+oder Y=EXP(-X/10)*COS(X) mit XU = -18,XO = 10,YU=-5,YO = 5 oder Y=2*SIN(X) + SIN(2*X + 2) mit XU = -6,XO = 15,YU = -3,YO = 3
+Ihrer Phantasie sind keine Grenzen gesetzt.
 
+## Flacher Raum: 3D-Grafik, wie funktioniert das?
 
+Nun sind wir bei dreidimensionalen, also räumlichen Abbildungen angekommen. Zunächst einmal: Es ist klar, weil der Fernsehschirm eben nur eine Fläche ist wie ein Blatt Zeichenpapier, daß wir etwas Räumliches auf einer Fläche darstellen müssen. Alles andere ist Science fiction, auch für die größten Computer! Bei 3D-Darstellungen unterscheidet man hauptsächlich zwei Arten:
+a)	Zeichnungen, die mit einer Spezialbrille räumlich wahrgenommen werden können,
+b)	Zeichnungen, die perspektivisch gestaltet sind und deswegen als räumlich empfunden werden.
 
+Im Prinzip ist der Weg a) für uns begehbar. Wir könnten die dazu nötigen zwei verschiedenfarbigen Zeichnungen (meist rot und blau) mit Hilfe des Mehrfarben-Bitmap-Modus erzeugen. Allerdings ist der rechnerische Aufwand nicht unerheblich. Ab und zu werden in Programmzeitschriften entsprechende Entwürfe veröffentlicht.
 
+Der übliche Weg allerdings geht über eine perspektivische Darstellung. Zwei Arten wiederum finden vor allem Anwendung:
+a)	Die sogenannte Kavaliers-Perspektive
+b)	Die Perspektive mit mindestens einem Fluchtpunkt.
+Den Unterschied soll Bild 6 erläutern.
 
+Bei der Kavaliers-Perspektive bleiben alle Linien, die auch in Wirklichkeit parallel verlaufen, parallel, wohingegen sie im anderen Fall in einem Fluchtpunkt zusammenlaufen, wenn sie in die räumliche Tiefe weisen. Gemeinsam ist beiden Verfahren, daß die Linien, die in den Raum verlaufen (also nach hinten oder vorne) verkürzt werden, weil unsere Augen sonst über die Größenverhältnisse täuschen. Zwar sieht die Fluchtpunktperspektive sehr viel natürlicher aus, aber die Kavaliers-Perspektive ist mathematisch bei weitem nicht so kompliziert. Deswegen wollen wir uns mit ihr befassen. Weiterhin schränken wir uns noch ein: Der Winkel, unter dem die Linien in den Raum laufen, soll 45 ° betragen, also ein halber rechter Winkel sein. In diesem Fall verkürzen sich die nach vorne oder hinten verlaufenden Kanten auf die Hälfte. Genauso, wie man einen Punkt durch seine Koordinaten im ebenen System festlegen kann, ist er auch in einem räumlichen Koordinatensystem definierbar. Man baut einfach noch eine dritte Achse (eine in den Raum weisende Z-Achse) zu den vorhandenen dazu und erhält so Zusammenhänge wie in Bild 7.
 
+Das Verfahren soll durch diese Erklärung noch etwas verdeutlicht werden. Man kann sich den Raum als eine große Anzahl dicht an dicht hintereinander gestapelter X-Y-Ebenen vorstellen, etwa wie in Bild 8.
 
+Im Bild sind sie, damit man das erkennen kann, mit Lücken gezeichnet.
 
+Auf einer Fläche zeichenbar wird das Verfahren dann, wenn man jede X-Y-Ebene um den Betrag ihrer Raumtiefe (das entspricht der halben Z-Koordinate) entlang der Achse Z nach rechts oben verschiebt wie in Bild 9.
 
+Nehmen wir nun noch an, daß auf jeder Ebene eine Kurve gezeichnet sei, die sich von Ebene zu Ebene etwas verändert, dann bekommen wir auf diese Weise aus allen Kurven zusammen den Eindruck einer räumlichen Fläche wie in Bild 10.
 
+Das Prinzip ist jetzt wohl klar. Wenn wir nun bedenken, daß die Raumfläche aus lauter ebenen Kurven und die Kurven aus lauter Punkten zusammengesetzt sind, dann stellt sich für uns die Frage, wie man einen Punkt P(Xr,Yr,Z1') an der richtigen Stelle unseres Bildschirmes darstellen kann. Weil wir schon wissen (von den 2D-Zeichnungen her), wie wir unser gewünschtes Koordinatensystem auf den Bildschirm bringen können, stellt sich die Frage für uns einfacher. Wir müssen uns nur noch überlegen, wie man mit zwei Koordinaten X1,Y1 den räumlichen Punkt in unserem selbstgewählten System zeichnen kann. Sehen wir uns dazu Bild 11 an.
 
+Wir haben hier einfach so getan, als gäbe es die Z-Achse gar nicht, sondern der Punkt P wäre einfach um einen Wert ΔX nach rechts und einen weiteren Wert ΔY nach oben geschoben worden. Die Koordinaten von P im ebenen System sind dann
+Xl = X1' + ΔX
+Yl = Y1' + ΔY
+wie man auch aus der Zeichnung sehen kann. Wie lang AX ist, kann man aus dem Dreieck ABC berechnen. Mathematisch Versierte werden mir zustimmen, daß
+COS(α) = ΔX/Z1
+ist und im Dreieck DEF gilt
+SIN(α) = ΔY/Z1
+Daraus ergibt sich dann:
+ΔX = Z1*COS(α)
+ΔY = Z1*SIN(α)
 
+Weil außerdem noch nach unserer anfänglichen Vereinbarung a = 45° beträgt und die Z-Achse auf die Hälfte verkürzt ist und weil schließlich
+SIN(45°) = COS(45°) = 1/√2 ist, ergibt sich:
+ΔX = Z1'/(2*SQR(2))
+ΔY = Z1'/(2*SQR(2))
 
+Beide sind also gleich und für unser eigenes Koordinatensystem hat der Punkt P die Koordinaten: X1 = X1' + Z1'/(2*SQR(2))
+Y1 = Y1' + Z1'/(2*SQR(2))
 
+Damit ist unser Problem gelöst. Denn XF, YT und Z1' sind die vorgegebenen Koordinaten und X1,Y1 können jetzt mit unseren Transformationen X = FNX(X1),Y=FNY(Y1) in Bildschirmkoordinaten umgerechnet werden. Wir verschachteln nun zwei Schleifen ineinander wie in Bild 12 und lassen uns damit Kurve für Kurve zeichnen.
 
+Nun wollen wir auch für die 3D-Grafik ein Programm entwerfen. Tippen Sie also NEW ein, laden Sie die Grafik-Unterprogramme und erwecken Sie unser 3D-Dornröschen mit dem nachfolgenden Aufrufprogramm.
 
+5 POKE 52,92:POKE 56,92
+100 DEFFNX(X) = (X-XU)/(XO-XU) *319
+105 DEFFNY(Y) = (YO-Y)/(YO-YU) *199
+110 DEFFNZ(Z) = Z/(2*SQR(2))
+140 DEFFNA(X) = SIN(Z)*COS(X)
+150 PRINTCHR$(147)CHR$(17)CHR$ (18)"UNSER SYSTEM:"CHR$(146): PRINT:PRINT
+160 INPUT"XU,XO = ";XU,XO:INPUT ”YU,YO = ”;YU,YO
 
+Jetzt wird es ein bißchen kompliziert, weil wir darauf achten müssen, daß die Z-Achse noch auf dem Bildschirm paßt. Wir lassen uns berechnen und anzeigen, wie groß ZO höchstens sein darf und wie klein ZU:
+162 Z3 = 2*XO*SQR(2):Z4 = 2*YO* SQR(2):IF Z3<Z4 THEN PRINT "ZO MAXIMAL = "Z/3:GOTO 166
+164 PRINT"ZO MAXIMAL = "Z4 166 Z5 = 2*XU*SQR(2):Z6 = 2*YU* SQR(2):IF Z5>Z6 THEN PRINT ”ZU MINIMAL = "Z5:GOTO170
+168 PRINT"ZU MINIMAL = "Z6
+170 PRINT:INPUT"ZU,ZO = '';ZU,ZO: Z1 = FNZ(ZO):Z2 = FNZ(ZU)
 
+Im nachfolgenden geht es nach dem (nicht immer angebrachten) Motto: Vertrauen ist gut, Kontrolle bosser:
+172 IF Z1>YO OR Z1>YO THEN 162
+174 IF Z2<XU OR Z2<YU THEN 162
 
+Dann lassen wir uns die Freiheit der Farbenwahl:
+180 PRINT:INPUT"ZEICHEN- UND HINTERGRUNDFARBE = ";F1,F2
 
+Nach dem Anschalten der Hochauflösung zeichnen wir die Achsen:
+190 GOSUB 50100:Xl = FNX(XU):Y1 = FNY(0):X2 = FNX(XO):Y2 =Y1: GOSUB 50060
+192 XI = FNX(O):Y1 = FNY(YU):X2 = Xl:Y2 = FNY(YO):GOSUB 50060
+194 X1 = FNX(Z2):Y1 = FNY(Z2):X2 = FNX(Zl):Y2 = FNY(Z1):GOSUB 50060
 
+Wir könnten jetzt mit den beiden ineinandergeschachtelten Schleifen beginnen, wenn es da nicht noch das Problem der Schrittweite in den Schleifen gäbe. Die Schrittweite von X haben wir schon im 2D-Programm verwendet:
+200 DX = (XO-XU)/319
 
+Die Schrittweite von Z ist nicht so einfach zu fassen, weil man ja, je nach Kurvenart, mal weitere und mal engere Schritte machen muß. Deswegen halten wir diese Schrittweite veränderlich und lassen uns vorher nochmal danach fragen:
+202 DZ = A*(Z1-Z2)/(FNX(Z1)-FNX (Z2))
+182 INPUT"SCHRITTWEITE VON Z(CA.8) = ";A:PRINT
 
+Mit Zeile 202 hätten wir bei A = 1 die selbe Punktauflösung wie in der X-Schleife. Das ist meistens zu eng und A sollte deshalb Werte um etwa 8 haben.
 
+Es ist ganz gut, sich auch die Freiheit offenzulassen, von wo bis wo unsere Raumfläche zu zeichnen ist. Es sieht einfach besser aus, wenn sie nicht bis zum Rand des Bildschirms reicht. Die Schleifen sollten also nicht von ZU bis ZO und von XU bis XO reichen, sondern von den Anfangswerten ZA beziehungsweise XA bis zu den Endwerten ZE beziehungsweise XE. Auch diese Werte müssen abgefragt werden:
+184 PRINTCHR$(18)"UNSERE ZEICHNUNG:"CHR$(146):PRINT 185 INPUT"X-BEREICH XA,XE = ";XA,XE
+186 INPUT"Z-BEREICH ZA,ZE = ";ZA,ZE
+Jetzt kommen die Schleifen:
+210 FOR Z = ZA TO ZE STEP DZ:ZZ = FNZ(Z)
+220 FOR XX = XA TO XE STEP DX:X1 = XX + ZZ
+230 X = FNX(X1):YY=FNA(XX):Y1 = YY+ZZ:Y=FNY(Y1):GOSUB 50040 240 NEXT XX
+250 NEXT Z
 
+Abschließend muß wieder zurückgeschaltet werden auf den Normalbildschirm:
+300 GET A$:IF A$ = "" THEN 300
+310 GOSUB 50030
+320 END
 
+So! Nun können Sie das ganze vorsichtshalber abspeichern und dann mit RUN starten. Aber fassen Sie sich in Geduld. Bis das Bild komplett ist, vergehen zirka 21 Minuten. Probieren Sie mal die Eingaben:
+XU=-1,XO = 6,YU=-2,YO = 6,ZU=-1, ZO = 6, Schrittweite von Z = 8, XA = 0, XE = 4,ZA = 0,ZE = 4.
 
+Es wird Ihnen sicherlich aufgefallen sein, daß ich zu Beginn des Programms den gleichen Zeilennummernabstand wie beim 2D-Programm verwendet habe. Sie können, genauso wie dort, nun noch unseren Trick zur Funktionseingabe einsetzen. Wenn Sie das getan haben, ist unser 3D-Programm komplett und Sie können nach Herzenslust Funktionen ausprobieren. Allerdings kommt es zum Erreichen einer besonders schön aussehenden Raumfläche nur dann, wenn Sie die ganzen Eingaben zu Beginn des Programms wohlüberlegt machen oder aber mehrere Male ausprobieren.
 
+Diese Menge an Eingaben hat zwar den Vorteil, daß man sehr frei in der Gestaltung des Ergebnisses ist, aber eine gewisse Automatik wäre schon ganz angenehm. Das überlasse ich Ihnen, denn der Programmaufwand dazu würde den Rahmen dieser Folge sprengen.
 
+Auf ein anderes Problem werden wir in der nächsten Folge eingehen: Wie verhindert man, daß auch Linien gezeichnet werden, die eigentlich beim realen Körper (oder bei der Fläche) nicht sichtbar sind, weil sie hinter anderen Teilen der Zeichnung verschwinden?
 
+Ich hoffe, daß diese Folge nicht allzu schwierig war. Sollten Sie Probleme mit dem mathematischen Teil haben, trösten Sie sich, indem Sie die Programme einfach so abtippen. Oder stellen Sie Fragen per Leserbrief. Ich werde mich bemühen, alle zu beantworten.
 
+(Heimo Ponnath/aa)
 
+# Der gläserne VC 20 – Teil 1
 
+> Der VC 20, schon etwas betagt und oft genug totgesagt, ist immer noch der meistverbreitete Computer seiner Klasse. Mit diesem Kurs wollen wir den legendären »Volkscomputer« endlich für alle Anwender vollkommen transparent machen.
 
+Das Betriebssystem und das Basic des VC 20 sind äußerst flexibel gestaltet. Es gibt viele Möglichkeiten, das Bestehende zu ändern oder zu ergänzen. Diese Serie soll über die üblichen Tips und Tricks hinausgehen. Es werden also nicht nur POKEs, sondern auch weitergehende Maschinenprogramme wie zum Beispiel Funktionstastenabfrage oder die Definition neuer Basic-Befehle besprochen. Dieser erste Teil soll dabei bereits einen tieferen Einblick in das VC 20-System geben.
 
+## Wie Basic den Speicher verwaltet
 
+Beginnen wir mit der Organisation des verfügbaren RAM durch den Basic-Interpreter.
 
+Der Basicbeginn liegt bei Adresse 4096, das Ende bei Adresse 7680 (die Werte beziehen sich auf die Grundversion). Unmittelbar ab dem Basicbeginn wird das eigentliche Programm abgelegt. An dessen Ende beginnen die Variablen und Felder (Bild 1).
 
+Der Variablenbereich wächst beim Anlegen neuer Variablen von unten nach oben. Nur das Stringende wandert in entgegenlaufender Richtung.
 
+Die wichtigsten Zeiger, wie unter anderem Beginn und Ende von Basic und Variablen, sind in der Zeropage (Adresse 0 bis 256) abgelegt (Tabelle 1). Dabei ist die Reihenfolge Low-Byte/High-Byte zu beachten (Adresse = High-Byte * 256 + Low-Byte).
+Um Speicherplatz für Maschinenprogramme oder Sonderzeichen zu schaffen, hat man prinzipiell zwei Möglichkeiten. Entweder man verschiebt den Basicanfang nach oben oder das Basicende nach unten. Letztere Alternative ist in den meisten Fällen günstiger.
 
+Um zum Beispiel das Basicende von Adresse 7680 nach 7168 ( = 512 Byte) zu verlegen, gibt man ein:
+POKE 55,0:POKE 56,28:CLR:REM (256 * 28 = 7168)
 
+Bei anderen Speichergrößen verfährt man analog.
 
+Der Befehl CLR ist nötig, damit sich verschiedene Hilfszeiger (Stringbeginn und Felderende) anpassen können.
 
+Die andere Alternative der Platzbeschaffung ist etwas komplizierter. Sie wird nur bei erweitertem Speicher angewendet, um dort Sonderzeichen abzulegen. Um den Anfang des Programmspeichers von 4608 nach 7680 zu schieben, gibt man: POKE 44,30:POKE 30 * 256,0:NEW ein, denn 30 * 256 ist gerade 7680. Der zweite POKE-Befehl ist nötig, da am Anfang des Basicbereichs immer ein Nullbyte stehen muß.
 
+## Erste Hilfe — Basicprogramme retten nach NEW oder Reset
 
+Schon oft wurden Verfahren beschrieben, um nach einem versehentlichen NEW das Basicprogramm wieder zurückzuholen. Doch wie funktionieren diese Verfahren? Um das zu verstehen, betrachten wir zunächst kurz den Aufbau eines Basicprogramms (Bild 2).
 
+Am Kopf des Programms steht immer eine Null. Dann folgt die Adresse der nächsten Programmzeile (Koppeladresse) und die Zeilennummer. Danach kommt die eigentliche Programmzeile, die sich aus den sogenannten Tokens — den Basiccodenummern (Tabelle 2) — zusammensetzt. Am Ende dieser Zeile steht dann nochmals eine Null. Die nächste Zeile beginnt wieder mit einem Verbindungszeiger und der Zeilennummer. Das Programm wird mit drei Nullen abgeschlossen. Hieran schließen sich die Variablen an (vergleiche Bild 1).
 
+Durch NEW oder durch einen RESET wird nicht das gesamte Programm, sondern nur der Variablenpointer (45/46) und die erste Koppeladresse gelöscht. Durch Rekonstruktion dieser beiden Zeiger kann das scheinbar verlorene Basicprogramm wieder benutzt werden.
 
+Hier nun das »Rezept« zur Rekonstruktion:
 
+• POKE (Basicanfang) + 2,1
+Basicanfang in GV = 4097
++ 3K = 1025
++ 8K = 4609
+• SYS 50483:POKE 46,PEEK(35): POKE 45, PEEK (781)+2:CLR
 
+Unbedingt wichtig ist hier die Reihenfolge der Befehle! Ferner darf während der gesamten Prozedur keine Variable definiert werden, da diese das gelöschte Programm überschreiben würde.
 
+Die Funktionsweise ist relativ einfach. Die Unterprogrammroutine (SYS 50483) bindet die Programmzeilen neu und stellt dabei den ersten Verbindungszeiger wieder her. Sie übergibt dann in den beiden Speicherstellen (35 und 781) die Adresse des Variablenbeginns —2.
 
+## Die CHRGET-Routine
 
+Die Zeropage ist in Maschinensprache besonders einfach zu adressieren. Aus diesem Grund sind hier oft benötigte Daten abgelegt. Doch die Seite Null beheimatet auch ein Unterprogramm aus dem Basicinterpreter namens CHRGET (CHaRacter GET, TabeUe 3). Diese Routine hat die Aufgabe, aus dem Basictext einzelne Zeichen oder Befehle zur Auswertung bereitzustellen. Sie befindet sich gerade deshalb im RAM-Speicher, weil sie einen veränderbaren 2-Byte-Zeiger enthält. Da die Routine bei jeder Ausführung eines Basicbefehls benutzt wird, bietet sich hier eine gute Möglichkeit, in den Ablauf einzugreifen, um damit den Befehlsvorrat zu erweitern. CHRGET endet mit einem Sprung zurück zur Befehlsauswertung. Da die CHRGET-Routine im RAM liegt, kann an dieser Stelle die Routine in das Befehlsauswertungsprogramm des Benutzers umgeleitet werden. Dort wird zuerst das CHRGET-Unterprogramm zu Ende geführt.
 
+Als Beispiel soll der bestehende Befehl π (Tokennummer 255) geändert werden. Das Befehlsauswertungsprogramm nach Tabelle 4 fragt ihn ab und verzweigt dann nach § 1C16, wo ein RESET ausgeführt wird (entspricht SYS 64802).
 
+Man kann aber auch noch zusätzliche Parameter abfragen. Die nun folgende Änderung des x-Befehls steuert den Tongenerator, wobei drei Argumente und zwei Kommata geprüft werden müssen. Die Syntax des neuen Befehls ist aus Tabelle 5 ersichtlich.
+Die Steuerungsroutine wird nun aus diesen vorgefertigten Modulen zusammengesetzt.
+Zuerst der Baustein zum Abfragen von Argumenten (Tabelle 6).
 
+Die ROM-Routine ($D79B) holt sich aus dem Basictext den numerischen Ausdruck und stellt ihn im X-Register zur Verfügung. Ist der Wert größer als 255, wird eine Fehlermeldung ausgegeben. Die Syntax unseres Befehls erlaubt aber nur Argumente zwischen 0 und 3. Daher wird nochmals eine Bereichsprüfung vorgenommen.
 
+Als nächstes wird das Komma abgefragt (Tabelle 7). CHRGOT holt das laufende Zeichen aus dem Basictext und die Routine vergleicht es mit dem ASCII-Code für das Komma.
 
+Man unterscheidet im übrigen zwischen CHRGET und CHRGOT. CHRGET ($0073) stellt den Zwei-Byte-Zeiger um eins hoch und lädt dann das neue Zeichen in das Akku. CHRGOT ($0079) hingegen holt lediglich das Zeichen.
 
+Um den Soundbefehl zu komplettieren müssen noch die restlichen drei Module eingebaut werden. Wir wollen an dieser Stelle jedoch darauf verzichten, das im einzelnen auszuführen. Es sollte jetzt jedoch klar geworden sein, wie man eine Befehlserweiterung realisieren kann.
 
+Für Assembler-Laien jetzt noch ein komplettes Befehlsprogramm. Es erweitert die bestehenden Kommandos um:
+πO = Old (Rekonstruktion),
+πS Tongenerator, Höhe, Lautstärke ≙ Soundbefehl (wie oben)
+πS Tongenerator, 0 ≙ Tongenerator abschalten,
+πP Horizontal, Vertikal, ”..” oder
+πP Horizontal, Vertikal, String ≙ Druck an einer spezifizierten Bildschirmstelle.
 
+Das Ladeprogramm (Listing 1) lädt die Maschinenroutine automatisch in den richtigen Speicherbereich (abhängig von der Speichergröße) und gibt dann die Startadresse an. Zur Referenz ist das vollständige Assemblerprogramm als Listing 2 abgedruckt.
 
+Die neuen Befehle können sowohl im Direktmodus, als auch im Programm verwendet werden. Benutzt man sie im Programm, so ist zu beachten, daß sie nie direkt nach der Zeilennummer stehen dürfen. So muß zum Beispiel der Befehl
+πS 1,240,15 mit Doppelpunkt im Programm stehen:
+10 : πS1,240,15 oder
+10 PRINT A$: πS1,240,15
 
+## Listschutz für Basicprogramme:
 
+Es wurden bereits mehrfach Methoden veröffentlicht, mit denen man Programme vor unbefugtem Kopieren schützen kann. Hierbei gibt es mehrere Alternativen: 
+1.	Man verändert die Koppeladressen so, daß das Programm nicht listfähig ist, es jedoch normal mit RUN bedient werden kann.
+2.	Man verändert den LIST-Vektor mit POKE 774,34:POKE 755,253. Bei einem Listversuch löst dieser Vektor einen RESET aus und das Programm ist weg.
 
+Diese und andere Schutzmaßnahmen haben den Nachteil, daß sie von »Hackern« innerhalb kurzer Zeit umgangen werden können. Es gibt zwar keinen hundertprozentigen Programmschutz, jedoch bietet die nachfolgend beschriebene Methode eine große Sicherheit. Bei diesem Verfahren läßt die Änderung eines Kernalvektors (Tastatureingabe 804/805) das Basicprogramm mit Hilfe einer Maschinenroutine nach Abschluß des Ladevorgangs automatisch starten.
 
+Zunächst zur Verfahrensweise beim Autostart:
+Schritt 1:
 
+Eingabe des Ladeprogramms (Listing 3)
+Schritt 2:
 
+Programm und Prüfsumme testen (Achtung es zerstört sich selbst mit NEW) und abspeichern
+Schritt 3:
 
+POKE 44,A: POKE A*256,0 : NEW (A = 17 für die Grundversion; A = 19 bei Erweiterung ab 8 KByte; A = 5 Erweiterung + 3 KByte
+Schritt 4:
 
+Ladeprogramm laden und starten
+Schritt 5:
 
+Eigenes Programm nachladen
+Schritt 6:
 
+POKE 43,24 : POKE 44,3
+Schritt 7:
 
+POKE 792,91 : POKE 793,255 : POKE 808,114
+Schritt 8:
 
+POKE 804,0 : POKE 805,X : SAVE "...”,1,1
 
+X wird vom Ladeprogramm angegeben (X = 16 in Grundversion; X = 18 bei Erweiterung ab 8 KByte; X = 4 bei Erweiterung von 3 KByte). Die Befehle von Schritt 8 müssen unbedingt in einer Zeile stehen, sonst stürzt der Computer ab.
 
+Das Ladeprogramm (oder einfacher der Lader) übernimmt die Abspeicherung des Maschinenprogramms, wobei er sich nach einer eventuell vorhandenen Speichererweiterung richtet.
 
+Nun zur Bedienung:
 
+Nach der Prüfsummenkontrolle ist die Speichergröße per Tastendruck einzugeben. Dadurch wird überprüft, ob man vor dem Laden POKE 44,A eingegeben hat, denn sonst würde sich das Programm selbst überschreiben. Dann wird nach der Anfangsadresse für das zu schützende Basicprogramm gefragt. Der Lader gibt der Einfachheit halber bereits die entsprechende Adresse vor. Man kann sie aber auch ändern, wodurch das Auffinden des Basicprogramms nach einem RESET erschwert wird.
 
+Zur Erklärung betrachten wir Bild 3. Es zeigt die Speicheraufteilung beim Autostart, bezogen auf die Grundversion. Das eigentliche Maschinenprogramm benötigt 95 Byte. Es liegt direkt am Basicbeginn (Adresse 4096). Dann folgt eine Lücke. Sie ist, wie bereits gesagt, nicht unbedingt nötig, aber sie erschwert etwaigen Raubkopierern das Auffinden des Programms. Hieran schließt sich das eigentliche Basicprogramm an.
 
+## So funktioniert der Autostart
 
+Durch POKE 43,24 : POKE 44,3 wird der gesamte Bereich zwischen Adresse 792 und Programmende aufgezeichnet, wodurch sich die Ladezeit etwas erhöht.
 
+Wie wir bereits gesehen haben, ist das Betriebssystem des VC 20 dank seiner Vektoren äußerst flexibel. Für den Programmschutz machen wir uns dabei folgende Zeiger zu Nutze:
 
+1.	NMI-Vektor, Adresse 792,793: Dieser Vektor stellt die Verbindung zwischen RESTORE-Taste und NMI-Routine her. Durch die Änderung (siehe Schritt 7) wird die RESTORE-Routine einfach übersprungen; die Taste ist quasi abgeschaltet.
+2.	STOP-Vektor, Adresse 808,809: Auch hier wird die bestehende Routine übersprungen.
+Da dieser Vektorenbereich mit abgespeichert wird, ist, nachdem der Computer "FOUND" anzeigt, ein Stoppen des Computers nicht mehr möglich.
+3.	INPUT-Vektor, Adresse 804,805: Dieser Zeiger ist der eigentliche Dreh- und Angelpunkt des Autostarts. Er ist für die Tastatureingabe verantwortlich. Da er ständig durchlaufen wird, bewirkt POKE 804,0 : POKE 805,16 (bei geladener Autostartroutine) in der Grundversion einen Start des Basicprogramms. Ändert man den Zeiger hingegen vor dem Abspeichervorgang (wie in Schritt 8) geschieht vorläufig nichts, denn dann wird die Tastatur ja nicht benutzt.
 
+Somit eignet sich dieser Vektor besonders gut für unseren Zweck. Denn solange sich der Computer mit dem Laden beschäftigt, ist die Tastatur »ruhig gestellt«. Der Zeiger wird so lange nicht benötigt, bis das Programm komplett geladen ist. Ist dies geschehen, springt das Betriebssystem über den INPUT-Vektor in die Autostartroutine, die ihrerseits (nach dem Rückstellen des Zeigers auf seinen ursprünglichen Wert) über RUN das Basicprogramm startet.
 
+Damit auch alles wieder in den richtigen Speicherbereich geladen wird, dafür sorgt die Sekundäradresse bei SAVE " ",1,1.
 
+Das Programm kann anschließend ganz normal mit LOAD geladen werden. Zum Schluß noch zwei Tips:
 
+1.	Wer besonders clever ist, der vernichtet alle »Spuren«, indem er die Maschinenroutine nach ihrer Benutzung im Basicprogramm löscht:
+5 FOR T = (Startadresse) TO (Startadresse) + 95 : POKE T, RND(0) + 255 : NEXT
+(Startadresse = 4096 in der Grundversion; = 1024 bei Erweiterung von 3 KByte; = 4608 bei Erweiterung ab 8 KByte
+2.	Bei einer Erweiterung von 8 KByte liegt ja bekanntlich der Bildschirmspeicher im Bereich zwischen Adresse 4096 und 4607. Somit wird er ebenfalls mit abgespeichert.
+Soweit die erste Folge unseres Kurses. Im zweiten Teil wollen wir uns etwas näher mit der Zeropage beschäftigen und unter anderem zeigen, wie man mehrere Basicprogramme gleichzeitig im Speicher halten kann.
 
+(Christoph Sauer/ev)
 
+# Datenbrennerei
 
+> Nicht aus Schottland und auch nicht trinkbar, aber dennoch gehaltvoll: EPROMs, fest programmierbare Speicher für Ihren C 64. Wie man sich eigene Programm-Module herstellt und was dahinter steckt, zeigt dieser Bericht.
 
+Wenn sie ein Spielmodul in Ihren Computer eingeschoben haben war das Ihr erster Kontakt zur Welt der EPROMs: Erasable Programmable Read-Only Memory. Das bedeutet, daß Daten, die in einem EPROM gespeichert sind, nur noch gelesen und erst durch ein bestimmtes Verfahren wieder gelöscht werden können.
 
+Die Vorteile dieser Art der Datenspeicherung sind enorm:
 
+— Das Programm ist sofort nach dem Einschalten des Computers im Speicher vorhanden.
+— Besondere Funktionen, wie automatisches Laden des Directory nach dem Einschalten sind möglich.
+— Problemlose Handhabung, da zum Laden eines Programms keine Kenntnisse von Programmiersprachen notwendig sind.
 
+Die Nachteile liegen zum einen in den reltaiv hohen Kosten für die EPROMs (16 bis 160 Mark) und die notwendige Steckkarte (zirka 50 Mark). Zum anderen darin, daß es zu Überschneidungen im Speicherbereich kommen kann, wenn Programme von Diskette nachgeladen werden.
 
+Wie funktioniert aber die Datenspeicherung auf EPROMs? Damit Sie die Daten des internen Speichers Ihres Computers in den Speicher eines EPROMs übertragen können, brauchen Sie einen »EPROM-Brenner«. Damit wird die Verbindung zwischen Computer und EPROM hergestellt und für die notwendige Programmierspannung gesorgt.
 
+Das einzige, was jetzt noch fehlt, ist ein Programm, das die Datenübertragung steuert. Das Prinzip der EPROM-Programmierung beruht darauf, daß Ladungen in die Speicherzellen des EPROMs transportiert werden. Dabei wird nur zwischen zwei Ladungszuständen unterschieden: geladen und ungeladen. Die einzelnen Ladungszustände werden vom Computer entweder als logische 1 (high) oder logische 0 (low) interpretiert. Jede dieser Speicherzellen enthält somit ein Bit. Auch in EPROMs werden Daten in binärer Weise gespeichert. Die Speicherzellen eines neuen EPROMs sind normalerweise ungeladen (logische 1). Wird nun eine Programmierspannung (zwischen 12,5 und 25 V) auf eine dieser Zellen gelegt, so ändert sich ihr Potential, sie wird »geladen« (logisch 0). Dabei werden die am Datenbus des EPROMs anliegenden Daten in die durch den Adreßbus angegebene Adresse des EPROMs übernommen. Es können keine Bits, die durch eine bereits vorgenommene Programmierung auf logisch 0 Qow) gesetzt sind, beim Programmieren wieder in logisch 1 (high) umgewandelt werden. Damit die Ladung der Speicherzellen auch nach dem Wegnehmen der Programmierspannung erhalten bleibt, ist jede Zelle von einer semipermeablen Isolierschicht umgeben. Entsprechend dem Programm wird so, immer acht Speicherzellen (ein Byte) auf einmal, das gesamte Programm aus dem Computer in den EPROM übertragen.
 
+Natürlich hängt die Länge des übertragbaren Programms von der Speicherkapazität der verwendeten EPROMs ab. Die meistverwendeten Typen können dabei zwischen 2 und 16 KByte speichern, es gibt aber auch schon EPROMs mit 32 KByte. Ein Programm mit 8 KByte Länge kann so entweder auf einem 8-KByte-EPROM oder auf zwei 4-KByte-EPROMs gespeichert werden.
 
+Wie das »Erasable« im Namen der EPROMs schon andeutet, ist der Speicherinhalt nicht auf alle Zeiten festgeschrieben. Der Inhalt eines EPROMs wird durch Bestrahlung mit ultraviolettem Licht wieder gelöscht. Dazu ist im Gehäuse des EPROMs ein rundes Fenster ausgespart, durch das die UV-Strahlen auf den Chip einwirken können. Beim Löschen wird die Isolationsschicht der Speicherstellen in beide Richtungen durchlässig, was eine Entladung zur Folge hat.
 
+Der EPROM ist danach wieder programmierbar. Ein EPROM kann so zwischen 25 und 30 mal gelöscht und neu programmiert werden. Am billigsten ist es, die EPROMs zum Löschen einfach in die Sonne zu legen, leider auch am langsamsten. Schnell geht es mit einem speziellen EPROM-Löschgerät, das ist der teuerste Weg. Im Normalfall reicht eine einfache Höhensonne. Die Löschzeit beträgt dann, je nach Entfernung der EPROMs zur UV-Quelle, zwischen 15 und 25 Minuten.
 
+Nun aber zur Praxis. Mit dem ab-gedruckten Assemblerlisting ist es möglich, jedes beliebige Basicprogramm in EPROMs zu brennen. Die Programme werden damit automatisch gestartet und sind gegen Programmabruch geschützt. Das Programm »EPROM-Maker« steht im Speicherbereich zwischen $8000 und $8100 und muß vor jedem anderen Programm in die Speicherzellen 0 bis 100 des EPROMs gebrannt werden. In Adresse $8004 beginnt die Meldung »CMB80«, die das Betriebssystem während seiner Initialisierungsroutine abfragt. Dadurch wird bewirkt, daß in die, in den Speicherstellen $8 000 und $8 001 abgelegten Adresse, ($800A) verzweigt wird. Dort wird dann der eigentliche Basic-Lader nach $C000 geladen. Vier Speicherstellen sind vor dem jeweiligen Brennen des EPROMs zu verändern. Dazu gehen Sie wie folgt vor:
 
+1.	Laden sie das zu brennende Basicprogramm ganz normal in den Speicher.
+2.	Ermitteln Sie den Inhalt der Speicherstellen 2049, 2050, 45 und 46 mittels PEEK.
+3.	Rechnen Sie die Werte in Hexadezimalzahlen um und schreiben Sie diese auf.
+4.	Laden Sie nun einen Monitor
+5.	Laden Sie den EPROM-Maker und starten Sie den Monitor
+6.	Schreiben Sie den Wert der Speicherzelle 2049 in den LDA-Befehl in 80AC, den von 2050 in 80Bl, den von 45 in 80B6 und den von 46 in 80BA.
+Sie haben dann ein individuelles Startprogramm für Ihr Basicpro-gramm.
+7.	Laden Sie die Treibersoftware für Ihren EPROM-Brenner.
+8.	Übertragen Sie Ihren EPROM-Maker in die ersten 100 Speicherzellen des EPROMs.
+9.	Nun können Sie Ihr Basicpro-gramm (ab $0 800) mit EPROM-Start 100 brennen. Reine Maschinenprogramme können Sie so natürlich auch brennen, wenn Sie diese zuvor in DATA-Zeilen mit Ladeschleife umgewandelt haben.
 
+Das Programm ist auf die Platine von M. Frank zugeschnitten, so daß bis zu 16 KByte lange Programme problemlos gebrannt werden können. Wer über die Platine nicht verfügt, ist leider auf 8 KByte beschränkt. Wenn Sie die Autostartfunktion nicht benötigen, brauchen Sie den EPROM-Maker für Maschinenprogramme natürlich nicht. Hier genügt es, den EPROM einfach ab Speicherzelle 0 mit dem gewünschten Speicherbereich zu brennen und durch SYS (Startadresse) zu starten.
 
+(A. Wängler/M. Frank/gk)
 
+# Geregelter Zahlungsverkehr
 
+> Bargeldlos bezahlen ist eine feine Sache, doch das Ausfüllen der Formulare kann manchmal ganz schön lästig fallen. Sind nacheinander mehrere Überweisungsträger zu »beschreiben«, artet es schon in »Arbeit« aus.
 
+Auch der Lehrer Manfred Bräuler mußte diese Erfahrung machen. Es war einfach lästig — immer wenn er Überweisungen tätigte, spannte er das Fomular in seine Schreibmaschine ein und mußte zum wiederholten Male eigene Kenndaten, wie Absender und Kontonummer eintragen. Vertippte er sich dabei, landete das für seine Auffassung mißverständlich ausgefüllte Formular im Papierkorb, denn auf der Durchschrift war eine Korrektur nicht eindeutig identifizierbar. Das waren manchmal Stunden, die eher einer langweiligen Beschäftigungsübung glichen als einer sinnvollen Tätigkeit.
 
+Heute geht Manfred Bräuler ganz anders vor, denn mittlerweile hat er »den Stein des Weisen« gefunden. Auf seinem C 64 schrieb er ein Programm, das ihm weitgehend Doppeleingaben erspart. Hat sich ein Stapel von Rechnungen gesammelt, macht er sich ans Werk. Das Überweisungsformular wird in den Drucker — einen Epson RX-80 — eingespannt, das Programm geladen und los geht’s. Die eigene Kontonummer und Absenderdaten sind im Programm festgelegt (Zeile 70 und 80)und müssen nicht mehr bei jeder Überweisung neu eingegeben werden. Die Daten von Empfängern, denen Manfred Bräuler häufiger Geld zahlen muß, hat er fest abgespeichert (Zeile 95) und erspart sich damit auch hier unnötige Tipparbeit. Über die Zeile 800 werden die Namen der Empfänger numeriert am Bildschirm ausgegeben. Wieviele Empfänger abgespeichert werden können, hängt allein von der Größe des Arbeitsspeichers ab. Aus der vorgeschlagenen Liste wählt Manfred Bräuler dann den gewünschten Empfänger aus, indem er dessen Nummer eingibt (Zeile 1000). Die Zeile 1200 führt dann weiter zu dem jeweils gewünschten Datensatz: Es erscheint die vollständige Anschrift und Bankverbindung des Empfängers. Bei einem nicht gespeicherten Empfänger erfolgt ab Zeile 100 die Abfrage der notwendigen Daten.
 
+Ob vorher gespeichert oder nicht: Weiter geht’s in Zeile 150; hier gibt Manfred Bräuler ein, warum er das Geld überweist, ob es beispielsweise die Miete ist oder die Bezahlung der letzten Autoreparatur. Ab Zeile 235 wird alles noch einmal am Bildschirm gezeigt, wobei die Möglichkeit eingeräumt ist, Eingabefehler zu korrigieren (ab Zeile 420). Sind alle Eingaben als richtig bestätigt worden, wird die Überweisung ausgedruckt. Und noch ein »Komfort« ist eingebaut: Über Zeile 630 kann bestimmt werden, ob eine weitere Überweisung auszudrucken ist, und wenn ja, ob sie an denselben Empfänger geht.
 
+Manfred Bräuler setzt seinen C 64 nicht nur ein, um notwendige Arbeiten zu rationalisieren. Das Uberweisungsprogramm schrieb er nach eigenen Aussagen in erster Linie aus Spaß an der Freud. Und Freude hatte er schon häufig mit dem Computer. Das war auch bezweckt, als er sich im August letzten Jahres zunächst die Grundeinheit kaufte. Er wollte Basic lernen, um dann Pro-। gramme zur Arbeitserleichterung I und zum Spielen zu schreiben. Mittlerweile erweiterte er sein System, in zwei »Ausbaustufen«. Zunächst beendete er das Spiel mit der Datasette; sie genügte seinen Ansprüchen nicht mehr: Speicher- und Ladevorgänge dauerten zu lange und nach seiner Ansicht war sie auch zu unzuverlässig; einige Programme, die er sich gekauft hatte, liefen einfach nicht. So legte er sich eine Floppy zu. Die zweite Erweiterung kam im Dezember ins Haus: ein Drucker. Manfred Bräuler war es leid, alles nur auf dem Bildschirm anschauen zu können, er wollte seine Daten und Programme auch schwarz auf weiß sehen.
 
+Momentan ist ein Textverarbeitungsprogramm in Arbeit, wobei Manfred Bräuler auch gleichzeitig seine Programmierkenntnisse erweitern wiU. Auch bei der Schularbeit läßt sich der Lehrer von seinem C64 entlasten: Die immer wieder anfallenden Zeugnisse werden per Computer ausgestellt.
 
+Einen kleinen Haken hat die ganze Sache, denn der Computer zeigt sich in einer Hinsicht als regelrechter Dieb: Er stiehlt die Zeit, die vorher der Familie gehörte.
 
+(Manfred Bräuler/kg)
 
+# Die Ka-Di-Ecke
 
+> Mit unserer Kassetten-Disketten-Ecke bieten wir Ihnen im Rahmen des Leserservice die Alternative zum mühsamen Eintippen: Einfach Kassette bestellen und Programme laden.
 
+Hier eine kleine Übersicht über den Lieferumfang unserer letzten Ausgaben (Preis jeweils 29,90 Mark pro Kassette). Zu den Programmen sind immer die Seitenzahlen angegeben, unter denen Sie die Beschreibungen im 64’er Magazin finden können. Abkürzungen: SB = Simons Basic wird benötigt; + 16K = es wird eine 16-KByte-Speichererweiterung benötigt; GV = Grundversion; + 3 K = 3-KByte-Erweiterung; und so weiter. SE = Supererweiterung nur VC 20.
 
+Die Programme auf Diskette zu liefern ist uns leider aus produktionstechnischen Gründen noch nicht möglich.
 
+## Commodore 64
 
+### Kassette zu Ausgabe 4/84:
 
+— Drawline + Demos S. 65
+— Sprite Move S. 70
+- Invaders (SB) S. 74
+- Cäsar S.78
+— Disk-Copy S.92
+— Merge S.94
+Bestellnr. CB007
 
+### Kassette zu Ausgabe 5/84:
 
+— Adress & Telefonregister S.64
+— Fahrsimulator S.82
+— Schatzsucher S.90
+Bestellnr. CB008
 
+### Kassette zu Ausgabe 6/84:
 
+— Lehrerkalender S.64
+— Morsetrainer S.72
+— Supervoc S.69
+— Grafische Darstellg.(SB) S.82
+- Hot Wheels S.98
+Bestellnr. CB012
 
+### Kassette zu Ausgabe 7/84:
+— Terminalprogramm S.24
+— ProgrammverwaltungS.72
+— Russvok (SB) S.76
+— Crown No.1 S.80
+— Space Invaders S.81
+- 1520 Hardcopy S.108
+— Centronics-Interface S.110
+— Kurvendiskussion S.116
+— Copy Rel. Datei S.132
+— Autostart S.138
+- Strubs(OPundQP) S.154
+Bestellnr. CB009
 
+## VC 20
 
+### Kassette zu Ausgabe 4/84:
 
+— Elektr.Notiz, + 16 K S.50
+— Rennfahrer, GV S.86
+- ErsteHilfe, GV o. > S.88
+— Disk-Copy, +3K o. > S.92
+Bestellnr. VC006
 
+### Kassette zu Ausgabe 5/84:
 
+— Relative Datei, +8 K S.69
+— Schmatzer, GV S.76
+- 3D-Grafik, +8K S.78
+- VC 20 Rallye, +28K S.128
+Bestellnr. VC007
 
+### Kassette zu Ausgabe 6/84:
 
+— Movemaster, +8K S.78
+- Ghost Manor, GV S.104
+— Logic DisAss, + 3 K o. > S.108
+— Underground, +16K S.120
+Bestellnr. VC008
 
+Und nun noch eine kleine Bitte: Bevor Sie bei Nicht-funktionieren eines Programms bei uns anrufen, lesen Sie sich die Bedienungsanweisung in der entsprechenden Ausgabe vom 64’er durch.
+PS: Bitte Bestellkarte am Ende des Heftes benutzen.
 
+# Vorschau
 
+In der nächsten Ausgabe vom 21. September lesen Sie:
 
+## Lernen Sie die Floppy kennen
 
+Die meisten VC 20-und C64-Anwender dürften mittlerweile statt einer Datasette ein Floppy-Laufwerk zu Hause stehen haben. In dieser ob ihrer Zuverlässigkeit und Geschwindigkeit oft geschmähten schmähten steckt mehr, als man zunächst vermuten möchte. Mit dem neuen Floppy-Kurs steigen wir unter anderem in das Betriebssystem (eigener 6502-Prozessor mit 16 KByte ROM und 2 KByte RAM) ein. Sie erfahren alles über Ihre Floppy.
 
+## Drucker: Vergleichstest und Marktübersicht
 
+Jeder Computeranwender steht früher oder später vor dem Problem: Welchen Drucker für mein Gerät (und für meinen Geldbeutel)? Unser Drucker-Vergleichstest soll allen Besitzern eines C 64 oder VC 20 eine Hilfestellung bei der Auswahl des richtigen Druckers sein. Unsere Marktübersicht informiert über die Vielfalt der an den Commodore anschließbaren Drucker.
 
+## Vom Umgang mit Datex-P
 
+Jeder an der Datenfernübertragung Interessierte spricht davon, doch keiner weiß genau Bescheid. Wir liefern eine praktische Anleitung zum Umgang mit Datex-P und ausländischen Netzwerken.
 
+## Hardcopy-Routinen
 
+Wir bringen endlich eine Sammlung von Hardcopy-Routinen für die gängigsten Drucker: MPS 801, VC 1515, MPS 802, VC 1526, Epson FX 80, Gemini 10X und als besonderen Leckerbissen eine farbige Hardcopy mit dem VC 1520-Plotter.
 
+## 40/80-Zeichenkarte für VC 20
 
+Der VC 20 kann tatsächlich wesentlich mehr, als man ihm im allgemeinen zutraut. Mit einer 40/80-Zeichenkarte ausgerüstet, taugt er sogar als Textverarbeitungssystem. Wir zeigen, was diese Erweiterung kann und wie man damit arbeitet.
 
+## Software-Test
 
+- Vizawrite und Vizastar: Ein Textverarbeitungs- und ein Datenverwaltungsprogramm der gehobenen Kategorie
+- ExDOS & Disk-Doctor: Wir haben uns ein sehr interessantes Disk-Utility-Programm für Sie angesehen
+- Audiogenic-Forth: Eine Forth-Version für C 64/VC 20, die ohne Diskettenlaufwerk auskommt
+— Loja: Mit diesem Programm wird die Lohn- und Einkommensteuererklärung zum Vergnügen.
 
+## Listing des Monats: Schneller laden
 
+Das Disketten-Laufwerk VC 1541 ist sicherlich jedem zu langsam. Mit unserem Listing des Monats lassen sich fast alle Programme fünfmal schneller laden.
 
+## So laufen Basic-Programme schneller
 
+Wir haben Ihnen in mehreren Ausgaben die strukturierte Programmierung nähergebracht. Dadurch werden die Basic-Pro-gramme aber auch furchtbar langsam. Mit einigen »Tricks« lassen sich diese Programme in der Abarbeitungsgeschwindigkeit um den Faktor zehn steigern.
 
+## Listings
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+— Anwendung des Monats: Finanzmathematik — ein Listing, das einige besondere Vorzüge bietet
+— Userport-Tastatur: Taschenrechner als frei programmierbare Tastatur anschließen
+— Diskettenorganisation: Alle Diskettenoperationen per Menü wählen
+— Apocalypse now: Testen Sie Ihre Fähigkeiten als Hubschrauberpilot
+— Epidemie: Ein strategisches Spiel für den VC 20
+— Video-Vorspann: Ein kleines, aber nützliches Programm für alle Video-Amateure unter den VC 20-Besitzern
+— und natürlich auch in der nächsten Ausgabe wieder viele Tips und Tricks für den VC 20 und den C64
 
