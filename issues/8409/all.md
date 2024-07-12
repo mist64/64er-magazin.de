@@ -1277,7 +1277,7 @@ Soll mehr als ein neues Instrument entworfen werden, muß man die Bildschirmgest
 
 ## Der Orgelbauer
 
->> Wohlklngende Münze erhiett Christian Gebauer fiir sein Musikprogramm. Der Autor steBt sich selbst kurz vor.
+>> Wohlklingende Münze erhielt Christian Gebauer für sein Musikprogramm. Der Autor stellt sich selbst kurz vor.
 
 Ich wurde am 21. Oktober 1965 in Bad Nauheim geboren. Nach der Grundschule besuchte ich das Ernst-Ludwig-Gymnasium, an dem ich gerade die 12. Klasse absolviert habe und mich auf das Abitur vorbereite.
 
@@ -2038,7 +2038,7 @@ Doch Vorsicht, der »Tilt« funktioniert auch!
 
 Ewig läßt sich die Kugel aber nicht im Spiel halten. Nicht etwa, daß sie einfach aus dem Bild verschwindet. Sie wird, fast brutal, von zwei Schmiedehämmern zerstampft.
 
-Insgesamt ist »Slamball« mehr ein Spiel, als eine echte Flippersimulation. Kaum ein Flipper hat eine lächelnde Kugel, die bei Spielende zerstampft wird oder einen Joystick, um die Flipperbacken zu steuern. Einemjüngeren Spieler wird »Slamball« sicher eine Menge Unterhaltung bieten. Die Älteren wollen wahrscheinlich nicht auf das »hautnahe« Gefühl der rollenden und anschlagenden Kugel eines echten Flippers verzichten.
+Insgesamt ist »Slamball« mehr ein Spiel, als eine echte Flippersimulation. Kaum ein Flipper hat eine lächelnde Kugel, die bei Spielende zerstampft wird oder einen Joystick, um die Flipperbacken zu steuern. Einem jüngeren Spieler wird »Slamball« sicher eine Menge Unterhaltung bieten. Die Älteren wollen wahrscheinlich nicht auf das »hautnahe« Gefühl der rollenden und anschlagenden Kugel eines echten Flippers verzichten.
 
 (Arnd Wängler)
 
@@ -2579,7 +2579,7 @@ Außerdem ist der Punkt P1 zu sehen. Je nach dem, auf welches Koordinatensystem 
 
 2)	XI', Y1'.
 
-Unser eigenes System soll vom unteren Wert XU bis zum oberen X-Wert XO reichen und vom unteren Y-Wert YU bis zum oberen YO. Am Beispiel unserer Sinus-Kurve wäre es sinnvoll, die X-Werte von XU=-1 bis XO = 10 und die Y-Werte von YU=-2 bis YO= +2 abzubilden. Die Entfernung von XU bis XO (also XO-XU) erstreckt sich auf 319 Bildpunkte. Man kann nun ein Verhältnis bilden, denn XI muß sich zu (Xl-XU)(das ist die Länge der Strecke von XU bis X1') genauso verhalten wie 319 zur Gesamtentfernung(XO-XU). Als Formel sieht das so aus:
+Unser eigenes System soll vom unteren Wert XU bis zum oberen X-Wert XO reichen und vom unteren Y-Wert YU bis zum oberen YO. Am Beispiel unserer Sinus-Kurve wäre es sinnvoll, die X-Werte von XU=-1 bis XO = 10 und die Y-Werte von YU=-2 bis YO= +2 abzubilden. Die Entfernung von XU bis XO (also XO-XU) erstreckt sich auf 319 Bildpunkte. Man kann nun ein Verhältnis bilden, denn XI muß sich zu (X1-XU)(das ist die Länge der Strecke von XU bis X1') genauso verhalten wie 319 zur Gesamtentfernung(XO-XU). Als Formel sieht das so aus:
 
 X1 / (X1' - XU) = 319 / (XO - XU)
 
@@ -2680,8 +2680,8 @@ Nehmen wir nun noch an, daß auf jeder Ebene eine Kurve gezeichnet sei, die sich
 Das Prinzip ist jetzt wohl klar. Wenn wir nun bedenken, daß die Raumfläche aus lauter ebenen Kurven und die Kurven aus lauter Punkten zusammengesetzt sind, dann stellt sich für uns die Frage, wie man einen Punkt P(Xr,Yr,Z1') an der richtigen Stelle unseres Bildschirmes darstellen kann. Weil wir schon wissen (von den 2D-Zeichnungen her), wie wir unser gewünschtes Koordinatensystem auf den Bildschirm bringen können, stellt sich die Frage für uns einfacher. Wir müssen uns nur noch überlegen, wie man mit zwei Koordinaten X1,Y1 den räumlichen Punkt in unserem selbstgewählten System zeichnen kann. Sehen wir uns dazu Bild 11 an.
 
 Wir haben hier einfach so getan, als gäbe es die Z-Achse gar nicht, sondern der Punkt P wäre einfach um einen Wert ΔX nach rechts und einen weiteren Wert ΔY nach oben geschoben worden. Die Koordinaten von P im ebenen System sind dann
-Xl = X1' + ΔX
-Yl = Y1' + ΔY
+X1 = X1' + ΔX
+Y1 = Y1' + ΔY
 wie man auch aus der Zeichnung sehen kann. Wie lang AX ist, kann man aus dem Dreieck ABC berechnen. Mathematisch Versierte werden mir zustimmen, daß
 COS(α) = ΔX/Z1
 ist und im Dreieck DEF gilt
@@ -2724,8 +2724,8 @@ Dann lassen wir uns die Freiheit der Farbenwahl:
 180 PRINT:INPUT"ZEICHEN- UND HINTERGRUNDFARBE = ";F1,F2
 
 Nach dem Anschalten der Hochauflösung zeichnen wir die Achsen:
-190 GOSUB 50100:Xl = FNX(XU):Y1 = FNY(0):X2 = FNX(XO):Y2 =Y1: GOSUB 50060
-192 XI = FNX(O):Y1 = FNY(YU):X2 = Xl:Y2 = FNY(YO):GOSUB 50060
+190 GOSUB 50100:X1 = FNX(XU):Y1 = FNY(0):X2 = FNX(XO):Y2 =Y1: GOSUB 50060
+192 XI = FNX(O):Y1 = FNY(YU):X2 = X1:Y2 = FNY(YO):GOSUB 50060
 194 X1 = FNX(Z2):Y1 = FNY(Z2):X2 = FNX(Zl):Y2 = FNY(Z1):GOSUB 50060
 
 Wir könnten jetzt mit den beiden ineinandergeschachtelten Schleifen beginnen, wenn es da nicht noch das Problem der Schrittweite in den Schleifen gäbe. Die Schrittweite von X haben wir schon im 2D-Programm verwendet:
@@ -2812,7 +2812,7 @@ Die Funktionsweise ist relativ einfach. Die Unterprogrammroutine (SYS 50483) bin
 
 ## Die CHRGET-Routine
 
-Die Zeropage ist in Maschinensprache besonders einfach zu adressieren. Aus diesem Grund sind hier oft benötigte Daten abgelegt. Doch die Seite Null beheimatet auch ein Unterprogramm aus dem Basicinterpreter namens CHRGET (CHaRacter GET, TabeUe 3). Diese Routine hat die Aufgabe, aus dem Basictext einzelne Zeichen oder Befehle zur Auswertung bereitzustellen. Sie befindet sich gerade deshalb im RAM-Speicher, weil sie einen veränderbaren 2-Byte-Zeiger enthält. Da die Routine bei jeder Ausführung eines Basicbefehls benutzt wird, bietet sich hier eine gute Möglichkeit, in den Ablauf einzugreifen, um damit den Befehlsvorrat zu erweitern. CHRGET endet mit einem Sprung zurück zur Befehlsauswertung. Da die CHRGET-Routine im RAM liegt, kann an dieser Stelle die Routine in das Befehlsauswertungsprogramm des Benutzers umgeleitet werden. Dort wird zuerst das CHRGET-Unterprogramm zu Ende geführt.
+Die Zeropage ist in Maschinensprache besonders einfach zu adressieren. Aus diesem Grund sind hier oft benötigte Daten abgelegt. Doch die Seite Null beheimatet auch ein Unterprogramm aus dem Basicinterpreter namens CHRGET (CHaRacter GET, Tabelle 3). Diese Routine hat die Aufgabe, aus dem Basictext einzelne Zeichen oder Befehle zur Auswertung bereitzustellen. Sie befindet sich gerade deshalb im RAM-Speicher, weil sie einen veränderbaren 2-Byte-Zeiger enthält. Da die Routine bei jeder Ausführung eines Basicbefehls benutzt wird, bietet sich hier eine gute Möglichkeit, in den Ablauf einzugreifen, um damit den Befehlsvorrat zu erweitern. CHRGET endet mit einem Sprung zurück zur Befehlsauswertung. Da die CHRGET-Routine im RAM liegt, kann an dieser Stelle die Routine in das Befehlsauswertungsprogramm des Benutzers umgeleitet werden. Dort wird zuerst das CHRGET-Unterprogramm zu Ende geführt.
 
 Als Beispiel soll der bestehende Befehl π (Tokennummer 255) geändert werden. Das Befehlsauswertungsprogramm nach Tabelle 4 fragt ihn ab und verzweigt dann nach § 1C16, wo ein RESET ausgeführt wird (entspricht SYS 64802).
 
@@ -2964,7 +2964,7 @@ Ob vorher gespeichert oder nicht: Weiter geht’s in Zeile 150; hier gibt Manfre
 
 Manfred Bräuler setzt seinen C 64 nicht nur ein, um notwendige Arbeiten zu rationalisieren. Das Uberweisungsprogramm schrieb er nach eigenen Aussagen in erster Linie aus Spaß an der Freud. Und Freude hatte er schon häufig mit dem Computer. Das war auch bezweckt, als er sich im August letzten Jahres zunächst die Grundeinheit kaufte. Er wollte Basic lernen, um dann Pro-। gramme zur Arbeitserleichterung I und zum Spielen zu schreiben. Mittlerweile erweiterte er sein System, in zwei »Ausbaustufen«. Zunächst beendete er das Spiel mit der Datasette; sie genügte seinen Ansprüchen nicht mehr: Speicher- und Ladevorgänge dauerten zu lange und nach seiner Ansicht war sie auch zu unzuverlässig; einige Programme, die er sich gekauft hatte, liefen einfach nicht. So legte er sich eine Floppy zu. Die zweite Erweiterung kam im Dezember ins Haus: ein Drucker. Manfred Bräuler war es leid, alles nur auf dem Bildschirm anschauen zu können, er wollte seine Daten und Programme auch schwarz auf weiß sehen.
 
-Momentan ist ein Textverarbeitungsprogramm in Arbeit, wobei Manfred Bräuler auch gleichzeitig seine Programmierkenntnisse erweitern wiU. Auch bei der Schularbeit läßt sich der Lehrer von seinem C64 entlasten: Die immer wieder anfallenden Zeugnisse werden per Computer ausgestellt.
+Momentan ist ein Textverarbeitungsprogramm in Arbeit, wobei Manfred Bräuler auch gleichzeitig seine Programmierkenntnisse erweitern will. Auch bei der Schularbeit läßt sich der Lehrer von seinem C64 entlasten: Die immer wieder anfallenden Zeugnisse werden per Computer ausgestellt.
 
 Einen kleinen Haken hat die ganze Sache, denn der Computer zeigt sich in einer Hinsicht als regelrechter Dieb: Er stiehlt die Zeit, die vorher der Familie gehörte.
 
