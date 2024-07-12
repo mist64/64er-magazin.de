@@ -1,28 +1,47 @@
-<h1>1520-Hardcopy mit dem VC 20</h1>
+<!DOCTYPE html>
+<html lang="de">
 
-<p class="intro">Dieses Programm ermöglicht es allen VC 20-Besitzern, Grafik-Hardcopys mit dem Printer/Plotter VC 1520 von Commodore anzufertigen.</p>
+<head>
+    <title>XXX</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="XXX">
+    <meta name="64er.issue" content="9/84">
+    <meta name="64er.pages" content="XXX">
+    <meta name="64er.toc_title" content="XXX">
+    <meta name="64er.toc_category" content="XXX">
+    <meta name="64er.id" content="XXX">
+</head>
 
-<p>Das Programm ist einfach mit »LOAD« und den gerätespezifischen Parametern zu laden. Da es sich um ein Basicprogramm handelt, wird keine Sekundäradresse benötigt.</p>
+<body>
+    <article>
+        <h1>1520-Hardcopy mit dem VC 20</h1>
 
-<p>Mit RUN wird das Basicprogramm gestartet, welches die eigentliche Maschinensprachroutine in Form von DATA-Statements enthält. Das Programm fragt nun nach der Zieladresse, ab welcher die Routine abgelegt werden soll. Ist dabei der angegebene Wert gleich Null, so werden 388 Byte vom Basic-Pointer ($55/56) abgezogen und das Programm dahinter abgelegt. Wird ein anderer Wert eingegeben, so wird das Programm ab dieser Adresse gespeichert und der Pointer bleibt unverändert. Nach dieser Eingabe braucht man sich, da das Basicprogramm über einen Relocator und Prüfsummenabfrage verfügt, nicht mehr um das weitere Ablesen des Maschinenspracheprogramms zu kümmern. Sollte sich ein Prüfsummenfehler ergeben, so wird dieser angezeigt und der DATA-Block mit dem Maschinenprogramm muß auf Tippfehler hin untersucht werden.</p>
+        <p class="intro">Dieses Programm ermöglicht es allen VC 20-Besitzern, Grafik-Hardcopys mit dem Printer/Plotter VC 1520 von Commodore anzufertigen.</p>
 
-<p>Am Ende des Ladevorganges wird die Position der Routine und die Startadresse für den SYS-Befehl angezeigt. Jetzt kann »HARDCOPY 60« mit SYS 0 oder der ausgegebenen Absolutadresse gestartet werden.</p>
+        <p>Das Programm ist einfach mit »LOAD« und den gerätespezifischen Parametern zu laden. Da es sich um ein Basicprogramm handelt, wird keine Sekundäradresse benötigt.</p>
 
-<p>Folgende Einschränkungen sind zu beachten:<br/>
-(a) Falls ein File mit der logischen File-Nummer 127 geöffnet wurde, so ist dieses vor dem Start von »HARDCOPY 60« wieder zu schließen.<br/>
-(b) Der Startbefehl darf nicht im »Direktmodus« stehen.</p>
+        <p>Mit RUN wird das Basicprogramm gestartet, welches die eigentliche Maschinensprachroutine in Form von DATA-Statements enthält. Das Programm fragt nun nach der Zieladresse, ab welcher die Routine abgelegt werden soll. Ist dabei der angegebene Wert gleich Null, so werden 388 Byte vom Basic-Pointer ($55/56) abgezogen und das Programm dahinter abgelegt. Wird ein anderer Wert eingegeben, so wird das Programm ab dieser Adresse gespeichert und der Pointer bleibt unverändert. Nach dieser Eingabe braucht man sich, da das Basicprogramm über einen Relocator und Prüfsummenabfrage verfügt, nicht mehr um das weitere Ablesen des Maschinenspracheprogramms zu kümmern. Sollte sich ein Prüfsummenfehler ergeben, so wird dieser angezeigt und der DATA-Block mit dem Maschinenprogramm muß auf Tippfehler hin untersucht werden.</p>
 
-<p>Das Maschinenprogramm liest beim Aufruf die aktuellen Daten aus den Registern des Video-Interface-Controller (VIC) und berechnet daraus folgende Parameter:</p>
+        <p>Am Ende des Ladevorganges wird die Position der Routine und die Startadresse für den SYS-Befehl angezeigt. Jetzt kann »HARDCOPY 60« mit SYS 0 oder der ausgegebenen Absolutadresse gestartet werden.</p>
 
-<p>TODO Tabelle</p>
+        <p>Folgende Einschränkungen sind zu beachten:<br />
+            (a) Falls ein File mit der logischen File-Nummer 127 geöffnet wurde, so ist dieses vor dem Start von »HARDCOPY 60« wieder zu schließen.<br />
+            (b) Der Startbefehl darf nicht im »Direktmodus« stehen.</p>
 
-<p>Das Programm liest von links nach rechts die Bildschirm-Codes aus dem Video-RAM und berechnet unter Zuhilfenahme der oben genannten Parameter die Position der Bitmuster im Zeichengenerator. Ist ein Bit gesetzt, so wird seine Position in den MOVE-Befehl des Plotters umgesetzt und dort ein Strich der Länge 1 gezogen.</p>
+        <p>Das Maschinenprogramm liest beim Aufruf die aktuellen Daten aus den Registern des Video-Interface-Controller (VIC) und berechnet daraus folgende Parameter:</p>
 
-<p>Ein Video-Punkt entspricht vier Plotter-Punkten woraus sich eine Auflösung von 30 Zeichen pro Plotterzeile ergibt. Dieser 2x2-Punkt hätte einen zweiten Plotvorgang nötig gemacht. Tatsächlich wurde aber die Dauer eines Plot-Vorgangs halbiert indem der Wagenrücklauf des Stiftes mitbenutzt wird. Eine weitere Zeitoptimierung wird dadurch erreicht, indem keine »Leer-Plot«-Befehle ausgegeben werden. Der Stift wird also nur dann bewegt, wenn ein Bit auch gesetzt ist.</p>
+        <p>TODO Tabelle</p>
 
-<p>Das dauernde »Ticken« des Stiftes läßt sich leider nicht vermeiden, da pro Bit eine neue Positionierung des Stiftes nötig ist (sonst hätte ein Punkt die Größe 3x2).</p>
+        <p>Das Programm liest von links nach rechts die Bildschirm-Codes aus dem Video-RAM und berechnet unter Zuhilfenahme der oben genannten Parameter die Position der Bitmuster im Zeichengenerator. Ist ein Bit gesetzt, so wird seine Position in den MOVE-Befehl des Plotters umgesetzt und dort ein Strich der Länge 1 gezogen.</p>
 
-<p>»Hardcopy 60« kann sowohl für normale Texte, als auch für Grafik-Bildschirme eingesetzt werden.</p>
+        <p>Ein Video-Punkt entspricht vier Plotter-Punkten woraus sich eine Auflösung von 30 Zeichen pro Plotterzeile ergibt. Dieser 2x2-Punkt hätte einen zweiten Plotvorgang nötig gemacht. Tatsächlich wurde aber die Dauer eines Plot-Vorgangs halbiert indem der Wagenrücklauf des Stiftes mitbenutzt wird. Eine weitere Zeitoptimierung wird dadurch erreicht, indem keine »Leer-Plot«-Befehle ausgegeben werden. Der Stift wird also nur dann bewegt, wenn ein Bit auch gesetzt ist.</p>
 
-<p>(Wolfgang W. Wirth/ev)</p>
+        <p>Das dauernde »Ticken« des Stiftes läßt sich leider nicht vermeiden, da pro Bit eine neue Positionierung des Stiftes nötig ist (sonst hätte ein Punkt die Größe 3x2).</p>
 
+        <p>»Hardcopy 60« kann sowohl für normale Texte, als auch für Grafik-Bildschirme eingesetzt werden.</p>
+
+        <p>(Wolfgang W. Wirth/ev)</p>
+
+    </article>
+</body>
