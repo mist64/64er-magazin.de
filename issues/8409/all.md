@@ -810,47 +810,863 @@ An Möglichkeiten mangelt es Synthimat 64 sicher nicht. Manch ordentlicher Synth
 
 (Richard Aicher/aa)
 
+# Computer-Music – Komponieren leicht gemacht
+
+> Mit dem VC 20 Music-Composer können Sie auf einfache Weise bis zu dreistimmige Partituren programmieren.
+
+Das Programm arbeitet nicht etwa mit Zahlen oder Buchstaben, sondern benutzt die gewohnte Standardnotenschrift.
+
+Im Compose-Modus fordert Sie der Computer auf, zwischen drei Stimmen zu wählen:
+Voice 1 (Alt)
+Voice 2 (Tenor)
+Voice 3 (Sopran)
+
+Haben Sie sich nun für eine der drei Stimmen entschieden, wird nach der gewünschten Tonart gefragt. Wie jeder Musiker weiß, gehört zu einer vernünftigen Komposition auch ein Takt. Bei der Takteingabe werden allerdings auch äußerst seltsame Takte akzeptiert (zum Beispiel 3/7 Takt, 1/9 Takt etc.).
+
+Nach der Taktwahl erscheint auf dem Bildschirm die Komponier- beziehungsweise Bearbeitungsseite (EDIT-PAGE). Mit den Cursor-Tasten können Sie nun die gewünschte Note (ganze Note bis 1/32 Note) anwählen und diese in eine Notenzeile setzen. Auf Wunsch kann diese Note nun er--höht, erniedrigt oder punktiert werden. Entsprechend lassen sich auch beliebig lange Pausen setzen. Die Taktstriche müssen Sie sich leider selber setzen.
+
+Wie laut eine Passage gespielt werden soll, wird jeweils in italienischen Begriffen angegeben. Es stehen sechs Lautstärken, von pianissimo (= sehr leise) bis fortissimo ( = sehr laut) zur Verfügung.
+
+Die Editiermöglichkeiten des Programms sind gut. Noten lassen sich bequem einfügen oder löschen.
+
+Da sich alle drei Stimmen unabhängig voneinander programmieren lassen, können auch polyphone (= mehrstimmige) Partituren gespielt werden. Dies geschieht im PLAY-Modus. Nach der Frage DISPLAY WHICH VOICE? kann die Notation der gewünschten Stimme parallel zur Melodie verfolgt werden. Das Tempo läßt sich stufenweise von 1 (= sehr schnell) bis 9 (= sehr langsam) anwählen.
+
+Damit Sie nicht jedesmal das 4. Brandenburgische Konzert von Johann Sebastian Bach neu eingeben müssen, können Sie jedes Stück wahlweise auf Kassette oder Diskette abspeichern und später erneut laden.
+
+### Fazit
+
+Sowohl für den musikalischen Anfänger als auch für den Fortgeschrittenen bietet der VC 20 Music-Composer zahlreiche Möglichkeiten, musikalische Ideen zu verwirklichen.
+
+‚Computer Music' von Thorn Emi Video ist als Steckmodul für den VC 20 erhältlich.
+
+(C.Q. Spitzner/B.Carli)
+
+# Brandaktuell aus USA: Musik Neuigkeiten
+
+> Ein weiteres Musik-Keyboard für den Commodore 64
+
+Auch in den USA präsentierte man ein Keyboard für den Commodore 64. Das Colortone Synthesizer Keyboard. Drei Oktaven besitzt das von Waveform (Musi-calc!) entwickelte Keyboard und ein futuristisch anmuten-des Design, das auch jedem wirklichen Synthesizer alle Ehre machen würde. Mit dem Keyboard können Melodien per Klaviatur in die Musicalc I Software eingespielt werden, was bisher nicht möglich war. Die Songs lassen sich dann wie bekannt mit Musicalc bearbeiten oder in Notenschrift ausdrucken. Somit wäre das System Commodore 64, Floppy 1541, Monitor, Colortone-Keyboard und Musicalc-Software ein komplettes Musiksystem, das auch Keyboarder spielen können, ohne sich die Finger auf einer QWERTY—Tastatur zu verrenken. Der Preis des Colortone-Keyboards wird sich in den USA zwischen 200 Dollar und 300 Dollar bewegen.
+
+Ein weiteres dreistimmiges, vier Oktaven umfassendes Musik-Keyboard, mit dem man die drei Soundgeneratoren des SID-Chips kontrollieren kann, ist seit kurzem in England erhältlich. Es besitzt zwei Slide-Regler, deren Funktion man per Software selbst definieren kann. Hiermit lassen sich zum Beispiel Vibrato-, Pitch-bend- oder ähnliche Effekte bequem regeln. Zu diesem Keyboard wird passende Musiksoftware mit Sequenzer und Realtime-Spielmöglichkeiten geliefert. Man arbeitet momentan an einer Softwareerweiterung, mit der dann zirka 0,8 Sekunden Naturklang aufgenommen, gespeichert und per Keyboard über vier Oktaven gespielt werden. Das Microsound 64-Keyboard ist bisher leider nur in England erhältlich. Ich werde sobald als möglich darüber berichten.
+
+## MIDI-Interface- und Software auch in einer C 64-Version erhältlich
+
+Roland vertreibt ein intelligentes MIDI-Interface mit eigenem Mikroprozessor, das mittels Interface-Karte an Apple II und IBM PCs angeschlossen werden kann.
+
+In Kürze erscheint nun auch eine Version für den Commodore 64. Das Interface verfügt über diverse Synchronisationsmöglichkeiten (Tape Sync, Sync von Roland-Drumy-Units) und erspart durch seine eigene Intelligenz dem externen Computer viel Arbeit. Die C 64-MIDI-Software existiert momentan ebenfalls nur in einer Apple II- und IBM-Ver-sion, man schreibt aber gerade fleißig auf den C 64 um. Diese Roland MIDI-Recorder-Software für den Commmodore 64 wird dann, genau wie die bisherigen Versionen, acht Tracks zur Verfügung stellen, die 16 Kanäle ansprechen können. Timing-Fehler lassen sich nach der Aufnahme automatisch korrigieren. Vor jeder Aufnahme kann man die Anzahl der aufzunehmenden Takte und der Vorzähl-Takte bis zum Aufnahmebeginn bestimmen.
+
+## Microsound 64 — Keyboard mit Musiksoftware für den Commodore 64
+
+Weitere Features: Metronom Temporegelung, Pitchbend. Das Interface kostet zirka 600 Mark, die zugehörige Software mit Interfaceadapter voraussichtlich zirka 300 Mark.
+
+## IMA, die Internationale MIDI Association bietet Mitgliedschaft an
+
+Alle an der Entwicklung des MIDI-Systems Interessierte, können in der International Midi Association (IMA) Mitglied werden. Die IMA ist eine nichtkommerzielle Einrichtung. Sie verfügt über sämtliche Informationen zum aktuellen Stand des MIDI-Geschehens. Die Gesellschaft versucht, ein weltweites Forum des Gedankenaustausches zu sein. Die Mitglieder unterteilt man in drei Gruppen: Hersteller, Händler und Anwender. Für jede Kategorie werden spezifisch zugeschnittene Informationen angeboten.
+
+Der Mitgliedsbeitrag beläuft sich für Anwender auf jährlich 40 Dollar, zuzüglich 5 Dollar Postgebühren. Dafür erhält man das »MIDI Specification Manual« kostenlos. Diese Fundgrube für MIDI-Technik-Freaks kann man auch als Nichtmitglied, zum Preis von 10 Dollar zuzüglich 5 Dollar Postgebühren, beziehen.
+
+Daneben existieren noch eine Reihe anderer interessanter Angebote, die Mitglieder kostenlos oder zumindest ermäßigt erhalten. Zum Beispiel, das monatlich erscheinende »IMA Bulletin« vollgepackt mit den allerneuesten Informationen zum MIDI-Standard, Produktinformationen, Kontaktadressen anderer Mitglieder, Seminarpläne und Termine, der 36 mal jährlich erscheinende »IMA Update Service« und jährlich herausgegebene »IMA Sourcer« mit Nachrichten über MIDI Equipment. Detailliertere Informationen bietet die »IMA Membership Information Brouchure«. Diese erhält man über: IMA — The International MIDI Association, 8426 Vine Valley Drive, Sun Valley, CA 91352
+
+(Richard Aicher/aa)
+
+# MIDI – Glanz und Elend eines Interfaces
+
+> Für die meisten Profi-Keyboarder ist der Computer mittlerweile zum unentbehrlichen Begleiter auf den Bühnen der Wert geworden. 1983 haben sich fast alle Synthesizerhersteller auf ein einheitliches Keyboard-Bus-System, das Midi, geeinigt. Seither ist es auch ohne Lötkolben möglich, mehrere Keyboards, Rhythmusmaschinen und Effektgeräte, Takt für Takt synchron, durch einen Song zu jagen. Und wenn man will, nimmt einem der Computer sogar das Spielen ab. Doch war die Einführung dieses Systems auch mit Schwierigkeiten verbunden.
+
+Noch vor einem Jahrzehnt war ein Synthesizer ein riesiges Klangmonster, vollgestopft mit Analog-Elektronik. Dank moderner Mikroprozessortechnik hat sich dies jedoch innerhalb weniger Jahre grundlegend gewandelt. Synthesizer von heute sind klein und handlich, kaum noch größer als die Tastatur und voll polyphon, also vielstimmig spielbar. Alle Klangparameter lassen sich heute problemlos abspeichern und stehen nach einem Druck auf ein Knöpfchen sofort und jederzeit wieder zum Spiel bereit. Zeit ist kostbar, vor allem auf der Bühne.
+
+Die Arrangements moderner Popsongs konnten dank moderner Studiotechnik unheimlich verfeinert werden. Mit einer 24-Spur-Maschine, einem guten Techniker und viel Zeit, läßt sich heute aus einer Fünf-Mann-Combo ein vielstimmiges Orchester zaubern. Die einzelnen Stimmen spielt man hintereinander auf das Bandgerät.
+
+Doch wie realisiert man solche Meisterwerke moderner Studiotechnik auf der Bühne, live, möglichst ohne Playback? Hier sind wir an dem Punkt, der Keyboarder, die etwas auf sich halten wollen, wohl oder übel zu Computerfreaks werden läßt — denn auch ein Keyboarder hat nur zwei Hände. Dank Midi genügen ihm diese nun auch, die Stimmen, die er nicht mehr selbst zu spielen schafft, übernimmt der Computer. Wenn ein Konzert abläuft, hat der Midi-Keyboarder die Hauptaufgabe schon zu Hause erledigt, nämlich das Einprogrammieren der Songs. Theoretisch könnte der Computer den Keyboarder natürlich voll ersetzen. Doch das wäre unfair, wo bliebe dann noch die Show?
+
+Midi hilft nicht nur, komplexe Studiomusik live auf der Bühne zu realisieren. Das Inventar eines modernen Tonstudios geht heutzutage in die Millionen. Entsprechend hoch sind auch die Mieten. Midi hilft auch, teure Studiozeit zu sparen. Zumindest Keyboards und Elektronikdrums programmieren viele weniger betuchte Musikgruppen heute per Computer und Midi bereits zu Hause fertig ein. Im Studio spielt dann der Computer fehlerfrei sämtliche Stimmen gleichzeitig auf das Band. Mühseliges und zeitraubendes Spur-für-Spur-Aufnehmen wird so hinfällig. Midi ist also quasi notwendig geworden. Immer komplizierter werdende Technik erfordert meist noch mehr Technik, um sie wieder in Griff zu bekommen.
+
+So, genug des Lobs. Selbst Computermusiker, habe ich mich wieder einmal in Begeisterung geschrieben. Es wäre mittlerweile allerdings sehr wichtig, die anfängliche Begeisterung von Musikern, Herstellern und Presse, über das neue Wunderkind, das alles möglich zu machen versprach, gegen eine kritischere Betrachtungsweise auszuwechseln; Midi, nach einem Jahr auf dem Markt, als das zu betrachten, was es eigentlich wirklich ist, — lediglich ein genormtes Bus-System. Genau wie RS232 oder Centronics, oder S-100 oder wie sie alle heißen. Ein Standard wie viele andere, behaftet mit genau den gleichen Unzulänglichkeiten und Vereinfachungen. In der Entwicklung behindert durch Fehlinterpretationen und dem Konkurrenzverhalten vieler Industriefirmen. Das ist das Fazit nach einem Jahr Midi.
+
+## Wie sich alles entwickette
+
+Sehen wir uns an, wie sich alles entwickelte.
+
+Die Idee, ein genormtes Bussystem für Synthesizer-Keyboards zu entwickeln, kam erstmals im Juni 1981 auf der berühmten NAMM (National Association of Music Merchants) Show in Anaheim, USA auf. Diese größte Musikmesse der Welt findet jährlich statt, — hier werden meist sämtliche Neuentwicklungen der Musikindustrie erstmals vorgestellt. Die Präsidenten der bekannten Synthesizerfirmen Sequential Circuits, Oberheim Electronics und Roland (Dave Smith, Tom Oberheim, Kahehashi) unterhielten sich erstmals über die Möglichkeiten eines Standard-Digital-Interface für ihre Keyboards. Die nächsten Monate arbeitete man an ersten Vorschlägen. Ein weiteres Gespräch im Oktober 1981; der Kreis der Interessenten war mittlerweile gewachsen — Yamaha, Korg und Kawai, drei japanische Hersteller, hatten sich mittlerweile dazugesellt. Im Oktober 1981 stellte dann Sequential Circuits (SCI) auf der AES (Audio Engineering Society) in New York den ersten Versuch eines solchen Interfaces vor. Es hieß USI (Universal Synthesizer Interfaces) und war ein schnelles serielles Interface. Der Effekt: wenig Interesse von seiten anderer Hersteller. Doch der Stein war damit ins Rollen gekommen. Bei der NAMM-Show im Januar 1982 zählten bereits 15 Synthesizer-Hersteller zum Kreis der Interface-Interessenten: Oberheim, E-mu, Yamaha, Korg, Roland, Kawai, Moog, Fairlight, GDS, CBS-Rhodes, MusicTechnologie Inc., Octave Plateau, Passport Design, Alpha Syntauri und noch einige mehr. Für Keyboarder alles bekannte und wohlklingende Namen. Viele Streitpunkte tauchten auf, man fand keine Einigung, SCI und die Firmen, Yamaha, Roland, Korg, Kawai waren die einzigen, die nach diesem Treffen zunächst weitermachten. Es war mittlerweile klar, daß es kein optimales Interface geben würde, jedes müßte ein Kompromiß sein. Ein Kompromiß zwischen dem Wunsch jedes Herstellers nach wie vor Keyboards zu entwickeln, die sich möglichst von allen anderen in den meisten Features unterscheiden und andererseits dem Wunsch, alle Instrumente unter einen Hut zu bringen. So verwundert es nicht, daß trotz vieler Bemühungen, bis zum heutigen Tage wirklich 100 prozentig mit Midi nur eines machbar ist: die Ansteuerung eines zweiten Keyboards von einem ersten aus. Das heißt: drückt man auf eine Taste von Keyboard 1, klingt der Ton gleichzeitig von beiden Keyboards. Hier treten nie Schwierigkeiten auf, unabhängig davon, welchen Markennamen die gekoppelten Keyboards tragen.
+
+Im folgenden Jahr machten nun die Japaner einige Vorschläge zur Abänderung des USI-Interfaces und Roland erfand den Namen Midi (Musical Instrument Digital Interface).
+
+Im Januar 1983, wieder einmal NAMM, war es dann soweit. SCI stellte das erste Midi-Keyboard vor, den Prophet 600. Auch die Roland-Leute waren fleißig gewesen und hatten ebenfalls ein Midi-Keyboard entwickelt, den JP-6. Und, welch ein Wunder, obwohl die Instrumente unabhängig voneinander entwickelt wurden, verstanden sie sich. Keyboarddaten ließen sich austauschen. Doch das war auch schon alles. Tonhöhe und Anschlagsdauer wurden zwar korrekt übermittelt, SCI übermittelte jedoch zusätzlich Arpeggiator-Daten, Roland nicht.
+
+## Nach anfänglicher Begeisterung regte sich bald Mißtrauen unter den Musikern
+
+Erst im Nachhinein wurde man sich leider klar, daß es gewisse Richtlinien geben müsse, welche Daten übertragen werden sollen und wie. So entstand die erste Midi-Spezifikation 1.0. Leider waren zu diesem Zeitpunkt schon Keyboards auf dem Markt, die ihr noch nicht entsprachen. Überdies hatten sich unter den Musikern mittlerweile die unglaublichsten Gerüchte aufgebauscht, was Midi alles könne: nämlich alles. Sie stellten jedoch bald fest, daß dies weit gefehlt war. Die Enttäuschung war groß, die Unsicherheit wuchs. Musiker ahnen eben nicht, welche Schwierigkeiten sich hinter einer so einfach aussehenden Entwicklung verbergen.
+
+Mittlerweile jedoch hatte die anfängliche Begeisterung von seiten der Musiker viele Hersteller, die zunächst der Spezifikation skeptisch gegenüberstanden, in Zugzwang gebracht. Sie befürchteten, ihre Keyboards ohne Midi-Anschluß nicht mehr los zu werden. Die Folge: Mittlerweile sind bis auf vereinzelte Ausnahmen alle neueren Keyboards mit Midi ausgerüstet.
+
+Die Geister waren hiermit gerufen. Es bleibt nur noch, das Beste aus dem Anfang zu machen. Alle Hersteller haben sich mittlerweile geeinigt, bis März dieses Jahres die gültige Midi-Spezifikation 1.0 in allen Punkten zu befolgen. Die Hoffnung bleibt.
+
+## Die technischen Details der Midi-Spezifikation 1.0
+
+Wenden wir uns nach diesem historischen Abriß den technischen Details der Midi-Spezifikation 1.0 zu.
+Um die Verkabelung der Instrumente einfach zu halten, hat man sich für eine serielle Datenübertragung entschlossen. Diese Tatsache stößt nach wie vor auf viel Widerspruch. Viele halten die Datenübertragungsgeschwindigkeit für zu niedrig. Sie würden lieber mit paralleler Datenübertragung arbeiten. Bei sehr komplexen Systemen, in denen viele Instrumente gleichzeitig mit sehr vielen Daten versorgt werden sollen, können Verzögerungen aufgrund der langsamen seriellen Datenübertragung Delays auftreten, das heißt, die Toninformationen erscheinen am Ende der Leitung mit Verzögerung. Der Streit ist groß, ob dieser Effekt nun hörbar ist oder nicht. Einige wollen Delays störend bemerkt haben, andere entgegnen, daß dieselben Zeitunterschiede für einen Hörer auftreten, der lediglich einige Meter vom Keyboard entfernt steht. Unser Schall ist ja auch nicht der schnellste. Und wer hat hier schon störende Delays bemerkt? Sei es wie es sei. Immerhin arbeiten Midi-Interfaces mit fast der doppelten Geschwindigkeit des in der Computerindustrie weit verbreiteten RS232 Busses, nämlich mit 31,25 KBaud. Diese Frequenz wählte man, da sie hardwaremäßig leicht durch Teilung eines l-MHz-Taktes durch 32 zu erhalten ist. Jedes Daten-Byte besteht aus einem Start-Bit, acht Daten-Bits und einem Stop-Bits (siehe Bild 2).
+
+In jedem mit Midi ausgerüsteten Instrument sowie in allen Midi-Interfaces befindet sich nun eine Baugruppe, die parallele Daten des internen Keyboardprozessors in serielle wandelt und auf die Reise in das Midi-Verbindungskabel schickt, beziehungsweise von einem externen Computer ankommende serielle Daten in parallele rückwandelt. Diese Einheit heißt ACIA (Asynchronous Communications Interface Adapter Bild 3).
+
+Von außen unterscheidet sich ein Midi-Keyboard nur durch drei Buchsen — Midi-Input, Midi-Output und Midi-Durchgangsbuchse (Midi Thru) — von einem anderen. Laut Spezifikation dürfen lediglich 5-Pin/180-Grad-DIN- beziehungsweise XLR-Buchsen Verwendung finden. Verbindungskabel zwischen Midi-Systemen dürfen nicht länger als 15 m sein, man muß eine zweipolige Leitung, abgeschirmt und verdrillt, verwenden.
+
+Will man Keyboards nicht bloß verbinden, sondern von einem Computer ansteuern, benötigt man ein externes Midi-Interface, das die parallelen Daten des Computers in serielle wandelt, die unser Keyboard versteht. Den prinzipiellen Aufbau eines Midi-Interfaces erkennen wir in Bild 4.
+
+Solch externe Interfaces gibt es mittlerweile in den verschiedensten Modifikationen. Viele passen nur an einen Rechner, einige mittels zusätzlicher Adapter-Karten an mehrere. Für den Commodore 64 existieren momentan die meisten Midi-Inter-faces und, was noch wichtiger ist, sehr viel Software. Auch im Midi-Sektor scheint der C 64-Konkurrenten mittlerweile weit abzuschlagen.
+
+## Welche Daten sollen übertragen werden? Diese Frage ließ Köpfe rauchen
+
+Das Problem des Midi-Standards lag bisher jedoch weniger in der Normung der Hardware. Ungleich schwerer fiel die Entscheidung, welche Daten nun eigentlich übertragen werden können beziehungsweise müssen, um das System für den Musiker interessant zu machen.
+
+Optimal wäre, alle Features eines Instruments per Midi auf ein anderes Instrument übertragen zu können.
+
+Dieser Wunsch scheitert jedoch sofort an den unterschiedlichen technischen Möglichkeiten diverser Geräte. Midi kann lediglich auf dem niedrigsten gemeinsamen Level aller angeschlossenen Instrumente wirken. So lassen sich zwar auf einen vierstimmigen Synthesizer Daten für acht Stimmen, also eine achtstimmige Komposition, übertragen, gleichzeitig spielen wird er aber nur vier hiervon. Ebenso werden einen Synthi, der keine Anschlagsdynamik aufweist, diesbezügliche Daten kalt lassen. Die erste Lektion lautet folglich: Midi erweitert niemals die technischen Möglichkeiten angeschlossener Instrumente!
+
+Zweitens: Jedes Instrument interessieren nur ganz bestimmte Informationen; Keyboards ganz andere als zum Beispiel eine elektronische Rhythmuseinheit oder einen Sequenzer. Um Synthesizer sinnvoll zu koppeln, müssen mindestens die Keyboardinformationen, Tonhöhe, Gate on time und die Anschlagsgeschwindigkeit beziehungsweise -dynamik codiert übertragen werden.
+
+Polyphone Sequenzer können mit denselben Daten arbeiten, nicht aber monophone Sequenzer. Letztere registrieren nur einzelne Melodiestimmen. Rhythmusmaschinen wiederum sind überhaupt nicht an Ton-, sondern nur an Synchronisationsinformationen interessiert.
+
+Noch schwieriger vorhersehbar als diese Punkte ist die Frage, in welcher Konfiguration von Geräten das Midi-Interface dann jeweils tatsächlich vom Benutzer eingesetzt werden wird. Will man zum Beispiel mehrere verschiedene Synthis ansteuern und auf jedem eine andere Stimme einer mehrstimmigen Komposition mit anderem Klang ausgeben, so erfordert dies sicher eine ganz andere Zuordnung, als wenn alle Instrumente dieselbe Stimme spielen sollen. Deshalb führte man drei unterschiedliche Zuordnungsmodi ein, den OMNI-, POLY- und MONOmodus. Da die Verkabelung der einzelnen Instrumente möglichst einfach sein soll, müssen softwaremäßig Kanäle geschaffen werden, um die Instrumente mit den unterschiedlichen Stimmen der Komposition zu versorgen. Jedes Instrument muß für es bestimmte Daten gezielt erkennen. So führte man neben den drei Modi noch 16 Kanäle (Channels) ein. Mit geeigneter Software ließen sich deshalb auch maximal 16 Instrumente gleichzeitig und polyphon ansprechen — angesteuert von einem Computer.
+
+Was für Möglichkeiten bieten die einzelnen Modi? Im OMNImodus spielen alle Instrumente, die am Bus hängen, parallel und polyphon. Die angeschlossenen Instrumente empfangen sämtliche über den Bus geleitete Daten, unabhängig vom jeweiligen Kanal, auf dem diese übermittelt werden. Sollen die gekoppelten Synthis jedoch verschiedene Stimmen spielen, wechselt man in den POLYmodus. Hier lassen sich die einzelnen Instrumente unterschiedlich adressieren. Kanal 1 spricht dann zum Beispiel nur Synthi 1 an. Man könnte auf diesem Kanal eine Baßstimme programmieren, über Kanal 2 einen zweiten Synthesizer ansprechen und diesen Begleitakkorde spielen lassen. Eine Melodiestimme über Kanal 3 auf Synthi 3 gelegt und zu guter Letzt eine Rhythmusmaschine synchronisiert, über Kanal 4 — schon hat man das Orchester fertig. Auf jedem Kanal können theoretisch unbegrenzt viele Stimmen gleichzeitig übermittelt werden; das angeschlossene Keyboard spielt natürlich nur so viele, wie es Stimmen besitzt. Bei modernen Keyboards sind das mittlerweile bis zu 16, wie der Yamaha DX-7 zeigt. Hätte man 16 DX-7, könnte man eine 16 x 16, also 256stimmige Komposition mit Top-Sound, von einem Commodore 64 gesteuert, über diese Maschinerie ausgeben! Da die jüngsten Tendenzen der Synthesizerindustrie wieder in Richtung Modultechnik gehen, steht dies auch nicht mehr in allzu weiter Ferne. So erscheinen demnächst von den Firmen Roland und Yamaha 19-Zoll-Synthiracks, in denen jeweils acht komplette Synthesizer untergebracht sind, per Midi und Computer steuerbar. Dann braucht man nur noch ein Klaviatur-Modul und los geht’s.
+
+Im dritten und letzten Modus, dem MONOmodus wird schließlich je Kanal nur eine einzige Stimme übertragen. Jedes angeschlossene Instrument empfängt so viele Kanäle, wie es Stimmen besitzt, beginnend bei dem Kanal, mit dem es adressiert wurde. Verfügt es über keinen Adreßschalter, wird es automatisch mit Kanal 1 adressiert. Letzteres gilt übrigens für alle Modi. Besitzt man zum Beispiel den Six-Track von Sequential Circuits, einen Synthesizer, der sechs verschieden klingende Stimmen gleichzeitig spielen kann, lassen sich diese Stimmen im MONOmodus mit unterschiedlichen Melodien belegen. So spielt dann ein Synthi gleichzeitig stampfendes Baßfundament, Bläserbegleitung, Fuzzsolo und vielleicht noch drei Percussionstimmen — was will man mehr.
+
+Prinzipiell sind zwei verschiedene Arten der Verkabelung angeschlossener Geräte möglich, sternförmig und kettenförmig. Wir sehen dies in Bild 5.
+
+## Alle Midi-Features funktionieren meist nur im Idealfall
+
+Midi bietet also ungeheure Möglichkeiten. Doch das Ganze funktioniert tadellos nur im Idealfall.
+
+Vor dem Kauf jeglichen Midi-Equipments sollte man sich zunächst immer möglichst genau informieren, ob das Gerät auch in Zusammenhang mit den anderen, die man schon besitzt, funktionieren wird. Schwierigkeiten treten meistens auf, wenn Equipment verschiedener Hersteller gekoppelt werden soll. Die meisten Möglichkeiten und wenigsten Probleme ergeben sich, wenn man nur Equipment eines Herstellers nutzt. Dies ist prinzipiell nicht anders als in der Computerszene. Andernfalls werden zwar viele Features funktionieren, aber nicht alle.
+
+Was man dann mit dem Computer und seinem Equipment tatsächlich für Möglichkeiten hat, bestimmt die Qualität der verwendeten Software. Midi-Software für den Commodore 64 gibt es mittlerweile in Hülle und Fülle. Tunlichst sollte man sich auch hier vor dem Kauf genau über deren Möglichkeiten informieren. Sich wenn möglich alles praktisch demonstrieren lassen. Hier liegt jedoch meist der Hund begraben. Man versuche einmal, in einem Musikgeschäft bestimmte Midi-Software vorgeführt zu bekommen. Die meisten werden passen. Mangels Kenntnis im Umgang mit dem Computer oder überhaupt in Ermangelung eines solchen. Entsprechend wird man ebenso verzweifelt in Computershops nach Midi-Keyboards Ausschau halten. Hier bleibt nur die Hoffnung, daß sich demnächst einiges ändert.
+
+(Richard Aicher/aa)
+
+# Die Index-sequentielle Datei
+
+> Das Arbeiten mit einer relativen Datei ist gar nicht so komfortabel wie man es eigentlich möchte. Der Zugriff auf Datensätze nur über die Datensatznummer ist nicht besonders benutzerfreundlich und in der Regel auch praxisfremd. Unter Zuhilfenahme einer sequentiellen Datei wird dieser Nachteil jedoch aufgehoben.
+
+In den letzten beiden Ausgaben des 64’er wurden Ihnen die Grundzüge der sequentiellen und der relativen Datei vorgestellt und erläutert. Ich deutete auch schon an, daß erst die Verbindung dieser beiden Dateiformen zu einer befriedigenden Lösung führt. Aber auch hier muß man Abstriche machen. Durch diese Vermischung werden leider nicht nur die Vorteile, sondern auch ein Teil der Nachteile mit übernommen. Ich möchte diese noch einmal kurz anreißen.
+
+Das Wesen der sequentiellen Datei liegt in der aufeinanderfolgenden (eben sequentiellen) Anordnung der Daten. Um mit dieser Datei arbeiten zu können, muß sie vollkommen in den Speicher des Computers geladen werden. Bei großen Datenbeständen kann das eine ganze Zeit lang dauern. Andererseits wird die maximale Größe durch den zu Verfügung stehenden Speicherplatz im Computer selbst bestimmt. Sind jedoch alle Datensätze erst einmal geladen, ist ein Bearbeiten der Daten sehr einfach und auch schnell. Dann können alle Änderungen, Ergänzungen und sonstige Manipulationen im Computer selbst durchgeführt werden. Und für zeitkritische Funktionen wie Sortieren und Suchen kann man die Maschinensprache sehr wirkungsvoll einsetzen.
+
+Die relative Datei hingegen benötigt außer dem eigentlichen Programm nur sehr wenig Speicherplatz, nämlich nur noch denjenigen für die internen Variablen und für einen Datensatz. Der Rest aller Daten befindet sich auf Diskette. Und dort stehen einem fast 170 KByte zur Verfügung. Allerdings ist das Arbeiten mit einer rein relativen Datei nur in speziellen Fällen sinnvoll und praktisch, da bei ihr ein Datensatz nur über die Datensatznummer angesprochen werden kann. Ein weiteres Merkmal ist, daß die Datensatzlänge vorher festgelegt werden muß und eine Floppy unbedingt notwendig ist.
+
+## Indizierung als Lösung
+
+Durch die Verbindung einer relativen Datei mit einer sequentiellen wird ein Kompromiß geschlossen. Einerseits wird die Suche nach einem Datensatz, beispielsweise nach einer Adresse, jetzt direkt über den Namen möglich. Andererseits muß gleich nach dem Programmstart die sequentielle Datei geladen und am Ende wieder gespeichert werden. Allerdings fällt sie wesentlich kürzer aus. In ihr braucht lediglich ein Feld der Datensätze enthalten zu sein, nämlich das Indexfeld, im Beispiel die Nachnamen, und nicht, wie bei der puren sequentiellen Form, alle Felder.
+
+Gehen wir einmal von folgender Voraussetzung aus: Auf der Diskette sind bereits eine Anzahl von Adressen gespeichert. Im RAM des Computers befindet sich das Programm und in einem eindimensionalen Feld (im Beispiel die Variable IN$) alle bisher eingegebenen Nachnamen. Indem wir diese Variable mittels einer FOR-NEXT-Schleife durchsuchen, können wir auch einen gespeicherten Namen finden. Allerdings kommen wir damit noch nicht an seine Adresse heran, da diese ja in diesem Moment nicht im Computer sondern auf Diskette gespeichert steht. Mit einem kleinen Kniff schaffen wir aber auch diese Hürde. Wir speichern bei der Eingabe einer neuen Adresse einfach die Datensatznummer vor dem Nachnamen in die Variable IN$. Und zwar reservieren wir vor jedem Nachnamen vier Stellen für die zugehörige Datensatznummer. Ab der 5. Stelle beginnt also der jeweilige Nachname. Wollen wir nun einen Namen suchen, so müssen wir mit der MID$-Funktion die Feldvariable IN$ ab dem fünften Buchstaben durch-kämmen. Sobald der gesuchte Name gefunden wurde, trennen wir die ersten vier Zeichen ab und erhalten damit die zugehörige Datensatznummer. Mit dieser Nummer können wir jetzt direkt auf die relative Datei auf der Diskette zugreifen und holen uns die komplette Adresse.
+
+## ... und so wird’s gemacht
+
+Anhand eines Beispiels soll das noch einmal gezeigt werden:
+Inhalt der ersten Elemente von IN$:
+IN$(1) =»1... MEIER«
+IN$(2) =»2... MUELLER«
+IN$(3) =»3... ANDERMANN«
+IN$(4) =»*«
+
+Gesuchter Name = Mueller, er steht in der Variablen N$ (Zeile 3060)
+3060 INPUT"NACHNAME";N$
+3070 N = LEN(N$) Länge des eingegebenen Namens
+
+Die folgenden Programmzeilen suchen den Namen.
+3090 FOR 1 = 1 TO DATEIENDE
+3100 IF IN$(I) = ”*” THEN 3120
+3110 IF MID$(IN$(I),5,N)=N$ THEN gefunden
+3120 NEXT I
+
+Zur Zeile 3100 kommen wir später noch. Angenommen, wir haben nicht den ganzen Namen eingegeben, sondern lediglich die ersten drei Buchstaben MUE. Dann werden in der Variable IN$ nur die 5.,6. und 7. Zeichen, das entspricht den ersten drei Buchstaben eines jeden Namens, verglichen. Dafür sorgt die Zeile 3070 und in 3110 das »,N« als letzter Parameter der MID$-Funktion. Somit könnte mit dieser Eingabe auch der Name MUECKE gefunden werden. Im Extremfall, wenn nichts eingegeben, also RETURN gedrückt wird, findet diese Funktion jeden Namen. Das heißt, man kann mit der Suchfunktion sich nicht nur einzelne Adressen holen, sondern auch die gesamte Datei, oder zum Beispiel alle Adressen, die mit M anfangen. Damit würde der Menüpunkt »G = Anzeigen gesamte Datei« überflüssig. Ich habe ihn nicht entfernt, da hier unabhängig von der sequentiellen Datei alle Datensätze direkt von der Diskette aus der relativen Datei gelesen werden. Man könnte diese Funktion benutzen, um eine eventuell (zum Beispiel durch Stromausfall) teilweise zerstörte sequentielle Datei zu reorganisieren.
+
+Die Zeile 3100 wird dann verständlich, wenn man sich den Programmteil »Neue Datei anlegen« ab 11000 anschaut. In den Zeilen 11320 bis 11350 wird jedes Element der Variablen IN$ mit einem »*« vorbesetzt. Der Stern kennzeichnet einen leeren Datensatz. Damit kommen wir auch gleich zum Programmteil »Löschen Datensatz« ab 4000. Auch dort wird ein zu löschender Datensatz in IN$ mit einem »*« gekennzeichnet und zusätzlich der entsprechende Datensatz auf der Diskette mit Hex FF (= Dezimal 255 = das Zeichen PI). Auch das wollen wir uns anhand eines kleinen Beispiels näher betrachten:
+
+Wir wollen den Herrn Mueller aus unserer Datei entfernen. Nachdem wir seine Adresse mit der Suchfunktion gefunden haben, geben wir ein »L« für Löschen ein. Danach springt das Programm nach 4000, schreibt in die Variable IN$ das »*« , überschreibt den Datensatz auf der Diskette mit CHR$(255)(=PI), löscht die einzelnen Datensatzfelder (NN$, NV$, und so weiter) und springt zurück nach 3350. Die Variable IN$ sieht jetzt so aus:
+IN$(1) =»1... MAIER«
+IN$(2) =»*«
+IN$(3) =»3... ANDERMANN«»
+IN$(4) =»*«
+
+Der zweite Datensatz ist nun mit »*« als gelöscht und leer gekennzeichnet. Das bedeutet auch, daß er wieder mit einer neuen Adresse belegt werden kann. Sehen wir uns dazu den Programmteil »Neueingabe Adresse« ab 1800 an.
+
+Nachdem wir eine neue Adresse eingegeben haben (die einzelnen Programmteile, die in 1830 bis 1850 aufgerufen werden, kennen Sie ja bereits aus den letzten beiden 64'er Ausgaben), muß jetzt ein leerer Platz gefunden werden, auf dem wir die neue Adresse abspeichern können. Wichtig sind jetzt die Zeilen 1880 bis 1910. In diesem Abschnitt wird IN$ so lange durchsucht, bis ein mit »*« gekennzeichnetes Element gefunden wird (1910). In unserem Beispiel ist das bereits das zweite Element (IN$(I) = »*«, bei I = 2). Somit wird die neue Adresse als zweiter Datensatz auf Diskette gespeichert. In Zeile 1930 und 1940 wird die Variable IN$ auf den neuesten Stand gebracht. Zuerst wird die Datensatznummer (I) in einen String umgewandelt (1920). Dabei wird immer das (unsichtbare positive) Vorzeichen mit berücksichtigt. Da wir dieses nicht brauchen, wird es abgeschnitten (MID$(I$,2) und die Zahl mit Leerstellen auf insgesamt vier Zeichen Länge erweitert. Zeile 1940 verbindet dann die Datensatznummer mit dem Namen.
+
+Vielleicht ein Wort noch zur MID$-Funktion. Normalerweise gehören zu dieser Funktion drei Parameter. So steht es auch kurz erläutert im Commodore-Handbuch. Der letzte Parameter gibt an, wieviele Zeichen ab einer definierten Stelle des Strings genommen werden sollen. Wird dieser Parameter weggelassen, werden ab der definierten Stelle alle restlichen Zeichen des Strings übernommen.
+
+## Probleme, dfe sich ergeben können
+
+Es könnte sein, daß Ihnen die Dateistruktur nicht gefällt. Zum Beispiel möchten Sie die Länge der Datenfelder ändern. Das dürfen Sie nur machen, wenn die Datei neu eingerichtet werden soll. Bei einer bestehenden geht es nicht! Beim Verkürzen gibt es keine Probleme, auch keine beim Verlängern bis zu 88 Zeichen. Zu verändern sind dann die Zeile 30040 sowie die Längenangaben zwischen den Zeilen 5000 und 7100. Bedenken Sie dabei, daß die Variable BL$ mindestens so viele Leerstellen haben muß, wie das längste Datenfeld.
+
+Schwieriger wird es, wenn Sie infolge einer Vergrößerung der Datensatzlänge über 88 Zeichen hinwegkommen. Das Problem hierbei ist der INPUT#-Befehl. Mit ihm kann man nämlich nur maximal 88 Zeichen aus einer Datei lesen. Es gibt zwei Methoden, diese Hürde zu überwinden. Erstens eine Maschinensprache-Routine, die den INPUT#-Befehl erweitert, so daß auch Datensätze mit bis zu 255 Zeichen gelesen werden können (schauen Sie doch einmal in das Floppy-Buch von Data Becker, dort finden Sie eine entsprechende Routine). Die zweite Möglichkeit ist die Verwendung des GET#-Befehls anstelle des INPUT#-Befehls. Dann ist die Zeile 9070 INPUT#1,RC$ durch folgende Zeilen zu ersetzen:
+9068 RC$ = " "
+9070 GET#1,W$
+9072 RC$ = RC$+W$
+9074 IF W$ = CHR$(255) THEN 9090
+9076 IF W$ = CHR$(13) THEN 9070
+
+Den GET#-Befehl kann man natürlich auch dann einsetzen, wenn die Satzlänge kleiner als 88 Zeichen ist. Dann werden die Zeichen jedoch um einiges langsamer eingelesen als mit dem INPUT#-Befehl. Aber es ist mit dem GET#-Befehl möglich, bis zu 255 Zeichen in eine Variable einzulesen.
+
+Ein Problem ganz anderer Art kann auftauchen, wenn Sie eine Floppy besitzen, die vor Dezember 1983 gekauft beziehungsweise hergestellt wurde und gleichzeitig mit einem VC 1526 drucken. Es kann möglich sein, daß bei Benutzung einer relativen Datei Fehler auftauchen, sobald dieser Drucker eingeschaltet ist. Probieren Sie das vorher aus! Abhilfe schafft meines Wissens nur ein neues DOS für die alte VC 1541.
+
+## Anregungen für Programmierer
+
+Dieses Programm ist — bis auf die Druckerroutine, die sich jeder für seinen eigenen Drucker selber schreiben sollte — komplett und funktionsfähig. Sicherlich lassen sich noch eine ganze Reihe von Schönheitsreparaturen machen. Auch eine Erweiterung des Programms ist durchaus sinnvoll. Zum Beispiel könnte man ein Unterprogramm schreiben, das, ähnlich einem professionellen Dateiprogramm, es ermöglicht, sich die Datenfelder selbst zu definieren. Auch die Suche nach mehr als einem Feld ist durchaus sinnvoll. Wenn erwünscht, kann auch eine Sortierroutine eingefügt werden. Der modulare Aufbau erlaubt dies ohne Schwierigkeiten. So kann sich jeder, der etwas Programmiererfahrung hat, eine Dateiverwaltung aufbauen, die sogar professionellen Programmen etwas voraus hat: Sie ist auf die persönlichen Bedürfnisse abgestimmt und läßt sich auch jederzeit ändern. Wer das Programm kompiliert, kann auch bei sehr großen Dateien noch mit guten Suchgeschwindigkeiten rechnen. Dieses Beispielprogramm enthält alle Voraussetzungen für eigene Erweiterungen. Ich selbst habe obengenannte Funktionen für meine eigene Dateiverwaltung bereits realisiert.
+
+(gk)
+
+# Hard and Soft: eine kleine Marktübersicht
+
+> Von der Qualität und leichten Bedienbarkeit der Programme hängt die Qualität der Keyboardarrangements immer mehr mit ab. Nichts-desto-trotz sollte man immer daran denken, daß ein schlechter Song auch mit der ausgefeiltesten Software nicht besser wird. Hier ein kurzer Überblick über Midi-Software und -Interfaces für den Commodore 64.
+
+### Steinberg Research: 16-Spur-Midi-Recorder, Interface und Drum to Midi Converter
+
+Vom Keyboarder für Keyboarder entwickelt wurde die Steinberg-Midi-Software: Einer der beiden Entwickler ist selbst Keyboarder in der Gruppe um die Rock-Lady Inga Rumpf. Dieselbe Firma verteibt auch ein Mini-Midi-Interface mit einem Midi-Input und zwei Outputs. Das Interface selbst besteht aus einer Platine mit festgelöteten Buchsen. Die Platine wird direkt in den User-Port des C 64 gesteckt. Leider hat man, wahrscheinlich aus Kostengründen, auf ein Gehäuse verzichtet. Hier empfiehlt es sich, auf jeden Fall selbst Hand anzulegen. Preis zirka 120 Mark.
+
+Die Software kann man als 16 Spur-Multitrack-Recorder bezeichnen. 16 Sequenzen verschiedener Länge haben im Arbeitsspeicher Platz. Die einzelnen Sequenzen spielt man Spur für Spur ein. Jede faßt bis zu 16 polyphone Spuren und unterschiedliche Parameter. Pitchbending und Modulation, Dynamik und After Touch sowie Sound-Änderungen werden mit aufgezeichnet. Natürlich nur, wenn das Instrument dazu in der Lage ist. Jede Spur kann dabei so viele Stimmen aufnehmen, wie das Einspielkeyboard zur Verfügung stellt. Längere Kompositionen bildet man durch Verknüpfen der 16 Sequenzen, wobei die Reihenfolge frei wählbar ist. Die 16 Sequenzen und 16 Spuren erscheinen recht musikerfreundlich in einer Art Songtable am Bildschirm. Man arbeitet ausschließlich mit diesem Bild (Bild 1). Bereits während der Aufnahme werden etwaige Timingfehler korrigiert, wobei die Korrektur für jede Spur individuell anwählbar ist. (Korrektur auf %-&Ji6,%2- und Yw-Werte möglich). Ein Metronom hilft während des Einspielens, das richtige Tempo zu halten.
+
+Bis zu 16 Midi-Instrumente spricht das Interface im Playmode an. Die 16 Recorder-Spuren lassen sich natürlich beliebig auf die 16 Channels und somit verschiedenen Instrumente verteilen. Die Software ist für OMNI-, POLY- und MONOmode ausgelegt.
+
+Ein Farbbildschirm ist unbedingt nötig. Die einzelnen Betriebsmodes, wie Aufnahme, Play und so weiter, erkennt man durch verschiedene Hintergrundfarben. Bespielte Spuren lassen sich in jede beliebige Sequenz und dort an jeden Platz kopieren, sowie in einem Bereich von + 32 bis +32 Halbtönen transportieren. Preis 290 Mark.
+
+Für schwierige Synchronisations-Aufgaben in größeren Midi-Systemen, stellt Steinberg eine auf die Midi-Multitrack-Recorder-Software und den C 64 abgestimmte Synchronisier-Platine her. Mit dieser läßt sich dann eine Band-Maschine synchronisieren (Tape Sync) oder der Midi-Recorder extern triggern. Umgekehrt kann man ihm diverse Glock-Signale und einen Start-Impuls zur Steuerung externer, noch nicht Midi-kompatibler Elektronik-Drums entnehmen. Preis zirka 98 Mark.
+
+Demnächst erscheint im Programm von Steinberg ein Drum-to-Midi-Converter. Dies wäre das erste Gerät dieser Art. Mit diesem Gerät kann man dann endlich Percussion-Impulse direkt in die Midi-Software einspielen. Hierzu ist zusätzlich Hardware nötig. Die Impulse können entweder von einem Pad-Set (Simmons oder ähnliches) oder über Mikrofon von einem »echten« Schlagzeugset abgenommen werden.
+
+### Jellinghaus Music Systems: Midi-Interfaces und Software
+
+Jellinghaus, einer der deutschen Pioniere auf dem Gebiet der Midi-Technik, bietet zwei verschiedene Interface-Versionen an. Ein sogenanntes Mini-Interface, zum Preis von 115 Mark, daß sich ausschließlich an den Commodore 64 anschließen läßt, sowie eines mit mehr Features, das sich sowohl mit 6502 als auch Z80-Prozessoren ansprechen läßt, zum Preis von 330 Mark. Das Mini-Interface verfügt lediglich über einen In- und zwei Outputs. Die größere Version bietet zusätzlich eine Midi-Thru-Buchse sowie Drum Sync-Möglichkeit.
+
+Jellinghaus bietet diverse Software für den Commodore 64 an. Vor allem Yamaha-DX-7-Besitzer kommen hier auf ihre Kosten. Der Sound-Editor DX-7/DX-9 zeigt alle Soundparameter dieser Keyboards übersichtlich auf dem Bildschirm an. Dies weiß jeder zu schätzen, der sich schon an der Programmierung der beiden Keyboards versucht hat. Die einzelnen Parameter lassen sich nun bequem über die C 64-Tastatur editieren und anschließend ausdrucken.
+
+Überdies entkommt man auf diese Weise auch den teuren RAM-Cartridges, denn mit dieser Software lassen sich sämtliche Sounddaten auch auf die Commodore-Diskette speichern. Preis zirka 185 Mark.
+
+Auch eine Multitracker-Software gibt es hier, den sogenannten Multitrack Live-Sequenzer für den Commodore 64 (Bild 2).
+
+Er stellt 12 Spuren zur Verfügung, natürlich wieder voll polyphon. 10000 Events (note on/note off) haben insgesamt im Speicher Platz. Ein Metronom sorgt für den richtigen Takt, die Aufnahme startet mit einem wählbaren Ereignis, zum Beispiel der ersten gespielten Note, einem Druck auf die Programmwechseltaste oder durch Drehen am Pitch-Bender. Für jede Aufnahme-Spur läßt sich getrennt festlegen, welche Parameteränderungen gespeichert werden sollen, zum Beispiel Keyboarddaten, Anschlagsdynamik, Programmwechsel, Pitch Bender und andere. Die Auswahl erfolgt in einem Filter-Menü. Diese Bezeichnung erscheint mir hier allerdings etwas fehl am Platze. Beim Arbeiten mit einer Drum-Box kann entweder diese den Recorder, oder der Recorder diese synchronisieren. Das Tempo läßt sich im Bereich von 40 bis 200 regeln, die Taktart kann von 2/2 bis 11/2, 2/4 bis 11/4, 2/8 bis 11/8 gewählt werden. Natürlich auch hier alle drei Midimodes und wählbare Zuordnung von Spuren auf Channels. Einzigartig bisher: Die gespeicherten Songs lassen sich listen und editieren. Auf dem Bildschirm erscheint hierbei ein korrektes Zeitprotokoll der Reihenfolge, in der bestimmte Tasten gedruckt und wieder losgelassen wurden, mit Angabe der zusätzlich aufgenommenen Parameter. Außerdem lassen sich alle Spuren nachträglich im Timing korrigieren, in 1/4 bis 1/32-Werten, sowie 1/4- bis 1/32-Triolen. Weitere Features: Endlos-Wiedergabe (loops), Fuß-Schalter-Anschluß, Transponierung und Loudness-Skalierung jedes Tracks und die Möglichkeit, mehrere Tracks auf einen abzumischen (Mix-Down). Das Jellinghaus Midi-Recording-Studio kostet 250 Mark.
+
+Eine weitere interessante Midi-Software: das Master-Keyboard (Bild 3). Dieses Programm ist interessant, wenn man viele Instrumente an seinem Midi-System angeschlossen hat und live darauf spielen will. Die Einspielklaviatur läßt sich dann in verschiedenen Weisen zur Steuerung der anderen Synthis einsetzen. So lassen sich zum Beispiel auf dem Einspiel-Keyboard (Master Keyboard) sechs Splitpunkte bestimmen. Mit den so entstandenen Klaviaturabschnitten kann man dann die restlichen Synthis gezielt vom Master-Keyboard aus live spielen. Außerdem können für die angeschlossenen Keyboards oder Effektgeräte 80 Presets programmiert werden, so daß sie bei Anwahl eines dieser Presets durch einen Tastendruck auf die bestimmten Klangbeziehungsweise Effektprogramme geschaltet werden. Ein drittes Feature ermöglicht zu jedem gespielten Ton andere hinzumischen. Diese Software kostet 200 Mark.
+
+Passport Design: Midi-Interface und Software
+Passport Design ist in Computermusik-Kreisen durch ihr System für den Apple II, das Mountain Board Music System, wohlbekannt. Mittlerweile wurde auch Midi-Software und ein Interface für den C 64 von dieser Firma entwickelt. Auf der Midi-Interface-Karte sind drei 5-Pol-DIN-Buchsen vorhanden. Einmal Midi-In, einmal Midi-Out und eine dritte Buchse, für die Synchronisation einer Drum-Maschine (Drum Sync). Die Midi-Interfacecard überträgt und empfängt sämtliche Standard-Midi-Daten. Sie kostet in Deutschland 590 Mark.
+
+Mit dem Midi-Recorder Midi/4 kann man bis zu 16 Stimmen Real-Time einspielen, beliebig über vier Aufnahmespuren verteilt. Hierbei speichert die Software alle für die Komposition wichtigen Informationen, also Tonhöhe, Dauer, Anschlagsdynamik, Pitch-Bend, Presetänderungen und After Touch. Sollte man sich einmal verspielt haben, können einzelne Stellen mit der »Punch-In«-Funktion während des Abspielens korrigiert werden, — so, als hätte man eine der guten alten Vier-Spur-Bandmaschinen vor sich. Natürlich lassen sich alle Midikompatiblen Rhythmusmaschinen synchronisieren. Auch Geräte ohne Midi-Bus, wie zum Beispiel ältere Electronic-Drums der Firmen Roland und Korg, kann man anschließen, sofern sie einen 5-Pol-DIN-Stecker zur Synchronisation besitzen. Das Schlagzeug wird durch die Software gestoppt und gestartet. Weitere Features von Midi/4 sind eine »Loop«-Funktion, »Clicktrack on/off«, die die Synchronisation des Midi-Sequenzers mit einer Bandmaschine erlaubt und »Transposition«. Der Preis beträgt in Deutschland zirka 295 Mark.
+
+### Sequential Circuits: Model 64-Sequenzer für den Commodore 64
+
+Der Model 64 Midi-Sequenzer Sequential Circuits ist als Cartridge entwickelt, die in den Memory-Expansion-Port des C 64 gesteckt wird. Um ihn voll ausnutzen zu können, benötigt man ein sechsstimmig polyphones, Midi-fähiges Keyboard. Der Sequenzer zeichnet dann exakt das auf, was von der Tastatur her eingespielt wird. Insgesamt können bis zu 4000 Noten gespeichert werden. Verfügt das benutzte Keyboard über Anschlagsdynamik, so wird auch diese mit aufgezeichnet.
+
+Der Sequenzer merkt sich auch alle Pitchbend- beziehungsweise Modulationsinformationen. Im Wiedergabemodus können alle gespeicherten Informationen dann entweder real-time oder auto-corrected, wobei Timing Fehler des Einspielens nachkorrigiert werden, an den angeschlossen Synthesizer gegeben werden. Der Speicher des Sequenzers läßt sich in acht Blocks unterteilen, jeder dieser Blocks enthält dann eine sechsstimmig polyphone Sequenz, die alle unterschiedliche Längen haben können. Die Sequenzen kann man nachträglich per Software ganz, oder in Teilbereichen ändern, transportieren und auf Diskette beziehungsweise Kassette abspeichern. Der Sequenzer ist so konstruiert, daß er auch ohne Monitor betrieben werden kann. LEDs auf der Frontplatte signalisieren den jeweiligen Betriebszustand, was natürlich vor allem für Livemusiker auf der Bühne praktisch ist. An den Sequenzer kann man einen Fußschalter anschließen, zum Starten und Stoppen, wenn keine Hand frei ist; außerdem läßt er sich mit externen Rhythmusgeräten synchronisieren. Es kostet 725 Mark.
+
+Natürlich gibt es noch mehr Software, noch mehr Interfaces. Alles Aufzuzählen würde den Rahmen erheblich sprengen. Für den Keyboarder zumindest, kann ein gut durchdachtes Midi-System mit entsprechender Software ein herkömmliches Recordingsystem mit Mehrspurmaschine und Mischpult in vielen Fällen ersetzen. Billiger kommt man jedoch auch nicht weg. Die Anschaffungskosten eines Computersystems und der Midi-Soft- und Hardware dürften sich in der Größenordnung eines Acht-Spur-Recorders der Low-Cost-Klasse bewegen.
+
+(Richard Aicher/aa)
+
+# Klangsynthese und Synthesizertechnik
 
 
+> Unser Commodore 64 ist ein hervorragender Musikus. Manches Musikprogramm läßt Ihn sogar teurere, professionelle Musiksynthesizer übertreffen. Will man ihm selbst gezielt Töne entlocken, muß man über einige grundlegende Dinge der Klangsynthese und Synthesizertechnik Bescheid wissen.
 
+Drei verschiedene Kurvenformen und sogenanntes »weißes Rauschen« stellt der Sound-Chip des Commodore 64 für unsere Experimente zur Verfügung. Die drei Kurvenformen nennt man Dreieck, Rechteck und Sägezahn (siehe Bild 1).
 
+Jede der drei Kurven klingt ganz charakteristisch und zwar unabhängig von der Tonhöhe. Keine der drei klingt identisch mit irgendeinem natürlichen Instrument. Leider, sonst wäre nämlich alles viel einfacher. Bei den genannten Schwingungsformen handelt es sich um sehr einfache Basiskurven. Betrachtet man Kurvenformen natürlicher Klangerzeuger, also etwa eines Musikinstruments oder irgend eines anderen Geräusches am Oszillograph, stellt man sehr viel kompliziertere Kurvenverläufe fest (siehe Bild 2).
 
+Außerdem verändern sich die Kurven kontinuierlich während des gesamten Klangablaufes. Wie lassen sich so komplexe Abläufe elektronisch realisieren?
 
+Zu Beginn des 19. Jahrhunderts lebte der französische Mathematiker Jean Baptiste Joseph Fourier. Er entwickelte die mathematischphysikalischen Grundlagen, die uns auch heute noch Klänge verstehen und elektronisch nachahmen lassen. Es handelt sich um das Verfahren der sogenannten harmonischen Analyse von Klängen. Heute nennen wir das zugrundeliegende mathematische Prinzip ihm zu Ehren Fourier-Synthese. Fourier stellte fest, daß sämtliche periodischen Schwingungen in eine sinusförmige Grundschwingung und ebenfalls sinusförmige Oberschwingungen zerlegt werden können. Man nennt diese auch harmonische Oberschwingungen oder einfach Harmonische. Diese unterscheiden sich nur in der Frequenz und der jeweiligen Amplitude. Er bewies auch, daß die Umkehrung dieses Satzes ebenso gilt.
 
+## Unterschiedliche Obertongemische produzieren verschiedene Klänge
 
+Jede periodische Schwingung läßt sich durch Addition ihrer Grundkomponenten, also Sinusschwingungen mit bestimmter Frequenz und Amplitude, aufbauen. Sein Beweis war natürlich rein mathematischer Natur. Prinzipiell handelt es sich hier um Mathematik in Reinkultur. Natürlich bestehen nicht alle Klänge aus periodischen Schwingungsverläufen. Deshalb kann man mit diesem Verfahren auch nicht alle Klänge analysieren beziehungsweise synthetisieren. Rauschen ist zum Beispiel eine absolut nicht periodische Schwingungsform und kann nicht nach diesem Verfahren behandelt werden. Für die Frequenzen der Harmonischen gilt die Bedingung, daß sie in einem geradzahligen Verhältnis zur Frequenz der Grundschwingung stehen. Die Reihen der möglichen Sinuskurven haben also alle denselben Frequenzabstand, nämlich die Frequenz der Grundschwingung. Die Grundschwingung ist die Sinuskurve mit der tiefsten Frequenz. Sie bestimmt meist gleichzeitig die Tonhöhe des Klangs. Die Harmonischen bestimmen den Charakter des Klanges.
 
+Wie ein Ton nun letztlich klingt, bestimmt die Zusammensetzung seines Obertongemisches. Entscheidend ist, welche Harmonischen beteiligt sind und mit welcher Amplitude. Betrachten wir wieder unsere Grundschwingungsformen. Hier handelt es sich um reine periodische Grundschwingungen. Sie lassen sich auch sehr leicht mit Mitteln der Elektronik erzeugen. Deshalb sind sie für uns so wichtig.
 
+Der Sinuston besitzt keine Oberschwingungen, er ist rein. Sein Klang hört sich unnatürlich weich an. Reine Sinustöne existieren in der Natur nicht. Ganz anders der Sägezahn. In einer Sägezahnschwingung sind alle Obertöne vertreten. Der n-te Oberton ist hierbei l/n mal so laut wie der Grundton. Die Amplitude der Obertöne nimmtalso hier mit zunehmender Ordnungszahl ab. Der Sägezahn klingt hell, trompetenhaft. Die Dreieckschwingung weist sehr viel weniger Obertöne auf. Sie klingt dumpf. Man kann den Klang auch als flötenähnlich bezeichnen. Die Rechteckschwingung besteht aus ungeradzahligen Obertönen. Sie klingt hohl.
 
+## Bob Moog konstruierte den ersten Synthesizer
 
+Bob A. Moog hatte als erster die Idee, diese Grundschwingungsformen zur Klangsynthese einzusetzen. Inspiriert von den Klangwünschen seines Freundes Herb Deutsch, eines Experimental-Musikers, hatte er den Sommer 1964 damit verbracht, Elektronik-Module zu konstruieren, die die absonderlichsten Klänge hervorbrachten. Mit diesen Modulen war es erstmals möglich, die drei Größen, mit denen sich jedes Klangereignis beschreiben läßt, nämlich Tonhöhe (Frequenz), Klangfarbe (Kurvenform-Oberwellengehalt) und Lautstärke (Amplitude) relativ genau zu kontrollieren. Die entscheidende Idee war die Einführung der Spannungssteuerung. Er entwickelte Module, die direkt diesen drei Größen zuzuordnen und mittels Spannungssteuerung elektronisch kontrollierbar waren.
 
+So entstand der Moog-Synthesizer, ein Klangmonster von 1 x 2 m Größe. Dieses Gerät revolutionierte die gesamte elektronische Tonerzeugung grundlegend. Auch unser kleiner SID-Chip ist prinzipiell nichts anderes als ein Nachfolger des Riesenkastens von einst. Nur mit dem Unterschied, daß er aus wenigen Kubikzentimetern Raum Leistung zaubert, für die ehedem der Moog-Synthesizer Kubikmeter benötigte und statt analoger Technik und Spannungssteuerung Digitaltechnik und Digitalkontrolle einsetzt.
 
+Eines hat jedoch der Moog von einst dem SID-Chip von heute immer noch voraus. Er klingt wesentlich besser. SID-Klänge sind nicht sehr bombastisch. Es fehlen volle Bässe und höchste Höhen. Deshalb konnte sich auch bisher der Commodore 64 mit dem SID bei Profimusikern als Instrument nicht etablieren.
 
+Im folgenden möchte ich kurz die einzelnen Funktionsgruppen eines Synthesizers, wie es auch unser SID ist, beschreiben.
 
+Töne und Melodien entstehen in Tongeneratoren. Unser SID stellt uns drei unabhängig voneinander funktionierende Tongeneratoren zur Verfügung. Jeder produziert drei verschiedene Kurvenformen, nämlich Dreieck, Sägezahn und Rechteck. Überdies erzeugt jeder noch weißes Rauschen, ein Gemisch sämtlicher Frequenzen, die von einem Zufallsgenerator erzeugt werden.
 
+## Töne entstehen in Oszillatoren
 
+Wir haben gehört, daß sich unsere Basis-Kurvenformen durch ihren unterschiedlichen Gehalt an Obertönen und somit durch ihren Klang prinzipiell unterscheiden. Nach einigem Üben mit dem SID wissen wir bald, welche Kurvenform sich für einen bestimmten Klang anbietet.
 
+Verschiedene Kurvenformen, schön und gut, aber wozu drei Tongeneratoren? Ganz einfach. Musik besteht nicht nur aus Solo-Melodien. Mit einem Tongenerator alleine könnten wir kaum Musik produzieren. Drei Tongeneratoren lassen uns jedoch schon ein ganzes Kammer-musik-Trio realisieren. Das heißt, wollen wir drei verschiedene Töne gleichzeitig erzeugen, also dreistimmig polyphon spielen, muß für jeden Ton ein eigener Tongenerator vorhanden sein.
 
+## Der Rauschgenerator — kein Sturm ist ihm heilig
 
+Mit dem Rausch-Generator (Noise-Generator) ist es möglich, Effekte wie Wind und Brandung zu erzeugen, den Klang einer Pauke oder eines Beckens, den Anblaswind von Orgelpfeifen, Holzblasinstrumenten und schließlich Gewehrschüsse in allen Variationen nachzuahmen.
 
+Ein Ton macht nun aber noch lange keine Musik. Viele Töne unterschiedlicher Tonhöhe sind hierzu nötig. Deshalb muß die Tonhöhe der Oszillatoren steuerbar sein. Wie wir schon wissen, erfand Moog das Prinzip der Spannungssteuerung. Sämtliche Module seines Synthesizers konnten von analogen Steuerspannungen geregelt werden. Man nannte deshalb die Module auch »voltage controlled modules« (spannungsgesteuerte Module).
 
+Computer hantieren nur ungern mit analogen Spannungen. Auch die Tongeneratoren unseres SIDs werden deshalb nicht von Analogspannungen, sondern mittels digitalen Informationen gesteuert. Wir nennen diese Oszillatoren deshalb auch nicht VCOs (voltage controlled oscillators), wie dies Moog machte, sondern besser DCOs (digital controlled oscillators).
 
+Musiker wollen mit ihrem Instrument spielen. Es soll Töne produzieren. Wie teilen wir unseren Tongeneratoren mit, welche Töne sie spielen sollen? Routinierte Klavierspieler möchten ihre Ideen am liebsten über eine Klaviatur einspielen. Leider verfügt der Commodore 64 über keine richtige. So bleibt nichts anderes, als die Alpha-Tastatur in ein Keyboard zu verwandeln. Hierzu ordnet man jeder QWERTYTaste eine Tonfrequenz zu. Drückt man die Taste, erklingt der Ton. Das Spielen auf einer Schreibmaschinentastatur bereitet jedoch wenig Freude, zumindest muß man sich erst daran gewöhnen.
 
+Kürzlich erschienen jedoch zwei Klaviaturen auf dem Markt, die mit richtigen Klaviertasten ausgerüstet, an den Commodore 64 angeschlossen werden können. Ihre Anschaffung lohnt sich sicher für den, der mit dem Commodore ausschließlich Musik machen will und eine Klaviertastatur gewöhnt ist.
 
+Viele beherrschen das Klavierspiel jedoch nicht. Sie können trotzdem Musik mit dem Commodore 64 komponieren. Die Kompositionen werden nun nicht »Live« eingespielt, sondern Ton für Ton über die Alpha-Tastatur eingetippt. Es spielt dabei keine Rolle, in welcher Geschwindigkeit die Eingabe erfolgt. Man kann sich also viel Zeit lassen und Eingabefehler nachträglich ausbessern. Die einzelnen Töne werden hierbei mittels mehreren Eingaben für Tonhöhe, Tondauer und Lautstärke bestimmt. Das Verfahren ist relativ langwierig. Hat man alles eingegeben, spielt der Commodore den Song in der gewünschten Geschwindigkeit ab.
 
+Bei den meisten ordentlichen Musikprogrammen kann der Computer die eingespielten oder eingetippten Songs speichern und auf Befehl wieder ausgeben. Die Länge der Kompositionen kann hierbei meist einige tausend Töne betragen. Ein Moog-Synthesizer von einst konnte sich nur 16 Töne merken und diese zyklisch immer wieder abspielen. Man nannte Geräte, die dies ermöglichten, Sequenzer. Heute benutzt man diesen Begriff meist allgemein für Tonspeichersysteme.
 
+Wir sagten schon, daß sich jeder Klangeindruck durch die drei Größen Tonhöhe, Klangfarbe und Lautstärke beschreiben läßt. Wir wissen nun, daß die Töne in den Oszillatoren entstehen und die Tonhöhe durch digitale Steuerung dieser Oszillatoren entsteht. Außerdem können wir durch Auswahl der Kurvenformen bereits unterschiedliche Klangfarben erhalten. Wie können wir nun die Lautstärke bestimmen?
 
+## Der ADSR steuert den Lautstärkeverlauf der Klänge
 
+Der Klang eines Klaviers weist ein ähnliches Frequenzspektrum wie der einer Geige auf. Trotzdem unterscheiden sich die beiden Klänge voneinander gravierend. Eine wesentliche Ursache hierfür ist der unterschiedliche zeitliche Verlauf der Lautstärken. Schlägt man eine Klaviersaite an, setzt der Ton schlagartig ein und schwillt dann relativ rasch wieder ab. Im Gegensatz dazu schwillt der Geigenklang langsam an und behält, solange der Bogen gestrichen wird, eine konstante Lautstärke bei. Erst wenn der Bogen nicht mehr über die Saite streicht, klingt der Ton langsam ab. Klavier und Geige unterscheiden sich also im zeitlichen Verlauf der Lautstärke in der sogenannten »Hüllkurve«.
 
+Jedes Instrument, jedes Geräusch zeichnet sich vor allem durch einen ganz spezifischen Lautstärkenverlauf aus. Hier spielen sich sehr komplexe Vorgänge ab, und nicht zuletzt bestimmt die Möglichkeit, solche komplexe Hüllkurven nachzubilden, die Qualität eines Synthesizers. Moog reduzierte bei der Entwicklung seines Synthesizers den Verlauf der Hüllkurve auf die Nachbildung der für das menschliche Klangempfinden wichtigsten vier Phasen: Attack, Decay, Sustain und Release (ADSR). Zu Deutsch: Anstieg, Abfall, Aushalten und Freigabe des Lautstärkeverlaufes. Der sogenannte ADSR- oder Hüllkurvengenerator liefert nun eine dem gewünschten Hüllkurvenverlauf entsprechende Steuerinformation. In unserem SID handelt es sich hierbei wieder um Digitalinformationen, die direkt die Lautstärke der drei Tongeneratoren beeinfllussen. In Analogsynthesizern benutzt man auch in diesem Fall Steuerspannungen. Unser SID stellt drei ADSRs zur Verfügung. Jede Stimme kann folglich einen eigenen Hüllkurvenverlauf erhalten. In Bild 3 sehen wir links eine typische ADSR-Kurve. Auf der x-Achse ist die Zeit, auf der y-Achse die Amplitude (Lautstärke) des Klanges abgetragen. Sofort nach dem Anschlag einer Taste würde die Lautstärke des Tons zunächst langsam bis zum Maximum ansteigen (Attack) und dann auf einem bestimmten Sustainpegel einige Zeit verweilen (Sustain). Läßt man die Taste los, verklingt er in der Abklingphase (Release), bis man nichts mehr hört. Natürliche Attack-Werte liegen, je nach Klang, im Bereich von einigen Millisekunden bis zu einigen Sekunden. Kurze Attack-Werte besitzen alle percussiven Instrumente wie Pauke, Schuß, auch Saiten-Instrumente wie Gitarre und Klavier gehören hierzu. Längere Attack-Zeiten finden wir zum Beispiel bei Blasinstrumenten. Es dauert, bis die Atemluft des Trompeters das Instrument zum Klingen bringt. Streichinstrumente weisen noch längere Attack-Werte auf. Sehr lange Attack-Zeiten, im Bereich vieler Sekunden, benötigt man zum Beispiel, um Wind oder Brandungsgeräusche nachzuahmen. Hat der Ton dann den maximalen Attack-Pegel mehr oder weniger schnell erreicht, können wir ihn in der ebenfalls regelbaren Decay-Phase bis auf einen gewissen Pegel abfallen lassen, den Sustain-Pegel.
 
+Wie lange der Ton den Sustain-Pegel beibehält, bestimmt das Gate-Signal. Solange unser Gate gleich 1 ist, bleibt der Ton auf dem durch den eingestellten Sustain-Pegel bestimmten Lautstärkeniveau. Wird das Gate-Signal gleich 0, geht der Ton in die letzte der vier Phasen, die Release-Phase über.
 
+Die Release-Phase bestimmt, in welcher Zeit unser Ton vom Sustain-Pegel auf die Lautstärke Null abfällt. Sobald unser Gate gleich 0 wird, beginnt die Release-Phase. Natürliche Instrumente besitzen nur kurze Release-Phasen. Man denke zum Beispiel an ein Klavier. Läßt man die Tasten nach dem Anschlag wieder los, verklingt der Ton relativ schnell. Die Zeit des Tastendrucks entspricht der Zeit, die wir unser Gate-Signal auf dem Wert 1 halten, also eingeschaltet haben müssen. Manche Klänge durchlaufen nicht alle vier Phasen der Hüllkurve. Denken wir zum Beispiel an die Orgel. Der Orgelton erklingt fast augenblicklich nach dem Anschlagen einer Taste und verlischt ebenso schnell wieder. Der elektronisch erzeugte Klang benötigt im Vergleich zu einem natürlichen Instrument keine Zeit, um sich aufzubauen, und es schwingt auch kein Resonanzkörper nach. Um das zu realisieren, müßten wir Attack, Decay und Release gleich Null setzen, den Sustain-Pegel auf Maximum einstellen. Percussionsinstrumente wiederum verfügen nur über Attack und Decay. Trifft der Schlegel die Pauke, baut sich der Ton fast sofort auf. Genau so schnell klingt er jedoch wieder ab. Man kann ihn nicht durch längeres Drücken auf das Fell in eine Sustain-Phase zwingen. Ein Beispiel für so eine percussive Hüllkurve sehen wir rechts in Bild 3.
 
+## Unser SID-Chip wird digital gesteuert
 
+Durch Auswahl verschiedener Grundschwingungsformen können wir unsere Klänge schon in bestimmte Richtungen lenken. Wir können diese Grundklänge jedoch noch weiter verändern.
 
+Jede Stereo-Anlage verfügt über einen Klangregler. Wie jeder weiß, kann man mit diesem die Musik hell oder dumpf klingen lassen. Elektronisch wird dies mit einem Filter realisiert. Solche Filter kann man mit Kaffee-Filtern vergleichen. Diese halten Kaffekörnchen bestimmter Größe zurück. Ab einer bestimmten Größe können sie nicht mehr durch die Filterporen schlüpfen. Unsere Elektronik-Filter tun auch nichts anderes. Nur daß sie nicht Kaffeepartikel bestimmter Größe aufhalten, sondern harmonische Oberschwingungen bestimmter Frequenz. Wie wir bereits wissen, verändert dies unseren Gesamtklang unter Umständen beträchtlich. Nimmt man zum Beispiel alle Oberschwingungen höherer Frequenz weg, wird der Klang immer dumpfer. Nimmt man alle tieffrequenten Oberschwingungen weg, klingt der Ton heller. Auf diese Weise können wir also unsere Grundwellenformen nochmals entscheidend im Klang verändern.
 
+## Filter bestimmen, ob unser Ton hell oder dumpf klingt
 
+Unser SID stellt zunächst drei verschiedene Grundfiltertypen zur Verfügung. Der Hochpaßfilter läßt alle hochfrequenten Oberschwingung passieren. Die Tiefen schneidet er ab. Leitet man einen Klang hindurch, klingt er am Schluß heller als zuvor. Der Tiefpaßfilter stellt das Gegenteil unseres Hochpasses dar. Er beschneidet die hohen Klanganteile, läßt tiefe ungehindert passieren. Die Klänge klingen dann dumpfer als vorher. Der dritte Filtertyp ist der Bandpaßfilter. Er läßt ein bestimmtes Frequenzband passieren, schneidet alle darüber- und darunterliegenden Frequenzanteile ab. Die Klänge werden dadurch flach.
 
+Bei allen drei Filtertypen kann man die jeweilige Filterfrequenz bei der sie wirken sollen, genau einstellen.
 
+Neben diesen drei Hauptfiltertypen, kann unser SID durch Mischung dieser drei, noch weitere Mischfiltertypen erzeugen.
 
+Neben der Filterfrequenz existiert noch eine weitere wichtige klangbestimmende Größe, die Filterresonanz. Eine Gitarre klingt völlig anders als eine Geige, auch wenn man bei beiden die selben Töne spielt. Dies rührt von der unterschiedlichen mechanischen Bauweise der Resonanzkörper der beiden Instrumente her. Eine Elektrogitarre ohne solchen klingt ohne angeschlossenen Verstärker fast gar nicht. Der Resonanzkörper ist für den Klang verantwortlich. Er dient bei unseren Instrumenten gewissermaßen als Klangverstärker. Die Bauweise entscheidet hierbei, welche Frequenzen besonders verstärkt werden, welche weniger. Dieses Phänomen nennt man Resonanz.
+
+Bei unserem elektronischen Filter kann natürlich kein Gehäuse mitschwingen. Die Resonanz wird elektronisch erzeugt. Welche Frequenzen dabei besonders angehoben werden sollen und welche nicht, können wir mit der sogenannten Filterresonanz einstellen. Auf diese Weise läßt sich das Resonanzverhalten natürlicher Instrumente simulieren.
+
+Unser Sound-Chip besitzt nur einen Filter. Durch diesen müssen alle drei Tonoszillatoren geleitet werden. Sie lassen sich folglich nicht unabhängig voneinander mit diversen Filtereinstellungen versehen. Wir können aber für jeden Oszillator bestimmen, ob er den Filter durchlaufen soll oder nicht. Wir können die Oszillatoren, also auch um den Filter herum, direkt in den Verstärker leiten.
+
+Ein weites Feld an Klangeffekten eröffnen Ringmodulation und Synchronisation von Oszillatoren. Ich möchte hier weniger auf die theoretischen Grundlagen dieser beiden Effekte eingehen. Nur so viel sei gesagt, in beiden Fällen wird ein Oszillatorsignal mit einem zweiten, von einem anderen Oszillator, moduliert.
+
+Bei der Ringmodulation multipliziert man die Frequenzen der beteiligten Oszillatoren miteinander. Es entsteht dann eine neue Frequenz, die viele nicht harmonische Obertöne enthält. Im SID werden natürlich keine Frequenzen sondern digitale Zahlenwerte multipliziert. Auf diese Weise kann man vor allem metallische oder glockenähnliche Klänge synthetisieren.
+
+Synchronisiert ein Oszillator einen anderen, so zwingt er diesen dazu, seine Kurvennulldurchgänge den eigenen anzupassen. Vor allem, wenn beide Oszillatoren unterschiedliche Frequenz aufweisen, ergeben sich hier interessante Klangeffekte.
+
+So, dies war nun die graue Theorie, zumindest die erste Lektion auf dem steinigen Weg, dem SID-Chip Töne, Klänge und Musik zu entlocken. In einer weiteren Lektion werden wir lernen, mit welchen Befehlen wir die Parameter der Oszillatoren, Hüllkurvengeneratoren, des Filters und des Ringmodulators unseres SID-Chips ansprechen können.
+
+(Richard Aicher/aa)
+
+# »Der Sumpf«
+
+> Unser Beitrag über die Raubkopierer-Szene in der 64’er 6/84 hat weite Wellen geschlagen. Nachstehend bringen wir einen in mehrfacher Hinsicht bemerkenswerten Leserbrief zu diesem Thema — und unsere Antwort darauf.
+
+Als Vorwegnahme meiner Meinung zu Ihrem Artikel »Der Sumpf« muß ich Ihnen sagen, daß ich selbst Raubkopierer bin. Ich bin 15 Jahre und mir voll und ganz bewußt, daß mein Tun illegal ist. Jedoch läßt sich von dieser »kleinen« Taschengeldaufbesserung (zirka 100 Mark pro Monat) ganz gut leben. Ich möchte aber Ihre These, »die Raubkopierer sind für die hohen Softwarepreise verantwortlich« widerlegen. Denn was war eher, die Software oder die Raubkopie? Es ist doch logisch, daß man ohne die teure Software, die urheberrechtlich geschützt ist, keine Raubkopie machen kann. Ich stimme Ihnen voll und ganz zu, daß es (auf gut deutsch gesagt) eine Schweinerei ist, daß Kinder genau dieselbe Strafe bekommen wie Profihacker. Ich will Ihnen für die wirklich gute Idee der billigen Kleinanzeigen keine Vorwürfe machen, sie ist nur ein weiterer guter Bestandteil Ihres sonst hervorragenden Heftes, aber meinen Sie nicht, daß Sie damit Raubkopierer etwas animieren? Meinen Brief unterzeichne ich mit
+
+H. Acker
+
+Es ist richtig, wenn Sie meinen, nicht die Raubkopierer allein wären für die-hohen Software-Preise verantwortlich zu machen. Dazu kommt natürlich auch der oft enorme Entwicklungsaufwand, der in so einem Programm steckt. Nicht zuletzt wollen auch der Hersteller, die Distributoren und Händler einen kleinen Gewinn nach Hause tragen.
+
+Es ist traurig aber wahr, daß die kleinen (sprich jungen) Raubkopierer mit demselben Strafmaß zu rechnen haben wie die großen. Die Firmen gehen in dieser Hinsicht aber nach dem Grundsatz: »Wehret den Anfängen« vor. Ein amerikanischer Datenschützer sprach einmal von der »fehlenden Moral« im Bereich der Software. Es ist in der Tat unter den Jugendlichen ein schwereres Vergehen, jemandem die Cola wegzutrinken, als einem relativ anonymen Entwickler das geistige Eigentum in Form eines Spiels oder Anwenderprogramms zu klauen. Sicher, die Materie, das Programm ist etwas reell nicht Greifbares; außer auf der Diskette (und das sollte man ja tunlichst vermeiden).
+
+Die von Ihnen angesprochenen Kleinanzeigen in unserer Zeitschrift sind da nur ein Spiegel der Gesellschaft. Geplant waren sie, um dem Leser eine billige Möglichkeit zu bieten, Kontakte zu knüpfen, Erfahrungen auszutauschen, nicht mehr benötigte Hard- und Software zu verkaufen und vieles andere mehr. Nicht beabsichtigt war natürlich, den Raubkopierern ein preisgünstiges Forum für ihre illegalen Geschäftspraktiken zu sein. Wir sind um Abhilfe bemüht, aber wie läßt sich eine Anzeige über 100 selbstgeschriebene Programme von 100 raubkopierten unterscheiden, wenn dies nicht im Text erscheint. Außerdem gibt es in einigen Bereichen, wie zum Beispiel dem Lehrberuf, sogenannte »Public Domain Software«, die der Öffentlichkeit zugänglich gemacht wird.
+
+Es ist nicht unsere Aufgabe und entspricht auch nicht unserem Selbstverständnis, der Vorreiter für die Industrie zu sein. Doch es ist unser Bestreben, ein in allen Belangen »sauberes« Magazin für den Computer-Fan zu machen. Dazu gehört es auch, rechtzeitig zu warnen, Mißstände aufzuzeigen und Hilfestellung zu leisten. Und diese Art der Taschengeldaufbesserung ist nicht in Ordnung. Die jungen Schüler und Studenten, denen es gelingt, den Software-Schutz fremder Programme zu knacken, eigene Kommentare und Veränderungen im Programm anzubringen, die verstehen doch etwas vom Programmieren. Diese Energien und dieses Know-how ließe sich doch wesentlich sinnvoller für die Entwicklung eigener, guter Programme einsetzen. Es gibt genug Programme auf dem Markt, die es nicht einmal wert sind, kopiert zu werden. Dagegen sollte man mit seinem ganzen Können angehen. Gerade in Deutschland sind wir in der Computertechnologie und der Softwareerstellung noch um Jahre hinter den USA, Großbritannien oder Japan. Es ist an der Zeit, denen zu zeigen, wo der Bartel den Most holt. Gute Software erstellen, zu einem fairen Preis, da liegt Eure Chance.
+
+(aa)
+
+# Fehlersuche in Basicprogrammen - 2. Teil
+
+> Immer wieder erreichen uns Anrufe von Lesern, die (besorgt) anfragen, ob in diesem oder jenem Listing Fehler bekannt sind. Meistens handelt es sich jedoch um Eintipp-Fehler, vom Leser selbst verursacht. Und meistens liegen die tückischen Fehler innerhalb von DATA-Zeilen. Was tun?
+
+Wie schon in der vorletzten Ausgabe des 64'er-Magazins angedeutet wurde, sind Eintipp-Fehler in DATA-Zeilen besonders tückisch. Und das hauptsächlich aus zwei Gründen. Erstens zeigt eine eventuelle Fehlermeldung nie auf den wirklichen Fehler, sondern in der Regel auf die Einlese- (READ-) Schleife dieser Daten. Zweitens, und das ist noch viel unangenehmer, kann es vorkommen, daß es gar keine Fehlermeldung gibt, sondern der Computer einfach aussteigt und »abstürzt«. Hoffentlich haben Sie das mühsam eingegebene Programm vor dem ersten RUN abgespeichert!
+
+Gerade Anfänger haben jetzt Schwierigkeiten. Und deshalb möchte ich mich hauptsächlich an diese wenden.
+
+Als erstes möchte ich Ihnen empfehlen, noch einmal das »Handbuch« des VC 20/C 64 in die Hände zu nehmen. Lesen Sie noch einmal durch, was dort über den READ/DATA-Be-fehl geschrieben steht. Auch ich bin diesem ominösen READ-Befehl anfangs möglichst aus dem Weg gegangen und stehe ihm jetzt noch manchmal mit Mißtrauen gegenüber. Und das liegt an den oben genannten zwei Punkten.
+
+Oft sind nämlich diese DATA-Werte nichts anderes als codierte Maschinensprache. Und dann kann sogar eine einzige falsch abgetippte Ziffer zum absoluten Kollaps führen. Aber wenn es sich um Maschinensprache handelt, haben alle DATA-Werte einige gemeinsame Merkmale: Erstens sind sie nicht negativ, zweitens sind sie niemals größer als 256 und drittens sind es immer ganze Zahlen. Diese Merkmale können wir benutzen um eine kleine Prüfroutine zu entwickeln, die einen, aufgrund eines Eingabefehlers, falschen DATA-Wert sofort sichtbar macht, wenn er gegen diese Merkmale verstoßen sollte.
+
+Dieses folgende kleine Programm sollten Sie vor oder hinter das zu überprüfende Programm schreiben. Nach abgeschlossener Prüfung kann es ruhig wieder gelöscht werden. Hier das Programm:
+50000 READ A$; PRINT "ZEILE "PEEK(64)*256 + PEEK(63);A$
+50010 POKE198,0: WAIT 198,1:GOTO 50000
+
+Starten Sie das Programm in diesem Fall mit RUN 50000. Sie werden jetzt den ersten DATA-Wert am Bildschirm sehen, davor die Zeilennummer, in der dieser Wert steht. Wenn Sie dann eine Taste drücken , zum Beispiel die große Leertaste, wird der nächste Wert sichtbar, direkt darunter. Bei fortwährendem Drücken der Leertaste, rasen die Zahlen sehr schnell über den Bildschirm. Für den ersten Durchlauf sollten Sie das ruhig machen. Man sieht dann sofort, ob eine Zahl (unzulässiger Weise?) länger als drei Ziffern ist. Falls dies der Fall ist, können Sie sehr schnell im Originallisting nachschauen, ob der Wert in Ordnung ist. Falls der Fehler so jedoch nicht erkannt werden kann, bleibt nichts anderes übrig, als das Programm noch einmal zu starten und diesmal jeden einzelnen Wert mit dem Original zu vergleichen. Machen Sie sich aber keine Sorgen über die Fehlermeldung »OUT OF DATA ERROR» die unweigerlich am Ende auftaucht. Sie zeigt hier lediglich, daß alle DATAs angezeigt wurden.
+
+Apropos Fehlermeldung. »OUT OF DATA ERROR« oder »ILLEGAL QUANTITY ERROR«. Wenn nach dem Starten des Hauptprogramms eine dieser Fehlermeldungen kommt, können Sie fast todsicher davon ausgehen, daß ein DATA-Wert falsch eingetippt wurde. Das »fast« nur deswegen, weil Sie eventuell die FOR-NEXT-Schleife, in der ein READ-Befehl steht, falsch eingegeben haben. Die Bedeutung dieser Fehlermeldungen sind im schon erwähnten Handbuch erklärt.
+
+Ich hoffe, daß Sie mit dieser kleinen Routine in Zukunft schneller diese lästigen Fehler finden. Um Ihnen aber die Fehlersuche noch etwas weiter zu erleichtern, habe ich ein weiteres Programm geschrieben. Wir werden in den kommenden Heften bei Programmen mit vielen DATA-Werten eine spezielle Prüfsummenliste mit abdrucken, die es gestattet, alle DATA-Werte blockweise zu überprüfen. Dazu müßen Sie dann jedesmal das hier abgedruckte Programm (siehe Listing) an das zu testende Programm anhängen (entweder mit MERGE oder durch Abtippen) und laufen lassen. Damit kann ein Tippfehler auf wenige DATAs eingegrenzt werden. Wenn Sie das nebenstehende Programm laufen lassen, sollten Sie am Bildschirm die gleichen Werte erhalten wie die dann abgedruckte Prüfsummenliste. Eine Abweichung kann auf einen Eingabefehler hinweisen (muß aber nicht). Die vier Spalten der Prüfsummenliste haben folgende Bedeutung:
+
+Ganz links steht unter ZEILE die Zeilennummer des letzten DATA-Wertes des jeweiligen Blocks, daneben die Anzahl der bisher gelesenen DATAs, rechts davon die Summe aller bisher gelesenen Werte und ganz rechts eine mögliche Fehlerquelle, das heißt, hier wird ein Wert angezeigt, wenn er größer als 256 ist oder einer gebrochenen Zahl, aber auch, wenn er keine Zahl ist und Buchstaben enthält.
+
+Die als Beispiel abgedruckte Prüfsummenliste sieht so aus, wenn Sie den DATA-Tester an das in diesem Heft veröffentlichte Mailbox-Programm angehängt haben. Es wurden hier jeweils 30 DATAs gelesen und deren Prüfsumme errechnet. Man sieht auch, daß sich zum Beispiel in Zeile 10030 (die erste Zahl in der Prüfsummenliste) ein Leerstring befindet. An dieser Stelle werden Sie im Mailbox-Programm zwei Kommata finden. Das gleiche gilt für die Zeilen 10040,10100,10150,10170 und 10220. Insgesamt werden 282 DATAs gelesen. Die Gesamtsumme beträgt 32970. Die Spalte unter »TEXT« bleibt leer, weil in den DATAs weder Text noch negative Zahlen vorkommen.
+
+Ich hoffe, daß Sie mit diesen Mitteln mögliche Eingabefehler schneller finden und somit nicht vorschnell Frust aufkommt. Aber einen Fehler werden Sie oft vergebens suchen: Das ist der, den unser Fehlerteufel hinzaubert. Aber dem werden wir in der Redaktion schon das Leben schwer machen (umgekehrt allerdings genauso).
+
+(gk)
+
+# Spring Vogel, Spring
+
+> Kennen Sie Jumpman, Miner 2049 oder Mister Robot and his Factory? Dann haben Sie sich sicherlich geärgert, daß Sie nie die letzten Bilder erreicht haben. Oder Sie haben sich über die eintönigen Spielszenen geärgert. Mit dem Listing des Monats wäre das nicht passiert. Spring-Vogel ist eine Kombination aus den drei Spielen. Eines kann jedoch nicht mehr passieren! Wird eines der Bilder langweilig, dann machen Sie sich einfach ein neues.
+
+Tatsächlich kann man Spring-Vogel fast als Spielgenerator bezeichnen. Mit Spring-Vogel gelingt es Ihnen, sich jedes beliebige Spielfeld aufzubauen. Das klingt sehr vielversprechend, und das ist es auch. Spring-Vogel ist ein Vertreter derJump and Run-Kategorie. Damit lassen sich also keine Schieß- oder Abenteuerspiele erzeugen, aber innerhalb der Spring- und Laufgruppe bleibt kein Wunsch offen. Worum handelt es sich bei Spring-Vogel nun eigentlich? Zunächst die Story.
+
+Ein heftiger Sturm hat einen Vogel – unseren Helden – mitsamt seinen Eiern aus dem Nest geweht. Durch den harten Aufprall auf die Erde hat er sich seine Flügel gebrochen. Er kann also nicht mehr richtig fliegen, sondern nur noch auf dem Boden laufen, hüpfen und springen. Die Aufgaben des Vogels (die genaue Klassifizierung bleibt Ihnen überlassen) besteht nun darin, in einem Labyrinth aus Aufzügen, Transportbändern, Seilen, Einbahnstraßen, Trampolinen, Rutschbahnen, Gummiwänden, magischen Flügeln, gemeinen Vogelfallen und mißgestimmten Monstern alle Eier wieder einzusammeln. Gelingt es dem Vogel, die Eier in einer Spielszene aufzunehmen, muß er mit der nächsten Überraschung fertig werden; es waren nicht alle. Das nächste vom Winde verwehte Bild erwartet ihn mit weiteren schwierigen Aufgaben.
+
+Die Anzahl der Torturen für unseren leidgeprüften Helden bestimmen Sie selbst. Doch Vorsicht, unser Vogel verfügt nicht wie eine Katze über sieben, sondern »nur« über sechs Leben. Und diese sechs Leben sind schnell, durch Kontakt mit den Monstern oder Verzehrern einer roten Tollkirsche, ausgehaucht.
+
+Der Sturz über mehr als vier Etagen ist ebenfalls für den flugunfähigen Vogel lebensbedrohend. Es sei denn, er findet die von seinem Tierschützer verstreuten »magischen Flügel«. Ausgestattet mit deren zauberhaften Fähigkeiten kann er in einem ökologischen Flecken beliebig umherfliegen. Durch Betätigen des Feuerknopfes wird er wieder in seinen behinderten Zustand zurückversetzt, erlangte allerdings vorher die Fähigkeit an unzugänglichen Stellen landen zu können. Diese magischen Flügel gestatten es, Bilder so aufzubauen, daß nur der taktisch gezielte Einsatz dieser Flughilfe es ermöglicht, ein Bild vollständig abzuräumen. Dabei kann es vorkommen, daß sich der Vogel in eine völlig aussichtslose Situation manövriert, und in einer Sackgasse landet. Auch hier bietet das Programm einen Ausweg an, die Funktionstasten. Diese können jederzeit (außer während der Flugphase) benutzt werden.
+
+Die genaue Bedeutung können Sie der Beschreibung zum Listing entnehmen. Um zu sehen, welcher Vogel von welchem Spieler der bessere ist, gibt es auch hier eine Punktezählung. Bei den bereits mitgelieferten Bildern ist diese in Zehnerschritten ab dem ersten Bild gestaffelt.
+Entscheidungskriterien
+
+Weshalb wurde dieses Programm zum Listing des Monats auserkoren? Das Hauptkriterium war die Realisierung eines Spielegenerators. Mit dem Editiermodus von Spring-Vogel lassen sich nahezu beliebig viele Bilder konstruieren. Wird ein Bild langweilig, so kann man ohne großen Aufwand ein neues mit noch größeren Schwierigkeiten entwickeln (versuchen Sie aber erst einmal, die beiden bereits existierenden Bilder 5 und 6 zu bewältigen). Der Phantasie sind keine Grenzen gesetzt.
+
+## Warum alleine spielen?
+
+Vorstellbar ist ein Wettbewerb unter Freunden, wer das lustigste, das interessanteste, das schwierigste oder das raffinierteste Bild entwirft. Der Programmieraufwand hält sich für ein solch komplexes Programm in relativ bescheidenen Grenzen. Die vorgegebenen Bausteine bieten eine derartige Vielfalt an verschiedenen Bildern, daß jeder nach seinem eigenen Geschmack entwerfen kann. Insgesamt ein Programm, das durch Witz und Programmierkunst überzeugt.
+
+(aa/Matthias Törk)
+
+## Der Gewinner
+
+> Sein Ärger brachte Matthias Törk 2000 Mark ein.
+
+Ich bin am 18.4.1955 geboren und studiere derzeit Germanistik, Philosophie und Informatik. Mein erster Computer war ein VC 20, der dann Anfang 1983 durch einen C 64 ersetzt wurde.
+
+Für die Entwicklung des Programms »Spring-Vogel« ist neben der verlockenden Aussicht auf 2000 Mark vor allem der Ärger über Spiele wie »Jumpman Jnr.« oder »Miner 2049er« verantwortlich, bei denen ich die letzten Bilder nie zu sehen bekam. Nach kleinen Änderungen an diesen Programmen, die die Helden mit Unsterblichkeit versorgten, war zwar das Ende einfach zu erreichen, aber leider wurden die Spiele dadurch auch schnell langweilig. Deshalb wollte ich ein ähnliches Spielprogramm entwickeln, daß diese Nachteile vermeidet.
+
+Zunächst sollte es möglich sein, jedes einzelne Bild extra anzuwählen und vor allem sollten sich einfach neue Bilder erstellen lassen sobald die alten langweilig werden. Durch konsequente Parametrisierung und eine Spielroutine, die in der Art eines Interpreters die Bilder und Tabellen abarbeitet, entwickelte sich aus dieser Idee schließlich ein regelrechter »Generator« für solche »Jump an Run«-Spiele. Das Ergebnis liegt nun nach rund einem Monat Entwicklungszeit in Form von »Spring-Vogel« vor, einem Programm, mit dem Sie sicher viel Spaß haben werden.
+
+(Matthias Törk)
+
+# Die Musik macht der C 64
+
+> Wie musikalisch der C 64 sein kann, ist den meisten bekannt, wie man die Musik macht, aber den wenigsten. Dieses Programm, als Anwendung des Monats, zeigt die Fähigkeiten Ihres Computers.
+
+Elf verschiedene Instrumente sind in diesem Programm schon verwirklicht. Sie können zwischen Piano, Röhrengong, Metallophon, Xylophon, Glocke, Glasorgel, Violine, Flöte, Panflöte, Klarinette und Harfe auswählen. Das Programm läßt sich jedoch noch erweitern. Ihrer Phantasie sind keine Grenzen gesetzt.
+
+Empfehlenswert ist ein Verstärker oder eine Stereoanlage. Das Programmlisting ist weitgehend selbstdokumentierend, daher nur einige Hinweise zur Bedienung:
+
+Oben rechts wird eine Klaviatur dargestellt, die der augenblicklichen Tastenbelegung entspricht. Gespielt wird durch Drücken der jeweiligen Taste.
+
+Die Instrumente werden durch geshiftete Buchstaben gewählt.
+<b>Besondere Funktionen:</b>
+- Halleffekt:
+Alle drei Tongeneratoren werden abwechselnd benutzt, so daß immer zwei Töne nachklingen. Symbol: <<<0>>> ganz unten.
+— Oktavenwahl:
+Oktaven wählbar von Sub-contraoktave (SCO) bis dreigestrichene Oktave (O'''). Die Subcontraoktave ist nur durch Einzeltonverschiebung zu erreichen. Das Pfundzeichen setzt Instrumente in die Grundoktave zurück und die Einzeltonverschiebung 0. Symbol: unter der Klaviatur.
+— Einzeltonverschiebung:
+Die Tastaturbelegung kann in Einzeltonschritten über den gesamten Tonbereich verschoben werden. Symbol: Klaviatur
+- Akkorde:
+Zweiklang, wählbar bis None. Apostroph setzt Akkorde auf 0. Symbol: >?< links neben Halleffekt.
+— Lautstärke:
+wählbar von 0 bis 15.
+Symbol: 0000000000...unten.
+
+Von der Bildschirmaufteilung her kann noch ein Instrument zusätzlich entworfen werden. Dazu muß man die Variable IZ in 150 gleich 11 setzen. Nun kann man ab Zeile 620 das neue Instrument entwerfen.
+<b>Format:</b>
+Name, Wellenform, Anschlag-Abschwellen, Halten-Ausklingen. Tastverhältnis low, Tastverhältnis high, Hall (3 = ja, 1 = nein), Grundoktave Contraoktave = 0), Bild (10 x 7).
+
+Soll mehr als ein neues Instrument entworfen werden, muß man die Bildschirmgestaltung ändern.
+
+(Christian Gebauer/rg)
+
+## Der Orgelbauer
+
+>> Wohlklngende Münze erhiett Christian Gebauer fiir sein Musikprogramm. Der Autor steBt sich selbst kurz vor.
+
+Ich wurde am 21. Oktober 1965 in Bad Nauheim geboren. Nach der Grundschule besuchte ich das Ernst-Ludwig-Gymnasium, an dem ich gerade die 12. Klasse absolviert habe und mich auf das Abitur vorbereite.
+
+Meine Kombination der Leistungskurse ist Chemie und Mathematik, beides Fächer, die mich sehr interessieren. In diesemJahr belegte ich einen EDV-Kurs, der von der Schule angeboten wurde.
+
+### So fing es an
+
+Zur Computerei bin ich durch einen Bekannten gekommen, der mir im Herbst 1982 für mehrere Wochen einen Computer geliehen hat und mich in Basic einweihte. Meine Kenntnisse dieser Sprache vertiefte ich dann im Selbststudium.
+
+Im darauffolgenden Frühjahr kauften mir meine Eltern einen Commodore 64 mit Floppy 1541, ein halbes Jahr später kam dann noch ein Seikosha-Drucker GP-100VC hinzu.
+
+Das Programm »Orgel« begann ich im Sommer 1983 zu schreiben, um die hervorragenden Toneigenschaften des Gerätes auszunutzen. Diese Version ist das Ergebnis eines halben Jahres Erweiterungs- und Verbesserungsarbeit.
+
+(Christian Gebauer)
+
+# Schiebung
+
+>Dieses kleine Strategiespiel auf dem VC 20 ist die Computerversion eines bekannten »Zeitvertreibers«.
+
+Nach dem Eintippen und Starten des Schiebespiels erscheint ein Feld mit 24 Buchstaben von A bis X und ein Feld mit einem »—«. Es kann nun immer ein Buchstabe eingegeben werden, der neben, über oder unter diesem Feld steht. Anschließend ertönt ein kurzer Piepston und der Buchstabe wandert in das »Leerfeld«, wobei an der Stelle, an der zuvor der Buchstabe war, ein neues Leerfeld entsteht (Buchstabe und »—« wechseln also den Platz). Wird ein Buchstabe eingegeben, der nicht Nachbar des mit »—« bezeichneten Feldes ist, so wird die Eingabe ignoriert.
+
+Dieser Schiebevorgang muß so oft und geschickt wiederholt werden, bis die Buchstaben schließlich in alphabetischer Reihenfolge (spaltenweise von oben nach unten gelesen) sind. Das Leerfeld muß am Ende wieder rechts unten sein.
+
+Wenn dieses geschafft wurde, muß man die Funktionstaste f 1 betätigen. Danach wird geprüft, ob die Aufgabe richtig gelöst wurde. Wenn man schon f 1 drückt, bevor die Reihenfolge korrekt ist, so meldet der Computer den Irrtum und das Spiel kann fortgesetzt werden. Während des Spiels werden rechts unter dem Feld die Anzahl der bisher benötigten Schritte angezeigt.
+
+Das Spiel läuft auf allen Versionen des VC 20 (mit oder ohne Speichererweiterung).
+
+(Gerhard Gaber/ev)
+
+# Bildschirmmasken schnell erstellt
+
+> Bei jedem selbstgeschriebenen Anwendungsprogramm steht man in der Regel stets aufs Neue vor dem Problem, zur Abfrage diverser Parameter eine geeignete Bildschirmmake zu erstellen. Dieser Maskengenerator macht die Arbeit etwas einfacher.
+
+Dieser Generator für den VC 20 liest eine Maske direkt vom Bildschirm und erzeugt automatisch die entsprechenden PRINT-Befehle im Programm. Durch diesen Vorgang löscht der Generator sich selbst, so daß ein SAVEn des Programms unmittelbar nach dem Eintippen unbedingt notwendig ist.
+
+Das Programm benötigt eine Erweiterung von mindestens 8 KByte, da am Schluß der Basicspeicher höher gelegt wird. Ohne Erweiterung würde Speicherplatz fehlen. Auch müßte man eine Verschiebung des Bildschirm- und Basicspeicher beachten. Das Programm wird nach dem Laden einfach mit »RUN« gestartet. Danach erscheint eine kurze Anleitung.
+
+## So wird die Maske aufgebaut
+
+In Zeile 23 wird der Tastaturpuffer abgefragt. Wurde eine Taste gedrückt, wird er auf 0 zurückgesetzt. Nun wird in Zeile 1000 der Bildschirm gelöscht und eine Datei für den Bildschirm eröffnet, da der Bildschirm dann ja ausgelesen wird und daraus die neuen Zeilen der Maske generiert werden. Sie sehen jetzt eine geänderte Farbe und den blinkenden Cursor. Nun erstellen Sie Ihre Maske nach Ihren Wünschen, wobei Sie mit den Cursortasten bliebig hin- und herfahren können. Ist die Bildschirm-Maske in der richtigen Form, drücken Sie RETURN.
+
+Jetzt wird der Bildschirmspeicher ausgelesen. Die neue Zeile wird mit Zeile 2O1O generiert. Das Fragezeichen ist die Kurzform von Print, (CHR$(34) ist der Code für Anführungsstriche. Das Generieren von neuen Programmzeilen geschieht in einer Schleife. Sind alle 23 Bildschirmreihen ausgelesen, springt das Programm nach Zeile 10000. Jetzt wird der Anfang vom Basicspeicher höher gelegt und Zeile 23 gelistet. Nun muß noch ein Leerzeichen aus Zeile 23 entfernt werden. Damit ist die neue Maske fertig und kann abgespeichert werden, oder das nachfolgende Programm kann direkt geschrieben werden. Zeile 50 sorgt dafür, daß das Bild nicht nach oben gescrollt wird. Dadurch wird auch die READY-Meldung unterdrückt. Die fertige Maske wird auch wieder mit RUN gestartet.
+
+(Bernd Borghold/ev)
+
+# Deutscher Zeichensatz für den VC 20
+
+> Wenn man die ersten (Programmier-) Schritte mit seinem neu erworbenen VC 20 gegangen ist und schon das eine oder andere Programm »geboren« hat, vielleicht ein Adressenprogramm oder eine Lagerliste, spätestens dann wird man die Entdeckung machen, daß der VC 20 trotz deutscher Produktionsstätte nur Englisch spricht, für deutsche Umlaute und »ß« also kein Interesse zu haben scheint.
+
+Dies bedauert man noch umso mehr, wenn man eine anschließbare elektronische Schreibmaschine mit deutschem Typensatz besitzt.
+
+Zwar ist auf der Tastatur des VC 20 kein Platz für einen deutschen Zeichensatz vorgesehen, es ist jedoch möglich, bestimmte Tasten dafür auszuwählen, deren CHR$-Code demjenigen des gewünschten deutschen Umlautes auf der Schreibmaschine entspricht.
+
+Auf diese Weise kann man zwar deutsche Texte drucken, aber auf dem Bildschirm sieht ein solcher Text recht merkwürdig aus: Hier steht zum Beispiel das Zeichen für das britische Pfund statt »ö«.
+
+Auch hier ist mit einigem Know-how Abhilfe zu schaffen oder mit meinem Programm »DEUZEI«.
+
+## Der Zeichengenerator
+
+Woher weiß der VC 20 eigentlich, wie die einzelnen Zeichen auszusehen haben, die man auf dem Bildschirm sieht? Hierzu bedient er sich eines Speicherbereichs Hex. 8000 bis 8FFF beziehungsweise 32768 und 36863 dezimal.
+
+In diesem ROM-Bereich sind in genau festgelegter Reihenfolge (vergleiche Bildschirm-Code-Tabelle des Handbuches) die Bitmuster aller verfügbaren Zeichen in jeweils acht hintereinander stehenden Speicherstellen festgelegt.
+
+Wie das funktioniert, veranschaulicht Bild 1: Jedes Zeichen ist auf dem Bildschirm in einer 8 x 8-Matrixwiedergegeben, ein Bildpunkt entspricht einer »1« im Dualcode, sonst steht die »0« (freie Felder). Da ja pro Speicherplatz 8 Bit gespeichert werden, benötigt man 8 Byte pro Zeichen.
+
+Der Computer weiß durch sein Betriebssystem, welche acht Speicherstellen er bei einem Tastendruck abfragen muß, es erscheint soweit recht leicht möglich, ihm ein geändertes Bitmuster in diese Speicherstellen zu »schmuggeln«, zum Beispiel durch POKEs. Dies scheitert allerdings daran, daß der Zeichengenerator im ROM-Bereich liegt und somit nur Lesen, aber nicht Verändern der gespeicherten Daten zuläßt.
+
+Hier hat dankenswerterweise Commodore ein Hintertürchen offengelassen, um doch noch am Datensatz manipulieren zu können. Man kann dem Betriebssystem mitteilen, daß der Zeichensatz an einer anderen Stelle sitzt als normal; dies ist in Speicherstelle 36869 codiert.
+
+Benutzt man nun einen RAM-Bereich für den alternativen Zeichensatz, so kann man nach Lust und Laune Veränderungen der Bitmuster vornehmen.
+
+Da man ja doch wohl gern die Bitmuster der meisten Zeichen übernehmen möchte, wäre es ganz sinnvoll, vor der Kreation einiger neuer Zeichen erst einmal die Bitmuster des Zeichengenerator-Bereichs in den ausgewählten RAM-Bereich zu kopieren (immerhin 4 KByte). Diese Aufgabe übernimmt ein kleines Maschinenprogramm (Listing 2), das im Programm »DEUZEI« integriert ist. Ein Kopieren durch Basic-POKEs ist hingegen recht zeitraubend.
+
+Um Speicherplatz im RAM zu sparen, kopiert »DEUZEI« allerdings nur den Zeichenset 2, der Groß- und Kleinbuchstaben, Ziffern und einige Grafikzeichen enthält (normal und invers), aber nur 2 KByte RAM beansprucht.
+»DEUZEI« benutzt den RAM-Speicher wie folgt: Zeichengenerator: Page 16 bis 23; Bildschirmspeicher: Page 24 und 25; Basicprogramme ab Page 26 (Bild 2). Eine Page entspricht einem 256-Byte-Block. Der Bildschirmspeicher befindet sich beim VC 20 ab 8 KByte Erweiterung normalerweise in Page 16 und 17 (4096 bis 4607), muß bei »DEUZEI« allerdings »umziehen«; dies erfährt das Betriebssystem durch entsprechende Codierung der Speicherstellen 648 (siehe Zeile 130) und 36869 (zugleich Pointer für den Zeichengenerator).
+Das eigentliche Programm »DEUZEI« beginnt bei der Speicherstelle 6656 (Page 26). Da man es nach dem Generieren des neuen Zeichensatzesja nicht mehr benötigt, wird es beim Einladen eines neuen Programms ab Page 26 gelöscht. Es fehlen dem neuen Programm also nur genau 2 KByte RAM-Speicherplatz, den der neue Zeichensatz beansprucht.
+
+TODO Tabelle
+
+## Eingabe von »DEUZEI«
+
+Wenn man nun das Programm »DEUZEI« in den Computer eingibt und übereifrig mit RUN startet, wird man eine böse Überraschung erleben: Das Programm stürzt sofort ab und ist zudem auch noch gelöscht!
+
+Des Rätsels Lösung: Normalerweise werden Basicprogramme ja ab Page 18 (Speicherstelle 4608 = 18*256) abgelegt. In diesen Bereich transformiert allerdings das Maschinenprogramm den neuen Zeichensatz und »zerstört« frühzeitig das Basicprogramm. Man muß folglich Sorge tragen, daß das Programm ab Page 26 im Speicher steht. Hierzu sollte man folgendermaßen vorgehen:
+
+1.	»DEUZEI« eingeben und auf Band oder Floppy abspeichern (kein RUN!)
+2.	Programm mit NEW löschen und folgende Basiczeile eingeben:
+1 POKE 44,26:POKE 6656,0:PRINT CHR$(3):RUN
+3.	RETURN-Taste drücken, aber nicht RUN!
+4.	POKE 44,26:POKE 6656,0 eintippen, dann RETURN-Taste drücken
+5.	Eingabe von NEW; RETURN-Taste
+6.	Einladen des abgespeicherten »DEUZEI«
+7.	POKE 44,18 eintippen und unter neuem Namen abspeichern.
+
+Die kleine Mühe hat sich sicherlich gelohnt, denn das neu abgespeicherte Programm ist nun absolut »wartungsfrei«. Es kann ganz normal eingeladen werden, setzt automatisch die Basicuntergrenze auf Page 26, generiert den neuen Zeichensatz in 2 bis 3 Sekunden und erlaubt das Einladen beliebiger Basicprogramme ohne Zusatz-POKEs.
+
+Erklärung für obige Prozedur: Die erste Basiczeile muß am Anfang von Page 18 liegen, der Interpreter erwartet das so. Startet man das »umgebaute« Programm, so wird in dieser Zeile der neue Basicbeginn mitgeteilt, und zwar mit POKE 44,26.
+
+Dieses Miniprogramm wird mit PRINT CHR$(3) abgebrochen und mit RUN in der gleichen Zeile das eigentliche »DEUZEI« ab Page 26 gestartet. Dies sitzt bereits richtig, da man es (siehe unter 4) gleich in Page 26 geladen hat. Danach wurde der Basicanfang wieder durch POKE 44,18 herabgesetzt und somit das funktionsfähige Programm abgespeichert.
+
+Dieses Vorgehen bedeutet zwar, daß beim Abspeichern fast 2 KByte unbrauchbares Material mit abgespeichert wird, aber der Vorteil der besonderen Bedienungsfreundlichkeit überwiegt doch eindeutig.
+
+## Arbeiten mit »DEUZEI«
+
+Nach dem Einladen des—wie oben beschrieben bearbeiteten — Programms »DEUZEI« erscheinen die neuen Sonderzeichen auf dem Bildschirm normal/invers, und beliebige Programme können geladen werden.
+
+Die neuen Zeichen und ihr CHR$- beziehungsweise POKE-Code:
+
+TODO Tabelle
+
+Dieser Zeichensatz bleibt erhalten, solange der VC 20 eingeschaltet ist, wird allerdings durch Betätigen der RUN STOP/RESTORE-Tasten abgeschaltet; es wird wieder der Pointer auf den normalen Zeichensatz gesetzt. Durch Eingabe von: POKE 36869,236:POKE 648,24:CLR kann man aber wieder den neuen Zeichensatz verfügbar machen. Leider sind sich offensichtlich nicht alle Produzenten von Drucker-Interfaces bezüglich der CHR$-Codes für die deutschen Umlaute einig. So kann es vorkommen, daß bei bestimmten Druckern das »ß« nicht gedruckt wird, wenn es auch noch so deutlich am Bildschirm prangt. Das ist allerdings kein Beinbruch, man muß nur herausfinden, welchen CHR$-Code dieses Zeichen vom Hersteller erhalten hat. Eine Anpassung von »DEUZEI« ist dann mit Hilfe der Tabellen des VC 20-Handbuchs einfach:
+
+1.	In CHR$-Tabelle Zeichen suchen, das der Code-Nummer entspricht.
+2.	In POKE-Tabelle den POKE-Wert für dieses Zeichen ablesen.
+3.	POKE-Wert*8+4096 ergibt erste Speicherstelle für neues Zeichen; diesen Wert im Listing ersetzen.
+
+Beispiel: Buchstabe »ß« ist als CHR$(94) vorgesehen.
+
+Normales Zeichen (Pfeil nach oben) entspricht POKE 30. 30*8+4096 = 4336. In Zeile 270 des Listings ist dieser Wert zu finden. Ist nun der CHR$-Code beispielsweise für »ß« = 126 (entspricht dem Zeichen 7r), so ergibt sich aus der POKE-Tabelle: 94*8+4096 = 4848 als neuer Wert im Listing.
+
+Um die entsprechenden Speicherplatzdaten für die inversen Zeichen zu finden, muß man nur zu den berechneten Werten noch 1024 addieren (vergleiche DATA-Zeilen 700 bis 760 in Listing 1).
+
+## »DEUZEI«-Ausbau
+
+Wem die deutschen Sonderzeichen nicht ausreichen für seine verschiedenen Vorhaben, der kann natürlich recht einfach in das Programm noch zusätzliche »Phantasiezeichen« einbauen. Das Auffinden der gewünschten Speicherstelle und die Berechnung der 8 Byte-Werte für das Bitmuster der 8x8-Zeichenmatrix sollten ja keine Schwierigkeiten mehr bereiten.
+
+Als Beispiel sei der Ersatz des »Klammeraffen« (CHR$:64; POKE:0) durch eine »Brezel« aufgezeigt, die ab Speicherstelle 0*8+4096 = 4096 codiert wird (Bild 3). Diese beiden Programmzeilen wären hier einzufügen:
+361 forbr=0to7:readda%:poke4096+br,da%:next
+770 data0,60,66,165,153,153,102,0
+
+In analoger Weise kann man sich auch leicht beliebige andere Zeichen definieren.
+
+(Peter Wülknitz/ev)
+
+# Spring Vogel, spring
+
+> Das Listing des Monats zur Erzeugung von »Jump and Run«-Spielen für Commodore 64.
+
+Bei dem ersten Start des Progrmms dauert es einige Zeit (bei weiteren Starts geht es dann schneller), bis sich das Programm mit der Frage »Edit, Wahl oder Spiel?« meldet.
+
+Mit »W« kann man eines der sechs Bilder zum Spielen auswählen, mit »S« wird ein vollständiges Spiel ab Bild 1 gewählt.
+
+Die Funktionstasten haben folgende Bedeutung:
+f1: Dieses Spiel aufgeben, zurück zum Menü
+f2: diesen Vogel opfern und mit dem nächsten Vogel neu an der Startposition beginnen
+f3: mit dem nächsten Bild weitermachen
+f5: Pause (weiter mit SPACE)
+
+Für jedes Ei gibt es jen ach Bild 10, 20... 60 Punkte. Wird ein Bild in einer bestimmten Zeit beendet, so erhält der Spieler einen Bonus, der um so größer ist, je schneller das Bild beendet wurde.
+
+## Der Editor
+
+Der Editor dient dazu, eigene Spiele zu entwickeln. Mit ihm können neue Bilder erstellt werden, die im Programmtext selbst die alten Bilder überschreiben. Deshalb sollte das Programm vor dem Editieren, das neue Spiel nach dem Editieren unter neuem Namen gespeichert werden. Dazu einfach das Programm mit »STOP« abbrechen. Der Editor fragt zunächst, welches Bild geändert werden soll. Dann erscheint dieses Bild mit einem Cursor. Es stehen folgende Funktionen zur Verfügung:
+
+←: die vorgenommenen Änderungen endgültig in den Programmtext übernehmen
+f1: Editor verlassen, ohne Änderungen zu übernehmen. Das Bild bleibt erhalten, wie es vor dem Editoraufruf war. In beiden Fällen fragt das Programm, ob das Bild ausprobiert werden soll. Aus dem Spiel gelangt man mit f1 und E jederzeit in den Editor zurück.
+
+Die Cursorsteuerung erfolgtwie gewohnt über die Cursortasten. SHIFT CLR: Bild löschen
+
+Die Startposition des Vogels wird durch »0« festgelegt. In jedes Bild können zwischen 0 und 7 Monster gesetzt werden, die sich horizontal auf einer Breite von acht Spalten hin und her bewegen. Das linkte Ende dieser Bewegungsbahn kann mit den Tasten 1 bis 7 festgelegt werden.
+
+Mit den Tasten A bis T können die 20 verschiedenen Bausteine, die zur Verfügung stehen, gesetzt werden. Der Vogel reagiert immer nur auf das Zeichen unter seinen Füßen. Bei Sprüngen reagiert er (außer bei Wänden) erst in der absteigenden Phase wieder auf Zeichen. Eine Übersicht über die Bau-steinebietetdieTabelle 1. Dazu einigeergänzende Bemerkungen:
+
+Die Bausteine A bis D sind durch verschiedene Bewegungsmöglichkeiten gekennzeichnet. Springen ist möglich:
+A: rechts, links
+B: rechts, links, runter
+C: rechts, links, rauf
+D: alle vier Richtungen
+
+Bei E bis H ist eine Bewegung nur in jeweils eine Richtung und kein Sprung möglich.
+
+Bei I bis N wird der Vogel automatisch bewegt. Er selbst kann nur springen.
+
+Der Trampolin 0 bewirkt einen zufälligen Sprung nach rechts oder links.
+
+Bei der Gummiwand S wird der Vogel auf das letzte Zeichen, das weder Wand noch Luft war, zurückgeworfen.
+
+## Hinweise zum Eintippen
+
+Da das Problem in die Interruptroutine eingreift und seinen eigenen Programmtext verändert, sollte es auf jeden Fall vor dem ersten Start abgespeichert werden.
+
+Um das Abtippen des Listings zu erleichtern, wurden im Listing alle Steuerzeichen innerhalb von Printbefehlen durch leicht lesbare Worte entsprechend Tabelle 2 ersetzt. Wenn zum Beispiel im Listing <CD> steht, dann ist an dieser Stellle CURSOR DOWN einzugeben.
+
+Um Tippfehler bei den zahlreichen DATA-Zeilen besser lokalisieren zu können, wurden diese in verschiedene Blöcke mit jeweils eigener Prüfsumme aufgeteilt.
+
+Um das Eintippen der sechs Bilder zu erleichtern, wurden die Zeilen ab 60000 im Kleinschriftmodus gelistet. Hier ist für jeden Großbuchstaben (nicht bei den Ziffern!) die entsprechende Taste zusammen mit SHIFT zu drücken. Hier ist vor allem darauf zu achten, daß jeder PRINT-Befehl genau 39 Zeichen enthält. Fehlende Zeichen können zur Zerstörung des Programms führen, da der Editor diese Zeilen überschreibt.
+
+Daß die jeweils 39 Zeichen genau mit dem Listing übereinstimmen, ist dagegen nicht so wichtig. Durch Abweichungen wird hier allenfalls die Spielbarkeit des vorgegebenen Spiels beeinflußt, ein Mangel, der jederzeit mit dem Editor behoben werden kann. Im Prinzip ist es auch möglich, auf das Abtippen der Bilder 2 bis 6 zu verzichten und an anderer Stelle einfach mit Hilfe des Bildschirmeditors fünfmal das erste Bild zu kopieren. AufjedenFallaber mußdieZahl derZeilen, die Zeilennummer und die Länge der Zeilen mit dem Listing übereinstimmen.
+
+Um das Eintippen der Bilder zu erleichtern, wurden diese in der vorliegenden Programmversion in den Programmtext selbst gelegt. Deshalb ist die Zahl der Bilder auf sechs (diese Zahl wurde gewählt, um die Tipparbeit in erträglichen Grenzen zu halten) festgelegt. Die Anzahl der Bilder kann aber folgendermaßen erhöht werden:
+
+Der Variablen BM in Zeile 50070 ist die gewünschte Anzahl zuzuweisen. Für jedes weitere Bild sind dem Programm entsprechend dem Schema der ersten sechs Bilder 22 PRINT-Zeilen, die jeweils 39 beliebige Zeichen ausgeben, und ein abschließendes RETURN, anzufügen. Die erste Zeilennummer eines Bildes berechnet sich nach der Formel 59900 + Bildnummer*100 + 1, zum Beispiel 60601 für Bild 7.
+
+(Matthias Törk/aa)
+
+# 1520-Hardcopy mit dem VC 20
+
+> Dieses Programm ermöglicht es allen VC 20-Besitzern, Grafik-Hardcopys mit dem Printer/Plotter VC 1520 von Commodore anzufertigen.
+
+Das Programm ist einfach mit »LOAD« und den gerätespezifischen Parametern zu laden. Da es sich um ein Basicprogramm handelt, wird keine Sekundäradresse benötigt.
+
+Mit RUN wird das Basicprogramm gestartet, welches die eigentliche Maschinensprachroutine in Form von DATA-Statements enthält. Das Programm fragt nun nach der Zieladresse, ab welcher die Routine abgelegt werden soll. Ist dabei der angegebene Wert gleich Null, so werden 388 Byte vom Basic-Pointer ($55/56) abgezogen und das Programm dahinter abgelegt. Wird ein anderer Wert eingegeben, so wird das Programm ab dieser Adresse gespeichert und der Pointer bleibt unverändert. Nach dieser Eingabe braucht man sich, da das Basicprogramm über einen Relocator und Prüfsummenabfrage verfügt, nicht mehr um das weitere Ablesen des Maschinenspracheprogramms zu kümmern. Sollte sich ein Prüfsummenfehler ergeben, so wird dieser angezeigt und der DATA-Block mit dem Maschinenprogramm muß auf Tippfehler hin untersucht werden.
+
+Am Ende des Ladevorganges wird die Position der Routine und die Startadresse für den SYS-Befehl angezeigt. Jetzt kann »HARDCOPY 60« mit SYS 0 oder der ausgegebenen Absolutadresse gestartet werden.
+
+Folgende Einschränkungen sind zu beachten:
+(a)	Falls ein File mit der logischen File-Nummer 127 geöffnet wurde, so ist dieses vor dem Start von »HARDCOPY 60« wieder zu schließen.
+(b)	Der Startbefehl darf nicht im »Direktmodus« stehen.
+
+Das Maschinenprogramm liest beim Aufruf die aktuellen Daten aus den Registern des Video-Interface-Controller (VIC) und berechnet daraus folgende Parameter:
+
+TODO Tabelle
+
+Das Programm liest von links nach rechts die Bildschirm-Codes aus dem Video-RAM und berechnet unter Zuhilfenahme der oben genannten Parameter die Position der Bitmuster im Zeichengenerator. Ist ein Bit gesetzt, so wird seine Position in den MOVE-Befehl des Plotters umgesetzt und dort ein Strich der Länge 1 gezogen.
+
+Ein Video-Punkt entspricht vier Plotter-Punkten woraus sich eine Auflösung von 30 Zeichen pro Plotterzeile ergibt. Dieser 2x2-Punkt hätte einen zweiten Plotvorgang nötig gemacht. Tatsächlich wurde aber die Dauer eines Plot-Vorgangs halbiert indem der Wagenrücklauf des Stiftes mitbenutzt wird. Eine weitere Zeitoptimierung wird dadurch erreicht, indem keine »Leer-Plot«-Befehle ausgegeben werden. Der Stift wird also nur dann bewegt, wenn ein Bit auch gesetzt ist.
+
+Das dauernde »Ticken« des Stiftes läßt sich leider nicht vermeiden, da pro Bit eine neue Positionierung des Stiftes nötig ist (sonst hätte ein Punkt die Größe 3x2).
+
+»Hardcopy 60« kann sowohl für normale Texte, als auch für Grafik-Bildschirme eingesetzt werden.
+
+(Wolfgang W. Wirth/ev)
+
+# Druckfehlerteufekhen
+
+Folgende Fehler sind in den Ausgaben 7 und 8 auf dem Konto von unserem Teufelchen gutgeschrieben worden.
+
+### Komfortables Treiberprogramm für Centronics-Drucker, 7/84, Seite 110
+
+Ein Leserbrief hat ergeben, daß der Drucker NEC 8032 im Bitmustermodus das niederwertige Bit nicht wie der Epson-Drucker unten sondern oben druckt. Damit stehen alle ausgedruckten Bildschirmzeichen bei Verwendung meines Treiberprogramms auf dem Kopf. Bei diesem Drucker müssen deshalb im Programm 2 Byte geändert werden. In Zeile 260 das 2. Datum in 128 und in Zeile 264 das 3. Datum in 70.
+
+(Helmut Eyssele)
+
+### Hardcopy mit dem VC 1520, 7/84, Seite 108
+
+In dem einleitenden Text sind zwei Fehler vorhanden, ein Druck- und ein Denkfehler. Der Druckfehler ist in der POKE-Zeile. Da muß das + durch ein * ersetzt werden. Der Denkfehler ist, daß dies eigentlich überhaupt nicht notwendig ist. Als ich Ihnen das HC 1520-Programm zuschickte, war es ein Teilprogramm in der Pic-Show 1520 und nur für diese Pic-Show war die POKE-Zeile notwendig. Ein Fehler ist auch mir unterlaufen. Die letzte Zeile wird nicht geplottet. Dieser Fehler ist aber leicht zu korrigieren. Einfach die Zahl 7680 in Zeile 330 in die Zahl 8000 verwandeln.
+
+(Jörg Wichmann)
+
+### Zwei Einzeiler, 7/84, Seite 135
+
+Der zweite Einzeiler muß korrekt lauten:
+x$ = " ":fori=1to4:xO = x/16:x=x-int(xO)*16:x$ = chr$(48 + x-(x(9)*7)+x$:x=int(xO):next
+
+### Centronics-Schnittstellen, 7/84, Seite 13
+
+In Zeile 110 der Hardcopyroutine für das Görlitz-Interface muß vor dem V unbedingt ein SPACE in den Anführungszeichen eingefügt werden. Die korrekte Zeile lautet:
+110 PRINT#1,CHR$(27)”V”.
+
+### Vollautomatisches Blumengießen, 7/84, Seite 82
+
+1.	Der Minuspol vom Netzteil muß mit der Masse (GND) vom User-Port verbunden sein, da die Ansteuerung von T1 sonst nicht klappt.
+2.	Der Pfeil im Schaltzeichen von T1 ist umzudrehen.
+3.	C1 muß aufgrund seiner Größe ein Elco sein. Im Schaltzeichen muß daher ein + am Pluspol des Gleichrichters eingezeichnet sein.
+4.	In einer Zeitschrift für Software-Anwender ist der Hinweis, daß 220 Volt, vor allem im Zusammenhang mit Wasser, auch für Hardware-Bastler tödlich sein können, sicherlich angebracht.
+
+Die Software-Spezialisten danken dem Hardware-Profi und Leser Michael Scharf für diese Hinweise.
+
+### Was ist Comal?, 8/84, Seite 41
+
+Die angebene Adresse der Firma INSTRUTEK in Dänemark ist leider nicht ganz richtig. Genauer, die Adresse stimmt schon, nur kann man dort die Sprache Comal nicht umsonst beziehen. In-struktek bietet nämlich nur die Version 2.0 von Comal für die großen CBMs an, und die kostet um die 600 Mark.
+
+Die von uns besprochene Version 0.14 gibt es als sogenannte Public Domain Software gegen Verpackungs-und Versandkosten bei:
+Interpool c/o Prof. Burkard Leuschner
+Wiesengrund 6
+7487 Gammetingen-Bronnen
+Tel: 07574/3728
+
+### Steuerzeichen
+
+Unser Drucker beherrscht immer noch nicht alle Commodore-Steuerzeichen. So ist das Zeichen »_« durch Pfeil links, »^« durch Pfeil nach oben,»/«(revers) durch das reverse Pfundzeichen und »§« durch den Klammeraffen (@) zu ersetzen.
+
+### Pascal, 7/84, Seite 44
+
+Die Version Pascal 64 von Data Becker ist seit einem halben Jahr nicht mehr erhältlich und durch Pascal 64 Version 3.0 vollständig ersetzt worden. Der Umtausch ist für 50 Mark (mit neuem Handbuch) möglich.
+
+# Der Super-Sprite-Editor
+
+> Zirka fünfzig verschiedene Sprite-Editorprogramme erreichten uns in der Redaktion. Das beste Programm haben wir für Sie ausgewählt.
+
+Der Hauptbildschirm besteht aus einem Anzeigefeld (Spalte 0 bis 12) und einem Arbeitsfeld (rechts eingerahmt). Im Anzeigefeld stehen das zu bearbeitende Sprite und Hinweise auf verfügbare Kommandos, im Arbeitsfeld wird das Sprite erstellt. Die Zahlen im Rahmen des Arbeitsfeldes ergeben sich aus dem Format der Sprites im Speicher.
+
+## Das Menü
+
+Das Menü (=Command List) wird mit »Space« ins Anzeigefeld gerufen.
+*0 bis 7*
+Es werden bis zu sieben Sprites gleichzeitig im Spritefeld dargestellt. Die Tasten 0 bis 7 fungieren als On/Off-Schalter.
+*I*
+Das jeweils zuletzt angeschaltete Sprite wird nacheinander in Y-, XY- und X-Richtung vergrößert.
+*M*
+Schaltet für das zuletzt bearbeitete Sprite den Multicolormodus ein.
+*C*
+Verzweigt in die Routine für die Farbwahl.
+*R*
+Reproduktion des zuletzt bearbeiteten Sprites ins Arbeitsfeld. Kann mit beliebiger Taste abgebrochen werden.
+*F1*
+Schaltet in den Arbeitsmodus (siehe unten).
+*F3*
+Ändert die Hintergrundfarbe.
+*F7*
+Schiebt das Sprite im Speicher um eine Zeile tiefer. Es kann passieren, daß Punkte aus dem Sprite davor ins Bild verschoben werden.
+*F8*
+Wie F7, schiebt das Sprite hoch.
+*H*
+Verzweigt in die Handle-Routine, mit der Sprites auf dem Bildschirm verschoben werden können.
+*$*
+Zeigt das Diskettendirectory an. Kann mit F 1 abgebrochen werden.
+*@*
+Ermöglicht Disk-Befehle zu senden, beziehungsweise nur mit RETURN den Fehlerkanal abzufragen.
+*S*
+Gibt die Dezimalwerte des zuletzt bearbeiteten Sprite im Anzeigefeld aus. Am Kopf der Tabelle steht die Anfangsadresse des Sprites im Speicher (dezimal).
+*P*
+Ausgabe auf Drucker. Zusätzliche Angabe eines 20 Zeichen langen Namens möglich. Geräteadresse = 4
+*F*
+Verzweigt ins Floppymenü. Dieser Programmteil erklärt sich weitgehend selbst. Beim ersten Einsprung in die Routine sollte ein Name definiert werden, sonstwird das File (sequentiell) unter dem Namen »Data« geSAVEd. Später kann die Position »Filename« mit RETURN übergangen werden und der alte Name wird verwendet. Unter einem Namen können beliebig viele Sprites abgelegt werden. Geräteadresse = 8
+*D*
+Alle acht Sprites werden in Datazeilen umgewandelt.
+*K*
+Das Programm wird gelöscht. Datazeilen bleiben bestehen und können an andere Programme angehängt werden. Geduld, die Sache dauert!
+
+## Der Arbeitsmodus
+
+<b>’*’ beziehungsweise ’@’</b>
+Diese Tasten zeichnen Punkte (Linien) in horizontaler beziehungsweise vertikaler Richtung.
+<b>’=’ beziehungsweise ’;’</b>
+Wie oben, nur werden Punkte gelöscht. Die Belegung dieser Tasten ist an die Cursortasten angelehnt. Gleichzeitig mit SHIFT ist die Bewegungsrichtung umgekehrt.
+Außerdem definiert: RETURN, HOME, CLEAR, F1
+
+Aus fast jeder Routine kann mit F1 ausgestiegen werden. Auf Fragen wird mit Y(es) oder RETURN und N(o) oder beliebiger Taste geantwortet. NichtdefinierteTasten bewirken nichts. Fehleingaben sind abgefangen.
+
+Man sollte das Programm nicht mit STOP/RESTORE beenden. Der Bildschirminhalt ist sonst nicht mehr lesbar. Nach QUIT oder STOP kann allerdings problemlos ohne Verlust der Sprites neu gestartet werden.
+
+Für »Tippfaule«: Sämtliche Remzeilen sind optional, da sie nicht angesprungen werden, und dienen nur der Orientierung im Listing. Man kann sie also auch später einfügen, oder ganz weglassen.
+
+Und wenn’s dann endlich drin ist (wunde Finger gehören nunmal dazu): Viel Spaß beim Malen!
+
+## Erweiterungen
+
+1)	Der Bildschirm ist nach 33792 verlegt, um für acht Sprites Platz zu schaffen. Dementsprechend liegen die Sprites auch in Block 3, nämlich ab Adresse 32768.
+2)	Die Tastenbelegung der »Work«-Routine ist der Verwendung von Cursortasten angeglichen. Links vertikale, rechts horizontale Bewegungen.
+3)	Es stehen drei Routinen für Diskettenverwaltung zur Verfügung:
+a)	Anzeige des Directory
+b)	Senden von Disk-Commands
+c)	Floppy Controller
+4)	Die »Floppy«-Routine ist so gestaltet, daß ein relativ bequemes Umsortieren der Sprites auf Diskette von einem File ins andere möglich wird.
+
+Das heißt: Viele Stellen, an denen bei Irrtum noch eine »Umkehr« möglich ist; immer wieder wird gezeigt, was gerade passiert. Bei Eingabe des Filenamens kann jetzt mit DELETE korrigiert werden. Bei fehlender Namensangabe heißt das File »Data« — kein unlöschbares »,« mehr.
+
+Wenn man in letzter Minute noch aussteigt und doch kein einziges Sprite abgespeichert, entsteht nun kein Geisterfile mehr, das zwar einen Eintrag im Directory hat, aber keine Daten enthält und das Programm bei nächster Gelegenheit böswillig zum Absturz bringt.
+
+5)	Diverse Kleinigkeiten.
+
+(A. Kölbach/rg)
+
+# Screen Change
+
+> Ärgern Sie sich beim Erstellen umfangreicher Programme auch manchmal darüber, daß Sie nicht mehr genau wissen, wie ein bestimmter Programmteil aussieht? Dann werden Sie neu listen und der zuletzt bearbeitete Programmteil ist verschwunden. Die entsprechende Stelle muß wieder gesucht werden. Bis dahin hat man die zuerst gesuchte Stelle vielleicht schon wieder vergessen.
+
+Die Routine »Screen Change« erweitert den Basicbefehlssatz dahingehend, daß der aktuelle Bildschirminhalt im RAM zwischengespeichert und bei Bedarf wieder zurückgeholt werden kann. So können bis zu vier Seiten abgelegt werden. Man hat also die Möglichkeit Notizen, oder andere Informationen, wie beispielsweise Listings oder Low-Resolution-Grafik, zu konservieren. Gleichermaßen sind Sie in der Lage, im Programmablauf eine Text- oder Grafikseite darzustellen, während eine weitere unsichtbar aufgebaut wird.
+
+Nachdem der Basic-Lader gestartet wurde, ist das Programm automatisch initialisiert (SYS 49152). Durch gleichzeitiges Drücken der Tasten »CTRL« und »COMMODORE C« und einer f-Taste werden nun Video-RAM und entsprechender Seitenspeicher vertauscht. Normalerweise wird anschließend lediglich »Müll« auf dem Bildschirm zu sehen sein, da die betreffende Seite noch nicht beschrieben war. Drücken Sie nun aber die gleiche Kombination, oder einfach nur die Tasten »CTRL-und f-Taste« dann erscheint sofort der ursprüngliche Inhalt. Haben Sie die erste Kombination eingegeben wurden die Speicher wieder vertauscht, das heißt der Müll wurde zurückgeschrieben. Hingegen bleibt bei der zweiten Kombination der Seitenspeicher mit der gerade eingelesenen Information gefüllt. Dies läßt sich leicht überprüfen, indem der Bildschirm gelöscht wird, um daraufhin die zweite Kombination noch einmal einzugeben. Es zeigt sich sofort, daß der Inhalt unverändert geblieben ist. Dies istsolange der Fall bis die betreffende Seite mit Tastenkombination 1 »CTRL + C« eine andere Bildschirmseite aufnimmt. Das oben gesagte gilt für alle vier Funktionstasten.
+
+Natürlich versagt diese Methode, wenn die gewünschte Funktion vom Basicprogramm her aufgerufen werden soll. Dazu wird der neue Befehl »SEITEx.m« eingeführt. Der Index x gibt dabei die Seitennummer und m den Modus an. Die Seitennummer darf dabei zwischen 0 und 3 liegen.m kann T oder H sein.
+T bedeutet: Seiten tauschen; entsprechend Tastenkombination 1
+H bedeutet: Seite holen; entsprechend Tastenkombination 2
+
+Damit hat man die Möglichkeit Zwischenergebnisse abzulegen, eine Bedienungsanleitung einzublenden, um dann wieder in die normale Textseite zurückzukehren, Bildschirmmasken einzublenden und vieles mehr. Der interessierte Anwender wird sicher eine Fülle weiterer Einsatzmöglichkeiten entdecken. Doch nun einige Worte zum Programm selbst. Natürlich ist es auch möglich die Seiten über das Befehlswort im Basicdirektmodus aufzurufen. Dies hat jedoch den Nachteil, daß der Befehlstext sowie die READY-Meldung mit übertragen werden. Um dies zu umgehen wird die Tastaturabfrage über eine neue Routine geleitet, die die f-Tasten decodiert.
+
+Der Befehl »SEITE« wird erkannt indem die Interpreterschleife meine Routine durchläuft. Dies kann im einzelnen dem Assemblerlisting entnommen werden.
+
+Interessant ist in diesem Zusammenhang, daß die zusätzlich benötigten 4 KByte Video-RAM den freien Basicspeicherbereich nicht einschränken, da sie im normalerweise nicht nutzbaren Bereich hinter dem Interpreter liegen.
+
+Zusätzlich habe ich eine Routine entwickelt, die über eine Befehlserweiterung das Laden und Speichern der Seiten auf Diskette zuläßt.
+
+Über die normale Anwendung hinaus mögen folgende Anmerkungen von Nutzen sein:
+
+lm CTRL-Modus wird in die rechte obere Bildecke die gewählte Seitennummer eingeblendet. Sollte dies als störend empfunden werden, so kann durch Ändern der letzten Zahl der letzten DATA-Zeile in eine beliebige andere die Einblendung ausgeschaltet werden.
+
+Das Zurückschreiben der »32« führt wieder zur Standardausgabe. Über die Adresse 49313 (POKE 49313,F) läßt sich die Zeichenfarbe F der einzublendenden Seiten ändern. Gekoppelt mit dem Befehl SEITE ließen sich die verschiedenen Seiten in jeweils typischen Farben darstellen. Soll von vornherein eine bestimmte Zeichenfarbe eingestellt werden, so ist die »14« in der DATA-Zeile 79 dahingehend zu ändern.
+
+Durch Anpassung der Zieladressen-Tabelle lassen sich die Seiten in jeden möglichen Speicherbereich legen. Dabei muß lediglich beachtet werden, ob eventuell das Basic-RAM oder ein darin liegendes Programm geschützt werden muß! Auf diese Weise lassen sich natürlich auch weit mehr Seiten anlegen.
+
+Soll nun im Rahmen eines Basicprogramms eine Seite beschrieben werden, so kann dies wie gewohnt über POKEs erfolgen. Zu berücksichtigen sind lediglich die Startadressen der vier Seitenspeicher. Will man normalerweise den Bildschirm über POKE ansprechen, dann geht man von Adresse 1024 aus. Diese ersetzt man nun gegen die unten angegebenen und die gewählte Seite läßt sich unsichtbar beschreiben um bei Bedarf eingeblendet zu werden. Das Farb-RAM muß hier nicht neu beschrieben werden. Im folgenden nun die benötigten Adressen:
+Seite 0: 40960 bis 41959
+Seite 1 : 41984 bis 42983
+Seite 2 : 43008 bis 44007
+Seite 3 : 44032 bis 45031
+
+(Harald Soyka/rg)
 
 
 
