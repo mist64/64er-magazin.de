@@ -26,10 +26,10 @@
 
         <p>Der Basicbeginn liegt bei Adresse 4096, das Ende bei Adresse 7680 (die Werte beziehen sich auf die Grundversion). Unmittelbar ab dem Basicbeginn wird das eigentliche Programm abgelegt. An dessen Ende beginnen die Variablen und Felder (Bild 1).</p>
 
-		<figure>
-			<img src="155-1.png" alt="">
+        <figure>
+            <img src="155-1.png" alt="">
             <figcaption>Bild 1. Die Speicherbelegung des Basicbereichs</figcaption>
-		</figure>
+        </figure>
 
         <p>Der Variablenbereich wächst beim Anlegen neuer Variablen von unten nach oben. Nur das Stringende wandert in entgegenlaufender Richtung.</p>
 
@@ -49,12 +49,394 @@
 
         <p>Schon oft wurden Verfahren beschrieben, um nach einem versehentlichen NEW das Basicprogramm wieder zurückzuholen. Doch wie funktionieren diese Verfahren? Um das zu verstehen, betrachten wir zunächst kurz den Aufbau eines Basicprogramms (Bild 2).</p>
 
-		<figure>
-			<img src="155-2.png" alt="">
+        <figure>
+            <img src="155-2.png" alt="">
             <figcaption>Bild 2. Aufbau eines Basicprogramms. Über die Koppeladressen sind die einzelnen Zeilen miteinander verbunden</figcaption>
-		</figure>
+        </figure>
 
         <p>Am Kopf des Programms steht immer eine Null. Dann folgt die Adresse der nächsten Programmzeile (Koppeladresse) und die Zeilennummer. Danach kommt die eigentliche Programmzeile, die sich aus den sogenannten Tokens — den Basiccodenummern (Tabelle 2) — zusammensetzt. Am Ende dieser Zeile steht dann nochmals eine Null. Die nächste Zeile beginnt wieder mit einem Verbindungszeiger und der Zeilennummer. Das Programm wird mit drei Nullen abgeschlossen. Hieran schließen sich die Variablen an (vergleiche Bild 1).</p>
+
+        <figure>
+            <table border="1">
+                <tbody>
+                    <tr>
+                        <td>Code (Dezimal)</td>
+                        <td>Zeichen/<br>
+                            Befehl</td>
+                        <td>Code (Dezimal)</td>
+                        <td>Zeichen/ Befehl</td>
+                        <td>Code (Dezimal)</td>
+                        <td>Zeichen/<br>
+                            Befehl</td>
+                        <td>Code (Dezimal)</td>
+                        <td>Zeichen/<br>
+                            Befehl</td>
+                    </tr>
+                    <tr>
+                        <td>0</td>
+                        <td>Zeilenende</td>
+                        <td>66</td>
+                        <td>B</td>
+                        <td>133</td>
+                        <td>INPUT</td>
+                        <td>169</td>
+                        <td>STEP</td>
+                    </tr>
+                    <tr>
+                        <td>1-31</td>
+                        <td>Leer</td>
+                        <td>67</td>
+                        <td>C</td>
+                        <td>134</td>
+                        <td>DIM</td>
+                        <td>170</td>
+                        <td>+</td>
+                    </tr>
+                    <tr>
+                        <td>32</td>
+                        <td>Space</td>
+                        <td>68</td>
+                        <td>D</td>
+                        <td>135</td>
+                        <td>READ</td>
+                        <td>171</td>
+                        <td>—</td>
+                    </tr>
+                    <tr>
+                        <td>33</td>
+                        <td>!</td>
+                        <td>69</td>
+                        <td>E</td>
+                        <td>136</td>
+                        <td>LET</td>
+                        <td>172</td>
+                        <td><br></td>
+                    </tr>
+                    <tr>
+                        <td>34</td>
+                        <td>"</td>
+                        <td>70</td>
+                        <td>F</td>
+                        <td>137</td>
+                        <td>GOTO</td>
+                        <td>173</td>
+                        <td>/</td>
+                    </tr>
+                    <tr>
+                        <td>35</td>
+                        <td>#</td>
+                        <td>71</td>
+                        <td>G</td>
+                        <td>138</td>
+                        <td>RUN</td>
+                        <td>174</td>
+                        <td>t</td>
+                    </tr>
+                    <tr>
+                        <td>36</td>
+                        <td>$<br></td>
+                        <td>72</td>
+                        <td>H</td>
+                        <td>139</td>
+                        <td>IF</td>
+                        <td>175</td>
+                        <td>AND</td>
+                    </tr>
+                    <tr>
+                        <td>37</td>
+                        <td>%</td>
+                        <td>73</td>
+                        <td>I</td>
+                        <td>140</td>
+                        <td>RESTORE</td>
+                        <td>176</td>
+                        <td>OR</td>
+                    </tr>
+                    <tr>
+                        <td>38</td>
+                        <td>&amp;</td>
+                        <td>74</td>
+                        <td>J</td>
+                        <td>141</td>
+                        <td>GOSUB</td>
+                        <td>177</td>
+                        <td>&gt;</td>
+                    </tr>
+                    <tr>
+                        <td>39</td>
+                        <td>'</td>
+                        <td>75</td>
+                        <td>K</td>
+                        <td>142</td>
+                        <td>RETURN</td>
+                        <td>178</td>
+                        <td>=</td>
+                    </tr>
+                    <tr>
+                        <td>40</td>
+                        <td>(</td>
+                        <td>76</td>
+                        <td>L</td>
+                        <td>143</td>
+                        <td>REM</td>
+                        <td>179</td>
+                        <td>&lt;</td>
+                    </tr>
+                    <tr>
+                        <td>41</td>
+                        <td>)</td>
+                        <td>77</td>
+                        <td>M</td>
+                        <td>144</td>
+                        <td>STOP</td>
+                        <td>180</td>
+                        <td>SGN</td>
+                    </tr>
+                    <tr>
+                        <td>42</td>
+                        <td>*</td>
+                        <td>78</td>
+                        <td>N</td>
+                        <td>145</td>
+                        <td>ON</td>
+                        <td>181</td>
+                        <td>INT</td>
+                    </tr>
+                    <tr>
+                        <td>43</td>
+                        <td>+</td>
+                        <td>79</td>
+                        <td>0</td>
+                        <td>146</td>
+                        <td>WAIT</td>
+                        <td>182</td>
+                        <td>ABS</td>
+                    </tr>
+                    <tr>
+                        <td>44</td>
+                        <td>,</td>
+                        <td>80</td>
+                        <td>P</td>
+                        <td>147</td>
+                        <td>LOAD</td>
+                        <td>183</td>
+                        <td>USR</td>
+                    </tr>
+                    <tr>
+                        <td>45</td>
+                        <td>-</td>
+                        <td>81</td>
+                        <td>Q</td>
+                        <td>148</td>
+                        <td>SAVE</td>
+                        <td>184</td>
+                        <td>FRE</td>
+                    </tr>
+                    <tr>
+                        <td>46</td>
+                        <td>.</td>
+                        <td>82</td>
+                        <td>R</td>
+                        <td>149</td>
+                        <td>VERIFY</td>
+                        <td>185</td>
+                        <td>POS</td>
+                    </tr>
+                    <tr>
+                        <td>47</td>
+                        <td>/</td>
+                        <td>83</td>
+                        <td>S</td>
+                        <td>150</td>
+                        <td>DEF</td>
+                        <td>186</td>
+                        <td>SQR</td>
+                    </tr>
+                    <tr>
+                        <td>48</td>
+                        <td>0</td>
+                        <td>84</td>
+                        <td>T</td>
+                        <td>151</td>
+                        <td>POKE</td>
+                        <td>187</td>
+                        <td>RND</td>
+                    </tr>
+                    <tr>
+                        <td>49</td>
+                        <td>1</td>
+                        <td>85</td>
+                        <td>U</td>
+                        <td>152</td>
+                        <td>PRINT#</td>
+                        <td>188</td>
+                        <td>LOG</td>
+                    </tr>
+                    <tr>
+                        <td>50</td>
+                        <td>2</td>
+                        <td>86</td>
+                        <td>V</td>
+                        <td>153</td>
+                        <td>PRINT</td>
+                        <td>189</td>
+                        <td>EXP</td>
+                    </tr>
+                    <tr>
+                        <td>51</td>
+                        <td>3</td>
+                        <td>87</td>
+                        <td>W</td>
+                        <td>154</td>
+                        <td>CONT</td>
+                        <td>190</td>
+                        <td>COS</td>
+                    </tr>
+                    <tr>
+                        <td>52</td>
+                        <td>4</td>
+                        <td>88</td>
+                        <td>X</td>
+                        <td>155</td>
+                        <td>LIST</td>
+                        <td>191</td>
+                        <td>SIN</td>
+                    </tr>
+                    <tr>
+                        <td>53</td>
+                        <td>5</td>
+                        <td>89</td>
+                        <td>Y</td>
+                        <td>156</td>
+                        <td>CLR</td>
+                        <td>192</td>
+                        <td>TAN</td>
+                    </tr>
+                    <tr>
+                        <td>54</td>
+                        <td>6</td>
+                        <td>90</td>
+                        <td>Z</td>
+                        <td>157</td>
+                        <td>CMD</td>
+                        <td>193</td>
+                        <td>ATN</td>
+                    </tr>
+                    <tr>
+                        <td>55</td>
+                        <td>7</td>
+                        <td>91</td>
+                        <td>[</td>
+                        <td>158</td>
+                        <td>SYS</td>
+                        <td>194</td>
+                        <td>PEEK</td>
+                    </tr>
+                    <tr>
+                        <td>56</td>
+                        <td>8</td>
+                        <td>92</td>
+                        <td>£</td>
+                        <td>159</td>
+                        <td>OPEN</td>
+                        <td>195</td>
+                        <td>LEN</td>
+                    </tr>
+                    <tr>
+                        <td>57</td>
+                        <td>9</td>
+                        <td>93</td>
+                        <td>]</td>
+                        <td>160</td>
+                        <td>CLOSE</td>
+                        <td>196</td>
+                        <td>STR$</td>
+                    </tr>
+                    <tr>
+                        <td>58</td>
+                        <td>:</td>
+                        <td>94</td>
+                        <td>↑</td>
+                        <td>161</td>
+                        <td>GET</td>
+                        <td>197</td>
+                        <td>VAL</td>
+                    </tr>
+                    <tr>
+                        <td>59</td>
+                        <td>;</td>
+                        <td>95</td>
+                        <td>"</td>
+                        <td>162</td>
+                        <td>NEW</td>
+                        <td>198</td>
+                        <td>ASC</td>
+                    </tr>
+                    <tr>
+                        <td>60</td>
+                        <td>&lt;</td>
+                        <td>96-127</td>
+                        <td>Leer</td>
+                        <td>163</td>
+                        <td>TAB(</td>
+                        <td>199</td>
+                        <td>CHR$</td>
+                    </tr>
+                    <tr>
+                        <td>61</td>
+                        <td>=</td>
+                        <td>128</td>
+                        <td>END</td>
+                        <td>164</td>
+                        <td>TO</td>
+                        <td>200</td>
+                        <td>LEFT$</td>
+                    </tr>
+                    <tr>
+                        <td>62</td>
+                        <td>&gt;</td>
+                        <td>129</td>
+                        <td>FOR</td>
+                        <td>165</td>
+                        <td>FN</td>
+                        <td>201</td>
+                        <td>RIGHT$</td>
+                    </tr>
+                    <tr>
+                        <td>63</td>
+                        <td>?</td>
+                        <td>130</td>
+                        <td>NEXT</td>
+                        <td>166</td>
+                        <td>SPC(</td>
+                        <td>202</td>
+                        <td>MID$</td>
+                    </tr>
+                    <tr>
+                        <td>64</td>
+                        <td>@</td>
+                        <td>131</td>
+                        <td>DATA</td>
+                        <td>167</td>
+                        <td>THEN</td>
+                        <td>203-254</td>
+                        <td>Leer</td>
+                    </tr>
+                    <tr>
+                        <td>65</td>
+                        <td>A</td>
+                        <td>132</td>
+                        <td>INPUT</td>
+                        <td>168</td>
+                        <td>NOT</td>
+                        <td>255</td>
+                        <td><br></td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <figcaption>Tabelle 2. VC 20 Basic-Token. Die Codenummern 32 bis 95 entsprechen den ASCII-Codes. Nummern größer als 127 sind Token, also Abkürzungen für Basic-Befehle, die der Basic-Interpreter verwendet, um Speicherplatz zu sparen und die Verarbeitungsgeschwindigkeit zu erhöhen.</figcaption>
+        </figure>
 
         <p>Durch NEW oder durch einen RESET wird nicht das gesamte Programm, sondern nur der Variablenpointer (45/46) und die erste Koppeladresse gelöscht. Durch Rekonstruktion dieser beiden Zeiger kann das scheinbar verlorene Basicprogramm wieder benutzt werden.</p>
 
@@ -76,9 +458,27 @@
 
         <p>Als Beispiel soll der bestehende Befehl π (Tokennummer 255) geändert werden. Das Befehlsauswertungsprogramm nach Tabelle 4 fragt ihn ab und verzweigt dann nach § 1C16, wo ein RESET ausgeführt wird (entspricht SYS 64802).</p>
 
-        <p>Man kann aber auch noch zusätzliche Parameter abfragen. Die nun folgende Änderung des x-Befehls steuert den Tongenerator, wobei drei Argumente und zwei Kommata geprüft werden müssen. Die Syntax des neuen Befehls ist aus Tabelle 5 ersichtlich.<br />
-            Die Steuerungsroutine wird nun aus diesen vorgefertigten Modulen zusammengesetzt.<br />
-            Zuerst der Baustein zum Abfragen von Argumenten (Tabelle 6).</p>
+        <p>Man kann aber auch noch zusätzliche Parameter abfragen. Die nun folgende Änderung des x-Befehls steuert den Tongenerator, wobei drei Argumente und zwei Kommata geprüft werden müssen. Die Syntax des neuen Befehls ist aus Tabelle 5 ersichtlich.</p>
+
+        <figure>
+            <table border="1">
+                <tbody>
+                    <tr>
+                        <td>Tongenerator Bereich 0-3</td>
+                        <td>,</td>
+                        <td>Tonhöhe Bereich 0-255</td>
+                        <td>,</td>
+                        <td>Lautstärke Bereich 0-15</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <figcaption>Tabelle 5. Die Syntax des neuen π-Befehls</figcaption>
+        </figure>
+
+        <p>Die Steuerungsroutine wird nun aus diesen vorgefertigten Modulen zusammengesetzt.</p>
+
+        <p>Zuerst der Baustein zum Abfragen von Argumenten (Tabelle 6).</p>
 
         <p>Die ROM-Routine ($D79B) holt sich aus dem Basictext den numerischen Ausdruck und stellt ihn im X-Register zur Verfügung. Ist der Wert größer als 255, wird eine Fehlermeldung ausgegeben. Die Syntax unseres Befehls erlaubt aber nur Argumente zwischen 0 und 3. Daher wird nochmals eine Bereichsprüfung vorgenommen.</p>
 
@@ -147,10 +547,10 @@
 
         <p>Zur Erklärung betrachten wir Bild 3. Es zeigt die Speicheraufteilung beim Autostart, bezogen auf die Grundversion. Das eigentliche Maschinenprogramm benötigt 95 Byte. Es liegt direkt am Basicbeginn (Adresse 4096). Dann folgt eine Lücke. Sie ist, wie bereits gesagt, nicht unbedingt nötig, aber sie erschwert etwaigen Raubkopierern das Auffinden des Programms. Hieran schließt sich das eigentliche Basicprogramm an.</p>
 
-		<figure>
-			<img src="155-3.png" alt="">
+        <figure>
+            <img src="155-3.png" alt="">
             <figcaption>Bild 3. Die Speicheraufteilung beim Autostart, bezogen auf die Grundversion</figcaption>
-		</figure>
+        </figure>
 
         <h2>So funktioniert der Autostart</h2>
 
