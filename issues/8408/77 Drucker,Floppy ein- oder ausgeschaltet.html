@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>Drucker/Floppy ein- oder ausgeschaltet?</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="Werner Pfeil, gk">
+    <meta name="64er.issue" content="8/84">
+    <meta name="64er.pages" content="77">
+    <meta name="64er.toc_category" content="Programme zum Abtippen|Anwendungen">
+    <meta name="64er.toc_title" content="Drucker/Floppy ein- oder ausgeschaltet">
+    <meta name="64er.index_title" content="Drucker/Floppy ein- oder ausgeschaltet?">
+    <meta name="64er.index_category" content="Listings zum Abtippen|Anwendung|Floppy">
+    <meta name="64er.id" content="eingeschaltet">
+</head>
+
+<body>
+    <article>
+        <h1>Drucker/Floppy ein- oder ausgeschaltet?</h1>
+
+        <p class="intro">Diese Prüfroutine verhindert wirkungsvoll die Fehlermeldung: DEVICE NOT PRESENT ERROR und hilft, ein Programm absturzsicher zu machen.</p>
+
+        <p>Bei der Prüfroutine handelt es sich um ein Unterprogramm, das mit GOSUB 10080 aufgerufen wird. Vor dem Aufruf der Routine muß festgelegt werden, welches Gerät überprüft werden soll (Gerätenummer DN%: 4 für Drucker, 8 für Floppy). Die Auswertung der Variablen DR% (0 = aus, 1 = ein) ermöglicht eine Aussage über den Einschaltzustand.<br>
+            <b>Prüfroutine</b><br>
+            Zeile 10080:<br>
+            Um die Maschinenroutine nicht bei jedem Aufruf des Unterprogramms einzulesen, wird sie nur beim ersten Aufruf eingelesen.<br>
+            Zeile 10090 und 10100:<br>
+            In die vom Computer nicht benutzte Speicherstelle 2 der Zeropage wird die Device-Nummer DN% (4 für Drucker, 8 für Floppy) gePOKEt, das Maschinenprogramm aufgerufen und anschließend der Inhalt der Speicherstelle 2 überprüft. War das Carry-Bit gesetzt, ist das entsprechende Gerät ausgeschaltet. Die Variable DR% wird entsprechend dem Einschaltzustand 1 (= ein) oder 0 (= aus) gesetzt.<br>
+            Zeile 10140 bis 10170:<br>
+            Basic-Lader der Maschinenroutine
+        </p>
+
+        <p>Nach dem Löschen des Bildschirms wird der Variablen DN% die entsprechende Geräte-Nummer (4 für Drucker, 8 für Floppy) zugewiesen und die Prüfroutine aufgerufen. Die Abfrage der Variablen DR% (Device ready) ermöglicht es, eine Aussage über den Einschaltzustand (0 = aus, 1 = ein) des entsprechenden Gerätes zu machen.</p>
+
+        <p>Wird die Prüfroutine beim Diskettenlaufwerk angewendet (DN%=8), so muß nach dem Aufruf der Routine der Fehlerkanal der Floppy gelöscht werden, da durch die Prüfung ein Syntax Error (31) vom DOS gemeldet wird (Ansprung des NMI-Vektors in Zeile 160).</p>
+
+        <address class="author">(Werner Pfeil/gk)</address>
+
+        <figure>
+            <pre data-filename="peripherie test" data-name="Peripherie Test"></pre>
+            <figcaption>Ein Demo-Programm. Die Prüfroutine befindet sich ab Zeile 10000</figcaption>
+        </figure>
+
+        <figure>
+            <pre>                0010            ; *****************************
+                0020            ; *   ASSEMBLER-LISTING DER   *
+                0030            ; * PRUEFROUTINE DEVICE EIN ? *
+                0040            ; *  GESCHRIEBEN FUER  C- 64  *
+                0050            ; * (C) 1984 BY  WERNER PFEIL *
+                0060            ; *****************************
+                0070            ;
+                0100            .BA $C000
+C000- A9 01     0110            lda #$01              ; LAENGE
+C002- A0 C0     0120            ldy #$C0              ; ADRESSE HIGH
+C006- A2 21     0130            ldx #$21              ; ADRESSE LOW
+C006- 20 BD FF  0140            JSR $FFBD             ; PARAMETER FUER FILENAMEN
+C009- A9 01     0150            LDA #$01              ; FILE-NR.
+C00B- A0 0F     0160            LDY #$0F              ; SEKUNDAERADRESSE
+C00D- A6 02     0170            LDX $02               ; DEVICE-NR.
+C00F- 20 BA FF  0180            JSR $FFBA             ; FILEPARAMETER SETZEN
+C012- 20 C0 FF  0190            JSR $FFC0             ; OPEN
+C015- B0 02     0200            BCS $C019             ; WENN AUSGESCHALTET, DANN
+C017- A9 00     0210            LDA #$00
+C019- 85 02     0220            STA $02               ; ERGEBNIS DER PRUEFUNG
+C01B- A9 01     0230            LDA #$01              ; FILE-NR.
+C01D- 20 C3 FF  0240            JSR $FFC3             ; CLOSE
+C020- 60        0250            RTS
+C021- 20        0260            .BY $20
+                0270            .EN</pre>
+            <figcaption>Der Inhalt der DATA-Zeilen mit zugehörigem Assembler-Listing</figcaption>
+        </figure>
+
+    </article>
+
+</body>
+
+</html>
