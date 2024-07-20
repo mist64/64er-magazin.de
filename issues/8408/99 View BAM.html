@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>View BAM</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="Jörg Schieb, gk">
+    <meta name="64er.issue" content="8/84">
+    <meta name="64er.pages" content="99-100">
+    <meta name="64er.toc_category" content="Programme zum Abtippen|Tips & Tricks">
+    <meta name="64er.toc_title" content="View BAM (C 64)">
+    <meta name="64er.index_title" content="View BAM">
+    <meta name="64er.index_category" content="Listings zum Abtippen|Tips & Tricks|Floppy">
+    <meta name="64er.id" content="viewbam">
+</head>
+
+<body>
+    <article>
+        <h1>View BAM</h1>
+
+        <p class="intro">Dieses Programm zeigt Ihnen sekundenschnell, wie und wo die Floppy Dateien und Programme abspeichert, welche Blöcke noch frei sind und welche nicht.</p>
+
+        <p>Das hier vorgestellte Programm stellt die sogenannte BAM der Disketten grafisch auf dem Bildschirm des C 64 dar. Das gesamte Programm ist in Maschinensprache geschrieben und daher sehr schnell. Es ist dem Viewbam-Programm, das von Commodore auf der Testdiskette mitgeliefert wird, in zweierlei Hinsicht überlegen:</p>
+
+        <ol>
+            <li>ist es, wie bereits erwähnt, um ein Vielfaches schneller und</li>
+            <li>stellt es übersichtlich die gesamte Diskettenbelegung dar, wobei freie, belegte und nicht belegbare Blöcke gut zu erkennen sind.</li>
+        </ol>
+
+        <p>Eine Hardcopy läßt sich auch leicht anfertigen (siehe Bild 1).</p>
+
+        <p>Das Programm braucht inklusive Ladezeit des Blockes 18/0, auf dem die BAM gespeichert ist, unter drei Sekunden zur Ausführung. (Im Vergleich zum Viewbam von Commodore, das 73 Sekunden benötigt.)</p>
+
+        <p>Es ist interessant zu sehen, wie das DOS Files abspeichert, welche Blöcke noch frei sind und welche nicht. Ich wurde durch die geringe Geschwindigkeit und die fehlende Möglichkeit des Viewbam von Commodore, alle Blöcke auf einmal zu betrachten, zu diesem Programm animiert.</p>
+
+        <p>Die Routine läuft auf dem C 64 von Commodore mit dem Floppy-Laufwerk VC 1541. Die Routine steht im geschützten Speicherbereich $C000-$C21C, dezimal 49152 bis 49693. Man kann sie auch in einem Basicprogramm aufrufen.</p>
+
+        <p>Mit diesem Programm wird in grafischer Darstellung ersichtlich, wieviele von den 664 Blöcken besetzt beziehungsweise frei sind.</p>
+
+        <p>Nach mühevoller Eingabe der Data-Zeilen und des Ladeprogramms sollte man dieses erst einmal auf Diskette sichern.</p>
+
+        <p>Eine Prüfsumme wird berechnet; dadurch vermeidet man eventuelle Eingabefehler.</p>
+
+        <p>Zuerst wird die BAM, die sogenannte »Block Availiability Map«, von der Floppy in den Speicher des Computers geladen. Die BAM ist im Block 18/0, das heißt Track 18, Sektor 0, auf jeder Diskette gespeichert.</p>
+
+        <p>Die BAM umfaßt 256 Bytes, die im einzelnen folgende Bedeutung haben:</p>
+
+        <table>
+            <tr>
+            <td>Bytes 0-1</td><td>Track und Sektor vom ersten Directory-Block (meistens 18/1).</td>
+            </tr><tr>
+            <td>Byte 2</td><td>Hier steht ein »A« (ASCII-Code 65) für das 4040 Format</td>
+            </tr><tr>
+            <td>Byte 3</td>
+            <td>nicht belegt</td>
+            </tr><tr>
+            <td>Bytes 4-143</td>
+            <td>Hier stehen die für dieses Programm wichtigen Informationen</td>
+            </tr><tr>
+            <td>Bytes 144-161</td>
+            <td>Diskettenname, aufgefüllt mit geshifteten Leerzeichen</td>
+            </tr><tr>
+            <td>Bytes 162-163</td>
+            <td>Disk ID</td>
+            </tr><tr>
+            <td>Byte 164</td>
+            <td>Geshiftetes Leerzeichen</td>
+            </tr><tr>
+            <td>Bytes 165-166</td>
+            <td>»2A«-ASCII Repräsentation für die DOS-Version</td>
+            </tr><tr>
+            <td>Bytes 166-167</td>
+            <td>Geshiftete Leerzeichen</td>
+            </tr><tr>
+            <td>Bytes 168-255</td>
+            <td>Nullen, unbenutzt</td>
+            </tr>
+        </table>
+
+        <p>Es existieren 35 Tracks, für jeden Track wurden in dem für uns wichtigen Bereich von Byte 4 bis Byte 143 vier Bytes reserviert. Die Tracks sind auch noch in Sektoren unterteilt, maximal 21 und mindestens 17, dies ist durch die Formel 2*Pi*Radius begründet, das heißt, daß bei kleinerem Radius nach innen weniger Raum zur Verfügung steht.</p>
+
+        <p>Das erste Byte eines jeden Viererblocks gibt die Anzahl der noch freien Blöcke in diesem Track an.</p>
+
+        <p>Die nächsten drei Bytes beinhalten die Informationen, welche Sektoren in dem Track belegt sind, und welche nicht.</p>
+
+        <p>Jedes Byte besteht aus 8 Bit und kann somit über 8 Sektoren Auskunft geben. Ein gesetztes Bit (1) bedeutet: freier, verfügbarer Block, ein nicht gesetztes Bit (0) bedeutet das Gegenteil, dieser Block (Track/Sektor) ist belegt.</p>
+
+        <p>Aus diesen Informationen kann man dann ein überschaubares Bild schaffen.</p>
+
+        <address class="author">(Jörg Schieb/gk)</address>
+
+        <figure>
+            <img src="99-1.png" alt="">
+            <figcaption>Bild 1. Zwei Beispiele von »View BAM«</figcaption>
+        </figure>
+
+        <figure>
+            <pre data-filename="viewbam" data-name="View BAM"></pre>
+            <figcaption>Der Basic-Lader von »Vier BAM«</figcaption>
+        </figure>
+    </article>
+
+</body>
+
+</html>

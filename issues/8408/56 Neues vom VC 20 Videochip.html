@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>Neues vom VC 20 Videochip</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="Heino Verder, ev">
+    <meta name="64er.issue" content="8/84">
+    <meta name="64er.pages" content="56-60,62">
+    <meta name="64er.toc_category" content="Software">
+    <meta name="64er.toc_title" content="So nutzt man den Videochip des VC 20 voll aus">
+    <meta name="64er.index_title" content="Neues vom Video-Chip beim VC 20">
+    <meta name="64er.index_category" content="Software|Grafik">
+    <meta name="64er.id" content="vic">
+</head>
+
+<body>
+    <article>
+
+        <h1>Neues vom VC 20 Videochip</h1>
+
+        <p class="intro">Der Video-Chip des VC 20 kann wesentlich mehr als nur die Bildschirmfarben steuern und Musik machen. So läßt sich zum Beispiel mit wenig Aufwand das Bildschirmformat ändern oder zwischen verschiedenen Bildschirmseiten umschalten. Auch die Erzeugung hochauflösender Grafik ist nicht so schwierig, wie es manchem Anfänger scheinen mag.</p>
+
+        <figure>
+            <img src="56-1.png" alt="">
+            <figcaption>Bild 1. Bildschirmformat 25 x 20</figcaption>
+        </figure>
+        <figure>
+            <img src="56-2.png" alt="">
+            <figcaption>Bild 2. Bildschirmformat 17 x 29</figcaption>
+        </figure>
+        <figure>
+            <img src="56-3.png" alt="">
+            <figcaption>Bild 3. Das Plotten von Funktionen ist kein Problem mit der Grafikerweiterung</figcaption>
+        </figure>
+        <figure>
+            <img src="56-4.png" alt="">
+            <figcaption>Bild 4. Ein weiteres Beispiel für die Anwendung der neuen Grafikbefehle</figcaption>
+        </figure>
+
+        <p>Wie bei seinen »großen Brüdern« CBM 4032/8032 wird die Bildschirmdarstellung des VC 20 mit einem speziellen Videocontroller erzeugt. Das Betriebssystem stellt diesen Baustein nach dem Einschalten auf das bekannte Format von 22 Zeichen bei 23 Zeilen ein. Da diese Festlegung softwaremäßig erfolgt, ist es in Grenzen möglich, das Bildschirmformat nachträglich durch POKE-Befehle zu ändern. Leider werden solche interessanten Möglichkeiten des VC 20 (und C 64) von Commodore nur durch die Befehle PEEK und POKE unterstützt. Deshalb an dieser Stelle zunächst ein Exkurs zu den Bits und Bytes. Ein Byte setzt sich aus acht Bits zusammen, aber das wissen Sie ja sicherlich schon. Um in Basic einzelne Bits anzusprechen, muß eine Bit-Kombination zuerst in den entsprechenden Dezimalwert umgerechnet werden. Dies erreicht man mit der folgenden Beispielrechnung:</p>
+
+        <table>
+            <tr>
+                <td>Bit</td>
+                <td>7</td>
+                <td>6</td>
+                <td>5</td>
+                <td>4</td>
+                <td>3</td>
+                <td>2</td>
+                <td>1</td>
+                <td>0</td>
+            </tr>
+            <tr>
+                <td>Wert</td>
+                <td>1</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>1</td>
+            </tr>
+        </table>
+
+        <p>= 1↑7*1+2↑6*0+2↑5*0+&hellip;+2↑0*1 oder: 2↑7+2↑0<br>
+            Das Ergebnis aus 2↑7+2↑0 lautet 128+1 also 129. Mit den beiden Basic-Befehlen AND und OR können die Bits gezielt verändert werden. Hierzu ein Beispiel: »R=128 : V=1 : PRINT R OR V«. In Bit-Schreibweise sieht die Rechnung wie folgt aus:</p>
+
+        <table>
+            <tr>
+                <td>R:</td>
+                <td>1</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>: 128</td>
+            </tr>
+            <tr>
+                <td>V:</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>1</td>
+                <td>: 1</td>
+            </tr>
+            <tr>
+                <td>E:</td>
+                <td>1</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>1</td>
+                <td>= 129</td>
+            </tr>
+        </table>
+
+        <p>Falls ein Bit in R oder in V (oder in beiden) gesetzt ist, wird dieses Bit auch als »1« in das Ergebnis übernommen. Umgekehrt werden jene Bits zu Null, deren entsprechenden Positionen in beiden Variablen zurückgesetzt sind.</p>
+
+        <p>Durch den OR-Befehl können gezielt Bits gesetzt werden. Im Bildschirmspeicher bewirkt das gesetzte siebte Bit, daß das Zeichen invertiert dargestellt wird. Schreiben Sie einmal ein Zeichen links oben auf den Bildschirm. Ermitteln Sie nun den »Z = PEEK(7680)« (PEEK(4096) beim erweiterten VC) den entsprechenden Zeichencode. Durch Z = Z OR 128 wird nun das siebente Bit gesetzt. POKE 7680,Z schreibt den Wert zurück und das Zeichen erscheint invertiert.</p>
+
+        <p>Das folgende kurze Programm invertiert den gesamten Bildschirm.</p>
+
+        <pre>
+10 A = 7680 : REM ODER 4096!
+20 FOR I=0 TO 511 : D = PEEK(I+A)
+30 D=D OR 128 : POKE A+I,D : NEXT
+</pre>
+
+
+        <p>Falls Sie die Zeile 30 durch »D = D AND 127:&hellip;« ersetzen, werden die zuvor invertierten Zeichen wieder »normal« dargestellt. Durch die BIT-Schreibweise wird dies anschaulich:</p>
+
+        <table>
+            <tr>
+                <td>R:</td>
+                <td>1</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>1</td>
+                <td>: 129)</td>
+            </tr>
+            <tr>
+                <td>V:</td>
+                <td>0</td>
+                <td>1</td>
+                <td>1</td>
+                <td>1</td>
+                <td>1</td>
+                <td>1</td>
+                <td>1</td>
+                <td>1</td>
+                <td>: 127)</td>
+            </tr>
+            <tr>
+                <td>E:</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>1</td>
+                <td>= 1</td>
+            </tr>
+        </table>
+
+        <p>Alle BIT-Positionen von R werden in das Ergebnis übernommen, sobald die entsprechenden Positionen des Vergleichswertes auf »1« gesetzt sind. Durch D AND 127 wird somit das siebte Bit in D gelöscht.</p>
+
+        <p>Die Tabelle 1 zeigt die für unsere Zwecke wichtigsten Register des Video-Chips sowie deren Funktion.</p>
+
+        <figure>
+            <table>
+                <tr>
+                    <th class="separator">Adresse / BIT</th>
+                    <th class="separator"></th>
+                    <th class="separator">7</th>
+                    <th class="separator">6</th>
+                    <th class="separator">5</th>
+                    <th class="separator">4</th>
+                    <th class="separator"> </th>
+                    <th class="separator">3</th>
+                    <th class="separator">2</th>
+                    <th class="separator">1</th>
+                    <th class="separator">0</th>
+                    <th class="separator"></th>
+                </tr>
+                <tr>
+                    <td>36864 =</td>
+                    <td></td>
+                    <td>–</td>
+                    <td>HZ</td>
+                    <td>HZ</td>
+                    <td>HZ</td>
+                    <td></td>
+                    <td>HZ</td>
+                    <td>HZ</td>
+                    <td>HZ</td>
+                    <td>HZ</td>
+                    <td>: Horizontal-Zentrierung</td>
+                </tr>
+                <tr>
+                    <td>36865 =</td>
+                    <td></td>
+                    <td>VZ</td>
+                    <td>VZ</td>
+                    <td>VZ</td>
+                    <td>VZ</td>
+                    <td></td>
+                    <td>VZ</td>
+                    <td>VZ</td>
+                    <td>VZ</td>
+                    <td>VZ</td>
+                    <td>: Vertikal-Zentrierung</td>
+                </tr>
+                <tr>
+                    <td>36866 =</td>
+                    <td></td>
+                    <td>BA</td>
+                    <td>ZE</td>
+                    <td>ZE</td>
+                    <td>ZE</td>
+                    <td></td>
+                    <td>ZE</td>
+                    <td>ZE</td>
+                    <td>ZE</td>
+                    <td>ZE</td>
+                    <td>: Bildschirm-Adresse<br>: ZEichen pro Zeile</td>
+                </tr>
+                <tr>
+                    <td>36867 =</td>
+                    <td></td>
+                    <td>–</td>
+                    <td>ZL</td>
+                    <td>ZL</td>
+                    <td>ZL</td>
+                    <td></td>
+                    <td>ZL</td>
+                    <td>ZL</td>
+                    <td>ZL</td>
+                    <td>MA</td>
+                    <td>: ZeiLen-Anzahl<br>: Matrix: (8*8 / 8*16)</td>
+                </tr>
+                <tr>
+                    <td>36869 =</td>
+                    <td></td>
+                    <td>BA</td>
+                    <td>BA</td>
+                    <td>BA</td>
+                    <td>BA</td>
+                    <td></td>
+                    <td>ZA</td>
+                    <td>ZA</td>
+                    <td>ZA</td>
+                    <td>ZA</td>
+                    <td>: Bildschirm-Adresse<br>: Zeichensatz-Adresse</td>
+                </tr>
+            </table>
+            <figcaption>Tabelle 1. Einige wenig bekannte, aber recht nützliche Register des VIC-Chips.</figcaption>
+        </figure>
+
+        <p>Die folgende Tabelle 2 verdeutlicht, wie die Register verändert werden können. Mit dem PEEK-Befehl wird der Inhalt der Speicheradresse abgefragt. Der AND-Befehl löscht nun einen Teilbereich und mit OR X wird zuletzt ein neuer Wert angeknüpft.</p>
+
+        <p>Außerdem gibt die Tabelle 2 die Originalwerte für die Variable X an, sowie — in Klammern — den zulässigen Zahlenbereich.</p>
+
+        <figure>
+            <img src="56-5.png" alt="">
+            <figcaption>Tabelle 2. So können die Register aus Tabelle 1 verändert werden</figcaption>
+        </figure>
+
+        <p>Die Adressen 36864/36865 zentrieren die Bilddarstellung auf dem Fernsehgerät oder Monitor. Mit dem Basicprogramm »BILD ZENTRIEREN« (Listing 1) können Sie dies testen. Der Bildausschnitt wird mit den Cursor-Tasten verschoben. Falls Sie die RETURN-Taste drücken, zeigt das Programm die notwendigen POKE-Befehle für die letzte Einstellung und setzt den Bildschirm zuletzt wieder in den Ausgangszustand zurück.</p>
+
+        <p>Das Programm »BILDSCHIRMFORMAT« (Listing 2) verändert die Adressen 36866/36867. Mit den Cursor-Tasten wird die Anzahl der Zeilen beziehungsweise die Anzahl der Zeichen pro Zeile verändert. Auch hier können Sie durch Drücken der RETURN-Taste die erforderlichen POKE-Befehle für die letzte Einstellung ermitteln.</p>
+
+        <p>Die Bilder 1 und 2 zeigen zwei geänderte Bildformate mit den dazugehörigen POKE-Befehlen.</p>
+
+        <h2>Zwischen verschiedenen Bildschirmbereichen umschatten</h2>
+
+        <p>Das Register 36869 legt die Adressen für den Zeichensatz und den Bildschirmspeicher fest. Die Tabelle 2 zeigt vier POKE-Befehle mit den entsprechenden Bildschirm-Startadressen. Falls Sie eine Änderung durchführen, müssen Sie dem Computer die neue Startadresse in dem Zeiger 648 mitteilen. Außerdem müssen noch 25 weitere Zeiger (MSB der Zeilenanfänge) geändert werden. Durch SYS 58775 führt der Computer die notwendigen Berechnungen aus. Die POKE-Befehle in die Adressen 52/53 begrenzen den oberen Speicherbereich und schützen so das Bild-RAM vor dem Überschreiben durch Basic-Variablen.</p>
+
+        <p>Die mit einem Doppelkreuz »#« gekennzeichneten Adressen gelten, falls die Bildadresse zusätzlich um 512 Byte nach unten verschoben wurde. Diese »Feinverschiebung« erfolgt durch das siebte Bit der Adresse 36866. Die Tabelle 2 zeigt die beiden POKE-Anweisungen, mit denen diese Umschaltung — beispielsweise zwischen zwei Text- oder Grafikseiten — durchgeführt wird.</p>
+
+        <p>Das Programm »BILD-RAM« (Listing 3) verdeutlicht dies. Die Programmzeile 11 schützt den oberen Speicherbereich. Mit GOSUB 80 wird die erste Seite »vorgeblendet«. CHR$(147) löscht die Seite. Zuletzt wird der Text »ERSTE SEITE« gedruckt. Die Zeilen 40 bis 42 wiederholen den Vorgang für die zweite Seite. Die Programmzeilen 50 bis 61 schalten nun — mit einer Verzögerung — abwechselnd die beiden Testseiten ein. So schnell und flimmerfrei kann dies kein anderes Commodore-System.</p>
+
+        <p>Falls Sie nach dem Umschalten mit dem Register 36866 die Zeile »POKE 648,&hellip;:SYS 58775« weglassen, wird sich die Bildanzeige zwar ändern; PRINT-Befehle gelangen jedoch weiterhin in die alte — nun unsichtbare — Seite.</p>
+
+        <h2>Eigene Zeichen definieren</h2>
+
+        <p>Aus der Tabelle 1 kann man ablesen, daß nur die oberen vier Bits der Adresse 36869 das Bild-RAM verschieben. Die restlichen Bits bestimmen die Lage des Zeichensatzes im Speicher. Durch die in der Tabelle 2 angegebenen OR-Verknüpfungen kann der Zeichensatz ins RAM gelegt werden. Nur »OR 15« stellt eine Ausnahme dar, da hierdurch die unteren 128 Zeichen aus dem RAM, die oberen — invertierten — Zeichen weiterhin aus dem ROM geholt werden. Diese Zeichen erscheinen dann aber »nichtinvertiert«.</p>
+
+        <p>In dem Programm »PROG. ZEICHENSATZ« (Listing 4) werden die notwendigen Änderungen in der Programmzeile 30 vorgenommen. Nach »POKE 36869,240« lautet die Startadresse des Bildschirm-RAMs 7680. Der Wert »+15« verschiebt den Zeichensatz zur Adresse 7168.</p>
+
+        <p>Im einzelnen schreibt das Programm den gesamten Zeichensatz des VC 20 auf den Bildschirm. Dabei werden die Zeichen durch »POKE 38400+1,0« in der Farbe Schwarz gedruckt. Die Zeile 30 verändert dann die Zeiger, so daß die ersten 128 Zeichen den zufälligen Inhalt des Zeichensatz-RAMs wiedergeben. Der Zeichensatzspeicher wird dann in den folgenden Zeilen gesetzt und anschließend gelöscht. Zuletzt werden noch die Originalzeichen aus dem ROM in das RAM »gePOKEt«. Die Zeile 55 schaltet den programmierten Zeichensatz wieder ab.</p>
+
+        <p>Falls Sie mit dem Zeichensatz experimentieren wollen, brauchen Sie nur die letzte Zeile wegzulassen. Alle »ungeshifteten« Zeichen können dann verändert werden. Zuerst müssen Sie jedoch ermitteln, wohin Sie »POKEn« müssen. Schreiben Sie hierzu das Zeichen, das Sie ändern wollen, links oben auf den Bildschirm. Mit »PRINT PEEK(7680)« kann dann der dazugehörige Code ermittelt werden. Der Wert muß nun mit acht multipliziert werden, da zu jedem Zeichen acht Byte gehören. Zuletzt müssen Sie noch die Startadresse des Zeichensatzes (hier 7168) hinzuaddieren. Für den Buchstaben »A« lautet die richtige Adresse 7174. POKEn Sie einmal den Wert 129 an diese Adresse. In Bit-Form sieht das wie folgt aus: 129 gibt 10000001.</p>
+
+        <p>Genauso wird anschließend die erste Zeile in dem Buchstaben »A« aussehen; rechts und links außen je ein Pünktchen. Verändert Sie auch einmal die nächsten Adressen oder versuchen Sie den Umlaut »Ä« zu gestalten.</p>
+
+        <p>Nach der Theorie nun ein praktisches Grafikbeispiel. Das abschreckend lange Basic-Ladeprogramm (Listing 5) erweitert den Basic-Befehlssatz des VC 20 (ohne Speichererweiterung) um sieben weitere Anweisungen (COPY, GNEW, GON, GOFF, PLOT, TURN und CLEAR). Beim Eintippen sollten Sie jedoch die Zeilen 10 bis 32 durch das Programm »Prüfsumme« (Listing 6) ersetzen. Nach RUN können Sie mit Hilfe der Tabelle 3 überprüfen, ob Sie die Daten fehlerfrei eingegeben haben. Die Prüfsummen gelten jeweils für eine DATA-Zeile.</p>
+
+        <figure>
+            <table>
+                <tr>
+                    <td>Zeile 50-54</td>
+                    <td>2390</td>
+                    <td>2436</td>
+                    <td>2823</td>
+                    <td>2640</td>
+                    <td>3449</td>
+                </tr>
+                <tr>
+                    <td>Zeile 55-59</td>
+                    <td>3487</td>
+                    <td>3010</td>
+                    <td>3321</td>
+                    <td>2882</td>
+                    <td>2608</td>
+                </tr>
+                <tr>
+                    <td>Zeile 60-64</td>
+                    <td>2930</td>
+                    <td>2741</td>
+                    <td>2458</td>
+                    <td>3089</td>
+                    <td>2285</td>
+                </tr>
+                <tr>
+                    <td>Zeile 65-69</td>
+                    <td>2480</td>
+                    <td>2156</td>
+                    <td>2935</td>
+                    <td>3048</td>
+                    <td>2241</td>
+                </tr>
+                <tr>
+                    <td>Zeile 70-74</td>
+                    <td>2495</td>
+                    <td>2564</td>
+                    <td>3256</td>
+                    <td>2723</td>
+                    <td>2393</td>
+                </tr>
+                <tr>
+                    <td>Zeile 75-79</td>
+                    <td>1864</td>
+                    <td>2230</td>
+                    <td>2187</td>
+                    <td>2148</td>
+                    <td>3300</td>
+                </tr>
+                <tr>
+                    <td>Zeile 80-84</td>
+                    <td>3135</td>
+                    <td>2640</td>
+                    <td>3023</td>
+                    <td>2734</td>
+                    <td>1918</td>
+                </tr>
+                <tr>
+                    <td>Zeile 85-88</td>
+                    <td>2258</td>
+                    <td>1431</td>
+                    <td>1564</td>
+                    <td>449</td>
+                    <td>-</td>
+                </tr>
+            </table>
+            <figcaption>Tabelle 3. Prüfsummen zum Grafikprogramm</figcaption>
+        </figure>
+
+        <p>Nachdem Sie das Ladeprogramm (Zeile 10 bis 32) hinzugenommen haben, muß das Programm unbedingt abgespeichert werden. Nach RUN sucht das Programm die Zeile 32 (also nicht weglassen) und überträgt die Daten ab dieser Adresse in den Speicher. In den Programmzeilen 22 bis 24 wird das Maschinenprogramm zuletzt in den oberen RAM-Bereich übertragen und durch die folgenden POKE-Befehle geschützt. Der NEW-Befehl löscht zuletzt das — ohnehin zerstörte — Programm.</p>
+
+        <p>Mit SYS 6273 können die Befehle jetzt eingeschaltet werden. Bei 2173 BYTES FREE nähert man sich natürlich gefährlich dem »Sinclair-Syndrom«.</p>
+
+        <p>Nach dem Einschalten fällt zuerst ein neuer Cursor auf. In der invertierten Blinkphase des Cursors wird ein »graues« Viereck (COMMODORE-SHIFT »+«) gedruckt. Dies ist notwendig, da der Zeichensatz keine invertierten Zeichen mehr umfaßt und deshalb der Cursor nicht mehr blinken würde. Durch das Grafikprogramm werden alle 64 umgeshifteten Zeichen programmierbar. Der Zeichensatzspeicher beginnt — wie in dem kleinen Textprogramm »PROG. ZEICHENSATZ« (Listing 4) — an der Adresse 7168. Mit dem Befehl »COPY« wird der Originalzeichensatz aus dem ROM in diesen Bereich kopiert.</p>
+
+        <p>Der Befehl »GON« schaltet nun den Grafik-Modus ein. Da zuvor der Originalzeichensatz ins RAM kopiert wurde, werden sich die ersten 64 Zeichen nicht verändern. Falls invertierte Zeichen auf dem Bildschirm stehen, werden diese jetzt nichtinvertiert wiedergegeben. Nur bei den geshifteten Zeichen (außer den invertierten) gibt es einen Totalausfall, aber bei 3,5 KByte Speicherraum muß man schon gewisse Mängel in Kauf nehmen. Mit »GOFF« wird der Zeichensatz wieder ins ROM verlegt, so daß alle Zeichen sichtbar werden.</p>
+
+        <p>Die drei Befehle PLOT/CLEAR/TURN setzen, löschen oder invertieren einen Bildpunkt. Natürlich muß hinter den Befehlen eine X- und Y-Koordinate angegeben werden. Beispielsweise »PLOT 176,1«; allerdings führt diese Eingabe zu der Fehlermeldung X-ERROR (IN&hellip;), da der zulässige Wertebereich für die X-Koordinate 0 bis 175 (22 Zeichen * 8 — 1), und für die Y-Koordinate 0 bis 183 (23 Zeichen * 8 — 1) beträgt.</p>
+
+        <p>Der Wertebereich für die Koordinatenangabe wird durch den letzten Befehl »GNEW« ermittelt, da das Bildschirmformat — wie zuvor beschrieben — per Software geändert werden kann. Bei einer Einstellung mit beispielsweise 25 Zeichen pro Zeile kann der Wert für X zwischen 0 und 199 variieren.</p>
+
+        <p>Außerdem löscht der GNEW-Befehl die 64 programmierbaren Zeichen sowie alle nichtinvertierten Zeichen auf dem Bildschirm. Da sich eine Grafik jedoch aus genau solchen Zeichen zusammensetzt, wird — falls sich eine Zeichnung auf dem Bildschirm befindet — diese gelöscht. Invertierte Zeichen werden hingeben nicht verändert, so daß Texte oder Beschriftungen erhalten bleiben.</p>
+
+        <p>Doch nun ein Beispiel:</p>
+
+        <pre>
+10 PRINT CHR$(147);CHR$(18);
+20 PRINT »TEST-PROGRAMM«
+30 GNEW
+40 GON
+50 FORI = 0 TO 111
+60 : PLOT I,I
+70 NEXT
+80 POKE 198,0:WAIT 198,1
+90 GOFF
+</pre>
+
+
+        <p>In den Zeilen 10 bis 20 wird der Bildschirm gelöscht und der invertierte Text »TEXT-PROGRAMME« geschrieben. Der Befehl »GNEW« löscht den Grafikspeicher und den Bildschirm, wobei der invertierte Text unverändert bleibt. GON schaltet dann die Grafik ein und in der Schleife wird eine Linie von links unten nach rechts oben (in der augenblicklichen Schriftfarbe) gezeichnet. Sobald Sie eine Taste drücken, wird die Grafik wieder abgeschaltet und Sie sehen eine schräge Linie aus Fragezeichen.</p>
+
+        <p>Das Maschinenprogramm schreibt ein programmierbares Zeichen auf den Bildschirm und ändert den Grafikinhalt dieses Zeichens. Anschließend wird geprüft, ob schon ein Zeichen mit genau dieser Grafik umdefiniert wurde. Ist dies der Fall, so wird das gefundene Zeichen auf den Bildschirm gebracht und das alte Zeichen ist wieder frei. Wegen dieser Optimierungs-Routine »verbraucht« das Beispielprogramm nur ein Zeichen aus dem schmalen Vorrat von 64 programmierbaren Zeichen.</p>
+
+        <p>Da diese Optimierung über einen Vektor verläuft, kann sie durch »POKE 1,PEEK(1)-1« abgeschaltet werden. Lassen Sie das Testprogramm erneut laufen und sehen Sie sich das neue Ergebnis an. Mit »POKE 1,PEEK(1)+1« optimiert das Programm wieder, wird aber auch etwas langsamer.</p>
+
+        <p>Durch »PEEK(0)« können Sie außerdem abfragen, wie viele Zeichen noch frei sind. Hierdurch kann die Fehlermeldung »CHARACTER-ERROR (IN&hellip;)« verhindert werden. Falls PEEK(0) den Wert Null ergibt, sollten keine Grafikbefehle mehr folgen.</p>
+
+        <p>Ändern Sie nun die Zeile 60 des Testprogramms in »60 TURN I,I« und erweitern Sie folgende Zeile mit »GOTO 50«.</p>
+
+        <p>Das Programm wird jetzt eine Linie ziehen, anschließend löschen und so fort, da die Bildpunkte jetzt fortlaufend invertiert werden. Falls Sie in der Zeile 40 den Befehle »GON« durch »GOFF« ersetzen, können Sie anschaulich verfolgen, wie das Programm — und speziell die Optimierung — arbeitet.</p>
+
+        <p>Eine Besonderheit müssen Sie jedoch unbedingt beachten. Die neuen Basicbefehle können nicht direkt hinter einer THEN-Anweisung stehen. Am einfachsten ist es, die beiden Befehle dann durch einen Doppelpunkt (&hellip;THEN : COPY) zu trennen.</p>
+
+        <p>Zuletzt eine Grafik-Anwendung. Die Bilder 3 und 4 zeigen, welche Ergebnisse mit der Grafik-Erweiterung möglich sind. Das Basicprogramm »FUNKTIONS-PLOT« (Listing 7) vereinfacht das programmierte Plotten von Funktionen doch erheblich.</p>
+
+        <p>Nachdem Sie das Programm eingegeben und gestartet haben, werden Sie nach dem Wertebereich gefragt. Anschließend wird die Bildumrahmung gezeichnet. Die Größe sowie die Position des Diagramms auf dem Bildschirm ist durch die Variablen Unten, Oben, Rechts und Links (U,O,R,L) in der Zeile 110 festgelegt. Die Zeilen 170 bis 230 berechnen nun das Minimum sowie das Maximum der Funktion. Außerdem werden die Werte in das Feld Y(A) übertragen. Die Variablen MI und MA werden in Zeile 250 auf vier Nachkommastellen begrenzt. Diese Werte sowie die Funktion selbst werden nun (invertiert) im unteren Bildteil gedruckt. Nachdem die Funktion grafisch dargestellt wurde, läuft das Programm in Zeile 390 in einer Warteschleife.</p>
+
+        <p>Drücken Sie jetzt eine Taste, so gelangen Sie in ein Mini-Menü. Sie können nun eine neue Funktion eingeben oder die alte mit neuen Werten untersuchen.</p>
+
+        <p>Eine neue Funktion wird in der Zeile 450 mit INPUT A$ übergeben. Salopp gesagt, programmiert sich der Copmputer in den folgenden Zeilen selbst. Wie das?</p>
+
+        <p>Zuerst wird der Bildschirm gelöscht und in der obersten Zeile die Zeilennummer 190 und der String A$, der die neue Funktion enthält, gedruckt. Die Zeile 460 druckt darunter die Nummer 190 und einen PRINT-Befehl. Anschließend folgt ein Anführungszeichen, dann die Funktion und schließlich wieder ein Anführungszeichen. Zuletzt wird in der dritten Bildschirmzeile der Befehl »RUN« gedruckt. Jetzt könnte auf dem Bildschirm der folgende Text stehen:</p>
+
+        <pre>
+190 Y=COS(X)
+290 ?"Y=COS(X)"
+RUN
+</pre>
+
+
+        <p>Wäre das Programm hier zu Ende, so müßten Sie nur die HOME-Taste drücken und der Cursor würde auf der Zeile 190 stehen. Drückt man jetzt RETURN, so wird diese Zeile einprogrammiert. Ein erneuertes RETURN übernimmt die Zeile 290 in das Programm und beim dritten RETURN wird der Befehl RUN ausgeführt. Da sich der Computer bis zu neun Tastatureingaben »merken« kann, brauchen Sie diesen Ablauf nicht »von Hand« einzugeben. Der erste POKE-Befehl in der Zeile 470 sagt dem Computer, daß — angeblich — sechs Tasten gedrückt worden sind. Zuerst »CURSOR HOME« (POKE 631,19), und dann fünfmal »RETURN« (Zeile 480). Nach dem END-Befehl führt er diese — untergeschobenen — Eingaben aus, programmiert die beiden Programmzeilen ein und startet sich zuletzt wieder mit dem RUN-Befehl.</p>
+
+        <p>Dieses Verfahren ist übrigens sehr praktisch, falls man ein Maschinenprogramm in DATA-Zeilen umwandeln muß. Vorausgesetzt das notwendige Programm ist fehlerfrei, kann man eigentlich sicher sein, daß es der Basic-Lader anschließend auch ist.</p>
+
+        <p>Wie Sie an dem Funktions-Plotter sehen können, ermöglicht die Grafikhilfe die Programmierung auch komplexerer Grafiken in einfacher und überschaubarer Form. Da die Erstellung der Grafik recht schnell erfolgt, ist eine große Vielfalt von Anwendungen denkbar.</p>
+
+        <address class="author">(Heino Verder/ev)</address>
+
+        <figure>
+            <pre data-filename="zentrieren" data-name="Bild zentrieren"></pre>
+            <figcaption>Listing 1. »Bild zentrieren«</figcaption>
+        </figure>
+        <figure>
+            <pre data-filename="format" data-name="Bildschirmformat"></pre>
+            <figcaption>Listing 2. »Bildschirmformat«</figcaption>
+        </figure>
+        <figure>
+            <pre data-filename="bild-ram" data-name="Bild-RAM"></pre>
+            <figcaption>Listing 3. »Bild-RAM« - Umschalten zwischen zwei Bildschirmseiten</figcaption>
+        </figure>
+        <figure>
+            <pre data-filename="zeichensatz" data-name="Programmierbarer Zeichensatz"></pre>
+            <figcaption>Listing 4. »Programmierbarer Zeichensatz«</figcaption>
+        </figure>
+        <figure>
+            <pre data-filename="befehlserweiter" data-name="Befehlserweiterung"></pre>
+            <figcaption>Listing 5. Basic-Ladeprogramm zur Befehlserweiterung</figcaption>
+        </figure>
+        <figure>
+            <pre data-filename="pruefsumme" data-name="Prüfsummenprogramm" data-range="10-32"></pre>
+            <figcaption>Listing 6. Prüfsummenprogramm zum Basic-Lader aus Listing 5. Das Zeichen »^« in Zeile 28 ist der Hochpfeil (»↑«)</figcaption>
+        </figure>
+        <figure>
+            <pre data-filename="funktions-plot" data-name="Funktions-Plot"></pre>
+            <figcaption>Listing 7. Basicprogramm »Funktions-Plot« zur Demonstration der neuen Grafikbefehle</figcaption>
+        </figure>
+
+        <aside class="futureteufelchen">
+            <h2>Futureteufelchen</h2>
+
+            <img alt="Futureteufelchen" src="futureteufelchen.svg" width="119" height="200" class="inline">
+
+            <p>Der folgende Fehler wurde in Listing 6 behoben:</p>
+
+            <p>Zeile 14 sah so aus:</p>
+
+            <pre>14 ZL=PEEK(60)+PEEK(61)*256:D=0</pre>
+
+            <p>Die Adressen 60 und 61 ergeben keinen Sinn. Die Zeilennummer des DATA-Pointers befindet sich in 63 und 64:
+
+            <pre>14 ZL=PEEK(63)+PEEK(64)*256:D=0</pre>
+
+            <address class="author">(Endurion)</address>
+		</aside>
+
+    </article>
+
+</body>
+
+</html>

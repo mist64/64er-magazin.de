@@ -443,7 +443,7 @@ MSN LSN
             (Spalte 13)</p>
 
         <p>In unserem Beispiel muß der Punkt in Zeile 12 an Spaltenplatz 13 stehen. Weil in jeder Zeile 320 Byte (8x40) und an jedem Platz 8 Byte vorhanden sind, fängt unser Bildschirmfeld bei Byte Nr.<br>
-            Z<em>320 + S</em>8 = 12<em>320 + 13</em>8 = 3944 an (siehe Bild 7).</p>
+            Z*320 + S*8 = 12*320 + 13*8 = 3944 an (siehe Bild 7).</p>
 
         <figure>
             <img src="132-7.png" alt="">
@@ -451,10 +451,10 @@ MSN LSN
         </figure>
 
         <p>Nun müssen wir feststellen, um welches Byte in diesem Feld es sich handelt. Wir haben vorhin beim Feststellen der Zeile einfach gleich INT(Y/8) berechnet. Wenn wir nun nur Y/8 berechnen, kommen wir in unserem Beispiel auf Y/8 = 100/8 = 12.5. Ziehen wir davon INT(Y/8) ab: Y/8-INT(Y/8 = 12.5-12 = 0.5 und multiplizieren das Ergebnis mit 8:<br>
-            80<em>(Y/8-INT(Y/8))=8</em>0.5=4</p>
+            80*(Y/8-INT(Y/8))=8*0.5=4</p>
 
         <p>Genau das ist unser gesuchtes Byte: Nr. 4 von oben. Das sieht komplizierter aus, als es ist. Aus alledem ergibt sich jetzt, in welchem Byte der Bit-Map ein Bit zu setzen ist:<br>
-            BYTE=Z<em>320 + S</em>8 + 8*(Y/8-INT(Y/ 8))</p>
+            BYTE=Z*320 + S*8 + 8*(Y/8-INT(Y/ 8))</p>
 
         <p>In unserem Beispiel ist es dann also das Byte 3948 der Bit-Map. Nun müssen wir noch herauskriegen, welches Bit in diesem Byte zu setzen ist (siehe Bild 8).</p>
 
@@ -464,7 +464,7 @@ MSN LSN
         </figure>
 
         <p>Auch hier haben wir vorhin bei der Berechnung der Spalte einfach gerechnet INT(X/8). Jetzt rechnen wir:<br>
-            X-8<em>INT(X/8)=110-8</em>INT(110/8)</p>
+            X-8*INT(X/8)=110-8*INT(110/8)</p>
 
         <p>Das ergibt 6. Wenn wir das von 7 abziehen (Nummer des höchstwertigen Bit), erhalten wir:<br>
             BIT = 7-(X-8*INT(X/8))</p>
@@ -472,12 +472,12 @@ MSN LSN
         <h2>Die Zauberformeln</h2>
 
         <p>In unserem Beispiel ist BIT = 1. Es muß also Bit 1 gesetzt werden. Damit haben wir jetzt folgende Formeln zur Verfügung:<br>
-            BYTE=INT(Y/8)<em>320 + INT(X/8)</em>8 + 8<em>(Y/8-INT(Y/8))<br>
+            BYTE=INT(Y/8)*320 + INT(X/8)*8 + 8*(Y/8-INT(Y/8))<br>
                 und<br>
-                BIT=7-(X-8</em>INT(X/8))</p>
+                BIT=7-(X-8*INT(X/8))</p>
 
         <p>Den ersten Ausdruck für Byte kann man noch etwas vereinfachen:<br>
-            BYTE = 8<em>(39</em>INT(Y/8) + INT(X/8) + Y/8)</p>
+            BYTE = 8*(39*INT(Y/8) + INT(X/8) + Y/8)</p>
 
         <p>Die genaue Speicherzelle ergibt sich durch Addieren der Bit-Map-Startadresse (8192) zu BYTE. Um also einen Punkt zu setzen, gibt man das Kommando:</p>
 

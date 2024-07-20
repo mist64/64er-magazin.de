@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>Von den Kleinen auf die Großen</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="K. Petanides, rg">
+    <meta name="64er.issue" content="8/84">
+    <meta name="64er.pages" content="96-97">
+    <meta name="64er.toc_category" content="Programme zum Abtippen|Tips & Tricks">
+    <meta name="64er.toc_title" content="Von den Kleinen auf die Großen (C 64)">
+    <meta name="64er.index_title" content="Von den Kleinen auf die Großen (C 64 - CBM)">
+    <meta name="64er.index_category" content="Listings zum Abtippen|Tips & Tricks|Transfer">
+	<meta name="64er.id" content="cbm1">
+</head>
+
+<body>
+	<article>
+<h1>Von den Kleinen auf die Großen</h1>
+
+<p class="intro">Für einen so erfolgreichen Computer wie den Commodore 64 dauert es naturgemäß nicht lange, bis auch entsprechend viel gute Software zur Verfügung steht. Viele von diesen Programmen, die nicht die speziellen Eigenschaften des C 64 benutzen, könnten ohne weiteres auf den CBM-Geräten der 3-, 4- und 8000-Serie laufen, wenn Commodore nicht überflüssigerweise den Beginn des Basic-RAM-Bereichs geändert hätte.</p>
+
+<p>Während jedoch der C 64 und auch der VC 20 in der Lage sind, auf CBM-Geräten erstellte Basicprogramme selbsttätig an das eigene System anzupassen (siehe dazu den entsprechenden Artikel in dieser Ausgabe), besitzen die CBM-Geräte diese Fähigkeit nicht. Es ist vielmehr Aufgabe des Anwenders die Programme anzupassen, will er etwa C 64-Programme auf den CBMs laufen lassen.</p>
+
+<p>Im Heft 9/83 der Zeitschrift mc wurde eine einfache Möglichkeit vorgestellt, um auf C 64 erstellte Programme auch für die CBM-Geräte lauffähig zu machen. Es werden dabei mit Hilfe einer Zählschleife die Inhalte der Speicherstellen ab 2048 (Beginn des C 64-Basic-Bereichs) bis Programmende auf die Speicherplätze ab 1024 (Basic-Beginn für die CBMs) transferiert.</p>
+
+<p>Diese Prozedur dauert je nach Länge des zu transferierenden Programms mitunter ein paar Minuten. Aus diesem Grund benutzte ich für die Umwandlung von C 64-Programmen ein eigens dafür erstelltes Maschinenprogramm. Ein versehentlich in den Maschinenprogramm-Bereich gePOKEter Wert sorgte eines Tages dafür, daß statt des ganzen Programms nur ein Block (256 Byte) transferiert wurde. Erstaunlich genug, das (ansonsten nicht lauffähige) Programm ließ sich anstandslos listen!</p>
+
+<p>Diese zunächst überraschende Tatsache hat eine einfache Erklärung: Die Vorwärtszeiger (die ersten beiden Byte einer jeden Basic-Zeile) geben den Beginn der nächsten Basic-Zeile absolut an, das heißt es spielt keine Rolle, ob dieser weniger als 80 Byte oder ein ganzes KByte weiter liegt — die Zeile wird immer richtig angesprungen. Daß das Programm dann nicht auch noch lauffähig ist, liegt daran, daß der Basic-Interpreter, solange keine Sprunganweisungen vorkommen, sich nicht nach den Zeilenzeigern richtet, sondern die Zeilen byteweise in ihrer natürlichen Reihenfolge abarbeitet. Stößt er dabei auf eine Lücke zwischen den Zeilen, so kann er damit nichts anfangen, das System stürzt ab.</p>
+
+<p>Folgende Befehlssequenz, etwa in Direktmodus eingegeben, liefert zum Beispiel die Anfangsadressen der Zeilen eines Basic-Programms:</p>
+
+<pre>x=1025: printx;: fori=1to1000: x=peek(x) + peek(x+1) *256: printx;: ifx<>0thennext</pre>
+
+
+<p>Es wurde dabei vorausgesetzt, daß das vorliegende Programm nicht mehr als 1000 Zeilen Umfang hat. Will man die Arbeitsweise des Betriebssystems erkennen, so kann man in der obigen Zahlenfolge in eine der dort stehenden Adressen (jede Adresse: Zwei Byte in der Form, Adresse = LSB + MSB*256) statt der nächsten eine etwas später kommende Adresse einPOKEn. Alle dazwischen liegenden Zeilen verschwinden dann aus dem Listing, sie werden aber bei RUN vom Interpreter abgearbeitet. Die »verschwundenen« Zeilen werden wieder sichtbar, sobald eine neue Zeile mit RETURN »übernommen« wird.</p>
+
+<p>Nehmen wir uns die Zeit, um uns an einem Beispiel klar zu machen, was eigentlich im letzten Absatz gemeint ist. Angenommen die Zeilen eines Basicprogramms ergeben die Zahlenfolge: 1025 1057 1092 1149 1226 1286 1350 1412 1465 1500</p>
+
+<p>Das sind die Adressen, an denen jeweils eine Basic-Zeile beginnt, und zwar steht in den Speicherstellen 1025 und 1026 zusammen die Adresse 1057, in 1057 und 1058 die Adresse 1092 und so weiter. Wenn wir nun zum Beispiel in die Adresse 1092 (und 1093) etwa die Adresse 1350 einPOKEn könnten, so würden die Zeilen dazwischen vom Listing verschwinden, der Interpreter würde sich aber weiterhin durchlaufen und abarbeiten. Wie geht das POKEn vor sich? Wenn Ihr System den Befehl »doke« kennt, etwa durch eine Erweiterung wie Exbasic, so geben Sie einfach ein: doke1092,1350. Wenn nicht, so muß man sich erinnern, daß eine Adresse gleich dem Ausdruck MSB*256+LSB ist, wobei MSB und LSB für Most Significant (höherwertiges) Byte und Least Significant (niederwertiges) Byte steht. Es ist in unserem Beispiel: msb=int(1350/256): lsb=1350-msb*256.</p>
+
+<p>msb und lsb sind hier richtige numerische Variablen und müssen (das gilt für die ersten zwei Zeichen, die allein relevant sind) ungeSHIFTet eingegeben werden! Sie geben jetzt ein:</p>
+
+<pre>poke1092,lsb:poke1093,msb</pre>
+
+
+<p>Um ein C 64-Programm auf einem CBM listen zu können, ist es also nicht erforderlich, erst das ganze Programm zu verschieben, es genügt nur ein Teil davon. Genauer: ein Teil, der mindestens eine Zeile enthält! Der Grund liegt darin, daß das System erst das Ende einer Zeile, gekennzeichnet durch eine 0, gefunden haben muß, bevor der Sprung in die nächste Zeile erfolgt.</p>
+
+<p>Vorgehen: Man gibt im Direktmodus ein:</p>
+
+<pre>fori=1025to1111:pokei,peek(i+1024):next:poke43,peek (43)-4</pre>
+
+
+<p>Der Wert 1111 aus mnemonischen und Sicherheitsgründen (1111 - 1024 > 80, Anzahl der Zeichen in einer Basic-Zeile). Die »Verschiebung« dauert etwa eine Sekunde.<br/>
+Man listet einige Zeilen des Programms, setzt den Cursor auf die erste Zeile und übernimmt sie mit RETURN. Dadurch werden auch alle anderen Zeiger richtig gesetzt, wobei das Betriebssystem gleichzeitig die einzelnen Zeilen lückenlos in steigenden Nummern aneinanderfügt. (Das ist übrigens auch der Grund, warum es zwar prinzipiell möglich, jedoch nicht einfach ist, etwa relokatible Maschinenprogramme zwischen den Basic-Zeilen zu verstecken. Über die Möglichkeit, Textteile in Basic-Zeilen zu verstecken, werden wir bei anderer Gelegenheit reden). Das Programm ist jetzt auch auf CBM-Geräten lauffähig, von systemgebundenen Befehlen natürlich abgesehen.</p>
+
+<p>Aber auch diese Prozedur ist zeitraubend, wenn mehrere Programme von einem System auf das andere übertragen werden müssen. Das kleine Basic-Programm (siehe Listing) namens »transfer« wäre in diesem Fall eine bessere Alternative: Es erzeugt ein Maschinenprogramm ab Adresse 960 und löscht sich anschließend selbst Das Maschinen»programm« bleibt, so lange der Computer nicht ausgeschaltet wird, in diesem Bereich resistent, verschiebt beim Abruf mit »sys 960« einen einzigen Block des C 64-Programms ab Adresse 2049 auf Adresse 1025 aufwärts und setzt auch die Zeiger für den Beginn der Variablen richtig.</p>
+
+<p>Vorgehen: Das Basicprogramm »transfer« laden und mit RUN starten. Anschließend das zu verschiebende Programm laden, »sys 960« eintippen und mit RETURN abschließen. Dadurch werden die ersten 256 Byte des Basicprogramms »herunter« geholt. Das verschobene Programm läßt sich jetzt listen. Cursor auf die erste Zeile setzen und mit RETURN übernehmen. Gegebenenfalls eine eigene REM-Zeile als Zeile mit der niedrigsten Nummer übernehmen!</p>
+
+		<address class="author">(K. Petanides/rg)</address>
+
+        <figure>
+            <pre data-filename="umsetzung" data-name="Umsetzung von C 64-Programmen auf CBM-Computer"></pre>
+            <figcaption>Listing des kurzen Programms für die Umsetzung von C 64-Programmen auf CBM-Computer</figcaption>
+        </figure>
+	</article>
+
+</body>
+
+</html>

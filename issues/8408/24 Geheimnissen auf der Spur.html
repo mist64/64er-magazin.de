@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>Geheimnissen auf der Spur</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="Arnd Wängler">
+    <meta name="64er.issue" content="8/84">
+    <meta name="64er.pages" content="24-27">
+    <meta name="64er.toc_category" content="Hardware">
+    <meta name="64er.toc_title" content="Keine Probleme mit der Floppy – Selbsthilfe: VC 1541-Tricks">
+    <meta name="64er.index_title" content="Geheimnissen auf der Spur: 1541 reparieren">
+    <meta name="64er.index_category" content="Hardware|Reparatur">
+    <meta name="64er.id" content="1541">
+</head>
+
+<body>
+    <article>
+
+        <h1>Geheimnissen auf der Spur</h1>
+
+        <p class="intro">Mit steigenden Umsatzzahlen des Commodore 64 gewann auch das dazugehörige Diskettenlaufwerk ständig an Popularität und verdrängte die Datasette. Wie es aufgebaut ist und welche Möglichkeiten die Hardware bietet, zeigt dieser Bericht.</p>
+
+        <p>Zunächst ein paar Worte zur Geschichte: Entstanden ist das 1541-Laufwerk aus dem CBM 2031-Laufwerk, das bis auf die Schnittstelle identisch ist. Das 2031-Laufwerk arbeitet mit dem parallelen IEEE-488-Bus, während die 1541-Floppy Daten seriell überträgt. Früher hieß das Laufwerk allerdings noch 1540 und war zum Einsatz mit dem VC 20 vorgesehen. Mit Erscheinen des Commodore 64 erhielt es einen neuen Namen und durch ein neues Betriebssytem die Fähigkeit, sowohl mit dem VC 20 als auch mit dem C 64 zusammenarbeiten zu können. Die Änderung des Betriebssystems wurde wegen der unterschiedlichen Datenlesegeschwindigkeit der beiden Computer durchgeführt (tatsächlich ist der VC 20 schneller als der C 64). Meinen Erfahrungen nach funktioniert das 1541 am VC 20 aber auch ohne Umstellung (mit dem Befehl UI-) einwandfrei. Übrigens: Wer noch ein 1540-Laufwerk hat und dieses umrüsten möchte, kann dies durch Auslesen eines 1541-ROMs und Brennen auf EPROMs preisgünstig tun, ohne lange auf einen Umrüstsatz warten zu müssen.</p>
+
+        <p>Damit die gängigen EPROM-Typen (zum Beispiel der 2764) verwendet werden können, ist es allerdings notwendig, einige Pins umzuleiten. Ein solches Zwischenstück wird meines Wissens nach von Kalansky (siehe Expansions-Heft 7) geliefert.</p>
+
+        <h2>Einfaches Umrüsten des 1540</h2>
+
+        <p>Die Erweiterung des Betriebssytems war allerdings nicht die einzige Veränderung, die seit dem Erscheinen des 1541 vorgenommen wurde. Die bis Weihnachten 1983 ausgelieferten 1541 funktionierten bei angeschlossenem 1526-Drucker beim Arbeiten mit relativen Dateien nicht einwandfrei, da diese Version eine Handshake-Leitung nicht überprüfte. Die Änderung des Betriebssystems des Druckers konnte daran natürlich nichts verbessern. Die nach Weihnachten 1983 verkauften Laufwerke haben meiner Erfahrung nach keinen Fehler mehr in ihrem DOS (Disk Operating System).</p>
+
+        <h2>Das 1541 ist eigentlich ein Computer</h2>
+
+        <p>Damit habe ich schon auf eine Besonderheit des 1541-Laufwerks hingewiesen. Im Gegensatz zu vielen anderen Computersystemen ist das Commodore-Laufwerk ein sogenanntes »intelligentes« Peripheriegerät. Intelligent deswegen, weil im Laufwerk ein eigener Prozessor mit oben erwähntem eigenen Betriebssystem seine Arbeit leistet. Die VC 1541-Floppy wird deshalb mit Recht als eigener Computer bezeichnet. Neben dem 6502-Prozessor als CPU (Bild 1, Pfeil B) sorgen noch eine Reihe anderen Bausteine für den Datenaustausch mit dem Computer. Das sind im wesentlichen zwei 6522 Input/Output-Bausteine, von denen einer die Verwaltung des seriellen Busses übernimmt und der andere für die korrekte Motor-, Schreib- und Lesekopfsteuerung zuständig ist. Das 16 KByte große Betriebssystem ist in drei eigenen Bausteinen untergebracht. Zusätzlich stehen noch vier 2114-Bausteine mit insgesamt 2 KByte Pufferspeicher zur Verfügung.</p>
+
+        <figure>
+            <img src="24-1.png" alt="">
+            <figcaption>Bild 1. Die DOS-Platine des 1541-Laufwerks</figcaption>
+        </figure>
+
+        <p>Eigentlich eine ganze Menge, das für den relativ günstigen Preis geboten wird. Wie sieht es aber mit den Leistungen des Laufwerks im täglichen Betrieb aus?</p>
+
+        <h2>Igel oder Hase?</h2>
+
+        <p>Wer von der Datasette auf die VC 1541-Floppy umsteigt, wird sicherlich zunächst von der Ladegeschwindigkeit, den Diskettenbefehlen und der Auswahlmöglichkeit des Directory begeistert sein. Wer aber, wie ich, schon mit anderen Computern und deren Laufwerken gearbeitet hat, ist von der relativ langsamen Datenübertragung enttäuscht. In Zahlen ausgedrückt, beträgt die Datenübertragungsgeschwindigkeit 0,4 KByte pro Sekunde (im Vergleich: Die CBM 2031 überträgt mit 1,8 KByte pro Sekunde). Außerdem ist die VC 1541-Floppy, jedenfalls die, die ich hatte, sehr störanfällig. Die bei längerem Betrieb (bei mir nach einem Monat) auftretenden Fehler machen sich zunächst in immer häufigeren Lesefehlern und Blinken der Kontrollampe bemerkbar. Später wird es dann unmöglich, noch einzelne Disketten zu lesen, außer sie wurden gerade formatiert. Dies sind typische Anzeichen einer Dejustierung des Schreib-/Lesekopfes.</p>
+
+        <p>Da diese Fehler bei meinem Laufwerk, auch nach Reparatur durch den Fachhandel, innerhalb kürzester Zeit wieder auftraten, war es an der Zeit, dem Problem auf die Spur zu kommen. Mit einem Disk-Monitor versuchte ich, bei meinem defekten Laufwerk eine frisch formatierte Diskette zu lesen. Das funktionierte auch auf allen Spuren einwandfrei, außer auf Spur 1. Die ausgegebene Fehlermeldung deutete auf eine fehlerhafte Formatierung hin. Da Spur 1 aber die äußerste auf der Diskette ist, schloß ich daraus, daß der Schreib-/Lesekopf die Position der Spur 1 nicht mehr exakt erreichen konnte. Mittlerweise war die Garantie auf mein Laufwerk abgelaufen (die erste Reparatur dauerte zwei Monate), deshalb entschloß ich mich, das Laufwerk zu öffnen.</p>
+
+        <h2>Abhilfe bei Funktionsstörungen</h2>
+
+        <p style="text-align: center; border: solid 10px black;">
+            Achtung! Ziehen Sie bei allen Arbeiten an offenen elektrischen Geräten den Netzstecker
+        </p>
+
+
+        <p>Wer dies nachvollzieht, wird im Inneren die Platine mit dem Disk-Controller, dem Netzteil und dem eigentlichen Laufwerk (das von Alps, einem japanischen Elektrogiganten kommt) finden. Zusammengehalten werden die Einzelteile in einem Rahmen aus Preßblech. Nimmt man die Platine (bitte vorsichtig) ab, wird der Blick auf den Schreib-/Lesekopf (Bild 2, Pfeil F) und dessen Antrieb frei. Dieser Antrieb ist es aber, der meist für die Lesefehler verantwortlich ist. Die Funktionsweise ist schnell erklärt: Ein Steppermotor überträgt über seine Achse (Bild 2, Pfeil E) die Bewegungsinformationen auf ein Rad, auf dem eine segmentförmige Erhebung ist. Um dieses Rad herum läuft ein Stahlband, das durch ein Zugrad auf Spannung gehalten wird. An dem Stahlband ist der Schreib-/Lesekopf befestigt und folgt somit den Bewegungen des Steppermotors. Beim sicherlich jedem Laufwerkbesitzer bekannten Klappern zu Beginn eines Formatiervorgangs justiert sich der Schreib-/Lesekopf, indem das auf dem Steppermotor angebrachte Rad mehrmals an einen Anschlag fährt. Dabei verschiebt sich im Laufe der Zeit das leider nur aufgesteckte Rad auf der Achse des Steppermotors. Daß der Schreib-/Lesekopf sich danach nicht mehr justieren kann, ist einleuchtend.</p>
+
+        <figure>
+            <img src="24-2.png" alt="">
+            <figcaption>Bild 2. Das »eigentliche« Laufwerk</figcaption>
+        </figure>
+
+        <h2>Thermische Probleme</h2>
+
+        <p>Verstärkt wird dieser Effekt noch durch die starke Erhitzung des Laufwerks bei längerem Betrieb. Diese ist zum einen darauf zurückzuführen, daß das Netzteil eingebaut ist, zum anderen entwickeln die beiden Spannungsregler (Bild 1, Pfeil C) Temperaturen über 50 Grad. Dies mag für die Elektronik ja noch verträglich sein, die Mechanik nimmt es übel. Da sich das Metall der Steppermotorachse und das des aufgesprengten Rades bei diesen Temperaturen unterschiedlich ausdehnt, wird das Rad auf der Achse leichter verdrehbar.</p>
+
+        <p>Welche Maßnahmen kann man aber treffen, um solche Verstellungen zu verhindern? Das Einfachste ist es, nach gründlicher Reinigung einen Tropfen Superkleber auf das Rad und die Achse zu geben. Dabei sollte man natürlich vorsichtig sein, damit nicht das Stahlbändchen verklebt. Eine andere, wesentlich elegantere Methode besteht darin, durch Achse und Rad ein Loch zu bohren und beide durch einen Splint zu sichern. Dazu ist natürlich die Demontage des Steppermotors notwendig. Deshalb sollte man diese Arbeiten nur dann vornehmen, wenn Kenntnis und einwandfreies Werkzeug vorhanden ist. Möglicherweise erklärt sich auch Ihre Fachwerkstätte, gegen ein gewisses Entgelt, dazu bereit. Dort könnte dann die selbstverständlich notwendige Justage des Schreib-/Lesekopfes vorgenommen werden. Sie können aber auch, mit etwas Geschick, die Justage mit einer auf einem einwandfreien Laufwerk formatierten (beziehungsweise einer Ihrer ersten Disketten) vornehmen. Die Einstellung mittels Disk-Monitor wird dann zwar nicht 100prozentig, aber ein störungsfreies Schreiben und Lesen ist auf jeden Fall zu erreichen.</p>
+
+        <h2>Schmutz als Fehlerursache</h2>
+
+        <p>Die zweite Fehlerursache beim 1541 liegt im Antrieb der Disketten (Bild 2, Pfeil G). Durch Verwendung von schmutzigen beziehungsweise alten Disketten geht oft die Haftung zwischen den Antriebsrädern und der Diskettenscheibe verloren. Die Folge ist eine zu geringe Umdrehungsgeschwindigkeit der Diskette (wenn sie sich überhaupt dreht), die meist mit wildem Blinken der Funktionsanzeige quittiert wird. Eine Abhilfe schafft da nur die gründliche Reinigung des Andruckkopfes und des Antriebsrades mit Alkohol. Bei dieser Gelegenheit können Sie auch vorsichtig den Schreib-/Lesekopf mit einem Wattestäbchen säubern. Es ist empfehlenswert, die beiden Laufschienen des Schreib-/Lesekopfes ganz leicht (auch mit Wattestäbchen) einzuölen. Das Laufwerk wird dann leiser und zuverlässiger.</p>
+
+        <p>Sollten Ihnen die eben genannten Maßnahmen allerdings zu aufwendig vorkommen, ist es auf alle Fälle ratsam, für eine bessere Kühlung des Laufwerks zu sorgen. Dies ist entweder durch Einbau eines flachen Lüfters oder durch vollständiges Entfernen der Lüftungsschlitze im Gehäusedeckel möglich. Vermeiden Sie auf jeden Fall das Formatieren von Disketten, wenn das Laufwerk heiß ist.</p>
+
+        <h2>Hardwareumstellung der Geräteadresse</h2>
+
+        <p>Eine oft gestellte Frage ist auch die nach der hardwaremäßigen Umstellung der Geräteadresse. Die im Handbuch beschriebenen Teile sind nämlich auf der ganzen Platine nicht zu finden, weil das Floppy-Handbuch noch die alte, etwas größere und anders aufgebaute Platine beschreibt. Insgesamt gibt es drei verschiedene Platinen. In Bild 1 zeigt Pfeil A auf zwei Lötbrücken in der Form von zwei durch einen Steg verbundenen Halbkreisen. Durch Zertrennen der vorderen dieser beiden Lötbrücken läßt sich die Gerätenummer fest auf 9 einstellen. Ist es aber notwendig, das Laufwerk wechselweise mit 8 oder 9 zu betreiben, besteht die Möglichkeit, auf beide Halbkreise der vorderen Lötbrücke einen Draht zu führen und diesen mit einem Schalter zu verbinden. Nach Drücken des Schalters und Durchführen eines Resets stellt sich die neue Nummer automatisch ein. Der Schalter wird am besten an der Rückseite des Gehäusedeckels befestigt. Bei älteren (weißen) Diskettenlaufwerken befinden sich die beiden Lötbrücken übrigens nicht im vorderen Drittel der Platine, sondern, von vorne gesehen, hinten links. Auch hier wird wieder die vordere der beiden Leiterbahnen durchtrennt, um die Geräteadresse 9 einzustellen.</p>
+
+        <h2>Die Überbrückung des Schreibschutzes</h2>
+
+        <p>Daß es beim 1541-Laufwerk möglich ist, auch einseitige Disketten (durch Herausschneiden eines zweiten Schreibschutzloches) und hardsektororientierte Disketten beidseitig zu verwenden, ist mittlerweile sicherlich bekannt. Daß es aber auch möglich ist, ohne diese Schnippelei Disketten auf der Rückseite zu bespielen, ist die nächste Erweiterung, die uns das 1541-Laufwerk bietet. Auch hier ist das Prinzip des Schreibschutzes schnell erklärt, denn eine einfache Lichtschranke prüft, ob sich eine Diskette mit oder ohne Schreibschutz im Laufwerk befindet. Dies hat mich vor langer Zeit mal eine Diskette gekostet, da ich aus Sparsamkeitsgründen durchsichtigen Tesafilm als Schreibschutz verwendet hatte.</p>
+
+        <p>Nun aber zum notwendigen Umbau. Auf der Platine befinden sich auf der linken Seite die Steckverbindungen für Laufwerkssteuerung, Datenübertragung und eine Leuchtdiode. Diese Steckplätze sind auf der Platine mit »p« und einer Nummer bezeichnet. Der für uns wichtige Steckplatz ist der mit der Bezeichnung P6. Die ersten beiden Kabel haben die Farben Orange und Lila. Lötet man zwischen diese beiden Kabel ebenfalls einen Schalter, so ist es möglich, Disketten von der Rückseite zu bespielen, ohne eine Einkerbung für den Schreibschutz machen zu müssen. Es ist empfehlenswert, einen Kippschalter zu verwenden, damit optisch erkennbar ist, ob der Schreibschutz aktiviert ist oder nicht. Zum Wechseln der Disketten ist der Schalter übrigens wieder in Normalstellung zu bringen, da bei geschlossenem Schreibschutzschalter ein Diskettenwechsel vom Laufwerk »nicht bemerkt« wird. Einige Nachteile dieser Arbeiten am Laufwerk sollten allerdings nicht verschwiegen werden: Durch Öffnen des Gerätes verlieren Sie jeden Garantieanspruch. Teile, die Sie bei Arbeiten an der 1541 zerstören (zum Beispiel durch statische Entladung oder zu heißen Lötkolben) werden Ihnen von keinem Händler ersetzt. Und achten Sie natürlich auf Ihre Sicherheit, indem Sie den Netzstecker ziehen und weglegen.</p>
+
+        <address class="author">(Arnd Wängler)</address>
+    </article>
+
+</body>
+
+</html>

@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>Sprachausgabe mit dem SDP 120</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="Christian Quirin Spitzner, rg">
+    <meta name="64er.issue" content="8/84">
+    <meta name="64er.pages" content="22-23">
+    <meta name="64er.toc_category" content="Test">
+    <meta name="64er.toc_title" content="Sprachausgabe mit dem SDP">
+    <meta name="64er.index_title" content="Sprachausgabe mit dem SDP 120">
+    <meta name="64er.index_category" content="Hardware-Test|Sprachausgabe">
+    <meta name="64er.id" content="sdp120">
+</head>
+
+<body>
+    <article>
+        <h1>Sprachausgabe mit dem SDP 120</h1>
+
+        <p class="intro">Es taucht sicherlich bei einigen der Wunsch auf, ihrem Commodore 64 das Sprechen beizubringen. Wir haben mit den SDP 120 eine hardwaremäßige Lösung getestet.</p>
+
+        <figure>
+            <img src="22-1x.png" alt="">
+        </figure>
+
+        <p>Wie arbeitet nun dieser Sprachsynthesizer? Er benutzt das Verfahren der Phonemsynthese, wobei wir schon wieder bei der nächsten Frage sind: Was ist Phonemsynthese?</p>
+
+        <p>Mit diesem Verfahren ist es möglich, jedes beliebige Wort synthetisch wiederzugeben. »Phoneme« sind die vom Sprachsynthesizer erzeugten Laute, die sehr wenig Speicherplatz benötigen. Der SDP 120 benutzt 64 Phoneme (Einschließlich unhörbarer Steuercodes.) Daß es zwischen gesprochenen und geschriebenen Worten große Unterschiede gibt, merkt man spätestens wenn man versucht, einfache Worte in Phonemschreibweise zu erstellen.</p>
+
+        <p>Das Wort »Datei« wird aus den 5 Phonemen d - al - t - a - y zusammengesetzt. Bei »Diskette« wird die Schreibweise schon etwas schwieriger: d - il - ss - k - ael - t - ael. Am Titel dieser Zeitschrift hat man allerdings schon ganz schön zu kauen. Für »64'er« benötigt man folgende 14 Phoneme: f - il - r - ul - n - d - ss - ael - ch - t - ss - il - g - ael - r.</p>
+
+        <p>Welche Vorteile hat nun diese Art der Spracherzeugung? Der wohl größte Vorteil liegt im minimalen Speicherbedarf eines Wortes. Da ein Phonem durch jeweils ein Byte dargestellt wird, benötigt man für das Wort »Datei« nur 5 Byte. Ein weiterer Vorteil liegt darin, daß der Sprachsynthesizer jedes beliebige Wort oder jeden beliebigen Satz sagen kann, da er ja nicht an einen bestimmten Wortschatz gebunden ist. Das Phonem-Verfahren bringt jedoch nicht nur Vorteile, sondern birgt auch einige Nachteile. Vokale und einige Konsonanten können von Sprachsynthesizer recht gut nachgeahmt werden, während einige synthetische Konsonanten kaum wiederzuerkennen sind. Darunter leidet natürlich die Verständlichkeit des Systems.</p>
+
+        <p>Vom Hersteller erhält man ein sorgfälltig geschriebenes 28seitiges Handbuch, das neben technischen Einzelheiten und der Schaltungen einschließlich Platinenbestückungen, den Umgang mit dem Gerät erklärt und Hinweise gibt, wie man bei der Programmierung von Worten vorgehen soll. Es ist auch eine Liste von 250 aussprachemäßig definierten deutschen Wörtern beigefügt.</p>
+
+        <p>Das Herzstück des Sprachsynthesizers ist der Baustein SC-01A. Dieser Baustein besitzt einen Vorrat von 64 Lauten (=Phoneme), wovon drei Steuercodes sind (zwei Pausen und 1 Stop-Code). Die Phoneme können jeweils in vier sogenannten Betonungsstufen erzeugt werden, was bei den Steuerlauten natürlich bedeutungslos ist. Bei den Vokalen bewirkt das Setzen der Betonungsstufen ein starkes Anheben der Stimmlage, aber keine Erhöhung der Amplitude, was recht unnatürlich klingt. Bei den stimmhaften Konsonanten bewirkt das Setzen einer Betonung ebenfalls ein Anheben der Tonlage, was aber für die Betonung von Konsonanten im Deutschen ungeeignet ist. Eine Zunahme der Lautstärke erfolgt nicht, und so bleiben Akzente auf stimmlosen Konsonanten gänzlich ohne Wirkung. Im Deutschen werden aber Konsonanten ebenso wie die Vokale betont, was durch ein Anhebung der Lautstärke und gegebenfalls eine leicht Anhebung der Stimmlage erfolgen sollte. In vielen Fällen kann die Betonung von Silben durch Verlängerung der in ihnen enthaltenen Vokalen erzielt werden.</p>
+
+        <p>Mit den 64 Phonemen und den Betonungsstufen kommt man auf 4 mal 64 = 256 Codes, das entspricht genau einem Byte oder einem 8 Bit langen Datenwort. Dies ist für eine preisgünstige Konstruktion und für die einfache Programmierung vorteilhaft, vom Gesichtspunkt der Spracherzeugung her aber nur ein Minimum. Wünschenswert wäre eine mehrfach größere Anzahl von Grundlauten. Ähnlich verhält es sich bei den Betonungsstufen, die einen Kompromiß darstellen zwischen Vergrößerung der Amplitude (eigentliche Betonung) und der Anhebung der Stimmfrequenz. Da im Deutschen die resultierende Anhebung der Stimmfrequenz zu groß ist, führt dies zu unnatürlichen klingenden Anhebungen der Sprachmelodie. Besser wäre eine getrennte Steuerbarkeit von Amplitude und Stimmfrequenz.</p>
+
+        <p>Der Sprachsynthesizer wird an User-Port angeschloßen und kann somit von allen CBM-Geräten (CBM 2001 bis C 64) angesteuert werden. Das Design des Gerätes ist sehr einfach. An der Frontseite befinden sich der Ein/Aus-Schalter und zwei Drehregler um die Frequenz und Lautstärke zu ändern (siehe Bild).</p>
+
+        <p>Wie kann man nun die Sprachausgabe im eigenen Programm verwenden? Dies ist etwas aufwendig. Zuerst muß man mit Hilfe eines vom Hersteller mitgelieferten Programms den benötigten Wortschatz definieren. Dieser wird dann als sequentielles File auf Diskette gespeichert und kann vom eigenen Programm aus mit Hilfe eines zirka 40zeiligen Unterprogramms aufgerufen werden.</p>
+
+        <p>Der Sprachsynthesizer SDP 120 ist zum Preis von 487 Mark von Speech Design erhältlich.</p>
+
+        <h3>Fazit:</h3>
+
+        <p>Der Sprachsynthesizer SDP 120 findet sowohl als nette Spielerei für Hobbyprogrammier als auch in professionellen Programmen seine Anwendungsgebiete.</p>
+
+        <h3>Gesamtüberblick:</h3>
+
+        <p>
+            Verständlichkeit: gut<br>
+            Programmierung: umständlich<br>
+            Dokumentation: sehr gut<br>
+            Sprachbeispiele: sehr gut<br>
+            Gesamtnote: gut-befriedigend<br>
+        </p>
+
+        <address class="author">(Christian Quirin Spitzner/rg)</address>
+
+		<p class="literatur">Bezugadresse:<br>
+        Speech Design, Altostraße 11, 8000 München 60</p>
+
+    </article>
+
+</body>
+
+</html>

@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>Alle Tasten-, Zeichen- und Steuercodes – 4. Teil und Schluß</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="Dr. Helmuth Hauck, gk">
+    <meta name="64er.issue" content="8/84">
+    <meta name="64er.pages" content="151-155">
+    <meta name="64er.toc_category" content="Kurse">
+    <meta name="64er.toc_title" content="Alle Tasten-, Zeichen- und Steuercodes (4)">
+    <meta name="64er.index_title" content="Alle Tasten-, Zeichen- und Steuercodes (Teil 4)">
+    <meta name="64er.index_category" content="Kurse|Codes">
+    <meta name="64er.id" content="codes">
+</head>
+
+<body>
+    <article>
+        <h1>Alle Tasten-, Zeichen- und Steuercodes – 4. Teil und Schluß</h1>
+
+        <p class="intro">In dem letzten Teil dieses Kurses finden Sie eine Zusammenfassung der Methoden, wie man in Basic Tasten abfragen kann.</p>
+
+        <p>Wir haben insgesamt vier Methoden kennengelernt und verwendet, um das Drücken einer Taste im Programm abzufragen:</p>
+
+        <h3>1. Tastencode in Speicherzellen 203/653</h3>
+        <p>10 A = PEEK(203)<br>
+            20 B = PEEK(653)<br>
+            30 IF A = <em>ZEICHENCODE</em> AND B=<em>STEUERCODE</em> THEN <em>AKTION</em></p>
+
+        <h3>2. ASCII-Code im Tastaturpuffer</h3>
+
+        <p>100 POKE 198,0<br>
+            110 A = PEEK(631)<br>
+            120 IF A=<em>ASCII-CODE</em> THEN <em>AKTION</em></p>
+
+        <h3>3. Abfrage des ASCII-Codes mit GET/INPUT</h3>
+
+        <p>200 GET A$<br>
+            210 IF A$&lt;>CHR$(ASCII-CODE) THEN <em>AKTION 1</em><br>
+            220 <em>AKTION 2</em></p>
+
+        <h3>4. Abfrage des Gänsefuß-Modus mit GET/INPUT</h3>
+
+        <p>300 GET A$<br>
+            310 IF A$ »ZEICHEN« THEN <em>AKTION1</em><br>
+            320 <em>AKTION 2</em></p>
+
+        <p>Diese vier Methoden haben alle eins gemeinsam:</p>
+
+        <p>Sie können immer nur eine einzelne Taste abfragen. Zwei oder gar mehrere Tasten gleichzeitig oder kurz hintereinander gedrückt ergeben keine sinnvollen Resultate.</p>
+
+        <p>Jetzt möchte ich Sie an meine allererste Darstellung im Aprilheft des »64’er«, Seite 115, erinnern, nämlich wie die Tasten elektrisch angeordnet sind und wie das Betriebssystem sie abfragt. Ich möchte das hier noch einmal darstellen, erstens weil es eine gute Überleitung bildet zu meiner Methode der Vielfach-Tastenabfrage, zweitens weil meine damalige Darstellung nicht vollständig war.</p>
+
+        <p>In Bild 1 ist noch einmal die VC 20-Tastenanordnung dargestellt, in Bild 2 diejenige des C 64. Trotz des Unterschiedes der elektrischen Anordnung ist bei beiden Computern die Abfragemethode identisch, nur die dafür benötigten Register haben unterschiedliche Adressen.</p>
+
+        <figure>
+            <img src="152-1.png" alt="">
+            <figcaption>Bild 1. Tastenanordnung des VC 20</figcaption>
+        </figure>
+
+        <p>Zur Erinnerung:</p>
+
+        <p>Das Betriebssystem wählt der Reihe nach die senkrechten Spalten dadurch an, daß es die Zahl, die am Fuße jeder Spalte steht, in das Spalten-Register 37152 (beziehungsweise 56320) schreibt. Diese Zahl ergibt in dualer Darstellung eine 0 an dieser Stelle.</p>
+
+        <p>Für jede Taste, die in der angewählten Spalte gedrückt ist, wird eine 0 in das andere Register 37153 (56321) geschrieben. Diese Dualzahl ergibt einen Dezimalwert, welcher aus dem Register herausPEEKbar ist.</p>
+
+        <p>Das, was das Betriebssystem macht, machen wir ihm nach, zuerst für den VC 20:</p>
+
+        <p>10 POKE 37152,247<br>
+            20 PRINT PEEK (37152);PEEK(37153)<br>
+            30 GOTO 10</p>
+
+        <p>und für den C 64:</p>
+
+        <p>10 POKE 56320,127<br>
+            20 PRINT PEEK(56320);PEEK(56321)<br>
+            30 GOTO 10</p>
+
+        <p>In Zeile 10 ist noch ein weiterer Unterschied zwischen den beiden Computern zu sehen. Beim VC 20 habe ich die Spaltenzahl 247 gewählt, weil in dieser Spalte die STOP-Taste liegt. Diese Spalte ist nämlich, wie wir in Teil 1 ja schon festgestellt haben, die einzige Spalte, die wir mit Basic abfragen können. Bei POKEn der anderen sieben Spaltenzahlen in Zeile 10 wirft uns die 60mal in der Sekunde stattfindende Überprüfung der STOP-Taste aus dem Programm.</p>
+
+        <p>Beim C 64 ist das die Spalte 127, wie es uns ein Blick auf das Bild 2 zeigt.</p>
+
+        <figure>
+            <img src="152-2.png" alt="">
+            <figcaption>Bild 2. Tastenanordnung des C 64</figcaption>
+        </figure>
+
+        <p>Ich freue mich übrigens, daß ein aufmerksamer Leser aus Wien diesen Unterschied sofort bemerkt und mich darauf aufmerksam gemacht hat. Aber ich hatte damals nur einen VC 20 zur Verfügung, und mangels eigener Erprobung ist es mir nicht aufgefallen. Das hat sich übrigens jetzt geändert.</p>
+
+        <p>Diese Tastenabfrage hat den großen Vorteil, daß mehrere Tasten gleichzeitig drück- und abfragbar sind. Jede gedrückte Taste erzeugt eine 0 im »Reihen-Register«. Mit dem kleinen Programm oben können Sie es ausprobieren. Drücken Sie alle Tasten der Spalte 247 (127), die STOP-Taste bitte als letzte! Der rechte Zahlenstreifen auf dem Bildschirm zeigt die 0.</p>
+
+        <p>Lassen Sie die STOP-Taste (die 1-Taste) los, und es erscheint die 1, bei Loslassen der linken SHIFT-Taste (der ←-Taste) zusätzlich erhalten wir die 3. Das ist die Dezimalzahl für 00000011, die beiden Einser entstehen durch die losgelassenen Tasten.</p>
+
+        <p>Jede mögliche Tastenkombination in einer Spalte hat ihre spezielle und abfragbare (!) Codezahl im Register 37153 (56321), insgesamt 256 Kombinationen. Ist das nichts?</p>
+
+        <p>Diese Methode der Mehrfach-Tastenabfrage haben wir bereits in der Ausgabe 4/84 im ersten Teil meines Aufsatzes erfolgreich eingesetzt.</p>
+
+        <p>Heute möchte ich diese Methode auf alle acht Spalten, also auf alle Tasten erweitern. Dazu müssen wir das oben erwähnte Hindernis, nämlich den Rausschmiß durch das Betriebssytem, überwinden. Dazu gibt es zwei Methoden. Methode 1 will ich nur kurz erwähnen — sie ist einen eigenen Aufsatz wert.</p>
+
+        <p>Man kann durch Beeinflussung der Speicherzellen 788 und 789 die Pause (Interrupt) zur Tastenabfrage des Betriebssytems künstlich verlängern und sie zur eigenen Abfrage benutzen.</p>
+
+        <p>Die zweite Methode ist einfacher. Wir schreiben das Programm oben (Zeilen 10 und 20) in Maschinensprache. Das läuft dann so schnell ab, daß es innerhalb zweier Unterbrechungen ausgeführt und somit vom Betriebssystem nicht gestört wird.</p>
+
+        <p>Da ich nicht annehme, daß alle Leser dieses Kurses in Maschinencode programmieren können, zeige ich es Ihnen einfach als Kochrezept. Es besteht aus einer Reihe von Zahlen, die über READ &hellip; DATA in vorbestimmte Speicherplätze gePOKEt und von dort dann mit SYS gestartet werden.</p>
+
+        <p>Für den VC 20 gilt:<br>
+            100 DATA 169, <span style="border: solid 1px black;">254</span>,141,32,145,173, 33,145,141,255,29,96<br>
+            <br>
+            Für den C 64 gilt:<br>
+            100 DATA 169, <span style="border: solid 1px black;">254</span>,141,0,220,173,1, 220,141,255,29,96
+        </p>
+
+        <p>Ich habe einige Zahlen gekennzeichnet:</p>
+
+        <ul>
+            <li>Die zweite Zahl der DATA-Reihe in den Kästchen ist die Zahl der Spalte, die angewählt wird (ich habe 254 gewählt).</li>
+            <li>Die 32 und 145 (0,220 beim C 64) ergeben die Registeradresse 37152 (56320), die DATA-Werte 33 und 145 (1,220) die Registeradresse 37153 (56321), die Werte 255,29 ergeben eine Speicherzelle 7679, auf die ich noch zurückkomme.</li>
+        </ul>
+
+
+        <p>Die Registeradressen sind, wie immer bei Commodores 8-Bit-Computern, mit zwei Zahlen, das heißt mit zwei Bytes dargestellt.</p>
+
+        <hr>
+        <p>REGEL:<br>
+            LSB+256*MSB = Adresse<br>
+            32 + 256* 145 = 37152<br>
+            1 + 256* 220 = 56321<br>
+            LSB = niederwertiges Byte<br>
+            MSB = höherwertiges Byte</p>
+        <hr>
+
+        <p>Diese 12 DATA-Zahlen, ich nenne sie X, werden eingelesen mit:<br>
+            110 FORK=1 TO 12<br>
+            120 READ X<br>
+            140 NEXT K</p>
+
+        <p>Damit diese Zahlen vom Basicprogramm nicht überschrieben oder gelöscht werden (was dasselbe ist), POKEn wir sie an das Ende des VC 20-Speichers ohne Erweiterung, nämlich ab Speicherzelle 7661. Für den C 64 geht es mit denselben Adressen natürlich allemal.<br>
+            130 POKE 7660+K,X</p>
+
+        <p>Um ganz sicher zu gehen, daß mit dem Maschinenprogramm nichts passiert, schützen wir es, indem wir dem Computer vorgaukeln, daß sein für Basic zur Verfügung stehender Speicher bei Adresse 7659 aufhört. Diese Speichergrenze steht in den Speicherzellen 51/52 und 55/56, und sie kann natürlich durch POKEn anderer Zahlen willkürlich verändert werden.</p>
+
+        <p>Die entsprechenden Werte für die Grenze 7659 sind 235 und 29. Machen wir die Probe:<br>
+            PRINT 235 + 256 + 29 (RETURN)<br>
+            ergibt 7659.</p>
+
+        <pre>
+20 POKE 51,235
+30 POKE 52,29
+40 POKE 55,235
+50 POKE 56,29
+</pre>
+
+        <p>Falls Sie diese Speicherzellen und ihre Anwendung nicht kennen, bitte ich um Zuschrift, da ich es hier aus Platzgründen nicht näher erläutern kann.</p>
+
+        <p>So, nun ist das Maschinenprogramm gespeichert und gesichert. Wir starten das Programm mit SYS-Aufruf der 1. Adresse und PEEKen danach in das Register 37153 (56321), genau wie vorher.</p>
+        <pre>
+150 SYS 7661
+160 PRINT PEEK(37153): REM VC 20
+160 PRINT PEEK(56321): REM C 64
+170 GOTO 150.</pre>
+
+        <p>Nach RUN erzeugt der Rücksprung den schon obligatorischen Zahlenstreifen mit 255 für »keine Taste gedrückt«. Wenn wir die Taste 3 (RETURN beim C 64) drücken, dann muß entsprechend Bild 1 und 2 (Spalte 254) die Zahl 253 erscheinen. Das tut sie auch, aber immer wieder unterbrochen durch 255. Das kommt daher, daß das Auslesen des Registers 37153 (56321) in Basic doch schon zu langsam ist. Wir müssen daher die Funktion der Zeile 160 ebenfalls in das Maschinenprogramm einbauen, was ich in weiser Voraussicht in Zeile 100 schon vorbereitet habe. Der Trick ist nämlich dabei, daß der Inhalt des Registers vom Maschinenprogramm in eine vor dem bösen Basic geschützte Speicheradresse gebracht wird. Da wir ja einen gesicherten Bereich bereits haben, habe ich darauf die Zelle 7679 ausgewählt.</p>
+
+        <p>Bitte ändern Sie die Zeile 160 ab:<br>
+            160 PRINT PEEK(7679)</p>
+
+        <p>Jetzt haben wir’s geschafft.</p>
+
+        <p>Natürlich können wir mit diesem Programm alle acht Spalten abfragen. Wir brauchen bloß in Zeile 100 die Zahl, die hier im Kästchen steht, abändern, zum Beispiel in 253, und schon reagiert das Programm auf alle Tasten dieser Spalte.</p>
+
+        <p>Ich habe mir den Luxus erlaubt und unser Programm von oben erweitert, indem ich der Reihe nach alle acht Spalten aufrufe (siehe Listing 1). Dazu habe ich in Zeile 100 die Spaltennummer auf 0 gesetzt, was eigentlich unnötig aber einleuchtend ist, POKE aber dann jeweils die Spaltenzahl (in den Zeilen 200, 300, 400 etc.) auf diesen Platz, der die Adresse 7662 hat.</p>
+
+        <p>Das Programm ist immer noch schnell genug, um innerhalb der zur Verfügung stehenden Zeit von 1/60 Sekunde alle Abfragen durchzuführen.</p>
+
+        <p>Ein Appell an alle 64er: Wenn Sie die Semikolons in den Zeilen 220, 320, 420 etc. (außer 920!!!) richtig plaziert haben, erscheinen die Zahlen für alle acht Spalten brav nebeneinander.</p>
+
+        <p>Beim VC 20 haben wir ein kleines Problem, hervorgerufen durch die kleinere Zeilenlänge, die uns eine Darstellung aller acht Zahlen nebeneinander nicht erlaubt.</p>
+
+        <p>Ich schlage deshalb vor, nach vier Zahlen ab Zeile 520 die Reihenfolge zu unterbrechen (Semikolon weglassen) und an den Anfang (Zeile 200) zurückzuspringen, es sei denn, die f-l-Taste wurde gedrückt (Zeile 560). Dann nämlich kommen die nächsten vier Zahlen dran — sogar in einer anderen Farbe. Eine weitere Tastenabfrage in Zeile 960, diesmal der &hellip;..Taste — ja schauen Sie halt in der ASCII-Tabelle nach, welche Taste dieses Zeichen hat (Methode des waagrechten Sprunges zwei Spalten weiter) — entscheidet zwischen Wiederholung der zweiten Gruppe oder Rücksprung auf die ersten vier Zahlen. Wie gesagt, die Verwendung der Semikolons an der richtigen Stelle ist wichtig.</p>
+
+        <p>Jetzt ist die Gelegenheit da zum Experimentieren:</p>
+
+        <ul>
+            <li>mehrere Tasten aus verschiedenen Spalten</li>
+            <li>mehrere Tasten aus derselben Spalte</li>
+        </ul>
+
+
+        <p>Ja, und irgendwann bleibt Ihnen das Programm mit BREAK IN &hellip;. stehen!!</p>
+
+        <p>Leider ist das schon wieder der STOP-Tasten-Effekt, den wir nicht ganz loswerden. Wenn nämlich Tasten der waagrechten Reihe 254 (beziehungsweise 127) gedrückt werden, interpretiert dies das Betriebssystem als STOP-Taste, die ja in dieser Reihe liegt, und stoppt das Programm.</p>
+
+        <p>Uns soll das aber nicht bedrücken, denn wir können in unserem Programm den Gebrauch dieser Tastenreihe einfach vermeiden. Für unsere Zwecke reichen alle andern Tasten allemal aus. Man muß diese Einschränkung nur berücksichtigen.</p>
+
+        <p>Zusammenfassend sei gesagt, daß Sie in einem Programm jetzt alle Kombinationen aller Tasten abfragen können mit<br>
+            IF PEEK(7679)= &hellip;.. THEN &hellip;..</p>
+
+        <p>Sie müssen sich lediglich die entstehenden Dualzahlen im Register 37153 (56321) in Dezimalzahlen umrechnen oder sie vorher ausprobieren.</p>
+
+        <p>Ich will auch am Schluß meiner Darstellung der Gewohnheit treu bleiben und das Kochrezept in einem kleinen Gericht anwenden (Listing 2).</p>
+
+        <h2>Ein Spiel für vier Personen</h2>
+
+        <p>Um mir und Ihnen die Sache leichter zu machen, verwende ich möglichst viele Teile aus den vorherigen Programmen.</p>
+
+        <h3>Spielidee:</h3>
+
+        <ul>
+            <li>Jeder Spieler wählt eine von vier bestimmten Tasten.</li>
+            <li>Auf dem Bildschirm wird ein beliebiger Buchstabe »angesagt«</li>
+            <li>Der Bildschirm füllt sich langsam mit Zufalls-Buchstaben</li>
+            <li>Sobald der »angesagte« Buchstabe erscheint, sollen die Spieler ihre Taste drücken
+            <li>Wer zuerst drückt, hat gewonnen!</li>
+        </ul>
+
+
+        <p>Programmbeschreibung:<br>
+            Zeile 10 bis 50<br>
+            — schützt das Maschinenprogramm (wie vorher)<br>
+            Zeile 100 bis 140<br>
+            — liest das Kochrezept »Maschinenprogramm« ein<br>
+            Zeile 215 und Zeile 530<br>
+            — stellen einen besonderen Trick dar. Man nennt das eine »Flagge setzen« (set a flag). Die Abfrage der Tasten soll nämlich nur dann funktionieren, wenn ein Buchstabe (später VB genannt) mit dem anfangs »angesagten« Buchstaben BU übereinstimmt. Wenn VB = BU dann wird in eine »sichere« Speicherzelle (ich habe 830 gewählt) eine Zahl (hier 250) hineingePOKEt. Diese Zahl in 830 wird bei der Abfrage ebenfalls abgefragt. Bei Beginn des Spieles muß diese Flagge natürlich eingeholt, das heißt auf 0 gesetzt werden (Zeile 215).<br>
+            Zeile 220 bis 270<br>
+            — gibt Anweisungen und teilt den Spielern ihre Taste zu (von mir willkürlich ausgewählt)<br>
+            Zeile 280/300<br>
+            — löscht den Bildschirm und färbt alles schwarz<br>
+            Zeile 310/320<br>
+            — gibt Anweisungen<br>
+            Zeile 330<br>
+            — wählt per Zufallsgenerator (wie vorher) einen Buchstaben BU aus, zwischen 1 und 10 (A bis J in Bildschirm-Code!)<br>
+            Zeile 340/350<br>
+            — druckt diesen Buchstaben BU genau an das Ende des Textes der Zeile 320 (Bildschirmspeicher-Platz und Farbspeicher-Platz ausrechnen!)<br>
+            Zeile 260/270 und 370/380<br>
+            — schalten den Text weiter mit irgendeiner Taste<br>
+            Zeile 400<br>
+            — verzögert das Erscheinen des 1. Buchstabens<br>
+            Zeile 520<br>
+            — wählt wieder per Zufallsgenerator einen Buchstaben, diesmal VB, aus (zwischen A und J) Zeile 540<br>
+            — wählt per Zufallsgenerator einen Platz C auf dem Bildschirm aus, auf den der Buchstabe VB gePOKEt wird<br>
+            Beim VC 20 fülle ich den ganzen Bildschirm von Platz 0 bis 505. Beim C 64 wäre das der Bereich von 0 bis 1000. Damit aber den Spielern wegen der viel kleineren Buchstaben des C 64 die Augen nicht übergehen, habe ich die eigentliche Formel C = INT(RND(0)*1000) in Zeile 540 so abgeändert, daß die Buchstaben nur auf jeden 2. Platz gePOKEt werden können.<br>
+            Zeile 550/560<br>
+            — die Buchstaben VB werden in weiß gePOKEt<br>
+            Zeile 610<br>
+            — leiert die Tastenabfrage 15 mal hintereinander durch. Diese Zahl bestimmt auch die Geschwindigkeit, mit der die Buchstaben auf dem Bildschirm erscheinen. Ihre Verkleinerung erhöht die Schwierigkeit des Spieles<br>
+            Zeile 620 bis 740<br>
+            — fragt die in Zeile 220 bis 250 definierten Tasten und die Flagge in 830 ab. Beim VC 20 ist jede der gewählten Tasten in einer anderen Spalte, daher sind vier POKEs in 7662 notwendig. Beim C 64 liegen je zwei Tasten in einer Spalte, daher nur zwei POKEs in 7662. Da aber gleichzeitige Tastendrücke vorkommen können (in einer Spalte natürlich), fragen Zeile 660 und 710 diesen speziellen Fall ab.<br>
+            Zeile 810 bis 840 beziehungsweise 850<br>
+            — meldet den Sieger (Aussprung aus der Abfrage)</p>
+
+        <h2>Zusammenfassung und Schluß</h2>
+
+        <p>Diese »gleichzeitige« Mehrfach-Tastenabfrage ist genau genommen nicht ganz gleichzeitig.</p>
+
+        <p>Nichts in einem einzelnen Computer ist gleichzeitig! Alles erfolgt in einer Sequenz.</p>
+
+        <p>In dem Spielprogramm für vier Personen erfolgt die Tastenabfrage natürlich auch hintereinander, wodurch die zuerst abgefragten Tasten ihren Besitzern einen kleinen Vorteil gewähren, aber halt nur einen ganz winzigen!</p>
+
+        <p>Dieser Effekt wird durch das 15fache Durchlaufen der Abfrage und durch die Schnelligkeit des Maschinenprogramms gemildert. Das ganze Programm in Maschinensprache geschrieben würde natürlich durch die Geschwindigkeit auch die letzte Ungerechtigkeit ausmerzen.</p>
+
+        <p>So, liebe VC 20er und C 64er. Das war’s.</p>
+
+        <p>Ich hoffe, Sie kennen jetzt die verschiedenen Codes und fühlen sich wohl bei der Tasten-Abfrage. Methoden und Kochrezepte haben Sie dazu ja jetzt genug.</p>
+
+        <p>Ich habe mich bemüht, Sie zum Experimentieren anzuregen, denn gerade diese spielhafte Auswirkung der Neugier unterscheidet den Amateur vom Profi und fördert das Verständnis der Zusammenhänge.</p>
+
+        <p>Ich habe mir am Anfang das Ziel gesetzt, allgemein verständlich und ohne Fachchinesisch zu schreiben.</p>
+
+        <p>Ob mir das gelungen ist, können nur Sie mir sagen. Falls etwas unklar geblieben ist und Sie Fragen haben, schicken Sie sie mir, ich werde Ihnen antworten. Und wenn es sogenannte »gute Fragen« sind, schreibe ich vielleicht darüber den nächsten Kurs.</p>
+
+        <address class="author">(Dr. Helmuth Hauck/gk)</address>
+
+        <p class="literatur">Literatur:<br>
+            1. VIC REVEALED von N. Hampshire, Computabits Ltd., 1981<br>
+            2. M. Bassman, S. Lederman in COMPUTE!S FIRST BOOK OF VIC COMPUTE!, Books Publ., 1982<br>
+            3. VC 20 SPIELE-BUCH 1 von A. Dripke, Computer Life Verlag, 1983<br>
+            4. VC-INTERN von Angerhausen und Englisch, Data Becker, 1983<br>
+            5. 64-INTERN von Angerhausen et al., Data Becker, 1983<br>
+            6. DAS VC-20-Buch von M. Hegenbarth, M. Schäfer, Markt &amp; Technik Verlags, 1983<br>
+            7. VIC-20-PROGRAMMERS REFERENCE GUIDE von A. Finkel et al., Howard W. Sams &amp; Co, 1982<br></p>
+
+        <figure>
+            <pre data-filename="vielfachtasten c64" data-name="Vielfachtasten-Abfrage (C 64)"></pre>
+            <figcaption>Listing 1. In diesem Programm können alle Tasten abgefragt und angezeigt werden (C 64)</figcaption>
+        </figure>
+        <figure>
+            <pre data-filename="vielfachtasten vc20" data-name="Vielfachtasten-Abfrage (VC 20)"></pre>
+            <figcaption>Listing 1. In diesem Programm können alle Tasten abgefragt und angezeigt werden (VC 20)</figcaption>
+        </figure>
+        <figure>
+            <pre data-filename="4 personen c64" data-name="Ein Spiel für 4 Personen (C 64)"></pre>
+            <figcaption>Listing 2. Ein Tastenspiel für vier Personen (C 64)</figcaption>
+        </figure>
+        <figure>
+            <pre data-filename="4 personen vc20" data-name="Ein Spiel für 4 Personen (VC 20)"></pre>
+            <figcaption>Listing 2. Ein Tastenspiel für vier Personen (VC 20)</figcaption>
+        </figure>
+
+        <aside class="futureteufelchen">
+            <h2>Futureteufelchen</h2>
+
+            <img alt="Futureteufelchen" src="futureteufelchen.svg" width="119" height="200" class="inline">
+
+            <p>In Zeile 300 der C64-Version von "Spiel für 4 Personen" hieß es ursprünglich:</p>
+            <pre>300 POKE36879,8</pre>
+            <p>was für den VC 20 gilt. Im Listing wurde die Zeile für den C 64 angepasst wurde, da sonst der Text nicht lesbar ist.
+        </aside>
+
+        <address class="author">(Endurion)</address>
+
+        </aside>
+
+    </article>
+
+</body>
+
+</html>
