@@ -631,6 +631,504 @@ Nachdem der Druckerkanal geöffnet wurde, muß vor dem nächsten ISM-Befehl der 
 
 Frank Götze
 
+# Mehr Übersicht am Bildschirm – Test 40/80-Zeichenkarte
+
+> Mit 506 Zeichen auf dem Bildschirm sind die Grenzen recht eng gesetzt. VC 20-Besitzer konnten nur neidisch auf den C 64 mit 1000 Zeichen oder den CBM 8032 mit 2000 Zeichen schauen. Mit einer 40/80-Zeichenkarte kann es der VC 20 jedoch leicht auch mit diesen Computern aufnehmen.
+
+Um 40 oder 80 Zeichen pro Zeile mit dem VC 20 zu realisieren, is auch Software-Lösung möglich. Sie ist jedoch sehr aufwendig, da neben dem Zeichensatz auch weite Teile des Betriebssystems geändert werden müssen. Außerdem ist diese Lösung sehr langsam und nicht für professionelle Anwendungen geeignet.
+
+Eine Hardware-Lösung ist dagegen leichter zu handhaben (nur Karte einstecken) und bietet zusätzliche Leistungen. Wir haben die 40/80-Zeichenkarte MR 40/80 (Bild 1) von Roos-Elektronik getestet.
+
+Wie bedient man nun diese 40/80-Zeichenkarte, und was kann sie?
+
+Aus der sehr mageren Beschreibung kann man leider nur wenig entnehmen. Die MR 40/80 stellt jedenfalls keine Farben mehr am Bildschirm dar. Reverse Schrift ist jedoch weiterhin möglich. Im 40-Zeichenmodus sind sowohl die Schrift wie auch die Grafikzeichen am Fernseher noch einwandfrei lesbar (Bild 2). Bei 80 Zeichen je Zeile tut man sich jedoch am Fernseher recht schwer (Bild 3), deshalb ist ein Monitor unbedingt zu empfehlen.
+
+Nach dem Einstecken der MR 40/80 in den Expansionport des VC 20 wird an der fünfpoligen DIN-Buchse der Karte ein Monitor oder der HF-Modulator für den Fernseher angeschlossen. Nach dem Einschalten meldet sich der VC 20 wie gewohnt, jedoch mit einer Bildschirmbreite von 40 Zeichen und ohne Farbe. Das Bildschirmformat kann durch Drücken bestimmter Tasten während des Einschaltens geändert werden: Eine der Tasten 0 bis 8 bestimmt die Anzahl der Punkte für den Zeilenabstand. Diese Funktion ist ähnlich dem CHR$(14) beim CBM 4001/8001, das den Zeilenabstand um zwei Punkte vergrößert. Betätigt man eine der Tasten 0 bis 8 in Verbindung mit der rechten SHIFT-Taste, dann wird der 80-Zeichenmodus aufgerufen.
+
+Drücken der RETURN Taste während des Einschaltens verhindert, daß die MR 40/80 aktiviert wird. Die Bildschirmausgabe erfolgt dann über den bisherigen Video-Ausgang des VC 20, also bitte das Umstecken des Kabels nicht vergessen.
+
+Um das Bildschirmformat bei eingeschaltetem Computer zu ändern, drückt man eine der oben beschriebenen Tastenfolgen zusammen mit der RESTORE Taste. Das Umschalten in den 80-Zeichenmodus ist aber etwas kompliziert: Man muß gleichzeitig die rechte SHIFI-laste, die CTRL- und die RESTORE Taste drücken.
+
+Zurück in den 40-Zeichenmodus kommt man durch Betätigen von CTRL und RESTORE. Das Programm bleibt beim Hin- und Herschalten natürlich erhalten.
+
+## Sonderfunktionen auf den Funktionstasten
+
+Alle acht Funktionstasten werden durch die MR 40/80 mit speziellen Sonderfunktionen für die Textverarbeitung belegt (Tabelle 1). Unter anderem sind ein Tabulator und zusätzliche Lösch- und Cursorsteuerfunktionen vorhanden. Alle diese Funktionen F1 bis F8 können natürlich auch vom Programm aus aufgerufen werden. Dies geschieht mit »PRINT CHR$(133 ... 140)«.
+
+Zu beachten ist die Lage des Bildschirmspeichers. Die MR 40/80 enthält ein eigenes Video-RAM von 2 KByte Umfang, das ab Speicheradresse 43008 ($A800) liegt. Da der normale Video-Speicher nicht benötigt wird, stehen zusätzliche 512 Bytes RAM zur Verfügung. Mit SYS 43000 wird dieser Speicher dem Basic-RAM hinzugefügt.
+
+Für viele Programme ist es durchaus sinnvoll, die oberste Zeile des Bildschirms zu schützen. Die Zeile bleibt dann unverändert stehen und scrollt auch nicht aus dem ..Bildschirm heraus. So bleiben Überschriften oder Bedienungshilfen ständig sichtbar.
+
+Die MR 40/80-Karte ist recht übersichtlich aufgebaut und mit einem Video-Controller, einem 2 KByte-CMOS-RAM sowie mit zwei EPROMs (2716 und 2732) und diversen Logikbausteinen bestückt. Alle IC sind gesockelt (!) und können im Schadensfall leicht selbst ausgewechselt werden. Die Steuersoftware im 2716-EPROM belegt den Adreßbereich von $A000 bis $A7FF. Im 2732-EPROM befindet sich der
+
+## Aufbau der Platine
+
+Zeichengenerator, der natürlich auch leicht ausgewechselt werden kann. Für die Textverarbeitung wären beispielsweise deutsche Umlaute recht sinnvoll. Ein entsprechendes EPROM ist auf Anfrage beim Hersteller erhältlich.
+
+Die Platine macht einen recht stabilen Eindruck. Leider hat es für ein Gehäuse bei dem immerhin 249 Mark teuren Gerät nicht mehr gereicht.
+
+Fazit: Diese 40/80-Zeichenkarte ist für professionelle Anwendungen durchaus geeignet. Die 40 Zeichen pro Zeile sind am Fernseher gut lesbar, die 80 Zeichen Darstellung jedoch ist ohne Augenschäden auf Dauer nur mit einem Monitor möglich. Da die Farbe fehlt, ist die Karte für alle Arten von Spielen weniger geeignet.
+
+(Christian Q. Spitzner/ev)
+
+# X 100 — Farbig plotten und drucken
+
+> Seitdem moderne Matrixdrucker voll grafikfähig sind, haben Plotter es schwer, sich durchzusetzen. Auch der relativ hohe Preis wirkte leicht abschreckend. Der X100 ist jedoch von der Leistung als auch vom Preis, für den C 64-Benutzer interessant.
+
+Einen Plotter in Aktion zu sehen, ist ein aufregendes Erlebnis. Das beweisen die Menschentrauben, die zum Beispiel bei Messen und Fachausstellungen so einem Gerät bei der Arbeit fasziniert zuschauen. Man überlegt sich unwillkürlich, ob man sich nicht auch so einen Zeichenkünstler anschaffen sollte. Doch wenn dann Preise genannt werden, sinkt die Kauflust oft ganz erheblich. Aber ebenso wie die Matrixdrucker, brechen auch die Plotter in einen bisher ungesättigten Markt ein: Sie werden immer preiswerter, bieten aber trotzdem beachtliche Leistungen. Der Ad-comp X100 ist solch ein Gerät (Preis: zirka 2 000 Mark).
+
+Auf den ersten Blick verwechselt man ihn glatt mit einem üblichen Matrixdrucker. Ein ähnliches Gehäuse, ein Handrad an der Seite, Tractoreinheit und Gummiwalze. Doch schon ein etwas genauerer Blick unter die Gehäuseabdeckung zeigt den wichtigen Unterschied auf: Anstelle des Druckkopfes sieht man 4 Farbstifte, die in einem Revolvereinsatz stecken. Spätestens jetzt wird jedem klar, daß er einen Plotter vor sich stehen hat.
+
+Der X100 wird mit einer deutschen Anleitung geliefert. Speziell für den C 64-Besitzer liegt noch eine zusätzliche Broschüre bei, die auf die speziellen Befehle des Plotters und auf die Programme der ebenfalls beiliegenden Demodiskette eingeht und sie beschreibt. Außerdem befindet sich auf der Diskette ein Druckertreiber-Programm, das die Centronics-Schnittstelle des Plotters ansteuert. Der Plotter wird mit einem Kabel über den User-Port des C 64 verbunden. Die Treibersoftware entspricht übrigens dem Programm aus Heft 7.
+
+Aktiviert wird der X100 über die bekannten OPEN n,4-Befehle wie bei den Matrixdruckern. Damit ist es auch möglich, Texte zu plotten, also auch Listings. Allerdings können keine Commodore-Grafik- und -Steuerzeichen dargestellt werden. Kommen wir jedoch zu den Plottmöglichkeiten.
+
+Es können selbstverständlich Linien in jeder Richtung gezeichnet werden. Dabei ist sowohl eine relative als eine absolute Bewegung möglich. Linien lassen sich durchgezogen, aber auch gestrichelt zeichnen. Der Abstand zwischen den Teilstrichen kann eingestellt werden. Text läßt sich an jeder beliebigen Stelle setzen. Auch die Schriftgröße und die Schreibrichtung sind definierbar, wobei jedes Zeichen zwischen 1 und 255 mm groß sein und in 4 Richtungen gedreht werden kann. Oft benötigte Routinen wie Achsen, Kreise und Histogramme (Rechtecke) sind auch implementiert; umständliche Unterprogramme können deswegen entfallen. Die Lage und Parameter der einzelnen Figuren sind frei wählbar. Selbstverständlich kann man zu jeder Zeit zu einer der anderen vier Farben wechseln. Die Farbstifte, mit Druckflüssigkeit gefüllte Kugelminen, sind ausreichend dünn. Sie besitzen laut Handbuch eine »Lebensdauer« von mehr als 800 Meter. Auch in der kleinsten Schriftart (1 mm) sind die Zeichen noch gut zu lesen (mit Lupe). Das bewirkt aber auch die Schrittweite von wahlweise 0,1 beziehungsweise 0,05 mm. Die Wiederholgenauigkeit beträgt 0,2 mm bei Positionierung über 50 mm und die Positionierungsgenauigkeit erreicht zirka 1% bei einer Positionierung über 100 mm. Die Plottgeschwindigkeit reicht von 120 mm/ sec, bei 0,1 mm Schrittweite, bis 60 mm/sec bei 0,05 mm Schrittweite. Der effektive Plottbereich liegt in beiden Hauptrichtungen (X- und Y-Achse) bei 20 cm.
+
+## Bewertung
+
+Der X100 ist ein Plotter nicht nur für den Hobby-Einsatz. Durch sein Papierformat, DIN A4, mit wahlweiser Verwendung von Einzelblatt oder Endlospapier wird er vielseitig einsetzbar. Seine technischen Daten genügen gehobenen Ansprüchen, auch wenn sie selbstverständlich nicht an die echte Profiklasse heranreichen. Ein kleiner Tip noch für VC 1520-Besitzer: Alle Befehle des VC 1520 werden auch vom X 100 verstanden. Lediglich einige Längenangaben müssen wegen dem unterschiedlichen Plottbereich etwas geändert werden.
+
+(gk)
+
+## Ein Drucker für alle Fälle: Epson FX 80
+
+> Der FX 80 ist ein Matrixdrucker, der kaum noch Wünsche offen läßt. Zur Zeit seiner Einführung eine Sensation, gehört er aber auch heute noch immer zu den Besten seiner Klasse.
+
+Jeder C 64-Besitzer wird sich irgendwann einmal einen Druckerwünschen, entweder, um seine selbst erstellten Programme auszudrucken, oder um Briefe, Listen und andere wichtige Dinge zu Papier zu bringen. Es stellt sich dann die Frage, was der Drucker leisten soll. Nicht zuletzt hat da das eigene Konto einen wichtigen Diskussionsbeitrag zu leisten.
+
+Eines kann schon vorausgeschickt werden: Es wird schwer fallen, alle Möglichkeiten des FX 80 auszunutzen. Seine vielen Druckfunktionen dürften auch die meisten Textverarbeitungsprogramme überfordern. In der Praxis wird es jedoch so sein, daß man sich einige wichtige Schriftarten merkt und nur mit diesen arbeitet. So kann man mit einfachen Befehlen zum Beispiel Breitschrift, Schmalschrift, Elite, Fettdruck, Doppeldruck, Proportionaldruck und Kursivschrift wählen. Viele dieser Druckarten sind auch untereinander mischbar. Natürlich läßt sich auch der Zeilenabstand fast stufenlos verstellen und der Papiertransport durch einfache Steuersignale variieren. Tabulatoren lassen sich vertikal und horizontal einstellen, ebenso wie der linke und rechte Druckrand. Wem der Drucker zu schnell ist, der kann ihn durch einen Befehl auf halbe Geschwindigkeit drosseln. Die neun internationalen Zeichensätze ASCII, französisch, deutsch, englisch, amerikanisch, schwedisch, dänisch, japanisch und italienisch lassen sich ebenso einstellen wie die Papierlänge, die in Zeilen oder Zoll angegeben werden kann. Wem die internationalen Zeichensätze nicht reichen, der kann sich selbst welche entwickeln. Der frei ladbare Zeichengenerator ist 2 KByte groß und kann auch abgeschaltet werden. Falls kein eigener Zeichensatz geladen wird, dient der Speicher als Druckerpuffer. Dadurch kann man schon mit dem Computer weiterarbeiten, wenn der FX noch zu tun hat. Die Grafikfähigkeit des Epson braucht eigentlich nicht weiter betont zu werden. 64'er-Leser finden ab und zu einige Beispiele einer hochauflösenden Grafik, die der FX 80 gedruckt hat.
+
+Innerhalb seines Gehäuses befinden sich zwei DIP-Schalter, mit denen sich einige Möglichkeiten fest einstellen lassen, so daß nach dem Einschalten der gewünschte Zustand anliegt. Folgende Schalter können gesetzt werden: Einstellung der Zahl der Druckspalten (80 und 132 Spalten pro Zeile), Form der Null (durchstrichen oder nicht), Papierendeerkennung an und aus, Sperren oder freigeben des Zeichengenerators, Fettdruck oder Normaldruck nach dem Einschalten sowie die Wahl des Internationalen Zeichensatzes (1 bis 9). Der zweite DIP-Schalter schaltet den Summer, den automatischen Seitenvorschub und den automatischen Zeilenvorschub an und aus. Außerdem kann ein Schalter gesetzt werden, der es erlaubt, den Drucker per Software anzusteuern oder abzuschalten. Leider sind diese Schalter nur nach dem Öffnen eines Gehäusedeckels erreichbar, jedoch hat man damit keine Schwierigkeiten.
+
+Etwas, was uns sehr gefällt, aber auch manchmal die Tränen in die Augen schießen läßt, ist die Handhabung und Bedienung. Was uns sehr gefällt, ist die Papierabrißkante. Sie erweist sich in der Praxis als sehr vorteilhaft, weil lediglich zirka 2 cm über dem Druckkopf das Papier an einer Metallschiene abgerissen werden kann. Kein lästiges Vorwärtstransportieren um eine halbe Seite und damit Blattverlust und anschließendes Neujustieren der Perforationskante. Auch Zurückdrehen des Papiers ist ohne Probleme möglich. Nur das Einziehen von neuem gelochtem Endlospapier über den Tractor erfordert manchmal eine Engelsgeduld. Wenn es nicht auf Anhieb klappt und sich eventuell sogar Papierfetzen zwischen den schwer zugänglichen Tractoren verfangen, geht die Fummelei mit Pinzette oder anderen spitzen und dünnen Werkzeugen los. Um solchen Ärger nicht erst aufkommen zu lassen, muß man beim Papierabzug sehr vorsichtig und akkurat vorgehen. Dann klappt es allerdings sehr gut. Beim Einzelblatteinzug hingegen gibt es gar keine Probleme.
+
+Der FX 80 ist ein Drucker, der es in sich hat. Bezogen auf seinen Preis (um 1500 Mark ohne Interface) und seine Nutzungsfähigkeiten ist er ein Matrixdrucker, der keine Konkurrenz zu scheuen braucht. Durch seine Verbreitung haben sich auch schon mehrere Fremdhersteller bemüht, entsprechende Schnittstellen zum C 64 zu entwickeln. Mit dem richtigen Interface können nicht nur die Fähigkeiten des FX voll ausgenutzt, sondern sogar noch erweitert werden.
+
+(gk)
+
+# Brother HR-5C: Fast nicht zu hören
+
+> Der Brother HR-5C ist ein Thermodrucker, der aber auch mit normalem Papier arbeiten kann. Er ist zwar keine Schönheit, aber dafür klein und vor allem sehr leise.
+
+Mit den Maßen 303(B)*174(H)*65(T) mm und einem Gewicht von 1,6 kg gehört er zu den ganz kleinen. Er paßt somit in die kleinste Ecke. Auch sonst wird der HR-5C keine großen Schwierigkeiten bereiten. Das fängt bei der Stromversorgung an: wahlweise über ein Netzteil oder über Batterien, die mitgeliefert werden. Falls diese durch häufige Benutzung verbraucht sein sollten, ertönt ein eingebauter Summer, der zum Batteriewechsel auffordert. Im Gegensatz zu den anderen »Brüdern« besitzt der HR-5C jedoch keine Tastatur. Damit ist die Wahlmöglichkeit Batterie oder Netzteil nicht mehr so interessant. Denn der Computer muß ja angeschlossen sein, um den Drucker arbeiten zu lassen. Und dieser Anschluß ist eine große Stärke der Brother Drucker. Sie besitzen eine Schnittstelle, die voll kompatibel ist mit dem Commodore-Zeichensatz. Das schließt sämtliche Grafikzeichen ein. Sie werden so gedruckt, wie sie auch auf dem Bildschirm zu sehen sind.
+
+Da der HR-5C ein Thermodrucker ist, wird wärmeempfindliches Papier benötigt. Es sei denn, man legt eine mitgelieferte Farbbandkassette ein. Dann ist es auch möglich, auf normales Papier zu drucken. Allerdings sollte darauf geachtet werden, möglichst glattes Papier zu verwenden. Papier mit rauher Oberfläche (wie zum Beispiel teures Dekorationspapier mit Textilfasern) kann zu Problemen führen. Es kann Papier auf Rollen verwendet werden (eine volle Rolle wird mitgeliefert), aber auch Einzelblatteinzug ist möglich. Und der Papiereinzug ist denkbar einfach und problemlos. Auch wird ein akustisches Signal gegeben, wenn kein Papier anliegt, Papierende oder Farbbandende erreicht ist, außerdem leuchtet die Warnlampe dann noch auf. Der Summer läßt sich über leicht erreichbare DIP-Schalter abschalten. Eine sinnvolle Absicherung: Auch im abgeschalteten Zustand ertönt der Summer bei schwachen Batterien.
+
+Mit einem weiteren DIP-Schalter läßt sich der Zeilenabstand von 1/6 auf 1/9 Zoll umstellen. Damit sind die hardwareseitigen Einstellmöglichkeiten aber schon vorbei. Alle Einstellungen, die das Schriftbild betreffen, müssen vom Computer übertragen werden.
+
+Der Brother HR-5C wird vom Computer rnit den gewohnten OPEN-Befehlen unter der Geräteadresse 4 aktiviert. Dabei kann durch die Wahl der Sekundäradresse entweder der Großschrift/Grafikmodus oder der Klein-/Großschriftmodus eingestellt werden. Auch der reverse Ausdruck ist möglich (CHR$(18)). Mit CHR$(14) werden Zeichen mit doppelter Breite ausgegeben. Eine Besonderheit ist die Möglichkeit, sich ein eigenes Zeichen definieren zu können. Ein Zeichen wird mit 7 DATA-Werten beschrieben. Auf die gleiche Art und Weise funktioniert das übrigens mit den Commodore Druckern VC 1526 und MPS 802. Durch diese Einzelnadelansteuerung müßte es auch möglich sein, sich hochauflösende Grafiken ausdrucken zu lassen, auch wenn das recht mühsam und langsam sein würde. Apropos Geschwindigkeit: Bei 30 Zeichen pro Sekunde braucht man schon einige Geduld. Diese Zeit wird noch erhöht durch die geringe Geschwindigkeit des Thermokopfes beim Zurückfahren zum Zeilenanfang und durch das Weiterspulen des Farbbandes nach jeder Zeile. Denn das Farbband ist ein Wegwerf-Band, es kann nur einmal verwendet werden.
+
+Der Brother HR-5C ist besonders dort zu empfehlen, wo der Geldbeutel nicht allzu dick ist (Preis zirka 500 Mark) und wo sehr großer Wert auf geringe Geräuschentwicklung gelegt wird. Ein weiteres Plus ist die vollständige Kompatibilität zum Commodore-Zeichensatz. Eine Einschränkung stellt die Druckgeschwindigkeit dar und die fehlende Möglichkeit, normales gelochtes Endlospapier zu verwenden. Seine Druckmöglichkeiten sind sehr einfach. Sie beschränken sich auf Reversdruck und Breitschrift. Zusammengefaßt: der HR-5C ist ein einfacher Thermodrucker für einfache Anwendungen.
+
+(gk)
+
+# Ein Star, der es in sich hat
+
+> Drucker müssen schon einiges bieten, um konkurrenzfähig zu sein. Der Drucker Delta 10 von Star braucht sich dabei nicht zu verstecken.
+
+Nach dem Auspacken des Druckers ist man zuerst einmal überrascht von der Anzahl der mitgelieferten Einzelteile. Das reichhaltige Zubehör findet man normalerweise nicht bei vergleichbaren Druckern. Abgesehen von den sonst auch üblichen Beigaben wie Farbband, Kunstoffdeckel und Handbuch erhält man auch noch zwei verschiedene, gleichzeitig verwendbare Papierführungen, einen Rollenhalter für Endlospapier auf Rolle und zusätzliche Reservesicherungen.
+
+Im ersten Moment sieht das etwas verwirrend aus. Wohin mit den ganzen Teilen? Im Handbuch, wird man schnell fündig. Schon beim Durchblättern erkennt man an den Illustrationen, wie alles zusammengehört, die Beschreibungen sind fast unnötig, doch sehr exakt. Folgerichtig beginnt es bei der Montage der einzelnen Zubehörteile, beschreibt die Grundeinstellung des Gerätes, wie man sie ändert und erst danach die Möglichkeiten, das Druckbild zu verändern. Am Ende werden einige (der etwas klein geratenen) Tabellen erklärt und Beispiele zu den verschiedensten Druckbefehlen gegeben, so daß auch ein Unerfahrener auf diesem Gebiet nur selten Schwierigkeiten haben wird. Das Handbuch — es liegt in englisch und in deutsch vor — macht insgesamt einen guten Eindruck. Auch wenn es nicht mit einem Glanzumschlag und Ringbuchlochung aufwartet.
+
+Der Delta 10 (Preis zirka 1750 Mark) kann gelochtes Endlospapier ebenso verarbeiten wie einzelne Blätter und Papier auf Rollen. Die zum Umstellen notwendigen Tätigkeiten sind problemlos, so etwa die Montage und Demontage der Tractoreinheit. Dieser Vorteil wird jedoch mit einem Nachteil erkauft: Eben weil die Tractoreinheit oben sitzt, also das Papier zieht und nicht schiebt, gibt es keine nützliche Papierabrißkante in der Nähe des Druckkopfes. Zum Abreißen eines Blattes muß es weitertransportiert werden bis zum Ende des Kunstoffdeckels. Daß ein Zurückdrehen des Papiers in Verbindung mit der Tractoreinheit nicht möglich ist, ist ärgerlich und kostet jedesmal ein unnötiges Blatt.
+
+## Zwei Schnittstellen
+
+Selten findet man bei Druckern standardmäßig zwei Schnittstellen. Die Star-Familie besitzt denn auch eine Centronics- und eine RS232-Schnittstelle. Über DIP- Schalter können sie umgeschaltet werden. Der Delta 10 besitzt 3 verschiedene DIP-Schalter. Leider ist davon nur einer von außen zugänglich, die anderen beiden erreicht man nach Demontage des Gehäusedeckels.
+
+Der Delta 10 ist mit einem Standard-Zeichengenerator (ROM) und einem freiladbaren Zeichengenerator (RAM) ausgestattet. Mit Hilfe des ladbaren Zeichengenerators ist es möglich, sich bis zu 192 Zeichen nach eigenem Wunsch zu generieren. Außerdem lassen sich durch Ansteuern der einzelnen Nadeln hochauflösende Grafiken erzeugen (Bit-Image-Graphicmode). Es existieren vier verschiedene Modi, von einfacher Dichte mit 480 Punkten bis hin zu 1920 Punkten pro Zeile.
+
+## Die Schriftarten
+
+Der Drucker bringt je nach gewählter Schriftgröße 80,96,136 Zeichen und bei doppelter Breite 40,48 oder 68 Zeichen pro Zeile zu Papier. Als Schriftart kann man wählen zwischen dem normalen ASCII-Standard-Zeichensatz, Kursivschrift und 8 verschiedenen internationalen Zeichensätzen. Außerdem kann man Pica, Elite, komprimierte und gedehnte Schrift sowie Doppeldruck, uni- und bidirektionalen Druck einstellen. Auch ist es möglich, sämtliche Zeichen unterstrichen, hochgestellt (superscript) und tiefgestellt (subscript) darzustellen.
+
+Es existieren einige Einstellmöglichkeiten zum vertikalen Zeilenvorschub. Der Zeilenabstand läßt sich bis zu einer Stufe von 1/144 Inch einstellen. Auch der Seitenvorschub läßt sich variieren. Man bestimmt die Länge des Papiers bis zur Perforation, kann einen Seitenvorschub kurz vor Ende des Blattes programmieren und die Position bestimmen, die die erste Zeile eines Blattes haben soll. Selbstverständlich lassen sich alle Einstellungen abschalten. Auch Tabulatoren lassen sich vertikal und horizontal einstellen, inklusive des linken und rechten Randes. Allein dafür gibt es zehn verschiedene Befehle, die keine Wünsche offen lassen. Mit diesen Kommandos läßt sich jede mögliche Art von Formularen ausfüllen.
+
+Daß dieser Drucker voll grafikfähig ist, braucht eigentlich nicht besonders erwähnt zu werden. Das ist bei heutigen Matrixdruckern schon Standard. Der Ausdruck von Grafiken läßt sich mit einfachen Befehlen steuern. Sie erlauben den Ausdruck mit einfacher Dichte, doppelter Dichte, doppelter Dichte mit doppelter Geschwindigkeit und superhoher Dichte mit doppelter Geschwindigkeit.
+
+## Prädikat: sehr gut
+
+Der Delta 10 ist ein Drucker, der das Prädikat »sehr gut« verdient, bezogen auf seine Druckfähigkeiten. Auch die Druckgeschwindigkeit und die Möglichkeit sowohl gelochtes Endlospapier als auch Endlospapier auf Rollen und Einzelblätter zu verwenden werden positiv gewertet. Abstriche müssen bei der Handhabung und bei dem Bedienungskomfort gemacht werden. Negativ fiel dabei der umständliche Papiertransport bei Verwendung der Tractor-Einheit (zurück nicht möglich) auf.
+
+(gk)
+
+# Seikoshas Größter: Test GP-550A
+
+> Die Seikosha-Drucker stehen seit den Zeiten des schon fast legendären GP-80, der als VC-1515 Drucker zum VC 20 bekannt wurde, im dem Ruf von »Billigdruckern«, zwar grafikfähig, aber ansonsten mit wenig Vorzügen ausgestattet.
+
+Der GP-550A wird diesem Ruf jedoch nur zum Teil gerecht, nämlich hinsichtlich des günstigen Preises. Ansonsten verfügt er über eine Reihe von Eigenschaften, die ihn auf eine höhere Stufe als seine bekannten kleinen Brüder GP-80 und GP-100 stellen.
+
+Da wäre zunächst einmal die Schrift. Der GP-550A kann über Steuerzeichen insgesamt 18 verschiedene Schriftarten anwählen, unter anderem auch Elite, Script und Kursiv. Die Standardeinstellung ist Pica. Außerdem ist Breit- und Schmalschrift einstellbar. Auch Proportionalschrift ist möglich, was bei einem Drucker dieser Preisklasse durchaus nicht selbstverständlich ist.
+
+Der GP-550A verfügt über 8 Drucknadeln, die Zeichen normalerweise in einer 8 x 9-Matrix zu Papier bringen. Daneben ist aber auch ein Schönschreibmodus vorgesehen, in dem die Punkte innerhalb einer 16 x 9- oder 16 x 12-Matrix gesetzt werden. Der Druckkopf wird dabei um einen halben Punktabstand vertikal versetzt, so daß insgesamt 16 sich überlappende Punkte gedruckt werden können. Durch diesen »Correspondence« genannten Schönschreibmodus ergibt sich ein Schriftbild ähnlich einer Schreibmaschine, da die einzelnen Druckpunkte so ineinander übergehen, daß sie auf den ersten Blick nicht mehr als solche zu erkennen sind. Dabei ist es noch möglich, wiederum verschiedene Schriftarten zu verwenden. Durch den Schönschreibmodus reduziert sich allerdings die ohnehin nicht allzu hohe Druckgeschwindigkeit von normalerweise 50 Zeichen pro Sekunde auf die Hälfte.
+
+Wie alle Seikosha-Drucker, verfügt auch der GP-550A über eine Einzelnadelansteuerung. Der Umgang damit ist recht einfach. Nach Empfang eines bestimmten Steuerzeichens interpretiert der Drucker die weiteren ankommenden Zeichen als Grafik-Daten zur Nadelsteuerung. Jedem Bit eines Zeichens ist dabei eine Drucknadel zugeordnet. Ist das betreffende Bit in dem Zeichen gesetzt, dann wird auch die zugehörige Nadel gesetzt und erzeugt einen Punkt. So lassen sich problemlos Sonderzeichen und Symbole erzeugen, aber auch hochauflösende Grafik über eine größere Fläche ist möglich. Dabei können Grafik und Text auch in der gleichen Zeile beliebig gemischt werden.
+
+Neben dem 8-Bit-Grafikmodus gibt es noch einen erweiterten 16-Bit-Grafikmodus, in dem die zusätzlichen acht Grafikpunkte wieder »zwischen» die anderen gelegt werden (wie im Schönschreibmodus). Damit lassen sich wirklich durchgezogene Linien erzeugen, die Grafik wirkt kompakter.
+
+Der Seikosha GP-550A verfügt normalerweise über eine Centronics-Schnittstelle, ist jedoch auch (wie unser Testgerät) mit eingebautem VC-Interface lieferbar. Damit gibt es dann natürlich keine Anschlußprobleme an den C 64 oder VC 20: Einfach das Druckerkabel in den seriellen Port des Computers einstecken, einschalten, und schon ist die Anlage druckfertig. Damit erspart man sich unter Umständen eine Menge Ärger mit Interfaces und Treibersoftware.
+
+Beim ersten Versuch, ein Programm zu LISTen, wird man allerdings feststellen, daß der GP-550A hinsichtlich des Zeichensatzes leider nicht Commodore-kompatibel ist. Es werden nämlich keine Steueroder Grafikzeichen gedruckt. Dafür sind aber die deutschen Umlaute möglich. Der GP-550A läßt sich nämlich per DIP-Schalter zwischen acht verschiedenen nationalen Zeichensätzen umschalten. Für Textverarbeitung und ähnliche Anwendungen wird man dabei sinnvollerweise den deutschen Zeichensatz wählen. Verzichtet man in seinen Programmen auf Grafiksymbole und schreibt Steuerzeichen als CHR$-Anweisungen, dann erhält man mit dem amerikanischen Zeichensatz recht brauchbare Listings.
+
+Die praktische Arbeit mit diesem Drucker gestaltet sich einigermaßen angenehm, sieht man einmal von der niedrigen Druckgeschwindigkeit ab. Die Geräuschentwicklung ist für einen Seikosha erstaunlich zivil. Vom »Kreissägeneffekt« seiner kleinen Brüder ist nicht viel zu merken, obschon er von der Lautstärke her doch etwas über dem Niveau zum Beispiel eines Epson FX-80 liegt.
+
+Papiereinzug und Farbbandwechsel sind mit wenigen Handgriffen und völlig problemlos erledigt. An Bedienelementen ist neben den üblichen Tasten für Zeilen- und Seitenvorschub eine zusätzliche Taste mit der Bezeichnung »Stop/Reset« vorhanden. Mit dieser Taste kann ein Druckvorgang unterbrochen und der Drucker wieder in den Einschaltzustand versetzt werden. Dadurch spart man sich das lästige Aus- und Einschalten des Druckers nach einem Fehler.
+
+Insgesamt gesehen hat der Seikosha GP-550A im Test einen durchaus positiven Eindruck gemacht. Neben seinem günstigen Preis (1098 Mark) besticht er vor allem durch seine Grafikfähigkeiten und durch die variablen Schriftarten. Nachteilig sind sicher seine vergleichsweise geringe Druckgeschwindigkeit und die fehlende Zeichensatz-Kompatibilität zum C 64. Den letzten Nachteil hat er aber mit den meisten Druckern seiner Leistungsklasse gemein.
+
+(ev)
+
+# Roland DXY-101 – ein Flachbettplotter im DIN-A3-Format
+
+> Die Entscheidung, ob Trommelplotter oder Flachbettplotter hängt vom Anwendungsfall ab. Der DXY-101 ist ein Flachbettplotter und besitzt nicht nur zwei Schnittstellen, sondern auch einen großen Befehlsvorrat.
+
+Erfaßt ein Computer physikalische Meßwerte, so fallen jedesmal eine Unmenge an Zahlen an.
+
+Ein gewöhnlicher Drucker erstellt Zahlentabellen, die zumeist sehr unübersichtlich sind. Wesentlich besser erkennt man Zusammenhänge, wenn man sie optisch aufbereitet und in Kurven darstellt. Nun können auch Matrixdrucker Grafiken erstellen. Sie haben dabei jedoch einige gravierende Nachteile. Sie sind selten in der Lage, farbig zu drucken. Auch läßt sich das Papier nicht in beide Richtungen bewegen, eine Grafik kann dann nur von oben nach unten abgearbeitet werden. Ein dritter Punkt betrifft die Darstellung. Matrixdrucker setzen lediglich Punkte nebeneinander, während Plotter zusammenhängende Linien zeichnen. So gesehen, gibt es eine ganze Reihe von sinnvollen Anwendungsgebieten für Plotter.
+
+Der Roland DXY-101 ist der kleinste Vertreter dieser Reihe im Roland-Programm. Außer dem Preis (zirka 2 000 Mark) sind auch einige Fähigkeiten interessant. Als erstes fallen die beiden Schnittstellen an der Rückseite des flachen Plotters auf, eine Centronics- und eine RS232-Schnittstelle. Somit können Sie als 64'er Leser auch die im Heft 7 abgedruckte Treibersoftware hervorragend einsetzen.
+
+Der DXY-101 wird mit einem Handbuch geliefert, das zwar alle möglichen Befehle beschreibt und auch zu jedem Befehl ein Beispiel enthält, jedoch in Englisch. Die abgedruckten Listings der kleinen Demonstrationsprogramme sind nicht für den C 64 geschrieben, lassen sich jedoch leicht anpassen. Die ebenfalls mitgelieferte Diskette enthält ein Demonstrationsprogramm, mit dem man sich jeden Befehl des Plotters einzeln vorführen lassen kann.
+
+Ein großer Vorteil des Plotters ist sein Format. Mit DIN A3 läßt sich schon mehr anfangen als mit dem oft nicht ausreichenden Format A4. Das Papier, das möglichst glatt sein sollte, wird an beiden Seiten von zwei flexiblen Magnetstreifen gehalten. Es gibt keine Probleme beim Einlegen und Wechseln. Das gilt ebenso für die Zeichenstifte, die in verschiedenen Farben erhältlich sind. Die gelieferten Filzstifte empfanden wir jedoch als etwas zu dick. Außerdem verursachten sie ein gut wahrnehmbares Schleifgeräusch beim Plotten. Aber es gibt andere, auch feinere Stifte, die sich mit den mitgelieferten Spezialhalterungen einfach installieren lassen.
+
+Der Befehlsvorrat des DXY-101 ist, gemessen an der Preislage, ausreichend groß. Neben den üblichen Befehlen zum absoluten und relativen Zeichnen und Bewegen ohne Zeichnen sind auch unterbrochene Linien möglich; der Abstand zwischen den Strichen ist frei wählbar. Auch x- und y-Achsen (mit und ohne Teilung) lassen sich mit einem Befehl erzeugen. Selbstverständlich können auch Buchstaben und Zahlen geplottet werden. Alle Zeichen können 16 verschiedene Größen annehmen, wobei nicht nur der Abstand zwischen ihnen, sondern auch die Schreibrichtung variabel ist. Zusätzlich gibt es noch einige Sonderzeichen, die zur zusätzlichen Begrenzung von Zeichnungen und Kurven eingesetzt werden können. Eine ganze Reihe von Befehlen befassen sich mit dem Zeichnen von Kreisen und Kreisausschnitten. Allerdings gibt es kein Kommando um Ellipsen zu zeichnen. Ganz auf selbst gestrickte Routinen kann man also nicht verzichten, will man den Plotter voll ausnutzen. Jedoch kann man sich eine kniffelige Aufgabe sparen: die Schraffur von Rechtecken. Auch sie kann mit nur einem Befehl ausgeführt werden.
+
+## Technische Daten
+
+Der DXY-101 weist einen effektiven Plottbereich von 37 mal 26 cm auf, wobei der Stift sich mit einer Geschwindigkeit von bis zu 180 mm/sec bewegen kann. Seine Schrittweite beträgt 0,1 mm pro Schritt bei einer Wiederholgenauigkeit von 0,3 mm oder weniger. Die Positionierungsgenauigkeit liegt bei 1%.
+
+Aufgrund seiner Größe ist der DXY-101 in der Lage, auch komplexere Zeichnungen aufs Papier zu bringen. Mit entsprechend feinen Stiften könnten allerdings feinere Linien gezogen werden. Die Filzstifte sind nicht so optimal. Die mechanische Stabilität der Führung ist für diese Preisklasse (um 2000 Mark) und Konstruktionsart durchaus ausreichend, auch wenn ab und zu leichte Resonanzen auftauchen können, die sich auf der Zeichnung durch leichtes Zittern bemerkbar machen. Sein Befehlsvorrat läßt nur wenig Wünsche offen und seine Schnittstellen lassen einen Anschluß an fast jeden Computer zu.
+
+(gk)
+
+# Schreibmaschine – anschlußfertig für den C 64
+
+> Die Industrie merkt schon, wo der Hase hinläuft. Der C 64 mausert sich langsam zum Bürocomputer. Und für Bürocomputer, speziell für den Schriftverkehr im Büro, brauchen viele einen Drucker mit der Qualität einer Schreibmaschine.
+
+Typenradschreibmaschinen sind in der Schriftqualität mit konventionellen Schreibmaschinen vergleichbar, weil auch sie für jedes Zeichen eine Type zur Verfügung halten. Diese Typen sind sternförmig auf dem Typenrad angeordnet, das sich leicht auswechseln läßt. Je nach Modell gibt es eine ganze Reihe von Typenrädern, für jede nur denkbare Schriftart ein anderes. Auch Räder mit Sonderzeichen (mathematische und andere Sonderzeichen, verschiedene Sprachen, etc.) gibt es. Typenraddrucker eignen sich auf Grund ihres guten Schriftbildes für Anwender, die optisch einwandfreie Schriftstücke verlangen.
+
+Doch wir wollen in dieser Ausgabe nicht die Schreibmaschine als solche vorstellen, sondern den Anschluß der Schreibmaschine an den Computer, in diesem Fall der an den C 64.
+
+Die Olympia Werke bieten die Compact 2 zwar als anschlußfertig für einen Computer an, jedoch nicht für den C 64 mit seiner seriellen Schnittstelle. Den Einbau einer seriellen Schnittstelle muß dann auch der Fachhandel vornehmen. In unserem Fall macht das für Olympia die Firma iti-Datentechnik in Leonberg. Sie baut eine Schnittstelle in das Gehäuse ein, so daß man lediglich das normale serielle Kabel, das auch zum Anschluß der Floppy VC 1541 dient, einstecken muß und schon ist die Verbindung hergestellt. Die Spannungsversorgung geschieht dabei über die Schreibmaschine. Intern hat die Compact 2 eine parallele Centronics-Schnittstelle, so daß auch bei einem eventuellen Systemwechsel eine andere Schnittstelle leicht eingebaut werden kann.
+
+Das Interface ist, natürlich, Commodore-kompatibel. Das heißt, daß der Drucker über die Geräteadresse 4 angesprochen werden kann. Der C 64 sendet normalerweise kein Auto-Line-Feed Signal (das macht er nur, wenn man eine Primäradresse größer als 128 nimmt, also zum Beispiel OPEN 132,4). Um trotzdem mit »normalen» Primäradressen arbeiten zu können, muß nach dem Einschalten der Olympia die ON-LINE-Taste und die Halbzeilentaste gedrückt werden. Damit wird automatisch bei einem Wagenrücklauf ein Zeilenvorschub durchgeführt, solange der Drucker eingeschaltet ist.
+
+Beim Einschalten des Gerätes kommt man in den GroB-/Klein-schrift-Modus, genauer gesagt den »Cursor-Down-Modus«. Durch Verwendung der Sekundäradresse 7 wird in den »Cursor-Up-Modus« geschaltet, das heißt Großbuchstaben werden als Kleinbuchstaben gedruckt und umgekehrt. Diese zwei Betriebsarten können ausgetauscht werden. Auch die Geräteadresse ist durch Trennen einer Brücke auf der Schnittstellenplatine auf 5 einstellbar.
+
+Die Frage vor allem für uns Commodore-Besitzer ist natürlich, ob man sich auch Listings ausdrucken lassen kann. Vielleicht will sich dieser oder jener in seiner Freizeit Programme schreiben und möchte sich zum Ausdrucken nicht extra einen Matrixdrucker kaufen. Aber keine Sorge, das funktioniert ohne große Probleme. Man darf dabei aber nicht vergessen, daß ein Typenraddrucker nicht grafikfähig ist. Also Steuerzeichen können nicht dargestellt werden, wie man es gewohnt ist. Vergessen wurden sie jedoch auch nicht. Dieses Problem wurde so geregelt, daß vor jedem Steuerzeichen im Listing ein »I« vorangestellt wird, gefolgt von einem Buchstaben, der so auch im Listing am Bildschirm zu sehen ist, wenn man in den Groß-/Kleinschriftmo-dus schaltet. Das ist akzeptabel und eine gute Idee.
+
+Viele Funktionen der Schreibmaschine können durch Einsatz von Steuersignalen auch vom Computer aus durchgeführt werden. Dazu gehören unter anderem der Hupton, die Zeilenschaltung, der Formularvorschub, der Wagenrücklauf, Ein-und Ausschalten der Sonderzeichenebene, mit der einige weitere Zeichen gedruckt werden können. Mit Sondersteuerzeichen (durch Senden verschiedener Escape-Signale) läßt sich die Schreibdichte (10,12,15 Zeichen/Zoll) umschalten, aber auch die Zeilenschaltung (1-,2-, 1½-zeilig) und die Halbzeile positiv und negativ (zum Hoch/Tiefstellen von Zeichen um eine halbe Zeile) einstellen.
+
+Werden innerhalb von Strings Commodore-Steuerzeichen verwendet, so führen auch sie eine Funktion aus: CLR = Formfeed, HOME . = Löschen des Schnittstellenspeichers (Puffer), CURSOR links = Leerschritt, CURSOR rechts = Rückschritt, RVS ON/OFF = Sonderzeichenebene ein-/ausschalten.
+
+Die Olympia Compact 2 ist eine professionelle Schreibmaschine, die man nicht nur an den C 64 anschließen, sondern auch als reine elektronische Schreibmaschine einsetzen kann. In Verbindung mit dem C 64 und einer Floppy erhält man ein System, das den Weg zur wirklich professionellen Büroarbeit ebnet. Die leichte Handhabung und Bedienbarkeit der Compact 2 und der Preis von zirka 1500 Mark lassen dann auch nur wenig Wünsche offen.
+
+(gk)
+
+Info: iti-Datentechnik, Telemannstraße 18, 7250 Leonberg, Tel.: 0 7152-63 05
+
+# Marktübersicht: Drucker für C 64/VC 20
+
+> Das Angebot an Druckern und Plottern für Homecomputer wird beinahe von Woche zu Woche umfangreicher. Diese Marktübersicht soll unseren Lesern helfen, sich einen Weg durch den »Druckerdschungel« zu bahnen.
+
+Zwei Kategorien von Druckern und Plottern fehlen in dieser Übersicht. Das sind zum einen Geräte aus Preisklassen, die für den C 64-Anwender (und erst recht für den VC 20-Benutzer) nicht mehr interessant sind. Sie werden also nach Superdruckern für 5000 Mark ebenso vergeblich suchen wie nach DIN-A3-Plottern im fünfstelligen Preisbereich. Außerdem haben wir generell Drucker nicht berücksichtigt, die nur mit unvertretbar großem Aufwand an den C 64/VC 20 angeschlossen werden können.
+
+Sie können also davon ausgehen, daß alle in dieser Marktübersicht vertetenen Drucker und Plotter sich ohne größere Probleme an den C 64/VC 20 anschließen lassen. Eine Reihe von Geräten ist sogar direkt über den seriellen Bus anschließbar. Bei diesen Geräten ist in der Rubrik »Interface« dann »C 64/VC 20« vermerkt.
+
+Die Liste der direkt zum C 64/VC 20 kompatiblen Drucker ist wahrscheinlich nicht vollständig, da ständig neue Drucker mit bereits eingebautem VC-Interface auf den Markt kommen. An dieser Stelle sind daher auch die Anbieter entsprechend umgerüsteter Drucker aufgefordert, uns entsprechende Informationen zukommen zu lassen. Diese Marktübersicht soll in der nächsten Ausgabe noch um weitere, hier nicht berücksichtigte Geräte ergänzt werden.
+
+Geräte mit Centronics-Schnittstelle setzen ein spezielles Interface und die entsprechende Treibersoftware voraus, um sie an den C 64/VC 20 anschließen zu können.
+
+Entgegen einer unter Anfängern weit verbreiteten Meinung ist der serielle Port bei den Commodore-Computern nicht mit einer RS232C-Schnittstelle identisch. Allerdings sind im Betriebssystem schon die Routinen zur Verwaltung einer RS232C-Schnittstelle vorhanden, so daß ein solcher Anschluß (über den User-Port) nicht allzu schwer zu realisieren ist.
+
+Ein wichtiger Punkt bei der Auswahl des Druckers ist der Zeichensatz. Nur Drucker, bei denen in der Rubrik »Zeichensatz« der Vermerk »Commodore« vorkommt, können tatsächlich ohne Schwierigkeiten den gesamten Commodore-Zeichensatz drucken. Geräte mit dem Vermerk »ASCII« können ebenso wie Typenraddrucker nur die Standard ASCII-Zeichen drucken, also keine Grafiksymbole oder Steuerzeichen. Ist der Drucker grafikfähig oder können Zeichen selbst definiert werden, dann lassen sich allerdings auch diese speziellen Zeichen per Software simulieren.
+
+Zum Schluß sei noch gesagt, daß alle Preisangaben nur ungefähre Werte sind. Wer sich bei verschiedenen Anbietern informiert, kann unter Umständen günstiger einkaufen. (ev)
+
+Anbieter-Liste Drucker & Plotter
+
+Die hier aufgeführten Adressen sind vielfach keine direkten Bezugsquellen. Sie erhalten aber zumindest Datenblatt und Händlernachweis für den von Ihnen ins Auge gefaßten Drucker oder Plotter.
+
+Adcomp Datensysteme, Olgastr. 15, 8000 München 19; Brother International GmbH, Im Rosengarten 14, 6368 Bad Vilbel; Canon Deutschland GmbH, Postfach 1209, 8033 München-Martinsried; Casio Computer, Kieler Str. 212, 2000 Hamburg 54; Citizen Vertrieb Deutschland, MVB, Brüder-Grimm-Str. 5, 6408 Ebersburg; CItoh Deutschland GmbH, Königsallee 21, 4000 Düsseldorf 1; Commodore Deutschland, Lyoner Str. 38, 6000 Frankfurt 71; Epson Deutschland GmbH, Am See-stern24,4000Düsseldorf 11; MannesmannTally GmbH, Postfach 2969, 7900 Ulm; Micro Enterprises, Prinzregentenstr. 78, 8000 München 80; Mirwald Elektronik, Fasanenstr. 8, 8025 Unterhaching; NEC Europa, Wiesenstr. 148, 4040 Neuss; Neumüller GmbH, Eschenstr. 2, 8028 Taufkirchen; OKI Electric, Emanuel-Leutze-Str. 8, 4000 Düsseldorf 11; Olympia International, Postfach 960, 2940 Wilhelmshafen; Quen-Data GmbH/WELCO, Paul-Ehrlich-Str. 8,6074 Rödermark; Robotron-Vertrieb, Unitronic GmbH, Münsterstr. 338; 4000 Düsseldorf 30; Seikosha-Vertrieb, Microscan GmbH, Postfach 601705; 2000 Hamburg 60; Star Europe GmbH, Frankfurter Allee 1-3, 6236 Eschborn; Synelec Datensysteme GmbH, Lindwurmstr. 117, 8000 München 2; Watanabe GmbH, Arzberger Str. 10, 8036 Hersching.
+
+# So sieht der Output aus
+
+> Auf dieser Seite werden die verschiedenen Schriftbilder der getesteten Matrixdrucker sowie zwei Zeichnungen der beiden Plotter gegenübergestellt. Es konnten nicht alle Möglichkeiten von jedem Drucker oder Plotter gezeigt werden. Doch können Sie sich vielleicht auch so schon einen kleinen Eindruck machen.
+
+# The Blade of Blackpoole – die Lösung
+
+> Im Gegensatz zu manchen Actionspielen, die schnell langweilig werden, sind Abenteuerspiele wie »The Blade of Blackpool« eine lohnende Anschaffung. Sie garantieren lang anhaftende Spielfreude, da die Aufgabe oft sehr schwierig ist. Für Computerbesitzer mit weniger Freizeit habe ich diese Lösung entworfen.
+
+Die eigentliche Spannung eines Abenteuerspiels liegt natürlich darin, die Lösung selbst zu erarbeiten. Das dauert manchmal viele Monate, da einige der geforderten Lösungsschritte vollkommen unlogisch und nur durch reine Intuition (die Verwendung eines Monitors lehne ich ab) lösbar sind. So wird beispielsweise während der Suche nach dem Schwert Myraglym an einer Stelle verlangt, Bier in einen Fluß zu kippen. Wer dann keinen Maßkrug mit Bier aus einer Gaststätte bei sich hat, ist aufgeschmissen und muß von vorne beginnen.
+
+Aus diesem Grund habe ich die Anleitung so gestaltet, daß im ersten Teil, der Hilfsliste, (Bild 1) nicht gleich alles verraten wird. Die Hilfsliste gibt lediglich Aufschluß darüber, wie ein spezielles Hindernis überwunden werden kann. Zum Auffinden der jeweiligen Position dient der zweite Teil, die Lagekarte (Bild 2). Jedes Feld ist mit einer Nummer und einem Buchstaben versehen. Sie geben einen Anhalt, unter welchem Punkt in der Hilfsliste nachgeschaut werden kann.
+
+Der dritte Teil (Bild 3) besteht aus einer »Schritt-für-Schritt-Lösung«, mit der das Abenteuer innerhalb von zwei Stunden lösbar ist. Von der Verwendung dieses Teiles möchte ich dem ambitionierten Abenteurer eigentlich abraten, denn ist das Abenteuer erst gelöst, verliert das Spiel vollkommen seinen Reiz.
+
+Vorab möchte ich allerdings noch einige allgemeine Hinweise zu »The Blade of Blackpool« geben: Die Aufgabe des Abenteurers besteht darin, das lange verschollene Schwert Myraglym zu finden und in eine Gaststätte nahe dem Ausgangspunkt zu bringen.
+
+Erst dann ist das Abenteuer gelöst (500 von 500 möglichen Punkten). Dazu ist äußerst selten reine Gewalt notwendig (was mir sehr gut gefällt). Wenn Waffen gebraucht werden, dann findet man sie, beziehungsweise erhält sie durch einen magischen Spruch. Das Spiel ist eigentlich nur mit viel unkonventionellem und einfallsreichem Denken zu lösen. Der »dann hau ich mich eben durch«-Typ wird vom Programm meist mit höhnischen Bemerkungen wie »we are a little violent today? abgespeist. Auch sonst sind die Bemerkungen oft mit Spott gewürzt, zum Beispiel:»you might fall and hurt yourself« beim Versuch einen Baum zu erklimmen. Die meist gegebene Antwort ist aber »that had no effect« und das hat mich manchmal fast zum Wahnsinn getrieben.
+
+Abschließend seien hier noch ein paar Tips vermerkt:
+
+1. Es wird viel gelaufen, also keinen Rückweg scheuen, beziehungsweise einen Weg zweimal gehen, um alle Sachen zu transportieren.
+2. Vorsichtig mit allen Zauberwörtern umgehen. Ab einer bestimmten Spielstufe hat das Wort »Regnilo« verheerende Wirkungen, denn es werden alle Besitztümer wieder an ihren ursprünglichen Ort gezaubert.
+3. Das Spiel hat kein Eigenleben (im Gegensatz zu »The Hobbit«), Gegenstände können beliebig weggelegt und später wieder geholt werden. Es gibt keine Kobolde, die Gegenstände stehlen.
+4.  Immer gelassen bleiben, denn es ist nur ein Spiel, wenn auch ein sehr schönes.
+
+(Arnd Wängler/aa)
+
+# House of Usher
+
+> Wenn Sie gute Spiele für wenig Geld suchen — wir haben eins gefunden
+
+Bei diesem Spiel aus dem Hause Kingsoft handelt es sich um ein Geschicklichkeitsspiel, bei dem der Titelheld die geheimnisvollen Rätsel des Hauses Usher lösen soll. Nach einem grafisch sehr schön gemachten Vorspann (Bild), in dem die Spielfigur das Haus betritt, kann er sich von der Empfangshalle aus eine der acht Türen (Nummer 2 bis 9) aussuchen. Hinter diesen Türen verbirgt sich jeweils ein Raum, in dem eine Aufgabe zu lösen ist.
+
+Der letzte Raum vor der Schatzkammer (Nummer X) kann jedoch nur betreten werden, wenn vorher alle anderen Aufgaben gelöst wurden. Dabei muß der Titelheld sich vor Monstern retten, Abgründe und Falltüren überspringen, herabfallenden Felsen oder Kanonenkugeln ausweichen.
+
+Bemerkenswert ist, daß nicht nur die Reaktionsschnelligkeit des Spielers, sondern auch Übersicht und Planung gefordert werden. Obwohl die Spielidee nicht ganz neu ist (Jumpman und Miner 2049er lassen grüßen), kann man sagen, daß »House of Usher« durch gute Grafik und Ton gefällt und lange Zeit interessant bleibt, da die verschiedenen Aufgaben nicht gerade einfach zu lösen sind. Das Spiel kostet nur 39 Mark auf Kassette oder Diskette.
+
+(Manfred Kohlen/aa)
+
+# Fire-Galaxy
+
+> Man greife eine alte Idee auf, füge noch einige Schwierigkeitsgrade hinzu — fertig ist das neue Spiel. Es läuft auf dem VC 20 mit 16 KByte.
+
+Bereits nach einigen Sekunden ist dem versierten Computerspieler klar, daß es sich um das altbekannte »Scramble« handelt. Allerdings wurde die Version Fire-Galaxy auf acht Spielstufen erweitert. Bei dem Spiel Scramble (Fire-Galaxy) dringt man möglichst tief in eine Höhle ein, in der die verschiedensten Feinde lauern. Diesen muß man ausweichen oder sie abschießen. Weiterhin ist zu beachten, daß man möglichst viele Treibstofftanks abschießt, um nicht infolge Treibstoffmangels abzustürzen. Dies wird natürlich immer schwieriger, je weiter man in die Höhle vordringt, denn man muß sich immer mehr darauf konzentrieren, den Angreifern auszuweichen.
+
+Wer ein »Schlaftabletten-Reaktionsvermögen« besitzt, sollte sich entweder dieses Spiel nicht kaufen oder die F7-Taste mit einem Tesastreifen festkleben. Mit diesem Trick läßt sich das Spiel auf Zeitlupen-Tempo reduzieren. Wenn Sie schon beim Festkleben sind, dann können Sie auch den Feuerknopf am Joystick mit Tesafilm fixieren, denn diesen müssen Sie während der gesamten acht Spielstufen permanent drücken, was bereits nach kurzer Zeit schmerzhaft wird.
+
+Auffallend an diesem Spiel ist nicht die Spielidee, sondern die wirklich ausgezeichnete Grafik und der gute Sound. Hier werden die grafischen und die musikalischen Fähigkeiten des VC 20 voll ausgeschöpft. Daß ein Spiel, das den VC 20 -so gut nutzt und zudem ziemlich schnell ist, in Maschinensprache geschrieben wurde, versteht sich fast von selbst.
+
+Fire-Galaxy von Kingsoft ist wirklich ein ausgezeichnetes Spiel, das sich jeder leisten kann. Denn es kostet (man glaubt es kaum!) nur 39 Mark.
+
+(C. Q. Spitzner & B. Carti/ev)
+
+# Druckfehlerteufelchen
+
+## Adreß- und Telefonregister, 5/84. Seite 64
+
+In Zeile 1840 sollte nicht GOTO 610, sondern GOTO 510 stehen. (Gert Marx)
+
+## Abgerechnet wird mit dem C 64, 8/84, Seite 68
+
+Mit Interesse habe ich den o.g. Artikel in Ihrer Zeitschrift gelesen. Da sich der Autor mit diesem Programm wegen der Thematik zwangsläufig an Gewerbetreibende wendet, fühle ich mich veranlaßt, einige Bemerkungen zu machen.
+
+Im Text wird unter der Überschrift »Der feine Unterschied« auf die umsatzsteuerliche Behandlung von Portogebühren hingewiesen.
+
+Die Deutsche Bundespost ist mit einem Teil ihrer Aufgaben (Postbeförderung) hoheitlich tätig und daher nicht Unternehmer im umsatzsteuerlichen Sinne, daher sind diese Umsätze der Post nicht steuerbar. Der gewerbliche Unternehmer ist - von Spezialfällen abgesehen - bei Weiterbelastung des Portos auch mit diesem Betrag umsatzsteuerpflichtig. Im Umsatzsteuerrecht wird die Portobelastung als Nebenleistung zur Hauptleistung (der Warenlieferung) gesehen und teilt deren Schicksal, das heißt der für die Lieferung geltende Steuersatz ist in der Regel auch für berechnete Portokosten zu erheben und an das Finanzamt abzuführen.
+
+Im Interesse Ihrer gewerblichen Leser, für die eine Anwendung in Frage kommt, halte ich zur Vermeidung von leichtfertigen Steuerverkürzungen eine Richtigstellung für notwendig.
+
+Zeile 60400 lautet:
+...*10↑ur+.5))/10↑ur)
+
+(Rainer Voß, Steuerberater)
+
+## Kurvendiskussion in hires, 7/84, Seite 118
+
+Ich möchte hiermit auf einen von mir lang gesuchten Druckfehler aufmerksam machen. Er befindet sich auf Seite 118, Zeile 114.
+Original:
+114 SYS49629.Y+.5.X/8.XAND255:SYS49744.2↑PEEK(16122)
+Richtig:
+114 SYS49629,Y+.5,X/8,XAND255:SYS49744,2↑РЕКК(16722)
+
+(Thomas Lade)
+
+## Alle Tasten-, Zeichen- und Steuercodes, Teil 2, 5/84, Seite 107
+
+Unter »Wo steht was?« hat sich ein Fehler eingeschlichen. Unter Punkt (4) muß stehen:
+60536 für 64632
+Dasselbe gilt für Zeile 160.
+64632 = $ FC78
+60536 = $ EC78
+Der Fehler ist also schon in der Programmerstellung entstanden, als sich für ein E ein F eingeschlichen hat.
+
+(Willi Heusser)
+
+## Pac-Boy, 8/84, Seite 89
+
+Das Abspeichern des Datenblockes »DATA-PAC« auf Datasette hat sich leider als schwieriger herausgestellt, als angenommen. Ein Abspeichern ist aber dennoch folgendermaßen möglich:
+
+Das Listing »DATA-PAC« wird wie folgt abgeändert...
+
+<pre>310 poke 56,128:clr:rem speicherplatz fuer ma reservieren
+500:
+510:
+520:
+530:
+540
+550:
+560 for t=0 to 5937:read a :rem ma in Speicher bringen
+570 poke 32768+t,a :next</pre>
+
+Diese Änderung bewirkt, daß der Datenblock nun im Speicherbereich 32768 aufwärts abgelegt wird und weiterbearbeitet werden kann.
+
+Nachdem sich DATA-PAC selbst gelöscht hat, ist folgendes Listing einzugeben...
+
+<pre>0 data 169,128,133,21,169,0,133, 20,169,48,133,88,169,0,133,87,162,23,160
+1 data0,177,20,145,87,136,208, 249,230,21,230,88,202,16,240,169,0,133,251
+2 data169,48,133,252,169,3,162,1,160,3,32,186,255,169,6,162,70,160,192,32
+3 data189,255,169,251,162,0,160,72,32,216,255,96,77,65,45,80,65,67,0
+4 for t= 0 to 76:reada:poke 49152 + t,a:next
+5 sys 49152</pre>
+
+Startet man dieses Programm mit RUN, so wird das Programm »MA-PAC« auf Kassette abgespeichert. Damit das gesamte Programm ablauffähig ist, muß außerdem noch die Zeile 40 im Listing »PAC-BOY« zu
+
+<pre>40........:load "ma-pac",1,1</pre>
+
+abgeändert werden. Abschließend sei noch gesagt, daß die Programme »PAC BOY« und »MA-PAC« auf der Kassette hintereinander abgespeichert werden sollten.
+
+(H. Schlangmann)
+
+## Spring Vogel, 9/84, Seite 82
+
+Das beste Listing das mir in meiner Laufbahn als Computerfreak untergekommen ist, ist jenes aus der Ausgabe 9/84, Seite 82. Das Druckfehlerteufelchen hat jedoch auch bei diesem Listing zugeschlagen. Damit das Programm korrekt läuft sollte man folgendes ändern:
+
+Die Zeilennummern 59999, 60199, 60299, 60399, 60499 umändern in 60000, 60200, 60300, 60400 60500.
+
+Nach Zeile 60030 sollte man noch folgende Zeile einfüigen: 60100 REM BILD 2. Das Zeichen »_« in den Zeilen 146050, 48041, 49096 und 49160 bedeuted »←«.
+
+Ansonsten stimmt alles beim »SPRING VOGEL«, und es wurde bei mir sofort zum Listing des Jahres gewählt!
+
+(Lettner Gerhard)
+
+## Merge für C 64,10/84, Seite 105
+
+2. muß wohl richtig lauten:
+POKE 43,(PEEK(45) + 256* PEEK(46)-2) AND 255 &lt;RETURN&gt;
+POKE 44,(PEEK(45) + 256* PEEK(46)-2)/255 &lt;RETURN&gt;
+dann funktioniert es.
+
+(Klaus de Boor)
+
+## Index-sequentielle Datei, 9/84, Seite 56
+
+Folgende Zeilen müssen korrekt lauten: 3350 IF R$ = ”L” THEN GOSUB 4000: GOTO 3220
+3340 IF R$ = "A” THEN GOSUB 12000: GOTO 3240.
+
+## Das macht den Kleinen größer, 9/84, Seite 112
+
+Die beiden Bildunterschriften wurden vertauscht.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
