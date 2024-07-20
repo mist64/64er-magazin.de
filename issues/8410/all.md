@@ -1013,12 +1013,118 @@ Folgende Zeilen müssen korrekt lauten: 3350 IF R$ = ”L” THEN GOSUB 4000: GO
 
 Die beiden Bildunterschriften wurden vertauscht.
 
+# Der Commodore 64 wird zum PC – mit Vizawrite 64
 
+> Das Textverarbeitungsprogramm »Vizawrite 64« ist mit Leistungsmerkmalen ausgestattet, die sehr nahe an Wordstar herankommen. Dabei kosten Vizawrite und Computer zusammen weniger als ein vergleichbares Programm für einen Personal Computer.
 
+Sie haben sich sicherlich schon gefragt, worin der Unterschied zwischen einem »Heimcomputer« wie dem C 64 und einem Personal Computer wie dem IBM-PC liegt. Das Computerlexikon definiert einen Heimcomputer als einen preislich zwar günstigen, aber wenig leistungsfähigen Computer für Heim- und Hobbyanwendungen. Ein Personal Computer ist in diesem Lexikon als ein hauptsächlich am Preis (5000 bis 15 000 Mark) und der fast unbegrenzten Erweiterungsfähigkeit erkennbarer Computer beschrieben.
 
+Rein technisch gesehen ist der Unterschied gar nicht so frappierend. Ein Vergleich fällt in manchen Bereichen (Grafik, Farbe, Ton) nicht selten zugunsten des Heimcomputers aus. Derartige Zusatzfunktionen sind beim PC, wenn überhaupt, oft nur mit sehr viel Geld zu realisieren. Anders sieht es bei der Verfügbarkeit sehr leistungsfähiger Anwenderprogramme aus, hier haben die PCs die Nase vorn. Ob Datenbanken (dBase II), Textverarbeitung (Wordstar, Word) oder Tabellenkalkulation (Multiplan), jedes dieser Programme ist ein Spitzenprodukt. Mit »Vizawrite 64« wurde ein Programm geschrieben, das den Abstand zwischen einem »Heimcomputer« und den PCs weiter verringert. Der Preisvorteil der Heimcomputer ist geblieben.
 
+»Vizawrite 64« ist mit der lange erwarteten deutschen Version in der Lage, den deutschen Zeichensatz auf dem Bildschirm darzustellen. Eine unabdingbare Forderung an ein Textverarbeitungsprogramm für den deutschen Markt wurde damit erfüllt. Die deutsche Version ist als Modul und auf Diskette erhältlich. Beide Versionen arbeiten mit einem oder zwei Laufwerken und sogar der Datasette zusammen. Das deutsche Handbuch (56 Seiten) macht insgesamt einen guten Eindruck und beschreibt ausführlich die enormen Fähigkeiten dieses Programms.
 
+Diese Fähigkeiten wollen wir nun etwas genauer betrachten. Nach dem Laden (beziehungsweise Einschalten, bei der Modulversion) erscheint das Hauptmenü (Bild 1). Hier hat man die Auswahl zwischen dem Erstellen einer neuen Textdatei, dem Laden einer bestehenden Textdatei oder des Disketteninhalts und dem Senden von DOS-Befehlen (New, Scratch ...). Vom Hauptmenü aus wird auch, nach getaner Arbeit, das Programm verlassen. Zum Anwählen der einzelnen Aktivitäten dienen die Funktionstasten.
 
+Zum Schreiben einer neuen Textdatei oder nach dem Laden eines bestehenden Dokuments wird in den Textverarbeitungsmodus geschaltet (Bild 2).
+
+Das zur Verfügung stehende Arbeitsfeld ist 20 Zeilen hoch und hat eine variable Breite von bis zu 240 Spalten. Auf dem Bildschirm erscheinen aber immer nur 40 Zeichen. Ab dem 38. Zeichen wird der Text horizontal verschoben (scrolling). Besitzer eines PCs kontern hier: »Aber mein PC kann jederzeit 80 Zeichen pro Zeile darstellen.« Stimmt, aber wenn man bedenkt, daß selbst Wordstar in der Regel nur 65 Zeichen benutzt, ist dies nicht unbedingt ein Nachteil. Auch hat nicht jeder Computerbesitzer einen Monitor, der die notwendige Auflösung für 80 Zeichen bereitstellen kann, sondern einen ganz normalen Fernseher. Für diesen sind aber 40 Zeichen pro Zeile mit horizontalem Verschieben geradezu ideal. Daß der ganze Text trotzdem, ohne lästiges Hin- und Herfahren mit dem Cursor überschaubar ist, ermöglicht die »WIDTH = Bildschirmbreite«-Funktion. Auf Tastendruck (CBM+w) wird der gesamte Text auf 38 Zeichen umformatiert. Der Zeitbedarf für diese Umformung ist fast nicht meßbar.
+
+Alle Informationen des Textverarbeitungsmodus stehen in den oberen drei und der untersten Zeile. Dort erscheinen Fehler-, Systemmeldungen, die Seiten-, Zeilen- und Spaltennummern sowie der Name des Dokuments. Die vierte Zeile ist die sogenannte Formatzeile. Sie bestimmt das Aussehen des Textes. Hier werden Textbreite, Tabulatoren und die später noch beschriebenen Kontroll-Marken festgelegt. Die Formatzeile ist an jede beliebige Stelle im Text kopierbar (CTRL + f). Sie gibt dem Text ab dort ein neues Aussehen.
+
+»Vizawrite 64« ist ein bildschirmorientiertes Textverarbeitungsprogramm. Alle Texte werden formatiert eingegeben und erscheinen praktisch so auf dem Bildschirm, wie sie später auf dem Papier stehen. Im Gegensatz zu anderen Textverarbeitungsprogrammen wird kein Wort am Zeilenende abgeschnitten, sondern statt dessen in die nächste Zeile übernommen (word wrap). Jedes Dokument kann beliebig viele Seiten haben, die einer späteren Druckseite entsprechen. Bei einem freien Arbeitsspeicher von 34000 Zeichen finden so zehn »normal« beschriebene Schreibmaschinenseiten Platz. Das ist wesentlich mehr als bei anderen Programmen.
+
+## Schnelles Arbeiten möglich
+
+Vizawrite ist schnell. Wir haben den Test gemacht und den gesamten Speicher gefüllt. Dabei gab es keine Probleme mit der Geschwindigkeit. Selbst das letzte Zeichen wird ohne Verzögerung angenommen. Beachtlich gering ist auch der Zeitverbrauch beim Umformatieren. Von 40 auf 80 Zeichen haben wir nur eine Sekunde gemessen. Der IBM-PC braucht dafür, zusammen mit Wordstar, mehrere Minuten Qe nach Länge des Textes).
+
+Die Befehle des Textverarbeitungsmodus bestehen im wesentlichen aus drei Hauptgruppen:
+
+1.	Die Systembefehle wie Laden, Finden, Drucken und vieles mehr.
+2.	Die Formatsymbole wie Tabulatoren und Befehle zur Druckersteuerung.
+3.	Die Funktionstasten.
+
+Alle Befehle und Funktionen von »Vizawrite 64« können zu jeder Zeit und an jeder Stelle des Textes aufgerufen werden. Dazu ist kein langwieriger Marsch durch verschiedene Menüs notwendig. Die Befehle sind einprägsam und logisch. So bedeutet beispielsweise CBM + s (s für SAVE), daß der Text abgespeichert wird. Obwohl die Befehle schnell erlernbar sind, kann man sich in der Anfangszeit mit einem Trick behelfen: Das mitgelieferte Programm »Hilfe« wird gemäß der Anleitung in die sogenannte »work page« oder Arbeitsseite geladen. Die Arbeitsseite ist ein separater Textspeicher, aus dem oder in den Texte kopiert werden. Alles, was der Anwender dann noch wissen muß, ist der Befehl CBM + g. Beantwortet er die Frage nach der anzuzeigenden Seite mit »w«, so befindet er sich auf der »work page«. Dort kann er sich dann über alle Befehle und Funktionen informieren.
+
+Die Systembefehle sind die leistungsfähigsten Anweisungen von »Vizawrite 64«. Sie rufen wichtige Funktionen auf und beginnen immer mit der CBM-Taste. Daraufhin erscheint in der Kommandozeile die Frage nach der gewünschten Funktion.
+
+Der Anwender hat nun die Auswahl zwischen 16 verschiedenen Funktionen:
+
+1.	CBM + c: Text kopieren. Mit Hilfe der Cursortasten wird der Text, der kopiert werden soll, markiert. Dies geschieht durch einfaches Darüberfahren mit dem Cursor. Die markierten Textteile erscheinen farblich abgehoben. Durch Abwärtsbewegen des Cursors werden ganze Zeilen, durch Drücken der fl-Taste ganze Seiten und mit der f3-Taste eine Bildschirmseite markiert. Nach dem Markieren wird nur noch der Bestimmungsort des Textteils festgelegt und mit Return quittiert. Der Text befindet sich dann an der neuen und der alten Stelle im Dokument.
+2.	CBM + m: Text verschieben. Hat die gleiche Funktion wie Text kopieren, mit dem Unterschied, daß der markierte Bereich an seiner ursprünglichen Position gelöscht wird.
+3.	CBM + f. Finden eines bestimmten Ausdrucks. Die Länge des Ausdrucks ist dabei auf 25 Zeichen beschränkt.
+4.	CBM + F: Finden eines Ausdrucks, ohne dabei auf Groß/Klein-schreibung zu achten.
+5.	CBM + g: Zu einer bestimmten Seite springen. Mit dieser Funktion erscheint die angewählte Seite im Textfenster. Andererseitswerden so die separaten Seiten für Kopfzeile, Schlußzeile sowie die Arbeitsseite (work page) erreicht.
+6.	CBM + d: DOS-Befehle senden. Dieser Befehl dient der Handhabung des Diskettenlaufwerks.
+7.	CBM + M: Einfügen von Dokumenten. Eine sehr wichtige Funktion, mit der an einen Text im Speicher ein Textteil von Diskette nachgeladen wird. Der Merge-Befehl dient aber auch zum Einlesen verschiedener Dateiarten. Es können Dateien von anderen Textverarbeitungsprogrammen wie Wordpro 3 +, Easyscript, SM-Text und vielen anderen eingelesen werden. Im Rahmen des später beschriebenen Erstellens von Serienbriefen dient diese Funktion dem Einlesen der Adreßdateien von Vizastar oder anderen Datenbanken.
+8.	CBM + n: Neubenennen eines Textes.
+9.	CBM + p: Drucken. In dem dann erscheinenden Druckermenü (Bild 3) können alle wesentlichen Einstellungen, die auf das gesamte Schriftstück wirken sollen, definiert werden.
+10.	CBM + q: Arbeit beenden. Mit dieser Funktion wird zum Hauptmenü (Bild 1) zurückgekehrt. Sollte der Text im Speicher mit der zuletzt geladenen Version nicht übereinstimmen, wird der Anwender gewarnt und zum Abspeichern aufgefordert.
+11.	CBM + r: Ersetzen eines Ausdrucks. Der auszutauschende Text wird wie unter 1. beschrieben markiert und durch bis zu 28 neue Zeichen ersetzt.
+12.	CBM + R: Globales Austauschen. Der Ausdruck wird nicht nur an einer bestimmten Stelle ersetzt, sondern im gesamten Text.
+13.	CBM + s: Abspeichern des Textes. Vizawrite produziert PRG-Files, in denen alle Informationen des bestimmten Textes mit abgelegt sind. Sowohl die Farbgebung, alle Formatierungen als auch die gewählte Druckereinstellung werden zusammen mit dem Text abgespeichert. Bereits bestehende Dateien mit dem gleichen Namen werden allerdings überschrieben.
+14.	CBM + t: Änderung der Farbgebung.
+15.	CBM + w: Ändern der Dokumentbreite auf 38 Zeichen.
+16.	CBM + x: Einstellen auf andere Gerätekonfigurationen. Bis zu zwei Diskettenlaufwerke sind ansprechbar, aber auch eine Einstellung auf die Datasette ist machbar. Wer seinen Drucker (oder mehrere Drucker) betreiben möchte, hat hier Gelegenheit, die Geräteadresse des Druckers auf 5 einzustellen. Wir haben es mit dem 1520 Printer/Plot-ter versucht und hatten Erfolg. Auch auf diesem Gerät wird jeder Text ausgedruckt (Bild 4). Die einzelnen Schriftarten des Plotters eignen sich besonders für Aufkleber und Beschriftungen.
+
+Kein anderes mir bekanntes Textverarbeitungsprogramm hat eine ähnliche Fülle von Befehlen, die mit vergleichbarer Geschwindigkeit und Zuverlässigkeit funktionieren. Damit es auch bei der Texteingabe an keinem Komfort mangelt, haben einige Tasten Sonderfunktionen.
+
+Die Funktionstasten dienen zum seitenweisen oder bildschirmweisen Vor- oder Zurückblättern sowie dem komfortablen Einfügen und Löschen. Ein Druck auf die f7-Taste genügt, um beliebig viele Zeilen in einen Text einfügen zu können. Ein zweiter Druck auf dieselbe Taste oder die Stop-Taste fügt den restlichen Text nahtlos wieder an. Die f8-Taste sorgt für das schnelle Löschen von Textteilen. Der Text wird, wie unter Punkt 1 der Befehlsfunktionen beschrieben, markiert und nach dem Quittieren mit der Return-Taste blitzschnell gelöscht. Nicht selten wird es bei der Texteingabe notwendig, große Sprünge durch den Text zu machen. Die Taste »HOME« bewirkt beim ersten Druck einen Sprung zum oberen Rand des Bildschirms und beim zweiten Druck den Sprung zum Anfang des Textes. Zurück geht es mit der »CLR«-Taste, die den Cursor an das Textende bewegt.
+
+»Vizawrite 64« ist, wie schon gesagt, bildschirmorientiert. Deshalb ist es natürlich gut, schon bei der Eingabe auf die entsprechende Formatierung des Texteszuachten. Der Anwender wird dabei tatkräftig unterstützt. Seine Hilfsmittel sind Texttabulatoren, numerische Tabulatoren, Formatzeilen, Einrück- und Zentrierbefehle. Die f5- und f6-Tasten dienen dabei dem schnellen Sprung von einem Tabulator zum nächsten oder vom Anfang einer Zeile zum Ende. Auch die Kommandos zur Druckersteuerung bildet »Vizawrite 64« auf dem Bildschirm ab. Dabei sind eine Reihe von Kontrollbefehlen bereits »fest verdrahtet«. Fettschrift, Unterstreichen, Sub-und Superscript haben ihre festen Symbole, die mit vorangestellter CTRL-Taste in den Text eingefügt werden. Um aber optimale Flexibilität für die Fähigkeiten verschiedener Drucker bereitzustellen, kann jeder Anwender beliebig viele Befehle selbst definieren. Dies geschieht in der Formatzeile. Die Ziffern 0 bis 9 erhalten dort Werte, die, bei Wiederholung im Text, den Drucker steuern. Die bei manchen Druckern üblichen ESC-Sequenzen müssen dabei nicht explizit definiert werden. Es genügt, hinter der Zahl des Kontrollbefehls den Buchstaben der betreffenden Sequenz anzufügen.
+
+## Optimale Druckersteuerung
+
+Das Umschalten eines Epson-Druckers auf »Elite«-Schrift sieht in der Formatzeile beispielsweise so aus: 0 = M. Da aber beliebig viele Formatzeilen einfügbar sind, ist die Anzahl der Kontrollbefehle unbegrenzt.
+
+Zu den Kontrollbefehlen gehört auch das »Merge«-Zeichen. Es ist bei der Erstellung von Serienbriefen unverzichtbar, denn immer dort, wo ein »Merge«-Zeichen steht, wird eine Information aus der Arbeitsseite (work page) eingefügt. Dort können, entweder von Hand eingegeben oder aus einer Datenbank Adressen eingeladen werden. Die Position »Global/Fill« im Druckermenü (Bild 3) sorgt dann dafür, daß der Brief entsprechend oft mit den eingefügten Daten ausgedruckt wird. Selbstverständlich können auch beliebig viele Dokumente aneinandergehängt werden. Die einzige Grenze, die dem pausenlosen Drucken gesetzt ist, ist die Speicherkapazität der Diskette.
+
+Die wichtigste aller Funktionen eines Textverarbeitungsprogramms ist aber das Ausdrucken. Und hier trumpft »Vizawrite 64« erst richtig auf.
+
+## Eingebaute Centronics-Schnittstelle
+
+Vizawrite 64 hat ein eigenes, eingebautes Centronics-Soft-Interface, das den Anschluß eines Druckers mit dieser Schnittstelle problemlos macht. Die einzigen zusätzlich entstehenden Kosten bestehen in einem 50-Mark-Kabel. Für den Anschluß eines CBM-Druckers wird dieses Kabel natürlich nicht benötigt. Leider kann Vizawrite 64 auf diesen Druckern noch keine deutschen Umlaute erzeugen. Dafür arbeiten aber fast alle anderen Drucker und Schreibmaschinen mit Vizawrite ausgezeichnet zusammen. Dabei ist es fast ohne Belang, mit welchem Interface der Drucker angeschlossen ist. Der Centronics-Interface-Vergleich in Heft 7/84 zeigte, daß Vizawrite 64 als einziges Textverarbeitungsprogramm mit allen Schnittstellen einwandfrei funktionierte. Auch die Original-Epson-Schnittstelle ist geeignet.
+
+Ganz besonders positiv sind die Handhabung und die Hilfen während des Ausdrucks. Zum einen kann der Ausdruck jederzeit gestoppt, fortgesetzt oder neu begonnen werden. Zum anderen helfen sinnvolle Hinweise beim Ausdrucken mit Einzelblatteinzug. Dabei steht vor dem Ausdrucken noch zur Wahl, ob in Blocksatz gedruckt oder welcher Zeilen- beziehungsweise Zeichenabstand gelten soll. Papierlänge, linker Rand, automatischer Seitenvorschub und Anfügen einer Kopfzeile auf jeder Seite sind weitere Funktionen, die einfach und schnell im Druckermenü bestimmbar sind.
+
+Vizawrite 64 ist enorm zuverlässig. Außer mit brutaler Gewalt (Resetknopf) ist das Programm kaum zum Abstürzen zu bringen. Ein einziges Mal während des Tests dachten wir, Vizawrite hätte sich »aufgehängt«.
+
+Dies war der Fall, als die »Shift«- und die »CBM«-Taste zu gleicher Zeit gedrückt wurden. Es war danach nur noch wirres Zeug auf dem Bildschirm. Ein erneuter Druck auf die gleichen Tasten stellte aber den Originalzustand wieder her (eine hervorragende Möglichkeit, Texte blitzschnell vor fremden Blicken zu schützen).
+
+Bei so vielen positiven Eigenschaften sind auch ein paar negative Eigenheiten von Vizawrite 64 anzumerken: Es wurde keine vollständige DIN-Tastatur implementiert »Blindschreiber« müssen sich also etwas umgewöhnen. Die deutschen Umlaute gibt es nur auf Druckern von Fremdherstellern. Und letztlich ist es schade, daß ein so hervorragendes Produkt noch in englisch geschrieben ist. Ein Umstand, den der Hersteller möglichst bald ändern sollte.
+
+Mit 320 Mark für die Diskettenversion und 360 Mark für die Modulversion ist Vizawrite 64 sicherlich nicht billig. Gemessen an den Leistungen ist dieser Preis aber mit Sicherheit mehr als gerechtfertigt.
+
+## Auch für Unternehmer interessant
+
+Vizawrite 64 ist nicht nur für den ambitionierten Privatanwender interessant, sondern auch für all jene Unternehmen, die mit möglichst wenig Investitionskosten ein leistungsfähiges Computersystem erwerben wollen. Der Commodore 64 zusammen mit Diskettenlaufwerk, einem Monitor und einem Epson FX 80 kostet zum Beispiel inklusive Vizawrite 64 weniger als 4000 Mark. Den Löwenanteil mit über 1500 Mark trägt dabei der Drucker. Für einen PC mit gleichem Drucker (und der bestimmt ja schließlich das Druckbild) ist mindestens das Doppelte bis Dreifache zu bezahlen. Das Endprodukt, der ausgedruckte Text, unterscheidet sich aber in keiner Weise von dem mit einem PC erstellten. Auch steht die Geschwindigkeit und der Komfort bei der Eingabe einem PC kaum nach.
+
+In der nächsten Ausgabe werden wir ein weiteres Produkt dieser Reihe vorstellen: Vizastar, eine kombinierte Datenbank und Tabellenkalkulation. Der Commodore 64 ist ein preiswerter, aber vielseitiger PC — Sie dürfen gespannt sein.
+
+(Arnd Wängler/aa)
+
+Bezugsquelle: Microton, Postfach 40, CH-2542 Pieterlen
+
+# Lohnsteuer-jahresausgleich leichtgemacht
+
+> Der Kampf mit den Formularen für den Lohnsteuerjahresausgleich ist mühsam und nervenaufreibend. Mit dem Programm HL-L0JA-64 soll das anders werden.
+
+Die Autoren dieses Programms haben sich an ein heikles Thema herangewagt. Die mitgelieferte Beschreibung ist recht spärlich ausgefallen. Doch diesen Nachteil fängt das Programm mit einer einfachen Bedienbarkeit, leicht verständlichen Texten und einer sich stets wiederholenden Korrekturabfrage ab. Als Muster sind dem Handbuch eine Lohnsteuerkarte und ein Formular für den Lohnsteuerjahresausgleich (für das Jahr ’83) beigelegt.
+
+## Das Programm
+
+Nach dem Starten des Programms werden zuerst die persönlichen Daten, wie Geburtsdatum, Anzahl der Kinder und die Kirchenzugehörigkeit abgefragt. Dann werden die Eintragungen, die sich auf der Steuerkarte befinden, in das Programm übertragen. Auch hier kann man ständig Fehleingaben korrigieren.
+
+Nachdem dieser Programmteil durchlaufen ist, wird mit Hilfe des nächsten Teiles die Anlage N des Formulares ausgefüllt. Das Programm fragt einzeln die steuerrelevanten Daten ab, und weist darauf hin, welche Einträge vorzunehmen sind.
+
+Ist die Anlage N ganz ausgefüllt, wird der Hauptvordruck in Angriff genommen. Das Verfahren beim Ausfüllen ist das gleiche wie bei der Anlage N.
+
+Nachdem das Ausfüllen mit der Unterschrift unter den Antrag abgeschlossen ist, berechnet das Programm die fälligen Steuern und den Betrag, den man nachzahlen muß oder erstattet bekommt.
+
+## Fazit
+
+Über die Zweckmäßigkeit dieses Programms kann man geteilter Meinung sein. Solange es nur als Hilfestellung zum Ausfüllen des Jahresausgleichs benutzt wird, ist der Preis von 98 Mark sicherlich nicht zu hoch (man kann auch diesen Kaufpreis unter »Steuerberatungskosten« absetzen). Erwartet man allerdings ein Programm, das den eventuell nötigen Gang zum Steuerberater ersetzt, wird man enttäuscht. Weder Handbuch noch Programm geben konkrete Hinweise über Absetzbarkeit mancher Kosten. Man sollte also möglichst genau wissen, was und wieviel man in dem Antrag an Kosten ansetzen muß. In diesen Fällen wird das Programm wirklich voll ausgenutzt. Allerdings können die Berliner damit recht wenig anfangen. Die Berlinvergünstigung ist nicht berücksichtigt. Vor Änderungen der Steuergesetzgebung braucht man keine Angst zu haben. Das Programm wird, wie der Hersteller mitteilt, bei Änderungen aktualisiert und bei Einsendung einer Originaldiskette ausgetauscht, (rg)
+
+Bezugsquelle: HL Computer-Software GmbH, Hammstr. 8, 6842 Bürstadt, Tel. 0 62 06/8198
 
 
 
