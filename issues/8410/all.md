@@ -282,21 +282,354 @@ Wer hat Erfahrung mit dem Programm »Textomat« und »Datamat« (neue Version) v
 
 Axel Birtel
 
+## Wollen Sie antworten?
 
+Wir veröffentlichen auf dieser Seite auch Fragen, die sich nicht ohne weiteres anhand eines gutes Archivs oder aufgrund der Sachkunde eines Herstellers beziehungsweise Programmierers beantworten lassen. Das ist vor allem der Fall, wenn es um bestimmte Erfahrungen* geht oder um die Suche nach speziellen Programmen beziehungsweise Produkten. Wenn Sie eine Antwort auf eine hier veröffentlichte Frage wissen - oder eine andere. bessere Antwort als die hier gelesene - dann schreiben Sie uns doch. Die Antworten werden wir in einer der nächsten Ausgaben publizieren. Bei Bedarf stellen wir auch den Kontakt zwischen Lesern her.
 
+## C 64-Platine kaufen?
 
+Kann man bei Commodore oder woanders auch nur eine Platine des C 64 kaufen?
 
+Eric Kratzin
 
+## C 64-Tastatur kaufen?
 
+Woher bekomme ich eine Tastatur für den C 64?
 
+Oliver Varoß
 
+## Hardcopy für Printer 4022?
 
+Ich besitze einen C 64 mit IEEE 488-Interface und den Tractor-Printer 4022.
 
+1) Ist ein Hardcopy möglich? (Hardcopy der IEEE 488 funktioniert nicht!)
+2) Wie komme ich zur Sperrschrift (breiterer Ausdruck von Zeichen) beim 4022?
+3) Wo liegt der Grafikspeicher der IEEE 448?
 
+Gernot Zelzef
 
+## Horizontales Scrolling?
 
+Wie kann man beim C 64 ein horizontales Fine-Scrolling (Punkt für Punkt) auf der Textseite simulieren? Mit welcher Speicherzelle kann man die Textseite Punkt für Punkt verschieben?
 
+Christoph Bergmann
 
+Geldfrage?
+
+1. Bei welchen Disketten ist das Preis-/Leistungsverhaltnis am günstigsten? (in bezug auf die Commodore-Floppy VC 1541).
+2. Wie kann man Sprites drehen?
+3. Bei welchen Geschäften/Versandhäusern bekommt man die billigste Hard-/Software?
+4. Gibt es Möglichkeiten, mit dem Homecomputer Geld zu verdienen?
+
+Hendrik Richter
+
+## Fortran auf dem C 64?
+
+Ich besitze einen Commodore 64. Gibt es für dieses Gerät einen Fortran-IV-Compiler oder eine andere Möglichkeit, auf dem C 64 mit Fortran IV zu arbeiten?
+
+Hergen Eilers
+
+Der C 64 an der Stereoanlage?
+
+Ich habe folgende Fragen:
+— Wie schließe ich meinen Computer(C 64) an eine Stereoanlage an (Mono-Umschalter nicht vorhanden)? Es soll kein Stereoton simuliert werden.
+— Wie kann ich die Erweiterung »Turbo-Tape« von Maschinensprache aus nutzen? (Wo sind die Einsprünge; wie werden die Parameter übergeben?) Kann man mit »Turbo-Tape« absolut laden und von Maschinensprache aus speichern?
+— Kann man Maschinenprogramme im Diskettenpuffer ablegen und dort laufen lassen? Wie kann man sie starten, wenn das oben genannte möglich ist?
+
+Thomas Denner
+
+## SM-Text 64 mit Umlauten?
+
+Ist es möglich, mit SM-Text 64 mittels C 64 und Drucker MPS 801 auch Umlaute zu drucken? Wer kennt gegebenenfalls ein Hilfsprogramm ?
+
+Ulrich Uphagen
+
+## Aztec Tomb
+
+Wer kann mir bei der Pflanze weiterhelfen?
+
+Ausgabe: 8/84
+
+Stefan Sache
+
+So würden Sie nicht weiterkommen, denn die folgenden Schritte fehlen Ihnen noch:
+— im Hausflur:
+Eingabe: examine hallstand
+Comp.: I can see empty jam jar
+Eingabe: take jar
+Comp: O.K.
+— beim Teich:
+Eingabe: examine pool
+Comp: I can see fish-pool
+Eingabe: catch fish
+Comp: It’s now in jam jar
+— Waste Ground:
+Eingabe: examine fish
+Comp: It’s magical it says: Plants need water and vanishes
+Eingabe (2mal): fill jar — empty jar
+
+Die Pflanze wächst und Sie gelangen mit »climb beanstork« in die nächste Abenteuerstufe.
+
+Olaf Amblank
+
+## Probleme mit Speichererweiterung
+
+3-KByte-Spiele funktionieren nicht mit dem 16-KByte-Modul? Ausgabe: 7/84
+
+Daniel Hüller
+
+Meine Antwort haben Sie offenbar falsch verstanden. Um beim VC 20 eine 3-KByte-RAM-Erweiterung zu simulieren, benötigt man lediglich eine 8-KByte-Erweiterung (oder natürlich mehr). Eine 3-KByte-Erweiterung, die man dann zusammen mit der 16-KByte-Erweiterung in eine (wohl kaum vorhandene) Modul-Box stecken muß, ist völlig unnötig. Die von mir beschriebenen PO-KEs reichen aus, um Programme, die eigentlich eine 3-KByte-Erweiterung benötigen, nur mit einer 8-KByte-(oder mehr) Erweiterung lauffähig zu machen.
+
+Oliver Eichhorn
+
+## Wordpro 3+
+
+Kann Wordpro 3+ auch mit Centronics-Druckern am Userport betrieben werden?
+
+Ausgabe: 5/84
+
+Heinz-Josef Erben
+
+Die Redaktion weist in Ihrem Test in der Ausgabe 6/84, Seite 52 ff. darauf hin, daß das Programm nur mit Druckern betrieben werden kann, die am seriellen Bus angeschlossen sind.
+
+Mir ist es nun gelungen, die nötige Treibersoftware für eine Centronicsschnittstelle in das Programm einzubinden. Darüber hinaus habe ich es auch um eine deutsche Tastaturbelegung und deutschen Zeichensatz erweitert. Wer also mit seinem Wordpro gerne »Deutsch« schreiben möchte oder einen Centronics-Drucker benutzt, kann sich gerne an mich wenden.
+
+David Trobisch
+Neckarhauserstr. 54
+6800 Mannheim 71
+Tel. 06 21/47 56 59
+
+## Probleme mit Monitoren
+
+Wie schließe ich einen Monitor an den VC 20 an?
+
+Ausgabe: 8/84
+
+Inge Märkle
+
+Hier mein Tip, wie ich meinen Monitor angeschlossen habe. In einem Elektrogeschäft kauft man sich einen 5poligen Diodenstecker, einen Cinch-Stecker und ein abgeschirmtes Kabel (soviel wie man eben braucht). Das alles kostet nur wenige Mark. Das Kabel wird abisoliert. Der Innenleiter wird dann an Stift 5 des Diodensteckers gelötet, das Drahtgeflecht kommt an Stift 2. Auf der anderen Seite des Kabels kommt der Innenleiter an den Stift des Cinch-Steckers, das Drahtgeflecht an den noch freien Anschluß. Das ist schon alles. Der Diodenstecker wird anstelle des Modulators in die Video-Buchse des VC 20 gesteckt, der Cinch-Stecker kommt in den Monitor. Siehe auch Seite 151 im Handbuch.
+
+Manchmal kann es vorkommen, daß das Monitorbild trotz voll aufgedrehtem Helligkeitsregler sehr dunkel ist. Abhilfe: VC 20 aufschrauben und das Video-IC suchen. (Großes schwarzes Bauteil mit 40 Beinchen, auf dem »Mos 656« steht. Manchmal ist dieses IC von einem silbrigen Metallkästchen umgeben: Deckel entfernen.) In der Nähe dieses ICs gibt es zwei blaue Regler. Monitor anschließen und Helligkeitsregler ganz aufdrehen. Nun einen der beiden Regler vorsichtig (!) verdrehen. Verändert sich die Bildhelligkeit, so muß der Regler so lange verdreht werden, bis das Bild hell genug ist. Wenn beim Verdrehen nichts passiert, den Regler wieder in die Stellung bringen, in der er war und das Experiment mit dem anderen Regler wiederholen. Wenn auch hier nichts passiert, muß das Videosignal verstärkt werden. Den Schaltplan für einen entsprechenden Verstärker kann man bei mir bekommen.
+
+Bernd Eßlinger
+Panoramastr. 32
+7470 Albstadt 2
+
+## Text und Grafik mischen
+
+Wie kann ich in Simons Basic hochauflösende Grafik und Text gleichzeitig darstellen?
+
+Ausgabe: 8/84
+
+Frank Schager
+
+Die Darstellung von Text und gleichzeitig Grafik im Grafikmodus des Simons Basic läßt sich durch den Simons Basic-Befehl »TEXT« bewerkstelligen. Dieser ist so anzuwenden:
+TEXT x,y,”Text”,m,gr,ab
+x = X-Koordinate; y = Y-Koordinate;
+m = Grafikmodus (m = 0 oder m = l oder m=2), wenn m = 0, 1 oder 2) wenn m = 0 dann aus;
+gr = Größe des darzustellenden Buchstabens;
+ab = Abstand zwischen den einzelnen Buchstaben.
+
+Um einen gleichen Abstand und eine gleiche Größe der Buchstaben wie beim normalen Textmodus zu erreichen, wird für »gr« eine 1 und für »ab« eine 7 eingesetzt. Also:
+TEXT x,y,"Text",m,1,7
+
+Dennoch läßt sich eine Eingabe von Antworten im Grafikmodus des Simons Basic nicht sehr einfach realisieren, da bei der Eingabe, jedenfalls im Grafikmodus, weder Cursor noch Eingaben sichtbar sind. Vielleicht gibt es einen Ersatzbefehl für den herkömmlichen INPUT?
+
+Stephan Hardy
+
+## C 64 und Videorecorder
+
+Wie kann ich mit dem Videorecorder die Signale vom Computer aufnehmen?
+
+Ausgabe: 8/84
+
+Eugen Anger
+
+Die Lösung ist ganz einfach: Man nehme das Kabel, welches beim C 64 direkt vom Computer kommt, und steckt dieses in den Eingang des Videorecorders. Dann führt man das Kabel vom Ausgang, wie in der Betriebsanleitung angegeben, zum Fernsehgerät. Nun muß man das Gerät auf den Computer einstellen, und zwar so, als würde man einen Fernsehsender einstellen. Danach braucht man nur noch wie bei der normalen Aufnahme zu verfahren.
+
+Stefan Wößner
+
+## Hardcopy mit NEC 8023 B-N
+
+Wer bietet Software an, um mit dem C 64 und dem Drucker NEC 8023 B-N hochauflösende Grafik und Hardcopys zu erstellen?
+
+Ausgabe: 8/84
+
+Wolfgang Jaworski
+
+Unser neues Interface Typ 92000/NEC erlaubt, den NEC-Drucker 8023 oder Itoh 8510 an den C 64 anzuschließen. Der Drucker wird voll kompatibel zum CBM-Drucker 1515. Auf diese Weise können zum Beispiel mit Simons Basic problemlos Hardcopys erstellt werden. Das Interface ist für 298 Mark inklusive Mehrwertsteuer sofort lieferbar. Vorhandene Geräte Typ 9200 rüsten wir für 91,20 Mark inklusive Mehrwertsteuer in die neue Version um. Ihr Leser
+
+Reinhard Wiesemann Mikrocomputertechnik, Wuppertal
+
+## Rechengenauigkeit beim C64
+
+Warum gibt der C 64 als Ergebnis der Aufgabe PRINT INT(3/0.03) nicht 100, sondern 99 an?
+
+Ausgabe: 9/84
+
+Oliver Treiber
+
+Wie genau der C 64 in seiner Ausarbeitung ist, beweist Ihr Auftrag-Print INT(3/0.03). Von der Logik her ist diese Antwort als richtig einzustufen. Die INT-Funktion (Ganzzahl-Funktion) geht davon aus, daß im Endergebnis die kleinere, ganze Zahl ausgegeben wird. Das Ergebnis lautet natürlich 100; da aber die INT-Funktion die nächst kleinere Zahl anzugeben hat, wäre dies die Zahl 99.99, die der 100 am nächsten käme.
+
+Nun hat aber die INT-Funktion auch die Aufgabe, aus einer Zahl mit Dezimalstellen eine ganze Zahl zu machen. Also werden die beiden Dezimalstellen geschluckt. Das INT-Ergebnis lautet daher 99. Nun kann man diese »Ungenauigkeit« in der INT-Funktion umgehen, in dem man das Originalergebnis mit einer Dezimalstelle versieht. PRINT INT(3/0.03 + 0.5). Das Ergebnis müßte jetzt 100.5 lauten. Aber die nächst kleinere, ganze Zahl lautet 100.
+
+Im übrigen kann man mit der INT-Funktion auf- und abrunden sowie vorausbestimmen, auf wieviele Dezimalstellen das Endergebnis ausgedruckt werden soll. Im Prinzip kommt es darauf an, welche Aufgabe eine Funktion übernimmt. Eine solche Rechenoperation löst man einfacher mit Print 3/0.03. Besondere Vorsicht ist bei einer INT-Funktion mit einer negativen Zahl geboten.
+
+Prüfen Sie die Aussage PRINT INT(-2.3) auf die Aussage der nächst kleineren, ganzen Zahl hin. Das Ergebnis lautet —3.
+
+Rolf Voigt
+
+## Programmunterbrechung bei Druckerausgabe
+
+Bei Ausgabe über Drucker erfolgt nach unterschiedlich langer Druckerausgabe des öfteren die Fehlermeldung »Device not present error«. Handelt es sich um einen Hard- oder Softwarefehler?
+
+Ausgabe 8/84
+
+Rudolf Ott
+
+Als Hersteller von Zusatzgeräten für den C 64 ist uns das geschilderte Problem bekannt. Der Fehler liegt im seriellen Bus des C 64. Er dürfte nicht mehr auftreten, wenn die Signalleitungen an der 6poligen Buchse mit 4,7 kOhm gegen Masse abgeschlossen sind.
+
+Josef Wildgruber
+Fotronic GmbH
+
+## Autostart
+
+Wie bringe ich meine Programme dazu, daß sie nach dem Laden von Diskette oder Kassette automatisch starten?
+
+Ausgabe: 6/84
+
+Carsten Bruch
+
+Ich habe noch eine ergänzende Antwort. Um einen Autostart bei der Floppy hervorzurufen, genügt es, folgende Zeile einzugeben:
+LOAD”NAME”,8:(SHIFT) (RUN/STOP)
+
+Dabei müssen die Tasten (SHIFT) und (RUN/STOP) gleichzeitig gedrückt werden. Das Programm »NAME« wird dann ohne Eingabe von (RETURN) automatisch geladen und gestartet.
+
+Arndt Grothoff
+
+## Bits hörbar machen
+
+Ist es beim C 64 möglich, beim Laden von Datasette die Signale hörbar zu machen?
+
+Ausgabe: 8/84
+
+Werner Frings
+
+Um die Signale, die von der Datasette kommen, hörbar zu machen, muß einfach mit POKE54296,15 die Lautstärke im SID auf 15 gesetzt werden. Nun sind die Signale beim Laden, Saven und Verifyen über den Lautsprecher des Monitors zu hören (auch bei Fast- und Turbo Tape).
+
+Und nun ein Nachtrag zum Autostart: Es gibt auch eine einfachere Lösung als die von Ihnen beschriebene.
+
+1. Programm einladen (Disk oder Tape)
+2. PRINT PEEK(174),PEEK(175)
+3. Beide Werte notieren
+4. Als erste Anweisung im Programm
+POKE174, < 1.Wert > :POKE175, <2.Wert> setzen
+5. Programm abspeichern
+6. NEW
+7. Ein kleines Ladeprogramm entwerfen:
+10 LOAD''Name>',8 (bei Disk oder
+10 LOAD''Name>' (bei Kassette)
+8. Dieses Miniprogramm abspeichern (bei Kassette vor dem Hauptprogramm)
+
+Soll nun das Hauptprogramm mit Autostart geladen werden, muß das Ladeprogramm geladen und mit RUN gestartet werden. Der Computer sucht darauf das Hauptprogramm, lädt und startet es.
+
+Nun zur Funktionsweise: Wenn in einem Programm eine LOAD-Anweisung erfolgt, lädt der Computer schon das angesprochene Programm und startet es. Probleme tauchen allerdings auf, wenn das zu ladende Programm länger ist als das Ladeprogramm. Der Computer lädt zwar die Programmdaten mit, »glaubt« sich aber immer noch im Ladeprogramm, da die Zeiger aufs Programmende sich in diesem Fall nicht dem neuen Programm anpassen. Die Adressen 174 und 175 enthalten die Zeiger aufs Programmende und können so mit den POKEs in der ersten Zeile angepaßt werden.
+
+Dieses Verfahren läuft sowohl auf Diskette als auch auf Kassette, allerdings nicht mit Fast- oder Turbo Tape.
+
+Stefan Gossens
+
+## EPROM-Brenner: Disput
+
+Mit Interesse las ich Ihren Testbericht über EPROM-Programmer in der 64’er, Ausgabe 8/84.
+
+Doch schon bald wurde aus dem Interesse Unmut. Unmut über einen zu oberflächlichen Test, der wenig die Funktion der Geräte ausgeleuchtet hat. J
+Als Hersteller der Geräte Mod. V64 und Mod. V128 (Fa. Jeschke tritt als Wiederverkäufer dieser Geräte auf), möchte ich hier ein wenig das Konzept erläutern: Die EPROM-Programmer sind für den Einsatz am User-Port vorgesehen. Das hat drei große Vorteile:
+
+1. Ein Gerät läuft ohne Änderung an der Hardware auf zwei Computern (nämlich dem VC 20 und dem C 64)
+2. bleibt der Expansionport frei für Steckmodule, 80-Zeichen-karten etc.
+3. Ist es am User-Port möglich, über die herausgeführte Wechselspannung auf einfache Art und Weise die Programmierspannung zu erzeugen. Ein externes Netzteil ist somit nicht nötig, was zumindest ein lästiges Kabel erspart, letzten Endes aber für den Kunden Sicherheit darstellt, da er nicht mit der Netzspannung in Berührung kommen kann.
+
+Da vor allem die Software unserer Geräte bemängelt wurde, auch hierzu eine Stellungnahme:
+
+Es ist nicht sinnvoll, für die Treibersoftware Maßstäbe anzusetzen wie etwa für ein Telespiel.
+
+Grafik, Farbe und Ton können zwar ganz reizvoll sein, sind aber für die Funktion der Software nicht notwendig und bei guter Dokumentation sogar überflüssig.
+
+Auch die Hintergründe für bestimmte Befehle der Treibersoftware wurden im Test vernachlässigt:
+
+Eine Transfer- (Verschiebe-) Funktion ist in unserer Software nicht eingebaut, da sie nicht notwendig ist. Anders als bei anderen Programmiergeräten können Sie den Speicherbereich, aus dem das Quellprogramm kopiert werden soll, frei wählen. Dabei ist es auch möglich, die Programmlänge beliebig festzusetzen, sowie die Startadresse im EPROM frei zu wählen. Unsere Treibersoftware gestattet Ihnen so das Programmieren eines »halben« EPROMs, oder sogar nur ein einzelnes Byte zu programmieren. Das Nicht-Vorhandensein von LOAD- und SAVE-Routinen hat folgende Gründe:
+Aufgabe der Treibersoftware ist in erster Linie die Bedienung des Programmiergerätes. So ist zum Beispiel das Kopieren eines EPROMs mit der Treibersoftware kein Problem.
+
+Für das umfassende Arbeiten mit Maschinenprogrammen benötigt der Anwender aber ein Monitorprogramm. Da ein Monitorprogramm normalerweise LOAD- und SAVE-Routinen enthält, brauchen sie in der Treibersoftware kein zweites Mal installiert zu sein.
+
+Für solche Fälle kann ich nur unsere UNIMENT-Befehlserweiterung empfehlen, die neben zahlreichen neuen Basic-, Grafik-, Sprite- und Sound-Befehlen sowie einer parallelen Centronics-Schnittstelle einen kompletten Maschinenmonitor mit Assembler-, Lade-, Speicher-, Transfer-Routinen und so weiter enthält.
+
+Auch die Treibersoftware für unsere EPROM-Programmer ist bereits implementiert, so daß beim UNIMENT-Steckmodul keinerlei Software geladen werden muß. Mit dem Einschalten des Computers stehen dem Benutzer die oben genannten Funktionen sofort zur Verfügung.
+
+Hagen Völzke
+
+Als Autor des EPROM-Vergleichstests in der Ausgabe 8/84 kann der oben abgedruckte Brief der Firma Völzke meinerseits nicht unbeantwortet bleiben.
+
+Der erste Unmut stellte sich bei Herrn Völzke wegen eines angeblich zu oberflächlichen Tests ein. Dazu ist folgendes zu sagen:
+
+1) Ich besitze persönlich seit über einem halben Jahr das Modell V128 und benutze es regelmäßig. Von einer Unkenntnis des Gerätes kann also sicher nicht die Rede sein.
+2) Die meisten von H. Völzke bemängelten Punkte werden im Test angesprochen. Dazu im einzelnen: Die Anschlußmöglichkeit der EPROM-Brenner am User-Port ist aus der Vergleichstabelle auf Seite 37 Spalte 2 ersichtlich. Dort kann ebenfalls gelesen werden, daß die EPROMmer der Firma Völzke sowohl für den VC 20 als auch den C 64 eingesetzt werden können. Als wesentliches Entscheidungskriterium für die Testbewertung ist die Tauglichkeit für beide Computer aber sekundär, da nur sehr wenige Computeranwender einen VC 20 und einen C 64 besitzen. Die Anzahl derer, die dann noch EPROMs brennen, scheint mir verschwindend gering.
+
+Der zweite Kritikpunkt bezieht sich auf das Freibleiben des Expansion-Ports bei den Völzke-Geräten. Nun, daß es auch bei einem EPROM-Brenner mit Anschluß am Expansion-Port zu keinem Verlust des Expansion-Ports kommen muß, zeigt das Gerät von Kalawski.
+
+Der beste Beweis dafür, daß auch ich den Anschluß einer zusätzlichen Stromversorgung nicht für notwendig halte, ist in der Tatsache zu sehen, daß der Testsieger von Roßmöller ebenfalls ein User-Port Gerät ist.
+
+Ein paar Worte sollten aber auch zur Software hinzugefügt werden:
+
+1) Natürlich ist die Treibersoftware für ein EPROM-Programmiergerät nicht mit einem Telespiel zu vergleichen. Dennoch betrachte ich die optische und akustische Hilfen geführt für den Benutzer als sinnvoll. Bedenkt man den doch relativ hohen Preis für EPROMs, so ist die Zerstörung durch Fehlprogrammierung oder falsches Einsetzen für sicherlich fast jeden Anwender ein herber Verlust. Auch ist das wiederholte Löschen und Neuprogrammieren eines falsch »geschossenen« EPROMs mit dem Nachteil der verkürzten Lebensdauer des EPROMs verbunden.
+
+Die Treibersoftware der Völzke-Geräte bietet in diesem Bereich keinerlei Sicherheit (ein Freund hat wegen einer falsch eingestellten Programmierspannung einen Verlust von über 600 Mark gehabt). Viel besser in Hinsicht auf die Sicherheit ist der Testsieger und das Gerät von Kalawski, wobei letzterer sogar den richtigen Einsetzpunkt des EPROMs optisch anzeigt.
+
+2) Auch andere EPROM-Brenner verfügen über die Fähigkeit, den Speicherbereich, aus dem das Quellprogramm kopiert werden soll, frei zu wählen.
+
+3. Die weiterhin von Herrn Völzke angesprochenen Punkte, wie die LOAD- und SAVE-Funktion oder der Einsatz eines Monitors für diese Zwecke sind zwar richtig, er vergißt aber, daß für ein solches Programm zusätzlich finanzielle Aufwendungen entstehen. Viel besser ist es doch, wenn diese Funktionen, wie bei unserem Testsieger, kostenlos mitgeliefert werden, da sie in der Treibersoftware implementiert sind.
+
+4) Herr Völzke empfiehlt für oben genannte Zwecke den Einsatz seiner Befehlserweiterung UNIMENT. Dafür sind allerdings nochmals 99 Mark auf den Tisch zu legen: Der Vorteil dieses Konzeptes soll aber nicht verschwiegen werden. Sowohl die UNIMENT-Erweiterung als auch der Monitor (der aus einem riesigen Softwareangebot ausgewählt werden kann) sind auch ohne den EPROMmer einsetzbar. Rechnet man zum Preis der Völzke-Geräte den eines guten Monitors hinzu, so werden zirka 300 Mark fällig. Dafür bekommt man aber auch schon unseren Testsieger mit eingebautem Monitor und einem überlegenen Konzept, das beispielsweise die Programmierung der zukunftsträchtigen 27256-EPROMs ermöglicht.
+
+(Arnd Wängler)
+
+## Vielseitiges Supervoc<br>Ausgabe: 6/84
+
+Alle Besitzer einer VC 1541, die Vokabeln mit dem Programm Supervoc lernen wollen, können sich glücklich schätzen. Das Programm muß, um auch mehrere Vokabelprogramme zu laden oder gleichzeitig zu schreiben, folgendermaßen geändert werden:
+In Zeile 220 Diskette geschrieben, statt Kassette. In Zeile 230 muß der erste GOSUB-Befehl in GOSUB 1315 umgeändert werden.
+1315 PRINT »Welches Programm soll geladen werden?«
+1317 INPUT P$
+1330 OPEN 1,8,0,P$
+1340 INPUT #l,P$
+1470 OPEN 1,8,1,N$
+Außerdem: Wer kann mir einen Tip geben, wie man das Kopierprogramm (Disk Copy), aus der April-Ausgabe, zum Laufen bekommt? Gibt es ein Vokabel-Lernprogramm für französische Vokabeln?
+
+Markus Bluhm
+Gruberzeile 95
+1000 Berlin 20
+
+## Autostart geknackt<br>Ausgabe 8/84, Seite 98
+
+Dirk Rother irrt sich, wenn er behauptet, Autostartprogramme könnte man nicht mehr stoppen und überarbeiten. Ein Autostartprogramm kann wie folgt geknackt werden:
+
+Kassette in normalen Recorder einlegen und Autostartprogramm anhören, Kassette in Da-tasette einlegen, Counter auf Null stellen, Kassette auf Anfang des Autostartprogrammes zurückspulen, Autostartprogramm einladen, wenn Counter aufNull steht dann Stopp-Taste an Data-sette drücken, andere Kassette mit dem vorher abgeSAVEten Kurzprogramm: 10PRINT'': END einlegen und Play-Taste drücken. Nach ein paar Sekunden erscheint auf dem Bildschirm READY. Das Autostartprogramm läßt sich listen, das nachfolgende Programm einladen, überarbeiten und kopieren. Das Autostartprogramm kann auch wieder abgespeichert werden.
+
+Ich glaube mit an Sicherheit grenzender Wahrscheinlichkeit, daß Ihr es Euch nicht traut, den Leserbrief abzudrucken. Aber warum denn nicht? Ihr bringt so viele Listings wie man das und jenes kopieren kann und ein paar Seiten weiter:
+
+»Wir wollen unsere Leser darauf aufmerksam machen, daß verkaufen, tauschen, etc.«. Das ist so wie: Hier hast du den Schlüssel zum Tresor, aber aufschließen darfst du ihn nicht. Überlegt doch mal selber oder versucht es zumindest einmal!
+
+Ein Knackie
+
+Lieber Knackie, Sie sehen, wir haben nachgedacht und uns getraut.
+
+## Rettung, wenn ISM 64 abstürzt
+
+Bei der Anwendung des Dateiverwalters ISM ist es mir bei einer damit verbundenen Druckerbenutzung auch passiert, daß der ISM abstürzte. Nach einigem Herumprobieren bin ich auch darauf gekommen, daß durch ein Initialisieren der Diskette der Betrieb fortgesetzt werden kann. Diese Lösung hat allerdings in keiner Weise befriedigt, und so wandte ich mich an den Hersteller, die SM-Software AG. Nach einer Woche bekam ich die erlösende und sehr einfache Antwort.
+
+Nachdem der Druckerkanal geöffnet wurde, muß vor dem nächsten ISM-Befehl der Basic-Befehl POKE 186,GN eingegeben werden. GN ist dabei die Gerätenummer der Floppy, also meistens 8.
+
+Frank Götze
 
 
 
