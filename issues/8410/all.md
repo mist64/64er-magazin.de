@@ -174,16 +174,113 @@ Wichtig ist, daß das gedruckte Medium nur eine Krücke und ein Übergangsmedium
 Was würdet Ihr jemandem raten, der sich für die Kommunikation als solche interessiert?
 
 Online! Rein in die Dinger! Gucken und sehen, was ihm gefällt, ob er irgendwas findet, womit er etwas anfangen kann und was seinen Interessen entspricht. Und wenn er nichts findet, sollte er zusehen, daß er etwas aufbaut. Auf alle Fälle immer aktiv sein.
-Wer da ein bißchen ernsthaft herangeht, wird rela-
+Wer da ein bißchen ernsthaft herangeht, wird relativ bald mit allem, was er sieht, unzufrieden sein. Er wird sagen: Verdammt noch mal, ich mache meine eigene Mailbox. Das ist ja das elektronische Äquivalent zu einer Zeitung. Die Medien per DFÜ ermöglichen so etwas für alle, die etwas sagen, etwas mitteilen wollen. Jede Mailbox hat ihre eigene Handschrift, ihre eigenen Informationsecken, wenn auch ziemlich viel soziales Geräusch wie beim CB-Funk dabei ist. 
 
-Fortsetzung auf Seite 176
+Plant Ihr vielleicht eine Mailbox oder auch etwas ähnliches?
 
+Wir sind dabei, eine elektronische Mitfahrerzentrale zu programmieren. Der Schwarzmarkt hier in Hamburg praktiziert seit acht Jahren eine Mitfahrerzentrale.
+Wir wollen so etwas über DFÜ und Computer machen.
 
+Kostenlos, oder?
 
+Ja, wenn einer aber etwas spenden will, wird das natürlich gerne gesehen, aber grundsätzlich soll es nichts kosten.
 
+Wie seht Ihr die Lage bei den Modems?
 
+Die Situation bei den Modems sieht so aus: Die billigsten sind im Moment von Tandy, die aber im Moment nicht lieferbar sind. Es gibt noch ganz billige Selbstbaumodems, die aber nur 300 Baud schaffen. Wenn man sich länger damit beschäftigt, sind 300 Baud einfach zu langsam. Da kommt man auf so etwas wie den 7910/7911; deshalb haben wir den Bausatz mit Platine entwickelt, den wir zu Selbstkosten vertreiben.
 
+Noch eine Frage: Ist BTX eine Konkurrenz für DFÜ?
 
+BTX ist von der Gebührenpolitik so konzipiert, daß es einfach viel zu teuer ist. BTX wurde zu einem Zeitpunkt entworfen, als die ganzen Mikro- und Kleincomputer noch gar nicht absehbar waren. Noch einmal direkter gesagt: BTX und der Cept-Standard wurden am Schreibtisch konzipiert, und die meisten Bildschirmtextgeräte sind nun einmal reine BTX-Geräte und keine Computer, und zwingen den, der ein BTX-Gerät hat, sich zusätzlich noch einen Computer zu kaufen. So glaube ich einfach, daß ein Datennetz, das die grafischen Möglichkeiten eines C 64 ausnutzt, sich mehr verbreiten wird, als BTX von der Post, das staatlich unterstützt wird.
+
+Also BTX wird längerfristig nicht überleben?
+
+Nicht als breites Enduser-Ding. Für spezialisierte Sachen und bestimmte Firmen wird es wohl überleben, aber in sehr kleinem Rahmen. Guck Dir an wieviel hunderttausend C 64 es gibt und wieviel tausend BTX-Anwender. Trotzdem werden wir bis zum Ende des Jahres unseren BTX-Dienst ausbauen und erweitern, aber ab Einführung der erhöhten Gebühren werden wir unseren BTX ausschalten. Wir haben einen Antrag auf 100 Seiten laufen, um einen einigermaßen aktuellen Informationsdienst anzubieten. Wir wollen eben einige BTX-Anwender auf andere Gedanken bringen und sie auf andere Möglichkeiten hinweisen. Aber spätestens zur Gebührenerhöhungwerden wir aussteigen. Wir sind auf der Seite 19058 im Berliner Übergangsrechner, und auf der Seite 20305080 im neuen.
+
+Ok, das war’s!
+
+Der CCC ist auch noch im RMI-Net über Datex-P zu erreichen (NUA 44241040341) unter dem Namen Chaos-Computer-Club c/o Schwarzmarkt, Bundesstraße 9, 2000 Hamburg 13.
+
+# Leserforum
+
+## Steuercodes oder Interface?
+
+Ich besitze die elektronische Schreibmaschine SILVER-REED EX 44 und das dazugehörige Interface mit der Bezeichnung SRI IF-UI84 SIGMA 8300 SP zum Commodore 64. Diesem Interface ist leider nur eine äußerst dürftige Beschreibung beigefügt, die in keiner Weise den Möglichkeiten entspricht. Einen Teil der Codes, die — entgegen Herstellerangaben — auch funktionieren, habe ich schon herausgefunden. Für mich sehr interessant wäre eine Umschaltmöglichkeit (elektronisch) der Zeilendichte (Pitch), um für Diagramme eine höhere Auflösung erzielen zu können. Daher meine Frage: Wer hat den Code dieses Interfaces geknackt und/oder kann mir helfen? Das Problem scheint die Belegung der ESC-Funktion mit 1/2-Space zu sein.
+
+## Was steckt in der Demodiskette?
+
+Als ich mir vor ein paar Monaten zu meinem Commodore 64 das Diskettenlaufwerk kaufte, lagen da zwei Disketten dabei. Die eine Diskette nennt sich »TEST/DEMO«, wo auch das DOS 5.1 drauf ist. Die andere Diskette, die sich »DEMODISKETTE« nennt, sind zahlreiche Demonstrationen drauf wie: Musikdemos, Grafikdemos, ein paar Anwendungen, Spiele und zu guter Letzt auch Werbung für den C 64. Auf dieserDiskette ist auch das Programm, wo ich Sie nun um eine Auskunft bitte. Das Programm besteht eigentlich aus zwei Programmen. Das erste Programm (der Lader), das sich »3000.EMU.BOOT« nennt, lädt, nach dem man es gestartet hat, das eigentliche Programm, das sich »EMULATOR« nennt. Das Programm »EMULATOR« wird vom Lader aus mit SYS 12*4096 gestartet. Man erhält dann folgenden Bildschirmaufbau:
+PET EMULATOR V0.5/081382
+WITH
+DOSMANAGER V5.1/071382
+BY BOB FAIRBAIRN
+(C) 1982 COMMODORE BUSINESS MACHINES
+PETMODE
+EMULATOR ON
+READY
+
+Und nun meine Fragen zu diesem Programm: Was kann man mit diesem Programm alles anfangen? Wie kann man es sinnvoll anwenden? Das einzige, was ich bisher herausgefunden habe, ist folgendes:
+
+1.	Das Programm »EMULATOR« liegt im Adressenbereich 49152-53247, also ist es zirka 4 KByte lang.
+
+2.	Fragt man den freien Speicher ab, mit PRINT FRE(O), so erhält man die Antwort: 31741. Es gehen also zirka 7 KByte verloren. Was ist nun mit diesen 7 KByte passiert?
+
+3.	Das einzige, das bei der Diskette beilag, ist folgender Text: »Hilfsprogramm, um Programme von CBM 3000 auf den C 64 zu verwenden«. Bezieht sich dieser Text nur auf Basic- oder auch auf Maschinenprogramme.
+
+Ich bin sicher, daß ein großer Teil aller C 64-Besitzer, die sich eine Floppy zugelegt haben, dies interessiert, um die große Software-Vielfalt der CBMs für den C 64 auszunutzen.
+
+Wolfgang Joachim
+
+## Textverarbeitung mit Seikosha GP-700A?
+
+Obwohl ich einige Textverarbeitungsprogramme in meiner Sammlung habe, ist es mir noch nicht gelungen, meinen Text durch Einfügen von Formatierungsbefehlen farbig zu gestalten. Der Drucker wird derzeit mit einer Centronics-Schnittstelle der Marke Wiesemann Typ 9200 angesteuert. Mit welchen Textprogrammen kann ich farbig ausdrucken und welche Centronics-Schnittstellen muß ich an den Drucker anschließen?
+
+Conny Scharfenberg
+
+## C 64 extern anhalten?
+
+Wie kann man den C 64 über externe Beschaltung (nur Hardware) beliebig (über den DMA-Eingang vielleicht?) anhalten und wieder starten?
+
+Ulrich Lang
+
+## Vielsaitig für C 64?
+
+Ich besitze ein Programmpaket für den VC 20 mit Namen »Vielsaitig«von Commodore. Es handelt sich dabei um ein Programm zur Lösung musiktheoretischer Probleme. Es kann insgesamt 25 internationale Tonskalen in Tabulatur und Klaviatur grafisch ausgeben, Gitarrengriffe bestimmen oder die richtigen finden und vieles mehr. Da ich nun auf den Commodore 64 umsteigen möchte würde mich interessieren, ob es ein Programm fürden C 64 gibt, das über die obengenannten Funktionen verfügt und eventuell mit besserer Grafik und besserem Eingabekomfort aufwarten kann?
+
+Oliver Kreuzahler
+
+## Der C 64 als Effektgerät?
+
+Wer hat Programme für den C 64 zur Benutzung als Effektgerät über den Audioein- und -ausgang am User-Port (Pin 3/5)?Da-bei denke ich an Anwendungen wie Echo/Phaser/Flanger/Chorus und Verzerrer oder auch Oktaver und Vocoder. Ferner würde mich interessieren, wie der Audioeingang intern verschaltet ist und ob er einen A-D-/D-A-Wandler besitzt?
+
+Patrick Bandenberger
+
+## Wo gibt es Testprogramme?
+
+1)	Gibt es ein »Testprogramm«, das alle Funktionen des Computers testet? (zum Beispiel durch User-Port, Baud-Rate und so weiter).
+2)	Wo kann man »Bauteile« für den C 64 kaufen (zum Beispiel 6526)?
+3)	Exbasic Level II wurde auch schon angesprochen. Mit DUMP erhält man die Werte der Variablen (abernur die absoluten!). Wie kann man die Vorzeichen sichtbar machen? Ist es eine Macke vom Exbasic?
+4)	Was ist mit den Unterschieden der einzelnen »C 64-Jahrgänge«?
+
+Peter Strempel
+
+## 3032-Monitor am C 64?
+
+Ich möchte den Monitoreines CBM 3032 an den C 64 anschließen. Ist eine Schaltungbekannt, die die von diesem Monitor benötigten Signale (Video, horiz. sync., verf. sync.) aus dem F-BAS-Signal des C 64 erzeugt?
+
+Wolfgang Stumm
+
+## Simons Basic und DOS 5.1 gleichzeitig?
+
+Die gleichzeitige Verwendung von Simons Basic und DOS 5.1 auf der Gerätekombination C 64 und VC 1541 funktioniert nicht. Obwohl Simons Basic einige Disk-Befehle anbietet, empfiehlt es sich, um jederzeit den Fehlerkanal abfragen zu können, das DOS 5.1 mit zu verwenden. Welche Abhilfe gibt es, um beides störungsfrei nebeneinander betreiben zu können? Wer bietet das Textverarbeitungsprogramm »VIZAWRITE64« an?
+
+Detlev Preisler
+
+## Textomat und Steuerzeichen?
+
+Wer hat Erfahrung mit dem Programm »Textomat« und »Datamat« (neue Version) von Data Becker in Verbindung mit dem Görlitz-Interface?Ich wäre an einer Druckertabelle und den Steuerzeichen interessiert.
+
+Axel Birtel
 
 
 
