@@ -1536,22 +1536,367 @@ Aber ich kann doch nicht widerstehen und Sie scharf machen auf ultima velocitas 
 
 (Dr. Helmuth Hauck/aa)
 
+# Datex-P und ausländische Netzwerke
 
+> Datex-P ist ein Daten-Vermittlungssystem der Deutschen Bundespost. In diesem Netz wird die Vermittlung der Daten in Form von sogenannten Paketen (daher auch das ’P’ in Datex-P) vorgenommen.
 
+Das Datex-P-Netz ist ein flächendeckendes, öffentliches Datenübertragungsnetz, welches auf der Technologie der Paketvermittlung basiert. Bei dieser Technik werden die zu übertragenden Daten an einen Netzknoten übermittelt, dort kurzzeitig zwischengespeichert und dann — eventuell über andere Knoten — an die Zieladresse weitergeleitet. Paketvermittlung ist dadurch charakterisiert, daß die zu sendenden Daten in Pakete maximaler Länge zerlegt werden, die mit zusätzlichen Verwaltungsinformationen versehen dem Netz zur Weitervermittlung zugeführt und schließlich vom empfangenden Teilnehmer wieder zusammengesetzt werden. Die Vermittlungsknoten sind durch digitale Leitungen hoher Geschwindigkeit miteinander verbunden. Die Beibehaltung der Reihenfolge gesendeter Pakete wird vom Paketvermittlungsnetz garantiert. Der Datenaustausch zwischen der sendenden und der empfangenden Endeinrichtung wird über eine logische Verbindung abgewickelt, bei der aber (im Gegensatz zur Leitungsvermittlung) die Übertragungsleitungen nicht exklusiv reserviert, sondern mehrfach genutzt werden, da sie nur zur tatsächlichen Transportzeit in Anspruch genommen werden. Man spricht in diesem Zusammenhang von einer virtuellen Verbindung.«
 
+So lautet die offizielle Definition im Datex-P-Handbuch der Post.
 
+»Leitungsvermittlung« verwendet zum Beispiel der Datei-Dienst Datex-L der Post, aber auch das normale Telefon. Man kann sich also das Ganze als ein Netz von einzelnen Computern vorstellen, die nichts anderes zu tun haben, als ankommende Daten (Pakete) an den richtigen Computer weiterzuleiten (Bild 1). Die »Adresse« des Zielcomputers entnehmen sie dabei der Kopfinformation des jeweiligen Pakets, das heißt am Anfang eines Datenpakets steht der »Empfänger« des Datenpakets. Beim Aufbau des ganzen Netzes liegt der Vergleich zum Telefonnetz nahe, auch hier besteht das Netz aus Vermittlungsstellen, deren Funktion mit der der »Vermittlungscomputer« des Datex-P-Netzes äquivalent ist.
 
+Der Vorteil eines Netzwerkes liegt auf der Hand: Die Anzahl der Leitungen, die nötig sind, um eine Verbindung zwischen zwei beliebigen Datenendeinrichtungen möglich zu machen, ist erheblich geringer, als wenn jede Datenendeinrichtung mit jeder verbunden wäre.
 
+## Zugang zum Datex-P-Netz mit Heimcomputer oder Terminal
 
+Man braucht für den Datex-P-Zugang generell drei verschiedene Dinge: Eine Tastatur, einen Bildschirm oder eine andere Anzeige, um die empfangenen Daten anzuzeigen und ein Modem (MODulator-DEModulator), der die Daten entsprechend umwandelt, damit sie über das Telefon übertragen werden können (Bild 2). Zum Begriff MODEM: Alle Vorrichtungen, die »Daten modulieren« sind der Definition nach Modems. Akustikkoppler sind dabei eine Untergruppe, welche die Information nicht durch direkte Verbindung mit dem Telefonnetz übertragen, sondern mit Lautsprecher und Mikrofon eine »akustische Koppelung« erreichen. Als normaler Benutzer des Datex-P-Netzes braucht man sich um die Paketübertragung nicht zu kümmern, da die Umwandlung der Daten der angewählte PAD (Packet Assembly Disassembly Facility), auch wieder ein Computer, übernimmt. Dabei kommen die Daten in Form von einzelnen Zeichen an, werden vom PAD in Datenpakete umgewandelt und an die richtige Adresse weitergeleitet. Genauso werden empfangene Datenpakete vom PAD in einzelne Zeichen umgewandelt. Bei Datex-P-Be-trieb mit Terminal ist in der Regel außer einem Modem und einem Telefon nichts weiter erforderlich. Bei einem Heimcomputer braucht man, damit er eine Terminalfunktion übernimmt, ein Terminalprogramm (wie zum Beispiel das Teleterm für den C 64) und, wenn er die erforderliche Schnittstelle zum Modem nicht bietet, noch ein Interface, das die nötige Umwandlung der Daten übernimmt. Dann kannes losgehen, man wählt, je nach Übertragungsrate des Modems (in der Regel hat man ein 300-Baud-Modem) die entsprechende Nummer des nächsten PADs an.
 
+Tabelle 1 gibt eine Übersicht der in Deutschland anwählbaren PADs.
 
+Jeder Commodore 64-Benutzer, der in der Lage ist, Mailboxen wie Decates oder Tedas anzuwählen, ist mit der selben technischen Einrichtung auch in der Lage, die PADs anzuwählen, um am Datex-P-Netz teilzunehmen (300-Baud-Nummern!).
 
+Es besteht auch die Möglichkeit, einen Datex-P-Hauptanschluß zu beantragen. Dann erhält man eine Extra-Leitung, über die die Daten im Datex-P-Paketformat ankommen. Die billigste Version kostet 300 Mark im Monat und dürfte für keinen, der einen Homecomputer besitzt, in Frage kommen. Die Computer, die an einem solchen Hauptanschluß hängen, sind dann die, die »angerufen« werden können.
 
+## So wird eine Verbindung hergesteltt
 
+Die Nummer des PADs wird gewählt, das Telefon mit dem Akustikkoppler verbunden, wenn das Piepsen des PAD-Modems hörbar ist (bei 300 Baud wird das Modem des Anrufers wie beim Anrufen von De-cates auf ORIGINATE gestellt).
 
+Dann tippt man ».«(Punkt) und RETURN gegebenenfalls so lange, bis sich der PAD mit »Datex-P« und der Nummer seines Anschlusses meldet. Jetzt kann sich der Benutzer durch Eingabe seiner Benutzerkennung (NUI) identifizieren und/oder eine sogenannte NUA (Network User Adress) eingeben. Das ist nichts anderes als eine Art »Telefonnummer« innerhalb des Datex-P-Netzes). Nach Eingabe der NUA meldet Datex-P, ob der angerufene Anschluß frei ist (»Verbindung hergestellt«), besetzt ist (»Gegenstelle belegt«) oder nicht antwortet (»Gegenstelle antwortet nicht«). Wie beim Telefon gibt es eine Meldung »kein Anschluß unter dieser Nummer«.
 
+Beim Datex-P-Netz gibt es natürlich auch eine Gebührenabrechnung. Sie richtet sich dabei nicht nach Entfernung der Verbindungspunkte, sondern hauptsächlich nach der Menge der übertragenen Daten.
 
+## Was ist eine NUI?
 
+Das Abrechnungssystem des Datex-P-Netzes basiert auf sogenannten NUIs (Network-User-Identifications), die den Teilnehmer identifizieren, der für die Verbindung zu zahlen hat. Dieses Abrechnungssystem hat den Vorteil, daß der Datex-P-Benutzer von jedem Telefon aus in das Netz gelangen kann. Die NUI besteht insgesamt aus zwei Teilen, Teil A und B. Bei der Beantragung der NUI sucht sich der Teilnehmer den Teil A der NUI selbst aus, den Teil B der NUI, das Passwort, bekommt er dann von der Post schriftlich mitgeteilt. Dieser Teil B wird mittels eines bestimmten Algorithmus’ aus dem Teil A der Teilnehmererkennung errechnet.
+
+Ohne eine NUI erreicht man nur Teilnehmer, deren Anschluß die Gebühren übernimmt, und das auch nur innerhalb Deutschlands. Bei der Anfrage auf Gebührenübernahme muß vor der NUA die Zeichenfolge »R« und »«(Leerzeichen) stehen. Übernimmt der angewählte Anschluß die Gebühren nicht, so meldet der Datex-P-Computer (PAD) »Gebührenübernahme verweigert«. Nun eine Liste von Computern, die ein Benutzer ohne Eingabe einer Benutzerkennung über Datex-P erreichen kann (jede einzelne Nummer ist getestet):
+
+TODO
+
+Kurz zusammengefaßt: Im normalen Zustand des PADs, wenn er also eine Eingabe verlangt, kann man immer eine Nummer »wählen«, also eingeben. Hat man sich durch Eingabe seiner NUI identifiziert, ist die Eingabe jeder Nummer möglich, hat man sich nicht identifiziert, kann man nur die »reverse Charging«-Nummern, also die, die die anfallenden Gebühren übernehmen, anwählen. Die Anfrage auf Gebührenübernahme durch die Gegenstelle geschieht dadurch, daß die Zeichen »R« und » « (Leerzeichen) vor der Nummer zu stehen haben. Sonst sind folgende Befehle wichtig:
+
+Hat der PAD eine Verbindung zu einem anderen Computer hergestellt, und möchte dem PAD einen Befehl übermitteln, drückt man generell CTRL-P. Dann wird der Befehl eingegeben, und dieser mit RETURN abgeschlossen. Hat der PAD keine Verbindung aufgebaut, ist die Eingabe von CTRL-P nicht erforderlich.
+CLEAR
+
+Dieser Befehl bricht die bestehende Verbindung ab. In der Praxis wird er dann angewandt, wenn man nicht weiß, wie man den Computer normal verlassen kann. Dieser Befehl hat also nur dann einen Sinn, wenn Datex-P eine Verbindung aufgebaut hat.
+NUI Dxxxxxxxxx
+
+Der Benutzer muß sich identifizieren, das heißt er gibt seine Kennung ein (Teil A). Der PAD fragt danach den Teil B der NUI (das Passwort) ab. (die »x« stehen hier für bei der Beantragung der NUI frei wählbare Zeichen).
+SET 3:126, 5:1, 12:1
+
+Diese Befehlsfolge setzt im PAD einige Parameter auf bestimmte Werte. Damit kann das Terminalprogramm mit dem sogenannten X-ON/X-OFF-Protokoll fahren, das heißt der PAD stoppt die Ausgabe der Daten, wenn er ein CTRL-S empfängt und fährt wieder damit fort, wenn er ein CTRL-Q erhält. Teleterm arbeitet zum Beispiel mit dieser Sequenz, um Daten auf Diskette abzuspeichern.
+NUI OFF
+
+Hiermit wird die korrekt eingegebene NUI gelöscht, das heißt jetzt kann eine andere eingegeben werden. Die Post empfiehlt diesen Befehl vor Auflegen des Telefons. Damit ist sichergestellt, daß die NUI nicht im PAD gültig bleibt, und von anderen mißbraucht werden kann.
+
+## Wie beantragt man eine NUI, was kostet sie?
+
+Der beste Weg zu einer eigenen NUI: Man ruft das örtliche Fernmeldeamt der Post an und läßt sich die Nummer der für Datex-P zuständigen Stelle geben. Dort sagt man einfach, man möchte eine NUI beantragen, und sie sollen ein Antragsformular zuschicken (auch nach einem Freiumschlag fragen, dann braucht man kein Porto zu zahlen). Auf dem Antragsformular steht dann alles weitere. Dieses Antragsformular steckt man ausgefüllt in den Umschlag, und nach ungefähr einer Woche bekommt man von der Post Nachricht, daß man den Teil B der NUI, das Passwort, beim nächsten Postamt mit seinem Ausweis abholen kann. Bis hierher entstehen einem keinerlei Kosten. Ab da kostet die NUI monatlich 15 Mark, ohne daß sie benutzt werden muß (ähnlich der Grundgebühr beim Telefonanschluß). Die Verbindungskosten berechnen sich hauptsächlich nach der Menge der übertragenen Daten. Eine angewählte Verbindung zum PAD (300 Baud) kostet:
+
+Der PAD-Zugang 4 Pfennig pro Minute;
+
+jede bereitgestellte Verbindung 5 Pfennig;
+
+Der Datex-P Gebrauch 1 Pfennig pro Minute.
+
+Die Übertragung von 64 Bytes kostet zusätzlich:
+von 8 bis 18 Uhr 0,33 Pfennig
+von 6-8 und 18-22 Uhr 0,22 Pfennig
+von 22-6 Uhr 0,11 Pfennig
+
+Diese Preise senken sich mit der übertragenen Anzahl von 64-Byte-Gruppen; es gibt also eine Art Mengenrabatt. Bei Verbindungen mit dem Ausland wird noch eine zusätzliche Zeitgebühr berechnet, die zum Beispiel für die USA 0,20 Pfennig pro Minute beträgt.
+
+## Lohnt sich eine NUI?
+
+Diese Frage muß jeder für sich selbst beantworten, vor allem dann, wenn er sie nicht geschäftlich, sondern privat nutzen will. Der wesentliche Vorteil von Datex-P ist: Eine Verbindung über den Bereich des örtlichen Telefonnetzes hinaus kommt über Datex-P immer billiger, als wenn man direkt dort anrufen würde. Natürlich hängt es von den finanziellen Verhältnissen ab. Viele jugendliche C64-Besitzer sind kaum in der Lage, eine NUI von ihrem Taschengeld zu finanzieren. Auch wird die Unterschrift des Anschlußinhabers verlangt, das heißt die Unterschrift der Eltern, die sie aus Angst vor den Kosten verweigern werden. Ich persönlich rate jedoch jedem, der es sich leisten kann, eine NUI zu beantragen. Mit einer NUI kann man zum Beispiel ein CBBS, ein Computer Bulletin Board Service in Aachen erreichen (NUA 44241040341), das sogenannte RMI-Net. Für die Benutzung dieses Services werden keinerlei weitere Gebühren verlangt, auch nicht (im Gegensatz zu Decates) wenn man eingetragener Benutzer werden will. Ich habe den Betreibern des RMI-Net einige Fragen gestellt, die der SYSOP (Systemoperator) des RMI-Net, Rupert Mohr, wieder mit einer Message beantwortete. Mich interessierten die Beziehungen zwischen dem RMI-Net und dem Chaos-Computer-Club, ob sich seiner Meinung nach eine NUI für einen Privatmann lohnt, warum sie nicht mehr ohne NUI erreichbar sind, und ob es etwas ähnliches wie RMI noch einmal gibt. So sehen die Nachrichten im Originaltext am Bildschirm aus:
+
+Msg # *840 Dated 07-10-84 11:13:58
+From: SYSOP
+To: THOMAS OBERMAIR
+Re: (R)Fragen-2
+1. Zwischen mir und dem CCC bestehen keine Beziehungen.
+2. Ich kann nicht beurteilen, ob sich für einen Privatmann eine NUI lohnt. Im Raum Aachen lohnt sich aber unter Umständen schon ein Hauptanschluß für einen Privatmann.
+3. Reverse Charge kostet Geld, unser Geld.
+4. Das kommt auf die Definition von ähnlich an. Wenn Du gebührenfrei meinst, dann: NEIN.
+Weiter (J), N, NS, RE, K? k
+Msg # 840 Killed.
+Msg # (577 to 842, ★, <H>elp)?
+
+RMI ist ein Unternehmen, das Software für den IBM-PC herstellt. Das CBBS läuft ebenfalls auf einem IBM-PC mit Harddisk. RMI hat Zugang zu verschiedenen Datenbanken (wie Compuserve, The Source) und sammelt dort Informationen, die in ihrem CBBS öffentlich zugänglich gemacht werden. Sie bietet RMI eine umfangreiche Programmbibliothek an. Wenn genügend C 64-Anwender RMI benutzen würden, könnte man eine spezielle Rubrik für C 64-Programme einrichten lassen.
+
+## Der Zugang zu ausländischen Netzwerken
+
+Da verschiedene Länder Datenvermittlungsnetze aufPaketbasis anbieten, liegt der Zugang von einem Netz zum anderen nahe. Dies geschieht durch sogenannte Auslandsvermittlungsstellen, die die eventuell verschiedenen Protokollformate untereinander anpassen (siehe Bild 3). Ferner übernehmen sie dieselben Aufgaben, wie die Vermittlungscomputer des Datex-P-Netzes. In der Praxis sieht das so aus: Jedes Netz hat eine eigene »Vorwahl«, die, wie beim Telefon, vor der eigentlichen Teilnehmer-Nummer eingegeben wird. Datex-P verlangt vor jeder Auslandsnummer die Ziffer 0 (Null) als Kennzeichen für einen Verbindungswunsch mit dem Ausland. In Tabelle 3 sehen Sie eine nicht vollständige Aufstellung erreichbarer Netze mit ihren »Vorwahlen« (sogenannte Netzkennzahlen). Das »in ausländische Netze eindringen« ist also meistens nichts anderes, als das Wählen einer vorher bekannten NUA im Ausland. Mit folgender Ausnahme: Es gibt Computer, die einen Anrufer weitervermitteln und einen recht komfortablen Dialog bieten. Generell gilt: Für Verbindungen mit dem Ausland braucht man eine NUI. Auslandsnummern findet man in größeren Mailboxen, wie in Decates oder im RMI-Net (über Datex-P). Soweit man die Datenbanken nicht bezahlen will oder kann, muß man Hacken, das heißt die verlangten Passwörter herausfinden. Wertvolle Kontaktadresse hierzu: Der Chaos Computer Club, ein Club von Computerfreaks, die es sich zur Philosophie gemacht haben, möglichst auf alles kostenlosen Zugriff zu haben. Erreichbar sind sie unter der RMI-Net-Mailbox mit dem Empfängernamen CHAOS TEAM, oder über normalen Postweg an folgende Adresse: Chaos Computer Club c/o Schwarzmarkt Bundesstr. 9 D 2000 Hamburg 13. Es lohnt sich, das Informationsblatt »Die Datenschleuder«, die unregelmäßig erscheint, im Abonnement kommen zu lassen. Das kostet etwa 30 Mark für ein Jahr. Mittlerweile sind bereits drei Ausgaben erschienen.
+
+Zum EURONET: Vor einigen Jahren haben die Mitgliedstaaten der EG beschlossen, ein gemeinsames Netz von Paketvermittlungsdiensten aufzubauen. Ein einziger Großrechner übernimmt für alle Länder der EG die Vermittlungsaufgaben. Diesen Computer soll es in einem Jahr nicht mehr geben; das heißt die Vermittlung der Datenpakete wird, wie jetzt schon teilweise realisiert, über »normale« Auslandsvermittlungsstellen durchgeführt.
+
+## Was bringt die Zukunft?
+
+Die Post plant für die nähere Zukunft ein »einheitliches digitales Übertragungsnetz« (ISDN). Dieses Netzwerk vereinheitlicht alle Dienste der Post in einem Übertragungsnetz, das heißt sowohl Sprache als auch Datenübertragung jeder Art (Daten, Texte, digitalisierte Bilder etc.) werden über ein Netz vermittelt. Dieses Netz soll bereits 1987 verfügbar sein. Dann soll vom ISDN zum IBFN (integriertes breitbandiges Fernmelde-Netz) allmählich übergegangen werden. Das IBFN unterscheidet sich vom ISDN im Prinzip nur durch die Übertragungsmedien. Daten werden dann über Glasfaser und Satelliten übertragen. Ein Anschluß zu einem Netzwerk wird so alltäglich, wie das heutige Telefonnetz. Das 64'er-Magazin wird Sie mit der Serie »Aktuelles aus der Datenfernübertragung« stets auf dem Laufenden halten.
+
+Es ist mir leider nicht gelungen, Adressen von C 64-User-Clubs zu bekommen, die sich hauptsächlich mit Datenfernübertragung beschäftigen. Es existieren nur vereinzelt ein paar »Hacker«, die den C 64 fleißig beanspruchen. Wer Lust hat, einen solchen zu gründen, kann mir schreiben, oder mir eine Nachricht im RMI-Net hinterlassen. Ich werde dann ein solches Vorhaben nach meinen Kräften unterstützen.
+
+(Thomas Obermair/aa)
+
+### Literaturliste zum Thema
+
+MC-Modem-Sonderheft Franzis Verlag, Preis 16 Mark.
+
+Dieses Sonderheft enthält alles Wissenswerte über Modems, Schnittstellen etc. Etwas zu teuer, aber es gibt nichts Vergleichbares, was billiger ist.
+
+Elektronik-Sonderheft »Datenkommunikation« Franzis Verlag, 18 Mark.
+
+Ein vom Informationsgehalt sehr hochwertiges Heft mit Fachbeiträgen von kompetenten Autoren. Fast zu kompliziert für den Laien, viel Theorie.
+
+# Bücher
+
+## Data-Becker Bücher zum Commodore 64
+
+Es sollen hier drei Bücher aus der Data-Becker Sachbuchreihe zum C 64, die mittlerweile auf 19 Titel angeschwollen ist, besprochen werden.
+
+Zunächst zum »64 intern«, dem teuersten der vorgestellten Bücher. Die größte Leistung dieses Buches ist das ausreichend kommentierte ROM-Listing, das folgerichtig auch den meisten Raum in Anspruch nimmt. Außerdem enthält das Buch noch Kapitel über den technischen Aufbau des C 64, sowie über Grafik- und Musikprogrammierung, die beiden letzteren sind allerdings arg dürftig ausgefallen. Dafür gibt es dann eigene Bücher.
+
+»64 intern« soll das Arbeiten mit dem C 64 erleichtern. Dieses Ziel wird jedoch nur dann erreicht, wenn der Leser schon einige Grundkenntnisse der Maschinenprogrammierung besitzt, und weiß, was er mit den gebotenen Informationen anfangen kann. Wer mehr über die Programmierung von Basic aus wissen will, ist mit anderen Büchern mit Sicherheit besser bedient.
+
+In Verbindung mit anderen Büchern ist »64 intern« mit Sicherheit eine wertvolle Hilfe für erfahrenere C 64-Benutzer.
+
+»Das Trainingsbuch zum Simons Basic« ist mit fast 400 Seiten das umfangreichste der Reihe. Sinnvoll angewendet werden kann es logischerweise nur von Besitzern dieser Basic-Erweiterung. Alle Besitzer von Simons Basic jedoch haben Grund zur Freude. Das Buch geht weit über das hinaus, was das eher spartanisch knappe Originalhandbuch an Informationen und Arbeitshinweisen gibt. Die Beispiele demonstrieren recht eindrucksvoll die Möglichkeiten dieser Basic-Erweiterung, aber auch ihr Unvermögen, bestimmte Dinge zu tun. Ein recht neutrales Sachbuch, das für den Besitzer von Simons Basic eine gute Hilfe beim Programmieren ist.
+
+»Der C 64 und der Rest der Welt«. Dieses Buch gehört, wie auch »Das Grafikbuch zum C 64«, zur neuen Generation der Data-Becker Bücher. Ein Teilaspekt des Computers wird herausgegriffen und zum Thema eines Buches gemacht. Bei der Vielfalt der Möglichkeiten des C 64 erscheint dieses Vorgehen auch sinnvoll, die Frage ist nur, ob das einzelne Buch dann auch alle Ansprüche erfüllt.
+
+Im vorliegenden Buch wird eine ganze Reihe von Zusatzschaltungen für den C 64 vorgestellt, die mit relativ wenig Aufwand selbst hergestellt werden können. Die Palette reicht von der einfachen Leuchtdiodenansteuerung, über ein EPROM-Programmiergerät, bis hin zu einer einfachen Sprachein- und -ausgabe.
+
+Die vorgestellten Schaltungen stellen zwar nicht immer die beste Lösung des Problems dar, lassen aber dafür einigen Spielraum für eigene Ideen. Zu jeder Hardware-Erweiterung gehört natürlich auch die Treibersoftware. Hier zeigt das Buch deutliche Schwächen, denn die Erklärungen zur Ein/Ausgabesteuerung sind eher dürftig, so daß es dem weniger versierten Benutzer manchmal recht schwer fallen dürfte, das Behandelte nachzuvollziehen. Es sei auch dahingestellt, ob es sinnvoll ist, den C 64 in ein Digitalthermometer umzubauen; für diese und ähnliche Anwendungen scheint er mir doch zwei Nummern zu groß zu sein.
+
+Es braucht wohl nicht darauf hingewiesen werden, daß das Buch nur für den sinnvoll ist, der weiß, an welchem Ende ein Lötkolben heiß wird...
+
+(Reinhard Schrutzki)
+
+Info: 1. Angerhausen/Brückmann/Englisch/Gerits, 64 Intern, Data Becker 1983, 320 Seiten, ISBN 3-89011-000-2, 69 Mark.
+2. Plenge/Szczepanowski, Das Trainingsbuch zum Simons Basic, Data Becker 1983, 380 Seiten, ISBN 3-89011-009-6, 49 Mark.
+3. Brückmann, Der Commodore 64 und der Rest der Welt, Data Becker 1984, 230 Seiten, ISBN 3-89011-015-0, 49 Mark.
+
+## Programmierung des 6502
+
+Dieses Buch von Rodney Zaks, welches man bereits zu den Klassikern der Bücher zum 6502-Mikroprozessor zählen kann, nimmt für sich in Anspruch, ein »vollständiger und in sich abgeschlossener Text zum Erlernen des Programmierens mit dem 6502-Prozessor« zu sein. Dieser Prozessor befindet sich im LV 20 und, in einer kompatiblen Form (dem 6510), im C 64.
+
+Um das Ergebnis der Prüfung vorwegzunehmen: Ein Lehrbuch zum Erlernen der Programmierung dieses Mikroprozessors ist das Buch meiner Meinung nach nicht. Schon gar nicht,wenn man über keine Programmierkenntnisse verfügt, was im Vorwort als möglich bezeichnet wird.
+
+Doch bevor ich schreibe, was mir nicht gefallen hat, möchte ich zuerst einmal die Vorzüge des Buches aus meiner Sicht schildern. Der größte Pluspunkt des Buches ist für mich das 4. Kapitel, in welchem auf etwa 80 Seiten der gesamte 6502-Befehlssatz erläutert wird. Dabei ist jedem Befehl knapp eine Seite gewidmet worden, auf welcher sich die jeweilige Funktion, das Format und eine Beschreibung des Befehles findet. Darüber hinaus werden grafisch die Datenwege, die möglichen Adressierungsarten und die Beeinflussung der verschiedenen Flaggen dargestellt. Dieses und drei benachbarte Kapitel (grundlegende
+
+Programmiertechniken; Adressierungsarten und Anwendungsbeispiele) machen das Buch zu dem, was es für mich geworden ist, nämlich zu einem wertvollen Nachschlagewerk bei der Programmierung in der Assemblersprache.
+
+Dem Anspruch, ein Lehrbuch zu sein, wird das Buch jedoch leider weder durch eine einführende, erklärende Sprache, noch durch einen besonderen didaktischen Aufbau gerecht. Nur die eingestreuten Übungsaufgaben (deren Lösungen ich im Anhang vergeblich suchte), deuten darauf hin, daß das Buch zum Erlernen eines Sachverhaltes geeignet sein soll. Auch im Buch vorhandene, aber für den Anfänger unwichtige, ja abschreckende Kapitel (Hardware-Organisation des 6502; Ein- und Ausgabetechniken; I/O-Bausteine) machen dieses Werk als Lehrbuch für mich ungeeignet.
+
+Zusammenfassend möchte ich sagen, daß dieses Buch aufgrund der oben erwähnten Vorteile, der schönen, übersichtlichen Darstellung der vorhandenen Informationen, des ausführlichen Registers und nicht zuletzt auch wegen seines sauberen Druckes und der guten Verarbeitung ein wichtiges Arbeitsbuch für den fortgeschrittenen Assemblerprogrammierer sein kann. Dafür erscheint der Preis, unter Berücksichtigung der Preise vergleichbarer Bücher angemessen. Als Lehrbuch zum Einarbeiten in die Assemblersprache, insbesondere für Anfänger ohne
+
+Programmierkenntnisse, kann ich dieses Buch allerdings nicht uneingeschränkt weiterempfehlen.
+
+(Wolfgang Willing)
+
+Info: Rodney Zaks, Programmierung des 6502, Sybex-Verlag, 400 Seiten, ISBN 3-88745-011-6, 44 Mark
+
+# HYPRA-LOAD: Schnelles Laden von Diskette
+
+> Spontane Begeisterung und Zustimmung erhielten die beiden Autoren des folgenden Programms. Ein bis zu sechsmal schnelleres Laden von Programmen von der VC 1541 hatte uns bisher noch niemand angeboten.  Wir meinen, ein echter Knüller, der es ganz bestimmt verdient, Listing des Monats zu werden.
+
+Bisherige Versuche, die VC 1541 schneller zu machen, scheiterten fast alle. C 64-Besitzer hatten lediglich die Möglichkeit, mittels einer zusätzlichen IEEE-Schnittstelle eine der größeren Floppys (4040, 8250, etc.) anzuschließen. Viele waren der Meinung, daß die serielle Datenübertragung vom C 64 an die VC 1541 schuld an deren Trägheit hatte. Was natürlich nicht ganz stimmen kann. Denn es gibt serielle Schnittstellen, die mehr als 12000 Baud ( = Bit pro Sekunde) übertragen. Somit war klar, daß nicht die serielle Übertragung, sondern eher das DOS (Disk Operating System), die interne Software der Floppy, der große Hemmschuh sein mußte. Und in der Tat, wenn Sie in der Ausgabe 9/84 des 64'er-Magazins auf Seite 10 die Aktuell-Meldung über eine neue Alternativ-Floppy gelesen haben, konnten Sie erfahren, daß lediglich das kompatible DOS die mögliche Geschwindigkeit des TEAC-Laufwerkes stark einschränkte. Und hier setzten die beiden Autoren mit ihrer Arbeit an.
+
+(gk)
+
+## Zusammenarbeit und Ehrgeiz werden mit 2000 Mark belohnt
+
+Ich, Boris Schneider, wurde am 5.7.66 in Grevenbroich (zirka 20 km südwestlich von Düsseldorf) geboren.
+
+Genau 10 Jahre später erhielt ich meinen ersten Taschenrechner. Um 1978/79 hatte ich meine ersten Kontakte mit einem »richtigen« Computer: einem PET 2001, den mein Vater manchmal mit nach Hause brachte.
+
+1980 erfolgte dann der Umzug nach Bayern; hier besuche ich das Gymnasium Vaterstetten, wo ich unter anderem auch Karsten Schramm kennenlernte, der sich nun ebenfalls kurz vorstellt:
+
+Meine Geschichte begann am 1.3.66 in München.
+
+Ich besuche zur Zeit ebenfalls das Gymnasium Vaterstetten, wo Boris und ich nächstesJahr das Abitur machen wollen.
+
+Mit 14 Jahren kam ich das erste Mal mit Computern in Kontakt, wobei ich prompt vom »Fieber« angesteckt wurde, so daß meine Eltern ernstlich um meine Zurechnungsfähigkeit besorgt sein mußten.
+
+Meine Krankheit klang zum Glück schon nach einem Jahr ab, doch das Hobby blieb, und so besitze ich seit einem halbenJahr einen C 64, nachdem ich zuvor in der Schule auf CBM-Computern gearbeitet hatte.
+
+Wir (Boris und ich) teilen uns die Leidenschaft, in Maschinensprache zu programmieren und dem Computer die letzten Geheimnisse zu entlocken!
+
+Boris Oliver Schneider, Sudetenstraße 46, 8018 Grafing, Tel. 08092/6872.
+Karsten Oliver Schramm, Herzog-Stephan-Weg 33, 8011 Zorneding, Tel. 08106/20252
+
+---
+## Warum Zeit verschwenden? Laden Sie lhre Programme in Zukunft fünfmal schneller.
+
+Schon ganze Scharen von Computerbesitzern werden hilflos gestöhnt haben, als sie wieder einmal eine Kaffeepause einlegen mußten, um das Laden des nächsten Programms von Diskette abzuwarten. War das Programm dann auch noch länger als 150 Blocks, so konnte diese »Zwangssendepause« durchaus länger als 2,5 Minuten werden.
+
+Auch Hardware-Hersteller haben diesen Mangel erkannt und bieten neuerdings immer mehr schnelle Laufwerke als Ersatz für die VC 1541 an.
+
+Halt! Jetzt aber Schluß mit dem dauernden Herziehen über die VC 1541, die nämlich eigentlich gar keine Schuld an den langen Wartezeiten hat; vielmehr kann sie es, was die Geschwindigkeit betrifft, ohne weiteres mit den großen CBM-Floppys aufnehmen, oder anders formuliert, die VC 1541 ist genauso schnell wie zum Beispiel die CBM 2031.
+
+Aber wo liegt denn dann nun der Haken? Das Stichwort lautet: Der serielle Bus, also die Schnittstelle zwischen Floppy und Computer. Diese Verbindung erfordert zwar weniger Materialaufwand als der üblicherweise bei Commodore benutzte IEEE-488-Bus, (der 8-Bit-parallel arbeitet). Der serielle Bus hat aber den Nachteil, daß die Geschwindigkeit bei der Übertragung im Normalbetrieb zirka 5 bis 6mal langsamer ist als beim lEC-Bus, was sich dann auch auf die Ladezeit auswirkt.
+
+Die Hardwarelösung habe ich ja schon erwähnt: Sie erfordert außer einer neuen Floppy, auch noch das lEEE-Bus-Modul, da der C 64 in der Grundversion keine derartige Schnittstelle zu bieten hat. Mitunter ist also diese Lösung sehr teuer und übersteigt die Kaufkraft vieler C 64-Anwender.
+
+Aber zum Glück gibt es noch eine Softwaremöglichkeit, hier effektiv einzugreifen. Das Prinzip ist denkbar einfach. Es beruht auf der Möglichkeit, in die Floppy Maschinenprogramme einzuspeichern und diese dann dort auszuführen.
+
+In unserem Fall werden also modifizierte Busroutinen in der Floppy und im Computer abgelegt, die dann die sonst so langsame Übertragung auf ein Vielfaches steigern.
+
+In Zahlen: Der serielle Bus wird durch diese Routinen weit über 10mal so schnell und das Laden geschieht nun mit der maximalen Floppygeschwindigkeit, die etwa 5 bis 6mal höher ist.
+
+Nun aber zum Programm, damit Sie so schnell wie möglich in den Genuß von HYPRA-LOAD kommen: Wenn Sie den Basic-Lader eintippen, achten Sie bitte besonders sorgfältig auf richtiges Eingeben der Checksummen, da diese zur Fehlerkontrolle bei der Eingabe der DATAs dienen!
+
+Vor dem ersten Startversuch das Programm bitte unbedingt auf Diskette speichern, da es sich bei der Ausführung automatisch überschreibt. Anschließend starten Sie mit RUN. Wurde alles korrekt eingegeben, wird am Basic-Anfang ein Maschinenprogramm generiert und das Basic-Programm gelöscht.
+
+Dieses Maschinenprogramm ist das eigentliche HYPRA-LOAD und kann nun mit »SAVE« abgespeichert werden.
+
+Um den Geschwindigkeitsvorteil auch wirklich nutzen zu können, wird empfohlen, HYPRA-LOAD möglichst auf alle Programmdisketten zu überspielen. Es wurde dazu extra sehr kurz (6 Blocks) gehalten. Müßten Sie nämlich nach jedem Laden zuerst die Diskette wechseln, so wäre die Effektivität von HYPRA-LOAD erheblich vermindert.
+
+Übrigens: Die Einschaltmeldung von HYPRA-LOAD umfaßt auch eine Bytes-free-Meldung, welche jedoch ignoriert werden sollte, da die Zahlenangabe aus programmtechnischen Gründen falsch ist. Dies hat jedoch keinen Einfluß auf die einwandfreie Funktion des Computers!!!
+
+Nun aber zu den besonderen Eigenschaften — HYPRA-LOAD kopiert nach dem Kaltstart das gesamte Betriebssystem vom ROM ins darunterliegende RAM, jedoch ohne dabei Basic-Speicherplatz zu verbrauchen. Danach werden die einzelnen Programmteile im Betriebssystem verteilt und das Betriebssystem im RAM gestartet.
+
+— Abzulesen ist die Aktivierung von HYPRA-LOAD an der Speicherstelle 1 der Zeropage. Diese enthält normalerweise den Wert 55, was besagt, daß ab $A000 ROM aktiviert ist, welches Basic und das Betriebssystem enthält.
+
+HYPRA-LOAD schaltet den Wert auf 53 um und aktiviert dadurch anstelle von ROM-Bausteinen freien RAM Bereich, in dem nun das Betriebssystem und Basic stehen.
+
+Man kann also ganz einfach HYPRA-LOAD abschalten, durch POKE 1,55 und, sofern nicht zerstört, mit POKE 1,53 wieder einschalten.
+
+— Da HYPRA-LOAD im RAM steht, ergeben sich natürlich einige Probleme. So gibt es viele Programme, die beim Laden den Bereich ab $A000 überschreiben. Würde nach der Rückkehr aus der Laderoutine nun ins RAM ab $A000 gesprungen, so wäre ein »Aufhängen« des Computers fast unvermeidlich.
+
+Gegen solche Programme ist HYPRA-LOAD abgesichert, und es wird nach dem Ladevorgang automatisch ins ROM-Basic zurückgesprungen. Bei mehrteiligen Programmen erkennt man dies daran, daß plötzlich wieder »normal« geladen wird.
+
+Überschreiben Programme jedoch den Bereich ab $E000, so treffen sie früher oder später auf die Laderoutinen und der Computer »stürzt ab«. Bei solchen Programmen hilft nur das vorherige Ausprobieren. Es muß an dieser Stelle erwähnt werden, daß es auch Programme gibt, die ein Abschalten von HYPRA-LOAD erfordern, aber erst nachdem der Ladevorgang abgeschlossen ist. Auch hier hilft zum Erkennen solcher Programme nur das Ausprobieren.
+
+Am besten arbeitet HYPRA-LOAD mit einteiligen Programmen, da es hier nicht vorkommt, daß der Bereich ab $EOOO überschrieben wird (solche Programme müßten nämlich den davorliegenden I/O-Bereich überschreiben) und so das gesamte Programm schnell geladen werden kann!
+
+— Es sollte vielleicht noch einmal erwähnt werden, daß sich HYPRA-LOAD nur auf den LOAD-Befehl beschränkt, andere Diskettenoperationen bleiben davon unberührt.
+— Da HYPRA-LOAD im Betriebssystem steht, vernichtet es zwangsläufig andere Routinen, das heißt, vor Kassetten- und RS232-Betrieb muß HYPRA-LOAD abgeschaltet werden.
+— SYS 64738 als Reset reaktiviert auch HYPRA-LOAD, sofern es noch nicht zerstört oder ausgeschaltet ist.
+— Nach einem Reset durch einen Taster kann HYPRA-LOAD, sofern noch nicht überschrieben, durch
+POKE 1,53
+wieder eingeschaltet werden. Wird danach jedoch langsam geladen, so ist im Basic-Teil etwas verändert worden, so daß HYPRA-LOAD auf das ROM umgeschaltet hat.
+— Ein Test hat ergeben, daß HYPRA-LOAD auf dem SX 64 trotz dessen angeblicher »Vollkompatibilität« nicht lauffähig ist. — Da zusätzliche Peripheriegeräte und auch der Bildschirm den schnellen Busbetrieb stören, müssen diese entfernt, beziehungsweise abgestellt und der Bildschirm ausgeschaltet werden. Ist dies nicht geschehen, so macht HYPRA-LOAD darauf aufmerksam und wartet auf das Nachholen des Versäumten. Anschließend kann durch Drücken der RUN/STOP-Taste mit dem Laden begonnen werden. Es erfolgt keine weitere Kontrolle mehr!
+— Betreiben Sie ein Floppy-Laufwerk zum Beispiel unter der Geräteadresse 9, so müssen folgende Änderungen durchgeführt werden:
+
+Die DATAs in den Zeilen 104, 114 und 239; dort müssen die entsprechenden Zahlen (008) auf die neue Geräteadresse umgestellt werden. Natürlich ist auch ein Angleichen der Checksummen erforderlich. Es sind dies die 1., die 2. und die 12. Checksumme.
+
+Übrigens: Für eventuelle Berichte über die Erfahrungen mit HYPRA-LOAD sowie Verbesserungsvorschläge wäre ich sehr dankbar.
+
+Und nun viel Spaß mit einer 5 bis 6mal so schnellen VC 1541.
+
+(K. Schramm/B. Schneider/gk)
+
+# Menügesteuerte Finanzmathematik
+
+> Zwei herausragende Eigenschaften machen dieses Programm für alle C 64-Besitzer interessant: Die sehr gute Menütechnik und der modulare Bildschirmmaskenaufbau.
+
+Wer wünscht sich nicht, daß Programme von Diskette auf Tastendruck geladen, beziehungsweise nach-geladen werden? Wenn Sie das Menüprogramm dieses Listings übernehmen und für Ihren Bedarf abändern, ist das Laden von Programmen kein Problem mehr.
+
+Das Programm wird geladen mit dem Befehl:
+LOAD "Menü" ,8
+Gestartet wird dann mit dem Befehl: RUN
+
+Wählen Sie nun mit den Funktionstasten F3 und F5 die Nummer des Programmes, mit welchem Sie als nächstes arbeiten wollen. Sie erkennen Ihre augenblickliche Position an der blinkenden Zahl.
+
+Nach beendeter Wahl drücken Sie »RETURN«. Dann wird das Programm geladen, dessen Zahl gerade blinkt und an der sich nach »RETURN« ein ← (Pfeil links) befindet.
+
+** Bedienungsanleitung für das Programm:**
+** Erstellen eines Tilgungsplanes.**
+
+Nach erfolgter Auswahl im Hauptmenü wird das Programm automatisch gestartet.
+
+Durch entsprechende Informationen in der Fußzeile erklärt sich das Programm im wesentlichen selbst. Allerdings mußte manchmal wegen Platzmangel darauf verzichtet werden.
+Grundsätzlich gilt:
+
+— Bis auf die Funktionstasten erfolgt bei jeder Eingabe und Auswahl ein Abschluß mit »RETURN«.
+— Bei der Auswahl im Programm, wird immer mit den Tasten F3 und F5 gewählt, nach Drücken von »RETURN« wird immer das als nächstes ausgeführt, was zuletzt geblinkt hat.
+— Zum Abschluß der Dateneingabe gilt für die Abfrage, ob die Eingabe korrekt ist, folgendes:
+a)	Zugelassen sind die Buchstaben j Qa) und n (nein).
+b)	Die Antwort kann bis zum Abschluß mit »RETURN« durch die Taste »DEL« korrigiert werden.
+— Während der Dateneingabe, kann man durch Drücken der Taste Fl zum ersten Auswahlmenü zurückkehren.
+— Wird die Tabelle auf dem Bildschirm ausgedruckt, kann man den Bildschirmausschnitt, innerhalb der festgesetzten Grenzen verändern.
+Mit F1 kehrt man zur alten Bildschirmmaske zurück.
+Das Ausgabefeld »Resultat« enthält folgende Informationen:
+— Zinsaufwand (gesamt): Dieser Summe entsprechen sämtliche in den einzelnen Jahren zu zahlende Zinsen.
+— Annuität (gesamt): Dies ist die Summe, die man insgesamt zurückzahlen muß (Zins- und Tilgungsanteil zusammen),
+Im linken unteren Feld wird noch einmal angegeben, wie hoch der Zinsanteil von der Annuität in Prozent ist. Dieses Programm stellt Tilgungspläne bis zu einer Laufzeit von 50 Jahren auf. Falls dies nicht ausreicht, braucht in Zeile neun nur die Dimensionierung der Variablen e und e$ erhöht werden.
+
+(Klaus Klöker/rg)
+
+## Lebenslauf
+
+Ich bin 20 Jahre alt, habe im Frühjahr dieses Jahres mein Abitur bestanden und im August eine Ausbildung als Bankkaufmann begonnen.
+
+In meiner Freizeit beschäftige ich mich gerne mit Geschichte und der Computerprogrammierung.
+
+## Entstehungsgeschichte und Anwendung
+
+Entstanden ist das Programm aufgrund eines Kurses über Finanzmathematik.
+
+Es schien mir damals zweckmäßig, Tilgungspläne mit dem Computer aufzustellen. Dieser absolviert seine Arbeit sekundenschnell und fehlerfrei. Wer selbst einmal Tilgung »zu Fuß« geplant hat, weiß, daß gerade letzteres keine Selbstverständlichkeit ist (bei 20 Jahren Laufzeit und 6 Beträgen pro Jahr, müssen immerhin 120 Beträge einzeln berechnet werden).
+
+Einen großen Teil der Programmierzeit beanspruchte der Aufbau der Bildschirmmasken und die Menüsteuerung. Ich hielt diesen Aufwand für angebracht, weil die Anwendung bequemer ist und außerdem mehr Spaß macht. Wer sich das Programm »Tilgungspläne« genauer anschaut, wird feststellen, daß man durch einfaches Austauschen der Formeln verschiedene Tabellen aufstellen kann, obwohl nur eine begrenzte Zahl von Eingabekriterien notwendigist.
+
+(Klaus Klöker)
+
+# Video-Vorspann mit dem VC 20
+
+> Einen professionellen Vorspann wie aus einem richtigen Filmstudio produziert dieses Programm.
+
+Erzeugt wird ein technischer Vorspann, ähnlich wie ihn auch Fernsehstudios verwenden. Dieser Vorspann dient einerseits der Kontrolle der richtigen Einstellungen, andererseits der Dokumentation der einzelnen Szenen. Darüber hinaus wird die Synchronisation einer eventuellen Nachvertonung erleichtert.
+
+Der Vorspann besteht im einzelnen aus
+— einem farbfolgerichtigen Farbbalken zur Einstellkontrolle; dazu wird ein Meßton von 1000 Hz erzeugt,
+— einem »Etikett« (anstatt der Klappe beim Film) mit Angaben über Datum, Bandnummer, Geschwindigkeit, Aufnahmegerät, Quelle, Serienname und Titel,
+— schließlich einem Countdown von neun bis zwei im Sekundentakt, dazu wieder ein Meßton von 1000 Hz.
+
+Unter dem Farbbalken und über den Zahlen des Countdowns erscheint Ihr Name beziehungsweise die Studiobezeichnung. Ersetzen Sie daher in den Zeilen 440 und 1330 »Schulz Video« durch die von Ihnen gewünschte Bezeichnung.
+
+Nach dem Starten des Programms muß als erstes die Eingabe der Etikett-Daten erfolgen. Folgende Angaben sind notwendig:
+— Bandnummer (bis 9 Stellen)
+— Geschwindigkeit (SP oder LP)
+— Datum (beliebiges Format)
+— Aufnahmegerät (bis 13 Stellen)
+— Quelle (bis 13 Stellen)
+— Serienname (bis 19 Stellen)
+— Titel (bis 19 Stellen)
+
+Jede Antwort wird mit RETURN abgeschlossen. Die Fortschaltung der Sequenzen Farbbalken/Etikett/Countdown geschieht mit der F7-Taste. Zwischen den einzelnen Sequenzen erscheint immer — bis zum erneuten Drücken von F7 — eine Schwarzblende
+
+Nach dem Countdown bewirkt die F7-Taste wiederum das Erscheinen der Farbbalken, und die einzelnen Sequenzen werden erneut durchlaufen. Für eine neue Beschriftung des Etiketts ist STOP/RESTORE und ein erneuter Programmstart notwendig.
+
+(Wolfgang Schulz/ev)
+
+# Hardcopy MPS 801/VC 1515
+
+Mit dem Programm kann in knapp drei Minuten der Grafikbildschirm des C 64 ausgedruckt werden. Dabei wird Bit für Bit der Inhalt des Grafikspeichers auf die Druckernadel übertragen. Es arbeitet mit dem MPS801 und läuft auch mit dem VC 1515. Allerdings muß dann der Bildschirm während des Druckens abgeschaltet werden.
+
+Der Basic-Lader kann auch in eigenen Grafik-Programmen verwendet werden. Sie können den Bereich 8192 bis 49151 als Grafikspeicher benutzen.
+
+Um passende Bits für jede Druckernadel im Grafikspeicher zu finden, habe ich den Ausdruck BYTEADRESSE = 8192 + 8 * X + Y + INT(Y/8) * 312 verwendet. Er läßt sich aus den Angaben im »Commodore 64-Programmers Reference Guide« (Seiten 124 bis 12 6) ableiten. X und Y sind dabei die Koordinaten eines Grafikpunktes (gezählt von der oberen, linken Ecke des Bildschirms). Die Gleichung gibt zu jedem Bildpunkt die Adresse des Bytes, in dem das entsprechende Bit gesetzt (Bildpunkt an) oder gelöscht (Bildpunkt aus) ist.
+
+Diese Adressen müssen für den MPS 801-Drucker in Siebener-Blöcke sortiert werden, da der Druckkopf nur über sieben Nadeln verfügt. Jeder Siebener-Block steuert dann achtmal (einmal fürjedes Bit) die sieben Druckernadeln.
+
+Insgesamt ist der Grafikbildschirm 320 Punkte entsprechend – 320 : 8 = 40 Bytes – breit. Eine Druckzeile enthält also 40 * 7 = 280 Bytes. Das Programm sortiert jeweils 280 Bytes (1 Druckzeile) in Siebener-Blöcke und speichert sie im Bereich 49920 bis 50199. Von dort werden die Bitmuster auf den Druckkopf übertragen.
+
+Das Sortieren erfolgt mit der Formel POKE(49920+7 *X+Y-INT(Y/7) * 7),PEEK(BYTEADRESSE).
+
+Mit Hilfe der Additions-, Multiplikations- und Divisionsroutinen aus R. Zaks »Programmierung des 6502« und LA. Leventhal :»6502 Programmieren in Assembler« habe ich diesen Ausdruck in Maschinensprache übersetzt.
+
+## Benutzung des Programms
+
+CHR$(8) schaltet den Grafik-Modus des Druckers ein.
+Die drei folgenden CHR$(13) bewirken einen Papiervorschub. Er sorgt für ein sauberes Drucken der ersten Grafik-Zeilen (Zeile 450). Aufgerufen wird die Druckroutine mit SYS 49525,LF (Zeile 460). Dabei ist LF die logische Filenummer des geöffneten Drucker-Files (Zeile 450). Mit CHR$(15) wird der Drucker wieder auf den Normal-Modus eingestellt (Zeile 470).
+
+In den Zeilen 410 bis 430 wird die Anfangsadresse des Grafikspeichers ermittelt und in Zeile 440 der Hardcopy-Routine mitgeteilt. Dadurch läßt sich zum Beispiel auch der RAM-Bereich unter dem Basic-Interpreter als Grafikspeicher nutzen. Der ganze Basic-Bereich (2048 bis 40959) ist dann für Programme frei.
+
+Nicht benutzt werden darf das RAM unter dem Betriebssystem, da es zur Ausgabe der Zeichen auf den Drucker gebraucht wird (BSOUT=$FFD2). Ebenfalls nicht benutzbar als Grafikspeicher ist der Bereich 49152 bis 57343, da sonst das Programm von der Grafik überschrieben wird.
+
+Die Zeilen 410 bis 440 können weggelassen werden, wenn der Grafikspeicher bei 8192 bis 16191 liegt.
+
+(Rainer Kracht/rg)
 
 
 
