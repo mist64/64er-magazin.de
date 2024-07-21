@@ -2838,79 +2838,350 @@ Damit möchte ich für heute schließen. In der nächsten Folge werden schwerpun
 
 (Christoph Sauer/ev)
 
+# Mit 4 Baud über den Balkon
 
+> Man stelle sich vor: Der Nachbar morst mit einer Taschenlampe und Ihr Computer empfängt die Zeichen. Auf dem Bildschirm zeigt er Ihnen an, was Ihr Nachbar will. Nicht möglich? In Sindelfingen schon. Zwei Computer senden und empfangen Lichtzeichen. Datenfernübertragung von Balkon zu Balkon.
 
+Die Nachbarn haben sich inzwischen daran gewöhnt. Immer wenn es dunkel wird, blinken auf zwei Balkons Morsezeichen auf. Dann wissen die Anwohner, daß die beiden 19jährigen Freunde Mark Schneider und Dietmar Schwuchow wieder mit ihren Computern spielen.
 
+Die Computer-Karriere der beiden begann vor zwei Jahren: Wie viele andere auch studierten sie Handbücher, tippten Listings ab, schrieben schließlich eigene Spiele und »Nutzprogramme«. Im Frühjahr brach bei beiden der Spieltrieb durch. »Wir waren es leid, immer getrennt mit unseren Computern zu arbeiten. So kamen wir auf die Idee, sie als Kommunikationsmittel einzusetzen. Ein Kabel oder ein Akustikkoppler war uns jedoch zu langweilig«, erklärten Dietmar und Mark, die beide gerade ihr Abitur erfolgreich hinter sich gebracht haben.
 
+Die Freunde wohnen so nah beieinander, daß sie sich vom Balkon aus zuwinken können. Daher erschien es ihnen am einfachsten, Lichtimpulse für die Datenübertragung zu nutzen. Schnell einigten sich die Elektronik-Fans über diesen Weg. »Klar wußten wir von ersten Moment an, daß wir damit keine professionelle Datenfernübertragung machen können. Was uns reizt, ist vielmehr das Basteln und Spielen. Unter diesem Vorzeichen sehen wir auch unser selbstgebautes Lichttelefon«. Für Mark und Dietmar zählt das Außergewöhnliche ihrer Sende- und Empfangseinrichtung mehr als ein tatsächlicher Nutzen.
 
+Vier Monate brauchten sie, um die Idee in die Tat umzusetzen. Jetzt spielen sie zusammen »Schiffchen versenken« — jeder an seinem Computer. Der übernimmt mittlerweile »artig« die Ver- und Entschlüsselung der Daten sowie das »Morsen« bei der Übertragung. Vier Bit huschen in jeder Sekunde von Balkon zu Balkon und übermitteln die Züge an den jeweils anderen Computer.
 
+Zunächst machten sich die Computer-Freaks über die Hardware her. Die beiden Computer, ein C 64 und ein Sinclair ZX Spectrum, mußten durch entsprechende Elektronik mitje einer Lampe als Sender und einem Fotowiderstand als Empfänger verbunden werden.
 
+## Ins Innenteben des Computers wurde nicht eingegriffen
 
+Da Mark und Dietmar nicht unbedingt in das Innenleben der Computer eingreifen wollten, nutzten sie die vorhandenen Anschlüsse. Der Tonausgang dient zum Ansteuern der Lampe: beim C 64 ist dies der Audio-Ausgang und beim ZX Spectrum der Recorderanschluß. Den Signalempfang übernimmt der jeweilige Joystick-Port.
 
+Es war von vornherein vorgesehen, nur bei Dunkelheit zu übertragen. Trotzdem — die erste Schaltung erwies sich bei den Testläufen als zu unempfindlich. Mit einer verbesserten Elektronik war dieses Problem schnell gelöst.
 
+Nachdem sich die beiden Freunde auf einen gemeinsamen Code geeinigt hatten, kam der große Moment: der erste richtige Übertragungsversuch. Jedem Bustaben wurde ein Fünf-Bit-Code zugeordnet. Es handelte sich um eine serielle Übermittlung, wobei die Lampe bei gesetztem Bit kurz aufblinkte. Das Senden begann mit einem Synchronisationssignal, um damit den empfangenden Computer auf den Übertragungstakt einzustellen. Da Basic für diese Zwecke nicht präzise genug arbeitet, kamen Mark und Dietmar auf die Idee, den internen Zeitzähler zu nutzen. Es funktionierte, die Daten wurden im Sekundenrhythmus übertragen — jede Sekunde ein Bit.
 
+Ganz zufrieden waren die Elektronik-Tüfftler noch nicht. Bei mehr als 20 Zeichen gab es noch Ungenauigkeiten in der Übertragung. Außerdem war ein Baud (Bit pro Sekunde) doch ein bißchen zu langsam. Fazit: Die Software wurde umgeschrieben, so daß die Geschwindigkeit jetzt vier Baud beträgt. Auch bei größeren Datenmengen fällt nur selten ein gesendetes Bit über den Balkon — die Information kommt zuverlässig beim anderen an.
 
+Derzeit arbeiten Mark und Dietmar an der nächsten Verbesserung ihrer Datenfernübertragung. Die Auswertung von zwischengespeicherten Daten ist momentan erst möglich, nachdem alle Bits im Computer angekommen sind. Geplant ist ein Maschinenprogramm, das die empfangenen Zeichen sofort decodiert und ausdruckt. Die Lust am Basteln hält weiter an. Das nächste Projekt — ein Plotter aus Fischer-Technik-Bauteilen — steht kurz vor der Vollendung. Aber auch den »Ernst des Lebens« will sich — zumindest Mark — mit Computern versüßen. Bereits am Gymnasium hat er Lehrer »gespielt«. Jetzt versucht er, sein Computer-Wissen in der Volkshochschule »loszuwerden«.
 
+(M. Schneider/ D. Schwuchow/kg)
 
+## Ablauf der Datenübertragung
 
+Die Datenübermittlung beginnt wie es sich gehört: Der Sender »klingelt« zunächst beim Empfänger. Dazu setzt er ein Blinksignal von % Hz, das bedeutet 2 Sekunden Licht an, 2 Sekunden aus und so weiter. Der Empfänger muß seine Bereitschaft signalisieren. Kennzeichen: einmal 4 Sekunden lang aufblinken. Wird dieses sogenannte Bereitschaftssignal erkannt, schaltet der vorher blinkende Computer auf Texteingabe um und beginnt zu senden. Der »angeklingelte« Computer stellt nach dem Abschicken des Bereitschaftssignals sofort auf Empfang um. Damit ist die Richtung der Informationsübermittlung festgelegt. Sie wechselt jetzt regelmäßig ohne vorheriges »Klingeln«.
 
+Jeder Sendevorgang beginnt mit einem Synchronisationssignal — einem Aufblinken von 3 Sekunden Dauer. Eine Sekunde später folgen die Kontrollbytes: Zweimal fünf Bit im Viertelsekundenrhythmus. Damit wird dem empfangenden Computer mitgeteilt, wie-viele Zeichen die Nachricht beinhaltet und wie oft demnach die Empfangsschleife durchlaufen werden muß, bevor er decodieren darf. Das Synchronisationssignal dauert drei Sekunden, dann folgt eine Sekunde lang Sendepause. Erst jetzt wird die eigentliche Nachricht geschickt, ebenfalls im Viertelsekundentakt.
 
+Die Übertragungsrichtung wechselt am Ende der Mitteilung automatisch und der vorherige Empfänger startet seinen Sendevorgang mit dem Synchronisationssignal.
 
+Wie kann der Empfänger dem Sender mitteilen, daß er nur »Schrott« mitbekommt, wenn die Übertragung immer nur auf eine Richtung festgelegt ist? Dafür gibt es eine Ma-schinen-Code-Routine.
 
+Falls der Empfänger während der Übertragung einen Fehler feststellt, so drückt er einfach eine Error-Taste, beim C 64 ist dies die obere linke Pfeiltaste. Damit schaltet er seinen Computer auf »Texteingabe«, was bedeutet, er kann jetzt senden und dem anderen mitteilen, daß etwas falsch angekommen ist. Das
 
+Synchronisationssignal dauert dann — zur Unterscheidung von normaler, fehlerfreier Übermittlung — allerdings 10 Sekunden. Obwohl der andere Computer in dem Moment noch eifrig weitersendet (er hat ja keine Ahnung, daß etwas nicht richtig rüberkommt) erkennt er ein Dauersignal von mehr als 5 Sekunden. Nach der Warnung schaltet er auf Empfang, um die Fehlermeldung des anderen aufzunehmen.
 
+## Hardwarebeschreibung
 
+Computer und ein Teil der Elektronik sind im Zimmer untergebracht — der Rest des sogenannten Lichttelefons steckt in einem Sende- und Empfangskästchen auf dem Balkon. Bild 3 zeigt, was drinnen und was draußen steht.
 
+Mark und Dietmar müssen bei der Datenübertragung eine Strecke von etwa 200 m überwinden. Das erfordert ein relativ intensives Lichtsignal, damit die Information überhaupt beim anderen ankommt. Eine 12V/10W-Lampe erbringt die notwendige Leistung.
 
+Als Spannungsquelle für die Lampe dient ein ausrangierter (Renn-bahn-)Trafo. Die 12V des Trafos sind außerdem mit einem Spannungsregler des Typs 7805 verbunden, der für eine konstante 5V-Spannung der zusätzlichen Hardware sorgt (Bild 1).
 
+Die Sende- und Empfangskästchen sind mit Schirmklemmen am Balkongeländer befestigt. Nimmt man den Regenschutz — aus Pappe und aufgeklebter Aluminiumfolie — ab, so wird ein quaderförmige Holzgehäuse von 7 x 7 x 12 cm frei. In die Vorderwand wurde ein Loch für die Linse gesägt, die wiederum fest in einem Papprohr sitzt. Das Sendeelement (Lampe) und Empfangsteil, der lichtempfindliche Widerstand (LDR), müssen im Brennpunkt der Linse sein. Da diese fest eingebaut ist, wird eine genaue Einstellung nur durch Verschieben der Platine erreicht, auf die die Bauteile gelötet sind (Bild 6).
 
+Die Kästchen auf dem Balkon sind über ein vier-poliges abgeschirmtes Kabel mit der Elektronik im Zimmer verbunden. Das Ende des Kabels bildet ein DIN-Stecker, mit der in Bild 2 dargestellten Stiftbelegung.
 
+Das Senden funktioniert nach einem einfachen Prinzip: Beim Morsen wird für logisch »1« am Audioausgang des Computers ein Tonsignal abgegeben, das durch die Schaltung (Bild 4) verstärkt und digitalisiert wird. Als Folge davon schließt das Relais und die Lampe im Sendekästchen leuchtet auf.
 
+Beim Empfangen (Bild 5) vergleicht der Operationsverstärker (OP3) die Signale von beiden Spannungsteilern, die durch den lichtempfindlichen Widerstand (LDR) mit dem 100 KOhm-Wider-stand und dem Regler 47 KOhm gebildet werden. Dieser Verstärker ist auch für die hohe Empfindlichkeit verantwortlich. Die nachfolgende Schaltung ist für langsame Helligkeitsschwankungen unempfindlich. Lediglich bei Lichteinfall setzt sie ein Flipflop und nimmt es bei Dunkelheit zurück. Dieses Flipflop steuert das Relais für denJoystick-Eingang an. Darüber hinaus bietet es eine doppelte Kontrolle beim Empfang: sowohl auf dem Balkon beim Einstellen der Kästchen über die LED als auch im Zimmer durch den BEEP.
 
+# Unterprogrammebibliothek: Sieger mit Maske
 
+> In dieser Ausgabe wird zum erstenmal ein Gewinner unseres Programmierwettbewerbs »Unterprogrammbibliothek« vorgestellt. Das Programm »Maske« bietet eine komfortable Routine zur Eingabe und Programmierung von Bildschirmmasken.
 
+Die Anzahl der eingegangenen Unterprogramme und deren unterschiedliche Thematik machte eine Bewertung natürlich nicht einfach. Wenn Ihr Programm diesmal nicht vorgestellt wird, so bedeutet das keine Abqualifikation. Damit Sie als Leser aber auch in den Genuß umfangreicherer Unterprogramme kommen, werden wir gelegentlich zusätzlich zu unserem »Unterprogramm des Monats« andere interessante Einsendungen veröffentlichen.
 
+Der Autor dieses Programms ist ein waschechter Berliner. Jacques Effenberg ist 35 Jahre alt und von Beruf Maschinenschlosser. Im März 1983 kaufte er sich einen C 64. Nachdem er sich ein knappes Jahr mit Basic versuchte, stieg er auf Assemblerprogrammierung um, weil er mit Maschinensprache viele Probleme besser lösen konnte. Zum Programm selbst:
 
+Das Programm Maske hat die Aufgabe, die Programmierung von Bildschirmmasken zu vereinfachen. Der erste Befehl erstellt horizontale und vertikale Linien. Die an den Schnittstellen benötigten Zeichen werden vom Programm ermittelt und eingesetzt. Der zweite Befehl löscht vom Benutzer definierte Felder in der Bildschirmmaske. Der dritte Befehl dient dazu, Text an bestimmte Stellen des Bildschirms zu drucken. Das Maschinenprogramm liegt im Speicherbereich von 49152 bis 50539. Eigene Fehlermeldungen und das Listen der Basic-Zeile in der der Fehler vorkommt, erleichtern dem Benutzer die Arbeit.
 
+## Parameterübergabe, Fehlermeldungen
 
+### 1)	Linien zeichnen
 
+Der Befehl für Linien zeichnen wird in Basic wie folgt programmiert:
+SYS 49152, Richtung, Zeile, Spalte, Länge, Farbe
+1a) Richtung
+Für eine horizontale Linie geben Sie eine 0 und für eine vertikale Linie eine 1 ein. Bei einer Zahl größer als 1 meldet sich der Computer mit der Fehlermeldung:
 
+Richtung Wert zu groß (0 bis 1) in:
+und listet die Zeile Ihres Basic-Programms.
+1b) Zeile
+Die Zeilenangabe liegt im Bereich von 1 bis 25. Bei Werten von kleiner als 1 oder größer als 25 lautet die Fehlermeldung:
 
+Zeilenwert kleiner 1 oder größer 25 in:
+und die Basic-Zeile wird gelistet.
 
+1c) Spalte
 
+Die Werte für die Spaltenangabe liegen im Bereich von 1 bis 40 und Werte kleiner als 1 oder größer als 40 ergeben die Fehlermeldung:
 
+Spaltenwert kleiner 1 oder größer 40 in:
+sowie eine Anzeige der Zeile.
+1d) Die Länge kann im Bereich von 1 bis 40 für horziontale Linien und für vertikale Linien im Bereich von 1 bis 25 liegen. Werte, die nicht in diesem Zahlenbereich liegen, führen zu der Fehlermeldung:
 
+Länge Linie zu klein oder zu groß in:
+Wollen Sie zum Beispiel eine horizontale Linie zeichnen, mit dem Spaltenwert 20 und geben als Länge einen Wert von 22 an, so führt das zur Meldung:
 
+Spalte + Länge Linie größer 40 in:
+da der Bereich von 40 möglichen Spalten überschritten wird.
 
+Eine vertikale Linie zum Beispiel ab Zeile 10 und mit der Länge 17 würde die Fehlermeldung:
 
+Zeile + Länge Linie größer 25 in:
+ergeben, da das Ergebnis von 10 + 17 den möglichen Bereich von 25 Zeilen überschreitet. In allen drei Beispielen erfolgt ein LISTen der Basic-Zeile.
+1e) Farbe
+Für die Farbwerte würden Zahlen im Bereich von 0 bis 15 in Frage kommen. Werte größer als 15 führen zu keiner Fehlermeldung.
 
+### 2)	Felder löschen
 
+Um bestimmte Bereiche auf dem Bildschirm zu löschen, müssen Sie den Befehl:
 
+SYS50083, abZeile, bisZeile, Spalte, Länge eingeben.
+2a) ab Zeile, bis Zeile
 
+Wollen Sie zum Beispiel die ersten fünf Zeilen auf Ihrem Bildschirm komplett löschen, müßte der Befehl wie folgt aussehen:
+SYS 50083,1,5,1,40
+also ab Zeile 1 bis Zeile 5, ab Spalte 1 und 40 Zeichen lang. Ist nur eine Zeile zu löschen, dann ist der Wert ab Zeile gleich dem Wert bis Zeile.
 
+Geben Sie zum Beispiel für ab Zeile 10 und bis Zeile 2 ein, so erfolgt die Fehlermeldung:
 
+Zeile 1 ist größer als Zeile 2 in:
+sowie ein Listen der Basic-Zeile.
+2b) Zahlenbereich
 
+Für die Bereichsangabe gelten die Werte aus Absatz 1, sowie bei Überschreitungen auch die Fehlermeldungen.
 
+### 3)	Print
 
+Für die gezielte Ausgabe eines Textes auf dem Bildschirm lautet der Befehl:
 
+SYS 50242, Zeile, Spalte, Farbe, ”Text”
+3a) Zeile, Spalte, Farbe
 
+Alle unter Absatz 1 beschriebenen Zahlenbereiche für die Angabe bei Zeile, Spalte, Farbe gelten auch hier. Ebenso treffen auch die dort erwähnten Fehlermeldungen bei einer Bereichsüberschreitung zu.
+3b) "Text”
 
+Hier kann all das stehen, was Sie auf dem Bildschirm ausgeben wollen.
+Ein Beispiel:
+SYS 50242,1,20,2,”Probe”
+es wird in diesem Fall in der ersten Zeile ab Spalte 20 das Wort »Probe« in roter Farbe auf dem Bildschirm ausgegeben. Sie könnten auch vorher im Programm festlegen, daß D$ = ’’Probe” ist, schreiben dann SYS 50242,1,20,2, D$ und erhalten das gleiche Ergebnis.
 
+Hatten Sie vor diesem Befehl eine grüne Cursorfarbe, dann wird, nach dem Ausgeben des Wortes »Probe« in roter Farbe, Ihre Cursorfarbe wieder grün sein.
 
+### 4)	Erklärungen zum DATA-Programm
 
+4a) Programmablauf
 
+In Zeile 1000 werden nach der Dimensionierung der Variablen P die 116 Prüfsummen für das Maschinenprogramm in P(I) eingelesen. Jede Prüfsumme ist das Ergebnis einer Addition von zwölf DATA-Werten. Die Variable SP addiert die Prüfsummen. Zeile 1130 überprüft die Gesamtsumme und gibt bei einer Differenz die Meldung »Fehler Prüfsumme« aus. Das Programm wird beendet.
 
+Das Maschinenprogramm wird ab Zeile 1140 eingelesen und gespeichert. Die Variablen S und SI addieren und ZI zählt die DATA-Werte.
 
+Ist ZI = 12 wird in Zeile 1160 die Variable S mit der jeweiligen Prüfsumme P (PI) verglichen. Ist S ungleich P (PI), verzweigt das Programm zur Zeile 1210.
 
+In Zeile 1190 wird SI mit der Gesamtsumme aller DATAs verglichen. Bei einer Differenz ergibt sich ein Fehler in der letzten DATA-Reihe. Es kommt zur Ausgabe der Meldung »Fehler letzte Reihe DATA«.
 
+Sind alle Werte richtig eingegeben, wird in Zeile 1200 nach der Meldung »OK« das Programm beendet. Beim Einlesen von DATA-Zeilen notiert sich der Interpreter die abzuarbeitende Zeilennummer in den Speicherstellen 63 und 64 der Zeropage. War in Zeile 1160 die Summe von 12 DATA-Werten und die Prüfsumme P (PI) ungleich, so wird in Zeile 1210 die Zeilennummer in der der Fehler auftrat in Z$ festgehalten.
 
+Dann wird der Bildschirm gelöscht und in Zeile 1240 die Meldung »Fehler in Zeile« Z$ ausgegeben. In den Zeilen 1250 bis 1260 wird der Befehl »LIST« und die Zeilennummer in den Tastaturpuffer gePOKEt. Dazu kommt in Zeile 1270 noch der Befehl »RETURN« und in der Speicherstelle 198 wird dem Interpreter mitgeteilt, wieviel Stellen im Tastaturpuffer belegt sind.
 
+Nach dem Befehl »END« in Zeile 1280 und der Ausgabe von »READY« befindet sich der Computer in einer Warteschleife, in der auch die Speicherstelle 198 abgefragt wird. Da der Wert in 198 größer als 0 ist, arbeitet der Interpreter jetzt den Tastaturpuffer in folgender Reihenfolge (zum Beispiel bei Fehler in Zeile 1290) ab:
+Speicher 631 Wert 76 = L
+Speicher 632 Wert 105 = i (L + Shift i = Kurzzeichen für LIST)
+Speicher 633 Wert 49 = 1
+Speicher 634 Wert 50 = 2
+Speicher 635 Wert 57 = 9
+Speicher 636 Wert 48 = 0
+Speicher 637 Wert 13 = Return
+also LIST 1290 und die Zeile mit dem Fehler wird gelistet.
+4b) Programmverbindung
 
+Haben Sie alle DATA-Werte richtig eingegeben und der Computer hat sich nach einiger Zeit mit »OK« wieder gemeldet, so können Sie jetzt die Zeilen 1000 bis 1280 löschen. Dann geben Sie die folgende Zeile ein: 1280 FOR I = 49152 TO 50539:READ X : POKE I, X:NEXT:NEW
+und speichern das Programm ab.
 
+Wenn Sie das Programm in Zukunft benutzen, dann wird nach dem Einlesen des Maschinenprogramms in den Speicherbereich 49152 bis 50539 das DATA-Programm gelöscht, und Sie haben den ganzen Basic-Speicher für Ihr eigenes Programm zur Verfügung.
 
+Sind Sie Besitzer eines Diskettenlaufwerkes, dann können Sie in der Zeile 1280 statt »NEW« den Befehl LOAD ”...”,8 schreiben, und das DATA-Programm lädt nach dem Einlesen der DATA-Zeilen Ihr eigenes Programm gleich nach.
 
+Zwischen ”...” muß der Name Ihres Programms stehen. Wenn Sie diese Variante wählen, dann muß aber die erste Zeile Ihres eigenen Programms wie folgt aussehen:
+10 POKE 45, PEEK (174): POKE 46, PEEK (175): CLR
+Durch diese Lösung wird das DATA-Programm auch gelöscht und Ihr Programm wird gleich nachgeladen und startet sich selbst.
 
+(Jacques Effenberg/gk)
 
+# 64'er Disk-Ecke
 
+> Wie die Überschrift schon andeutet, hat sich eine Änderung vollzogen. Das »Ka« für Kassette ist weggefallen. Dafür hat sich »Di« zu Disk gemausert. Es ist uns also endlich gelungen, die Programme auch auf Diskette anzubieten. Wir mußten allerdings eine Entscheidung fällen: Kassette oder Diskette, beides ging nicht. Die Diskette ist aufgrund ihrer Verbreitung ausgewählt worden. Dafür sind jetzt alle Programme einer Ausgabe (VC 20 und C 64) auf einer Diskette erhältlich.
 
+Eines hat sich aber nicht geändert: der Preis. Die Diskette für eine Ausgabe kostet demnach 29,90 Mark. Sie werden bei einigen Disketten bestimmte Programme vermissen. Deren Autoren konnten sich nicht entschließen, ihr Programm im Rahmen des Leserservice für eine Verbreitung auf Datenträger freizugeben. Bei den Ausgaben 4, 5 und 6 können noch Kassetten (VC ...) bestellt werden. Auf kurze Programme wurde aus Gründen der Übersichtlichkeit verzichtet. Nun noch einige technische Details. Zu den Programmen sind immer die Seitenzahlen angegeben, unter der Sie die Beschreibungen in der entsprechenden Ausgabe finden können. Der Diskette liegen also, keinerlei Informationen bei. Lesen Sie daher aufmerksam die Anleitung (ob SYS-Befehle nötig sind, in welcher Reihenfolge geladen werden muß, eventuelle Sprach- oder Speichererweiterungen und ähnliches mehr) in dem jeweiligen Artikel nach. Aus Aktualitätsgründen wird jeweils die abgedruckte Version angeboten. Eventuelle systematische Fehler, die sich noch im Programm befinden können, müssen von Ihnen selbst, nach Studium des Druckfehlerteufelchens, korrigiert werden.
+
+## Ausgabe 10/84
+
+Bestellnummer CB 019
+
+### Commodore 64
+
+Finanzmathematik (AdM)
+Hypra-Load (LdM)
+Hardcopy
+Compact 2
+Hardcopy MPS 801
+Hardcopy VC 1526 neu
+Hardcopy Gemini-10X
+Hardcopy FX-80
+Hardcopy VC 1520 farbig
+Apocalypse now
+Supercopy
+Disk-Dump
+Diskettenorganisation
+User-Port-Tastatur
+UP-Maske
+
+### VC20
+
+Epedemic
+Video-Vorspann
+
+## Ausgabe 9/84
+
+Bestellnummer CB 014
+
+### Commodore 64
+
+Indexsequentielle Adreßdatei, S. 54 — Spring Vogel (LdM), S. 68 — Orgel/Synthesizer (AdM), S. 70 — Sprite Aid +, S. 89 — Screen Change, S. 94 — List-Stop, S. 97 — Renew, Datawandler, S. 102 — Synthetische suchen, S. 104 — Geregelter Zahlungsverkehr, S. 164
+
+### VC20
+
+Schiebung (GV>), S. 77 — Deuzei (8K >), S. 79 — Hardcopy 1520 (GV>), S. 87 - RS232-Interface (GV>), S. 100 — Datawandler (GV>), S. 102
+
+## Ausgabe 8/84
+
+Bestellummer CB 013
+
+### Commodore 64
+
+Castle of Doom, S. 66 — Pac-Boy, S. 89 — Kopplung, S. 73 — User-Port-Display, S. 97 — RS232-Test, S. 77 - View BAM, S. 99 - Görlitz Hardcopy, S. 83 — Milchvieh, S. 156
+
+### VC20
+
+Kudiplo (3K), S. 86 — Print at Restore n (GV), S. 101
+
+## Ausgabe 7/84
+
+Bestellnummer CB 017
+
+### Commodore 64
+
+Terminalprogramm, S. 24 — Softwarekatalog, S. 72 — Russvok (SB), S. 76 - Crown No. 1, S. 80 -Space Invaders, S. 81 — 1520 Hardcopy, S. 108 — Centronics Interface, S. 110 — Kurvendiskussion, S. 116 — Copy Rel. Files, S. 132 — Autostart, S. 138 — Strubs (OP u. QP), S. 154
+
+### VC20
+
+Rätsel, S. 122
+
+## Ausgabe 6/84
+
+### Commodore 64
+
+Bestellnummer CB 018
+
+Lehrerkalender, S. 64 — Morsetrainer, S. 72 — Supervoc, S. 69 — Grafische Darst. (SB), S. 82 — Hot Wheels, S. 92
+
+### VC 20
+
+Bestellnummer VC 008
+
+Movemaster (8K), S. 78 — Ghost Manor (GV), S.104 — Logic Disass. (3K>), S. 108 — Underground (LdM 16K), S. 120
+
+## Ausgabe 5/84
+
+### Commodore 64
+
+Bestellnummer CB 016
+
+Adreß- & Telefonregister, S. 64 — Fahrsimulator, S. 82 — Schatzsucher (LdM), S. 90
+
+### VC 20
+
+Bestellnummer VC 007
+
+Relative Datei (8K), S. 69 — Schmatzer (GV) S. 76 — 3D-Grafik (8K), S. 78 - Rallye (28K), S. 128
+
+## Ausgabe 4/84
+
+### Commodore 64
+
+Bestellnummer CB 015
+
+Drawline + Demos, S. 65 — Sprite Move, S. 70 — Invaders (SB), S. 74 — Caesar, S. 78 — Disk-Copy, S. 92 - Merge, S. 94
+
+### VC 20
+
+Bestellnummer VC 006
+
+Elektr. Notiz. (16K), S. 50 — Rennfahrer (GV), S. 86 - Erste Hilfe (GV >), S. 88 - Disk-Copy (3K >), S. 92
+
+Bedeutung der Abkürzungen
+*LdM = Listing des Monats
+*AdM = Anwendung des Monats
+*SB = Simons Basic
+*GV = Grundversion
+*GV> = alle Speicherversionen können verwendet werden (einschließlich GV)
+*3K = 3-KByte-Speichererweiterung wird benötigt
+*8K> = Speichererweiterunggrößer als 8 KByte wird benötigt.
+
+# Vorschau
+
+In der nächsten Ausgabe vom 19. Oktober lesen Sie:
+
+## Listing des Monats
+
+Das Bestechende an dieser Grafik-Spracherweiterung ist nicht nur die einfache Anwen-dung durch neue Befehle, sondern auch die hohe Geschwindigkeit, mit der gezeichnet wird. Die neuen Grafik-Befehle lassen sich problemlos in Basic-Programme einbauen. Auch das Zeichnen mit Joystick oder Light-Pen wird unterstützt.
+
+## Drucker-Test
+
+Wiederum stellen wir Ihnen einige Drucker vor, die sowohl für den C 64-Besitzer als auch für den VC 20-Besitzer interessant sein dürften. Die Marktübersicht (Teil 2) bietet weitere wichtige Hilfen für die Kaufentscheidung.
+
+## Einführung in Comal
+
+Eine neue Programmiersprache für den C 64 ist auf ihrem Siegeszug. Comal vereint die Vorzüge von Basic, Pascal und Logo und erfreut sich dadurch wachsender Beliebtheit. Wir zeigen, wie man mit Comal programmiert.
+
+## Anwendung des Monats
+
+Schachspieler wollen oft bereits gespielte Partien von bedeutenden Turnieren nachvollziehen. Das Programm Schachmeister bietet Ihnen eine optisch ansprechende Lösung.
+
+## Test Monitore
+
+Was bringt ein Farbmonitor gegenüber einem Fernseher mit Video-Eingang? Ist wirklich jeder Monitor gleichermaßen für die Textverarbeitung geeignet? Wir haben eine Reihe von Geräten für Sie getestet und ihre Stärken und Schwächen festgestellt. In einer Marktübersicht informieren wir über Monitore für den VC 20 und C 64.
+
+## Das Super-Laufwerk
+
+Nun gibt es das MSD Super Disk Drive für den C 64 endlich auch in Deutschland. Diese Floppy stellt eigentlich den Traum für jeden C 64-Besitzer dar. Doppellaufwerk, serieller und paralleler Anschluß, qualitativ hochwertige Mechanik und schnellere Übertragung (mit dem IEC-Bus) der Daten. Wir haben die Floppy unter den Aspekten der Kompatibilität, der Laufzeiten und der Zuverlässigkeit getestet.
+
+## Software-Tests
+
+VizaStar wird als ideale Ergänzung zu dem Textverarbeitungsprogramm VizaWrite angeboten. Was läßt sich mit diesem Tabellen- und Datenverwaltungsprogramm in Verbindung mit dem Textprogramm alles anfangen? Wie steht es im Vergleich mit den Einzellösungen da? Hat die Konzeption eines integrierten Software-Pakets auf dem C 64 eine Zukunft? Ist es besser als die im Plus/4 eingebaute Software? Wir geben eine Antwort auf all diese Fragen.
+
+## Der beste Einzeiler
+
+Die Wettbewerbe bringen eine ganze Reihe guter Ideen ans Licht. Wir veröffentlichen die bisher besten Einzeiler. Lassen Sie sich überraschen, was man alles in einer Zeile realisieren kann. Die Unterprogramm-Bibliothek wird ergänzt durch eine sehr komfortable Sortierroutine in Maschinensprache. Außerdem stellen wir den Programmierern eine weitere, sehr anspruchsvolle Aufgabe.
+
+## Listings
+
+— Eine Grafik-Befehlserweiterung — Komfortabler Synthesizer
+— SMON — ein komplettes Assemblerpaket mit Monitor fTeil 1)
+— Vier gewinnt in drei Dimensionen — Verbesserung von Simons Basic — Einfaches Laden von Programmen
+— Betriebssystemerweiterung — Pseudo-Sprites und Sprites ohne Esoterik
+— 3D-Körper aus allen Richtungen betrachten
+— und wieder viele Tips und Tricks für den VC 20 und C 64
 
