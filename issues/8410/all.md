@@ -1047,7 +1047,7 @@ Die Systembefehle sind die leistungsfähigsten Anweisungen von »Vizawrite 64«.
 
 Der Anwender hat nun die Auswahl zwischen 16 verschiedenen Funktionen:
 
-1.	CBM + c: Text kopieren. Mit Hilfe der Cursortasten wird der Text, der kopiert werden soll, markiert. Dies geschieht durch einfaches Darüberfahren mit dem Cursor. Die markierten Textteile erscheinen farblich abgehoben. Durch Abwärtsbewegen des Cursors werden ganze Zeilen, durch Drücken der fl-Taste ganze Seiten und mit der f3-Taste eine Bildschirmseite markiert. Nach dem Markieren wird nur noch der Bestimmungsort des Textteils festgelegt und mit Return quittiert. Der Text befindet sich dann an der neuen und der alten Stelle im Dokument.
+1.	CBM + c: Text kopieren. Mit Hilfe der Cursortasten wird der Text, der kopiert werden soll, markiert. Dies geschieht durch einfaches Darüberfahren mit dem Cursor. Die markierten Textteile erscheinen farblich abgehoben. Durch Abwärtsbewegen des Cursors werden ganze Zeilen, durch Drücken der f1-Taste ganze Seiten und mit der f3-Taste eine Bildschirmseite markiert. Nach dem Markieren wird nur noch der Bestimmungsort des Textteils festgelegt und mit Return quittiert. Der Text befindet sich dann an der neuen und der alten Stelle im Dokument.
 2.	CBM + m: Text verschieben. Hat die gleiche Funktion wie Text kopieren, mit dem Unterschied, daß der markierte Bereich an seiner ursprünglichen Position gelöscht wird.
 3.	CBM + f. Finden eines bestimmten Ausdrucks. Die Länge des Ausdrucks ist dabei auf 25 Zeichen beschränkt.
 4.	CBM + F: Finden eines Ausdrucks, ohne dabei auf Groß/Kleinschreibung zu achten.
