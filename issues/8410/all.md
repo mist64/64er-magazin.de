@@ -207,7 +207,7 @@ Ich besitze die elektronische Schreibmaschine SILVER-REED EX 44 und das dazugeh�
 
 ## Was steckt in der Demodiskette?
 
-Als ich mir vor ein paar Monaten zu meinem Commodore 64 das Diskettenlaufwerk kaufte, lagen da zwei Disketten dabei. Die eine Diskette nennt sich »TEST/DEMO«, wo auch das DOS 5.1 drauf ist. Die andere Diskette, die sich »DEMODISKETTE« nennt, sind zahlreiche Demonstrationen drauf wie: Musikdemos, Grafikdemos, ein paar Anwendungen, Spiele und zu guter Letzt auch Werbung für den C 64. Auf dieserDiskette ist auch das Programm, wo ich Sie nun um eine Auskunft bitte. Das Programm besteht eigentlich aus zwei Programmen. Das erste Programm (der Lader), das sich »3000.EMU.BOOT« nennt, lädt, nach dem man es gestartet hat, das eigentliche Programm, das sich »EMULATOR« nennt. Das Programm »EMULATOR« wird vom Lader aus mit SYS 12*4096 gestartet. Man erhält dann folgenden Bildschirmaufbau:
+Als ich mir vor ein paar Monaten zu meinem Commodore 64 das Diskettenlaufwerk kaufte, lagen da zwei Disketten dabei. Die eine Diskette nennt sich »TEST/DEMO«, wo auch das DOS 5.1 drauf ist. Die andere Diskette, die sich »DEMODISKETTE« nennt, sind zahlreiche Demonstrationen drauf wie: Musikdemos, Grafikdemos, ein paar Anwendungen, Spiele und zu guter Letzt auch Werbung für den C 64. Auf dieser Diskette ist auch das Programm, wo ich Sie nun um eine Auskunft bitte. Das Programm besteht eigentlich aus zwei Programmen. Das erste Programm (der Lader), das sich »3000.EMU.BOOT« nennt, lädt, nach dem man es gestartet hat, das eigentliche Programm, das sich »EMULATOR« nennt. Das Programm »EMULATOR« wird vom Lader aus mit SYS 12*4096 gestartet. Man erhält dann folgenden Bildschirmaufbau:
 PET EMULATOR V0.5/081382
 WITH
 DOSMANAGER V5.1/071382
@@ -611,7 +611,7 @@ Gruberzeile 95
 
 Dirk Rother irrt sich, wenn er behauptet, Autostartprogramme könnte man nicht mehr stoppen und überarbeiten. Ein Autostartprogramm kann wie folgt geknackt werden:
 
-Kassette in normalen Recorder einlegen und Autostartprogramm anhören, Kassette in Datasette einlegen, Counter auf Null stellen, Kassette auf Anfang des Autostartprogrammes zurückspulen, Autostartprogramm einladen, wenn Counter aufNull steht dann Stopp-Taste an Datasette drücken, andere Kassette mit dem vorher abgeSAVEten Kurzprogramm: 10PRINT'': END einlegen und Play-Taste drücken. Nach ein paar Sekunden erscheint auf dem Bildschirm READY. Das Autostartprogramm läßt sich listen, das nachfolgende Programm einladen, überarbeiten und kopieren. Das Autostartprogramm kann auch wieder abgespeichert werden.
+Kassette in normalen Recorder einlegen und Autostartprogramm anhören, Kassette in Datasette einlegen, Counter auf Null stellen, Kassette auf Anfang des Autostartprogrammes zurückspulen, Autostartprogramm einladen, wenn Counter auf Null steht dann Stopp-Taste an Datasette drücken, andere Kassette mit dem vorher abgeSAVEten Kurzprogramm: 10PRINT'': END einlegen und Play-Taste drücken. Nach ein paar Sekunden erscheint auf dem Bildschirm READY. Das Autostartprogramm läßt sich listen, das nachfolgende Programm einladen, überarbeiten und kopieren. Das Autostartprogramm kann auch wieder abgespeichert werden.
 
 Ich glaube mit an Sicherheit grenzender Wahrscheinlichkeit, daß Ihr es Euch nicht traut, den Leserbrief abzudrucken. Aber warum denn nicht? Ihr bringt so viele Listings wie man das und jenes kopieren kann und ein paar Seiten weiter:
 
@@ -1627,7 +1627,7 @@ RMI ist ein Unternehmen, das Software für den IBM-PC herstellt. Das CBBS läuft
 
 ## Der Zugang zu ausländischen Netzwerken
 
-Da verschiedene Länder Datenvermittlungsnetze aufPaketbasis anbieten, liegt der Zugang von einem Netz zum anderen nahe. Dies geschieht durch sogenannte Auslandsvermittlungsstellen, die die eventuell verschiedenen Protokollformate untereinander anpassen (siehe Bild 3). Ferner übernehmen sie dieselben Aufgaben, wie die Vermittlungscomputer des Datex-P-Netzes. In der Praxis sieht das so aus: Jedes Netz hat eine eigene »Vorwahl«, die, wie beim Telefon, vor der eigentlichen Teilnehmer-Nummer eingegeben wird. Datex-P verlangt vor jeder Auslandsnummer die Ziffer 0 (Null) als Kennzeichen für einen Verbindungswunsch mit dem Ausland. In Tabelle 3 sehen Sie eine nicht vollständige Aufstellung erreichbarer Netze mit ihren »Vorwahlen« (sogenannte Netzkennzahlen). Das »in ausländische Netze eindringen« ist also meistens nichts anderes, als das Wählen einer vorher bekannten NUA im Ausland. Mit folgender Ausnahme: Es gibt Computer, die einen Anrufer weitervermitteln und einen recht komfortablen Dialog bieten. Generell gilt: Für Verbindungen mit dem Ausland braucht man eine NUI. Auslandsnummern findet man in größeren Mailboxen, wie in Decates oder im RMI-Net (über Datex-P). Soweit man die Datenbanken nicht bezahlen will oder kann, muß man Hacken, das heißt die verlangten Passwörter herausfinden. Wertvolle Kontaktadresse hierzu: Der Chaos Computer Club, ein Club von Computerfreaks, die es sich zur Philosophie gemacht haben, möglichst auf alles kostenlosen Zugriff zu haben. Erreichbar sind sie unter der RMI-Net-Mailbox mit dem Empfängernamen CHAOS TEAM, oder über normalen Postweg an folgende Adresse: Chaos Computer Club c/o Schwarzmarkt Bundesstr. 9 D 2000 Hamburg 13. Es lohnt sich, das Informationsblatt »Die Datenschleuder«, die unregelmäßig erscheint, im Abonnement kommen zu lassen. Das kostet etwa 30 Mark für ein Jahr. Mittlerweile sind bereits drei Ausgaben erschienen.
+Da verschiedene Länder Datenvermittlungsnetze auf Paketbasis anbieten, liegt der Zugang von einem Netz zum anderen nahe. Dies geschieht durch sogenannte Auslandsvermittlungsstellen, die die eventuell verschiedenen Protokollformate untereinander anpassen (siehe Bild 3). Ferner übernehmen sie dieselben Aufgaben, wie die Vermittlungscomputer des Datex-P-Netzes. In der Praxis sieht das so aus: Jedes Netz hat eine eigene »Vorwahl«, die, wie beim Telefon, vor der eigentlichen Teilnehmer-Nummer eingegeben wird. Datex-P verlangt vor jeder Auslandsnummer die Ziffer 0 (Null) als Kennzeichen für einen Verbindungswunsch mit dem Ausland. In Tabelle 3 sehen Sie eine nicht vollständige Aufstellung erreichbarer Netze mit ihren »Vorwahlen« (sogenannte Netzkennzahlen). Das »in ausländische Netze eindringen« ist also meistens nichts anderes, als das Wählen einer vorher bekannten NUA im Ausland. Mit folgender Ausnahme: Es gibt Computer, die einen Anrufer weitervermitteln und einen recht komfortablen Dialog bieten. Generell gilt: Für Verbindungen mit dem Ausland braucht man eine NUI. Auslandsnummern findet man in größeren Mailboxen, wie in Decates oder im RMI-Net (über Datex-P). Soweit man die Datenbanken nicht bezahlen will oder kann, muß man Hacken, das heißt die verlangten Passwörter herausfinden. Wertvolle Kontaktadresse hierzu: Der Chaos Computer Club, ein Club von Computerfreaks, die es sich zur Philosophie gemacht haben, möglichst auf alles kostenlosen Zugriff zu haben. Erreichbar sind sie unter der RMI-Net-Mailbox mit dem Empfängernamen CHAOS TEAM, oder über normalen Postweg an folgende Adresse: Chaos Computer Club c/o Schwarzmarkt Bundesstr. 9 D 2000 Hamburg 13. Es lohnt sich, das Informationsblatt »Die Datenschleuder«, die unregelmäßig erscheint, im Abonnement kommen zu lassen. Das kostet etwa 30 Mark für ein Jahr. Mittlerweile sind bereits drei Ausgaben erschienen.
 
 Zum EURONET: Vor einigen Jahren haben die Mitgliedstaaten der EG beschlossen, ein gemeinsames Netz von Paketvermittlungsdiensten aufzubauen. Ein einziger Großrechner übernimmt für alle Länder der EG die Vermittlungsaufgaben. Diesen Computer soll es in einem Jahr nicht mehr geben; das heißt die Vermittlung der Datenpakete wird, wie jetzt schon teilweise realisiert, über »normale« Auslandsvermittlungsstellen durchgeführt.
 
@@ -1719,7 +1719,7 @@ Ich besuche zur Zeit ebenfalls das Gymnasium Vaterstetten, wo Boris und ich näc
 
 Mit 14 Jahren kam ich das erste Mal mit Computern in Kontakt, wobei ich prompt vom »Fieber« angesteckt wurde, so daß meine Eltern ernstlich um meine Zurechnungsfähigkeit besorgt sein mußten.
 
-Meine Krankheit klang zum Glück schon nach einem Jahr ab, doch das Hobby blieb, und so besitze ich seit einem halbenJahr einen C 64, nachdem ich zuvor in der Schule auf CBM-Computern gearbeitet hatte.
+Meine Krankheit klang zum Glück schon nach einem Jahr ab, doch das Hobby blieb, und so besitze ich seit einem halben Jahr einen C 64, nachdem ich zuvor in der Schule auf CBM-Computern gearbeitet hatte.
 
 Wir (Boris und ich) teilen uns die Leidenschaft, in Maschinensprache zu programmieren und dem Computer die letzten Geheimnisse zu entlocken!
 
@@ -1735,9 +1735,9 @@ Auch Hardware-Hersteller haben diesen Mangel erkannt und bieten neuerdings immer
 
 Halt! Jetzt aber Schluß mit dem dauernden Herziehen über die VC 1541, die nämlich eigentlich gar keine Schuld an den langen Wartezeiten hat; vielmehr kann sie es, was die Geschwindigkeit betrifft, ohne weiteres mit den großen CBM-Floppys aufnehmen, oder anders formuliert, die VC 1541 ist genauso schnell wie zum Beispiel die CBM 2031.
 
-Aber wo liegt denn dann nun der Haken? Das Stichwort lautet: Der serielle Bus, also die Schnittstelle zwischen Floppy und Computer. Diese Verbindung erfordert zwar weniger Materialaufwand als der üblicherweise bei Commodore benutzte IEEE-488-Bus, (der 8-Bit-parallel arbeitet). Der serielle Bus hat aber den Nachteil, daß die Geschwindigkeit bei der Übertragung im Normalbetrieb zirka 5 bis 6mal langsamer ist als beim lEC-Bus, was sich dann auch auf die Ladezeit auswirkt.
+Aber wo liegt denn dann nun der Haken? Das Stichwort lautet: Der serielle Bus, also die Schnittstelle zwischen Floppy und Computer. Diese Verbindung erfordert zwar weniger Materialaufwand als der üblicherweise bei Commodore benutzte IEEE-488-Bus, (der 8-Bit-parallel arbeitet). Der serielle Bus hat aber den Nachteil, daß die Geschwindigkeit bei der Übertragung im Normalbetrieb zirka 5 bis 6mal langsamer ist als beim IEC-Bus, was sich dann auch auf die Ladezeit auswirkt.
 
-Die Hardwarelösung habe ich ja schon erwähnt: Sie erfordert außer einer neuen Floppy, auch noch das lEEE-Bus-Modul, da der C 64 in der Grundversion keine derartige Schnittstelle zu bieten hat. Mitunter ist also diese Lösung sehr teuer und übersteigt die Kaufkraft vieler C 64-Anwender.
+Die Hardwarelösung habe ich ja schon erwähnt: Sie erfordert außer einer neuen Floppy, auch noch das IEEE-Bus-Modul, da der C 64 in der Grundversion keine derartige Schnittstelle zu bieten hat. Mitunter ist also diese Lösung sehr teuer und übersteigt die Kaufkraft vieler C 64-Anwender.
 
 Aber zum Glück gibt es noch eine Softwaremöglichkeit, hier effektiv einzugreifen. Das Prinzip ist denkbar einfach. Es beruht auf der Möglichkeit, in die Floppy Maschinenprogramme einzuspeichern und diese dann dort auszuführen.
 
@@ -1976,7 +1976,7 @@ Zum Katalog der Sonderzeichen: Hier steht an erster Stelle der Wagenrücklauf, d
 
 Das folgende Sonderzeichen ermöglicht es, bei Bedarf auch nur den Wagenrücklauf zu senden. Der neue Code hierfür ist 11 (Befehl PRINT CHR$(11) oder in Strings PRINT »<Control>K«. Die dritte Umsetzung ist erforderlich, damit die Compact 2 auch ein geshiftetes Space als solches serviert bekommt.
 
-Danach folgen 8 Steuerzeichen der Schreibmaschine, die mit PRINT CHR$(1, 2, 3, 21, 22, 23, 25 oder 26) oder in einen String auch mit PRINT >><Control>A, B, C, U, V, W, Y oderZ« gesendet werden können. Dies ist auch mit PRINT CHR$(12) beziehungsweise PRINT »<Control>L« möglich, was einen Seitenvorschub bewirkt. Die Control-Methode führt jedoch bei A,B,C und L zu Problemen, da sie nicht gelistet, sondern auch im Listmodus ausgeführt werden.
+Danach folgen 8 Steuerzeichen der Schreibmaschine, die mit PRINT CHR$(1, 2, 3, 21, 22, 23, 25 oder 26) oder in einen String auch mit PRINT >><Control>A, B, C, U, V, W, Y oder Z« gesendet werden können. Dies ist auch mit PRINT CHR$(12) beziehungsweise PRINT »<Control>L« möglich, was einen Seitenvorschub bewirkt. Die Control-Methode führt jedoch bei A,B,C und L zu Problemen, da sie nicht gelistet, sondern auch im Listmodus ausgeführt werden.
 
 Im Katalog folgen nun die Umlaute und Sonderzeichen der Schreibmaschine, die den folgenden Tasten des C 64 zugeordnet wurden:
 Comm + : ä
@@ -1995,7 +1995,7 @@ eckige Klammer zu : <sup>3</sup>
 
 Der Akzent »´« wird über das nachfolgende Zeichen gedruckt, UNT+RT unterstreicht das nachfolgende Zeichen. Auf den Einbau von Promille und My wurde verzichtet. Wem diese Zeichen lieb und wert sind, der möge eine der Zeilen 298 bis 303 ändern, indem er die ersten drei DATA durch 60,0,0 für My und durch 14,46,15 für Promille ändert. (Die vierte DATA-Zahl ist, wie erwähnt, der Code des C 64-Zeichens, das ersetzt wird). In TEXT 64, das das Pfundzeichen als Steuerzeichen benutzt könnte man sich das »ß« erhalten, indem man die 64 und die 92 in den Zeilen 288 und 294 vertauscht und so das »ß« auf die Alphakringel-Taste legt. Ich selbst habe stattdessen die Zeilen 3160, 7110, 540, 1200, 7200, 8220 und 7140 von TEXT 64 geändert.
 
-Bei den nun anstehenden Listcodes herrscht folgende Systematik: Die Kleinbuchstabencodes gehören zu den direkt . ansprechbaren Funktionen CLR, HOME und den Cursortasten. »g« bedeutet CHR$(142), Umschalten auf Großschrift, was nur mitTricks eingegeben werden kann, aber in manchen Listings auftaucht.
+Bei den nun anstehenden Listcodes herrscht folgende Systematik: Die Kleinbuchstabencodes gehören zu den direkt . ansprechbaren Funktionen CLR, HOME und den Cursortasten. »g« bedeutet CHR$(142), Umschalten auf Großschrift, was nur mit Tricks eingegeben werden kann, aber in manchen Listings auftaucht.
 
 Die Zeichen ”!,”, #, $, %, &, ’ und (” stehen für die acht Farben, die zusammen mit der Commodore-Taste eingegeben werden.
 
@@ -2024,7 +2024,7 @@ Für jede Veränderung müssen nur eine beziehungsweise mehrere Variablen geänd
 Möchte man ein Programm mit einem einfachen Listschutz versehen, so verfährt man folgendermaßen:
 1.	Man ergänzt die Zeile, ab der der Listschutz wirksam werde nsoll, mit »:REM””«.
 2.	Man fährt mit dem Cursor auf das zweite Anführungszeichen und drückt fünfmal die Taste INST
-3.	Nun wird ebenfalls fünfmal dieTaste DEL gedrückt, so daß zwischen den Anführungszeichen fünf reverse T stehen.
+3.	Nun wird ebenfalls fünfmal die Taste DEL gedrückt, so daß zwischen den Anführungszeichen fünf reverse T stehen.
 4.	Zuletzt bewegt man den Cursor hinter das zweite Anführungszeichen und drückt die Tastenkombination SHIFT und L Anschließend RETURN nicht vergessen.
 
 Wenn nun versucht wird, das Programm zu listen, gelangt der Computer nur bis zu der Zeile, in der der Listschutz steht und bricht dann den Vorgang mit »Syntax Error« ab.
@@ -2176,7 +2176,7 @@ Die Bedienung des Programms erklärt sich durch die Menü-Steuerung von selbst.
 
 Das Programm (Listing 1) ist für den VC 20 geschrieben, mit kleinen Änderungen jedoch auch auf dem C 64 lauffähig. Die für den C 64 notwendigen Änderungen beschränken sich im Wesentlichen auf die Anpassung des Bildschirmlayouts. Die im Listing vorkommenden Adressen 828 und 36879sind für den C 64 durch 49152 und 53280/81 zu ersetzen.
 
-Nach dem Starten erscheint sofort das Menü (Bild 1)auf dem Bildschirm. Durch Drücken derTasten »+« oder»—« kann nun die Gerätenummer, unter der das Floppy-Laufwerk angesprochen wird, geändert werden. Diese Funktion ist sinnvoll, wenn mit zwei oder mehr Disketten-Stationen gearbeitet wird.
+Nach dem Starten erscheint sofort das Menü (Bild 1)auf dem Bildschirm. Durch Drücken der Tasten »+« oder »—« kann nun die Gerätenummer, unter der das Floppy-Laufwerk angesprochen wird, geändert werden. Diese Funktion ist sinnvoll, wenn mit zwei oder mehr Disketten-Stationen gearbeitet wird.
 
 Über das Menü sind unter anderem alle Diskettenbefehle ausführbar, die sonst umständlich über den Kommandokanal gesendet werden müssen. Diese Befehle sind im Handbuch zur 1541-Floppy ausführlich erklärt, so daß an dieser Stelle nicht näher darauf eingegangen werden muß. Einige der Floppy-Kommandos stehen in erweiterter Form zurVerfügung. So kann zum Beispiel die Directory-Ausgabe wahlweise auf den Bildschirm oder über den Drucker erfolgen. Im letzteren Fall wird das Directory alphabetisch sortiert (Bild 2). Wird dies nicht gewünscht, dann muß in Zeile 1370 das »GOTO 1490« durch »RETURN« ersetzt werden.
 
@@ -2232,7 +2232,7 @@ Entscheiden Sie sich für»Kopieren«, werden Sie aufgefordert, die Quelldiskett
 *** Space ***
 für weiter
 
-Sie können nun in aller Ruhe eine Zieldiskette aussuchen, eventuell noch formatieren etc. Sie kommen in jedem Fall in dieses Menü zurück. Sind alle Vorbereitungen abgeschlossen, drücken Sie »Space«, um mit dem Kopieren fortzufahren. Das Programm fordert nun auf, die Quelldiskette einzulegen, und liest die vorher markierten Programme ein. Sollte dabei ein Fehler auftreten, weil Sie zum Beispiel aus Versehen die falsche Diskette eingelegt haben, wird eine entsprechende Meldung ausgegeben und gefragt, ob dieses File übersprungen oder ein neuerVersuch unternommen werden soll. Auch Lesefehler des Laufwerks werden in dieser Weise gehandhabt. In einem Durchgang können maximal 234 Blöcke eingelesen werden. Ist noch mehr zu kopieren wird das Einlesen abgebrochen.
+Sie können nun in aller Ruhe eine Zieldiskette aussuchen, eventuell noch formatieren etc. Sie kommen in jedem Fall in dieses Menü zurück. Sind alle Vorbereitungen abgeschlossen, drücken Sie »Space«, um mit dem Kopieren fortzufahren. Das Programm fordert nun auf, die Quelldiskette einzulegen, und liest die vorher markierten Programme ein. Sollte dabei ein Fehler auftreten, weil Sie zum Beispiel aus Versehen die falsche Diskette eingelegt haben, wird eine entsprechende Meldung ausgegeben und gefragt, ob dieses File übersprungen oder ein neuer Versuch unternommen werden soll. Auch Lesefehler des Laufwerks werden in dieser Weise gehandhabt. In einem Durchgang können maximal 234 Blöcke eingelesen werden. Ist noch mehr zu kopieren wird das Einlesen abgebrochen.
 
 Jetzt müssen Sie angeben, ob Sie fortlaufend oder einzeln kopieren möchten. Fortlaufend bedeutet, daß die Files der Reihe nach auf dieselbe Diskette geschrieben werden. Beim Einzelkopieren dagegen springt das Programm nach jedem Schreibvorgang wieder in ein Menü, und Sie haben die Möglichkeit, die Diskette zu wechseln, ein Directory anzusehen, zu formatieren oder zu validieren. Außerdem können Sie auch das zuletzt kopierte Programm noch einmal auf eine andere Diskette kopieren. Das jeweils nächste File wird vor dem Schreiben angezeigt, damit Sie die richtige Zieldiskette einlegen können.
 
@@ -2254,7 +2254,7 @@ Bevor Sie sich ans Eintippen des Ladeprogramms machen, müssen Sie unbedingt fol
 
 POKE 43,1: POKE 44,32: POKE 8192,0: NEW (RETURN)
 
-Damit wird der Start des Basic-Speichers nach oben verlegt. Tun Sie das nicht, steht Ihr Basic-Ladeprogramm dort, wo nachher das fertige Kopierprogramm hin’ gePOKEf wird.
+Damit wird der Start des Basic-Speichers nach oben verlegt. Tun Sie das nicht, steht Ihr Basic-Ladeprogramm dort, wo nachher das fertige Kopierprogramm hingePOKEf wird.
 
 Ich weiß, daß es eine Zumutung ist, eine derartige Menge von Zahlen abzutippen, und kein Mensch wird dies auf Anhieb fehlerfrei bewerkstelligen können. Um Ihnen aber die Fehlersuche so leicht wie möglich zu machen, habe ich den ’DATA-Zeilenberg’ in 11 Blöcke eingeteilt. Zujedem dieser Blöcke gehört eine Prüfsumme. Stimmt etwas nicht, gibt das Ladeprogramm an, in welchem Block der Fehler steckt. Achten Sie aber vor allem darauf, daß Sie am Zeilenende kein Komma mehr schreiben, denn das interpretiert der Computer als Null!
 
@@ -2440,7 +2440,7 @@ Das bedeutet: Lade den Akkumulator. Alle Assembler-Befehlsworte bestehen aus dre
 
 Hier tritt also die Speicherplatznummer mit einem nachfolgenden Befehl anstelle der vom Basic gewohnten Zeilennummer.
 
-Hier fehlt noch etwas Entscheidendes: Was soll den in den Akku geladen werden? Genauso wie es in Basic Befehle gibt, die für sich alleine stehen können wie CLR oder LIST, gibt es auch im Assembler solche Befehle. Weitaus häufiger aber sind hier Befehle, die ein Argument erfordern (in Basic zum Beispiel PEEK(100)). Dabei ist 100 das Argument). In Assembler gibt es zwei Sorten von Argumenten. Solche, die in einemSpeicherplatz unterzubringen sind und andere, die zwei Bytes brauchen. Mit dem Befehlswort Quer also LDA) zusammen gezählt, existieren in Assembler also l-Byte-Befehle, 2-Byte-Befehle und 3-Byte-Befehle.
+Hier fehlt noch etwas Entscheidendes: Was soll den in den Akku geladen werden? Genauso wie es in Basic Befehle gibt, die für sich alleine stehen können wie CLR oder LIST, gibt es auch im Assembler solche Befehle. Weitaus häufiger aber sind hier Befehle, die ein Argument erfordern (in Basic zum Beispiel PEEK(100)). Dabei ist 100 das Argument). In Assembler gibt es zwei Sorten von Argumenten. Solche, die in einem Speicherplatz unterzubringen sind und andere, die zwei Bytes brauchen. Mit dem Befehlswort Quer also LDA) zusammen gezählt, existieren in Assembler also l-Byte-Befehle, 2-Byte-Befehle und 3-Byte-Befehle.
 
 Das Argument von LDA ist also das, was in den Akku soll. Laden wir also mal eine 1 in den Akku:
 1500 LDA #$01
@@ -2673,7 +2673,7 @@ Das DOS legt jetzt einen sogenannten Side-Sektor an, der aus bis zu sechs Blöck
 
 Wir haben eine relative Datei mit 250 Datensätzen ä 127 Zeichen. Diese Datei benötigt also 125 Datenblöcke und zwei Side-Sektor-Blöcke. Im Directory-Eintrag finden wir jetzt die schon erwähnten zusätzlichen Bytebelegungen: Byte 19 und 20 jedes Eintrags enthalten jetzt Spur und Sektor des ersten Side-Sektor-Blocks; Byte 21 gibt die Datensatzlänge (Recordlänge) an.
 
-Wir wollen jetzt auf den 248. Datensatz zugreifen; das DOS arbeitet nun folgendermaßen: Ein Datensatz enthält 127 Byte, das heißt, es passen zwei Datensätze in einen Block; dadurch errechnet sich der Block, auf den jetzt zugegriffen wird, aus (248-1)/2 = 123.5. (Minus 1, da immer von 0 an gezählt wird). Da ein Side-Sektor-Block nur 120 Einträge aufnehmen kann, ist der Zeiger auf den Datenblock im Side-Sektor-Block Nummer 2 zu finden. Dieser wird jetzt anhand des Verzeichnisses in Block 1 gelesen und dann aufZeiger Nummer 3 (Bytes 22,23) zugegriffen. Wir kennen also jetzt Spur und Sektor des Blockes, in dem unser Datensatz steht; die Position des ersten Datenbyte berechnet sich jetzt aus dem Nachkommaanteil der obigen Division (0.5*254 = 127). Der Datensatz beginnt also beim 127+2 = 129ten Byte.
+Wir wollen jetzt auf den 248. Datensatz zugreifen; das DOS arbeitet nun folgendermaßen: Ein Datensatz enthält 127 Byte, das heißt, es passen zwei Datensätze in einen Block; dadurch errechnet sich der Block, auf den jetzt zugegriffen wird, aus (248-1)/2 = 123.5. (Minus 1, da immer von 0 an gezählt wird). Da ein Side-Sektor-Block nur 120 Einträge aufnehmen kann, ist der Zeiger auf den Datenblock im Side-Sektor-Block Nummer 2 zu finden. Dieser wird jetzt anhand des Verzeichnisses in Block 1 gelesen und dann auf Zeiger Nummer 3 (Bytes 22,23) zugegriffen. Wir kennen also jetzt Spur und Sektor des Blockes, in dem unser Datensatz steht; die Position des ersten Datenbyte berechnet sich jetzt aus dem Nachkommaanteil der obigen Division (0.5*254 = 127). Der Datensatz beginnt also beim 127+2 = 129ten Byte.
 
 Der Aufbau von relativen Dateien ist also, wie schon erwähnt, ziemlich kompliziert; diese Art der Datenspeicherung hat aber einige Vorteile gegenüber der ’normalen’ mit SEQ-Files.
 
@@ -2894,7 +2894,7 @@ Die Kästchen auf dem Balkon sind über ein vierpoliges abgeschirmtes Kabel mit 
 
 Das Senden funktioniert nach einem einfachen Prinzip: Beim Morsen wird für logisch »1« am Audioausgang des Computers ein Tonsignal abgegeben, das durch die Schaltung (Bild 4) verstärkt und digitalisiert wird. Als Folge davon schließt das Relais und die Lampe im Sendekästchen leuchtet auf.
 
-Beim Empfangen (Bild 5) vergleicht der Operationsverstärker (OP3) die Signale von beiden Spannungsteilern, die durch den lichtempfindlichen Widerstand (LDR) mit dem 100 KOhm-Widerstand und dem Regler 47 KOhm gebildet werden. Dieser Verstärker ist auch für die hohe Empfindlichkeit verantwortlich. Die nachfolgende Schaltung ist für langsame Helligkeitsschwankungen unempfindlich. Lediglich bei Lichteinfall setzt sie ein Flipflop und nimmt es bei Dunkelheit zurück. Dieses Flipflop steuert das Relais für denJoystick-Eingang an. Darüber hinaus bietet es eine doppelte Kontrolle beim Empfang: sowohl auf dem Balkon beim Einstellen der Kästchen über die LED als auch im Zimmer durch den BEEP.
+Beim Empfangen (Bild 5) vergleicht der Operationsverstärker (OP3) die Signale von beiden Spannungsteilern, die durch den lichtempfindlichen Widerstand (LDR) mit dem 100 KOhm-Widerstand und dem Regler 47 KOhm gebildet werden. Dieser Verstärker ist auch für die hohe Empfindlichkeit verantwortlich. Die nachfolgende Schaltung ist für langsame Helligkeitsschwankungen unempfindlich. Lediglich bei Lichteinfall setzt sie ein Flipflop und nimmt es bei Dunkelheit zurück. Dieses Flipflop steuert das Relais für den Joystick-Eingang an. Darüber hinaus bietet es eine doppelte Kontrolle beim Empfang: sowohl auf dem Balkon beim Einstellen der Kästchen über die LED als auch im Zimmer durch den BEEP.
 
 # Unterprogrammebibliothek: Sieger mit Maske
 
@@ -3179,7 +3179,7 @@ Die Wettbewerbe bringen eine ganze Reihe guter Ideen ans Licht. Wir veröffentli
 ## Listings
 
 — Eine Grafik-Befehlserweiterung — Komfortabler Synthesizer
-— SMON — ein komplettes Assemblerpaket mit Monitor fTeil 1)
+— SMON — ein komplettes Assemblerpaket mit Monitor (Teil 1)
 — Vier gewinnt in drei Dimensionen — Verbesserung von Simons Basic — Einfaches Laden von Programmen
 — Betriebssystemerweiterung — Pseudo-Sprites und Sprites ohne Esoterik
 — 3D-Körper aus allen Richtungen betrachten
