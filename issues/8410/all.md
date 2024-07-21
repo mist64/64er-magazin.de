@@ -1898,25 +1898,383 @@ Die Zeilen 410 bis 440 können weggelassen werden, wenn der Grafikspeicher bei 8
 
 (Rainer Kracht/rg)
 
+# Der VC 1526/MPS 802 als Grafikdrucker
 
+Aufgabe des Programms ist es, die Punkte aus dem Bildspeicher (nachfolgend als HRBM — Hires-Bit-Map — bezeichnet) zu lesen und dem Drucker in geeigneter Form zu übergeben. Die gestellte Aufgabe läßt sich in die folgenden Abschnitte unterteilen: Initialisierung; Lesen des HRBM; Umformen der gelesenen Daten; Übergabe der Daten an den Drucker; Ende.
 
+Betrachten wir das Ganze aus der Bit-Sicht. Das HRBM besteht aus 8 000 Bytes. Diese lassen sich als 8 x 8 Bit-Zeichen zusammenfassen. Man erhält dann also 25 Zeilen zu je 40 Spalten aus 8 x 8 Bit-Zeichen = 1000 solche Zeichen. Das Programm liest also ein solches Zeichen aus der HRBM und definiert nach diesem Muster einen neuen Character für den 1526. Im HRBM sind aber die Bytes horizontal orientiert, während sie der Drucker vertikal orientiert erwartet (siehe Skizze 1). Das Umformungsprogramm hat deshalb die Aufgabe, die Bits um die Diagonale zu spiegeln. Damit wären alle Teilprobleme gelöst.
 
+Das Assemblerprogramm bietet noch folgende Vorzüge: — Befehlssyntax: SYS 6 * 4096, T, P
+T = Tabulator (0 <= T <= 40)
+P*4096 = Anfangsadresse des HRBM (0 <= P <= 15) — das HR-Bild kann auf dem Drucker in der Horizontalen verschoben werden (Tab)
+— durch einen speziellen Parameter wird das HRBM gewählt (auch das »versteckte« RAM unter dem Interpreter und dem Betriebssystem)
+— durch RUN/STOP unterbrechbar (Files werden korrekt geschlossen)
+— kein Zeilenvorschub, das heißt zwei nacheinander ausgedruckte Bilder fügen sich nahtlos aneinander
+— das Programm liegt von $6 000 bis $613b in einem günstigen Bereich und kann somit mit vorhandenen Basic-Erweiterungen verwendet werden
+— hohe Geschwindigkeit durch reine Maschinensprache.
 
+Wenn Sie das Hardcopy-Programm in Verbindung mit einer Basic-Erweiterung verwenden, beachten Sie bitte folgende Reihenfolge:
+1.	Basic-Erweiterung laden und starten.
+2.	Basic-Lader des Hardcopy-Programms laden und starten. Das Maschinenprogramm schützt sich selbst vor dem Überschreiben.
 
+Es kann sein, daß Sie vor dem Starten des Programms den Zeilenvorschub des VC 1526/MPS 802 verkleinern müssen:
+OPEN 4,4: OPEN 6, 4, 6: PRINT#6, CHR$(18): PRINT#4: CLOSE 4: CLOSE 6
 
+(Lucas Kalt/rg)
 
+# Der besondere Leckerbissen — die mehrfarbige Hardcopy
 
+> Mit Ihrem Commodore 64 und einem VC 1520-Plotter können Sie farbige Hardcopys produzieren.
 
+Das Programm arbeitet als Basic-Lader mit Maschinencodeteil in Form von DATA-Zeilen. Der Maschinenspracheteil operiert im Bereich ab $ 6000, der meines Wissens bei allen gängigen Basic-Versionen zur Verfügung steht. Das bedeutet, daß das Programm mit ihnen lauffähig ist und Hardcopys ihrer Grafikseiten machen kann, selbst wenn diese, wie bei Simons Basic, unter dem ROM liegen. Man braucht nur die Startadresse der Grafikseite einzugeben, und schon setzt sich der Plotter in Bewegung. Die Kopierdauer liegt bei zirka 12 bis 13 Minuten für eine einfarbige Kopie und bei einer halben bis dreiviertel Stunde für eine mehrfarbige Kopie. Dabei gilt: je geringer die Bildgröße, desto schneller die Kopie. Aber auch eine große Grafik wird dann schnell ausgedruckt, wenn sie wenig unterbrochene Linien enthält. (Klaus Schneider/rg)
 
+# Hardcopy Gemini-10X
 
+Das Programm erlaubt, in der Kombination des von C 64 mit dem Matrix-Drucker Gemini-10X von Star eine Hardcopy der hochauflösenden Grafik zu erstellen.
 
+Es werden die Grafikpunkte in 25 Zeilen zusammengefaßt und nacheinander ausgedruckt.
 
+Der Druckvorgang dauert rund 45 Sekunden.
+Das Programm wird in den Kassettenspeicher eingelesen und von dort mit folgendem Befehl aufgerufen:
+xxx OPENX,4,5
+xxx SYS828,X
+xxx PRINT#X:CLOSEX
 
+Das X bei den einzelnen Befehlen steht für die freidefinierbare Filenummer.
 
+Nach dem CLOSE-Befehl springt das Programm automatisch wieder in das Basic-Programm.
 
+(Gunnar E. Krüger/rg)
 
+# Olympia Compact 2: ein Interface
 
+> Das hier beschriebene Interface ermöglicht den Anschluß einer Olympia Compact 2 an den Commodore 64. Es gleicht einerseits die Zeichensätze der beiden Geräte an die ASCII-Norm an, andererseits gestattet es den Ausdruck der Steuerzeichen des C 64.
 
+Die Steuerzeichen werden in einer Form dargestellt, anhand derer man sie bequem identifizieren und wieder eingeben kann. Außerdem simuliert das Programm eine Rücktaste und führt einen Cursor für den Drucker.
+
+Für die Verbindung des Userports mit der Centronics-Schnittstelle ist ein Kabel erforderlich, das folgende Pins verbindet:
+Userport 8 C D E F H J K L B A und N
+Amphenol 1 2 3 4 5 6 7 8 9 11 19 — 29
+
+PC2 des C 64 liefert also das Strobe-Signal, das der Schreibmaschine das Vorhandensein gültiger Daten mitteilt, und an FLAG2 wird das BUSY-Signal des Druckers auf Bereitschaft zur Entgegennahme neuer Zeichen abgefragt.
+
+Das Programm können Sie natürlich auch ohne die REMs abtippen, die hier wiedergegebene Pseudo-Assembler-Fassung hat den Sinn, einen gewissen Durchblickzu ermöglichen und Änderungen zu vereinfachen.
+
+Die Schnittstelle hat die Sekundäradresse 4. Wird eine andere Geräteadresse gewünscht, etwa, weil schon ein Matrixdrucker mit dieser Adresse existiert, so sind die Zeilen 127 und 137 des Programms entsprechend zu ändern.
+
+Das Maschinenprogramm belegt in der vorliegenden Fassung die Speicherplätze von 32000 bis 32511. So ist eine Zusammenarbeit mit Simons Basic und Exbasic II gewährleistet. Wer das Programm in einen anderen Bereich, zum Beispiel in die 4 KByte RAM ab 49152, legen will, muß dazu die Zeilen 79,111,114,116,142,144,218,224,233,237 und256, die durch ein Sternchen gekennzeichnet sind, ändern. In 111 ist das MSB der Anfangsadresse einzusetzen (bei Anfang 50000 ist dies 195), in 114 das LSB der Anfangsadresse des CHROUT-Teils (Anfang + 55, im Beispiel 135), in 116 die Anfangsadresse des CHKOUTTeils (Anfang + 30, im Beispiel 110). In 142 und 144 stehen jeweils als zweites Byte LSB und MSB vom Anfang des Umsetzungskatalogs. Sie wären bei Umlegung der Schnittstelle nach 50000 auf 73 (Zeile 144) und 196 (Zeile 140) zu ändern.
+
+Das Programm verwendet die Adresse »Anfang« (32000) als Druckercursor, der für formatierten Druck abgefragt werden kann (zum Beispiel mit PRINT#4 TAB(31-PEEK (32000)),...). Im Programm dient er dazu, durch (von der Compact 2 nicht tatsächlich ausgeführten, sondern druckwegoptimierten) Wagenrücklauf und Wiedervorrücken eine Rücktaste zu simulieren. Dieser Cursor wird in den Zeilen 218, 224, 233, 237 und 256 des Programms verwendet und müßte bei Verlegung des Programms geändert werden (für Anfang 50000 ist jeweils das LSB 80 statt 0 und das MSB 195 statt 125);
+
+Zum Aufbau des Programms: Der Initialisierungsteil verbiegt die KERNAL-Vektoren CHKOUT und CHROUT in die Schnittstellensoftware. Da diese Vektoren durch RUNSTOP/RESTORE wieder zurückgestellt werden, muß die Initialisierungsroutine nicht nur nach dem Laden, sondern nach jedem RUNSTOP/ RESTORE mit SYS 32001 aufgerufen werden. Die neu eingebauten Teile CHKOUT und CHROUT prüfen nun bei jeder Zeichenausgabe, ob das Zeichen für die Schreibmaschinenschnittstelle bestimmt ist.
+
+Der CHROUT-Teil sucht ein auszugebendes Zeichen zunächst im Sonderzeichenkatalog. Hier wird ein Zeichen des C 64 in bis zu drei Codes an die Schreibmaschine umgesetzt. (Man beachte das zusammengestoppelte Potenzzeichen oder das elegante Pi). Dabei werden die Steuerzeichen für die Schreibmaschine im Druckmodus anders behandelt als im Listmodus. Ist das auszugebende Zeichen nicht im Sonderzeichenkatalog zu finden, so wird es je nach Zeichensatz auf ASCII-Wert umgesetzt. Anstelle von unbekannten Zeichen druckt die Schreibmaschine als Joker einen accent aigu »´«.
+
+In den folgenden drei Abschnitten des Programms werden die angesammelten Schreibmaschinencodes der Reihe nach ausgegeben und der Cursor aktualisiert.
+
+Zum Katalog der Sonderzeichen: Hier steht an erster Stelle der Wagenrücklauf, der beim C 64 anders als bei der Schreibmaschine gehandhabt wird. Jeder Wagenrücklauf (CR, CHR$(13)), den der C 64 sendet, muß durch eine Zeilenschaltung (LF, CHR$(10)) ergänzt werden. Das zu ersetzende Zeichen (hier 13) steht immer in der vierten Spalte des Kataloges, die Ersatzzeichen (hier 13,10,0) in den ersten drei Spalten. Das Zeichen 0 wird nur deswegen gesendet, weil jedes umzusetzende C64 Sonderzeichen prinzipiell durch drei Compact 2-Zeichen ersetzt wird.
+
+Das folgende Sonderzeichen ermöglicht es, bei Bedarf auch nur den Wagenrücklauf zu senden. Der neue Code hierfür ist 11 (Befehl PRINT CHR$(11) oder in Strings PRINT »<Control>K«. Die dritte Umsetzung ist erforderlich, damit die Compact 2 auch ein geshiftetes Space als solches serviert bekommt.
+
+Danach folgen 8 Steuerzeichen der Schreibmaschine, die mit PRINT CHR$(1, 2, 3, 21, 22, 23, 25 oder 26) oder in einen String auch mit PRINT >><Control>A, B, C, U, V, W, Y oderZ« gesendet werden können. Dies ist auch mit PRINT CHR$(12) beziehungsweise PRINT »<Control>L« möglich, was einen Seitenvorschub bewirkt. Die Control-Methode führt jedoch bei A,B,C und L zu Problemen, da sie nicht gelistet, sondern auch im Listmodus ausgeführt werden.
+
+Im Katalog folgen nun die Umlaute und Sonderzeichen der Schreibmaschine, die den folgenden Tasten des C 64 zugeordnet wurden:
+Comm + : ä
+Shift + : Ä
+Comm — : ö
+Shift — : Ö
+Pfund : ß
+Comm Pfund : ü
+Shift Pfund : Ü
+j Comm Alphak : §
+Shift Alphak: |
+Comm * : ´
+Shift * : Unterstreichen des nächsten Zeichens
+eckige Klammer auf: <sup>2</sup>
+eckige Klammer zu : <sup>3</sup>
+
+Der Akzent »´« wird über das nachfolgende Zeichen gedruckt, UNT+RT unterstreicht das nachfolgende Zeichen. Auf den Einbau von Promille und My wurde verzichtet. Wem diese Zeichen lieb und wert sind, der möge eine der Zeilen 298 bis 303 ändern, indem er die ersten drei DATA durch 60,0,0 für My und durch 14,46,15 für Promille ändert. (Die vierte DATA-Zahl ist, wie erwähnt, der Code des C 64-Zeichens, das ersetzt wird). In TEXT 64, das das Pfundzeichen als Steuerzeichen benutzt könnte man sich das »ß« erhalten, indem man die 64 und die 92 in den Zeilen 288 und 294 vertauscht und so das »ß« auf die Alphakringel-Taste legt. Ich selbst habe stattdessen die Zeilen 3160, 7110, 540, 1200, 7200, 8220 und 7140 von TEXT 64 geändert.
+
+Bei den nun anstehenden Listcodes herrscht folgende Systematik: Die Kleinbuchstabencodes gehören zu den direkt . ansprechbaren Funktionen CLR, HOME und den Cursortasten. »g« bedeutet CHR$(142), Umschalten auf Großschrift, was nur mitTricks eingegeben werden kann, aber in manchen Listings auftaucht.
+
+Die Zeichen ”!,”, #, $, %, &, ’ und (” stehen für die acht Farben, die zusammen mit der Commodore-Taste eingegeben werden.
+
+Ziffern und Großbuchstaben werden zusammen mit < Control > eingegeben. Es sind dies die ersten acht Farben, 9 und 0 für RVS und RVS OFF, die Umschaltung auf den zweiten Zeichensatz durch <Control>N, Blockieren und Freigabe der Umschaltung durch <Control>H beziehungsweise <Control>I sowie die oben schon erwähnten Steuercodes <Control>F, K,U,V,W,Y,Z für die Schreibmaschine. Die angegebenen Control-Codes gehören natürlich in einen String nach PRINT.
+
+Nicht in Print-Statements, sondern nur in Abfragen tauchen mitunter auch die Listcodes der Funktionstasten auf, die aber aus Platzgründen hier ausgelassen werden mußten und von der Schreibmaschine wie alle unbekannten Zeichen als Joker »'«ausgegeben werden.
+
+Damit nicht jedesmal das ganze, lange Programm eingelesen werden muß, habe ich am Anfang des Programms eine Möglichkeit beschrieben, eine reine Maschinencodefassung abzuspeichern und direkt oder unter Programmkontrolle wieder einzulesen.
+
+(Reinhard Atzbach/rg)
+
+# Hardcopy Epson FX-80
+
+Ich bin ein Freund der guten Hires-Darstellungen. Mein Basic-Programm ermöglicht es, den Epson voll in seiner Fähigkeit des Plottens auszunutzen und das Bild zu verändern, das heißt:
+1.	Veränderung der Punktdichte
+2.	Veränderung der Darstellung
+
+Für jede Veränderung müssen nur eine beziehungsweise mehrere Variablen geändert werden. Das Programm eignet sich natürlich auch für mathematische Funktionen oder ähnliches. Das Programm arbeitet problemlos mit dem Centronics-Interface von Data Becker.
+
+(Mark Zimmermann/rg)
+
+# Tips & Tricks
+
+## Listschutz
+
+Möchte man ein Programm mit einem einfachen Listschutz versehen, so verfährt man folgendermaßen:
+1.	Man ergänzt die Zeile, ab der der Listschutz wirksam werde nsoll, mit »:REM””«.
+2.	Man fährt mit dem Cursor auf das zweite Anführungszeichen und drückt fünfmal die Taste INST
+3.	Nun wird ebenfalls fünfmal dieTaste DEL gedrückt, so daß zwischen den Anführungszeichen fünf reverse T stehen.
+4.	Zuletzt bewegt man den Cursor hinter das zweite Anführungszeichen und drückt die Tastenkombination SHIFT und L Anschließend RETURN nicht vergessen.
+
+Wenn nun versucht wird, das Programm zu listen, gelangt der Computer nur bis zu der Zeile, in der der Listschutz steht und bricht dann den Vorgang mit »Syntax Error« ab.
+
+(Thomas Lopatic)
+
+## C 64 beschleunigt
+
+Für alle diejenigen C 64 - Besitzer, denen die Bewegung des Cursors bisher zu langsam war, gibt es einen speziellen POKE.
+
+Mit POKE 56325,5 wird der Cursor rasend schnell und flitzt bei Betätigung der Cursortasten nur noch so über den Bildschirm. Wer’s lieber gemütlicher mag, der sollte es statt dessen einmal mit POKE 56325,255 probieren.
+
+(Oliver Bausch)
+
+## Text und Grafik mischen
+
+Im Leserforum des 64’er Magazins, Ausgabe 8/84, fragte Frank Schager nach einer Möglichkeit, mit Simons Basic ein Textfenster in der hochauflösenden Grafik zu erzeugen.
+
+Mit dem folgenden kleinen Programm wird die normale Tastaturabfrage mit dem Simons Basic-Befehl »TEXT« verbunden:
+10 X = 2 : Y = 2 : REM Text-Anfang
+20 HIRES 15,11 : REM Grafik ein
+30 GETA$
+40 IF A$ <> ""THEN GOSUB 100
+50 GOTO 30
+60 REM
+100 X = X + 8 : REM X-Koordinate erhöhen
+110 IFX > 38 * 8THEN X = 2: Y = Y + 8: REM Zeilenende ? Dann neue Zeile
+120 TEXTX,Y,A$,1,1,8 : REM Zeichen drucken
+130 AA$ = AA$ + A$ : REM Wort erzeugen
+140 IF AA$ = ”GEHE” THEN 1000 : REM Zum Beispiel
+150 RETURN
+
+Natürlich kann man die Anfangskoordinaten so verändern, daß sie zum Spiel passen. Veränderbar ist auch der Faktor 38 in Zeile 110, je nachdem, welche Zeilenlänge gewünscht wird. Ebenso besteht die Möglichkeit, zwischen den Zeilen 130 und 150 weitere IF-Abfragen einzubauen. Empfehlenswert ist die besondere Abfrage der Tasten SPACE und RETURN.
+
+(Jörg Prante)
+
+## Textomat-Tip
+
+Bei Ihrem Software-Test des Textomat von Data-Becker (Ausgabe 9/84) wurde als gravierender Nachteil angeführt, daß bei einmal gestartetem Ausdruck keine Unterbrechung mehr möglich ist. Ich arbeite in Zusammenhang mit Textomat mit einem Epson-Drucker RX 80 FT. Um den begonnenen Ausdruck zu unterbrechen, kann man einfach den ON-LINE-Schalter betätigen und den Drucker anschließend ausschalten. Sekunden später meldet sich der Textomat am Bildschirm mit dem zu druckenden Text zurück.
+
+(H. Rendelmann)
+
+## Basic-Programme verbinden
+
+So manch einen C 64-Besitzer wird es schon geärgert haben, daß sein Computer keinen MERGE-Befehl besitzt. Mit wenig Aufwand ist es aber dennoch möglich, Basic-Programme aneinanderzuhängen:
+
+1.	Im Direktmodus »PRINT PEEK(43); PEEK(44)« eingeben und sich die Ergebnisse merken.
+2.	Das erste Programm normal laden.
+3.	Erscheint jetzt nach »PRINT PEEK(45)« eine Null oder eine Eins, dann geben Sie »POKE 43, 256 + PEEK(45) - 2 : POKE 44, PEEK(46) -1 : NEW« ein. Im anderen Fall wird »POKE 43, PEEK(45) - 2 : POKE 44, PEEK(46): NEW« eingegeben.
+4.	Nun wird das anzuhängende Programm geladen (Achtung! Das anzuhängende Programm muß die höheren Zeilennummern haben).
+5.	Jetzt POKEn Sie in die Speicherstellen 43 und 44 die zu Anfang gemerkten Werte
+
+Beide Programme sind nun verbunden und können ganz normal gehandhabt werden. Wichtig bei der ganzen Prozedur ist, daß keine Variablen definiert werden, da das MERGEn sonst nicht richtig funktioniert.
+
+(Thomas Lopatic)
+
+## POKEs für den C 64
+
+Mit POKE 775,1 ist ein (fast) perfekter Listschutz aktiviert. Auch ein SAVE-Schutz ist mit wenig Aufwand möglich: POKE 801,0 : POKE 802,0 : POKE 818,165. Nach diesen drei POKE-Befehlen kann das Programm weder auf Kassette noch auf Diskette kopiert werden. Schließlich gibt es noch eine Möglichkeit, die RUN/STOPTaste abzuschalten, und zwar mit POKE 808,225. Wiedereinschalten ist mit POKE 808,237 möglich.
+
+(Thomas Lopatic)
+
+## GOTO X für VC 20
+
+Viele schätzen es, viele wünschen es sich: Einen berechneten GOTO-Befehl auf einen variablen Ausdruck anstelle einer Zeilennummer. Hier ist eine schnelle und sichere Methode, die nur 17 Bytes Speicherplatz benötigt.
+
+Schreiben Sie als erste Programmzeile »1 REM "*********"« (mindestens neun Sternchen). Anschließend geben Sie im Direktmodus ein:
+
+»PRINT PEEK(43) + PEEK(44) * 256 + 6« (RETURN). Die daraufhin angezeigte Adresse notieren Sie sich bitte Ohne Erweiterung müßten Sie den Wert 4103 erhalten haben, mit 3 KByte Erweiterung 1031 und ab 8 KByte Erweiterung 4615.
+
+Jetzt POKEn Sie ab der notierten Adresse bitte folgende Werte ein: 32, 138, 205, 32, 247, 215, 76, 163, 200.
+
+Wenn Sie nun die erste Zeile (mit dem REM) aufLISTen, sehen Sie einige Grafikzeichen. Diese stellen ein kurzes Maschinenspracheprogramm dar, das einen mathematischen Ausdruck in einen ganzzahligen Wert umrechnet. Diese Zeile muß immer die erste Programmzeile sein und darf auch nicht mehr geändert werden. Das übrige Programm kann natürlich wie gewohnt editiert werden.
+
+Sie haben jetzt im Programm einen simulierten GOTO X - Befehl zur Verfügung, der mit SYS (Adresse) X aufgerufen wird. Für Adresse müssen Sie die anfangs notierte Adresse einsetzen (Klammern nicht vergessen). Für X kann ein beliebiger arithmetischer Ausdruck stehen wie zum Beispiel 5, A, A+2, C+D/SQR(9) oder PEEK(5).
+
+Der neue Befehl hat im übrigen die gleichen Auswirkungen wie der normale GOTO-Befehl. Ist eine Zeilennummer nicht vorhanden, gibt es daher ebenfalls einen »UNDEF’D STATEMENT ERROR«.
+
+(Thomas Maul)
+
+# Der große Überblick
+
+> Man braucht sehr viel Geduld, um bei einem langen Listing die Übersicht zu behalten. Ein formatiertes Listing schafft Ordnung und erleichtert somit die Fehlersuche.
+
+Das Programm FLIST belegt 134 Bytes im Kassettenpuffer des C 64. Es wird mit LOAD”FLIST.DATA”, 8 geladen und mit RUN gestartet. Dabei wird das, in DATA-Zeilen stehende Programm im Speicher ab 828 abgelegt und mit SYS gestartet. Die Zeile 10, die diese Dinge erledigt, dient später als Demonstrationszeile. Nun zur Funktion:
+Das Programm erweitert das Basic um den Befehl FLIST. Dieser Befehl erzeugt ein formatiertes Listing auf dem Bildschirm, indem vor der Ausgabe eines Zeichens geprüft wird, ob dieses Zeichen ein »:«ist. Trifft dies nicht zu, so wird das ’LISTen’ fortgesetzt. Andernfalls erzeugt das Programm ein »CR« (Carriadge Return) und fügt eine, von der Länge der Zeilennummer abhängige Anzahl von Leerzeichen ein. Dadurch stehen alle in einer Zeile vorhandenen Doppelpunkte untereinander und unter dem Leerzeichen nach der Zeilennummer. Jeder Befehl, vor dem ein Doppelpunkt steht, erscheint so in einer neuen Zeile. Die Angabe der Zeilennummer(n) erfolgt bei FLIST wie beim normalen LIST-Befehl (zum Beispiel FLIST-100). Zum Editieren einer Zeile steht dem Benutzer weiterhin der normale LIST-Befehl zur Verfügung. Versuchen Sie mal FLIST10! Benutzer eines Druckers könnten ja mal OPEN1,4:FLIST:close1 ausprobieren.
+
+(Michael Weidlich/rg)
+
+# Kudiplo auch für den C 64
+
+> In der Ausgabe 8 des 64’er Magazins war das Programm »Kudiplo« für den VC 20 abgedruckt, das mit dem 1520-Printer-Plotter eine komplette Kurvendiskussion ausgibt. Hier sind die erforderlichen Änderungen, um dieses nützliche Programm auch auf dem C 64 laufen zu lassen.
+
+Nach der Veröffentlichung meines Programms Kudiplo für den VC 20, erreichten mich viele Leserbriefe mit der Bitte um nähere Auskunft dazu, wie das Programm für den C 64 abzuändern ist. Probleme gab es dabei mit der Routine in den Zeilen 185, 190 und 230.
+
+Die genannten Zeilen bewirken in der veröffentlichten Version für den VC 20 ein »Verbiegen« des Vektors für die Fehlerbehandlungsroutine. Der in den Speicherstellen $0300 und $0301 stehende Zeiger wird so verändert, daß er nicht mehr zu der im Basic-ROM stehenden Routine zur Ausgabe von Fehlermeldungen zeigt. Statt dessen zeigt er nun auf einen Sprungbefehl, der mit Hilfe der Zeile 185 in den Kassettenpuffer geschrieben wurde. Dieser Sprungbefehl führt zurück ins Basic-Programm, dessen nächste Zeile gesucht und so abgearbeitet wird, als sei kein Fehler aufgetreten.
+
+Die Ähnlichkeit des VC 20 mit seinem großen Bruder ist oft zitiert. Auch bei ihm läßt sich eine solche Fehlerblockade einrichten. Allerdings ist beim großen Bruder zu diesem Zweck ein kleines Maschinenprogramm in den Kassettenpuffer zu schreiben, in welchem abgefragt wird, ob ein Fehler vorgekommen ist und das dann abhängig vom Ergebnis entweder zum nächsten Statement oder zur nächsten Zeile verzweigt.
+
+Für den C 64 müssen darum die Zeilen 185 und 230 wie folgt geändert werden:
+185 DATA 138,48,3, 76,59,169, 76,116,164: FOR I=823 TO 840 : READ A : POKE I, A : NEXT
+230 NEXT : POKE 768, 139 : POKE 769, 227
+
+Mit diesen Änderungen läuft Kudiplo dann endlich auch auf dem »großen Bruder«.
+
+(Jürgen Curdt/ev)
+
+# POKE mal wieder
+
+> Viele C 64-Benutzer haben sich sicher schon mit dem Basic des C 64 herumgeärgert: Egal, was man machen will, fast alles läuft über PEEK und POKE. Doch gerade diese POKEs helfen manchmal erheblich, wenn es um Probleme geht, die mit einfachen Basic-Befehlen nicht zu lösen sind.
+
+TODO Table
+
+# User-Port-Tastatur
+
+> Mit Hilfe dieses Programmes ist es möglich, eine beliebige Tastatur mit bis zu 4 x 5 Matrix an den User-Port anzuschließen und die Funktionstasten mit Strings bis 9 Byte Länge zu belegen.
+
+Bei der Auswahl einer geeigneten Tastatur gibt es eigentlich nur eine Bedingung: Sie darf höchstens 4 x 5 Anschlüsse haben und die Tasten müssen auf den Kreuzungspunkten der 4 x 5 Anschlüsse liegen. Ansonsten gibt es keine Beschränkungen, da jede Taste frei programmierbar ist. Um die Tastatur zu programmieren, muß man über ihren Aufbau nichts wissen. Man schließt sie einfach am User-Port an den Leitungen PbO bis Pb7 und Pa2 an. Die Anschlüsse PbO bis Pb3sind die Zeilen der Tastatur. Es sind am User-Port die Anschlüsse PbO=c, Pb1=d, Pb2=e, Pb3=f. Für die Spalten gelten die Anschlüsse Pb4=h, Pb5=j, Pb6=k, Pb7=l, Pa2=m.
+
+Die Programmierung geschieht mit Hilfe des Basic-Ladeprogramms. Man wird gebeten, die zu programmierende Taste zu drücken. Die momentane Belegung wird ausgegeben, und man wird gefragt, welchen ASCII-Wert man der Tastatur zuweisen möchte. Danach gibt man den entsprechenden ASCII-Wert ein. Danach wird man erneut gebeten, eine Taste zu drücken. Es ist also nicht notwendig, die Matrix zu kennen. Fertig programmierte Tastaturen können dann als Maschinenprogramm auf Diskette abgespeichert werden, welches nur zwei Blöcke belegt. Es kann dann von Diskette mit LOAD »na-me<<,8,1 geladen und mit SYS12*4096 gestartet werden. Im Zusammenhang mit der Funktionstastenbelegung können auf die Tastatur auch ganze Strings gelegt werden, indem man nur den entsprechenden ASCII-Code der Funktionstasten (133-139) auf die Zusatztastatur programmiert. Auf diese Weise ist es möglich, komplette DATA-Listings mit einer kleinen Tastatur mit Zehnerblock bequem und schnell abzutippen, da man auch die Returntaste und alle Sonderzeichen auf die Tastatur umlegen kann. Auch eine komplette Hex-Tastatur mit den Zeichen 0-9 und a-f und vier Sonderzeichen, zum Beispiel Return, Delete, Komma, Punkt (Grundausstattung), kann programmiert werden. Dadurch wird das Abtippen von Hexdumps zum Kinderspiel. Bewährt hat sich eine alte Rechenmaschinentastatur, mit der ich auch schon Spiele gespielt habe.
+
+Die Belegung der Funktionstasten geschieht ebenfalls durch das Ladeprogramm. Zunächst wird gezeigt, wie die Tasten belegt sind und gefragt, ob man die Belegung ändern will. Man gibt dann nur den entsprechenden String ein und drückt Return. Zum Schluß wird man noch gefragt, ob man mit seiner Wahl zufrieden ist.
+
+(Martin Kloss/aa)
+
+# Diskette intern
+
+Der genaue Inhalt einer Diskette ist den meisten Floppy-Besitzern wohl bisher unbekannt geblieben. Das Programm Disk-Dump schafft den Einblick.
+
+Dieses Programm ermöglicht den Inhalt einzelner Disketten-Blocks auf dem Bildschirm anzusehen, sie auszudrucken und zu ändern!
+
+Nach dem Start des Programms wird Track 18 — Sektor 0 in den Speicher geladen und — in zwei Stufen — auf den Bildschirm ausgegeben. Zwei Stufen sind notwendig, um den Inhalt gut auf dem Bildschirm darzustellen. In der ersten Stufe werden die ersten 128 Byte angezeigt, je 8 Byte in einer Zeile. Am Anfang der Zelle steht noch die Hexnummer des ersten Bytes der jeweiligen Zeile, hinter dem Inhalt werden die 8 Byte noch als Character-String ausgegeben. Hierbei werden Steuerzeichen als Blank ausgegeben. Dieser Bildschirminhalt bleibt nun bestehen, bis eine Taste gedrückt wird und somit die zweiten 128 Byte in gleicher Weise angezeigt werden.
+
+Im Anschluß daran erscheint, zusammen mit den letzten 128 Byte, ein Menü, das sämtliche Funktionen umfaßt. Hier kann man den Drucker ein- und ausschalten, den nächsten oder vorigen Block laden, einen beliebigen anderen Block laden, denselben Block nochmal anzeigen und den Inhalt des Blocks im Speicher ändern.
+
+Zum Ändern muß man zuerst die Bytenummer (in Hex) eingeben und dann den neuen Inhalt (ebenfalls in Hex). Gibt man als Adresse »X« ein, so wird das Ändern abgeschlossen, der geänderte Block wird ausgegeben und man kann entscheiden, ob der Block nun auf Diskette geschrieben werden soll.
+
+Um einen beliebigen Block zu laden, muß man die Track- und Sektornummer (Dezimal) eingeben.
+
+Der physikalische Aufbau der Blocks ist aus dem Manual des Laufwerks zu entnehmen. Man muß jedoch beachten, daß der Inhalt in Hex angezeigt und geändert wird und die Angabe der Block- und Sektorennummern dezimal erfolgt.
+
+Die Bedienung des Programms erklärt sich durch die Menü-Steuerung von selbst.
+
+(Horst Wibbing/rg)
+
+# Disketten-Organisation
+
+> Dieses Programm ermöglicht es, alle wichtigen Diskettenoperationen komfortabel und schnell durchzuführen.
+
+Das Programm (Listing 1) ist für den VC 20 geschrieben, mit kleinen Änderungen jedoch auch auf dem C 64 lauffähig. Die für den C 64 notwendigen Änderungen beschränken sich im Wesentlichen auf die Anpassung des Bildschirmlayouts. Die im Listing vorkommenden Adressen 828 und 36879sind für den C 64 durch 49152 und 53280/81 zu ersetzen.
+
+Nach dem Starten erscheint sofort das Menü (Bild 1)auf dem Bildschirm. Durch Drücken derTasten »+« oder»—« kann nun die Gerätenummer, unter der das Floppy-Laufwerk angesprochen wird, geändert werden. Diese Funktion ist sinnvoll, wenn mit zwei oder mehr Disketten-Stationen gearbeitet wird.
+
+Über das Menü sind unter anderem alle Diskettenbefehle ausführbar, die sonst umständlich über den Kommandokanal gesendet werden müssen. Diese Befehle sind im Handbuch zur 1541-Floppy ausführlich erklärt, so daß an dieser Stelle nicht näher darauf eingegangen werden muß. Einige der Floppy-Kommandos stehen in erweiterter Form zurVerfügung. So kann zum Beispiel die Directory-Ausgabe wahlweise auf den Bildschirm oder über den Drucker erfolgen. Im letzteren Fall wird das Directory alphabetisch sortiert (Bild 2). Wird dies nicht gewünscht, dann muß in Zeile 1370 das »GOTO 1490« durch »RETURN« ersetzt werden.
+
+Zusätzlich zu den über OPEN 1,8,15,... ansprechbaren Disketten-Befehlen können über das Menü noch einige weitere nützliche Funktionen aufgerufen werden. Unteranderem ist es möglich, Namen und ID einer Diskette oder die Gerätenummer der Floppy-Station zu ändern.
+
+Außerdem sind Routinen zum Regenerieren und Überprüfen einer Diskette vorhanden. Weiterhin gibt es die Möglichkeit, die BAM einer Diskette alphabetisch zu sortieren. Diese Funktion erzeugt zwar ein übersichtliches, sortiertes Directory, sollte aber nur mit Vorsicht verwendet werden. Falls die BAM noch Einträge gelöschter Files enthält, kann es nach Abschluß des Sortiervorganges zu »Disk-Salat« kommen, da die Sortierroutine gelöschte Files nicht erkennt. Vor dem Einsatz dieser Funktion sollte die Diskette daher unbedingt mit dem Menüpunkt »Regenerieren« auf gelöschte Files überprüft werden.
+
+Das Programm erklärt sich im übrigen weitgehend von selbst und stellt infolge der leichten und übersichtlichen Bedienbarkeit eine wirkliche Hilfe für den geplagten Disketten-Benutzer dar.
+
+(Wilhelm Boosz/ev)
+
+# Programmiertes LISTing: LISTX-Y
+
+Bei Hilfsprogrammen, die viele Benutzeranleitungen enthalten, gibt man diese Anleitungen normalerweise über PRINT-Anweisungen auf dem Bildschirm aus. An sich würde es bei geschickter Formulierung jedoch reichen, die sowieso vorhandenen REM-Erläuterungen als Anleitungen für den Benutzer mitzuverwenden.
+
+Nur, wie bringt man diese auf den Bildschirm? Mit LIST wird das Basic-Programm jedesmal zum Direktmodus hin verlassen und, was noch schwerer wiegt, die Anfangs- und Endzeilennummern können nur als direkte Zahlen, nicht über Variablen, angegeben werden. Unser Programmvorschlag (Listing 1) simuliert den im VC 20-Basic nicht vorhandenen Befehl LISTX-Y (X=Variable, die die Anfangszeilennummer des zu listenden Programms übergibt, Y = Endzeilennummer).
+
+Man könnte sich ein solches Hilfsprogramm durch Beschreiben des Tastaturpuffers konstruieren. Dann würden sich aber die in den Puffer geschriebenen LIST-Anweisungen auf dem Bildschirm störend bemerkbar machen. Andererseits kommt aus Geschwindigkeitsgründen nur ein Maschinenprogramm in Frage. Will man ein solches Maschinenprogramm per DATA-Zeilen einlesbar gestalten, wäre der Aufwand recht hoch. Außerdem gäbe es Schwierigkeiten mit dem nur immer auf den Datenanfang zurückstellbaren DATA-Zeiger (kein RESTORE X vorhanden). Einlesen per POKE wäre noch aufwendiger. Umgekehrt muß aber ein solches Maschinenprogramm zur Simulation von LIST Y notwendigerweise viele Teile enthalten, die bereits im Betriebssystem vorkommen. Wir lösen das Problem, indem wir mit zwei einfachen FOR-NEXT-Schleifen geeignete Teile des Betriebssystems in den Kassettenpuffer kopieren und diese Kopien dann durch sechs POKE-Anweisungen so abändern, daß sie unseren Ansprüchen genügen. Listing 1 zeigt das entsprechende Unterprogramm, das beim ersten Aufruf mit »GOSUB 63000« die Maschinenroutine erzeugt. Alle weiteren Aufrufe können mit »GOSUB 6350« erfolgen, wodurch, einiges an Zeit gespart wird. In der Variablen X wird die Anfangszeile, in Y die Endzeile übergeben. Listing 3 zeigt ein Demo-Programm. In Listing 2 gebe wir ein Anwendungsbeispiel an: In einem längeren Programm mögen alle REM-Erläuterungen in den Zeilen 100*a bis 100*a+4 untergebracht sein, also in den ersten fünf Zeilen ab jeder vollen Hunderternummer. Das Beispielprogramm nach Listing 2 wird per GOSUB63100 angesprungen und listet per Cursor-Down-Taste alle oben genannten REM-Zeilen (und nur diese, eventuelle weitere REM-Zeilen werden nicht berücksichtigt). Und zwar geschieht dies in Endlosform, das heißt nach Durchgang durch die letzte zu listende REM-Erläuterung erscheint wieder die erste und so fort. Durch Drücken der Return-Taste gelangt man wieder ins Hauptprogramm.
+
+(Fred Behringer/ev)
+
+# Kopieren mit Komfort: Super Copy
+
+> Bereits im ersten 64’er wurde Ihnen mit »Disk Copy« ein Kopierprogramm für Disketten vorgestellt. Wir möchten Ihnen heute eine völlig revidierte Fassung vorstellen, die erheblich leistungsfähiger und komfortabler ist.
+
+Was soll ein gutes Kopierprogramm leisten? Nun, zunächst einmal soll es kopieren. Dazu muß man auswählen können, was kopiert werden soll. Dieser Vorgang dauert beim »Disk Copy« sehr lange, vor allem, wenn auf der Quelldiskette viele Programme sind. Bei »Super Copy« geht es genauso schnell wie das Einlesen eines Directory. Fehler beim Kopieren sollen möglichst ohne Programmabsturz und völligen Neubeginn behebbar sein. Gerade hier liegt eine Stärke von »Super Copy«. Alle Funktionen, die man sonst noch beim Kopieren braucht (Formatieren, Gültigkeitskontrolle (Vality check) etc.), sollen integriert sein. Dazu gehört auch eine komfortable Löschmöglichkeit, um Disketten »aufzuräumen«. Schließlich soll das Programm möglichst wenig Speicherplatz belegen, damit zum Kopieren genug zur Verfügung steht.
+
+Aus all dem ergibt sich eine Konsequenz: Ein solches Programm läßt sich nur in Maschinensprache schreiben, da Basic einfach zu langsam ist und zuviel Speicherplatz belegt. Trotzdem habe ich einige Einschränkungen gemacht:
+
+Relative Files können nicht kopiert werden. Dies verlangt eine zu aufwendige Verwaltung und kommt auch zu selten vor, um es ins Programm zu integrieren. In einem Programmdurchlauf können höchstens 32 Files kopiert werden. Mehr Filenamen kann das Programm nicht speichern.
+
+Ansonsten aber läßt »Super Copy<<kaum noch Wünsche offen, höchstens den nach einem schnelleren Laufwerk.Aber auch da läßt sich wohl noch etwas machen.
+
+### Wie arbeitet »Super Copy«?
+
+Nach dem Programmstart meldet sich das Programm mit einem Menü:
+1.	Directory
+2.	Kopieren
+3.	Formatieren
+4.	Scratchen
+5.	Validieren
+6.	Ende
+Durch Druck auf eine Ziffer wählen Sie die entsprechende Funktion aus. Übrigens können Sie im Programm immer dann, wenn Sie irgendeine Taste drücken müssen, mit »^«in dieses Menü zurückkehren. Gehen wir nun die einzelnen Funktionen einmal durch.
+
+Zur Funktion »Directory« ist nicht viel zu sagen. Es erscheint das Verzeichnis aller Files auf der Diskette.
+
+Beim »Formatieren« müssen Sie den Diskettennamen und die ID — wie üblich durch ein Komma getrennt — angeben. Eine ID ist nur bei einer neuen Diskette wichtig. Verzichten Sie darauf, werden zwar alle Einträge im Directory gelöscht, aber es entfällt das Neuformatieren der einzelnen Spuren. »Validieren« (Gültigkeitskontrolle) entspricht dem Basic-Befehl OPEN 1,8,15,”V”:CLOSE 1.
+
+Entscheiden Sie sich für»Kopieren«, werden Sie aufgefordert, die Quelldiskette einzulegen. Nach Tastendruck erscheinen nun die Namen der Programme. Files, die kopiert werden sollen, kennzeichnen Sie mit der »J«-Taste, die anderen mit »N«. Relative Files können nicht kopiert werden, daher erscheint eine Fehlermeldung, wenn Sie versuchen, solche Files mit »J« zu markieren. Das Programm kann maximal 32 Namen speichern. Wenn Sie mehr als 32 Files kopieren wollen, erscheint die Fehlermeldung »Kopierliste voll«. Sie können nun die bisher markierten Programme kopieren und nach Abschluß einen neuen Programmdurchlauf starten. Haben Sie Ihre Auswahl beendet, gibt das Programm an, wieviele Blöcke insgesamt zu kopieren sind, damit Sie genügend Platz auf der Zieldiskette bereitstellen können. Ein neues Menü erscheint:
+1. Directory
+2. Formatieren
+3. Validieren
+*** Space ***
+für weiter
+
+Sie können nun in aller Ruhe eine Zieldiskette aussuchen, eventuell noch formatieren etc. Sie kommen in jedem Fall in dieses Menü zurück. Sind alle Vorbereitungen abgeschlossen, drücken Sie »Space«, um mit dem Kopieren fortzufahren. Das Programm fordert nun auf, die Quelldiskette einzulegen, und liest die vorher markierten Programme ein. Sollte dabei ein Fehler auftreten, weil Sie zum Beispiel aus Versehen die falsche Diskette eingelegt haben, wird eine entsprechende Meldung ausgegeben und gefragt, ob dieses File übersprungen oder ein neuerVersuch unternommen werden soll. Auch Lesefehler des Laufwerks werden in dieser Weise gehandhabt. In einem Durchgang können maximal 234 Blöcke eingelesen werden. Ist noch mehr zu kopieren wird das Einlesen abgebrochen.
+
+Jetzt müssen Sie angeben, ob Sie fortlaufend oder einzeln kopieren möchten. Fortlaufend bedeutet, daß die Files der Reihe nach auf dieselbe Diskette geschrieben werden. Beim Einzelkopieren dagegen springt das Programm nach jedem Schreibvorgang wieder in ein Menü, und Sie haben die Möglichkeit, die Diskette zu wechseln, ein Directory anzusehen, zu formatieren oder zu validieren. Außerdem können Sie auch das zuletzt kopierte Programm noch einmal auf eine andere Diskette kopieren. Das jeweils nächste File wird vor dem Schreiben angezeigt, damit Sie die richtige Zieldiskette einlegen können.
+
+Haben Sie Ihre Wahl getroffen, läuft der Schreibvorgang in der oben beschriebenen Art und Weise ab. Schreibfehler werden wie Lesefehler behandelt, das heißt es wird gefragt, ob ein neuer Versuch gestartet oder das File übersprungen werden soll.
+
+Sind alle Programme kopiert, erscheint die Meldung »KOPIE FERTIG«. Sind aber nach dem ersten Lese/Schreib-Durch-gang noch weitere Programme zu kopieren, fährt das Programm mit der Aufforderung zum Einlegen der Quelldiskette fort.
+
+»Scratchen«, also das Löschen von Programmen, gehört zu den angenehmsten Funktionen, die »Super Copy« zu bieten hat. Seien Sie aber vorsichtig, sonst haben Sie bald überhaupt keine Programme mehr. Der Ablauf ist ähnlich wie beim Kopieren. Doch anstatt die Files zum Kopieren zu kennzeichnen, werden sie nun zum Löschen markiert. Sollten Sie einen Fehler gemacht haben, ist allerdings noch nichts verloren, denn am Ende des Markiervorgangs müssen Sie noch einmal ausdrücklich durch Drücken der »Space«-Taste bestätigen, daß es Ihnen ernst ist.
+
+### Zum Programmaufbau:
+
+Ausführliche Erläuterungen des Assemblerquelltextes möchte ich Ihnen und mir ersparen. Nur soviel: Das Programm ist im wesentlichen modular aufgebaut, das heißt es besteht aus einzelnen Blöcken, die von den verschiedenen Menüs aus angesprungen werden. Daher ist es nicht nötig, häufig vorkommende Programmteile wie Tasten- oder Fehlerabfragen ständig neu zu schreiben. Auch der Teil zum Markieren der Programme ist beim »Scratchen« und beim Kopieren identisch. Ein Flag, also eine Speicherstelle, deren Inhalt etwas »signalisieren« soll, entscheidet darüber, welche Texte ausgegeben und wohin zurückgesprungen werden soll.
+
+Eine solche Programmiertechnik trägt dazu bei, die Programme ebenso kurz wie übersichtlich zu halten.
+
+### Hinweise zum Abtippen:
+
+Bevor Sie sich ans Eintippen des Ladeprogramms machen, müssen Sie unbedingt folgende Befehle im Direktmodus eingeben:
+
+POKE 43,1: POKE 44,32: POKE 8192,0: NEW (RETURN)
+
+Damit wird der Start des Basic-Speichers nach oben verlegt. Tun Sie das nicht, steht Ihr Basic-Ladeprogramm dort, wo nachher das fertige Kopierprogramm hin’ gePOKEf wird.
+
+Ich weiß, daß es eine Zumutung ist, eine derartige Menge von Zahlen abzutippen, und kein Mensch wird dies auf Anhieb fehlerfrei bewerkstelligen können. Um Ihnen aber die Fehlersuche so leicht wie möglich zu machen, habe ich den ’DATA-Zeilenberg’ in 11 Blöcke eingeteilt. Zujedem dieser Blöcke gehört eine Prüfsumme. Stimmt etwas nicht, gibt das Ladeprogramm an, in welchem Block der Fehler steckt. Achten Sie aber vor allem darauf, daß Sie am Zeilenende kein Komma mehr schreiben, denn das interpretiert der Computer als Null!
+
+Nach dem Abtippen sollten Sie vor dem ersten Programmlauf dieses unbedingt abspeichern, denn sonst könnte es passieren, daß sich das Programm durch eine fehlerhafte Eingabe selbst löscht, und die ganze Mühe war umsonst. Vor dem Laden des Programms müssen Sie die obengenannte Zeile eintippen, um die Basic-Startadresse wieder hochzulegen.
+
+Starten Sie dann das Programm mit »RUN«. Erscheint während des Programmablaufs die Fehlermeldung »TYPE MISMATCH ERROR«, dann haben Sie bestimmt ein »I« statt einer »1« eingetippt oder ein »O« statt einer »0«. Ansonsten müssen Sie alle Fehler in den DATA-Blöcken korrigieren. Wenn alles richtig ist, meldet sich das Ladeprogramm nach einiger Zeit mit »READY«. Nun steht das Programm fertig im Speicher. Um es auf Diskette abzuspeichern, müssen jetzt folgende Befehle eingetippt werden:
+
+SYS64738(RETURN)
+Keine Angst! Das ist zwar ein Befehl, der den Computer in den Zustand direkt nach dem Einschalten zurückversetzt, aber unser Programm ist nach wie vor im Speicher vorhanden. Nun noch folgende Zeilen:
+
+10 SYS 2064 (RETURN)
+Das ist der Startbefehl für »Super Copy«
+
+POKE 45, 251 : POKE 46, 18
+Damit wird das Basic-Ende auf das Programmende gesetzt. Jetzt können Sie mit
+
+SAVE »Super Copy«, 8
+das fertige Programm auf Diskette abspeichern.
+
+(Dietrich Weineck/gk)
 
 
 
