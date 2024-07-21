@@ -1104,7 +1104,7 @@ In der nächsten Ausgabe werden wir ein weiteres Produkt dieser Reihe vorstellen
 
 Bezugsquelle: Microton, Postfach 40, CH-2542 Pieterlen
 
-# Lohnsteuer-jahresausgleich leichtgemacht
+# Lohnsteuerjahresausgleich leichtgemacht
 
 > Der Kampf mit den Formularen für den Lohnsteuerjahresausgleich ist mühsam und nervenaufreibend. Mit dem Programm HL-L0JA-64 soll das anders werden.
 
