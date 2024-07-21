@@ -2579,8 +2579,264 @@ In der nächsten Folge werden wir eine Anzahl neuer Assembler-Befehle kennenlern
 
 (Heimo Ponnath/aa)
 
+# In die Geheimnisse der Floppy eingetaucht – Teil 1
 
+> Das Diskettenlaufwerk VC 1541 ist der Renner unter den Massenspeichern. Doch mit der passenden Literatur hapert es. Deshalb beschränken sich die meisten Anwender auf das Speichern und Laden von Programmen. Mit diesem Kurs lernen Sie, Ihre Floppy effektiv auszunützen und schließlich zu manipulieren.
 
+Daß die 1541 ein sehr wandelbares Gerät ist, werden die meisten Benutzer wohl wissen oder zumindest erahnen. Man denke ja nur an den »Kleinkrieg« zwischen Softwareherstellern und Softwarepiraten, die sich gegenseitig das Leben schwer machen. Die meisten »Schlachten« liefert man sich hier im Inneren der Floppy, die viel raffiniertere Methoden des Programmschutzes anbietet als der Commodore 64.
+
+Aber auch solche Programme, wie das HYPRA-LOAD, das Sie ebenfalls in dieser Ausgabe als Listing des Monats finden, beweisen die Flexibilität der 1541. Doch wie bei so vielen Dingen in der Commodore-Welt sind auch hier die Informationen rar, beziehungsweise in den Handbüchern gar nicht vorhanden. So wollen wir uns mit Ihnen an die Floppy heran- und in sie hineintasten. Angefangen bei grundlegenden Informationen über den Diskettenaufbau und den Befehlssatz der Floppy werden wir Schritt für Schritt in deren Möglichkeiten zur Programmierung und Manipulation hinabtauchen. Was wird benötigt?
+
+Nun, außer einem C 64 und einer VC 1541, »nur« Basic-Erfahrungen, grundlegende Kenntnisse in Maschinensprache (für spätere Folgen) und ein wenig Geduld.
+
+Bevor wir jedoch mit unserer ersten Tauchfahrt beginnen, tippen Sie bitte das beigefügte Programm EDDI (Listing 1) ein, sofern Sie nicht über einen eigenen Disk-Monitor verfügen. Auf die Bedienung von EDDI wird im Einzelnen eingegangen.
+
+Sehen wir uns jetzt erst einmal so eine Diskette an; die folgenden Erläuterungen beziehen sich auf eine formatierte Diskette.
+
+## Aufbau einer Diskette
+
+Die Diskette ist in 35 konzentrische Spuren (englisch: Tracks) aufgeteilt. Diese Spuren enthalten wiederum jede eine bestimmte Anzahl von Sektoren, die von außen nach innen abnimmt. Die genauen Zahlenverhältnisse stehen in Tabelle 1.
+
+Die Spuren sind, beginnend mit der äußeren Spur, von 1 bis 35 durchnumeriert. Die Sektoren sind auf den Spuren in numerischer Reihenfolge gegen den Uhrzeigersinn angeordnet. Jeder Sektor enthält einen Block, das sind 256 Bytes, an Information. Es kann jeder der 683 Blöcke auf der Diskette durch Angabe der jeweiligen Spur- und Sektornummer aufgerufen werden. Allerdings stehen davon dem Benutzer normalerweise nur 664 Blocks zur Verfügung, da das Betriebssystem der Floppy die Spur 18 für sich beschlagnahmt.
+
+Für die nun folgenden Versuche wäre es sinnvoll, eine Diskette neu zu formatieren, mit der wir ein bißchen »spielen« können. Sehen wir uns nun erst einmal das Directory an (LOAD "$",8).
+
+In der ersten Zeile stehen die Drivenummer (hier immer 0) und der Name der Diskette, sowie die ID und das Formatkennzeichen (genaueres später).
+
+Die zweite Zeile enthält, da sich kein File auf der Diskette befindet, die Meldung »664 BLOCKS FREE«.
+
+## Erste Versuche mit EDDI, dem Disk-Monitor/Editor
+
+Da sich diese Informationen auf der schon erwähnten Spur 18 befinden, wollen wir uns diese Spur mit EDDI gleich einmal etwas genauer ansehen. Laden Sie den Editor und legen Sie unsere »Spieldiskette« ein; danach starten Sie mit RUN.
+
+Als Kommando tippen Sie F3 für »BLOCK LESEN«. Danach geben Sie, durch Komma getrennt, die Spur und Sektornummer des gewünschten Blocks ein; in unserem Fall »18,0«.
+
+Nach dem Ladevorgang meldet sich EDDI mit Byte 0 der ersten von 16 Seiten, zu je 16 Bytes. Drücken Sie jetzt RETURN, um die erste Seite anzuzeigen, welche wir nun betrachten wollen.
+
+Es sollte vielleicht erwähnt werden, daß die Zählung von Blöcken und Bytes grundsätzlich bei Null beginnt. Den eingeladenen Block bezeichnet man als BAM (Block Availability Map), auf deutsch etwa »Blockbelegungsplan«. Dieser Plan gibt an, welche Blöcke auf der Diskette frei und welche schon beschrieben sind. Ferner enthält er den Namen der Diskette, die ID, das Formatkennzeichen und den Beginn des Directory.
+
+Die ersten beiden Bytes (0,1) dieses Blocks enthalten Spur und Sektor des ersten Directoryblocks; normalerweise »18,1« (siehe auch Tabelle 2).
+
+Byte 2 enthält das Formatkennzeichen (hier 65, beziehungsweise »A«), Zur Erklärung: Commodore stellt ja verschiedene Laufwerke her, zum Beispiel 1541, 3040, 8050, 8250... Diese Laufwerke unterscheiden sich fast alle im Aufzeichnungsformat, das heißt Anzahl und Verteilung der Spuren und Sektoren; so hat die CBM 8050 77 Spuren mit bis zu 29 Sektoren, was deren höhere Speicherkapazität zur Folge hat. Solche Disketten können verständlicherweise von der 1541 weder gelesen noch beschrieben werden. Am Formatkennzeichen »A« erkennt die 1541 nun Disketten ihres eigenen Formats; ist dieses nicht identisch, so beschwert sich die Floppy mit einer Fehlermeldung. Eine Ausnahme dieser Regel bildet die Lesekompatibilität, die besagt, daß eine »fremde« Diskette zwar gelesen, aber nicht beschrieben werden kann (zum Beispiel 3040 auf 1541).
+
+Byte 3 steht generell auf Null, da es bei der 1541 keine Funktion erfüllt.
+
+Die Bytes 4 bis 143 enthalten nun die eigentliche BAM, deren Format ein wenig kompliziert ist: Für jede Spur sind 4 Bytes reserviert, wobei das jeweils erste Byte die Anzahl der noch freien Blöcke auf dieser Spur angibt. Die folgenden drei Bytes müssen wir als eine Gesamtheit von 24 Bits betrachten, wobei jedes gesetzte Bit einen freien Block signalisiert; siehe auch Tabelle 3.
+
+Um auch die folgenden Seiten des Blocks zu betrachten, drücken Sie zum Vorwärtsblättern Fl; die weitere Bedienung ist analog zur oben beschriebenen. Rückwärtsblättern ist durch Drücken von F2 möglich.
+
+Fahren Sie nun bis zum Byte 144 vor und sehen Sie sich die Seite an.
+
+Die Bytes 144 bis 161 enthalten den Namen der Diskette, der beim Formatieren festgelegt wird. Direkt im Anschluß daran folgen die Bytes 162,163, die die ID im ASCII-Code beinhalten, gefolgt von einem »Shift Space«. An der ID erkennt die Floppy, ob die Diskette gewechselt wurde; deshalb sollte jede Diskette eine andere ID haben.
+
+Byte 165 und 166 enthalten DOS-Version und Formatkennzeichen, hier normalerweise »2A«, wiederum gefolgt von einem »Shift Space«.
+
+Die Bytes 171 bis 255 haben normalerweise keine Bedeutung und können unterschiedlich gefüllt sein.
+
+## Wie sieht das Inhaltsverzeichnis aus?
+
+Auf unserer Entdeckungsreise durch Spur 18 folgen wir jetzt der Angabe in den ersten beiden Bytes und laden den ersten Directoryblock (F3; 18,1). Das Format des Blocks ist der Tabelle 4 zu entnehmen. Jeder Direktoryblock enthält acht File-Einträge und den Zeiger auf den nächsten Direktoryblock (Byte 0 und 1); ist die Tracknummer des nächsten Blocks 0, so war der gelesene Directoryblock der letzte, und das zweite Byte zeigt die Anzahl der hier benutzten Bytes an. In unserem Fall stehen hier 0 und 255.
+
+Nun zu Tabelle 5, die das Format eines Directoryeintrags darlegt: Jeder dieser Einträge besteht aus 30 Bytes, wobei das erste den Filetyp (siehe Tabelle 6), die beiden nächsten Spuren und Sektoren des ersten Fileblocks und die 16folgenden Bytes den Filenamen enthalten. Die folgenden 3 Byte werden nur bei relativen Dateien verwendet; sie werden später im einzelnen noch besprochen.
+
+Byte 26 und 27 enthalten Track und Sektor des neuen Files, falls das alte mit »@« überschrieben wurde. Die Bytes 28,29 schließlich geben die Anzahl der belegten Blöcke dieses Files an.
+
+## Die einzelnen Datei-Typen der Floppy
+
+Diese bis jetzt beschriebenen Angaben werden vom Betriebssystem der Floppy, also vom DOS (englisch: Disk Operating System) verwaltet.
+
+Beschäftigen wir uns nun mit den restlichen Blöcken auf der Diskette, die dem Anwender zur freien Verfügung stehen, denn dort werden die einzelnen Files abgespeichert, deren Aufbau uns jetzt interessiert.
+
+### DEL-Files:
+
+Diese Fileanzeige existiert normalerweise nicht im Directory; wird ein File gelöscht, so wird dieses nicht mehr angezeigt; das Byte des Filetyps steht dann auf 0. Durch setzen des Filetyps auf 128 (hex. $80) kann eine DEL-Anzeige jedoch erzwungen werden.
+
+### SEQ-Files:
+
+Dieser Filetyp dient zur Speicherung von Daten auf Diskette (im Gegensatz zur Programmspeicherung). Der Aufbau dieses Filetyps ist relativ einfach: Die ersten beiden Bytes eines Datenblocks zeigen jeweils auf den nächsten Block im File; so erfolgt eine beliebig lange Blockverkettung auf der Diskette. Da aber auch das schönste File einmal zu Ende geht, muß der letzte Block gekennzeichnet sein. Dies erfolgt, wie schon beim Directory, durch eine 0 als Spurnummer. Die Sektornummer bezeichnet jetzt die Anzahl der belegten Datenbytes dieses Blocks. Diese Art der Verkettung von Blöcken wird bei allen Filetypen vorgenommen! Die restlichen 254 Bytes jedes Blocks enthalten die Daten.
+
+### USR-Files
+
+USR-Files stimmen im Aufbau exakt mit den SEQ-Files überein, sie haben jedoch noch Zusatzfunktionen im DOS, auf die ein anderes Mal eingegangen werden soll.
+
+### PRG-Files
+
+PRG-Files stellen den häufigsten Filetyp dar. Sie dienen der Speicherung von Programmen auf der Diskette und haben nahezu den selben Aufbau wie SEQ-Files. Der einzige Unterschied besteht in den Bytes 2 und 3 des ersten Blocks, welche die Startadresse des Programms im Computer enthalten. Ist diese Adresse gleich der Adresse des Basic-Anfangs, also 2049 ($0801), so können die Programme mit »LO-AD”Name",8« geladen werden; dieser Modus ignoriert die Anfangsadresse auf Diskette und lädt die Programme generell an den Basic-Anfang (sogenanntes relatives Laden). Sollen Programme jedoch an anderen Stellen im Speicher stehen, zum Beispiel Maschinenprogramme, so muß diese angegebene Adresse als Startadresse benutzt werden; man lädt hier absolut mit »LOAD”Name”,8,1«.
+
+### REL-Files:
+
+Dieser Filetyp ist im Aufbau ungleich komplizierter als die eben besprochenen; es soll daher zuerst kurz auf die Arbeitsweise von REL-Files eingegangen werden. Sequentielle Files haben den Nachteil, daß sie praktisch nur aus einem Datensatz bestehen. Sucht man nun, zum Beispiel in einer Kartei, eine bestimmte Hausnummer oder einen bestimmten Namen, so muß der gesamte Datensatz durchgelesen werden, um die entsprechende Stelle zu finden. In einer relativen Datei geht man deshalb einen anderen Weg, um jede Stelle schnell auffinden zu können.
+
+Es existiert eine beliebige Anzahl (zum Beispiel 100) von Datensätzen, wobei alle Datensätze die gleiche Länge haben müssen (maximal 254 Zeichen).
+
+Das DOS legt jetzt einen sogenannten Side-Sektor an, der aus bis zu sechs Blöcken bestehen kann. Diese Blöcke enthalten nun die Zeiger auf sämtliche Datenblöcke, in denen die Datensätze gespeichert sind (1 Datensatz hat maximal 1 Block Länge). Auch hier sind die Datenblöcke wieder durch Zeiger in den Bytes 0 und 1 verkettet. Den Aufbau eines Side-Sektor-Blocks zeigt Tabelle 7. Zum besseren Verständnis hier ein kleines Beispiel:
+
+Wir haben eine relative Datei mit 250 Datensätzen ä 127 Zeichen. Diese Datei benötigt also 125 Datenblöcke und zwei Side-Sektor-Blöcke. Im Directory-Eintrag finden wir jetzt die schon erwähnten zusätzlichen Bytebelegungen: Byte 19 und 20 jedes Eintrags enthalten jetzt Spur und Sektor des ersten Side-Sektor-Blocks; Byte 21 gibt die Datensatzlänge (Recordlänge) an.
+
+Wir wollen jetzt auf den 248. Datensatz zugreifen; das DOS arbeitet nun folgendermaßen: Ein Datensatz enthält 127 Byte, das heißt, es passen zwei Datensätze in einen Block; dadurch errechnet sich der Block, auf den jetzt zugegriffen wird, aus (248-1)/2 = 123.5. (Minus 1, da immer von 0 an gezählt wird). Da ein Side-Sektor-Block nur 120 Einträge aufnehmen kann, ist der Zeiger auf den Datenblock im Side-Sektor-Block Nummer 2 zu finden. Dieser wird jetzt anhand des Verzeichnisses in Block 1 gelesen und dann aufZeiger Nummer 3 (Bytes 22,23) zugegriffen. Wir kennen also jetzt Spur und Sektor des Blockes, in dem unser Datensatz steht; die Position des ersten Datenbyte berechnet sich jetzt aus dem Nachkommaanteil der obigen Division (0.5*254 = 127). Der Datensatz beginnt also beim 127+2 = 129ten Byte.
+
+Der Aufbau von relativen Dateien ist also, wie schon erwähnt, ziemlich kompliziert; diese Art der Datenspeicherung hat aber einige Vorteile gegenüber der ’normalen’ mit SEQ-Files.
+
+### Bedienungshinweise für EDDI, dem Disk-Monitor/Editor
+
+Da unserem U-Boot auf dieser schwierigen Fahrt der Sauerstoff ausgegangen ist, wollen wir uns nun erst einmal erholen. Hier noch ein paar Anregungen zur Arbeit mit EDDI: EDDI kann nicht nur Blöcke lesen und anzeigen; Sie können auch Bytes verändern und diesen Block danach wieder abspeichern.
+
+Dazu laden Sie den zu verändernden Block und fahren auf die Seite, die Sie interessiert; hier tippen Sie als Kommando F5, und der Editor-Modus startet. Sie können jetzt Bytes dezimal abändern, indem Sie den jeweils neuen Wert eingeben und »RETURN« drücken. Wollen Sie aus dem Eingabemodus aussteigen, so tippen Sie entweder »RETURN« und können weiterblättern ohne den Editor zu verlassen, oder Sie tippen »t RETURN«, um in den Kommando-Modus zu kommen. Nach einigem Probieren wird Ihnen EDDI sehr schnell vertraut werden; wir gehen auch in den folgenden Ausgaben noch darauf ein.
+
+### Wichtig:
+
+Beim Wechseln einer Diskette muß die Funktionstaste F6 getippt und nach dem Austausch eine Taste gedrückt werden, sonst reagiert die Floppy mit einer Fehlermeldung. Diese können übrigens mit »@« abgerufen werden. Das Zurückschreiben eines Blocks auf Diskette erfolgt mit F4, wobei Spur und Sektornummer angegeben werden müssen. Hier noch ein paar Vorschläge zum Ausprobieren: Ändern Sie doch einmal auf Ihrer Versuchsdiskette (!) das Formatkennzeichen (Spur 18, Sektor 0, Byte 2 auf 66 statt jetzt 65 und speichern den Block an die gleiche Stelle auf die Diskette zurück. Versuchen Sie nun einmal ein kleines Programm auf diese Diskette zu schreiben. (Die genauen Vorgänge in der Floppy werden beim nächstenmal erläutert.) Oder ändern Sie einmal die Bytes im Directory, die den Filetyp angeben, entsprechend Tabelle 6 und laden Sie es danach. Mit dem klugen Satz »Probieren geht über Studieren« verabschieden wir uns für diese Ausgabe. Nächstesmal beginnt dann ein praktischer Teil unserer Expedition, nämlich die Vorstellung des Befehlssatzes der 1541 mit vielen Beispielen und Anregungen.
+
+(K. Schramm/B. Schneider/gk)
+
+# Der gläserne VC 20 – Teil 2
+
+> In der ersten Folge haben wir uns hauptsächlich mit der Basic-Verwaltung befaßt. Dabei tauchte immer wieder der Begriff Zeropage auf, mit dem wir uns heute beschäftigen wollen.
+
+Die Zeropage — oder zu Deutsch die Seite Null — ist in Maschinensprache besonders einfach zu handhaben. Als Seite bezeichnet man im übrigen immer ein Paket von jeweils 256 Byte. So entspricht Seite 0 den Adressen 0-255, Seite 1 den Adressen 256-511 und so weiter.
+
+Eine Zeropageadressierung, zum Beispiel LDA $42, benötigt nur zwei Byte, eine absolute Adressierung, zum Beispiel LDA $1234, hingegen drei Bytes im Speicher. Damit verbunden ist auch die Bearbeitungsgeschwindigkeit eines Maschinenprogramms. Denn die Zeropageadressierung ist schneller als die entsprechende Drei-Byte-Methode. Bei kleineren Programmen in Assembler fällt dieser Aspekt zwar nicht so sehr ins Gewicht, bei sehr umfangreichen Routinen, (wie zum Beispiel beim Basic-Interpreter) spielt die Adressierungsart jedoch eine größere Rolle.
+
+In der Seite 0 legt der Computer also insbesondere die Daten ab, die er oft benötigt, wie zum Beispiel Vektoren, Parameter etc. Die komplette Liste der Adreßbelegung zeigt Tabelle 1.
+
+Wir wollen es jedoch nicht nur mit der Aufstellung alleine bewenden lassen. Die interessantesten Lokationen möchte ich hier herausgreifen und besprechen. Beginnen wir also mit den ersten drei Bytes im Speicher:
+
+## Der USR-Vektor
+
+**Adresse 0,1,2:** Über die USR-Funktion kann der Benutzer eigene mathematische Routinen, die nicht im Basic implementiert sind, in seine Programme einbinden. Dieses Kommando ruft ein Maschinenprogramm auf, dessen Startadresse vorher in den Speicherzellen 1 und 2 abgelegt wurde. Wer sich dieses Befehls nicht bedient, hat drei Zero-pagespeicherzellen zur freien Verfügung, die er für eigene Maschinenprogramme nutzen kann. Die Syntax der USR-Funktion entspricht derjenigen normaler Basic-Funktio-nen wie zum Beispiel FRE, POS, SIN, COS, TAN etc.: A= USR (B) oder PRINT USR (B).
+
+Der Vorteil gegenüber dem SYS-Befehl liegt in der Möglichkeit Parameter zu übergeben. In unserem Beispiel wird der Benutzerroutine die Variable B übergeben. Der errechnete Zahlenwert kann dann seinerseits wieder einer Variablen zugewiesen werden.
+
+Wie kann man sich in einem Maschinenprogramm die eingegebene Zahl beschaffen? Nun, alle Basic-Variablen werden im Fließkommaformat abgespeichert, eine Ausnahme bilden nur die Integer-Variablen. Dabei werden die Zahlen vom Computer nach einem bestimmten Verfahren binär verschlüsselt, so daß eine Zahl mit acht Nachkommastellen und einem Exponenten in nur fünf Bytes Platz findet.
+
+Zwischengespeichert wird das Ergebnis in besonderen Fließkomma-Akkumulatoren (Adresse 97-104). Mit Hilfe eines Unterprogramms aus dem Basic-Interpreter kann es von dort aus abgerufen werden, wobei es in eine Integerzahl (also ein Wert zwischen 0 und 65536) umgewandelt wird.
+
+Aufgerufen wird die Routine mit JSR $D7F7. Der 2-Byte-Wert steht dann in den Zeropagestellen $14 und $15 (Hexadezimal) zur Verfügung. Da diese Adressen vom Interpreter oft benutzt werden, ist es ratsam die Zahlen in andere Register zu übertragen (in welche, darauf kommen wir später noch zu sprechen).
+
+Das Gegenstück zu dem eben gezeigten Unterprogramm stellt die Routine »2-Byte in Fließkomma« dar. Das Low-Byte wird in das y-Register geladen, das höherwertige Byte muß in den Akku. Dann wird die Routine mit JSR $D391 gestartet, wobei die USR-Variable (in unserem Beispiel A) die Daten erhält.
+
+## Speicher ausgedeutet — die Basic-Zeiger
+
+**Adresse 43 — 56:** Diese Adressen spielen, wie wir schon im ersten Teil gesehen haben, bei der Verwaltung von Basic-Programmen und -Variablen eine zentrale Rolle. Über sie erfolgt die Trennung zwischen Programm und den einzelnen Variablentypen. Auch für das Speichern und Laden von Programmen liefern sie die Basisdaten. Die einzelnen Funktionen können sie Tabelle 1 entnehmen.
+
+Eine interessante Gebrauchsmöglichkeit ergibt sich durch die Memoryroutine. Dies ist ein kurzes Basic-Programm, welches die Aufgabe hat, den von Programmen, Variablen, Strings und Arrays belegten Speicherplatz festzustellen (Listing 1):
+
+Wie man nach dem Starten des Programms sehen kann, erhält man die Werte, indem man die Zeiger — nachdem sie in Dezimalzahlen umgewandelt worden sind — voneinander subtrahiert. Den Speicherplatz, der durch Variablen belegt ist, erhält man beispielsweise durch Subtraktion des Hilfszeigers, »Beginn der Variablen« (45/46) von dem Zeigerpaar »Beginn der Arrays« (47/ 48).
+
+Gerade bei stark limitiertem Speicherplatz (wie zum Beispiel in der Grundversion) kann dieses Hilfsprogramm Aufschluß über die momentane Speicherverteilung geben.
+
+Eine weitere Verwendung ergibt sich durch geschicktes Manipulieren der Speicherzellen, so daß es möglich wird, mehrere Programme gleichzeitig um Speicher unterzubringen.
+
+Diese Aufgabe erfüllt das recht komfortable Programm »Basic-Switch« (Listing 2); zunächst aber die Grundlagen: Die besagten Zeiger stecken, wie bereits im ersten Teil unseres Kurses beschrieben, den Adreßbereich für Basic-Programme ab. Die ersten vier Bytes aus dem Zeropagekomplex (Adresse 43 bis 46) grenzen das Programm nach oben und unten ab. Die daran folgenden Variablen sind in ihrer Ausdehung ebenfalls durch ein Zeigerpaar (Adresse 55/56) limitiert. Der Bereich jenseits dieser Markierung ist für Basic tabu. Dort ist also Platz für Maschinenprogramme oder ähnliches, denn ein Überschreiben durch Basic-Variable ist nicht möglich.
+
+Will man nun mehrere Basic-Pro-gramme im Speicher versammeln, so muß man sie nur durch verstellen der Zeiger eindeutig voneinander trennen.
+
+Wie in Bild 1 zu sehen ist, grenzen die Programmblöcke direkt aneinander. Unter Programmblock ist hier die Einheit von Programm und einem sich daran anschließenden Variablenbereich zu verstehen. Durch Umschalten der Zeiger wird dann immer der gewünschte Programmblock eingeblendet.
+
+Nützlich kann diese Art der Speicheraufteilung sein, wenn man umfangreiche Programme erstellen möchte und es nötig wird, andauernd Hilfsprogramme (zum Beispiel Grafikeditor oder ähnliches) nachzuladen. Durch Basic-Switch kann hier viel Arbeit eingespart werden.
+
+Diese Routine liegt wieder in zweierlei Form ausgedruckt vor. Zum einen als Assemblerlisting für solche, die tiefer in das Programm einsteigen möchten (Listing 3). Und zum anderen als Basic-Lader. Das Programm ist grundsätzlich auf jeder Ausbaustufe lauffähig. Sinnvoll wird es jedoch erst bei größerem Speicher. Es ist in bewährter Weise über das Befehlswort PI in den Interpreter eingebunden.
+
+Nachdem die Routine per SYS gestartet worden ist, (der Lader übernimmt auch diese Arbeit), muß der erste Programmbereich initialisiert werden, das heißt der Benutzer nimmt die größenmäßige Einteilung des Speichers vor. Man muß sich jedoch schon im voraus darüber im klaren sein, wie lang das Programm inklusive Variablen sein soll, denn eine nachträgliche Änderung ist nicht möglich.
+
+Die Syntax für die Initialisierung lautet: πE »Länge«. Danach steht der Speicherbereich abzüglich zwei Bytes für Basic zur Verfügung. Der erste so eingerichtete Programmblock hat die Nummer 1, der zweite 2 und so fort. Nachdem ein zweiter Programmbereich eingerichtet wurde, kann mit πS »Nummer« zwischen den Blöcken umgeschaltet werden, wobei die Routine jedoch jedesmal die Variable löscht.
+
+Um dem Benutzer die Orientierung zu erleichtern, druckt das Maschinenprogramm nach jedem Umschalten die ersten REM-Zeilen aus. Daher ist es ratsam, jedem Programm eine Kopfzeile mit den wichtigsten Informationen zu geben.
+
+Nach dieser etwas umfangreichen Erläuterung kehren wir nun zur Beschreibung der Zeropage zurück.
+
+**Adresse 59,60:** Diese Speicherzellen enthalten die laufende Zeilennummer eines Basic-Programms. Sollte es im Programmlauf unterbrochen werden, hat man hier die Möglichkeit, die Zeilennummer nachzulesen.
+
+**Adresse 63 — 66:** Mit Hilfe dieser Zeiger läßt sich ein zeilennummerngesteuertes RESTORE realisieren. Die ersten zwei Bytes enthalten die momentane Zeilennummer für die DATA-Abfrage. Dies ist sehr praktisch, denn damit kann man jederzeit feststellen, in welcher DATA-Zeile man sich befindet. Das zweite Doppelbyte bildet die Adresse für die nächste DATA-Zeile. Man hat also zwischen Zeilennummer und der absoluten Adresse einer DATA-Zeile zu unterscheiden.
+
+Das nun folgende kurze Maschinenprogramm (Listing 4 und 5) ermöglicht ein Zeilennummern-RE-STORE. Man kann damit zwar nicht gezielt auf ein Element in einer DATA-Zeile zugreifen, aber zumindest auf eine bestimmte Zeile.
+
+Was auch im Zusammenhang mit dem Maschinensprachkurs von Interesse sein kann, ist der Aufbau dieser kurzen Routine. Denn durch geschicktes Nutzen von Unterprogrammen aus dem ROM kann man nämlich viel Speicherplatz sparen. Aus diesem Grunde werde ich in einer späteren Folge Interpreter- und Betriebssystemunterroutinen näher beleuchten.
+
+Das vorliegende Maschinenprogramm benötigt genau 43 Byte und liegt am Ende des verfügbaren Ba-sic-Speichers. Die Start- und Endadresse wird vom Lader angegeben. Aufgerufen wird der Zeilenre-store mit: SYS »Startadresse«, »Zeilennumer«.
+
+Die DATA-Zeiger werden dann auf die angegebene Zeile zurückgestellt, was sowohl im Direktmodus, als auch vom Programm aus erfolgen kann.
+
+## Zustandsbeschreibung: Das Statusflag
+
+**Adresse 144:** Dieses Statusflag ist auch von Basic aus über die STATUS beziehungsweise ST-Anweisung abfragbar. Es liefert das Computerstatus-Byte, dessen Inhalt aufgrund der letzten Input-Output-Operation gesetzt wurde. Bezogen auf den Kassettenport liefert es nach Bild 2 bestimmte Meldungen. Die Informationen über die geladenen Programme werden binär wiedergegeben. Die Null signalisiert ein ordnungsgemäß geladenes Programm. 32 hingegen bedeutet, daß ein Prüfsummenfehler vorliegt. Es ist aber auch möglich, daß der Computer mehrere Meldungen in dieses Byte packt, beispielsweise 52 = 32 + 16 + 4 : Hier wurde ein kurzer Block geladen, jedoch ist die Priifsumme falsch und ein fataler Ladefehler liegt vor.
+
+An dieser Stelle ist es angebracht, sich näher mit dem Aufzeichnungsverfahren zu beschäftigen (Bild 3).
+
+## So kommen Programme aufs Band
+
+Jeder Abspeichervorgang beginnt mit dem Header. Dieser Kopf besteht aus dem Vorspann (das ist ein etwa acht Sekunden langer Pfeifton) und dem eigentlichen Programmkopf. Dieser enthält vier wichtige Informationen, nämlich über Programmtyp, Startadresse, Endadresse und Programmname. Diese Daten sind ebenfalls im Bandpuffer zu finden und können von dort abgerufen werden.
+
+Das erste Byte (Adresse 828) gibt Auskunft über den Headertyp. Eine 1 zeigt an, daß es sich um ein Programm handelt, das verschoben geladen werden kann, also auch an eine andere Stelle, als die, von der aus es abgespeichert wurde. Das Gegenstück dazu ist die absolute Lademethode (Headertyp 3), die bereits in der ersten Folge meiner Abhandlung vorgestellt wurde. Gemeint ist LOAD”..”,1,1. Die Sekundäradresse 1 signalisiert dem Computer, daß er das Proramm (unabhängig von den Zeigern 43, 44) wieder in den gleichen Adreßbereich laden soll. Um Verwechslungen vorzubeugen, ist es wichtig, Headertyp und Sekundäradresse zu unterscheiden. Für den Headertyp gibt es drei Möglichkeiten:
+1:	Laden mit Verschiebelader (die Anfangsadresse wird durch den Zeiger 43 und 44 bestimmt).
+2:	Ein File — also Daten aus Variablen — wurde abgespeichert. Die Unterscheidung ist wichtig, denn Daten können nicht mit LOAD geladen werden.
+3:	Ein Programm ist absolut zu laden.
+
+Die nächsten vier Bytes geben die Anfangs- und Endadresse des geladenen Files an. Mit der Endadresse hat es eine besondere Bewandtnis. Sie wird nämlich nach korrektem Laden der Zeropage (Adresse 45, 46) übergeben. Bei Load Error geschieht dies nicht; PRINT FRE(0) zeigt dann die volle Bytezahl an, obwohl sich ein Programm im Speicher befindet. Man darf das Programm — das vielleicht nur einen geringfügigen Fehler hat —, dann nicht starten, weil die Variablen dieses überschreibenwürden. Abhilfe schafft in diesem Fall
+POKE 45,PEEK(831):POKE 46,PEEK (832):CLR.
+Die Werte werden damit von »Hand« übertragen und ein normaler Programmablauf ist in den meisten Fällen wieder möglich.
+
+Jetzt aber wieder zurück zu Bild 3: Nachdem der Vorspann und der Programmkopf vor einem Trennzeichen (dies ist ein ganz kurzer Pieps) auf Band geschrieben worden ist, wird der Header gleich noch einmal abgespeichert.
+
+Dies ist eine Eigenheit des Commodore-Systems, das der Datensicherheit dient. Denn nachdem der Programmkopf 1 geladen hat, vergleicht er in einem zweiten Durchgang das bisher geladene (welches sich ja schon im Speicher befindet) mit Programmkopf 2. Eine Abweichung veranlaßt den Computer eine Fehlermeldung auszugeben, in ganz schweren Fällen wird der Ladevorgang gleich ganz unterbrochen. Diese Verfahrensweise gilt nicht nur für den Programmkopf, sondern auch für Programme und Daten — sie alle werden doppelt abgespeichert.
+
+Nachdem also der Programmkopf erkannt worden ist, zeigt der Computer den Filenamen an, und das eigentliche Programm (oder die Daten) wird geladen. Ihnen ist wiederum ein kurzer Vorspann vorangestellt. Der Endblock besteht aus Endmarkierung und einem Nachspann. Er zeigt dem VC 20 das Ende des geladenen Programms an, womit der Ladevorgang beendet ist.
+
+Nach diesem Exkurs zum Kassettenaufzeichnungsformat nun wieder zur Zeropage.
+
+## Die STOP-Taste mit Sonderfunktion
+
+**Adresse 145:** Mit Hilfe dieser Speicherstelle kann man den Zustand der STOP- und der linken SHIFT-Taste abfragen:
+Wert =
+253:	Linke SHIFT-Taste gedrückt
+254:	STOP-Taste gedrückt
+255:	Keine der beiden gedrückt
+
+Wenn man das Low-Byte des STOP-Vektors (Adresse 808) auf 114 — statt ursprünglich 112 — setzt, so ist man in der Lage, diese Taste von Basic aus abzufragen, ohne das laufende Programm anzuhalten. Ihr kann dann in der Routine eine besondere Funktion zugewiesen werden, beispielsweise Anhalten des Programmablaufs für eine bestimmte Zeit.
+
+## Programmiert oder direkt? Das ist hier die Frage
+
+**Adresse 157:** Dieses Flag kann nur zwei Zustände annehmen: Entweder 0 oder 128. Ist der Inhalt der Speicherstelle Null, dann arbeitet der Computer gerade ein Programm ab; bei 128 befindet er sich im Direktmodus.
+
+Diese Zeropageadresse kann dann von Bedeutung sein, wenn man eigene Basic-Kommandos definieren will (vergleiche Teil 1).
+
+Zum Beenden einer solchen Routine gibt es zwei Möglichkeiten: Entweder kam der Programmbefehl aus dem Direktmodus. In diesem Fall springt man in die Interpreterschleife QMP $C474) zurück, damit der Computer READY meldet. Kam das Kommando aber aus einem Basic-Programm, so muß man mit JMP $0079 in die CHRGOT-Routine zurückspringen, damit kein Bereitschaftszeichen ausgegeben wird. Mit Hilfe dieses Flags trifft man hier die Unterscheidung.
+
+Nun wenden wir uns einem anderen Kapitel zu, der Cursorverwaltung. Über die Zeropage kann jederzeit die Cursorposition festgestelltwerden. Die Speicherstelle 211 zeigt die Spalte, 214 die Zeile, in der sich der Blinker derzeit befindet. Korrekte Werte liefern die zwei Adressen aber nur innerhalb eines Programms.
+
+Interessanter ist die umgekehrte Verfahrensweise, nämlich das Setzen des Cursors an eine beliebige Bildschirmposition. Dazu müssen allerdings vier Adressen geändert werden. Glücklicherweise nimmt uns eine Unterroutine aus dem Betriebssystem diese Arbeit ab.
+
+## Gewußt wo — der Cursor
+
+In Maschinensprache wird das X-Register mit dem Zeilenwert, das Y-Register mit dem Spaltenwert geladen. Danach ruft man mit JSR $E50C das Unterprogramm auf.
+
+Von Basic aus werden die zwei CPU-Register über die Adressen 781 und 782 geladen (warum das so ist, sehen wir in der nächsten Folge): POKE 781,»Zeile«: POKE 782,»Spal-te«: SYS 58636.
+
+Diese Verfahrensweise ist, wie man sieht, wesentlich komfortabler als das Hantieren mit den Steuerzeichen.
+
+Eine andere Zeropageadresse kann uns zu einer weiteren Erleichterung verhelfen. Jeder kennt das Problem, den Cursor innerhalb von Anführungszeichen (»Gänsefüßchen«) zu bewegen. Es werden nur Steuerzeichen ausgedruckt, eine Bewegung des Zeigers findet nicht statt.
+
+Dieses Manko läßt sich durch eine kurze Maschinenroutine beheben:
+LDA #$00 ; lösche Hochkommaflag
+STA $D4	; speichere es ab
+JMP $FEAD ; springe in die NMI-Routine
+
+Ausgelöst wird diese Routine durch Drücken der RESTORE-Taste. Dazu muß vorher der NMI-Vektor (eine nähere Beschreibung nächstes Mal) auf den Beginn unserer Routine gestellt werden. Da die sehr kurz ist, legen wir sie im Kassettenpuffer ab. Dort ist sie solange sicher verwahrt, bis man etwas laden oder abspeichern will. Hier zunächst der Einzeiler, der die Routine in den Bandpuffer generiert:
+10 FORT=828 TO 834: READD: POKE T,D:NEXT: DATA 169, 0, 133, 212, 76, 173, 254: POKE 792, 60: POKE 793, 3
+
+Arbeitet man im Hochkommamodus, so kann man durch Drücken der RESTORE-Taste diesen Betriebszustand abschalten, der Cursor kann dann wieder ganz normal bewegt werden.
+
+Abschließend möchte ich noch sagen, welche Zeropageadressen ohne Komplikationen von eigenen Maschinenroutinen genutzt werden können, was im hohen Maße vom Verwendungszweck abhängt.
+
+Nicht verändert werden dürfen solche Speicherstellen, die vom Betriebssystem gebraucht werden, also die Adressen 192 bis 244 und 160 bis 162. Hat das Maschinenprogramm keine Verbindung zu Basic, so können alle Speicherstellen zwischen 0 und 138 überschrieben werden, weil sich hier nur Basic-Parameter befinden. Eng wird der Platz für die sogenannten Utilities— also für Basic-Ergänzungen oder Hilfsprogramme. Will man Daten nur zwischenspeichem, kann man sie in den Bereich zwischen Adresse 147 bis 159 packen. Dort sind sie bis zum nächsten Lade- oder Abspeichervorgang sicher.
+
+Dauerhaft können Daten nur am Anfang und am Ende der Zeropage abgelegt werden. Dazu gehören Adresse 0 bis 2 und 245 bis 254.
+
+Genau diese werden aber auch von käuflichen Basic-Erweiterungen gebraucht, wodurch es zu Komplikationen kommen kann. Also Vorsicht, erst durch vorheriges Probieren testen, ob man sie benutzen darf!
+
+Damit möchte ich für heute schließen. In der nächsten Folge werden schwerpunktmäßig der Tastaturpuffer, die Basic-Vektoren und die Kernalvektoren behandelt.
+
+(Christoph Sauer/ev)
 
 
 
