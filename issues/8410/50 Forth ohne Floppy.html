@@ -1,0 +1,65 @@
+<h1>Forth ohne Floppy</h1>
+
+<p class="intro">Die virtuelle Speicherverwaltung der Forth-Systeme erfordert meistens ein Floppy-Laufwerk. Das Audiogenic-Forth benötigt dagegen nur eine Datasette.</p>
+
+<p>Der Befehlsumfang des Audiogenic-Forth beschränkt sich im wesentlichen auf den FIG-Forth-Standard und ist in einem einzigen Vokabular zusammengefaßt. Dies bedeutet im Vergleich mit anderen Forth-Versionen eine gewisse Einschränkung. Mancher Benutzer wird spezielle Befehle zum Ansprechen eines Floppy-Laufwerkes vermissen. Dieses Manko erklärt sich aus der Zielgruppe, an die sich diese Forth-Version primär wendet: An jene Computerbesitzer, die ohne Floppy-Laufwerk auskommen müssen und sich lediglich einer Datasette bedienen. Dementsprechend wurden die Befehle für die Floppy einfach fortgelassen.</p>
+
+<p>Doch wenden wir uns der Speicherverwaltung zu. Im Gegensatz zur sonst üblichen virtuellen Speicherverwaltung wurde bei dieser Forth-Version eine »screen compressing routine« implementiert. Diese Routine reduziert zum Beispiel einen leeren Screen auf eine Länge von nur 5 Bytes. So hat man alle 255 möglichen Screens ständig im Speicher, also im direkten Zugriff. Ein ständiges Laden und Speichern von und auf Diskette ist somit überflüssig.</p>
+
+<p>Das Textfeld Nummer Null fungiert als Interpreterscreen. Hier werden alle Benutzereingaben sofort ausgewertet und gegebenenfalls compiliert. Beim interaktiven Arbeiten mit dem System stört es häufig, daß alle auf dem Bildschirm ausgegebenen Ergebnisse nach Betätigen einer Taste (für die nächste Eingabe) wieder verschwinden.</p>
+
+<p>Ebenso wie Screen 0 werden auch die übrigen Textfelder mit einem zeilenorientierten Editor bearbeitet, der 16 Zeilen mit je 64 Spalten durch horizontales Scrollen auf der Mattscheibe darstellt. Dieser Editor kann zwar einen Full-Screen-Editor nicht ersetzen, aber aufgrund mehrerer Hilfsfunktionen und Editiermöglichkeiten, die zum Teil auch auf die Funktionstasten gelegt sind, wird ein insgesamt annehmbarer Bedienkomfort erreicht. Die Funktionstaste Fl ist übrigens frei belegbar.</p>
+
+<p>Das Audiogenic-Forth verfügt über einige Befehle, die nicht zum FIG-Forth-Standard gehören. Sie unterstützen hauptsächlich die Hardwaremöglichkeiten des VC 20 beziehungsweise des C 64. Die VC 20-Version bietet dabei sogar etwas mehr, denn hier wird die Programmierung von Grafik und Musik durch die Befehle SOUND, VOLUME und COLOUR vereinfacht. Besondere Beachtung verdient die Behandlung der RESTORE-Taste. Durch den Befehl »RESTORE« wird wahlweise keine Reaktion, eine Rückkehr in den Interpreterscreen oder ein Kaltstart ausgelöst.</p>
+
+<p>Das Handbuch, das in Umfang und Ausführlichkeit stark an die Commodore-Handbücher erinnert, ist leider in Englisch geschrieben und kann ein Forth-Lehrbuch nicht ersetzen. Es ist allerdings sehr gut gegliedert und zum schnellen Nachschlagen brauchbar. Neben einer sinnvoll geordneten und übersichtlichen Kurzbeschreibung aller Befehle sind die abgedruckten Beispielprogramme erwähnenswert. Viele davon dienen zur Darstellung bestimmter Programmiertechniken in Forth. Andere jedoch, wie zum Beispiel ein Screen-Lister für Druckerausgabe oder ein Programm zum Lesen einer Directory sind wirklich nützliche Utilities. Natürlich fehlt auch ein vollständig in Forth programmiertes Spiel nicht.</p>
+
+<p>Das Audiogenic-Forth gibt es als Steckmodul in einer Ausführung für den C 64 und gleich in zwei Versionen für den VC 20, einmal mit und einmal ohne eingebaute 3 KByte Speichererweiterung. Die VC 20-Version ohne eingebaute Speichererweiterung ist jedoch auf der Grundversion nicht lauffähig und kann nur mit einem bereits erweiterten VC 20 benutzt werden.</p>
+
+<p>Empfehlenswert ist das Audiogenic-Forth vor allem für Systeme ohne Floppy-Laufwerk, die bisher die mächtige Sprache Forth aufgrund der nötigen Zwischenspeicherung der Screens auf Diskette nicht benutzen konnten.</p>
+
+<p>(Daniel Kobler/ev)</p>
+
+<p>Audiogenic-Forth ist erhältlich über Kingsoft, Fritz Schäfer, Schnackebusch 4, 5106 Roetgen.<br/>
+Preis 119 Mark (Steckmodul).</p>
+
+<h2>Das Standard-Vokabular von Audiogenic-Forth</h2>
+
+<h3>Stackmanipulation</h3>
+
+<p>OVER DROP SWAP DUP ROT ?DUP SP@ SP! RP! > R R > R@ I J K STACK-BOTTOM</p>
+
+<h3>Numerische Befehle</h3>
+
+<p>DIGIT + D+ MINUS DMINUS MIN MAX AND OR XOR U<em> U/ 1+ 2+ 1- 2- - HEX DECIMAL LITERAL NUMBER S- ->D + -D + - ABS DABS * 2</em> 2/ MOD /MOD M/MOD / M<em> </em>/ */MOD 0 1 2 3 -1 DPL BASE 0= 0&lt; = U&lt; &lt; > HOLD &lt;# #> SIGN # #S</p>
+
+<h3>Textfeld-Speicherung</h3>
+
+<p>TP SCR BLK EXP COM EXPAND SSAVE SLOAD DEVICE ?SCREENS DELETE COPY RESET CLR0 - -> ( LOAD SCREEN SCRSTART C/L CONTROL</p>
+
+<h3>Speicherzugriff</h3>
+
+<p>FILL ERASE BLANKS CMOVE &lt;CMOVE @ C@ ! C! TOGGLE + ! , C, COUNT</p>
+
+<h3>Wörterbuch</h3>
+
+<p>FENCE SET-FORTH -FIND HERE ALLOT LATEST TRAVERSE LFA CFA NFA PFA FORGET &lsquo;<br/>
++ ORIGIN PAD VOCABULARY DEFINITIONS DP CURRENT CONTEXT</p>
+
+<h3>Compiler-Anweisungen</h3>
+
+<p class="intro">IN EXECUTE ENCLOSE ERROR TERROR ?STACK ?COMP ?EXEC ?PAIRS ?CSP TLOADING COMPILE [COMPILE] [ ] WORD !CSP ;S QUIT ABORT INTERPRET IMMEDIATE STATE SMUDGE COLD LITERAL</p>
+
+<h3>Ein-/Ausgabe</h3>
+
+<p>KEY 0KEY EMIT CR TYPE -TRAILING (.») .» EXPECT QUERRY SPACE SPACES DR D. .R U. . ? CLR ?TERMINAL TEXT # IN P HOME BL TIB OPEN CLOSE IN OUT OFF STATUS</p>
+
+<h3>Definitions-Worte</h3>
+
+<p>: ; CREATE CONSTANT VARIABLE <BUILDS DOES> Kontrollstrukturen<br/>
+BRANCH 0BRANCH (LOOP) (+ LOOP) (DO) LEAVE DO LOOP + LOOP BACK BEGIN UNTIL AGAIN IF ELSE THEN REPEAT WHILE DOBRAN IJ K R@</p>
+
+<h3>VC 20 / C 64 - Funktionen</h3>
+
+<p>SOUND VOLUME NMI COLOUR SET RESTORE</p>
+

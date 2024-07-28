@@ -1,0 +1,61 @@
+<h1>Olympia Compact 2: ein Interface</h1>
+
+<p class="intro">Das hier beschriebene Interface ermöglicht den Anschluß einer Olympia Compact 2 an den Commodore 64. Es gleicht einerseits die Zeichensätze der beiden Geräte an die ASCII-Norm an, andererseits gestattet es den Ausdruck der Steuerzeichen des C 64.</p>
+
+<p>Die Steuerzeichen werden in einer Form dargestellt, anhand derer man sie bequem identifizieren und wieder eingeben kann. Außerdem simuliert das Programm eine Rücktaste und führt einen Cursor für den Drucker.</p>
+
+<p>Für die Verbindung des Userports mit der Centronics-Schnittstelle ist ein Kabel erforderlich, das folgende Pins verbindet:<br/>
+Userport 8 C D E F H J K L B A und N<br/>
+Amphenol 1 2 3 4 5 6 7 8 9 11 19 — 29</p>
+
+<p>PC2 des C 64 liefert also das Strobe-Signal, das der Schreibmaschine das Vorhandensein gültiger Daten mitteilt, und an FLAG2 wird das BUSY-Signal des Druckers auf Bereitschaft zur Entgegennahme neuer Zeichen abgefragt.</p>
+
+<p>Das Programm können Sie natürlich auch ohne die REMs abtippen, die hier wiedergegebene Pseudo-Assembler-Fassung hat den Sinn, einen gewissen Durchblickzu ermöglichen und Änderungen zu vereinfachen.</p>
+
+<p>Die Schnittstelle hat die Sekundäradresse 4. Wird eine andere Geräteadresse gewünscht, etwa, weil schon ein Matrixdrucker mit dieser Adresse existiert, so sind die Zeilen 127 und 137 des Programms entsprechend zu ändern.</p>
+
+<p>Das Maschinenprogramm belegt in der vorliegenden Fassung die Speicherplätze von 32000 bis 32511. So ist eine Zusammenarbeit mit Simons Basic und Exbasic II gewährleistet. Wer das Programm in einen anderen Bereich, zum Beispiel in die 4 KByte RAM ab 49152, legen will, muß dazu die Zeilen 79,111,114,116,142,144,218,224,233,237 und256, die durch ein Sternchen gekennzeichnet sind, ändern. In 111 ist das MSB der Anfangsadresse einzusetzen (bei Anfang 50000 ist dies 195), in 114 das LSB der Anfangsadresse des CHROUT-Teils (Anfang + 55, im Beispiel 135), in 116 die Anfangsadresse des CHKOUTTeils (Anfang + 30, im Beispiel 110). In 142 und 144 stehen jeweils als zweites Byte LSB und MSB vom Anfang des Umsetzungskatalogs. Sie wären bei Umlegung der Schnittstelle nach 50000 auf 73 (Zeile 144) und 196 (Zeile 140) zu ändern.</p>
+
+<p>Das Programm verwendet die Adresse »Anfang« (32000) als Druckercursor, der für formatierten Druck abgefragt werden kann (zum Beispiel mit PRINT#4 TAB(31-PEEK (32000)),&hellip;). Im Programm dient er dazu, durch (von der Compact 2 nicht tatsächlich ausgeführten, sondern druckwegoptimierten) Wagenrücklauf und Wiedervorrücken eine Rücktaste zu simulieren. Dieser Cursor wird in den Zeilen 218, 224, 233, 237 und 256 des Programms verwendet und müßte bei Verlegung des Programms geändert werden (für Anfang 50000 ist jeweils das LSB 80 statt 0 und das MSB 195 statt 125);</p>
+
+<p>Zum Aufbau des Programms: Der Initialisierungsteil verbiegt die KERNAL-Vektoren CHKOUT und CHROUT in die Schnittstellensoftware. Da diese Vektoren durch RUNSTOP/RESTORE wieder zurückgestellt werden, muß die Initialisierungsroutine nicht nur nach dem Laden, sondern nach jedem RUNSTOP/ RESTORE mit SYS 32001 aufgerufen werden. Die neu eingebauten Teile CHKOUT und CHROUT prüfen nun bei jeder Zeichenausgabe, ob das Zeichen für die Schreibmaschinenschnittstelle bestimmt ist.</p>
+
+<p>Der CHROUT-Teil sucht ein auszugebendes Zeichen zunächst im Sonderzeichenkatalog. Hier wird ein Zeichen des C 64 in bis zu drei Codes an die Schreibmaschine umgesetzt. (Man beachte das zusammengestoppelte Potenzzeichen oder das elegante Pi). Dabei werden die Steuerzeichen für die Schreibmaschine im Druckmodus anders behandelt als im Listmodus. Ist das auszugebende Zeichen nicht im Sonderzeichenkatalog zu finden, so wird es je nach Zeichensatz auf ASCII-Wert umgesetzt. Anstelle von unbekannten Zeichen druckt die Schreibmaschine als Joker einen accent aigu »´«.</p>
+
+<p>In den folgenden drei Abschnitten des Programms werden die angesammelten Schreibmaschinencodes der Reihe nach ausgegeben und der Cursor aktualisiert.</p>
+
+<p>Zum Katalog der Sonderzeichen: Hier steht an erster Stelle der Wagenrücklauf, der beim C 64 anders als bei der Schreibmaschine gehandhabt wird. Jeder Wagenrücklauf (CR, CHR$(13)), den der C 64 sendet, muß durch eine Zeilenschaltung (LF, CHR$(10)) ergänzt werden. Das zu ersetzende Zeichen (hier 13) steht immer in der vierten Spalte des Kataloges, die Ersatzzeichen (hier 13,10,0) in den ersten drei Spalten. Das Zeichen 0 wird nur deswegen gesendet, weil jedes umzusetzende C64 Sonderzeichen prinzipiell durch drei Compact 2-Zeichen ersetzt wird.</p>
+
+<p>Das folgende Sonderzeichen ermöglicht es, bei Bedarf auch nur den Wagenrücklauf zu senden. Der neue Code hierfür ist 11 (Befehl PRINT CHR$(11) oder in Strings PRINT »<Control>K«. Die dritte Umsetzung ist erforderlich, damit die Compact 2 auch ein geshiftetes Space als solches serviert bekommt.</p>
+
+<p>Danach folgen 8 Steuerzeichen der Schreibmaschine, die mit PRINT CHR$(1, 2, 3, 21, 22, 23, 25 oder 26) oder in einen String auch mit PRINT >><Control>A, B, C, U, V, W, Y oder Z« gesendet werden können. Dies ist auch mit PRINT CHR$(12) beziehungsweise PRINT »<Control>L« möglich, was einen Seitenvorschub bewirkt. Die Control-Methode führt jedoch bei A,B,C und L zu Problemen, da sie nicht gelistet, sondern auch im Listmodus ausgeführt werden.</p>
+
+<p>Im Katalog folgen nun die Umlaute und Sonderzeichen der Schreibmaschine, die den folgenden Tasten des C 64 zugeordnet wurden:<br/>
+Comm + : ä<br/>
+Shift + : Ä<br/>
+Comm — : ö<br/>
+Shift — : Ö<br/>
+Pfund : ß<br/>
+Comm Pfund : ü<br/>
+Shift Pfund : Ü<br/>
+j Comm Alphak : §<br/>
+Shift Alphak: |<br/>
+Comm * : ´<br/>
+Shift * : Unterstreichen des nächsten Zeichens<br/>
+eckige Klammer auf: <sup>2</sup><br/>
+eckige Klammer zu : <sup>3</sup></p>
+
+<p>Der Akzent »´« wird über das nachfolgende Zeichen gedruckt, UNT+RT unterstreicht das nachfolgende Zeichen. Auf den Einbau von Promille und My wurde verzichtet. Wem diese Zeichen lieb und wert sind, der möge eine der Zeilen 298 bis 303 ändern, indem er die ersten drei DATA durch 60,0,0 für My und durch 14,46,15 für Promille ändert. (Die vierte DATA-Zahl ist, wie erwähnt, der Code des C 64-Zeichens, das ersetzt wird). In TEXT 64, das das Pfundzeichen als Steuerzeichen benutzt könnte man sich das »ß« erhalten, indem man die 64 und die 92 in den Zeilen 288 und 294 vertauscht und so das »ß« auf die Alphakringel-Taste legt. Ich selbst habe stattdessen die Zeilen 3160, 7110, 540, 1200, 7200, 8220 und 7140 von TEXT 64 geändert.</p>
+
+<p>Bei den nun anstehenden Listcodes herrscht folgende Systematik: Die Kleinbuchstabencodes gehören zu den direkt . ansprechbaren Funktionen CLR, HOME und den Cursortasten. »g« bedeutet CHR$(142), Umschalten auf Großschrift, was nur mit Tricks eingegeben werden kann, aber in manchen Listings auftaucht.</p>
+
+<p>Die Zeichen ”!,”, #, $, %, &amp;, ’ und (” stehen für die acht Farben, die zusammen mit der Commodore-Taste eingegeben werden.</p>
+
+<p>Ziffern und Großbuchstaben werden zusammen mit &lt; Control > eingegeben. Es sind dies die ersten acht Farben, 9 und 0 für RVS und RVS OFF, die Umschaltung auf den zweiten Zeichensatz durch <Control>N, Blockieren und Freigabe der Umschaltung durch <Control>H beziehungsweise <Control>I sowie die oben schon erwähnten Steuercodes <Control>F, K,U,V,W,Y,Z für die Schreibmaschine. Die angegebenen Control-Codes gehören natürlich in einen String nach PRINT.</p>
+
+<p>Nicht in Print-Statements, sondern nur in Abfragen tauchen mitunter auch die Listcodes der Funktionstasten auf, die aber aus Platzgründen hier ausgelassen werden mußten und von der Schreibmaschine wie alle unbekannten Zeichen als Joker »'«ausgegeben werden.</p>
+
+<p>Damit nicht jedesmal das ganze, lange Programm eingelesen werden muß, habe ich am Anfang des Programms eine Möglichkeit beschrieben, eine reine Maschinencodefassung abzuspeichern und direkt oder unter Programmkontrolle wieder einzulesen.</p>
+
+<p>(Reinhard Atzbach/rg)</p>
+
