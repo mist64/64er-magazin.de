@@ -1189,6 +1189,35 @@ Zum Schluß noch zwei Tips.
 
 (Bernd Schrödter/ev)
 
+# Grafik leicht gemacht
+
+> Mit einigen neuen Befehlen macht dieses Programm das Plotten von Funktionen zum Kinderspiel. Das mühsame Arbeiten mit den Commodore-Grafik-befehlen ist vorbei, wenn man die neuen Befehleeinsetzt.
+
+Das Programm stellt eine Basic-Erweiterung dar, die im Bereich von $0800-$4000 angesiedelt ist. Dieser Bereich enthält das Maschinenspracheprogramm sowie den Grafikbildschirm. Die neuen Befehle und ihre Bedeutung:
+**HIRES**: Dieser Befehl schaltet die hochauflösende Grafik ein. SCNCLR: Hiermit wird der Grafikbildschirm gelöscht.
+**TEXT**: Um die Grafik wieder auszuschalten wird dieser Befehl benutzt. Am Programmende schaltet die hochauflösende Grafik automatisch ab.
+**REGION a**: Die Cursor- beziehungsweise Plotfarbe wird festgelegt. Der Parameter a darf Werte von 0 bis 15 annehmen. COLOR a,b,c: Bestimmt die Hintergrundfarbe ( a ), die Rahmenfarbe (b) und die Zeichenfarbe (c ).
+**PLOT x,y**: Dieser Befehl setzt einzelne Punkte auf dem Grafik-bildschirm. Die Parameter x und y geben die Position des Punktes an. Der Ursprung des Koordinatensystems liegt in der linken oberen Bildschirmecke. X darf Werte von 0 bis 319, y Werte von 0 bis 199 annehmen. Bei Überschreiten dieser Bereiche gibt der Computer jedoch keine Fehlermeldung aus, wie es bei anderen Programmen meist der Fall ist. Für die Darstellung von Funktionen ist diese Einrichtung jedoch sehr nützlich.
+**UNPLOT x,y**: Löscht einen gesetzten Punkt. Für die Parameter gelten die gleichen Grenzen wie beim Befehl PLOT.
+**AXES x,y**: Zeichnet Koordinatenachsen auf den Grafikbildschirm. Die Parameter x und y bestimmen in diesem Fall den Ursprung des Koordinatensystems.
+
+**ONERROR GOTO n**: Dieser Befehl fängt Definitionslücken von Funktionen ab, wenn nicht mit dem FPLOT-Befehl gearbeitet wird (siehe dort). Tritt während des Programmablaufs ein Fehler auf, der durch eine Definitionslücke verursacht wurde, wird zur Zeile n verzweigt. Dort wird das Programm ohne Unterbrechung weitergeführt. Die Fehlerausgabe wird sinnvollerweise jedoch nur bei den folgenden Fehlern unterdrückt:
+ILLEGAL QUANTITY, DIVISION BY ZERO, OVERFLOW Bei anderen Fehlerursachen bricht das Programm wie üblich ab.
+**FPLOT f(x) STEP n**: Dieser Befehl stellt das Kernstück des Programms dar. Er ermöglicht das Plotten einer beliebigen Funktion mit einem Befehl. Er setzt voraus, daß das Koordinatensystem seinen Ursprung in der Mitte des Bildschirms hat. Nach STEP kann noch angegeben werden, in welchen Intervallen Punkte für die Funktionsdarstellung berechnet werden sollen. Soll die Funktion sehr genau ausfallen, muß n klein gewählt werden. Reicht eine grobe Darstellung, so wählt man den Parameter n größer. Läßt man den STEP-Befehl aus, wird n=0.03 gesetzt, was sich meist als bester Wert erweist. Die Anwendung des FPLOT-Befehls an einem Beispiel: Die Funktion f(x)=SQR(X) soll ausgegeben werden.
+10 HIRES
+20 SCNCLR
+30 AXES160,100
+40 FPLOTSQR(X)
+Das Programm schaltet die hochauflösende Grafik ein, löscht den Grafikbildschirm, zeichnet die Koordinatenachsen und plottet die Funktion. Alle neuen Befehle des Programms können übrigens wie die normalen Basic-Befehle über die Shift-Taste abgekürzt werden.
+
+Zum Schluß noch ein Tip: Es gibt Funktionen, die in der Hauptsache in einem Bereich verlaufen, der nicht innerhalb der Koordinaten liegt, die für den FPLOT-Befehl vorgesehen sind. In diesem Fall wird einfach auf den PLOT-Befehl zurückgegriffen. Ein kleines Basic-Programm plottet unter Verwendung dieses Befehls auch solche Funktionen problemlos. In diesem Fall ist außerdem die Benutzung des ONERROR-Befeh|s sinnvoll.
+
+Hier noch Hinweise zum Eintippen und Abspeichern beziehungsweise Laden des Programms. Vor dem Eingeben des Basic-Quellprogramms werden die folgenden Befehle eingegeben, die den Anfang des Basic-Speicherbereichs nach oben verschieben:
+POKE44,16:POKE4096,0:NEW
+Danach gibt man das Quellprogramm ein. Es enthält die DATAs für das Maschinenprogramm sowie eine Prüfsummenroutine. Nachdem das Maschinenprogramm erzeugt ist, wird es abgespeichert. In Zukunft muß nur noch das Maschinenprogramm geladen und gestartet werden.
+
+(Uwe Seimet/rg)
+
 
 
 
