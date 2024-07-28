@@ -1107,7 +1107,87 @@ Bevor Sie Ihren Computer aus dem Fenster werfen, noch ein Hinweis: Von der näch
 
 Und noch ein letzter Tip: Das Wichtigste, was ein angehender Maschinenprogrammierer braucht, ist ein Reset-Taster. (Bauanleitungen oder fertige Taster wurden schon oft im 64’er vorgestellt.) Sie werden es merken, wenn Sie mit sorgenzerfurchter Stirn, den Tränen nahe, vor Ihrem Bildschirm sitzen, kein freundlich blinkender Cursor weit und breit und RUN/STOP RESTORE auch dann nichts mehr bringt, wenn Sie die Tasten durch das Gehäuse durchdrücken. Verzweifeln Sie nicht, drücken Sie RESET, starten Sie SMON neu mit SYS 49152 und schon können Sie bis zum nächsten Absturz weiterarbeiten......
 
+# Get Koala Pic
 
+> Wenn Sie sowohl einen C 64 als auch das Koala Pad besitzen, dann können Sie Jetzt Koala-Bilder in ganz »normale« Basic-Programme einbeziehen.
+
+Sie möchten Koala-Bilder auch ohne Koala laden und zeigen können. Wahrscheinlich haben Sie das Programm am Ende der Anleitung abgetippt, wie ich. Aber dann dachten Sie vielleicht auch, wie schön es wäre, wenn es möglich wäre, die Bilder der Reihe nach, wie eine Dia-Show abzurufen. Dann müßte man nicht mehr STOP-RETURN drücken, und unser Basic-Programm könnte weitergehen. Somit hätte man vielfältige Möglichkeit, Koala-Bilder anzuwenden! Zum Beispiel könnte man:
+
+1.	...mit Koala ein Titelbild machen
+2.	...mit Koala ein Abenteuer-Programm schreiben; denn: Wenn der Anwender einen Text lesen muß, während das Bild geladen wird, ergibt sich praktisch keine »Wartezeit« für ihn!
+3.	...mit Koala ein Lernprogramm schreiben.
+
+Tja, so ähnlich waren meine Gedankengänge. Aber meine Programmierkenntnisse in Basic nützen nichts; so ein Programm muß in Maschinensprache geschrieben werden! Also telefonierte ich mit einigen C 64-Besitzer-Kollegen herum und wurde fündig: Michael M. Meiszl war schon dabei, an so einem Programm zu basteln. Er paßte es meinen Wünschen an und stellte es in Rekordzeit fertig. Und nun können Sie alles oben Erwähnte tatsächlich tun, und noch viel mehr.
+
+Listing 1 ist das Hauptprogramm. Es wird als erstes geladen. Listing 2 ist ein kleines Anwenderbeispiel, damit Sie sehen, wie die SYS-Befehle in ein normales Basic-Programm eingebaut werden. Bild 1 ist eine Übersicht, welcher SYS-Befehl nun was bewirkt. Falls Sie zwei Laufwerke besitzen, dann können Sie wahlweise 8 oder 9 eingeben.
+
+Das Hauptprogramm ist sehr anwenderfreundlich: Es geht kein Basic-Speicherplatz verloren. Da jedes Bild einzeln geladen und danach alle Zeiger auf Null gesetzt werden, kann man, der Reihe nach, praktisch unzählige Bilder hintereinander im selben Basic-Programm zeigen. Hierzu muß der Anwender nur die Bilder-Diskette einlegen. Sollten Sie mehrere Bild-Disketten benützen wollen, so genügt ein PRINT-Hinweis auf dem Bildschirm, welche Diskette jetzt eingelegt werden muß. Da die Bilder per Leertaste »beendet« werden, kann das Programm nach einem Bild ganz normal weiterlaufen. Ein SYS-Befehl ermöglicht das Nochmalzeigen des letzten Bildes. Dies kann bei Lernprogrammen von Vorteil sein. Ein anderer SYS-Befehl ermöglicht das Laden ohne Zeigen, so daß dieses Bild dann blitzschnell abgerufen werden kann, da es »unsichtbar« bereits »besteht«. Wenn Sie die Tabelle griffbereit neben sich legen, haben Sie die SYS-Befehle bald im Griff.
+
+## Noch ein paar Koala-Tips
+
+1.	Im Menü finden Sie »INIT DISK«. Damit ist nicht »initialisieren« sondern formatieren gemeint. Trotzdem: Bei Disketten, die mit Koala formatiert wurden, ging jeder zweite Versuch, ein Bild zu laden schief: Dabei stieg dann jedesmal der Computer aus, so daß nicht nur das Bild verloren war, sondern man Koala neu laden mußte, und so weiter.
+2.	Ich habe bereits des öfteren gelesen, daß die Handhabung im ZOOM-Modus so schwierig sein soll. Mein Vorschlag: Setzen Sie den Pfeil an die richtige Stelle und drücken Sie dann kurz auf die Taste oben. Auf diese Weise kann man punktweise (ebenfalls sehr schnell in lauter Einzelpunkt-Aktionen) und extrem akkurat arbeiten!
+3.	Wenn Sie ein größeres Stück sauber »radieren« wollen (was durch DRAW mit Hintergrundfarbe leicht ist), dann hilft Ihnen ZOOM ebenfalls: »Radieren« Sie mit ZOOM erst die Ränder mit dem feinsten »Pinsel«, dann können Sie mit einem breiten »Pinselstrich« den Mittelteil schnell weg-malen!
+4.	Wenn Sie etwas Riskantes ausprobieren wollen, was möglicherweise Ihr Bild kaputtmachen müßte (erst »radieren«, dann das Neue zeichnen, dann erst sehen, ob es Ihnen gefällt), dann rate ich Ihnen: Kopieren Sie das gesamte Bild per COPY (dem ein SWAP vorausgehen muß) auf den zweiten Bildschirm. Jetzt können Sie nach Herzenslust experimentieren, denn Ihr Bild existiertja noch »im Original« auf der anderen Grafikseite.
+
+So, jetzt hoffe ich nur noch, daß Sie in Zukunft noch mehr Spaß mit Koala haben werden.
+
+(Vera F. Birkenbihl/aa)
+
+# Der VC 20 als Laterna Magica
+
+> Laterna Magica macht Spiele beweglicher und professioneller. Man kann Zeichen und zusammengesetzte Bilder nicht nur entwickeln, sondern auch bewegen, pulsieren, rotieren oder explodieren lassen und in eigene Programme einbauen.
+
+»Laterna Magica« ist für jeden VC 20 gedacht, sei er erweitert oder nicht. Als Peripherie wird ein Floppy-Disk-Laufwerk VC-1541 vorausgesetzt. Das Programm kann aber für die Datasette umgeschrieben werden, indem die Gerätenummer 8 in Zeile 60 des DATA-Laders in eine 1 umgewandelt wird. Außerdem muß es dann im Hauptprogramm heißen: 490 PRINT”SAVE”CHR$(34)” ”CHR$(34)”,1,1”
+
+Das Programm (Listing 1) ist nicht mehr zu erweitern, es können also auch keine REM-Zeilen mehr eingefügt werden. Es sieht zwar als Listing nicht sehr umfangreich aus, jedoch mußte das Basic-Ende heruntergesetzt werden, um das Maschinenprogramm, den neuen Zeichengenerator und den Speicherplatz, in dem wir später unsere Ersatzbilder speichern, vor Überschreibung zu schützen. Die Erzeugung von Grafik beim VC 20 beruht ja darauf, die Zeichen auf dem Bildschirm, die aus 88 Punkten aufgebaut sind, in ihrem Aufbau zu ändern. Bei einem Zeichen hieße es, 8 Byte gegen 8 andere auszutauschen. Bei 9 Zeichen (das ist die Zeichenanzahl, mit der »Lan-terna Magica« arbeitet) werden es 7 2 Byte. Versuchte man das Problem mit Basic zu lösen, müßte man bei jedem Tauschvorgang eine Zählschleife von 1 bis 72 mit einigen POKEs dazwischen in Kauf nehmen. So etwas kann Action-Spiele ganz schön langsam machen. Ich habe diese Routine daher in Maschinensprache geschrieben. So genügt ein SYS-Aufruf, und 9 Zeichen auf dem Bildschirm ändern sofort ihre Form.
+
+Ausgeführt werden kann derTausch nur, wenn der Zeichengenerator nicht wie üblich im ROM liegt. Das ist also die erste Aufgabe des Maschinenprogramms. Es legt den Zeichengenerator ins RAM ab $1COO(entspricht dezimal 7168). Danach holt es sich aus dem Reserve-Bildschirmspeicher ($1A00 bis $1BFF, dezimal 6656 bis 7167) die ersten 72 Byte und legt sie im Bildschirmspeicher ab. Das ist zunächst alles. Beim nächsten Aufruf verfährt es mit den folgenden 72 Byte in gleicher Weise. Das geht siebenmal so, danach werden wieder die ersten 72 Byte geholt und so weiter.
+
+Wichtig ist, daß vor jedem Aufruf in die Speicher $FB und $FC (dezimal 251 und 252) ein Wert von maximal 7 gePOKEt wird. An diesem Wert erkennt das Maschinenprogramm, wievielmal es die Bilder austauschen soll, bis es wieder beim ersten beginnt. Das bedeutet, daß man auch »Filme« mit nur drei Bildern laufen lassen kann, indem man den Wert 3 in diese Speicher POKEt.
+
+## Der Bildeditor
+
+Um diese besprochenen Bilder zu entwickeln, wären langwierige Berechnungen und viel Tastaturarbeit zum Eingeben der bis zu 504 Werte notwendig. Deswegen habe ich ein Programm geschrieben, das diese Arbeit übernimmt. (Listing 2).
+
+Der Umgang mit dem Bildeditor ist recht einfach. Nach RUN erscheint in der oberen Hälfte des Bildschirmes eine Maske, in der die Zeichen aufgebaut werden und in der unteren Hälfte das Menü (siehe Bild).
+
+Das Feld rechts oben zeigt das erste Bild. Man sieht zwar zunächst nur ein abstraktes Gebilde, das liegt aber nur daran, daß noch keine Zeichen entwickelt wurden. Links daneben stehen die gleichen Zeichen in Klarschrift. In beiden Feldern sind die gleichen Zeichen in der linken oberen Ecke schwarz, um herauszustellen, daß dieses Zeichen bearbeitet werden kann.
+
+Mit F1 kann man nun ein Zeichen auswählen, das verändert werden soll. Dabei wandert das schwarze Feld jeweils eine Ziffer weiter.
+
+Weiterhin kann man über den beiden Feldern die Bildnummer ablesen. Mit F3 können wir zwischen sieben Bildern wählen. Die Bilder werden jeweils im rechten Feld gezeigt. Es entsteht so schon ein Zeichentrickeffekt.
+
+Hat man nun seine Wahl getroffen, kann man mit F7 in den Entwicklungsmodus wechseln. Der Cursor steht nun in der linken oberen Ecke des großen Entwicklungsfeldes. Er läßt sich voll steuern, jedoch nicht über den Feldrand hinaus. Tippt man nun, mehr oder weniger willkürlich, Buchstaben oder Zeichen in das Feld, sieht man gleichzeitig an der vorgewählten Ziffer im rechten Feld das Ergebnis. Man sollte nur nicht den Fehler machen, CLR/HOME oder INST/DEL zu drücken. Das kann den Bildschirmaufbau durcheinander bringen.
+
+Mit RETURN kommt man ins Menü zurück.
+
+Ist eine Bild- oder Zeichenfolge fertiggestellt, kann man den Trickfilm mit F5 ausprobieren. Im Menüfeld wird die Geschwindigkeit des Ablaufes erfragt. Eine gute Geschwindigkeit von 100 ist vorgegeben. Ein Wert von Null ergibt die größte Geschwindigkeit. In der anderen Richtung wird man selbst merken, wenn es langweilig wird. Mit RETURN wird gestartet, und mit der SPACE-Taste kann der Vorgang abgebrochen werden.
+
+Es bleibt noch die F2-Funktion zu erklären. Bei Druck auf F2 erscheinen ein paar im ersten Augenblick wirr anmutende Befehle und die Bitte, den Namen der Bildfolge einzutragen. Das bedeutet, daß in der ersten Zeile (mit den vielen POKEs und dem SAVE) in die Lücke ein Name eingetragen werden soll. Es ist auch angebracht, das zweite Anführungszeichen an den Namen heranzuziehen. Dann drückt man RETURN, und alles geht wieder automatisch. Die Bildfolge wird als Maschinenprogramm geSAVEt und das Programm startet von neuem.
+
+Zur Eingabe des Programmes: Bei Verwendung der Data-sette muß zunächst der DATA-Lader (Listing 1) abgetippt und abgespeichert werden und danach Listing 2, weil der DATA-Lader selbständig das nächste Programm nachlädt. Verwendet man ein Floppy-Laufwerk, ist die Reihenfolge unerheblich.
+
+Will man mit dem Programm arbeiten, muß erst der DATA-Lader geladen werden. »RUN« startet den Lader, der das Hauptprogramm lädt.
+
+## Bildfolgen in eigenen Programmen
+
+Will man die Trickfolge im selbstgemachten Programm anwenden, muß natürlich das Machinenprogramm im Speicher vorhanden sein. Dazu lädt man den DATA-Lader, löscht die Zeilen 60-75, setzt in Zeile 60 ein NEW und startet den Lader. Damit ist das Maschinenprogramm im Bereich dezimal 6400 bis 6640 abgelegt und vor Überschreibung geschützt. Der Lader löscht sich selbst. Außerdem ist auch der Bereich geschützt, in den nun die selbstgemachte Bildfolge mit »LOAD ”Name”,8,1« oder »LOAD ”Name”,1,1« geladen werden kann.
+
+Damit keine Fehlermeldungen auftreten, gibt man jetzt noch den Befehl NEW ein und drückt die Return-Taste. Jetzt kann man das eigene Programm laden oder eintippen.
+
+Das Maschinenprogramm wird übrigens mit SYS6400 aufgerufen.
+
+Und noch einmal: Am Anfang des Programmes, vor dem ersten SYS6400 muß unbedingt eine Zahl zwischen 1 und 7 in 251 und 252 gePOKEt werden, eben die Anzahl der Bilder des Trickfilms. Alle kleineren Zahlen als 1 und alle größeren als 7 richten zwar keinen Schaden an, jedoch bewirken sie eine Einschränkung der Funktion.
+
+Sollte man dies einmal vergessen haben, ist es angebracht, das Maschinenprogramm neu zu laden.
+
+Zum Schluß noch zwei Tips.
+
+1.	Bei erweitertem VC 20 sollte man für eigene Programme nicht das Basic-Ende herunter-, sondern den Basic-Beginn heraufsetzen. Damit hat man mehr Speicherplatz für seine Programme. (Zeile 20) des DATA-Laders: POKE44,32:POKE8192,0:CLR).
+2.	Da bei der Arbeit mit diesem Programm nicht der Original-Zeichensatz vorhanden ist, kann man ihn, wenn gebraucht, über die RVS-ON-Taste darstellen. Dieses Verfahren habe ich selbst im Listing 1 verwendet.
+
+(Bernd Schrödter/ev)
 
 
 
