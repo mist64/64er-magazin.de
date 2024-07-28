@@ -30,7 +30,7 @@ SERVER = 'www.64er-magazin.de'
 NEW_DOWNLOADS = 15
 HOURS_PER_ARTICLE = 16
 
-EXTRACT_PDF_PAGES = False # disable if there is no PDF yet
+EXTRACT_PDF_PAGES = True # disable if there is no PDF yet
 
 #
 # Parse arguments
