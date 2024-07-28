@@ -1,24 +1,45 @@
-<h1>Der VC 1526/MPS 802 als Grafikdrucker</h1>
+<!DOCTYPE html>
+<html lang="de">
 
-<p>Aufgabe des Programms ist es, die Punkte aus dem Bildspeicher (nachfolgend als HRBM — Hires-Bit-Map — bezeichnet) zu lesen und dem Drucker in geeigneter Form zu übergeben. Die gestellte Aufgabe läßt sich in die folgenden Abschnitte unterteilen: Initialisierung; Lesen des HRBM; Umformen der gelesenen Daten; Übergabe der Daten an den Drucker; Ende.</p>
+<head>
+    <title>An alle Leser</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="XXX">
+    <meta name="64er.issue" content="10/84">
+    <meta name="64er.pages" content="XXX">
+    <meta name="64er.toc_category" content="XXX">
+    <meta name="64er.id" content="XXX">
+</head>
 
-<p>Betrachten wir das Ganze aus der Bit-Sicht. Das HRBM besteht aus 8 000 Bytes. Diese lassen sich als 8 x 8 Bit-Zeichen zusammenfassen. Man erhält dann also 25 Zeilen zu je 40 Spalten aus 8 x 8 Bit-Zeichen = 1000 solche Zeichen. Das Programm liest also ein solches Zeichen aus der HRBM und definiert nach diesem Muster einen neuen Character für den 1526. Im HRBM sind aber die Bytes horizontal orientiert, während sie der Drucker vertikal orientiert erwartet (siehe Skizze 1). Das Umformungsprogramm hat deshalb die Aufgabe, die Bits um die Diagonale zu spiegeln. Damit wären alle Teilprobleme gelöst.</p>
+<body>
+    <article>
+        <h1>Der VC 1526/MPS 802 als Grafikdrucker</h1>
 
-<p>Das Assemblerprogramm bietet noch folgende Vorzüge: — Befehlssyntax: SYS 6 * 4096, T, P<br/>
-T = Tabulator (0 &lt;= T &lt;= 40)<br/>
-P*4096 = Anfangsadresse des HRBM (0 &lt;= P &lt;= 15) — das HR-Bild kann auf dem Drucker in der Horizontalen verschoben werden (Tab)<br/>
-— durch einen speziellen Parameter wird das HRBM gewählt (auch das »versteckte« RAM unter dem Interpreter und dem Betriebssystem)<br/>
-— durch RUN/STOP unterbrechbar (Files werden korrekt geschlossen)<br/>
-— kein Zeilenvorschub, das heißt zwei nacheinander ausgedruckte Bilder fügen sich nahtlos aneinander<br/>
-— das Programm liegt von $6 000 bis $613b in einem günstigen Bereich und kann somit mit vorhandenen Basic-Erweiterungen verwendet werden<br/>
-— hohe Geschwindigkeit durch reine Maschinensprache.</p>
+        <p>Aufgabe des Programms ist es, die Punkte aus dem Bildspeicher (nachfolgend als HRBM — Hires-Bit-Map — bezeichnet) zu lesen und dem Drucker in geeigneter Form zu übergeben. Die gestellte Aufgabe läßt sich in die folgenden Abschnitte unterteilen: Initialisierung; Lesen des HRBM; Umformen der gelesenen Daten; Übergabe der Daten an den Drucker; Ende.</p>
 
-<p>Wenn Sie das Hardcopy-Programm in Verbindung mit einer Basic-Erweiterung verwenden, beachten Sie bitte folgende Reihenfolge:<br/>
-1.  Basic-Erweiterung laden und starten.<br/>
-2.  Basic-Lader des Hardcopy-Programms laden und starten. Das Maschinenprogramm schützt sich selbst vor dem Überschreiben.</p>
+        <p>Betrachten wir das Ganze aus der Bit-Sicht. Das HRBM besteht aus 8 000 Bytes. Diese lassen sich als 8 x 8 Bit-Zeichen zusammenfassen. Man erhält dann also 25 Zeilen zu je 40 Spalten aus 8 x 8 Bit-Zeichen = 1000 solche Zeichen. Das Programm liest also ein solches Zeichen aus der HRBM und definiert nach diesem Muster einen neuen Character für den 1526. Im HRBM sind aber die Bytes horizontal orientiert, während sie der Drucker vertikal orientiert erwartet (siehe Skizze 1). Das Umformungsprogramm hat deshalb die Aufgabe, die Bits um die Diagonale zu spiegeln. Damit wären alle Teilprobleme gelöst.</p>
 
-<p>Es kann sein, daß Sie vor dem Starten des Programms den Zeilenvorschub des VC 1526/MPS 802 verkleinern müssen:<br/>
-OPEN 4,4: OPEN 6, 4, 6: PRINT#6, CHR$(18): PRINT#4: CLOSE 4: CLOSE 6</p>
+        <p>Das Assemblerprogramm bietet noch folgende Vorzüge: — Befehlssyntax: SYS 6 * 4096, T, P<br />
+            T = Tabulator (0 &lt;= T &lt;= 40)<br />
+            P*4096 = Anfangsadresse des HRBM (0 &lt;= P &lt;= 15) — das HR-Bild kann auf dem Drucker in der Horizontalen verschoben werden (Tab)<br />
+            — durch einen speziellen Parameter wird das HRBM gewählt (auch das »versteckte« RAM unter dem Interpreter und dem Betriebssystem)<br />
+            — durch RUN/STOP unterbrechbar (Files werden korrekt geschlossen)<br />
+            — kein Zeilenvorschub, das heißt zwei nacheinander ausgedruckte Bilder fügen sich nahtlos aneinander<br />
+            — das Programm liegt von $6 000 bis $613b in einem günstigen Bereich und kann somit mit vorhandenen Basic-Erweiterungen verwendet werden<br />
+            — hohe Geschwindigkeit durch reine Maschinensprache.</p>
 
-<p>(Lucas Kalt/rg)</p>
+        <p>Wenn Sie das Hardcopy-Programm in Verbindung mit einer Basic-Erweiterung verwenden, beachten Sie bitte folgende Reihenfolge:<br />
+            1. Basic-Erweiterung laden und starten.<br />
+            2. Basic-Lader des Hardcopy-Programms laden und starten. Das Maschinenprogramm schützt sich selbst vor dem Überschreiben.</p>
 
+        <p>Es kann sein, daß Sie vor dem Starten des Programms den Zeilenvorschub des VC 1526/MPS 802 verkleinern müssen:<br />
+            OPEN 4,4: OPEN 6, 4, 6: PRINT#6, CHR$(18): PRINT#4: CLOSE 4: CLOSE 6</p>
+
+        <p>(Lucas Kalt/rg)</p>
+
+    </article>
+
+</body>
+
+</html>

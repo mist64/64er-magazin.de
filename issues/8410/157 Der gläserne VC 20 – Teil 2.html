@@ -1,149 +1,170 @@
-<h1>Der gläserne VC 20 – Teil 2</h1>
+<!DOCTYPE html>
+<html lang="de">
 
-<p class="intro">In der ersten Folge haben wir uns hauptsächlich mit der Basic-Verwaltung befaßt. Dabei tauchte immer wieder der Begriff Zeropage auf, mit dem wir uns heute beschäftigen wollen.</p>
+<head>
+    <title>An alle Leser</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="XXX">
+    <meta name="64er.issue" content="10/84">
+    <meta name="64er.pages" content="XXX">
+    <meta name="64er.toc_category" content="XXX">
+    <meta name="64er.id" content="XXX">
+</head>
 
-<p>Die Zeropage — oder zu Deutsch die Seite Null — ist in Maschinensprache besonders einfach zu handhaben. Als Seite bezeichnet man im übrigen immer ein Paket von jeweils 256 Byte. So entspricht Seite 0 den Adressen 0-255, Seite 1 den Adressen 256-511 und so weiter.</p>
+<body>
+    <article>
+        <h1>Der gläserne VC 20 – Teil 2</h1>
 
-<p>Eine Zeropageadressierung, zum Beispiel LDA $42, benötigt nur zwei Byte, eine absolute Adressierung, zum Beispiel LDA $1234, hingegen drei Bytes im Speicher. Damit verbunden ist auch die Bearbeitungsgeschwindigkeit eines Maschinenprogramms. Denn die Zeropageadressierung ist schneller als die entsprechende Drei-Byte-Methode. Bei kleineren Programmen in Assembler fällt dieser Aspekt zwar nicht so sehr ins Gewicht, bei sehr umfangreichen Routinen, (wie zum Beispiel beim Basic-Interpreter) spielt die Adressierungsart jedoch eine größere Rolle.</p>
+        <p class="intro">In der ersten Folge haben wir uns hauptsächlich mit der Basic-Verwaltung befaßt. Dabei tauchte immer wieder der Begriff Zeropage auf, mit dem wir uns heute beschäftigen wollen.</p>
 
-<p>In der Seite 0 legt der Computer also insbesondere die Daten ab, die er oft benötigt, wie zum Beispiel Vektoren, Parameter etc. Die komplette Liste der Adreßbelegung zeigt Tabelle 1.</p>
+        <p>Die Zeropage — oder zu Deutsch die Seite Null — ist in Maschinensprache besonders einfach zu handhaben. Als Seite bezeichnet man im übrigen immer ein Paket von jeweils 256 Byte. So entspricht Seite 0 den Adressen 0-255, Seite 1 den Adressen 256-511 und so weiter.</p>
 
-<p>Wir wollen es jedoch nicht nur mit der Aufstellung alleine bewenden lassen. Die interessantesten Lokationen möchte ich hier herausgreifen und besprechen. Beginnen wir also mit den ersten drei Bytes im Speicher:</p>
+        <p>Eine Zeropageadressierung, zum Beispiel LDA $42, benötigt nur zwei Byte, eine absolute Adressierung, zum Beispiel LDA $1234, hingegen drei Bytes im Speicher. Damit verbunden ist auch die Bearbeitungsgeschwindigkeit eines Maschinenprogramms. Denn die Zeropageadressierung ist schneller als die entsprechende Drei-Byte-Methode. Bei kleineren Programmen in Assembler fällt dieser Aspekt zwar nicht so sehr ins Gewicht, bei sehr umfangreichen Routinen, (wie zum Beispiel beim Basic-Interpreter) spielt die Adressierungsart jedoch eine größere Rolle.</p>
 
-<h2>Der USR-Vektor</h2>
+        <p>In der Seite 0 legt der Computer also insbesondere die Daten ab, die er oft benötigt, wie zum Beispiel Vektoren, Parameter etc. Die komplette Liste der Adreßbelegung zeigt Tabelle 1.</p>
 
-<p><strong>Adresse 0,1,2:</strong> Über die USR-Funktion kann der Benutzer eigene mathematische Routinen, die nicht im Basic implementiert sind, in seine Programme einbinden. Dieses Kommando ruft ein Maschinenprogramm auf, dessen Startadresse vorher in den Speicherzellen 1 und 2 abgelegt wurde. Wer sich dieses Befehls nicht bedient, hat drei Zeropagespeicherzellen zur freien Verfügung, die er für eigene Maschinenprogramme nutzen kann. Die Syntax der USR-Funktion entspricht derjenigen normaler Basic-Funktionen wie zum Beispiel FRE, POS, SIN, COS, TAN etc.: A= USR (B) oder PRINT USR (B).</p>
+        <p>Wir wollen es jedoch nicht nur mit der Aufstellung alleine bewenden lassen. Die interessantesten Lokationen möchte ich hier herausgreifen und besprechen. Beginnen wir also mit den ersten drei Bytes im Speicher:</p>
 
-<p>Der Vorteil gegenüber dem SYS-Befehl liegt in der Möglichkeit Parameter zu übergeben. In unserem Beispiel wird der Benutzerroutine die Variable B übergeben. Der errechnete Zahlenwert kann dann seinerseits wieder einer Variablen zugewiesen werden.</p>
+        <h2>Der USR-Vektor</h2>
 
-<p>Wie kann man sich in einem Maschinenprogramm die eingegebene Zahl beschaffen? Nun, alle Basic-Variablen werden im Fließkommaformat abgespeichert, eine Ausnahme bilden nur die Integer-Variablen. Dabei werden die Zahlen vom Computer nach einem bestimmten Verfahren binär verschlüsselt, so daß eine Zahl mit acht Nachkommastellen und einem Exponenten in nur fünf Bytes Platz findet.</p>
+        <p><strong>Adresse 0,1,2:</strong> Über die USR-Funktion kann der Benutzer eigene mathematische Routinen, die nicht im Basic implementiert sind, in seine Programme einbinden. Dieses Kommando ruft ein Maschinenprogramm auf, dessen Startadresse vorher in den Speicherzellen 1 und 2 abgelegt wurde. Wer sich dieses Befehls nicht bedient, hat drei Zeropagespeicherzellen zur freien Verfügung, die er für eigene Maschinenprogramme nutzen kann. Die Syntax der USR-Funktion entspricht derjenigen normaler Basic-Funktionen wie zum Beispiel FRE, POS, SIN, COS, TAN etc.: A= USR (B) oder PRINT USR (B).</p>
 
-<p>Zwischengespeichert wird das Ergebnis in besonderen Fließkomma-Akkumulatoren (Adresse 97-104). Mit Hilfe eines Unterprogramms aus dem Basic-Interpreter kann es von dort aus abgerufen werden, wobei es in eine Integerzahl (also ein Wert zwischen 0 und 65536) umgewandelt wird.</p>
+        <p>Der Vorteil gegenüber dem SYS-Befehl liegt in der Möglichkeit Parameter zu übergeben. In unserem Beispiel wird der Benutzerroutine die Variable B übergeben. Der errechnete Zahlenwert kann dann seinerseits wieder einer Variablen zugewiesen werden.</p>
 
-<p>Aufgerufen wird die Routine mit JSR $D7F7. Der 2-Byte-Wert steht dann in den Zeropagestellen $14 und $15 (Hexadezimal) zur Verfügung. Da diese Adressen vom Interpreter oft benutzt werden, ist es ratsam die Zahlen in andere Register zu übertragen (in welche, darauf kommen wir später noch zu sprechen).</p>
+        <p>Wie kann man sich in einem Maschinenprogramm die eingegebene Zahl beschaffen? Nun, alle Basic-Variablen werden im Fließkommaformat abgespeichert, eine Ausnahme bilden nur die Integer-Variablen. Dabei werden die Zahlen vom Computer nach einem bestimmten Verfahren binär verschlüsselt, so daß eine Zahl mit acht Nachkommastellen und einem Exponenten in nur fünf Bytes Platz findet.</p>
 
-<p>Das Gegenstück zu dem eben gezeigten Unterprogramm stellt die Routine »2-Byte in Fließkomma« dar. Das Low-Byte wird in das y-Register geladen, das höherwertige Byte muß in den Akku. Dann wird die Routine mit JSR $D391 gestartet, wobei die USR-Variable (in unserem Beispiel A) die Daten erhält.</p>
+        <p>Zwischengespeichert wird das Ergebnis in besonderen Fließkomma-Akkumulatoren (Adresse 97-104). Mit Hilfe eines Unterprogramms aus dem Basic-Interpreter kann es von dort aus abgerufen werden, wobei es in eine Integerzahl (also ein Wert zwischen 0 und 65536) umgewandelt wird.</p>
 
-<h2>Speicher ausgedeutet — die Basic-Zeiger</h2>
+        <p>Aufgerufen wird die Routine mit JSR $D7F7. Der 2-Byte-Wert steht dann in den Zeropagestellen $14 und $15 (Hexadezimal) zur Verfügung. Da diese Adressen vom Interpreter oft benutzt werden, ist es ratsam die Zahlen in andere Register zu übertragen (in welche, darauf kommen wir später noch zu sprechen).</p>
 
-<p><strong>Adresse 43 — 56:</strong> Diese Adressen spielen, wie wir schon im ersten Teil gesehen haben, bei der Verwaltung von Basic-Programmen und -Variablen eine zentrale Rolle. Über sie erfolgt die Trennung zwischen Programm und den einzelnen Variablentypen. Auch für das Speichern und Laden von Programmen liefern sie die Basisdaten. Die einzelnen Funktionen können sie Tabelle 1 entnehmen.</p>
+        <p>Das Gegenstück zu dem eben gezeigten Unterprogramm stellt die Routine »2-Byte in Fließkomma« dar. Das Low-Byte wird in das y-Register geladen, das höherwertige Byte muß in den Akku. Dann wird die Routine mit JSR $D391 gestartet, wobei die USR-Variable (in unserem Beispiel A) die Daten erhält.</p>
 
-<p>Eine interessante Gebrauchsmöglichkeit ergibt sich durch die Memoryroutine. Dies ist ein kurzes Basic-Programm, welches die Aufgabe hat, den von Programmen, Variablen, Strings und Arrays belegten Speicherplatz festzustellen (Listing 1):</p>
+        <h2>Speicher ausgedeutet — die Basic-Zeiger</h2>
 
-<p>Wie man nach dem Starten des Programms sehen kann, erhält man die Werte, indem man die Zeiger — nachdem sie in Dezimalzahlen umgewandelt worden sind — voneinander subtrahiert. Den Speicherplatz, der durch Variablen belegt ist, erhält man beispielsweise durch Subtraktion des Hilfszeigers, »Beginn der Variablen« (45/46) von dem Zeigerpaar »Beginn der Arrays« (47/ 48).</p>
+        <p><strong>Adresse 43 — 56:</strong> Diese Adressen spielen, wie wir schon im ersten Teil gesehen haben, bei der Verwaltung von Basic-Programmen und -Variablen eine zentrale Rolle. Über sie erfolgt die Trennung zwischen Programm und den einzelnen Variablentypen. Auch für das Speichern und Laden von Programmen liefern sie die Basisdaten. Die einzelnen Funktionen können sie Tabelle 1 entnehmen.</p>
 
-<p>Gerade bei stark limitiertem Speicherplatz (wie zum Beispiel in der Grundversion) kann dieses Hilfsprogramm Aufschluß über die momentane Speicherverteilung geben.</p>
+        <p>Eine interessante Gebrauchsmöglichkeit ergibt sich durch die Memoryroutine. Dies ist ein kurzes Basic-Programm, welches die Aufgabe hat, den von Programmen, Variablen, Strings und Arrays belegten Speicherplatz festzustellen (Listing 1):</p>
 
-<p>Eine weitere Verwendung ergibt sich durch geschicktes Manipulieren der Speicherzellen, so daß es möglich wird, mehrere Programme gleichzeitig um Speicher unterzubringen.</p>
+        <p>Wie man nach dem Starten des Programms sehen kann, erhält man die Werte, indem man die Zeiger — nachdem sie in Dezimalzahlen umgewandelt worden sind — voneinander subtrahiert. Den Speicherplatz, der durch Variablen belegt ist, erhält man beispielsweise durch Subtraktion des Hilfszeigers, »Beginn der Variablen« (45/46) von dem Zeigerpaar »Beginn der Arrays« (47/ 48).</p>
 
-<p>Diese Aufgabe erfüllt das recht komfortable Programm »Basic-Switch« (Listing 2); zunächst aber die Grundlagen: Die besagten Zeiger stecken, wie bereits im ersten Teil unseres Kurses beschrieben, den Adreßbereich für Basic-Programme ab. Die ersten vier Bytes aus dem Zeropagekomplex (Adresse 43 bis 46) grenzen das Programm nach oben und unten ab. Die daran folgenden Variablen sind in ihrer Ausdehung ebenfalls durch ein Zeigerpaar (Adresse 55/56) limitiert. Der Bereich jenseits dieser Markierung ist für Basic tabu. Dort ist also Platz für Maschinenprogramme oder ähnliches, denn ein Überschreiben durch Basic-Variable ist nicht möglich.</p>
+        <p>Gerade bei stark limitiertem Speicherplatz (wie zum Beispiel in der Grundversion) kann dieses Hilfsprogramm Aufschluß über die momentane Speicherverteilung geben.</p>
 
-<p>Will man nun mehrere Basic-Programme im Speicher versammeln, so muß man sie nur durch verstellen der Zeiger eindeutig voneinander trennen.</p>
+        <p>Eine weitere Verwendung ergibt sich durch geschicktes Manipulieren der Speicherzellen, so daß es möglich wird, mehrere Programme gleichzeitig um Speicher unterzubringen.</p>
 
-<p>Wie in Bild 1 zu sehen ist, grenzen die Programmblöcke direkt aneinander. Unter Programmblock ist hier die Einheit von Programm und einem sich daran anschließenden Variablenbereich zu verstehen. Durch Umschalten der Zeiger wird dann immer der gewünschte Programmblock eingeblendet.</p>
+        <p>Diese Aufgabe erfüllt das recht komfortable Programm »Basic-Switch« (Listing 2); zunächst aber die Grundlagen: Die besagten Zeiger stecken, wie bereits im ersten Teil unseres Kurses beschrieben, den Adreßbereich für Basic-Programme ab. Die ersten vier Bytes aus dem Zeropagekomplex (Adresse 43 bis 46) grenzen das Programm nach oben und unten ab. Die daran folgenden Variablen sind in ihrer Ausdehung ebenfalls durch ein Zeigerpaar (Adresse 55/56) limitiert. Der Bereich jenseits dieser Markierung ist für Basic tabu. Dort ist also Platz für Maschinenprogramme oder ähnliches, denn ein Überschreiben durch Basic-Variable ist nicht möglich.</p>
 
-<p>Nützlich kann diese Art der Speicheraufteilung sein, wenn man umfangreiche Programme erstellen möchte und es nötig wird, andauernd Hilfsprogramme (zum Beispiel Grafikeditor oder ähnliches) nachzuladen. Durch Basic-Switch kann hier viel Arbeit eingespart werden.</p>
+        <p>Will man nun mehrere Basic-Programme im Speicher versammeln, so muß man sie nur durch verstellen der Zeiger eindeutig voneinander trennen.</p>
 
-<p>Diese Routine liegt wieder in zweierlei Form ausgedruckt vor. Zum einen als Assemblerlisting für solche, die tiefer in das Programm einsteigen möchten (Listing 3). Und zum anderen als Basic-Lader. Das Programm ist grundsätzlich auf jeder Ausbaustufe lauffähig. Sinnvoll wird es jedoch erst bei größerem Speicher. Es ist in bewährter Weise über das Befehlswort PI in den Interpreter eingebunden.</p>
+        <p>Wie in Bild 1 zu sehen ist, grenzen die Programmblöcke direkt aneinander. Unter Programmblock ist hier die Einheit von Programm und einem sich daran anschließenden Variablenbereich zu verstehen. Durch Umschalten der Zeiger wird dann immer der gewünschte Programmblock eingeblendet.</p>
 
-<p>Nachdem die Routine per SYS gestartet worden ist, (der Lader übernimmt auch diese Arbeit), muß der erste Programmbereich initialisiert werden, das heißt der Benutzer nimmt die größenmäßige Einteilung des Speichers vor. Man muß sich jedoch schon im voraus darüber im klaren sein, wie lang das Programm inklusive Variablen sein soll, denn eine nachträgliche Änderung ist nicht möglich.</p>
+        <p>Nützlich kann diese Art der Speicheraufteilung sein, wenn man umfangreiche Programme erstellen möchte und es nötig wird, andauernd Hilfsprogramme (zum Beispiel Grafikeditor oder ähnliches) nachzuladen. Durch Basic-Switch kann hier viel Arbeit eingespart werden.</p>
 
-<p>Die Syntax für die Initialisierung lautet: πE »Länge«. Danach steht der Speicherbereich abzüglich zwei Bytes für Basic zur Verfügung. Der erste so eingerichtete Programmblock hat die Nummer 1, der zweite 2 und so fort. Nachdem ein zweiter Programmbereich eingerichtet wurde, kann mit πS »Nummer« zwischen den Blöcken umgeschaltet werden, wobei die Routine jedoch jedesmal die Variable löscht.</p>
+        <p>Diese Routine liegt wieder in zweierlei Form ausgedruckt vor. Zum einen als Assemblerlisting für solche, die tiefer in das Programm einsteigen möchten (Listing 3). Und zum anderen als Basic-Lader. Das Programm ist grundsätzlich auf jeder Ausbaustufe lauffähig. Sinnvoll wird es jedoch erst bei größerem Speicher. Es ist in bewährter Weise über das Befehlswort PI in den Interpreter eingebunden.</p>
 
-<p>Um dem Benutzer die Orientierung zu erleichtern, druckt das Maschinenprogramm nach jedem Umschalten die ersten REM-Zeilen aus. Daher ist es ratsam, jedem Programm eine Kopfzeile mit den wichtigsten Informationen zu geben.</p>
+        <p>Nachdem die Routine per SYS gestartet worden ist, (der Lader übernimmt auch diese Arbeit), muß der erste Programmbereich initialisiert werden, das heißt der Benutzer nimmt die größenmäßige Einteilung des Speichers vor. Man muß sich jedoch schon im voraus darüber im klaren sein, wie lang das Programm inklusive Variablen sein soll, denn eine nachträgliche Änderung ist nicht möglich.</p>
 
-<p>Nach dieser etwas umfangreichen Erläuterung kehren wir nun zur Beschreibung der Zeropage zurück.</p>
+        <p>Die Syntax für die Initialisierung lautet: πE »Länge«. Danach steht der Speicherbereich abzüglich zwei Bytes für Basic zur Verfügung. Der erste so eingerichtete Programmblock hat die Nummer 1, der zweite 2 und so fort. Nachdem ein zweiter Programmbereich eingerichtet wurde, kann mit πS »Nummer« zwischen den Blöcken umgeschaltet werden, wobei die Routine jedoch jedesmal die Variable löscht.</p>
 
-<p><strong>Adresse 59,60:</strong> Diese Speicherzellen enthalten die laufende Zeilennummer eines Basic-Programms. Sollte es im Programmlauf unterbrochen werden, hat man hier die Möglichkeit, die Zeilennummer nachzulesen.</p>
+        <p>Um dem Benutzer die Orientierung zu erleichtern, druckt das Maschinenprogramm nach jedem Umschalten die ersten REM-Zeilen aus. Daher ist es ratsam, jedem Programm eine Kopfzeile mit den wichtigsten Informationen zu geben.</p>
 
-<p><strong>Adresse 63 — 66:</strong> Mit Hilfe dieser Zeiger läßt sich ein zeilennummerngesteuertes RESTORE realisieren. Die ersten zwei Bytes enthalten die momentane Zeilennummer für die DATA-Abfrage. Dies ist sehr praktisch, denn damit kann man jederzeit feststellen, in welcher DATA-Zeile man sich befindet. Das zweite Doppelbyte bildet die Adresse für die nächste DATA-Zeile. Man hat also zwischen Zeilennummer und der absoluten Adresse einer DATA-Zeile zu unterscheiden.</p>
+        <p>Nach dieser etwas umfangreichen Erläuterung kehren wir nun zur Beschreibung der Zeropage zurück.</p>
 
-<p>Das nun folgende kurze Maschinenprogramm (Listing 4 und 5) ermöglicht ein Zeilennummern-RE-STORE. Man kann damit zwar nicht gezielt auf ein Element in einer DATA-Zeile zugreifen, aber zumindest auf eine bestimmte Zeile.</p>
+        <p><strong>Adresse 59,60:</strong> Diese Speicherzellen enthalten die laufende Zeilennummer eines Basic-Programms. Sollte es im Programmlauf unterbrochen werden, hat man hier die Möglichkeit, die Zeilennummer nachzulesen.</p>
 
-<p>Was auch im Zusammenhang mit dem Maschinensprachkurs von Interesse sein kann, ist der Aufbau dieser kurzen Routine. Denn durch geschicktes Nutzen von Unterprogrammen aus dem ROM kann man nämlich viel Speicherplatz sparen. Aus diesem Grunde werde ich in einer späteren Folge Interpreter- und Betriebssystemunterroutinen näher beleuchten.</p>
+        <p><strong>Adresse 63 — 66:</strong> Mit Hilfe dieser Zeiger läßt sich ein zeilennummerngesteuertes RESTORE realisieren. Die ersten zwei Bytes enthalten die momentane Zeilennummer für die DATA-Abfrage. Dies ist sehr praktisch, denn damit kann man jederzeit feststellen, in welcher DATA-Zeile man sich befindet. Das zweite Doppelbyte bildet die Adresse für die nächste DATA-Zeile. Man hat also zwischen Zeilennummer und der absoluten Adresse einer DATA-Zeile zu unterscheiden.</p>
 
-<p>Das vorliegende Maschinenprogramm benötigt genau 43 Byte und liegt am Ende des verfügbaren Basic-Speichers. Die Start- und Endadresse wird vom Lader angegeben. Aufgerufen wird der Zeilenrestore mit: SYS »Startadresse«, »Zeilennumer«.</p>
+        <p>Das nun folgende kurze Maschinenprogramm (Listing 4 und 5) ermöglicht ein Zeilennummern-RE-STORE. Man kann damit zwar nicht gezielt auf ein Element in einer DATA-Zeile zugreifen, aber zumindest auf eine bestimmte Zeile.</p>
 
-<p>Die DATA-Zeiger werden dann auf die angegebene Zeile zurückgestellt, was sowohl im Direktmodus, als auch vom Programm aus erfolgen kann.</p>
+        <p>Was auch im Zusammenhang mit dem Maschinensprachkurs von Interesse sein kann, ist der Aufbau dieser kurzen Routine. Denn durch geschicktes Nutzen von Unterprogrammen aus dem ROM kann man nämlich viel Speicherplatz sparen. Aus diesem Grunde werde ich in einer späteren Folge Interpreter- und Betriebssystemunterroutinen näher beleuchten.</p>
 
-<h2>Zustandsbeschreibung: Das Statusflag</h2>
+        <p>Das vorliegende Maschinenprogramm benötigt genau 43 Byte und liegt am Ende des verfügbaren Basic-Speichers. Die Start- und Endadresse wird vom Lader angegeben. Aufgerufen wird der Zeilenrestore mit: SYS »Startadresse«, »Zeilennumer«.</p>
 
-<p><strong>Adresse 144:</strong> Dieses Statusflag ist auch von Basic aus über die STATUS beziehungsweise ST-Anweisung abfragbar. Es liefert das Computerstatus-Byte, dessen Inhalt aufgrund der letzten Input-Output-Operation gesetzt wurde. Bezogen auf den Kassettenport liefert es nach Bild 2 bestimmte Meldungen. Die Informationen über die geladenen Programme werden binär wiedergegeben. Die Null signalisiert ein ordnungsgemäß geladenes Programm. 32 hingegen bedeutet, daß ein Prüfsummenfehler vorliegt. Es ist aber auch möglich, daß der Computer mehrere Meldungen in dieses Byte packt, beispielsweise 52 = 32 + 16 + 4 : Hier wurde ein kurzer Block geladen, jedoch ist die Priifsumme falsch und ein fataler Ladefehler liegt vor.</p>
+        <p>Die DATA-Zeiger werden dann auf die angegebene Zeile zurückgestellt, was sowohl im Direktmodus, als auch vom Programm aus erfolgen kann.</p>
 
-<p>An dieser Stelle ist es angebracht, sich näher mit dem Aufzeichnungsverfahren zu beschäftigen (Bild 3).</p>
+        <h2>Zustandsbeschreibung: Das Statusflag</h2>
 
-<h2>So kommen Programme aufs Band</h2>
+        <p><strong>Adresse 144:</strong> Dieses Statusflag ist auch von Basic aus über die STATUS beziehungsweise ST-Anweisung abfragbar. Es liefert das Computerstatus-Byte, dessen Inhalt aufgrund der letzten Input-Output-Operation gesetzt wurde. Bezogen auf den Kassettenport liefert es nach Bild 2 bestimmte Meldungen. Die Informationen über die geladenen Programme werden binär wiedergegeben. Die Null signalisiert ein ordnungsgemäß geladenes Programm. 32 hingegen bedeutet, daß ein Prüfsummenfehler vorliegt. Es ist aber auch möglich, daß der Computer mehrere Meldungen in dieses Byte packt, beispielsweise 52 = 32 + 16 + 4 : Hier wurde ein kurzer Block geladen, jedoch ist die Priifsumme falsch und ein fataler Ladefehler liegt vor.</p>
 
-<p>Jeder Abspeichervorgang beginnt mit dem Header. Dieser Kopf besteht aus dem Vorspann (das ist ein etwa acht Sekunden langer Pfeifton) und dem eigentlichen Programmkopf. Dieser enthält vier wichtige Informationen, nämlich über Programmtyp, Startadresse, Endadresse und Programmname. Diese Daten sind ebenfalls im Bandpuffer zu finden und können von dort abgerufen werden.</p>
+        <p>An dieser Stelle ist es angebracht, sich näher mit dem Aufzeichnungsverfahren zu beschäftigen (Bild 3).</p>
 
-<p>Das erste Byte (Adresse 828) gibt Auskunft über den Headertyp. Eine 1 zeigt an, daß es sich um ein Programm handelt, das verschoben geladen werden kann, also auch an eine andere Stelle, als die, von der aus es abgespeichert wurde. Das Gegenstück dazu ist die absolute Lademethode (Headertyp 3), die bereits in der ersten Folge meiner Abhandlung vorgestellt wurde. Gemeint ist LOAD”..”,1,1. Die Sekundäradresse 1 signalisiert dem Computer, daß er das Proramm (unabhängig von den Zeigern 43, 44) wieder in den gleichen Adreßbereich laden soll. Um Verwechslungen vorzubeugen, ist es wichtig, Headertyp und Sekundäradresse zu unterscheiden. Für den Headertyp gibt es drei Möglichkeiten:<br/>
-1:  Laden mit Verschiebelader (die Anfangsadresse wird durch den Zeiger 43 und 44 bestimmt).<br/>
-2:  Ein File — also Daten aus Variablen — wurde abgespeichert. Die Unterscheidung ist wichtig, denn Daten können nicht mit LOAD geladen werden.<br/>
-3:  Ein Programm ist absolut zu laden.</p>
+        <h2>So kommen Programme aufs Band</h2>
 
-<p>Die nächsten vier Bytes geben die Anfangs- und Endadresse des geladenen Files an. Mit der Endadresse hat es eine besondere Bewandtnis. Sie wird nämlich nach korrektem Laden der Zeropage (Adresse 45, 46) übergeben. Bei Load Error geschieht dies nicht; PRINT FRE(0) zeigt dann die volle Bytezahl an, obwohl sich ein Programm im Speicher befindet. Man darf das Programm — das vielleicht nur einen geringfügigen Fehler hat —, dann nicht starten, weil die Variablen dieses überschreibenwürden. Abhilfe schafft in diesem Fall<br/>
-POKE 45,PEEK(831):POKE 46,PEEK (832):CLR.<br/>
-Die Werte werden damit von »Hand« übertragen und ein normaler Programmablauf ist in den meisten Fällen wieder möglich.</p>
+        <p>Jeder Abspeichervorgang beginnt mit dem Header. Dieser Kopf besteht aus dem Vorspann (das ist ein etwa acht Sekunden langer Pfeifton) und dem eigentlichen Programmkopf. Dieser enthält vier wichtige Informationen, nämlich über Programmtyp, Startadresse, Endadresse und Programmname. Diese Daten sind ebenfalls im Bandpuffer zu finden und können von dort abgerufen werden.</p>
 
-<p>Jetzt aber wieder zurück zu Bild 3: Nachdem der Vorspann und der Programmkopf vor einem Trennzeichen (dies ist ein ganz kurzer Pieps) auf Band geschrieben worden ist, wird der Header gleich noch einmal abgespeichert.</p>
+        <p>Das erste Byte (Adresse 828) gibt Auskunft über den Headertyp. Eine 1 zeigt an, daß es sich um ein Programm handelt, das verschoben geladen werden kann, also auch an eine andere Stelle, als die, von der aus es abgespeichert wurde. Das Gegenstück dazu ist die absolute Lademethode (Headertyp 3), die bereits in der ersten Folge meiner Abhandlung vorgestellt wurde. Gemeint ist LOAD”..”,1,1. Die Sekundäradresse 1 signalisiert dem Computer, daß er das Proramm (unabhängig von den Zeigern 43, 44) wieder in den gleichen Adreßbereich laden soll. Um Verwechslungen vorzubeugen, ist es wichtig, Headertyp und Sekundäradresse zu unterscheiden. Für den Headertyp gibt es drei Möglichkeiten:<br />
+            1: Laden mit Verschiebelader (die Anfangsadresse wird durch den Zeiger 43 und 44 bestimmt).<br />
+            2: Ein File — also Daten aus Variablen — wurde abgespeichert. Die Unterscheidung ist wichtig, denn Daten können nicht mit LOAD geladen werden.<br />
+            3: Ein Programm ist absolut zu laden.</p>
 
-<p>Dies ist eine Eigenheit des Commodore-Systems, das der Datensicherheit dient. Denn nachdem der Programmkopf 1 geladen hat, vergleicht er in einem zweiten Durchgang das bisher geladene (welches sich ja schon im Speicher befindet) mit Programmkopf 2. Eine Abweichung veranlaßt den Computer eine Fehlermeldung auszugeben, in ganz schweren Fällen wird der Ladevorgang gleich ganz unterbrochen. Diese Verfahrensweise gilt nicht nur für den Programmkopf, sondern auch für Programme und Daten — sie alle werden doppelt abgespeichert.</p>
+        <p>Die nächsten vier Bytes geben die Anfangs- und Endadresse des geladenen Files an. Mit der Endadresse hat es eine besondere Bewandtnis. Sie wird nämlich nach korrektem Laden der Zeropage (Adresse 45, 46) übergeben. Bei Load Error geschieht dies nicht; PRINT FRE(0) zeigt dann die volle Bytezahl an, obwohl sich ein Programm im Speicher befindet. Man darf das Programm — das vielleicht nur einen geringfügigen Fehler hat —, dann nicht starten, weil die Variablen dieses überschreibenwürden. Abhilfe schafft in diesem Fall<br />
+            POKE 45,PEEK(831):POKE 46,PEEK (832):CLR.<br />
+            Die Werte werden damit von »Hand« übertragen und ein normaler Programmablauf ist in den meisten Fällen wieder möglich.</p>
 
-<p>Nachdem also der Programmkopf erkannt worden ist, zeigt der Computer den Filenamen an, und das eigentliche Programm (oder die Daten) wird geladen. Ihnen ist wiederum ein kurzer Vorspann vorangestellt. Der Endblock besteht aus Endmarkierung und einem Nachspann. Er zeigt dem VC 20 das Ende des geladenen Programms an, womit der Ladevorgang beendet ist.</p>
+        <p>Jetzt aber wieder zurück zu Bild 3: Nachdem der Vorspann und der Programmkopf vor einem Trennzeichen (dies ist ein ganz kurzer Pieps) auf Band geschrieben worden ist, wird der Header gleich noch einmal abgespeichert.</p>
 
-<p>Nach diesem Exkurs zum Kassettenaufzeichnungsformat nun wieder zur Zeropage.</p>
+        <p>Dies ist eine Eigenheit des Commodore-Systems, das der Datensicherheit dient. Denn nachdem der Programmkopf 1 geladen hat, vergleicht er in einem zweiten Durchgang das bisher geladene (welches sich ja schon im Speicher befindet) mit Programmkopf 2. Eine Abweichung veranlaßt den Computer eine Fehlermeldung auszugeben, in ganz schweren Fällen wird der Ladevorgang gleich ganz unterbrochen. Diese Verfahrensweise gilt nicht nur für den Programmkopf, sondern auch für Programme und Daten — sie alle werden doppelt abgespeichert.</p>
 
-<h2>Die STOP-Taste mit Sonderfunktion</h2>
+        <p>Nachdem also der Programmkopf erkannt worden ist, zeigt der Computer den Filenamen an, und das eigentliche Programm (oder die Daten) wird geladen. Ihnen ist wiederum ein kurzer Vorspann vorangestellt. Der Endblock besteht aus Endmarkierung und einem Nachspann. Er zeigt dem VC 20 das Ende des geladenen Programms an, womit der Ladevorgang beendet ist.</p>
 
-<p><strong>Adresse 145:</strong> Mit Hilfe dieser Speicherstelle kann man den Zustand der STOP- und der linken SHIFT-Taste abfragen:<br/>
-Wert =<br/>
-253:    Linke SHIFT-Taste gedrückt<br/>
-254:    STOP-Taste gedrückt<br/>
-255:    Keine der beiden gedrückt</p>
+        <p>Nach diesem Exkurs zum Kassettenaufzeichnungsformat nun wieder zur Zeropage.</p>
 
-<p>Wenn man das Low-Byte des STOP-Vektors (Adresse 808) auf 114 — statt ursprünglich 112 — setzt, so ist man in der Lage, diese Taste von Basic aus abzufragen, ohne das laufende Programm anzuhalten. Ihr kann dann in der Routine eine besondere Funktion zugewiesen werden, beispielsweise Anhalten des Programmablaufs für eine bestimmte Zeit.</p>
+        <h2>Die STOP-Taste mit Sonderfunktion</h2>
 
-<h2>Programmiert oder direkt? Das ist hier die Frage</h2>
+        <p><strong>Adresse 145:</strong> Mit Hilfe dieser Speicherstelle kann man den Zustand der STOP- und der linken SHIFT-Taste abfragen:<br />
+            Wert =<br />
+            253: Linke SHIFT-Taste gedrückt<br />
+            254: STOP-Taste gedrückt<br />
+            255: Keine der beiden gedrückt</p>
 
-<p><strong>Adresse 157:</strong> Dieses Flag kann nur zwei Zustände annehmen: Entweder 0 oder 128. Ist der Inhalt der Speicherstelle Null, dann arbeitet der Computer gerade ein Programm ab; bei 128 befindet er sich im Direktmodus.</p>
+        <p>Wenn man das Low-Byte des STOP-Vektors (Adresse 808) auf 114 — statt ursprünglich 112 — setzt, so ist man in der Lage, diese Taste von Basic aus abzufragen, ohne das laufende Programm anzuhalten. Ihr kann dann in der Routine eine besondere Funktion zugewiesen werden, beispielsweise Anhalten des Programmablaufs für eine bestimmte Zeit.</p>
 
-<p>Diese Zeropageadresse kann dann von Bedeutung sein, wenn man eigene Basic-Kommandos definieren will (vergleiche Teil 1).</p>
+        <h2>Programmiert oder direkt? Das ist hier die Frage</h2>
 
-<p>Zum Beenden einer solchen Routine gibt es zwei Möglichkeiten: Entweder kam der Programmbefehl aus dem Direktmodus. In diesem Fall springt man in die Interpreterschleife QMP $C474) zurück, damit der Computer READY meldet. Kam das Kommando aber aus einem Basic-Programm, so muß man mit JMP $0079 in die CHRGOT-Routine zurückspringen, damit kein Bereitschaftszeichen ausgegeben wird. Mit Hilfe dieses Flags trifft man hier die Unterscheidung.</p>
+        <p><strong>Adresse 157:</strong> Dieses Flag kann nur zwei Zustände annehmen: Entweder 0 oder 128. Ist der Inhalt der Speicherstelle Null, dann arbeitet der Computer gerade ein Programm ab; bei 128 befindet er sich im Direktmodus.</p>
 
-<p>Nun wenden wir uns einem anderen Kapitel zu, der Cursorverwaltung. Über die Zeropage kann jederzeit die Cursorposition festgestelltwerden. Die Speicherstelle 211 zeigt die Spalte, 214 die Zeile, in der sich der Blinker derzeit befindet. Korrekte Werte liefern die zwei Adressen aber nur innerhalb eines Programms.</p>
+        <p>Diese Zeropageadresse kann dann von Bedeutung sein, wenn man eigene Basic-Kommandos definieren will (vergleiche Teil 1).</p>
 
-<p>Interessanter ist die umgekehrte Verfahrensweise, nämlich das Setzen des Cursors an eine beliebige Bildschirmposition. Dazu müssen allerdings vier Adressen geändert werden. Glücklicherweise nimmt uns eine Unterroutine aus dem Betriebssystem diese Arbeit ab.</p>
+        <p>Zum Beenden einer solchen Routine gibt es zwei Möglichkeiten: Entweder kam der Programmbefehl aus dem Direktmodus. In diesem Fall springt man in die Interpreterschleife QMP $C474) zurück, damit der Computer READY meldet. Kam das Kommando aber aus einem Basic-Programm, so muß man mit JMP $0079 in die CHRGOT-Routine zurückspringen, damit kein Bereitschaftszeichen ausgegeben wird. Mit Hilfe dieses Flags trifft man hier die Unterscheidung.</p>
 
-<h2>Gewußt wo — der Cursor</h2>
+        <p>Nun wenden wir uns einem anderen Kapitel zu, der Cursorverwaltung. Über die Zeropage kann jederzeit die Cursorposition festgestelltwerden. Die Speicherstelle 211 zeigt die Spalte, 214 die Zeile, in der sich der Blinker derzeit befindet. Korrekte Werte liefern die zwei Adressen aber nur innerhalb eines Programms.</p>
 
-<p>In Maschinensprache wird das X-Register mit dem Zeilenwert, das Y-Register mit dem Spaltenwert geladen. Danach ruft man mit JSR $E50C das Unterprogramm auf.</p>
+        <p>Interessanter ist die umgekehrte Verfahrensweise, nämlich das Setzen des Cursors an eine beliebige Bildschirmposition. Dazu müssen allerdings vier Adressen geändert werden. Glücklicherweise nimmt uns eine Unterroutine aus dem Betriebssystem diese Arbeit ab.</p>
 
-<p>Von Basic aus werden die zwei CPU-Register über die Adressen 781 und 782 geladen (warum das so ist, sehen wir in der nächsten Folge): POKE 781,»Zeile«: POKE 782,»Spalte«: SYS 58636.</p>
+        <h2>Gewußt wo — der Cursor</h2>
 
-<p>Diese Verfahrensweise ist, wie man sieht, wesentlich komfortabler als das Hantieren mit den Steuerzeichen.</p>
+        <p>In Maschinensprache wird das X-Register mit dem Zeilenwert, das Y-Register mit dem Spaltenwert geladen. Danach ruft man mit JSR $E50C das Unterprogramm auf.</p>
 
-<p>Eine andere Zeropageadresse kann uns zu einer weiteren Erleichterung verhelfen. Jeder kennt das Problem, den Cursor innerhalb von Anführungszeichen (»Gänsefüßchen«) zu bewegen. Es werden nur Steuerzeichen ausgedruckt, eine Bewegung des Zeigers findet nicht statt.</p>
+        <p>Von Basic aus werden die zwei CPU-Register über die Adressen 781 und 782 geladen (warum das so ist, sehen wir in der nächsten Folge): POKE 781,»Zeile«: POKE 782,»Spalte«: SYS 58636.</p>
 
-<p>Dieses Manko läßt sich durch eine kurze Maschinenroutine beheben:<br/>
-LDA #$00 ; lösche Hochkommaflag<br/>
-STA $D4 ; speichere es ab<br/>
-JMP $FEAD ; springe in die NMI-Routine</p>
+        <p>Diese Verfahrensweise ist, wie man sieht, wesentlich komfortabler als das Hantieren mit den Steuerzeichen.</p>
 
-<p>Ausgelöst wird diese Routine durch Drücken der RESTORE-Taste. Dazu muß vorher der NMI-Vektor (eine nähere Beschreibung nächstes Mal) auf den Beginn unserer Routine gestellt werden. Da die sehr kurz ist, legen wir sie im Kassettenpuffer ab. Dort ist sie solange sicher verwahrt, bis man etwas laden oder abspeichern will. Hier zunächst der Einzeiler, der die Routine in den Bandpuffer generiert:<br/>
-10 FORT=828 TO 834: READD: POKE T,D:NEXT: DATA 169, 0, 133, 212, 76, 173, 254: POKE 792, 60: POKE 793, 3</p>
+        <p>Eine andere Zeropageadresse kann uns zu einer weiteren Erleichterung verhelfen. Jeder kennt das Problem, den Cursor innerhalb von Anführungszeichen (»Gänsefüßchen«) zu bewegen. Es werden nur Steuerzeichen ausgedruckt, eine Bewegung des Zeigers findet nicht statt.</p>
 
-<p>Arbeitet man im Hochkommamodus, so kann man durch Drücken der RESTORE-Taste diesen Betriebszustand abschalten, der Cursor kann dann wieder ganz normal bewegt werden.</p>
+        <p>Dieses Manko läßt sich durch eine kurze Maschinenroutine beheben:<br />
+            LDA #$00 ; lösche Hochkommaflag<br />
+            STA $D4 ; speichere es ab<br />
+            JMP $FEAD ; springe in die NMI-Routine</p>
 
-<p>Abschließend möchte ich noch sagen, welche Zeropageadressen ohne Komplikationen von eigenen Maschinenroutinen genutzt werden können, was im hohen Maße vom Verwendungszweck abhängt.</p>
+        <p>Ausgelöst wird diese Routine durch Drücken der RESTORE-Taste. Dazu muß vorher der NMI-Vektor (eine nähere Beschreibung nächstes Mal) auf den Beginn unserer Routine gestellt werden. Da die sehr kurz ist, legen wir sie im Kassettenpuffer ab. Dort ist sie solange sicher verwahrt, bis man etwas laden oder abspeichern will. Hier zunächst der Einzeiler, der die Routine in den Bandpuffer generiert:<br />
+            10 FORT=828 TO 834: READD: POKE T,D:NEXT: DATA 169, 0, 133, 212, 76, 173, 254: POKE 792, 60: POKE 793, 3</p>
 
-<p>Nicht verändert werden dürfen solche Speicherstellen, die vom Betriebssystem gebraucht werden, also die Adressen 192 bis 244 und 160 bis 162. Hat das Maschinenprogramm keine Verbindung zu Basic, so können alle Speicherstellen zwischen 0 und 138 überschrieben werden, weil sich hier nur Basic-Parameter befinden. Eng wird der Platz für die sogenannten Utilities— also für Basic-Ergänzungen oder Hilfsprogramme. Will man Daten nur zwischenspeichem, kann man sie in den Bereich zwischen Adresse 147 bis 159 packen. Dort sind sie bis zum nächsten Lade- oder Abspeichervorgang sicher.</p>
+        <p>Arbeitet man im Hochkommamodus, so kann man durch Drücken der RESTORE-Taste diesen Betriebszustand abschalten, der Cursor kann dann wieder ganz normal bewegt werden.</p>
 
-<p>Dauerhaft können Daten nur am Anfang und am Ende der Zeropage abgelegt werden. Dazu gehören Adresse 0 bis 2 und 245 bis 254.</p>
+        <p>Abschließend möchte ich noch sagen, welche Zeropageadressen ohne Komplikationen von eigenen Maschinenroutinen genutzt werden können, was im hohen Maße vom Verwendungszweck abhängt.</p>
 
-<p>Genau diese werden aber auch von käuflichen Basic-Erweiterungen gebraucht, wodurch es zu Komplikationen kommen kann. Also Vorsicht, erst durch vorheriges Probieren testen, ob man sie benutzen darf!</p>
+        <p>Nicht verändert werden dürfen solche Speicherstellen, die vom Betriebssystem gebraucht werden, also die Adressen 192 bis 244 und 160 bis 162. Hat das Maschinenprogramm keine Verbindung zu Basic, so können alle Speicherstellen zwischen 0 und 138 überschrieben werden, weil sich hier nur Basic-Parameter befinden. Eng wird der Platz für die sogenannten Utilities— also für Basic-Ergänzungen oder Hilfsprogramme. Will man Daten nur zwischenspeichem, kann man sie in den Bereich zwischen Adresse 147 bis 159 packen. Dort sind sie bis zum nächsten Lade- oder Abspeichervorgang sicher.</p>
 
-<p>Damit möchte ich für heute schließen. In der nächsten Folge werden schwerpunktmäßig der Tastaturpuffer, die Basic-Vektoren und die Kernalvektoren behandelt.</p>
+        <p>Dauerhaft können Daten nur am Anfang und am Ende der Zeropage abgelegt werden. Dazu gehören Adresse 0 bis 2 und 245 bis 254.</p>
 
-<p>(Christoph Sauer/ev)</p>
+        <p>Genau diese werden aber auch von käuflichen Basic-Erweiterungen gebraucht, wodurch es zu Komplikationen kommen kann. Also Vorsicht, erst durch vorheriges Probieren testen, ob man sie benutzen darf!</p>
 
+        <p>Damit möchte ich für heute schließen. In der nächsten Folge werden schwerpunktmäßig der Tastaturpuffer, die Basic-Vektoren und die Kernalvektoren behandelt.</p>
+
+        <p>(Christoph Sauer/ev)</p>
+
+    </article>
+
+</body>
+
+</html>
