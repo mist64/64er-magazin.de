@@ -1218,14 +1218,344 @@ Danach gibt man das Quellprogramm ein. Es enthält die DATAs für das Maschinenp
 
 (Uwe Seimet/rg)
 
+# Supergrafik II
+> Dieses Programm liefert eine Grafik-Auflösung von 200 mal 256 Punkten und nützt damit den Bildschirm vollständig aus, und dies in der Grundversion des VC 20.
 
+Es handelt sich hier um eine Weiterentwicklung des im 64’er, Ausgabe Mai 1984, Seite 81 abgedruckten Programms. Nach Eingabe der Größe des Koordinatensystems generiert das Programm den Grafen einer Funktion und ihrer Ableitung in verschiedenen Farben. Es ist sicher für viele Besitzer des VC 20, insbesondere für Schüler und Lehrer interessant.
 
+Die Funktionsgleichung wird in Zeile 1 definiert. Das Programm legt den Koordinatenursprung in die Bildschirmmitte und zeichnet den Grafen der Funktion (rot) und ihrer Ableitung (gelb). Nach dem Programmstart wird der Definitionsbereich der Funktion abgefragt (-XMAX^X^XMAX) und der Maßstab für die Hochwert-Achse gewählt (-YMAX^Y^YMAX). Das Programm kann aus Gründen des beschränkten Speicherplatzes zwar »nur« 159 Felder aus jeweils 8 mal 16 Punkten ansprechen, was aber für diese Anwendung vollkommen ausreicht. Um Speicherplatz zu sparen, wurde auf Kommentare im Programm und Grundsätze zur übersichtlichen Programmierung bewußt verzichtet.
 
+(Rudolf Dörr/ev)
 
+# Sprites ohne Esoterik
 
+> Auch fortgeschrittenen Programmierern bleibt es meist rätselhaft, wie der C 64 die Sprites auf den Bildschirm zaubert. Wir wollen dieses Thema einmal ohne Geheimniskrämerei (Esoterik) angehen.
 
+Noch vor fünf Jahren war alles ganz einfach. Im guten alten PET 2001 wurde das Bild durch ein mittleres TTL-Bergwerk erzeugt. In den Nachfolgern CBM 30xx und so weiter wird diese Aufgabe durch einigeTTL-ICs und den Bildschirmcontroller MC6845 erledigt. Bis dahin war alles überschaubar.
 
+Da Commodore die Halbleiterfirma MOS Technology besitzt, liegt es nahe, eigene Video-Controller zu entwickeln. So treibt im VC 20 der noch relativ einfache VIC I (Video-Interface-Chip I) sein Unwesen. Im C 64 wirft der sehr komplexe VIC II die »Flammenschrift« auf den Bildschirm.
 
+Die Funktionsweise dieses Video-Controllers soll dieser Bericht ein wenig enträtseln. Leider muß man es größtenteils durch Überlegung lösen.
+
+Zunächst ein paar Worte zum Bildschirmformat: Es entspricht weitgehend der normalen Fernsehnorm. Je 312 Rasterzeilen ergeben fünfzig Bilder in der Sekunde. Jede Rasterzeile (Bild 1) ist 64 µs lang und beginnt mit einem Synchronisationsimpuls, der dem Monitor mitteilt, wann er mit der neuen Zeile beginnen soll. Ohne diese Synchronisation gäbe es nur Bildsalat und durchlaufende Bilder. Der Synchronisationsimpuls entspricht in der Helligkeitsskala der Videosignale einem Dunkelschwarz, so daß man den Strahlrücklauf nicht sehen kann. Es gibt übrigens nur fünf Helligkeitsstufen:
+
+1.	Schwarz
+2.	Rot, Blau, Braun, Grau 1
+3.	Violett, Grün, Orange, Hellrot, Grau 2, Hellblau
+4.	Türkis, Gelb, Hellgrün, Grau 3
+5.	Weiß
+
+Es ist empfehlenswert, für die Vorder- und Hintergrundfarbe Farben aus verschiedenen Helligkeitsstufen zu wählen, da man sonst auf farblosen Monitoren nicht viel sehen kann...
+
+40 µs der Rasterzeile werden für das eigentliche Bild benützt. Bei derTaktfrequenz (desVIC) von zirka8MHz ergeben sich 512 Punkte auf der ganzen Rasterzeile, was mit der horizontalen Auflösung der Positionen der Sprites übereinstimmt. Aus den 64 µs ergibt sich eine Zeilenfrequenz von 15625 Hz, die für das unangenehme Pfeifen verantwortlich ist, das man beijedem Bildschirm hören kann, sofern man noch gute Ohren hat. Das horizontale Scrolling ist übrigens sehr einfach zu verwirklichen. Statt dem ganzen Bild wird kurzerhand der Synchronisationsimpuls und das durch den Rand gebildete »Fenster« verschoben.
+
+Das vertikale Format ist folgendermaßen aufgebaut:
+4 Zeilen Schwarz, damit man den Strahlrücklauf nicht sieht
+3 Zeilen Synchronisationsimpuls
+4 Zeilen Schwarz
+51 Zeilen Rand
+200 Zeilen Bild
+51 Zeilen Rand
+
+Den aufmerksamen Lesern wird aufgefallen sein, daß ich hier von 312 Zeilen pro Bild rede und nicht von 625 Zeilen, wie es beim normalen Fernseher der Fall ist. Beim Fernseher werden nacheinander zwei »Halbbilder«, die zueinander um eine halbe Rasterzeile versetzt sind, geschrieben, so daß die Auflösung höher ist. Nachteilig ist bei diesem Verfahren die geringe Bildwiederholfrequenz von 25 Hz, bei der das Bild leicht flimmert. Beim C 64 sind beide Bilder identisch und nicht versetzt (non-interlace), die Bildwechselfrequenz beträt 50 Hz.
+
+Um ein Zeichen darzustellen, muß der VIC in einer einzigen Mikrosekunde folgende Informationen lesen:
+
+1. POKE-Wert des Zeichens aus der Videomatrix; zeigt in den Zeichengenerator
+2. Farbe aus der Farbmatrix
+3. Daten aus dem Zeichengenerator.
+
+Das heißt, zusammen mit den Zugriffen der CPU müßte der Speicher mit einer Zyklusfrequenz von 4 MHz (!) betrieben werden. Das ist nicht möglich. Dieses Problem wird auf eine andere Weise gelöst.
+
+Die CPU 6510 gibt an ihrem Ausgang Pin 2 einen Takt von zirka 1 MHz ab (Bild 2). Wenn Pin 2 Low ist, ist der Bus frei, wenn Pin 2 High ist, benötigt die CPU den Bus für ihre Speicherzugriffe.
+
+Der VIC liest, während Pin 2 Low ist, die Daten aus dem Zeichengenerator oder aus der hochauflösenden Grafik.
+
+Das Farb-RAM wird vom VIC parallel zum normalen RAM gelesen. Der VIC hat also einen 12-Bit-Datenbus.
+
+Zum Lesen der Videomatrix ist keine Zeit mehr übrig. Deswegen muß der VIC regelmäßig die CPU anhalten, um die Daten lesen zu können. Durch dieses »Kaltstellen« wird der Prozessor natürlich verlangsamt. Damit die CPU nur um etwa zehn Prozent und nicht um die Hälfte verlangsamt wird, hat der VIC intern Puffer für die Video- und Farbdaten der aktuellen Zeile. Daraus ergibt sich die auf Bild 3 gezeigte Reihenfolge der Zugriffe:
+a) Letzte Rasterzeile der vorherigen Zeile: Die CPU wird angehalten, in die Puffer werden die Daten für die neue Zeile gelesen.
+b) Während den sieben ersten Rasterzeilen der neuen Zeile wird die CPU nicht angehalten.
+a) Wieder von vorn.
+
+Leider hat auch dieses Verfahren Nachteile. Erstens wird der Prozessor verlangsamt, zweitens geraten bei zeitkritischen Programmen durch das Anhalten des Prozessors die Zeitverhältnisse aus dem Lot. Deswegen wird zum Beispiel beim Laden von Programmen von Kassette der Bildschrim abgeschaltet!
+
+Und nun zu den Sprites. Unbegrenztes Vertrauen in die Leistungsfähigkeit der CPU 6510 ist nicht angebracht. Im VIC ist kein Maschinenprogramm versteckt. Es wäre ganz einfach zu langsam. Statt dessen werden die Sprites durch aufwendige Hardware erzeugt. Dieser Aufwand macht aber nicht so viel aus, da eben alles in einem Chip versammelt ist. Schwierig wird die Entwicklung eines solchen Video-Controllers vor allem durch die notwendige hohe Geschwindigkeit: Der IC hat immerhin eine Taktfrequenz von 8 MHz zu verkraften. Deswegen wird der VIC gewaltig heiß und residiert in einem unter kühlendem Blech verborgenen Keramikgehäuse.
+
+Trotz allem ist die Logik für die Sprites eigentlich verblüffend einfach und elegant. Da Digitalelektroniker auch beim Einschlafen noch Gatter zählen, die über Schafe springen, und auch sonst mit jedem Gatter geizen (einfache ICs sind billiger), kann man schließen, daß wahrscheinlich auch hier der einfachste Weg benützt wird.
+
+Die Daten der Sprites müssen zuerst gelesen werden. Die Logik zur Errechnung der Adressen der Sprites soll hier nicht erklärt werden, da sie nicht besonders interessant ist. Es ist mir leider nicht bekannt, wann die Spritezeiger (am Ende der Videomatrix) gelesen werden.
+
+In jeder Rasterzeile müssen die Daten aller Sprites gelesen werden, also 3 x 8 Byte, die nahtlos in das »gemütliche Eckchen« in der Austastlücke passen. Jetzt wissen wir auch, wieso die Sprites ein so unmögliches Format (24 x 21 Pixel) haben...
+
+Ich möchte nun anhand von Bild 4 erklären, wie die Sprites dort angezeigt werden, wo sie hingehören. Im Schema ist nur die Schaltung für ein Sprite gezeichnet, die anderen Sprites sind gleichartig aufgebaut.
+
+Die Spritedaten werden in einen Puffer gelesen. Ein Zähler gibt die Nummer der aktuellen Rasterspalte, also die X-Koordinate, an. Davon wird die X-Koordinate der Sprites abgezogen, und man erhält eine auf den »Ursprung« des Sprites bezogene Koordinate. Die Ausdehnung von Sprites in der X-Richtung ist sehr einfach: Die Koordinate wird einfach durch zwei geteilt (in Binärsystem sehr einfach: rechts schieben). Das gleiche geschieht übrigens auch bei der Ausdehnung von Sprites in der Y-Richtung. Ein Multiplexer gibt das, durch die so erhaltene Koordinate, gewählte Bit (oder Bitpaar bei mehrfarbigen Sprites) aus. Falls die Koordinate nicht im Bereich des Sprites liegt, gibt der Multiplexer einfach den Wert für »Sprite transparent« — also 0 — aus.
+
+Wie werden die Sprites nach der Priorität geordnet und Kollisionen von Sprites mit anderen Sprites oder mit dem Vordergrund des normalen Bilds erkannt?
+
+Jedes Sprite gibt ein Signal von sich, das angibt, ob das Sprite jetzt transparent oder »deckend« ist. Eine relativ einfache Schaltung (in TTL nur 28 Gatter: 74LS148) erzeugt die Nummer des Sprites mit der höchsten Priorität, das gerade deckend ist oder zeigt an, daß gar kein Sprite deckend ist.
+
+Nun muß noch entschieden werden, wer jetzt Vorfahrt hat (in der Reihenfolge der Prioritäten): Der Rand, Sprites im Vordergrund, das normale Bild, Sprites im Hintergrund oder der Hintergrund. Entsprechend dieser Entscheidung wird der richtige Farbcode ausgewählt und an den PAL-Codierer weitergegeben, der das Helligkeitssignal (Videosignal) und das Farbsignal (Chroma) erzeugt.
+
+Die Erkennung von Kollisionen ist keine schwierige Sache mehr. Wenn sowohl das Bild als auch ein oder mehrere Sprites nicht transparent sind, werden im Kollisionregister für Sprite-Bild-Kollisionen die Bits der nicht transparenten Sprites gesetzt.
+
+Sprite-Sprite-Kollisionen sind etwas schwieriger auszuwerten, auch hier bleibt der Aufwand aber im Rahmen.
+
+Ich hoffe, daß ich bei den Lesern mit diesem Artikel jeglichen Geisterglauben ausgetrieben habe.
+
+(Pascal Dornier/aa)
+
+# Pseudo-Sprites auf dem VC 20
+
+> Der VC 20 kennt von Haus aus leider nicht die freibeweglichen Grafikobjekte des C 64, die sogenannten Sprites. Das bedeutet aber nicht, daß man auf die Vorteile der Sprites oder MOBs gänzlich verzichten muß.
+
+Das Programm ist für den VC 20 mit 8 KByte Speichererweiterung konzipiert. Es läuft jedoch mit einigen Änderungen auch bei nur 3 KByte Speichererweiterung.
+
+Vor dem Eintippen oder Laden muß man POKE 44,32:POKE 8192,0: NEW eingeben, womit der Basic-Anfang im Speicher auf die Adresse dezimal 8193 ($2001) erhöht wird. Somit ergibt sich folgende Speicheraufteilung:
+4096 — 4607 Bildschirm
+4608 — 8191 frei
+8192 — 16383 (bei + 8 KByte) Basic-Programmspeicher
+8192 — 24575 (bei + 16 KByte) Basic-Programmspeicher
+8192 — 32767 (bei + 24 KByte) Basic-Programmspeicher
+
+Der freie Bereich wird nun vollständig von dem Maschinenspracheprogramm gebraucht. Die Aufteilung des Speicherraums ist die folgende:
+
+TODO
+
+Die Pseudo-Sprites sollten eine Auflösung von 16 x 16 Punkten haben, das sind 256 Punkte oder 4 Zeichen im freidefinierbaren Zeichensatz (Bild 1). Damitaberein 16 x 16 Punkte großes Zeichen jede Position auf dem Bildschirm einnehmen kann, braucht man eine 24 x 24 Punkte große Umdefinier-Matrix, in die das Zeichen hineinkopiert wird. Das Aussehen dieser Umdefinier-Matrix ist in Bild 2 zu sehen. Das Programm übernimmt nun die Aufgabe, das Zeichen in die Umdefinier-Matrix zu kopieren (Bild 3), in die richtige X-Position zu schieben (Bild 4), und dasselbe mit der Y-Position zu tun.
+
+Außerdem werden die Zeichen, die später auf dem Bildschirm von den Sprites verdeckt werden, mit in die Umdefinier-Matrix hineinkopiert. So entsteht der Eindruck, daß die Sprites wirklich über die Zeichen wandern. Beim späteren Löschen werden die verdeckten Zeichen wieder hergestellt. Wie funktioniert das nun?
+
+Im Speicher ab dezimal 4608 ist 9mal (für jedes Sprite einer) der sogenannte Sprite-Control-Block (SCB) eingerichtet. Er hat die Aufgabe, die momentane X- und Y-Position, die Farbe des Sprites, den Bildschirmmodus (gesetzt/gelöscht) des Sprites, die durch die Umdefinier-Matrixverdeckten 9 Zeichen und Farben zwischenzuspeichern:
+
+TODO
+
+Die Basisadresse des SCB errechnet sich somit aus der Formel Basisadresse = 4608 + Spritenummer x 22. Das Zwischenspeichern und die Auswertung der Parameter übernimmt natürlich das Maschinenprogramm. Über den SCB werden auch im nachfolgend beschriebenen Programm »Sprite-Definer« die Sprites initialisiert und deren Farbe festgelegt. Da nur die oberen 128 Zeichen des Zeichensatzes für die Sprites verwendet werden, hat man eine ausreichende Anzahl von noch frei definierbaren Zeichen, nämlich genau 128, zur Verfügung. Außerdem kommenjeweils 13 Zeichen, nämlich 4 für das Sprite und 9 für die Umdefinier-Matrix hinzu, wenn man auf ein Sprite verzichtet. Die Matrixen werden im Speicher so abgelegt:
+
+TODO
+
+Konkret wird das Programm (Listing 1) nun folgendermaßen bedient: Vor dem Laden oder Eingeben wird POKE 44,32:POKE 8192,0:NEW eingetippt. Ist nun das Maschinenspracheprogramm im Speicher, kann es mit einem Monitorprogramm auch noch einmal abgespeichert werden. Später muß man es nur noch mit LOAD »name«, 1,1 laden.
+
+Die Bedienung:
+Sind die Sprites definiert. muß dem Maschinenspracheprogramm mitgeteilt werden, wo der Zeichensatz liegt, den es verwalten soll. Das geschieht mit den Befehlen POKE 677, Low-byte:POKE 678, Highbyte, in unserem Fall also POKE 677,0:POKE 678,20, da der Zeichensatz auf der Adresse 5120 beginnt.
+
+Soll nun ein Sprite auf den Bildschirm, muß zuerst einmal in Adresse 683 die Spritenummer gePOKEt werden (Achtung, keine Zahl über 8 angeben, da sich das Programm dann selbst zerstören könnte). Schließlich werden in Adresse 673 die X-Koordinate (maximal 159) und 674 die Y-Koordinate (maximal 167) gesetzt. Dann kann das Programm mit SYS 8021 sofort aufgerufen und auf dem Bildschirm das Sprite betrachtet werden, vorausgesetzt man hat vorher mit POKE 36869,205 auf den freidefinierbaren Zeichensatz geschaltet.
+
+Wird nun das Sprite auf eine andere Position gesetzt, so verschwindet es vollständig von der alten Position, und die Zeichen, die auf diesem Platz waren, erscheinen wieder mit ihrer alten Farbe. Will man aber das Sprite ganz vom Bildschirm löschen, POKEt man wieder in 683 die Spritenummer und ruft das Maschinenspracheprogramm diesmal mit SYS 8099 auf. PRINT »CLR/HOME« sollte man nicht verwenden, da im SCB noch die alten Bildschirmzeichen gespeichert sind und beim nächsten Setzen wieder auf ihren alten Plätzen auf dem Bildschirm erscheinen würden.
+
+## Der Sprite-Generator
+
+Nun zum Programm »Sprite-Definer« (Listing 2).
+
+Dieses Programm ist ein Sprite-Generator in Basic, der bei der Erstellung von Sprites recht hilfreich sein kann. Das Programm verdeutlicht auch, wie die Definition der Sprites und die Bedienung des Maschinenspracheprogramms erfolgt.
+
+Obwohl sich das Programm fast von selbst erklärt, hier doch einige kurze Erläuterungen:
+
+Startet man das Programm mit RUN, erscheint als erstes die Begrüßung und die Aufforderung »Bitte warten!«. Das Programm kopiert nämlich jetzt den Zeichensatz aus dem ROM ins RAM, was in Basic naturgemäß etwas dauert.
+
+Jedesmal, wenn man in einem Menüteil eine Eingabe gemacht hat, wird man »Richtig?« gefragt. Tippt man hier für N (Nein), so kann die Eingabe wiederholt werden. Drückt man aber den Linkspfeil, so kommt man wieder ins Hauptmenü.
+
+Die Tastenbelegung im Editiermodus:
+
+TODO
+
+Bei der Funktion »Weiter« kommt man in ein zweites Menü, das weitere Funktionen zur Verfügung stellt. Aus diesem Menü gelangt man mit »zurück« wieder ins Hauptmenü. Beim Speichern werden die Sprites als reiner Speicherauszug auf Kassette gebracht, so daß das Laden im Prinzip auch mit LOAD »name«,1,1 möglich ist.
+
+Sicherlich kann das Maschinenspracheprogramm noch weiter verbessert werden. So wäre zum Beispiel eine Spritesteuerung per Interrupt durchaus denkbar. Leider funktioniert das Maschinenprogramm nicht mit den üblichen Grafikmodulen, da diese den Bildschirminhalt auch mit dem freidefinierbaren Zeichensatz aufbauen. Sollen Sprites auch miteinander oder übereinander dargestellt werden, dann muß das Setzen und Löschen nach folgender Reihenfolge durchgeführt werden, da es sonst zu Schwierigkeiten mit dem SCB kommen kann:
+
+Sprite 0 setzen, Sprite 1 setzen,..., Sprite n setzen. Hiernach die Berechnungen für die neuen Positionen durchführen.
+
+Sprite n l0schen,.Sprite n-1 löschen,..., Sprite 0 löschen. Danach Vorgang von oben wiederholen.
+
+Noch eins zum »Sprite-Definer«: Die erste REM-Zeile muß aufjeden Fall mit 16 Sternchen eingegeben werden, da sich das Programm später mit POKEs selbst verändert und andernfalls, wäre die REM-Zeile kürzer, die folgende Zeile in Mitleidenschaft ziehen würde. Doch nun wünsche ich allen, die das Programm eintippen, viel Spaß und vielleicht ein bißchen C 64-Feeling.
+
+(Markus Leberecht/ev)
+
+# Hex-DATA-Automat
+
+> Der Computer programmiert sich selbst — Maschinenprogramme werden automatisch in DATA-Statements mit Prüfsumme umgewandelt.
+
+Ein Maschinenprogramm in ein korrektes Basic-Ladepro-gramm umzusetzen, ist sicherlich eine sehr langweilige Programmieraufgabe, außerdem schleichen sich sehr schnell Fehler ein.
+
+Soll diese Umsetzung automatisch erfolgen, müßte sich der Computer — salopp gesagt — selbst programmieren. Dies ist prinzipiell möglich; doch zuvor einige Grundlagen.
+
+Geben Sie hierzu das nebenstehende kleine Testprogramm ein.
+
+<pre>100 POKE 2,0
+110 ZL=PEEK(2) : POKE 2,ZL+1
+120 D$=STR$(ZL+1000)
+130 D$=D$+"DATA ABCFDEF”
+140 PRINTCHR$(147);D$
+150 PRINT ”RUN 110”
+160 :
+180 END
+</pre>
+
+Die Programmzeile 100 setzt die Speicheradresse 2 auf Null. Anschließend wird der Wert dieser Adresse nach ZL geholt und die Adresse um eins erhöht. Der STR$-Befehl wandelt den WertZL+1000 in einen String, und die Zeile 130 erweitert den String mit »DATA ABCDEF«. Die CHR$-Anweisung löscht anschließend den Bildschirm und schreibt den String »1000 DATA ABCDEF« links oben auf den Bildschirm. Zuletzt wird in der zweiten Bildschirmzeile der Text »RUN 110« gedruckt.
+
+Falls Sie nach RUN die Taste HOME drücken, steht der Cursor auf der Zeile »1000 DATA ABCDEF«. Drücken Sie nun die RETURN-Taste, dann wird die Zeile 1000 in das Programm aufgenommen. Der Cursor steht jetzt auf dem »RUN 110«. Drücken Sie jetzt erneut RETURN, so startet das Programm wieder, und es folgt der nächste Durchgang mit:
+1001 DATAABCDEF
+RUN 110
+
+Da im ersten Durchlauf der Wert in der Speicherzelle 2 um eins erhöht wurde, lautet die nächste Zeilennummer 1001. Nun könnten Sie wieder (in Handarbeit) HOME/RETURN/RE-TURN eingeben, doch — und jetzt wird’s interessant — auch dies kann der Computer durchführen.
+160 POKE 198,3
+170 POKE 631,19:POKE 632,13:POKE 633,13
+
+Geben Sie nun RUN ein. Das Programm erweitert sich nun automatisch — ab der Nummer 1000 — um DATA-Zeilen.
+
+Dies ist möglich, da alle Commodore-Computer mit einem Tastaturpuffer arbeiten. In diesem Zwischenspeicher, der beim VC 20 und C 64 ab der Adresse 631 beginnt, kann sich der Computer bis zu neun Tastatureingaben merken. Die Anzahl der Zeichen in dem Puffer steht in der Adresse 198.
+
+In der vorherigen Programmerweiterung wurde in der Zeile 160 der Wert 3 eingePOKEt. Der Computer meint anschließend, es seien drei Tastatureingaben erfolgt. Die POKE-Befehle in der Zeile 170 simulieren die Eingabesequenz HOME, RETURN, RETURN. Nach dem Programmende vergißt der Computer diese untergeschobenen Eingaben keineswegs, sondern führt sie nachträglich aus.
+
+Aus derZeit des legendären PET 2001 stammt noch die Bezeichnung »selbsterhaltendes Programm«. Naja, aberso hatte das Kind wenigstens einen Namen.
+
+Leider hat das beschriebene Verfahren den Nachteil, daß der Computer, sobald er sich selbst die Zeile einprogrammiert, die Variablen löscht. Aus diesem Grund müssen Sie wichtige Werte vor dem Programmabbruch durch POKE sichern und beim Neustart mit PEEK zurückholen. In dem vorherigen Testprogramm wurde beispielsweise der Zähler für die Zeilennummer mit der Adresse 2 weiter gegeben.
+
+Das Programm »HEX-DATA-Automatik« arbeitet im Prinzip genau nach dem zuvor beschriebenen Verfahren. Die Umwandlungsroutine wird mit RUN 200 gestartet. Das Programm fragt dann nach der Anfangs- und Endadresse des Maschinenprogramms und wandelt es anschließend in DATA-Zeilen um. Diese haben das folgende Format:
+1000 DATA 01,02,03,04,05,...,20, 1234
+1001 DATA 11,12,13,14,15,...,40, 5678
+1002 DATA ...
+
+Nach jeweils 20 Hexadezimal-Daten folgt immer eine Prüfsumme.
+
+Anschließend müssen Sie die DATA-Routine (200—720) löschen und den Schleifenzähler in Zeile 30 anpassen. Falls das Programm veröffentlicht werden soll, können Sie zusätzlich ein Copyrightstatement hinzufügen.
+
+Für diesen Zweck wurde diese Routine auch ursprünglich erstellt. Die Zeilen 10—90 wandeln die Hex-Zahlen wieder um und schreiben das Maschinenprogramm in den entsprechenden Speicherbereich zurück (Zeile 30 beachten).
+
+Das Programm kann in dieser Form sehr leicht abgetippt werden, da Prüfsummenfehler wie folgt angezeigt werden:
+ZEILE 1000
+ZEILE 1001
+ZEILE 1002
+ZEILE 1003 PRÜFSUMMENFEHLER !
+BREAK IN 80
+
+Anschließend müssen nur 20 Daten überprüft werden, so daß auch längere Basic-Lader vergleichsweise schnell und fehlerfrei abgeschrieben werden können.
+
+(Heino Velder/ev)
+
+# Joystick-Abfrage in Theorie und Praxis
+
+> Wenn der Joystickanschluß für Sie »ein Buch mit sieben Siegeln« ist, so wird Ihnen dieser Artikel für den VC 20 weiterhelfen. Doch auch die »Profis« werden einige wichtige Informationen finden.
+
+Ein Joystick besteht aus vier Schaltern, die im rechten Winkel zueinander angeordnet sind. Der Handgriff erlaubt neun abfragbare Positionen:
+
+— eine Position mit allen Schaltern offen: Griff in Ruhe
+— vier Positionen mit je einem Schalter geschlossen: Griff in Nord, Süd, Ost, West
+— vier Positionen mit zwei Schaltern geschlossen: Griff in Nordost, Südost, Südwest, Nordwest
+
+Ein zusätzlicher »Feuerknopf« hat einen eigenen Schalter.
+
+Grafisch sieht das so aus:
+
+TODO
+
+Jeder der fünf Schalter ist mit je einer Leitung von zwei speziellen integrierten Bausteinen mit dem Namen »VIA 6522« (Versatile Interface Adapter) verbunden. Diese sind, wie der Name andeutet, programmierbare Adapter für die Ein- und Ausgabe (also auch für den Joystick).
+
+Leider sind die fünf Schalter etwas ungleichmäßig auf die beiden VIAs verteilt:
+
+— Schalter 0,1, 2 und der Feuer-Schalter 4 verwenden VIA 1
+— Schalter 3 verwendet VIA 2
+
+Der Kontakt des Joysticks mit den VIAs und damit mit dem VC 20 wird durch zum Teil Ihnen schon bekannte Registerzellen geregelt, welche folgende Adressen haben:
+
+— Ein-/Ausgabe-Register A des VIA 1: 37137
+— Ein-/Ausgabe-Register B des VIA 2: 37152
+
+Der Vollständigkeit halber sei erwähnt, daß jeder VIA noch ein zweites E/A-Register hat, nämlich:
+
+— E/A-Register B des VIA 1: 37136
+— E/A-Register A des VIA 2: 37153
+
+Für den Joystick brauchen wir diese jedoch nicht.
+
+Die einzelnen Leitungsanschlüsse der Joystick-Schalter sind:
+
+— Schalter 0 ... Bit 2 von 37137
+— Schalter 1 ... Bit 3 von 37137
+— Schalter 2 ... Bit 4 von 37137
+— Schalter 4 ... Bit 5 von 37137
+— Schalter 3 ... Bit 7 von 37152
+
+Ich habe gesagt, daß 37137 und 37152 Ein- und Ausgaberegister sind, das heißt wir können sie in beiden Richtungen benützen.
+
+Die Entscheidung darüber liegt in je einem zugeordneten »Daten-Richtungs-Register«.
+
+— Dem E/A-Register 37137 ist das DR-Register 37139 zugeordnet.
+— Dem E/A-Register 37152 ist das DR-Register 37154 zugeordnet.
+
+Dieses Arrangement erlaubt, jede einzelne Leitung eines E/A-Registers separat auf Ein- oder Ausgabe zu schalten, völlig unabhängig voneinander.
+
+Das geht so:
+
+Sobald in einem Bit des DR-Registers eine 1 steht, ist die entsprechende Leitung des E/A-Registers auf Ausgabe geschaltet, bei einer 0 auf Eingabe.
+
+Im Bild unten habe ich die notwendigen Bitmuster in die beiden DR-Register eingezeichnet.
+
+Im Register 37139, an dem ja vier Schalter hängen, wäre die hineinzuPOKEnde Zahl 195. Da aber während der Joystick-Abfrage dieses Register für nichts anderes verwendet wird, setzen wir ruhig das ganze Register auf 0.
+10 POKE 37139,0
+
+Beim Register 37154 ist die Lage anders, dadas zugehörige E/A-Register 37152 zur Tastaturabfrage verwendet wird. Da müssen wir die Auswahl der Leitung schon genau machen.
+20 POKE 37154,127
+
+Während der Joystick-Abfrage funktionieren die Tasten in der Spalte 127 der 8 x 8-Matrix nicht.
+
+Zeile 10 und 20 »initialisieren« die Joystick-Abfrage.
+
+Ein Experimentier-Programm zum Testen, was jetzt bei der Bewegung des Joysticks stattfindet, ist ganz einfach:
+30 PRINT PEEK(37137);PEEK(37152)
+40 GOTO 30
+
+Am Ende empfiehlt es sich, die volle Tastatur wieder einzuschalten mit
+POKE 37154,255
+
+In einem Programm können Sie also einfach die Werte in den beiden Adressen der Zeile 30 (mit IF ... THEN) abfragen.
+
+Zur Vermeidung von eventuellen Störungen durch die Mehrfachfunktionen der Register ist es aber empfehlenswert, die einzelnen Bits direkt abzufragen. Das sieht dann so aus:
+10 POKE 37139,0
+20 POKE 37154,127
+30 IF PEEK(37137) AND 4 THEN...   (Schalter 0)
+40 IF PEEK(37137) AND 8 THEN...   (Schalter 1)
+50 IF PEEK(37137) AND 16 THEN...  (Schalter 2)
+60 IF PEEK(37137) AND 32 THEN...  (Schalter 4 = Feuerknopf)
+70 IF PEEK(37152) AND 128 THEN... (Schalter 3)
+80 POKE37154,255
+
+(Helmuth Hauck/rg)
+
+# Unterbrechen Sie mich bitte!
+
+> Im Gegensatz zum Bereich zwischenmenschlicher Beziehungen, wo jemanden zu unterbrechen als plumpe Unhöflichkeit eingestuft wird, ist dies einem Computer gegenüber nicht nur ein beliebtes, sondern sogar erwünschtes Verfahren effektvoller Programmgestaltung. Für die meisten Anwender aber sind solche, »Interrupt« genannte, Methoden — leider — mehr oder weniger »Böhmische Dörfer«.
+
+Anhand der vielseitigen Hardware des Commodore 64 wollen wir nun einmal den Schleier des Geheimnisses ein wenig lüften, Ihnen mit einem Demonstrationsprogramm einige Anwendungsbeispiele zeigen und Sie auf Ihrem Bildschirm kein blaues, aber ein buntes Wunder erleben lassen.
+
+Wenn Sie Ihren C 64 einschalten, und der Cursor blinkt, dann haben Sie bereits einen Interrupt erzeugt. Es handelt sich dabei um eine gezielte Programmunterbrechung, die auf ein bestimmtes Ereignis fixiert ist, so zum Beispiel den Inhalt einer Speicherstelle. Tritt der erwünschte Zustand ein, so räumt die Hardware diesem Vorgang Priorität vor allen anderen Aufgaben ein. Gleich was der Computer im Augenblick macht, er wird unverzüglich seine Tätigkeit einstellen und ein spezielles Unterprogramm abarbeiten, das ihm zuvor als Interruptroutine deklariert wurde. Im Betriebssystem-ROM befindet sie sich von Adresse $EA31 (dezimal 59953) bis $ECB8 (60600). Hier wird etwa 60mal in jeder Sekunde geprüft, ob eine — und falls ja, welche — Taste gedrückt wurde; hier wird das Blinken des Cursors erzeugt und der Motor der Datasette ein- oder ausgeschaltet. Wenn der Interrupt beendet ist, setzt der Computer die Bearbeitung des laufenden Programms exakt an der Stelle fort, an der er sich vor Eintritt des Interrupts gerade befand. Gewöhnlich merkt man von solchen Intermezzi nichts, weil der Prozessor eine ungeheure Geschwindigkeit entwickelt, deren Arbeitstakte sich bereits im Bereich von Mikrosekunden (millionstel Sekunden) bewegen.
+
+Noch eine andere Einrichtung der von Ihnen benutzten Geräte ist mit extremer Schnelligkeit ausgestattet: Der Elektronenstrahl, der vor Ihren Augen 25mal in jeder Sekunde ein neues Bild auf die Mattscheibe zeichnet. Nach diesen grundsätzlichen Überlegungen wollen wir aus solchen Voraussetzungen einen Wettstreit der Systeme entwickeln und den Computer gegen den flotten Strahl antreten lassen. Unglaublich, werden Sie jetzt wahrscheinlich sagen, aber warten Sie ab! Möglich ist das nämlich, weil der für die Bildorganisation zuständige Video-Interface-Controller (VIC) stets genau darüber »im Bild« ist, welche Rasterzeile des Monitorbildes augenblicklich geschrieben wird. Das ist die Bedingung dafür, daß auf dem Schirm auch ein Bild im geordneten Zusammenhang wiedergegeben wird. Der VIC, dessen Register unter den Adressen 53248 ($D000) bis 53294 ($D02E) erreichbar sind, führtin derSpeicherzelle 53266 ($D012) Buch über die jeweilige Zeilennummer. Darüber war schon einmal zu lesen, daß es unsinnig wäre, dort etwas hineinzuschreiben, weil man den Elektronenstrahl der Bildröhre gar nicht steuern könne. Und das ist nur zum Teil richtig, denn steuern können wir den Strahl nicht, wohl aber können wir ihn steuern lassen.
+
+Dafür ist besagtes Register — wie übrigens viele andere auch — mit einer Doppelfunktion ausgerüstet. Abhängig von der jeweiligen Zugriffsart, Lesen oder Schreiben (PEEK oder POKE), erreicht man unter derselben Hausnummer verschiedene Adressaten. Wird das Register gelesen, so erfährt man die gerade bearbeitete Rasterzeile, wird es beschrieben, bleibt der übermittelte Wert gespeichert und dient dem internen Vergleich, ob er mit der aktuellen Zeile identisch ist. Wenn dieser Fall eintritt, so reagiert die Hardware selbständig darauf und erzeugt einen Interrupt — falls ein solcher vorgesehen war. Zuvor muß dem Computer nämlich noch mitgeteilt werden, daß dies ein Interruptauslöser sein soll. Die Anmeldestelle ist die Adresse 53274 ($D01A), das Interrupt-Masken-Register.
+
+Diese Speicherstelle korrespondiert ständig mit ihrem Nachbarn 53273 ($D019), dem Interrupt-Request-Register. Ist die vorgewählte Rasterzeile erreicht, signalisiert 53266 dieses Ereignis durch Kippen des Bits 0 im Request-Register: Es nimmt den Wert 1 an. Ist Bit 0 auch in der Maske gesetzt, wird der Interrupt-Pin des VIC aktiv und löst die Unterbrechung aus. Im Demo-Programm schreiben wir zu diesem Zweck eine 1 in die Maske, und fortan gilt für uns die Gesetzmäßigkeit, daß Bildhintergrund und -rand unifarben dargestellt werden, nicht mehr. Wir ändern nämlich ab einer beliebigen Rasterzeile die Bildfarben, um sie einige Zeilen weiter abermals umzuschalten. Da das schneller vor sich geht, als das träge menschliche Auge es registrieren kann, resultiert daraus kein wirres Flackern, sondern ein konstantes mehrfarbiges Bild, das im Extremfall (siehe Beispiel »Regenbogen«) sogar alle 16 möglichen Farben des Randes und Hintergrunds gleichzeitig wiederzugeben in der Lage ist.
+
+Noch aber funktioniert der neue Interrupt nicht, denn der C 64 weiß noch nichts von unserem Programmsegment, mit dem wir den Farbwechsel vornehmen wollen. Dazu müssen wir ihm die Adresse der Routine im Interrupt-Vektor ab Speicherstelle 788 ($0314) hinterlegen: Lowbyte in 788, Highbyte in 789. Aber auch jetzt wird das Ergebnis immer noch nicht unseren Erwartungen entsprechen, da uns laufend der immer noch aktivierte Systeminterrupt in die Quere kommt und nach der Vektorenänderung ebenfalls in der neuen Routine unkontrolliert arbeitet. Dieser Interrupt stammt aus einer ganz anderen Quelle, vom Complex-Interface-Adapter (CIA), auf den wir gleich noch zu sprechen kommen. Softwaremäßig können wir ihn durch Setzen der Interruptflagge (SEI) nicht unterbinden, weil damit auch der ebenfalls maskierbare Rasterzeilen-lnterrupt abgeschaltet würde. Zwei Möglichkeiten gibt es, das Problem zu lösen: Der CIA-Interrupt wird belassen, muß dann aber zu Beginn der Interrupt-Routine abgefragt (zum Beispiel durch Prüfen des Bits 0 im Request-Register 53273) und gegebenenfalls durch eine Umleitung über Sprungbefehle unschädlich gemacht werden, oder er wird eliminiert durch Schreiben des Wertes 127 in die Speicherstelle 56333 ($DCOD). Weil wir in unserem Demo-Programm weder Cursor-Blinken noch die Tastaturabfrage benötigen, entscheiden wir uns für letztere und löschen gleich zu Programmbeginn (siehe Assembler-Listing) den CIA-Interrupt völlig.
+
+Außerdem ist zu berücksichtigen, daß der Elektronenstrahl auf allen Seiten ein Stück über den Rand des auf dem Monitor sichtbaren Bildes hinausschreibt. Dadurch entstehen Zeilennummern bis 280, so daß von Register 53266 aus bei einem Überlauf ein Highbyte nach Bit 7 des Registers 53265 übertragen werden muß. In dieser als »SCREEN« definierten Speicherstelle liegen allerdings auch einige andere Funktionen, die gegebenenfalls durch eine logische OR-Verknüpfung berücksichtigt werden müssen. Das Demo-Programm verwendet diese Funktionen indem durch Löschen des Bits 4 der Bildschirm ausgeblendet wird, so daß auf dem Schirm nur noch ein ganzflächiger Rand erscheint, obwohl auch weiterhin Texte auf den jetzt unsichtbaren Hintergrund ausgegeben werden können. Beispiel: POKE 53265, PEEK (53265) AND 255-16 läßt den Hintergrund verschwinden, POKE 53265, PEEK(53265) OR 16 zaubert ihn dann wieder herbei.
+
+Der Rasterzeilen-Interrupt ist eine Spezialität des C 64, die ihn zu einem äußerst vielseitigen Gerät macht. Die Programmier-Profis der Videospiel-Produzenten benutzen ihn nicht allein dafür, oben blauen Himmel und unten braune Erde darzustellen, sondern auch, um ein nur partielles Scrolling zu erzielen, um Text und hochauflösende Grafik zu mischen, um gleichzeitig normale und Multicolorzeichen zu benutzen und und und... Aber damit erschöpfen sich die Interruptmöglichkeiten des Commodore 64 noch nicht. Bit 1 (Wert = 2) der Maske in 53274 erzeugt einen Interrupt, wenn ein Sprite Berührung mit einem Zeichen hat, Bit 2 (Wert = 4) wenn Sprite mit Sprite zusammenstößt, Bit 3 (Wert = 8) wenn ein Impuls vom Lightpen kommt, oder der Feuerknopf eines am Controlport 1 angeschlossenen Joysticks gedrückt wird und schließlich Bit 7 (Wert = 128), wenn eines der genannten Ereignisse eingetreten ist
+
+Und dann ist da noch der bereits genannte CIA-Interrupt, der von einem gleich doppelt vorhandenen Baustein stammt. Beiden sind jedoch im C 64 teilweise unterschiedliche Aufgaben zugewiesen. CIA 1 hat die Basisadresse 56320 ($DC00), CIA 2 eine solche von 56576 ($DD00). Hier erfolgt beispielsweise die Tastaturdekodierung, die Abfrage von Joysticks, Paddles und Lightpen, die serielle Datenübertragung zu einer Schnittstelle, hier befinden sich die Echtzeituhren und die Timer. Wenden wir uns letzteren in CIA 1 zu.
+
+Der Timer ist ein 16-Bit-Zählregister, das nach dem Starten ohne weiteres Zutun mit einer konstanten Geschwindigkeit dekrementiert, das heißt jeweils um 1 abwärts gezählt wird. Durch die zuvor beim VIC schon erwähnte Doppelfunktion besteht die Möglichkeit, den Timer ab einem bestimmten Wert zählen zu lassen: Lesen der Adresse 56324 ($DC04) liefert den aktuellen Stand des Lowbytes, Hineinschreiben den Startwert des Timers, ebenso beim Highbyte unter der Adresse 56325. Auf diese Weise wird der Systeminterrupt erzeugt, da der Computer in der Initialisierungsphase den Timer mit dem Wert 16421 ( = 37 low und 64 high) lädt. Wenn derTimerüber Null hinauszählt und damit einen sogenannten Unterlauf erzeugt, wird das durch Setzen des Bits 0 im lnterrupt-Control-Register 56333 ($DC0D) signalisiert. Auch dieses arbeitet wieder doppelt: Lesen ergibt die Interruptanforderung, ein Schreibzugriff erzeugt die Maske, die darüber entscheidet, welches Ereignis Interruptauslöser sein soll. Besondere Beachtung beim Beschreiben des Registers verdient Bit 7, das darüber bestimmt, ob die nachfolgend gesetzten Bits 6 bis 0 in der Maske gesetzt oder gelöscht werden. Alle übrigen bleiben unangetastet. Deshalb löscht 127 (Bit 7 nicht gesetzt!) im Demo-Programm sämtliche Maskenbits (siehe Bitmuster im Assembler-Listing, Zeile 1010), deshalb setzt 129 (Bitmuster 10000001) das Bit 0 der Maske und schaltet damit auf Interrupt durch den Timer. Erzeugen Sie doch einmal im Direktmodus auf dem Bildschirm ein längeres Zählintervall durch Heraufsetzen des Timer-Highbytes: POKE 56325, 255 läßt den Cursor sehr träge werden, POKE 56325, 5 versetzt ihn in nervöses Flattern.
+
+Dieser Timer besitzt einen Zwillingsbruder mit den Adressen 56326 und 56327, der nicht nur gleichartig konstruiert ist und ebenfalls eigenständig einen Interrupt auf Bit 1 des Control-Registers erzeugen kann, sondern sich auch mit dem Timer A koppeln läßt. Beide Timer können nämlich auf verschiedene Taktquellen gelegt, unterschiedlich getriggert werden. Im Demo-Programm nutzen wir das aus, indem wir Timer A Systemtakte zählen lassen (Bit 5 des Registers 56334 gelöscht — Standardeinstellung), Timer B hingegen nur die Unterläufe von Timer A durch Setzen des Bits 6 im Register 56335. Dadurch erhalten wir einen 32-Bit-Zähler, der beliebige Zeitverzögerungen ermöglicht, eleganter als mitjeder ausschließlich softwaremäßig realisierten Warteschleife, weil die Timer von keinem Interrupt unterbrochen werden.
+
+In der Warteschleife des Demo-Programms (Listing ab Zeile 9010), die als Subroutine angelegt ist, wird mit den Timern kein Interrupt erzeugt, sondern lediglich eine Zeitverzögerung erzielt. Dazu wird zunächst Timer B mit den vom Hauptprogramm im Akku und im Y-Register übergebenen Werten geladen, während Timer A konstant mit einem mittleren Wert arbeitet. Dann werden beide gestartet durch Setzen des Bits 0 im Register 56334 für Timer A und 56335 für Timer B. Aus Zeile 9030 des Listings ist ersichtlich, daß Bit 3 für Timer A gelöscht ist, was Continuous- oder Dauerbetrieb zur Folge hat. Jedesmal, wenn der Timer einen Unterlauf hat, lädt er umgehend wieder den zwischengespeicherten Startwert und beginnt erneut zu zählen. Den anderen schalten wir hingegen auf One-Shot (Zeile 9050), einen »Einzelschuß«. Bei einem Unterlauf lädt er zwar wieder den Startwert, bleibt aber stehen, wodurch sein Start/Stoppbit automatisch gelöscht wird. Wir prüfen dies, indem wir Bit 0 logisch nach rechts ins Carry verschieben, wo es bequem mit einem Branchbefehl untersucht werden kann. Erst der One-Shot-Betrieb des Timers B stellt sicher, daß ein Unterlauf auch erkannt wird, weil er im Dauerbetrieb vorübergehen könnte, während sich der Prozessor im Interrupt befindet. Außerdem verlangt ein gesetztes Bit 4 in der Warteschleife für beide Timer Force-Load, einen unbedingten Ladevorgang. Unabhängig davon, ob der Timer gerade läuft oder nicht, wird der Startwert geladen. Mit einem gelöschten Bit 4 kommt ein neuer Startwert erst dann zum Tragen, wenn er nach dem nächsten Unterlauf geladen wird.
+
+Neben den Unterläufen der beiden Timer kann das Control-Register 56333 auf Bit 2 auch einen Interrupt erzeugen bei Übereinstimmung der Echtzeituhr 56328 bis 56331 mit einer vorgewählten Alarmzeit, auf Bit 3 durch ein volles oder leeres Schieberegister (56332) und auf Bit 4 durch den Impuls einer externen Signalquelle. Ein gesetztes Bit 7 zeigt hier an, daß mindestens eines der gesetzten Bits auch in der Maske gewählt ist, also ein Interrupt stattfindet. Das Interrupt-Flag wird aber bereits durch Lesen des Registers gelöscht.
+
+Diese Kurzabhandlung vermag nur ansatzweise darzustellen, wie flexibel das Instrumentarium ist, das hier dem Anwender zur Verfügung steht. Speziell die zahlreichen Interruptmöglichkeiten verlangen geradezu nach Anwendung, wobei wir abschließend auf eine bisher nicht erwähnte noch zu sprechen kommen müssen. Denn das Demo-Programm läuft in einer Endlosschleife, die nicht ohne weiteres abgebrochen werden kann. Außerdem wirdja durch den lahmgelegten Systeminterrupt ohnehin kein Tastendruck mehr erkannt. Den Ausweg aus diesem Dilemma, haben die Konstrukteure geschaffen, als sie den sogenannten NMI erfanden. Das ist die Abkürzung für nicht maskierbarer Interrupt, eine hardwareseitige Unterbrechungsmöglichkeit mit so hoher Priorität, daß selbst ein gesetztes Interruptflag keine Rolle spielt. Wir können den NMI auslösen, indem wir die STOP-Taste gedrückt halten und gleichzeitig auf die RESTORE-Taste klopfen. Und schon ist alles wieder normal: Bild und Interrupt. Sie können zwar gleich wieder mitSYS49152 ins Demo-Programm starten, doch vielleicht lassen Sie sich selbst einmal etwas einfallen. Nur zu — unterbrechen Sie doch Ihren Commodore 64 bitte mal ...
+
+(Helmut Welke/aa)
 
 
 
