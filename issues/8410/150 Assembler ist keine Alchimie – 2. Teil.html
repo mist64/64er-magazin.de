@@ -22,9 +22,64 @@
 
         <p>Sollten Sie einen Assembler haben, dann schalten Sie ihn jetzt bitte ein. Falls Sie keinen haben, schaffen wir Abhilfe. Wir werden in den nächsten Ausgaben ein komplettes Software-Paket; Assembler, Disassembler und Monitor veröffentlichen. Dieser Assembler wird uns dann den ganzen Kurs hindurch begleiten. Meistens meldet der Assembler sich mit einer Registeranzeige. Sollte Ihrer das nicht tun, dann müssen Sie wohl noch den Monitor anschalten oder speziell einen Befehl für die Registeranzeige eingeben (häufig ist das ein R). Jedenfalls wird nun auf dem Bildschirm der Inhalt der Register angezeigt, (Bild 1).</p>
 
+        <figure>
+            <table>
+                <tbody>
+                    <tr>
+                        <td>PC</td>
+                        <td>JRQ</td>
+                        <td>NV-BDJZC</td>
+                        <td>AC</td>
+                        <td>XR</td>
+                        <td>YR</td>
+                        <td>SP</td>
+                    </tr>
+                    <tr>
+                        <td>E147</td>
+                        <td>EA31</td>
+                        <td>10110000</td>
+                        <td>00</td>
+                        <td>00</td>
+                        <td>00</td>
+                        <td>F8</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <figcaption>Bild 1. Eine Registeranzeige</figcaption>
+        </figure>
+
         <p>Die angezeigten Werte sind Beispiele, wie sie beim C 64 auftreten können. PC ist der Programmzähler, der immer auf den nächsten zu holenden Befehl zeigt. (Der Wert $E147 rührt vom SYS-Aufruf, mit dem ich meinen Assembler starte). IRO zeigt uns an, auf welche Adresse der sogenannte Interrupt-Vektor gestellt ist. Das ist das Byte-Paar 788 (LSB) und 789 (MSB). Auf den Wert $EA31 zeigt es im Normalfall.</p>
 
         <p>Die nächsten acht Angaben beziehen sich auf das Prozessorstatusregister, das wir in der letzten Folge P genannt haben. Die Bedeutung der einzelnen »Flaggen« zeigt Ihnen (Bild 2).</p>
+
+        <figure>
+            <table>
+                <tbody>
+                    <tr>
+                        <td>N</td>
+                        <td>V</td>
+                        <td>-</td>
+                        <td>B</td>
+                        <td>D</td>
+                        <td>J</td>
+                        <td>Z</td>
+                        <td>C</td>
+                    </tr>
+                    <tr>
+                        <td>Negativ- Flagge</td>
+                        <td>Überlauf- Flagge</td>
+                        <td>unbenutzt</td>
+                        <td>Abbruch-Flagge</td>
+                        <td>Dezimal-Flagge</td>
+                        <td>Interrupt-Flagge</td>
+                        <td>Zero-(Null) Flagge</td>
+                        <td>Carry-(Übertrag) Flagge</td>
+                    </tr>
+                </tbody>
+            </table>
+            <figcaption>Bild 2. Das Prozessor-Status-Register P: die Flaggen</figcaption>
+        </figure>
 
         <p>AC ist der aktuelle Inhalt des Akkus.</p>
 
@@ -139,6 +194,117 @@
         <p>Offensichtlich gehört jeweils das erste angezeigte Byte zu LDA. Sie sind aber verschieden! Wir sehen daraus, daß die Codezahl für einen Befehl gleich zwei Informationen enthält: Das Befehlswort selbst (LDA) und die Adressierungsart.</p>
 
         <p>Genauso wie man LDA sowohl unmittelbar als auch absolut ausführen kann, ist das auch mit LDX und LDY möglich. Bei den Befehlen STA, STX, STY ist eine unmittelbare Adressierung sinnlos. Für RTS kennt man nur eine implizite Adressierung. Wir fassen das alles zusammen in Bild 3.</p>
+
+        <figure>
+            <table>
+                <tbody>
+                    <tr>
+                        <td rowspan="2">Befehlswort</td>
+                        <td rowspan="2">Adressierung</td>
+                        <td rowspan="2">Byteanzahl</td>
+                        <td colspan="2">Code</td>
+                        <td rowspan="2">Dauer in Taktzyklen</td>
+                        <td rowspan="2">Beeinflussung von Flaggen</td>
+                    </tr>
+                    <tr>
+                        <td>HEX</td>
+                        <td>DEZ</td>
+                    </tr>
+                    <tr>
+                        <td>LDA</td>
+                        <td>unmittelbar</td>
+                        <td>2</td>
+                        <td>A9</td>
+                        <td>169</td>
+                        <td>2</td>
+                        <td>N,Z</td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td>absolut</td>
+                        <td>3</td>
+                        <td>AD</td>
+                        <td>173</td>
+                        <td>4</td>
+                        <td>N,Z</td>
+                    </tr>
+                    <tr>
+                        <td>LDX</td>
+                        <td>unmittelbar</td>
+                        <td>2</td>
+                        <td>A2</td>
+                        <td>162</td>
+                        <td>2</td>
+                        <td>N,Z</td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td>absolut</td>
+                        <td>3</td>
+                        <td>AE</td>
+                        <td>174</td>
+                        <td>4</td>
+                        <td>N,Z</td>
+                    </tr>
+                    <tr>
+                        <td>LDY</td>
+                        <td>unmittelbar</td>
+                        <td>2</td>
+                        <td>A0</td>
+                        <td>160</td>
+                        <td>2</td>
+                        <td>N,Z</td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td>absolut</td>
+                        <td>3</td>
+                        <td>AC</td>
+                        <td>172</td>
+                        <td>4</td>
+                        <td>N,Z</td>
+                    </tr>
+                    <tr>
+                        <td>STA</td>
+                        <td>absolut</td>
+                        <td>3</td>
+                        <td>8D</td>
+                        <td>141</td>
+                        <td>4</td>
+                        <td>keine</td>
+                    </tr>
+                    <tr>
+                        <td>STX</td>
+                        <td>absolut</td>
+                        <td>3</td>
+                        <td>8E</td>
+                        <td>142</td>
+                        <td>4</td>
+                        <td>keine</td>
+                    </tr>
+                    <tr>
+                        <td>STY</td>
+                        <td>absolut</td>
+                        <td>3</td>
+                        <td>8C</td>
+                        <td>140</td>
+                        <td>4</td>
+                        <td>keine</td>
+                    </tr>
+                    <tr>
+                        <td>RTS</td>
+                        <td>implizit</td>
+                        <td>1</td>
+                        <td>60</td>
+                        <td>96</td>
+                        <td>6</td>
+                        <td>keine</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <figcaption>Bild 3. Die ersten sieben Befehle</figcaption>
+        </figure>
 
         <p>In den letzten Spalten von Bild 3 ist noch angegeben, inwieweit durch diese Befehle das Prozessorstatusregister beeinflußt wird, so wie wir es für den Befehl LDA schon ausprobiert haben. In der vorletzten Spalte sehen Sie, wie lange die Ausführung eines Befehls dauert. Wenn sie für einen Taktzyklus etwa eine Mikrosekunde rechnen, dann müßten Sie jetzt ausrechnen können, wie lange unser letztes Programm zur Bearbeitung braucht: 48 Mikrosekunden. Ein vergleichbares Basic-Programm braucht dazu etwa hundertmal so lange: zirka 0,05 Sekunden.</p>
 
