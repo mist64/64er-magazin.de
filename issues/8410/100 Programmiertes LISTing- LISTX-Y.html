@@ -26,6 +26,81 @@
 
         <address class="author">(Fred Behringer/ev)</address>
 
+        <figure>
+            <table>
+                <tbody>
+                    <tr>
+                        <td>60010</td>
+                        <td>Einlesen von $C613-$C640 (50707-50752). Maschinenprogramm zur Berechnung der Startadresse einer Basic- Zeile. Zeilennummereingabe (der Anfangszeile) in $0014/$0015 (20/21).</td>
+                    </tr>
+                    <tr>
+                        <td>63020</td>
+                        <td>Verlegen dieser Parameterübergabestellen nach $OOFB/$OOFC (251/252), da $0014/$0015 (20/21) beim Ansprung SYS828 (siehe unten) gestört werden</td>
+                    </tr>
+                    <tr>
+                        <td>63030</td>
+                        <td>$C6009-$C741 (50889-51009). Programm zum Auflisten der gewünschten Zeilen. In diesem Programm wird die laufende Nummer der gerade gelisteten Zeile mit der beim Ansprung dieser Routine an $0014/$0015 (20/21) übergebenen Nummer der Endzeile verglichen, und die Routine wird verlassen, wenn die Endnummer erreicht ist. Auch hier läßt sich aus dem eben erwähnten Grund die Stelle $0014/$0015 (20/21) nicht als Parameterübergabestelle (von Basic zu Maschinenprogramm) verwenden und wird in 63040 zu $OOFD/$OOFE (253/254) abgeändert. Überschreiben des JMP-Befehls in $C714 (50964) mit einem RTS-Befehl sorgt dafür, daß nicht zum Basic- Warmstart zurückgekehrt wird, sondern zum Hauptprogramm. Die Sprungadresse $0306/$0307 (774/775), die in $C717 (50967) wirksam wird, hätte geändert werden müssen, da sich der Sprung ja nun auf die der Stelle $C71A (50970) entsprechenden Stelle in der Kopie im Kassettenpuffer bezieht. Es war einfacher, den (hier) überflüssigen JMP-Befehl in $C717 (50967) zu umgehen, indem die Sprungadresse in der der Stelle $C705 (50949) entsprechenden Stelle der Kopie abgeändert wurde.</td>
+                    </tr>
+                    <tr>
+                        <td>63050</td>
+                        <td>Die vom Hauptprogramm in X stammende Nummer der Anfangszeile wird in Low By- te/High Byte gespalten und der Stelle 251/252 übergeben (siehe oben)</td>
+                    </tr>
+                    <tr>
+                        <td>63060</td>
+                        <td>Entsprechend für die aus Y stammende Nummer der Endzeile und 253/254</td>
+                    </tr>
+                    <tr>
+                        <td>63070</td>
+                        <td>Aufruf des Maschinenprogramms und Rückkehr ins Basic-Hauptprogramm. Nach Rückkehr steht in $030D/$030C (781/780) die Nummer (Low Byte/High Byte) der nächstanstehenden Basic-Zeile zur Verfügung.</td>
+                    </tr>
+                </tbody>
+            </table>
+            <figcaption>Beschreibung des Programms nach Listing 1 zur Simulation von LISTX-Y</figcaption>
+        </figure>
+
+        <figure>
+            <table>
+                <tbody>
+                    <tr>
+                        <td>63110</td>
+                        <td>Einlesen des Simulationsprogramms für LISTX-Y nach Listing 1
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>63120</td>
+                        <td>Anfangszeile auf Null</td>
+                    </tr>
+                    <tr>
+                        <td>63130<br>63140
+                        </td>
+                        <td>Wenn Return-Taste, dann zurück ins Hauptprogramm</td>
+                    </tr>
+                    <tr>
+                        <td>63150</td>
+                        <td>Wenn nicht Cursor-Down- oder Return-Taste, dann Anfang wieder 0.</td>
+                    </tr>
+                    <tr>
+                        <td>63160</td>
+                        <td>Wenn Cursor-Down-Taste, dann Listen der Zeilen X bis X+4 und Ausgleich für Zeilenvorschub</td>
+                    </tr>
+                    <tr>
+                        <td>63170</td>
+                        <td>Sprung um 100 nach vorn. Wenn Vorrat erschöpft, Zeilennummer wieder auf 0 (Endlosdurchlauf).</td>
+                    </tr>
+                    <tr>
+                        <td>63180</td>
+                        <td>Schnelles Vortasten zur nächsten vorhandenen Zeile mit Nummer zwischen 110*a und 100*a+4</td>
+                    </tr>
+                    <tr>
+                        <td>63190</td>
+                        <td>Weiter in Eingabeschleife</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <figcaption>Beschreibung des Programms nach Listing 2 zum Ausdrucken aller Kopf-REM-Zeilen. Das Programm verwendet die Routine für LISTX-Y aus Listing 1.</figcaption>
+        </figure>
+
     </article>
 
 </body>
