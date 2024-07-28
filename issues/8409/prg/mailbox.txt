@@ -1,0 +1,548 @@
+;mailbox.prg ==0801==
+;Eingetippt von Endurion
+    0 open1,2,2,chr$(166)+chr$(224)
+    1 poke53281,0:poke53280,43
+   25 open9,8,5,"Anrufer,s,r":input#9,an%:close9
+   30 poke56579,peek(56579)or8:poke56577,0
+ 1000 rem *******************************
+ 1010 rem ***      m a i l b o x      ***
+ 1020 rem ***    all copyrights by    ***
+ 1030 rem ***     thomas  koether     ***
+ 1035 rem *** und rudolf moellenbeck  ***
+ 1040 rem *******************************
+ 1050 :
+ 1060 rem      initialisierung
+ 1070 :
+ 1080 print"{clr}{lblu}":print"Mailbox Initialisierung...
+ 1100 printchr$(14)
+ 1110 bl$="                                      "
+ 1120 p$="...................................."
+ 1130 dimna$(40):dimpa$(40):dimbr$(16):dimem$(11):dimbe$(100)
+ 1140 dimo%(256):dimi%(256):gosub5700
+ 1150 open2,8,3,"namen,s,r":input#2,n$:an=val(n$)
+ 1160 ifan>0thenfora=1toan:input#2,n$:na$(a)=n$:next
+ 1170 close2
+ 1180 e$="Ihre Eingabe......................? :"
+ 1190 forx=1to5:reada$:me$(x)=a$:next:forx=1to4:reada$:in$(x)=a$:next
+ 1200 open2,8,5,"impressum,u,r":fora=1to10:input#2,im$(a):next
+ 1210 fora=1to3:input#2,me$(a):next:close2
+ 1220 fora=1to11:reada$:em$(a)=a$:next
+ 1230 open2,8,3,"passwort,s,r"
+ 1240 input#2,n$:an=val(n$)
+ 1250 ifan>0thenfora=1toan:input#2,p$:pa$(a)=p$:next
+ 1260 close2
+ 1270 t=peek(2):tt=t:open15,8,15:input#15,a%:close15
+ 1275 :
+ 1280 print"{clr}":print"Mailbox 64 {rvon}Ich warte auf Anruf":a=peek(56577)
+ 1285 print"Zum manuellen Start Taste druecken"
+ 1290 printpeek(56577):geta$:ifa=peek(56577)anda$=""thenprint"{up}";:goto1290
+ 1295 ifa$><""then1305
+ 1300 ar=ar+1:ifar<10then1290
+ 1302 poke56577,peek(56577)or8
+ 1305 an%=an%+1:open9,8,5,"@:Anrufer,s,w":print#9,an%:close9
+ 1310 fora=1to25:print:print#1:next:print:print#1:z$=str$(an%)
+ 1311 z$=right$(z$,len(z$)-1):print"      Sie sind der ";z$;". Anrufer
+ 1312 print#1,"       Sie sind der ";z$;" Anrufer":fora=1to2000:next
+ 1315 sys51200,"000000",1:ti$="000000"
+ 1320 gosub5800:rem   begruessungs bild
+ 1330 :
+ 1340 rem     modem abfrage
+ 1350 :
+ 1360 rem         menue
+ 1370 :
+ 1380 fora=1to5:print#1:next
+ 1390 fora=1to5:print:next
+ 1400 print#1,"          H a u pt m e n u e"
+ 1410 print"          H a u p t m e n u e"
+ 1420 print#1,"         --------------------"
+ 1430 print"         --------------------"
+ 1440 print#1:print#1
+ 1450 print:print
+ 1460 fora=1to5:ifa=4then1490
+ 1470 print#1,me$(a):gosub1510
+ 1480 printme$(a)
+ 1490 next
+ 1500 goto1790
+ 1510 :
+ 1520 rem         antwort
+ 1530 :
+ 1540 gosub9000:ift%>ttthen8030
+ 1550 get#1,q$:ifq$=""then1630
+ 1560 q=o%(asc(q$)):q$=chr$(i%(asc(q$)))
+ 1570 ifq=19then1720
+ 1580 ifq=24thengoto8030
+ 1590 return
+ 1600 :
+ 1610 rem       eigene eingabe
+ 1620 :
+ 1630 getr$:ifr$=""thenreturn
+ 1640 ifr$="^"thenprint:print"< ";:goto1660
+ 1642 ifr$=chr$(20)thenr$=chr$(8)
+ 1645 q$=r$
+ 1650 return
+ 1660 getr$:ifr$=""then1660
+ 1670 ifr$=chr$(13)thenprint#1,r$:printr$:return
+ 1680 print#1,r$;:printr$;:goto1660
+ 1690 :
+ 1700 rem      halteschleife
+ 1710 :
+ 1720 get#1,q$:ifq$=""then1720
+ 1730 q=o%(asc(q$)):q$=chr$(i%(asc(q$)))
+ 1740 ifq=17thenreturn
+ 1750 ifq=24thengoto8030
+ 1760 print#1,q$
+ 1770 printq$:goto1720
+ 1780 :
+ 1790 rem        eingabe online
+ 1800 :
+ 1810 print#1
+ 1820 print
+ 1830 print#1,e$;:gosub1510
+ 1840 printe$;
+ 1850 gosub1510
+ 1860 ifq$=""then1850
+ 1870 q=o%(asc(q$)):q$=chr$(i%(asc(q$))):print#1,q$:printq$
+ 1880 ifq=49then1960
+ 1890 ifq=50then2230
+ 1900 ifq=51then3120
+ 1910 ifq=52then1850
+ 1920 ifq=48thenprint#1,"auf wiedersehen":print"auf wiedersehen":goto8030
+ 1930 ifq=24then8030
+ 1940 goto1850
+ 1950 :
+ 1960 rem    aktuelle informationen
+ 1970 :
+ 1980 fora=1to5:print#1:print:next:gosub1510
+ 1990 print#1,"              N e w s"
+ 2000 print"              N e w s"
+ 2010 print#1:print#1
+ 2020 print:print
+ 2030 open2,8,3,"aktuell,s,r":w$=""
+ 2040 input#2,w$:w$="":ifst=64then2090
+ 2050 get#2,h$:ifh$<>chr$(13)thenw$=w$+h$:goto2050
+ 2060 ifst=64then2090
+ 2070 ifw$="AAA"then2160
+ 2080 goto2150
+ 2090 print#1:print#1:print#1,"E n d e  d e r  I n f o s":w$=""
+ 2100 print:print:print"E n d e  d e r  I n f o s":w$=""
+ 2110 print#1:print#1,"T a s t e  d r u e c k e n"
+ 2120 print:print"T a s t e  d r u e c k e n"
+ 2130 gosub1510:ifq$=""then2130
+ 2140 fora=1to5:print#1:print:next:gosub1510:close2:goto1360
+ 2150 print#1,w$:printw$:w$="":gosub1510:goto2050
+ 2160 w$="":print#1:print#1,"    Weiter (Return) sonst (0)
+ 2170 w$="":print:print"    Weiter (Return) sonst (0)
+ 2180 gosub1510
+ 2190 ifq=13thenprint#1,q$:printq$:goto2050
+ 2200 ifq=48thenclose2:goto1360
+ 2210 goto2180
+ 2220 :
+ 2230 :
+ 2240 rem        catalog
+ 2250 :
+ 2260 :
+ 2270 fora=1to5:print#1:print:next:gosub1540
+ 2280 open3,8,3,"catalog,s,r":c$="":an=0
+ 2290 input#3,c$:c$="":ifst=64then3050
+ 2300 z=1:s=9:fora=1to5:print#1:print:next
+ 2310 get#3,h$:ifh$<>chr$(13)thenc$=c$+h$:goto2310
+ 2320 ifst=64thenfl=8:goto2390
+ 2330 ifc$="AAA"then2390
+ 2335 z$=str$(z):z$=right$(z$,len(z$)-1)
+ 2340 print#1,z$"."c$:printz$"."c$:gosub1540
+ 2350 fe$(z)=c$:z=z+1:s=s-1:c$="":goto2310
+ 2360 :
+ 2370 rem          catalog menue
+ 2380 :
+ 2390 c$="":print#1:print#1,"Moechten Sie etwas bestellen  <b>"
+ 2400 print:print"Moechten Sie etwas bestellen  <b>"
+ 2410 iffl=8then2440
+ 2420 print#1,"die Liste weiter sehen        <w>"
+ 2430 print"die Liste weiter sehen        <w>"
+ 2440 print#1,"oder zurueck zum Menue        <m>";" "
+ 2450 print"oder zurueck zum Menue        <m>";" "
+ 2460 gosub1540
+ 2470 ifq$=""then2460
+ 2480 ifq=98orr$="b"then2550
+ 2490 ifq=119orr$="w"thenz=1:fora=1to5:print#1:print:next:goto2300
+ 2500 ifq=109orr$="m"thenclose3:goto2910
+ 2510 goto2460
+ 2520 :
+ 2530 rem          bestellen
+ 2540 :
+ 2550 ifop=1then2720
+ 2560 op=1:print#1:print
+ 2570 print#1,"Bitte geben Sie Ihren Namen ein":n$=""
+ 2580 print"Bitte geben Sie IHren Namen ein"
+ 2590 gosub1540
+ 2600 ifq$=""then2590
+ 2610 ifq=13then2650
+ 2620 :
+ 2630 ifq=20thenb$=n$:gosub6050:n$=b$:goto2590
+ 2640 n$=n$+q$:print#1,q$;:printq$;:goto2590
+ 2650 print#1:print#",und nun Ihre Adresse"
+ 2660 print:print"und nun Ihre Adresse"
+ 2670 gosub1540
+ 2680 ifq$=""then2670
+ 2690 ifq=13then2720
+ 2700 ifq=20thenb$=ad$:gosub6050:ad$=b$:goto2670
+ 2710 ad$=ad$+q$:print#1,q$;:printq$;:goto2670
+ 2720 print#1:print
+ 2730 print#1,"Bitte geben Sie die Titelnummer ein"
+ 2740 print"Bitte geben{$a0}Sie die Titelnummer ein":an=an+1
+ 2750 gosub1540
+ 2760 ifq$=""then2750
+ 2770 ifq<49orq>57-sthen2750
+ 2780 print#1,q$:printq$:t=val(q$):print#1:print:print#1,fe$(t):printfe$(t)
+ 2790 be$(an=fe$(t)
+ 2800 print#1,"Wollen Sie noch etwas bestellen ?";
+ 2810 print"Wollen Sie noch etwas bestellen{$a0}?";
+ 2820 gosub1540
+ 2830 ifq$=""then2820
+ 2840 ifq=106orq=121thenprint#1,q$:printq$:goto2720
+ 2850 ifq=110andfl<>8thenprint#1,q$:printq$:goto2300
+ 2860 iffl=8then3050
+ 2870 goto2820
+ 2880 :
+ 2890 rem      bestelliste absaven
+ 2900 :
+ 2910 print#1:print
+ 2920 print#1,"Die bestellten Artikel werden in ein"
+ 2930 print"Die bestellten Artikel werden in ein"
+ 2940 print#1,"paar{$a0}Tagen bei{$a0}Ihnen sein"
+ 2950 print"paar Tagen bei Ihnen sein"
+ 2960 open10,8,10,"bestelliste,s,a"
+ 2970 ifan=0thenclose10:goto1370
+ 2980 fora=1toan:print#10,be$(a):next
+ 2990 print#10,"AAA":close10
+ 3000 gosub1540
+ 3010 goto1370
+ 3020 :
+ 3030 rem        catalog zuende
+ 3040 :
+ 3050 print#1:print#1:print#1,"C A T A L O G  Z U  E N D E":print#1:print#1
+ 3060 print:print:print"C A T A{$a0}L O{$a0}G  Z U  E N{$a0}D E":print:print
+ 3070 print#1,"T a s t e  d r u e c k e n"
+ 3080 print"T a s t e  d r u e c k e n"
+ 3090 gosub1540
+ 3100 ifq$=""then3090
+ 3110 close3:goto1370
+ 3120 :
+ 3130 rem   electronic mail entry
+ 3140 :
+ 3150 fora=1to5:print#1:print:next
+ 3160 print#1,"      E L{$a0}E C T R O N I C M{$a0}A{$a0}I{$a0}L"
+ 3170 print"      E{$a0}L{$a0}E C T R O{$a0}N I{$a0}C M A I L"
+ 3180 print#1,"     -----------------------------"
+ 3190 print"     -----------------------------"
+ 3200 print#1:print#1
+ 3210 print:print
+ 3220 fora=1to5
+ 3230 print#1,em$(a):gosub1510
+ 3240 printem$(a)
+ 3250 next:print#1:print
+ 3260 print#1,e$;:printe$
+ 3270 gosub1510
+ 3280 ifq$=""then3270
+ 3290 ifq<48orq>52then3270
+ 3300 print#1,q$:printq$
+ 3310 ifq=48then1360
+ 3320 ifq=49then3390
+ 3330 ifq=50then4020
+ 3340 ifq=51then4610
+ 3350 goto5160:rem   q=52
+ 3360 :
+ 3370 rem      menuepunkt 1
+ 3380 :
+ 3390 fora=1to5:print#1:print:next:gosub1510
+ 3400 print#1,em$(6):print#1,em$(7):n$=""
+ 3410 printem$(6):printem$(7):n$=""
+ 3420 gosub1510
+ 3430 ifq$=""then3420
+ 3440 ifq=13thenfl=1:print#1,q$:printq$:goto3520
+ 3450 ifq=20thenb$=n$:gosub6050:n$=b$:goto3420
+ 3460 print#1,q$;
+ 3470 printq$;
+ 3480 n$=n$+q$:goto3420
+ 3490 :
+ 3500 rem    namens kontrolle
+ 3510 :
+ 3520 iflen(n$)=0then3120
+ 3530 z=1
+ 3540 ifna$(z)=n$thenonflgoto3620,4140,5270
+ 3550 ifz<20thenz=z+1:goto3540
+ 3560 print#1:print
+ 3570 print#1,n$;" hat kein{$a0}Postfach bei uns!!!"
+ 3580 printn$;" hat kein{$a0}Postfach bei uns!!!":fora=1to2000:next:goto3120
+ 3590 :
+ 3600 rem         brief eingabe
+ 3610 :
+ 3620 open15,8,15,"io":print#15,"m-r"chr$(250)chr$(2)
+ 3630 get#15,l$:ifl$=""thenl$=chr$(0)
+ 3640 print#15,"m-r"chr$(252)chr$(2):get#15,m$:ifm$=""thenm$=chr$(0)
+ 3650 fr=asc(l$)+256*asc(m$):close15
+ 3660 iffr>15then3720
+ 3670 print#1:print#1,"Leider kein Speicherplatz mehr          vorhanden !!!"
+ 3680 print:print"Leider kein Speicherplatz mehr          vorhanden !!!"
+ 3690 fora=1to2000:next:goto3120
+ 3700 :
+ 3710 :
+ 3720 open2,8,3,n$+pa$(z)+",s,a"
+ 3730 print#1,"Geben Sie Ihre Nachricht ein            max. 15 Zeilen"
+ 3740 print"Geben Sie Ihre Nachricht ein            max. 15 Zeilen"
+ 3750 print#1:print#1,"Abschluss mit Leerzeile":print#1
+ 3760 print:print"Abschluss mit Leerzeile":print
+ 3770 z=1:w$=" "
+ 3780 ifz=16thenprint#1:print#1,"Zeilengrenze erreicht"
+ 3790 ifz=16thenprint:print"Zeilengrenze erreicht":goto3950
+ 3800 get#1,q$:ifq$=""then3800
+ 3810 q$=chr$(i%(asc(q)))
+ 3820 ifasc(q$)=13andasc(w$)=13thenbr$(z)="AAA":goto3950
+ 3830 ifasc(q$)=13thenw$=q$:print#1:print:br$(z)=b$:b$="":z=z+1:goto3780
+ 3840 ifasc(q$)<>20then3870
+ 3850 gosub6050
+ 3860 goto3800
+ 3870 print#1,q$;:printq$;
+ 3880 b$=b$+q$:w$=q$
+ 3890 iflen(b$)<80then3800
+ 3900 print#1,"Z E I L{$a0}E  Z U  L{$a0}A{$a0}N G !!!":b$="":print#1
+ 3910 print"Z I L{$a0}E  Z U  L{$a0}A N{$a0}G !!!":b$="":print:goto3800
+ 3920 :
+ 3930 rem        brief absaven
+ 3940 :
+ 3950 print#1:print#1,"Brief wird abgespeichert"
+ 3960 print:print"Brief wird abgespeichert"
+ 3970 fora=1toz:print#2,br$(a):next:close2:goto3120
+ 3980 :
+ 3990 :
+ 4000 rem      menuepunkt 2
+ 4010 :
+ 4020 fora=1to5:print#1:print:next:gosub1510
+ 4030 print#1,em$(8):n$=""
+ 4040 printem$(8):n$=""
+ 4050 gosub1510
+ 4060 ifq$=""then4050
+ 4070 ifq=13thenfl=2:print#1,q$:printq$:goto3520
+ 4080 ifq=20thenb$=n$:gosub6050:n$=b$:goto4050
+ 4090 print#1,q$;:printq$;
+ 4100 n$=n$+q$:goto4050
+ 4110 :
+ 4120 rem       passwort eingabe
+ 4130 :
+ 4140 fl=1
+ 4150 print#1,em$(10):p$=""
+ 4160 printem$(10):p$=""
+ 4170 gosub1510
+ 4180 ifq$=""then4170
+ 4190 ifq=13thenprint#1,q$:printq$:goto4260
+ 4200 ifq=20thenb$=p$:gosub6050:p$=b$:goto4170
+ 4210 print#1,q$;:printq$;
+ 4220 p$=p$+q$:goto4170
+ 4230 :
+ 4240 rem       passwort kontrolle
+ 4250 :
+ 4260 iflen(p$)=0then3120
+ 4270 ifpa$(z)=p$thenonflgoto4330,5310
+ 4280 print#1:print#1,"Falsche Eingabe !!!"
+ 4290 print:print"Falsche Eingabe !!!":goto4150
+ 4300 :
+ 4310 rem         brief ausgabe
+ 4320 :
+ 4330 open2,8,3,na$(z)+pa$(z)+",s,r":t$=""
+ 4340 fora=1to5:print#1:print:next
+ 4350 input#2,t$:ifst=64then4510
+ 4360 t$=""
+ 4370 get#2,h$:ifh$<>chr$(13)thent$=t$+h$:goto4370
+ 4380 ifst=64then4510
+ 4390 ift$="AAA"then4410
+ 4400 print#1,t$:printt$:t$="":gosub1510:goto4370
+ 4410 print#1:print#1,"Weiter (Return) Ende (0)":t$=""
+ 4420 print:print"Weiter (Return){$a0}Ende (0)":t$=""
+ 4430 gosub1510
+ 4440 ifq$=""then4430
+ 4450 ifq=13thenfora=1to5:print#1:print:next:goto4370
+ 4460 ifq=48thenclose2:goto3120
+ 4470 goto4430
+ 4480 :
+ 4490 rem        brief zuende
+ 4500 :
+ 4510 print#1:print#1,"Keine weiteren Briefe vorhanden !!!"
+ 4520 close2:print:print"Keine weiteren Briefe vorhanden !!!"
+ 4530 print#1:print#1,"Taste druecken"
+ 4540 print:print"Taste druecken"
+ 4550 gosub1510
+ 4560 ifq$=""then4550
+ 4570 goto3120
+ 4580 :
+ 4590 rem       mailbox einrichten
+ 4600 :
+ 4610 ifan=40thenprint#1,em$(11):printem$(11):fora=1to3000:next:goto3120
+ 4620 fora=1to5:print#1:print:next:gosub1510
+ 4630 print#1,em$(8):n$="":z=1
+ 4640 printem$(8):n$=""
+ 4650 gosub1510
+ 4660 ifq$=""then4650
+ 4670 ifz<1thenz=1
+ 4680 ifq=13thenprint#1,q$:printq$:goto4720
+ 4690 ifq=20thenz=z-1:b$=n$:gosub6050:n$=b$:goto4650
+ 4700 ifz<9thenprint#1,q$;:printq$;:n$=n$+q$:z=z+1
+ 4710 goto4650
+ 4720 iflen(n$)=0then3120
+ 4730 z=1
+ 4740 ifna$(z)=n$then4770
+ 4750 ifz<19thenz=z+1:goto4740
+ 4760 goto4820
+ 4770 print#1:print#1,"Name schon existent":print
+ 4780 print:print"Name schon existent":print:goto4630
+ 4790 :
+ 4800 rem       passwort definieren
+ 4810 :
+ 4820 print#1,em$(9):p$="":z=1
+ 4830 printem$(9):p$=""
+ 4840 gosub1510
+ 4850 ifq$=""then4840
+ 4860 ifq=13then4910
+ 4870 ifz<1thenz=1
+ 4880 ifq=20thenz=z-1:b$=p$:gosub6050:p$=b$:goto4840
+ 4890 ifz<9thenprint#1,q$;:printq$;:p$=p$+q$:z=z+1
+ 4900 goto4840
+ 4910 iflen(p$)=0then3120
+ 4920 z=1
+ 4930 ifpa$(z)=p$then4960
+ 4940 ifz<an-1thenz=z+1:goto4930
+ 4950 goto5020
+ 4960 print#1:print#1,"Password schon existent"
+ 4970 print:print"Password schon existent"
+ 4980 goto4820
+ 4990 :
+ 5000 rem        neue mailbox creieren
+ 5010 :
+ 5020 an=an+1:na$(an)=n$:pa$(an)=p$
+ 5030 print#1:print#1,"...B i t t e  w a r t e n..."
+ 5040 print:print"...B i t t e  w a r t e n...":gosub1510
+ 5050 open5,8,5,na$(an)+pa$(an)+",s,w":print#5,"first":close5
+ 5060 open5,8,5,"@:namen,s,w":print#5,an:fora=1toan:print#5,na$(a):next:close5
+ 5070 open5,8,5,"@:passwort,s,w":print#5,an:fora=1toan:print#5,pa$(a):next
+ 5080 close5
+ 5090 print#1:print
+ 5100 print#1,"Postfach mit dem Namen ";n$;"           eroeffnet"
+ 5110 print,"Postfach mit dem Namen ";n$;"           eroeffnet"
+ 5120 goto3120
+ 5130 :
+ 5140 rem        mailbox loeschen
+ 5150 :
+ 5160 fora=1to5:print#1:print:next:gosub1510
+ 5170 print#1,em$(8):n$="":fl=3
+ 5180 printem$(8):n$="":fl=3
+ 5190 gosub1510
+ 5200 ifq$=""then5190
+ 5210 ifq=13thenfl=3:print#1,q$:printq$;:goto3520
+ 5220 ifq=20thenb$=n$:gosub6050:n$=b$:goto5190
+ 5230 print#1,q$;:printq$;:n$=n$+q$:goto5190
+ 5240 :
+ 5250 rem          passwort
+ 5260 :
+ 5270 fl=2:goto4150
+ 5280 :
+ 5290 rem       mailbox loeschen
+ 5300 :
+ 5310 fora=ztoan-1:na$(a)=na$(a+1):pa$(a)=pa$(a+1):next:na$(an)="":pa$(an)=""
+ 5320 an=an-1
+ 5330 print#1,"...B i t t e  w a r t e n..."
+ 5340 print"...B i t t e  w a r t e n..."
+ 5350 open5,8,5,"@:namen,s,w"
+ 5360 print#5,an:fora=1toan:print#5,na$(a):next:close5
+ 5370 open5,8,5,"@:passwort,s,w"
+ 5380 print#5,an:fora=1toan:print#5,pa$(a):next:close5
+ 5390 open5,8,15,"s:"+n$+p$:close5
+ 5400 print#1:print
+ 5410 print#1,"Postfach ist geloescht"
+ 5420 print"Postfach ist geloescht"
+ 5430 goto3120
+ 5440 :
+ 5450 rem      menue - datas
+ 5460 :
+ 5470 data"Aktuelle Informationen.............<1>"
+ 5480 data"Catalog............................<2>"
+ 5490 data"Electronic Mail....................<3>"
+ 5500 data"Info - Service....................<4>"
+ 5510 data"Ende der Kommunikation.............<0>"
+ 5520 :
+ 5530 rem      info - datas
+ 5540 :
+ 5550 data"vc 64","vc 20","spectrum","atari
+ 5560 :
+ 5570 rem   electronic mail menue
+ 5580 :
+ 5590 data"Brief Eingabe......................<1>"
+ 5600 data"Briefe lesen.......................<2>"
+ 5610 data"Postfach einrichten................<3>"
+ 5620 data"Postfach loeschen..................<4>"
+ 5630 data"Zum Hauptmenue.....................<0>"
+ 5640 data"An wen wollen Sie einen Brief
+ 5650 data"schreiben ?
+ 5660 data"Bitte geben{$a0}Sie Ihren Namen ein         max. 8 Zeichen   :"
+ 5670 data"Bitte definieren Sie ein Passwort       max. 8 Zeichen   :"
+ 5680 data"Bitte geben Sie Ihr Passwort ein :"
+ 5690 data"Maximale Teilnehmerzahl erreicht !!"
+ 5700 rem                     asciichange
+ 5710 forz=32to64:o%(z)=z:next:o%(13)=13:o%(20)=8:o%(160)=32
+ 5720 forz=65to90:y=z+32:o%(z)=y:next:forz=91to95:o%(z)=z:next
+ 5730 forz=193to218:y=z-128:o%(z)=y:next
+ 5740 forz=133to140:o%(z)=z:next:o%(20)=20
+ 5750 forz=0to255:y=o%(z):ify<>0theni%(y)=z
+ 5760 next:o%(17)=17:o%(19)=19:o%(24)=24
+ 5770 return
+ 5780 :
+ 5790 rem           eingangs bild
+ 5800 :
+ 5820 print#1,"+++++++++++++++++++++++++++++++++++++++"
+ 5830 print,"+++++++++++++++++++++++++++++++++++++++"
+ 5840 print#1,"+++       M A I L B O X  6 4        +++"
+ 5850 print,"+++       M A I L B O X  6 4        +++"
+ 5860 print#1,"+++   copyright SOFTWARE E          +++"
+ 5870 print,"+++   copyright SOFTWARE EXPR       +++"
+ 5880 print#1,"+++++++++++++++++++++++++++++++++++++++"
+ 5890 print,"+++++++++++++++++++++++++++++++++++++++"
+ 5900 fora=1to8:print#1:print:next
+ 5910 print#1,"    Dieses{$a0}Mailbox Programm wurde auf"
+ 5920 print"    Dieses{$a0}Mailbox Programm wurde auf"
+ 5930 print#1,"    einen Commodore VC 64 realisiert"
+ 5940 print,"    einen Commodore VC 64 realisiert"
+ 5950 print#1,"     geschrieben von Thomas Koether"
+ 5960 print,"     geschrieben von Thomas Koether"
+ 5970 print#1,"        adaptiert auf Automodem":print#1:print#1
+ 5975 print"         adaptiert auf Automodem
+ 5976 print#1,"         von Rudolf Moellenbeck":print#1:print#1
+ 5977 print"         von{$a0}Rudolf Moellenbeck":print:print
+ 5980 print#1,"      T a s t e  d r u e c k e n"
+ 5990 print,"      T a s t e  d r u e c k e n"
+ 6000 get#1,q$:ifq$<>""then6010
+ 6005 getq$:ifq$=""then6000
+ 6010 goto6070
+ 6020 :
+ 6030 rem          inst/del
+ 6040 :
+ 6050 l=len(b$):ifl>0thenb$=left$(b$,l-1):print#1,chr$(20);:printq$;
+ 6060 return
+ 6070 :
+ 6080 rem           impressum
+ 6090 :
+ 6100 fora=1to5:print#1:print:next
+ 6170 fora=1to10:print#1,im$(a):printim$(a):next
+ 6180 fora=1to7:print#1:print:next
+ 6190 print#1,"      T a s t e  d r u e c k e n"
+ 6200 print,"      T a s t e  d r u e c k e n"
+ 6210 get#1,q$:ifq$<>""then6220
+ 6215 getq$:ifq$=""then5210
+ 6220 goto1380
+ 8000 :
+ 8020 :
+ 8030 :
+ 8040 sys51200:print#1:print#1;"Auf wieder sehen...
+ 8045 close2:close3:close4:close5:close6:close7:close8:close9:close10
+ 8050 poke56577,0:goto1275
+ 9000 t%=val(mid$(ti$,3,2)):ift<t%thenreturn
+ 9010 ift-t%<ttthentt=tt-1
+ 9020 return
+
