@@ -1,0 +1,243 @@
+;olymp.-comp.-2.org ==0801==
+;Quelle: 8410.D64
+  100 rem ******  centronics  ***********
+  101 rem interface fuer olympia compact2
+  102 rem  (c) reinhard atzbach 020784
+  103 rem *******************************
+  104 forn=0to462: readb: poke32000+n,b
+  105 next:sys32000:poke55,255:poke56,124
+  106 rem *******************************
+  107 :
+  108 :     rem initialisierung
+  109 :
+  110 data 169,255    :rem   lda #ff
+  111 data 141,  3,221:rem   sta ddr b
+  112 data 169,  0    :rem   lda #00
+  113 data 141,  1,221:rem   sta port b
+  114 data 169,125    :rem * lda #chrouth
+  115 data 141, 39,  3:rem   sta chrvekh
+  116 data 141, 33,  3:rem   sta chkvekh
+  117 data 169, 54    :rem * lda #chroutl
+  118 data 141, 38,  3:rem   sta chrvekl
+  119 data 169, 29    :rem * lda #chkoutl
+  120 data 141, 32,  3:rem   sta chkvekl
+  121 data  96        :rem   rts
+  122 :
+  123 :     rem chkout
+  124 :
+  125 data  32, 15,243:rem   jsr filenr
+  126 data 240,  3    :rem   beq a
+  127 data  76,  1,247:rem   jmp f n open
+  128 data  32, 31,243:rem a jsr setpara
+  129 data 165,186    :rem   lda geraetnr
+  130 data 201,  4    :rem   cmp #cen
+  131 data 240,  5    :rem   beq b
+  132 data 165,186    :rem   lda geraetnr
+  133 data  76, 93,242:rem   jmp anderes
+  134 data  76,117,242:rem b jmp centr.
+  135 :
+  136 :     rem chrout
+  137 :
+  138 data  72        :rem   pha
+  139 data 165,154    :rem   lda geraet
+  140 data 201,  4    :rem   cmp #centr.
+  141 data 240,  3    :rem   beq c
+  142 data  76,205,241:rem   jmp anderes
+  143 :
+  144 :     rem olympiaumsetzung
+  145 :
+  146 data 134,  5    :rem c stx 5
+  147 data 132,  6    :rem   sty 6
+  148 data 169,  6    :rem * lda #endpgl
+  149 data 133,  3    :rem   sta 3
+  150 data 169,126    :rem * lda #endpgh
+  151 data 133,  4    :rem   sta 4
+  152 data 160,200    :rem   ldy lencat
+  153 data 162,  1    :rem   ldx #1
+  154 data 104        :rem   pla
+  155 :
+  156 :     rem sonderzeichen
+  157 :
+  158 data 201,127    :rem   cmp #7f
+  159 data 240, 77    :rem   beq k
+  160 :
+  161 data 209,  3    :rem d cmp (3),y
+  162 data 240,  8    :rem   beq e
+  163 data 136        :rem   dey
+  164 data 136        :rem   dey
+  165 data 136        :rem   dey
+  166 data 136        :rem   dey
+  167 data 208,246    :rem   bne d
+  168 data 240, 27    :rem   beq g
+  169 data 192, 73    :rem e cpy #49
+  170 data 144,  8    :rem   bcc f
+  171 data  36, 15    :rem   bit 15
+  172 data  48,  4    :rem   bmi f
+  173 data 169,  0    :rem   lda #0
+  174 data  16, 53    :rem   bpl k
+  175 data 162,  3    :rem f ldx #3
+  176 data 136        :rem   dey
+  177 data 177,  3    :rem   lda (3),y
+  178 data  72        :rem   pha
+  179 data 136        :rem   dey
+  180 data 177,  3    :rem   lda (3),y
+  181 data  72        :rem   pha
+  182 data 136        :rem   dey
+  183 data 177,  3    :rem   lda (3),y
+  184 data  16, 38    :rem   bpl k
+  185 :
+  186 :     rem zeichensatz ?
+  187 :
+  188 data  72        :rem g pha
+  189 data 173, 24,208:rem   lda video
+  190 data  41,  2    :rem   and #02
+  191 data 208,  9    :rem   bne h
+  192 :
+  193 :     rem 1.zeichensatz
+  194 :
+  195 data 104        :rem   pla
+  196 data 201, 91    :rem   cmp #5b
+  197 data 144, 25    :rem   bcc k
+  198 data 169, 95    :rem   lda #5f
+  199 data 176, 21    :rem   bcs k
+  200 :
+  201 :     rem 2.zeichensatz
+  202 :
+  203 data 104        :rem h pla
+  204 data 201, 64    :rem   cmp #40
+  205 data 144, 10    :rem   bcc j
+  206 data 201,192    :rem   cmp #c0
+  207 data 144,  4    :rem   bcc i
+  208 data  41,127    :rem   and #7f
+  209 data 208,  2    :rem   bne j
+  210 data   9, 32    :rem i ora #20
+  211 data 201,123    :rem j cmp #7a
+  212 data 144,  2    :rem   bcc k
+  213 data 169, 95    :rem   lda #5f
+  214 data  72        :rem k pha
+  215 :
+  216 :     rem ruecktaste
+  217 :
+  218 data 104        :rem l pla
+  219 data 201,127    :rem   cmp #7f
+  220 data 208, 20    :rem   bne o
+  221 data 198,  2    :rem   dec 2
+  222 data 230,  2    :rem   inc 2
+  223 data 240, 68    :rem   beq t
+  224 data 198,  2    :rem   dec 2
+  225 data 240,  8    :rem   beq n
+  226 data 169, 32    :rem   lda #20
+  227 data 232        :rem m inx
+  228 data  72        :rem   pha
+  229 data 198,  2    :rem   dec 2
+  230 data 208,250    :rem   bne m
+  231 data 169, 13    :rem n lda #0d
+  232 :
+  233 :     rem druckercursor in 0002
+  234 :
+  235 data 201, 13    :rem o cmp #0d
+  236 data 208,  6    :rem   bne q
+  237 data  72        :rem p pha
+  238 data 169,  0    :rem   lda #0
+  239 data 133,  2    :rem   sta 2
+  240 data 104        :rem   pla
+  241 :
+  242 data 201, 27    :rem q cmp #1b
+  243 data 208,  2    :rem   bne r
+  244 data 198,  2    :rem   dec 2
+  245 :
+  246 data 201, 32    :rem r cmp #20
+  247 data 144, 34    :rem   bcc u
+  248 :
+  249 data 201, 94    :rem   cmp #5e
+  250 data 208, 12    :rem   bne s
+  251 data 169,127    :rem   lda #7f
+  252 data  72        :rem   pha
+  253 data 232        :rem   inx
+  254 data 169, 32    :rem   lda #20
+  255 data  72        :rem   pha
+  256 data 232        :rem   inx
+  257 data 169, 94    :rem   lda #5e
+  258 data 208, 18    :rem   bne u
+  259 :
+  260 data 201, 96    :rem s cmp #60
+  261 data 208, 12    :rem   bne t
+  262 data 169,127    :rem   lda #7f
+  263 data  72        :rem   pha
+  264 data 232        :rem   inx
+  265 data 169, 32    :rem   lda #20
+  266 data  72        :rem   pha
+  267 data 232        :rem   inx
+  268 data 169, 96    :rem   lda #60
+  269 data 208,  2    :rem   bne u
+  270 :
+  271 data 230,  2    :rem t inc 2
+  272 :
+  273 :     rem ausgabe
+  274 :
+  275 data  72        :rem u pha
+  276 data 173, 13,221:rem v lda flag
+  277 data  41, 16    :rem   and #10
+  278 data 240,249    :rem   beq v
+  279 data 104        :rem   pla
+  280 data 141,  1,221:rem   sta port
+  281 data 202        :rem   dex
+  282 data 208,162    :rem   bne l
+  283 data 166,  5    :rem   ldx 5
+  284 data 164,  6    :rem   ldy 6
+  285 data  24        :rem   clc
+  286 data  96        :rem   rts
+  287 :
+  288 :     rem olympiadaten
+  289 :
+  290 data  13, 10,  0, 13 :rem cr mit lf
+  291 data  13,  0,  0, 11 :rem   ohne lf
+  292 data 112,127,105,255 :rem ~
+  293 data  96, 94, 39, 94 :rem ^
+  294 data  62,  0,  0, 64 :rem @
+  295 data  14, 47, 15, 62 :rem >
+  296 data  14, 45, 15, 60 :rem <
+  297 data 123,  0,  0,166 :rem kl ae
+  298 data 124,  0,  0,220 :rem kl oe
+  299 data 125,  0,  0,168 :rem kl ue
+  300 data 126,  0,  0, 92 :rem sz
+  301 data  91,  0,  0,219 :rem gr ae
+  302 data  92,  0,  0,221 :rem gr oe
+  303 data  93,  0,  0,169 :rem gr ue
+  304 data  95,  0,  0,164 :rem unterstr
+  305 data  14, 44, 15,186 :rem teilung
+  306 data  14, 42, 15,223 :rem quadrat
+  307 data  14, 43, 15,192 :rem kubik
+  308 data  95,127, 85,145 :rem curs u
+  309 data  95,127, 68, 17 :rem curs d
+  310 data  95,127, 76,157 :rem curs l
+  311 data  95,127, 82, 29 :rem curs r
+  312 data  95,127, 67, 19 :rem clr
+  313 data  95,127, 72,147 :rem home
+  314 data  95,127, 73, 18 :rem rvs
+  315 data  95,127, 78,146 :rem rvs off
+  316 data  95,127, 97,144 :rem schwarz
+  317 data  95,127, 98,  5 :rem weiss
+  318 data  95,127, 99, 28 :rem rot
+  319 data  95,127,100,159 :rem cyan
+  320 data  95,127,101,156 :rem magenta
+  321 data  95,127,102, 30 :rem gruen
+  322 data  95,127,103, 31 :rem blau
+  323 data  95,127,103,158 :rem yellow
+  324 data  95,127,105,129 :rem orange
+  325 data  95,127,106,149 :rem braun
+  326 data  95,127,107,150 :rem hellrot
+  327 data  95,127,108,151 :rem grau 1
+  328 data  95,127,109,152 :rem grau 2
+  329 data  95,127,110,153 :rem gruen
+  330 data  95,127,111,154 :rem hellblau
+  331 data  95,127,112,155 :rem grau 3
+  332 data  95,127, 49,133 :rem f 1
+  333 data  95,127, 51,134 :rem f 3
+  334 data  95,127, 53,135 :rem f 5
+  335 data  95,127, 55,136 :rem f 7
+  336 data  95,127, 50,137 :rem f 2
+  337 data  95,127, 52,138 :rem f 4
+  338 data  95,127, 54,139 :rem f 6
+  339 data  95,127, 56,140 :rem f 8
+
