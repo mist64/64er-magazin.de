@@ -24,15 +24,39 @@
 
         <p>Es stellte sich die Frage, wie man es wohl erreichen könnte, daß nur sichtbare Teile einer Raumfläche gezeichnet werden. H.W. Franke hat in einem Artikel über Computergrafik geschrieben: »Bis heute kann man das Problem noch nicht als völlig abgeschlossen ansehen«. Damit meinte er das Hinterschneidungsproblem. Zumindest für unsere Aufgabenstellung und den C 64 kann man es lösen, wenn man folgendem Gedankengang verfolgt. Stellen Sie sich doch mal den Bildschirm des C 64 in 320 senkrechte Linien unterteilt vor, für jeden möglichen X-Wert also eine Senkrechte. Nun nehmen wir mal eine davon (bei X = X1) und ordnen ihr in unserem Koordinatensystem willkürlich einen Y-Wert 0 zu (Bild 1). In der Doppelschleife (siehe 3D-Programm in der letzten Folge) wird nun irgendwann X = XI sein und dann der dazugehörige Y-Wert berechnet. Dieser soll zum Beispiel gleich 1 sein. Der Punkt wird gesetzt, und die Schleife läuft weiter (Bild 2).</p>
 
+        <figure>
+            <img src="146-1.png" alt="">
+            <figcaption>Bild 1. Eine der 320 Senkrechten (X=X1)</figcaption>
+        </figure>
+        <figure>
+            <img src="146-2.png" alt="">
+            <figcaption>Bild 2. Der erste Punkt auf der Senkrechten</figcaption>
+        </figure>
+
         <p>Wenn alle X-Werte durchlaufen wurden, erhöht sich der Z-Wert in der äußeren Schleife und von neuem wird für XI ein Y-Wert berechnet. Nehmen wir an, der läge bei 1,5. Auch dieser Punkt wird gesetzt und die Schleife geht weiter (Bild 3).</p>
 
+        <figure>
+            <img src="146-3.png" alt="">
+            <figcaption>Bild 3. Der zweite Punkt P’ ist gesetzt</figcaption>
+        </figure>
+
         <p>Wenn nun beim nächsten Schleifendurchlauf XI erreicht ist, wird es spannend. Es gibt nun drei Möglichkeiten (Bild 4).</p>
+
+        <figure>
+            <img src="146-4.png" alt="">
+            <figcaption>Bild 4. Die drei Möglichkeiten für einen neuen Punkt</figcaption>
+        </figure>
 
         <p>In Fall A liegt der neue Punkt oberhalb von P', ist sichtbar und wird gezeichnet. Im Fall B liegt er unterhalb von P, ist ebenfalls sichtbar und wird gezeichnet. Im Fall C aber liegt er zwischen P und P', er ist nicht sichtbar, weil er auf einem uns abgewandten Hang der Raumfläche liegt und wird daher nicht gezeichnet. Sie sehen also, daß wir uns lediglich immer auf jeder dieser Senkrechten den bisher größten und den bisher kleinsten Wert von Y merken müssen. Bei jedem neuen Y-Wert können wir feststellen, ob er innerhalb des damit aufgespannten Bereiches liegt (dann wird er nicht gezeichnet) oder außerhalb (dann wird er gezeichnet und dieser Wert als der größte oder kleinste bisherige gemerkt). Damit ist für uns das Problem gelöst! Wir richten ein zweidimensionales Feld ein: G (319, 2), wo für jede der 320 Senkrechten drei Werte gespeichert werden können:</p>
 
         <p>G(X,0) als bisher höchster Y-Wert,<br />
             G(X,1) als bisher kleinster Y-Wert,<br />
             G(X,2) als Kennmarke, ob für diesen X-Wert schon ein Y-Wert aufgetaucht ist (in dem Fall ist G(X,2)>0) oder noch nicht (dann ist G(X,2) = 0). Durch das RUN-Kommando sind alle Variablen gleich 0, also auch G(X,2). Genau besehen benötigen wir diese Kennmarke, ob auf der Senkrechten durch X schon ein Punkt gesetzt wurde, nicht unbedingt in unserem Programm. Es ist so gestaltet, daß beim X-Durchlauf keine Lücken gelassen werden. Sinnvoll ist es trotzdem, sie einzurichten, denn durch die 45° -Verschiebung erhöht sich ja der maximale X-Wert ständig und außerdem könnte man sich ja mal überlegen, ob man den X-Durchlauf mit Lücken macht. In der letzten Folge hatten wir im Flußdiagramm unsere Doppelschleife entwickelt. Dabei war ein Teil »Zeichnen des Punktes X,Y«. Diesen Teil ersetzen wir durch den in Bild 5.</p>
+
+        <figure>
+            <img src="146-5.png" alt="">
+            <figcaption>Bild 5. Flußdiagramm zum Hinterschneidungsproblem</figcaption>
+        </figure>
 
         <p>Jetzt sehen wir uns das als Programmteil an. Also Computer anschalten, Laden des 3D-Programmes aus der letzten Folge sowie der Grafik-Unterprogramme aus der vierten Folge (entweder — falls Sie das haben — durch MERGEn oder als kombiniertes Programm aus der Arbeit in der letzten Folge). Zeile 230 des 3D-Programmes enthält als letzten Befehl GOSUB 50040, den Aufruf zum »Punkt zeichnen«. Den löschen wir jetzt und fügen die folgenden Zeilen ein:<br />
             232 IF G(X,2) = 0THEN G(X,0) = Y:G(X,1)=Y:GOTO 238<br />
@@ -44,6 +68,11 @@
             Mit der Beispielfunktion Y=COS(Z) *SIN(X) und den Eingaben:XU = -1, XO = 10, YU=-2, YO = 5, ZU = -.1, ZO = 7, Schrittweite = 8,XA = 0,<br />
             XE = 6, ZA = .1, ZE = 7 sieht man den Effekt jetzt ganz deutlich. Das einzige — außer der Geschwindigkeit (und naja - vielleicht noch ein paar Kleinigkeiten) — was unsere 3D-Grafik jetzt von professionellen Systemen unterscheidet, ist die Möglichkeit der Netzgrafik (Bild 6).</p>
 
+        <figure>
+            <img src="146-6.png" alt="">
+            <figcaption>Bild 6. Netzdarstellung</figcaption>
+        </figure>
+
         <p>Dieses Thema soll nicht ausführlich behandelt werden, sondern wir werden nur zwei Wege zur Netzgrafik anschauen:</p>
 
         <h3>Weg 1:</h3>
@@ -53,6 +82,11 @@
             b) 2. bis 7. Z-Wert: Nur jeder 8.Punkt der X-Schleife wird gesetzt, dann c) wieder weiter wie beim 1. Z-Wert und so weiter.</p>
 
         <p>Stark vergrößert hätten wir dann etwa Verhältnisse wie in Bild 7.</p>
+
+        <figure>
+            <img src="146-7.png" alt="">
+            <figcaption>Bild 7. Eine Möglichkeit der Netzdarstellung</figcaption>
+        </figure>
 
         <p>Diese Lösung ist programmtechnisch einfacher als Weg 2 und ganz gut an unser bisheriges 3D-Programm anzuhängen. Nun aber noch zu</p>
 
