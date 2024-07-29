@@ -1,0 +1,181 @@
+;licht-tele(4baud.prg ==0801==
+;Quelle: 8410.D64
+    0 rem *********************************       **                             **
+    1 rem **   l i c h t t e l e f o n   **       **                             **
+    2 rem **                             **       **                             **
+    3 rem **                             **       **          by m&t             **
+    4 rem **                             **       *********************************
+    5 :
+    6 ix=828
+    7 print"{clr}":poke53280,0:poke53281,0:fori=49152to49172:reada:pokei,a:next
+    8 gosub14000
+   10 dimx$(255)
+   11 ix=828
+   13 print"{clr}":poke53280,0:poke53281,0
+   20 poke56,145:poke650,128
+   28 fori=54272to54296:pokei,0:next
+   30 poke54272,1:poke54273,0:poke54277,100:poke54278,100:poke54276,17
+   31 poke54279,1:poke54280,0:poke54284,100:poke54285,100:poke54283,33
+   40 ifpeek(ix)=3thenpokeix,0:goto300
+   42 ifpeek(ix)=7then10000
+  100 print"{clr}{lred}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}";
+  101 print"{rvon}          h a u p t m e n u e           "
+  104 print"{down}{down}{down}{rght}{rght}{rght}{rght}{lblu}'klingeln'   {gry3}==>   {lred}< k >"
+  105 print"{down}{down}{rght}{rght}{rght}{rght}{rght}{lblu}senden      {gry3}==>   {lred}< s >"
+  106 print"{down}{rght}{rght}{rght}{rght}{rght}{lblu}empfangen   {gry3}==>   {lred}< e >"
+  107 print"{down}{down}{rght}{rght}{rght}{rght}{rght}{lblu}ende        {gry3}==>   {lred}< f8 >"
+  110 geta$:ifa$=""then110
+  111 ifa$="k"then20000
+  112 ifa$="s"then10000
+  113 ifa$="e"then305
+  114 ifa$="{f8}"thenprint:end
+  115 goto110
+  300 rem---- empfang --------------------
+  305 print"{clr}{lred}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}";
+  306 print"{rvon}       e m p f a n g                    "
+  307 print"{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{rght}{rght}{rght}{rght}{rght}{rght}{cyn}* bei fehlern {rvon} _ {rvof}{up}{left}{left}{left}{CBM-@}{CBM-@}{CBM-@}{down} druecken *"
+  310 le=10:pp=38000:gosub500
+  320 l=0:forj=0to4
+  321 ifpeek(pp+j)=1thenl=l+2^(4-j)
+  322 nextj
+  330 h=0:forj=5to9
+  331 ifpeek(pp+j)=1thenh=h+2^(9-j)
+  332 nextj
+  340 print"{home}{down}{down}{down}{down}{down}{down}{lblu}die nachricht enthaelt"h*32+l"zeichen."
+  350 le=5*(h*32+l):gosub500
+  400 print"{clr}":add=0:pp=38000
+  402 print"{home}{lred}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}";
+  403 print"{rvon}         t e x t a u s g a b e          "
+  404 print"{down}{down}{down}{lblu}folgendes wurde aus dem aether gefischt:"
+  408 a$=" abcdefghijklmnopqrstuvwxyz     0123456789()'&+-*/.,:;><=?!#^ "
+  410 forj=1tolestep5
+  415 x$="":forjj=0to4:x$=x$+right$(str$(peek(pp+j-1+jj)),1):nextjj
+  420 x=0:fork=1to5:ifmid$(x$,k,1)="1"thenx=x+2^(5-k)
+  421 nextk
+  422 ifx=31thenx=0
+  425 ifx=27andadd=0thenadd=32:nextj
+  430 printmid$(a$,1+x+add,1);:add=0:nextj:goto470
+  470 fori=0to700:nexti:poke54296,0
+  471 print"{home}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{lred}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}";
+  472 print"{rvon}  zur fortsetzung bitte 'f1' druecken!  {rvof}";
+  473 fori=0to120:geta$:ifa$<>"{f1}"thennexti:goto480
+  474 run10
+  480 print"{up}{up}                                        ";
+  481 print"  zur fortsetzung bitte 'f1' druecken!  ";
+  482 fori=0to120:geta$:ifa$<>"{f1}"thennexti:goto471
+  483 run10
+  500 rem---- empfangsschleife -----------
+  510 if(peek(56320)and16)=0then518
+  512 ifpeek(197)=57thenpokeix,7:run10
+  514 goto510
+  518 print"{home}{down}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rvon}{lred}l a e u f t"
+  520 if(peek(56320)and16)=0then520
+  530 ti$="000000"
+  540 ifti<54then540
+  550 z$=""
+  560 forl=1tole
+  562 ifpeek(197)=57thenpokeix,7:run10
+  565 ti$="000000"
+  570 if(peek(56320)and16)=0thena=ti:goto600
+  580 ifti<14then570
+  590 pokepp-1+l,0:nextl:return
+  600 if(peek(56320)and16)=0then600
+  610 b=ti
+  620 x=(12-b+a)/2
+  630 pokepp-1+l,1:ti$="000000"
+  640 ifti<x-6thengoto640
+  650 nextl:return
+10000 rem---- senden -------------------
+10001 print"{clr}{lred}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}";
+10002 print"{rvon}              s e n d e n               "
+10005 print"{down}{down}{down}{lblu}ihr text?"
+10006 print"{down}bitte nach jeder zeile {cyn}{rvon} return {rvof}{up}{left}{left}{left}{left}{left}{left}{left}{left}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{down}{lblu} druecken"
+10010 a$="":fori=1to5:inputa$:t$=t$+a$:a$="":nexti
+10011 iflen(t$)=0thenpokeix,0:run10
+10020 pp=38000:poke54296,15
+10030 b$="11111000010001000011001000010100110001110100001001010100101101100"
+10032 b$=b$+"011010111001111100001000110010100111010010101101101011111000"
+10034 b$=b$+"1100111010110111110011101111101111100000"
+10036 c$="0123456789()'&+-*/.{CBM-+}[;><=?!#^ "
+10050 add=0:fori=1tolen(t$)
+10060 m$=mid$(t$,i,1)
+10070 ifm$=" "thenx$=mid$(b$,1,5):goto10100
+10080 ifasc(m$)>64andasc(m$)<91thenx$=mid$(b$,(asc(m$)-64)*5+1,5):goto10100
+10085 forii=1tolen(c$)
+10086 ifmid$(c$,ii,1)=m$thenx$="11011"+mid$(b$,(ii-1)*5+1,5):add=add+1:goto10100
+10087 nextii:x$="00000"
+10100 forj=1tolen(x$)
+10110 pokepp,(asc(mid$(x$,j,1))-48)
+10120 pp=pp+1
+10130 nextj:x$(i)=x$
+10140 nexti
+10200 rem---- laenge feststellen -------
+10205 l=len(t$)+add
+10206 print"{down}{down}die nachricht enthaelt"l"zeichen."
+10210 h=int(l/32):l=l-h*32
+10300 l$=mid$(b$,(l*5)+1-160*(l=0),5)+mid$(b$,(h*5)+1-160*(h=0),5)
+12000 rem---- kontrollbytes senden -----
+12100 print"{home}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{cyn}* sendung laeuft *{lblu}"
+12105 poke54273,100:ti$="000000"
+12106 ifti$<>"000003"then12106
+12107 ifpeek(ix)=7thenifti$<>"000010"then12107
+12108 poke54273,0:ifpeek(ix)=7thenpokeix,0
+12110 ti$="000000"
+12120 ifti<60then12120
+12200 fori=1tolen(l$)
+12210 ti$="000000"
+12215 sys49152:ifpeek(54280)<>0thenpokeix,3:fori=0to2000:next:run10
+12220 ifmid$(l$,i,1)="0"then12300
+12230 ifti<3then12230
+12235 poke54273,100
+12240 ifti<11then12240
+12245 poke54273,0
+12300 ifti<15then12300
+12320 nexti
+12330 fori=0to3000:nexti
+12400 rem---- hauptsendeschleife -------
+12405 poke54273,100:ti$="000000"
+12406 ifti$<>"000003"then12406
+12407 poke54273,0
+12420 ti$="000000"
+12430 ifti<60then12430
+12510 forzr=38000to38000+5*len(t$)+5*add-1
+12520 ti$="000000"
+12525 sys49152:ifpeek(54280)<>0thenpokeix,3:fori=0to2000:next:run10
+12530 ifpeek(zr)=0then12600
+12540 ifti<3then12540
+12545 poke54273,100
+12550 ifti<11then12550
+12555 poke54273,0
+12600 ifti<15then12600
+12620 nextzr
+12650 pokeix,3:run10
+14000 rem---- bereitschaft melden ------
+14001 print"{clr}{down}{down}{down}{down}{down}{down}{rght}{rght}{rght}{cyn}empfangsbereitschaft melden (j/n)?"
+14010 geta$:ifa$="j"then14020
+14011 ifa$<>"n"then14010
+14012 return
+14020 print"{down}{down}{down}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{lblu}* meldung wird gesendet *"
+14030 poke54296,15:poke54273,100:ti$="000000"
+14032 ifti$<>"000004"then14032
+14034 poke54273,0:pokeix,3:return
+20000 rem---- klingeln -----------------
+20001 print"{clr}{lred}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}";
+20002 print"{rvon}          ' k l i n g e l n '           {down}{down}{down}{lblu}"
+20010 poke54296,15
+20020 ti$="000000"
+20030 poke54273,100
+20040 ifti$<>"000002"then20040
+20050 poke54273,0:ti$="000000"
+20052 ifti$<>"000001"then20052
+20054 ti$="000000"
+20060 if(peek(56320)and16)=0then20100
+20062 ifti$<>"000001"then20060
+20070 goto20020
+20100 print"{rght}{rght}{rght}{rght}{rght}mark ist jetzt empfangsbereit!"
+20110 ti$="000000"
+20112 ifti$<>"000004"then20112
+20120 goto10000:rem senden
+21000 rem---- daten fuer mc-routine ----
+21010 data173,0,220,201,111,208,13,232,138,201,20,208,7,162,0,169,152,141,8,212,96
+

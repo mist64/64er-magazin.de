@@ -1,0 +1,145 @@
+;eddi_diskmon.prg ==0801==
+;Quelle: 8410.D64
+   10 rem{rvon}eddi - diskmonitor/editor
+   20 rem{dish}         von
+   30 rem{dish}{rvon}karsten schramm (c) 1984
+   40 rem geschuetzte version
+   50 print"{clr}{blk}":poke53280,14:poke53281,14
+   60 gosub10000
+   70 open1,8,15,"i0":open2,8,2,"#"
+   80 print"{clr} e d d i  -  hauptmenue"
+   85 he$="byte      dec   hex   bin        asc":poke650,128
+   90 print" EEEEEEEEEEEEEEEEEEEEEE"
+  100 print:print:print
+  110 print"(f1) - scrolling vorwaerts":print
+  120 print"(f2) - scrolling rueckwaerts":print
+  130 print"(f3) - block lesen":print
+  140 print"(f4) - block schreiben":print
+  150 print"(f5) - editor einschalten":print
+  160 print"(f6) - diskette wechseln":print
+  170 print"(f7) - rueckkehr ins menue":print
+  180 print"(f8) - programmende"
+  190 po=1:goto 9000
+ 1000 rem eddi an
+ 1010 x=0:y=0
+ 1020 fory=eto255step16
+ 1030 po=2:print"{clr}editor-modus fuer track"t" sektor"s
+ 1040 print:printhe$:print
+ 1050 forx=ytoy+15:printx:nextx
+ 1060 print"{home}{down}{down}{down}":forx=ytoy+15
+ 1065 da=peek(50000+x):gosub7030:printx,ou$
+ 1070 input"{up}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}";in$:ifin$=""then1090
+ 1072 ifleft$(in$,1)="^"thenprint"{home}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}":goto9000
+ 1073 ifleft$(in$,1)="_"thenprint"{home}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}":goto1125
+ 1075 da=val(left$(in$,3)):ifda>255orda<0thenprint"{up}{up}":goto1065
+ 1080 poke50000+x,da
+ 1120 nextx:print
+ 1125 print"eingabe ?";
+ 1130 geta$:ifa$=""then1130
+ 1140 ifa$="{f1}"then1200
+ 1150 ifa$="{f2}"then1300
+ 1160 ifa$<>" "thennexty
+ 1170 po=1:goto9000
+ 1200 print"{home}{down}{down}{down}":printe".....???"
+ 1210 geta$:ifa$=""then1210
+ 1215 ifa$="{f2}"then1300
+ 1220 ifa$<>"{f1}"then1020
+ 1230 e=e+16:ife>255thene=0
+ 1240 goto1200
+ 1300 print"{home}{down}{down}{down}":printe".....???"
+ 1310 geta$:ifa$=""then1310
+ 1315 ifa$="{f1}"then1200
+ 1320 ifa$<>"{f2}"then1020
+ 1330 e=e-16:ife<0thene=240
+ 1340 goto1300
+ 2000 rem diskettenwechsel
+ 2010 print"{clr}bitte neue diskette einlegen"
+ 2020 geta$:ifa$=""then2020
+ 2030 run
+ 3000 rem block read
+ 3010 po=2:print"{clr}   block lesen":print:print
+ 3020 input"track, sektor ";t,s
+ 3025 ift<1ort>35then3010
+ 3030 print#1,"u1 2 0"t;s
+ 3035 ifst<>0thenprint:goto9000
+ 3040 print#1,"b-p 2 0"
+ 3050 sys49152:e=0:x=0:y=0:goto5010
+ 3060 fory=eto255step16
+ 3070 print"{clr}track"t" sektor"s
+ 3080 print:printhe$:print
+ 3090 forx=ytoy+15:da=peek(50000+x):gosub7030:printx,ou$:nextx
+ 3100 goto9000
+ 4000 rem block write
+ 4010 po=1:print:print:input"{clr}{red}track, sektor";t,s:print"{blk}"
+ 4020 print#1,"b-p 2 0"
+ 4030 sys49177
+ 4040 print#1,"u2 2 0"t;s
+ 4050 goto9000
+ 5000 rem scroll forward
+ 5010 e=x:ife>255thenx=0:e=0
+ 5020 print"{clr}track"t" sektor"s
+ 5030 print:printhe$:print
+ 5040 da=peek(50000+e):gosub7030:printe,ou$
+ 5050 x=x+16
+ 5060 geta$:ifa$=""then5060
+ 5070 ifa$="{f1}"then5010
+ 5075 ifa$="{f2}"thenx=x-16:goto6010
+ 5077 ifa$="{f5}"then1000
+ 5080 goto3060
+ 6000 rem scroll backward
+ 6010 e=x:ife<0thene=240:x=240
+ 6020 print"{clr}track"t" sektor"s
+ 6030 print:printhe$:print
+ 6040 da=peek(50000+e):gosub7030:printe,ou$
+ 6050 x=x-16
+ 6060 geta$:ifa$=""then6060
+ 6070 ifa$="{f2}"then6010
+ 6075 ifa$="{f1}"thenx=x+16:goto5010
+ 6077 ifa$="{f5}"then1000
+ 6080 goto3060
+ 7000 rem bereitstellung des strings
+ 7010 rem da/da$ sind ausgabewerte                h$,d$,b$,c$ sind zwischenwerte
+ 7020 rem ou,ou$ sind endergebnisse
+ 7030 ifda>31andda<128orda>159andda<256thenc$=chr$(da):goto7040
+ 7035 c$="."
+ 7040 xx$="000":d$=right$(str$(da),len(str$(da))-1)
+ 7045 d$=left$(xx$,3-len(d$))+d$
+ 7050 xx$="123456789abcdef":h$=""
+ 7060 hh=int(da/16):hl=da-hh*16
+ 7070 ifhhthenh$=h$+mid$(xx$,hh,1):goto7080
+ 7075 h$=h$+"0"
+ 7080 ifhlthenh$=h$+mid$(xx$,hl,1):goto7090
+ 7085 h$=h$+"0"
+ 7090 b$="":forq=7to0step-1
+ 7100 if(daand(2^q))<>0thenb$=b$+"1":next:goto7110
+ 7105 b$=b$+"0":next
+ 7110 ou$=d$+"   "+h$+"    "+b$+"   "+c$
+ 7120 return
+ 8999 end
+ 9000 rem get kommando
+ 9010 print:print"kommando ?  ";
+ 9020 print"{left}{CBM-B}";:forw=1to75:getko$:ifko$<>""then9090
+ 9030 nextw
+ 9040 print"{left}{rvon}{CBM-B}{rvof}";:forw=1to75:getko$:ifko$<>""then9090
+ 9050 nextw
+ 9060 goto9020
+ 9090 ifko$="@"then9200
+ 9100 if asc(ko$)>140orasc(ko$)<133then9020
+ 9110 ko=asc(ko$)-132
+ 9120 on po goto9130,9140,20000
+ 9130 on ko goto9020,3000,1000,80,9020,4000,2000,20000
+ 9140 on ko goto5000,3000,1000,80,6000,4000,2000,20000
+ 9200 print
+ 9210 get#1,a$:printa$;:ifst<>64then9210
+ 9220 goto 9000
+ 9999 end
+10000 data160,0,169,8,32,9,237,169,98,32,199,237,32,19,238,153,80,195,200
+10010 data208,247,32,239,237,96,160,0,169,8,32,12,237,169,98,32,185,237
+10020 data185,80,195,32,221,237,200,208,247,32,254,237,96,0,0
+10030 restore:forz=1to51:reada:poke49151+z,a:next
+10040 rem get:49152; write:49177
+10050 return
+20000 print:print:print"{lblu}auf wiedersehen !!!":print:poke53280,14:poke53281,6
+20001 print"und dankeschoen !"
+65535 new:"{del}{del}{del}{del}{del}{del}{del}{del}{del}{del}{del}{del}{del}{del}{del}{del}{del}{del}{del}{del}{del}{del}":end
+
