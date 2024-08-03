@@ -204,10 +204,10 @@ Etwaige Bedenken einer Verstopfung des Druckkopfes sind unbegründet. Ich habe d
 Übrigens:
 Sperrschrift und Reversschrift sind auch im Direktmodus möglich:
 OPEN 1,4
-PRINT #1, CHR$(14) (bzw. 18 für rvs)
+PRINT#1, CHR$(14) (bzw. 18 für rvs)
 CMD 1
 LIST
-PRINT #1, CHR$(15) (Normalschrift)
+PRINT#1, CHR$(15) (Normalschrift)
 CLOSE 1
 
 Hartmut Wenzel
@@ -1557,27 +1557,329 @@ Diese Kurzabhandlung vermag nur ansatzweise darzustellen, wie flexibel das Instr
 
 (Helmut Welke/aa)
 
+# Betriebssystem-Erweiterung für den VC 20
 
+> Hier sind einige Erweiterungen für das Betriebssystem des VC 20, die auf Tastendruck funktionieren, wie zum Beispiel Hardcopy, Find, Relocate, Append und Beep.
 
+Diese nützlichen Routinen werden mit dem Basic-Lader (Listing) ab Adresse $6050 in den Speicher gebracht. Ein voll ausgebauter VC 20 (+24 KByte) ist daher Voraussetzung. Um das Programm in die Tastaturabfrage einzubinden, die alle 60stel Sekunde erfolgt, wird der Zeiger für die Tastaturdecodierung (655,656) abgeändert. Damit dort nicht nach jedem STOP/RESTORE wieder der alte Wert steht, wird auch noch der BRK-Vektor (790,791) abgeändert. Zu alledem dient der SYS-Befehl in Zeile 120. Im einzelnen stehen folgende Erweiterungen zur Verfügung (die Druckroutinen sind für den Epson RX-80 mit VC-Interface):
+CTRL G: Grafik auf Drucker (mit VIC 1211A)
+CTRL D: Bildschirm-Hardcopy mit Zwischenzeile
+CTRL H: Bildschirm-Hardcopy ohne Zwischenzeile (zum Beispiel für normale Blockgrafik)
 
+Dabei ist zu beachten, daß das letzte Zeichen rechts unten nicht gedruckt wird, da sonst der Bildschirm gescrollt würde. Ein Bildschirm-Dump kann jederzeit erfolgen, auch während des Programmablaufs.
+CTRL F: FIND mit Eingabe des Suchstrings
+CTRL L: FIND weiter
 
+FIND durchsucht ein Basic-Programm nach bestimmten Befehlen oder Zeichenfolgen und listet die Zeile, in der sich der gesuchte Begriff befindet. FIND weiter (CTRL L)bedeutet, daß das Programm weiter nach demselben Begriff durchsucht wird. Dabei ist eine Zeichenkette in Anführungszeichen einzugeben. Beispiel: Gesucht wird die Anweisung IF. Eingabe IF. Gesucht wird der String »REIF«. Eingabe »REIF«.
 
+Im folgenden bedeutet »CTRL+Com«, daß die CTRL- und die Commodore-Taste gleichzeitig gedrückt werden.
 
+CTRL+Com R:RELOCATE; rückgängig machen des NEW-Befehls. Diese Routine istbesonders nützlich, wenn ein Reset-Schalter existiert, da bei einem Reset ein Basic-Programm nicht zerstört wird, sondern wie bei NEW nur die ersten beiden Bytes auf Null gesetzt werden. Falls der Computer sich also mal beim Aufruf eines fehlerhaften Maschinenprogramms »aufhängt«, kann nach Reset, SYS 25600 und Drücken von CTRL+Com R ohne Verlust des Basic-Programms weitergemacht werden.
 
+Auch nach einem »LOAD-ERROR« kann nach RELOCATE das falsch geladene Programm gelistet werden.
 
+CTRL+Com S: Kopiert die Zeiger auf den Basic-Programm-start, die Variablen, Arrays und Strings und die ersten 65 Byte des Basic-Programms in den (hoffentlich) geschützten Bereich, in dem sich die Betriebssystemerweiterung befindet.
 
+CTRL+Com+RETURN-Taste: Umkehrfunktion von CTRL +Com S
 
+Falls ein Programm gelöscht und anschließend im Direktmodus mit Variablen gearbeitet wurde, dann ist der Anfang des gelöschten Programms zerstört. Das Programm kann nicht mit RELOCATE repariert werden. Wurde aber vorher zu irgendeinem Zeitpunkt, an dem das zerstörte Programm noch existierte, CTRL+Com S gedrückt, dann steht das Programm nach Betätigen von CTRL+COM+RETURN-Taste wieder mit allen Variablen, Arrays und Strings so zur Verfügung, wie zum Zeitpunkt des Kopierens.
+CTRL+Com —: BEEP aus
+CTRL+Com +: BEEP an
 
+BEEP dient als akustische Rückmeldung der Tastatur, daß eine Taste gedrückt wurde. Ein momentan laufender Sound wird nicht beeinflußt.
 
+CTRL+Com t: APPEND. Der Zeiger auf den Basic-Anfang wird auf das Ende des momentanen Programms gesetzt. So können mehrere Basic-Programme aneinandergehängt werden. Dabei wird die Größe des zur Verfügung stehenden Spei-cherplatzesausgegeben. Durch CTRL+Com -: werden das angehängte und das vorherige Programm verknüpft.
 
+CTRL+Com W: WARTE. »Friert« den Computer ein, bis die RETURN-Taste gedrückt wird. Diese Routine ist vor allem bei LIST nützlich: Das Bildschirm-Scrollen wird verhindert.
 
+Die Funktion der Zusatztasten wird dabei nicht beeinflußt, so daß während dieses Zustands zum Beispiel auch eine Hardcopy angefertigt werden kann.
 
+Soll das Progamm mit der VC1211A-Supererweiterung zusammmenlaufen, dann müssen folgende Änderungen vorgenommen werden:
+Zeile 25: Die letzten drei DATA-Werte lauten 55,163,0.
+Zeile 43: Die ersten vier DATA-Werte lauten 0,32,13,164.
+Zeile 120: SYS 25453 (muß auch beim Aufruf der Relocate-Funktion angegeben werden.
 
+Nachdem diese Änderungen durchgeführt sind, stimmen natürlich die Prüfsummenabfragen nicht mehr. Es empfiehlt sich daher, das Programm in jedem Falle zunächst einmal probeweise unverändert (und ohne VC 1211A) laufen zu lassen, um eventuelle Tippfehler in den DATA-Zeilen herauszufinden. Danach kann man die Prüfsummenabfragen in den Zeilen 10, 30, 40, 60, 70, 90, 100 und 110 einfach löschen.
 
+(Manfred Weigt/ev)
 
+# Befehlserweiterung für Simons Basic
 
+> Die Fähigkeiten des Commodore 64 sind mit dem vorhandenen Befehlsvorrat des Basic 2.0 nur sehr schwer auszunutzen. Dafür bietet Commodore eine Erweiterung an, die diesen Mangel weitgehend behebt: Simons Basic. Dieser Artikel gibt eine grobe Speicherbelegung und behebt einige Mängel.
 
+Leider muß im voraus erwähnt werden, daß nur Besitzer der Disk-Version POKEs anwenden können, da bei der Modul-Version ein unveränderbares ROM vorliegt und somit POKEs hier unwirksam sind.
 
+Obwohl nur 8 KByte im Basic-Speicher verbraucht werden, ist Simons Basic eine 16-KByte-Basic-Erweiterung. Die zweiten 8 KByte liegen unter dem Basic-ROM im RAM, so daß Simons Basic immer trickreich zwischen beiden Ebenen umschalten muß. Zusätzlich wird auch der Bereich von $C400-$CBFF (dezimal 50176-52223) benutzt; zum Beispiel liegt der KEY-Funktionstastenspeicher ab $C64D (50765).
+
+Bei MEM (dem Befehl zum Kopieren des Original-ZeichenROMs ins RAM und dessen Einschalten) liegt der Zeichensatz ab $E000 (57344) im RAM unter dem Kernal, der Bildschirm von nun an ab $CC00 (52224), die Sprite-Pointer ab $CFF8 (53240) und die Sprites von $C000-$C3FF (49152-50175).
+
+Bei HIRES und MULTI (den Grafik- und Farbgrafik-Modi) liegt der Grafik-Speicher unter dem Kernalim RAM ($EOOO-$FFFF, 57344-65535), der Farbspeicher ab $C000 (49152), und Sprites finden sich in den Blocks 48-63 (ab $CC00, 52224). Man sieht also, daß $COOO-CFFF (49152-53247) laufend belegt sind und kleine Maschinenroutinen höchstens in Sprite-Speichern plaziert werden können.
+
+Hier erst einmal Beanstandungen zur Beschreibung einiger Befehle:
+
+Beim **TEXT-Befehl (Einsetzen von Text in die HiRes-Grafik-Seite) müssen Zeichentyp, Größe und Abstand als Konstanten gegeben sein, da der Text sonst nicht korrekt ausgedruckt wird. <CTRL-A> und <CTRL-B> können beliebig in einem String benutzt werden. Kein CTRL am Anfang wird als Großschrift ausgelegt. <RVS ON/OFF>-Zeichen werden auch richtig ausgeführt.
+
+Beim Befehl **FETCH** (Eingaberoutine mit bestimmbarer Zeicheneingabe-Beschränkung) fehlt die Angabe, daß die Eingabelänge über ein Zeichen (wie angegeben) hinausgehen darf. Das Limit liegt bei 88 Zeichen. Danach ist der Eingabepuffer, in den die eingegebenen Zeichen abgelegt werden, gefüllt und dahinterliegende Systemvariablen (siehe C 64-Handbuch) können zerstört werden. Ein Fehler ist außerdem, daß nach der Eingabe des letzten Zeichens keine Korrektur (mit < DEL>) mehr möglich ist. Es bleibt keine andere Wahl, als <RETURN> zu drücken.
+
+Bei **DUMP** (Ausgabe der Inhalte aller nicht indizierten Variablen) werden die Werte leider ohne Vorzeichen ausgegeben. Dies kann man beheben mit **POKE 32953,221**. Zudem werden leere Strings (Länge 0) als Strings mit zufälligen 255 Zeichen und Integervariablen als 16-Bit-Adressen ausgegeben. Das Programm in Listing 1 beseitigt alle drei Fehler.
+
+Im Handbuch wird bei den Bildschirmroll-Befehlen das Format leider falsch angegeben. Die Parameter werden mit der Routine geholt, die auch INV und MOVE bedient. Daher ist auch das Format das gleiche:
+Richtung W/B r,c,w,d.
+
+Die Parameter entsprechen denen im Simons Basic-Handbuch in Abschnitt 7.6.
+
+Bei **MERGE** kann es vorkommen, daß ein Programm nicht ordnungsgemäß angehängt wird. Dieser Fehler kommt nicht mehr vor, wenn man immer **OLD** vor MERGE eingibt, da dieser Befehl das Programmende noch einmal überprüft und gegebenenfalls bereinigt.
+
+Bei **PAGE** kann man das Listen nicht, wie in der Anleitung angegeben, durch Drücken der RUN/STOP-Taste abbrechen. Das Programm in Listing 2 behebt diesen Fehler.
+
+Befehle, die zwar nicht im Handbuch, jedoch in der Befehlsliste im RAM zu finden sind, wurden bereits in früheren Ausgaben behandelt.
+Zur Speicherung der Simons Basic-Befehle:
+
+Die Befehle werden als Zwei-Byte-Kombination abgespeichert. Das erste Byte hat den Wert 100, und das zweite einen Wert zwischen 1 und 127. Dies ergäbe eine Befehlsmenge von 127 Befehlen, einige Tokens sind aber nicht belegt.
+
+Um alle Befehlscodes auszugeben, kann man Listing 3 verwenden. Nach RUN wird eine Liste der Interpretercodes ausgegeben, die direkt aus dem RAM von Simons Basic und aus dem Basic-ROM entnommen wird. Setzt man in Zeile 20 für A den Wert 12 7 ein, so wird nur der normale Befehlsvorrat ausgedruckt. Mit diesem geänderten Programm kann sich jeder C 64-Anwender eine Interpretercodetabelle erstellen, die leider im C 64-Handbuch fehlt.
+
+Nun zwei kurze Maschinenprogramme, die nach einmaligem Lauf als neue Befehle zur Verfügung stehen:
+**ERROR**:
+
+Ausgabe des Diskettenstatus auf dem Bildschirm (Listing 4).
+**JOY n**:
+
+Nach Ausführung dieses Befehls liest die Funktion JOY den Control Port n (n=1 oder 2) (Listing 5).
+
+Die Listings 1 und 5 lassen sich zum Beispiel als Vorprogramm nach dem Start von Simons Basic laden und starten und stehen danach bis zum Ausschalten des Computers bereit.
+(Dieter Temme/gk)
+
+# Die Ebenen des Absturzes
+
+> Nachdem ich mir den Commodore 64 gekauft hatte, schnappte ich mir das Handbuch und fing an, in Basic zu programmieren. Wenn ich einmal versehentlich in eine Endlosschleife geriet, drückte ich die Run/StopTaste, und das Programm wurde unterbrochen, damit ich den Fehler beseitigen konnte — die Computerwelt war in Ordung!
+
+Doch wer den C 64 kennt, hat sich sicher schon an die Befehle PEEK und POKE versucht. Zum Beispiel:
+100 FOR I = 0TO999
+110 POKE 1024 + I,0
+120 POKE55296 + I,0
+130 NEXT I
+
+Dieses kleine Programm füllt den Bildschirm mit schwarzen Klammeraffen. Doch wehe, man hat in Zeile 100 statt 999 die leicht erweiterte Version 9999 stehen! Direkt hinter dem Bildschirmspeicher liegt der Basic-Benutzerspeicher. Bei solchen Fehlern frißt sich das Programm von selbst auf. Das Programm ist teilweise, wenn nicht ganz, zerstört. Der fortgeschrittene Programmierer macht sich sicher eines Tages Gedanken, wie er seine Programme durch versehentliches Drücken der Run/Stop-Taste schützen kann.
+
+Dieses ist besonders dann angebracht, wenn das fertige Programm von einem C 64-Unkundigen bedient werden soll.
+
+Dieses kleine Porgramm bewirkt Wunder:
+100 FOR I = 830TO834
+110 READ A : POKE I,A : NEXT I
+120 POKE 808,62 : POKE 809,3
+130 DATA169,1,201,0,96
+
+Weshalb? Im Betriebssystem gibt es ein Unterprogramm, welches die 8topp-Taste abfragt. Das Programm liegt zwischen 63213 ($ F6ED) und 63226 ($ F6FA). Die Anfangsadresse dieser Routine ist in den Speicherzellen 808 und 809 gespeichert; und zwar Low-Byte vor High-Byte. Nun wird diese Routine regelmäßig aufgerufen. Ist die Stopp-Taste gedrückt worden, so veranlaßt diese Routine — abgesehen von ein paar anderen Instruktionen —, daß das Zeroflag gesetzt wird. Wurde die Stopp-Taste aber nicht gedrückt, so löscht dieses Unterprogramm das Zeroflag. Wenn die Speicherzellen 808 und 809 so verändert werden, daß zu einer Routine gesprungen wird, die immer das Zeroflag löscht, dann wird nie das Drücken der Stopp-Taste erkannt. Dieses geschieht durch unser kleines Programm, welches eine Routine in den Kassettenpuffer schreibt.
+
+Haben wir für kritische Programmteile die Stopp-Taste unterdrückt, können wirjene wieder durch den Befehl
+200 POKE 808,237 : POKE 809,246
+aktivieren.
+
+Nehmen wir einmal an, uns ist folgendes passiert: Wir haben ein Programm geschrieben, das die Stopp-Taste ausschaltet (damit auch Run/Stop + Restore). Das Programm stürzt ab (zum Beispiel durch eine Endlosschleife), und wir haben es noch nicht abgespeichert. Das Programm scheint verloren, denn wir können den Computer nur noch aus- und einschalten. Doch da gibt es noch eine Rettung. Das magische Wort heißt RESET.
+
+Falls Sie in einem Programm einen Reset wünschen, dann benutzen Sie folgenden Befehl:
+100 SYS 64738
+
+Der Bildschirm verengt sich links und rechts um ein halbes Zeichen, und dann meldet sich der Computer, als ob sie ihn gerade eingeschaltet hätten. Hardwaremäßig bewirken sie einen Reset, indem Sie Pin 1 und Pin 3 am User-Port verbinden.
+
+Sie können aber auch Pin 2 und Pin 6 am seriellen Bus verbinden. Dazu nehmen Sie das Kabel aus dem Floppy-Laufwerk und verbinden die beiden Pins. Das Prinzip ist, die Reset-Leitung mit der GND-Leitung (Erde) zu verbinden.
+
+Komfortabler geht es mit einem Resetschalter, der in den User-Port eingeschoben wird und per Knopfdruck einen Reset bewirkt.
+
+Wenn Sie nun versuchen, Ihr Programm zu listen, wird Ihre Skepsis zunächst bestätigt werden. Es gibt scheinbar kein Programm mehr.
+
+Durch das Rücksetzen (Reset) des Computers sind alle Basic-Pointer auf ihren Urzustand gebracht worden. Das Programm selbst existiert noch, denn der Basic-Benutzerspeicher wurde nicht gelöscht. Um die Zeiger (Pointer) zurückzusetzen, und somit Ihr Programm wieder sichtbar zu machen, laden Sie das Programm »UNNEW« ein, das Sie hoffentlich vorher eingetippt haben. Nun starten Sie es und — das Basic-Programm wird wieder sichtbar.
+
+Haben Sie vor dem Reset in Maschinensprache mit einem Monitor (zum Beispiel HES-Mon oder Supermon 64) programmiert, dann starten Sie den Monitor und fahren Sie mit der Programmierung beziehungsweise dem Testen fort. Sowohl Ihr Maschinenprogramm als auch der Monitor wurden nicht zerstört.
+
+Haben Sie sich einmal mit dem Umgang des Resets vertraut gemacht, werden Sie sicher auch gerne einmal hinter die Kulissen von Videospielen schauen wollen. Dieses konnten Sie bisher nicht, weil viele Programme die Run/Stop-Taste sperren. Funktioniert der Reset, dann können Sie mit einem Monitor das Spiel erforschen. Doch was geschieht, wenn der Reset wirkungslos bleibt? Wie kann sich ein Videospiel gegen das scheinbare Aus- und Einschalten schützen?
+
+Die Lösung besteht in der Möglichkeit, Module anzuschließen, nämlich wenn Sie ein Modul einschieben und das Gerät einschalten, dann meldet sich keineswegs Basic V2.0 mit einem READY, sondern das Modul übernimmt das Kommando, ohne daß Sie es dazu aufgefordert hätten.
+
+Dazu muß das Modul drei Sachen veranlassen:
+
+1.	Den Basic-Interpreter ausblenden,
+2.	sich als Modul zu erkennen geben und
+3.	eine Einsprungadresse zur Verfügung stellen.
+
+Das Wegbleiben eines ROMs, sei es der Basic-Interpreter oder das Betriebssystem, erfolgt durch Setzen beziehungsweise Löschen von Bits in der Speicherzelle 0001. Dort liegen die für uns interessanten Kanäle High-RAM und Low-RAM, die durch die beiden Bits 0 und 1 dargestellt werden. Im Einschaltzustand sind beide gesetzt. Ferner gibt es die hardwaremäßigen Kanäle GAME und ExROM. Diese liegen im Moduleinschub und sind ohne Modul auf High (1) gesetzt. Wird ein Modul eingeschoben, so bewirkt dieses, daß die Kanäle GAME und ExROM auf Low gesetzt werden. Dadurch wird das Basic-ROM ausgeblendet.
+
+Als zweites muß sich das Modul zu erkennen geben. Im Betriebssystem gibt es eine Routine, die erkennt, ob ein Modul eingeschoben ist. Sie liegt zwischen 64770 ($ FD02) und 64788 ($ FD14). Dabei wird überprüft, ob in den Speicherzellen 32772 bis 32777 ($ 8004 bis $ 8009) das Wort »cbm80« steht. Das sind die ASCII-Zeichen: 195,194,205, 56,48. Ist das der Fall, setzt das Unterprogramm das Zeroflag. Wenn nun eine Routine im Betriebssystem (zum Beispiel die Reset-Routine) dieses Unterprogramm aufruft, und das Zeroflag wird gesetzt, dann nimmt das Betriebssystem an, daß ein Modul vorliegt. Es springt zur Adresse, die in $8002 und $ 8003 steht. Die Steuerung wird dem Modul übergeben. Will man nun ein Modul simulieren, muß man
+
+1. $ 8004 bis 8009 mit »cbm80« belegen,
+2.	eine Adresse in $ 8002 und $ 8003 eintragen (Low-Byte vor High-Byte) und
+3.	durch den Befehl CLI Interrupts (IRQ) erlauben.
+
+Mit folgendem kleinen Programm sorgt man von Basic aus dafür, daß ein Reset keinen Effekt hat:
+100 FOR I=32770 TO 32778
+110 READ A : POKE I,A
+120 NEXT I
+130 DATA 10, 128, 195, 194, 205
+140 DATA 56, 48, 88, 0
+
+Unser Ausgangsproblem war aber: Wie kann ich ein Reset verursachen, obwohl es gesperrt ist? Es gibt zwei Methoden:
+
+1.	Man sorgt dafür, daß in $ 8004 bis $ 8009 nicht »cbm80« steht.
+2.	Die Routine im Betriebssystem ändert man so ab, daß sie nicht mehr »cbm80« sondern zum Beispiel »cbm81« abfragt.
+
+Es soll zuerst der zweite Fall behandelt werden. Da das Betriebssystem (auch Kernal genannt) im ROM liegt, läßt es sich nicht ohne weiteres ändern. Deshalb wird es zuerst in das darunterliegende RAM kopiert. Dieses funktioniert folgendermaßen:
+100 FOR I = 57344 TO 65535
+110 POKE I,PEEK(l)
+120 NEXT I
+
+Nun könnte, durch Löschen des Bits 1 (High-RAM) in der Speicherzelle 0001, vom ROM auf RAM umgeschaltet werden:
+320 POKE I,PEEK(l) AND 253
+
+Durch das Löschen dieses Bits wird aber auch das Basic-ROM ausgeblendet. Also müssen wir dieses auch ins RAM kopieren:
+200 FOR I=40960 TO 49151
+210 POKE I,PEEK(I)
+220 NEXT I
+
+Jetzt könnte man das Programm starten, es hätte jedoch keinen Effekt, weil in der Adresse 0001 immer die Zahl 55 (High-RAM gesetzt) erscheint — statt der angestrebten 53. Dieses kommt durch den I/O-Reset. Diese Routine liegt im Kernal und setzt die Kanäle in 0001 immer wieder neu. Also muß man diese Routine für unsere Zwecke ändern: 300 POKE 64982,229
+
+Schließlich werden wir aus der »cbm80«-Abfrage eine »cbm81«-Abfrage machen:
+310 POKE 64788,49
+
+Wenn man jetzt das Programm startet und ein Reset auslöst durch: SYS 64738 wird sich die Maschine zurücksetzen, auch wenn in 32772 bis 32777 (exklusive) »cbm80« stehen sollte. Betätigt man jedoch den Resetschalter, dann wird der Reset abhängig von 32772 bis 32777 ausgelöst. Beim Reset werden nicht nur der Prozessor, sondern auch die beiden CIAs und der SID zurückgesetzt. Diese bewirken, daß in 0001 High-RAM gesetzt wird, und somit kommt die Veränderung des Betriebssystems nicht zum Tragen. Im ersten Fall wird ein POKE 32772,0 das Nötige tun, sofern nicht das Programm seinerseits dafür sorgt, daß »cbm80« immer wieder erneuert wird.
+
+Hier das Programm UNNEW:
+100 FOR I=525 TO 578
+120 READ A : POKE I,A : NEXT I
+200 POKE 43,525 AND 255 : POKE 44,2
+210 POKE 45,578 AND 255 : POKE 46,2
+220 CLR : SAVE "UNNEW" ,8 : REM bzw. ,1,1
+300 DATA 160,003,200,177,043,208,251,200
+310 DATA 200,152,160,000,145,043,165,044
+320 DATA 200,145,043,133,060,160,000,132
+330 DATA 059,162,000,200,208,002,230,060
+340 DATA 177,059,208,245,232,224,003,208
+350 DATA 242,200,208,002,230,060,132,045
+360 DATA 164,060,132,046,096,256
+
+Wenn Sie dieses Programm eingeben und starten, wird es ein Programm namens »UNNEW« auf Diskette schreiben. Falls sie aus Versehen NEW eingetippt haben, dann laden sie das Programm durch
+LOAD "UNNEW" ,8,1 und starten es durch
+SYS 525
+
+Ihr Basic-Programm ist gerettet, selbst wenn sie ein Reset ausgelöst haben. Das Programm setzt die Zeiger in $0801 und $0802, die auf die nächste Zeile zeigen, auf den richtigen Wert. Bei NEW werden diese beiden Bytes auf Null gesetzt, und zwei aufeinanderfolgende Nullen bedeuten für den Interpreter »Ende des Programms«.
+
+(Daniel Kossmann/aa)
+
+# Epedemic 2
+
+> Ein Nachtrag zu dem VC 20-Spielprogramm aus der 64er/Ausgabe 10
+
+Nachdem der Druckfehlerteufel in der letzten Ausgabe wieder einmal zugeschlagen hatte, bringen wir hier den fehlenden Teil zum Listing »Epedemic» für den VC 20. Nachzutragen wäre auch noch, daß man sich bei derartigen Simulationsspielen immer über die Handlungsbrisanz im Klaren sein sollte. Denn die Zahlenjonglierereien auf dem Bildschirm stellen immerhin Menschenleben dar. Wem das Spiel allerdings deswegen zu makaber ist, der sollte sich vielleicht einmal die Realität ansehen... (ev)
+
+# In die Geheimnisse der Floppy eingetaucht
+
+> Diese Folge befaßt sich mit dem Befehlssatz der VC 1541 und deren Meldungen an den Computer. Sie werden erkennen, daß Sie neben Ihrem C 64 noch einen anderen vollständigen Computer vor sich haben, der nicht nur als einfaches und »dummes« Peripheriegerät verstanden werden will.
+
+Sicherlich machte sich mancher Floppybesitzer, der ein schnelleres Peripheriegerät als die Datasette haben wollte, schon seine Gedanken über den Preis der VC 1541: »Die kostet ja mehr als der Computer!«. In der Tat ist die VC 1541 von dieser Seite her betrachtet nicht gerade günstig, wer sich jedoch schon intensiver mit ihr beschäftigt hat, wird eine Eigenart festgestellt haben, die sie mit allen CBM-Floppys teilt: Es handelt sich hier um sogenannte Floppystationen, nicht nur um Laufwerke. Das bedeutet, diese Geräte besitzen ein eigenes Betriebssystem (DOS) und eigene Mikroprozessoren. Sie arbeiten völlig unabhängig vom Computer und dessen Speicher. Der Vorteil liegt auf der Hand: Die Floppy beansprucht weder Speicherplatz noch Rechenzeit des Computers, außer beim direkten Datenaustausch. Als Beispiel betrachte man den Befehl »N:« (Formatieren). Während der Formatierung steht der Computer zur (fast) freien Verfügung, da dieser Vorgang nur floppyintern abläuft und sich der C 64 mit READY meldet, während die 1541 noch arbeitet.
+
+Wir wollen uns jedoch nur den Direktzugriffsbefehlen und den Speicherbefehlen widmen; auch übergehen wir die im Commodore-Handbuch nicht erwähnte relative Datenspeicherung, über die in anderen Ausgaben schon ausführlich gesprochen wurde. Uns sollen nur die Befehle beschäftigen, die uns zur willkürlichen Manipulation von Floppystation und Disketten nützen.
+
+Zur Beruhigung: Ein Beschädigen der 1541 durch direkte Eingriffe in das DOS ist nicht zu befürchten, auch wenn es passieren kann, daß sich die Floppy nur durch Aus-/ Einschalten wieder in den Normalzustand versetzen läßt. Haben Sie übrigens einmal, wie in der letzten Folge empfohlen, das Formatkennzeichen einer Diskette verändert? Sie werden sicherlich bemerkt haben, daß sich danach nichts mehr auf Ihre Diskette schreiben läßt. Mit diesem Trick, der die gleichen Folgen wie das Anbringen einer Schreibschutzplakette an der Diskette hat, können Sie sich also ganz einfach Ihre Diskette gegen unbeabsichtigtes Löschen sichern. ACHTUNG: Diese Methode funktioniert natürlich nicht, wenn neu formatiert werden soll; hiergegen hilft nur das Anbringen einer Schreibschutzplakette!
+
+Die Floppystation verfügt über, außer den schon bekannten Befehlen zur Diskettenorganisation, noch eine ganze Anzahl weiterer Befehle, mit denen sich ungeahnte Möglichkeiten ergeben, zum Beispiel Herstellen eines eigenen Diskettenformats, Leseschutz von Disketten, Programmschutz, Modifikation der Lade- und Saveroutinen und, und... Dafür ist es allerdings nötig, daß wir diese Befehle Schritt für Schritt kennen lernen, bevor wir auf die Tricks der Profis, die Manipulationen des DOS und den gezielten Eingriff in den Programmablauf der Floppystation zu sprechen kommen. Dafür ist allerdings das Beherrschen des C 64 und der Maschinensprache unerläßlich. So lohnt es sich unter Umständen, nachdem man aus Basic nichts mehr herausholen kann, den Einstieg in die Assemblerprogrammierung zu wagen. Sehr gute Literatur dafür ist vorhanden. Aber diesmal wollen wir uns noch auf Basic beschränken, um Sie mit dem Befehlssatz der Floppy vertraut zu machen.
+
+Wie schon erwähnt, handelt es sich bei der 1541 um einen vollständigen Computer, der ebenso wie Ihr C 64 RAM und ein Betriebssystem (DOS) im ROM besitzt.
+
+Die genaue Aufteilung ist in Bild 1 zu sehen. Jetzt soll uns nur der RAM-Bereich interessieren (Bild 2). Nicht nur auf der Diskette, sondern auch im RAM werden Speicherbereiche in Abschnitte zu jeweils 256 Byte aufgeteilt. Sie heißen dann nicht mehr BLOCKS sondern PAGES (Seiten). Das RAM der 1541 umfaßt nun genau 8 PAGES, durchnumeriert von 0 bis 7, insgesamt als 2 KByte. Die Page Nr. 0 (auch Zero-Page genannt) wird hier, wie auch im C 64, vom Betriebssystem als Arbeitsspeicher benutzt und steht uns deshalb nicht zur freien Verfügung. Ähnlich verhält es sich mit den Pages 1 und 2. Die Pages 3 bis 7 stellen sogenannte Pufferspeicher dar; hier werden alle Daten, die von der Diskette gelesen beziehungsweise auf sie geschrieben werden, zwischengespeichert, da nur blockweise gelesen oder geschrieben werden kann.
+
+Soll zum Beispiel nur ein einziges Byte auf der Diskette geändert werden, so wird erst der gesamte Block in einen der 5 Pufferspeicher gelesen, dort abgeändert und schließlich komplett wieder zurückgeschrieben. Aus diesen Gründen ist es also notwendig, daß wir uns vor einem Direktzugriff einen der Puffer reservieren, in dem dann gearbeitet wird.
+
+Mit Hilfe des »Open«-Befehls eröffnen wir einen Direktzugriffskanal. Die Syntax lautet wie folgt:
+OPENfn, gn, kn, ”#”
+
+Hierbei bedeuten:
+fn — Filenummer (1-127)
+gn — Gerätenummer (norm. 8)
+kn — Kanalnummer in der Floppy (2-14)
+
+Diese Abkürzungen werden wir im folgenden immer verwenden! Ein Beispiel:
+OPEN 1, 8, 2, ”#”
+
+Diese Anweisung eröffnet im Computer ein File mit der Nummer 1, adressiert als Gerät die Floppy (Nummer 8) und reserviert in der 1541 einen Kanal (Nummer 2), dem ein Puffer zugeordnet wird. Mit den floppyinternen Kanälen verhält es sich wie folgt: Es stehen insgesamt 16 Kanäle zur Verfügung. Hierbei sind Kanal 0 und 1 für LOAD und SAVE reserviert, Kanal 15 ist der Kommandokanal, den Sie bisher immer benutzt haben, um Befehle (zum Beispiel Formatieren) an die Floppy zu senden und die Fehlermeldungen der Floppy zu empfangen.
+
+Für unsere Zwecke stehen also noch die Kanäle 2 bis 14 zur Verfügung. In unserem Fall reserviert die Floppy den nächsten freien Puffer. Will man jedoch einen bestimmten Puffer reservieren, etwa um dort ein Maschinenprogramm abzulegen, so ist es notwendig, der 1541 mitzuteilen, welcher Puffer gewünscht wird:
+OPEN1,8,2,"#1"
+
+Es ist hier allerdings zu beachten, daß der gewählte Puffer nicht schon belegt ist; in diesem Fall gibt die Floppy eine Fehlermeldung aus. Wollen Sie an dieser Stelle mehr über das Auslesen der Fehlermeldungen und deren Bedeutung wissen, können wir Sie hier beruhigt auf das Commodore-Handbuch verweisen. Im allgemeinen sind Puffer 4 für die BAM und Puffer 3 für das Directory reserviert. Haben Sie die Wahl des Puffers der Floppy überlassen, so erfahren Sie die gewählte Nummer durch Auslesen des soeben geöffneten Direktzugriffskanals:
+10 OPEN 1,8,2,”#"
+20 GET#1,D$
+30D = ASC (D$ + CHR$(0))
+40 REM Puffernummer in D
+
+### Die BLOCK-Befehle
+
+a)	Der BLOCK-READ-Befehl (B-R): Mit dem BLOCK-READ-Befehl liest man jeden beliebigen Block von Diskette in einen vorher reservierten Puffer. Die Syntax lautet:
+PRINT#fn,"B-R";kn;dn;t;s
+dn — Drivenummer (immer 0)
+t — Tracknummer
+s — Sektornummer
+Beispiel: PRINT#15,"B-R 2 0 18 0”
+
+Diese Befehlsfolge liest den Block 18,0 von der Diskette in den oben reservierten Puffer. Wie man sieht, können anstelle der CHR$-Codes feste Zahlenwerte in den Befehlsstring mit übernommen werden. Das ganze hat bloß einen kleinen Schönheitsfehler. Mit dem B-R-Befehl läßt sich das erste Byte eines Blocks nicht lesen. Deshalb benutzt man normalerweise anstatt des B-R-Befehls den U1-Befehl. Dieser hat exakt die gleiche Syntax und kann in jedem Fall benutzt werden:
+PRINT#15,"U1 2 0 18 0”
+
+Auf diese USER-Befehle kommen wir später zurück. Mit einer GET#-Schleife lassen sich nun die einzelnen Bytes in den Computer einlesen.
+
+b)	Der BLOCK-WRITE-Befehl (B-W): Hiermit lassen sich die Daten aus dem reservierten Puffer wieder auf die Diskette schreiben. Syntax:
+PRINT#fn,”B-W”;kn;dn;t;s
+Beispiel: PRINT#15,"B-W 2 0 18 0”
+Natürlich gibt es analog zum B-R einen USER-Befehl ; U2.
+Beispiel: PRINT#15,"U2 2 0 18 0".
+
+c) Der BUFFER-POINTER-Befehl (B-P):
+Für jeden Puffer gibt es einen Zeiger, den BUFFER-POINTER. Dieser zeigt auf das aktuelle Byte im Puffer und wird bei jedem Datenzugriff um Eins erhöht, damit man alle 256 Bytes eines Blocks der Reihe nach lesen kann. Dieser Pointer wird mit dem B-P-Befehl gezielt auf bestimmte Bytes positioniert, wenn man nur einzelne Werte und nicht den gesamten Block lesen will. Syntax:
+PRINT# fn,"B-P"; kn; position
+Beispiel:
+Wir möchten in die Variable A den Wert des 123. Bytes von Block 1;16 einlesen:
+10 OPEN15,8,15
+20 OPEN1,8,2,"#"
+30 PRINT#15,"U1 2 0 1 16”
+40 PRINT#15,"B-P2 122”
+50 GET#1,A$
+60 A = ASC(A$ + CHR$(0))
+Als weiteres Beispiel dient Listing 1. d) Der BLOCK-ALLOCATE-Befehl (B-A):
+Wenn Sie im Direktzugriffsverfahren eine Diskette beschreiben, muß in der BAM danach auch verzeichnet werden, daß die entsprechenden Blocks mit Daten gefüllt sind und nicht mehr überschrieben werden dürfen. Dazu dient der B-A-Befehl, der jeden beliebigen Block in der BAM als belegt kennzeichnet. Die Syntax lautet:
+PRINT#fn,"B-A";dn;t;s
+Beispiel:
+PRINT#15,"B-A0 1 16”
+kennzeichnet Block 1;16 als belegt; war dieser Block schon belegt, meldet sich die Floppy mit der Fehlermeldung >>65,NO BLOCK,XX,YY<<; wobei XX und YY die Track- und Sektornummer des nächsten freien Blocks angeben.
+
+e)	Der BLOCK-FREE-Befehl (B-F): Dieser ist das genaue Gegenstück zum B-A-Befehl; er deklariert einmal belegte Blöcke wieder als frei für einen weiteren Zugriff. Seine Syntax ist identisch mit der des B-A-Befehls.
+
+f)	Der BLOCK-EXECUTE-Befehl (B-E): Dieser Befehl nimmt eine Sonderstellung ein. Er gleicht im Prinzip dem B-R-Befehl; nur mit dem zusätzlichen Effekt, daß der eingelesene Block im Puffer als Maschinenprogramm gestartet wird.
+
+Zur Vertiefung der Block-Befehle sei noch auf die Listings 2 bis 5 hingewiesen, welche die eben besprochenen Anwendungen noch an praktischen Beispielen verdeutlichen.
+
+### Die MEMORY-Befehle
+
+a)	Der MEMORY-READ-Befehl (M-R): Dieser Befehl entspricht haargenau dem PEEK-Befehl in Basic. Mit ihm können Sie jede beliebige Speicherstelle der Floppy auslesen. Syntax:
+PRINT#fn,"M-R";CHR$(adl);CHR$ (adh);CHR$(n)
+adl = Low-Byte
+adh = High-Byte
+n = Anzahl (0 bis 255)
+
+Abgeholt werden die gelesenen Daten ebenfalls über den Kommandokanal mit GET#.
+Beispiel: Lesen der beiden ID-Zeichen im ASCII-Format der zuletzt initialisierten Diskette:
+10 OPEN15,8,15
+20 PRINT#15,"M-R"CHR$(18)CHR$ (0)CHR$(2)
+30 GET#15,A$,B$
+40 PRINTA$;B$
+
+Diese Routine liest die Zero-Page Adressen 18 und 19, in denen die entsprechenden Werte gespeichert sind. In Tabelle 1 sind einige der wichtigsten Zero-Page Adressen aufgeführt.
+
+b)	Der MEMORYWRITE-Befehl (M-W):
+
+Dieses Kommando kann als POKE-Befehl in den Floppy-Speicher angesehen werden. Die Syntax ist hier wie folgt:
+PRINT#fn,"M-W";CHR$(adl)CHR$ (adh)CHR$(n)CHR$(datal)CHR$(da-ta2)...
+
+c)	Der MEMORY-EXECUTE-Befehl (M-E):
+
+TODO Fortsetzung auf Seite163
 
 
 
