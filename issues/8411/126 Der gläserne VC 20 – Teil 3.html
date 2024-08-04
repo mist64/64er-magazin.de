@@ -1,144 +1,167 @@
-<h1>Der gläserne VC 20 – Teil 3</h1>
+<!DOCTYPE html>
+<html lang="de">
 
-<p class="intro">In der letzten Folge befaßten wir uns schwerpunktmäßig mit der Zeropage. Diesmal wird der sich daran anschließende Adreßbereich von $0100 bis $03FF unter die Lupe genommen.</p>
+<head>
+    <title>XXX</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="XXX">
+    <meta name="64er.issue" content="11/84">
+    <meta name="64er.pages" content="999">
+    <meta name="64er.id" content="XXX">
+</head>
 
-<p>Dieser Bereich ist so interessant, daß sich die Betrachtungen darüber bis in die 4. Folge erstrecken werden. Übrigens ist dieser Teil auch auf den C 64 anwendbar, denn Betriebssytem und Basic-Interpreter dieser beiden Computer sind ja nahezu identisch.</p>
+<body>
+    <article>
 
-<p>Wenn wir einen Basic-Befehl im Direktmodus (LIST, RUN, PRINT) oder eine Programmzeile mit Zeilennummer eingeben, werden die Informationen — wie bekannt — auf den Bildschirm geschrieben und gelangen gleichzeitig in den Basic-Eingabepuffer (Adresse 512-600/ $0200-$0258). Dort werden Programmzeilen oder direkte Befehle zunächst einmal im ASCII-Format gesammelt (Bild la). Dies geschieht solange, bis man die RETURN-Taste betätigt.</p>
+        <h1>Der gläserne VC 20 – Teil 3</h1>
 
-<p>Dieser Puffer hat eine Kapazität von 88 Zeichen — also den bekannten vier Bildschirmzeilen.</p>
+        <p class="intro">In der letzten Folge befaßten wir uns schwerpunktmäßig mit der Zeropage. Diesmal wird der sich daran anschließende Adreßbereich von $0100 bis $03FF unter die Lupe genommen.</p>
 
-<h2>Der Weg einer Eingabezeile</h2>
+        <p>Dieser Bereich ist so interessant, daß sich die Betrachtungen darüber bis in die 4. Folge erstrecken werden. Übrigens ist dieser Teil auch auf den C 64 anwendbar, denn Betriebssytem und Basic-Interpreter dieser beiden Computer sind ja nahezu identisch.</p>
 
-<p>Drückt man die RETURN-Taste, so beginnt der Interpreter mit der Auswertung der Kommandos. Eingaben ohne Zeilennummer werden auf ihre Syntax hin überprüft und danach ausgeführt.</p>
+        <p>Wenn wir einen Basic-Befehl im Direktmodus (LIST, RUN, PRINT) oder eine Programmzeile mit Zeilennummer eingeben, werden die Informationen — wie bekannt — auf den Bildschirm geschrieben und gelangen gleichzeitig in den Basic-Eingabepuffer (Adresse 512-600/ $0200-$0258). Dort werden Programmzeilen oder direkte Befehle zunächst einmal im ASCII-Format gesammelt (Bild la). Dies geschieht solange, bis man die RETURN-Taste betätigt.</p>
 
-<p>Verfolgen wir nun einmal genauer den Weg einer Befehlszeile. Die einzelnen ASCII-Zeichen werden von der inzwischen hinreichend bekannten CHRGET-Routine aus dem Puffer gelesen und mit den Befehlswörtern aus dem ROM verglichen. War die Überprüfung positiv — ist der Befehl als identifiziert worden —, so verkürzt der Computer die Kommandozeile, indem er die Befehle in Token (siehe Teil 1, Tabelle 1) umwandelt. Diese Prozedur durchlaufen sowohl die Programmzeilen (mit Zeilennummer) als auch die direkten Kommandos (Bild 1b). An dieser Stelle trennen sich nun aber die Wege dieser beiden Zeilentypen.</p>
+        <p>Dieser Puffer hat eine Kapazität von 88 Zeichen — also den bekannten vier Bildschirmzeilen.</p>
 
-<p>Zunächst zu dem weiteren Weg einer Programmzeile. Die inzwischen komplett übersetzte Zeile im Basic-Puffer wird nun in einem zweiten Durchlauf vom Zwischenspeicher in den Programmspeicher übertragen, wobei sie auch gleich richtig eingeordnet wird (damit die Reihenfolge der Zeilennummern stimmt). Weil sich dadurch der Programmbereich im Basic-Speicher vergrößert, muß der Variablenbereich weiter oben angesiedelt werden. Die bis dahin gespeicherten Variablen werden dadurch natürlich überschrieben. Nach dem Übertragen der Programmzeile springt das Interpreterprogramm wieder in die Warteschleife zurück, damit weitere Befehle entgegen genommen werden können.</p>
+        <h2>Der Weg einer Eingabezeile</h2>
 
-<p>Nun möchte ich den weiteren Weg einer Direktmoduszeile beschreiben, denn der verläuft anders. Nachdem die Zeile mit Hilfe der CHRGET-Routine in Interpretercode (also Token) umgewandelt worden ist, wird der 2-Byte-Zeiger ($7A-$7B) auf den Pufferanfang zurückgestellt und der Inhalt wie eine Programmzeile behandelt und abgearbeitet (wieder mit Hilfe der CHRGET-Routine).</p>
+        <p>Drückt man die RETURN-Taste, so beginnt der Interpreter mit der Auswertung der Kommandos. Eingaben ohne Zeilennummer werden auf ihre Syntax hin überprüft und danach ausgeführt.</p>
 
-<h2>Verbotenes</h2>
+        <p>Verfolgen wir nun einmal genauer den Weg einer Befehlszeile. Die einzelnen ASCII-Zeichen werden von der inzwischen hinreichend bekannten CHRGET-Routine aus dem Puffer gelesen und mit den Befehlswörtern aus dem ROM verglichen. War die Überprüfung positiv — ist der Befehl als identifiziert worden —, so verkürzt der Computer die Kommandozeile, indem er die Befehle in Token (siehe Teil 1, Tabelle 1) umwandelt. Diese Prozedur durchlaufen sowohl die Programmzeilen (mit Zeilennummer) als auch die direkten Kommandos (Bild 1b). An dieser Stelle trennen sich nun aber die Wege dieser beiden Zeilentypen.</p>
 
-<p>Die Befehle INPUT und GET dürfen im Direktmodus nicht verwendet werden. Der Grund liegt darin, daß diese Eingabebefehle ebenfalls den Basic-Eingabepuffer zur Zwischenspeicherung der Daten verwenden. Das »Direktmodusprogramm«, was sich zu dieser Zeit im Puffer befindet, würde dann überschrieben. Um das zu verhindern, sind diese Kommandos im Direktmodus verboten (Fehlermeldung »ILLEGAL DIRECT«).</p>
+        <p>Zunächst zu dem weiteren Weg einer Programmzeile. Die inzwischen komplett übersetzte Zeile im Basic-Puffer wird nun in einem zweiten Durchlauf vom Zwischenspeicher in den Programmspeicher übertragen, wobei sie auch gleich richtig eingeordnet wird (damit die Reihenfolge der Zeilennummern stimmt). Weil sich dadurch der Programmbereich im Basic-Speicher vergrößert, muß der Variablenbereich weiter oben angesiedelt werden. Die bis dahin gespeicherten Variablen werden dadurch natürlich überschrieben. Nach dem Übertragen der Programmzeile springt das Interpreterprogramm wieder in die Warteschleife zurück, damit weitere Befehle entgegen genommen werden können.</p>
 
-<h2>Die Tastaturverwaltung</h2>
+        <p>Nun möchte ich den weiteren Weg einer Direktmoduszeile beschreiben, denn der verläuft anders. Nachdem die Zeile mit Hilfe der CHRGET-Routine in Interpretercode (also Token) umgewandelt worden ist, wird der 2-Byte-Zeiger ($7A-$7B) auf den Pufferanfang zurückgestellt und der Inhalt wie eine Programmzeile behandelt und abgearbeitet (wieder mit Hilfe der CHRGET-Routine).</p>
 
-<p>Die Schlüsselfunktionen für Basic wie beispielsweise die Umwandlung der ASCII-Zeichen in Token (wie eben beschrieben), Umwandlung der Token in Klartext (die Befehlswörter werden bei LIST wieder als ASCII-Zeichen sichtbar gemacht), werden durch indirekte Sprünge über Vektoren abgewickelt. Durch Zusatzroutinen besteht so die Möglichkeit, Klartextbefehle wie SOUND, KEY, OLD ect. in den Interpreter mit einzubinden. Dieses Verfahren besprechen wir später, zunächst aber schreiten wir in der Betrachtung des Adreßbereiches von $0277-$03FF fort (dieser ist in Tabelle 1 genauer aufgelistet).</p>
+        <h2>Verbotenes</h2>
 
-<p>Der nächste, größere Komplex, den wir hier behandeln wollen, ist die Tastaturverwaltung. Wie sie bestimmt schon öfter bemerkt oder gelesen haben, wickelt der VC 20 (der C 64 übrigens auch) seine Tastaturoperationen ebenfalls über einen Puffer ab. Dies wird beim LISTen von Basic-Programmen deutlich, denn während der Computer ein Programm ausgibt, können sie alle Tasten (mit Ausnahme des STOP-Keys) drücken — diese erscheinen aber nicht auf dem Bildschirm. Erst wenn das Programm zu Ende gelistet ist, sieht man, daß keine Taste »vergessen« wurde, denn alle Eingaben wurden im Tastaturpuffer (Adresse 631-640/ $0277-$0280) zwischengespeichert .</p>
+        <p>Die Befehle INPUT und GET dürfen im Direktmodus nicht verwendet werden. Der Grund liegt darin, daß diese Eingabebefehle ebenfalls den Basic-Eingabepuffer zur Zwischenspeicherung der Daten verwenden. Das »Direktmodusprogramm«, was sich zu dieser Zeit im Puffer befindet, würde dann überschrieben. Um das zu verhindern, sind diese Kommandos im Direktmodus verboten (Fehlermeldung »ILLEGAL DIRECT«).</p>
 
-<p>Dieser Puffer hat eine Kapazität von maximal zehn Zeichen. Wem dies zuviel ist, der kann die Länge des Puffers durch Adresse 649 einstellen. Ratsam kann dies bei relativ langsamen Basic-Spielen sein, wo es empfehlenswert ist, nur ein Zeichen im Tastaturpuffer zwischenzuspeichern (POKE 649,1). Anderenfalls »hinkt« die Tastatur immer den Ereignissen hinterher.</p>
+        <h2>Die Tastaturverwaltung</h2>
 
-<p>Mit Hilfe des Tastaturpuffers kann aber auch — und das ist das interessante an diesen zehn Bytes — eine relativ unkonventionelle Art der Programmierung praktiziert werden.</p>
+        <p>Die Schlüsselfunktionen für Basic wie beispielsweise die Umwandlung der ASCII-Zeichen in Token (wie eben beschrieben), Umwandlung der Token in Klartext (die Befehlswörter werden bei LIST wieder als ASCII-Zeichen sichtbar gemacht), werden durch indirekte Sprünge über Vektoren abgewickelt. Durch Zusatzroutinen besteht so die Möglichkeit, Klartextbefehle wie SOUND, KEY, OLD ect. in den Interpreter mit einzubinden. Dieses Verfahren besprechen wir später, zunächst aber schreiten wir in der Betrachtung des Adreßbereiches von $0277-$03FF fort (dieser ist in Tabelle 1 genauer aufgelistet).</p>
 
-<h2>Der »DATA-Erzeuger«</h2>
+        <p>Der nächste, größere Komplex, den wir hier behandeln wollen, ist die Tastaturverwaltung. Wie sie bestimmt schon öfter bemerkt oder gelesen haben, wickelt der VC 20 (der C 64 übrigens auch) seine Tastaturoperationen ebenfalls über einen Puffer ab. Dies wird beim LISTen von Basic-Programmen deutlich, denn während der Computer ein Programm ausgibt, können sie alle Tasten (mit Ausnahme des STOP-Keys) drücken — diese erscheinen aber nicht auf dem Bildschirm. Erst wenn das Programm zu Ende gelistet ist, sieht man, daß keine Taste »vergessen« wurde, denn alle Eingaben wurden im Tastaturpuffer (Adresse 631-640/ $0277-$0280) zwischengespeichert .</p>
 
-<p>Um dies verständlich zu machen, habe ich ein Programm (Listing 1) geschrieben, welches DATA-Zeilen aus Maschinenprogrammen oder Sonderzeichen erzeugt. Die Problematik dabei ist folgende: Wenn ich DATA-Zeilen ins Programm schreiben möchte, so ist dies nur im Direktmodus möglich. Um dies automatisch zu tun, benötigen wir ein Programm. Also was tun? — Man bedient sich des Tastaturpuffers!</p>
+        <p>Dieser Puffer hat eine Kapazität von maximal zehn Zeichen. Wem dies zuviel ist, der kann die Länge des Puffers durch Adresse 649 einstellen. Ratsam kann dies bei relativ langsamen Basic-Spielen sein, wo es empfehlenswert ist, nur ein Zeichen im Tastaturpuffer zwischenzuspeichern (POKE 649,1). Anderenfalls »hinkt« die Tastatur immer den Ereignissen hinterher.</p>
 
-<p>Dazu nochmals die Durchleuchtung der Funktionsweise. Während des Systeminterrupts (was dort geschieht klären wir in einer der nächsten Folgen), der alle 60stel Sekunde durchlaufen wird, fragt der Computer die Tastatur ab. Ein eingegebenes Zeichen wird dabei im Tastaturpuffer abgelegt, wo es so lange verbleibt, bis ein Zeichen von der Tastatur benötigt wird. Dies ist zum Beispiel im Direktmodus der Fall (wenn der Cursor blinkt) oder im Programm — bei INPUT oder GET. Die Zeichen werden dann wieder aus dem Tastaturpuffer hervorgeholt und zwar nach dem Prinzip »First in, First out«. Bei unserem Programm werden zunächst einmal sechs Speicherzellen initialisiert. Die ersten zwei Adressen enthalten die Anfangsadresse der abzuspeichernden Daten aus dem Speicher. Dieser Zeiger wird solange inkrementiert, bis er den Wert der Endadresse — der in den zwei folgenden Bytes abgelegt ist — erreicht hat. In den letzten zwei Speicherstellen (Adresse 252, 253) steht die Zeilennummer in der Reihenfolge Low-/ High-Byte. Bequemer währe es natürlich, wenn man normale Variablen verwenden könnte. Dies ist jedoch nicht möglich, weil diese beim Einfügen einer DATA-Zeile gelöscht werden. Darum bleibt nur der Umweg über Speicherstellen, deren Inhalte durch Basic nicht überschrieben werden können.</p>
+        <p>Mit Hilfe des Tastaturpuffers kann aber auch — und das ist das interessante an diesen zehn Bytes — eine relativ unkonventionelle Art der Programmierung praktiziert werden.</p>
 
-<p>Als nächstes erzeugt das Programm — mit Hilfe der in 252/253 gespeicherten Zwei-Byte-Zahl — eine Zeilennummer, welche auf den Bildschirm gePRINTet wird. Dann schreibt es das Befehlswort »DATA« und druckt acht dreistellige Zahlen (die Daten aus dem zu verarbeitenden Maschinenprogramm) aus. Nun haben wir eine fertige Programmzeile auf dem Bildschirm stehen, die sich allerdings noch nicht im Speicher befindet. Dies erledigt jetzt unser Tastaturpuffer.</p>
+        <h2>Der »DATA-Erzeuger«</h2>
 
-<p>Vorher müssen wir und jedoch genau überlegen, wie unser Bildschirm aussieht, denn dementsprechend muß der Cursor programmiert werden.</p>
+        <p>Um dies verständlich zu machen, habe ich ein Programm (Listing 1) geschrieben, welches DATA-Zeilen aus Maschinenprogrammen oder Sonderzeichen erzeugt. Die Problematik dabei ist folgende: Wenn ich DATA-Zeilen ins Programm schreiben möchte, so ist dies nur im Direktmodus möglich. Um dies automatisch zu tun, benötigen wir ein Programm. Also was tun? — Man bedient sich des Tastaturpuffers!</p>
 
-<h2>Cursorprogrammierung einmal anders</h2>
+        <p>Dazu nochmals die Durchleuchtung der Funktionsweise. Während des Systeminterrupts (was dort geschieht klären wir in einer der nächsten Folgen), der alle 60stel Sekunde durchlaufen wird, fragt der Computer die Tastatur ab. Ein eingegebenes Zeichen wird dabei im Tastaturpuffer abgelegt, wo es so lange verbleibt, bis ein Zeichen von der Tastatur benötigt wird. Dies ist zum Beispiel im Direktmodus der Fall (wenn der Cursor blinkt) oder im Programm — bei INPUT oder GET. Die Zeichen werden dann wieder aus dem Tastaturpuffer hervorgeholt und zwar nach dem Prinzip »First in, First out«. Bei unserem Programm werden zunächst einmal sechs Speicherzellen initialisiert. Die ersten zwei Adressen enthalten die Anfangsadresse der abzuspeichernden Daten aus dem Speicher. Dieser Zeiger wird solange inkrementiert, bis er den Wert der Endadresse — der in den zwei folgenden Bytes abgelegt ist — erreicht hat. In den letzten zwei Speicherstellen (Adresse 252, 253) steht die Zeilennummer in der Reihenfolge Low-/ High-Byte. Bequemer währe es natürlich, wenn man normale Variablen verwenden könnte. Dies ist jedoch nicht möglich, weil diese beim Einfügen einer DATA-Zeile gelöscht werden. Darum bleibt nur der Umweg über Speicherstellen, deren Inhalte durch Basic nicht überschrieben werden können.</p>
 
-<p>Bild 2 zeigt ein Bildschirmfoto dieser Situation. Zuerst wird der Cursor mit HOME (= CHR$ (19)) an die linke obere Ecke befördert. Dort wird durch einen Druck auf die RETURN-Taste (=CHR$(13)) die Basic-Zeile in den Speicher übernommen. Nun befindet sich der Cursor in der dritten Zeile. Durch ein »Cursor down« (=CHR$(17)) bewegt er sich eine Zeile nach unten und steht nun auf dem Befehlswort RUN 60. Ein weiteres RETURN bewirkt den erneuten Start des Hilfsprogramms.</p>
+        <p>Als nächstes erzeugt das Programm — mit Hilfe der in 252/253 gespeicherten Zwei-Byte-Zahl — eine Zeilennummer, welche auf den Bildschirm gePRINTet wird. Dann schreibt es das Befehlswort »DATA« und druckt acht dreistellige Zahlen (die Daten aus dem zu verarbeitenden Maschinenprogramm) aus. Nun haben wir eine fertige Programmzeile auf dem Bildschirm stehen, die sich allerdings noch nicht im Speicher befindet. Dies erledigt jetzt unser Tastaturpuffer.</p>
 
-<p>Wir benötigen für die Cursorbewegung also vier Werte. Diese werden vor dem Ende des Programms mit »POKE 631,19: POKE 632, 13: PO-KE 633,17: POKE 634, 13: POKE 198,4« in den Tastaturpuffer geschrieben. Hierdurch simulieren wir eine gedrückte Tastenfolge: denn nachdem sich der Computer über den Befehl END wieder im Direktmodus befindet, wird zuerst der Tastaturpuffer geleert, wodurch der Cursor den vorbestimmten Weg nimmt. POKE 198,4 gibt an (das noch als Nachtrag) wieviele Zeichen sich momentan im Puffer befinden. Dieser POKE-Befehl darf bei der Manipulation des Tastaturspeichers nie vergessen werden. Ferner ist die Bereitschaftsmeldung »READY«, die beim Übergang in den Direktmodus ausgegeben wird, zu berücksichtigen. Man muß beachten, daß dadurch nicht die bereits auf dem Bildschirm befindlichen Zeichen überschrieben werden.</p>
+        <p>Vorher müssen wir und jedoch genau überlegen, wie unser Bildschirm aussieht, denn dementsprechend muß der Cursor programmiert werden.</p>
 
-<p>Die Bedienung des Programms an sich ist ganz einfach. Nach Eingabe der Anfangs- und Endadresse werden die DATA-Zeilen mit jeweils acht Elementen in den Programmspeicher generiert; begonnen wird mit Zeilennummer 300, die in 10er-Schritten erhöht wird. Da sich das Listing selbst kommentiert, erübrigt sich alles Weitere. Der Vollständigkeit halber ist noch zu erwähnen, daß die REM-Zeilen nicht mit eingegeben werden müssen.</p>
+        <h2>Cursorprogrammierung einmal anders</h2>
 
-<p>Benutzt wurde der Tastaturpuffer bereits in einem Programm, das im ersten Teil dieser Serie abgedruckt wurde. Die Rede ist von der Autostartroutine, welche einen Basic-Programmstart (aus einem Maschinenprogramm heraus) durch Füllen des Puffers mit dem Kommando RUN (+ CHR$ (13)) realisierte.</p>
+        <p>Bild 2 zeigt ein Bildschirmfoto dieser Situation. Zuerst wird der Cursor mit HOME (= CHR$ (19)) an die linke obere Ecke befördert. Dort wird durch einen Druck auf die RETURN-Taste (=CHR$(13)) die Basic-Zeile in den Speicher übernommen. Nun befindet sich der Cursor in der dritten Zeile. Durch ein »Cursor down« (=CHR$(17)) bewegt er sich eine Zeile nach unten und steht nun auf dem Befehlswort RUN 60. Ein weiteres RETURN bewirkt den erneuten Start des Hilfsprogramms.</p>
 
-<h2>Die Eckadressen</h2>
+        <p>Wir benötigen für die Cursorbewegung also vier Werte. Diese werden vor dem Ende des Programms mit »POKE 631,19: POKE 632, 13: PO-KE 633,17: POKE 634, 13: POKE 198,4« in den Tastaturpuffer geschrieben. Hierdurch simulieren wir eine gedrückte Tastenfolge: denn nachdem sich der Computer über den Befehl END wieder im Direktmodus befindet, wird zuerst der Tastaturpuffer geleert, wodurch der Cursor den vorbestimmten Weg nimmt. POKE 198,4 gibt an (das noch als Nachtrag) wieviele Zeichen sich momentan im Puffer befinden. Dieser POKE-Befehl darf bei der Manipulation des Tastaturspeichers nie vergessen werden. Ferner ist die Bereitschaftsmeldung »READY«, die beim Übergang in den Direktmodus ausgegeben wird, zu berücksichtigen. Man muß beachten, daß dadurch nicht die bereits auf dem Bildschirm befindlichen Zeichen überschrieben werden.</p>
 
-<p>Als nächstes besprechen wir die Adressen 641-644/ $0281-$0284. Sie enthalten die Anfangs- beziehungsweise Endadresse des verfügbaren Speicherbereiches.</p>
+        <p>Die Bedienung des Programms an sich ist ganz einfach. Nach Eingabe der Anfangs- und Endadresse werden die DATA-Zeilen mit jeweils acht Elementen in den Programmspeicher generiert; begonnen wird mit Zeilennummer 300, die in 10er-Schritten erhöht wird. Da sich das Listing selbst kommentiert, erübrigt sich alles Weitere. Der Vollständigkeit halber ist noch zu erwähnen, daß die REM-Zeilen nicht mit eingegeben werden müssen.</p>
 
-<p>Bei dem Systemreset ($FD22/ 64802) werden verschiedene Routinen wie beispielsweise Initialisierung der Zeropage, Setzen der Vektoren, RAM-Test ect. durchlaufen. Dabei wird unter anderem auch der verfügbare Speicherplatz festgestellt und die Eckadressen den obengenannten Registern übergeben. Diese Daten sind die Grundlage für alle weiteren Grundeinstellungen des Systems, also Basic-Beginn und -Ende, Beginn des Video- und Farbspeichers ect.</p>
+        <p>Benutzt wurde der Tastaturpuffer bereits in einem Programm, das im ersten Teil dieser Serie abgedruckt wurde. Die Rede ist von der Autostartroutine, welche einen Basic-Programmstart (aus einem Maschinenprogramm heraus) durch Füllen des Puffers mit dem Kommando RUN (+ CHR$ (13)) realisierte.</p>
 
-<p>Wird es nun nötig, eine Speicherkonfiguration zu simulieren, beispielsweise Grundversion bei eingesteckter 8-KByte-Erweiterung, so kann das über diese Zeiger geschehen:<br/>
-POKE 642, 16: POKE 644, 30: SYS 64970: SYS 64821 bewirkt diese Simulation. Das Unterprogramm im Betriebssystem (Adresse 64970), das zur Reset-Routine gehört, hat die Aufgabe, die Seiten 0 (Zeropage), 2 und 3 zu löschen. Danach prüft der Computer seine Speicherzellen. Dieser Test hat die Aufgabe, das RAM auf seine Funktionsfähigkeit hin zu überprüfen, damit es nicht zu Fehlfunktionen durch einen beschädigten Speicher kommt. Bei dieser Gelegenheit wird die Ausbaustufe des Speichers festgestellt; das Ergebnis findet sich dann in den Registern für die Anfangs- beziehungsweise Endadresse.Hier steigen wir nun mit den entsprechend manipulierten Registern (642 auf 16 und 644 auf 30) in die ROM-Routine ein. Mit Hilfe dieser Werte richtet das Unterprogramm nun den Video- und Farbspeicher ein. Mit dem zweiten SYS-Befehl (SYS 64821) wird die Initialisierung fortgesetzt. Dabei richtet er den Speicher für Basic ein und gibt die Kaltstartmeldung<br/>
-<strong><strong> CBM BASIC V2 </strong></strong><br/>
-3583 BYTES FREE<br/>
-aus.</p>
+        <h2>Die Eckadressen</h2>
 
-<p>Soweit ein kleiner Einblick ins Betriebssystem, eine ausführlichere Erläuterung erfolgt in einer der nächsten Folgen.</p>
+        <p>Als nächstes besprechen wir die Adressen 641-644/ $0281-$0284. Sie enthalten die Anfangs- beziehungsweise Endadresse des verfügbaren Speicherbereiches.</p>
 
-<h2>Die Speicherorganisation</h2>
+        <p>Bei dem Systemreset ($FD22/ 64802) werden verschiedene Routinen wie beispielsweise Initialisierung der Zeropage, Setzen der Vektoren, RAM-Test ect. durchlaufen. Dabei wird unter anderem auch der verfügbare Speicherplatz festgestellt und die Eckadressen den obengenannten Registern übergeben. Diese Daten sind die Grundlage für alle weiteren Grundeinstellungen des Systems, also Basic-Beginn und -Ende, Beginn des Video- und Farbspeichers ect.</p>
 
-<p>Jetzt möchte ich noch einen kleinen Einblick in die Speicherorganisation geben, was auch im Hinblick auf Grafik von Bedeutung ist. Wie hinreichend bekannt sein dürfte, gibt es drei verschiedene Speichererweiterungen zu kaufen, nämlich 3 KByte, 8 KByte und 16 KByte. Die Sammelerweiterungen (also 27/32/64 KByte-Erweiterungen sollen hier gedanklich ebenfalls in diese drei verschiedenen Module zerlegt werden.</p>
+        <p>Wird es nun nötig, eine Speicherkonfiguration zu simulieren, beispielsweise Grundversion bei eingesteckter 8-KByte-Erweiterung, so kann das über diese Zeiger geschehen:<br />
+            POKE 642, 16: POKE 644, 30: SYS 64970: SYS 64821 bewirkt diese Simulation. Das Unterprogramm im Betriebssystem (Adresse 64970), das zur Reset-Routine gehört, hat die Aufgabe, die Seiten 0 (Zeropage), 2 und 3 zu löschen. Danach prüft der Computer seine Speicherzellen. Dieser Test hat die Aufgabe, das RAM auf seine Funktionsfähigkeit hin zu überprüfen, damit es nicht zu Fehlfunktionen durch einen beschädigten Speicher kommt. Bei dieser Gelegenheit wird die Ausbaustufe des Speichers festgestellt; das Ergebnis findet sich dann in den Registern für die Anfangs- beziehungsweise Endadresse.Hier steigen wir nun mit den entsprechend manipulierten Registern (642 auf 16 und 644 auf 30) in die ROM-Routine ein. Mit Hilfe dieser Werte richtet das Unterprogramm nun den Video- und Farbspeicher ein. Mit dem zweiten SYS-Befehl (SYS 64821) wird die Initialisierung fortgesetzt. Dabei richtet er den Speicher für Basic ein und gibt die Kaltstartmeldung<br />
+            <strong><strong> CBM BASIC V2 </strong></strong><br />
+            3583 BYTES FREE<br />
+            aus.
+        </p>
 
-<p>Bei Erweiterungen von mehr als 8 KByte verändert sich die Lage des Bildschirm- und Farbspeichers (die Einstellung nimmt die Reset-Routine vor). Anhand von Bild 3 soll erläutert werden, warum eine Verschiebung notwendig ist.</p>
+        <p>Soweit ein kleiner Einblick ins Betriebssystem, eine ausführlichere Erläuterung erfolgt in einer der nächsten Folgen.</p>
 
-<p>Der <strong>V</strong>ideo-<strong>I</strong>nterface-<strong>C</strong>hip VIC (daher auch der Englische Name des VC 20), der vor allem für die Erzeugung des Fernsehsignals und den Aufbau des Bildschirmes verantwortlich ist, kann hardwaremäßig nur Videospeicherplätze zwischen 4096 und 8192 adressieren. Folglich muß das Bildschirm-RAM in diesem Bereich angesiedelt werden.</p>
+        <h2>Die Speicherorganisation</h2>
 
-<p>In der Grundversion liegt es zwischen Adresse 7680 und 8191 — also am Ende des verfügbaren Speichers, damit der Speicherbereich für Basic auch bei eingesteckter 3 KByte-Erweiterung durchgängig ist (läge der Bildschirmspeicher sowie bei einer 8-KByte-Erweiterung, währe dies nicht der Fall).</p>
+        <p>Jetzt möchte ich noch einen kleinen Einblick in die Speicherorganisation geben, was auch im Hinblick auf Grafik von Bedeutung ist. Wie hinreichend bekannt sein dürfte, gibt es drei verschiedene Speichererweiterungen zu kaufen, nämlich 3 KByte, 8 KByte und 16 KByte. Die Sammelerweiterungen (also 27/32/64 KByte-Erweiterungen sollen hier gedanklich ebenfalls in diese drei verschiedenen Module zerlegt werden.</p>
 
-<p>Ist ein Speichermodul von mehr als 8 KByte eingesteckt (egal ob der 3-KByte-Bereich zugeschaltet ist oder nicht), so legt das System den Videospeicher an die unterste adressierbare Stelle für den VIC, also Adresse 4096. Aus diesem Grund kann die eingesteckte 3-KByte-Erweiterung nicht mehr für Basic benutzt werden, denn sonst wäre der Speicher nicht mehr durchgängig.</p>
+        <p>Bei Erweiterungen von mehr als 8 KByte verändert sich die Lage des Bildschirm- und Farbspeichers (die Einstellung nimmt die Reset-Routine vor). Anhand von Bild 3 soll erläutert werden, warum eine Verschiebung notwendig ist.</p>
 
-<p>Programme sollten immer auf allen Erweiterungsversionen lauffähig sein. Wer also in Routinen mit dem Bildschirm- oder Farbspeicher arbeitet, kann sich mit Hilfe der Register 36866 und 86869 im VIC die momentanen Adressen beschaffen. Bildschirm: 4<em>(PEEK(36866)AND128) + 64</em>(PEEK(36869)AND120)<br/>
-Farbspeicher:<br/>
-4*(PEEK(36866)AND128) + 37888</p>
+        <p>Der <strong>V</strong>ideo-<strong>I</strong>nterface-<strong>C</strong>hip VIC (daher auch der Englische Name des VC 20), der vor allem für die Erzeugung des Fernsehsignals und den Aufbau des Bildschirmes verantwortlich ist, kann hardwaremäßig nur Videospeicherplätze zwischen 4096 und 8192 adressieren. Folglich muß das Bildschirm-RAM in diesem Bereich angesiedelt werden.</p>
 
-<h2>Gewußt wo — Die Bildschirmadressen</h2>
+        <p>In der Grundversion liegt es zwischen Adresse 7680 und 8191 — also am Ende des verfügbaren Speichers, damit der Speicherbereich für Basic auch bei eingesteckter 3 KByte-Erweiterung durchgängig ist (läge der Bildschirmspeicher sowie bei einer 8-KByte-Erweiterung, währe dies nicht der Fall).</p>
 
-<p>Mit Hilfe bestimmter Bits aus diesen Registern bildet der VIC die Adressen, die er benötigt, um — unabhängig vom Prozessor — Bild- und Farbspeicherstellen auszulesen, damit er mit diesen Informationen das Fernsehbild erzeugen kann.</p>
+        <p>Ist ein Speichermodul von mehr als 8 KByte eingesteckt (egal ob der 3-KByte-Bereich zugeschaltet ist oder nicht), so legt das System den Videospeicher an die unterste adressierbare Stelle für den VIC, also Adresse 4096. Aus diesem Grund kann die eingesteckte 3-KByte-Erweiterung nicht mehr für Basic benutzt werden, denn sonst wäre der Speicher nicht mehr durchgängig.</p>
 
-<p>Das Betriebssystem hingegen bezieht seine Informationen über die Lage des Videospeichers nicht aus diesen VIC-internen Registern, sondern aus Adresse 648. Gibt man beispielsweise »POKE 648,28« ein, so liegt der Bildschirmspeicher zwischen 7168 und 7679. In Wirklickkeit stellt der Video-Interface-Chip — der, wie gesagt, unabhängig arbeitet — weiterhin den Speicherausschnitt zwischen Adresse 7680 und 8191 auf dem Bildschirm dar. Der Cursor schreibt also in einem ganz anderen Speicherabschnitt. Erst durch einen Warmstart (durch die Tastenkombination RUN/ STOP — RESTORE) werden die VIC-Register angepaßt.</p>
+        <p>Programme sollten immer auf allen Erweiterungsversionen lauffähig sein. Wer also in Routinen mit dem Bildschirm- oder Farbspeicher arbeitet, kann sich mit Hilfe der Register 36866 und 86869 im VIC die momentanen Adressen beschaffen. Bildschirm: 4<em>(PEEK(36866)AND128) + 64</em>(PEEK(36869)AND120)<br />
+            Farbspeicher:<br />
+            4*(PEEK(36866)AND128) + 37888</p>
 
-<p>Vom Bildschirm nun wieder zur Tastatur. In unseren systematischen Betrachtungen der Seite 1 bis 3 im Speicher, kommen wir nun zu den Adressen $0280-$0291/649-656, die der Tastatur zugeordnet sind. Sie enthalten lediglich Parameter für die Arbeit mit der Tastatur wie zum Beispiel Repeat Flag, das Flag für Kontrolltasten ect. Näheres entnehmen sie bitte Tabelle 1.</p>
+        <h2>Gewußt wo — Die Bildschirmadressen</h2>
 
-<h2>Praktisches: Die Befehlseingabe über Funktionstasten</h2>
+        <p>Mit Hilfe bestimmter Bits aus diesen Registern bildet der VIC die Adressen, die er benötigt, um — unabhängig vom Prozessor — Bild- und Farbspeicherstellen auszulesen, damit er mit diesen Informationen das Fernsehbild erzeugen kann.</p>
 
-<p>Zwei weithin unbekannte Adressen ($028F, $0290/ 655,656) sind vorzüglich dazu geeignet, eine Funktionstastenabfrage auf Interruptbasis zu realisieren. Besagte Adressen bilden einen Vektor für die Tastaturdecodierung, der meines Erachtens nur für den Zweck der Funktionstastenabfrage geschaffen wurde.</p>
+        <p>Das Betriebssystem hingegen bezieht seine Informationen über die Lage des Videospeichers nicht aus diesen VIC-internen Registern, sondern aus Adresse 648. Gibt man beispielsweise »POKE 648,28« ein, so liegt der Bildschirmspeicher zwischen 7168 und 7679. In Wirklickkeit stellt der Video-Interface-Chip — der, wie gesagt, unabhängig arbeitet — weiterhin den Speicherausschnitt zwischen Adresse 7680 und 8191 auf dem Bildschirm dar. Der Cursor schreibt also in einem ganz anderen Speicherabschnitt. Erst durch einen Warmstart (durch die Tastenkombination RUN/ STOP — RESTORE) werden die VIC-Register angepaßt.</p>
 
-<p>Was sind überhaupt Vektoren? ROM, so sagt ja bereits der Name (<strong>R</strong>ead <strong>O</strong>nly <strong>M</strong>emory), ist grundsätzlich nicht überschreibbar. Wer dennoch das System ergänzen will (beispielsweise durch neue Basic-Befehle), ist gezwungen, das gesamte ROM auszutauschen, es sei denn, die Schöpfer des Computers haben mögliche Optionen — so wie beim VC 20 (oder C 64) — bereits eingeplant. Dies geschieht, indem aus dem ROM heraus ins RAM verzweigt wird.</p>
+        <p>Vom Bildschirm nun wieder zur Tastatur. In unseren systematischen Betrachtungen der Seite 1 bis 3 im Speicher, kommen wir nun zu den Adressen $0280-$0291/649-656, die der Tastatur zugeordnet sind. Sie enthalten lediglich Parameter für die Arbeit mit der Tastatur wie zum Beispiel Repeat Flag, das Flag für Kontrolltasten ect. Näheres entnehmen sie bitte Tabelle 1.</p>
 
-<p>Normalerweise steht an der entsprechenden RAM-Adresse nur ein Zeiger auf eine ROM-Adresse, eben ein Vektor. Durch Änderung eines solchen Vektors kann man elegant bestehende Routinen umgehen und sie durch eigene ersetzen beziehungsweise ergänzen. Soweit, so gut.</p>
+        <h2>Praktisches: Die Befehlseingabe über Funktionstasten</h2>
 
-<p>Wie im Handbuch zu lesen, gibt es Unterschiede zwischen den Bildschirmcodes eines Zeichens (»A« beispielsweise hat den Wert 1) und dem allgemein verbreiteten ASCII-Code (»A« hat hier den Wert 65). Gleiches gilt für die Tastatur. Hier unterscheidet man ebenfalls zwischen dem ASCII- und dem sogenannten Tastatur-Matrixcode. Diese VC 20-interne Codierung wird durch eine Betriebssystemroutine — die über einen Vektor verfügt (den oben erwähnten für die Tastaturdecodierung) — in ASCII-Zeichen umgewandelt. Das Maschinenprogramm in Listing 2 und 3 wird durch »verbiegen« des Vektors 655/656 in die Tastaturroutine mit eingebaut. Es fragt die Codes der Funktionstasten ab und druckt die Zeichen aus, mit denen sie belegt wurden.</p>
+        <p>Zwei weithin unbekannte Adressen ($028F, $0290/ 655,656) sind vorzüglich dazu geeignet, eine Funktionstastenabfrage auf Interruptbasis zu realisieren. Besagte Adressen bilden einen Vektor für die Tastaturdecodierung, der meines Erachtens nur für den Zweck der Funktionstastenabfrage geschaffen wurde.</p>
 
-<p>Das recht komfortable Programm liegt als Basic-Lader in Listing 2 vor. Nach dem Starten mit RUN wird das Maschinenprogramm automatisch ans Ende des verfügbaren Speichers geladen. Mit der SPACE-Taste aktiviert man diese Routine. Als erstes werden die Befehle gelistet, mit denen die Funktionstasten belegt sind. (Tabelle 2).</p>
+        <p>Was sind überhaupt Vektoren? ROM, so sagt ja bereits der Name (<strong>R</strong>ead <strong>O</strong>nly <strong>M</strong>emory), ist grundsätzlich nicht überschreibbar. Wer dennoch das System ergänzen will (beispielsweise durch neue Basic-Befehle), ist gezwungen, das gesamte ROM auszutauschen, es sei denn, die Schöpfer des Computers haben mögliche Optionen — so wie beim VC 20 (oder C 64) — bereits eingeplant. Dies geschieht, indem aus dem ROM heraus ins RAM verzweigt wird.</p>
 
-<p>Auffällig ist bei den Kommandos LIST und RUN der Pfeil nach oben (t). Er bewirkt ein sofortiges Ausführen des Befehls — entspricht also »LIST« und RETURN-Taste beziehungsweise »RUN« und RETURN-Taste. Das andere auffällige Zeichen ist der Apostroph (&lsquo;) bei dem Kommando LOAD, der dem Hochkomma (”) entspricht. Das echte Gänsefüßchen ist bereits für die Syntax des Änderungsbefehls (siehe unten) vergeben.</p>
+        <p>Normalerweise steht an der entsprechenden RAM-Adresse nur ein Zeiger auf eine ROM-Adresse, eben ein Vektor. Durch Änderung eines solchen Vektors kann man elegant bestehende Routinen umgehen und sie durch eigene ersetzen beziehungsweise ergänzen. Soweit, so gut.</p>
 
-<p>Auf den Befehl π wie er beispielsweise beim Programm »Basic-Switch« (Folge 2) verwendet wurde, habe ich dieses Mal aus Platzgründen verzichtet, damit Lader und Maschinenprogramm in der Grundversion Platz finden. Die Kommandos werden statt dessen über den Befehl »SYS0« (oder F5) eingegeben. Dabei machen wir uns den USR-Vektor (Adresse 0-2) als Sprungzeiger zu Nutze. Damit zur Syntax bei der Funktionstastenprogrammierung:<br/>
-SYS0 L – Listen der Funktionstastenbelegungen<br/>
-SYS0 O – (Off) schaltet die Funktionstasten ab<br/>
-SYS0 R – (Restart) schaltet die Funktionstasten wieder ein.<br/>
-SYS0,X, »befehl« – belegt die X-te Funktionstaste mit einem Befehl.</p>
+        <p>Wie im Handbuch zu lesen, gibt es Unterschiede zwischen den Bildschirmcodes eines Zeichens (»A« beispielsweise hat den Wert 1) und dem allgemein verbreiteten ASCII-Code (»A« hat hier den Wert 65). Gleiches gilt für die Tastatur. Hier unterscheidet man ebenfalls zwischen dem ASCII- und dem sogenannten Tastatur-Matrixcode. Diese VC 20-interne Codierung wird durch eine Betriebssystemroutine — die über einen Vektor verfügt (den oben erwähnten für die Tastaturdecodierung) — in ASCII-Zeichen umgewandelt. Das Maschinenprogramm in Listing 2 und 3 wird durch »verbiegen« des Vektors 655/656 in die Tastaturroutine mit eingebaut. Es fragt die Codes der Funktionstasten ab und druckt die Zeichen aus, mit denen sie belegt wurden.</p>
 
-<p>Zum Schluß kommen wir noch zu einem Thema, mit dem ich mich mehr an den fortgeschrittenen Maschinensprachenprogrammierer wenden möchte. Im ersten Teil dieser Serie wurde beschrieben, wie der Basic-Befehlssatz mit Hilfe der CHRGET-Routine und des Befehles »π« im beschränktem Umfang erweitert werden kann. Diese Methode hat allerdings viele Unzulässigkeiten; es sind beispielsweise keine verkürzten Befehle wie beim normalen Basic (LIST = L SHIFT I) möglich.</p>
+        <p>Das recht komfortable Programm liegt als Basic-Lader in Listing 2 vor. Nach dem Starten mit RUN wird das Maschinenprogramm automatisch ans Ende des verfügbaren Speichers geladen. Mit der SPACE-Taste aktiviert man diese Routine. Als erstes werden die Befehle gelistet, mit denen die Funktionstasten belegt sind. (Tabelle 2).</p>
 
-<p>Nun soll beschrieben werden, wie der Basic-Befehlssatz um richtige Klartextkommandos erweitert werden kann. Auch hierfür müssen wir bestehende Interpreterroutinen, die über Vektoren angesprungen werden, umgehen beziehungsweise ergänzen.</p>
+        <p>Auffällig ist bei den Kommandos LIST und RUN der Pfeil nach oben (t). Er bewirkt ein sofortiges Ausführen des Befehls — entspricht also »LIST« und RETURN-Taste beziehungsweise »RUN« und RETURN-Taste. Das andere auffällige Zeichen ist der Apostroph (&lsquo;) bei dem Kommando LOAD, der dem Hochkomma (”) entspricht. Das echte Gänsefüßchen ist bereits für die Syntax des Änderungsbefehls (siehe unten) vergeben.</p>
 
-<p>Für das Verarbeiten von Basic-Programmen sind drei Schlüsselroutinen zu substituieren. Da ist zunächst das Unterprogramm »ASCII in Token wandeln«. ($C57C) welches — wie der Name bereits sagt — die Aufgabe hat, Eingabezeilen im Basic-Puffer (wie zu Anfang beschrieben) in Interpretercode zu wandeln. Das Gegenstück dazu ist die Unterroutine »Interpretercode in Klartext wandeln.« Will man Basic-Zeilen sichtbar machen, so benutzt man das Kommando LIST. Dazu wird eben diese ROM-Routine benötigt, die die Rückumwandlung der Token in ASCII-Zeichen vornimmt.</p>
+        <p>Auf den Befehl π wie er beispielsweise beim Programm »Basic-Switch« (Folge 2) verwendet wurde, habe ich dieses Mal aus Platzgründen verzichtet, damit Lader und Maschinenprogramm in der Grundversion Platz finden. Die Kommandos werden statt dessen über den Befehl »SYS0« (oder F5) eingegeben. Dabei machen wir uns den USR-Vektor (Adresse 0-2) als Sprungzeiger zu Nutze. Damit zur Syntax bei der Funktionstastenprogrammierung:<br />
+            SYS0 L – Listen der Funktionstastenbelegungen<br />
+            SYS0 O – (Off) schaltet die Funktionstasten ab<br />
+            SYS0 R – (Restart) schaltet die Funktionstasten wieder ein.<br />
+            SYS0,X, »befehl« – belegt die X-te Funktionstaste mit einem Befehl.</p>
 
-<p>Sämtliche Befehle sind in Form von ASCII-Zeichen im Basic-ROM enthalten, lediglich zum letzten Buchstaben jedes Befehlswortes wurde 128 ($80) addiert. Läßt man sich die Befehle durch<br/>
-FOR T= 49310 TO 47565: PRINT CHR$(PEEK(T)):NEXT<br/>
-ausdrucken, so sehen die Kommandos im Groß-/Kleinschrift-Modus folgendermaßen aus:<br/>
-END = enD<br/>
-FOR = foR ect.</p>
+        <p>Zum Schluß kommen wir noch zu einem Thema, mit dem ich mich mehr an den fortgeschrittenen Maschinensprachenprogrammierer wenden möchte. Im ersten Teil dieser Serie wurde beschrieben, wie der Basic-Befehlssatz mit Hilfe der CHRGET-Routine und des Befehles »π« im beschränktem Umfang erweitert werden kann. Diese Methode hat allerdings viele Unzulässigkeiten; es sind beispielsweise keine verkürzten Befehle wie beim normalen Basic (LIST = L SHIFT I) möglich.</p>
 
-<p>Ferner ist jedem Basic-Befehl eine Adresse zugeordnet, bei der eine Abarbeitung vorgenommen wird. Diese Adressen sind in einer Tabelle (von $C00C $C07F) zusammengefaßt. Eine spezielle Routine hat wiederum die Aufgabe, die Befehlsadresse für ein entsprechendes Token aus der Tabelle zu lesen, und einen Sprung nach dorthin durchzuführen. Auch dieses Unterprogramm kann man mittels eines Vektors umgehen.</p>
+        <p>Nun soll beschrieben werden, wie der Basic-Befehlssatz um richtige Klartextkommandos erweitert werden kann. Auch hierfür müssen wir bestehende Interpreterroutinen, die über Vektoren angesprungen werden, umgehen beziehungsweise ergänzen.</p>
 
-<p>Damit haben wir das nötige Rüstzeug, um selbst Basic-Kommandos in den Interpreter mit aufzunehmen. In Listing 4 ist ein dafür geeignetes Programm abgedruckt, welches ich jetzt näher erläutern möchte. Es ist der Kopf für ein Utility, in das nach Belieben Befehlswörter und Sprungadressen eingesetzt werden können.</p>
+        <p>Für das Verarbeiten von Basic-Programmen sind drei Schlüsselroutinen zu substituieren. Da ist zunächst das Unterprogramm »ASCII in Token wandeln«. ($C57C) welches — wie der Name bereits sagt — die Aufgabe hat, Eingabezeilen im Basic-Puffer (wie zu Anfang beschrieben) in Interpretercode zu wandeln. Das Gegenstück dazu ist die Unterroutine »Interpretercode in Klartext wandeln.« Will man Basic-Zeilen sichtbar machen, so benutzt man das Kommando LIST. Dazu wird eben diese ROM-Routine benötigt, die die Rückumwandlung der Token in ASCII-Zeichen vornimmt.</p>
 
-<p>Die Routine gliedert sich in vier Teile: Der erste Teil (von $2000 - $203A) ist eine Kopie der Reset-Routine. Dabei wird der Computer neu initialisiert und eine neue Kaltstartmeldung<br/>
-<strong><strong> 64’ER BASIC </strong></strong><br/>
-ausgedruckt. Hier ist genügend Platz vorgesehen, damit der Text nach eigenen Wünschen gestaltet werden kann. Ferner wurden die ersten neun Bytes mit NOPs versehen, damit dort — falls das Programm im Modulbereich abgelegt wird — die obligate Autostartinformation (a0CBM) eingesetzt werden kann. Anderenfalls — wenn das Maschinenprogramm per SYS gestartet wird — muß der erste Mnemonic-Befehl ein SEI sein.</p>
+        <p>Sämtliche Befehle sind in Form von ASCII-Zeichen im Basic-ROM enthalten, lediglich zum letzten Buchstaben jedes Befehlswortes wurde 128 ($80) addiert. Läßt man sich die Befehle durch<br />
+            FOR T= 49310 TO 47565: PRINT CHR$(PEEK(T)):NEXT<br />
+            ausdrucken, so sehen die Kommandos im Groß-/Kleinschrift-Modus folgendermaßen aus:<br />
+            END = enD<br />
+            FOR = foR ect.</p>
 
-<p>Die sich jetzt anschließenden Programmteile sind die oben erwähnten Ergänzungen zu den Interpreterroutinen. Dies sind teilweise Kopien aus den alten ROM-Routinen mit Ergänzungen für die neuen Basic-Kommandos. Die Befehlswörter müssen jetzt nur noch eingetragen werden. Das geschieht folgendermaßen:</p>
+        <p>Ferner ist jedem Basic-Befehl eine Adresse zugeordnet, bei der eine Abarbeitung vorgenommen wird. Diese Adressen sind in einer Tabelle (von $C00C $C07F) zusammengefaßt. Eine spezielle Routine hat wiederum die Aufgabe, die Befehlsadresse für ein entsprechendes Token aus der Tabelle zu lesen, und einen Sprung nach dorthin durchzuführen. Auch dieses Unterprogramm kann man mittels eines Vektors umgehen.</p>
 
-<p>Die Befehle werden mit Hilfe des Programms »Tokenerzeuger« (Listing 5) in den entsprechenden Adreßbereich geschrieben. Bei nachträglichen Eintragungen ist zu beachten, daß zum letzten Buchstaben jedes Befehlswortes der Wert $80 (=128) zu addieren ist. Die Ergänzungsbefehle beginnen mit Token 204. Das erste Befehlswort beginnt mit dieser Nummer, der zweite erhält automatisch die 205 und so weiter.</p>
+        <p>Damit haben wir das nötige Rüstzeug, um selbst Basic-Kommandos in den Interpreter mit aufzunehmen. In Listing 4 ist ein dafür geeignetes Programm abgedruckt, welches ich jetzt näher erläutern möchte. Es ist der Kopf für ein Utility, in das nach Belieben Befehlswörter und Sprungadressen eingesetzt werden können.</p>
 
-<p>Weiterhin ist für jedes Kommando die Sprungadresse in der Tabelle ($2208-$2268) zu vermerken. Dabei muß die Reihenfolge Low-/High Byte beachtet werden. Außerdem muß das LOW-Byte vor dem Eintrag um eines dekrementiert werden (LOW Byte -1). Auch diese Arbeit erledigt das Programm in Listing 5.</p>
+        <p>Die Routine gliedert sich in vier Teile: Der erste Teil (von $2000 - $203A) ist eine Kopie der Reset-Routine. Dabei wird der Computer neu initialisiert und eine neue Kaltstartmeldung<br />
+            <strong><strong> 64’ER BASIC </strong></strong><br />
+            ausgedruckt. Hier ist genügend Platz vorgesehen, damit der Text nach eigenen Wünschen gestaltet werden kann. Ferner wurden die ersten neun Bytes mit NOPs versehen, damit dort — falls das Programm im Modulbereich abgelegt wird — die obligate Autostartinformation (a0CBM) eingesetzt werden kann. Anderenfalls — wenn das Maschinenprogramm per SYS gestartet wird — muß der erste Mnemonic-Befehl ein SEI sein.
+        </p>
 
-<p>Ein Befehl wurde bereits eingetragen. Der Befehl KILL führt einen Reset durch und damit ist das Programm abgeschaltet. Wer also seine Maschinenprogramme ins Basic einbinden möchte, kann dies mit der beschriebenen Methode tun. Beispielsweise könnte man die in Listing 2 abgedruckte Funktionstastenroutine mit dem KEY-Befehl belegen. Auch im Hinblick auf Grafik, Tonerzeugung oder Joystickabfrage bietet sich hier die Möglichkeit, die Unzulänglichkeiten des Basics zu überwinden. Auch die Besitzer eines C 64 können die beschriebene Routine benutzen, da die Basic-ROMs nahezu identisch sind (sie haben lediglich eine andere Adresse). Außerdem habe ich in Tabelle 3 eine Liste der wichtigsten Unterprogramme zusammengestellt, mit denen man unter anderem Parameter, Strings, Kommas oder ähnliches abfragen kann. Auf jeden Fall sollte man sich für diese Arbeit ein ROM-Listing (zum Beispiel »VC 20 Intern« von Data Becker) zulegen.</p>
+        <p>Die sich jetzt anschließenden Programmteile sind die oben erwähnten Ergänzungen zu den Interpreterroutinen. Dies sind teilweise Kopien aus den alten ROM-Routinen mit Ergänzungen für die neuen Basic-Kommandos. Die Befehlswörter müssen jetzt nur noch eingetragen werden. Das geschieht folgendermaßen:</p>
 
-<p>Damit möchte ich für heute schließen. Das nächste Mal werden wir sehen, was man mit den Kernal-Vektoren anfangen kann und betrachten die Grafikmöglichkeiten beim VC 20.</p>
+        <p>Die Befehle werden mit Hilfe des Programms »Tokenerzeuger« (Listing 5) in den entsprechenden Adreßbereich geschrieben. Bei nachträglichen Eintragungen ist zu beachten, daß zum letzten Buchstaben jedes Befehlswortes der Wert $80 (=128) zu addieren ist. Die Ergänzungsbefehle beginnen mit Token 204. Das erste Befehlswort beginnt mit dieser Nummer, der zweite erhält automatisch die 205 und so weiter.</p>
 
-<p>(Christoph Sauer/ev)</p>
+        <p>Weiterhin ist für jedes Kommando die Sprungadresse in der Tabelle ($2208-$2268) zu vermerken. Dabei muß die Reihenfolge Low-/High Byte beachtet werden. Außerdem muß das LOW-Byte vor dem Eintrag um eines dekrementiert werden (LOW Byte -1). Auch diese Arbeit erledigt das Programm in Listing 5.</p>
 
+        <p>Ein Befehl wurde bereits eingetragen. Der Befehl KILL führt einen Reset durch und damit ist das Programm abgeschaltet. Wer also seine Maschinenprogramme ins Basic einbinden möchte, kann dies mit der beschriebenen Methode tun. Beispielsweise könnte man die in Listing 2 abgedruckte Funktionstastenroutine mit dem KEY-Befehl belegen. Auch im Hinblick auf Grafik, Tonerzeugung oder Joystickabfrage bietet sich hier die Möglichkeit, die Unzulänglichkeiten des Basics zu überwinden. Auch die Besitzer eines C 64 können die beschriebene Routine benutzen, da die Basic-ROMs nahezu identisch sind (sie haben lediglich eine andere Adresse). Außerdem habe ich in Tabelle 3 eine Liste der wichtigsten Unterprogramme zusammengestellt, mit denen man unter anderem Parameter, Strings, Kommas oder ähnliches abfragen kann. Auf jeden Fall sollte man sich für diese Arbeit ein ROM-Listing (zum Beispiel »VC 20 Intern« von Data Becker) zulegen.</p>
+
+        <p>Damit möchte ich für heute schließen. Das nächste Mal werden wir sehen, was man mit den Kernal-Vektoren anfangen kann und betrachten die Grafikmöglichkeiten beim VC 20.</p>
+
+        <address class="author">(Christoph Sauer/ev)</address>
+
+    </article>
+
+</body>
+
+</html>

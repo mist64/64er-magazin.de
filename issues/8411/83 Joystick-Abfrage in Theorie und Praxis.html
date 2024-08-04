@@ -1,89 +1,110 @@
-<h1>Joystick-Abfrage in Theorie und Praxis</h1>
+<!DOCTYPE html>
+<html lang="de">
 
-<p class="intro">Wenn der Joystickanschluß für Sie »ein Buch mit sieben Siegeln« ist, so wird Ihnen dieser Artikel für den VC 20 weiterhelfen. Doch auch die »Profis« werden einige wichtige Informationen finden.</p>
+<head>
+    <title>XXX</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="XXX">
+    <meta name="64er.issue" content="11/84">
+    <meta name="64er.pages" content="999">
+    <meta name="64er.id" content="XXX">
+</head>
 
-<p>Ein Joystick besteht aus vier Schaltern, die im rechten Winkel zueinander angeordnet sind. Der Handgriff erlaubt neun abfragbare Positionen:</p>
+<body>
+    <article>
 
-<p>— eine Position mit allen Schaltern offen: Griff in Ruhe<br/>
-— vier Positionen mit je einem Schalter geschlossen: Griff in Nord, Süd, Ost, West<br/>
-— vier Positionen mit zwei Schaltern geschlossen: Griff in Nordost, Südost, Südwest, Nordwest</p>
+        <h1>Joystick-Abfrage in Theorie und Praxis</h1>
 
-<p>Ein zusätzlicher »Feuerknopf« hat einen eigenen Schalter.</p>
+        <p class="intro">Wenn der Joystickanschluß für Sie »ein Buch mit sieben Siegeln« ist, so wird Ihnen dieser Artikel für den VC 20 weiterhelfen. Doch auch die »Profis« werden einige wichtige Informationen finden.</p>
 
-<p>Grafisch sieht das so aus:</p>
+        <p>Ein Joystick besteht aus vier Schaltern, die im rechten Winkel zueinander angeordnet sind. Der Handgriff erlaubt neun abfragbare Positionen:</p>
 
-<p>TODO</p>
+        <p>— eine Position mit allen Schaltern offen: Griff in Ruhe<br />
+            — vier Positionen mit je einem Schalter geschlossen: Griff in Nord, Süd, Ost, West<br />
+            — vier Positionen mit zwei Schaltern geschlossen: Griff in Nordost, Südost, Südwest, Nordwest</p>
 
-<p>Jeder der fünf Schalter ist mit je einer Leitung von zwei speziellen integrierten Bausteinen mit dem Namen »VIA 6522« (Versatile Interface Adapter) verbunden. Diese sind, wie der Name andeutet, programmierbare Adapter für die Ein- und Ausgabe (also auch für den Joystick).</p>
+        <p>Ein zusätzlicher »Feuerknopf« hat einen eigenen Schalter.</p>
 
-<p>Leider sind die fünf Schalter etwas ungleichmäßig auf die beiden VIAs verteilt:</p>
+        <p>Grafisch sieht das so aus:</p>
 
-<p>— Schalter 0,1, 2 und der Feuer-Schalter 4 verwenden VIA 1<br/>
-— Schalter 3 verwendet VIA 2</p>
+        <p>TODO</p>
 
-<p>Der Kontakt des Joysticks mit den VIAs und damit mit dem VC 20 wird durch zum Teil Ihnen schon bekannte Registerzellen geregelt, welche folgende Adressen haben:</p>
+        <p>Jeder der fünf Schalter ist mit je einer Leitung von zwei speziellen integrierten Bausteinen mit dem Namen »VIA 6522« (Versatile Interface Adapter) verbunden. Diese sind, wie der Name andeutet, programmierbare Adapter für die Ein- und Ausgabe (also auch für den Joystick).</p>
 
-<p>— Ein-/Ausgabe-Register A des VIA 1: 37137<br/>
-— Ein-/Ausgabe-Register B des VIA 2: 37152</p>
+        <p>Leider sind die fünf Schalter etwas ungleichmäßig auf die beiden VIAs verteilt:</p>
 
-<p>Der Vollständigkeit halber sei erwähnt, daß jeder VIA noch ein zweites E/A-Register hat, nämlich:</p>
+        <p>— Schalter 0,1, 2 und der Feuer-Schalter 4 verwenden VIA 1<br />
+            — Schalter 3 verwendet VIA 2</p>
 
-<p>— E/A-Register B des VIA 1: 37136<br/>
-— E/A-Register A des VIA 2: 37153</p>
+        <p>Der Kontakt des Joysticks mit den VIAs und damit mit dem VC 20 wird durch zum Teil Ihnen schon bekannte Registerzellen geregelt, welche folgende Adressen haben:</p>
 
-<p>Für den Joystick brauchen wir diese jedoch nicht.</p>
+        <p>— Ein-/Ausgabe-Register A des VIA 1: 37137<br />
+            — Ein-/Ausgabe-Register B des VIA 2: 37152</p>
 
-<p>Die einzelnen Leitungsanschlüsse der Joystick-Schalter sind:</p>
+        <p>Der Vollständigkeit halber sei erwähnt, daß jeder VIA noch ein zweites E/A-Register hat, nämlich:</p>
 
-<p>— Schalter 0 &hellip; Bit 2 von 37137<br/>
-— Schalter 1 &hellip; Bit 3 von 37137<br/>
-— Schalter 2 &hellip; Bit 4 von 37137<br/>
-— Schalter 4 &hellip; Bit 5 von 37137<br/>
-— Schalter 3 &hellip; Bit 7 von 37152</p>
+        <p>— E/A-Register B des VIA 1: 37136<br />
+            — E/A-Register A des VIA 2: 37153</p>
 
-<p>Ich habe gesagt, daß 37137 und 37152 Ein- und Ausgaberegister sind, das heißt wir können sie in beiden Richtungen benützen.</p>
+        <p>Für den Joystick brauchen wir diese jedoch nicht.</p>
 
-<p>Die Entscheidung darüber liegt in je einem zugeordneten »Daten-Richtungs-Register«.</p>
+        <p>Die einzelnen Leitungsanschlüsse der Joystick-Schalter sind:</p>
 
-<p>— Dem E/A-Register 37137 ist das DR-Register 37139 zugeordnet.<br/>
-— Dem E/A-Register 37152 ist das DR-Register 37154 zugeordnet.</p>
+        <p>— Schalter 0 &hellip; Bit 2 von 37137<br />
+            — Schalter 1 &hellip; Bit 3 von 37137<br />
+            — Schalter 2 &hellip; Bit 4 von 37137<br />
+            — Schalter 4 &hellip; Bit 5 von 37137<br />
+            — Schalter 3 &hellip; Bit 7 von 37152</p>
 
-<p>Dieses Arrangement erlaubt, jede einzelne Leitung eines E/A-Registers separat auf Ein- oder Ausgabe zu schalten, völlig unabhängig voneinander.</p>
+        <p>Ich habe gesagt, daß 37137 und 37152 Ein- und Ausgaberegister sind, das heißt wir können sie in beiden Richtungen benützen.</p>
 
-<p>Das geht so:</p>
+        <p>Die Entscheidung darüber liegt in je einem zugeordneten »Daten-Richtungs-Register«.</p>
 
-<p>Sobald in einem Bit des DR-Registers eine 1 steht, ist die entsprechende Leitung des E/A-Registers auf Ausgabe geschaltet, bei einer 0 auf Eingabe.</p>
+        <p>— Dem E/A-Register 37137 ist das DR-Register 37139 zugeordnet.<br />
+            — Dem E/A-Register 37152 ist das DR-Register 37154 zugeordnet.</p>
 
-<p>Im Bild unten habe ich die notwendigen Bitmuster in die beiden DR-Register eingezeichnet.</p>
+        <p>Dieses Arrangement erlaubt, jede einzelne Leitung eines E/A-Registers separat auf Ein- oder Ausgabe zu schalten, völlig unabhängig voneinander.</p>
 
-<p>Im Register 37139, an dem ja vier Schalter hängen, wäre die hineinzuPOKEnde Zahl 195. Da aber während der Joystick-Abfrage dieses Register für nichts anderes verwendet wird, setzen wir ruhig das ganze Register auf 0.<br/>
-10 POKE 37139,0</p>
+        <p>Das geht so:</p>
 
-<p>Beim Register 37154 ist die Lage anders, dadas zugehörige E/A-Register 37152 zur Tastaturabfrage verwendet wird. Da müssen wir die Auswahl der Leitung schon genau machen.<br/>
-20 POKE 37154,127</p>
+        <p>Sobald in einem Bit des DR-Registers eine 1 steht, ist die entsprechende Leitung des E/A-Registers auf Ausgabe geschaltet, bei einer 0 auf Eingabe.</p>
 
-<p>Während der Joystick-Abfrage funktionieren die Tasten in der Spalte 127 der 8 x 8-Matrix nicht.</p>
+        <p>Im Bild unten habe ich die notwendigen Bitmuster in die beiden DR-Register eingezeichnet.</p>
 
-<p>Zeile 10 und 20 »initialisieren« die Joystick-Abfrage.</p>
+        <p>Im Register 37139, an dem ja vier Schalter hängen, wäre die hineinzuPOKEnde Zahl 195. Da aber während der Joystick-Abfrage dieses Register für nichts anderes verwendet wird, setzen wir ruhig das ganze Register auf 0.<br />
+            10 POKE 37139,0</p>
 
-<p>Ein Experimentier-Programm zum Testen, was jetzt bei der Bewegung des Joysticks stattfindet, ist ganz einfach:<br/>
-30 PRINT PEEK(37137);PEEK(37152)<br/>
-40 GOTO 30</p>
+        <p>Beim Register 37154 ist die Lage anders, dadas zugehörige E/A-Register 37152 zur Tastaturabfrage verwendet wird. Da müssen wir die Auswahl der Leitung schon genau machen.<br />
+            20 POKE 37154,127</p>
 
-<p>Am Ende empfiehlt es sich, die volle Tastatur wieder einzuschalten mit<br/>
-POKE 37154,255</p>
+        <p>Während der Joystick-Abfrage funktionieren die Tasten in der Spalte 127 der 8 x 8-Matrix nicht.</p>
 
-<p>In einem Programm können Sie also einfach die Werte in den beiden Adressen der Zeile 30 (mit IF &hellip; THEN) abfragen.</p>
+        <p>Zeile 10 und 20 »initialisieren« die Joystick-Abfrage.</p>
 
-<p>Zur Vermeidung von eventuellen Störungen durch die Mehrfachfunktionen der Register ist es aber empfehlenswert, die einzelnen Bits direkt abzufragen. Das sieht dann so aus:<br/>
-10 POKE 37139,0<br/>
-20 POKE 37154,127<br/>
-30 IF PEEK(37137) AND 4 THEN&hellip;   (Schalter 0)<br/>
-40 IF PEEK(37137) AND 8 THEN&hellip;   (Schalter 1)<br/>
-50 IF PEEK(37137) AND 16 THEN&hellip;  (Schalter 2)<br/>
-60 IF PEEK(37137) AND 32 THEN&hellip;  (Schalter 4 = Feuerknopf)<br/>
-70 IF PEEK(37152) AND 128 THEN&hellip; (Schalter 3)<br/>
-80 POKE37154,255</p>
+        <p>Ein Experimentier-Programm zum Testen, was jetzt bei der Bewegung des Joysticks stattfindet, ist ganz einfach:<br />
+            30 PRINT PEEK(37137);PEEK(37152)<br />
+            40 GOTO 30</p>
 
-<p>(Helmuth Hauck/rg)</p>
+        <p>Am Ende empfiehlt es sich, die volle Tastatur wieder einzuschalten mit<br />
+            POKE 37154,255</p>
 
+        <p>In einem Programm können Sie also einfach die Werte in den beiden Adressen der Zeile 30 (mit IF &hellip; THEN) abfragen.</p>
+
+        <p>Zur Vermeidung von eventuellen Störungen durch die Mehrfachfunktionen der Register ist es aber empfehlenswert, die einzelnen Bits direkt abzufragen. Das sieht dann so aus:<br />
+            10 POKE 37139,0<br />
+            20 POKE 37154,127<br />
+            30 IF PEEK(37137) AND 4 THEN&hellip; (Schalter 0)<br />
+            40 IF PEEK(37137) AND 8 THEN&hellip; (Schalter 1)<br />
+            50 IF PEEK(37137) AND 16 THEN&hellip; (Schalter 2)<br />
+            60 IF PEEK(37137) AND 32 THEN&hellip; (Schalter 4 = Feuerknopf)<br />
+            70 IF PEEK(37152) AND 128 THEN&hellip; (Schalter 3)<br />
+            80 POKE37154,255</p>
+
+        <address class="author">(Helmuth Hauck/rg)</address>
+
+    </article>
+
+</body>
+
+</html>
