@@ -1,3 +1,4 @@
+
 # Zuviel Programme, keine Ideen?
 
 In Amerika stöhnen die Propheten (und vor allem die, die sich auf die Voraussagen verließen): Sie haben sich offenbar geirrt. Nach den Schätzungen von Future Computing dürften die Softwareumsätze in diesem Jahr nicht um 100 sondern »nur« um 60 Prozent wachsen. Ein anderes Marktforschungsunternehmen, Creative Strategies, schätzt bei Business Software sogar nur 40 (statt vorher über 50) Prozent — und ist bei Heimcomputer-Software noch skeptischer: Die schlechten Umsätze in diesem Sommer könnten zwar saisonbedingt sein — wahrscheinlich fehle es aber an der richtigen Art von Programmen. Ein Mitarbeiter des Verlags Prentice-Hall wurde noch deutlicher: »Es wird ein Haufen Mist angeboten« erklärte kürzlich Lynn Lumsden »Und so etwas kauft der Kunde einfach nicht mehr«. Es gebe, so meinen die Amerikaner, zu viele schlechte und unter den brauchbaren zu viele »me too«-Programme — an der xten Textverarbeitung oder der yten Dateiverwaltung bestehe kein Bedarf; sie drückten höchstens die Preise. Es fehle an guten und innovativen Produkten.
@@ -50,7 +51,7 @@ Außergewöhnlich ist auch die Möglichkeit der Darstellung von Farben (auf Schw
 
 Info: Rolf Rocke Computer, Auestraße 1, 5090 Leverkusen 3, Tel.: 0 2171-26 24
 
-## Deutscher Zeichensatz für 626 und MPS 802
+## Deutscher Zeichensatz für 1526 und MPS 802
 
 Das Ingenieurbüro Hollmann in Hamburg bietet für die Commodore-Drucker 1526 und MPS 802 deutsche Zeichensätze im EPROM an. Die Zeichensätze sind auf mehrere zum C 64 erhältliche professionelle Textprogramme abgestimmt.
 
@@ -168,7 +169,7 @@ Im Bericht über die Customer Electronics Show in Chicago in Ausgabe 8/84, Seite
 
 »Diese Musikprogramme sind mittlerweile so ausgereift, daß fast kein Unterschied mehr zu einem digitalen Synthesizer bemerkbar ist.«
 
-Ich halte diesen Absatz für ziemlich übertrieben, ja eigentlich ist dieser sogar falsch! Denn keine noch so ausgefeilte Programmierung macht aus dem digital gesteuerten, aber ansonsten analogen SID des C 64 einen digitalen Sythesizer ä la Emulator, Fairlight oder PPG.
+Ich halte diesen Absatz für ziemlich übertrieben, ja eigentlich ist dieser sogar falsch! Denn keine noch so ausgefeilte Programmierung macht aus dem digital gesteuerten, aber ansonsten analogen SID des C 64 einen digitalen Sythesizer à la Emulator, Fairlight oder PPG.
 
 Als einziger Vergleichsmaßstab käme eventuell die Bedienungsfreundlichkeit in Frage, mehr aber auch nicht. Auch hier gilt: Hardware kann nicht durch noch so gute Software ersetzt werden.
 
@@ -255,7 +256,7 @@ Diese Unterschiede lassen sich mit den Eigenarten der Floppy-Betriebssysteme erk
 
 Das MSD-Laufwerk ist mit seriellem Kabel zu zirka 90% der Software kompatibel, sogar der doch etwas kompliziertere Disketten-Kopierschutz von Synapse-Software lief darauf. Bei der Wahl der parallelen Schnittstelle sieht die Sache leider etwas düsterer aus:
 Nur etwa 75% der kommerziellen, kopiergeschützten Software lief darauf.
-Hätte MSD nicht aus den Fehlern der alten CBM-4040-Floppy gelernt, wäre die Kompatibilität zum C-1541-Einzellaufwerk gänzlich in den Wind zu schreiben gewesen. Bei vielen Software-Produkten wird keine Laufwerksnummer 0 oder 1 angegeben. Das 4040-Floppy hat die Angewohnheit, dabei immer auf beide Laufwerke zuzugreifen und Programme wie zum Beispiel die Adventurespiele von Infocom nur zu starten, wenn in beiden Laufwerken die gleiche Disk vorhanden ist. Das MSD-Laufwerk greift automatisch aufLaufwerkOzu, um die Kompatibilität zum Einzellaufwerk stärker zu gewährleisten.
+Hätte MSD nicht aus den Fehlern der alten CBM-4040-Floppy gelernt, wäre die Kompatibilität zum C-1541-Einzellaufwerk gänzlich in den Wind zu schreiben gewesen. Bei vielen Software-Produkten wird keine Laufwerksnummer 0 oder 1 angegeben. Das 4040-Floppy hat die Angewohnheit, dabei immer auf beide Laufwerke zuzugreifen und Programme wie zum Beispiel die Adventurespiele von Infocom nur zu starten, wenn in beiden Laufwerken die gleiche Disk vorhanden ist. Das MSD-Laufwerk greift automatisch auf Laufwerk O zu, um die Kompatibilität zum Einzellaufwerk stärker zu gewährleisten.
 
 ## Solide Hardware bis ins letzte Detail
 
@@ -309,7 +310,7 @@ Welches Bildschirmgerät ist aber am geeignetsten? Nun, das kommt ganz auf den V
 
 Insgesamt betrachtet, erscheint ein Farbfernseher mit Videoeingang ein guter Kompromiß zu sein. Man sollte dann jedoch darauf achten, daß die Bildschirmgröße bei 20 bis 35 cm Schirmdiagonale liegt. Dann kann man in einem optimalen Abstand zwischen 0.5 und 1.5 Metern vom Bildschirm sitzen (schon deshalb ist ein großer Farbfernseher ungeeignet). Verbindliche Werte gibt es jedoch nicht. (gk)
 
-Bezugsquellen: siehe Marktübersicht aufSeite 22. Die beiden Farbfernseher sind im Fachhandel erhältlich.
+Bezugsquellen: siehe Marktübersicht auf Seite 22. Die beiden Farbfernseher sind im Fachhandel erhältlich.
 
 # Marktübersicht Schwarzweiß- und Farbmonitore
 
@@ -395,7 +396,7 @@ Alles in allem stellen die beiden Itoh Drucker 1550B und 8510 ein sehr leistungs
 
 > Obwohl das Schriftbild der Matrixdrucker ständig besser wird, sind Typenrad-Drucker in diesem Bereich bislang ungeschlagen. Ein auch für den C 64 bestens geeigneter und preisgünstiger Typenraddrucker ist der Petal MA20.
 
-Leider waren Typenraddrucker bislang immer relativ teuer. Nicht so der Petal MA20 (Bild 1), er ist baugleich mit dem bekannten Juki 6100 Typenraddrucker, unterscheidet sich von diesem aber im Preis. Der Juki hat einen empfohlenen Verkaufspreis von zirka 1798 Mark. Der Petal MA 20 soll laut Liste 1498 Mark kosten. Er ist aber unserer Erfahrung nach noch um einiges günstiger zu haben. Der Petal MA20 ist ein Typenraddrucker, das heißt er besitzt im Gegensatz zu einer Schreibmaschine keine eigene Tastatur. Die Texteingabe und Drucksteuerung muß von einem Computer übernommen werden. Mit diesem Konzept sind natürlich Vor- und Nachteile verbunden. Hauptnachteil ist für den Commodore 64-Besitzer, daß keine Grafik- und Commodore-eigene Schriftzeichen ausdruckbar sind. Außerdem sind Typenraddrucker oft relativ langsam und laut (beim Petal zirka 62dBA). Der Vorteil des exzellenten Schriftbildes überwiegt diesen Nachteil aber dann bei weitem, wenn hauptsächlich Texte ausgedrucktwerden. Durch Auswechseln der Triumph-Adler-kompatiblen Typenräder (100 Zeichen) steht eine enorme Anzahl der verschiedensten Schriftarten zur Verfügung. Wissenschaftliche Sonderzeichen, Schreibschrift und fremdsprachliche Schriften sind so innerhalb von Sekunden verfügbar. Aber auch das zum Drucker mitgelieferte Typenrad Caroll-Pica erlaubt schon einige Variationen der Schrift (Bild 2). Nicht vergessen wurde dabei die Unterstreichfunktion und die Fettschrift. Der Haupteinsatzbereich eines Druckers wie dem Petal MA20 ist sicherlich die Textverarbeitung. Mit einem guten Textverarbeitungsprogramm, wie dem Vizawrite 64 (das eine eigene Druckoption für den Petal/Juki hat), verwandelt sich die gute Stube in ein kleines Büro. Der Petal MA20 kann sowohl Einzelblatt-, als auch Endlospapier verarbeiten. Für unbeaufsichtigtes Drucken sind zusätzlich ein automatischer Einzelblatteinzug und ein Traktoraufsatz erhältlich. Für den normalen Betrieb genügt aber die Standard-Ausrüstung. Die aber kann sich sehen lassen: Die Druckgeschwindigkeit beträgt 18 Zeichen pro Sekunde bei bidirektionalem Druck. Sehr praktisch ist der sowohl hard- als auch softwaremäßig bestimmbare Zeichenabstand. Er beträgt entweder 10, 12 oder 15 Zeichen pro Zoll. In der Standardschrift können so bis zu 165 Zeichen in einer Zeile untergebracht werden. In der ebenfalls verfügbaren Proportionalschrift (automatischer Ausgleich der Zeichenabstände) sind sogar 220 Zeichen pro Zeile verfügbar. Damit ist auch gesagt, daß die Papierbreite bis zu 13 Inches (= 33 cm) betragen kann. Der Petal MA20 verarbeitet somit j,auch DH4-A4-Papier im Querformat.
+Leider waren Typenraddrucker bislang immer relativ teuer. Nicht so der Petal MA20 (Bild 1), er ist baugleich mit dem bekannten Juki 6100 Typenraddrucker, unterscheidet sich von diesem aber im Preis. Der Juki hat einen empfohlenen Verkaufspreis von zirka 1798 Mark. Der Petal MA 20 soll laut Liste 1498 Mark kosten. Er ist aber unserer Erfahrung nach noch um einiges günstiger zu haben. Der Petal MA20 ist ein Typenraddrucker, das heißt er besitzt im Gegensatz zu einer Schreibmaschine keine eigene Tastatur. Die Texteingabe und Drucksteuerung muß von einem Computer übernommen werden. Mit diesem Konzept sind natürlich Vor- und Nachteile verbunden. Hauptnachteil ist für den Commodore 64-Besitzer, daß keine Grafik- und Commodore-eigene Schriftzeichen ausdruckbar sind. Außerdem sind Typenraddrucker oft relativ langsam und laut (beim Petal zirka 62dBA). Der Vorteil des exzellenten Schriftbildes überwiegt diesen Nachteil aber dann bei weitem, wenn hauptsächlich Texte ausgedruckt werden. Durch Auswechseln der Triumph-Adler-kompatiblen Typenräder (100 Zeichen) steht eine enorme Anzahl der verschiedensten Schriftarten zur Verfügung. Wissenschaftliche Sonderzeichen, Schreibschrift und fremdsprachliche Schriften sind so innerhalb von Sekunden verfügbar. Aber auch das zum Drucker mitgelieferte Typenrad Caroll-Pica erlaubt schon einige Variationen der Schrift (Bild 2). Nicht vergessen wurde dabei die Unterstreichfunktion und die Fettschrift. Der Haupteinsatzbereich eines Druckers wie dem Petal MA20 ist sicherlich die Textverarbeitung. Mit einem guten Textverarbeitungsprogramm, wie dem Vizawrite 64 (das eine eigene Druckoption für den Petal/Juki hat), verwandelt sich die gute Stube in ein kleines Büro. Der Petal MA20 kann sowohl Einzelblatt-, als auch Endlospapier verarbeiten. Für unbeaufsichtigtes Drucken sind zusätzlich ein automatischer Einzelblatteinzug und ein Traktoraufsatz erhältlich. Für den normalen Betrieb genügt aber die Standard-Ausrüstung. Die aber kann sich sehen lassen: Die Druckgeschwindigkeit beträgt 18 Zeichen pro Sekunde bei bidirektionalem Druck. Sehr praktisch ist der sowohl hard- als auch softwaremäßig bestimmbare Zeichenabstand. Er beträgt entweder 10, 12 oder 15 Zeichen pro Zoll. In der Standardschrift können so bis zu 165 Zeichen in einer Zeile untergebracht werden. In der ebenfalls verfügbaren Proportionalschrift (automatischer Ausgleich der Zeichenabstände) sind sogar 220 Zeichen pro Zeile verfügbar. Damit ist auch gesagt, daß die Papierbreite bis zu 13 Inches (= 33 cm) betragen kann. Der Petal MA20 verarbeitet somit auch DIN-A4-Papier im Querformat.
 
 Die unumgängliche Wartezeit auf das fertige Schriftstück wird durch den eingebauten Pufferspeicher von 2 KByte (erweiterbar auf 8 KByte) angenehm verkürzt. Angeschlossen wird der Petal MA20 an den C 64/VC20 wie jeder andere Drucker mit Centronics-kompatibler Schnittstelle.
 
@@ -411,7 +412,7 @@ Ein guter Matrixdrucker kostete vor etwas mehr als einem Jahr noch ein halbes Ve
 
 Schon nach dem ersten Augenschein wirkt er sympathisch, ja man kann sogar von einem hübschen Gerät sprechen. Der Drucker ist kompakt aufgebaut. Das wurde vor allem durch den im Gehäuse versenkten Antriebsmechanismus für Einzelblätter und Endlospapier möglich. Der Vorteil dieses Konstruktionsprinzips liegt in dem auch für die beachtliche Druckgeschwindigkeit von 100 Zeichen pro Sekunde angenehmen Geräuschpegel. Der BMC BX100 wird in der Regel mit einer Centronics-kompatiblen Schnittstelle ausgeliefert. Es sind aber auch eine serielle Schnittstelle und, besonders interessant, eine Version zum direkten Anschluß an den Commodore 64/VC 20 erhältlich. Zum Test stand die Commodore-Version mit externem Interface zur Verfügung. Die ohnehin umfangreichen Druckfunktionen des BX100 werden durch das Commodore-Interface noch um einige Varianten erweitert. Dazu gehört auch der gesamte Commodore-Zeichensatz und die Cursor-Steuerzeichen. Sogar reverse Buchstaben sind enthalten. Die für jeden Programmierer besonders wichtigen Programmlistings werden komplett mit allen Grafikzeichen und den reversen Steuercodes ausgegeben. Der Drucker wird dabei kaum langsamer. Aber auch die Standardfunktionen des BX100 brauchen den Vergleich mit anderen Druckern nicht zu scheuen: Kursiv-Proportional-, Elite-, Schmal-, und Breitschrift sind mit einfachen ESC-Befehlen zu aktivieren (Bild 2).
 
-Befehle zur Formatierung des Textes, wie sie von jedem guten Textverarbeitungsprogramm vorausgesetzt werden, sind dem BX100 nicht unbekannt. Dazu gehören Funktionen wie das Anspringen bestimmter Tab-Positionen, das Setzen des linken und rechten Randes oder die Festlegung der Seitenlänge. Man kann sogar das Papier rückwärts transportieren. Das Druckbild kann zwar nicht mit einem Typenraddrucker verglichen werden, ist aber mit das Beste, was wir bei einem Matrixdrucker dieser Preisklasse bisher gesehen haben. Verglichen mit einem Epson FX80 ist das Schriftbild des BX100 sogar noch etwas besser. Verantwortlich für diese sehr guten Druckeigenschaften ist der Druckkopf, der mit seiner 9xll + 3sp Nadelmatrix üppig ausgestattet ist.
+Befehle zur Formatierung des Textes, wie sie von jedem guten Textverarbeitungsprogramm vorausgesetzt werden, sind dem BX100 nicht unbekannt. Dazu gehören Funktionen wie das Anspringen bestimmter Tab-Positionen, das Setzen des linken und rechten Randes oder die Festlegung der Seitenlänge. Man kann sogar das Papier rückwärts transportieren. Das Druckbild kann zwar nicht mit einem Typenraddrucker verglichen werden, ist aber mit das Beste, was wir bei einem Matrixdrucker dieser Preisklasse bisher gesehen haben. Verglichen mit einem Epson FX80 ist das Schriftbild des BX100 sogar noch etwas besser. Verantwortlich für diese sehr guten Druckeigenschaften ist der Druckkopf, der mit seiner 9x11 + 3sp Nadelmatrix üppig ausgestattet ist.
 
 Mit seinen zwei verschiedenen Nadeldichten kann der BX100 als voll grafikfähig bezeichnet werden, zumal das verwendete Interface diese Funktionen voll unterstützt. Zum Ausdruck des Textes oder der Grafik beträgt die einstellbare Papierbreite zwischen 4,5 und 10 Inches (11,43 bis 25,40 Zentimeter). Die Handgriffe für die Justage des Traktors sind einfach und als durchaus fingerfreundlich zu bezeichnen. Ebenso das Einlegen der Farbbandkassette. Das Eindrehen eines einzelnen Blattes ist Dank des leichtgängigen Drehknopfes und der sinnvollen Papierführung problemlos.
 
@@ -447,7 +448,7 @@ In dieser Übersicht der allgemeinen Befehle fehlt nur noch GMOVE. Damit ist ein
 
 Kommen wir als nächstes zu den selbstdefinierbaren Figuren. In einem Definitions-String muß angegeben sein, in welcher Richtung der Grafikcursor weiterbewegt, beziehungsweise wann ein Punkt gesetzt werden soll. Die so definierte Figur kann mit dem DRAW-Befehl an jeder Stelle des Bildschirms gezeichnet werden. Auch hier dürfen sämtliche oben angesprochene Optionen verwendet werden. Mit SCALE= können Sie vorher noch übergeben, mit welchem Vergrößerungsfaktor und um welchen Winkel gedreht ihre Figur erscheinen soll. Eine Anwendung sehen Sie in der Bildschirmaufnahme.
 
-Die nächste Gruppe von Befehlen sind die Farbbefehle. Mit COLOR = können, fürjeden der drei Bildschirme einzeln, Hintergrund- und Rahmenfarbe gesetzt werden. SCOL = bestimmt die Zeichenfarbe auf der gesamten entsprechenden Seite; sie kann mit PCOL= für einzelne Bildelemente abgeändert werden, um mehrfarbige Grafiken zu erhalten. Im Multicolor-Modus werden mit SCOL= auch die zwei zusätzlichen Farben angewählt.
+Die nächste Gruppe von Befehlen sind die Farbbefehle. Mit COLOR = können, für jeden der drei Bildschirme einzeln, Hintergrund- und Rahmenfarbe gesetzt werden. SCOL = bestimmt die Zeichenfarbe auf der gesamten entsprechenden Seite; sie kann mit PCOL= für einzelne Bildelemente abgeändert werden, um mehrfarbige Grafiken zu erhalten. Im Multicolor-Modus werden mit SCOL= auch die zwei zusätzlichen Farben angewählt.
 
 Dem Speichern und Laden von Grafiken dienen die Befehle GSAVE und GLOAD. Da das Format, in dem ihre Grafiken geladen oder gespeichert werden, frei wählbar ist, können Bilder der verschiedensten Malprogramme geladen und weiterverarbeitet werden. Dummerweise scheint es kein Einheitsformat zu geben, so daß Sie beim Speichern oder Laden immer eine Formatangabe machen müssen, was auf die Dauer ziemlich lästig ist.
 
@@ -655,7 +656,7 @@ Hier hätte Spinnaker ruhig mehr Fantasie aufbringen können, so daß auch Erwac
 
 Die Programmiersprache Comal ist keine ganz neue Sprache, wenngleich sie auch — ähnlich wie Forth — erst seit relativ kurzer Zeit in Europa kursiert. Comal (COMmon Algorithmic Language) wurde bereits 1973 von Borge R. Christensen und Benedict Loefstedt in Dänemark entwickelt, fand aber, wie viele andere Programmiersprachen, zunächst kein großes Echo. Ähnlich wie bei Forth bildeten sich aber bald in vielen Ländern nationale User-Groups, die sich für die Verbreitung und kontinuierliche Verbesserung der Sprache einsetzten.
 
-Das im 64'er Magazin, Ausgabe 8/84, besprochene Comal ist die Version 0.14, das auch als Grundlage für diesen Einführungskurs dient. Comal 2.0 ist um einiges schneller und ist ein 52 KByte langes Programm. Dabei sind mehr als 30 KByte frei für eigene Programme. Das Modul selbst enthält 64 KByte ROM. In Dänemark wird es für umgerechnet 600 Mark angeboten und istdort fast an allenSchulen im Einsatz. Ältere Comal-Versionen als 0.14 (zum Beispiel 0.12) verfügen unter Umständen über eine Reihe von Befehlen nicht. Umgekehrt ist die Version 0.14 gegenüber der kommerziellen Version 2.0 mit einigen Nachteilenbehaftet, zu denen vor allem der mit exakt 9902 Bytes nicht gerade üppig bemessene Speicherplatz gehört. Die Comal-Versionen 0.xx sind sogenannte »Public Domain Software«, dasheißt sie dürfen kopiert und weitergegeben, allerdings nicht kommerziell vertrieben werden. Der Sinn dieser auf den ersten Blick verblüffenden Freizügigkeit liegt in der gewünschten möglichst umfassenden Verbreitung der Sprache.
+Das im 64'er Magazin, Ausgabe 8/84, besprochene Comal ist die Version 0.14, das auch als Grundlage für diesen Einführungskurs dient. Comal 2.0 ist um einiges schneller und ist ein 52 KByte langes Programm. Dabei sind mehr als 30 KByte frei für eigene Programme. Das Modul selbst enthält 64 KByte ROM. In Dänemark wird es für umgerechnet 600 Mark angeboten und ist dort fast an allen Schulen im Einsatz. Ältere Comal-Versionen als 0.14 (zum Beispiel 0.12) verfügen unter Umständen über eine Reihe von Befehlen nicht. Umgekehrt ist die Version 0.14 gegenüber der kommerziellen Version 2.0 mit einigen Nachteilenbehaftet, zu denen vor allem der mit exakt 9902 Bytes nicht gerade üppig bemessene Speicherplatz gehört. Die Comal-Versionen 0.xx sind sogenannte »Public Domain Software«, das heißt sie dürfen kopiert und weitergegeben, allerdings nicht kommerziell vertrieben werden. Der Sinn dieser auf den ersten Blick verblüffenden Freizügigkeit liegt in der gewünschten möglichst umfassenden Verbreitung der Sprache.
 
 In letzter Zeit gewinnt Comal zunehmende Bedeutung als Alternative zur vergleichsweise primitiven Basic-Programmierung. Der Benutzer von Comal hat dabei gegenüber der Verwendung anderer Programmiersprachen den entscheidenden Vorteil, daß die Sprache stark an Basic angelehnt ist, daß aber die vielen Schwachpunkte von Basic überwunden wurden. Hinsichtlich des Konzeptes der strukturierten Programmierung wurden viele Anleihen bei Pascal gemacht, ohne jedoch dessen oft unnötig komplizierte und langatmige Sprachstruktur zu kopieren.
 
@@ -685,7 +686,7 @@ In Wirklichkeit ist Comal keins von beiden — oder beides zur Hälfte, je nach 
 
 Der Syntax-Check funktioniert im Prinzip recht einfach. Bei jeder eingegebenen Zeile wird zunächst überprüft, ob die Zeilennummer im erlaubten Bereich von 1 bis 9999 liegt. Anschließend wird getestet, ob eine Kommentarzeile vorliegt. Ein Kommentar wird in Comal allerdings nicht mit »REM« eingeleitet, sondern mit zwei Schrägstrichen. Jede Zeile, die mit »//« beginnt, wird daher nicht weiter beachtet. Alle anderen Zeilen durchlaufen jedoch die Routine »Text in Token wandeln«. Dabei wird ganz einfach überprüft, ob das erste Zeichen in der so codierten Zeile ein Token ist. Ein Token erkennt das Comal-System daran, daß in dem betreffenden Byte Bit 7 gesetzt ist; das funktioniert also völlig analog zu Basic.
 
-Ist das erste Zeichen einer Zeile also weder das Kommentarsymbol noch ein Token, dann wird ein Syntax-Fehler gemeldet. Des weiteren wird einfach die Anzahl der öffnenden und schließenden Klammern einer Zeile gezählt. Ergibt sich eine Ungleichheit, dann resultiert das in einer Fehlermeldung. Eine kontextabhängige Syntaxprüfung findet jedoch nicht statt, das heißt, daß die Eingabezeile in dieser ersten Phase ohne Bezugzum Rest des Programms überprüft wird.
+Ist das erste Zeichen einer Zeile also weder das Kommentarsymbol noch ein Token, dann wird ein Syntax-Fehler gemeldet. Des weiteren wird einfach die Anzahl der öffnenden und schließenden Klammern einer Zeile gezählt. Ergibt sich eine Ungleichheit, dann resultiert das in einer Fehlermeldung. Eine kontextabhängige Syntaxprüfung findet jedoch nicht statt, das heißt, daß die Eingabezeile in dieser ersten Phase ohne Bezug zum Rest des Programms überprüft wird.
 
 Sie können das Prinzip leicht selbst testen, indem Sie beispielsweise die folgende Zeile eintippen:
 100 print sqr(2)
@@ -739,7 +740,7 @@ Zur einfacheren Bedienung der Floppy ist in Comal der Befehl »PASS« vorgesehen
 
 Erheblich komfortabler als in Basic ist auch das Laden des Directory. Einfach »CAT« (für catalog) eingeben, und das Inhaltsverzeichnis der Diskette wird angezeigt, und zwar ohne das Programm zu zerstören.
 
-Neben »LOAD« und »SAVE« gibt es noch zwei weitere Lade- und Speicherbefehle. »LIST "name”« legt ein Comal-Programm als sequentielles File aufDiskette ab. Mit »ENTER "name” «wird ein solches sequentielles File wieder als Comal-Programm eingelesen.
+Neben »LOAD« und »SAVE« gibt es noch zwei weitere Lade- und Speicherbefehle. »LIST "name”« legt ein Comal-Programm als sequentielles File auf Diskette ab. Mit »ENTER "name” «wird ein solches sequentielles File wieder als Comal-Programm eingelesen.
 
 Was ist der Unterschied zwischen diesen beiden Formen des Abspeicherns? Die Antwort darauf mag der eine oder andere schon von Basic her kennen. Der Comal-Befehl »LIST "name"« hat die gleiche Wirkung wie die Basic-Befehlsfolge »OPEN 1,8,1, "name,s,w"« : CMD 1 : LIST : CLOSE 1«. Anschließend existiert in beiden Fällen auf der Diskette ein sequentielles File, das das entsprechende Basic- oder Comal-Programm als reine ASCII-Zeichenfolge, also ohne Token, enthält.
 
@@ -774,7 +775,7 @@ Das Programm unterstützt die Programmierung zweier voneinander völlig unabhän
 1.	Den normalen Textbildschirm
 2.	Den Grafikbildschirm auf dem die hochauflösende Grafik erscheint.
 
-Zwischen den beiden Bildschirmen können Sie mit der Funktionstast1 Fl hin- und herschalten. Der neue Befehl HIRES1 schaltet den Grafik-Bildschirm ein (HIRES 0 = ausschalten).
+Zwischen den beiden Bildschirmen können Sie mit der Funktionstaste F1 hin- und herschalten. Der neue Befehl HIRES1 schaltet den Grafik-Bildschirm ein (HIRES 0 = ausschalten).
 
 Im folgenden die Befehle im Einzelnen
 
@@ -865,7 +866,7 @@ Mit der Taste F5 wird der Cursor (der normale) in die obere linke Ecke des Textf
 
 ### JOYSTICK ve
 
-(ve=Verzogerung. Mit ve = 0 malt man am schnellsten, mit ve = 255 am langsamsten.)
+(ve=Verzögerung. Mit ve = 0 malt man am schnellsten, mit ve = 255 am langsamsten.)
 
 Dieser Befehl erlaubt das Zeichnen von Bildern mit dem Joystick (Port 2). Mit dem Joystick kann der Grafikcursor bewegt werden. Druckt man gleichzeitig den Feuerknopf, wird entsprechend dem eingestellten Modus ein Punkt gesetzt, gelöscht etc. Nun können beliebige Bilder gezeichnet werden, solange, bis mit der F7-Taste mit der Programmabarbeitung fortgefahren wird.
 
@@ -876,15 +877,6 @@ Dieser Befehl erlaubt das Zeichnen von Bildern mit dem Lightpen (Port 1). Ini Pr
 Alle Befehle können unabhängig vom Einschaltzustand des Grafikbildschirms angewendet werden. Sie lassen sich auch wie normale Basic-Befehle abkürzen.
 
 Die Funktionen und Anwendungen des Programms und seiner Befehle sind sehr gut in dem Programm »TURTLE DEMO« demonstriert (Listing 2).
-
-(Peter Menke/gk)
-
-Die drei auf Seite 49 genannten Möglichkeiten haben jedoch alle große Nachteile: Sie sind alle entweder zu langsam (1. und 3.), die Befehle lassen sich nur im Direktmodus anwenden (2.) oder sie können nicht abgekürzt werden. Deshalb wurden die Befehle mit sehr komplexen Routinen voll als Tokens integriert. Aus diesem Grund wurde die Interpreterschleife, die Routine zur Umwandlung in Interpretercode und die Routine zur Rückumwandlung in Klartext verändert. Die Vorteile dieser Arbeitsweise sind, daß sich die neuen Befehle wie normale Basic-Befehle anwenden lassen und daß nur minimale Geschwindigkeitsverluste bei der Ausführung von Basic-Programmen in Kauf genommen werden müssen. Ähnliche Methoden verwenden übrigens auch professionelle Basic-Erweiterungen, wie zum Beispiel Simons Basic.
-Ein solches »Anzapfen« von Betriebssystem- und Basic-Routinen wird beim C 64 durch zahlreiche Sprungvektoren ermöglicht, die verändert werden können. Dies ist leider nicht bei allen Computern so gut möglich. Die hier benutzten Vektoren sind:
-
-TODO
-
-Das Wissen über die Programmierung des Programms ist für dessen Anwendung nicht nötig. Doch nun viel Spaß mit Turtle Grafik.
 
 (Peter Menke/gk)
 
@@ -910,11 +902,19 @@ c) Das Textfenster:
 Wie Sie wissen, wird das Bild auf dem Fernseher (Monitor) durch einen Elektronenstrahl erzeugt, der den Bildschirm zeilenweise von oben nach unten abfährt. Der VIC bietet nun die Möglichkeit bei einer bestimmten Zeilenposition einen Interrupt auszulösen. Diese Fähigkeit des VIC wird ausgenutzt. In der dann ausgeführten Interruptroutine wird zwischen Hires- und Textmodus hin und her geschaltet, so daß der Bildschirm in ein Text und ein Grafikfenster eingeteilt wird.
 d) Die neuen Befehle:
 Es gibt zahlreiche Möglichkeiten, neue Basic-Befehle zu implementieren. Anzapfen der
+
 1. CHRGET-Routme (DOS 5.1)
 2. Eingabe-Warteschleife (Toolkits)
 3. Interpreterschleife (beschrieben im 64 Intern)
 
-TODO TODO TODO Fortsetzung auf Seite 55
+Die drei <!-- auf Seite 49 genannten --> Möglichkeiten haben jedoch alle große Nachteile: Sie sind alle entweder zu langsam (1. und 3.), die Befehle lassen sich nur im Direktmodus anwenden (2.) oder sie können nicht abgekürzt werden. Deshalb wurden die Befehle mit sehr komplexen Routinen voll als Tokens integriert. Aus diesem Grund wurde die Interpreterschleife, die Routine zur Umwandlung in Interpretercode und die Routine zur Rückumwandlung in Klartext verändert. Die Vorteile dieser Arbeitsweise sind, daß sich die neuen Befehle wie normale Basic-Befehle anwenden lassen und daß nur minimale Geschwindigkeitsverluste bei der Ausführung von Basic-Programmen in Kauf genommen werden müssen. Ähnliche Methoden verwenden übrigens auch professionelle Basic-Erweiterungen, wie zum Beispiel Simons Basic.
+Ein solches »Anzapfen« von Betriebssystem- und Basic-Routinen wird beim C 64 durch zahlreiche Sprungvektoren ermöglicht, die verändert werden können. Dies ist leider nicht bei allen Computern so gut möglich. Die hier benutzten Vektoren sind:
+
+TODO
+
+Das Wissen über die Programmierung des Programms ist für dessen Anwendung nicht nötig. Doch nun viel Spaß mit Turtle Grafik.
+
+(Peter Menke/gk)
 
 # Schachmeister
 
@@ -922,7 +922,7 @@ TODO TODO TODO Fortsetzung auf Seite 55
 
 Nach dem Start dös Programms muß man einen Augenblick warten, bis der Computer die neuen Multicolor-Zeichen definiert hat und diverse Felder und Listen aufgestellt hat (zirka 20 Sekunden). Darauf kann man eine der gespeicherten Partien auswählen und das Schachbrett baut sich auf.
 
-Am rechten Rand werden dieNamen der Spieler, das Jahr, die Zugnummer und der Zug sowie verschiedene Meldungen wie »Schach«, »Matt«, »Rochade« ... ausgegeben. Das Schachbrett nimmt zirka % des Bildschirms ein.
+Am rechten Rand werden die Namen der Spieler, das Jahr, die Zugnummer und der Zug sowie verschiedene Meldungen wie »Schach«, »Matt«, »Rochade« ... ausgegeben. Das Schachbrett nimmt zirka % des Bildschirms ein.
 
 Durch Drücken der F7-Taste nach einem Zug wird das Bild bis zu einem erneuten Tastendruck »eingefroren«. Durch Drücken einer anderen Taste nach einem Zug wird der Ablauf beschleunigt. Durch anhaltendes Drücken der Space-Taste kann man so eine Art »Blitzschach« erreichen. Nach Spielende führt ein Tastendruck wieder zum Auswahlmenü.
 
@@ -960,7 +960,7 @@ Das Programm:
 Der Computer spielt berühmte oder weniger berühmte Schachpartien vor, die man leicht selbst einprogrammieren kann, so daß man sich mit der Zeit eine richtige Sammlung aufbaut. Besonderer Wert wurde auf eine gute Multicolor-Grafik gelegt.
 Entstehungsgeschichte:
 
-Das Programm entstand aus einer spontanen ,Idee heraüs. In Büchereien findet man unzählige Bücher mit aufgeschriebenen Schachpartien, die manauf einem Brett nachspielen kann, was aber nicht unbedingt jedermanns Sache ist, und außerdem ist die Gefahr groß, daß man sich verschaut und einen Fehler macht. Da müßte es doch viel einfacher sein, wenn der Computer dies übernehmen würde. In zirka einwöchiger Arbeit entstand so das vorliegende Programm.
+Das Programm entstand aus einer spontanen Idee heraus. In Büchereien findet man unzählige Bücher mit aufgeschriebenen Schachpartien, die manauf einem Brett nachspielen kann, was aber nicht unbedingt jedermanns Sache ist, und außerdem ist die Gefahr groß, daß man sich verschaut und einen Fehler macht. Da müßte es doch viel einfacher sein, wenn der Computer dies übernehmen würde. In zirka einwöchiger Arbeit entstand so das vorliegende Programm.
 
 Wesentlich Merkmale und Vorzüge des Programms:
 – Multicolorgrafik, die sich zum Beispiel hinter »Grandmaster« nicht zu verstecken braucht.
@@ -1067,7 +1067,7 @@ M [ANFADR ENDADR]
 gibt die HEX-Werte des Speichers sowie die zugehörigen ASCII-Zeichen aus. Auch hier kann auf die Eingabe einer Endadresse verzichtet werden. Die Steuerung der Ausgabe entspricht der beim Disassemblieren.
 Beispiel:
 
-M 4000 gibt die Inhalte der Speicherstellen $4000 bis $4007 aus. Weiter geht es wie beim Disassemblieren mit SPACE oder RETURN. Die Bytes können ebenfalls durch Überschreiben geändert werden, allerdings nicht die ASCII-Zeichen. Verantwortlich dafür ist der Doppelpunkt, der am Anfang jeder Zeile ausgegeben wird, ein weiterer »hidden command«. WennJhre Änderung nicht durchgeführt werden kann, weil Sie zum Beispiel versuchen, ins ROM zu schreiben, wird ein »?« als Fehlermeldung ausgegeben.
+M 4000 gibt die Inhalte der Speicherstellen $4000 bis $4007 aus. Weiter geht es wie beim Disassemblieren mit SPACE oder RETURN. Die Bytes können ebenfalls durch Überschreiben geändert werden, allerdings nicht die ASCII-Zeichen. Verantwortlich dafür ist der Doppelpunkt, der am Anfang jeder Zeile ausgegeben wird, ein weiterer »hidden command«. Wenn Ihre Änderung nicht durchgeführt werden kann, weil Sie zum Beispiel versuchen, ins ROM zu schreiben, wird ein »?« als Fehlermeldung ausgegeben.
 
 ### Registeranzeige
 
@@ -1083,7 +1083,7 @@ Wir wollen jetzt einen Blick auf das Programm selbst werfen. Natürlich ist es u
 
 Zum besseren Verständnis werden solche Routinen so abgedruckt, wie wir sie im Assembler-Quelltext geschrieben haben. Sie enthalten daher anstelle absoluter Adressen Labels, deren Name — hoffentlich — etwas über den Sinn und Zweck aussagt. Parallel dazu sollten Sie sich diese Routinen von SMON disassemblieren lassen, damit Sie sehen, wie es denn nun fertig im Speicher aussieht.
 
-Beginnen wir mit der Routine GETCHRERR. Das soll soviel bedeuten wie »Hole ein Zeichen und erzeuge eine Fehlermeldung, wenn keins eingegeben wurde«. Leider wäre so ein Label auch für den geduldigsten Assembler viel zu lang, daher die merkwürdige Abkürzung. Mit dieser Routine holen wir ein Zeichen von derTastatur. Das erledigt die Betriebssystemroutine CHRIN. Um zu prüfen, ob überhaupt etwas eingegeben wurde, untersuchen wir das Zeichen. Handelt es sich um die »RETURN«-Taste ($0D), hat der Benutzer gar kein Zeichen eingegeben. Dies quittiert SMON mit einem »?« und dem Rücksprung in den Eingabemodus. So läßt sich — in gewissen Grenzen — kontrollieren, ob zu einem Befehl die richtigen Eingaben gemacht wurden. Geben Sie einmal den »D«-Befehl ohne Angabe einer Adresse ein, dann sehen Sie, was gemeint ist.
+Beginnen wir mit der Routine GETCHRERR. Das soll soviel bedeuten wie »Hole ein Zeichen und erzeuge eine Fehlermeldung, wenn keins eingegeben wurde«. Leider wäre so ein Label auch für den geduldigsten Assembler viel zu lang, daher die merkwürdige Abkürzung. Mit dieser Routine holen wir ein Zeichen von der Tastatur. Das erledigt die Betriebssystemroutine CHRIN. Um zu prüfen, ob überhaupt etwas eingegeben wurde, untersuchen wir das Zeichen. Handelt es sich um die »RETURN«-Taste ($0D), hat der Benutzer gar kein Zeichen eingegeben. Dies quittiert SMON mit einem »?« und dem Rücksprung in den Eingabemodus. So läßt sich — in gewissen Grenzen — kontrollieren, ob zu einem Befehl die richtigen Eingaben gemacht wurden. Geben Sie einmal den »D«-Befehl ohne Angabe einer Adresse ein, dann sehen Sie, was gemeint ist.
 
 Alle Eingaberoutinen benutzen GETCHRERR, um Falscheingaben zu prüfen. Nehmen wir als Beispiel GETBYT. Diese soll ein Byte, also zwei ASCII-Zeichen 0 - F von der Tastatur holen und in ein Byte umwandeln. Das erste Zeichen wird darauf überprüft, ob es sich um ein »Space« oder ein Komma handelt. Trifft das zu, wird es einfach übergangen und das nächste Zeichen geholt. Der Benutzer kann also Leerzeichen und Komma benutzen, um seine Eingaben übersichtlicher zu machen, er muß aber nicht! Ist das Zeichen aber gültig, wird es von ASCHEX in eine Hexzahl gewandelt.
 Dazu ein Beispiel:
@@ -1094,7 +1094,7 @@ Meistens aber braucht SMON zwei Bytes als Eingabe, zum Beispiel für Adressen. M
 
 Sie sehen, wie aus einfachen Routinen immer kompliziertere Befehle zusammengesetzt werden. Und das ist das ganze Geheimnis, wenn Sie umfangreiche Programme schreiben: Gliedern Sie sich das Problem (hier eine benutzerfreundliche Eingabe) in kleine und kleinste Schritte auf, die Sie dann jeden für sich programmieren und austesten.
 
-Werfen wir noch einen Blick auf die Art und Weise, wie SMON Befehle verarbeitet. In EXECUTE setzen wir zunächst den Stackpointer auf den Wert, den er beim letzten BRK erreicht hatte. Dann werden als erstes die »hidden commands« abgeprüft. Wir lesen dazu direkt vom Bildschirm. D3 enthält die Anfangsadresse der aktuellen Zeile im Speicher. Übrigens gibt es neben den bereits erwähnten noch weitere »hidden commands«, die in den späteren Folgen noch auftauchen werden. Liegt kein verstecktes Kommando vor, holen wir mit GETCHRERR ein Zeichen und merken es uns in COMMAND. Jetzt untersuchen wir, ob dieses Zeichen in der Befehlsliste (CMDTBL) steht. CMDTBL steht übrigens ab $C00B ganz oben im Speicher. Sie endet mit fünf Nullen für spätere Erweiterungen. Direkt dahinter stehen die Anfangsadressen der zugehörigen Routinen in derfürden 6502 typischen Reihenfolge, Low-Byte zuerst, dann High-Byte. Sehen Sie sich das mit M C00B einmal an. Am Ende dieser Tabelle stehen nochmals 10 Nullen, denn zu jedem Byte in CMDTBL gehören ja zwei Adreßbytes in der Liste (CMDS). Wenn nun ein Kommando in CMDSEARCH gefunden wurde, wird CMDEXEC als Subroutine aufgerufen. CMDEXEC legt nun die zugehörigen Adreßbytes auf den Stack und führt dann einen RTS aus, der jetzt — nach der Stackmanipulation — zu dem gewünschten Befehl führt. Beachten Sie, daß RTS immer auf die um eins erhöhte Adresse springt, daher müssen Sie zu den Adressen in CMDS immer 1 addieren, wenn Sie den Anfang einer Routine suchen.
+Werfen wir noch einen Blick auf die Art und Weise, wie SMON Befehle verarbeitet. In EXECUTE setzen wir zunächst den Stackpointer auf den Wert, den er beim letzten BRK erreicht hatte. Dann werden als erstes die »hidden commands« abgeprüft. Wir lesen dazu direkt vom Bildschirm. D3 enthält die Anfangsadresse der aktuellen Zeile im Speicher. Übrigens gibt es neben den bereits erwähnten noch weitere »hidden commands«, die in den späteren Folgen noch auftauchen werden. Liegt kein verstecktes Kommando vor, holen wir mit GETCHRERR ein Zeichen und merken es uns in COMMAND. Jetzt untersuchen wir, ob dieses Zeichen in der Befehlsliste (CMDTBL) steht. CMDTBL steht übrigens ab $C00B ganz oben im Speicher. Sie endet mit fünf Nullen für spätere Erweiterungen. Direkt dahinter stehen die Anfangsadressen der zugehörigen Routinen in der für den 6502 typischen Reihenfolge, Low-Byte zuerst, dann High-Byte. Sehen Sie sich das mit M C00B einmal an. Am Ende dieser Tabelle stehen nochmals 10 Nullen, denn zu jedem Byte in CMDTBL gehören ja zwei Adreßbytes in der Liste (CMDS). Wenn nun ein Kommando in CMDSEARCH gefunden wurde, wird CMDEXEC als Subroutine aufgerufen. CMDEXEC legt nun die zugehörigen Adreßbytes auf den Stack und führt dann einen RTS aus, der jetzt — nach der Stackmanipulation — zu dem gewünschten Befehl führt. Beachten Sie, daß RTS immer auf die um eins erhöhte Adresse springt, daher müssen Sie zu den Adressen in CMDS immer 1 addieren, wenn Sie den Anfang einer Routine suchen.
 
 Alle Befehle in SMON enden mit einem RTS, springen also auf den JMP EXECUTE hinter CMDFOUND. Damit ist eine Endlosschleife geschlossen, die immer einen Befehl ausführt und anschließend wieder in die Eingabe zurückspringt. Beim nächsten Mal erfahren Sie etwas über LOAD, SAVE und die Umrechnung verschiedener Zahlensysteme.
 
@@ -1135,7 +1135,7 @@ Das Hauptprogramm ist sehr anwenderfreundlich: Es geht kein Basic-Speicherplatz 
 1.	Im Menü finden Sie »INIT DISK«. Damit ist nicht »initialisieren« sondern formatieren gemeint. Trotzdem: Bei Disketten, die mit Koala formatiert wurden, ging jeder zweite Versuch, ein Bild zu laden schief: Dabei stieg dann jedesmal der Computer aus, so daß nicht nur das Bild verloren war, sondern man Koala neu laden mußte, und so weiter.
 2.	Ich habe bereits des öfteren gelesen, daß die Handhabung im ZOOM-Modus so schwierig sein soll. Mein Vorschlag: Setzen Sie den Pfeil an die richtige Stelle und drücken Sie dann kurz auf die Taste oben. Auf diese Weise kann man punktweise (ebenfalls sehr schnell in lauter Einzelpunkt-Aktionen) und extrem akkurat arbeiten!
 3.	Wenn Sie ein größeres Stück sauber »radieren« wollen (was durch DRAW mit Hintergrundfarbe leicht ist), dann hilft Ihnen ZOOM ebenfalls: »Radieren« Sie mit ZOOM erst die Ränder mit dem feinsten »Pinsel«, dann können Sie mit einem breiten »Pinselstrich« den Mittelteil schnell wegmalen!
-4.	Wenn Sie etwas Riskantes ausprobieren wollen, was möglicherweise Ihr Bild kaputtmachen müßte (erst »radieren«, dann das Neue zeichnen, dann erst sehen, ob es Ihnen gefällt), dann rate ich Ihnen: Kopieren Sie das gesamte Bild per COPY (dem ein SWAP vorausgehen muß) auf den zweiten Bildschirm. Jetzt können Sie nach Herzenslust experimentieren, denn Ihr Bild existiertja noch »im Original« auf der anderen Grafikseite.
+4.	Wenn Sie etwas Riskantes ausprobieren wollen, was möglicherweise Ihr Bild kaputtmachen müßte (erst »radieren«, dann das Neue zeichnen, dann erst sehen, ob es Ihnen gefällt), dann rate ich Ihnen: Kopieren Sie das gesamte Bild per COPY (dem ein SWAP vorausgehen muß) auf den zweiten Bildschirm. Jetzt können Sie nach Herzenslust experimentieren, denn Ihr Bild existiert ja noch »im Original« auf der anderen Grafikseite.
 
 So, jetzt hoffe ich nur noch, daß Sie in Zukunft noch mehr Spaß mit Koala haben werden.
 
@@ -1149,7 +1149,7 @@ So, jetzt hoffe ich nur noch, daß Sie in Zukunft noch mehr Spaß mit Koala habe
 
 Das Programm (Listing 1) ist nicht mehr zu erweitern, es können also auch keine REM-Zeilen mehr eingefügt werden. Es sieht zwar als Listing nicht sehr umfangreich aus, jedoch mußte das Basic-Ende heruntergesetzt werden, um das Maschinenprogramm, den neuen Zeichengenerator und den Speicherplatz, in dem wir später unsere Ersatzbilder speichern, vor Überschreibung zu schützen. Die Erzeugung von Grafik beim VC 20 beruht ja darauf, die Zeichen auf dem Bildschirm, die aus 88 Punkten aufgebaut sind, in ihrem Aufbau zu ändern. Bei einem Zeichen hieße es, 8 Byte gegen 8 andere auszutauschen. Bei 9 Zeichen (das ist die Zeichenanzahl, mit der »Lanterna Magica« arbeitet) werden es 7 2 Byte. Versuchte man das Problem mit Basic zu lösen, müßte man bei jedem Tauschvorgang eine Zählschleife von 1 bis 72 mit einigen POKEs dazwischen in Kauf nehmen. So etwas kann Action-Spiele ganz schön langsam machen. Ich habe diese Routine daher in Maschinensprache geschrieben. So genügt ein SYS-Aufruf, und 9 Zeichen auf dem Bildschirm ändern sofort ihre Form.
 
-Ausgeführt werden kann derTausch nur, wenn der Zeichengenerator nicht wie üblich im ROM liegt. Das ist also die erste Aufgabe des Maschinenprogramms. Es legt den Zeichengenerator ins RAM ab $1COO(entspricht dezimal 7168). Danach holt es sich aus dem Reserve-Bildschirmspeicher ($1A00 bis $1BFF, dezimal 6656 bis 7167) die ersten 72 Byte und legt sie im Bildschirmspeicher ab. Das ist zunächst alles. Beim nächsten Aufruf verfährt es mit den folgenden 72 Byte in gleicher Weise. Das geht siebenmal so, danach werden wieder die ersten 72 Byte geholt und so weiter.
+Ausgeführt werden kann der Tausch nur, wenn der Zeichengenerator nicht wie üblich im ROM liegt. Das ist also die erste Aufgabe des Maschinenprogramms. Es legt den Zeichengenerator ins RAM ab $1COO(entspricht dezimal 7168). Danach holt es sich aus dem Reserve-Bildschirmspeicher ($1A00 bis $1BFF, dezimal 6656 bis 7167) die ersten 72 Byte und legt sie im Bildschirmspeicher ab. Das ist zunächst alles. Beim nächsten Aufruf verfährt es mit den folgenden 72 Byte in gleicher Weise. Das geht siebenmal so, danach werden wieder die ersten 72 Byte geholt und so weiter.
 
 Wichtig ist, daß vor jedem Aufruf in die Speicher $FB und $FC (dezimal 251 und 252) ein Wert von maximal 7 gePOKEt wird. An diesem Wert erkennt das Maschinenprogramm, wievielmal es die Bilder austauschen soll, bis es wieder beim ersten beginnt. Das bedeutet, daß man auch »Filme« mit nur drei Bildern laufen lassen kann, indem man den Wert 3 in diese Speicher POKEt.
 
@@ -1217,7 +1217,7 @@ ILLEGAL QUANTITY, DIVISION BY ZERO, OVERFLOW Bei anderen Fehlerursachen bricht d
 40 FPLOTSQR(X)
 Das Programm schaltet die hochauflösende Grafik ein, löscht den Grafikbildschirm, zeichnet die Koordinatenachsen und plottet die Funktion. Alle neuen Befehle des Programms können übrigens wie die normalen Basic-Befehle über die Shift-Taste abgekürzt werden.
 
-Zum Schluß noch ein Tip: Es gibt Funktionen, die in der Hauptsache in einem Bereich verlaufen, der nicht innerhalb der Koordinaten liegt, die für den FPLOT-Befehl vorgesehen sind. In diesem Fall wird einfach auf den PLOT-Befehl zurückgegriffen. Ein kleines Basic-Programm plottet unter Verwendung dieses Befehls auch solche Funktionen problemlos. In diesem Fall ist außerdem die Benutzung des ONERROR-Befeh|s sinnvoll.
+Zum Schluß noch ein Tip: Es gibt Funktionen, die in der Hauptsache in einem Bereich verlaufen, der nicht innerhalb der Koordinaten liegt, die für den FPLOT-Befehl vorgesehen sind. In diesem Fall wird einfach auf den PLOT-Befehl zurückgegriffen. Ein kleines Basic-Programm plottet unter Verwendung dieses Befehls auch solche Funktionen problemlos. In diesem Fall ist außerdem die Benutzung des ONERROR-Befehls sinnvoll.
 
 Hier noch Hinweise zum Eintippen und Abspeichern beziehungsweise Laden des Programms. Vor dem Eingeben des Basic-Quellprogramms werden die folgenden Befehle eingegeben, die den Anfang des Basic-Speicherbereichs nach oben verschieben:
 POKE44,16:POKE4096,0:NEW
@@ -1255,7 +1255,7 @@ Zunächst ein paar Worte zum Bildschirmformat: Es entspricht weitgehend der norm
 
 Es ist empfehlenswert, für die Vorder- und Hintergrundfarbe Farben aus verschiedenen Helligkeitsstufen zu wählen, da man sonst auf farblosen Monitoren nicht viel sehen kann...
 
-40 µs der Rasterzeile werden für das eigentliche Bild benützt. Bei derTaktfrequenz (desVIC) von zirka8MHz ergeben sich 512 Punkte auf der ganzen Rasterzeile, was mit der horizontalen Auflösung der Positionen der Sprites übereinstimmt. Aus den 64 µs ergibt sich eine Zeilenfrequenz von 15625 Hz, die für das unangenehme Pfeifen verantwortlich ist, das man beijedem Bildschirm hören kann, sofern man noch gute Ohren hat. Das horizontale Scrolling ist übrigens sehr einfach zu verwirklichen. Statt dem ganzen Bild wird kurzerhand der Synchronisationsimpuls und das durch den Rand gebildete »Fenster« verschoben.
+40 µs der Rasterzeile werden für das eigentliche Bild benützt. Bei der Taktfrequenz (desVIC) von zirka8MHz ergeben sich 512 Punkte auf der ganzen Rasterzeile, was mit der horizontalen Auflösung der Positionen der Sprites übereinstimmt. Aus den 64 µs ergibt sich eine Zeilenfrequenz von 15625 Hz, die für das unangenehme Pfeifen verantwortlich ist, das man bei jedem Bildschirm hören kann, sofern man noch gute Ohren hat. Das horizontale Scrolling ist übrigens sehr einfach zu verwirklichen. Statt dem ganzen Bild wird kurzerhand der Synchronisationsimpuls und das durch den Rand gebildete »Fenster« verschoben.
 
 Das vertikale Format ist folgendermaßen aufgebaut:
 4 Zeilen Schwarz, damit man den Strahlrücklauf nicht sieht
@@ -1331,7 +1331,7 @@ Der freie Bereich wird nun vollständig von dem Maschinenspracheprogramm gebrauc
 
 TODO
 
-Die Pseudo-Sprites sollten eine Auflösung von 16 x 16 Punkten haben, das sind 256 Punkte oder 4 Zeichen im freidefinierbaren Zeichensatz (Bild 1). Damitaberein 16 x 16 Punkte großes Zeichen jede Position auf dem Bildschirm einnehmen kann, braucht man eine 24 x 24 Punkte große Umdefinier-Matrix, in die das Zeichen hineinkopiert wird. Das Aussehen dieser Umdefinier-Matrix ist in Bild 2 zu sehen. Das Programm übernimmt nun die Aufgabe, das Zeichen in die Umdefinier-Matrix zu kopieren (Bild 3), in die richtige X-Position zu schieben (Bild 4), und dasselbe mit der Y-Position zu tun.
+Die Pseudo-Sprites sollten eine Auflösung von 16 x 16 Punkten haben, das sind 256 Punkte oder 4 Zeichen im freidefinierbaren Zeichensatz (Bild 1). Damit aber ein 16 x 16 Punkte großes Zeichen jede Position auf dem Bildschirm einnehmen kann, braucht man eine 24 x 24 Punkte große Umdefinier-Matrix, in die das Zeichen hineinkopiert wird. Das Aussehen dieser Umdefinier-Matrix ist in Bild 2 zu sehen. Das Programm übernimmt nun die Aufgabe, das Zeichen in die Umdefinier-Matrix zu kopieren (Bild 3), in die richtige X-Position zu schieben (Bild 4), und dasselbe mit der Y-Position zu tun.
 
 Außerdem werden die Zeichen, die später auf dem Bildschirm von den Sprites verdeckt werden, mit in die Umdefinier-Matrix hineinkopiert. So entsteht der Eindruck, daß die Sprites wirklich über die Zeichen wandern. Beim späteren Löschen werden die verdeckten Zeichen wieder hergestellt. Wie funktioniert das nun?
 
@@ -1339,7 +1339,7 @@ Im Speicher ab dezimal 4608 ist 9mal (für jedes Sprite einer) der sogenannte Sp
 
 TODO
 
-Die Basisadresse des SCB errechnet sich somit aus der Formel Basisadresse = 4608 + Spritenummer x 22. Das Zwischenspeichern und die Auswertung der Parameter übernimmt natürlich das Maschinenprogramm. Über den SCB werden auch im nachfolgend beschriebenen Programm »Sprite-Definer« die Sprites initialisiert und deren Farbe festgelegt. Da nur die oberen 128 Zeichen des Zeichensatzes für die Sprites verwendet werden, hat man eine ausreichende Anzahl von noch frei definierbaren Zeichen, nämlich genau 128, zur Verfügung. Außerdem kommenjeweils 13 Zeichen, nämlich 4 für das Sprite und 9 für die Umdefinier-Matrix hinzu, wenn man auf ein Sprite verzichtet. Die Matrixen werden im Speicher so abgelegt:
+Die Basisadresse des SCB errechnet sich somit aus der Formel Basisadresse = 4608 + Spritenummer x 22. Das Zwischenspeichern und die Auswertung der Parameter übernimmt natürlich das Maschinenprogramm. Über den SCB werden auch im nachfolgend beschriebenen Programm »Sprite-Definer« die Sprites initialisiert und deren Farbe festgelegt. Da nur die oberen 128 Zeichen des Zeichensatzes für die Sprites verwendet werden, hat man eine ausreichende Anzahl von noch frei definierbaren Zeichen, nämlich genau 128, zur Verfügung. Außerdem kommen jeweils 13 Zeichen, nämlich 4 für das Sprite und 9 für die Umdefinier-Matrix hinzu, wenn man auf ein Sprite verzichtet. Die Matrixen werden im Speicher so abgelegt:
 
 TODO
 
@@ -1374,9 +1374,9 @@ Sicherlich kann das Maschinenspracheprogramm noch weiter verbessert werden. So w
 
 Sprite 0 setzen, Sprite 1 setzen,..., Sprite n setzen. Hiernach die Berechnungen für die neuen Positionen durchführen.
 
-Sprite n l0schen,.Sprite n-1 löschen,..., Sprite 0 löschen. Danach Vorgang von oben wiederholen.
+Sprite n löschen,.Sprite n-1 löschen,..., Sprite 0 löschen. Danach Vorgang von oben wiederholen.
 
-Noch eins zum »Sprite-Definer«: Die erste REM-Zeile muß aufjeden Fall mit 16 Sternchen eingegeben werden, da sich das Programm später mit POKEs selbst verändert und andernfalls, wäre die REM-Zeile kürzer, die folgende Zeile in Mitleidenschaft ziehen würde. Doch nun wünsche ich allen, die das Programm eintippen, viel Spaß und vielleicht ein bißchen C 64-Feeling.
+Noch eins zum »Sprite-Definer«: Die erste REM-Zeile muß auf jeden Fall mit 16 Sternchen eingegeben werden, da sich das Programm später mit POKEs selbst verändert und andernfalls, wäre die REM-Zeile kürzer, die folgende Zeile in Mitleidenschaft ziehen würde. Doch nun wünsche ich allen, die das Programm eintippen, viel Spaß und vielleicht ein bißchen C 64-Feeling.
 
 (Markus Leberecht/ev)
 
@@ -1416,7 +1416,7 @@ Dies ist möglich, da alle Commodore-Computer mit einem Tastaturpuffer arbeiten.
 
 In der vorherigen Programmerweiterung wurde in der Zeile 160 der Wert 3 eingePOKEt. Der Computer meint anschließend, es seien drei Tastatureingaben erfolgt. Die POKE-Befehle in der Zeile 170 simulieren die Eingabesequenz HOME, RETURN, RETURN. Nach dem Programmende vergißt der Computer diese untergeschobenen Eingaben keineswegs, sondern führt sie nachträglich aus.
 
-Aus derZeit des legendären PET 2001 stammt noch die Bezeichnung »selbsterhaltendes Programm«. Naja, aberso hatte das Kind wenigstens einen Namen.
+Aus der Zeit des legendären PET 2001 stammt noch die Bezeichnung »selbsterhaltendes Programm«. Naja, aber so hatte das Kind wenigstens einen Namen.
 
 Leider hat das beschriebene Verfahren den Nachteil, daß der Computer, sobald er sich selbst die Zeile einprogrammiert, die Variablen löscht. Aus diesem Grund müssen Sie wichtige Werte vor dem Programmabbruch durch POKE sichern und beim Neustart mit PEEK zurückholen. In dem vorherigen Testprogramm wurde beispielsweise der Zähler für die Zeilennummer mit der Adresse 2 weiter gegeben.
 
@@ -1539,7 +1539,7 @@ Anhand der vielseitigen Hardware des Commodore 64 wollen wir nun einmal den Schl
 
 Wenn Sie Ihren C 64 einschalten, und der Cursor blinkt, dann haben Sie bereits einen Interrupt erzeugt. Es handelt sich dabei um eine gezielte Programmunterbrechung, die auf ein bestimmtes Ereignis fixiert ist, so zum Beispiel den Inhalt einer Speicherstelle. Tritt der erwünschte Zustand ein, so räumt die Hardware diesem Vorgang Priorität vor allen anderen Aufgaben ein. Gleich was der Computer im Augenblick macht, er wird unverzüglich seine Tätigkeit einstellen und ein spezielles Unterprogramm abarbeiten, das ihm zuvor als Interruptroutine deklariert wurde. Im Betriebssystem-ROM befindet sie sich von Adresse $EA31 (dezimal 59953) bis $ECB8 (60600). Hier wird etwa 60mal in jeder Sekunde geprüft, ob eine — und falls ja, welche — Taste gedrückt wurde; hier wird das Blinken des Cursors erzeugt und der Motor der Datasette ein- oder ausgeschaltet. Wenn der Interrupt beendet ist, setzt der Computer die Bearbeitung des laufenden Programms exakt an der Stelle fort, an der er sich vor Eintritt des Interrupts gerade befand. Gewöhnlich merkt man von solchen Intermezzi nichts, weil der Prozessor eine ungeheure Geschwindigkeit entwickelt, deren Arbeitstakte sich bereits im Bereich von Mikrosekunden (millionstel Sekunden) bewegen.
 
-Noch eine andere Einrichtung der von Ihnen benutzten Geräte ist mit extremer Schnelligkeit ausgestattet: Der Elektronenstrahl, der vor Ihren Augen 25mal in jeder Sekunde ein neues Bild auf die Mattscheibe zeichnet. Nach diesen grundsätzlichen Überlegungen wollen wir aus solchen Voraussetzungen einen Wettstreit der Systeme entwickeln und den Computer gegen den flotten Strahl antreten lassen. Unglaublich, werden Sie jetzt wahrscheinlich sagen, aber warten Sie ab! Möglich ist das nämlich, weil der für die Bildorganisation zuständige Video-Interface-Controller (VIC) stets genau darüber »im Bild« ist, welche Rasterzeile des Monitorbildes augenblicklich geschrieben wird. Das ist die Bedingung dafür, daß auf dem Schirm auch ein Bild im geordneten Zusammenhang wiedergegeben wird. Der VIC, dessen Register unter den Adressen 53248 ($D000) bis 53294 ($D02E) erreichbar sind, führtin derSpeicherzelle 53266 ($D012) Buch über die jeweilige Zeilennummer. Darüber war schon einmal zu lesen, daß es unsinnig wäre, dort etwas hineinzuschreiben, weil man den Elektronenstrahl der Bildröhre gar nicht steuern könne. Und das ist nur zum Teil richtig, denn steuern können wir den Strahl nicht, wohl aber können wir ihn steuern lassen.
+Noch eine andere Einrichtung der von Ihnen benutzten Geräte ist mit extremer Schnelligkeit ausgestattet: Der Elektronenstrahl, der vor Ihren Augen 25mal in jeder Sekunde ein neues Bild auf die Mattscheibe zeichnet. Nach diesen grundsätzlichen Überlegungen wollen wir aus solchen Voraussetzungen einen Wettstreit der Systeme entwickeln und den Computer gegen den flotten Strahl antreten lassen. Unglaublich, werden Sie jetzt wahrscheinlich sagen, aber warten Sie ab! Möglich ist das nämlich, weil der für die Bildorganisation zuständige Video-Interface-Controller (VIC) stets genau darüber »im Bild« ist, welche Rasterzeile des Monitorbildes augenblicklich geschrieben wird. Das ist die Bedingung dafür, daß auf dem Schirm auch ein Bild im geordneten Zusammenhang wiedergegeben wird. Der VIC, dessen Register unter den Adressen 53248 ($D000) bis 53294 ($D02E) erreichbar sind, führtin der Speicherzelle 53266 ($D012) Buch über die jeweilige Zeilennummer. Darüber war schon einmal zu lesen, daß es unsinnig wäre, dort etwas hineinzuschreiben, weil man den Elektronenstrahl der Bildröhre gar nicht steuern könne. Und das ist nur zum Teil richtig, denn steuern können wir den Strahl nicht, wohl aber können wir ihn steuern lassen.
 
 Dafür ist besagtes Register — wie übrigens viele andere auch — mit einer Doppelfunktion ausgerüstet. Abhängig von der jeweiligen Zugriffsart, Lesen oder Schreiben (PEEK oder POKE), erreicht man unter derselben Hausnummer verschiedene Adressaten. Wird das Register gelesen, so erfährt man die gerade bearbeitete Rasterzeile, wird es beschrieben, bleibt der übermittelte Wert gespeichert und dient dem internen Vergleich, ob er mit der aktuellen Zeile identisch ist. Wenn dieser Fall eintritt, so reagiert die Hardware selbständig darauf und erzeugt einen Interrupt — falls ein solcher vorgesehen war. Zuvor muß dem Computer nämlich noch mitgeteilt werden, daß dies ein Interruptauslöser sein soll. Die Anmeldestelle ist die Adresse 53274 ($D01A), das Interrupt-Masken-Register.
 
@@ -1555,13 +1555,13 @@ Und dann ist da noch der bereits genannte CIA-Interrupt, der von einem gleich do
 
 Der Timer ist ein 16-Bit-Zählregister, das nach dem Starten ohne weiteres Zutun mit einer konstanten Geschwindigkeit dekrementiert, das heißt jeweils um 1 abwärts gezählt wird. Durch die zuvor beim VIC schon erwähnte Doppelfunktion besteht die Möglichkeit, den Timer ab einem bestimmten Wert zählen zu lassen: Lesen der Adresse 56324 ($DC04) liefert den aktuellen Stand des Lowbytes, Hineinschreiben den Startwert des Timers, ebenso beim Highbyte unter der Adresse 56325. Auf diese Weise wird der Systeminterrupt erzeugt, da der Computer in der Initialisierungsphase den Timer mit dem Wert 16421 ( = 37 low und 64 high) lädt. Wenn derTimerüber Null hinauszählt und damit einen sogenannten Unterlauf erzeugt, wird das durch Setzen des Bits 0 im lnterrupt-Control-Register 56333 ($DC0D) signalisiert. Auch dieses arbeitet wieder doppelt: Lesen ergibt die Interruptanforderung, ein Schreibzugriff erzeugt die Maske, die darüber entscheidet, welches Ereignis Interruptauslöser sein soll. Besondere Beachtung beim Beschreiben des Registers verdient Bit 7, das darüber bestimmt, ob die nachfolgend gesetzten Bits 6 bis 0 in der Maske gesetzt oder gelöscht werden. Alle übrigen bleiben unangetastet. Deshalb löscht 127 (Bit 7 nicht gesetzt!) im Demo-Programm sämtliche Maskenbits (siehe Bitmuster im Assembler-Listing, Zeile 1010), deshalb setzt 129 (Bitmuster 10000001) das Bit 0 der Maske und schaltet damit auf Interrupt durch den Timer. Erzeugen Sie doch einmal im Direktmodus auf dem Bildschirm ein längeres Zählintervall durch Heraufsetzen des Timer-Highbytes: POKE 56325, 255 läßt den Cursor sehr träge werden, POKE 56325, 5 versetzt ihn in nervöses Flattern.
 
-Dieser Timer besitzt einen Zwillingsbruder mit den Adressen 56326 und 56327, der nicht nur gleichartig konstruiert ist und ebenfalls eigenständig einen Interrupt auf Bit 1 des Control-Registers erzeugen kann, sondern sich auch mit dem Timer A koppeln läßt. Beide Timer können nämlich auf verschiedene Taktquellen gelegt, unterschiedlich getriggert werden. Im Demo-Programm nutzen wir das aus, indem wir Timer A Systemtakte zählen lassen (Bit 5 des Registers 56334 gelöscht — Standardeinstellung), Timer B hingegen nur die Unterläufe von Timer A durch Setzen des Bits 6 im Register 56335. Dadurch erhalten wir einen 32-Bit-Zähler, der beliebige Zeitverzögerungen ermöglicht, eleganter als mitjeder ausschließlich softwaremäßig realisierten Warteschleife, weil die Timer von keinem Interrupt unterbrochen werden.
+Dieser Timer besitzt einen Zwillingsbruder mit den Adressen 56326 und 56327, der nicht nur gleichartig konstruiert ist und ebenfalls eigenständig einen Interrupt auf Bit 1 des Control-Registers erzeugen kann, sondern sich auch mit dem Timer A koppeln läßt. Beide Timer können nämlich auf verschiedene Taktquellen gelegt, unterschiedlich getriggert werden. Im Demo-Programm nutzen wir das aus, indem wir Timer A Systemtakte zählen lassen (Bit 5 des Registers 56334 gelöscht — Standardeinstellung), Timer B hingegen nur die Unterläufe von Timer A durch Setzen des Bits 6 im Register 56335. Dadurch erhalten wir einen 32-Bit-Zähler, der beliebige Zeitverzögerungen ermöglicht, eleganter als mit jeder ausschließlich softwaremäßig realisierten Warteschleife, weil die Timer von keinem Interrupt unterbrochen werden.
 
 In der Warteschleife des Demo-Programms (Listing ab Zeile 9010), die als Subroutine angelegt ist, wird mit den Timern kein Interrupt erzeugt, sondern lediglich eine Zeitverzögerung erzielt. Dazu wird zunächst Timer B mit den vom Hauptprogramm im Akku und im Y-Register übergebenen Werten geladen, während Timer A konstant mit einem mittleren Wert arbeitet. Dann werden beide gestartet durch Setzen des Bits 0 im Register 56334 für Timer A und 56335 für Timer B. Aus Zeile 9030 des Listings ist ersichtlich, daß Bit 3 für Timer A gelöscht ist, was Continuous- oder Dauerbetrieb zur Folge hat. Jedesmal, wenn der Timer einen Unterlauf hat, lädt er umgehend wieder den zwischengespeicherten Startwert und beginnt erneut zu zählen. Den anderen schalten wir hingegen auf One-Shot (Zeile 9050), einen »Einzelschuß«. Bei einem Unterlauf lädt er zwar wieder den Startwert, bleibt aber stehen, wodurch sein Start/Stoppbit automatisch gelöscht wird. Wir prüfen dies, indem wir Bit 0 logisch nach rechts ins Carry verschieben, wo es bequem mit einem Branchbefehl untersucht werden kann. Erst der One-Shot-Betrieb des Timers B stellt sicher, daß ein Unterlauf auch erkannt wird, weil er im Dauerbetrieb vorübergehen könnte, während sich der Prozessor im Interrupt befindet. Außerdem verlangt ein gesetztes Bit 4 in der Warteschleife für beide Timer Force-Load, einen unbedingten Ladevorgang. Unabhängig davon, ob der Timer gerade läuft oder nicht, wird der Startwert geladen. Mit einem gelöschten Bit 4 kommt ein neuer Startwert erst dann zum Tragen, wenn er nach dem nächsten Unterlauf geladen wird.
 
 Neben den Unterläufen der beiden Timer kann das Control-Register 56333 auf Bit 2 auch einen Interrupt erzeugen bei Übereinstimmung der Echtzeituhr 56328 bis 56331 mit einer vorgewählten Alarmzeit, auf Bit 3 durch ein volles oder leeres Schieberegister (56332) und auf Bit 4 durch den Impuls einer externen Signalquelle. Ein gesetztes Bit 7 zeigt hier an, daß mindestens eines der gesetzten Bits auch in der Maske gewählt ist, also ein Interrupt stattfindet. Das Interrupt-Flag wird aber bereits durch Lesen des Registers gelöscht.
 
-Diese Kurzabhandlung vermag nur ansatzweise darzustellen, wie flexibel das Instrumentarium ist, das hier dem Anwender zur Verfügung steht. Speziell die zahlreichen Interruptmöglichkeiten verlangen geradezu nach Anwendung, wobei wir abschließend auf eine bisher nicht erwähnte noch zu sprechen kommen müssen. Denn das Demo-Programm läuft in einer Endlosschleife, die nicht ohne weiteres abgebrochen werden kann. Außerdem wirdja durch den lahmgelegten Systeminterrupt ohnehin kein Tastendruck mehr erkannt. Den Ausweg aus diesem Dilemma, haben die Konstrukteure geschaffen, als sie den sogenannten NMI erfanden. Das ist die Abkürzung für nicht maskierbarer Interrupt, eine hardwareseitige Unterbrechungsmöglichkeit mit so hoher Priorität, daß selbst ein gesetztes Interruptflag keine Rolle spielt. Wir können den NMI auslösen, indem wir die STOP-Taste gedrückt halten und gleichzeitig auf die RESTORE-Taste klopfen. Und schon ist alles wieder normal: Bild und Interrupt. Sie können zwar gleich wieder mitSYS49152 ins Demo-Programm starten, doch vielleicht lassen Sie sich selbst einmal etwas einfallen. Nur zu — unterbrechen Sie doch Ihren Commodore 64 bitte mal ...
+Diese Kurzabhandlung vermag nur ansatzweise darzustellen, wie flexibel das Instrumentarium ist, das hier dem Anwender zur Verfügung steht. Speziell die zahlreichen Interruptmöglichkeiten verlangen geradezu nach Anwendung, wobei wir abschließend auf eine bisher nicht erwähnte noch zu sprechen kommen müssen. Denn das Demo-Programm läuft in einer Endlosschleife, die nicht ohne weiteres abgebrochen werden kann. Außerdem wird ja durch den lahmgelegten Systeminterrupt ohnehin kein Tastendruck mehr erkannt. Den Ausweg aus diesem Dilemma, haben die Konstrukteure geschaffen, als sie den sogenannten NMI erfanden. Das ist die Abkürzung für nicht maskierbarer Interrupt, eine hardwareseitige Unterbrechungsmöglichkeit mit so hoher Priorität, daß selbst ein gesetztes Interruptflag keine Rolle spielt. Wir können den NMI auslösen, indem wir die STOP-Taste gedrückt halten und gleichzeitig auf die RESTORE-Taste klopfen. Und schon ist alles wieder normal: Bild und Interrupt. Sie können zwar gleich wieder mitSYS49152 ins Demo-Programm starten, doch vielleicht lassen Sie sich selbst einmal etwas einfallen. Nur zu — unterbrechen Sie doch Ihren Commodore 64 bitte mal ...
 
 (Helmut Welke/aa)
 
@@ -1582,13 +1582,13 @@ FIND durchsucht ein Basic-Programm nach bestimmten Befehlen oder Zeichenfolgen u
 
 Im folgenden bedeutet »CTRL+Com«, daß die CTRL- und die Commodore-Taste gleichzeitig gedrückt werden.
 
-CTRL+Com R:RELOCATE; rückgängig machen des NEW-Befehls. Diese Routine istbesonders nützlich, wenn ein Reset-Schalter existiert, da bei einem Reset ein Basic-Programm nicht zerstört wird, sondern wie bei NEW nur die ersten beiden Bytes auf Null gesetzt werden. Falls der Computer sich also mal beim Aufruf eines fehlerhaften Maschinenprogramms »aufhängt«, kann nach Reset, SYS 25600 und Drücken von CTRL+Com R ohne Verlust des Basic-Programms weitergemacht werden.
+CTRL+Com R:RELOCATE; rückgängig machen des NEW-Befehls. Diese Routine ist besonders nützlich, wenn ein Reset-Schalter existiert, da bei einem Reset ein Basic-Programm nicht zerstört wird, sondern wie bei NEW nur die ersten beiden Bytes auf Null gesetzt werden. Falls der Computer sich also mal beim Aufruf eines fehlerhaften Maschinenprogramms »aufhängt«, kann nach Reset, SYS 25600 und Drücken von CTRL+Com R ohne Verlust des Basic-Programms weitergemacht werden.
 
 Auch nach einem »LOAD-ERROR« kann nach RELOCATE das falsch geladene Programm gelistet werden.
 
 CTRL+Com S: Kopiert die Zeiger auf den Basic-Programmstart, die Variablen, Arrays und Strings und die ersten 65 Byte des Basic-Programms in den (hoffentlich) geschützten Bereich, in dem sich die Betriebssystemerweiterung befindet.
 
-CTRL+Com+RETURN-Taste: Umkehrfunktion von CTRL +Com S
+CTRL+Com+RETURN-Taste: Umkehrfunktion von CTRL+Com S
 
 Falls ein Programm gelöscht und anschließend im Direktmodus mit Variablen gearbeitet wurde, dann ist der Anfang des gelöschten Programms zerstört. Das Programm kann nicht mit RELOCATE repariert werden. Wurde aber vorher zu irgendeinem Zeitpunkt, an dem das zerstörte Programm noch existierte, CTRL+Com S gedrückt, dann steht das Programm nach Betätigen von CTRL+COM+RETURN-Taste wieder mit allen Variablen, Arrays und Strings so zur Verfügung, wie zum Zeitpunkt des Kopierens.
 CTRL+Com —: BEEP aus
@@ -1621,7 +1621,7 @@ Obwohl nur 8 KByte im Basic-Speicher verbraucht werden, ist Simons Basic eine 16
 
 Bei MEM (dem Befehl zum Kopieren des Original-ZeichenROMs ins RAM und dessen Einschalten) liegt der Zeichensatz ab $E000 (57344) im RAM unter dem Kernal, der Bildschirm von nun an ab $CC00 (52224), die Sprite-Pointer ab $CFF8 (53240) und die Sprites von $C000-$C3FF (49152-50175).
 
-Bei HIRES und MULTI (den Grafik- und Farbgrafik-Modi) liegt der Grafik-Speicher unter dem Kernalim RAM ($EOOO-$FFFF, 57344-65535), der Farbspeicher ab $C000 (49152), und Sprites finden sich in den Blocks 48-63 (ab $CC00, 52224). Man sieht also, daß $COOO-CFFF (49152-53247) laufend belegt sind und kleine Maschinenroutinen höchstens in Sprite-Speichern plaziert werden können.
+Bei HIRES und MULTI (den Grafik- und Farbgrafik-Modi) liegt der Grafik-Speicher unter dem Kernal im RAM ($EOOO-$FFFF, 57344-65535), der Farbspeicher ab $C000 (49152), und Sprites finden sich in den Blocks 48-63 (ab $CC00, 52224). Man sieht also, daß $COOO-CFFF (49152-53247) laufend belegt sind und kleine Maschinenroutinen höchstens in Sprite-Speichern plaziert werden können.
 
 Hier erst einmal Beanstandungen zur Beschreibung einiger Befehle:
 
@@ -1680,7 +1680,7 @@ Dieses kleine Porgramm bewirkt Wunder:
 
 Weshalb? Im Betriebssystem gibt es ein Unterprogramm, welches die 8topp-Taste abfragt. Das Programm liegt zwischen 63213 ($ F6ED) und 63226 ($ F6FA). Die Anfangsadresse dieser Routine ist in den Speicherzellen 808 und 809 gespeichert; und zwar Low-Byte vor High-Byte. Nun wird diese Routine regelmäßig aufgerufen. Ist die Stopp-Taste gedrückt worden, so veranlaßt diese Routine — abgesehen von ein paar anderen Instruktionen —, daß das Zeroflag gesetzt wird. Wurde die Stopp-Taste aber nicht gedrückt, so löscht dieses Unterprogramm das Zeroflag. Wenn die Speicherzellen 808 und 809 so verändert werden, daß zu einer Routine gesprungen wird, die immer das Zeroflag löscht, dann wird nie das Drücken der Stopp-Taste erkannt. Dieses geschieht durch unser kleines Programm, welches eine Routine in den Kassettenpuffer schreibt.
 
-Haben wir für kritische Programmteile die Stopp-Taste unterdrückt, können wirjene wieder durch den Befehl
+Haben wir für kritische Programmteile die Stopp-Taste unterdrückt, können wir jene wieder durch den Befehl
 200 POKE 808,237 : POKE 809,246
 aktivieren.
 
@@ -1883,7 +1883,7 @@ Diese Routine liest die Zero-Page Adressen 18 und 19, in denen die entsprechende
 b)	Der MEMORYWRITE-Befehl (M-W):
 
 Dieses Kommando kann als POKE-Befehl in den Floppy-Speicher angesehen werden. Die Syntax ist hier wie folgt:
-PRINT#fn,"M-W";CHR$(adl)CHR$ (adh)CHR$(n)CHR$(datal)CHR$(data2)...
+PRINT#fn,"M-W";CHR$(adl)CHR$ (adh)CHR$(n)CHR$(data1)CHR$(data2)...
 
 c)	Der MEMORY-EXECUTE-Befehl (M-E):
 
@@ -1911,11 +1911,11 @@ Wir wollen uns für diese Folge von Ihnen verabschieden, nicht ohne Sie dringend
 
 In der letzten Folge haben wir die ersten Assembler-Befehle kennengelernt und wissen, wie man sie benutzt und was sich im Computer dabei tut. Die Zahlen der Assembler-Alchimisten haben uns einige Geheimnisse enthüllt, obwohl sie für die Zweifingerlinge und die Sechzehnfingerlinge gedacht sind. Die Binärzahlen können wir schon zusammenzählen. Heute werden Sie eine Reihe weiterer Assembler-Befehle kennenlernen und noch ein weiteres Zahlensystem. Wir ergründen das Geheimnis der negativen Zahlen und machen uns die Funktion der Flaggen zunutze.
 
-Wir haben nun auch einen sehr brauchbaren Assembler für den C 64: Den SMON, dessen 1. Teil in dieser Ausgabe abgedruckt ist. Künftig wird in dieser Serie die SMON-Syntax verwendet und kein Basic-Lader mehr angegeben. Außerdem hat in Ausgabe 9 die Serie »Der gläserne VC 20« begonnen, so daß sich der Schwerpunkt hier mehr auf den C 64 verlagert. Das sollte aber die VC 20-Fans nicht davon abhalten, diesen Kurs weiter zu verfolgen, denn bis auf gelegentliche Adreß-änderungen ist fast alles für sie verwendbar.
+Wir haben nun auch einen sehr brauchbaren Assembler für den C 64: Den SMON, dessen 1. Teil in dieser Ausgabe abgedruckt ist. Künftig wird in dieser Serie die SMON-Syntax verwendet und kein Basic-Lader mehr angegeben. Außerdem hat in Ausgabe 9 die Serie »Der gläserne VC 20« begonnen, so daß sich der Schwerpunkt hier mehr auf den C 64 verlagert. Das sollte aber die VC 20-Fans nicht davon abhalten, diesen Kurs weiter zu verfolgen, denn bis auf gelegentliche Adreßänderungen ist fast alles für sie verwendbar.
 
 ### Eine Zauberformel der Assembler-Alchimisten: INX, INY, INC, DEX, DEY, DEC?
 
-Wir wissen ja schon, daß man diese »Zauberformeln« entzaubern kann. INX heißt einfach »increment X-Register«, also Inhalt des X-Registers um 1 erhöhen. Es wird Ihnen sicher einleuchten, daß INY dasselbe mit dem Y-Register tut. Etwas weniger deutlich ist das bei INC. Das bedeutet »increment memory«, also zähle zum Inhalt einer Speicherstelle eins dazu. INX und INY enthalten alles, was dem Computer zu sagen ist, sind also offensichtlich l-Byte-Befehle mit der in der letzten Folge schon kennengelernten impliziten Adressierung. Bei INC muß dem Computer noch gesagt werden, welche Speicherstelle er um 1 erhöhen soll. Es gehört also noch eine Adresse dazu. Das läßt diesen Befehl im allgemeinen zu einem 3-Byte-Befehl werden.
+Wir wissen ja schon, daß man diese »Zauberformeln« entzaubern kann. INX heißt einfach »increment X-Register«, also Inhalt des X-Registers um 1 erhöhen. Es wird Ihnen sicher einleuchten, daß INY dasselbe mit dem Y-Register tut. Etwas weniger deutlich ist das bei INC. Das bedeutet »increment memory«, also zähle zum Inhalt einer Speicherstelle eins dazu. INX und INY enthalten alles, was dem Computer zu sagen ist, sind also offensichtlich 1-Byte-Befehle mit der in der letzten Folge schon kennengelernten impliziten Adressierung. Bei INC muß dem Computer noch gesagt werden, welche Speicherstelle er um 1 erhöhen soll. Es gehört also noch eine Adresse dazu. Das läßt diesen Befehl im allgemeinen zu einem 3-Byte-Befehl werden.
 
 ## Befehle zum Zählen
 
@@ -2211,7 +2211,7 @@ Jetzt möchte ich noch einen kleinen Einblick in die Speicherorganisation geben,
 
 Bei Erweiterungen von mehr als 8 KByte verändert sich die Lage des Bildschirm- und Farbspeichers (die Einstellung nimmt die Reset-Routine vor). Anhand von Bild 3 soll erläutert werden, warum eine Verschiebung notwendig ist.
 
-Der **V**ideo-**I**nterface-**C**hip VIC (daher auch der Englische Name des VC 20), der vor allem fürdie Erzeugung des Fernsehsignals und den Aufbau des Bildschirmes verantwortlich ist, kann hardwaremäßig nur Videospeicherplätze zwischen 4096 und 8192 adressieren. Folglich muß das Bildschirm-RAM in diesem Bereich angesiedelt werden.
+Der **V**ideo-**I**nterface-**C**hip VIC (daher auch der Englische Name des VC 20), der vor allem für die Erzeugung des Fernsehsignals und den Aufbau des Bildschirmes verantwortlich ist, kann hardwaremäßig nur Videospeicherplätze zwischen 4096 und 8192 adressieren. Folglich muß das Bildschirm-RAM in diesem Bereich angesiedelt werden.
 
 In der Grundversion liegt es zwischen Adresse 7680 und 8191 — also am Ende des verfügbaren Speichers, damit der Speicherbereich für Basic auch bei eingesteckter 3 KByte-Erweiterung durchgängig ist (läge der Bildschirmspeicher sowie bei einer 8-KByte-Erweiterung, währe dies nicht der Fall).
 
@@ -2249,7 +2249,7 @@ SYS0 O – (Off) schaltet die Funktionstasten ab
 SYS0 R – (Restart) schaltet die Funktionstasten wieder ein.
 SYS0,X, »befehl« – belegt die X-te Funktionstaste mit einem Befehl.
 
-Zum Schluß kommen wir noch zu einem Thema, mit dem ich mich mehr an den fortgeschrittenen Maschinensprachenprogrammierer wenden möchte. Im ersten Teil dieser Serie wurde beschrieben, wie der Basic-Befehlssatz mit Hilfe der CHRGET-Routine und des Befehles »π« im beschränktem Umfang erweitert werden kann. Diese Methode hat allerdings viele Unzulässigkeiten; es sind beispielsweise keine verkürzten Befehle wie beim normale nBasic (LIST = L SHIFT I) möglich.
+Zum Schluß kommen wir noch zu einem Thema, mit dem ich mich mehr an den fortgeschrittenen Maschinensprachenprogrammierer wenden möchte. Im ersten Teil dieser Serie wurde beschrieben, wie der Basic-Befehlssatz mit Hilfe der CHRGET-Routine und des Befehles »π« im beschränktem Umfang erweitert werden kann. Diese Methode hat allerdings viele Unzulässigkeiten; es sind beispielsweise keine verkürzten Befehle wie beim normalen Basic (LIST = L SHIFT I) möglich.
 
 Nun soll beschrieben werden, wie der Basic-Befehlssatz um richtige Klartextkommandos erweitert werden kann. Auch hierfür müssen wir bestehende Interpreterroutinen, die über Vektoren angesprungen werden, umgehen beziehungsweise ergänzen.
 
@@ -2271,11 +2271,11 @@ ausgedruckt. Hier ist genügend Platz vorgesehen, damit der Text nach eigenen W�
 
 Die sich jetzt anschließenden Programmteile sind die oben erwähnten Ergänzungen zu den Interpreterroutinen. Dies sind teilweise Kopien aus den alten ROM-Routinen mit Ergänzungen für die neuen Basic-Kommandos. Die Befehlswörter müssen jetzt nur noch eingetragen werden. Das geschieht folgendermaßen:
 
-Die Befehle werden mit Hilfe des Programms »Tokenerzeuger« (Listing 5) in den entsprechenden Adreßbereich geschrieben. Bei nachträglichen Eintragungen ist zu beachten, daß zum letzten Buchstaben jedes Befehlswortes der Wert $80 (=128) zu addieren ist. Die Ergänzungsbefehle beginnen mit Token 204. Das erste Befehlswort beginnt mit dieser Nummer, der zweite erhält automatisch die 205 undso weiter.
+Die Befehle werden mit Hilfe des Programms »Tokenerzeuger« (Listing 5) in den entsprechenden Adreßbereich geschrieben. Bei nachträglichen Eintragungen ist zu beachten, daß zum letzten Buchstaben jedes Befehlswortes der Wert $80 (=128) zu addieren ist. Die Ergänzungsbefehle beginnen mit Token 204. Das erste Befehlswort beginnt mit dieser Nummer, der zweite erhält automatisch die 205 und so weiter.
 
 Weiterhin ist für jedes Kommando die Sprungadresse in der Tabelle ($2208-$2268) zu vermerken. Dabei muß die Reihenfolge Low-/High Byte beachtet werden. Außerdem muß das LOW-Byte vor dem Eintrag um eines dekrementiert werden (LOW Byte -1). Auch diese Arbeit erledigt das Programm in Listing 5.
 
-Ein Befehl wurde bereits eingetragen. Der Befehl KILL führt einen Reset durch und damit ist das Programm abgeschaltet. Wer also seine Maschinenprogramme ins Basic einbihden möchte, kann dies mit der beschriebenen Methode tun. Beispielsweise könnte man die in Listing 2 abgedruckte Funktionstastenroutine mit dem KEY-Befehl belegen. Auch im Hinblick auf Grafik, Tonerzeugung oder Joystickabfrage bietet sich hier die Möglichkeit, die Unzulänglichkeiten des Basics zu überwinden. Auch die Besitzer eines C 64 können die beschriebene Routine benutzen, da die Basic-ROMs nahezu identisch sind (sie haben lediglich eine andere Adresse). Außerdem habe ich in Tabelle 3 eine Liste der wichtigsten Unterprogramme zusammengestellt, mit denen man unter anderem Parameter, Strings, Kommas oder ähnliches abfragen kann. Auf jeden Fall sollte man sich für diese Arbeit ein ROM-Listing (zum Beispiel »VC 20 Intern« von Data Becker) zulegen.
+Ein Befehl wurde bereits eingetragen. Der Befehl KILL führt einen Reset durch und damit ist das Programm abgeschaltet. Wer also seine Maschinenprogramme ins Basic einbinden möchte, kann dies mit der beschriebenen Methode tun. Beispielsweise könnte man die in Listing 2 abgedruckte Funktionstastenroutine mit dem KEY-Befehl belegen. Auch im Hinblick auf Grafik, Tonerzeugung oder Joystickabfrage bietet sich hier die Möglichkeit, die Unzulänglichkeiten des Basics zu überwinden. Auch die Besitzer eines C 64 können die beschriebene Routine benutzen, da die Basic-ROMs nahezu identisch sind (sie haben lediglich eine andere Adresse). Außerdem habe ich in Tabelle 3 eine Liste der wichtigsten Unterprogramme zusammengestellt, mit denen man unter anderem Parameter, Strings, Kommas oder ähnliches abfragen kann. Auf jeden Fall sollte man sich für diese Arbeit ein ROM-Listing (zum Beispiel »VC 20 Intern« von Data Becker) zulegen.
 
 Damit möchte ich für heute schließen. Das nächste Mal werden wir sehen, was man mit den Kernal-Vektoren anfangen kann und betrachten die Grafikmöglichkeiten beim VC 20.
 
@@ -2328,7 +2328,7 @@ Hinweise: Diesen drei Adressen des VC 20 entsprechen beim C 64 die Adressen 784 
 
 Hand aufs Herz: Haben Sie USR schon einmal benützt? Ohne Zweifel gehört dieser Befehl zu den seltenen. Ich will ihn daher hier kurz erläutern. USR hat dieselbe Funktion wie SYS, nämlich aus einem Basic-Programm direkt in ein Maschinenprogramm zu springen und dort solange weiterzufahren, bis mit dem Befehl RTS (entspricht dem Basic-Befehl RETURN) in das Basic-Programm zurückgesprungen wird. Die Sprungadresse in das Maschinenprogramm steht bei SYS gleich hinter dem Befehl.
 
-Bei USR muß die Adresse zuerst in die Speicherzellen 1 und 2 (aha!!) ge-POKEt werden.
+Bei USR muß die Adresse zuerst in die Speicherzellen 1 und 2 (aha!!) gePOKEt werden.
 Beispiel — Sprung auf 56524 ($DCCC):
 mit SYS: SYS 56524
 mit USR: POKE 1,204:POKE 2,220:X = USR(Y)
@@ -2456,7 +2456,7 @@ Wenn Basic im RAM steht, können wir das ändern:
 POKE 46991,5
 Die Wiederholung des Befehls PRINT ASC("") ergibt jetzt 0 — und, was das Wichtige ist, das Programm läuft weiter.
 
-Durch zusätzliches Umladen des Speicherblocks E und anschließendes Umschälten mit POKEl,53 ist auch das Betriebssystem veränderbar — ein weites Feld für fortgeschrittene Programmierer in Maschinensprache.
+Durch zusätzliches Umladen des Speicherblocks E und anschließendes Umschalten mit POKE1,53 ist auch das Betriebssystem veränderbar — ein weites Feld für fortgeschrittene Programmierer in Maschinensprache.
 
 Die wohl wichtigste Anwendung der Umschaltmethode wird den Maschinen-Programmierern geboten, die dadurch eine kostenlose Speichererweiterung von 16 KByte erhalten. Bei gleichzeitiger Verwendung von Basic und Maschinenprogramm kann die Umschaltung besonders vorteilhaft eingesetzt werden. Das Umschaltprogramm muß dann aber ebenfalls in Maschinensprache geschrieben sein und darf nicht im Umschaltbereich liegen.
 
@@ -2540,7 +2540,7 @@ Tja, wäre da nicht jemand aus dem großen Bekanntenkreis des jungen Fotografen 
 
 Anfangs diente dieses heute schon antiquare Gerät nur zum Daddeln. Wer die eher einfachen bis langweiligen Spiele aus dieser Ära noch kennt, kann sich leicht vorstellen, daß bald mehr gefragt war. So machte Dirk Franke seine ersten Tapser in Basic. Und obwohl die grafischen Fähigkeiten dieses Modells noch nicht einmal bescheiden zu nennen waren, faszinierte ihn die Möglichkeit, mit einem solchen Gerät Bilder, wenn auch sehr primitive, erzeugen zu können.
 
-Anders als die mit seiner Fotokamera geschossenen, hatten diese Bilder von sich aus schon ein gewisses Eigenleben, das man mit der herkömmlichen Fotografie erst mühsam und kreativ erzeugen mußte. Einen ersten Gehversuch, dieses für den Fotografen völlig neue Medium auch beruflich zu nutzen, zeigt das Cover für die Single »Letric Metric« von Peter Griffin (Bild 1), für den er das Titelbild vor nun fast dreiJahren knipste.
+Anders als die mit seiner Fotokamera geschossenen, hatten diese Bilder von sich aus schon ein gewisses Eigenleben, das man mit der herkömmlichen Fotografie erst mühsam und kreativ erzeugen mußte. Einen ersten Gehversuch, dieses für den Fotografen völlig neue Medium auch beruflich zu nutzen, zeigt das Cover für die Single »Letric Metric« von Peter Griffin (Bild 1), für den er das Titelbild vor nun fast drei Jahren knipste.
 
 Der TRS-80 verließ einige Tage später samt dem Bekannten wieder das Studio. Aber von nun an war es klar, ein Computer mußte her. Es vergingen zwar noch ein paar Monate, doch dann war der C 64 und mit ihm bis dahin in dieser Preisklasse ungekannte grafische Möglichkeiten auf dem Markt.
 
@@ -2898,7 +2898,7 @@ MICROSOUND ist für den Commodore C 64 entwickelt. Das Programm wird mit RUN ges
 Tips zur Eingabe dieses Programms:
 
 1. Schalten Sie vor der Eingabe durch SHIFT/COMM. auf Kleinschrift.
-2. Geben Sie ? statt print und sY4(Pfeil n. oben)5 statt syslO24 ein und verzichten Sie auf unnötige Leerzeichen.
+2. Geben Sie ? statt print und sY4(Pfeil n. oben)5 statt sys1O24 ein und verzichten Sie auf unnötige Leerzeichen.
 3. SPACEs bitte ohne COMM. oder SHIFT-Tasten zu drücken eingeben. Ausnahme: Das letzte SPACE muß ein SHIFT/SPA-CE sein.
 4. Achten Sie genau auf Groß- und Kleinschreibung! Das Programm kann beim kleinsten Tippfehler abstürzen!
 
@@ -3016,7 +3016,7 @@ YOU ASK FUNNY QUESTIONS
 
 ## C 64 und Floppy schneller gemacht
 
-Während das HYPRA-LOAD in Ausgabe 10/84 eine reine Software-Lösung war, werden jetzt Systeme vorgestellt, die zusätzlich auch Hardware benötigen. Dabei beschränkt man sich nicht nur darauf, die schnellermachende Software aufEPROMs zu brennen, sondern die Daten werden nun parallel transportiert. Doch wie ist es mit der Kompatibilität bestellt? Ist der Drucker ansprechbar? Lohnt sich also eine Umrüstung?
+Während das HYPRA-LOAD in Ausgabe 10/84 eine reine Software-Lösung war, werden jetzt Systeme vorgestellt, die zusätzlich auch Hardware benötigen. Dabei beschränkt man sich nicht nur darauf, die schnellermachende Software auf EPROMs zu brennen, sondern die Daten werden nun parallel transportiert. Doch wie ist es mit der Kompatibilität bestellt? Ist der Drucker ansprechbar? Lohnt sich also eine Umrüstung?
 
 ## Kreuzworträtsel-Wettbewerb
 
