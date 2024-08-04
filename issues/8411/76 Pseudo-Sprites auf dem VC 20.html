@@ -1,66 +1,87 @@
-<h1>Pseudo-Sprites auf dem VC 20</h1>
+<!DOCTYPE html>
+<html lang="de">
 
-<p class="intro">Der VC 20 kennt von Haus aus leider nicht die freibeweglichen Grafikobjekte des C 64, die sogenannten Sprites. Das bedeutet aber nicht, daß man auf die Vorteile der Sprites oder MOBs gänzlich verzichten muß.</p>
+<head>
+    <title>XXX</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="XXX">
+    <meta name="64er.issue" content="11/84">
+    <meta name="64er.pages" content="999">
+    <meta name="64er.id" content="XXX">
+</head>
 
-<p>Das Programm ist für den VC 20 mit 8 KByte Speichererweiterung konzipiert. Es läuft jedoch mit einigen Änderungen auch bei nur 3 KByte Speichererweiterung.</p>
+<body>
+    <article>
 
-<p>Vor dem Eintippen oder Laden muß man POKE 44,32:POKE 8192,0: NEW eingeben, womit der Basic-Anfang im Speicher auf die Adresse dezimal 8193 ($2001) erhöht wird. Somit ergibt sich folgende Speicheraufteilung:<br/>
-4096 — 4607 Bildschirm<br/>
-4608 — 8191 frei<br/>
-8192 — 16383 (bei + 8 KByte) Basic-Programmspeicher<br/>
-8192 — 24575 (bei + 16 KByte) Basic-Programmspeicher<br/>
-8192 — 32767 (bei + 24 KByte) Basic-Programmspeicher</p>
+        <h1>Pseudo-Sprites auf dem VC 20</h1>
 
-<p>Der freie Bereich wird nun vollständig von dem Maschinenspracheprogramm gebraucht. Die Aufteilung des Speicherraums ist die folgende:</p>
+        <p class="intro">Der VC 20 kennt von Haus aus leider nicht die freibeweglichen Grafikobjekte des C 64, die sogenannten Sprites. Das bedeutet aber nicht, daß man auf die Vorteile der Sprites oder MOBs gänzlich verzichten muß.</p>
 
-<p>TODO</p>
+        <p>Das Programm ist für den VC 20 mit 8 KByte Speichererweiterung konzipiert. Es läuft jedoch mit einigen Änderungen auch bei nur 3 KByte Speichererweiterung.</p>
 
-<p>Die Pseudo-Sprites sollten eine Auflösung von 16 x 16 Punkten haben, das sind 256 Punkte oder 4 Zeichen im freidefinierbaren Zeichensatz (Bild 1). Damit aber ein 16 x 16 Punkte großes Zeichen jede Position auf dem Bildschirm einnehmen kann, braucht man eine 24 x 24 Punkte große Umdefinier-Matrix, in die das Zeichen hineinkopiert wird. Das Aussehen dieser Umdefinier-Matrix ist in Bild 2 zu sehen. Das Programm übernimmt nun die Aufgabe, das Zeichen in die Umdefinier-Matrix zu kopieren (Bild 3), in die richtige X-Position zu schieben (Bild 4), und dasselbe mit der Y-Position zu tun.</p>
+        <p>Vor dem Eintippen oder Laden muß man POKE 44,32:POKE 8192,0: NEW eingeben, womit der Basic-Anfang im Speicher auf die Adresse dezimal 8193 ($2001) erhöht wird. Somit ergibt sich folgende Speicheraufteilung:<br />
+            4096 — 4607 Bildschirm<br />
+            4608 — 8191 frei<br />
+            8192 — 16383 (bei + 8 KByte) Basic-Programmspeicher<br />
+            8192 — 24575 (bei + 16 KByte) Basic-Programmspeicher<br />
+            8192 — 32767 (bei + 24 KByte) Basic-Programmspeicher</p>
 
-<p>Außerdem werden die Zeichen, die später auf dem Bildschirm von den Sprites verdeckt werden, mit in die Umdefinier-Matrix hineinkopiert. So entsteht der Eindruck, daß die Sprites wirklich über die Zeichen wandern. Beim späteren Löschen werden die verdeckten Zeichen wieder hergestellt. Wie funktioniert das nun?</p>
+        <p>Der freie Bereich wird nun vollständig von dem Maschinenspracheprogramm gebraucht. Die Aufteilung des Speicherraums ist die folgende:</p>
 
-<p>Im Speicher ab dezimal 4608 ist 9mal (für jedes Sprite einer) der sogenannte Sprite-Control-Block (SCB) eingerichtet. Er hat die Aufgabe, die momentane X- und Y-Position, die Farbe des Sprites, den Bildschirmmodus (gesetzt/gelöscht) des Sprites, die durch die Umdefinier-Matrixverdeckten 9 Zeichen und Farben zwischenzuspeichern:</p>
+        <p>TODO</p>
 
-<p>TODO</p>
+        <p>Die Pseudo-Sprites sollten eine Auflösung von 16 x 16 Punkten haben, das sind 256 Punkte oder 4 Zeichen im freidefinierbaren Zeichensatz (Bild 1). Damit aber ein 16 x 16 Punkte großes Zeichen jede Position auf dem Bildschirm einnehmen kann, braucht man eine 24 x 24 Punkte große Umdefinier-Matrix, in die das Zeichen hineinkopiert wird. Das Aussehen dieser Umdefinier-Matrix ist in Bild 2 zu sehen. Das Programm übernimmt nun die Aufgabe, das Zeichen in die Umdefinier-Matrix zu kopieren (Bild 3), in die richtige X-Position zu schieben (Bild 4), und dasselbe mit der Y-Position zu tun.</p>
 
-<p>Die Basisadresse des SCB errechnet sich somit aus der Formel Basisadresse = 4608 + Spritenummer x 22. Das Zwischenspeichern und die Auswertung der Parameter übernimmt natürlich das Maschinenprogramm. Über den SCB werden auch im nachfolgend beschriebenen Programm »Sprite-Definer« die Sprites initialisiert und deren Farbe festgelegt. Da nur die oberen 128 Zeichen des Zeichensatzes für die Sprites verwendet werden, hat man eine ausreichende Anzahl von noch frei definierbaren Zeichen, nämlich genau 128, zur Verfügung. Außerdem kommen jeweils 13 Zeichen, nämlich 4 für das Sprite und 9 für die Umdefinier-Matrix hinzu, wenn man auf ein Sprite verzichtet. Die Matrixen werden im Speicher so abgelegt:</p>
+        <p>Außerdem werden die Zeichen, die später auf dem Bildschirm von den Sprites verdeckt werden, mit in die Umdefinier-Matrix hineinkopiert. So entsteht der Eindruck, daß die Sprites wirklich über die Zeichen wandern. Beim späteren Löschen werden die verdeckten Zeichen wieder hergestellt. Wie funktioniert das nun?</p>
 
-<p>TODO</p>
+        <p>Im Speicher ab dezimal 4608 ist 9mal (für jedes Sprite einer) der sogenannte Sprite-Control-Block (SCB) eingerichtet. Er hat die Aufgabe, die momentane X- und Y-Position, die Farbe des Sprites, den Bildschirmmodus (gesetzt/gelöscht) des Sprites, die durch die Umdefinier-Matrixverdeckten 9 Zeichen und Farben zwischenzuspeichern:</p>
 
-<p>Konkret wird das Programm (Listing 1) nun folgendermaßen bedient: Vor dem Laden oder Eingeben wird POKE 44,32:POKE 8192,0:NEW eingetippt. Ist nun das Maschinenspracheprogramm im Speicher, kann es mit einem Monitorprogramm auch noch einmal abgespeichert werden. Später muß man es nur noch mit LOAD »name«, 1,1 laden.</p>
+        <p>TODO</p>
 
-<p>Die Bedienung:<br/>
-Sind die Sprites definiert. muß dem Maschinenspracheprogramm mitgeteilt werden, wo der Zeichensatz liegt, den es verwalten soll. Das geschieht mit den Befehlen POKE 677, Lowbyte:POKE 678, Highbyte, in unserem Fall also POKE 677,0:POKE 678,20, da der Zeichensatz auf der Adresse 5120 beginnt.</p>
+        <p>Die Basisadresse des SCB errechnet sich somit aus der Formel Basisadresse = 4608 + Spritenummer x 22. Das Zwischenspeichern und die Auswertung der Parameter übernimmt natürlich das Maschinenprogramm. Über den SCB werden auch im nachfolgend beschriebenen Programm »Sprite-Definer« die Sprites initialisiert und deren Farbe festgelegt. Da nur die oberen 128 Zeichen des Zeichensatzes für die Sprites verwendet werden, hat man eine ausreichende Anzahl von noch frei definierbaren Zeichen, nämlich genau 128, zur Verfügung. Außerdem kommen jeweils 13 Zeichen, nämlich 4 für das Sprite und 9 für die Umdefinier-Matrix hinzu, wenn man auf ein Sprite verzichtet. Die Matrixen werden im Speicher so abgelegt:</p>
 
-<p>Soll nun ein Sprite auf den Bildschirm, muß zuerst einmal in Adresse 683 die Spritenummer gePOKEt werden (Achtung, keine Zahl über 8 angeben, da sich das Programm dann selbst zerstören könnte). Schließlich werden in Adresse 673 die X-Koordinate (maximal 159) und 674 die Y-Koordinate (maximal 167) gesetzt. Dann kann das Programm mit SYS 8021 sofort aufgerufen und auf dem Bildschirm das Sprite betrachtet werden, vorausgesetzt man hat vorher mit POKE 36869,205 auf den freidefinierbaren Zeichensatz geschaltet.</p>
+        <p>TODO</p>
 
-<p>Wird nun das Sprite auf eine andere Position gesetzt, so verschwindet es vollständig von der alten Position, und die Zeichen, die auf diesem Platz waren, erscheinen wieder mit ihrer alten Farbe. Will man aber das Sprite ganz vom Bildschirm löschen, POKEt man wieder in 683 die Spritenummer und ruft das Maschinenspracheprogramm diesmal mit SYS 8099 auf. PRINT »CLR/HOME« sollte man nicht verwenden, da im SCB noch die alten Bildschirmzeichen gespeichert sind und beim nächsten Setzen wieder auf ihren alten Plätzen auf dem Bildschirm erscheinen würden.</p>
+        <p>Konkret wird das Programm (Listing 1) nun folgendermaßen bedient: Vor dem Laden oder Eingeben wird POKE 44,32:POKE 8192,0:NEW eingetippt. Ist nun das Maschinenspracheprogramm im Speicher, kann es mit einem Monitorprogramm auch noch einmal abgespeichert werden. Später muß man es nur noch mit LOAD »name«, 1,1 laden.</p>
 
-<h2>Der Sprite-Generator</h2>
+        <p>Die Bedienung:<br />
+            Sind die Sprites definiert. muß dem Maschinenspracheprogramm mitgeteilt werden, wo der Zeichensatz liegt, den es verwalten soll. Das geschieht mit den Befehlen POKE 677, Lowbyte:POKE 678, Highbyte, in unserem Fall also POKE 677,0:POKE 678,20, da der Zeichensatz auf der Adresse 5120 beginnt.</p>
 
-<p>Nun zum Programm »Sprite-Definer« (Listing 2).</p>
+        <p>Soll nun ein Sprite auf den Bildschirm, muß zuerst einmal in Adresse 683 die Spritenummer gePOKEt werden (Achtung, keine Zahl über 8 angeben, da sich das Programm dann selbst zerstören könnte). Schließlich werden in Adresse 673 die X-Koordinate (maximal 159) und 674 die Y-Koordinate (maximal 167) gesetzt. Dann kann das Programm mit SYS 8021 sofort aufgerufen und auf dem Bildschirm das Sprite betrachtet werden, vorausgesetzt man hat vorher mit POKE 36869,205 auf den freidefinierbaren Zeichensatz geschaltet.</p>
 
-<p>Dieses Programm ist ein Sprite-Generator in Basic, der bei der Erstellung von Sprites recht hilfreich sein kann. Das Programm verdeutlicht auch, wie die Definition der Sprites und die Bedienung des Maschinenspracheprogramms erfolgt.</p>
+        <p>Wird nun das Sprite auf eine andere Position gesetzt, so verschwindet es vollständig von der alten Position, und die Zeichen, die auf diesem Platz waren, erscheinen wieder mit ihrer alten Farbe. Will man aber das Sprite ganz vom Bildschirm löschen, POKEt man wieder in 683 die Spritenummer und ruft das Maschinenspracheprogramm diesmal mit SYS 8099 auf. PRINT »CLR/HOME« sollte man nicht verwenden, da im SCB noch die alten Bildschirmzeichen gespeichert sind und beim nächsten Setzen wieder auf ihren alten Plätzen auf dem Bildschirm erscheinen würden.</p>
 
-<p>Obwohl sich das Programm fast von selbst erklärt, hier doch einige kurze Erläuterungen:</p>
+        <h2>Der Sprite-Generator</h2>
 
-<p>Startet man das Programm mit RUN, erscheint als erstes die Begrüßung und die Aufforderung »Bitte warten!«. Das Programm kopiert nämlich jetzt den Zeichensatz aus dem ROM ins RAM, was in Basic naturgemäß etwas dauert.</p>
+        <p>Nun zum Programm »Sprite-Definer« (Listing 2).</p>
 
-<p>Jedesmal, wenn man in einem Menüteil eine Eingabe gemacht hat, wird man »Richtig?« gefragt. Tippt man hier für N (Nein), so kann die Eingabe wiederholt werden. Drückt man aber den Linkspfeil, so kommt man wieder ins Hauptmenü.</p>
+        <p>Dieses Programm ist ein Sprite-Generator in Basic, der bei der Erstellung von Sprites recht hilfreich sein kann. Das Programm verdeutlicht auch, wie die Definition der Sprites und die Bedienung des Maschinenspracheprogramms erfolgt.</p>
 
-<p>Die Tastenbelegung im Editiermodus:</p>
+        <p>Obwohl sich das Programm fast von selbst erklärt, hier doch einige kurze Erläuterungen:</p>
 
-<p>TODO</p>
+        <p>Startet man das Programm mit RUN, erscheint als erstes die Begrüßung und die Aufforderung »Bitte warten!«. Das Programm kopiert nämlich jetzt den Zeichensatz aus dem ROM ins RAM, was in Basic naturgemäß etwas dauert.</p>
 
-<p>Bei der Funktion »Weiter« kommt man in ein zweites Menü, das weitere Funktionen zur Verfügung stellt. Aus diesem Menü gelangt man mit »zurück« wieder ins Hauptmenü. Beim Speichern werden die Sprites als reiner Speicherauszug auf Kassette gebracht, so daß das Laden im Prinzip auch mit LOAD »name«,1,1 möglich ist.</p>
+        <p>Jedesmal, wenn man in einem Menüteil eine Eingabe gemacht hat, wird man »Richtig?« gefragt. Tippt man hier für N (Nein), so kann die Eingabe wiederholt werden. Drückt man aber den Linkspfeil, so kommt man wieder ins Hauptmenü.</p>
 
-<p>Sicherlich kann das Maschinenspracheprogramm noch weiter verbessert werden. So wäre zum Beispiel eine Spritesteuerung per Interrupt durchaus denkbar. Leider funktioniert das Maschinenprogramm nicht mit den üblichen Grafikmodulen, da diese den Bildschirminhalt auch mit dem freidefinierbaren Zeichensatz aufbauen. Sollen Sprites auch miteinander oder übereinander dargestellt werden, dann muß das Setzen und Löschen nach folgender Reihenfolge durchgeführt werden, da es sonst zu Schwierigkeiten mit dem SCB kommen kann:</p>
+        <p>Die Tastenbelegung im Editiermodus:</p>
 
-<p>Sprite 0 setzen, Sprite 1 setzen,&hellip;, Sprite n setzen. Hiernach die Berechnungen für die neuen Positionen durchführen.</p>
+        <p>TODO</p>
 
-<p>Sprite n löschen,.Sprite n-1 löschen,&hellip;, Sprite 0 löschen. Danach Vorgang von oben wiederholen.</p>
+        <p>Bei der Funktion »Weiter« kommt man in ein zweites Menü, das weitere Funktionen zur Verfügung stellt. Aus diesem Menü gelangt man mit »zurück« wieder ins Hauptmenü. Beim Speichern werden die Sprites als reiner Speicherauszug auf Kassette gebracht, so daß das Laden im Prinzip auch mit LOAD »name«,1,1 möglich ist.</p>
 
-<p>Noch eins zum »Sprite-Definer«: Die erste REM-Zeile muß auf jeden Fall mit 16 Sternchen eingegeben werden, da sich das Programm später mit POKEs selbst verändert und andernfalls, wäre die REM-Zeile kürzer, die folgende Zeile in Mitleidenschaft ziehen würde. Doch nun wünsche ich allen, die das Programm eintippen, viel Spaß und vielleicht ein bißchen C 64-Feeling.</p>
+        <p>Sicherlich kann das Maschinenspracheprogramm noch weiter verbessert werden. So wäre zum Beispiel eine Spritesteuerung per Interrupt durchaus denkbar. Leider funktioniert das Maschinenprogramm nicht mit den üblichen Grafikmodulen, da diese den Bildschirminhalt auch mit dem freidefinierbaren Zeichensatz aufbauen. Sollen Sprites auch miteinander oder übereinander dargestellt werden, dann muß das Setzen und Löschen nach folgender Reihenfolge durchgeführt werden, da es sonst zu Schwierigkeiten mit dem SCB kommen kann:</p>
 
-<p>(Markus Leberecht/ev)</p>
+        <p>Sprite 0 setzen, Sprite 1 setzen,&hellip;, Sprite n setzen. Hiernach die Berechnungen für die neuen Positionen durchführen.</p>
 
+        <p>Sprite n löschen,.Sprite n-1 löschen,&hellip;, Sprite 0 löschen. Danach Vorgang von oben wiederholen.</p>
+
+        <p>Noch eins zum »Sprite-Definer«: Die erste REM-Zeile muß auf jeden Fall mit 16 Sternchen eingegeben werden, da sich das Programm später mit POKEs selbst verändert und andernfalls, wäre die REM-Zeile kürzer, die folgende Zeile in Mitleidenschaft ziehen würde. Doch nun wünsche ich allen, die das Programm eintippen, viel Spaß und vielleicht ein bißchen C 64-Feeling.</p>
+
+        <address class="author">(Markus Leberecht/ev)</address>
+
+    </article>
+
+</body>
+
+</html>
