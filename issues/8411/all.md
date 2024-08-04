@@ -384,9 +384,11 @@ Wesentlich vielfältiger als die Unterschiede sind die gemeinsamen Fähigkeiten 
 
 Damit diese Druckfunktionen aber auch richtig aufs Papier kommen, bedarf es der richtigen Verbindung zum Computer. Für die Besitzer des C 64/VC 20 ist dies eine relativ problemlose Angelegenheit, denn beide Drucker haben in der Regel eine Centronics-kompatible Schnittstelle. Die Commodore-Grafik- und Cursorsteuerzeichen sind im Zeichensatz der Itoh-Drucker nicht vorhandenen. Erst die Verwendung eines speziellen Soft- oder Hardwareinterfaces mit entsprechender Programmierung, macht diese Zeichen verfügbar. Die zweite Anschlußmöglichkeit der Itoh Drucker besteht im Einbau einer seriellen Schnittstelle.
 
-Sehr erfreulich verlief der Praxistest mit einem Textverarbeitungspro-
+Sehr erfreulich verlief der Praxistest mit einem Textverarbeitungsprogramm (Vizawrite 64). Außer einem Verbindungskabel für knapp 50 Mark waren keine zusätzlichen Maßnahmen notwendig. Der Ausdruck funktionierte auf Anhieb mit der eingebauten Treibersoftware des Textverarbeitungsprogramms. Die zweite Frage galt der Grafikfähigkeit der Itoh Drucker. Aber auch hier hatten »Die Zwei« eine Überraschung parat. Je nach der eingestellten Schriftart (Pitchsetting) sind Punktdichten von 1088 bis zu 2176 Punkten pro Zeile beim 1550B möglich. Diese Auflösung wird vom Commodore natürlich bei weitem nicht erreicht. Die Deutlichkeit der Grafik steigt aber mit zunehmender Punktdichte und es sind auch mehrere Farbschattierungen (Graustufen) als Farbersatz programmierbar. Die zweite Methode, andere Zeichen als die vom Zeichengenerator vorgegebenen auszudrucken, ist der ladbare Zeichensatz. Die eingebauten 2-KByte-Pufferspeicher sind auch dazu verwendbar, einen eigenen Zeichensatz zu programmieren. In Verbindung mit dem ebenfalls möglichen Rückwärtstransport des Papiers, kann ähnlich wie mit einem Plotter gearbeitet werden.
 
-TODO TODO TODO TODO
+Alles in allem stellen die beiden Itoh Drucker 1550B und 8510 ein sehr leistungsfähiges Druckerpaar dar. Die verfügbaren Schriften haben ein überdurchschnittlich gutes Druckbild. Einzig eine gedehnte Schrift, wie von den Commodore- und Ep-son-Druckern bekannt, fehlt. Bei einem Preis von 2 400 Mark für den 1550B und 1800 Mark für den 8510 stellen die Itoh-Drucker eine kostengünstige Alternative dar.
+
+(Arnd Wängler)
 
 # Der Petal MA20 – kleiner Name, großer Drucker
 
@@ -460,9 +462,13 @@ Und nun zu den in der Werbung angekündigten 16 Sprites, die gleichzeitig auf de
 
 Aber die Supergraphik bietet nicht nur Grafik-Befehle, auch die Tongeneratoren des SID können per Basic angesteuert werden. Mit VOLUME = , legen Sie erst einmal die Lautstärke fest. SOUND dient der Einstellung von Wellenform und Hüllkurve der drei Stimmen. Mit FILTER kann der Filter des SID gesteuert werden. Und als letztes gibt es TUNE, das nach Voreinstellung der oben genannten Parameter einen Ton spielt.
 
-Supergraphik benötigt eine Menge Speicherplatz, Ihnen gehen 10 KByte Ihres Basic-Speichers und sämtliche RAM-Bereiche in der ROM-Gegend, auch der $C-Bereich verloren. Deshalb wird die Supergraphik wohl kaum mit irgendeiner anderen Basic-Erweiterung zusammenarbeiten können. Aus diesen Gründen wurden die »wichtigsten« Programmierhilfen in das Programm mit eingebaut. So bringt der Befehl DIRECTORY selbiges ohne Programmverlust auf den Bildschirm. Mit MERGE können Pro-
+Supergraphik benötigt eine Menge Speicherplatz, Ihnen gehen 10 KByte Ihres Basic-Speichers und sämtliche RAM-Bereiche in der ROM-Gegend, auch der $C-Bereich verloren. Deshalb wird die Supergraphik wohl kaum mit irgendeiner anderen Basic-Erweiterung zusammenarbeiten können. Aus diesen Gründen wurden die »wichtigsten« Programmierhilfen in das Programm mit eingebaut. So bringt der Befehl DIRECTORY selbiges ohne Programmverlust auf den Bildschirm. Mit MERGE können Programme angehängt werden; so ist zum Beispiel ein komfortables Nachladen der Spritedaten möglich. RENUM ist ein Zeilennumerierungs-Befehl; er gleicht auch alle Sprungadressen hinter GOTO, GOSUB an. Ihre Funktionstasten können Sie mit KEY belegen. Sie sind relativ sinnvoll vorbelegt; so ist mit F5/F7 eine Umschaltung zwischen Textseite und Grafikseite möglich. DTASET ist ein gezieltes RESTORE; da hier auch arithmetische Ausdrücke vorkommen dürfen, ist eine Angleichung beim RENUM-Befehl nicht implementiert. Neben der Joystickabfrage ist auch eine Paddleabfrage über PADDLE realisiert worden. Als letztes noch der Befehl POS = ; mit ihm kann im Textmodus der Cursor einfach auf beliebige Spalten und Zeilen gesetzt werden.
 
-TODO TODO TODO Fortsetzung auf Seite 157
+Ein anderes Detail, das mir allerdings sehr gut gefallen hat: Bei etwaigen Fehlermeldungen wird von der Grafikseite wieder automatisch auf die Textseite umgeschaltet. Das hält Sie beim Austesten eines Programms immer auf dem Laufenden.
+
+Supergraphik 64 ist ein Programm von Data Becker für 99 Mark, das einerseits durch seine Befehlsvielfalt, andererseits durch einige kleine Details beeindruckt. Einige Mängel schwächen den positiven Eindruck allerdings ein wenig ab. Man sollte aber auf jeden Fall beim Kauf einer Grafikerweiterung Supergraphik 64 in Erwägung ziehen, insbesondere, wenn man es nicht so sehr auf komfortables Sprite-Handling, sondern eher auf ein gutes Werkzeug für hochauflösende Grafiken abgesehen hat.
+
+(Boris Schneider/aa)
 
 # Viel zu schade, um nur damit zu kalkulieren
 
@@ -1219,6 +1225,7 @@ Danach gibt man das Quellprogramm ein. Es enthält die DATAs für das Maschinenp
 (Uwe Seimet/rg)
 
 # Supergrafik II
+
 > Dieses Programm liefert eine Grafik-Auflösung von 200 mal 256 Punkten und nützt damit den Bildschirm vollständig aus, und dies in der Grundversion des VC 20.
 
 Es handelt sich hier um eine Weiterentwicklung des im 64’er, Ausgabe Mai 1984, Seite 81 abgedruckten Programms. Nach Eingabe der Größe des Koordinatensystems generiert das Programm den Grafen einer Funktion und ihrer Ableitung in verschiedenen Farben. Es ist sicher für viele Besitzer des VC 20, insbesondere für Schüler und Lehrer interessant.
@@ -1879,1207 +1886,1164 @@ PRINT#fn,"M-W";CHR$(adl)CHR$ (adh)CHR$(n)CHR$(datal)CHR$(da-ta2)...
 
 c)	Der MEMORY-EXECUTE-Befehl (M-E):
 
-TODO Fortsetzung auf Seite163
+Auch dieser Befehl ist äquivalent zu einem Basic-Befehl, dem SYS-Befehl. Mit ihm kann man also ein Maschinenprogramm an einer beliebigen Stelle im Floppy-Speicher ausführen. Syntax:
+PRINT#fn,"M-E"CHR$(adl)CHR$(adh). Siehe auch Listing 7.
 
+### Die USER-Befehle
 
+Die USER-Befehle stellen eine Erweiterung des Befehlssatzes dar, der fast ausschließlich der Bequemlichkeit dient. Ul und U2 wurden schon besprochen, sie ersetzen B-R und B-W. Die Befehle U3 bis U8 dienen dem Start eines Maschinenprogramms im Floppy-Speicher, dessen Anfangsadressen in einer Tabelle abgelegt sind, so entsprechen:
+U3 einem Start bei $0500
+U4 einem Start bei $0503
+U8 einem Start bei $050F.
+U4 ersetzt also beispielsweise den Befehlsstring: M-E CHR$(3)CHR$(5). U9 zeigt auf den NMI-Vektor der 1541, welcher allerdings eine Sonderfunktion hat: Mit U9+ wird die Floppy auf C 64- und mit U9- auf VC 20-Betrieb umgeschaltet.
+U: stellt einen Reset dar, ähnlich dem SYS 64738 beim C 64.
 
+Mit den Kenntnissen über den Befehlssatz der VC 1541 dürfte es Ihnen nun keine Schwierigkeiten mehr bereiten, sich das Programm EDDI einmal zu Gemüte zu führen. Das einzig Besondere daran sind die Routinen zum Lesen und Schreiben eines Blocks, die aus Geschwindigkeitsgründen in Maschinensprache geschrieben sind. Ein großer Teil der in diesen Folgen erwähnten Informationen ist auch im Commodore-Handbuch enthalten, nur sind dort oft Fehler.
 
+Wir wollen uns für diese Folge von Ihnen verabschieden, nicht ohne Sie dringend dazu anzuhalten zu probieren.
 
+(Schramm/Schneider/gk)
 
+# Assembler ist keine Alchimie – Teil 3
 
+> In den ersten beiden Folgen unseres Assembler-Kurses mußten Sie noch mit Basic- Ladern arbeiten. Jetzt steht Ihnen ein leistungsfähiger Monitor zur Verfügung, der SMON. Somit können Sie alle Beispiele direkt eingeben und ausprobieren.
 
+In der letzten Folge haben wir die ersten Assembler-Befehle kennengelernt und wissen, wie man sie benutzt und was sich im Computer dabei tut. Die Zahlen der Assembler-Alchimisten haben uns einige Geheimnisse enthüllt, obwohl sie für die Zweifingerlinge und die Sechzehnfingerlinge gedacht sind. Die Binärzahlen können wir schon zusammenzählen. Heute werden Sie eine Reihe weiterer Assembler-Befehle kennenlernen und noch ein weiteres Zahlensystem. Wir ergründen das Geheimnis der negativen Zahlen und machen uns die Funktion der Flaggen zunutze.
 
+Wir haben nun auch einen sehr brauchbaren Assembler für den C 64: Den SMON, dessen 1. Teil in dieser Ausgabe abgedruckt ist. Künftig wird in dieser Serie die SMON-Syntax verwendet und kein Basic-Lader mehr angegeben. Außerdem hat in Ausgabe 9 die Serie »Der gläserne VC 20« begonnen, so daß sich der Schwerpunkt hier mehr auf den C 64 verlagert. Das sollte aber die VC 20-Fans nicht davon abhalten, diesen Kurs weiter zu verfolgen, denn bis auf gelegentliche Adreß-änderungen ist fast alles für sie verwendbar.
 
+### Eine Zauberformel der Assembler-Alchimisten: INX, INY, INC, DEX, DEY, DEC?
 
+Wir wissen ja schon, daß man diese »Zauberformeln« entzaubern kann. INX heißt einfach »increment X-Register«, also Inhalt des X-Registers um 1 erhöhen. Es wird Ihnen sicher einleuchten, daß INY dasselbe mit dem Y-Register tut. Etwas weniger deutlich ist das bei INC. Das bedeutet »increment memory«, also zähle zum Inhalt einer Speicherstelle eins dazu. INX und INY enthalten alles, was dem Computer zu sagen ist, sind also offensichtlich l-Byte-Befehle mit der in der letzten Folge schon kennengelernten impliziten Adressierung. Bei INC muß dem Computer noch gesagt werden, welche Speicherstelle er um 1 erhöhen soll. Es gehört also noch eine Adresse dazu. Das läßt diesen Befehl im allgemeinen zu einem 3-Byte-Befehl werden.
 
+## Befehle zum Zählen
 
+Das umgekehrte leisten die Befehle DEX, DEY und DEC. Sie bedeuten nämlich »decrement X-Register«, also »zähle das X-Register um eins herunter«, beziehungsweise das Y-Register oder — bei DEC — die angegebene Speicherstelle. Für die Adressierungsart und die Anzahl Bytes pro Befehl gilt hier das gleiche wie für die INX...-Befehle. Sehen wir uns das an einem kleinen Beispiel an: Bitte lesen Sie sich dazu die Bedienungshinweise zum SMON durch.
 
+1500	LDA #00
+1502	LDX #01
+1504	STA D800
+1507	STX 0400
+150A	INX
+150B	STA D801
+150E	STX 0401
+1511	DEX
+1512	STA D802
+1515	STX 0402
+1518	BRK
 
+Wenn Sie das kleine Programm mit G 1500 starten, dann sollten Sie in der linken oberen Ecke des Bildschirms ABA in schwarzer Schrift stehen haben. Was ist geschehen? Wir haben den Inhalt des Akku (= 0, also Farbcode für schwarz) in das Bildschirm-Farbregister geschrieben (#D800), dann den Inhalt des X-Registers (1 = POKE-Code für den Buchstaben A) in die erste Bildschirm-Speicherzelle (# 0400). Anschließend wurde das X-Register um 1 erhöht (2 = POKE-Code für den Buchstaben B) und dieser Inhalt in die zweite Bildschirmzelle geschrieben. Außerdem mußte natürlich auch dieser Bildschirm-Farbspeicherplatz mit dem Farbcode 0 belegt werden. Durch DEX wurde das X-Register wieder herunter gezählt, somit wieder ein A erzeugt und in die dritte Bildschirmstelle gedruckt.
 
+Sie haben sicher schon bemerkt, daß man auf diese Weise Abläufe mitzählen kann. Soll zum Beispiel ein Vorgang 20 mal wiederholt werden, dann packt man ins X-Register (oder ins Y-Register oder in eine andere Speicherstelle) den Anfangswert 0, läßt den Computer eine Arbeit ausführen, erhöht das entsprechende Register oder die Speicherzelle um 1 mit INX, INY oder INC, prüft dann, ob dieser Inhalt schon 20 geworden ist und so weiter. Wie man diese Prüfung vornimmt, dazu kommen wir erst später bei den BRANCH-Befeh-len. Das ist also ähnlich wie im Basic bei den FOR...NEXT-Schleifen: Dort wird eine Variable als Zähler verwendet, hier ein Register (oder eine Speicherstelle). Ebenso wie im Basic bei diesen Schleifen kann man auch hier rückwärts zählen mit DEX, DEY oder DEC. Das hat oft gewisse Vorzüge, was uns aber noch nicht kümmern soll.
 
+Wenn wir diese Befehle als Zähler verwenden, sollten wir im Auge behalten, daß eine Speicherstelle (auch ein X- oder Y-Register) Zahlen nur von 0 bis 255 enthalten kann. Die höchste 8-Bit-Zahl ist ja:
+TODO
+dez. 255 = bin. 1111 1111
++ 1	1
+      —---------+
+ergibt:	(1) 0000 0000
 
+Wenn wir also über 255 hinauszählen, ergibt sich wieder 0 und so weiter, weil ein Überlauf stattgefunden hat. Das 9.Bit paßt nicht mehr in das Byte hinein. Üm nochmal genau sehen zu können, was unser Computer da tut, probieren Sie einmal aus:
+1500 LDA #01
+1502 BRK
 
+Das soll uns die Register zunächst mal im Ausganszustand zeigen. Nach G 1500 werden sie angezeigt:
+AC XR YR N V- BDI ZC
+01 00 00 0 0 1 10 000
 
+Im Akku steht jetzt die dort eingeladene 1. Nun wollen wir das X-Register laden mit 255 (also $FF). Dazu ändern wir das Programm:
+1502 LDX #FF
+1504 BRK
 
+Nach erneutem G 1500 zeigen die Register:
+AC XR YR N V- BDI ZC
+01 FF 00 1 0 110 000
 
+Im X-Register steht nun die Zahl $FF. Bei den Flaggen hat sich die N-Flagge (die negative Zahlen anzeigen soll) auf 1 geschaltet!
 
+Nun wollen wir das X-Register über 255 hinauszählen. Wir verändern das Programm nochmal:
+1504 INX
+1505 BRK
 
+Der Start mit G 1500 liefert uns die folgende Registeranzeige:
+AC XR YR N V- BDI ZC
+01 00 00 0 0 110 0 10
 
+Wie erwartet, ist der Überlauf des X-Registers eingetreten: Es ist jetzt Null. Die N-Flagge hat ihren gewohnten Wert 0 wieder angenommen und die Z-Flagge, die uns anzeigt, ob die letzte Operation eine Null erzeugt hat, ist jetzt gesetzt. Bei weiterem Hochzählen verschwindet die Z-Flagge wieder:
+1505 INX
+1506 BRK
 
+G 1500 liefert den Registerinhalt:
+AC XR YR N V- BDI ZC
+01 01 00 0 0 1 10 000
 
+Das gleiche passiert bei Verwendung des Y-Registers als Zähler, wie Sie leicht durch Austauschen aller auf X bezogenen Befehle feststellen können. Sehr nett ist es, diesen Befehlsablauf einmal für den INC-Befehl auf die Speicherstelle $0400 (Bildschirmspeicher links oben) bezogen ablaufen zu lassen. Wenn man darauf achtet, daß kein Hochscrollen des Bildschirms eintritt, kann man das Ergebnis außer in den Registern auch noch als Zeichen auf dem Bildschirm verfolgen. Der Beginn der Befehlsequenz ist dann sinnvollerweise:
+1500 LDA #FF
+1502 STA 0400
+1505 BRK
 
+Im folgenden setzt man dann anstelle von INX immer INC 0400 ein.
 
+Was passiert beim Herunterzählen unter Null? Sie können das mit der gezeigten Befehlskette leicht verfolgen, indem Sie immer statt INX jetzt DEX setzen und die Register nicht mit $FF, sondern mit 01 laden. Es zeigt sich, daß beim Herabzählen nach der Null wieder 255 (= $FF) im Register zu finden ist. Die Reaktion der N- und der Z-Flagge auf den jeweiligen Registerinhalt ist die gleiche wie beim Hochzählen.
 
+Es ist uns nun deutlich, daß diese sechs Befehle die N-Flagge und die Z-Flagge beeinflussen können. Diese Tatsache wird später noch eine große Rolle spielen, wenn es um die bereits erwähnte Schleifenkontrolle geht.
+
+### Noch ein alchimistischer Zahlentrick
+
+Die Assembler-Alchimisten haben noch viel mehr Arten der Zahlen-und Zeichendarstellung auf Lager. Eine davon ist die Codierung als BCD-Zahlen. BCD kommt vom englischen »binary coded dezimal«, was bedeutet: Binär codierte Dezimalzahlen.
+
+Zwischendurch möchte ich noch eine Bemerkung loswerden, die Sie als Trost auffassen sollen: Auch wenn wir später andere Zahlendarstellungen kennenlernen werden, es wird nicht so schwierig! Sogar so komplette Idioten wie Computer verstehen das, obwohl man ihnen alles haarklein vorkauen muß.
+
+Wenden wir uns nun wieder den lächerlich einfachen BCD-Zahlen zu. Alle Zahlen von 0 bis 9 lassen sich binär mit nur 4 Bits ausdrücken:
+TODO
+Binär	Dezimal
+0000	0
+0001	1
+0010	2
+0011	3
+0100	4
+0101	5
+0110	6
+0111	7
+1000	8
+1001	9
+
+Die weiteren Werte 1010 bis 1111 werden in der BCD-Codierung nicht benutzt. Liegt nun eine Dezimalzahl (zum Beispiel 12) vor, dann wird jede Stelle dieser Zahl (also die 1 und die 2) getrennt binär codiert. In unserem Beispiel mit der 12 wäre das dann 0001 für die 1 und 0010 für die 2. Somit ist die 12 im BCD-Code 0001 0010. Jede Ziffer erhält so ihr Nibble. Eine Zahl im BCD-Format hat deswegen keine feste Anzahl von Bytes, sondern die Byte-Zahl hängt von der Anzahl der Stellen ab. Die Zahl 1984 beispielsweise braucht 2 Bytes: 0001 1001 1000 0100.
+
+Schwierig gestaltet sich das Rechnen mit diesen Zahlen wegen der sechs unbenutzten Codes. Aber auch da habe ich einen Trost für Sie: Wir werden damit nicht rechnen. Wozu das ganze dann, werden Sie sich fragen? Der Grund für das alles ist, daß BCD-Zahlen im Gegensatz zu den Zahlen mit festem Format (die sonst verwendet werden) so eingegeben und verarbeitet werden können, wie sie vorliegen. Das ist im kaufmännischen Bereich manchmal notwendig, wo eben 1000mal 0,1 Pfennige 1 Mark ergeben und Fehler unzulässig sind. Sollten Sie also vor dem Problem stehen, mit BCD-Zahlen rechnen zu müssen, grämen Sie sich nicht: Unser Prozessor kennt den Dezimalmodus. Er ist dann eingeschaltet, wenn die Dezimal-Flagge auf 1 gesetzt ist.
+
+Damit sollen Sie dann auch noch gleich zwei neue Befehle kennenlernen: SED und CLD. Der erstere hat nichts mit Parteien zu tun, sondern ist die Abkürzung für »Set dezimal-flag«, also setze die Dezimalflagge. So schalten Sie den Dezimal-Modus ein. Wie Sie sicher schon messerscharf geschlossen haben, heißt CLD »Clear dezimal-flag«, also setze die Dezimalflagge auf Null, wodurch dieser Modus wieder auszuschalten ist.
+
+Wichtig! Wenn Sie argwöhnen, daß in einem Programm irgendwann mal die Dezimal-Flagge gesetzt sein könnte, dann gehen Sie auf Nummer sicher und schieben vor eine Rechenoperation, die nicht im Dezimalmodus laufen soll, ein CLD.
+
+Beide Befehle sind 1-Byte-Befehle mit implizierter Adressierung. Sie beeinflussen lediglich die Dezimalflagge.
+
+### Das Geheimnis der negativen Binärzahlen
+
+Wie schon mal betont: Der Computer ist strohdumm. Er kann nicht einmal auf normale Weise voneinander abziehen! Deswegen geht er den komplizierten Weg: Er addiert eine negative Zahl. Nur: Wie sehen negative Binärzahlen aus? Wir werden diese Frage in drei Etappen beantworten.
+
+a) Man könnte eine Flagge setzen, die 1 ist bei negativen und 0 bei positiven Zahlen. Bei einigen Fließkommazahlen wird das auch so gemacht. Hier aber setzt man die Flagge direkt in die Zahl ein: Bit 7 jeder Zahl ist jetzt ein Vorzeichenmerkmal. Wenn dieses Bit 0 ist, handelt es sich um eine positive, wenn es 1 ist, um eine negative Zahl. Auf diese Weise ist also +1 wie bisher 0000 0001, wohingegen —1 jetzt 1000 0001 hieße. Damit wird allerdings der Zahlenbereich, der durch ein Byte auszudrücken ist, verschoben. 255 = binär 1111 1111 kann so nicht mehr verwendet werden. Die größte Zahl, die jetzt ausgedrückt werden kann, ist 0111 1111 = dezimal 127. Die kleinste Zahl ist dann 1111 1111 = —127. Probieren wir mal aus, wie sich damit rechnen läßt:
+TODO
++ 10 0000 1010
+-6	1000 0110
+--------- +
+ergibt 1001 0000 = -16,
+was offensichtlich falsch ist, denn nach Adam Riese sollte + 4 herauskommen. So kann man also nicht rechnen!
+
+Man nennt diese Art der Zahlendarstellung, übrigens »signed bina-ry<<-Format, also in Deutsch: markierte Binärzahlen.
+b) Der nächste Schritt ist das sogenannte Einerkomplement. Dabei tritt für die positiven Zahlen keine Änderung ein. Die negativen entstehen aus den positiven durch Komplementbildung, das heißt jedes Bit der positiven Zahl wird in sein Gegenteil verkehrt, wie es das folgende Beispiel zeigen soll:
+0000 1100 ist +12,
 
+dann ist das Einerkomplement:
+1111 0011 = -12.
 
+## Komplement ist nicht kompliziert
 
+Interessanterweise taucht hier auch wieder das Merkmal der »si-gned binary<<-Zahlen auf: die 1 in Bit 7 bei negativen Zahlen. Beschränkt man sich auf den Zahlenbereich, der für die »signed binary<<-Zahlen gültig war, dann hätten wir jetzt beide Darstellungsweisen miteinander vereint. Nun müssen wir natürlich noch feststellen, ob man so auch rechnen kann.
++ 8	0000 1000
+-6	1111 1001
+in Einerkomplementdarstellung
+-------- +
+ergibt(l) 0000 0001
+was 1 mit einem Übertrag ergäbe, jedenfalls nicht 2, wie’s sich gehört. Also ist auch die Einerkomplementdarstellung noch nicht das Gelbe vom Ei.
+c) Ich will Sie nicht länger auf die Folter spannen: Wenn man zum Einerkomplement einer Zahl noch 1 dazuzählt, erhält man das Zweierkomplement. Und genau so werden negative Zahlen in unserem Computer gehandhabt. Die positiven Zahlen bleiben unverändert. Von den negativen bildet man das Zweierkomplement wie zum Beispiel hier mit der Zahl -12:
+12	0000 1100
+normale Binärdarstellung
+(—12) 1111 0011 Einerkomplement
++ 1	0000 0001 addieren
+-12	11110100 Zweierkomplement
 
+Jetzt wollen wir auch diese Zahlenart ausgiebig testen:
 
+Wir rechnen nochmal 8-6:
++ 8	0000 1000
+—6	1111 1010 das ist -6 in der Zweierkomplementdarstellung.
+------- + ergibt
+(1)	0000 0010..
+also 2 mit einem Übertrag, der ignoriert wird. Das Ergebnis ist richtig. Wenn bei einer solchen Rechnung eine negative Zahl herauskommt, ist sie nicht leicht zu erkennen. In solchen Fällen kehrt man das Vorzeichen um, indem man das Zweierkomplement berechnet. Das machen wir mal am Beispiel 5—6:
++ 5	0000 0101
+-6	1111 1010
+das ist wieder unser Zweierkomplement von 6, also —6
+------ +
+ergibt 1111 1111
+das ist —1 in der Zweierkomple-mentdarstellung. Zur Kontrolle nun die Vorzeichenumkehr durch Umrechnen ins Zweierkomplement:
+Einerkomplement davon 0000 0000
+plus 1	0000 0001
+------- +
+ ergibt	0000 0001
+also wie erwartet +1.
 
+Auf diese Weise rechnet unser Computer mit negativen Zahlen. Negative ganze Zahlen speichert er im Zweierkomplement-Format. Auch wenn wir nun etwas vorgreifen müssen, wollen wir uns das ansehen. Dazu schalten Sie am besten erst einmal den Computer aus und laden dann den SMON beziehungsweise ihren Assembler. Dann bauen wir ein kleines Basic-Programm:
+10 A% = -12
+20 END
 
+## Wie Variable im Speicher stehen
 
+Noch nicht RUN eingeben! Zuerst schalten Sie den Maschinensprachmonitor ein und wir sehen uns das Programm so an, wie es im Speicher steht. Der Basic-Speicher des C 64 beginnt im Normalfall bei $0800. Wir geben also den Monitorbefehl
+M 0800
 
+Uns genügen schon die Speicherplätze bis $081C. Nun sehen wir das nackte Basic-Programm im Speicher, so wie es uns C. Sauer in seinem Artikel »Der gläserne VC 20, Teil 1« im 64'er, Ausgabe 9/84 auf Seite 156 beschrieben hat.
 
+In Bild 1 ist unser Speicherinhalt kommentiert zu sehen. Das Programm endet im Speicherplatz $0813. Das Kennzeichen für Programmende sind zwei aufeinanderfolgende Bytes mit dem Wert Null. Dahinter werden die Variablen abgelegt, sobald das Programm gestartet wird. Wir steigen aus dem Monitor durch X aus und starten das Programm mit RUN. Jetzt sehen wir nochmal in den Speicher. Bis $0813 hat sich nichts verändert. Danach aber ist jetzt in 7 Bytes die Variable A% abgelegt. Das zeigt Bild 2.
 
+Zunächst einmal die Bytes $0814 und $0815: Hier wird der Väriablen-name und der -typ angegeben. Der Typ ist aus den Bits 7 zu erkennen. Sind beide (wie hier) gleich 1, dann handelt es sich um eine Integervariable (also eine ganze Zahl). Läßt man die Kennbits außer acht, zeigt sich, daß in $0814 der Code für den Buchstaben A steht und $0815 nur den Wert 0 enthält. Nun zum Rest: Der C 64 legt Integers in nur 2 Bytes ab — die restlichen 3 Bytes $0818 bis $081A bleiben unbenutzt. Das ist auch dann der Fall, wenn danach noch weitere Variable kommen. Es bringt also keine Speicherersparnis (VC 20-Benutzer aufgepaßt!), wenn man mit Ganzzahlvariablen arbeitet!
 
+In $0817 steht $F4, welches binär ausgedrückt 1111 0100 ist. Das kennen wir noch von weiter oben als die —12 im Zweierkomplement-Format. Woher kommt $FF in Speicherzelle $0816? Wie gesagt, die Integers werden in 2 Bytes gespeichert, und wenn wir —12 in 16 Bits ausdrücken, dann sieht das so aus:
++ 12	0000 0000 0000 1100
+Einerkomplement:
+1111 1111 1111 0011
+plus 1
+0000 0000 0000 0001
+ergibt-12:	1111111111110100
+MSB	LSB
+= $FF =$F4
+als 16-Bit-Zweierkomplement.
 
+Die größte positive ganze Zahl, die man in 2 Bytes ausdrücken kann, ist 32767, was binär
+0111 1111 1111 1111
+ergibt. Die kleinste ist
+1000 0000 0000 0000
+also —32768. Das ist der Grund dafür, daß der C 64 Integers größer als 32767 oder kleiner als —32767 dankend mit ILLEGAL QUANTITY ERROR ablehnt, wenn sie als Argument verwendet werden. (Die Zahl —32768 kann als Ergebnis von logischen Operationen durchaus auftauchen.)
 
+Damit will ich Sie für diesmal von den Zahlenspielereien erlösen. In der nächsten Folge müssen wir darauf nochmal zurückkommen. Sie können die Art des Abziehens von Zahlen durch Addieren des Zweierkomplementes bis zum nächsten Mal an weiteren Beispielen üben. Wenn Sie das mit 16-Bit-Zahlen tun, werden Sie bald feststellen, daß noch nicht alles so funktioniert wie es sollte...
 
+Wir können jetzt übrigens auch das Rätsel lösen, weshalb bei positiven Zahlen (zum Beispiel LDA # FF) die Negativ-Flagge auf 1 geht: Die Flagge wird immer dann gezückt, wenn eine Zahl auftritt, die in Bit 7 eine 1 aufweist. Ganz einfach, gell?
 
+### Ein wirkungsvolles Zweiglein: BNE
 
+Vermutlich raucht Ihnen nach soviel Zahlensalat der Kopf. Deshalb sollen Sie zur Entspannung noch einen neuen Assembler-Befehl kennenlernen und auch gleich ein nützliches Programmbeispiel dazu.
 
+BNE heißt »branch if not equal zero«, was man übersetzen kann mit »verzweige, wenn ungleich Null«. Genauer gesagt: Es wird dann verzweigt — also zu einer angegebenen Adresse gesprungen —, wenn die Z-Flagge (die haben wir bei den INX,DEX...-Befehlen genauer untersucht) nicht gesetzt ist, also 0 zeigt. Sehen wir uns das mal an der nachfolgenden Verzögerungsschleife an, deren Flußdiagramm Bild 3 zeigt.
 
+Das Progrämmchen dazu:	
+1500	LDX #FF
+1502	LDY #FF
+1504	DEY
+1505	BNE 1504
+1507	DEX
+1508	BNE 1502
+150A	BRK
 
+Zunächst einmal werden das X-und das Y-Register als Zähler initialisiert (also mit einem Ausgangswert geladen). Mit dem vorhin behandelten Befehl DEY wird dann das Y-Register um 1 heruntergezählt, was jetzt $FE ergibt. Für die Nullflagge (Z) bedeutet das den Inhalt 0, denn es liegt kein Grund vor, sie zu setzen (also eine 1 dort anzuzeigen), weil noch keine Null aufgetreten ist. Bei der nachfolgenden Prüfung durch BNE wird also eine Verzweigung nach 1504 das Ergebnis sein, worauf das Y-Register weiter verringert und dann die Z-Flagge erneut geprüft wird und so weiter. Das geht so lange, bis nun wirklich endlich die Null im Y-Register erreicht ist. In diesem Fall zählt DEX nun das X-Register herunter und der nächste BNE-Befehl führt zum Sprung nach 1502, wo das Y-Register wieder auf $FF gesetzt wird. Auf diese Weise wird die äußere Schleife 255mal und die innere 65025mal durchlaufen.
 
+## Kein Widerspruch: Assembler-Programme langsamer machen
 
+Sie haben beim Eingeben des Programmes vermutlich etwas gestutzt, als der Assembler nach dem BNE 1504 als nächste Adresse statt dem erwarteten 1508 eine 1507 ausgegeben hat. Der Befehl sieht zwar wie ein 3-Byte-Befehl aus, ist aber nur ein 2-Byte-Befehl! Das liegt an der speziellen Art der Adressierung von solchen Branch-Anweisungen: Der sogenannten relativen Adressierung, die wir aber erst später mit den anderen Branch-Befehlen behandeln werden.
 
+Wenn Sie das Programm mit G 1500 starten, werden Sie — obwohl alles in Maschinensprache schnell läuft — eine merkliche Verzögerung feststellen, bevor die Registeranzeige auftaucht. Noch längere Verzögerungen lassen sich ohne weiteres erreichen, indem man mehr Schleifen ineinanderschachtelt. Dabei verwendet man dann den DEC-Befehl.
 
+In der Tabelle sind auch die Zyklen angegeben, die die heute neu gelernten Befehle zur Abarbeitung benötigen. Mit solchen Angaben lassen sich recht genau definierte Zeiten einstellen, in denen der Computer nichts anderes tut als durch das Programm zu flitzen. Wozu das dient, braucht wohl kaum noch gesagt werden: Wenn Sie zum Beispiel einen Text auf dem Bildschirm lesen wollen, bevor das Programm weiterläuft oder wenn Sie mit Peripherie arbeiten, die langsamer als das Programm ist oder... Allerdings muß noch gesagt werden, daß es noch elegantere Methoden zur Verzögerungs-Programmierung gibt als das Lahmlegen des Computers, aber dazu kommen wir erst in einer späteren Folge.
 
+(Heimo Ponnath/gk)
 
+# Der gläserne VC 20 – Teil 3
 
+> In der letzten Folge befaßten wir uns schwerpunktmäßig mit der Zeropage. Diesmal wird der sich daran anschließende Adreßbereich von $0100 bis $03FF unter die Lupe genommen.
 
+Dieser Bereich ist so interessant, daß sich die Betrachtungen darüber bis in die 4. Folge erstrecken werden. Übrigens ist dieser Teil auch auf den C 64 anwendbar, denn Betriebssytem und Basic-Interpreter dieser beiden Computer sind ja nahezu identisch.
 
+Wenn wir einen Basic-Befehl im Direktmodus (LIST, RUN, PRINT) oder eine Programmzeile mit Zeilennummer eingeben, werden die Informationen — wie bekannt — auf den Bildschirm geschrieben und gelangen gleichzeitig in den Basic-Eingabepuffer (Adresse 512-600/ $0200-$0258). Dort werden Programmzeilen oder direkte Befehle zunächst einmal im ASCII-Format gesammelt (Bild la). Dies geschieht solange, bis man die RETURN-Taste betätigt.
 
+Dieser Puffer hat eine Kapazität von 88 Zeichen — also den bekannten vier Bildschirmzeilen.
 
+## Der Weg einer Eingabezeile
 
+Drückt man die RETURN-Taste, so beginnt der Interpreter mit der Auswertung der Kommandos. Eingaben ohne Zeilennummer werden auf ihre Syntax hin überprüft und danach ausgeführt.
 
+Verfolgen wir nun einmal genauer den Weg einer Befehlszeile. Die einzelnen ASCII-Zeichen werden von der inzwischen hinreichend be-kanntenCHRGET-Routine aus dem Puffer gelesen und mit den Befehlswörtern aus dem ROM verglichen. War die Überprüfung positiv — ist der Befehl als identifiziert worden —, so verkürzt der Computer die Kommandozeile, indem er die Befehle in Token (siehe Teil 1, Tabelle 1) umwandelt. Diese Prozedur durchlaufen sowohl die Programmzeilen (mit Zeilennummer) als auch die direkten Kommandos (Bild 1b). An dieser Stelle trennen sich nun aber die Wege dieser beiden Zeilentypen.
 
+Zunächst zu dem weiteren Weg einer Programmzeile. Die inzwischen komplett übersetzte Zeile im Basic-Puffer wird nun in einem zweiten Durchlauf vom Zwischenspeicher in den Programmspeicher übertragen, wobei sie auch gleich richtig eingeordnet wird (damit die Reihen-folge der Zeilennummern stimmt). Weil sich dadurch der Programmbereich im Basic-Speicher vergrößert, muß der Variablenbereich weiter oben angesiedelt werden. Die bis dahin gespeicherten Variablen werden dadurch natürlich überschrieben. Nach dem Übertragen der Programmzeile springt das Interpreterprogramm wieder in die Warteschleife zurück, damit weitere Befehle entgegen genommen werden können.
 
+Nun möchte ich den weiteren Weg einer Direktmoduszeile beschreiben, denn der verläuft anders. Nachdem die Zeile mit Hilfe der CHRGET-Routine in Interpretercode (also Token) umgewandelt worden ist, wird der 2-Byte-Zeiger ($7A-$7B) auf den Pufferanfang zurückgestellt und der Inhalt wie eine Programmzeile behandelt und abgearbeitet (wieder mit Hilfe der CHRGET-Routine).
 
+## Verbotenes
 
+Die Befehle INPUT und GET dürfen im Direktmodus nicht verwendet werden. Der Grund liegt darin, daß diese Eingabebefehle ebenfalls den Basic-Eingabepuffer zur Zwischenspeicherung der Daten verwenden. Das »Direktmoduspro-gramm«, was sich zu dieser Zeit im Puffer befindet, würde dann überschrieben. Um das zu verhindern, sind diese Kommandos im Direktmodus verboten (Fehlermeldung »ILLEGAL DIRECT«).
 
+## Die Tastaturverwaltung
 
+Die Schlüsselfunktionen für Basic wie beispielsweise die Umwandlung der ASCII-Zeichen in Token (wie eben beschrieben), Umwandlung der Token in Klartext (die Befehlswörter werden bei LIST wieder als ASCII-Zeichen sichtbar gemacht), werden durch indirekte Sprünge über Vektoren abgewickelt. Durch Zusatzroutinen besteht so die Möglichkeit, Klartextbefehle wie SOUND, KEY, OLD ect. in den Interpreter mit einzubinden. Dieses Verfahren besprechen wir später, zunächst aber schreiten wir in der Betrachtung des Adreßberei-ches von $0277-$03FF fort (dieser ist in Tabelle 1 genauer aufgelistet).
 
+Der nächste, größere Komplex, den wir hier behandeln wollen, ist die Tastaturverwaltung. Wie sie bestimmt schon öfter bemerkt oder gelesen haben, wickelt der VC 20 (der C 64 übrigens auch) seine Tastaturoperationen ebenfalls über einen Puffer ab. Dies wird beim LISTen von Basic-Programmen deutlich, denn während der Computer ein Programm ausgibt, können sie alle Tasten (mit Ausnahme des STOP-Keys) drücken — diese erscheinen aber nicht auf dem Bildschirm. Erst wenn das Programm zu Ende gelistet ist, sieht man, daß keine Taste »vergessen« wurde, denn alle Eingaben wurden im Tastaturpuffer (Adresse 631-640/ $0277-$0280) zwischengespeichert .
 
+Dieser Puffer hat eine Kapazität von maximal zehn Zeichen. Wem dies zuviel ist, der kann die Länge des Puffers durch Adresse 649 einstellen. Ratsam kann dies bei relativ langsamen Basic-Spielen sein, wo es empfehlenswert ist, nur ein Zeichen im Tastaturpuffer zwischenzuspeichern (POKE 649,1). Anderenfalls »hinkt« die Tastatur immer den Ereignissen hinterher.
 
+Mit Hilfe des Tastaturpuffers kann aber auch — und das ist das interessante an diesen zehn Bytes — eine relativ unkonventionelle Art der Programmierung praktiziert werden.
 
+## Der »DATA-Erzeuger«
 
+Um dies verständlich zu machen, habe ich ein Programm (Listing 1) geschrieben, welches DATA-Zeilen aus Maschinenprogrammen oder Sonderzeichen erzeugt. Die Problematik dabei ist folgende: Wenn ich DATA-Zeilen ins Programm schreiben möchte, so ist dies nur im Direktmodus möglich. Um dies automatisch zu tun, benötigen wir ein Programm. Also was tun? — Man bedient sich des Tastaturpuffers!
 
+Dazu nochmals die Durchleuchtung der Funktionsweise. Während des Systeminterrupts (was dort geschieht klären wir in einer der nächsten Folgen), der alle 60stel Sekunde durchlaufen wird, fragt der Computer die Tastatur ab. Ein eingegebenes Zeichen wird dabei im Tastaturpuffer abgelegt, wo es so lange verbleibt, bis ein Zeichen von der Tastatur benötigt wird. Dies ist zum Beispiel im Direktmodus der Fall (wenn der Cursor blinkt) oder im Programm — bei INPUT oder GET. Die Zeichen werden dann wieder aus dem Tastaturpuffer hervorgeholt und zwar nach dem Prinzip »First in, First out«. Bei unserem Programm werden zunächst einmal sechs Speicherzellen initialisiert. Die ersten zwei Adressen enthalten die Anfangsadresse der abzuspeichernden Daten aus dem Speicher. Dieser Zeiger wird solange inkrementiert, bis er den Wert der Endadresse — der in den zwei folgenden Bytes abgelegt ist — erreicht hat. In den letzten zwei Speicherstellen (Adresse 252, 253) steht die Zeilennummer in der Reihenfolge Low-/ High-Byte. Bequemer währe es natürlich, wenn man normale Variablen verwenden könnte. Dies ist jedoch nicht möglich, weil diese beim Einfügen einer DATA-Zeile gelöscht werden. Darum bleibt nur der Umweg über Speicherstellen, deren Inhalte durch Basic nicht überschrieben werden können.
 
+Als nächstes erzeugt das Programm — mit Hilfe der in 252/253 gespeicherten Zwei-Byte-Zahl — eine Zeilennummer, welche auf den Bildschirm gePRINTet wird. Dann schreibt es das Befehlswort »DATA« und druckt acht dreistellige Zahlen (die Daten aus dem zu verarbeitenden Maschinenprogramm) aus. Nun haben wir eine fertige Programmzeile auf dem Bildschirm stehen, die sich allerdings noch nicht im Speicher befindet. Dies erledigt jetzt unser Tastaturpuffer.
 
+Vorher müssen wir und jedoch genau überlegen, wie unser Bildschirm aussieht, denn dementsprechend muß der Cursor programmiert werden.
 
+## Cursorprogrammierung einmal anders
 
+Bild 2 zeigt ein Bildschirmfoto dieser Situation. Zuerst wird der Cursor mit HOME (= CHR$ (19)) an die linke obere Ecke befördert. Dort wird durch einen Druck auf die RETURN-Taste (=CHR$(13)) die Basic-Zeile in den Speicher übernommen. Nun befindet sich der Cursor in der dritten Zeile. Durch ein »Cursor down« (=CHR$(17)) bewegt er sich eine Zeile nach unten und steht nun auf dem Befehlswort RUN 60. Ein weiteres RETURN bewirkt den erneuten Start des Hilfsprogramms.
 
+Wir benötigen für die Cursorbewegung also vier Werte. Diese werden vor dem Ende des Programms mit »POKE 631,19: POKE 632, 13: PO-KE 633,17: POKE 634, 13: POKE 198,4« in den Tastaturpuffer geschrieben. Hierdurch simulieren wir eine gedrückte Tastenfolge: denn nachdem sich der Computer über den Befehl END wieder im Direktmodus befindet, wird zuerst der Tastaturpuffer geleert, wodurch der Cursor den vorbestimmten Weg nimmt. POKE 198,4 gibt an (das noch als Nachtrag) wieviele Zeichen sich momentan im Puffer befinden. Dieser POKE-Befehl darf bei der Manipulation des Tastaturspeichers nie vergessen werden. Ferner ist die Bereitschaftsmeldung »READY«, die beim Übergang in den Direktmodus ausgegeben wird, zu berücksichtigen. Man muß beachten, daß dadurch nicht die bereits auf dem Bildschirm befindlichen Zeichen überschrieben werden.
 
+Die Bedienung des Programms an sich ist ganz einfach. Nach Eingabe der Anfangs- und Endadresse werden die DATA-Zeilen mit jeweils acht Elementen in den Programmspeicher generiert; begonnen wird mit Zeilennummer 300, die in 10er-Schritten erhöht wird. Da sich das Listing selbst kommentiert, erübrigt sich alles Weitere. Der Vollständigkeit halber ist noch zu erwähnen, daß die REM-Zeilen nicht mit eingegeben werden müssen.
 
+Benutzt wurde der Tastaturpuffer bereits in einem Programm, das im ersten Teil dieser Serie abgedruckt wurde. Die Rede ist von der Autostartroutine, welche einen Basic-Programmstart (aus einem Maschinenprogramm heraus) durch Füllen des Puffers mit dem Kommando RUN (+ CHR$ (13)) realisierte.
 
+## Die Eckadressen
 
+Als nächstes besprechen wir die Adressen 641-644/ $0281-$0284. Sie enthalten die Anfangs- beziehungsweise Endadresse des verfügbaren Speicherbereiches.
 
+Bei dem Systemreset ($FD22/ 64802) werden verschiedene Routinen wie beispielsweise Initialisierung der Zeropage, Setzen der Vektoren, RAM-Test ect. durchlaufen. Dabei wird unter anderem auch der verfügbare Speicherplatz festgestellt und die Eckadressen den obengenannten Registern übergeben. Diese Daten sind die Grundlage für alle weiteren Grundeinstellungen des Systems, also Basic-Beginn und -Ende, Beginn des Video- und Farbspeichers ect.
 
+Wird es nun nötig, eine Speicherkonfiguration zu simulieren, beispielsweise Grundversion bei eingesteckter 8-KByte-Erweiterung, so kann das über diese Zeiger geschehen:
+POKE 642, 16: POKE 644, 30: SYS 64970: SYS 64821 bewirkt diese Simulation. Das Unterprogramm im Betriebssystem (Adresse 64970), das zur Reset-Routine gehört, hat die Aufgabe, die Seiten 0 (Zeropage), 2 und 3 zu löschen. Danach prüft der Computer seine Speicherzellen. Dieser Test hat die Aufgabe, das RAM auf seine Funktionsfähigkeit hin zu überprüfen, damit es nicht zu Fehlfunktionen durch einen beschädigten Speicher kommt. Bei dieser Gelegenheit wird die Ausbaustufe des Speichers festgestellt; das Ergebnis findet sich dann in den Registern für die Anfangs- beziehungsweise Endadresse.Hier steigen wir nun mit den entsprechend manipulierten Registern (642 auf 16 und 644 auf 30) in die ROM-Routine ein. Mit Hilfe dieser Werte richtet das Unterprogramm nun den Video- und Farbspeicher ein. Mit dem zweiten SYS-Befehl (SYS 64821) wird die Initialisierung fortgesetzt. Dabei richtet er den Speicher für Basic ein und gibt die Kaltstartmeldung
+**** CBM BASIC V2 ****
+3583 BYTES FREE
+aus.
 
+Soweit ein kleiner Einblick ins Betriebssystem, eine ausführlichere Erläuterung erfolgt in einer der nächsten Folgen.
 
+## Die Speicherorganisation
 
+Jetzt möchte ich noch einen kleinen Einblick in die Speicherorganisation geben, was auch im Hinblick auf Grafik von Bedeutung ist. Wie hinreichend bekannt sein dürfte, gibt es drei verschiedene Speichererweiterungen zu kaufen, nämlich 3 KByte, 8 KByte und 16 KByte. Die Sammelerweiterungen (also 27/32/64 KByte-Erweiterungen sollen hier gedanklich ebenfalls in diese drei verschiedenen Module zerlegt werden.
 
+Bei Erweiterungen von mehr als 8 KByte verändert sich die Lage des Bildschirm- und Farbspeichers (die Einstellung nimmt die Reset-Routine vor). Anhand von Bild 3 soll erläutert werden, warum eine Verschiebung notwendig ist.
 
+Der **V**ideo-**I**nterface-**C**hip VIC (daher auch der Englische Name des VC 20), der vor allem fürdie Erzeugung des Fernsehsignals und den Aufbau des Bildschirmes verantwortlich ist, kann hardwaremäßig nur Videospeicherplätze zwischen 4096 und 8192 adressieren. Folglich muß das Bildschirm-RAM in diesem Bereich angesiedelt werden. 
+In der Grundversion liegt es zwischen Adresse 7680 und 8191 — also am Ende des verfügbaren Speichers, damit der Speicherbereich für Basic auch bei eingesteckter 3 KByte-Erweiterung durchgängig ist (läge der Bildschirmspeicher sowie bei einer 8-KByte-Erweiterung, währe dies nicht der Fall). 
+Ist ein Speichermodul von mehr als 8 KByte eingesteckt (egal ob der 3-KByte-Bereich zugeschaltet ist oder nicht), so legt das System den Videospeicher an die unterste adressierbare Stelle für den VIC, also Adresse 4096. Aus diesem Grund kann die eingesteckte 3-KByte-Erweiterung nicht mehr für Basic benutzt werden, denn sonst wäre der Speicher nicht mehr durchgängig.
 
+Programme sollten immer auf allen Erweiterungsversionen lauffähig sein. Wer also in Routinen mit dem Bildschirm- oder Farbspeicher arbeitet, kann sich mit Hilfe der Register 36866 und 86869 im VIC die momentanen Adressen beschaffen. Bildschirm: 4*(PEEK(36866)AND128) + 64*(PEEK(36869)AND120)
+Farbspeicher:
+4*(PEEK(36866)AND128) + 37888
 
+## Gewußt wo — Die Bildschirmadressen
 
+Mit Hilfe bestimmter Bits aus diesen Registern bildet der VIC die Adressen, die er benötigt, um — unabhängig vom Prozessor — Bild- und Farbspeicherstellen auszulesen, damit er mit diesen Informationen das Fernsehbild erzeugen kann.
 
+Das Betriebssystem hingegen bezieht seine Informationen über die Lage des Videospeichers nicht aus diesen VIC-internen Registern, sondern aus Adresse 648. Gibt man beispielsweise »POKE 648,28« ein, so liegt der Bildschirmspeicher zwischen 7168 und 7679. In Wirklickkeit stellt der Video-Interface-Chip — der, wie gesagt, unabhängig arbeitet — weiterhin den Speicherausschnitt zwischen Adresse 7680 und 8191 auf dem Bildschirm dar. Der Cursor schreibt also in einem ganz anderen Speicherabschnitt. Erst durch einen Warmstart (durch die Tastenkombination RUN/ STOP — RESTORE) werden die VIC-Register angepaßt.
 
+Vom Bildschirm nun wieder zur Tastatur. In unseren systematischen Betrachtungen der Seite 1 bis 3 im Speicher, kommen wir nun zu den Adressen $0280-$0291/649-656, die der Tastatur zugeordnet sind. Sie enthalten lediglich Parameter für die Arbeit mit der Tastatur wie zum Beispiel Repeat Flag, das Flag für Kontrolltasten ect. Näheres entnehmen sie bitte Tabelle 1.
 
+## Praktisches: Die Befehlseingabe über Funktionstasten
 
+Zwei weithin unbekannte Adressen ($028F, $0290/ 655,656) sind vorzüglich dazu geeignet, eine Funktionstastenabfrage auf Interruptbasis zu realisieren. Besagte Adressen bilden einen Vektor für die Tastaturdecodierung, der meines Erachtens nur für den Zweck der Funktionstastenabfrage geschaffen wurde.
 
+Was sind überhaupt Vektoren? ROM, so sagt ja bereits der Name (**R**ead **O**nly **M**emory), ist grundsätzlich nicht überschreibbar. Wer dennoch das System ergänzen will (beispielsweise durch neue Basic-Befehle), ist gezwungen, das gesamte ROM auszutauschen, es sei denn, die Schöpfer des Computers haben mögliche Optionen — so wie beim VC 20 (oder C 64) — bereits eingeplant. Dies geschieht, indem aus dem ROM heraus ins RAM verzweigt wird.
 
+Normalerweise steht an der entsprechenden RAM-Adresse nur ein Zeiger auf eine ROM-Adresse, eben ein Vektor. Durch Änderung eines solchen Vektors kann man elegant bestehende Routinen umgehen und sie durch eigene ersetzen beziehungsweise ergänzen. Soweit, so gut.
 
+Wie im Handbuch zu lesen, gibt es Unterschiede zwischen den Bildschirmcodes eines Zeichens (»A« beispielsweise hat den Wert 1) und dem allgemein verbreiteten ASCII-Code (»A« hat hier den Wert 65). Gleiches gilt für die Tastatur. Hier unterscheidet man ebenfalls zwischen dem ASCII- und dem sogenannten Tastatur-Matrixcode. Diese VC 20-interne Codierung wird durch eine Betriebssystemroutine — die über einen Vektor verfügt (den oben erwähnten für die Tastaturdecodierung) — in ASCII-Zeichen umgewandelt. Das Maschinenprogramm in Listing 2 und 3 wird durch »verbiegen« des Vektors 655/656 in die Tastaturroutine mit eingebaut. Es fragt die Codes der Funktionstasten ab und druckt die Zeichen aus, mit denen sie belegt wurden.
 
+Das recht komfortable Programm liegt als Basic-Lader in Listing 2 vor. Nach dem Starten mit RUN wird das Maschinenprogramm automatisch ans Ende des verfügbaren Speichers geladen. Mit der SPACE-Taste aktiviert man diese Routine. Als erstes werden die Befehle gelistet, mit denen die Funktionstasten belegt sind. (Tabelle 2).
 
+Auffällig ist bei den Kommandos LIST und RUN der Pfeil nach oben (t). Er bewirkt ein sofortiges Ausführen des Befehls — entspricht also »LIST« und RETURN-Taste beziehungsweise »RUN« und RETURN-Taste. Das andere auffällige Zeichen ist der Apostroph (') bei dem Kommando LOAD, der dem Hochkomma (”) entspricht. Das echte Gänsefüßchen ist bereits für die Syntax des Änderungsbefehls (siehe unten) vergeben.
 
+Auf den Befehl π wie er beispielsweise beim Programm »Basic-Switch« (Folge 2) verwendet wurde, habe ich dieses Mal aus Platzgründen verzichtet, damit Lader und Maschinenprogramm in der Grundversion Platz finden. Die Kommandos werden statt dessen über den Befehl »SYS0« (oder F5) eingegeben. Dabei machen wir uns den USR-Vektor (Adresse 0-2) als Sprungzeiger zu Nutze. Damit zur Syntax bei der Funktionstastenprogrammierung:
+SYS0 L – Listen der Funktionstastenbelegungen
+SYS0 O – (Off) schaltet die Funktionstasten ab
+SYS0 R – (Restart) schaltet die Funktionstasten wieder ein.
+SYS0,X, »befehl« – belegt die X-te Funktionstaste mit einem Befehl.
 
+Zum Schluß kommen wir noch zu einem Thema, mit dem ich mich mehr an den fortgeschrittenen Maschinensprachenprogrammierer wenden möchte. Im ersten Teil dieser Serie wurde beschrieben, wie der Basic-Befehlssatz mit Hilfe der CHRGET-Routine und des Befehles »π« im beschränktem Umfang erweitert werden kann. Diese Methode hat allerdings viele Unzulässigkeiten; es sind beispielsweise keine verkürzten Befehle wie beim normale nBasic (LIST = L SHIFT I) möglich.
 
+Nun soll beschrieben werden, wie der Basic-Befehlssatz um richtige Klartextkommandos erweitert werden kann. Auch hierfür müssen wir bestehende Interpreterroutinen, die über Vektoren angesprungen werden, umgehen beziehungsweise ergänzen.
 
+Für das Verarbeiten von Basic-Programmen sind drei Schlüsselroutinen zu substituieren. Da ist zunächst das Unterprogramm »ASCII in Token wandeln«. ($C57C) welches — wie der Name bereits sagt — die Aufgabe hat, Eingabezeilen im Basic-Puffer (wie zu Anfang beschrieben) in Interpretercode zu wandeln. Das Gegenstück dazu ist die Unterroutine »Interpretercode in Klartext wandeln.« Will man Basic-Zeilen sichtbar machen, so benutzt man das Kommando LIST. Dazu wird eben diese ROM-Routine benötigt, die die Rückumwandlung der Token in ASCII-Zeichen vornimmt.
 
+Sämtliche Befehle sind in Form von ASCII-Zeichen im Basic-ROM enthalten, lediglich zum letzten Buchstaben jedes Befehlswortes wurde 128 ($80) addiert. Läßt man sich die Befehle durch
+FOR T= 49310 TO 47565: PRINT CHR$(PEEK(T)):NEXT
+ausdrucken, so sehen die Kommandos im Groß-/Kleinschrift-Modus folgendermaßen aus:
+END = enD
+FOR = foR ect.
 
+Ferner ist jedem Basic-Befehl eine Adresse zugeordnet, bei der eine Abarbeitung vorgenommen wird. Diese Adressen sind in einer Tabelle (von $C00C $C07F) zusammengefaßt. Eine spezielle Routine hat wiederum die Aufgabe, die Befehlsadresse für ein entsprechendes Token aus der Tabelle zu lesen, und einen Sprung nach dorthin durchzuführen. Auch dieses Unterprogramm kann man mittels eines Vektors umgehen.
 
+Damit haben wir das nötige Rüstzeug, um selbst Basic-Kommandos in den Interpreter mit aufzunehmen. In Listing 4 ist ein dafür geeignetes Programm abgedruckt, welches ich jetzt näher erläutern möchte. Es ist der Kopf für ein Utility, in das nach Belieben Befehlswörter und Sprungadressen eingesetzt werden können.
 
+Die Routine gliedert sich in vier Teile: Der erste Teil (von $2000 - $203A) ist eine Kopie der Reset-Routine. Dabei wird der Computer neu initialisiert und eine neue Kaltstartmeldung
+**** 64’ER BASIC ****
+ausgedruckt. Hier ist genügend Platz vorgesehen, damit der Text nach eigenen Wünschen gestaltet werden kann. Ferner wurden die ersten neun Bytes mit NOPs versehen, damit dort — falls das Programm im Modulbereich abgelegt wird — die obligate Autostartinformation (a0CBM) eingesetzt werden kann. Anderenfalls — wenn das Maschinenprogramm per SYS gestartet wird — muß der erste Mnemonic-Befehl ein SEI sein.
 
+Die sich jetzt anschließenden Programmteile sind die oben erwähnten Ergänzungen zu den Interpreterroutinen. Dies sind teilweise Kopien aus den alten ROM-Routinen mit Er-gänzungen für die neuen Basic-Kommandos. Die Befehlswörter müssen jetzt nur noch eingetragen werden. Das geschieht folgendermaßen:
 
+Die Befehle werden mit Hilfe des Programms »Tokenerzeuger« (Listing 5) in den entsprechenden Adreßbereich geschrieben. Bei nachträglichen Eintragungen ist zu beachten, daß zum letzten Buchstaben jedes Befehlswortes der Wert $80 (=128) zu addieren ist. Die Ergänzungsbefehle beginnen mit Token 204. Das erste Befehlswort beginnt mit dieser Nummer, der zweite erhält automatisch die 205 undso weiter.
 
+Weiterhin ist für jedes Kommando die Sprungadresse in der Tabelle ($2208-$2268) zu vermerken. Dabei muß die Reihenfolge Low-/High Byte beachtet werden. Außerdem muß das LOW-Byte vor dem Eintrag um eines dekrementiert werden (LOW Byte -1). Auch diese Arbeit erledigt das Programm in Listing 5.
 
+Ein Befehl wurde bereits eingetragen. Der Befehl KILL führt einen Reset durch und damit ist das Programm abgeschaltet. Wer also seine Maschinenprogramme ins Basic einbihden möchte, kann dies mit der beschriebenen Methode tun. Beispielsweise könnte man die in Listing 2 abgedruckte Funktionstastenroutine mit dem KEY-Befehl belegen. Auch im Hinblick auf Grafik, Tonerzeugung oder Joystickabfrage bietet sich hier die Möglichkeit, die Unzulänglichkeiten des Basics zu überwinden. Auch die Besitzer eines C 64 können die beschriebene Routine benutzen, da die Basic-ROMs nahezu identisch sind (sie haben lediglich eine andere Adresse). Außerdem habe ich in Tabelle 3 eine Liste der wichtigsten Unterpro-gramme zusammengestellt, mit denen man unter anderem Parameter, Strings, Kommas oder ähnliches abfragen kann. Auf jeden Fall sollte man sich für diese Arbeit ein ROM-Listing (zum Beispiel »VC 20 Intern« von Data Becker) zulegen.
 
+Damit möchte ich für heute schließen. Das nächste Mal werden wir sehen, was man mit den Kernal-Vektoren anfangen kann und betrachten die Grafikmöglichkeiten beim VC 20.
 
+(Christoph Sauer/ev)
 
+# Memory Map mit Wandervorschlägen
 
+> Es steckt sehr viel im ersten Kilobyte des VC 20 und C 64. Wir werden Ihnen im Rahmen dieses Kurses die Bedeutung und Anwendung der Speicher und Register von Betriebssystem und Interpreter näherbringen.
 
+Hinweise und Tips über nützliche PEEK- und POKE-Adressen gehören zum Standard-Repertoire einer Computer-Zeitschrift. Ebenso häufig werden Leserfragen zu diesem Thema gestellt, obwohl mehrere Handbücher für die beiden Home-Computer von Commodore bereits Speicherlisten (auf englisch »Memory Map«) enthalten.
 
+Warum ich mich jetzt auch noch mit diesem Thema befassen will, hat zwei Gründe. Zum einen stört mich, daß ein Hinweis wie:
+»...mit POKE 19,1 läßt sich das Fragezeichen bei INPUT-Befehlen unterdrücken...«
+zwar richtig und auch anwendbar ist, aber halt nicht erklärt, was da eigentlich passiert und welche Folgen das für ein Programm haben kann. Zum anderen vermisse ich speziell in den Speicherlisten nähere, auch für den Anfänger verständliche und irgendwann einmal verwertbare Angaben.
 
+Ich habe mir deshalb vorgenommen, Ihnen die Bedeutung und Anwendungen der PEEK- und POKE-baren Adressen, — sozusagen eine Wanderkarte mit Tourenvorschlägen und Sehenswürdigkeiten — in Form von Beispielen und Kochrezepten, näher zu bringen. Mir ist durchaus bewußt, daß das kein leichtes Unterfangen ist, da ich möglichst ohne Fach-Jargon auch für Nichttechniker verständlich bleiben möchte und da die Zahl der zu behandelnden Adressen recht hoch ist. Ich werde also um Kompromisse wohl manchmal nicht herumkommen. Bevor wir anfangen, möchte ich noch einen kleinen »Arbeitsplan« machen.
 
+* Zur Methode:
+Meine Erklärungen sind so aufgebaut, daß sie am besten vor dem Computer mit der Zeitschrift auf den Knien nachvollziehbar sind, also »Lies und Tipp«.
+* Zum Adressenbereich:
+Prinzipiell sind natürlich alle RAM-Adressen (RAM = Lese- und Schreibspeicher) POKEbar und kämen daher in Betracht. Vorerst aber werden wir uns nur den Bereich von 0 bis 1023 vornehmen.
+* Zum Computer:
+Der genannte Speicherbereich hat mit wenigen Ausnahmen für VC 20 und C 64 die gleiche Bedeutung. Ich werde daher beide Computer gleichzeitig behandeln und auf Unterschiede jeweils gezielt hinweisen.
+* Der erste Hinweis:
+InTabelle 1 sind die Unterschiede in groben Umrissen zusammengefaßt.
+* Zur Darstellung:
+Die Kenntnis der Bedeutung dieser Speicherzellen kommt auch Programmen in Maschinensprache zugute. Ich gebe daher alle Adressen sowohl als Dezimal- als auch als Hexadezimalzahl (mit vorgestelltem »$«) an.
+* Zu den Adressen:
+Wenn in die zur Diskussion stehenden Speicherzellen eine Adresse aus dem erlaubten Bereich 0 bis 65535 ($0 bis $FFFF) hineingeschrieben wird, geschieht das immer mit der Aufteilung in einen niederwertigen Teil (Low Byte) und einen höherwertigen Teil (High Byte). Das Rezept zur Umrechnung finden Sie auf Seite 137.
 
+## Wozu brauchen das Betriebssystem und der Basic-Übersetzer RAM-Speicherzellen?
 
+Auf den ersten Blick ist nicht verständlich, warum die Speicherzellen von 0 bis 1023 feste Bedeutung haben und für normale Programme nicht zur Verfügung stehen. Wenn sie schon, wie es heißt, vom Betriebssystem und dem Übersetzer-Programm verwendet werden, warum stehen sie dann nicht gleich im ROM-Speicher bei allen anderen Teilen dieser Systeme?
 
+Ein Computer führt einen Programmschritt nach dem anderen aus, ganz stur, ohne eigene Entscheidungsfähigkeit, es sei denn, das Programm schreibt derartige Entscheidungen vor. Das Betriebssystem ist sozusagen im ROM eingefroren beziehungsweise festgeschrieben. Das würde aber bedeuten, daß der Computer keine Variationsmöglichkeiten hat, und daß alle Programme in gleicher Weise ablaufen. Aber das stimmt natürlich nicht! Alle Programme sind verschieden, sie belegen einen verschieden langen Speicherbereich und verarbeiten die unterschiedlichsten Variablen. Wir geben verschiedene Zeichen mit der Tastatur ein, der Computer wartet, bis eine Taste der Datasette gedrückt ist und so weiter.
 
+Dafür braucht das Betriebssystem einen Speicherbereich, der variabel ist, in den es Zwischenwerte ablegen und später wieder auslesen kann.
 
+Und das ist genau der Speicherbereich, der uns interessiert, nämlich von 0 bis 1023, womit wir wieder beim Thema wären.
 
+Jetzt aber geht es los und zwar gleich in die Vollen. Denn ausgerechnet die ersten drei Speicherzellen haben laut Tabelle bei beiden Computern eine verschiedene Bedeutung und zusätzlich gehören sie mit zu den kompliziertesten.
 
+### Adresse 0 bis 2 ($0 — $2) beim VC 20:
 
+Sprungbefehl und wählbare »Sprungadresse« des USR-Befehls.
 
+Die drei Adressen werden bei der Abwicklung des Basic-Befehls USR verwendet und stehen dem Programmierer zur Verfügung.
 
+Hinweise: Diesen drei Adressen des VC 20 entsprechen beim C 64 die Adressen 784 ($310) bis 786 ($312). Die folgenden Erklärungen gelten also entsprechend auch für den C 64.
 
+Hand aufs Herz: Haben Sie USR schon einmal benützt? Ohne Zweifel gehört dieser Befehl zu den seltenen. Ich will ihn daher hier kurz erläutern. USR hat dieselbe Funktion wie SYS, nämlich aus einem Basic-Programm direkt in ein Maschinenprogramm zu springen und dort solange weiterzufahren, bis mit dem Befehl RTS (entspricht dem Basic-Befehl RETURN) in das Basic-Pro-gramm zurückgesprungen wird. Die Sprungadresse in das Maschinenprogramm steht bei SYS gleich hinter dem Befehl.
 
+Bei USR muß die Adresse zuerst in die Speicherzellen 1 und 2 (aha!!) ge-POKEt werden.
+Beispiel — Sprung auf 56524 ($DCCC):
+mit SYS: SYS 56524
+mit USR: POKE 1,204:POKE 2,220:X = USR(Y)
 
+Kein Wunder, daß USR selten benützt wird. Aber erstens ist er durch das POKEn der Low-High-Byte-Darstellung aufgebläht und zweitens hat er auch wesentlich mehr Fähigkeiten als SYS.
 
+Sein Argument, im obigen Beispiel also das »Y«, wird nämlich zuerst in den »Fließkomma-Akkumula-tor« FAC 1 (Floating Point Accumulator Nr. 1) gebracht, der sich in den Speicherzellen 97 bis 102 ($61 bis $66) befindet. Da wir ihn auf unserer Reise durch den Speicher noch treffen werden, brauche ich jetzt nicht näher darauf einzugehen. Wichtig ist lediglich, daß der Wert von »Y« dann vom angesprungenen Maschinenprogramm verarbeitet werden kann. Das Resultat kommt dann wieder in diesen FAC 1 und steht als Wert von X (siehe Beispiel oben) dem Basic-Programm zur Verfügung.
 
+Mit USR kann man also Variable ins Maschinenprogramm zur Bearbeitung und zurück transferieren — und das ist der Unterschied zum SYS-Befehl. Ich möchte das an einem kleinen Beispiel demonstrieren. Statt allerdings ein Maschinenprogramm selbst zu schreiben, verwende ich, beziehungsweise springe ich, auf eine Routine des Betriebssystems, welches Werte des FAC 1 für mathematische Operationen verwendet.
 
+Als mathematische Operation wähle ich das eingebaute Programm für INT, welches im VC 20 ab Speicherzelle 56524 ($DCCC) steht (im C 64 steht es ab 48332 ($BCCC)). Dieses wollen wir verwenden:
+In Zeile 10 definieren wir einen Wert für die Variable X, der in das Maschinenprogramm gebracht werden soll. Mit Zeile 20 bringen wir die Startadresse des Maschinenpro-gramms in die Speicherzellen 1 und 2.
 
+Laut Kochrezept teilen wir die Adresse 56524 auf in ein Low-Byte = 204 und ein High-Byte = 220.
 
+Der Befehl in Zeile 30 löst den ganzen USR-Vorgang aus, Zeile 40 gibt uns das Resultat.
+10 Y = 14.35
+20 POKE 1,204:POKE 2,220
+30 X = USR(Y)
+40 PRINT X
+Hinweis:
+Entsprechend der anderen Adresse 48332 lautet die Zeile 20 beim C64:
+20 POKE 785,204:POKE 786,188
 
+Nach RUN erhalten wir das Resultat 14, wie das Gesetz für INT es befiehlt. Natürlich hätten wir gleich PRINT INT (14.35) schreiben können, aber ich wollte ja nur demonstrieren. Der eigentliche Wert des USR-Befehls kommt hauptsächlich bei selbtgeschriebenen Maschinenprogrammen zum Zuge.
 
+Sie können zur Übung im obigen Programm statt INT auch COS verwenden, indem Sie auf die Adresse 57935 ($E261) beziehungsweise beim C 64 auf 57938 ($E264) springen. Der Vergleich mit dem Basic-Befehl COS muß dasselbe Resultat ergeben.
 
+Wer hat gemerkt, daß wir überhaupt nichts mit der Speicherzelle 0 gemacht haben, obwohl sie doch beim USR angeblich beteiligt ist?
 
+Sie ist es wirklich, doch ohne unser Zutun. In diese Adresse wird beim Einschalten des Computers die Zahl 76 ($4C) geschrieben. Das ist der Code für den Maschinenbefehl »JMP«, der soviel bedeutet wie GOSUB. Bei USR springt nämlich das Programm auf die Speicherzelle 0, findet dort den Sprungbefehl und in den nachfolgenden Zellen 1 und 2 die Sprungadresse — und führt den Sprung auch gleich aus.
 
+Jetzt aber wollen wir uns anschauen, wie diese drei Speicherzellen beim C 64 verwendet werden.
 
+### Adresse 0 ($0) beim C 64:
 
+Datenrichtungsregister für Ein/Aus-gabe-Port des 6510-Mikroprozes-sors
 
+### Adresse 1 ($1) beim C 64:
 
+Datenregister für Ein/Ausgabe-Port des 6510 — Mikroprozessors.
 
+### Adresse 2 ($2) beim C 64:
 
+unbenutzt
 
+Im Gegensatz zum Mikroprozessor des VC 20 hat der des C 64 sechs Ein/Ausgabe-Leitungen die einzeln programmierbar sind und so eine direkte Verbindung zwischen dem Mikroprozessor und der Außenwelt herstellen. Warum nur sechs Leitungen und nicht wie üblich acht? Auf dem Chip selbst könnten acht Bit verkraftet werden, aber es stehen nur sechs Anschlußbeine zur Verfügung.
 
+Um trotzdem flexibel zu bleiben, ist dieses Tor zum Prozessor — zutreffend auch »Port« genannt — in beiden Richtungen begehbar. Jede einzelne der sechs Leitungen kann vom Programmierer auf »Eingang« oder auf »Ausgang« geschaltet werden. Dazu dient das Datenrichtungsregister in der Speicherzelle 0.
 
+### Datenrichtungs-Register in Zelle 0
 
+Wenn zum Beispiel in das Bit 4 der Zelle 0 eine 0 hineingePOKEt wird, ist die Leitung Nummer 4 des Ports auf »Eingang« geschaltet. Es gilt für alle 6 Bits (Nummer 0 bis 5):
+— Bit auf 0 = Eingang
+— Bit auf 1 = Ausgang
+Beim Einschalten schreibt das Betriebssystem in dieses Register die Dualzahl ..101111 (dezimal = 47). Das heißt also, daß nur die Leitung Nummer 4 als Eingang verwendet wird, alle anderen aber als Ausgang. Warum das so ist, sehen wir gleich. Vorher will ich aber noch erwähnen, daß im C 64 von dieser Flexibilität des Mikroprozessor-Ports kein Gebrauch gemacht wird. Ich habe das ganze Betriebssystem durchgesehen, aber das einzige Mal, wo die Speicherzelle 0 angesprochen wird, ist eben bei der Einschaltroutine.
+Das heißt aber nicht, daß Sie, lieber Hobby-Programmierer, darauf verzichten müssen. Ich kann mir vorstellen, daß besonders Ausgefuchste unter Ihnen durch POKEn eines anderen Bitmusters in die Speicherzelle 0 vielseitige Befehle erzeugen und einsetzen können.
 
+Das wird besonders deutlich, wenn Sie jetzt sehen, mit welchen Teilen des Computers diese sechs Leitungen verbunden sind.
 
+### Datenregister in Speicherzelle 1
 
+Mit diesem Register steuert der Mikroprozessor (und damit natürlich das Betriebssystem) die Auswahl von Speicherblöcken und den Betrieb mit dem Kassettenrecorder. Dem Programmierer steht diese Möglichkeit über POKEn auch zur Verfügung.
 
+### Bit O
 
+schaltet den Speicherbereich 40960 - 49151 ($A000 - $BFFF) zwischen dem Basic-Übersetzer (Interpreter) im ROM und freiem RAM um (Normalzustand = 1)
 
+### Bit 1
 
+schaltet den Speicherbereich 57344 — 65535 ($E000 — $FFFF) zwischen dem Betriebssystem (Kernal) im ROM und freiem RAM um (Normalzustand = 1)
 
+### Bit 2
 
+schaltet den Speicherbereich 53248 - 57343 ($D000 - $DFFF) zwischen Zeichen-ROM und Ein/Ausgabe-ROM um (Normalzustand = 1)
 
+### Bit 3
 
+sendet serielle Daten zum Kassettenrecorder (Normalzustand = 0)
 
+### Bit 4
 
+prüft, ob eine der Tasten des Recorders gedrückt ist, welche den Motor einschalten (Normalzustand = 1)
 
+### Bit 5
 
+schaltet den Motor des Recorders ein und aus (Normalzustand 1)
 
+Als erstes möchte ich die RAM-ROM-Umschaltung näher beschreiben.
 
+Sie wissen, daß Ihr C 64 deswegen so heißt, weil er 64 KByte Speicherplätze hat. Nur stimmt das nicht! Er hat nämlich 88 KByte und müßte eigentlich C 88 heißen.
 
+Da mit den 16 Bit der High/Low-Byte Methode (siehe Bild 1) nur 64 KByte adressierbar sind, müssen die restlichen 22KByte bei Bedarf eingeschoben werden — und das machen die oben erwähnten Bits 0 — 2 des Datenregisters.
 
+In Bild 2 sehen Sie die drei oben erwähnten Speicherblöcke, die sowohl mit RAM als auch mit ROM belegt sind, einer davon gleich doppelt. Ich habe ihnen folgende Namen gegeben:
 
+- 40960-49151 ($A000-$BFFF) = BLOCK A
+- 53248-57343 ($D000-$DFFF) = BLOCK D
+- 57344-65535 ($E000-$FFFF) = BLOCK E
 
+Tabelle 2 gibt Ihnen die Übersicht über die gemeinsame Wirkung der Bits 0,1 und 2 des Datenregisters auf den jeweiligen Inhalt der Speicherblöcke.
 
+Wie Sie durch PRINT PEEK (1) selbst leicht feststellen, steht nach dem Einschalten des Computers im Register 1 die Zahl 55. In dualer Darstellung ist das 110111. Das entspricht dem oben genannten »Normalzustand« der einzelnen Bits.
 
+Vergleichen Sie es bitte mit der Auflistung am Anfang der Beschreibung der Speicherzelle 1. Die in Tabelle 2 dargestellten Bits sind also die rechten drei Bits der Zelle 1. Lassen wir die Bits 3, 4 und 5 unverändert, ergeben die acht Kombinationen der Tabelle 2 die Zahlen 55 bis 48. Durch den Befehl POKE 1,54 können wir nun den Basic-Übersetzer ausschalten und 8 KByte Speicher gewinnen. Nur nutzt uns das nicht viel, denn was tun — ohne Basic! Es gibt aber doch eine Anwendung. Zuvor will ich Ihnen aber noch beweisen, daß wir tatsächlich den Block A auf RAM umschalten. Der Trick besteht darin, den Basic-Übersetzer vom ROM in den darunter liegenden RAM umzuladen. Wenn er tatsächlich inRAM steht, müßten wir ihn durch POKEn verändern können zu einem Privat-Basic. Geben Sie direkt ein:
+FORJ = 40960 TO 49151: POKE J, PEEK(J):
+NEXTJ
+POKE J,PEEK(J)—das sieht dümmer aus als es ist. Die »Doppeldecker-Speicher« erlauben nämlich ein PEEKen nur aus dem ROM-Bereich. Ein hineinPOKEn dagegen geht nur in den RAM-Teil. Von dort aber kann er — wie gerade gesagt — nicht herausgelesen werden, es sei denn, wir schalten um !
 
+Merken Sie was? Die Zeile oben liest also den Inhalt des Basic-ROMs und schreibt ihn in den RAM mit identischen Adressen. Die Ausführung der Zeile braucht einige Zeit. Wenn der Cursor wieder blinkt, schalten wir den RAM ein mit:
+POKE 1,54
 
+Wir merken natürlich noch keinen Unterschied, denn das RAM-Basic ist ja noch dasselbe, wie es im ROM steht.
 
+Doch nun werden wir es verändern. In der Speicherzelle 41220 steht das »P« für den Befehl PRINT mit dem ASCII-Codewert 80. Dieses P ersetzen wir durch ein »G« (ASCII-Code = 71).
+POKE 41220,71
+Versuchen Sie bitte, mit dem (nicht durch »?« abgekürzten) PRINT-Befehl ein Zeichen auf den Bildschirm zu drucken. Es wird Ihnen nicht gelingen, denn der Befehl heißt jetzt:
+GRINT ”A”
+was beweist, daß das Basic jetzt in RAM steht. Das Umdefinieren von Befehlen ist natürlich wenig sinnvoll. Aber wer die Maschinenprogramme des Basic kennt, kann sie auf diese Weise ändern, erweitern, einschränken, solange er sich auf in sich geschlossene Teile beschränkt.
 
+Eine inzwischen oft zitierte Anwendung stammt von Jim Butterfield (siehe Literatur), den es begreiflicherweise stört, daß der Befehl ASC, welcher den ASCII-Code eines Strings erzeugt, bei einem Null-String das Programm mit ILLEGAL QUANTITY ERROR beendet.
+Versuchen Sie es:
+PRINT ASC("A") ergibt die Zahl 65. PRINT ASC("") hat die obige Fehlermeldung zur Folge.
+Wenn Basic im RAM steht, können wir das ändern:
+POKE 46991,5
+Die Wiederholung des Befehls PRINT ASC("") ergibt jetzt 0 — und, was das Wichtige ist, das Programm läuft weiter.
 
+Durch zusätzliches Umladen des Speicherblocks E und anschließendes Umschälten mit POKEl,53 ist auch das Betriebssystem veränderbar — ein weites Feld für fortgeschrittene Programmierer in Maschinensprache.
 
+Die wohl wichtigste Anwendung der Umschaltmethode wird den Maschinen-Programmierern geboten, die dadurch eine kostenlose Speichererweiterung von 16 KByte erhalten. Bei gleichzeitiger Verwendung von Basic und Maschinenprogramm kann die Umschaltung besonders vorteilhaft eingesetzt werden. Das Umschaltprogramm muß dann aber ebenfalls in Maschinensprache geschrieben sein und darf nicht im Umschaltbereich liegen.
 
+Das Umschalten von den Ein/Aus-gabe-Registern des Blocks D mit POKE 1,51 erlaubt, die Bitmuster der fest programmierten Zeichen aus dem Zeichen-ROM auszulesen, in einen freien RAM-Bereich zu bringen und dort dann nach eigenen Vorstellungen zu verändern. Im Grafik-Kurs war das ausführlich beschrieben.
 
+Der Vollständigkeit halber muß ich hier noch erwähnen, daß neben den drei ersten Bits der Speicherzelle 1 noch zwei weitere Signale die RAM/ROM-Umschaltung beeinflussen. Es sind das die Leitungen auf Pin 8 und 9 des Erweiterungssteckers (GAME und EXROM), welche durch Spiel- und Programmodule benützt werden. Eine genaue Beschreibung der dadurch erzeugten sinnvollen Speicherkombinationen finden Sie in dem Buch »64 Intern« von Data Becker ab Seite 14.
 
+Bit 3, 4 und 5 regeln wie schon gesagt den Betrieb des Kassettenrecorders.
+Zu **Bit 3** ist oben schon alles notwendige gesagt.
+**Bit 4** ist im Normalzustand auf 1, »normal« heißt hier, solange keine der Motor-Tasten der Datasette (PLAY, REWIND, FAST FORWARD) gedrückt ist.
+Zur Probe:
+10 X = PEEK(1)
+20 PRINT X
+40 GOTO 10
 
+## Betrieb des Kassettenrecorders
 
+Die schon erwähnte »Normalzahl« 55 (dual = 110111) läuft als Zahlenband solange, bis eine der besagten Tasten gedrückt wird. Dann läuft eine 7 (dual = 000111). Warum auch Bit 5 zu 0 wird, kommt gleich nachher zur Sprache.
 
+Mit einer kleinen Erweiterung der drei Zeilen können Sie in einem Programm den Status der Motor-Tasten abfragen. Ergänzen Sie:
+30 IFX = 7 THEN 50
+50 PRINT »TASTE GEDRÜCKT«
+Um nur Bit 5 abzufragen, schreiben wir besser:
+30 IF (X AND 16) = 0 THEN 50
 
+Diese Abfrage kann allerdings nicht unterscheiden, welche der drei Tasten der Datasette gedrückt worden ist. Außerdem funktioniert das alles nur, wenn — wie im »Normalfall« — das Bit 4 des Datenrichtungsregister (Speicherzelle 0) auf 0 (Eingang) steht.
 
+**Bit 5** schaltet den Motor der Datasette ein und aus. Es bietet sich an, damit per Programm die Datasette zu schalten — wenn so etwas nützlich ist. Leider ist dieses Bit etwas schwieriger zu handhaben, da es in der Interrupt-Routine des Betriebssystems eine Rolle spielt.
 
+Die Tasten der Datasette werden nämlich 60mal in der Sekunde abgefragt. Wenn keine Taste gedrückt ist, setzt das Betriebssystem sowohl das sogenannte »Interlock«-Register in Speicherzelle 192 auf 0 als auch Bit 5 der Zelle 1 auf 1, wodurch der Motor ausgeschaltet wird beziehungsweise bleibt. Da kann man nicht dagegen an. Wir haben nur eine Chance, wenn eine Taste bereits gedrückt ist und der Kassettenmotor schon läuft.
 
+Dann nämlich können wir zuerst das Interlock-Register mit einem Wert größer als 0 lahmlegen:
+POKE 192,255
+Jetzt läßt sich der Motor der Datasette mit Bit 5 steuern:
+POKE 1,39 beziehungsweise
+POKE 1,PEEK(1) OR 32
+schaltet den Motor aus,
+POKE 1,7 beziehungsweise
+POKE 1,PEEK(1) AND 31
+schaltet den Motor ein.
 
+Das Interlock-Register in Speicherzelle 192 werde ich später noch einmal erwähnen, da es seine Funktion auch beim VC 20 ausübt, allerdings mit anderen Ein/Ausgangs-Ports. Das ist alles, was zur Speicherzelle 1 zu sagen ist. Das nächste Mal wird unsere Speicherreise weitergehen, wobei natürlich nicht alle Speicherzellen soviel hergeben beziehungsweise dem Programmierer so direkt zur Verfügung stehen, wie die Adressen 0 und 1.
 
+(Dr. Helmuth Hauck/aa)
 
+<aside>
 
+## Die Low-High-Byte-Methode
 
+DARSTELLUNG VON ADRESSEN GRÖSSER 255
 
+Um große Zahlen darzustellen, wird von allen Homecomputern die sogenannte High-Low-Byte-Methode angewendet.
 
+Eine Speicherzelle der Commodore Computer ist 8 Bit lang, das ist 1 Byte, und sie kann daher als größte Zahl 255 ($FF) enthalten. Für Zahlen größer als 255 hängen wir mehrere Speicherzellen hintereinander, in unserem Fall deren zwei. Mit 2 Bytes (16 Bit) können wir nämlich maximal 65535 ($FFFF) darstellen. Diese Aufspaltung einer Adresse in zwei Speicherzellen soll das folgende Beispiel verdeutlichen.
 
+TODO
 
+Sie sehen, daß die Dezimalzahl 47491 aufgespalten wird in $B9 = 185 und $83 = 131. Zur Erinnerung: Jede Stelle einer Hex-Zahl kann direkt in eine 4stellige Dualzahl und umgekehrt gewandelt werden (1011 = $B, 1000= $8).
 
+Der Umrechnungsweg über eine 16stellige Dualzahl ist natürlich viel zu aufwendig. Ich empfehle Ihnen folgendes Kochrezept:
+(1) Dezimal High/Low-Byte:
+47491 : 256 = 185, Rest 131
+Der Rest fällt bei der Division per Hand automatisch an. Mit dem (Taschen-)Rechner erhält man den Rest durch:
+185 * 256 - 47491 = -131
+2) High/Low-Byte Dezimal:
+HB* 256 + LB = Dezimal
+185* 256 + 131 = 47491
+Wichtige Regel:
+Die Mikroprozessoren von VC 20 und C 64 verlangen, daß immer das Low-Byte vor dem High-Byte kommen muß. Die Zahl wird sozusagen von rechts nach links gelesen (im Beispiel: 131, 185)
+</aside>
 
+# Mode-Fotos – mit Bits und Bytes
 
+> Aus anfänglichem Hobby wurde ernsthafte Anwendung. In seinem Münchener Hinterhofstudio verbindet der Fotograf Dirk Franke Schönheiten und Mode mit auf einem C 64 erzeugter Computer-Grafik. Die Ergebnisse können sich sehen lassen.
 
+Das Lehel ist eines der ältesten und gemütlichsten Münchner Stadtteile. Hier wohnen neben Alteingesessenen Ausgeflippte aus den Bereichen Mode, Musik und Film. Versicherungskonzerne residieren protzig neben Tante-Emma-Läden, und vor nicht allzu langer Zeit gab es in diesem Viertel noch Münchens einzigen Pferdemetzger und sogar einen letzten, privaten Bauernhof. Auch heute gibt es dort noch viele kleine Handwerksbetriebe und Hinterhofwerkstätten. Und in einer von diesen beginnt unsere Geschichte.
 
+In den Räumen einer aufgelassenen Galvanisierfabrik entstand mit viel Eigenleistung und Umbauarbeit das Lime-Light Studio. Dort machte sich nach langen »Lehrjahren« bei Profis der Mode- und Werbefotograf Dirk Franke mit einem eigenen Studio selbständig. Und lange sah es auch so aus, als würde dieses Studio ein Fotostudio wie so viele andere bleiben. Wäre da nicht...
 
+Tja, wäre da nicht jemand aus dem großen Bekanntenkreis des jungen Fotografen mit einem TRS-80-Computer samt Monitor eines Tages im Studio bei Dirk Franke aufgetaucht.
 
+Anfangs diente dieses heute schon antiquare Gerät nur zum Daddeln. Wer die eher einfachen bis langweiligen Spiele aus dieser Ära noch kennt, kann sich leicht vorstellen, daß bald mehr gefragt war. So machte Dirk Franke seine ersten Tapser in Basic. Und obwohl die grafischen Fähigkeiten dieses Modells noch nicht einmal bescheiden zu nennen waren, faszinierte ihn die Möglichkeit, mit einem solchen Gerät Bilder, wenn auch sehr primitive, erzeugen zu können.
 
+Anders als die mit seiner Fotokamera geschossenen, hatten diese Bilder von sich aus schon ein gewisses Eigenleben, das man mit der herkömmlichen Fotografie erst mühsam und kreativ erzeugen mußte. Einen ersten Gehversuch, dieses für den Fotografen völlig neue Medium auch beruflich zu nutzen, zeigt das Cover für die Single »Letric Metric« von Peter Griffin (Bild 1), für den er das Titelbild vor nun fast dreiJahren knipste.
 
+Der TRS-80 verließ einige Tage später samt dem Bekannten wieder das Studio. Aber von nun an war es klar, ein Computer mußte her. Es vergingen zwar noch ein paar Monate, doch dann war der C 64 und mit ihm bis dahin in dieser Preisklasse ungekannte grafische Möglichkeiten auf dem Markt.
 
+Dennoch, mit der schnellen Entscheidung für diesen Computer war es nicht getan. Jeder kennt die umständliche Programmierung von Grafiken beim C 64, ohne Tools oder Grafikerweiterungen. Es folgten also die Floppy und das Koala Pad. Jetzt konnte es endlich losgehen. Denkste!
 
+Nach nächtelangen Versuchen und endlosem Testen mit den verschiedensten Kameratypen, unterschiedlichen Filmmaterialien, ja sogar variierenden Film-Emulsionen, die einzelne Farben nuanciert anders wiedergaben, und nachdem Dirk Franke sämtliche Laboranten im Entwicklungslabor kirre gemacht hatte, wollte er beinahe aufgeben. Die Qualität war einfach nicht akzeptabel.
 
+Wieder mal ging es quer durch den Dschungel des Münchner Computer-Handels, bis ein geeigneter Farbmonitor gefunden war. Mit diesem ließ sich dann auch die letzte Hürde, die vorher viel zu grobe Auflösung, nehmen. Die neuen Tests waren vielversprechend, und ein erster Kunde zeigte Mut und Interesse an der neuen »Technik«.
 
+Eine junge Modefirma suchte nach etwas Neuem: einem »Eyecatcher«. Denn nach wie vor gilt auch in dieser Branche die Devise des Auffallens um jeden Preis. Und dafür schien die Frankesche Verbindung von Real-Fotografie und Computergrafik wie geschaffen.
 
+Mittels des Tabletts vom Koala Pad und der mitgelieferten Schrift-Software entstand das Computerbild (Bild 2). Ein Modell war schnell gebucht und stellte sich mitsamt der, damit sie nicht reflektieren, an speziell behandelten Nylonschnüren aufgehängtenJeans vor den schwarzen Hintergrund in Pose (Bild 3).
 
+Stimmte erst einmal das Licht und stand die Grafik, war der Rest nur noch für den Assistenten Plackerei. Er war es nun, der die Filmkassetten für die ständigen Mehrfachbelichtungen quer durchs Studio hin- und herbringen mußte. Zweimal Klick mit Modell und Jeans. Blitze aus. Zweimal Klack am Computer. Blitze wieder an. Und immer weiter so, mindestens hundertmal.
 
+Das Endergebnis war dann die Vorlage für die Anzeige und der Modekunde zufrieden. Doch schon während der Aufnahmen hatte der Layouter der Werbeagentur Gelegenheit zu letzten Korrekturen. Ein kurzes Basic-Programm ermöglicht eine Hardcopy des Bildschirms auf dem grafikfähigen Drucker. So konnte der Art-Director immer wieder Varianten scribbeln oder Veränderungen am Bildaufbau vornehmen, bevor der letzte Schuß im Kasten und die Aufnahmen damit gestorben waren (Bild 4).
 
+Welche Faszination diese Verbindung zweier, eigentlich artfremder Medien auf den Fotografen Dirk Franke ausübt, zeigt auch seine Visitenkarte: Ein 6 x 6-Dia, das den realfotografierten Meister im Bogie-Look zusammen mit Computerbild und Telefonnummer, einen bleibenden Eindruck hinterlassend zeigt (Bild 5).
 
+Doch nicht nur das fotografische Leben hat der Computer bei Dirk Franke nachhaltig beeinflußt. Auch in die interne Organisation seines »Ladens« brachte der C 64 neuen Schwung. Der ganze Papierkram befindet sich nun auf Disketten und teils selbstgeschriebene, teils gekaufte Programme erleichtern und übernehmen das Halten der täglichen Ordnung.
 
+Vom Hauptmenü (Bild 6 und 7) geht es zur Textverarbeitung, zum Rechnungsstellung- und Film- und Requisitenlager-Programm, in die Einnahmenüberschuß-Buchhaltung und in die Adressenverwaltung, die für die zahlreichen, berühmtberüchtigten Studiofeste besonders wichtig ist.
 
+Dirk Franke möchte jedenfalls seinen »Compi« nicht mehr missen. Und seit es Spiele wie den Flugsimulator gibt, daddelt er auch manche Nacht mal wieder. Doch obwohl bereits erste Anzeigen mit seinen Computerbildern erschienen sind und er eigentlich recht zufrieden sein könnte, kommen angesichts der zahlreichen Veröffentlichungen über die Möglichkeiten großer Grafikcomputer bereits neue Wünsche auf. Verständlich...
 
+(Klaus Koch/aa)
 
+# 64'er Disk-Ecke
 
+> Wie die Überschrift schon andeutet, hat sich eine Änderung vollzogen. Das »Ka« für Kassette ist weggefallen. Dafür hat sich »Di« zu Disk gemausert. Es ist uns also endlich gelungen, die Programme auch auf Diskette anzubieten. Wir mußten allerdings eine Entscheidung fallen:
+Kassette oder Diskette, beides ging nicht. Die Diskette ist aufgrund ihrer Verbreitung ausgewählt worden. Dafür sind jetzt alte Programme einer Ausgabe (VC 20 und C 64) auf einer Diskette erhältlich.
 
+Eines hat sich aber nicht geändert: der Preis. Die Diskette für eine Ausgabe kostet demnach 29,90 Mark. Sie werden bei einigen Disketten bestimmte Programme vermissen. Deren Autoren konnten sich nicht entschließen, ihr Programm im Rahmen des Leserservice für eine Verbreitung auf Datenträger freizugeben. Bei den Ausgaben 4, 5 und 6 können noch Kassetten (VC ...) bestellt werden. Auf kurze Programme wurde aus Gründen der Übersichtlichkeit verzichtet. Nun noch einige technische Details. Zu den Programmen sind immer die Seitenzahlen angegeben, unter der Sie die Beschreibungen in der entsprechenden Ausgabe finden können.
+Der Diskette liegen also keinerlei Informationen bei. Lesen Sie daher aufmerksam die Anleitung (ob SYS-Befehle nötig sind, in welcher Reihenfolge geladen werden muß, eventuelle Sprach- oder Speichererweiterungen und ähnliches mehr) in dem jeweiligen Artikel nach. Aus Aktualitätsgründen wird jeweils die abgedruckte Version angeboten. Eventuelle systematische Fehler, die sich noch im Programm befinden können, müssen von Ihnen selbst, nach Studium des Druckfehlerteufelchens, korrigiert werden.
+Fehlende Hefte erhalten Sie bei: Markt & Technik
+Vertrieb 64’er
+Hans-Pinsel-Str. 2, 8013 Haar
 
+Ausgabe 11/84
+Bestellnummer CB 020
+Commodore 64
+Turtle Grafik (LdM)	S.48
+Schachmeister (AdM)	S.50
+SMON (1. Teil)	S.59
+Floppykurs	S.117
+FPLOT-Befehlserweiterung S.73
+Get Koala pic	S.66
+Interrupttechnik	S.84
+Exsort (UPB)	S.154
+Einzeiler	S.158
+Simons Basic	S.90
+Befehlserweiterung (SB)
+VC20
+Pseudosprites(8K)	S.76
+Laterna Magica (8K)	S.68
+Betriebssystem-
+Erweiterung (24K >)	S. 88
+Supergrafik (GV)	S.71
+VC20-Kurs(GV>)	S.126
 
+Ausgabe 10/84
+BestellnummerCB 019
+Commodore 64
+Finanzmathematik (AdM)	S.68
+Hypra-Load (LdM)	S.67
+Hardcopy
+Compact 2	S.86
+Hardcopy MPS 801	S.82
+Hardcopy VC 1526 neu	S.83
+Hardcopy Gemini-10X	S.85
+Hardcopy FX-80	S.88
+Hardcopy VC 1520 farbig S.84
+Apocalypse now	S.106
+Supercopy	S.102
+Disk-Dump	S.95
+Diskettenorganisation	S.97
+User-Port-Tastatur	S.92
+(UPB)-Maske	S.172
+VC20
+Epedemic	S.112
+Video-Vorspann	S.81
 
+Ausgabe 9/84
+Bestellnummer CB 014
+Commodore 64
+Indexsequentielle Adreßdatei, S. 54 — Spring Vogel (LdM), S. 68 — Orgel/Synthesizer (AdM), S. 70 — Sprite Aid +, S. 89 — Screen Change, S. 94 — List-Stop, S. 97 — Renew, Datawandler, S. 102 — Synthetische suchen, S. 104 — Geregelter Zahlungsverkehr, S. 164
+VC20
+Schiebung (GV>), S. 77 - Deuzei (8K >), S. 79 - Hardcopy 1520 (GV>), S. 87 - RS232-Interface (GV>), S. 100 — Datawandler (GV>), S. 102
 
+Ausgabe 8/84
+Bestellummer CB 013
+Commodore 64
+Castle of Doom, S. 66 — Pac-Boy, S. 89 — Kopplung, S. 73 — User-Port-Display, S. 97 — RS232-Test, S. 77 - View BAM, S. 99 - Görlitz Hardcopy, S. 83 — Milchvieh, S. 156
+VC20
+Kudiplo (3K), S. 86 — Print at Re-store n (GV), S. 101
 
+Ausgabe 7/84
+Bestellnummer CB 017
+Commodore 64
+Terminalprogramm, S. 24 — Softwarekatalog, S. 72 — Russvok (SB), S. 76 - Crown No. 1, S. 80 — Space Invaders, S. 81 — 1520 Hardcopy, S. 108 — Centronics Interface, S. 110 — Kurvendiskussion, S. 116 — Copy Rel. Files, S. 132 — Autostart, S. 138 — Strubs (OP u. QP), S. 154
+VC20
+Rätsel, S. 122
 
+Ausgabe 6/84
+Commodore 64
+Bestellnummer CB 018
+Lehrerkalender,S.64-Morse-trainer,S. 72 — Supervoc, S. 69 — Grafische Darst. (SB), S. 82 — Hot Wheels, S. 92
+VC 20 Bestellnummer VC 008 Movemaster (8K), S. 78 — Ghost Manor (GV), S.104 - Logic Dis-ass. (3K>),S. 108 - Underground (LdM 16K), S. 120
 
+Ausgabe 5/84
+Commodore 64
+Bestellnummer CB 016
+Adreß- & Telefonregister, S. 64 — Fahrsimulator, S. 82 — Schatzsucher (LdM), S. 90
+VC 20 Bestellnummer VC 007
+Relative Datei (8K), S. 69 — Schmatzer (GV) S. 76 — 3D-Grafik (8K), S. 78 - Rallye (28K), S. 128 
 
+<aside>
+### Bedeutung der Abkürzungen
+*LdM - Listing des Monats
+*AdM = Anwendung des Monats
+*SB = Simons Basic
+*GV = Grundversion
+*GV> = alle Speicherversionen können verwendet werden (einschließlich GV)
+*3K = 3-KByte-Speichererweiterung wird benötigt
+*8K> - Speichererweiterung größer als 8 KByte wird benötigt.
+</aside>
 
+# Unterprogrammbibliothek Exsort – Sortieren mit Komfort
 
+> Exsort zeichnet sich zum einen durch die Sortiergeschwindigkeit aus. Zum anderen werden sowohl numerische als auch alphanumerische Felder auf- oder absteigend sortiert. Ein weiterer Clou: Ein zweites Feld kann abhängig vom ersten Feld mitsortiert werden.
 
+<aside>
 
+Jeder Programmierer ärgert sich irgendwann einmal über das langsame Basic, das vor allem beim Suchen und Sortieren stört. Gute Sortierroutinen, in Assembler geschrieben, kann nicht jeder entwickeln. Viele Sort-Programme sind aber auch sehr einseitig: Entweder sortieren sie nur aufsteigend oder lediglich alphanumerische Felder. Exsort kann beides und noch mehr.
 
+### Vorteile:
 
+* Zirka zehnmal so schnell wie die schnellste Basic-Version.
+* Die Befehle können in jedem Basic-Programm angewendet werden.
+* Unterprogramme in Basic, die oft nur ein bestimmtes Feld in einer Richtung sortieren können, entfallen.
+* Die Erweiterung belegt keinen Basic-Speicher.
+* Beim Sortieren von Strings kommt es nicht zu einem zeitraubenden Garbage-Collect, da die Descriptoren vertauscht werden.
+* Ein zweites Feld, das Informationen über das erste Feld enthält, kann mitsortiert werden.
+* Das zu sortierende Feld kann numerisch oder alphanumerisch sein.
 
+### Nachteile:
 
+* Es kann nicht mit Exbasic oder Simons Basic zusammen genutzt werden.
+* Es kann nicht compiliert werden.
 
+### 1. Befehl »so«
 
+Syntax: so, (feldname), (an-fangsindex), (endindex), (sortierungsrichtung)
 
+Dieser Befehl sortiert ein beliebiges eindimensionales Feld innerhalb von zwei Grenzen mit einer vom Benutzer gewählten Sortierungsrichtung.
+Beispiel 1:
 
+Das Feld heißt ax$, alphanumerisch aufsteigend sortieren (von Index 100 bis Index 5000).
+Befehl: so,ax$,100,5000,l (1 = aufsteigend)
+Beispiel 2:
 
+Das Feld heißt qe%, numerisch absteigend sortieren (von Index 0 bis zu dem Index, der in der Variable »en« enthalten ist).
+Befehl: so,qe%,0,en,0(0 = absteigend)
+Option: Manchmal ist es notwendig, daß Daten, die in einem zweiten Feld vorhanden sind, entsprechend dem ersten Feld sortiert werden.
+Syntax: so,(feldname 1), (anfangsindex), (endindex), (sortierungsrichtung), (feldname2)
+Beispiel: Das Feld fe$ soll alphanumerisch aufsteigend von Index 0 bis Index 10 sortiert werden. Die Daten in dem Realfeld »nr« sollen entsprechend dem ersten Feld sortiert werden.
+Befehl: so,fe$,0,10,1,nr
 
+### 2. Befehl: »se«
 
+Syntax: se,(feldname),(an-fangsindex),(endindex),(element)
 
+Dieser Befehl durchsucht ein beliebiges eindimensionales Feld innerhalb von zwei Grenzen nach einem Element.
+Beispiel: Es soll die Zahl - 12 in dem Feld rt% von Index 0 bis Index 100 gesucht werden.
+Befehl: se,rt%,0,100, - 12
 
+Wenn das Element gefunden wird, enthält die Variable »in« den jeweiligen Index. Wird das Element nicht gefunden, so enthält »in« den Wert -1.
 
+### Fehlermeldungen:
 
+* type mismatch:
+Sie versuchten, einen String in einem numerischen Feld zu suchen (oder umgekehrt).
+* wrong index:
+Beim Suchen war der Anfangsindex größer als der Endindex.
+* bad subscript:
+Index außerhalb des zulässigen Bereiches.
+* only one dimension array:
+Sie können nur eindimensionale Felder durchsuchen oder sortieren.
+* array not found:
+Das Feld war nicht durch einen DIM-Befehl dimensioniert worden.
+* wrong array name:
+Geben Sie bitte nur die ersten beiden Buchstaben des Feldnamen ein (plus % oder $ wenn nötig). Es wird dann sicher funktionieren.
+* wrong sorting direction error:
+Sie haben einen anderen Wert als 0 oder 1 als Sortierungsrichtung angegeben.
 
+### Zu den Programmen:
 
+Listing 1
 
+Das Programm »Exsort data« erstellt das Maschinenprogramm aus DATA-Zeilen und speichert es als »Exsort«-Absolutprogramm auf Diskette oder Kassette. Sie können es dann jederzeit durch LOAD »Exsort«, 8,1 absolutla-den. Dabei geht ein Basic-Programm nicht verloren (siehe auch Listing 2, Demo-Programm).
+Listing 2
 
+Das Programm »Exsort demo« lädt das Absolutprogramm »Exsort« nach und startet es. Danach folgt eine Demonstration der beiden Befehle.
 
+Um »Exsort« zu laden, muß Zeile 0 des Basic-Programms lauten:
+0 if k = 0 then k = 1 : load"ex-sort",8,1 (für Diskette)
+0 if k = 0 then k = 1 : load"ex-sort",1,1 (für Kassette)
 
+In Zeile 1 muß stehen:
+1 sys 49400
 
+Da die Erweiterung nur einmal geladen und gestartet werden muß, kann sie bei späteren Starts des Programms übersprungen werden.
 
+(Marcus Rickert/gk)
 
 
 
+## Sortierter Lebenslauf:
 
+Ich wurde am 26.10.1967 in Köln geboren und wohne zur Zeit in Bergisch Gladbach. Ich besuche die elfte Klasse des Johann-Gottfried-Herder-Gymnasiums in Köln-Buchheim. Zum Computern kam ich durch meine Liebe zur Mathematik. Es hat mit kleinen Taschenrechnern angefangen, ging über die ersten programmierbaren Rechner (32,128,512 Schritte) zum ersten Heimcomputer (ZX81) und schließlich zum C 64, den ich im Oktober letzten Jahres als Geburtstagsgeschenk erhielt. Später folgten Floppy und Drucker 1526. Auf dem ZX81 machte ich Bekanntschaft mit Assembler (Z-80) und programmierte kleine Programme, die aber oft nur 100—300 Bytes lang waren. Erst auf dem C 64 begann ich längere Maschinenprogramme zu schreiben, da ich mit meinem Monitor arbeiten konnte.
 
+### Zur Entstehungsgeschichte des Programms:
 
+Ich brauchte für ein Datenverwaltungsprogramm eine Sortierroutine. Ich kannte zu diesem Zeitpunkt nur das BUBBLE-Sort-Verfahren. Auf die Basic-Version programmierte ich eine in Assembler, die zwar bei Dateien unter 50 Einträgen annehmbare Zeiten lieferte, aber bei größeren Datenmengen zeitlich versagte. Dann bekam ich von einem Freund eine Kopie des QUICKSORT-Algorithmus, der schon in Basic sehr schnell ist. Nachdem ich das Sortiersystem begriffen hatte, konnte ich es in Maschinensprache umschreiben und es mit einigen Extras versehen. Das Ergebnis ist mein Programm »Exsort«, das ich inzwischen in mein Datenverwaltungsprogramm integriert habe.
 
+Ich hoffe, daß es vielen Lesern des 64’er-Magazins eine komfortable Hilfe ist.
 
+M. Rickert
 
+</aside>
 
+# Einzeiler-Wettbewerb – die Top 10
 
+Wir wußten gar nicht, was auf uns zukommen sollte, als die Idee zum Einzeiler-Wettbewerb geboren war. Täglich gingen zirka 20 bis 40 Einzeiler bei uns ein. Und diese Flut hat noch kein Ende.
 
+Man glaubt gar nicht, wie interessant manche Einzeiler sind. Hier werden Probleme in eine Zeile gesteckt, bei denen manche Programmierer etliche KByte benötigen. Ein Beispiel ist das Mini-Orgel-Programm. Vielleicht finden Sie, daß hier mit einem Trick gearbeitet wurde, aber Einzeiler ist Einzeiler. Sehr viele Programme lassen sich nur eingeben, wenn die Abkürzungen der Basic-Befehle benutzt werden. Sie stehen im Anhang D Ihres C 64 Handbuches. Doch schauen Sie sich die folgenden Mini-Programme an, von denen man sagen kann: Klein — aber oho! Jedes von ihnen wird deshalb mit 100 Mark honoriert.
 
+### Merge (C 64)
 
+TODO
 
+Möchte man zwei Programme zu einem einzigen zusammenfassen, gab es oft nur eine Möglichkeit: das kürzere an das Ende des längeren zu tippen. Manche längere Hilfsprogramme vollbringen durchaus ein richtiges MERGE. Es geht aber auch ganz kurz.
 
+(Andreas Gast)
 
+### Directory laden, ohne Basic-Programm zu zerstören (C 64/VC 20)
 
+TODO
 
+Zunächst eine Bemerkung zu einem dem Programmierer sehr bekannten Problem. Hat man nun, mit Ach und Krach, ein wichtiges Programm in Basic geschrieben, und man will seine Arbeit mit dem Abspeichern dieses Programmes beenden, so kann es vorkommen, daß man seine freien Disketten nicht wiedererkennt. Also muß man sich die Disketten listen. Mit LOAD”$”,8:LIST würde aber das eigene Basic-Programm gelöscht und die ganze Arbeit wäre umsonst. Wenn man dagegen diese kleine Zeile eingibt, und zwar so, daß sie vor dem eigenen Programm liegt, läßt sich das Directory listen, ohne das im Speicher befindliche Programm zu zerstören.
+Zum Starten:
+OPEN 1,8,2,”$”:GOTO 0
 
+Beschreibung
+TODO
 
+**Weitere Anwendungen:**
 
+Da man alle auf der Diskette befindlichen Programme als sequentielle Datei lesen kann, ist es ohne weiteres möglich, mit dem obigen Programm alle Kommentare, Inhalte von Printanweisungen und Texte des auf der Diskette befindlichen Programms auf den Bildschirm zu bringen. Zum Starten eröffnet man dann die Datei nach dem folgenden Schema:
+OPEN 1,8,2,”filename”
+und startet das Programm mit GOTO 0.
 
+Wenn die Ausgabe beendet ist, wird mit der RUN/STOP-Taste die Endlosschleife verlassen.
 
+(Reinhard Abdel-Hamid)
 
+### Speicherblockverschiebung — Blitzschnell (C 64)
 
+TODO
 
+Dieses Programm dient zur Übertragung von Speicherblöcken. Die Variablen mit L sind also jeweils das Low-Byte, die mit H das High-Byte der Adresse.
+Sie lassen sich für eine Adresse X so berechnen:
+AL = X-256*INT(X/256): AH = INT(X/256)
 
+Dieser Einzeiler benützt die Blockverschieberoutine des ROMs. Er ist zum Beispiel nützlich, um das Basic beziehungsweise das Betriebssystem vom ROM ins RAM zu verlegen oder um den Zeichengenerator zu kopieren (!).
 
+(Jens Baas)
 
+DI-AS, ein grafischer Disassembler für C 64
 
+TODO
 
+Der Speicherbereich des C 64 läßt sich in 256 Seiten (Pages) ä 256 Byte aufteilen. DI-AS interpretiert die Speicherinhalte als Bildschirmcode und stellt die 64 KByte des C 64 Seite für Seite auf den Zeilen 7-13 des Bildschirms dar. Die Seitennummer wird am oberen Bildschirmrand angezeigt.
+Die Bedienung:
 
+Bevor das Programm geladen und gestartet wird, muß mit SYS64738 unbedingt ein Reset durchgeführt werden, da sonst möglicherweise die Zeiger der Zeropage nicht korrekt initialisiert werden. Es empfiehlt sich, den Bildschirm mit CLR zu löschen, um dieÜbersichtlichkeit zu erhöhen.
+Das Programm wird mit RUN gestartet.
+Dem Benutzer stehen nun folgende Optionen offen:
 
+1. Mit CURSOR-RIGHT im Speicher vorwärts blättern
+2. Mit CURSOR-DOWN im Speicher rückwärts blättern
+3. Mit R/S POKE3, NR :CLR: RUN die Seite NR betrachten
 
+Fehlerbehandlung:
 
+Es stehen umfangreiche Fehlerbehandlungen zur Verfügung: Der Versuch, Seiten kleiner als 0 oder größer als 256 anzusehen wird mit »illegal quantity error in 5« quittiert. Mit CLR: RUN wird das Programm normal wiedergestartet.
 
+Beachten Sie sorgfältig die Hinweise zum korrekten Eintippen des Programms!
 
+Gehen Sie die Anwendungsbeispiele durch, um sich mit der Speicheraufteilung Ihres C 64 vertraut zu machen. Da das Programm die 80 Zeichen des Basic-Editors benötigt, muß der Cursor erst eine Zeile hochgefahren werden, bevor diese mit RETURN in den Programmspeicher übernommen wird.
+Steuerzeichen:
+Reverses s = Home
+Reverses r = RVSON
+Reverses R = RVSOFF
+hinter dem P: Commodore O
+die Restlichen: Cursor links, rechts, unten
 
+Anwendungsbeispiele:
 
+Wenn Sie das Programm zum ersten Mal starten, so wird Ihnen wahrscheinlich Seite 170 angezeigt. Drücken Sie solange auf CURSOR-DOWN, bis Sie bei Seite 0 angelangt sind. Falls Sie zu weit gefahren sein sollten, und das Programm den Fehler meldet, so starten Sie es einfach noch einmal. Sie sehen jetzt die Zeropage als Bildschirmcodes. Nun gehen Sie die Seiten Schritt für Schritt durch. Dabei können Sie beobachten:
 
+TODO
 
+*Anmerkung: Manches läßt sich erst entdecken, wenn durch gleichzeitiges Drücken von SHIFT und COMMODORE der Zeichensatz umgeändert wird. Nun nehmen Sie doch einmal Simons Basic oder Spiele und schauen, wo der Text, die Befehle etc. stehen!
 
+(Andreas Carl)
 
+### Scrollen mit bleibendem Text (C 64)
 
+TODO
 
+Dieses kleine Programm bewirkt, daß nicht mehr der gesamte Bildschirm gescrollt wird. Wieviel Zeilen am oberen Rand fest stehen bleiben, bestimmt die Zahl, die Sie in 59639 POKEn. So kann man eine Information, die für ein Programm wichtig ist, auf dem Bildschirm festhalten. Oder die Kopfzeilen einer Tabelle, etc.
 
+Mein Beispiel mit 0 gePOKEt hält eine Zeile fest. Eine 1 würde 2 Zeilen festhalten, etc. Abgestellt wird das Programm einfach durch »POKE 1,55«. Es muß noch darauf hingewiesen werden, daß dieses Programm, obwohl es so kurz ist, sehr lange bis zur ersten Ausführung braucht.
 
+(Peter Eckart)
 
+### Maschinenprogramme abspeichern (C 64)
 
+TODO
 
+Mit folgendem Einzeiler können Maschinen-Programme sehr einfach gespeichert werden: (ohne Basic-Pointer zu verstellen)
 
+Für die Berechnung von LE und HE muß die Endadresse + 1 genommen werden.
+Als erstes Beispiel soll ein Programm von 20 000 — 22 000 unter dem Namen »BEISPIEL 1« auf Diskette gespeichert werden.
+SYS(57812)"BEISPIEL 1”, 8:POKE193,32:POKE194,78:POKE 174,241:POKE175,85:SYS62957
+Als zweites Beispiel soll ein Programm von $C000 — $C37E unter dem Namen ’’BEISPIEL 2” auf Kassette gespeichert werden.
+SYS(57812)”BEISPIEL 2",l:POKE193,0:POKE194,192:POKE174, 127:POKE175,195:SYS62957
+Falls der Einzeiler infolge eines längeren Programm-Namens zu lang werden sollte, können die POKE-Befehle selbstverständlich durch P, Shift O abgekürzt werden.
 
+(Markus Eicher)
 
+### Das kürzeste Heimcomputerorgelprogramm der Welt (C 64)
 
+TODO
 
+Um in Basic ein Maschinenspracheprogramm einzulesen, schreibt man normalerweise einen Basic-Lader, der in einer FOR/NEXT-Schleife mehrere DATAs einliest und in einen freien Speicherbereich POKEt, um dann das Programm mit SYS zu starten. Da diese Befehle und die DATAs sehr viel Platz benötigen, können so in einer Zeile kaum umfangreiche Programme geschrieben werden. Deshalb haben wir eine Möglichkeit entwickelt, den Basic-Lader zu umgehen: Wir PRIN-Ten das Maschinenspracheprogramm in die erste Bildschirmzeile und starten das Programm mit SYS 1024. Mit diesem Trick ist es uns gelungen, ein Programm von 45 Maschi-nesprachebytes in einer Basic-Zeile zu laden und zu starten.
 
+Das Programm »MICROSOUND« ist das, unseres Wissens, kürzeste Heimcomputerorgelprogramm der Welt. Es ist 86 Basic-Bytes lang und erzeugt ein Maschinenspracheprogramm von 45 Byte. Davon werden 14 Byte für Grafik-Effekte und 3 Byte für eine Programmende-Abfrage genutzt. Da der Einzeiler bereits beim geringsten Tippfehler nicht mehr richtig funktioniert, haben wir zum Vergleich den normalen Basic-Lader und das Monitor-Listing mit Erklärungen beigefügt.
 
+Das Musik-Programm funktioniert im Wesentlichen dadurch, daß die Zahl der gedrückten Taste (PEEK (203)) mit 63 AND-verknüpft in das Hi-Byte der 1. Stimme des SID 6581 gebracht wird. Der Grafik-Effekt kommt durch einen Vergleich mit dem Rasterregister in 53266 zustande.
 
+MICROSOUND ist für den Commodore C 64 entwickelt. Das Programm wird mit RUN gestartet und mit INST/DEL beendet. Es können ohne weiteres Basic-Zeilen angefügt werden, die dann nach INST/DEL abgearbeitet werden. Wenn das Maschinenspracheprogramm in der erste Zeile nicht mehr sichtbar sein soll, muß vorher die Zeichenfarbe auf die Bildschirmfarbe umgestellt werden. Der Basic-Lader kann auch ohne weiteres auf Bereiche außerhalb des Bildschirms gesetzt werden, indem man die Variable »anfang« entsprechend ändert. Alle Tasten, außer CTRL, COMM., SHIFT und RESTORE sind mit Noten belegt, die überwiegend so angeordnet sind, daß die linken Tasten tiefere Töne spielen als die rechten. Die Funktions- und Cursor-Tasten sind Bässe.
 
+Tips zur Eingabe dieses Programms:
 
+1. Schalten Sie vor der Eingabe durch SHIFT/COMM. auf Kleinschrift.
+2. Geben Sie ? statt print und sY4(Pfeil n. oben)5 statt syslO24 ein und verzichten Sie auf unnötige Leerzeichen.
+3. SPACEs bitte ohne COMM. oder SHIFT-Tasten zu drücken eingeben. Ausnahme: Das letzte SPACE muß ein SHIFT/SPA-CE sein.
+4. Achten Sie genau auf Groß- und Kleinschreibung! Das Programm kann beim kleinsten Tippfehler abstürzen!
 
+MICROSOUND als Basic-Lader:
+10 rem***microsound***
+20 anfang = 1024
+30 for x = 0 to 44:read a:poke an + x,a:next
+40 sys an
+100 data 169, 143, 141, 24, 212, 169, 240, 141, 5, 212, 238
+110 data 32, 208, 160, 16, 140, 4, 212, 206, 32, 208, 165
+120 data 203, 240, 19, 41, 63, 141, 1, 212, 200, 140, 4
+130 data 212, 173, 18, 208, 205, 18, 208, 208, 214, 240, 246, 96
 
+Der Basic-Lader hat gegenüber dem Einzeiler den Vorteil, daß man ihn leichter abtippen und ohne weiteres in einen anderen freien RAM-Bereich verlegen kann. Wenn Sie richtig abgetippt haben, müssen beide Programme identisch arbeiten.
 
+Monitor Listing:
 
+0400  lda #$8f;
+0402  sta $d418;  Lautstärke(si + 24)
+0405  lda #$f0;
+0407  sta $d405;  Halten d. Tones (si + 5)
+040a  inc $d020;  Rahmenfarbe um 1 erhöhen
+040d  ldy #$10;
+040f  sty $d404;  Wellenform (si + 4) = 16
+0412  dec $d020;  Rahmenfarbe um 1 vermindern
+0415  lda $cb;    gedrückte Taste (peek(203))
+0417  beq $042c;  wenn $cb = null (inst/del gedrückt) dann Ende
+0419  and #$3f;   wenn $cb = 64 dann akku = 0
+041b  sta $d401;  akku nach hi-byte von Stimme 1 (si +1)
+041e  iny;
+041f  sty $d404;  Wellenform(si + 4) = 17
+0422  lda $dO12;  Rasterregister(v+18)
+0425  cmp $dO12;  (Grafik-Effekt durch registergesteuerte Verzögerung)
+0428  bne $0400;
+042a  beq $0422;
+042c  rts;        Basic-Rücksprung
 
+### Elektronisches Klavier für den VC 20
 
+Das Programm läuft nur auf dem VC 20 und verwandelt den Computer in ein elektronisches Klavier. Die Tasten 1 bis 8 dienen dabei als Klaviatur, auf der man in etwa eine D-Dur Tonleiter spielen kann.
 
+Der Computer gibt beim Niederdrücken der Tasten 1 bis 9 jeweils einen kurzen Ton aus. Die Zahlen 1 bis 8 entsprechen dabei den Tönen einer D-Dur Tonleiter, also d, e, fis, g, a, h, cis, d. Das Betätigen der Taste 9 ergibt zwar auch einen Ton, der sich aber nicht mehr in die Tonleiter einreiht. Andere Tasten haben, außer der RUN/STOP-Taste, keine Funktion.
 
+Basic-Programm:
+1 POKE36878,15:GETA$:A=VAL(A$):POKE36876,127+(10-(A>1)+(A>3)+(A>5)*4+(A>6)*3+(A>7)*6)*A:GOTO1
 
+Beschreibung des Programms:
+POKE36878,15: Die Lautstärke des VIC-Chips wird gesetzt.
+GETA$:A=VAL(A$): Der Variablen A wird ein Wert zwischen 0 bis 9 zugewiesen, je nachdem, welche Taste man drückt. Das Einlesen der Variablen A$ verhindert einen SYNTAX ERROR bei Betätigung einer Buchstabentaste.
+POKE36876,...: Die Tonhöhe wird gesetzt, und ein Ton wird ausgegeben, wenn A>0. Die Ausdrücke (A>1), (A>3), und so weiter bewirken eine Anpassung des Tonregisters an die Tonleiter, da sie bei erfüllter Bedingung den Wert —1 ergeben und im anderen Fall 0 sind.
+GOTO1: Das Programm wird so lange wiederholt, bis die RUN/STOP-Taste gedrückt wird.
 
+(Joachim Günther)
 
+### Track-Zerstörer: Kopierschutz (C 64/VC 20)
 
+TODO
 
+Diese Zeile produziert auf dem gewünschten Track der Diskette (Variable T) einen READ ERROR 21. Das bedeutet einen relativ sicheren Kopierschutz.
 
+(Jörg Wegmeyer)
 
+# Programmierwettbewerb: Das »intelligente« Programm
 
+> Computerprogramme tun sich ja in der Regel recht schwer, in normaler Umgangssprache eingegebene Sätze zu »verstehen« und womöglich noch folgerichtig zu reagieren. Viele Adventure-Programme zeigen aber zumindest ansatzweise, daß es doch geht.
 
+Warum fällt dem Computer so schwer, was uns Menschen so leichtfällt, nämlich sich einfach zu unterhalten ? Diese Frage ist gleichzeitig die Frage nach dem Wesen der Intelligenz. Eine Forschungsrichtung innerhalb der Informatik beschäftigt sich schon seit Jahren mit der Entwicklung und Erforschung von »Künstlicher Intelligenz«. Wir wollen Sie nun einmal dazu anregen, Programme zu entwickeln, die intelligentes Verhalten in einem gewissen Rahmen simulieren.
 
+## Die Eliza-Story
 
+Im Jahre 1966 entwickelte Joseph Weizenbaum vom Massachusetts Institute of Technology ein Programm namens »Eliza«, das — vereinfacht gesagt — einen Psychoanalytiker simuliert. Der Mensch begibt sich also in der Rolle als Patient an die Tastatur des Eliza-Computers und wird aufgefordert, von seinen Schwierigkeiten zu berichten. Aufgrund der Eingaben gibt Eliza dann durchaus differenzierte Antworten oder stellt auch schon mal eine Zwischenfrage, so daß ein regelrechtes Zwiegespräch zustande-kommt (siehe Bild).
 
+Eliza wurde ursprünglich, wie fast alle Programme zur künstlichen Intelligenz, in der Programmiersprache Lisp geschrieben. Eine-Basic-Version von Steve North wurde in den Siebziger Jahren in Creative Computing veröffentlich. Das Bemerkenswerte an dem Eliza-Programm ist seine Einfachheit. Eliza wurde auch nicht als »intelligentes Programm« entwickelt, sondern sollte lediglich bewußt einfach menschliches (Gesprächs-) Verhalten simulieren. Die Eingabe des menschlichen Gesprächspartners wird nach bestimmten Schlüsselwörtern durchsucht, und zu jedem Schlüsselwort ist eine Reihe von möglichen Antworten vorgesehen.
 
+Eliza wurde sehr schnell dadurch bekannt, daß ein großer Teil der Versuchspersonen der festen Überzeugung war, von einem anderen Terminal aus würde tatsächlich ein Psychiater die Antworten geben und dem Programm ihre ganz persönlichen Probleme anvertrauten. Aus diesen Versuchen wurde schließlich die Erkenntnis gezogen, daß die einfache Simulation menschlichen Verhaltens kein ausreichendes Kriterium für Intelligenz ist (so bitter das dem einen öder anderen erscheinen mag), denn Eliza analysiert jain Wirklichkeit nicht die Satzstruktur, sondern akzeptiert auch völligen Unsinn.
 
+Dennoch bleibt unbestreitbar eine gewisse Faszination, wenn man einmal mit Eliza gearbeitet hat. Diese Faszination wollen wir auch ins 64’er Magazin holen. Setzen Sie sich doch einmal an Ihren Schreibtisch und überlegen Sie sich, wie ein Programm funktionieren müßte, mit dem man sich in ganzen Sätzen unterhalten kann.
 
+Um die ganze Angelegenheit nicht zu kompliziert zu machen, braucht das Programm nur einfache deutsche Sätze bearbeiten, das heißt es muß bei Eingabe von Goethes »Faust« nicht unbedingt von sich aus den »Faust II« zitieren. Außerdem können Sie den Themenbereich, in dem das Programm sicher arbeitet, durchaus auf bestimmte Gebiete einschränken. Beispielsweise wäre ein Programm denkbar, das mit dem Menschen über die Vor- und Nachteile von Computern diskutiert. Seien Sie bei der Themenwahl (und beim Programmieren) ruhig kreativ.
 
+Das beste Programm, das sich mit uns Redakteuren unterhalten will, ist uns 1000 Mark wert. Länge und Programmierstil sind unwichtig, entscheidend ist der Effekt.
 
+Senden Sie uns Ihr Programm für den C 64 oder VC 20 auf Diskette oder Kassette zu, und vergessen Sie nicht, eine ausreichende Beschreibung beizufügen. Unsere Adresse ist:
 
+Redaktion 64’er, Stichwort »Programmierwettbewerb: Das »intelligente Programm«, Markt & Technik Verlag AG, Hans-Pinsel-Str. 2, 8013 Haar bei München.
 
+<aside>
+Der Beginn einer Sitzung mit »Eliza«
 
+**HI, I AM ELIZA
+PLEASE TELL ME YOUR PROBLEM**<br>
+I HATE COMPUTERS
+**DO COMPUTERS WORRY YOU?**<br>
+YES
+**ARE YOU SURE?**<br>
+I DON’T REALLY KNOW
+**DON’T YOU REALLY REALLY KNOW**<br>
+HA HA
+**SAY, DO YOU HAVE ANY PSYCHOLOGICAL PROBLEMS?**<br>
+ELIZA YOU ARE MY PROBLEM
+**WHAT MAKES YOU THINK I AM YOUR PROBLEM**<br>
+YOUR SYNTAX ERRORS
+**WHY ARE YOU CONCERNED ABOUT MY SYNTAX ERRORS**<br>
+I HATE THEM
+**WHAT DOES THAT SUGGEST TO YOU?**<br>
+I DON'T KNOW
+**WHY DON'T YOU KNOW**<br>
+I CAN’T THINK ABOUT IT
+**HOW DO YOU KNOW YOU CAN'T THINK ABOUT IT**<br>
+YOU ASK FUNNY QUESTIONS
+**WE WERE DISCUSSING YOU - NOT ME!**
+</aside>
 
+# Vorschau
 
+## C 64 und Floppy schneller gemacht
 
+Während das HYPRA-LOAD in Ausgabe 10/84 eine reine Software-Lösung war, werden jetzt Systeme vorgestellt, die zusätzlich auch Hardware benötigen. Dabei beschränkt man sich nicht nur darauf, die schnellermachende Software aufEPROMs zu brennen, sondern die Daten werden nun parallel transportiert. Doch wie ist es mit der Kompatibilität bestellt? Ist der Drucker ansprechbar? Lohnt sich also eine Umrüstung?
 
+## Kreuzworträtsel-Wettbewerb
 
+Der Sieger war ziemlich schnell gefunden. Dessen Programm unterschied sich in einigen wesentlichen Merkmalen von den anderen: Es besitzt eine sehr komfortable Wörterauswahl, erstellt eine hervorragende Druckerausgabe und ist auch noch das schnellste Programm gewesen.
 
+## Vergleichstest Joysticks
 
+Mit der Spiele-Welle kam auch die Joystick-Welle. Wir haben die verbreitetsten Joysticks für C 64 und VC 20 getestet. Dieser Test stellt eine wirkliche Hilfe bei der Auswahl eines Joysticks dar.
 
+## Ein neuer Kurs über Musik
 
+Der SID vom C 64 wird oft als der leistungsfähigste Synthesizer-Chip in einem Heimcomputer bezeichnet; wir meinen mit recht. Was liegt also näher als mit einem Kurs zu beginnen, der Ihnen diesen elektronischen Musikus aufschlüsselt.
 
+## Test: Lernsoftware
 
+Sie ist im Kommen, die Software, mit der man mühelos mittels des C 64 Vokabeln pauken, Fremdsprachen und Basic erlernen oder mathematische Probleme lösen kann. Also weg vom Spielen und hin zum spielenden Lernen.
 
+## Der mathematische VC 20
 
+»Mathematical Basic«, eine umfangreiche Basic-Erweiterung für den VC 20 mit über 40 neuen Befehlen und Funktionen wurde diesmal Listing des Monats. Neben zusätzlichen mathematischen Funktionen gibt es eine Reihe von Befehlen zum einfacheren Arbeiten mit der Diskettenstation und weitere Programmierhilfen.
 
+## Das Spiel des Jahres
 
+Es gab 1984 eine wahre Flut an neuen Spielen für den C 64. Ein Spiel hat uns jedoch 1984 besonders beeindruckt, weil es nicht nur für kurze Zeit interessant ist, sondern weil man es um so lieber spielt, je länger man es hat. Warum? — Lassen Sie sich überraschen.
 
+## Synthesizer
 
+Unser Synthesizer zum Abtippen ist kein einfaches Orgelprogramm. Mit ihm lassen sich alle möglichen Einstellungen des Sound-Chips simulieren. Sie können sogar dreistimmig spielen. Ein Programm, das keine Wünsche offen läßt.
 
+## Print 64 — ein außergewöhnliches Interface
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+Centronics-Schnittstellen für den Commodore 64 gibt es einige auf dem Markt. Auch Print 64 ist sicherlich noch nicht der Weisheit letzter Schluß. Dennoch überrascht es mit einigen erfreulichen Leistungsmerkmalen.
 
