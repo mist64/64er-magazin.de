@@ -1,0 +1,126 @@
+<h1>In die Geheimnisse der Floppy eingetaucht</h1>
+
+<p class="intro">Diese Folge befaßt sich mit dem Befehlssatz der VC 1541 und deren Meldungen an den Computer. Sie werden erkennen, daß Sie neben Ihrem C 64 noch einen anderen vollständigen Computer vor sich haben, der nicht nur als einfaches und »dummes« Peripheriegerät verstanden werden will.</p>
+
+<p>Sicherlich machte sich mancher Floppybesitzer, der ein schnelleres Peripheriegerät als die Datasette haben wollte, schon seine Gedanken über den Preis der VC 1541: »Die kostet ja mehr als der Computer!«. In der Tat ist die VC 1541 von dieser Seite her betrachtet nicht gerade günstig, wer sich jedoch schon intensiver mit ihr beschäftigt hat, wird eine Eigenart festgestellt haben, die sie mit allen CBM-Floppys teilt: Es handelt sich hier um sogenannte Floppystationen, nicht nur um Laufwerke. Das bedeutet, diese Geräte besitzen ein eigenes Betriebssystem (DOS) und eigene Mikroprozessoren. Sie arbeiten völlig unabhängig vom Computer und dessen Speicher. Der Vorteil liegt auf der Hand: Die Floppy beansprucht weder Speicherplatz noch Rechenzeit des Computers, außer beim direkten Datenaustausch. Als Beispiel betrachte man den Befehl »N:« (Formatieren). Während der Formatierung steht der Computer zur (fast) freien Verfügung, da dieser Vorgang nur floppyintern abläuft und sich der C 64 mit READY meldet, während die 1541 noch arbeitet.</p>
+
+<p>Wir wollen uns jedoch nur den Direktzugriffsbefehlen und den Speicherbefehlen widmen; auch übergehen wir die im Commodore-Handbuch nicht erwähnte relative Datenspeicherung, über die in anderen Ausgaben schon ausführlich gesprochen wurde. Uns sollen nur die Befehle beschäftigen, die uns zur willkürlichen Manipulation von Floppystation und Disketten nützen.</p>
+
+<p>Zur Beruhigung: Ein Beschädigen der 1541 durch direkte Eingriffe in das DOS ist nicht zu befürchten, auch wenn es passieren kann, daß sich die Floppy nur durch Aus-/ Einschalten wieder in den Normalzustand versetzen läßt. Haben Sie übrigens einmal, wie in der letzten Folge empfohlen, das Formatkennzeichen einer Diskette verändert? Sie werden sicherlich bemerkt haben, daß sich danach nichts mehr auf Ihre Diskette schreiben läßt. Mit diesem Trick, der die gleichen Folgen wie das Anbringen einer Schreibschutzplakette an der Diskette hat, können Sie sich also ganz einfach Ihre Diskette gegen unbeabsichtigtes Löschen sichern. ACHTUNG: Diese Methode funktioniert natürlich nicht, wenn neu formatiert werden soll; hiergegen hilft nur das Anbringen einer Schreibschutzplakette!</p>
+
+<p>Die Floppystation verfügt über, außer den schon bekannten Befehlen zur Diskettenorganisation, noch eine ganze Anzahl weiterer Befehle, mit denen sich ungeahnte Möglichkeiten ergeben, zum Beispiel Herstellen eines eigenen Diskettenformats, Leseschutz von Disketten, Programmschutz, Modifikation der Lade- und Saveroutinen und, und&hellip; Dafür ist es allerdings nötig, daß wir diese Befehle Schritt für Schritt kennen lernen, bevor wir auf die Tricks der Profis, die Manipulationen des DOS und den gezielten Eingriff in den Programmablauf der Floppystation zu sprechen kommen. Dafür ist allerdings das Beherrschen des C 64 und der Maschinensprache unerläßlich. So lohnt es sich unter Umständen, nachdem man aus Basic nichts mehr herausholen kann, den Einstieg in die Assemblerprogrammierung zu wagen. Sehr gute Literatur dafür ist vorhanden. Aber diesmal wollen wir uns noch auf Basic beschränken, um Sie mit dem Befehlssatz der Floppy vertraut zu machen.</p>
+
+<p>Wie schon erwähnt, handelt es sich bei der 1541 um einen vollständigen Computer, der ebenso wie Ihr C 64 RAM und ein Betriebssystem (DOS) im ROM besitzt.</p>
+
+<p>Die genaue Aufteilung ist in Bild 1 zu sehen. Jetzt soll uns nur der RAM-Bereich interessieren (Bild 2). Nicht nur auf der Diskette, sondern auch im RAM werden Speicherbereiche in Abschnitte zu jeweils 256 Byte aufgeteilt. Sie heißen dann nicht mehr BLOCKS sondern PAGES (Seiten). Das RAM der 1541 umfaßt nun genau 8 PAGES, durchnumeriert von 0 bis 7, insgesamt als 2 KByte. Die Page Nr. 0 (auch Zero-Page genannt) wird hier, wie auch im C 64, vom Betriebssystem als Arbeitsspeicher benutzt und steht uns deshalb nicht zur freien Verfügung. Ähnlich verhält es sich mit den Pages 1 und 2. Die Pages 3 bis 7 stellen sogenannte Pufferspeicher dar; hier werden alle Daten, die von der Diskette gelesen beziehungsweise auf sie geschrieben werden, zwischengespeichert, da nur blockweise gelesen oder geschrieben werden kann.</p>
+
+<p>Soll zum Beispiel nur ein einziges Byte auf der Diskette geändert werden, so wird erst der gesamte Block in einen der 5 Pufferspeicher gelesen, dort abgeändert und schließlich komplett wieder zurückgeschrieben. Aus diesen Gründen ist es also notwendig, daß wir uns vor einem Direktzugriff einen der Puffer reservieren, in dem dann gearbeitet wird.</p>
+
+<p>Mit Hilfe des »Open«-Befehls eröffnen wir einen Direktzugriffskanal. Die Syntax lautet wie folgt:<br/>
+OPENfn, gn, kn, ”#”</p>
+
+<p>Hierbei bedeuten:<br/>
+fn — Filenummer (1-127)<br/>
+gn — Gerätenummer (norm. 8)<br/>
+kn — Kanalnummer in der Floppy (2-14)</p>
+
+<p>Diese Abkürzungen werden wir im folgenden immer verwenden! Ein Beispiel:<br/>
+OPEN 1, 8, 2, ”#”</p>
+
+<p>Diese Anweisung eröffnet im Computer ein File mit der Nummer 1, adressiert als Gerät die Floppy (Nummer 8) und reserviert in der 1541 einen Kanal (Nummer 2), dem ein Puffer zugeordnet wird. Mit den floppyinternen Kanälen verhält es sich wie folgt: Es stehen insgesamt 16 Kanäle zur Verfügung. Hierbei sind Kanal 0 und 1 für LOAD und SAVE reserviert, Kanal 15 ist der Kommandokanal, den Sie bisher immer benutzt haben, um Befehle (zum Beispiel Formatieren) an die Floppy zu senden und die Fehlermeldungen der Floppy zu empfangen.</p>
+
+<p>Für unsere Zwecke stehen also noch die Kanäle 2 bis 14 zur Verfügung. In unserem Fall reserviert die Floppy den nächsten freien Puffer. Will man jedoch einen bestimmten Puffer reservieren, etwa um dort ein Maschinenprogramm abzulegen, so ist es notwendig, der 1541 mitzuteilen, welcher Puffer gewünscht wird:<br/>
+OPEN1,8,2,&ldquo;#1&rdquo;</p>
+
+<p>Es ist hier allerdings zu beachten, daß der gewählte Puffer nicht schon belegt ist; in diesem Fall gibt die Floppy eine Fehlermeldung aus. Wollen Sie an dieser Stelle mehr über das Auslesen der Fehlermeldungen und deren Bedeutung wissen, können wir Sie hier beruhigt auf das Commodore-Handbuch verweisen. Im allgemeinen sind Puffer 4 für die BAM und Puffer 3 für das Directory reserviert. Haben Sie die Wahl des Puffers der Floppy überlassen, so erfahren Sie die gewählte Nummer durch Auslesen des soeben geöffneten Direktzugriffskanals:<br/>
+10 OPEN 1,8,2,”#&ldquo;<br/>
+20 GET#1,D$<br/>
+30D = ASC (D$ + CHR$(0))<br/>
+40 REM Puffernummer in D</p>
+
+<h3>Die BLOCK-Befehle</h3>
+
+<p>a)  Der BLOCK-READ-Befehl (B-R): Mit dem BLOCK-READ-Befehl liest man jeden beliebigen Block von Diskette in einen vorher reservierten Puffer. Die Syntax lautet:<br/>
+PRINT#fn,&ldquo;B-R&rdquo;;kn;dn;t;s<br/>
+dn — Drivenummer (immer 0)<br/>
+t — Tracknummer<br/>
+s — Sektornummer<br/>
+Beispiel: PRINT#15,&ldquo;B-R 2 0 18 0”</p>
+
+<p>Diese Befehlsfolge liest den Block 18,0 von der Diskette in den oben reservierten Puffer. Wie man sieht, können anstelle der CHR$-Codes feste Zahlenwerte in den Befehlsstring mit übernommen werden. Das ganze hat bloß einen kleinen Schönheitsfehler. Mit dem B-R-Befehl läßt sich das erste Byte eines Blocks nicht lesen. Deshalb benutzt man normalerweise anstatt des B-R-Befehls den U1-Befehl. Dieser hat exakt die gleiche Syntax und kann in jedem Fall benutzt werden:<br/>
+PRINT#15,&ldquo;U1 2 0 18 0”</p>
+
+<p>Auf diese USER-Befehle kommen wir später zurück. Mit einer GET#-Schleife lassen sich nun die einzelnen Bytes in den Computer einlesen.</p>
+
+<p>b)  Der BLOCK-WRITE-Befehl (B-W): Hiermit lassen sich die Daten aus dem reservierten Puffer wieder auf die Diskette schreiben. Syntax:<br/>
+PRINT#fn,”B-W”;kn;dn;t;s<br/>
+Beispiel: PRINT#15,&ldquo;B-W 2 0 18 0”<br/>
+Natürlich gibt es analog zum B-R einen USER-Befehl ; U2.<br/>
+Beispiel: PRINT#15,"U2 2 0 18 0&rdquo;.</p>
+
+<p>c) Der BUFFER-POINTER-Befehl (B-P):<br/>
+Für jeden Puffer gibt es einen Zeiger, den BUFFER-POINTER. Dieser zeigt auf das aktuelle Byte im Puffer und wird bei jedem Datenzugriff um Eins erhöht, damit man alle 256 Bytes eines Blocks der Reihe nach lesen kann. Dieser Pointer wird mit dem B-P-Befehl gezielt auf bestimmte Bytes positioniert, wenn man nur einzelne Werte und nicht den gesamten Block lesen will. Syntax:<br/>
+PRINT# fn,&ldquo;B-P&rdquo;; kn; position<br/>
+Beispiel:<br/>
+Wir möchten in die Variable A den Wert des 123. Bytes von Block 1;16 einlesen:<br/>
+10 OPEN15,8,15<br/>
+20 OPEN1,8,2,&ldquo;#&rdquo;<br/>
+30 PRINT#15,&ldquo;U1 2 0 1 16”<br/>
+40 PRINT#15,"B-P2 122”<br/>
+50 GET#1,A$<br/>
+60 A = ASC(A$ + CHR$(0))<br/>
+Als weiteres Beispiel dient Listing 1. d) Der BLOCK-ALLOCATE-Befehl (B-A):<br/>
+Wenn Sie im Direktzugriffsverfahren eine Diskette beschreiben, muß in der BAM danach auch verzeichnet werden, daß die entsprechenden Blocks mit Daten gefüllt sind und nicht mehr überschrieben werden dürfen. Dazu dient der B-A-Befehl, der jeden beliebigen Block in der BAM als belegt kennzeichnet. Die Syntax lautet:<br/>
+PRINT#fn,"B-A&rdquo;;dn;t;s<br/>
+Beispiel:<br/>
+PRINT#15,&ldquo;B-A0 1 16”<br/>
+kennzeichnet Block 1;16 als belegt; war dieser Block schon belegt, meldet sich die Floppy mit der Fehlermeldung >>65,NO BLOCK,XX,YY&lt;&lt;; wobei XX und YY die Track- und Sektornummer des nächsten freien Blocks angeben.</p>
+
+<p>e)  Der BLOCK-FREE-Befehl (B-F): Dieser ist das genaue Gegenstück zum B-A-Befehl; er deklariert einmal belegte Blöcke wieder als frei für einen weiteren Zugriff. Seine Syntax ist identisch mit der des B-A-Befehls.</p>
+
+<p>f)  Der BLOCK-EXECUTE-Befehl (B-E): Dieser Befehl nimmt eine Sonderstellung ein. Er gleicht im Prinzip dem B-R-Befehl; nur mit dem zusätzlichen Effekt, daß der eingelesene Block im Puffer als Maschinenprogramm gestartet wird.</p>
+
+<p>Zur Vertiefung der Block-Befehle sei noch auf die Listings 2 bis 5 hingewiesen, welche die eben besprochenen Anwendungen noch an praktischen Beispielen verdeutlichen.</p>
+
+<h3>Die MEMORY-Befehle</h3>
+
+<p>a)  Der MEMORY-READ-Befehl (M-R): Dieser Befehl entspricht haargenau dem PEEK-Befehl in Basic. Mit ihm können Sie jede beliebige Speicherstelle der Floppy auslesen. Syntax:<br/>
+PRINT#fn,&ldquo;M-R&rdquo;;CHR$(adl);CHR$ (adh);CHR$(n)<br/>
+adl = Low-Byte<br/>
+adh = High-Byte<br/>
+n = Anzahl (0 bis 255)</p>
+
+<p>Abgeholt werden die gelesenen Daten ebenfalls über den Kommandokanal mit GET#.<br/>
+Beispiel: Lesen der beiden ID-Zeichen im ASCII-Format der zuletzt initialisierten Diskette:<br/>
+10 OPEN15,8,15<br/>
+20 PRINT#15,&ldquo;M-R"CHR$(18)CHR$ (0)CHR$(2)<br/>
+30 GET#15,A$,B$<br/>
+40 PRINTA$;B$</p>
+
+<p>Diese Routine liest die Zero-Page Adressen 18 und 19, in denen die entsprechenden Werte gespeichert sind. In Tabelle 1 sind einige der wichtigsten Zero-Page Adressen aufgeführt.</p>
+
+<p>b)  Der MEMORYWRITE-Befehl (M-W):</p>
+
+<p>Dieses Kommando kann als POKE-Befehl in den Floppy-Speicher angesehen werden. Die Syntax ist hier wie folgt:<br/>
+PRINT#fn,&ldquo;M-W&rdquo;;CHR$(adl)CHR$ (adh)CHR$(n)CHR$(data1)CHR$(data2)&hellip;</p>
+
+<p>c)  Der MEMORY-EXECUTE-Befehl (M-E):</p>
+
+<p>Auch dieser Befehl ist äquivalent zu einem Basic-Befehl, dem SYS-Befehl. Mit ihm kann man also ein Maschinenprogramm an einer beliebigen Stelle im Floppy-Speicher ausführen. Syntax:<br/>
+PRINT#fn,&ldquo;M-E"CHR$(adl)CHR$(adh). Siehe auch Listing 7.</p>
+
+<h3>Die USER-Befehle</h3>
+
+<p>Die USER-Befehle stellen eine Erweiterung des Befehlssatzes dar, der fast ausschließlich der Bequemlichkeit dient. Ul und U2 wurden schon besprochen, sie ersetzen B-R und B-W. Die Befehle U3 bis U8 dienen dem Start eines Maschinenprogramms im Floppy-Speicher, dessen Anfangsadressen in einer Tabelle abgelegt sind, so entsprechen:<br/>
+U3 einem Start bei $0500<br/>
+U4 einem Start bei $0503<br/>
+U8 einem Start bei $050F.<br/>
+U4 ersetzt also beispielsweise den Befehlsstring: M-E CHR$(3)CHR$(5). U9 zeigt auf den NMI-Vektor der 1541, welcher allerdings eine Sonderfunktion hat: Mit U9+ wird die Floppy auf C 64- und mit U9- auf VC 20-Betrieb umgeschaltet.<br/>
+U: stellt einen Reset dar, ähnlich dem SYS 64738 beim C 64.</p>
+
+<p>Mit den Kenntnissen über den Befehlssatz der VC 1541 dürfte es Ihnen nun keine Schwierigkeiten mehr bereiten, sich das Programm EDDI einmal zu Gemüte zu führen. Das einzig Besondere daran sind die Routinen zum Lesen und Schreiben eines Blocks, die aus Geschwindigkeitsgründen in Maschinensprache geschrieben sind. Ein großer Teil der in diesen Folgen erwähnten Informationen ist auch im Commodore-Handbuch enthalten, nur sind dort oft Fehler.</p>
+
+<p>Wir wollen uns für diese Folge von Ihnen verabschieden, nicht ohne Sie dringend dazu anzuhalten zu probieren.</p>
+
+<p>(Schramm/Schneider/gk)</p>
+
