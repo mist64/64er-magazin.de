@@ -29,7 +29,26 @@
 
         <p>Der freie Bereich wird nun vollständig von dem Maschinenspracheprogramm gebraucht. Die Aufteilung des Speicherraums ist die folgende:</p>
 
-        <p>TODO</p>
+        <table>
+            <tbody>
+                <tr>
+                    <td>4608 — 5119</td>
+                    <td>Sprite-Control-Block (SCB), wird später erklärt</td>
+                </tr>
+                <tr>
+                    <td>5120 — 6143</td>
+                    <td>freidefinierbarer Zeichensatz, die ersten 128 Zeichen, stehen zur freien Verfügung</td>
+                </tr>
+                <tr>
+                    <td>6144 — 7167</td>
+                    <td>freidefinierbarer Zeichensatz, die zweiten 128 Zeichen, werden vom Programm zur Erstellung der 9 Sprites gebraucht und stehen somit nicht zur freien Verfügung</td>
+                </tr>
+                <tr>
+                    <td>7168 — 8191</td>
+                    <td>Maschinenspracheprogramm, Beschreibung siehe Text</td>
+                </tr>
+            </tbody>
+        </table>
 
         <p>Die Pseudo-Sprites sollten eine Auflösung von 16 x 16 Punkten haben, das sind 256 Punkte oder 4 Zeichen im freidefinierbaren Zeichensatz (Bild 1). Damit aber ein 16 x 16 Punkte großes Zeichen jede Position auf dem Bildschirm einnehmen kann, braucht man eine 24 x 24 Punkte große Umdefinier-Matrix, in die das Zeichen hineinkopiert wird. Das Aussehen dieser Umdefinier-Matrix ist in Bild 2 zu sehen. Das Programm übernimmt nun die Aufgabe, das Zeichen in die Umdefinier-Matrix zu kopieren (Bild 3), in die richtige X-Position zu schieben (Bild 4), und dasselbe mit der Y-Position zu tun.</p>
 
@@ -37,11 +56,57 @@
 
         <p>Im Speicher ab dezimal 4608 ist 9mal (für jedes Sprite einer) der sogenannte Sprite-Control-Block (SCB) eingerichtet. Er hat die Aufgabe, die momentane X- und Y-Position, die Farbe des Sprites, den Bildschirmmodus (gesetzt/gelöscht) des Sprites, die durch die Umdefinier-Matrixverdeckten 9 Zeichen und Farben zwischenzuspeichern:</p>
 
-        <p>TODO</p>
+        <table>
+            <tbody>
+                <tr>
+                    <td>Byte 0 — 8</td>
+                    <td>Bildschirmcode der verdeckten Zeichen</td>
+                </tr>
+                <tr>
+                    <td>Byte 9 - 17</td>
+                    <td>Farbcode der verdeckten Zeichen</td>
+                </tr>
+                <tr>
+                    <td>Byte 18</td>
+                    <td>X-Position des Sprites</td>
+                </tr>
+                <tr>
+                    <td>Byte 19</td>
+                    <td>Y-Position des Sprites</td>
+                </tr>
+                <tr>
+                    <td>Byte 20</td>
+                    <td>Farbe des Sprites</td>
+                </tr>
+                <tr>
+                    <td>Byte 21</td>
+                    <td>Bildschirmmodus (gesetzt= $00/gelöscht=$FF)</td>
+                </tr>
+            </tbody>
+        </table>
 
         <p>Die Basisadresse des SCB errechnet sich somit aus der Formel Basisadresse = 4608 + Spritenummer x 22. Das Zwischenspeichern und die Auswertung der Parameter übernimmt natürlich das Maschinenprogramm. Über den SCB werden auch im nachfolgend beschriebenen Programm »Sprite-Definer« die Sprites initialisiert und deren Farbe festgelegt. Da nur die oberen 128 Zeichen des Zeichensatzes für die Sprites verwendet werden, hat man eine ausreichende Anzahl von noch frei definierbaren Zeichen, nämlich genau 128, zur Verfügung. Außerdem kommen jeweils 13 Zeichen, nämlich 4 für das Sprite und 9 für die Umdefinier-Matrix hinzu, wenn man auf ein Sprite verzichtet. Die Matrixen werden im Speicher so abgelegt:</p>
 
-        <p>TODO</p>
+        <table>
+            <tbody>
+                <tr>
+                    <td>128 — 131</td>
+                    <td>Grundmatrix Sprite 0</td>
+                </tr>
+                <tr>
+                    <td>132 — 140</td>
+                    <td>Umdef.-Matrix Sprite 0</td>
+                </tr>
+                <tr>
+                    <td>141 — 144</td>
+                    <td>Grundmatrix Sprite 1</td>
+                </tr>
+                <tr>
+                    <td>145 — 153</td>
+                    <td>Umdef.-Matrix Sprite 1</td>
+                </tr>
+            </tbody>
+        </table>
 
         <p>Konkret wird das Programm (Listing 1) nun folgendermaßen bedient: Vor dem Laden oder Eingeben wird POKE 44,32:POKE 8192,0:NEW eingetippt. Ist nun das Maschinenspracheprogramm im Speicher, kann es mit einem Monitorprogramm auch noch einmal abgespeichert werden. Später muß man es nur noch mit LOAD »name«, 1,1 laden.</p>
 
@@ -66,7 +131,38 @@
 
         <p>Die Tastenbelegung im Editiermodus:</p>
 
-        <p>TODO</p>
+        <table>
+            <tbody>
+                <tr>
+                    <td>Cursor-Tasten</td>
+                    <td>Cursor-Bewegungen</td>
+                </tr>
+                <tr>
+                    <td>Leertaste</td>
+                    <td>Punkt setzen</td>
+                </tr>
+                <tr>
+                    <td>Delete-Taste</td>
+                    <td>Punkt löschen</td>
+                </tr>
+                <tr>
+                    <td>CLR/HOME</td>
+                    <td>Gitter löschen</td>
+                </tr>
+                <tr>
+                    <td>RETURN</td>
+                    <td>Modus beenden mit Änderung des Sprites, vorher aber Abfrage</td>
+                </tr>
+                <tr>
+                    <td>Linkspfeil</td>
+                    <td>Modus beenden, aber ohne Änderung des Sprites</td>
+                </tr>
+                <tr>
+                    <td>I-Taste</td>
+                    <td>Sprite invertieren</td>
+                </tr>
+            </tbody>
+        </table>
 
         <p>Bei der Funktion »Weiter« kommt man in ein zweites Menü, das weitere Funktionen zur Verfügung stellt. Aus diesem Menü gelangt man mit »zurück« wieder ins Hauptmenü. Beim Speichern werden die Sprites als reiner Speicherauszug auf Kassette gebracht, so daß das Laden im Prinzip auch mit LOAD »name«,1,1 möglich ist.</p>
 

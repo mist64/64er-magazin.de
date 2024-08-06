@@ -30,6 +30,288 @@
 
         <p>Verfolgen wir nun einmal genauer den Weg einer Befehlszeile. Die einzelnen ASCII-Zeichen werden von der inzwischen hinreichend bekannten CHRGET-Routine aus dem Puffer gelesen und mit den Befehlswörtern aus dem ROM verglichen. War die Überprüfung positiv — ist der Befehl als identifiziert worden —, so verkürzt der Computer die Kommandozeile, indem er die Befehle in Token (siehe Teil 1, Tabelle 1) umwandelt. Diese Prozedur durchlaufen sowohl die Programmzeilen (mit Zeilennummer) als auch die direkten Kommandos (Bild 1b). An dieser Stelle trennen sich nun aber die Wege dieser beiden Zeilentypen.</p>
 
+        <figure>
+            <table>
+                <tbody>
+                    <tr>
+                        <td><b>Dezimal</b></td>
+                        <td><b>Hexadezimal</b></td>
+                        <td><b>Bemerkung</b></td>
+                    </tr>
+                    <tr>
+                        <td>255-266</td>
+                        <td>00FF-010A</td>
+                        <td>Arbeitsspeicher für Fließkomma nach ASCII</td>
+                    </tr>
+                    <tr>
+                        <td>256-318</td>
+                        <td>0100-013E</td>
+                        <td>Korrekturpuffer für Bandbetrieb</td>
+                    </tr>
+                    <tr>
+                        <td>256-511</td>
+                        <td>0100-01FF</td>
+                        <td>Prozessor Stack</td>
+                    </tr>
+                    <tr>
+                        <td>512-600</td>
+                        <td>0200-0258</td>
+                        <td>Basic-Eingabepuffer</td>
+                    </tr>
+                    <tr>
+                        <td>601-610</td>
+                        <td>0259-0262</td>
+                        <td>Tabelle der logischen Filenummern...</td>
+                    </tr>
+                    <tr>
+                        <td>611-620</td>
+                        <td>0263-026C</td>
+                        <td>....sowie der dazugehörigen Gerätenummern....</td>
+                    </tr>
+                    <tr>
+                        <td>621-630</td>
+                        <td>026D-0276</td>
+                        <td>...und der entsprechenden Sekundäradressen</td>
+                    </tr>
+                    <tr>
+                        <td>631-640</td>
+                        <td>0277-0280</td>
+                        <td>Tastaturpuffer</td>
+                    </tr>
+                    <tr>
+                        <td>641-642</td>
+                        <td>0281-0282</td>
+                        <td>Start des verfügbaren RAM-Bereichs</td>
+                    </tr>
+                    <tr>
+                        <td>643-644</td>
+                        <td>0283-0284</td>
+                        <td>Ende des verfügbaren RAM-Bereichs</td>
+                    </tr>
+                    <tr>
+                        <td>645</td>
+                        <td>0285</td>
+                        <td>Timeout-Flag für den seriellen Port</td>
+                    </tr>
+                    <tr>
+                        <td>646</td>
+                        <td>0286</td>
+                        <td>Aktueller Farbcode</td>
+                    </tr>
+                    <tr>
+                        <td>647</td>
+                        <td>0287</td>
+                        <td>Farbe unter dem Cursor</td>
+                    </tr>
+                    <tr>
+                        <td>648</td>
+                        <td>0288</td>
+                        <td>High-Byte des Bildschirmspeichers (Information für das Betriebssystem)</td>
+                    </tr>
+                    <tr>
+                        <td>649</td>
+                        <td>0289</td>
+                        <td>Größe des Tastaturpuffers (Maximum 10)</td>
+                    </tr>
+                    <tr>
+                        <td>650</td>
+                        <td>028A</td>
+                        <td>Repeat-Flag (0: Cursor + Space/ 64: Keine Taste/ 128: Alle Tasten mit Repeat)</td>
+                    </tr>
+                    <tr>
+                        <td>651</td>
+                        <td>028B</td>
+                        <td>Repeat-Zähler (bestimmt die Wartezeit bis die Taste wiederholt wird)</td>
+                    </tr>
+                    <tr>
+                        <td>652</td>
+                        <td>028C</td>
+                        <td>Repeat-Verzögerung (bestimmt die Zeit, bis die Taste das erste mal wiederholt wird)</td>
+                    </tr>
+                    <tr>
+                        <td>653</td>
+                        <td>028D</td>
+                        <td>Kontrolltasten-Flag (1: SHIFT/ 2: CBM/ 4: CTRL. Es können auch 2 Tasten erkannt werden zum Beispiel 5: SHIFT + CTRL)</td>
+                    </tr>
+                    <tr>
+                        <td>654</td>
+                        <td>028E</td>
+                        <td>Letzte Kontrolltaste (Identisch mit 653)</td>
+                    </tr>
+                    <tr>
+                        <td>655-656</td>
+                        <td>028F-0290</td>
+                        <td>Vektor für Tastaturdecodierung</td>
+                    </tr>
+                    <tr>
+                        <td>657</td>
+                        <td>0291</td>
+                        <td>Flag für SHIFT + CBM gesperrt (keine Groß-Kleinschrift Umschaltung. 0: Normal/ 128: Sperre)</td>
+                    </tr>
+                    <tr>
+                        <td>658</td>
+                        <td>0292</td>
+                        <td>Flag für Scrolling</td>
+                    </tr>
+                    <tr>
+                        <td>659-670</td>
+                        <td>0293-029E</td>
+                        <td>RS 232 Register, Zeiger, ect.</td>
+                    </tr>
+                    <tr>
+                        <td>671-672</td>
+                        <td>029F-02A0</td>
+                        <td>Zwischenspeicher für IRQ bei Bandbetrieb</td>
+                    </tr>
+                    <tr>
+                        <td>673-676</td>
+                        <td>02Al-02A4</td>
+                        <td>Diverse VIA-Zeiger</td>
+                    </tr>
+                    <tr>
+                        <td>677-767</td>
+                        <td>02A5-02FF</td>
+                        <td>Zwischenspeicher einer Bildschirmzeile</td>
+                    </tr>
+                    <tr>
+                        <td>786-769</td>
+                        <td>0300-0301</td>
+                        <td>Vektor für Fehlermeldung (C43A)</td>
+                    </tr>
+                    <tr>
+                        <td>770-771</td>
+                        <td>0302-0303</td>
+                        <td>Vektor für Basic-Warmstart (C483)</td>
+                    </tr>
+                    <tr>
+                        <td>772-773</td>
+                        <td>0304-0305</td>
+                        <td>Vektor für Umwandlung von ASCII in Token (C579)</td>
+                    </tr>
+                    <tr>
+                        <td>774-775</td>
+                        <td>0306-0307</td>
+                        <td>Vektor für Umwandlung von Token in ASCII (C717)</td>
+                    </tr>
+                    <tr>
+                        <td>776-777</td>
+                        <td>0308-0309</td>
+                        <td>Vektor für Basic-Befehlsadresse (C7E1)</td>
+                    </tr>
+                    <tr>
+                        <td>778-779</td>
+                        <td>030A-030B</td>
+                        <td>Vektor für arithmetisches Element (CE83)</td>
+                    </tr>
+                    <tr>
+                        <td>780</td>
+                        <td>030C</td>
+                        <td>Akku für SYS-Befehl (Bei SYS wird 780 in den Akku geladen)</td>
+                    </tr>
+                    <tr>
+                        <td>781</td>
+                        <td>030D</td>
+                        <td>X-Reg für SYS-Befehl</td>
+                    </tr>
+                    <tr>
+                        <td>782</td>
+                        <td>030E</td>
+                        <td>Y-Reg für SYS-Befehl</td>
+                    </tr>
+                    <tr>
+                        <td>783</td>
+                        <td>030F</td>
+                        <td>Speicher für Status Register für SYS-Befehl</td>
+                    </tr>
+                    <tr>
+                        <td>788-789</td>
+                        <td>0314-0315</td>
+                        <td>IRQ-Vektor (EABF) *** Kernal-Vektoren</td>
+                    </tr>
+                    <tr>
+                        <td>790-791</td>
+                        <td>0316-0317</td>
+                        <td>BRK-Vektor (FED2)</td>
+                    </tr>
+                    <tr>
+                        <td>792-793</td>
+                        <td>0318-0319</td>
+                        <td>NMI-Vektor (FEAD)</td>
+                    </tr>
+                    <tr>
+                        <td>794-795</td>
+                        <td>031A-031B</td>
+                        <td>OPEN-Vektor (F40A)</td>
+                    </tr>
+                    <tr>
+                        <td>796-797</td>
+                        <td>031C-031D</td>
+                        <td>CLOSE-Vektor (F34A)</td>
+                    </tr>
+                    <tr>
+                        <td>798-799</td>
+                        <td>031E-031F</td>
+                        <td>Kanal für Eingabe (CHKIN, F2C7)</td>
+                    </tr>
+                    <tr>
+                        <td>800-801</td>
+                        <td>0320-0321</td>
+                        <td>Kanal für Ausgabe (CHOUT, F309)</td>
+                    </tr>
+                    <tr>
+                        <td>802-803</td>
+                        <td>0322-0323</td>
+                        <td>Kanäle initialisieren (CLRCH, F3F3)</td>
+                    </tr>
+                    <tr>
+                        <td>804-805</td>
+                        <td>0324-0325</td>
+                        <td>Eingabe-Vektor (F20E)</td>
+                    </tr>
+                    <tr>
+                        <td>806-807</td>
+                        <td>0326-0327</td>
+                        <td>Ausgabe-Vektor (F27A)</td>
+                    </tr>
+                    <tr>
+                        <td>808-809</td>
+                        <td>0328-0329</td>
+                        <td>Vektor für STOP-Taste prüfen (F770)</td>
+                    </tr>
+                    <tr>
+                        <td>810-811</td>
+                        <td>032A-032B</td>
+                        <td>GET-Vektor (F1F5)</td>
+                    </tr>
+                    <tr>
+                        <td>812-813</td>
+                        <td>032C-032D</td>
+                        <td>Alle Files schließen ((F3EF)</td>
+                    </tr>
+                    <tr>
+                        <td>814-815</td>
+                        <td>032E-032F</td>
+                        <td>User-Vektor (FED2)</td>
+                    </tr>
+                    <tr>
+                        <td>816-817</td>
+                        <td>0330-0331</td>
+                        <td>LOAD-Vektor (F549)</td>
+                    </tr>
+                    <tr>
+                        <td>818-819</td>
+                        <td>0332-0333</td>
+                        <td>SAVE-Vektor (F685)</td>
+                    </tr>
+                    <tr>
+                        <td>828-1019</td>
+                        <td>033C-03FB</td>
+                        <td>Kassettenpuffer</td>
+                    </tr>
+                </tbody>
+            </table>
+            <figcaption>Tabelle 1. Die Adreßbelegung der Seiten 2 bis4 beim VC 20</figcaption>
+        </figure>
         <p>Zunächst zu dem weiteren Weg einer Programmzeile. Die inzwischen komplett übersetzte Zeile im Basic-Puffer wird nun in einem zweiten Durchlauf vom Zwischenspeicher in den Programmspeicher übertragen, wobei sie auch gleich richtig eingeordnet wird (damit die Reihenfolge der Zeilennummern stimmt). Weil sich dadurch der Programmbereich im Basic-Speicher vergrößert, muß der Variablenbereich weiter oben angesiedelt werden. Die bis dahin gespeicherten Variablen werden dadurch natürlich überschrieben. Nach dem Übertragen der Programmzeile springt das Interpreterprogramm wieder in die Warteschleife zurück, damit weitere Befehle entgegen genommen werden können.</p>
 
         <p>Nun möchte ich den weiteren Weg einer Direktmoduszeile beschreiben, denn der verläuft anders. Nachdem die Zeile mit Hilfe der CHRGET-Routine in Interpretercode (also Token) umgewandelt worden ist, wird der 2-Byte-Zeiger ($7A-$7B) auf den Pufferanfang zurückgestellt und der Inhalt wie eine Programmzeile behandelt und abgearbeitet (wieder mit Hilfe der CHRGET-Routine).</p>
@@ -119,6 +401,46 @@
 
         <p>Das recht komfortable Programm liegt als Basic-Lader in Listing 2 vor. Nach dem Starten mit RUN wird das Maschinenprogramm automatisch ans Ende des verfügbaren Speichers geladen. Mit der SPACE-Taste aktiviert man diese Routine. Als erstes werden die Befehle gelistet, mit denen die Funktionstasten belegt sind. (Tabelle 2).</p>
 
+        <figure>
+            <table>
+                <tbody>
+                    <tr>
+                        <td>Fl: LIST</td>
+                        <td>- LIST-Befehl mit CHR$(13)</td>
+                    </tr>
+                    <tr>
+                        <td>F2: RUN</td>
+                        <td>- wie bei LIST</td>
+                    </tr>
+                    <tr>
+                        <td>F3: INPUT</td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td>F4: GOSUB</td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td>F5: SYS0</td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td>F6: RETURN</td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td>F7: RESTORE</td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td>F8: LOAD’</td>
+                        <td>— ’ entspricht dem Hochkomma (”)</td>
+                    </tr>
+                </tbody>
+            </table>
+            <figcaption>Tabelle 2. Die Grundbelegung der Funktionstasten nach dem Laden des Maschinenprogramms</figcaption>
+        </figure>
+
         <p>Auffällig ist bei den Kommandos LIST und RUN der Pfeil nach oben (t). Er bewirkt ein sofortiges Ausführen des Befehls — entspricht also »LIST« und RETURN-Taste beziehungsweise »RUN« und RETURN-Taste. Das andere auffällige Zeichen ist der Apostroph (&lsquo;) bei dem Kommando LOAD, der dem Hochkomma (”) entspricht. Das echte Gänsefüßchen ist bereits für die Syntax des Änderungsbefehls (siehe unten) vergeben.</p>
 
         <p>Auf den Befehl π wie er beispielsweise beim Programm »Basic-Switch« (Folge 2) verwendet wurde, habe ich dieses Mal aus Platzgründen verzichtet, damit Lader und Maschinenprogramm in der Grundversion Platz finden. Die Kommandos werden statt dessen über den Befehl »SYS0« (oder F5) eingegeben. Dabei machen wir uns den USR-Vektor (Adresse 0-2) als Sprungzeiger zu Nutze. Damit zur Syntax bei der Funktionstastenprogrammierung:<br />
@@ -155,6 +477,86 @@
         <p>Weiterhin ist für jedes Kommando die Sprungadresse in der Tabelle ($2208-$2268) zu vermerken. Dabei muß die Reihenfolge Low-/High Byte beachtet werden. Außerdem muß das LOW-Byte vor dem Eintrag um eines dekrementiert werden (LOW Byte -1). Auch diese Arbeit erledigt das Programm in Listing 5.</p>
 
         <p>Ein Befehl wurde bereits eingetragen. Der Befehl KILL führt einen Reset durch und damit ist das Programm abgeschaltet. Wer also seine Maschinenprogramme ins Basic einbinden möchte, kann dies mit der beschriebenen Methode tun. Beispielsweise könnte man die in Listing 2 abgedruckte Funktionstastenroutine mit dem KEY-Befehl belegen. Auch im Hinblick auf Grafik, Tonerzeugung oder Joystickabfrage bietet sich hier die Möglichkeit, die Unzulänglichkeiten des Basics zu überwinden. Auch die Besitzer eines C 64 können die beschriebene Routine benutzen, da die Basic-ROMs nahezu identisch sind (sie haben lediglich eine andere Adresse). Außerdem habe ich in Tabelle 3 eine Liste der wichtigsten Unterprogramme zusammengestellt, mit denen man unter anderem Parameter, Strings, Kommas oder ähnliches abfragen kann. Auf jeden Fall sollte man sich für diese Arbeit ein ROM-Listing (zum Beispiel »VC 20 Intern« von Data Becker) zulegen.</p>
+
+        <figure>
+            <table>
+                <tbody>
+                    <tr>
+                        <td><b>Adresse</b></td>
+                        <td><b>Funktionsbeschreibung</b></td>
+                        <td><b>Bemerkung</b></td>
+                        <td><b>Übergaberegister</b></td>
+                    </tr>
+                    <tr>
+                        <td>C613</td>
+                        <td>Startadresse einer Programmzeile berechnen</td>
+                        <td></td>
+                        <td>Eingabe: Zeile in $14,15 Ausgabe: Adresse in $5F, 60</td>
+                    </tr>
+                    <tr>
+                        <td>C807</td>
+                        <td>Prüft auf Doppelpunkt</td>
+                        <td>Zur Syntaxkontrolle</td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td>CD8A</td>
+                        <td>Ausdruck holen (z.B. Zeichen)</td>
+                        <td>$D7FD wandelt Fließk. in Int.</td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td>CAA0</td>
+                        <td>PRINT-Befehl: Ausdruck oder String holen und ausdrucken</td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td>CEF7</td>
+                        <td>Prüft auf Klammer zu »)«</td>
+                        <td>Syntaxkontrolle</td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td>CEFA</td>
+                        <td>Prüft auf Klammer auf »(«</td>
+                        <td>Syntaxkontrolle</td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td>CEFD</td>
+                        <td>Prüft auf Komma</td>
+                        <td>Syntaxkontrolle</td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td>CF04</td>
+                        <td>»SYNTAX ERROR« ausgeben</td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td>D113</td>
+                        <td>Prüft auf Buchstabe (A-Z)</td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td>D248</td>
+                        <td>»ILLEGAL QUANTITY« ausgeben</td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td>D79B</td>
+                        <td>Byte-Wert (0-255) holen</td>
+                        <td>Bei der Argumentabfrage</td>
+                        <td></td>
+                    </tr>
+                </tbody>
+            </table>
+            <figcaption>Tabelle 3. Einige der wichtigsten Routinen, mit denen man für Basic-Befehle Argumente, Satzzeichen etc. abfragen kann.</figcaption>
+        </figure>
 
         <p>Damit möchte ich für heute schließen. Das nächste Mal werden wir sehen, was man mit den Kernal-Vektoren anfangen kann und betrachten die Grafikmöglichkeiten beim VC 20.</p>
 
