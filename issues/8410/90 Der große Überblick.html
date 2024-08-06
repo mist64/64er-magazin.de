@@ -23,7 +23,7 @@
         <p class="intro">Man braucht sehr viel Geduld, um bei einem langen Listing die Übersicht zu behalten. Ein formatiertes Listing schafft Ordnung und erleichtert somit die Fehlersuche.</p>
 
         <p>Das Programm FLIST belegt 134 Bytes im Kassettenpuffer des C 64. Es wird mit LOAD”FLIST.DATA”, 8 geladen und mit RUN gestartet. Dabei wird das, in DATA-Zeilen stehende Programm im Speicher ab 828 abgelegt und mit SYS gestartet. Die Zeile 10, die diese Dinge erledigt, dient später als Demonstrationszeile. Nun zur Funktion:<br />
-            Das Programm erweitert das Basic um den Befehl FLIST. Dieser Befehl erzeugt ein formatiertes Listing auf dem Bildschirm, indem vor der Ausgabe eines Zeichens geprüft wird, ob dieses Zeichen ein »:«ist. Trifft dies nicht zu, so wird das ’LISTen’ fortgesetzt. Andernfalls erzeugt das Programm ein »CR« (Carriadge Return) und fügt eine, von der Länge der Zeilennummer abhängige Anzahl von Leerzeichen ein. Dadurch stehen alle in einer Zeile vorhandenen Doppelpunkte untereinander und unter dem Leerzeichen nach der Zeilennummer. Jeder Befehl, vor dem ein Doppelpunkt steht, erscheint so in einer neuen Zeile. Die Angabe der Zeilennummer(n) erfolgt bei FLIST wie beim normalen LIST-Befehl (zum Beispiel FLIST-100). Zum Editieren einer Zeile steht dem Benutzer weiterhin der normale LIST-Befehl zur Verfügung. Versuchen Sie mal FLIST10! Benutzer eines Druckers könnten ja mal OPEN1,4:FLIST:close1 ausprobieren.</p>
+            Das Programm erweitert das Basic um den Befehl FLIST. Dieser Befehl erzeugt ein formatiertes Listing auf dem Bildschirm, indem vor der Ausgabe eines Zeichens geprüft wird, ob dieses Zeichen ein »:«ist. Trifft dies nicht zu, so wird das ’LISTen’ fortgesetzt. Andernfalls erzeugt das Programm ein »CR« (Carriadge Return) und fügt eine, von der Länge der Zeilennummer abhängige Anzahl von Leerzeichen ein. Dadurch stehen alle in einer Zeile vorhandenen Doppelpunkte untereinander und unter dem Leerzeichen nach der Zeilennummer. Jeder Befehl, vor dem ein Doppelpunkt steht, erscheint so in einer neuen Zeile. Die Angabe der Zeilennummer(n) erfolgt bei FLIST wie beim normalen LIST-Befehl (zum Beispiel FLIST-100). Zum Editieren einer Zeile steht dem Benutzer weiterhin der normale LIST-Befehl zur Verfügung. Versuchen Sie mal FLIST10! Benutzer eines Druckers könnten ja mal <a href="#fehlerteufelchen" class="fehlerteufelchen_link">OPEN1,4:FLIST:close1</a> ausprobieren.</p>
 
         <address class="author">(Michael Weidlich/rg)</address>
 
@@ -34,6 +34,27 @@
         <figure>
             <pre data-filename="flist" data-name="FLIST"></pre>
         </figure>
+
+        <aside class="fehlerteufelchen">
+            <h2>Fehlerteufelchen</h2>
+            <p>Der Hinweis für Druckerbesitzer muß natürlich lauten:<br>
+                OPEN1,4:CMD1:FLIST<br>
+                und nach dem Drucken:<br>
+                PRINT#1:CLOSE1</p>
+            <p>Außerdem bin ich durch Zufall auf einen Programmfehler gestoßen, der bei aktivem Programm auftritt und bei einer Variablenzuweisung, bei der die Variable mit F beginnt einen SYNTAX ERROR erzeugt (zum Beispiel bei F = 1, FX = 100 etc.).</p>
+            <p>Dies kann man auf zwei Arten verhindern:</p>
+            <p>Entweder schaltet man die Erweiterung vor dem Starten eines Basic-Programms durch SYS 58451 ab, oder man ändert den Basic-Lader wie folgt:</p>
+            <p>Den Endwert der FOR-NEXT-Schleife auf 981 setzen, in Zeile 230 den letzten Wert 8 durch 195 und in Zeile 240 den ersten Wert 175 in 3 abändern. Dann fügt man diese DATA-Zeilen an:<br>
+                440 DATA 56,165,122,233<br>
+                450 DATA 1,133,122,165<br>
+                460 DATA 123,233,0,133<br>
+                470 DATA 123,32,121,0<br>
+                480 DATA 76,231,167</p>
+                <!-- TODO apply? -->
+            <address class="author">(Michael Weidlich)</address>
+            </p>
+            <!-- 64'er 12/1984 -->
+        </aside>
 
     </article>
 
