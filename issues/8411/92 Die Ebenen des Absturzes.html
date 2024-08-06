@@ -76,17 +76,18 @@
 
         <ol>
             <li>$ 8004 bis 8009 mit »cbm80« belegen,</li>
-            <li>eine Adresse in $ 8002 und $ 8003 eintragen (Low-Byte vor High-Byte) und</li>
+            <li>eine Adresse in <a href="#fehlerteufelchen" class="fehlerteufelchen_link">$ 8002 und $ 8003</a> eintragen (Low-Byte vor High-Byte) und</li>
             <li>durch den Befehl CLI Interrupts (IRQ) erlauben.</li>
         </ol>
 
 
         <p>Mit folgendem kleinen Programm sorgt man von Basic aus dafür, daß ein Reset keinen Effekt hat:<br />
-            100 FOR I=32770 TO 32778<br />
+            <a href="#fehlerteufelchen" class="fehlerteufelchen_link">100 FOR I=32770 TO 32778</a><br />
             110 READ A : POKE I,A<br />
             120 NEXT I<br />
-            130 DATA 10, 128, 195, 194, 205<br />
-            140 DATA 56, 48, 88, 0</p>
+            <a href="#fehlerteufelchen" class="fehlerteufelchen_link">130 DATA 10, 128, 195, 194, 205</a><br />
+            140 DATA 56, 48, 88, 0
+        </p>
 
         <p>Unser Ausgangsproblem war aber: Wie kann ich ein Reset verursachen, obwohl es gesperrt ist? Es gibt zwei Methoden:</p>
 
@@ -128,7 +129,7 @@
             330 DATA 059,162,000,200,208,002,230,060<br />
             340 DATA 177,059,208,245,232,224,003,208<br />
             350 DATA 242,200,208,002,230,060,132,045<br />
-            360 DATA 164,060,132,046,096,256</p>
+            360 DATA 164,060,132,046,096,<a href="#fehlerteufelchen" class="fehlerteufelchen_link">256</a></p>
 
         <p>Wenn Sie dieses Programm eingeben und starten, wird es ein Programm namens »UNNEW« auf Diskette schreiben. Falls sie aus Versehen NEW eingetippt haben, dann laden sie das Programm durch<br />
             LOAD &ldquo;UNNEW&rdquo; ,8,1 und starten es durch<br />
@@ -137,6 +138,20 @@
         <p>Ihr Basic-Programm ist gerettet, selbst wenn sie ein Reset ausgelöst haben. Das Programm setzt die Zeiger in $0801 und $0802, die auf die nächste Zeile zeigen, auf den richtigen Wert. Bei NEW werden diese beiden Bytes auf Null gesetzt, und zwei aufeinanderfolgende Nullen bedeuten für den Interpreter »Ende des Programms«.</p>
 
         <address class="author">(Daniel Kossmann/aa)</address>
+
+        <aside class="fehlerteufelchen" id="fehlerteufelchen">
+            <h2>Fehlerteufelchen</h2>
+            <p>Das letzte Datum in Zeile 360 (Programm UNNEW) lautet 255.</p>
+            <!-- 64'er 12/1984 -->
+            <hr>
+            <p>Leider mußte ich feststellen, daß mir in den »Ebenen des Absturzess« ein kleiner Fehler unterlaufen ist.</p>
+            <p>Nach Erkennen von »cbm 80« springt das Betriebssystem natürlich zu den Adressen $800 und $801, und nicht wie angegeben nach $802/803.</p>
+            <p>Die Zeilen 100 und 130 sehen dann folgendermaßen aus:<br>
+                100 FOR I = 32768 TO 32778<br>
+                130 DATA 9, 128, 0, 0, 195, 194, 205.</p>
+            <address class="author">(Daniel Kossmann)</address>
+            <!-- 64'er 2/1985 -->
+        </aside>
 
     </article>
 
