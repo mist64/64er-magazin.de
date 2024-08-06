@@ -69,8 +69,128 @@
             <li>Da bei der Arbeit mit diesem Programm nicht der Original-Zeichensatz vorhanden ist, kann man ihn, wenn gebraucht, über die RVS-ON-Taste darstellen. Dieses Verfahren habe ich selbst im Listing 1 verwendet.</li>
         </ol>
 
-
         <address class="author">(Bernd Schrödter/ev)</address>
+
+        <figure>
+            <table>
+                <tbody>
+                    <tr>
+                        <td><b>10 — 40:</b></td>
+                        <td>Hier wird die Anfangsadresse des Zeichenspeichers nach Adresse 7168 verlegt, der Beginn des Farb-RAM ermittelt (unterschiedliche Werte bei GV und Erweiterungen) und das Maschinenprogramm »Bildtausch« initialisiert.</td>
+                    </tr>
+                    <tr>
+                        <td><b>50 — 90:</b></td>
+                        <td>Aufbau des Bildschirms</td>
+                    </tr>
+                    <tr>
+                        <td><b>100:</b></td>
+                        <td>Einsprung in das Maschinenprogramm »Zeichen-Entwicklung«</td>
+                    </tr>
+                    <tr>
+                        <td><b>110 — 190:</b></td>
+                        <td>Menü</td>
+                    </tr>
+                    <tr>
+                        <td><b>200 — 240:</b></td>
+                        <td>Ziffernwahl. Bei Betätigung von F1 wird der Ziffernzähler erhöht und diese Änderung auf dem Bildschirm kenntlich gemacht (Unterlegung der gewählten Ziffer mit Schwarz, der Rest Blau).</td>
+                    </tr>
+                    <tr>
+                        <td><b>260 — 270:</b></td>
+                        <td>Löschen des Menüs</td>
+                    </tr>
+                    <tr>
+                        <td><b>280 — 350:</b></td>
+                        <td>Bildwahl. Berechnung der Anfangsadresse des nächsten Zeichens im Reserve-Bildspeicher und im Zeichenspeicher aus den Werten BI (Bildnr.) und ZI (Ziffernr.). Die Adressen werden in das LB-HB-Format umgewandelt und an das MP »Zeichen-Entwicklung« übergeben.</td>
+                    </tr>
+                    <tr>
+                        <td><b>360 — 440:</b></td>
+                        <td>Trick. Der Bildschirm wird neu aufgebaut. Die Hauptsache ist jedoch die Zeile 430. Dort wird immer wieder das Maschinenprogramm »Bildtausch« aufgerufen, das einen Mini-Trickfilm auf dem Bildschirm erzeugt.</td>
+                    </tr>
+                    <tr>
+                        <td><b>450 — 500:</b></td>
+                        <td>Basic-Anfang und -Ende werden in den Bytes 680-683 abgelegt. Der Zeichenspeicher wird normalisiert. Es wird eine Maske zum Abspeichern des Reserve- Bildspeichers ausgegeben. Maske: Basic-Anfang und -Ende werden gleich Reserve-Bildspeicher-Anfang und -Ende gesetzt. In den Tastaturpuffer wird ein RETURN = CHR$(13) gePOKEt, damit nach dem Abspeichern die zweite Zeile der Maske abgearbeitet wird, die Basic- Anfang und -Ende wieder in den Ausgangszustand bringt. Mit dem »RUN« am Ende der Zeile startet das Programm wieder.</td>
+                    </tr>
+                    <tr>
+                        <td><b>510:</b></td>
+                        <td>Unterprogramm zur Ausgabe von mehreren »Cursor Down«</td>
+                    </tr>
+                </tbody>
+            </table>
+            <figcaption>Programmübersicht</figcaption>
+        </figure>
+
+        <figure>
+            <table>
+                <tbody>
+                    <tr>
+                        <td>AZ</td>
+                        <td>Beginn des Farb-RAM</td>
+                    </tr>
+                    <tr>
+                        <td>BI</td>
+                        <td>Bildzähler</td>
+                    </tr>
+                    <tr>
+                        <td>I,J,K</td>
+                        <td>Schleifenzähler</td>
+                    </tr>
+                    <tr>
+                        <td>WV</td>
+                        <td>Parameterübergabe für Unterprogramm in Zeile 510</td>
+                    </tr>
+                    <tr>
+                        <td>A$</td>
+                        <td>Abfrageergebnis aus dem Menü</td>
+                    </tr>
+                    <tr>
+                        <td>ZI</td>
+                        <td>Ziffernzähler</td>
+                    </tr>
+                    <tr>
+                        <td>HH,HI</td>
+                        <td>Farbspeicher, die auf dem Bildschirm schwarz erscheinen sollen</td>
+                    </tr>
+                    <tr>
+                        <td>TE</td>
+                        <td>Zähler zum Vergleich mit aktueller Ziffer (200 bis 240) und Geschwindigkeit für »Trick« (360 bis 440)</td>
+                    </tr>
+                    <tr>
+                        <td>PR</td>
+                        <td>Verzweigungsargument für Unterprogramm (280 bis 350)</td>
+                    </tr>
+                    <tr>
+                        <td>LE</td>
+                        <td>Verzweigungsargument für Zeile 260</td>
+                    </tr>
+                    <tr>
+                        <td>X</td>
+                        <td>1. Speicherplatz für das nächste zu erstellende Zeichen (im Reserve-Bildspeicher)</td>
+                    </tr>
+                    <tr>
+                        <td>Q</td>
+                        <td>HB von X</td>
+                    </tr>
+                    <tr>
+                        <td>R</td>
+                        <td>LB von X</td>
+                    </tr>
+                    <tr>
+                        <td>HI</td>
+                        <td>Äquivalent zu X (für Zeichenspeicher)</td>
+                    </tr>
+                    <tr>
+                        <td>H</td>
+                        <td>HB von HI</td>
+                    </tr>
+                    <tr>
+                        <td>L</td>
+                        <td>LB von HI</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <figcaption>Die wichtigsten Variablen</figcaption>
+        </figure>
 
     </article>
 

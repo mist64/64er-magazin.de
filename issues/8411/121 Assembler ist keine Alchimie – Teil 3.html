@@ -196,6 +196,129 @@
 
         <p>In Bild 1 ist unser Speicherinhalt kommentiert zu sehen. Das Programm endet im Speicherplatz $0813. Das Kennzeichen für Programmende sind zwei aufeinanderfolgende Bytes mit dem Wert Null. Dahinter werden die Variablen abgelegt, sobald das Programm gestartet wird. Wir steigen aus dem Monitor durch X aus und starten das Programm mit RUN. Jetzt sehen wir nochmal in den Speicher. Bis $0813 hat sich nichts verändert. Danach aber ist jetzt in 7 Bytes die Variable A% abgelegt. Das zeigt Bild 2.</p>
 
+        <figure>
+            <table>
+                <tbody>
+                    <tr>
+                        <td><b>0800</b></td>
+                        <td><b>00</b></td>
+                        <td><b>0C</b></td>
+                        <td><b>08</b></td>
+                        <td><b>0A</b></td>
+                        <td><b>00</b></td>
+                        <td><b>41</b></td>
+                        <td><b>25</b></td>
+                        <td><b>B2</b></td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td></td>
+                        <td colspan="2">080C<br>Koppeladresse</td>
+                        <td colspan="2">000A<br>Zeilennr.10</td>
+                        <td>A</td>
+                        <td>%</td>
+                        <td>=<br>Token</td>
+                    </tr>
+                    <tr>
+                        <td><b>0808</b></td>
+                        <td><b>AB</b></td>
+                        <td><b>31</b></td>
+                        <td><b>32</b></td>
+                        <td><b>00</b></td>
+                        <td></td>
+                        <td>08</td>
+                        <td><b>14</b></td>
+                        <td><b>00</b></td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td>–<br>Token</td>
+                        <td>1</td>
+                        <td>2</td>
+                        <td>Zeilen-<br>ende</td>
+                        <td colspan="2">0812<br>Koppeladresse</td>
+                        <td colspan="2">0014<br>Zeilennr.20</td>
+                    </tr>
+                    <tr>
+                        <td><b>0810</b></td>
+                        <td><b>80</b></td>
+                        <td><b>00</b></td>
+                        <td><b>00</b></td>
+                        <td><b>00</b></td>
+                        <td><b>FF</b></td>
+                        <td><b>FF</b></td>
+                        <td><b>FF</b></td>
+                        <td><b>FF</b></td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td>END<br>Token</td>
+                        <td>Zeilen-<br>ende</td>
+                        <td colspan="2">Programm-<br>ende</td>
+                        <td colspan="2">Leerer Speicher</td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                </tbody>
+            </table>
+            <figcaption>Bild 1. Der Monitor zeigt das nackte Programm im Speicher</figcaption>
+        </figure>
+
+        <figure>
+            <table>
+                <tbody>
+                    <tr>
+                        <td><b>Speicherstelle</b></td>
+                        <td align="center"><b>0814</b></td>
+                        <td align="center"><b>0815</b></td>
+                        <td align="center"><b>0816</b></td>
+                        <td align="center"><b>0817</b></td>
+                        <td align="center"><b>0818 bis 081A</b></td>
+                    </tr>
+                    <tr>
+                        <td><b>Byte</b></td>
+                        <td align="center"><b>1</b></td>
+                        <td align="center"><b>2</b></td>
+                        <td align="center"><b>3</b></td>
+                        <td align="center"><b>4</b></td>
+                        <td align="center"><b>5-7</b></td>
+                    </tr>
+                    <tr>
+                        <td rowspan="4">Inhalt</td>
+                        <td align="center">C1</td>
+                        <td align="center">80</td>
+                        <td align="center">FF</td>
+                        <td align="center">F4</td>
+                        <td align="center">00 00 00</td>
+                    </tr>
+                    <tr>
+                        <td align="center">1100 0001</td>
+                        <td align="center">1000 0000</td>
+                        <td align="center">1111 1111</td>
+                        <td align="center">1111 0100</td>
+                        <td align="center" rowspan="3">unbenutzt bei Integerzahlen</td>
+                    </tr>
+                    <tr>
+                        <td align="center" colspan="2">Kennbits 7 für Integer</td>
+                        <td align="center">MSB</td>
+                        <td align="center">LSB</td>
+                    </tr>
+                    <tr>
+                        <td align="center">0100 0001<br>≙ 65<br>Code für A</td>
+                        <td align="center" valign="top">0000 0000</td>
+                        <td align="center" colspan="2">von<br>-12</td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td align="center" colspan="3">Variablenname und -typ<br>Variablenwert</td>
+                    </tr>
+                </tbody>
+            </table>
+            <figcaption>Bild 2. So werden Integer-Variable aus Basic-Programmen vom C 64 im Speicher eingerichtet</figcaption>
+        </figure>
+
         <p>Zunächst einmal die Bytes $0814 und $0815: Hier wird der Väriablenname und der -typ angegeben. Der Typ ist aus den Bits 7 zu erkennen. Sind beide (wie hier) gleich 1, dann handelt es sich um eine Integervariable (also eine ganze Zahl). Läßt man die Kennbits außer acht, zeigt sich, daß in $0814 der Code für den Buchstaben A steht und $0815 nur den Wert 0 enthält. Nun zum Rest: Der C 64 legt Integers in nur 2 Bytes ab — die restlichen 3 Bytes $0818 bis $081A bleiben unbenutzt. Das ist auch dann der Fall, wenn danach noch weitere Variable kommen. Es bringt also keine Speicherersparnis (VC 20-Benutzer aufgepaßt!), wenn man mit Ganzzahlvariablen arbeitet!</p>
 
         <p>In $0817 steht $F4, welches binär ausgedrückt 1111 0100 ist. Das kennen wir noch von weiter oben als die —12 im Zweierkomplement-Format. Woher kommt $FF in Speicherzelle $0816? Wie gesagt, die Integers werden in 2 Bytes gespeichert, und wenn wir —12 in 16 Bits ausdrücken, dann sieht das so aus:<br />
@@ -245,6 +368,115 @@
         <p>In der Tabelle sind auch die Zyklen angegeben, die die heute neu gelernten Befehle zur Abarbeitung benötigen. Mit solchen Angaben lassen sich recht genau definierte Zeiten einstellen, in denen der Computer nichts anderes tut als durch das Programm zu flitzen. Wozu das dient, braucht wohl kaum noch gesagt werden: Wenn Sie zum Beispiel einen Text auf dem Bildschirm lesen wollen, bevor das Programm weiterläuft oder wenn Sie mit Peripherie arbeiten, die langsamer als das Programm ist oder&hellip; Allerdings muß noch gesagt werden, daß es noch elegantere Methoden zur Verzögerungs-Programmierung gibt als das Lahmlegen des Computers, aber dazu kommen wir erst in einer späteren Folge.</p>
 
         <address class="author">(Heimo Ponnath/gk)</address>
+
+        <figure>
+            <table>
+                <tbody>
+                    <tr>
+                        <td rowspan="2">
+                            <p><b>Befehlswort</b>
+                        </td>
+                        <td rowspan="2">
+                            <p><b>Adressierung</b>
+                        </td>
+                        <td rowspan="2">
+                            <p><b>Byteanzahl</b>
+                        </td>
+                        <td><b>Code</b></td>
+                        <td><b>Dauver in Taktzyklen</b></td>
+                        <td rowspan="2">
+                            <p><b>Beeinflussung von Flaggen</b>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><b>Hex</b></td>
+                        <td><b>Dez</b></td>
+                    </tr>
+                    <tr>
+                        <td>INX</td>
+                        <td>implizcit</td>
+                        <td>1</td>
+                        <td>E8</td>
+                        <td>232</td>
+                        <td>2</td>
+                        <td>N,Z</td>
+                    </tr>
+                    <tr>
+                        <td>INY</td>
+                        <td>implizit</td>
+                        <td>1</td>
+                        <td>C8</td>
+                        <td>200</td>
+                        <td>2</td>
+                        <td>N,Z</td>
+                    </tr>
+                    <tr>
+                        <td>INC</td>
+                        <td>absolut</td>
+                        <td>3</td>
+                        <td>EE</td>
+                        <td>238</td>
+                        <td>6</td>
+                        <td>N,Z</td>
+                    </tr>
+                    <tr>
+                        <td>DEX</td>
+                        <td>implizit</td>
+                        <td>1</td>
+                        <td>CA</td>
+                        <td>202</td>
+                        <td>2</td>
+                        <td>N,Z</td>
+                    </tr>
+                    <tr>
+                        <td>DEY</td>
+                        <td>implizit</td>
+                        <td>1</td>
+                        <td>88</td>
+                        <td>136</td>
+                        <td>2</td>
+                        <td>N,Z</td>
+                    </tr>
+                    <tr>
+                        <td>DEC</td>
+                        <td>absolut</td>
+                        <td>3</td>
+                        <td>CE</td>
+                        <td>206</td>
+                        <td>6</td>
+                        <td>N,Z</td>
+                    </tr>
+                    <tr>
+                        <td>SED</td>
+                        <td>implizit</td>
+                        <td>1</td>
+                        <td>F8</td>
+                        <td>248</td>
+                        <td>2</td>
+                        <td>1 → D</td>
+                    </tr>
+                    <tr>
+                        <td>CLD</td>
+                        <td>implizit</td>
+                        <td>1</td>
+                        <td>D8</td>
+                        <td>216</td>
+                        <td>2</td>
+                        <td>0 → D</td>
+                    </tr>
+                    <tr>
+                        <td>BNE</td>
+                        <td>relativ</td>
+                        <td>2</td>
+                        <td>D0</td>
+                        <td>208</td>
+                        <td>2<br>+1 bei Verzweigung<br>+ 2 bei Überschreiten einer Seitengrenze</td>
+                        <td></td>
+                    </tr>
+                </tbody>
+            </table>
+            <figcaption>Tabelle. Die in dieser Folge erwähnten Befehle</figcaption>
+        </figure>
 
     </article>
 
