@@ -64,7 +64,7 @@ Die Eingabe-Ausgaben werden aus `issues` gelesen, die Website wird nach `out` ge
 ## Credits
 
 * Script, HTML, CSS, Scan, Bildbearbeitung, OCR:
-    * Michael Steil <mist64@mac.com>
+    * [Michael Steil](https://github.com/mist64) &lt;mist64@mac.com&gt;
     * [ellduin](https://github.com/ellduin)
 * Ausgabe 5/84:
     * Abtippen der Listings
@@ -78,6 +78,7 @@ Die Eingabe-Ausgaben werden aus `issues` gelesen, die Website wird nach `out` ge
         * [thierer](https://www.forum64.de/wcf/index.php?user/26370-thierer/)
 * Ausgabe 7/84:
     * Erfassen diverser Tabellen, Eintragen der Index-Kategorien und -Titel
+        * [thierer](https://www.forum64.de/wcf/index.php?user/26370-thierer/)
     * Abtippen der Listings
         * [Dekay](https://www.forum64.de/wcf/index.php?user/1038-dekay/)
         * [Endurion](https://www.forum64.de/wcf/index.php?user/1964-endurion/)
@@ -86,7 +87,11 @@ Die Eingabe-Ausgaben werden aus `issues` gelesen, die Website wird nach `out` ge
         * [pgeorgi](https://www.forum64.de/wcf/index.php?user/28405-pgeorgi/)
         * [thierer](https://www.forum64.de/wcf/index.php?user/26370-thierer/)
         * [vicjack](https://www.forum64.de/wcf/index.php?user/15999-vicjack/)
-
+* Ausgabe 8/84:
+    * Erfassen diverser Tabellen, Eintragen der Index-Kategorien und -Titel, OCR-Fixes
+    * [thierer](https://www.forum64.de/wcf/index.php?user/26370-thierer/)
+    * Abtippen der Listings
+        * [Endurion](https://www.forum64.de/wcf/index.php?user/1964-endurion/)
 
 
 ![](screenshot1.png)

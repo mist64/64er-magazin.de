@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>RESET am C64</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="A. Wängler, rg">
+    <meta name="64er.issue" content="8/84">
+    <meta name="64er.pages" content="34-35">
+    <meta name="64er.head1" content="Hardware">
+    <meta name="64er.head2" content="C 64">
+    <meta name="64er.toc_category" content="Hardware">
+    <meta name="64er.toc_title" content="Reset am C64">
+    <meta name="64er.index_title" content="Resetschalter am C 64">
+    <meta name="64er.index_category" content="Listings zum Abtippen|Tips & Tricks|Reset">
+    <meta name="64er.index_category" content="Hardware|Bauanleitung">
+    <meta name="64er.id" content="reset">
+</head>
+
+<body>
+    <article>
+
+        <h1>RESET am C64</h1>
+
+        <p class="intro">Ohne Sicherheitskopie ist das Arbeiten mit dem C 64 eine riskante Sache. Zu oft stürzt ein Programm in der Entwicklungsphase ab. Also vor einem RUN immer abspeichern?</p>
+
+        <p>Leider verzögert dieses häufige Abspeichern, besonders wenn nur mehrere kleine Änderungen vorgenommen werden müssen die Programmierarbeit sehr. Deshalb wäre es sicher wünschenswert am C 64 einen RESET-Knopf zu haben, wie er bei anderen Computern vorzufinden ist. Wichtig ist dabei natürlich, daß durch Betätigen dieses Knopfes der Speicherbereich nicht total gelöscht wird, sondern lediglich wieder für eine neue Befehlsaufnahme bereit ist.</p>
+
+        <p>Da die beiden im Handbuch aufgeführten Möglichkeiten, den Computer wieder in einen aufnahmebereiten Zustand zu versetzen (RUN/STOP + RESTORE oder SYS 64738) oft zu keinem Resultat mehr führen, kann diesem Problem nur durch eine kleine Hardware-Erweiterung gelöst werden.</p>
+
+        <p>Das Prinzip dieses Schalters beruht auf einer Verbindung der RESET-Leitung des Prozessors (Pin 40) mit Masse (zum Beispiel Pin 21). Zur Realisierung dieser Verbindung bieten sich mehrere Ansatzpunkte an, die im folgenden beschrieben werden sollen:</p>
+
+        <h3>1. RESET-Knopf am User-Port</h3>
+
+        <p>Die an dieser Stelle nach außen geführte Platine des C 64 (User-Port) stellt an Leitung 1 GND (Masse) und an Leitung 3 RESET zur Verfügung. Durch Aufsetzen eines User-Port Steckers (zum Beispiel TRW 251-12-50-170 50-24SN-9) besteht nun die Möglichkeit, zwischen Leitung 1 und Leitung 3 einen Schalter dazwischen zu löten. Der Schalter sollte dabei ein Druckkontaktschalter sein und nach dem Löten durch einige Tropfen Schnellkleber fixiert werden (siehe Bild 1). Der Nachteil dieser Lösung besteht darin, daß zum einen der User-Port nicht mehr für andere Zwecke genutzt werden kann (zum Beispiel RS232..), zum anderen sind die Kosten für einen User-Port Stecker relativ hoch (zirka 12 Mark).</p>
+
+        <figure>
+            <img src="34-1.png" alt="">
+            <figcaption>Bild 1. Verschiedene RESET-Schalter</figcaption>
+        </figure>
+
+        <h3>2. RESET-Knopf am seriellen Bus</h3>
+
+        <p>Auch der serielle Bus (zum Beispiel Buchse 2 am Floppy) bietet die beiden Leitungen GND und RESET (Bild 2). Diese befinden sich an den Stiften 2 (GND) und 6 (RESET). Als Stecker wird lediglich ein ganz gewöhnlicher sechspoliger DIN-Stecker, den es für wenige Mark in jedem Elektrogeschäft gibt, benötigt. Dort sollte man auch den weiterhin notwendigen Mini-Taster bekommen können. Dieser Mini-Taster wird nun auf die beiden Stifte 2 und 6 gelötet, so daß der Tastknopf oben aus dem Stecker herausragt (eventuell aufschneiden). Den ganzen Stecker braucht man dann nur noch auf den seriellen Bus aufstecken um einen preiswerten RESET-Knopf zu haben.</p>
+
+        <figure>
+            <img src="34-2a.png" alt="">
+            <img src="34-2b.png" alt="">
+            <figcaption>Bild 2. RESET-Taster im Schnittstellenstecker</figcaption>
+        </figure>
+
+        <h3>3. RESET-Knopf fest eingebaut</h3>
+
+        <p>Die dritte Möglichkeit einen RESET-Knopf zu installieren, besteht darin, ihn fest in das Gehäuse des C 64 einzubauen. Dazu ist es notwendig, den Computer zu öffnen, die Tastatur auszustecken und die Platine auszubauen. Auf der Unterseite der Platine befinden sich die Lötkontakte des seriellen Busses. An dieser links und oben Mitte) über einen Druckschalter zu verbinden. Der links und oben mitte) über einen Druckschalter zu verbinden. Der Schalter selbst kann beispielsweise an der linken Geräteseite in einem gebohrten Loch Bild 4 befestigt werden.</p>
+
+        <figure>
+            <img src="34-3.png" alt="">
+            <figcaption>Bild 3. Platine des C 64 von unten/hinten</figcaption>
+        </figure>
+        <figure>
+            <img src="34-4.png" alt="">
+            <figcaption>Bild 4. RESET-Schalter im Gehäuse des C 64</figcaption>
+        </figure>
+
+        <p>Der Einbau des Schalters in den Computer ist allerdings dem Profi vorbehalten, da bei falschem Zusammenlöten der Kontakte, beziehungsweise bei zu starker Erhitzung der Platine, der Computer ernstlich beschädigt werden kann. Ferner ist zu bedenken, daß mit diesem Eingriff jeder Garantieanspruch verloren geht.</p>
+
+        <p>Hat man sich für einen der drei Wege entschieden und ihn realisiert, so wird man feststellen, daß nach dem kurzzeitigen Drücken der RESET-Taste das Programm verschwunden ist. Der Computer meldet sich nach einem RUN oder LIST Befehl mit einem freundlichen READY. Der Speicher scheint gelöscht zu sein. Das dies nicht so ist, sieht man durch den Einsatz eines Monitors. Betrachtet man sich den Basic-Programmstart, so wird man feststellen, daß das alte Programm noch vorhanden ist und nur die ersten drei Byte mit Nullen überschrieben wurden. Diese Nullen sagen dem Betriebssystem, daß hier das Programm zu Ende ist (genau wie nach einem NEW-Befehl). Um das Programm wieder lauffähig zu machen, müssen nur diese drei ersten Byte rekonstruiert werden.</p>
+
+        <p>Der Inhalt des ersten Byte ist immer Null, die beiden Folgebyte stellen einen Zeiger auf den Beginn der nächsten Basiczeile im Format Low-Byte, High-Byte dar. Diese beiden Byte werden mit der Adresse der nächsten Basiczeile gefüllt. Das Programm wird dann wieder lauffähig sein.</p>
+
+        <p>Die Rekonstruktion der Adresse der nächsten Basiczeile kann mit einem Monitor geschehen, indem das nächste Nullbyte im Speicher sucht und die darauf folgende Adresse in die beiden obigen Speicherzellen schreibt. Ein weitaus besseres Verfahren ist der Einsatz eines Programmes, das diese Arbeit für uns erledigt. Das beigefügte Programm OLD (siehe Listing 1) berechnet die gesuchte Adresse und schreibt sie in den Speicher. Damit wird der RESET beziehungsweise ein NEW aufgehoben und das Programm ist wieder vorhanden.</p>
+
+        <p>Es empfiehlt sich das Programm zunächst abzuspeichern und dann mit der Fehlersuche zu beginnen. Benötigt wird das OLD-Programm natürlich nur bei Basicprogrammen, ein vor dem RESET im Speicher befindliches Maschinenprogramm ist sofort wieder mit SYS startbar.</p>
+
+        <p>Das OLD-Programm selbst kann auf mehrere Arten geladen werden. Zum einen besteht die Möglichkeit, es mit einem Monitor im Kassettenpuffer (falls frei) abzulegen und als Maschinenprogramm abzuspeichern. Zum anderen kann es mit einem Basic-Lader (Listing 2) eingegeben werden. In diesem Fall wird das Programm ab $C000 abgelegt, da der Kassettenpuffer bei einem RESET ebenfalls gelöscht wird. Das Programm muß nun jeweils einmal nach Inbetriebnahme des Computers geladen und gestartet werden. Im Fall des Falles kann man es dann mit SYS 49152 aufrufen. Bei längeren Basicprogrammen sollte man es aber durch POKE 56,124 gegen überschreiben schützen.</p>
+
+        <p>Der Vorteil der ersten Möglichkeit besteht darin, daß man das OLD-Programm jederzeit laden und mit SYS 828 aufrufen kann, allerdings benötigt man einen Monitor. Die zweite Möglichkeit ist zwar einfach einzugeben, zerstört aber, hat man vergessen das Programm vorher zu laden, das zu rettende Basicprogramm.</p>
+
+        <p>Selbstverständlich arbeitet das OLD-Programm auch ohne die RESET-Taste, zum Beispiel nach einem irrtümlichen NEW-Befehl und stellt somit eine Basic-Erweiterung dar, die nicht nur in Verbindung mit der RESET-Taste ihre Anwendung findet.</p>
+
+        <address class="author">(A. Wängler/rg)</address>
+
+        <figure>
+            <pre>
+.,  033c   a5  2b       lda $2b
+.,  033e   a4  2c       ldy $2c
+.,  0340   85  22       sta $22
+.,  0342   84  23       sty $23
+.,  0344   a0  03       ldy #$03
+.,  0346   c8           iny
+.,  0347   b1  22       lda ($22),y
+.,  0349   d0  fb       bne $0346
+.,  034b   c8           iny
+.,  034c   98           tya
+.,  034d   18           clc
+.,  034e   65  22       adc $22
+.,  0350   a0  00       ldy #$00
+.,  0352   91  2b       sta ($2b),y
+.,  0354   a5  23       lda $23
+.,  0356   69  00       adc #$00
+.,  0358   c8           iny
+.,  0359   91  2b       sta ($2b),y
+.,  035b   88           dey
+.,  035c   a2  03       ldx #$03
+.,  035e   e6  22       inc $22
+.,  0360   d0  02       bne $0364
+.,  0362   e6  23       inc $23
+.,  0364   b1  22       lda ($22),y
+.,  0366   d0  f4       bne $035c
+.,  0368   ca           dex
+.,  0369   d0  f3       bne $035e
+.,  036b   a5  22       lda $22
+.,  036d   69  02       adc #$02
+.,  036f   85  2d       sta $2d
+.,  0371   a5  23       lda $23
+.,  0373   69  00       adc #$00
+.,  0375   85  2e       sta $2e
+.,  0377   60           rts
+.
+.
+</pre>
+            <figcaption>Listing 1. Assemblerlisting des OLD-Programms</figcaption>
+        </figure>
+
+        <figure>
+            <pre data-filename="old" data-name="OLD-Programm"></pre>
+            <figcaption>Listing 2. Basic-Lader des OLD-Programms</figcaption>
+        </figure>
+
+    </article>
+
+</body>
+
+</html>

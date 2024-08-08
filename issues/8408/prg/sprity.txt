@@ -1,0 +1,246 @@
+;sprity.prg ==0801==
+;Eingetippt von Endurion
+
+   10 :   rem*********************************************************************
+   20 :   rem**                     s p r i t y                                 **
+   30 :   rem**                                                                 **
+   40 :   rem**      manfred walter thoma  2102 hamburg 93  ernastrasse 10      **
+   50 :   rem**                                                                 **
+   60 :   rem*********************************************************************
+   70 poke53280,0:poke53281,0:poke646,1:printchr$(147);
+   75 :   rem*********************************************************************
+   80 :   rem**                   daten fuer die drei sprites                   **
+   90 :   rem*********************************************************************
+  100 data0,0,0,0,0,0,0,0,0,0,0,0,0,14,0,0,17,0,0,32,128,0,64,64,0,155,32,0,128
+  110 data32,0,132,32,0,132,32,0,145,32,0,78,64,0,32,128,0,31,0,0,0,0,0,0,0,0,0
+  120 data0,0,0,0,0,0,0
+  130 data0,0,0,0,0,0,0,0,0,0,0,0,0,14,0,0,17,0,0,32,128,0,64,64,0,155,32,0,128
+  140 data32,0,132,32,0,132,32,0,128,32,0,78,64,0,64,64,0,32,128,0,31,0,0,0,0,0
+  150 data0,0,0,0,0,0,0,0
+  160 data0,0,0,0,0,0,0,0,0,0,0,0,0,14,0,0,17,0,0,32,128,0,64,64,0,155,32,0,128
+  170 data32,0,132,32,0,132,32,0,128,32,0,78,64,0,81,64,0,64,64,0,32,128,0,31,0
+  180 data0,0,0,0,0,0,0,0,0
+  190 :  rem*********************************************************************
+  200 :  rem**               einlesen der sprites und titelbild                **
+  210 :  rem*********************************************************************
+  220 printtab(12)"s  p  r  i  t  y"
+  230 printtab(12)"================"
+  240 print:print:print:print
+  250 printtab(19)"by"
+  260 printtab(12)"manfred w. thoma"
+  270 printtab(12)"2102  hamburg 93"
+  280 printtab(12)" ernastrasse 10"
+  290 fori=13*64to13*64+62:readx:pokei,x:next
+  300 poke2040,13:                            rem** sprite 0 aus block 13      **
+  310 fori=14*64to14*64+62:readx:pokei,x:next
+  320 poke2041,14:                            rem** sprite 1 aus block 14      **
+  330 fori=15*64to15*64+62:readx:pokei,x:next
+  340 poke2042,15:                            rem** sprite 2 aus block 15      **
+  350 v=53248:                                rem** startadresse des vic 2 chip**
+  360 poke v+39,1:                            rem** farbe fuer sprite 0        **
+  370 poke v+40,1:                            rem** farbe fuer sprite 1        **
+  380 poke v+41,1:                            rem** farbe fuer sprite 2        **
+  390 poke v+23,7:                            rem** sprites 0-2 in x-richtung  **
+  400 poke v+29,7:                            rem** sprites 0-2 in y-richtung  **
+  410 poke v,160:pokev+1,160:                 rem** x-y-koordinaten sprite 0   **
+  420 poke v+2,160:pokev+3,160:               rem** x-y-koordinaten sprite 1   **
+  430 poke v+4,160:pokev+5,160:               rem** x-y-koordinaten sprite 2   **
+  440 for i=1 to 10
+  450 pokev+21,1:for ii=1to300:next:          rem** einschalten nur sprite 0   **
+  460 pokev+21,2:for ii=1to200:next:          rem** einschalten nur sprite 1   **
+  470 pokev+21,4:for ii=1to100:next:          rem** einschalten nur sprite 2   **
+  480 nexti
+  490 pokev+21,0:                             rem** ausschalten aller sprites  **
+  500 printchr$(147)
+  510 dr$="{CBM-N}     _{left}{left}{left}{left}{left}{left}"
+  520 poke 650,128:                           rem**  repeat fuer alle tasten   **
+  530 :  rem*********************************************************************
+  540 :  rem**                  tastenbelegungserklaerung                      **
+  550 :  rem*********************************************************************
+  560 printchr$(147);
+  570 printtab(9)"bewegungssimulation"
+  580 printtab(9)"==================="
+  590 print:print"{CBM-A}CCCC{CBM-S}"
+  600 print"B f1 B   bewegen sprite 0 in +x richtung";
+  610 print"{CBM-Q}CCCC{CBM-W}
+  620 print"B f3 B   bewegen sprite 0 in -x richtung";
+  630 print"{CBM-Q}CCCC{CBM-W}
+  640 print"B f5 B   bewegen sprite 0 in +y richtung";
+  650 print"{CBM-Q}CCCC{CBM-W}
+  660 print"B f7 B   bewegen sprite 0 in -y richtung";
+  670 print"{CBM-Z}CCCC{CBM-X}
+  680 print:print"{CBM-A}CCCC{CBM-S}"
+  690 print"B f2 B   bewegen sprite 1 in +x richtung";
+  700 print"{CBM-Q}CCCC{CBM-W}
+  710 print"B f4 B   bewegen sprite 1 in -x richtung";
+  720 print"{CBM-Q}CCCC{CBM-W}
+  730 print"B f6 B   bewegen sprite 1 in +y richtung";
+  740 print"{CBM-Q}CCCC{CBM-W}
+  750 print"B f8 B   bewegen sprite 1 in -y richtung";
+  760 print"{CBM-Z}CCCC{CBM-X}
+  770 print:printtab(11)"weiter bitte taste"
+  780 geta$:ifa$=""then780
+  790 print"{clr}{rvon}verkleinern der sprite"
+  800 print"nach druecken der taste{rvon}< v >{rvof}kann mit den";
+  810 print"funktionstasten in +x,-x und +y,-y  ver-";
+  820 print"kleinert werden."
+  830 print"{down}{rvon}farben
+  840 print"nach druecken der taste{rvon}< f >{rvof}kann mit der";
+  850 print"taste >f1< die farbe fuer sprite0 geaen-";
+  860 print"dert werden.mit >f2< farbe fuer sprite1.";
+  870 print"{rvon}{down}hintergrundfarbe"
+  880 print"duch druecken d. taste{rvon}< h >{rvof}wird die"
+  890 print"bildschirmfarbe geaendert."
+  900 print"{down}{rvon}ende"
+  910 print"programmende mit  taste{rvon}< e >{rvof}"
+  920 print"{down}{rvon}sprite ein/aus"
+  930 print"nach druecken der taste{rvon}< o >{rvof}kann mit den";
+  940 print"funktionstasten >f1< und >f2<sprite0 und";
+  950 print"sprite1 ein- bzw. ausgeschaltet werden"
+  960 print"{down}           {rvon}weiter bitte taste"
+  970 geta$:ifa$=""then970
+  980 print chr$(147);
+  990 printspc(33)"{CBM-N}{rvon}x-sp.0{rvof}";
+ 1000 printspc(33)"{CBM-N}  50 _";
+ 1010 printspc(33)"{CBM-N}{rvon}y-sp.0{rvof}";
+ 1020 printspc(33)"{CBM-N} 150 _";
+ 1030 printspc(33)"{CBM-N}{rvon}x-sp.1{rvof}";
+ 1040 printspc(33)"{CBM-N} 150 _";
+ 1050 printspc(33)"{CBM-N}{rvon}y-sp.1{rvof}";
+ 1060 printspc(33)"{CBM-N} 150 _";
+ 1070 printspc(33)"{CBM-N}{rvon}farbe0{rvof}";
+ 1080 printspc(33)"{CBM-N}   1 _";
+ 1090 printspc(33)"{CBM-N}{rvon}farbe1{rvof}";
+ 1100 printspc(33)"{CBM-N}   1 _";
+ 1110 printspc(33)"{CBM-N}{rvon}x-dehn{rvof}";
+ 1120 printspc(33)"{CBM-N}   3 _";
+ 1130 printspc(33)"{CBM-N}{rvon}y-dehn{rvof}";
+ 1140 printspc(33)"{CBM-N}   3 _";
+ 1150 printspc(33)"{CBM-N}{rvon}schirm{rvof}";
+ 1160 printspc(33)"{CBM-N}   0 _";
+ 1170 printspc(33)" {CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}";
+ 1180 printspc(33)"{CBM-N}{rvon}on/off{rvof}";
+ 1190 printspc(33)"{CBM-N}{rvon}s0:{rvof} on";
+ 1200 printspc(33)"{CBM-N}{rvon}s1:{rvof} on";
+ 1210 print"{rvon}            s p r i t y          ";chr$(19)
+ 1220 pokev,50:
+ 1230 pokev+2,150
+ 1240 pokev+21,3
+ 1250 a=peek(v+30):                           rem** lesen/loeschen kollisonreg**
+ 1260 : rem*********************************************************************
+ 1270 : rem**                   tastatur abfrage (get)                        **
+ 1280 : rem*********************************************************************
+ 1290 geta$:ifa$=""then1290
+ 1300 if a$="e"thenprintchr$(147):pokev+21,0:end
+ 1310 if a$="h"then 1730:                     rem** aendern der bilds.farbe   **
+ 1320 if a$="v"then 1990:                     rem** sprites kleiner/groesser  **
+ 1330 if a$="f"then 1830:                     rem** sprites farbe             **
+ 1340 if a$="o"then 2210:                     rem** sprites ein/aus           **
+ 1350 a=asc(a$)-132:                          rem** umrechnen funktionstasten **
+ 1360 ifa<0 or a>8then1290:                   rem** keine funktionstaste      **
+ 1370 on a gosub  1490,1520,1550,1580,1610,1640,1670,1700
+ 1380 : rem*********************************************************************
+ 1390 : rem**                  kollisions abfrage                             **
+ 1400 : rem*********************************************************************
+ 1410 if peek(v+30)=0 then 1290
+ 1420 print"{home}       !!! kollision !!!"
+ 1430 for i=0 to 100:next
+ 1440 print"{home}                         "
+ 1450 goto 1290
+ 1460 : rem*********************************************************************
+ 1470 : rem**                  sprite bewegen x/y-koord.                      **
+ 1480 : rem*********************************************************************
+ 1490 we=peek(v):ifwe=255 then return
+ 1500 we=we+1:pokev,we
+ 1510 z=1:gosub2370:return
+ 1520 we=peek(v):ifwe=1then return
+ 1530 we=we-1:pokev,we
+ 1540 z=1:gosub2370:return
+ 1550 we=peek(v+1):ifwe=1then return
+ 1560 we=we-1:pokev+1,we
+ 1570 z=3:gosub2370:return
+ 1580 we=peek(v+1):ifwe=198then return
+ 1590 we=we+1:pokev+1,we
+ 1600 z=3:gosub2370:return
+ 1610 we=peek(v+2):ifwe=255 then return
+ 1620 we=we+1:pokev+2,we
+ 1630 z=5:gosub2370:return
+ 1640 we=peek(v+2):ifwe=1then return
+ 1650 we=we-1:pokev+2,we
+ 1660 z=5:gosub2370:return
+ 1670 we=peek(v+3):ifwe=1then return
+ 1680 we=we-1:pokev+3,we
+ 1690 z=7:gosub2370:return
+ 1700 we=peek(v+3):ifwe=198then return
+ 1710 we=we+1:pokev+3,we
+ 1720 z=7:gosub2370:return
+ 1730 : rem*********************************************************************
+ 1740 : rem**                   hintergrundfarbe (bilds.)                     **
+ 1750 : rem*********************************************************************
+ 1760 hf=peek(53280)
+ 1770 if hf=255 then poke53280,0:poke53281,0:we=0:z=17:gosub2370:goto 1290
+ 1780 poke53280,hf+1:poke53281,hf+1
+ 1790 we=hf+1-240:z=17:gosub2370
+ 1800 goto 1290
+ 1810 :
+ 1820 :
+ 1830 : rem*********************************************************************
+ 1840 : rem**                         sprite  farben                          **
+ 1850 : rem*********************************************************************
+ 1860 for i=1 to50
+ 1870 geta$
+ 1880 ifa$=chr$(133) or a$=chr$(137)then 1910:rem** pruefen  >f1<  oder  >f2< **
+ 1890 next i
+ 1900 goto 1290
+ 1910 f1=peek(v+40):f2=peek(v+39):            rem** aktuelle farben sprite 0+1**
+ 1920 if a$=chr$(137) then 1960
+ 1930 if f2=255then pokev+39,0:we=0:z=9:gosub2370:goto1290
+ 1940 poke v+39,f2+1:we=f2+1-240:z=9:gosub2370
+ 1950 goto1290
+ 1960 if f1=255then pokev+40,0:we=0:z=11:gosub2370:goto1290
+ 1970 poke v+40,f1+1:we=f1+1-240:z=11:gosub2370
+ 1980 goto1290
+ 1990 : rem*********************************************************************
+ 2000 : rem**                     verkleinern der sprites                     **
+ 2010 : rem*********************************************************************
+ 2020 for i=1 to 100
+ 2030 geta$:if a$=""then2060
+ 2040 a=asc(a$)-132
+ 2050 if a>0 and a<9 then 2070
+ 2060 next i:goto1290
+ 2070 dx=peek(v+29):dy=peek(v+23)
+ 2080 on a goto 2100,2110,2120,2130,2140,2150,2160,2170
+ 2090 goto1260
+ 2100 dx=dx or 1:goto2180
+ 2110 dx=dx and 254:goto2180
+ 2120 dy=dy or 1:goto2190
+ 2130 dy=dy and 254:goto2190
+ 2140 dx=dx or 2:goto2180
+ 2150 dx=dx and 253:goto2180
+ 2160 dy=dy or 2:goto2190
+ 2170 dy=dy and 253:goto2190
+ 2180 poke v+29,dx:we=dx-4:z=13:gosub 2370:goto1290
+ 2190 poke v+23,dy:we=dy-4:z=15:gosub 2370:goto1290
+ 2200 goto1290
+ 2210 : rem*********************************************************************
+ 2220 : rem**                     sprites ein/aus schalten                    **
+ 2230 : rem*********************************************************************
+ 2240 for i=1 to 100
+ 2250 geta$:if a$=""then2280
+ 2260 ifa$=chr$(133)then 2290
+ 2270 ifa$=chr$(137)then 2310
+ 2280 next i: goto 1290
+ 2290 if(peek(v+21)and1)=1thenpokev+21,peek(v+21)-1:goto2330:rem*bit 0 gesetzt?*
+ 2300 pokev+21,peek(v+21)+1:goto2340
+ 2310 if(peek(v+21)and2)=2thenpokev+21,peek(v+21)-2:goto2350:rem*bit 1 gesetzt?*
+ 2320 pokev+21,peek(v+21)+2:goto2360
+ 2330 poke211,37:poke214,20:sys58640:print"off":goto1290
+ 2340 poke211,37:poke214,20:sys58640:print" on":goto1290
+ 2350 poke211,37:poke214,21:sys58640:print"off":goto1290
+ 2360 poke211,37:poke214,21:sys58640:print" on":goto1290
+ 2370 : rem*********************************************************************
+ 2380 : rem**                        cursor setzen (x-y)                      **
+ 2390 : rem*********************************************************************
+ 2400 poke211,33:poke214,z:sys58640:printleft$(dr$,9+len(str$(we)));we:return
+ 2410 :
+

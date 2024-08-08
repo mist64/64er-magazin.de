@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>»PRINT AT« und »RESTORE N«</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="Jürgen Reinert, ev">
+    <meta name="64er.issue" content="8/84">
+    <meta name="64er.pages" content="101">
+    <meta name="64er.head1" content="Tips & Tricks">
+    <meta name="64er.head2" content="VC 20">
+    <meta name="64er.toc_category" content="Programme zum Abtippen|Tips & Tricks">
+    <meta name="64er.toc_title" content="PRINT AT und RESTORE N (VC 20)">
+    <meta name="64er.index_title" content="PRINT AT und RESTORE N (VC 20)">
+    <meta name="64er.index_category" content="Listings zum Abtippen|Tips & Tricks|Basic-Erweiterung">
+    <meta name="64er.id" content="printat">
+</head>
+
+<body>
+    <article>
+        <h1>»PRINT AT« und »RESTORE N«</h1>
+
+        <p class="intro">Die hier vorgestellte kleine Basic-Erweiterung bringt zwei häufig benötigte Funktionen, nämlich die PRINT-Ausgabe an einer wählbaren Bildschirmposition und das Setzen des DATA-Zeigers auf einen bestimmten Datensatz. Zusätzlich ist noch die Möglichkeit gegeben, beliebige Bildschirmzeilen zu löschen.</p>
+
+        <p>In vielen Leserbriefen wurde nach einem geeigneten »PRINT AT« gefragt. Da bislang keine optimale Lösung angeboten wurde, habe ich nun einen »PRINT AT-Ersatz« geschrieben. Diese Ersatzroutine arbeitet sehr zuverlässig und ist denkbar einfach anzuwenden. Das 146 Bytes lange Maschinenprogramm enthält außerdem eine Routine, mit der man beliebig viele Bildschirmzeilen löschen kann und eine Erweiterung des Restorebefehls, nämlich »RESTORE N«. Es ist nun möglich, die Data-Zeile, aus der das nächste Statement gelesen werden soll, selbst zu bestimmen, ohne die nichtbenötigten Daten zu überlesen. Der Datazeiger kann zum Beispiel mit »RESTORE 1100« direkt auf Zeile 1100 gestellt werden und beim ersten »READ« wird das erste Statement aus Zeile 1100 gelesen. Beim Umnumerieren eines Programmes mit diesem Befehl ist die Zeilenangabe von Hand zu ändern, da Renumberroutinen diesen Befehl nicht berücksichtigen. Der Restore-Befehl kann nach wie vor auch ohne Angabe einer Zeilennummer verwendet werden.</p>
+
+        <p>Für die Bildschirmzeilen-Löschroutine steht ein Kurzbefehl zur Verfügung. Die Syntax ist »£A,B«. In A steht die Nummer der obersten, in B die Nummer der untersten zu löschenden Zeile. Beispiele:</p>
+
+        <table>
+            <tr>
+                <td>£0,22</td>
+                <td>löscht den ganzen Bildschirm</td>
+            </tr>
+            <tr>
+                <td>£0,0</td>
+                <td>löscht die oberste Zeile</td>
+            </tr>
+            <tr>
+                <td>£4,9</td>
+                <td>löscht BS-Zeilen 4 bis 9 (5. bis 10. von oben)</td>
+            </tr>
+        </table>
+
+        <p>Das besondere an dieser Einrichtung ist, daß die Cursorposition dabei nicht verändert wird. Folgt der »£«-Befehl auf eine IF..THEN-Abfrage, so ist vor dem »£«-Befehl ein »:« zu setzen. Wird er vergessen, meldet der Interpreter einen »Syntax Error«. Die Werte von A und B müssen zwischen 0 und 22 liegen.</p>
+
+        <p>Auch die PRINT AT-Routine wird mit einem Kurzbefehl aufgerufen. Das Kurzzeichen ist der Klammeraffe (»@«) oder besser das »AT«-Zeichen. Die Syntax lautet: »@, X, Y; Ausdruck«. X steht für waagerecht, Y für senkrecht.</p>
+
+        <p>X darf Werte zwischen 0 und 21, Y Werte zwischen 0 und 22 erreichen. Andernfalls wird ein »Illegal Quantity Error« ausgegeben. Für X und Y sind möglich:</p>
+
+        <ol>
+            <li>Direkte Zahlenangabe</li>
+            <li>Wertangabe in Form einer Variablen</li>
+            <li>Eine Formel als Koordinate.</li>
+        </ol>
+
+        <p>Der Ausdruck kann Text (in Hochkommata eingeschlossen, Strichpunkt kann entfallen) oder eine Stringvariable (Strichpunkt unbedingt erforderlich) sein. Der Nullpunkt der Koordinaten ist die obere, linke Ecke. Einige Beispiele:</p>
+
+        <table>
+            <tr><td>@0,0"V C - 2 0"</td><td>Text beginnt oben links</td></tr>
+            <tr><td>@X,Y"V C - 2 0"</td><td>Text erscheint an gegebener Position</td></tr>
+            <tr><td>@A+B,3+A;A$</td><td>String A$ wird gedruckt</td></tr>
+            <tr><td>@0,10;</td><td>Cursor wird für »Input« positioniert</td></tr>
+        </table>
+
+        <p>Auch hier ist bei einer IF&hellip;THEN Abfrage zwischen »THEN« und dem »@«-Befehl ein »:« zu setzen.</p>
+
+        <p>Das Programm läuft sowohl auf der VC 20-Grundversion als auch mit Erweiterung, nicht jedoch mit der 40-Zeichen-Karte.</p>
+
+        <p>Der Basiclader (Listing) lädt das Maschinenprogramm ans Speicherende. Hierzu wird der für Basic zur Verfügung stehende Speicherplatz um 256 Bytes verkürzt. Dies übernimmt Zeile 10. In Zeile 20 wird die Anfangsadresse berechnet und dann das Maschinenprogramm in den Speicher gepoket. Nebenbei wird eine Prüfsumme gebildet. Sollte diese nicht gleich 17442 sein, wird der Programmablauf in Zeile 70 abgebrochen. Ist der Prüfsummencheck OK (dies meldet das Programm), wird das Maschinenprogramm aufgerufen (Zeile 90). Abschließend meldet der VC 20 Interpreter »READ« und die Befehle stehen nun zur Verfügung. Wenn das Maschinenprogramm an einer bestimmten Stelle des Speichers stehen soll, kann dies durch Löschen der Programmzeile 10 und Ändern der Zeile 20 in »20 ES=[ADRESSE]« erreicht werden. Einen geeigneten Platz bietet zum Beispiel die 3KByte-Erweiterung, wenn Block 1 erweitert (8KByte oder 16KByte) ist. Auch der Kassettenpuffer (AB 828) ist verwendbar, jedoch nur bei Diskettenbetrieb empfehlenswert, da das Programm dann bei jeder Kassettenoperation gelöscht wird.</p>
+
+        <address class="author">(Jürgen Reinert/ev)</address>
+
+        <figure>
+            <pre data-filename="printat restoren" data-name="PRINT AT und RESTORE N"></pre>
+            <figcaption>PRINT AT und RESTORE N für den VC 20</figcaption>
+        </figure>
+    </article>
+
+</body>
+
+</html>

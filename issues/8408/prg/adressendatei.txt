@@ -1,0 +1,189 @@
+;adressendatei.prg ==0801==
+;Eingetippt von Endurion
+
+  100 rem  ******************************
+  110 rem  * adressendatei 64'er/6      *
+  120 rem  ******************************
+  130 :
+  131 rem ***** steuerzeichen *****
+  132 rem  *                       *
+  133 rem  * <clr> = clr/home      *
+  134 rem  * <crr> = cursor rechts *
+  135 rem  * <crl> = cursor links  *
+  136 rem  *                       *
+  137 rem *************************
+  138 :
+  140 di=200
+  150 dim nv$(di),nn$(di),sr$(di)
+  160 dim pl$(di),ot$(di),te$(di)
+  170 poke 53281,0
+  180 close 15:open 15,8,15
+ 1000 rem  ----------------------------
+ 1010 rem  - menue                    -
+ 1020 rem  ----------------------------
+ 1030 :
+ 1040 print "{clr}"
+ 1050 print :print
+ 1060 print "     adressendatei"
+ 1070 print :print
+ 1080 print "   x = programmende"
+ 1090 print
+ 1100 print "   1 = anzeigen gesamte datei"
+ 1110 print
+ 1120 print "   2 = suchen"
+ 1130 print
+ 1140 print "   3 = loeschen"
+ 1150 print
+ 1160 print "   4 = aendern"
+ 1170 print
+ 1180 print "   5 = neue adressen eingeben"
+ 1190 print
+ 1200 print "   6 = speichern"
+ 1210 print :print :print :print
+ 1220 print "waehlen sie ";
+ 1230 get r$:if r$="" then 1230
+ 1240 if r$="x" then 1500
+ 1250 if r$="1" then gosub 2000:rem  anz.
+ 1260 if r$="2" then gosub 3000:rem  such
+ 1270 if r$="3" then gosub 4000:rem  del
+ 1280 if r$="4" then gosub 5000:rem  aen
+ 1290 if r$="5" then gosub 6000:rem  neu
+ 1300 if r$="6" then gosub 8000:rem  spei
+ 1310 goto 1000
+ 1320 :
+ 1500 rem  ----------------------------
+ 1510 rem  - programm ende            -
+ 1520 rem  ----------------------------
+ 1530 rem  ss=2 wenn nicht gespeichert
+ 1540 if ss=1 then gosub 8000
+ 1550 close 15
+ 1560 end
+ 1570 :
+ 1580 :
+ 2000 rem  ------------------------------
+ 2010 rem  - anzeigen gesamte datei
+ 2020 rem  ------------------------------
+ 2030 :
+ 2040 if l=0 then gosub 9000:rem  laden
+ 2050 for i=1 to nd
+ 2060 :print "{clr}    anzeige der datei"
+ 2065 :print
+ 2070 :print " nummer ";i:print
+ 2075 :print
+ 2080 :print " name    : "nv$(i)" "nn$(i)
+ 2100 :print " strasse : "sr$(i)
+ 2110 :print " plz/ort : "pl$(i)" "ot$(i)
+ 2130 :print " telefon : "te$(i)
+ 2150 :print :print :print
+ 2160 :print "  w = weiter     x = ende"
+ 2170 :get r$:if r$="" then 2170
+ 2180 :if r$="x" then 2200
+ 2190 next i
+ 2200 return
+ 2210 :
+ 6000 rem ------------------------------
+ 6010 rem - eingabe neue daten         -
+ 6020 rem ------------------------------
+ 6030 :
+ 6040 if l=0 then gosub 9000:rem  laden
+ 6050 print "{clr}"
+ 6060 print "    eingabe neue daten"
+ 6070 print :print
+ 6075 nd=nd+1
+ 6076 print "    nummer ";nd
+ 6078 print :print
+ 6080 input "nachname {rght}{rght}{rght}.{left}{left}{left}";nn$(nd)
+ 6090 input "vorname  {rght}{rght}{rght}.{left}{left}{left}";nv$(nd)
+ 6100 input "strasse  {rght}{rght}{rght}.{left}{left}{left}";sr$(nd)
+ 6110 input "postlz.  {rght}{rght}{rght}.{left}{left}{left}";pl$(nd)
+ 6120 input "ort      {rght}{rght}{rght}.{left}{left}{left}";ot$(nd)
+ 6130 input "telefon  {rght}{rght}{rght}.{left}{left}{left}";te$(nd)
+ 6140 print :print
+ 6150 print "w = weitere adresse   x = ende"
+ 6160 get r$:if r$="" then 6160
+ 6170 if r$="w" then 6050
+ 6175 ss=1:rem   daten neu eingegeben
+ 6180 return
+ 6190 :
+ 8000 rem  ----------------------------
+ 8010 rem  - speichern datei auf disk -
+ 8020 rem  ----------------------------
+ 8025 rem  l=0 wenn noch nicht geladen
+ 8030 if l=0 then 8170
+ 8040 close 1:open 1,8,2,"@:adresse,s,w"
+ 8050 gosub 10000:rem   diskettenfehler?
+ 8060 if a1<>0 then 8040
+ 8070 print# 1,nd
+ 8080 for i=1 to nd
+ 8083 :print "{clr}    speichern der daten"
+ 8085 :print i" von "nd
+ 8090 :print# 1,nv$(i)
+ 8100 :print# 1,nn$(i)
+ 8110 :print# 1,sr$(i)
+ 8120 :print# 1,pl$(i)
+ 8130 :print# 1,ot$(i)
+ 8140 :print# 1,te$(i)
+ 8150 next i
+ 8160 close 1
+ 8165 ss=2:rem  letzten stand gespeichert
+ 8170 return
+ 8180 :
+ 9000 rem  ----------------------------
+ 9010 rem  - laden der datei von disk -
+ 9020 rem  ----------------------------
+ 9030 i=0
+ 9040 close 1:open 1,8,2,"adresse,s,r"
+ 9045 gosub 10000:rem  diskettenfehler?
+ 9046 if a1<>0 then 9030
+ 9047 input# 1,nd$:nd=val(nd$)
+ 9048 i=i+1
+ 9049 print "{clr}"i" von "nd
+ 9050 input# 1,nv$(i)
+ 9060 input# 1,nn$(i)
+ 9070 input# 1,sr$(i)
+ 9080 input# 1,pl$(i)
+ 9090 input# 1,ot$(i)
+ 9100 input# 1,te$(i)
+ 9110 if (st and 64)<>64 then 9048
+ 9120 close 1
+ 9130 l=1:rem   datei ist geladen
+ 9140 return
+ 9150 :
+10000 rem  ----------------------------
+10010 rem  - diskettenfehler          -
+10020 rem  ----------------------------
+10030 print "{clr}"
+10050 input# 15,a1,a2$,a3,a4
+10060 if a1=0 then 10170
+10062 if a1=62 then gosub 11000:goto 10170
+10065 print
+10070 print a1,a2$;a3;a4
+10080 print :print
+10090 print "        diskettenfehler"
+10100 print :print
+10110 print "     beheben sie den fehler"
+10120 print "        und druecken sie"
+10130 print
+10140 print "            >> f <<"
+10150 get r$:if r$="" then 10150
+10160 print "{clr}"
+10170 return
+10180 :
+11000 rem  ---------------------------
+11010 rem   - neue datei anlegen
+11020 rem  ---------------------------
+11030 :
+11040 print "{clr}"
+11050 print " die datei existiert noch nicht"
+11060 print :print
+11070 print "n = neue datei   x = ende"
+11080 get r$:if r$="" then 11080
+11090 if r$="x" then run
+11100 if r$<>"n" then 11080
+11140 close 1:open 1,8,2,"adresse,s,w"
+11150 for i=1 to 7
+11160 :print# 1,"."
+11170 next i
+11180 close 1
+11200 return
+

@@ -1,0 +1,225 @@
+;faktan brother.prg ==0801==
+;Eingetippt von Endurion
+
+   10 printchr$(147):printchr$(14):printchr$(8)
+   15 print" * * * * * * * * * * * * * * * * * * * "
+   20 print" *                                   * "
+   25 print" *         F A K T A N  C-64         * "
+   30 print" *                                   * "
+   35 print" *   (C.) by  Gerhard Schroeter      * "
+   40 print" *            Tel.:07355/1285        * "
+   55 print" *                                   * "
+   60 print" * * * * * * * * * * * * * * * * * * * "
+   70 print:print:print" Guten{$a0}Tag!":print:print" Bitte warten Sie!":print:print
+   90 printchr$(32)chr$(91)chr$(60),chr$(93)chr$(62)chr$(64)chr$(186),chr$(123)
+   95 poke52,48:poke56,48:clr:poke56334,peek(56334)and254:poke1,peek(1)and251
+  100 fori=0to1023:pokei+12288,peek(i+2048+53248):next
+  110 fori=0to7:reada:poke12288+i,a:next
+  120 fori=0to7:reada:poke12288+122*8+i,a:next
+  130 fori=0to7:reada:poke12288+27*8+i,a:next
+  140 fori=0to7:reada:poke12288+60*8+i,a:next
+  150 fori=0to7:poke12288+29*8+i,peek(53248+2048+8+i):next
+  160 poke12288+29*8+1,102
+  170 fori=0to7:reada:poke12288+62*8+i,a:next
+  180 fori=0to7:reada:poke12288+91*8+i,a:next
+  190 poke1,peek(1)or4:poke56334,peek(56334)or1
+  200 poke53272,(peek(53272)and240)+12
+  210 data0,0,102,0,102,102,60,0,102,0,102,102,102,102,60,0
+  220 data0,0,102,60,102,102,60,0,102,60,102,102,102,102,60,0
+  230 data102,0,60,102,126,102,102,0,0,56,108,120,108,108,120,96
+  240 diman$(20):dimm(20):dimp(20):l$="zu.":h$="Mit freundlichen Gr'ssen"
+  250 k$="Wir bitten um Ihren Auftrag und sichern Ihnen sorgf[ltige Ausf'hrung"
+  260 wt$=k$:gosub45000:k$=wt$:wt$=h$:gosub45000:h$=wt$
+  280 f$="ABELE{$a0}& BEBELE{$a0}OHG   Textilversand":g$="ABELE{$a0}& BEBELE OHG"
+  290 ff$="ABELE{$a0}&{$a0}BEBELE{$a0}OHG, Postfach 1 23, 9870 Abcstadt 6"
+  300 fo$="Postfach 1 23, 9870 Abcstadt 6, Tel.: 09999/1234567"
+  310 fb$="Bankkonto: Kreissparkasse Abcstadt (BLZ 654 500 70) Nr. 239 699"
+  320 bz$="Ihre Zeichen u. Nachricht, unsere Zeichen u. Nachricht      Abcstadt"
+  330 wt$=f$:gosub45000:f$=wt$:wt$=g$:gosub45000:g$=wt$
+  340 wt$=ff$:gosub45000:ff$=wt$:wt$=fo$:gosub45000:fo$=wt$
+  350 wt$=fb$:gosub45000:fb$=wt$:wt$=bz$:gosub45000:bz$=wt$:printchr$(147)
+  620 input" Heutiges Datum    : ";d$:print:input" Mehrwertsteuersatz: ";t:print
+  640 input"{$a0}Skontosatz        : ";sn:print:print:j$="j"
+  650 input" Alles richtig (j/n) : ";j$:ifj$=""orj$="j"then680
+  670 ifj$="n"thenprintchr$(147):goto620
+  680 printchr$(147):print" Aufgabe: Rechnung schreiben    =  1":a=0
+  690 print:print"          Angebot schreiben     =  2":print
+  700 input" Aufgabenart    1  oder  2     : ";a:print:ifa<1ora>2then680
+  712 ifa=1thenx1$="Rechnung":x2$="Rechnungsnummer:":x3$="Rechnungsdatum :"
+  720 ifa=2thenx1$="Angebot":x2$="Angebotsnummer:":x3$="Angebotsdatum :"
+  730 ifa=2thenx4$="Sehr geehrte Damen und Herren,"
+  735 ifa=2thenx5$="aufgrund Ihrer Anfrage bieten wir Ihnen folgende Artikel an:"
+  740 printchr$(147):n$="":s$="":o$="":nr$="":iz$="":in$="":uz$="":un$="":v=0
+  750 vp=0:f=0
+  770 print" Anrede:    Firma       = 1":print"            Herr        = 2"
+  790 print"            Frau        = 3":print
+  800 ar=0:input" Anredewahl  1 bis 3   :";ar:ifar<1orar>3then740
+  820 ifar=1thenar$="Firma"
+  830 ifar=2thenar$="Herr"
+  840 ifar=3thenar$="Frau"
+  850 print:print:input" Empfaengername : ";n$:print:wt$=n$:gosub45000:n$=wt$
+  860 input" Strasse u. Nr. : ";s$:print:wt$=s$:gosub45000:s$=wt$
+  870 input" PLZ und{$a0}ort    : ";o$:print:wt$=o$:gosub45000:o$=wt$
+  875 ifa=2theninput" Angebotsnummer : ";nr$:print:print:goto890
+  880 input" Rechnungsnummer: ";nr$:print:print
+  890 j$="j":input" Alles richtig (j/n) : ";j$:ifj$=""orj$="j"then920
+  910 ifj$="n"thenprintchr$(147):goto740
+  920 printchr$(147):input" Ihre Zeichen       : ";iz$:print
+  925 wt$=iz$:gosub45000:iz$=wt$
+  930 input" Ihre Nachricht     : ";in$:print:wt$=in$:gosub45000:in$=wt$
+  940 input" unsere Zeichen     : ";uz$:print:wt$=uz$:gosub45000:uz$=wt$
+  950 input" unsere Nachricht   : ";un$:print:print:wt$=un$:gosub45000:un$=wt$
+  960 j$="j":input" Alles richtig (j/n) : ";j$:ifj$=""orj$="j"then980
+  970 ifj$="n"then920
+  980 l0$="Artikelname od. Leistung   Einheiten   Preis/Einheit  Gesamtpreis/DM"
+  985 l1$="--------------------------------------------------------------------"
+  990 l2$="--------------------------------------------------------------------"
+  995 l3$="                                                      --------------"
+ 1000 l4$="                                                      =============="
+ 1010 v=v+1
+ 1015 an$="":m=0:p=0:printchr$(147):input" Artikel/Leistung : ";an$:print
+ 1020 wt$=an$:gosub45000:an$=wt$
+ 1030 input" Menge            : ";m:print
+ 1040 input" Einzelpreis      : ";p:print:print
+ 1045 an$(v)=an$:m(v)=m:p(v)=p:j$="j":input" Alles richtig  (j/n) : ";j$:print
+ 1060 ifj$=""orj$="j"then1090
+ 1070 ifj$="n"then1015
+ 1090 j$="":print:input" Weitere Artikel (j/n) : ";j$:print
+ 1100 ifj$=""orj$="j"then1010
+ 1110 ifj$="n"thenprintchr$(147):print
+ 1120 input" Verpackungskosten/Fracht : ";vp:print
+ 1130 input" Versandkosten (Porti)    : ";f:print
+ 1132 j$="j":input" Alles richtig  (j/n) : ";j$:print:ifj$=""orj$="j"then1135
+ 1133 ifj$="n"thenprintchr$(147):goto1120
+ 1135 ifa=2thenza=2:goto1220
+ 1140 printchr$(147):print"{$a0}Zahlungsart: Barverkauf = 1"
+ 1150 print"              Ziel       = 2"
+ 1160 print"              Nachnahme  = 3"
+ 1170 za=0:print:input" Zahlungsart   1 bis 3 : ";za:print:print
+ 1180 ifza<1orza>3thenprintchr$(147):print:goto1140
+ 1190 j$="j":input" Alles richtig  ( j / n )  : ";j$:print
+ 1200 ifj$="j"orj$=""then1220
+ 1210 ifj$="n"thenprintchr$(147):print:goto1140
+ 1220 ifa=2then1270
+ 1225 printchr$(147):print:a$="n":input" Anmerkungen  (j/n) : ";a$:print
+ 1228 a1$="":a2$=""
+ 1230 ifa$="j"thenprint:goto1240
+ 1235 ifa$=""ora$="n"then1300
+ 1240 print" ACHTUNG max. je der 2 Doppelzeilen bis  zum Sternchen schreiben! *"
+ 1245 print:inputa1$:print:inputa2$:print
+ 1247 wt$=a1$:gosub45000:a1$=wt$:wt$=a2$:gosub45000:a2$=wt$
+ 1250 i$="j":input" Alles richtig (j/n) : ";i$
+ 1255 ifi$=""ori$="j"then1300
+ 1260 ifi$="n"then1225
+ 1270 printchr$(147):print:a$="n":input" Anmerkung (j/n) : ";a$:print:a6$=""
+ 1275 ifa$="j"thenprint:goto1285
+ 1280 ifa$=""ora$="n"t1300
+ 1285 print" ACHTUNG in der Doppelzeile nur bis zum  Sternchen schreiben!     *"
+ 1290 print:inputa6$:wt$=a6$:gosub45000:a6$=wt$:i$=""
+ 1291 print:input" Alles richtig (j/n) : ";i$
+ 1292 ifi$=""ori$="j"then1300
+ 1295 ifi$="n"then1270
+ 1300 printchr$(147):print:print
+ 1310 input" Anzahl der Kopien : ";ak:print
+ 1311 print:print"{$a0}Bitte warten Sie !"
+ 1312 bl=30:ifa=2anda$="j"thenbl=18
+ 1313 ifa=2anda$="n"thenbl=20
+ 1314 ifa=2thenax=2:goto1319
+ 1315 ifza=1thenht=3
+ 1316 ifza=2thenht=2
+ 1317 ifza=3thenht=1
+ 1318 ax=0:ifa$="j"thenax=3:goto1319
+ 1319 z=bl-ht-ax-(v)
+ 1320 open1,4,7
+ 1330 s=0:print#1,f$:print#1,fo$:print#1,fb$
+ 1390 print#1,chr$(27);chr$(119);chr$(1);:print#1,f$
+ 1410 print#1,chr$(27);chr$(119);chr$(0);:print#1,fo$:print#1,fb$
+ 1480 print#1,chr$(30);:print#1,chr$(6);
+ 1500 print#1:print#1:print#1:print#1,ff$
+ 1510 print#1,chr$(25);:print#1,chr$(7);
+ 1530 print#1:print#1:print#1,ar$
+ 1580 print#1,n$:print#1.s$:print#1:print#1,o$:print#1:print#1:print#1
+ 1590 print#1:print#1,bz$:tl=16:tx$=iz$:gosub40100:tl=11:tx$=in$:gosub40100
+ 1670 tl=18:tx$=uz$:gosub40100:tl=13:tx$=un$:gosub40100:tl=11:tx$=d$:gosub40100
+ 1710 print#1:print#1:print#1,x1$:print#1
+ 1720 print#1,x2$;nr$:print#1,x3$;d$
+ 1730 ifa=2thenprint#1:print#1:print#1,x4$:print#1:print#1,x5$:print#1:goto1770
+ 1740 print#1:print#1:print#1,"Wir lieferten Ihnen:"
+ 1770 print#1:oprint#1,l0$:print#1,l1$:tl=26:vk=6:nk=2:u$="13.2":n=(v)-kz
+ 1800 forv=1ton:tx$=an$(v):gosub40100
+ 1830 zx=m(v):gosub50100:ux=p(v):gosub60100:g=m(v)*p(v):ux=g:gosub60100:s=s+g
+ 1880 print#1,:nextv:ifv=nthen1900
+ 1900 print#1,l2$:tl=30:u$="35.2":tx$="Summe, Nettowarenwert:":gosub40100
+ 1930 ux=s:gosub60100:print#1,:tx$="Verpackung/Fracht:":gosub40100
+ 1960 ux=vp:gosub60100:print#1,:gp=s+vp:tx$="Gesamtpreis exkl. Mwst.:"
+ 2000 gosub40100:ux=gp:gosub60100:print#1,:mw=(gp*t)/100
+ 2030 t2$=str$(t):t1$="+"+t2$+" % gesetzl. Mwst.:":tx$=t1$:gosub40100:ux=mw
+ 2050 gosub60100:print#1,:tx$="Versandkosten (Porti):":gosub40100
+ 2055 ux=f:gosub60100
+ 2090 print#1,:print#1,l3$:ge=gp+mw+f:tx$="Gesamtpreis/DM: >>>>>>":gosub40100
+ 2130 ux=ge:gosub60100:print#1,:print#1,l4$:print#1:print#1
+ 2160 sk=(gp+mw)*(sn/100):so=int(sk*100+0.5)/100:ifso=0thenso$="00"
+ 2180 ifso>1thenso$=str$(so):so$=right$(so$,len(so$)-1)
+ 2190 ifso<1thenso$=str$(s):so$="0"+right$(so$,len(so$)-1)
+ 2192 ifa=1then2200
+ 2195 ifa=2then2260
+ 2200 ifza=0then2350
+ 2210 ifza=1then2240
+ 2220 ifza=2then2260
+ 2230 ifza=3then2280
+ 2240 print#1,"Betrag erhalten.":print#1
+ 2250 print#1,"Abcstadt, den ";d$;"      .........................":goto2290
+ 2260 print#1,"Zahlbar innerhalb 30 Tage, netto, oder innerhalb von 10 Tagen"
+ 2270 print#1,"mit";sn;"% Skontoabzug (";so$;" DM).":goto2290
+ 2280 print#1,"Betrag durch Nachnahme erhalten.":goto2290
+ 2290 ifa=1then2300
+ 2294 ifa$="n"then2340
+ 2296 ifa$="j"then2335
+ 2300 ifa$="n"then2350
+ 2320 print#1:print#1,a1$:print#1,a2$:goto2350
+ 2335 print#1:print#1,a6$
+ 2340 print#1:print#1,k$:print#1,l$:print#1:print#1,h$:print#1:print#1,g$
+ 2350 forq=1toz:print#1:nextq
+ 2360 ifak>0then2380
+ 2370 ifak=0then2424
+ 2380 forc=1toak:kz=x+1:ak=ak-1:gp=0:goto1330:nextc
+ 2424 ifa=1then2430
+ 2425 ifa=2thenprintchr$(147):print:input"{$a0}Weitere Angebote  (j/n) : ";wa$:print
+ 2426 ifwa$=""orwa$="j"thenclose1:goto740
+ 2427 ifwa$="n"then2460
+ 2430 printchr$(147):print:input" Weitere Rechnungen (j/n) : ";wr$:print
+ 2440 ifwr$="j"orwr$=""thenclose1:goto740
+ 2450 ifwr$="n"then2460
+ 2460 print#1,chr$(27);chr$(64);:close1
+ 2470 print:print:input"{$a0}Weitere Arbeiten  (j/n) : ";j$:ifj$=""orj$="j"then680
+ 2490 ifj$="n"thenprintchr$(147):end
+40100 tx=len(tx$):print#1,tx$;tab(tl-tx);:return
+45000 forl=1tolen(wt$)
+45010 vu$=mid$(wt$,l,1)
+45020 ifvu$=chr$(219)thenvu$=chr$(190)
+45030 ifvu$=chr$(64)thenvu$=chr$(189)
+45040 ifvu$=chr$(186)thenvu$=chr$(221)
+45050 ifvu$=chr$(91)thenvu$=chr$(188)
+45060 ifvu$=chr$(60)thenvu$=chr$(220)
+45070 ifvu$=chr$(93)thenvu$=chr$(187)
+45080 ifvu$=chr$(62)thenvu$=chr$(219)
+45090 ww$=ww$+vu$
+45100 nextl:wt$=ww$:ww$="":return
+50100 zx=int(zx*100+0.5)/100:zx$=str$(zx)
+50200 zl=len(zx$):zu=0:forzn=1tozl:ifmid$(zx$,zn,1)="."goto50400
+50300 zu=zu+1:nextzn
+50400 print#1,tab(vk-zu);zx;tab((nk+vk)-(vk-zu+zl)+1);:return
+60100 uv$=right$(u$,1):ul=int(val(u$)):ifvu$<>"."thenur=val(uv$):goto60400
+60300 ua$=str$(sgn(ux)*int(abs(ux)))+".":ub$="":ul=ul+1:goto 61300
+60400 ul=int(val(u$)):ux$=str$(sgn(ux)*(int(abs(ux)*10^ur)
+60600 uv=0:forun=1tolen(ux$):ifmid$(ux$,un,1)="."thenuv=un
+60650 nextun
+60700 if uv=0 then uv=un:ux$=ux$+"."
+60900 if uv<>2 then 61100
+61000 ux$=left$(ux$,1)+"0"+right$(ux$,len(ux$)-1):ul=ul-1:ur=ur+1
+61100 ub$=mid$(ux$,uv,len(ux$)+1)+"000000000"
+61200 ub$=left$(ub$,ur+1):ua$=left$(ux$,uv-1)
+61300 if len(ua$)>ul then print"usingbereich zu klein":stop
+61400 if len(ua$)<ul then ua$=" "+ua$:goto 61400
+61500 print#1,(ua$+ub$);:return
+
