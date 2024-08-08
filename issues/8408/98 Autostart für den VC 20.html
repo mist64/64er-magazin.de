@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>Autostart für den VC 20</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="Dirk Rother, ev">
+    <meta name="64er.issue" content="8/84">
+    <meta name="64er.pages" content="98-99">
+    <meta name="64er.head1" content="Tips & Tricks">
+    <meta name="64er.head2" content="VC 20">
+    <meta name="64er.toc_category" content="Programme zum Abtippen|Tips & Tricks">
+    <meta name="64er.toc_title" content="Autostart (VC 20)">
+    <meta name="64er.index_title" content="Autostart für den VC 20">
+    <meta name="64er.index_category" content="Listings zum Abtippen|Tips & Tricks|Autostart">
+    <meta name="64er.id" content="autostart">
+</head>
+
+<body>
+    <article>
+        <h1>Autostart für den VC 20</h1>
+
+        <p class="intro">Will man Programme vor unbefugten Eingriffen schützen, so ist dies nur möglich, indem man die Programme auf EPROMs ab $A000 schreibt, die sich dann nach dem Einschalten des VC 20 selbst starten (Modulspiele, Toolkit). Es ist aber auch möglich, solche »Autostart«-Programme mit der Datasette und dem VC 20 zu generieren.</p>
+
+        <p>Ein automatischer Programmstart ist überhaupt erst möglich, weil das Betriebssystem des Computers nach dem Laden eines Programmes vom Kassettenrecorder einen indirekten Sprung über einen Vektor der Zeropage zu einer Routine des Betriebssystems durchführt. Beim VC 20 findet dieser Sprung über den Vektor $0302/$0303 zum Basic-Warmstart des Interpreters statt. Dieser Vektor ist jetzt so zu verändern, daß er auf eine selbstgeschriebene Routine zeigt, die dann nach dem Laden eines Programmes von der Kassette sofort gestartet wird. Um nun eine Wirkung zu erzielen, muß dieser Vektor also während des Ladevorgangs an seine ursprüngliche Adresse ($0302/$0303) geschrieben werden. Normalerweise werden aber Programme, die mit SAVE gespeichert wurden, vom Computer als Basic-Programme angesehen und daher nicht unbedingt immer an ihre ursprüngliche Adresse geladen, sondern an den Anfang des Basic-Speichers verschoben. Speichert man dagegen die Programme mit SAVE &ldquo;Name&rdquo;,1,1 ab, so werden sie später immer in den Speicherbereich geladen, in dem sie zum Zeitpunkt des SAVEns gestanden haben. Setzen wir doch zum Beispiel in einem Programm (Listing 1) den Basic-Warmstartvektorauf $FD22 (High Byte: 253/ Low Byte: 34) und die Basicanfang/ende-Zeiger auf den Bereich des LOAD-Vektors ($2B:01/$2C:03/$2D:04/$2E:03). Wenn wir diesen dann mit SAVE &ldquo;RESET’,1,1 abspeichern, erfolgt nach dem späteren Laden des Programms mit LOAD ein Sprung zu der Adresse, die durch den Vektor gekennzeichnet wird. In diesem Fall wird sofort nach dem Stoppen des Kassettenmotors ein Reset durchgeführt (SYS 64802).</p>
+
+        <h2>Ein kleiner Trick hilft weiter</h2>
+
+        <p>Mit dieser Methode läßt sich aber nur der Basic-Warmstartvektor abspeichern, da das Programm im Basicspeicher steht und mit dem SAVE-Befehl nur zusammenhängende RAM-Bereiche gespeichert werden können. Daher wird ein Ladeprogramm benutzt, das das eigentliche Basicprogramm in den Programmspeicher lädt und selbst im unteren Bereich des Kassetten-Puffers ($033C-$03FC) steht. Dort wird es dann als Name (Tape-Header) zusammen mit dem veränderten Vektor auf die Kassette geschrieben. Damit ist auch der Wert des Vektors auf den Bereich des Kassetten-Puffers festgelegt.</p>
+
+        <p>Wird jetzt der Kassetten-Puffer mit dem Basic-Warmstartvektor (der auf den Anfang des Ladeprogramms, $0355, zeigt) und dem Befehl SAVE &ldquo; &rdquo;,1,1 auf eine Kassette geschrieben und wieder geladen, fängt der Computer nach dem Stoppen des Kassettenmotors sofort an, das Programm ab $0355 auszuführen. Statt des Ladeprogramms kann auch eine Hilfsroutine, die nicht länger als 192 Byte ist, in den Kassettenpuffer geschrieben werden, die dann nach dem Laden, ohne speziellen Startbefehl, sofort zur Verfügung steht. Schließlich wird das zu schützende Basicprogramm nach dem Vektor, ohne Tape-Header (Programmname), abgespeichert. Würde das Basic-Programm normal geSAVEt werden, bräuchte man das Autostart-Programm nur zu übergehen und könnte das zu schützende Basic-Programm auch so laden. Das Lade-Programm im Kassettenpuffer lädt dann das Basic-Programm in den Speicher. Danach werden die Vektoren $0318/0319 (NMI-Vektor) und $0308/$0309 (Text-Stop-Vektor) so geändert, daß erstens die Stop-Taste nicht mehr abgefragt wird und zweitens beim Versuch, das Basic-Programm mit RUN/STOP + RESTORE zu stoppen, das Basic-Programm abgebrochen wird und in einer Endlosschleife die Ausgabe eines Textes (»Autostart ist gesichert«) erfolgt. Zum Schluß wird das Basic-Programm mit RUN (in Maschinensprache: JSR $C659 +JMP $C7AE) gestartet.</p>
+
+        <h2>Bedienung des Programms »Autostart« (Listing 2)</h2>
+
+        <ol>
+            <li>Basic-Lader eintippen und noch einmal genau die DATA-Statements prüfen.</li>
+            <li>Basic-Lader mit RUN starten; daraufhin wird das Maschinenprogramm generiert und vom Basic-Lader aus mit SAVE "Autostart Gen.",1,1 gspeichert.</li>
+            <li>Laden des Maschinenprogramms &ldquo;Autostart Gen.“ mit LOAD und Eingabe von: POKE 56,28:NEW</li>
+            <li>Laden des zu schützenden Programms.</li>
+            <li>Autostart-Generator mit SYS 7168 starten.</li>
+            <li>Programmname auf Aufforderung hin eingeben; das zu schützende Programm wird dann als Autostart-Programm geSAVEt.</li>
+        </ol>
+
+        <p>Es ist darauf zu achten, daß die Programme, die mit Autostart versehen werden, ausgearbeitete Programme sind, die nicht noch irgendeine Ergänzung oder Verbesserung benötigen. Da die Autostart-Programme nicht mehr zu stoppen sind, kann später auch nicht mehr an ihnen gearbeitet werden, so daß ein unfertiges Programm noch einmal neu eingetippt werden müßte.</p>
+
+        <pre>
+10 POKE43,1:POKE44,3:POKE45,4:POKE46,3:CLR: REM Basicanfang/ende setzen
+20 POKE770,34:POKE771,253:    :REM Basic-Warmstartvektor
+30 SAVE "Reset",1,1
+40 POKE770,131:POKE771,196:POKE43,1:POKE44,18:POKE45,185:POKE46,18:END
+50 REM Zeiger und Vektoren wieder auf alten Wert bringen
+</pre>
+
+
+        <p>Das Programm &ldquo;Autostart&rdquo; läuft nur auf einem VC 20 mit 3,5 KByte Speicher (Grundversion) sowie der Datasette und belegt die obersten beiden Pages von 7168 bis 7616. Die verschlüsselten Programme werden automatisch in den Grundversionsspeicher geschrieben. Daher ist es mit dieser Version nicht möglich, Programme, die auf einer Speichererweiterung laufen, mit &ldquo;Autostart&rdquo; zu versehen.</p>
+
+        <address class="author">(Dirk Rother/ev)</address>
+
+        <figure>
+            <pre data-filename="autostart" data-name="Autostart"></pre>
+            <figcaption>Listing 2. Basic-Lader für "Autostart"</figcaption>
+        </figure>
+    </article>
+
+</body>
+
+</html>
