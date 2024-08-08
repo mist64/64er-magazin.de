@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>Analoger Meßwert rein — analoger Stellwert raus</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="Dr. Ernst Breitz, rg">
+    <meta name="64er.issue" content="8/84">
+    <meta name="64er.pages" content="78-79">
+    <meta name="64er.head1" content="Anwendung">
+    <meta name="64er.head2" content="C 64">
+    <meta name="64er.toc_category" content="Programme zum Abtippen|Anwendungen">
+    <meta name="64er.toc_title" content="Analoger Meßwert rein — analoger Stellwert raus (C 64)">
+    <meta name="64er.index_title" content="Analoger Meßwert rein — analoger Stellwert raus">
+    <meta name="64er.index_category" content="Listings zum Abtippen|Anwendung|User-Port">
+    <meta name="64er.id" content="analog">
+</head>
+
+<body>
+    <article>
+        <h1>Analoger Meßwert rein — analoger Stellwert raus</h1>
+
+        <p class="intro">In diesem Beitrag wird eine einfache Anordnung für den Commodore 64 beschrieben, bei der ohne Umschalten ein Analogsignal eingegeben und ein Analogstellwert ausgegeben werden kann.</p>
+
+        <p>Für einen regeltechnischen Versuch wurde eine Anordnung gebaut, bei der über eine dauernd mit dem Computer verbundene Meßleitung ein analoges Meßsignal aufgenommen, im Computer verarbeitet und über die 8-Bit-Datenleitung des Userports und einen 8-Bit-D-A-Wandler wieder ein analoges Stellsignal als Antwort ausgegeben werden kann (siehe Bild)</p>
+
+        <figure>
+            <img src="78-1.png" alt="">
+            <figcaption>Ein- und Ausgangsschaltung</figcaption>
+        </figure>
+
+        <p>Diese Anordnung dürfte auch für viele Bastelzwecke sehr interessant sein. Für den Analogeingang wurde mit dem IC LM311 ein Spannungs-Frequenzwandler gebaut. Die Frequenz des erzeugten Rechtecksignals wurde über eine einadrige Schirmleitung mit Ader auf PIN6 = CNT-2 des Userports und Schirm auf PIN1 = GND zur Frequenzmessung eingegeben. Diese Anwendung ist prinzipiell in [1] beschrieben, allerdings mit dem kleinen Schönheitsfehler, daß die Sache so nicht funktioniert. Trotzdem ist das erwähnte Buch sehr empfehlenswert wegen seiner Vielfalt und Verständlichkeit. Im folgenden wird zunächst ein funktionsfähiges Programm gezeigt und anschließend werden wesentliche Verbesserungen unter Verwendung einer Assembler-Routine geschildert. Ein Studium der Literatur [1 bis 4] zeigt, daß für eine einfache Frequenzmessung bis hinauf zu etwas mehr als 20 kHz der im CIA 6526 (Complex Interface-Adapter-IC) eingebaute Zähler und die Systemuhr Tl als Zeitbasis in Frage kommen. Wer einen Rechteckgenerator zur Hand hat, kann dies auch gleich (TTL-Pegel 5 V einstellen) mal ausprobieren! Geben sie das folgende Basic-Programm ein und schließen Sie den Generator — wie beschrieben — an CNT-2 an.</p>
+
+        <figure>
+            <pre>90 rem****basic-programm frequenzmessung************
+100 poke56590,240
+110 poke56580,255:poke56581,255
+120 t=ti
+130 ift=tithen130
+140 poke56590,241
+150 ifti<>t+60then150
+160 a=peek(56581):b=peek(56580)
+170 print65535-(256*a+b)
+180 goto100:rem !!dauerschleife!
+</pre>
+            <figcaption>Listing »Frequenzmessung«</figcaption>
+        </figure>
+
+        <p>Es wurden folgende Adressen verwendet<br>
+            Dez. 56590 Hex DD0E Kontrollregister für Zähler 1<br>
+            Dez. 56580 Hex DD04 Zähler 1 Low-Byte T1L<br>
+            Dez. 56581 Hex DD05 Zähler 1 High-Byte T1H</p>
+
+        <p>In Zeile 100 wird das Kontrollregister für den Zähler 1 so programmiert, daß dieser in der gewünschten Art arbeitet und zunächst im STOP-Zustand ist. In Zeile 110 wird der Zähler mit HB = 255 und LB = 255 geladen; er hat die Eigenschaft, diese zwei Byte nach dem Start herunterzuzählen (Dez. 65535 bis 0). Der Zähler kann nun aber nicht, wie in [1] erwähnt, mit dem Setzen des High-Byte von T1 (T1H) gestartet werden, sondern durch den Befehl Poke 56590, 241, bei dem Bit 0 im Kontrollregister auf 1 = START gesetzt wird. Die Tl-Uhr wird bei diesem Programm »im Vorübergehen« gelesen, die beiden IF Abfragen geben den Start- und den Auslesebefehl für den Zähler.</p>
+
+        <p>Im Kontrollregister haben nur Bit 0 und 5 wichtige Funktionen:<br>
+            11110001 = Dez. 241 → Zähler Start<br>
+            11110000 = Dez. 240 → Zähler Stop</p>
+
+        <p>Die anderen Bits sind als »Dauermaske« aufzufassen.</p>
+
+        <p>Das Basicprogramm zeigt jedoch leider bei der praktischen Anwendung Anzeigeschwankungen von etwa 2 Prozent und manchmal weit darüber. Schuld daran ist sicher die Programmsprache Basic, welche zum Beispiel aufgrund von zu langsamen Bearbeitungszeiten des Basic-Interpreters in den IF Abfragen ziemliche Fehler in der Zeitbasis zu verursachen scheint. Gelegentlich kommt die ganze Messung aber auch noch stärker »aus dem Tritt«. Geht man dazu über, die Uhr Tl nicht »im Vorübergehen« abzulesen, dann kann man schon eine etwas bessere Genauigkeit erreichen.</p>
+
+        <figure>
+            <pre>90 rem****basic-programm frequenzmessung************
+100 poke56590,240
+110 poke56580,255:poke56581,255
+120 t=ti
+130 ift=tithen130
+140 poke56590,241
+150 ifti<>t+60then150
+160 a=peek(56581):b=peek(56580)
+170 print65535-(256*a+b)
+180 goto100:rem !!dauerschleife!
+</pre>
+            <figcaption>Listing »Frequenzmessung« 2</figcaption>
+        </figure>
+
+        <p>In diesem Programm wird in Zeile 120/130 durch EinPOKEn von 0 in die drei TI-Register 160, 161, 162 die Uhr Tl jedesmal neu gestartet, wobei Register 162 des »schnellsten Rädchens« zuletzt genullt wird. Hierdurch entfällt die erste IF Schleife des Starts. Benützt wird im Prinzip nur Regsiter 162, in welchem die Uhr von 0 bis 255 in Schritten von 1/60 s (Jiffies) läuft. Die beiden anderen Register werden nur zur Sicherheit genullt.</p>
+
+        <p>Ausgehend von diesem Programm wurde das folgende Assembler-Programm geschrieben, das im Prinzip den gleichen Ablauf hat, bei dem aber die Startbefehle für Zähler und Uhr Tl sowie der Stop-Befehl für den Zähler und vor allem die Zeitabfrage und das Ablesen »blitzschnell« ablaufen:</p>
+
+        <figure>
+            <pre>DD0E              100 CRA   =    $DD0E
+DD04              110 T1L   =    $DD04
+DD05              120 T1H   =    $DD05
+00A2              130 TIM   =    $A2
+00A0              131 TY1   =    $A0
+00A1              132 TY2   =    $A1
+C000              140       *=    $C000
+C000  A9 F0       150       LDA   #$F0
+C002  8D 0E DD    160       STA   CRA
+C005  A9 00       220       LDA   #$00
+C007  85 A0       221       STA   *TY1
+C009  85 A1       222       STA   *TY2
+C00B  85 A2       230       STA   *TIM
+C00D  A9 F1       240       LDA   #$F1
+C00F  8D 0E DD    250       STA   CRA
+C012  A5 A2       260 MA    LDA   *TIM
+C014  C9 3C       270       CMP   #$3C
+C016  D0 FA       280       BNE   MA
+C018  AE 05 DD    290       LDX   T1H
+C01B  AC 04 DD    300       LDY   T1L
+C01E  60          320       RTS
+                  330       .EN</pre>
+            <figcaption>Listing »Frequenzmessung Maschinensprache«</figcaption>
+        </figure>
+        <figure>
+            <pre>100 for i = 49152 to 49182
+110 read x:pokei,x:s=s+x:next
+120 data169,240,141, 14,221,169,  0,133,160,133,161,133
+130 data162,169,241,141, 14,221,165,162,201, 60,208,250
+140 data174,  5,221,172,  4,221, 96
+150 ifs<> 4561 then print"fehler in datas":end
+160 print"ok"
+</pre>
+            <figcaption>Listing »Basiclader«</figcaption>
+        </figure>
+
+        <p>Nach einmaligem RUN-Lauf kann dieses Programm immer mit SYS 49152 aufgerufen werden, der Basiclader kann dann gelöscht werden (vorher natürlich speichern!). Das Programm arbeitet einen Durchlauf des Meßzyklus ab und kehrt dann nach Basic zurück, zuvor hat es jedoch HB und LB des Zählers, T1H und T1L, nach Adresse Dez 781 und 782 abgelegt. Aus diesem »Briefkasten« können die Werte mit PEEK geholt werden. Als Beispiel ein Miniprogramm zur dauernden Frequenzanzeige in Hz:</p>
+
+        <figure>
+            <pre>100 sys49152
+110 a=peek(781):b=peek(782)
+120 print65535-(256*a+b)
+130 goto100:rem !!dauerschleife!
+</pre>
+            <figcaption>Listing »Frequenzanzeige«</figcaption>
+        </figure>
+
+        <p>Mit diesem Programm wurde eine Genauigkeit von deutlich besser als 1 Prozent erhalten. Versuche zeigten, daß selbst im praktischen Betrieb mit einem Spannungs-Frequenzwandler die Meßdauer ohne Verschlechterung des Ergebnisses auf 30 x 1/60 s + 0,5 s verkürzt werden kann. Dies kann man im Basiclader dadurch bewerkstelligen, daß in Zeile 130 die Zahl 60 in 30 geändert wird.</p>
+
+        <p>Bei der praktischen Anwendung wurde entsprechend [1] beziehungsweise nach Angaben des Herstellers [5] mit dem IC LM 331 folgender Spannungs-Frequenzwandler gebaut:</p>
+
+        <p>Die Schaltung funktioniert sehr gut und recht genau! Für die »Stellenwertausgabe« wurde mit dem 8-Bit-D-A-Wandler ZN428 folgende Schaltung aufgebaut:</p>
+
+        <p>Die Ausgabe über den Userport erfolgt mit Hilfe folgender Befehle:<br>
+            Poke 56579, 255 (Datenleitungen PB0 bis PB7 auf Ausgabe)<br>
+            Poke 56577, x (x = Dez.-Wert der Ausgabe)<br>
+            Der Wandler erzeugt dann eine zu x proportionale Spannung.</p>
+
+        <p>Dem Nachteil einer V/f-Wandler-Zeit von ≈ 0,5 s steht der Vorteil gegenüber, daß keine Ein-Ausgabeleitungs-Umschaltung erforderlich ist, die Signale stehen stetig am Port zur Verfügung. Eine mehrkanalige Ausführung des Eingangs durch Multiplexen ist denkbar. Beim Ausgang ist dies sicher etwas schwieriger.</p>
+
+        <address class="author">(Dr. Ernst Breitz/rg)</address>
+
+        <p class="literatur">Literatur<br>
+            [1] Anderson A., Kullbjer A.: »Messen, steuern, regeln mit dem VC 20 und Commdore 64«, Haller-Verlag, Saarbrücken<br>
+            [2] Angerhausen, Brückmann, Englisch, Gerits, »64 intern«, Data-Becker, Düsseldorf<br>
+            [3] Floegel E., »Hardware-Erweiterungen für Commodore 64«, Hofacker-Verlag, Holzkirchen<br>
+            [4] Brückmann, »Der Commodore 64 und der Rest der Welt«; Data-Becker, Düsseldorf<br>
+            [5] National-Semiconductor, Daten-Blatt zu LM 131/231/331</p>
+
+        <figure>
+            <img src="78-2.png" alt="">
+            <figcaption>Schaltbild »Spannungs-Frequenzwandler«</figcaption>
+        </figure>
+        <figure>
+            <img src="78-3.png" alt="">
+            <p>*: Bei »Freigabe« Low oder Offen: Wert wird laufend »durchgeschoben«. Bei »Freigabe« High: Wandler gesperrt, alter Wert wird noch angezeigt</p>
+            <figcaption>Schaltbild »Stellwertausgabe«</figcaption>
+        </figure>
+
+    </article>
+
+</body>
+
+</html>

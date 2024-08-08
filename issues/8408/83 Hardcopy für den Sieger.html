@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>Hardcopy für den Sieger</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="Frank Lonczewski, gk">
+    <meta name="64er.issue" content="8/84">
+    <meta name="64er.pages" content="83-85">
+    <meta name="64er.head1" content="Grafik">
+    <meta name="64er.head2" content="C 64">
+    <meta name="64er.toc_category" content="Programme zum Abtippen|Grafik">
+    <meta name="64er.toc_title" content="Hardcopy für Görlitz-Interface">
+    <meta name="64er.index_title" content="Hardcopy für den Sieger (FX-80 mit Görlitz-Interface)">
+    <meta name="64er.index_category" content="Listings zum Abtippen|Grafik|Hardcopy">
+    <meta name="64er.id" content="hardcopy">
+</head>
+
+<body>
+    <article>
+        <h1>Hardcopy für den Sieger</h1>
+
+        <p class="intro">In unserer letzten Ausgabe konnten wir das Görlitz-Interface für Epson-Drucker zum Testsieger erklären. Die Schnittstelle verdankt diesen Sieg hauptsächlich ihrer universellen Anwendbarkeit. Dazu gehört auch das Ausdrucken eines Bildschirminhaltes in Verbindung mit Simons Basic. Daß eine Basicerweiterung aber nicht unbedingt notwendig ist, zeigt diese Hardcopyroutine.</p>
+
+        <figure>
+            <img src="83-1.png" alt="">
+            <figcaption>Ein Beispiel für den Ausdruck in doppelter Größe</figcaption>
+        </figure>
+
+        <p>Mit dem Maschinenprogramm ist es möglich, Grafiken im Maßstab 1:1 (Druckdauer zirka 35 Sekunden, 64 000 Dots) oder im Maßstab 2:1 (Druckdauer zirka 2 Minuten, 256 000 Dots) ausgeben zu lassen.</p>
+
+        <p>Mit dem Basic-Lader kann das Maschinenprogramm in jeden beliebigen Speicherbereich eingelesen werden. Sinnvollerweise sollte das Maschinenprogramm auf die Startadresse # 49152 ($C000) gesetzt werden, da hier keine Basic-Bytes verloren gehen. Wird trotzdem eine Endadresse für das Programm festgestellt, die unter #40960 ($A000) liegt, so wird der Beginn des Maschinenprogramms gleichzeitig als Ende des Basic-RAMs ausgewiesen; hierdurch wird verhindert, daß das Maschinenprogramm versehentlich von Basic aus überschrieben wird. Zusätzlich kann wegen der Unterschiedlichkeit der Interfaces gewählt werden, welche Filenummer, welches Gerät und was für eine Sekundäradresse gesetzt werden sollen. Damit die Zeichen ohne Umdefinition vom Computer zum Drucker gesendet werden, ist es je nach Interface notwendig, eine entsprechende Sekundäradresse zu setzen. Entsprechende Hinweise befinden sich sicher bei der Betriebsanleitung des Interfaces. Je nach Bedarf können die Parameter der Initialisierungsroutine geändert werden.</p>
+
+        <p>Die mit dem Basic-Lader erzeugte Routine sollte man nach der Erzeugung abspeichern. Für die verschiedenen Speicherkonfigurationen lassen sich natürlich auch verschiedene Hardcopyroutinen erzeugen. Die Startadresse und die Endadresse des erzeugten Maschinenprogramms werden auf dem Monitor angezeigt.</p>
+
+        <p>Wird das Maschinenprogramm abgespeichert, so geschieht das unter dem Namen »HC EPSON xxxxx«, wobei xxxxx die Startadresse der Routine wiedergibt.</p>
+
+        <p>Hinweise zum Maschinenprogramm:</p>
+
+        <ul>
+            <li>Es wird nur eine Datei auf den Drucker eröffnet; diese kann vom Anwender selbst definiert werden.</li>
+            <li>Es können die Grafiken aller acht Grafikbildschirme ohne Einschränkungen verarbeitet werden.</li>
+            <li>Nach dem Ende des Maschinenprogramms müssen 16 Byte für zwei Umrechnungstabellen freigehalten werden.</li>
+            <li>Es werden nur die folgenden Byte in der Zero-Page für die Routine benötigt: $FB-$FF, $02, $A7-$AA.</li>
+        </ul>
+
+        Zur Implementierung des Programms:</p>
+
+        <p>Die Routine kann im Direktmodus, aber auch unter Programmkontrolle aufgerufen werden. Dabei liegt der besondere Vorteil des Programms darin, das sämtliche Parameter durch Basicvariablen ausgedrückt werden können. Das Format zum Ausdruck eines Bildes in Hires-Grafik lautet SYS A, B, C.</p>
+
+        <table>
+            <tr>
+                <td>A</td>
+                <td>bezeichnet die Startadresse der Routine</td>
+            </tr>
+            <tr>
+                <td>B</td>
+                <td>bezeichnet die Startadresse von einem der acht möglichen Grafikbildschirme</td>
+            </tr>
+            <tr>
+                <td>C</td>
+                <td>gibt den Maßstab der Wiedergabe an. Dabei kann man zwischen vier Ausgabetypen wählen:</td>
+            </tr>
+            <tr>
+                <td>0</td>
+                <td>gibt das Hiresbild im Maßstab 1:1 aus, zusätzlich wird die Grafik invertiert ausgegeben.</td>
+            </tr>
+            <tr>
+                <td>1</td>
+                <td>gibt das Hiresbild ohne Invertierung im Maßstab 1:1 aus.</td>
+            </tr>
+            <tr>
+                <td>2</td>
+                <td>Der Grafikbildschirm wird im Verhältnis 1:2 vergrößert. Zusätzlich wird das Bild invertiert.</td>
+            </tr>
+            <tr>
+                <td>3</td>
+                <td>Auch hier wird das Bild vergrößert, die Ausgabe des Bildes erfolgt ohne Invertierung.</td>
+            </tr>
+        </table>
+
+        <p>Wird die Routine als Maschinenprogramm geladen, so muß man nach dem Laden »NEW« eingeben, um sämtliche Zeiger zu korrigieren.</p>
+
+        <p>Fehlerbehandlung:</p>
+
+        <ul>
+            <li>Werden die Angaben nicht durch Kommata getrennt, erscheint SYNTAX ERROR.</li>
+            <li>Wird eine Startadresse für B eingegeben, die nicht mit der Anfangsadresse eines der acht Grafikbildschirme (0, 8192, 16384, 24576, 32768, 40960, 49152 oder 57344) übereinstimmt, so wird je nach Argument »UNDEF’D STATEMENT« oder »ILLEGAL QUANTITY« ausgegeben.</li>
+            <li>Bei Angabe eines ungültigen Maßstabs dagegen wird je nach Argument »UNDEF'D FUNCTION« oder »ILLEGAL QUANTITY« ausgegeben.</li>
+        </ul>
+
+        <p>Anwendungsbeispiel:</p>
+
+        <p>Zunächst wird mit dem Basic-Lader die Maschinenspracheroutine initialisiert. Soll zum Beispiel die Hardcopyroutine zusammen mit Simons Basic arbeiten, so braucht die vorgesehene Startadresse 49152 nicht geändert zu werden. Die erfragten Parameter Device (Gerätenummer) und Sekundäradresse richten sich nach dem benutzten Interface. Änderungen können bei Bedarf durch Überschreiben der alten Werte vorgenommen werden. Nach korrekter Eingabe wird dann das Maschinenprogramm erzeugt. Nach Abschluß dieser Operation kann dann noch entschieden werden, ob der erzeugte Code abgespeichert werden soll. Wird die Frage positiv beantwortet, so wird das Maschinenprogramm nach Wahl auf Diskette beziehungsweise Kassette abgespeichert. Zum Schluß wird nur noch errechnet, ob das Programm in einem Bereich steht, der von Basic aus erreichbar ist. Ist das der Fall, so wird das Maschinenprogramm vor einem versehentlichen Überschreiben geschützt.</p>
+
+        <p>Ist dann die Routine einmal erzeugt, so kann man mit der Ausgabe von Hires-Grafiken beginnen. Erzeugt man zum Beispiel mit Hilfe von Simons Basic eine Hires-Grafik, so wird diese mit SYS xxxxx,57344,1 im Originalmaßstab ausgegeben. Dabei bezeichnet xxxxx die Anfangsadresse der Routine, bei 57344 liegt der Grafikbildschirm von Simons Basic und der letzte Parameter 1 gibt an, daß die Grafik im Maßstab 1:1 ohne Invertierung des Bildes ausgegeben werden soll. Nach ordnungsgemäßer Eingabe des SYS-Befehls beginnt der Drucker das Bild auszugeben.</p>
+
+        <p>Bei Bedarf kann man dann zu einem späteren Zeitpunkt die abgespeicherte Maschinenroutine nachladen. Liegt sie im Basicbereich (bis #40959,$9FFF), so kann man durch Abtippen und Starten der Zeilen 144 bis 146 des Laders erreichen, daß das Programm vor Überschreibung geschützt wird, ohne gleich den gesamten Lader zu starten. Dazu ist in diesen Zeilen die Variable AN durch die Startadresse der Routine zu ersetzen.</p>
+
+        <p>Sonstige Hinweise:</p>
+
+        <p>Bevor die Routine beginnt, muß der Drucker bereits eingeschaltet sein.</p>
+
+        <p>Werden eventuell andere Codes für die Erzeugung der Hires-Grafik benötigt, so sind die Steuercodes, die die Bit-Image Schreibweise des Druckers steuern, zu ändern. Das hier vorgestellte Maschinenprogramm ist für den FX-80 ausgelegt, ist jedoch auch auf anderen Druckern lauffähig. Da das Assemblerlisting nicht abgedruckt werden kann, können sich Interessierte gerne schriftlich an mich wenden.</p>
+
+        <address class="author">(Frank Lonczewski/gk)</address>
+
+        <figure>
+            <img src="83-2.png" alt="">
+            <figcaption>Ein Beispiel für den Ausdruck in einfacher Größe</figcaption>
+        </figure>
+
+        <figure>
+            <pre data-filename="hardcopy epson" data-name="Hardcopy Epson"></pre>
+            <figcaption>Listing der Hardcopy-Routine für Epson-Drucker</figcaption>
+        </figure>
+
+    </article>
+
+</body>
+
+</html>

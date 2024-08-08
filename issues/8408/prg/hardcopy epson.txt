@@ -1,0 +1,137 @@
+
+
+;hardcopy epson ==0801==
+  100 rem ******************************************************
+  101 rem *                                                    *
+  102 rem *  hardcopyroutine fuer epson-drucker, basic-loader  *
+  103 rem *                                                    *
+  104 rem *      copyright juni 1984 by frank lonczewski       *
+  105 rem * 5810 witten 6,froebelstrasse 33, tel.::02302/60933 *
+  106 rem * cursorsteuerzeichen stehen in klammern:"[" und "]" *
+  107 rem ******************************************************
+  108 print"{clr}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rvon}epson hardcopyroutine{rvof}{down}"
+  109 input"startadresse{rght}{rght}{rght}{rght}{rght}{rght}{rght}49152{left}{left}{left}{left}{left}{left}{left}";an:ifan<0oran>53248then109
+  110 input"filenummer{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}127{left}{left}{left}{left}{left}";lf:iflf<1orlf>255then110
+  111 input"device{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}4{left}{left}{left}";dn:ifdn<4ordn>15then111
+  112 input"sekundaeradresse{rght}{rght}{rght}4{left}{left}{left}";sn:ifsn<0orsn>15then112
+  113 i=an:print"{down}ich arbeite ! bitte etwas geduld."
+  114 gosub147
+  115 ifrethengosub158:goto117
+  116 pokei,a
+  117 ps=ps+a:re=0:i=i+1:ifi-an<528then114
+  118 ifps<>57824thenprint"pruefsummenfehler !":end
+  119 pokean+62,dn:rem  device  setzen
+  120 pokean+64,sn:rem  sekun.  setzen
+  121 pokean+60,lf:pokean+72,lf:pokean+176,lf:pokean+244,lf:rem filenr. setzen
+  122 print"{clr}epson hardcopyroutine initalisiert"
+  123 k=an+475:b=int(k/256):k=k-b*256:pokean+47,k:pokean+49,b
+  124 print"{down}startadresse{rght}{rght}{rght}{rght}:";an
+  125 print"endadresse{rght}{rght}{rght}{rght}{rght}{rght}:";an+527
+  126 print"filenummer{rght}{rght}{rght}{rght}{rght}{rght}:";lf
+  127 print"device{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}:";dn
+  128 print"sekundaeradresse:";sn
+  129 print"{down}aufruf mit sys"an"{left},gradr,mas"
+  130 print"{down}gradr : dezimal grafikbildschirmadresse"
+  131 print"mas{rght}{rght}{rght}: dezimal massstab{down}"
+  132 input"code abspeichern{rght}{rght}{rght}{rght}y{left}{left}{left}";j$:ifj$<>"y"then144
+  133 input"{rvon}d{rvof}isk oder {rvon}t{rvof}ape{rght}{rght}{rght}d{left}{left}{left}";j$:ifj$<>"d"andj$<>"t"then133
+  134 ifj$="d"thend=8:goto136
+  135 d=1
+  136 ps=0:print:fori=688to738
+  137 gosub147:pokei,a:ps=ps+a:next
+  138 ifps<>5381then118
+  139 b=an:h=int(b/256):l=b-h*256
+  140 b=an+528:he=int(b/256):le=b-he*256
+  141 poke707,l:poke711,h:poke717,le:poke719,he
+  142 poke693,d:an$=mid$(str$(an),2):fori=1tolen(an$):poke732+i,asc(mid$(an$,i,1))
+  143 nexti:poke157,128:sys688:print
+  144 ifan+543>40960thenprint"{down}maschinenprogramm wird nicht geschuetzt.":end
+  145 b=an:h=int(b/256):l=b-h*256
+  146 poke56,h:poke55,l:clr:end
+  147 reada$:iflen(a$)<>2thenprint"tippfehler in zeile"peek(63)+peek(64)*256:end
+  148 a1=asc(a$):a2=asc(right$(a$,1))
+  149 ifa1=42thena1=48:re=1
+  150 ifa1<48ora1>57thenifa1<65ora1>70then157
+  151 ifa2<48ora2>57thenifa2<65ora2>70then157
+  152 ifa1>64thena1=a1-55:goto154
+  153 ifa1<58thena1=a1-48
+  154 ifa2>64thena2=a2-55:goto156
+  155 ifa2<58thena2=a2-48
+  156 a=a1*16+a2:return
+  157 print"ungueltiger hexcode in zeile"peek(63)+peek(64)*256:end
+  158 b=an+a2*256:gosub147:i=i+1:b=b+a
+  159 hb=int(b/256):b=b-hb*256:pokei-1,b:pokei,hb:return
+  160 data 20,fd,ae,20,8a,ad,20,9b
+  161 data bc,a5,65,f0,03,4c,e3,a8
+  162 data a5,64,aa,29,10,d0,f6,8e
+  163 data *0,58,20,fd,ae,20,9e,b7
+  164 data e0,04,30,03,4c,ae,b3,86
+  165 data aa,8a,29,80,30,f6,a9,db
+  166 data a0,c1,20,1e,ab,a9,00,85
+  167 data b7,85,a9,a9,7f,a2,04,a0
+  168 data 04,20,ba,ff,20,c0,ff,a2
+  169 data 7f,20,c9,ff,a2,06,bd,*1
+  170 data cd,20,d2,ff,ca,10,f7,a9
+  171 data 00,85,fc,a9,00,85,fb,18
+  172 data 69,40,85,fd,a5,fc,69,1f
+  173 data 85,fe,a5,aa,c9,02,10,05
+  174 data a9,09,20,d2,ff,a2,04,a5
+  175 data aa,c9,02,10,0b,bd,*1,c3
+  176 data 20,d2,ff,ca,10,f7,30,09
+  177 data bd,*1,c8,20,d2,ff,ca,10
+  178 data f7,a2,00,86,ff,20,*0,f8
+  179 data a6,ff,a5,fb,18,69,08,85
+  180 data fb,a5,fc,69,00,85,fc,e8
+  181 data e0,28,d0,e7,20,cc,ff,a2
+  182 data 7f,20,c9,ff,a9,0a,20,d2
+  183 data ff,a5,aa,c9,02,30,16,a6
+  184 data a9,d0,12,e6,a9,38,a5,fb
+  185 data e9,40,85,fb,a5,fc,e9,01
+  186 data 85,fc,4c,*0,6a,a9,00,85
+  187 data a9,a5,fc,c5,fe,d0,8b,a5
+  188 data fb,c5,fd,d0,85,a2,06,bd
+  189 data *1,d4,20,d2,ff,ca,10,f7
+  190 data 20,cc,ff,a9,7f,4c,c3,ff
+  191 data a5,01,48,78,a9,34,85,01
+  192 data a0,07,b1,fb,99,*2,18,a9
+  193 data 00,99,*2,10,88,10,f3,68
+  194 data 85,01,58,20,*1,32,a0,07
+  195 data a5,aa,c9,02,10,0a,b9,*2
+  196 data 10,20,*1,b2,88,10,f7,60
+  197 data b9,*2,10,20,*1,68,88,10
+  198 data f7,60,a2,07,a0,07,b9,*2
+  199 data 18,29,80,20,*1,58,18,7d
+  200 data *2,10,9d,*2,10,88,10,ee
+  201 data a0,07,b9,*2,18,0a,99,*2
+  202 data 18,88,10,f6,ca,10,dd,60
+  203 data 85,02,98,c0,00,f0,05,46
+  204 data 02,88,10,f7,a8,a5,02,60
+  205 data 85,a8,98,48,a5,a9,f0,07
+  206 data a0,04,06,a8,88,d0,fb,a0
+  207 data 00,84,a7,a5,a8,29,80,20
+  208 data *1,a6,a5,a8,29,40,20,*1
+  209 data a5,a5,a8,29,20,4a,20,*1
+  210 data a5,a5,a8,29,10,4a,4a,20
+  211 data *1,a5,48,20,*1,b2,68,20
+  212 data *1,b2,68,a8,60,4a,48,20
+  213 data *1,ac,68,4a,18,65,a7,85
+  214 data a7,60,48,a5,aa,29,01,f0
+  215 data 04,68,4c,d2,ff,68,49,ff
+  216 data 4c,d2,ff,01,40,00,2a,1b
+  217 data 02,80,04,2a,1b,00,0d,44
+  218 data 1b,17,33,1b,0a,0a,0a,0a
+  219 data 0a,32,1b,0d,48,41,52,44
+  220 data 43,4f,50,59,20,45,50,53
+  221 data 4f,4e,0d,0d,28,43,29,20
+  222 data 20,4a,55,4e,49,20,31,39
+  223 data 38,34,20,42,59,0d,46,52
+  224 data 41,4e,4b,20,4c,4f,4e,43
+  225 data 5a,45,57,53,4b,49,0d,00
+  226 data a9,01,a0,01,a2,08,20,ba
+  227 data ff,a9,0f,a2,d3,a0,02,20
+  228 data bd,ff,a9,00,85,fb,a9,00
+  229 data 85,fc,a9,fb,a2,00,a0,00
+  230 data 4c,d8,ff,48,43,20,45,50
+  231 data 53,4f,4e,20,20,20,20,20
+  232 data 20,20,20
+
