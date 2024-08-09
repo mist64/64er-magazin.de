@@ -34,8 +34,12 @@
             <li>Weiß</li>
         </ol>
 
-
         <p>Es ist empfehlenswert, für die Vorder- und Hintergrundfarbe Farben aus verschiedenen Helligkeitsstufen zu wählen, da man sonst auf farblosen Monitoren nicht viel sehen kann&hellip;</p>
+
+        <figure>
+            <img src="74-1.png" alt="">
+            <figcaption>Bild 1. Videosignal einer Rasterzeile</figcaption>
+        </figure>
 
         <p>40 µs der Rasterzeile werden für das eigentliche Bild benützt. Bei der Taktfrequenz (desVIC) von zirka8MHz ergeben sich 512 Punkte auf der ganzen Rasterzeile, was mit der horizontalen Auflösung der Positionen der Sprites übereinstimmt. Aus den 64 µs ergibt sich eine Zeilenfrequenz von 15625 Hz, die für das unangenehme Pfeifen verantwortlich ist, das man bei jedem Bildschirm hören kann, sofern man noch gute Ohren hat. Das horizontale Scrolling ist übrigens sehr einfach zu verwirklichen. Statt dem ganzen Bild wird kurzerhand der Synchronisationsimpuls und das durch den Rand gebildete »Fenster« verschoben.</p>
 
@@ -62,6 +66,11 @@
 
         <p>Die CPU 6510 gibt an ihrem Ausgang Pin 2 einen Takt von zirka 1 MHz ab (Bild 2). Wenn Pin 2 Low ist, ist der Bus frei, wenn Pin 2 High ist, benötigt die CPU den Bus für ihre Speicherzugriffe.</p>
 
+        <figure>
+            <img src="74-2.png" alt="">
+            <figcaption>Bild 2. Takt der CPU 6510</figcaption>
+        </figure>
+
         <p>Der VIC liest, während Pin 2 Low ist, die Daten aus dem Zeichengenerator oder aus der hochauflösenden Grafik.</p>
 
         <p>Das Farb-RAM wird vom VIC parallel zum normalen RAM gelesen. Der VIC hat also einen 12-Bit-Datenbus.</p>
@@ -70,6 +79,11 @@
             a) Letzte Rasterzeile der vorherigen Zeile: Die CPU wird angehalten, in die Puffer werden die Daten für die neue Zeile gelesen.<br />
             b) Während den sieben ersten Rasterzeilen der neuen Zeile wird die CPU nicht angehalten.<br />
             a) Wieder von vorn.</p>
+
+        <figure>
+            <img src="74-3.png" alt="">
+            <figcaption>Bild 3. Zeitliche Anordnung der Speicherzugriffe</figcaption>
+        </figure>
 
         <p>Leider hat auch dieses Verfahren Nachteile. Erstens wird der Prozessor verlangsamt, zweitens geraten bei zeitkritischen Programmen durch das Anhalten des Prozessors die Zeitverhältnisse aus dem Lot. Deswegen wird zum Beispiel beim Laden von Programmen von Kassette der Bildschrim abgeschaltet!</p>
 
@@ -82,6 +96,11 @@
         <p>In jeder Rasterzeile müssen die Daten aller Sprites gelesen werden, also 3 x 8 Byte, die nahtlos in das »gemütliche Eckchen« in der Austastlücke passen. Jetzt wissen wir auch, wieso die Sprites ein so unmögliches Format (24 x 21 Pixel) haben&hellip;</p>
 
         <p>Ich möchte nun anhand von Bild 4 erklären, wie die Sprites dort angezeigt werden, wo sie hingehören. Im Schema ist nur die Schaltung für ein Sprite gezeichnet, die anderen Sprites sind gleichartig aufgebaut.</p>
+
+        <figure>
+            <img src="74-4.png" alt="">
+            <figcaption>Bild 4. Schema der Sprite/Bildlogik (stark vereinfacht</figcaption>
+        </figure>
 
         <p>Die Spritedaten werden in einen Puffer gelesen. Ein Zähler gibt die Nummer der aktuellen Rasterspalte, also die X-Koordinate, an. Davon wird die X-Koordinate der Sprites abgezogen, und man erhält eine auf den »Ursprung« des Sprites bezogene Koordinate. Die Ausdehnung von Sprites in der X-Richtung ist sehr einfach: Die Koordinate wird einfach durch zwei geteilt (in Binärsystem sehr einfach: rechts schieben). Das gleiche geschieht übrigens auch bei der Ausdehnung von Sprites in der Y-Richtung. Ein Multiplexer gibt das, durch die so erhaltene Koordinate, gewählte Bit (oder Bitpaar bei mehrfarbigen Sprites) aus. Falls die Koordinate nicht im Bereich des Sprites liegt, gibt der Multiplexer einfach den Wert für »Sprite transparent« — also 0 — aus.</p>
 
