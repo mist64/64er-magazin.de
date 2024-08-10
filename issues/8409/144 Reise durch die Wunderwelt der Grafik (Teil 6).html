@@ -89,9 +89,11 @@
 
         <p>Das gleiche Programm können wir mit kleinen Änderungen für horizontales Scrollen verwenden. Wir müssen nur überall dort, wo 53265 steht, jetzt 53270 und in Zeile 50 anstelle von OR3 jetzt OR0 einsetzen. Wenn Sie Zeile 10 mit der Rückwärtsschleife belassen haben, scrollt der Bildschirminhalt nach links. Ändern Sie dagegen Zeile 10 wieder zur ursprünglichen Vorwärtsschleife, dann erfolgt ein Scrollen nach rechts. Sie werden jetzt sagen, daß das alles ja ganz nett ist, aber was kann man damit tun? Damit kann man Laufschriften erzeugen, die in beliebiger Richtung über den Bildschirm sausen oder schleichen — je nachdem. Leider, leider kommen wir hier langsam aber sicher an die Grenzen von Basic. Denn jetzt taucht ein Problem auf, dessen Lösung — in Basic als auch in Maschinensprache — gleich ein zweites nach sich zieht. Sehen wir uns zunächst Problem Nummer 1 an:</p>
 
-        <p>In dem Moment, wo man das Zeichen geduldig Byte für Byte aus dem Versteck herausgeholt hat, also 7 in die Bits 0 bis 2 von 53265 oder 53270 eingegeben hat, muß man ja dafür sorgen, daß<br />
-            1) der Bildschirminhalt um ein Zeichen weitergeschoben wird,<br />
-            2) im Versteck (am Rand) ein nächstes Zeichen parat liegt.</p>
+        <p>In dem Moment, wo man das Zeichen geduldig Byte für Byte aus dem Versteck herausgeholt hat, also 7 in die Bits 0 bis 2 von 53265 oder 53270 eingegeben hat, muß man ja dafür sorgen, daß</p>
+        <ol>
+            <li>der Bildschirminhalt um ein Zeichen weitergeschoben wird,</li>
+            <li>im Versteck (am Rand) ein nächstes Zeichen parat liegt.</li>
+        </ol>
 
         <p>Dazu können wir uns zum Beispiel des ohnehin schon eingebauten Zeilen-Scrolls bedienen, wie im nachfolgenden Programm:<br />
             10 POKE 53265,PEEK(53265)AND 247<br />
@@ -120,8 +122,10 @@
 
         <p>Jedesmal, wenn der Zeilenstrahl über die 255. Rasterzeile hinaushuscht, wird dieses Bit gleich 1. Das Problem Nummer zwei läßt sich also jetzt so ausdrücken: Wenn eine Bildänderung stattfindet, während der Zeilenstrahl über die Änderungsstelle hinwegstreicht, kommt es zu Zuckungen des Bildes. Man muß dafür sorgen, daß man diesem Flitzer nicht ins Gehege kommt. H. Gehrmann hat das in seinem Programm so gemanagt, daß er den Bildinhalt verändert, während der Rasterstrahl außerhalb des sichtbaren Bereiches arbeitet. Trotzdem gibt es hier aber noch Schwierigkeiten. Ein ganzer Bildschirm besteht aus 280 Rasterzeilen. Wenn man nun nachrechnet, braucht der Elektronenstrahl zirka 180 Microsekunden zum Überstreichen einer Rasterzeile, das heißt, er ist in sehr kurzer Zeit wieder im sichtbaren Bereich! Bis dahin muß die Bildveränderung abgeschlossen sein. Normalerweise ist das eine Aufgabe für Maschinenprogramme, von denen Sie einige in der nachfolgend genannten Literatur finden:</p>
 
-        <p>— R. Babel, M. Krause, A. Dripke: Das Interface Age Systemhandbuch zum Commodore 64, München 1983, S. 63-64,<br />
-            — A. Plenge: Das Grafikbuch zum Commodore 64, Düsseldorf 1984, S. 272ff.</p>
+        <ul>
+            <li>R. Babel, M. Krause, A. Dripke: Das Interface Age Systemhandbuch zum Commodore 64, München 1983, S. 63-64,</li>
+            <li>A. Plenge: Das Grafikbuch zum Commodore 64, Düsseldorf 1984, S. 272ff.</li>
+        </ul>
 
         <h2>Dornröschen ist wieder dran: 2D-Grafik besser</h2>
 
@@ -162,15 +166,17 @@
             <figcaption>Bild 5. Transformation</figcaption>
 		</figure>
 
-        <p>1) Das Bildschirmsystem X, Y mit Nullpunkt 0</p>
-
-        <p>2) Das von uns gewünschte System X', Y', mit Nullpunkt O', welches rot gezeichnet ist.</p>
+        <ol>
+            <li>Das Bildschirmsystem X, Y mit Nullpunkt 0</li>
+            <li>Das von uns gewünschte System X', Y', mit Nullpunkt O', welches rot gezeichnet ist.</li>
+        </ol>
 
         <p>Außerdem ist der Punkt P1 zu sehen. Je nach dem, auf welches Koordinatensystem er bezogen wird, hat er die Koordinaten</p>
 
-        <p>1) XI, Y1 oder</p>
-
-        <p>2) XI', Y1'.</p>
+        <ol>
+            <li>XI, Y1 oder</li>
+            <li>XI', Y1'.</li>
+        </ol>
 
         <p>Unser eigenes System soll vom unteren Wert XU bis zum oberen X-Wert XO reichen und vom unteren Y-Wert YU bis zum oberen YO. Am Beispiel unserer Sinus-Kurve wäre es sinnvoll, die X-Werte von XU=-1 bis XO = 10 und die Y-Werte von YU=-2 bis YO= +2 abzubilden. Die Entfernung von XU bis XO (also XO-XU) erstreckt sich auf 319 Bildpunkte. Man kann nun ein Verhältnis bilden, denn XI muß sich zu (X1-XU)(das ist die Länge der Strecke von XU bis X1') genauso verhalten wie 319 zur Gesamtentfernung(XO-XU). Als Formel sieht das so aus:</p>
 
@@ -249,16 +255,20 @@
 
         <h2>Flacher Raum: 3D-Grafik, wie funktioniert das?</h2>
 
-        <p>Nun sind wir bei dreidimensionalen, also räumlichen Abbildungen angekommen. Zunächst einmal: Es ist klar, weil der Fernsehschirm eben nur eine Fläche ist wie ein Blatt Zeichenpapier, daß wir etwas Räumliches auf einer Fläche darstellen müssen. Alles andere ist Science fiction, auch für die größten Computer! Bei 3D-Darstellungen unterscheidet man hauptsächlich zwei Arten:<br />
-            a) Zeichnungen, die mit einer Spezialbrille räumlich wahrgenommen werden können,<br />
-            b) Zeichnungen, die perspektivisch gestaltet sind und deswegen als räumlich empfunden werden.</p>
+        <p>Nun sind wir bei dreidimensionalen, also räumlichen Abbildungen angekommen. Zunächst einmal: Es ist klar, weil der Fernsehschirm eben nur eine Fläche ist wie ein Blatt Zeichenpapier, daß wir etwas Räumliches auf einer Fläche darstellen müssen. Alles andere ist Science fiction, auch für die größten Computer! Bei 3D-Darstellungen unterscheidet man hauptsächlich zwei Arten:</p>
+        <ol type="a">
+            <li>Zeichnungen, die mit einer Spezialbrille räumlich wahrgenommen werden können,</li>
+            <li>Zeichnungen, die perspektivisch gestaltet sind und deswegen als räumlich empfunden werden.</li>
+        </ol>
 
         <p>Im Prinzip ist der Weg a) für uns begehbar. Wir könnten die dazu nötigen zwei verschiedenfarbigen Zeichnungen (meist rot und blau) mit Hilfe des Mehrfarben-Bitmap-Modus erzeugen. Allerdings ist der rechnerische Aufwand nicht unerheblich. Ab und zu werden in Programmzeitschriften entsprechende Entwürfe veröffentlicht.</p>
 
-        <p>Der übliche Weg allerdings geht über eine perspektivische Darstellung. Zwei Arten wiederum finden vor allem Anwendung:<br />
-            a) Die sogenannte Kavaliers-Perspektive<br />
-            b) Die Perspektive mit mindestens einem Fluchtpunkt.<br />
-            Den Unterschied soll Bild 6 erläutern.</p>
+        <p>Der übliche Weg allerdings geht über eine perspektivische Darstellung. Zwei Arten wiederum finden vor allem Anwendung:</p>
+        <ol type="a">
+            <li>Die sogenannte Kavaliers-Perspektive</li>
+            <li>Die Perspektive mit mindestens einem Fluchtpunkt.</li>
+        </ol>
+        <p>Den Unterschied soll Bild 6 erläutern.</p>
 
 		<figure>
 			<img src="150-6.png" alt="">
