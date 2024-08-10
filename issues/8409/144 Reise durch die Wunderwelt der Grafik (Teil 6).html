@@ -66,7 +66,7 @@
         <p>Probieren wir dasselbe mit der Speicherstelle 53270:<br />
             POKE 53270,PEEK(53270)AND247 (RETURN)<br />
             Unsere Kommandos sehen jetzt etwas merkwürdig aus und auch der Cursor. Wir haben nicht mehr 40 Spalten, sondern nur noch 38 zur Verfügung. Zurück in den Normalzustand:<br />
-            POKE 53270,PEEK(53270)GR8 (RETURN)</p>
+            POKE 53270,PEEK(53270)OR8 (RETURN)</p>
 
         <p>Beim Eingeben dieser Zeile werden Sie bemerkt haben, daß trotzdem noch der ganze 40-Zeichen-Bereich zur Verfügung steht, nur sind die erste und letzte Spalte verdeckt. Der Rahmen ist breiter geworden und versteckt gewissermaßen den Rand des Bildschirmes.</p>
 
@@ -87,7 +87,7 @@
             10 FOR I = 7 TO 0 STEP —1<br />
             dann erfolgt Scrollen nach oben.</p>
 
-        <p>Das gleiche Programm können wir mit kleinen Änderungen für horizontales Scrollen verwenden. Wir müssen nur überall dort, wo 53265 steht, jetzt 53270 und in Zeile 50 anstelle von OR3 jetzt ORO einsetzen. Wenn Sie Zeile 10 mit der Rückwärtsschleife belassen haben, scrollt der Bildschirminhalt nach links. Ändern Sie dagegen Zeile 10 wieder zur ursprünglichen Vorwärtsschleife, dann erfolgt ein Scrollen nach rechts. Sie werden jetzt sagen, daß das alles ja ganz nett ist, aber was kann man damit tun? Damit kann man Laufschriften erzeugen, die in beliebiger Richtung über den Bildschirm sausen oder schleichen — je nachdem. Leider, leider kommen wir hier langsam aber sicher an die Grenzen von Basic. Denn jetzt taucht ein Problem auf, dessen Lösung — in Basic als auch in Maschinensprache — gleich ein zweites nach sich zieht. Sehen wir uns zunächst Problem Nummer 1 an:</p>
+        <p>Das gleiche Programm können wir mit kleinen Änderungen für horizontales Scrollen verwenden. Wir müssen nur überall dort, wo 53265 steht, jetzt 53270 und in Zeile 50 anstelle von OR3 jetzt OR0 einsetzen. Wenn Sie Zeile 10 mit der Rückwärtsschleife belassen haben, scrollt der Bildschirminhalt nach links. Ändern Sie dagegen Zeile 10 wieder zur ursprünglichen Vorwärtsschleife, dann erfolgt ein Scrollen nach rechts. Sie werden jetzt sagen, daß das alles ja ganz nett ist, aber was kann man damit tun? Damit kann man Laufschriften erzeugen, die in beliebiger Richtung über den Bildschirm sausen oder schleichen — je nachdem. Leider, leider kommen wir hier langsam aber sicher an die Grenzen von Basic. Denn jetzt taucht ein Problem auf, dessen Lösung — in Basic als auch in Maschinensprache — gleich ein zweites nach sich zieht. Sehen wir uns zunächst Problem Nummer 1 an:</p>
 
         <p>In dem Moment, wo man das Zeichen geduldig Byte für Byte aus dem Versteck herausgeholt hat, also 7 in die Bits 0 bis 2 von 53265 oder 53270 eingegeben hat, muß man ja dafür sorgen, daß<br />
             1) der Bildschirminhalt um ein Zeichen weitergeschoben wird,<br />
@@ -98,13 +98,13 @@
             20 PRINTCHR$(147):FOR I = 1 TO 24:PRINTCHR$(17);:NEXT I<br />
             30 POKE 53265,(PEEK(53265)AND 248)OR7<br />
             40 PRINT"SCROLLING NACH OBEN”<br />
-            50 FORI = 6TOOSTEP-1<br />
+            50 FORI = 6TO0STEP-1<br />
             60 POKE53265,(PEEK(53265)AND-248)OR I:FORJ=1TO 50:NEXT J<br />
             70 NEXTI:GOTO30</p>
 
-        <p>Wenn Sie dieses Programm gestartet haben, können Sie mit RUN/ STOP und RESTORE den Normalzustand wiederherstellen. Haben Sie etwas bemerkt? Ein Flackern des Bildes trat auf. Das ist das zweite Problem, auf das wir gleich kommen werden.</p>
+        <p>Wenn Sie dieses Programm gestartet haben, können Sie mit RUN/STOP und RESTORE den Normalzustand wiederherstellen. Haben Sie etwas bemerkt? Ein Flackern des Bildes trat auf. Das ist das zweite Problem, auf das wir gleich kommen werden.</p>
 
-        <p>Ein Beispiel für das horizontale Scrollen gibt das Programm von H. Gehrmann in Happv-Computer, Ausgabe 4/84, Seite 108f. H. Gehrmann hat es geschafft, in Basic tatsächlich fließendes Scrollen ohne Bildschirmflackern zu erzeugen. In Zeile 36 seines Programms ist ein Teil seiner Lösung für Problem Nummer 2 zu finden. Dort steht:<br />
+        <p>Ein Beispiel für das horizontale Scrollen gibt das Programm von H. Gehrmann in Happy-Computer, Ausgabe 4/84, Seite 108f. H. Gehrmann hat es geschafft, in Basic tatsächlich fließendes Scrollen ohne Bildschirmflackern zu erzeugen. In Zeile 36 seines Programms ist ein Teil seiner Lösung für Problem Nummer 2 zu finden. Dort steht:<br />
             36 IF PEEK(53265) &lt; > 155 THEN 36</p>
 
         <p>Erst danach druckt er an den oberen Bildschirmrand die zu scrollende Textzeile und scrollt dann, wie wir es bisher kennengelernt haben. Was ist denn nun dieses zweite Problem? Sehen wir dazu zunächst einmal in die Speicherstelle 53265 hinein. Geben Sie (nach NEW) mal die folgende Textzeile ein:<br />
@@ -236,7 +236,7 @@
             60 PRINT"RUN 100&rdquo;:PRINTCHR$ (19);<br />
             65 POKE 631,13:POKE 632,13:POKE 633,13:POKE 198,3:END</p>
 
-        <p>Tippen Sie’s ein und fügen Sie in Zeile 100 noch ein STOP ein, damit Sie sehen können, was mit diesen Zeilen passiert. Sie sehen, daß der Bildschirm zunächst frei gemacht wird (CHR$(147) in Zeile 50) und dann zwei Programmzeilen 130 und 140 gedruckt werden mit der neuen Funktion, danach noch die RUN-Anweisung. Der Cursor springt dann wieder in die Ecke links oben (CHR$(19) in Zeile 60). Jetzt arbeitet unser Computer den Inhalt des Tastaturpuffers ab, der aus drei RE-TURNs (die 13) besteht. Die Anzahl 3 muß in Speicherstelle 198 festgehalten sein. Die Tatsache, daß der Tastaturpuffer abgearbeitet wird, haben wir dem END zu verdanken. Weil aber ein RETURN nach RUN 100 folgt, startet das Programm sofort wieder selbständig ab Zeile 100. Wenn Sie jetzt mal Zeile 130 und 140 listen lassen, steht dort die neue Funktion. Weil sie sich im Programmablauf störend auswirken, sollen die zu druckenden Zeilen unsichtbar werden. Deswegen fügen wir in Zeile 45 noch an:<br />
+        <p>Tippen Sie’s ein und fügen Sie in Zeile 100 noch ein STOP ein, damit Sie sehen können, was mit diesen Zeilen passiert. Sie sehen, daß der Bildschirm zunächst frei gemacht wird (CHR$(147) in Zeile 50) und dann zwei Programmzeilen 130 und 140 gedruckt werden mit der neuen Funktion, danach noch die RUN-Anweisung. Der Cursor springt dann wieder in die Ecke links oben (CHR$(19) in Zeile 60). Jetzt arbeitet unser Computer den Inhalt des Tastaturpuffers ab, der aus drei RETURNs (die 13) besteht. Die Anzahl 3 muß in Speicherstelle 198 festgehalten sein. Die Tatsache, daß der Tastaturpuffer abgearbeitet wird, haben wir dem END zu verdanken. Weil aber ein RETURN nach RUN 100 folgt, startet das Programm sofort wieder selbständig ab Zeile 100. Wenn Sie jetzt mal Zeile 130 und 140 listen lassen, steht dort die neue Funktion. Weil sie sich im Programmablauf störend auswirken, sollen die zu druckenden Zeilen unsichtbar werden. Deswegen fügen wir in Zeile 45 noch an:<br />
             :POKE 646,6<br />
             und ab Zeile 100 soll wieder sichtbar werden, was zu drucken ist, weshalb wir dort anfügen:<br />
             :PRINTCHR$(147):POKE 646,14</p>
@@ -295,7 +295,7 @@
             <figcaption>Bild 10. Zusammensetzung von Raumflächen aus ebenen Kurven</figcaption>
 		</figure>
 
-        <p>Das Prinzip ist jetzt wohl klar. Wenn wir nun bedenken, daß die Raumfläche aus lauter ebenen Kurven und die Kurven aus lauter Punkten zusammengesetzt sind, dann stellt sich für uns die Frage, wie man einen Punkt P(Xr,Yr,Z1') an der richtigen Stelle unseres Bildschirmes darstellen kann. Weil wir schon wissen (von den 2D-Zeichnungen her), wie wir unser gewünschtes Koordinatensystem auf den Bildschirm bringen können, stellt sich die Frage für uns einfacher. Wir müssen uns nur noch überlegen, wie man mit zwei Koordinaten X1,Y1 den räumlichen Punkt in unserem selbstgewählten System zeichnen kann. Sehen wir uns dazu Bild 11 an.</p>
+        <p>Das Prinzip ist jetzt wohl klar. Wenn wir nun bedenken, daß die Raumfläche aus lauter ebenen Kurven und die Kurven aus lauter Punkten zusammengesetzt sind, dann stellt sich für uns die Frage, wie man einen Punkt P(X1',Y1',Z1') an der richtigen Stelle unseres Bildschirmes darstellen kann. Weil wir schon wissen (von den 2D-Zeichnungen her), wie wir unser gewünschtes Koordinatensystem auf den Bildschirm bringen können, stellt sich die Frage für uns einfacher. Wir müssen uns nur noch überlegen, wie man mit zwei Koordinaten X1,Y1 den räumlichen Punkt in unserem selbstgewählten System zeichnen kann. Sehen wir uns dazu Bild 11 an.</p>
 
 		<figure>
 			<img src="150-11.png" alt="">
@@ -321,7 +321,7 @@
         <p>Beide sind also gleich und für unser eigenes Koordinatensystem hat der Punkt P die Koordinaten:<br/>X1 = X1' + Z1'/(2*SQR(2))<br />
                 Y1 = Y1' + Z1'/(2*SQR(2))</p>
 
-        <p>Damit ist unser Problem gelöst. Denn XF, YT und Z1' sind die vorgegebenen Koordinaten und X1,Y1 können jetzt mit unseren Transformationen X = FNX(X1),Y=FNY(Y1) in Bildschirmkoordinaten umgerechnet werden. Wir verschachteln nun zwei Schleifen ineinander wie in Bild 12 und lassen uns damit Kurve für Kurve zeichnen.</p>
+        <p>Damit ist unser Problem gelöst. Denn X1', Y1' und Z1' sind die vorgegebenen Koordinaten und X1,Y1 können jetzt mit unseren Transformationen X = FNX(X1),Y=FNY(Y1) in Bildschirmkoordinaten umgerechnet werden. Wir verschachteln nun zwei Schleifen ineinander wie in Bild 12 und lassen uns damit Kurve für Kurve zeichnen.</p>
 
 		<figure>
 			<img src="150-12.png" alt="">
@@ -338,17 +338,18 @@
             150 PRINTCHR$(147)CHR$(17)CHR$ (18)&ldquo;UNSER SYSTEM:"CHR$(146): PRINT:PRINT<br />
             160 INPUT"XU,XO = &rdquo;;XU,XO:INPUT ”YU,YO = ”;YU,YO</p>
 
-        <p>Jetzt wird es ein bißchen kompliziert, weil wir darauf achten müssen, daß die Z-Achse noch auf dem Bildschirm paßt. Wir lassen uns berechnen und anzeigen, wie groß ZO höchstens sein darf und wie klein ZU:<br />
-            162 Z3 = 2*XO*SQR(2):Z4 = 2*YO* SQR(2):IF Z3&lt;Z4 THEN PRINT "ZO MAXIMAL = "Z/3:GOTO 166<br/>
-            164 PRINT"ZO MAXIMAL = "Z4 166 Z5 = 2*XU*SQR(2):Z6 = 2*YU* SQR(2):IF Z5&gt;Z6 THEN PRINT ”ZU MINIMAL = "Z5:GOTO170<br/>
-168 PRINT" ZU MINIMAL="Z6<br/>
-170 PRINT:INPUT" ZU,ZO=&lsquo;&rsquo;;ZU,ZO: Z1=FNZ(ZO):Z2=FNZ(ZU)</p>
+        <p>Jetzt wird es ein bißchen kompliziert, weil wir darauf achten müssen, daß die Z-Achse noch auf dem Bildschirm paßt. Wir lassen uns berechnen und anzeigen, wie groß ZO höchstens sein darf und wie klein ZU:<br>
+            162 Z3 = 2*X0*SQR(2):Z4 = 2*YO* SQR(2):IF Z3&lt;Z4 THEN PRINT "ZO MAXIMAL = "Z/3:GOTO 166<br>
+            164 PRINT"ZO MAXIMAL = "Z4<br>
+            166 Z5 = 2*XU*SQR(2):Z6 = 2*YU* SQR(2):IF Z5&gt;Z6 THEN PRINT ”ZU MINIMAL = "Z5:GOTO170<br>
+            168 PRINT" ZU MINIMAL="Z6<br>
+            170 PRINT:INPUT" ZU,ZO=&lsquo;&rsquo;;ZU,ZO: Z1=FNZ(ZO):Z2=FNZ(ZU)</p>
 
-                <p>Im nachfolgenden geht es nach dem (nicht immer angebrachten) Motto: Vertrauen ist gut, Kontrolle bosser:<br />
-                    172 IF Z1>YO OR Z1>YO THEN 162<br />
+                <p>Im nachfolgenden geht es nach dem (nicht immer angebrachten) Motto: Vertrauen ist gut, Kontrolle besser:<br>
+                    172 IF Z1>YO OR Z1>YO THEN 162<br>
                     174 IF Z2&lt;XU OR Z2&lt;YU THEN 162</p>
 
-                <p>Dann lassen wir uns die Freiheit der Farbenwahl:<br />
+                <p>Dann lassen wir uns die Freiheit der Farbenwahl:<br>
                     180 PRINT:INPUT"ZEICHEN- UND HINTERGRUNDFARBE = &ldquo;;F1,F2</p>
 
                 <p>Nach dem Anschalten der Hochauflösung zeichnen wir die Achsen:<br />
@@ -366,12 +367,14 @@
                 <p>Mit Zeile 202 hätten wir bei A = 1 die selbe Punktauflösung wie in der X-Schleife. Das ist meistens zu eng und A sollte deshalb Werte um etwa 8 haben.</p>
 
                 <p>Es ist ganz gut, sich auch die Freiheit offenzulassen, von wo bis wo unsere Raumfläche zu zeichnen ist. Es sieht einfach besser aus, wenn sie nicht bis zum Rand des Bildschirms reicht. Die Schleifen sollten also nicht von ZU bis ZO und von XU bis XO reichen, sondern von den Anfangswerten ZA beziehungsweise XA bis zu den Endwerten ZE beziehungsweise XE. Auch diese Werte müssen abgefragt werden:<br />
-                    184 PRINTCHR$(18)&ldquo;UNSERE ZEICHNUNG:"CHR$(146):PRINT 185 INPUT"X-BEREICH XA,XE = &rdquo;;XA,XE<br />
-                    186 INPUT"Z-BEREICH ZA,ZE = &ldquo;;ZA,ZE<br />
-                    Jetzt kommen die Schleifen:<br />
-                    210 FOR Z = ZA TO ZE STEP DZ:ZZ = FNZ(Z)<br />
-                    220 FOR XX = XA TO XE STEP DX:X1 = XX + ZZ<br />
-                    230 X = FNX(X1):YY=FNA(XX):Y1 = YY+ZZ:Y=FNY(Y1):GOSUB 50040 240 NEXT XX<br />
+                    184 PRINTCHR$(18)&ldquo;UNSERE ZEICHNUNG:"CHR$(146):PRINT<br>
+                    185 INPUT"X-BEREICH XA,XE = &rdquo;;XA,XE<br>
+                    186 INPUT"Z-BEREICH ZA,ZE = &ldquo;;ZA,ZE<br>
+                    Jetzt kommen die Schleifen:<br>
+                    210 FOR Z = ZA TO ZE STEP DZ:ZZ = FNZ(Z)<br>
+                    220 FOR XX = XA TO XE STEP DX:X1 = XX + ZZ<br>
+                    230 X = FNX(X1):YY=FNA(XX):Y1 = YY+ZZ:Y=FNY(Y1):GOSUB 50040<br>
+                    240 NEXT XX<br>
                     250 NEXT Z</p>
 
                 <p>Abschließend muß wieder zurückgeschaltet werden auf den Normalbildschirm:<br />
