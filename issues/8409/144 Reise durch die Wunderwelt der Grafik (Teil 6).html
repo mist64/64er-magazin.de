@@ -26,29 +26,29 @@
 
         <p>Wenn Sie an Ihrem Computer eine Kassettenstation verwenden, dann kennen Sie das ja zur Genüge. Sie geben irgendeinen Kassettenbefehl ein, der Computer fordert zum Beispiel PRESS RECORD &amp; PLAY. Sobald Sie dieser Aufforderung nachgekommen sind, ist der Bildschirm total leer. Dieses üble Verhalten — wir sehen ja nun einige Meldungen nicht mehr — hat seinen Grund. Die Kassettenoperationen können etwas schneller laufen. Überhaupt beschleunigt ein abgeschalteter Bildschirm einen Programmablauf. Im allgemeinen nützt uns das nicht viel, denn wir reden ja mit unserem Computer per Bildschirm und wenn der Gesprächspartner einen »black-out« hat, kann nicht miteinander verkehrt werden. Manchmal gibt es aber Situationen, wo dieses Abschalten für kurze Zeit ganz angenehm sein kann. Wenn wir zum Beispiel ein kompliziertes Titelbild aufbauen, mögen viele nicht zuschauen. Sondern nach einem leeren Bildschirm soll sofort das fertige Titelbild auftauchen.</p>
 
-        <p>Was passiert beim Abschalten des Bildschirmes? Das ist optisch eigentlich gar nicht so aufregend, denn der ganze Bildschirm nimmt die Farbe des Rahmens ein. Er wird also genau genommen nicht abgeschaltet. Geschaltet wird etwas, das wir nicht sehen können. Nämlich eine ganz bestimmte Fähigkeit unseres Prozessors, auf den Systembus anders als im Normalbetrieb zuzugreifen. Diese Art des Zugriffs birgt eine versteckte, mögliche Fehlerquelle: Wenn während Kassettenoperationen Sprites angeschaltet bleiben, können Störungen beim Zugriff auf Daten auftreten. Falls Sie die erste Folge dieser Artikelserie noch vorliegen haben, dann können Sie in Tabelle 1 nachsehen (Registerübersicht). In Register 17 (Adresse 53265) dient das Bit 4 als Schaltbild für Bildschirm »aus« oder »an«. Wenn wir dieses Bit auf 0 setzen, erblindet der Monitor. (Da hatte sich in die Tabelle 1 ein Fehler eingeschlichen: Dort steht&rsquo;s genau umgekehrt). Wie Sie noch aus den anderen Folgen wissen, ist dieses Register 17 ein ziemlich komplexes Ding. Wir müssen also darauf achten, daß nur Bit 4 gesetzt oder gelöscht wird. Ich hoffe, daß Sie noch wissen, wie das ging. Zur Erinnerung:<br />
-            Normaler Inhalt von 53265:<br />
-            XXX1 XXXX<br />
-            AND 239:<br />
-            1110 1111<br />
-            Jetzt ist Bit 4 gelöscht:<br />
-            XXX0 XXXX<br />
-            Das entspricht dem Befehl:<br />
-            POKE 53265,PEEK(53265)AND239<br />
-            Nun noch zum Wiedereinschalten des Bildschirmes:<br />
-            Mit gelöschten Bit 4:<br />
-            XXX0 XXXX<br />
-            OR 16:<br />
+        <p>Was passiert beim Abschalten des Bildschirmes? Das ist optisch eigentlich gar nicht so aufregend, denn der ganze Bildschirm nimmt die Farbe des Rahmens ein. Er wird also genau genommen nicht abgeschaltet. Geschaltet wird etwas, das wir nicht sehen können. Nämlich eine ganz bestimmte Fähigkeit unseres Prozessors, auf den Systembus anders als im Normalbetrieb zuzugreifen. Diese Art des Zugriffs birgt eine versteckte, mögliche Fehlerquelle: Wenn während Kassettenoperationen Sprites angeschaltet bleiben, können Störungen beim Zugriff auf Daten auftreten. Falls Sie die erste Folge dieser Artikelserie noch vorliegen haben, dann können Sie in Tabelle 1 nachsehen (Registerübersicht). In Register 17 (Adresse 53265) dient das Bit 4 als Schaltbild für Bildschirm »aus« oder »an«. Wenn wir dieses Bit auf 0 setzen, erblindet der Monitor. (Da hatte sich in die Tabelle 1 ein Fehler eingeschlichen: Dort steht&rsquo;s genau umgekehrt). Wie Sie noch aus den anderen Folgen wissen, ist dieses Register 17 ein ziemlich komplexes Ding. Wir müssen also darauf achten, daß nur Bit 4 gesetzt oder gelöscht wird. Ich hoffe, daß Sie noch wissen, wie das ging. Zur Erinnerung:<br>
+            Normaler Inhalt von 53265:<br>
+            XXX1 XXXX<br>
+            AND 239:<br>
+            1110 1111<br>
+            Jetzt ist Bit 4 gelöscht:<br>
+            XXX0 XXXX<br>
+            Das entspricht dem Befehl:<br>
+            POKE 53265,PEEK(53265)AND239<br>
+            Nun noch zum Wiedereinschalten des Bildschirmes:<br>
+            Mit gelöschten Bit 4:<br>
+            XXX0 XXXX<br>
+            OR 16:<br>
             0001 0000</p>
 
-        <p>Normaler Inhalt wieder hergestellt:<br />
-            XXXI XXXX<br />
-            In Basic ist das dann:<br />
+        <p>Normaler Inhalt wieder hergestellt:<br>
+            XXXI XXXX<br>
+            In Basic ist das dann:<br>
             POKE53265,PEEK(53265)OR16.</p>
 
-        <p>Zum Ausprobieren ein kleiner Dreizeiler:<br />
-            10 POKE 198,0:WAIT 198,1:POKE 53265,PEEK(53265)AND 239<br />
-            15 PRINTCHR$(147):POKE 211,15:POKE 214,10:SYS 58640:PRINT &ldquo;HALLO”<br />
+        <p>Zum Ausprobieren ein kleiner Dreizeiler:<br>
+            10 POKE 198,0:WAIT 198,1:POKE 53265,PEEK(53265)AND 239<br>
+            15 PRINTCHR$(147):POKE 211,15:POKE 214,10:SYS 58640:PRINT &ldquo;HALLO”<br>
             20 POKE 198,0:WAIT 198,1:POKE 53265,PEEK(53265)OR16</p>
 
         <p>Nach RUN wartet das Programm auf einen Tastendruck, auf den hin dann der Bildschirm »ausgeschaltet« wird. Ein weiterer Tastendruck macht das Bild dann wieder sichtbar.</p>
@@ -57,34 +57,34 @@
 
         <h2>Das sogenannte Scrollen: Bildverschiebung</h2>
 
-        <p>Wir kennen jetzt fast alle Register des VIC-II-Chips. Zwei Bytes, nämlich 53265 und 53270, bergen noch Geheimnisse, die wir nun lüften wollen. Zunächst die Bits 3. Sie enthalten normalerweise den Wert 1. Jetzt ändern wir das mal in 53265:<br />
+        <p>Wir kennen jetzt fast alle Register des VIC-II-Chips. Zwei Bytes, nämlich 53265 und 53270, bergen noch Geheimnisse, die wir nun lüften wollen. Zunächst die Bits 3. Sie enthalten normalerweise den Wert 1. Jetzt ändern wir das mal in 53265:<br>
             POKE 53265,PEEK(53265)AND247 (RETURN)</p>
 
-        <p>Haben Sie&rsquo;s bemerkt? Wenn nicht, dann zählen Sie mal die Zeilen auf dem Bildschirm nach: Es sind nur noch 24 zu sehen. Rückgängig können Sie das wieder machen durch Setzen des Bit 3:<br />
+        <p>Haben Sie&rsquo;s bemerkt? Wenn nicht, dann zählen Sie mal die Zeilen auf dem Bildschirm nach: Es sind nur noch 24 zu sehen. Rückgängig können Sie das wieder machen durch Setzen des Bit 3:<br>
             POKE 53265,PEEK(53265)OR8 (RETURN)</p>
 
-        <p>Probieren wir dasselbe mit der Speicherstelle 53270:<br />
-            POKE 53270,PEEK(53270)AND247 (RETURN)<br />
-            Unsere Kommandos sehen jetzt etwas merkwürdig aus und auch der Cursor. Wir haben nicht mehr 40 Spalten, sondern nur noch 38 zur Verfügung. Zurück in den Normalzustand:<br />
+        <p>Probieren wir dasselbe mit der Speicherstelle 53270:<br>
+            POKE 53270,PEEK(53270)AND247 (RETURN)<br>
+            Unsere Kommandos sehen jetzt etwas merkwürdig aus und auch der Cursor. Wir haben nicht mehr 40 Spalten, sondern nur noch 38 zur Verfügung. Zurück in den Normalzustand:<br>
             POKE 53270,PEEK(53270)OR8 (RETURN)</p>
 
         <p>Beim Eingeben dieser Zeile werden Sie bemerkt haben, daß trotzdem noch der ganze 40-Zeichen-Bereich zur Verfügung steht, nur sind die erste und letzte Spalte verdeckt. Der Rahmen ist breiter geworden und versteckt gewissermaßen den Rand des Bildschirmes.</p>
 
-        <p>Nun kommen wir zum Scrollen. Das englische Wort »scroll« heißt auf Deutsch etwa Rolle oder Schriftrolle. Wenn wir ein längeres Programm listen oder mit dem Cursor an den unteren Bildrand fahren, rollt der C 64 den Bildschirminhalt nach oben. Das ist ein zeilenweises Scrollen. Der VIC-II-Chip gestattet aber auch eine andere Art des Scrollens, die im englischen als »smooth scrolling«, etwa »fließendes« Scrollen bezeichnet wird. Wie Sie sich sicherlich erinnern, ist jedes Zeichen aus 8 Bytes zusammengesetzt. Während beim erstgenannten Scrollen alle 8 Bytes (also ein Zeichen) auf einmal nach oben springen, geht das beim fließenden Scrollen Byte für Byte. Dazu dienen die Bits 0 bis 2 der Register 53265 und 53270. Sehen wir uns das mal in Einzelschritten an. Der Maximalwert in den 3 Bits (0,1,2) kann 7 sein (binär 111). Alle anderen Bits müssen geschützt sein. Normalerweise steht in 53265 in den Bits 0 bis 2 der Wert 3 und an derselben Stelle in 53270 der Wert 0. Folgendes Kurzprogramm soll diese Werte mit jedem Tastendruck verändern:<br />
-            5 PRINT CHR$(147)CHR$(166)<br />
-            10 FOR I = 0 TO 7<br />
-            20 POKE 53265,(PEEK(53265)AND 248)OR I<br />
-            30 GETA$:IFA$ = &ldquo;"THEN30<br />
-            40 NEXTI<br />
+        <p>Nun kommen wir zum Scrollen. Das englische Wort »scroll« heißt auf Deutsch etwa Rolle oder Schriftrolle. Wenn wir ein längeres Programm listen oder mit dem Cursor an den unteren Bildrand fahren, rollt der C 64 den Bildschirminhalt nach oben. Das ist ein zeilenweises Scrollen. Der VIC-II-Chip gestattet aber auch eine andere Art des Scrollens, die im englischen als »smooth scrolling«, etwa »fließendes« Scrollen bezeichnet wird. Wie Sie sich sicherlich erinnern, ist jedes Zeichen aus 8 Bytes zusammengesetzt. Während beim erstgenannten Scrollen alle 8 Bytes (also ein Zeichen) auf einmal nach oben springen, geht das beim fließenden Scrollen Byte für Byte. Dazu dienen die Bits 0 bis 2 der Register 53265 und 53270. Sehen wir uns das mal in Einzelschritten an. Der Maximalwert in den 3 Bits (0,1,2) kann 7 sein (binär 111). Alle anderen Bits müssen geschützt sein. Normalerweise steht in 53265 in den Bits 0 bis 2 der Wert 3 und an derselben Stelle in 53270 der Wert 0. Folgendes Kurzprogramm soll diese Werte mit jedem Tastendruck verändern:<br>
+            5 PRINT CHR$(147)CHR$(166)<br>
+            10 FOR I = 0 TO 7<br>
+            20 POKE 53265,(PEEK(53265)AND 248)OR I<br>
+            30 GETA$:IFA$ = &ldquo;"THEN30<br>
+            40 NEXTI<br>
             50 POKE 53265,(PEEK(53265)AND 248)OR3</p>
 
-        <p>Wenn Sie dieses Programm starten, wandelt das Grafikzeichen bei jedem Tastendruck Byte für Byte herunter. Wenn Sie jetzt noch einfügen:<br />
-            7 POKE 53265,PEEK(53265)AND 247<br />
-            das war ja das Einführen des 24-Zeilen-Modus, dann ist das Grafikzeichen zu Anfang fast versteckt. Wir sollten dann aber auch noch den Normalzustand wiederherstellen am Programmende:<br />
+        <p>Wenn Sie dieses Programm starten, wandelt das Grafikzeichen bei jedem Tastendruck Byte für Byte herunter. Wenn Sie jetzt noch einfügen:<br>
+            7 POKE 53265,PEEK(53265)AND 247<br>
+            das war ja das Einführen des 24-Zeilen-Modus, dann ist das Grafikzeichen zu Anfang fast versteckt. Wir sollten dann aber auch noch den Normalzustand wiederherstellen am Programmende:<br>
             60 POKE 53265,PEEK(53265)OR8</p>
 
-        <p>Auf diese Weise geschieht das fließende Scrollen nach unten. Verändern wir Zeile 10:<br />
-            10 FOR I = 7 TO 0 STEP —1<br />
+        <p>Auf diese Weise geschieht das fließende Scrollen nach unten. Verändern wir Zeile 10:<br>
+            10 FOR I = 7 TO 0 STEP —1<br>
             dann erfolgt Scrollen nach oben.</p>
 
         <p>Das gleiche Programm können wir mit kleinen Änderungen für horizontales Scrollen verwenden. Wir müssen nur überall dort, wo 53265 steht, jetzt 53270 und in Zeile 50 anstelle von OR3 jetzt OR0 einsetzen. Wenn Sie Zeile 10 mit der Rückwärtsschleife belassen haben, scrollt der Bildschirminhalt nach links. Ändern Sie dagegen Zeile 10 wieder zur ursprünglichen Vorwärtsschleife, dann erfolgt ein Scrollen nach rechts. Sie werden jetzt sagen, daß das alles ja ganz nett ist, aber was kann man damit tun? Damit kann man Laufschriften erzeugen, die in beliebiger Richtung über den Bildschirm sausen oder schleichen — je nachdem. Leider, leider kommen wir hier langsam aber sicher an die Grenzen von Basic. Denn jetzt taucht ein Problem auf, dessen Lösung — in Basic als auch in Maschinensprache — gleich ein zweites nach sich zieht. Sehen wir uns zunächst Problem Nummer 1 an:</p>
@@ -95,25 +95,25 @@
             <li>im Versteck (am Rand) ein nächstes Zeichen parat liegt.</li>
         </ol>
 
-        <p>Dazu können wir uns zum Beispiel des ohnehin schon eingebauten Zeilen-Scrolls bedienen, wie im nachfolgenden Programm:<br />
-            10 POKE 53265,PEEK(53265)AND 247<br />
-            20 PRINTCHR$(147):FOR I = 1 TO 24:PRINTCHR$(17);:NEXT I<br />
-            30 POKE 53265,(PEEK(53265)AND 248)OR7<br />
-            40 PRINT"SCROLLING NACH OBEN”<br />
-            50 FORI = 6TO0STEP-1<br />
-            60 POKE53265,(PEEK(53265)AND-248)OR I:FORJ=1TO 50:NEXT J<br />
+        <p>Dazu können wir uns zum Beispiel des ohnehin schon eingebauten Zeilen-Scrolls bedienen, wie im nachfolgenden Programm:<br>
+            10 POKE 53265,PEEK(53265)AND 247<br>
+            20 PRINTCHR$(147):FOR I = 1 TO 24:PRINTCHR$(17);:NEXT I<br>
+            30 POKE 53265,(PEEK(53265)AND 248)OR7<br>
+            40 PRINT"SCROLLING NACH OBEN”<br>
+            50 FORI = 6TO0STEP-1<br>
+            60 POKE53265,(PEEK(53265)AND-248)OR I:FORJ=1TO 50:NEXT J<br>
             70 NEXTI:GOTO30</p>
 
         <p>Wenn Sie dieses Programm gestartet haben, können Sie mit RUN/STOP und RESTORE den Normalzustand wiederherstellen. Haben Sie etwas bemerkt? Ein Flackern des Bildes trat auf. Das ist das zweite Problem, auf das wir gleich kommen werden.</p>
 
-        <p>Ein Beispiel für das horizontale Scrollen gibt das Programm von H. Gehrmann in Happy-Computer, Ausgabe 4/84, Seite 108f. H. Gehrmann hat es geschafft, in Basic tatsächlich fließendes Scrollen ohne Bildschirmflackern zu erzeugen. In Zeile 36 seines Programms ist ein Teil seiner Lösung für Problem Nummer 2 zu finden. Dort steht:<br />
+        <p>Ein Beispiel für das horizontale Scrollen gibt das Programm von H. Gehrmann in Happy-Computer, Ausgabe 4/84, Seite 108f. H. Gehrmann hat es geschafft, in Basic tatsächlich fließendes Scrollen ohne Bildschirmflackern zu erzeugen. In Zeile 36 seines Programms ist ein Teil seiner Lösung für Problem Nummer 2 zu finden. Dort steht:<br>
             36 IF PEEK(53265) &lt; > 155 THEN 36</p>
 
-        <p>Erst danach druckt er an den oberen Bildschirmrand die zu scrollende Textzeile und scrollt dann, wie wir es bisher kennengelernt haben. Was ist denn nun dieses zweite Problem? Sehen wir dazu zunächst einmal in die Speicherstelle 53265 hinein. Geben Sie (nach NEW) mal die folgende Textzeile ein:<br />
+        <p>Erst danach druckt er an den oberen Bildschirmrand die zu scrollende Textzeile und scrollt dann, wie wir es bisher kennengelernt haben. Was ist denn nun dieses zweite Problem? Sehen wir dazu zunächst einmal in die Speicherstelle 53265 hinein. Geben Sie (nach NEW) mal die folgende Textzeile ein:<br>
             10 PRINT PEEK(53265):GOTO10</p>
 
-        <p>Nach RUN sehen Sie eine Reihe aus 27 und ab und zu taucht 155 auf. Wenn Sie jetzt mit RUN/STOP und RESTORE dieses Testprogramm angehalten haben, sehen wir uns diese Zahlen mal binär an:<br />
-            27 = binär 0001 1011<br />
+        <p>Nach RUN sehen Sie eine Reihe aus 27 und ab und zu taucht 155 auf. Wenn Sie jetzt mit RUN/STOP und RESTORE dieses Testprogramm angehalten haben, sehen wir uns diese Zahlen mal binär an:<br>
+            27 = binär 0001 1011<br>
             155 = binär 1001 1011</p>
 
         <p>Alle Bits kennen wir schon, außer Bit 7, welches sich verändert hat. Es handelt sich um das msb des Rasterzeilen-Registers. Das LSB davon findet sich in Speicherzelle 53266. Wir haben es hier mit einer 9stelligen Binärzahl zu tun, von der 8 Stellen (die Bits 0 bis 7) in 53266 und die 9. Stelle als Bit 7 in 53265 zu finden sind. Gezählt werden ständig in diesen neun Bits die Rasterzeilen. Sie werden sich fragen, was das soll, hier ist die Antwort:</p>
@@ -182,75 +182,75 @@
 
         <p>X1 / (X1' - XU) = 319 / (XO - XU)</p>
 
-        <p>Das einzige in dieser Formel, was wir nicht kennen (X1' ist ja unsere Eingabe, die auf unser eigenes Koordinatensystem bezogen ist) ist nun X1, also die X-Koordinate unseres Punktes P1 im Bildschirmsystem. Man kann diese Verhältnisgleichung nach X1 auflösen:<br />
+        <p>Das einzige in dieser Formel, was wir nicht kennen (X1' ist ja unsere Eingabe, die auf unser eigenes Koordinatensystem bezogen ist) ist nun X1, also die X-Koordinate unseres Punktes P1 im Bildschirmsystem. Man kann diese Verhältnisgleichung nach X1 auflösen:<br>
             X1 = (X1' - XU)/(XO - XU)*319</p>
 
         <p>So ähnlich geht das auch bei der Y-Koordinate. Es ist nur zu beachten, daß im Bildschirmsystem die Y-Achse nach unten, in unserem System aber nach oben zeigt. Deswegen ist die Entfernung von YO nach Y1': YO-Y1'. Das Verhältnis hat hier also die Formel:</p>
 
         <p>Y1 / (YO - Y1') = 199 / (YO - YU)</p>
 
-        <p>Nach Y1 aufgelöst ergibt sich:<br />
+        <p>Nach Y1 aufgelöst ergibt sich:<br>
             Y1 = (YO-Y1')/(YO-YU)*199</p>
 
-        <p>Es empfiehlt sich, diese beiden sogenannten Transformationsgleichungen als Basicfunktionen zu definieren:<br />
-            DEFFNX(X)=(X-XU)/(XO-XU)*319<br />
+        <p>Es empfiehlt sich, diese beiden sogenannten Transformationsgleichungen als Basicfunktionen zu definieren:<br>
+            DEFFNX(X)=(X-XU)/(XO-XU)*319<br>
             DEFFNY(Y)=(YO-Y)/(YO-YU)*199</p>
 
-        <p>Nun können wir ein kleines Aufrufprogramm schreiben, welches sich wieder der Unterprogrammsammlung aus Folge vier bedient. Laden Sie also zuerst (die hoffentlich damals gespeicherten!) Unterprogramme und tippen Sie dann ein:<br />
-            5 POKE 52,92:POKE 56,92<br />
-            100 DEFFNX(X)=(X-XU)/(XO-XU)*319<br />
-            110 DEFFNY(Y) = (YO-Y)/)YO-YU)*199<br />
-            120 REM +++++ BEISPIELFUNKTION +++++<br />
-            140 DEFFNA(X) = SIN(X)<br />
-            150 PRINTCHR$(147)CHR$(17): INPUT"XU,XO,YU,YO = &ldquo;;XU,XO,YU,Y0<br />
-            160 INPUT"ZEICHEN- UND HINTERGRUNDFARBE = &lsquo;&rsquo;;F1,F2<br />
-            170 GOSUB 50100:FOR I = XU TO XO STEP(XO-XU)/319<br />
-            180 X = FNX(I):Y=FNY(FNA(I)):GOSUB 50040<br />
-            190 NEXT I:X1 = FNX(XU):Y1 = FNY(O):X2 = FNX(XO):Y2=Y1<br />
-            GOSBUB 50060<br />
-            195 X1 = FNX(O):Y1 = FNY(YU):X2 = X1:Y2 = FNY(YO):GOSUB 50060<br />
-            200 GET A$:IF A$=&rdquo;&ldquo;THEN 200<br />
-            210 GOSUB 50030<br />
+        <p>Nun können wir ein kleines Aufrufprogramm schreiben, welches sich wieder der Unterprogrammsammlung aus Folge vier bedient. Laden Sie also zuerst (die hoffentlich damals gespeicherten!) Unterprogramme und tippen Sie dann ein:<br>
+            5 POKE 52,92:POKE 56,92<br>
+            100 DEFFNX(X)=(X-XU)/(XO-XU)*319<br>
+            110 DEFFNY(Y) = (YO-Y)/)YO-YU)*199<br>
+            120 REM +++++ BEISPIELFUNKTION +++++<br>
+            140 DEFFNA(X) = SIN(X)<br>
+            150 PRINTCHR$(147)CHR$(17): INPUT"XU,XO,YU,YO = &ldquo;;XU,XO,YU,Y0<br>
+            160 INPUT"ZEICHEN- UND HINTERGRUNDFARBE = &lsquo;&rsquo;;F1,F2<br>
+            170 GOSUB 50100:FOR I = XU TO XO STEP(XO-XU)/319<br>
+            180 X = FNX(I):Y=FNY(FNA(I)):GOSUB 50040<br>
+            190 NEXT I:X1 = FNX(XU):Y1 = FNY(O):X2 = FNX(XO):Y2=Y1<br>
+            GOSBUB 50060<br>
+            195 X1 = FNX(O):Y1 = FNY(YU):X2 = X1:Y2 = FNY(YO):GOSUB 50060<br>
+            200 GET A$:IF A$=&rdquo;&ldquo;THEN 200<br>
+            210 GOSUB 50030<br>
             220 END</p>
 
-        <p>Nach RUN und mit der erforderlichen Geduld (kennen Sie ja schon) zeichnet der Computer eine ganz normale Sinuskurve in das von Ihnen durch XU,XO,YU und YO angegebene Koordinatensystem. In die Zeile 140 können Sie jetzt jede beliebige Funktion eingeben. Allerdings ist es unglücklich, daß man jedesmal das Programm ändern muß, nämlich Zeile 140, wenn man eine neue Funktion sehen will. Es gibt da einen Trick, der mit dem Tastaturpuffer arbeitet (Speicherstellen 631-640) und den ich Ihnen nun zeigen möchte. Zunächst fügen wir noch eine Zeile 130 ein:<br />
+        <p>Nach RUN und mit der erforderlichen Geduld (kennen Sie ja schon) zeichnet der Computer eine ganz normale Sinuskurve in das von Ihnen durch XU,XO,YU und YO angegebene Koordinatensystem. In die Zeile 140 können Sie jetzt jede beliebige Funktion eingeben. Allerdings ist es unglücklich, daß man jedesmal das Programm ändern muß, nämlich Zeile 140, wenn man eine neue Funktion sehen will. Es gibt da einen Trick, der mit dem Tastaturpuffer arbeitet (Speicherstellen 631-640) und den ich Ihnen nun zeigen möchte. Zunächst fügen wir noch eine Zeile 130 ein:<br>
             130 F$ = &ldquo;SIN(X)&rdquo;</p>
 
-        <p>Wenn das Programm startet, soll man zunächst einmal erfahren, welche Funktion überhaupt in Zeile 140 steht. Deswegen also:<br />
-            10 PRINTCHR$(147):POKE211,5:POKE214,10:SYS58640:<br />
-            PRINT"FUNKTION IM PROGRAMM:”<br />
+        <p>Wenn das Programm startet, soll man zunächst einmal erfahren, welche Funktion überhaupt in Zeile 140 steht. Deswegen also:<br>
+            10 PRINTCHR$(147):POKE211,5:POKE214,10:SYS58640:<br>
+            PRINT"FUNKTION IM PROGRAMM:”<br>
             20 PRINT:PRINTTAB(3)&ldquo;Y= ”F$</p>
 
-        <p>Wenn wir das so laufen lassen, wird keine Funktion erscheinen, weil diese dem Computer erst in Zeile 130 mitgeteilt wird. Der Computer muß also vorher nachsehen, als was F$ definiert ist. Deswegen führen wir ein:<br />
-            15 K=1:GOSUB 130:K = 0<br />
-            und<br />
+        <p>Wenn wir das so laufen lassen, wird keine Funktion erscheinen, weil diese dem Computer erst in Zeile 130 mitgeteilt wird. Der Computer muß also vorher nachsehen, als was F$ definiert ist. Deswegen führen wir ein:<br>
+            15 K=1:GOSUB 130:K = 0<br>
+            und<br>
             145 IFK=1 THEN RETURN</p>
 
-        <p>Jetzt druckt das Programm uns die Funktion aus. Als nächstes soll der Computer erfahren, ob die Funktion zu verändern ist:<br />
-            30 PRINT:PRINTTAB(5)CHR$(18)”A” CHR$(146)&ldquo;LTE ODER”<br />
-            CHR$(18)"N"CHR$(146)"EUE FUNKTION?”<br />
+        <p>Jetzt druckt das Programm uns die Funktion aus. Als nächstes soll der Computer erfahren, ob die Funktion zu verändern ist:<br>
+            30 PRINT:PRINTTAB(5)CHR$(18)”A” CHR$(146)&ldquo;LTE ODER”<br>
+            CHR$(18)"N"CHR$(146)"EUE FUNKTION?”<br>
             35 GET A$:IFA$&lt;>"A&rdquo; AND A$&lt;>&ldquo;N&rdquo; THEN 35</p>
 
-        <p>Wenn die alte Funktion gewählt wurde, dann kann alles wie bisher ablaufen:<br />
+        <p>Wenn die alte Funktion gewählt wurde, dann kann alles wie bisher ablaufen:<br>
             40 IF A$=&ldquo;A&rdquo; THEN 100</p>
 
-        <p>Ansonsten wollen wir jetzt unseren Trick anwenden. Zunächst das Eingeben der neuen Funktion:<br />
-            45 PRINT:PRINTTAB (3);:INPUT &ldquo;Y=&rdquo;;F$<br />
-            Dann:<br />
-            50 PRINTCHR$(147)CHR$(17)CHR$ (17)” 130F$ = &ldquo;CHR$(34)F$CHR$(34)<br />
-            55 PRINT”140DEFFNA(X) = ”F$<br />
-            60 PRINT"RUN 100&rdquo;:PRINTCHR$ (19);<br />
+        <p>Ansonsten wollen wir jetzt unseren Trick anwenden. Zunächst das Eingeben der neuen Funktion:<br>
+            45 PRINT:PRINTTAB (3);:INPUT &ldquo;Y=&rdquo;;F$<br>
+            Dann:<br>
+            50 PRINTCHR$(147)CHR$(17)CHR$ (17)” 130F$ = &ldquo;CHR$(34)F$CHR$(34)<br>
+            55 PRINT”140DEFFNA(X) = ”F$<br>
+            60 PRINT"RUN 100&rdquo;:PRINTCHR$ (19);<br>
             65 POKE 631,13:POKE 632,13:POKE 633,13:POKE 198,3:END</p>
 
-        <p>Tippen Sie’s ein und fügen Sie in Zeile 100 noch ein STOP ein, damit Sie sehen können, was mit diesen Zeilen passiert. Sie sehen, daß der Bildschirm zunächst frei gemacht wird (CHR$(147) in Zeile 50) und dann zwei Programmzeilen 130 und 140 gedruckt werden mit der neuen Funktion, danach noch die RUN-Anweisung. Der Cursor springt dann wieder in die Ecke links oben (CHR$(19) in Zeile 60). Jetzt arbeitet unser Computer den Inhalt des Tastaturpuffers ab, der aus drei RETURNs (die 13) besteht. Die Anzahl 3 muß in Speicherstelle 198 festgehalten sein. Die Tatsache, daß der Tastaturpuffer abgearbeitet wird, haben wir dem END zu verdanken. Weil aber ein RETURN nach RUN 100 folgt, startet das Programm sofort wieder selbständig ab Zeile 100. Wenn Sie jetzt mal Zeile 130 und 140 listen lassen, steht dort die neue Funktion. Weil sie sich im Programmablauf störend auswirken, sollen die zu druckenden Zeilen unsichtbar werden. Deswegen fügen wir in Zeile 45 noch an:<br />
-            :POKE 646,6<br />
-            und ab Zeile 100 soll wieder sichtbar werden, was zu drucken ist, weshalb wir dort anfügen:<br />
+        <p>Tippen Sie’s ein und fügen Sie in Zeile 100 noch ein STOP ein, damit Sie sehen können, was mit diesen Zeilen passiert. Sie sehen, daß der Bildschirm zunächst frei gemacht wird (CHR$(147) in Zeile 50) und dann zwei Programmzeilen 130 und 140 gedruckt werden mit der neuen Funktion, danach noch die RUN-Anweisung. Der Cursor springt dann wieder in die Ecke links oben (CHR$(19) in Zeile 60). Jetzt arbeitet unser Computer den Inhalt des Tastaturpuffers ab, der aus drei RETURNs (die 13) besteht. Die Anzahl 3 muß in Speicherstelle 198 festgehalten sein. Die Tatsache, daß der Tastaturpuffer abgearbeitet wird, haben wir dem END zu verdanken. Weil aber ein RETURN nach RUN 100 folgt, startet das Programm sofort wieder selbständig ab Zeile 100. Wenn Sie jetzt mal Zeile 130 und 140 listen lassen, steht dort die neue Funktion. Weil sie sich im Programmablauf störend auswirken, sollen die zu druckenden Zeilen unsichtbar werden. Deswegen fügen wir in Zeile 45 noch an:<br>
+            :POKE 646,6<br>
+            und ab Zeile 100 soll wieder sichtbar werden, was zu drucken ist, weshalb wir dort anfügen:<br>
             :PRINTCHR$(147):POKE 646,14</p>
 
         <p>Dieser Trick ist sehr vielseitig anwendbar. Man muß nur beachten, daß durch das RUN alle Variablen, die bis dahin definiert wurden, gelöscht werden. Das ist ja auch sinnvoll, weil wir das Basicprogramm verändert haben und so unter Umständen Variable überschrieben wurden. Sollte es nicht möglich sein, alle Variablen nach dem Neustart zu definieren, dann läßt sich ein ähnlicher Kniff anwenden, wie wir ihn in Zeile 15 verwendet haben. Probieren Sie das Programm mal mit folgenden Eingaben:</p>
 
-        <p>Y= SIN(X) mit XU = -1,XO = 10,YU = -2,YO = 2<br />
-            oder Y=EXP(-X/10)*COS(X) mit XU = -18,XO = 10,YU=-5,YO = 5 oder Y=2*SIN(X) + SIN(2*X + 2) mit XU = -6,XO = 15,YU = -3,YO = 3<br />
+        <p>Y= SIN(X) mit XU = -1,XO = 10,YU = -2,YO = 2<br>
+            oder Y=EXP(-X/10)*COS(X) mit XU = -18,XO = 10,YU=-5,YO = 5 oder Y=2*SIN(X) + SIN(2*X + 2) mit XU = -6,XO = 15,YU = -3,YO = 3<br>
             Ihrer Phantasie sind keine Grenzen gesetzt.</p>
 
         <h2>Flacher Raum: 3D-Grafik, wie funktioniert das?</h2>
@@ -312,23 +312,23 @@
             <figcaption>Bild 11. Transformation von 3D nach 2D</figcaption>
 		</figure>
 
-        <p>Wir haben hier einfach so getan, als gäbe es die Z-Achse gar nicht, sondern der Punkt P wäre einfach um einen Wert ΔX nach rechts und einen weiteren Wert ΔY nach oben geschoben worden. Die Koordinaten von P im ebenen System sind dann<br />
-            X1 = X1' + ΔX<br />
-            Y1 = Y1' + ΔY<br />
-            wie man auch aus der Zeichnung sehen kann. Wie lang AX ist, kann man aus dem Dreieck ABC berechnen. Mathematisch Versierte werden mir zustimmen, daß<br />
-            COS(α) = ΔX/Z1<br />
-            ist und im Dreieck DEF gilt<br />
-            SIN(α) = ΔY/Z1<br />
-            Daraus ergibt sich dann:<br />
-            ΔX = Z1*COS(α)<br />
+        <p>Wir haben hier einfach so getan, als gäbe es die Z-Achse gar nicht, sondern der Punkt P wäre einfach um einen Wert ΔX nach rechts und einen weiteren Wert ΔY nach oben geschoben worden. Die Koordinaten von P im ebenen System sind dann<br>
+            X1 = X1' + ΔX<br>
+            Y1 = Y1' + ΔY<br>
+            wie man auch aus der Zeichnung sehen kann. Wie lang AX ist, kann man aus dem Dreieck ABC berechnen. Mathematisch Versierte werden mir zustimmen, daß<br>
+            COS(α) = ΔX/Z1<br>
+            ist und im Dreieck DEF gilt<br>
+            SIN(α) = ΔY/Z1<br>
+            Daraus ergibt sich dann:<br>
+            ΔX = Z1*COS(α)<br>
             ΔY = Z1*SIN(α)</p>
 
-        <p>Weil außerdem noch nach unserer anfänglichen Vereinbarung a = 45° beträgt und die Z-Achse auf die Hälfte verkürzt ist und weil schließlich<br />
-            SIN(45°) = COS(45°) = 1/√2 ist, ergibt sich:<br />
-            ΔX = Z1'/(2*SQR(2))<br />
+        <p>Weil außerdem noch nach unserer anfänglichen Vereinbarung a = 45° beträgt und die Z-Achse auf die Hälfte verkürzt ist und weil schließlich<br>
+            SIN(45°) = COS(45°) = 1/√2 ist, ergibt sich:<br>
+            ΔX = Z1'/(2*SQR(2))<br>
             ΔY = Z1'/(2*SQR(2))</p>
 
-        <p>Beide sind also gleich und für unser eigenes Koordinatensystem hat der Punkt P die Koordinaten:<br/>X1 = X1' + Z1'/(2*SQR(2))<br />
+        <p>Beide sind also gleich und für unser eigenes Koordinatensystem hat der Punkt P die Koordinaten:<br/>X1 = X1' + Z1'/(2*SQR(2))<br>
                 Y1 = Y1' + Z1'/(2*SQR(2))</p>
 
         <p>Damit ist unser Problem gelöst. Denn X1', Y1' und Z1' sind die vorgegebenen Koordinaten und X1,Y1 können jetzt mit unseren Transformationen X = FNX(X1),Y=FNY(Y1) in Bildschirmkoordinaten umgerechnet werden. Wir verschachteln nun zwei Schleifen ineinander wie in Bild 12 und lassen uns damit Kurve für Kurve zeichnen.</p>
@@ -340,12 +340,12 @@
 
         <p>Nun wollen wir auch für die 3D-Grafik ein Programm entwerfen. Tippen Sie also NEW ein, laden Sie die Grafik-Unterprogramme und erwecken Sie unser 3D-Dornröschen mit dem nachfolgenden Aufrufprogramm.</p>
 
-        <p>5 POKE 52,92:POKE 56,92<br />
-            100 DEFFNX(X) = (X-XU)/(XO-XU) *319<br />
-            105 DEFFNY(Y) = (YO-Y)/(YO-YU) *199<br />
-            110 DEFFNZ(Z) = Z/(2*SQR(2))<br />
-            140 DEFFNA(X) = SIN(Z)*COS(X)<br />
-            150 PRINTCHR$(147)CHR$(17)CHR$ (18)&ldquo;UNSER SYSTEM:"CHR$(146): PRINT:PRINT<br />
+        <p>5 POKE 52,92:POKE 56,92<br>
+            100 DEFFNX(X) = (X-XU)/(XO-XU) *319<br>
+            105 DEFFNY(Y) = (YO-Y)/(YO-YU) *199<br>
+            110 DEFFNZ(Z) = Z/(2*SQR(2))<br>
+            140 DEFFNA(X) = SIN(Z)*COS(X)<br>
+            150 PRINTCHR$(147)CHR$(17)CHR$ (18)&ldquo;UNSER SYSTEM:"CHR$(146): PRINT:PRINT<br>
             160 INPUT"XU,XO = &rdquo;;XU,XO:INPUT ”YU,YO = ”;YU,YO</p>
 
         <p>Jetzt wird es ein bißchen kompliziert, weil wir darauf achten müssen, daß die Z-Achse noch auf dem Bildschirm paßt. Wir lassen uns berechnen und anzeigen, wie groß ZO höchstens sein darf und wie klein ZU:<br>
@@ -362,21 +362,21 @@
                 <p>Dann lassen wir uns die Freiheit der Farbenwahl:<br>
                     180 PRINT:INPUT"ZEICHEN- UND HINTERGRUNDFARBE = &ldquo;;F1,F2</p>
 
-                <p>Nach dem Anschalten der Hochauflösung zeichnen wir die Achsen:<br />
-                    190 GOSUB 50100:X1 = FNX(XU):Y1 = FNY(0):X2 = FNX(XO):Y2 =Y1: GOSUB 50060<br />
-                    192 XI = FNX(O):Y1 = FNY(YU):X2 = X1:Y2 = FNY(YO):GOSUB 50060<br />
+                <p>Nach dem Anschalten der Hochauflösung zeichnen wir die Achsen:<br>
+                    190 GOSUB 50100:X1 = FNX(XU):Y1 = FNY(0):X2 = FNX(XO):Y2 =Y1: GOSUB 50060<br>
+                    192 XI = FNX(O):Y1 = FNY(YU):X2 = X1:Y2 = FNY(YO):GOSUB 50060<br>
                     194 X1 = FNX(Z2):Y1 = FNY(Z2):X2 = FNX(Zl):Y2 = FNY(Z1):GOSUB 50060</p>
 
-                <p>Wir könnten jetzt mit den beiden ineinandergeschachtelten Schleifen beginnen, wenn es da nicht noch das Problem der Schrittweite in den Schleifen gäbe. Die Schrittweite von X haben wir schon im 2D-Programm verwendet:<br />
+                <p>Wir könnten jetzt mit den beiden ineinandergeschachtelten Schleifen beginnen, wenn es da nicht noch das Problem der Schrittweite in den Schleifen gäbe. Die Schrittweite von X haben wir schon im 2D-Programm verwendet:<br>
                     200 DX = (XO-XU)/319</p>
 
-                <p>Die Schrittweite von Z ist nicht so einfach zu fassen, weil man ja, je nach Kurvenart, mal weitere und mal engere Schritte machen muß. Deswegen halten wir diese Schrittweite veränderlich und lassen uns vorher nochmal danach fragen:<br />
-                    202 DZ = A*(Z1-Z2)/(FNX(Z1)-FNX (Z2))<br />
+                <p>Die Schrittweite von Z ist nicht so einfach zu fassen, weil man ja, je nach Kurvenart, mal weitere und mal engere Schritte machen muß. Deswegen halten wir diese Schrittweite veränderlich und lassen uns vorher nochmal danach fragen:<br>
+                    202 DZ = A*(Z1-Z2)/(FNX(Z1)-FNX (Z2))<br>
                     182 INPUT"SCHRITTWEITE VON Z(CA.8) = &ldquo;;A:PRINT</p>
 
                 <p>Mit Zeile 202 hätten wir bei A = 1 die selbe Punktauflösung wie in der X-Schleife. Das ist meistens zu eng und A sollte deshalb Werte um etwa 8 haben.</p>
 
-                <p>Es ist ganz gut, sich auch die Freiheit offenzulassen, von wo bis wo unsere Raumfläche zu zeichnen ist. Es sieht einfach besser aus, wenn sie nicht bis zum Rand des Bildschirms reicht. Die Schleifen sollten also nicht von ZU bis ZO und von XU bis XO reichen, sondern von den Anfangswerten ZA beziehungsweise XA bis zu den Endwerten ZE beziehungsweise XE. Auch diese Werte müssen abgefragt werden:<br />
+                <p>Es ist ganz gut, sich auch die Freiheit offenzulassen, von wo bis wo unsere Raumfläche zu zeichnen ist. Es sieht einfach besser aus, wenn sie nicht bis zum Rand des Bildschirms reicht. Die Schleifen sollten also nicht von ZU bis ZO und von XU bis XO reichen, sondern von den Anfangswerten ZA beziehungsweise XA bis zu den Endwerten ZE beziehungsweise XE. Auch diese Werte müssen abgefragt werden:<br>
                     184 PRINTCHR$(18)&ldquo;UNSERE ZEICHNUNG:"CHR$(146):PRINT<br>
                     185 INPUT"X-BEREICH XA,XE = &rdquo;;XA,XE<br>
                     186 INPUT"Z-BEREICH ZA,ZE = &ldquo;;ZA,ZE<br>
@@ -387,12 +387,12 @@
                     240 NEXT XX<br>
                     250 NEXT Z</p>
 
-                <p>Abschließend muß wieder zurückgeschaltet werden auf den Normalbildschirm:<br />
-                    300 GET A$:IF A$ = &ldquo;&rdquo; THEN 300<br />
-                    310 GOSUB 50030<br />
+                <p>Abschließend muß wieder zurückgeschaltet werden auf den Normalbildschirm:<br>
+                    300 GET A$:IF A$ = &ldquo;&rdquo; THEN 300<br>
+                    310 GOSUB 50030<br>
                     320 END</p>
 
-                <p>So! Nun können Sie das ganze vorsichtshalber abspeichern und dann mit RUN starten. Aber fassen Sie sich in Geduld. Bis das Bild komplett ist, vergehen zirka 21 Minuten. Probieren Sie mal die Eingaben:<br />
+                <p>So! Nun können Sie das ganze vorsichtshalber abspeichern und dann mit RUN starten. Aber fassen Sie sich in Geduld. Bis das Bild komplett ist, vergehen zirka 21 Minuten. Probieren Sie mal die Eingaben:<br>
                     XU=-1,XO = 6,YU=-2,YO = 6,ZU=-1, ZO = 6, Schrittweite von Z = 8, XA = 0, XE = 4,ZA = 0,ZE = 4.</p>
 
                 <p>Es wird Ihnen sicherlich aufgefallen sein, daß ich zu Beginn des Programms den gleichen Zeilennummernabstand wie beim 2D-Programm verwendet habe. Sie können, genauso wie dort, nun noch unseren Trick zur Funktionseingabe einsetzen. Wenn Sie das getan haben, ist unser 3D-Programm komplett und Sie können nach Herzenslust Funktionen ausprobieren. Allerdings kommt es zum Erreichen einer besonders schön aussehenden Raumfläche nur dann, wenn Sie die ganzen Eingaben zu Beginn des Programms wohlüberlegt machen oder aber mehrere Male ausprobieren.</p>

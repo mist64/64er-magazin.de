@@ -36,31 +36,31 @@
 
         <h2>&hellip; und so wird’s gemacht</h2>
 
-        <p>Anhand eines Beispiels soll das noch einmal gezeigt werden:<br />
-            Inhalt der ersten Elemente von IN$:<br />
-            IN$(1) =»1&hellip; MEIER«<br />
-            IN$(2) =»2&hellip; MUELLER«<br />
-            IN$(3) =»3&hellip; ANDERMANN«<br />
+        <p>Anhand eines Beispiels soll das noch einmal gezeigt werden:<br>
+            Inhalt der ersten Elemente von IN$:<br>
+            IN$(1) =»1&hellip; MEIER«<br>
+            IN$(2) =»2&hellip; MUELLER«<br>
+            IN$(3) =»3&hellip; ANDERMANN«<br>
             IN$(4) =»*«</p>
 
-        <p>Gesuchter Name = Mueller, er steht in der Variablen N$ (Zeile 3060)<br />
-            3060 INPUT"NACHNAME";N$<br />
+        <p>Gesuchter Name = Mueller, er steht in der Variablen N$ (Zeile 3060)<br>
+            3060 INPUT"NACHNAME";N$<br>
             3070 N = LEN(N$) Länge des eingegebenen Namens</p>
 
-        <p>Die folgenden Programmzeilen suchen den Namen.<br />
-            3090 FOR I = 1 TO DATEIENDE<br />
-            3100 IF IN$(I) = ”*” THEN 3120<br />
-            3110 IF MID$(IN$(I),5,N)=N$ THEN gefunden<br />
+        <p>Die folgenden Programmzeilen suchen den Namen.<br>
+            3090 FOR I = 1 TO DATEIENDE<br>
+            3100 IF IN$(I) = ”*” THEN 3120<br>
+            3110 IF MID$(IN$(I),5,N)=N$ THEN gefunden<br>
             3120 NEXT I</p>
 
         <p>Zur Zeile 3100 kommen wir später noch. Angenommen, wir haben nicht den ganzen Namen eingegeben, sondern lediglich die ersten drei Buchstaben MUE. Dann werden in der Variable IN$ nur die 5.,6. und 7. Zeichen, das entspricht den ersten drei Buchstaben eines jeden Namens, verglichen. Dafür sorgt die Zeile 3070 und in 3110 das »,N« als letzter Parameter der MID$-Funktion. Somit könnte mit dieser Eingabe auch der Name MUECKE gefunden werden. Im Extremfall, wenn nichts eingegeben, also RETURN gedrückt wird, findet diese Funktion jeden Namen. Das heißt, man kann mit der Suchfunktion sich nicht nur einzelne Adressen holen, sondern auch die gesamte Datei, oder zum Beispiel alle Adressen, die mit M anfangen. Damit würde der Menüpunkt »G = Anzeigen gesamte Datei« überflüssig. Ich habe ihn nicht entfernt, da hier unabhängig von der sequentiellen Datei alle Datensätze direkt von der Diskette aus der relativen Datei gelesen werden. Man könnte diese Funktion benutzen, um eine eventuell (zum Beispiel durch Stromausfall) teilweise zerstörte sequentielle Datei zu reorganisieren.</p>
 
         <p>Die Zeile 3100 wird dann verständlich, wenn man sich den Programmteil »Neue Datei anlegen« ab 11000 anschaut. In den Zeilen 11320 bis 11350 wird jedes Element der Variablen IN$ mit einem »*« vorbesetzt. Der Stern kennzeichnet einen leeren Datensatz. Damit kommen wir auch gleich zum Programmteil »Löschen Datensatz« ab 4000. Auch dort wird ein zu löschender Datensatz in IN$ mit einem »*« gekennzeichnet und zusätzlich der entsprechende Datensatz auf der Diskette mit Hex FF (= Dezimal 255 = das Zeichen PI). Auch das wollen wir uns anhand eines kleinen Beispiels näher betrachten:</p>
 
-        <p>Wir wollen den Herrn Mueller aus unserer Datei entfernen. Nachdem wir seine Adresse mit der Suchfunktion gefunden haben, geben wir ein »L« für Löschen ein. Danach springt das Programm nach 4000, schreibt in die Variable IN$ das »*« , überschreibt den Datensatz auf der Diskette mit CHR$(255)(=PI), löscht die einzelnen Datensatzfelder (NN$, NV$, und so weiter) und springt zurück nach 3350. Die Variable IN$ sieht jetzt so aus:<br />
-            IN$(1) =»1&hellip; MAIER«<br />
-            IN$(2) =»*«<br />
-            IN$(3) =»3&hellip; ANDERMANN«»<br />
+        <p>Wir wollen den Herrn Mueller aus unserer Datei entfernen. Nachdem wir seine Adresse mit der Suchfunktion gefunden haben, geben wir ein »L« für Löschen ein. Danach springt das Programm nach 4000, schreibt in die Variable IN$ das »*« , überschreibt den Datensatz auf der Diskette mit CHR$(255)(=PI), löscht die einzelnen Datensatzfelder (NN$, NV$, und so weiter) und springt zurück nach 3350. Die Variable IN$ sieht jetzt so aus:<br>
+            IN$(1) =»1&hellip; MAIER«<br>
+            IN$(2) =»*«<br>
+            IN$(3) =»3&hellip; ANDERMANN«»<br>
             IN$(4) =»*«</p>
 
         <p>Der zweite Datensatz ist nun mit »*« als gelöscht und leer gekennzeichnet. Das bedeutet auch, daß er wieder mit einer neuen Adresse belegt werden kann. Sehen wir uns dazu den Programmteil »Neueingabe Adresse« ab 1800 an.</p>
@@ -73,11 +73,11 @@
 
         <p>Es könnte sein, daß Ihnen die Dateistruktur nicht gefällt. Zum Beispiel möchten Sie die Länge der Datenfelder ändern. Das dürfen Sie nur machen, wenn die Datei neu eingerichtet werden soll. Bei einer bestehenden geht es nicht! Beim Verkürzen gibt es keine Probleme, auch keine beim Verlängern bis zu 88 Zeichen. Zu verändern sind dann die Zeile 30040 sowie die Längenangaben zwischen den Zeilen 5000 und 7100. Bedenken Sie dabei, daß die Variable BL$ mindestens so viele Leerstellen haben muß, wie das längste Datenfeld.</p>
 
-        <p>Schwieriger wird es, wenn Sie infolge einer Vergrößerung der Datensatzlänge über 88 Zeichen hinwegkommen. Das Problem hierbei ist der INPUT#-Befehl. Mit ihm kann man nämlich nur maximal 88 Zeichen aus einer Datei lesen. Es gibt zwei Methoden, diese Hürde zu überwinden. Erstens eine Maschinensprache-Routine, die den INPUT#-Befehl erweitert, so daß auch Datensätze mit bis zu 255 Zeichen gelesen werden können (schauen Sie doch einmal in das Floppy-Buch von Data Becker, dort finden Sie eine entsprechende Routine). Die zweite Möglichkeit ist die Verwendung des GET#-Befehls anstelle des INPUT#-Befehls. Dann ist die Zeile 9070 INPUT#1,RC$ durch folgende Zeilen zu ersetzen:<br />
-            9068 RC$ = &ldquo; &rdquo;<br />
-            9070 GET#1,W$<br />
-            9072 RC$ = RC$+W$<br />
-            9074 IF W$ = CHR$(255) THEN 9090<br />
+        <p>Schwieriger wird es, wenn Sie infolge einer Vergrößerung der Datensatzlänge über 88 Zeichen hinwegkommen. Das Problem hierbei ist der INPUT#-Befehl. Mit ihm kann man nämlich nur maximal 88 Zeichen aus einer Datei lesen. Es gibt zwei Methoden, diese Hürde zu überwinden. Erstens eine Maschinensprache-Routine, die den INPUT#-Befehl erweitert, so daß auch Datensätze mit bis zu 255 Zeichen gelesen werden können (schauen Sie doch einmal in das Floppy-Buch von Data Becker, dort finden Sie eine entsprechende Routine). Die zweite Möglichkeit ist die Verwendung des GET#-Befehls anstelle des INPUT#-Befehls. Dann ist die Zeile 9070 INPUT#1,RC$ durch folgende Zeilen zu ersetzen:<br>
+            9068 RC$ = &ldquo; &rdquo;<br>
+            9070 GET#1,W$<br>
+            9072 RC$ = RC$+W$<br>
+            9074 IF W$ = CHR$(255) THEN 9090<br>
             9076 IF W$ = CHR$(13) THEN 9070</p>
 
         <p>Den GET#-Befehl kann man natürlich auch dann einsetzen, wenn die Satzlänge kleiner als 88 Zeichen ist. Dann werden die Zeichen jedoch um einiges langsamer eingelesen als mit dem INPUT#-Befehl. Aber es ist mit dem GET#-Befehl möglich, bis zu 255 Zeichen in eine Variable einzulesen.</p>
