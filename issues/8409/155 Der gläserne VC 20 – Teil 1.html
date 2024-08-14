@@ -37,10 +37,10 @@
 
         <p>Der Variablenbereich wächst beim Anlegen neuer Variablen von unten nach oben. Nur das Stringende wandert in entgegenlaufender Richtung.</p>
 
-        <p>Die wichtigsten Zeiger, wie unter anderem Beginn und Ende von Basic und Variablen, sind in der Zeropage (Adresse 0 bis 256) abgelegt (Tabelle 1). Dabei ist die Reihenfolge Low-Byte/High-Byte zu beachten (Adresse = High-Byte * 256 + Low-Byte).<br />
+        <p>Die wichtigsten Zeiger, wie unter anderem Beginn und Ende von Basic und Variablen, sind in der Zeropage (Adresse 0 bis 256) abgelegt (Tabelle 1). Dabei ist die Reihenfolge Low-Byte/High-Byte zu beachten (Adresse = High-Byte * 256 + Low-Byte).<br>
             Um Speicherplatz für Maschinenprogramme oder Sonderzeichen zu schaffen, hat man prinzipiell zwei Möglichkeiten. Entweder man verschiebt den Basicanfang nach oben oder das Basicende nach unten. Letztere Alternative ist in den meisten Fällen günstiger.</p>
 
-        <p>Um zum Beispiel das Basicende von Adresse 7680 nach 7168 ( = 512 Byte) zu verlegen, gibt man ein:<br />
+        <p>Um zum Beispiel das Basicende von Adresse 7680 nach 7168 ( = 512 Byte) zu verlegen, gibt man ein:<br>
             POKE 55,0:POKE 56,28:CLR:REM (256 * 28 = 7168)</p>
 
         <p>Bei anderen Speichergrößen verfährt man analog.</p>
@@ -114,7 +114,7 @@
                         <td>136</td>
                         <td>LET</td>
                         <td>172</td>
-                        <td><br></td>
+                        <td>*</td>
                     </tr>
                     <tr>
                         <td>34</td>
@@ -134,7 +134,7 @@
                         <td>138</td>
                         <td>RUN</td>
                         <td>174</td>
-                        <td>t</td>
+                        <td>↑</td>
                     </tr>
                     <tr>
                         <td>36</td>
@@ -444,13 +444,12 @@
 
         <p>Durch NEW oder durch einen RESET wird nicht das gesamte Programm, sondern nur der Variablenpointer (45/46) und die erste Koppeladresse gelöscht. Durch Rekonstruktion dieser beiden Zeiger kann das scheinbar verlorene Basicprogramm wieder benutzt werden.</p>
 
-        <p>Hier nun das »Rezept« zur Rekonstruktion:</p>
-
-        <p>• POKE (Basicanfang) + 2,1<br />
-            Basicanfang in GV = 4097<br />
-            + 3K = 1025<br />
-            + 8K = 4609<br />
-            • SYS 50483:POKE 46,PEEK(35): POKE 45, PEEK (781)+2:CLR</p>
+        <p>Hier nun das »Rezept« zur Rekonstruktion:<br>
+        • POKE (Basicanfang) + 2,1<br>
+        Basicanfang in GV = 4097<br>
+        + 3K = 1025<br>
+        + 8K = 4609<br>
+        • SYS 50483:POKE 46,PEEK(35): POKE 45, PEEK (781)+2:CLR</p>
 
         <p>Unbedingt wichtig ist hier die Reihenfolge der Befehle! Ferner darf während der gesamten Prozedur keine Variable definiert werden, da diese das gelöschte Programm überschreiben würde.</p>
 
@@ -462,7 +461,7 @@
 
         <p>Als Beispiel soll der bestehende Befehl π (Tokennummer 255) geändert werden. Das Befehlsauswertungsprogramm nach Tabelle 4 fragt ihn ab und verzweigt dann nach § 1C16, wo ein RESET ausgeführt wird (entspricht SYS 64802).</p>
 
-        <p>Man kann aber auch noch zusätzliche Parameter abfragen. Die nun folgende Änderung des x-Befehls steuert den Tongenerator, wobei drei Argumente und zwei Kommata geprüft werden müssen. Die Syntax des neuen Befehls ist aus Tabelle 5 ersichtlich.</p>
+        <p>Man kann aber auch noch zusätzliche Parameter abfragen. Die nun folgende Änderung des π-Befehls steuert den Tongenerator, wobei drei Argumente und zwei Kommata geprüft werden müssen. Die Syntax des neuen Befehls ist aus Tabelle 5 ersichtlich.</p>
 
         <figure>
             <table border="1">
@@ -492,51 +491,52 @@
 
         <p>Um den Soundbefehl zu komplettieren müssen noch die restlichen drei Module eingebaut werden. Wir wollen an dieser Stelle jedoch darauf verzichten, das im einzelnen auszuführen. Es sollte jetzt jedoch klar geworden sein, wie man eine Befehlserweiterung realisieren kann.</p>
 
-        <p>Für Assembler-Laien jetzt noch ein komplettes Befehlsprogramm. Es erweitert die bestehenden Kommandos um:<br />
-            πO = Old (Rekonstruktion),<br />
-            πS Tongenerator, Höhe, Lautstärke ≙ Soundbefehl (wie oben)<br />
-            πS Tongenerator, 0 ≙ Tongenerator abschalten,<br />
-            πP Horizontal, Vertikal, ”..” oder<br />
-            πP Horizontal, Vertikal, String ≙ Druck an einer spezifizierten Bildschirmstelle.</p>
+        <p>Für Assembler-Laien jetzt noch ein komplettes Befehlsprogramm. Es erweitert die bestehenden Kommandos um:<br>
+            πO = Old (Rekonstruktion),<br>
+            πS <b>Tongenerator, Höhe, Lautstärke</b> ≙ Soundbefehl (wie oben)<br>
+            πS <b>Tongenerator, 0</b> ≙ Tongenerator abschalten,<br>
+            πP <b>Horizontal, Vertikal,</b> ”..” oder<br>
+            πP <b>Horizontal, Vertikal, String</b> ≙ Druck an einer spezifizierten Bildschirmstelle.</p>
 
         <p>Das Ladeprogramm (Listing 1) lädt die Maschinenroutine automatisch in den richtigen Speicherbereich (abhängig von der Speichergröße) und gibt dann die Startadresse an. Zur Referenz ist das vollständige Assemblerprogramm als Listing 2 abgedruckt.</p>
 
-        <p>Die neuen Befehle können sowohl im Direktmodus, als auch im Programm verwendet werden. Benutzt man sie im Programm, so ist zu beachten, daß sie nie direkt nach der Zeilennummer stehen dürfen. So muß zum Beispiel der Befehl<br />
-            πS 1,240,15 mit Doppelpunkt im Programm stehen:<br />
-            10 : πS1,240,15 oder<br />
+        <p>Die neuen Befehle können sowohl im Direktmodus, als auch im Programm verwendet werden. Benutzt man sie im Programm, so ist zu beachten, daß sie nie direkt nach der Zeilennummer stehen dürfen. So muß zum Beispiel der Befehl<br>
+            πS 1,240,15 mit Doppelpunkt im Programm stehen:<br>
+            10 : πS1,240,15 oder<br>
             10 PRINT A$: πS1,240,15</p>
 
         <h2>Listschutz für Basicprogramme:</h2>
 
-        <p>Es wurden bereits mehrfach Methoden veröffentlicht, mit denen man Programme vor unbefugtem Kopieren schützen kann. Hierbei gibt es mehrere Alternativen:
-
-            1. Man verändert die Koppeladressen so, daß das Programm nicht listfähig ist, es jedoch normal mit RUN bedient werden kann.<br />
-            2. Man verändert den LIST-Vektor mit POKE 774,34:POKE 755,253. Bei einem Listversuch löst dieser Vektor einen RESET aus und das Programm ist weg.</p>
+        <p>Es wurden bereits mehrfach Methoden veröffentlicht, mit denen man Programme vor unbefugtem Kopieren schützen kann. Hierbei gibt es mehrere Alternativen:</p>
+        <ol>
+            <li>Man verändert die Koppeladressen so, daß das Programm nicht listfähig ist, es jedoch normal mit RUN bedient werden kann.</li>
+            <li>Man verändert den LIST-Vektor mit POKE 774,34:POKE 755,253. Bei einem Listversuch löst dieser Vektor einen RESET aus und das Programm ist weg.</li>
+        </ol>
 
         <p>Diese und andere Schutzmaßnahmen haben den Nachteil, daß sie von »Hackern« innerhalb kurzer Zeit umgangen werden können. Es gibt zwar keinen hundertprozentigen Programmschutz, jedoch bietet die nachfolgend beschriebene Methode eine große Sicherheit. Bei diesem Verfahren läßt die Änderung eines Kernalvektors (Tastatureingabe 804/805) das Basicprogramm mit Hilfe einer Maschinenroutine nach Abschluß des Ladevorgangs automatisch starten.</p>
 
-        <p>Zunächst zur Verfahrensweise beim Autostart:<br />
+        <p>Zunächst zur Verfahrensweise beim Autostart:<br>
             Schritt 1:</p>
 
-        <p>Eingabe des Ladeprogramms (Listing 3)<br />
+        <p>Eingabe des Ladeprogramms (Listing 3)<br>
             Schritt 2:</p>
 
-        <p>Programm und Prüfsumme testen (Achtung es zerstört sich selbst mit NEW) und abspeichern<br />
+        <p>Programm und Prüfsumme testen (Achtung es zerstört sich selbst mit NEW) und abspeichern<br>
             Schritt 3:</p>
 
-        <p>POKE 44,A: POKE A*256,0 : NEW (A = 17 für die Grundversion; A = 19 bei Erweiterung ab 8 KByte; A = 5 Erweiterung + 3 KByte<br />
+        <p>POKE 44,A: POKE A*256,0 : NEW (A = 17 für die Grundversion; A = 19 bei Erweiterung ab 8 KByte; A = 5 Erweiterung + 3 KByte<br>
             Schritt 4:</p>
 
-        <p>Ladeprogramm laden und starten<br />
+        <p>Ladeprogramm laden und starten<br>
             Schritt 5:</p>
 
-        <p>Eigenes Programm nachladen<br />
+        <p>Eigenes Programm nachladen<br>
             Schritt 6:</p>
 
-        <p>POKE 43,24 : POKE 44,3<br />
+        <p>POKE 43,24 : POKE 44,3<br>
             Schritt 7:</p>
 
-        <p>POKE 792,91 : POKE 793,255 : POKE 808,114<br />
+        <p>POKE 792,91 : POKE 793,255 : POKE 808,114<br>
             Schritt 8:</p>
 
         <p>POKE 804,0 : POKE 805,X : SAVE &ldquo;&hellip;”,1,1</p>
@@ -564,7 +564,7 @@
 
         <ol>
             <li>NMI-Vektor, Adresse 792,793: Dieser Vektor stellt die Verbindung zwischen RESTORE-Taste und NMI-Routine her. Durch die Änderung (siehe Schritt 7) wird die RESTORE-Routine einfach übersprungen; die Taste ist quasi abgeschaltet.</li>
-            <li>STOP-Vektor, Adresse 808,809: Auch hier wird die bestehende Routine übersprungen.<br />
+            <li>STOP-Vektor, Adresse 808,809: Auch hier wird die bestehende Routine übersprungen.<br>
                 Da dieser Vektorenbereich mit abgespeichert wird, ist, nachdem der Computer &ldquo;FOUND&rdquo; anzeigt, ein Stoppen des Computers nicht mehr möglich.</li>
             <li>INPUT-Vektor, Adresse 804,805: Dieser Zeiger ist der eigentliche Dreh- und Angelpunkt des Autostarts. Er ist für die Tastatureingabe verantwortlich. Da er ständig durchlaufen wird, bewirkt POKE 804,0 : POKE 805,16 (bei geladener Autostartroutine) in der Grundversion einen Start des Basicprogramms. Ändert man den Zeiger hingegen vor dem Abspeichervorgang (wie in Schritt 8) geschieht vorläufig nichts, denn dann wird die Tastatur ja nicht benutzt.</li>
         </ol>
@@ -577,10 +577,10 @@
         <p>Das Programm kann anschließend ganz normal mit LOAD geladen werden. Zum Schluß noch zwei Tips:</p>
 
         <ol>
-            <li>Wer besonders clever ist, der vernichtet alle »Spuren«, indem er die Maschinenroutine nach ihrer Benutzung im Basicprogramm löscht:<br />
-                5 FOR T = (Startadresse) TO (Startadresse) + 95 : POKE T, RND(0) + 255 : NEXT<br />
+            <li>Wer besonders clever ist, der vernichtet alle »Spuren«, indem er die Maschinenroutine nach ihrer Benutzung im Basicprogramm löscht:<br>
+                5 FOR T = (Startadresse) TO (Startadresse) + 95 : POKE T, RND(0) + 255 : NEXT<br>
                 (Startadresse = 4096 in der Grundversion; = 1024 bei Erweiterung von 3 KByte; = 4608 bei Erweiterung ab 8 KByte</li>
-            <li>Bei einer Erweiterung von 8 KByte liegt ja bekanntlich der Bildschirmspeicher im Bereich zwischen Adresse 4096 und 4607. Somit wird er ebenfalls mit abgespeichert.<br />
+            <li>Bei einer Erweiterung von 8 KByte liegt ja bekanntlich der Bildschirmspeicher im Bereich zwischen Adresse 4096 und 4607. Somit wird er ebenfalls mit abgespeichert.<br>
                 Soweit die erste Folge unseres Kurses. Im zweiten Teil wollen wir uns etwas näher mit der Zeropage beschäftigen und unter anderem zeigen, wie man mehrere Basicprogramme gleichzeitig im Speicher halten kann.</li>
         </ol>
 
