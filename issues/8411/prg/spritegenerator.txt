@@ -1,0 +1,155 @@
+;spritegenerator.prg ==1201==
+;Quelle: 8411.D64
+;Zeilen 1-2 wurden manuell hinzugefügt
+    1 rem sprite-generator
+    2 rem
+   10 poke36879,25:print"{clr}";:poke157,128
+   15 poke677,0:poke678,20
+   20 print"{pur}{rvon}    sprite-definer    "
+   30 print"{rvon}{rght}{rght}{rght}   fuer vc=20   "
+   40 print"{down}{rvon}{rght}{rght}{rght}  (c) 1984 by   "
+   50 print"{down}{grn}   markus leberecht{blu}"
+   60 print"{down}{down}{down}{rght}{rght}{rght}{rght}bitte warten!"
+   70 az=32768:nz=5120:fora=0to2047:pokenz+a,peek(az+a):next
+   80 printchr$(8);"{clr}";
+   90 print"{rvon}{pur}         menue        {blu}"
+  100 print"{down}{rvon}{rght}f1{rvof} sprite erstellen
+  110 print"{down}{rvon}{rght}f2{rvof} sprite editieren
+  120 print"{down}{rvon}{rght}f3{rvof} sprite loeschen
+  130 print"{down}{rvon}{rght}f4{rvof} sp.-farbe aendern
+  150 print"{down}{rvon}{rght}f5{rvof} sprite(s) saven
+  160 print"{down}{rvon}{rght}f6{rvof} sprite(s) laden
+  170 print"{down}{rvon}{rght}f7{rvof} sprite kopieren
+  180 print"{down}{rvon}{rght}f8{rvof} {red}weiter
+  190 gosub61000
+  200 f$="{f1}{f2}{f3}{f4}{f5}{f6}{f7}{f8}":fora=1to8:ifmid$(f$,a,1)=a$then220
+  210 nexta:goto190
+  220 onagoto290,320,450,520,570,690,750
+  230 print"{clr}{rvon}{pur}         menue        {blu}"
+  240 print"{down}{down}{rght}{rvon}f1{rvof} verifizieren
+  250 print"{down}{down}{rght}{rvon}f2{rvof} initialisieren
+  251 print"{down}{down}{rght}{rvon}f3{rvof} sprite-demo
+  260 print"{down}{down}{rght}{rvon}f7{rvof} {red}zurueck{blu}
+  270 print"{down}{down}{rght}{rvon}f8{rvof} beenden
+  280 gosub61000
+  285 f$="{f1}{f2}{f3}{f4}{f5}{f6}{f7}{f8}":fora=1to8:ifmid$(f$,a,1)=a$then287
+  286 nexta:goto280
+  287 onagoto810,840,880,280,280,280,80,940
+  288 goto280
+  290 print"{clr}{blu}spritenummer:";
+  300 inputs%:print"{down}richtig?":gosub61000:ifa$="n"thenprint"{up}{up}";:goto290
+  302 ifa$="_"thenpoke36879,25:goto80
+  305 print"{clr}";:gosub50000:ifa$="_"then80
+  310 gosub40000:goto80
+  320 poke36879,24:print"{clr}{blu}spritenummer";:inputs%
+  330 print"{down}richtig?":gosub61000:ifa$="n"then320
+  335 ifa$="_"thenpoke36879,25:goto80
+  340 ba%=nz+1024+s%*104
+  350 print"{clr}{down}{down}{down}{rght}{rght}{rght}";:fora=0to15:forb=0to7
+  360 ifpeek(ba%+a)and(2^(7-b))thenprint"Q";:goto380
+  370 print" ";
+  380 nextb:print:print"{rght}{rght}{rght}";:nexta
+  390 print"{home}{down}{down}{down}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}";:fora=0to15:forb=0to7
+  400 ifpeek(ba%+16+a)and(2^(7-b))thenprint"Q";:goto420
+  410 print" ";
+  420 nextb:print:print"{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}";:nexta
+  430 gosub50000:ifa$="_"thenpoke36879,25:goto80
+  440 gosub40000:poke36879,25:goto80
+  450 poke36879,26:print"{clr}{blu}spritenummer:":print"{down}(9=keins)
+  460 inputs%:print"{down}richtig?":gosub61000
+  470 ifa$="n"or(s%>9ors%<0)then450
+  480 ifs%=9thenpoke36879,25:goto80
+  490 print"{down}{rvon}!! loesche !!"
+  500 ba%=nz+1024+s%*104
+  510 fora=0to31:pokeba%+a,0:next:poke36879,25:goto80
+  520 poke36879,27:print"{clr}{blu}spritefarben:"
+  530 fora=0to8:print"{down}sprite nr."a"---"peek(4608+a*22+20)and15:nexta
+  540 input"{down}welches (9=exit)";s%:ifs%<0ors%>8thenpoke36879,25:goto80
+  550 input"farbe";f%:iff%<0orf%>15thenpoke36879,25:goto80
+  560 poke4608+22*s%+20,f%:goto520
+  570 poke36879,28:input"{clr}{blu}anf.-sprite:";sa%:ifsa%<0orsa%>8then570
+  580 input"{down}endsprite:   {left}{left}{left}";se%:ifse%<0orse%>8thenprint"{up}{up}";:goto580
+  585 print"{down}richtig?":gosub61000:ifa$="n"then570
+  587 ifa$="_"thenpoke36879,25:goto80
+  590 ifsa%>se%then570
+  600 st%=nz+1024+sa%*104:en%=nz+1024+(se%+1)*104
+  610 poke185,3:input"{down}filename:";fi$:fi$=left$(fi$,16):iffi$=""thenprint"{up}{up}";:goto610
+  620 fora=1tolen(fi$):poke8192+5+a,asc(mid$(fi$,a,1)):next:poke183,len(fi$)
+  640 poke186,1
+  650 poke187,6:poke188,32
+  660 poke193,st%-256*int(st%/256):poke194,st%/256
+  670 poke174,en%-256*int(en%/256):poke175,en%/256
+  680 sys63106:poke36879,25:goto80
+  690 poke36879,29:input"{clr}{blu}{down}filename:";fi$
+  700 print"{down}richtig?":gosub61000:ifa$="n"then690
+  705 ifa$="_"thenpoke36879,25:goto80
+  710 iflen(fi$)=0then730
+  720 fora=1tolen(fi$):poke8192+5+a,asc(mid$(fi$,a,1)):next
+  730 poke183,len(fi$):poke186,1:poke187,6:poke188,32
+  740 sys62786:poke36879,25:goto80
+  750 poke36879,30:input"{clr}{blu}quelle=";s1%:ifs1%<0ors1%>8thenpoke36879,25:goto80
+  760 input"{down}ziel=";s2%:ifs2%<0ors2%>8thenpoke36879,25:goto80
+  770 print"{down}richtig?":gosub61000:ifa$="n"then750
+  775 ifa$="_"thenpoke36879,25:goto80
+  780 print"{down}{rvon}!! kopiere !!"
+  790 s1%=nz+1024+104*s1%:s2%=nz+1024+104*s2%
+  800 fora=0to31:pokes2%+a,peek(s1%+a):next:poke36879,25:goto80
+  810 poke36879,31:print"{clr}{rvon}bestaetigen":gosub61000
+  815 ifa$="_"thenpoke36879,25:goto80
+  820 print:verify"",1,1:print"{down}{down}{rvon}taste":gosub61000
+  830 poke36879,25:goto80
+  840 poke36879,24:print"{clr}{down}{blu}{rvon}bestaetigen":gosub61000:ifa$="_"thenpoke36879,25:goto80
+  845 print"{down}{rvon}!! initialisiere !!"
+  850 fora=0to9:print"{down}sprite"a:forb=0to31:pokenz+1024+a*104+b,0:nextb
+  860 poke4608+a*22+20,0
+  870 forb=0to17:poke4608+a*22+b,32:nextb,a:poke36879,25:goto80
+  880 input"{clr}{blu}spritenummer:";s%:print"{down}richtig?":gosub61000
+  890 ifa$="n"then880
+  891 ifa$="_"then80
+  900 print"{clr}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{rght}{rght}{rght}{rght}{rght}{blk}sp{red}ri{cyn}te{pur}-d{grn}em{blu}o!"
+  910 poke36869,205
+  920 fora=-127to127:poke673,abs(a):poke674,abs(a):poke683,s%:sys8021
+  930 nexta:poke683,s%:sys8099:poke36869,192:goto80
+  940 print"{clr}{blu}wirklich?":gosub61000
+  950 ifa$="j"thennew
+  960 goto80
+  999 end
+40000 print"{home}{rvon}!! werte aus !!";
+40005 fora=0to15:bb%=0:forb=0to7
+40010 bb%=bb%-((peek(b%+a*22+b)and127)=81)*2^(7-b):nextb
+40020 pokenz+128*8+s%*104+a,bb%:nexta
+40030 b%=b%+8
+40040 fora=0to15:bb%=0:forb=0to7
+40050 bb%=bb%-((peek(b%+a*22+b)and127)=81)*2^(7-b):nextb
+40060 pokenz+128*8+s%*104++16+a,bb%:nexta
+40070 return
+50000 print"{home}spritenr."s%
+50010 print"{down}{rght}{rght}{CBM-A}{CBM-R}{CBM-R}{CBM-R}{CBM-R}{CBM-R}{CBM-R}{CBM-R}{CBM-R}{CBM-R}{CBM-R}{CBM-R}{CBM-R}{CBM-R}{CBM-R}{CBM-R}{CBM-R}{CBM-S}"
+50020 fora=0to15:print"{rght}{rght}{CBM-Q}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{CBM-W}":next:print"{rght}{rght}{CBM-Z}{CBM-E}{CBM-E}{CBM-E}{CBM-E}{CBM-E}{CBM-E}{CBM-E}{CBM-E}{CBM-E}{CBM-E}{CBM-E}{CBM-E}{CBM-E}{CBM-E}{CBM-E}{CBM-E}{CBM-X}"
+50030 b%=4096+22*3+3:x%=0:y%=0
+50035 d%=b%+y%*22+x%
+50040 if(peek(d%)and128)=0thenpoked%,peek(d%)or128:poked%+33792,6:goto50060
+50050 if(peek(d%)and128)thenpoked%,peek(d%)and127:poked%+33792,6
+50060 ax%=x%:ay%=y%:gosub61000
+50070 ifa$="{down}"andy%<15theny%=y%+1:goto50200
+50080 ifa$="{up}"andy%>0theny%=y%-1:goto50200
+50090 ifa$="{rght}"andx%<15thenx%=x%+1:goto50200
+50100 ifa$="{left}"andx%>0thenx%=x%-1:goto50200
+50110 ifa$=" "thenpoked%,209:poked%+33792,6:goto50060
+50120 ifa$=chr$(20)thenpoked%,160:poked%+33792,6:goto50060
+50130 ifa$="{clr}"thenprint"{home}{down}{down}{down}";:fora=0to15:print"{rght}{rght}{rght}                ":next:goto50030
+50140 ifa$="i"thengosub60000:goto50035
+50150 ifa$=chr$(13)then50240
+50160 ifa$="_"thenreturn
+50200 d%=b%+ay%*22+ax%
+50210 if(peek(d%)and128)=0thenpoked%,peek(d%)or128:goto50230
+50220 if(peek(d%)and128)thenpoked%,peek(d%)and127
+50230 goto50035
+50240 print"{home}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}wirklich(j/n)?";
+50250 gosub61000:ifa$="j"thenreturn
+50260 print"{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}              {home}";:goto50000
+60000 forx=0to15:fory=0to15:dd%=b%+22*y+x
+60010 if(peek(dd%)and127)=81thenpokedd%,32:pokedd%+33792,6:next:next:return
+60020 if(peek(dd%)and127)=32thenpokedd%,81:pokedd%+33792,6:next:next:return
+61000 poke198,0:wait198,1:geta$:return
+
