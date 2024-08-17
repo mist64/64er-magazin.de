@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>Deutscher Zeichensatz für den VC 20</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="Peter Wülknitz, ev">
+    <meta name="64er.issue" content="9/84">
+    <meta name="64er.pages" content="79-81">
+    <meta name="64er.head1" content="Anwendung">
+    <meta name="64er.head2" content="VC 20">
+    <meta name="64er.toc_category" content="Programme zum Abtippen|Anwendungen">
+    <meta name="64er.index_title" content="Deutscher Zeichensatz für den VC 20">
+    <meta name="64er.index_category" content="Listings zum Abtippen|Anwendung|Zeichensatz">
+    <meta name="64er.id" content="deutzei">
+</head>
+
+<body>
+    <article>
+        <h1>Deutscher Zeichensatz für den VC 20</h1>
+
+        <p class="intro">Wenn man die ersten (Programmier-) Schritte mit seinem neu erworbenen VC 20 gegangen ist und schon das eine oder andere Programm »geboren« hat, vielleicht ein Adressenprogramm oder eine Lagerliste, spätestens dann wird man die Entdeckung machen, daß der VC 20 trotz deutscher Produktionsstätte nur Englisch spricht, für deutsche Umlaute und »ß« also kein Interesse zu haben scheint.</p>
+
+        <p>Dies bedauert man noch umso mehr, wenn man eine anschließbare elektronische Schreibmaschine mit deutschem Typensatz besitzt.</p>
+
+        <p>Zwar ist auf der Tastatur des VC 20 kein Platz für einen deutschen Zeichensatz vorgesehen, es ist jedoch möglich, bestimmte Tasten dafür auszuwählen, deren CHR$-Code demjenigen des gewünschten deutschen Umlautes auf der Schreibmaschine entspricht.</p>
+
+        <p>Auf diese Weise kann man zwar deutsche Texte drucken, aber auf dem Bildschirm sieht ein solcher Text recht merkwürdig aus: Hier steht zum Beispiel das Zeichen für das britische Pfund statt »ö«.</p>
+
+        <p>Auch hier ist mit einigem Know-how Abhilfe zu schaffen oder mit meinem Programm »DEUZEI«.</p>
+
+        <h2>Der Zeichengenerator</h2>
+
+        <p>Woher weiß der VC 20 eigentlich, wie die einzelnen Zeichen auszusehen haben, die man auf dem Bildschirm sieht? Hierzu bedient er sich eines Speicherbereichs Hex. 8000 bis 8FFF beziehungsweise 32768 und 36863 dezimal.</p>
+
+        <p>In diesem ROM-Bereich sind in genau festgelegter Reihenfolge (vergleiche Bildschirm-Code-Tabelle des Handbuches) die Bitmuster aller verfügbaren Zeichen in jeweils acht hintereinander stehenden Speicherstellen festgelegt.</p>
+
+        <p>Wie das funktioniert, veranschaulicht Bild 1: Jedes Zeichen ist auf dem Bildschirm in einer 8 x 8-Matrixwiedergegeben, ein Bildpunkt entspricht einer »1« im Dualcode, sonst steht die »0« (freie Felder). Da ja pro Speicherplatz 8 Bit gespeichert werden, benötigt man 8 Byte pro Zeichen.</p>
+
+        <figure>
+            <img src="79-1.png" alt="">
+            <figcaption>Bild 1. Die 8 x 8-Matrix des Buchstabens »a«</figcaption>
+        </figure>
+
+        <p>Der Computer weiß durch sein Betriebssystem, welche acht Speicherstellen er bei einem Tastendruck abfragen muß, es erscheint soweit recht leicht möglich, ihm ein geändertes Bitmuster in diese Speicherstellen zu »schmuggeln«, zum Beispiel durch POKEs. Dies scheitert allerdings daran, daß der Zeichengenerator im ROM-Bereich liegt und somit nur Lesen, aber nicht Verändern der gespeicherten Daten zuläßt.</p>
+
+        <p>Hier hat dankenswerterweise Commodore ein Hintertürchen offengelassen, um doch noch am Datensatz manipulieren zu können. Man kann dem Betriebssystem mitteilen, daß der Zeichensatz an einer anderen Stelle sitzt als normal; dies ist in Speicherstelle 36869 codiert.</p>
+
+        <p>Benutzt man nun einen RAM-Bereich für den alternativen Zeichensatz, so kann man nach Lust und Laune Veränderungen der Bitmuster vornehmen.</p>
+
+        <p>Da man ja doch wohl gern die Bitmuster der meisten Zeichen übernehmen möchte, wäre es ganz sinnvoll, vor der Kreation einiger neuer Zeichen erst einmal die Bitmuster des Zeichengenerator-Bereichs in den ausgewählten RAM-Bereich zu kopieren (immerhin 4 KByte). Diese Aufgabe übernimmt ein kleines Maschinenprogramm (Listing 2), das im Programm »DEUZEI« integriert ist. Ein Kopieren durch Basic-POKEs ist hingegen recht zeitraubend.</p>
+
+        <p>Um Speicherplatz im RAM zu sparen, kopiert »DEUZEI« allerdings nur den Zeichenset 2, der Groß- und Kleinbuchstaben, Ziffern und einige Grafikzeichen enthält (normal und invers), aber nur 2 KByte RAM beansprucht./p>
+        <p>»DEUZEI« benutzt den RAM-Speicher wie folgt: Zeichengenerator: Page 16 bis 23; Bildschirmspeicher: Page 24 und 25; Basicprogramme ab Page 26 (Bild 2). Eine Page entspricht einem 256-Byte-Block. Der Bildschirmspeicher befindet sich beim VC 20 ab 8 KByte Erweiterung normalerweise in Page 16 und 17 (4096 bis 4607), muß bei »DEUZEI« allerdings »umziehen«; dies erfährt das Betriebssystem durch entsprechende Codierung der Speicherstellen 648 (siehe Zeile 130) und 36869 (zugleich Pointer für den Zeichengenerator).</p>
+        <p>Das eigentliche Programm »DEUZEI« beginnt bei der Speicherstelle 6656 (Page 26). Da man es nach dem Generieren des neuen Zeichensatzes ja nicht mehr benötigt, wird es beim Einladen eines neuen Programms ab Page 26 gelöscht. Es fehlen dem neuen Programm also nur genau 2 KByte RAM-Speicherplatz, den der neue Zeichensatz beansprucht.</p>
+
+        <p>»DEUZEI« intern</p>
+        <table border="1">
+            <tbody>
+                <tr>
+                    <td>Zeile 110-120:</td>
+                    <td>Ab Speicherstelle 700 wird das Maschinenprogramm (35 Byte) abgelegt (unbenutzter RAM- Bereich).</td>
+                </tr>
+                <tr>
+                    <td>Zeile 130:</td>
+                    <td>Pointer für neuen Zeichengenerator-Bereich und Bildschirm-Bereich.</td>
+                </tr>
+                <tr>
+                    <td>Zeile 140:</td>
+                    <td>Zeichen-Set 2 wird durch Starten des Maschinenprogramms ab Page 16 abgelegt.</td>
+                </tr>
+                <tr>
+                    <td>Zeile 210-270:</td>
+                    <td>Bitmuster für deutsche Umlaute wird in neuen Zeichensatz gePOKEd.</td>
+                </tr>
+                <tr>
+                    <td>Zeile 300-360:</td>
+                    <td>Bitmuster für Umlaute (invers)</td>
+                </tr>
+                <tr>
+                    <td>Zeile 410:</td>
+                    <td>Umschaltsperre zum anderen Zeichen-Set (nur ein Zeichen-Set existiert im neuen Zeichengenerator-Bereich).</td>
+                </tr>
+                <tr>
+                    <td>Zeile 420-450:</td>
+                    <td>Bildschirm-Display (neue Zeichen erscheinen)</td>
+                </tr>
+                <tr>
+                    <td>Zeile 510-530:</td>
+                    <td>Data für Maschinenprogramm</td>
+                </tr>
+                <tr>
+                    <td>Zeile 540-600:</td>
+                    <td>Data für Umlaute Ä,Ö,Ü,ä,ö,ü,ß</td>
+                </tr>
+                <tr>
+                    <td>Zeile 700-760:</td>
+                    <td>Data für inverse Umlaute Ä,Ö,Ü,ä,ö,ü,ß</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <p>CHR$-Codes:</p>
+        <table border="1">
+            <tbody>
+                <tr>
+                    <td>17</td>
+                    <td>= Cursor nach unten</td>
+                </tr>
+                <tr>
+                    <td>18</td>
+                    <td>= Inverse Zeichen an</td>
+                </tr>
+                <tr>
+                    <td>28</td>
+                    <td>= rot</td>
+                </tr>
+                <tr>
+                    <td>31</td>
+                    <td>= blau</td>
+                </tr>
+                <tr>
+                    <td>147</td>
+                    <td>= clr home</td>
+                </tr>
+                <tr>
+                    <td>156</td>
+                    <td>= purpur</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <figure>
+            <img src="79-2.png" alt="">
+            <figcaption>Bild 2. VC 20-Speicher ab 8 KByte Erweiterung</figcaption>
+        </figure>
+
+        <h2>Eingabe von »DEUZEI«</h2>
+
+        <p>Wenn man nun das Programm »DEUZEI« in den Computer eingibt und übereifrig mit RUN startet, wird man eine böse Überraschung erleben: Das Programm stürzt sofort ab und ist zudem auch noch gelöscht!</p>
+
+        <p>Des Rätsels Lösung: Normalerweise werden Basicprogramme ja ab Page 18 (Speicherstelle 4608 = 18*256) abgelegt. In diesen Bereich transformiert allerdings das Maschinenprogramm den neuen Zeichensatz und »zerstört« frühzeitig das Basicprogramm. Man muß folglich Sorge tragen, daß das Programm ab Page 26 im Speicher steht. Hierzu sollte man folgendermaßen vorgehen:</p>
+
+        <ol>
+            <li>»DEUZEI« eingeben und auf Band oder Floppy abspeichern (kein RUN!)</li>
+            <li>Programm mit NEW löschen und folgende Basiczeile eingeben:<br>
+                1 POKE 44,26:POKE 6656,0:PRINT CHR$(3):RUN</li>
+            <li>RETURN-Taste drücken, aber nicht RUN!</li>
+            <li>POKE 44,26:POKE 6656,0 eintippen, dann RETURN-Taste drücken</li>
+            <li>Eingabe von NEW; RETURN-Taste</li>
+            <li>Einladen des abgespeicherten »DEUZEI«</li>
+            <li>POKE 44,18 eintippen und unter neuem Namen abspeichern.</li>
+        </ol>
+
+
+        <p>Die kleine Mühe hat sich sicherlich gelohnt, denn das neu abgespeicherte Programm ist nun absolut »wartungsfrei«. Es kann ganz normal eingeladen werden, setzt automatisch die Basicuntergrenze auf Page 26, generiert den neuen Zeichensatz in 2 bis 3 Sekunden und erlaubt das Einladen beliebiger Basicprogramme ohne Zusatz-POKEs.</p>
+
+        <p>Erklärung für obige Prozedur: Die erste Basiczeile muß am Anfang von Page 18 liegen, der Interpreter erwartet das so. Startet man das »umgebaute« Programm, so wird in dieser Zeile der neue Basicbeginn mitgeteilt, und zwar mit POKE 44,26.</p>
+
+        <p>Dieses Miniprogramm wird mit PRINT CHR$(3) abgebrochen und mit RUN in der gleichen Zeile das eigentliche »DEUZEI« ab Page 26 gestartet. Dies sitzt bereits richtig, da man es (siehe unter 4) gleich in Page 26 geladen hat. Danach wurde der Basicanfang wieder durch POKE 44,18 herabgesetzt und somit das funktionsfähige Programm abgespeichert.</p>
+
+        <p>Dieses Vorgehen bedeutet zwar, daß beim Abspeichern fast 2 KByte unbrauchbares Material mit abgespeichert wird, aber der Vorteil der besonderen Bedienungsfreundlichkeit überwiegt doch eindeutig.</p>
+
+        <h2>Arbeiten mit »DEUZEI«</h2>
+
+        <p>Nach dem Einladen des — wie oben beschrieben bearbeiteten — Programms »DEUZEI« erscheinen die neuen Sonderzeichen auf dem Bildschirm normal/invers, und beliebige Programme können geladen werden.</p>
+
+        <p>Die neuen Zeichen und ihr CHR$- beziehungsweise POKE-Code:</p>
+
+        <table border="1">
+            <tbody>
+                <tr>
+                    <td><br></td>
+                    <td>ä</td>
+                    <td>ö</td>
+                    <td>ü</td>
+                    <td>Ä</td>
+                    <td>Ö</td>
+                    <td>Ü</td>
+                    <td>ß</td>
+                </tr>
+                <tr>
+                    <td>CHR$:</td>
+                    <td>91</td>
+                    <td>92</td>
+                    <td>93</td>
+                    <td>123</td>
+                    <td>124</td>
+                    <td>125</td>
+                    <td>94</td>
+                </tr>
+                <tr>
+                    <td>POKE:</td>
+                    <td>27</td>
+                    <td>28</td>
+                    <td>29</td>
+                    <td>91</td>
+                    <td>92</td>
+                    <td>93</td>
+                    <td>30</td>
+                </tr>
+                <tr>
+                    <td>statt:</td>
+                    <td>[<br></td>
+                    <td>£</td>
+                    <td>]<br></td>
+                    <td>SHIFT [</td>
+                    <td>SHIFT £</td>
+                    <td>SHIFT ]</td>
+                    <td>↑</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <p>Dieser Zeichensatz bleibt erhalten, solange der VC 20 eingeschaltet ist, wird allerdings durch Betätigen der RUN STOP/RESTORE-Tasten abgeschaltet; es wird wieder der Pointer auf den normalen Zeichensatz gesetzt. Durch Eingabe von: POKE 36869,236:POKE 648,24:CLR kann man aber wieder den neuen Zeichensatz verfügbar machen. Leider sind sich offensichtlich nicht alle Produzenten von Drucker-Interfaces bezüglich der CHR$-Codes für die deutschen Umlaute einig. So kann es vorkommen, daß bei bestimmten Druckern das »ß« nicht gedruckt wird, wenn es auch noch so deutlich am Bildschirm prangt. Das ist allerdings kein Beinbruch, man muß nur herausfinden, welchen CHR$-Code dieses Zeichen vom Hersteller erhalten hat. Eine Anpassung von »DEUZEI« ist dann mit Hilfe der Tabellen des VC 20-Handbuchs einfach:</p>
+
+        <ol>
+            <li>In CHR$-Tabelle Zeichen suchen, das der Code-Nummer entspricht.</li>
+            <li>In POKE-Tabelle den POKE-Wert für dieses Zeichen ablesen.</li>
+            <li>POKE-Wert*8+4096 ergibt erste Speicherstelle für neues Zeichen; diesen Wert im Listing ersetzen.</li>
+        </ol>
+
+
+        <p>Beispiel: Buchstabe »ß« ist als CHR$(94) vorgesehen.</p>
+
+        <p>Normales Zeichen (Pfeil nach oben) entspricht POKE 30. 30*8+4096 = 4336. In Zeile 270 des Listings ist dieser Wert zu finden. Ist nun der CHR$-Code beispielsweise für »ß« = 126 (entspricht dem Zeichen 7r), so ergibt sich aus der POKE-Tabelle: 94*8+4096 = 4848 als neuer Wert im Listing.</p>
+
+        <p>Um die entsprechenden Speicherplatzdaten für die inversen Zeichen zu finden, muß man nur zu den berechneten Werten noch 1024 addieren (vergleiche DATA-Zeilen 700 bis 760 in Listing 1).</p>
+
+        <h2>»DEUZEI«-Ausbau</h2>
+
+        <p>Wem die deutschen Sonderzeichen nicht ausreichen für seine verschiedenen Vorhaben, der kann natürlich recht einfach in das Programm noch zusätzliche »Phantasiezeichen« einbauen. Das Auffinden der gewünschten Speicherstelle und die Berechnung der 8 Byte-Werte für das Bitmuster der 8x8-Zeichenmatrix sollten ja keine Schwierigkeiten mehr bereiten.</p>
+
+        <p>Als Beispiel sei der Ersatz des »Klammeraffen« (CHR$:64; POKE:0) durch eine »Brezel« aufgezeigt, die ab Speicherstelle 0*8+4096 = 4096 codiert wird (Bild 3). Diese beiden Programmzeilen wären hier einzufügen:<br>
+            361 forbr=0to7:readda%:poke4096+br,da%:next<br>
+            770 data0,60,66,165,153,153,102,0</p>
+
+        <p>In analoger Weise kann man sich auch leicht beliebige andere Zeichen definieren.</p>
+
+        <figure>
+            <img src="79-3.png" alt="">
+            <figcaption>Bild 3. Die 8 x 8-Matrix des Grafiksymbols »Brezel«</figcaption>
+        </figure>
+
+        <address class="author">(Peter Wülknitz/ev)</address>
+
+        <figure>
+            <pre data-filename="deutzei" data-name="DEUZEI"></pre>
+            <figcaption>Listing 1. Basiclader für »DEUZEI«. Die Zeichen »\« und »^« in den Zeilen 430 und 440 bedeuten »£« und »↑«.</figcaption>
+        </figure>
+
+        <figure>
+            <pre>02BC  A9 00      LDA #$00    Low-byte Zeichenbereich laden
+02BE  85 FB      STA $FB     speichern in dez. 251
+02C0  A9 88      LDA #$88    High-byte Zeichenbereich laden
+02C2  85 FC      STA $FC     speichern in dez. 252
+02C4  A9 00      LDA #$00    Low-byte neuer Z.-Bereich laden
+02C6  85 FD      STA $FD     speichern in dez. 253
+02C8  A9 10      LDA #$10    High-byte neuer Z.-Bereich laden
+02CA  85 FE      STA $FE     speichern in dez. 254
+02CC  A2 08      LDX #$08    X-Register: Zahl der Blöcke
+02CE  A0 00      LDY #$00    Y-Register Null setzen (Zähler)
+02D0  B1 FB NEXT LDA($FB),Y  Laden von Koppeladr. (i.indiz.)
+02D2  91 FD      STA($FD),Y  Speichern in Koppeladresse
+02D4  88         DEY         Zähler -1
+02D5  D0 F9      BNE NEXT    Y nicht 0, dann Sprung zu NEXT
+02D7  E6 FC      INC $FC     High-byte Z.-Bereich +1
+02D9  E6 FE      INC $FE     High-byte neuer Z.-Bereich +1
+02DB  CA         DEX         Block-Zähler -1
+02DC  D0 F2      BNE NEXT    X nicht 0, dann Sprung zu NEXT
+02DE  60         RTS         zurück zu Basic</pre>
+            <figcaption>Listing 2. Assembler-Listing zu »DEUZEI«. Das Assemblerprogramm ist im Basiclader nach Listing 1 bereits enthalten und braucht nicht zusätzlich eingegeben zu werden.</figcaption>
+        </figure>
+
+    </article>
+</body>

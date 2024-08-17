@@ -1,0 +1,23 @@
+;2 verschieb asm.prg ==0801==
+;Eingetippt von goloMAK
+    0 rem listing 2
+    1 :
+    2 rem dos-routine 15.05.1984
+    3 rem by herbert heise
+    4 rem <c> 1984 herbiesoft
+    5 :
+  200 ldy $14  ; sys-einsprungpunkt
+  210 lda $15
+  220 sty $5a  ; = blockende + 1
+  230 sta $5b
+  240 sec
+  250 sbc #$04 ; blockende - 4*256
+  260 sty $5f  ; = blockanfang
+  270 sta $60
+  280 ldy #$00 ;
+  290 lda #$d0
+  300 sty $58  ; = neues blockende +1
+  310 sta $59
+  320 jsr $a3bf; block-verschiebe-routine
+  330 jmp $cc00; dos-einsprung
+

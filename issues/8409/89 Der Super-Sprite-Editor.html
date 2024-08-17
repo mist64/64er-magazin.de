@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>Der Super-Sprite-Editor</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="A. Kölbach, rg">
+    <meta name="64er.issue" content="9/84">
+    <meta name="64er.pages" content="89-93">
+    <meta name="64er.head1" content="Grafik">
+    <meta name="64er.head2" content="C 64">
+    <meta name="64er.toc_category" content="Programme zum Abtippen|Grafik">
+    <meta name="64er.index_title" content="Der Super-Sprite-Editor">
+    <meta name="64er.index_category" content="Listings zum Abtippen|Grafik|Sprites">
+    <meta name="64er.id" content="sprite_editor">
+</head>
+
+<body>
+    <article>
+        <h1>Der Super-Sprite-Editor</h1>
+
+        <p class="intro">Zirka fünfzig verschiedene Sprite-Editorprogramme erreichten uns in der Redaktion. Das beste Programm haben wir für Sie ausgewählt.</p>
+
+        <p>Der Hauptbildschirm besteht aus einem Anzeigefeld (Spalte 0 bis 12) und einem Arbeitsfeld (rechts eingerahmt). Im Anzeigefeld stehen das zu bearbeitende Sprite und Hinweise auf verfügbare Kommandos, im Arbeitsfeld wird das Sprite erstellt. Die Zahlen im Rahmen des Arbeitsfeldes ergeben sich aus dem Format der Sprites im Speicher.</p>
+
+        <h2>Das Menü</h2>
+
+        <p>Das Menü (=Command List) wird mit »Space« ins Anzeigefeld gerufen.<br>
+            <b>0 bis 7</b><br>
+            Es werden bis zu sieben Sprites gleichzeitig im Spritefeld dargestellt. Die Tasten 0 bis 7 fungieren als On/Off-Schalter.<br>
+            <b>I</b><br>
+            Das jeweils zuletzt angeschaltete Sprite wird nacheinander in Y-, XY- und X-Richtung vergrößert.<br>
+            <b>M</b><br>
+            Schaltet für das zuletzt bearbeitete Sprite den Multicolormodus ein.<br>
+            <b>C</b><br>
+            Verzweigt in die Routine für die Farbwahl.<br>
+            <b>R</b><br>
+            Reproduktion des zuletzt bearbeiteten Sprites ins Arbeitsfeld. Kann mit beliebiger Taste abgebrochen werden.<br>
+            <b>F1</b><br>
+            Schaltet in den Arbeitsmodus (siehe unten).<br>
+            <b>F3</b><br>
+            Ändert die Hintergrundfarbe.<br>
+            <b>F7</b><br>
+            Schiebt das Sprite im Speicher um eine Zeile tiefer. Es kann passieren, daß Punkte aus dem Sprite davor ins Bild verschoben werden.<br>
+            <b>F8</b><br>
+            Wie F7, schiebt das Sprite hoch.<br>
+            <b>H</b><br>
+            Verzweigt in die Handle-Routine, mit der Sprites auf dem Bildschirm verschoben werden können.<br>
+            <b>$</b><br>
+            Zeigt das Diskettendirectory an. Kann mit F 1 abgebrochen werden.<br>
+            <b>@</b><br>
+            Ermöglicht Disk-Befehle zu senden, beziehungsweise nur mit RETURN den Fehlerkanal abzufragen.<br>
+            <b>S</b><br>
+            Gibt die Dezimalwerte des zuletzt bearbeiteten Sprite im Anzeigefeld aus. Am Kopf der Tabelle steht die Anfangsadresse des Sprites im Speicher (dezimal).<br>
+            <b>P</b><br>
+            Ausgabe auf Drucker. Zusätzliche Angabe eines 20 Zeichen langen Namens möglich. Geräteadresse = 4<br>
+            <b>F</b><br>
+            Verzweigt ins Floppymenü. Dieser Programmteil erklärt sich weitgehend selbst. Beim ersten Einsprung in die Routine sollte ein Name definiert werden, sonst wird das File (sequentiell) unter dem Namen »Data« geSAVEd. Später kann die Position »Filename« mit RETURN übergangen werden und der alte Name wird verwendet. Unter einem Namen können beliebig viele Sprites abgelegt werden. Geräteadresse = 8<br>
+            <b>D</b><br>
+            Alle acht Sprites werden in Datazeilen umgewandelt.<br>
+            <b>K</b><br>
+            Das Programm wird gelöscht. Datazeilen bleiben bestehen und können an andere Programme angehängt werden. Geduld, die Sache dauert!
+        </p>
+
+        <h2>Der Arbeitsmodus</h2>
+
+        <p><b>’*’ beziehungsweise ’@’</b><br>
+            Diese Tasten zeichnen Punkte (Linien) in horizontaler beziehungsweise vertikaler Richtung.<br>
+            <b>’=’ beziehungsweise ’;’</b><br>
+            Wie oben, nur werden Punkte gelöscht. Die Belegung dieser Tasten ist an die Cursortasten angelehnt. Gleichzeitig mit SHIFT ist die Bewegungsrichtung umgekehrt.<br>
+            Außerdem definiert: RETURN, HOME, CLEAR, F1
+        </p>
+
+        <p>Aus fast jeder Routine kann mit F1 ausgestiegen werden. Auf Fragen wird mit Y(es) oder RETURN und N(o) oder beliebiger Taste geantwortet. Nicht definierte Tasten bewirken nichts. Fehleingaben sind abgefangen.</p>
+
+        <p>Man sollte das Programm nicht mit STOP/RESTORE beenden. Der Bildschirminhalt ist sonst nicht mehr lesbar. Nach QUIT oder STOP kann allerdings problemlos ohne Verlust der Sprites neu gestartet werden.</p>
+
+        <p>Für »Tippfaule«: Sämtliche Remzeilen sind optional, da sie nicht angesprungen werden, und dienen nur der Orientierung im Listing. Man kann sie also auch später einfügen, oder ganz weglassen.</p>
+
+        <p>Und wenn’s dann endlich drin ist (wunde Finger gehören nunmal dazu): Viel Spaß beim Malen!</p>
+
+        <h2>Erweiterungen</h2>
+
+        <ol>
+            <li>Der Bildschirm ist nach 33792 verlegt, um für acht Sprites Platz zu schaffen. Dementsprechend liegen die Sprites auch in Block 3, nämlich ab Adresse 32768.</li>
+            <li>Die Tastenbelegung der »Work«-Routine ist der Verwendung von Cursortasten angeglichen. Links vertikale, rechts horizontale Bewegungen.</li>
+            <li>Es stehen drei Routinen für Diskettenverwaltung zur Verfügung:
+                <ol type="a">
+                    <li>Anzeige des Directory</li>
+                    <li>Senden von Disk-Commands</li>
+                    <li>Floppy Controller</li>
+                </ol>
+            </li>
+            <li>Die »Floppy«-Routine ist so gestaltet, daß ein relativ bequemes Umsortieren der Sprites auf Diskette von einem File ins andere möglich wird.
+                <p>Das heißt: Viele Stellen, an denen bei Irrtum noch eine »Umkehr« möglich ist; immer wieder wird gezeigt, was gerade passiert. Bei Eingabe des Filenamens kann jetzt mit DELETE korrigiert werden. Bei fehlender Namensangabe heißt das File »Data« — kein unlöschbares »,« mehr.</p>
+                <p>Wenn man in letzter Minute noch aussteigt und doch kein einziges Sprite abgespeichert, entsteht nun kein Geisterfile mehr, das zwar einen Eintrag im Directory hat, aber keine Daten enthält und das Programm bei nächster Gelegenheit böswillig zum Absturz bringt.</p>
+            </li>
+            <li>Diverse Kleinigkeiten.</li>
+        </ol>
+
+        <address class="author">(A. Kölbach/rg)</address>
+
+        <figure>
+            <pre data-filename="sprite aid +" data-name="Spriteaid+"></pre>
+            <figcaption>Listing »Spriteaid+«</figcaption>
+        </figure>
+
+    </article>
+</body>
