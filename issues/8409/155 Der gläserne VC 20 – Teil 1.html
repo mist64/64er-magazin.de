@@ -1,0 +1,704 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>Der gläserne VC 20 – Teil 1</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="Christoph Sauer, ev">
+    <meta name="64er.issue" content="9/84">
+    <meta name="64er.pages" content="155-156,158-161">
+    <meta name="64er.head1" content="Kurs">
+    <meta name="64er.head2" content="VC 20">
+    <meta name="64er.toc_category" content="Kurse">
+    <meta name="64er.index_title" content="Der gläserne VC 20 (Teil 1)">
+    <meta name="64er.index_category" content="Kurse|VC 20">
+    <meta name="64er.id" content="vc20">
+</head>
+
+<body>
+    <article>
+        <h1>Der gläserne VC 20 – Teil 1</h1>
+
+        <p class="intro">Der VC 20, schon etwas betagt und oft genug totgesagt, ist immer noch der meistverbreitete Computer seiner Klasse. Mit diesem Kurs wollen wir den legendären »Volkscomputer« endlich für alle Anwender vollkommen transparent machen.</p>
+
+        <p>Das Betriebssystem und das Basic des VC 20 sind äußerst flexibel gestaltet. Es gibt viele Möglichkeiten, das Bestehende zu ändern oder zu ergänzen. Diese Serie soll über die üblichen Tips und Tricks hinausgehen. Es werden also nicht nur POKEs, sondern auch weitergehende Maschinenprogramme wie zum Beispiel Funktionstastenabfrage oder die Definition neuer Basic-Befehle besprochen. Dieser erste Teil soll dabei bereits einen tieferen Einblick in das VC 20-System geben.</p>
+
+        <h2>Wie Basic den Speicher verwaltet</h2>
+
+        <p>Beginnen wir mit der Organisation des verfügbaren RAM durch den Basic-Interpreter.</p>
+
+        <p>Der Basicbeginn liegt bei Adresse 4096, das Ende bei Adresse 7680 (die Werte beziehen sich auf die Grundversion). Unmittelbar ab dem Basicbeginn wird das eigentliche Programm abgelegt. An dessen Ende beginnen die Variablen und Felder (Bild 1).</p>
+
+        <figure>
+            <img src="155-1.png" alt="">
+            <figcaption>Bild 1. Die Speicherbelegung des Basicbereichs</figcaption>
+        </figure>
+
+        <p>Der Variablenbereich wächst beim Anlegen neuer Variablen von unten nach oben. Nur das Stringende wandert in entgegenlaufender Richtung.</p>
+
+        <p>Die wichtigsten Zeiger, wie unter anderem Beginn und Ende von Basic und Variablen, sind in der Zeropage (Adresse 0 bis 256) abgelegt (Tabelle 1). Dabei ist die Reihenfolge Low-Byte/High-Byte zu beachten (Adresse = High-Byte * 256 + Low-Byte).<br>
+            Um Speicherplatz für Maschinenprogramme oder Sonderzeichen zu schaffen, hat man prinzipiell zwei Möglichkeiten. Entweder man verschiebt den Basicanfang nach oben oder das Basicende nach unten. Letztere Alternative ist in den meisten Fällen günstiger.</p>
+
+        <p>Um zum Beispiel das Basicende von Adresse 7680 nach 7168 ( = 512 Byte) zu verlegen, gibt man ein:<br>
+            POKE 55,0:POKE 56,28:CLR:REM (256 * 28 = 7168)</p>
+
+        <p>Bei anderen Speichergrößen verfährt man analog.</p>
+
+        <p>Der Befehl CLR ist nötig, damit sich verschiedene Hilfszeiger (Stringbeginn und Felderende) anpassen können.</p>
+
+        <p>Die andere Alternative der Platzbeschaffung ist etwas komplizierter. Sie wird nur bei erweitertem Speicher angewendet, um dort Sonderzeichen abzulegen. Um den Anfang des Programmspeichers von 4608 nach 7680 zu schieben, gibt man: POKE 44,30:POKE 30 * 256,0:NEW ein, denn 30 * 256 ist gerade 7680. Der zweite POKE-Befehl ist nötig, da am Anfang des Basicbereichs immer ein Nullbyte stehen muß.</p>
+
+        <h2>Erste Hilfe — Basicprogramme retten nach NEW oder Reset</h2>
+
+        <p>Schon oft wurden Verfahren beschrieben, um nach einem versehentlichen NEW das Basicprogramm wieder zurückzuholen. Doch wie funktionieren diese Verfahren? Um das zu verstehen, betrachten wir zunächst kurz den Aufbau eines Basicprogramms (Bild 2).</p>
+
+        <figure>
+            <img src="155-2.png" alt="">
+            <figcaption>Bild 2. Aufbau eines Basicprogramms. Über die Koppeladressen sind die einzelnen Zeilen miteinander verbunden</figcaption>
+        </figure>
+
+        <p>Am Kopf des Programms steht immer eine Null. Dann folgt die Adresse der nächsten Programmzeile (Koppeladresse) und die Zeilennummer. Danach kommt die eigentliche Programmzeile, die sich aus den sogenannten Tokens — den Basiccodenummern (Tabelle 2) — zusammensetzt. Am Ende dieser Zeile steht dann nochmals eine Null. Die nächste Zeile beginnt wieder mit einem Verbindungszeiger und der Zeilennummer. Das Programm wird mit drei Nullen abgeschlossen. Hieran schließen sich die Variablen an (vergleiche Bild 1).</p>
+
+        <figure>
+            <table border="1">
+                <tbody>
+                    <tr>
+                        <td>Code (Dezimal)</td>
+                        <td>Zeichen/<br>
+                            Befehl</td>
+                        <td>Code (Dezimal)</td>
+                        <td>Zeichen/ Befehl</td>
+                        <td>Code (Dezimal)</td>
+                        <td>Zeichen/<br>
+                            Befehl</td>
+                        <td>Code (Dezimal)</td>
+                        <td>Zeichen/<br>
+                            Befehl</td>
+                    </tr>
+                    <tr>
+                        <td>0</td>
+                        <td>Zeilenende</td>
+                        <td>66</td>
+                        <td>B</td>
+                        <td>133</td>
+                        <td>INPUT</td>
+                        <td>169</td>
+                        <td>STEP</td>
+                    </tr>
+                    <tr>
+                        <td>1-31</td>
+                        <td>Leer</td>
+                        <td>67</td>
+                        <td>C</td>
+                        <td>134</td>
+                        <td>DIM</td>
+                        <td>170</td>
+                        <td>+</td>
+                    </tr>
+                    <tr>
+                        <td>32</td>
+                        <td>Space</td>
+                        <td>68</td>
+                        <td>D</td>
+                        <td>135</td>
+                        <td>READ</td>
+                        <td>171</td>
+                        <td>—</td>
+                    </tr>
+                    <tr>
+                        <td>33</td>
+                        <td>!</td>
+                        <td>69</td>
+                        <td>E</td>
+                        <td>136</td>
+                        <td>LET</td>
+                        <td>172</td>
+                        <td>*</td>
+                    </tr>
+                    <tr>
+                        <td>34</td>
+                        <td>"</td>
+                        <td>70</td>
+                        <td>F</td>
+                        <td>137</td>
+                        <td>GOTO</td>
+                        <td>173</td>
+                        <td>/</td>
+                    </tr>
+                    <tr>
+                        <td>35</td>
+                        <td>#</td>
+                        <td>71</td>
+                        <td>G</td>
+                        <td>138</td>
+                        <td>RUN</td>
+                        <td>174</td>
+                        <td>↑</td>
+                    </tr>
+                    <tr>
+                        <td>36</td>
+                        <td>$<br></td>
+                        <td>72</td>
+                        <td>H</td>
+                        <td>139</td>
+                        <td>IF</td>
+                        <td>175</td>
+                        <td>AND</td>
+                    </tr>
+                    <tr>
+                        <td>37</td>
+                        <td>%</td>
+                        <td>73</td>
+                        <td>I</td>
+                        <td>140</td>
+                        <td>RESTORE</td>
+                        <td>176</td>
+                        <td>OR</td>
+                    </tr>
+                    <tr>
+                        <td>38</td>
+                        <td>&amp;</td>
+                        <td>74</td>
+                        <td>J</td>
+                        <td>141</td>
+                        <td>GOSUB</td>
+                        <td>177</td>
+                        <td>&gt;</td>
+                    </tr>
+                    <tr>
+                        <td>39</td>
+                        <td>'</td>
+                        <td>75</td>
+                        <td>K</td>
+                        <td>142</td>
+                        <td>RETURN</td>
+                        <td>178</td>
+                        <td>=</td>
+                    </tr>
+                    <tr>
+                        <td>40</td>
+                        <td>(</td>
+                        <td>76</td>
+                        <td>L</td>
+                        <td>143</td>
+                        <td>REM</td>
+                        <td>179</td>
+                        <td>&lt;</td>
+                    </tr>
+                    <tr>
+                        <td>41</td>
+                        <td>)</td>
+                        <td>77</td>
+                        <td>M</td>
+                        <td>144</td>
+                        <td>STOP</td>
+                        <td>180</td>
+                        <td>SGN</td>
+                    </tr>
+                    <tr>
+                        <td>42</td>
+                        <td>*</td>
+                        <td>78</td>
+                        <td>N</td>
+                        <td>145</td>
+                        <td>ON</td>
+                        <td>181</td>
+                        <td>INT</td>
+                    </tr>
+                    <tr>
+                        <td>43</td>
+                        <td>+</td>
+                        <td>79</td>
+                        <td>0</td>
+                        <td>146</td>
+                        <td>WAIT</td>
+                        <td>182</td>
+                        <td>ABS</td>
+                    </tr>
+                    <tr>
+                        <td>44</td>
+                        <td>,</td>
+                        <td>80</td>
+                        <td>P</td>
+                        <td>147</td>
+                        <td>LOAD</td>
+                        <td>183</td>
+                        <td>USR</td>
+                    </tr>
+                    <tr>
+                        <td>45</td>
+                        <td>-</td>
+                        <td>81</td>
+                        <td>Q</td>
+                        <td>148</td>
+                        <td>SAVE</td>
+                        <td>184</td>
+                        <td>FRE</td>
+                    </tr>
+                    <tr>
+                        <td>46</td>
+                        <td>.</td>
+                        <td>82</td>
+                        <td>R</td>
+                        <td>149</td>
+                        <td>VERIFY</td>
+                        <td>185</td>
+                        <td>POS</td>
+                    </tr>
+                    <tr>
+                        <td>47</td>
+                        <td>/</td>
+                        <td>83</td>
+                        <td>S</td>
+                        <td>150</td>
+                        <td>DEF</td>
+                        <td>186</td>
+                        <td>SQR</td>
+                    </tr>
+                    <tr>
+                        <td>48</td>
+                        <td>0</td>
+                        <td>84</td>
+                        <td>T</td>
+                        <td>151</td>
+                        <td>POKE</td>
+                        <td>187</td>
+                        <td>RND</td>
+                    </tr>
+                    <tr>
+                        <td>49</td>
+                        <td>1</td>
+                        <td>85</td>
+                        <td>U</td>
+                        <td>152</td>
+                        <td>PRINT#</td>
+                        <td>188</td>
+                        <td>LOG</td>
+                    </tr>
+                    <tr>
+                        <td>50</td>
+                        <td>2</td>
+                        <td>86</td>
+                        <td>V</td>
+                        <td>153</td>
+                        <td>PRINT</td>
+                        <td>189</td>
+                        <td>EXP</td>
+                    </tr>
+                    <tr>
+                        <td>51</td>
+                        <td>3</td>
+                        <td>87</td>
+                        <td>W</td>
+                        <td>154</td>
+                        <td>CONT</td>
+                        <td>190</td>
+                        <td>COS</td>
+                    </tr>
+                    <tr>
+                        <td>52</td>
+                        <td>4</td>
+                        <td>88</td>
+                        <td>X</td>
+                        <td>155</td>
+                        <td>LIST</td>
+                        <td>191</td>
+                        <td>SIN</td>
+                    </tr>
+                    <tr>
+                        <td>53</td>
+                        <td>5</td>
+                        <td>89</td>
+                        <td>Y</td>
+                        <td>156</td>
+                        <td>CLR</td>
+                        <td>192</td>
+                        <td>TAN</td>
+                    </tr>
+                    <tr>
+                        <td>54</td>
+                        <td>6</td>
+                        <td>90</td>
+                        <td>Z</td>
+                        <td>157</td>
+                        <td>CMD</td>
+                        <td>193</td>
+                        <td>ATN</td>
+                    </tr>
+                    <tr>
+                        <td>55</td>
+                        <td>7</td>
+                        <td>91</td>
+                        <td>[</td>
+                        <td>158</td>
+                        <td>SYS</td>
+                        <td>194</td>
+                        <td>PEEK</td>
+                    </tr>
+                    <tr>
+                        <td>56</td>
+                        <td>8</td>
+                        <td>92</td>
+                        <td>£</td>
+                        <td>159</td>
+                        <td>OPEN</td>
+                        <td>195</td>
+                        <td>LEN</td>
+                    </tr>
+                    <tr>
+                        <td>57</td>
+                        <td>9</td>
+                        <td>93</td>
+                        <td>]</td>
+                        <td>160</td>
+                        <td>CLOSE</td>
+                        <td>196</td>
+                        <td>STR$</td>
+                    </tr>
+                    <tr>
+                        <td>58</td>
+                        <td>:</td>
+                        <td>94</td>
+                        <td>↑</td>
+                        <td>161</td>
+                        <td>GET</td>
+                        <td>197</td>
+                        <td>VAL</td>
+                    </tr>
+                    <tr>
+                        <td>59</td>
+                        <td>;</td>
+                        <td>95</td>
+                        <td>"</td>
+                        <td>162</td>
+                        <td>NEW</td>
+                        <td>198</td>
+                        <td>ASC</td>
+                    </tr>
+                    <tr>
+                        <td>60</td>
+                        <td>&lt;</td>
+                        <td>96-127</td>
+                        <td>Leer</td>
+                        <td>163</td>
+                        <td>TAB(</td>
+                        <td>199</td>
+                        <td>CHR$</td>
+                    </tr>
+                    <tr>
+                        <td>61</td>
+                        <td>=</td>
+                        <td>128</td>
+                        <td>END</td>
+                        <td>164</td>
+                        <td>TO</td>
+                        <td>200</td>
+                        <td>LEFT$</td>
+                    </tr>
+                    <tr>
+                        <td>62</td>
+                        <td>&gt;</td>
+                        <td>129</td>
+                        <td>FOR</td>
+                        <td>165</td>
+                        <td>FN</td>
+                        <td>201</td>
+                        <td>RIGHT$</td>
+                    </tr>
+                    <tr>
+                        <td>63</td>
+                        <td>?</td>
+                        <td>130</td>
+                        <td>NEXT</td>
+                        <td>166</td>
+                        <td>SPC(</td>
+                        <td>202</td>
+                        <td>MID$</td>
+                    </tr>
+                    <tr>
+                        <td>64</td>
+                        <td>@</td>
+                        <td>131</td>
+                        <td>DATA</td>
+                        <td>167</td>
+                        <td>THEN</td>
+                        <td>203-254</td>
+                        <td>Leer</td>
+                    </tr>
+                    <tr>
+                        <td>65</td>
+                        <td>A</td>
+                        <td>132</td>
+                        <td>INPUT</td>
+                        <td>168</td>
+                        <td>NOT</td>
+                        <td>255</td>
+                        <td><br></td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <figcaption>Tabelle 2. VC 20 Basic-Token. Die Codenummern 32 bis 95 entsprechen den ASCII-Codes. Nummern größer als 127 sind Token, also Abkürzungen für Basic-Befehle, die der Basic-Interpreter verwendet, um Speicherplatz zu sparen und die Verarbeitungsgeschwindigkeit zu erhöhen.</figcaption>
+        </figure>
+
+        <p>Durch NEW oder durch einen RESET wird nicht das gesamte Programm, sondern nur der Variablenpointer (45/46) und die erste Koppeladresse gelöscht. Durch Rekonstruktion dieser beiden Zeiger kann das scheinbar verlorene Basicprogramm wieder benutzt werden.</p>
+
+        <p>Hier nun das »Rezept« zur Rekonstruktion:<br>
+        • POKE (Basicanfang) + 2,1<br>
+        Basicanfang in GV = 4097<br>
+        + 3K = 1025<br>
+        + 8K = 4609<br>
+        • SYS 50483:POKE 46,PEEK(35): POKE 45, PEEK (781)+2:CLR</p>
+
+        <p>Unbedingt wichtig ist hier die Reihenfolge der Befehle! Ferner darf während der gesamten Prozedur keine Variable definiert werden, da diese das gelöschte Programm überschreiben würde.</p>
+
+        <p>Die Funktionsweise ist relativ einfach. Die Unterprogrammroutine (SYS 50483) bindet die Programmzeilen neu und stellt dabei den ersten Verbindungszeiger wieder her. Sie übergibt dann in den beiden Speicherstellen (35 und 781) die Adresse des Variablenbeginns —2.</p>
+
+        <h2>Die CHRGET-Routine</h2>
+
+        <p>Die Zeropage ist in Maschinensprache besonders einfach zu adressieren. Aus diesem Grund sind hier oft benötigte Daten abgelegt. Doch die Seite Null beheimatet auch ein Unterprogramm aus dem Basicinterpreter namens CHRGET (CHaRacter GET, Tabelle 3). Diese Routine hat die Aufgabe, aus dem Basictext einzelne Zeichen oder Befehle zur Auswertung bereitzustellen. Sie befindet sich gerade deshalb im RAM-Speicher, weil sie einen veränderbaren 2-Byte-Zeiger enthält. Da die Routine bei jeder Ausführung eines Basicbefehls benutzt wird, bietet sich hier eine gute Möglichkeit, in den Ablauf einzugreifen, um damit den Befehlsvorrat zu erweitern. CHRGET endet mit einem Sprung zurück zur Befehlsauswertung. Da die CHRGET-Routine im RAM liegt, kann an dieser Stelle die Routine in das Befehlsauswertungsprogramm des Benutzers umgeleitet werden. Dort wird zuerst das CHRGET-Unterprogramm zu Ende geführt.</p>
+
+        <p>Als Beispiel soll der bestehende Befehl π (Tokennummer 255) geändert werden. Das Befehlsauswertungsprogramm nach Tabelle 4 fragt ihn ab und verzweigt dann nach § 1C16, wo ein RESET ausgeführt wird (entspricht SYS 64802).</p>
+
+        <p>Man kann aber auch noch zusätzliche Parameter abfragen. Die nun folgende Änderung des π-Befehls steuert den Tongenerator, wobei drei Argumente und zwei Kommata geprüft werden müssen. Die Syntax des neuen Befehls ist aus Tabelle 5 ersichtlich.</p>
+
+        <figure>
+            <table border="1">
+                <tbody>
+                    <tr>
+                        <td>Tongenerator Bereich 0-3</td>
+                        <td>,</td>
+                        <td>Tonhöhe Bereich 0-255</td>
+                        <td>,</td>
+                        <td>Lautstärke Bereich 0-15</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <figcaption>Tabelle 5. Die Syntax des neuen π-Befehls</figcaption>
+        </figure>
+
+        <p>Die Steuerungsroutine wird nun aus diesen vorgefertigten Modulen zusammengesetzt.</p>
+
+        <p>Zuerst der Baustein zum Abfragen von Argumenten (Tabelle 6).</p>
+
+        <p>Die ROM-Routine ($D79B) holt sich aus dem Basictext den numerischen Ausdruck und stellt ihn im X-Register zur Verfügung. Ist der Wert größer als 255, wird eine Fehlermeldung ausgegeben. Die Syntax unseres Befehls erlaubt aber nur Argumente zwischen 0 und 3. Daher wird nochmals eine Bereichsprüfung vorgenommen.</p>
+
+        <p>Als nächstes wird das Komma abgefragt (Tabelle 7). CHRGOT holt das laufende Zeichen aus dem Basictext und die Routine vergleicht es mit dem ASCII-Code für das Komma.</p>
+
+        <p>Man unterscheidet im übrigen zwischen CHRGET und CHRGOT. CHRGET ($0073) stellt den Zwei-Byte-Zeiger um eins hoch und lädt dann das neue Zeichen in das Akku. CHRGOT ($0079) hingegen holt lediglich das Zeichen.</p>
+
+        <p>Um den Soundbefehl zu komplettieren müssen noch die restlichen drei Module eingebaut werden. Wir wollen an dieser Stelle jedoch darauf verzichten, das im einzelnen auszuführen. Es sollte jetzt jedoch klar geworden sein, wie man eine Befehlserweiterung realisieren kann.</p>
+
+        <p>Für Assembler-Laien jetzt noch ein komplettes Befehlsprogramm. Es erweitert die bestehenden Kommandos um:<br>
+            πO = Old (Rekonstruktion),<br>
+            πS <b>Tongenerator, Höhe, Lautstärke</b> ≙ Soundbefehl (wie oben)<br>
+            πS <b>Tongenerator, 0</b> ≙ Tongenerator abschalten,<br>
+            πP <b>Horizontal, Vertikal,</b> ”..” oder<br>
+            πP <b>Horizontal, Vertikal, String</b> ≙ Druck an einer spezifizierten Bildschirmstelle.</p>
+
+        <p>Das Ladeprogramm (Listing 1) lädt die Maschinenroutine automatisch in den richtigen Speicherbereich (abhängig von der Speichergröße) und gibt dann die Startadresse an. Zur Referenz ist das vollständige Assemblerprogramm als Listing 2 abgedruckt.</p>
+
+        <p>Die neuen Befehle können sowohl im Direktmodus, als auch im Programm verwendet werden. Benutzt man sie im Programm, so ist zu beachten, daß sie nie direkt nach der Zeilennummer stehen dürfen. So muß zum Beispiel der Befehl<br>
+            πS 1,240,15 mit Doppelpunkt im Programm stehen:<br>
+            10 : πS1,240,15 oder<br>
+            10 PRINT A$: πS1,240,15</p>
+
+        <h2>Listschutz für Basicprogramme:</h2>
+
+        <p>Es wurden bereits mehrfach Methoden veröffentlicht, mit denen man Programme vor unbefugtem Kopieren schützen kann. Hierbei gibt es mehrere Alternativen:</p>
+        <ol>
+            <li>Man verändert die Koppeladressen so, daß das Programm nicht listfähig ist, es jedoch normal mit RUN bedient werden kann.</li>
+            <li>Man verändert den LIST-Vektor mit POKE 774,34:POKE 755,253. Bei einem Listversuch löst dieser Vektor einen RESET aus und das Programm ist weg.</li>
+        </ol>
+
+        <p>Diese und andere Schutzmaßnahmen haben den Nachteil, daß sie von »Hackern« innerhalb kurzer Zeit umgangen werden können. Es gibt zwar keinen hundertprozentigen Programmschutz, jedoch bietet die nachfolgend beschriebene Methode eine große Sicherheit. Bei diesem Verfahren läßt die Änderung eines Kernalvektors (Tastatureingabe 804/805) das Basicprogramm mit Hilfe einer Maschinenroutine nach Abschluß des Ladevorgangs automatisch starten.</p>
+
+        <p>Zunächst zur Verfahrensweise beim Autostart:<br>
+            Schritt 1:</p>
+
+        <p>Eingabe des Ladeprogramms (Listing 3)<br>
+            Schritt 2:</p>
+
+        <p>Programm und Prüfsumme testen (Achtung es zerstört sich selbst mit NEW) und abspeichern<br>
+            Schritt 3:</p>
+
+        <p>POKE 44,A: POKE A*256,0 : NEW (A = 17 für die Grundversion; A = 19 bei Erweiterung ab 8 KByte; A = 5 Erweiterung + 3 KByte<br>
+            Schritt 4:</p>
+
+        <p>Ladeprogramm laden und starten<br>
+            Schritt 5:</p>
+
+        <p>Eigenes Programm nachladen<br>
+            Schritt 6:</p>
+
+        <p>POKE 43,24 : POKE 44,3<br>
+            Schritt 7:</p>
+
+        <p>POKE 792,91 : POKE 793,255 : POKE 808,114<br>
+            Schritt 8:</p>
+
+        <p>POKE 804,0 : POKE 805,X : SAVE &ldquo;&hellip;”,1,1</p>
+
+        <p>X wird vom Ladeprogramm angegeben (X = 16 in Grundversion; X = 18 bei Erweiterung ab 8 KByte; X = 4 bei Erweiterung von 3 KByte). Die Befehle von Schritt 8 müssen unbedingt in einer Zeile stehen, sonst stürzt der Computer ab.</p>
+
+        <p>Das Ladeprogramm (oder einfacher der Lader) übernimmt die Abspeicherung des Maschinenprogramms, wobei er sich nach einer eventuell vorhandenen Speichererweiterung richtet.</p>
+
+        <p>Nun zur Bedienung:</p>
+
+        <p>Nach der Prüfsummenkontrolle ist die Speichergröße per Tastendruck einzugeben. Dadurch wird überprüft, ob man vor dem Laden POKE 44,A eingegeben hat, denn sonst würde sich das Programm selbst überschreiben. Dann wird nach der Anfangsadresse für das zu schützende Basicprogramm gefragt. Der Lader gibt der Einfachheit halber bereits die entsprechende Adresse vor. Man kann sie aber auch ändern, wodurch das Auffinden des Basicprogramms nach einem RESET erschwert wird.</p>
+
+        <p>Zur Erklärung betrachten wir Bild 3. Es zeigt die Speicheraufteilung beim Autostart, bezogen auf die Grundversion. Das eigentliche Maschinenprogramm benötigt 95 Byte. Es liegt direkt am Basicbeginn (Adresse 4096). Dann folgt eine Lücke. Sie ist, wie bereits gesagt, nicht unbedingt nötig, aber sie erschwert etwaigen Raubkopierern das Auffinden des Programms. Hieran schließt sich das eigentliche Basicprogramm an.</p>
+
+        <figure>
+            <img src="155-3.png" alt="">
+            <figcaption>Bild 3. Die Speicheraufteilung beim Autostart, bezogen auf die Grundversion</figcaption>
+        </figure>
+
+        <h2>So funktioniert der Autostart</h2>
+
+        <p>Durch POKE 43,24 : POKE 44,3 wird der gesamte Bereich zwischen Adresse 792 und Programmende aufgezeichnet, wodurch sich die Ladezeit etwas erhöht.</p>
+
+        <p>Wie wir bereits gesehen haben, ist das Betriebssystem des VC 20 dank seiner Vektoren äußerst flexibel. Für den Programmschutz machen wir uns dabei folgende Zeiger zu Nutze:</p>
+
+        <ol>
+            <li>NMI-Vektor, Adresse 792,793: Dieser Vektor stellt die Verbindung zwischen RESTORE-Taste und NMI-Routine her. Durch die Änderung (siehe Schritt 7) wird die RESTORE-Routine einfach übersprungen; die Taste ist quasi abgeschaltet.</li>
+            <li>STOP-Vektor, Adresse 808,809: Auch hier wird die bestehende Routine übersprungen.<br>
+                Da dieser Vektorenbereich mit abgespeichert wird, ist, nachdem der Computer &ldquo;FOUND&rdquo; anzeigt, ein Stoppen des Computers nicht mehr möglich.</li>
+            <li>INPUT-Vektor, Adresse 804,805: Dieser Zeiger ist der eigentliche Dreh- und Angelpunkt des Autostarts. Er ist für die Tastatureingabe verantwortlich. Da er ständig durchlaufen wird, bewirkt POKE 804,0 : POKE 805,16 (bei geladener Autostartroutine) in der Grundversion einen Start des Basicprogramms. Ändert man den Zeiger hingegen vor dem Abspeichervorgang (wie in Schritt 8) geschieht vorläufig nichts, denn dann wird die Tastatur ja nicht benutzt.</li>
+        </ol>
+
+
+        <p>Somit eignet sich dieser Vektor besonders gut für unseren Zweck. Denn solange sich der Computer mit dem Laden beschäftigt, ist die Tastatur »ruhig gestellt«. Der Zeiger wird so lange nicht benötigt, bis das Programm komplett geladen ist. Ist dies geschehen, springt das Betriebssystem über den INPUT-Vektor in die Autostartroutine, die ihrerseits (nach dem Rückstellen des Zeigers auf seinen ursprünglichen Wert) über RUN das Basicprogramm startet.</p>
+
+        <p>Damit auch alles wieder in den richtigen Speicherbereich geladen wird, dafür sorgt die Sekundäradresse bei SAVE &ldquo; &rdquo;,1,1.</p>
+
+        <p>Das Programm kann anschließend ganz normal mit LOAD geladen werden. Zum Schluß noch zwei Tips:</p>
+
+        <ol>
+            <li>Wer besonders clever ist, der vernichtet alle »Spuren«, indem er die Maschinenroutine nach ihrer Benutzung im Basicprogramm löscht:<br>
+                5 FOR T = (Startadresse) TO (Startadresse) + 95 : POKE T, RND(0) + 255 : NEXT<br>
+                (Startadresse = 4096 in der Grundversion; = 1024 bei Erweiterung von 3 KByte; = 4608 bei Erweiterung ab 8 KByte</li>
+            <li>Bei einer Erweiterung von 8 KByte liegt ja bekanntlich der Bildschirmspeicher im Bereich zwischen Adresse 4096 und 4607. Somit wird er ebenfalls mit abgespeichert.<br>
+                Soweit die erste Folge unseres Kurses. Im zweiten Teil wollen wir uns etwas näher mit der Zeropage beschäftigen und unter anderem zeigen, wie man mehrere Basicprogramme gleichzeitig im Speicher halten kann.</li>
+        </ol>
+
+        <address class="author">(Christoph Sauer/ev)</address>
+
+        <figure>
+            <pre data-filename="befehlserw" data-name="Befehlserweiterung"></pre>
+            <figcaption>Listing 1. Basic-Lader zur Befehlserweiterung</figcaption>
+        </figure>
+        <figure>
+            <pre>******************** CHRGET FORTSETZUNG
+1D00  CMP #$FF     ; PI ?
+1D02  BEQ $1D16    ; JA, DANN VERZWEIGEN
+1D04  CMP #$3A     ; SONST CHRGET ZU ENDE FUEHREN
+1D06  BCS $1D15
+1D08  CMP #$20
+1D0A  BNE $1D0F
+1D0C  JMP $0073
+1D0F  SEC
+1D10  SBC #$30
+1D12  SEC
+1D13  SBC #$D0
+1D15  RTS
+1D16  JSR $0073    ; NAECHSTES ZEICHEN HOLEN
+1D19  CMP #$4F     ; 'O' ?
+1D1B  BNE $1D20    ; NEIN, DANN WEITER
+1D1D  JMP $1D31    ; SONST VERZWEIGEN
+1D20 CMP #$50      ; 'P' ?
+1D22  BNE $1D27    ; NEIN, DANN WEITER
+1D24  JMP $1D4B    ; SONST VERZWEIGEN
+1D27  CMP #53      ; 'S' ?
+1D29  BNE $1D2E    ; NEIN, DANN FEHLER
+1D2B  JMP $1D86    ; SONST VERZWEIGEN
+1D2E  JMP $CF08    ; 'SYNTAX ERROR' AUSGEBEN
+******************** O FUER REKONSTRUKTION
+1D31  LDY #$01
+1D33  STA ($2B),Y  ; AM BASICANFANG ABSPEICHERN
+1D35  JSR $C533    ; BASICZEILEN NEU BINDEN
+1D38  LDA $22
+1D3A  CLC
+1D3B  ADC #$02
+1D3D  STA $2D
+1D3F  LDA $23
+1D41  ADC #$00
+1D43  STA $2E      ; PROGRAMMENDE in DEZ 43,44 ABSPEICHERN
+1D45  JSR $C660    ; CLR DURCHFUEHREN
+1D48  JMP $C474    ; ZURUECK IN DEN DIREKTMODUS
+******************** P FUER POSITIONSDRUCK
+1D4B  JSR $D79B    ; PARAMETER HOLEN
+1D4E  CPX #$17     ; >23 ?
+1D50  BCC $1D55    ; NEIN, DANN WEITER
+1D52  JMP $D248    ; SONST FEHLERMELDUNG
+1D55  STA $FA      ; HORIZONTAL POSITION ABSPEICHERN
+1D57  JSR $0079    ; LFD. ZEICHEN HOLEN
+1D5A  CMP #$2C     ; KOMMA ?
+1D5C  BEQ $1D61    ; JA, DANN WEITER
+1D5E  JMP $CF08    ; SONST SYNTAX ERROR
+1D61  JSR $D79B    ; NAECHSTEN PARAMETER HOLEN
+1D64  CPX #$16     ; >22 ?
+1D66  BCC $1D6B    ; NEIN, DANN WEITER
+1D68  JMP $D248    ; SONST FEHLERMELDUNG
+1D6B  JSR $0079    ; NAECHSTES ZEICHEN HOLEN
+1D6E  CMP #$2C     ; KOMMA ?
+1D70  BEQ $1D75    ; JA, DANN WEITER
+1D72  JMP $CF08    ; SONST SYNTAX ERROR
+1D75  CLC          ; VORBEREITUNG FUER DAS UNTERPROGRAMM
+1D76  TXA            CURSOR SETZEN
+1D77  TAY
+1D78  LDX $FA
+1D7A  JSR $E50A    ; CURSOR AN POSITION (X/Y REG)
+1D7D  JSR $0073    ; NAECHSTES ZEICHEN HOLEN
+1D80  JSR $CAA0    ; STRING AUSWERTEN UND AUSGEBEN
+1D83  JMP $20C1    ; ROUTINE ABSCHLIESSEN
+******************** S FUER SOUND
+1D86  JSR $D79B    ; PARAMETER HOLEN
+1D89  CPX #$04     ; >4 ?
+1D8B  BCC $1D90    ; NEIN, DANN WEITER
+1D8D  JMP $D248    ; SONST FEHLERMELDUNG
+1D90  STX $FA
+1D92  JSR $0079    ; LFD. ZEICHEN HOLEN
+1D95  CMP $#2C     ; KOMMA ?
+1D97  BEQ $1D9C    ; JA, DANN VERZWEIGEN
+1D99  JMP $CF08    ; SONST SYNTAX ERROR
+1D9C  JSR $D79B    ; NAECHSTEN PARAMETER
+1D9F  STX $FB
+1DA1  BEQ $ 1DBA   ; BEI 0 TONGENERATOR ABSCHALTEN
+1DA3  JSR $0079    ; NAECHSTES ZEICHEN HOLEN
+1DA6  CMP #$2C     ; KOMMA ?
+1DA8  BEQ $1DAD    ; JA, DANN WEITER
+1DAA  JMP $CF08    ; SONSR SYNTAX ERROR
+1DAD  JSR $D79B    ; LETZTEN PARAMETER HOLEN
+1DB0  CPX #$10     ; >16 ?
+1DB2  BCC $1DB7    ; NEIN, DANN WEITER
+1DB4  JMP $D248    ; SONST FEHLERMELDUNG
+1DB7  STX $900E    ; LAUTSTAERKE
+1DBA  LDX $FA
+1DBC  LDA $FB
+1DBE  STA $900A,X  ; TONHOEHE IN DEN TONGENERATOR
+******************** ROUTINE ABSCHLIESSEN
+1DC1  LDA $9D      ; FLAG DIREKTMODUS/PROGRAMM
+1DC3  BPL $1DC8    ; FALL PROGRAMM DANN VERZWEIGEN
+1DC5  JMP $C474    ; DIREKTMODUS: READY EINSPRUNG
+1DC8  JMP $0079    ; ZUR NORMALEN BEFEHLSBEARBEITUNG
+******************** INITIALISIERUNG
+1DCB  LDA #$4C
+1DCD  STA $7C
+1DCF  LDA #$00
+1DD1  STA $7D
+1DD3  LDA #$20
+1DD5  STA $7E
+1DD7  RTS
+</pre>
+            <figcaption>Listing 2. Das vollstandige Assemblerprogramm zur Befehlserweiterung</figcaption>
+        </figure>
+        <figure>
+            <pre data-filename="autostart" data-name="Autostart"></pre>
+            <figcaption>Listing 3. Basicloader zum Autostart</figcaption>
+        </figure>
+
+    </article>
+</body>

@@ -1,0 +1,79 @@
+;catalog.prg ==0801==
+;Eingetippt von Endurion
+  100 rem +++++++++++++++++++++++++++++++
+  105 rem +++                         +++
+  110 rem +++     c a t a l o g       +++
+  120 rem +++                         +++
+  130 rem +++  all copyrights by      +++
+  140 rem +++                         +++
+  150 rem +++     thomas koether      +++
+  160 rem +++                         +++
+  170 rem +++++++++++++++++++++++++++++++
+ 1000 :
+ 1010 rem          m e n u e
+ 1020 :
+ 1030 print"{clr}
+ 1040 print"{down}{down}{down}{down}             c a t a l o g"
+ 1045 print"            CCCCCCCCCCCCCCC{down}{down}"
+ 1050 print"neuen catalog anlegen.............<1>"
+ 1060 print"neue produkte anhaengen...........<2>"
+ 1080 print"e n d e...........................<0>
+ 1090 print"{down}i h r e  e i n g a b e............<";
+ 1100 getw$:ifw$=""then1100
+ 1105 printw$
+ 1110 ifw$="1"then1185
+ 1120 ifw$="2"then1250
+ 1140 ifw$="0"thenend
+ 1150 print"{up}{up}{up}":w$="":goto1090
+ 1160 :
+ 1170 rem      dateiinhalt loeschen
+ 1180 :
+ 1185 ifg=1then1000
+ 1190 open1,8,15,"s:catalog":close1
+ 1200 g=1
+ 1210 goto1430
+ 1220 :
+ 1230 rem           infos anhaengen
+ 1240 :
+ 1250 ifg=1thenprint"datei nicht vorhanden":fora=1to2000:next:goto1000
+ 1260 open1,8,3,"catalog,s,a"
+ 1270 gosub9000
+ 1280 gosub8000
+ 1290 getw$:ifw$=""then1290
+ 1300 ifw$="y"orw$="j"thenprint#1,"AAA":goto1270
+ 1310 ifw$="n"thenprint#1,"AAA":close1:goto1000
+ 1320 goto1290
+ 1400 :
+ 1410 rem         infos eingeben
+ 1420 :
+ 1430 open1,8,4,"catalog,s,w":g=0:print#1,"first"
+ 1440 gosub9000
+ 1445 gosub8000
+ 1450 getw$:ifw$=""then1450
+ 1460 ifw$="y"orw$="j"thenprint#1,"AAA":goto1440
+ 1470 ifw$="n"thenprint#1,"AAA":close1:goto1000
+ 1480 goto1450
+ 8000 print"{up}{up}{up}{up}{up}{up}{up}{up}{up}{up}":x=1
+ 8010 z$=""
+ 8020 ifx>9then8090
+ 8030 getq$:ifq$=""thenprint"{rvon} {rvof}{left}";:goto8035
+ 8032 goto8039
+ 8035 getq$:ifq$=""thenprint" {left}";:goto8030
+ 8039 print" {left}";
+ 8040 ifq$=chr$(13)then8060
+ 8045 ifq$="_"thenfora=xto12:print"{down}":next:goto8090
+ 8047 ifq$=chr$(20)thenl=len(z$):z$=left$(z$,l-1):printchr$(157);:goto8030
+ 8050 z$=z$+q$:printq$;:goto8030
+ 8060 x=x+1
+ 8070 print#1,z$:print:goto8010
+ 8080 w$=""
+ 8090 print"{down}{down}{down}wollen sie noch mehr infos eingeben ?"
+ 8100 return
+ 8110 :
+ 8120 :
+ 8130 :
+ 9000 print"{clr}{down}{down}{down}{down}{down}"
+ 9010 ifg=1thenprint"datei nicht vorhanden":fora=1to2000:next:goto1000
+ 9020 fora=1to9:forb=1to39:printchr$(46);:next:print:next
+ 9030 return
+

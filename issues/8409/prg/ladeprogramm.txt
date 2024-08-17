@@ -1,0 +1,93 @@
+;ladeprogramm.prg ==0801==
+;Eingetippt von Endurion
+  900 printchr$(14):print"{clr}
+  950 p$="......................................
+ 1000 print"Wenn Sie ein eigenes Impressum"
+ 1010 print"eingeben wollen druecken Sie bitte <i>.":print
+ 1020 print"Wenn Sie schon ein Impressum haben "
+ 1030 print"dann <h>
+ 1040 getq$:ifq$=""then1040
+ 1050 ifq$="i"then1110
+ 1060 ifq$="h"thenprint:print"A B{$a0}C C D E F G H{$a0}I{$a0}N":goto2000
+ 1070 goto1040
+ 1080 :
+ 1090 rem         eingabe impressum
+ 1100 :
+ 1110 print"{clr}":print
+ 1120 print"Bitte geben Sie Ihr Impressum ein
+ 1130 print"Maximal 10 Zeilen a 35 Zeichen"
+ 1140 print
+ 1150 open1,3,0:open2,0,1
+ 1160 forz=1to10:printz;tab(4):input#2,fe$(z):print:next:close2:close1
+ 1270 print"Alles OK ?";
+ 1280 geta$:ifa$=""then1280
+ 1290 ifa$="j"ora$="y"then1320
+ 1300 ifa$="n"thenprint"{home}{down}{down}{down}{down}":goto1150
+ 1310 goto1280
+ 1320 open8,8,5,"@:impressum,u,w"
+ 1330 fora=1to10:print#8,fe$(a):next
+ 1340 close8
+ 1350 print"{clr}
+ 1360 print"Bitte geben Sie jetzt Ihr Hauptmenue ein":print
+ 1370 print"BEISPIEL":print
+ 1380 print"1. Aktuelle Informationen"
+ 1390 print"2. Catalog"
+ 1400 print"3. Electronic Mail"
+ 1410 print"{home}{down}{down}{down}{down}{down}":open1,3,0:open2,0,1
+ 1420 fora=1to3:input#2,fe$(a):print:next:close2:close1
+ 1460 fe$(1)=fe$(1)+right$(p$,36-len(fe$(1)))+"<1>"
+ 1470 fe$(2)=fe$(2)+right$(p$,36-len(fe$(2)))+"<2>"
+ 1480 fe$(3)=fe$(3)+right$(p$,36-len(fe$(3)))+"<3>"
+ 1490 print:print
+ 1500 fora=1to3:printfe$(a):next:print
+ 1510 print"Eingabe OK ?"
+ 1520 geta$:ifa$=""then1520
+ 1530 ifa$="j"ora$="y"then1560
+ 1540 ifa$="n"then1350
+ 1550 goto1520
+ 1560 open8,8,5,"impressum,u,a"
+ 1570 fora=1to3:print#8,fe$(a):next
+ 1580 close8
+ 2000 :
+ 2010 rem     time out einstellen
+ 2020 :
+ 2030 print:print:print
+ 2040 print"Bitte geben{$a0}Sie nun den Timeout ein
+ 2050 print"Das heisst,wie lange ein Anrufer in
+ 2060 print"der Mailbox arbeiten darf"
+ 2070 print"  1 .. 50 Minuten
+ 2080 inputt:ift<1ort>50then2080
+ 2090 printt" Minuten OK"
+ 2100 poke2,t
+10000 fori=51200to51481
+10010 readx:pokei,x:s=s+x:n=n+1:next
+10020 data173,14,220,9,128,141,14,220,173,15,220,41
+10030 data127,141,15,220,32,121,,240,101,32,253,174
+10040 data32,158,173,32,163,182,201,6,208,107,160,
+10050 data177,34,56,233,48,201,3,176,96,10,10,10
+10060 data10,133,251,200,177,34,56,233,48,201,10,176
+10070 data80,5,251,208,4,169,146,208,15,201,36,176
+10080 data68,201,19,144,7,56,248,233,18,216,9,128
+10090 data141,11,220,32,253,200,141,10,220,32,253,200
+10100 data141,9,220,169,,141,8,220,32,121,,240
+10110 data13,32,253,174,32,158,183,224,16,176,22,142
+10120 data167,2,120,173,20,3,73,161,141,20,3,173
+10130 data21,3,73,34,141,21,3,88,96,76,72,178
+10140 data165,251,72,165,252,72,173,136,2,133,252,169
+10150 data,133,251,160,30,173,11,220,201,18,240,17
+10160 data201,128,144,15,41,127,201,18,240,9,248,24
+10170 data105,18,216,208,2,169,,32,219,200,173,10
+10180 data220,32,219,200,173,9,220,32,219,200,173,8
+10190 data220,9,48,32,243,200,104,133,252,104,133,251
+10200 data76,49,234,72,41,240,74,74,74,74,24,105
+10210 data48,32,243,200,104,41,15,24,105,48,32,243
+10220 data200,169,58,145,251,173,167,2,153,,216,200
+10230 data96,200,177,34,56,233,48,201,6,176,134,10
+10240 data10,10,10,133,251,200,177,34,56,233,48,201
+10250 data10,176,238,5,251,96
+15000 open1,8,2,"impressum,u,r"
+15010 input#1,a$:printa$:ifst=0then15010
+15020 close1:print:print"ok j/n"
+15030 wait198,1:geta$:ifa$="n"thenrun
+20000 print"{clr}{down}bitte laden Sie nun mba2 nach!
+

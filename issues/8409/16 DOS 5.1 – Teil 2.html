@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>DOS 5.1 – Teil 2</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="Herbert Heise, gk">
+    <meta name="64er.issue" content="9/84">
+    <meta name="64er.pages" content="16-18">
+    <meta name="64er.head1" content="Software">
+    <meta name="64er.head2" content="C 64">
+    <meta name="64er.toc_category" content="Software">
+    <meta name="64er.index_title" content="DOS 5.1 (Teil 2)">
+    <meta name="64er.index_category" content="Software|Tips">
+    <meta name="64er.id" content="dos5_1">
+</head>
+
+<body>
+    <article>
+        <h1>DOS 5.1 – Teil 2</h1>
+
+        <p class="intro">Das interessante Programm DOS 5.1 auf Ihrer Demo-Diskette bietet noch mehr als wir bisher gedacht hatten. Einige Leser schrieben uns: Sie entlockten dem DOS noch einige bemerkenswerte Geheimnisse. Außerdem wird das Programm noch um einige Befehle erweitert, zum Beispiel durch Merge.</p>
+
+        <p>Wie schon in der Ausgabe 5/84 des 64'er-Magazins berichtet (»Wie bitte, Sie besitzen ein tolles Programm und wissen es gar nicht?«), gab es zum DOS 5.1 nur sehr wenig Literatur. Daraufhin setzten sich einige Tüftler hin und versuchten anhand eines Assemblerlistings, ihm seine Geheimnisse zu entlocken. Einer von Ihnen ist Herbert Heise. Sein Bericht steht stellvertretend für alle anderen Zusendungen, die wir erhalten haben. Doch lesen Sie selbst.</p>
+
+        <h3>Geheimnisvolles DOS</h3>
+
+        <p>Ich würde diesen Beitrag über das DOS gern fortsetzen und durch drei Programme abrunden. Denn das DOS hat noch folgende nützliche Eigenschaften:</p>
+        <ol>
+            <li>%NAME bedeutet, ein Maschinenprogramm absolut laden.</li>
+            <li>@#9 ändert die Geräteadresse des DOS in 9.</li>
+            <li>@Q schaltet das DOS ab.</li>
+            <li>@$:*=PRG listet nur PRG-Files.</li>
+            <li>Das Auslisten mit @$ läßt sich über Space steuern.</li>
+            <li>DOS-Befehle funktionieren auch im Programmbetrieb.</li>
+        </ol>
+
+        <p>Als ich mir das Diskettenlaufwerk gekauft hatte, wußte ich mit dem DOS wenig anzufangen. Dies liegt wohl hauptsächlich an der mangelnden Beschreibung im Handbuch. Mit der Zeit erfuhr ich durch Zufall und durch Bekannte, daß hinter dem DOS doch mehr steckt. Ich wurde neugierig und schaute mir das DOS genauer an. Damit das besser ging, erstellte ich mir zum DOS zuerst ein Assemblerlisting. Ich habe es gelesen und versucht, es zu verstehen. Was ich dabei herausgefunden habe, möchte ich hier beschreiben.</p>
+
+        <p>Später werde ich ein Programm 1 vorstellen, das es vereinfacht, das DOS zu kopieren.</p>
+
+        <p>Ein Programm 4 wird den Namen (=Einschaltmeldung) ändern.</p>
+
+        <p>Zum Schluß erweitere ich das DOS um den MERGE-Befehl. Über »+« kann damit ein Programm zugeladen werden.</p>
+
+        <p>Ich empfehle, zuerst das DOS zu laden.</p>
+
+        <h3>Erklärung der Befehle /,↑,%</h3>
+
+        <p>Das DOS erlaubt, ein Programm auf drei verschiedene Arten zu laden.</p>
+
+        <p>Um die Beschreibung etwas zu vereinfachen, werde ich die Programme, die ich laden will, einfach »Test« nennen. Normalerweise soll ein Basicprogramm geladen werden. Über Basic gebe ich »LOAD ” TEST ”,8« ein. Beim DOS erspart man sich die Anführungszeichen und schreibt ganz kurz: /TEST. Soll nach dem LOADING sofort ein RUN ausgeführt werden, schreibt man einfach ↑ TEST.</p>
+
+        <p>Die dritte Möglichkeit besteht darin, ein <b>Maschinenprogramm absolut zu laden</b>. Da dies seltener vorkommt, wird dies meist verschwiegen. In Basic lautet der Befehl LOAD ” TEST ”,8,1.</p>
+
+        <p>Geschieht dies im Direktmodus, so teilt mir der Computer bald sein OUT OF MEMORY mit und ich muß ein NEW eingeben. Dies wird beim DOS mit %TEST vermieden. Um diesen Befehl testen zu können, wird natürlich ein Maschinenprogramm benötigt. Das DOS ist zwar ein solches, versucht man es aber mit zum Beispiel %DOS so erhält man eine Fehlermeldung. Diejenigen, die von Data Becker »Profimat« oder »Profiass« besitzen, können dies damit probieren.</p>
+
+        <h3>Ein Tip am Rande</h3>
+
+        <p>Man spart sich Tipparbeit, wenn man sich mit @$ das Inhaltsverzeichnis auf den Bildschirm holt. Danach fährt man mit dem Cursor hoch zum gewünschten Programmnamen und drückt die Tasten »/«, »↑«, »%« oder »←« und ein RETURN. Schon erscheint ein LOADING beziehungsweise SAVING des Programms.</p>
+
+        <p>>Wer der Meinung ist, das DOS läßt sich nur mit einer Floppy einsetzen, den kann ich jetzt eines Besseren belehren. Soll das DOS zum Beispiel mit einem Kassettenrecorder arbeiten, genügt die Eingabe »@ # 1«. Dadurch adressieren wir Gerät 1. Es können nun die Abkürzungen /,↑,% benutzt werden. Natürlich kann man mit @ keinen Fehlerkanal lesen. Da nach jedem SAVE-Befehl mit »←« versucht wird, diesen zu lesen, kann auch diese Abkürzung nicht verwendet werden.</p>
+
+        <h2>DOS 5.1 arbeitet mit Disk oder Kassette</h2>
+
+        <p>Die Glücklichen, denen zwei Diskettenlaufwerke zur Verfügung stehen, wählen zum Beispiel über: @#9 ihre Station aus.</p>
+
+        <h3>Anmerkungen:</h3>
+
+        <p>Die Geräteadresse wird beim Aufruf mit »SYS 52224« festgelegt. Das DOS nimmt sich dabei den Wert aus der Speicherstelle 186(=$ba). Demnach wird das Gerät adressiert, von dem das DOS geladen wurde.</p>
+
+        <p>Sicher kennen viele den ’RESET-Befehl' über ’SYS 64738’. Damit bringt sich unser Rechnergenie in den Einschaltzustand. Soll das DOS danach wieder arbeiten, müssen wir ihm die richtige Gerätenummer zuweisen (zum Beispiel @ # 8).</p>
+
+        <p>Wer hätte das gedacht: Das DOS kann sich abschalten. Die Syntax lautet »@Q«. Eine Kontrolle mit dem Klammeraffen »@« ergibt SYNTAX ERROR.</p>
+
+        <p>Dies ist nützlich bei Programmen, die sich mit dem DOS nicht vertragen wollen. Beispielsweise tun dies Simons Basic und manche BACKUP-Programme nicht. Natürlich kann ersatzweise auch kurz der »Saft« abgedreht werden (das heißt Computer ausschalten).</p>
+
+        <h3>DOS und das Inhaltsverzeichnis</h3>
+
+        <p>Die Diskette hat viele Vorteile, unter anderem wird auf dieser automatisch ein Inhaltsverzeichnis angelegt. Dieses ist als Programm »$« gespeichert. Man kann es also über LOAD"$&ldquo;, 8 laden und mit LIST anschauen. Das DOS bietet diesen Befehl auch an. Er lautet »@$«. Dabei wird ein eventuell vorhandenes Programm nicht überschrieben. Zusätzlich kann das Auslisten gestoppt werden. Es genügt ein Druck auf die SPACE-Taste und das DOS verweilt in einer Warteschleife. Ein zweiter Tastendruck veranlaßt das DOS weiterzuarbeiten. Komfortabel wird das Ganze dadurch, daß man unter den Programmnamen auswählen kann. Dies geschieht durch Angabe von »*« oder »?«. Eine dritte Möglichkeit erlaubt Filetypen zu unterscheiden. »@$:*=PRG« listet alle vorhandenen PRG-Files aus. Entsprechendes gilt für »@$:T?S=SEQ« und »@$:TES*=USR«.</p>
+
+        <h3>DOS innerhalb von Programmen</h3>
+
+        <p>Aus dem Beitrag über das DOS in der Ausgabe 5/84 geht hervor, daß man das DOS nur im Direktmodus benutzen kann. Dem muß ich widersprechen. Die Befehle haben allerdings eine andere Form. Allgemein ist es notwendig, <b>den Namen in Anführungszeichen</b> zu setzen. Die Befehle lauten dann zum Beispiel »@&ldquo;$"«, »/"TEST"«, »←"TEST"« und »@&rdquo; &ldquo;«. So darf man auch im Direktmodus vorgehen. Ich denke aber, es wird sich keiner diese Mühe machen. Die Befehle werden ganz normal durch Doppelpunkt getrennt, zum Beispiel »@"S:TES*&rdquo; :@&ldquo; &rdquo;:@&ldquo;$"«.</p>
+
+        <h3>DOS als Programm ohne Lader</h3>
+
+        <p>Als ich zum ersten Mal mit dem DOS Bekanntschaft machte, störte mich die Tatsache, daß es in Form zweier Programme abgespeichert war. Das DOS ließ sich außerdem ohne Kopierprogramme schlecht auf eine andere Diskette kopieren. Deshalb habe ich aus dem DOS eine Art Basicprogramm gemacht. Dieses kann ich mit LOAD laden und mit SAVE abspeichern. Wollen Sie es mir nachmachen?</p>
+
+        <p>Dann laden Sie bitte das DOS auf dem bisher üblichen Weg, falls es nicht ohnehin schon geschehen ist. Tippen Sie nun das Programm »DOS verschieben« ein (Listing 1 und 2). Mit einem RUN ohne Datafehler verschiebt sich das DOS direkt hinter das Programm. Dies erlaube ich nur einmal, da das Programm sonst doppelt so lang oder länger würde. Löschen Sie jetzt alle Programmzeilen außer Zeile 100. Es darf kein NEW eingegeben werden. Es können aber beliebig Zeilen hinzugefügt werden. Zum Beispiel könnte man die Bildschirmfarben festlegen und alle Tasten mit Repeatfunktion versehen (Listing 3). Damit ist meine DOS-Version fertig und kann abgespeichert werden.</p>
+
+        <figure>
+            <pre data-filename="1 verschieben" data-name="DOS Verschieben"></pre>
+            <figcaption>Listing 1. Mit diesem Programm wird das DOS 5.1 kopierbar wie ein normales Basicprogramm.</figcaption>
+        </figure>
+        <figure>
+            <pre data-filename="2 verschieb asm" data-name="DOS Verschieben (Assembler)"></pre>
+            <figcaption>Listing 2. Die im Listing 1 enthaltenen DATA-Werte als Assemblerlisting.</figcaption>
+        </figure>
+        <figure>
+            <pre data-filename="3 gestutzt" data-name="DOS Gestutzt"></pre>
+            <figcaption>Listing 3. In Verbindung mit Listing 1 lassen sich Bildschirmfarben und andere Einstellungen mühelos integrieren.</figcaption>
+        </figure>
+
+        <h3>DOS unter neuem Namen</h3>
+
+        <p>Tippen Sie das Programm »Neuer Name für DOS« (Listing 4) ein. Die Bezeichnung für das eigene DOS muß der Variablen Z$ zugeordnet werden. Hierfür werden die Zeilen 0 bis 99 verwendet. Der String darf bis zu 98 Zeichen enthalten und hat dieselbe Form wie beim PRINT-Befehl (PRINT Z$;). Ein RUN schreibt diesen String in das DOS. Jedes SYS 52224 erzeugt nun diesen Namen auf dem Bildschirm. Diese DOS-Version kann natürlich in ein Basicprogramm umgewandelt werden, wie ich es oben beschrieben habe.</p>
+
+        <figure>
+            <pre data-filename="4 neuer name" data-name="Neuer Name für DOS"></pre>
+            <figcaption>Listing 4. Verändern Sie den Namen des DOS.</figcaption>
+        </figure>
+
+        <h3>MERGE-Befehl für das DOS</h3>
+
+        <p>Es wurden schon viele Methoden vorgestellt, die es ermöglichen sollten, ein Programm so zu laden, daß es an ein bestehendes angehängt wird. Ich erlaube mir nun, dem DOS diese zusätzliche Last aufzubürden.</p>
+
+        <p>Das Programm »DOS plus MERGE« (Listing 5 und 6) erzeugt diesen Befehl. Als Zeichen dient »+«. Ein MERGE-Befehl sieht dann aus wie »+TEST«. »+« und »/« arbeiten fast gleich. Sie unterscheiden sich nur in der Ladeadresse.</p>
+
+        <figure>
+            <pre data-filename="5 merge" data-name="DOS mit Merge"></pre>
+            <figcaption>Listing 5. Erweitern Sie das DOS mit dem Merge-Befehl.</figcaption>
+        </figure>
+        <figure>
+            <pre data-filename="6 merge asm" data-name="DOS mit Merge (Assembler)"></pre>
+            <figcaption>Listing 6. Auch hier wieder die in Listing 5 enthaltenen DATA-Werte als Assembler-Listing.</figcaption>
+        </figure>
+
+        <p>Ich sollte noch etwas anmerken. Hat das DOS das neue Zeichen »+« akzeptiert, so wird es vergeßlich. Denn das Zeichen »>« erfüllt seine Funktion nur noch im Direktbetrieb wie »+« auch.</p>
+
+        <p>Wie schon in der Ausgabe 5 angedeutet, lassen sich sämtliche Befehle, die normalerweise mit OPEN 15, 8, 15,&ldquo;&hellip;. übertragen werden, mit dem Klammeraffen abkürzen. Dazu gehören auch die Direktzugriffsbefehle wie B-R oder etwa B-W, und so weiter. Auch der im normalen Basic mögliche Replace-Befehl: SAVE&rdquo;@:name", 8 läßt sich abkürzen mit ←@:name. Damit kann man ein Programm erneut unter gleichem Namen abspeichern, ohne daß es zu einem FILE EXIST ERROR kommt. Der Replace-Befehl funktioniert natürlich auch beim erneuten Schreiben von zum Beispiel sequentielle Dateien, die bereits unter gleichem Namen existieren. Allerdings wird dabei die alte Version überschrieben.</p>
+
+        <address class="author">(Herbert Heise/gk)</address>
+
+    </article>
+</body>

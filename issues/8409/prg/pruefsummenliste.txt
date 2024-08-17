@@ -1,0 +1,34 @@
+;pruefsummenliste.prg ==0801==
+;Eingetippt von goloMAK
+62000 rem----------------------------
+62010 rem pruefsummenliste
+62020 rem----------------------------
+62030 bl$="            "
+62040 input"blockgroesse";bg
+62050 open1,4:cmd1
+62060 print"pruefsummenliste"
+62070 print"blockgroesse";bg
+62080 gosub62200
+62090 print"zeile  anzahl   summe    kein poke?"
+62100 gosub62200
+62110 restore
+62120 reada$:a=val(a$)
+62130 ifa$="*"thengosub62200:rc$="":gosub62210:print"gesamt" rc$:goto62300
+62140 an=an+1:s=s+a:b=b+1
+62160 ifa$<>mid$(str$(a),2)thenprintpeek(64)*256+peek(63);spc(20);a$
+62170 ifa>256thenprint peek(64)*256+peek(63) spc(20);a$
+62175 ifa<>int(a)thenprint peek(64)*256+peek(63) spc(20);a$
+62180 ifan=bgthengosub62205  :printrc$:an=0
+62190 goto62120
+62200 fori=1to10:print"    ";:next:print:return
+62205 rem-----------------------------
+62206 rc$=""
+62207 z$ =str$(peek(64)*256+peek(63))
+62208 rc$=rc$+left$(bl$,6-len(z$))+z$
+62210 b$=str$(b):s$=str$(s)
+62220 rc$=rc$+left$(bl$,6-len(b$))+b$
+62240 rc$=rc$+left$(bl$,10-len(s$))+s$
+62250 return
+62260 data*
+62300 print#1:close1
+

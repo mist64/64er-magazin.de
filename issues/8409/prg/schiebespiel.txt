@@ -1,0 +1,94 @@
+;schiebespiel.prg ==1001==
+;Eingetippt von Endurion
+    0 :
+    1 rem ***************
+    2 rem *             *
+    3 rem * schiebespiel*
+    4 rem *             *
+    5 rem ***************
+    6 :
+    7 :
+    8 gosub1000
+   10 dima$(7,7)
+   30 dimb$(25)
+  100 :
+  110 c=65
+  120 forx=1to5
+  130 fory=1to5
+  140 a$(x,y)=chr$(29)+chr$(c)
+  150 c=c+1
+  160 nexty
+  170 nextx
+  180 a$(5,5)="{rght}-"
+  270 print"{clr}{down}{down}{down}{down}"
+  275 print"{CBM-A}C{CBM-R}C{CBM-R}C{CBM-R}C{CBM-R}C{CBM-S}"
+  276 print"B B B B B B"
+  277 print"{CBM-Q}C{SHIFT-+}C{SHIFT-+}C{SHIFT-+}C{SHIFT-+}C{CBM-W}"
+  278 print"B B B B B B"
+  279 print"{CBM-Q}C{SHIFT-+}C{SHIFT-+}C{SHIFT-+}C{SHIFT-+}C{CBM-W}"
+  280 print"B B B B B B"
+  281 print"{CBM-Q}C{SHIFT-+}C{SHIFT-+}C{SHIFT-+}C{SHIFT-+}C{CBM-W}"
+  282 print"B B B B B B"
+  283 print"{CBM-Q}C{SHIFT-+}C{SHIFT-+}C{SHIFT-+}C{SHIFT-+}C{CBM-W}"
+  284 print"B B B B B B"
+  285 print"{CBM-Z}C{CBM-E}C{CBM-E}C{CBM-E}C{CBM-E}C{CBM-X}"
+  290 poke36878,10:t=36876
+  300 :
+  310 print"{home}"
+  320 print"{down}{down}{down}{down}"
+  330 forx=1to5
+  340 fory=1to5
+  350 printa$(x,y);
+  360 next
+  370 print:print
+  380 next
+  390 printtab(15);pu
+  400 :
+  410 getw$
+  420 ifw$=""then400
+  440 ifw$=chr$(133)then2000
+  450 forx=1to5
+  460 fory=1to5
+  470 ifright$(a$(x,y),1)=w$then500
+  480 nexty,x
+  500 :
+  520 ifa$(x-1,y)<>"{rght}-"anda$(x+1,y)<>"{rght}-"anda$(x,y-1)<>"{rght}-"anda$(x,y+1)<>"{rght}-"then400
+  530 poket,200:forr=1to40:next:poket,0
+  550 :
+  570 ifa$(x-1,y)="{rght}-"thena$(0,0)=a$(x,y):a$(x,y)=a$(x-1,y):a$(x-1,y)=a$(0,0)
+  580 ifa$(x+1,y)="{rght}-"thena$(0,0)=a$(x,y):a$(x,y)=a$(x+1,y):a$(x+1,y)=a$(0,0)
+  590 ifa$(x,y-1)="{rght}-"thena$(0,0)=a$(x,y):a$(x,y)=a$(x,y-1):a$(x,y-1)=a$(0,0)
+  600 ifa$(x,y+1)="{rght}-"thena$(0,0)=a$(x,y):a$(x,y)=a$(x,y+1):a$(x,y+1)=a$(0,0)
+  610 pu=pu+1
+  620 :
+  630 goto300
+ 1000 :
+ 1020 print"{clr};
+ 1040 print"  * schiebespiel *
+ 1050 print"{down}sie muessen durch     {down}verschieben der       {down}buchstaben ihre"
+ 1070 print"{down}anordnung so ver-     {down}aendern, dass sie     {down}statt waagerecht
+ 1090 print"{down}senkrecht zu stehen   {down}kommen.
+ 1110 print"{down}wenn das geschafft    {down}wurde, dann {rvon}f1{rvof}        {down}druecken !   (taste)";
+ 1150 getw$:
+ 1160 ifw$=""then1150
+ 1170 return
+ 2000 :
+ 2030 c=1
+ 2040 forx=1to5
+ 2050 fory=1to5
+ 2070 b$(c)=a$(y,x)
+ 2080 c=c+1
+ 2090 next:next
+ 2100 :
+ 2130 forc=2to24
+ 2140 ifb$(c)<b$(c-1)then2400
+ 2150 next
+ 2160 print"{down}{down}{down}bravo"
+ 2200 end
+ 2220 :
+ 2400 print"{down}{down}{down}das war leider       {down}  nicht richtig
+ 2430 forq=1to2000
+ 2440 next
+ 2450 print"{clr}
+ 2480 goto270
+
