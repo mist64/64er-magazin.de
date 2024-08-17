@@ -89,9 +89,15 @@ Die Eingabe-Ausgaben werden aus `issues` gelesen, die Website wird nach `out` ge
         * [vicjack](https://www.forum64.de/wcf/index.php?user/15999-vicjack/)
 * Ausgabe 8/84:
     * Erfassen diverser Tabellen, Eintragen der Index-Kategorien und -Titel, OCR-Fixes
-    * [thierer](https://www.forum64.de/wcf/index.php?user/26370-thierer/)
+        * [thierer](https://www.forum64.de/wcf/index.php?user/26370-thierer/)
     * Abtippen der Listings
         * [Endurion](https://www.forum64.de/wcf/index.php?user/1964-endurion/)
+* Ausgabe 9/84:
+    * Formatierung, Eintragen der Index-Kategorien und -Titel, OCR-Fixes
+        * [thierer](https://www.forum64.de/wcf/index.php?user/26370-thierer/)
+    * Abtippen der Listings
+        * [Endurion](https://www.forum64.de/wcf/index.php?user/1964-endurion/)
+        * [goloMAK](https://www.forum64.de/wcf/index.php?user/28439-golomak/)
 
 
 ![](screenshot1.png)
