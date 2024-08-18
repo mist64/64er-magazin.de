@@ -1,0 +1,109 @@
+;zahlungsverkehr.prg ==0801==
+;Quelle: 1984-08-09-10.d64
+
+   10 rem********************************
+   20 rem* druck von bankueberweisungen *
+   25 rem*    cbm 64 - epson rx-80f/t   *
+   30 rem*     manfred braeuler  1984   *
+   35 rem*     wormser str. 118         *
+   40 rem*     6840 lampertheim         *
+   45 rem********************************
+   49 :
+   50 printchr$(147)     : rem clr/home
+   55 poke 53280,6: rem bildschirmrand blau,kann entfallen!
+   60 le$="***********************************************":rem entwertung
+   70 ka$="5 999 085           ":rem kontonr. des absenders
+   80 a$="m. br[uler, 6840 lampertheim, wormser str. 118"        : rem absender
+   90 print"         bankueberweisung":print"folgende empfaenger sind im speicher:"
+   95 goto 800: rem gespeicherte empfaenger
+  100 print:print"   ueberweisungsauftrag"
+  110 print:print:print"empfaenger (max. 50 zeichen)
+  115 inpute$: e=len(e$)
+  120 if e>50 then print"zeile zu lang, bitte neue eingabe!": goto 115
+  130 input"kontonummer ";k$:k=len(k$)
+  140 input"bankleitzahl";bl$
+  145 print"bei bank (max. 45 zeichen)
+  147 inputb$
+  148 if len (b$)>45then print"zeile zu lang,bitte neue eingabe!":goto 147
+  150 print"verwendungszweck    (zwei zeilen mit je max. 45  zeichen moeglich)"
+  155 inputv1$
+  160 if len (v1$)>45then print"zeile zu lang,bitte neue eingabe!":goto 155
+  170 print"zweite zeile (leer ist 'return')"
+  180 inputv2$:v=len(v2$)
+  190 if v>45 then print"zeile zu lang, bitte neue eingabe!": goto 180
+  200 print"betrag in buchstaben (max. 45 zeichen)
+  210 inputbe$:b=len(be$)
+  215 if b>45 then print"zeile zu lang, bitte neue eingabe!": goto 210
+  220 print"betrag als zahl (dm 'return' pfennige    >kein komma<)": inputdm$,pf$
+  230 input"datum";d$
+  234 :
+  235 rem*bildschirmausgabe zur kontrolle
+  240 printchr$(147)
+  250 print:print"      ueberweisung"
+  300 print:print"empfaenger        :  ";e$
+  320 print:print"kontonummer       :  ";k$
+  330 print"bankleitzahl      :  ";bl$
+  340 print"bei               :  ";b$
+  350 print:print"verwendungszweck  :  ";v1$;" ";v2$
+  370 print:print"betrag in worten  :  ";be$
+  390 print:print"betrag als zahl   :  ";dm$;",";pf$
+  400 print:print"kntonr. auftragg. :  ";ka$
+  410 print:print"auftraggeber      :  ";a$
+  415 print:print"datum             :  ";d$
+  420 print:print"  ";chr$(18);"  alles richtig <j/n>";chr$(146): rem rvs on/off
+  430 get x$: if x$<>"j"andx$<>"n" then 430
+  440 if x$="n" then 50
+  448 :
+  449 rem*druckerausgabe
+  450 if x$<>"j" then 430
+  500 printchr$(147)
+  510 print:printchr$(18);"  formular in drucker einlegen!";chr$(146)
+  520 print:print"druckerstart durch druecken einer       beliebigen taste!"
+  530 get t$: ift$="" then 530
+  540 open1,4:print#1,chr$(27);"m";: rem***    schoenschrift an
+  550 print#1,e$;tab(55-e);bl$
+  555 print#1,
+  560 print#1,:print#1,k$;tab(20-k);b$
+  570 print#1,:print#1,v1$
+  580 print#1,v2$;tab(52-v);"****";dm$;",";pf$
+  585 print#1,
+  590 print#1,be$;left$(le$,(47-b))
+  595 print#1,
+  600 print#1,ka$;a$
+  610 print#1,:print#1,tab(20);d$
+  615 print#1,:print#1,:print#1,
+  620 print#1,chr$(27);chr$(64): rem ***  drucker normieren
+  625 close1
+  628 :
+  629 rem***wiederholung?
+  630 print:print"noch eine ueberweisung <j/n>?"
+  640 get  ue$: if ue$<>"j"andue$<>"n" then 640
+  645 if ue$="n" then 670
+  650 if ue$="j" then print"gleicher empfaenger    <j/n>?"
+  655 get em$: if em$<>"j"andem$<>"n" then655
+  660 if em$="j"then printchr$(147):goto150
+  665 if em$="n"then run
+  670 printchr$(147)
+  680 print:print"   programmende":end
+  689 :
+  790 rem***auflistung der gespeicherten empfaenger mit verzweigung ab 1000
+  795 :
+  800 print:print"2< dr. graunwald"
+  810 print"3< firma baerwind
+  990 print"1< empfaenger ist nicht gespeichert
+  994 :
+  995 rem*weitere empfaenger koennen nach dem gleichen muster gespeichert werden!
+  996 rem*ab1200 folgen die gespeicherten empfaengerdaten                       *
+  997 :
+ 1000 print:printchr$(18);"bitte nummer des empfaengers eingeben";chr$(146)
+ 1020 get nr$: if nr$=""then1020
+ 1030 n=val(nr$)
+ 1040 printchr$(147)
+ 1200 on n  goto   100,1210,1220
+ 1210 e$="dr. med. graunwald lampertheim bartstr. 112": e=43
+ 1212 k$="12345":k=5:bl$="22258909":b$="dresdner bank lampertheim filiale mitte"
+ 1215 goto 150
+ 1220 e$="firma baerwald lampertheim industriestr. 115":e=44
+ 1222 k$="5678912":k=7:bl$="66090800":b$="kreis- u. stadtsparkasse worms"
+ 1225 goto 150
+

@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>Screen Change</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="Harald Soyka, rg">
+    <meta name="64er.issue" content="9/84">
+    <meta name="64er.pages" content="94-96">
+    <meta name="64er.head1" content="Grafik">
+    <meta name="64er.head2" content="C 64">
+    <meta name="64er.toc_category" content="Programme zum Abtippen|Grafik">
+    <meta name="64er.index_title" content="Screen Change">
+    <meta name="64er.index_category" content="Listings zum Abtippen|Grafik|Befehlserweiterung">
+    <meta name="64er.id" content="screen_change">
+</head>
+
+<body>
+    <article>
+        <h1>Screen Change</h1>
+
+        <p class="intro">Ärgern Sie sich beim Erstellen umfangreicher Programme auch manchmal darüber, daß Sie nicht mehr genau wissen, wie ein bestimmter Programmteil aussieht? Dann werden Sie neu listen und der zuletzt bearbeitete Programmteil ist verschwunden. Die entsprechende Stelle muß wieder gesucht werden. Bis dahin hat man die zuerst gesuchte Stelle vielleicht schon wieder vergessen.</p>
+
+        <p>Die Routine »Screen Change« erweitert den Basicbefehlssatz dahingehend, daß der aktuelle Bildschirminhalt im RAM zwischengespeichert und bei Bedarf wieder zurückgeholt werden kann. So können bis zu vier Seiten abgelegt werden. Man hat also die Möglichkeit Notizen, oder andere Informationen, wie beispielsweise Listings oder Low-Resolution-Grafik, zu konservieren. Gleichermaßen sind Sie in der Lage, im Programmablauf eine Text- oder Grafikseite darzustellen, während eine weitere unsichtbar aufgebaut wird.</p>
+
+        <p>Nachdem der Basic-Lader gestartet wurde, ist das Programm automatisch initialisiert (SYS 49152). Durch gleichzeitiges Drücken der Tasten »CTRL« und »COMMODORE C« und einer f-Taste werden nun Video-RAM und entsprechender Seitenspeicher vertauscht. Normalerweise wird anschließend lediglich »Müll« auf dem Bildschirm zu sehen sein, da die betreffende Seite noch nicht beschrieben war. Drücken Sie nun aber die gleiche Kombination, oder einfach nur die Tasten »CTRL- und f-Taste« dann erscheint sofort der ursprüngliche Inhalt. Haben Sie die erste Kombination eingegeben wurden die Speicher wieder vertauscht, das heißt der Müll wurde zurückgeschrieben. Hingegen bleibt bei der zweiten Kombination der Seitenspeicher mit der gerade eingelesenen Information gefüllt. Dies läßt sich leicht überprüfen, indem der Bildschirm gelöscht wird, um daraufhin die zweite Kombination noch einmal einzugeben. Es zeigt sich sofort, daß der Inhalt unverändert geblieben ist. Dies istsolange der Fall bis die betreffende Seite mit Tastenkombination 1 »CTRL + C« eine andere Bildschirmseite aufnimmt. Das oben gesagte gilt für alle vier Funktionstasten.</p>
+
+        <p>Natürlich versagt diese Methode, wenn die gewünschte Funktion vom Basicprogramm her aufgerufen werden soll. Dazu wird der neue Befehl »SEITEx,m« eingeführt. Der Index x gibt dabei die Seitennummer und m den Modus an. Die Seitennummer darf dabei zwischen 0 und 3 liegen.m kann T oder H sein.<br>
+            T bedeutet: Seiten tauschen; entsprechend Tastenkombination 1<br>
+            H bedeutet: Seite holen; entsprechend Tastenkombination 2</p>
+
+        <p>Damit hat man die Möglichkeit Zwischenergebnisse abzulegen, eine Bedienungsanleitung einzublenden, um dann wieder in die normale Textseite zurückzukehren, Bildschirmmasken einzublenden und vieles mehr. Der interessierte Anwender wird sicher eine Fülle weiterer Einsatzmöglichkeiten entdecken. Doch nun einige Worte zum Programm selbst. Natürlich ist es auch möglich die Seiten über das Befehlswort im Basicdirektmodus aufzurufen. Dies hat jedoch den Nachteil, daß der Befehlstext sowie die READY-Meldung mit übertragen werden. Um dies zu umgehen wird die Tastaturabfrage über eine neue Routine geleitet, die die f-Tasten decodiert.</p>
+
+        <p>Der Befehl »SEITE« wird erkannt indem die Interpreterschleife meine Routine durchläuft. Dies kann im einzelnen dem Assemblerlisting entnommen werden.</p>
+
+        <p>Interessant ist in diesem Zusammenhang, daß die zusätzlich benötigten 4 KByte Video-RAM den freien Basicspeicherbereich nicht einschränken, da sie im normalerweise nicht nutzbaren Bereich hinter dem Interpreter liegen.</p>
+
+        <p>Zusätzlich habe ich eine Routine entwickelt, die über eine Befehlserweiterung das Laden und Speichern der Seiten auf Diskette zuläßt.</p>
+
+        <p>Über die normale Anwendung hinaus mögen folgende Anmerkungen von Nutzen sein:</p>
+
+        <p>lm CTRL-Modus wird in die rechte obere Bildecke die gewählte Seitennummer eingeblendet. Sollte dies als störend empfunden werden, so kann durch Ändern der letzten Zahl der letzten DATA-Zeile in eine beliebige andere die Einblendung ausgeschaltet werden.</p>
+
+        <p>Das Zurückschreiben der »32« führt wieder zur Standardausgabe. Über die Adresse 49313 (POKE 49313,F) läßt sich die Zeichenfarbe F der einzublendenden Seiten ändern. Gekoppelt mit dem Befehl SEITE ließen sich die verschiedenen Seiten in jeweils typischen Farben darstellen. Soll von vornherein eine bestimmte Zeichenfarbe eingestellt werden, so ist die »14« in der DATA-Zeile 79 dahingehend zu ändern.</p>
+
+        <p>Durch Anpassung der Zieladressen-Tabelle lassen sich die Seiten in jeden möglichen Speicherbereich legen. Dabei muß lediglich beachtet werden, ob eventuell das Basic-RAM oder ein darin liegendes Programm geschützt werden muß! Auf diese Weise lassen sich natürlich auch weit mehr Seiten anlegen.</p>
+
+        <p>Soll nun im Rahmen eines Basicprogramms eine Seite beschrieben werden, so kann dies wie gewohnt über POKEs erfolgen. Zu berücksichtigen sind lediglich die Startadressen der vier Seitenspeicher. Will man normalerweise den Bildschirm über POKE ansprechen, dann geht man von Adresse 1024 aus. Diese ersetzt man nun gegen die unten angegebenen und die gewählte Seite läßt sich unsichtbar beschreiben um bei Bedarf eingeblendet zu werden. Das Farb-RAM muß hier nicht neu beschrieben werden. Im folgenden nun die benötigten Adressen:<br>
+            Seite 0: 40960 bis 41959<br>
+            Seite 1 : 41984 bis 42983<br>
+            Seite 2 : 43008 bis 44007<br>
+            Seite 3 : 44032 bis 45031</p>
+
+        <address class="author">(Harald Soyka/rg)</address>
+
+        <figure>
+            <pre data-filename="screen change" data-name="Screen Change"></pre>
+            <figcaption>Listing Basic-Lader von »Screen Change«</figcaption>
+        </figure>
+        <figure>
+            <pre>90 OPEN4,4
+180 SYS9*4096
+110 *= $C000
+120 .OPT P,OO
+130 STO1     = $FB
+140 STO2     = $FD
+150 LSTX     = $C5
+160 SFDX     = $CB
+170 R6510    = $01
+180 SHFLAG   = $028D
+190 RETURN1  = $EB48
+200 RETURN2  = $EB42
+210 RETURN3  = $A7E7
+220 VECTOR1  = $028F
+230 VECTOR2  = $0308
+240 CHRGET   = $0073
+250 CHRGOT   = $0079
+260 SYNTAX   = $AF08
+278 ;
+288 ; ***********   HARALD SOYKA   **********
+298 ; *********** HATTINGERSTR.685 **********
+388 ; ***********   463 BOCHUM 5   **********
+385 ; *********** TEL. 8234/411913 **********
+310 ;
+328 ; DIESES PROGRAMM TAUSCHT DEN BILDSCHIRMSPEICHER
+338 ; MIT DEM BEREICH $A000-$B000. SOMIT KOENNEN BILD-
+348 ; SCHIRMINHALTE ZWISCHENGESPEICHERT WERDEN.
+350 ; UEBER DIE FUNKTIONSTASTEN+(CTRL) KANN LAUFEND
+360 ; ZWISCHEN VIER BILDSCHIRMSEITEN GEWECHSELT WERDEN.
+378 ;
+380 ;
+398 ; ********** PRG INITIALISIEREN *********
+400 LDA #&lt;START
+410 LDX #&gt;START       ;TASTATURABFRAGE
+420 STA VECTOR1       ;UEBER EIGENE
+430 STX VECTOR1+1     ;ROUTINE LEITEN
+440 ;
+450 LDA #&lt;INTER
+460 LDX #&gt;INTER       ;INTERPRETER
+470 STA VECTOR2       ;UEBER EIGENE
+480 STX VECTOR2+1     ;ROUTINE LEITEN
+490 RTS
+500 ;
+510 ; *** AUF GEDRUECKTE F-TASTEN PRUEFEN ***
+520 START LDX #$83
+530 S0 CPX SFDX
+548 BEO FOUND
+558 INX
+560 CPX #$07
+578 BNE S0
+580 BACK JMP RETURN1
+590 ;
+608 FOUND CPX LSTX
+610 BEQ BACK
+620 STX LSTX
+630 LDA SHFLAG        ;CONTROL TASTE
+640 CMP #$04          ;GEDRUECKT
+650 BEQ M1
+660 CMP #$06
+670 BEQ M2
+680 JMP RETURN1
+690 M1 JSR VFL           ;V-FLAG SETZEN
+700 M2 JSR CHAN          ;CHANGE SRCEEN
+710 JMP RETURN2
+720 ;
+730 ; *** ZEIGER FUER VERSCHIEBEROUTINE SETZEN ***
+740 ;
+750 CHAN SEI
+760 ;
+770 LDA SEITE,X       ;NUMMER DER TASTE
+780 PHA
+790 STA STO2+1        ;IN X
+800 LDA #04
+810 STA STO1+1
+820 LDA #$00
+830 STA STO1
+840 STA STO2
+850 PHA
+860 ;
+870 ;*********** RAM AUSTAUSCHEN ***********
+880 RAM DEC R6510        ;$A000 RAM FREIGEBEN
+890 LDX #4           ;4 BLOECKE
+900 LDY #0
+910 S2 LDA (STO2),Y     ;VON $AXXX
+920 BVS M3
+930 PHA
+940 LDA (STO1),Y     ;VON $0400
+950 STA (STO2),Y     ;NACH $AXXX
+960 PLA
+970 M3 STA (STO1),Y     ;NACH $0400
+980 DEY
+990 BNE S2
+1000 ;
+1010 BLOCK INC STO1+1       ;ZEIGER
+1020 INC STO2+1       ;HOCHZAEHLEN
+1030 DEX
+104© BNE S2
+1050 INC $01
+1060 CLV
+1070 ;
+1080 ; ******** SEITENNUMMER EINTRAGEN *******
+1090 PLA
+1100 TAX
+1110 LDY TEXT+6        ;AUF MODUS
+1120 CPY #$20          ;PRUEFEN
+1130 BEQ S1
+1140 PLA
+115© JMP FARB          ;FARBE SETZEN
+1160 S1 LDA TEXT,X
+1170 AND #%10111111
+1180 EOR #$80          ;IN BILDSCHIRM
+1190 STA $0400,Y       ;SCHREIBEN
+1200 INY
+1210 INX
+1220 CPX #$07          ;ALLE ZEICHEN
+1230 BNE S1
+1240 PLA
+1250 LSR : LSR
+1260 AND #%100000011   ;SEITENNUMMER
+1270 ORA #%110110000
+12S0 STA $0400,Y       ;EINFUEGEN
+1290 ;
+1300 ; *********  FARB-RAM AUFUELLEN *********
+1310 FARB LDA #$D8          ;ZEIGER AUF
+1320 STA STO2+1        ;FARB-RAM
+1330 LDX #4
+1340 LDY #0
+1350 LDA #14           ;FARBE NR. 14
+1360 S3 STA (STO2),Y
+1370 DEY
+1380 BNE S3            ;IN RAM
+1390 INC STO2+1
+1400 DEX
+1410 BNE S3            ;SCHREIBEN
+1420 CLI
+1430 RTS
+1440 ;
+1450 ; *********** V-FLAG SETZEN *************
+1460 VFL PHP
+1470 PLA
+1480 ORA #%01000000
+1490 PHA
+1500 PLP
+1510 RTS
+1515 ;
+1520 ; ************ BASIC-CODE SUCHEN ********
+1530 INTER JSR CHRGET        ;ZEICHEN HOLEN
+1540 PHP
+1550 CMP #$53
+1560 BNE PL
+1573 LDY #$01
+1580 LDA ($7A),Y       ;ZEICHEN HOLEN
+1590 CMP #$45
+1600 BEQ TAUSCH
+1610 PL PLP
+1620 JSR CHRGOT
+1630 JMP RETURN3       ;BEFEHL AUSFUEHREN
+1635 ;
+1640 TAUSCH JSR CHRGET
+1650 LDX #$03          ;BEFEHLSCODE
+1660 S4 JSR CHRGET
+1670 CMP TEXT,X        ;PRUEFEN.
+1680 BNE SY            ;EINGABE FEHLER
+1690 INX
+1700 CPX #$06
+1710 BNE S4
+1720 JSR CHRGET        ;SEITENNR.
+1730 CMP #$30
+1740 BMI SY
+1750 CMP #$34          ;HOLEN
+1760 BPL SY
+1770 AND #$0F          ;UND AUFBEREITEN
+1780 CLC
+1790 ADC #$03
+1800 TAX
+1810 JSR CHRGET        ;NAECHSTES ZEICHEN
+1820 CMP #$2C
+1830 BNE SY
+1840 JSR CHRGET
+1850 CMP #$48
+1860 BEQ I1
+1878 CMP #$54
+1880 BEQ I2
+1890 SY JMP SYNTAX         ;SYNTAX ERROR
+1900 I1 JSR VFL            ;V-FLAG SETZEN
+1910 I2 INC TEXT+6         ;EINBLENDUNG
+1920 JSR CHAN
+1930 DEC TEXT+6        ;BLOCKIEREN
+1940 JSR CHRGET
+1950 JMP $A7AE
+1955 ;
+I960 ; ****  HIGH BYTES DER ZIELADRESSEN *****
+1970 SEITE .BYTE $00,$00,$00,$A0,$A4,$A8,$AC
+1980 ;
+1990 ; ************* BILDEINTRAG *************
+2000 TEXT .ASC "&gt;SEITE ”
+READY.</pre>
+            <figcaption>Assembler Listing von »Screen Change«</figcaption>
+        </figure>
+
+    </article>
+</body>

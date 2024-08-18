@@ -1,0 +1,30 @@
+;datawandler.prg ==0801==
+;Quelle: 1984-08-09-10.d64
+
+60000 rem *** datawandler ***
+60010 rem *** (c) uwe chr. parpart ***
+60020 print"{clr}{down}    *** d a t a w a n d l e r ***"
+60030 input"{down} jetzige anfangsadresse";aa
+60040 input"{down}     jetzige endadresse";ea
+60050 print"{down} ist die anfangsadresse identisch"
+60060 print"{down} mit spaeterer ladeadresse (j/n)?"
+60070 geta$:ifa$=""then60070
+60080 ifa$="j"thenla=aa:goto60120
+60090 ifa$="n"then60110
+60100 goto 60070
+60110 input"{down}   spaetere ladeadresse";la
+60120 input"{down} name des programms";l$
+60130 open1,8,1,l$+",p,w"
+60140 hb=int(la/256):lb=la-hb*256
+60150 print#1,chr$(lb);chr$(hb);
+60160 fori=aatoea
+60170 print#1,chr$(peek(i));
+60180 nexti:close1
+60190 rem *** abfrage fehlerkanal ***
+60200 open1,8,15
+60210 input#1,a,b$,c,d
+60220 printa;b$;c;d
+60230 close1
+60240 print"{rght}{rght}{down}{down}{rvon}f e r t i g !{rvof}"
+60250 end
+

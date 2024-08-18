@@ -1,0 +1,566 @@
+;orgelsynthesizer.prg ==0801==
+;Quelle: 1984-08-09-10.d64
+
+    0 goto 100
+    1 rem"               CCC
+    2 rem"    B        CCCCCCC        B
+    3 rem"   BB      CCCCCCCCCCC      BB
+    4 rem"  BBB    elektronenorgel    BBB
+    5 rem"   BB      CCCCCCCCCCC      BB
+    6 rem"    B        CCCCCCC        B
+    7 rem"               CCC
+    9 :
+   10 rem        christian gebauer
+   11 rem        6350 bad nauheim
+   12 rem           april 1983
+   13 rem      verbessert im juli '83
+   15 :
+   19 rem
+   20 rem        --- variablen ---
+   25 rem
+   30 rem iz     zahl der instrumente
+   31 rem mz     ''   ''  toene
+   32 rem tz     ''   ''  tontasten
+   33 rem
+   34 rem i$()   instrumentenname
+   35 rem ib$(,) symbolfragment des instr.
+   36 rem i1()   parameter fuer die
+   37 rem  --     klangeigenschaften
+   38 rem i5()    des instrumentes                        entspr.: wf,as,ha,tl,th
+   39 rem ia     aktuelles instrument
+   40 rem ib     voriges   ''
+   41 rem ih     grundeistellung hall-eff.
+   42 rem io     ''              oktave
+   43 rem
+   44 rem m1%()  tonparameter high
+   45 rem m2%()  ''           low
+   46 rem n1     ergebnis taste-ton low
+   47 rem n2     ''       ''        high
+   48 rem
+   49 rem t%()   tasten-ton-zuordnung
+   50 rem
+   51 rem sid-adressen:
+   52 rem si()   grundadresse
+   53 rem fl()   frequenz low
+   54 rem fh()   frequenz high
+   55 rem tl()   tastverhaeltnis low
+   56 rem th()   tastverhaeltnis high
+   57 rem wf()   wellenform
+   58 rem as()   anschlag - abschwellen
+   59 rem ha()   halten - ausklingen
+   60 rem
+   61 rem o      oktave (1 enspr. 28)
+   62 rem v      verschiebung
+   63 rem w      verschiebung des manuals
+   64 rem ak     akkord
+   65 rem h      halleffekt: 1=aus  3=ein
+   66 rem g      aktueller tongenerator
+   67 rem gv     voriger tongenerator
+   68 rem d      grundtonkonstante (d+t)
+   69 rem l      lautstaerke
+   70 rem
+   71 rem a$     eingabestring
+   72 rem a      num. fuer a$
+   73 rem p      flag fuer gen. ausschalt.
+   74 rem
+   75 rem md$()  manualdarstellung
+   76 rem mb$()  buchstaben des manuals
+   77 rem
+   80 rem i,j,s$ hilfsvariablen
+   90 :
+  100 rem"         CCCCCCCCCC
+  101 rem"        UCCCCCCCCCCI
+  102 rem"        B vorspann B
+  103 rem"        JCCCCCCCCCCK
+  104 rem"         CCCCCCCCCC
+  110 :
+  120 print"{lblu}";chr$(142);chr$(8):poke 650,0:poke 53280,14:poke 53281,6
+  130 print"{clr}{down}"
+  140 :
+  150 iz=10:mz=111:tz=33:l=10
+  160 dim m1%(mz),m2%(mz)
+  170 dim i$(iz),ib$(iz,7),i1(iz),i2(iz),i3(iz),i4(iz),i5(iz),ih(iz),io(iz)
+  180 dim t%(tz),md$(40),mb$(40)
+  190 :
+  200 rem     -------------------
+  201 rem     --- instrumente ---
+  202 rem     -------------------
+  210 :
+  220 for i=0 to iz
+  240 read i$(i),i1(i),i2(i),i3(i),i4(i),i5(i),ih(i),io:io(i)=14*io
+  250 for j=1 to 7
+  260 read ib$(i,j)
+  270 next j
+  280 next i
+  290 :
+  300 data       piano
+  305 data 65,9,0,0,202
+  307 data 3,3
+  310 data "    N     "
+  311 data "   N{CBM-@}     "
+  312 data "  NN M{CBM-P}{CBM-P}  "
+  313 data " NN{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}M "
+  314 data " L{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{SHIFT-@} "
+  315 data " {CBM-L}      {CBM-J} "
+  316 data " {CBM-C}      {CBM-V} "
+  320 :
+  330 data    roehrengong
+  335 data 65,11,0,0,200
+  337 data 3,3
+  340 data "HGHGHGHGHG"
+  341 data "HGHGHGHGHG"
+  342 data "HGHGHGHGHG"
+  343 data "HGHGHQHG  "
+  344 data "HGHGHGM   "
+  345 data "HGHG   M  "
+  346 data "HG      M "
+  350 :
+  360 data    metallophon
+  365 data 17,10,0,0,0
+  367 data 3,4
+  370 data "  {CBM-K}{CBM-F}      "
+  371 data "  {CBM-K}{CBM-K}{CBM-K}{CBM-F}    "
+  372 data "  {CBM-K}{CBM-K}{CBM-K}{CBM-K}{CBM-K}   "
+  373 data "  {CBM-K}{CBM-K}{CBM-K}{CBM-K}{CBM-V}Q  "
+  374 data "  {CBM-K}{CBM-K}{CBM-V} N   "
+  375 data "  {CBM-V}CCNCQ  "
+  376 data "    N     "
+  380 :
+  390 data     xylophon
+  395 data 17,5,0,0,0
+  397 data 3,4
+  400 data " UI       "
+  401 data " BBUI     "
+  402 data " BBBBUI   "
+  403 data " BBBBBB N "
+  404 data " BBBBJKN  "
+  405 data " BBJQCNCC "
+  406 data " JK  Q    "
+  410 :
+  420 data      glocke
+  425 data 17,13,0,0,0
+  427 data 3,4
+  430 data "   UCI    "
+  431 data "   G H    "
+  432 data "   {CBM-G} {CBM-M}    "
+  433 data "  N{CBM-@}{CBM-@}{CBM-@}M   "
+  434 data " {CBM-M}N  QM{CBM-G}  "
+  435 data "  M{CBM-@}{CBM-@}{CBM-@}N   "
+  436 data "          "
+  440 :
+  450 data     glasorgel
+  455 data 17,170,0,0,0
+  457 data 3,4
+  460 data "   {CBM-@}{CBM-@}{CBM-@}    "
+  461 data "  ({CBM-@}{CBM-@}{CBM-@})   "
+  462 data "   M N    "
+  463 data "    B     "
+  464 data "    B     "
+  465 data "   ({CBM-@})    "
+  466 data "          "
+  470 :
+  480 data     violine
+  485 data 65,170,202,250,0
+  487 data 1,3
+  490 data "    UI    "
+  491 data " M  YT    "
+  492 data "  M YT    "
+  493 data "   NYTM   "
+  494 data "   >)(<   "
+  495 data "   {CBM-G}YT{CBM-M}   "
+  496 data "   M{CBM-@}{CBM-@}NM  "
+  500 :
+  510 data     troete
+  515 data 33,90,228,0,0
+  517 data 1,3
+  520 data "          "
+  521 data "        N{$a0}"
+  522 data "IRR{CBM-F}{CBM-F}{CBM-F}RD  "
+  523 data "KENEEEEF  "
+  524 data "  M{CBM-P}{CBM-P}N  M "
+  525 data "          "
+  526 data "      {$a0}{$a0}{$a0} "
+  530 :
+  540 data   panfloete
+  545 data 17,102,197,0,0
+  547 data 1,4
+  550 data "          "
+  551 data "  {CBM-K}{CBM-K}{CBM-K}{CBM-K}{CBM-K}{CBM-K}{CBM-K}{$a0}"
+  552 data "  {CBM-K}{CBM-K}{CBM-K}{CBM-K}{CBM-K}{CBM-V}{CBM-V} "
+  553 data "  {CBM-K}{CBM-K}{CBM-K}{CBM-V}    "
+  554 data "  {CBM-K}{CBM-K}      "
+  555 data "  {CBM-K}       "
+  556 data "          "
+  560 :
+  570 data   klarinette
+  575 data 65,105,197,0,100
+  577 data 1,2
+  580 data "  M       "
+  581 data " MWM      "
+  582 data "  MWM     "
+  583 data "   MWM    "
+  584 data "    MN{CBM-Y}M  "
+  585 data "     {CBM-H} {CBM-N}  "
+  586 data "     M{CBM-P}N  "
+  590 :
+  600 data     harfe
+  605 data 17,44,0,0,6
+  607 data 3,3
+  610 data "UDF{CBM-P}FD{CBM-Y}{CBM-Y}C{CBM-P}"
+  611 data "BMMMMMMMNN"
+  612 data "{CBM-M} MMMMMNN "
+  613 data " B MMMNN  "
+  614 data " {CBM-M}  MNN   "
+  615 data "  B NN    "
+  616 data "   NN     "
+  900 :
+ 1000 rem    --------------------
+ 1001 rem    --- tonparameter ---
+ 1002 rem    --------------------
+ 1010 :
+ 1020 for i=1 to mz
+ 1030 read m2%(i),m1%(i)
+ 1040 next i
+ 1050 :
+ 1060 data 1,4,,
+ 1065 :
+ 1070 data 1,22,1,39,1,57,1,75,1,95,,,1,116,1,138,1,161,1,186,1,212
+ 1080 data 1,240,2,14,,
+ 1085 :
+ 1090 data 2,45,2,78,2,113,2,150,2,190,,,2,231,3,20,3,66,3,116,3,169
+ 1100 data 3,224,4,27,,
+ 1105 :
+ 1110 data 4,90,4,156,4,226,5,45,5,123,,,5,207,6,39,6,133,6,232,7,81
+ 1120 data 7,193,8,55,,
+ 1125 :
+ 1130 data 8,180,9,56,9,196,10,89,10,247,,,11,158,12,78,13,10,13,208
+ 1140 data 14,162,15,129,16,109,,
+ 1145 :
+ 1150 data 17,103,18,112,19,137,20,178,21,237,,,23,59,24,157,26,20,27,160
+ 1160 data 29,69,31,3,32,219,,
+ 1165 :
+ 1170 data 34,207,36,225,39,18,41,101,43,219,,,46,118,49,58,52,39,55,65
+ 1180 data 58,138,62,5,65,181,,
+ 1185 :
+ 1190 data 69,157,73,193,78,36,82,201,87,182,,,92,237,98,115,104,78,110,130
+ 1200 data 117,20,124,10,131,106,,
+ 1205 :
+ 1210 data 139,59,147,130,156,72,165,147,175,107,,,185,218,196,231
+ 1220 data 208,156,221,4,234,40
+ 1300 :
+ 1500 rem    -------------------------
+ 1501 rem    --- data fuer tasten- ---
+ 1502 rem    ---  ton - zuordnung  ---
+ 1503 rem    -------------------------
+ 1510 :
+ 1520 for i=0 to 33
+ 1530 read t%(i)
+ 1540 next i
+ 1560 data 23,20,22,,24,,,21,2,,,6,5,8,10,12,15,14,16,18,,
+ 1570 data 17,19,1,7,4,9,13,,3,,11,
+ 1590 :
+ 2000 rem    ------------------
+ 2001 rem    --- manualdata ---
+ 2002 rem    ------------------
+ 2010 :
+ 2020 for i=1 to 14
+ 2030 read md$(i)
+ 2040 next
+ 2050 for i=15 to 40
+ 2060 md$(i)=md$(i-14)
+ 2070 next
+ 2080 :
+ 2100 data " ","{rvon} {rvof}"," ","{rvon} {rvof}","{rvon}B{rvof}","{rvon}{yel} {lblu}{rvof}"," ","{rvon} {rvof}"," ","{rvon} {rvof}","{rvon}B{rvof}","{rvon} {rvof}"
+ 2110 data " ","{rvon} {rvof}"
+ 2190 :
+ 2200 for i=0 to 24
+ 2210 read mb$(i)
+ 2220 next
+ 2230 :
+ 2240 data " ",q,a,w,s,e,d,r,f,t,g,y,h,u,j,i,k,o,l,p,":",@,;,*,=
+ 2290 :
+ 3000 rem    ------------------------
+ 3001 rem    --- adressen des sid ---
+ 3002 rem    ------------------------
+ 3010 :
+ 3020 si(1)=54272
+ 3030 si(2)=si(1)+7
+ 3040 si(3)=si(1)+14
+ 3050 for i=1 to 3
+ 3060 fl(i)=si(i)
+ 3070 fh(i)=si(i)+1
+ 3080 tl(i)=si(i)+2
+ 3090 th(i)=si(i)+3
+ 3100 wf(i)=si(i)+4
+ 3110 as(i)=si(i)+5
+ 3120 ha(i)=si(i)+6
+ 3130 next i
+ 3200 :
+ 4000 rem    ----------------------
+ 4001 rem    --- gestaltung des ---
+ 4002 rem    ---  bildschirms   ---
+ 4003 rem    ----------------------
+ 4010 :
+ 4150 v=0:ak=0:g=1:ia=0
+ 4200 :
+ 4210 print"{home}{down}{down}{down}{down}{down}{down}{down}{down}"
+ 4250 :
+ 4300 print" instrumente        sonstiges":print" (shift){down}":s$="*"
+ 4310 for i=0 to iz
+ 4320 if s$<>"" then read s$
+ 4330 print" "chr$(i+65);tab(3);i$(i);tab(20);s$
+ 4340 next i
+ 4350 data " /  hall-effekt"
+ 4360 data "+\- oktaven"
+ 4370 data "< > tonverschiebung"
+ 4380 data "(') akkorde"
+ 4390 data "hom lautstaerke +"
+ 4400 data "del lautstaerke -",
+ 4500 :
+ 4700 gosub 10100
+ 4710 gosub 11100
+ 4720 gosub 12100
+ 4730 gosub 13100
+ 4740 gosub 14100
+ 4750 gosub 15000
+ 4760 gosub 16040
+ 4770 :
+ 4780 goto 5000
+ 4790 :
+ 4800 rem   -------------------
+ 4801 rem   --- darstellung ---
+ 4802 rem   --- des manuals ---
+ 4803 rem   -------------------
+ 4810 :
+ 4820 print"{home}{down}";
+ 4825 w=v+1:if w<0 then w=w+14
+ 4830 for x=1 to 2:print"{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}";
+ 4835 for i=0 to 23
+ 4840 print md$(i+w);
+ 4850 next:print:next
+ 4860 print"{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}";
+ 4870 for i=0 to 23
+ 4880 if md$(i+w)=chr$(32) then print mb$(i+1);:goto 4900
+ 4890 print md$(i+w);
+ 4900 next
+ 4910 print:print"{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rvon}";
+ 4920 for i=2 to 24 step 2
+ 4925 print"B";
+ 4930 if md$(i+w-1)="{rvon}{yel} {lblu}{rvof}" then print"{yel} {lblu}";:goto 4940
+ 4935 print" ";
+ 4940 next:print"{rvof}"
+ 4950 print"{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rvon}";
+ 4960 for i=2 to 24 step 2
+ 4965 print"B";
+ 4970 if md$(i+w-1)="{rvon}{yel} {lblu}{rvof}" then print"{yel}"mb$(i)"{lblu}";:goto 4980
+ 4975 print mb$(i);
+ 4980 next:print"{rvof}"
+ 4990 return
+ 4999 :
+ 5000 rem" UCCCCCCCCCCCCCCCCCCCCCCCCI
+ 5001 rem" B{CBM-A}CCCCCCCCCCCCCCCCCCCCCC{CBM-S}B
+ 5002 rem" BB  laufendes programm  BB
+ 5003 rem" B{CBM-Z}CCCCCCCCCCCCCCCCCCCCCC{CBM-X}B
+ 5004 rem" JCCCCCCCCCCCCCCCCCCCCCCCCK
+ 5010 :
+ 5020 get a$
+ 5030 if i3(ia)=0 then 5040
+ 5035 if peek(203)=64 and p<>0 then for i=1 to 3:poke wf(i),i1(ia)-1:next:p=0
+ 5040 if a$="" then 5020
+ 5050 :
+ 5100 if a$>="@" and a$<="z" then gosub 20000:goto 5020
+ 5110 if a$="*" or a$=";" or a$=":" or a$="=" then gosub 20000:goto 5020
+ 5120 if a$>="A" and a$<=chr$(193+iz) then gosub 10000:goto 5020
+ 5130 if a$="+" or a$="\" or a$="-" then gosub 11000:goto 5020
+ 5140 if a$="<" or a$=">" then gosub 12000:goto 5020
+ 5150 if a$="(" or a$=")" or a$="'" then gosub 13000:goto 5020
+ 5160 if a$="/" then gosub 14000:goto 5020
+ 5170 if a$=chr$(32) then gosub 15000:goto 5020
+ 5180 if a$="{home}" or a$=chr$(20) then gosub 16000:goto 5020
+ 5900 :
+ 6000 goto 5020
+ 7000 :
+ 8000 rem"  CCCCCCCCCCCCCCCCCCCCCCCCC
+ 8001 rem" UCCCCCCCCCCCCCCCCCCCCCCCCCI
+ 8002 rem" B klang- und tastroutinen B
+ 8003 rem" JCCCCCCCCCCCCCCCCCCCCCCCCCK
+ 8004 rem"  CCCCCCCCCCCCCCCCCCCCCCCCC
+ 9000 :
+10000 rem  ----------------------
+10001 rem  --- instrumentwahl ---
+10002 rem  ----------------------
+10010 :
+10020 ib=ia
+10030 ia=asc(a$)-193
+10040 :
+10100 print"{home}"
+10110 for i=1 to 7
+10120 print " "ib$(ia,i)
+10130 next i
+10150 :
+10200 for i=1 to 3
+10210 poke as(i),i2(ia)
+10220 poke ha(i),i3(ia)
+10230 poke tl(i),i4(ia)
+10240 poke th(i),i5(ia)
+10250 next i
+10300 :
+10310 h=ih(ia)
+10320 o=io(ia)
+10330 gosub 14100
+10340 gosub 11060
+10390 :
+10400 print"{home}"
+10410 for i=0 to ib+10
+10420 print
+10430 next i
+10440 print"{rght}{rght}{rght}"i$(ib)"{home}"
+10450 :
+10460 for i=0 to ia+10
+10470 print
+10480 next i
+10490 print"{rght}{rght}{rght}{yel}"i$(ia)"{lblu}{home}"
+10500 :
+10800 return
+10900 :
+11000 rem  -----------------------
+11001 rem  --- aktuelle oktave ---
+11002 rem  -----------------------
+11010 :
+11020 if a$="\" then o=io(ia):if v<>0 then v=0:gosub 12100
+11030 if a$="+" then o=o+14
+11050 if a$="-" then o=o-14
+11060 d=o+v+ak+11
+11070 if d<0 then o=o+14:goto 11060
+11080 if d>mz-24 then o=o-14:goto 11060
+11090 :
+11100 ok=int((o+7)/14)
+11110 print"{home}"
+11120 print"{down}{down}{down}{down}{down}{down}";tab(13);
+11125 if ok=-1then print"sco ":return
+11130 if ok=0 then print"co  ":return
+11140 if ok=1 then print"go  ":return
+11150 if ok=2 then print"ko  ":return
+11160 print"o";:for i=3 to ok
+11170 print"'";
+11180 next i
+11190 print"{$a0}{$a0}{$a0}"
+11300 :
+11800 return
+11900 :
+12000 rem  --------------------
+12001 rem  --- verschiebung ---
+12002 rem  --------------------
+12010 :
+12020 if a$="<" then v=v-2
+12030 if a$=">" then v=v+2
+12050 d=o+v+ak+11
+12055 if d>mz-24 then v=v-2:goto 12050
+12060 if d<0 then v=v+2:goto 12050
+12070 if v>6 then v=-6:o=o+14:gosub 11100
+12080 if v<-6 then v=6:o=o-14:gosub 11100
+12090 :
+12100 gosub 4800
+12130 :
+12800 return
+12900 :
+13000 rem  ---------------
+13001 rem  --- akkorde ---
+13002 rem  ---------------
+13010 :
+13020 if a$="'" then ak=0
+13030 if a$="(" then ak=ak-2
+13040 if a$=")" then ak=ak+2
+13050 d=o+v+ak+11
+13055 if d<0 then ak=ak+2:goto 13050
+13060 if d>mz-24 then ak=ak-2:goto13050
+13070 if abs(ak)>16 then ak=16*sgn(ak):goto 13050
+13090 :
+13100 print"{home}"
+13110 print"{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}";tab(20);
+13120 print" )";ak/2+sgn(ak);"( "
+13130 :
+13800 return
+13900 :
+14000 rem  -------------------
+14001 rem  --- hall-effekt ---
+14002 rem  -------------------
+14010 :
+14020 if h=1 then h=3:goto 14100
+14030 h=1
+14090 :
+14100 if h=3 then h$=")))Q((("
+14110 if h=1 then h$="       ":g=1
+14120 :
+14150 print"{home}"
+14160 print"{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}";tab(30);
+14170 print h$
+14190 :
+14800 return
+14900 :
+15000 rem  --------------------------
+15001 rem  --- tongeneratorenstop ---
+15002 rem  --------------------------
+15010 :
+15020 for i=1 to 3
+15030 poke wf(i),0
+15040 next i
+15050 :
+15800 return
+15900 :
+16000 rem  -------------------
+16001 rem  --- lautstaerke ---
+16002 rem  -------------------
+16010 :
+16020 if a$="{home}" then l=l+(l>0)
+16030 if a$=chr$(20) then l=l-(l<15)
+16040 poke si(1)+24,l:print"{home}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}";tab(21);
+16050 if l>0 then for i=1 to l:print"Q";:next i
+16060 if l<15 then for i=l to 14:print".";:next i
+16070 :
+16800 return
+16900 :
+20000 rem"     UCCCCCCCCCCCCCI
+20001 rem"     B    toene    B
+20002 rem"     JCCCCCCCCCCCCCK
+20010 :
+20020 poke wf(g),i1(ia)-1:p=1
+20030 :
+20050 a=asc(a$)-57
+20060 if a<0 then a=0
+20070 :
+20100 t=t%(a):if t=0 then return
+20110 n1=m1%(t+d-ak):n2=m2%(t+d-ak)
+20120 :
+20130 poke fl(g),n1
+20140 poke fh(g),n2
+20150 :
+20160 poke wf(g),i1(ia)
+20170 :
+20180 gv=g
+20200 g=g+1
+20210 if g>h then g=1
+20220 :
+20250 if ak=0 then return
+20300 :
+20310 if n1*n2=0 then return
+20320 n1=m1%(t+d)
+20330 if n1=0 then n1=m1%(t+d-sgn(ak))
+20340 n2=m2%(t+d)
+20350 if n2=0 then n2=m2%(t+d-sgn(ak))
+20360 :
+20370 gv=g
+20380 if h=1 then g=2:gv=1
+20390 :
+20400 poke wf(g),i1(ia)-1
+20410 poke fl(g),n1
+20420 poke fh(g),n2
+20430 poke wf(g),i1(ia)
+20440 :
+20500 g=g+1
+20510 if g>h then g=1
+20800 :
+20900 return
+30000 :
+50000 end
+

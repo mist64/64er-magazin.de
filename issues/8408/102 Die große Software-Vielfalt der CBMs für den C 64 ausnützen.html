@@ -1,0 +1,910 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>Die große Software-Vielfalt der CBMs für den C 64 ausnützen</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="M. und J. Heinz, rg">
+    <meta name="64er.issue" content="8/84">
+    <meta name="64er.pages" content="102-105">
+    <meta name="64er.head1" content="Tips & Tricks">
+    <meta name="64er.head2" content="C 64">
+    <meta name="64er.toc_category" content="Programme zum Abtippen|Tips & Tricks">
+    <meta name="64er.toc_title" content="Die große Software-Vielfalt der CBMs für den C 64">
+    <meta name="64er.index_title" content="Die Software-Vielfalt der CBMs für den C 64 nutzen">
+    <meta name="64er.index_category" content="Listings zum Abtippen|Tips & Tricks|Transfer">
+    <meta name="64er.id" content="cbm2">
+</head>
+
+<body>
+    <article>
+        <h1>Die große Software-Vielfalt der CBMs für den C 64 ausnützen</h1>
+
+        <p class="intro">Den meisten Anwendern wird sich schon einmal das Problem gestellt haben, wie sie Programme von anderen Computersystemen auf ihr eigenes übertragen können. Dieser Artikel sollte es jedem ermöglichen, auch komplexe Basicprogramme der weitverbreiteten Commodore-Systeme CBM 30XX, CBM 40XX (hier kurz als CBMs bezeichnet) und C 64 füreinander umzuschreiben.</p>
+
+        <p>Hat man das Programm fertig eingegeben und auf Kassette oder Diskette abgespeichert, so ist das Laden von CBM-Programmen in den C 64 kein Problem: Disketten- und Kassettenformat sind identisch (zumindest bei den Doppellaufwerken 2031 und 4040 mit dem Einzellaufwerk VC 1541). Der Basic-Benutzerspeicher beginnt beim C 64 mit der Speicherstelle 2048 und endet bei 40959. Ein spezielles »Verschiebeprogramm« im C 64 sorgt dafür, daß CBM-Programme in den richtigen Speicherbereich geladen werden. Wer jedoch schon einmal versucht hat, C 64-Programme in einen CBM zu laden, wird damit keinen Erfolg gehabt haben, denn die CBMs besitzen kein solches Programm. Dort beginnt der Speicher für Basic-Programme bei 1024 und endet, je nach RAM-Ausbaustufe (8 KByte, 16 KByte oder 32 KByte) bei spätestens 32767. In einen CBM geladene C 64-Programme sind ohne Verbiegung von Zeigern weder zu listen noch zu starten. Man könnte bei den CBMs nach dem Laden den Zeiger für den Programmanfang verändern (durch den Befehl »POKE 40,0:POKE 41,8«), aber man müßte diesjedesmal nach dem Laden tun, ein auf die Dauer sehr umständliches Verfahren. Ein entsprechendes »Verschiebeprogramm«, welches diesen Aufwand vermeidet, finden Sie unter der Überschrift »Von den Kleinen auf die Großen« in dieser Ausgabe. Nun zur eigentlichen Arbeit, dem Umschreiben: Alle Computer haben die gleichen Basic-Anweisungen (bis auf die CBMs der Serie 4000, welche zusätzlich komfortable Diskettenbefehle besitzen). Sie unterscheiden sich im wesentlichen nur durch die Speicherbelegung und die Farbe, die Sprites und die hochauflösende Grafik des C 64.</p>
+
+        <h3>Der Bildschirmbereich:</h3>
+
+        <p>Die meisten Basicprogramme erstellen bewegte Grafiken mit Hilfe der Befehle PEEK und POKE. Im Bildschirmbereich wird durch den Befehl »POKE X, Y« an der Stelle mit der Adresse X das Zeichen mit dem Bildschirm-Code Y gesetzt. Gelöscht wird es dann durch den Befehl »POKE X, 32«, denn die Zahl 32 entspricht dem Leerzeichen (Blank). Durch PRINT PEEK(X) kann man abfragen, welches Zeichen sich an der Stelle X befindet. Der Bildschirmcode ist bei allen drei Systemen identisch. Jedoch liegt der Bildschirmspeicher an unterschiedlichen Stellen: Bei den CBMs zwischen 32768 und 33767, beim C 64 zwischen 1024 und 2023. Wenn man ein CBM-Programm auf den C 64 überträgt, muß man also von allen Bildschirmadressen 31744 subtrahieren, umgekehrt 31744 addieren.</p>
+
+        <p>Jedoch kommt da noch ein kleines Problem hinzu: Der C 64 kann 16 Farben darstellen. Dazu besitzt er einen Farbenspeicher, welcher ganz analog zum Bildschirmspeicher zu behandeln ist. Er beginnt bei 55296 und endet bei 56295; die Differenz zwischen Bildschirmadresse und Farbadresse beträgt 54272. Wenn man also ein CBM-Programm für den C 64 umschreibt, muß man hinter jedem POKE-Befehl für den Bildschirm einen entsprechenden für die Farbe anhängen, also zum Beispiel hinter POKE 1024,64 anfügen: POKE 1024 + 54272,X ,wobei X eine Zahl zwischen 0 und 15 ist, welche dann die Farbe des Zeichens bestimmt. Dieser Befehl kann weggelassen werden, wenn ein Zeichen gelöscht wird, also im Befehl der Bildschirmcode 32 (= Leerzeichen) eingesetzt wird. Die Farbcodes haben folgende Bedeutung:</p>
+
+        <table>
+            <tr>
+                <td>0</td>
+                <td>schwarz</td>
+            </tr>
+            <tr>
+                <td>1</td>
+                <td>weiß</td>
+            </tr>
+            <tr>
+                <td>2</td>
+                <td>rot</td>
+            </tr>
+            <tr>
+                <td>3</td>
+                <td>türkis</td>
+            </tr>
+            <tr>
+                <td>4</td>
+                <td>violett</td>
+            </tr>
+            <tr>
+                <td>5</td>
+                <td>grün</td>
+            </tr>
+            <tr>
+                <td>6</td>
+                <td>blau</td>
+            </tr>
+            <tr>
+                <td>7</td>
+                <td>gelb</td>
+            </tr>
+            <tr>
+                <td>8</td>
+                <td>orange</td>
+            </tr>
+            <tr>
+                <td>9</td>
+                <td>braun</td>
+            </tr>
+            <tr>
+                <td>10</td>
+                <td>hellrot</td>
+            </tr>
+            <tr>
+                <td>11</td>
+                <td>grau 1</td>
+            </tr>
+            <tr>
+                <td>12</td>
+                <td>grau2</td>
+            </tr>
+            <tr>
+                <td>13</td>
+                <td>hellgrün</td>
+            </tr>
+            <tr>
+                <td>14</td>
+                <td>hellblau</td>
+            </tr>
+            <tr>
+                <td>15</td>
+                <td>grau 3</td>
+            </tr>
+        </table>
+
+        <p>Umgekehrt müssen die POKE-Befehle für den Farbenspeicher bei einer Übertragung auf die CBMs gestrichen werden. Sprites und hochauflösende Grafik können nicht auf die CBM-Serie übertragen werden.</p>
+
+        <h2>Tastatur und Joystick</h2>
+
+        <p>Viele Programme fragen durch PEEK die gerade gedrückte Taste ab. Dazu existiert in der Zero-Page eine Speicherstelle, in welcher sich die Matrixkoordinate der gerade gedrückten Taste befindet. Bei den CBMs ist dies die 151, beim C 64 die 203. Die Wirkungsweise kann man sich leicht durch folgendes kleines Programm verdeutlichen:</p>
+
+        <pre>
+10 PRINT PEEK (203)
+20 GOTO 10
+</pre>
+
+
+        <p>(Bei den CBMs muß die 203 in Zeile 10 durch 151 ersetzt werden). Nach dem Starten durch RUN erscheint eine Reihe von Zahlen, beim C 64 die 64, bei den CBMs die 255. Drückt man nun irgendeine Taste, so erscheint eine gerade Zahl, je nachdem, welche Taste gerade gedrückt ist. In Tabelle 1 ist ein Vergleich der Tastaturcodes dargestellt.</p>
+
+        <figure>
+            <table>
+                <tbody>
+                    <tr>
+                        <td>gedrückte Taste</td>
+                        <td>CBM 30XX</td>
+                        <td>CBM 40XX</td>
+                        <td>Commodore 64</td>
+                    </tr>
+                    <tr>
+                        <td>←</td>
+                        <td>75</td>
+                        <td>95</td>
+                        <td>57</td>
+                    </tr>
+                    <tr>
+                        <td>1</td>
+                        <td>26</td>
+                        <td>49</td>
+                        <td>56</td>
+                    </tr>
+                    <tr>
+                        <td>2</td>
+                        <td>18</td>
+                        <td>50</td>
+                        <td>59</td>
+                    </tr>
+                    <tr>
+                        <td>3</td>
+                        <td>25</td>
+                        <td>51</td>
+                        <td>8</td>
+                    </tr>
+                    <tr>
+                        <td>4</td>
+                        <td>42</td>
+                        <td>52</td>
+                        <td>11</td>
+                    </tr>
+                    <tr>
+                        <td>5</td>
+                        <td>34</td>
+                        <td>53</td>
+                        <td>16</td>
+                    </tr>
+                    <tr>
+                        <td>6</td>
+                        <td>41</td>
+                        <td>54</td>
+                        <td>19</td>
+                    </tr>
+                    <tr>
+                        <td>7</td>
+                        <td>58</td>
+                        <td>55</td>
+                        <td>24</td>
+                    </tr>
+                    <tr>
+                        <td>8</td>
+                        <td>50</td>
+                        <td>56</td>
+                        <td>27</td>
+                    </tr>
+                    <tr>
+                        <td>9</td>
+                        <td>57</td>
+                        <td>57</td>
+                        <td>32</td>
+                    </tr>
+                    <tr>
+                        <td>0</td>
+                        <td>10</td>
+                        <td>48</td>
+                        <td>35</td>
+                    </tr>
+                    <tr>
+                        <td>+</td>
+                        <td>17</td>
+                        <td>43</td>
+                        <td>40</td>
+                    </tr>
+                    <tr>
+                        <td>—</td>
+                        <td>9</td>
+                        <td>45</td>
+                        <td>43</td>
+                    </tr>
+                    <tr>
+                        <td>£</td>
+                        <td>—</td>
+                        <td>—</td>
+                        <td>48</td>
+                    </tr>
+                    <tr>
+                        <td>HOME</td>
+                        <td>7</td>
+                        <td>19</td>
+                        <td>51</td>
+                    </tr>
+                    <tr>
+                        <td>INS/DEL</td>
+                        <td>?</td>
+                        <td>?</td>
+                        <td>0</td>
+                    </tr>
+                    <tr>
+                        <td>Q</td>
+                        <td>64</td>
+                        <td>81</td>
+                        <td>62</td>
+                    </tr>
+                    <tr>
+                        <td>W</td>
+                        <td>56</td>
+                        <td>87</td>
+                        <td>9</td>
+                    </tr>
+                    <tr>
+                        <td>E</td>
+                        <td>63</td>
+                        <td>69</td>
+                        <td>14</td>
+                    </tr>
+                    <tr>
+                        <td>R</td>
+                        <td>55</td>
+                        <td>82</td>
+                        <td>17</td>
+                    </tr>
+                    <tr>
+                        <td>T</td>
+                        <td>62</td>
+                        <td>84</td>
+                        <td>22</td>
+                    </tr>
+                    <tr>
+                        <td>Y</td>
+                        <td>54</td>
+                        <td>89</td>
+                        <td>25</td>
+                    </tr>
+                    <tr>
+                        <td>U</td>
+                        <td>23</td>
+                        <td>86</td>
+                        <td>30</td>
+                    </tr>
+                    <tr>
+                        <td>I</td>
+                        <td>53</td>
+                        <td>73</td>
+                        <td>33</td>
+                    </tr>
+                    <tr>
+                        <td>O</td>
+                        <td>60</td>
+                        <td>79</td>
+                        <td>38</td>
+                    </tr>
+                    <tr>
+                        <td>P</td>
+                        <td>52</td>
+                        <td>80</td>
+                        <td>41</td>
+                    </tr>
+                    <tr>
+                        <td>@</td>
+                        <td>15</td>
+                        <td>64</td>
+                        <td>46</td>
+                    </tr>
+                    <tr>
+                        <td>*</td>
+                        <td>33</td>
+                        <td>42</td>
+                        <td>49</td>
+                    </tr>
+                    <tr>
+                        <td>↑</td>
+                        <td>59</td>
+                        <td>94</td>
+                        <td>54</td>
+                    </tr>
+                    <tr>
+                        <td>A</td>
+                        <td>48</td>
+                        <td>65</td>
+                        <td>10</td>
+                    </tr>
+                    <tr>
+                        <td>S</td>
+                        <td>40</td>
+                        <td>83</td>
+                        <td>13</td>
+                    </tr>
+                    <tr>
+                        <td>D</td>
+                        <td>47</td>
+                        <td>68</td>
+                        <td>18</td>
+                    </tr>
+                    <tr>
+                        <td>F</td>
+                        <td>39</td>
+                        <td>70</td>
+                        <td>21</td>
+                    </tr>
+                    <tr>
+                        <td>G</td>
+                        <td>46</td>
+                        <td>71</td>
+                        <td>26</td>
+                    </tr>
+                    <tr>
+                        <td>H</td>
+                        <td>38</td>
+                        <td>72</td>
+                        <td>29</td>
+                    </tr>
+                    <tr>
+                        <td>J</td>
+                        <td>45</td>
+                        <td>74</td>
+                        <td>34</td>
+                    </tr>
+                    <tr>
+                        <td>K</td>
+                        <td>37</td>
+                        <td>75</td>
+                        <td>37</td>
+                    </tr>
+                    <tr>
+                        <td>L</td>
+                        <td>44</td>
+                        <td>76</td>
+                        <td>42</td>
+                    </tr>
+                    <tr>
+                        <td>=</td>
+                        <td>1</td>
+                        <td>61</td>
+                        <td>53</td>
+                    </tr>
+                    <tr>
+                        <td>RETURN</td>
+                        <td>27</td>
+                        <td>13</td>
+                        <td>1</td>
+                    </tr>
+                    <tr>
+                        <td>Z</td>
+                        <td>32</td>
+                        <td>90</td>
+                        <td>12</td>
+                    </tr>
+                    <tr>
+                        <td>X</td>
+                        <td>24</td>
+                        <td>88</td>
+                        <td>23</td>
+                    </tr>
+                    <tr>
+                        <td>C</td>
+                        <td>31</td>
+                        <td>67</td>
+                        <td>20</td>
+                    </tr>
+                    <tr>
+                        <td>V</td>
+                        <td>23</td>
+                        <td>86</td>
+                        <td>31</td>
+                    </tr>
+                    <tr>
+                        <td>B</td>
+                        <td>30</td>
+                        <td>66</td>
+                        <td>28</td>
+                    </tr>
+                    <tr>
+                        <td>N</td>
+                        <td>22</td>
+                        <td>78</td>
+                        <td>39</td>
+                    </tr>
+                    <tr>
+                        <td>M</td>
+                        <td>29</td>
+                        <td>77</td>
+                        <td>36</td>
+                    </tr>
+                    <tr>
+                        <td>,</td>
+                        <td>70</td>
+                        <td>44</td>
+                        <td>47</td>
+                    </tr>
+                    <tr>
+                        <td>.</td>
+                        <td>2</td>
+                        <td>46</td>
+                        <td>44</td>
+                    </tr>
+                    <tr>
+                        <td>/</td>
+                        <td>49</td>
+                        <td>47</td>
+                        <td>55</td>
+                    </tr>
+                    <tr>
+                        <td>CRS↑</td>
+                        <td>?</td>
+                        <td>?</td>
+                        <td>7</td>
+                    </tr>
+                    <tr>
+                        <td>CRS←</td>
+                        <td>?</td>
+                        <td>?</td>
+                        <td>2</td>
+                    </tr>
+                    <tr>
+                        <td>SPACE</td>
+                        <td>6</td>
+                        <td>32</td>
+                        <td>60</td>
+                    </tr>
+                </tbody>
+            </table>
+            <figcaption>Tabelle 1. Vergleich der Tastaturcodes</figcaption>
+        </figure>
+
+        <p>Es gilt, einige besondere Adressen zu beachten:</p>
+
+        <p>CBM: In 152 steht 1 (anstatt 0), wenn die Taste SHIFT gedrückt ist.<br>
+            C 64: Adresse 653:<br>
+            0: wenn nichts gedrückt<br>
+            1: SHIFT gedrückt<br>
+            2: Commodore-Taste gedrückt<br>
+            4: CTRL gedrückt</p>
+
+        <p>Dazu noch ein Tip für eigene Programme: Meistens benötigt man für ein Spiel eine Unterscheidung zwischen verschiedenen Tastendrücken (zum Beispiel bis zu neun verschiedene Tasten für die Richtungssteuerung eines Raumschiffes). Am schnellsten funktioniert die Abfrage, wenn man ein Feld mit 256 (Ganzzahl-)Variablen definiert (zum Beispiel A%(255)), und die Richtung als Wert des entsprechenden Indexes darin speichert.</p>
+
+        <p>Beispiel (hier für C 64): Wir wollen für ein Spielprogramm eine Kanone (↑haben, die man am unteren Bildschirmrand mit Taste ”1” nach links und mit Taste ”2” nach rechts steuern kann. In unserem Beispiel würde das Programm entsprechend Listing 1 aussehen.</p>
+
+        <figure>
+            <pre>
+ 1 REM KANONE
+ 5 ZA = 1984:ZE = 2023:OP = 2004
+10 DIM A%(255)
+20 A%(56) = –1:A%(59) = 1
+:
+1000 REM ABFRAGE – ZEICHEN SETZEN, SUBROUTINE
+1010 NP = OP + A%(PEEK(203)):REM NEUE POSITION
+1020 IF NP &gt;ZE OR NP&lt;ZA THEN NP = OP: REM ZEILENBEGRENZUNG
+1030 POKE OP, 32:REM ALTE POSITION LÖSCHEN
+1040 POKE NP, 30:REM NEUE POSITION SETZEN
+1050 POKE NP+54272,1:REM FARBE SETZEN
+1060 OP = NP
+1070 RETURN
+</pre>
+            <figcaption>Listing 1. Ein kleines Beispielprogramm für den C 64.</figcaption>
+        </figure>
+
+        <p>A% (255) ist das Variablenfeld. Der Tastaturcode von ”1” ist beim C 64 die 56, von ”2” die 59. Die Tastaturadresse ist 203. Variablen:<br>
+            OP die alte Position der Kanone<br>
+            NP die neue Position der Kanone<br>
+            ZE Bildschirmadresse am Ende der Zeile, in der sich die bewegt<br>
+            ZA Bildschirmadresse am Zeilenanfang</p>
+
+        <p>CBM-Besitzer können nach Studium des Artikels an diesem Beispielprogramm ihr neugelerntes Wissen ausprobieren. Die Lösung steht am Ende des Artikels (aber nicht vorher nachschauen!).</p>
+
+        <p>Diese Methode ist auch bei der Verwendung eines Joysticks nützlich, denn dieser muß ähnlich wie die Tastatur mit PEEK abgefragt werden. Seine Adresse ist 56321 (Port 1) beziehungsweise 56320 (Port 2), wobei Port 1 weniger geeignet ist, da der Inhalt seines Speichers auch von der Tastatur beeinflußt wird. Die Codierung ist der Tabelle 2 zu entnehmen.</p>
+
+        <figure>
+            <table>
+                <tr>
+                    <th>Bewegung</th>
+                    <th>Port 1</th>
+                    <th>Port 2</th>
+                </tr>
+                <tr>
+                    <td>Feuer-Taste</td>
+                    <td>239</td>
+                    <td>111</td>
+                </tr>
+                <tr>
+                    <td>nach oben</td>
+                    <td>254</td>
+                    <td>126</td>
+                </tr>
+                <tr>
+                    <td>nach unten</td>
+                    <td>253</td>
+                    <td>125</td>
+                </tr>
+                <tr>
+                    <td>nach rechts</td>
+                    <td>247</td>
+                    <td>119</td>
+                </tr>
+                <tr>
+                    <td>nach links</td>
+                    <td>251</td>
+                    <td>123</td>
+                </tr>
+                <tr>
+                    <td>nach links oben</td>
+                    <td>250</td>
+                    <td>122</td>
+                </tr>
+                <tr>
+                    <td>nach rechts unten</td>
+                    <td>245</td>
+                    <td>117</td>
+                </tr>
+                <tr>
+                    <td>nach rechts oben</td>
+                    <td>246</td>
+                    <td>118</td>
+                </tr>
+                <tr>
+                    <td>nach links unten</td>
+                    <td>249</td>
+                    <td>121</td>
+                </tr>
+                <tr>
+                    <td>keine Taste gedrückt</td>
+                    <td>255</td>
+                    <td>127</td>
+                </tr>
+            </table>
+            <figcaption>Tabelle 2. Die Codierung der Joystick-Ports</figcaption>
+        </figure>
+
+        <p>Die CBMs besitzen keinen Anschluß für Joysticks, es gibt jedoch diverse Konstruktionen zum Anschluß an den User-Port. Daher empfiehlt es sich, beim Übertragen von C 64-Programmen auf die CBMs auf den Joystick zu verzichten und diese Programmteile durch Tastaturabfragen zu ersetzen.</p>
+
+        <h2>PRINT-Befehle</h2>
+
+        <p>Die ASCII-Codes sind bei allen drei Systemen größtenteils identisch, sie unterscheiden sich praktisch nur in den Farbsteuerzeichen und der Umschaltung von Grafik auf Groß/Kleinschreibung. Die Umschaltung auf Groß/Kleinschreibung erfolgt bei den CBMs durch den Befehl ”POKE 59468,14” und zurück auf die Blockgrafik durch ”POKE 59468,12”. C 64-Besitzer benutzen hier den Befehl ”PRINT CHR$(14)&ldquo; (Kleinschreibung) beziehungsweise den Befehl ”PRINT CHR$(142)&rdquo; (Grafik). Beim Übertragen von Programmen auf den C 64 kann man nach Belieben Farbsteuerzeichen einfügen, umgekehrt sind diese zu löschen.</p>
+
+        <h2>Der Ton</h2>
+
+        <p>Wichtig für das Übertragen von Programmen mit Ton ist vor allem die Tonhöhe und ihre Adresse. Beim C 64 stehen drei Tongeneratoren zur Verfügung. Ihre Tonhöhe wird dabei durch je zwei Adressen bestimmt, wobei die erste Adresse (das Low-Byte) die Tonhöhe nur sehr wenig, die zweite Adresse (das High-Byte) die Tonhöhe hingegen wesentlich stärker (nämlich genau 255 mal so stark wie das Low-Byte) beeinflußt. In der Tabelle 3 sind die wichtigsten Tonadressen des Commodore 64 zusammengefaßt.<br>
+            (Adresse = 54272 + Register)</p>
+
+        <figure>
+            <table>
+                <tr>
+                    <th></th>
+                    <th colspan="3">REGISTER</th>
+                    <th colspan="2">INHALT</th>
+                </tr>
+                <tr>
+                    <th>Stimme</th>
+                    <th>2</th>
+                    <th>2</th>
+                    <th>3</th>
+                    <th colspan="2"></th>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td>0</td>
+                    <td>7</td>
+                    <td>14</td>
+                    <td colspan="2">Frequenz Low-Byte (0-255)</td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td>1</td>
+                    <td>8</td>
+                    <td>15</td>
+                    <td colspan="2">Frequenz High-Byte (0-255)</td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td>2</td>
+                    <td>9</td>
+                    <td>16</td>
+                    <td colspan="2">Tastverhältnis Low-Byte (0-255)</td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td>3</td>
+                    <td>10</td>
+                    <td>17</td>
+                    <td colspan="2">Tastverhältnis High-Byte (0-255)</td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td>4</td>
+                    <td>11</td>
+                    <td>18</td>
+                    <td>Wellenform:</td>
+                    <td>Rauschen = 129<br>Rechteck = 65<br>Sägezahn = 33<br>Dreieck = 17</td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td>5</td>
+                    <td>12</td>
+                    <td>19</td>
+                    <td>Anschlag<br>0 (hart) – 15*16 (weich)</td>
+                    <td>+ Abschwellen<br>0 (hart) – 15 (weich)</td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td>6</td>
+                    <td>13</td>
+                    <td>20</td>
+                    <td>Halten<br>0 (stumm) – 15*16 (laut)</td>
+                    <td>+ Ausklingen<br>0 (schnell) – 15 (langsam)</td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td>24</td>
+                    <td>24</td>
+                    <td>24</td>
+                    <td colspan="2">Lautstärke: 0 (stumm) – 15 (volle Lautstärke)</td>
+                </tr>
+            </table>
+            <figcaption>Tabelle 3. Die wichtigsten Tonadressen von C 64.</figcaption>
+        </figure>
+
+        <p>Bei den CBMs steht jedoch nur ein Tongenerator zur Verfügung, auch können dort weder Wellenform, noch Lautstärke, noch Hüllenkurve programmiert werden. Daher ist es bei der Übertragung von C 64-Programmen auf die CBMs bei komplexen Klängen und Geräuschen meist am einfachsten, den Ton selbst neu zu gestalten. Wenn man den Ton beim Übertragen auf den C 64 direkt übernehmen will, ist das Umschreiben nicht schwierig. Bei den CBMs gibt es drei Tonadressen, welche wie üblich durch PEEK und POKE angesprochen werden: 59464, 59466 und 59467. Der Tongenerator wird dort eingeschaltet durch POKE 59466,16:POKE 59467,20: POKE 59464,0. Nun kann man die Tonhöhe einfach festsetzen, indem man eine Zahl zwischen 0 und 255 in die Adresse 59646 schreibt (durch POKE 59464,X, wobei X eine Zahl zwischen 0 und 255 ist). Dabei ist 255 ein relativ tiefer Ton und 0 ein sehr hoher Ton (Ultraschall, daher unhörbar und mit »Ton ausgeschaltet« zu vergleichen). Die Tonhöhe kann man für den C 64 als High-Byte übernehmen, jedoch bedeutet dort 0 einen sehr tiefen Ton und 255 einen sehr hohen, also genau umgekehrt. Daher muß man wie folgt vorgehen. Wenn im CBM-Programm steht: POKE TA, TH, wobei TA die Adresse der Tonhöhe 59464 und TH die Tonhöhe ist, muß es nun im C 64-Programm heißen: POKE FH, 255 — TH. Es kommt aber dazu, daß der Tonumfang des C 64 etwas kleiner ist als der der CBMs. Daher empfiehlt es sich, den Wert für die Tonhöhe mit 2 oder 3 zu multiplizieren, wobei darauf zu achten ist, daß der Bereich von 0 bis 255 nicht überschritten wird. Der Befehl muß also lauten: POKE FH, 255 — 2 * TH.</p>
+
+        <h2>Diskettenbefehle</h2>
+
+        <p>Die komfortablen Diskettenbefehle des CBM 40 XX können nicht übernommen werden, jedoch kann man die überall möglichen Kommando-String-Befehle verwenden. Allerdings muß dafür für die Monofloppy 1541 (beziehungsweise 1540) die Laufwerksnummer gestrichen werden. Tabelle 4 stellt eine Vergleichsliste der beiden Laufwerke dar.</p>
+
+        <figure>
+            <table border="1">
+                <tbody>
+                    <tr>
+                        <td><b>Doppelfloppy 4040</b><br>
+                            (die neuen 4er Befehle stehen in Klammern)</td>
+                        <td><b>Monofloppy 1541</b></td>
+                    </tr>
+                    <tr>
+                        <td><u>Diskette neu formatieren:</u><br>
+                            OPEN 1,8,15,"N0:Name,XX"<br>
+                            (HEADER"Name,",IXX<br>
+                            I = Laufwerksnummer)</td>
+                        <td>OPEN 1,8,15,"N:Name,XX"</td>
+                    </tr>
+                    <tr>
+                        <td><u>Inhaltsverzeichnis lesen:</u><br>
+                            LOAD"$1",8 bzw. LOAD"$",8<br>
+                            (DIRECTORY)</td>
+                        <td>LOAD"$",8</td>
+                    </tr>
+                    <tr>
+                        <td><u>Beliebiges Programm laden:</u><br>
+                            LOAD"Name",8 bzw. LOAD"Name1’,8<br>
+                            (DLOAD"Name" bzw.<br>
+                            DLOAD"Name"D1)</td>
+                        <td>LOAD"Name",8</td>
+                    </tr>
+                    <tr>
+                        <td><u>Beliebiges Programm sichern:</u><br>
+                            SAVE"Name",8 bzw. SAVE"NameT",8<br>
+                            (DSAVE"Name" bzw. DSAVE"Name",D1)</td>
+                        <td>SAVE"Name",8</td>
+                    </tr>
+                    <tr>
+                        <td><u>Datei löschen:</u><br>
+                            OPEN 1,8,15,"S0:Name" bzw. OPEN 1,8,15,"S1:Name"<br>
+                            (SCRATCH"Name",DO bzw. SCRATCH"Name",D1)</td>
+                        <td>OPEN 1,8,15,"S:Name"</td>
+                    </tr>
+                    <tr>
+                        <td><u>Datei umbenennen:</u><br>
+                            OPEN 15,8,15:<br>
+                            PRINT15,"R0:Neu=0:Alt" bzw. OPEN 15,8,15:PRINT15,"R1:Neu=1:Alt"<br>
+                            (RENAME D1, "Alt"TO"Neu" bzw. RENAME DO,"Alt"TO"Neu")</td>
+                        <td>OPEN 15,8,15:<br>
+                            PRINT15,"R:Neu=Alt"</td>
+                    </tr>
+                </tbody>
+            </table>
+            <figcaption>Tabelle 4. Vergleich der Befehle für die Laufwerke 4040 und 1541</figcaption>
+        </figure>
+
+        <p>Zum Schluß noch einige wichtige Zero-Page-Adressen zum Vergleich in Tabelle 5 (aus urheberrechtlichen Gründen dürfen die vollständigen Listen leider nicht abgedruckt werden).</p>
+
+        <figure>
+            <table>
+                <tr>
+                    <th colspan="2">CBM</th>
+                    <th colspan="2">C64</th>
+                    <th>Bedeutung</th>
+                </tr>
+                <tr>
+                    <th>Hex</th>
+                    <th>Dezimal</th>
+                    <th>Hex</th>
+                    <th>Dezimal</th>
+                    <th></th>
+                </tr>
+                <tr>
+                    <td>0028-0029</td>
+                    <td>40-41</td>
+                    <td>002B-002C</td>
+                    <td>43-44</td>
+                    <td>Zeiger auf Basic-Anfang</td>
+                </tr>
+                <tr>
+                    <td>002A-002B</td>
+                    <td>42-43</td>
+                    <td>002D-002E</td>
+                    <td>45-46</td>
+                    <td>Zeiger auf Variablen Anfang</td>
+                </tr>
+                <tr>
+                    <td>002C-002D</td>
+                    <td>44-45</td>
+                    <td colspan="2">s.u.</td>
+                    <td>Zeiger auf Ende der Variablentabelle</td>
+                </tr>
+                <tr>
+                    <td colspan="2">s.o.</td>
+                    <td>002F-0030</td>
+                    <td>47-48</td>
+                    <td>Zeiger auf Beginn der Felder</td>
+                </tr>
+                <tr>
+                    <td>002E-002F</td>
+                    <td>46-47</td>
+                    <td>0031-0032</td>
+                    <td>49-50</td>
+                    <td>Zeiger auf Ende der Felder</td>
+                </tr>
+                <tr>
+                    <td>0030-0031</td>
+                    <td>48-49</td>
+                    <td>0033-0034</td>
+                    <td>51-52</td>
+                    <td>Zeiger auf Beginn der Strings (rückwärts)</td>
+                </tr>
+                <tr>
+                    <td>0032-0033</td>
+                    <td>50-51</td>
+                    <td>0037-0038</td>
+                    <td>55-56</td>
+                    <td>Zeiger auf Ende der Strings (= Speichergrenze)</td>
+                </tr>
+                <tr>
+                    <td>0036-0037</td>
+                    <td>54-55</td>
+                    <td>0039-003A</td>
+                    <td>57-58</td>
+                    <td>laufende Zeilennummer</td>
+                </tr>
+                <tr>
+                    <td>0038-0039</td>
+                    <td>56-57</td>
+                    <td>003B-003C</td>
+                    <td>59-60</td>
+                    <td>vorhergehende Zeilennummer</td>
+                </tr>
+                <tr>
+                    <td>003A-0038<!-- sic! --></td>
+                    <td>58-59</td>
+                    <td>003D-003E</td>
+                    <td>61-62</td>
+                    <td>nächster Befehl (für CONT)</td>
+                </tr>
+                <tr>
+                    <td>003C-003D</td>
+                    <td>60-61</td>
+                    <td>003F-0040</td>
+                    <td>63-64</td>
+                    <td>aktuelle DATA-Zeile</td>
+                </tr>
+                <tr>
+                    <td>003E-003F</td>
+                    <td>62-63</td>
+                    <td>0041-0042</td>
+                    <td>65-66</td>
+                    <td>aktuelles DATA-Element (Adresse)</td>
+                </tr>
+                <tr>
+                    <td>0042-0043</td>
+                    <td>66-67</td>
+                    <td>0045-0046</td>
+                    <td>69-70</td>
+                    <td>aktueller Variablenname</td>
+                </tr>
+                <tr>
+                    <td>0044-0045</td>
+                    <td>68-69</td>
+                    <td>0047-0048</td>
+                    <td>71-72</td>
+                    <td>Zeiger auf aktuelle Variable</td>
+                </tr>
+                <tr>
+                    <td>0046-0047</td>
+                    <td>70-71</td>
+                    <td>0049-004A</td>
+                    <td>73-74</td>
+                    <td>Variablenzeiger für FOR...NEXT</td>
+                </tr>
+                <tr>
+                    <td>0070-0087</td>
+                    <td>112-135</td>
+                    <td>0073-008A</td>
+                    <td>115-138</td>
+                    <td>diese Routine holt nächstes Basic-Zeichen</td>
+                </tr>
+                <tr>
+                    <td>0088-008C</td>
+                    <td>136-140</td>
+                    <td>008B-008F</td>
+                    <td>139-143</td>
+                    <td>Zufallszahl</td>
+                </tr>
+                <tr>
+                    <td>008D-008F</td>
+                    <td>141-143</td>
+                    <td>00A0-00A2</td>
+                    <td>160-162</td>
+                    <td>interne Uhr</td>
+                </tr>
+                <tr>
+                    <td>0097</td>
+                    <td>151</td>
+                    <td>00CB</td>
+                    <td>203</td>
+                    <td>gedrückte Taste</td>
+                </tr>
+                <tr>
+                    <td>00A7</td>
+                    <td>167</td>
+                    <td>00CC</td>
+                    <td>204</td>
+                    <td>Cursor an/aus (0=an,1=aus)</td>
+                </tr>
+                <tr>
+                    <td>00C6</td>
+                    <td>198</td>
+                    <td>00CA</td>
+                    <td>202</td>
+                    <td>Spaltenposition des Eingabecursors</td>
+                </tr>
+                <tr>
+                    <td>00D8</td>
+                    <td>216</td>
+                    <td>00C9</td>
+                    <td>201</td>
+                    <td>Zeilenposition des Eingabecursors</td>
+                </tr>
+                <tr>
+                    <td>00FD-00FF</td>
+                    <td>253-255</td>
+                    <td>00FB-00FE</td>
+                    <td>251-254</td>
+                    <td>freier Platz für Zeiger in Page 0</td>
+                </tr>
+                <tr>
+                    <td>026F-0278</td>
+                    <td>623-632</td>
+                    <td>0277-0280</td>
+                    <td>631-640</td>
+                    <td>Tastaturpuffer</td>
+                </tr>
+            </table>
+            <figcaption>Tabelle 5. Die wichtigsten Zero-Page Adressen</figcaption>
+        </figure>
+
+        <p>Lösung des Beispielprogramms »Kanone« für CBM:</p>
+
+        <pre>
+1 REM KANONE
+5 ZA = 33728:ZE = 33767:OP = 33748
+10 DIM A%(255)
+20 A%(26) = -1:A%(18) = 1:REM (Für CBM 30XX)
+oder
+20 A%(49) = 1:A%(50) = 1:REM (Für CBM 40XX)
+1000 REM Abfrage und Zeichen setzen, Subroutine
+1010 NP = OP + A%(PEEK(151)):REM neue Position
+1020 IF NP&gt;ZE OR NP&lt;ZA THEN NP = OP: REM Zeilenbegrenzung
+1030 POKE OP, 32:REM alte Position löschen
+1040 POKE NP,30:REM neue Position setzen
+1050:
+1060 OP = NP
+1070 RETURN
+</pre>
+
+        <p>Und nun viel Erfolg beim Umschreiben!</p>
+
+        <address class="author">(M. und J. Heinz/rg)</address>
+
+    </article>
+
+</body>
+
+</html>
