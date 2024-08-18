@@ -177,7 +177,7 @@
                     <td>0111</td>
                     <td>112</td>
                     <td>7168</td>
-                    <td>lC00</td>
+                    <td>1C00</td>
                 </tr>
                 <tr>
                     <td>1000</td>
@@ -264,7 +264,7 @@
             Siehe da! Es funktioniert also im Programm-Modus (zum Beispiel mit I = 1 und W= 128). Wir können daher unter das Basic-ROM auf diese Weise acht Bildschirme legen. Unter das Betriebssystem lassen sich so auch Bildschirme legen, nur können wir hier den Text nicht lesen, weil der VIC-II-Chip — wie gesagt — hier keinen Zugriff zum Zeichen-ROM hat. So legt zum Beispiel I = 0 und W=240 den Bildschirm nach 64512, was leicht nachprüfbar ist durch die Zeile:<br>
             62 POKE 65000, 1:POKE 55784,1.</p>
 
-        <p>Damit wenden wir uns nun dem kritischen Bereich zwischen 53248 und 57343 zu. Hier liegen ja das Zeichen-ROM und die Ein- und Ausgabebausteine. Normalerweise — wie man auch durch unsere POKE in diesen Bereich erkennen kann — sind hier die Ein- und Ausgabe- Bausteine eingeschaltet. Wenn wir hierher Bildschirme legen, kann alles mögliche passieren, weil wir Register des VIC-II-Chip, des SID und CIAs beeinflussen. Hier sollte man mit viel Vorsicht und gegebenenfalls nur in Maschinensprache operieren.</p>
+        <p>Damit wenden wir uns nun dem kritischen Bereich zwischen 53248 und 57343 zu. Hier liegen ja das Zeichen-ROM und die Ein- und Ausgabebausteine. Normalerweise — wie man auch durch unsere POKE in diesen Bereich erkennen kann — sind hier die Ein- und Ausgabe-Bausteine eingeschaltet. Wenn wir hierher Bildschirme legen, kann alles mögliche passieren, weil wir Register des VIC-II-Chip, des SID und CIAs beeinflussen. Hier sollte man mit viel Vorsicht und gegebenenfalls nur in Maschinensprache operieren.</p>
 
         <p>Was wir durch die Programmzeile 62 noch erkennen können: Das Bildschirmfarben-RAM verschiebt sich nicht, egal, welches Speicherviertel wir wählen und wohin wir den Bildschirm auch legen: Das Farb-RAM liegt immer von 55296 bis 56295.</p>
 
@@ -321,16 +321,16 @@
         <p>Es existiert also eine Hintergrundfarbe für den gesamten Bildschirm, die überall dort auftaucht, wo in der Bit-Map ein Bit-Paar 00 vorhanden ist. Diese Hintergrundfarbe ist durch den Zahlenwert in Register 53281 bestimmt. Die anderen drei Farben treten jeweils in den 8 x 8-Bit-Bildschirmfeldern auf, in die das Video-RAM, beziehungsweise der Bildschirmfarbspeicher aufgeteilt sind.</p>
 
         <p>Wir ergänzen unser Programm 1 für den Mehrfarben-Modus: Außer dem Bit-Map-Modus muß hier also noch der Mehrfarb-Modus eingeschaltet werden. Das haben wir in der letzten Folge kennengelernt: 145 POKE 53270,PEEK(53270) OR 16 Weiterhin ändern wir noch die Zeile 5 und schreiben anstelle von F=6 jetzt GOSUB 300. Folgende Zeilen kommen neu hinzu:<br>
-            300 PRINT CHR$(147)CHR$(17)&ldquo; FARBENWAHL:”<br>
+            300 PRINT CHR$(147)CHR$(17)&ldquo;FARBENWAHL:”<br>
             310 PRINT CHR$ (17)"HINTER-GRUNDFARBE"TAB (30);:INPUT F0<br>
             320 PRINT "BITS 4-7 VIDEOMATRIX"TAB(30);:INPUT F1<br>
             330 PRINT "BITS 0-3 VIDEOMATRIX"TAB(30);:INPUT F2<br>
-            340 PRINT ’’BILDSCHIRMFARBSPEICHER"TAB(30);:INPUT F3<br>
+            340 PRINT &ldquo;BILDSCHIRMFARBSPEICHER"TAB(30);:INPUT F3<br>
             350 POKE 53281,F0:F=16*Fl+F2: FOR I = 55296 TO 56295:POKE I,F: NEXTI<br>
             360 PRINT CHR$(147):RETURN</p>
 
         <p>Um des Effektes willen ändern wir noch die Zeile 220, in der die Videomatrix mit den Farbzahlen belegt wird:<br>
-            220 FOR J = 0TO 998 STEP 2:POKE J,F:NEXT J:FOR J = lTO 999 STEP 2:POKE J,F+l:NEXTJ</p>
+            220 FOR J = 0TO 998 STEP 2:POKE J,F:NEXT J:FOR J = 1TO 999 STEP 2:POKE J,F+l:NEXTJ</p>
 
         <p>Starten Sie dieses Programm nach dem Abspeichern mit RUN, probieren Sie alle möglichen Farbkennzahlen aus. Sie werden fast immer bemerken, daß die Hoch- und Tiefpunkte der Kurve nicht mitgezeichnet werden. Das liegt daran, daß unter Verfahren der Berechnung, welches Bit in welchem Byte gesetzt werden soll, noch auf einzelne Bits und nicht die paarweise Verwendung abgestimmt ist. Es gibt zwei Möglichkeiten: Entweder ändert man das Berechnungsverfahren in Zeile 240, um an die richtige Stelle die passenden Bit-Paare zu bekommen, oder wir ändern die Programmzeile 230 zu:<br>
             230 FOR I = 0 TO 319 STEP 2:Y= FNA(X)</p>

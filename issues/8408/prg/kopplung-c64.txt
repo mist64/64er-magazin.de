@@ -1,0 +1,132 @@
+
+
+;kopplung-c64 ==0801==
+   10 rem " Johannes Mockenhaupt
+   20 rem " Hochstadenstr. 28
+   30 rem "
+   40 rem " D-5000 K\ln 1                                        ,den 29.M[rz 1984
+   50 :
+   60 rem " C 64 / VC 20 / Koppelung
+   70 rem " ]ber den programmierbaren USER Port.
+   80 :
+  100 bytes=165:                 rem " Anzahl Bytes Maschinen-PRG
+  110 hs=peek(56)-1:             rem " hoechste aktuelle RAM-Seite minus 1.
+  120 if peek(55)>0 then hs=hs-1:rem " kein 'glattes' RAM-Ende: Sicherheits-Seite
+  130 :
+  140 print "{down}sys"hs*256":BASIC PRG senden.
+  150 print "{down}sys"hs*256+39":BASIC PRG empfangen.
+  160 print "{down}sys"hs*256+94":1 BYTE senden
+  170 print "{down}sys"hs*256+124":1 BYTE empfangen
+  180 print "{down}sys"hs*256+143":USER-Port auf Eingang
+  190 print "{down}sys"hs*256+146":USER-Port auf Ausgang
+  200 print "{down}sys"hs*256+157":QUICK-Port Initialisierung
+  290 :
+  300  for i=hs*256 to i+bytes-1
+  310   read a
+  320   b=a
+  330    if a<0 then a=a+hs+1
+  340   poke i,a
+  350   s=s+b
+  360  next i
+  370 s=s-20510
+  380 if s<>0 then print "{down}{rvon}Data-Fehler{rvof}:"s"betraegt die Differenz.":end
+  390 :
+  400 print "{down}{rvon}QuickPort{rvof} ist jetzt initialisiert.
+  410 poke 56,hs:    rem " neue RAM-top Adresse
+  420 sys hs*256+157:rem " Initialisierung
+  430 new:           rem " Setzen der BASIC-Zeiger auf neuen Bereich.
+  440 :
+ 6000 rem " Transport-Routinen     BASIC-PRG  Senden:    $..00
+ 6010 :
+ 6100 data  32,146, -1:rem " ..00  20 92 ..  jsr ..92    USER-Port auf Ausgang
+ 6110 data 165, 43:    rem " ..03  a5 2b     lda 2b      L-Byte Basic-Start
+ 6120 data 164, 44:    rem " ..05  a4 2c     ldy 2c      H-Byte Basic-Start
+ 6130 data 133, 88:    rem " ..07  85 58     sta 58             merken
+ 6140 data 132, 89:    rem " ..09  84 59     sty 59             merken
+ 6200 data 160,  0:    rem " ..0b  a0 00     ldy#00      Y-Register vorbereiten.
+ 6210 data 177, 88:    rem " ..0d  b1 58     lda (58).y  1 Byte aus PRG holen
+ 6220 data  32, 94, -1:rem " ..0f  20 5e ..  jsr .. 5e   und senden.
+ 6230 data 230, 88:    rem " ..12  e6 58     inc 58      Zeiger erhoehen L-Byte
+ 6240 data 208,  2:    rem " ..14  d0 02     bne ..18    ohne Uebertrag
+ 6250 data 230, 89:    rem " ..16  e6 59     inc 59      Zeiger erhoehen H-Byte
+ 6300 data 165, 89:    rem " ..18  a5 59     lda 59      Zeiger     H-Byte
+ 6310 data 197, 46:    rem " ..1a  c5 2e     cmp 2e      BASIC-Ende H-Byte
+ 6320 data 144,237:    rem " ..1c  90 ed     bcc ..0b    noch nicht erreicht.
+ 6330 data 165, 88:    rem " ..1e  a5 58     lda 58      Zeiger     L-Byte
+ 6340 data 197, 45:    rem " ..20  c5 2d     cmp 2d      BASIC-Ende L-Byte
+ 6350 data 144,231:    rem " ..22  90 e7     bcc ..0b    noch nicht erreicht.
+ 6360 data  76,143, -1:rem " ..24  4c 8f ..  jmp ..8f    USER-Port auf Eingang
+ 6370 :
+ 7000 rem " Transport-Routinen     BASIC-PRG  Empfangen: $..27
+ 7010 :
+ 7100 data  56:        rem " ..27  38        sec         Start-Adresse berechnen
+ 7110 data 165, 45:    rem " ..28  a5 2d     lda 2d       L-Byte Basic-Ende
+ 7120 data 233,  2:    rem " ..2a  e9 02     sbc#02       $02 substrahieren
+ 7130 data 133, 45:    rem " ..2c  85 2d     sta 2d       und speichern.
+ 7140 data 165, 46:    rem " ..2e  a5 2e     lda 2e       H-Byte Basic-Ende
+ 7150 data 233,  0:    rem " ..30  e9 00     sbc#00       Carry-Flag subtrahieren
+ 7160 data 133, 46:    rem " ..32  85 2e     sta 2e       und speichern.
+ 7200 data 160,  0:    rem " ..34  a0 00     ldy#00      Y-Register vorbereiten.
+ 7210 data  32,124, -1:rem " ..36  20 7c ..  jsr ..7c    1 Byte empfangen
+ 7220 data 145, 45:    rem " ..39  91 2d     sta (2d).y  und speichern.
+ 7230 data 230, 45:    rem " ..3b  e6 2d     inc 2d      BASIC-PRG Ende erhoehen
+ 7240 data 208,  2:    rem " ..3d  d0 02     bne ..41    ohne Uebertrag
+ 7250 data 230, 46:    rem " ..3f  e6 2e     inc 2e      H-Byte erhoehen
+ 7300 data 168:        rem " ..41  a8        tay         Ende-Bedingung pruefen
+ 7310 data 208,  8:    rem " ..42  d0 08     bne ..4c    kein Ende
+ 7320 data 165,252:    rem " ..44  a5 fc     lda fc      2.Byte=0 ?
+ 7330 data 208,  4:    rem " ..46  d0 04     bne ..4c    nein, kein Ende
+ 7340 data 165,253:    rem " ..48  a5 fd     lda fd      3.Byte=0 ?
+ 7350 data 240,  9:    rem " ..4a  f0 09     beq ..55    ja, dann Ende
+ 7360 data 165,252:    rem " ..4c  a5 fc     lda fc      vorletztes Byte kellern
+ 7370 data 133,253:    rem " ..4e  85 fd     sta fd
+ 7380 data 132,252:    rem " ..50  84 fc     sty fc      letztes    Byte kellern
+ 7390 data  24:        rem " ..52  18        clc         Sprungbedingung
+ 7400 data 144,223:    rem " ..53  90 d9     bcc ..34    weiter machen.
+ 7500 data  32, 96,166:rem " ..55  20 60 a6  jsr a660    CLR-Befehl
+ 7510 data  32, 51,165:rem " ..58  20 33 a5  jsr a533    BASIC-Zeilen binden
+ 7520 data  76,133,227:rem " ..5b  4c 85 e3  jmp e385    in READY-Modus springen
+ 7530 :
+ 8000 rem " Transport-Routinen: 1 BYTE Senden:    $..5e
+ 8010 :
+ 8100 data 141,  1,221:rem " ..5e  8d 01 dd  sta dd01    AKKU in USER-Port
+ 8110 data 162,147:    rem " ..61  a2 93     ldx#93      VALID-Signal senden
+ 8115 data 142,  0,221:rem " ..63  8e 00 dd  stx dd00
+ 8120 data 173, 13,221:rem " ..66  ad 0d dd  lda dd0d    QUITTUNG laden
+ 8125 data 208, 11:    rem " ..69  d0 0b     bne ..76    QUITTUNG empfangen
+ 8130 data 202:        rem " ..6b  ca        dex         abzaehlen der Zeit
+ 8135 data 208,248:    rem " ..6c  d0 f8     bne ..66    Ueberschreitung?
+ 8140 data  32,143, -1:rem " ..6e  20 8f ..  jsr ..8f    USER-Port als Eingang
+ 8150 data 162,  5:    rem " ..71  a2 05     ldx#05      Fehler-Nummer Bet.System
+ 8155 data  76, 58,164:rem " ..73  4c 3a a4  jmp a43a    Fehler-Routine Rechner
+ 8160 data 162,151:    rem " ..76  a2 97     ldx#97      VALID-Flag aus
+ 8165 data 142,  0,221:rem " ..78  8e 00 dd  stx dd00    VALID zuruecknehmen
+ 8170 data  96:        rem " ..7b  60        rts         RETURN
+ 8180 :
+ 8200 rem " Transport-Routinen: 1 BYTE Empfangen: $..7c
+ 8202 :
+ 8204 data 173, 13,221:rem " ..7c  ad 0d dd  lda dd0d    VALID holen
+ 8210 data 240,251:    rem " ..7f  f0 fb     beq ..7c      ''  warten
+ 8220 data 173,  1,221:rem " ..81  ad 01 dd  lda dd01    BYTE  holen
+ 8230 data 162,147:    rem " ..84  a2 93     ldx#93      QUITTUNG-Signal senden
+ 8235 data 142,  0,221:rem " ..86  8e 00 dd  stx dd00
+ 8240 data 162,151:    rem " ..89  a2 97     ldx#97      QUITTUNG-Signal loeschen
+ 8245 data 142,  0,221:rem " ..8b  8e 00 dd  stx dd00
+ 8250 data  96:        rem " ..8e  60        rts         RETURN
+ 8260 :
+ 9000 rem " Richtungs-Register auf Eingang:  $..8f
+ 9010 rem "                        Ausgang:  $..92
+ 9020 :
+ 9100 data 162,  0:    rem " ..8f  a2 00     ldx#00      USER-Port als Eingang
+ 9110 data  44,162,255:rem " ..92  a2 ff     ldx#ff      USER-Port als Ausgang
+ 9120 data 160,151:    rem " ..94  a0 97     ldy#97
+ 9130 data 140,  0,221:rem " ..96  8c 00 dd  sty dd00    VALID-Flag zuruecksetzen
+ 9140 data 142,  3,221:rem " ..99  8e 03 dd  stx dd03    USER-Richtung setzen
+ 9150 data  96:        rem " ..9c  60        rts         RETURN{$a0}{$a0}{$a0}{$a0}{$a0}{$a0}{$a0}{$a0}{$a0}{$a0}{$a0}{$a0}{$a0}{$a0}{$a0}
+ 9160 :
+ 9200 rem " Initialisierung des Ports        $..9d                       {$a0}{$a0}{$a0}{$a0}{$a0}
+ 9210 :
+ 9220 data 173, 13,221:rem " ..9d  ad 0d dd  lda dd0d    VALID laden{$a0}{$a0}{$a0}{$a0}{$a0}{$a0}{$a0}{$a0}{$a0}{$a0}
+ 9230 data 208,251:    rem " ..a0  d0 fb     bne ..9d    Flag gesetzt:noch einmal
+ 9240 data  76,143, -1:rem " ..a2  4c 8f ..  jmp ..8f    USER-Port als Eingang
+
