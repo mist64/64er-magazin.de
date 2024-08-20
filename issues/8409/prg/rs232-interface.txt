@@ -1,0 +1,65 @@
+;rs232-interface.prg ==0801==
+;Quelle: 8409.D64
+  100 rem rs 232 schnittstelle
+  110 rem 13.02.84
+  120 rem (c) h.-j. kellermann
+  130 rem anfangswerte festlegen
+  140 k(0)=0:k(1)=6:k(2)=0:k(3)=0:k(4)=0:k(5)=0:k(6)=0
+  150 data6,"","test-routine","baud-rate","datenwort-laenge","stop-bits"
+  160 data"handshake","uebertragungsart","paritaetspruefung"
+  170 data10,"baud"," anw. ","  50  ","  75  "," 110  "," 134.5"," 150  "
+  180 data" 300  "," 600  ","1200  ","1800  ","2400  "
+  190 data3," bits",8,7,6,5
+  200 data1," stop-bits",1,2
+  210 data1,-draht,3,x
+  220 data1,duplex,voll,halb
+  230 data7,,ohne par.pruef.,unger.parit.,ohne par.pruef
+  240 datagerad.parit.,ohne par.pruef,8.bit auf 1,ohne par.pruef,8.bit auf 0
+  250 poke650,128:rem alle tasten repeat
+  260 rem
+  270 rem menue zur parameteraenderung
+  280 restore:forj=0to6:readk%(j)
+  290 readk$:fori=0tok%(j):readk$(i,j):k$(i,j)=k$(i,j)+k$
+  300 nexti:nextj
+  310 j=0:k(j)=k(j)+1:ifk(j)=7thenk(j)=0
+  320 gosub680:k$="registerinhalte{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{down}---------------"
+  330 k$=k$+"{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{up}{up}{up}{rvon}kr="+str$(kr)+"{rvof}  {rvon}br="+str$(br)+"{down}{down}"
+  340 gosub520:j=k(j):ifj>0thenk$=k$(j,0):gosub520:goto310
+  350 rem
+  360 rem testroutine abarbeiten
+  370 gosub710:gosub690:gosub660:close1:gosub700
+  380 gosub680:open1,2,0,chr$(kr)+chr$(br):gosub700
+  390 get#1,i$:rem puffer initialisieren
+  400 print"{rvon}";:rem optische kennung fuer senden
+  410 fori=32to95:printchr$(i);:print#1,chr$(i);:next:rem zeichensatz
+  420 print#1:print:print#1:print
+  430 print#1,"the quick brown fox jumps over the lazy dog 0123456789"
+  440 print#1:poke204,0:rem cursor blinken ein
+  450 get#1,i$:ifi$=""then480
+  460 if(asc(i$)and127)<32thenwait207,1,1:rem steuerzeichen
+  470 poke207,0:printi$;:poke204,0:rem blinken steuern
+  480 geti$:ifi$="_"thenpoke204,1:print"{clr}{down}{down}{down}{down}{down}{rght}{rght}{rght}{rght}{rght}moment bitte":goto280
+  490 print#1,i$;:goto450:rem abfrageschleife
+  500 rem
+  510 rem unterprogramme
+  520 gosub710:print"  "k$"{down}"
+  530 fori=0tok%(j):ifj<>1thenprint"{down}";
+  540 print"  "k$(i,j):next
+  550 print"{home}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{rvon}> cursor oder return {rvof}";
+  560 print"{home}{down}{down}{down}{down}{down}{down}";:ifj<>1thenprint
+  570 ifk(j)=0then600
+  580 fori=1tok(j):print"{down}";:ifj<>1thenprint
+  590 next
+  600 print"  {rvon}"k$(k(j),j)
+  610 getk$:ifk$=""then610
+  620 ifk$="{up}"thenifk(j)>0thenprint"{up}  "k$(k(j),j):k(j)=k(j)-1:goto560
+  630 ifk$="{down}"thenifk(j)<k%(j)thenprint"{up}  "k$(k(j),j):k(j)=k(j)+1:goto560
+  640 ifk$<>chr$(13)then610
+  650 return
+  660 if(64andpeek(37150))then660:rem puffer leeren
+  670 return
+  680 kr=128*k(3)+32*k(2)+k(1):br=32*k(6)+16*k(5)+k(4):return
+  690 fori=0to7:poke828+i,k(i):next:return
+  700 fori=0to7:k(i)=peek(828+i):next:return
+  710 print"{clr}{rvon}  rs-232 ein/ausgabe  {down}{down}":return
+
