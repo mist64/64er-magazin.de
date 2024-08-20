@@ -1060,8 +1060,45 @@ Wenn Sie Fragen haben, können Sie mich mit einer Leserzuschrift ansprechen.
 
 (Dr. Helmuth Hauck/aa)
 
+Spiel des Jahres: Soccer II
 
+> Viele Spiele wurden in der 64’er Redaktion angeschaut, gespielt, getestet. Eines fesselte uns immer wieder.
 
+20.00 Uhr. Das Spitzenspiel »Bayern Albert« gegen »VC Volker 20« wird vom Schiedsrichter angepfiffen. Jetzt entscheidet sich, wer die Tabellenführung übernimmt. Anstoß von VC Volker. Langer Paß in die gegnerische Hälfte. Doch was ist das? Bayern Albert fängt den Ball ab, kontert, stürmt vor das Tor, schießt und ... der Torwart von VC Volker wirft sich in die falsche Ecke. 1:0.
+
+Nach nervenaufreibenden drei Minuten der langerwartete Halb-zeitpfiff.
+
+Weitere drei Minuten später ist es entschieden. Die Legende um den in dieser Saison bisher ungeschlagenen »VC Volker 20« ist beendet. Der neue Tabellenführer »Bayern Albert« sitzt schweißgebadet auf seinem Stuhl und kann es noch gar nicht glauben. Es ist geschafft.
+
+Die ersten Kommentare sind zu hören: Der Boden sei viel zu hart, der Rasen viel zu grün und das Bier für Trainer Volker viel zu warm ...
+
+Oft trafen wir uns abends oder am Wochenende, um unsere Spieler über den Rasen laufen zu lassen. Die Soccer-Sucht hatte uns befallen.
+
+Doch warum gerade dieses Spiel, und nicht »Summer Games«, »Pha-raoh's Curse« oder eines der anderen aus der Vielzahl der Spiele für den C 64?
+
+Soccer kann man alleine gegen den Computer oder gegen einen Partner spielen. Der Computer läßt sich auf neun Schwierigkeitsstufen einstellen. In Stufe 1 fällt es auch dem Anfänger nicht allzu schwer, den Computer zu besiegen. In der Stufe 9 muß man fast schon Profi-Kicker sein. Die Spiele gegen den Computer machen allerdings nicht halb soviel Spaß, als gegen einen zweitenSpieler.
+
+## Andere Taktik bei jedem neuen Gegner
+
+Hier treten die Qualitäten dieses Spieles erst richtig hervor. Einfach nur nach vorne schießen, nützt in den wenigsten Fällen. Man ist gezwungen, sich Taktiken zurechtzulegen, den Gegner zu berechnen und dies, mit dem Joystick auch noch umzusetzen. Wieviele verschiedene Tricks, den Ball zu spielen, zu schaffen sind, merkt man erst mit der wachsenden Anzahl der Spiele.
+
+Die Fußballregeln beherrscht der Computer im allgemeinen recht gut. Die Abseitsregel wurde ignoriert, da es nicht möglich ist, ins Abseits zu gelangen. Auch Spieler mit Neigung zur Ruppigkeit haben keine Chance. Fouls sind einfach nicht vorgesehen. Mit dieser Regelung entfallen also Freistöße, Elfmeter, gelbe und rote Karten.
+
+Soccer erschien schon 1983. Wieso wird dieses Spiel zum »Spiel des Jahres 1984« gewählt?
+
+Da unser Preis in diesem Jahr zum ersten Mal vergeben wird, erschien es uns fair, auch die früher veröffentlichten Programme mit einzubeziehen. Unter allen Spielen, die uns in der Redaktion erreichten (und das waren sehr viele!), hatte fast jeder der Redakteure seinen Favoriten. Aber nur von Soccer waren alle begeistert. So wählten wir gemeinsam ein »altes« Spiel.
+
+Zum Thema Fußball gehört eine Fußballmannschaft. Für einen Fototermin konnten wir den FC Bayern München gewinnen. Wie schon auf der »Systems ’83« wurde hierbei natürlich Soccer gespielt. Einstimmige Meinung: »Spitze«. Vielleicht wird Soccer in Zukunft sogar als Trainingshilfsmittel eingesetzt?
+
+## Auch die Profis waren begeistert
+
+Der C 64 war kaum aufgebaut, da saßen die ersten Bayern-Spieler auch schon davor, obwohl sie gerade erst vom Training kamen. Dieter Hoeness und Raimund Aumann waren die ersten, die sich einen Platz am Joystick sicherten. Der Pfiff des Computerschiedsrichters lockte dann immer mehr Spieler an. Selten wird in der Kabine Fußball gespielt, doch hier waren dann fast alle dabei. Nur Lothar Matthäus, der mit der Nationalmannschaft im Trainingslager war, verpaßte diese Gelegenheit. Aber vielleicht wird auch in der Nationalmannschaft schon mit Soccer taktiert und trainiert.
+
+Jean Marie Pfaff erzählte, daß bei ihm zuhause der C 64 fast den ganzen Tag läuft. Wenn seine Kinder nicht davor sitzen, spielt auch er sehr gerne. Natürlich nicht nur Soccer.
+
+Soccer wird von Commodore zu einem Preis von 59 Mark angeboten.
+
+(rg)
 
 
 
