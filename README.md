@@ -98,6 +98,8 @@ Die Eingabe-Ausgaben werden aus `issues` gelesen, die Website wird nach `out` ge
     * Abtippen der Listings
         * [Endurion](https://www.forum64.de/wcf/index.php?user/1964-endurion/)
         * [goloMAK](https://www.forum64.de/wcf/index.php?user/28439-golomak/)
+        * [64erGrufti](https://www.forum64.de/wcf/index.php?user/30650-64ergrufti/)
+        * [ClausS](https://www.forum64.de/wcf/index.php?user/28399-clauss/)
 
 
 ![](screenshot1.png)
