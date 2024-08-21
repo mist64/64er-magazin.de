@@ -92,7 +92,7 @@
                     </tr>
                     <tr>
                         <td>10</td>
-                        <td>IFZ&lt;&gt;Sstatt IFZ = S</td>
+                        <td>IF Z&lt;&gt;Sstatt IF Z = S</td>
                         <td align="right">2,50</td>
                         <td align="right">2,98</td>
                     </tr>
@@ -151,7 +151,7 @@
 
         <p>Ich weiß, es geht auch kürzer, aber bei meinen Experimenten spielt Speicherplatz keine Rolle und außerdem habe ich noch einen Hintergedanken, den ich erst später erklären kann. Nicht zuletzt will ich dadurch auch erreichen, daß die Laufzeiten der Programme mit den Ihren übereinstimmen.</p>
 
-        <p>Schalten Sie bitte auch Programmierhilfen CToolkit, Simon’s Basic etc.) und Disk Operating-Programme (DOS 5.1) aus, denn sie verlangsamen den Programmablauf.</p>
+        <p>Schalten Sie bitte auch Programmierhilfen (Toolkit, Simon’s Basic etc.) und Disk Operating-Programme (DOS 5.1) aus, denn sie verlangsamen den Programmablauf.</p>
 
         <h2>Die interne Uhr mißt die Zeit</h2>
 
@@ -163,19 +163,19 @@
         <p>Zwischen diese beiden Zeilen stecken wir dann die Prüflinge, das heißt die Programme, deren Laufzeit wir messen wollen.</p>
 
         <p>Zur Prüfung geben wir zuerst die Zeile 15 mit einer simplen Verzögerungsschleife ein.<br />
-            15 FORT=1 TO 100:NEXTT</p>
+            15 FOR T=1 TO 100:NEXT T</p>
 
         <p>Das Programm dieser drei Zeilen hat die Laufzeit von 0,13 Sekunden mit dem VC 20 und 0,15 Sekunden mit dem C 64.</p>
 
         <h2>Das erste Testprogramm</h2>
 
-        <p>Löschen Sie bitte wieder die Zeile 15. Als' Programm, welches wir in mehreren Versionen programmieren wollen, habe ich mir einen Ablauf ausgesucht, der auch optisch verfolgbar ist. Auf dem Bildschirm soll nämlich der Buchstabe A gleich 374 mal nebeneinander gedruckt werden.</p>
+        <p>Löschen Sie bitte wieder die Zeile 15. Als Programm, welches wir in mehreren Versionen programmieren wollen, habe ich mir einen Ablauf ausgesucht, der auch optisch verfolgbar ist. Auf dem Bildschirm soll nämlich der Buchstabe A gleich 374 mal nebeneinander gedruckt werden.</p>
 
         <p>Die Zahl 374 hat nichts Magisches an sich. Es sind ganz einfach 17 Zeilen voller As auf dem Schirm des VC 20, der mit seiner begrenzten Spaltenzahl hier den Ton angibt. 17 Zeilen lassen uns genug Platz, um die gestoppte Zeit darunter gut lesbar anzuzeigen.</p>
 
         <p>Ich bleibe für den C 64 bei derselben Zahl, damit wir beide Computer miteinander vergleichen können und damit die Programme möglichst identisch sind.</p>
 
-        <p>In der Version 1 des Programms verwenden wir POKE-Befehle, mit denen wir das A und die dazugehörige Farbe auf den Bildschirm, das heißt in den Bildschirmspeicher (Video-RAM) und den Farbspeicher (Color-RAM) bringen. Beim VC 20 (ohne Erweiterung) beginnt der Bildschirmspeicher ab Speicherzelle 7680, der Farbspeicher ab 38400. Beim C 64 sind es die Speicherzellen 1024 und 55296. Schauen Sie bitte in den Commodore-Handbüchern nach und vergewissern Sie sich, daß Sie dieses System des Zeichen-POKEns verstehen. Es ist dort gut beschrieben. Der Buchstabe A hat den Bildschirm-Codewert 1. Als Farbe wähle ich die »Normalfarben« der beiden Computer. Der Farbcode für das Blau des VC 20 ist 6, für das Hellblau des C 64 ist er 14.</p>
+        <p>In der <strong>Version 1</strong> des Programms verwenden wir POKE-Befehle, mit denen wir das A und die dazugehörige Farbe auf den Bildschirm, das heißt in den Bildschirmspeicher (Video-RAM) und den Farbspeicher (Color-RAM) bringen. Beim VC 20 (ohne Erweiterung) beginnt der Bildschirmspeicher ab Speicherzelle 7680, der Farbspeicher ab 38400. Beim C 64 sind es die Speicherzellen 1024 und 55296. Schauen Sie bitte in den Commodore-Handbüchern nach und vergewissern Sie sich, daß Sie dieses System des Zeichen-POKEns verstehen. Es ist dort gut beschrieben. Der Buchstabe A hat den Bildschirm-Codewert 1. Als Farbe wähle ich die »Normalfarben« der beiden Computer. Der Farbcode für das Blau des VC 20 ist 6, für das Hellblau des C 64 ist er 14.</p>
 
         <p>Das Programm beginnt mit dem Löschen des Bildschirms (Zeile 20) und POKEt dann in Zeile 40 das erste A in den ersten Platz des Bildschirms.<br />
             20 PRINT CHR$ (147)<br />
@@ -183,14 +183,14 @@
             (40 POKE 1024 + Z:POKE 55296 + Z,14)
         </p>
 
-        <p>Die Zeile in Klammern gilt für den C 64. In Zeile 40 finden Sie zusätzlich eine Variable »Z«. Wie geplant, soll das A 374mal gePOKEt werden. Also müssen wie die Zahl der Speicherzelle laufendum 1 erhöhen. Dazu erfinden wir diese Variable Z, die zur Speicherzelle addiert wird.</p>
+        <p>Die Zeile in Klammern gilt für den C 64. In Zeile 40 finden Sie zusätzlich eine Variable »Z«. Wie geplant, soll das A 374mal gePOKEt werden. Also müssen wie die Zahl der Speicherzelle laufend um 1 erhöhen. Dazu erfinden wir diese Variable Z, die zur Speicherzelle addiert wird.</p>
 
         <p>Wir setzen Z am Anfang des Programms (in Zeile 30) auf Null und zählen es in Zeile 50 um 1 weiter.<br />
             30 Z = 0<br />
             50 Z = Z + l</p>
 
         <p>Als nächstes müssen wir prüfen, ob Z den Schlußwert 374 erreicht hat. Wenn nicht, dann soll der nächste POKE-Befehl ausgeführt werden, das heißt wir springen auf Zeile 40 zurück. Dann kommt die Zeile 1000 zum Zug mit dem Stoppen und Ausdrucken der Laufzeit. Also:<br />
-            60 IFZ = 374 THEN 1000<br />
+            60 IF Z = 374 THEN 1000<br />
             70 GOTO 40</p>
 
         <p>Ich schlage vor, daß Sie das kleine Programm nochmal LISTen, damit wir es komplett sehen können.</p>
@@ -224,7 +224,7 @@
 
         <h2>Drei Formen für »PRINT AT«</h2>
 
-        <p>Das druckt den Buchstaben A in die 4. Spalte auf der 9. Zeile. Für unseren Anwendungsfall in Zeile 1000 müssen wir die Zahl 18 nach 214 PO-KEn, 211 können wir vernachlässigen.<br />
+        <p>Das druckt den Buchstaben A in die 4. Spalte auf der 9. Zeile. Für unseren Anwendungsfall in Zeile 1000 müssen wir die Zahl 18 nach 214 POKEn, 211 können wir vernachlässigen.<br />
             1000 POKE 214,18:PRINT:PRINT TI/ 60 &ldquo;SEKUNDEN&rdquo;:END</p>
 
         <p>Alle drei Methoden sind gleichwertig, sowohl in Auswirkung als auch beim Speicherbedarf. Ich bleibe im folgenden bei der 214-Methode.</p>
@@ -240,8 +240,8 @@
             (30 Z = 0:VIDEO = 1024:FARBE = 55296:REM C 64)</p>
 
         <p>Zeile 40 ergibt sich dann eigentlich zwangsläufig:<br />
-            40 POKEVIDEO + Z, l:POKEFARBE + Z,6<br />
-            (40 POKE VIDEO + Z,l:POKE FARBE + Z,14)</p>
+            40 POKEVIDEO + Z, 1:POKEFARBE + Z,6<br />
+            (40 POKE VIDEO + Z,1:POKE FARBE + Z,14)</p>
 
         <p>Alles andere bleibt gleich. Tippen Sie RUN ein. Ergebnis: der VC 20 braucht 5,78 Sekunden, der C 64 7,3 Sekunden. Wir haben also eine Verkürzung von zirka drei Sekunden erzielt, das sind 30 Prozent!</p>
 
@@ -254,9 +254,9 @@
         <p>Eine Beschleunigung von 30 Prozent ist gut, aber noch nicht alles, was wir erreichen können. Da die Methode der vordefinierten Variablen so effektiv ist, wollen wir sie auf alle oft verwendeten Zahlen des Programms anwenden. Neben Z, VIDEO und FARBE gibt es noch die 1 für den Buchstaben A und die 6 (14) für die Farbe sowie den Schlußwert 374 der Schleife.</p>
 
         <p>Sie wissen schon, wie das geht. Wir ändern folgende Zeilen:<br />
-            30 Z = 0: SCHLUSSWERT = 374: VIDEO = 7680:FARBE = 38400:BUCH-STA=1:DRUCK = 6<br />
-            (30 Z = 0: SCHLUSSWERT = 374: VIDEO = 1024:FARBE = 55296:BUCH STA=1:DRUCK=14)<br />
-            40 POKE VIDEO + Z, BUCHSTA:PO-KEFARBE + Z,DRUCK<br />
+            30 Z = 0: SCHLUSSWERT = 374: VIDEO = 7680:FARBE = 38400:BUCHSTA = 1:DRUCK = 6<br />
+            (30 Z = 0: SCHLUSSWERT = 374: VIDEO = 1024:FARBE = 55296:BUCHSTA = 1:DRUCK = 14)<br />
+            40 POKE VIDEO + Z, BUCHSTA:POKE FARBE + Z,DRUCK<br />
             60 IF Z = SCHLUSSWERT THEN 1000</p>
 
         <p>Das ist <strong>Version 3</strong> des Programms, mit Laufzeiten von 5,15 Sekunden (VC 20) beziehungsweise 6,15 Sekunden (C 64). Das ist eine Verbesserung von 3,10 (4,23) Sekunden gegenüber der ersten Version.</p>
@@ -266,7 +266,8 @@
         <p>In <strong>Version 4</strong> des Programms reduzieren wir also alle langen Variablennamen auf zwei Zeichen. Wir wollen mal schauen, was das bringt:<br />
             30 Z = 0: SC = 374: VI = 7680:FA = 38400:BU = 1:DR = 6<br />
             (30 Z = 0: SC = 374: VI = 1024:FA = 55296:BU = 1:DR = 14)<br />
-            40 POKE VI + Z,BU:POKE FA + Z,DR 60 IFZ = SC THEN 1000</p>
+            40 POKE VI + Z,BU:POKE FA + Z,DR<br />
+            60 IF Z = SC THEN 1000</p>
 
         <p>Ergebnis: VC 20: 4,71 Sekunden<br />
             C 64: 5,63 Sekunden</p>
@@ -277,7 +278,7 @@
             30 Z = 0: S = 374: V=7680:F=38400: B = l:D = 6<br />
             (30 S = 374: V=1024: F=55296:B = 1: D = 16)<br />
             40 POKE V+Z,B:POKE F+Z,D<br />
-            60 IFZ = STHEN 1000</p>
+            60 IF Z = STHEN 1000</p>
 
         <p>Die erzielte Verbesserung ist meßbar, aber nicht gerade überwältigend. Der VC 20 braucht nun 4,63 und der C 64 5,51 Sekunden. Mit dem bisher Gesagten läßt sich bereits eine erste generelle Regel für schnellere Basic-Programme aufstellen.</p>
 
@@ -314,9 +315,10 @@
         <p>Aber selbst — oder gerade — jedem Anfänger ist die direkte PRINT-Anweisung mit Gänsefüßen am geläufigsten. Sie braucht auch weniger Speicherplatz und macht sogar ein Vordefinieren unnötig. Wir wollen schauen, ob sie auch schneller ist.</p>
 
         <p>Ändern Sie für <strong>Version 8</strong> die Zeilen 30 und 40:<br />
-            30Z = 0:S = 374 40 PRINT &lsquo;A";</p>
+            30 Z = 0:S = 374<br />
+            40 PRINT &lsquo;A";</p>
 
-        <p>Erstaunlicherweise bringt das fast gar nichts, beim VC 20 nur 0,05 Sekunden Verbesserung, beim C 64 0,07 Sekunden. Die Erklärung liegt darin, daß beide Darstellungen, CHR$(65) und ’A” ASCII-Code-Verwender sind. Damit ist der einzige Unterschied zwischen Version 7 und 8 die Anzahl der Zeichen im Programm.</p>
+        <p>Erstaunlicherweise bringt das fast gar nichts, beim VC 20 nur 0,05 Sekunden Verbesserung, beim C 64 0,07 Sekunden. Die Erklärung liegt darin, daß beide Darstellungen, CHR$(65) und "A" ASCII-Code-Verwender sind. Damit ist der einzige Unterschied zwischen Version 7 und 8 die Anzahl der Zeichen im Programm.</p>
 
         <p>Fassen wir zusammen:</p>
 
@@ -332,12 +334,12 @@
         <p>In der PRINT-Schleife (Zeile 40) und nachfolgender IF-Abfrage (Zeile 60) gibt es noch zwei Feinheiten. Basic erlaubt uns bei bedingten Sprüngen statt IF .. THEN GOTO .. nur IF .. THEN .. zu schreiben und das haben wir bisher auch brav gemacht.</p>
 
         <p>Man kann aber auch IF .. GOTO verwenden. Eigentlich ist nicht zu erwarten, daß zwischen den beiden Schreibarten ein Zeitunterschied besteht. Der Fall ist tatsächlich fast akademisch, wie <strong>Version 9</strong> beweist:<br />
-            60 IFZ = SGOTO 1000</p>
+            60 IF Z = S GOTO 1000</p>
 
         <p>Laufzeit des VC 20:2,51 Sekunden, die des C 64: 3,0 Sekunden.</p>
 
         <p>Eine andere Änderung bringt auch nur ganz wenig in der Geschwindigkeit, aber sie spart uns eine ganze Zeile und damit Speicherplatz:<br />
-            60 IFZ&lt;>SGOTO 40<br />
+            60 IF Z&lt;>S GOTO 40<br />
             70 entfällt</p>
 
         <p>Diese <strong>Version 10</strong> gewinnt nur 0,01 (0,02) Sekunden.</p>
@@ -357,7 +359,7 @@
             110 GOTO 50</p>
 
         <p>Zeile 100 prüft jedesmal, ob alle drei Bedingungen erfüllt sind, erst nach dem THEN wird entschieden, ob das Programm auf Zeile 999 springt oder auf 110 weiterläuft. Nehmen wir an, A ist im 20. Durchlauf erfüllt, B im 50. Durchlauf, C aber erst im 300. Durchlauf. Das Programm muß also 300mal alle drei Bedingungen nachprüfen. Wenn wir die Zeile 100 so schreiben:<br />
-            100 IF C = 3 THEN IF B = 2THEN IF A = 1 THEN 999<br />
+            100 IF C = 3 THEN IF B = 2 THEN IF A = 1 THEN 999<br />
             dann bricht das Programm 300mal die Prüfung nach dem C sofort ab und geht in 110 weiter. B und A werden erst dann zur Prüfung herangezogen, wenn C = 3 ist. Es ist wohl klar und einzusehen, daß die zweite Schreibweise schneller ist.</p>
 
         <aside>
@@ -370,7 +372,7 @@
         <p>Jetzt wollen wir noch eine andere Basic-Möglichkeit austesten, die Sie ja alle kennen, nämlich die Schleife mit FOR..TO..NEXT zu programmmieren.</p>
 
         <p>Wir wollen in <strong>Version 11</strong> des immer noch gleichen Programms dazu die Zeilen 30, 50 und 60 ändern:<br />
-            30 FORZ = 1 TO 374<br />
+            30 FOR Z = 1 TO 374<br />
             50 NEXT Z<br />
             60 entfällt</p>
 
@@ -395,10 +397,10 @@
             16 REM * * * * * * * * * * * * * * * * * * * * * * * *<br />
             20 PRINT CHR$(147);:REM ALLES LOESCHEN<br />
             30 FOR Z=1 TO 374:REM 374 ZEICHEN<br />
-            <a href="#fehlerteufelchen" class="fehlerteufelchen_link">40 PRINT"A":</a>a<br />
+            <a href="#fehlerteufelchen" class="fehlerteufelchen_link">40 PRINT"A":</a><br />
             50 NEXT<br />
             999 REM ZEIT AUSDRUCKEN<br />
-            1000 POKE 214,18:PRINT TI/60 &ldquo;SEKUN-DEN&rdquo;:END
+            1000 POKE 214,18:PRINT TI/60 &ldquo;SEKUNDEN&rdquo;:END
         </p>
 
         <p>Sieht gut aus, nicht wahr?</p>
@@ -417,7 +419,7 @@
 
         <p>In Version 15 treiben wir die Schrumpfung ins Extrem, indem wir das Programm im Prinzip unverändert aber mit einem Minimum an Zeilen schreiben, also möglichst viele Befehle in eine Zeile packen.</p>
 
-        <p>Sie wissen, die maximale Zeilenlänge beträgt 88 Zeichen beim VC 20, 80 Zeichen beim C 64. Unser Programm können wir sogar in einer einzigen Zeile unterbringen — fast unglaublich, aber es geht. Sie müssen allerdings alle Abkürzungsmöglichkeiten ausschöpfen, die das Commodore-System bietet. Im Anhang der Commodore-Handbücher finden Sie die Liste aller Abkürzungen beim Eintippen: C und geSHIF-TEtes H für CHR$, ? für PRINT und so weiter. Im nachfolgenden Ausdruck ist das natürlich nicht zu sehen, weil der Befehl LIST die Abkürzungen nicht berücksichtigt. So kommen auch mehr als 88 (80) Zeichen in eine Zeile des Listings, woran Sie sich nicht stören dürfen.<br />
+        <p>Sie wissen, die maximale Zeilenlänge beträgt 88 Zeichen beim VC 20, 80 Zeichen beim C 64. Unser Programm können wir sogar in einer einzigen Zeile unterbringen — fast unglaublich, aber es geht. Sie müssen allerdings alle Abkürzungsmöglichkeiten ausschöpfen, die das Commodore-System bietet. Im Anhang der Commodore-Handbücher finden Sie die Liste aller Abkürzungen beim Eintippen: C und geSHIFTEtes H für CHR$, ? für PRINT und so weiter. Im nachfolgenden Ausdruck ist das natürlich nicht zu sehen, weil der Befehl LIST die Abkürzungen nicht berücksichtigt. So kommen auch mehr als 88 (80) Zeichen in eine Zeile des Listings, woran Sie sich nicht stören dürfen.<br />
             10 TI$ = ”000000”:PRINTCHR$(147); :FORZ = 1TO374:PRINT’A”;:NEXT :POKE214,18:PRINT:PRINT TI/60 ”SEKUNDEN”:END</p>
 
         <p>Und siehe da, diese »Kurzform« des Programms ist auch die allerschnellste Version. Der VC 20 braucht 0,78 Sekunden, der C 64 0,93 Sekunden. Diese letzte Beschleunigung wird dadurch erreicht, daß das Betriebssystem des Computers nur einmal einen Zeilenanfang und Zeilenende suchen und erkennen muß, statt sechsmal in der Version 14.</p>
@@ -437,14 +439,18 @@
 
         <h2>Einzeilige Programme</h2>
 
-        <p>Eine englische Zeitschrift hat darüber sogar einige Male einen Wettbewerb ausgeschrieben (die 64'er ist unabhängig davon auch auf diese Idee gekommen, siehe Ausgabe 8; d. Red.). Ich schreibe die Einzeiler unten lesbar, das heißt mit Leerstellen. Sie müssen die Programme aber wieder mit allen Abkürzungstricks schreiben, sonst geht’s schief. □Von A. Boyd (Manchester) stammt ein Primzahlen-Erzeuger, der für die obere Grenze von 65000 viele Stunden braucht.<br />
-            1 FORN = 1 T0 65000:F = OFORJ = 2 TO N-1:F=F + ((N-J * INT(N/J)) = 0) :NEXT:X = -(F = 0):PRINT RIGHT$(STR$(X * N),6*X):NEXT</p>
+        <p>Eine englische Zeitschrift hat darüber sogar einige Male einen Wettbewerb ausgeschrieben (die 64'er ist unabhängig davon auch auf diese Idee gekommen, siehe Ausgabe 8; d. Red.). Ich schreibe die Einzeiler unten lesbar, das heißt mit Leerstellen. Sie müssen die Programme aber wieder mit allen Abkürzungstricks schreiben, sonst geht’s schief.</p>
 
-        <p>□ Ein anderer Einzeiler wurde von I A.M. Simmelt (Sheffield) geschrieben zur Konvertierung von Dezimalzahlen in Dualzahlen.<br />
-            1 INPUT A:FOR I = 14 TO 0 STEP-1 :Z = A AND 2↑I:A = A-Z:Z = Z/2↑I:Z$ = RIGHT$(STR$(Z),1):PRINT Z$;: NEXT:GOTO1</p>
+        <ul>
+            <li>Von A. Boyd (Manchester) stammt ein Primzahlen-Erzeuger, der für die obere Grenze von 65000 viele Stunden braucht.<br />
+                1 FOR N = 1 T0 65000:F = 0FOR J = 2 TO N-1:F = F + ((N-J*INT(N/J)) = 0):NEXT:X = -(F = 0):PRINT RIGHT$(STR$(X*N),6*X):NEXT</li>
 
-        <p>□Zuletzt noch ein Juwel, nur für den I VC 20 geeignet, von M. Dooling (Dewsbury). Hochauflösende Grafik und Scrolling in einer Zeile — wer hält&rsquo;s für möglich?<br />
-            1 POKE 36869,255: PRINT"[SHIFT CLR/HOME]@@@@@@@@@@@@&ldquo;:FOR X = 7168 TO 7175:POKE X, PEEK(X + 1):NEXT:POKE7176, PEEK(A + 8↑5):A = A + 1:GOTO 1</p>
+            <li>Ein anderer Einzeiler wurde von A.M. Simmelt (Sheffield) geschrieben zur Konvertierung von Dezimalzahlen in Dualzahlen.<br />
+                1 INPUT A:FOR I = 14 TO 0 STEP-1:Z = A AND 2↑I:A = A-Z:Z = Z/2↑I:Z$ = RIGHT$(STR$(Z),1):PRINT Z$;: NEXT:GOTO1</li>
+
+            <li>Zuletzt noch ein Juwel, nur für den I VC 20 geeignet, von M. Dooling (Dewsbury). Hochauflösende Grafik und Scrolling in einer Zeile — wer hält&rsquo;s für möglich?<br />
+                1 POKE 36869,255: PRINT"[SHIFT CLR/HOME]@@@@@@@@@@@@":FOR X = 7168 TO 7175:POKE X, PEEK(X + 1):NEXT:POKE7176, PEEK(A + 8↑5):A = A + 1:GOTO 1</li>
+        </ul>
 
         <p>Lassen wir’s gut sein mit diesem Programmsport und kehren wir zurück zu einer abschließenden Betrachtung der Zeitgewinne.</p>
 
@@ -469,4 +475,4 @@
 
 </body>
 
-</html>>
+</html>
