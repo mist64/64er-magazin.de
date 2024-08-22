@@ -1166,7 +1166,39 @@ Um mehrere Funktionen über den USR-Vektor zu implementieren, müßte man vor je
 
 (Wolfgang W. Wirth)
 
+# Musik, Musik, Musik
 
+> Das Programm ist als Werkzeug zum Experimentieren mit dem hardwaremäßig phantastischen aber softwaremäßig völlig vernachlässigten »Sound Interface Device« (SID) im C 64 gedacht. Nicht zuletzt kann man mit dem Synthesizer auch musizieren!
+
+Um die Möglichkeiten zu nutzen, sind folgende Parameter einstellbar und werden übersichtlich — teilweise grafisch unterstützt — auf dem Bildschirm dargestellt.
+1) Die Tastenreihe »Q« bis »RETURN« bildet die Orgeltastatur. Sie umfaßt zwei Oktaven mit allen Halbtönen und erscheint oben auf dem Bildschirm. Beim Drücken einer Taste erklingt der Ton so lange, bis sie wieder losgelassen wird. Gleichzeitig zeigt ein gelber Balken (Sprite) die aktivierte Orgeltaste an.
+2) Anschlag (Attack), Abschwellen (Decay), Haltepegel (Sustain Level) und Ausklingen (Release) sind mit den Funktionstasten einstellbar. Die geshifteten Tasten verringern, die un-geshifteten erhöhen den Wert. Die relative Lautstärke (Pegel) des Tones wird ständig rechts oben als Balken auf dem Bildschirm gezeigt.
+3) Als Wellenformen kann man Dreieck, Sägezahn, Rechteck, Rauschen und die ringmodulierte Dreieckschwingung (RING) mit der Taste »Z« wählen. Die beiden letzten sind in Klammern eingefaßt, da sie sich zum Musizieren nicht eignen.
+4) Wählt man die Rechteckschwingung, wird das Tastverhältnis angezeigt und kann mit den Tasten »N« und »M« in Sechzehntel-Abstufungen verändert werden. Das Low-Byte des Tastverhältnisses beträgt immer 128.
+5) Der Synthesizer nutzt das im Anhang P des Handbuchs gezeigte Frequenzspektrum voll aus: Der tiefste Ton ist der Halbton unter C0 und der höchste ist das Ais-7 (!).
+Da die Tastatur aber nur zwei Oktaven umfaßt, kann man mit den Cursortasten den Frequenzbereich um jeweils eine Oktave ändern.
+6) Mit derTaste »C« wird der Filtermodus umgeschaltet, wobei das entsprechende Wort auf dem Bildschirm revers geschrieben wird. Ist kein Filtermodus eingeschaltet, werden die Schaltbits 0,1 und 2 im Register 23 gelöscht, also für alle drei Stimmen die Filter ausgeschaltet. Auch die Verwendung mehrerer Filtermodi ist zugelassen.
+7) Die folgenden Parameter sind nur bei eingeschalteten Filtern hör- und sichtbar:
+7a) Mit den (ungeshifteten) Tasten »[« und »]« verändert man die Grenzfrequenz der Filter in Sechzehntelschritten. Es werden also die höchstwertigen vier Bits im Register 22 variiert.
+7b) Die Filterresonanz wird mit den Tasten » < « und » > « vergrößert oder verkleinert.
+7c) Die Tasten »?« beziehungsweise ».« schalten den »Wah-wah«-Effekt (er heißt wie er klingt) ein und aus. Nach dem Einschalten wird die Filtergrenzfrequenz (Register 22) gemäß dem Verlauf der Hüllkurve (Register 28) verändert. Die eingestellte Filterfrequenz (siehe 7a) hat dann keine Bedeutung.
+8)  Mit der Stopp-Taste verläßt man das Programm. Da es jetzt im Speicher ist, kann es mit RUN 1000 unverzüglich wieder gestartet werden. Nun haben alle Parameter wieder die ursprünglichen Werte.
+
+Ich möchte nicht verheimlichen, daß der »Synthesizer« natürlich auch einige Einschränkungen hat:
+1) Alle Parameter werden jeweils für alle drei Stimmen gleichzeitig eingestellt, denn bei nur einem Manual wäre es sinnlos, den verschiedenen Stimmen zum Beispiel verschiedene Wellenformen zu geben.
+2) Es gibt natürlich grenzenlos viele Möglichkeiten, Parameter (zum Beispiel die Filterfrequenz) während des Erklingens eines Tones zu verändern. Ihr Einbau würde aber ebenfalls den Rahmen dieses Programms sprengen.
+3) Die Lautstärke ist fest auf 15 eingestellt. (Wozu hat man schließlich den Regler am Fernseher?)
+4) Eine Computertastatur ist kein Orgel-Keyboard. Dies setzt dem Spieler von Musikstücken natürlich Grenzen. Für Bastler dürfte es aber nicht allzu schwierig sein, parallel zur Tastatur ein in der richtigen Matrix verdrahtetes Keyboard anzuschließen.
+
+### Abspeichern des Programms
+
+Wer es ganz elegant machen möchte, kann das Maschinenprogramm (den »Objektcode«) als solches auf Band oder Diskette schreiben. Ich habe die dazu nötigen POKEs und SYS-Aufrufe zusammengestellt, die man im Direktmodus eingeben kann. Allerdings sind die PRINT-Befehle (Zeilen 1000-1200) nicht im Maschinenprogramm enthalten! Aus diesen Zeilen sollte man also ein kleines Basic-Programm schreiben, das mit der Zeile »LOAD ’’SYNTHESIZER-OBS”«, Gerätenummer, 1« beginnt und mit »SYS12800« endet.
+
+Wer einen Monitor besitzt, kann natürlich diesen zum Abspeichern benutzen. Die Startadresse ist $ 2F00 und die Endadresse $ 35DD.
+
+Nun noch ein Hinweis für diejenigen, die den SID selbst programmieren wollen und nur das Handbuch zum Commodore 64 besitzen: Wer die Beispielprogramme schon ausprobiert hat, dem sollte aufgefallen sein, daß die Töne nie ausklingen — egal, welchen Wert man hierfür eingestellt hat. Das liegt daran, daß der Tongenerator dort immer mit POKE W, 0 »abgewürgt« wird. Zum korrekten Ausschalten eines Tones darf man aber nur das 0. Bit des Wellenform-Registers löschen, das sogenannte »KEY«-Bit! Richtig heißt es also POKE W, 16 (bei der Dreieckschwingung).
+
+(Martin Ahlborn/rg)
 
 
 
