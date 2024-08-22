@@ -670,7 +670,7 @@ class ArticleDatabase:
     def __init__(self, in_directory):
         self.issues = {}  # Change to dictionary
         self.articles = []
-        for issue_dir_name in os.listdir(in_directory):
+        for issue_dir_name in sorted(os.listdir(in_directory)):
             issue_dir_path = os.path.join(in_directory, issue_dir_name)
             if os.path.isdir(issue_dir_path) and re.match(r'^\d{4}$', issue_dir_name):
 
