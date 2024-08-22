@@ -13,6 +13,7 @@ import http.server
 import socketserver
 import hashlib
 import urllib.parse
+import pytz
 import argparse
 from dataclasses import dataclass, field
 from collections import defaultdict, OrderedDict
@@ -496,6 +497,15 @@ class Issue:
       if not pubdate:
           # no system exit as this also triggers for empty folders (eg. after branch change)
           raise Exception(f"- [{issue_directory_path}] does not contain expected data")
+
+      elif not CONFIG.build_future:
+        # Define the current datetime with UTC timezone for comparison
+          current_datetime = datetime.now(pytz.utc)
+
+          # Remove the item if its publication date is in the future
+          if pubdate > current_datetime:
+              # no system exit
+              raise Exception(f"- [{issue_directory_path}] is from the future")
 
       # XXX used directly after init and then never again
       self.articles = articles
