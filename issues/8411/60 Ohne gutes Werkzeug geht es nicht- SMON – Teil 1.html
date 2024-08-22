@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>XXX</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="XXX">
+    <meta name="64er.issue" content="11/84">
+    <meta name="64er.pages" content="999">
+    <meta name="64er.id" content="XXX">
+</head>
+
+<body>
+    <article>
+
+        <h1>Ohne gutes Werkzeug geht es nicht: SMON – Teil 1</h1>
+
+        <p class="intro">In mehreren Teilen möchten wir Ihnen einen Maschinensprachmonitor vorstellen. Parallel zum Kursus über Assembler-Programmierung wird Schritt für Schritt ein Programm entstehen, das sich durchaus mit kommerziellen Monitoren messen kann.</p>
+
+        <p>Ich kann mich noch gut an unsere ersten Schritte in die Maschinensprache erinnern. Ausgerüstet mit einer Befehlsliste für den 6502 und einem in Basic geschriebenen »Mini-Monitor« entstanden Programme, die 3 und 5 addieren und das Ergebnis im Speicher ablegen konnten. Dazu mußten wir die Befehlcodes aus der Liste heraussuchen und dann in den Speicher »POKEn«. Jeder Sprung mußte von Hand ausgerechnet werden, jeder falsch herausgesuchte Befehl führte zum Programmabsturz. Der erste Disassembler — ein Programm zur Anzeige der Maschinenbefehle in Assemblersprache — war für uns die Offenbarung. Von nun an konnten wir Maschinenprogramme analysieren und daraus lernen. Zum Verständnis der Maschinensprache ist es nämlich noch weit mehr als bei anderen Sprachen wichtig, vorhandene Programme zu verstehen und sich dabei die wichtigsten Techniken anzueignen.</p>
+
+        <p>Mit der Zeit wuchsen unsere Ansprüche, ein Assembler mußte her, um die neugewonnenen Erkenntnisse auch auszuprobieren. Das war zuerst wieder ein Basic-Programm, langsam und wenig komfortabel, aber immerhin. Wir schrieben unsere ersten kleinen Routinen, vor allem, um vorhandene Maschinenprogramme unseren eigenen Wünschen anzupassen. Mit dem AMON für den VC 20 bekamen wir dann einen Monitor, der (fast) alle unsere Wünsche erfüllte. Als wir jedoch auf den C 64 umstiegen, mußten wir feststellen, daß es für diesen Computer nichts gab, das uns zufriedenstellen konnte. Der einzige Ausweg: Selbst programmieren. So entstand im Laufe eines Jahres SMON. Ursprünglich hatten wir nur vor, die Funktionen von AMON für den C 64 zu programmieren, aber dabei blieb es nicht. Immer neue Befehle und Routinen kamen hinzu, bis wir endlich zufrieden waren.</p>
+
+        <h2>Was bietet SMON?</h2>
+
+        <p>Zunächst ist alles enthalten, was zum »Standard« gehört: Memory-Dump, also die Anzeige des Speicherinhalts in Hexbytes, mit Änderungsmöglichkeiten, ein Disassembler mit Änderungsmöglichkeit sowie Routinen zum Laden, Abspeichern und Starten von Maschinenprogrammen. Darüber hinaus gibt es einen kleinen Direktassembler, der sogar Labels verarbeitet, Befehle zum Verschieben im Speicher mit und ohne Umrechnen der Adressen und Routinen zum Umrechnen von Hex-, Dezimal- und Binärzahlen. Der besondere Clou von SMON liegt aber zweifellos in seinen leistungsfähigen Suchroutinen und vor allem im Trace-Modus. Damit lassen sich Maschinenprogramme Schritt für Schritt abarbeiten und kontrollieren.</p>
+
+        <p>Dieser erste Teil umfaßt sämtliche Eingabe- und Ausgaberoutinen, die Registeranzeige, den Memory-Dump sowie Disassembler und Assembler. Damit steht Ihnen bereits ein lauffähiges Monitorprogramm mit den unten aufgeführten Befehlen zur Verfügung.</p>
+
+        <p>Der Monitor benötigt für alle Eingaben die hexadezimale Schreibweise, das heißt zu den Zahlen 1 bis 9 kommen noch die Buchstaben A (für dez. 10) bis F (für dez. 15) hinzu.</p>
+
+        <p>Bei der Eingabe von Adressen ist folgendes zu beachten: [ANFADR] bedeutet exakt die Startadresse, [ENDADR] bedeutet hierbei die erste Adresse hinter dem gewählten Bereich. Im Normalfall ist die Eingabe mit und ohne Leerzeichen zulässig. Beim Abweichen von dieser Regel wird darauf besonders verwiesen.</p>
+
+        <h3>Assemblieren</h3>
+
+        <p>A [ANFADR]<br>
+            Assemblierung beginnt bei angegebener Adresse Beispiel:<br>
+            A 4000 Beginn bei Startadresse $4000</p>
+
+        <p>Nach Eingabe von »RETURN« erscheint auf dem Bildschirm die gewählte Adresse mit einem blinkenden Cursor. Die Befehle werden so eingegeben, wie sie der Disassembler zeigt: LDY #00 oder LDA 400E,Y und so weiter. »RETURN« schließt die Eingabe der Zeile ab. Bei fehlerhafter Eingabe springt der Cursor wieder in die Anfangsposition zurück. Ansonsten wird der Befehl disassembliert und nach Ausgabe der Hex-Bytes gelistet. Zur Korrektur vorhergehender Zeilen gehen Sie mit dem Cursor zur Anfangsposition (hinter die Adresse) zurück, schreiben den Befehl neu und gehen nach »RETURN« mit dem Cursor wieder in die letzte Zeile. Falls Ihnen bei Sprüngen (Branch-Befehl, JSR und JMP) die Zieladressen noch nicht bekannt sind, geben Sie einfach sogenannte »Label« ein.</p>
+
+        <p>Ein Label besteht aus dem Buchstaben »M« (für Marke) und einer zweistelligen Hex-Zahl von 01 bis 30.<br>
+            Zum Beispiel: BCC M01</p>
+
+        <p>Wenn Sie die Zieladresse für diesen Sprung erreicht haben, dann kennzeichnen Sie diese mit eben dieser »Marke«.<br>
+            Zum Beispiel: M01 LDY #00</p>
+
+        <p>Einzelne Bytes nimmt der Assembler an, indem Sie diese mit einem Punkt kennzeichnen: .00 oder .AB. In diesem Modus werden die Eingaben natürlich nicht disassembliert.</p>
+
+        <p>Nach Beendigung des Assemblierens geben Sie »F« ein. Danach sehen Sie alle Ihre Eingaben noch einmal aufgelistet und korrigieren bei Bedarf wie beim Disassembler (!) angegeben.</p>
+
+        <p>Probieren Sie einmal das folgende Beispiel:<br>
+            A4000</p>
+
+        <p>Der Assembler meldet sich mit: »4000« und einem blinkenden Cursor. Geben Sie nun ein (die Adressen erscheinen automatisch):</p>
+
+        <pre>4000 LDY #00
+4002 LDA 400E,Y
+4005 JSR FFD2
+4008 INY
+4009 CPY #12
+400B BCC 4002
+400D BRK</pre>
+
+
+        <p>Die folgenden Bytes werden wie beschrieben mit einem Punkt eingegeben. Sie werden nicht disassembliert.</p>
+
+        <pre>400E .0D
+400F .0D
+4010 .53
+4011 .4D
+4012 .4F
+4013 .4E
+4014 .20
+4015 .49
+4016 .53
+4017 .54
+4018 .20
+4019 .53
+401A .55
+401B .50
+401C .45
+401D .52
+401E .0D
+401F .0D</pre>
+
+
+        <p>Drücken Sie anschließend »F«. Ihr Programm wird nochmal aufgelistet. Starten Sie es nun mit »G 4000«. Es erscheint ein Text auf dem Bildschirm — lassen Sie sich überraschen.</p>
+
+        <h2>Disassemblieren</h2>
+
+        <p>D[ANFADR,ENDADR]<br>
+            disassembliert den Bereich von ANFADR bis ENDADR, wobei ENDADR nicht eingegeben werden muß. Wird keine Endadresse eingegeben, erscheint zunächst nur eine Zeile:<br>
+            ADR HEXBYTES BEFEHL<br>
+            4000 A000 LDY #00<br>
+            TODO</p>
+
+        <p>Mit der SPACE-Taste wird der jeweils nächste Befehl in der gleichen Art und Weise gezeigt. Wünschen Sie eine fortlaufende Ausgabe, drücken Sie »RETURN«. Die Ausgabe wird dann so lange fortgesetzt, bis eine weitere Taste gedrückt wird oder bis ENDADR erreicht ist.Mit »RUN/STOP« springen Sie jederzeit in den Eingabemodus zurück.</p>
+
+        <p>Das Komma, das vor der Adresse auf dem Bildschirm erscheint, ist ein »hidden command« (verstecktes Kommando). Es braucht nicht eingegeben zu werden, da es automatisch beim Disassemblieren angezeigt wird. So ermöglicht es ein einfaches Ändern des Programms. Fahren Sie mit dem Cursor auf den zu ändernden Befehl und überschreiben Sie ihn mit dem neuen. Wenn Sie jetzt »RETURN« drücken, erkennt SMON das Komma als Befehl und führt ihn im Speicher aus. Achten Sie aber darauf, daß der neue Befehl die gleiche Länge (in Bytes) hat und füllen Sie gegebenenfalls mit »NOPs« auf. Zur Kontrolle können Sie den geänderten Bereich noch einmal disassemblieren.</p>
+
+        <p>Lassen Sie als Beispiel einmal das Programm (siehe Befehl »A«) ab 4000 disassemblieren (»D 4000 4011«). Ändern Sie nun den ersten Befehl auf LDY #01. Die Änderung zeigt sich daran, daß die HEX-Bytes automatisch den neuen Wert annehmen. Starten Sie nun das Programm nochmals mit »G 4000«. Jetzt erscheint der Text mit nur einer Zeile Abstand auf dem Bildschirm.</p>
+
+        <h3>Starten eines Maschinenprogramms (Go)</h3>
+
+        <p>G [ADRESSE]<br>
+            startet ein Maschinenprogramm, das bei ADRESSE beginnt. Das Programm muß mit einem BRK-Befehl abgeschlossen werden, damit ein Rücksprung in SMON erfolgen kann. Wird nach »G« keine Adresse eingegeben, benutzt SMON die, die mit dem letzten BRK erreicht worden ist und bei der Register-Ausgabe als PC auftaucht. Mit dem »R«-Befehl (siehe unten) werden die Register vorher auf gewünschte Werte gesetzt.</p>
+
+        <h3>Memory-Dump</h3>
+
+        <p>M [ANFADR ENDADR]<br>
+            gibt die HEX-Werte des Speichers sowie die zugehörigen ASCII-Zeichen aus. Auch hier kann auf die Eingabe einer Endadresse verzichtet werden. Die Steuerung der Ausgabe entspricht der beim Disassemblieren.<br>
+            Beispiel:</p>
+
+        <p>M 4000 gibt die Inhalte der Speicherstellen $4000 bis $4007 aus. Weiter geht es wie beim Disassemblieren mit SPACE oder RETURN. Die Bytes können ebenfalls durch Überschreiben geändert werden, allerdings nicht die ASCII-Zeichen. Verantwortlich dafür ist der Doppelpunkt, der am Anfang jeder Zeile ausgegeben wird, ein weiterer »hidden command«. Wenn Ihre Änderung nicht durchgeführt werden kann, weil Sie zum Beispiel versuchen, ins ROM zu schreiben, wird ein »?« als Fehlermeldung ausgegeben.</p>
+
+        <h3>Registeranzeige</h3>
+
+        <p>R zeigt den gegenwärtigen Stand der wichtigsten 6510-Register an: Programmzähler (PC), Status-Register (SR), Akkumulator (AC), X-Register (XR), Y-Register (YR), Stackpointer (SP). Außerdem werden die einzelnen Flags des Status-Registers mit 1 für »gesetzt« und O für »nicht gesetzt« angezeigt. Durch Überschreiben werden die Inhalte auf einen gewünschten Wert gesetzt. Die Flags können allerdings nicht einzeln verändert werden, sondern nur durch Überschreiben des Wertes von SR.</p>
+
+        <h3>Exit</h3>
+
+        <p>X springt ins Basic zurück. Alle Basic-Pointer bleiben erhalten. Sie können also zum Beispiel direkt im Programm fortfahren, wenn Sie zwischendurch mit SMON einige Speicherstellen kontrolliert haben.</p>
+
+        <p>Probieren Sie alle bisher beschriebenen Befehle in Ruhe aus und machen Sie sich mit SMON vertraut. Arbeiten Sie auch parallel den Kurs über Assemblerprogrammierung in dieser Ausgabe durch. Alle Beispiele dort sind auf SMON abgestimmt.</p>
+
+        <p>Wir wollen jetzt einen Blick auf das Programm selbst werfen. Natürlich ist es unmöglich, den gesamten Quelltext umfassend zu beschreiben. Andererseits enthält SMON aber eine Reihe von Routinen, die in jedem Maschinenprogramm vorkommen. Wir werden im Rahmen dieser Serie versuchen, die wichtigsten zu erklären, damit Sie sie später in eigene Programme einbauen können.</p>
+
+        <p>Zum besseren Verständnis werden solche Routinen so abgedruckt, wie wir sie im Assembler-Quelltext geschrieben haben. Sie enthalten daher anstelle absoluter Adressen Labels, deren Name — hoffentlich — etwas über den Sinn und Zweck aussagt. Parallel dazu sollten Sie sich diese Routinen von SMON disassemblieren lassen, damit Sie sehen, wie es denn nun fertig im Speicher aussieht.</p>
+
+        <p>Beginnen wir mit der Routine GETCHRERR. Das soll soviel bedeuten wie »Hole ein Zeichen und erzeuge eine Fehlermeldung, wenn keins eingegeben wurde«. Leider wäre so ein Label auch für den geduldigsten Assembler viel zu lang, daher die merkwürdige Abkürzung. Mit dieser Routine holen wir ein Zeichen von der Tastatur. Das erledigt die Betriebssystemroutine CHRIN. Um zu prüfen, ob überhaupt etwas eingegeben wurde, untersuchen wir das Zeichen. Handelt es sich um die »RETURN«-Taste ($0D), hat der Benutzer gar kein Zeichen eingegeben. Dies quittiert SMON mit einem »?« und dem Rücksprung in den Eingabemodus. So läßt sich — in gewissen Grenzen — kontrollieren, ob zu einem Befehl die richtigen Eingaben gemacht wurden. Geben Sie einmal den »D«-Befehl ohne Angabe einer Adresse ein, dann sehen Sie, was gemeint ist.</p>
+
+        <p>Alle Eingaberoutinen benutzen GETCHRERR, um Falscheingaben zu prüfen. Nehmen wir als Beispiel GETBYT. Diese soll ein Byte, also zwei ASCII-Zeichen 0 - F von der Tastatur holen und in ein Byte umwandeln. Das erste Zeichen wird darauf überprüft, ob es sich um ein »Space« oder ein Komma handelt. Trifft das zu, wird es einfach übergangen und das nächste Zeichen geholt. Der Benutzer kann also Leerzeichen und Komma benutzen, um seine Eingaben übersichtlicher zu machen, er muß aber nicht! Ist das Zeichen aber gültig, wird es von ASCHEX in eine Hexzahl gewandelt.<br>
+            Dazu ein Beispiel:</p>
+
+        <p>Auf der Tastatur wurde 5B eingetippt. Zuerst wird jetzt die 5 (ASCII $35) mit $3A verglichen, um festzustellen, ob es sich um eine Zahl (0 - 9) oder einen Buchstaben (A - F) handelt. ASCII $35 ist eine Zahl, also wird nur die linke Hälfte ausmaskiert (AND #$0F). Ergebnis ist $05. Jetzt wird viermal nach links geschoben und das Ergebnis ($50) in $B4 zwischengespeichert. Nun ist das B (ASCII $42) an der Reihe. Da $42 größer ist als $3A werden diesmal 8 und das gesetzte Carry-Flag, also 9 addiert. Ergebnis ist $5B. Linke Hälfte ausmaskieren wie gehabt und eine OR-Verknüpfung mit dem gemerkten $50 ergibt $5B. Das war’s.</p>
+
+        <p>Meistens aber braucht SMON zwei Bytes als Eingabe, zum Beispiel für Adressen. Mit dem, was wir schon haben, kein Problem: GETADR ruft einfach GETBYT zweimal hintereinander auf und legt das Ergebnis in zwei Speicherstellen in der Zeropage ab, die mit dem X-Register ausgewählt werden können. Brauchen wir mehr als eine Adreßeingabe, rufen wir einfach GETADR mehrmals auf. So etwas machen GET3ADR und GET2ADR. Bisweilen aber, zum Beispiel beim G-Befehl, darf eine Adresse eingegeben werden, es muß aber nicht sein. Deswegen prüft GETSTART, ob direkt nach dem »G« »RETURN« gedrückt wurde. Dies erledigt GETRET. Wenn ja, wird die Adresse benutzt, die in PCL und PCH steht. Das sind SMONs interne Programm-Counter. Ansonsten wird die eingetippte Adresse benutzt.</p>
+
+        <p>Sie sehen, wie aus einfachen Routinen immer kompliziertere Befehle zusammengesetzt werden. Und das ist das ganze Geheimnis, wenn Sie umfangreiche Programme schreiben: Gliedern Sie sich das Problem (hier eine benutzerfreundliche Eingabe) in kleine und kleinste Schritte auf, die Sie dann jeden für sich programmieren und austesten.</p>
+
+        <p>Werfen wir noch einen Blick auf die Art und Weise, wie SMON Befehle verarbeitet. In EXECUTE setzen wir zunächst den Stackpointer auf den Wert, den er beim letzten BRK erreicht hatte. Dann werden als erstes die »hidden commands« abgeprüft. Wir lesen dazu direkt vom Bildschirm. D3 enthält die Anfangsadresse der aktuellen Zeile im Speicher. Übrigens gibt es neben den bereits erwähnten noch weitere »hidden commands«, die in den späteren Folgen noch auftauchen werden. Liegt kein verstecktes Kommando vor, holen wir mit GETCHRERR ein Zeichen und merken es uns in COMMAND. Jetzt untersuchen wir, ob dieses Zeichen in der Befehlsliste (CMDTBL) steht. CMDTBL steht übrigens ab $C00B ganz oben im Speicher. Sie endet mit fünf Nullen für spätere Erweiterungen. Direkt dahinter stehen die Anfangsadressen der zugehörigen Routinen in der für den 6502 typischen Reihenfolge, Low-Byte zuerst, dann High-Byte. Sehen Sie sich das mit M C00B einmal an. Am Ende dieser Tabelle stehen nochmals 10 Nullen, denn zu jedem Byte in CMDTBL gehören ja zwei Adreßbytes in der Liste (CMDS). Wenn nun ein Kommando in CMDSEARCH gefunden wurde, wird CMDEXEC als Subroutine aufgerufen. CMDEXEC legt nun die zugehörigen Adreßbytes auf den Stack und führt dann einen RTS aus, der jetzt — nach der Stackmanipulation — zu dem gewünschten Befehl führt. Beachten Sie, daß RTS immer auf die um eins erhöhte Adresse springt, daher müssen Sie zu den Adressen in CMDS immer 1 addieren, wenn Sie den Anfang einer Routine suchen.</p>
+
+        <p>Alle Befehle in SMON enden mit einem RTS, springen also auf den JMP EXECUTE hinter CMDFOUND. Damit ist eine Endlosschleife geschlossen, die immer einen Befehl ausführt und anschließend wieder in die Eingabe zurückspringt. Beim nächsten Mal erfahren Sie etwas über LOAD, SAVE und die Umrechnung verschiedener Zahlensysteme.</p>
+
+        <address class="author">(Dietrich Weineck/N. Mann/gk)</address>
+
+        <aside>
+            <h3>Hinweise zum Abtippen</h3>
+
+            <p>Es ist mal wieder eine DATA-Wüste, die wir Ihnen zumuten, aber wenn Sie die erfolgreich hinter sich brachten, haben Sie schon mehr als die Hälfte vom gesamten SMON geschafft. Um Ihnen das Abtippen beziehungsweise die anschließende — fast unvermeidliche — Fehlersuche so einfach wie möglich zu machen, unterteilten wir das Gesamtprogramm in Blöcke zu je 256 Bytes, die jeweils eine eigene Prüfsumme haben. Wenn Sie sich vertippt haben, erscheint eine Fehlermeldung mit Angabe des Blocks, in dem sich der Fehler — höchstwahrscheinlich — befindet.</p>
+
+            <p>Vor dem ersten »RUN« sollten Sie aber unbedingt das Programm speichern, sonst kann Ihnen bei Fehlern der Computer abstürzen, und alle Mühe war umsonst.</p>
+
+            <p>Eins findet die Prüfsummenmethode allerdings nicht, nämlich zuviel eingegebene Nullen oder Kommas. Erhalten Sie aber keine Fehlermeldung und das Programm läuft trotzdem nicht, kontrollieren Sie als erstes, ob wirklich alle DATAs »aufgebraucht« sind. Dazu tippen Sie im Direktmodus PRINT A ein. Jetzt muß die letzte Zahl, also 197 erscheinen. Wenn nicht, haben Sie eine 0 oder ein Komma zu viel.</p>
+
+            <p>Wenn das Ladeprogramm endlich ohne Fehler bis zum READY durchläuft, können Sie SMON mit SYS 49152 starten. Die Bildschirmfarben ändern sich und es erscheint die Registeranzeige und in der nächsten Zeile ein Punkt mit blinkendem Cursor. Probieren Sie jetzt alle Kommandos durch. Hüten Sie sich aber vor allen anderen Kommandos. Die Fehlermeldung bei falschen Kommandos funktioniert noch nicht richtig!! Deshalb führen Falscheingaben in den meisten Fällen zum Programmabsturz. Das wird sich im Verlauf dieser Serie allerdings noch ändern.</p>
+
+            <p>Bevor Sie Ihren Computer aus dem Fenster werfen, noch ein Hinweis: Von der nächsten Folge ab wird SMON auch fix und fertig im Leserservice zu erhalten sein.</p>
+
+            <p>Und noch ein letzter Tip: Das Wichtigste, was ein angehender Maschinenprogrammierer braucht, ist ein Reset-Taster. (Bauanleitungen oder fertige Taster wurden schon oft im 64’er vorgestellt.) Sie werden es merken, wenn Sie mit sorgenzerfurchter Stirn, den Tränen nahe, vor Ihrem Bildschirm sitzen, kein freundlich blinkender Cursor weit und breit und RUN/STOP RESTORE auch dann nichts mehr bringt, wenn Sie die Tasten durch das Gehäuse durchdrücken. Verzweifeln Sie nicht, drücken Sie RESET, starten Sie SMON neu mit SYS 49152 und schon können Sie bis zum nächsten Absturz weiterarbeiten&hellip;&hellip;</p>
+        </aside>
+
+        <figure>
+            <pre data-filename="smon.teil1" data-name="DATA-Lader für SMON — Teil 1"></pre>
+            <figcaption>Listing 1. Der DATA-Lader für SMON — Teil 1</figcaption>
+        </figure>
+
+        <figure>
+            TODO
+            <figcaption>Listing 2. Der Assembler-Quelltext von SMON — Teil 1</figcaption>
+        </figure>
+
+    </article>
+
+</body>
+
+</html>

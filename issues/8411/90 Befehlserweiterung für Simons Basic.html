@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>XXX</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="XXX">
+    <meta name="64er.issue" content="11/84">
+    <meta name="64er.pages" content="999">
+    <meta name="64er.id" content="XXX">
+</head>
+
+<body>
+    <article>
+
+        <h1>Befehlserweiterung für Simons Basic</h1>
+
+        <p class="intro">Die Fähigkeiten des Commodore 64 sind mit dem vorhandenen Befehlsvorrat des Basic 2.0 nur sehr schwer auszunutzen. Dafür bietet Commodore eine Erweiterung an, die diesen Mangel weitgehend behebt: Simons Basic. Dieser Artikel gibt eine grobe Speicherbelegung und behebt einige Mängel.</p>
+
+        <p>Leider muß im voraus erwähnt werden, daß nur Besitzer der Disk-Version POKEs anwenden können, da bei der Modul-Version ein unveränderbares ROM vorliegt und somit POKEs hier unwirksam sind.</p>
+
+        <p>Obwohl nur 8 KByte im Basic-Speicher verbraucht werden, ist Simons Basic eine 16-KByte-Basic-Erweiterung. Die zweiten 8 KByte liegen unter dem Basic-ROM im RAM, so daß Simons Basic immer trickreich zwischen beiden Ebenen umschalten muß. Zusätzlich wird auch der Bereich von $C400-$CBFF (dezimal 50176-52223) benutzt; zum Beispiel liegt der KEY-Funktionstastenspeicher ab $C64D (50765).</p>
+
+        <p>Bei MEM (dem Befehl zum Kopieren des Original-ZeichenROMs ins RAM und dessen Einschalten) liegt der Zeichensatz ab $E000 (57344) im RAM unter dem Kernal, der Bildschirm von nun an ab $CC00 (52224), die Sprite-Pointer ab $CFF8 (53240) und die Sprites von $C000-$C3FF (49152-50175).</p>
+
+        <p>Bei HIRES und MULTI (den Grafik- und Farbgrafik-Modi) liegt der Grafik-Speicher unter dem Kernal im RAM ($EOOO-$FFFF, 57344-65535), der Farbspeicher ab $C000 (49152), und Sprites finden sich in den Blocks 48-63 (ab $CC00, 52224). Man sieht also, daß $COOO-CFFF (49152-53247) laufend belegt sind und kleine Maschinenroutinen höchstens in Sprite-Speichern plaziert werden können.</p>
+
+        <p>Hier erst einmal Beanstandungen zur Beschreibung einiger Befehle:</p>
+
+        <p>Beim **TEXT-Befehl (Einsetzen von Text in die HiRes-Grafik-Seite) müssen Zeichentyp, Größe und Abstand als Konstanten gegeben sein, da der Text sonst nicht korrekt ausgedruckt wird. &lt;CTRL-A> und &lt;CTRL-B> können beliebig in einem String benutzt werden. Kein CTRL am Anfang wird als Großschrift ausgelegt. <RVS ON/OFF>-Zeichen werden auch richtig ausgeführt.</p>
+
+        <p>Beim Befehl <strong>FETCH</strong> (Eingaberoutine mit bestimmbarer Zeicheneingabe-Beschränkung) fehlt die Angabe, daß die Eingabelänge über ein Zeichen (wie angegeben) hinausgehen darf. Das Limit liegt bei 88 Zeichen. Danach ist der Eingabepuffer, in den die eingegebenen Zeichen abgelegt werden, gefüllt und dahinterliegende Systemvariablen (siehe C 64-Handbuch) können zerstört werden. Ein Fehler ist außerdem, daß nach der Eingabe des letzten Zeichens keine Korrektur (mit &lt; DEL>) mehr möglich ist. Es bleibt keine andere Wahl, als <RETURN> zu drücken.</p>
+
+        <p>Bei <strong>DUMP</strong> (Ausgabe der Inhalte aller nicht indizierten Variablen) werden die Werte leider ohne Vorzeichen ausgegeben. Dies kann man beheben mit <strong>POKE 32953,221</strong>. Zudem werden leere Strings (Länge 0) als Strings mit zufälligen 255 Zeichen und Integervariablen als 16-Bit-Adressen ausgegeben. Das Programm in Listing 1 beseitigt alle drei Fehler.</p>
+
+        <p>Im Handbuch wird bei den Bildschirmroll-Befehlen das Format leider falsch angegeben. Die Parameter werden mit der Routine geholt, die auch INV und MOVE bedient. Daher ist auch das Format das gleiche:<br>
+            Richtung W/B r,c,w,d.</p>
+
+        <p>Die Parameter entsprechen denen im Simons Basic-Handbuch in Abschnitt 7.6.</p>
+
+        <p>Bei <strong>MERGE</strong> kann es vorkommen, daß ein Programm nicht ordnungsgemäß angehängt wird. Dieser Fehler kommt nicht mehr vor, wenn man immer <strong>OLD</strong> vor MERGE eingibt, da dieser Befehl das Programmende noch einmal überprüft und gegebenenfalls bereinigt.</p>
+
+        <p>Bei <strong>PAGE</strong> kann man das Listen nicht, wie in der Anleitung angegeben, durch Drücken der RUN/STOP-Taste abbrechen. Das Programm in Listing 2 behebt diesen Fehler.</p>
+
+        <p>Befehle, die zwar nicht im Handbuch, jedoch in der Befehlsliste im RAM zu finden sind, wurden bereits in früheren Ausgaben behandelt.<br>
+            Zur Speicherung der Simons Basic-Befehle:</p>
+
+        <p>Die Befehle werden als Zwei-Byte-Kombination abgespeichert. Das erste Byte hat den Wert 100, und das zweite einen Wert zwischen 1 und 127. Dies ergäbe eine Befehlsmenge von 127 Befehlen, einige Tokens sind aber nicht belegt.</p>
+
+        <p>Um alle Befehlscodes auszugeben, kann man Listing 3 verwenden. Nach RUN wird eine Liste der Interpretercodes ausgegeben, die direkt aus dem RAM von Simons Basic und aus dem Basic-ROM entnommen wird. Setzt man in Zeile 20 für A den Wert 12 7 ein, so wird nur der normale Befehlsvorrat ausgedruckt. Mit diesem geänderten Programm kann sich jeder C 64-Anwender eine Interpretercodetabelle erstellen, die leider im C 64-Handbuch fehlt.</p>
+
+        <p>Nun zwei kurze Maschinenprogramme, die nach einmaligem Lauf als neue Befehle zur Verfügung stehen:<br>
+            <strong>ERROR</strong>:
+        </p>
+
+        <p>Ausgabe des Diskettenstatus auf dem Bildschirm (Listing 4).<br>
+            <strong>JOY n</strong>:
+        </p>
+
+        <p>Nach Ausführung dieses Befehls liest die Funktion JOY den Control Port n (n=1 oder 2) (Listing 5).</p>
+
+        <p>Die Listings 1 und 5 lassen sich zum Beispiel als Vorprogramm nach dem Start von Simons Basic laden und starten und stehen danach bis zum Ausschalten des Computers bereit.</p>
+        <address class="author">(Dieter Temme/gk)</address>
+
+        <figure>
+            <pre data-filename="list 1" data-name="DUMP"></pre>
+            <figcaption>Listing 1. Variablen-Liste mit Vorzeichen</figcaption>
+        </figure>
+        <figure>
+            <pre data-filename="list 2" data-name="PAGE"></pre>
+            <figcaption>Listing 2. Verbesserte Version des Page-Befehls</figcaption>
+        </figure>
+        <figure>
+            <pre data-filename="list 3" data-name="Interpretercode-Tabelle"></pre>
+            <figcaption>Listing 3. Alle Befehle des C 64 mit Simons Basic</figcaption>
+        </figure>
+        <figure>
+            <pre data-filename="list 4" data-name="ERROR"></pre>
+            <figcaption>Listing 4. Disk-Status-Ausgabe</figcaption>
+        </figure>
+        <figure>
+            <pre data-filename="list 5" data-name="JOY"></pre>
+            <figcaption>Listing 5. Joystick für beide Ports</figcaption>
+        </figure>
+
+    </article>
+
+</body>
+
+</html>

@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>XXX</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="XXX">
+    <meta name="64er.issue" content="11/84">
+    <meta name="64er.pages" content="999">
+    <meta name="64er.id" content="XXX">
+</head>
+
+<body>
+    <article>
+
+        <h1>Schachmeister</h1>
+
+        <p class="intro">Viele Schachspieler zeichnen ihre Partien auf und überprüfen sie hinterher. Oder sie spielen berühmte Partien nach. Der C64 übernimmt nicht nur die Rolle des Protokollanten — er splelt mit Hilfe dieses Programms gespeicherte Partien mit guter grafischer Darstellung nach.</p>
+
+        <figure>
+            <img src="50-1.png" alt="">
+        </figure>
+
+        <p>Nach dem Start dös Programms muß man einen Augenblick warten, bis der Computer die neuen Multicolor-Zeichen definiert hat und diverse Felder und Listen aufgestellt hat (zirka 20 Sekunden). Darauf kann man eine der gespeicherten Partien auswählen und das Schachbrett baut sich auf.</p>
+
+        <p>Am rechten Rand werden die Namen der Spieler, das Jahr, die Zugnummer und der Zug sowie verschiedene Meldungen wie »Schach«, »Matt«, »Rochade« &hellip; ausgegeben. Das Schachbrett nimmt zirka % des Bildschirms ein.</p>
+
+        <p>Durch Drücken der F7-Taste nach einem Zug wird das Bild bis zu einem erneuten Tastendruck »eingefroren«. Durch Drücken einer anderen Taste nach einem Zug wird der Ablauf beschleunigt. Durch anhaltendes Drücken der Space-Taste kann man so eine Art »Blitzschach« erreichen. Nach Spielende führt ein Tastendruck wieder zum Auswahlmenü.</p>
+
+        <p>Eingeben eigener Schachpartien:<br>
+            1. Zuerst werden die Namen der Spieler und das Jahr eingegeben:<br>
+            10000 DATA SPIELER 1', SPIELER 2, 1984.<br>
+            2. Die Eingabe der Züge: Beispiel für einen normalen Zug: 10010 DATA E2E4, E7E5, G1F3 &hellip;<br>
+            Wenn eine Figur eine gegnerische schlägt, braucht man das nicht anzugeben; der Computer erkennt das von selbst.<br>
+            3. Sonderregeln:<br>
+            ■ Aufgabe eines Spielers: 10020 DATA &hellip;,SA (Schwarz gibt auf) 10020 DATA WA (Weiß gibt auf)<br>
+            ■ Rochaden: 10020 DATA KR (kurze Rochade) 10020 DATA LR (lange Rochade)<br>
+            Es braucht nicht angegeben zu werden, welcher der beiden Spieler rochiert.<br>
+            ■ Schach, Matt, Remis:<br>
+            Um dem Computer einen dieser drei Zustände anzuzeigen, muß ein S (Schach), ein M (Matt) oder ein R (Remis) dem jeweiligen Zug angehängt werden:<br>
+            10020 DATA &hellip;, D6E6S (Schach wird geboten) 10030 DATA &hellip;, F6E6M (Schachmatt)<br>
+            10020 DATA &hellip;, E5E6R (Remis)<br>
+            ■ Dametausch:<br>
+            Wenn ein Bauer in eine Dame umgetauscht wird, so ist dem jeweiligen Zug ein D anzufügen:<br>
+            10020 DATA &hellip;. A7A8D (weißer Bauer wird in Dame getauscht)<br>
+            Wichtig:<br>
+            Nach Ende jeder Partie muß unbedingt ein E angefügt werden, damit der Computer eine Liste der Partien aufstellt. Nach der letzten Partie ist statt dem E ein X anzufügen:<br>
+            19999 DATA &hellip;,F6E6M,E<br>
+            19999 DATA &hellip;,F6E6M,X</p>
+
+        <p>Die Programmlänge ohne gespeicherte Partien beträgt zirka 7,5 KByte pro gespeicherter Partie werden zusätzlich zirka 0,5 KByte benötigt.<br>
+            Da der Bildschirmspeicher verschoben wird, muß nach einem RUN STOP-RESTORE blind RUN eingetippt werden, um das Programm wieder auflisten zu lassen.</p>
+
+        <address class="author">(Thomas Behrend/rg)</address>
+
+        <aside>
+            <h2>Der Schachmeister und sein Programm</h2>
+
+            <img class="inline" src="50-0.png" alt="">
+
+            <p>Ich bin 16 Jahre alt und gehe in die 11. Klasse eines Ulmer Gymnasiums. Seit Weihnachten &lsquo;83 besitze ich einen Commodore 64; sein Vorgänger war ein ZX81.<br>
+                Das Programm:</p>
+
+            <p>Der Computer spielt berühmte oder weniger berühmte Schachpartien vor, die man leicht selbst einprogrammieren kann, so daß man sich mit der Zeit eine richtige Sammlung aufbaut. Besonderer Wert wurde auf eine gute Multicolor-Grafik gelegt.<br>
+                Entstehungsgeschichte:</p>
+
+            <p>Das Programm entstand aus einer spontanen Idee heraus. In Büchereien findet man unzählige Bücher mit aufgeschriebenen Schachpartien, die manauf einem Brett nachspielen kann, was aber nicht unbedingt jedermanns Sache ist, und außerdem ist die Gefahr groß, daß man sich verschaut und einen Fehler macht. Da müßte es doch viel einfacher sein, wenn der Computer dies übernehmen würde. In zirka einwöchiger Arbeit entstand so das vorliegende Programm.</p>
+
+            <p>Wesentlich Merkmale und Vorzüge des Programms:</p>
+
+            <ul>
+                <li>Multicolorgrafik, die sich zum Beispiel hinter »Grandmaster« nicht zu verstecken braucht.</li>
+                <li>alle wichtigen Schachregeln sind berücksichtigt (zum Beispiel Rochaden, Dametausch, Matt, Remis &hellip;)</li>
+                <li>jeder Benutzer kann seine eigenen Partien eingeben und mit dem Programm speichern (maximal 20)</li>
+                <li>das Bild kann jederzeit »eingefroren« werden</li>
+                <li>der Programmablauf kann beschleunigt weiden.</li>
+            </ul>
+
+            <address class="author">(Thomas Behrend)</address>
+        </aside>
+        <figure>
+            <table>
+                <tbody>
+                    <tr>
+                        <td>A$-Feld</td>
+                        <td>: Speicherung der sechs Schachfiguren</td>
+                    </tr>
+                    <tr>
+                        <td>A(x,y)-Feld</td>
+                        <td>: Spielfeld (Figuren)</td>
+                    </tr>
+                    <tr>
+                        <td>B(x,y)-Feld</td>
+                        <td>: Spielbrett</td>
+                    </tr>
+                    <tr>
+                        <td>P-Feld</td>
+                        <td>: Zähler zum Überspringen der DATA-Zeilen bis zur gewählten Partie</td>
+                    </tr>
+                    <tr>
+                        <td>P$-Feld</td>
+                        <td>: Namen der Spieler (weiß)</td>
+                    </tr>
+                    <tr>
+                        <td>P1$-Feld</td>
+                        <td>: Namen der Spieler (schwarz)</td>
+                    </tr>
+                    <tr>
+                        <td>P</td>
+                        <td>: Anzahl der gespeicherten Partien</td>
+                    </tr>
+                    <tr>
+                        <td>DA</td>
+                        <td>: Zähler zum Überspringen der ersten DATA-Zeilen</td>
+                    </tr>
+                    <tr>
+                        <td>AW</td>
+                        <td>: Flag für verschiedene Spielzustände (Matt, Remis...)</td>
+                    </tr>
+                </tbody>
+            </table>
+            <p>Wichtige Programmzeilen und Programmteile:</p>
+            <table>
+                <tbody>
+                    <tr>
+                        <td>150- 190</td>
+                        <td>: MC-Programm zur Beschleunigung der Zeichendefinition</td>
+                    </tr>
+                    <tr>
+                        <td>200- 260</td>
+                        <td>: Zeichendefinition</td>
+                    </tr>
+                    <tr>
+                        <td>300- 860</td>
+                        <td>: Zeichen-DATA (Multicolor)</td>
+                    </tr>
+                    <tr>
+                        <td>900-1050</td>
+                        <td>: Felder aufstellen und Variablen definieren</td>
+                    </tr>
+                    <tr>
+                        <td>1100,1110</td>
+                        <td>: Multicolor-Modus einschalten</td>
+                    </tr>
+                    <tr>
+                        <td>1170-1250</td>
+                        <td>: Partienanfänge einlesen und Tabelle aufstellen</td>
+                    </tr>
+                    <tr>
+                        <td>1290-1350</td>
+                        <td>: Auswahlmenü</td>
+                    </tr>
+                    <tr>
+                        <td>1390-1660</td>
+                        <td>: Bildschirmaufbau</td>
+                    </tr>
+                    <tr>
+                        <td>1730-1910</td>
+                        <td>: Hauptprogramm (normaler Zug)</td>
+                    </tr>
+                    <tr>
+                        <td>1950-2410</td>
+                        <td>: Besondere Regeln (Rochade, Dametausch, Matt. Remis...)</td>
+                    </tr>
+                    <tr>
+                        <td>2470-2490</td>
+                        <td>: Einzelnes Feld löschen</td>
+                    </tr>
+                    <tr>
+                        <td>2530-2580</td>
+                        <td>: Figur drucken</td>
+                    </tr>
+                    <tr>
+                        <td>2620</td>
+                        <td>: Koordinaten errechnen</td>
+                    </tr>
+                    <tr>
+                        <td>2660-2720</td>
+                        <td>: Zeitschlaufe mit Unterbrechung und Verkürzung</td>
+                    </tr>
+                    <tr>
+                        <td>2760-2800</td>
+                        <td>: Grundstellung der Figuren</td>
+                    </tr>
+                    <tr>
+                        <td>2840-2850</td>
+                        <td>: Bildschirmpositionierung</td>
+                    </tr>
+                    <tr>
+                        <td>2890-2910</td>
+                        <td>: Spielende</td>
+                    </tr>
+                    <tr>
+                        <td>10000-</td>
+                        <td>: DATAs für die Partien</td>
+                    </tr>
+                </tbody>
+            </table>
+            <p>Alle REM-Zeilen dienen nur zur Anschaulichkeit und können entfernt werden.</p>
+            <figcaption>Programmbeschreibung zum »Schachmeister«</figcaption>
+        </figure>
+
+        <figure>
+            <pre data-filename="schachmeister" data-name="Schachmeister"></pre>
+            <figcaption>Listing »Schachmeister«</figcaption>
+        </figure>
+    </article>
+
+</body>
+
+</html>

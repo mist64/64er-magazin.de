@@ -1,0 +1,56 @@
+;laterna ed.prg ==1201==
+;Quelle: 8411.D64
+    1 rem**** laterna magica ****
+    2 rem** by bernd schroedter**
+   10 poke36869,peek(36869)and240or15
+   20 if(peek(36866)or127)=255thenaz=38400
+   30 if(peek(36866)or127)<>255thenaz=37888
+   40 bi=0:poke251,7:poke252,7:poke6415,255:poke6416,25:sys6400
+   50 print"{clr}";:fori=1to11:print"{rvon}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}":next
+   60 print"{home}";:fori=1to8:print"{rvon}        ":next
+   70 print"{home}{down}{down}{down}"tab(9)"{rvon}     {CBM-+}     ":printtab(9)"{rvon} 012 {CBM-+} {rvof}012{rvon} {rvof}"
+   80 print tab(9)"{rvon} 345 {CBM-+} {rvof}345{rvon} {rvof}"
+   90 print tab(9)"{rvon} 678 {CBM-+} {rvof}678{rvon} {rvof}":printtab(9)"{rvon}     {CBM-+}     ":goto200
+  100 print"{home}{rvon}";:sys6459:poke204,1
+  110 print"{home}":wv=11:gosub510
+  120 print"{rvon}f1 - ziffernwahl"
+  130 print"{down}{rvon}f2 - saven"
+  140 print"{down}{rvon}f3 - bildwahl"
+  150 print"{down}{rvon}f5 - trick"
+  160 print"{down}{rvon}f7 - zeichnen"
+  170 geta$:ifa$=""then170
+  180 ifasc(a$)<133orasc(a$)>137then170
+  190 onasc(a$)-132goto200,280,360,250,450
+  200 zi=zi+1:ifzi>9thenzi=1
+  210 forj=1to3:fori=0to2:hh=az+104+i+k:hi=hh-6:te=te+1:ifte=zithen230
+  220 pokehh,5:pokehi,5:goto240
+  230 pokehh,0:pokehi,0
+  240 nexti:k=k+22:nextj:k=0:te=0:pr=1:goto290
+  250 printchr$(19);:wv=10:gosub510
+  260 fori=1to11:print"{wht}                     ":next:print"{blu}";:ifle=1thenle=0:return
+  270 goto100
+  280 bi=bi+1:ifbi>6thenbi=0
+  290 print"{home}{down}{rvon}"tab(13)"bild "bi+1
+  300 x=72*bi+8*(zi-1)+6655:q=int(x/256):r=x-256*q
+  310 poke6600,r:poke6601,q
+  320 hi=7551+8*(zi-1):h=int(hi/256):l=hi-256*h
+  330 poke6603,l:poke6604,h
+  340 ifpr=1thenpr=0:goto110
+  350 sys6400:goto110
+  360 le=1:gosub250:print"{home}";:wv=11:gosub510:print"{rvon}tempo     0=max."
+  370 print:printtab(7)"{rvon}1000=klein"
+  380 print:print"{rvon}{rght}{rght}100{left}{left}{left}{left}{left}";:input"{rvon}";te
+  390 print"{clr}":wv=8:gosub510:printtab(9)"012"
+  400 printtab(9)"345"
+  410 printtab(9)"678"
+  420 print"{down}{down}{down}{down}{rvon}>> stop << mit space!"
+  430 sys6400:fori=0tote:next:ifpeek(197)=32thenle=1:gosub250:clr:goto10
+  440 goto430
+  450 poke680,peek(43):poke681,peek(44):poke682,peek(45):poke683,peek(46)
+  460 poke36869,peek(36869)and240
+  470 print"{clr}bitte namen einsetzen:"
+  480 print"pO43,0:pO44,26:pO45,0:pO46,28:pO198,1:pO631,13:";
+  490 print"save"chr$(34)"@0:             "chr$(34)",8,1"
+  500 print"{down}{down}{down}pO43,pE(680):pO44,pE(681):pO45,pE(682):pO46,pE(683):run":end
+  510 fori=1towv:printchr$(17);:next:return
+

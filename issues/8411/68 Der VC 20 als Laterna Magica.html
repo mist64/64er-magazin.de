@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>XXX</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="XXX">
+    <meta name="64er.issue" content="11/84">
+    <meta name="64er.pages" content="999">
+    <meta name="64er.id" content="XXX">
+</head>
+
+<body>
+    <article>
+
+        <h1>Der VC 20 als Laterna Magica</h1>
+
+        <p class="intro">Laterna Magica macht Spiele beweglicher und professioneller. Man kann Zeichen und zusammengesetzte Bilder nicht nur entwickeln, sondern auch bewegen, pulsieren, rotieren oder explodieren lassen und in eigene Programme einbauen.</p>
+
+        <figure>
+            <img src="68-1.png" alt="">
+            <figcaption>Der Bildeditor</figcaption>
+        </figure>
+
+        <p>»Laterna Magica« ist für jeden VC 20 gedacht, sei er erweitert oder nicht. Als Peripherie wird ein Floppy-Disk-Laufwerk VC-1541 vorausgesetzt. Das Programm kann aber für die Datasette umgeschrieben werden, indem die Gerätenummer 8 in Zeile 60 des DATA-Laders in eine 1 umgewandelt wird. Außerdem muß es dann im Hauptprogramm heißen: 490 PRINT”SAVE”CHR$(34)” ”CHR$(34)”,1,1”</p>
+
+        <p>Das Programm (Listing 1) ist nicht mehr zu erweitern, es können also auch keine REM-Zeilen mehr eingefügt werden. Es sieht zwar als Listing nicht sehr umfangreich aus, jedoch mußte das Basic-Ende heruntergesetzt werden, um das Maschinenprogramm, den neuen Zeichengenerator und den Speicherplatz, in dem wir später unsere Ersatzbilder speichern, vor Überschreibung zu schützen. Die Erzeugung von Grafik beim VC 20 beruht ja darauf, die Zeichen auf dem Bildschirm, die aus 88 Punkten aufgebaut sind, in ihrem Aufbau zu ändern. Bei einem Zeichen hieße es, 8 Byte gegen 8 andere auszutauschen. Bei 9 Zeichen (das ist die Zeichenanzahl, mit der »Lanterna Magica« arbeitet) werden es 7 2 Byte. Versuchte man das Problem mit Basic zu lösen, müßte man bei jedem Tauschvorgang eine Zählschleife von 1 bis 72 mit einigen POKEs dazwischen in Kauf nehmen. So etwas kann Action-Spiele ganz schön langsam machen. Ich habe diese Routine daher in Maschinensprache geschrieben. So genügt ein SYS-Aufruf, und 9 Zeichen auf dem Bildschirm ändern sofort ihre Form.</p>
+
+        <p>Ausgeführt werden kann der Tausch nur, wenn der Zeichengenerator nicht wie üblich im ROM liegt. Das ist also die erste Aufgabe des Maschinenprogramms. Es legt den Zeichengenerator ins RAM ab $1COO(entspricht dezimal 7168). Danach holt es sich aus dem Reserve-Bildschirmspeicher ($1A00 bis $1BFF, dezimal 6656 bis 7167) die ersten 72 Byte und legt sie im Bildschirmspeicher ab. Das ist zunächst alles. Beim nächsten Aufruf verfährt es mit den folgenden 72 Byte in gleicher Weise. Das geht siebenmal so, danach werden wieder die ersten 72 Byte geholt und so weiter.</p>
+
+        <p>Wichtig ist, daß vor jedem Aufruf in die Speicher $FB und $FC (dezimal 251 und 252) ein Wert von maximal 7 gePOKEt wird. An diesem Wert erkennt das Maschinenprogramm, wievielmal es die Bilder austauschen soll, bis es wieder beim ersten beginnt. Das bedeutet, daß man auch »Filme« mit nur drei Bildern laufen lassen kann, indem man den Wert 3 in diese Speicher POKEt.</p>
+
+        <h2>Der Bildeditor</h2>
+
+        <p>Um diese besprochenen Bilder zu entwickeln, wären langwierige Berechnungen und viel Tastaturarbeit zum Eingeben der bis zu 504 Werte notwendig. Deswegen habe ich ein Programm geschrieben, das diese Arbeit übernimmt. (Listing 2).</p>
+
+        <p>Der Umgang mit dem Bildeditor ist recht einfach. Nach RUN erscheint in der oberen Hälfte des Bildschirmes eine Maske, in der die Zeichen aufgebaut werden und in der unteren Hälfte das Menü (siehe Bild).</p>
+
+        <p>Das Feld rechts oben zeigt das erste Bild. Man sieht zwar zunächst nur ein abstraktes Gebilde, das liegt aber nur daran, daß noch keine Zeichen entwickelt wurden. Links daneben stehen die gleichen Zeichen in Klarschrift. In beiden Feldern sind die gleichen Zeichen in der linken oberen Ecke schwarz, um herauszustellen, daß dieses Zeichen bearbeitet werden kann.</p>
+
+        <p>Mit F1 kann man nun ein Zeichen auswählen, das verändert werden soll. Dabei wandert das schwarze Feld jeweils eine Ziffer weiter.</p>
+
+        <p>Weiterhin kann man über den beiden Feldern die Bildnummer ablesen. Mit F3 können wir zwischen sieben Bildern wählen. Die Bilder werden jeweils im rechten Feld gezeigt. Es entsteht so schon ein Zeichentrickeffekt.</p>
+
+        <p>Hat man nun seine Wahl getroffen, kann man mit F7 in den Entwicklungsmodus wechseln. Der Cursor steht nun in der linken oberen Ecke des großen Entwicklungsfeldes. Er läßt sich voll steuern, jedoch nicht über den Feldrand hinaus. Tippt man nun, mehr oder weniger willkürlich, Buchstaben oder Zeichen in das Feld, sieht man gleichzeitig an der vorgewählten Ziffer im rechten Feld das Ergebnis. Man sollte nur nicht den Fehler machen, CLR/HOME oder INST/DEL zu drücken. Das kann den Bildschirmaufbau durcheinander bringen.</p>
+
+        <p>Mit RETURN kommt man ins Menü zurück.</p>
+
+        <p>Ist eine Bild- oder Zeichenfolge fertiggestellt, kann man den Trickfilm mit F5 ausprobieren. Im Menüfeld wird die Geschwindigkeit des Ablaufes erfragt. Eine gute Geschwindigkeit von 100 ist vorgegeben. Ein Wert von Null ergibt die größte Geschwindigkeit. In der anderen Richtung wird man selbst merken, wenn es langweilig wird. Mit RETURN wird gestartet, und mit der SPACE-Taste kann der Vorgang abgebrochen werden.</p>
+
+        <p>Es bleibt noch die F2-Funktion zu erklären. Bei Druck auf F2 erscheinen ein paar im ersten Augenblick wirr anmutende Befehle und die Bitte, den Namen der Bildfolge einzutragen. Das bedeutet, daß in der ersten Zeile (mit den vielen POKEs und dem SAVE) in die Lücke ein Name eingetragen werden soll. Es ist auch angebracht, das zweite Anführungszeichen an den Namen heranzuziehen. Dann drückt man RETURN, und alles geht wieder automatisch. Die Bildfolge wird als Maschinenprogramm geSAVEt und das Programm startet von neuem.</p>
+
+        <p>Zur Eingabe des Programmes: Bei Verwendung der Datasette muß zunächst der DATA-Lader (Listing 1) abgetippt und abgespeichert werden und danach Listing 2, weil der DATA-Lader selbständig das nächste Programm nachlädt. Verwendet man ein Floppy-Laufwerk, ist die Reihenfolge unerheblich.</p>
+
+        <p>Will man mit dem Programm arbeiten, muß erst der DATA-Lader geladen werden. »RUN« startet den Lader, der das Hauptprogramm lädt.</p>
+
+        <h2>Bildfolgen in eigenen Programmen</h2>
+
+        <p>Will man die Trickfolge im selbstgemachten Programm anwenden, muß natürlich das Machinenprogramm im Speicher vorhanden sein. Dazu lädt man den DATA-Lader, löscht die Zeilen 60-75, setzt in Zeile 60 ein NEW und startet den Lader. Damit ist das Maschinenprogramm im Bereich dezimal 6400 bis 6640 abgelegt und vor Überschreibung geschützt. Der Lader löscht sich selbst. Außerdem ist auch der Bereich geschützt, in den nun die selbstgemachte Bildfolge mit »LOAD ”Name”,8,1« oder »LOAD ”Name”,1,1« geladen werden kann.</p>
+
+        <p>Damit keine Fehlermeldungen auftreten, gibt man jetzt noch den Befehl NEW ein und drückt die Return-Taste. Jetzt kann man das eigene Programm laden oder eintippen.</p>
+
+        <p>Das Maschinenprogramm wird übrigens mit SYS6400 aufgerufen.</p>
+
+        <p>Und noch einmal: Am Anfang des Programmes, vor dem ersten SYS6400 muß unbedingt eine Zahl zwischen 1 und 7 in 251 und 252 gePOKEt werden, eben die Anzahl der Bilder des Trickfilms. Alle kleineren Zahlen als 1 und alle größeren als 7 richten zwar keinen Schaden an, jedoch bewirken sie eine Einschränkung der Funktion.</p>
+
+        <p>Sollte man dies einmal vergessen haben, ist es angebracht, das Maschinenprogramm neu zu laden.</p>
+
+        <p>Zum Schluß noch zwei Tips.</p>
+
+        <ol>
+            <li>Bei erweitertem VC 20 sollte man für eigene Programme nicht das Basic-Ende herunter-, sondern den Basic-Beginn heraufsetzen. Damit hat man mehr Speicherplatz für seine Programme. (Zeile 20) des DATA-Laders: POKE44,32:POKE8192,0:CLR).</li>
+            <li>Da bei der Arbeit mit diesem Programm nicht der Original-Zeichensatz vorhanden ist, kann man ihn, wenn gebraucht, über die RVS-ON-Taste darstellen. Dieses Verfahren habe ich selbst im Listing 1 verwendet.</li>
+        </ol>
+
+        <address class="author">(Bernd Schrödter/ev)</address>
+
+        <figure>
+            <table>
+                <tbody>
+                    <tr>
+                        <td><b>10 — 40:</b></td>
+                        <td>Hier wird die Anfangsadresse des Zeichenspeichers nach Adresse 7168 verlegt, der Beginn des Farb-RAM ermittelt (unterschiedliche Werte bei GV und Erweiterungen) und das Maschinenprogramm »Bildtausch« initialisiert.</td>
+                    </tr>
+                    <tr>
+                        <td><b>50 — 90:</b></td>
+                        <td>Aufbau des Bildschirms</td>
+                    </tr>
+                    <tr>
+                        <td><b>100:</b></td>
+                        <td>Einsprung in das Maschinenprogramm »Zeichen-Entwicklung«</td>
+                    </tr>
+                    <tr>
+                        <td><b>110 — 190:</b></td>
+                        <td>Menü</td>
+                    </tr>
+                    <tr>
+                        <td><b>200 — 240:</b></td>
+                        <td>Ziffernwahl. Bei Betätigung von F1 wird der Ziffernzähler erhöht und diese Änderung auf dem Bildschirm kenntlich gemacht (Unterlegung der gewählten Ziffer mit Schwarz, der Rest Blau).</td>
+                    </tr>
+                    <tr>
+                        <td><b>260 — 270:</b></td>
+                        <td>Löschen des Menüs</td>
+                    </tr>
+                    <tr>
+                        <td><b>280 — 350:</b></td>
+                        <td>Bildwahl. Berechnung der Anfangsadresse des nächsten Zeichens im Reserve-Bildspeicher und im Zeichenspeicher aus den Werten BI (Bildnr.) und ZI (Ziffernr.). Die Adressen werden in das LB-HB-Format umgewandelt und an das MP »Zeichen-Entwicklung« übergeben.</td>
+                    </tr>
+                    <tr>
+                        <td><b>360 — 440:</b></td>
+                        <td>Trick. Der Bildschirm wird neu aufgebaut. Die Hauptsache ist jedoch die Zeile 430. Dort wird immer wieder das Maschinenprogramm »Bildtausch« aufgerufen, das einen Mini-Trickfilm auf dem Bildschirm erzeugt.</td>
+                    </tr>
+                    <tr>
+                        <td><b>450 — 500:</b></td>
+                        <td>Basic-Anfang und -Ende werden in den Bytes 680-683 abgelegt. Der Zeichenspeicher wird normalisiert. Es wird eine Maske zum Abspeichern des Reserve- Bildspeichers ausgegeben. Maske: Basic-Anfang und -Ende werden gleich Reserve-Bildspeicher-Anfang und -Ende gesetzt. In den Tastaturpuffer wird ein RETURN = CHR$(13) gePOKEt, damit nach dem Abspeichern die zweite Zeile der Maske abgearbeitet wird, die Basic- Anfang und -Ende wieder in den Ausgangszustand bringt. Mit dem »RUN« am Ende der Zeile startet das Programm wieder.</td>
+                    </tr>
+                    <tr>
+                        <td><b>510:</b></td>
+                        <td>Unterprogramm zur Ausgabe von mehreren »Cursor Down«</td>
+                    </tr>
+                </tbody>
+            </table>
+            <figcaption>Programmübersicht</figcaption>
+        </figure>
+
+        <figure>
+            <table>
+                <tbody>
+                    <tr>
+                        <td>AZ</td>
+                        <td>Beginn des Farb-RAM</td>
+                    </tr>
+                    <tr>
+                        <td>BI</td>
+                        <td>Bildzähler</td>
+                    </tr>
+                    <tr>
+                        <td>I,J,K</td>
+                        <td>Schleifenzähler</td>
+                    </tr>
+                    <tr>
+                        <td>WV</td>
+                        <td>Parameterübergabe für Unterprogramm in Zeile 510</td>
+                    </tr>
+                    <tr>
+                        <td>A$</td>
+                        <td>Abfrageergebnis aus dem Menü</td>
+                    </tr>
+                    <tr>
+                        <td>ZI</td>
+                        <td>Ziffernzähler</td>
+                    </tr>
+                    <tr>
+                        <td>HH,HI</td>
+                        <td>Farbspeicher, die auf dem Bildschirm schwarz erscheinen sollen</td>
+                    </tr>
+                    <tr>
+                        <td>TE</td>
+                        <td>Zähler zum Vergleich mit aktueller Ziffer (200 bis 240) und Geschwindigkeit für »Trick« (360 bis 440)</td>
+                    </tr>
+                    <tr>
+                        <td>PR</td>
+                        <td>Verzweigungsargument für Unterprogramm (280 bis 350)</td>
+                    </tr>
+                    <tr>
+                        <td>LE</td>
+                        <td>Verzweigungsargument für Zeile 260</td>
+                    </tr>
+                    <tr>
+                        <td>X</td>
+                        <td>1. Speicherplatz für das nächste zu erstellende Zeichen (im Reserve-Bildspeicher)</td>
+                    </tr>
+                    <tr>
+                        <td>Q</td>
+                        <td>HB von X</td>
+                    </tr>
+                    <tr>
+                        <td>R</td>
+                        <td>LB von X</td>
+                    </tr>
+                    <tr>
+                        <td>HI</td>
+                        <td>Äquivalent zu X (für Zeichenspeicher)</td>
+                    </tr>
+                    <tr>
+                        <td>H</td>
+                        <td>HB von HI</td>
+                    </tr>
+                    <tr>
+                        <td>L</td>
+                        <td>LB von HI</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <figcaption>Die wichtigsten Variablen</figcaption>
+        </figure>
+
+        <figure>
+            <pre data-filename="laterna magica" data-name="Laterna Magica Basic-Lader"></pre>
+            <figcaption>Listing 1. »Laterna Magica« Basic-Lader</figcaption>
+        </figure>
+        <figure>
+            <pre data-filename="laterna ed" data-name="Laterna Magica Grafik-Editor"></pre>
+            <figcaption> Listing 2. »Laterna Magica« Grafik-Editor</figcaption>
+        </figure>
+
+    </article>
+
+</body>
+
+</html>
