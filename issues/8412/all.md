@@ -1100,10 +1100,71 @@ Soccer wird von Commodore zu einem Preis von 59 Mark angeboten.
 
 (rg)
 
+# XQ 9
 
+> QX 9 macht Schluß mit der plattgetretenen »Space-Invaders-Variante«.
 
+Viele Computer-Fans sind es sicherlich leid, ständig neue Schießspiele, im altbekannten Invaders-Prinzip »vorgesetzt zu bekommen. Nur der Feind sieht anders aus, die Grundidee bleibt die gleiche. Für diejenigen, die dennoch mit Lasern und Photonen ihre Freizeit verbringen wollen, gibt es seit kurzem für den C 64 ein Spiel, das im Happy-Software-Verlag erschienen ist. Es heißt QX 9, und basiert auf dem »Ich-sitze-im-Raum-schiff-Prinzip«. Im Klartext heißt das: Der Monitor zeigt das Innere eines Raumschiffs mit Blick nach draußen. So sind bei QX 9 an beiden Seiten Instrumente angebracht, die zur Navigation des Schiffes nötig sind. OX 9 steht für ein Raumschiff im Weltraum, den eine Flotte feindlicher Raumschiffe bedroht. Letztere besteht aus einer Gruppe von Jägern und deren Mutterschiffe. Zwischen beiden schwebt ein Meteoritengürtel. Er trennt sie voneinander. Die Aufgabe des Spielers ist nun denkbar einfach: Weg damit, und zwar soviel wie möglich! Zunächst weckt das Spiel den Anschein, als könne man nie erlernen, seinen Kreuzer sicher durch das feindliche Abwehrfeuer zu steuern; doch dies vergeht mit der Zeit, und QX 9 entwickelt sich zu einem rasanten Actionspiel. Die Grafik schwebt in der Mittelklasse, dafür ist die Sounduntermalung um so besser. Da das Spiel erst mit der Zerstörung des Schiffs endet, werden einem High-Score keinerlei Grenzen gesetzt. Anders als die anderen "Star-Raiders«-Variaten kann man mit seinem Raumkreuzer auch auf dem Satelliten aufschlagen beziehungsweise bei der Landung abstürzen. Das jedoch wertet das Spiel nur auf, und formt das Endbild zu einer gelungenen Abwechslung in der Welt der Schießspiele. Preis: 48 Mark.
 
+(Oliver v. Quadt/aa)
 
+# Catastrophes
+
+Die Grundidee ist endlich einmal nicht die eines »Miners« be-ziehungsweise die eines »Pac-Man«. Vielmehr geht es um ein waghalsiges Geschäft. Sie haben nämlich die Aufgabe, ein wind- und wetterfestes »Häuschen« zu bauen. Gleichzeitig müssen Sie ein bestimmtes Score-Limit erreichen und noch dazu möglichst den Gegner übertrumpfen. Nun, das ist jetzt ziemlich viel auf einmal. Zuerst jedoch zum Bildschirm: Zu erkennen sind nach der Einleitung eine schöne Meeresbucht, umgeben von hohen Bergen, ein zierlicher Leuchtturm, der später eine wichtige Rolle einnimmt, und zuletzt zwei recht unförmige, gebäudeähnliche Gebilde. Eines davon gehört Ihnen. Versuchen Sie nun, in sechs Tagen ein ansehnliches Hochhaus daraus zu machen. Steigen Sie in Ihren Hubschrauber, fliegen Sie damit zu einem Transportkutter, der geduldig am Bildrand wartet. Er hat je ein Fertigteil-Appartment geladen. Dieses muß jetzt von Ihnen zum Haus gebracht werden und schließlich richtig draufgesetzt werden. Unter »richtig« sei verstanden: hurricane-, erdbeben-, gewitter-und überschwemmungsfest! Eine gewiß nicht leichte Aufgabe, doch das ist der Reiz an dem Spiel. Nach jedem Tag (man sieht die Sonne richtig wandern) wird eine neue Mindestpunktzahl festgesetzt. Wird sie nicht erreicht, scheidet der Spieler aus.
+
+Am Ende des sechsten Tages erscheint der »Daily Mirror«, der über den Erfolg des Bauvorhabens berichtet. Große Pluspunkte erzielt das Spiel, das von Happy-Software vertrieben wird, wegen der originellen Grundidee und deren Ausführung. Grafik und Musik sind ebenfalls sehr gut. Besonders die Unterbrechung des Spielvorgangs ist positiv zu bewerten: Nach wenigen Sekunden springt der Computer für den Spieler ein. Die leider englische Anleitung im Programm kann auf- beziehungsweise abgescrollt werden. Grundsätzlich formen die einzelnen Reize des Spiels und seine Finessen im Detail »Cata-strophes« (für C 64: Preis: 48 Mark) zu einem lustigen, aber auch sehr spannenden Geschicklichkeitsspiel, das sogar dem actionliebenden Arcade-Fan viel Spaß machen wird.
+
+(Oliver v. Quadt/aa)
+
+# Wizard – ein würdiger Nachfolger für Jumpman
+
+> Mit Wizard hat die amerikanische Softwarefirma PP & S (Progressive Peripherals and Software) ein Spiel auf den Markt gebracht, das den Rennern Jumpman und Jumpman Junior in nichts nachsteht.
+
+Wizard ist nicht etwa, wie der Name vermuten läßt, ein Zaubererspiel, sondern ist eher in die Kategorie der intelligenten »Jump- and Run-Spiele« einzuordnen. Intelligent deshalb, weil man auch selbst kreativ das Spiel gestalten kann.
+
+## Das Spiel
+
+Das Ziel des Spieles ist es, möglichst viele Punkte zu sammeln. Diese erhält man, indem man möglichst viele Schätze sammelt, oder möglichst schnell das Ende des Levels erreicht. Das Ende einer Spielstufe erreicht man dann, wenn man es geschafft hat, den Schlüssel zu ergattern und damit das Schlüsselloch (also den Ausgang) zu erreichen. Daß dies nicht so einfach ist, wird sich wohl jeder denken können: Schließlich hat man mit 20 verschiedenen Arten von Feinden zu rechnen, und mit der Gefahr, irgendwo zwischen den vielen Leitern, Seilen, Treppen und gefährlichen Feuern abzustürzen. Weitere Gemeinheiten wie Teleporter und Transporter sind in höheren Levels in immer stärkerem Maße eingebaut.
+
+Hätte man da nicht noch so tolle Dinge wie Zaubersprüche, dann wäre man spätestens nach der 15. Spielstufe dem Tod geweiht. Bei sinnvoller Nutzung der zur Verfügung stehenden Sprüche kann man den letzten, also den 39. Level mit ein bißchen Übung erreichen.
+
+Keine Sorge, auch nachdem man den letzten Schwierigkeitsgrad geschafft hat, wird das Spiel nicht so schnell langweilig: Wer will, kann sich seine eigenen Levels erstellen.
+
+## Das »Construction Kit«
+
+Bei der Entwicklung eigener Bilder steht dem »Bildschirmkünstler« die Wahl zwischen fünf Menüpunkten offen: Die Wahl der Monster, die Zaubersprüche, das Editieren des Bildschirms, die Startposition des »Wizard« und die Farbwahl. Der Bildschirmeditor besteht aus einer Kombination von Cursorbewegung per Joystick und Gegenstandsauswahl durch zwei Tasten. Hat man den Bildschirmeditor verlassen, kann man beginnen, die ersten Bosheiten einzubauen. Zur Wahl stehen 128 verschiedene Sprites, deren Auftrittshäufigkeit und Animationsgeschwindigkeit durch den Spieler bestimmt werden können. Falls Sie sich zu viele »Shadow Lords«, Riesenratten oder »Slimes« eingebaut haben, besteht noch immer die Möglichkeit, den Level durch Zaubersprüche (Unsichtbarkeit, Teleport, Feuerball etc.) zu erleichtern.
+
+Auf eine Diskettenseite passen insgesamt 100 Levels. Wer sich nicht sattspielen kann, braucht sich also deswegen nicht gleich massenweise Disketten kaufen.
+
+## Eine Fortsetzung ist geplant
+
+Wizard ist ein Spiel, das durchaus mit Hüpfspielklassikern wie Jumpman konkurrieren kann, und das zu kaufen es sich lohnt.
+
+Übrigens: Die Herstellerfirma PP & S plant für Anfang 1985 ein »Wizard Expansion Set« mit erweiterten Möglichkeiten und 40 neuen, gut durchdachten Levels. Einem Erfolg dieses Spiels dürfte eigentlich nichts mehr im Wege stehen.
+
+(Manfred Kohlen/aa)
+
+# Mathematical-Basic: Das Super-Basic für den VC 20
+
+> Einen echten Knüller für alle Besitzer eines VC 20 mit 8 KByte Erweiterung haben wir zum »Listing des Monats« gewählt. Mathematical Basic steift über 50 neue Befehle und Funktionen zur Verfügung und setzt damit einen Standard, an dem andere Toolkits künftig gemessen werden müssen.
+
+Das Programm ist vollständig in Assembler geschrieben und liegt zum Eintippen als Basic-Lader vor. Nach dem Starten des Laders wird das eigentliche Maschinenprogramm ab Adresse 29211, also am oberen Ende von Speicherblock 3 abgelegt und gleichzeitig vor dem Überschreiben durch Basic-Programme oder Variable geschützt. Bei einem voll ausgebauten VC 20 (+ 24 KByte) kann das Programm ohne weitere Veränderungen benutzt werden. Aber auch Besitzer einer 8-KByte-Erweiterung können diese Basic-Erweiterung nutzen. Allerdings muß dann diese 8-KByte-Erweiterung hardwaremäßig auf den Adreßbereich von $6000 bis $7FFF, also auf Speicherblock 3 umgeschaltet werden. Schlagen Sie bitte die erforderliche Vorgehensweise im Handbuch für die 8-KByte-Erweiterung nach. Es ist die gleiche Umstellung, die auch nötig wird, wenn Sie das 8-KByte-Modul zusammen mit einer 16-KByte-Erweiterung als 24 KByte RAM nutzen wollen.
+
+Haben Sie allerdings keine zusätzliche 16-KByte-Erweiterung, dann steht Ihnen für das Arbeiten mit Ma-thematical-Basic nur der Grundversionsspeicher zur Verfügung. Leider ist es nicht möglich, nur das 16-KByte-Modul zu verwenden, da dieses immer auf Speicherblock 1 und 2 eingestellt ist. Doch nun zum Programm selbst: Mathema-tical-Basic erweitert den Wortschatz des Basic-Inter-preters um zusätzliche Befehle und Funktionen. Insbesondere wurde die Handhabung der trigonometrischen Funktionen verbessert (man kann zwischen Altgrad, Neugrad und Bogenmaß wählen). Daneben wurden Spezialbefehle für Diskettenbetrieb wie CATALOG, DLOAD, DSAVE etc. eingebaut. Strukturierte Programmierung wird durch DO...UNTIL-Schleifen unterstützt. Viele weitere Befehle und Funktionen vereinfachen die Programmierung zum Teil ganz erheblich.
+
+Auf jeden Fall braucht »Mathematical-Basic« den Vergleich auch mit kommerziellen Softwareprodukten dieser Art nicht zu scheuen.
+
+(ev)
+
+## Der Autor des »Mathematical Basic« stellt sich vor
+
+Ich bin am 9.7.1963 geboren und zur Zeit Praktikant in einem Softwarehaus in Bad Kreuznach.
+
+Für die Entwicklung des Programms ist hauptsächlich der Ärger über das permanente Fehlen der gebräuchlichsten naturwissenschaftlichen Funktionen in jedem Basic-Interpreter von Commodore verantwortlich.
+
+Um mehrere Funktionen über den USR-Vektor zu implementieren, müßte man vor jedem Aufruf auch lästigerweise die jeweilige Adresse in diesen Vektor schreiben. Das ist sehr umständlich; also müssen mehrere USR-Funktionen her. Wenn nun aber schon eine Routine für das Selektieren der Adressen geschrieben wird, so kann man auch gleich das Ganze etwas komfortabler gestalten und eine Interpreter-Erweiterung basteln. Das waren meine anfänglichen Überlegungen und heraus kam »Mathematical Basic«. Das Programm wurde so gehalten, daß esje-derzeit weitere Befehle und Funktionen aufnehmen kann. 6502-Freunde mit Kenntnissen über das VC 20-Betriebssystem werden sich schnell mit »Mathematical Basic« zurechtfinden und auch eigene Änderungen durchführen können.
+
+(Wolfgang W. Wirth)
 
 
 
