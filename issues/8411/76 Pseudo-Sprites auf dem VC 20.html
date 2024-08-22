@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>XXX</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="XXX">
+    <meta name="64er.issue" content="11/84">
+    <meta name="64er.pages" content="999">
+    <meta name="64er.id" content="XXX">
+</head>
+
+<body>
+    <article>
+
+        <h1>Pseudo-Sprites auf dem VC 20</h1>
+
+        <p class="intro">Der VC 20 kennt von Haus aus leider nicht die freibeweglichen Grafikobjekte des C 64, die sogenannten Sprites. Das bedeutet aber nicht, daß man auf die Vorteile der Sprites oder MOBs gänzlich verzichten muß.</p>
+
+        <p>Das Programm ist für den VC 20 mit 8 KByte Speichererweiterung konzipiert. Es läuft jedoch mit einigen Änderungen auch bei nur 3 KByte Speichererweiterung.</p>
+
+        <p>Vor dem Eintippen oder Laden muß man POKE 44,32:POKE 8192,0: NEW eingeben, womit der Basic-Anfang im Speicher auf die Adresse dezimal 8193 ($2001) erhöht wird. Somit ergibt sich folgende Speicheraufteilung:<br>
+            4096 — 4607 Bildschirm<br>
+            4608 — 8191 frei<br>
+            8192 — 16383 (bei + 8 KByte) Basic-Programmspeicher<br>
+            8192 — 24575 (bei + 16 KByte) Basic-Programmspeicher<br>
+            8192 — 32767 (bei + 24 KByte) Basic-Programmspeicher</p>
+
+        <p>Der freie Bereich wird nun vollständig von dem Maschinenspracheprogramm gebraucht. Die Aufteilung des Speicherraums ist die folgende:</p>
+
+        <table>
+            <tbody>
+                <tr>
+                    <td>4608 — 5119</td>
+                    <td>Sprite-Control-Block (SCB), wird später erklärt</td>
+                </tr>
+                <tr>
+                    <td>5120 — 6143</td>
+                    <td>freidefinierbarer Zeichensatz, die ersten 128 Zeichen, stehen zur freien Verfügung</td>
+                </tr>
+                <tr>
+                    <td>6144 — 7167</td>
+                    <td>freidefinierbarer Zeichensatz, die zweiten 128 Zeichen, werden vom Programm zur Erstellung der 9 Sprites gebraucht und stehen somit nicht zur freien Verfügung</td>
+                </tr>
+                <tr>
+                    <td>7168 — 8191</td>
+                    <td>Maschinenspracheprogramm, Beschreibung siehe Text</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <p>Die Pseudo-Sprites sollten eine Auflösung von 16 x 16 Punkten haben, das sind 256 Punkte oder 4 Zeichen im freidefinierbaren Zeichensatz (Bild 1). Damit aber ein 16 x 16 Punkte großes Zeichen jede Position auf dem Bildschirm einnehmen kann, braucht man eine 24 x 24 Punkte große Umdefinier-Matrix, in die das Zeichen hineinkopiert wird. Das Aussehen dieser Umdefinier-Matrix ist in Bild 2 zu sehen. Das Programm übernimmt nun die Aufgabe, das Zeichen in die Umdefinier-Matrix zu kopieren (Bild 3), in die richtige X-Position zu schieben (Bild 4), und dasselbe mit der Y-Position zu tun.</p>
+
+        <figure>
+            <img src="76-1.png" alt="">
+            <figcaption>Bild 1. Die Speicheraufteilung in der Grundmatrix des Sprites Nummer 0. Das höchstwertige Bit eines Bytes steht links.</figcaption>
+        </figure>
+        <figure>
+            <img src="76-2.png" alt="">
+            <figcaption>Bild 2. Die Undefinier-Matrix hat 24 x 24 Punkte und ist notwendig, um Sprites auch punktweise verschieben zu können</figcaption>
+        </figure>
+        <figure>
+            <img src="76-3.png" alt="">
+            <figcaption>Bild 3. Hineinkopieren der Grundmatrix in die Umdefinier-Matrix</figcaption>
+        </figure>
+        <figure>
+            <img src="76-4.png" alt="">
+            <figcaption>Bild 4. Zur punktgenauen Justierung wird das Sprite nach dem Kopieren in die Umdefinier-Matrix noch horizontal und vertikal verschoben</figcaption>
+        </figure>
+
+        <p>Außerdem werden die Zeichen, die später auf dem Bildschirm von den Sprites verdeckt werden, mit in die Umdefinier-Matrix hineinkopiert. So entsteht der Eindruck, daß die Sprites wirklich über die Zeichen wandern. Beim späteren Löschen werden die verdeckten Zeichen wieder hergestellt. Wie funktioniert das nun?</p>
+
+        <p>Im Speicher ab dezimal 4608 ist 9mal (für jedes Sprite einer) der sogenannte Sprite-Control-Block (SCB) eingerichtet. Er hat die Aufgabe, die momentane X- und Y-Position, die Farbe des Sprites, den Bildschirmmodus (gesetzt/gelöscht) des Sprites, die durch die Umdefinier-Matrixverdeckten 9 Zeichen und Farben zwischenzuspeichern:</p>
+
+        <table>
+            <tbody>
+                <tr>
+                    <td>Byte 0 — 8</td>
+                    <td>Bildschirmcode der verdeckten Zeichen</td>
+                </tr>
+                <tr>
+                    <td>Byte 9 - 17</td>
+                    <td>Farbcode der verdeckten Zeichen</td>
+                </tr>
+                <tr>
+                    <td>Byte 18</td>
+                    <td>X-Position des Sprites</td>
+                </tr>
+                <tr>
+                    <td>Byte 19</td>
+                    <td>Y-Position des Sprites</td>
+                </tr>
+                <tr>
+                    <td>Byte 20</td>
+                    <td>Farbe des Sprites</td>
+                </tr>
+                <tr>
+                    <td>Byte 21</td>
+                    <td>Bildschirmmodus (gesetzt= $00/gelöscht=$FF)</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <p>Die Basisadresse des SCB errechnet sich somit aus der Formel Basisadresse = 4608 + Spritenummer x 22. Das Zwischenspeichern und die Auswertung der Parameter übernimmt natürlich das Maschinenprogramm. Über den SCB werden auch im nachfolgend beschriebenen Programm »Sprite-Definer« die Sprites initialisiert und deren Farbe festgelegt. Da nur die oberen 128 Zeichen des Zeichensatzes für die Sprites verwendet werden, hat man eine ausreichende Anzahl von noch frei definierbaren Zeichen, nämlich genau 128, zur Verfügung. Außerdem kommen jeweils 13 Zeichen, nämlich 4 für das Sprite und 9 für die Umdefinier-Matrix hinzu, wenn man auf ein Sprite verzichtet. Die Matrixen werden im Speicher so abgelegt:</p>
+
+        <table>
+            <tbody>
+                <tr>
+                    <td>128 — 131</td>
+                    <td>Grundmatrix Sprite 0</td>
+                </tr>
+                <tr>
+                    <td>132 — 140</td>
+                    <td>Umdef.-Matrix Sprite 0</td>
+                </tr>
+                <tr>
+                    <td>141 — 144</td>
+                    <td>Grundmatrix Sprite 1</td>
+                </tr>
+                <tr>
+                    <td>145 — 153</td>
+                    <td>Umdef.-Matrix Sprite 1</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <p>Konkret wird das Programm (Listing 1) nun folgendermaßen bedient: Vor dem Laden oder Eingeben wird POKE 44,32:POKE 8192,0:NEW eingetippt. Ist nun das Maschinenspracheprogramm im Speicher, kann es mit einem Monitorprogramm auch noch einmal abgespeichert werden. Später muß man es nur noch mit LOAD »name«, 1,1 laden.</p>
+
+        <p>Die Bedienung:<br>
+            Sind die Sprites definiert. muß dem Maschinenspracheprogramm mitgeteilt werden, wo der Zeichensatz liegt, den es verwalten soll. Das geschieht mit den Befehlen POKE 677, Lowbyte:POKE 678, Highbyte, in unserem Fall also POKE 677,0:POKE 678,20, da der Zeichensatz auf der Adresse 5120 beginnt.</p>
+
+        <p>Soll nun ein Sprite auf den Bildschirm, muß zuerst einmal in Adresse 683 die Spritenummer gePOKEt werden (Achtung, keine Zahl über 8 angeben, da sich das Programm dann selbst zerstören könnte). Schließlich werden in Adresse 673 die X-Koordinate (maximal 159) und 674 die Y-Koordinate (maximal 167) gesetzt. Dann kann das Programm mit SYS 8021 sofort aufgerufen und auf dem Bildschirm das Sprite betrachtet werden, vorausgesetzt man hat vorher mit POKE 36869,205 auf den freidefinierbaren Zeichensatz geschaltet.</p>
+
+        <p>Wird nun das Sprite auf eine andere Position gesetzt, so verschwindet es vollständig von der alten Position, und die Zeichen, die auf diesem Platz waren, erscheinen wieder mit ihrer alten Farbe. Will man aber das Sprite ganz vom Bildschirm löschen, POKEt man wieder in 683 die Spritenummer und ruft das Maschinenspracheprogramm diesmal mit SYS 8099 auf. PRINT »CLR/HOME« sollte man nicht verwenden, da im SCB noch die alten Bildschirmzeichen gespeichert sind und beim nächsten Setzen wieder auf ihren alten Plätzen auf dem Bildschirm erscheinen würden.</p>
+
+        <h2>Der Sprite-Generator</h2>
+
+        <p>Nun zum Programm »Sprite-Definer« (Listing 2).</p>
+
+        <p>Dieses Programm ist ein Sprite-Generator in Basic, der bei der Erstellung von Sprites recht hilfreich sein kann. Das Programm verdeutlicht auch, wie die Definition der Sprites und die Bedienung des Maschinenspracheprogramms erfolgt.</p>
+
+        <p>Obwohl sich das Programm fast von selbst erklärt, hier doch einige kurze Erläuterungen:</p>
+
+        <p>Startet man das Programm mit RUN, erscheint als erstes die Begrüßung und die Aufforderung »Bitte warten!«. Das Programm kopiert nämlich jetzt den Zeichensatz aus dem ROM ins RAM, was in Basic naturgemäß etwas dauert.</p>
+
+        <p>Jedesmal, wenn man in einem Menüteil eine Eingabe gemacht hat, wird man »Richtig?« gefragt. Tippt man hier für N (Nein), so kann die Eingabe wiederholt werden. Drückt man aber den Linkspfeil, so kommt man wieder ins Hauptmenü.</p>
+
+        <p>Die Tastenbelegung im Editiermodus:</p>
+
+        <table>
+            <tbody>
+                <tr>
+                    <td>Cursor-Tasten</td>
+                    <td>Cursor-Bewegungen</td>
+                </tr>
+                <tr>
+                    <td>Leertaste</td>
+                    <td>Punkt setzen</td>
+                </tr>
+                <tr>
+                    <td>Delete-Taste</td>
+                    <td>Punkt löschen</td>
+                </tr>
+                <tr>
+                    <td>CLR/HOME</td>
+                    <td>Gitter löschen</td>
+                </tr>
+                <tr>
+                    <td>RETURN</td>
+                    <td>Modus beenden mit Änderung des Sprites, vorher aber Abfrage</td>
+                </tr>
+                <tr>
+                    <td>Linkspfeil</td>
+                    <td>Modus beenden, aber ohne Änderung des Sprites</td>
+                </tr>
+                <tr>
+                    <td>I-Taste</td>
+                    <td>Sprite invertieren</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <p>Bei der Funktion »Weiter« kommt man in ein zweites Menü, das weitere Funktionen zur Verfügung stellt. Aus diesem Menü gelangt man mit »zurück« wieder ins Hauptmenü. Beim Speichern werden die Sprites als reiner Speicherauszug auf Kassette gebracht, so daß das Laden im Prinzip auch mit LOAD »name«,1,1 möglich ist.</p>
+
+        <p>Sicherlich kann das Maschinenspracheprogramm noch weiter verbessert werden. So wäre zum Beispiel eine Spritesteuerung per Interrupt durchaus denkbar. Leider funktioniert das Maschinenprogramm nicht mit den üblichen Grafikmodulen, da diese den Bildschirminhalt auch mit dem freidefinierbaren Zeichensatz aufbauen. Sollen Sprites auch miteinander oder übereinander dargestellt werden, dann muß das Setzen und Löschen nach folgender Reihenfolge durchgeführt werden, da es sonst zu Schwierigkeiten mit dem SCB kommen kann:</p>
+
+        <p>Sprite 0 setzen, Sprite 1 setzen,&hellip;, Sprite n setzen. Hiernach die Berechnungen für die neuen Positionen durchführen.</p>
+
+        <p>Sprite n löschen,.Sprite n-1 löschen,&hellip;, Sprite 0 löschen. Danach Vorgang von oben wiederholen.</p>
+
+        <p>Noch eins zum »Sprite-Definer«: Die erste REM-Zeile muß auf jeden Fall mit 16 Sternchen eingegeben werden, da sich das Programm später mit POKEs selbst verändert und andernfalls, wäre die REM-Zeile kürzer, die folgende Zeile in Mitleidenschaft ziehen würde. Doch nun wünsche ich allen, die das Programm eintippen, viel Spaß und vielleicht ein bißchen C 64-Feeling.</p>
+
+        <address class="author">(Markus Leberecht/ev)</address>
+
+        <figure>
+            <pre data-filename="pseudosprts.data" data-name="Pseudosprites (Basic-Lader)"></pre>
+            <figcaption>Listing 1. Das Maschinenprogramm zur Sprite-Kontrolle als Basic-Lader</figcaption>
+        </figure>
+        <figure>
+            <pre data-filename="spritegenerator" data-name="Sprite-Generator"></pre>
+            <figcaption>Listing 2. Der Sprite-Generator</figcaption>
+        </figure>
+
+        <div style="display: none;">
+            <pre data-filename="sprite-demo" data-name="Sprite Demo"></pre>
+        </div>
+
+    </article>
+
+</body>
+
+</html>

@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>XXX</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="XXX">
+    <meta name="64er.issue" content="11/84">
+    <meta name="64er.pages" content="999">
+    <meta name="64er.id" content="XXX">
+</head>
+
+<body>
+    <article>
+
+        <h1>Hex-DATA-Automat</h1>
+
+        <p class="intro">Der Computer programmiert sich selbst — Maschinenprogramme werden automatisch in DATA-Statements mit Prüfsumme umgewandelt.</p>
+
+        <p>Ein Maschinenprogramm in ein korrektes Basic-Ladeprogramm umzusetzen, ist sicherlich eine sehr langweilige Programmieraufgabe, außerdem schleichen sich sehr schnell Fehler ein.</p>
+
+        <p>Soll diese Umsetzung automatisch erfolgen, müßte sich der Computer — salopp gesagt — selbst programmieren. Dies ist prinzipiell möglich; doch zuvor einige Grundlagen.</p>
+
+        <p>Geben Sie hierzu das nebenstehende kleine Testprogramm ein.</p>
+
+        <pre>100 POKE 2,0
+110 ZL=PEEK(2) : POKE 2,ZL+1
+120 D$=STR$(ZL+1000)
+130 D$=D$+"DATA ABCFDEF”
+140 PRINTCHR$(147);D$
+150 PRINT ”RUN 110”
+160 :
+180 END
+</pre>
+
+
+        <p>Die Programmzeile 100 setzt die Speicheradresse 2 auf Null. Anschließend wird der Wert dieser Adresse nach ZL geholt und die Adresse um eins erhöht. Der STR$-Befehl wandelt den WertZL+1000 in einen String, und die Zeile 130 erweitert den String mit »DATA ABCDEF«. Die CHR$-Anweisung löscht anschließend den Bildschirm und schreibt den String »1000 DATA ABCDEF« links oben auf den Bildschirm. Zuletzt wird in der zweiten Bildschirmzeile der Text »RUN 110« gedruckt.</p>
+
+        <p>Falls Sie nach RUN die Taste HOME drücken, steht der Cursor auf der Zeile »1000 DATA ABCDEF«. Drücken Sie nun die RETURN-Taste, dann wird die Zeile 1000 in das Programm aufgenommen. Der Cursor steht jetzt auf dem »RUN 110«. Drücken Sie jetzt erneut RETURN, so startet das Programm wieder, und es folgt der nächste Durchgang mit:<br>
+            1001 DATAABCDEF<br>
+            RUN 110</p>
+
+        <p>Da im ersten Durchlauf der Wert in der Speicherzelle 2 um eins erhöht wurde, lautet die nächste Zeilennummer 1001. Nun könnten Sie wieder (in Handarbeit) HOME/RETURN/RE-TURN eingeben, doch — und jetzt wird’s interessant — auch dies kann der Computer durchführen.<br>
+            160 POKE 198,3<br>
+            170 POKE 631,19:POKE 632,13:POKE 633,13</p>
+
+        <p>Geben Sie nun RUN ein. Das Programm erweitert sich nun automatisch — ab der Nummer 1000 — um DATA-Zeilen.</p>
+
+        <p>Dies ist möglich, da alle Commodore-Computer mit einem Tastaturpuffer arbeiten. In diesem Zwischenspeicher, der beim VC 20 und C 64 ab der Adresse 631 beginnt, kann sich der Computer bis zu neun Tastatureingaben merken. Die Anzahl der Zeichen in dem Puffer steht in der Adresse 198.</p>
+
+        <p>In der vorherigen Programmerweiterung wurde in der Zeile 160 der Wert 3 eingePOKEt. Der Computer meint anschließend, es seien drei Tastatureingaben erfolgt. Die POKE-Befehle in der Zeile 170 simulieren die Eingabesequenz HOME, RETURN, RETURN. Nach dem Programmende vergißt der Computer diese untergeschobenen Eingaben keineswegs, sondern führt sie nachträglich aus.</p>
+
+        <p>Aus der Zeit des legendären PET 2001 stammt noch die Bezeichnung »selbsterhaltendes Programm«. Naja, aber so hatte das Kind wenigstens einen Namen.</p>
+
+        <p>Leider hat das beschriebene Verfahren den Nachteil, daß der Computer, sobald er sich selbst die Zeile einprogrammiert, die Variablen löscht. Aus diesem Grund müssen Sie wichtige Werte vor dem Programmabbruch durch POKE sichern und beim Neustart mit PEEK zurückholen. In dem vorherigen Testprogramm wurde beispielsweise der Zähler für die Zeilennummer mit der Adresse 2 weiter gegeben.</p>
+
+        <p>Das Programm »HEX-DATA-Automatik« arbeitet im Prinzip genau nach dem zuvor beschriebenen Verfahren. Die Umwandlungsroutine wird mit RUN 200 gestartet. Das Programm fragt dann nach der Anfangs- und Endadresse des Maschinenprogramms und wandelt es anschließend in DATA-Zeilen um. Diese haben das folgende Format:<br>
+            1000 DATA 01,02,03,04,05,&hellip;,20, 1234<br>
+            1001 DATA 11,12,13,14,15,&hellip;,40, 5678<br>
+            1002 DATA &hellip;</p>
+
+        <p>Nach jeweils 20 Hexadezimal-Daten folgt immer eine Prüfsumme.</p>
+
+        <p>Anschließend müssen Sie die DATA-Routine (200—720) löschen und den Schleifenzähler in Zeile 30 anpassen. Falls das Programm veröffentlicht werden soll, können Sie zusätzlich ein Copyrightstatement hinzufügen.</p>
+
+        <p>Für diesen Zweck wurde diese Routine auch ursprünglich erstellt. Die Zeilen 10—90 wandeln die Hex-Zahlen wieder um und schreiben das Maschinenprogramm in den entsprechenden Speicherbereich zurück (Zeile 30 beachten).</p>
+
+        <p>Das Programm kann in dieser Form sehr leicht abgetippt werden, da Prüfsummenfehler wie folgt angezeigt werden:<br>
+            ZEILE 1000<br>
+            ZEILE 1001<br>
+            ZEILE 1002<br>
+            ZEILE 1003 PRÜFSUMMENFEHLER !<br>
+            BREAK IN 80</p>
+
+        <p>Anschließend müssen nur 20 Daten überprüft werden, so daß auch längere Basic-Lader vergleichsweise schnell und fehlerfrei abgeschrieben werden können.</p>
+
+        <address class="author">(Heino Velder/ev)</address>
+
+        <figure>
+            TODO <!-- <pre data-filename="hex-data-automat" data-name="Hex-DATA-Automat"></pre> -->
+            <figcaption>Listing »Hex-DATA-Automat«</figcaption>
+        </figure>
+
+    </article>
+
+</body>
+
+</html>

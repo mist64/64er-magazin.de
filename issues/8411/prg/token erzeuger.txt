@@ -1,0 +1,27 @@
+;token erzeuger.prg ==1201==
+;Quelle: 8411.D64
+  100 print"{clr}{down}{down}{rvon}tokenerzeuger"
+  110 input"{down}{down}startadresse";sa
+  115 rem *** programmueberpruefung
+  120 fort=1to3:readd:ifpeek(sa+8+t)<>dthenprint"{clr}{down}{down}{rvon}programm nicht geladen":end
+  130 print"{down}{down}{rvon}1{rvof} beginn bei 204 (kill  wird ueberscrieben)
+  140 print"{down}{rvon}2{rvof} oder bei token 205 ?"
+  150 geta$:ifa$=""then150
+  160 ifa$="1"thenf=617:goto190
+  170 ifa$<>"2"then150
+  180 f=621
+  190 input"{down}{down}wieviele token";at
+  200 ifat>47thenprint"{rvon}{down}nicht moeglich":goto190
+  205 rem *** befehlswort abspeichern
+  210 z=sa+f:w=sa+520
+  220 fort=1toat
+  230 print"{down}token "t+204", adresse"
+  240 inputa$,b:b=b-1
+  250 fory=1tolen(a$)
+  260 x=asc(mid$(a$,y,1)):ifmid$(a$,y+1,1)=""thenx=x+128
+  270 pokez,x:z=z+1:next
+  280 b2=int(b/256):b1=b-b2*256
+  290 pokew,b1:pokew+1,b2:w=w+2
+  300 next
+  310 data32,141,253
+

@@ -1,0 +1,120 @@
+;exsort demo.prg ==0801==
+;Quelle: 8411.D64
+    0 ifk=0thenk=1:load"exsort?",8,1:rem laden von exsort
+    1 sys49400:rem starten von exsort
+  100 rem ***********************
+  110 rem ***   exsort demo   ***
+  120 rem ***********************
+  130 rem
+  140 rem ******************
+  150 rem * 1.befehl: "so" *
+  160 rem ******************
+  165 print"{clr}Erster Befehl: 'so'"
+  170 input"{down}Zahl der zu sortierenden Elemente";a
+  175 print"{down}Anfuellen des Feldes 'za' mit Zufalls-    zahlen"
+  180 dimza(a)
+  190 rem *** das feld za wird mit zufallszahlen belegt ***
+  200 fors=1toa
+  210 :za(s)=rnd(1)*10000-5000
+  220 nexts
+  230 it=ti:rem zeit speichern
+  240 print"{down}Sortierbeginn"
+  250 rem
+  260 rem *** aufruf des befehls "so" ***
+  270 so,za,1,a,1
+  280 rem   so   =   befehl
+  290 rem   za   =   feldname
+  300 rem   1    =   anfangsindex
+  310 rem   a    =   endindex
+  320 rem   1    =   sortierungsrichtung(aufsteigend)
+  330 rem
+  340 it=ti-it
+  350 print"{down}Sortierende"
+  355 fors=1to1000:nexts
+  360 rem *** ausgabe der sortierten elemente ***
+  370 fors=1toa
+  380 :prints,tab(6)za(s)
+  390 nexts
+  400 print"{down}Zeit:"it/60"sec"
+  410 print"{down}bitte Taste druecken"
+  420 gett$:ift$=""then420
+  430 rem
+  440 rem ******************
+  450 rem * 2.befehl: "se" *
+  460 rem ******************
+  470 rem
+  480 clr:dimfe$(10000)
+  485 print"{clr}Zweiter Befehl 'se'"
+  490 rem ** in 50 beliebige elemente  **
+  500 rem ** des feldes fe$ wird das   **
+  510 rem ** wort "hallo" geschrieben  **
+  520 rem
+  525 print"{down}In 50 beliebige Elemente von fe$ wird   'hallo' geschrieben"
+  530 fors=1to50
+  540 :fe$(rnd(1)*10000)="hallo"
+  550 nexts
+  560 print"{down}In folgendem elementen steht 'hallo':"
+  570 rem
+  580 rem ** ausdrucken jedes indexes **
+  590 rem ** in dem "hallo" steht     **
+  600 rem
+  610 in=-1:it=ti
+  620 rem ** aufruf des befehls "se" **
+  630 se,fe$,in+1,10000,"hallo"
+  640 rem  se      =   befehl
+  650 rem  fe$     =   feldname
+  660 rem  in+1    =   anfangsindex
+  670 rem  10000   =   endindex
+  680 rem  "hallo" =   element
+  690 rem ** bei rueckkehr aus "se"  **
+  700 rem ** enthaelt "in" den index **
+  710 rem ** oder (wenn das element  **
+  720 rem ** nicht gefunden wurde)   **
+  730 rem ** den wert -1             **
+  740 ifin=-1orin=10000then760
+  750 printin,:goto630
+  760 print:print"{down}Zeit:"(ti-it)/60"sec"
+  770 print"{down}bitte Taste druecken"
+  780 gett$:ift$=""then780
+  790 rem
+  800 rem ****************************
+  810 rem * 1.befehl 'so' mit option *
+  820 rem ****************************
+  830 rem
+  835 print"{clr}Erster Befehl mit option"
+  840 datanull,zwei,vier,sechs,acht,zehn,eins,drei,fuenf,sieben,neun
+  850 data0,2,4,6,8,10,1,3,5,7,9
+  860 clr:dimnr(10),nr$(10)
+  870 rem ** einlesen in feld nr$ **
+  880 fors=0to10
+  890 :readx$:nr$(s)=x$
+  900 nexts
+  910 rem ** einlesen in feld nr  **
+  920 fors=0to10
+  930 :readx:nr(s)=x
+  940 nexts
+  950 rem ** ausgabe feld vor sortierung **
+  960 print"{down}Index nr$ vorher nr * nr$ nachher nr"
+  970 fors=0to10
+  980 :prints;tab(6)nr$(s)tab(16)nr(s)
+  990 nexts
+ 1000 rem ** aufruf des befehl "so" mit option **
+ 1010 so,nr$,0,10,0,nr
+ 1020 rem so   =   befehl
+ 1030 rem nr$  =   feldname 1
+ 1040 rem 0    =   anfangsindex
+ 1050 rem 10   =   endindex
+ 1060 rem 0    =   sortierungsrichutng(absteigend)
+ 1070 rem nr   =   feldname 2
+ 1080 rem
+ 1090 print"{down}Sortieren von nr$ absteigend"
+ 1095 print"{down}nr wird entsprechend mitsortiert"
+ 1097 print"{down}bitte Taste druecken"
+ 1098 gett$:ift$=""then1098
+ 1100 rem ** ausgabe feld nach sortierung **
+ 1110 print"{home}{down}{down}{down}";
+ 1120 fors=0to10
+ 1130 :printtab(22)nr$(s)tab(33)nr(s)
+ 1140 nexts
+ 1150 print"{down}{down}{down}{down}{down}{down}"
+
