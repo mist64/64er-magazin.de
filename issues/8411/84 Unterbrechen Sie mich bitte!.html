@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>XXX</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="XXX">
+    <meta name="64er.issue" content="11/84">
+    <meta name="64er.pages" content="999">
+    <meta name="64er.id" content="XXX">
+</head>
+
+<body>
+    <article>
+
+        <h1>Unterbrechen Sie mich bitte!</h1>
+
+        <p class="intro">Im Gegensatz zum Bereich zwischenmenschlicher Beziehungen, wo jemanden zu unterbrechen als plumpe Unhöflichkeit eingestuft wird, ist dies einem Computer gegenüber nicht nur ein beliebtes, sondern sogar erwünschtes Verfahren effektvoller Programmgestaltung. Für die meisten Anwender aber sind solche, »Interrupt« genannte, Methoden — leider — mehr oder weniger »Böhmische Dörfer«.</p>
+
+        <p>Anhand der vielseitigen Hardware des Commodore 64 wollen wir nun einmal den Schleier des Geheimnisses ein wenig lüften, Ihnen mit einem Demonstrationsprogramm einige Anwendungsbeispiele zeigen und Sie auf Ihrem Bildschirm kein blaues, aber ein buntes Wunder erleben lassen.</p>
+
+        <p>Wenn Sie Ihren C 64 einschalten, und der Cursor blinkt, dann haben Sie bereits einen Interrupt erzeugt. Es handelt sich dabei um eine gezielte Programmunterbrechung, die auf ein bestimmtes Ereignis fixiert ist, so zum Beispiel den Inhalt einer Speicherstelle. Tritt der erwünschte Zustand ein, so räumt die Hardware diesem Vorgang Priorität vor allen anderen Aufgaben ein. Gleich was der Computer im Augenblick macht, er wird unverzüglich seine Tätigkeit einstellen und ein spezielles Unterprogramm abarbeiten, das ihm zuvor als Interruptroutine deklariert wurde. Im Betriebssystem-ROM befindet sie sich von Adresse $EA31 (dezimal 59953) bis $ECB8 (60600). Hier wird etwa 60mal in jeder Sekunde geprüft, ob eine — und falls ja, welche — Taste gedrückt wurde; hier wird das Blinken des Cursors erzeugt und der Motor der Datasette ein- oder ausgeschaltet. Wenn der Interrupt beendet ist, setzt der Computer die Bearbeitung des laufenden Programms exakt an der Stelle fort, an der er sich vor Eintritt des Interrupts gerade befand. Gewöhnlich merkt man von solchen Intermezzi nichts, weil der Prozessor eine ungeheure Geschwindigkeit entwickelt, deren Arbeitstakte sich bereits im Bereich von Mikrosekunden (millionstel Sekunden) bewegen.</p>
+
+        <p>Noch eine andere Einrichtung der von Ihnen benutzten Geräte ist mit extremer Schnelligkeit ausgestattet: Der Elektronenstrahl, der vor Ihren Augen 25mal in jeder Sekunde ein neues Bild auf die Mattscheibe zeichnet. Nach diesen grundsätzlichen Überlegungen wollen wir aus solchen Voraussetzungen einen Wettstreit der Systeme entwickeln und den Computer gegen den flotten Strahl antreten lassen. Unglaublich, werden Sie jetzt wahrscheinlich sagen, aber warten Sie ab! Möglich ist das nämlich, weil der für die Bildorganisation zuständige Video-Interface-Controller (VIC) stets genau darüber »im Bild« ist, welche Rasterzeile des Monitorbildes augenblicklich geschrieben wird. Das ist die Bedingung dafür, daß auf dem Schirm auch ein Bild im geordneten Zusammenhang wiedergegeben wird. Der VIC, dessen Register unter den Adressen 53248 ($D000) bis 53294 ($D02E) erreichbar sind, führtin der Speicherzelle 53266 ($D012) Buch über die jeweilige Zeilennummer. Darüber war schon einmal zu lesen, daß es unsinnig wäre, dort etwas hineinzuschreiben, weil man den Elektronenstrahl der Bildröhre gar nicht steuern könne. Und das ist nur zum Teil richtig, denn steuern können wir den Strahl nicht, wohl aber können wir ihn steuern lassen.</p>
+
+        <p>Dafür ist besagtes Register — wie übrigens viele andere auch — mit einer Doppelfunktion ausgerüstet. Abhängig von der jeweiligen Zugriffsart, Lesen oder Schreiben (PEEK oder POKE), erreicht man unter derselben Hausnummer verschiedene Adressaten. Wird das Register gelesen, so erfährt man die gerade bearbeitete Rasterzeile, wird es beschrieben, bleibt der übermittelte Wert gespeichert und dient dem internen Vergleich, ob er mit der aktuellen Zeile identisch ist. Wenn dieser Fall eintritt, so reagiert die Hardware selbständig darauf und erzeugt einen Interrupt — falls ein solcher vorgesehen war. Zuvor muß dem Computer nämlich noch mitgeteilt werden, daß dies ein Interruptauslöser sein soll. Die Anmeldestelle ist die Adresse 53274 ($D01A), das Interrupt-Masken-Register.</p>
+
+        <p>Diese Speicherstelle korrespondiert ständig mit ihrem Nachbarn 53273 ($D019), dem Interrupt-Request-Register. Ist die vorgewählte Rasterzeile erreicht, signalisiert 53266 dieses Ereignis durch Kippen des Bits 0 im Request-Register: Es nimmt den Wert 1 an. Ist Bit 0 auch in der Maske gesetzt, wird der Interrupt-Pin des VIC aktiv und löst die Unterbrechung aus. Im Demo-Programm schreiben wir zu diesem Zweck eine 1 in die Maske, und fortan gilt für uns die Gesetzmäßigkeit, daß Bildhintergrund und -rand unifarben dargestellt werden, nicht mehr. Wir ändern nämlich ab einer beliebigen Rasterzeile die Bildfarben, um sie einige Zeilen weiter abermals umzuschalten. Da das schneller vor sich geht, als das träge menschliche Auge es registrieren kann, resultiert daraus kein wirres Flackern, sondern ein konstantes mehrfarbiges Bild, das im Extremfall (siehe Beispiel »Regenbogen«) sogar alle 16 möglichen Farben des Randes und Hintergrunds gleichzeitig wiederzugeben in der Lage ist.</p>
+
+        <p>Noch aber funktioniert der neue Interrupt nicht, denn der C 64 weiß noch nichts von unserem Programmsegment, mit dem wir den Farbwechsel vornehmen wollen. Dazu müssen wir ihm die Adresse der Routine im Interrupt-Vektor ab Speicherstelle 788 ($0314) hinterlegen: Lowbyte in 788, Highbyte in 789. Aber auch jetzt wird das Ergebnis immer noch nicht unseren Erwartungen entsprechen, da uns laufend der immer noch aktivierte Systeminterrupt in die Quere kommt und nach der Vektorenänderung ebenfalls in der neuen Routine unkontrolliert arbeitet. Dieser Interrupt stammt aus einer ganz anderen Quelle, vom Complex-Interface-Adapter (CIA), auf den wir gleich noch zu sprechen kommen. Softwaremäßig können wir ihn durch Setzen der Interruptflagge (SEI) nicht unterbinden, weil damit auch der ebenfalls maskierbare Rasterzeilen-Interrupt abgeschaltet würde. Zwei Möglichkeiten gibt es, das Problem zu lösen: Der CIA-Interrupt wird belassen, muß dann aber zu Beginn der Interrupt-Routine abgefragt (zum Beispiel durch Prüfen des Bits 0 im Request-Register 53273) und gegebenenfalls durch eine Umleitung über Sprungbefehle unschädlich gemacht werden, oder er wird eliminiert durch Schreiben des Wertes 127 in die Speicherstelle 56333 ($DCOD). Weil wir in unserem Demo-Programm weder Cursor-Blinken noch die Tastaturabfrage benötigen, entscheiden wir uns für letztere und löschen gleich zu Programmbeginn (siehe Assembler-Listing) den CIA-Interrupt völlig.</p>
+
+        <p>Außerdem ist zu berücksichtigen, daß der Elektronenstrahl auf allen Seiten ein Stück über den Rand des auf dem Monitor sichtbaren Bildes hinausschreibt. Dadurch entstehen Zeilennummern bis 280, so daß von Register 53266 aus bei einem Überlauf ein Highbyte nach Bit 7 des Registers 53265 übertragen werden muß. In dieser als »SCREEN« definierten Speicherstelle liegen allerdings auch einige andere Funktionen, die gegebenenfalls durch eine logische OR-Verknüpfung berücksichtigt werden müssen. Das Demo-Programm verwendet diese Funktionen indem durch Löschen des Bits 4 der Bildschirm ausgeblendet wird, so daß auf dem Schirm nur noch ein ganzflächiger Rand erscheint, obwohl auch weiterhin Texte auf den jetzt unsichtbaren Hintergrund ausgegeben werden können. Beispiel: POKE 53265, PEEK (53265) AND 255-16 läßt den Hintergrund verschwinden, POKE 53265, PEEK(53265) OR 16 zaubert ihn dann wieder herbei.</p>
+
+        <p>Der Rasterzeilen-Interrupt ist eine Spezialität des C 64, die ihn zu einem äußerst vielseitigen Gerät macht. Die Programmier-Profis der Videospiel-Produzenten benutzen ihn nicht allein dafür, oben blauen Himmel und unten braune Erde darzustellen, sondern auch, um ein nur partielles Scrolling zu erzielen, um Text und hochauflösende Grafik zu mischen, um gleichzeitig normale und Multicolorzeichen zu benutzen und und und&hellip; Aber damit erschöpfen sich die Interruptmöglichkeiten des Commodore 64 noch nicht. Bit 1 (Wert = 2) der Maske in 53274 erzeugt einen Interrupt, wenn ein Sprite Berührung mit einem Zeichen hat, Bit 2 (Wert = 4) wenn Sprite mit Sprite zusammenstößt, Bit 3 (Wert = 8) wenn ein Impuls vom Lightpen kommt, oder der Feuerknopf eines am Controlport 1 angeschlossenen Joysticks gedrückt wird und schließlich Bit 7 (Wert = 128), wenn eines der genannten Ereignisse eingetreten ist</p>
+
+        <p>Und dann ist da noch der bereits genannte CIA-Interrupt, der von einem gleich doppelt vorhandenen Baustein stammt. Beiden sind jedoch im C 64 teilweise unterschiedliche Aufgaben zugewiesen. CIA 1 hat die Basisadresse 56320 ($DC00), CIA 2 eine solche von 56576 ($DD00). Hier erfolgt beispielsweise die Tastaturdekodierung, die Abfrage von Joysticks, Paddles und Lightpen, die serielle Datenübertragung zu einer Schnittstelle, hier befinden sich die Echtzeituhren und die Timer. Wenden wir uns letzteren in CIA 1 zu.</p>
+
+        <p>Der Timer ist ein 16-Bit-Zählregister, das nach dem Starten ohne weiteres Zutun mit einer konstanten Geschwindigkeit dekrementiert, das heißt jeweils um 1 abwärts gezählt wird. Durch die zuvor beim VIC schon erwähnte Doppelfunktion besteht die Möglichkeit, den Timer ab einem bestimmten Wert zählen zu lassen: Lesen der Adresse 56324 ($DC04) liefert den aktuellen Stand des Lowbytes, Hineinschreiben den Startwert des Timers, ebenso beim Highbyte unter der Adresse 56325. Auf diese Weise wird der Systeminterrupt erzeugt, da der Computer in der Initialisierungsphase den Timer mit dem Wert 16421 ( = 37 low und 64 high) lädt. Wenn derTimerüber Null hinauszählt und damit einen sogenannten Unterlauf erzeugt, wird das durch Setzen des Bits 0 im lnterrupt-Control-Register 56333 ($DC0D) signalisiert. Auch dieses arbeitet wieder doppelt: Lesen ergibt die Interruptanforderung, ein Schreibzugriff erzeugt die Maske, die darüber entscheidet, welches Ereignis Interruptauslöser sein soll. Besondere Beachtung beim Beschreiben des Registers verdient Bit 7, das darüber bestimmt, ob die nachfolgend gesetzten Bits 6 bis 0 in der Maske gesetzt oder gelöscht werden. Alle übrigen bleiben unangetastet. Deshalb löscht 127 (Bit 7 nicht gesetzt!) im Demo-Programm sämtliche Maskenbits (siehe Bitmuster im Assembler-Listing, Zeile 1010), deshalb setzt 129 (Bitmuster 10000001) das Bit 0 der Maske und schaltet damit auf Interrupt durch den Timer. Erzeugen Sie doch einmal im Direktmodus auf dem Bildschirm ein längeres Zählintervall durch Heraufsetzen des Timer-Highbytes: POKE 56325, 255 läßt den Cursor sehr träge werden, POKE 56325, 5 versetzt ihn in nervöses Flattern.</p>
+
+        <p>Dieser Timer besitzt einen Zwillingsbruder mit den Adressen 56326 und 56327, der nicht nur gleichartig konstruiert ist und ebenfalls eigenständig einen Interrupt auf Bit 1 des Control-Registers erzeugen kann, sondern sich auch mit dem Timer A koppeln läßt. Beide Timer können nämlich auf verschiedene Taktquellen gelegt, unterschiedlich getriggert werden. Im Demo-Programm nutzen wir das aus, indem wir Timer A Systemtakte zählen lassen (Bit 5 des Registers 56334 gelöscht — Standardeinstellung), Timer B hingegen nur die Unterläufe von Timer A durch Setzen des Bits 6 im Register 56335. Dadurch erhalten wir einen 32-Bit-Zähler, der beliebige Zeitverzögerungen ermöglicht, eleganter als mit jeder ausschließlich softwaremäßig realisierten Warteschleife, weil die Timer von keinem Interrupt unterbrochen werden.</p>
+
+        <p>In der Warteschleife des Demo-Programms (Listing ab Zeile 9010), die als Subroutine angelegt ist, wird mit den Timern kein Interrupt erzeugt, sondern lediglich eine Zeitverzögerung erzielt. Dazu wird zunächst Timer B mit den vom Hauptprogramm im Akku und im Y-Register übergebenen Werten geladen, während Timer A konstant mit einem mittleren Wert arbeitet. Dann werden beide gestartet durch Setzen des Bits 0 im Register 56334 für Timer A und 56335 für Timer B. Aus Zeile 9030 des Listings ist ersichtlich, daß Bit 3 für Timer A gelöscht ist, was Continuous- oder Dauerbetrieb zur Folge hat. Jedesmal, wenn der Timer einen Unterlauf hat, lädt er umgehend wieder den zwischengespeicherten Startwert und beginnt erneut zu zählen. Den anderen schalten wir hingegen auf One-Shot (Zeile 9050), einen »Einzelschuß«. Bei einem Unterlauf lädt er zwar wieder den Startwert, bleibt aber stehen, wodurch sein Start/Stoppbit automatisch gelöscht wird. Wir prüfen dies, indem wir Bit 0 logisch nach rechts ins Carry verschieben, wo es bequem mit einem Branchbefehl untersucht werden kann. Erst der One-Shot-Betrieb des Timers B stellt sicher, daß ein Unterlauf auch erkannt wird, weil er im Dauerbetrieb vorübergehen könnte, während sich der Prozessor im Interrupt befindet. Außerdem verlangt ein gesetztes Bit 4 in der Warteschleife für beide Timer Force-Load, einen unbedingten Ladevorgang. Unabhängig davon, ob der Timer gerade läuft oder nicht, wird der Startwert geladen. Mit einem gelöschten Bit 4 kommt ein neuer Startwert erst dann zum Tragen, wenn er nach dem nächsten Unterlauf geladen wird.</p>
+
+        <p>Neben den Unterläufen der beiden Timer kann das Control-Register 56333 auf Bit 2 auch einen Interrupt erzeugen bei Übereinstimmung der Echtzeituhr 56328 bis 56331 mit einer vorgewählten Alarmzeit, auf Bit 3 durch ein volles oder leeres Schieberegister (56332) und auf Bit 4 durch den Impuls einer externen Signalquelle. Ein gesetztes Bit 7 zeigt hier an, daß mindestens eines der gesetzten Bits auch in der Maske gewählt ist, also ein Interrupt stattfindet. Das Interrupt-Flag wird aber bereits durch Lesen des Registers gelöscht.</p>
+
+        <p>Diese Kurzabhandlung vermag nur ansatzweise darzustellen, wie flexibel das Instrumentarium ist, das hier dem Anwender zur Verfügung steht. Speziell die zahlreichen Interruptmöglichkeiten verlangen geradezu nach Anwendung, wobei wir abschließend auf eine bisher nicht erwähnte noch zu sprechen kommen müssen. Denn das Demo-Programm läuft in einer Endlosschleife, die nicht ohne weiteres abgebrochen werden kann. Außerdem wird ja durch den lahmgelegten Systeminterrupt ohnehin kein Tastendruck mehr erkannt. Den Ausweg aus diesem Dilemma, haben die Konstrukteure geschaffen, als sie den sogenannten NMI erfanden. Das ist die Abkürzung für nicht maskierbarer Interrupt, eine hardwareseitige Unterbrechungsmöglichkeit mit so hoher Priorität, daß selbst ein gesetztes Interruptflag keine Rolle spielt. Wir können den NMI auslösen, indem wir die STOP-Taste gedrückt halten und gleichzeitig auf die RESTORE-Taste klopfen. Und schon ist alles wieder normal: Bild und Interrupt. Sie können zwar gleich wieder mitSYS49152 ins Demo-Programm starten, doch vielleicht lassen Sie sich selbst einmal etwas einfallen. Nur zu — unterbrechen Sie doch Ihren Commodore 64 bitte mal &hellip;</p>
+
+        <address class="author">(Helmut Welke/aa)</address>
+
+        <figure>
+            <table>
+                <tbody>
+                    <tr>
+                        <td>CHRCOL</td>
+                        <td>0286</td>
+                        <td>CLEAR</td>
+                        <td>E544</td>
+                    </tr>
+                    <tr>
+                        <td>COLOR</td>
+                        <td>C198</td>
+                        <td>CRA</td>
+                        <td>DC0E</td>
+                    </tr>
+                    <tr>
+                        <td>CRB</td>
+                        <td>DC0F</td>
+                        <td>EXIT</td>
+                        <td>C147</td>
+                    </tr>
+                    <tr>
+                        <td>FLAG</td>
+                        <td>00FB</td>
+                        <td>GETPAR</td>
+                        <td>C17D</td>
+                    </tr>
+                    <tr>
+                        <td>GOLD</td>
+                        <td>C141</td>
+                        <td>GRUND</td>
+                        <td>D021</td>
+                    </tr>
+                    <tr>
+                        <td>HIGH</td>
+                        <td>C1B8</td>
+                        <td>ICR</td>
+                        <td>DC0D</td>
+                    </tr>
+                    <tr>
+                        <td>INIT</td>
+                        <td>C000</td>
+                        <td>INTRO</td>
+                        <td>C1C8</td>
+                    </tr>
+                    <tr>
+                        <td>IREQU</td>
+                        <td>D019</td>
+                        <td>IRMASK</td>
+                        <td>D01A</td>
+                    </tr>
+                    <tr>
+                        <td>IRQ1</td>
+                        <td>C12C</td>
+                        <td>IRQ2</td>
+                        <td>C158</td>
+                    </tr>
+                    <tr>
+                        <td>IRQ3</td>
+                        <td>C173</td>
+                        <td>IRQOFF</td>
+                        <td>EA81</td>
+                    </tr>
+                    <tr>
+                        <td>LINE</td>
+                        <td>00FD</td>
+                        <td>LOOP1</td>
+                        <td>C03E</td>
+                    </tr>
+                    <tr>
+                        <td>LOOP2</td>
+                        <td>C04C</td>
+                        <td>LOOP3</td>
+                        <td>C0B7</td>
+                    </tr>
+                    <tr>
+                        <td>LOOP4</td>
+                        <td>C0F9</td>
+                        <td>LOW</td>
+                        <td>C1A8</td>
+                    </tr>
+                    <tr>
+                        <td>NAME</td>
+                        <td>C1DD</td>
+                        <td>OBEN</td>
+                        <td>C168</td>
+                    </tr>
+                    <tr>
+                        <td>PLOT</td>
+                        <td>FFF0</td>
+                        <td>PRINT</td>
+                        <td>AB1E</td>
+                    </tr>
+                    <tr>
+                        <td>RAND</td>
+                        <td>D020</td>
+                        <td>RASTER</td>
+                        <td>D012</td>
+                    </tr>
+                    <tr>
+                        <td>ROT</td>
+                        <td>C139</td>
+                        <td>SCREEN</td>
+                        <td>D011</td>
+                    </tr>
+                    <tr>
+                        <td>TEXT</td>
+                        <td>C1FE</td>
+                        <td>TIME</td>
+                        <td>C115</td>
+                    </tr>
+                    <tr>
+                        <td>TIMERA</td>
+                        <td>DC04</td>
+                        <td>TIMERB</td>
+                        <td>DC06</td>
+                    </tr>
+                    <tr>
+                        <td>VECTOR</td>
+                        <td>0314</td>
+                        <td>WAIT</td>
+                        <td>C125</td>
+                    </tr>
+                </tbody>
+            </table>
+            <figcaption>Die Symboltabelle für das Maschinensprache-Programm »Rasterzeilen-Interrupt«</figcaption>
+        </figure>
+
+        <figure>
+            <pre data-filename="interrupt.data" data-name="Rasterzeilen-Interrupt (Basic-Lader)"></pre>
+            <figcaption>Basic-Lader von »Rasterzeilen-Interrupt«</figcaption>
+        </figure>
+
+        <div class="binary_download" data-filename="interrupt.masch..prg" data-name="Rasterzeilen-Interrupt"></div>
+
+        <figure>
+            TODO
+            <figcaption>Assemblerlisting des »Rasterzeilen-Interrupt«</figcaption>
+        </figure>
+
+    </article>
+
+</body>
+
+</html>

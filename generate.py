@@ -13,6 +13,9 @@ import http.server
 import socketserver
 import hashlib
 import urllib.parse
+import pytz
+import argparse
+from dataclasses import dataclass, field
 from collections import defaultdict, OrderedDict
 from bs4 import BeautifulSoup, NavigableString
 from urllib.parse import quote
@@ -21,47 +24,116 @@ from dateutil.relativedelta import relativedelta
 from PyPDF2 import PdfReader, PdfWriter
 
 #
+# Parse arguments
+#
+
+### CONFIG Class
+
+@dataclass
+class BuildConfig():
+    source_dir: str = "issues" # where to look for files
+    build_dir: str = "out" # where to put the output
+    cache_dir: str = "cache"
+
+    server: str = "www.64er-magazin.de" # where to put the files so others can see
+
+    base_dir: str = "" # base directory: updated from command line arguments and branch name
+
+    # cli arguments
+    deploy: bool = False # set via cli argument "upload": upload to server
+    build_future: bool = False # set via cli flag "--future": helper for disabling unfinished categories
+    start_local_server: bool = True # set via cli flag "--join": helper for not starting a local server every time
+    lang: str = "de" # set via cli flag "--lang": change language between english and german
+
+    # git status
+    git_has_changes: bool = True # set in setup
+    git_branch_name: str = "main" # set in setup
+
+
+def parse_cli_into_config():
+
+    # supported command line arguments
+    parser = argparse.ArgumentParser(description=f"Generate the magazine")
+    parser.add_argument("deploy_mode", choices=["upload", "local"], nargs='?', default="local", help="the deploy mode (default: %(default)s)")
+    parser.add_argument("--future", action='store_true', help="also build issues with release dates in the future")
+    parser.add_argument("--lang", choices=['de', 'en'], nargs='?', const='de', default='de', help="[WIP] build a different language version (default: %(default)s)")
+    parser.add_argument("--join", action='store_true', help="open page locally without starting a server ")
+
+    # parsing command line arguments
+    args = parser.parse_args()
+
+    config = BuildConfig()
+    config.deploy = args.deploy_mode == "upload"
+    config.build_future = args.future
+    config.lang = args.lang
+    config.start_local_server = not args.join
+
+    # get git status
+    f = os.popen(f'git ls-files -m | wc -l')
+    if int(f.read()) <= 0:
+      config.git_has_changes = False
+
+    git_branch_name = subprocess.check_output(["git", "rev-parse", "--abbrev-ref", "HEAD"]).decode("utf-8").strip()
+    config.git_branch_name = git_branch_name
+
+
+    ##
+    ## SETUP
+    ##
+    print("*** Setup")
+
+    is_on_main = git_branch_name == 'main'
+
+    # adjust base dir for the current build destination and branches
+    if is_on_main:
+        if not config.build_future:
+            config.base_dir = ''
+        else:
+            config.base_dir = 'test/'
+    else:
+        config.base_dir = 'test/' + config.git_branch_name + '/'
+
+    if config.lang != 'de':
+        config.base_dir += '/' + config.lang
+
+    print(f"  > branch '{config.git_branch_name}' -> '{config.base_dir}'")
+
+    # if the current build should be uploaded: do some sanity checking
+    if config.deploy:
+
+      if config.git_has_changes:
+        print("Generating and upload failed:")
+        print("There are uncommited changes in the working copy.")
+        exit()
+
+      if is_on_main and not config.build_future:
+          response = input("Deploy to production? [Y/N]: ").strip()
+          if response.lower() != 'y':
+              print("Exiting.")
+              exit()
+
+    return config
+
+
+CONFIG = parse_cli_into_config()
+print(CONFIG)
+
+
+#
 # Settings
 #
-LANG='de'
-OUT_DIRECTORY = 'out'
-CACHE_DIRECTORY = 'cache'
-SERVER = 'www.64er-magazin.de'
+
+OUT_DIRECTORY = CONFIG.build_dir
+CACHE_DIRECTORY = CONFIG.cache_dir
+SERVER = CONFIG.server
+
+BASE_DIR = CONFIG.base_dir
+LANG = CONFIG.lang
+
 NEW_DOWNLOADS = 15
 HOURS_PER_ARTICLE = 16
 
-EXTRACT_PDF_PAGES = True # disable if there is no PDF yet
-
-#
-# Parse arguments
-#
-DEPLOY=None
-if len(sys.argv) > 1:
-    if sys.argv[1] == "local":
-        DEPLOY = "local"
-    elif sys.argv[1] == "upload":
-        DEPLOY = "upload"
-    else:
-        print("Unknown command.")
-        exit()
-
-#
-# if we're on "main", we will deploy to production, otherwise into a subdirectory
-#
-branch_name = subprocess.check_output(["git", "rev-parse", "--abbrev-ref", "HEAD"]).decode("utf-8").strip()
-RELEASE = branch_name == "main"
-if RELEASE:
-    BASE_DIR = ''
-else:
-    BASE_DIR = 'test/' + branch_name + '/'
-if LANG != "de":
-    BASE_DIR += '/' + LANG
-
-if RELEASE and DEPLOY == "upload":
-    response = input("Deploy to production? [Y/N]: ").strip()
-    if response.lower() != 'y':
-        print("Exiting.")
-        exit()
+EXTRACT_PDF_PAGES = False # disable if there is no PDF yet
 
 RSS_BASE_URL = "https://www.64er-magazin.de/"
 MASTODON_HASHTAGS = "#c64 #retrocomputing #64er"
@@ -426,6 +498,15 @@ class Issue:
           # no system exit as this also triggers for empty folders (eg. after branch change)
           raise Exception(f"- [{issue_directory_path}] does not contain expected data")
 
+      elif not CONFIG.build_future:
+        # Define the current datetime with UTC timezone for comparison
+          current_datetime = datetime.now(pytz.utc)
+
+          # Remove the item if its publication date is in the future
+          if pubdate > current_datetime:
+              # no system exit
+              raise Exception(f"- [{issue_directory_path}] is from the future")
+
       # XXX used directly after init and then never again
       self.articles = articles
       self.issue_key = issue_key
@@ -589,7 +670,7 @@ class ArticleDatabase:
     def __init__(self, in_directory):
         self.issues = {}  # Change to dictionary
         self.articles = []
-        for issue_dir_name in os.listdir(in_directory):
+        for issue_dir_name in sorted(os.listdir(in_directory)):
             issue_dir_path = os.path.join(in_directory, issue_dir_name)
             if os.path.isdir(issue_dir_path) and re.match(r'^\d{4}$', issue_dir_name):
 
@@ -1004,18 +1085,18 @@ def write_full_html_file(db, path, title, preview_img, body_html, body_class, co
 
     mastodon_link = share_on_mastodon_link(title, url)
 
-    if DEPLOY == "local" or DEPLOY == None:
+    if CONFIG.deploy:
+      fav_icon_html = f"""
+        <link rel="icon" href="/{BASE_DIR}favicon.ico" sizes="32x32">
+        <link rel="icon" href="/{BASE_DIR}fav/icon.svg" type="image/svg+xml">
+        <link rel="apple-touch-icon" href="/{BASE_DIR}fav/apple-touch-icon.png">
+        """
+    else:
       fav_icon_html = f"""
         <link rel="icon" href="/{BASE_DIR}favicon-dev.ico" sizes="32x32">
         <link rel="icon" href="/{BASE_DIR}fav/icon-dev.svg" type="image/svg+xml">
         <link rel="apple-touch-icon" href="/{BASE_DIR}fav/apple-touch-icon-dev.png">
-      """
-    else:
-      fav_icon_html = f"""
-          <link rel="icon" href="/{BASE_DIR}favicon.ico" sizes="32x32">
-          <link rel="icon" href="/{BASE_DIR}fav/icon.svg" type="image/svg+xml">
-          <link rel="apple-touch-icon" href="/{BASE_DIR}fav/apple-touch-icon.png">
-      """
+        """
 
     full_html = f"""
 <!DOCTYPE html>
@@ -1383,14 +1464,14 @@ def copy_articles_and_assets(db, in_directory, out_directory):
     if not os.path.exists(fav_path_out):
         os.makedirs(fav_path_out)
 
-    if DEPLOY == "local" or DEPLOY == None:
-        shutil.copy(os.path.join(in_directory, 'favicon-dev.ico'), out_directory)
-        shutil.copy(os.path.join(fav_path, 'apple-touch-icon-dev.png'), fav_path_out)
-        shutil.copy(os.path.join(fav_path, 'icon-dev.svg'), fav_path_out)
-    else:
+    if CONFIG.deploy:
         shutil.copy(os.path.join(in_directory, 'favicon.ico'), out_directory)
         shutil.copy(os.path.join(fav_path, 'apple-touch-icon.png'), fav_path_out)
         shutil.copy(os.path.join(fav_path, 'icon.svg'), fav_path_out)
+    else:
+        shutil.copy(os.path.join(in_directory, 'favicon-dev.ico'), out_directory)
+        shutil.copy(os.path.join(fav_path, 'apple-touch-icon-dev.png'), fav_path_out)
+        shutil.copy(os.path.join(fav_path, 'icon-dev.svg'), fav_path_out)
 
     shutil.copy('filter_rss.py', out_directory)
     shutil.copy('filter_index.py', out_directory)
@@ -1590,7 +1671,7 @@ if __name__ == '__main__':
     subprocess.run(['./filter_rss.py'], cwd=dir)
     subprocess.run(['./filter_index.py'], cwd=dir)
 
-    if DEPLOY == "upload":
+    if CONFIG.deploy:
         print("*** Uploading")
         command = f"rsync -Pa {OUT_DIRECTORY}/* local@{SERVER}:/var/www/html/"
         print("    " + command)
@@ -1598,7 +1679,8 @@ if __name__ == '__main__':
         url = f"https://{SERVER}/{BASE_DIR}"
         print(url)
         subprocess.run(f"open {url}", check=True, text=True, shell=True)
-    elif DEPLOY == "local":
+
+    elif CONFIG.start_local_server:
         PORT = 8000
         class Handler(http.server.SimpleHTTPRequestHandler):
             def __init__(self, *args, **kwargs):
@@ -1608,4 +1690,10 @@ if __name__ == '__main__':
             print(url)
             subprocess.run(f"open {url}", check=True, text=True, shell=True)
             httpd.serve_forever()
+    else:
+      port = 8000
+      url = f"http://localhost:{port}/{CONFIG.base_dir}"
+      print(url)
+      subprocess.run(f"open {url}", check=True, text=True, shell=True)
+
 

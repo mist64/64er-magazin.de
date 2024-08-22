@@ -1,0 +1,44 @@
+;data erzeuger.prg ==1201==
+;Quelle: 8411.D64
+    1 rem *************************
+    2 rem ****  data-erzeuger  ****
+    3 rem ****                 ****
+    4 rem ****   by c. sauer   ****
+    5 rem ****    muenchen     ****
+    6 rem *************************
+   10 input"{clr}{down}{down}startadresse ";sa
+   20 input"{down}endadresse   ";ea
+   30 a=sa:gosub250:poke248,a1:poke249,a2
+   40 a=ea:gosub250:poke250,a1:poke251,a2
+   50 poke252,44:poke253,1
+   55 rem *** startzeilennummer = 300
+   60 def fnz(x)=peek(x)+peek(x+1)*256
+   65 rem *** doppelpeek funktion
+   70 ad=fnz(252)
+   75 rem *** ad = aktuelle zeilennummer
+   80 print"{clr}"ad"dA ";
+   90 fort=0to7
+   95 rem *** data zeile mit 8 elementen
+   96 rem ***         erzeugen
+  100 b=peek(fnz(248)+t)
+  110 b$=str$(b):l=len(b$)
+  120 b$=right$(b$,l-1)
+  130 ifl=4then150
+  140 fory=l+1to4:b$="0"+b$:next
+  145 rem *** jedes element ist 3 stellig
+  150 b$=","+b$
+  160 ift=0thenb$=right$(b$,3)
+  170 printb$;:iffnz(248)+t>=fnz(250)         then230
+  175 rem *** lfd. adresse > end adresse ?
+  180 next
+  190 a=ad+10:gosub250:poke252,a1:            poke253,a2
+  200 a=fnz(248)+8:gosub250:poke248,a1:       poke249,a2
+  210 print:print"{down}run 60"
+  213 rem *** tastaturpuffer mit <home>,
+  215 rem *** <return>, <crsr down> und
+  217 rem ***    <reutrn> fuellen
+  220 poke631,19:poke632,13:poke633,17:       poke634,13:poke198,4
+  230 end
+  250 a2=int(a/256):a1=a-a2*256
+  260 return
+

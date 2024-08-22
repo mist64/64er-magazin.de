@@ -1,0 +1,31 @@
+;floppyk.listing2.prg ==0801==
+;Quelle: 8411.D64
+ 1000 rem unterprogramm 1
+ 1001 rem lesen eines eintrages aus dem
+ 1002 rem directory (alle 30 bytes !!!)
+ 1003 rem in die variable dd$
+ 1004 rem uebergabeparameter:
+ 1005 rem mm=nummer des eintrages der
+ 1006 rem    gelesen werden soll
+ 1007 :
+ 1008 :
+ 1009 :
+ 1010 open 15,8,15,"i":open8,8,8,"#"
+ 1020 nn$="":fori=1to30:nn$=nn$+chr$(0):nexti
+ 1030 xx=int((mm-1)/8)
+ 1040 print#15,"u1 8 0 18 0"
+ 1050 forzz=1toxx+1
+ 1060 print#15,"b-p 8 0"
+ 1070 get#8,tt$:tt=asc(tt$+chr$(0))
+ 1080 get#8,ss$:ss=asc(ss$+chr$(0))
+ 1090 if tt=0 then dd$=nn$:goto1170
+ 1100 print#15,"u1 8 0";tt;ss
+ 1110 nextzz
+ 1120 pp=mm-(xx*8):pp=(pp-1)*32+2
+ 1130 print#15,"b-p 8";pp
+ 1140 forzz=1 to 30:get#8,zz$
+ 1150 ifzz$=""thenzz$=chr$(0)
+ 1160 dd$=dd$+zz$:nextzz
+ 1170 close 8:close 15
+ 1180 return
+

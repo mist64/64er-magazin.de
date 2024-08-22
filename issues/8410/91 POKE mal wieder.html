@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>POKE mal wieder</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="M. Kohlen, gk">
+    <meta name="64er.issue" content="10/84">
+    <meta name="64er.pages" content="91-92">
+    <meta name="64er.head1" content="Tips & Tricks">
+    <meta name="64er.head2" content="C 64">
+    <meta name="64er.toc_category" content="Programme zum Abtippen|Tips & Tricks">
+    <meta name="64er.index_title" content="POKE mal wieder: diverse POKEs">
+    <meta name="64er.index_category" content="Listings zum Abtippen|Tips & Tricks|POKEs">
+    <meta name="64er.id" content="poke">
+</head>
+
+<body>
+    <article>
+        <h1>POKE mal wieder</h1>
+
+        <p class="intro">Viele C 64-Benutzer haben sich sicher schon mit dem Basic des C 64 herumgeärgert: Egal, was man machen will, fast alles läuft über PEEK und POKE. Doch gerade diese POKEs helfen manchmal erheblich, wenn es um Probleme geht, die mit einfachen Basic-Befehlen nicht zu lösen sind.</p>
+
+        <p>Hier nun eine Liste von wichtigen PEEKs, POKEs und SYS-Befehlen.</p>
+
+        <table border="1">
+            <tbody>
+                <tr>
+                    <td>1</td>
+                    <td>Inhalt 55 = normal<br>
+                        Inhalt 54 = Basic ausgeschaltet (auf RAM umgestellt)<br>
+                        Inhalt 53 = Basic und Kernal auf RAM umgestellt.<br>
+                        (Es empfiehlt sich dabei, das Basic und das Kernal vorher ins RAM zu POKEn, damit der Computer bei der Umschaltung nicht aussteigt.)</td>
+                </tr>
+                <tr>
+                    <td>17</td>
+                    <td>Mit diesem PEEK läßt sich abfragen, wie die letzte Variable zugewiesen wurde. Ist PEEK(17) = 00, dann war die letzte Variablenzuweisung ein INPUT, oder es hat noch keine Zuweisung stattgefunden.<br>
+                        Ist PEEK(17) = 64, dann wurde die letzte Variable durch GET geholt.<br>
+                        Bei PEEK(17) = 152 erfolgte die letzte Variablenübergabe durch einen READ-Befehl.</td>
+                </tr>
+                <tr>
+                    <td>19</td>
+                    <td>Durch POKE 19,64 wird beim nächsten INPUT-Befehl kein Fragezeichen mehr ausgegeben. Allerdings kann man nachher durch Drücken der RETURN-Taste nicht mehr in die nächste Zeile gelangen. Es empfiehlt sich daher, nach dem INPUT-Befehl diesen Befehl wieder mit POKE 19,0 rückgängig zu machen.</td>
+                </tr>
+                <tr>
+                    <td>43/44</td>
+                    <td>Der Anfang des zur Zeit im Speicher befindlichen Basic-Programms errechnet sich durch PEEK(43) + PEEK(44)*256.</td>
+                </tr>
+                <tr>
+                    <td>45/46</td>
+                    <td>Das Ende des Basic-Programms erhält man durch 7PEEK(45) + PEEK(46)*256.</td>
+                </tr>
+                <tr>
+                    <td>61/62</td>
+                    <td>Zeiger auf Basic-Statement für CONT: Durch PEEK(61)+PEEK(62)*256 erhält man die Speicherstelle, die nach dem zuletzt ausgeführten Basic-Befehl liegt, das heißt die Speicherstelle, von der sich der Basic-Interpreter bei CONT den nächsten Befehl holt.<br>
+                        Tip: Bei CONT kommt öfter CAN’T CONTINUE ERROR vor, wenn man nach dem Stoppen ein CLR eingegeben oder in irgendeiner Programmzeile etwas geändert hat. Liest man die Werte mit PEEK(61) und PEEK(62) nach der Unterbrechung aus, dann macht ein CLR oder ähnliches nichts aus, wenn man vor CONT die zuvor ausgelesenen Werte wieder in die Speicherstellen POKEt.</td>
+                </tr>
+                <tr>
+                    <td>63/64</td>
+                    <td>Nummer der aktuellen DATA-Zeile:<br>
+                        Mit ?PEEK(63) + PEEK(64) * 256 erhält man die Nummer der DATA-Zeile, aus der gerade das letzte Datum geholt wurde. (Gut zum Finden von Fehlern in DATA-Zeilen geeignet.)</td>
+                </tr>
+                <tr>
+                    <td>69/70</td>
+                    <td>Name der zuletzt zugewiesenen Variable: Bei normalen Fließkommavariablen liest man den Wert mit PRINT CHR$(PEEK(69)) + CHR$(PEEK(70)) aus.<br>
+                        Bei Integervariablen (zum Beispiel XY%) erhält man den Namen durch<br>
+                        ?CHR$(PEEK(69)-128)+CHR$(PEEK(70)- 128).<br>
+                        Strings (zum Beispiel VX$) erhält man durch<br>
+                        ?CHR$(PEEK(69)) + CHR$(PEEK)70)-128).</td>
+                </tr>
+                <tr>
+                    <td>120</td>
+                    <td>Nach Ausführung dieses POKEs nimmt der C 64 keinerlei Befehle mehr an:<br>
+                        POKE 120,2</td>
+                </tr>
+                <tr>
+                    <td>147</td>
+                    <td>Wenn man die LOAD-Routine im Betriebssystem anspringt, holt es sich aus der Speicherstelle 147 die Information, ob LOAD oder VERIFY durchgeführt wird.<br>
+                        Inhalt 0 = LOAD<br>
+                        Inhalt 4 = VERIFY</td>
+                </tr>
+                <tr>
+                    <td>157</td>
+                    <td>Ausgabe-Kontrolle:<br>
+                        Inhalt 000 = Programm-Modus<br>
+                        Inhalt 128 = Direktmodus<br>
+                        Damit bei LOAD-Befehlen vom Programm aus die Mitteilungen SEARCHING, LOADING oder VERIFYING auf dem Bildschirm erscheinen, setzt man vor dem LOAD-VERIFY- oder SAVE- Befehl ein POKE157,128.</td>
+                </tr>
+                <tr>
+                    <td>197</td>
+                    <td>Derzeitiger Tastendruck: PEEK(197)</td>
+                </tr>
+                <tr>
+                    <td>200</td>
+                    <td>Zeiger auf Zeilenende. PEEK(200) gibt an, wieviel Zeichen die zuletzt eingegebene Zeile hatte.</td>
+                </tr>
+                <tr>
+                    <td>204</td>
+                    <td>Nach POKE 204,0 bleibt der Cursor an, auch bei GET-Befehlen. Mit POKE 207,0:POKE 204,1 kommt man dann wieder auf den Normalzustand zurück.</td>
+                </tr>
+                <tr>
+                    <td>641-644</td>
+                    <td>Start- und Endadresse des Basic-RAMs: Durch Ändern dieser Werte kann man die Größe des Basic-RAMs verändern, zum Beispiel:<br>
+                        POKE 643,0 : POKE 644,128 : SYS 64764 setzt das Ende des Basic-RAMs um 8 KByte nach unten. Anderes Beispiel: POKE 641,0 : POKE 642,16 : SYS 64764 setzt das Basic-RAM um 2 KByte nach oben.</td>
+                </tr>
+                <tr>
+                    <td>646</td>
+                    <td>POKE 646,Farbwert setzt die Cursorfarbe.</td>
+                </tr>
+                <tr>
+                    <td>653</td>
+                    <td>PEEK für Shift-, Commodore- und für CTRL-Taste:<br>
+                        Bit 0 = Shift-Taste, Bit 1 = Commodore-Taste und Bit 2 = Control-Taste.</td>
+                </tr>
+                <tr>
+                    <td>788/789</td>
+                    <td>IRQ, Hardware-Interrupt: Das Betriebssystem springt ständig in diese Routine, durch Ändern des Inhalts kann man eigene, »interruptgesteuerte« Maschinenroutinen ständig laufen lassen.</td>
+                </tr>
+                <tr>
+                    <td>792/793</td>
+                    <td>Restore-Vektor: PEEK(792) + PEEK(793)*256 ergibt die Speicherstelle, an die bei Restore-Tastendruck gesprungen wird.<br>
+                        Beispiel: Bei POKE 792,226 : POKE 793,252 wird bei Drücken der Restore-Taste ein Reset ausqelöst.</td>
+                </tr>
+                <tr>
+                    <td>828-1019</td>
+                    <td>Kassettenpuffer: Nach Laden oder Verify stehen im Kassettenpuffer folgende Informationen:<br>
+                        828: 1 = normales File, 3 = wurde mit SAVE”Name”,1,1 abgespeichert. Solche Programme werden bei LOAD automatisch ab der Adresse geladen, von der sie abgespeichert wurden.<br>
+                        829/830: Hier ist die Startadresse des Programms abgelegt (829 ist das Low-Byte, 830 das High-Byte).<br>
+                        831/832: Endadresse des Programms.<br>
+                        833-1019: 186 Zeichen langer Programmname (auf dem Bildschirm werden nur 16 angezeigt, aber es lassen sich bis 186 Stellen lange Programmnamen abspeichern).<br>
+                        Der Kassettenpuffer ist auch gut zum Ablegen eigener Maschinenprogramme geeignet, sofern mit der Floppy gearbeitet wird.</td>
+                </tr>
+                <tr>
+                    <td>42291</td>
+                    <td>Koppeladressen angleichen: Falls Programme mit NEW gelöscht wurden, kann man mit diesem SYS-Befehl die Bytes 2049 und 2050 wieder in Ordnung bringen, wenn vorher etwas anderes als 0 in diese Speicherzellen gePOKEt wird.</td>
+                </tr>
+                <tr>
+                    <td>56320</td>
+                    <td>Joystick Port 2:<br>
+                        WAIT 56320,16,16 wartet auf Feuerknopf<br>
+                        WAIT 56320,4,4 wartet auf Linksbewegung des Joysticks<br>
+                        WAIT 56320,1,1 wartet auf Joystick nach oben<br>
+                        WAIT 56320,2,2 wartet auf Joystick nach unten<br>
+                        WAIT 56320,8,8 wartet auf Joystick nach rechts</td>
+                </tr>
+                <tr>
+                    <td>56321</td>
+                    <td>Wie 56320, aber Joystick in Port 1.</td>
+                </tr>
+                <tr>
+                    <td>56576</td>
+                    <td>Mit PEEK(56576) kann man die Pins PB0-PB7 vom User-Port (auf der Unterseite des Ports, siehe Handbuch) auslesen. Mit POKE in diese Speicherstelle kann man auch Ausgaben über den User-Port laufen lassen.</td>
+                </tr>
+                <tr>
+                    <td>56578</td>
+                    <td>Datenrichtungsregister für User-Port: Jedes der Bits gibt die Datenrichtung für die Pins PB0-PB7 des User-Ports an. Ist das entsprechende Bit gesetzt, so fungiert der dem Bit zugeordnete Pin als Ausgang, bei nicht gesetztem Bit als Eingang.</td>
+                </tr>
+                <tr>
+                    <td>65409</td>
+                    <td>SYS 65409 setzt den Video-Chip des C 64 auf den Ursprungszustand zurück.</td>
+                </tr>
+                <tr>
+                    <td>65493</td>
+                    <td>LOAD-Routine des Betriebssystems. Mit folgender kleiner Routine kann man Unterprogramme nachladen, ohne irgendwelche Basic-Pointer (wie zum Beispiel die Zeiger auf die Endadresse, 45 und 46) zu verändern:<br>
+                        POKE 186,1 : POKE 780,0 :<br>
+                        POKE 781,0 : POKE 782,96 :<br>
+                        POKE 183,0 : SYS 65493<br>
+                        Erklärung: 186,1 = Geräteadresse für Recorder<br>
+                        781 und 782 gibt die Startadresse an, ab der das Programm geladen werden soll. 183,0 = kein Programmname.<br>
+                        SYS 65493 = LOAD-Routine.</td>
+                </tr>
+                <tr>
+                    <td>
+                        65511</td>
+                    <td>Durch SYS 65511 lassen sich alle Files schließen. So erspart man sich das lästige Eintippen von CLOSE1:CLOSE2:CLOSE3... Dabei sollte aber beachtet werden, daß so nur der Kanal geschlossen wird, aber keine Dateien auf einer Disk.</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <p>Auf PEEKs und POKEs für Grafik und Sprites wurde hier verzichtet, da die Grafik und die Sprites im Grafikkurs von H. Ponnath schon sehr ausführlich beschrieben sind.</p>
+
+        <address class="author">(M. Kohlen/gk)</address>
+    </article>
+
+</body>
+
+</html>
