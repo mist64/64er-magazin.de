@@ -49,7 +49,7 @@ python3 -m pip install -r requirements.txt
 Die Python-Packages können auch in eine virtuelle Umgebung installiert werden:
 ```
 python3 -m venv .venv                       # create a virtual environment
-source .venv/bin/activate                   # activate it 
+source .venv/bin/activate                   # activate it
 python3 -m pip install -r requirements.txt  # install the required packages
 ```
 
@@ -100,6 +100,9 @@ Die Eingabe-Ausgaben werden aus `issues` gelesen, die Website wird nach `out` ge
         * [goloMAK](https://www.forum64.de/wcf/index.php?user/28439-golomak/)
         * [64erGrufti](https://www.forum64.de/wcf/index.php?user/30650-64ergrufti/)
         * [ClausS](https://www.forum64.de/wcf/index.php?user/28399-clauss/)
+* Ausgabe 10/84:
+    * OCR-Fixes
+        * [vicjack](https://www.forum64.de/wcf/index.php?user/15999-vicjack/)
 
 
 ![](screenshot1.png)
