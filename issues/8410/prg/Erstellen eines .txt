@@ -1,0 +1,221 @@
+;Erstellen eines .prg ==0801==
+;Quelle: 1984-08-09-10.d64
+
+    7 poke45,peek(174):poke46,peek(175):clr
+    8 rem (c) by klaus kloeker
+    9 clr:dima$(15),e(50,6),e$(50,6):goto1000
+   10 z1=3:z2=9:s=13:rem * maske loeschen *
+   15 forz=z1toz2:gosub90:print"                          ":next:ifc=0thenreturn
+   20 z1=13:z2=21:c=0:goto15
+   30 forj=2to6:e$(i,j)=str$(int(e(i,j)*10+.5)):rem * format tabelle
+   35 e$(i,j)=left$(e$(i,j),len(e$(i,j))-1)+"."+right$(e$(i,j),1)
+   40 l$="":fora=1to10-len(e$(i,j)):l$=l$+".":next
+   45 e$(i,j)=l$+e$(i,j)
+   50 iflen(e$(i,j))>10thene$(i,j)=right$(e$(i,j),10)
+   55 next:return
+   70 load"menue",8:rem *load menue
+   80 a=55909:fori=1637to1662:pokei,100:pokea,1:a=a+1:next:return
+   90 poke214,z:poke211,s:sys58732:return:rem * cursorposition *
+   95 fori=56216to56255:pokei,o:next:return
+  100 rem * auswahlroutine *
+  110 gosub90:print"{rvon}           {rvof}":fori=1to75:nexti
+  120 gosub90:print"{rvon}"a$(y)"{rvof}":fori=1to125:next
+  130 getg$:ifg$<>chr$(133)andg$<>chr$(134)andg$<>chr$(135)andg$<>chr$(13)then110
+  140 ifg$=chr$(133)andcthenc=0:return
+  150 ifg$=chr$(13)thengosub90:a$(y)=">"+mid$(a$(y),2,10):print"{rvon}"a$(y)"{rvof}":return
+  155 ifg$=chr$(134)then170
+  160 ifg$=chr$(135)then190
+  165 goto110
+  170 z=z+sw:y=y+1:ifz>z2thenz=z1:y=y1
+  180 goto110
+  190 z=z-sw:y=y-1:ifz<z1thenz=z2:y=y2
+  195 goto110
+  200 rem * wahl-fusszeile *:s=0
+  210 z=23:gosub90:print"{rvon}        {rvof}";:fori=1to75:next
+  220 gosub90:print"{rvon}"ba$(y)"{rvof}";:fori=1to175:next
+  230 getg$:ifg$<>chr$(134)andg$<>chr$(135)andg$<>chr$(13)then210
+  240 ifg$=chr$(13)thengosub90:print"{rvon}>{rvof}";:return
+  250 ifg$=chr$(135)then280
+  260 s=s+8:y=y+1:ifs>32thens=0:y=1
+  270 goto210
+  280 s=s-8:y=y-1:ifs<0thens=32:y=5
+  290 goto210
+  300 rem * eingaberoutine *
+  310 gosub90
+  320 in$=""
+  330 print"{CBM-I}{left}";
+  340 getg$:ifg$=""then340
+  350 g=asc(g$):ifg=13thengoto460
+  360 ifg=13thenreturn
+  370 ifg$<"0"org$>"9"then420
+  380 in$=in$+g$
+  390 printg$;
+  400 iflen(in$)>nthenfori=1tolen(in$):printchr$(20);:next:goto320
+  410 goto330
+  420 ifg=46then380
+  425 ifg$=chr$(133)then9
+  430 ifg<>20then330
+  440 iflen(in$)<1then330
+  450 in$=left$(in$,len(in$)-1):goto390
+  460 pn$="":fori=1to(9-len(in$)):pn$=pn$+".":next:printpn$
+  470 iflen(in$)<1then310
+  480 return
+  900 rem * maske *
+  910 printma$:a=55388:fori=1076to1906step40:pokei,101:pokea,1:a=a+40:next
+  920 a=55776:fori=1504to1514:pokei,100:pokea,1:a=a+1:next
+  930 a=55785:fori=1517to1546:pokei,100:pokea,1:a=a+1:next
+  950 z=3:s=0:gosub90:print"Auswahl :":print"{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}":print"{rvon} - - - - - {rvof}"
+  960 z=6:fori=1to3:gosub90:print"{rvon}"a$(i)"{rvof}":print"{rvon} - - - - - {rvof}":z=z+2:next
+  970 return
+  999 :
+ 1000 rem ** tilgungsrechnung *
+ 1010 gosub6000:gosub900
+ 1020 z=23:s=0:gosub90:printmb$
+ 1080 z=6:z1=z:z2=10:s=0:y=1:y1=y:y2=3:sw=2:c=0:gosub100:f=y:iff=3then70
+ 2000 rem * eingabemaske *
+ 2010 z=3:s=13:gosub90:print"Eingabe :":z=4:gosub90:print"{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}"
+ 2020 z=5:fori=4to6:s=13:gosub90:print"{rvon}"a$(i)"{rvof} : ";pm$
+ 2030 z=z+2:next:z=23:s=0:gosub90:printmc$
+ 2040 z=5:s=27:n=9:forj=4to6:gosub300:a(j)=val(in$):z=z+2:next
+ 2070 z=14:s=13:gosub90:print"Eingabe korrekt ? (j/n):":gosub80
+ 2080 z=14:s=38:gosub90:print"{CBM-I}{left}";
+ 2090 getg$:ifg$<>"j"andg$<>"n"then2090
+ 2100 printg$:ifg$="j"theny=1
+ 2110 ifg$="n"theny=0
+ 2120 geti$:ifi$<>chr$(13)andi$<>chr$(20)then2120
+ 2130 ifi$=chr$(20)then2080
+ 2140 c=1:gosub10:ify=0then2010
+ 3000 rem * rechnung *
+ 3005 print"{clr}":z=23:s=23:gosub90:printmg$:ee(3)=0:ee(5)=0
+ 3010 iff=2then3500
+ 3100 rem * ratentilgung *
+ 3110 t1=a(4)/a(6):j2=0:t2=0
+ 3120 fori=1toa(6):r1=a(4)-j2*t2:z1=r1*(a(5)/100):a1=z1+t1
+ 3130 e(i,2)=r1:e(i,3)=z1:e(i,4)=t1:e(i,5)=a1:e(i,6)=a1/12:gosub30
+ 3140 forj=3to5step2:ee(j)=ee(j)+e(i,j):next
+ 3150 j2=j2+1:t2=(a(4)/a(6)):next:goto3700
+ 3500 rem * aunnuitaetentilgung *
+ 3510 q1=a(5)/100+1:t1=a(4)*((q1-1)/(q1^a(6)-1))
+ 3520 z1=a(4)*(a(5)/100):a1=t1+z1:r1=a(4)
+ 3530 e(1,2)=r1:e(1,3)=z1:e(1,4)=t1:e(1,5)=a1:e(1,6)=a1/12:i=1:gosub30
+ 3540 t2=t1:fori=2toa(6):r1=r1-t2:z2=r1*(a(5)/100):t2=t2*q1
+ 3550 e(i,2)=r1:e(i,3)=z2:e(i,4)=t2:e(i,5)=a1:e(i,6)=a1/12:gosub30
+ 3560 forj=3to5step2:ee(j)=ee(j)+e(i,j):nextj:nexti
+ 3570 ee(3)=ee(3)+e(1,3):ee(5)=ee(5)+e(1,5)
+ 3700 ee(3)=ee(3)/2:ee(5)=ee(5)/2
+ 3710 fori=3to5step2:ee$(i)=str$(int(ee(i)*10/.5))
+ 3720 ee$(i)=left$(ee$(i),len(ee$(i))-1)+"."+right$(ee$(i),1):next
+ 3800 rem * screen *
+ 3805 gosub900
+ 3810 z=3:s=13:gosub90:print"Eingabe :":z=4:gosub90:print"{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}"
+ 3820 z=5:s=13:fori=4to6:gosub90:printa$(i)" :"a(i):z=z+2:next
+ 3830 z=14:s=13:gosub90:print"Resultat :":z=15:gosub90:print"{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}"
+ 3840 z=17:forj=3to5step2:gosub90:print"{rvon}"ec$(j)"{rvof}:"ee$(j):z=z+2:next
+ 3850 z=21:gosub90:print"Ausdruck in 'DM' !"
+ 3860 za=val(ee$(3))/(val(ee$(5))/100)
+ 3870 z=14:s=0:gosub90:print"{rvon}   Zins-   {rvof}":z=15:gosub90:print"{rvon}   anteil  {rvof}"
+ 3880 za$=str$(za):ifza<10thenza$=" "+za$
+ 3890 za$=left$(za$,5):z=17:s=2:gosub90:printza$;" %"
+ 3900 z=18:s=3:gosub90:print"======"
+ 3910 z=23:s=0:gosub90:fori=1to5:print"{rvon}"ba$(i)"{rvof}";:next
+ 3920 y=1:gosub200:ify=5then70
+ 3930 ify=4then9
+ 3940 ify=3then5500
+ 3950 ify=2then5000
+ 4000 rem * tabelle *
+ 4010 gosub95:x1=2:x2=4:y1=1:y2=a(6)
+ 4020 z=1:s=0:gosub90:fori=1to22:printmd$:next:z=22:gosub90:printmh$
+ 4030 z=3:s=0:gosub90:printm$(1)
+ 4040 z=3:s=6:fori=x1tox2:gosub90:printm$(i):s=s+11:next
+ 4050 z=4:s=1:gosub90:fori=1to37:print"=";:next
+ 4100 z=6:s=1:fori=y1toy2
+ 4105 i$=str$(i):ifi<10theni$="."+i$
+ 4107 gosub90:print"."+i$:s=6
+ 4110 forj=x1tox2
+ 4120 gosub90:printe$(i,j)
+ 4130 s=s+11:nextj
+ 4140 ifpeek(214)>15theny2=i:y1=y2-9:goto4200
+ 4150 z=z+1:s=1:nexti
+ 4200 z=17:s=1:gosub90:forj=1to38:print"-";:next
+ 4500 wait203,63:getg$
+ 4510 ifg$=chr$(29)then4550
+ 4520 ifg$=chr$(157)then4580
+ 4530 ifg$=chr$(17)then4610
+ 4540 ifg$=chr$(145)then4640
+ 4543 ifg$=chr$(133)then3800
+ 4545 goto4500
+ 4550 x1=x1+1:x2=x2+1:rem * ->
+ 4560 ifx2>6thenx2=6:x1=4:goto4500
+ 4570 goto4030
+ 4580 x1=x1-1:x2=x2-1:rem * <-
+ 4590 ifx1<2thenx1=2:x2=4:goto4500
+ 4600 goto4030
+ 4610 ifa(6)<10thengoto4500
+ 4615 y1=y1+10:y2=y2+10:rem * down
+ 4620 ify2>a(6)theny2=a(6):y1=y2-9:ifi=a(6)then4500
+ 4630 goto4030
+ 4640 ifa(6)<10thengoto4500
+ 4645 y1=y1-10:y2=y2-10:rem * up
+ 4650 ify1<1theny1=1:y2=y1+9:ifi<11then4500
+ 4660 goto4030
+ 5000 rem * aenderung *
+ 5010 c=1:gosub10:s=0:forz=13to20:gosub90:print"           ":next
+ 5020 z=3:s=13:gosub90:print"Aenderung :":z=4:gosub90:print"{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}"
+ 5030 z=5:s=13:fori=4to6:gosub90:print"{rvon}"a$(i)"{rvof} :";a(i):z=z+2:next
+ 5040 z=23:s=0:gosub90:printmf$;
+ 5050 z=5:z1=z:z2=9:s=13:y=4:y1=y:y2=6:sw=2:c=1:gosub100
+ 5060 ifc=0goto3000
+ 5070 z=14:s=13:gosub90:print"{rvon}"a$(y)"{rvof} : ";pm$:gosub80
+ 5080 z=23:s=0:gosub90:printmc$;:z=14:s=27:gosub300:a(y)=val(in$)
+ 5090 a$(y)=" "+mid$(a$(y),2,10):goto5010
+ 5500 rem * printer
+ 5505 tb$=chr$(16):ta$=chr$(10)
+ 5510 open4,4,7:print#4,chr$(14)tb$"10Ausdruck eines Tilgungsplanes"
+ 5520 print#4,tb$;"10-----------------------------"ta$
+ 5530 fori=4to6:print#4,chr$(15)tb$"10*** "a$(i)" : "a(i):next
+ 5540 print#4,ta$;ta$;ta$
+ 5550 fori=1to6:print#4,"   "m$(i);:next:print#4," "
+ 5560 fori=1to40:print#4,"--";:next:print#4
+ 5570 fori=1toa(6):i$=str$(i):ifi<10theni$="."+i$
+ 5575 print#4,"    ."+i$" ";
+ 5580 forj=2to6:print#4," .."e$(i,j);:nextj:print#4," ":nexti
+ 5590 fori=1to40:print#4,"--";:next:print#4
+ 5595 print#4," Gesamt:";
+ 5600 po=27:forj=3to5step2:print#4,spc(po-len(ee$(j)))ee$(j);:po=26:next
+ 5610 print#4,ta$;ta$;tb$"10*** Ausdruck der Tabelle erfolgt in 'DM' !"
+ 5620 print#4,tb$"10*** Berechnung der Zinsen erfolgt am Ende des Jahres !"
+ 5630 print#4,ta$;tb$"10*** Tilgung konstant   = Ratentilgung !!"
+ 5640 print#4,tb$"10*** Annuitaet konstant = Annuitaetentilgung !!"
+ 5650 print#4:fori=1to40:print#4,"==";:nexti:print#4,ta$;ta$;ta$;ta$
+ 5660 close4:goto3860
+ 6000 rem * variablen *
+ 6010 ma$="{clr}{rvon}    T I{$a0}L{$a0}G{$a0}U{$a0}N{$a0}G{$a0}S{$a0}R{$a0}E{$a0}C{$a0}H{$a0}N{$a0}U{$a0}N{$a0}G    {rvof}"
+ 6020 mb$="{rvon} F3 u. F5 - Wahl ! 'RETURN' - Eingabe !"
+ 6030 mc$="{rvon} F1 - Auswahl !   Geben Sie ein !      {rvof}"
+ 6040 md$="                                       "
+ 6050 me$="{rvon}                                       {rvof}"
+ 6060 mf$="{rvon} F1 - Resultat !     F3 u. F5 - Wahl ! {rvof}"
+ 6070 mg$="Bitte Warten !!!"
+ 6080 mh$="{rvon} F1 - Resultat !    Cursor - Steuern ! {rvof}"
+ 6100 a$(1)=" Ratentilg."
+ 6110 a$(2)=" Annu.tilg."
+ 6120 a$(3)="  Menue    "
+ 6130 a$(4)=" Darlehen  "
+ 6140 a$(5)=" Zinssatz  "
+ 6150 a$(6)=" Jahre     "
+ 6160 pm$="........."
+ 6200 m$(1)=" Jahr "
+ 6210 m$(2)="Restschuld"
+ 6220 m$(3)="    Zinsen"
+ 6230 m$(4)="   Tilgung"
+ 6240 m$(5)=" Annuitaet"
+ 6250 m$(6)=" Annu./Mon"
+ 6300 ec$(3)=" Zinsen  ges."
+ 6310 ec$(5)=" Annuit. ges."
+ 6400 ba$(1)=" Tabelle"
+ 6410 ba$(2)=" Aendern"
+ 6420 ba$(3)="  Kopie "
+ 6430 ba$(4)="   Neu  "
+ 6440 ba$(5)="  Menue "
+ 6500 return
+

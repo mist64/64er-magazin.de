@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>Programmiertes LISTing: LISTX-Y</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="Fred Behringer, ev">
+    <meta name="64er.issue" content="10/84">
+    <meta name="64er.pages" content="100-102">
+    <meta name="64er.head1" content="Tips & Tricks">
+    <meta name="64er.head2" content="VC 20">
+    <meta name="64er.toc_category" content="Programme zum Abtippen|Tips & Tricks">
+    <meta name="64er.index_title" content="Programmiertes LISTing: LIST X-Y">
+    <meta name="64er.index_category" content="Listings zum Abtippen|Tips & Tricks|Listing">
+    <meta name="64er.id" content="list">
+</head>
+
+<body>
+    <article>
+        <h1>Programmiertes LISTing: LISTX-Y</h1>
+
+        <p>Bei Hilfsprogrammen, die viele Benutzeranleitungen enthalten, gibt man diese Anleitungen normalerweise über PRINT-Anweisungen auf dem Bildschirm aus. An sich würde es bei geschickter Formulierung jedoch reichen, die sowieso vorhandenen REM-Erläuterungen als Anleitungen für den Benutzer mitzuverwenden.</p>
+
+        <p>Nur, wie bringt man diese auf den Bildschirm? Mit LIST wird das Basic-Programm jedesmal zum Direktmodus hin verlassen und, was noch schwerer wiegt, die Anfangs- und Endzeilennummern können nur als direkte Zahlen, nicht über Variablen, angegeben werden. Unser Programmvorschlag (Listing 1) simuliert den im VC 20-Basic nicht vorhandenen Befehl LISTX-Y (X=Variable, die die Anfangszeilennummer des zu listenden Programms übergibt, Y = Endzeilennummer).</p>
+
+        <p>Man könnte sich ein solches Hilfsprogramm durch Beschreiben des Tastaturpuffers konstruieren. Dann würden sich aber die in den Puffer geschriebenen LIST-Anweisungen auf dem Bildschirm störend bemerkbar machen. Andererseits kommt aus Geschwindigkeitsgründen nur ein Maschinenprogramm in Frage. Will man ein solches Maschinenprogramm per DATA-Zeilen einlesbar gestalten, wäre der Aufwand recht hoch. Außerdem gäbe es Schwierigkeiten mit dem nur immer auf den Datenanfang zurückstellbaren DATA-Zeiger (kein RESTORE X vorhanden). Einlesen per POKE wäre noch aufwendiger. Umgekehrt muß aber ein solches Maschinenprogramm zur Simulation von LIST Y notwendigerweise viele Teile enthalten, die bereits im Betriebssystem vorkommen. Wir lösen das Problem, indem wir mit zwei einfachen FOR-NEXT-Schleifen geeignete Teile des Betriebssystems in den Kassettenpuffer kopieren und diese Kopien dann durch sechs POKE-Anweisungen so abändern, daß sie unseren Ansprüchen genügen. Listing 1 zeigt das entsprechende Unterprogramm, das beim ersten Aufruf mit »GOSUB 63000« die Maschinenroutine erzeugt. Alle weiteren Aufrufe können mit »GOSUB 6350« erfolgen, wodurch, einiges an Zeit gespart wird. In der Variablen X wird die Anfangszeile, in Y die Endzeile übergeben. Listing 3 zeigt ein Demo-Programm. In Listing 2 gebe wir ein Anwendungsbeispiel an: In einem längeren Programm mögen alle REM-Erläuterungen in den Zeilen 100*a bis 100*a+4 untergebracht sein, also in den ersten fünf Zeilen ab jeder vollen Hunderternummer. Das Beispielprogramm nach Listing 2 wird per GOSUB63100 angesprungen und listet per Cursor-Down-Taste alle oben genannten REM-Zeilen (und nur diese, eventuelle weitere REM-Zeilen werden nicht berücksichtigt). Und zwar geschieht dies in Endlosform, das heißt nach Durchgang durch die letzte zu listende REM-Erläuterung erscheint wieder die erste und so fort. Durch Drücken der Return-Taste gelangt man wieder ins Hauptprogramm.</p>
+
+        <address class="author">(Fred Behringer/ev)</address>
+
+        <figure>
+            TODO
+            <figcaption>Listing 1. Programm zur Simulation von LISTX-Y. Ansprung
+per GOSUB63000. Einlesezeit 2,6 Sekunden. Jeder weitere Ansprung per GOSUB63050 mit »sofortiger« Abarbeitung.</figcaption>
+        </figure>
+
+        <figure>
+            <table>
+                <tbody>
+                    <tr>
+                        <td>60010</td>
+                        <td>Einlesen von $C613-$C640 (50707-50752). Maschinenprogramm zur Berechnung der Startadresse einer Basic- Zeile. Zeilennummereingabe (der Anfangszeile) in $0014/$0015 (20/21).</td>
+                    </tr>
+                    <tr>
+                        <td>63020</td>
+                        <td>Verlegen dieser Parameterübergabestellen nach $OOFB/$OOFC (251/252), da $0014/$0015 (20/21) beim Ansprung SYS828 (siehe unten) gestört werden</td>
+                    </tr>
+                    <tr>
+                        <td>63030</td>
+                        <td>$C6009-$C741 (50889-51009). Programm zum Auflisten der gewünschten Zeilen. In diesem Programm wird die laufende Nummer der gerade gelisteten Zeile mit der beim Ansprung dieser Routine an $0014/$0015 (20/21) übergebenen Nummer der Endzeile verglichen, und die Routine wird verlassen, wenn die Endnummer erreicht ist. Auch hier läßt sich aus dem eben erwähnten Grund die Stelle $0014/$0015 (20/21) nicht als Parameterübergabestelle (von Basic zu Maschinenprogramm) verwenden und wird in 63040 zu $OOFD/$OOFE (253/254) abgeändert. Überschreiben des JMP-Befehls in $C714 (50964) mit einem RTS-Befehl sorgt dafür, daß nicht zum Basic- Warmstart zurückgekehrt wird, sondern zum Hauptprogramm. Die Sprungadresse $0306/$0307 (774/775), die in $C717 (50967) wirksam wird, hätte geändert werden müssen, da sich der Sprung ja nun auf die der Stelle $C71A (50970) entsprechenden Stelle in der Kopie im Kassettenpuffer bezieht. Es war einfacher, den (hier) überflüssigen JMP-Befehl in $C717 (50967) zu umgehen, indem die Sprungadresse in der der Stelle $C705 (50949) entsprechenden Stelle der Kopie abgeändert wurde.</td>
+                    </tr>
+                    <tr>
+                        <td>63050</td>
+                        <td>Die vom Hauptprogramm in X stammende Nummer der Anfangszeile wird in Low By- te/High Byte gespalten und der Stelle 251/252 übergeben (siehe oben)</td>
+                    </tr>
+                    <tr>
+                        <td>63060</td>
+                        <td>Entsprechend für die aus Y stammende Nummer der Endzeile und 253/254</td>
+                    </tr>
+                    <tr>
+                        <td>63070</td>
+                        <td>Aufruf des Maschinenprogramms und Rückkehr ins Basic-Hauptprogramm. Nach Rückkehr steht in $030D/$030C (781/780) die Nummer (Low Byte/High Byte) der nächstanstehenden Basic-Zeile zur Verfügung.</td>
+                    </tr>
+                </tbody>
+            </table>
+            <figcaption>Beschreibung des Programms nach Listing 1 zur Simulation von LISTX-Y</figcaption>
+        </figure>
+
+        <figure>
+            TODO
+            <figcaption>Listing 2. Programm zum Ausdrucken aller Zeilen mit den Nummern 100*a bis 100*a+4, wobei a von 0 bis 633 geht. Nicht vorhandene Zeilen werden ohne Verzögerung übersprungen. Der Ausdruck läuft, solange die Cursor-Down-Taste gedrückt ist, auch über 63304 hinaus (Wiederanfang bei 0).</figcaption>
+        </figure>
+
+        <figure>
+            <table>
+                <tbody>
+                    <tr>
+                        <td>63110</td>
+                        <td>Einlesen des Simulationsprogramms für LISTX-Y nach Listing 1
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>63120</td>
+                        <td>Anfangszeile auf Null</td>
+                    </tr>
+                    <tr>
+                        <td>63130<br>63140
+                        </td>
+                        <td>Wenn Return-Taste, dann zurück ins Hauptprogramm</td>
+                    </tr>
+                    <tr>
+                        <td>63150</td>
+                        <td>Wenn nicht Cursor-Down- oder Return-Taste, dann Anfang wieder 0.</td>
+                    </tr>
+                    <tr>
+                        <td>63160</td>
+                        <td>Wenn Cursor-Down-Taste, dann Listen der Zeilen X bis X+4 und Ausgleich für Zeilenvorschub</td>
+                    </tr>
+                    <tr>
+                        <td>63170</td>
+                        <td>Sprung um 100 nach vorn. Wenn Vorrat erschöpft, Zeilennummer wieder auf 0 (Endlosdurchlauf).</td>
+                    </tr>
+                    <tr>
+                        <td>63180</td>
+                        <td>Schnelles Vortasten zur nächsten vorhandenen Zeile mit Nummer zwischen 110*a und 100*a+4</td>
+                    </tr>
+                    <tr>
+                        <td>63190</td>
+                        <td>Weiter in Eingabeschleife</td>
+                    </tr>
+                </tbody>
+            </table>
+
+        <figure>
+            TODO
+            <figcaption>Listing 3. LIST-Demo zum Testen der Routine nach Listing 1.</figcaption>
+        </figure>
+
+            <figcaption>Beschreibung des Programms nach Listing 2 zum Ausdrucken aller Kopf-REM-Zeilen. Das Programm verwendet die Routine für LISTX-Y aus Listing 1.</figcaption>
+        </figure>
+
+    </article>
+
+</body>
+
+</html>

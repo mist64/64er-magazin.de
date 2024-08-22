@@ -1,0 +1,330 @@
+;diskorganisat.64.prg ==0801==
+;Quelle: 8410.D64
+    1 rem **********************************
+    2 rem *disketten-organisations-programm*
+    3 rem *       fuer den cbm-64          *
+    4 rem *            von                 *
+    5 rem *wilhelm boosz - heinrichstr. 21 *
+    6 rem *8602 strullendorf - t.09543/7606*
+    7 rem **********************************
+    8 rem
+    9 poke49152,8:poke53280,1:poke53281,1
+   10 print"{clr}";:gn%=peek(49152):ur%=0
+   11 print"{pur}    disketten-organisations-programm"
+   12 print"{down}{grn}         von wilhelm boosz / 09543/7606"
+   13 printtab(4)"{down}{down}{red}geraetenr. floppy =          {left}{left}{left}{left}{left}{left}{left}{left}{left}{left}"gn%" {rvon}(+/-)"
+   14 print"{down}{brn} {rvon}i{rvof} nitialisieren"tab(22)"{rvon}f{rvof} ormatieren"
+   15 print"{down} {rvon}v{rvof} alidieren"tab(22)"{rvon}d{rvof} irectory"
+   16 print"{down} {rvon}k{rvof} opieren"tab(22)"{rvon}b{rvof} am alphabetisch"
+   17 print"{down} {rvon}g{rvof} eraetenr.aendern"tab(22)"{rvon}u{rvof} mbenennen"
+   18 print"{down} {rvon}l{rvof} oeschen"tab(22)"{rvon}r{rvof} egenerieren"
+   19 print"{down} {rvon}n{rvof} ame disk aendern"tab(22)"{rvon}a{rvof} endern disk-id"
+   20 print"{down} {rvon}c{rvof} heck disk"tab(22)"{rvon}e{rvof} nde programm"
+   21 printtab(10)"{blu}{down}{down}bitte waehlen !"
+   22 gety$:ify$=""then22
+   23 ify$="+"thengn%=gn%+1:ifgn%>255thengn%=255
+   24 ify$="-"thengn%=gn%-1:ifgn%<0thengn%=0
+   25 ify$="+"ory$="-"thenpoke49152,gn%:print"{home}";:goto11
+   26 ify$="e"thenpoke53280,14:poke53281,6:print"{clr}{lblu}":clr:end
+   27 ify$="i"thengosub44:clr:goto10
+   28 ify$="f"thengosub50:clr:goto10
+   29 ify$="d"thengosub64:clr:goto10
+   30 ify$="b"thengosub84:clr:goto10
+   31 ify$="k"thengosub121:clr:goto10
+   32 ify$="u"thengosub130:clr:goto10
+   33 ify$="l"thengosub148:clr:goto10
+   34 ify$="r"thengosub159:clr:goto10
+   35 ify$="n"thengosub212:clr:goto10
+   36 ify$="a"thengosub221:clr:goto10
+   37 ify$="g"thengosub231:clr:goto10
+   38 ify$="c"thengosub263:clr:goto10
+   39 ify$="v"thengosub58:clr:goto10
+   40 goto22
+   41 rem ******************************
+   42 rem *i n i t i a l i s i e r e n *
+   43 rem ******************************
+   44 print"{clr}{down}{down}{down}{down}{down}{down}{down}{down}"tab(5)"i n i t i a l i s i e r e n"
+   45 close1:open1,gn%,15,"i0":gosub298:close1:ifen=0thenreturn
+   46 print"{down}{down}{down}    "en;en$;ne;ee:gosub305:return
+   47 rem ******************************
+   48 rem *   f o r m a t i e r e n    *
+   49 rem ******************************
+   50 print"{clr}{down}{down}{down}{down}{down}"tab(5)"f o r m a t i e r e n"
+   51 na$="test":input"{down}{down}{down}{down}diskettenname";na$:na$=left$(na$,16)
+   52 id$="":input"{down}{down}disketten-id ";id$:id$=left$(id$,2)
+   53 close1:open1,gn%,15,"n0:"+na$+","+id$:close1:gosub298:ifenthen46
+   54 return
+   55 rem ******************************
+   56 rem *    v a l i d i e r e n     *
+   57 rem ******************************
+   58 print"{clr}{down}{down}{down}{down}{down}{down}{down}{down}"tab(5)"v a l i d i e r e n"
+   59 close1:open1,gn%,15,"v":gosub298:close1:ifen=0thenreturn
+   60 goto46
+   61 rem ******************************
+   62 rem *directory drucker/bildschirm*
+   63 rem ******************************
+   64 print"{clr}{down}{down}{down}"tab(5)"d i r e c t o r y":printtab(5)"{down}{down}{down}{down}{rvon}d{rvof} rucker"
+   65 printtab(5)"{down}{down}{rvon}b{rvof} ildschirm"
+   66 gety$:ify$<>"d"andy$<>"b"then66
+   67 ify$="d"thenprint"{clr}{down}{down}{down}"tab(5)"d r u c k e r   bereit ?":goto69
+   68 gosub309:goto77
+   69 gety$:ify$<>"j"andy$<>"n"then69
+   70 ify$="n"thenreturn
+   71 input"{down}{down}{down}geraetenummer drucker   4{left}{left}{left}";gd%:open4,gd%:gosub309
+   72 print#4,"      "f$(0)" "id$:print#4
+   73 fory=1toze-1
+   74 iflen(f$(y))<16thenf$(y)=f$(y)+" ":goto74
+   75 print#4,l$(y)"   "f$(y)"   "k$(y)
+   76 next:print#4:print#4,"      freie bloecke: "l$(ze):print#4:return
+   77 print"{clr}{down}name:{rvon}"tab(8)f$(0):print"id:{rvon}"tab(8)id$"{rvof}{down}"
+   78 yy=3:fory=1toze-1:yy=yy+1
+   79 printtab(2)l$(y)tab(8)f$(y)tab(26)k$(y):ifyy/20=int(yy/20)thengosub305:print"{clr}"
+   80 next:printtab(8)"{down}freie bloecke:"tab(26)"{rvon}"l$(ze):gosub305:return
+   81 rem ******************************
+   82 rem *     bam alphabetisch       *
+   83 rem ******************************
+   84 dimpn$(224),sp(29),se(29):open15,gn%,15,"i"
+   85 nn=0:sn=0:so=1:sp%=18:se%=1
+   86 ur%=1:gosub299:ifenthenclose15:return
+   87 open2,gn%,2,"#":gosub299:ifenthenclose15:goto46
+   88 print"{clr}"
+   89 print#15,"u1";2;0;sp%;se%:sp(sn)=sp%:se(sn)=se%
+   90 get#2,eg$:ifeg$=""theneg$=chr$(0)
+   91 sp%=asc(eg$)
+   92 get#2,eg$:ifeg$=""theneg$=chr$(0)
+   93 se%=asc(eg$):pz=2
+   94 print#15,"b-p";2;pz:nn=nn+1
+   95 fori=1to30:get#2,eg$:ifeg$=""theneg$=chr$(0)
+   96 pn$(nn)=pn$(nn)+eg$:nexti
+   97 ifasc(left$(pn$(nn),1))=0thenpn$="":lo=lo+1:goto101
+   98 fori=19to5step-1:ifmid$(pn$(nn),i,1)<>chr$(160)theni=5:goto100
+   99 pn$(nn)=left$(pn$(nn),i-1)+chr$(32)+right$(pn$(nn),30-i)
+  100 nexti:printmid$(pn$(nn),4,16)
+  101 ifpz-226thenpz=pz+32:goto94
+  102 ifsp%thenpz=2:sn=sn+1:goto89
+  103 iflo=0then108
+  104 n$="":forj=1to30:n$=n$+chr$(0):nextj
+  105 forj=1tolo
+  106 pn$(nn+j)=n$
+  107 nextj
+  108 print"{down}{down}{down}files werden sortiert{$a0}!":print
+  109 forj=1tonn-1:fori=j+1tonn:ifmid$(pn$(i),4,16)>mid$(pn$(j),4,16)then111
+  110 n$=pn$(i):pn$(i)=pn$(j):pn$(j)=n$:so=0
+  111 nexti,j:forj=1tonn:printmid$(pn$(j),4,16):fori=19to5step-1
+  112 ifmid$(pn$(j),i,1)<>chr$(32)theni=5:goto114
+  113 pn$(j)=left$(pn$(j),i-1)+chr$(160)+right$(pn$(j),30-i)
+  114 nexti,j:ifsothenclose2:close15:return
+  115 pn%=1:forj=0tosn:print#15,"b-p";2;0:print#2,chr$(sp(j+1));chr$(se(j+1))
+  116 pz=2:fori=1to8:print#15,"b-p";2;pz:print#2,pn$(pn%);:pn%=pn%+1:pz=pz+32
+  117 nexti:print#15,"u2";2;0;sp(j);se(j):nextj:close2:close15:return
+  118 rem ******************************
+  119 rem *      k o p i e r e n       *
+  120 rem ******************************
+  121 print"{clr}{down}{down}{down}{down}"tab(5)"k o p i e r e n"
+  122 print"{down}{down}{down}welches file soll kopiert werden?"
+  123 input"{down}alter name";an$
+  124 input"{down}neuer name";nn$
+  125 close1:open1,gn%,15,"c:"+nn$+"="+an$:gosub298:ifenthen46
+  126 return
+  127 rem ******************************
+  128 rem *    u m b e n e n n e n     *
+  129 rem ******************************
+  130 print"{clr}{down}{down}{down}"tab(5)"u m b e n e n n e n"
+  131 print"{down}{down}{down}1  =  ein file umbenennen":print"{down}{down}2  =  alle files umbenennen"
+  132 print"{down}{down}bitte waehlen !"
+  133 gety$:ify$<"1"ory$>"2"then133
+  134 ify$="2"then139
+  135 input"{down}{down}{down}alter name";an$
+  136 input"{down}neuer name";nn$
+  137 close1:open1,gn%,15,"r:"+nn$+"="+an$:gosub298:ifenthen46
+  138 return
+  139 gosub309
+  140 print"{clr}":fory=1toze-1:print"neuer name   "f$(y):print"{up}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}";:inputnn$
+  141 ifnn$=f$(y)then144
+  142 close1:open1,gn%,15,"r:"+nn$+"="+f$(y):gosub298
+  143 ifenthenprint"{down}    "en;en$;ne;ee:gosub305
+  144 next:return
+  145 rem ******************************
+  146 rem *      l o e s c h e n       *
+  147 rem ******************************
+  148 print"{clr}{down}{down}{down}"tab(5)"l o e s c h e n"
+  149 input"{down}{down}name des zu loeschenden files";na$
+  150 print"{down}{down}sind sie sicher, dass {rvon}"na$:print"geloescht werden soll ?"
+  151 gety$:ify$=""then151
+  152 ify$<>"j"thenclr:goto10
+  153 close1:open1,gn%,15,"s0:"+na$:gosub298:ifen$<>"files scratched"then46
+  154 ifne=0thenprint"{down}{down}kein file {rvon}"na$"{rvof} gefunden !":gosub305:return
+  155 print"{down}{down}    "ne"file(s) geloescht":gosub305:return
+  156 rem ******************************
+  157 rem *  r e g e n e r i e r e n   *
+  158 rem ******************************
+  159 gosub206:re%=0:print"{clr}"tab(5)"r e g e n e r i e r e n"
+  160 sp%=1:tr%=di%:open15,8,15,"i0
+  161 open8,8,2,"#2":fi%=0
+  162 print#15,"u1:"2;0;tr%;sp%:gosub204
+  163 fori=0to1:get#8,a$:gosub201:p%(i)=asc(a$):next:a=2:gosub203
+  164 get#8,a$:gosub201:a=asc(a$)and7
+  165 h$="":fori=0to1:get#8,a$:gosub201:l%(i)=asc(a$):next
+  166 fori=3to18:get#8,a$:h$=h$+a$:next:
+  167 ifh$=""then169
+  168 print ki$(a);" ";co$;h$;tab(11)co$;;l%(0);l%(1):ifa=0thengoto185
+  169 fi%=fi%+1:iffi%<8thena=fi%*32+2:gosub203:goto164
+  170 ifp%(0)=0then172
+  171 tr%=p%(0):sp%=p%(1):fi%=0:goto162
+  172 close8:ifre%then58
+  173 gosub204:close15:return
+  174 print#15,"u1:"2;0;l%(0);l%(1):return
+  175 d%=2:print"{down}spur, sektor";
+  176 gosub174:fori=0to1:get#8,a$:gosub201:z%(i)=asc(a$)
+  177 printz%(i)"{left} ";:next:print:print"{up}spur, sektor";
+  178 ifz%(0)=0thenprint:return
+  179 print#15,"b-f"0;z%(0);z%(1):l%(0)=z%(0):l%(1)=z%(1):z%(d%)=z%(0)
+  180 z%(d%+1)=z%(1):d%=d%+2
+  181 ifds=0then176
+  182 print:print"{rvon}das file wurde bereits ueberschrieben{rvof}!":x%=not(x%):a=fi%*32+2
+  183 fori=2tod%-4step2:print#15,"b-f:"0;z%(i);z%(i+1):next
+  184 l%(0)=tr%:l%(1)=sp%:gosub174:goto203
+  185 print"zurueckholen? (j/n){$a0}{$a0}{$a0}{$a0}
+  186 get a$:if a$="" then 186
+  187 if a$<>"j"then169
+  188 x%=0:print"{down}bloecke wiederbelegen...":z%(0)=l%(0):gosub175:ifx%then169
+  189 print"{down}{rvon}p{rvof}rogramm, {rvon}s{rvof}equenielles, {rvon}u{rvof}ser,"
+  190 print"oder {rvon}r{rvof}elatives file ?"
+  191 get ja$:ifja$<>"p"andja$<>"s"andja$<>"u"andja$<>"r"then191
+  192 print:ifja$="p"thenki%=130:goto196
+  193 ifja$="u"thenki%=131:goto196
+  194 ifja$="r"thenki%=132:goto196
+  195 ki%=129
+  196 print"file zurueckholen..."
+  197 l%(0)=tr%:l%(1)=sp%:gosub174
+  198 a=fi%*32+2:gosub203:print#8,chr$(ki%);
+  199 bl%=((d%-2)/2)+1:print"{down}"bl%"bloecke ";
+  200 print#15,"u2:"2;0;tr%;sp%:print"wiederhergestellt !{down}":re%=1:goto169
+  201 ifa$=""thena$=chr$(0)
+  202 return
+  203 print#15,"b-p:"2;a
+  204 input#15,en%,em$,et%,es%:ifen%=0thenreturn
+  205 goto46
+  206 dimp%(1),l%(1),z%(300),ki$(4):co$=chr$(34)
+  207 fori=0to4:readki$(i):next:di%=18:return
+  208 data"{rvon}del{rvof}","seq","prg","usr","rel"
+  209 rem ******************************
+  210 rem *     diskname aendern       *
+  211 rem ******************************
+  212 open15,gn%,15:nr=0:open1,gn%,3,"#":print#15,"u1:3"nr",18,0"
+  213 print#15,"b-p:3,144":d$="":forl=1to16:get#1,a$:d$=d$+a$:next
+  214 print"{clr}{down}{down}{down}{down}{down}alter disk-name: {rvon}"d$
+  215 na$="disk-name":print"{down}{down}neuer disk-name";:inputna$
+  216 na$=left$(na$+"                 ",16)
+  217 print#15,"b-p:3,144":print#1,na$;:print#15,"u2:3"nr",18,0":close1:close15:return
+  218 rem ******************************
+  219 rem *     disk - id aendern      *
+  220 rem ******************************
+  221 dv=0:open15,gn%,15:open1,gn%,3,"#":print#15,"u1:3"dv",18,0"
+  222 print#15,"b-p:3,162":get#1,a$,b$,c$,d$,e$:print"{clr}{down}alter disk-id: {rvon}"a$;b$;c$;
+  223 printd$;e$:input"{down}neuer disk-id";i$
+  224 iflen(i$)<3theni$=i$+" ":goto224
+  225 i$=left$(i$+"2a",5)
+  226 print#15,"b-p:3,162":print#1,i$;:print#15,"u2:3"dv",18,0
+  227 gosub45:return
+  228 rem *****************************
+  229 rem *geraetenummer disk aendern *
+  230 rem *****************************
+  231 poke59468,12:print"{clr}{down}{down}{down}{down}{down}  g e r a e t e n u m m e r   aendern"
+  232 print"{down}{down}{down}bitte alle floppys ausschalten ausser"
+  233 print"der, deren nummer geaendert werden soll!"
+  234 print"{down}alte geraetenummer  8{left}{left}{left}";
+  235 inputod:ifod<8orod>15then234
+  236 print"{down}neue geraetenummer  9{left}{left}{left}";
+  237 inputnd:ifnd<8ornd>15then236
+  238 gosub239:gosub256:return
+  239 close15:open15,od,15
+  240 print#15,"m-r"chr$(255)chr$(255):get#15,c$:c=asc(c$+chr$(0))
+  241 ifstthen259
+  242 ifc=254thenmt=119
+  243 ifc=226thenmt=50
+  244 ifc=213thenmt=12
+  245 ifc=242thenmt=12
+  246 ifc=198then248
+  247 return
+  248 print#15,"m-r"chr$(234)chr$(16):get#15,zb$:zb=asc(zb$+chr$(0))
+  249 ifzb=0thenmt=12
+  250 ifzb=1then252
+  251 ifstthen259
+  252 print#15,"m-r"chr$(172)chr$(16):get#15,zc$:zc=asc(zc$+chr$(0))
+  253 ifzc=1thenmt=12
+  254 ifzc=2thenmt=12
+  255 return
+  256 close15:open15,od,15
+  257 print#15,"m-w"chr$(mt)chr$(0)chr$(2)chr$(nd+32)chr$(nd+64)
+  258 return
+  259 print"{down}{down} fehler am geraet !":gosub305:return
+  260 rem *****************************
+  261 rem *    c h e c k   d i s k    *
+  262 rem *****************************
+  263 dimt(100):dims(100)
+  264 print"{clr}{down}{down}"tab(8)"c h e c k   d i s k{down}{down}{down}"
+  265 gosub59:open15,gn%,15:n%=rnd(ti)*255
+  266 a$="":fori=1to255:a$=a$+chr$(255and(i+n%)):next
+  267 ur%=1:gosub299:ifenthenclose15:goto46
+  268 open2,gn%,2,"#"
+  269 print:print#2,a$;
+  270 t=1:s=0
+  271 print#15,"b-a:0"t;s
+  272 input#15,en,em$,et,es
+  273 ifen=0then276
+  274 ifet=0then284
+  275 print#15,"b-a:0"et;es:t=et:s=es
+  276 print#15,"u2:2,0"t;s
+  277 nb=nb+1:printtab(8)"getestete bloecke:"nb
+  278 printtab(8)"{down} spur     {left}{left}{left}{left}"t;" sektor    {left}{left}{left}{left}"s"{up}{up}{up}"
+  279 input#15,en,em$,es,et
+  280 ifen=0then271
+  281 t(j)=t:s(j)=s:j=j+1
+  282 print"{down}{down}{down}{down}{down}fehlerhafter block:",t;s"{up}{up}{up}{up}{up}{up}"
+  283 goto271
+  284 gosub45
+  285 gosub299:ifenthenclose15:close2:goto46
+  286 close2:close15
+  287 ifj=0thenprint"{down}{down}{down}{rght}{rght}{rght}keine fehlerhaften bloecke !":return
+  288 open2,gn%,2,"#"
+  289 print"{down}{down}fehlerbloecke","spur","sektor"
+  290 fori=0toj-1
+  291 print#15,"b-a:0"t(i);s(i)
+  292 print,,t(i),s(i)
+  293 next
+  294 print"{down}"j"fehlerbloecke wurden festgestellt":close15:close2:gosub305:return
+  295 rem *****************************
+  296 rem * fehlerkanal ueberpruefen  *
+  297 rem *****************************
+  298 close15:open15,gn%,15
+  299 input#15,en,en$,ne,ee:ifur%thenreturn
+  300 close15
+  301 return
+  302 rem *****************************
+  303 rem *    tastendruck abwarten   *
+  304 rem *****************************
+  305 printtab(5)"{down}weiter  -->  taste druecken !":poke198,0:wait198,1:poke198,0:return
+  306 rem *****************************
+  307 rem *     directory lesen       *
+  308 rem *****************************
+  309 print"{clr}{down}{down}{down}{down}{down}"tab(5)"d i r e c t o r y   l e s e n":printtab(5)"{down}{down}{down}{down}{down}moment bitte !"
+  310 diml$(140),k$(140),f$(140)
+  311 open1,gn%,0,"$0":open15,gn%,15:ur%=1:gosub299:ifenthen46
+  312 get#1,a$,b$:ze=-1
+  313 ze=ze+1:get#1,a$,b$
+  314 get#1,a$,b$:c=0
+  315 ifa$<>""thenc=asc(a$)
+  316 ifb$<>""thenc=c+asc(b$)*256
+  317 l$(ze)=right$("   "+mid$(str$(c),2),3)
+  318 get#1,b$:ifst<>0thenfb$=right$("   "+l$,3):goto327
+  319 ifb$<>chr$(34)then 318
+  320 f$(ze)=""
+  321 get#1,b$:ifb$<>chr$(34)thenf$(ze)=f$(ze)+b$:goto321
+  322 get#1,b$:ifb$=chr$(32)then322
+  323 c$=""
+  324 c$=c$+b$:get#1,b$:ifb$<>""then324
+  325 k$(ze)=left$(c$,3):ifze=0thenid$=left$(c$,5)
+  326 ifst=0then313
+  327 close1:close15:return
+

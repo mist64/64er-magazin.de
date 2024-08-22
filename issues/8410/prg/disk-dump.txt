@@ -1,0 +1,214 @@
+;disk-dump.prg ==0801==
+;Quelle: 1984-08-09-10.d64
+
+  100 print"{clr}{up}{up}{up}"
+  101 rem copyright (c) 1984 by
+  102 rem horst wibbing, 62 wiesbaden
+  110 print"    ****************************"
+  120 print"    *                          *"
+  130 print"    *      disk - dump  v2     *"
+  140 print"    *                          *"
+  150 print"    ****************************"
+  151 print"{down}{down}"
+  153 print"ist die diskette drin ? ";
+  154 get y$:if(y$<>"y"andy$<>"j")then154
+  155 print"{clr}"
+  160 rem ***** init *****
+  161 d=0:d$(0)="{rvon}off{rvof}":d$(1)="{rvon}on {rvof}"
+  162 tr=18:se=0
+  163 print"{down}"
+  164 dimb$(255)
+  165 goto270
+  166 rem ***** track/sector *****
+  170 print"    which track ( 1 - 35 )";
+  180 inputtr
+  190 iftr<1ortr>35thenprint"{up}{up}":goto170
+  200 iftr<18thensr=20:goto240
+  210 iftr<25thensr=18:goto240
+  220 :iftr<31thensr=17:goto240
+  230 :sr=16
+  235 rem *****
+  240 print"{down}    which sector ( 0 -";sr;")";
+  250 inputse
+  260 ifse<0orse>srthenprint"{up}{up}{up}":goto240
+  265 rem *****
+  270 gosub1000:rem lesen
+  280 gosub2000:rem ausdrucken
+  310 rem *****
+  320 print"  1 => next block      2 => same block"
+  330 print"  3 => prev. block     4 => other block"
+  340 print"  5 => aendern         6 => printer ";d$(d)
+  350 print"  0 => end"
+  360 gett$:ift$=""then360
+  370 ift$="1"thengosub3000:goto270
+  380 ift$="2"thengoto280
+  385 ift$="3"thengosub3500:goto270
+  390 ift$="4"thengoto170
+  391 ift$="5"thengosub5000:print"{clr}":goto 320
+  392 ift$="6"thengosub2500:goto410
+  400 ift$="0"thengoto9999
+  410 print"{up}{up}{up}{up}{up}":goto320
+  430 rem ***************** ende ******
+ 1000 rem *******************
+ 1001 rem **** sub lesen ****
+ 1002 rem *******************
+ 1010 open15,8,15
+ 1020 open8,8,8,"#"
+ 1025 print#15,"u1 8 0"tr,se
+ 1030 fori=0to255
+ 1040 :get#8,b$(i)
+ 1070 nexti
+ 1080 close8:close15
+ 1090 return
+ 1100 rem *********** ende sub lesen *****
+ 2000 rem **********************
+ 2001 rem **** sub ausdruck ****
+ 2002 rem **********************
+ 2010 iftr<18thenbl=21*(tr-1)+se:goto2050
+ 2020 iftr<25thenbl=19*(tr-1)+se+34:goto2050
+ 2030 iftr<31thenbl=18*(tr-1)+se+34+24:goto2050
+ 2040 bl=17*(tr-1)+se+34+24+30
+ 2050 ifd=1thenopen4,4
+ 2051 print"{clr}{rvon} track:";tr;"  sector:";se;"  block:";bl"{rvof}"
+ 2055 ifd=1thenprint#4,"{rvon} track:";tr;"  sector:";se;"  block:";bl"{rvof}{down}"
+ 2060 print"{down}"
+ 2070 fori=0to15
+ 2071 :c$=""
+ 2072 :x=8*i:gosub 6000:rem dec-hex
+ 2075 :print" ";x$;" : ";
+ 2076 :ifd=1thenprint#4," ";x$;" : ";
+ 2080 :forj=0to7
+ 2088 :x=(asc(b$(i*8+j)+chr$(0)))
+ 2089 :gosub 6000:rem dec-hex
+ 2090 :print" ";x$;
+ 2091 :ifd=1thenprint#4," ";x$;
+ 2095 :gosub4000:rem check
+ 2100 :nextj
+ 2110 :printc$
+ 2111 :ifd=1thenprint#4,c$
+ 2120 nexti
+ 2125 rem ***** 2.seite
+ 2130 print"{down}   taste"
+ 2140 gett$:ift$=""then2140
+ 2150 print"{down}{rvon} track:";tr;"  sector:";se;"  block:";bl"{rvof}"
+ 2155 ifd=1thenprint#4,"{down}{rvon} track:";tr;"  sector:";se;"  block:";bl"{rvof}{down}"
+ 2160 print"{down}"
+ 2170 fori=16to31
+ 2171 :c$=""
+ 2172 :x=(8*i):gosub 6000:rem dec-hex
+ 2175 :print" ";x$;" : ";
+ 2176 :ifd=1thenprint#4," ";x$;" : ";
+ 2180 :forj=0to7
+ 2188 :x=(asc(b$(i*8+j)+chr$(0)))
+ 2189 :gosub 6000:rem dec-hex
+ 2190 :print" ";x$;
+ 2191 :ifd=1thenprint#4," ";x$;
+ 2195 :gosub4000:rem check
+ 2200 :nextj
+ 2210 :printc$
+ 2211 :ifd=1thenprint#4,c$
+ 2220 nexti
+ 2225 ifd=1thenclose4
+ 2230 return
+ 2240 rem ***********ende sub ausdruck*****
+ 2500 rem *********************
+ 2510 rem **** sub printer ****
+ 2520 rem *********************
+ 2530 ifd=0thend=1:return
+ 2540 ifd=1thend=0:return
+ 2550 rem *********** ende sub printer *****
+ 3000 rem ************************
+ 3001 rem **** sub next block ****
+ 3002 rem ************************
+ 3010 se=se+1
+ 3020 iftr<18andse>20thentr=tr+1:se=0:return
+ 3030 iftr<25andse>18thentr=tr+1:se=0:return
+ 3040 iftr<31andse>17thentr=tr+1:se=0:return
+ 3050 iftr<36andse>16thentr=tr+1:se=0
+ 3060 iftr=36thentr=0
+ 3070 return
+ 3080 rem *********** ende sub next block *****
+ 3500 rem *************************
+ 3510 rem **** sub prev. block ****
+ 3520 rem *************************
+ 3530 se=se-1
+ 3540 ifse<0thengoto3600
+ 3550 return
+ 3600 tr=tr-1
+ 3610 se=16
+ 3620 iftr=0thentr=35:return
+ 3630 iftr<18thense=20:return
+ 3640 iftr<25thense=18:return
+ 3650 iftr<31thense=17
+ 3660 return
+ 3670 rem *********** ende sub prev. block *****
+ 4000 rem *******************
+ 4001 rem **** sub check ****
+ 4002 rem *******************
+ 4010 b=asc(b$(i*8+j)+chr$(0))
+ 4020 if((b<32)or((b>127)and(b<160)))thenc$=c$+" ":goto4030
+ 4025 c$=c$+b$(i*8+j)
+ 4030 return
+ 4040 rem *********** ende sub check *****
+ 5000 rem *********************
+ 5001 rem **** sub aendern ****
+ 5002 rem *********************
+ 5010 print"addr (00-ff/x=exit)";:inputadr$
+ 5015 ifadr$=""thengoto5010
+ 5020 ifadr$="x"thengoto5150
+ 5030 iflen(adr$)<2thenadr$="0"+adr$
+ 5040 iflen(adr$)>2thenadr$=right$(adr$,2)
+ 5045 x$=adr$
+ 5046 gosub 6500:rem hex-dec
+ 5050 i=x
+ 5060 print"wert (00-ff)";:inputw$
+ 5065 ifw$=""thengoto5060
+ 5070 iflen(w$)<2thenw$="0"+w$
+ 5080 iflen(w$)>2thenw$=right$(w$,2)
+ 5085 x$=w$
+ 5086 gosub 6500:rem hex-dec
+ 5090 b$(i)=chr$(x)
+ 5100 goto5000
+ 5110 rem *****
+ 5150 gosub2000:rem ausdrucken
+ 5160 print"auf disk schreiben";:inputy$
+ 5170 if((y$<>"j")and(y$<>"y"))thengoto5300
+ 5175 b1=asc(b$(0)+chr$(0))+1
+ 5180 open15,8,15
+ 5190 open8,8,8,"#"
+ 5200 fori=1to255
+ 5205 :ifb$(i)=""thenprint#8,chr$(0);:goto5220
+ 5210 :print#8,b$(i);
+ 5220 nexti
+ 5225 print#15,"b-p:8",b1
+ 5230 print#15,"b-w:8,0"tr,se
+ 5240 close8:close15
+ 5300 print"weiter aendern";:inputy$
+ 5310 if((y$="j")or(y$="y"))thengoto5000
+ 5320 return
+ 5330 rem *********** ende sub aendern *****
+ 6000 rem *********************
+ 6010 rem **** sub dec-hex ****
+ 6020 rem *********************
+ 6030 x1=0:x2=0
+ 6040 x1=int(x/16)
+ 6050 x2=((x/16)-int(x/16))*16
+ 6100 ifx1<10thenx$=chr$(x1+48):goto6120
+ 6110 x$=chr$(x1+55)
+ 6120 ifx2<10thenx$=x$+chr$(x2+48):return
+ 6130 x$=x$+chr$(x2+55)
+ 6140 return
+ 6150 rem *********** end sub dec-hex *****
+ 6500 rem *********************
+ 6510 rem **** sub hex-dec ****
+ 6520 rem *********************
+ 6530 x1$=left$(x$,1)
+ 6540 x2$=right$(x$,1)
+ 6550 if asc(x1$)>64 then x=((asc(x1$)-55)*16):goto 6570
+ 6560 x=((asc(x1$)-48)*16)
+ 6570 if asc(x2$)>64 then x=x+(asc(x2$)-55):return
+ 6580 x=x+(asc(x2$)-48)
+ 6590 return
+ 6600 rem *********** end sub hex-dec *****
+ 9999 end
+

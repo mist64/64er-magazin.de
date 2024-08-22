@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>Kudiplo auch für den C 64</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="Jürgen Curdt, ev">
+    <meta name="64er.issue" content="10/84">
+    <meta name="64er.pages" content="91">
+    <meta name="64er.head1" content="Tips & Tricks">
+    <meta name="64er.head2" content="C 64">
+    <meta name="64er.toc_category" content="Programme zum Abtippen|Tips & Tricks">
+    <meta name="64er.index_title" content="Kudiplo auf für den C 64 (Kurvendiskussion)">
+    <meta name="64er.index_category" content="Listings zum Abtippen|Tips & Tricks|Funktionen">
+    <meta name="64er.id" content="kudiplo">
+</head>
+
+<body>
+    <article>
+        <h1>Kudiplo auch für den C 64</h1>
+
+        <p class="intro">In der Ausgabe 8 des 64’er Magazins war das Programm »Kudiplo« für den VC 20 abgedruckt, das mit dem 1520-Printer-Plotter eine komplette Kurvendiskussion ausgibt. Hier sind die erforderlichen Änderungen, um dieses nützliche Programm auch auf dem C 64 laufen zu lassen.</p>
+
+        <p>Nach der Veröffentlichung meines Programms Kudiplo für den VC 20, erreichten mich viele Leserbriefe mit der Bitte um nähere Auskunft dazu, wie das Programm für den C 64 abzuändern ist. Probleme gab es dabei mit der Routine in den Zeilen 185, 190 und 230.</p>
+
+        <p>Die genannten Zeilen bewirken in der veröffentlichten Version für den VC 20 ein »Verbiegen« des Vektors für die Fehlerbehandlungsroutine. Der in den Speicherstellen $0300 und $0301 stehende Zeiger wird so verändert, daß er nicht mehr zu der im Basic-ROM stehenden Routine zur Ausgabe von Fehlermeldungen zeigt. Statt dessen zeigt er nun auf einen Sprungbefehl, der mit Hilfe der Zeile 185 in den Kassettenpuffer geschrieben wurde. Dieser Sprungbefehl führt zurück ins Basic-Programm, dessen nächste Zeile gesucht und so abgearbeitet wird, als sei kein Fehler aufgetreten.</p>
+
+        <p>Die Ähnlichkeit des VC 20 mit seinem großen Bruder ist oft zitiert. Auch bei ihm läßt sich eine solche Fehlerblockade einrichten. Allerdings ist beim großen Bruder zu diesem Zweck ein kleines Maschinenprogramm in den Kassettenpuffer zu schreiben, in welchem abgefragt wird, ob ein Fehler vorgekommen ist und das dann abhängig vom Ergebnis entweder zum nächsten Statement oder zur nächsten Zeile verzweigt.</p>
+
+        <p>Für den C 64 müssen darum die Zeilen 185 und 230 wie folgt geändert werden:<br />
+            185 DATA 138,48,3, 76,59,169, 76,116,164: FOR I=<a href="#fehlerteufelchen" class="fehlerteufelchen_link">823</a> TO 840 : READ A : POKE I, A : NEXT<br />
+            230 NEXT : POKE 768, 139 : POKE 769, 227</p>
+
+        <p>Mit diesen Änderungen läuft Kudiplo dann endlich auch auf dem »großen Bruder«.</p>
+
+        <address class="author">(Jürgen Curdt/ev)</address>
+
+        <aside class="fehlerteufelchen" id="fehlerteufelchen">
+            <h2>Fehlerteufelchen</h2>
+            <p>In Zeile 185 wurden zwei Ziffern vertauscht. Statt »... FOR I = 823...« muß es richtig heißen: »... FOR I = 832 ...«.</p>
+            <!-- 64'er 11/1984 -->
+        </aside>
+
+    </article>
+
+</body>
+
+</html>

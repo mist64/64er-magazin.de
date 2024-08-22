@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>Der VC 1526/MPS 802 als Grafikdrucker</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="Lucas Kalt, rg">
+    <meta name="64er.issue" content="10/84">
+    <meta name="64er.pages" content="83">
+    <meta name="64er.head1" content="Grafik">
+    <meta name="64er.head2" content="C 64">
+    <meta name="64er.toc_category" content="Programme zum Abtippen|Grafik">
+    <meta name="64er.index_title" content="Der VC 1525/MPS 802 als Grafikdrucker">
+    <meta name="64er.index_category" content="Listings zum Abtippen|Grafik|Hardcopy">
+    <meta name="64er.id" content="vc1526">
+</head>
+
+<body>
+    <article>
+        <h1>Der VC 1526/MPS 802 als Grafikdrucker</h1>
+
+        <p>Aufgabe des Programms ist es, die Punkte aus dem Bildspeicher (nachfolgend als HRBM — Hires-Bit-Map — bezeichnet) zu lesen und dem Drucker in geeigneter Form zu übergeben. Die gestellte Aufgabe läßt sich in die folgenden Abschnitte unterteilen: Initialisierung; Lesen des HRBM; Umformen der gelesenen Daten; Übergabe der Daten an den Drucker; Ende.</p>
+
+        <p>Betrachten wir das Ganze aus der Bit-Sicht. Das HRBM besteht aus 8 000 Bytes. Diese lassen sich als 8 x 8 Bit-Zeichen zusammenfassen. Man erhält dann also 25 Zeilen zu je 40 Spalten aus 8 x 8 Bit-Zeichen = 1000 solche Zeichen. Das Programm liest also ein solches Zeichen aus der HRBM und definiert nach diesem Muster einen neuen Character für den 1526. Im HRBM sind aber die Bytes horizontal orientiert, während sie der Drucker vertikal orientiert erwartet (siehe Skizze 1). Das Umformungsprogramm hat deshalb die Aufgabe, die Bits um die Diagonale zu spiegeln. Damit wären alle Teilprobleme gelöst.</p>
+
+        <p>Das Assemblerprogramm bietet noch folgende Vorzüge:</p>
+        <ul>
+            <li>Befehlssyntax: SYS 6 * 4096, T, P<br />
+                T = Tabulator (0 &lt;= T &lt;= 40)<br />
+                P*4096 = Anfangsadresse des HRBM (0 &lt;= P &lt;= 15) — das HR-Bild kann auf dem Drucker in der Horizontalen verschoben werden (Tab)</li>
+            <li>durch einen speziellen Parameter wird das HRBM gewählt (auch das »versteckte« RAM unter dem Interpreter und dem Betriebssystem)</li>
+            <li>durch RUN/STOP unterbrechbar (Files werden korrekt geschlossen)</li>
+            <li>kein Zeilenvorschub, das heißt zwei nacheinander ausgedruckte Bilder fügen sich nahtlos aneinander</li>
+            <li>das Programm liegt von $6 000 bis $613b in einem günstigen Bereich und kann somit mit vorhandenen Basic-Erweiterungen verwendet werden</li>
+            <li>hohe Geschwindigkeit durch reine Maschinensprache.</li>
+        </ul>
+
+        <p>Wenn Sie das Hardcopy-Programm in Verbindung mit einer Basic-Erweiterung verwenden, beachten Sie bitte folgende Reihenfolge:</p>
+        <ol>
+            <li>Basic-Erweiterung laden und starten.</li>
+            <li>Basic-Lader des Hardcopy-Programms laden und starten. Das Maschinenprogramm schützt sich selbst vor dem Überschreiben.</li>
+        </ol>
+
+        <p>Es kann sein, daß Sie vor dem Starten des Programms den Zeilenvorschub des VC 1526/MPS 802 verkleinern müssen:<br />
+            OPEN 4,4: OPEN 6, 4, 6: PRINT#6, CHR$(18): PRINT#4: CLOSE 4: CLOSE 6</p>
+
+        <address class="author">(Lucas Kalt/rg)</address>
+
+        <figure>
+            <table>
+                <tbody>
+                    <tr>
+                        <td>Simons Basic</td>
+                        <td>P = 14</td>
+                    </tr>
+                    <tr>
+                        <td>Screen-Graphics 64</td>
+                        <td>P = 10</td>
+                    </tr>
+                    <tr>
+                        <td>Ultra-Basic 64</td>
+                        <td>P = 10</td>
+                    </tr>
+                    <tr>
+                        <td>Supergrafik 64</td>
+                        <td>P = 10 &amp; P = 14</td>
+                    </tr>
+                    <tr>
+                        <td>Hi-Res Grafik Aid (64 intern)</td>
+                        <td>P = 2</td>
+                    </tr>
+                </tbody>
+            </table>
+            <figcaption>Tabelle 1. Dies sind die Angaben, die das Programm benötigt.</figcaption>
+        </figure>
+
+        <figure>
+            <pre data-filename="hc-vc 1526" data-name="Hardcopy VC 1526/MPS 802 (Basic-Lader)"></pre>
+            <figcaption>Basic-Lader »Hardcopy VC 1526/MPS 802«</figcaption>
+        </figure>
+
+    </article>
+
+</body>
+
+</html>

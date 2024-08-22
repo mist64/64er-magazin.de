@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>In die Geheimnisse der Floppy eingetaucht – Teil 1</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="K. Schramm, B. Schneider, gk">
+    <meta name="64er.issue" content="10/84">
+    <meta name="64er.pages" content="153-156">
+    <meta name="64er.head1" content="Floppy-Kurs">
+    <meta name="64er.head2" content="C 64">
+    <meta name="64er.toc_category" content="Kurse">
+    <meta name="64er.index_title" content="In die Geheimnisse der Floppy eingetaucht (Teil 1)">
+    <meta name="64er.index_category" content="Kurse|Floppy">
+    <meta name="64er.id" content="floppy">
+</head>
+
+<body>
+    <article>
+        <h1>In die Geheimnisse der Floppy eingetaucht – Teil 1</h1>
+
+        <p class="intro">Das Diskettenlaufwerk VC 1541 ist der Renner unter den Massenspeichern. Doch mit der passenden Literatur hapert es. Deshalb beschränken sich die meisten Anwender auf das Speichern und Laden von Programmen. Mit diesem Kurs lernen Sie, Ihre Floppy effektiv auszunützen und schließlich zu manipulieren.</p>
+
+        <p>Daß die 1541 ein sehr wandelbares Gerät ist, werden die meisten Benutzer wohl wissen oder zumindest erahnen. Man denke ja nur an den »Kleinkrieg« zwischen Softwareherstellern und Softwarepiraten, die sich gegenseitig das Leben schwer machen. Die meisten »Schlachten« liefert man sich hier im Inneren der Floppy, die viel raffiniertere Methoden des Programmschutzes anbietet als der Commodore 64.</p>
+
+        <p>Aber auch solche Programme, wie das HYPRA-LOAD, das Sie ebenfalls in dieser Ausgabe als Listing des Monats finden, beweisen die Flexibilität der 1541. Doch wie bei so vielen Dingen in der Commodore-Welt sind auch hier die Informationen rar, beziehungsweise in den Handbüchern gar nicht vorhanden. So wollen wir uns mit Ihnen an die Floppy heran- und in sie hineintasten. Angefangen bei grundlegenden Informationen über den Diskettenaufbau und den Befehlssatz der Floppy werden wir Schritt für Schritt in deren Möglichkeiten zur Programmierung und Manipulation hinabtauchen. Was wird benötigt?</p>
+
+        <p>Nun, außer einem C 64 und einer VC 1541, »nur« Basic-Erfahrungen, grundlegende Kenntnisse in Maschinensprache (für spätere Folgen) und ein wenig Geduld.</p>
+
+        <p>Bevor wir jedoch mit unserer ersten Tauchfahrt beginnen, tippen Sie bitte das beigefügte Programm EDDI (Listing 1) ein, sofern Sie nicht über einen eigenen Disk-Monitor verfügen. Auf die Bedienung von EDDI wird im Einzelnen eingegangen.</p>
+
+        <p>Sehen wir uns jetzt erst einmal so eine Diskette an; die folgenden Erläuterungen beziehen sich auf eine formatierte Diskette.</p>
+
+        <h2>Aufbau einer Diskette</h2>
+
+        <p>Die Diskette ist in 35 konzentrische Spuren (englisch: Tracks) aufgeteilt. Diese Spuren enthalten wiederum jede eine bestimmte Anzahl von Sektoren, die von außen nach innen abnimmt. Die genauen Zahlenverhältnisse stehen in Tabelle 1.</p>
+
+        <figure>
+            <table>
+                <tbody>
+                    <tr>
+                        <td>Spuren</td>
+                        <td>Sektoren</td>
+                        <td>Anzahl Total
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>01-17</td>
+                        <td>00-20</td>
+                        <td>21</td>
+                    </tr>
+                    <tr>
+                        <td>18-24</td>
+                        <td>00-18</td>
+                        <td>19</td>
+                    </tr>
+                    <tr>
+                        <td>25-30</td>
+                        <td>00-17</td>
+                        <td>18</td>
+                    </tr>
+                    <tr>
+                        <td>31-35</td>
+                        <td>00-16</td>
+                        <td>17</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <figcaption>Tabelle 1. Spuren und Sektoren des VC 1541-Diskettenformates</figcaption>
+        </figure>
+
+        <p>Die Spuren sind, beginnend mit der äußeren Spur, von 1 bis 35 durchnumeriert. Die Sektoren sind auf den Spuren in numerischer Reihenfolge gegen den Uhrzeigersinn angeordnet. Jeder Sektor enthält einen Block, das sind 256 Bytes, an Information. Es kann jeder der 683 Blöcke auf der Diskette durch Angabe der jeweiligen Spur- und Sektornummer aufgerufen werden. Allerdings stehen davon dem Benutzer normalerweise nur 664 Blocks zur Verfügung, da das Betriebssystem der Floppy die Spur 18 für sich beschlagnahmt.</p>
+
+        <p>Für die nun folgenden Versuche wäre es sinnvoll, eine Diskette neu zu formatieren, mit der wir ein bißchen »spielen« können. Sehen wir uns nun erst einmal das Directory an (LOAD &ldquo;$&rdquo;,8).</p>
+
+        <p>In der ersten Zeile stehen die Drivenummer (hier immer 0) und der Name der Diskette, sowie die ID und das Formatkennzeichen (genaueres später).</p>
+
+        <p>Die zweite Zeile enthält, da sich kein File auf der Diskette befindet, die Meldung »664 BLOCKS FREE«.</p>
+
+        <h2>Erste Versuche mit EDDI, dem Disk-Monitor/Editor</h2>
+
+        <p>Da sich diese Informationen auf der schon erwähnten Spur 18 befinden, wollen wir uns diese Spur mit EDDI gleich einmal etwas genauer ansehen. Laden Sie den Editor und legen Sie unsere »Spieldiskette« ein; danach starten Sie mit RUN.</p>
+
+        <p>Als Kommando tippen Sie F3 für »BLOCK LESEN«. Danach geben Sie, durch Komma getrennt, die Spur und Sektornummer des gewünschten Blocks ein; in unserem Fall »18,0«.</p>
+
+        <p>Nach dem Ladevorgang meldet sich EDDI mit Byte 0 der ersten von 16 Seiten, zu je 16 Bytes. Drücken Sie jetzt RETURN, um die erste Seite anzuzeigen, welche wir nun betrachten wollen.</p>
+
+        <p>Es sollte vielleicht erwähnt werden, daß die Zählung von Blöcken und Bytes grundsätzlich bei Null beginnt. Den eingeladenen Block bezeichnet man als BAM (Block Availability Map), auf deutsch etwa »Blockbelegungsplan«. Dieser Plan gibt an, welche Blöcke auf der Diskette frei und welche schon beschrieben sind. Ferner enthält er den Namen der Diskette, die ID, das Formatkennzeichen und den Beginn des Directory.</p>
+
+        <p>Die ersten beiden Bytes (0,1) dieses Blocks enthalten Spur und Sektor des ersten Directoryblocks; normalerweise »18,1« (siehe auch Tabelle 2).</p>
+
+        <figure>
+            Aufbau des Blocks 18,0:
+            <table>
+                <tbody>
+                    <tr>
+                        <td>BYTE(s)</td>
+                        <td>Bedeutung:</td>
+                    </tr>
+                    <tr>
+                        <td>000-001</td>
+                        <td>Spur und Sektor des ersten Directory-Blocks</td>
+                    </tr>
+                    <tr>
+                        <td>002</td>
+                        <td>Formatkennzeichen »A«</td>
+                    </tr>
+                    <tr>
+                        <td>003</td>
+                        <td>unbenutzt</td>
+                    </tr>
+                    <tr>
+                        <td>004-007</td>
+                        <td>BAM der Spur 1</td>
+                    </tr>
+                    <tr>
+                        <td>008-011</td>
+                        <td>BAM der Spur 2</td>
+                    </tr>
+                    <tr>
+                        <td>012-143</td>
+                        <td>BAM der Spuren 3-35</td>
+                    </tr>
+                    <tr>
+                        <td>144-161</td>
+                        <td>Name der Diskette, aufgefüllt mit 160</td>
+                    </tr>
+                    <tr>
+                        <td>162-163</td>
+                        <td>ID der Diskette</td>
+                    </tr>
+                    <tr>
+                        <td>164</td>
+                        <td>unbenutzt</td>
+                    </tr>
+                    <tr>
+                        <td>165-166</td>
+                        <td>DOS und Formatkennzeichen</td>
+                    </tr>
+                    <tr>
+                        <td>167-255</td>
+                        <td>nicht benutzt</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <figcaption>Tabelle 2. Aufbau und Inhalt der BAM (Block-Belegungs-Plan) in Spur 18, Sektor 0</figcaption>
+        </figure>
+
+        <p>Byte 2 enthält das Formatkennzeichen (hier 65, beziehungsweise »A«), Zur Erklärung: Commodore stellt ja verschiedene Laufwerke her, zum Beispiel 1541, 3040, 8050, 8250&hellip; Diese Laufwerke unterscheiden sich fast alle im Aufzeichnungsformat, das heißt Anzahl und Verteilung der Spuren und Sektoren; so hat die CBM 8050 77 Spuren mit bis zu 29 Sektoren, was deren höhere Speicherkapazität zur Folge hat. Solche Disketten können verständlicherweise von der 1541 weder gelesen noch beschrieben werden. Am Formatkennzeichen »A« erkennt die 1541 nun Disketten ihres eigenen Formats; ist dieses nicht identisch, so beschwert sich die Floppy mit einer Fehlermeldung. Eine Ausnahme dieser Regel bildet die Lesekompatibilität, die besagt, daß eine »fremde« Diskette zwar gelesen, aber nicht beschrieben werden kann (zum Beispiel 3040 auf 1541).</p>
+
+        <p>Byte 3 steht generell auf Null, da es bei der 1541 keine Funktion erfüllt.</p>
+
+        <p>Die Bytes 4 bis 143 enthalten nun die eigentliche BAM, deren Format ein wenig kompliziert ist: Für jede Spur sind 4 Bytes reserviert, wobei das jeweils erste Byte die Anzahl der noch freien Blöcke auf dieser Spur angibt. Die folgenden drei Bytes müssen wir als eine Gesamtheit von 24 Bits betrachten, wobei jedes gesetzte Bit einen freien Block signalisiert; siehe auch Tabelle 3.</p>
+
+
+        <figure>
+            Aufbau eines 4 Byte-Eintrages in der BAM (eine Spur)
+            <table>
+                <tbody>
+                    <tr>
+                        <td>BYTE(s)</td>
+                        <td>Bedeutung:</td>
+                    </tr>
+                    <tr>
+                        <td>000</td>
+                        <td>Anzahl der freien Blöcke dieser Spur
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>001-003</td>
+                        <td>Belegplan der Spur Jedes Byte ist zuständig für 8 Sektoren:<br>
+                            Byte 1 für 0-7<br>
+                            &nbsp;&nbsp;&nbsp;&nbsp;Bit 7 für Sektor 0<br>
+                            &nbsp;&nbsp;&nbsp;&nbsp;Bit 6 für Sektor 1 und so weiter<br>
+                            Byte 2 für 8-15<br>
+                            Byte 3 für 16-23
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <figcaption>Tabelle 3. Für jede Spur reserviert die BAM 4 Bytes</figcaption>
+        </figure>
+
+        <p>Um auch die folgenden Seiten des Blocks zu betrachten, drücken Sie zum Vorwärtsblättern Fl; die weitere Bedienung ist analog zur oben beschriebenen. Rückwärtsblättern ist durch Drücken von F2 möglich.</p>
+
+        <p>Fahren Sie nun bis zum Byte 144 vor und sehen Sie sich die Seite an.</p>
+
+        <p>Die Bytes 144 bis 161 enthalten den Namen der Diskette, der beim Formatieren festgelegt wird. Direkt im Anschluß daran folgen die Bytes 162,163, die die ID im ASCII-Code beinhalten, gefolgt von einem »Shift Space«. An der ID erkennt die Floppy, ob die Diskette gewechselt wurde; deshalb sollte jede Diskette eine andere ID haben.</p>
+
+        <p>Byte 165 und 166 enthalten DOS-Version und Formatkennzeichen, hier normalerweise »2A«, wiederum gefolgt von einem »Shift Space«.</p>
+
+        <p>Die Bytes 171 bis 255 haben normalerweise keine Bedeutung und können unterschiedlich gefüllt sein.</p>
+
+        <h2>Wie sieht das Inhaltsverzeichnis aus?</h2>
+
+        <p>Auf unserer Entdeckungsreise durch Spur 18 folgen wir jetzt der Angabe in den ersten beiden Bytes und laden den ersten Directoryblock (F3; 18,1). Das Format des Blocks ist der Tabelle 4 zu entnehmen. Jeder Direktoryblock enthält acht File-Einträge und den Zeiger auf den nächsten Direktoryblock (Byte 0 und 1); ist die Tracknummer des nächsten Blocks 0, so war der gelesene Directoryblock der letzte, und das zweite Byte zeigt die Anzahl der hier benutzten Bytes an. In unserem Fall stehen hier 0 und 255.</p>
+
+
+        <figure>
+            Aufbau eines Directory-Blocks:
+            <table>
+                <tbody>
+                    <tr>
+                        <td>BYTE(s)</td>
+                        <td>Bedeutung</td>
+                    </tr>
+                    <tr>
+                        <td>000-001</td>
+                        <td>Spur und Sektor des nächsten Dir.-Blocks</td>
+                    </tr>
+                    <tr>
+                        <td>002-031</td>
+                        <td>Eintrag Nr. 1</td>
+                    </tr>
+                    <tr>
+                        <td>032-033</td>
+                        <td>unbenutzt</td>
+                    </tr>
+                    <tr>
+                        <td>034-063</td>
+                        <td>Eintrag Nr. 2</td>
+                    </tr>
+                    <tr>
+                        <td>064-066</td>
+                        <td>unbenutzt</td>
+                    </tr>
+                    <tr>
+                        <td>067-225</td>
+                        <td>Einträge Nr. 3-7 bzw. unbenutzt</td>
+                    </tr>
+                    <tr>
+                        <td>226-255</td>
+                        <td>Eintrag Nr. 8</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <figcaption>Tabelle 4. Aufbau der Directory der VC 1541</figcaption>
+        </figure>
+
+        <p>Nun zu Tabelle 5, die das Format eines Directoryeintrags darlegt: Jeder dieser Einträge besteht aus 30 Bytes, wobei das erste den Filetyp (siehe Tabelle 6), die beiden nächsten Spuren und Sektoren des ersten Fileblocks und die 16folgenden Bytes den Filenamen enthalten. Die folgenden 3 Byte werden nur bei relativen Dateien verwendet; sie werden später im einzelnen noch besprochen.</p>
+
+        <figure>
+            Aufbau eines Directory-Eintrags:
+            <table>
+                <tbody>
+                    <tr>
+                        <td>BYTE(s)</td>
+                        <td>Bedeutung</td>
+                    </tr>
+                    <tr>
+                        <td>000</td>
+                        <td>Filetyp, siehe ges. Tab</td>
+                    </tr>
+                    <tr>
+                        <td>001-002</td>
+                        <td>Spur und Sektor des ersten Datenblocks</td>
+                    </tr>
+                    <tr>
+                        <td>003-018</td>
+                        <td>Filename, aufgefüllt mit 160</td>
+                    </tr>
+                    <tr>
+                        <td>019-020</td>
+                        <td>REL-Files: Spur und Sektor des ersten Side- Sektor-Blocks</td>
+                    </tr>
+                    <tr>
+                        <td>021</td>
+                        <td>REL-Files: Datensatzlänge</td>
+                    </tr>
+                    <tr>
+                        <td>022-025</td>
+                        <td>unbenutzt</td>
+                    </tr>
+                    <tr>
+                        <td>026-027</td>
+                        <td>Spur und Sektor beim Überschreiben mit @ (nur Zwischenspeicher)</td>
+                    </tr>
+                    <tr>
+                        <td>028-029</td>
+                        <td>Anzahl der von diesem File belegten Blocks</td>
+                    </tr>
+                </tbody>
+            </table>
+            <figcaption>Tabelle 5. Bedeutung der einzelnen Byte des Directory</figcaption>
+        </figure>
+
+        <figure>
+            Aufbau des Filetyp-Bytes
+            <table>
+                <tbody>
+                    <tr>
+                        <td>BIT</td>
+                        <td colspan="5">Bedeutung, in Klammern jeweiliger Inhalt</td>
+                    </tr>
+                    <tr>
+                        <td>0</td>
+                        <td>(0)</td>
+                        <td>(1)</td>
+                        <td>(0)</td>
+                        <td>(1)</td>
+                        <td>(0)</td>
+                    </tr>
+                    <tr>
+                        <td>1</td>
+                        <td>(0)=DEL</td>
+                        <td>(O)=SEQ</td>
+                        <td>(l)=PRG</td>
+                        <td>(l)=USR</td>
+                        <td>(O)=REL</td>
+                    </tr>
+                    <tr>
+                        <td>2</td>
+                        <td>(0)</td>
+                        <td>(0)</td>
+                        <td>(0)</td>
+                        <td>(0)</td>
+                        <td>(1)</td>
+                    </tr>
+                    <tr>
+                        <td>3</td>
+                        <td colspan="5">unbenutzt</td>
+                    </tr>
+                    <tr>
+                        <td>4</td>
+                        <td colspan="5">unbenutzt</td>
+                    </tr>
+                    <tr>
+                        <td>5</td>
+                        <td colspan="5">unbenutzt</td>
+                    </tr>
+                    <tr>
+                        <td>6</td>
+                        <td colspan="5">(0)=normal; (1) = File kann durch SCRATCH nicht mehr gelöscht werden</td>
+                    </tr>
+                    <tr>
+                        <td>7</td>
+                        <td colspan="5">(0)= File noch offen</td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td colspan="5">(1)= File ordnungsgemäß geschlossen</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <figcaption>Tabelle 6. Die Bedeutung des ersten Bytes eines Directory-Eintrages</figcaption>
+        </figure>
+
+        <p>Byte 26 und 27 enthalten Track und Sektor des neuen Files, falls das alte mit »@« überschrieben wurde. Die Bytes 28,29 schließlich geben die Anzahl der belegten Blöcke dieses Files an.</p>
+
+        <h2>Die einzelnen Datei-Typen der Floppy</h2>
+
+        <p>Diese bis jetzt beschriebenen Angaben werden vom Betriebssystem der Floppy, also vom DOS (englisch: Disk Operating System) verwaltet.</p>
+
+        <p>Beschäftigen wir uns nun mit den restlichen Blöcken auf der Diskette, die dem Anwender zur freien Verfügung stehen, denn dort werden die einzelnen Files abgespeichert, deren Aufbau uns jetzt interessiert.</p>
+
+        <h3>DEL-Files:</h3>
+
+        <p>Diese Fileanzeige existiert normalerweise nicht im Directory; wird ein File gelöscht, so wird dieses nicht mehr angezeigt; das Byte des Filetyps steht dann auf 0. Durch setzen des Filetyps auf 128 (hex. $80) kann eine DEL-Anzeige jedoch erzwungen werden.</p>
+
+        <h3>SEQ-Files:</h3>
+
+        <p>Dieser Filetyp dient zur Speicherung von Daten auf Diskette (im Gegensatz zur Programmspeicherung). Der Aufbau dieses Filetyps ist relativ einfach: Die ersten beiden Bytes eines Datenblocks zeigen jeweils auf den nächsten Block im File; so erfolgt eine beliebig lange Blockverkettung auf der Diskette. Da aber auch das schönste File einmal zu Ende geht, muß der letzte Block gekennzeichnet sein. Dies erfolgt, wie schon beim Directory, durch eine 0 als Spurnummer. Die Sektornummer bezeichnet jetzt die Anzahl der belegten Datenbytes dieses Blocks. Diese Art der Verkettung von Blöcken wird bei allen Filetypen vorgenommen! Die restlichen 254 Bytes jedes Blocks enthalten die Daten.</p>
+
+        <h3>USR-Files</h3>
+
+        <p>USR-Files stimmen im Aufbau exakt mit den SEQ-Files überein, sie haben jedoch noch Zusatzfunktionen im DOS, auf die ein anderes Mal eingegangen werden soll.</p>
+
+        <h3>PRG-Files</h3>
+
+        <p>PRG-Files stellen den häufigsten Filetyp dar. Sie dienen der Speicherung von Programmen auf der Diskette und haben nahezu den selben Aufbau wie SEQ-Files. Der einzige Unterschied besteht in den Bytes 2 und 3 des ersten Blocks, welche die Startadresse des Programms im Computer enthalten. Ist diese Adresse gleich der Adresse des Basic-Anfangs, also 2049 ($0801), so können die Programme mit »LO-AD”Name",8« geladen werden; dieser Modus ignoriert die Anfangsadresse auf Diskette und lädt die Programme generell an den Basic-Anfang (sogenanntes relatives Laden). Sollen Programme jedoch an anderen Stellen im Speicher stehen, zum Beispiel Maschinenprogramme, so muß diese angegebene Adresse als Startadresse benutzt werden; man lädt hier absolut mit »LOAD”Name”,8,1«.</p>
+
+        <h3>REL-Files:</h3>
+
+        <p>Dieser Filetyp ist im Aufbau ungleich komplizierter als die eben besprochenen; es soll daher zuerst kurz auf die Arbeitsweise von REL-Files eingegangen werden. Sequentielle Files haben den Nachteil, daß sie praktisch nur aus einem Datensatz bestehen. Sucht man nun, zum Beispiel in einer Kartei, eine bestimmte Hausnummer oder einen bestimmten Namen, so muß der gesamte Datensatz durchgelesen werden, um die entsprechende Stelle zu finden. In einer relativen Datei geht man deshalb einen anderen Weg, um jede Stelle schnell auffinden zu können.</p>
+
+        <p>Es existiert eine beliebige Anzahl (zum Beispiel 100) von Datensätzen, wobei alle Datensätze die gleiche Länge haben müssen (maximal 254 Zeichen).</p>
+
+        <p>Das DOS legt jetzt einen sogenannten Side-Sektor an, der aus bis zu sechs Blöcken bestehen kann. Diese Blöcke enthalten nun die Zeiger auf sämtliche Datenblöcke, in denen die Datensätze gespeichert sind (1 Datensatz hat maximal 1 Block Länge). Auch hier sind die Datenblöcke wieder durch Zeiger in den Bytes 0 und 1 verkettet. Den Aufbau eines Side-Sektor-Blocks zeigt Tabelle 7. Zum besseren Verständnis hier ein kleines Beispiel:</p>
+
+        <figure>
+            Aufbau eines Side-Sektor-Blocks:
+            <table>
+                <tbody>
+                    <tr>
+                        <td>BYTE(s)</td>
+                        <td>Bedeutung</td>
+                    </tr>
+                    <tr>
+                        <td>000-001</td>
+                        <td>Spur und Sektor des nächsten Side-Sektor-Blocks</td>
+                    </tr>
+                    <tr>
+                        <td>002</td>
+                        <td>Nummer des Side-Sektor- Blocks</td>
+                    </tr>
+                    <tr>
+                        <td>003</td>
+                        <td>Datensatzlänge</td>
+                    </tr>
+                    <tr>
+                        <td>004-005</td>
+                        <td>Spur und Sektor des Side-</p>
+                            <p>Sektor-Blocks 1
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>006-007</td>
+                        <td>Spur und Sektor des Side-</p>
+                            <p>Sektor-Blocks 2
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>008-015</td>
+                        <td>Spur und Sektor der Side- Sektor-Blöcke 3-6</td>
+                    </tr>
+                    <tr>
+                        <td>016-017</td>
+                        <td>Spur und Sektor des ersten Datenblocks für den der Side-Sektor-Block zuständig ist. (Datenblock 0) Spur und Sektor des zweiten Datenblocks (Nr. 1)</td>
+                    </tr>
+                    <tr>
+                        <td>018-255</td>
+                        <td>Spur und Sektor der Datenblocks Nr. 2 bis Nr. 119</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <figcaption>Tabelle 7 Relative Dateien benutzen Side-Sektor-Blöcke um Datensätze gezielt anzuspringen</figcaption>
+        </figure>
+
+        <p>Wir haben eine relative Datei mit 250 Datensätzen ä 127 Zeichen. Diese Datei benötigt also 125 Datenblöcke und zwei Side-Sektor-Blöcke. Im Directory-Eintrag finden wir jetzt die schon erwähnten zusätzlichen Bytebelegungen: Byte 19 und 20 jedes Eintrags enthalten jetzt Spur und Sektor des ersten Side-Sektor-Blocks; Byte 21 gibt die Datensatzlänge (Recordlänge) an.</p>
+
+        <p>Wir wollen jetzt auf den 248. Datensatz zugreifen; das DOS arbeitet nun folgendermaßen: Ein Datensatz enthält 127 Byte, das heißt, es passen zwei Datensätze in einen Block; dadurch errechnet sich der Block, auf den jetzt zugegriffen wird, aus (248-1)/2 = 123.5. (Minus 1, da immer von 0 an gezählt wird). Da ein Side-Sektor-Block nur 120 Einträge aufnehmen kann, ist der Zeiger auf den Datenblock im Side-Sektor-Block Nummer 2 zu finden. Dieser wird jetzt anhand des Verzeichnisses in Block 1 gelesen und dann auf Zeiger Nummer 3 (Bytes 22,23) zugegriffen. Wir kennen also jetzt Spur und Sektor des Blockes, in dem unser Datensatz steht; die Position des ersten Datenbyte berechnet sich jetzt aus dem Nachkommaanteil der obigen Division (0.5*254 = 127). Der Datensatz beginnt also beim 127+2 = 129ten Byte.</p>
+
+        <p>Der Aufbau von relativen Dateien ist also, wie schon erwähnt, ziemlich kompliziert; diese Art der Datenspeicherung hat aber einige Vorteile gegenüber der ’normalen’ mit SEQ-Files.</p>
+
+        <h3>Bedienungshinweise für EDDI, dem Disk-Monitor/Editor</h3>
+
+        <p>Da unserem U-Boot auf dieser schwierigen Fahrt der Sauerstoff ausgegangen ist, wollen wir uns nun erst einmal erholen. Hier noch ein paar Anregungen zur Arbeit mit EDDI: EDDI kann nicht nur Blöcke lesen und anzeigen; Sie können auch Bytes verändern und diesen Block danach wieder abspeichern.</p>
+
+        <p>Dazu laden Sie den zu verändernden Block und fahren auf die Seite, die Sie interessiert; hier tippen Sie als Kommando F5, und der Editor-Modus startet. Sie können jetzt Bytes dezimal abändern, indem Sie den jeweils neuen Wert eingeben und »RETURN« drücken. Wollen Sie aus dem Eingabemodus aussteigen, so tippen Sie entweder »RETURN« und können weiterblättern ohne den Editor zu verlassen, oder Sie tippen »t RETURN«, um in den Kommando-Modus zu kommen. Nach einigem Probieren wird Ihnen EDDI sehr schnell vertraut werden; wir gehen auch in den folgenden Ausgaben noch darauf ein.</p>
+
+        <h3>Wichtig:</h3>
+
+        <p>Beim Wechseln einer Diskette muß die Funktionstaste F6 getippt und nach dem Austausch eine Taste gedrückt werden, sonst reagiert die Floppy mit einer Fehlermeldung. Diese können übrigens mit »@« abgerufen werden. Das Zurückschreiben eines Blocks auf Diskette erfolgt mit F4, wobei Spur und Sektornummer angegeben werden müssen. Hier noch ein paar Vorschläge zum Ausprobieren: Ändern Sie doch einmal auf Ihrer Versuchsdiskette (!) das Formatkennzeichen (Spur 18, Sektor 0, Byte 2 auf 66 statt jetzt 65 und speichern den Block an die gleiche Stelle auf die Diskette zurück. Versuchen Sie nun einmal ein kleines Programm auf diese Diskette zu schreiben. (Die genauen Vorgänge in der Floppy werden beim nächstenmal erläutert.) Oder ändern Sie einmal die Bytes im Directory, die den Filetyp angeben, entsprechend Tabelle 6 und laden Sie es danach. Mit dem klugen Satz »Probieren geht über Studieren« verabschieden wir uns für diese Ausgabe. Nächstesmal beginnt dann ein praktischer Teil unserer Expedition, nämlich die Vorstellung des Befehlssatzes der 1541 mit vielen Beispielen und Anregungen.</p>
+
+        <address class="author">(K. Schramm/B. Schneider/gk)</address>
+
+        <figure>
+            <pre data-filename="eddi_diskmon" data-name="EDDI"></pre>
+            <figcaption>Listing 1. EDDI, ein Disk-Monitor/Editor</figcaption>
+        </figure>
+
+    </article>
+
+</body>
+
+</html>

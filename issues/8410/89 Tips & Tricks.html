@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>Tips &amp; Tricks</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="Thomas Lopatic, Oliver Bausch, Jörg Prante, H. Rendelmann, Thomas Maul">
+    <meta name="64er.issue" content="10/84">
+    <meta name="64er.pages" content="89-90">
+    <meta name="64er.head1" content="Tips & Tricks">
+    <meta name="64er.head2" content="C 64/VC 20">
+    <meta name="64er.toc_category" content="Programme zum Abtippen|Tips & Tricks">
+    <meta name="64er.index_title" content="Diverse">
+    <meta name="64er.index_category" content="Listings zum Abtippen|Tips & Tricks|Tips & Tricks">
+    <meta name="64er.id" content="tips">
+</head>
+
+<body>
+    <article>
+        <h1>Tips &amp; Tricks</h1>
+
+        <h2>Listschutz</h2>
+
+        <p>Möchte man ein Programm mit einem einfachen Listschutz versehen, so verfährt man folgendermaßen:</p>
+        <ol>
+            <li>Man ergänzt die Zeile, ab der der Listschutz wirksam werde nsoll, mit »:REM””«.</li>
+            <li>Man fährt mit dem Cursor auf das zweite Anführungszeichen und drückt fünfmal die Taste INST</li>
+            <li>Nun wird ebenfalls fünfmal die Taste DEL gedrückt, so daß zwischen den Anführungszeichen fünf reverse T stehen.</li>
+            <li>Zuletzt bewegt man den Cursor hinter das zweite Anführungszeichen und drückt die Tastenkombination SHIFT und L Anschließend RETURN nicht vergessen.</li>
+        </ol>
+
+        <p>Wenn nun versucht wird, das Programm zu listen, gelangt der Computer nur bis zu der Zeile, in der der Listschutz steht und bricht dann den Vorgang mit »Syntax Error« ab.</p>
+
+        <address class="author">(Thomas Lopatic)</address>
+
+        <h2>C 64 beschleunigt</h2>
+
+        <p>Für alle diejenigen C 64 - Besitzer, denen die Bewegung des Cursors bisher zu langsam war, gibt es einen speziellen POKE.</p>
+
+        <p>Mit POKE 56325,5 wird der Cursor rasend schnell und flitzt bei Betätigung der Cursortasten nur noch so über den Bildschirm. Wer’s lieber gemütlicher mag, der sollte es statt dessen einmal mit POKE 56325,255 probieren.</p>
+
+        <address class="author">(Oliver Bausch)</address>
+
+        <h2>Text und Grafik mischen</h2>
+
+        <p>Im Leserforum des 64’er Magazins, Ausgabe 8/84, fragte Frank Schager nach einer Möglichkeit, mit Simons Basic ein Textfenster in der hochauflösenden Grafik zu erzeugen.</p>
+
+        <p>Mit dem folgenden kleinen Programm wird die normale Tastaturabfrage mit dem Simons Basic-Befehl »TEXT« verbunden:<br />
+            10 X = 2 : Y = 2 : REM Text-Anfang<br />
+            20 HIRES 15,11 : REM Grafik ein<br />
+            30 GETA$<br />
+            40 IF A$ &lt;> &ldquo;"THEN GOSUB 100<br />
+            50 GOTO 30<br />
+            60 REM<br />
+            100 X = X + 8 : REM X-Koordinate erhöhen<br />
+            110 IFX > 38 * 8THEN X = 2: Y = Y + 8: REM Zeilenende ? Dann neue Zeile<br />
+            120 TEXTX,Y,A$,1,1,8 : REM Zeichen drucken<br />
+            130 AA$ = AA$ + A$ : REM Wort erzeugen<br />
+            140 IF AA$ = ”GEHE” THEN 1000 : REM Zum Beispiel<br />
+            150 RETURN</p>
+
+        <p>Natürlich kann man die Anfangskoordinaten so verändern, daß sie zum Spiel passen. Veränderbar ist auch der Faktor 38 in Zeile 110, je nachdem, welche Zeilenlänge gewünscht wird. Ebenso besteht die Möglichkeit, zwischen den Zeilen 130 und 150 weitere IF-Abfragen einzubauen. Empfehlenswert ist die besondere Abfrage der Tasten SPACE und RETURN.</p>
+
+        <address class="author">(Jörg Prante)</address>
+
+        <h2>Textomat-Tip</h2>
+
+        <p>Bei Ihrem Software-Test des Textomat von Data-Becker (Ausgabe 9/84) wurde als gravierender Nachteil angeführt, daß bei einmal gestartetem Ausdruck keine Unterbrechung mehr möglich ist. Ich arbeite in Zusammenhang mit Textomat mit einem Epson-Drucker RX 80 FT. Um den begonnenen Ausdruck zu unterbrechen, kann man einfach den ON-LINE-Schalter betätigen und den Drucker anschließend ausschalten. Sekunden später meldet sich der Textomat am Bildschirm mit dem zu druckenden Text zurück.</p>
+
+        <address class="author">(H. Rendelmann)</address>
+
+        <h2>Basic-Programme verbinden</h2>
+
+        <p>So manch einen C 64-Besitzer wird es schon geärgert haben, daß sein Computer keinen MERGE-Befehl besitzt. Mit wenig Aufwand ist es aber dennoch möglich, Basic-Programme aneinanderzuhängen:</p>
+
+        <ol>
+            <li>Im Direktmodus »PRINT PEEK(43); PEEK(44)« eingeben und sich die Ergebnisse merken.</li>
+            <li>Das erste Programm normal laden.</li>
+            <li>Erscheint jetzt nach »PRINT PEEK(45)« eine Null oder eine Eins, dann geben Sie »POKE 43, 256 + PEEK(45) - 2 : POKE 44, PEEK(46) -1 : NEW« ein. Im anderen Fall wird »POKE 43, PEEK(45) - 2 : POKE 44, PEEK(46): NEW« eingegeben.</li>
+            <li>Nun wird das anzuhängende Programm geladen (Achtung! Das anzuhängende Programm muß die höheren Zeilennummern haben).</li>
+            <li>Jetzt POKEn Sie in die Speicherstellen 43 und 44 die zu Anfang gemerkten Werte</li>
+        </ol>
+
+
+        <p>Beide Programme sind nun verbunden und können ganz normal gehandhabt werden. Wichtig bei der ganzen Prozedur ist, daß keine Variablen definiert werden, da das MERGEn sonst nicht richtig funktioniert.</p>
+
+        <address class="author">(Thomas Lopatic)</address>
+
+        <h2>POKEs für den C 64</h2>
+
+        <p>Mit POKE 775,1 ist ein (fast) perfekter Listschutz aktiviert. Auch ein SAVE-Schutz ist mit wenig Aufwand möglich: POKE 801,0 : POKE 802,0 : POKE 818,165. Nach diesen drei POKE-Befehlen kann das Programm weder auf Kassette noch auf Diskette kopiert werden. Schließlich gibt es noch eine Möglichkeit, die RUN/STOPTaste abzuschalten, und zwar mit POKE 808,225. Wiedereinschalten ist mit POKE 808,237 möglich.</p>
+
+        <address class="author">(Thomas Lopatic)</address>
+
+        <h2>GOTO X für VC 20</h2>
+
+        <p>Viele schätzen es, viele wünschen es sich: Einen berechneten GOTO-Befehl auf einen variablen Ausdruck anstelle einer Zeilennummer. Hier ist eine schnelle und sichere Methode, die nur 17 Bytes Speicherplatz benötigt.</p>
+
+        <p>Schreiben Sie als erste Programmzeile »1 REM &ldquo;*********"« (mindestens neun Sternchen). Anschließend geben Sie im Direktmodus ein:</p>
+
+        <p>»PRINT PEEK(43) + PEEK(44) * 256 + 6« (RETURN). Die daraufhin angezeigte Adresse notieren Sie sich bitte Ohne Erweiterung müßten Sie den Wert 4103 erhalten haben, mit 3 KByte Erweiterung 1031 und ab 8 KByte Erweiterung 4615.</p>
+
+        <p>Jetzt POKEn Sie ab der notierten Adresse bitte folgende Werte ein: 32, 138, 205, 32, 247, 215, 76, 163, 200.</p>
+
+        <p>Wenn Sie nun die erste Zeile (mit dem REM) aufLISTen, sehen Sie einige Grafikzeichen. Diese stellen ein kurzes Maschinenspracheprogramm dar, das einen mathematischen Ausdruck in einen ganzzahligen Wert umrechnet. Diese Zeile muß immer die erste Programmzeile sein und darf auch nicht mehr geändert werden. Das übrige Programm kann natürlich wie gewohnt editiert werden.</p>
+
+        <p>Sie haben jetzt im Programm einen simulierten GOTO X - Befehl zur Verfügung, der mit SYS (Adresse) X aufgerufen wird. Für Adresse müssen Sie die anfangs notierte Adresse einsetzen (Klammern nicht vergessen). Für X kann ein beliebiger arithmetischer Ausdruck stehen wie zum Beispiel 5, A, A+2, C+D/SQR(9) oder PEEK(5).</p>
+
+        <p>Der neue Befehl hat im übrigen die gleichen Auswirkungen wie der normale GOTO-Befehl. Ist eine Zeilennummer nicht vorhanden, gibt es daher ebenfalls einen »UNDEF’D STATEMENT ERROR«.</p>
+
+        <address class="author">(Thomas Maul)</address>
+
+    </article>
+
+</body>
+
+</html>

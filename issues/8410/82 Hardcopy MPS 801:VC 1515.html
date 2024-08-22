@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>Hardcopy MPS 801/VC 1515</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="Rainer Kracht, rg">
+    <meta name="64er.issue" content="10/84">
+    <meta name="64er.pages" content="82">
+    <meta name="64er.head1" content="Grafik">
+    <meta name="64er.head2" content="C 64">
+    <meta name="64er.toc_category" content="Programme zum Abtippen|Grafik">
+    <meta name="64er.index_title" content="Hardcopy MPS 801/VC 1515">
+    <meta name="64er.index_category" content="Listings zum Abtippen|Grafik|Hardcopy">
+    <meta name="64er.id" content="mps801">
+</head>
+
+<body>
+    <article>
+        <h1>Hardcopy MPS 801/VC 1515</h1>
+
+        <p>Mit dem Programm kann in knapp drei Minuten der Grafikbildschirm des C 64 ausgedruckt werden. Dabei wird Bit für Bit der Inhalt des Grafikspeichers auf die Druckernadel übertragen. Es arbeitet mit dem MPS801 und läuft auch mit dem VC 1515. Allerdings muß dann der Bildschirm während des Druckens abgeschaltet werden.</p>
+
+        <p>Der Basic-Lader kann auch in eigenen Grafik-Programmen verwendet werden. Sie können den Bereich 8192 bis 49151 als Grafikspeicher benutzen.</p>
+
+        <p>Um passende Bits für jede Druckernadel im Grafikspeicher zu finden, habe ich den Ausdruck BYTEADRESSE = 8192 + 8 * X + Y + INT(Y/8) * 312 verwendet. Er läßt sich aus den Angaben im »Commodore 64-Programmers Reference Guide« (Seiten 124 bis 12 6) ableiten. X und Y sind dabei die Koordinaten eines Grafikpunktes (gezählt von der oberen, linken Ecke des Bildschirms). Die Gleichung gibt zu jedem Bildpunkt die Adresse des Bytes, in dem das entsprechende Bit gesetzt (Bildpunkt an) oder gelöscht (Bildpunkt aus) ist.</p>
+
+        <p>Diese Adressen müssen für den MPS 801-Drucker in Siebener-Blöcke sortiert werden, da der Druckkopf nur über sieben Nadeln verfügt. Jeder Siebener-Block steuert dann achtmal (einmal fürjedes Bit) die sieben Druckernadeln.</p>
+
+        <p>Insgesamt ist der Grafikbildschirm 320 Punkte entsprechend – 320 : 8 = 40 Bytes – breit. Eine Druckzeile enthält also 40 * 7 = 280 Bytes. Das Programm sortiert jeweils 280 Bytes (1 Druckzeile) in Siebener-Blöcke und speichert sie im Bereich 49920 bis 50199. Von dort werden die Bitmuster auf den Druckkopf übertragen.</p>
+
+        <p>Das Sortieren erfolgt mit der Formel POKE(49920+7 *X+Y-INT(Y/7) * 7),PEEK(BYTEADRESSE).</p>
+
+        <p>Mit Hilfe der Additions-, Multiplikations- und Divisionsroutinen aus R. Zaks »Programmierung des 6502« und LA. Leventhal :»6502 Programmieren in Assembler« habe ich diesen Ausdruck in Maschinensprache übersetzt.</p>
+
+        <h2>Benutzung des Programms</h2>
+
+        <p>CHR$(8) schaltet den Grafik-Modus des Druckers ein.<br />
+            Die drei folgenden CHR$(13) bewirken einen Papiervorschub. Er sorgt für ein sauberes Drucken der ersten Grafik-Zeilen (Zeile 450). Aufgerufen wird die Druckroutine mit SYS 49525,LF (Zeile 460). Dabei ist LF die logische Filenummer des geöffneten Drucker-Files (Zeile 450). Mit CHR$(15) wird der Drucker wieder auf den Normal-Modus eingestellt (Zeile 470).</p>
+
+        <p>In den Zeilen 410 bis 430 wird die Anfangsadresse des Grafikspeichers ermittelt und in Zeile 440 der Hardcopy-Routine mitgeteilt. Dadurch läßt sich zum Beispiel auch der RAM-Bereich unter dem Basic-Interpreter als Grafikspeicher nutzen. Der ganze Basic-Bereich (2048 bis 40959) ist dann für Programme frei.</p>
+
+        <p>Nicht benutzt werden darf das RAM unter dem Betriebssystem, da es zur Ausgabe der Zeichen auf den Drucker gebraucht wird (BSOUT=$FFD2). Ebenfalls nicht benutzbar als Grafikspeicher ist der Bereich 49152 bis 57343, da sonst das Programm von der Grafik überschrieben wird.</p>
+
+        <p>Die Zeilen 410 bis 440 können weggelassen werden, wenn der Grafikspeicher bei 8192 bis 16191 liegt.</p>
+
+        <address class="author">(Rainer Kracht/rg)</address>
+
+        <figure>
+            <pre data-filename="hc-mps 801" data-name="Hardcopy MPS 801/VC 1515 (Basic-Lader)"></pre>
+            <figcaption>Basic-Lader »Hardcopy MPS 801/VC 1515«</figcaption>
+        </figure>
+
+    </article>
+
+</body>
+
+</html>

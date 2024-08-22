@@ -1,0 +1,51 @@
+;funkt.tast.prg ==0801==
+;Quelle: 1984-08-09-10.d64
+
+  100 rem"{CBM-A}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{CBM-S}
+  110 rem"{SHIFT--} funktionstastenbelegung {SHIFT--}
+  120 rem"{CBM-Q}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{CBM-W}
+  130 rem"{SHIFT--} by m.kloss  duesseldorf {SHIFT--}
+  140 rem"{CBM-Q}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{CBM-W}
+  150 rem"{SHIFT--}nn,mm:laufvariable       {SHIFT--}
+  160 rem"{SHIFT--}q1   :readvariable       {SHIFT--}
+  170 rem"{SHIFT--}q2   :aenderungsvariable {SHIFT--}
+  180 rem"{CBM-Q}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{CBM-W}
+  190 rem"{SHIFT--}q1$  :loeschvariable     {SHIFT--}
+  200 rem"{SHIFT--}q2$():befehlsfeld        {SHIFT--}
+  210 rem"{SHIFT--}q3$  :antwortvariable    {SHIFT--}
+  220 rem"{CBM-Q}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{CBM-W}
+  230 rem"{SHIFT--} belegung der f.ftasten  {SHIFT--}
+  240 rem"{SHIFT--} mit strings bis 9 byte  {SHIFT--}
+  250 rem"{SHIFT--} laenge.initialisierung  {SHIFT--}
+  260 rem"{SHIFT--} durch run/stop restore  {SHIFT--}
+  270 rem"{CBM-Z}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{CBM-X}
+  280 print"{clr}{down}{down}{down}{down}{down}{down}{down}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}moment bitte":gosub450:print"{clr}"
+  290 fornn=0to7:readq2$(nn):nextnn:print"{clr}":q1$="                   {up}"
+  300 printspc(5)"{CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-I}"
+  310 printspc(5)"{rvon} funktionstastenbelegung "
+  320 printspc(5)"{rvon}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-I}"
+  330 printspc(5)"{down}{down}{down}jetzige belegung{down}"
+  340 fornn=0to7:readq1:printspc(5)"f"q1"  "q2$(nn):nextnn
+  350 printspc(5)"{down}aenderungen erwuenscht (j)";:inputq3$
+  360 ifq3$<>"j"thenpoke58,255:end
+  370 print"{clr}":fornn=0to7:readq1
+  380 printspc(3)"funktionstaste "q1" "q2$(nn):print"{up}"tab(20);
+  390 inputq2$(nn):iflen(q2$(nn))>9thenprint"{up}"tab(20)q1$:printtab(20);:goto390
+  400 nextnn
+  410 printspc(3)"{down}eingaben korrekt (j)";:inputq3$:ifq3$<>"j"thenrun
+  420 q2=49262:fornn=0to7:formm=1tolen(q2$(nn))
+  430 pokeq2+mm,asc(mid$(q2$(nn),mm,1)):nextmm
+  440 formm=len(q2$(nn))+1to9:pokeq2+mm,0:nextmm:q2=q2+10:nextnn:poke58,255:end
+  450 fornn=49152to49343:readq1:pokenn,q1:nextnn:sys49152:return
+  460 rem * datastatements *
+  470 data120,169,78,141,0,3,169,192,141,1,3,169,23,141,20,3,169,192,141,21
+  480 data3,88,96,36,157,16,48,169,133,141,94,192,165,215,141,93,192,173,93
+  490 data192,205,94,192,240,12,238,94,192,173,94,192,201,141,240,20,208,236
+  500 data56,173,93,192,233,133,10,170,189,96,192,168,189,95,192,32,30,171
+  510 data76,49,234,120,169,23,141,20,3,169,192,141,21,3,88,76,139,227,10,141
+  520 data111,192,121,192,131,192,141,192,151,192,161,192,171,192,181,192,82
+  530 data85,78,0,0,0,0,0,0,0,76,73,83,84,0,0,0,0,0,0,76,79,65,68,0,0,0,0,0
+  540 data0,83,65,86,69,0,0,0,0,0,0,86,69,82,73,70,89,0,0,0,0,79,80,69,78,0
+  550 data0,0,0,0,0,67,76,79,83,69,0,0,0,0,0,67,79,78,84,0,0,0,0,0,0,0,run,list
+  560 dataload,save,verify,open,close,cont,1,3,5,7,2,4,6,8,1,3,5,7,2,4,6,8
+
