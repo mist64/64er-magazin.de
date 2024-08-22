@@ -101,10 +101,10 @@ def parse_cli_into_config():
     # if the current build should be uploaded: do some sanity checking
     if config.deploy:
 
-      if config.git_has_changes:
-        print("Generating and upload failed:")
-        print("There are uncommited changes in the working copy.")
-        exit()
+      # if config.git_has_changes:
+      #   print("Generating and upload failed:")
+      #   print("There are uncommited changes in the working copy.")
+      #   exit()
 
       if is_on_main and not config.build_future:
           response = input("Deploy to production? [Y/N]: ").strip()
@@ -132,8 +132,6 @@ LANG = CONFIG.lang
 
 NEW_DOWNLOADS = 15
 HOURS_PER_ARTICLE = 16
-
-EXTRACT_PDF_PAGES = False # disable if there is no PDF yet
 
 RSS_BASE_URL = "https://www.64er-magazin.de/"
 MASTODON_HASHTAGS = "#c64 #retrocomputing #64er"
@@ -444,10 +442,7 @@ class Issue:
       pubdate = None
       articles = []
 
-      if EXTRACT_PDF_PAGES:
-        pdf_filename = None
-      else:
-        pdf_filename = "dummy.pdf"
+      pdf_filename = None
 
       # todo: XXX get listings and binaries from the articles instead of the prg folder
       # read all listings in petcat format (and other binaries)
@@ -496,8 +491,7 @@ class Issue:
 
       if not pubdate:
           # no system exit as this also triggers for empty folders (eg. after branch change)
-          raise Exception(f"- [{issue_directory_path}] does not contain expected data")
-
+          raise Exception(f"- [{issue_directory_path}] Skipping: no pubdate")
       elif not CONFIG.build_future:
         # Define the current datetime with UTC timezone for comparison
           current_datetime = datetime.now(pytz.utc)
@@ -505,7 +499,10 @@ class Issue:
           # Remove the item if its publication date is in the future
           if pubdate > current_datetime:
               # no system exit
-              raise Exception(f"- [{issue_directory_path}] is from the future")
+              raise Exception(f"- [{issue_directory_path}] Skipping: pubdate in the future")
+
+      if not pdf_filename:
+          print(f"- [{issue_directory_path}] Warning: Missing PDF")
 
       # XXX used directly after init and then never again
       self.articles = articles
@@ -1315,6 +1312,9 @@ def generate_rss_feed(db, out_directory):
 ###
 
 def extract_pages_from_pdf(source_pdf_path, dest_pdf_path, page_descriptions):
+    if page_descriptions == '999' or page_descriptions == '':
+        print(f"- Warning: No page numbers")
+        return
     cache_path = os.path.join(CACHE_DIRECTORY, calculate_sha1(source_pdf_path) + os.path.basename(dest_pdf_path))
     if os.path.exists(cache_path):
         shutil.copy(cache_path, dest_pdf_path)
@@ -1485,6 +1485,7 @@ def copy_articles_and_assets(db, in_directory, out_directory):
 
     for issue_key in db.issues.keys():
         issue = db.issues[issue_key]
+        print(f"  *** Issue {issue_key}")
         issue_source_path = os.path.join(in_directory, issue.issue_dir_name)
         issue_dest_path = os.path.join(out_directory, issue.issue_dir_name)
         issue_dest_path_prg = os.path.join(issue_dest_path, 'prg')
@@ -1501,7 +1502,7 @@ def copy_articles_and_assets(db, in_directory, out_directory):
             convert_and_copy_image(os.path.join(issue_source_path, 'title.png'), os.path.join(issue_dest_path, 'title.jpg'))
 
         pdf_filename = issue.pdf_filename
-        if EXTRACT_PDF_PAGES:
+        if pdf_filename:
             # Copy full PDF
             shutil.copy(os.path.join(issue_source_path, pdf_filename), issue_dest_path)
 
@@ -1572,11 +1573,11 @@ def copy_articles_and_assets(db, in_directory, out_directory):
             pages = article.pages
 
             # create PDF with just the article
-            source_pdf_path = os.path.join(issue_source_path, pdf_filename)
-            pdf_path = pdf_filename[:-4] + '_' + pages + '.pdf'
-            dest_pdf_path = os.path.join(issue_dest_path, pdf_path)
+            if pdf_filename:
+                source_pdf_path = os.path.join(issue_source_path, pdf_filename)
+                pdf_path = pdf_filename[:-4] + '_' + pages + '.pdf'
+                dest_pdf_path = os.path.join(issue_dest_path, pdf_path)
 
-            if EXTRACT_PDF_PAGES:
                 extract_pages_from_pdf(source_pdf_path, dest_pdf_path, pages)
 
             if article_index > 0:
@@ -1655,6 +1656,8 @@ if __name__ == '__main__':
     out_directory = os.path.join(OUT_DIRECTORY, BASE_DIR)
 
     copy_articles_and_assets(db, IN_DIRECTORY, out_directory)
+
+    print("  *** Navigation")
     generate_all_issues_with_tocs_html(db, out_directory)
     generate_issues_tocs_html(db, out_directory)
     generate_all_topics_html(db, out_directory)
