@@ -225,6 +225,10 @@ if LANG == "de":
     <img src="/{BASE_DIR}fehlerteufelchen.svg" alt="Fehlerteufelchen">
   """
 
+  HTML_IMG_FUTURETEUFELCHEN= f"""
+    <img src="/{BASE_DIR}futureteufelchen.svg" alt="Futureteufelchen">
+  """
+
   HTML_404 = f"""
     <main class="fehlerteufelchen">
     <h1>Seite nicht gefunden</h1>
@@ -318,6 +322,10 @@ elif LANG == "en":
   HTML_IMG_FEHLERTEUFELCHEN=f"""
     <img src="/{BASE_DIR}fehlerteufelchen.svg" alt="Error Devil">
     """
+
+  HTML_IMG_FUTURETEUFELCHEN= f"""
+    <img src="/{BASE_DIR}futureteufelchen.svg" alt="Future Devil">
+  """
 
   HTML_404 = f"""
     <main class="fehlerteufelchen">
@@ -1393,6 +1401,12 @@ def copy_and_modify_html(article, html_dest_path, pdf_path, prev_page_link, next
       for aside in asides:
         ft_tag = BeautifulSoup(HTML_IMG_FEHLERTEUFELCHEN, 'html.parser')
         aside.insert(0, ft_tag)
+    # Same with Futureteufelchen
+    asides = soup.find_all("aside", { "class" : "futureteufelchen" } )
+    if asides:
+      for aside in asides:
+        ft_tag = BeautifulSoup(HTML_IMG_FUTURETEUFELCHEN, 'html.parser')
+        aside.insert(0, ft_tag)
 
     # Insert actions for downloading the pdf and tooting to mastooton
     download_pdf_html = f'''
@@ -1450,6 +1464,7 @@ def copy_articles_and_assets(db, in_directory, out_directory):
     shutil.copy(os.path.join(in_directory, 'logo.svg'), out_directory)
     shutil.copy(os.path.join(in_directory, 'logo.png'), out_directory)
     shutil.copy(os.path.join(in_directory, 'fehlerteufelchen.svg'), out_directory)
+    shutil.copy(os.path.join(in_directory, 'futureteufelchen.svg'), out_directory)
     shutil.copy(os.path.join(in_directory, 'mastodon.svg'), out_directory)
     shutil.copy(os.path.join(in_directory, 'mastodon_blue.svg'), out_directory)
     shutil.copy(os.path.join(in_directory, 'rss.svg'), out_directory)
