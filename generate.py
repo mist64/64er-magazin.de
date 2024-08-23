@@ -1319,9 +1319,9 @@ def generate_rss_feed(db, out_directory):
 
 ###
 
-def extract_pages_from_pdf(source_pdf_path, dest_pdf_path, page_descriptions):
+def extract_pages_from_pdf(source_pdf_path, dest_pdf_path, page_descriptions, article_path):
     if page_descriptions == '999' or page_descriptions == '':
-        print(f"- Warning: No page numbers")
+        print(f"- Warning: No page numbers: {article_path}")
         return
     cache_path = os.path.join(CACHE_DIRECTORY, calculate_sha1(source_pdf_path) + os.path.basename(dest_pdf_path))
     if os.path.exists(cache_path):
@@ -1593,7 +1593,7 @@ def copy_articles_and_assets(db, in_directory, out_directory):
                 pdf_path = pdf_filename[:-4] + '_' + pages + '.pdf'
                 dest_pdf_path = os.path.join(issue_dest_path, pdf_path)
 
-                extract_pages_from_pdf(source_pdf_path, dest_pdf_path, pages)
+                extract_pages_from_pdf(source_pdf_path, dest_pdf_path, pages, article.path)
 
             if article_index > 0:
                 prev_page_link = articles[article_index - 1].target_filename
