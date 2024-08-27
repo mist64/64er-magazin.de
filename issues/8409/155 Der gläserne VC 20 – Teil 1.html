@@ -539,7 +539,7 @@
         <p>POKE 792,91 : POKE 793,255 : POKE 808,114<br>
             Schritt 8:</p>
 
-        <p>POKE 804,0 : POKE 805,X : SAVE &ldquo;&hellip;”,1,1</p>
+        <p>POKE 804,0 : POKE 805,X : SAVE "&hellip;”,1,1</p>
 
         <p>X wird vom Ladeprogramm angegeben (X = 16 in Grundversion; X = 18 bei Erweiterung ab 8 KByte; X = 4 bei Erweiterung von 3 KByte). Die Befehle von Schritt 8 müssen unbedingt in einer Zeile stehen, sonst stürzt der Computer ab.</p>
 
@@ -565,14 +565,14 @@
         <ol>
             <li>NMI-Vektor, Adresse 792,793: Dieser Vektor stellt die Verbindung zwischen RESTORE-Taste und NMI-Routine her. Durch die Änderung (siehe Schritt 7) wird die RESTORE-Routine einfach übersprungen; die Taste ist quasi abgeschaltet.</li>
             <li>STOP-Vektor, Adresse 808,809: Auch hier wird die bestehende Routine übersprungen.<br>
-                Da dieser Vektorenbereich mit abgespeichert wird, ist, nachdem der Computer &ldquo;FOUND&rdquo; anzeigt, ein Stoppen des Computers nicht mehr möglich.</li>
+                Da dieser Vektorenbereich mit abgespeichert wird, ist, nachdem der Computer "FOUND" anzeigt, ein Stoppen des Computers nicht mehr möglich.</li>
             <li>INPUT-Vektor, Adresse 804,805: Dieser Zeiger ist der eigentliche Dreh- und Angelpunkt des Autostarts. Er ist für die Tastatureingabe verantwortlich. Da er ständig durchlaufen wird, bewirkt POKE 804,0 : POKE 805,16 (bei geladener Autostartroutine) in der Grundversion einen Start des Basicprogramms. Ändert man den Zeiger hingegen vor dem Abspeichervorgang (wie in Schritt 8) geschieht vorläufig nichts, denn dann wird die Tastatur ja nicht benutzt.</li>
         </ol>
 
 
         <p>Somit eignet sich dieser Vektor besonders gut für unseren Zweck. Denn solange sich der Computer mit dem Laden beschäftigt, ist die Tastatur »ruhig gestellt«. Der Zeiger wird so lange nicht benötigt, bis das Programm komplett geladen ist. Ist dies geschehen, springt das Betriebssystem über den INPUT-Vektor in die Autostartroutine, die ihrerseits (nach dem Rückstellen des Zeigers auf seinen ursprünglichen Wert) über RUN das Basicprogramm startet.</p>
 
-        <p>Damit auch alles wieder in den richtigen Speicherbereich geladen wird, dafür sorgt die Sekundäradresse bei SAVE &ldquo; &rdquo;,1,1.</p>
+        <p>Damit auch alles wieder in den richtigen Speicherbereich geladen wird, dafür sorgt die Sekundäradresse bei SAVE " ",1,1.</p>
 
         <p>Das Programm kann anschließend ganz normal mit LOAD geladen werden. Zum Schluß noch zwei Tips:</p>
 

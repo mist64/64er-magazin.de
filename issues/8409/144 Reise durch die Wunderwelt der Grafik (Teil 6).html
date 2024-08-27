@@ -48,7 +48,7 @@
 
         <p>Zum Ausprobieren ein kleiner Dreizeiler:<br>
             10 POKE 198,0:WAIT 198,1:POKE 53265,PEEK(53265)AND 239<br>
-            15 PRINTCHR$(147):POKE 211,15:POKE 214,10:SYS 58640:PRINT &ldquo;HALLO”<br>
+            15 PRINTCHR$(147):POKE 211,15:POKE 214,10:SYS 58640:PRINT "HALLO”<br>
             20 POKE 198,0:WAIT 198,1:POKE 53265,PEEK(53265)OR16</p>
 
         <p>Nach RUN wartet das Programm auf einen Tastendruck, auf den hin dann der Bildschirm »ausgeschaltet« wird. Ein weiterer Tastendruck macht das Bild dann wieder sichtbar.</p>
@@ -74,7 +74,7 @@
             5 PRINT CHR$(147)CHR$(166)<br>
             10 FOR I = 0 TO 7<br>
             20 POKE 53265,(PEEK(53265)AND 248)OR I<br>
-            30 GETA$:IFA$ = &ldquo;"THEN30<br>
+            30 GETA$:IFA$ = ""THEN30<br>
             40 NEXTI<br>
             50 POKE 53265,(PEEK(53265)AND 248)OR3</p>
 
@@ -202,24 +202,24 @@
             110 DEFFNY(Y) = (YO-Y)/)YO-YU)*199<br>
             120 REM +++++ BEISPIELFUNKTION +++++<br>
             140 DEFFNA(X) = SIN(X)<br>
-            150 PRINTCHR$(147)CHR$(17): INPUT"XU,XO,YU,YO = &ldquo;;XU,XO,YU,Y0<br>
+            150 PRINTCHR$(147)CHR$(17): INPUT"XU,XO,YU,YO = ";XU,XO,YU,Y0<br>
             160 INPUT"ZEICHEN- UND HINTERGRUNDFARBE = &lsquo;&rsquo;;F1,F2<br>
             170 GOSUB 50100:FOR I = XU TO XO STEP(XO-XU)/319<br>
             180 X = FNX(I):Y=FNY(FNA(I)):GOSUB 50040<br>
             190 NEXT I:X1 = FNX(XU):Y1 = FNY(O):X2 = FNX(XO):Y2=Y1<br>
             GOSBUB 50060<br>
             195 X1 = FNX(O):Y1 = FNY(YU):X2 = X1:Y2 = FNY(YO):GOSUB 50060<br>
-            200 GET A$:IF A$=&rdquo;&ldquo;THEN 200<br>
+            200 GET A$:IF A$=""THEN 200<br>
             210 GOSUB 50030<br>
             220 END</p>
 
         <p>Nach RUN und mit der erforderlichen Geduld (kennen Sie ja schon) zeichnet der Computer eine ganz normale Sinuskurve in das von Ihnen durch XU,XO,YU und YO angegebene Koordinatensystem. In die Zeile 140 können Sie jetzt jede beliebige Funktion eingeben. Allerdings ist es unglücklich, daß man jedesmal das Programm ändern muß, nämlich Zeile 140, wenn man eine neue Funktion sehen will. Es gibt da einen Trick, der mit dem Tastaturpuffer arbeitet (Speicherstellen 631-640) und den ich Ihnen nun zeigen möchte. Zunächst fügen wir noch eine Zeile 130 ein:<br>
-            130 F$ = &ldquo;SIN(X)&rdquo;</p>
+            130 F$ = "SIN(X)"</p>
 
         <p>Wenn das Programm startet, soll man zunächst einmal erfahren, welche Funktion überhaupt in Zeile 140 steht. Deswegen also:<br>
             10 PRINTCHR$(147):POKE211,5:POKE214,10:SYS58640:<br>
             PRINT"FUNKTION IM PROGRAMM:”<br>
-            20 PRINT:PRINTTAB(3)&ldquo;Y= ”F$</p>
+            20 PRINT:PRINTTAB(3)"Y= ”F$</p>
 
         <p>Wenn wir das so laufen lassen, wird keine Funktion erscheinen, weil diese dem Computer erst in Zeile 130 mitgeteilt wird. Der Computer muß also vorher nachsehen, als was F$ definiert ist. Deswegen führen wir ein:<br>
             15 K=1:GOSUB 130:K = 0<br>
@@ -227,19 +227,19 @@
             145 IFK=1 THEN RETURN</p>
 
         <p>Jetzt druckt das Programm uns die Funktion aus. Als nächstes soll der Computer erfahren, ob die Funktion zu verändern ist:<br>
-            30 PRINT:PRINTTAB(5)CHR$(18)”A” CHR$(146)&ldquo;LTE ODER”<br>
+            30 PRINT:PRINTTAB(5)CHR$(18)”A” CHR$(146)"LTE ODER”<br>
             CHR$(18)"N"CHR$(146)"EUE FUNKTION?”<br>
-            35 GET A$:IFA$&lt;>"A&rdquo; AND A$&lt;>&ldquo;N&rdquo; THEN 35</p>
+            35 GET A$:IFA$&lt;>"A" AND A$&lt;>"N" THEN 35</p>
 
         <p>Wenn die alte Funktion gewählt wurde, dann kann alles wie bisher ablaufen:<br>
-            40 IF A$=&ldquo;A&rdquo; THEN 100</p>
+            40 IF A$="A" THEN 100</p>
 
         <p>Ansonsten wollen wir jetzt unseren Trick anwenden. Zunächst das Eingeben der neuen Funktion:<br>
-            45 PRINT:PRINTTAB (3);:INPUT &ldquo;Y=&rdquo;;F$<br>
+            45 PRINT:PRINTTAB (3);:INPUT "Y=";F$<br>
             Dann:<br>
-            50 PRINTCHR$(147)CHR$(17)CHR$ (17)” 130F$ = &ldquo;CHR$(34)F$CHR$(34)<br>
+            50 PRINTCHR$(147)CHR$(17)CHR$ (17)” 130F$ = "CHR$(34)F$CHR$(34)<br>
             55 PRINT”140DEFFNA(X) = ”F$<br>
-            60 PRINT"RUN 100&rdquo;:PRINTCHR$ (19);<br>
+            60 PRINT"RUN 100":PRINTCHR$ (19);<br>
             65 POKE 631,13:POKE 632,13:POKE 633,13:POKE 198,3:END</p>
 
         <p>Tippen Sie’s ein und fügen Sie in Zeile 100 noch ein STOP ein, damit Sie sehen können, was mit diesen Zeilen passiert. Sie sehen, daß der Bildschirm zunächst frei gemacht wird (CHR$(147) in Zeile 50) und dann zwei Programmzeilen 130 und 140 gedruckt werden mit der neuen Funktion, danach noch die RUN-Anweisung. Der Cursor springt dann wieder in die Ecke links oben (CHR$(19) in Zeile 60). Jetzt arbeitet unser Computer den Inhalt des Tastaturpuffers ab, der aus drei RETURNs (die 13) besteht. Die Anzahl 3 muß in Speicherstelle 198 festgehalten sein. Die Tatsache, daß der Tastaturpuffer abgearbeitet wird, haben wir dem END zu verdanken. Weil aber ein RETURN nach RUN 100 folgt, startet das Programm sofort wieder selbständig ab Zeile 100. Wenn Sie jetzt mal Zeile 130 und 140 listen lassen, steht dort die neue Funktion. Weil sie sich im Programmablauf störend auswirken, sollen die zu druckenden Zeilen unsichtbar werden. Deswegen fügen wir in Zeile 45 noch an:<br>
@@ -345,8 +345,8 @@
             105 DEFFNY(Y) = (YO-Y)/(YO-YU) *199<br>
             110 DEFFNZ(Z) = Z/(2*SQR(2))<br>
             140 DEFFNA(X) = SIN(Z)*COS(X)<br>
-            150 PRINTCHR$(147)CHR$(17)CHR$ (18)&ldquo;UNSER SYSTEM:"CHR$(146): PRINT:PRINT<br>
-            160 INPUT"XU,XO = &rdquo;;XU,XO:INPUT ”YU,YO = ”;YU,YO</p>
+            150 PRINTCHR$(147)CHR$(17)CHR$ (18)"UNSER SYSTEM:"CHR$(146): PRINT:PRINT<br>
+            160 INPUT"XU,XO = ";XU,XO:INPUT ”YU,YO = ”;YU,YO</p>
 
         <p>Jetzt wird es ein bißchen kompliziert, weil wir darauf achten müssen, daß die Z-Achse noch auf dem Bildschirm paßt. Wir lassen uns berechnen und anzeigen, wie groß ZO höchstens sein darf und wie klein ZU:<br>
             162 Z3 = 2*X0*SQR(2):Z4 = 2*YO* SQR(2):IF Z3&lt;Z4 THEN PRINT "ZO MAXIMAL = "Z/3:GOTO 166<br>
@@ -360,7 +360,7 @@
                     174 IF Z2&lt;XU OR Z2&lt;YU THEN 162</p>
 
                 <p>Dann lassen wir uns die Freiheit der Farbenwahl:<br>
-                    180 PRINT:INPUT"ZEICHEN- UND HINTERGRUNDFARBE = &ldquo;;F1,F2</p>
+                    180 PRINT:INPUT"ZEICHEN- UND HINTERGRUNDFARBE = ";F1,F2</p>
 
                 <p>Nach dem Anschalten der Hochauflösung zeichnen wir die Achsen:<br>
                     190 GOSUB 50100:X1 = FNX(XU):Y1 = FNY(0):X2 = FNX(XO):Y2 =Y1: GOSUB 50060<br>
@@ -372,14 +372,14 @@
 
                 <p>Die Schrittweite von Z ist nicht so einfach zu fassen, weil man ja, je nach Kurvenart, mal weitere und mal engere Schritte machen muß. Deswegen halten wir diese Schrittweite veränderlich und lassen uns vorher nochmal danach fragen:<br>
                     202 DZ = A*(Z1-Z2)/(FNX(Z1)-FNX (Z2))<br>
-                    182 INPUT"SCHRITTWEITE VON Z(CA.8) = &ldquo;;A:PRINT</p>
+                    182 INPUT"SCHRITTWEITE VON Z(CA.8) = ";A:PRINT</p>
 
                 <p>Mit Zeile 202 hätten wir bei A = 1 die selbe Punktauflösung wie in der X-Schleife. Das ist meistens zu eng und A sollte deshalb Werte um etwa 8 haben.</p>
 
                 <p>Es ist ganz gut, sich auch die Freiheit offenzulassen, von wo bis wo unsere Raumfläche zu zeichnen ist. Es sieht einfach besser aus, wenn sie nicht bis zum Rand des Bildschirms reicht. Die Schleifen sollten also nicht von ZU bis ZO und von XU bis XO reichen, sondern von den Anfangswerten ZA beziehungsweise XA bis zu den Endwerten ZE beziehungsweise XE. Auch diese Werte müssen abgefragt werden:<br>
-                    184 PRINTCHR$(18)&ldquo;UNSERE ZEICHNUNG:"CHR$(146):PRINT<br>
-                    185 INPUT"X-BEREICH XA,XE = &rdquo;;XA,XE<br>
-                    186 INPUT"Z-BEREICH ZA,ZE = &ldquo;;ZA,ZE<br>
+                    184 PRINTCHR$(18)"UNSERE ZEICHNUNG:"CHR$(146):PRINT<br>
+                    185 INPUT"X-BEREICH XA,XE = ";XA,XE<br>
+                    186 INPUT"Z-BEREICH ZA,ZE = ";ZA,ZE<br>
                     Jetzt kommen die Schleifen:<br>
                     210 FOR Z = ZA TO ZE STEP DZ:ZZ = FNZ(Z)<br>
                     220 FOR XX = XA TO XE STEP DX:X1 = XX + ZZ<br>
@@ -388,7 +388,7 @@
                     250 NEXT Z</p>
 
                 <p>Abschließend muß wieder zurückgeschaltet werden auf den Normalbildschirm:<br>
-                    300 GET A$:IF A$ = &ldquo;&rdquo; THEN 300<br>
+                    300 GET A$:IF A$ = "" THEN 300<br>
                     310 GOSUB 50030<br>
                     320 END</p>
 
