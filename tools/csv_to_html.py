@@ -50,7 +50,7 @@ def generate_index_html(file_path):
 
     active_category = ['' for _ in range(4)]
 
-    print('<table border="1">\n  <tbody>')
+    print('<table>\n  <tbody>')
 
     for entry in entries:
         category = entry[0]
