@@ -2734,16 +2734,437 @@ Wie die anderen Folgen auch, soll auch diese hier noch mit einer Tabelle enden, 
 
 (Heimo Ponnath/gk)
 
+# In die Geheimnisse der Floppy eingetaucht (Teil 3)
 
+> In den letzten beiden Folgen sind die Möglichkeiten, die Basic bietet, ausgeschöpft worden. Heute soll deswegen die Bedienung der Floppy in Maschinensprache im Vordergrund stehen.
 
+Wenn wir in dieser Folge von Routinen sprechen, die im Betriebssystem stehen, so werden wir die in Tabelle 1 dargestellten Kürzel verwenden, die Sie übrigens auch in Editorprogrammen gut benutzen können.
 
+### FILPAR und FILNAM
 
+Bei OPEN, LOAD und ähnlichen Befehlen müssen Sie entsprechenden Routinen mitteilen, welches File Sie wo öffnen wollen. Um Ihnen eine »Herumwurstelei« in der Zeropage zu ersparen, wo Sie die einzelnen Angaben von Hand setzen müßten, hat das Betriebssystem zwei entsprechende Routinen implementiert. FILPAR setzt für Sie die einzelnen Fileparameter. Diese müssen der Routine in den Prozessorregistern übergeben werden:
 
+— Filenummer (Akku)
+— Geräteadresse (X-Register)
+— Sekundäradresse (Y-Register)
 
+Ein Beispiel:
+Sie wollen für ein File mit der Nummer 1, der Geräteadresse 8 und der Sekundäradresse 15 (Kommandokanal der Floppy) die entsprechenden Fileparameter setzen:
 
+TODO
 
+Wie Sie sehen, muß zu der betreffenden Sekundäradresse ein Wert von $60 addiert werden.
 
+Aber in vielen Fällen müssen Sie ja auch einen Filenamen angeben. Dazu dient die FILNAM-Routine. Hier erfolgt die Para-meterübergabe:
 
+— Länge des Filenamens (Akku)
+— Adresse LO des Namens (X-Register)
+— Adresse HI des Namens (Y-Register)
+
+Und wieder ein Beispiel. Um das Directory-File mit dem Namen »$« anzusprechen, geben Sie bitte folgende Befehle ein:
+
+TODO
+
+Sie müssen also wissen, wo der Filename im Speicher steht und wie lang er ist. Dies ist aber im allgemeinen kein Problem. Auf die gleiche Weise können Sie der Floppy über den Kommandokanal auch Befehle senden, wie Sie in der letzten Folge vorgestellt wurden. Das entsprä-che der Basic-Sequenz:
+OPENx, 8, 15, "befehl”
+
+Natürlich können Sie auch alle Parameter von Hand setzen, beziehungsweise noch einmal lesen. Wo sich die einzelnen Parameter in der Zero-Page nach Ausführung dieser und der anderen Routinen befinden, ist in Tabelle 2 angegeben.
+
+### OPEN und CLOSE
+
+Nachdem wir alle Fileparameter und den Filenamen übergeben haben, können wir die OPEN-Routine mit JSR OPEN aufrufen. Schon ist das entsprechende File geöffnet. Zu beachten wäre folgendes: Es können im Computer niemals mehr als 10 Files gleichzeitig geöffnet sein!
+
+Die CLOSE-Routine arbeitet analog zu OPEN, mit der Ausnahme, daß nur die Filenummer übergeben werden muß. Geräteadresse und Sekundäradresse sucht sich der C 64 aus einer Tabelle heraus, auf die wir später noch zu sprechen kommen:
+LDA # $01 ; Filenummer
+JSR CLOSE in Akku
+
+Der Filename wird beim Schließen überhaupt nicht mehr benötigt.
+
+### LISTEN und UNLIST, TALK und UNTALK
+
+Nach dem Öffnen eines Files kann die Datenübertragung noch nicht beginnen. Sie müssen dem entsprechenden Gerät zuerst mitteilen, ob es senden oder empfangen soll.
+
+Bestes Beispiel ist wieder der Kommandokanal. Über diesen kann die Floppy sowohl Befehle empfangen, als auch Fehlermeldungen senden. Um ein Gerät zum Empfangen zu veranlassen, verwenden wir die Routine LISTEN. Das hat nichts mit dem Basic-Befehl LIST zu tun, sondern kommt vom englischen Wort für »Hören«. Beim Aufruf vom LISTEN ist das angesprochene Gerät auf Empfang und der Computer auf Senden eingestellt.
+
+Wichtig ist, daß der Akku beim Aufruf die Geräteadresse enthält. Dies gilt für alle vier hier beschriebenen Routinen. Wenn Sie mit dem Senden der Daten fertig sind, sollten Sie ein UNLISTEN zum entsprechenden Gerät schicken, um dieses wieder freizugeben. Dies geschieht mit Hilfe der UNLIST-Routine. Analog verhält es sich mit den Routinen TALK und UNTALK. Sie veranlassen das angesprochene Gerät, Daten zu senden, beziehungsweise mit dem Senden aufzuhören und wieder in den Wartezustand zurückzukehren.
+
+### SECTLK und SECLST
+
+Die beiden Routinen SECTLK und SECLST sind ebenfalls sehr wichtig für die Datenübertragung. Denn obwohl wir beim OPEN-Befehl eine Sekundäradresse angeben, muß diese bei jeder weiteren Übertragung nochmals an das aktuelle Gerät gesendet werden. Dies hat zwei Gründe: Einerseits können Sie ja mehrere Floppykanäle gleichzeitig geöffnet halten. Damit die Floppy nun weiß, für welchen Kanal der nächste Schwung von Daten bestimmt ist, beziehungsweise, welcher Kanal senden soll, muß nach dem Aufruf von TALK SECTLK, beziehungsweise nach dem Aufruf von LISTEN SECLST durchgeführt werden. Außerdem merkt sich der Computer zwar die angegebene Sekundäradresse, sendet sie aber nicht. Dies hat praktische Gründe, wie wir noch bei den LOAD/ SAVE-Routinen sehen werden. SECTLK und SECLST benötigen die jeweilige Sekundäradresse + $60 im Akku. Diese kann, wie in unseren Beispielen, direkt geladen oder aber auch der entsprechenden Zero-Page-Adresse entnommen werden.
+
+### IECOUT und lECIN
+
+Nachdem wir nun endlich alle Vorbereitungen getroffen haben, können wir munter Bytes von der Floppy zum Computer und umgekehrt übertragen. Dies ist mit den ROM-Routinen denkbar einfach. IECOUT überträgt das im Akku befindliche Byte an das aktuelle Gerät; IECIN empfängt eines und legt es im Akku ab.
+
+### Busfehlerbehandlung
+
+Bei aller Sorgfalt; Fehler können immer auftreten, so auch beim Busbetrieb. Um einen in einer Busroutine aufgetretenen Fehler zu signalisieren, verwendet das Betriebssystem das Carry-Flag. Generell gilt: Ist das Carry-Flag gesetzt, so ist etwas nicht in Ordnung, und wir sollten das Statusbyte überprüfen. Dieses Statusbyte steht in der Speicherstelle $90. Immer wenn es ungleich Null ist, liegt irgendein Sonderfall vor. Jedes Bit des Statusbytes hat eine andere Funktion; Tabelle 3 zeigt diese Belegung. Ist zum Beispiel das Bit 7 gesetzt, so ist das angesprochene Gerät entweder nicht vorhanden oder abgeschaltet. In Basic bekämen wir in einem solchen Fall die Meldung »DEVICE NOT PRESENT ERROR«. Interessant ist für uns noch das Bit 6. Ist es gesetzt, so bedeutet das, daß das letzte Byte der angeforderten Informationen übertragen wurde. Dies können wir uns auch in Basic zunutze machen, um beispielsweise die Fehlermeldung der Floppy auszulesen:
+10 OPEN1,8,15
+20 GET#1, A$: PRINTA$;: IF ST<>64 THEN 20
+30 CLOSE1
+
+Wie Sie an diesem Beispiel sehen, ist der Inhalt der Speicherstelle $90 in der Variablen ST enthalten. Vor jeder neuen Datenübertragung sollten Sie darauf achten, daß das Statusbyte gelöscht wird, da sonst irrtümlich Fehler festgestellt werden könnten. Zur Verdeutlichung des bisher Gesagten dienen die Listings 1 und 2, die jedoch nur Anhaltspunkte geben sollen. Sie sind weder perfekt noch eintippfertig und sollten auf den jeweiligen Bedarf abgestimmt werden.
+
+### Bearbeiten mehrerer Files
+
+Sie werden festgestellt haben, daß wir bisher immer nur mit einem einzigen File gearbeitet haben. Was aber, wenn Sie gleichzeitig zwei Files offen halten müssen, zum Beispiel, um einen Block von Diskette zu lesen. Sie erinnern sichja, daß wir dazu sowohl den Kommandokanal als auch einen Übertragungskanal benötigen. Wir könnten zwar jeweils, wenn wir den Kanal wechseln wollen, mit CLOSE den alten schließen und mit OPEN den neuen öffnen, aber es geht auch einfacher.
+
+Voraussetzung ist, daß alle benötigten Files schon geöffnet sind. Dann kann mit Hilfe einer, schon erwähnten, Filetabelle zwischen — bis zu 10 — Files beliebig umgeschaltet werden. Diesen Zweck erfüllen die Routinen FILTAB und FILSET.
+
+FILTAB benötigt im Akku die Nummer des Files, auf das Sie umschalten wollen. Die Routine sucht dann in der Filetabelle nach den entsprechenden anderen Parametern. Tritt hier ein Fehler auf, weil das File noch gar nicht geöffnet wurde, so wird das Zero-Flag gelöscht und es kann mit BNE auf einen Fehler überprüft werden.
+
+FILSET schreibt dann die gefundenen Parameter in die entsprechenden Zero-Page-Adressen. Die komplette Routine zum Umschalten auf das File x lautet also:
+
+TODO
+
+Die ERROR-Routine müssen Sie natürlich noch selbst schreiben. Danach ist das angewählte File zum aktuellen File geworden. Alle LISTEN, TALK und so weiter, beziehen sich jetzt auf dieses neue File.
+
+In den Zero-Page-Adressen aus Tabelle 2 stehen nun die für dieses File aktuellen Parameter, da sie aus der großen Filetabelle automatisch übertragen werden. Eine Ausnahme bildet hier der Filename, da er nur beim Öffnen des Files benötigt wird.
+
+Diese große Filetabelle befindet sich übrigens an den Speicherstellen $0259 bis $0276.
+
+Denken Sie immer daran, vor einem erneuten Umschalten UNLIST oder UNTALK aufzurufen. CLOSE braucht dagegen erst aufgerufen zu werden, wenn die Bearbeitung eines Files völlig abgeschlossen ist.
+
+### LOAD und SAVE
+
+Prinzipiell könnten Sie mit dem bisher Erwähnten auch schon Programme laden und speichern, allerdings nur sehr mühselig. Da unser Computer das aber schon von selbst beherrscht, geben wir ihm gern diese Arbeit ab.
+
+Betrachten wir zunächst die LOAD-Routine. Auch hier muß wieder eine Vielzahl an Parametern übergeben werden. Mit FILPAR werden Gerätenummer und Sekundäradresse gesetzt. Eine Filenummer braucht nicht gesetzt zu werden. Für die Sekundäradresse gilt folgendes:
+
+Ist sie gleich Null, so wird das Programm an eine, von Ihnen festgelegte, Speicherstelle geladen. Ist sie gleich Eins, so wird das Programm an die Speicherstelle geladen, an der es bei SAVE stand. Der erste Modus wird vom Betriebssystem ausgenutzt, um Programme ab $0800 zu laden, wenn beim LOAD-Befehl keine Sekundäradresse angegeben wird. Prinzipiell kann aber an jede beliebige Adresse geladen werden! Der Filename wird, wie gewohnt, mit FILNAM gesetzt. Vor dem Aufruf der LOAD-Routine treten zwei, uns neue, Parameter hinzu, die wie folgt übergeben werden: LOAD/VERIFY Flag (Akku) Ladeadresse LO (X-Register) Ladeadresse HI (Y-Register)
+
+Steht beim Aufruf der Routine im Akku 0, so wird geladen. Steht dort hingegen eine 1, so wird ein VERIFY durchgeführt.
+
+Die Startadresse in den X/Y-Registern wird nur beachtet, wenn die Sekundäradresse gleich Null ist. Alles übrige erledigt die LOAD-Routine, und Sie brauchen nur noch deren Ende abzuwarten. Zur Sekundäradresse wäre noch folgendes zu bemerken:
+
+Egal, was Sie für eine Adresse angeben, zur Floppy wird immer nur 0 gesendet. Wie Sie schon wissen, ist diese Sekundäradresse floppyintern für den LOAD-Befehl reserviert und darf nicht ohne weiteres bei OPEN-Befehlen verwendet werden. Nach Beendigung der LOAD-Routine wird im X und Y-Register die Endadresse des Programms übergeben.
+
+Die SAVE-Routine hat eine etwas kompliziertere Parameterübergabe. FILPAR braucht nur mit der Gerätenummer im X-Register aufgerufen zu werden, da weder Sekundäradresse noch Filenummer benötigt werden. Das Setzen des Filnamens erfolgt normal über FILNAM.
+
+Übergeben werden müssen nun noch Anfangsadresse und Endadresse + 1 des zu speichernden Bereichs. Die Anfangsadressen müssen Sie irgendwo in der Zero-Page in der Reihenfolge LO/HI ablegen. Empfehlenswert wären die Adressen $FB/FC, da diese nicht vom Betriebssystem oder Basic benutzt werden. Im Akku muß dann die Adresse des LO-Byte übergeben werden; wenn Sie die Adresse also unter $FB/FC spreichern, muß im Akku $FB stehen.
+
+Die Endadresse übergeben Sie wie folgt:
+LO-Byte im X- und HI-Byte im Y-Register. Es muß immer 1 zur Engadresse addiert werden, da sonst das letzte Byte des Programms nicht abgespeichert wird. Danach kann die Routine SAVE aufgerufen werden. Wieder haben wir für Sie zur Verdeutlichung zwei Listings: Listing 3 zeigt, wie man ein Programm an eine beliebige Adresse lädt; Listing 4 wie man einen beliebigen Bereich auf Diskette speichert. Erwähnenswert ist noch die Routine CLALL, die alle Files im Computer schließt; die Kanäle in der Floppy bleiben davon jedoch unberührt. Hier müssen Sie also sorgfältig mit CLOSE arbeiten, da Sie sonst Daten verlieren können.
+
+Nachdem wie Sie nun mit Theorie überschwemmt haben, sollen Sie sogleich in den Genuß Ihrer neuen Kenntnisse kommen. Haben Sie schon einmal etwas von Spooling gehört? Nein? Macht nichts, wir werden uns mit dieser Technik nämlichjetzt auseinandersetzen, und Sie werden dabei die Vorzüge dieser Möglichkeit genießen lernen.
+
+## Spooling? Was ist das?
+
+Unter dem Begriff Spooling verbirgt sich eigentlich eine ganz einfache Technik, die jedoch enorme Vorteile besitzt: Es handelt sich um das Drucken direkt von Diskette. Haben Sie nicht auch schon öfters versucht, ein meterlanges Listing auf Papier zu bringen und den Drucker dabei mit wütenden Blicken zu größerer Eile aufgefordert, weil Sie nämlich unter Zeitdruck standen und sich bei der Arbeit keine Verzögerung erlauben konnten? Dann ist Spooling genau das Richtige für Sie. Bei dieser Methode wird ein Listing, das ausgedruckt werden soll, auf Diskette gebracht. Danach starten Sie ein Spooling-Programm und siehe da; der Drucker beginnt Ihr Listing auf Papier zu bringen, und der Computer meldet sich betriebsbereit mit READY.
+
+Dies ist kein Wunder, sondern die Eigenschaft des seriellen Bus Ihres Computers. Sie haben vorhin gelernt, wie man den Bus des Computers in Maschinensprache bedient. Dabei fielen auch Worte wie TALK, LISTEN, SENDEN und EMPFANGEN. Der Trick des Spooling ist nun der: Mit Hilfe des CMD-Befehls in Basic können Sie ein Listing auf Diskette »umleiten«, und zwar geschieht dies ähnlich wie beim Drucker: Sie eröffnen ein File und schicken mit dem CMD-Kommando alle weiteren Bildschirmausgaben auf den Bus. Nur ist jetzt nicht der Drucker der Adressat sondern die Floppy. Hier ein Beispiel:
+Sie haben ein Listing im Speicher und wollen dieses auf Diskette ablegen, sein Name soll »TEST« sein:
+OPEN 1,8,2,"TEST,U,W"
+CMD1
+LIST
+
+## Drucken ohne Umwege
+
+Nach dieser Befehlsfolge wird Ihr Listing als USR-File auf Diskette geschrieben. Wie wäre es nun, wenn die Floppy ein TALK-Kommando erhalten würde, das sie veranlaßt, das eben geschriebene File auf den Bus zu bringen? Der »Hörer« ist aber jetzt nicht, wie üblich, der Computer sondern der Drucker, den wir zuvor mit einem LISTEN dazu aufgefordert haben. Die Folge wäre das, was Sie sich jetzt schon denken können:
+
+Die Floppy schickt das gesamte Listing über den Bus, und der Drucker, der ja auf Empfang programmiert ist, bekommt dieses Listing und druckt es aus. Der Computer hat mit der ganzen Sache nichts zu tun, da er sich nach Senden der Kommandos »zurückgezogen« hat und bleibt demzufolge frei für weitere Arbeit.
+
+Der Zugriff auf den Bus ist dem Computer natürlich für die Zeit der Übertragung verwehrt, aber Sie können währenddessen intern weiterarbeiten. Ist die Übertragung beendet, so sind beide Peripheriegeräte noch auf Sendung und müssen erst »zur Ruhe gebracht« werden, bevor sie wieder ansprechbar sind. Aber auch das erledigt ein kleines Programm für uns. Sehen Sie sich jetzt einmal Listing 5 an. Es enthält ein Spooling-Programm, das mit SYS828,”filename” aufgerufen wird. Danach meldet sich der Computer mit
+SPOOLING filename
+READY
+und der Drucker beginnt zu arbeiten. Ist der Druckvorgang beendet, so tippen Sie noch einmal
+SYS828
+ohne Filenamen, und die Leuchtdiode an der Floppy erlischt. Es erscheint die Meldung END OF SPOOLING
+READY
+Dieses Programm ist, im Gegensatz zu unseren anderen Listings, zum sofortigen Eintippen gedacht.
+
+Wie Sie aus diesem Beispiel sehen, kann es von großem Nutzen sein, wenn Sie das Prinzip des seriellen Bus verstehen und dessen »Verkehrsregeln« kennen, da viele Programme nur deshalb mit geringem Aufwand große Effekte und Nutzen erzielen. Ein weiteres Beispiel in dieser Reihe dürfte wohl HYPRA-LOAD sein, das Sie in Ausgabe 10 des 64'er-Magazins fanden. Dieses Programm nutzt aber noch einige weitere Tricks der Maschinenspracheprogrammierung, die wir in den nächsten Ausgaben besprechen wollen.
+
+## Was kommt demnächst
+
+In Teil 4 unseres Kurses wollen wir nämlich in die direkte Programmierung der Floppy einsteigen, das heißt, das Abspeichern von Maschinenprogrammen in ihren Pufferspeicher und das Ausführen derselben. Als Beispiel werden wir unser HYPRA-LOAD ein wenig »zerlegen«, um Ihnen die Möglichkeiten dieser Programmiertechnik nahezubringen.
+
+Bis zum nächsten Mal also noch viel Spaß in der Busprogrammierung und in der Anwendung des Druckerspooling.
+
+(B. Schneider/K. Schramm/gk)
+
+# Comal - eine Einführung (Teil 2)
+
+> Nachdem wir in der ersten Folge die Grundkenntnisse erworben haben, um mit Comal umgehen zu können, wollen wir jetzt die ersten kleinen Programme erstellen.
+
+Die Verwandtschaft zwischen Basic und Comal wird uns dabei den Einstieg in die einfache Programmierung sehr erleichtern. Wir brauchen uns also nicht wie beim Erlernen anderer Programmiersprachen mit völlig neuen Befehlsstrukturen herumzuschlagen, sondern kommen weitgehend mit unserem Basic-Wissen aus. Man kann sagen, daß zwischen Basic und Comal eine Art Aufwärtskompatibilität besteht. Basic-Programme lassen sich mit minimalen Änderungen in Comal übersetzen; in der anderen Richtung können allerdings größere Schwierigkeiten auftreten. So sind zwar alle numerischen Funktionen und Operatoren von Basic auch in Comal vorhanden, es gibt jedoch zusätzlich einige Comal-Funktionen, die in Basic nicht vorkommen (Tabelle 1), beispielsweise MOD (Restbildung bei Division). Auch die Datenein- und Ausgabe ist in Comal um einiges komfortabler.
+
+Betrachten wir einmal das folgende kleine Beispiel einer Mehrwertsteuer-Berechnung, zunächst in Basic:
+10 rem Mehrwertsteuer
+20 input ”Betrag”;b
+30 s = b*0.14
+40 b = b + s
+50 print ”Mehrwertsteuer:”;s
+60 print ”Gesamtbetrag:”;b
+
+Dies ist zugegebenermaßen ein sehr einfaches Beispiel, und man hätte es auch gut in einer Zeile unterbringen können. Aber sehen wir uns dieses Programm doch einmal in Comal an:
+10 // Mehrwertsteuer
+20 input "Betrag?” : betrag
+30 mwert := betrag * 0.14
+40 betrag := betrag + mwert
+30 print "Mehrwertsteuer:” nwert
+30 print "Gesamtbetrag:” , betrag
+
+Man erkennt sofort die sehr große Ähnlichkeit beider Programme. Allerdings gibt es auch einige mehr oder weniger auffällige Unterschiede. Zunächst versteht Comal auch lange Va-riablennamen, wodurch die Programme generell übersichtlicher werden. Als nächstes fällt die Verwendung von »:=« für die Wertzuweisungen auf. Bei der Eingabe braucht man allerdings nur ein Gleichheitszeichen zu schreiben. Comal merkt dann, was gemeint ist und wandelt das Gleichheitszeichen in »:=« um.
+
+Bei genauerem Hinsehen entdeckt man schließlich noch die Verwendung des Doppelpunktes statt eines Semikolons bei der INPUT-Anweisung und die Verwendung des Kommas statt eines Semikolons bei den PRINT-Befehlen.
+
+Befassen wir uns zunächst mit dem INPUT-Befehl. Genau wie in Basic werden damit Daten vom Benutzer erfragt und an die im Befehl angegebenen Variablen zugewiesen. Mehrere Variablen können dabei durch Komma getrennt eingegeben werden.
+
+Enthält die INPUT-Anweisung nur eine Variablenliste und keinen Text, dann erscheint beim Programmlauf ein Fragezeichen, um dem Benutzer mitzuteilen, daß jetzt eine Eingabe erwartet wird.
+
+Im Unterschied zu Basic kann hinter INPUT nicht nur ein Text in Anführungszeichen stehen, sondern auch ein beliebiger Stringausdruck. Hinter diesem Stringausdruck muß ein Doppelpunkt folgen, und dahinter wiederum die Liste der einzulesenden Variablen. In unserem kleinen Beispiel könnten wir also die Zeile 20 ersetzen durch:
+20 frage$ := "Betrag"
+25 input frage$ : betrag
+
+Wir müssen allerdings beachten, daß Strings in Comal dimensioniert werden müssen, da vor dem eigentlichen Programmlauf die Adressen aller Variablen festgelegt werden (siehe Teil 1). Um die Adressen von Stringvariablen aber festlegen zu können, muß Comal deren maximale Länge kennen. Bevor wir also die Stringvariable »frage$« das erste Mal benutzen können, muß eine Dimensionierung erfolgen. Dies geschieht, indem wir noch eine weitere Zeile einfügen:
+15 dim frage$ of 20
+
+Durch diese Anweisung wird Speicherplatz für eine Stringvariable »frage$« mit einer maximalen Länge von 20 Zeichen reserviert. Die Stringlänge ist in Comal übrigens grundsätzlich nur durch den Speicherplatz begrenzt. Nach »dim text$ of 3000« beispielsweise kann text$ bis zu 3000 Zeichen enthalten.
+
+Doch kommen wir nun zur Print-Anweisung, die im wesentlichen analog zu Basic ist, darüber hinaus aber einige zusätzliche Feinheiten kennt.
+
+## Formatierte Ausgabe ohne Probleme
+
+Die einzelnen zu druckenden Argumente (numerische oder Stringausdrücke) werden grundsätzlich durch Komma getrennt. Wünscht man die Ausgabe an einer bestimmten Tabulatorstelle, kann man wie in Basic die TAB(n)-Funktion verwenden. Die durch Komma getrennten Ausdrücke werden normalerweise unmittelbar nebeneinander gedruckt — so, als hätte man in Basic ein Semikolon verwendet. Zum Drucken von Tabellen ist das natürlich nicht besonders sinnvoll. Es ist jedoch mit dem Comal-Befehl »ZONE« möglich, die Spaltenbreite für die Print-Anweisung festzulegen. Mit ZONE 10 erhält man eine Spaltenbreite wie bei Basic.
+
+Zur weiteren Formatierung von Zahlenausgaben kann man »PRINT USING« verwenden. Hinter »USING« muß dabei ein String stehen, der das Ausgabeformat bestimmt. Für jede Ziffernstelle der auszudruckenden Zahl steht in diesem String ein Nummernzeichen »#«. Außerdem kann die Position des Dezimalpunktes angegeben werden. In unserem kleinen Mehrwertsteuer-Programm wäre es zum Beispiel sinnvoll, die Geldbeträge mit zwei Nachkommastellen auszugeben. Dazu ersetzen wir die Zeilen 50 und 60 durch die folgenden vier Comal-Zeilen:
+50 print »Mehrwertsteuer:«,
+55 print using ”#####.##”: mwert
+60 print "Gesamtbetrag:”,
+65 print using ”#####.##”: betrag
+Jetzt werden die Beträge rechtsbündig mit fünf Stellen vor und zwei Stellen nach dem Komma (oder besser Dezimalpunkt) ausgegeben. Die beiden zusätzlichen PRINT-Befehle waren nötig, da hinter dem Doppelpunkt im Anschluß an das »USING«-Statement nur noch numerische Parameter folgen dürfen. Die Konstruktion »PRINT USING”# ##”: ”Hallo”,5« führt zu einer Fehlermeldung, weil »USING« sich an dem String ’’Hallo” — etwas salopp gesagt — die Zähne ausbeißt.
+
+Der zur »USING«-Anweisung gehörende Formatierungsstring darf übrigens auch andere Zeichen enthalten. Probieren Sie doch einmal folgende Zeile (im Direktmodus) aus: PRINT USING ”DM ###.##”: 12.6
+
+Experimentieren Sie ruhig einmal mit diesen Formatierungsmöglichkeiten, auch unter Verwendung des ZONE-Be-fehls.
+
+## Strukturiert programmieren
+
+Jede höhere Programmiersprache kennt sogenannte »Kontrollstrukturen«, um den Programmablauf in Abhängigkeit von bestimmten Bedingungen beeinflussen zu können. In Basic gibt es zwei derartige Strukturen, nämlich die Wiederholung mit FOR...NEXT und die Bedingungsabfrage mit IF...THEN. Die Realisierung der IF-Abfrage in Basic hat dabei zwei entscheidende Nachteile. Zum einen fehlt, zumindest im Commodore-Basic, die Angabe einer Alternative (ELSE-Teil einer IF-Anweisung), zum anderen ist die Beschränkung auf eine Zeile in vielen Fällen sehr störend. Man behilft sich in Basic dann mehr schlecht als recht mit GOTO-Sprüngen vor, nach und inner-halb von IF-Anweisungen, was die Übersichtlichkeit eines Programms nicht gerade fördert.
+
+Comal unterstützt nun strukturiertes Programmieren durch eine Vielzahl von Strukturbefeh-len (Tabelle 2). Zur Bildung von Programmschleifen stehen ne-ben der von Basic bekannten FOR...NEXT-Struktur noch WHI-LE...ENDWHILE und REPE-AT...UNTIL zur Verfügung. Am einfachsten davon ist die Schleife mit REPEAT...UNTIL (»Wiederhole ... bis«). Hinter UNTIL muß eine Bedingung stehen. Ist die Bedingung nicht erfüllt, wird die Schleife ab REPEAT wiederholt, und zwar so oft, bis entweder die Bedingung wahr wird, oder bis der entnervte Programmierer die STOPTaste drückt. Der folgende Vierzeiler wartet zum Beispiel, bis die Taste »X« gedrückt wird.
+10 DIM EINGABE$ OF 1
+20 REPEAT
+30 EINGABE$ : = KEY$
+40 UNTIL EINGABE$ = ”X”
+
+Die Systemvariable »KEY$« enthält stets die gerade gedrückte Taste. Ist keine Taste gedrückt, ist KEY$ = CHR$(0).
+
+WHILE...ENDWHILE funktioniert ähnlich wie REPEAT...UN-TIL, nur steht hier die Bedingung direkt hinter WHILE, wird also überprüft, bevor die Schleife zum ersten Mal durchlaufen wird. Dadurch wird eine WHILE-Schleife möglicherweise nie durchlaufen, nämlich dann, wenn die Bedingung von Anfang an schon nicht erfüllt war. In diesem Fall werden alle Befehle zwischen WHILE und ENDWHILE übersprungen und das Programm nach ENDWHILE normal fortgesetzt.
+
+Das genaue Format der WHILE-Schleife ist »WHILE (Bedingung) DO (Anweisungen) ENDWHILE«.
+
+Mit dem »DO« hat es dabei eine besondere Bewandtnis. Steht hinter dem »DO« in der gleichen Zeile eine Anweisung, dann faßt Comal dies als eine einzeilige WHILE-Schleife auf. In diesem Fall darf kein ENDWHILE mehr folgen, sonst gibt es einen »Fehler in der Programmstruktur«. Mit dieser Kurzform einer WHILE-Schleife und dem Comal-Befehl »NULL« läßt sich sehr elegant eine Warteschleife auf einen Tastendruck aufbauen:
+10 WHILE KEY$ = CHR$(0) DO NULL
+
+Die Anweisung NULL ist eine »Dummy«-Anweisung mit der speziellen Eigenschaft, nichts zu bewirken. Die obige Zeile könnte man also etwas frei übersetzen mit »solange keine Taste gedrückt, tue nichts«.
+
+Neben diesen beiden Schleifenstrukturen gibt es natürlich noch die Zählschleife FOR.. .TO... ENDFOR, die völlig analog zur FOR...NEXT-Schleife in Basic arbeitet, so daß die Besprechung der Arbeitsweise entbehrlich erscheint.
+
+## Entscheidungen fällen
+
+In praktisch jedem Programm müssen logische Entscheidungen, meist sogar in großer Anzahl, getroffen werden. Comal stellt dafür eine sehr mächtige IF.. .THEN...ELIF. ..ELSE...ENDIF-Konstruktion zur Verfügung die sich in der Regel über mehrere Zeilen erstreckt und ganze Programmblöcke umfassen kann. Daneben gibt es — wie bei »WHILE« — noch eine einzeilige Kurzform. Diese Kurzform besteht einfach darin, daß hinter dem »THEN« in der gleichen Zeile noch ein Befehl folgt. Das funktioniert dann völlig analog zu Basic, nur mit dem Unterschied, daß in Basic noch weitere Befehle, jeweils durch Doppelpunkt getrennt, in der gleichen Zeile folgen dürfen. Für derartige Fälle — und für Fälle, die man in Basic so gar nicht lösen kann — wird in Comal die mehrteilige Form der IF-Anwei-sung verwendet.
+
+Bei dieser Form muß die Zeile nach dem »THEN« beendet werden. Dann werden, falls die Bedingung hinter dem IF erfüllt ist, alle folgenden Programmzeilen bis zum Ende der IF-Anweisung ausgeführt. Eine mehrzeilige IF-Anweisung muß immer mit dem Schlüsselwort »ENDIF« beendet werden. Außer »ENDIF« darf die entsprechende Zeile allenfalls noch einen Kommentar (//) enthalten. War die IF-Bedingung nicht erfüllt, dann wird das Programm in der auf das »ENDIF«-Statement folgenden Zeile fortgesetzt.
+
+Doch damit sind wir noch längst nicht am Ende. Die IF-Anweisung kann auch um einen »ELSE«-Teil erweitert werden und hat dann das folgende Format:
+IF (Bedingung) THEN (Teil 1) ELSE (Teil 2) ENDIF.
+
+Der Programmteil (Teil 1) wird ausgeführt, falls die (Bedingung) erfüllt war, sonst wird (Teil 2) ausgeführt. Jeder dieser beiden Teile ist ein völlig unabhängiges Programmstück und kann seinerseits auch wieder IF-Abfra-gen enthalten.
+
+Will man gleich mehrere verschiedene Bedingungen testen, dann kann man das Comal-Schlüsselwort »ELIF« verwenden. »ELIF« ist eine Abkürzung für »ELSE IF« und hat auch die gleiche Wirkung, nur mit dem Unterschied, daß keine zweite IF-Anweisung (zu der dann auch ein zweites ENDIF gehören müßte) eröffnet wird. Das folgende Beispielprogramm testet eine einzugebende Zahl auf bestimmte Werte:
+10 INPUT ”ZAHL ?”: ZAHL
+20 IF ZAHL = 1 THEN
+30 PRINT ”EINS”
+40 ELIF ZAHL = 2 THEN
+50 PRINT ”Zwei”
+60 ELSE
+70 PRINT "WEDER EINS NOCH ZWEI”
+80 ENDIF
+
+Ich erspare mir — und Ihnen — an dieser Stelle, ein entsprechendes Basic-Programm vorzustellen (GOTO, GOTO, ...).
+
+Für den Fall, daß die zu testenden Bedingungen durch einen Variablenwert dargestellt werden können, ist die CASE-Anweisung vorgesehen. Die Wirkungsweise wird wohl am besten klar, wenn wir unser Beispiel zur IF-Anweisung auf die CASE-Konstruktion umschreiben:
+10 INPUT ”ZAHL ?”: ZAHL
+20 CASE ZAHL OF
+30 WHEN 1
+40 PRINT "EINS”
+50 WHEN 2
+60 PRINT ”ZWEI”
+70 OTHERWISE
+80 PRINT "WEDER EINS NOCH ZWEI”
+90 ENDCASE
+
+In der Kopfzeile einer CASE-Anweisung wird also eine Variable angegeben, gefolgt vom Schlüsselwort »OF«.
+
+Dann folgen beliebig viele Zeilen mit »WHEN«-Konstruktio-nen. Hinter WHEN ist immer ein Wert angegeben, der bei der Programmausführung mit dem aktuellen Wert der CASE-Variablen verglichen wird. Wird eine Übereinstimmung festgestellt, dann wird der Programmteil hinter der entsprechenden WHEN-Anweisung bis zum fol-genden WHEN ausgeführt. Trifft keine WHEN-Bedingung zu, dann wird der Programmteil hinter OTHERWISE ausgeführt. OTHERWISE ist optional und muß nicht vorhanden sein. Trifft keine WHEN-Bedingung zu und ist kein OTHERWISE vorhanden, dann wird das Programm hinter ENDCASE normal fortgesetzt.
+
+Kommen wir nun noch, sowohl last als auch least, zu einem Befehl, den hartgesottene Spaghetticode-Programmierer schon vermißt haben mögen. Gemeint ist die GOTO-Anwei-sung, die, obschon weitgehend entbehrlich, auch in Comal noch für Spezialfälle zur Verfügung steht. In Comal wird allerdings nicht zu bestimmten Zeilennummern gesprungen, sondern ein GOTO bezieht sich immer auf ein LABEL. Ein Label ist einfach irgendein Name, wie er auch als Variablenname verwendet werden könnte, gefolgt von einem Doppelpunkt. Vor diesem Namen kann, muß aber nicht, das Schlüsselwort LABEL stehen. Die betreffende Zeile darf nur dieses Label und keine weiteren Befehle enthalten. Wer also von GOTO wirklich nicht loskommt, kann das Warten auf einen Tastendruck auch folgendermaßen programmieren (nicht zur Nachahmung empfohlen):
+5 DIM A$ OF 1
+10 LABEL WARTEN:
+20 A$ := KEY$
+30 IF A$ = CHR$(0) THEN GOTO WARTEN
+
+Es sollte auch nicht unerwähnt bleiben, daß man nicht in FOR...ENDFOR-Schleifen, Funktionen und Prozeduren hinein oder aus ihnen hinaus springen sollte. Mit »Funktionen und Prozeduren« ist im übrigen bereits das Stichwort für die nächste Folge gegeben. Bis dahin können Sie sich ja vielleicht die Zeit damit vertreiben, Ihre Basic-Pro-gramme in Comal umzuschreiben, und zwar selbstverständlich ohne GOTO!
+
+(ev)
+
+# 64'er Disk-Ecke
+
+> Wie die Überschrift schon andeutet, hat sich eine Änderung vollzogen. Das »Ka« für Kassette ist weggefallen. Dafür hat sich »Di« zu Disk gemausert. Die Diskette ist aufgrund ihrer Verbreitung ausgewählt worden. Dafür sind jetzt alle Programme einer Ausgabe (VC 20 und C 64) auf einer Diskette erhältlich.
+
+Eines hat sich aber nicht geändert: der Preis. Die Diskette für eine Ausgabe kostet demnach 29,90 Mark. Sie werden bei einigen Disketten bestimmte Programme vermissen. Deren Autoren konnten sich nicht entschließen, ihr Programm im Rahmen des Leserservice für eine Verbreitung auf Datenträger freizugeben. Bei den Ausgaben 5 und 6 können noch Kassetten (VC ...) bestellt werden. Auf kurze Programme wurde aus Gründen der Übersichtlichkeit verzichtet. Nun noch einige technische Details. Zu den Programmen sind immer die Seitenzahlen angegeben, unter der Sie die Beschreibungen in der entsprechenden Ausgabe finden können. Der Diskette liegen also keinerlei Informationen bei. Lesen Sie daher aufmerksam die Anleitung (ob SYS-Befehle nötig sind, in welcher Reihenfolge geladen werden muß, eventuelle Sprach- oder Speichererweiterungen und ähnliches mehr) in demjeweiligen Artikel nach. Aus Aktualitätsgründen wird jeweils die abgedruckte Version angeboten. Eventuelle systematische Fehler, die sich noch im Programm befinden können, müssen von Ihnen selbst, nach Studium des Druckfeh-lerteufelchens, korrigiert werden.
+
+**Fehlende Hefte erhalten Sie bei: Markt & Technik
+Vertrieb 64’er
+Hans-Pinsel-Str. 2,8013 Haar**
+
+### Ausgabe 12/84
+
+Bestell-Nr. CB 022 DM 29,90*
+**Commodore 64**
+Synthesizer (AdM)
+SMON (2. Teil)
+3D-Vier gewinnt
+Trace
+Stringy
+Lader
+PET-Simulator
+Auto
+Listschutz
+Hires
+Simons Axo (SB)
+Kreuzworträtsel
+**VC 20**
+Mathematikal Basic (8K>) (LdM)
+Fast Tape
+
+### Ausgabe 11/84
+
+Bestell-Nr. CB 020 DM 29,90*
+** Commodore 64**
+Turtle Grafik (LdM)	S.48
+Schachmeister (AdM)	S.50
+SMON (1. Teil)	S.59
+Floppykurs	S.117
+FPLOT-Befehlserweiterung S.73
+Get Koala pic	S.66
+Interrupttechnik	S.84
+Exsort (UPB)	S.154
+Einzeiler	S.158
+Simons Basic
+Befehlserweiterung (SB)	S.90
+**VC20**
+Pseudosprites (8K)	S.76
+Laterna Magica (8K)	S.68
+Betriebssystem-
+Erweiterung (24K >)	S.88
+Supergrafik (GV)	S.71
+VG 20-Kurs(GV>)	S.126
+
+### Ausgabe 10/84
+
+Bestell-Nr. CB 019 DM 29,90*
+**Commodore 64**
+Finanzmathematik (AdM) S.68
+Hypra-Load (LdM) S.67
+Hardcopy
+Compact 2	S.86
+Hardcopy MPS 801	S.82
+Hardcopy VC 1526 neu	S.83
+Hardcopy Gemini-10X	S.85
+Hardcopy FX-80	S.88
+Hardcopy VC 1520 farbig	S.84
+Apocalypse now	S.106
+Supercopy	S.102
+Disk-Dump	S.95
+Diskettenorganisation S.97
+User-Port-Tastatur	S.92
+Maske-(UPB)	S.172
+**VC20**
+Epedemic	S.112
+Video-Vorspann	S.81
+
+## Ausgabe 9/84
+
+Bestell-Nr. CB 014 DM 29,90*
+**Commodore 64**
+Indexsequentielle Adreßdatei, S. 54
+- Spring Vogel (LdM), S. 68
+— Orgel/Synthesizer (AdM), S. 70
+— Sprite Aid +, S. 89
+— Screen Change, S. 94
+— List-Stop, S. 97
+— Renew, Datawandler, S. 102
+— Synthetische suchen, S. 104
+— Geregelter Zahlungsverkehr, S. 164
+**VC 20**
+Schiebung (GV>), S. 77
+— Deuzei (8K >), S. 79
+— Hardcopy 1520 (GV>), S. 87
+- RS232-Interface (GV>), S. 100
+— Datawandler (GV>), S. 102
+
+### Ausgabe 8/84
+
+Bestell-Nr. CB 013 DM 29,90*
+**Commodore 64**
+Castle of Doom, S. 66
+— Pac-Boy, S. 89
+— Kopplung, S. 73
+— User-Port-Display, S. 97
+— RS232-Test, S. 77
+- View BAM, S. 99
+- Görlitz Hardcopy, S. 83
+— Milchvieh, S. 156
+**VC20**
+Kudiplo (3K), S. 86 — Print at Restore n (GV), S. 101
+
+## Ausgabe 7/84
+
+Bestell-Nr. CB 017 DM 29,90*
+**Commodore 64**
+
+Terminalprogramm, S. 24
+— Softwarekatalog, S. 72
+— Russvok (SB), S. 76
+— Crown No. 1, S. 80
+— Space Invaders, S. 81
+— 1520 Hardcopy, S. 108
+— Centronics Interface, S. 110
+— Kurvendiskussion, S. 116
+— Copy Rel. Files, S. 132
+— Autostart, S. 138
+— Strubs (OP u. QP), S. 154
+**VC20**
+Rätsel, S. 122
+
+## Ausgabe 6/84
+
+**Commodore 64**
+Bestell-Nr. CB 018 DM 29,90*
+Lehrerkalender, S. 64 — Morsetrainer, S. 72 — Supervoc, S. 69 — Grafische Darst. (SB), S. 82 — Hot Wheels, S. 92
+**VC 20** Bestellnummer VC 008
+Movemaster (8K), S. 78 — Ghost Manor(GV), S. 104, Logic Disass. (3K>), S. 108, Underground (LdM 16K), S. 120 DM 29,90*
+
+## Ausgabe 5/84
+
+**Commodore 64**
+Bestell-Nr. CB 016 DM 29,90*
+Adreß- & Telefonregister, S. 64 — Fahrsimulator, S. 82 — Schatzsucher (LdM), S. 90
+**VC 20** Bestellnummer VC 007
+Relative Datei (8K), S. 69 — Schmatzer (GV) S. 76 - 3D-Grafik (8K), S. 78 - Rallye (28K), S. 128	DM 29,90*
+
+Bedeutung der Abkürzungen
+*LdM = Listing des Monats
+*GV > = alle Speicherversionen können yerwendetwerden(emschheBhch GV) wMjDeno^
+als 8 KByte wird benötigt.
+*UPB = Unterprogrammbibliothek
+
+Bestellungen richten Sie bitte an:
+M &T Buchverlag, Hans-Pinsel-Str. 2, 8013 Haar
+*Alle Preise inklusive Mehrwertsteuer. Der Versand erfolgt mit offener Rechnung zuzüglich Porto und Verpackung.
 
 
 
