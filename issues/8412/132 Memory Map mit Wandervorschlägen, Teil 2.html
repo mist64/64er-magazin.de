@@ -27,7 +27,53 @@
 
         <p>In diesen beiden Speicherzellen steht also ein Vektor. Was das ist, wird in der Tabelle 1 näher erläutert. Beim VC 20 deutet dieser Vektor auf die Adresse 53674 ($D1AA), beim C 64 auf 45482 ($B1AA). Sie können das mit PRINT PEEK (3) + 256*PEEK (4) leicht nachprüfen. Ab diesen Adressen beginnt im Basic-Übersetzer (Interpreter) ein Programm, welches — natürlich in Maschinensprache — eine Gleitkommazahl in eine ganze Zahl umwandelt.</p>
 
+        <figure>
+            <h3>Zeiger, Vektoren und Flaggen</h3>
+
+            <p>Zeiger und Vektoren sind 2 benachbarte Speicherzellen (Bytes), die eine wichtige Adresse enthalten.</p>
+
+            <p>Wir sprechen von einem <strong>Zeiger</strong>, wenn diese Adresse den Beginn von gespeicherten Daten angibt.</p>
+
+            <p>Ein <strong>Vektor</strong> kennzeichnet den Beginn eines Maschinenprogramms. (Ich muß zugeben, daß diese Unterscheidung nicht immer scharf angewendet wird beziehungsweise anwendbar ist).</p>
+
+            <p>Eine <strong>Flagge</strong> besteht aus einer Zahl, die von einem Programm verwendet wird, um sich das Resultat einer Operation zu merken beziehungsweise für eine spätere Verwendung festzuhalten.</p>
+            <figcaption>Tabelle 1. Was sind Zeiger, Vektoren und Flaggen?</figcaption>
+        </figure>
+
         <p>Diejenigen Leser, welche mit Gleitkommazahlen nicht so vertraut sind, möchte ich auf die Tabelle 2 verweisen. Er ist nur eine kleine Einführung. Später, bei der Behandlung der Speicherzellen 97 — 102 werde ich im Detail auf die externe und interne Darstellung und Verwendung von Gleitkommazahlen eingehen.</p>
+
+        <figure>
+            <h3>Gleitkomma-Zahlen</h3>
+
+            <p>Für diejenigen Leser, die das Thema der Zahlendarstellung in den Commodore-Handbüchern großzügig übersprungen haben, stelle ich es hier noch einmal vor.</p>
+
+            <p>Sie kennen die gängigen vier Zahlentypen:</p>
+
+            <ul>
+                <li>ganze Zahlen: 15, 21, 244</li>
+                <li>Brüche: 2/3, 26/8, 15/14</li>
+                <li>negative Zahlen: —15, —255</li>
+                <li>positive Zahlen: 10, 5, 123</li>
+            </ul>
+
+            <p>Ganze Zahlen bereiten uns und dem Computer keine Probleme.</p>
+
+            <p>Bei Brüchen sieht es schon anders aus. Erinnern Sie sich an die Bruchrechnungsstunden in der Schule? Wieviel ist 51/52 + 3/4!!</p>
+
+            <p>Ohne lang zu überlegen, rechnen wir natürlich um, 51/52 = 0,9807692 und 3/4 = 0,75; addiert ist das Resultat 1,7307692 — und schon sind Sie mitten in den Gleitkomma-Zahlen.</p>
+
+            <p>Bei obigem Beispiel gleitet allerdings noch nichts. Bei sehr großen oder aber auch sehr kleinen Bruch-Zahlen reicht uns — und einem Computer — nicht der Platz, um sie darzustellen. Die Zahl 0,000000000000000123 sprengt jeden normalen Rahmen.</p>
+
+            <p>Daher schreiben wir sie anders. Wir lassen das Komma nach rechts gleiten, bis es die erste Ziffer, die von 0 verschieden ist, findet und für jede Null, die es passiert multiplizieren wir die Zahl mit 10.</p>
+
+            <p>Die Zahl oben sieht dann so aus:<br>
+                0,123 x 10 hoch 15 (eine 1 mit 15 Nullen).</p>
+
+            <p>Die Grundzahl vorn heißt »Mantisse«, die 10 mit Hochzahl heißt »Exponent«.</p>
+
+            <p>Alle Commodore-Computer verarbeiten intern alle Zahlen in dieser Darstellung, also als Gleitkommazahl (siehe auch Assembler Kurs im 64’er-Magazin, Ausgabe 11)</p>
+            <figcaption>Tabelle 2. Die Zahlendarstellung bei den Commodore-Systemen</figcaption>
+        </figure>
 
         <p>Dieses Umwandlungsprogramm steht nicht nur den Maschinen, sondern auch den Basic-Programmierern zur Verfügung, allerdings nur über den USR-Befehl und da auch nur, wenn der »Floating Point Accumulator« # 1 (FAC1) in den besagten Adressen 97 bis 102 mitbenutzt wird. Ich verschiebe daher alle weiteren Details auf unsere Ankunft bei diesen Speicherzellen.</p>
 
@@ -160,50 +206,6 @@
         <p>Mit dieser Adresse fahren wir das nächste Mal fort.</p>
 
         <address class="author">(Dr. Helmuth Hauck/aa)</address>
-
-        <p>TODO<br>
-            Tabelle 1. Was sind Zeiger, Vektoren und Flaggen?</p>
-
-        <h3>Zeiger, Vektoren und Flaggen</h3>
-
-        <p>Zeiger und Vektoren sind 2 benachbarte Speicherzellen (Bytes), die eine wichtige Adresse enthalten.</p>
-
-        <p>Wir sprechen von einem <strong>Zeiger</strong>, wenn diese Adresse den Beginn von gespeicherten Daten angibt.</p>
-
-        <p>Ein <strong>Vektor</strong> kennzeichnet den Beginn eines Maschinenprogramms. (Ich muß zugeben, daß diese Unterscheidung nicht immer scharf angewendet wird beziehungsweise anwendbar ist).</p>
-
-        <p>Eine <strong>Flagge</strong> besteht aus einer Zahl, die von einem Programm verwendet wird, um sich das Resultat einer Operation zu merken beziehungsweise für eine spätere Verwendung festzuhalten.</p>
-
-        <p>TODO<br>
-            Tabelle 2. Die Zahlendarstellung bei den Commodore-Systemen</p>
-
-        <h3>Gleitkomma-Zahlen</h3>
-
-        <p>Für diejenigen Leser, die das Thema der Zahlendarstellung in den Commodore-Handbüchern großzügig übersprungen haben, stelle ich es hier noch einmal vor.</p>
-
-        <p>Sie kennen die gängigen vier Zahlentypen:</p>
-
-        <p>— ganze Zahlen: 15, 21, 244<br>
-            — Brüche: 2/3, 26/8, 15/14<br>
-            — negative Zahlen: —15, —255<br>
-            — positive Zahlen: 10, 5, 123</p>
-
-        <p>Ganze Zahlen bereiten uns und dem Computer keine Probleme.</p>
-
-        <p>Bei Brüchen sieht es schon anders aus. Erinnern Sie sich an die Bruchrechnungsstunden in der Schule? Wieviel ist 51/52 + 3/4!!</p>
-
-        <p>Ohne lang zu überlegen, rechnen wir natürlich um, 51/52 = 0,9807692 und 3/4 = 0,75; addiert ist das Resultat 1,7307692 — und schon sind Sie mitten in den Gleitkomma-Zahlen.</p>
-
-        <p>Bei obigem Beispiel gleitet allerdings noch nichts. Bei sehr großen oder aber auch sehr kleinen Bruch-Zahlen reicht uns — und einem Computer — nicht der Platz, um sie darzustellen. Die Zahl 0,000000000000000123 sprengt jeden normalen Rahmen.</p>
-
-        <p>Daher schreiben wir sie anders. Wir lassen das Komma nach rechts gleiten, bis es die erste Ziffer, die von 0 verschieden ist, findet und für jede Null, die es passiert multiplizieren wir die Zahl mit 10.</p>
-
-        <p>Die Zahl oben sieht dann so aus:<br>
-            0,123 x 10 hoch 15 (eine 1 mit 15 Nullen).</p>
-
-        <p>Die Grundzahl vorn heißt »Mantisse«, die 10 mit Hochzahl heißt »Exponent«.</p>
-
-        <p>Alle Commodore-Computer verarbeiten intern alle Zahlen in dieser Darstellung, also als Gleitkommazahl (siehe auch Assembler Kurs im 64’er-Magazin, Ausgabe 11)</p>
 
     </article>
 
