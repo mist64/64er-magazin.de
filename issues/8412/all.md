@@ -762,9 +762,17 @@ Eines sei vorweggenommen, der Befehlssatz des »Graphic-Basic« läßt kaum eine
 
 Ebenso besteht die Möglichkeit, die ganze 24x21 Punktmatrix um beliebig viele Spalten beziehungsweise Reihen zu verschieben. Wer schon früher mit ähnlichen Programmen gearbeitet hat, wird diesen Vorteil zu schätzen wissen. Selbstverständlich können sowohl Single- als auch Multicolorsprites definiert werden, die Vorder und Hintergrundabfrage, sowie die Kollisionserkennung sind eingebaut. Ein Sprite-Editor wie dieser wird noch lange Zeit seinesgleichen suchen.
 
-Doch was kann man nun mit seinem eben erstellten Sprite-Kunstwerk alles anfangen? Sehr viel, denn dem Benutzer steht eine Vielzahl von neuen, sinnvollen Befehlen zur Verfügung. Diese Befehle zeichnen sich durch eine interessante Besonderheit aus, denn sie sind allesamt Interrupt-gesteuert. Das heißt, Sprites bewegen sich nach einmaligem Aufruf selbständig. Der Effekt ist, daß jedes Ba-sic-Programm mit höherer Geschwindigkeit weiterläuft. Mancher Befehlserweiterung geht hier schon langsam die »Luft« aus, nicht so »Graphic-Basic«. Diese Supererweiterung sammelt weitere Pluspunkte, etwa durch die Befehle »Copy Hires
+Doch was kann man nun mit seinem eben erstellten Sprite-Kunstwerk alles anfangen? Sehr viel, denn dem Benutzer steht eine Vielzahl von neuen, sinnvollen Befehlen zur Verfügung. Diese Befehle zeichnen sich durch eine interessante Besonderheit aus, denn sie sind allesamt Interrupt-gesteuert. Das heißt, Sprites bewegen sich nach einmaligem Aufruf selbständig. Der Effekt ist, daß jedes Ba-sic-Programm mit höherer Geschwindigkeit weiterläuft. Mancher Befehlserweiterung geht hier schon langsam die »Luft« aus, nicht so »Graphic-Basic«. Diese Supererweiterung sammelt weitere Pluspunkte, etwa durch die Befehle »Copy Hires To Sprite, Copy Sprite To Hires«. Zeitlupengrafiken und Bewegungsstudien wie etwa der Flug eines Vogels, werden innerhalb weniger Minuten zur Realität. Wesentlich unterstützt wird der Programmierer bei seinen Entwürfen durch wichtige Befehle wie »Dot, Line, Box, Circle« und andere bekannte Grafikhilfen.
 
-TODO Fortsetzung auf Seite 150
+Weil die Programmierer bei HES-ware mit Vorliebe die Interrupttechnik verwendet haben, lassen sich Text und Grafik beliebig mischen. Zusammen mit der umfangreichen Farbgebung sind so Bilder auf der Diskette speicherbar und stehen bei Bedarf, beispielsweise in einem Adventure, rasch zur Verfügung.
+
+Fast ebenso umfangreich wie der Befehlssatz für die Sprite-Programmierung sind die neuen Kommandos zur Tonerzeugung. Alle Musikfunktionen werden wie die Sprites interruptgesteuert. Man kann sich sogar beim Programmieren mit Musik unterhalten lassen. Alle wichtigen Parameter wie Attack, Sustain, Release, Decay und Wellenform werden über simple Basic-Befehle eingestellt.
+
+Nach all diesen Erläuterungen entsteht vielleicht der Eindruck, bei »Graphic-Basic« handle es sich um eine reine Grafikerweiterung. Weit gefehlt!. Es gibt Befehle zur Funktionstastenbelegung, ebenso wie solche zur Abfrage der Joysticks und zur Diskettenhandhabung (Dir, Disk). Auch über die typischen Befehle vieler Erweiterungen für bedingte Sprünge (If-Then-Else oder On-Error-Goto) verfügt die Hes-Grafik. Am ungewöhnlichsten ist aber der »Window«-Befehl, der es erlaubt, den Bildschirm in mehrere »Aktivitätszonen« zu unterteilen. Abschließend soll noch angemerkt werden, daß sowohl Text als auch Grafik auf verschiedenen Druk-kern (Copy) ausgegeben werden kann.
+
+Wer die Grafik- und Tonprogrammierung zu seinem Lieblingsthema gewählt hat, aber auf den Komfort einiger Hilfen zur strukturierten Programmierung nicht verzichten möchte, findet in der Hes-Grafik den richtigen Partner. Für relativ wenig Geld erhält er ein Werkzeug, mit dem der eigenen Kreativität keine Grenzen mehr gesetzt sind. Für meinen C 64 ist »Graphic-Basic« jedenfalls zum gern gesehenen Prinzen geworden.
+
+(Arnd Wängler/Martin Gaksch/ev)
 
 # Oxford-Pascal für den Commodore
 
@@ -3157,192 +3165,181 @@ Adreß- & Telefonregister, S. 64 — Fahrsimulator, S. 82 — Schatzsucher (LdM)
 Relative Datei (8K), S. 69 — Schmatzer (GV) S. 76 - 3D-Grafik (8K), S. 78 - Rallye (28K), S. 128	DM 29,90*
 
 Bedeutung der Abkürzungen
-*LdM = Listing des Monats
-*GV > = alle Speicherversionen können yerwendetwerden(emschheBhch GV) wMjDeno^
-als 8 KByte wird benötigt.
-*UPB = Unterprogrammbibliothek
+*LdM - Listing des Monats
+*AdM - Anwendung des Monats
+*SB = Simons Basic
+*CV - Grundversion
+*GV> - alle Speicherversionen können verwendet werden (einschließlich GV)
+*3K - 3-KByte-Speichererweiterung wird benötigt
+*8K> - Speichererweiterung größer als 8 KByte wird benötigt.
+*UPB - Unterprogrammbibliothek
 
 Bestellungen richten Sie bitte an:
 M &T Buchverlag, Hans-Pinsel-Str. 2, 8013 Haar
 *Alle Preise inklusive Mehrwertsteuer. Der Versand erfolgt mit offener Rechnung zuzüglich Porto und Verpackung.
 
+# Kreuzworträtsel selber machen – 1000 Mark für den Gewinner
 
+> Kreuzworträtsel sind bei jung und ah beliebt. Das beweisen die vielen Rätselzeitschriften. Aber ein Kreuzworträtselprogramm zu schreiben ist etwas ganz anderes, als ein Rätsel zu lösen. Diese Aufgabe ist eine Herausforderung für gute Programmierer. Das beste Ergebnis des Kreuzworträtsel-Wettbewerbs stellen wir Ihnen vor.
 
+Es läßt kaum Wünsche offen. Der Bildschirmaufbau ist genauso gut gelöst wie die Druckerausgabe. Auch den Bedienungskomfort kann man sich kaum besser vorstellen.
 
+Ein Kreuzworträtselprogramm zu schreiben ist eine knifflige Aufgabe. Nicht nur die für den Betrachter eines Rätsels selbstverständlichen Regeln, wie das Kreuzen von Worten senkrecht zueinander und die dichte Vernetzung von Wörtern, auch die Geschwindigkeit und der Komfort des Programmes spielen eine große Rolle. Damit blieb in diesem Falle nur der Einsatz von Maschinensprache übrig. Das Kreuzworträtselprogramm besteht also aus zwei Teilen. Einem Rahmenprogramm in Basic, sowie einer Maschinenroutine, die im Bereich ab $C000/ 49152 geladen wird und die die Schwerarbeit leistet (zirka 30 Wortvergleiche/Se-kunde).
 
+Um das Rätselprogramm nicht unnötig mit der Eingabe des Wortschatzes zu belasten, werden die Wörter vorher mit einem Editor eingegeben und bis zu 255 in einem File auf Diskette abgelegt. Das eigentliche Rätselprogramm liest diese Files dann ein und verwendet sie im Rätselfeld (Bild 1). Trotzdem ist die Eingabe von Hand möglich. Denn der große Wortschatz eines Menschen kann niemals auf Diskette gespeichert werden.
 
+### Die Programme
 
+Bevor also die Erzeugung eines Kreuzworträtsels starten kann, muß ein Wortschatz mit dem Lexikon-Editor eingegeben werden (Bild 2). Dieses Programm hat vier Aufgaben:
+a)	Directory lesen. Dabei werden nur die bereits auf Diskette vorhandenen Wortschatzdateien angezeigt.
+b)	Wortdatei anlegen. Mit diesem Programmteil können Sie bis zu 255 Wörter und die zugehörigen Fragestellungen eingeben und diese dann auf Diskette als Wortdatei ablegen. Eine spezielle Eingaberoutine (Zeile 1000 — 1099) sorgt dafür, daß nur erlaubte Zeichen eingegeben werden. Es ist zum Beispiel unsinnig, ein Kreuzwort einzugeben, das aus mehreren Teilen besteht, wie etwa »Level II Basic«, oder eine Mischung aus Zahlen und Buchstaben, wie »C 64«.
 
+So können Sie sich also im Laufe der Zeit eine ganze Bibliothek von Wortschätzen aufbauen, die beliebig während der Rätselerzeugung einzusetzen sind.
 
+Eine Besonderheit ist die Verkettung von Dateien. Sie können Nachfolgedateien benennen, die im Rätselprogramm automatisch nachgeladen werden, sobald der Vorgängerwortschatz erschöpft ist. Beispiel: Sie wollen ein Rätsel zum Thema »Computer« basteln. Geben Sie jetzt mit Hilfe des Lexikon-Editors den ersten Teil des geplanten Wortschatzes ein und benennen ihn mit»Computer.l«. Der Folgewortschatz soll »Compu-ter.2« sein. Nachdem Sie den 1. Teil abgespeichert haben, geben Sie den 2. Teil ein und benennen den Nachfolger mit »Computer.3« und so weiter. Wollen Sie diese Kette beenden, wird einfach ein »q« (Quit) für den Nachfolger angegeben. Das Rätselprogramm bricht dann später an dieser Stelle mit dem automatischen Nachladen ab.
 
+Bei dieser Methode hängt die Qualität des Rätsels entscheidend von der Staffelung der Dateien ab, das heißt im ersten File sollten lange Wörter stehen und mit jedem Folgefile die durchschnittliche Wortlänge abnehmen. Die Erstellung des Rätsels gerät dadurch wesentlich flüssiger, denn mit zunehmender Dichte des Wortfeldes müssen die Wörter natürlich immer kürzer werden, damit sie noch einzubauen sind.
+c)	Wortdatei ändern. Mit Sicherheit tauchen irgendwann falsch eingegebene Kreuzwörter auf, so daß eine Datei verbessert werden muß. Unter diesem Programmpunkt kann daher die entsprechende Wortdatei geladen und editiert werden.
+d)	Abbrechen. Mit Verlassen des Editors kann das Rätselprogramm geladen und gestartet werden, so daß ein fließender Übergang von der Worteingabe zur Rätselerstellung möglich ist.
 
+Nun zum Kreuzworträtselprogramm. Wie schon gesagt, besteht dieses Programm aus zwei Teilen, einer Maschinenroutine und dem
 
+Basic-Rahmenprogramm. Dieses Rahmenprogramm (Bild 3) will ich zuerst beschreiben.
 
+Nach dem Start des Programmes beginnt zunächst eine Initialisierungsphase (Zeilen 27—39). In einem Unterprogramm (ab Zeile 970) werden die Maschinenroutine für das Kreuzworträtsel und Treibersoftware für den Drucker am User-Port geladen. Wenn Sie einen Druk-ker am IEC-Bus betreiben, ist dieser Programmteil (Zeile 976 + 979) natürlich nicht nötig und zu entfernen.
 
+Im folgenden Unterprogramm zur Dimensionierung der Variablen und Definition einiger Konstanten (Zeile 915—969) erfolgt der erste Sprung in die Maschinenroutine (Zeile 937), um sie zu initialisieren.
 
+Nach dem Bildaufbau (Unterprogramm ab Zeile 600), ist auf dem Monitor ein Kreuzwortfeld von 20x20 Zeichen zu sehen. Das Programm fragt jetzt nach dem Startwort, das als erstes Wort im Feld eingetragen werden muß, um der Maschinenroutine einen Kristallisationspunkt zu bieten (Zeile 34— 35). Geben Sie ein möglichst langes Wort ein, das Sie zum Beispiel unbedingt im Rätsel verarbeiten möchten. Bei dieser Eingabe findet, wie schon beim Editor, ein Zeichencheck statt, der es unmöglich machen soll, unerlaubte Zeichen im Rätselfeld unterzubringen. Danach müssen Sie sich zwischen einer waagerechten oder senkrechten Eintragung entscheiden, und ein Cursor taucht im Wortfeld auf. Fahren Sie wie gewohnt mit den Cursortasten die gewünschte Wortposition an und drücken die RETURN-Taste. Da es das erste Wort ist und genügend Platz im Wortfeld herrscht, wird Ihr Wort ohne Protest sofort eingetragen. Jetzt noch schnell die zugehörige Fragestellung eingetippt, und das erste Wort ist korrekt eingetragen.
 
+Sie können dieses Spiel beliebig fortsetzen und theoretisch das ganze Rätsel auf diese Weise per Hand erstellen. Alle Eingaben von Hand sind frei von dem Zwang, ein Wort mit einem anderen kreuzen zu müssen. Sie können Ihre Wörter also beliebig positionieren, sollte ein Wort allerdings nicht passen, wird es zurückgewiesen und der Handeingabe-Modus abgebrochen.
 
+Regulär verlassen Sie die Handeingabe, indem Sie anstelle eines neuen Wortes ein »q« eintippen. Später können Sie die automatische Rätselerzeugung jederzeit unterbrechen und mit F7 wieder in den Handmodus zurückkehren.
 
+Im Wortfeld stehen nun ein oder mehrere Wörter, die als Startpunkte für andere Wörter dienen. Senkrechte Eintragungen sind weiß und waagerechte gelb gefärbt.
 
+Bleibt nur die Angabe, welcher auf Diskette gespeicherte Wortschatz als erstes geladen werden soll (Zeile 37). Dabei können Sie sich mit »$« auch das Inhaltsverzeichnis der Diskette ansehen, für den Fall, daß Ihnen der Name eines Wortschatzes entfallen ist.
 
+Nach erfolgreichem Laden des ersten Wortschatzes beginnt nun die automatische Rätselerzeugung (Hauptschleife Zeile 40—99). Zunächst überraschend schnell füllt sich das Wortfeld mit zufällig plazierten und gekreuzten Wörtern. Dieser Vorgang wird von der Maschinenroutine gesteuert. Auf die genaue Arbeitsweise dieses Programmteiles gehe ich noch gesondert ein. Links oben auf dem Bildschirm erscheint die Anzahl der Wörter, die bereits eingetragen sind (maximal 255 sind möglich) und daneben die momentane prozentuale Größe des noch zur Verfügung stehenden Wortschatzes im Speicher.
 
+Bei jeder Eintragung wird die Liste der Kreuzwörter gekürzt und das benutzte Wort aus der Liste gestrichen. Dies geschieht durch Vertauschen der Stringvektoren des zu streichenden Wortes und des letzten Wortes im Array (Zeile 300—399). Diese Methode wurde gewählt, um die Bildung von neuen Strings im Speicher zu vermeiden und der schrecklich langsamen Garbage-Collection aus dem Wege zu gehen.
 
+Während der Rätselerzeugung können Sie sich in Ruhe überlegen, ob Sie ein automatisches Nachladen von Wortschätzen gestatten wollen oder nicht. In der rechten Bildhälfte ist inzwischen die Belegung der Funktionstasten zu sehen, und mit der F6-Taste schalten Sie die Autolader-Option ein oder aus. Erscheint »Aus« im F6-Tastenfeld, ist das Nachladen gesperrt.
 
+Die Maschinenroutine sucht derweil ständig nach passenden Stellen im Wortfeld. Dieser Vorgang kann im Prinzip endlos sein, da irgendwann natürlich kein geeignetes Wort mehr zu finden ist. Aus diesem Grund hat das Programm eine »Geduld-Schwelle«, eine Anzahl von Suchversuchen, innerhalb derer ein passendes Wort gefunden werden muß. Ist die Versuchszahl ohne Erfolg abgelaufen, geht das Programm davon aus, daß der Wortschatz nicht mehr ausreicht. Diese »Ge-duld-Schwelle« können Sie in Zeile 964 selbst bestimmen.
 
+Bevor allerdings in der obersten Bildzeile die Meldung »Wortschatz ungenügend« erscheint (Zeile 64/ U nterprogramm 110—15 8), hebt das Programm noch die »Blausperre« auf (Zeile 66). Dieses Flag hat dem Maschinenprogramm bisher mitgeteilt, daß nur dann eine Eintragung erlaubt ist, wenn dabei auch ein blaues, unbesetztes Feld abgedeckt wird. Eine Maßnahme, um das Rätsel möglichst dicht zu packen. Ab sofort ist also auch das Einpassen eines Wortes nur auf besetzten Feldern möglich. Läßt sich auch jetzt kein Wort mehr finden, erscheint endgültig der Hinweis auf mangelnde Wortauswahl. Wenn Sie das »Autoladen« zugelassen haben, wird nun der Folgewortschatz, fallsvorhanden, gelesen und das Spiel beginnt von Neuem. Selbstverständlich ist auch das Laden von Wortdateien vor Ablauf der »Geduld-Schwelle« machbar. Dazu dient die Fl-Taste. Aber Vorsicht, auf die Gefahr, daß Sie einen bereits verbrauchten Wortschatz nochmal laden, müssen Sie schon selbst achten.
 
+Es dauert gar nicht so lange, dann ist das Wortfeld so dicht gepackt, daß der Maschinenroutine keine Eintragung mehr gelingt. Jetzt sind Sie gefordert, und mit der F7-Taste wählen Sie die Handeingabe an. Genauwie bei der Eintragung der ersten Startwörter können Sie Ihre »Lückenfüller« positionieren und die Fragestellung dazu eingeben.
 
+Zufrieden mit Ihrer Arbeit (hoffentlich!) bleibt nur noch der Ausdruck des Rätsels. Mit F4 wird er gestartet. Das Unterprogramm für die Druckausgabe nimmt im Programm den weitaus größten Platz ein (Zeile 740—914). Ich verwende einen Epson RX-80-Drucker, der mit Hilfe einer speziellen Treibersoftware (Epson Software-Inter-face) auch CBM-Sonderzei-chen drucken kann. Dazu muß eine unübliche Geräteadresse (6) angegeben werden (Zeile 761 und 900). Sollten Sie also einen CBM-gra-fikfähigen Drucker am IEC-Bus betreiben, tauschen Sie diese Adresse gegen die gewohnte »4« (im Listing schon geändert).
 
+Auch die Druckerinitiali-sierung ist von Drucker zu Drucker verschieden (Zeilen 754—758). Achten Sie darauf, daß Ihr Drucker hier folgende Einstellung erhält:
 
+— Zeilenabstand = 0
+— CBM-Grafikmodus
+- Startposition des Druckkopfes = lr (Linker Rand, kann in Zeile 946 geändert werden).
 
+Für den Ausdruck der Fragestellung wird der RX80 im Engschriftmodus versetzt, um Platz zu sparen (Zeile 824—827). Auf diesen Effekt können Sie natürlich verzichten, müssen dann aber die Zeilenlänge (cz, in Zeile 948) ändern, da der Ausdruck vom Programm mit Randausgleich versehen wird (Zeile 847 - 889).
 
+Nun wie versprochen zum Maschinenprogramm, kurz genannt »Such« (Bild 4 und 5). Diese Routine liegt im Bereich $C000/49152, wo sie gut gegen überschreiben durch Basic geschützt ist. Der Einsprung erfolgt über den USR-Vektor (definiert in Zeile 931 bis 932), das heißt es findet eine Parameterübergabe zwischen Basic und Maschinenroutine statt. Basic übergibt in »dl« die Anzahl der Versuche, die die Routine durchlaufen sollen (Zeile 44). Mit der Rückkehr aus der Routine wird der Variablen »u« ein Wert zwischen 1 und 4 zugewiesen. Aus dem Wert von »u« kann also auf die Ursache für den Abbruch der Routine geschlossen werden:
 
+— u = 1; eine Taste ist betätigt worden.
+— u = 2; die Suche nach einem passenden Kreuzwort war vergeblich.
+— u = 3; ein Wort wurde gefunden und in das Wortfeld eingetragen.
+— u = 4; die maximale Anzahl (255) von eingetragenen Kreuzwörtern ist erreicht; keine weitere Eintragung möglich. Das Rahmenprogramm kann jetzt entsprechend reagieren und zum Beispiel im Falle u = 3 das benutzte Wort aus der Wortliste streichen. Im Falle einer Eintragung (von Hand oder automatisch) wird das Wort nicht nur in den Bildspeicher eingesetzt, sondern es werden auch einige weitere Informationen abgelegt:
 
+a) Eintragung im »Wortbe-ginn/ende«-Speicher (50176 bis 50575); hier wird vermerkt, ob ein Rätselfeld den Start- oder Endpunkt eines Kreuzwortes repräsentiert. Der Speicher ist, wie die folgenden auch, in 20 Zeilen mit je 20 Positionen (Speicherstellen) aufgeteilt. Daslmke Halbbyte (4 Bit) emer Speicherstelle trägt die Informationen über senkrechte, das rechte Halbbyte über waagerechte Start/Endpositio-nen. Das 1. Bit im Halbbyte wird für Endpunkte gesetzt, das 3. Bit für Startpunkte. Diese Informationen werden später bei der Ausgabe des Rätsels auf dem Drucker benötigt, um an den richtigen Stellen die Nummer der zugehörigen Fragestellung eintragen zu können.
+b)	Eintragungen im »Senk-recht«-Speicher (50576 bis 50975); in dieser Speicher-matrix werden die Ordnungsnummern der Fragestellungen für senkrechte Rätselwörter abgelegt. Bei der Druckausgabe wird diese Matrix abgefragt (Zeile 773 bis 777), um die Nummer der Fragestellung im entsprechenden Startfeld einzusetzen.
+c)	Eintragung im »Waage-recht«-Speicher (50976 bis 51375), wie unter b) Zeile 796 bis 800).
 
+Um die Speicherinhalte vor dem Start des Rätselprogramms zu löschen, springt man die Routine mit »sys 50016« an (Zeile 937).
 
+Nun zur Arbeitsweise der Routine während der automatischen Rätselerzeugung. Zunächst muß das Maschinenprogramm erst einmal wissen, ob es wegen einer Handeintragung angesprungen wurde oder zur automatischen Wortsuche. Dazu liest die Routine die Speicherstelle 26 aus. Ist das Ergebnis Null, wird in den Automodus verzweigt. Andernfalls wird in 26 die Länge des von Hand eingetragenen Wortes übergeben (siehe Zeile 662 bis 663). Die Routine braucht dann nur den Paß des Wortes zu überprüfen und bei korrekter Eintragung ins Basic zurückzukehren. Paßt das Wort allerdings nicht, verfällt die Routine in den Automodus. Das Maschinenprogramm durchläuft im Automodus eine Schleife, die zunächst durch Auslesen des Rauschgenerators im Soundchip ein Wort aus dem Wortschatz per Zufall bestimmt. Dann erfolgt auf die gleiche Weise die Auswahl eines Startpunktes im Bildspeicher. Ist dieser Punkt nicht geeignet für eine Eintragung, wird Zeile für Zeile des Wortfeldes nach einer Alternative gesucht. Im Falle eines Treffers startet der Wortvergleich. Das gewählte Wort wird mit dem Inhalt des Bildspeichers auf Übereinstimmung geprüft. Paßt es nicht, kommt das nächste Wort aus dem Wortschatz-Array an die Reihe. Bei Erfolg kehrt »Such« ins Basic zurück, wenn nicht, beginnt die Schleife von Neuem.
 
+Damit der Zugriff auf das Array klappt, muß es nur als erstes im Basic-Programm definiert worden sein (Zeile 925). »Primitiv« werden Sie vielleicht anmerken. Richtig, aber Computer sind nun mal (sehr) schnelle Idioten.
 
+(Gert Büttgenbach/gk)
 
+## Zur Person des Autors:
 
+Gert Büttgenbach, geb. 20. 09. 53, Beruf: Nautischer Offizier.
 
+Wer sich für eine Berufsausbildung als Deckoffizier in der Handelsschiffahrt entscheidet, so wie ich 1977, der ist ein potentielles Opfer der Computersucht. Denn auf der Brücke eines Frachters kann man eine ganze Menge schon mit einem Taschenrechner zaubern. Die Navigation bietet da ein weites Feld. So dauerte es auch kein halbes Jahr und ich stand klopfenden Herzens vor der schillernden Vitrine eines Kaufhauses in Houston/Te-xas und vernarrte mich in eines der ersten Exemplare des TI59. Ich mußte mir eine ganze Monatsheuer bei meinem Kumpel pumpen, um in den 7. Bytehimmel aufzusteigen. Von nun an gab es keine Langeweile mehr. Bald berechnete mein Rechenknecht simultan aus 7 Sternenbeobachtungen den Standort auf See.
 
+Während meines Seefahrtstudiums an der Fachhochschule Hamburg lernte ich dann andere Computerfreaks kennen. Inzwischen marmelte ein TRS80 Modell I in meiner Bude und ich mußte erst einmal lernen, daß ein Computer nicht alles kann. Dabei ging der Respekt vor diesen Dingern endgültig flöten. In die weite Welt der CBMs bin ich durch meinen Physikprofessor geraten. Gemeinsam mit anderen Studenten bildeten wir bald einen harten Kern, der der zweitschönsten Sache auf der Welt ungehemmt frönte. Als das Ende des Studiums nahte, war das Thema meiner Abschlußarbeit Schuld an der »Ehe« mit dem C 64. Wir brauchten ein Grafikwunder für die Simulation eines Radarbildes. Und da kam gerade ein merkwürdiger »Spielcomputer« (man konnte einen Joystick anschließen, sehr verdächtig?) über den Speicherhorizont, der mehr zu können schien ...
 
+Wie kam ich nun auf die verrückte Idee, ein Kreuzworträtsel-Programm zu schreiben?
 
+Das hatte ich schon auf Modell I probiert, und gemerkt wie vielfältig die Probleme da-bei sind. Als ich vom Preisausschreiben im 64'er-Magazin las, war es natürlich eine Herausforderung, die alte Nuß zu knacken.
 
+Mem nächster Computer? Sorry, aber das könnte ein Macintosh sein, denn mein Buckel wird langsam krumm vom Maschinendenken!
 
+(Gert Büttgenbach/gk)
 
+# Pragrammierwettbewerb: Dokumentationshilfe
 
+> Insgesamt 1000 Mark zu gewinnen. Möchte man ein Programm analysieren oder schreiben, und die Dokumentation ist nicht oder nur mangelhaft vorhanden, ist eine automatische Dokumentations-hilfe ein interessantes Werkzeug.
 
+Die Aufgabe, die wir diesmal stellen, ist nicht nur eine Herausforderung an Programmierer, sondern soll zudem für Software-Entwickler ein nützliches Utility sein. Es geht um die Programmierung einer erweiterten Crossreferenzliste. Eine Crossreferenzliste durchsucht per Definition ein beliebiges Programm nach Variablen und Sprungbefehlen und gibt sie auf einem Drucker in gut lesbarer Form aus. Wir wollen aber in diesem Programmierwettbewerb ein vollständiges Werkzeug zur Dokumentation eines sich in der Entwicklung befindlichen oder fertigen Programms erhalten. Im einzelnen sollte das Programm folgendes können:
+1.	Alle Programmzeilennummern drucken, die Sprünge enthalten. Ausgegeben werden soll die Zeilennummer, dahinter die Zeilen, die angesprungen werden.
+2.	Ausgabe aller Programmzeilen, die angesprungen werden, wenn möglich mit den Zeilen, von denen aus der Sprung erfolgt.
+3.	Ausgabe aller im Programm verwendeten Variablen.
+3.1	In der Reihenfolge, wie sie im Programm auftauchen.
+3.2	In sortierter Reihenfolge: Sortiert nach Gruppe (Integer, Real, Strings und Felder) sowie alphabetisch.
+3.3	In welcher Zeile sie definiert werden (Variable =) und in welcher Zeile sie be-nutztwerden(= Variable).
+3.4	Es soll zu jeder Variable ein Kommentar eingegeben werden können.
+4.	Denkbar wäre auch, die ganze Prozedur innerhalb wählbarer Grenzen (zum Beispiel zwischen Zeile 1000 und 2000) eines Programms ablaufen zu lassen.
 
+Wie Sie aus dem letzten Punkt ersehen können, sind den Ideen keine Grenzen gesetzt. Wichtig ist vor allen Dingen, daß ein komplettes Dokumentationsprogramm für die eigene Entwicklung und zur Analyse fremder Programme zustande kommt. So könnte eine automatische Aufschlüsselung nach Zeilennummern oder die Erstellung eines Fluß- oder Nassi-Shneidermann-Diagramms durchaus mit eingebaut werden. Lassen Sie Ihre Phantasie spielen und dokumentieren eigene und fremde Programme auf die bestmögliche Art und Weise.
 
+Es wird mindestens zwei Gewinner geben: Einer für die beste Lösung in Basic, der andere für das beste Assembler-Programm.
 
+Wenn Ihre Lösung von der oben genannten Aufgabenstellung etwas abweicht, so ist das keine Disqualifikation. Bewertungskriterien werden vor allem sein: Nutzbarkeit, Übersichtlichkeit, Schnelligkeit und Komfort.
 
+Schicken Sie Ihre Lösung unter dem Stichwort
 
+»Programmierwettbewerb: Dokumentationshilfe« an folgende Adresse:
+Markt & Technik Verlag AG, Redaktion 64’er, Hans-Pinsel-Str. 2, 8013 Haar bei München
 
+# Vorschau
 
+## Softlearning
 
+Die Lehr- und Lernmethoden an den Schulen ändern sich laufend. Auch auf dem Gebiet des computerunterstützten Lernens können neue Wege beschritten werden. SM hat sich bei der Auslegung ihrer Lernsoftware an dem Erfolgskonzept des Superlearning, das bei der Schulung von Führungskräften in der Wirtschaft seit zwei Jahren für Furore sorgt, orientiert. Also Lernen mit dem C 64, ohne blockierende Ängste und Streßgefühle.
 
+## Alles über Strings
 
+Fast kein Programm kommt ohne Strings aus. Was ist eigentlich ein String? Warum gibt es manchmal »Zwangspausen« — die Garbage Collection — beim Verarbeiten von vielen Strings und wie kann man sie umgehen? Die Antworten und viele Tips und Tricks lesen Sie in der nächsten Ausgabe.
 
+## Forth to Clarity
 
+Voran zum Verständnis — nämlich zum Verständnis von Forth, dieser eigenwilligen Programmiersprache, die in letzter Zeit immer größere Verbreitung findet. Anhand eines konkreten Programmierbeispiels, nämlich dem Bau eines Decompilers, wird in leicht nachzuvollziehender Form in die grundsätzliche Struktur der Sprache eingeführt.
 
+## Hypra-Load mal fünf
 
+Das in Ausgabe 10 vorgestellte Hypra-Load war eine Sensation. Aus diesem Grund bringen wir viele Anregungen und Verbesserungen zu diesem Programm. Außerdem erfahren Sie, wie Hypra-Load fest in das Betriebssystem eingebaut werden kann.
 
+## Außerdem...
 
+— Hi-Eddi, ein faszinierendes Zeichen- und Grafikprogramm als Listing des Monats
+— ein strategischer Handballtrainer als Anwendung des Monats
+— sieben Kurse
+— und wieder viele Tips und Tricks für C 64 und VC 20.
 
+## Der Nachfolger
 
+Der C 16, ursprünglich als Nachfolger des VC 20 konzipiert, ist dabei, sich einen eigenen Platz an der Sonne im heißumkämpften Markt der kleinen Computer zu sichern. Sein Basic 3.5 mit mehr als 75 Befehlen unterstützt Grafik, Sound und strukturierte Programmierung.
+Ist der C 16 wirklich nur als Nachfolger des VC 20 gedacht, oder kann er sogar dem C 64 das Leben schwer machen? Unser großer Testbericht zeigt, was der C 16 wirklich kann — und wer ihn sich kaufen sollte.
 
+## Assembler im Test
 
+Immer mehr C 64-Besitzer wollen mehr als nur in Basic programmieren. Um jedoch effektiv in Maschinensprache arbeiten zu können, braucht man einen Assembler. Wir haben die bekanntesten und leistungsfähigsten für Sie herausgesucht und getestet, darunter MAE, Profimat, Pofisoft, ASS64, ASSI und TE.X.AS. Lesen Sie, welcher für Sie am geeignetsten ist.
 
+## G-Basic, die Spracherweiterung für alle Fälle
 
+Spracherweiterungen für den C 64 gibt es schon eine ganze Menge. Die bisher bekannteste dürfte wohl Simons Basic sein. Hat ein neues Produkt wie G-Basic eine Chance? Was leistet G-Basic? Gibt es Probleme oder Fehler? Ist es mit 259 Mark preiswert oder wieder nur eine Lösung mit Kompromissen?
 
+## Digitalisierer
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+Digitalisierer verwandeln Videobilder oder Sprachimpulse in für den Computer verständliche Signale. Der Empfangvon Satellitenbildern, die Auswertung durch den Computer und die Ausgabe auf einem Farbdrucker ist nur ein Beispiel für die Anwendung. Lassen Sie sich überraschen, was man mit Di-gitalisierern noch alles machen kann.
