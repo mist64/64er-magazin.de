@@ -1,0 +1,34 @@
+<h1>Oxford-Pascal für den Commodore</h1>
+
+<p class="intro">Dieser leistungsfähige Compiler unterstützt den vollen Pascal-Standard — und noch etwas mehr.</p>
+
+<p>Schon der erste Blick in das Handbuch zeigt es: Oxford-Pascal ist im Wesentlichen das gute alte TCL-Pascal, das es auch schon für die CBM-Computer gibt.</p>
+
+<p>Oxford-Pascal wird auf einer Diskette zusammen mit einem Handbuch in englischer Sprache geliefert (eine Kassettenversion soll demnächst folgen). Der Text des Handbuches sowie die abgedruckten Beispielprogramme sind überwiegend wörtlich vom TCL-Pascal übernommen. Neu am Oxford-Pascal sind Erweiterungen für Grafik, Ton und Farbe speziell für den C 64.</p>
+
+<p>Nach einem recht langen Ladevorgang meldet sich das System schließlich mit einem »READY«. Oxford-Pascal ist im Gegensatz zum UCSD-Pascal nicht menügesteuert, was in meinen Augen insbesondere für den Computeranfänger ein wesentlicher Vorteil ist.</p>
+
+<p>Auf Nachfrage teilt das System mit, daß etwa 13 KByte freier Speicherplatz zur Verfügung steht. Das ist beachtlich: TCL-Pascal auf dem CBM 3032 bietet nur etwas mehr als 7 KByte an. Der Compiler und der Executer sind resident, es kann also gleich losgehen mit den ersten Gehversuchen. Programm eintippen (mit Zeilennummern, damit man leichter editieren kann), auf »L« tippen und sich das Programm langsam vorlesen lassen. Dabei findet eine Syntaxprüfung und eine Compilierung in den P-Code statt. Mit »RUN« kann dann gestartet werden. Währenddessen findet kein Rückgriff auf die Floppy statt, dadurch ist das System relativ schnell. Sollte ein Fehler im Programm sein, wird eine Fehlermeldung mit Nummer und Klartext eingefügt. Die Eingabe von »P« statt »L« bringt Listing und Fehlermeldungen auf den Drucker. Editierkommandos wie CHANGE, FIND und DELETE vereinfachen Fehlersuche und Programmänderungen.</p>
+
+<p>Leider vermißt man eine DOS-Unterstützung. Das Inhaltsverzeichnis ist nur mit »LOAD”$”,8« zu erreichen, dabei geht ein eventuell im Speicher vorhandenes Programm, das nicht vorher mit PUT auf der Diskette abgespeichert wurde, verloren.</p>
+
+<p>Was tut man jetzt, wenn 13 KByte nicht ausreichen? Oxford-Pascal bietet die Möglichkeit, den residenten Compiler aufzugeben. Damit stehen dann etwa 32 KByte nur für den Programmquelltext zur Verfügung. Das Programm muß nach Fertigstellung abgespeichert werden, dann wird mit »COMP« der Diskcompiler aufgerufen, der ein Object-File erstellt, das mit »EX« ausgeführt werden kann. Diese Prozedur ist typisch englisch: Teatime ist angesagt. Die Zeit ist ausreichend. Interessanterweise ist der P-Code von TCL-Pascal mit dem von Oxford-Pascal aufwärtskompatibel. Ich konnte mein Stundenplanprogramm, das vom CBM 3032 compiliert wurde, sofort auf dem C 64 laufen lassen.</p>
+
+<p>Die Abwärtskompatibilität ist natürlich nicht gewährleistet. Mit einigen Spezialitäten wurde den Möglichkeiten des Commodore 64 Rechnung getragen. Mit BORDER wird die Rahmenfarbe definiert, mit SCREEN die Bildschirmfarbe, mit PEN die Schreibfarbe. PAPER und INC setzen die Farben für die hochauflösende Grafik (der Multicolormodus wird nicht unterstützt), HIRES (1) schaltet die Grafik ein, HIRES (0) führt in den Textmodus zurück. WINDOW teilt den Bildschirm in einen Grafik- und einen Textteil ein. EXAMINE (X,Y) dient zum Testen, ob der Punkt (x,y) gesetzt ist. Für alles weitere ist der PLOT-Befehl zuständig. PLOT (F,Xl,Yl,X2,Y2) hat in Abhängigkeit von F folgende Aufgaben:</p>
+
+<p>Ist F=0, so wird der Hintergrund auf die PAPER-Farbe gesetzt, ist F=1, so wird die Grafik gelöscht, ist F = 2, so wird eine Linie von (X1,Y1) nach (X2,Y2) gezeichnet, ist F = 3, so wird diese Linie gelöscht, ist F=4, so wird das Gebiet um (X1,Y1) gefüllt, ist F = 5, so wird dieses Gebiet gelöscht.</p>
+
+<p>Für das vollständige Löschen der Grafik ist also die Anweisungssequenz PLOT (0,0,0,0,0); PLOT (1,0,0,0,0) notwendig. Man beachte, daß von den neun Nullen acht lediglich aus formalen Gründen angegeben werden müssen. Der Pascalästhetiker wird dabei ein ungutes Gefühl haben. Durch den gewiß lobenswerten Versuch, die Anzahl der Spezialitäten gering zu halten, leidet die Selbstdokumentation doch erheblich.</p>
+
+<p>Immerhin braucht sich der Programmierer nicht so viele neue Vokabeln zu merken. Es ist möglich, im PLOT-Befehl x-Werte zwischen 0 und 255 sowie y-Werte zwischen 0 und 199 anzugeben. Da der Bildschirm aber 320 Pixel breit ist, bleibt rechts ein Streifen, auf den man nicht zugreifen kann.</p>
+
+<p>Falls eine Darstellung von Text und Grafik gleichzeitig gewünscht wird (ein Einblenden von Buchstaben in die Grafik ist nicht vorgesehen), so wird man mit dem WINDOW-Kommando, so nützlich es auch ist, nicht so ganz glücklich. Da die Umsteuerung des Bildschirms durch den Interrupt erfolgt, flackert er bei Diskettenzugriffen erheblich.</p>
+
+<p>So mager und ungeschickt die Grafik auch ausgestattet ist, so vollständig ist der von Wirth geforderte Sprachumfang. Man wird nichts vermissen. Hier zeigt sich die Abstammung vom TCL-Pascal mit allen Vorteilen. Erwähnenswert ist auch, daß einige der von mir im Artikel »Für Schulen gerade richtig« (Computerjournal Januar/Februar 1983) monierten Fehler beseitigt sind. File-Identifier können jetzt als VAR-Parameter an Prozeduren und Funktionen übergeben werden (übrigens: im Apple-UCSD-Pascal geht das nicht einmal mit Funktionsnamen und trotzdem gibt es Schulen, die es im Unterricht verwenden), und Mengen, die Bestandteile eines Records sind, werden jetzt unter der WITH-Anweisung korrekt bearbeitet. Vermutlich hat es schon TCL-Versionen gegeben, die diese Fehler nicht mehr hatten, und dies wurde einfach übernommen.</p>
+
+<p>Zusammenfassend muß festgestellt werden, daß man hier für 199 Mark ein vollwertiges Pascal-System in der Hand hat, das sowohl dem Lernenden als auch dem Anwender sehr viel zu bieten hat.</p>
+
+<address class="author">(Norbert Stüven/ev)</address>
+
+<p>Info: Vertrieb in Deutschland durch Computer Plus Soft GmbH, Bahnstr. 22-26, 4220 Dinslaken</p>
+
