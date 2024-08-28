@@ -1390,6 +1390,7 @@ def copy_and_modify_html(article, html_dest_path, pdf_path, prev_page_link, next
     head1 = article.head1
     head2 = article.head2
     pages = article.pages
+    issue = db.issues[issue_number]
 
     # Parse navigation HTML and prepare for insertion
     body = soup.find('body')
@@ -1401,8 +1402,9 @@ def copy_and_modify_html(article, html_dest_path, pdf_path, prev_page_link, next
 <div class="head_line">
 <div class="head_line_head2">{head2}</div>
 <div class="head_line_head1">{head1}</div>
-<div class="head_line_logo">{LOGO}</div>
-<div class="head_line_issue">{issue_number}, {LABEL_PAGE} {pages}</div>
+<div class="head_line_logo"><a href="/{BASE_DIR}{issue.issue_dir_name}">{LOGO}</a></div><!--
+--><div class="head_line_issue"><a href="/{BASE_DIR}{issue.issue_dir_name}">{issue_number}, {LABEL_PAGE} {pages}</a></div>
+</a>
 </div>
 '''
     custom_div_soup = BeautifulSoup(custom_div_html, 'html.parser')
