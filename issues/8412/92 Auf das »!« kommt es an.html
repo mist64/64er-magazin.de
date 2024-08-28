@@ -1,0 +1,76 @@
+<h1>Auf das »!« kommt es an</h1>
+
+<p class="intro">Das folgende Programm wurde aus der Not geboren. Es erleichtert das Laden von Diskette und macht das umständliche Laden und Listen des Directory überflüssig. Nebenher lernen Sie eine Reihe nützlicher Maschinenroutinen kennen.</p>
+
+<p>Geht es Ihnen auch so: Ich weiß nie genau, ob das Programm, das ich laden willl, nun »Disk Copy V 1.0« oder »Disk Copy V1.0« heißt. Versuche ich es mit »Disk*«, lade ich mit Sicherheit »Disk Monitor«.</p>
+
+<p>Es hilft also nichts: Ich lade das Directory, liste es und — ärgere mich, weil das Programm, das ich laden wollte, ganz oben steht und beim Scrollen verschwindet. Also nochmal »LIST«, dann mit dem Cursor in die richtige Reihe fahren, »LOAD« eingeben, Cursor hinter den Programmnamen, »,8«eintippen. Der Computer antwortet mit einem verächtlichen »SYNTAX ER-ROR«, weil ich den Doppelpunkt mal wieder vergessen habe&hellip;</p>
+
+<p>Vielleicht stelle ich mich besonders dumm an, aber es sollte auch anders gehen. Für Tätigkeiten, die meine geistigen Fähigkeiten übersteigen, gibt es doch Computer! Aus diesem Gedanken entstand das Programm.</p>
+
+<p>Es wird mit »LOAD”!”,8,1« geladen, startet automatisch, liest das Directory ein und schreibt hinter jedes Programm eine Nummer. Wenn der Bildschirm voll ist, wartet es auf meine Eingabe. Tippe ich »+«, bekomme ich die nächsten Programme angezeigt. Tippe ich aber die Programmnummer und dahinter ein »L«, wird das entsprechende Programm automatisch geladen. Handelt es sich um ein Maschinenprogramm, das absolut geladen werden muß (mit »,8,1«), tippe ich hinter die Nummer ein »A«.</p>
+
+<h2>So funktioniert es</h2>
+
+<p>Da ich nicht auf einen Autostart verzichten wollte, mußte das Programm vollständig in Maschinensprache geschrieben werden. Außerdem mußte es sehr kurz sein, denn ich hatte nur den Bereich von Speicherstelle 2 56 bis 600 ($0100 — $0258) zur Verfügung. Zu allem Unglück benötigen die Betriebssystemroutinen, die das Programm verwendet, auch noch Platz in diesem Bereich (Prozessorstack). Deshalb mußte ich auf alles verzichten, was nicht unbedingt nötig war. Es gibt also kein Menü für den Benutzer, ebenso keine Möglichkeit, das Programm zu unterbrechen, wenn man nichts laden will. Man kann nur »OL« eingeben, dann springt es mit einer Fehlermeldung ins Basic zurück. Trotzdem ist der verfügbare Speicher bis auf das letzte Byte belegt.</p>
+
+<p>Die folgende Programmbeschreibung ist zwangsläufig sehr theoretisch. Das Programm läuft ja aber auch, wenn man sie nicht versteht. Machen Sie sich aber ruhig einmal die Mühe. Vielleicht können Sie doch den einen oder anderen nützlichen Tip bekommen. Wem es zu kompliziert wird, der kann bei den »Hinweisen zum Abtippen« weiterlesen.</p>
+
+<p>Nehmen Sie also das Assembler-Listing zur Hand und folgen Sie mir in die Tiefen der Maschinensprache&hellip; Zur besseren Übersicht habe ich die einzelnen Teile beschrieben und immer die entsprechenden Zeilennummern dahintergesetzt.</p>
+
+<p>Im Programmkopf bis Zeile 320 werden die Betriebssystemroutinen und die Variablen definiert. Sie sind nochmals im Kasten erläutert. Als Startadresse wird $010A festgelegt, der Maschinencode kann aber nicht direkt dorthin assembliert werden, sonst würde ja der Autostart anlaufen. Deshalb wird er zunächst in den Bereich $C00A — $C158 geschrieben.</p>
+
+<p>Das Programm selbst beginnt mit Zeile 1510. Die Routine »DIRIN« lädt das Directory in den Speicher. Dazu benutzen wir die Betriebssystemroutine »LOAD«. Diese braucht zur Vorbereitung die Routinen SETLFS und SETNAM. SETLFS bestimmt die logische Filenmmer (01), die Geräteadresse (08) und die Sekundäradresse (0 für Lesen). SETNAM übergibt den Filenamen, in unserem Falle »$«. LOAD muß schließlich noch wissen, wohin das Directory geladen werden soll. Diese Adresse (Anfang des Basic-Speichers, steht in ($2B/$2C) wird im X- und Y-Register übergeben. Um die richtigen Koppeladressen zu erhalten, muß anschließend noch die Basic-Routine aufgerufen werden, die das für uns erledigt ($A533). Jetzt steht unser Directory genauso im Speicher wie sonst und wartet darauf, auf dem Bildschirm ausgegeben zu werden.</p>
+
+<p>Die Ausgabe kann aber nicht wie beim normalen Listen erfolgen, denn wir wollen ja hinter jedem Namen eine Nummer ausgeben. Also müssen wir das selbst in die Hand nehmen. Mit einem kühnen Sprung geht es deshalb jetzt nach DIROUT. Sehen wir uns nun den Speicherausdruck eines Directory etwas genauer an:</p>
+
+<p>Es geht los bei $0801. Dort steht die Adresse des nächsten Eintrages $081F. Wie immer steht im Speicher zuerst das Low-Byte und dahinter das High-Byte. Es folgt der Diskettenname, der in diesem Falle mit dem des Verfassers auffallend übereinstimmt. Der erste Eintrag beginnt also mit Adresse $081F. Dort finden wir wieder die Adresse des nächsten Eintrages ($083F). Jeder Eintrag hat übrigens die gleiche Länge, nämlich 32 Byte. Wir werden davon später noch Gebrauch machen.</p>
+
+<p>Die 2 Byte hinter der Koppeladresse enthalten die Länge des Programms in Blöcken, in unserem Falle also $0002. Nun kommen ein paar Leerzeichen ($20). Wieviele, hängt davon ab, ob die Blocklänge ein, zwei oder drei Ziffern benötigt. Die Namen sollen ja beim Listen schließlich ordentlich untereinander stehen. Jetzt folgt der Filename, von Anführungszeichen eingeschlossen. 8ie haben es sicher schon bemerkt: Das Directory dieser Diskette hat als erstes Programm das »!« wie sich das für anständige Disketten gehört!</p>
+
+<p>Jetzt wieder einige Leerzeichen und schon ist der nächste Fileeintrag erreicht. Das geht so weiter bis eine Koppeladresse erreicht wird ($089D in Adresse $087F), die aus dem Rahmen fällt. In Adresse $089D stehen nämlich zwei jämmerliche Nullen. 8o, sagt sich das Betriebssystem, jetzt ist aber Schluß. Und es hat wie so oft recht&hellip;</p>
+
+<p>Zurück zu unserem Programm. Es soll ja jetzt ein Directory auf den Bildschirm ausgeben, und zwar schöner, als es das Betriebssystem jemals könnte. Wir initialisieren also unsere Variable USE mit dem Basic-Anfang ($0801). In Zeile 390 beginnt eine Schleife, die immer eine Zeile ausgibt. Zuerst holen wir uns die Koppeladresse und speichern sie in NEXT (Zeile 410 — 460). Als nächstes müssen wir die 2 Byte mit der Blocklänge in eine ordentliche Dezimalzahl umwandeln. Das erledigt für uns die Basic-Routine »NUMOUT« (470 — 520). Jetzt brauchen wir nur noch den Namen mit allen Leerzeichen davor und dahinter, auszugeben (530 — 580).</p>
+
+<p>Eigentlich müßte nun die Programmnummer ausgegeben werden, aber damit warten wir noch. Aus folgendem Grund: Wir wollen diese Schleife ja für jede Zeile benützen, auch für die letzte. In der steht aber die »BLOCKS FREE«-Meldung und dahinter darf ja keine Nummer mehr erscheinen. Wir müssen also vorher prüfen, ob wir schon die letzte Zeile erreicht haben.</p>
+
+<p>Dazu übertragen wir die Adresse des nächsten Files, die wir in NEXT aufbewahrt haben, nach USE. Zeigt USE jetzt auf eine Null, sind wir fertig und springen ans Ende unserer Routine, nach DIR4 (590 — 650). Ist das aber noch nicht der Fall, geben wir unsere Programmnummer aus. Den Cursor stellen wir dazu auf Spalte 27 ($1B) und benutzen wieder NUMOUT, um FILENR als Dezimalzahl auszugeben (660 — 700). Eine Zeile wäre geschafft! Im folgenden bereiten wir uns auf die nächste Filenummer vor und springen wieder nach oben zu DIR1 zurück. Sollten aber schon 20 Zeilen auf dem Bildschirm stehen, merken wir uns im ENDFLG, daß wir noch nicht fertig sind und verlassen die Ausgaberoutine vorerst. Erinnern Sie sich, wir wollten vermeiden, daß der Bildschirm ohne unseren ausdrücklichen Befehl wegscrollt (710 — 800).</p>
+
+<p>Der Bildschirm hat sich inzwischen gefüllt, unsere Nummern stehen fein säuberlich hinter den Programmen, nun sollte uns ein freundlich blinkender Cursor dazu animieren, dem Computer mitzuteilen, wie es weitergehen soll. Also hinein in die Routine WAHL</p>
+
+<p>Das Wichtigste erledigt hier die Betriebssystemroutine CHRIN. Sie läßt den Cursor blinken, bis »RETURN« gedrückt wird, schreibt die eingegebenen Zeichen auf den Bildschirm und liest sie anschließend vom Bildschirm wieder ab, damit wir sie schön der Reihe nach bearbeiten können. Wir speichern alle Zeichen zunächst im BUFFER und sehen uns dann das letzte Zeichen genauer an (820 — 900). Als erstes prüfen wir, ob ein »+« eingegeben wurde. Wenn ja, setzen wir FILEANZ wieder auf Null, und, je nachdem ob das ENDFLG Ende signalisiert oder nicht, auch die FILENR. Anschließend erfolgt der Rücksprung in die Directory-Ausgabe (910 — 980).</p>
+
+<p>Wurde kein »+« eingegeben, prüfen wir weiter auf »L« beziehungsweise »A«. In Abhängigkeit davon setzen wir das ABSFLG (990 — 1070). Jetzt müssen wir herausfinden, welche Programmnummer geladen werden soll. Dazu müssen wir die ein oder zwei Dezimalzahlen in ein Hexbyte umwandeln, weil unser Computer nun mal nichts anderes versteht. Andererseits ist es ja nicht einzusehen, daß wir uns auf sein mathematisches Niveau herabbegeben und unsere Zahlen demnächst als Hex- oder noch schlimmer als Binärzahlen eingeben. Das Umwandeln ist ja gar nicht so schwierig. Wir holen uns die Einerziffer und zählen dann so oft 10 ($0A) dazu, wie die Zehnerziffer angibt. Da der Computer sich unsere Ziffern aber nicht als 0,1&hellip;9 merkt, sondern als $30, $31&hellip; $3A, müssen wir jeweils die oberen 4 Bits ausmaskieren. Das war’s denn auch schon. In FILENR steht zur Belohnung tatsächlich die gewünschte Filenummer mundgerecht für unseren Computer (1080 — 1200).</p>
+
+<p>Jetzt haben wir das Schlimmste — fast — hinter uns. Wir brauchen nur noch den passenden Filenamen zu suchen. Den holen wir uns aus dem Directory. In bewährter Weise benutzen wir unsere Variable USE. Um den Diskettennamen zu überlesen, zählen wir zum Basic-Anfang in $2B/$2C 35 ($23) dazu. Damit liegen wir so ungefähr richtig, auf jeden Fall vor dem ersten Namen. Erinnern sie sich, jeder Eintrag im Directory belegt genau 32 Byte. Allerdings beginnen die Filenamen nicht immer so schön regelmäßig wie in unserem Beispiel, immer an der selben Stelle. Wir müssen den Anfang des Namens also noch genau suchen. Vorher brauchen wir aber erst einmal die richtige Stelle im Directory. Wir addieren zu USE jetzt daher so oft 32 ($20), wie in FILENR angegeben (1250 — 1400).</p>
+
+<p>Jetzt müssen wir in unserem Programm ein Stück überspringen, weil die folgenden Bytes wegen des Autostarts auf 2 gesetzt werden müssen. Weiter geht es mit LAD2 in Zeile 1780. Vorher steht allerdings im Programm noch die Subroutine FIN-DA.E, was so viel wie »Finde den Anfang beziehungsweise das Ende des Namens« bedeutet. Sie durchsucht den Text, auf den USE zeigt, nach einem Anführungszeichen und übergibt im Akku, wieviel Zeichen es bis dahin sind (1680 — 1750).</p>
+
+<p>Diese Zahl addieren wir zu USE — eins mehr, denn das Anführungszeichen selbst gehört ja nicht mit zum Namen. Mit FINDA.E erhalten wir im Akku die Länge des Namens, so wie es die Routine SETNAM, die wir oben schon benutzt haben, verlangt. Noch ein kurzer Sprung nach SETLFS, wo wir in Abhängigkeit vom ABSFLG als Sekundäradresse Null oder Eins übergeben. Den Rest erledigt die Basic-Routine BASICLOAD (1780—1940). Geschafft, die schönste Zeile im Assemblerlisting ist erreicht: .EN heißt ENDE.</p>
+
+<p>Sicher, es war nicht ganz einfach, aber wenn Sie mir bis hierhin gefolgt sind, haben Sie eine ganze Reihe kleiner Routinen gelernt, wie sie in jedem Maschinenprogramm gebraucht werden.</p>
+
+<p>TODO table!<br>
+NUMOUT ($BDCD) — wandelt zwei Hexbytes in eine Dezimalzahl um und gibt sie aus. (HByte im Akku, LByte im X-Reg)<br>
+SETLFS ($FFBA) — übergibt logische Filenummer (Akku), Geräteadresse (X-Reg) und Sekundäradresse (Y-Reg).<br>
+SETNAM ($FFBD) — übergibt den Filenamen. Akku enthält die Länge des Namens, X-Reg das LByte, Y-Reg das HByte der Adresse, an der der Name beginnt.<br>
+LOAD ($FFD5) — lädt das durch SETLFS und SETNAM bezeichnete File an die Adresse, die im X-Reg (LByte) und im Y-Reg (HByte) angegeben ist. Der Akku enthält 0 für LOAD und 1 für VERIFY.<br>
+CHRIN ($FFCF) — holt Zeichen von dem in $99 festgelegten Eingabegerät. Der Cursor blinkt, bis RETURN eingegeben wird. Die Zeichen werden dann vom Bildschirm gelesen und im Akku übergeben.<br>
+CHROUT ($FFD2) — gibt das ASCII-Zeichen im Akku aus.<br>
+Variable<br>
+BUFFER — ist ein Zwischenspeicher.<br>
+USE und NEXT — enthalten die Adresse des gegenwärtigen beziehungsweise nächsten Directory-Eintrages.<br>
+FILENR — ist die aktuelle Filenummer im Directory.<br>
+ABSFLG — ist ein Flag, das normales oder absolutes Laden signalisiert. FILEANZ — enthält die Anzahl der auf dem Bildschirm ausgedruckten Files.<br>
+ENDFLG — ist ein Flag, das signalisiert, ob das Ende des Directory bereits erreicht ist.</p>
+
+<p>Betriebssystem-Routinen</p>
+
+<h3>Hinweise zum Abtippen</h3>
+
+<p>Das Programm kann nicht an die Stelle geschrieben werden, an der es endgültig stehen soll, weil sonst ja der Autostart anlaufen würde. Wir schreiben es daher zuerst nach 49152 ($C000). Tippen Sie zuerst den Basic-Lader ein. Nach RUN muß der Text aus Zeile 30 erscheinen, sonst haben Sie einen Fehler gemacht. Legen Sie nun eine neue Diskette ein, und drücken Sie eine Taste. Das Programm wird nun auf die Diskette geschrieben, allerdings mit der falschen Startadresse. Schalten Sie danach bitte den Computer aus und wieder ein. Um die falsche Startadresse zu ändern, geben Sie das Programm »Startadresse« ein und starten Sie es mit RUN. Jetzt wird die Adresse geändert, und Sie haben das »!«lauffähig auf Ihrer Diskette. Um es auf andere Disketten zu übertragen, verwenden Sie ein Kopierprogramm, zum Beispiel »Super Copy«.</p>
+
+<p>Und dann lehnen Sie sich zurück, geben LOAD »!«,8,1 ein und genießen die Früchte Ihrer Arbeit.</p>
+
+<address class="author">(Dietrich Weineck/rg)</address>
+

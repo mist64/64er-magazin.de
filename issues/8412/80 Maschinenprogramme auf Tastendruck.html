@@ -1,0 +1,63 @@
+<h1>Maschinenprogramme auf Tastendruck</h1>
+
+<p class="intro">Mit einer kleinen Routine kann man ein Maschinenprogramm mit einem Tastendruck aufrufen. Dafür benutzt man ein Zeichen, das normalerweise nicht oder nur selten verwendet wird. Ich habe mich für das @-Zeichen entschieden.</p>
+
+<p>Im Interpreter existiert eine Schleife, die einen Basic-Befehl holt und ausführt.</p>
+
+<pre>
+A7E1    JMP (0308)  ; zeigt normalerweise auf A7E4
+A7E4    JSR 0073    ; nächstes Zeichen aus Basic-Text holen
+A7E7    JSR A7ED    ; Statement ausführen
+A7EA    JMP A7AE    ; zurück zur Interpreterschleife
+</pre>
+
+
+<p>In den Speicherzellen 0308 und 0309 (776 und 777 dez) liegt ein Zeiger, der normalerweise auf den Beginn dieser Schleife zeigt. Verbiegt man nun den Zeiger auf eine eigene Routine, kann man den Basic-Befehl auf das eigene Zeichen überprüfen.</p>
+
+<p>Wird es erkannt, springt man auf den Anfang des gewünschten Unterprogramms. Wurde das Zeichen nicht vorgefunden, macht man in der Schleife normal weiter.</p>
+
+<p>Dieses Verfahren verwende ich bei der Programmierhilfe »Merge« aus Ausgabe 4/84, die normalerweise mit SYS 50000 gestartet werden muß. Es kann aber auch für andere Maschinenprogramme umgeschrieben werden.</p>
+
+<p>»Merge« belegt den Speicherbereich 50000 bis 50264. Die eigene Routine beginnt auf Adresse 49152 (C000 hex). Der Wert in den Adressen 0308 und 0309 muß deshalb auf C000 abgeändert werden. Der Computer durchläuft dann vor jedem Befehl, den er ausführen soll, folgende Schleife:</p>
+
+<pre>
+C000 JSR 0073 ;nächstes Zeichen holen
+C003 CMP 40   ; Vergleich mit @-Zeichen
+C005 BEQ      ; verzweigen wenn erkannt
+C007 JSR 0079 ; Flags setzen
+C00A JMP A7E7 ; Rücksprung
+COOD JSR 0073 ; nächstes Zeichen holen
+C010 JSR C350 ; zur eigenen Routine
+C013 JMP A7AE ; Rücksprung
+</pre>
+
+
+<p>Nach dem Drücken von @ und RETURN wird nun das Programm ab Adresse 50000 (C350 Hex) ausgeführt. Auf die anderen Befehle hat diese Routine keinen Einfluß. Eine Hürde gibt es noch zu meistern. Die Änderung der Adressen 0308 und 0309 ist auf der Basic-Ebene mit POKE nicht möglich. Dies ist auch verständlich, da POKE auch ein Basic-Befehl ist und durch die Änderung der ersten Adresse der Einsprung verändert wird.</p>
+
+<p>Deshalb muß diese Adreßänderung in Maschinensprache durchgeführt werden.</p>
+
+<pre>
+C100 LDA 00   ; Lade Akku mit 00
+C102 STA 0308 ; Speichere Akku nach 0308
+C105 LDA C0   ; Lade Akku mit C0
+C107 STA 0309 ; Speichere Akku nach 0309
+C10A RTS      ; Rückkehr nach Basic
+</pre>
+
+
+<p>Basic-Lader für Befehlserweiterung</p>
+
+<pre>
+240 FOR I= 49152 TO 49152 + 21
+250 READ Q : POKE I, Q
+260 NEXT
+300 FOR I = 49408 TO 49408 + 10
+310 READ Q : POKE I, Q
+320 NEXT : SYS 49408
+11000 DATA 32,115,0,201,64,240,6,32,121
+12000 DATA 0,76,231,167,32,115,0,32,80
+13000 DATA 195,76,174,167
+14000 DATA 169,0,141,8,3,169,192,141,9,3,96
+</pre>
+
+

@@ -1,0 +1,158 @@
+<h1>So macht man Basic-Programme schneller – Teil 2</h1>
+
+<p class="intro">Diesmal wollen wir den Basic-Programmen, was die Geschwindigkeit anbelangt, mit einem Ausflug in die Assemblerprogrammierung, auf die Sprünge helfen.</p>
+
+<p>Hier soll Ihnen kein Maschinensprache-Kurs zugemutet werden. Doch ein Programm in Maschinensprache besteht genauso aus Befehlen, Adressen und Variablen, wie ein Basic-Programm, nur sind sie in einem speziellen Zahlencode geschrieben. Dieser Zahlencode muß in den Arbeitsspeicher geladen werden. Die für uns einfachste Möglichkeit besteht darin, die Zahlen in den Speicher hineinzuPOKEn. Damit wir aber nicht unmäßig viele POKE-Befehle schreiben müssen, legen wir alle Code-Zahlen hinter DATA-Befehle und holen sie dann mit READ in eine einzige POKE-Schleife. Ich sage das deswegen, weil dieses Einlesen natürlich nicht zu dem Testprogramm gehören darf, dessen Laufzeit wir messen wollen. Das Testprogramm selbst sitzt zwischen den drei Zeilen der »Stoppuhr«. Das heißt, genauer gesagt sitzt das Programm in den Speicherzellen, in die wir es hinein-POKEn. Aber zwischen der Stoppuhr rufen wir es auf, der dem RUN entsprechende Befehl bei Maschinensprache heißt SYS.</p>
+
+<p>Wie Sie gleich noch sehen werden fängt unser Testprogramm ab Speicherzelle 7168 an. Das Ganze sieht dann so aus:<br>
+10 TI$ = &ldquo;000000&rdquo;<br>
+20 PRINT CHR$ (147)<br>
+30 SYS 7168<br>
+1000 POKE 214,18:PRINT:PRINT TI/60 ”SEKUNDEN”:END</p>
+
+<p>Ab Zeile 2000 setzen wir jetzt das Programm, welches uns das Maschinenprogramm einliest. Um mit dem Einlesen zu beginnen, setzen wir noch eine Umleitung vor das Meßprogramm:<br>
+5 GOTO 2000</p>
+
+<p>In Zeile 2000 löschen wir den Bildschirm. Zeile 2010 und 2020 und 2030 liest die Codezahlen, die von Zeile 2050 bis 2090 stehen, und POKEt sie in die Speicherplätze 7168 bis 7200.</p>
+
+<p>Die Codezahlen sind für beide Computer fast identisch, nur die Adressen sind verschieden. Deshalb sind Zeile 2060 und 2080 beim C 64 anders als beim VC 20.</p>
+
+<p>Sobald die Zahlen eingelesen sind, können Sie das Meßprogramm mit dem Befehl GOTO 10 (direkt eingetippt) starten.</p>
+
+<p>Im Abdruck unten wird das etwas eleganter gemacht. Zuerst meldet das Programm das Ende des Einlesens (Zeile 2100 und 2101). Dann kommt die Anweisung, wie das Meßprogramm zu starten ist, nämlich durch Drücken irgendeiner Taste, die durch eine GET-Schleife abgefragt wird. Wenn eine Taste gedrückt wird, springt das Programm auf Zeile 10 (das geschieht in Zeile 2160).<br>
+5 GOTO 2000<br>
+10 TI$ = &ldquo;000000&rdquo;<br>
+20 PRINT CHR$(147)<br>
+30 SYS 7168<br>
+1000 POKE 214,18:PRINT:PRINT TI/60 ”SEKUNDEN”:END<br>
+2000 PRINT CHR$(147)<br>
+2010 FOR A = 7168 TO 7200<br>
+2020 READ B<br>
+2030 POKE A,B<br>
+2040 NEXT<br>
+2050 DATA 162,0,169,1,157<br>
+2060 DATA 0,30,169,6,157,0,150<br>
+(2060 DATA 0,4,169,14,157,0,216)<br>
+2070 DATA 232,224,0,208,241,169,1,157<br>
+2080 DATA 254,30,169,6,157,254,150<br>
+(2080 DATA 254,4,169,14,157,254,216)<br>
+2090 DATA 232,224,120,208,241,96<br>
+2100 PRINT"DAS MASCHINENPROGRAMM"<br>
+2110 PRINT"IST JETZT EINGELE-SEN.&ldquo;:PRINT<br>
+2120 PRINT"ZUM STARTEN DES PRO-&rdquo;<br>
+2130 PRINT"GRAMMS &ldquo;CHR$(18) "TASTE"CHR$(146)"DRUECKEN&rdquo;<br>
+2140 GET A$<br>
+2150 IF A$ = &ldquo;"THEN 2140<br>
+2160 GOTO 10</p>
+
+<p>So, inzwischen haben Sie sicher Ihre Überraschung gehabt! 0,066 Sekunden Laufzeit beim C 64 und 0,033 beim VC 20.</p>
+
+<p>Ich hoffe, daß ich Sie mit dem Virus der Maschinensprache infiziert habe.</p>
+
+<p>Wir wollen im Folgenden ein paar arithmetische Funktionen untersuchen und beschleunigen. Als erste nehmen wir uns in Version 17 die Multiplikation vor. Die Messung der Laufzeit erfolgt auf dieselbe Weise wie bei allen Programmen vorher auch. Deshalb bleiben die Zeilen 10, 20 und 1000 gleich. Die Multiplikation selbst soll 300 mal ausgeführt werden (Zeile 30). Dann wird das Ergebnis gedruckt (Zeile 60).<br>
+30 FORZ = 1 TO 300<br>
+50 NEXT<br>
+60 PRINT A</p>
+
+<p>Als Multiplikation nehmen wir den Extremfall einer kurzen Zahl multipliziert mit einer langen.<br>
+40 A = 3*0,123456789</p>
+
+<p>Nach RUN bleibt der Bildschirm zuerst leer, bis dann nach 11,85 (14, 15) Sekunden das Ergebnis der Multiplikation und die Laufzeit ausgedruckt wird.</p>
+
+<p>In <strong>Version 18</strong> vertauschen wir die beiden Zahlen, die in Zeile 40 multipliziert werden.<br>
+40 A = 0.123456789*3</p>
+
+<p>Diese einfache Manipulation bringt natürlich nach Adam Riese dasselbe Resultat wie vorher, aber die Laufzeit ist kürzer. Wir gewinnen beim VC 20 0,37 Sekunden, beim C 64 0,44 Sekunden. Dieser Gewinn ist nicht überwältigend, aber überraschend. Aber denken Sie nach!</p>
+
+<p>Wie ist das, wenn Sie so eine Multiplikation auf dem Papier durchführen? Da ist die Rechnung im zweiten Fall auch einfacher. Der Computer hat genau dasselbe Problem.</p>
+
+<p>In <strong>Version 19</strong> nützen wir noch eine kleine Eigenheit der Commodore-Computer aus, die auf ihre amerikanische Herkunft zurückzuführen ist. Bei den Angelsachsen ist es nämlich erlaubt, eine Null vor dem Dezimalpunkt wegzulassen. Beim Computer dürfen wir das auch. Obwohl das mit der Multiplikatikon direkt nichts zu tun hat, bietet sie uns doch eine gute Gelegenheit, die Einsparung durch das Weglassen der Null auch zeitlich zu messen. Also, Zeile 40 sieht jetzt so aus:<br>
+40A = .123456789*3</p>
+
+<p>Das bringt nicht sehr viel, 0,17 Sekunden beim VC 20, 0,20 Sekunden beim C 64. Aber Kleinvieh macht auch Mist.</p>
+
+<p>Eine ähnliche Verbesserung, die wir hier nicht ausprobieren, wird erzielt durch den Ersatz einer alleinstehenden Null durch einen Punkt, zum Beispiel:<br>
+statt IF X = 0 THEN –<br>
+jetzt IF x = . THEN –</p>
+
+<p>Eine gewaltige Beschleunigung erfährt das Multiplikationsbeispiel, wenn wir die Regel 1 anwenden und die Variablen vordefinieren.</p>
+
+<p>Regel 7<br>
+★ Bei einer Multiplikation soll die längere Zahl vor der kürzeren stehen (langer Multiplikant, kurzer Multiplikator).<br>
+★ Eine einzelne Null wird durch einen Punkt ersetzt, eine Null vor dem Dezimalpunkt wird weggelassen.</p>
+
+<p>In <strong>Version 20</strong> ersetzen wir in Zeile 40 beide Zahlen durch Buchstaben, die wir in einer neuen Zeile 25 diese Werte zuweisen.<br>
+25 B = .123456789:C = 3<br>
+40 A = B*C</p>
+
+<p>Dieser Lauf bleibt nach 1,23 (1,48) Sekunden stehen, das heißt wir gewinnen 10,25 (12,23) Sekunden (von 11,48!). Also bitte Regel 1 unbedingt beachten!</p>
+
+<p>Eine andere betrachtenswerte arithmetische Funktion ist das »Potenzieren« (Quadrat-/Kubikzahlen), ausgelöst durch das Zeichen 1. Version 21 erzielen wir durch Löschen der Zeile 25 und Abänderung der Zeile 40:<br>
+40 A= 4 ↑ 3<br>
+»Vier hoch drei« ergibt 64 und braucht 8,81 (10,53) Sekunden.</p>
+
+<p>In <strong>Version 22</strong> wollen wir sehen, ob vordefinierte Variable auch so einschlagen, wie bei der Multiplikation.<br>
+25 B = 4:C = 3<br>
+40 A = B↑C</p>
+
+<p>Man kann sich doch auf nichts verlassen! Diesmal sind wir nur um 0,18 (0,22) Sekunden schneller. Wir dürfen aber nicht aufgeben. Version 23 macht alles wieder wett und zwar durch den simplen Trick, daß wir das Potenzieren in seine Grundelemente zerlegen.</p>
+
+<p>Sie wissen doch: 4 hoch 3 (413) ist dasselbe wie »4 zweimal mit sich selbst multipliziert« (4*4*4).<br>
+25 B = 4 (C entfällt)<br>
+40 A = B*B*B</p>
+
+<p>Ja, da schauen Sie, gell? Beim VC 20 braucht das Programm nur 1,68, also fast 7 Sekunden weniger. Beim C 64 sind es 8,31 Sekunden, die wir sparen.</p>
+
+<p>Regel 8<br>
+Die Funktion Potenzieren (t) soll durch Mehrfach-Multiplikation ersetzt werden.</p>
+
+<p>Als letztes Objekt möchte ich oft aufgerufene Unterprogramme messen. Wir erreichen das ganz einfach dadurch, daß wir das letzte Programm (Version 23) abändern. So erhalten wir <strong>Version 24</strong>: Die Definition der Variablen(Zeile 25) und die Multiplikation (Zeile 40) verbannen wir als Unterprogramm an das Ende des Programms und springen innerhalb der 300fachen Schleife mit GOTO darauf.<br>
+25 löschen; 30 FOR Z = 1 TO 300; 40 GOTO 40000</p>
+
+<p>Alles andere bleibt, aber neu kommt dazu: 40000 B = 4; 50000 A = B*B*B; 60000 GOTO 50</p>
+
+<p>Es ist nicht weiter erstaunlich, daß dieser Umbau diese Version 24 gegenüber Version 23 verlangsamt. Aber merken Sie sich die Laufzeit, VC 20: 2,75 Sekunden, C 64: 3,28 Sekunden. Als nächstes ersetzen wir die beiden GOTO-Zeilen durch GOSUB-RETURN.<br>
+40 GOSUB 40000<br>
+60000 RETURN</p>
+
+<p>Diese <strong>Version 25</strong> spart uns 0,14 (0,15) Sekunden. GOSUB ist schneller als GOTO!</p>
+
+<p>Sie haben vielleicht schon gelesen, daß oft gebrauchte Unterprogramme am Anfang eines Programms stehen sollen. Den Grund dafür will ich Ihnen mit den nächsten zwei Versionen vorführen.</p>
+
+<p><strong>Version 26</strong> macht das zunächst für die GOTO-Version. Wir bauen sie auf der Version 24 auf, mit folgenden Änderungen:</p>
+
+<p>Die Zeitmessung lassen wir wie gehabt in den Zeilen 10, 20 und 1000, die Schleife und den Ausdruck des Resultats in den Zeilen 30, 50 und 60.</p>
+
+<p>Nur beim Unterprogramm streichen wir alle Nullen der Zeilennummern, so daß es jetzt in den Zeilen 4, 5 und 6 steht. Um zu vermeiden, daß das Programm gleich mit dem Unterprogramm beginnt, fügen wir davor (Zeile 3) noch eine Umleitung ein, die sofort auf der Zeile 10 weitermacht. Schließlich brauchen wir noch den Sprung in das Unterprogramm, den wir in die Zeile 33 setzten. Das Ganze sieht jetzt so aus:<br>
+3 GOTO1O<br>
+4 B = 4<br>
+5 A = B*B*B*<br>
+6 GOTO 50<br>
+10 TI$ = &ldquo;000000&rdquo;<br>
+20 PRINT CHR$(147)<br>
+30 FORZ = 1 TO 300<br>
+33 GOTO 4<br>
+50 NEXT<br>
+60 PRINT A<br>
+1000 POKE 214,18:PRINT:PRINT TI/60 &ldquo;SEKUNDEN&rdquo;:END</p>
+
+<p>Nach RUN erhalten wir beim VC 20 2,6 Sekunden, beim C 64 3,1 Sekunden. Gegenüber Version 24, unserem Vergleichsobjekt, sparen wir 0,15 (0,18) Sekunden.</p>
+
+<p>Dasselbe passiert, wenn wir in der <strong>Version 27</strong> die GOTOs mit GOSUB-RETURN ersetzen.<br>
+6 RETURN<br>
+33 GOSUB 4</p>
+
+<p>Gegenüber der anderen GOSUB-Version (Version 25) sparen wir beim VC 20 0,13 Sekunden, beim C 64 0,17 Sekunden.</p>
+
+<p>Regel 9<br>
+★ Der Aufruf von Unterprogrammen mit GOSUB ist schneller als mit GOTO.<br>
+★ Häufig gebrauchte Unterprogramme gehören ganz an den Anfang eines Programms. Sie müssen dann allerdings zuerst mit einem GOTO umgangen werden.</p>
+
+<p>Ich bin überzeugt, daß in Basic noch mehr spektakuläre Zeitgewinne stecken.</p>
+
+<p>Falls Sie eine REGEL 10 oder noch mehr entdecken, ermuntere ich Sie um Mitteilung.</p>
+
+<p>Wenn Sie Fragen haben, können Sie mich mit einer Leserzuschrift ansprechen.</p>
+
+<address class="author">(Dr. Helmuth Hauck/aa)</address>
+

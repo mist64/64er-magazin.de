@@ -1,0 +1,112 @@
+<h1>Stringy: C64-Erweiterung</h1>
+
+<p class="intro">Stringy stellt eine Basic-Interpretererweiterung dar, die den Befehlssatz des C 64 um acht Befehle ergänzt. Mit diesen Befehlen ausgestattet, kann man sich einen Programmgenerator von Basic aus programmieren.</p>
+
+<p>Das Listing zu Stringy entstand mit Hilfe von Stringy. Dabei wurden die Zahlen formatiert, die Prüfsummen berechnet und nach jeder vierten Zeile angefügt. Mit Stringy kann man Strubs-ähnliche Erweiterungen programmieren (Der Grund, weshalb ich Stringy schrieb). Man könnte auch ein Programm schreiben, das die in einem Basic-Programm vorkommenden Grafikzeichen durch die entsprechenden CHR$-Funktionen ersetzt, damit sie im Listing besser zu erkennen sind. Auch Sprite- oder Bildschirmmasken-Generatoren sind recht einfach zu programmieren. Der wichtigste Befehl von Stringy ist der !INPUT-Befehl. Mit ihm kann man einen String, der eine Basic-Zeile mit Zeilennummer darstellt, bei laufendem Programm in das Basic-Programm übernehmen — ohne, daß dabei die Programmausführung unterbrochen wird.</p>
+
+<p>Umgekehrt kann es sinnvoll sein, eine Zeile aus dem Basic-Programm herauszuholen, um sie einer Stringvariablen zuzuordnen. Dies ermöglicht der !GET-Befehl.</p>
+
+<p>Damit es keine Komplikationen mit den Basic-Zeilennummern gibt, teilt der !NEXL-Befehl Ihnen die Folge der Zeilennummern mit.</p>
+
+<p>Die anderen fünf Befehle dienen der Stringverarbeitung. Vier davon sind dem Sinn nach identisch mit den entsprechenden Stringoperationen aus Simons Basic, mit dem Unterschied, daß die Parameter beliebig komplizierte Ausdrücke sein können (dies gilt für alle Befehle von Stringy).</p>
+
+<p>Der letzte der fünf Stringbefehle ist der !REPLACE-Befehl.</p>
+
+<h2>Die Stringy-Befehle</h2>
+
+<p>Nachfolgend bedeuten str1, str2, str3 immer Stringausdrücke und m, n, p, w, z immer numerische Ausdrücke.</p>
+
+<h3>!PLACE</h3>
+
+<p>Format:<br>
+!PLACE (str1,str2)<br>
+!PLACE (str1,str2,m)<br>
+!PLACE (str1,str2,m,n)</p>
+
+<p>Funktion: Bestimmung der Position, an der str2 in str1 steht. Die Angabe von m und n grenzt str1 auf einen Teilstring ein. Nur dieser Teilstring von str1 wird dann durchsucht, und nicht der ganze String, m gibt den Beginn dieses Teilstrings an, gerechnet vom Anfang von str1, n bestimmt das Ende des Teilstrings. Vorsichtig: n wird vom Ende von str1 aus gezählt, also in anderer Richtung als m.<br>
+Beispiel: »PRINT !PLACE (’’COMMODORE”, ”0”)« liefert 2 als Antwort.<br>
+»PRINT !PLACE (’’COMMODORE”, ”O”,3)« liefert 5 als Antwort, da nur in ’’MMODORE” gesucht wurde<br>
+»PRINT !PLACE (’’COMMODORE”, ”E”, 1, 4)« liefert 0 als Ergebnis, da ”E” nicht in dem Teilstring ’’COMMOD” enthalten ist.</p>
+
+<h3>!REPLACE</h3>
+
+<p>Format:<br>
+!REPLACE (str1,str2,str3)<br>
+!REPLACE (str1,str2,str3,m)<br>
+!REPLACE (str1,str2,str3,m,n)</p>
+
+<p>Funktion: Ersetzen aller str2, die in str1 vorkommen, durch str3. Dabei kann str1, wie beim !PLACE-Befehl beschrieben, durch n und m eingegrenzt werden.<br>
+Beispiel:   10 A$=”INDEX=B$ + C$”<br>
+20 B$ = !REPLACE(A$,”INDEX”,”IN$”) Nach Ausführung gilt: B$=”IN$ = B$ + C$”<br>
+10 N$ = ”PETER PAUL MARY”<br>
+20 M$ = !REPLACE (N$,”PETER”, ” ”) Nach Ausführung gilt: M$ = ”PAUL MARY”</p>
+
+<h3>!INSERT</h3>
+
+<p>Format: !INSERT(str1,str2,p)</p>
+
+<p>Funktion: Fügt str2 in str1 ein. Die Position p bestimmt, an welcher Stelle str2 in str1 eingefügt werden soll.<br>
+Ist dabei p=0 oder p=len (str1), so wird angefügt.<br>
+Beispiel: »PRINT !INSERT (”ABCEF”,”D”,3)« liefert: ’ABCDEF” »PRINT !INSERT (”ABCEF”,”D”,0)« liefert: ’’DABCEF” »PRINT !IN8ERT (”ABCEF”,”D”,5)« liefert: ’’ABCEFD”</p>
+
+<h3>!STOVER</h3>
+
+<p>Format: !STOVER (str1,str2,p)</p>
+
+<p>Funktion: Überschreibt str1 mit str2.<br>
+Die Position, ab der str1 überschrieben werden soll, wird durch p angegeben.<br>
+Ist str2 länger als str1, oder ist wegen der Positionsangabe p ein Überschreiben nicht möglich, so erfolgt ein ILLEGAL QUANTITY ERROR.<br>
+Beispiel: »PRINT !STOVER (”GOTO XXXX”, ”0169”,6)« liefert: ”GOTO 0169”</p>
+
+<h3>!DUP</h3>
+
+<p>Format: !DUP (str,w)</p>
+
+<p>Funktion: Es wird str w-mal dupliziert.<br>
+Beispiel: A$ = !DUP(”.”,255) lieferteinen String mit255 einzelnen Punkten.</p>
+
+<h3>!INPUT</h3>
+
+<p>Format: !INPUT(str)</p>
+
+<p>Funktion: Hat str keine Zeilennummer am Anfang, so geht der Computer in den Direktmodus über und führt str sofort aus. Soll der Computer anschließend zum Programm zurückkehren, so muß der letzte Befehl in str ein »GOTO (Zeilennummer)« sein.</p>
+
+<p>Beginnt str mit einer Zeilennummer, so wird str als Basic-Zeile in das laufende Programm eingefügt, sofern in dem Programm nicht bereits eine Zeile mit derselben Zeilennummer existiert. Andernfalls wird die betreffende Zeile vor dem Einfügen gelöscht. Wenn allerdings diese zu löschende Zeile eine noch offene FOR&hellip;TO-Anweisung oder ein noch nicht durch RETURN abgeschlossenes GOSUB enthält, so erfolgt ein CAN’T CONTINUE ERROR.</p>
+
+<p>Die gleiche Fehlermeldung erscheint auch, wenn Sie eine Zeile löschen wollen, in der sich der DATA-Zeiger momentan befindet. Beispiel:<br>
+10 DATA56<br>
+20 READA:!INPUT(STR$(10))</p>
+
+<p>Nach RUN erfolgt ein CAN’T CONTINUE ERROR, da sich der DATA-Zeiger in Zeile 10 befindet. Durch einen RESTORE-Befehl, läßt sich diese Zeile dennoch löschen:<br>
+10 DATA56<br>
+20 READA:RESTORE:!INPUT(”10”)</p>
+
+<p>Nach Ausführung dieser beiden Zeilen ist die Zeile 10 gelöscht. Enthielt die gelöschte Basic-Zeile eine DEF-Anweisung, so gilt diese Funktion als nicht definiert. Enthielt die gelöschte Basic-Zeile eine Stringvariablenzuordnung der Art »AA$=”ABCD”« oder »A$(n)=”ABCDE”«, so ist anschließend die Variable nur noch als Leerstring definiert.</p>
+
+<p>Soll der !INPUT-Befehl direkt nach einem THEN stehen, dann ist ein Doppelpunkt einzufügen »&hellip;THEN:!INPUT&hellip;«</p>
+
+<h3>!GET</h3>
+
+<p>Format: !GET(z)</p>
+
+<p>Funktion: Es wird die Basic-Zeile mit der Zeilennummer z in Stringformat geholt. Der Parameter z darf dabei nicht den Wert 0 haben. Beispiel:<br>
+10 REM !GET-DEMO<br>
+20 PRINT!GET(10):PRINT!GET(20)<br>
+30 A$ = !GET(30)<br>
+40 PRINT MID$(A$,!PLACE(A$,” ”) + 1)</p>
+
+<h3>!NEXL</h3>
+
+<p>Format: !NEXL(z)</p>
+
+<p>Funktion: Es wird die auf z folgende Basic-Zeilennummer geholt. Hat !NEXL(z) den Wert 0, so bedeutet dies, daß auf z keine Basic-Zeilen mehr folgen. Beispiel:<br>
+10 REM !NEXL-DEMO<br>
+20 REM SIMULATION DES LIST-BEFEHLS<br>
+30 Z = 0<br>
+40 Z=!NEXL(Z):IF Z = 0 THEN END<br>
+50 PRINT !GET(Z):GOTO 40</p>
+
+<p>Zum Schluß noch einige Daten zu Stringy. Stringy belegt den Speicher von $c100 bis $c85a. Der Bereich von $c000 bis $c0ff dient als Stringzwischenspeicher (je nach Befehl wird dieser Raum benutzt). Die Speicherplätze $c85b bis $c865 dienen als Zwischenspeicher für einige wichtige Betriebssystemdaten. Der unter dem Basic-ROM liegende Speicherbereich wird mitbenutzt.</p>
+
+<address class="author">(Karl Szameitat/ev)</address>
+

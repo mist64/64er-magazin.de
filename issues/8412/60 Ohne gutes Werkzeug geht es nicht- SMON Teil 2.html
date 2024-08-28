@@ -1,0 +1,158 @@
+<h1>Ohne gutes Werkzeug geht es nicht: SMON Teil 2</h1>
+
+<p class="intro">Der Maschinensprache-Monitor SMON wird immer leistungsfähiger. Dieser 2. Teil erweitert ihn um wichtige Ausgabe-Routinen, läßt das Verschieben eines Programms mit und ohne Adreßumrechnung zu und kann Zahlen vom Dezimal- in das Binärsystem und umgekehrt umrechnen.</p>
+
+<p>Wir hoffen, daß wir Ihnen in der letzten Ausgabe nicht zuviel zugemutet haben, und daß sich Ihre wunden Finger inzwischen wieder erholen konnten. Bestimmt haben Sie im vergangenen Monat schon eifrig mit dem neuen Monitor gearbeitet und sind inzwischen mit den bisherigen Befehlen vertraut. Denn nun folgt der zweite Teil und mit diesem natürlich wieder einige neue Befehle, die es zu erklären gilt.<br>
+Und das bieten wir Ihnen heute:<br>
+I/O-SET, LOAD, SAVE, PRINTER-SET, die verschiedenen Zahlenumrechnungen (HEX-DEZ-BIN-ADD-SUB), OCCUPY CONVERT, VERSCHIEBEN und WRITE.</p>
+
+<h3>I/O-SET</h3>
+
+<p>I01 legt die Device-Nummer für LOAD und SAVE auf I (Kassette). Jedes Laden und Abspeichern erfolgt jetzt auf das angegebene Gerät. Die voreingestellte Device-Nummer ist 8 (für die Floppy also: I 08). Wenn Sie nur mit der Floppy arbeiten, brauchen Sie diesen Befehl also nicht.</p>
+
+<h3>LOAD</h3>
+
+<p>L ”Name” lädt ein Programm vom angegebenen Gerät (wie oben beschrieben) an die Originaladresse in den Speicher. Die Basic-Zeiger bleiben bei diesem Ladevorgang unbeeinflußt, das heißt, sie werden nicht verändert.</p>
+
+<p>Beispiel: Unser Monitor soll an seiner Originaladresse ($C000) im Speicher stehen. Also brauchen Sie ihn nur mit »L ”SMON”«zuladen, damit er dort erscheint. Wenn Sie einmal ein Programm an eine andere als die Originaladresse laden wollen, dann bietet Ihnen SMON dazu folgende Möglichkeit: ’L ”Name” ADRESSE lädt ein Programm an die angegebene Adresse. Nehmen Sie doch bitte noch einmal unser letztes Test-Programm und geben es mit dem Assembler ab Adresse $4000 ein. Speichern Sie es mit »’S ’’SUPERTEST” 4000 4023« ab und laden es dann</p>
+
+<ol>
+<li>an die Originaladresse (L &ldquo;SUPERTEST”) und</li>
+<li>an eine andere Adresse (mit L ”SUPERTEST”5000 zum Beispiel nach $5000).</li>
+</ol>
+
+
+<p>Schauen Sie sich danach mit dem Disassembler-Befehl beide Routinen einmal an. Sie werden feststellen, daß beide Programme zwar bis auf die BRANCH-Befehle gleich aussehen, daß das Programm in $5000 aber nicht funktionieren kann, da es eine falsche Adresse verwendet (5002 LDA 400E,Y). Ein anderes Beispiel dazu: Ein Autostart-Programm beginnt bei $0120, läßt sich aber in diesem Bereich nicht untersuchen, da dort der Prozessor-STACK (im Bereich von $0100 bis $01FF) liegt, der vom Prozessor selbst ständig verändert wird. Wenn Sie nun L”Name” 4120 eingeben, befindet sich das Programm anschließend bei $4120 (nicht an der Originaladresse $0120) und Sie können es ohne Einschränkungen — von den falschen Absolut-Adressen abgesehen — disassemblieren.</p>
+
+<h3>SAVE</h3>
+
+<p>S ”Name”, ANFADR ENDADR speichert ein Programm von ANFADR bis ENDADR-1 unter »Name« auf die Floppy ab, da diese — wie wir ja inzwischen wissen — das voreingestellte Gerät ist. Wenn Sie auf Kassette abspeichern wollen, setzen Sie vorher mit »I 01« die Device-Nummer auf 1.</p>
+
+<p>Beispiel: S”SUPERTEST”4000 4020 speichert das Programm mit dem Namen »SUPERTEST« (es steht im Speicher von $4000 bis $401F) auf Diskette ab. Bitte beachten Sie auch bei diesem Befehl, daß die Endadresse auf das nächste Byte hinter dem Programm gesetzt wird.</p>
+
+<h3>PRINTER-SET</h3>
+
+<p>P 02 setzt die Primäradresse für den Drucker auf 2. Voreingestellt ist hier die 4 als Gerätenummer (zum Beispiel für Commodore-Drucker). Vielleicht haben Sie es ja schon bemerkt: Bei allen Ausgabe-Befehlen (wie D, M etc.) können Sie auch den Drucker ansprechen, wenn Sie das Kommando geshiftet eingeben. Die Ausgabe erfolgt dann gleichzeitig auf Bildschirm und Drucker. (Beachten Sie bitte die Änderung für die Druckerausgabe am Schluß des Artikels.)</p>
+
+<h2>Ein bißchen Rechnerei</h2>
+
+<p>Die folgende Befehlsgruppe enthält Befehle zur Zahlenumrechnung. Sie wissen ja: Der Mensch mit seinen zehn Fingern neigt eher zur dezimalen Rechenweise, aber der Computer bevorzugt das Binärsystem, weil er nur zwei Finger hat (siehe Netzstecker). Ein Kompromiß ist das Hexadezimalsystem, denn das versteht keiner von beiden. Um Verständnis-Schwierigkeiten mit Ihrem Liebling aus dem Weg zu gehen, haben Sie aber SMON.</p>
+
+<h3>UMRECHNUNG DEZ → HEX</h3>
+
+<p># (Dezimalzahl) rechnet die Dezimalzahl in die entsprechende Hexadezimalzahl um. Hierbei können Sie die Eingabe in beliebiger Weise vornehmen, da SMON Zahlen bis 65 535 umrechnet. Beispiel: #12, #144, #3456, #65533 und so weiter.</p>
+
+<h3>UMRECHNUNG HEX → DEZ</h3>
+
+<p>$ (Hexadezimalzahl) rechnet die Hexadezimalzahl in die entsprechende Dezimalzahl um. Die Eingabe muß hierbei zweistellig beziehungsweise vierstellig erfolgen. Ist diese Zahl kleiner als $100 ( = 255), wird zusätzlich auch der Binärwert ausgegeben.</p>
+
+<p>Beispiel: $12, $0012, $0D, $FFD2, etc. In den ersten drei Beispielen erfolgt die Anzeige auch in binärer Form.</p>
+
+<h3>UMRECHNUNG BINÄR → HEX,DEZ</h3>
+
+<p>% (Binärzahl (achtstellig) rechnet die Binärzahl in die entsprechenden Hexa- und Dezimalzahlen um. Bei diesem Befehl müssen Sie genau acht Binärzahlen eingeben. Falls Sie einmal versehentlich mehr eingeben sollten, werden nur die ersten acht zur Umrechnung herangezogen. Beispiel: %00011111, %10101011</p>
+
+<h3>ADD-SUB</h3>
+
+<p>? 2340 + 156D berechnet die Summe der beiden vier(!)-stelligen Hex-Zahlen. Neben der Addition ist auch Subtraktion möglich.</p>
+
+<h2>Programme auf dem Rangierbahnhof</h2>
+
+<h3>OCCUPY (Besetzen)</h3>
+
+<p>0 (ANFADR ENDADR HEX-Wert) belegt den angebenen Bereich mit dem vorgegebenen HEX-Wert. Beispiel:O 5000 8000 00 füllt den Bereich von $5000 bis $7FFF mit Nullen.</p>
+
+<p>Man kann mit »OCCUPY« aber nicht nur Speicherbereiche löschen, sondern auch mit beliebigen Werten belegen. Häufig hat man das Problem, festzustellen, welcher Speicherplatz von einem Programm wirklich benutzt wird. Wir füllen den in Frage kommenden Bereich dann zuerst zum Beispiel mit »AA« und laden dann unser Programm. Probieren Sie bitte das folgende Beispiel: Füllen Sie den Speicherbereich von $3000 bis $6000 mit $AA, und laden Sie dann unser SUPERTEST-Programm. Beim Disassemblieren können Sie erkennen, daß unser kleines Programm exakt zwischen vielen AAs eingebettet ist.</p>
+
+<h3>WRITE</h3>
+
+<p>W (ANFADRalt ENDADRalt ANFADRneu) verschiebt den Speicherbereich von ANFADRalt bis ENDADRalt nach ANFADRneu ohne Umrechnung der Adressen! Unser kleines Testprogramm möge noch einmal als Beispiel dienen: W 4000 4020 6000 verschiebt das oben angesprochene Programm von $4000 nach $6000.</p>
+
+<p>Hierbei werden weder die absoluten Adressen umgerechnet noch die Tabellen geändert. Letzteres ist sicherlich erwünscht, aber denken Sie daran, daß das verschobene Programm nun nicht mehr lauffähig ist, da die absoluten Adressen nicht mehr stimmen (zum Beispiel bei dem Befehl LDA 400E,Y). Falls Sie jetzt »G6000« eingeben, um das Programm zu starten, werden Sie sich sicherlich wundern, daß es dennoch läuft. Doch löschen Sie einmal das Programm in $4000 (mit »04000 4100 AA«) und starten das Programm in $6000 noch einmal! Seltsam, nicht? Abhilfe schafft der nächste Befehl.</p>
+
+<h3>VARIATION</h3>
+
+<p>V (ANFADRalt ENDADRalt ANFADRneu ANFADR ENDADR) rechnet alle absoluten Adressen im Bereich von ANFADR bis ENDADR, die sich auf ANFADRalt bis ENDADRalt beziehen, auf ANFADRneu um. Kompliziert? Nicht, wenn Sie sich klarmachen, daß die ersten drei Adressen exakt den Eingaben beim »W«-Befehl entsprechen. Neu hinzukommen nur die beiden Adressen für den Bereich, in dem die Änderung tatsächlich erfolgt.</p>
+
+<p>Um unser mit »W« schon verschobenes Programm auch wieder lauffähig zu machen, geben Sie folgendes ein: V 4000 4020 6000 6000 600E. Damit werden alle Absolutadressen, die im Bereich von $6000 bis $600E — dahinter steht die Tabelle — liegen und sich bisher auf $4000 bis $4020 bezogen haben, auf den neuen Bereich umgerechnet. Probieren geht wie immer über kapieren.</p>
+
+<p>Eine Zusammenfassung dieser beiden Befehle ermöglicht:</p>
+
+<h3>CONVERTIEREN</h3>
+
+<p>verschieben eines Programmes mit Adreßumrechnung)</p>
+
+<p>C (ANFADRalt ENDADRalt ANFADRneu ANFADRges END-ADRges) verschiebt das Programm von ANFADRalt bis ENDADRalt zur ANFADRneu und zwar mit Umrechnung der Adressen zwischen ANFADRges und ENDADRges</p>
+
+<p>An unserem kleinen Testprogramm läßt sich wieder einmal demonstrieren, wie der Befehl eingesetzt wird. Laden Sie es also mit »L’SUPERTEST”« und schauen es mit »D 4000« an. Jetzt wollen wir an der Adresse $4008 einen 3-Byte-Befehl einfügen: C 4008 4020 400B 4000 4011 verschiebt das Programm von $4008 bis $4020 zur neuen Anfangsadresse $400B. Dabei werden im Bereich von $4000 bis $4011 (neue Endadresse des »aktiven« Programmes!) die Sprungadressen umgerechnet. Nun können Sie ab Adresse $4008 einen 3-Byte-Befehl einfügen, zum Beispiel STY 0286. Dazu geben Sie bitte ein:<br>
+A 4008<br>
+4008 STY 0286<br>
+F</p>
+
+<p>Überzeugen Sie sich davon, daß SMON die Befehle korrekt umgerechnet hat, indem Sie unser Beispiel disassemblieren (D 4000) und anschließend mit G 4000 starten. Besitzer eines Farbmonitors werden in helle Begeisterung ausbrechen. Vorsicht ist geboten, wenn Tabellen oder Text vorhanden sind. SMON wird versuchen, diese als Befehle zu disassemblieren und gegebenenfalls umzurechnen. Dabei können unvorhersehbare Verfälschungen auftreten. Aus diesem Grunde ist im Beispiel die Endadresse des zu ändernden Bereiches auf $4011 und nicht etwa auf $4023 gelegt worden. Wenn Sie größere Programme zu verschieben haben, sollten Sie die Kommandos W und V anwenden, beziehungsweise einen Assembler einsetzen, der es Ihnen gestattet, beliebige Einfügungen, Verschiebungen und sonstige Änderungen vorzunehmen. Das C-Kommando eignet sich in erster Linie für kleinere Änderungen innerhalb eines Programms.</p>
+
+<h2>Der Blick hinter die Kulissen</h2>
+
+<p>Wie beim letzten Mal wollen wir noch einen kleinen Blick auf das Programm werfen. Wir haben zwei häufig vorkommende Programmteile ausgewählt. Wenn Sie nach erfolgreichem Eintippen der neuen DATAs einmal mit »D C84F« die »LOAD-SAVE«-Routine listen, sehen Sie, daß diese sehr wenig Platz beansprucht. Das Geheimnis dieser Beschränkung liegt in der Tatsache begründet, daß wir hier auf Betriebssystem-Routinen zurückgegriffen haben. Doch dazu nachher mehr; erst einmal die angesprochene Routine von Anfang an:</p>
+
+<p>TODO</p>
+
+<p>Die Speicherstellen $BB/$BC enthalten jetzt die Adresse $0201, also den Beginn des Basic-Eingabepuffers. In $B9 befindet sich der Wert 01, das bedeutet, daß die Sekundäradresse für absolutes Laden voreingestellt ist. Die Speicherstelle $B7 enthält die Länge des Dateinamens, hier erst einmal 0.</p>
+
+<p>TODO</p>
+
+<p>Überprüft, ob Anführungsstriche eingegeben wurden. Falls nicht, springt unser Programm in die Routine »LSERROR« und bricht ab.</p>
+
+<p>TODO</p>
+
+<p>In diesem Programmteil wird der Filename eingelesen und in die Adresse gespeichert, die in $BB/$BC enthalten ist ($0201). Gleichzeitig wird $B7 als Zähler für die Namenlänge so lange erhöht, bis das zweite Anführungszeichen auftaucht. Damit ist der Filename gespeichert, beginnend bei $0201.</p>
+
+<p>TODO</p>
+
+<p>Da die Namenlänge um eins zu groß geraten ist (das letzte Zeichen war ein »”«), muß sie dekrementiert werden. Die gewählte oder voreingestellte I/O-Nummer (Device-Nummer) soll in $BA gespeichert werden, damit die Betriebssystemroutine nachher das richtige Gerät anspricht. Zum Abschluß überprüft der Compare-Befehl, ob das Kommando »S« gewählt ist, um dann dorthin zu verzweigen.</p>
+
+<p>TODO</p>
+
+<p>Wir sind nun an der Stelle des Befehls angelangt, an der sich herausstellen muß, ob das Programm an seine Originaladresse (absolut) oder an eine andere Adresse geladen werden soll. Die Unterroutine »GETRET« prüft, ob unmittelbar nach dem Namen ein »RETURN« folgt und führt eine Verzweigung nach »LOAD1« durch, falls dieses eintritt. Ansonsten holen wir uns die Adresse und laden das vorgesehene Programm dorthin, nachdem in Speicherstelle *$B9 eine Null gespeichert ist, da ein absolutes Laden nicht erfolgt. Die Routine »GETADR« ist so aufgebaut, daß sie die nächsten 2 Bytes an die mit dem X-Register gewählte Stelle in der Zeropage ablegt. Dann führen wir ebenfalls »LOAD1« durch.</p>
+
+<p>In »LOAD1« erfolgt der indirekte Sprung über $0330 in die LOAD-Routine des Betriebssystems.</p>
+
+<p>Die SAVE-Routine erfragt vorher noch die fehlenden Adressen (Anfangs- und Endadresse des Programmes, das gespeichert werden soll), speichert sie nach $C1/C2 und $AE/AF und springt dann in die SAVE-Routine. Noch ein Wort zu den angesprochenen Betriebssystem-Routinen: Mittlerweile gibt es für den C 64 mindestens drei verschiedene Versionen des Betriebssystems von Commodore. Es sind zwar meist nur kleine Änderungen, aber die können fatale Folgen haben, wenn sich die Einsprungadressen ändern. Deshalb gibt es einen besonderen Bereich, das KERNAL, der einen Sprungverteiler für die wichtigsten Routinen enthält. Dieser wird grundsätzlich nie geändert. Beziehen Sie deshalb Ihre Einsprungadressen immer auf die KERNAL-Routinen, um sicher zu sein, daß Ihr Programm auch noch mit der zwölften Version des Betriebssystems läuft. Die KERNAL-Einsprünge stehen ganz hinten ab $FF81 im Speicher.</p>
+
+<p>Als zweites ein Vergleich, der in Maschinenprogrammen häufig und in allen Variationen auftaucht: Es handelt sich dabei um den Vergleich zweier Adressen. Nun sind Adressen leider 16-Bit-Werte, unser Prozessor aber kann nur 8 Bit auf einmal verarbeiten. Gehen wir einmal von folgenden Bedingungen aus: Ein Programm soll von $4000 bis $4020 gelistet werden. Die Zeiger für das Ende befinden sich in Speicherstelle ENDLO (Lowbyte) und ENDHI (Highbyte). »PCL« (Programm-Counter-Low) und »PCH« (Programm-Counter-High) geben den augenblicklichen Stand des Programmes an. Dann erfolgt die Abfrage auf erreichtes Ende mit dieser Befehlsfolge:</p>
+
+<p>TODO</p>
+
+<p>Solange PCL und PCH kleiner sind als die Endwerte geht das Programm »WEITER«.</p>
+
+<p>Sobald aber PCL und PCH die Werte von ENDLO und ENDHI erreicht haben, wird das Carry-Flag gesetzt und die Abfage mit BCS FERTIG würde das Auflisten anhalten. Daß es bei der Anwendung einige Probleme geben kann, sieht man daran, daß die Ausgabe auch schon unterbrochen wird, wenn gerade erst das Programmende erreicht ist. (Der letzte Befehl könnte »unter den Tisch fallen«.) Aber kein Problem ohne Problemlösung — und natürlich ohne weitere Probleme, die Sie aber mit ein bißchen Nachdenken sicher selbst lösen können.</p>
+
+<h3>Hinweise zum Abtippen</h3>
+
+<p>Tippen Sie das Ladeprogramm sorgfältig ab, speichern Sie es (!) und starten Sie mit RUN. Sollte es sich wider Erwarten auf Anhieb mit READY melden, haben Sie das Schlimmste geschafft. Ansonsten beseitigen Sie nun alle Fehler bis es zum READY durchläuft. Jetzt laden Sie das alte Ladeprogramm aus der letzten Ausgabe und starten es. Nach dem READY starten Sie SMON mit SYS 49152. Als erstes probieren Sie nun den Befehl »S«, um SMON selbst abzuspeichern, diesmal nicht mehr als Basic-Lader, sondern als Maschinenprogramm.<br>
+S ”SMON $C000” C000 CAB7</p>
+
+<p>SMON belegt jetzt 11 Blöcke auf der Diskette. Ab jetzt können Sie SMON direkt mit »LOAD ”SMON $C000”,8,1« laden und mit SYS 49152 starten.</p>
+
+<p>Noch zwei Hinweise in eigener Sache: Einige wenige (!) Leser haben uns darauf aufmerksam gemacht, daß die Druckerausgabe auf bestimmten (exotischen) Druckern bisweilen kleinere Unzulänglichkeiten aufweist. Kurz und schlecht, uns ist in der letzten Folge ein Programmierfehler unterlaufen: Beim Disassemblieren verschwindet die letzte Zeile vor dem Strich (&mdash;&ndash;) im Drucker und ward nicht mehr gesehen. So etwas passiert, wenn man kurz vor Redaktionsschluß noch auf die Schnelle kleine »Verbesserungen« vornimmt.</p>
+
+<p>Für die Korrektur ist folgendes notwendig: Listen Sie mit »M C56C C57B« zwei Zeilen, gehen mit dem Cursor in die betreffenden Zeilen und geben folgende Änderung ein:</p>
+
+<p>TODO</p>
+
+<p>Nur die fetten Werte müssen geändert werden, alle anderen können Sie stehen lassen. Denken Sie bitte bei jeder Änderung daran, daß Sie die Zeile nur mit Drücken der RETURN-Taste an den Computer übergeben. Zur Probe können Sie ja noch einmal listen&hellip;</p>
+
+<p>Wir haben nach dem letzten Artikel eine Menge Anrufe erhalten, von Lesern, die größtenteils Schwierigkeiten beim Eintippen der DATAs beziehungsweise bei der Fehlersuche hatten. Deswegen hier Hinweise zu den häufigsten Problemen:</p>
+
+<ol>
+<li>Wenn nach Beendigung der Tipparbeit nach dem RUN eine Fehlermeldung »&hellip;. ERROR in 40« (oder 70) erfolgt, dann ist sicherlich nicht die Zeile 40 oder 70 daran schuld, sondern Sie haben aller Wahrscheinlichkeit nach einen Wert (ein »Datum«) falsch eingetippt. Der Computer bringt eine Fehlermeldung, wenn er beim POKE-Befehl auf eine Kommazahl trifft oder einen anderen nicht POKEbaren Wert. Dafür gibt es — neben schlichten Tippfehlern — mehrere Möglichkeiten: Es kann ein Komma fehlen oder durch einen Punkt ersetzt worden sein. Gerade dies ist nämlich auf dem Bildschirm sehr schlecht zu erkennen.</li>
+<li>Überprüfen Sie nach dem Programmabbruch anhand des Direktbefehls »PRINT I« in welchem Block ( + 1) der Fehler steckt. Also bei der Antwort »1« steckt der Fehler in Block 2. 3. Der Direktbefehl »PRINT A« zeigt Ihnen den Wert, der den Fehler verursacht hat.</li>
+</ol>
+
+
+<p>Versuchen Sie es erst einmal mit dieser kleinen Hilfe. Übrigens ist unser Listing mit 99prozentiger Wahrscheinlichkeit fehlerfrei, von uns und der Redaktion mehrfach durchprobiert. Das Dreckfuhlerteufelchen hat kaum eine Chance, da das Listing direkt von der Diskette auf den Drucker läuft.</p>
+
+<p>Ich hoffe, daß Sie bis jetzt nicht in Ihren Bemühungen nachgelassen haben, möglichst häufig die verschiedensten Befehle zu probieren. Sie wissen doch: Nur die Übung macht den Meister — und das gilt speziell für die Maschinensprache. In der nächsten Ausgabe bekommen Sie dann die letzten Raffinessen des SMON, der dann komplett ist.</p>
+
+<address class="author">(Norfried Mann/gk)</address>
+
