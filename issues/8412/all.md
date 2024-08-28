@@ -1,4 +1,4 @@
-## Mehr 64'er
+# Mehr 64'er
 
 Obwohl wir Ihnen in jeder Ausgabe des 64’er um die 120 Seiten redaktionellen Teil bieten, reicht der Platz nicht aus, um all das unterzubringen, was an interessantem und nützlichem Material vorhanden ist. Das hat natürlich auch seine positive Seite: Zeigt es doch, wieviel im »Volkscomputer« und in seinem größeren Bruder steckt — und daß der Benutzer nicht so schnell an die Grenzen des Systems stößt.
 
@@ -517,7 +517,7 @@ Dieser Fehler tritt sehr häufig bei Druckern auf, die über den seriellen Bus d
 
 Marc Haber
 
-# Wo gibt's EPROM-Brenner?
+## Wo gibt's EPROM-Brenner?
 
 Wo kann ich den im Hardware-Test beschriebenen EPROM-Brenner von Roßmöller beziehen?
 
@@ -1072,7 +1072,7 @@ Wenn Sie Fragen haben, können Sie mich mit einer Leserzuschrift ansprechen.
 
 (Dr. Helmuth Hauck/aa)
 
-Spiel des Jahres: Soccer II
+# Spiel des Jahres: Soccer II
 
 > Viele Spiele wurden in der 64’er Redaktion angeschaut, gespielt, getestet. Eines fesselte uns immer wieder.
 
@@ -1178,52 +1178,7 @@ Um mehrere Funktionen über den USR-Vektor zu implementieren, müßte man vor je
 
 (Wolfgang W. Wirth)
 
-# Musik, Musik, Musik
-
-> Das Programm ist als Werkzeug zum Experimentieren mit dem hardwaremäßig phantastischen aber softwaremäßig völlig vernachlässigten »Sound Interface Device« (SID) im C 64 gedacht. Nicht zuletzt kann man mit dem Synthesizer auch musizieren!
-
-Um die Möglichkeiten zu nutzen, sind folgende Parameter einstellbar und werden übersichtlich — teilweise grafisch unterstützt — auf dem Bildschirm dargestellt.
-1) Die Tastenreihe »Q« bis »RETURN« bildet die Orgeltastatur. Sie umfaßt zwei Oktaven mit allen Halbtönen und erscheint oben auf dem Bildschirm. Beim Drücken einer Taste erklingt der Ton so lange, bis sie wieder losgelassen wird. Gleichzeitig zeigt ein gelber Balken (Sprite) die aktivierte Orgeltaste an.
-2) Anschlag (Attack), Abschwellen (Decay), Haltepegel (Sustain Level) und Ausklingen (Release) sind mit den Funktionstasten einstellbar. Die geshifteten Tasten verringern, die ungeshifteten erhöhen den Wert. Die relative Lautstärke (Pegel) des Tones wird ständig rechts oben als Balken auf dem Bildschirm gezeigt.
-3) Als Wellenformen kann man Dreieck, Sägezahn, Rechteck, Rauschen und die ringmodulierte Dreieckschwingung (RING) mit der Taste »Z« wählen. Die beiden letzten sind in Klammern eingefaßt, da sie sich zum Musizieren nicht eignen.
-4) Wählt man die Rechteckschwingung, wird das Tastverhältnis angezeigt und kann mit den Tasten »N« und »M« in Sechzehntel-Abstufungen verändert werden. Das Low-Byte des Tastverhältnisses beträgt immer 128.
-5) Der Synthesizer nutzt das im Anhang P des Handbuchs gezeigte Frequenzspektrum voll aus: Der tiefste Ton ist der Halbton unter C0 und der höchste ist das Ais-7 (!).
-Da die Tastatur aber nur zwei Oktaven umfaßt, kann man mit den Cursortasten den Frequenzbereich um jeweils eine Oktave ändern.
-6) Mit der Taste »C« wird der Filtermodus umgeschaltet, wobei das entsprechende Wort auf dem Bildschirm revers geschrieben wird. Ist kein Filtermodus eingeschaltet, werden die Schaltbits 0,1 und 2 im Register 23 gelöscht, also für alle drei Stimmen die Filter ausgeschaltet. Auch die Verwendung mehrerer Filtermodi ist zugelassen.
-7) Die folgenden Parameter sind nur bei eingeschalteten Filtern hör- und sichtbar:
-7a) Mit den (ungeshifteten) Tasten »[« und »]« verändert man die Grenzfrequenz der Filter in Sechzehntelschritten. Es werden also die höchstwertigen vier Bits im Register 22 variiert.
-7b) Die Filterresonanz wird mit den Tasten » < « und » > « vergrößert oder verkleinert.
-7c) Die Tasten »?« beziehungsweise ».« schalten den »Wah-wah«-Effekt (er heißt wie er klingt) ein und aus. Nach dem Einschalten wird die Filtergrenzfrequenz (Register 22) gemäß dem Verlauf der Hüllkurve (Register 28) verändert. Die eingestellte Filterfrequenz (siehe 7a) hat dann keine Bedeutung.
-8)  Mit der Stopp-Taste verläßt man das Programm. Da es jetzt im Speicher ist, kann es mit RUN 1000 unverzüglich wieder gestartet werden. Nun haben alle Parameter wieder die ursprünglichen Werte.
-
-Ich möchte nicht verheimlichen, daß der »Synthesizer« natürlich auch einige Einschränkungen hat:
-1) Alle Parameter werden jeweils für alle drei Stimmen gleichzeitig eingestellt, denn bei nur einem Manual wäre es sinnlos, den verschiedenen Stimmen zum Beispiel verschiedene Wellenformen zu geben.
-2) Es gibt natürlich grenzenlos viele Möglichkeiten, Parameter (zum Beispiel die Filterfrequenz) während des Erklingens eines Tones zu verändern. Ihr Einbau würde aber ebenfalls den Rahmen dieses Programms sprengen.
-3) Die Lautstärke ist fest auf 15 eingestellt. (Wozu hat man schließlich den Regler am Fernseher?)
-4) Eine Computertastatur ist kein Orgel-Keyboard. Dies setzt dem Spieler von Musikstücken natürlich Grenzen. Für Bastler dürfte es aber nicht allzu schwierig sein, parallel zur Tastatur ein in der richtigen Matrix verdrahtetes Keyboard anzuschließen.
-
-### Abspeichern des Programms
-
-Wer es ganz elegant machen möchte, kann das Maschinenprogramm (den »Objektcode«) als solches auf Band oder Diskette schreiben. Ich habe die dazu nötigen POKEs und SYS-Aufrufe zusammengestellt, die man im Direktmodus eingeben kann. Allerdings sind die PRINT-Befehle (Zeilen 1000-1200) nicht im Maschinenprogramm enthalten! Aus diesen Zeilen sollte man also ein kleines Basic-Programm schreiben, das mit der Zeile »LOAD ’’SYNTHESIZER-OBS”«, Gerätenummer, 1« beginnt und mit »SYS12800« endet.
-
-Wer einen Monitor besitzt, kann natürlich diesen zum Abspeichern benutzen. Die Startadresse ist $ 2F00 und die Endadresse $ 35DD.
-
-Nun noch ein Hinweis für diejenigen, die den SID selbst programmieren wollen und nur das Handbuch zum Commodore 64 besitzen: Wer die Beispielprogramme schon ausprobiert hat, dem sollte aufgefallen sein, daß die Töne nie ausklingen — egal, welchen Wert man hierfür eingestellt hat. Das liegt daran, daß der Tongenerator dort immer mit POKE W, 0 »abgewürgt« wird. Zum korrekten Ausschalten eines Tones darf man aber nur das 0. Bit des Wellenform-Registers löschen, das sogenannte »KEY«-Bit! Richtig heißt es also POKE W, 16 (bei der Dreieckschwingung).
-
-(Martin Ahlborn/rg)
-
-
-
-
-
-
-
-
-
-
-# Mathematical Basic
-
-Fortsetzung von Seite 50
+---
 
 Eine gute Nachricht für alle Freunde des VC 20: Unser »Listing des Monats« macht mit über 50 neuen Befehlen das Programmieren zum Vergnügen.
 
@@ -1347,6 +1302,40 @@ cefd Test auf Komma und nächstes Zeichen holen.
 Damit sind alle neuen Befehle und Funktionen vorgestellt. Bleibt nur noch, Ihnen viel Spaß beim Programmieren mit »Mathematical Basic« zu wünschen.
 
 (Wolfgang W. Wirth/ev)
+
+# Musik, Musik, Musik
+
+> Das Programm ist als Werkzeug zum Experimentieren mit dem hardwaremäßig phantastischen aber softwaremäßig völlig vernachlässigten »Sound Interface Device« (SID) im C 64 gedacht. Nicht zuletzt kann man mit dem Synthesizer auch musizieren!
+
+Um die Möglichkeiten zu nutzen, sind folgende Parameter einstellbar und werden übersichtlich — teilweise grafisch unterstützt — auf dem Bildschirm dargestellt.
+1) Die Tastenreihe »Q« bis »RETURN« bildet die Orgeltastatur. Sie umfaßt zwei Oktaven mit allen Halbtönen und erscheint oben auf dem Bildschirm. Beim Drücken einer Taste erklingt der Ton so lange, bis sie wieder losgelassen wird. Gleichzeitig zeigt ein gelber Balken (Sprite) die aktivierte Orgeltaste an.
+2) Anschlag (Attack), Abschwellen (Decay), Haltepegel (Sustain Level) und Ausklingen (Release) sind mit den Funktionstasten einstellbar. Die geshifteten Tasten verringern, die ungeshifteten erhöhen den Wert. Die relative Lautstärke (Pegel) des Tones wird ständig rechts oben als Balken auf dem Bildschirm gezeigt.
+3) Als Wellenformen kann man Dreieck, Sägezahn, Rechteck, Rauschen und die ringmodulierte Dreieckschwingung (RING) mit der Taste »Z« wählen. Die beiden letzten sind in Klammern eingefaßt, da sie sich zum Musizieren nicht eignen.
+4) Wählt man die Rechteckschwingung, wird das Tastverhältnis angezeigt und kann mit den Tasten »N« und »M« in Sechzehntel-Abstufungen verändert werden. Das Low-Byte des Tastverhältnisses beträgt immer 128.
+5) Der Synthesizer nutzt das im Anhang P des Handbuchs gezeigte Frequenzspektrum voll aus: Der tiefste Ton ist der Halbton unter C0 und der höchste ist das Ais-7 (!).
+Da die Tastatur aber nur zwei Oktaven umfaßt, kann man mit den Cursortasten den Frequenzbereich um jeweils eine Oktave ändern.
+6) Mit der Taste »C« wird der Filtermodus umgeschaltet, wobei das entsprechende Wort auf dem Bildschirm revers geschrieben wird. Ist kein Filtermodus eingeschaltet, werden die Schaltbits 0,1 und 2 im Register 23 gelöscht, also für alle drei Stimmen die Filter ausgeschaltet. Auch die Verwendung mehrerer Filtermodi ist zugelassen.
+7) Die folgenden Parameter sind nur bei eingeschalteten Filtern hör- und sichtbar:
+7a) Mit den (ungeshifteten) Tasten »[« und »]« verändert man die Grenzfrequenz der Filter in Sechzehntelschritten. Es werden also die höchstwertigen vier Bits im Register 22 variiert.
+7b) Die Filterresonanz wird mit den Tasten » < « und » > « vergrößert oder verkleinert.
+7c) Die Tasten »?« beziehungsweise ».« schalten den »Wah-wah«-Effekt (er heißt wie er klingt) ein und aus. Nach dem Einschalten wird die Filtergrenzfrequenz (Register 22) gemäß dem Verlauf der Hüllkurve (Register 28) verändert. Die eingestellte Filterfrequenz (siehe 7a) hat dann keine Bedeutung.
+8)  Mit der Stopp-Taste verläßt man das Programm. Da es jetzt im Speicher ist, kann es mit RUN 1000 unverzüglich wieder gestartet werden. Nun haben alle Parameter wieder die ursprünglichen Werte.
+
+Ich möchte nicht verheimlichen, daß der »Synthesizer« natürlich auch einige Einschränkungen hat:
+1) Alle Parameter werden jeweils für alle drei Stimmen gleichzeitig eingestellt, denn bei nur einem Manual wäre es sinnlos, den verschiedenen Stimmen zum Beispiel verschiedene Wellenformen zu geben.
+2) Es gibt natürlich grenzenlos viele Möglichkeiten, Parameter (zum Beispiel die Filterfrequenz) während des Erklingens eines Tones zu verändern. Ihr Einbau würde aber ebenfalls den Rahmen dieses Programms sprengen.
+3) Die Lautstärke ist fest auf 15 eingestellt. (Wozu hat man schließlich den Regler am Fernseher?)
+4) Eine Computertastatur ist kein Orgel-Keyboard. Dies setzt dem Spieler von Musikstücken natürlich Grenzen. Für Bastler dürfte es aber nicht allzu schwierig sein, parallel zur Tastatur ein in der richtigen Matrix verdrahtetes Keyboard anzuschließen.
+
+### Abspeichern des Programms
+
+Wer es ganz elegant machen möchte, kann das Maschinenprogramm (den »Objektcode«) als solches auf Band oder Diskette schreiben. Ich habe die dazu nötigen POKEs und SYS-Aufrufe zusammengestellt, die man im Direktmodus eingeben kann. Allerdings sind die PRINT-Befehle (Zeilen 1000-1200) nicht im Maschinenprogramm enthalten! Aus diesen Zeilen sollte man also ein kleines Basic-Programm schreiben, das mit der Zeile »LOAD ’’SYNTHESIZER-OBS”«, Gerätenummer, 1« beginnt und mit »SYS12800« endet.
+
+Wer einen Monitor besitzt, kann natürlich diesen zum Abspeichern benutzen. Die Startadresse ist $ 2F00 und die Endadresse $ 35DD.
+
+Nun noch ein Hinweis für diejenigen, die den SID selbst programmieren wollen und nur das Handbuch zum Commodore 64 besitzen: Wer die Beispielprogramme schon ausprobiert hat, dem sollte aufgefallen sein, daß die Töne nie ausklingen — egal, welchen Wert man hierfür eingestellt hat. Das liegt daran, daß der Tongenerator dort immer mit POKE W, 0 »abgewürgt« wird. Zum korrekten Ausschalten eines Tones darf man aber nur das 0. Bit des Wellenform-Registers löschen, das sogenannte »KEY«-Bit! Richtig heißt es also POKE W, 16 (bei der Dreieckschwingung).
+
+(Martin Ahlborn/rg)
 
 # Ohne gutes Werkzeug geht es nicht: SMON Teil 2
 
@@ -1501,14 +1490,23 @@ Ich hoffe, daß Sie bis jetzt nicht in Ihren Bemühungen nachgelassen haben, mö
 (Norfried Mann/gk)
 
 # Bewegte Grafik und Text mischen
-Wer an Sprites denkt, stellt sich meist kleine Männchen oder Raumschiffe vor. Aber auch beim Einsatz in Anwendungsprogrammen können Sprites zur grafischen Illustration sehr nützlich sein.
+
+> Wer an Sprites denkt, stellt sich meist kleine Männchen oder Raumschiffe vor. Aber auch beim Einsatz in Anwendungsprogrammen können Sprites zur grafischen Illustration sehr nützlich sein.
+
 Als ich die Grafik entwarf, wollte ich ein Programm unter folgenden Gesichtspunkten schreiben: kein Spielkram und von Basic aus verwendbar. Damit diese Erweiterung auch mit anderen Basic-Erweiterungen ohne weiteres funktioniert, sollten die Befehle über »SYS« aufgerufen werden. Nun sollte es kein Allerweltsprogramm sein, sondern irgend etwas Neues. Da fielen mir die Sprites ein. Mit dem richtigen Programm könnten damit kleine aber deutliche Grafiken erstellt werden, zum Beispiel Niederschlags-Temperatur- oder Umsatztabellen. Als ideal fand ich vier Sprites hintereinander und das zweimal untereinander. Das gibt eine Auflösung von immerhin 95 x 42 = 4032 Punkten. Damit läßt sich schon einiges machen. Zur Handhabung werden vier Routinen benötigt. Eine zum Einschalten der Grafik, eine zum Setzen beziehungsweise Löschen der Punkte und eine zum schnellen Löschen der gesamten Grafik. Weiterhin noch eine, die die ganze Grafik auf eine Farbe setzt.
-Das Einschalten und Positionieren der Grafik
+
+### Das Einschalten und Positionieren der Grafik
+
 Dazu sind vier Parameter nötig, zwei für die x,y-Koordinaten und zwei für die x,y-Ausdehnung, also das Spreizen der Sprites. Je nachdem, ob gespreizt oder nicht, werden die Koordinaten berechnet und in die jeweiligen Register abgelegt. Zum Schluß werden noch alle Sprites aktiviert. Der Einfachheit halber kann x nur Werte zwischen 0 und 255 haben. Bei x=255 und ungespreizt ragt die Grafik sowieso schon aus dem Bildschirm heraus. Auch sollte man mit dem y-Wert nicht zu hoch gehen, da sonst die Grafik möglicherweise oben in den Bildschirm hereinkommt. Diese Einschränkungen sind aber in den meisten Fällen unwesentlich.
-Das Setzen beziehungsweise Löschen von einem Punkt
+
+### Das Setzen beziehungsweise Löschen von einem Punkt
+
 Dazu muß genau das Byte errechnet werden, in dem sich der Punkt befindet. Dafür braucht man nur die obere Spritereihe zu betrachten. Sie ist genau eine Speicherseite (256 Byte) groß. Sollte nun die y-Koordinate größer als 20 sein, so wird einfach eine Seite weitergeblättert, das heißt das Hi-Byte des Zeigers inkrementieren. Als erstes wird das Sprite errechnet. Es wird solange #24 (= eine Spritelänge) vom x-Wertabgezogen bis der x-Wert kleiner als 24 (24 < x < = 0) ist. So ist man praktisch im ersten Spriteblock gelandet. Nun wird vom x-Wert solange #8 abgezogen, bis der x-Wert kleiner als 8 (8<x> =0) ist. Jetzt weiß man, welches Bit gesetzt werden soll, und welches Byte in der Reihe gemeint ist (eins von dreien).
+
 Nun der y-Wert. Ist er größer als 20, dann muß das Hi-Byte des Zeigers inkrementiert und vom y-Wert 21 abgezogen werden. Man will ja die Byteposition in einem Spriteblock errechnen. Ist der y-Wert jetzt noch größer als 0 so müssen noch einmal 3 * y dazugezählt werden, denn ein Sprite hat die Ausdehnung von 3 Byte. Damit hat man das Byte, das in einem Spriteblock verändert werden soll. Nun wird das Low-Byte des jeweiligen Sprites dazuaddiert und in der Zeropage für den Zeiger abgelegt. Nachdem das Bytemuster hergestellt ist, kann nun der Punkt gelöscht beziehungsweise gesetzt werden.
+
 Das Löschen der Grafik und Setzen der Farbe versteht sich wohl von selbst. Das Ausschalten der Grafik geschieht durch POKE 53269,0.
+
 Die Befehlsliste sieht dann so aus:
 
 TODO
