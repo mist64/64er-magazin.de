@@ -1793,40 +1793,418 @@ Schreibt man noch einen Autostart für »£« (eventuell mittels des Beispiels i
 
 (Bernhard Lauer/rg)
 
+# Automatische Zeilennumerierung
 
+> Das lästige Durchnumerieren der Zeilen bei der Programmierung kann Ihnen dieses kleine Programm abnehmen.
 
+Die Syntax des AUTO-Befehls ist:
+←A anfangszeilennummer, schrittweite
 
+Nach Eingabe dieses Befehls wird die Zeilennummer vorgegeben und nach RETURN um »schrittweite« erhöht.
 
+Um aus dem AUTO-Modus wieder herauszukommen, muß man nach Vorgabe einer Zeilennummer
+»←« RETURN eingeben.
 
+Falls man nach Vorgabe einer Zeilennummer die RETURN-Taste betätigt, wird die entsprechende Zeile, falls sie vorhanden ist, gelöscht. Hiermit lassen sich auch sehr schnell Pro-grammblöcke löschen, falls man die RETURN-Taste gedrückt hält, die Zeilenvorgabe weiterläuft und die entsprechenden Zeilennummern gelöscht werden.
 
+»←«=CHR$(95)
 
+»A«=CHR$(65)
 
+Das Programm als Basic-Lader eintippen, anschließend mit RUN starten. Falls »FEHLER IN DEN DATAZEILEN« erscheint, DATAS auf Tippfehler überprüfen. Falls »OK«, kann die Basic-Erweiterung mit SYS 49152 initialisiert werden. Nun hat man das Basic um den Befehl »A« erweitert.
 
+(Frank Siedel/rg)
 
+# Musik aus der Datasette
 
+> Mit dieser Routine ist es beim C 64 möglich, die Datasette ohne techni-chen Umbau als normalen Kassettenrecorder zu betreiben.
 
+Die Maschinenroutine, die mit SYS 49152 gestartet wird, stellt eine Endlosschleife dar, die mit der SHIFT-Taste jederzeit abgebrochen werden kann. In der Schleife selber werden die Datenbits aus der Datasette kommend von dem Interrupt-Control-Register der CIA 1 isoliert. Der Lautsprecher im Fernseher oder Monitor wird dem logischen Zustand des einzelnen Datenbits entsprechend ein- oder ausgeschaltet. Die für uns daraus resultierende Frequenz wird originalgetreu wiedergegeben, nur nicht die Tonqualität. Der Vorteil der Maschinenroutine ist, daß von der Datasette nichts geladen, sondern nur wiedergegeben wird. Es kann also bei einer Kassette irgendwo »hineingehört« werden. Als Alternative zu Programmen sollte man zur einfachen Musikkassette greifen. Mit Phantasie kann die Musik erkannt werden, doch die Tonqualität läßt noch zu wünschen übrig.
 
+(Jörg Wagner/rg)
 
+# List- und Löschschutz leicht gemacht
 
+> Es wurden schon viele Methoden veröffentlicht, um ein Basic-Programm gegen Listen zu schützen. Aber alle mir bekannten Möglichkeiten weisen entschiedene Nachteile auf. Entweder der Schutz ist nicht sicher genug und leicht zu entfernen, oder er ist viel zu aufwendig.
 
+Ich habe mich daher entschlossen, ein Programm zu schreiben, das diese Mängel umgeht und sogar noch andere positive Merkmale aufweist.
 
+Zunächst eine Zusammenfassung von drei mir bekannten Listschutzmöglichkeiten mit ihren Vor- und Nachteilen:
 
+### 1. Möglichkeit
 
+In die erste Zeile des Basic-Programms (zum Beispiel Zeilennummer 1) wird REM, gefolgt von zwei Anführungszeichen und SHIFT L, geschrieben.
+1 REM””L (RETURN)
 
+Der Cursor wird nun auf das zweite Anführungszeichen gesetzt und sechsmal SHIFT INST gedrückt (das Anführungszeichen wird um sechs Positionen nach rechts geschoben). Dann wird sechsmal DEL eingegeben (es erscheinen als Steuerzeichen sechs reverse T) und die Zeile mit (RETURN) abgespeichert. Wird nun der LIST-Befehl aufgerufen, meldet sich der Rechner mit:
+"
+?SYNTAX ERROR
+READY.
+Auf den ersten Blick sehr beeindruckend, aber durch Entfernen dieser Zeile ist der Listschutz wieder aufgehoben. Außerdem ist ein ’LIST 2’ noch möglich.
 
+### 2. Möglichkeit
+In jede Basic-Zeile werden synthetische Steuerzeichen eingefügt (genaue Beschreibung im 64’er-Magazin, Ausgabe 6/84). Diese Methode ist zwar recht sicher, will man aber alle Zeilen eines längeren Basic-Programms schützen, ist der Aufwand viel zu groß, vom Speicherplatzbedarf der Steuerzeichen ganz abgesehen.
 
+### 3.	Möglichkeit
 
+Durch POKE 775,200 wird der Listbefehl außer Kraft gesetzt, durch POKE 775,167 wird diese Wirkung wieder aufgehoben. Dieser Listschutz ist zwar wirkungsvoll, aber er muß erst durch diesen POKE-Befehl aktiviert werden. Nach dem Laden eines Programms ist er daher noch nicht aktiv.
 
+Das hier vorgestellte Programm erzeugt nicht nur einen sicheren Listschutz, sondern schützt auch vor dem Löschen einzelner Basic-Zeilen. So können zum Beispiel Hinweise auf ein Kopierrecht und auf den Autor eines Programms nicht geändert oder entfernt werden. Auch kann ein so gesichertes Programm nur mit RUN gestartet werden, ein RUN, gefolgt von einer Zeilennummer, führt zu einer Fehlermeldung. Jede Zeile des Programms ist geschützt, es können also auch einzelne Zeilen nicht gelistet werden. Einzige Bedingung für die Verwendung dieses Schutzes: Das zu schützende Programm darf keine Zeilennummern 0 und 1 enthalten. Ansonsten wird eine Fehlermeldung ausgegeben und das Programm bleibt unverändert.
 
+Das Listschutzprogramm liegt als Basic-Lader vor. Nachdem es richtig abgetippt wurde, kann es durch RUN gestartet werden. Das Maschinenprogramm steht dann im Speicher ab der Adresse 50000 zur Verfügung. Das zu schützende Basic-Programm kann nun geladen werden, durch SYS 50000 wird das Schutzprogramm aktiviert und das Basic-Programm geschützt. Es kann nun wieder auf Kassette/Diskette gespeichert werden. Das mit dem Listschutz versehene Programm ist nur um wenige Bytes größer als vorher.
 
+### Funktionsweise
 
+Das Maschinenprogramm generiert zwei Basic-Zeilen mit den Zeilennummern 0 und 1. Die Zeile 0 ist eine REM-Zeile, in der ein unlistbares Zeichen (SHIFT L) steht. Hinter diesem Zeichen stehen dann noch zwei kurze Maschinenprogramme, deren Funktionen im folgenden noch erklärt werden. In der zweiten Zeile steht ein SYS-Befehl, der eine der beiden Maschinenroutinen in Zeile 0 startet. Sind diese beiden Zeilen nun erzeugt, wird die Zeilennummer 0 durch eine höhere, eigentlich unerlaubte Zeilennummer (größer 64000) ersetzt. Diese Zeile kann daher auch nicht gelöscht werden.
 
+Da alle nun folgenden Zeilen des Programms kleiner sind als die erste, können diese vom Computer nicht mehr erkannt werden. Ein Sprung in eine solche Zeile führt zu der Fehlermeldung: ?UNDEF’D STATEMENT ERROR. Es kann daher auch keine Zeile gelöscht werden, da diese für den Computer ja nicht mehr vorhanden sind.
 
+Der einzige Nachteil ist, daß es nicht nur ein perfekter List-und Löschschutz, sondern auch ein RUN-Schutz ist (auch Sprungziele innerhalb des Programms können nicht gefunden werden).
 
+Wird das geschützte Programm gestartet, trifft der Interpreter als erstes auf den SYS-Befehl in Zeile 1. Es folgt ein Sprung in das Maschinenprogramm in der REM-Zeile. Dort wird die Zeilennummer wieder auf 0 gesetzt, und der Vektor auf den Basic-Warmstart wird auf die zweite Maschinenroutine gesetzt.
 
+Nun kann das Basic-Programm ohne Fehler ausgeführt werden. Wird der Programmlauf unterbrochen (durch STOP-Taste, Fehlermeldungen, Programmende und so weiter), wird das zweite Maschinenprogramm über den Basic-Warmstartvektor angesprungen. Dort wird die Zeilennummer wieder hochgesetzt, der Warmstartvektor wieder auf den normalen Wert gebracht und die Warmstartroutine angesprungen. Das Programm liegt nun wieder in der geschützten Form vor.
 
+(Ulrich von Gaisberg/rg)
 
+# Stringy: C64-Erweiterung
 
+> Stringy stellt eine Basic-Interpreterer-weiterung dar, die den Befehlssatz des C 64 um acht Befehle ergänzt. Mit diesen Befehlen ausgestattet, kann man sich einen Programmgenerator von Basic aus programmieren.
+
+Das Listing zu Stringy entstand mit Hilfe von Stringy. Dabei wurden die Zahlen formatiert, die Prüfsummen berechnet und nach jeder vierten Zeile angefügt. Mit Stringy kann man Strubsähnliche Erweiterungen programmieren (Der Grund, weshalb ich Stringy schrieb). Man könnte auch ein Programm schreiben, das die in einem Basic-Programm vorkommenden Grafikzeichen durch die entsprechenden CHR$-Funktionen ersetzt, damit sie im Listing besser zu erkennen sind. Auch Sprite- oder Bildschirmmasken-Generatoren sind recht einfach zu programmieren. Der wichtigste Befehl von Stringy ist der !INPUT-Befehl. Mit ihm kann man einen String, der eine Basic-Zeile mit Zeilennummer darstellt, bei laufendem Programm in das Basic-Programm übernehmen — ohne, daß dabei die Programmausführung unterbrochen wird.
+
+Umgekehrt kann es sinnvoll sein, eine Zeile aus dem Basic-Programm herauszuholen, um sie einer Stringvariablen zuzuordnen. Dies ermöglicht der !GET-Befehl.
+
+Damit es keine Komplikationen mit den Basic-Zeilennum-mern gibt, teilt der !NEXL-Befehl Ihnen die Folge der Zeilennummern mit.
+
+Die anderen fünf Befehle dienen der Stringverarbeitung. Vier davon sind dem Sinn nach identisch mit den entsprechenden Stringoperationen aus Simons Basic, mit dem Unterschied, daß die Parameter beliebig komplizierte Ausdrücke sein können (dies gilt für alle Befehle von Stringy).
+
+Der letzte der fünf Stringbefehle ist der !REPLACE-Befehl.
+
+## Die Stringy-Befehle
+
+Nachfolgend bedeuten str1, str2, str3 immer Stringausdrücke und m, n, p, w, z immer numerische Ausdrücke.
+
+### !PLACE
+
+Format:
+!PLACE (str1,str2)
+!PLACE (str1,str2,m)
+!PLACE (str1,str2,m,n)
+
+Funktion: Bestimmung der Position, an der str2 in str1 steht. Die Angabe von m und n grenzt str1 auf einen Teilstring ein. Nur dieser Teilstring von str1 wird dann durchsucht, und nicht der ganze String, m gibt den Beginn dieses Teilstrings an, gerechnet vom Anfang von str1, n bestimmt das Ende des Teilstrings. Vorsichtig: n wird vom Ende von str1 aus gezählt, also in anderer Richtung als m.
+Beispiel: »PRINT !PLACE (’’COMMODORE”, ”0”)« liefert 2 als Antwort.
+»PRINT !PLACE (’’COMMODORE”, ”O”,3)« liefert 5 als Antwort, da nur in ’’MMODORE” gesucht wurde
+»PRINT !PLACE (’’COMMODORE”, ”E”, 1, 4)« liefert 0 als Ergebnis, da ”E” nicht in dem Teilstring ’’COMMOD” enthalten ist.
+
+### !REPLACE
+
+Format:
+!REPLACE (str1,str2,str3)
+!REPLACE (str1,str2,str3,m)
+!REPLACE (str1,str2,str3,m,n)
+
+Funktion: Ersetzen allerstr2, die in str1 vorkommen, durch str3. Dabei kann str1, wie beim !PLACE-Befehl beschrieben, durch n und m eingegrenzt werden.
+Beispiel:	10 A$=”INDEX=B$ + C$”
+20 B$ = !REPLACE(A$,”INDEX”,”IN$”) Nach Ausführung gilt: B$=”IN$ = B$ + C$”
+10 N$ = ”PETER PAUL MARY”
+20 M$ = !REPLACE (N$,”PETER”, ” ”) Nach Ausführung gilt: M$ = ”PAUL MARY”
+
+### !INSERT
+
+Format: !INSERT(str1,str2,p)
+
+Funktion: Fügtstr2 in str1 ein. Die Position p bestimmt, an welcher Stelle str2 in str1 eingefügt werden soll.
+Ist dabei p=0 oder p=len (str1), so wird angefügt.
+Beispiel: »PRINT !INSERT (”ABCEF”,”D”,3)« liefert: ’ABCDEF” »PRINT !INSERT (”ABCEF”,”D”,0)« liefert: ’’DABCEF” »PRINT !IN8ERT (”ABCEF”,”D”,5)« liefert: ’’ABCEFD”
+
+### !STOVER
+
+Format: !STOVER (str1,str2,p)
+
+Funktion: Überschreibt str1 mit str2.
+Die Position, ab der str1 überschrieben werden soll, wird durch p angegeben.
+Ist str2 länger als str1, oder ist wegen der Positionsangabe p ein Überschreiben nicht möglich, so erfolgt ein ILLEGAL QUANTITY ERROR.
+Beispiel: »PRINT !STOVER (”GOTO XXXX”, ”0169”,6)« liefert: ”GOTO 0169”
+
+### !DUP
+
+Format: !DUP (str,w)
+
+Funktion: Es wird str w-mal dupliziert.
+Beispiel: A$ = !DUP(”.”,255) lieferteinen String mit255 einzelnen Punkten.
+
+### !INPUT
+
+Format: !INPUT(str)
+
+Funktion: Hat str keine Zeilennummer am Anfang, so geht der Computer in den Direktmodus über und führt str sofort aus. Soll der Computer anschließend zum Programm zurückkehren, so muß der letzte Befehl in str ein »GOTO (Zeilennummer)« sein.
+
+Beginnt str mit einer Zeilennummer, so wird str als Basic-Zeile in das laufende Programm eingefügt, sofern in dem Programm nicht bereits eine Zeile mit derselben Zeilennummer existiert. Andernfalls wird die betreffende Zeile vor dem Einfügen gelöscht. Wenn allerdings diese zu löschende Zeile eine noch offene FOR...TO-Anweisung oder ein noch nicht durch RETURN abgeschlossenes GOSUB enthält, so erfolgt ein CAN’T CONTINUE ERROR.
+
+Die gleiche Fehlermeldung erscheint auch, wenn Sie eine Zeile löschen wollen, in der sich der DATA-Zeiger momentan befindet. Beispiel:
+10 DATA56
+20 READA:!INPUT(STR$(10))
+
+Nach RUN erfolgt ein CAN’T CONTINUE ERROR, da sich der DATA-Zeiger in Zeile 10 befindet. Durch einen RESTORE-Befehl, läßt sich diese Zeile dennoch löschen:
+10 DATA56
+20 READA:RESTORE:!INPUT(”10”)
+
+Nach Ausführung dieser beiden Zeilen ist die Zeile 10 gelöscht. Enthielt die gelöschte Basic-Zeile eine DEF-Anweisung, so gilt diese Funktion als nicht definiert. Enthielt die gelöschte Basic-Zeile eine Stringvariablenzuordnung der Art »AA$=”ABCD”« oder »A$(n)=”ABCDE”«, so ist anschließend die Variable nur noch als Leerstring definiert.
+
+Soll der !INPUT-Befehl direkt nach einem THEN stehen, dann ist ein Doppelpunkt einzufügen »...THEN:!INPUT...«
+
+### !GET
+
+Format: !GET(z)
+
+Funktion: Es wird die Basic-Zeile mit der Zeilennummer z in Stringformat geholt. Der Parameter z darf dabei nicht den Wert 0 haben. Beispiel:
+10 REM !GET-DEMO
+20 PRINT!GET(10):PRINT!GET(20)
+30 A$ = !GET(30)
+40 PRINT MID$(A$,!PLACE(A$,” ”) + 1)
+
+### !NEXL
+
+Format: !NEXL(z)
+
+Funktion: Es wird die auf z folgende Basic-Zeilennummer geholt. Hat !NEXL(z) den Wert 0, so bedeutet dies, daß auf z keine Basic-Zeilen mehr folgen. Beispiel:
+10 REM !NEXL-DEMO
+20 REM SIMULATION DES LIST-BEFEHLS
+30 Z = 0
+40 Z=!NEXL(Z):IF Z = 0 THEN END
+50 PRINT !GET(Z):GOTO 40
+
+Zum Schluß noch einige Daten zu Stringy. Stringy belegt den Speicher von $c100 bis $c85a. Der Bereich von $c000 bis $cOff dient als Stringzwischenspeicher (je nach Befehl wird dieser Raum benutzt). Die Speicherplätze $c85b bis $c865 dienen als Zwischenspeicher für einige wichtige Betriebssystemdaten. Der unter dem Basic-ROM liegende Speicherbereich wird mitbenutzt.
+
+(Karl Szameitat/ev)
+
+# Bücher
+
+## Basic-Pragrammier-Handbuch
+
+Wer sich endlich seine mehr oder weniger teure Computer-Anlage angeschafft hat, wird auch gerne die Kunst des Programmierens erlernen wollen. Die meisten Computerneulinge betätigen sich hier als Autodidakten, doch steht ihnen zumeist nur eine unzureichende Dokumentation im Handbuch zur Verfügung. Das nun in zweiter Auflage in deutscher Übersetzung erschienene »Basic-Programmier-Handbuch« aus der Reihe der Computer-Persönlich-Bücher ist ein weiteres Buch in der Masse der Literatur, die dem Neuling die Auswahl erschwert. Doch dieses Buch unterscheidet sich in einigen Punkten deutlich vom sonstigen Angebot.
+
+Zunächst fällt einmal der Umfang dieser Einführung auf: Ganze 508 Seiten, in gut lesbarem Druck gesetzt, stehen dem Basic-Anfänger zur Durcharbeitung bevor. Doch das Arbeiten mit diesem Handbuch ist ausgesprochen leicht. Der Inhalt ist klar in Kapitel und Abschnitte unterteilt. Es beginnt mit einer allgemeinen Einführung in die Praxis der Programmierung, und über die Grundlagen der Programmierung bis hin zu den Höhen der Maschinencode-Programmierung wird dem Interessierten alles Wissenswerte vermittelt.
+
+Im ersten Kapitel werden die Grundlagen einer Programmiersprache vermittelt, so die Ein- und Ausgabe und das Erstellen einfacher Listings. Im zweiten Kapitel werden dann Programmerstellung und -Steuerung vorgestellt. Alles wird mit einfachen, durchweg »netten« Beispielen verdeutlicht. Überhaupt findet sich in diesem Buch nicht der Ernst, der das Arbeiten mit anderen Veröffentlichungen manchmal schnell verleidet. Einige humorstische Abbildungen und ein leichter Schreibstil lassen dieses Handbuch zu einer Lektüre werden, bei der jeder neue Abschnitt mit anhaltendem Interesse angegangen wird.
+
+Am Ende jedes Kapitels stehen einige Fragen, die den Lernerfolg bestätigen sollen. Die in den ersten beiden Kapiteln vermittelten Grundkenntnisse werden im dritten Kapitel anhand eines Spielprogramms vertieft und mit einigen Raffinessen angereichert.
+
+In die Feinheiten von Basic führen dann die Kapitel vier und fünf ein, Stringfunktionen und Programmierhilfen lernt der Leser ebenso kennen wie den Umgang mit der Peripherie. Nachdem schließlich das Kapitel sechs ebenso wichtige wie interessante Funktionen und Routinen für eine gute Programmierung, wie Fehler-, String- und Va-riablenbehandlung vorstellt, wird im letzten Kapitel ein komplettes Programm entwickelt. Hier kann der inzwischen zum »Fast-Profi« gewordene Leser alle Kenntnisse anwenden, um den Zauberwürfel auf seinem Computer zu simulieren.
+
+Ein umfangreicher Anhang, in dem die verschiedenen Zahlensysteme sowie Tips zum Speichersparen und Programmbeschleunigen ebenso aufgelistet sind wie die Lösungen zu den Aufgaben am Ende jedes Kapitels schließt das Buch dann ab.
+
+In diesem Basic-Programmier-handbuch wird kein spezieller Basic-Dialekt zugrunde gelegt, jedoch finden sich viele Befehle und Funktionen, die auf einem Kleinstcomputer wohl kaum anzutreffen sind. Der Umfang und der verwendete Sprachschatz deuten hingegen an, daß dieses Buch auf Computer der gehobenen Klasse zugeschnitten ist. Da Dinge wie Grafik, Ton oder Peripherieansteuerung sehr rechnerspezifisch sind, wird im Buch nicht darauf eingegangen.
+
+Wer also eine gut zu lesende allgemeine und noch dazu umfangreiche Einführung ins Basic-Programmieren sucht, für den ist dieses Buch das Richtige. Sowohl als Lektüre zwischendurch wie bei der Arbeit am Computer bietet es sich an. Die sehr übersichtliche Gestaltung lädt direkt zum Nachschlagen ein, womit der Titel durchaus seine Berechtigung findet.
+
+(Bernd Schulte)
+
+Mitchell Waite/Miachel Pardee, Basic-Pro-grammier-Handbuch, Markt&Technik 1984, 506 Seiten, ISBN 3-922120-92-X, 78 Mark
+
+## Das Maschinensprachebuch für Fortgeschrittene zum Commodore 64
+
+Wer glaubt, daß das Thema »C 64« buchmäßig abgeschlossen sein müßte, wird von Data-Becker eines Besseren belehrt. Inzwischen sind über zwanzig Bücher dieses Verlags auf dem Markt. Eines davon ist das »Maschinensprachebuch für Fortgeschrittene zum Commodore 64«. Der Rückseitentext verspricht eine Einführung in die professionelle Maschinenspracheprogrammierung, angefangen bei der Problemanalyse, bis zu stets verwendbaren Tips und Tricks.
+
+Wer jetzt erwartet, eine Art Lehrbuch oder Kursus zu bekommen, wird allerdings enttäuscht. Denn der tatsächliche Inhalt läßt sich grob in drei Teilgebiete aufteilen:
+
+— Fließkommaarithmetik auf dem C 64 unter Ausnutzung schon vorhandener ROM-Routinen
+— Interruptprogrammierung
+— Selbstprogrammierte Basic-Erweiterungen
+
+Diese drei Teilgebiete werden auf je zirka 70 Seiten ausführlich und mit sehr vielen Beispielen besprochen.
+
+Dabei ist das Buch sehr verständlich geschrieben. So lernt man, wie versprochen, beim Lesen der einzelnen Kapitel und Ausprobieren der Beispiele, nicht nur etwas über die entsprechende Thematik, sondern auch über Maschinensprache im allgemeinen.
+
+Nur ein Detail hat mir an diesem Buch mißfallen: Die ständige »Werbung« für den Data-Becker-Assembler Profimat.
+
+Insgesamt kann ich das Buch folgenden zwei Gruppen wärmstens empfehlen:
+
+Denen, die ihren C 64 besser kennenlernen wollen und denen ein ROM-Listing dazu nicht reicht, sowie denen, die gerne in Maschinensprache »weiterkommen« wollen.
+
+(Boris Schneider)
+
+Lothar Englisch, Maschinensprache für Fortgeschrittene, Data Becker 1984, 200 Seiten, 39 Mark
+
+## PEEKs und POKEs zum Commodore 64
+
+Die große Reihe der Data-Becker-Bücher zum Commodore 64 ist um ein Buch reicher geworden. Es handelt sich um »PEEKs & POKEs zum Commodore 64« des Autors Hans Joachim Liesert.
+
+Dieses Buch erweckte sofort mein Interesse, versprach doch der Titel endlich einmal ein Werk, mit dessen Hilfe man sich durch den »POKE-Wald« des Commodore 64 kämpfen konnte, ohne dabei an den Rand des Wahnsinns zu gelangen.
+
+Dieses Buch ist für Anfänger gedacht und beginnt mit einer lockeren Einführung in die Arbeitsweise des Mikroprozessors 6502 und schließlich des gesamten Computers. Da die Informationen sehr ausführlich und genau nahegebracht werden, wird auch der blutigste Einsteiger schon innerhalb kürzester Zeit das Konzept eines Mikrocomputers verstehen.
+
+Nach den Grundlagen beginnt der Autor die wichtigsten Adressen des Speichers zu erläutern und die Funktionsweise anhand von Beispielen ausführlich darzustellen. Das fängt bei der Peripherieverwaltung an, geht über die Grafik und den Ton, bis hin zur Tastatur und schließlich zu Basic und Betriebssystem.
+
+Da praktisch keine Vorkennt-nisse verlangt werden und das Buch zudem sehr erfrischend und spannend geschrieben ist, wird auch der Anfänger bei der Lektüre nicht überfordert, und er wird schnell mit den Möglichkeiten seines C 64 vertraut.
+
+Etwas negativ bewerte ich nur den »Minikurs« für Maschinensprache am Ende des Buches, der eigentlich überflüssig ist, da sich die Adressaten des Buches, die noch ihre Anfangsschwierigkeiten mit PEEK und POKE überwinden müssen, sicherlich nicht in der Lage sehen, auch schon in Maschinensprache einzusteigen.
+
+Insgesamt sicher ein empfehlenswertes Buch, bei dem auch der wichtige Speicherbelegungsplan zum C 64 nicht fehlt.
+
+(Karsten Schramm)
+
+Liesert, Peeks & Pokes zum Commodore 64, Data Becker 1984, 150 Seiten, 29 Mark
+
+# Auf das »!« kommt es an
+
+> Das folgende Programm wurde aus der Not geboren. Es erleichtert das Laden von Diskette und macht das umständliche Laden und Listen des Directory überflüssig. Nebenher lernen Sie eine Reihe nützlicher Maschinenroutinen kennen.
+
+Geht es Ihnen auch so: Ich weiß nie genau, ob das Programm, das ich laden willl, nun »Disk Copy V 1.0« oder »Disk Copy V1.0« heißt. Versuche ich es mit »Disk*«, lade ich mit Si-cherheit »Disk Monitor«.
+
+Es hilft also nichts: Ich lade das Directory, liste es und — ärgere mich, weil das Programm, das ich laden wollte, ganz oben steht und beim Scrollen verschwindet. Also nochmal »LIST«, dann mit dem Cursor in die richtige Reihe fahren, »LOAD« eingeben, Cursor hinter den Programmnamen, »,8«eintippen. Der Computer antwortet mit einem verächtlichen »SYNTAX ER-ROR«, weil ich den Doppelpunkt mal wieder vergessen habe...
+
+Vielleicht stelle ich mich besonders dumm an, aber es sollte auch anders gehen. Für Tätigkeiten, die meine geistigen Fähigkeiten übersteigen, gibt es doch Computer! Aus diesem Gedanken entstand das Programm.
+
+Es wird mit »LOAD”!”,8,1« geladen, startet automatisch, liest das Directory ein und schreibt hinter jedes Programm eine Nummer. Wenn der Bildschirm voll ist, wartet es auf meine Eingabe. Tippe ich »+«, bekomme ich die nächsten Programme angezeigt. Tippe ich aber die Programmnummer und dahinter ein »L«, wird das entsprechende Programm automatisch geladen. Handelt es sich um ein Maschinenprogramm, das absolut geladen werden muß (mit »,8,1«), tippe ich hinter die Nummer ein »A«.
+
+## So funktioniert es
+
+Da ich nicht auf einen Autostart verzichten wollte, mußte das Programm vollständig in Maschinensprache geschrieben werden. Außerdem mußte es sehr kurz sein, denn ich hatte nur den Bereich von Speicherstelle 2 56 bis 600 ($0100 — $0258) zur Verfügung. Zu allem Unglück benötigen die Betriebssystemroutinen, die das Programm verwendet, auch noch Platz in diesem Bereich (Prozessorstack). Deshalb mußte ich auf alles verzichten, was nicht unbedingt nötig war. Es gibt also kein Menü für den Benutzer, ebenso keine Möglichkeit, das Programm zu unterbrechen, wenn man nichts laden will. Man kann nur »OL« eingeben, dann springt es mit einer Fehlermeldung ins Basic zurück. Trotzdem ist der verfügbare Speicher bis auf das letzte Byte belegt.
+
+Die folgende Programmbeschreibung ist zwangsläufig sehr theoretisch. Das Programm läuft ja aber auch, wenn man sie nicht versteht. Machen Sie sich aber ruhig einmal die Mühe. Vielleicht können Sie doch den einen oder anderen nützlichen Tip bekommen. Wem es zu kompliziert wird, der kann bei den »Hinweisen zum Abtippen« weiterlesen.
+
+Nehmen Sie also das Assembler-Listing zur Hand und folgen Sie mir in die Tiefen der Maschinensprache... Zur besseren Übersicht habe ich die einzelnen Teile beschrieben und immer die entsprechenden Zeilennummern dahintergesetzt.
+
+Im Programmkopf bis Zeile 320 werden die Betriebssystemroutinen und die Variablen definiert. Sie sind nochmals im Kasten erläutert. Als Startadresse wird $010A festgelegt, der Maschinencode kann aber nicht direkt dorthin assembliert werden, sonst würde ja der Autostart anlaufen. Deshalb wird er zunächst in den Bereich $C00A — $C158 geschrieben.
+
+Das Programm selbst beginnt mit Zeile 1510. Die Routine »DIRIN« lädt das Directory in den Speicher. Dazu benutzen wir die Betriebssystemroutine »LOAD«. Diese braucht zur Vorbereitung die Routinen SETLFS und SETNAM. SETLFS bestimmt die logische Filenmmer (01), die Geräteadresse (08) und die Sekundäradresse (0 für Lesen). SETNAM übergibt den Filenamen, in unserem Falle »$«. LOAD muß schließlich noch wissen, wohin das Directory geladen werden soll. Diese Adresse (Anfang des Basic-Speichers, steht in ($2B/$2C) wird im X- und Y-Register übergeben. Um die richtigen Koppeladressen zu erhalten, muß anschließend noch die Basic-Routine aufgerufen werden, die das für uns erledigt ($A533). Jetzt steht unser Directory genauso im Speicher wie sonst und wartet darauf, auf dem Bildschirm ausgegeben zu werden.
+
+Die Ausgabe kann aber nicht wie beim normalen Listen erfolgen, denn wir wollen ja hinter jedem Namen eine Nummer ausgeben. Also müssen wir das selbst in die Hand nehmen. Mit einem kühnen Sprung geht es deshalb jetzt nach DIROUT. Sehen wir uns nun den Speicherausdruck eines Directory etwas genauer an:
+
+Es geht los bei $0801. Dort steht die Adresse des nächsten Eintrages $081F. Wie immer steht im Speicher zuerst das Low-Byte und dahinter das High-Byte. Es folgt der Diskettenname, der in diesem Falle mit dem des Verfassers auffallend übereinstimmt. Der erste Eintrag beginnt also mit Adresse $081F. Dort finden wir wieder die Adresse des nächsten Eintrages ($083F). Jeder Eintrag hat übrigens die gleiche Länge, nämlich 32 Byte. Wir werden davon später noch Gebrauch machen.
+
+Die 2 Byte hinter der Koppeladresse enthalten die Länge des Programms in Blöcken, in unserem Falle also $0002. Nun kommen ein paar Leerzeichen ($20). Wieviele, hängt davon ab, ob die Blocklänge ein, zwei oder drei Ziffern benötigt. Die Namen sollen ja beim Listen schließlich ordentlich untereinander stehen. Jetzt folgt der Filename, von Anführungszeichen eingeschlossen. 8ie haben es sicher schon bemerkt: Das Directory dieser Diskette hat als erstes Programm das »!« wie sich das für anständige Disketten gehört!
+
+Jetzt wieder einige Leerzeichen und schon ist der nächste Fileeintrag erreicht. Das geht so weiter bis eine Koppeladresse erreicht wird ($089D in Adresse $087F), die aus dem Rahmen fällt. In Adresse $089D stehen nämlich zwei jämmerliche Nullen. 8o, sagt sich das Betriebssystem, jetzt ist aber Schluß. Und es hat wie so oft recht...
+
+Zurück zu unserem Programm. Es soll ja jetzt ein Directory auf den Bildschirm ausgeben, und zwar schöner, als es das Betriebssystem jemals könnte. Wir initialisieren also unsere Variable USE mit dem Basic-Anfang ($0801). In Zeile 390 beginnt eine Schleife, die immer eine Zeile ausgibt. Zuerst holen wir uns die Koppeladresse und speichern sie in NEXT (Zeile 410 — 460). Als nächstes müssen wir die 2 Byte mit der Blocklänge in eine ordentliche Dezimalzahl umwandeln. Das erledigt für uns die Basic-Routine »NUMOUT« (470 — 520). Jetzt brauchen wir nur noch den Namen mit allen Leerzeichen davor und dahinter, auszugeben (530 — 580).
+
+Eigentlich müßte nun die Programmnummer ausgegeben werden, aber damit warten wir noch. Aus folgendem Grund: Wir wollen diese Schleife ja für jede Zeile benützen, auch für die letzte. In der steht aber die »BLOCKS FREE«-Meldung und dahinter darf ja keine Nummer mehr erscheinen. Wir müssen also vorher prüfen, ob wir schon die letzte Zeile erreicht haben.
+
+Dazu übertragen wir die Adresse des nächsten Files, die wir in NEXT aufbewahrt haben, nach USE. Zeigt USE jetzt auf eine Null, sind wir fertig und springen ans Ende unserer Routine, nach DIR4 (590 — 650). Ist das aber noch nicht der Fall, geben wir unsere Programmnummer aus. Den Cursor stellen wir dazu auf Spalte 27 ($1B) und benutzen wieder NUMOUT, um FILENR als Dezimalzahl auszugeben (660 — 700). Eine Zeile wäre geschafft! Im folgenden bereiten wir uns auf die nächste Filenummer vor und springen wieder nach oben zu DIR1 zurück. Sollten aber schon 20 Zeilen auf dem Bildschirm stehen, merken wir uns im ENDFLG, daß wir noch nicht fertig sind und verlassen die Ausgaberoutine vorerst. Erinnern Sie sich, wir wollten vermeiden, daß der Bildschirm ohne unseren ausdrücklichen Befehl wegscrollt (710 — 800).
+
+Der Bildschirm hat sich inzwischen gefüllt, unsere Nummern stehen fein säuberlich hinter den Programmen, nun sollte uns ein freundlich blinkender Cursor dazu animieren, dem Computer mitzuteilen, wie es weitergehen soll. Also hinein in die Routine WAHL
+
+Das Wichtigste erledigt hier die Betriebssystemroutine CHRIN. Sie läßt den Cursor blinken, bis »RETURN« gedrückt wird, schreibt die eingegebenen Zeichen auf den Bildschirm und liest sie anschließend vom Bildschirm wieder ab, damit wir sie schön der Reihe nach bearbeiten können. Wir speichern alle Zeichen zunächst im BUFFER und sehen uns dann das letzte Zeichen genauer an (820 — 900). Als erstes prüfen wir, ob ein »+« eingegeben wurde. Wenn ja, setzen wir FILEANZ wieder auf Null, und, je nachdem ob das ENDFLG Ende signalisiert oder nicht, auch die FILENR. Anschließend erfolgt der Rücksprung in die Directory-Ausgabe (910 — 980).
+
+Wurde kein »+« eingegeben, prüfen wir weiter auf »L« beziehungsweise »A«. In Abhängigkeit davon setzen wir das ABSFLG (990 — 1070). Jetzt müssen wir herausfinden, welche Programmnummer geladen werden soll. Dazu müssen wir die ein oder zwei Dezimalzahlen in ein Hexbyte umwandeln, weil unser Computer nun mal nichts anderes versteht. Andererseits ist es ja nicht einzusehen, daß wir uns auf sein mathematisches Niveau herabbegeben und unsere Zahlen demnächst als Hex- oder noch schlimmer als Binärzahlen eingeben. Das Umwandeln ist ja gar nicht so schwierig. Wir holen uns die Einerziffer und zählen dann so oft 10 ($0A) dazu, wie die Zehnerziffer angibt. Da der Computer sich unsere Ziffern abernichtalsO,1...9merkt, sondern als$30, $31... $3A, müssen wir jeweils die oberen 4 Bits ausmaskieren. Das war’s denn auch schon. In FILENR steht zur Belohnung tatsächlich die gewünschte Filenummer mundgerecht für unseren Computer (1080 — 1200).
+
+Jetzt haben wir das Schlimmste — fast — hinter uns. Wir brauchen nur noch den passenden Filenamen zu suchen. Den holen wir uns aus dem Directory. In bewährter Weise benutzen wir unsere Variable USE. Um den Diskettennamen zu überlesen, zählen wirzum Basic-Anfang in $2B/$2C 35 ($23) dazu. Damit liegen wir so ungefähr richtig, aufjeden Fall vor dem ersten Namen. Erinnern sie sich, jeder Eintrag im Directory belegt genau 32 Byte. Allerdings beginnen die Filenamen nicht immer so schön regelmäßig wie in unserem Beispiel, immer an der selben Stelle. Wir müssen den Anfang des Namens also noch genau suchen. Vorher brauchen wir aber erst einmal die richtige Stelle im Directory. Wir addieren zu USE jetzt daher so oft 32 ($20), wie in FILENR angegeben (1250 — 1400).
+
+Jetzt müssen wir in unserem Programm ein Stück überspringen, weil die folgenden Bytes wegen des Autostarts auf 2 ge-setztwerden müssen. Weiter geht es mit LAD2 in Zeile 1780. Vorher steht allerdings im Programm noch die Subroutine FIN-DA.E, was so viel wie »Finde den Anfang beziehungsweise das Ende des Namens« bedeutet. Sie durchsucht den Text, auf den USE zeigt, nach einem Anführungszeichen und übergibt im Akku, wieviel Zeichen es bis dahin sind (1680 — 1750).
+
+Diese Zahl addieren wir zu USE — eins mehr, denn das Anführungszeichen selbst gehört ja nicht mit zum Namen. Mit FINDA.E erhalten wir im Akku die Länge des Namens, so wie es die Routine SETNAM, die wir oben schon benutzt haben, verlangt. Noch ein kurzer Sprung nach SETLFS, wo wir in Abhängigkeit vom ABSFLG als Sekundäradresse Null oder Eins übergeben. Den Rest erledigt die Basic-Routine BASICLOAD (1780—1940). Geschafft, dieschönste Zeile imAssemblerli-sting ist erreicht: .EN heißt ENDE.
+
+Sicher, es war nicht ganz einfach, aber wenn Sie mir bis hierhin gefolgt sind, haben Sie eine ganze Reihe kleiner Routinen gelernt, wie sie in jedem Maschinenprogramm gebraucht werden.
+
+TODO table!
+NUMOUT ($BDCD) — wandelt zwei Hexbytes in eine Dezimalzahl um und gibt sie aus. (HByte im Akku, LByte im X-Reg)
+SETLFS ($FFBA) — übergibt logische Filenummer (Akku), Geräteadresse (X-Reg) und Sekundäradresse (Y-Reg).
+SETNAM ($FFBD) — übergibt den Filenamen. Akku enthält die Länge des Namens, X-Reg das LByte, Y-Reg das HByte der Adresse, an der der Name beginnt.
+LOAD ($FFD5) — lädt das durch SETLFS und SETNAM bezeichnete File an die Adresse, die im X-Reg (LByte) und im Y-Reg (HByte) angegeben ist. Der Akku enthält 0 für LOAD und 1 für VERIFY.
+CHRIN ($FFCF) — holt Zeichen von dem in $99 festgelegten Eingabegerät. Der Cursor blinkt, bis RETURN eingegeben wird. Die Zeichen werden dann vom Bildschirm gelesen und im Akku übergeben.
+CHROUT ($FFD2) — gibt das ASCII-Zeichen im Akku aus.
+Variable
+BUFFER — ist ein Zwischenspeicher.
+USE und NEXT — enthalten die Adresse des gegenwärtigen beziehungsweise nächsten Directory-Eintrages.
+FILENR — ist die aktuelle Filenummer im Directory.
+ABSFLG — ist ein Flag, das normales oder absolutes Laden signalisiert. FILEANZ — enthält die Anzahl der auf dem Bildschirm ausgedruckten Files.
+ENDFLG — ist ein Flag, das signalisiert, ob das Ende des Directory bereits erreicht ist.
+
+Betriebssystem-Routinen
+
+### Hinweise zum Abtippen
+
+Das Programm kann nicht an die Stelle geschrieben werden, an der es endgültig stehen soll, weil sonst ja der Autostart anlaufen würde. Wir schreiben es daher zuerst nach 49152 ($C000). Tippen Sie zuerst den Basic-Lader ein. Nach RUN muß der Text aus Zeile 30 erscheinen, sonst haben Sie einen Fehler gemacht. Legen Sie nun eine neue Diskette ein, und drücken Sie eine Taste. Das Programm wird nun auf die Diskette geschrieben, allerdings mit der falschen Startadresse. Schalten Sie danach bitte den Computer aus und wieder ein. Um die falsche Startadresse zu ändern, geben Sie das Programm »Startadresse« ein und starten Sie es mit RUN. Jetzt wird die Adresse geändert, und Sie haben das »!«lauffähig auf Ihrer Diskette. Um es auf andere Disketten zu übertragen, verwenden Sie ein Kopierprogramm, zum Beispiel »Super Copy«.
+
+Und dann lehnen Sie sich zurück, geben LOAD »!«,8,1 ein und genießen die Früchte Ihrer Arbeit.
+
+(Dietrich Weineck/rg)
+
+# Spielen in der dritten Dimension
+
+> »3D-Vier gewinnt« ist eine interessante Variante des bekannten Strategiespiels. Bemerkenswert ist auch, daß der Autor ohne Steuerzeichen ausgekommen ist.
+
+Bei »3D-Vier gewinnt« setzen die beiden Spieler abwechselnd einen Spielstein auf eines der 16 Felder, die in vier Reihen und vier Spalten angeordnet sind. Hierbei werden Türme von maximal vier Steinen Höhe gebildet. Sieger ist, wer als erster eine beliebige Reihe oder Diagonale — auch Raumdiagonale — mit vier Steinen besetzt. Sollten zuvor alle 64 möglichen Felder besetzt sein, so geht das Spiel unentschieden aus.
+
+### Zum Programm:
+
+Man kann wahlweise gegen einen Spielpartner oder, bei unterschiedlicher Spielstärke, gegen den Computer antreten. Der Computer benötigt hierbei, obwohl das Programm in reinem Basic geschrieben ist, weniger als zehn Sekunden Bedenkzeit. Es ist auch möglich, den Computer sich selbst zu überlassen. Das Programm übernimmt die dreidimensionale Darstellung, überwacht die Korrektheit der Züge und ermittelt den Sieger.
+
+Während des Spieles kann man sich jederzeit vom Computer einen Zugvorschlag holen, der allerdings mit Vorsicht zu genießen ist (da Spielstärke 1 voreingestellt ist) und auf Wunsch die Seiten wechseln. Alle nötigen Eingaben werden im Dialog erfragt. Bleibt nur zu erklären, wie man einen Zug ausführt: Während des Spieles ist in der linken Bildschirmhälfte die dreidimensionale Darstellung des Spielfeldes zu sehen. Rechts erscheint in schematisierter Form eine Draufsicht auf das Spielfeld, wobei in deren unteren linken Ecke ein Cursor erscheint. Dieser läßt sich nun, entweder mit einem Joystick in Port 2 oder mittels der Cursortasten an die gewünschte Position dirigieren. Drückt man nun den Feuerknopf beziehungsweise die Return-Taste, wird der gewünschte Zug — sofern er den Regeln entspricht — ausgeführt.
+
+Bei Spielende ertönt eine kleine Melodie, und das Programm verdeutlicht durch Blinken der entsprechenden Spielsteine die Gewinnsituation. Außerdem wird der Name des Siegers angezeigt. Durch Drücken einer beliebigen Taste startet man ein neues Spiel.
+
+### Detailbeschreibung — Spielstrategie:
+
+Jedes Feld ist durch eine x-, y- und z-Koordinate eindeutig bestimmt. Damit der Computer etwas zu rechnen hat, wird jedem möglichen Zustand der einzelnen Felder ein Zahlenwert zugeordnet, der im dreidimensionalen Feld FE gespeichert wird. Hierbei bedeutet
+3 = das Feld ist von Spieler 2 besetzt
+2 = das Feld ist von Spieler 1 besetzt
+1 = das Feld ist unbesetzt, kann aber im nächsten Zug besetzt werden
+0 = unbesetztes Feld
+
+Ist der Computer am Zug oder wird ein Zugvorschlag gewünscht, geschieht folgendes: Der Computer berechnet für jedes mögliche Feld (FE(X,Y,Z)=1) eine Bewertung (im Programm ab Zeile 2000) und entscheidet sich dann für das Feld mit der höchsten Bewertung. Mit einem kleinen Trick wurde der Zeitaufwand hierfür minimiert: Für die Entscheidung, ob ich in die linke untere Ecke setze, ist es unwesentlich, wie es rechts oben aussieht. Das Programm bewertet also jede Viererreihe getrennt und ermittelt die Bewertung eines Feldes als Summe der Bewertungen aller Viererreihen, an denen dieses Feld beteiligt ist. Der große Zeitvorteil ergibt sich jetzt dadurch, daß nach jedem Zug nur einfach jene Reihen neu bewertet werden müssen, in denen sich wirklich etwas geändert hat (ab Programmzeile 2 500).
+
+Bei der Spielstärke 2 wird im Gegensatz zur Spielstärke 1 mit berücksichtigt, daß das darüberliegende Feld im nächsten Zug vom Gegner besetzt werden kann. Deshalb wird dieses Feld (mit negativem Vorzeichen) ebenfalls bewertet. Dadurch verdoppelt sich allerdings die Bedenkzeit bei Spielstärke 2.
+
+In den Programmzeilen 3010, 3100 und 3180 steht der Aufruf »SYS 58732«. Hierbei handelt es sich um eine Betriebssystem-Routine, die nach der Cursorpositionierung (durch Setzen der Speicherstellen 211 und 214) die Bildschirmparameter neu bestimmt.
+
+(Uwe Weiß/rg)
+
+# Druckfehlerteufelchen
+
+### Hardcopy mit dem VC 1520, Ausgabe 7/84, Seite 108
+
+Die korrekte Zeile lautet:
+POKE44,64:POKE64*256, 0:NEW
+und nicht 64-256!
+
+### Einzeiler, Ausgabe 11/84, Seite 155
+
+Die Spaces bei dem Einzeiler DI-AS müssen als Shift-Space eingegeben werden.
+
+### Die Ebenen des Absturzes, 11/84, Seite 93
+
+Das letzte Datum in Zeile 360 (Programm UNNEW) lautet 255.
+
+### User-Port-Tastatur, Ausgabe 10/84, Seite 93
+
+Das Datum 28 in Zeile 880 muß in 82 umgewandelt werden.
+
+### FLIST, Ausgabe 10/84, Seite 90
+
+Der Hinweis für Druckerbesitzer muß natürlich lauten:
+OPEN1,4:CMD1:FLIST und nach dem Drucken: PRINT#1:CLOSE1
+
+Außerdem bin ich durch Zufall auf einen Programmfehler gestoßen, der bei aktivem Programm auftritt und bei einer Variablenzuwei-sung, bei der die Variable mit F beginnt einen SYNTAX ERROR erzeugt (zum Beispiel beiF=l, FX = 100 etc.).
+
+Dies kann man auf zwei Arten verhindern:
+
+Entweder schaltet man die Erweiterung vor dem Starten eines Basic-Programms durch SYS 58451 ab, oder man ändert den Basic-Lader wie folgt:
+
+Den Endwert der FOR-NEXT-Schleife auf 981 setzen, in Zeile 230 den letzten Wert 8 durch 195 und in Zeile 240 den ersten Wert 175 in 3 abändern.
+
+Dann fügt man diese DATA-Zeilen an:
+440 DATA 56,165,122,233
+450 DATA 1,133,122,165
+460 DATA 123,233,0,133 470 DATA 123,32,121,0 480 DATA 76,231,167
+
+Michael Weidlich
+
+### So macht man Basic-Programme schneller, Ausgabe 10/84, Seite 55
+
+Bei den Versionen 1 für C 64 und VC 20 wurde in den Zeilen 40 jeweils nach dem Z ein »,1« vergessen. Also: 40 POKE 7680 + Z,1: POKE 38400 + Z,6 etc.
+Seite 58, Version 13: 40 PRINT"A”;
+
+### MSD-Super-Disk-Drive, Ausgabe 11/84, Seite 15
+
+Die vollständige Bezugsadresse von Softline lautet: Softline, Schwarzwaldstraße 8a, 7602 Oberkirch, Tel.: 07802/3707
+
+### Titelfoto, 11/84, Seite 1
+
+Das Titelfoto dieser Ausgabe wurde von Limelight Studio, Karolinenstraße 3, 8000 München 22, Tel.: 0 89/22 23 97 erstellt.
 
 
 
