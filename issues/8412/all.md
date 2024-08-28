@@ -463,7 +463,7 @@ Detlev Preisler
 Beide Programme arbeiten wie folgt zusammen:
 
 - Simons Basic laden und starten.
-- DOS 5.1 mit ”LOAD” ”DOS 5.1",8.1 laden und mit SYS 52224 starten.
+- DOS 5.1 mit ”LOAD” ”DOS 5.1",8,1 laden und mit SYS 52224 starten.
 
 Es geht natürlich auch umgekehrt, kann aber dann in einigen Fällen zu Problemen führen.
 
