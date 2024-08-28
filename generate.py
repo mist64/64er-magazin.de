@@ -96,7 +96,11 @@ def parse_cli_into_config():
     if config.lang != 'de':
         config.base_dir += '/' + config.lang
 
-    print(f"  > branch '{config.git_branch_name}' -> '{config.base_dir}'")
+    git_status = ''
+    if config.git_has_changes:
+      git_status = '+'
+
+    print(f"  > branch '{config.git_branch_name}'{git_status} -> '{config.base_dir}'")
 
     # if the current build should be uploaded: do some sanity checking
     if config.deploy:
@@ -116,7 +120,16 @@ def parse_cli_into_config():
 
 
 CONFIG = parse_cli_into_config()
-print(CONFIG)
+
+git_status =  '\n  <!!!> Has uncommited changes!' if CONFIG.git_has_changes else ''
+
+print(f"""
+    > base_dir: {CONFIG.base_dir}
+    > deploy: {CONFIG.deploy}
+    > build_future: {CONFIG.build_future}
+    > start_local_server: {CONFIG.start_local_server}
+{git_status}
+""")
 
 
 #
