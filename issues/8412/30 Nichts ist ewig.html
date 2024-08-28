@@ -19,6 +19,11 @@
 
         <p class="intro">Zugegeben, der Commodore 64 hat einige Nachteile. Aber warum sollte man sich damit abfinden? Alles kann mit dem ROM-Change-Programm verändert werden.</p>
 
+        <figure>
+            <img src="30-1.png" alt="">
+            <figcaption>Bild 1. Die Steckplätze U3 bis U5</figcaption>
+        </figure>
+
         <p>Jedem Computer, auch dem Commodore 64 wird ab Werk eine bestimmte Ausstattung an Software mit auf den Weg gegeben. Damit ist nicht die Demo-Diskette gemeint, sondern die fest im Computer eingebaute, auf PROMs gespeicherte Firmware. Sie sorgt dafür, daß der Commodore überhaupt auf Eingaben reagiert oder einen Basic-Befehl ausführt.</p>
 
         <p>Der gesamte C 64 (und jeder andere Computer) ist eigentlich nichts anderes als eine Anzahl miteinander verdrahteter Baugruppen, die allein zu nichts fähig sind. Leben eingehaucht wird dem ganzen erst durch ein sehr wichtiges Programm, das sogenannte Betriebssystem. Dieses Programm initialisiert und verwaltet die gesamte Hardware. Beim Commodore 64 ist es genau 8 KByte lang und liegt im Bereich von $E000 bis $FFFF. Der zweite wichtige Festwertspeicher ist der Basic-Interpreter. Er ist ein Übersetzungsprogramm, das eine Anweisung in ein maschinengerechtes Signal umwandelt. Auch der Interpreter benötigt 8 KByte und liegt im Bereich von $A000 bis $C000. Jetzt fehlt nur noch der Charakter-Set von 4 KByte, der ebenfalls in einem eigenen ROM untergebracht ist.</p>
@@ -29,9 +34,19 @@
 
         <p>Der zweite und wesentlich reizvollere Weg die Firmware zu beeinflussen ist, das Betriebssytem dauerhaft zu verändern. Dazu ist aber ein Eingriff im Computer notwendig, denn die oben beschriebenen Bausteine müssen gegen andere ausgetauscht werden. Wer also noch Garantie auf seinen Commodore hat, sollte besonders vorsichtig sein. Im ersten Teil dieses Artikels wollen wir, zum Einüben sozusagen, die Funktionstasten des Commodore 64 mit bestimmten, oft gebrauchten Werten belegen. Im zweiten Teil wird das Hypra-Load aus der Ausgabe 10/84 im Betriebssytem verankert. Der Nachteil dieser Änderungen soll nicht verschwiegen werden. Da alle neuen Funktionen natürlich Speicherplatz benötigen, müssen andere Teile des Betriebssystems entfallen. Wir haben uns entschlossen, die Kassettenroutinen ab $F800 herauszunehmen und zu überschreiben. Das Laden von Kassette wird dadurch unmöglich, es sei denn, das alte Betriebssystem wird parallelgeschaltet.</p>
 
+        <figure>
+            <img src="30-2.png" alt="">
+            <figcaption>Bild 2. Der 2764 (links) und der 2364 (rechts)</figcaption>
+        </figure>
+
         <p>Bevor wir nun auf das Hilfsprogramm für diese Veränderungen, das ROM-Change-Programm, eingehen, sollen die Hardware-Voraussetzungen für die Änderung des Betriebssystems erklärt werden. Nach dem Öffnen des Computers finden wir auf der linken hinteren Seite drei kleine Bausteine, hinter denen auf der Platine die Bezeichnungen U3 bis U5 stehen. U3 ist der Basic-Interpreter, U4 das Betriebssytem, U5 das Charakter-ROM (Bild 1). Heute interessieren wir uns aber nur für den U4-Steckplatz. Wer Glück hat, findet dort einen Stecksockel. Wer Pech hat, muß seinen Händler oder einen Lötkolbenfachmann bitten, ihm hier einen Stecksockel einzulöten. Anstelle des dort befindlichen ROMs kann aber, und das ist die wesentlichste Veränderung, auch ein EPROM stecken. Am besten eignen sich hierzu die 2564-Typen, denn sie sind pinkompatibel zu den Commodore-ICs. Leider sind sie sehr schwer zu beschaffen. Im Normalfall wird aber wahrscheinlich ein 2764-EPROM Verwendung finden. Der Nachteil dieses EPROMs besteht in einer anderen Belegung der Anschlußpins. Hier hilft allerdings ein einfacher Adaptersockel. Dazu braucht man einen 24- und einen 28-Pin-Stecksockel. Diese beiden Sockel werden miteinander verdrahtet (Bild 2 und 3). Bild 2 zeigt die beiden Sockel mit den Beinen nach unten stehend. Der kleine Sockel steckt später im U4-Steckplatz, der größere Sockel trägt das geänderte Betriebssystem und steckt auf dem kleineren Sockel. Vor dem Einbau ist es aber ratsam, alle Kontakte auf richtigen Anschluß und Leitfähigkeit zu überprüfen. Schon ein einziger falscher Anschluß führt zum »Absturz« des gesamten Systems. Bild 4 zeigt, wie der neue Sockel mit der EPROM-Kerbe zur Gehäuse-Rückseite auf der Platine steht.</p>
 
         <p>Nun aber zur Praxis, dem ROM-Change-Programm. Es ermöglicht das gefahrlose Ändern und Ausprobieren aller Umprogrammierungen. Dazu wird nach dem Start der selektierte ROM-Bereich (Betriebssytem oder Basic) ab Adresse $6000 ins RAM kopiert. Das geschieht mit einem kurzen Maschinenprogramm, das im Kassettenpuffer steht. Das Programm ist für den Betrieb mit einem Diskettenlaufwerk gedacht, läuft aber auch im Kassettenbetrieb, wenn ein eigener Monitor zum Laden und Abspeichern Verwendung findet. Nach dem Kopieren erscheint das Hauptmenü, von dem aus alle wichtigen Funktionen erreichbar sind. Die erste dient dem Einlesen von fest im Programm eingebauten DATA-Zeilen. In unserem Beispiel sind ab Zeilennummer 8000 die DATAs für die Funktionstasten einprogrammiert. Hier können natürlich auch eigene Werte stehen. Die erste Zahl gibt dabei die reelle Adresse an, ab der die DATAs geschrieben werden sollen (zum Beispiel 57612 = $E10C). Der Computer errechnet dann die entsprechende Stelle im RAM. Die zweite Zahl gibt an, wieviel Bytes übertragen werden sollen. Die dritte Zahl ist die Prüfsumme. Danach folgen die Programm-DATAs. Bei einem Prüfsummenfehler zeigt der Computer die falsche Prüfsumme an. Eigene Daten werden einfach an die vorhandenen DATAs angehängt. Die ersten drei Bytes müssen natürlich auch die obige Bedeutung haben. Als letzte Zeile muß stehen: DATA 0, da es sonst zu einem OUT OF DATA ERROR kommt. Der zweite Menüpunkt liest Maschinenprogramme direkt an die vorgesehene Stelle. Damit kann man beispielsweise ein Programmfile, das von einem Assembler erzeugt wurde, direkt einlesen. Wichtig ist, daß die Startadresse des Programms im ROM-Adreßbereich beziehungsweise im Bereich $6000 liegt. Der mit Punkt 3 wählbare Minimonitor hilft beim schnellen Ändern einzelner Bytes im hexadezimalen Zahlensystem. Die Startadresse entspricht dabei der Adresse im ROM. Der Minimonitor wird durch Eingabe einer Zahl größer $FF oder des Buchstabens X verlassen. Will man keine Speicherstelle ändern, genügt RETURN für die Übernahme des alten Wertes. Für größere Änderungen reicht dieser Minimonitor natürlich nicht mehr aus. Dazu wird mit Punkt 4 ein eigener Monitor aktiviert. Dieser muß allerdings vor dem Start des ROM-Change-Programms bereits geladen sein. Der Monitor darf im Bereich von $8000 bis $9FFF oder von $C000 bis $CFFF stehen. Zum Starten genügt das Eingeben der Startadresse des Monitors hexadezimal!). Mit den Menüpunkten 5 und 6 wird der Speicherbereich von $6000 bis $7FFF geladen beziehungsweise abgespeichert. Das Laden eines kompletten Betriebssystems dauert allerdings mehrere Minuten. Einer der wichtigsten Menüpunkte ist aber der siebte. Er startet das gerade veränderte oder geladene neue Betriebssystem (es wird natürlich zuerst in seinen richtigen Speicherbereich verschoben). Vor dem Ausprobieren dieser Funktion muß in jedem Fall der Punkt 5 angewählt werden, wenn die Änderungen nicht verlorengehen sollen. Es kann vorkommen, daß das Betriebsystem beim Starten »abstürzt«. Dann genügt ein RESET und die erneute Aktivierung des geänderten ROMs durch POKE 1,53.</p>
+
+        <figure>
+            TODO
+            <figcaption>Bild 3. So wird der 2764 mit den Pins des 2364-Sockels verbunden</figcaption>
+        </figure>
 
         <p>Sind alle Tests im RAM positiv verlaufen, können wir uns an die Speicherung des neuen Betriebssytems auf EPROMs heranwagen. Das neue Betriebssystem wird von Diskette in den RAM-Bereich ab $6000 absolut, das heißt mit LOAD"Ihr Betriebssytem",8,1 geladen. Ab dieser Adresse beginnt auch die Programmierung des EPROMs. Sie endet bei $8000 (8 KByte). Das neue EPROM wird anschließend in den beschriebenen Stecksockel eingesetzt und in Steckplatz U4 befestigt. Fertig ist das Betriebssytem.</p>
 
@@ -41,7 +56,12 @@
 
         <address class="author">(Arnd Wängler/Ernst Schöberl/aa)</address>
 
-        <p>Beim Abtippen des Programms sind die Werte in Klammern am Ende einer Zeile nicht miteinzugeben. Sie sind erst für eine spätere Ausgabe von Bedeutung. Unterstrichene Buchstaben sind mit der Shift-Taste, überstrichene mit der Commodore-Taste einzugeben. Bei Ausdrücken in eckigen Klammern ist die jeweilige Taste zu drücken.</p>
+        <figure>
+            <img src="30-4.png" alt="">
+            <figcaption>Bild 4. Das EPROM 2754 zweifach »gesockelt«</figcaption>
+        </figure>
+
+        <p class="literatur">Beim Abtippen des Programms sind die Werte in Klammern am Ende einer Zeile nicht miteinzugeben. Sie sind erst für eine spätere Ausgabe von Bedeutung. Unterstrichene Buchstaben sind mit der Shift-Taste, überstrichene mit der Commodore-Taste einzugeben. Bei Ausdrücken in eckigen Klammern ist die jeweilige Taste zu drücken.</p>
 
     </article>
 
