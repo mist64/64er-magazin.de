@@ -1,62 +1,86 @@
-<h1>Bewegte Grafik und Text mischen</h1>
+<!DOCTYPE html>
+<html lang="de">
 
-<p class="intro">Wer an Sprites denkt, stellt sich meist kleine Männchen oder Raumschiffe vor. Aber auch beim Einsatz in Anwendungsprogrammen können Sprites zur grafischen Illustration sehr nützlich sein.</p>
+<head>
+    <title>XXX</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="XXX">
+    <meta name="64er.issue" content="12/84">
+    <meta name="64er.pages" content="999">
+    <meta name="64er.id" content="XXX">
+</head>
 
-<p>Als ich die Grafik entwarf, wollte ich ein Programm unter folgenden Gesichtspunkten schreiben: kein Spielkram und von Basic aus verwendbar. Damit diese Erweiterung auch mit anderen Basic-Erweiterungen ohne weiteres funktioniert, sollten die Befehle über »SYS« aufgerufen werden. Nun sollte es kein Allerweltsprogramm sein, sondern irgend etwas Neues. Da fielen mir die Sprites ein. Mit dem richtigen Programm könnten damit kleine aber deutliche Grafiken erstellt werden, zum Beispiel Niederschlags-Temperatur- oder Umsatztabellen. Als ideal fand ich vier Sprites hintereinander und das zweimal untereinander. Das gibt eine Auflösung von immerhin 95 x 42 = 4032 Punkten. Damit läßt sich schon einiges machen. Zur Handhabung werden vier Routinen benötigt. Eine zum Einschalten der Grafik, eine zum Setzen beziehungsweise Löschen der Punkte und eine zum schnellen Löschen der gesamten Grafik. Weiterhin noch eine, die die ganze Grafik auf eine Farbe setzt.</p>
+<body>
+    <article>
 
-<h3>Das Einschalten und Positionieren der Grafik</h3>
+        <h1>Bewegte Grafik und Text mischen</h1>
 
-<p>Dazu sind vier Parameter nötig, zwei für die x,y-Koordinaten und zwei für die x,y-Ausdehnung, also das Spreizen der Sprites. Je nachdem, ob gespreizt oder nicht, werden die Koordinaten berechnet und in die jeweiligen Register abgelegt. Zum Schluß werden noch alle Sprites aktiviert. Der Einfachheit halber kann x nur Werte zwischen 0 und 255 haben. Bei x=255 und ungespreizt ragt die Grafik sowieso schon aus dem Bildschirm heraus. Auch sollte man mit dem y-Wert nicht zu hoch gehen, da sonst die Grafik möglicherweise oben in den Bildschirm hereinkommt. Diese Einschränkungen sind aber in den meisten Fällen unwesentlich.</p>
+        <p class="intro">Wer an Sprites denkt, stellt sich meist kleine Männchen oder Raumschiffe vor. Aber auch beim Einsatz in Anwendungsprogrammen können Sprites zur grafischen Illustration sehr nützlich sein.</p>
 
-<h3>Das Setzen beziehungsweise Löschen von einem Punkt</h3>
+        <p>Als ich die Grafik entwarf, wollte ich ein Programm unter folgenden Gesichtspunkten schreiben: kein Spielkram und von Basic aus verwendbar. Damit diese Erweiterung auch mit anderen Basic-Erweiterungen ohne weiteres funktioniert, sollten die Befehle über »SYS« aufgerufen werden. Nun sollte es kein Allerweltsprogramm sein, sondern irgend etwas Neues. Da fielen mir die Sprites ein. Mit dem richtigen Programm könnten damit kleine aber deutliche Grafiken erstellt werden, zum Beispiel Niederschlags-Temperatur- oder Umsatztabellen. Als ideal fand ich vier Sprites hintereinander und das zweimal untereinander. Das gibt eine Auflösung von immerhin 95 x 42 = 4032 Punkten. Damit läßt sich schon einiges machen. Zur Handhabung werden vier Routinen benötigt. Eine zum Einschalten der Grafik, eine zum Setzen beziehungsweise Löschen der Punkte und eine zum schnellen Löschen der gesamten Grafik. Weiterhin noch eine, die die ganze Grafik auf eine Farbe setzt.</p>
 
-<p>Dazu muß genau das Byte errechnet werden, in dem sich der Punkt befindet. Dafür braucht man nur die obere Spritereihe zu betrachten. Sie ist genau eine Speicherseite (256 Byte) groß. Sollte nun die y-Koordinate größer als 20 sein, so wird einfach eine Seite weitergeblättert, das heißt das Hi-Byte des Zeigers inkrementieren. Als erstes wird das Sprite errechnet. Es wird solange #24 (= eine Spritelänge) vom x-Wertabgezogen bis der x-Wert kleiner als 24 (24 &lt; x &lt; = 0) ist. So ist man praktisch im ersten Spriteblock gelandet. Nun wird vom x-Wert solange #8 abgezogen, bis der x-Wert kleiner als 8 (8<x> =0) ist. Jetzt weiß man, welches Bit gesetzt werden soll, und welches Byte in der Reihe gemeint ist (eins von dreien).</p>
+        <h3>Das Einschalten und Positionieren der Grafik</h3>
 
-<p>Nun der y-Wert. Ist er größer als 20, dann muß das Hi-Byte des Zeigers inkrementiert und vom y-Wert 21 abgezogen werden. Man will ja die Byteposition in einem Spriteblock errechnen. Ist der y-Wert jetzt noch größer als 0 so müssen noch einmal 3 * y dazugezählt werden, denn ein Sprite hat die Ausdehnung von 3 Byte. Damit hat man das Byte, das in einem Spriteblock verändert werden soll. Nun wird das Low-Byte des jeweiligen Sprites dazuaddiert und in der Zeropage für den Zeiger abgelegt. Nachdem das Bytemuster hergestellt ist, kann nun der Punkt gelöscht beziehungsweise gesetzt werden.</p>
+        <p>Dazu sind vier Parameter nötig, zwei für die x,y-Koordinaten und zwei für die x,y-Ausdehnung, also das Spreizen der Sprites. Je nachdem, ob gespreizt oder nicht, werden die Koordinaten berechnet und in die jeweiligen Register abgelegt. Zum Schluß werden noch alle Sprites aktiviert. Der Einfachheit halber kann x nur Werte zwischen 0 und 255 haben. Bei x=255 und ungespreizt ragt die Grafik sowieso schon aus dem Bildschirm heraus. Auch sollte man mit dem y-Wert nicht zu hoch gehen, da sonst die Grafik möglicherweise oben in den Bildschirm hereinkommt. Diese Einschränkungen sind aber in den meisten Fällen unwesentlich.</p>
 
-<p>Das Löschen der Grafik und Setzen der Farbe versteht sich wohl von selbst. Das Ausschalten der Grafik geschieht durch POKE 53269,0.</p>
+        <h3>Das Setzen beziehungsweise Löschen von einem Punkt</h3>
 
-<p>Die Befehlsliste sieht dann so aus:</p>
+        <p>Dazu muß genau das Byte errechnet werden, in dem sich der Punkt befindet. Dafür braucht man nur die obere Spritereihe zu betrachten. Sie ist genau eine Speicherseite (256 Byte) groß. Sollte nun die y-Koordinate größer als 20 sein, so wird einfach eine Seite weitergeblättert, das heißt das Hi-Byte des Zeigers inkrementieren. Als erstes wird das Sprite errechnet. Es wird solange #24 (= eine Spritelänge) vom x-Wertabgezogen bis der x-Wert kleiner als 24 (24 &lt; x &lt; = 0) ist. So ist man praktisch im ersten Spriteblock gelandet. Nun wird vom x-Wert solange #8 abgezogen, bis der x-Wert kleiner als 8 (8<x> =0) ist. Jetzt weiß man, welches Bit gesetzt werden soll, und welches Byte in der Reihe gemeint ist (eins von dreien).</p>
 
-<p>TODO</p>
+        <p>Nun der y-Wert. Ist er größer als 20, dann muß das Hi-Byte des Zeigers inkrementiert und vom y-Wert 21 abgezogen werden. Man will ja die Byteposition in einem Spriteblock errechnen. Ist der y-Wert jetzt noch größer als 0 so müssen noch einmal 3 * y dazugezählt werden, denn ein Sprite hat die Ausdehnung von 3 Byte. Damit hat man das Byte, das in einem Spriteblock verändert werden soll. Nun wird das Low-Byte des jeweiligen Sprites dazuaddiert und in der Zeropage für den Zeiger abgelegt. Nachdem das Bytemuster hergestellt ist, kann nun der Punkt gelöscht beziehungsweise gesetzt werden.</p>
 
-<p>Die Routine INIT bereitet das RAM auf S-Grafik vor. Sie schiebt den Speicher- und Programmstart auf $0A00, davor liegt jetzt der Speicher für die Sprites. Danach wird ein Kaltstart durchgeführt, das heißt der Basicspeicher gelöscht. Technische Daten:</p>
+        <p>Das Löschen der Grafik und Setzen der Farbe versteht sich wohl von selbst. Das Ausschalten der Grafik geschieht durch POKE 53269,0.</p>
 
-<p>Sprites von $0800 bis $09FF</p>
+        <p>Die Befehlsliste sieht dann so aus:</p>
 
-<p>S-Grafik ab $C000 bis C1A0</p>
+        <p>TODO</p>
 
-<p>Basic-RAM ab $0A00<br>
-Anwendung der S-Grafik:</p>
+        <p>Die Routine INIT bereitet das RAM auf S-Grafik vor. Sie schiebt den Speicher- und Programmstart auf $0A00, davor liegt jetzt der Speicher für die Sprites. Danach wird ein Kaltstart durchgeführt, das heißt der Basicspeicher gelöscht. Technische Daten:</p>
 
-<p>Mit ein wenig Routine läßt sich mit der S-Grafik viel realisieren. Setzt man zum Beispiel die Farbe der oberen Spritereihe auf Rot und die der unteren Reihe auf Grün, so hat man einen roten und einen grünen Bereich. Nun kann man bei Säulengrafiken sofort erkennen, wo es kritisch wird (zum Beispiel Alkoholkonsum). Die Möglichkeiten sind fast unbegrenzt. Dazu kommt, daß man ja die Grafik überall hinschieben kann und auch noch spreizen kann. Sie kann im Textmodus beschriftet werden, im »Dunklen« aufbereitet werden, ruckzuck invertiert werden und so weiter.</p>
+        <p>Sprites von $0800 bis $09FF</p>
 
-<p>Man lädt die S-Grafik mit LOAD”S-GRAFIK“,8,1 (Bild 1). Nun kann S-Grafik ohne Bedenken eingesetzt werden.</p>
+        <p>S-Grafik ab $C000 bis C1A0</p>
 
-<p>Achtung! Wenn sich ein Basicprogramm im Speicher befindet, wird es durch Aufruf der Routine INIT gelöscht</p>
+        <p>Basic-RAM ab $0A00<br>
+            Anwendung der S-Grafik:</p>
 
-<p>Der Grundgedanke zum Setzen eines Punktes.<br>
-Zum Beispiel (34/23)<br>
-<strong>A</strong>: 34 : 24 = 1 Rest 10</p>
+        <p>Mit ein wenig Routine läßt sich mit der S-Grafik viel realisieren. Setzt man zum Beispiel die Farbe der oberen Spritereihe auf Rot und die der unteren Reihe auf Grün, so hat man einen roten und einen grünen Bereich. Nun kann man bei Säulengrafiken sofort erkennen, wo es kritisch wird (zum Beispiel Alkoholkonsum). Die Möglichkeiten sind fast unbegrenzt. Dazu kommt, daß man ja die Grafik überall hinschieben kann und auch noch spreizen kann. Sie kann im Textmodus beschriftet werden, im »Dunklen« aufbereitet werden, ruckzuck invertiert werden und so weiter.</p>
 
-<p>Der Punkt befindet sich in Sprite 1 und ist das 10 Bit<br>
-<strong>B</strong>: 10 : 8 = 1 Rest 2</p>
+        <p>Man lädt die S-Grafik mit LOAD”S-GRAFIK“,8,1 (Bild 1). Nun kann S-Grafik ohne Bedenken eingesetzt werden.</p>
 
-<p>Der Punkt befindet sich im 1. Byte, als 2. Bit</p>
+        <p>Achtung! Wenn sich ein Basicprogramm im Speicher befindet, wird es durch Aufruf der Routine INIT gelöscht</p>
 
-<p>Y( = 23) ist größer als 20, also wird Grundadresse 2 gewählt (Grundadresse 1 = $0800, Grundadresse 2 = $0900<br>
-<strong>C</strong>: 23-21 = 2</p>
+        <p>Der Grundgedanke zum Setzen eines Punktes.<br>
+            Zum Beispiel (34/23)<br>
+            <strong>A</strong>: 34 : 24 = 1 Rest 10
+        </p>
 
-<p>Das Byte befindet sich in der unteren Spritereihe in Reihe 2, das heißt 2*3 Byte müssen zur Adresse zugezählt werden.<br>
-Daraus ergibt sich:</p>
+        <p>Der Punkt befindet sich in Sprite 1 und ist das 10 Bit<br>
+            <strong>B</strong>: 10 : 8 = 1 Rest 2
+        </p>
 
-<p>64 Grundadresse von Sprite 0, Rechnung A<br>
-+   1 Byte aus Rechnung B<br>
-+   2*3 Byte aus Rechnung C<br>
-+ $0900 Grundadresse der 2. Spritereihe<br>
-= Adresse des Bytes, in der sich der Punkt befindet.</p>
+        <p>Der Punkt befindet sich im 1. Byte, als 2. Bit</p>
 
-<p>Dazu ist noch zu bemerken, daß eine Spritereihe mit Sprite 0 beginnt. Wem das jetzt noch zu theoretisch ist, schaut sich einfach das Listing des Demo-Programms (Bild 2) an.</p>
+        <p>Y( = 23) ist größer als 20, also wird Grundadresse 2 gewählt (Grundadresse 1 = $0800, Grundadresse 2 = $0900<br>
+            <strong>C</strong>: 23-21 = 2
+        </p>
 
-<address class="author">(F. Espitalier/rg)</address>
+        <p>Das Byte befindet sich in der unteren Spritereihe in Reihe 2, das heißt 2*3 Byte müssen zur Adresse zugezählt werden.<br>
+            Daraus ergibt sich:</p>
 
+        <p>64 Grundadresse von Sprite 0, Rechnung A<br>
+            + 1 Byte aus Rechnung B<br>
+            + 2*3 Byte aus Rechnung C<br>
+            + $0900 Grundadresse der 2. Spritereihe<br>
+            = Adresse des Bytes, in der sich der Punkt befindet.</p>
+
+        <p>Dazu ist noch zu bemerken, daß eine Spritereihe mit Sprite 0 beginnt. Wem das jetzt noch zu theoretisch ist, schaut sich einfach das Listing des Demo-Programms (Bild 2) an.</p>
+
+        <address class="author">(F. Espitalier/rg)</address>
+
+    </article>
+
+</body>
+
+</html>

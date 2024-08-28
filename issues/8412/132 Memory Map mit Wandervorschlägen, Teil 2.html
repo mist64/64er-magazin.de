@@ -1,190 +1,211 @@
-<h1>Memory Map mit Wandervorschlägen, Teil 2</h1>
+<!DOCTYPE html>
+<html lang="de">
 
-<p class="intro">Bei der Durchforstung der ersten 1024 Speicherzellen werden wir in dieser Folge die Adressen 3 bis 17 etwas genauer beleuchten.</p>
+<head>
+    <title>XXX</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="XXX">
+    <meta name="64er.issue" content="12/84">
+    <meta name="64er.pages" content="999">
+    <meta name="64er.id" content="XXX">
+</head>
 
-<p>Das letzte Mal hatten die besprochenen Speicherzellen verschiedene Bedeutungen für VC 20 und C 64.</p>
+<body>
+    <article>
 
-<p>Ab diesmal, also ab Speicherzelle 3 über mehrere Folgen dieser Serie hinaus bis zur Speicherzelle 672 gelten alle Angaben für beide Computer, zumindest was die Bedeutung der Zellen betrifft. Ihr Inhalt kann entsprechend der verschiedenen Adressen der Betriebssysteme Voneinander abweichen. Wie üblich werde ich natürlich jeweils darauf aufmerksam machen.</p>
+        <h1>Memory Map mit Wandervorschlägen, Teil 2</h1>
 
-<h3>Adresse 3 und 4 ($3 — $4)<br>Vektor auf die Routine zur Umwandlung einer Gleitkommazahl in eine ganze Zahl mit Vorzeichen</h3>
+        <p class="intro">Bei der Durchforstung der ersten 1024 Speicherzellen werden wir in dieser Folge die Adressen 3 bis 17 etwas genauer beleuchten.</p>
 
-<p>In diesen beiden Speicherzellen steht also ein Vektor. Was das ist, wird in der Tabelle 1 näher erläutert. Beim VC 20 deutet dieser Vektor auf die Adresse 53674 ($D1AA), beim C 64 auf 45482 ($B1AA). Sie können das mit PRINT PEEK (3) + 256*PEEK (4) leicht nachprüfen. Ab diesen Adressen beginnt im Basic-Übersetzer (Interpreter) ein Programm, welches — natürlich in Maschinensprache — eine Gleitkommazahl in eine ganze Zahl umwandelt.</p>
+        <p>Das letzte Mal hatten die besprochenen Speicherzellen verschiedene Bedeutungen für VC 20 und C 64.</p>
 
-<p>Diejenigen Leser, welche mit Gleitkommazahlen nicht so vertraut sind, möchte ich auf die Tabelle 2 verweisen. Er ist nur eine kleine Einführung. Später, bei der Behandlung der Speicherzellen 97 — 102 werde ich im Detail auf die externe und interne Darstellung und Verwendung von Gleitkommazahlen eingehen.</p>
+        <p>Ab diesmal, also ab Speicherzelle 3 über mehrere Folgen dieser Serie hinaus bis zur Speicherzelle 672 gelten alle Angaben für beide Computer, zumindest was die Bedeutung der Zellen betrifft. Ihr Inhalt kann entsprechend der verschiedenen Adressen der Betriebssysteme Voneinander abweichen. Wie üblich werde ich natürlich jeweils darauf aufmerksam machen.</p>
 
-<p>Dieses Umwandlungsprogramm steht nicht nur den Maschinen, sondern auch den Basic-Programmierern zur Verfügung, allerdings nur über den USR-Befehl und da auch nur, wenn der »Floating Point Accumulator« # 1 (FAC1) in den besagten Adressen 97 bis 102 mitbenutzt wird. Ich verschiebe daher alle weiteren Details auf unsere Ankunft bei diesen Speicherzellen.</p>
+        <h3>Adresse 3 und 4 ($3 — $4)<br>Vektor auf die Routine zur Umwandlung einer Gleitkommazahl in eine ganze Zahl mit Vorzeichen</h3>
 
-<p>Bis dahin haben Sie hoffentlich auch den Assemblerkurs weiter verfolgt, die Assembler-, Dissassembler- und Monitorprogramme eingetippt und können damit arbeiten. Dann können wir viel besser den ganzen Zusammenhang verfolgen.</p>
+        <p>In diesen beiden Speicherzellen steht also ein Vektor. Was das ist, wird in der Tabelle 1 näher erläutert. Beim VC 20 deutet dieser Vektor auf die Adresse 53674 ($D1AA), beim C 64 auf 45482 ($B1AA). Sie können das mit PRINT PEEK (3) + 256*PEEK (4) leicht nachprüfen. Ab diesen Adressen beginnt im Basic-Übersetzer (Interpreter) ein Programm, welches — natürlich in Maschinensprache — eine Gleitkommazahl in eine ganze Zahl umwandelt.</p>
 
-<h3>Adresse 5 und 6 ($5 - $6)<br>Vektor auf die Routine zur Umwandlung einer ganzen Zahl in eine Gleitkommazahl</h3>
+        <p>Diejenigen Leser, welche mit Gleitkommazahlen nicht so vertraut sind, möchte ich auf die Tabelle 2 verweisen. Er ist nur eine kleine Einführung. Später, bei der Behandlung der Speicherzellen 97 — 102 werde ich im Detail auf die externe und interne Darstellung und Verwendung von Gleitkommazahlen eingehen.</p>
 
-<p>Dieses Programm ist die Umkehrung der oberen Routine. Es beginnt beim VC 20 ab Speicherzelle 54161 ($D391), beim C 64 ab 45969 ($B391). Da hier prinzipiell dasselbe gilt wie oben, möchte ich nur kurz den Vorteil beleuchten, den derartige Vektoren haben. Eigentlich könnten wir direkt auf die im Vektor enthaltenen Adressen springen — wenn wir sie kennen.</p>
+        <p>Dieses Umwandlungsprogramm steht nicht nur den Maschinen, sondern auch den Basic-Programmierern zur Verfügung, allerdings nur über den USR-Befehl und da auch nur, wenn der »Floating Point Accumulator« # 1 (FAC1) in den besagten Adressen 97 bis 102 mitbenutzt wird. Ich verschiebe daher alle weiteren Details auf unsere Ankunft bei diesen Speicherzellen.</p>
 
-<p>Ein Sprung auf die Adresse des Vektors erlaubt uns jedoch immer die völlige Ignoranz seines Inhalts — und Commodore erlaubt die Änderung der Adressen im Basic-Übersetzer, wie es ja beim C 64 gegenüber dem VC 20 auch gemacht worden ist, ohne daß vorhandene Programme umgeschrieben werden müssen.</p>
+        <p>Bis dahin haben Sie hoffentlich auch den Assemblerkurs weiter verfolgt, die Assembler-, Dissassembler- und Monitorprogramme eingetippt und können damit arbeiten. Dann können wir viel besser den ganzen Zusammenhang verfolgen.</p>
 
-<h3>Adresse 7 ($7)<br>Suchzeichen zur Prüfung von Texteingaben in Basic</h3>
+        <h3>Adresse 5 und 6 ($5 - $6)<br>Vektor auf die Routine zur Umwandlung einer ganzen Zahl in eine Gleitkommazahl</h3>
 
-<p>Diese Speicherzelle wird viel von denjenigen Basic-Routinen als Zwischenspeicher benützt, die den direkt eingegebenen Text absuchen, um Steuerzeichen (Gänsefüße, Kommata, Doppelpunkte und die Zeilenbeendigung durch die RETURN-Taste) rechtzeitig zu erkennen. Normalerweise wird in der Zelle 7 der ASCII-Wert dieser Zeichen abgelegt. Die Speicherzelle 7 wird aber auch von anderen Basic-Routinen benützt. Sie ist daher für den Programmierer praktisch nicht zu verwerten.</p>
+        <p>Dieses Programm ist die Umkehrung der oberen Routine. Es beginnt beim VC 20 ab Speicherzelle 54161 ($D391), beim C 64 ab 45969 ($B391). Da hier prinzipiell dasselbe gilt wie oben, möchte ich nur kurz den Vorteil beleuchten, den derartige Vektoren haben. Eigentlich könnten wir direkt auf die im Vektor enthaltenen Adressen springen — wenn wir sie kennen.</p>
 
-<h3>Adresse 8 ($8)<br>Suchzeichen speziell für Befehlsende und Gänsefüße</h3>
+        <p>Ein Sprung auf die Adresse des Vektors erlaubt uns jedoch immer die völlige Ignoranz seines Inhalts — und Commodore erlaubt die Änderung der Adressen im Basic-Übersetzer, wie es ja beim C 64 gegenüber dem VC 20 auch gemacht worden ist, ohne daß vorhandene Programme umgeschrieben werden müssen.</p>
 
-<p>Wie Speicherzelle 7 dient auch die Zelle 8 als Zwischenspeicher für Basic-Texteingabe und zwar während der Umwandlung von Basic-Befehlen in den vom Computer verwendeten Befehlscode (Tokens). Die Speicherzelle 8 ist vom Programmierer nicht verwertbar.</p>
+        <h3>Adresse 7 ($7)<br>Suchzeichen zur Prüfung von Texteingaben in Basic</h3>
 
-<h3>Adresse 9 ($9)<br>Spaltenposition des Cursors vor dem letzten TAB- oder SPC-Befehl</h3>
+        <p>Diese Speicherzelle wird viel von denjenigen Basic-Routinen als Zwischenspeicher benützt, die den direkt eingegebenen Text absuchen, um Steuerzeichen (Gänsefüße, Kommata, Doppelpunkte und die Zeilenbeendigung durch die RETURN-Taste) rechtzeitig zu erkennen. Normalerweise wird in der Zelle 7 der ASCII-Wert dieser Zeichen abgelegt. Die Speicherzelle 7 wird aber auch von anderen Basic-Routinen benützt. Sie ist daher für den Programmierer praktisch nicht zu verwerten.</p>
 
-<p>Speicherzelle 9 wird von den Basic-Befehlen TAB und SPC verwendet. Vor ihrer Ausführung wird die Nummer der Spalte, in der sich der Cursor befindet, aus der Speicherzelle 211 ($D3) nach 9 gebracht, von wo sie geholt wird, um die Position des Cursors nach der Ausführung von TAB und SPC auszurechnen.</p>
+        <h3>Adresse 8 ($8)<br>Suchzeichen speziell für Befehlsende und Gänsefüße</h3>
 
-<p>Diese komplizierte Erklärung können wir durch Ausprobieren deutlicher machen. Dazu PRINTen wir 16mal den Buchstaben X hintereinander (Semicolon !), allerdings mit SPC (2) jeweils um 2 Spalten versetzt.<br>
-10 FOR I = 0 TO 15<br>
-20 PRINT SPC (2) ”X”;<br>
-30 PRINT PEEK (9);<br>
-40 NEXT I<br>
-Nach jedem X wird durch Zeile 30 die »alte« Cursor-Spaltenposition ausgedruckt und zwar in derselben Zeile, ausgelöst durch das Semicolon. Dadurch erhöht sich laufend die in Speicherzelle 9 stehende Positionsangabe des Cursors. Wir erhalten folgenden Ausdruck:</p>
+        <p>Wie Speicherzelle 7 dient auch die Zelle 8 als Zwischenspeicher für Basic-Texteingabe und zwar während der Umwandlung von Basic-Befehlen in den vom Computer verwendeten Befehlscode (Tokens). Die Speicherzelle 8 ist vom Programmierer nicht verwertbar.</p>
 
-<p>Sie können die Positionsnummer nachrechnen. Berücksichtigen Sie bitte aber dabei, daß bei PRINT vor und nach jeder Zahl eine Stelle frei bleibt, die erste für das Vorzeichen, die zweite wegen des Abstandes.</p>
+        <h3>Adresse 9 ($9)<br>Spaltenposition des Cursors vor dem letzten TAB- oder SPC-Befehl</h3>
 
-<p>Wichtig ist außerdem, daß die maximal mögliche Spaltenzahl nicht die Bildschirmspaltenzahl, sondern die »logische« Spaltenzahl ist, also 88 beim VC 20 und 80 beim C 64.</p>
+        <p>Speicherzelle 9 wird von den Basic-Befehlen TAB und SPC verwendet. Vor ihrer Ausführung wird die Nummer der Spalte, in der sich der Cursor befindet, aus der Speicherzelle 211 ($D3) nach 9 gebracht, von wo sie geholt wird, um die Position des Cursors nach der Ausführung von TAB und SPC auszurechnen.</p>
 
-<p>Wir können die Cursorposition in Adresse 9 auch abfragen und ein Programm damit steuern. Fügen Sie einfach in das obige Programm die folgende Zeile 35 ein:<br>
-35 IF PEEK (9) = 33 THEN PRINT »END«: END</p>
+        <p>Diese komplizierte Erklärung können wir durch Ausprobieren deutlicher machen. Dazu PRINTen wir 16mal den Buchstaben X hintereinander (Semicolon !), allerdings mit SPC (2) jeweils um 2 Spalten versetzt.<br>
+            10 FOR I = 0 TO 15<br>
+            20 PRINT SPC (2) ”X”;<br>
+            30 PRINT PEEK (9);<br>
+            40 NEXT I<br>
+            Nach jedem X wird durch Zeile 30 die »alte« Cursor-Spaltenposition ausgedruckt und zwar in derselben Zeile, ausgelöst durch das Semicolon. Dadurch erhöht sich laufend die in Speicherzelle 9 stehende Positionsangabe des Cursors. Wir erhalten folgenden Ausdruck:</p>
 
-<p>Sobald Position 33 erreicht ist, bleibt das Programm stehen.</p>
+        <p>Sie können die Positionsnummer nachrechnen. Berücksichtigen Sie bitte aber dabei, daß bei PRINT vor und nach jeder Zahl eine Stelle frei bleibt, die erste für das Vorzeichen, die zweite wegen des Abstandes.</p>
 
-<h3>Adresse 10 ($A)<br>Flagge für LOAD oder VERIFY</h3>
+        <p>Wichtig ist außerdem, daß die maximal mögliche Spaltenzahl nicht die Bildschirmspaltenzahl, sondern die »logische« Spaltenzahl ist, also 88 beim VC 20 und 80 beim C 64.</p>
 
-<p>In Zelle 10 steht eine 0, wenn geladen wird und eine 1 bei einem VERIFY. Warum das so ist, will ich kurz erläutern:</p>
+        <p>Wir können die Cursorposition in Adresse 9 auch abfragen und ein Programm damit steuern. Fügen Sie einfach in das obige Programm die folgende Zeile 35 ein:<br>
+            35 IF PEEK (9) = 33 THEN PRINT »END«: END</p>
 
-<p>Die Basic-Routinen für LOAD beziehungsweise für VERIFY sind völlig identisch. Was das Betriebssystem hinterher daraus machen muß, ist natürlich unterschiedlich. Das Basic erspart sich eine doppelte Routine, zeigt aber mit der Flagge in Speicherzelle 10 den Unterschied an.</p>
+        <p>Sobald Position 33 erreicht ist, bleibt das Programm stehen.</p>
 
-<p>Erwähnenswert ist noch, daß das Betriebssystem in einer Art Nationalismus seine eigene Flagge aufzieht: Den Unterschied zwischen LOAD und VERIFY speichert es seinerseits in Zelle 147 ($93) ab. Soweit ich es sehen kann, sind Inhalt und Bedeutung beider Speicherzellen völlig identisch.</p>
+        <h3>Adresse 10 ($A)<br>Flagge für LOAD oder VERIFY</h3>
 
-<p>Ich habe für Sie zwar kein Kochrezept zur Anwendung der LOAD-VERIFY-Flagge in einem Programm vorrätig, möchte Sie aber trotzdem ein bißchen zum Spielen anregen. Um meine Erklärung nachzuvollziehen, tippen Sie bitte direkt LOAD ein. Den Ladevorgang brechen Sie mit der STOP-Taste ab und fragen dann den Inhalt der Zelle 10 ab mit</p>
+        <p>In Zelle 10 steht eine 0, wenn geladen wird und eine 1 bei einem VERIFY. Warum das so ist, will ich kurz erläutern:</p>
 
-<p>PRINT PEEK (10) Wir erhalten eine 0. Wiederholen Sie bitte diesen Vorgang, aber mit VERIFY. Wir erhalten jetzt eine 1 — Quod erat demonstrandum.</p>
+        <p>Die Basic-Routinen für LOAD beziehungsweise für VERIFY sind völlig identisch. Was das Betriebssystem hinterher daraus machen muß, ist natürlich unterschiedlich. Das Basic erspart sich eine doppelte Routine, zeigt aber mit der Flagge in Speicherzelle 10 den Unterschied an.</p>
 
-<p>Wir können auch in die Zelle 10 hineinPOKEn. Die »Wachablösung« zwischen Basic und Betriebssystem unter Hissen der Flagge in Zelle 10 findet beim VC 20 in der Speicherzelle 57705, beim C 64 in 57708 statt. Bevor wir diese Maschinenroutine mit SYS 57705 (SYS 57708) starten, geben wir mit dem Inhalt der Speicherzelle 10 an, ob es ein LOAD oder ein VERIFY sein soll.</p>
+        <p>Erwähnenswert ist noch, daß das Betriebssystem in einer Art Nationalismus seine eigene Flagge aufzieht: Den Unterschied zwischen LOAD und VERIFY speichert es seinerseits in Zelle 147 ($93) ab. Soweit ich es sehen kann, sind Inhalt und Bedeutung beider Speicherzellen völlig identisch.</p>
 
-<p>Legen Sie ein Band mit Programm in die Datasette. Um ein LOAD zu erzeugen, geben wir direkt ein:<br>
-POKE 10,0:SYS 57705<br>
-(POKE 10,0:SYS 57708)<br>
-Entsprechend der Anweisung auf dem Bildschirm drücken Sie PLAY und das Auffinden des ersten Programms wird mit LOAD gemeldet. Machen Sie das Ganze noch einmal, diesmal aber POKEn Sie bitte eine 1 in die Zelle 10. Jetzt meldet das Betriebssystem das Auffinden des Programms mit VERIFY.</p>
+        <p>Ich habe für Sie zwar kein Kochrezept zur Anwendung der LOAD-VERIFY-Flagge in einem Programm vorrätig, möchte Sie aber trotzdem ein bißchen zum Spielen anregen. Um meine Erklärung nachzuvollziehen, tippen Sie bitte direkt LOAD ein. Den Ladevorgang brechen Sie mit der STOP-Taste ab und fragen dann den Inhalt der Zelle 10 ab mit</p>
 
-<p>Wie gesagt, vielleicht fällt Ihnen eine Anwendung dafür ein.</p>
+        <p>PRINT PEEK (10) Wir erhalten eine 0. Wiederholen Sie bitte diesen Vorgang, aber mit VERIFY. Wir erhalten jetzt eine 1 — Quod erat demonstrandum.</p>
 
-<h3>Adresse 11 ($B)<br>Flagge für den Eingabepuffer/Anzahl der Dimensionen von Zahlenfeldern (Arrays)</h3>
+        <p>Wir können auch in die Zelle 10 hineinPOKEn. Die »Wachablösung« zwischen Basic und Betriebssystem unter Hissen der Flagge in Zelle 10 findet beim VC 20 in der Speicherzelle 57705, beim C 64 in 57708 statt. Bevor wir diese Maschinenroutine mit SYS 57705 (SYS 57708) starten, geben wir mit dem Inhalt der Speicherzelle 10 an, ob es ein LOAD oder ein VERIFY sein soll.</p>
 
-<p>Alle Buchstaben und Zeichen, die mit der Tastatur direkt eingetippt werden, kommen in einen Eingabe-Pufferspeicher. Er beginnt ab Speicherzelle 512 ($200). Sobald die RETURN-Taste gedrückt wird, wandelt eine Routine des Basic-Übersetzers den Text in Codezahlen (Tokens) um. Diese Routine und eine andere, welche die Zeilen eines Programms aneinanderhängt, verwenden die Zelle 11 als Zwischenspeicher.</p>
+        <p>Legen Sie ein Band mit Programm in die Datasette. Um ein LOAD zu erzeugen, geben wir direkt ein:<br>
+            POKE 10,0:SYS 57705<br>
+            (POKE 10,0:SYS 57708)<br>
+            Entsprechend der Anweisung auf dem Bildschirm drücken Sie PLAY und das Auffinden des ersten Programms wird mit LOAD gemeldet. Machen Sie das Ganze noch einmal, diesmal aber POKEn Sie bitte eine 1 in die Zelle 10. Jetzt meldet das Betriebssystem das Auffinden des Programms mit VERIFY.</p>
 
-<p>Sobald die Textumwandlung beendet ist, steht in Zelle 11 eine Zahl, welche die Länge der Token-Zeile angibt.</p>
+        <p>Wie gesagt, vielleicht fällt Ihnen eine Anwendung dafür ein.</p>
 
-<p>Die Zelle 11 wird außerdem noch von den Basic-Routinen benützt, die ein Feld (Array) aufbauen oder ein bestimmtes Element in einem Array suchen. Was ein Feld oder Array ist, finden Sie in den Commodore-Handbüchern gut beschrieben.</p>
+        <h3>Adresse 11 ($B)<br>Flagge für den Eingabepuffer/Anzahl der Dimensionen von Zahlenfeldern (Arrays)</h3>
 
-<p>Diese Routinen also verwenden die Speicherzelle 11, um die Anzahl der verlangten DIMensionen und den für ein neu aufgebautes Feld nötigen Speicherbedarf zu berechnen.</p>
+        <p>Alle Buchstaben und Zeichen, die mit der Tastatur direkt eingetippt werden, kommen in einen Eingabe-Pufferspeicher. Er beginnt ab Speicherzelle 512 ($200). Sobald die RETURN-Taste gedrückt wird, wandelt eine Routine des Basic-Übersetzers den Text in Codezahlen (Tokens) um. Diese Routine und eine andere, welche die Zeilen eines Programms aneinanderhängt, verwenden die Zelle 11 als Zwischenspeicher.</p>
 
-<h3>Adresse 12 ($C)<br>Flagge für Basic-Routinen, die ein Feld (Array) suchen beziehungsweise aufbauen</h3>
+        <p>Sobald die Textumwandlung beendet ist, steht in Zelle 11 eine Zahl, welche die Länge der Token-Zeile angibt.</p>
 
-<p>Diese Speicherzelle wird von den Basic-Routinen als Zwischenspeicher benutzt, die feststellen, ob eine Variable ein Feld (Array) ist, ob das Feld bereits DIMensioniert worden ist, oder ob ein neues Feld die unDIMensionierte Zahl von 11 Elementen hat.</p>
+        <p>Die Zelle 11 wird außerdem noch von den Basic-Routinen benützt, die ein Feld (Array) aufbauen oder ein bestimmtes Element in einem Array suchen. Was ein Feld oder Array ist, finden Sie in den Commodore-Handbüchern gut beschrieben.</p>
 
-<h3>Adresse 13 ($D)<br>Flagge zur Bestimmung des Datentyps (Zeichenkette/String oder Zahl)</h3>
+        <p>Diese Routinen also verwenden die Speicherzelle 11, um die Anzahl der verlangten DIMensionen und den für ein neu aufgebautes Feld nötigen Speicherbedarf zu berechnen.</p>
 
-<p>Diese Flagge zeigt den Routinen des Basic-Übersetzers an, ob es sich bei den zur Verarbeitung anstehenden Daten um einen String oder um Zahlenwerte handelt. Zeigt die Flagge 255 ($FF), ist es ein String. Bei 0 handelt es sich um Zahlen. Diese Bestimmung erfolgt jedesmal, wenn eine Variable definiert oder gesucht wird. Diese Flagge kann leider nicht durch ein Basic-Programm abgefragt werden.</p>
+        <h3>Adresse 12 ($C)<br>Flagge für Basic-Routinen, die ein Feld (Array) suchen beziehungsweise aufbauen</h3>
 
-<h3>Adresse 14 ($E)<br>Flagge zur Bestimmung des Zahlentyps (Ganze Zahl oder Gleitkommazahl)</h3>
+        <p>Diese Speicherzelle wird von den Basic-Routinen als Zwischenspeicher benutzt, die feststellen, ob eine Variable ein Feld (Array) ist, ob das Feld bereits DIMensioniert worden ist, oder ob ein neues Feld die unDIMensionierte Zahl von 11 Elementen hat.</p>
 
-<p>Sobald durch die Flagge in der vorherigen Zelle 13 eine Zahl signalisiert wird, steht hier die Zahl 128 ($80) wenn es sich um eine ganze Zahl handelt, während eine 0 die Zahl als Gleitkommazahl identifiziert.</p>
+        <h3>Adresse 13 ($D)<br>Flagge zur Bestimmung des Datentyps (Zeichenkette/String oder Zahl)</h3>
 
-<p>Damit wollen wir ein bißchen experimentieren. Zeile 10 definiert eine Gleitkommazahl, Zeile 20 druckt sie und die Flagge aus Zelle 14 aus.<br>
-10 A = 13.41<br>
-20 PRINT A,PEEK (14)<br>
-Wir erhalten die Zahl 13.41 und als Flagge eine 0.<br>
-30 B = INT (A)<br>
-40 PRINT B,PEEK (14)</p>
+        <p>Diese Flagge zeigt den Routinen des Basic-Übersetzers an, ob es sich bei den zur Verarbeitung anstehenden Daten um einen String oder um Zahlenwerte handelt. Zeigt die Flagge 255 ($FF), ist es ein String. Bei 0 handelt es sich um Zahlen. Diese Bestimmung erfolgt jedesmal, wenn eine Variable definiert oder gesucht wird. Diese Flagge kann leider nicht durch ein Basic-Programm abgefragt werden.</p>
 
-<p>INT bildet die ganze Zahl von 13.41. Also müßte die Flagge in Zelle 14 auf 128 stehen. Weit gefehlt! Da intern auch die 13 als Gleitkommazahl berechnet wird, erhalten wir immer noch eine 0.<br>
-50 B% = A<br>
-60 PRINT B%,PEEK (14)<br>
-Erst die Definition der Variablen B als ganze Zahl (mit %) ergibt die Flagge 128.<br>
-70 D = 16*B%<br>
-80 PRINT D,PEEK (14)</p>
+        <h3>Adresse 14 ($E)<br>Flagge zur Bestimmung des Zahlentyps (Ganze Zahl oder Gleitkommazahl)</h3>
 
-<p>Die Multiplikation einer ganzen Zahl mit der Ganzzahl-Variablen B% fällt in dieselbe Kategorie wie Zeile 30 oben, da die Verarbeitung als Gleitkommazahl erfolgt. Also erhalten wir zu Recht eine 0. Erst wenn D als ganze Zahl (Zeile 90) ausgewiesen wird, steht die Flagge wieder auf 128: 90 D% = 16*B%<br>
-100 PRINT D%, PEEK (14)</p>
+        <p>Sobald durch die Flagge in der vorherigen Zelle 13 eine Zahl signalisiert wird, steht hier die Zahl 128 ($80) wenn es sich um eine ganze Zahl handelt, während eine 0 die Zahl als Gleitkommazahl identifiziert.</p>
 
-<h3>Adresse 15 ($F)<br>Flagge bei LIST, Garbage Collection und Textumwandlung</h3>
+        <p>Damit wollen wir ein bißchen experimentieren. Zeile 10 definiert eine Gleitkommazahl, Zeile 20 druckt sie und die Flagge aus Zelle 14 aus.<br>
+            10 A = 13.41<br>
+            20 PRINT A,PEEK (14)<br>
+            Wir erhalten die Zahl 13.41 und als Flagge eine 0.<br>
+            30 B = INT (A)<br>
+            40 PRINT B,PEEK (14)</p>
 
-<p>Die Routine des LIST-Befehls muß unterscheiden zwischen Basic-Befehlen und normalem Text. Wenn eine Zeichenkette durch ein »Gänsefüßchen« identifiziert worden ist, wird die Flagge gesetzt, und der Text wird ausgedruckt.</p>
+        <p>INT bildet die ganze Zahl von 13.41. Also müßte die Flagge in Zelle 14 auf 128 stehen. Weit gefehlt! Da intern auch die 13 als Gleitkommazahl berechnet wird, erhalten wir immer noch eine 0.<br>
+            50 B% = A<br>
+            60 PRINT B%,PEEK (14)<br>
+            Erst die Definition der Variablen B als ganze Zahl (mit %) ergibt die Flagge 128.<br>
+            70 D = 16*B%<br>
+            80 PRINT D,PEEK (14)</p>
 
-<p>Unter »Garbage Collection« (Müllabfuhr) wird die Routine des Betriebssystems verstanden, welche zu bestimmten Anlässen im Variablenspeicher alle nicht mehr benötigten Strings entfernt, um Platz zu schaffen. Dabei wird eine Flagge in Zelle 15 gesetzt, die anzeigt, daß eine Müllabfuhr bereits stattgefunden hat. Wenn bei der Speicherung eines neuen Strings zu wenig Speicherplatz vorhanden ist, wird bei der Flagge nachgesehen, ob gerade vorher schon durch die Müllabfuhr (Garbage Collection) der Speicher entrümpelt worden ist. Falls das der Fall ist, wird OUT OF MEMORY angezeigt, falls nicht, wird eine Müllabfuhr durchgeführt.</p>
+        <p>Die Multiplikation einer ganzen Zahl mit der Ganzzahl-Variablen B% fällt in dieselbe Kategorie wie Zeile 30 oben, da die Verarbeitung als Gleitkommazahl erfolgt. Also erhalten wir zu Recht eine 0. Erst wenn D als ganze Zahl (Zeile 90) ausgewiesen wird, steht die Flagge wieder auf 128: 90 D% = 16*B%<br>
+            100 PRINT D%, PEEK (14)</p>
 
-<p>Schließlich wird Zelle 15 auch bei der Umwandlung von Basic-Befehlen in internen Codezahlen (Tokens) eingesetzt.</p>
+        <h3>Adresse 15 ($F)<br>Flagge bei LIST, Garbage Collection und Textumwandlung</h3>
 
-<p>Adresse 16 ($10) Flagge zur Anzeige eines Variablen-Feldes oder einer selbstdefinierten Funktion</p>
+        <p>Die Routine des LIST-Befehls muß unterscheiden zwischen Basic-Befehlen und normalem Text. Wenn eine Zeichenkette durch ein »Gänsefüßchen« identifiziert worden ist, wird die Flagge gesetzt, und der Text wird ausgedruckt.</p>
 
-<p>Im Basic-Übersetzer gibt es eine Routine, die den Speicher absucht, ob es eine Variable mit bestimmten Namen bereits gibt. Wenn diese mit einer Klammer beginnt, wird die Flagge in Zelle 16 gesetzt, um anzuzeigen, daß es sich um eine Array-Variable oder um eine mit DEF FN selbst definierte Funktion handelt.</p>
+        <p>Unter »Garbage Collection« (Müllabfuhr) wird die Routine des Betriebssystems verstanden, welche zu bestimmten Anlässen im Variablenspeicher alle nicht mehr benötigten Strings entfernt, um Platz zu schaffen. Dabei wird eine Flagge in Zelle 15 gesetzt, die anzeigt, daß eine Müllabfuhr bereits stattgefunden hat. Wenn bei der Speicherung eines neuen Strings zu wenig Speicherplatz vorhanden ist, wird bei der Flagge nachgesehen, ob gerade vorher schon durch die Müllabfuhr (Garbage Collection) der Speicher entrümpelt worden ist. Falls das der Fall ist, wird OUT OF MEMORY angezeigt, falls nicht, wird eine Müllabfuhr durchgeführt.</p>
 
-<h3>Adresse 17 ($11)<br>Flagge für INPUT, GET oder READ</h3>
+        <p>Schließlich wird Zelle 15 auch bei der Umwandlung von Basic-Befehlen in internen Codezahlen (Tokens) eingesetzt.</p>
 
-<p>Die Basic-Routinen für INPUT, GET und READ sind zum großen Teil identisch. Um Speicherplatz zu sparen, verwendet der Basic-Übersetzer die identischen Teile nur einmal. Um in die nichtidentischen Teile verzweigen zu können, wird in Zelle 17 angezeigt, um welchen der drei Befehle es sich gerade handelt. Die Flagge steht auf 0 für INPUT, auf 64 ($40) für GET und auf 152 ($98) für READ.</p>
+        <p>Adresse 16 ($10) Flagge zur Anzeige eines Variablen-Feldes oder einer selbstdefinierten Funktion</p>
 
-<p>Mit dem folgenden kleinen Programm können wir das leicht nachprüfen:<br>
-10 DATA 3<br>
-20 READ A<br>
-30 PRINT PEEK (17)<br>
-40 INPUT B<br>
-50 PRINT PEEK (17)<br>
-80 GET C$:IF G$ = ””THEN 60 70 PRINT PEEK (17)</p>
+        <p>Im Basic-Übersetzer gibt es eine Routine, die den Speicher absucht, ob es eine Variable mit bestimmten Namen bereits gibt. Wenn diese mit einer Klammer beginnt, wird die Flagge in Zelle 16 gesetzt, um anzuzeigen, daß es sich um eine Array-Variable oder um eine mit DEF FN selbst definierte Funktion handelt.</p>
 
-<p>Zeile 10 und 20, 40 sowie 60 sind Anwendungen der drei zur Debatte stehenden Basic-Befehle. Nach der Durchführung jedes Befehls wird in den Zeilen 30, 50 und 70 die jeweilige Flagge ausgelesen.</p>
+        <h3>Adresse 17 ($11)<br>Flagge für INPUT, GET oder READ</h3>
 
-<p>Nach RUN erhalten wir als Resultat der Zeile 20 die Zahl 152, als Resultat von Zeile 30 die INPUT-Aufforderung mit Fragezeichen. Geben Sie irgendeine Zahl und RETURN ein. Wir erhalten so die 0. Die GET-Schleife in Zeile 40 wartet auf einen Tastendruck, dann erhalten wir 64.</p>
+        <p>Die Basic-Routinen für INPUT, GET und READ sind zum großen Teil identisch. Um Speicherplatz zu sparen, verwendet der Basic-Übersetzer die identischen Teile nur einmal. Um in die nichtidentischen Teile verzweigen zu können, wird in Zelle 17 angezeigt, um welchen der drei Befehle es sich gerade handelt. Die Flagge steht auf 0 für INPUT, auf 64 ($40) für GET und auf 152 ($98) für READ.</p>
 
-<h3>Adresse 18 ($12)<br>Flagge für Vorzeichen des Ergebnisses bei SIN und TAN</h3>
+        <p>Mit dem folgenden kleinen Programm können wir das leicht nachprüfen:<br>
+            10 DATA 3<br>
+            20 READ A<br>
+            30 PRINT PEEK (17)<br>
+            40 INPUT B<br>
+            50 PRINT PEEK (17)<br>
+            80 GET C$:IF G$ = ””THEN 60 70 PRINT PEEK (17)</p>
 
-<p>Mit dieser Adresse fahren wir das nächste Mal fort.</p>
+        <p>Zeile 10 und 20, 40 sowie 60 sind Anwendungen der drei zur Debatte stehenden Basic-Befehle. Nach der Durchführung jedes Befehls wird in den Zeilen 30, 50 und 70 die jeweilige Flagge ausgelesen.</p>
 
-<address class="author">(Dr. Helmuth Hauck/aa)</address>
+        <p>Nach RUN erhalten wir als Resultat der Zeile 20 die Zahl 152, als Resultat von Zeile 30 die INPUT-Aufforderung mit Fragezeichen. Geben Sie irgendeine Zahl und RETURN ein. Wir erhalten so die 0. Die GET-Schleife in Zeile 40 wartet auf einen Tastendruck, dann erhalten wir 64.</p>
 
-<p>TODO<br>
-Tabelle 1. Was sind Zeiger, Vektoren und Flaggen?</p>
+        <h3>Adresse 18 ($12)<br>Flagge für Vorzeichen des Ergebnisses bei SIN und TAN</h3>
 
-<h3>Zeiger, Vektoren und Flaggen</h3>
+        <p>Mit dieser Adresse fahren wir das nächste Mal fort.</p>
 
-<p>Zeiger und Vektoren sind 2 benachbarte Speicherzellen (Bytes), die eine wichtige Adresse enthalten.</p>
+        <address class="author">(Dr. Helmuth Hauck/aa)</address>
 
-<p>Wir sprechen von einem <strong>Zeiger</strong>, wenn diese Adresse den Beginn von gespeicherten Daten angibt.</p>
+        <p>TODO<br>
+            Tabelle 1. Was sind Zeiger, Vektoren und Flaggen?</p>
 
-<p>Ein <strong>Vektor</strong> kennzeichnet den Beginn eines Maschinenprogramms. (Ich muß zugeben, daß diese Unterscheidung nicht immer scharf angewendet wird beziehungsweise anwendbar ist).</p>
+        <h3>Zeiger, Vektoren und Flaggen</h3>
 
-<p>Eine <strong>Flagge</strong> besteht aus einer Zahl, die von einem Programm verwendet wird, um sich das Resultat einer Operation zu merken beziehungsweise für eine spätere Verwendung festzuhalten.</p>
+        <p>Zeiger und Vektoren sind 2 benachbarte Speicherzellen (Bytes), die eine wichtige Adresse enthalten.</p>
 
-<p>TODO<br>
-Tabelle 2. Die Zahlendarstellung bei den Commodore-Systemen</p>
+        <p>Wir sprechen von einem <strong>Zeiger</strong>, wenn diese Adresse den Beginn von gespeicherten Daten angibt.</p>
 
-<h3>Gleitkomma-Zahlen</h3>
+        <p>Ein <strong>Vektor</strong> kennzeichnet den Beginn eines Maschinenprogramms. (Ich muß zugeben, daß diese Unterscheidung nicht immer scharf angewendet wird beziehungsweise anwendbar ist).</p>
 
-<p>Für diejenigen Leser, die das Thema der Zahlendarstellung in den Commodore-Handbüchern großzügig übersprungen haben, stelle ich es hier noch einmal vor.</p>
+        <p>Eine <strong>Flagge</strong> besteht aus einer Zahl, die von einem Programm verwendet wird, um sich das Resultat einer Operation zu merken beziehungsweise für eine spätere Verwendung festzuhalten.</p>
 
-<p>Sie kennen die gängigen vier Zahlentypen:</p>
+        <p>TODO<br>
+            Tabelle 2. Die Zahlendarstellung bei den Commodore-Systemen</p>
 
-<p>— ganze Zahlen: 15, 21, 244<br>
-— Brüche: 2/3, 26/8, 15/14<br>
-— negative Zahlen: —15, —255<br>
-— positive Zahlen: 10, 5, 123</p>
+        <h3>Gleitkomma-Zahlen</h3>
 
-<p>Ganze Zahlen bereiten uns und dem Computer keine Probleme.</p>
+        <p>Für diejenigen Leser, die das Thema der Zahlendarstellung in den Commodore-Handbüchern großzügig übersprungen haben, stelle ich es hier noch einmal vor.</p>
 
-<p>Bei Brüchen sieht es schon anders aus. Erinnern Sie sich an die Bruchrechnungsstunden in der Schule? Wieviel ist 51/52 + 3/4!!</p>
+        <p>Sie kennen die gängigen vier Zahlentypen:</p>
 
-<p>Ohne lang zu überlegen, rechnen wir natürlich um, 51/52 = 0,9807692 und 3/4 = 0,75; addiert ist das Resultat 1,7307692 — und schon sind Sie mitten in den Gleitkomma-Zahlen.</p>
+        <p>— ganze Zahlen: 15, 21, 244<br>
+            — Brüche: 2/3, 26/8, 15/14<br>
+            — negative Zahlen: —15, —255<br>
+            — positive Zahlen: 10, 5, 123</p>
 
-<p>Bei obigem Beispiel gleitet allerdings noch nichts. Bei sehr großen oder aber auch sehr kleinen Bruch-Zahlen reicht uns — und einem Computer — nicht der Platz, um sie darzustellen. Die Zahl 0,000000000000000123 sprengt jeden normalen Rahmen.</p>
+        <p>Ganze Zahlen bereiten uns und dem Computer keine Probleme.</p>
 
-<p>Daher schreiben wir sie anders. Wir lassen das Komma nach rechts gleiten, bis es die erste Ziffer, die von 0 verschieden ist, findet und für jede Null, die es passiert multiplizieren wir die Zahl mit 10.</p>
+        <p>Bei Brüchen sieht es schon anders aus. Erinnern Sie sich an die Bruchrechnungsstunden in der Schule? Wieviel ist 51/52 + 3/4!!</p>
 
-<p>Die Zahl oben sieht dann so aus:<br>
-0,123 x 10 hoch 15 (eine 1 mit 15 Nullen).</p>
+        <p>Ohne lang zu überlegen, rechnen wir natürlich um, 51/52 = 0,9807692 und 3/4 = 0,75; addiert ist das Resultat 1,7307692 — und schon sind Sie mitten in den Gleitkomma-Zahlen.</p>
 
-<p>Die Grundzahl vorn heißt »Mantisse«, die 10 mit Hochzahl heißt »Exponent«.</p>
+        <p>Bei obigem Beispiel gleitet allerdings noch nichts. Bei sehr großen oder aber auch sehr kleinen Bruch-Zahlen reicht uns — und einem Computer — nicht der Platz, um sie darzustellen. Die Zahl 0,000000000000000123 sprengt jeden normalen Rahmen.</p>
 
-<p>Alle Commodore-Computer verarbeiten intern alle Zahlen in dieser Darstellung, also als Gleitkommazahl (siehe auch Assembler Kurs im 64’er-Magazin, Ausgabe 11)</p>
+        <p>Daher schreiben wir sie anders. Wir lassen das Komma nach rechts gleiten, bis es die erste Ziffer, die von 0 verschieden ist, findet und für jede Null, die es passiert multiplizieren wir die Zahl mit 10.</p>
 
+        <p>Die Zahl oben sieht dann so aus:<br>
+            0,123 x 10 hoch 15 (eine 1 mit 15 Nullen).</p>
+
+        <p>Die Grundzahl vorn heißt »Mantisse«, die 10 mit Hochzahl heißt »Exponent«.</p>
+
+        <p>Alle Commodore-Computer verarbeiten intern alle Zahlen in dieser Darstellung, also als Gleitkommazahl (siehe auch Assembler Kurs im 64’er-Magazin, Ausgabe 11)</p>
+
+    </article>
+
+</body>
+
+</html>

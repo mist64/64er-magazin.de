@@ -1,30 +1,51 @@
-<h1>Spielen in der dritten Dimension</h1>
+<!DOCTYPE html>
+<html lang="de">
 
-<p class="intro">»3D-Vier gewinnt« ist eine interessante Variante des bekannten Strategiespiels. Bemerkenswert ist auch, daß der Autor ohne Steuerzeichen ausgekommen ist.</p>
+<head>
+    <title>XXX</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="XXX">
+    <meta name="64er.issue" content="12/84">
+    <meta name="64er.pages" content="999">
+    <meta name="64er.id" content="XXX">
+</head>
 
-<p>Bei »3D-Vier gewinnt« setzen die beiden Spieler abwechselnd einen Spielstein auf eines der 16 Felder, die in vier Reihen und vier Spalten angeordnet sind. Hierbei werden Türme von maximal vier Steinen Höhe gebildet. Sieger ist, wer als erster eine beliebige Reihe oder Diagonale — auch Raumdiagonale — mit vier Steinen besetzt. Sollten zuvor alle 64 möglichen Felder besetzt sein, so geht das Spiel unentschieden aus.</p>
+<body>
+    <article>
 
-<h3>Zum Programm:</h3>
+        <h1>Spielen in der dritten Dimension</h1>
 
-<p>Man kann wahlweise gegen einen Spielpartner oder, bei unterschiedlicher Spielstärke, gegen den Computer antreten. Der Computer benötigt hierbei, obwohl das Programm in reinem Basic geschrieben ist, weniger als zehn Sekunden Bedenkzeit. Es ist auch möglich, den Computer sich selbst zu überlassen. Das Programm übernimmt die dreidimensionale Darstellung, überwacht die Korrektheit der Züge und ermittelt den Sieger.</p>
+        <p class="intro">»3D-Vier gewinnt« ist eine interessante Variante des bekannten Strategiespiels. Bemerkenswert ist auch, daß der Autor ohne Steuerzeichen ausgekommen ist.</p>
 
-<p>Während des Spieles kann man sich jederzeit vom Computer einen Zugvorschlag holen, der allerdings mit Vorsicht zu genießen ist (da Spielstärke 1 voreingestellt ist) und auf Wunsch die Seiten wechseln. Alle nötigen Eingaben werden im Dialog erfragt. Bleibt nur zu erklären, wie man einen Zug ausführt: Während des Spieles ist in der linken Bildschirmhälfte die dreidimensionale Darstellung des Spielfeldes zu sehen. Rechts erscheint in schematisierter Form eine Draufsicht auf das Spielfeld, wobei in deren unteren linken Ecke ein Cursor erscheint. Dieser läßt sich nun, entweder mit einem Joystick in Port 2 oder mittels der Cursortasten an die gewünschte Position dirigieren. Drückt man nun den Feuerknopf beziehungsweise die Return-Taste, wird der gewünschte Zug — sofern er den Regeln entspricht — ausgeführt.</p>
+        <p>Bei »3D-Vier gewinnt« setzen die beiden Spieler abwechselnd einen Spielstein auf eines der 16 Felder, die in vier Reihen und vier Spalten angeordnet sind. Hierbei werden Türme von maximal vier Steinen Höhe gebildet. Sieger ist, wer als erster eine beliebige Reihe oder Diagonale — auch Raumdiagonale — mit vier Steinen besetzt. Sollten zuvor alle 64 möglichen Felder besetzt sein, so geht das Spiel unentschieden aus.</p>
 
-<p>Bei Spielende ertönt eine kleine Melodie, und das Programm verdeutlicht durch Blinken der entsprechenden Spielsteine die Gewinnsituation. Außerdem wird der Name des Siegers angezeigt. Durch Drücken einer beliebigen Taste startet man ein neues Spiel.</p>
+        <h3>Zum Programm:</h3>
 
-<h3>Detailbeschreibung — Spielstrategie:</h3>
+        <p>Man kann wahlweise gegen einen Spielpartner oder, bei unterschiedlicher Spielstärke, gegen den Computer antreten. Der Computer benötigt hierbei, obwohl das Programm in reinem Basic geschrieben ist, weniger als zehn Sekunden Bedenkzeit. Es ist auch möglich, den Computer sich selbst zu überlassen. Das Programm übernimmt die dreidimensionale Darstellung, überwacht die Korrektheit der Züge und ermittelt den Sieger.</p>
 
-<p>Jedes Feld ist durch eine x-, y- und z-Koordinate eindeutig bestimmt. Damit der Computer etwas zu rechnen hat, wird jedem möglichen Zustand der einzelnen Felder ein Zahlenwert zugeordnet, der im dreidimensionalen Feld FE gespeichert wird. Hierbei bedeutet<br>
-3 = das Feld ist von Spieler 2 besetzt<br>
-2 = das Feld ist von Spieler 1 besetzt<br>
-1 = das Feld ist unbesetzt, kann aber im nächsten Zug besetzt werden<br>
-0 = unbesetztes Feld</p>
+        <p>Während des Spieles kann man sich jederzeit vom Computer einen Zugvorschlag holen, der allerdings mit Vorsicht zu genießen ist (da Spielstärke 1 voreingestellt ist) und auf Wunsch die Seiten wechseln. Alle nötigen Eingaben werden im Dialog erfragt. Bleibt nur zu erklären, wie man einen Zug ausführt: Während des Spieles ist in der linken Bildschirmhälfte die dreidimensionale Darstellung des Spielfeldes zu sehen. Rechts erscheint in schematisierter Form eine Draufsicht auf das Spielfeld, wobei in deren unteren linken Ecke ein Cursor erscheint. Dieser läßt sich nun, entweder mit einem Joystick in Port 2 oder mittels der Cursortasten an die gewünschte Position dirigieren. Drückt man nun den Feuerknopf beziehungsweise die Return-Taste, wird der gewünschte Zug — sofern er den Regeln entspricht — ausgeführt.</p>
 
-<p>Ist der Computer am Zug oder wird ein Zugvorschlag gewünscht, geschieht folgendes: Der Computer berechnet für jedes mögliche Feld (FE(X,Y,Z)=1) eine Bewertung (im Programm ab Zeile 2000) und entscheidet sich dann für das Feld mit der höchsten Bewertung. Mit einem kleinen Trick wurde der Zeitaufwand hierfür minimiert: Für die Entscheidung, ob ich in die linke untere Ecke setze, ist es unwesentlich, wie es rechts oben aussieht. Das Programm bewertet also jede Viererreihe getrennt und ermittelt die Bewertung eines Feldes als Summe der Bewertungen aller Viererreihen, an denen dieses Feld beteiligt ist. Der große Zeitvorteil ergibt sich jetzt dadurch, daß nach jedem Zug nur einfach jene Reihen neu bewertet werden müssen, in denen sich wirklich etwas geändert hat (ab Programmzeile 2 500).</p>
+        <p>Bei Spielende ertönt eine kleine Melodie, und das Programm verdeutlicht durch Blinken der entsprechenden Spielsteine die Gewinnsituation. Außerdem wird der Name des Siegers angezeigt. Durch Drücken einer beliebigen Taste startet man ein neues Spiel.</p>
 
-<p>Bei der Spielstärke 2 wird im Gegensatz zur Spielstärke 1 mit berücksichtigt, daß das darüberliegende Feld im nächsten Zug vom Gegner besetzt werden kann. Deshalb wird dieses Feld (mit negativem Vorzeichen) ebenfalls bewertet. Dadurch verdoppelt sich allerdings die Bedenkzeit bei Spielstärke 2.</p>
+        <h3>Detailbeschreibung — Spielstrategie:</h3>
 
-<p>In den Programmzeilen 3010, 3100 und 3180 steht der Aufruf »SYS 58732«. Hierbei handelt es sich um eine Betriebssystem-Routine, die nach der Cursorpositionierung (durch Setzen der Speicherstellen 211 und 214) die Bildschirmparameter neu bestimmt.</p>
+        <p>Jedes Feld ist durch eine x-, y- und z-Koordinate eindeutig bestimmt. Damit der Computer etwas zu rechnen hat, wird jedem möglichen Zustand der einzelnen Felder ein Zahlenwert zugeordnet, der im dreidimensionalen Feld FE gespeichert wird. Hierbei bedeutet<br>
+            3 = das Feld ist von Spieler 2 besetzt<br>
+            2 = das Feld ist von Spieler 1 besetzt<br>
+            1 = das Feld ist unbesetzt, kann aber im nächsten Zug besetzt werden<br>
+            0 = unbesetztes Feld</p>
 
-<address class="author">(Uwe Weiß/rg)</address>
+        <p>Ist der Computer am Zug oder wird ein Zugvorschlag gewünscht, geschieht folgendes: Der Computer berechnet für jedes mögliche Feld (FE(X,Y,Z)=1) eine Bewertung (im Programm ab Zeile 2000) und entscheidet sich dann für das Feld mit der höchsten Bewertung. Mit einem kleinen Trick wurde der Zeitaufwand hierfür minimiert: Für die Entscheidung, ob ich in die linke untere Ecke setze, ist es unwesentlich, wie es rechts oben aussieht. Das Programm bewertet also jede Viererreihe getrennt und ermittelt die Bewertung eines Feldes als Summe der Bewertungen aller Viererreihen, an denen dieses Feld beteiligt ist. Der große Zeitvorteil ergibt sich jetzt dadurch, daß nach jedem Zug nur einfach jene Reihen neu bewertet werden müssen, in denen sich wirklich etwas geändert hat (ab Programmzeile 2 500).</p>
 
+        <p>Bei der Spielstärke 2 wird im Gegensatz zur Spielstärke 1 mit berücksichtigt, daß das darüberliegende Feld im nächsten Zug vom Gegner besetzt werden kann. Deshalb wird dieses Feld (mit negativem Vorzeichen) ebenfalls bewertet. Dadurch verdoppelt sich allerdings die Bedenkzeit bei Spielstärke 2.</p>
+
+        <p>In den Programmzeilen 3010, 3100 und 3180 steht der Aufruf »SYS 58732«. Hierbei handelt es sich um eine Betriebssystem-Routine, die nach der Cursorpositionierung (durch Setzen der Speicherstellen 211 und 214) die Bildschirmparameter neu bestimmt.</p>
+
+        <address class="author">(Uwe Weiß/rg)</address>
+
+    </article>
+
+</body>
+
+</html>
