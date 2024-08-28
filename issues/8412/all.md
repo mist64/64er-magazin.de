@@ -351,7 +351,8 @@ Michael Schmitt
 
 Die Grafikerweiterung VC 1211 A (auch als »Super Expander« bekannt) sollte bei jedem Commodore-Händler erhältlich, sein.
 
-## Probleme mit Datasette 
+## Probleme mit Datasette
+
 Ich habe andauernd »LOAD ERROR« bei meiner Datasette.
 Ausgabe: 9/84
 
@@ -552,7 +553,8 @@ Die beiden anderen monochromen Testkandidaten sind eigentlich sehr nahe Verwandt
 
 Obwohl zwischen zwei so guten Monitoren wie dem BM 12 ES und dem BM 12 EN (Bild 7) bei der Beurteilung der Bildqualität immer ein gewisser Anteil Subjektivität dabei ist, gefiel der BM 12 EN ein wenig besser. Mit einem Preis von 425 Mark ist er allerdings auch einer der teuersten getesteten Geräte. Für den BM 12 EN wird eine Bandbreite von über 20 Megahertz angegeben. Das Bild ist sehr deutlich und absolut ruhig. Auch beim Einsatz der 80-Zeichenkarte wartete der BM 12 EN mit dem besten Ergebnis auf (Bild 8). Alle Zeichen waren gestochen scharf, so daß der Eindruck entstehen konnte, daß der Commodore 64 nie für weniger als 80 Zeichen pro Zeile konzipiert wurde. Auch beim BM 12 EN ist die Bildröhre entspiegelt, allerdings nicht durch eine Folie, sondern durch leichtes Anätzen der Oberfläche. Das Resultat fiel allerdings nicht so überzeugend wie beim ES-Modell aus.
 
-## Kein eindeutiger Sieger 
+## Kein eindeutiger Sieger
+
 Ist die Entscheidung zwischen einem farbigen- und einem monochromen Monitor erst einmal gefallen, so sind bis auf den Taxan Monitor alle getesteten Geräte durchaus empfehlenswert. Mit einem Preis von etwa 800 Mark zuzüglich 18 Mark für das Verbindungskabel ist der Cable MC 3700, der auch in einer RGB-Version geliefert wird, zwar nicht gerade billig, bietet aber von allen bisher getesteten Farbmonitoren das beste Bild.
 
 Ein monochromer Monitor sollte in der Regel dann eingesetzt werden, wenn auch eine 80-Zeichenkarte vorhanden ist, dabei ist es wichtig, daß die Zusammenarbeit mit einer solchen Karte problemlos funktioniert. Die beiden BMC-Monitore bieten hierfür die besten Voraussetzungen. Wer sich allerdings für alle späteren Anwendungen gerüstet wissen will, sollte die 25 Mark Mehrkosten aufbringen und sich gleich das bessere EN-Modell zulegen.
@@ -1209,24 +1211,587 @@ Nun noch ein Hinweis für diejenigen, die den SID selbst programmieren wollen un
 
 
 
+# Mathematical Basic
 
+Fortsetzung von Seite 50
 
+Eine gute Nachricht für alle Freunde des VC 20: Unser »Listing des Monats« macht mit über 50 neuen Befehlen das Programmieren zum Vergnügen.
 
+Leider gibt es aber auch eine schlechte Nachricht. Sie müssen gut und gerne 150 DATA-Zeilen eintippen. Lassen Sie sich aber davon nicht entmutigen. Der Aufwand lohnt sich ganz bestimmt. Das Programm hilft Ihnen bei der wohl unvermeidlichen Suche nach Tippfehlern durch das blockweise Bilden von Prüfsummen.
 
+### Befehle des Mathematical Basic
 
+':	
+erlaubt eine REM-Anweisung innerhalb einer Zeile ohne sofortige Programmfortsetzung ab folgender Zeile.
+**BEEP** h, I:
+gibt einen Ton variabler Höhe (h) und Länge (I) aus. h ist im Bereich von 0 bis 126 und I von 0 bis 255 definiert. Beträgt l=O, so wird kein Ton ausgegeben.
+**CATALOG**:
+bringt das Inhaltsverzeichnis der Diskette auf den Bildschirm. Dieser Befehl ist nur für das Gerät mit der Nummer 8 definiert. Wird während der Ausgabe die STOP-Taste betätigt, so wird die Ausgabe sofort abgebrochen. Wird die Leertaste gedrückt, so wird die Ausgabe nur unterbrochen und kann mit einer weiteren Betätigung dieser Taste fortgesetzt werden.
+**COLOR**
+c,h,r: setzt die Farben für Cursor (c), Hintergrund (h) und Rahmen (r). r und c erstrecken sich von 0 bis 7 und h von 0 bis 1 5. Die einzelnen Farben bezüglich der Nummercodes können dem VC 20-Handbuch entnommen werden.
+**CLS**:
+löscht den Bildschirmspeicher.
+**DEFUSRn TO x**:
+definiert einen der neun möglichen USR-Vektoren. Die einzelnen USR-Funktionen werden durch das Zeichen n unterschieden. n kann dabei A, B, C, D, E, F, G oder H sein. Die neunte USR-Funktion ist die, welche über den Vektor in den Adressen 1 und 2 angesprungen wird. Soll dieser Vektor definiert werden, so muß n weggelassen werden. Die Variable x steht für den Vektor selbst, also der Adresse, ab der die U8R-Funktion starten soll. Beispiel: DEFUSRA TO 30000. Die USR-Funktion U8RA erhält die Einsprungadresse 30000.
+**DEGREE**:
+stellt die Routinen für trigonometrische Funktionen auf Normalgrad (0 bis 360) ein.
+**DELETE a-b**:
+löscht Zeilen eines Basic-Programms von Zeile a bis Zeile b. Für a und b sind nur Konstanten erlaubt.
+**DIRECTORY**:
+siehe CATALOG
+**DLOAD** pn$.
+lädt ein Programm mit dem Namen pn$ vom Floppy-Laufwerk mit der Nummer 8. Außer dem Namen sind keine weiteren Parameter erlaubt.
+**DO**:
+erlaubt zusammen mit UNTIL eine Schleife. Der zwischen diesen beiden Schlüsselwörtern liegende Programmteil wird so oft wiederholt, bis der Ausdruck, der UNTIL folgt, nicht mehr auf logisch 0 ist. Dazu ein Beispiel: DO GET a$: UNTIL a$="". Das Programm verläßt die Schleife nicht eher, bis die Leertaste gedrückt wird. DO-UNTIL-Schleifen können acht Ebenen tief geschachtelt werden. Eine neunte DO-Anweisung würde die Meldung »out of memory« zur Folge haben. Sollte UNTIL einmal ohne einen vorangegangenen DO-Befehl aufgerufen werden, so gibt der VC 20 »until without do« aus.
+**DSAVE** pn$:
+sichert ein Programm mit dem Namen pn$ auf dem Floppy-Laufwerk mit der Nummer 8. Außer dem Namen sind keine weiteren Parameter zulässig. Sollte dem Befehl DSAVE, DLOAD oder DVERIFY kein Parameter folgen, so wird automatisch »*« als Parameter gesetzt.
+**DVERIFY** pn$:
+vergleicht das Programm mit dem Namen pn$ im Speicher mit dem gleichen auf der Diskette. Als Parameter ist nur der Name erlaubt.
+**EXECUTE** a$:
+wandelt den String a$ in Interpretercode und führt die darin enthaltenen Anweisungen aus. Beispiel: a$=”a=22”:EXE-CUTE a$. Der Variablen a wird der Wert 22 zugewiesen. Der Befehl darf nicht im Direkt-Modus gegeben werden und der Befehlsstring (a$) darf eine Länge von 88 Zeichen nicht überschreiten.
+**GRAD**:
+stellt die trigonometrischen Routinen auf Neugrad (0 bis 400). IF:
+Die IF...THEN-Anweisung ist in ihren Aufbaumöglichkeiten erweitert worden. Es ist nicht mehr zwingend erforderlich, den THEN-Dummy zu schreiben. Beispiel: IF A=4 THEN PRINT B$ läßt sich auch als IF A=4 PRINT B$ eingeben.
+**INITIALIZE**:
+initialisiert die Floppy mit der Nummer 8.
+**LOCATE** z,s:
+setzt den Cursor in Zeile z und Spalte s. z liegt im Bereich von 1 bis23undsvon1 bis22.FolgendeVariationsm0glichkeiten sind gegeben: LOCATE z definiert nur eine neue Zeilenposition. LOCATE ,s setzt den Cursor innerhalb einer Zeile nur an eine neue Spaltenposition.
+**LPRINT**:
+verhält sich wie PRINT. Die Zeichen werden aber nicht auf den Bildschirm, sondern auf den Drucker (Nummer 4) ausgegeben. LPRINT und PPRINT sollten nur bei angeschlossenen Geräten benutzt werden, da sonst der lEC-Bus blockiert wird.
+**RADIAN**:
+stellt die trigonometrischen Routinen auf Bogenmaß ein.
+**RENUMBER** z,s:
+reorganisiert die Zeilennummern eines Basic-Programms. z ist dabei die Startzeile und s die Schrittweite, z und s dürfen nur Konstanten sein. Sollten dem Befehl keine Parameter folgen, so gilt z = 100 und s = 10.
+**RESTORE TO** z:
+positioniert den DATA-Pointer auf die Zeile z. Das Wort TO kann dabei wegfallen. RESTORE allein setzt den Pointer wie gewohnt auf den Programmstart.
+**RETURN TO** z:
+ermöglicht es, aus einem Unterprogramm in eine bestimmte Zeile z zurückzukehren.
+**RUN** ”name”:
+hat die gleiche Funktion wie DLOAD. Zusätzlich wird aber noch der String RUN +CHR$(13) in den Tastaturpuffer geschrieben. Das hat zur Folge, daß das gerade geladene Programm sofort gestartet wird.
+**PPRINT**:
+verhält sich wie PRINT. Die Zeichen werden aber, anstatt auf den Bildschirm, auf den Plotter (Nummer 6) ausgegeben.
+**QUIT**:
+führt ein Total-Reset aus. Mathematical Basic wird dabei gelöscht.
+**UNITL** a: siehe DO.
+**! a**:
+ist ein Äquivalent zur CHR$(a)-Funktion. Hierbei sind aber keine Klammern nötig, a ist nur als Konstante erlaubt.
+**&**:
+ist das »Hexadezimal-Vorzeichen« für Hex-Konstanten. Beispiel: &aO2b ist das Äquivalent für 41003. Die Anzahl der Hex-Ziffern ist beliebig, es wird maximal eine 16-Bit-Zahl errechnet.
+**←**:
+entspricht dem Ausdruck CHR$(13) und kann auch genauso gehandhabt werden.
+**[a]**:
+hat die gleiche Wirkung wie die ABS-Funktion. Unterscheidet sich aber durch die bessere Selbstdokumentation.
+**ACS**(a):
+berechnet abhängig von derjeweiligen Einstellung durch RA-DIAN, DEGREE oder GRAD den Arcus-Cosinus von a. Die hier angesprochene Abhängigkeit gilt für alle trigonometrischen Funktionen.
+**ACT**(a):
+bestimmt den Arcus-Cotangens von a.
+**ASN**(a):
+ergibt den Arcus-Sinus von a.
+**CHR$**(z,l).
+ist eine Variante von CHR$(z). z entspricht dabei dem Zeichen des normalerweise nur 1 Byte langen Strings. Mit I läßt sich nun aber zusätzlich auch die Länge variieren. I ist dabei von 0 bis 255 definiert.
+**COT**(a):
+berechnet den Cotangens von a.
+**CRSCOL**:
+holt die momentane Spaltenposition des Cursors.
+**CRSLIN**:
+holt die momentane Zeilenposition des Cursors.
+**CVF**(a$):
+wandelt den fünf Zeichen langen String a$ in eine Fließkommazahl um.
+**CVI**(a$):
+wandelt den zwei Zeichen langen String a$ in eine Integerzahl um.
+**DEC**(a$):
+berechnet aus dem 4-Byte-String a$, der sich aus Hex-Ziffern aufbaut, eine dezimale 16-Bit-Zahl.
+**DIV**(a,b,):
+ist gleichwertig mit dem Ausdruck INT(a/b).
+**FRC**(a):
+holt die Nachkommazahl von a.
+**FUNCTION**(a$).
+wandelt den maximal 88 Zeichen langen String a$ in Interpretercode und berechnet ihn. Beispiel: y=FUNCTION(”5 + 2”). y wird der Wert 7 zugewiesen. Diese Funktion darf nicht im Direktmodus stehen.
+**HEX$**(a):
+wandelt die 16-Bit-Zahl a in einen 4-Byte-Hex. String.
+**INSTR**(a$,b$):
+testet, an welcher Stelle a$ sich in b$ befindet. Ist a$ nicht in b$ enthalten, so ist das Ergebnis 0, ansonsten entspricht es der Position von a$ in b$. a$ und b$ müssen mindestens 1 Zeichen lang sein und a$ darf nicht länger als b$ sein. INSTR darf nicht im Direktmodus stehen.
+**LGD** (a):
+berechnet den dekadischen Logarithmus von a.
+**LGU**(a,b):
+bestimmt den Logarithmus von a zur Basis b.
+**MKF$**(a):
+wandelt die Zahl a in einen fünf Zeichen langen String.
+**MKI$**(a):
+wandelt die Integerzahl a in einen zwei Zeichen langen String. MOD(a,b):
+bestimmt den ganzzahligen Rest aus der Division von a durch b.
+**RANDOM**:
+entspricht dem Ausdruck RND(1).
+**RANDOM**(a,b):
+entspricht dem Ausdruck RND(1)*b+a.
+**TIME$**:
+ist eine modifizierte Form von Tl$. Der Unterschied liegt darin, daß bei TIME$ noch zwei Trennzeichen eingefügt werden.
+**USR**n:
+entspricht im Prinzip der USR(a)-Funktion. Unterschiede liegen darin, daß n (was der Kennung A, B, C, D, E, F, G oder H entspricht) folgen muß, aber keine »Klammer-auf-Klammer-zu«-Sequenz. Diese Routine (Aufruf durch JSR$cef1) muß zusätzlich an USR-Routinen, die für die Standard-USR-Funktion ausgelegt sind, angehängt werden. DerVorteil bei den USRn-Funktionen liegt nun darin, daß man den USR-String mit mehreren Parametern übergeben kann. Die dazu nötigen Routinen sind:
 
+TODO table
+cefa Test auf Klammer auf und nächstes Zeichen holen. cd9e Ausdruck holen und String- und lnteger-Flag setzen. cd8d Test auf numerischen Ausdruck.
+cd8f	Test auf String.
+cef7 Test auf Klammer zu und nächstes Zeichen holen.
+cefd Test auf Komma und nächstes Zeichen holen.
+Damit sind alle neuen Befehle und Funktionen vorgestellt. Bleibt nur noch, Ihnen viel Spaß beim Programmieren mit »Mathematical Basic« zu wünschen.
 
+(Wolfgang W. Wirth/ev)
 
+# Ohne gutes Werkzeug geht es nicht: SMON Teil 2
 
+> Der Maschinensprache-Monitor SMON wird immer leistungsfähiger. Dieser 2. Teil erweitert ihn um wichtige Ausgabe-Routinen, läßt das Verschieben eines Programms mit und ohne Adreß-umrechnung zu und kann Zahlen vom Dezimal- in das Binärsystem und umgekehrt umrechnen.
 
+Wir hoffen, daß wir Ihnen in der letzten Ausgabe nicht zuviel zugemutet haben, und daß sich Ihre wunden Finger inzwischen wieder erholen konnten. Bestimmt haben Sie im vergangenen Monat schon eifrig mit dem neuen Monitor gearbeitet und sind inzwischen mit den bisherigen Befehlen vertraut. Denn nun folgt der zweite Teil und mit diesem natürlich wieder einige neue Befehle, die es zu erklären gilt.
+Und das bieten wir Ihnen heute:
+I/O-SET, LOAD, SAVE, PRINTER-SET, dieverschiedenen Zahlenumrechnungen (HEX-DEZ-BIN-ADD-SUB), OCCUPY CONVERT, VERSCHIEBEN und WRITE.
 
+### I/O-SET
 
+I01 legt die Device-Nummer für LOAD und SAVE auf I (Kassette). Jedes Laden und Abspeichern erfolgt jetzt auf das angegebene Gerät. Die voreingestellte Device-Nummer ist 8 (für die Floppy also: I 08). Wenn Sie nur mit der Floppy arbeiten, brauchen Sie diesen Befehl also nicht.
 
+### LOAD
 
+L ”Name” lädt ein Programm vom angegebenen Gerät (wie oben beschrieben) an die Originaladresse in den Speicher. Die Basic-Zeiger bleiben bei diesem Ladevorgang unbeeinflußt, das heißt, sie werden nicht verändert.
 
+Beispiel: Unser Monitor soll an seiner Originaladresse ($C000) im Speicher stehen. Also brauchen Sie ihn nur mit »L ”SMON”«zuladen, damiterdorterscheint. WennSieeinmal ein Programm an eine andere als die Originaladresse laden wollen, dann bietet Ihnen SMON dazu folgende Möglichkeit: ’L ”Name” ADRESSE lädt ein Programm an die angegebene Adresse. Nehmen Sie doch bitte noch einmal unser letztes Test-Programm und geben es mit dem Assembler ab Adresse $4000 ein. Speichern Sie es mit »’S ’’SUPERTEST” 4000 4023« ab und laden es dann
 
+1.	an die Originaladresse (L "SUPERTEST”) und
+2.	an eine andere Adresse (mit L ”SUPERTEST”5000 zum Beispiel nach $5000).
 
+Schauen Sie sich danach mit dem Disassembler-Befehl beide Routinen einmal an. Sie werden feststellen, daß beide Programme zwar bis auf die BRANCH-Befehle gleich aussehen, daß das Programm in $5000 aber nichtfunktionieren kann, da es eine falsche Adresse verwendet (5002 LDA 400E,Y). Ein anderes Beispiel dazu: Ein Autostart-Programm beginnt bei $0120, läßt sich aber in diesem Bereich nicht untersuchen, da dort der Prozessor-STACK (im Bereich von $0100 bis $01FF) liegt, der vom Prozessor selbst ständig verändert wird. Wenn Sie nun L”Name” 4120 eingeben, befindet sich das Programm anschließend bei $4120 (nicht an der Originaladresse $0120) und Sie können es ohne Einschränkungen — von den falschen Absolut-Adressen abgesehen — disassemblieren.
 
+### SAVE
+
+S ”Name”, ANFADR ENDADR speichert ein Programm von ANFADR bis ENDADR-1 unter »Name« auf die Floppy ab, da diese — wie wir ja inzwischen wissen — das voreingestellte Gerät ist. Wenn Sie auf Kassette abspeichern wollen, setzen Sie vorher mit »I 01« die Device-Nummer auf 1.
+
+Beispiel: S”SUPERTEST”4000 4020 speichert das Programm mit dem Namen »SUPERTEST« (es steht im Speicher von $4000 bis $401F) auf Diskette ab. Bitte beachten Sie auch bei diesem Befehl, daß die Endadresse auf das nächste Byte hinter dem Programm gesetzt wird.
+
+### PRINTER-SET
+
+P 02 setzt die Primäradresse für den Drucker auf 2. Voreingestellt ist hier die 4 als Gerätenummer (zum Beispiel für Commodore-Drucker). Vielleicht haben Sie es ja schon bemerkt: Bei allen Ausgabe-Befehlen (wie D, M etc.) können Sie auch den Drucker ansprechen, wenn Sie das Kommando ge-shiftet eingeben. Die Ausgabe erfolgt dann gleichzeitig auf Bildschirm und Drucker. (Beachten Sie bitte die Änderung für die Druckerausgabe am Schluß des Artikels.)
+
+## Ein bißchen Rechnerei
+
+Die folgende Befehlsgruppe enthält Befehle zur Zahlenumrechnung. Sie wissen ja: Der Mensch mit seinen zehn Fingern neigt eher zur dezimalen Rechenweise, aber der Computer bevorzugt das Binärsystem, weil er nur zwei Finger hat (siehe Netzstecker). Ein Kompromiß ist das Hexadezimalsystem, denn das versteht keiner von beiden. Um Verständnis-Schwierigkeiten mit Ihrem Liebling aus dem Weg zu gehen, haben Sie aber SMON.
+
+### UMRECHNUNG DEZ → HEX
+
+\# (Dezimalzahl) rechnet die Dezimalzahl in die entsprechende Hexadezimalzahl um. Hierbei können Sie die Eingabe in beliebiger Weise vornehmen, da SMON Zahlen bis 65 535 umrechnet. Beispiel: #12, #144, #3456, #65533 und so weiter.
+
+### UMRECHNUNG HEX → DEZ
+
+$ (Hexadezimalzahl) rechnet die Hexadezimalzahl in die entsprechende Dezimalzahl um. Die Eingabe muß hierbei zweistellig beziehungsweise vierstellig erfolgen. Ist diese Zahl klei-ner als $100 ( = 255), wird zusätzlich auch der Binärwert aus-gegeben.
+
+Beispiel: $12, $0012, $0D, $FFD2, etc. In den ersten drei Beispielen erfolgt die Anzeige auch in binärer Form.
+
+### UMRECHNUNG BINÄR → HEX,DEZ
+
+% (Binärzahl (achtstellig) rechnet die Binärzahl in die entsprechenden Hexa- und Dezimalzahlen um. Bei diesem Befehl müssen Sie genau acht Binärzahlen eingeben. Falls Sie einmal versehentlich mehr eingeben sollten, werden nur die ersten acht zur Umrechnung herangezogen. Beispiel: %00011111, %10101011
+
+### ADD-SUB
+
+? 2340 + 156D berechnet die Summe der beiden vier (!)-stelligen Hex-Zahlen. Neben der Addition ist auch Subtraktion möglich.
+
+## Programme auf dem Rangierbahnhof
+
+### OCCUPY (Besetzen)
+
+0 (ANFADR ENDADR HEX-Wert) belegt den angebenen Bereich mit dem vorgegebenen HEX-Wert. Beispiel:O 5000 8000 00 füllt den Bereich von $5000 bis $7FFF mit Nullen.
+
+Man kann mit »OCCUPY« aber nicht nur Speicherbereiche löschen, sondern auch mit beliebigen Werten belegen. Häufig hat man das Problem, festzustellen, welcher Speicherplatz von einem Programm wirklich benutzt wird. Wir füllen den in Frage kommenden Bereich dann zuerst zum Beispiel mit »AA« und laden dann unser Programm. Probieren Sie bitte das folgende Beispiel: Füllen Sie den Speicherbereich von $3000 bis $6000 mit $AA, und laden Sie dann unser SUPERTEST-Programm. Beim Disassemblieren können Sie erkennen, daß unser kleines Programm exakt zwischen vielen AAs eingebettet ist.
+
+### WRITE
+
+W (ANFADRalt ENDADRalt ANFADRneu) verschiebt den Speicherbereich von ANFADRalt bis ENDADRalt nach ANFADRneu ohne Umrechnung der Adressen! Unser kleines Testprogramm möge noch einmal als Beispiel dienen: W 4000 4020 6000 verschiebt das oben angesprochene Programm von $4000 nach $6000.
+
+Hierbei werden weder die absoluten Adressen umgerechnet noch die Tabellen geändert. Letzteres ist sicherlich erwünscht, aber denken Sie daran, daß das verschobene Programm nun nicht mehr lauffähig ist, da die absoluten Adressen nicht mehr stimmen (zum Beispiel bei dem Befehl LDA 400E,Y). Falls Siejetzt »G6000« eingeben, um das Programm zu starten, werden Sie sich sicherlich wundern, daß es dennoch läuft. Doch löschen Sie einmal das Programm in $4000 (mit »04000 4100 AA«) und starten das Programm in $6000 noch einmal! Seltsam, nicht? Abhilfe schafft der nächste Befehl.
+
+### VARIATION
+
+V (ANFADRalt ENDADRalt ANFADRneu ANFADR ENDADR) rechnet alle absoluten Adressen im Bereich von ANFADR bis ENDADR, die sich auf ANFADRalt bis ENDADRalt beziehen, auf ANFADRneu um. Kompliziert? Nicht, wenn Sie sich klarmachen, daß die ersten drei Adressen exakt den Eingaben beim »W«-Befehl entsprechen. Neu hinzukommen nur die beiden Adressen für den Bereich, in dem die Änderung tatsächlich erfolgt.
+
+Um unser mit »W« schon verschobenes Programm auch wieder lauffähig zu machen, geben Sie folgendes ein: V 4000 4020 6000 6000 600E. Damit werden alle Absolutadressen, die im Bereich von $6000 bis $600E — dahinter steht die Tabelle — liegen und sich bisher auf $4000 bis $4020 bezogen haben, auf den neuen Bereich umgerechnet. Probieren geht wie immer über kapieren.
+
+Eine Zusammenfassung dieser beiden Befehle ermöglicht:
+
+### CONVERTIEREN
+
+verschieben eines Programmes mit Adreßumrechnung)
+
+C (ANFADRalt ENDADRalt ANFADRneu ANFADRges END-ADRges) verschiebt das Programm von ANFADRalt bis ENDADRalt zur ANFADRneu und zwar mit Umrechnung der Adressen zwischen ANFADRges und ENDADRges
+
+An unserem kleinen Testprogramm läßt sich wieder einmal demonstrieren, wie der Befehl eingesetzt wird. Laden Sie es also mit »L’SUPERTEST”« und schauen es mit »D 4000« an. Jetzt wollen wir an der Adresse $4008 einen 3-Byte-Befehl einfügen: C 4008 4020 400B 4000 4011 verschiebt das Programm von $4008 bis $4020 zur neuen Anfangsadresse $400B. Dabei werden im Bereich von $4000 bis $4011 (neue Endadresse des »aktiven« Programmes!) die Sprungadressen umgerechnet. Nun können Sie ab Adresse $4008 einen 3-Byte-Befehl einfügen, zum Beispiel STY 0286. Dazu geben Sie bitte ein:
+A 4008
+4008 STY 0286
+F
+
+Überzeugen Sie sich davon, daß SMON die Befehle korrekt umgerechnet hat, indem Sie unser Beispiel disassemblieren (D 4000) und anschließend mit G 4000 starten. Besitzer eines Farbmonitors werden in helle Begeisterung ausbrechen. Vorsicht ist geboten, wenn Tabellen oderText vorhanden sind. SMON wird versuchen, diese als Befehle zu disassemblieren und gegebenenfalls umzurechnen. Dabei können unvorhersehbare Verfälschungen auftreten. Aus diesem Grunde ist im Beispiel die Endadresse des zu ändernden Bereiches auf $4011 und nicht etwa auf $4023 gelegt worden. Wenn Sie größere Programme zu verschieben haben, sollten Sie die Kommandos W und V anwenden, beziehungsweise einen Assembler einsetzen, der es Ihnen gestattet, beliebige Einfügungen, Verschiebungen und sonstige Änderungen vorzunehmen. Das C-Kommando eignet sich in erster Linie für kleinere Änderungen innerhalb eines Programms.
+
+## Der Blick hinter die Kulissen
+
+Wie beim letzten Mal wollen wir noch einen kleinen Blick auf das Programm werfen. Wir haben zwei häufig vorkommende Programmteile ausgewählt. Wenn Sie nach erfolgreichem Eintippen der neuen DATAs einmal mit »D C84F« die »LOAD-SAVE«-Routine listen, sehen Sie, daß diese sehr wenig Platz beansprucht. Das Geheimnis dieser Beschränkung liegt in der Tatsache begründet, daß wir hier auf Betriebssystem-Routinen zurückgegriffen haben. Doch dazu nachher mehr; erst einmal die angesprochene Routine von Anfang an:
+
+TODO
+
+Die Speicherstellen $BB/$BC enthalten jetzt die Adresse $0201, also den Beginn des Basic-Eingabepuffers. In $B9 befindet sich der Wert 01, das bedeutet, daß die Sekundäradresse für absolutes Laden voreingestellt ist. Die Speicherstelle $B7 enthält die Länge des Dateinamens, hier erst einmal 0.
+
+TODO
+
+Überprüft, ob Anführungsstriche eingegeben wurden. Falls nicht, springt unser Programm in die Routine »LSERROR« und bricht ab.
+
+TODO
+
+In diesem Programmteil wird der Filename eingelesen und in die Adresse gespeichert, die in $BB/$BC enthalten ist ($0201). Gleichzeitig wird $B7 als Zähler für die Namenlänge so lange erhöht, bis das zweite Anführungszeichen auftaucht. Damit ist der Filename gespeichert, beginnend bei $0201.
+
+TODO
+
+Da die Namenlänge um eins zu groß geraten ist (das letzte Zeichen war ein »”«), muß sie dekrementiert werden. Die gewählte oder voreingestellte I/O-Nummer (Device-Nummer) soll in $BA gespeichert werden, damit die Betriebssystemroutine nachher das richtige Gerät anspricht. Zum Abschluß überprüft der Compare-Befehl, ob das Kommando »S« gewählt ist, um dann dorthin zu verzweigen.
+
+TODO
+
+Wir sind nun an der Stelle des Befehls angelangt, an der sich herausstellen muß, ob das Programm an seine Originaladresse (absolut) oder an eine andere Adresse geladen werden soll. Die Unterroutine »GETRET« prüft, ob unmittelbar nach dem Namen ein »RETURN« folgt und führt eine Verzweigung nach »LOAD1« durch, falls dieses eintritt. Ansonsten holen wir uns die Adresse und laden das vorgesehene Programm dorthin, nachdem in Speicherstelle *$B9 eine Null gespeichert ist, da ein absolutes Laden nicht erfolgt. Die Routine »GETADR« ist so aufgebaut, daß sie die nächsten 2 Bytes an die mit dem X-Register gewählte Stelle in der Zeropage ablegt. Dann führen wir ebenfalls »LOAD1« durch.
+
+In »LOAD1« erfolgt der indirekte Sprung über $0330 in die LOAD-Routine des Betriebssystems.
+
+Die SAVE-Routine erfragt vorher noch die fehlenden Adressen (Anfangs- und Endadresse des Programmes, das gespeichert werden soll), speichert sie nach $C1/C2 und $AE/AF und springt dann in die SAVE-Routine. Noch ein Wort zu den angesprochenen Betriebssystem-Routinen: Mittlerweile gibt es für den C 64 mindestens drei verschiedene Versionen des Betriebssystems von Commodore. Es sind zwar meist nur kleine Änderungen, aber die können fatale Folgen haben, wenn sich die Einsprungadressen ändern. Deshalb gibt es einen besonderen Bereich, das KERNAL, dereinen Sprungverteilerfür diewichtigsten Routinen enthält. Dieser wird grundsätzlich nie geändert. Beziehen Sie deshalb Ihre Einsprungadressen immer auf die KERNAL-Routinen, um sicher zu sein, daß Ihr Programm auch noch mit der zwölften Version des Betriebssystems läuft. Die KERNAL-Einsprünge stehen ganz hinten ab $FF81 im Speicher.
+
+Als zweites ein Vergleich, der in Maschinenprogrammen häufig und in allen Variationen auftaucht: Es handeltsich dabei um den Vergleich zweier Adressen. Nun sind Adressen leider 16-Bit-Werte, unser Prozessor aber kann nur 8 Bit auf einmal verarbeiten. Gehen wir einmal von folgenden Bedingungen aus: Ein Programm soll von $4000 bis $4020 gelistet werden. Die Zeiger für das Ende befinden sich in Speicherstelle ENDLO (Lowbyte) und ENDHI (Highbyte). »PCL« (Programm-Counter-Low) und »PCH« (Programm-Counter-High) geben den augenblicklichen Stand des Programmes an. Dann erfolgt die Abfrage auf erreichtes Ende mit dieser Befehlsfolge:
+
+TODO
+
+Solange PCL und PCH kleiner sind als die Endwerte geht das Programm »WEITER«.
+
+Sobald aber PCL und PCH die Werte von ENDLO und ENDHI erreicht haben, wird das Carry-Flag gesetzt und die Abfage mit BCS FERTIG würde das Auflisten anhalten. Daß es bei der Anwendung einige Probleme geben kann, sieht man daran, daß die Ausgabe auch schon unterbrochen wird, wenn gerade erst das Programmende erreicht ist. (Der letzte Befehl könnte »unter den Tisch fallen«.) Aber kein Problem ohne Problemlösung — und natürlich ohne weitere Probleme, die Sie aber mit ein bißchen Nachdenken sicher selbst lösen können.
+
+### Hinweise zum Abtippen
+
+Tippen Sie das Ladeprogramm sorgfältig ab, speichern Sie es (!) und starten Sie mit RUN. Sollte es sich wider Erwarten auf Anhieb mit READY melden, haben Sie das Schlimmste geschafft. Ansonsten beseitigen Sie nun alle Fehler bis es zum READY durchläuft. Jetzt laden Sie das alte Ladeprogramm aus der letzten Ausgabe und starten es. Nach dem READY starten Sie SMON mit SYS 49152. Als erstes probieren Sie nun den Befehl »S«, um SMON selbst abzuspeichern, diesmal nicht mehr als Basic-Lader, sondern als Maschinenprogramm.
+S ”SMON $C000” C000 CAB7
+
+SMON belegt jetzt 11 Blöcke auf der Diskette. Ab jetzt können Sie SMON direkt mit »LOAD ”SMON $C000”,8,1« laden und mit SYS 49152 starten.
+
+Noch zwei Hinweise in eigener Sache: Einige wenige (!) Leser haben uns darauf aufmerksam gemacht, daß die Druckerausgabe auf bestimmten (exotischen) Druckern bisweilen kleinere Unzulänglichkeiten aufweist. Kurz und schlecht, uns ist in der letzten Folge ein Programmierfehler unterlaufen: Beim Disassemblieren verschwindet die letzte Zeile vor dem Strich (-----) im Drucker und ward nicht mehr gesehen. So etwas passiert, wenn man kurz vor Redaktionsschluß noch auf die Schnelle kleine »Verbesserungen« vornimmt.
+
+Für die Korrektur ist folgendes notwendig: Listen Sie mit »M C56C C57B« zwei Zeilen, gehen mit dem Cursor in die betreffenden Zeilen und geben folgende Änderung ein:
+
+TODO
+
+Nur die fetten Werte müssen geändert werden, alle anderen können Sie stehen lassen. Denken Sie bitte bei jeder Änderung daran, daß Sie die Zeile nur mit Drücken der RETURN-Taste an den Computer übergeben. Zur Probe können Sie ja noch einmal listen...
+
+Wir haben nach dem letzten Artikel eine Menge Anrufe erhalten, von Lesern, die größtenteils Schwierigkeiten beim Eintippen der DATAs beziehungsweise bei der Fehlersuche hatten. Deswegen hier Hinweise zu den häufigsten Problemen:
+
+1.	Wenn nach Beendigung der Tipparbeit nach dem RUN eine Fehlermeldung ».... ERROR in 40« (oder 70) erfolgt, dann ist sicherlich nicht die Zeile 40 oder 70 daran schuld, sondern Sie haben aller Wahrscheinlichkeit nach einen Wert (ein »Datum«) falsch eingetippt. Der Computer bringt eine Fehlermeldung, wenn er beim POKE-Befehl auf eine Kommazahl trifft oder einen anderen nicht POKEbaren Wert. Dafür gibt es — neben schlichten Tippfehlern — mehrere Möglichkeiten: Es kann ein Komma fehlen oder durch einen Punkt ersetzt worden sein. Gerade dies ist nämlich auf dem Bildschirm sehr schlecht zu erkennen.
+2.	Überprüfen Sie nach dem Programmabbruch anhand des Direktbefehls »PRINT I« in welchem Block ( + 1) der Fehler steckt. Also bei der Antwort »1« steckt der Fehler in Block 2. 3. Der Direktbefehl »PRINT A« zeigt Ihnen den Wert, der den Fehler verursacht hat.
+
+Versuchen Sie es erst einmal mit dieser kleinen Hilfe. Übrigens ist unser Listing mit 99prozentiger Wahrscheinlichkeit fehlerfrei, von uns und der Redaktion mehrfach durchprobiert. Das Dreckfuhlerteufelchen hat kaum eine Chance, da das Listing direkt von der Diskette auf den Drucker läuft.
+
+Ich hoffe, daß Sie bisjetzt nicht in Ihren Bemühungen nachgelassen haben, möglichst häufig dieverschiedensten Befehle zu probieren. Sie wissen doch: Nur die Übung macht den Meister — und das gilt speziell für die Maschinensprache. In der nächsten Ausgabe bekommen Sie dann die letzten Raffinessen des SMON, der dann komplett ist.
+
+(Norfried Mann/gk)
+
+# Bewegte Grafik und Text mischen
+Wer an Sprites denkt, stellt sich meist kleine Männchen oder Raumschiffe vor. Aber auch beim Einsatz in Anwendungsprogrammen können Sprites zur grafischen Illustration sehr nützlich sein.
+Als ich die Grafik entwarf, wollte ich ein Programm unter folgenden Gesichtspunkten schreiben: kein Spielkram und von Basic aus verwendbar. Damit diese Erweiterung auch mit anderen Basic-Erweiterungen ohne weiteres funktioniert, sollten die Befehle über »SYS« aufgerufen werden. Nun sollte es kein Allerweltsprogramm sein, sondern irgend etwas Neues. Da fielen mir die Sprites ein. Mit dem richtigen Programm könnten damit kleine aber deutliche Grafiken erstellt werden, zum Beispiel Niederschlags-Temperatur- oder Umsatztabellen. Als ideal fand ich vier Sprites hintereinander und das zweimal untereinander. Das gibt eine Auflösung von immerhin 95 x 42 = 4032 Punkten. Damit läßt sich schon einiges machen. Zur Handhabung werden vier Routinen benötigt. Eine zum Einschalten der Grafik, eine zum Setzen beziehungsweise Löschen der Punkte und eine zum schnellen Löschen der gesamten Grafik. Weiterhin noch eine, die die ganze Grafikauf eine Farbe setzt.
+Das Einschalten und Positionieren der Grafik
+Dazu sind vier Parameter nötig, zwei für die x,y-Koordinaten und zwei für die x,y-Ausdehnung, also das Spreizen der Sprites. Je nachdem, ob gespreizt oder nicht, werden die Koordinaten berechnet und in die jeweiligen Register abgelegt. Zum Schluß werden noch alle Sprites aktiviert. Der Einfachheit halber kann x nur Werte zwischen 0 und 255 haben. Bei x=255 und ungespreizt ragt die Grafik sowieso schon aus dem Bildschirm heraus. Auch sollte man mit dem y-Wert nicht zu hoch gehen, da sonst die Grafik möglicherweise oben in den Bildschirm hereinkommt. Diese Einschränkungen sind aber in den meisten Fällen unwesentlich.
+Das Setzen beziehungsweise Löschen von einem Punkt
+Dazu muß genau das Byte errechnet werden, in dem sich der Punkt befindet. Dafür braucht man nur die obere Spritereihe zu betrachten. Sie ist genau eine Speicherseite (256 Byte) groß. Sollte nun die y-Koordinate größer als 20 sein, so wird einfach eine Seite weitergeblättert, das heißt das Hi-Byte des Zeigers inkrementieren. Als erstes wird das Sprite errechnet. Es wird solange #24 (= eine Spritelänge) vom x-Wertabgezogen bis der x-Wert kleiner als 24 (24 < x < = 0) ist. So ist man praktisch im ersten Spriteblock gelandet. Nun wird vom x-Wert solange #8 abgezogen, bis der x-Wert kleiner als 8 (8<x> =0) ist. Jetzt weiß man, welches Bit gesetzt werden soll, und welches Byte in der Reihe gemeint ist (eins von dreien).
+Nun der y-Wert. Ist er größer als 20, dann muß das Hi-Byte des Zeigers inkrementiert und vom y-Wert 21 abgezogen werden. Man will ja die Byteposition in einem Spriteblock errechnen. Ist der y-Wert jetzt noch größer als 0 so müssen noch einmal 3 * y dazugezählt werden, denn ein Sprite hat die Ausdehnung von 3 Byte. Damit hat man das Byte, das in einem Sprite-block verändert werden soll. Nun wird das Low-Byte des jeweiligen Sprites dazuaddiert und in der Zeropage für den Zeiger abgelegt. Nachdem das Bytemuster hergestellt ist, kann nun der Punkt gelöscht beziehungsweise gesetzt werden.
+Das Löschen der Grafik und Setzen der Farbe versteht sich wohl von selbst. Das Ausschalten der Grafik geschieht durch POKE 53269,0.
+Die Befehlsliste sieht dann so aus:
+
+TODO
+
+Die Routine INIT bereitet das RAM auf S-Grafik vor. Sie schiebt den Speicher- und Programmstart auf $0A00, davor liegt jetzt der Speicher für die Sprites. Danach wird ein Kaltstart durchgeführt, das heißt der Basicspeicher gelöscht. Technische Daten:
+
+Sprites von $0800 bis $09FF
+
+S-Grafik ab $C000 bis C1A0
+
+Basic-RAM ab $0A00
+Anwendung der S-Grafik:
+
+Mit ein wenig Routine läßt sich mit der S-Grafik viel realisieren. Setzt man zum Beispiel die Farbe der oberen Spritereihe auf Rot und die der unteren Reihe auf Grün, so hat man einen roten und einen grünen Bereich. Nun kann man bei Säulengrafiken sofort erkennen, wo es kritisch wird (zum Beispiel Alkoholkonsum). Die Möglichkeiten sind fast unbegrenzt. Dazu kommt, daß man ja die Grafik überall hinschieben kann und auch noch spreizen kann. Sie kann im Textmodus beschriftet werden, im »Dunklen« aufbereitet werden, ruckzuck invertiert werden und so weiter.
+
+Man lädt die S-Grafik mit LOAD”S-GRAFIK“,8,1 (Bild 1). Nun kann S-Grafik ohne Bedenken eingesetzt werden.
+
+Achtung! Wenn sich ein Basicprogramm im Speicher befindet, wird es durch Aufruf der Routine INIT gelöscht
+
+Der Grundgedanke zum Setzen eines Punktes.
+Zum Beispiel (34/23)
+**A**: 34 : 24 = 1 Rest 10
+
+Der Punkt befindet sich in Sprite 1 und ist das 10 Bit
+**B**: 10 : 8 = 1 Rest 2
+
+Der Punkt befindet sich im 1. Byte, als 2. Bit
+
+Y( = 23) istgrößerals 20, also wird Grundadresse 2 gewählt (Grundadresse 1 = $0800, Grundadresse 2 = $0900
+**C**: 23-21 = 2
+
+Das Byte befindet sich in der unteren Spritereihe in Reihe 2, das heißt 2*3 Byte müssen zur Adresse zugezählt werden.
+Daraus ergibt sich:
+
+64 Grundadresse von Sprite 0, Rechnung A
++	1 Byte aus Rechnung B
++	2*3 Byte aus Rechnung C
++ $0900 Grundadresse der 2. Spritereihe
+= Adresse des Bytes, in der sich der Punkt befindet.
+
+Dazu ist noch zu bemerken, daß eine Spritereihe mit Sprite 0 beginnt. Wem das jetzt noch zu theoretisch ist, schaut sich einfach das Listing des Demo-Programms (Bild 2) an.
+
+(F. Espitalier/rg)
+
+# Von allen Seiten betrachtet
+
+> Um dreidimensionale Körper von allen Seiten betrachten zu können, benötigen Sie den C 64, Simons Basic, einen Drucker und dieses Programm.
+
+Das Programm soll einmal dreidimensionale Körper auf dem Bildschirm darstellen und zum anderen die hervorragende Grafikfähigkeit des C 64 demonstrieren.
+
+Bei der Darstellungsart entschied ich mich für die normale Axonometrie. Sie ist einerseits leicht in eine für den C 64 verständliche Syntax zu packen und weist zum anderen einen räumlichen Effekt auf.
+
+So entstand dann bald die erste Version von »Simons-Axo«. Allerdings war ich mit dieser Version noch nicht zufrieden. So tüftelte ich noch einige Routinen aus, die dem Programm erst den richtigen Schliff geben.
+
+Nun fügten sich an die einfache Zeichenroutine noch weitere, die das Abspeichern der Körperdaten als sequentielle Datei auf Diskette, das Drehen des Körpers um die drei Koordinatenachsen (in beliebigerVariation), dasVerschieben des Körpers, das Einzeichnen der Koordinatenachsen mit ihren Bezeichnungen und das Ausdrucken des Hires-Bildschirmes auf einen angeschlossenen Drucker ermöglichen.
+
+Das Programm beginnt in der Zeile 10, wo der Bildschirm gelöscht und ebenso wie der Rahmen auf schwarz gesetzt wird. In den folgenden Zeilen gibt das Programm eine kurze Anleitung und wartet mit der Fortführung in Zeile 95, bis 8ie eine beliebige Taste gedrückt haben.
+
+In der Zeile 100 werden die Felder PT (Eckpunktkoordinaten, mitdenen laufend gearbeitet wird) und PA (Eckpunktkoordinaten des Ausgangszustandes) mit 100,3 dimensioniert. Das bedeutet, daß Sie Körper mit bis zu 100 Eckpunkten eingeben können. Das ArrayZP, ebenfalls mit 100 dimensioniert, gibt die Verbindungsvorschrift (Reihenfolge, in der die Punkte miteinander verbunden werden) an.
+
+In Zeile 105—120 erfolgt eine Abfrage, ob die Körperdaten von der Diskette eingelesen werden sollen (Einleseroutine ab 1000) oder, ob Sie diese »von Hand« eingeben wollen. Sie können hier mit J’ oder ’N’ antworten, jede andere Antwort wird ignoriert.
+
+Ab Zeile 125 steht die eigentliche Eingaberoutine, in der Sie mittels INPUT um die einzelnen Eckpunktkoordinaten gebeten werden. Diese werden den Feldern PT und PA zugeordnet. In dieser Eingabeschleife fungierten PX, PY und PZ als Zwischenvariablen und A als Zähler. Die Eingabe können Sie jeweils mit »Ende« abschließen. Hierbei empfiehlt es sich, den oben genannten Term einzufügen, da das Programm ja drei Variablen verlangt und sonst nur noch nachfragt, bis es alle drei hat. Mit »£« können Sie die vorige Eckpunkteingabe nochein-mal korrigieren (deswegen habe ich PX$ anstelle von PX verwendet).
+
+Von 200 bis 270 wird die Verbindungsvorschrift eingelesen. Hier geben Sie zuerst den Startpunkt ein und dann jeweils einen weiteren Eckpunkt. Die Nummern dieser Eckpunkte werden nacheinander in ZP(B) abgelegt. In der Zeichenroutine werden die Eckpunkte dann in dieser Reihenfolge durch Linien verbunden, wodurch der Körper gezeichnet wird. Auch hier können Sie mit der »£«-Taste Korrekturen ausführen. In dieser Schleife dient B als Zähler und A$ als Zwischenspeicher. A1 enthält die Nummer des zuvor eingegebenen Eckpunktes (für die Korrektur notwendig).
+
+In 300 bis 360 können Sie das Koordinatenkreuz festlegen, indem Sie die Winkel zwischen der z- und y-Achse (AL) und z- und x-Achse (BT) eingeben. Das Programm ist für jeweils 120° voreingestellt, Sie können diese Vorschläge aber einfach überschreiben.
+
+ACHTUNG: Sie wählen hier die Winkel zwischen den projezierten Koordinatenachsen. Die Winkel zwischen den realen Achsen im Raum sind natürlich immerje 90°!
+
+Durch geeignete Wahl dieser Winkel können Sie den Sichtwinkel, unter dem Sie den dargestellten Körper betrachten, ändern. Sind beide Winkel 90°, so blicken Sie frontal von vorne auf den Körper, sind beide kleiner als 90°, so sehen Sie von unten her auf Körper und bei Winkeln über 90° von oben her.
+
+Die nächsten Zeilen, von 400 bis 490 stellen die Zeichenroutine dar. Hier wird zunächst in Zeile 405 in den Hires-Modus umgeschaltet und die Zeichenfarbe grün bei schwarzem Hintergrund gewählt. In 410 bis 420 werden die Zeichenkoordinaten (zweidimensional) des Anfangspunktes, welcher durch ZP 0 gegeben ist, errechnet und in XA und YA abgelegt. In der nachfolgenden Schleife werden nach dem gleichen Schema die Endpunktkoordinaten für den LlNE-Befehl des Simons Basic berechnet und die Linie gezeichnet. In Zeile 450 wird der Endpunkt nun zum Anfangspunkt für die nächste Linie definiert. Die Variable B dient hier als Zähler, während A als Index verwendet wird. Wenn alle Punkte miteinander verbunden sind, so wie es die Verbindungsvorschrift ZP(B) angibt, wird die Schleife beendet und das Programm prüft, ob das Flag für das Einzeichnen der Koordinatenachsen, KO auf 1 (zeichnen) gesetzt ist. Ist dies der Fall, so wird nach 1410 verzweigt.
+
+In 480 und 485 wird in der linken oberen Ecke die Fertig-Meldung ausgegeben und in die Endlosschleife in 490 gesprungen, die nach Drücken der F1-Taste beziehungsweise RETURN verlassen wird.
+
+Nun sind wir im Hauptmenü, welches uns zehn Möglichkeiten bietet. Die Abfrage erfogt in 585 mittels GET. In 590 steht die Sprungtabelle auf die einzelnen Routinen. Wenn Sie 0 eingegeben haben, wird das Programm nun in 595 abgebrochen. Mit GOTO XXXX oder CONT können Sie wieder einsteigen, ohne daß Sie die Daten verlieren.
+
+In den Zeilen 600 bis790 steht nun die Routine, die erlaubt, die erstellte Figur in beliebiger Variation um die Koordinatenachsen zu drehen. Doch zuerst gelangen Sie wieder in ein Menü, in dem Sie die momentane Drehung auswählen müssen. Der Drehwinkel ist in Grad einzugeben. Ist dieser positiv, wird die Figur gegen den Uhrzeigersinn um die gewählte Achse gedreht. Bei einem negativen Winkel erfolgt die Drehung im Uhrzeigersinn. Die Drehroutine ist in drei Abschitte unterteilt, je nach Drehachse, wobei alle drei mit den Polarkoordinaten arbeiten. Diese werden in den Zeilen 660 bis 670, 710 bis 720 sowie 760 und 766 berechnet. EO ist der Winkel und R der Radius. Zu EO wird nun einfach der Drehwinkel addiert und die neuen kartesischen Koordinaten berechnet. In diesen Schleifen dient X als Zähler, während EP die Anzahl der Eckpunkte angibt. In Zeile 790 wird wieder auf die Grafik zurückgeschaltet und in die Zeichenroutine nach 400 gesprungen. Nun kann man am Bildschirm wieder das Entstehen des Körpers in gedrehter Lage beobachten.
+
+Die kurze Ausgangszustand-Routine in 800 bis 850 kopiert einfach die Anfangsdaten der Eckpunkte, die ja im PA-Feld festgehalten sind, in das Arbeitsfeld PT. Hier dienen X und Y wieder als Zähler. Danach wird die Zeichenroutine aufgerufen.
+
+Inden Zeilen 1000bis 1097 steht die Einleseroutine, die die Körperdaten (Eckpunkte und Verbindungsvorschrift) von der Diskette, wo sie als sequentielle Datei stehen müssen, einliest und sie den entsprechenden Feldern zuordnet. Dem abgefragten Dateinamen, der auch den Joker enthalten kann, wird gleich »,S,R« angehängt und dann die Datei geöffnet, nachdem der Fehlerkanal geöffnet wurde (1010). Nun werden EP (Anzahl der Eckpunkte) und SP (letzte Nummer der Verbindungsvorschrift), die beiden wichtigen Steuervariablen, eingelesen. Danach werden zunächst die Felder PT und PA gefüllt und schließlich noch die Verbindungsvorschrift eingelesen und dem ZP-Feld zugeordnet. Zwischendurch wird in die Fehlerkanalroutine verzweigt, die sich in den Zeilen 1250 bis 1290 befindet und das Programm stoppt, wenn es zu einem Diskettenfehler kommt. Dann wird die komplette Fehlermeldung, die in den Variablen F1, F1$, F2 und F3 festgehalten ist, ausgegeben. Nun hat man die Möglichkeit (meistens, wenn man den Dateinamen falsch eingegeben hat) in die Zeile, in der der Fehler entstanden ist, zurückzukehren, indem man mit RETURN bestätigt, oder das Programm abzubrechen, indem man die SPACE-Taste betätigt.
+
+Ab Zeile 1100 finden Sie die Schreibroutine. Diese funktioniert im wesentlichen genauso wie die Einleseroutine mit dem Unterschied, daß die momentanen Körperdaten auf Diskette gespeichert werden.
+
+Ab Zeile 1300 bis 1360 befindet sich die Verschieberoutine, die das Verschieben der erstellten Figur um einen Vektor, der in Zeile 1320 abgefragt wird (wieder mit drei Koordinaten) ermöglicht. Mit dieser und der Drehroutine ist es möglich, einen Körper zuerst in einer einfachen Lage zu erstellen und dann in eine komplizierte Lage zu drehen und zu schieben. Nach der Neuberechnung des PT-Felder wird wieder zur Zeichenroutine verzweigt.
+
+Das Zeichnen der Koordinatenachsen, ab Zeile 1400 stellt die vorletzte Routine dar. In Zeile 1405 wird zunächst getestet, ob das Flag KO schon auf 1 gesetzt ist. Ist dies der Fall, so werden die bereits gezeichneten Achsen gelöscht, indem der Zeichentypusvariable TY der Wert Null zugeordnet wird. War KO jedoch Null, so werden beide auf 1 gesetzt, als Zeichen dafür, daß die Achsen gezeichnet werden sollen. In den nächsten Zeilen werden den Variablen XS und YS die Endpunkte der Koordinatenachsen übergeben, während X1 und Y1 die Koordinaten zur Ausgabe der Bezeichnungen mit dem CHAR-Befehl darstellen. Es werden nun die Achsen nacheinander berechnet und dann gezeichnet und bezeichnet. Anschließend wird wieder auf den Grafikbildschirm umgeschaltet und nach 480 verzweigt, wo die Fertig-Meldung wieder ausgegeben wird.
+
+In den Zeilen 1500 bis 1535 steht die letzte und gleichzeitig die einfachste Routine, das Ausgeben des Bildschirminhaltes auf einen angeschlossenen Drucker mit dem COPY-Befehl.
+
+Vor der Hardcopy wird jedoch D$ mit »HARDCOPY« Meldung ausgegeben. Wer diese Meldung als störend empfindet, da sie auch auf dem Drucker ausgegeben wird, kann sie auch weglassen, indem er einfach die Zeilen 1515 und 1510 wegläßt. Ist die Hardcopy fertig, wird wieder nach 480 verzweigt und die Fertig-Meldung ausgegeben.
+
+(Peter Steger/rg)
+
+# Trace und Single Step für Maschinenprogramme
+
+> Maschinenprogramme stürzen bei Fehlern meist ohne Hinweis auf den Fehlerort ab. Mit Trace lassen sich Maschinenprogramme Befehl für Befehl abarbeiten. Es werden dabei die momentanen Registerwerte (Programmcounter, X-, Y-Register, Akku, Stackpointer und Flags) angezeigt. Diese Werte lassen sich ohne weiteres ändern. Als Dreingabe erscheinen auch noch der Zustand des User-Ports und des Datenrichtungsregisters B auf dem Bildschirm.
+
+Das Programm läßt eine Ausführung von Maschinenprogrammen im Einzelschrittmodus zu. Dabei wird das Programm wirklich ausgeführt also nicht simuliert. Es bietet Einzelschritt, langsam und schnellen Trace. Alle Register werden angezeigt und können verändert werden. Zusätzlich wird der Befehl dis-assembliert. Laden und Abspeichern des Programms ge-schiehtje nach Assemblerversion des Lesers. Das Assemblerprogramm erlaubt ein freies Verschieben von Trace durch Änderung in Zeile 100: *=$XXXX. Der Startwert für PC (Programmcounter) kannin Zeile 270 frei gewählt werden.
+
+### Programmfunktionen
+
+Nach dem SYS-Befehl befindet man sich im Tracemodus. Es sind nur die Tasten F1 bis F7 und X für Exit aktiv. Folgende Register werden angezeigt:
+
+1.	PC = Programmcounter.
+2.	SP = Stackpointer.
+3.	YR = Y-Register.
+4.	XR = X-Register.
+5.	AC = Akkumulator.
+6.	Prozessorstatusflags.
+7.	User-Port mit Datenrichtungsregister. Entsprechende Eingangsleitungen sind revers dargestellt.
+8.	Es werden 1 bis 3 Hexbytes angezeigt, die verändert werden können, dann wird der Befehl disassembliert dargestellt. Trace wartetjetzt auf einen Tastendruck. Der Programmcounter zeigt am Anfang auf Hex C000.
+
+Folgende Tastenfunktionen stehen zur Verfügung:
+**Taste F7** = Einzelschritt. Pro Tastendruck wird ein Befehl des Testprogramms ausgeführt (genauer gesagt beim Loslassen von F1). Danach werden wieder die Register angezeigt und disassembliert.
+**Tast F5** = Slow Trace. Solange diese Taste gedrückt ist, wird das Testprogramm Befehl für Befehl abgearbeitet, die Register angezeigt und pro Befehl noch zusätzlich um zirka 65 ms verzögert.
+**Taste F3** = Tast Trace. Wie F5 jedoch ohne Verzögerung.
+**Taste F1** = Set Register, Editmodus. Durch Drücken von F1 kommen Sie in den Editmodus.
+
+### Beschreibung Editmodus
+
+Die erste Ziffer des Programmcounters wird zur Kennzeichnung des Cursororts revers dargestellt. Sie können jetzt alle angezeigten Werte überschreiben. Der Stackpointer und die Userport-Anzeige können zwar überschrieben werden, dies hat aber keinen Einfluß auf die Werte. Eine Veränderung des SP würde meist zum Absturz des Systems führen, da die CPU nach dem Interrupt nicht mehr die korrekten Rücksprungadressen auf dem Stack vorfindet. Die Cursor-Right-Taste bewegt den Cursor nach rechts, die Cursor-Up-Taste nach links. Neben diesen Steuertasten sind nur die Tasten A bis F, 0 bis 9 für die Hexziffern, der »Pfeil nach oben«, um ein Flag zu setzen, und das »Minuszeichen«, um ein Flag zu löschen, sinnvoll. Die Spacetaste ist auch erlaubt.
+
+Die DELETE-Taste funktioniert nicht. Entsprechen die Änderungen in der PC-Zeile Ihren Wünschen, dann drücken Sie (RETURN) und können die disassemblierte Zeile editieren. Hier sind je nach Befehlslänge 1 bis 3 Hexbytes am Anfang der Zeile veränderbar, das heißt Sie können die Operanden oder auch den Opcode selbst noch vor der Ausführung verändern, was zum Austesten von Programmen sehr praktisch ist. Verlassen können Sie die disassemblierte Zeile wieder mit (RETURN). Sie befinden sich jetzt wieder im Tracemodus, das heißt die Tasten F1, F3, F5, F7 und X sind wieder aktiv.
+
+Den Tracemodus können Sie durch Drücken der X-Taste verlassen, der Computer istjetzt im Basic-Editmodus. Trace kann mit SYS 49152 wieder gestartet werden, wobei hier der Disassembler immer aktiviert ist. Starten Sie mit SYS 49160, dann ist der Disassembler nur beim Editieren an, Trace ist dann etwas schneller. Setzen Sie Trace nicht auf sich selbst an.
+
+### Funktionsweise
+
+Siehe hierzu auch Assemblersourcelisting. Zuerst schalte ich den normalen Tastaturinterrupt über Timer A aus und benütze den Timer B in CIA 1 für meine Interruptroutine. Timer A läuft zwar weiter, aber sendet keine IRQ mehr. Dann setze ich den IRQ-Vektor auf Trace. Trace initialisiert beim Start den Stack und beginnt dann mit der eigentlichen Einzelschrittroutine. Diese Routine dient als neue Interruptroutine, da der IRQ-Vektor auf Trace geändert wurde. Der Interrupt wird aber nicht mehr alle 1/60 Sekunde durch den Timer A ausgelöst, sondern durch Timer B und zwar alle 25 Mikrosekunden nach Start des Timers.
+
+In dieser Zeit kann der Prozessor das Ende der normalen IRQ-Routine durchlaufen (Register vom Stack holen). Jetzt bleibt aber nur mehr Zeit, um einen Befehl des Testprogramms abzuarbeiten, daTimerBja schon in genau einer Mikrosekunde erneut einen IRQ sendet. Der Prozessor legt nach diesem einen Befehl alle Register auf den Stack und verzweigt entsprechend dem IRQ-Vektor wieder auf Trace. Für genauere Information siehe Listing. Innerhalb der Traceroutine wird ein IRQ nicht akzeptiert, da sich sonst das Programm immer selbst unterbrechen würde. Trace läßt sich also nur durch einen NMI unterbrechen.
+Beispiel:
+SYS 49152 = Trace starten. Disassembler an.
+Taste F1 drücken = Editmodus wählen.
+PC auf $AF08 setzen. Diese Systemroutine gibt »Syntax Er-ror« aus. Sie können zum Spaß auch die Register verändern, benützen Sie auch die Cursorsteuertasten.
+
+RETURN drücken = Edit für disassemblierte Zeile. Hier kön-nen Sie die Hexbytes editieren. Eine Änderung hätte aber keinen Sinn, da wir ja eine ROM-Routine tracen. Drücken Sie nur (RETURN), und Sie gelangen wieder in den Tracemodus.
+F7 drücken = Einen Befehl ab PC ausführen.
+F5 drücken = Trace. Anzeige läuft. Flags werden in schneller Folge geändert. Die disassemblierte Zeile ändert sich sehr schnell. Halten Sie die Taste gedrückt, nach ein paar Sekunden sehen Sie schön langsam Buchstabe für Buchstabe »Syntax Error« erscheinen. Befindet sich der Cursor zufällig gerade am unteren Bildschirmrand und ist der Bildschirm vollgeschrieben, dann kann man schön verfolgen, wie die Scrollroutine arbeitet, der Bildschirminhalt wird Zeile für Zeile nach oben geschoben, um Platz für die Meldung zu machen.
+
+(Jürgen Göbel/aa)
+
+# Maschinenprogramme auf Tastendruck
+
+> Mit einer kleinen Routine kann man ein Maschinenprogramm mit einem Tastendruck aufrufen. Dafür benutzt man ein Zeichen, das normalerweise nicht oder nur selten verwendet wird. Ich habe mich für das @-Zeichen entschieden.
+
+Im Interpreter existiert eine Schleife, die einen Basic-Befehl holt und ausführt.
+
+<pre>
+A7E1	JMP	(0308)	; zeigt normalerweise auf A7E4
+A7E4	JSR	0073	; nächstes Zeichen aus Basic-Text holen
+A7E7	JSR	A7ED	; Statement ausführen
+A7EA	JMP	A7AE	; zurück zur Interpreterschleife
+</pre>
+
+In den Speicherzellen 0308 und 0309 (776 und 777 dez) liegt ein Zeiger, der normalerweise auf den Beginn dieser Schleife zeigt. Verbiegt man nun den Zeiger auf eine eigene Routine, kann man den Basic-Befehl auf das eigene Zeichen überprüfen.
+
+Wird es erkannt, springt man auf den Anfang des gewünschten Unterprogramms. Wurde das Zeichen nicht vorgefunden, macht man in der Schleife normal weiter.
+
+Dieses Verfahren verwende ich bei der Programmierhilfe »Merge« aus Ausgabe 4/84, die normalerweise mit SYS 50000 gestartet werden muß. Es kann aber auch für andere Maschinenprogramme umgeschrieben werden.
+
+»Merge« belegt den Speicherbereich 50000 bis 50264. Die eigene Routine beginnt auf Adresse 49152 (C000 hex). Der Wert in den Adressen 0308 und 0309 muß deshalb auf C000 abgeändert werden. Der Computer durchläuft dann vor jedem Befehl, den er ausführen soll, folgende Schleife:
+
+<pre>
+C000 JSR 0073 ;nächstes Zeichen holen
+C003 CMP 40   ; Vergleich mit @-Zeichen
+C005 BEQ      ; verzweigen wenn erkannt
+C007 JSR 0079 ; Flags setzen
+C00A JMP A7E7 ; Rücksprung
+COOD JSR 0073 ; nächstes Zeichen holen
+C010 JSR C350 ; zur eigenen Routine
+C013 JMP A7AE ; Rücksprung
+</pre>
+
+Nach dem Drücken von @ und RETURN wird nun das Programm ab Adresse 50000 (C350 Hex) ausgeführt. Auf die anderen Befehle hat diese Routine keinen Einfluß. Eine Hürde gibt es noch zu meistern. Die Änderung der Adressen 0308 und 0309 ist auf der Basic-Ebene mit POKE nicht möglich. Dies ist auch verständlich, da POKE auch ein Basic-Befehl ist und durch die Änderung der ersten Adresse der Einsprung verändert wird.
+
+Deshalb muß diese Adreßänderung in Maschinensprache durchgeführt werden.
+
+<pre>
+C100 LDA 00   ; Lade Akku mit 00
+C102 STA 0308 ; Speichere Akku nach 0308
+C105 LDA C0   ; Lade Akku mit C0
+C107 STA 0309 ; Speichere Akku nach 0309
+C10A RTS      ; Rückkehr nach Basic
+</pre>
+
+Basic-Lader für Befehlserweiterung
+
+<pre>
+240 FOR I= 49152 TO 49152 + 21
+250 READ Q : POKE I, Q
+260 NEXT
+300 FOR I = 49408 TO 49408 + 10
+310 READ Q : POKE I, Q
+320 NEXT : SYS 49408
+11000 DATA 32,115,0,201,64,240,6,32,121
+12000 DATA 0,76,231,167,32,115,0,32,80
+13000 DATA 195,76,174,167
+14000 DATA 169,0,141,8,3,169,192,141,9,3,96
+</pre>
+
+# Fast Tape — die schnelle Kassette
+
+> Dieses Programm für den VC 20 ermöglicht Ihnen einen zehnmal schnelleren Lade- und Abspeichervorgang, das lange Warten bei 16- oder 8-KByte-Programmen hat nun ein Ende.
+
+Das Maschinenprogramm benötigt etwa 750 Byte Ihres Basic-Speichers, was aber bei einer 16-KByte-Erweiterung nicht viel ausmacht. Das Programm läuft auch auf der Grundversion, doch ist es dann nicht so rentabel, weil es zu lange dauert, bis man FastTape geladen hat, und außerdem sind die Ladezeiten bei Programmen für die Grundversion noch erträglich. Aufgerufen wird Fast Tape mit »!L« zum Laden eines Programms und mit »!S« zum Abspeichern.
+
+Auf die Ausgabe von »Loading« während des Ladevorgangs sowie »Saving« während des Abspeicherns wurde verzichtet. Ebenfalls muß auf den Befehl »VERIFY« und das schnelle Laden/Abspeichern von Daten-Files verzichtet werden. »Fast Tape« liegt als Basic-Lader vor.
+
+Das Eintippen der DATAs erfordert sehr viel Sorgfalt. Speichern Sie das Programm auf jeden Fall ab, bevor Sie es starten, denn es löscht sich selbständig. Auf gröbere Fehler in den DATAs macht Sie das Programm selbst aufmerksam.
+
+(Thomas Kolbe/ev)
+
+# Master Mind als Vierzeiler
+
+Als Nebenprodukt meiner Einzeilerbemühungen entstand dieses Programm: Bei Master Mind gehtes darum, eine Zahl, die sich der Computer »denkt«, zu erraten. Am Anfang gibt man die Stellenzahl der zu erratenden Zahl ein, sie darf maximal acht sein (man hat aber schon mit drei oder vier genug zu knobeln). In der ersten Spalte muß man nun jeweils eine Zahl eingeben, der Computer zeigt in den folgenden drei Spalten an: 1. Anzahl der richtigen Ziffern an der richtigen Stelle 2. Anzahl der richtigen Ziffern an der falschen Stelle 3. Anzahl der Versuche
+
+<pre>
+Beispiel eines Spiels:
+Stellen? 4
+?1123	1	0	1
+?4456	0	0	2
+?7789	2	1	3
+?8989	1	0	4
+?7979	1	1	5
+?7187	4	0	6
+</pre>
+
+Es geht natürlich darum, die Zahl mit möglichst wenig Versuchen zu erraten. Hier noch die Tabelle der Variablen:
+
+TODO
+
+(Hans Haberl/aa)
+
+# Programmierter Direktmodus
+
+> Programmierter Direktmodus hört sich wie ein Widerspruch in sich an. Entweder man befindet sich im Direktmodus oder es läuft ein Programm, beides gleichzeitig scheint kaum vereinbar. Dennoch gibt es eine Verbindung, die bisher ungeahnte Möglichkeiten eröffnet.
+
+Das Geheimnis dieser Verbindung liegt im Tastaturpuffer (Tabelle 1) und dem Umstand, daß der Computer, nachdem er im Programm auf eine END-Anweisung trifft, so viele Zeichen aus dem Tastaturpuffer holt, wie der Anzahlspeicher angibt und sofort ausführt. Dies kann man sich zunutze machen, indem man mittels PRINT eine Anweisung auf den Bildschirm bringt, den Cursor veranlaßt, in diese Zeile zu springen und den Computer durch ein im Puffer abgelegtes RETURN mit der Abarbeitung der eingegebenen Bildschirmzeile fortfahren läßt. Dabei werden alle Zeichen über ihren ASCII-Code in den Puffer gebracht. Ein kleines Beispiel soll dieses Vorgehen verdeutlichen:
+Geben Sie Beispiel 1 ein.
+Was passiert? — Der Computer geht nach der END-Anweisung in den Direktmodus über und führt die beiden Steuerzeichen CURSOR/HOME und RETURN (CHR$(19 beziehungsweise 13)) aus. Der Cursor springt also in die erste Bildschirmzeile, wo zu lesen ist:
+
+I = I + 1 : GOTO 20
+Diese Zeile führt der Computer nun aus und springt, nachdem er die Variable I um 1 hochgezählt hat, zurück in Programmzeile 20. Jetzt hilft nur noch RUN/STOP.
+
+Beispiel 2
+Dieses Programm bewirkt folgendes:
+
+— Zeile 100 wird in das Programm eingefügt
+— Zeile 350 wird aus dem Programm gelöscht
+— der in Zeile 70 stehende Spruch wird durch einen — meiner Meinung nach treffenderen — ersetzt
+— das geänderte Programm wird gelistet.
+
+Anstelle des LIST-Befehles könnte auch ein GOTO beziehungsweise GOSUB-Befehl wieder in das Programm zurückspringen. Allerdings ist auch hier zu beachten, daß, sobald man neue Basic-Zeilen einfügt (beziehungsweise löscht), die Varia-blenwerte verloren gehen.
+
+Mittels dieser Methode kann man zum Beispiel ein Programm entwickeln, das die DATA-Zeilen eines Sprites berechnet, ins laufende Programm übernimmt und dann die restlichen Programmzeilen herauslöscht, so daß nur ein Sprite-Ladeprogramm übrigbleibt, welches sofort abgespeichert werden kann. Eine weitere sinnvolle Anwendungsmöglichkeit des »Programmierten Direktmodus« können Sie den folgenden Ausführungen entnehmen.
+
+## System Lademenü
+
+Das System soll die folgenden Aufgaben erfüllen:
+
+(1)	Mit verschiedenen Programmen (eventuell auf verschiedenen Disketten) arbeiten, ohne daß ständig LOAD und RUN gegeben werden muß.
+(2)	Den ärgerlichen »file not found error« verhindern, der bereits auftritt, wenn man ein Leerzeichen zuviel oder zuwenig eingibt.
+(3)	Programmiertes Aufrufen von Programmen (eventuell mit Parameterübergabe). Arbeiten mit dem Programmsystem ohne genaue Kenntnis der verwendeten Filenamen.
+
+### Die Idee
+
+Mit Hilfe des Commodore-Programmes DOS 5.1 und der Methode des Programmierten Direktmodus kann man das oben genannte Ziel erreichen. Man geht dabei folgendermaßen vor:
+
+Auf jede Diskette, die nach diesem System arbeiten soll, bringt man das Programm DOS 5.1 sowie dessen Lader unter einem möglichst kurzen einprägsamen Filenamen (hier»£«-Listing 1).
+
+Weiterhin kopiert man das Programm »Lademenü« auf jede der Disketten und trägt in dieses die Filenamen ein (Listing 2). Dabei ist darauf zu achten, daß die Filenamen »£« und »Lademe- ( nü« überall exakt gleich sind.
+
+Der Arbeitsablauf gestaltet sich dann in folgender Weise: Nach dem Einschalten von Computer und Floppy legt man die gewünschte Diskette ein und lädt »£«. Dieses Programm initialisiert nach dem Starten die bekannten DOS 5.1-Befehle. Das RUN für »£« soll auch gleichzeitig das letzte sein, da nun der DOS-Befehl »t« zur Verfügung steht. Mit dessen Hilfe wird das Lademenü dieser Disk geladen und gestartet, welches die Programme anbietet und automatisch richtig lädt und startet. Zusätzlich bietet das Lademenü auch einen Überblick über die wichtigsten DOS-Befehle, die ja nun zur Verfügung stehen.
+
+Um den Kreis zu schließen wird an jedes Programm auf der Diskette anstelle des üblichen END die folgende Zeile eingefügt:
+PRINT CHR$(147); »Lademenü« :POKE 631,19:POKE 632,13:POKE 198,2:END
+Dadurch wird nach jedem regulären Programmabbruch wieder das Lademenü dieser, oder wenn die Diskette vorher gewechselt wurde, einer beliebigen anderen Disk geladen. Nun wird durch das Lademenü das nächste ausgewählte Programm geladen und gestartet. Will man Parameter an andere Programme übergeben, so erreicht man dies über sequentielle Dateien.
+
+Die Lösung
+
+□	Listing »£«
+□	Listing »Lademenü«
+□	Listing »Beispielprogramm«
+
+### Ausblick
+
+Schreibt man noch einen Autostart für »£« (eventuell mittels des Beispiels in Ausgabe 6/84) so kann man das »System Lademenü« zu einem System »Nie wieder RUN« ausbauen.
+
+(Bernhard Lauer/rg)
 
 
 
