@@ -753,13 +753,13 @@
 
         <p>Jeder Abspeichervorgang beginnt mit dem Header. Dieser Kopf besteht aus dem Vorspann (das ist ein etwa acht Sekunden langer Pfeifton) und dem eigentlichen Programmkopf. Dieser enthält vier wichtige Informationen, nämlich über Programmtyp, Startadresse, Endadresse und Programmname. Diese Daten sind ebenfalls im Bandpuffer zu finden und können von dort abgerufen werden.</p>
 
-        <p>Das erste Byte (Adresse 828) gibt Auskunft über den Headertyp. Eine 1 zeigt an, daß es sich um ein Programm handelt, das verschoben geladen werden kann, also auch an eine andere Stelle, als die, von der aus es abgespeichert wurde. Das Gegenstück dazu ist die absolute Lademethode (Headertyp 3), die bereits in der ersten Folge meiner Abhandlung vorgestellt wurde. Gemeint ist LOAD”..”,1,1. Die Sekundäradresse 1 signalisiert dem Computer, daß er das Programm (unabhängig von den Zeigern 43, 44) wieder in den gleichen Adreßbereich laden soll. Um Verwechslungen vorzubeugen, ist es wichtig, Headertyp und Sekundäradresse zu unterscheiden. Für den Headertyp gibt es drei Möglichkeiten:<br />
-            1: Laden mit Verschiebelader (die Anfangsadresse wird durch den Zeiger 43 und 44 bestimmt).<br />
-            2: Ein File — also Daten aus Variablen — wurde abgespeichert. Die Unterscheidung ist wichtig, denn Daten können nicht mit LOAD geladen werden.<br />
+        <p>Das erste Byte (Adresse 828) gibt Auskunft über den Headertyp. Eine 1 zeigt an, daß es sich um ein Programm handelt, das verschoben geladen werden kann, also auch an eine andere Stelle, als die, von der aus es abgespeichert wurde. Das Gegenstück dazu ist die absolute Lademethode (Headertyp 3), die bereits in der ersten Folge meiner Abhandlung vorgestellt wurde. Gemeint ist LOAD”..”,1,1. Die Sekundäradresse 1 signalisiert dem Computer, daß er das Programm (unabhängig von den Zeigern 43, 44) wieder in den gleichen Adreßbereich laden soll. Um Verwechslungen vorzubeugen, ist es wichtig, Headertyp und Sekundäradresse zu unterscheiden. Für den Headertyp gibt es drei Möglichkeiten:<br>
+            1: Laden mit Verschiebelader (die Anfangsadresse wird durch den Zeiger 43 und 44 bestimmt).<br>
+            2: Ein File — also Daten aus Variablen — wurde abgespeichert. Die Unterscheidung ist wichtig, denn Daten können nicht mit LOAD geladen werden.<br>
             3: Ein Programm ist absolut zu laden.</p>
 
-        <p>Die nächsten vier Bytes geben die Anfangs- und Endadresse des geladenen Files an. Mit der Endadresse hat es eine besondere Bewandtnis. Sie wird nämlich nach korrektem Laden der Zeropage (Adresse 45, 46) übergeben. Bei Load Error geschieht dies nicht; PRINT FRE(0) zeigt dann die volle Bytezahl an, obwohl sich ein Programm im Speicher befindet. Man darf das Programm — das vielleicht nur einen geringfügigen Fehler hat —, dann nicht starten, weil die Variablen dieses überschreiben würden. Abhilfe schafft in diesem Fall<br />
-            POKE 45,PEEK(831):POKE 46,PEEK (832):CLR.<br />
+        <p>Die nächsten vier Bytes geben die Anfangs- und Endadresse des geladenen Files an. Mit der Endadresse hat es eine besondere Bewandtnis. Sie wird nämlich nach korrektem Laden der Zeropage (Adresse 45, 46) übergeben. Bei Load Error geschieht dies nicht; PRINT FRE(0) zeigt dann die volle Bytezahl an, obwohl sich ein Programm im Speicher befindet. Man darf das Programm — das vielleicht nur einen geringfügigen Fehler hat —, dann nicht starten, weil die Variablen dieses überschreiben würden. Abhilfe schafft in diesem Fall<br>
+            POKE 45,PEEK(831):POKE 46,PEEK (832):CLR.<br>
             Die Werte werden damit von »Hand« übertragen und ein normaler Programmablauf ist in den meisten Fällen wieder möglich.</p>
 
         <p>Jetzt aber wieder zurück zu Bild 3: Nachdem der Vorspann und der Programmkopf vor einem Trennzeichen (dies ist ein ganz kurzer Pieps) auf Band geschrieben worden ist, wird der Header gleich noch einmal abgespeichert.</p>
@@ -772,10 +772,10 @@
 
         <h2>Die STOP-Taste mit Sonderfunktion</h2>
 
-        <p><strong>Adresse 145:</strong> Mit Hilfe dieser Speicherstelle kann man den Zustand der STOP- und der linken SHIFT-Taste abfragen:<br />
-            Wert =<br />
-            253: Linke SHIFT-Taste gedrückt<br />
-            254: STOP-Taste gedrückt<br />
+        <p><strong>Adresse 145:</strong> Mit Hilfe dieser Speicherstelle kann man den Zustand der STOP- und der linken SHIFT-Taste abfragen:<br>
+            Wert =<br>
+            253: Linke SHIFT-Taste gedrückt<br>
+            254: STOP-Taste gedrückt<br>
             255: Keine der beiden gedrückt</p>
 
         <p>Wenn man das Low-Byte des STOP-Vektors (Adresse 808) auf 114 — statt ursprünglich 112 — setzt, so ist man in der Lage, diese Taste von Basic aus abzufragen, ohne das laufende Programm anzuhalten. Ihr kann dann in der Routine eine besondere Funktion zugewiesen werden, beispielsweise Anhalten des Programmablaufs für eine bestimmte Zeit.</p>
@@ -802,12 +802,12 @@
 
         <p>Eine andere Zeropageadresse kann uns zu einer weiteren Erleichterung verhelfen. Jeder kennt das Problem, den Cursor innerhalb von Anführungszeichen (»Gänsefüßchen«) zu bewegen. Es werden nur Steuerzeichen ausgedruckt, eine Bewegung des Zeigers findet nicht statt.</p>
 
-        <p>Dieses Manko läßt sich durch eine kurze Maschinenroutine beheben:<br />
-            LDA #$00 ; lösche Hochkommaflag<br />
-            STA $D4 ; speichere es ab<br />
+        <p>Dieses Manko läßt sich durch eine kurze Maschinenroutine beheben:<br>
+            LDA #$00 ; lösche Hochkommaflag<br>
+            STA $D4 ; speichere es ab<br>
             JMP $FEAD ; springe in die NMI-Routine</p>
 
-        <p>Ausgelöst wird diese Routine durch Drücken der RESTORE-Taste. Dazu muß vorher der NMI-Vektor (eine nähere Beschreibung nächstes Mal) auf den Beginn unserer Routine gestellt werden. Da die sehr kurz ist, legen wir sie im Kassettenpuffer ab. Dort ist sie solange sicher verwahrt, bis man etwas laden oder abspeichern will. Hier zunächst der Einzeiler, der die Routine in den Bandpuffer generiert:<br />
+        <p>Ausgelöst wird diese Routine durch Drücken der RESTORE-Taste. Dazu muß vorher der NMI-Vektor (eine nähere Beschreibung nächstes Mal) auf den Beginn unserer Routine gestellt werden. Da die sehr kurz ist, legen wir sie im Kassettenpuffer ab. Dort ist sie solange sicher verwahrt, bis man etwas laden oder abspeichern will. Hier zunächst der Einzeiler, der die Routine in den Bandpuffer generiert:<br>
             10 FOR T=828 TO 834: READD: POKE T,D:NEXT: DATA 169, 0, 133, 212, 76, 173, 254: POKE 792, 60: POKE 793, 3</p>
 
         <p>Arbeitet man im Hochkommamodus, so kann man durch Drücken der RESTORE-Taste diesen Betriebszustand abschalten, der Cursor kann dann wieder ganz normal bewegt werden.</p>

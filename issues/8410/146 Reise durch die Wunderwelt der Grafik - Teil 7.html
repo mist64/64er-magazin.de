@@ -50,8 +50,8 @@
         </figure>
 
         <p>In Fall A liegt der neue Punkt oberhalb von P', ist sichtbar und wird gezeichnet. Im Fall B liegt er unterhalb von P, ist ebenfalls sichtbar und wird gezeichnet. Im Fall C aber liegt er zwischen P und P', er ist nicht sichtbar, weil er auf einem uns abgewandten Hang der Raumfläche liegt und wird daher nicht gezeichnet. Sie sehen also, daß wir uns lediglich immer auf jeder dieser Senkrechten den bisher größten und den bisher kleinsten Wert von Y merken müssen. Bei jedem neuen Y-Wert können wir feststellen, ob er innerhalb des damit aufgespannten Bereiches liegt (dann wird er nicht gezeichnet) oder außerhalb (dann wird er gezeichnet und dieser Wert als der größte oder kleinste bisherige gemerkt). Damit ist für uns das Problem gelöst! Wir richten ein zweidimensionales Feld ein: G (319, 2), wo für jede der 320 Senkrechten drei Werte gespeichert werden können:<br>
-            G(X,0) als bisher höchster Y-Wert,<br />
-            G(X,1) als bisher kleinster Y-Wert,<br />
+            G(X,0) als bisher höchster Y-Wert,<br>
+            G(X,1) als bisher kleinster Y-Wert,<br>
             G(X,2) als Kennmarke, ob für diesen X-Wert schon ein Y-Wert aufgetaucht ist (in dem Fall ist G(X,2)>0) oder noch nicht (dann ist G(X,2) = 0). Durch das RUN-Kommando sind alle Variablen gleich 0, also auch G(X,2). Genau besehen benötigen wir diese Kennmarke, ob auf der Senkrechten durch X schon ein Punkt gesetzt wurde, nicht unbedingt in unserem Programm. Es ist so gestaltet, daß beim X-Durchlauf keine Lücken gelassen werden. Sinnvoll ist es trotzdem, sie einzurichten, denn durch die 45° -Verschiebung erhöht sich ja der maximale X-Wert ständig und außerdem könnte man sich ja mal überlegen, ob man den X-Durchlauf mit Lücken macht. In der letzten Folge hatten wir im Flußdiagramm unsere Doppelschleife entwickelt. Dabei war ein Teil »Zeichnen des Punktes X,Y«. Diesen Teil ersetzen wir durch den in Bild 5.</p>
 
         <figure>
@@ -59,14 +59,14 @@
             <figcaption>Bild 5. Flußdiagramm zum Hinterschneidungsproblem</figcaption>
         </figure>
 
-        <p>Jetzt sehen wir uns das als Programmteil an. Also Computer anschalten, Laden des 3D-Programmes aus der letzten Folge sowie der Grafik-Unterprogramme aus der vierten Folge (entweder — falls Sie das haben — durch MERGEn oder als kombiniertes Programm aus der Arbeit in der letzten Folge). Zeile 230 des 3D-Programmes enthält als letzten Befehl GOSUB 50040, den Aufruf zum »Punkt zeichnen«. Den löschen wir jetzt und fügen die folgenden Zeilen ein:<br />
-            232 IF G(X,2) = 0THEN G(X,0) = Y:G(X,1)=Y:GOTO 238<br />
-            234 IF Y>G(X,0) THEN G(X,0) = Y:GOTO 238<br />
-            236 IF Y&lt;G(X,1) THEN G(X,1) = Y:GOTO 238<br />
-            237 GOTO 240<br />
-            238 G(X,2) = G(X,2) + 1:GOSUB 50040<br />
-            Außerdem muß natürlich zu Beginn dieses Feld noch dimensioniert werden: 147 DIM G (319,2)<br />
-            Mit der Beispielfunktion Y=COS(Z) *SIN(X) und den Eingaben:XU = -1, XO = 10, YU=-2, YO = 5, ZU = -.1, ZO = 7, Schrittweite = 8,XA = 0,<br />
+        <p>Jetzt sehen wir uns das als Programmteil an. Also Computer anschalten, Laden des 3D-Programmes aus der letzten Folge sowie der Grafik-Unterprogramme aus der vierten Folge (entweder — falls Sie das haben — durch MERGEn oder als kombiniertes Programm aus der Arbeit in der letzten Folge). Zeile 230 des 3D-Programmes enthält als letzten Befehl GOSUB 50040, den Aufruf zum »Punkt zeichnen«. Den löschen wir jetzt und fügen die folgenden Zeilen ein:<br>
+            232 IF G(X,2) = 0THEN G(X,0) = Y:G(X,1)=Y:GOTO 238<br>
+            234 IF Y>G(X,0) THEN G(X,0) = Y:GOTO 238<br>
+            236 IF Y&lt;G(X,1) THEN G(X,1) = Y:GOTO 238<br>
+            237 GOTO 240<br>
+            238 G(X,2) = G(X,2) + 1:GOSUB 50040<br>
+            Außerdem muß natürlich zu Beginn dieses Feld noch dimensioniert werden: 147 DIM G (319,2)<br>
+            Mit der Beispielfunktion Y=COS(Z) *SIN(X) und den Eingaben:XU = -1, XO = 10, YU=-2, YO = 5, ZU = -.1, ZO = 7, Schrittweite = 8,XA = 0,<br>
             XE = 6, ZA = .1, ZE = 7 sieht man den Effekt jetzt ganz deutlich. Das einzige — außer der Geschwindigkeit (und naja - vielleicht noch ein paar Kleinigkeiten) — was unsere 3D-Grafik jetzt von professionellen Systemen unterscheidet, ist die Möglichkeit der Netzgrafik (Bild 6).</p>
 
         <figure>
@@ -78,8 +78,8 @@
 
         <h3>Weg 1:</h3>
 
-        <p>Wir machen die Schrittweite in Z-Richtung sehr klein (so wie die in X-Richtung), setzen aber nicht jeden Punkt, sondern zum Beispiel in folgender Anordnung:<br />
-            a) 1. Z-Wert: Jeder Punkt der X-Schleife wird gesetzt, dann<br />
+        <p>Wir machen die Schrittweite in Z-Richtung sehr klein (so wie die in X-Richtung), setzen aber nicht jeden Punkt, sondern zum Beispiel in folgender Anordnung:<br>
+            a) 1. Z-Wert: Jeder Punkt der X-Schleife wird gesetzt, dann<br>
             b) 2. bis 7. Z-Wert: Nur jeder 8.Punkt der X-Schleife wird gesetzt, dann c) wieder weiter wie beim 1. Z-Wert und so weiter.</p>
 
         <p>Stark vergrößert hätten wir dann etwa Verhältnisse wie in Bild 7.</p>
@@ -101,24 +101,24 @@
 
         <p>Das macht er Zeichen für Zeichen bis der gesamte — in einem String definierte — Text in der Bit-Map und damit für uns lesbar auf dem Bildschirm steht. Dieses Prinzip können wir in unsere Programme übernehmen. Dazu sind nur wenige Änderungen nötig. Zunächst schließen wir den neuen Zeichen-Speicher im RAM direkt an unsere Bit-Map an: ab 32768. Das Maschinenprogramm von Herbert Kunz verändern wir deshalb etwas und legen es nicht in den Kassettenpuffer, sondern von dez. 673 bis 715. Wie im Programm von Herbert Kunz brauchen wir dann nur noch die Angaben, in welcher Zeile und Spalte welcher Text geschrieben werden soll.</p>
 
-        <p>Zunächst einmal wird das Maschinenprogramm eingelesen und ausgeführt. In das 2D- und in das 3D-Programm fügen wir ein:<br />
-            500 FOR I = 673 TO 715: READ A:PO-KE I, A:NEXTI:SYS 673: RETURN<br />
-            510 DATA 120, 169, 49, 133, 1, 169, 0, 133, 98, 133,100, 169, 208, 133, 99, 169, 128, 133<br />
-            520 DATA 101, 162, 16, 160, 0, 177, 98, 145, 100, 200, 208, 249, 230, 99, 230, 101, 202, 208<br />
+        <p>Zunächst einmal wird das Maschinenprogramm eingelesen und ausgeführt. In das 2D- und in das 3D-Programm fügen wir ein:<br>
+            500 FOR I = 673 TO 715: READ A:PO-KE I, A:NEXTI:SYS 673: RETURN<br>
+            510 DATA 120, 169, 49, 133, 1, 169, 0, 133, 98, 133,100, 169, 208, 133, 99, 169, 128, 133<br>
+            520 DATA 101, 162, 16, 160, 0, 177, 98, 145, 100, 200, 208, 249, 230, 99, 230, 101, 202, 208<br>
             530 DATA 242, 169, 55, 133, 1, 88, 96</p>
 
         <p>In Zeile 5 hängen wir an die beiden POKE-Kommandos noch an :GOSUB 500</p>
 
-        <p>In Zeile 120 definieren wir einen String, der einen senkrechten Tabulator ermöglicht:<br />
-            120 CP$ = CHR$ (19):FOR I = 1 TO 24:CP$ = CP$ + CHR$ (17):NEXT I Dann definieren wir den zu druckenden String und Zeile und Spalte des Druckortes:<br />
+        <p>In Zeile 120 definieren wir einen String, der einen senkrechten Tabulator ermöglicht:<br>
+            120 CP$ = CHR$ (19):FOR I = 1 TO 24:CP$ = CP$ + CHR$ (17):NEXT I Dann definieren wir den zu druckenden String und Zeile und Spalte des Druckortes:<br>
             122 TE$ = "Y” + F$:ZE = 0:SP = 0</p>
 
-        <p>Jetzt müssen wir nur noch dafür sorgen, daß nach dem Zeichnen der Kurve oder Raumfläche der Text gedruckt wird. Dazu gleichen wir zunächst mal das 2D- an das 3D-Programm an. In den Zeilen 200, 210, 220 des 2D-Programmes ändern wir die Zeilennummern zu 300, 310, 320 (dann muß natürlich in Zeile 300 die Anweisung THEN 200 zu THEN 300 umgeschrieben werden und die alten Zeilen 200 bis 220 gelöscht werden). Im 2D-Programm hört das Zeichnen in Zeile 195, im 3D-Programm in Zeile 250 auf. Deswegen legen wir den Druckvorgang ab Zeile 260:<br />
-            260 PRINT LEFT$ (CP$,ZE + 1)TAB (SP)TE$;<br />
-            262 AN = 23552 + ZE * 40 + SP:GS = 24576 + ZE * 320 + SP * 8<br />
-            264 FOR I = AN TO AN + LEN (TE$)-1<br />
-            266 L = PEEK (I) :Z = 32768 + 8 * L:POKEI, 16*F1 + F2<br />
-            268 FOR J = 0 TO 7:POKE GS+J, PEEK (Z+J):NEXTJ<br />
+        <p>Jetzt müssen wir nur noch dafür sorgen, daß nach dem Zeichnen der Kurve oder Raumfläche der Text gedruckt wird. Dazu gleichen wir zunächst mal das 2D- an das 3D-Programm an. In den Zeilen 200, 210, 220 des 2D-Programmes ändern wir die Zeilennummern zu 300, 310, 320 (dann muß natürlich in Zeile 300 die Anweisung THEN 200 zu THEN 300 umgeschrieben werden und die alten Zeilen 200 bis 220 gelöscht werden). Im 2D-Programm hört das Zeichnen in Zeile 195, im 3D-Programm in Zeile 250 auf. Deswegen legen wir den Druckvorgang ab Zeile 260:<br>
+            260 PRINT LEFT$ (CP$,ZE + 1)TAB (SP)TE$;<br>
+            262 AN = 23552 + ZE * 40 + SP:GS = 24576 + ZE * 320 + SP * 8<br>
+            264 FOR I = AN TO AN + LEN (TE$)-1<br>
+            266 L = PEEK (I) :Z = 32768 + 8 * L:POKEI, 16*F1 + F2<br>
+            268 FOR J = 0 TO 7:POKE GS+J, PEEK (Z+J):NEXTJ<br>
             270 GS = GS + 8:NEXTI</p>
 
         <p>Wenn Sie das Programm (2D- oder 3D-Programm) jetzt starten, bekommen Sie als Kopf des Hochauflösungsbildschirmes noch die gezeichnete Funktion als Gleichung gedruckt. Sie können sich leicht aus diesen Angaben ein Programm schreiben, in dem die Zeilen 260 bis 270 ein Unterprogramm bilden, das jeweils mit neuem Text TE$, neuer Zeile ZE und Spalte SP aufgerufen werden kann. So können Sie beliebigen Text in das Hochauflösungsbild schreiben.</p>
