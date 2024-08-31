@@ -1,0 +1,261 @@
+;simons-axo.prg ==0801==
+;Quelle: 8412.D64
+;Der Kommentar in Zeile 4 wurde angepasst.
+    1 rem ************************
+    2 rem * normale  axonometrie *
+    3 rem *                      *
+    4 rem *                      *
+    5 rem *     steger peter     *
+    6 rem *  bahnhofstrasse 20b  *
+    7 rem *  6632 ehrwald/triol  *
+    8 rem *  tel : a-05673/2656  *
+    9 rem ************************
+   10 : print"{clr}" : poke 53280,0 : poke 53281,0
+   20 printtab(10)"{lred}normale axonometrie :" : print tab(10)"EEEEEEEEEEEEEEEEEEEEE{grn}"
+   25 print"{down}{down}{rght}{rght}{rght}{rght}dieses programm stellt  ebenflaechig"
+   30 print"{up}begrenzte koerper,nach eingabe bzw einle"
+   35 print"{up}sen der eckpunkte und der verbindungsvor"
+   40 print"{up}schrift in normaler axonometrie dar."
+   45 print"{down}{rght}{rght}{rght}hierbei kann das achsenkreuz beliebig"
+   50 print"{up}gewaehlt werden."
+   55 print"allerdings  bleibt der ursprung in  der"
+   60 print"bildschirmmitte."
+   65 print"{down}{rght}{rght}{rght}nach dem zeichnen der figur erscheint"
+   70 print"{up}in der linken oberen ecke <fertig> und"
+   75 print"man kommt dann mit {lred}<f1> oder <return> {grn}in"
+   76 print"{up}das hauptmenue."
+   80 print"{down}{rght}{rght}{rght}die erstellten  koerper koennen dann"
+   85 print"auch auf disk abgespeichert werden."
+   90 print"{down}{down}"tab(11)"< taste druecken >";
+   95 poke 198,0 : wait 198,1
+  100 clr:dim pt(100,3),zp(100),pa(100,3)
+  105 print"{clr}{grn}{down}{down}soll der koerper von disk eingelesen"
+  110 print"werden <j/n> ?"
+  115 get a$ : if a$ = "j" then 1000
+  120 if a$ <>"n" then 115
+  125 print"{clr}{rght}{rght}{rght}bitte um die eingabe der einzelnen"
+  126 print"eckpunkte mit drei koordinaten (x,y,z)"
+  127 print"{down}bei x='ende' wird die eingabe beendet."
+  128 print"{down}bei x='\' kann der vorige punkt nochein"
+  129 print"mal eingegeben werden.{down}{down}"
+  130 print"("a")"; : input px$,py,pz : px=val(px$) : if px$="ende" then 200
+  135 if px$="\" then a=a-1 : goto 130
+  140 pt(a,1) = px
+  145 pt(a,2) = py
+  150 pt(a,3) = pz
+  155 pa(a,1) = pt(a,1)
+  160 pa(a,2) = pt(a,2)
+  165 pa(a,3) = pt(a,3)
+  170 a=a+1 : goto 130
+  200 rem
+  201 rem verbindungsordnung
+  202 rem
+  205 ep = a-1 : print"{clr}{rght}{rght}{rght}in welcher reihenfolge sollen welche"
+  210 print"punkte verbunden werden ?
+  215 print"{down}'ende' beendet die eingabe wieder."
+  220 print"{down}'\' laesst die korrektur der vorigen "
+  225 print"eingabe zu."
+  230 input "{down}{down}ausgangspunkt";a
+  235 zp(0)=a
+  240 b=1 : print"{down}" : rem eingabeschleife
+  245 print"von ("a") nach : "; : input a$ : if a$= "ende" then 270
+  250 if a$ = "\" then b=b-1 : a=a1 : goto 245
+  255 a1=a : a = val(a$) :
+  260 zp(b) = a
+  265 b=b+1 : goto 245
+  270 sp=b-1
+  300 rem
+  301 rem koordinatensystem festlegen
+  302 rem
+  305 print"{clr}{down}{down}{rght}{rght}{rght}bestimmen sie nun das achsenkreuz."
+  310 print"{down}{rght}{rght}{rght}geben sie die winkel zwischen :"
+  315 print"{down}{down}"
+  320 print tab(19)"{CBM-M}"
+  325 print tab(19)"{CBM-M}"
+  330 print " z- und y-achse ";tab(19)"NM";tab(24)"z- und x-achse "
+  335 print tab(18)"N  M"tab(24)"{rght}{rght}{rght}{rght}{rght}ein."
+  345 print tab(17)"N    M"
+  350 rem
+  355 input "{down} alpha =  120{left}{left}{left}{left}{left}";al:printtab(25);:input"{up}  beta = 120{left}{left}{left}{left}{left}";bt
+  360 al=al*~/180 : bt=bt*~/180
+  400 rem
+  401 rem zeichenr($64){$7f}ine
+  402 rem
+  405 ($64){CTRL-A} 5,0
+  410 a=zp(0)
+  415 xa = 160 - sin(al)*pt(a,2) + sin(bt)*pt(a,1)
+  420 ya = 100 - pt(a,3) - cos(al)*pt(a,2) - cos(bt)*pt(a,1)
+  425 for b = 1 to sp
+  430 a=zp(b)
+  435 xs=160-sin(al)*pt(a,2)+sin(bt)*pt(a,1):if xs>319 then xs=319:ifxs<0thenxs=0
+  440 ys=100-pt(a,3)-cos(al)*pt(a,2)-cos(bt)*pt(a,1):ifys>199 then ys=199
+  441 if ys<0 thenys=0
+  445 ($64){stop} xa,ya,xs,ys,1
+  450 xa=xs : ya=ys
+  455 next
+  460 if ko = 1 then 1410
+  480 d$="{CTRL-A}<fertig>"
+  485 ($64){$6f} 5,5,d$,1,0,7
+  490 get a$ : if a$ <> chr$(133) and a$ <> chr$(13) then 490
+  500 rem
+  501 rem hauptmenue
+  502 rem
+  505 ($64){$67} : print"{clr}"tab(10) "hauptmenue :"
+  510 print tab(10)"EEEEEEEEEEEE"
+  515 print"{down}{down}{rght}{rght}{rght}(1) = neues achsenkreuz
+  520 print"{down}{rght}{rght}{rght}(2) = drehung der figur um oo
+  525 print"{down}{rght}{rght}{rght}(3) = ausgangszustand herstellen"
+  530 print"{down}{rght}{rght}{rght}(4) = verschieben der figur"
+  535 print"{down}{rght}{rght}{rght}(5) = koordinatenachsen einzeichnen"
+  545 print"{down}{rght}{rght}{rght}(6) = abspeichern der koerperdaten"
+  550 print"{down}{rght}{rght}{rght}(7) = hardcopy auf drucker
+  555 print"{down}{rght}{rght}{rght}(8) = neuer start"
+  560 print"{down}{rght}{rght}{rght}(9) = zur grafik zurueck"
+  580 print tab(10) "{down}(0) = ende"
+  585 get a$ : if a$ <"0" or a$ >"9" or a$="" then 585
+  590 on val(a$) goto 300,600,800,1300,1400,1100,1500,100,1220
+  595 stop
+  600 rem
+  601 rem drehung der figur um oo
+  610 print"{clr}{grn}{rght}{rght}{rght}{rght}{rght}drehung der figur um oo :":print"{rght}{rght}{rght}{rght}{rght}EEEEEEEEEEEEEEEEEEEEEEEE"
+  615 print"{down}{down}{rght}{rght}{rght}bitte waehlen sie aus :"
+  620 print"{down}{down}{rght}{rght}{rght}(1) = drehung um die z-achse.
+  625 print"{down}{rght}{rght}{rght}(2) = drehung um die y-achse.
+  630 print"{down}{rght}{rght}{rght}(3) = drehung um die x-achse."
+  635 get a :if a < 1 or a >3 then 635
+  636 z=5+2*a : ($64)
+ z,3,29,1
+  640 print tab(7)"{down}{down}{down}bitte den drehwinkel :";:input de : de=de*~/180
+  645 on a goto 650,700,750
+  650 rem
+  651 rem um die z-achse
+  655 for x=0 to ep
+  660 eo=atn(pt(x,1)/(pt(x,2)-1e-32))-~*(pt(x,2)<=0)-2*~*(pt(x,1)<0 andpt(x,2)>0)
+  665 eo = eo+de : if eo >= 2*~ then eo = eo-2*~
+  670 r=sqr(pt(x,1)^2+pt(x,2)^2)
+  675 pt(x,1)=sin(eo)*r
+  680 pt(x,2)=cos(eo)*r
+  685 next
+  690 goto 790 : rem return
+  700 rem
+  701 rem um die y-achse
+  705 for x=0 to ep
+  710 eo=atn(pt(x,3)/(pt(x,1)-1e-32))-~*(pt(x,1)<=0)-2*~*(pt(x,3)<0andpt(x,1)>0)
+  715 eo=eo+de : if eo >= 2*~ then eo=eo-2*~
+  720 r = sqr(pt(x,1)^2+pt(x,3)^2)
+  725 pt(x,1)=cos(eo)*r
+  730 pt(x,3)=sin(eo)*r
+  735 next
+  740 goto 790 : rem return
+  750 rem
+  751 rem um die x-achse
+  755 for x=0 to ep
+  760 eo=atn(pt(x,2)/(pt(x,3)-1e-32))-~*(pt(x,3)<=0)-2*~*(pt(x,2)<0andpt(x,3)>0)
+  765 eo=eo+de : if eo>= 2*~ then eo = eo-2*~
+  766 r = sqr (pt(x,2)^2+pt(x,3)^2)
+  770 pt(x,3)=cos(eo)*r
+  775 pt(x,2)=sin(eo)*r
+  780 next
+  790 ($64){$70} 2 : goto 400 : rem return
+  800 rem ausganagszustand
+  801 rem
+  810 for x = 0 to ep
+  820 for y = 1 to 3
+  830 pt(x,y)=pa(x,y)
+  840 nexty,x
+  850 goto 400
+  999 rem
+ 1000 rem daten vom der ($64){$72} holen
+ 1001 rem
+ 1010 open 1,8,15 : rem fehlerkanal
+ 1015 print"{down}{down}bitte dateinamen :"; : input ns$ : n$=ns$
+ 1020 ns$=ns$+",s,r"
+ 1025 open 2,8,2,ns$
+ 1030 gosub 1250
+ 1032 if f1 = 62 then close 2 : goto 1015
+ 1035 print"{down}{down}einlesen der daten von :";n$
+ 1040 input#2,ep
+ 1045 input#2,sp
+ 1050 for x = 0 to ep
+ 1055 for y = 1 to 3
+ 1060 input#2,pt(x,y)  : pa(x,y)=pt(x,y)
+ 1065 next y
+ 1070 gosub 1250
+ 1075 next x
+ 1080 for x = 0 to sp
+ 1085 input#2,zp(x)
+ 1090 next x
+ 1095 gosub 1250
+ 1097 close 2 : close 1 : goto 300
+ 1100 ($64){$67} : rem koerperdaten auf ($64){$72}
+ 1101 rem
+ 1110 print "{clr}{grn}{down}{down}{down}{rght}{rght}{rght}{rght}{rght}{rght}{rght}koerperdaten auf disk:"
+ 1120 print"{rght}{rght}{rght}{rght}{rght}{rght}{rght}EEEEEEEEEEEEEEEEEEEEEE"
+ 1130 print"{down}{down}{down}bitte dateinamen :"; : input ns$
+ 1140 open 1,8,15 : rem fehlerkanal
+ 1150 ns$=ns$+",s,w"
+ 1160 open 2,8,2,ns$
+ 1162 print#2,ep : print#2,sp
+ 1165 for x = 0 to ep : rem punkte
+ 1170 for y = 1 to 3
+ 1180 print#2,pt(x,y)
+ 1185 next y
+ 1190 gosub 1250
+ 1195 next x
+ 1200 for x = 0 to sp : rem verbindungsvorschrift
+ 1205 print#2,zp(x)
+ 1210 next
+ 1215 gosub 1250
+ 1220 close 2 : close 1 : ($64){$70} 2 : goto 490
+ 1250 rem
+ 1251 rem fehlerkanal
+ 1252 rem
+ 1255 input#1,f1,f1$,f2,f3 : if f1 = 0 then return : rem kein fehler
+ 1260 print "{down}{down}{rght}{rght}{rght}{lred}fehler auf der disk !"
+ 1265 print"{down}{rght}{rght}"f1,f1$"{grn}  "f3"  "f4
+ 1270 print"{down}{down}bitte mit <return> bestaetigen,oder mit"
+ 1275 print"{rght}{rght}{rght}<space> das programm abbrechen !"
+ 1280 getan$ : if an$ = chr$(13) then return
+ 1285 if an$ <> chr$(32) then 1280
+ 1290 close 1 : stop
+ 1300 rem
+ 1301 rem verschieben der figur
+ 1302 rem
+ 1305 print"{clr}{rght}{rght}{rght}{rght}{rght}{rght}verschieben der figur :":print"{rght}{rght}{rght}{rght}{rght}{rght}EEEEEEEEEEEEEEEEEEEEEEE"
+ 1310 print"{down}{down}{down}{rght}{rght}{rght}bitte um den verschiebevektor in der"
+ 1315 print"form 'x,y,z' !"
+ 1320 input"{down}{down}vektor :";px,py,pz
+ 1322 print"{down}{down}{down}{rght}{rght}{rght}bitte etwas geduld ."
+ 1325 for a=0 to ep
+ 1335 pt(a,1) = pt(a,1) + px
+ 1340 pt(a,2) = pt(a,2) + py
+ 1345 pt(a,3) = pt(a,3) + pz
+ 1350 next a
+ 1360 goto400
+ 1400 rem
+ 1401 rem koordinatenachsen
+ 1402 rem
+ 1405 if ko=1 then ty=0 : ko=0 : goto 1415
+ 1410 ko=1 : ty = 1
+ 1415 xs=160-sin(al)*95 : x1=160-sin(al)*105
+ 1420 ys=100-cos(al)*95 : y1=100-cos(al)*105
+ 1425 ($64){CTRL-K} x1,y1,25,ty,1
+ 1430 ($64){stop} 160,100,xs,ys,ty : rem y-achse
+ 1435 xs=160+sin(bt)*95 : x1=160+sin(bt)*102
+ 1440 ys=100-cos(bt)*95 : y1=100-cos(bt)*105
+ 1445 ($64){stop} 160,100,xs,ys,ty : rem x-achse
+ 1450 ($64){CTRL-K} x1,y1,24,ty,1
+ 1455 ($64){stop} 160,100,160,10,ty : rem z=achse
+ 1460 ($64){CTRL-K} 155,0,26,ty,1
+ 1470 ($64){$70} 2 : goto 480
+ 1500 rem
+ 1501 rem hard($64){$77}
+ 1502 rem
+ 1505 ($64){$6f} 5,5,d$,0,0,7
+ 1510 d$="<hardcopy>"
+ 1515 ($64){$6f} 5,5,d$,1,0,8
+ 1520 ($64){$70} 2
+ 1525 ($64){$77}
+ 1530 ($64){$6f} 5,5,d$,0,0,8
+ 1535 goto 480
+
