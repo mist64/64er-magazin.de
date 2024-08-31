@@ -70,8 +70,242 @@
 
         <figure>
             TODO
-            <figcaption>Listing von »Trace und Single Step«</figcaption>
+            <figcaption>Labeltabelle</figcaption>
         </figure>
+
+        <figure>
+            <pre>80 open1,4
+90 sys9*4096
+100 *=49152
+110 ;:;:;trace / single step fuer c64          9.84
+120 ;:;   +disassembler / editor
+130 ;:;       juergen goebel:;:;       8 muenchen 82:;:;       groschenweg 19:;:;
+140 ;:;      tel. 089 / 432709:;:;
+150 .opt oo,p
+160 irqvek =$314:stack =$100:col =55296;hintergrundfarbe
+170 screen =1024:ready =$a474-1
+180 cia =$dc00:tl =cia+6;timerwerte:th =cia+7:tast =$ea87;tastaturrout.
+190 ddrb =$dd03
+200 icr =cia+13;interr.controlreg.:crb =cia+15:tstart =*+$0500
+210 nop:lda #0:sta dison:beq go
+220 lda #255:sta dison
+230 go sei:lda #&lt;trace:sta irqvek;irq vektor
+240 lda #>trace:sta irqvek+1;auf trace
+250 lda #130:sta icr;timer b interrupt erlaubt:ldx #255:txs;stack initial.
+260 lda #>ready;stack fuer trace:pha;vorbereiten:lda #&lt;ready:pha
+270 lda #$c0;pc=$c000:pha:lda #0:pha
+280 lda #32:pha:lda #0:pha:pha:pha
+290 trace cld:ldy #0:titel lda text,y;kopfzeile
+300 jsr prizei;ausgeben:cpy #40:bne titel
+310 tsx:lda stack+6,x;pc ausgeben:sta tmp+3:jsr prbyte
+320 lda stack+5,x:sta tmp+4:jsr prbyte
+330 lda dison:bmi disoff
+340 jsr disas:disoff jsr space:txa;sp ausgeben
+350 jsr prbyte
+360 register jsr space:lda stack+1,x:jsr prbyte
+370 inx:cpy #56:bcc register:jsr space
+380 lda stack+1,x;prozessorstatus-flags anzeigen
+390 ldx #8
+400 cont1 asl:pha:lda #94;pfeil:bcs flsetz
+410 lda #45;minus:flsetz jsr prizei:pla
+420 dex:bne cont1:jsr space:ldx #8;userport anzeigen
+430 lda ddrb-2
+440 cont2 asl:pha:lda #$31:bcs usetz
+450 lda #$30:usetz jsr prizei:pla
+460 dex:bne cont2:ldx #8;datenrichtungsregister:lda ddrb;laden
+470 cont3 asl screen+65,x:lsr;entsprechende bits der anzeige
+480 ror screen+65,x;werden invertiert:dex:bne cont3
+490 wait jsr get;wartet auf:cmp #23;f1,f3,f5,f7 oder x:beq exit
+500 cmp #5:beq fast;und verzweigt entsprechend
+510 cmp #6:beq slow
+520 cmp #3:beq waitl:cmp #4:bne wait
+530 jmp set
+540 waitl jsr get;wartet bis f7 wieder losgelassen:cmp #64:bne waitl
+550 fast lda #$16:sta tl
+560 lda #0;timer laden:sta th:lda #17:sta crb;und starten:lda $dc0d;ende irq
+570 pla:tay:pla:tax
+580 pla:rti
+590 slow ldx #0:cont4 dex:bne cont4:dey:bne cont4
+600 beq fast
+610 exit lda #2;x taste:sta icr:lda #$31:sta irqvek;setzt irq vektor auf
+620 lda #$ea;alten wert:sta irqvek+1:lda #4:sta $028b:lda #16;repeat korrig.
+630 sta $028c:cli:jmp ready+1;sprung zu basic
+640 prbyte pha;1 byte als 2 hexz. auf schirm:stx tmp:lsr:lsr:lsr:lsr
+650 tax:lda hex,x:jsr prizei
+660 pla:and #$0f:tax:lda hex,x:ldx tmp
+670 jmp prizei
+680 space lda #$20
+690 prizei and #$3f;wegen bildschirmcode
+700 sta screen,y:lda #1;farbe setzen:sta col,y:iny:rts
+710 get jsr tast;holt tastencode:lda $cb:rts
+720 set jsr disas:ldy #40;f1 taste
+730 start lda screen,y:ora #128:sta screen,y:sty tmp
+740 jsr zeichhol;eingaberout.:ldy tmp:cmp #13:bne links
+750 cpy #100:bpl mread:jmp read:mread rts;zur leseroutine
+760 reverse lda screen,y;invertieren
+770 and #127:sta screen,y:rts
+780 links cmp #17;cursor links:bne rechts:jsr reverse:dey:bne start
+790 rechts cmp #29;cursor rechts:bne cont6:jsr reverse:iny:bne start
+800 cont6 jsr prizei;wert anzeigen:bne start:zeichhol lda #0;tast.abfrage
+810 sta $c6:jsr tast:lda $277
+820 cmp #0:beq zeichhol:ldy #0:sty $277;tastaturpufferstart
+830 cmp #$85;f1 taste:beq zeichhol
+840 ldy #64;verzoegerung repeatzaehler:sty $28b:sty $28c:rts
+850 read jsr reverse:ldy #40;pc lesen:tsx:jsr byt:sta stack+6,x
+860 sta tmp+3:iny:jsr byt
+870 sta stack+5,x:sta tmp+4:iny:iny;sp ueberlesen:iny:iny
+880 loop iny;register lesen:jsr byt:sta stack+1,x:iny:inx
+890 cpy #56:bne loop
+900 iny:lda #0:sta tmp:loop1 lda screen,y;flags lesen:and #%00011111
+910 cmp #30:rol tmp
+920 iny:cpy #65:bne loop1:tsx:lda tmp:and #%11111011;i flag loeschen
+930 sta stack+4,x:jsr disas:jsr readpc:jsr disas:jmp wait
+940 byt jsr lbit;8 bit zahl von screen holen:asl:asl:asl:asl:iny:sta tmp
+950 jsr lbit:clc:adc tmp:rts
+960 lbit lda screen,y;1 byte von screen in hex:cmp #48:bcs zahl:adc #57
+970 sec:zahl sbc #48:rts
+980 ;berechnet abs. adressen bei branches
+990 offset lda cod2:bmi bminus
+1000 clc;branch vor:adc #2:adc tmp+4:sta tmp1:lda tmp+3
+1010 adc #0:jsr prbyte:lda tmp1:jsr prbyte:rts:;branch rueck
+1020 bminus eor #255:sec:sbc #1:sta tmp
+1030 lda tmp+4:sbc tmp:sta tmp1:lda tmp+3
+1040 sbc #0:jsr prbyte:lda tmp1:jsr prbyte:rts;ende offset
+1050 ;laenge opcode
+1060 ;berechnet befehlslaenge (1,2 od. 3 bytes)
+1070 ;opcode in akku uebergeben
+1080 ;im y-reg. steht dann befehlslaenge
+1090 laenge ldy #1
+1100 cmp #$20:beq loo1:and #$9f:beq loo3
+1110 and #$1f:cmp #9:beq loo2:cmp #$19
+1120 beq loo1:and #$0d:cmp #8:beq loo3
+1130 and #8:beq loo2
+1140 loo1 iny:loo2 iny:loo3 rts
+1150 disas sty oldy:stx oldx;register retten
+1160 ldx #20:lda #" ":cle1 sta screen+120,x;zeile fuer disas. loeschen
+1170 dex:bne cle1
+1180 ;pc l/h in tmp+4 / tmp+3:;belegt 'ram' pointer zum lesen
+1190 lda tmp+4:sta ppoin1+1:sta tmp+6 :lda tmp+3:sta ppoin1+2:sta tmp+5
+1200 inc tmp+6:lda tmp+6:sta ppoin2+1:bne loo5
+1210 inc tmp+5:loo5 lda tmp+5:sta ppoin2+2:inc tmp+6
+1220 lda tmp+6:sta ppoin3+1:bne loo6
+1230 inc tmp+5:loo6 lda tmp+5:sta ppoin3+2
+1240 ppoin1 lda $c000:sta cod1;liest opcodes
+1250 ppoin2 lda $c000:sta cod2
+1260 ppoin3 lda $c000:sta cod3
+1270 lda cod1:jsr laenge:tya:sta codel:tax:ldy #120;bytes ab pc ausgeben
+1280 lda cod1:jsr prbyte:jsr space:dex
+1290 beq loo7:lda cod2:jsr prbyte:jsr space
+1300 dex:beq loo7:lda cod3:jsr prbyte
+1310 loo7 ldy #129:lda cod1;gibt opcode (3 buchstaben) aus
+1320 clc:lda #>tstart:sta tmp:lda cod1:adc cod1:bcc loo8
+1330 inc tmp:loo8 clc:adc cod1:bcc loo9:inc tmp:loo9 sta opp+1;pointer belegen
+1340 lda tmp:sta opp+2:ldx #0:opp lda $c000,x:jsr prizei:inx
+1350 cpx #3:bne opp:jsr space
+1360 lda codel:cmp #2:bpl code2:jmp endas
+1370 code2 ldx cod1:lda tadr,x;adress. feststellen:tax
+1380 ; '#$','$' od.'($' ausgeben
+1390 cpx #6:bmi loo10:lda #"(":jsr prizei
+1400 loo10 cpx #2:bne loo11:lda #"#"
+1410 jsr prizei:loo11 lda #"$":jsr prizei
+1420 cpx #1:bpl loo12:jsr offset:jmp endas
+1430 loo12 lda codel;operanden ausgeben:cmp #3:beq codl3
+1440 lda cod2:jsr prbyte:jmp loo13
+1450 codl3 lda cod3:jsr prbyte:lda cod2:jsr prbyte
+1460 loo13 cpx #4:bmi endas
+1470 ; ',x',',y',',x)','),y' od. ')' ausgeben
+1480 bne loo14:lda #",":jsr prizei
+1490 lda #"x":jsr prizei:jmp endas
+1500 loo14 cpx #5:bne loo15
+1510 lda #",":jsr prizei:lda #"y":jsr prizei:jmp endas
+1520 loo15 cpx #6:bne loo16:lda #",":jsr prizei
+1530 lda #"x":jsr prizei:lda #")":jsr prizei:jmp endas
+1540 loo16 lda #")":jsr prizei
+1550 cpx #8:beq endas:lda #",":jsr prizei
+1560 lda #"y":jsr prizei
+1570 endas ldy oldy;reg. holen:ldx oldx:rts;ende disas
+1580 readpc ldy #120:jsr start;dis.zeile edit.:jsr reverse:ldy #120
+1590 ;liest bytes und speichert in ram
+1600 jsr byt:sta cod1:iny:iny:jsr byt
+1610 sta cod2:iny:iny:jsr byt:sta cod3
+1620 lda tmp+4:sta pread1+1
+1630 lda tmp+3:sta pread1+2:lda cod1:pread1 sta $c000
+1640 ldy codel:cpy #2:bmi eread
+1650 lda tmp+4:clc:adc #1:sta pread2+1
+1660 lda tmp+3:adc #0:sta pread2+2
+1670 lda cod2:pread2 sta $c000
+1680 cpy #3:bmi eread
+1690 lda tmp+4:clc:adc #2:sta pread3+1
+1700 lda tmp+3:adc #0:sta pread3+2
+1710 lda cod3:pread3 sta $c000
+1720 eread rts;alle bytes gelesen. ende readpc
+1730 text .asc " pc  sp yr xr ac nv-bdizc 76543210      "
+1740 hex .asc "0123456789abcdef"
+1750 tmp .byt 0,0,0,0,0,0,0;arbeitsvariablen
+1760 tmp1 .byt 0
+1770 oldy .byt 0
+1780 oldx .byt 0
+1790 cod1 .byt 0:cod2 .byt 0:cod3 .byt 0
+1800 codel .byt 0:dison .byt 0
+1810 *=tstart:;tab. opcodes (l-byte tstart muss 0 sein)
+1820 .asc "brkora?????????oraasl???phporaasl"
+1830 .asc "??????oraasl???bplora??????"
+1840 .asc "???oraasl???clcora?????????"
+1850 .asc "oraasl???jsrand??????bitand"
+1860 .asc "rol???plpandrol???bitandrol"
+1870 .asc "???bmiand?????????androl???"
+1880 .asc "secand?????????androl???rti"
+1890 .asc "eor?????????eorlsr???phaeor"
+1900 .asc "lsr???jmpeorlsr???bvceor???"
+1910 .asc "??????eorlsr???clieor??????"
+1920 .asc "???eorlsr???rtsadc?????????"
+1930 .asc "adcror???plaadcror???jmpadc"
+1940 .asc "ror???bvsadc?????????adcror"
+1950 .asc "???seiadc?????????adcror???"
+1960 .asc "???sta??????stystastx???dey"
+1970 .asc "???txa???stystastx???bccsta"
+1980 .asc "??????stystastx???tyastatxs"
+1990 .asc "??????sta??????ldyldaldx???"
+2000 .asc "ldyldaldx???tayldatax???ldy"
+2010 .asc "ldaldx???bcslda??????ldylda"
+2020 .asc "ldx???clvldatsx???ldyldaldx"
+2030 .asc "???cpycmp??????cpycmpdec???"
+2040 .asc "inycmpdex???cpycmpdec???bne"
+2050 .asc "cmp?????????cmpdec???cldcmp"
+2060 .asc "?????????cmpdec???cpxsbc???"
+2070 .asc "???cpxsbcinc???inxsbcnop???"
+2080 .asc "cpxsbcinc???beqsbc?????????"
+2090 .asc "sbcinc???sedsbc?????????sbc"
+2100 .asc "inc???"
+2110 ;tabelle adressierung (keine standardwerte nur fuer disas)
+2120 tadr .byt 1,6,1,1,1,3,3,1,1,2,1,1
+2130 .byt 1,3,3,1,0,7,1,1,1,4,4,1,1,5
+2140 .byt 1,1,1,4,4,1,3,6,1,1,3,3,3,1
+2150 .byt 1,2,1,1,3,3,3,1,0,7,1,1,1,4
+2160 .byt 4,1,1,5,1,1,1,4,4,1,1,6,1,1
+2170 .byt 1,3,3,1,1,2,1,1,3,3,3,1,0,7
+2180 .byt 1,1,1,4,4,1,1,5,1,1,1,4,4,1
+2190 .byt 1,6,1,1,1,3,3,1,1,2,1,1,8,3
+2200 .byt 3,1,0,7,1,1,1,4,4,1,1,5,1,1,1
+2210 .byt 4,4,1,1,6,1,1,3,3,3,1,1,1,1
+2220 .byt 1,3,3,3,1,0,7,1,1,4,4,5,1,1
+2230 .byt 5,1,1,1,4,1,1,2,6,2,1,3,3,3
+2240 .byt 1,1,2,1,1,3,3,3,1,0,7,1,1,4
+2250 .byt 4,5,1,1,5,1,1,4,4,5,1,2,6,1
+2260 .byt 1,3,3,3,1,1,2,1,1,3,3,3,1,0
+2270 .byt 7,1,1,1,4,4,1,1,5,1,1,1,4,4
+2280 .byt 1,2,6,1,1,3,3,3,1,1,2,1,1,3
+2290 .byt 3,3,1,0,7,1,1,1,4,4,1,1,5,1
+2300 .byt 1,1,4,4,1
+2310 .end
+2320 end
+2330 inputa:printpeek(a+51456):goto2330
+            </pre>
+            <figcaption>Listing von »Trace und Single Step«</figcaption>
+            <!-- TODO Im Magazin ist es das LST davon -->
+        </figure>
+
+        <div class="binary_download" data-filename="dtrace.obj.prg" data-name="Trace und Single Step"></div>
 
     </article>
 
