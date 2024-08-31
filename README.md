@@ -88,12 +88,12 @@ Die Eingabe-Ausgaben werden aus `issues` gelesen, die Website wird nach `out` ge
         * [thierer](https://www.forum64.de/wcf/index.php?user/26370-thierer/)
         * [vicjack](https://www.forum64.de/wcf/index.php?user/15999-vicjack/)
 * Ausgabe 8/84:
-    * Erfassen diverser Tabellen, Eintragen der Index-Kategorien und -Titel, OCR-Fixes
+    * Erfassen diverser Tabellen, Metadaten, OCR-Fixes
         * [thierer](https://www.forum64.de/wcf/index.php?user/26370-thierer/)
     * Abtippen der Listings
         * [Endurion](https://www.forum64.de/wcf/index.php?user/1964-endurion/)
 * Ausgabe 9/84:
-    * Formatierung, Eintragen der Index-Kategorien und -Titel, OCR-Fixes
+    * Formatierung, Metadaten, OCR-Fixes
         * [thierer](https://www.forum64.de/wcf/index.php?user/26370-thierer/)
     * Abtippen der Listings
         * [Endurion](https://www.forum64.de/wcf/index.php?user/1964-endurion/)
@@ -101,8 +101,14 @@ Die Eingabe-Ausgaben werden aus `issues` gelesen, die Website wird nach `out` ge
         * [64erGrufti](https://www.forum64.de/wcf/index.php?user/30650-64ergrufti/)
         * [ClausS](https://www.forum64.de/wcf/index.php?user/28399-clauss/)
 * Ausgabe 10/84:
+    * Formatierung, Metadaten
+        * [thierer](https://www.forum64.de/wcf/index.php?user/26370-thierer/)
     * OCR-Fixes
         * [vicjack](https://www.forum64.de/wcf/index.php?user/15999-vicjack/)
+        * [thierer](https://www.forum64.de/wcf/index.php?user/26370-thierer/)
+    * Abtippen der Listings
+        * [Endurion](https://www.forum64.de/wcf/index.php?user/1964-endurion/)
+        * [darkvision](https://www.forum64.de/wcf/index.php?user/21031-darkvision/)
 
 
 ![](screenshot1.png)
