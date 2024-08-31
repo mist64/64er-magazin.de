@@ -1,0 +1,306 @@
+;editor.prg ==0801==
+;Quelle: 8412.D64
+   10 print"{clr}";:t=ti+180
+   11 print"{CBM-A}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{CBM-S}
+   12 print"{SHIFT--} lexikon-editor  hh,30.5.84 {SHIFT--}
+   18 print"{CBM-Z}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{CBM-X}
+   19 ifti<tthen19
+   20 :
+   22 :
+   24 rem" hauptprogramm
+   26 rem" {SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}
+   28 :
+   30 gosub900:rem" vorbereitungen
+   32 :
+   34 gosub600:rem" menue
+   36 :
+   38 m=0
+   40 iff$="{f1}"then    gosub3006:goto34
+   42 iff$="{f3}"then    gosub0300:goto34
+   44 iff$="{f5}"thenclr:gosub0500:goto34
+   46 iff$="{f7}"thenprint"{clr}"
+   47 :
+   48 print " Sicher           (j/n) ?"
+   50 wait203,64:poke198,0:wait203,63
+   52 getf$:iff$<>"j"then34
+   53 :
+   54 printchr$(9);
+   60 print"{down} Raetsel-Programm (j/n) ?"
+   62 wait203,64:poke198,0:wait203,63
+   63 :
+   64 getf$:iff$="n"then90
+   66 iff$<>"j"then62
+   68 print"{clr}load"+chr$(34);
+   70 print"raetsel";chr$(34);",8"
+   72 print"{down}{down}{down}":print"run"
+   74 poke198,3:poke631,19
+   76 poke632,13:poke633,13
+   77 goto97
+   88 :
+   90 poke792,71:rem" restore und
+   92 poke788,49:rem" stop reparieren
+   94 :
+   97 end
+   98 :
+   99 :
+  300 rem" datei aendern
+  302 rem" {SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}
+  304 :
+  306 gosub700:rem" Datei einlesen
+  307 :
+  308 ef=0:print"{clr}"
+  309 print" Mit {rvon}RETURN{rvof} auswaehlen"
+  310 print" Mit {rvon}LEERTASTE{rvof}  weiter"
+  311 print" Mit {rvon}q{rvof}       abbrechen"
+  312 gosub2000:rem" Datei auflisten
+  313 :
+  314 print"{down}   {rvon}Fertig ?{rvof} (j/n)"
+  316 wait203,64:poke198,0:wait203,63
+  318 getf$:iff$="n"then308
+  320 iff$<>"j"then316
+  322 :
+  323 ifef=0then397
+  324 gosub800:rem" Datei aufzeichnen
+  395 :
+  397 return
+  398 :
+  399 :
+  500 rem" datei eingeben
+  502 rem" {SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}
+  503 :
+  504 print"{clr}";:gosub900
+  505 :
+  506 t$="{rvon}Wortschatz-Name:"
+  507 l=14:m=1:f$="":gosub1000
+  508 af$="{SHIFT-+}"+chr$(20)+f$
+  510 :
+  519 print
+  520 t$="{rvon}Folge-Wortschatz (q=keinen):"
+  521 l=14:m=1:f$="":gosub1000
+  522 nf$="{SHIFT-+}"+chr$(20)+f$
+  524 :
+  525 print"{clr}":nr=0:ef=0
+  527 :
+  528 rem" woerter eingeben
+  529 gosub650
+  530 :
+  532 iff$="q"thennr=nr-1:goto539
+  534 ifnr<254thennr=nr+1
+  536 ifpeek(210)=7thenprint"{clr}"
+  537 goto529
+  538 :
+  539 ifef=0then597
+  540 rem" datei auf diskette ablegen
+  541 fg=nr:gosub800
+  592 :
+  597 return
+  598 :
+  599 :
+  600 rem" menue
+  602 rem" {SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}
+  604 :
+  606 print"{clr}";:f$=""
+  608 print"{down} {rvon}F1{rvof}  Directory
+  610 print"{down} {rvon}F3{rvof}  Datei aendern
+  612 print"{down} {rvon}F5{rvof}  Datei anlegen
+  614 print"{down} {rvon}F7{rvof}  Abbrechen
+  616 :
+  618 wait203,63:getf$
+  620 iff$<chr$(133)orf$>chr$(136)then618
+  621 print"{clr}"
+  622 :
+  647 return
+  648 :
+  649 :
+  650 rem" kreuzwoerter eingeben
+  651 rem" {SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}
+  652 :
+  653 n$=str$(nr):n$=right$(n$,len(n$)-1)
+  654 t$="{rvon}"+n$+". Kreuzwort{rvof} (q=ende)"
+  655 l=20:m=0:f$=kw$(nr):gosub1000
+  656 iff$="q"then697
+  657 iflen(f$)<2thenprint"{up}{up}{up}";:goto655
+  658 kw$(nr)=f$:print
+  659 :
+  664 t$="{rvon}Fragestellung{rvof}"
+  666 l=35:m=1:f$=fw$(nr):gosub1000
+  681 fw$(nr)=f$:print
+  682 :
+  683 ef=1
+  686 :
+  697 return
+  698 :
+  699 :
+  700 rem" datei einlesen
+  702 rem" {SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}
+  703 :
+  705 print"{clr}"
+  706 t$="{rvon}Wortschatz{rvof} ($=directory)"
+  708 l=14:m=1:f$="":gosub1000
+  709 iff$="$"thenm=1:gosub3000
+  710 iff$=""then705
+  712 :
+  713 af$="{SHIFT-+}"+chr$(20)+f$
+  714 open1,8,2,"0:"+af$+",s,r"
+  716 :
+  718 input#1,fg:rem" feldgroesse
+  719 :
+  720 rem" woerter/fragen einlesen
+  721 forn=0tofg
+  722 :input#1,kw$(n),fw$(n)
+  724 next
+  726 :
+  728 input#1,nf$:rem" folge-wortschatz
+  730 :
+  732 close1
+  796 :
+  797 return
+  798 :
+  799 :
+  800 rem" datei aufzeichnen
+  802 rem" {SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}
+  803 :
+  805 print"{clr}"
+  807 :
+  812 open15,8,15,"i":close15
+  813 :
+  814 open1,8,2,"@0:"+af$+",s,w"
+  816 :
+  818 print#1,fg :rem" feldgroesse
+  819 :
+  820 forn=0tofg
+  822 :print#1,kw$(n):print#1,fw$(n)
+  824 next
+  826 :
+  828 print#1,nf$:rem" naechster file
+  830 :
+  832 close1
+  896 :
+  897 return
+  898 :
+  899 :
+  900 rem" vorbereitungen
+  902 rem" {SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}
+  904 :
+  906 poke53280,6:rem" rahmen blau
+  908 poke53281,14:rem" grund hellblau
+  909 printchr$(14);chr$(8);chr$(144)
+  910 :
+  912 poke792,193:rem" restore und
+  913 poke788,52:rem" stop verriegeln
+  914 :
+  915 dimkw$(254):rem" kreuzwoerter
+  916 dimfw$(254):rem" fragen dazu
+  986 :
+  987 return
+  988 :
+  989 :
+  990 :
+ 1000 rem" inputform routine
+ 1001 rem" {SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}
+ 1002 :
+ 1003 x$=chr$(13):y$=chr$(20)
+ 1004 z$=chr$(34):poke198,0
+ 1005 :
+ 1006 print" ";t$:print"{down}{down}{up} ? ";f$;" ";
+ 1007 x=1:iff$<>""thenx=len(f$)+1
+ 1008 :
+ 1009 f$="":forn=xtol+1
+ 1010 :print"{left}";f$;"{CBM-@}";
+ 1011 :wait198,1:getf$:poke198,0
+ 1012 :iff$=x$then1025
+ 1013 :iff$=y$andn>1thenn=n-1:goto1010
+ 1014 :ifn>lthen1011
+ 1015 :ifm=0then1021
+ 1016 :iff$=","orf$=z$then1011
+ 1017 :iff$>=" "andf$<="9"then1022
+ 1018 :iff$>="A"andf$<="Z"then1022
+ 1021 :iff$<"a"orf$>"z"then1011
+ 1022 next
+ 1023 :
+ 1025 printchr$(20);:poke211,1
+ 1026 poke631,13:poke198,1:inputf$
+ 1030 iff$=x$thenprint"{up}{rght}{rght}{rght}{rght}";:goto1009
+ 1036 :
+ 1097 return
+ 1098 :
+ 1099 :
+ 2000 rem" datei auflisten
+ 2002 rem" {SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}
+ 2004 :
+ 2010 fornr=0tofg
+ 2012 :print"{down} ->{rvon}";kw$(nr);"{rvof}"
+ 2014 :print"   ";fw$(nr)
+ 2016 :forw=0to60:next
+ 2017 :wait198,1:getf$:print"{up}{up}   {down}{down}"
+ 2018 :iff$="q"then2029
+ 2019 :iff$<>chr$(13)then2024
+ 2021 :print"{clr}":gosub650
+ 2022 :print"{clr}":wait203,64
+ 2024 :ifpeek(210)=7thenprint"{clr}"
+ 2026 next
+ 2028 :
+ 2029 t$="{rvon}Folge-Wortschatz"
+ 2030 print"   ";t$;":":print" ->";nf$
+ 2032 wait203,64:poke198,0:wait203,63
+ 2034 :
+ 2036 getf$:iff$<>chr$(13)then2097
+ 2037 f$=right$(nf$,len(nf$)-2)
+ 2038 t$=t$+" (q=keinen):"
+ 2039 print"{clr}":gosub1000:ef=1
+ 2040 nf$="{SHIFT-+}"+chr$(20)+f$
+ 2096 :
+ 2097 return
+ 2098 :
+ 2099 :
+ 3000 rem" directory listen
+ 3002 rem" {SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}
+ 3003 :
+ 3004 print"{clr}"
+ 3005 print" Mit {rvon}RETURN{rvof} auswaehlen"
+ 3006 print" Mit {rvon}LEERTASTE{rvof}  weiter"
+ 3007 print
+ 3008 :
+ 3009 open15,8,15,"io":open2,8,2,"#"
+ 3010 :
+ 3012 t=18:s=1:f$=""
+ 3014 :
+ 3016 forw=0to99
+ 3018 :
+ 3020 :print#15,"b-r";2;0;t;s
+ 3022 :print#15,"b-p";2;0
+ 3024 :
+ 3026 :get#2,x$:t=asc(x$+chr$(0))
+ 3028 :get#2,x$:s=asc(x$+chr$(0))
+ 3030 :
+ 3032 :forx=0to7
+ 3034 : print#15,"b-p";2;x*32+5
+ 3036 : get#2,x$
+ 3038 : ifx$<>"{SHIFT-+}"thennextx:goto3060
+ 3040 : get#2,x$
+ 3042 : fory=1to14
+ 3044 :  get#2,x$:f$=f$+x$
+ 3046 :  ifx$=chr$(160)theny=15
+ 3048 : nexty
+ 3050 : print" -> {rvon}";f$;"{rvof}"
+ 3051 : ifm=0then3056
+ 3053 : wait203,64:wait203,63:getx$
+ 3054 : ifx$=chr$(13)then3064
+ 3055 : print"{up}    "
+ 3056 : f$=""
+ 3057 :nextx
+ 3058 :
+ 3060 :ift=0thenw=99
+ 3061 nextw
+ 3062 :
+ 3064 close2:close15
+ 3065 ifm=0thenwait203,63
+ 3066 :
+ 3068 return
+ 3070 :
+ 3071 :
+ 3072 :
+ 9000 rem"{CBM-A}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{CBM-S}
+ 9002 rem"{SHIFT--} ende     lexikon-editor    {SHIFT--}
+ 9004 rem"{CBM-Z}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{CBM-X}
+

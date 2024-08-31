@@ -1,0 +1,614 @@
+;kreuzwortraetse.prg ==0801==
+;Quelle: 8412.D64
+;Der Kommentar in Zeile 19 wurde angepasst.
+   15 print"{clr}";
+   16 print"{CBM-A}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{CBM-S}
+   17 print"{SHIFT--}kreuzwortraetsel version 1.a{SHIFT--}
+   18 print"{SHIFT--}                            {SHIFT--}
+;  19 print"{SHIFT--}(c) buettgenbach  hh,30.5.84{SHIFT--}
+   19 print"{SHIFT--}(c) buettgenbach        1984{SHIFT--}
+   20 print"{CBM-Z}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{CBM-X}
+   22 :
+   23 :
+   24 rem" ******** hauptprogramm ********
+   25 rem" *******************************
+   26 :
+   27 rem" {SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*} vorbereitungen {SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}
+   28 clr
+   29 gosub970 :rem" routinen laden
+   30 gosub915 :rem" vorbereitungen
+   32 gosub600 :rem" bild aufbauen
+   33 :
+   34 t$="Startwort" :rem" 1.wort
+   35 nr=1:gosub654  :rem" eintragen
+   36 :
+   37 gosub700 :rem" wortschatz einlesen
+   38 poke53280,0:poke53281,0
+   39 :
+   40 rem" ******** hauptschleife ********
+   42 :
+   44 poke142,bs:poke26,0:u=usr(dl)
+   46 :
+   47 on u goto 50,64,70,80
+   48 :
+   49 rem" {SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*} taste war gedrueckt {SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}
+   50 getf$
+   51 iff$="{f7}"thengosub650:goto59
+   52 iff$="{f4}"thengosub740:goto59
+   53 iff$="{f1}"thengosub700:goto60
+   54 iff$="{f6}"thengosub450:goto60
+   55 iff$="{f8}"thengosub092:goto59
+   56 iff$="{f2}"thengosub087:goto59
+   57 iffg>0then44
+   58 goto50
+   59 print"{home}";ll$;ll$
+   60 poke53280,0:poke53281,0:gosub337
+   61 iffg>0then44
+   62 goto50
+   63 :
+   64 rem" {SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*} suche war vergeblich {SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}
+   65 ifbs=0thengosub110
+   66 bs=0:goto44
+   69 :
+   70 rem" {SHIFT-*}{SHIFT-*}{SHIFT-*} ein wort wurde gefunden {SHIFT-*}{SHIFT-*}{SHIFT-*}
+   71 w=peek(25)
+   72 fs$(nr)=str$((peek(140)=0))+fw$(w)
+   73 gosub300:nr=nr+1:iffg>0then44
+   75 :
+   76 print"{home}";ll$;"{home}";tab(17);
+   77 print"{cyn}{rvon}Wortschatz erschoepft !"
+   78 gosub337:goto50
+   79 :
+   80 rem" {SHIFT-*}{SHIFT-*}{SHIFT-*} max. ordn.zahl erreicht {SHIFT-*}{SHIFT-*}{SHIFT-*}
+   81 print"{home}";ll$;"{home}{cyn}{rvon}Raetsel fertig:{rvof}";
+   82 print"  Ausdrucken mit {rvon}RETURN{rvof}"
+   83 wait203,64:wait203,63
+   84 print"{home}";ll$;ll$:gosub740
+   85 goto95
+   86 :
+   87 rem" {SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*} raetsel loeschen {SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}
+   88 f$="Raetsel loeschen":gosub4000
+   89 iff$<>"j"thenreturn
+   90 run30
+   91 :
+   92 rem" {SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*} programm abbrechen {SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}
+   93 f$="Abbrechen":gosub4000
+   94 iff$<>"j"thenreturn
+   95 gosub500:rem" programm-ende
+   96 :
+   97 end
+   98 :
+   99 :
+  100 rem" ******* unterprogramme *******
+  102 rem" ******************************
+  104 :
+  106 :
+  110 rem" autom. nachladen
+  112 rem" {SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}
+  114 :
+  115 print"{home}{cyn}";ll$;"{home}";tab(18);
+  116 print"{rvon}Wortschatz ungenuegend"
+  117 gosub337
+  118 ifright$(nf$,1)="q"then154
+  120 :
+  122 dl=int(dm/3)
+  124 :
+  125 ifav=0thenav=1:goto154
+  126 ifls=0then154
+  127 :
+  128 rem" {SHIFT-*}{SHIFT-*}{SHIFT-*} folge-wortschatz laden {SHIFT-*}{SHIFT-*}{SHIFT-*}
+  130 poke53280,2:poke53281,2
+  132 print"{home}";ll$;"{home}{cyn}Wortschatz ";
+  133 print"{rvon}";nf$;"{rvof} wird geladen"
+  136 f$=nf$:gosub713
+  137 poke53280,0:poke53281,0
+  138 :
+  154 return
+  156 :
+  158 :
+  300 rem" wortliste kuerzen
+  302 rem" {SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}
+  304 :
+  307 sa=peek(47)+peek(48)*256+7
+  308 :
+  315 gosub350 :rem" woerter kuerzen
+  316 :
+  320 sa=sa+772
+  322 gosub350 :rem" fragen kuerzen
+  324 :
+  334 fg=fg-1:poke2,fg:rem" feld kuerzen
+  336 :
+  337 print"{home}{wht}";nr;int(fg/og*100);"{left} %  "
+  338 :
+  341 return
+  342 :
+  344 :
+  349 rem" wortvektoren vertauschen
+  350 x=sa+fg*3:y=sa+w*3
+  354 pokey,peek(x)
+  356 pokey+1,peek(x+1)
+  358 pokey+2,peek(x+2)
+  360 :
+  397 return
+  398 :
+  399 :
+  450 rem" autoladen ein/aus
+  452 rem" {SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}
+  454 :
+  456 ifls=0thenls=1:goto461
+  458 ifls=1thenls=0
+  460 :
+  461 poke214,13:poke211,30:sys58732
+  462 :
+  463 print"{red}";
+  464 ifls=1thenprint"{rvon}Ein{rvof}";
+  466 ifls=0thenprint"Aus";
+  472 :
+  497 return
+  498 :
+  499 :
+  500 rem" programm-ende
+  502 rem" {SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}
+  504 :
+  505 print"{clr}{lblu}";chr$(9);
+  506 poke53280,14:rem" rahmen hellblau
+  508 poke53281,06:rem" grund blau
+  510 :
+  512 poke792,71:rem" restore und
+  514 poke788,49:rem" stop moeglich
+  594 :
+  596 return
+  598 :
+  599 :
+  600 rem" bild aufbauen
+  602 rem" {SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}
+  604 :
+  606 poke53265,11 :rem" bild aus
+  607 :
+  608 rem" {SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*} kreuzwortfeld {SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}
+  609 print"{clr}{down}{down}{down}";chr$(14);chr$(8);
+  610 print" {cyn}{CBM-A}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{CBM-S} "
+  612 forn=1to20
+  614 print" {cyn}{SHIFT--}{rvon}{lblu}                    {rvof}{cyn}{SHIFT--}"
+  616 next
+  618 print" {cyn}{CBM-Z}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{CBM-X} ";
+  619 :
+  620 rem" {SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*} tastenbelegung {SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}
+  621 b$="{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}"
+  622 print"{home}{down}{down}{down}{red}";
+  623 a$="Woerter   einlesen"
+  624 f=1:gosub639
+  625 a$="Raetsel   drucken "
+  626 f=4:gosub639
+  627 a$="Autolader Aus     "
+  628 f=6:gosub639
+  629 a$="von Hand  eingeben"
+  630 f=7:gosub639
+  631 printb$;"{down}{rvon}f 2{rvof}{down}{left}{left}Loeschen"
+  632 printb$;"{down}{rvon}f 8{rvof}{down}{left}{left}Abbrechen";
+  633 :
+  634 poke53265,27:rem" bild an
+  635 :
+  636 return
+  637 :
+  639 printb$;"{rvon}f";f;"{rvof}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{CBM-S}
+  640 rem    printb$;"{SHIFT--}         {SHIFT--}
+  641 printb$;"{SHIFT--}";left$(a$,9);"{SHIFT--}
+  642 printb$;"{SHIFT--}";right$(a$,9);"{SHIFT--}"
+  643 printb$;"{CBM-Z}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{CBM-X}
+  645 :
+  646 return
+  648 :
+  649 :
+  650 rem" kreuzwort v. hand eingeben
+  651 rem" {SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}
+  652 :
+  653 t$="Kreuzwort (Abbr=q)"
+  654 poke53280,2:poke53281,2
+  655 print"{home}";ll$;ll$
+  656 l=20:m=0:gosub1000:m$=f$
+  657 ifm$="q"andnr>1then685
+  658 l=len(m$):ifl<2then656
+  659 :
+  660 t$=m$:gosub2000 :rem" pos. eingeben
+  661 :
+  662 poke26,len(m$):m$=m$:rem" wort
+  663 wait203,64:u=usr(0) :rem" eintragen
+  664 ifu<>3then685
+  665 :
+  666 t$="Fragestellung" :rem" frage
+  667 l=36:m=1:gosub1000 :rem" eingeben
+  669 :
+  680 x$=str$(peek(140)=0)  :rem" frage
+  681 fs$(nr)=x$+f$:nr=nr+1 :rem" merken
+  682 av=0:dl=dm
+  683 goto650
+  684 :
+  685 return
+  698 :
+  699 :
+  700 rem" kreuzwoerter einlesen
+  701 rem" {SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}
+  702 :
+  703 poke53280,2:poke53281,2
+  704 print"{home}";ll$;ll$;
+  705 t$="Wortschatz (Abbr=q)"
+  706 l=14:m=1:gosub1000
+  707 iff$="q"thenprint"{home}";ll$:goto733
+  708 iff$="$"then710
+  709 f$="{SHIFT-+}"+chr$(20)+f$:goto712
+  710 gosub3000:iff$=""then704
+  711 :
+  712 print"{home}";ll$;ll$
+  713 open15,8,15
+  714 open1,8,2,"0:"+f$+",s,r"
+  715 input#15,en,en$
+  716 ifen<>0then728
+  717 :
+  718 input#1,fg :rem" feldgroesse gleich
+  719 poke2,fg   :rem" anzahl woerter
+  720 forn=0tofg :rem"lese woerter/fragen
+  721 :input#1,kw$(n),fw$(n)
+  722 next
+  723 :
+  724 input#1,nf$:rem" naechster file
+  725 input#15,en,en$
+  726 av=0:dl=dm:bs=1:og=fg
+  727 :
+  728 print"{home}";left$(ll$,40-len(en$));
+  729 print"{rvon}";en$
+  730 :
+  731 close1:close15
+  732 :
+  733 return
+  734 :
+  735 :
+  740 rem" raetsel drucken
+  741 rem" {SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}
+  742 :
+  743 poke53280,2:poke53281,2
+  744 print"{home}";ll$;ll$
+  745 print"{home}{cyn}{rvon}Raetsel wird ausgedruckt{rvof}"
+  746 :
+  747 gosub761:rem" wortfeld ausdrucken
+  748 gosub824:rem" fragen ausdrucken
+  749 gosub900:rem" loesung ausdrucken
+  750 :
+  751 return
+  752 :
+  753 :
+  754 rem" {SHIFT-*}{SHIFT-*} init epson rx-80 drucker {SHIFT-*}{SHIFT-*}
+  755 open1,4:print#1,chr$(27);"@";
+  756 print#1,chr$(27);"3";chr$(24);
+  757 rem print#1,chr$(27);"l";chr$(lr);
+  758 print#1: close1:return
+  759 :
+  760 rem" {SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*} wortfeld ausdrucken {SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}
+  761 gosub755:open1,4,10:cmd1 :print:print"{rvon}{CBM-A}";
+  762 forn=0to19:print"{SHIFT-*}{SHIFT-*}{SHIFT-*}";:next
+  763 print"{CBM-S}{rvof}"
+  764 :
+  765 forze=0to19
+  766 :d=ze*20:ad=s1+d:as=s2+d:aw=s3+d
+  767 :ab=s4+ze*40
+  768 :
+  772 :print" ";
+  773 :forsp=0to19
+  774 : c=peek(as+sp)
+  775 : ifc=0thenprint"   ";:goto777
+  776 : printmid$(str$(c)+"   ",2,3);
+  777 :nextsp
+  779 :gosub820
+  780 :forn=1to3
+  781 : print"{rvon}{SHIFT--}{rvof}";
+  782 : forsp=0to19
+  783 :  a=166:b=a:c=a
+  784 :  ifpeek(ab+sp)=160then790
+  785 :  b=32:c=b:ifsp=19then787
+  786 :  if(peek(ad+sp)and1)thenc=167
+  787 :  a=165:ifsp=0thena=32
+  788 :  if(n=1)andpeek(as+sp)thena=32
+  789 :  if(n=3)andpeek(aw+sp)thena=32
+  790 :  printchr$(a);chr$(b);chr$(c);
+  791 : nextsp
+  792 : print"{rvon}{SHIFT--}{rvof}";:ifn<3thenprint
+  793 :nextn
+  794 :
+  795 :gosub820:print" ";
+  796 :forsp=0to19
+  797 : c=peek(aw+sp)
+  798 : ifc=0thenprint"   ";:goto800
+  799 : printmid$(str$(c)+"   ",2,3);
+  800 :next
+  801 :
+  802 :ifze=19then810
+  803 :gosub820:print" ";
+  804 :forsp=0to19
+  805 : p=ad+sp:c=(peek(p)and16)
+  806 : ifcthenprint"{CBM-P}{CBM-P}{CBM-P}";:goto808
+  807 : print"{CBM-@}{CBM-@}{CBM-@}";
+  808 :nextsp
+  809 :
+  810 print:nextze
+  811 :
+  812 print"{rvon}{CBM-Z}";
+  813 :forn=0to19:print"{SHIFT-*}{SHIFT-*}{SHIFT-*}";:next
+  814 print"{CBM-X}{rvof}";:print#1:close1
+  815 :
+  816 return
+  817 :
+  818 :
+  820 printchr$(141);:return
+  821 rem  printchr$(141);left$(ll$,lr);:return :rem fuer rx80
+  822 :
+  823 rem" {SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*} fragen ausdrucken {SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}
+  824 printchr$(14):open1,4
+  825 print#1,chr$(27);"0";
+  826 print#1,chr$(27);chr$(15);
+  827 print#1,chr$(27);"l";chr$(lr*1.7);
+  828 :
+  829 cmd1:printchr$(14);"Senkrecht:"
+  830 sw=0:gosub838:print
+  831 :
+  832 printchr$(14);"Waagerecht:"
+  833 sw=-1:gosub838:print#1:close1
+  834 :
+  835 return
+  836 :
+  837 :
+  838 mz=0:zl=0:f=0:na=1
+  839 forn=1tonr-1
+  840 :ifval(fs$(n))=swthengosub847
+  841 nextn
+  842 m=0:mr=0:bz=0:gosub881:print
+  843 :
+  844 return
+  845 :
+  846 :
+  847 nl=len(str$(n))+2
+  848 l=zl+nl+len(fs$(n))
+  849 ifl<czthenzl=l:goto861
+  850 :
+  851 pa=1
+  852 forp=3tolen(fs$(n))-2
+  853 :ifmid$(fs$(n),p,1)<>" "then855
+  854 :l=zl+nl+p-2:ifl<czthenpa=p
+  855 nextp
+  856 :
+  857 ifpa=1thenmz=mz-1:l=zl
+  858 ifpa>1thenl=zl+nl+pa-2
+  859 gosub866:mz=0
+  860 :
+  861 mz=mz+1
+  862 :
+  863 return
+  864 :
+  865 :
+  866 bz=int((cz-l)/mz):mr=cz-(l+bz*mz)
+  867 m=-(mr>0):gosub881
+  868 :
+  869 na=n+1:l=len(fs$(n)):ifpa>1then873
+  870 w=n:print";":gosub892:zl=nl+l+3
+  871 printmid$(fs$(n),3,l);:goto878
+  872 :
+  873 print"; ";left$(ll$,bz);
+  874 w=n:gosub892:zl=l-pa+2
+  875 printmid$(fs$(n),3,pa-2)
+  876 printright$(fs$(n),l-pa);
+  877 :
+  878 return
+  879 :
+  880 :
+  881 forp=naton-1
+  882 :ifval(fs$(p))<>swthen887
+  883 :iffthenprint"; ";left$(ll$,bz+m);
+  884 :iffthenmr=mr+(mr>0):m=-(mr>0)
+  885 :f=1:w=p:gosub892
+  886 :printright$(fs$(p),len(fs$(p))-2);
+  887 nextp
+  888 :
+  889 return
+  890 :
+  891 :
+  892 nl=len(str$(w))-1:print"(";
+  893 printright$(str$(w),nl);") ";
+  894 return
+  895 :
+  899 rem" {SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*} loesung ausdrucken {SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}
+  900 gosub755:printchr$(14):open1,4,10:cmd1
+  901 :
+  902 print:print:print:print"Loesung:"
+  903 print"{CBM-A}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{CBM-S}"
+  904 forn=s4tos4+760step40
+  905 :print"{SHIFT--}";:forp=nton+19
+  906 :printchr$(peek(p));
+  907 :nextp:print"{SHIFT--}"
+  908 nextn
+  909 print"{CBM-Z}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{CBM-X}"
+  910 print#1:close1
+  911 :
+  912 return
+  913 :
+  914 :
+  915 rem" vorbereitungen
+  916 rem" {SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}
+  917 :
+  919 poke53280,2:rem" rahmen grau
+  920 poke53281,2:rem" hintergrund grau
+  921 :
+  922 rem   poke792,193:rem" restore und
+  923 rem poke788,52 :rem" stop verriegeln
+  924 :
+  925 dimkw$(254):rem" kreuzwoerter
+  926 dimfw$(254):rem" fragen dazu
+  927 dimfs$(255):rem" fragestellung
+  928 fg=1:og=fg :rem" feldgroesse
+  929 poke2,fg   :rem" uebergeben
+  930 :
+  931 poke785,0   :rem" usr-vektor
+  932 poke786,192 :rem" setzen
+  933 :
+  934 ls=0:rem" Autolader Aus
+  935 bs=1:rem" Blausperre Ein
+  936 :
+  937 sys50016:rem" matrix loeschen
+  938 :
+  940 rem sys 51859 :rem" init. drucktreiber
+  942 :
+  944 rem" konstanten:
+  945 :
+  946 lr=10  :rem" linker rand druckausg.
+  948 cz=int(130-lr*1.7) :rem" zeillaenge
+  949 :
+  950 forn=1to40   :rem" leerstring fuer
+  952 :ll$=ll$+" " :rem" formatierte
+  954 next         :rem" ausgabe
+  955 :
+  956 s1=50176 :rem" adressen der
+  958 s2=50576 :rem" wortfeld-
+  960 s3=50976 :rem" speicher
+  962 s4=1186
+  963 :
+  964 dm=10000:rem" max. anz. laeufe
+  965 :
+  966 return
+  967 :
+  969 :
+  970 rem" routinen laden
+  971 rem" {SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}
+  972 :
+  975 forn=0to3:s1=s1+peek(49152+n):next
+  976 forn=0to3:s2=s2+peek(51857+n):next
+  977 :
+  978 ifs1<>483thenload"such.obj",8,1
+  979 rem ifs2<>494thenload"druck.obj",8,1
+  980 :
+  987 return
+  997 :
+  998 :
+  999 :
+ 1000 rem" inputform routine
+ 1001 rem" {SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}
+ 1002 :
+ 1003 x$=chr$(13):y$=chr$(20)
+ 1004 z$=chr$(34)
+ 1005 :
+ 1006 print"{home}{cyn}{rvon}";t$;"?{rvof}  ";:poke198,0
+ 1007 :
+ 1008 f$=""
+ 1009 forn=1tol+1
+ 1010 :print"{left}";f$;"{CBM-@}";
+ 1011 :wait198,1:getf$:poke198,0
+ 1012 :iff$=x$then1024
+ 1013 :iff$=y$andn>1thenn=n-1:goto1010
+ 1014 :ifn>lthen1011
+ 1015 :ifm=0then1021
+ 1016 :iff$=","orf$=z$then1011
+ 1017 :iff$>=" "andf$<="9"then1022
+ 1018 :iff$>="A"andf$<="Z"then1022
+ 1021 :iff$<"a"orf$>"z"then1011
+ 1022 next
+ 1023 :
+ 1024 print"{left} {left}{home}{rvon}";t$;
+ 1026 poke631,13:poke198,1:inputf$
+ 1029 iff$=x$then1005
+ 1030 :
+ 1097 return
+ 1098 :
+ 1099 :
+ 2000 rem" wort positionieren
+ 2001 rem" {SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}
+ 2002 :
+ 2004 print"{home}{down}{lblu}{rvon} (S) enkrecht   oder";
+ 2005 print"   (W) aagerecht  ? "
+ 2006 wait203,63:getf$
+ 2007 iff$<>"s"andf$<>"w"then2006
+ 2008 :
+ 2009 print"{home}{down}{rvof}";ll$;
+ 2010 print"{home}{down}{rvon}Bitte Position anfahren!"
+ 2011 print"{home}{down}{down}{down}{rght}{rght}{rght}{rvof}";
+ 2012 :
+ 2013 fa=1186:p=fa:f=peek(fa)
+ 2014 x=0:y=0:s=(f$="s"):poke140,abs(s)
+ 2015 mx=20+l*(s=0)+(s=-1)
+ 2016 my=20+l*(s=-1)+(s=0)
+ 2017 :
+ 2018 forn=0to9999
+ 2019 pokep,f:p=fa+x+y*40
+ 2020 f=peek(p):pokep,94:wait198,1
+ 2021 getf$:iff$=chr$(13)then2028
+ 2022 iff$="{down}"theny=y-1*(y<my):next
+ 2023 iff$="{rght}"thenx=x-1*(x<mx):next
+ 2024 iff$="{up}"theny=y+1*(y>0):next
+ 2025 iff$="{left}"thenx=x+1*(x>0):next
+ 2026 next
+ 2027 :
+ 2028 pokep,f
+ 2029 print"{home}";ll$;ll$;
+ 2030 :
+ 2031 poke211,x :rem" cursor-position
+ 2032 poke214,y :rem" setzen
+ 2033 :
+ 2097 return
+ 2098 :
+ 2099 :
+ 3000 rem" directory listen
+ 3001 rem" {SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}
+ 3003 :
+ 3004 print"{home}";ll$;"{home}{cyn}";
+ 3005 print"Mit {rvon}RETURN{rvof} auswaehlen "
+ 3006 print"{up}Mit {rvon}LEERTASTE{rvof}  weiter "
+ 3007 :
+ 3008 open15,8,15,"io":open2,8,2,"#"
+ 3010 :
+ 3012 t=18:s=1:f$=""
+ 3014 :
+ 3016 forw=0to99
+ 3018 :
+ 3020 :print#15,"b-r";2;0;t;s
+ 3022 :print#15,"b-p";2;0
+ 3024 :
+ 3026 :get#2,x$:t=asc(x$+chr$(0))
+ 3028 :get#2,x$:s=asc(x$+chr$(0))
+ 3030 :
+ 3032 :forx=0to7
+ 3034 : print#15,"b-p";2;x*32+5:get#2,f$
+ 3038 : iff$<>"{SHIFT-+}"thennextx:goto3060
+ 3042 : fory=1to15
+ 3044 :  get#2,x$:f$=f$+x$
+ 3046 :  ifx$=chr$(160)theny=15
+ 3048 : nexty
+ 3050 : print"{home}";tab(24);"{rvon}";
+ 3052 : printright$(f$,len(f$)-2);"{rvof}"
+ 3053 : wait203,64:wait203,63:getx$
+ 3054 : ifx$=chr$(13)then3064
+ 3055 : print"{home}";tab(24);left$(ll$,14)
+ 3056 : f$=""
+ 3057 :nextx
+ 3058 :
+ 3060 :ift=0thenw=99
+ 3061 nextw
+ 3062 :
+ 3064 close2:close15
+ 3065 print"{home}";ll$;ll$
+ 3066 :
+ 3068 return
+ 3070 :
+ 3071 :
+ 4000 rem" sicherheitsabfrage
+ 4001 rem" {SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}
+ 4002 :
+ 4003 poke53280,2:poke53281,2
+ 4004 print"{home}";ll$
+ 4006 print"{home}{cyn}{rvon}";f$;":{rvof} Sicher (J/N) ?"
+ 4008 wait203,64:wait203,63:getf$
+ 4010 iff$<>"j"thenprint"{home}";ll$
+ 4012 :
+ 4014 return
+ 4016 :
+ 4018 :
+ 4020 :
+ 9000 rem"{CBM-A}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{CBM-S}
+ 9002 rem"{SHIFT--}  ende   raetselgenerator   {SHIFT--}
+ 9004 rem"{CBM-Z}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{CBM-X}
+
