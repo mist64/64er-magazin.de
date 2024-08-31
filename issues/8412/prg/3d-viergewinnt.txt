@@ -1,0 +1,315 @@
+;3d-viergewinnt.prg ==0801==
+;Quelle: 8412.D64
+   10 rem        *******************
+   11 rem        *                 *
+   12 rem        * 3d-vier-gewinnt *
+   13 rem        *                 *
+   14 rem        *   (c) 1984 by   *
+   15 rem        *                 *
+   16 rem        *    uwe weiss    *
+   17 rem        *  loeskenweg 60  *
+   18 rem        *  4300  essen 1  *
+   19 rem        *                 *
+   20 rem        * tel 0201/326366 *
+   21 rem        *                 *
+   22 rem        *******************
+   23 :
+   24 :
+   25 :
+   26 :
+   27 :
+   28 :
+   29 :
+   30 :
+  100 gosub1500:rem initialisierung
+  110 zg=0:pl=3:gw=0
+  120 pl=5-pl:zg=zg+1
+  130 if(gw<>0)or(zg>64)then3500:rem spielende
+  140 printco$(pl):gosub3100
+  141 h=(20-len(sp$(pl)))/2:x0=1:y0=24
+  145 x$=left$(bl$,h)+sp$(pl)+left$(bl$,10):gosub3010:printchr$(19)
+  150 ifsp$(pl)="c 64"then500
+  160 rem *** spielerzug ***
+  170 x=0:y=0:a0=1575
+  180 a1=1575+2*x-80*y
+  200 pokea0,32:a0=a1
+  210 pokea1,160:pokea1+54272,co(pl)
+  220 j=peek(56320)and31
+  230 getk$:k=asc(k$+chr$(0))
+  235 if(k=0)and(j=31)then220
+  240 ifk=133then350:rem zugvorschlag
+  250 ifk=134then360:rem seitenwechsel
+  260 if(k=13)or((jand16)=0)then320
+  270 if(k=145)or((jand1)=0)thenify<3theny=y+1
+  280 if(k=17)or((jand2)=0)thenify>0theny=y-1
+  290 if(k=157)or((jand4)=0)thenifx>0thenx=x-1
+  300 if(k=29)or((jand8)=0)thenifx<3thenx=x+1
+  310 goto180
+  320 ifbe(x,y)=4then220
+  330 gosub2500:rem zug ausfuehren
+  340 goto120
+  350 pokea1,32:gosub2000:x=zx:y=zy:goto180
+  360 sp$=sp$(2):sp$(2)=sp$(3):sp$(3)=sp$:goto140
+  500 rem *** computerzug ***
+  510 gosub2000
+  520 x=zx:y=zy
+  530 ad=1575+2*x-80*y
+  540 pokead,160:pokead+54272,co(pl)
+  550 gosub2500:pokead,32
+  560 goto120
+ 1500 ifru=1then1645
+ 1505 ru=1
+ 1510 dimfe(3,3,3),be(3,3),bw(3,3),w(3,3)
+ 1511 dimrx(3,3),ry(3,3),rz(3,3),mx(15)
+ 1512 dimux(3),uy(3),uz(3),ox(3),oy(3),oz(3)
+ 1513 dimx$(3),w$(3),sp$(3),co$(3),cl$(3)
+ 1514 dimx(3),y(3),z(3),ss(3),co(3)
+ 1515 h0$=chr$(18)+"{SHIFT-POUND}"
+ 1516 h1$=chr$(17)+chr$(157)
+ 1517 h2$=h1$+chr$(157)+chr$(157)
+ 1518 h3$=chr$(146)+"{SHIFT-POUND}"
+ 1520 w$(0)=h0$+h1$+"{CBM-H}"+h1$+"L{CBM-P}"+h3$
+ 1525 w$(1)=h0$+h1$+" "+h1$+"  "+h3$
+ 1530 w$(2)=h0$+"{CBM-H} "+h2$+"{CBM-H}L{CBM-P}"+h2$+"L{CBM-P}"+h3$
+ 1535 w$(3)=h0$+"{CBM-H} "+h2$+" L{CBM-P}"+h2$+"  "+h3$
+ 1536 x$(0)=w$(3)
+ 1537 fori=1to3:x$(i)=w$(2):next
+ 1539 printchr$(147):poke53280,0:poke53281,12
+ 1540 printchr$(19)chr$(18)chr$(144);
+ 1545 bl$="                                        "
+ 1550 printleft$(bl$,12)"3d-vier-gewinnt"left$(bl$,13)
+ 1555 print:print:print:print" bitte waehlen sie:"
+ 1560 print:print" 1 = schwarzweissfernseher"
+ 1565 print:print" 2 = farbfernseher"
+ 1570 getk$:k=val(k$)
+ 1575 onkgoto1585,1605
+ 1580 goto1570
+ 1585 co$(2)=chr$(5):co$(3)=chr$(144)
+ 1590 cl$(2)=chr$(155):cl$(3)=chr$(151)
+ 1595 co(2)=1:co(3)=0
+ 1600 goto1620
+ 1605 co$(2)=chr$(28):co$(3)=chr$(31)
+ 1610 cl$(2)=chr$(150):cl$(3)=chr$(154)
+ 1615 co(2)=2:co(3)=6
+ 1620 sp$(2)="c 64":sp$(3)="c 64"
+ 1625 s=54272:pokes+23,113:pokes+24,31
+ 1630 pokes+2,0:pokes+3,8:pokes+4,0
+ 1635 pokes+5,21:pokes+6,240
+ 1640 goto1670
+ 1645 sp$=sp$(2):sp$(2)=sp$(3):sp$(3)=sp$
+ 1650 fori=0to3:forj=0to3
+ 1655 be(i,j)=0
+ 1660 fork=1to3:fe(i,j,k)=0
+ 1665 nextk,j,i
+ 1670 printchr$(147)chr$(18)chr$(144);
+ 1675 print"f1:zugvorschlag";left$(bl$,9);"f3:seitenwechsel"
+ 1680 printchr$(5)
+ 1685 fori=1to4
+ 1690 print:print:print
+ 1695 print" OP    OP    OP    OP"
+ 1700 print" L{SHIFT-@}    L{SHIFT-@}    L{SHIFT-@}    L{SHIFT-@}":next
+ 1705 fori=2to3
+ 1710 printchr$(19)
+ 1715 printco$(i)"spieler";i-1;"  "sp$(i);bl$
+ 1720 printchr$(145)chr$(145);spc(9)" ";
+ 1725 inputsp$(i)
+ 1730 ss(i)=1
+ 1735 ifsp$(i)<>"c 64"then1755
+ 1740 print"spielstaerke 1/2"
+ 1745 getk$:ifk$="2"thenss(i)=2:goto1755
+ 1750 ifk$<>"1"then1745
+ 1755 printchr$(19)
+ 1760 printleft$(bl$,30):printleft$(bl$,30)
+ 1765 next
+ 1770 fori=0to3:forj=0to3
+ 1775 rx(i,j)=1/16:ry(i,j)=1/16:rz(i,j)=1/8:fe(i,j,0)=1
+ 1780 next:next
+ 1785 fori=0to3
+ 1790 rx(i,0)=1:ry(i,0)=1
+ 1795 ux(i)=1/8:uy(i)=1/8:uz(i)=1/16
+ 1800 ox(i)=1/8:oy(i)=1/8:oz(i)=1/16
+ 1805 next
+ 1810 uz(0)=1:oz(0)=1
+ 1815 d1=1/8:d2=d1:d3=d1:d4=d1
+ 1820 return
+ 2000 xx=0:gosub2200
+ 2010 ifss(pl)=1then2100
+ 2020 fori=0to3:forj=0to3
+ 2030 w(i,j)=bw(i,j)
+ 2040 next:next
+ 2050 xx=1:gosub2200
+ 2060 fori=0to3:forj=0to3
+ 2070 bw=bw(i,j):bw(i,j)=w(i,j)
+ 2080 if(w(i,j)<64)and(bw>0)thenbw(i,j)=bw(i,j)-bw/2
+ 2090 next:next
+ 2100 max=-5000:h=0
+ 2110 fori=0to3:forj=0to3
+ 2120 bw=bw(i,j)
+ 2130 ifbw=maxthenmx(h)=10*i+j:h=h+1
+ 2140 ifbw>maxthenh=1:mx(0)=10*i+j:max=bw
+ 2150 next:next
+ 2160 zz=int(rnd(0)*(h))
+ 2170 zx=int(mx(zz)/10):zy=mx(zz)-zx*10
+ 2180 return
+ 2200 fory=0to3:forx=0to3:bw=0
+ 2210 z=be(x,y)+xx:ad=1575+2*x-80*y:pokead,160:pokead+54272,co(pl)
+ 2220 ifz>3thenbw=-10000:goto2350
+ 2230 bw=bw+rx(y,z)+ry(x,z)+rz(x,y)
+ 2240 ify=zthenbw=bw+ux(x)
+ 2250 ifx=zthenbw=bw+uy(y)
+ 2260 ifx=ythenbw=bw+uz(z)
+ 2270 ify=3-zthenbw=bw+ox(x)
+ 2280 ifx=3-zthenbw=bw+oy(y)
+ 2290 ifx=3-ythenbw=bw+oz(z)
+ 2300 if(x=y)and(x=z)thenbw=bw+d1
+ 2310 if(x=3-y)and(x=z)thenbw=bw+d2
+ 2320 if(x=y)and(x=3-z)thenbw=bw+d3
+ 2330 if(y=z)and(x=3-z)thenbw=bw+d4
+ 2340 h0=bw*1e4-int(bw*1e4)
+ 2345 ifbw>64thenbw=64
+ 2346 ifabs(h0-pl/10)<0.05thenbw=65
+ 2350 bw(x,y)=bw
+ 2360 pokead,32
+ 2370 next:next
+ 2380 return
+ 2500 z=be(x,y):be(x,y)=z+1
+ 2505 f=1114:d=3:gosub3800
+ 2510 fe(x,y,z)=pl
+ 2520 ifz<>3thenfe(x,y,z+1)=1
+ 2530 printco$(pl):x$=x$(z):gosub3000
+ 2540 h=1:q=0:fori=0to3
+ 2541 h9=fe(i,y,z):x(i)=i:y(i)=y:z(i)=z
+ 2542 gosub2800:next
+ 2543 gosub2900:rx(y,z)=h
+ 2550 h=1:q=0:fori=0to3
+ 2551 h9=fe(x,i,z):x(i)=x:y(i)=i:z(i)=z
+ 2552 gosub2800:next
+ 2553 gosub2900:ry(x,z)=h
+ 2560 h=1:q=0:fori=0to3
+ 2561 h9=fe(x,y,i):x(i)=x:y(i)=y:z(i)=i
+ 2562 gosub2800:next
+ 2563 gosub2900:rz(x,y)=h
+ 2570 ify<>zthen2580
+ 2571 h=1:q=0:fori=0to3
+ 2572 h9=fe(x,i,i):x(i)=x:y(i)=i:z(i)=i
+ 2573 gosub2800:next
+ 2574 gosub2900:ux(x)=h
+ 2580 ifx<>zthen2590
+ 2581 h=1:q=0:fori=0to3
+ 2582 h9=fe(i,y,i):x(i)=i:y(i)=y:z(i)=i
+ 2583 gosub2800:next
+ 2584 gosub2900:uy(y)=h
+ 2590 ifx<>ythen2600
+ 2591 h=1:q=0:fori=0to3
+ 2592 h9=fe(i,i,z):x(i)=i:y(i)=i:z(i)=z
+ 2593 gosub2800:next
+ 2594 gosub2900:uz(z)=h
+ 2600 ify<>3-zthen2610
+ 2601 h=1:q=0:fori=0to3
+ 2602 h9=fe(x,i,3-i):x(i)=x:y(i)=i:z(i)=3-i
+ 2603 gosub2800:next
+ 2604 gosub2900:ox(x)=h
+ 2610 ifx<>3-zthen2620
+ 2611 h=1:q=0:fori=0to3
+ 2612 h9=fe(i,y,3-i):x(i)=i:y(i)=y:z(i)=3-i
+ 2613 gosub2800:next
+ 2614 gosub2900:oy(y)=h
+ 2620 ifx<>3-ythen2630
+ 2621 h=1:q=0:fori=0to3
+ 2622 h9=fe(i,3-i,z):x(i)=i:y(i)=3-i:z(i)=z
+ 2623 gosub2800:next
+ 2624 gosub2900:oz(z)=h
+ 2630 if(x<>y)or(x<>z)then2640
+ 2631 h=1:q=0:fori=0to3
+ 2632 h9=fe(i,i,i):x(i)=i:y(i)=i:z(i)=i
+ 2633 gosub2800:next
+ 2634 gosub2900:d1=h
+ 2640 if(x<>3-y)or(x<>z)then2650
+ 2641 h=1:q=0:fori=0to3
+ 2642 h9=fe(i,3-i,i):x(i)=i:y(i)=3-i:z(i)=i
+ 2643 gosub2800:next
+ 2644 gosub2900:d2=h
+ 2650 if(x<>y)or(x<>3-z)then2660
+ 2651 h=1:q=0:fori=0to3
+ 2652 h9=fe(i,i,3-i):x(i)=i:y(i)=i:z(i)=3-i
+ 2653 gosub2800:next
+ 2654 gosub2900:d3=h
+ 2660 if(y<>z)or(x<>3-z)then2670
+ 2661 h=1:q=0:fori=0to3
+ 2662 h9=fe(3-i,i,i):x(i)=3-i:y(i)=i:z(i)=i
+ 2663 gosub2800:next
+ 2664 gosub2900:d4=h
+ 2670 z=z+1:ifz=4then2700
+ 2680 rx(y,z)=rx(y,z)*2
+ 2681 ry(x,z)=ry(x,z)*2
+ 2682 ify=zthenux(x)=ux(x)*2
+ 2683 ifx=zthenuy(y)=uy(y)*2
+ 2684 ifx=ythenuz(z)=uz(z)*2
+ 2685 ify=3-zthenox(x)=ox(x)*2
+ 2686 ifx=3-zthenoy(y)=oy(y)*2
+ 2687 ifx=3-ythenoz(z)=oz(z)*2
+ 2688 if(x=y)and(x=z)thend1=2*d1
+ 2689 if(x=3-y)and(x=z)thend2=2*d2
+ 2690 if(x=y)and(x=3-z)thend3=2*d3
+ 2691 if(y=z)and(x=3-z)thend4=2*d4
+ 2700 return
+ 2800 ifh9=0thenh=h/2:return
+ 2810 ifh9=1thenreturn
+ 2820 if(q<2)or(h9=q)thenh=h*4:q=h9:return
+ 2830 h=0:return
+ 2900 ifh=64thenh=h+pl/1e5
+ 2910 ifh<>256thenreturn
+ 2920 forj=0to3:gx(j)=x(j):gy(j)=y(j):gz(j)=z(j):next
+ 2930 gw=pl:return
+ 3000 x0=6*x+z+1:y0=20-5*y-z
+ 3010 poke211,x0:poke214,y0:sys58732
+ 3020 printx$;:return
+ 3100 poke214,6:poke211,30:sys58732
+ 3110 print"{CBM-A}{SHIFT-*}{CBM-R}{SHIFT-*}{CBM-R}{SHIFT-*}{CBM-R}{SHIFT-*}{CBM-S}"
+ 3120 gosub3180:print"{SHIFT--} {SHIFT--} {SHIFT--} {SHIFT--} {SHIFT--}"
+ 3130 fori=1to3
+ 3140 gosub3180:print"{CBM-Q}{SHIFT-*}{SHIFT-+}{SHIFT-*}{SHIFT-+}{SHIFT-*}{SHIFT-+}{SHIFT-*}{CBM-W}"
+ 3150 gosub3180:print"{SHIFT--} {SHIFT--} {SHIFT--} {SHIFT--} {SHIFT--}":next
+ 3160 gosub3180:print"{CBM-Z}{SHIFT-*}{CBM-E}{SHIFT-*}{CBM-E}{SHIFT-*}{CBM-E}{SHIFT-*}{CBM-X}"
+ 3170 return
+ 3180 poke211,30:sys58732:return
+ 3500 x$=chr$(144)+chr$(18)
+ 3510 ifgw<>0then3540
+ 3520 x$=x$+left$(bl$,13)+"unentschieden!"+left$(bl$,13)
+ 3530 goto3580
+ 3540 h$="sieger: "+sp$(gw):h=len(h$)
+ 3550 ifh>40thenh$=left$(h$,40):h=40
+ 3560 h=(40-h)/2
+ 3570 x$=x$+left$(bl$,h)+h$+left$(bl$,h+.5)
+ 3580 printchr$(19);x$:printchr$(19)
+ 3590 f=4455:d=7:gosub3800
+ 3591 f=5001:d=7:gosub3800
+ 3592 f=5613:d=7:gosub3800
+ 3593 f=5947:d=20:gosub3800
+ 3594 f=4455:d=20:gosub3800
+ 3595 f=5947:d=20:gosub3800
+ 3596 f=4455:d=20:gosub3800
+ 3597 f=5947:d=50:gosub3800
+ 3600 ifgw<>0then3620
+ 3610 poke198,0:wait198,1:poke198,0:goto100
+ 3620 printco$(gw):gosub3750
+ 3630 t=ti
+ 3640 getk$:ifk$<>""then100
+ 3650 ifti-t<30then3640
+ 3660 printcl$(gw):gosub3750
+ 3670 t=ti
+ 3680 getk$:ifk$<>""then100
+ 3690 ifti-t<30then3680
+ 3700 goto3620
+ 3750 fori=0to3
+ 3760 x=gx(i):y=gy(i):z=gz(i):h=0
+ 3770 ifz=0thenh=h+1
+ 3780 ifz+1=be(x,y)thenh=h+2
+ 3790 x$=w$(h):gosub3000
+ 3795 next:return
+ 3800 f0=int(f/256):poke54272,f-256*f0
+ 3810 poke54273,f0:poke54276,65
+ 3820 t=ti
+ 3830 ifti-t<dthen3830
+ 3840 poke54276,0:return
+

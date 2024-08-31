@@ -21,13 +21,14 @@
 
         <p>Im Interpreter existiert eine Schleife, die einen Basic-Befehl holt und ausführt.</p>
 
-        <pre>
+        <figure>
+            <pre>
 A7E1    JMP (0308)  ; zeigt normalerweise auf A7E4
 A7E4    JSR 0073    ; nächstes Zeichen aus Basic-Text holen
 A7E7    JSR A7ED    ; Statement ausführen
 A7EA    JMP A7AE    ; zurück zur Interpreterschleife
 </pre>
-
+        </figure>
 
         <p>In den Speicherzellen 0308 und 0309 (776 und 777 dez) liegt ein Zeiger, der normalerweise auf den Beginn dieser Schleife zeigt. Verbiegt man nun den Zeiger auf eine eigene Routine, kann man den Basic-Befehl auf das eigene Zeichen überprüfen.</p>
 
@@ -37,7 +38,8 @@ A7EA    JMP A7AE    ; zurück zur Interpreterschleife
 
         <p>»Merge« belegt den Speicherbereich 50000 bis 50264. Die eigene Routine beginnt auf Adresse 49152 (C000 hex). Der Wert in den Adressen 0308 und 0309 muß deshalb auf C000 abgeändert werden. Der Computer durchläuft dann vor jedem Befehl, den er ausführen soll, folgende Schleife:</p>
 
-        <pre>
+        <figure>
+            <pre>
 C000 JSR 0073 ;nächstes Zeichen holen
 C003 CMP 40   ; Vergleich mit @-Zeichen
 C005 BEQ      ; verzweigen wenn erkannt
@@ -47,24 +49,26 @@ COOD JSR 0073 ; nächstes Zeichen holen
 C010 JSR C350 ; zur eigenen Routine
 C013 JMP A7AE ; Rücksprung
 </pre>
-
+        </figure>
 
         <p>Nach dem Drücken von @ und RETURN wird nun das Programm ab Adresse 50000 (C350 Hex) ausgeführt. Auf die anderen Befehle hat diese Routine keinen Einfluß. Eine Hürde gibt es noch zu meistern. Die Änderung der Adressen 0308 und 0309 ist auf der Basic-Ebene mit POKE nicht möglich. Dies ist auch verständlich, da POKE auch ein Basic-Befehl ist und durch die Änderung der ersten Adresse der Einsprung verändert wird.</p>
 
         <p>Deshalb muß diese Adreßänderung in Maschinensprache durchgeführt werden.</p>
 
-        <pre>
+        <figure>
+            <pre>
 C100 LDA 00   ; Lade Akku mit 00
 C102 STA 0308 ; Speichere Akku nach 0308
 C105 LDA C0   ; Lade Akku mit C0
 C107 STA 0309 ; Speichere Akku nach 0309
 C10A RTS      ; Rückkehr nach Basic
 </pre>
-
+        </figure>
 
         <p>Basic-Lader für Befehlserweiterung</p>
 
-        <pre>
+        <figure>
+            <pre>
 240 FOR I= 49152 TO 49152 + 21
 250 READ Q : POKE I, Q
 260 NEXT
@@ -76,8 +80,15 @@ C10A RTS      ; Rückkehr nach Basic
 13000 DATA 195,76,174,167
 14000 DATA 169,0,141,8,3,169,192,141,9,3,96
 </pre>
+        </figure>
 
+        Diesen Basic-Lader tippt man hinter das Programm »Merge« und speichert es gemeinsam ab.
 
+        Die Zeilennummern sind so gewählt, daß man sie direkt zum Basic-Lader von »Merge« dazutippen kann. In Zeile 10260 müssen aber dann die letzten fünf Nullen gelöscht werden.
+
+        Mit SYS 49408 wird die Befehlserweiterung aktiviert und steht dann zur Benutzung bereit.
+
+        <address class="author">(Patrik Fleig/rg)</address>
     </article>
 
 </body>

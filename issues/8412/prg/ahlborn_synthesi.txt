@@ -1,0 +1,232 @@
+;ahlborn_synthesi.prg ==0801==
+;Quelle: 8412.D64
+    1 rem -------  c-64 synthesizer  -------
+    2 rem   von martin ahlborn     4/5 1984
+    3 rem       hohe feldstrasse 1
+    4 rem       3418 uslar 2
+    5 rem
+   10 print"{clr}{down}{down}{down}"spc(12)"bitte warten"
+   20 aa=12288:ea=12339:gosub700
+   30 aa=12352:ea=12403:gosub700
+   40 aa=12465:ea=12520:gosub700
+   50 aa=12800:ea=13788:gosub700
+   88 :
+   90 rem ************************
+   92 rem *notentabelle erstellen*
+   94 rem ************************
+   96 :
+  100 deffn rd(a)=int(a)-((a-int(a))>=.5): rem auf ganze zahl runden
+  110 tn=67284:rem parameter fuer h-7
+  120 forz=95to0step-1
+  130 tn=tn/2^(1/12)
+  140 tn=fn rd(tn)
+  150 hb%=tn/256
+  160 lb%=tn-hb%*256
+  170 poke12032+2*z,lb%
+  180 poke12032+2*z+1,hb%
+  190 next
+  290 :
+  300 ifps<>15145then350
+  320 goto1000
+  350 print"falsche daten !":end
+  688 :
+  690 rem **************
+  692 rem *poke-routine*
+  694 rem **************
+  696 :
+  700 forpc=aatoea
+  710 readhx$
+  720 h=asc(hx$)-48:h=h+(h>9)*7
+  730 l=asc(right$(hx$,1))-48:l=l+(l>9)*7
+  740 pokepc,16*h+l
+  750 ps=ps+h+l :rem pruefsumme
+  760 next:return
+  980 :
+  990 rem ***************
+  992 rem *text & grafik*
+  994 rem ***************
+  996 :
+ 1000 printchr$(142)"{clr}{dish}{rght}{rght}{pur}********  c-64 synthesizer  ********{wht}"
+ 1010 print"{down} {rvon} {rght} {rght} {SHIFT--} {rght} {rght} {rght} {SHIFT--} {rght} {rght} {SHIFT--} {rght} {rght} {rght} {SHIFT--} {rvof}   max {rvon}{CBM-Y}"
+ 1020 print" {rvon} {rght} {rght} {SHIFT--} {rght} {rght} {rght} {SHIFT--} {rght} {rght} {SHIFT--} {rght} {rght} {rght} {SHIFT--} {rght}{rght}{rght}{rght}{rght}{rght}{rght} "
+ 1030 print" {rvon} {rght} {rght} {SHIFT--} {rght} {rght} {rght} {SHIFT--} {rght} {rght} {SHIFT--} {rght} {rght} {rght} {SHIFT--}r{rvof} pegel {rvon} "
+ 1040 print" {rvon} {SHIFT--} {SHIFT--} {SHIFT--} {SHIFT--} {SHIFT--} {SHIFT--} {SHIFT--} {SHIFT--} {SHIFT--} {SHIFT--} {SHIFT--} {SHIFT--} {SHIFT--} {SHIFT--}e{rght}{rght}{rght}{rght}{rght}{rght}{rght} "
+ 1050 print" {rvon}q{SHIFT--}w{SHIFT--}e{SHIFT--}r{SHIFT--}t{SHIFT--}y{SHIFT--}u{SHIFT--}i{SHIFT--}o{SHIFT--}p{SHIFT--}@{SHIFT--}*{SHIFT--}^{SHIFT--}={SHIFT--}t{rvof}   min {rvon}{CBM-I}"
+ 1060 print"{down}{down}{rght}{gry2}tasten    parameter    0123456789abcdef";
+ 1070 print" {CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}";
+ 1080 print"{orng} f1  f2    anschlag     {rvon}LLLLLL{rvof}          ";
+ 1090 print"{grn} f3  f4    abschwellen  {rvon}L{rvof}               ";
+ 1100 print"{lblu} f5  f6    halten       {rvon}LLLLLLLLLLLLLLLL{rvof}";
+ 1110 print"{yel} f7  f8    ausklingen   {rvon}LLLLLLL{rvof}         ";
+ 1120 print"{blk} 'n' 'm'   tastverh.    {rvon}LLLLLL{rvof}          ";
+ 1130 print"{lgrn}  'z'      wellenform   dreieck   "
+ 1140 print"{pur}  crsr     oktaven      c-{wht}4{pur} bis c-{wht}6"
+ 1150 print"{gry3}  'c'      filter       hoch band tief"
+ 1160 print"{blk} '[' ']'   filterfreq.  {rvon}LLLLLLL{rvof}         ";
+ 1170 print"{rvof} '<' '>'   resonanz     {rvon}LLLLLLL{rvof}         ";
+ 1180 print"{rvof}  '?'      'wah-wah'    aus"
+ 1190 print"{red} run/stop  ende"
+ 1200 print"{down}{gry1}(c) 1984      martin ahlborn 3418 uslar{up}"
+ 1300 :
+ 1305 rem ************
+ 1310 ::::::sys12800::
+ 1320 rem ************
+ 1480 :
+ 1490 rem **********
+ 1492 rem *tabellen*
+ 1494 rem **********
+ 1496 :
+ 1500 data10,40,18,50,20,40,28,50
+ 1510 data30,40,38,50,48,50,50,40
+ 1520 data58,50,60,40,68,50,70,40
+ 1530 data78,50,88,50,90,40,98,50
+ 1540 dataa0,40,a8,50,b8,50,c0,40
+ 1550 datac8,50,d0,40,d8,50,e0,40
+ 1560 datae8,50,f8,50
+ 1590 :
+ 1600 data7f,01,7f,40,7f,08,fd,02
+ 1610 datafd,01,fd,40,fb,02,fb,01
+ 1620 datafb,40,fb,08,f7,02,f7,01
+ 1630 dataf7,40,ef,02,ef,01,ef,40
+ 1640 dataef,08,df,02,df,40,df,08
+ 1650 databf,02,bf,01,bf,40,bf,08
+ 1660 databf,20,fe,02
+ 1690 :
+ 1700 data28,12,01,15,13,03,08,05
+ 1710 data0e,29,12,05,03,08,14,05
+ 1720 data03,0b,20,20,13,01,05,07
+ 1730 data05,1a,01,08,0e,20,04,12
+ 1740 data05,09,05,03,0b,20,20,20
+ 1750 data28,12,09,0e,07,29,20,20
+ 1760 data20,20,05,09,0e,01,15,13
+ 1980 :
+ 1990 rem **********
+ 1992 rem *programm*
+ 1994 rem **********
+ 1996 :
+ 2000 datad8,a9,00,a2,7e,9d,80,03
+ 2010 dataca,10,fa,a9,ff,a2,24,9d
+ 2020 datac1,03,ca,ca,ca,d0,f8,8d
+ 2030 data81,03,a2,03,a0,00,8c,20
+ 2040 datad0,8c,21,d0,8c,e9,07,8c
+ 2050 dataf4,07,8c,2a,d0,a9,0e,8d
+ 2060 datafb,07,a2,08,8e,10,d0,ca
+ 2070 data8e,27,d0,8e,28,d0,8e,29
+ 2080 datad0,8e,17,d0,a9,60,85,fa
+ 2090 data8d,f2,07,8d,f1,07,8d,16
+ 2100 datad4,8d,17,d4,a9,34,8d,f3
+ 2110 data07,a9,02,8d,15,d4,a9,2f
+ 2120 data85,fb,a9,80,8d,8a,02,8d
+ 2130 data02,d4,8d,09,d4,8d,10,d4
+ 2140 dataa2,10,8e,ee,07,a9,39,8d
+ 2150 data06,d0,ca,8e,f8,07,8e,f9
+ 2160 data07,8e,fa,07,8e,18,d4,8e
+ 2170 dataef,07,a9,05,8d,e8,07,8d
+ 2180 dataec,07,a9,0f,8d,ea,07,a9
+ 2190 data06,8d,eb,07,20,54,34,ac
+ 2200 dataee,07,8c,04,d4,8c,0b,d4
+ 2210 data8c,12,d4,a9,08,8d,15,d0
+ 2220 data10,0b,aa,a9,cc,9d,a8,05
+ 2230 dataa9,20,9d,a9,05,ad,1c,d4
+ 2240 dataac,f4,07,f0,03,8d,16,d4
+ 2250 data4a,4a,4a,85,02,38,a9,64
+ 2260 datae5,02,8d,07,d0,a6,cb,e0
+ 2270 data40,f0,c4,78,a0,00,ba,86
+ 2280 data02,b9,40,30,8d,00,dc,ad
+ 2290 data01,dc,39,41,30,d0,03,4c
+ 2300 data11,34,c8,c8,c0,34,d0,e9
+ 2310 databa,e4,02,f0,03,4c,87,34
+ 2320 data58,20,3e,f1,c9,03,d0,03
+ 2330 data4c,c3,35,c9,43,d0,03,4c
+ 2340 data55,35,c9,3b,d0,05,a2,00
+ 2350 data4c,a5,33,c9,3a,d0,05,a2
+ 2360 data00,4c,bc,33,c9,2e,d0,05
+ 2370 dataa2,01,4c,a5,33,c9,2c,d0
+ 2380 data05,a2,01,4c,bc,33,c9,2f
+ 2390 datad0,03,4c,30,34,c9,1d,d0
+ 2400 data03,4c,e7,33,c9,11,d0,03
+ 2410 data4c,f7,33,c9,5a,d0,03,4c
+ 2420 dataf3,34,c9,4d,d0,04,a2,04
+ 2430 data10,1b,c9,4e,d0,04,a2,04
+ 2440 data10,27,c9,85,90,04,c9,8d
+ 2450 data90,03,4c,bd,32,38,e9,85
+ 2460 datac9,04,b0,11,aa,bd,e8,07
+ 2470 datac9,0f,f0,ee,38,69,00,9d
+ 2480 datae8,07,4c,97,33,38,e9,04
+ 2490 dataaa,bd,e8,07,d0,03,4c,bd
+ 2500 data32,38,e9,01,9d,e8,07,48
+ 2510 data20,54,34,68,18,69,28,ca
+ 2520 data10,fa,4c,b2,32,bd,f1,07
+ 2530 data29,f0,c9,f0,f0,36,bd,f1
+ 2540 data07,18,69,10,9d,f1,07,9d
+ 2550 data16,d4,d0,13,bd,f1,07,29
+ 2560 dataf0,f0,21,bd,f1,07,38,e9
+ 2570 data10,9d,f1,07,9d,16,d4,4a
+ 2580 data4a,4a,4a,ca,d0,03,18,69
+ 2590 data28,aa,a9,cc,9d,10,07,a9
+ 2600 data20,9d,11,07,4c,bd,32,a5
+ 2610 datafa,c9,90,f0,21,18,69,18
+ 2620 data85,fa,ee,f3,07,d0,0c,a5
+ 2630 datafa,f0,13,38,e9,18,85,fa
+ 2640 datace,f3,07,ae,f3,07,8e,c2
+ 2650 data06,e8,e8,8e,ca,06,4c,bd
+ 2660 data32,ba,8a,18,69,0c,c5,02
+ 2670 datad0,03,4c,f2,32,b9,00,30
+ 2680 data48,b9,01,30,48,b1,fa,48
+ 2690 datac8,b1,fa,48,88,4c,f2,32
+ 2700 dataad,f4,07,a0,02,49,01,8d
+ 2710 dataf4,07,f0,0c,b9,e3,30,99
+ 2720 data60,07,88,10,f7,4c,bd,32
+ 2730 datab9,e6,30,99,60,07,88,10
+ 2740 dataf7,4c,bd,32,ad,e8,07,0a
+ 2750 data0a,0a,0a,0d,e9,07,8d,05
+ 2760 datad4,8d,0c,d4,8d,13,d4,ad
+ 2770 dataea,07,0a,0a,0a,0a,0d,eb
+ 2780 data07,8d,06,d4,8d,0d,d4,8d
+ 2790 data14,d4,ad,ec,07,8d,03,d4
+ 2800 data8d,0a,d4,8d,11,d4,60,ad
+ 2810 dataf4,07,d0,06,ad,f1,07,8d
+ 2820 data16,d4,68,8d,0f,d4,68,8d
+ 2830 data0e,d4,ac,ee,07,c8,8c,12
+ 2840 datad4,68,8d,01,d0,68,8d,00
+ 2850 datad0,a9,09,8d,15,d0,ba,e4
+ 2860 data02,f0,3d,68,8d,08,d4,68
+ 2870 data8d,07,d4,ac,ee,07,c8,8c
+ 2880 data0b,d4,68,8d,03,d0,68,8d
+ 2890 data02,d0,a9,0b,8d,15,d0,ba
+ 2900 datae4,02,f0,1c,68,8d,01,d4
+ 2910 data68,8d,00,d4,ac,ee,07,c8
+ 2920 data8c,04,d4,68,8d,05,d0,68
+ 2930 data8d,04,d0,a9,0f,8d,15,d0
+ 2940 data4c,00,33,a2,a6,86,fc,a2
+ 2950 data30,86,fd,ad,ee,07,29,04
+ 2960 dataf0,09,a9,10,8d,ee,07,85
+ 2970 data02,10,2f,ad,ee,07,29,70
+ 2980 datad0,0d,a9,d8,85,fc,a9,14
+ 2990 data8d,ee,07,a0,0a,10,2b,ad
+ 3000 dataee,07,0a,8d,ee,07,85,02
+ 3010 datac9,40,f0,04,a9,00,f0,02
+ 3020 dataa9,0a,a2,27,9d,58,da,ca
+ 3030 data10,fa,a5,fc,18,69,0a,85
+ 3040 datafc,a5,02,0a,85,02,90,f2
+ 3050 dataa0,0a,b1,fc,99,97,06,88
+ 3060 datad0,f8,4c,bd,32,a2,0d,bd
+ 3070 datae8,06,29,7f,9d,e8,06,ca
+ 3080 data10,f5,ae,ef,07,e0,0f,d0
+ 3090 data03,20,ab,35,e0,7f,d0,05
+ 3100 data20,ab,35,a2,ff,8a,18,69
+ 3110 data10,8d,ef,07,8d,18,d4,0a
+ 3120 data85,02,a2,06,86,fd,a2,e8
+ 3130 data86,fc,a2,03,a5,02,0a,85
+ 3140 data02,90,0b,a0,03,b1,fc,09
+ 3150 data80,91,fc,88,10,f7,a5,fc
+ 3160 data18,69,05,85,fc,ca,d0,e4
+ 3170 data4c,bd,32,ad,f2,07,49,07
+ 3180 data8d,f2,07,8d,17,d4,a0,6e
+ 3190 datab9,f8,da,49,0e,99,f8,da
+ 3200 data88,10,f5,60,4d,41,52,54
+ 3210 data49,4e,20,41,48,4c,42,4f
+ 3220 data52,4e,20,33,34,31,38,20
+ 3230 data55,53,4c,41,52
+ 4000 ende
+
