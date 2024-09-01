@@ -527,7 +527,7 @@ class Issue:
 
       if not pubdate:
           # no system exit as this also triggers for empty folders (eg. after branch change)
-          raise Exception(f"- [{issue_directory_path}] Skipping: no pubdate")
+          raise AssertionError(f"- [{issue_directory_path}] Skipping: no pubdate")
       elif not CONFIG.build_future:
         # Define the current datetime with UTC timezone for comparison
           current_datetime = datetime.now(pytz.utc)
@@ -535,7 +535,7 @@ class Issue:
           # Remove the item if its publication date is in the future
           if pubdate > current_datetime:
               # no system exit
-              raise Exception(f"- [{issue_directory_path}] Skipping: pubdate in the future")
+              raise AssertionError(f"- [{issue_directory_path}] Skipping: pubdate in the future")
 
       if not pdf_filename:
           print(f"- [{issue_directory_path}] Warning: Missing PDF")
@@ -710,7 +710,7 @@ class ArticleDatabase:
                 try:
                     issue = Issue(issue_dir_path)
 
-                except Exception as error:
+                except AssertionError as error:
                     print(error)
                     continue
 
