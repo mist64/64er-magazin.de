@@ -975,7 +975,7 @@ def html_generate_all_articles_by_category(db):
         "So machen's andere|",
         "Software-Test|",
         "Software|",
-        "Rubriken|" #! toc_category
+        "Rubriken|" # toc_category
     ]
 
     html_parts = []
@@ -1087,7 +1087,7 @@ def html_generate_all_article_previews(db):
 
 ### Write full HTML files
 
-def write_full_html_file(db, path, title, preview_img, body_html, body_class, comments=False):
+def write_full_html_file(db, path, title, preview_img, body_html, body_class, comments=False, additional_head_tags=''):
     latest_issue_path = db.issues[db.latest_issue_key()].issue_dir_name
     impressum_path = os.path.join(latest_issue_path, f"{FILENAME_IMPRINT}.html")
 
@@ -1148,6 +1148,9 @@ def write_full_html_file(db, path, title, preview_img, body_html, body_class, co
     </script>
     <script src="/{BASE_DIR}lunr.js"></script>
     <script src="/{BASE_DIR}search.js"></script>
+
+    {additional_head_tags}
+
     {isso_html1}
 </head>
 
@@ -1484,7 +1487,61 @@ def copy_and_modify_html(article, html_dest_path, pdf_path, prev_page_link, next
     preview_img = next((url for url in (article.img_urls if article.img_urls else [])), None)
 
 
-    write_full_html_file(db, html_dest_path, title, preview_img, body_html, 'one_article', True)
+    # add ls-json schema.com information
+    #! TODO: re-add the meta tags
+    # metas = soup.find_all('meta', {"name": True})
+
+    def create_ls_json(title, image_url, date_published, date_modified, authors):
+        if not image_url:
+            image_url = "logo.png"
+
+        def author_tag(author_name, author_url):
+            if not author_url:
+              author_url = ""
+              #! TODO: add author url:
+              # ,
+              # "url": "{author_url}"
+
+            author_json = f'''
+            {{
+              "@type": "Person",
+              "name": "{author_name}"
+            }}
+            '''
+            return author_json
+
+        # author information
+        authors_meta_list = soup.find_all('meta', {"name": "author"})
+        authors = []
+        for authors_meta in authors_meta_list:
+            authors.extend([ author.strip() for author in authors_meta["content"].split(',')])
+
+        if authors:
+            #print(authors)
+            authors_json_list = [author_tag(author, "") for author in authors]
+            authors_json = f''', "author": [{", ".join(authors_json_list)}]'''
+        else:
+            authors_json = ""
+
+        ls_json = f'''
+    {{
+      "@context": "https://schema.org",
+      "@type": "Article",
+      "headline": "{title}",
+      "image": [ "{image_url}" ],
+      "datePublished": "{date_published}",
+      "dateModified": "{date_published}"
+      {authors_json}
+    }}
+    '''
+        return ls_json
+
+    past_pubtime = article.article_pubdate() - relativedelta(years=40)
+    iso_date_published = past_pubtime.strftime("%a, %d %b %Y %H:%M:%S %z")[:-5] + "GMT"
+    ls_json = create_ls_json(article.title, preview_img, iso_date_published, iso_date_published, "")
+    head_html = f'<script type="application/ld+json">{ls_json}</script>'
+
+    write_full_html_file(db, html_dest_path, title, preview_img, body_html, 'one_article', True, head_html)
 
 def copy_articles_and_assets(db, in_directory, out_directory):
     if not os.path.exists(out_directory):
