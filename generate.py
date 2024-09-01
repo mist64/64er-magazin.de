@@ -1488,11 +1488,40 @@ def copy_and_modify_html(article, html_dest_path, pdf_path, prev_page_link, next
 
 
     # add ls-json schema.com information
+    #! TODO: re-add the meta tags
+    # metas = soup.find_all('meta', {"name": True})
 
     def create_ls_json(title, image_url, date_published, date_modified, authors):
-        #! TODO: back date the date
         if not image_url:
             image_url = "logo.png"
+
+        def author_tag(author_name, author_url):
+            if not author_url:
+              author_url = ""
+              #! TODO: add author url:
+              # ,
+              # "url": "{author_url}"
+
+            author_json = f'''
+            {{
+              "@type": "Person",
+              "name": "{author_name}"
+            }}
+            '''
+            return author_json
+
+        # author information
+        authors_meta_list = soup.find_all('meta', {"name": "author"})
+        authors = []
+        for authors_meta in authors_meta_list:
+            authors.extend([ author.strip() for author in authors_meta["content"].split(',')])
+
+        if authors:
+            #print(authors)
+            authors_json_list = [author_tag(author, "") for author in authors]
+            authors_json = f''', "author": [{", ".join(authors_json_list)}]'''
+        else:
+            authors_json = ""
 
         ls_json = f'''
     {{
@@ -1502,6 +1531,7 @@ def copy_and_modify_html(article, html_dest_path, pdf_path, prev_page_link, next
       "image": [ "{image_url}" ],
       "datePublished": "{date_published}",
       "dateModified": "{date_published}"
+      {authors_json}
     }}
     '''
         return ls_json
