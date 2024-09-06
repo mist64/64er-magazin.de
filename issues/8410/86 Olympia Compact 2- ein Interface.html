@@ -65,11 +65,11 @@
 
         <p>Das Maschinenprogramm belegt in der vorliegenden Fassung die Speicherplätze von 32000 bis 32511. So ist eine Zusammenarbeit mit Simons Basic und Exbasic II gewährleistet. Wer das Programm in einen anderen Bereich, zum Beispiel in die 4 KByte RAM ab 49152, legen will, muß dazu die Zeilen 79, 111, 114, 116, 142, 144, 218, 224, 233, 237 und 256, die durch ein Sternchen gekennzeichnet sind, ändern. In 111 ist das MSB der Anfangsadresse einzusetzen (bei Anfang 50000 ist dies 195), in 114 das LSB der Anfangsadresse des CHROUT-Teils (Anfang + 55, im Beispiel 135), in 116 die Anfangsadresse des CHKOUT-Teils (Anfang + 30, im Beispiel 110). In 142 und 144 stehen jeweils als zweites Byte LSB und MSB vom Anfang des Umsetzungskatalogs. Sie wären bei Umlegung der Schnittstelle nach 50000 auf 73 (Zeile 144) und 196 (Zeile 140) zu ändern.</p>
 
-        <p>Das Programm verwendet die Adresse »Anfang« (32000) als Druckercursor, der für formatierten Druck abgefragt werden kann (zum Beispiel mit PRINT#4 TAB(31-PEEK (32000)),&hellip;). Im Programm dient er dazu, durch (von der Compact 2 nicht tatsächlich ausgeführten, sondern druckwegoptimierten) Wagenrücklauf und Wiedervorrücken eine Rücktaste zu simulieren. Dieser Cursor wird in den Zeilen 218, 224, 233, 237 und 256 des Programms verwendet und müßte bei Verlegung des Programms geändert werden (für Anfang 50000 ist jeweils das LSB 80 statt 0 und das MSB 195 statt 125);</p>
+        <p>Das Programm verwendet die Adresse »Anfang« (32000) als Druckercursor, der für formatierten Druck abgefragt werden kann (zum Beispiel mit PRINT#4 TAB(31-PEEK (32000)),&hellip;). Im Programm dient er dazu, durch (von der Compact 2 nicht tatsächlich ausgeführten, sondern druckwegoptimierten) Wagenrücklauf und Wiedervorrücken eine Rücktaste zu simulieren. Dieser Cursor wird in den Zeilen 218, 224, 233, 237 und 256 des Programms verwendet und müßte bei Verlegung des Programms geändert werden (für Anfang 50000 ist jeweils das LSB 80 statt 0 und das MSB 195 statt 125).</p>
 
         <p>Zum Aufbau des Programms: Der Initialisierungsteil verbiegt die KERNAL-Vektoren CHKOUT und CHROUT in die Schnittstellensoftware. Da diese Vektoren durch RUNSTOP/RESTORE wieder zurückgestellt werden, muß die Initialisierungsroutine nicht nur nach dem Laden, sondern nach jedem RUNSTOP/ RESTORE mit SYS 32001 aufgerufen werden. Die neu eingebauten Teile CHKOUT und CHROUT prüfen nun bei jeder Zeichenausgabe, ob das Zeichen für die Schreibmaschinenschnittstelle bestimmt ist.</p>
 
-        <p>Der CHROUT-Teil sucht ein auszugebendes Zeichen zunächst im Sonderzeichenkatalog. Hier wird ein Zeichen des C 64 in bis zu drei Codes an die Schreibmaschine umgesetzt. (Man beachte das zusammengestoppelte Potenzzeichen oder das elegante Pi). Dabei werden die Steuerzeichen für die Schreibmaschine im Druckmodus anders behandelt als im Listmodus. Ist das auszugebende Zeichen nicht im Sonderzeichenkatalog zu finden, so wird es je nach Zeichensatz auf ASCII-Wert umgesetzt. Anstelle von unbekannten Zeichen druckt die Schreibmaschine als Joker einen accent aigu »´«.</p>
+        <p>Der CHROUT-Teil sucht ein auszugebendes Zeichen zunächst im Sonderzeichenkatalog. Hier wird ein Zeichen des C 64 in bis zu drei Codes an die Schreibmaschine umgesetzt. (Man beachte das zusammengestoppelte Potenzzeichen oder das elegante Pi). Dabei werden die Steuerzeichen für die Schreibmaschine im Druckmodus anders behandelt als im Listmodus. Ist das auszugebende Zeichen nicht im Sonderzeichenkatalog zu finden, so wird es je nach Zeichensatz auf ASCII-Wert umgesetzt. Anstelle von unbekannten Zeichen druckt die Schreibmaschine als Joker einen accent aigu »`«.</p>
 
         <p>In den folgenden drei Abschnitten des Programms werden die angesammelten Schreibmaschinencodes der Reihe nach ausgegeben und der Cursor aktualisiert.</p>
 
@@ -77,7 +77,7 @@
 
         <p>Das folgende Sonderzeichen ermöglicht es, bei Bedarf auch nur den Wagenrücklauf zu senden. Der neue Code hierfür ist 11 (Befehl PRINT CHR$(11) oder in Strings PRINT »&lt;Control&gt;K«. Die dritte Umsetzung ist erforderlich, damit die Compact 2 auch ein geshiftetes Space als solches serviert bekommt.</p>
 
-        <p>Danach folgen 8 Steuerzeichen der Schreibmaschine, die mit PRINT CHR$(1, 2, 3, 21, 22, 23, 25 oder 26) oder in einen String auch mit PRINT >>&lt;Control&gt;A, B, C, U, V, W, Y oder Z« gesendet werden können. Dies ist auch mit PRINT CHR$(12) beziehungsweise PRINT »&lt;Control&gt;L« möglich, was einen Seitenvorschub bewirkt. Die Control-Methode führt jedoch bei A,B,C und L zu Problemen, da sie nicht gelistet, sondern auch im Listmodus ausgeführt werden.</p>
+        <p>Danach folgen 8 Steuerzeichen der Schreibmaschine, die mit PRINT CHR$(1, 2, 3, 21, 22, 23, 25 oder 26) oder in einen String auch mit PRINT »&lt;Control&gt;A, B, C, U, V, W, Y oder Z« gesendet werden können. Dies ist auch mit PRINT CHR$(12) beziehungsweise PRINT »&lt;Control&gt;L« möglich, was einen Seitenvorschub bewirkt. Die Control-Methode führt jedoch bei A,B,C und L zu Problemen, da sie nicht gelistet, sondern auch im Listmodus ausgeführt werden.</p>
 
         <p>Im Katalog folgen nun die Umlaute und Sonderzeichen der Schreibmaschine, die den folgenden Tasten des C 64 zugeordnet wurden:<br>
         <table>
@@ -118,12 +118,12 @@
                 <td>|</td>
             </tr>
             <tr>
-                <td>Comm * :</td>
-                <td>Â´</td>
+                <td>Comm ★ :</td>
+                <td>´</td>
             </tr>
             <tr>
-                <td>Shift * :</td>
-                <td>Unterstreichen des nÃ¤chsten Zeichens</td>
+                <td>Shift ★ :</td>
+                <td>Unterstreichen des nächsten Zeichens</td>
             </tr>
             <tr>
                 <td>eckige Klammer auf :</td>
