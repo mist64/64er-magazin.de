@@ -21,7 +21,7 @@
 
         <h1>Assembler ist keine Alchimie – Teil 3</h1>
 
-        <p class="intro">In den ersten beiden Folgen unseres Assembler-Kurses mußten Sie noch mit Basic- Ladern arbeiten. Jetzt steht Ihnen ein leistungsfähiger Monitor zur Verfügung, der SMON. Somit können Sie alle Beispiele direkt eingeben und ausprobieren.</p>
+        <p class="intro">In den ersten beiden Folgen unseres Assembler-Kurses mußten Sie noch mit Basic-Ladern arbeiten. Jetzt steht Ihnen ein leistungsfähiger Monitor zur Verfügung, der SMON. Somit können Sie alle Beispiele direkt eingeben und ausprobieren.</p>
 
         <p>In der letzten Folge haben wir die ersten Assembler-Befehle kennengelernt und wissen, wie man sie benutzt und was sich im Computer dabei tut. Die Zahlen der Assembler-Alchimisten haben uns einige Geheimnisse enthüllt, obwohl sie für die Zweifingerlinge und die Sechzehnfingerlinge gedacht sind. Die Binärzahlen können wir schon zusammenzählen. Heute werden Sie eine Reihe weiterer Assembler-Befehle kennenlernen und noch ein weiteres Zahlensystem. Wir ergründen das Geheimnis der negativen Zahlen und machen uns die Funktion der Flaggen zunutze.</p>
 
@@ -35,7 +35,7 @@
 
         <p>Das umgekehrte leisten die Befehle DEX, DEY und DEC. Sie bedeuten nämlich »decrement X-Register«, also »zähle das X-Register um eins herunter«, beziehungsweise das Y-Register oder — bei DEC — die angegebene Speicherstelle. Für die Adressierungsart und die Anzahl Bytes pro Befehl gilt hier das gleiche wie für die INX&hellip;-Befehle. Sehen wir uns das an einem kleinen Beispiel an: Bitte lesen Sie sich dazu die Bedienungshinweise zum SMON durch.</p>
 
-        <p>1500 LDA #00<br>
+        <p><br>1500 LDA #00<br>
             1502 LDX #01<br>
             1504 STA D800<br>
             1507 STX 0400<br>
@@ -45,20 +45,33 @@
             1511 DEX<br>
             1512 STA D802<br>
             1515 STX 0402<br>
-            1518 BRK</p>
+            1518 BRK<br></p>
 
         <p>Wenn Sie das kleine Programm mit G 1500 starten, dann sollten Sie in der linken oberen Ecke des Bildschirms ABA in schwarzer Schrift stehen haben. Was ist geschehen? Wir haben den Inhalt des Akku (= 0, also Farbcode für schwarz) in das Bildschirm-Farbregister geschrieben (#D800), dann den Inhalt des X-Registers (1 = POKE-Code für den Buchstaben A) in die erste Bildschirm-Speicherzelle (# 0400). Anschließend wurde das X-Register um 1 erhöht (2 = POKE-Code für den Buchstaben B) und dieser Inhalt in die zweite Bildschirmzelle geschrieben. Außerdem mußte natürlich auch dieser Bildschirm-Farbspeicherplatz mit dem Farbcode 0 belegt werden. Durch DEX wurde das X-Register wieder herunter gezählt, somit wieder ein A erzeugt und in die dritte Bildschirmstelle gedruckt.</p>
 
         <p>Sie haben sicher schon bemerkt, daß man auf diese Weise Abläufe mitzählen kann. Soll zum Beispiel ein Vorgang 20 mal wiederholt werden, dann packt man ins X-Register (oder ins Y-Register oder in eine andere Speicherstelle) den Anfangswert 0, läßt den Computer eine Arbeit ausführen, erhöht das entsprechende Register oder die Speicherzelle um 1 mit INX, INY oder INC, prüft dann, ob dieser Inhalt schon 20 geworden ist und so weiter. Wie man diese Prüfung vornimmt, dazu kommen wir erst später bei den BRANCH-Befehlen. Das ist also ähnlich wie im Basic bei den FOR&hellip;NEXT-Schleifen: Dort wird eine Variable als Zähler verwendet, hier ein Register (oder eine Speicherstelle). Ebenso wie im Basic bei diesen Schleifen kann man auch hier rückwärts zählen mit DEX, DEY oder DEC. Das hat oft gewisse Vorzüge, was uns aber noch nicht kümmern soll.</p>
 
         <p>Wenn wir diese Befehle als Zähler verwenden, sollten wir im Auge behalten, daß eine Speicherstelle (auch ein X- oder Y-Register) Zahlen nur von 0 bis 255 enthalten kann. Die höchste 8-Bit-Zahl ist ja:<br>
-            TODO<br>
-            dez. 255 = bin. 1111 1111<br>
-            + 1 1<br>
-            —&mdash;&mdash;&mdash;+<br>
-            ergibt: (1) 0000 0000</p>
+        <table  border="0">
+        <tr> 
+           <td>dez. 255 =</td>
+           <td>bin. 1111 1111</td>
+        </tr>
+        <tr align="right"> 
+           <td>+1</td>
+           <td>1</td>
+        </tr>
+        <tr> 
+           <td>&nbsp;</td>
+           <td>---------------+</td>
+        </tr>
+        <tr>
+        <td>ergibt:</td>
+           <td>(1) 0000 0000</td>
+        </tr>
+        </table>
 
-        <p>Wenn wir also über 255 hinauszählen, ergibt sich wieder 0 und so weiter, weil ein Überlauf stattgefunden hat. Das 9.Bit paßt nicht mehr in das Byte hinein. Üm nochmal genau sehen zu können, was unser Computer da tut, probieren Sie einmal aus:<br>
+        <p>Wenn wir also über 255 hinauszählen, ergibt sich wieder 0 und so weiter, weil ein Überlauf stattgefunden hat. Das 9.Bit paßt nicht mehr in das Byte hinein. Um nochmal genau sehen zu können, was unser Computer da tut, probieren Sie einmal aus:<br>
             1500 LDA #01<br>
             1502 BRK</p>
 
@@ -230,7 +243,7 @@
                         <td><b>31</b></td>
                         <td><b>32</b></td>
                         <td><b>00</b></td>
-                        <td></td>
+                        <td><b>12</b></td>
                         <td>08</td>
                         <td><b>14</b></td>
                         <td><b>00</b></td>
@@ -324,7 +337,7 @@
             <figcaption>Bild 2. So werden Integer-Variable aus Basic-Programmen vom C 64 im Speicher eingerichtet</figcaption>
         </figure>
 
-        <p>Zunächst einmal die Bytes $0814 und $0815: Hier wird der Väriablenname und der -typ angegeben. Der Typ ist aus den Bits 7 zu erkennen. Sind beide (wie hier) gleich 1, dann handelt es sich um eine Integervariable (also eine ganze Zahl). Läßt man die Kennbits außer acht, zeigt sich, daß in $0814 der Code für den Buchstaben A steht und $0815 nur den Wert 0 enthält. Nun zum Rest: Der C 64 legt Integers in nur 2 Bytes ab — die restlichen 3 Bytes $0818 bis $081A bleiben unbenutzt. Das ist auch dann der Fall, wenn danach noch weitere Variable kommen. Es bringt also keine Speicherersparnis (VC 20-Benutzer aufgepaßt!), wenn man mit Ganzzahlvariablen arbeitet!</p>
+        <p>Zunächst einmal die Bytes $0814 und $0815: Hier wird der Variablenname und der -typ angegeben. Der Typ ist aus den Bits 7 zu erkennen. Sind beide (wie hier) gleich 1, dann handelt es sich um eine Integervariable (also eine ganze Zahl). Läßt man die Kennbits außer acht, zeigt sich, daß in $0814 der Code für den Buchstaben A steht und $0815 nur den Wert 0 enthält. Nun zum Rest: Der C 64 legt Integers in nur 2 Bytes ab — die restlichen 3 Bytes $0818 bis $081A bleiben unbenutzt. Das ist auch dann der Fall, wenn danach noch weitere Variable kommen. Es bringt also keine Speicherersparnis (VC 20-Benutzer aufgepaßt!), wenn man mit Ganzzahlvariablen arbeitet!</p>
 
         <p>In $0817 steht $F4, welches binär ausgedrückt 1111 0100 ist. Das kennen wir noch von weiter oben als die —12 im Zweierkomplement-Format. Woher kommt $FF in Speicherzelle $0816? Wie gesagt, die Integers werden in 2 Bytes gespeichert, und wenn wir —12 in 16 Bits ausdrücken, dann sieht das so aus:<br>
             + 12 0000 0000 0000 1100<br>
@@ -358,7 +371,7 @@
             <figcaption>Bild 3. Flußdiagramm zur Verzögerungsschleife</figcaption>
         </figure>
 
-        <p>Das Progrämmchen dazu:
+        <p>Das Progrämmchen dazu:<br>
             1500 LDX #FF<br>
             1502 LDY #FF<br>
             1504 DEY<br>
