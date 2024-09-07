@@ -11,7 +11,7 @@
     <meta name="64er.head1" content="Assembler-Kurs">
     <meta name="64er.head2" content="C 64/VC 20">
     <meta name="64er.toc_category" content="Kurse">
-    <meta name="64er.index_title" content="Assembler ist keine Alchimie (Teil 2)">
+    <meta name="64er.toc_title" content="Assembler ist keine Alchimie (Teil 2)">
     <meta name="64er.index_category" content="Kurse|Assembler">
     <meta name="64er.id" content="assembler">
 </head>
@@ -51,7 +51,7 @@
             <figcaption>Bild 1. Eine Registeranzeige</figcaption>
         </figure>
 
-        <p>Die angezeigten Werte sind Beispiele, wie sie beim C 64 auftreten können. PC ist der Programmzähler, der immer auf den nächsten zu holenden Befehl zeigt. (Der Wert $E147 rührt vom SYS-Aufruf, mit dem ich meinen Assembler starte). IRO zeigt uns an, auf welche Adresse der sogenannte Interrupt-Vektor gestellt ist. Das ist das Byte-Paar 788 (LSB) und 789 (MSB). Auf den Wert $EA31 zeigt es im Normalfall.</p>
+        <p>Die angezeigten Werte sind Beispiele, wie sie beim C 64 auftreten können. PC ist der Programmzähler, der immer auf den nächsten zu holenden Befehl zeigt. (Der Wert $E147 rührt vom SYS-Aufruf, mit dem ich meinen Assembler starte). IRQ zeigt uns an, auf welche Adresse der sogenannte Interrupt-Vektor gestellt ist. Das ist das Byte-Paar 788 (LSB) und 789 (MSB). Auf den Wert $EA31 zeigt es im Normalfall.</p>
 
         <p>Die nächsten acht Angaben beziehen sich auf das Prozessorstatusregister, das wir in der letzten Folge P genannt haben. Die Bedeutung der einzelnen »Flaggen« zeigt Ihnen (Bild 2).</p>
 
@@ -102,7 +102,7 @@
         <p>Das Argument von LDA ist also das, was in den Akku soll. Laden wir also mal eine 1 in den Akku:<br>
             1500 LDA #$01</p>
 
-        <p>Wir haben jetzt einen 2-Byte-Befehl erzeugt. Was aber bedeuten # und $ dabei? $ ist leicht zu erklären. Die große Mehrzahl der Assembler nimmt bei Zahlenangaben Hexadezimalzahlen an. Bei einigen muß man das durch das $-Zeichen kennzeichnen. Manche Assembler lassen auch Binärzahlen, Dezimalzahlen und sogar ASCII-Zeichen als Argumente zu. Für jede Eingabeart steht dann vor dem Argument ein Zeichen, das die Art des Argumentes angibt, zum Beispiel häufig »I« für Dezimalzahlen oder % für Binärzahlen. Nun zum # -Zeichen. Es gibt viele Arten, den Akku zu laden. Direkt mit einer Zahl — wie wir hier —, aber zum Beispiel auch mit dem Inhalt eines anderen Speichers und so weiter. Man spricht von der sogenannten Adressierung.</p>
+        <p>Wir haben jetzt einen 2-Byte-Befehl erzeugt. Was aber bedeuten # und $ dabei? $ ist leicht zu erklären. Die große Mehrzahl der Assembler nimmt bei Zahlenangaben Hexadezimalzahlen an. Bei einigen muß man das durch das $-Zeichen kennzeichnen. Manche Assembler lassen auch Binärzahlen, Dezimalzahlen und sogar ASCII-Zeichen als Argumente zu. Für jede Eingabeart steht dann vor dem Argument ein Zeichen, das die Art des Argumentes angibt, zum Beispiel häufig »!« für Dezimalzahlen oder % für Binärzahlen. Nun zum #-Zeichen. Es gibt viele Arten, den Akku zu laden. Direkt mit einer Zahl — wie wir hier —, aber zum Beispiel auch mit dem Inhalt eines anderen Speichers und so weiter. Man spricht von der sogenannten Adressierung.</p>
 
         <p>Es gibt eine ganze Menge davon und jede wird auf eindeutige Weise gekennzeichnet. Wenn wir in unseren Akku eine Zahl laden, dann ist das die »unmittelbare« Adressierung, und die kennzeichnet man mit dem #-Zeichen.</p>
 
@@ -143,8 +143,9 @@
             1501 $ 01<br>
             1502 STA<br>
             1503 $ 00 »das ist das LSB«<br>
-            1504 $ 04 »das ist das MSB«<br>
-            Hier liegt also ein 3-Byte-Befehl vor, und die nächste freie Speicherstelle ist $ 1505.</p>
+            1504 $ 04 »das ist das MSB«</p>
+            
+        <p>Hier liegt also ein 3-Byte-Befehl vor, und die nächste freie Speicherstelle ist $ 1505.</p>
 
         <p>Vom Basic her wissen Sie, daß 1 der Bildschirmcode für den Buchstaben A ist, und daß man jeder Bildschirmspeicherstelle auch eine Bildschirmfarbspeicherstelle zuordnet. Um ein eingeschriebenes Zeichen vom Hintergrund abzuheben, muß man dort dann eine Farbinformation eingeben. Der Start dieses Büdschirmspeichers liegt so:<br>
             C 64 :$ D800<br>
@@ -159,7 +160,7 @@
         <p>Das heißt »return from subroutine«, also »Rückkehr aus Unterprogramm«. In unserem Fall bewirkt das eine Rückkehr zum Basic. Wie Sie sehen, ist das ein l-Byte-Befehl, also ohne Argument. Auch hier spricht man von einer Adressierungsart, nämlich der »impliziten«-Adressierung. Man erkennt sie am Fehlen des Argumentes. Die Adresse ist implizit, das heißt im Befehl selbst enthalten. Dies ist nämlich ein Befehl, der immer an den Programmzähler gerichtet ist. Der Computer holt sich vom Stapel-Speicher die dort zuoberst liegende Adresse, das ist die, bei der der Computer in ein Unterprogramm gesprungen ist oder aber die, bei der der Computer Basic verlassen hat. Wir ergänzen also noch:<br>
             A 150A RTS<br>
             und starten das Programm, zum Beispiel von Basic aus mit SYS 5376. Natürlich taucht dann in der linken oberen Ecke des Bildschirmes ein schwarzes A auf. Hier noch der Basic-Lader:<br>
-            10 FOR I = 5376 TO 5386:READ A:POKE I,A:NEXT I:END 20 DATA169,1,141,0,4*,169,0,141,0,216*,96.</p>
+            10 FOR I = 5376 TO 5386:READ A:POKE I,A:NEXT I:END<br>20 DATA169,1,141,0,4*,169,0,141,0,216*,96.</p>
 
         <p>Die mit * markierten Zahlen müssen für den VC 20 verändert werden: Grundversion: 30 und 148 Erweiterung: 16 und 150.</p>
 
@@ -345,7 +346,7 @@
 
         <p>In der ersten Spalte wurde gerechnet 1 + 1 = 10, wobei nach dem alten Motto: 0 hin, 1 im Sinn die 0 unter den Strich gesetzt wurde. In der zweiten Spalte wird dann so verfahren: 1 +1 +1 (das ist die 1, die wir »im Sinn« hatten)=11. Ich meine, daß Sie ohne Probleme die folgenden Übungsaufgaben lösen und dann jeweils dezimal das Ergebnis nachprüfen können: 10+5, 7 + 1, 16 + 16, 240+16, 62 + 65.</p>
 
-        <p>In der nächsten Folge werden wir eine Anzahl neuer Assembler-Befehle kennenlernen und erfahren, wie der Computer Zahlen voneinander abzieht. Bei der Gelegenheit lernen Sie dann noch einige Flaggen kennen, und wir werden das Rätsel, warum bei LDA # $FF eine negative Zahl angezeigt wird, lösen. Und vor allen, Sie erhalten einen komfortablen Assembler, Disassembler und einen Monitor.</p>
+        <p>In der nächsten Folge werden wir eine Anzahl neuer Assembler-Befehle kennenlernen und erfahren, wie der Computer Zahlen voneinander abzieht. Bei der Gelegenheit lernen Sie dann noch einige Flaggen kennen, und wir werden das Rätsel, warum bei LDA #$FF eine negative Zahl angezeigt wird, lösen. Und vor allen, Sie erhalten einen komfortablen Assembler, Disassembler und einen Monitor.</p>
 
         <address class="author">(Heimo Ponnath/aa)</address>
 
