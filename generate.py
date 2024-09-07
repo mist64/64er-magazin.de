@@ -1745,6 +1745,24 @@ def generate_search_json(db, out_directory):
     with open(os.path.join(out_directory, 'search.json'), 'w', encoding='utf-8') as f:
         json.dump(articles_info, f, ensure_ascii=False, indent=4)
 
+def generate_author_pages(db, out_directory):
+    known_authors = {}
+    known_authors["aa"] = "Albert Absmeier"
+    known_authors["ev"] = "Volker Everts"
+    known_authors["gk"] = "Georg Klinge"
+    known_authors["kg"] = "Karin Gößlinghoff"
+    known_authors["py"] = "Michael M. Pauly"
+    known_authors["rg"] = "Christian Rogge"
+    known_authors["sc"] = "Michael Scharfenberger"
+
+    # the shorthands that are in the magazine but not in the imprint and
+    # XXX is the marker for author tags that are not set
+    unknown_authors = ["ai", "wg", "XXX"]
+
+    found_authors = [author for author in sorted(db.authors) if author not in unknown_authors]
+    #print(found_authors)
+
+
 if __name__ == '__main__':
     print("*** Generating")
 
@@ -1759,7 +1777,6 @@ if __name__ == '__main__':
     out_directory = os.path.join(OUT_DIRECTORY, BASE_DIR)
 
     copy_articles_and_assets(db, IN_DIRECTORY, out_directory)
-    #print(sorted(db.authors))
 
     print("  *** Navigation")
     generate_all_issues_with_tocs_html(db, out_directory)
@@ -1772,6 +1789,7 @@ if __name__ == '__main__':
     generate_privacy_page(db, out_directory)
     generate_404_page(db, out_directory)
     generate_search_json(db, out_directory)
+    generate_author_pages(db, out_directory)
 
     print("*** Filtering")
     dir = f"{OUT_DIRECTORY}/{BASE_DIR}"
