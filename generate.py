@@ -702,6 +702,7 @@ class ArticleDatabase:
 
     def __init__(self, in_directory):
         self.issues = {}  # Change to dictionary
+        self.authors = set(())
         self.articles = []
         for issue_dir_name in sorted(os.listdir(in_directory)):
             issue_dir_path = os.path.join(in_directory, issue_dir_name)
@@ -1517,7 +1518,7 @@ def copy_and_modify_html(article, html_dest_path, pdf_path, prev_page_link, next
             authors.extend([ author.strip() for author in authors_meta["content"].split(',')])
 
         if authors:
-            #print(authors)
+            db.authors.update(authors)
             authors_json_list = [author_tag(author, "") for author in authors]
             authors_json = f''', "author": [{", ".join(authors_json_list)}]'''
         else:
@@ -1758,6 +1759,7 @@ if __name__ == '__main__':
     out_directory = os.path.join(OUT_DIRECTORY, BASE_DIR)
 
     copy_articles_and_assets(db, IN_DIRECTORY, out_directory)
+    #print(sorted(db.authors))
 
     print("  *** Navigation")
     generate_all_issues_with_tocs_html(db, out_directory)
