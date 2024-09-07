@@ -11,7 +11,7 @@
     <meta name="64er.head1" content="Grafik-Kurs">
     <meta name="64er.head2" content="C 64/VC 20">
     <meta name="64er.toc_category" content="Kurse">
-    <meta name="64er.index_title" content="Reise durch die Wunderwelt der Grafik (Teil 7)">
+    <meta name="64er.toc_title" content="Reise durch die Wunderwelt der Grafik (Teil 7)">
     <meta name="64er.index_category" content="Kurse|Grafik">
     <meta name="64er.id" content="grafik">
 </head>
@@ -66,8 +66,7 @@
             237 GOTO 240<br>
             238 G(X,2) = G(X,2) + 1:GOSUB 50040<br>
             Außerdem muß natürlich zu Beginn dieses Feld noch dimensioniert werden: 147 DIM G (319,2)<br>
-            Mit der Beispielfunktion Y=COS(Z) *SIN(X) und den Eingaben:XU = -1, XO = 10, YU=-2, YO = 5, ZU = -.1, ZO = 7, Schrittweite = 8,XA = 0,<br>
-            XE = 6, ZA = .1, ZE = 7 sieht man den Effekt jetzt ganz deutlich. Das einzige — außer der Geschwindigkeit (und naja - vielleicht noch ein paar Kleinigkeiten) — was unsere 3D-Grafik jetzt von professionellen Systemen unterscheidet, ist die Möglichkeit der Netzgrafik (Bild 6).</p>
+            Mit der Beispielfunktion Y=COS(Z) *SIN(X) und den Eingaben:XU = -1, XO = 10, YU=-2, YO = 5, ZU = -.1, ZO = 7, Schrittweite = 8,XA = 0,XE = 6, ZA = .1, ZE = 7 sieht man den Effekt jetzt ganz deutlich. Das einzige — außer der Geschwindigkeit (und naja - vielleicht noch ein paar Kleinigkeiten) — was unsere 3D-Grafik jetzt von professionellen Systemen unterscheidet, ist die Möglichkeit der Netzgrafik (Bild 6).</p>
 
         <figure>
             <img src="146-6.png" alt="">
@@ -78,9 +77,13 @@
 
         <h3>Weg 1:</h3>
 
-        <p>Wir machen die Schrittweite in Z-Richtung sehr klein (so wie die in X-Richtung), setzen aber nicht jeden Punkt, sondern zum Beispiel in folgender Anordnung:<br>
-            a) 1. Z-Wert: Jeder Punkt der X-Schleife wird gesetzt, dann<br>
-            b) 2. bis 7. Z-Wert: Nur jeder 8.Punkt der X-Schleife wird gesetzt, dann c) wieder weiter wie beim 1. Z-Wert und so weiter.</p>
+        <p>Wir machen die Schrittweite in Z-Richtung sehr klein (so wie die in X-Richtung), setzen aber nicht jeden Punkt, sondern zum Beispiel in folgender Anordnung:</p>
+
+        <ol type="a">
+            <li>1. Z-Wert: Jeder Punkt der X-Schleife wird gesetzt, dann</li>
+            <li>2. bis 7. Z-Wert: Nur jeder 8.Punkt der X-Schleife wird gesetzt, dann</li>
+            <li>wieder weiter wie beim 1. Z-Wert und so weiter.</li>
+        </ol>
 
         <p>Stark vergrößert hätten wir dann etwa Verhältnisse wie in Bild 7.</p>
 
@@ -95,14 +98,14 @@
 
         <p>Man läßt außer der Z-X-Doppelschleife zur Berechnung von Y auch noch eine X-Z-Doppelschleife laufen. Wenn Sie das ausprobieren, gibt es allerdings wieder Schwierigkeiten mit den nicht sichtbaren Linien, denn unser Verfahren zur Lösung des Hinterschneidungsproblems läßt nichts mehr zeichnen, was innerhalb von G(X,0) bis G(X,1) liegt!</p>
 
-        <p>Anscheinend hat man bisher noch keine Möglichkeit Erklärungen auf das Grafikbild zu schreiben. Wenn wir im Hochauflösungsmodus zum Beispiel das Programm durch <RUN /STOP> anhalten, dann tauchen alle Meldungen als farbige Quadrate auf dem Bildschirm auf. Der Inhalt des Bildschirmspeichers dient ja jetzt als Farbinformation. Was der Computer mit dieser Farbkombination dann jeweils auf dem Bildschirm zeigen soll, holt er sich aus der Bit-Map. Man kann natürlich ohne weiteres die wichtigsten Zeichen aus Punkten, Linien und Ellipsenbögen zusammenbauen unter Verwendung unserer Grafik-Unterprogramme. Das wäre sozusagen der »harte« Weg. Aber wozu haben wir im Speicher schon die fertigen Zeichenmuster liegen! Wir müßten nur auf sinnvolle Weise an sie herankommen. Prinzipiell gibt es zwei »weiche« Wege:</p>
+        <p>Anscheinend hat man bisher noch keine Möglichkeit Erklärungen auf das Grafikbild zu schreiben. Wenn wir im Hochauflösungsmodus zum Beispiel das Programm durch &lt;RUN/STOP&gt; anhalten, dann tauchen alle Meldungen als farbige Quadrate auf dem Bildschirm auf. Der Inhalt des Bildschirmspeichers dient ja jetzt als Farbinformation. Was der Computer mit dieser Farbkombination dann jeweils auf dem Bildschirm zeigen soll, holt er sich aus der Bit-Map. Man kann natürlich ohne weiteres die wichtigsten Zeichen aus Punkten, Linien und Ellipsenbögen zusammenbauen unter Verwendung unserer Grafik-Unterprogramme. Das wäre sozusagen der »harte« Weg. Aber wozu haben wir im Speicher schon die fertigen Zeichenmuster liegen! Wir müßten nur auf sinnvolle Weise an sie herankommen. Prinzipiell gibt es zwei »weiche« Wege:</p>
 
         <p>a) Herbert Kunz hat den einen davon in der Zeitschrift Computer persönlich, Ausgabe 2 (1984), Seite 78 vorgestellt. Er kopiert zunächst den Zeichensatz in einen RAM-Bereich, schaltet dann — wie gewohnt — in den Hochauflösungsmodus (bei ihm liegt der Bildschirm bei 1024 und die Bit-Map richtet er bei 8192 ein) und druckt den Text auf den Bildschirm, wo dieser erst mal in farbigen Quadraten auftaucht. Nun sieht er mittels PEEK nach, welches Zeichen an der Bildschirmstelle steht (wo jetzt natürlich nur ein farbiges Quadrat zu sehen ist). Was Herbert Kunz dadurch erhält, ist die Kennzahl (der Bildschirmcode, zum Beispiel für ein A eine 1), die uns sagt, an welcher Stelle der Zeichentabelle das gefragte Zeichen steht. Dabei ist allerdings zu bedenken, daß es auch eine nullte Stelle gibt. Jedes Zeichen besteht aus 8 Bytes und deshalb multipliziert er die Kennzahl mit 8 und addiert sie zur Startadresse des RAM-Bereiches hinzu, in den er das Zeichen-ROM kopiert hat. Von da an überträgt er Byte für Byte das Zeichen in die entsprechende Stelle der Bit-Map (die er aus Zeilen und Spaltenangabe berechnet). So wird es dann sichtbar.</p>
 
         <p>Das macht er Zeichen für Zeichen bis der gesamte — in einem String definierte — Text in der Bit-Map und damit für uns lesbar auf dem Bildschirm steht. Dieses Prinzip können wir in unsere Programme übernehmen. Dazu sind nur wenige Änderungen nötig. Zunächst schließen wir den neuen Zeichen-Speicher im RAM direkt an unsere Bit-Map an: ab 32768. Das Maschinenprogramm von Herbert Kunz verändern wir deshalb etwas und legen es nicht in den Kassettenpuffer, sondern von dez. 673 bis 715. Wie im Programm von Herbert Kunz brauchen wir dann nur noch die Angaben, in welcher Zeile und Spalte welcher Text geschrieben werden soll.</p>
 
         <p>Zunächst einmal wird das Maschinenprogramm eingelesen und ausgeführt. In das 2D- und in das 3D-Programm fügen wir ein:<br>
-            500 FOR I = 673 TO 715: READ A:PO-KE I, A:NEXTI:SYS 673: RETURN<br>
+            500 FOR I = 673 TO 715: READ A:POKE I, A:NEXTI:SYS 673: RETURN<br>
             510 DATA 120, 169, 49, 133, 1, 169, 0, 133, 98, 133,100, 169, 208, 133, 99, 169, 128, 133<br>
             520 DATA 101, 162, 16, 160, 0, 177, 98, 145, 100, 200, 208, 249, 230, 99, 230, 101, 202, 208<br>
             530 DATA 242, 169, 55, 133, 1, 88, 96</p>
@@ -110,11 +113,11 @@
         <p>In Zeile 5 hängen wir an die beiden POKE-Kommandos noch an :GOSUB 500</p>
 
         <p>In Zeile 120 definieren wir einen String, der einen senkrechten Tabulator ermöglicht:<br>
-            120 CP$ = CHR$ (19):FOR I = 1 TO 24:CP$ = CP$ + CHR$ (17):NEXT I Dann definieren wir den zu druckenden String und Zeile und Spalte des Druckortes:<br>
+            120 CP$ = CHR$ (19):FOR I = 1 TO 24:CP$ = CP$ + CHR$ (17):NEXT I<br>Dann definieren wir den zu druckenden String und Zeile und Spalte des Druckortes:<br>
             122 TE$ = "Y” + F$:ZE = 0:SP = 0</p>
 
         <p>Jetzt müssen wir nur noch dafür sorgen, daß nach dem Zeichnen der Kurve oder Raumfläche der Text gedruckt wird. Dazu gleichen wir zunächst mal das 2D- an das 3D-Programm an. In den Zeilen 200, 210, 220 des 2D-Programmes ändern wir die Zeilennummern zu 300, 310, 320 (dann muß natürlich in Zeile 300 die Anweisung THEN 200 zu THEN 300 umgeschrieben werden und die alten Zeilen 200 bis 220 gelöscht werden). Im 2D-Programm hört das Zeichnen in Zeile 195, im 3D-Programm in Zeile 250 auf. Deswegen legen wir den Druckvorgang ab Zeile 260:<br>
-            260 PRINT LEFT$ (CP$,ZE + 1)TAB (SP)TE$;<br>
+            260 PRINT LEFT$ (CP$,ZE+1)TAB (SP)TE$;<br>
             262 AN = 23552 + ZE * 40 + SP:GS = 24576 + ZE * 320 + SP * 8<br>
             264 FOR I = AN TO AN + LEN (TE$)-1<br>
             266 L = PEEK (I) :Z = 32768 + 8 * L:POKEI, 16*F1 + F2<br>
@@ -125,7 +128,7 @@
 
         <p>b) Nun zum zweiten »weichen« Weg. Weil sich dieser nahezu völlig in Maschinensprache abspielt, soll hier nur das Prinzip erklärt werden. In der Serie über Assembler-Programmierung wird dieses sogenannte Interrupt-Handling besprochen. Zunächst das Programm. Tippen Sie NEW ein und dann Listing 1.</p>
 
-        <p>Starten Sie mit RUN und Ihr Bildschirm ist in drei Zonen aufgeteilt. Ist das Programm beendet, drücken Sie eine Taste. Sie sind auch nach dem END noch in dieser Bildschirm-Aufteilung. Sie können das leicht feststellen, wenn Sie den Cursor nach oben bewegen und ein paar Schreibversuche machen. Oder versuchen Sie mal das LIST-Kommando! Wenn Sie davon genug haben, dann geben Sie (RUN/ STOP) und (RESTORE) ein, und Sie sind wieder im Normalzustand des Bildschirmes. Wenn man diese Technik beherrscht, kann man mit dem Bildschirm praktisch alles machen, was man will! Wir bedienen uns eines sogenannten Rasterzeilen-Interrupts. Ich habe Ihnen in der letzten Folge erklärt, daß der bildaufbauende Elektronenstrahl über zirka 280 Rasterzeilen huscht und 20mal in der Sekunde ein komplettes neues Bild aufbaut. In der einschlägigen Literatur ist man sich übrigens uneins: Woanders wird erzählt, es handle sich um 264 Rasterzeilen und 60 mal in der Sekunde werde ein neues Bild aufgebaut. Wie dem auch sei: Richtig ist, daß es ein enorm schneller Geselle ist, der über den Bildschirm huscht, und daß die aktuelle Rasterzeile in den Registern 53266 (LSB) und 53265, Bit7 (msb) mitgezählt wird. Interrupts bringen den Computer dazu, neben seiner uns sichtbaren Arbeit (zum Beispiel Programmablauf) noch eine Anzahl anderer Dinge zu tun. Eines davon ist die ständige Wiederauffrischung des Fernsehbildes durch Informationen an den Rasterstrahl. Der C 64 löst solche Interrupts auch per Programm aus. Zu diesem Zweck dienen die Register 53273 und 53274. Bit 7 von 53273 sagt uns, daß ein Interrupt aufgetreten ist (Bit 7 ist dann 1), mit einer der Ursachen, die noch in den Bits 0 bis 3 einzeln angegeben werden:</p>
+        <p>Starten Sie mit RUN und Ihr Bildschirm ist in drei Zonen aufgeteilt. Ist das Programm beendet, drücken Sie eine Taste. Sie sind auch nach dem END noch in dieser Bildschirm-Aufteilung. Sie können das leicht feststellen, wenn Sie den Cursor nach oben bewegen und ein paar Schreibversuche machen. Oder versuchen Sie mal das LIST-Kommando! Wenn Sie davon genug haben, dann geben Sie (RUN/STOP) und (RESTORE) ein, und Sie sind wieder im Normalzustand des Bildschirmes. Wenn man diese Technik beherrscht, kann man mit dem Bildschirm praktisch alles machen, was man will! Wir bedienen uns eines sogenannten Rasterzeilen-Interrupts. Ich habe Ihnen in der letzten Folge erklärt, daß der bildaufbauende Elektronenstrahl über zirka 280 Rasterzeilen huscht und 20mal in der Sekunde ein komplettes neues Bild aufbaut. In der einschlägigen Literatur ist man sich übrigens uneins: Woanders wird erzählt, es handle sich um 264 Rasterzeilen und 60 mal in der Sekunde werde ein neues Bild aufgebaut. Wie dem auch sei: Richtig ist, daß es ein enorm schneller Geselle ist, der über den Bildschirm huscht, und daß die aktuelle Rasterzeile in den Registern 53266 (LSB) und 53265, Bit7 (msb) mitgezählt wird. Interrupts bringen den Computer dazu, neben seiner uns sichtbaren Arbeit (zum Beispiel Programmablauf) noch eine Anzahl anderer Dinge zu tun. Eines davon ist die ständige Wiederauffrischung des Fernsehbildes durch Informationen an den Rasterstrahl. Der C 64 löst solche Interrupts auch per Programm aus. Zu diesem Zweck dienen die Register 53273 und 53274. Bit 7 von 53273 sagt uns, daß ein Interrupt aufgetreten ist (Bit 7 ist dann 1), mit einer der Ursachen, die noch in den Bits 0 bis 3 einzeln angegeben werden:</p>
 
         <p>Bit 0= 1 Rasterzeilen-Interrupt Bit 1 = 1 Sprite/Hintergrund-Kollision Bit 2 = 1 Sprite/Sprite-Kollision Bit 3= 1 Interrupt durch Lichtgriffel.</p>
 
