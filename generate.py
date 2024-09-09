@@ -702,6 +702,7 @@ class ArticleDatabase:
 
     def __init__(self, in_directory):
         self.issues = {}  # Change to dictionary
+        self.authors = set(())
         self.articles = []
         for issue_dir_name in sorted(os.listdir(in_directory)):
             issue_dir_path = os.path.join(in_directory, issue_dir_name)
@@ -1517,7 +1518,7 @@ def copy_and_modify_html(article, html_dest_path, pdf_path, prev_page_link, next
             authors.extend([ author.strip() for author in authors_meta["content"].split(',')])
 
         if authors:
-            #print(authors)
+            db.authors.update(authors)
             authors_json_list = [author_tag(author, "") for author in authors]
             authors_json = f''', "author": [{", ".join(authors_json_list)}]'''
         else:
@@ -1744,6 +1745,24 @@ def generate_search_json(db, out_directory):
     with open(os.path.join(out_directory, 'search.json'), 'w', encoding='utf-8') as f:
         json.dump(articles_info, f, ensure_ascii=False, indent=4)
 
+def generate_author_pages(db, out_directory):
+    known_authors = {}
+    known_authors["aa"] = "Albert Absmeier"
+    known_authors["ev"] = "Volker Everts"
+    known_authors["gk"] = "Georg Klinge"
+    known_authors["kg"] = "Karin Gößlinghoff"
+    known_authors["py"] = "Michael M. Pauly"
+    known_authors["rg"] = "Christian Rogge"
+    known_authors["sc"] = "Michael Scharfenberger"
+
+    # the shorthands that are in the magazine but not in the imprint and
+    # XXX is the marker for author tags that are not set
+    unknown_authors = ["ai", "wg", "XXX"]
+
+    found_authors = [author for author in sorted(db.authors) if author not in unknown_authors]
+    #print(found_authors)
+
+
 if __name__ == '__main__':
     print("*** Generating")
 
@@ -1770,6 +1789,7 @@ if __name__ == '__main__':
     generate_privacy_page(db, out_directory)
     generate_404_page(db, out_directory)
     generate_search_json(db, out_directory)
+    generate_author_pages(db, out_directory)
 
     print("*** Filtering")
     dir = f"{OUT_DIRECTORY}/{BASE_DIR}"
