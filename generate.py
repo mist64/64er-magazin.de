@@ -812,9 +812,6 @@ def share_on_mastodon_link(title, url):
     mastodon_message = quote(f"{title}\n{url}\n{MASTODON_HASHTAGS}")
     return f"/{BASE_DIR}tootpick.html#text={mastodon_message}"
 
-
-
-
 def optional_issue_prefix(path, issue, prepend_issue_dir=False):
     if prepend_issue_dir:
         path = os.path.join(issue.issue_dir_name, path)
@@ -1310,7 +1307,7 @@ def generate_404_page(db, out_directory):
 def generate_rss_feed(db, out_directory):
     rss_items = []
 
-    sorted_articles = sorted(db.articles, key=lambda x: x.article_pubdate(), reverse=False)
+    sorted_articles = sorted(db.articles, key=lambda x: x.article_pubdate(), reverse=True)
 
     for article in sorted_articles:
         title = html.escape(index_title(article))
