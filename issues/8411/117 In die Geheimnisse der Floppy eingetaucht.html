@@ -46,7 +46,7 @@
         <p>Soll zum Beispiel nur ein einziges Byte auf der Diskette geändert werden, so wird erst der gesamte Block in einen der 5 Pufferspeicher gelesen, dort abgeändert und schließlich komplett wieder zurückgeschrieben. Aus diesen Gründen ist es also notwendig, daß wir uns vor einem Direktzugriff einen der Puffer reservieren, in dem dann gearbeitet wird.</p>
 
         <p>Mit Hilfe des »Open«-Befehls eröffnen wir einen Direktzugriffskanal. Die Syntax lautet wie folgt:<br>
-            OPENfn, gn, kn, ”#”</p>
+            OPEN fn, gn, kn, ”#”</p>
 
         <p>Hierbei bedeuten:<br>
             fn — Filenummer (1-127)<br>
@@ -69,76 +69,84 @@
 
         <h3>Die BLOCK-Befehle</h3>
 
-        <p>a) Der BLOCK-READ-Befehl (B-R): Mit dem BLOCK-READ-Befehl liest man jeden beliebigen Block von Diskette in einen vorher reservierten Puffer. Die Syntax lautet:<br>
-            PRINT#fn,"B-R";kn;dn;t;s<br>
-            dn — Drivenummer (immer 0)<br>
-            t — Tracknummer<br>
-            s — Sektornummer<br>
-            Beispiel: PRINT#15,"B-R 2 0 18 0”</p>
+        <ol type="a">
+            <li>Der BLOCK-READ-Befehl (B-R):<br>
+                Mit dem BLOCK-READ-Befehl liest man jeden beliebigen Block von Diskette in einen vorher reservierten Puffer. Die Syntax lautet:<br>
+                PRINT#fn,"B-R";kn;dn;t;s<br>
+                dn — Drivenummer (immer 0)<br>
+                t — Tracknummer<br>
+                s — Sektornummer<br>
+                Beispiel: PRINT#15,"B-R 2 0 18 0”
 
-        <p>Diese Befehlsfolge liest den Block 18,0 von der Diskette in den oben reservierten Puffer. Wie man sieht, können anstelle der CHR$-Codes feste Zahlenwerte in den Befehlsstring mit übernommen werden. Das ganze hat bloß einen kleinen Schönheitsfehler. Mit dem B-R-Befehl läßt sich das erste Byte eines Blocks nicht lesen. Deshalb benutzt man normalerweise anstatt des B-R-Befehls den U1-Befehl. Dieser hat exakt die gleiche Syntax und kann in jedem Fall benutzt werden:<br>
-            PRINT#15,"U1 2 0 18 0”</p>
-
-        <p>Auf diese USER-Befehle kommen wir später zurück. Mit einer GET#-Schleife lassen sich nun die einzelnen Bytes in den Computer einlesen.</p>
-
-        <p>b) Der BLOCK-WRITE-Befehl (B-W): Hiermit lassen sich die Daten aus dem reservierten Puffer wieder auf die Diskette schreiben. Syntax:<br>
-            PRINT#fn,”B-W”;kn;dn;t;s<br>
-            Beispiel: PRINT#15,"B-W 2 0 18 0”<br>
-            Natürlich gibt es analog zum B-R einen USER-Befehl ; U2.<br>
-            Beispiel: PRINT#15,"U2 2 0 18 0".</p>
-
-        <p>c) Der BUFFER-POINTER-Befehl (B-P):<br>
-            Für jeden Puffer gibt es einen Zeiger, den BUFFER-POINTER. Dieser zeigt auf das aktuelle Byte im Puffer und wird bei jedem Datenzugriff um Eins erhöht, damit man alle 256 Bytes eines Blocks der Reihe nach lesen kann. Dieser Pointer wird mit dem B-P-Befehl gezielt auf bestimmte Bytes positioniert, wenn man nur einzelne Werte und nicht den gesamten Block lesen will. Syntax:<br>
-            PRINT# fn,"B-P"; kn; position<br>
-            Beispiel:<br>
-            Wir möchten in die Variable A den Wert des 123. Bytes von Block 1;16 einlesen:<br>
-            10 OPEN15,8,15<br>
-            20 OPEN1,8,2,"#"<br>
-            30 PRINT#15,"U1 2 0 1 16”<br>
-            40 PRINT#15,"B-P2 122”<br>
-            50 GET#1,A$<br>
-            60 A = ASC(A$ + CHR$(0))<br>
-            Als weiteres Beispiel dient Listing 1. 
-            
-         <p>d) Der BLOCK-ALLOCATE-Befehl (B-A):<br>
-            Wenn Sie im Direktzugriffsverfahren eine Diskette beschreiben, muß in der BAM danach auch verzeichnet werden, daß die entsprechenden Blocks mit Daten gefüllt sind und nicht mehr überschrieben werden dürfen. Dazu dient der B-A-Befehl, der jeden beliebigen Block in der BAM als belegt kennzeichnet. Die Syntax lautet:<br>
-            PRINT#fn,"B-A";dn;t;s<br>
-            Beispiel:<br>
-            PRINT#15,"B-A0 1 16”<br>
-            kennzeichnet Block 1;16 als belegt; war dieser Block schon belegt, meldet sich die Floppy mit der Fehlermeldung >>65,NO BLOCK,XX,YY&lt;&lt;; wobei XX und YY die Track- und Sektornummer des nächsten freien Blocks angeben.</p>
-
-        <p>e) Der BLOCK-FREE-Befehl (B-F): Dieser ist das genaue Gegenstück zum B-A-Befehl; er deklariert einmal belegte Blöcke wieder als frei für einen weiteren Zugriff. Seine Syntax ist identisch mit der des B-A-Befehls.</p>
-
-        <p>f) Der BLOCK-EXECUTE-Befehl (B-E): Dieser Befehl nimmt eine Sonderstellung ein. Er gleicht im Prinzip dem B-R-Befehl; nur mit dem zusätzlichen Effekt, daß der eingelesene Block im Puffer als Maschinenprogramm gestartet wird.</p>
+                <p>Diese Befehlsfolge liest den Block 18,0 von der Diskette in den oben reservierten Puffer. Wie man sieht, können anstelle der CHR$-Codes feste Zahlenwerte in den Befehlsstring mit übernommen werden. Das ganze hat bloß einen kleinen Schönheitsfehler. Mit dem B-R-Befehl läßt sich das erste Byte eines Blocks nicht lesen. Deshalb benutzt man normalerweise anstatt des B-R-Befehls den U1-Befehl. Dieser hat exakt die gleiche Syntax und kann in jedem Fall benutzt werden:<br>
+                PRINT#15,"U1 2 0 18 0”<br>Auf diese USER-Befehle kommen wir später zurück. Mit einer GET#-Schleife lassen sich nun die einzelnen Bytes in den Computer einlesen.</p>
+            </li>
+            <li>Der BLOCK-WRITE-Befehl (B-W):<br>
+                Hiermit lassen sich die Daten aus dem reservierten Puffer wieder auf die Diskette schreiben. Syntax:<br>
+                PRINT#fn,”B-W”;kn;dn;t;s<br>
+                Beispiel: PRINT#15,"B-W 2 0 18 0”<br>
+                Natürlich gibt es analog zum B-R einen USER-Befehl ; U2.<br>
+                Beispiel: PRINT#15,"U2 2 0 18 0".
+            </li>
+            <li>Der BUFFER-POINTER-Befehl (B-P):<br>
+                Für jeden Puffer gibt es einen Zeiger, den BUFFER-POINTER. Dieser zeigt auf das aktuelle Byte im Puffer und wird bei jedem Datenzugriff um Eins erhöht, damit man alle 256 Bytes eines Blocks der Reihe nach lesen kann. Dieser Pointer wird mit dem B-P-Befehl gezielt auf bestimmte Bytes positioniert, wenn man nur einzelne Werte und nicht den gesamten Block lesen will. Syntax:<br>
+                PRINT# fn,"B-P"; kn; position<br>
+                Beispiel:<br>
+                Wir möchten in die Variable A den Wert des 123. Bytes von Block 1;16 einlesen:<br>
+                10 OPEN15,8,15<br>
+                20 OPEN1,8,2,"#"<br>
+                30 PRINT#15,"U1 2 0 1 16”<br>
+                40 PRINT#15,"B-P2 122”<br>
+                50 GET#1,A$<br>
+                60 A = ASC(A$ + CHR$(0))<br>
+                Als weiteres Beispiel dient Listing 1.
+            </li>
+            <li>Der BLOCK-ALLOCATE-Befehl (B-A):<br>
+                Wenn Sie im Direktzugriffsverfahren eine Diskette beschreiben, muß in der BAM danach auch verzeichnet werden, daß die entsprechenden Blocks mit Daten gefüllt sind und nicht mehr überschrieben werden dürfen. Dazu dient der B-A-Befehl, der jeden beliebigen Block in der BAM als belegt kennzeichnet. Die Syntax lautet:<br>
+                PRINT#fn,"B-A";dn;t;s<br>
+                Beispiel:<br>
+                PRINT#15,"B-A0 1 16”<br>
+                kennzeichnet Block 1;16 als belegt; war dieser Block schon belegt, meldet sich die Floppy mit der Fehlermeldung »65,NO BLOCK,XX,YY«; wobei XX und YY die Track- und Sektornummer des nächsten freien Blocks angeben.
+            </li>
+            <li>Der BLOCK-FREE-Befehl (B-F):<br>
+                Dieser ist das genaue Gegenstück zum B-A-Befehl; er deklariert einmal belegte Blöcke wieder als frei für einen weiteren Zugriff. Seine Syntax ist identisch mit der des B-A-Befehls.
+            </li>
+            <li>Der BLOCK-EXECUTE-Befehl (B-E):<br>
+                Dieser Befehl nimmt eine Sonderstellung ein. Er gleicht im Prinzip dem B-R-Befehl; nur mit dem zusätzlichen Effekt, daß der eingelesene Block im Puffer als Maschinenprogramm gestartet wird.
+            </li>
+        </ol>
 
         <p>Zur Vertiefung der Block-Befehle sei noch auf die Listings 2 bis 5 hingewiesen, welche die eben besprochenen Anwendungen noch an praktischen Beispielen verdeutlichen.</p>
 
         <h3>Die MEMORY-Befehle</h3>
 
-        <p>a) Der MEMORY-READ-Befehl (M-R): Dieser Befehl entspricht haargenau dem PEEK-Befehl in Basic. Mit ihm können Sie jede beliebige Speicherstelle der Floppy auslesen. Syntax:<br>
-            PRINT#fn,"M-R";CHR$(adl);CHR$ (adh);CHR$(n)<br>
-            adl = Low-Byte<br>
-            adh = High-Byte<br>
-            n = Anzahl (0 bis 255)</p>
+        <ol type="a">
+            <li>Der MEMORY-READ-Befehl (M-R):<br>
+                Dieser Befehl entspricht haargenau dem PEEK-Befehl in Basic. Mit ihm können Sie jede beliebige Speicherstelle der Floppy auslesen. Syntax:<br>
+                PRINT#fn,"M-R";CHR$(adl);CHR$ (adh);CHR$(n)<br>
+                adl = Low-Byte<br>
+                adh = High-Byte<br>
+                n = Anzahl (0 bis 255)
 
-        <p>Abgeholt werden die gelesenen Daten ebenfalls über den Kommandokanal mit GET#.<br>
-            Beispiel: Lesen der beiden ID-Zeichen im ASCII-Format der zuletzt initialisierten Diskette:<br>
-            10 OPEN15,8,15<br>
-            20 PRINT#15,"M-R"CHR$(18)CHR$ (0)CHR$(2)<br>
-            30 GET#15,A$,B$<br>
-            40 PRINTA$;B$</p>
-
-        <p>Diese Routine liest die Zero-Page Adressen 18 und 19, in denen die entsprechenden Werte gespeichert sind. In Tabelle 1 sind einige der wichtigsten Zero-Page Adressen aufgeführt.</p>
-
-        <p>b) Der MEMORYWRITE-Befehl (M-W):</p>
-
-        <p>Dieses Kommando kann als POKE-Befehl in den Floppy-Speicher angesehen werden. Die Syntax ist hier wie folgt:<br>
-            PRINT#fn,"M-W";CHR$(adl)CHR$ (adh)CHR$(n)CHR$(data1)CHR$(data2)&hellip;</p>
-
-        <p>c) Der MEMORY-EXECUTE-Befehl (M-E):</p>
-
-        <p>Auch dieser Befehl ist äquivalent zu einem Basic-Befehl, dem SYS-Befehl. Mit ihm kann man also ein Maschinenprogramm an einer beliebigen Stelle im Floppy-Speicher ausführen. Syntax:<br>
-            PRINT#fn,"M-E"CHR$(adl)CHR$(adh). Siehe auch Listing 7.</p>
+                <p>Abgeholt werden die gelesenen Daten ebenfalls über den Kommandokanal mit GET#.<br>
+                    Beispiel: Lesen der beiden ID-Zeichen im ASCII-Format der zuletzt initialisierten Diskette:<br>
+                    10 OPEN15,8,15<br>
+                    20 PRINT#15,"M-R"CHR$(18)CHR$ (0)CHR$(2)<br>
+                    30 GET#15,A$,B$<br>
+                    40 PRINTA$;B$</p>
+        
+                <p>Diese Routine liest die Zero-Page Adressen 18 und 19, in denen die entsprechenden Werte gespeichert sind. In Tabelle 1 sind einige der wichtigsten Zero-Page Adressen aufgeführt.</p>
+            </li>
+            <li>Der MEMORYWRITE-Befehl (M-W):<br>
+                Dieses Kommando kann als POKE-Befehl in den Floppy-Speicher angesehen werden. Die Syntax ist hier wie folgt:<br>
+                PRINT#fn,"M-W";CHR$(adl)CHR$ (adh)CHR$(n)CHR$(data1)CHR$(data2)&hellip;
+            </li>
+            <li>Der MEMORY-EXECUTE-Befehl (M-E):<br>
+                Auch dieser Befehl ist äquivalent zu einem Basic-Befehl, dem SYS-Befehl. Mit ihm kann man also ein Maschinenprogramm an einer beliebigen Stelle im Floppy-Speicher ausführen. Syntax:<br>
+                PRINT#fn,"M-E"CHR$(adl)CHR$(adh).<br>
+                Siehe auch Listing 7.
+            </li>
+        </ol>
 
         <h3>Die USER-Befehle</h3>
 

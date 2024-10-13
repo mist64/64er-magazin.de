@@ -24,9 +24,9 @@
         <p class="intro">Nachdem ich mir den Commodore 64 gekauft hatte, schnappte ich mir das Handbuch und fing an, in Basic zu programmieren. Wenn ich einmal versehentlich in eine Endlosschleife geriet, drückte ich die Run/StopTaste, und das Programm wurde unterbrochen, damit ich den Fehler beseitigen konnte — die Computerwelt war in Ordung!</p>
 
         <p>Doch wer den C 64 kennt, hat sich sicher schon an die Befehle PEEK und POKE versucht. Zum Beispiel:<br>
-            100 FOR I = 0TO999<br>
+            100 FOR I = 0 TO 999<br>
             110 POKE 1024 + I,0<br>
-            120 POKE55296 + I,0<br>
+            120 POK E55296 + I,0<br>
             130 NEXT I</p>
 
         <p>Dieses kleine Programm füllt den Bildschirm mit schwarzen Klammeraffen. Doch wehe, man hat in Zeile 100 statt 999 die leicht erweiterte Version 9999 stehen! Direkt hinter dem Bildschirmspeicher liegt der Basic-Benutzerspeicher. Bei solchen Fehlern frißt sich das Programm von selbst auf. Das Programm ist teilweise, wenn nicht ganz, zerstört. Der fortgeschrittene Programmierer macht sich sicher eines Tages Gedanken, wie er seine Programme durch versehentliches Drücken der Run/Stop-Taste schützen kann.</p>
@@ -34,12 +34,12 @@
         <p>Dieses ist besonders dann angebracht, wenn das fertige Programm von einem C 64-Unkundigen bedient werden soll.</p>
 
         <p>Dieses kleine Porgramm bewirkt Wunder:<br>
-            100 FOR I = 830TO834<br>
+            100 FOR I = 830 TO 834<br>
             110 READ A : POKE I,A : NEXT I<br>
             120 POKE 808,62 : POKE 809,3<br>
             130 DATA169,1,201,0,96</p>
 
-        <p>Weshalb? Im Betriebssystem gibt es ein Unterprogramm, welches die 8topp-Taste abfragt. Das Programm liegt zwischen 63213 ($ F6ED) und 63226 ($ F6FA). Die Anfangsadresse dieser Routine ist in den Speicherzellen 808 und 809 gespeichert; und zwar Low-Byte vor High-Byte. Nun wird diese Routine regelmäßig aufgerufen. Ist die Stopp-Taste gedrückt worden, so veranlaßt diese Routine — abgesehen von ein paar anderen Instruktionen —, daß das Zeroflag gesetzt wird. Wurde die Stopp-Taste aber nicht gedrückt, so löscht dieses Unterprogramm das Zeroflag. Wenn die Speicherzellen 808 und 809 so verändert werden, daß zu einer Routine gesprungen wird, die immer das Zeroflag löscht, dann wird nie das Drücken der Stopp-Taste erkannt. Dieses geschieht durch unser kleines Programm, welches eine Routine in den Kassettenpuffer schreibt.</p>
+        <p>Weshalb? Im Betriebssystem gibt es ein Unterprogramm, welches die Stopp-Taste abfragt. Das Programm liegt zwischen 63213 ($ F6ED) und 63226 ($ F6FA). Die Anfangsadresse dieser Routine ist in den Speicherzellen 808 und 809 gespeichert; und zwar Low-Byte vor High-Byte. Nun wird diese Routine regelmäßig aufgerufen. Ist die Stopp-Taste gedrückt worden, so veranlaßt diese Routine — abgesehen von ein paar anderen Instruktionen —, daß das Zeroflag gesetzt wird. Wurde die Stopp-Taste aber nicht gedrückt, so löscht dieses Unterprogramm das Zeroflag. Wenn die Speicherzellen 808 und 809 so verändert werden, daß zu einer Routine gesprungen wird, die immer das Zeroflag löscht, dann wird nie das Drücken der Stopp-Taste erkannt. Dieses geschieht durch unser kleines Programm, welches eine Routine in den Kassettenpuffer schreibt.</p>
 
         <p>Haben wir für kritische Programmteile die Stopp-Taste unterdrückt, können wir jene wieder durch den Befehl<br>
             200 POKE 808,237 : POKE 809,246<br>
@@ -104,11 +104,11 @@
 
         <p>Es soll zuerst der zweite Fall behandelt werden. Da das Betriebssystem (auch Kernal genannt) im ROM liegt, läßt es sich nicht ohne weiteres ändern. Deshalb wird es zuerst in das darunterliegende RAM kopiert. Dieses funktioniert folgendermaßen:<br>
             100 FOR I = 57344 TO 65535<br>
-            110 POKE I,PEEK(l)<br>
+            110 POKE I,PEEK(I)<br>
             120 NEXT I</p>
 
         <p>Nun könnte, durch Löschen des Bits 1 (High-RAM) in der Speicherzelle 0001, vom ROM auf RAM umgeschaltet werden:<br>
-            320 POKE I,PEEK(l) AND 253</p>
+            320 POKE I,PEEK(I) AND 253</p>
 
         <p>Durch das Löschen dieses Bits wird aber auch das Basic-ROM ausgeblendet. Also müssen wir dieses auch ins RAM kopieren:<br>
             200 FOR I=40960 TO 49151<br>
@@ -149,7 +149,7 @@
             <p>Das letzte Datum in Zeile 360 (Programm UNNEW) lautet 255.</p>
             <!-- 64'er 12/1984 -->
             <hr>
-            <p>Leider mußte ich feststellen, daß mir in den »Ebenen des Absturzess« ein kleiner Fehler unterlaufen ist.</p>
+            <p>Leider mußte ich feststellen, daß mir in den »Ebenen des Absturzes« ein kleiner Fehler unterlaufen ist.</p>
             <p>Nach Erkennen von »cbm 80« springt das Betriebssystem natürlich zu den Adressen $800 und $801, und nicht wie angegeben nach $802/803.</p>
             <p>Die Zeilen 100 und 130 sehen dann folgendermaßen aus:<br>
                 100 FOR I = 32768 TO 32778<br>

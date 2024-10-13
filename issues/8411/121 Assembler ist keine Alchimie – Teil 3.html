@@ -47,7 +47,7 @@
             1515 STX 0402<br>
             1518 BRK<br></p>
 
-        <p>Wenn Sie das kleine Programm mit G 1500 starten, dann sollten Sie in der linken oberen Ecke des Bildschirms ABA in schwarzer Schrift stehen haben. Was ist geschehen? Wir haben den Inhalt des Akku (= 0, also Farbcode für schwarz) in das Bildschirm-Farbregister geschrieben (#D800), dann den Inhalt des X-Registers (1 = POKE-Code für den Buchstaben A) in die erste Bildschirm-Speicherzelle (# 0400). Anschließend wurde das X-Register um 1 erhöht (2 = POKE-Code für den Buchstaben B) und dieser Inhalt in die zweite Bildschirmzelle geschrieben. Außerdem mußte natürlich auch dieser Bildschirm-Farbspeicherplatz mit dem Farbcode 0 belegt werden. Durch DEX wurde das X-Register wieder herunter gezählt, somit wieder ein A erzeugt und in die dritte Bildschirmstelle gedruckt.</p>
+        <p>Wenn Sie das kleine Programm mit G 1500 starten, dann sollten Sie in der linken oberen Ecke des Bildschirms ABA in schwarzer Schrift stehen haben. Was ist geschehen? Wir haben den Inhalt des Akku (= 0, also Farbcode für schwarz) in das Bildschirm-Farbregister geschrieben (#D800), dann den Inhalt des X-Registers (1 = POKE-Code für den Buchstaben A) in die erste Bildschirm-Speicherzelle (#0400). Anschließend wurde das X-Register um 1 erhöht (2 = POKE-Code für den Buchstaben B) und dieser Inhalt in die zweite Bildschirmzelle geschrieben. Außerdem mußte natürlich auch dieser Bildschirm-Farbspeicherplatz mit dem Farbcode 0 belegt werden. Durch DEX wurde das X-Register wieder herunter gezählt, somit wieder ein A erzeugt und in die dritte Bildschirmstelle gedruckt.</p>
 
         <p>Sie haben sicher schon bemerkt, daß man auf diese Weise Abläufe mitzählen kann. Soll zum Beispiel ein Vorgang 20 mal wiederholt werden, dann packt man ins X-Register (oder ins Y-Register oder in eine andere Speicherstelle) den Anfangswert 0, läßt den Computer eine Arbeit ausführen, erhöht das entsprechende Register oder die Speicherzelle um 1 mit INX, INY oder INC, prüft dann, ob dieser Inhalt schon 20 geworden ist und so weiter. Wie man diese Prüfung vornimmt, dazu kommen wir erst später bei den BRANCH-Befehlen. Das ist also ähnlich wie im Basic bei den FOR&hellip;NEXT-Schleifen: Dort wird eine Variable als Zähler verwendet, hier ein Register (oder eine Speicherstelle). Ebenso wie im Basic bei diesen Schleifen kann man auch hier rückwärts zählen mit DEX, DEY oder DEC. Das hat oft gewisse Vorzüge, was uns aber noch nicht kümmern soll.</p>
 
@@ -55,7 +55,7 @@
         <table  border="0">
         <tr> 
            <td>dez. 255 =</td>
-           <td>bin. 1111 1111</td>
+           <td>bin. 1111&nbsp;1111</td>
         </tr>
         <tr align="right"> 
            <td>+1</td>
@@ -63,11 +63,11 @@
         </tr>
         <tr> 
            <td>&nbsp;</td>
-           <td>---------------+</td>
+           <td>–––––––––––––– +</td>
         </tr>
         <tr>
         <td>ergibt:</td>
-           <td>(1) 0000 0000</td>
+           <td>(1)&nbsp;0000&nbsp;0000</td>
         </tr>
         </table>
 
@@ -75,17 +75,71 @@
             1500 LDA #01<br>
             1502 BRK</p>
 
-        <p>Das soll uns die Register zunächst mal im Ausganszustand zeigen. Nach G 1500 werden sie angezeigt:<br>
-            AC XR YR N V- BDI ZC<br>
-            01 00 00 0 0 1 10 000</p>
+        <p>Das soll uns die Register zunächst mal im Ausganszustand zeigen. Nach G 1500 werden sie angezeigt:</p>
+
+        <table>
+            <tr>
+                <td>AC</td>
+                <td>XR</td>
+                <td>YR</td>
+                <td>N</td>
+                <td>V</td>
+                <td>-</td>
+                <td>B</td>
+                <td>D</td>
+                <td>I</td>
+                <td>Z</td>
+                <td>C</td>
+            </tr>
+            <tr>
+                <td>01</td>
+                <td>00</td>
+                <td>00</td>
+                <td>0</td>
+                <td>0</td>
+                <td>1</td>
+                <td>1</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+            </tr>
+        </table>
 
         <p>Im Akku steht jetzt die dort eingeladene 1. Nun wollen wir das X-Register laden mit 255 (also $FF). Dazu ändern wir das Programm:<br>
             1502 LDX #FF<br>
             1504 BRK</p>
 
-        <p>Nach erneutem G 1500 zeigen die Register:<br>
-            AC XR YR N V- BDI ZC<br>
-            01 FF 00 1 0 110 000</p>
+        <p>Nach erneutem G 1500 zeigen die Register:</p>
+
+        <table>
+            <tr>
+                <td>AC</td>
+                <td>XR</td>
+                <td>YR</td>
+                <td>N</td>
+                <td>V</td>
+                <td>-</td>
+                <td>B</td>
+                <td>D</td>
+                <td>I</td>
+                <td>Z</td>
+                <td>C</td>
+            </tr>
+            <tr>
+                <td>01</td>
+                <td>FF</td>
+                <td>00</td>
+                <td>1</td>
+                <td>0</td>
+                <td>1</td>
+                <td>1</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+            </tr>
+        </table>
 
         <p>Im X-Register steht nun die Zahl $FF. Bei den Flaggen hat sich die N-Flagge (die negative Zahlen anzeigen soll) auf 1 geschaltet!</p>
 
@@ -93,17 +147,71 @@
             1504 INX<br>
             1505 BRK</p>
 
-        <p>Der Start mit G 1500 liefert uns die folgende Registeranzeige:<br>
-            AC XR YR N V- BDI ZC<br>
-            01 00 00 0 0 110 0 10</p>
+        <p>Der Start mit G 1500 liefert uns die folgende Registeranzeige:</p>
+
+        <table>
+            <tr>
+                <td>AC</td>
+                <td>XR</td>
+                <td>YR</td>
+                <td>N</td>
+                <td>V</td>
+                <td>-</td>
+                <td>B</td>
+                <td>D</td>
+                <td>I</td>
+                <td>Z</td>
+                <td>C</td>
+            </tr>
+            <tr>
+                <td>01</td>
+                <td>00</td>
+                <td>00</td>
+                <td>0</td>
+                <td>0</td>
+                <td>1</td>
+                <td>1</td>
+                <td>0</td>
+                <td>0</td>
+                <td>1</td>
+                <td>0</td>
+            </tr>
+        </table>
 
         <p>Wie erwartet, ist der Überlauf des X-Registers eingetreten: Es ist jetzt Null. Die N-Flagge hat ihren gewohnten Wert 0 wieder angenommen und die Z-Flagge, die uns anzeigt, ob die letzte Operation eine Null erzeugt hat, ist jetzt gesetzt. Bei weiterem Hochzählen verschwindet die Z-Flagge wieder:<br>
             1505 INX<br>
             1506 BRK</p>
+            
+        <p>G 1500 liefert den Registerinhalt:</p>
 
-        <p>G 1500 liefert den Registerinhalt:<br>
-            AC XR YR N V- BDI ZC<br>
-            01 01 00 0 0 1 10 000</p>
+        <table>
+            <tr>
+                <td>AC</td>
+                <td>XR</td>
+                <td>YR</td>
+                <td>N</td>
+                <td>V</td>
+                <td>-</td>
+                <td>B</td>
+                <td>D</td>
+                <td>I</td>
+                <td>Z</td>
+                <td>C</td>
+            </tr>
+            <tr>
+                <td>01</td>
+                <td>01</td>
+                <td>00</td>
+                <td>0</td>
+                <td>0</td>
+                <td>1</td>
+                <td>1</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+            </tr>
+        </table>
 
         <p>Das gleiche passiert bei Verwendung des Y-Registers als Zähler, wie Sie leicht durch Austauschen aller auf X bezogenen Befehle feststellen können. Sehr nett ist es, diesen Befehlsablauf einmal für den INC-Befehl auf die Speicherstelle $0400 (Bildschirmspeicher links oben) bezogen ablaufen zu lassen. Wenn man darauf achtet, daß kein Hochscrollen des Bildschirms eintritt, kann man das Ergebnis außer in den Registern auch noch als Zeichen auf dem Bildschirm verfolgen. Der Beginn der Befehlsequenz ist dann sinnvollerweise:<br>
             1500 LDA #FF<br>
@@ -122,21 +230,56 @@
 
         <p>Zwischendurch möchte ich noch eine Bemerkung loswerden, die Sie als Trost auffassen sollen: Auch wenn wir später andere Zahlendarstellungen kennenlernen werden, es wird nicht so schwierig! Sogar so komplette Idioten wie Computer verstehen das, obwohl man ihnen alles haarklein vorkauen muß.</p>
 
-        <p>Wenden wir uns nun wieder den lächerlich einfachen BCD-Zahlen zu. Alle Zahlen von 0 bis 9 lassen sich binär mit nur 4 Bits ausdrücken:<br>
-            TODO<br>
-            Binär Dezimal<br>
-            0000 0<br>
-            0001 1<br>
-            0010 2<br>
-            0011 3<br>
-            0100 4<br>
-            0101 5<br>
-            0110 6<br>
-            0111 7<br>
-            1000 8<br>
-            1001 9</p>
+        <p>Wenden wir uns nun wieder den lächerlich einfachen BCD-Zahlen zu. Alle Zahlen von 0 bis 9 lassen sich binär mit nur 4 Bits ausdrücken:<p>
 
-        <p>Die weiteren Werte 1010 bis 1111 werden in der BCD-Codierung nicht benutzt. Liegt nun eine Dezimalzahl (zum Beispiel 12) vor, dann wird jede Stelle dieser Zahl (also die 1 und die 2) getrennt binär codiert. In unserem Beispiel mit der 12 wäre das dann 0001 für die 1 und 0010 für die 2. Somit ist die 12 im BCD-Code 0001 0010. Jede Ziffer erhält so ihr Nibble. Eine Zahl im BCD-Format hat deswegen keine feste Anzahl von Bytes, sondern die Byte-Zahl hängt von der Anzahl der Stellen ab. Die Zahl 1984 beispielsweise braucht 2 Bytes: 0001 1001 1000 0100.</p>
+        <table>
+            <tr>
+                <td>Binär</td>
+                <td>Dezimal</td>
+            </tr>
+            <tr>
+                <td>0000</td>
+                <td>0</td>
+            </tr>
+            <tr>
+                <td>0001</td>
+                <td>1</td>
+            </tr>
+            <tr>
+                <td>0010</td>
+                <td>2</td>
+            </tr>
+            <tr>
+                <td>0011</td>
+                <td>3</td>
+            </tr>
+            <tr>
+                <td>0100</td>
+                <td>4</td>
+            </tr>
+            <tr>
+                <td>0101</td>
+                <td>5</td>
+            </tr>
+            <tr>
+                <td>0110</td>
+                <td>6</td>
+            </tr>
+            <tr>
+                <td>0111</td>
+                <td>7</td>
+            </tr>
+            <tr>
+                <td>1000</td>
+                <td>8</td>
+            </tr>
+            <tr>
+                <td>1001</td>
+                <td>9</td>
+            </tr>
+        </table>
+
+        <p>Die weiteren Werte 1010 bis 1111 werden in der BCD-Codierung nicht benutzt. Liegt nun eine Dezimalzahl (zum Beispiel 12) vor, dann wird jede Stelle dieser Zahl (also die 1 und die 2) getrennt binär codiert. In unserem Beispiel mit der 12 wäre das dann 0001 für die 1 und 0010 für die 2. Somit ist die 12 im BCD-Code 0001 0010. Jede Ziffer erhält so ihr Nibble. Eine Zahl im BCD-Format hat deswegen keine feste Anzahl von Bytes, sondern die Byte-Zahl hängt von der Anzahl der Stellen ab. Die Zahl 1984 beispielsweise braucht 2 Bytes: 0001&nbsp;1001&nbsp;1000&nbsp;0100.</p>
 
         <p>Schwierig gestaltet sich das Rechnen mit diesen Zahlen wegen der sechs unbenutzten Codes. Aber auch da habe ich einen Trost für Sie: Wir werden damit nicht rechnen. Wozu das ganze dann, werden Sie sich fragen? Der Grund für das alles ist, daß BCD-Zahlen im Gegensatz zu den Zahlen mit festem Format (die sonst verwendet werden) so eingegeben und verarbeitet werden können, wie sie vorliegen. Das ist im kaufmännischen Bereich manchmal notwendig, wo eben 1000mal 0,1 Pfennige 1 Mark ergeben und Fehler unzulässig sind. Sollten Sie also vor dem Problem stehen, mit BCD-Zahlen rechnen zu müssen, grämen Sie sich nicht: Unser Prozessor kennt den Dezimalmodus. Er ist dann eingeschaltet, wenn die Dezimal-Flagge auf 1 gesetzt ist.</p>
 
@@ -150,56 +293,165 @@
 
         <p>Wie schon mal betont: Der Computer ist strohdumm. Er kann nicht einmal auf normale Weise voneinander abziehen! Deswegen geht er den komplizierten Weg: Er addiert eine negative Zahl. Nur: Wie sehen negative Binärzahlen aus? Wir werden diese Frage in drei Etappen beantworten.</p>
 
-        <p>a) Man könnte eine Flagge setzen, die 1 ist bei negativen und 0 bei positiven Zahlen. Bei einigen Fließkommazahlen wird das auch so gemacht. Hier aber setzt man die Flagge direkt in die Zahl ein: Bit 7 jeder Zahl ist jetzt ein Vorzeichenmerkmal. Wenn dieses Bit 0 ist, handelt es sich um eine positive, wenn es 1 ist, um eine negative Zahl. Auf diese Weise ist also +1 wie bisher 0000 0001, wohingegen —1 jetzt 1000 0001 hieße. Damit wird allerdings der Zahlenbereich, der durch ein Byte auszudrücken ist, verschoben. 255 = binär 1111 1111 kann so nicht mehr verwendet werden. Die größte Zahl, die jetzt ausgedrückt werden kann, ist 0111 1111 = dezimal 127. Die kleinste Zahl ist dann 1111 1111 = —127. Probieren wir mal aus, wie sich damit rechnen läßt:<br>
-            TODO<br>
-            + 10 0000 1010<br>
-            -6 1000 0110<br>
-            &mdash;&mdash;&mdash; +<br>
-            ergibt 1001 0000 = -16,<br>
-            was offensichtlich falsch ist, denn nach Adam Riese sollte + 4 herauskommen. So kann man also nicht rechnen!</p>
+        <ol type="a">
+            <li>Man könnte eine Flagge setzen, die 1 ist bei negativen und 0 bei positiven Zahlen. Bei einigen Fließkommazahlen wird das auch so gemacht. Hier aber setzt man die Flagge direkt in die Zahl ein: Bit 7 jeder Zahl ist jetzt ein Vorzeichenmerkmal. Wenn dieses Bit 0 ist, handelt es sich um eine positive, wenn es 1 ist, um eine negative Zahl. Auf diese Weise ist also +1 wie bisher 0000&nbsp;0001, wohingegen —1 jetzt 1000 0001 hieße. Damit wird allerdings der Zahlenbereich, der durch ein Byte auszudrücken ist, verschoben. 255 = binär 1111&nbsp;1111 kann so nicht mehr verwendet werden. Die größte Zahl, die jetzt ausgedrückt werden kann, ist 0111&nbsp;1111 = dezimal 127. Die kleinste Zahl ist dann 1111&nbsp;1111 = —127. Probieren wir mal aus, wie sich damit rechnen läßt:
 
-        <p>Man nennt diese Art der Zahlendarstellung, übrigens »signed binary«-Format, also in Deutsch: markierte Binärzahlen.<br>
-            b) Der nächste Schritt ist das sogenannte Einerkomplement. Dabei tritt für die positiven Zahlen keine Änderung ein. Die negativen entstehen aus den positiven durch Komplementbildung, das heißt jedes Bit der positiven Zahl wird in sein Gegenteil verkehrt, wie es das folgende Beispiel zeigen soll:<br>
-            0000 1100 ist +12,</p>
+            <table>
+                <tr>
+                    <td>+10</td>
+                    <td>0000&nbsp;1010</td>
+                </tr>
+                <tr>
+                    <td>–6</td>
+                    <td>1000&nbsp;0110</td>
+                </tr>
+                <tr>
+                    <td colspan="2">––––––––––– +</td>
+                </tr>
+            </table>
 
-        <p>dann ist das Einerkomplement:<br>
-            1111 0011 = -12.</p>
+            ergibt 1001&nbsp;0000 = –16,<br>
+            was offensichtlich falsch ist, denn nach Adam Riese sollte +4 herauskommen. So kann man also nicht rechnen!
+    
+            <p>Man nennt diese Art der Zahlendarstellung, übrigens »signed binary«-Format, also in Deutsch: markierte Binärzahlen.</p>
 
-        <h2>Komplement ist nicht kompliziert</h2>
+            </li>
 
-        <p>Interessanterweise taucht hier auch wieder das Merkmal der »signed binary«-Zahlen auf: die 1 in Bit 7 bei negativen Zahlen. Beschränkt man sich auf den Zahlenbereich, der für die »signed binary&lt;&lt;-Zahlen gültig war, dann hätten wir jetzt beide Darstellungsweisen miteinander vereint. Nun müssen wir natürlich noch feststellen, ob man so auch rechnen kann.<br>
-            + 8 0000 1000<br>
-            -6 1111 1001<br>
-            in Einerkomplementdarstellung<br>
-            &mdash;&mdash;&ndash; +<br>
-            ergibt(l) 0000 0001<br>
-            was 1 mit einem Übertrag ergäbe, jedenfalls nicht 2, wie’s sich gehört. Also ist auch die Einerkomplementdarstellung noch nicht das Gelbe vom Ei.<br>
-            c) Ich will Sie nicht länger auf die Folter spannen: Wenn man zum Einerkomplement einer Zahl noch 1 dazuzählt, erhält man das Zweierkomplement. Und genau so werden negative Zahlen in unserem Computer gehandhabt. Die positiven Zahlen bleiben unverändert. Von den negativen bildet man das Zweierkomplement wie zum Beispiel hier mit der Zahl -12:<br>
-            12 0000 1100<br>
-            normale Binärdarstellung<br>
-            (—12) 1111 0011 Einerkomplement<br>
-            + 1 0000 0001 addieren<br>
-            -12 11110100 Zweierkomplement</p>
+            <li>Der nächste Schritt ist das sogenannte Einerkomplement. Dabei tritt für die positiven Zahlen keine Änderung ein. Die negativen entstehen aus den positiven durch 
+                Komplementbildung, das heißt jedes Bit der positiven Zahl wird in sein Gegenteil verkehrt, wie es das folgende Beispiel zeigen soll:<br>
+                0000&nbsp;1100 ist +12,
 
-        <p>Jetzt wollen wir auch diese Zahlenart ausgiebig testen:</p>
+                <p>dann ist das Einerkomplement:<br>
+                    1111&nbsp;0011 = –12.</p>
 
-        <p>Wir rechnen nochmal 8-6:<br>
-            + 8 0000 1000<br>
-            —6 1111 1010 das ist -6 in der Zweierkomplementdarstellung.<br>
-            &mdash;&mdash;- + ergibt<br>
-            (1) 0000 0010..<br>
-            also 2 mit einem Übertrag, der ignoriert wird. Das Ergebnis ist richtig. Wenn bei einer solchen Rechnung eine negative Zahl herauskommt, ist sie nicht leicht zu erkennen. In solchen Fällen kehrt man das Vorzeichen um, indem man das Zweierkomplement berechnet. Das machen wir mal am Beispiel 5—6:<br>
-            + 5 0000 0101<br>
-            -6 1111 1010<br>
-            das ist wieder unser Zweierkomplement von 6, also —6<br>
-            &mdash;&mdash; +<br>
-            ergibt 1111 1111<br>
-            das ist —1 in der Zweierkomplementdarstellung. Zur Kontrolle nun die Vorzeichenumkehr durch Umrechnen ins Zweierkomplement:<br>
-            Einerkomplement davon 0000 0000<br>
-            plus 1 0000 0001<br>
-            &mdash;&mdash;- +<br>
-            ergibt 0000 0001<br>
-            also wie erwartet +1.</p>
+                <h2>Komplement ist nicht kompliziert</h2>
+        
+                <p>Interessanterweise taucht hier auch wieder das Merkmal der »signed binary«-Zahlen auf: die 1 in Bit 7 bei negativen Zahlen. Beschränkt man sich auf den Zahlenbereich, der für die »signed binary«-Zahlen gültig war, dann hätten wir jetzt beide Darstellungsweisen miteinander vereint. Nun müssen wir natürlich noch feststellen, ob man so auch rechnen kann.<br>
+
+                <table>
+                    <tr>
+                        <td>+8</td>
+                        <td>0000&nbsp;1000</td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td>–6</td>
+                        <td>1111&nbsp;1001</td>
+                        <td>in Einerkomplementdarstellung</td>
+                    </tr>
+                    <tr>
+                        <td colspan="2">–––––––––––––––––– +</td>
+                    </tr>
+                    <tr>
+                        <td>ergibt</td>
+                        <td>(1)&nbsp;0000&nbsp;0001</td>
+                        <td></td>
+                    </tr>
+                </table>
+
+                was 1 mit einem Übertrag ergäbe, jedenfalls nicht 2, wie's sich gehört. Also ist auch die Einerkomplementdarstellung noch nicht das Gelbe vom Ei.</p>
+            </li>
+
+            <li>Ich will Sie nicht länger auf die Folter spannen: Wenn man zum Einerkomplement einer Zahl noch 1 dazuzählt, erhält man das Zweierkomplement. Und genau so werden negative Zahlen in unserem Computer gehandhabt. Die positiven Zahlen bleiben unverändert. Von den negativen bildet man das Zweierkomplement wie zum Beispiel hier mit der Zahl –12:
+
+                <table>
+                    <tr>
+                        <td>12</td>
+                        <td>0000&nbsp;1100</td>
+                        <td>normale Binärdarstellung</td>
+                    </tr>
+                    <tr>
+                        <td>(–12)</td>
+                        <td>1111&nbsp;0011</td>
+                        <td>Einerkomplement</td>
+                    </tr>
+                    <tr>
+                        <td>+1</td>
+                        <td>0000&nbsp;0001</td>
+                        <td>addieren</td>
+                    </tr>
+                    <tr>
+                        <td colspan="2">–––––––––––––––</td>
+                    </tr>
+                    <tr>
+                        <td>(–12)</td>
+                        <td>1111&nbsp;0100</td>
+                        <td>Zweierkomplement</td>
+                    </tr>
+                </table>
+
+                <p>Jetzt wollen wir auch diese Zahlenart ausgiebig testen:</p>
+
+                <p>Wir rechnen nochmal 8-6:</p>
+
+                <table>
+                    <tr>
+                        <td>+8</td>
+                        <td>0000&nbsp;1000</td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td>–6</td>
+                        <td>1111&nbsp;1010</td>
+                        <td>das ist –6 in der Zweierkomplementdarstellung.</td>
+                    </tr>
+                    <tr>
+                        <td colspan="2">––––––––––––––––– +</td>
+                    </tr>
+                    <tr>
+                        <td>ergibt</td>
+                        <td>(1)&nbsp;0000&nbsp;0010</td>
+                        <td></td>
+                    </tr>
+                </table>
+
+                also 2 mit einem Übertrag, der ignoriert wird. Das Ergebnis ist richtig. Wenn bei einer solchen Rechnung eine negative Zahl herauskommt, ist sie nicht leicht zu erkennen. In solchen Fällen kehrt man das Vorzeichen um, indem man das Zweierkomplement berechnet. Das machen wir mal am Beispiel 5—6:
+
+                <table>
+                    <tr>
+                        <td>+5</td>
+                        <td>0000&nbsp;0101</td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td>–6</td>
+                        <td>1111&nbsp;1010</td>
+                        <td>das ist wieder unser Zweierkomplement von 6, also —6</td>
+                    </tr>
+                    <tr>
+                        <td colspan="2">–––––––––––––– +</td>
+                    </tr>
+                    <tr>
+                        <td>ergibt</td>
+                        <td>1111&nbsp;1111</td>
+                        <td></td>
+                    </tr>
+                </table>
+
+                das ist —1 in der Zweierkomplementdarstellung. Zur Kontrolle nun die Vorzeichenumkehr durch Umrechnen ins Zweierkomplement:
+
+                <table>
+                    <tr>
+                        <td>Einerkomplement davon</td>
+                        <td>0000&nbsp;0000</td>
+                    </tr>
+                    <tr>
+                        <td>plus 1</td>
+                        <td>0000&nbsp;0001</td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td>––––––– +</td>
+                    </tr>
+                    <tr>
+                        <td>ergibt</td>
+                        <td>0000&nbsp;0001</td>
+                    </tr>
+                </table>
+
+                also wie erwartet +1.
+            </li>
+        </ol>
 
         <p>Auf diese Weise rechnet unser Computer mit negativen Zahlen. Negative ganze Zahlen speichert er im Zweierkomplement-Format. Auch wenn wir nun etwas vorgreifen müssen, wollen wir uns das ansehen. Dazu schalten Sie am besten erst einmal den Computer aus und laden dann den SMON beziehungsweise ihren Assembler. Dann bauen wir ein kleines Basic-Programm:<br>
             10 A% = -12<br>
@@ -307,13 +559,13 @@
                         <td align="center">80</td>
                         <td align="center">FF</td>
                         <td align="center">F4</td>
-                        <td align="center">00 00 00</td>
+                        <td align="center">00&nbsp;00&nbsp;00</td>
                     </tr>
                     <tr>
-                        <td align="center">1100 0001</td>
-                        <td align="center">1000 0000</td>
-                        <td align="center">1111 1111</td>
-                        <td align="center">1111 0100</td>
+                        <td align="center">1100&nbsp;0001</td>
+                        <td align="center">1000&nbsp;0000</td>
+                        <td align="center">1111&nbsp;1111</td>
+                        <td align="center">1111&nbsp;0100</td>
                         <td align="center" rowspan="3">unbenutzt bei Integerzahlen</td>
                     </tr>
                     <tr>
@@ -322,7 +574,7 @@
                         <td align="center">LSB</td>
                     </tr>
                     <tr>
-                        <td align="center">0100 0001<br>≙ 65<br>Code für A</td>
+                        <td align="center">0100&nbsp;0001<br>≙ 65<br>Code für A</td>
                         <td align="center" valign="top">0000 0000</td>
                         <td align="center" colspan="2">von<br>-12</td>
                     </tr>
@@ -339,26 +591,52 @@
 
         <p>Zunächst einmal die Bytes $0814 und $0815: Hier wird der Variablenname und der -typ angegeben. Der Typ ist aus den Bits 7 zu erkennen. Sind beide (wie hier) gleich 1, dann handelt es sich um eine Integervariable (also eine ganze Zahl). Läßt man die Kennbits außer acht, zeigt sich, daß in $0814 der Code für den Buchstaben A steht und $0815 nur den Wert 0 enthält. Nun zum Rest: Der C 64 legt Integers in nur 2 Bytes ab — die restlichen 3 Bytes $0818 bis $081A bleiben unbenutzt. Das ist auch dann der Fall, wenn danach noch weitere Variable kommen. Es bringt also keine Speicherersparnis (VC 20-Benutzer aufgepaßt!), wenn man mit Ganzzahlvariablen arbeitet!</p>
 
-        <p>In $0817 steht $F4, welches binär ausgedrückt 1111 0100 ist. Das kennen wir noch von weiter oben als die —12 im Zweierkomplement-Format. Woher kommt $FF in Speicherzelle $0816? Wie gesagt, die Integers werden in 2 Bytes gespeichert, und wenn wir —12 in 16 Bits ausdrücken, dann sieht das so aus:<br>
-            + 12 0000 0000 0000 1100<br>
-            Einerkomplement:<br>
-            1111 1111 1111 0011<br>
-            plus 1<br>
-            0000 0000 0000 0001<br>
-            ergibt-12: 1111111111110100<br>
-            MSB LSB<br>
-            = $FF =$F4<br>
-            als 16-Bit-Zweierkomplement.</p>
+        <p>In $0817 steht $F4, welches binär ausgedrückt 1111&nbsp;0100 ist. Das kennen wir noch von weiter oben als die —12 im Zweierkomplement-Format. Woher kommt $FF in Speicherzelle $0816? Wie gesagt, die Integers werden in 2 Bytes gespeichert, und wenn wir —12 in 16 Bits ausdrücken, dann sieht das so aus:</p>
+
+        <table>
+            <tr>
+                <td>+12</td>
+                <td>0000&nbsp;0000</td><td>0000&nbsp;1100</td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>Einerkomplement:</td>
+                <td>1111&nbsp;1111</td><td>1111&nbsp;0011</td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>+1</td>
+                <td>0000&nbsp;0000</td><td>0000&nbsp;0001</td>
+                <td></td>
+            </tr>
+            <tr>
+                <td colspan="3">–––––––––––––––––––––––––––––––––––––</td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>ergibt –12</td>
+                <td>1111&nbsp;1111</td><td>1111&nbsp;0100</td>
+                <td>als 16-Bit-Zweierkomplement.</td>
+            </tr>
+            <tr>
+                <td></td>
+                <td>MSB=$FF</td>
+                <td>LSB=$F4</td>
+                <td></td>
+            </tr>
+
+            
+        </table>
 
         <p>Die größte positive ganze Zahl, die man in 2 Bytes ausdrücken kann, ist 32767, was binär<br>
-            0111 1111 1111 1111<br>
+            0111&nbsp;1111&nbsp;1111&nbsp;1111<br>
             ergibt. Die kleinste ist<br>
-            1000 0000 0000 0000<br>
+            1000&nbsp;0000&nbsp;0000&nbsp;0000<br>
             also —32768. Das ist der Grund dafür, daß der C 64 Integers größer als 32767 oder kleiner als —32767 dankend mit ILLEGAL QUANTITY ERROR ablehnt, wenn sie als Argument verwendet werden. (Die Zahl —32768 kann als Ergebnis von logischen Operationen durchaus auftauchen.)</p>
 
         <p>Damit will ich Sie für diesmal von den Zahlenspielereien erlösen. In der nächsten Folge müssen wir darauf nochmal zurückkommen. Sie können die Art des Abziehens von Zahlen durch Addieren des Zweierkomplementes bis zum nächsten Mal an weiteren Beispielen üben. Wenn Sie das mit 16-Bit-Zahlen tun, werden Sie bald feststellen, daß noch nicht alles so funktioniert wie es sollte&hellip;</p>
 
-        <p>Wir können jetzt übrigens auch das Rätsel lösen, weshalb bei positiven Zahlen (zum Beispiel LDA # FF) die Negativ-Flagge auf 1 geht: Die Flagge wird immer dann gezückt, wenn eine Zahl auftritt, die in Bit 7 eine 1 aufweist. Ganz einfach, gell?</p>
+        <p>Wir können jetzt übrigens auch das Rätsel lösen, weshalb bei positiven Zahlen (zum Beispiel LDA #FF) die Negativ-Flagge auf 1 geht: Die Flagge wird immer dann gezückt, wenn eine Zahl auftritt, die in Bit 7 eine 1 aufweist. Ganz einfach, gell?</p>
 
         <h3>Ein wirkungsvolles Zweiglein: BNE</h3>
 
@@ -405,8 +683,8 @@
                         <td rowspan="2">
                             <p><b>Byteanzahl</b>
                         </td>
-                        <td><b>Code</b></td>
-                        <td><b>Dauver in Taktzyklen</b></td>
+                        <td colspan="2"><b>Code</b></td>
+                        <td rowspan="2"><b>Dauver in Taktzyklen</b></td>
                         <td rowspan="2">
                             <p><b>Beeinflussung von Flaggen</b>
                         </td>
@@ -494,7 +772,7 @@
                         <td>D0</td>
                         <td>208</td>
                         <td>2<br>+1 bei Verzweigung<br>+ 2 bei Überschreiten einer Seitengrenze</td>
-                        <td></td>
+                        <td>–</td>
                     </tr>
                 </tbody>
             </table>

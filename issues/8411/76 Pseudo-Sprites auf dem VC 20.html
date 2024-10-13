@@ -37,19 +37,19 @@
         <table>
             <tbody>
                 <tr>
-                    <td>4608 — 5119</td>
+                    <td>4608&nbsp;—&nbsp;5119</td>
                     <td>Sprite-Control-Block (SCB), wird später erklärt</td>
                 </tr>
                 <tr>
-                    <td>5120 — 6143</td>
+                    <td>5120&nbsp;—&nbsp;6143</td>
                     <td>freidefinierbarer Zeichensatz, die ersten 128 Zeichen, stehen zur freien Verfügung</td>
                 </tr>
                 <tr>
-                    <td>6144 — 7167</td>
+                    <td>6144&nbsp;—&nbsp;7167</td>
                     <td>freidefinierbarer Zeichensatz, die zweiten 128 Zeichen, werden vom Programm zur Erstellung der 9 Sprites gebraucht und stehen somit nicht zur freien Verfügung</td>
                 </tr>
                 <tr>
-                    <td>7168 — 8191</td>
+                    <td>7168&nbsp;—&nbsp;8191</td>
                     <td>Maschinenspracheprogramm, Beschreibung siehe Text</td>
                 </tr>
             </tbody>
@@ -76,7 +76,7 @@
 
         <p>Außerdem werden die Zeichen, die später auf dem Bildschirm von den Sprites verdeckt werden, mit in die Umdefinier-Matrix hineinkopiert. So entsteht der Eindruck, daß die Sprites wirklich über die Zeichen wandern. Beim späteren Löschen werden die verdeckten Zeichen wieder hergestellt. Wie funktioniert das nun?</p>
 
-        <p>Im Speicher ab dezimal 4608 ist 9mal (für jedes Sprite einer) der sogenannte Sprite-Control-Block (SCB) eingerichtet. Er hat die Aufgabe, die momentane X- und Y-Position, die Farbe des Sprites, den Bildschirmmodus (gesetzt/gelöscht) des Sprites, die durch die Umdefinier-Matrixverdeckten 9 Zeichen und Farben zwischenzuspeichern:</p>
+        <p>Im Speicher ab dezimal 4608 ist 9mal (für jedes Sprite einer) der sogenannte Sprite-Control-Block (SCB) eingerichtet. Er hat die Aufgabe, die momentane X- und Y-Position, die Farbe des Sprites, den Bildschirmmodus (gesetzt/gelöscht) des Sprites, die durch die Umdefinier-Matrix verdeckten 9 Zeichen und Farben zwischenzuspeichern:</p>
 
         <table>
             <tbody>
@@ -85,7 +85,7 @@
                     <td>Bildschirmcode der verdeckten Zeichen</td>
                 </tr>
                 <tr>
-                    <td>Byte 9 - 17</td>
+                    <td>Byte 9 — 17</td>
                     <td>Farbcode der verdeckten Zeichen</td>
                 </tr>
                 <tr>
@@ -133,7 +133,7 @@
         <p>Konkret wird das Programm (Listing 1) nun folgendermaßen bedient: Vor dem Laden oder Eingeben wird POKE 44,32:POKE 8192,0:NEW eingetippt. Ist nun das Maschinenspracheprogramm im Speicher, kann es mit einem Monitorprogramm auch noch einmal abgespeichert werden. Später muß man es nur noch mit LOAD »name«, 1,1 laden.</p>
 
         <p>Die Bedienung:<br>
-            Sind die Sprites definiert. muß dem Maschinenspracheprogramm mitgeteilt werden, wo der Zeichensatz liegt, den es verwalten soll. Das geschieht mit den Befehlen POKE 677, Lowbyte:POKE 678, Highbyte, in unserem Fall also POKE 677,0:POKE 678,20, da der Zeichensatz auf der Adresse 5120 beginnt.</p>
+            Sind die Sprites definiert, muß dem Maschinenspracheprogramm mitgeteilt werden, wo der Zeichensatz liegt, den es verwalten soll. Das geschieht mit den Befehlen POKE 677, Lowbyte:POKE 678, Highbyte, in unserem Fall also POKE 677,0:POKE 678,20, da der Zeichensatz auf der Adresse 5120 beginnt.</p>
 
         <p>Soll nun ein Sprite auf den Bildschirm, muß zuerst einmal in Adresse 683 die Spritenummer gePOKEt werden (Achtung, keine Zahl über 8 angeben, da sich das Programm dann selbst zerstören könnte). Schließlich werden in Adresse 673 die X-Koordinate (maximal 159) und 674 die Y-Koordinate (maximal 167) gesetzt. Dann kann das Programm mit SYS 8021 sofort aufgerufen und auf dem Bildschirm das Sprite betrachtet werden, vorausgesetzt man hat vorher mit POKE 36869,205 auf den freidefinierbaren Zeichensatz geschaltet.</p>
 
