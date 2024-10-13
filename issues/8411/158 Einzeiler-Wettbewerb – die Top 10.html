@@ -21,7 +21,7 @@
 
         <h1>Einzeiler-Wettbewerb – die Top 10</h1>
 
-        <p>Wir wußten gar nicht, was auf uns zukommen sollte, als die Idee zum Einzeiler-Wettbewerb geboren war. Täglich gingen zirka 20 bis 40 Einzeiler bei uns ein. Und diese Flut hat noch kein Ende.</p>
+        <p class="intro">Wir wußten gar nicht, was auf uns zukommen sollte, als die Idee zum Einzeiler-Wettbewerb geboren war. Täglich gingen zirka 20 bis 40 Einzeiler bei uns ein. Und diese Flut hat noch kein Ende.</p>
 
         <p>Man glaubt gar nicht, wie interessant manche Einzeiler sind. Hier werden Probleme in eine Zeile gesteckt, bei denen manche Programmierer etliche KByte benötigen. Ein Beispiel ist das Mini-Orgel-Programm. Vielleicht finden Sie, daß hier mit einem Trick gearbeitet wurde, aber Einzeiler ist Einzeiler. Sehr viele Programme lassen sich nur eingeben, wenn die Abkürzungen der Basic-Befehle benutzt werden. Sie stehen im Anhang D Ihres C 64 Handbuches. Doch schauen Sie sich die folgenden Mini-Programme an, von denen man sagen kann: Klein — aber oho! Jedes von ihnen wird deshalb mit 100 Mark honoriert.</p>
 
@@ -45,8 +45,27 @@
             Zum Starten:<br>
             OPEN 1,8,2,”$”:GOTO 0</p>
 
-        <p>Beschreibung<br>
-            TODO</p>
+        <figure>
+            <table>
+                <tr>
+                    <td>OPEN 1,8,2,"$"</td>
+                    <td>eröffnet eine sequentielle Datei (hier das Directory) zum Lesen.</td>
+                </tr>
+                <tr>
+                    <td>GET#1,A$</td>
+                    <td>holt ein Byte vom Disketten-Puffer (Buffer)</td>
+                </tr>
+                <tr>
+                    <td>A=ASC(A$+"SHIFT/HOME")</td>
+                    <td>wandelt ASCII-Zeichen nach Zahl (von 0-255). Wenn A$ eine Länge von 0 hat, gibt es keine Fehlermeldung, da der Ausdruck trotzdem eine Länge von 1 behält.</td>
+                </tr>
+                <tr>
+                    <td>PRINT CHR$((A=130 AND 13 OR ((31&lt;A AND A&lt;95) AND A)));</td>
+                    <td>druckt für A das zugehörige Zeichen, wenn sich A zwischen 32 und 95 bewegt. Wenn A=130 ist, wird Return ausgegeben. Durch die Formel innerhalb der Characterstring-Klammer werden alle Steuerzeichen und Grafiksymbole »herausgefiltert«. Es bleiben dann nur die Zahlen, Buchstaben und Satzzeichen, die ausgedruckt werden.</td>
+                </tr>
+            </table>
+            <figcaption>Beschreibung</figcaption>
+        </figure>
 
         <p><strong>Weitere Anwendungen:</strong></p>
 
@@ -72,16 +91,16 @@
 
         <address class="author">(Jens Baas)</address>
 
-        <p>DI-AS, ein grafischer Disassembler für C 64</p>
+        <h3>DI-AS, ein grafischer Disassembler für C 64</h3>
 
         <figure>
             <pre data-filename="einz.ram-pages" data-name="Einzeiler: DI-AS" data-range="5"></pre>
         </figure>
 
-        <p>Der Speicherbereich des C 64 läßt sich in 256 Seiten (Pages) ä 256 Byte aufteilen. DI-AS interpretiert die Speicherinhalte als Bildschirmcode und stellt die 64 KByte des C 64 Seite für Seite auf den Zeilen 7-13 des Bildschirms dar. Die Seitennummer wird am oberen Bildschirmrand angezeigt.<br>
+        <p>Der Speicherbereich des C 64 läßt sich in 256 Seiten (Pages) à 256 Byte aufteilen. DI-AS interpretiert die Speicherinhalte als Bildschirmcode und stellt die 64 KByte des C 64 Seite für Seite auf den Zeilen 7-13 des Bildschirms dar. Die Seitennummer wird am oberen Bildschirmrand angezeigt.<br>
             Die Bedienung:</p>
 
-        <p>Bevor das Programm geladen und gestartet wird, muß mit SYS64738 unbedingt ein Reset durchgeführt werden, da sonst möglicherweise die Zeiger der Zeropage nicht korrekt initialisiert werden. Es empfiehlt sich, den Bildschirm mit CLR zu löschen, um dieÜbersichtlichkeit zu erhöhen.<br>
+        <p>Bevor das Programm geladen und gestartet wird, muß mit SYS64738 unbedingt ein Reset durchgeführt werden, da sonst möglicherweise die Zeiger der Zeropage nicht korrekt initialisiert werden. Es empfiehlt sich, den Bildschirm mit CLR zu löschen, um die Übersichtlichkeit zu erhöhen.<br>
             Das Programm wird mit RUN gestartet.<br>
             Dem Benutzer stehen nun folgende Optionen offen:</p>
 
@@ -203,7 +222,7 @@
             Als erstes Beispiel soll ein Programm von 20 000 — 22 000 unter dem Namen »BEISPIEL 1« auf Diskette gespeichert werden.<br>
             SYS(57812)"BEISPIEL 1”, 8:POKE193,32:POKE194,78:POKE 174,241:POKE175,85:SYS62957<br>
             Als zweites Beispiel soll ein Programm von $C000 — $C37E unter dem Namen ’’BEISPIEL 2” auf Kassette gespeichert werden.<br>
-            SYS(57812)”BEISPIEL 2",1:POKE193,0:POKE194,192:POKE174, 127:POKE175,195:SYS62957<br>
+            SYS(57812)”BEISPIEL 2",1:POKE193,0:POKE194,192:POKE174,127:POKE175,195:SYS62957<br>
             Falls der Einzeiler infolge eines längeren Programm-Namens zu lang werden sollte, können die POKE-Befehle selbstverständlich durch P, Shift O abgekürzt werden.</p>
 
         <address class="author">(Markus Eicher)</address>
@@ -214,7 +233,7 @@
             <pre data-filename="einz.microsound" data-name="Einzeiler: Microsound" data-range="1"></pre>
         </figure>
 
-        <p>Um in Basic ein Maschinenspracheprogramm einzulesen, schreibt man normalerweise einen Basic-Lader, der in einer FOR/NEXT-Schleife mehrere DATAs einliest und in einen freien Speicherbereich POKEt, um dann das Programm mit SYS zu starten. Da diese Befehle und die DATAs sehr viel Platz benötigen, können so in einer Zeile kaum umfangreiche Programme geschrieben werden. Deshalb haben wir eine Möglichkeit entwickelt, den Basic-Lader zu umgehen: Wir PRIN-Ten das Maschinenspracheprogramm in die erste Bildschirmzeile und starten das Programm mit SYS 1024. Mit diesem Trick ist es uns gelungen, ein Programm von 45 Maschinesprachebytes in einer Basic-Zeile zu laden und zu starten.</p>
+        <p>Um in Basic ein Maschinenspracheprogramm einzulesen, schreibt man normalerweise einen Basic-Lader, der in einer FOR/NEXT-Schleife mehrere DATAs einliest und in einen freien Speicherbereich POKEt, um dann das Programm mit SYS zu starten. Da diese Befehle und die DATAs sehr viel Platz benötigen, können so in einer Zeile kaum umfangreiche Programme geschrieben werden. Deshalb haben wir eine Möglichkeit entwickelt, den Basic-Lader zu umgehen: Wir PRINTen das Maschinenspracheprogramm in die erste Bildschirmzeile und starten das Programm mit SYS 1024. Mit diesem Trick ist es uns gelungen, ein Programm von 45 Maschinesprachebytes in einer Basic-Zeile zu laden und zu starten.</p>
 
         <p>Das Programm »MICROSOUND« ist das, unseres Wissens, kürzeste Heimcomputerorgelprogramm der Welt. Es ist 86 Basic-Bytes lang und erzeugt ein Maschinenspracheprogramm von 45 Byte. Davon werden 14 Byte für Grafik-Effekte und 3 Byte für eine Programmende-Abfrage genutzt. Da der Einzeiler bereits beim geringsten Tippfehler nicht mehr richtig funktioniert, haben wir zum Vergleich den normalen Basic-Lader und das Monitor-Listing mit Erklärungen beigefügt.</p>
 
@@ -227,7 +246,7 @@
         <ol>
             <li>Schalten Sie vor der Eingabe durch SHIFT/COMM. auf Kleinschrift.</li>
             <li>Geben Sie ? statt print und sY4(Pfeil n. oben)5 statt sys1O24 ein und verzichten Sie auf unnötige Leerzeichen.</li>
-            <li>SPACEs bitte ohne COMM. oder SHIFT-Tasten zu drücken eingeben. Ausnahme: Das letzte SPACE muß ein SHIFT/SPA-CE sein.</li>
+            <li>SPACEs bitte ohne COMM. oder SHIFT-Tasten zu drücken eingeben. Ausnahme: Das letzte SPACE <strong>muß</strong> ein SHIFT/SPACE sein.</li>
             <li>Achten Sie genau auf Groß- und Kleinschreibung! Das Programm kann beim kleinsten Tippfehler abstürzen!</li>
         </ol>
 

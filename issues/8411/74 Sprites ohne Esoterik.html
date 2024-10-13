@@ -45,7 +45,7 @@
             <figcaption>Bild 1. Videosignal einer Rasterzeile</figcaption>
         </figure>
 
-        <p>40 µs der Rasterzeile werden für das eigentliche Bild benützt. Bei der Taktfrequenz (desVIC) von zirka8MHz ergeben sich 512 Punkte auf der ganzen Rasterzeile, was mit der horizontalen Auflösung der Positionen der Sprites übereinstimmt. Aus den 64 µs ergibt sich eine Zeilenfrequenz von 15625 Hz, die für das unangenehme Pfeifen verantwortlich ist, das man bei jedem Bildschirm hören kann, sofern man noch gute Ohren hat. Das horizontale Scrolling ist übrigens sehr einfach zu verwirklichen. Statt dem ganzen Bild wird kurzerhand der Synchronisationsimpuls und das durch den Rand gebildete »Fenster« verschoben.</p>
+        <p>40 µs der Rasterzeile werden für das eigentliche Bild benützt. Bei der Taktfrequenz (des VIC) von zirka 8 MHz ergeben sich 512 Punkte auf der ganzen Rasterzeile, was mit der horizontalen Auflösung der Positionen der Sprites übereinstimmt. Aus den 64 µs ergibt sich eine Zeilenfrequenz von 15&nbsp;625 Hz, die für das unangenehme Pfeifen verantwortlich ist, das man bei jedem Bildschirm hören kann, sofern man noch gute Ohren hat. Das horizontale Scrolling ist übrigens sehr einfach zu verwirklichen. Statt dem ganzen Bild wird kurzerhand der Synchronisationsimpuls und das durch den Rand gebildete »Fenster« verschoben.</p>
 
         <p>Das vertikale Format ist folgendermaßen aufgebaut:<br>
             4 Zeilen Schwarz, damit man den Strahlrücklauf nicht sieht<br>
@@ -79,10 +79,13 @@
 
         <p>Das Farb-RAM wird vom VIC parallel zum normalen RAM gelesen. Der VIC hat also einen 12-Bit-Datenbus.</p>
 
-        <p>Zum Lesen der Videomatrix ist keine Zeit mehr übrig. Deswegen muß der VIC regelmäßig die CPU anhalten, um die Daten lesen zu können. Durch dieses »Kaltstellen« wird der Prozessor natürlich verlangsamt. Damit die CPU nur um etwa zehn Prozent und nicht um die Hälfte verlangsamt wird, hat der VIC intern Puffer für die Video- und Farbdaten der aktuellen Zeile. Daraus ergibt sich die auf Bild 3 gezeigte Reihenfolge der Zugriffe:<br>
-            a) Letzte Rasterzeile der vorherigen Zeile: Die CPU wird angehalten, in die Puffer werden die Daten für die neue Zeile gelesen.<br>
-            b) Während den sieben ersten Rasterzeilen der neuen Zeile wird die CPU nicht angehalten.<br>
-            a) Wieder von vorn.</p>
+        <p>Zum Lesen der Videomatrix ist keine Zeit mehr übrig. Deswegen muß der VIC regelmäßig die CPU anhalten, um die Daten lesen zu können. Durch dieses »Kaltstellen« wird der Prozessor natürlich verlangsamt. Damit die CPU nur um etwa zehn Prozent und nicht um die Hälfte verlangsamt wird, hat der VIC intern Puffer für die Video- und Farbdaten der aktuellen Zeile. Daraus ergibt sich die auf Bild 3 gezeigte Reihenfolge der Zugriffe:</p>
+
+        <ol type="a">
+            <li>Letzte Rasterzeile der vorherigen Zeile: Die CPU wird angehalten, in die Puffer werden die Daten für die neue Zeile gelesen.</li>
+            <li>Während den sieben ersten Rasterzeilen der neuen Zeile wird die CPU nicht angehalten.</li>
+            <li>Wieder von vorn.</li>
+        </ol>
 
         <figure>
             <img src="74-3.png" alt="">
@@ -103,7 +106,7 @@
 
         <figure>
             <img src="74-4.png" alt="">
-            <figcaption>Bild 4. Schema der Sprite/Bildlogik (stark vereinfacht</figcaption>
+            <figcaption>Bild 4. Schema der Sprite/Bildlogik (stark vereinfacht)</figcaption>
         </figure>
 
         <p>Die Spritedaten werden in einen Puffer gelesen. Ein Zähler gibt die Nummer der aktuellen Rasterspalte, also die X-Koordinate, an. Davon wird die X-Koordinate der Sprites abgezogen, und man erhält eine auf den »Ursprung« des Sprites bezogene Koordinate. Die Ausdehnung von Sprites in der X-Richtung ist sehr einfach: Die Koordinate wird einfach durch zwei geteilt (in Binärsystem sehr einfach: rechts schieben). Das gleiche geschieht übrigens auch bei der Ausdehnung von Sprites in der Y-Richtung. Ein Multiplexer gibt das, durch die so erhaltene Koordinate, gewählte Bit (oder Bitpaar bei mehrfarbigen Sprites) aus. Falls die Koordinate nicht im Bereich des Sprites liegt, gibt der Multiplexer einfach den Wert für »Sprite transparent« — also 0 — aus.</p>
