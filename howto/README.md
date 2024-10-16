@@ -6,8 +6,8 @@ This is my process of scanning an issue. It'll result in about 160-180 GB of dat
 
 * An A3 flatbed scanner that can do 2400 dpi. I use a "VIISAN VF3240".
 * A macOS computer (min 16 GB RAM) with the built-in Image Capture app. (I tried both Windows and Linux, and both apps/drivers crash/fail when trying to scan A4 at 2400 dpi.)
-* A black A3 sheet of construction paper.
-* Another sheet of A3 construction paper of any color.
+* A A3 sheet of **black** construction paper.
+* Another sheet of A3 construction paper (any color).
 
 ### Taking the Issue Apart
 
@@ -85,9 +85,11 @@ Every now and then you should open a file and check that it contains the full pa
 	* The first rectangle starts from the very top of the preview area and goes 1 cm below the divider of the two pages.
 	* The second rectangle starts from 1 cm above the divider of the two pages to the very bottom of the preview area.
 
+![](imagecapture.png)
+
 Every scan operation will do the to pages separately and create two files. The reason for this is that an A3 image at 2400 dpi exceeds the maximum file size of TIFF (2 GB). (PNGs would be below 2 GB because of the compression, but the compression step after each sheet would slow down scanning.)
 
-The VF3240 will turn itself off after 10 minutes of inactivity.
+The VF3240 will turn itself off after 10 minutes of inactivity:
 * Image Capture might now recognize it when you turn the scanner back on, so you may have to restart Image Capture.
 * You will have re-do the following setup
 	* Set "Scan To" to the folder for your issue (it might show the correct folder, but due to a bug in Image Capture, it may save the files in a different folder anyway unless you manually select it again)
