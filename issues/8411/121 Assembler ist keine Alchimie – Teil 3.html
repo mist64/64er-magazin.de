@@ -33,25 +33,26 @@
 
         <h2>Befehle zum Zählen</h2>
 
-        <p>Das umgekehrte leisten die Befehle DEX, DEY und DEC. Sie bedeuten nämlich »decrement X-Register«, also »zähle das X-Register um eins herunter«, beziehungsweise das Y-Register oder — bei DEC — die angegebene Speicherstelle. Für die Adressierungsart und die Anzahl Bytes pro Befehl gilt hier das gleiche wie für die INX&hellip;-Befehle. Sehen wir uns das an einem kleinen Beispiel an: Bitte lesen Sie sich dazu die Bedienungshinweise zum SMON durch.</p>
-
-        <p><br>1500 LDA #00<br>
-            1502 LDX #01<br>
-            1504 STA D800<br>
-            1507 STX 0400<br>
-            150A INX<br>
-            150B STA D801<br>
-            150E STX 0401<br>
-            1511 DEX<br>
-            1512 STA D802<br>
-            1515 STX 0402<br>
-            1518 BRK<br></p>
+        <p>Das umgekehrte leisten die Befehle DEX, DEY und DEC. Sie bedeuten nämlich »decrement X-Register«, also »zähle das X-Register um eins herunter«, beziehungsweise das Y-Register oder — bei DEC — die angegebene Speicherstelle. Für die Adressierungsart und die Anzahl Bytes pro Befehl gilt hier das gleiche wie für die INX&hellip;-Befehle. Sehen wir uns das an einem kleinen Beispiel an: Bitte lesen Sie sich dazu die Bedienungshinweise zum SMON durch.
+            <code>1500 LDA #00
+                1502 LDX #01
+                1504 STA D800
+                1507 STX 0400
+                150A INX
+                150B STA D801
+                150E STX 0401
+                1511 DEX
+                1512 STA D802
+                1515 STX 0402
+                1518 BRK
+            </code>
+        </p>
 
         <p>Wenn Sie das kleine Programm mit G 1500 starten, dann sollten Sie in der linken oberen Ecke des Bildschirms ABA in schwarzer Schrift stehen haben. Was ist geschehen? Wir haben den Inhalt des Akku (= 0, also Farbcode für schwarz) in das Bildschirm-Farbregister geschrieben (#D800), dann den Inhalt des X-Registers (1 = POKE-Code für den Buchstaben A) in die erste Bildschirm-Speicherzelle (#0400). Anschließend wurde das X-Register um 1 erhöht (2 = POKE-Code für den Buchstaben B) und dieser Inhalt in die zweite Bildschirmzelle geschrieben. Außerdem mußte natürlich auch dieser Bildschirm-Farbspeicherplatz mit dem Farbcode 0 belegt werden. Durch DEX wurde das X-Register wieder herunter gezählt, somit wieder ein A erzeugt und in die dritte Bildschirmstelle gedruckt.</p>
 
         <p>Sie haben sicher schon bemerkt, daß man auf diese Weise Abläufe mitzählen kann. Soll zum Beispiel ein Vorgang 20 mal wiederholt werden, dann packt man ins X-Register (oder ins Y-Register oder in eine andere Speicherstelle) den Anfangswert 0, läßt den Computer eine Arbeit ausführen, erhöht das entsprechende Register oder die Speicherzelle um 1 mit INX, INY oder INC, prüft dann, ob dieser Inhalt schon 20 geworden ist und so weiter. Wie man diese Prüfung vornimmt, dazu kommen wir erst später bei den BRANCH-Befehlen. Das ist also ähnlich wie im Basic bei den FOR&hellip;NEXT-Schleifen: Dort wird eine Variable als Zähler verwendet, hier ein Register (oder eine Speicherstelle). Ebenso wie im Basic bei diesen Schleifen kann man auch hier rückwärts zählen mit DEX, DEY oder DEC. Das hat oft gewisse Vorzüge, was uns aber noch nicht kümmern soll.</p>
 
-        <p>Wenn wir diese Befehle als Zähler verwenden, sollten wir im Auge behalten, daß eine Speicherstelle (auch ein X- oder Y-Register) Zahlen nur von 0 bis 255 enthalten kann. Die höchste 8-Bit-Zahl ist ja:<br>
+        <p>Wenn wir diese Befehle als Zähler verwenden, sollten wir im Auge behalten, daß eine Speicherstelle (auch ein X- oder Y-Register) Zahlen nur von 0 bis 255 enthalten kann. Die höchste 8-Bit-Zahl ist ja:
         <table  border="0">
         <tr> 
            <td>dez. 255 =</td>
@@ -71,9 +72,11 @@
         </tr>
         </table>
 
-        <p>Wenn wir also über 255 hinauszählen, ergibt sich wieder 0 und so weiter, weil ein Überlauf stattgefunden hat. Das 9.Bit paßt nicht mehr in das Byte hinein. Um nochmal genau sehen zu können, was unser Computer da tut, probieren Sie einmal aus:<br>
-            1500 LDA #01<br>
-            1502 BRK</p>
+        <p>Wenn wir also über 255 hinauszählen, ergibt sich wieder 0 und so weiter, weil ein Überlauf stattgefunden hat. Das 9.Bit paßt nicht mehr in das Byte hinein. Um nochmal genau sehen zu können, was unser Computer da tut, probieren Sie einmal aus:
+            <code>1500 LDA #01
+                1502 BRK
+            </code>
+        </p>
 
         <p>Das soll uns die Register zunächst mal im Ausganszustand zeigen. Nach G 1500 werden sie angezeigt:</p>
 
@@ -106,9 +109,11 @@
             </tr>
         </table>
 
-        <p>Im Akku steht jetzt die dort eingeladene 1. Nun wollen wir das X-Register laden mit 255 (also $FF). Dazu ändern wir das Programm:<br>
-            1502 LDX #FF<br>
-            1504 BRK</p>
+        <p>Im Akku steht jetzt die dort eingeladene 1. Nun wollen wir das X-Register laden mit 255 (also $FF). Dazu ändern wir das Programm:
+            <code>1502 LDX #FF
+                1504 BRK
+            </code>
+        </p>
 
         <p>Nach erneutem G 1500 zeigen die Register:</p>
 
@@ -143,9 +148,11 @@
 
         <p>Im X-Register steht nun die Zahl $FF. Bei den Flaggen hat sich die N-Flagge (die negative Zahlen anzeigen soll) auf 1 geschaltet!</p>
 
-        <p>Nun wollen wir das X-Register über 255 hinauszählen. Wir verändern das Programm nochmal:<br>
-            1504 INX<br>
-            1505 BRK</p>
+        <p>Nun wollen wir das X-Register über 255 hinauszählen. Wir verändern das Programm nochmal:
+            <code>1504 INX
+                1505 BRK
+            </code>
+        </p>
 
         <p>Der Start mit G 1500 liefert uns die folgende Registeranzeige:</p>
 
@@ -178,9 +185,11 @@
             </tr>
         </table>
 
-        <p>Wie erwartet, ist der Überlauf des X-Registers eingetreten: Es ist jetzt Null. Die N-Flagge hat ihren gewohnten Wert 0 wieder angenommen und die Z-Flagge, die uns anzeigt, ob die letzte Operation eine Null erzeugt hat, ist jetzt gesetzt. Bei weiterem Hochzählen verschwindet die Z-Flagge wieder:<br>
-            1505 INX<br>
-            1506 BRK</p>
+        <p>Wie erwartet, ist der Überlauf des X-Registers eingetreten: Es ist jetzt Null. Die N-Flagge hat ihren gewohnten Wert 0 wieder angenommen und die Z-Flagge, die uns anzeigt, ob die letzte Operation eine Null erzeugt hat, ist jetzt gesetzt. Bei weiterem Hochzählen verschwindet die Z-Flagge wieder:
+            <code>1505 INX
+                1506 BRK
+            </code>
+        </p>
             
         <p>G 1500 liefert den Registerinhalt:</p>
 
@@ -213,10 +222,12 @@
             </tr>
         </table>
 
-        <p>Das gleiche passiert bei Verwendung des Y-Registers als Zähler, wie Sie leicht durch Austauschen aller auf X bezogenen Befehle feststellen können. Sehr nett ist es, diesen Befehlsablauf einmal für den INC-Befehl auf die Speicherstelle $0400 (Bildschirmspeicher links oben) bezogen ablaufen zu lassen. Wenn man darauf achtet, daß kein Hochscrollen des Bildschirms eintritt, kann man das Ergebnis außer in den Registern auch noch als Zeichen auf dem Bildschirm verfolgen. Der Beginn der Befehlsequenz ist dann sinnvollerweise:<br>
-            1500 LDA #FF<br>
-            1502 STA 0400<br>
-            1505 BRK</p>
+        <p>Das gleiche passiert bei Verwendung des Y-Registers als Zähler, wie Sie leicht durch Austauschen aller auf X bezogenen Befehle feststellen können. Sehr nett ist es, diesen Befehlsablauf einmal für den INC-Befehl auf die Speicherstelle $0400 (Bildschirmspeicher links oben) bezogen ablaufen zu lassen. Wenn man darauf achtet, daß kein Hochscrollen des Bildschirms eintritt, kann man das Ergebnis außer in den Registern auch noch als Zeichen auf dem Bildschirm verfolgen. Der Beginn der Befehlsequenz ist dann sinnvollerweise:
+            <code>1500 LDA #FF
+                1502 STA 0400
+                1505 BRK
+            </code>
+        </p>
 
         <p>Im folgenden setzt man dann anstelle von INX immer INC 0400 ein.</p>
 
@@ -326,7 +337,7 @@
 
                 <h2>Komplement ist nicht kompliziert</h2>
         
-                <p>Interessanterweise taucht hier auch wieder das Merkmal der »signed binary«-Zahlen auf: die 1 in Bit 7 bei negativen Zahlen. Beschränkt man sich auf den Zahlenbereich, der für die »signed binary«-Zahlen gültig war, dann hätten wir jetzt beide Darstellungsweisen miteinander vereint. Nun müssen wir natürlich noch feststellen, ob man so auch rechnen kann.<br>
+                <p>Interessanterweise taucht hier auch wieder das Merkmal der »signed binary«-Zahlen auf: die 1 in Bit 7 bei negativen Zahlen. Beschränkt man sich auf den Zahlenbereich, der für die »signed binary«-Zahlen gültig war, dann hätten wir jetzt beide Darstellungsweisen miteinander vereint. Nun müssen wir natürlich noch feststellen, ob man so auch rechnen kann.
 
                 <table>
                     <tr>
@@ -453,14 +464,17 @@
             </li>
         </ol>
 
-        <p>Auf diese Weise rechnet unser Computer mit negativen Zahlen. Negative ganze Zahlen speichert er im Zweierkomplement-Format. Auch wenn wir nun etwas vorgreifen müssen, wollen wir uns das ansehen. Dazu schalten Sie am besten erst einmal den Computer aus und laden dann den SMON beziehungsweise ihren Assembler. Dann bauen wir ein kleines Basic-Programm:<br>
-            10 A% = -12<br>
-            20 END</p>
+        <p>Auf diese Weise rechnet unser Computer mit negativen Zahlen. Negative ganze Zahlen speichert er im Zweierkomplement-Format. Auch wenn wir nun etwas vorgreifen müssen, wollen wir uns das ansehen. Dazu schalten Sie am besten erst einmal den Computer aus und laden dann den SMON beziehungsweise ihren Assembler. Dann bauen wir ein kleines Basic-Programm:
+            <code>10 A% = -12
+                20 END
+            </code>
+        </p>
 
         <h2>Wie Variable im Speicher stehen</h2>
 
-        <p>Noch nicht RUN eingeben! Zuerst schalten Sie den Maschinensprachmonitor ein und wir sehen uns das Programm so an, wie es im Speicher steht. Der Basic-Speicher des C 64 beginnt im Normalfall bei $0800. Wir geben also den Monitorbefehl<br>
-            M 0800</p>
+        <p>Noch nicht RUN eingeben! Zuerst schalten Sie den Maschinensprachmonitor ein und wir sehen uns das Programm so an, wie es im Speicher steht. Der Basic-Speicher des C 64 beginnt im Normalfall bei $0800. Wir geben also den Monitorbefehl
+            <code>M 0800</code>
+        </p>
 
         <p>Uns genügen schon die Speicherplätze bis $081C. Nun sehen wir das nackte Basic-Programm im Speicher, so wie es uns C. Sauer in seinem Artikel »Der gläserne VC 20, Teil 1« im 64'er, Ausgabe 9/84 auf Seite 156 beschrieben hat.</p>
 
@@ -649,14 +663,16 @@
             <figcaption>Bild 3. Flußdiagramm zur Verzögerungsschleife</figcaption>
         </figure>
 
-        <p>Das Progrämmchen dazu:<br>
-            1500 LDX #FF<br>
-            1502 LDY #FF<br>
-            1504 DEY<br>
-            1505 BNE 1504<br>
-            1507 DEX<br>
-            1508 BNE 1502<br>
-            150A BRK</p>
+        <p>Das Progrämmchen dazu:
+            <code>1500 LDX #FF
+                1502 LDY #FF
+                1504 DEY
+                1505 BNE 1504
+                1507 DEX
+                1508 BNE 1502
+                150A BRK
+            </code>
+        </p>
 
         <p>Zunächst einmal werden das X- und das Y-Register als Zähler initialisiert (also mit einem Ausgangswert geladen). Mit dem vorhin behandelten Befehl DEY wird dann das Y-Register um 1 heruntergezählt, was jetzt $FE ergibt. Für die Nullflagge (Z) bedeutet das den Inhalt 0, denn es liegt kein Grund vor, sie zu setzen (also eine 1 dort anzuzeigen), weil noch keine Null aufgetreten ist. Bei der nachfolgenden Prüfung durch BNE wird also eine Verzweigung nach 1504 das Ergebnis sein, worauf das Y-Register weiter verringert und dann die Z-Flagge erneut geprüft wird und so weiter. Das geht so lange, bis nun wirklich endlich die Null im Y-Register erreicht ist. In diesem Fall zählt DEX nun das X-Register herunter und der nächste BNE-Befehl führt zum Sprung nach 1502, wo das Y-Register wieder auf $FF gesetzt wird. Auf diese Weise wird die äußere Schleife 255mal und die innere 65025mal durchlaufen.</p>
 

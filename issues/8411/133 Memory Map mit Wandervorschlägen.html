@@ -118,10 +118,14 @@
 
         <p>Hand aufs Herz: Haben Sie USR schon einmal benützt? Ohne Zweifel gehört dieser Befehl zu den seltenen. Ich will ihn daher hier kurz erläutern. USR hat dieselbe Funktion wie SYS, nämlich aus einem Basic-Programm direkt in ein Maschinenprogramm zu springen und dort solange weiterzufahren, bis mit dem Befehl RTS (entspricht dem Basic-Befehl RETURN) in das Basic-Programm zurückgesprungen wird. Die Sprungadresse in das Maschinenprogramm steht bei SYS gleich hinter dem Befehl.</p>
 
-        <p>Bei USR muß die Adresse zuerst in die Speicherzellen 1 und 2 (aha!!) gePOKEt werden.<br>
-            Beispiel — Sprung auf 56524 ($DCCC):<br>
-            mit SYS: SYS 56524<br>
-            mit USR: POKE 1,204:POKE 2,220:X = USR(Y)</p>
+        <p>Bei USR muß die Adresse zuerst in die Speicherzellen 1 und 2 (aha!!) gePOKEt werden.</p>
+            
+        <p class="noindent">Beispiel — Sprung auf 56524 ($DCCC):</p>
+
+        <ul class="plain">
+            <li>mit SYS: SYS 56524<br></li>
+            <li>mit USR: POKE 1,204:POKE 2,220:X = USR(Y)</li>
+        </ul>
 
         <p>Kein Wunder, daß USR selten benützt wird. Aber erstens ist er durch das POKEn der Low-High-Byte-Darstellung aufgebläht und zweitens hat er auch wesentlich mehr Fähigkeiten als SYS.</p>
 
@@ -129,19 +133,25 @@
 
         <p>Mit USR kann man also Variable ins Maschinenprogramm zur Bearbeitung und zurück transferieren — und das ist der Unterschied zum SYS-Befehl. Ich möchte das an einem kleinen Beispiel demonstrieren. Statt allerdings ein Maschinenprogramm selbst zu schreiben, verwende ich, beziehungsweise springe ich, auf eine Routine des Betriebssystems, welches Werte des FAC 1 für mathematische Operationen verwendet.</p>
 
-        <p>Als mathematische Operation wähle ich das eingebaute Programm für INT, welches im VC 20 ab Speicherzelle 56524 ($DCCC) steht (im C 64 steht es ab 48332 ($BCCC)). Dieses wollen wir verwenden:<br>
+        <p>Als mathematische Operation wähle ich das eingebaute Programm für INT, welches im VC 20 ab Speicherzelle 56524 ($DCCC) steht (im C 64 steht es ab 48332 ($BCCC)).</p>
+
+        <p class="noindent">Dieses wollen wir verwenden:<br>
             In Zeile 10 definieren wir einen Wert für die Variable X, der in das Maschinenprogramm gebracht werden soll. Mit Zeile 20 bringen wir die Startadresse des Maschinenprogramms in die Speicherzellen 1 und 2.</p>
 
         <p>Laut Kochrezept teilen wir die Adresse 56524 auf in ein Low-Byte = 204 und ein High-Byte = 220.</p>
 
-        <p>Der Befehl in Zeile 30 löst den ganzen USR-Vorgang aus, Zeile 40 gibt uns das Resultat.<br>
-            10 Y = 14.35<br>
-            20 POKE 1,204:POKE 2,220<br>
-            30 X = USR(Y)<br>
-            40 PRINT X<br>
-            Hinweis:<br>
-            Entsprechend der anderen Adresse 48332 lautet die Zeile 20 beim C64:<br>
-            20 POKE 785,204:POKE 786,188</p>
+        <p>Der Befehl in Zeile 30 löst den ganzen USR-Vorgang aus, Zeile 40 gibt uns das Resultat.
+            <code>10 Y = 14.35
+                20 POKE 1,204:POKE 2,220
+                30 X = USR(Y)
+                40 PRINT X
+            </code>
+        </p>
+
+        <p class="noindent">Hinweis:<br>
+            Entsprechend der anderen Adresse 48332 lautet die Zeile 20 beim C64:
+            <code>20 POKE 785,204:POKE 786,188</code>
+        </p>
 
         <p>Nach RUN erhalten wir das Resultat 14, wie das Gesetz für INT es befiehlt. Natürlich hätten wir gleich PRINT INT (14.35) schreiben können, aber ich wollte ja nur demonstrieren. Der eigentliche Wert des USR-Befehls kommt hauptsächlich bei selbtgeschriebenen Maschinenprogrammen zum Zuge.</p>
 
@@ -178,8 +188,9 @@
             <li>Bit auf 1 = Ausgang</li>
         </ul>
     
-        <p>Beim Einschalten schreibt das Betriebssystem in dieses Register die Dualzahl ..101111 (dezimal = 47). Das heißt also, daß nur die Leitung Nummer 4 als Eingang verwendet wird, alle anderen aber als Ausgang. Warum das so ist, sehen wir gleich. Vorher will ich aber noch erwähnen, daß im C 64 von dieser Flexibilität des Mikroprozessor-Ports kein Gebrauch gemacht wird. Ich habe das ganze Betriebssystem durchgesehen, aber das einzige Mal, wo die Speicherzelle 0 angesprochen wird, ist eben bei der Einschaltroutine.<br>
-        Das heißt aber nicht, daß Sie, lieber Hobby-Programmierer, darauf verzichten müssen. Ich kann mir vorstellen, daß besonders Ausgefuchste unter Ihnen durch POKEn eines anderen Bitmusters in die Speicherzelle 0 vielseitige Befehle erzeugen und einsetzen können.</p>
+        <p class="noindent">Beim Einschalten schreibt das Betriebssystem in dieses Register die Dualzahl ..101111 (dezimal = 47). Das heißt also, daß nur die Leitung Nummer 4 als Eingang verwendet wird, alle anderen aber als Ausgang. Warum das so ist, sehen wir gleich. Vorher will ich aber noch erwähnen, daß im C 64 von dieser Flexibilität des Mikroprozessor-Ports kein Gebrauch gemacht wird. Ich habe das ganze Betriebssystem durchgesehen, aber das einzige Mal, wo die Speicherzelle 0 angesprochen wird, ist eben bei der Einschaltroutine.</p>
+
+        <p class="noindent">Das heißt aber nicht, daß Sie, lieber Hobby-Programmierer, darauf verzichten müssen. Ich kann mir vorstellen, daß besonders Ausgefuchste unter Ihnen durch POKEn eines anderen Bitmusters in die Speicherzelle 0 vielseitige Befehle erzeugen und einsetzen können.</p>
 
         <p>Das wird besonders deutlich, wenn Sie jetzt sehen, mit welchen Teilen des Computers diese sechs Leitungen verbunden sind.</p>
 
@@ -300,28 +311,37 @@
 
         <p>Wie Sie durch PRINT PEEK (1) selbst leicht feststellen, steht nach dem Einschalten des Computers im Register 1 die Zahl 55. In dualer Darstellung ist das 110111. Das entspricht dem oben genannten »Normalzustand« der einzelnen Bits.</p>
 
-        <p>Vergleichen Sie es bitte mit der Auflistung am Anfang der Beschreibung der Speicherzelle 1. Die in Tabelle 2 dargestellten Bits sind also die rechten drei Bits der Zelle 1. Lassen wir die Bits 3, 4 und 5 unverändert, ergeben die acht Kombinationen der Tabelle 2 die Zahlen 55 bis 48. Durch den Befehl POKE 1,54 können wir nun den Basic-Übersetzer ausschalten und 8 KByte Speicher gewinnen. Nur nutzt uns das nicht viel, denn was tun — ohne Basic! Es gibt aber doch eine Anwendung. Zuvor will ich Ihnen aber noch beweisen, daß wir tatsächlich den Block A auf RAM umschalten. Der Trick besteht darin, den Basic-Übersetzer vom ROM in den darunter liegenden RAM umzuladen. Wenn er tatsächlich inRAM steht, müßten wir ihn durch POKEn verändern können zu einem Privat-Basic. Geben Sie direkt ein:<br>
-            FORJ = 40960 TO 49151: POKE J, PEEK(J):<br>
-            NEXTJ<br>
-            POKE J,PEEK(J)—das sieht dümmer aus als es ist. Die »Doppeldecker-Speicher« erlauben nämlich ein PEEKen nur aus dem ROM-Bereich. Ein hineinPOKEn dagegen geht nur in den RAM-Teil. Von dort aber kann er — wie gerade gesagt — nicht herausgelesen werden, es sei denn, wir schalten um !</p>
+        <p>Vergleichen Sie es bitte mit der Auflistung am Anfang der Beschreibung der Speicherzelle 1. Die in Tabelle 2 dargestellten Bits sind also die rechten drei Bits der Zelle 1. Lassen wir die Bits 3, 4 und 5 unverändert, ergeben die acht Kombinationen der Tabelle 2 die Zahlen 55 bis 48. Durch den Befehl POKE 1,54 können wir nun den Basic-Übersetzer ausschalten und 8 KByte Speicher gewinnen. Nur nutzt uns das nicht viel, denn was tun — ohne Basic! Es gibt aber doch eine Anwendung. Zuvor will ich Ihnen aber noch beweisen, daß wir tatsächlich den Block A auf RAM umschalten. Der Trick besteht darin, den Basic-Übersetzer vom ROM in den darunter liegenden RAM umzuladen. Wenn er tatsächlich inRAM steht, müßten wir ihn durch POKEn verändern können zu einem Privat-Basic. Geben Sie direkt ein:
+            <code>FORJ = 40960 TO 49151: POKE J, PEEK(J):
+                NEXTJ
+            </code>
+        </p>
 
-        <p>Merken Sie was? Die Zeile oben liest also den Inhalt des Basic-ROMs und schreibt ihn in den RAM mit identischen Adressen. Die Ausführung der Zeile braucht einige Zeit. Wenn der Cursor wieder blinkt, schalten wir den RAM ein mit:<br>
-            POKE 1,54</p>
+        <p class="noindent">POKE J,PEEK(J)—das sieht dümmer aus als es ist. Die »Doppeldecker-Speicher« erlauben nämlich ein PEEKen nur aus dem ROM-Bereich. Ein hineinPOKEn dagegen geht nur in den RAM-Teil. Von dort aber kann er — wie gerade gesagt — nicht herausgelesen werden, es sei denn, wir schalten um !</p>
+
+        <p>Merken Sie was? Die Zeile oben liest also den Inhalt des Basic-ROMs und schreibt ihn in den RAM mit identischen Adressen. Die Ausführung der Zeile braucht einige Zeit. Wenn der Cursor wieder blinkt, schalten wir den RAM ein mit:
+            <code>POKE 1,54</code>
+        </p>
 
         <p>Wir merken natürlich noch keinen Unterschied, denn das RAM-Basic ist ja noch dasselbe, wie es im ROM steht.</p>
 
-        <p>Doch nun werden wir es verändern. In der Speicherzelle 41220 steht das »P« für den Befehl PRINT mit dem ASCII-Codewert 80. Dieses P ersetzen wir durch ein »G« (ASCII-Code = 71).<br>
-            POKE 41220,71<br>
-            Versuchen Sie bitte, mit dem (nicht durch »?« abgekürzten) PRINT-Befehl ein Zeichen auf den Bildschirm zu drucken. Es wird Ihnen nicht gelingen, denn der Befehl heißt jetzt:<br>
-            GRINT ”A”<br>
-            was beweist, daß das Basic jetzt in RAM steht. Das Umdefinieren von Befehlen ist natürlich wenig sinnvoll. Aber wer die Maschinenprogramme des Basic kennt, kann sie auf diese Weise ändern, erweitern, einschränken, solange er sich auf in sich geschlossene Teile beschränkt.</p>
+        <p>Doch nun werden wir es verändern. In der Speicherzelle 41220 steht das »P« für den Befehl PRINT mit dem ASCII-Codewert 80. Dieses P ersetzen wir durch ein »G« (ASCII-Code = 71).
+            <code>POKE 41220,71</code>
+            Versuchen Sie bitte, mit dem (nicht durch »?« abgekürzten) PRINT-Befehl ein Zeichen auf den Bildschirm zu drucken. Es wird Ihnen nicht gelingen, denn der Befehl heißt jetzt:
+            <code>GRINT ”A”</code>
+            was beweist, daß das Basic jetzt in RAM steht. Das Umdefinieren von Befehlen ist natürlich wenig sinnvoll. Aber wer die Maschinenprogramme des Basic kennt, kann sie auf diese Weise ändern, erweitern, einschränken, solange er sich auf in sich geschlossene Teile beschränkt.
+        </p>
 
-        <p>Eine inzwischen oft zitierte Anwendung stammt von Jim Butterfield (siehe Literatur), den es begreiflicherweise stört, daß der Befehl ASC, welcher den ASCII-Code eines Strings erzeugt, bei einem Null-String das Programm mit ILLEGAL QUANTITY ERROR beendet.<br>
-            Versuchen Sie es:<br>
-            PRINT ASC("A") ergibt die Zahl 65. PRINT ASC("") hat die obige Fehlermeldung zur Folge.<br>
-            Wenn Basic im RAM steht, können wir das ändern:<br>
-            POKE 46991,5<br>
-            Die Wiederholung des Befehls PRINT ASC("") ergibt jetzt 0 — und, was das Wichtige ist, das Programm läuft weiter.</p>
+        <p>Eine inzwischen oft zitierte Anwendung stammt von Jim Butterfield (siehe Literatur), den es begreiflicherweise stört, daß der Befehl ASC, welcher den ASCII-Code eines Strings erzeugt, bei einem Null-String das Programm mit ILLEGAL QUANTITY ERROR beendet.</p>
+
+        <p class="noindent">Versuchen Sie es:<br>
+            PRINT ASC("A") ergibt die Zahl 65. PRINT ASC("") hat die obige Fehlermeldung zur Folge.
+        </p>
+
+        <p class="noindent">Wenn Basic im RAM steht, können wir das ändern:
+            <code>POKE 46991,5</code>
+            Die Wiederholung des Befehls PRINT ASC("") ergibt jetzt 0 — und, was das Wichtige ist, das Programm läuft weiter.
+        </p>
 
         <p>Durch zusätzliches Umladen des Speicherblocks E und anschließendes Umschalten mit POKE1,53 ist auch das Betriebssystem veränderbar — ein weites Feld für fortgeschrittene Programmierer in Maschinensprache.</p>
 
@@ -334,21 +354,24 @@
         <p>Bit 3, 4 und 5 regeln wie schon gesagt den Betrieb des Kassettenrecorders.<br>
             Zu <strong>Bit 3</strong> ist oben schon alles notwendige gesagt.<br>
             <strong>Bit 4</strong> ist im Normalzustand auf 1, »normal« heißt hier, solange keine der Motor-Tasten der Datasette (PLAY, REWIND, FAST FORWARD) gedrückt ist.<br>
-            Zur Probe:<br>
-            10 X = PEEK(1)<br>
-            20 PRINT X<br>
-            40 GOTO 10
+            Zur Probe:
+            <code>10 X = PEEK(1)
+                20 PRINT X
+                40 GOTO 10
+            </code>
         </p>
 
         <h2>Betrieb des Kassettenrecorders</h2>
 
         <p>Die schon erwähnte »Normalzahl« 55 (dual = 110111) läuft als Zahlenband solange, bis eine der besagten Tasten gedrückt wird. Dann läuft eine 7 (dual = 000111). Warum auch Bit 5 zu 0 wird, kommt gleich nachher zur Sprache.</p>
 
-        <p>Mit einer kleinen Erweiterung der drei Zeilen können Sie in einem Programm den Status der Motor-Tasten abfragen. Ergänzen Sie:<br>
-            30 IFX = 7 THEN 50<br>
-            50 PRINT »TASTE GEDRÜCKT«<br>
-            Um nur Bit 5 abzufragen, schreiben wir besser:<br>
-            30 IF (X AND 16) = 0 THEN 50</p>
+        <p>Mit einer kleinen Erweiterung der drei Zeilen können Sie in einem Programm den Status der Motor-Tasten abfragen. Ergänzen Sie:
+            <code>30 IFX = 7 THEN 50
+                50 PRINT »TASTE GEDRÜCKT«
+                Um nur Bit 5 abzufragen, schreiben wir besser:
+                30 IF (X AND 16) = 0 THEN 50
+            </code>
+        </p>
 
         <p>Diese Abfrage kann allerdings nicht unterscheiden, welche der drei Tasten der Datasette gedrückt worden ist. Außerdem funktioniert das alles nur, wenn — wie im »Normalfall« — das Bit 4 des Datenrichtungsregister (Speicherzelle 0) auf 0 (Eingang) steht.</p>
 
@@ -356,15 +379,17 @@
 
         <p>Die Tasten der Datasette werden nämlich 60mal in der Sekunde abgefragt. Wenn keine Taste gedrückt ist, setzt das Betriebssystem sowohl das sogenannte »Interlock«-Register in Speicherzelle 192 auf 0 als auch Bit 5 der Zelle 1 auf 1, wodurch der Motor ausgeschaltet wird beziehungsweise bleibt. Da kann man nicht dagegen an. Wir haben nur eine Chance, wenn eine Taste bereits gedrückt ist und der Kassettenmotor schon läuft.</p>
 
-        <p>Dann nämlich können wir zuerst das Interlock-Register mit einem Wert größer als 0 lahmlegen:<br>
-            POKE 192,255<br>
-            Jetzt läßt sich der Motor der Datasette mit Bit 5 steuern:<br>
-            POKE 1,39 beziehungsweise<br>
-            POKE 1,PEEK(1) OR 32<br>
-            schaltet den Motor aus,<br>
-            POKE 1,7 beziehungsweise<br>
-            POKE 1,PEEK(1) AND 31<br>
-            schaltet den Motor ein.</p>
+        <p>Dann nämlich können wir zuerst das Interlock-Register mit einem Wert größer als 0 lahmlegen:
+            <code>POKE 192,255</code>
+            Jetzt läßt sich der Motor der Datasette mit Bit 5 steuern:
+            <code>POKE 1,39 beziehungsweise
+                POKE 1,PEEK(1) OR 32
+                schaltet den Motor aus,
+                POKE 1,7 beziehungsweise
+                POKE 1,PEEK(1) AND 31
+            </code>
+            schaltet den Motor ein.
+        </p>
 
         <p>Das Interlock-Register in Speicherzelle 192 werde ich später noch einmal erwähnen, da es seine Funktion auch beim VC 20 ausübt, allerdings mit anderen Ein/Ausgangs-Ports. Das ist alles, was zur Speicherzelle 1 zu sagen ist. Das nächste Mal wird unsere Speicherreise weitergehen, wobei natürlich nicht alle Speicherzellen soviel hergeben beziehungsweise dem Programmierer so direkt zur Verfügung stehen, wie die Adressen 0 und 1.</p>
 
