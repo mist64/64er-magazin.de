@@ -189,7 +189,287 @@
         <div class="binary_download" data-filename="interrupt.masch..prg" data-name="Rasterzeilen-Interrupt"></div>
 
         <figure>
-            TODO
+            <!--
+                Eingetippt von goloMAK. Der verwendete Assembler ist vermutlich
+                PROFI-ASS 64, siehe Diskussion https://www.forum64.de/index.php?thread/145873-64er-magazin-monatlich-online/&pageNo=27
+            -->
+            <pre>                        R A S T E R Z E I L E N - I N T E R R U P T
+
+                       %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+                          Ein Demo-Programm fuer den COMMODORE 64
+
+         von Helmut Welke, Moehnestrasse 26, 5760 Arnsberg 1, Telefon (02932) 23627
+
+                                ***** ASSEMBLERLISTING *****
+
+pass 2
+30:    c000                   .opt p1,oo
+                       ;
+50:    c000                   *=   $c000   ;startadresse 49152
+                       ;
+100:   c000           clear   =    $e544   ;bildschirm loeschen
+110:   c000           icr     =    $dc00+13 ;interrupt-control-register
+120:   c000           irmask  =    $d000+26 ;interruptmaske
+130:   c000           rand    =    $d000+32 ;farbe bildrand
+140:   c000           grund   =    rand+1  ;farbe bildhintergrund
+150:   c000           screen  =    $d000+17 ;bildschirm-steuerregister
+160:   c000           raster  =    screen+1 ;elektronenstrahlzeile
+170:   c000           vector  =    $0314   ;interrupt-sprungadresse
+180:   c000           timera  =    $dc00+4 ;16-bit-zaehler
+190:   c000           timerb  =    timera+2 ;dito
+200:   c000           flag    =    $fb     ;freie speicherstelle
+210:   c000           cra     =    icr+1   ;steuerregister timer a
+220:   c000           crb     =    cra+1   ;steuerregister timer b
+230:   c000           line    =    $fd     ;freie speicherstelle
+240:   c000           irequ   =    irmask-1 ;interrupt-register
+250:   c000           irqoff  =    $ea81   ;rueckkehr vom interrupt
+260:   c000           plot    =    $fff0   ;cursor setzen/holen
+270:   c000           print   =    $ab1e   ;string ausgeben
+280:   c000           chrcol  =    $0286   ;aktuelle zeichenfarbe
+                       ;
+                       ;*** programmvorbereitung ***
+                       ;
+1000:  c000  20 44 e5 init    jsr  clear
+1010:  c003  a9 7f            lda  #%01111111 ;alle interruptmöglichkeiten
+1020:  c005  8d 0d dc         sta  icr     ;loeschen
+1030:  c008  8d 04 dc         sta  timera  ;zaehlwerk auf
+1040:  c00b  8d 05 dc         sta  timera+1 ;32639 einstellen
+1050:  c00e  a2 00            ldx  #0
+1060:  c010  8e 1a d0         stx  irmask  ;kein vic-interrupt
+1070:  c013  ca               dex
+1080:  c014  86 fb            stx  flag    ;zaehler
+1090:  c016  a9 0b            lda  #11
+1100:  c018  8d 11 d0         sta  screen  ;bildschirm ausblenden
+1110:  c01b  85 fd            sta  line    ;zwischenspeicher zeile
+1120:  c01d  a9 0e            lda  #14     ;hellblaue farbe
+1130:  c01f  8d 21 d0         sta  grund
+1140:  c022  85 fe            sta  line+1  ;wie 1110
+                       ;
+                       ;*** interrupt-beispiel bundesflagge ***
+                       ;
+1150:  c024  a9 2c            lda  #&lt;irq1  ;zeiger
+1160:  c026  a0 c1            ldy  #&gt;irq1  ;auf
+1170:  c028  8d 14 03         sta  vector  ;neue
+1180:  c02b  8c 15 03         sty  vector+1 ;interrupt-routine
+1190:  c02e  a0 01            ldy  #1
+1200:  c030  8c 12 d0         sty  raster  ;irr-ausloeser rasterzeile 1
+1210:  c033  8c 1a d0         sty  irmask  ;irr-maske auf rasterzeilen
+1220:  c036  88               dey
+1230:  c037  a9 19            lda  #25
+1240:  c039  20 15 c1         jsr  time    ;zeitverzoegerung
+1250:  c03c  a6 fe            ldx  line+1
+1260:  c03e  a9 02    loop1   lda  #2
+1270:  c040  20 15 c1         jsr  time
+1280:  c043  e8               inx
+1290:  c044  86 fe            stx  line+1  ;eine zeile weiter
+1300:  c046  e0 c8            cpx  #200    ;bis zeile 200
+1310:  c048  90 f4            bcc  loop1   ;kleiner - dann weiter
+1320:  c04a  a6 fd            ldx  line    ;dito obere zeile
+1330:  c04c  a9 02    loop2   lda  #2
+1340:  c04e  20 15 c1         jsr  time
+1350:  c051  e8               inx
+1360:  c052  86 fd            stx  line
+1370:  c054  e0 73            cpx  #115
+1380:  c056  90 f4            bcc  loop2
+                       ;
+                       ;*** titel-einblendung ***
+                       ;
+1390:  c058  a2 07            ldx  #7
+1400:  c05a  a0 0d            ldy  #13
+1410:  c05c  18               clc
+1420:  c05d  20 f0 ff         jsr  plot
+1430:  c060  a9 c8            lda  #&lt;intro ;stringadresse low
+1440:  c062  a0 c1            ldy  #&gt;intro ;und high
+1450:  c064  20 1e ab         jsr  print   ;titel drucken
+1460:  c067  a9 96            lda  #150
+1470:  c069  a0 00            ldy  #0
+1480:  c06b  20 15 c1         jsr  time
+1490:  c06e  a9 1b            lda  #27
+1500:  c070  8d 11 d0         sta  screen  ;bildschirm oeffnen
+1510:  c073  a9 c8            lda  #200
+1520:  c075  20 15 c1         jsr  time
+                       ;
+                       ;*** interrrupt-beispiel gleitzeile ***
+                       ;
+1530:  c078  8c 1a d0         sty  irmask  ;interrupt aus
+1540:  c07b  8c 20 d0         sty  rand    ;schwarze umrandung
+1550:  c07e  20 44 e5         jsr  clear
+1560:  c081  a2 04            ldx  #4      ;farbe purpur
+1570:  c083  8e 21 d0         stx  grund
+1580:  c086  a0 03            ldy  #3
+1590:  c088  18               clc
+1600:  c089  20 f0 ff         jsr  plot
+1610:  c08c  a9 fe            lda  #&lt;text
+1620:  c08e  a0 c1            ldy  #&gt;text
+1630:  c090  20 1e ab         jsr  print
+1640:  c093  a9 1e            lda  #30
+1650:  c095  a0 00            ldy  #0
+1660:  c097  20 15 c1         jsr  time
+1670:  c09a  a9 58            lda  #&lt;irq2
+1680:  c09c  a0 c1            ldy  #&gt;irq2
+1690:  c09e  8d 14 03         sta  vector  ;neue
+1700:  c0a1  8c 15 03         sty  vector+1 ;interrupt-routine
+1710:  c0a4  a2 19            ldx  #25
+1720:  c0a6  86 fd            stx  line
+1730:  c0a8  8e 12 d0         stx  raster
+1740:  c0ab  ad 19 d0         lda  irequ
+1750:  c0ae  8d 19 d0         sta  irequ   ;interrupt-flag loeschen
+1760:  c0b1  a0 01            ldy  #1
+1770:  c0b3  8c 1a d0         sty  irmask
+1780:  c0b6  88               dey
+1790:  c0b7  a9 02    loop3   lda  #2
+1800:  c0b9  20 15 c1         jsr  time
+1810:  c0bc  e8               inx
+1820:  c0bd  86 fd            stx  line    ;eine zeile weiter
+1830:  c0bf  e0 aa            cpx  #170
+1840:  c0c1  90 f4            bcc  loop3
+1850:  c0c3  a9 64            lda  #100
+1860:  c0c5  20 15 c1         jsr  time
+                       ;
+                       ;*** interrrupt-beispiel regenbogen ***
+1870:  c0c8  20 44 e5         jsr  clear
+1880:  c0cb  8c 1a d0         sty  irmask
+1890:  c0ce  a9 73            lda  #&lt;irq3
+1900:  c0d0  a0 c1            ldy  #&gt;irq3
+1910:  c0d2  8d 14 03         sta  vector
+1920:  c0d5  8c 15 03         sty  vector+1
+1930:  c0d8  ad 19 d0         lda  irequ
+1940:  c0db  8d 19 d0         sta  irequ
+1950:  c0de  a0 00            ldy  #0
+1960:  c0e0  84 fb            sty  flag
+1970:  c0e2  c8               iny
+1980:  c0e3  8c 12 d0         sty  raster
+1990:  c0e6  8c 1a d0         sty  irmask
+2000:  c0e9  a9 00            lda  #0
+2010:  c0eb  20 15 c1         jsr  time
+2020:  c0ee  a9 0f            lda  #15     ;hellgraue
+2030:  c0f0  8d 86 02         sta  chrcol  ;zeichenfarbe
+2040:  c0f3  a2 03            ldx  #3
+2050:  c0f5  18               clc
+2060:  c0f6  20 f0 ff         jsr  plot
+2070:  c0f9  a9 dd    loop4   lda  #&lt;name
+2080:  c0fb  a0 c1            ldy  #&gt;name
+2090:  c0fd  20 1e ab         jsr  print   ;text ausgeben
+2100:  c100  a9 14            lda  #20
+2110:  c102  a0 00            ldy  #0
+2120:  c104  20 15 c1         jsr  time
+2130:  c107  ce 86 02         dec  chrcol  ;farbe - 1
+2140:  c10a  10 ed            bpl  loop4   ;weiter bis einschl. 0 (=schwarz)
+2150:  c10c  a9 01            lda  #1
+2160:  c10e  a8               tay
+2170:  c10f  20 15 c1         jsr  time
+2180:  c112  4c 00 c0         jmp  init    ;auf ein neues
+                       ;
+                       ;*** warteschleife ***
+                       ;
+9010:  c115  8d 06 dc time    sta  timerb  ;zaehler low
+9020:  c118  8c 07 dc         sty  timerb+1 ;und high laden
+9030:  c11b  a9 11            lda  #%00010001 ;force-load/continuous/systemtakt
+9040:  c11d  8d 0e dc         sta  cra      ;timer a starten
+9050:  c120  a9 59            lda  #%01011001 ;force-load/one-shot/takt timer a
+9060:  c122  8d 0f dc         sta  crb      ;timer b starten
+9070:  c125  ad 0f dc wait    lda  crb      ;b-control lesen
+9080:  c128  4a               lsr           ;bit 0 ins carry schieben
+9090:  c129  b0 fa            bcs  wait     ;timer b laeuft noch
+9100:  c12b  60               rts           ;zurueck wenn aus
+                       ;
+                       ;*** interrupt-routinen ***
+                       ;
+10010: c12c  a5 fb    irq1    lda  flag     ;sektorenflag
+10020: c12e  f0 09            beq  rot
+10030: c130  10 0f            bpl  gold
+10040: c132  a9 00            lda  #0
+10050: c134  aa               tax
+10060: c135  a4 fd            ldy  line
+10070: c137  d0 0e            bne  exit
+10100: c139  a9 02    rot     lda  #2
+10110: c13b  a2 01            ldx  #1
+10120: c13d  a4 fe            ldy  line+1
+10130: c13f  d0 06            bne  exit
+10200: c141  a9 07    gold    lda  #7
+10210: c143  a2 ff            ldx  #255
+10220: c145  a0 01            ldy  #1
+10500: c147  86 fb    exit    stx  flag    ;zeiger auf sektor
+10510: c149  8c 12 d0         sty  raster  ;naechste interruptzeile
+10520: c14c  8d 20 d0         sta  rand    ;farbe setzen
+10530: c14f  ad 19 d0         lda  irequ
+10540: c152  8d 19 d0         sta  irequ   ;irq-flag loeschen
+10550: c155  4c 81 ea         jmp  irqoff  ;und aussprung
+                       ;
+11000: c158  ad 21 d0 irq2    lda  grund
+11010: c15b  49 02            eor  #%00000010 ;farb-flipflop 4/6
+11020: c15d  a8               tay
+11030: c15e  29 02            and  #%00000010
+11040: c160  f0 06            beq  oben    ;purpur an der reihe
+11050: c162  a5 fd            lda  line
+11060: c164  18               clc
+11070: c165  69 15            adc  #21     ;+ 21 rasterzeilen
+11080: c167  2c               .byte$2c     ;= bit (versteckter ladebefehl)
+11090: c168  a5 fd    oben    lda  line
+11100: c16a  8d 12 d0         sta  raster  ;zeile und
+11110: c16d  8c 21 d0         sty  grund   ;farbe setzen
+11120: c170  4c 4f c1         jmp  exit+8  ;aussprung
+                       ;
+12000: c173  c6 fb    irq3    dec  flag
+12010: c175  a6 fb            ldx  flag    ;offset fuer tabellen
+12020: c177  10 04            bpl  getpar
+12030: c179  a2 0f            ldx  #low-color-1
+12040: c17b  86 fb            stx  flag    ;offset maximal
+12050: c17d  bd 98 c1 getpar  lda  color,x ;farbe holen
+12060: c180  48               pha          ;zunaechst auf stapel
+12070: c181  bc b8 c1         ldy  high,x  ;rasterzeile highbyte
+12080: c184  bd a8 c1         lda  low,x   ;und lowbyte
+12090: c187  aa               tax
+12100: c188  68               pla          ;farbe zurueckholen
+12110: c189  8e 12 d0         stx  raster  ;zeile low
+12120: c18c  8c 11 d0         sty  screen  ;und high
+12130: c18f  8d 20 d0         sta  rand    ;und randfarbe und
+12140: c192  8d 21 d0         sta  grund   ;hintergrundfarbe setzen
+12150: c195  4c 4f c1         jmp  exit+8  ;fertig
+                      ;
+                      ;*** interrupt-tabellen ***
+                      ;
+15000: c198 04 0b 05 color    .byte4,11,5,9
+15010: c19c 03 0a 01          .byte3,10,1,14
+15020: c1a0 07 0f 02          .byte7,15,2,13
+15030: c1a4 00 08 06          .byte0,8,6,12
+                      ;
+16000: c1a8 01 0b fe low      .byte1,11,254,235
+16010: c1ac db cb b3          .byte219,203,179,162
+16020: c1b0 8a 7a 6a          .byte138,122,106,82
+16030: c1b4 4b 3b 33          .byte75,59,51,33
+                      ;
+17000: c1b8 1b 9b 1b high     .byte27,155,27,27
+17010: c1bc 1b 1b 1b          .byte27,27,27,27
+17020: c1c0 1b 1b 1b          .byte27,27,27,27
+17030: c1c4 1b 1b 1b          .byte27,27,27,27
+                      ;
+                      ;*** tabellen hauptprogramm ***
+                      ;
+20000: c1c8 0e 08 1f intro    .byte14,8,31
+20010: c1cb c4 45 4d          .asc "Demo-Programm"
+20020: c1d8 11 11 11          .byte17,17,17,17,17
+20030: c1dd 0d 1d 1d name     .byte13,29,29,29,29
+20040: c1e2 1d 1d 1d          .byte29,29,29,29,29
+20050: c1e7 d2 c1 d3          .asc "RASTERZEILEN-Interrupt"
+20060: c1fd 00                .byte0
+                      ;
+21000: c1fe 9c       text     .byte156
+21010: c1ff d5 4e 44          .asc "Und nun    "
+21020: c20a 11 11 11          .byte17,17,17
+21030: c20d 53 45 48          .asc "sehen Sie    "
+21040: c21a 11 11 11          .byte17,17,17
+21050: c21d 4e 4f 43          .asc "noch den"
+21060: c225 0d 11 11          .byte13,17,17,17,17,17
+21070: c22b 1d 1d 1d          .byte29,29,29,29,29
+21080: c230 1d 1d 1d          .byte29,29,29,29,29
+21090: c235 d2 a0 c5          .asc "R E G E N B O G E N"
+21100: c248 00                .byte0
+
+end of assembly $c000 - $c248
+
+no errors</pre>
             <figcaption>Assemblerlisting des »Rasterzeilen-Interrupt«</figcaption>
         </figure>
 

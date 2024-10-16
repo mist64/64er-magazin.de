@@ -109,6 +109,13 @@ Die Eingabe-Ausgaben werden aus `issues` gelesen, die Website wird nach `out` ge
     * Abtippen der Listings
         * [Endurion](https://www.forum64.de/wcf/index.php?user/1964-endurion/)
         * [darkvision](https://www.forum64.de/wcf/index.php?user/21031-darkvision/)
+* Ausgabe 11/84:
+    * Formatierung, Metadaten, OCR-Fixes
+        * [thierer](https://www.forum64.de/wcf/index.php?user/26370-thierer/)
+    * Abtippen der Listings
+        * [Endurion](https://www.forum64.de/wcf/index.php?user/1964-endurion/)
+        * [goloMAK](https://www.forum64.de/wcf/index.php?user/28439-golomak/)
+        * [ClausS](https://www.forum64.de/wcf/index.php?user/28399-clauss/)
 
 
 ![](screenshot1.png)

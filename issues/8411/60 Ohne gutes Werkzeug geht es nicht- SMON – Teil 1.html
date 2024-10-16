@@ -193,7 +193,503 @@
         </figure>
 
         <figure>
-            TODO
+            <!-- eingetippt von ClausS -->
+            <pre>;***************************
+;*                         *
+;*         S M O N         *
+;* MASCHINENSPRACH-MONITOR *
+;*                         *
+;*       T E I L  1        *
+;*                         *
+;*        August 1984      *
+;*                         *
+;*  BY N.MANN & D.WEINECK  *
+;*   TEL. 0421 / 493090    *
+;*                         *
+;***************************
+;
+;
+                  .BA $C000
+                  .OS
+                  .CE
+PCL               .DE $FB
+PCH               .DE PCL+1
+FLAG              .DE $AA
+COMMAND           .DE $AC
+;
+BEFCODE           .DE $AD
+ADRCODE           .DE $AB
+BEFLEN            .DE $B6
+LOPER             .DE $AE
+HOPER             .DE $AF
+;
+PCHSAVE           .DE $02A8
+PCLSAVE           .DE PCHSAVE+1
+SRSAVE            .DE PCHSAVE+2
+AKSAVE            .DE PCHSAVE+3
+XRSAVE            .DE PCHSAVE+4
+YRSAVE            .DE PCHSAVE+5
+SPSAVE            .DE PCHSAVE+6
+;
+PRINTNR           .DE PCHSAVE+7
+IO.NR             .DE PCHSAVE+8
+MEM               .DE PCHSAVE+9
+;
+TASTBUF           .DE $0277
+COLOR             .DE $0286
+BUF1              .DE $033C
+BUF2              .DE BUF1+$30
+BUF3              .DE BUF2+$30
+BUF4              .DE BUF3+$30
+;
+READY             .DE $A474
+BORDER            .DE $D020
+BKGRND            .DE $D021
+OPEN              .DE $FFC0
+CLOSE             .DE $FFC3
+CHKOUT            .DE $FFC9
+CLRCHN            .DE $FFCC
+CHRIN             .DE $FFCF
+CHROUT            .DE $FFD2
+STOPT             .DE $FFE1
+GETIN             .DE $FFE4
+;
+SETBRK            LDA #L,BREAK
+                  STA $0316
+                  LDA #H,BREAK
+                  STA $0317
+                  BRK
+;
+CMDTBL            .BY $27
+                  .BY '#$%,:;=?A'
+                  .BY 'BCDFGIKL'
+                  .BY 'MOPRSTVWX'
+                  .BY $00,$00,$00,$00,$00
+;
+CMDS              .SE TICK-1
+                  .SE BEFDEC-1
+                  .SE BEFHEX-1
+                  .SE BEFBIN-1
+                  .SE KOMMA-1
+                  .SE COLON-1
+                  .SE SEMIS-1
+                  .SE COMP-1
+                  .SE ADDSUB-1
+                  .SE ASSEMBLER-1
+                  .SE BCDATA-1
+                  .SE CONVERT-1
+                  .SE DISASSEM-1
+                  .SE FIND-1
+                  .SE GO-1
+                  .SE IO.SET-1
+                  .SE KONTROLLE-1
+                  .SE LOADSAVE-1
+                  .SE MEMDUMP-1
+                  .SE OCCUPY-1
+                  .SE SETPRINTER-1
+                  .SE REGISTER-1
+                  .SE LOADSAVE-1
+                  .SE TRACE-1
+                  .SE VERSCHIEB-1
+                  .SE WRITE-1
+                  .SE EXIT-1
+                  .DS 10
+;
+OFFSET            .BY $FF,$FF,$01,$00
+;
+FINDTAB           .BY 'AZIRT'
+FINDFLG           .BY $80,$20,$40,$10,$00
+FINDFLG1          .BY $02,$01,$01,$02,$00
+;
+SYS172            .BY $91,$91,$0D,$53
+                  .BY  $D9,$31,$37,$32,$0D
+;
+DATATAB           .BY $00,$7D,$4C
+                  .SE DATALOOP
+;
+REGHEAD           .BY $0D,$0D,$20,$20
+                  .BY 'PC  SR AC XR YR SP'
+                  .BY '  NV-BDIZC' $00
+;
+                  .BA $C214
+;
+BREAK             CLD
+                  LDA #$08
+                  STA IO.NR
+                  LDA #04
+                  STA PRINTNR
+                  LDA #06
+                  STA BORDER
+                  STA BKGRND
+BREAK1            LDA #03
+                  STA COLOR
+                  LDX *$05
+BREAK2            PLA
+                  STA PCHSAVE,X
+                  DEX
+                  BPL BREAK2
+                  LDA PCLSAVE
+                  BNE BREAK3
+                  DEC PCHSAVE
+BREAK3            DEC PCLSAVE
+                  TSX
+                  STX SPSAVE
+                  LDA #'R'
+                  JMP CMDSTORE
+;
+GETSTART          JSR GETRET
+                  BEQ GETSTRTS
+GETSTART1         JSR GETADR1
+                  STA PCLSAVE
+                  LDA *PCH
+                  STA PCHSAVE
+GETSTRTS          RTS
+;
+GET3ADR           LDX *$A4
+                  JSR GETADR
+                  JSR GETADR
+                  BNE GETADR
+;
+GET1.2ADR         JSR GETADR1
+                  LDA #$FE
+                  STA *$FD
+                  LDA #$FF
+                  STA *$FE
+                  JSR GETRET
+                  BNE GETADR
+                  STA TASTBUF
+                  INC *$C6
+                  RTS
+;
+GET2ADR           JSR GETADR1
+                  .BY $2C
+GETADR1           LDX #$FB
+;
+GETADR            JSR GETBYT
+                  STA *$01,X
+                  JSR GETBYT1
+                  STA *$00,X
+                  INX
+                  INX
+                  RTS
+;
+GETBYT            JSR GETCHRERR
+                  CMP #$20
+                  BEQ GETBYT
+                  CMP #$2C
+                  BEQ GETBYT
+                  BNE ASCHEX
+;
+GETBYT1           JSR GETCHRERR
+ASCHEX            JSR ASCHEX1
+                  ASL A
+                  ASL A
+                  ASL A
+                  ASL A
+                  STA *$B4
+                  JSR GETCHRERR
+                  JSR ASCHEX1
+                  ORA *$B4
+                  RTS
+ASCHEX1           CMP #$3A
+                  BCC ASCHEX2
+                  ADC #$08
+ASCHEX2           AND #$0F
+                  RTS
+;
+SKIPSPACE         JSR GETCHRERR
+                  CMP #$20
+                  BEQ SKIPSPACE
+                  DEC *$D3
+                  RTS
+;
+GETRET
+                  JSR CHRIN
+                  DEC *$D3
+                  CMP #$0D
+GETBRTS           RTS
+;
+GETCHRERR
+                  JSR CHRIN
+                  CMP #$0D
+                  BNE GETBRTS
+;
+ERROR             LDA #'?'
+                  JSR CHROUT
+EXECUTE           LDX SPSAVE
+                  TXS
+                  LDX #$00
+                  STX *$C6
+                  JSR RETURN
+                  LDA ($D1,X)
+                  CMP #'''
+                  BEQ EXEC1
+                  CMP #':'
+                  BEQ EXEC1
+                  CMP #';'
+                  BEQ EXEC1
+                  CMP #','
+                  BEQ EXEC1
+                  LDA #'.'
+                  JSR CHROUT
+EXEC1             JSR GETCHRERR
+                  CMP #'.'
+                  BEQ EXEC1
+CMDSTORE          STA *COMMAND
+                  AND #$7F
+                  LDX *CMDS-CMDTBL
+CMDSEARCH         CMP CMDTBL-1,X
+                  BEQ CMDFOUND
+                  DEX
+                  BNE CMDSEARCH
+                  BEQ ERROR
+CMDFOUND          JSR CMDEXEC
+                  JMP EXECUTE
+;
+CMDEXEC           TXA
+                  ASL A
+                  TAX
+                  INX
+                  LDA CMDS-2,X
+                  PHA
+                  DEX
+                  LDA CMDS-2,X
+                  PHA
+                  RTS
+;
+HEXOUT            LDA *PCH
+                  JSR HEXOUT1
+                  LDA *PCL
+;
+HEXOUT1           PHA
+                  LSR A
+                  LSR A
+                  LSR A
+                  LSR A
+                  JSR HEXOUT2
+                  PLA
+                  AND #$0F
+HEXOUT2           CMP #$0A
+                  BCC HEXOUT3
+                  ADC #$06
+HEXOUT3           ADC #$30
+                  JMP CHROUT
+;
+CHARRET           LDA #$0D
+CHARR1            JSR CHROUT
+                  TXA
+                  JMP CHROUT
+;
+SPACE2            JSR SPACE
+SPACE             LDA #$20
+                  JMP CHROUT
+;
+RETURN            LDA #$0D
+                  JMP CHROUT
+;
+PRINT             STA *$BB
+                  STY *$BC
+                  LDY #$00
+PRINT1            LDA ($BB),Y
+                  BEQ PRINT2
+                  JSR CHROUT
+                  INY
+                  BNE PRINT1
+PRINT2            RTS
+;
+PCINC             INC *PCL
+                  BNE PCRTS
+                  INC *PCH
+PCRTS             RTS
+;
+;**********
+EXIT
+                  LDA #$0E
+                  STA COLOR
+                  STA BORDER
+                  LDA #$06
+                  STA BKGRND
+                  LDA #$37
+                  STA *$01
+                  LDX SPSAVE
+                  TXS
+                  JMP READY
+;
+;**********
+REGISTER          LDY #H,REGHEAD
+                  LDA #L,REGHEAD
+                  JSR PRINT
+                  LDX #';'
+                  JSR CHARRET
+REGISTER1         LDA PCHSAVE
+                  STA *PCH
+                  LDA PCLSAVE
+                  STA *PCL
+                  JSR HEXOUT
+                  JSR SPACE
+                  LDX #$FB
+REGISTER2         LDA SRSAVE-$FB,X
+                  JSR HEXOUT1
+                  JSR SPACE
+                  INX
+                  BNE REGISTER2
+                  LDA SRSAVE
+                  JMP CHANGBIN
+;
+;**********
+SEMIS             JSR GETSTART1
+                  LDX #$FB
+SEMIS1            JSR GETCHRERR
+                  JSR GETBYT1
+                  STA SRSAVE-$FB,X
+                  INX
+                  BNE SEMIS1
+                  JSR SPACE
+                  LDA SRSAVE,X
+                  JMP CHANGBIN
+;
+CHANGBIN          STA *FLAG
+                  LDA #$20
+                  LDY #$09
+CHANGB1           JSR CHROUT
+                  ASL *FLAG
+                  LDA #$30
+                  ADC #$00
+                  DEY
+                  BNE CHANGB1
+                  RTS
+;
+;**********
+GO                JSR GETSTART
+                  LDX SPSAVE
+                  TXS
+                  LDX #$FA
+GO2               LDA PCHSAVE-$FA,X
+                  PHA
+                  INX
+                  BNE GO2
+                  PLA
+                  TAY
+                  PLA
+                  TAX
+                  PLA
+                  RTI
+;
+;**********
+MEMDUMP           JSR GET1.2ADR
+MEMDUMP1          LDX #':'
+                  JSR CHARRET
+                  JSR HEXOUT
+                  LDY #32
+                  LDX #$00
+MEMDUMP2          JSR SPACE
+                  LDA (PCL,X)
+                  JSR HEXOUT1
+                  LDA (PCL,X)
+                  JSR ASCII
+                  BNE MEMDUMP2
+                  JSR CONTIN
+                  BCC MEMDUMP1
+                  RTS
+;
+;**********
+COLON             JSR GETADR1
+                  LDY #32
+                  LDX #$00
+COLON1            JSR GETCHRERR
+                  JSR GETBYT1
+                  STA (PCL,X)
+                  CMP (PCL,X)
+                  BEQ COLON2
+                  JMP ERROR
+COLON2            JSR ASCII
+                  BNE COLON1
+                  RTS
+;
+ASCII             CMP #$20
+                  BCC ASCII1
+                  CMP #$60
+                  BCC ASCII2
+                  CMP #$C0
+                  BCC ASCII1
+                  CMP #$DB
+                  BCC ASCII3
+ASCII1            LDA #'.'
+ASCII2            AND #$3F
+ASCII3            AND #$7F
+                  STA ($D1),Y
+                  LDA COLOR
+                  STA ($F3),Y
+                  JSR PCINC
+                  INY
+                  CPY #40
+                  RTS
+;
+CONTIN            JSR TASTE
+                  JMP CMPEND1
+;
+CMPEND            JSR PCINC
+CMPEND1           LDA *PCL
+                  CMP *$FD
+                  LDA *PCH
+                  SBC *$FE
+                  RTS
+;
+TASTE             JSR PRINTER1
+TASTE1            JSR SCANKEY
+                  BEQ TASTRTS
+TASTE2            JSR SCANKEY
+                  BEQ TASTE2
+                  CMP #$20
+                  BNE TASTRTS
+                  STA TASTBUF
+                  INC *$C6
+TASTRTS           RTS
+;
+SCANKEY
+                  JSR GETIN
+                  PHA
+                  JSR STOPT
+                  BEQ STOP
+                  PLA
+SCANRTS           RTS
+STOP              JMP EXECUTE
+;
+PRINTER1          LDY #40
+PRINTER           BIT COMMAND
+                  BPL SCANRTS
+                  STY *$C8
+                  STY *$D0
+                  LDA #$FF
+                  JSR CLOSE
+                  LDA #$FF
+                  STA *$B8
+                  STA *$B9
+                  LDA PRINTNR
+                  STA *$BA
+                  JSR OPEN
+                  LDX #$00
+                  STX *$D3
+                  DEX
+                  JSR CHKOUT
+PRLOOP            JSR CHRIN
+                  JSR CHROUT
+                  CMP #$0D
+                  BNE PRLOOP
+                  JSR CLRCHN
+                  LDA #$91
+                  JMP CHROUT
+;
+;
+;
+;
+;
+;
+;***************************
+;*                         *
+;*         S M O N         *
+;* MASCHINENSPRACH-MONITOR *
+;*                         *</pre>
             <figcaption>Listing 2. Der Assembler-Quelltext von SMON — Teil 1</figcaption>
         </figure>
 
