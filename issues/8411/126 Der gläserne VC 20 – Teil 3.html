@@ -378,9 +378,10 @@
         <p>Bei dem Systemreset ($FD22/ 64802) werden verschiedene Routinen wie beispielsweise Initialisierung der Zeropage, Setzen der Vektoren, RAM-Test ect. durchlaufen. Dabei wird unter anderem auch der verfügbare Speicherplatz festgestellt und die Eckadressen den obengenannten Registern übergeben. Diese Daten sind die Grundlage für alle weiteren Grundeinstellungen des Systems, also Basic-Beginn und -Ende, Beginn des Video- und Farbspeichers ect.</p>
 
         <p>Wird es nun nötig, eine Speicherkonfiguration zu simulieren, beispielsweise Grundversion bei eingesteckter 8-KByte-Erweiterung, so kann das über diese Zeiger geschehen:<br>
-            POKE 642, 16: POKE 644, 30: SYS 64970: SYS 64821 bewirkt diese Simulation. Das Unterprogramm im Betriebssystem (Adresse 64970), das zur Reset-Routine gehört, hat die Aufgabe, die Seiten 0 (Zeropage), 2 und 3 zu löschen. Danach prüft der Computer seine Speicherzellen. Dieser Test hat die Aufgabe, das RAM auf seine Funktionsfähigkeit hin zu überprüfen, damit es nicht zu Fehlfunktionen durch einen beschädigten Speicher kommt. Bei dieser Gelegenheit wird die Ausbaustufe des Speichers festgestellt; das Ergebnis findet sich dann in den Registern für die Anfangs- beziehungsweise Endadresse. Hier steigen wir nun mit den entsprechend manipulierten Registern (642 auf 16 und 644 auf 30) in die ROM-Routine ein. Mit Hilfe dieser Werte richtet das Unterprogramm nun den Video- und Farbspeicher ein. Mit dem zweiten SYS-Befehl (SYS 64821) wird die Initialisierung fortgesetzt. Dabei richtet er den Speicher für Basic ein und gibt die Kaltstartmeldung<br>
-            <strong><strong> CBM BASIC V2 </strong></strong><br>
-            3583 BYTES FREE<br>
+            POKE 642, 16: POKE 644, 30: SYS 64970: SYS 64821 bewirkt diese Simulation. Das Unterprogramm im Betriebssystem (Adresse 64970), das zur Reset-Routine gehört, hat die Aufgabe, die Seiten 0 (Zeropage), 2 und 3 zu löschen. Danach prüft der Computer seine Speicherzellen. Dieser Test hat die Aufgabe, das RAM auf seine Funktionsfähigkeit hin zu überprüfen, damit es nicht zu Fehlfunktionen durch einen beschädigten Speicher kommt. Bei dieser Gelegenheit wird die Ausbaustufe des Speichers festgestellt; das Ergebnis findet sich dann in den Registern für die Anfangs- beziehungsweise Endadresse. Hier steigen wir nun mit den entsprechend manipulierten Registern (642 auf 16 und 644 auf 30) in die ROM-Routine ein. Mit Hilfe dieser Werte richtet das Unterprogramm nun den Video- und Farbspeicher ein. Mit dem zweiten SYS-Befehl (SYS 64821) wird die Initialisierung fortgesetzt. Dabei richtet er den Speicher für Basic ein und gibt die Kaltstartmeldung
+            <code>CBM BASIC V2
+                3583 BYTES FREE
+            </code>
             aus.
         </p>
 
@@ -403,9 +404,12 @@
 
         <p>Ist ein Speichermodul von mehr als 8 KByte eingesteckt (egal ob der 3-KByte-Bereich zugeschaltet ist oder nicht), so legt das System den Videospeicher an die unterste adressierbare Stelle für den VIC, also Adresse 4096. Aus diesem Grund kann die eingesteckte 3-KByte-Erweiterung nicht mehr für Basic benutzt werden, denn sonst wäre der Speicher nicht mehr durchgängig.</p>
 
-        <p>Programme sollten immer auf allen Erweiterungsversionen lauffähig sein. Wer also in Routinen mit dem Bildschirm- oder Farbspeicher arbeitet, kann sich mit Hilfe der Register 36866 und 86869 im VIC die momentanen Adressen beschaffen.<br>
-            Bildschirm: 4*(PEEK(36866)AND128) + 64*(PEEK(36869)AND120)<br>
-            Farbspeicher: 4*(PEEK(36866)AND128) + 37888</p>
+        <p>Programme sollten immer auf allen Erweiterungsversionen lauffähig sein. Wer also in Routinen mit dem Bildschirm- oder Farbspeicher arbeitet, kann sich mit Hilfe der Register 36866 und 86869 im VIC die momentanen Adressen beschaffen.</p>
+
+        <ul class="plain">
+            <li>Bildschirm: 4*(PEEK(36866)AND128) + 64*(PEEK(36869)AND120)</li>
+            <li>Farbspeicher: 4*(PEEK(36866)AND128) + 37888</li>
+        </ul>
 
         <h2>Gewußt wo — Die Bildschirmadressen</h2>
 
@@ -469,11 +473,14 @@
 
         <p>Auffällig ist bei den Kommandos LIST und RUN der Pfeil nach oben (↑). Er bewirkt ein sofortiges Ausführen des Befehls — entspricht also »LIST« und RETURN-Taste beziehungsweise »RUN« und RETURN-Taste. Das andere auffällige Zeichen ist der Apostroph (&lsquo;) bei dem Kommando LOAD, der dem Hochkomma (”) entspricht. Das echte Gänsefüßchen ist bereits für die Syntax des Änderungsbefehls (siehe unten) vergeben.</p>
 
-        <p>Auf den Befehl π wie er beispielsweise beim Programm »Basic-Switch« (Folge 2) verwendet wurde, habe ich dieses Mal aus Platzgründen verzichtet, damit Lader und Maschinenprogramm in der Grundversion Platz finden. Die Kommandos werden statt dessen über den Befehl »SYS0« (oder F5) eingegeben. Dabei machen wir uns den USR-Vektor (Adresse 0-2) als Sprungzeiger zu Nutze. Damit zur Syntax bei der Funktionstastenprogrammierung:<br>
-            SYS0 L – Listen der Funktionstastenbelegungen<br>
-            SYS0 O – (Off) schaltet die Funktionstasten ab<br>
-            SYS0 R – (Restart) schaltet die Funktionstasten wieder ein.<br>
-            SYS0,X, »befehl« – belegt die X-te Funktionstaste mit einem Befehl.</p>
+        <p>Auf den Befehl π wie er beispielsweise beim Programm »Basic-Switch« (Folge 2) verwendet wurde, habe ich dieses Mal aus Platzgründen verzichtet, damit Lader und Maschinenprogramm in der Grundversion Platz finden. Die Kommandos werden statt dessen über den Befehl »SYS0« (oder F5) eingegeben. Dabei machen wir uns den USR-Vektor (Adresse 0-2) als Sprungzeiger zu Nutze. Damit zur Syntax bei der Funktionstastenprogrammierung:</p>
+
+        <ul class="plain">
+            <li>SYS0 L – Listen der Funktionstastenbelegungen</li>
+            <li>SYS0 O – (Off) schaltet die Funktionstasten ab</li>
+            <li>SYS0 R – (Restart) schaltet die Funktionstasten wieder ein.</li>
+            <li>SYS0,X, »befehl« – belegt die X-te Funktionstaste mit einem Befehl.</li>
+        </ul>
 
         <p>Zum Schluß kommen wir noch zu einem Thema, mit dem ich mich mehr an den fortgeschrittenen Maschinensprachenprogrammierer wenden möchte. Im ersten Teil dieser Serie wurde beschrieben, wie der Basic-Befehlssatz mit Hilfe der CHRGET-Routine und des Befehles »π« im beschränktem Umfang erweitert werden kann. Diese Methode hat allerdings viele Unzulässigkeiten; es sind beispielsweise keine verkürzten Befehle wie beim normalen Basic (LIST = L SHIFT I) möglich.</p>
 
@@ -481,18 +488,20 @@
 
         <p>Für das Verarbeiten von Basic-Programmen sind drei Schlüsselroutinen zu substituieren. Da ist zunächst das Unterprogramm »ASCII in Token wandeln«. ($C57C) welches — wie der Name bereits sagt — die Aufgabe hat, Eingabezeilen im Basic-Puffer (wie zu Anfang beschrieben) in Interpretercode zu wandeln. Das Gegenstück dazu ist die Unterroutine »Interpretercode in Klartext wandeln.« Will man Basic-Zeilen sichtbar machen, so benutzt man das Kommando LIST. Dazu wird eben diese ROM-Routine benötigt, die die Rückumwandlung der Token in ASCII-Zeichen vornimmt.</p>
 
-        <p>Sämtliche Befehle sind in Form von ASCII-Zeichen im Basic-ROM enthalten, lediglich zum letzten Buchstaben jedes Befehlswortes wurde 128 ($80) addiert. Läßt man sich die Befehle durch<br>
-            FOR T= 49310 TO 47565: PRINT CHR$(PEEK(T)):NEXT<br>
-            ausdrucken, so sehen die Kommandos im Groß-/Kleinschrift-Modus folgendermaßen aus:<br>
-            END = enD<br>
-            FOR = foR ect.</p>
+        <p>Sämtliche Befehle sind in Form von ASCII-Zeichen im Basic-ROM enthalten, lediglich zum letzten Buchstaben jedes Befehlswortes wurde 128 ($80) addiert. Läßt man sich die Befehle durch
+            <code>FOR T= 49310 TO 47565: PRINT CHR$(PEEK(T)):NEXT</code>
+            ausdrucken, so sehen die Kommandos im Groß-/Kleinschrift-Modus folgendermaßen aus:
+            <code>END = enD
+                FOR = foR ect.
+            </code>
+        </p>
 
         <p>Ferner ist jedem Basic-Befehl eine Adresse zugeordnet, bei der eine Abarbeitung vorgenommen wird. Diese Adressen sind in einer Tabelle (von $C00C $C07F) zusammengefaßt. Eine spezielle Routine hat wiederum die Aufgabe, die Befehlsadresse für ein entsprechendes Token aus der Tabelle zu lesen, und einen Sprung nach dorthin durchzuführen. Auch dieses Unterprogramm kann man mittels eines Vektors umgehen.</p>
 
         <p>Damit haben wir das nötige Rüstzeug, um selbst Basic-Kommandos in den Interpreter mit aufzunehmen. In Listing 4 ist ein dafür geeignetes Programm abgedruckt, welches ich jetzt näher erläutern möchte. Es ist der Kopf für ein Utility, in das nach Belieben Befehlswörter und Sprungadressen eingesetzt werden können.</p>
 
-        <p>Die Routine gliedert sich in vier Teile: Der erste Teil (von $2000 - $203A) ist eine Kopie der Reset-Routine. Dabei wird der Computer neu initialisiert und eine neue Kaltstartmeldung<br>
-            <strong><strong>**** 64’ER BASIC ****</strong></strong><br>
+        <p>Die Routine gliedert sich in vier Teile: Der erste Teil (von $2000 - $203A) ist eine Kopie der Reset-Routine. Dabei wird der Computer neu initialisiert und eine neue Kaltstartmeldung
+            <code>**** 64’ER BASIC ****</code>
             ausgedruckt. Hier ist genügend Platz vorgesehen, damit der Text nach eigenen Wünschen gestaltet werden kann. Ferner wurden die ersten neun Bytes mit NOPs versehen, damit dort — falls das Programm im Modulbereich abgelegt wird — die obligate Autostartinformation (a0CBM) eingesetzt werden kann. Anderenfalls — wenn das Maschinenprogramm per SYS gestartet wird — muß der erste Mnemonic-Befehl ein SEI sein.
         </p>
 
