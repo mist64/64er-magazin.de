@@ -1,0 +1,60 @@
+;hex-data-automat.prg ==0801==
+;Eingetippt von Endurion
+    1 rem *****************************************
+    2 rem *         ++++ programm-name ++++       *
+    3 rem *                                       *
+    4 rem *  stichwort.........................   *
+    5 rem *  copyright (c) ....................   *
+    6 rem *                                       *
+    7 rem *****************************************
+    8 :
+    9 :
+   10 dim h(75) : for i=0 to 9
+   20 h(48+i)=i : h(65+i)=i+10 : next
+   30 for i=anfang to schluss: read a$ : rem hier aktuelle werte einsetzen !
+   40 h=asc(left$(a$,1)):l=asc(right$(a$,1))
+   50 d=h(h)*16+h(l) : s=s+d : poke i,d
+   60 a=a+1:if a<20 then next : a=-1
+   65 print "zeile:";1000+z;
+   70 read v : z=z+1 : if v=s then 85
+   80 print" pruefsummenfehler !";999+z:stop
+   85 if a<0 then end
+   90 s=0 : a=0 : print : next : end
+   95 :
+   96 :
+   97 :
+   98 :
+   99 :
+  200 rem ***************************************
+  210 rem *  hex-data-automatik (vc 20 & c64)   *
+  220 rem *                                     *
+  230 rem *  data-zeilen programmieren          *
+  240 rem *      start mit run 200              *
+  250 rem *                                     *
+  260 rem ***************************************
+  270 :
+  280 :
+  500 input "start-adresse";a
+  510 h=int(a/256):l=a-h*256:poke 640,h:poke 641,l
+  520 input "end/adresse  ";e
+  530 h=int(e/256):l=e-h*256:poke 642,h:poke 643,l
+  540 poke 2,1 : if a>e then 500
+  550 :
+  560 a=peek(640)*256+peek(641)
+  570 e=peek(642)*256+peek(643)
+  580 :
+  590 dim h$(20):for i=0 to 9 : h$(i)=chr$(i+48)
+  600 h$(i+10)=chr$(i+65)     : next : z=3
+  610 :
+  620 for i=1 to 20 : d=peek(a) : s=s+d
+  630 h=int(d/16)   : l=d-16*h
+  640 a$=a$+h$(h)+h$(l)+","
+  650 if a=e then z=2 : d=peek(2) : goto 670
+  660 a=a+1 : next : d=peek(2) : poke 2,d+1
+  670 a$=str$(999+d)+" data "+a$
+  680 a$=a$+str$(s)
+  690 h=int(a/256):l=a-h*256:poke 640,h:poke 641,l
+  700 poke 631,19: poke 632,13 : poke 633,13
+  710 poke 198,z : print chr$(147);a$
+  720 print "run 560" : end
+
