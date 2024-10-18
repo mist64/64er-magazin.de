@@ -5,7 +5,7 @@ This is my process of scanning an issue. It'll result in about 160-180 GB of dat
 ### What you Need
 
 * An A3 flatbed scanner that can do 2400 dpi. I use a "VIISAN VF3240".
-* A macOS computer (min 16 GB RAM) with the built-in Image Capture app. (I tried both Windows and Linux, and both apps/drivers crash/fail when trying to scan A4 at 2400 dpi.)
+* A macOS computer (min 16 GB RAM, better 32 GB) with the built-in Image Capture app. (I tried both Windows and Linux, and both apps/drivers crash/fail when trying to scan A4 at 2400 dpi.)
 * A A3 sheet of **black** construction paper.
 * Another sheet of A3 construction paper (any color).
 
@@ -222,12 +222,12 @@ The PNG files contain pixels that don't belong to the page on the left, the righ
 
 Use an image editor that lets you efficiently crop pages. In this example, I'll describe it with Affinity Photo.
 
-Open all thumbnail (!) files (in Affinity, you need to do it in batches of 50), and for each file
+Open all thumbnail (!) files (in Affinity, you need to do it in batches of <64), and for each file
 
 * press C ("crop")
 * change the rectangle to cut off **only** the side where the other page shows, **not the outside or the bottom**
 * double click to confirm
-* Cmd+W, Return (Close & Save)
+* Cmd+S, Cmd+S (Close & Save)
 
 Then, run this Python 3 script to generate `widths.txt`:
 
