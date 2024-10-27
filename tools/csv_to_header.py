@@ -1,4 +1,5 @@
 import csv
+import os
 import sys
 
 def generate_meta_tags(file_path):
@@ -17,7 +18,7 @@ def generate_meta_tags(file_path):
 
 if __name__ == "__main__":
     if len(sys.argv) != 2:
-        print("Usage: python generate_meta_tags.py <csv_file_path>")
+        print(f'Usage: python {os.path.basename(__file__)} <csv_file_path>')
         sys.exit(1)
 
     csv_file_path = sys.argv[1]
