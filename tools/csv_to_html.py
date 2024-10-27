@@ -1,5 +1,6 @@
 import csv
 import html
+import os
 import sys
 
 # top level categories in sort order
@@ -73,7 +74,7 @@ def generate_index_html(file_path):
 
 if __name__ == "__main__":
     if len(sys.argv) != 2:
-        print("Usage: python generate_index_html.py <csv_file_path>")
+        print(f'Usage: python {os.path.basename(__file__)} <csv_file_path>')
         sys.exit(1)
 
     csv_file_path = sys.argv[1]
