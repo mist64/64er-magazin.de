@@ -12,7 +12,32 @@ Zum 40jährigen Jubiläum des *64'er Magazins* präsentieren wir das Kunstprojek
 * 11/84: 19. Oktober 2024
 * 12/84: 16. November 2024
 * 01/85: 14. Dezember 2024
-* usw.
+* 02/85: 18. Januar 2025
+* 03/85: 15. Feburar 2025
+* 04/85: 15. März 2025
+* 05/85: 19. April 2025
+* 06/85: 17. Mai 2025
+* 07/85: 14. Juni 2025
+* 08/85: 19. Juli 2025
+* 09/85: 16. August 2025
+* 10/85: 20. September 2025
+<!--
+* 11/85: 
+* 12/85: 
+* 01/86:
+* 02/86:
+* 03/86:
+* 04/86:
+* 05/86:
+* 06/86: 16. Mai 2026
+* 07/86:
+* 08/86: 18. Juli 2026
+* 09/86: 
+* 10/86: 
+* 11/86: 
+* 12/86: 
+-->
+usw.
 
 Auf der modernen Homepage gibt es
 
