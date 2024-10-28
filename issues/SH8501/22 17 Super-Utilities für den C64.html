@@ -1,0 +1,72 @@
+<h1>17 Super-Utilities für den C64</h1>
+
+<p class="intro"><p>Wollen Sie Ihre Basic-Programme schneller und kürzer machen? Wollen Sie Betriebssystem oder Zeichensatz Ihres C64 ändern? Dieses Maschinenprogramm löst Ihre Probleme.</p></p>
+
+<p>Das Programm entstand durch Zusammenfügen der in der praktischen Arbeit am häufigsten gebrauchten Maschinensprache-Routinen zu einem einzigen großen Utility-Paket.</p>
+
+<p>Die beiden Bereiche Optimierung von Basic-Programmen und Zeichen-Definition stehen im Mittelpunkt. Nach ordnungsgemäßem Laden kann man ein Menü mit »sys 49152« aufrufen (Bild 1), in dem alle Unterprogramme mit Namen und SYS-Adresse genannt werden.</p>
+
+<p>Nun zu den Programmen selbst:<br/>
+<strong>Space-Killer</strong> (sys 49155): Hinter diesem martialisch anmutenden Aufruf verbirgt sich nichts anderes als eine Maschinen-Routine, welche überflüssige Spaces aus einem Basic-Programm entfernt.</p>
+
+<p>Nach dem »sys 49155«-Aufruf erscheint in der oberen Bildschirmecke ein farbiges Symbol als Versicherung, daß alles in Ordnung ist, denn die Routine kann durchaus bis zu 1/4 Stunde laufen, wenn viele Spaces zu entfernen sind und das Programm entsprechend lang ist.<br/>
+<strong>Space-Expander (sys 49158)</strong>: Es erscheint auf den ersten Blick befremdend, etwas einzufügen, was man eben erst entfernt hatte. Doch die Aufgabe liegt auf der Hand: zwischen jeden Basic-Befehl ein Space einzufügen, um das Druckbild sauber und ansprechend zu gestalten.<br/>
+<strong>REM-Killer (sys49161)</strong>: erklärt sich selbst. Erwähnenswert ist die Geschwindigkeit, mit der die Routine läuft. 20 kByte-Programme werden in etwa 10-30 Sekunden »gesäubert«.<br/>
+<strong>Zeilen löschen (sys 49164)</strong>: Hiermit werden ganze Zeilenbereiche gelöscht. Beispiel: »sys 49164,1000,1999« entfernt alle Basic-Zeilen mit den Nummern von 1000 bis 1999 einschließlich. Mit Druck auf dieRETURN-Taste ist der Befehl schon ausgeführt.<br/>
+<strong>Text suchen (sys 49167,&ldquo;Suchtext&rdquo;)</strong>: Sucht eine Zeichenkette »Suchtext« im Basic-Programm und gibt die gefundenen Zeilennummern aus.<br/>
+Eine Besonderheit ist das Jokerzeichen »?«: Hier wird jedes Zeichen akzeptiert, es darf allerdings nicht an erster Stelle im Suchtext stehen.<br/>
+<strong>Colon-Maker (sys 49170)</strong>: Ersetzt jedes Space am Anfang einer Basic-Zeile durch einen Doppelpunkt»:«.<br/>
+<strong>Space-Maker (sys 49173)</strong>: Ersetzt jeden Doppelpunkt am Anfang einer Basic-Zeile durch ein Space » «. Beide Routinen dienen als Strukturhilfen. Da alle der Zeilennummer unmittelbar folgenden Spaces überlesen werden, muß man erst einen »neutralen« Doppelpunkt setzen, diesen dann später durch ein Space ersetzen.<br/>
+<strong>Package (sys 49179)</strong>: Hier ist die Notlösung für jeden, der einfach mehr Platz braucht und das Basic-Programm garantiert nicht mehr korrigieren muß. »Package« schmilzt nämlich benachbarte Zeilen zusammen, so daß bei jeder Verschmelzung vier Bytes freiwerden (Ein Null-Byte, Zwei Bytes der Koppeladresse plus Zwei Bytes der Zeilennummer, abzüglich ein Byte für den nun erforderlichen Doppelpunkt als Trennelement). Das braucht seine Zeit, weil einige Aspekte kontrolliert werden müssen, zum Beispiel ob die zu verschmelzende Zeile angesprungen wird, dann muß sie mit ihrer Zeilennummer präsent bleiben, sonst gibt’s Ärger mit dem Interpreter, der sich dann mit »undef’d statement« beschwert. Für die Verschmelzungstiefe gibt es leider eine unnatürliche Grenze: Mehr als 255 Bytes darf eine Zeile nicht lang sein, sonst kann der Interpreter die Zeilen nicht mehr binden und findet hinter einer solchen »Megazeile« keine Zeilennummer mehr.<br/>
+Um Basic-Programme auf ein Minimum zu komprimieren, empfiehlt sich folgender Weg:</p>
+
+<ul>
+<li>zuerst »sys 49161« eingeben. Danach sind alle REMarks weg, und die folgenden Routinen haben weniger Prüfarbeit.<br/>
+— dann »sys 49155« eingeben. Hier werden alle Zeilen gestaucht.<br/>
+— zuletzt »sys 49179« eingeben, danach ist Ihr PRG redundanzfrei.</li>
+</ul>
+
+
+<p>Für spätere Änderungsarbeiten wird man sich natürlich ein »augenfreundliches« Original verwahren, am besten benutzt man von allen Basic-Programmen zwei Versionen: Eine originale zur Dokumentation, Korrektur, Ausdruck und eine komprimierte mit minimalen Platzansprüchen und schneller Ausführung.<br/>
+<strong>CPU-Register ein (sys 49182)</strong>: Zeigt fortwährend die Register des Mikroprozessors in den beiden oberen Bildschirmzeilen an.<br/>
+Außerdem werden der IRQ-, NMI- und der BRK-Vektor sowie der Programmcounter angezeigt. Im Status-Register bedeutet »<em>« ein gesetztes Bit, ».« ein gelöschtes.<br/>
+<strong>CPU-Register aus (sys 49185)</strong>: Schaltet die Anzeige wieder ab.<br/>
+<strong>Basic-Ende setzen (sys 49188)</strong>: setzt das Basic-Ende genau hinter das im Speicher befindliche Programm. Normalerweise erledigt das der Interpreter; wenn aber absolut geladen wurde, zum Beispiel in den $c-Block hinein, dann steht der Programm-Ende-Zeiger ebenfalls im $c-Block, und Eingabeversuche werden mit »out of memory«-Fehlermeldungen abgewehrt.<br/>
+<strong>Dump (sys 49191)</strong>: Gibt alle definierten Variablen unter Angabe des Namens und des aktuellen Inhalts aus.<br/>
+Mit der Shift-Taste kann die Ausgabe angehalten, mit der Commodore-Taste vorzeitig abgebrochen werden.<br/>
+<strong>ROM kopieren (sys 49194)</strong>: Kopiert Interpreter- und Kernal-ROM in das darunter liegende RAM. Es gibt zwar viele veröffentlichte Programme zu diesem Thema, doch macht die Geschwindigkeit dieser Stilblüten auf Dauer aggressiv.<br/>
+<strong>Zeichensatz RAM</strong> Die letzten vier Routinen befassen sich mit dem Zeichensatz:<br/>
+<strong>(sys 49197)</strong>: Verlegt den Zeichensatz nach $7000 und den Bildschirm nach $6c00. Die Absicht ist klar: im RAM kann der Zeichensatz leicht verändert werden.<br/>
+<strong>Zeichensatz ändern (sys 49200)</strong>: Setzt voraus, daß vorher durch »sys 49197« der Zeichensatz verlegt wurde, sonst funktioniert’s nicht. Es wird eine Zeichen-Änderungsroutine aktiviert, die einfach zu bedienen ist. Man fährt einfach mit dem Cursor über das zu ändernde Zeichen, drückt RETURN, und schon guckt man wie durch eine Lupe in die Punkte-Matrix des Zeichens hinein. Auch hier kann man sich wieder frei mit dem Cursor bewegen, natürlich nur innerhalb des Zeichens. Will man einen Punkt löschen, drückt man die Space-Taste, zum Setzen gibt man ein Sternchen »</em>« ein. RETURN führt wieder in das Menü zurück.<br/>
+<strong>Zeichensatz speichern (sys 49203</strong>, &ldquo;filename&rdquo;, gerätenummer)<br/>
+Speichert den aktuellen Zeichensatz unter Angabe des Filenamens (der wie bei »SAVE« dem SYS-Befehl in Anführungsstrichen folgen muß), eines Kommas und der Gerätenummer entweder auf der Floppy oder dem Kassettenrecorder ab. Damit nicht jedesmal wieder bei Null begonnen werden muß, kann man einen Zeichensatz durch den Basic-Befehl:<br/>
+»load &ldquo;filename&rdquo;, gerätenummer,1«<br/>
+absolut, das heißt von $7000 bis $7fff laden.<br/>
+Die verbogenen Basic-Zeigerwerden danach mit »sys 49188« wieder gerade gerichtet.<br/>
+<strong>Zeichensatz ROM (sys 49206)</strong>: Schaltet den Zeichensatz wieder ins ROM $d000 zurück. Der Bildschirm wird wieder nach $400 verlegt.</p>
+
+<h2>Grundsätzliches zur Eingabe</h2>
+
+<p>Maschinenprogramme sind extrem empfindlich, was Fehler anbetrifft. Einfache Prüfsummen decken sich ausgleichende Fehler nicht auf. Wird beispielsweise eine »1« und eine »2« vertauscht, so stimmt die Prüfsumme zwar, das Programm ist aber wahrscheinlich nicht lauffähig. Aus diesem Grund habe ich die Prüfsummen gespalten, »pg« für gerade Bytes und »pu« für ungerade. Zwar sind auch jetzt noch Fehlermaskierungen möglich, aber extrem unwahrscheinlich.</p>
+
+<p>Noch eine Unart erregt manches Ärgernis:<br/>
+Viele Autoren veröffentlichen Basic-Lader, und geben dann nach etwa 4000 harten (das heißt unformatierten) Dezimal-Bytes eine (also eine einzige) Prüfsumme an, so ziemlich weit in den Hunderttausendern, die auf Anhieb nur selten übereinstimmt. Es wollen dann 4000 Bytes überprüft werden! Ich halte es für besser, nach einem kleineren Abschnitt, etwa einer »Page« (256 Bytes) eine Zwischenprüfung zu fahren und bei Unstimmigkeiten sofort mit einem Hinweis zu unterbrechen.</p>
+
+<p>In meinem Programm werden den Datenbytes die Angabe der Seite, dann die gerade und letztlich die ungerade Prüfsumme vorangestellt. Wenn Sie das berücksichtigen, können Sie nach Herzenslust ändern und erweitern, ein Maschinensprachemonitor und Assemblerkenntnisse vorausgesetzt.</p>
+
+<h2>Probieren Sie mal einige Routinen aus</h2>
+
+<p>Wenn Sie das Programm genauso wie abgebildet im Speicher stehen haben, so können Sie durch »sys 49161« die Eliminierung aller REMs erzielen. Die Routine startet mit der Meldung »20779 Bytes PRG-Laenge« und endet nach 22 Sekunden mit »20019 Bytes PRG-Laenge«. 760 Bytes haben Sie gewonnen oder verloren, wie man’s nimmt.</p>
+
+<p>Doch Vorsicht! Wenn Zeilen mit einem REM beginnen, wird die ganze Zeile entfernt. Sprünge zu dieser Zeile werden nicht berücksichtigt. Wenn das Programm mit der Fehlermeldung »undef’d statement« unterbricht, korrigieren Sie einfach den Sprungbefehl durch die Zeile, welcher der entfernten unmittelbar folgt.</p>
+
+<p>Wenn Sie allerdings schon vorher überblicken, welche Zeilen »fällig« sein werden, können Sie durch zum Beispiel »sys 49167,&ldquo;2000"« alle Zeilen mit dem Wortlaut "2000&rdquo; ausfindig machen und korrigieren.</p>
+
+<p>»sys 49155« kommt nach etwa 13 Minuten mit »17828 Bytes PRG-Laenge« zurück. Diese lange Zeit rührt davon her, daß nach jedem eliminiertem Space alle Programmzeilen wieder gekoppelt werden müssen, bei einemG ewinn von 2191 Bytes bedeutet das 2191 mal koppeln, und das Verschieben selbst braucht natürlich auch noch ein paar Millisekunden. Dann sind schnell, ehe man sich versieht, einige Minuten verflossen.</p>
+
+<p>»sys 49179« als Package-Befehl bringt Ihnen nach 9 Minuten weitere 2095 Bytes Speicherplatzgewinn. Nach diesem 3-Stufen-Plan haben Sie insgesamt 5046 Bytes, die für die Funktion des Programms entbehrlich sind, entfernt. Durch den Platzgewinn werden Ihre Programme übrigens schneller, da erstens die Strings mehr Platz haben und seltener aufgeräumt werden müssen und zweitens weniger Zeilenübergänge stattfinden.</p>
+
+<p>Ich möchte nochmals betonen, daß sich derartige »Rumpfpakete« ausschließlich für den RUN-Modus eignen. Listen, Korrigieren und so weiter sollte immer an einem »gesunden« Programm stattfinden.</p>
+
+<address class="author">(Johannes Mockenhaupt / ev)</address>
+

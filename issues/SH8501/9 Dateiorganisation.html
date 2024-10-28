@@ -1,0 +1,84 @@
+<h1>Dateiorganisation</h1>
+
+<p class="intro"><p>Dieses Programm ist eine echte Hilfe für den C64-Benutzer, der sich einmal etwas näher mit der internen Dateiorganisation des 1541-Laufwerks beschäftigen möchte.</p></p>
+
+<p>Die Idee zu diesem Programm kam mir, als ich nach einem »SCRATCH«-Befehl mit Bedauern feststellen mußte, ein in mühevoller Arbeit erstelltes Programm versehentlich mitgelöscht zu haben. Doch glücklicherweise hatte ich kurz zuvor erfahren, wie man ein gelöschtes File auf der 1541-Floppy regeneriert:</p>
+
+<p>Filetyp im Directoryeintrag im Direktzugriff wieder setzen und anschließend ein »VALIDATE« ausführen.</p>
+
+<p>Es begann also die Suche nach besagtem Byte, sowie die intensive Erkundung der Dateiorganisation und des Direktzugriffs.</p>
+
+<p>Nun, nach mehreren Monaten Arbeit liegt endlich das fertige Programm vor. Es druckt eine Vielzahl von Floppy-Informationen auf einem Epson-Drucker aus. Auf eine Bildschirmausgabe wurde aus Gründen der Übersichtlichkeit verzichtet.</p>
+
+<h2>Was bietet das Programm</h2>
+
+<p><strong>Ganze Dateien aufzeigen:</strong><br/>
+Hierbei fragt das Programm nach dem gewünschten Filenamen. Bei korrekter Eingabe werden folgende Informationen ausgedruckt: Filename, Filetyp, Filelänge in Blocks, Spur, Sektor, laufende Blocknummer und natürlich der Inhalt sämtlicher von dieser Datei belegten Blöcke in ASCII-Codes und -Zeichen (je 8 Byte). Eine Seite wird mit genau 2 Blocks beschrieben, dann erfolgt automatisch ein Seitenvorschub. Bei ungerader Blockanzahl kann ein Seitenvorschub auch vom Benutzer ausgelöst werden. Bei Dateiende springt das Programm wieder ins Menü zurück.</p>
+
+<p><strong>Einzelne Blöcke ausgeben:</strong><br/>
+Dieser Modus unterscheidet sich vom vorigen dadurch, daß hier bestimmte Sektoren ausgewählt werden können. Und dies auf zwei verschiedene Arten:</p>
+
+<ol>
+<li>Eingabe von Spur und Sektor:<br/>
+Geben Sie, durch Komma getrennt, Spur- und Sektornummer des auszudruckenden Blocks ein;</li>
+<li>Eingabe von Filename und Blocknummer: Das Programm liest aus der Directory, wieviele Blocks das angegebene File belegt und zeigt dies am Bildschirm an. Nun können Sie wählen, welchen dieser Blöcke Sie sehen möchten.</li>
+</ol>
+
+
+<p><strong>Bytereihen ausdrucken:</strong></p>
+
+<p>Mit diesem Menüpunkt können Sie gezielt bestimmte Bytes einer Datei oder eines Sektors herauspicken. Die Form der Eingabe von Parametern ist identisch mit der des Teilprogrammes »Einzelne Blöcke ausgeben«. Zusätzlich müssen Sie das erste und letzte auszudruckende Byte eines Sektors festlegen (0-255). Das erste Byte kann auch zugleich das letzte sein, was die Ausgabe nur eines Wertes bewirkt.</p>
+
+<p><strong>Blockbelegung von Files:</strong></p>
+
+<p>Von einer Datei belegte Sektoren werden ihrer Reihenfolge entsprechend, im Format: laufende Blocknummer, Spur/Sektor, ausgegeben. Auch eine Routine zur Berechnung der tatsächlichen Filelänge in Bytes ist in dieses Teilprogramm integriert. Das zweite Byte des letzten Blockes gibt die Anzahl der von der Datei in diesem Block benötigten Bytes an. Daraus ergibt sich folgende Formel für die Filelänge: (Gesamtzahl belegter Blocks — 1) * 254 + 2. Byte letzter Block.</p>
+
+<p>Einschränkung für relative Dateien: Spur und Sektor von Side-Sektor-Blöcken werden nicht angezeigt. An ihrer Stelle erscheint das Kürzel »SSB«, so daß man wenigstens weiß, wieviel SSB das DOS zur Verwaltung der Datei benötigt.</p>
+
+<p><strong>Directory:</strong><br/>
+Dieser Befehl bringt Ihnen eine erweiterte und vor allem übersichtlichere Directory Ihrer Disketten zu Papier. Selbstverständlich ohne das Programm zu zerstören. Sie enthält Informationen über:</p>
+
+<p>— Diskettenname und ID<br/>
+— Nummer des Eintrages<br/>
+— Filename<br/>
+— Filelänge in Blocks<br/>
+— Filelänge in Bytes = (Filelänge in Blocks — 1) * 254 + 127)</p>
+
+<p>Es wird davon ausgegangen, daß der letzte Block zur Hälfte belegt ist. Die Angabe weicht also um maximal 126Bytes von der tatsächlichen Länge ab.</p>
+
+<p>— 1. Datenblock des Files<br/>
+— Filetyp<br/>
+— Freie Einträge<br/>
+— Freie Blöcke</p>
+
+<p>Bei relativen Dateien finden Sie im Anschluß an den Filetyp zwei zusätzliche Angaben:</p>
+
+<p>— Erster Side - Sektor - Block (Spur/Sektor)<br/>
+— Recordlänge</p>
+
+<p><strong>BAM (Block Available Map)</strong><br/>
+Das Format des Blockbelegungsplanes ist wie folgt festgelegt: Horizontal werden die einzelen Sektoren aufgetragen, vertikal die Spuren 1—35. Ein Stern kennzeichnet einen belegten Sektor, das Minuszeichen einen freien. Mit »/« markierte Sektoren sind nicht vorhanden, da die Anzahl der Sektoren je Spur zum Diskettenmittelpunkt hin abnimmt. Dem Wert rechts neben jeder Spur können Sie entnehmen, wieviele Blöcke auf dieser noch nicht belegt sind. Die Summe der freien Sektoren finden Sie ganz unten. Sollte einmal die Gesamtzahl der freien Blöcke nicht mit der Angabe in der Directory übereinstimmen, so ist mit der Diskette ein »VALIDATE« durchzuführen, um den korrekten Zustand wieder herzustellen.</p>
+
+<h2>Benötigte Hardware</h2>
+
+<p>Erstellt und getestet wurde das Programm auf einem C 64 mit Floppy VC 1541 und Epson RX-80 (mit Data-Becker-Interface).</p>
+
+<p><strong>Eine Umsetzung auf andere Druckertypen</strong> dürfte keine großen Schwierigkeiten machen, da die meisten Steuerzeichen für Druckerfunktionen in den Zeilen 4220-4370 untergebracht sind. Weitere Steuerzeichen, welche vereinzelt im Programmtext vorkommen, sind durch die Form (c$=&ldquo;string&rdquo;:c3=Zahl:gosub4030) leicht zu erkennen. Durch diese Druckparameter werden vor allem Schriftart und Zeilenabstand gesteuert.</p>
+
+<p><strong>Ausnahme</strong>:<br/>
+Teilprogramm »Blockbelegung von Files«<br/>
+Zeilen<br/>
+1890—1900 : A(3) = 2 54<br/>
+1930—1940<br/>
+2020—2030 : A(3) = 255</p>
+
+<p>In diesen Zeilen wird in den Grafikmodus des Druckers umgeschaltet und eine Punktmatrix (CHR$(254) oder CHR$(255) für die senkrechten Linien, CHR$(64) für die waagrechte Linie übermittelt.</p>
+
+<p>Mit diesen Hinweisen sollte die Anpassung an andere Drucker keine Schwierigkeit mehr darstellen.</p>
+
+<p>Zum Schluß möchte ich noch auf ein Buch hinweisen, das mir erst die nötigen Grundlagen zu diesem Programm vermittelte: »Das große Floppy-Buch« von Data Becker. Eine wirklich ausgiebige und informative Quelle für alle jene, die sich intensiver mit der Floppy-Programmierung befassen wollen.</p>
+
+<p>Ich denke, daß Sie das Programm nun sinnvoll einsetzen können, zumal es auch Routinen enthält, die man in andere Programme übernehmen kann.</p>
+
+<address class="author">(Johann Auer / ev)</address>
+
