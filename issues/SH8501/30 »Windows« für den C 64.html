@@ -1,55 +1,82 @@
-<h1>»Windows« für den C 64</h1>
+<!DOCTYPE html>
+<html lang="de">
 
-<p class="intro"><p>Dieses Programm für den C 64 stellt vier Speicher für Bildschirminhalte im Text/Blockgrafikmodus zur Verfügung. Da diese Speicher im RAM »unterhalb« des Betriebssystems liegen, beanspruchen sie keinen zusätzlichen Speicherplatz. Das Programm ist in Maschinensprache geschrieben und durch Verwendung eines Verschiebeladers in verschiedenen Speicherbereichen lauffähig.</p></p>
+<head>
+	<title>XXXXX</title>
+	<meta charset="UTF-8">
+	<link rel="stylesheet" href="../style.css">
+	<meta name="author" content="XXXXX">
+	<meta name="64er.issue" content="Sonderheft 1/85">
+	<meta name="64er.pages" content="XXXXX">
+	<meta name="64er.head1" content="XXXXX">
+	<meta name="64er.head2" content="XXXXX">
+	<meta name="64er.toc_title" content="XXXXX">
+	<meta name="64er.id" content="msd">
+</head>
 
-<p>Besonders in größeren Programmen ist es oft wünschenswert, zwischen mehreren Bildschirmen umschalten zu können oder aber Fenster mit Zusatzinformationen in den laufenden Bildschirm einblenden zu können, ohne jedoch seinen ursprünglichen Inhalt zu zerstören. Um dies zu ermöglichen, stellt das Programm vier Speicher zur Verfügung, in denen komplette Bildschirminhalte oder Teile daraus abgelegt werden können. Ein Speicher belegt einen Bereich von 2 KByte, jeweils ein KByte für Zeichen und Farbe. Da diese Speicher unterhalb des Betriebssystems im RAM ab Adresse $E000 untergebracht sind, beanspruchen Sie keinerlei zusätzlichen Platz.</p>
+<body>
+	<article>
+		<h1>»Windows« für den C 64</h1>
 
-<h2>Anwendung</h2>
+		<p class="intro">
+		<p>Dieses Programm für den C 64 stellt vier Speicher für Bildschirminhalte im Text/Blockgrafikmodus zur Verfügung. Da diese Speicher im RAM »unterhalb« des Betriebssystems liegen, beanspruchen sie keinen zusätzlichen Speicherplatz. Das Programm ist in Maschinensprache geschrieben und durch Verwendung eines Verschiebeladers in verschiedenen Speicherbereichen lauffähig.</p>
+		</p>
 
-<p>Das Programm bietet folgende Betriebsarten:</p>
+		<p>Besonders in größeren Programmen ist es oft wünschenswert, zwischen mehreren Bildschirmen umschalten zu können oder aber Fenster mit Zusatzinformationen in den laufenden Bildschirm einblenden zu können, ohne jedoch seinen ursprünglichen Inhalt zu zerstören. Um dies zu ermöglichen, stellt das Programm vier Speicher zur Verfügung, in denen komplette Bildschirminhalte oder Teile daraus abgelegt werden können. Ein Speicher belegt einen Bereich von 2 KByte, jeweils ein KByte für Zeichen und Farbe. Da diese Speicher unterhalb des Betriebssystems im RAM ab Adresse $E000 untergebracht sind, beanspruchen Sie keinerlei zusätzlichen Platz.</p>
 
-<p>— STORE:  SYS BA,NR,XO,YO,FB,FH   Speichern<br/>
-— RECALL: SYSBA+3,NR  Rückholen<br/>
-— SWAP:   SYSBA+6,NR  Austauschen</p>
+		<h2>Anwendung</h2>
 
-<p>Die Parameter haben folgende Bedeutung:<br/>
-BA = Basisadresse des Programms (siehe unten)<br/>
-NR = Nummer des angesprochenen Speichers (0&hellip;3)<br/>
-X0,Y0 = Position der linken oberen Ecke des zu speichernden Bereiches (0..39,0..24)<br/>
-FB = Breite des Bereiches(1&hellip;40)<br/>
-FH = Hohe des Bereiches(1&hellip;25)</p>
+		<p>Das Programm bietet folgende Betriebsarten:</p>
 
-<p>Die Fensterseite (Höhe) darf nur bis zum rechten (unteren) Bildrand reichen. Wenn zum Beispiel die linke obere Ecke auf die Koordinate X = 10und Y = 5 gesetzt ist, so ist die maximale Fensterbreite 30 und die maximale Fensterhöhe 20. Falsche Angaben für die Parameter erzeugen die Fehlermeldung »ILLEGAL QUANTITY ERROR«.<br/>
-<strong>STORE</strong>: Um einen kompletten Bildschirm abzuspeichern, geben Sie folgendes ein: SYS BA,NR,0,0,40,25. Mit anderen Parametern erzeugen sie ein Bildschirmfenster, das bei RECALL auch nur den durch diese Parameter definierten Bereich überschreibt. Darum bleibt der ursprüngliche Bildschirm erhalten.<br/>
-<strong>RECALL</strong>: Es ist nur die Angabe der Speichernummer nötig. Der gespeicherte Bereich wird an seine ursprüngliche Position zurückgeschrieben.<br/>
-<strong>SWAP</strong>: Wenn Sie ein schon vorher vorbereitetes und im Speicher stehendes Informationsfenster in den aktuellen Bildschirm einblenden, wird dessen ursprünglicher Inhalt zerstört. Um ihn zu erhalten, müßten Sie ihn vor der Einblendung in einen noch freien Speicher retten. SWAP erleichtert die Arbeit und spart Speicherplatz, indem es die Inhalte von aktuellem Schirm und Speicher austauscht. Mit einmal SWAP rufen sie den Speicher ab, noch einmal SWAP erzeugt wieder das ursprüngliche Bild. Die Information über Position und Größe des auszutauschen Bereiches liefert das Bild im Speicher. SWAP wird daher nur mit der Speichernummer aufgerufen.</p>
+		<p>— STORE: SYS BA,NR,XO,YO,FB,FH Speichern<br />
+			— RECALL: SYSBA+3,NR Rückholen<br />
+			— SWAP: SYSBA+6,NR Austauschen</p>
 
-<p>Noch ein Hinweis: Vermeiden Sie es, mit RECALL oder SWAP einen Speicher aufzurufen, in den noch nichts hineingeschrieben wurde, dies würde zum Absturz des Programms führen (siehe: Kompatibilität zu Simons-Basic). Der Basic-Lader initialisiert alle 4 Speicher, um einer Fehlbedienung vorzubeugen.</p>
+		<p>Die Parameter haben folgende Bedeutung:<br />
+			BA = Basisadresse des Programms (siehe unten)<br />
+			NR = Nummer des angesprochenen Speichers (0&hellip;3)<br />
+			X0,Y0 = Position der linken oberen Ecke des zu speichernden Bereiches (0..39,0..24)<br />
+			FB = Breite des Bereiches(1&hellip;40)<br />
+			FH = Hohe des Bereiches(1&hellip;25)</p>
 
-<h2>Laden des Programmes</h2>
+		<p>Die Fensterseite (Höhe) darf nur bis zum rechten (unteren) Bildrand reichen. Wenn zum Beispiel die linke obere Ecke auf die Koordinate X = 10und Y = 5 gesetzt ist, so ist die maximale Fensterbreite 30 und die maximale Fensterhöhe 20. Falsche Angaben für die Parameter erzeugen die Fehlermeldung »ILLEGAL QUANTITY ERROR«.<br />
+			<strong>STORE</strong>: Um einen kompletten Bildschirm abzuspeichern, geben Sie folgendes ein: SYS BA,NR,0,0,40,25. Mit anderen Parametern erzeugen sie ein Bildschirmfenster, das bei RECALL auch nur den durch diese Parameter definierten Bereich überschreibt. Darum bleibt der ursprüngliche Bildschirm erhalten.<br />
+			<strong>RECALL</strong>: Es ist nur die Angabe der Speichernummer nötig. Der gespeicherte Bereich wird an seine ursprüngliche Position zurückgeschrieben.<br />
+			<strong>SWAP</strong>: Wenn Sie ein schon vorher vorbereitetes und im Speicher stehendes Informationsfenster in den aktuellen Bildschirm einblenden, wird dessen ursprünglicher Inhalt zerstört. Um ihn zu erhalten, müßten Sie ihn vor der Einblendung in einen noch freien Speicher retten. SWAP erleichtert die Arbeit und spart Speicherplatz, indem es die Inhalte von aktuellem Schirm und Speicher austauscht. Mit einmal SWAP rufen sie den Speicher ab, noch einmal SWAP erzeugt wieder das ursprüngliche Bild. Die Information über Position und Größe des auszutauschen Bereiches liefert das Bild im Speicher. SWAP wird daher nur mit der Speichernummer aufgerufen.
+		</p>
 
-<p>Die Verschieberoutine des Basic-Laders gestattet es, das Programm auf den Anfang jeder (sinnvollen) Speicherseite zu legen. Nach dem Start bietet der Lader die Optionen:<br/>
-&nbsp;1 RAM-Ende normales Basic ($9E00)<br/>
-&nbsp;2 RAM-EndeSimons-Basic ($7E00)<br/>
-&nbsp;3 Geschützter Bereich ($C000)<br/>
-&gt;7 Eingabe der Startseite</p>
+		<p>Noch ein Hinweis: Vermeiden Sie es, mit RECALL oder SWAP einen Speicher aufzurufen, in den noch nichts hineingeschrieben wurde, dies würde zum Absturz des Programms führen (siehe: Kompatibilität zu Simons-Basic). Der Basic-Lader initialisiert alle 4 Speicher, um einer Fehlbedienung vorzubeugen.</p>
 
-<p>Die Optionen 1 bis 3 setzen den Programmanfang auf die angegebene Adresse, bei Eingabe einer Zahl &gt; 7 wird diese als die Nummer derjenigen Speicherseite interpretiert, wo das Programm abgelegt werden soll.</p>
+		<h2>Laden des Programmes</h2>
 
-<p>Aus der Nummer der Speicherseite erhält man durch Multiplikation mit 256 die noch fehlende Basisadresse. Das Ladeprogramm gibt sie am Schluß mit aus.</p>
+		<p>Die Verschieberoutine des Basic-Laders gestattet es, das Programm auf den Anfang jeder (sinnvollen) Speicherseite zu legen. Nach dem Start bietet der Lader die Optionen:<br />
+			&nbsp;1 RAM-Ende normales Basic ($9E00)<br />
+			&nbsp;2 RAM-EndeSimons-Basic ($7E00)<br />
+			&nbsp;3 Geschützter Bereich ($C000)<br />
+			&gt;7 Eingabe der Startseite</p>
 
-<p>Der Vektor für die Basic-Obergrenze in (55),(56) wird entsprechend der Startadresse des Maschinenprogramms heruntergesetzt, sofern das Programm nicht im geschützten Bereich untergebracht ist. Beachten Sie, daß Sie diesen Vektor nach einem Reset beziehungsweise STOP/RESTORE korrigieren, sonst wird das Programm überschrieben.</p>
+		<p>Die Optionen 1 bis 3 setzen den Programmanfang auf die angegebene Adresse, bei Eingabe einer Zahl &gt; 7 wird diese als die Nummer derjenigen Speicherseite interpretiert, wo das Programm abgelegt werden soll.</p>
 
-<p>Im Programmlisting erkennen Sie zwei Unterschiedlich umfangreiche Blocks von DATA-Zeilen. Der erste, große Block stellt das eigentliche Programm dar, der kleine ist eine Liste von Adressen, welche relativ zum Programmanfang diejenigen Bytes angeben, die bei einer Verschiebung korrigiert werden müssen. Der Korrekturwert ergibt sich aus der Differenz zwischen der Startadresse, mit der das Programm assembliert wurde ($9E00=Speicherseite 158) und der gewünschten Startseite. Die beiden Blocks besitzen eigene Checksummen und OK-/Fehlermeldungen.</p>
+		<p>Aus der Nummer der Speicherseite erhält man durch Multiplikation mit 256 die noch fehlende Basisadresse. Das Ladeprogramm gibt sie am Schluß mit aus.</p>
 
-<h2>Kompatibilität zu Simons-Basic</h2>
+		<p>Der Vektor für die Basic-Obergrenze in (55),(56) wird entsprechend der Startadresse des Maschinenprogramms heruntergesetzt, sofern das Programm nicht im geschützten Bereich untergebracht ist. Beachten Sie, daß Sie diesen Vektor nach einem Reset beziehungsweise STOP/RESTORE korrigieren, sonst wird das Programm überschrieben.</p>
 
-<p>»Bildspeicher« ist auch eine hilfreiche Erweiterung der Simons-Basic-Befehle für die Bildschirmsteuerung. Es sind jedoch folgende Punkte zu beachten:</p>
+		<p>Im Programmlisting erkennen Sie zwei Unterschiedlich umfangreiche Blocks von DATA-Zeilen. Der erste, große Block stellt das eigentliche Programm dar, der kleine ist eine Liste von Adressen, welche relativ zum Programmanfang diejenigen Bytes angeben, die bei einer Verschiebung korrigiert werden müssen. Der Korrekturwert ergibt sich aus der Differenz zwischen der Startadresse, mit der das Programm assembliert wurde ($9E00=Speicherseite 158) und der gewünschten Startseite. Die beiden Blocks besitzen eigene Checksummen und OK-/Fehlermeldungen.</p>
 
-<p>— Die Hires-Grafik überschreibt alle vier Speicher. Diese müssen daher vor einem Zugriff mit »RECALL« oder »SWAP« unbedingt neu beschrieben werden.<br/>
-— Der geschützte Bereich ab $C000 wird ebenfalls von Hires überschrieben, so daß »Bildspeicher« in Programmen, welche die Hires-Grafik benützen, am Basic-RAM-Ende untergebracht werden muß (Option 2).</p>
+		<h2>Kompatibilität zu Simons-Basic</h2>
 
-<p>Ob Sie jedoch nun mit oder ohne Simons-Basic arbeiten, in jedem Falle ist »Bildspeicher« eine nützliche Routine, die auch dem C 64-Besitzer das Fenster zum »Windowing« aufstößt.</p>
+		<p>»Bildspeicher« ist auch eine hilfreiche Erweiterung der Simons-Basic-Befehle für die Bildschirmsteuerung. Es sind jedoch folgende Punkte zu beachten:</p>
 
-<address class="author">(Hans-Herbert Hagedorn / ev)</address>
+		<p>— Die Hires-Grafik überschreibt alle vier Speicher. Diese müssen daher vor einem Zugriff mit »RECALL« oder »SWAP« unbedingt neu beschrieben werden.<br />
+			— Der geschützte Bereich ab $C000 wird ebenfalls von Hires überschrieben, so daß »Bildspeicher« in Programmen, welche die Hires-Grafik benützen, am Basic-RAM-Ende untergebracht werden muß (Option 2).</p>
 
+		<p>Ob Sie jedoch nun mit oder ohne Simons-Basic arbeiten, in jedem Falle ist »Bildspeicher« eine nützliche Routine, die auch dem C 64-Besitzer das Fenster zum »Windowing« aufstößt.</p>
+
+		<address class="author">(Hans-Herbert Hagedorn / ev)</address>
+
+
+	</article>
+
+</body>
+
+</html>
