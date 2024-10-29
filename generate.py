@@ -353,12 +353,6 @@ LOGO = f'<img src="/{BASE_DIR}logo.svg" alt="{MAGAZINE_NAME}">'
 ### DATABASE
 ###
 
-def key_to_datetime(issue_key):
-    month, year = map(int, issue_key.split('/'))
-    # Handle century break properly if necessary
-    year += 1900 if year >= 50 else 2000
-    return datetime(year, month, 1)  # Assuming the first of the month
-
 # converts an img tag into a picture tag with AVIF and a JPEG fallback
 def avif_picture_tag(soup, img_src, attrs=None):
 
@@ -706,7 +700,7 @@ class ArticleDatabase:
         self.articles = []
         for issue_dir_name in sorted(os.listdir(in_directory)):
             issue_dir_path = os.path.join(in_directory, issue_dir_name)
-            if os.path.isdir(issue_dir_path) and re.match(r'^\d{4}$', issue_dir_name):
+            if os.path.isdir(issue_dir_path) and (re.match(r'^\d{4}$', issue_dir_name) or re.match(r'^SH\d{4}$', issue_dir_name)):
 
                 try:
                     issue = Issue(issue_dir_path)
@@ -721,7 +715,7 @@ class ArticleDatabase:
                 self.articles.extend(issue.articles)
 
     def latest_issue_key(self):
-        return max(self.issues.keys(), key=key_to_datetime)
+            return max(self.issues.keys(), key=lambda k: self.issues[k].pubdate)
 
     def articles_by_index_categories(self, index_categories, issue_key=None):
         # toc_category hacks for Rubriken and Aktuell
@@ -925,7 +919,7 @@ def html_generate_tocs_all_issues(db):
     html_parts.append(f"<h1>{LABEL_ALL_ISSUES}</h1>\n")
 
     # top: all issue title images
-    for issue_key in sorted(db.issues.keys(), key=lambda x: key_to_datetime(x), reverse=True):
+    for issue_key in sorted(db.issues.keys(), key=lambda x: db.issues[x].pubdate, reverse=True):
         issue = db.issues[issue_key]
         title_image = html_generate_title_image(db, issue, 200, True)
         html_parts.append(f"<a href=\"{issue.issue_dir_name}\">{title_image}</a>\n")
@@ -933,7 +927,7 @@ def html_generate_tocs_all_issues(db):
     html_parts.append("<hr>\n")
 
     # below: all TOCs
-    for issue_key in sorted(db.issues.keys(), key=lambda x: key_to_datetime(x), reverse=True):
+    for issue_key in sorted(db.issues.keys(), key=lambda x: db.issues[x].pubdate, reverse=True):
         html_parts.append(html_generate_toc(db, issue_key, 2, True))
         html_parts.append("<hr>\n")
 
@@ -1222,7 +1216,7 @@ def generate_issues_toc_html(db, issue_key, out_directory):
     write_full_html_file(db, os.path.join(issue_dest_path, 'index.html'), f'{LABEL_TOC_ISSUE} {issue_key} | {MAGAZINE_NAME}', 'title.jpg', body_html, 'one_issue', True)
 
 def generate_issues_tocs_html(db, out_directory):
-    for issue_key in sorted(db.issues.keys(), key=lambda x: key_to_datetime(x), reverse=True):
+    for issue_key in sorted(db.issues.keys(), key=lambda x: db.issues[x].pubdate, reverse=True):
         generate_issues_toc_html(db,  issue_key, out_directory)
 
 def generate_all_topics_html(db, out_directory):
@@ -1243,7 +1237,7 @@ def generate_topic_htmls(db, out_directory):
               html_parts.append(html)
 
         else:
-          for issue_key in sorted(db.issues.keys(), key=lambda x: key_to_datetime(x), reverse=True):
+          for issue_key in sorted(db.issues.keys(), key=lambda x: db.issues[x].pubdate, reverse=True):
               html = html_generate_articles_for_categories(db, index_topics, False, issue_key);
               if html:
                   html_parts.append(f"<h2>{LABEL_ISSUE} {issue_key}</h2>\n")
