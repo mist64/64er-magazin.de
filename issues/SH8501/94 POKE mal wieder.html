@@ -11,6 +11,7 @@
 	<meta name="64er.head1" content="Tips und Tricks">
 	<meta name="64er.head2" content="C 64 / VC 20">
 	<meta name="64er.toc_title" content="Tips und Tricks (C 64/VC 20)">
+	<meta name="64er.toc_category" content="">
 	<meta name="64er.id" content="tips_tricks">
 </head>
 
@@ -75,8 +76,8 @@
 
 		<p>Häufig steht man vor dem Problem, einen Textstring mit INPUT zu lesen, der auch Kommas enthalten soll. Versucht man es mit einem normalen INPUT-Befehl, dann meldet der Computer nur EXTRA IGNORED. Mit dem folgenden kleinen Trick kann sowohl der C 64 als auch der VC 20 Texte mit Komma einlesen.</p>
 
-		<p>Unmittelbar vor dem INPUT setzt man den Tastenzähler auf 1 und POKEt ein Anführungszeichen in den Tastaturpuffer. Es ergibt sich folgende Programmzeile:<br />
-			POKE 198,1 : POKE 631,34 : INPUT A$<br />
+		<p>Unmittelbar vor dem INPUT setzt man den Tastenzähler auf 1 und POKEt ein Anführungszeichen in den Tastaturpuffer. Es ergibt sich folgende Programmzeile:<br>
+			POKE 198,1 : POKE 631,34 : INPUT A$<br>
 			Probieren Sie’s aus.</p>
 
 		<address class="author">(Udo Stenger)</address>
@@ -93,7 +94,7 @@
 
 		<h3>VC 20-Tips</h3>
 
-		<p>Umschalten des VC20 auf die Grundversion bei eingesteckter Speichererweiterung:<br />
+		<p>Umschalten des VC20 auf die Grundversion bei eingesteckter Speichererweiterung:<br>
 			POKE 642,16 : POKE 644,30 : POKE 648,30 : SYS 64824</p>
 
 		<p>Mit POKE 55,30 : SAVE »(Name)« kann ein SAVE-Schutz umgangen werden, mit dem viele Programme geschützt sind.</p>
@@ -104,9 +105,9 @@
 
 		<h3>Basic-Programme retten</h3>
 
-		<p>Ein versehentlich mit »NEW« oder durch einen RESET gelöschtes Programm kann beim VC 20 durch Eingabe der folgenden Befehle im Direktmodus wieder zurückgeholt werden: POKE 46, PEEK(56) -1 : POKE 45, PEEK(55) + 247 : CLR »Return«<br />
-			POKE PEEK(44) * 256 + PEEK(43) + 1, PEEK(44) »Return« 63999 »Return«<br />
-			FOR I = PEEK(44) * 256 + PEEK(43) TO PEEK(46) * 256 + PEEK(45) : IF PEEK(I) OR PEEK(I + 1) OR PEEK(I + 2) THEN NEXT »Return«<br />
+		<p>Ein versehentlich mit »NEW« oder durch einen RESET gelöschtes Programm kann beim VC 20 durch Eingabe der folgenden Befehle im Direktmodus wieder zurückgeholt werden: POKE 46, PEEK(56) -1 : POKE 45, PEEK(55) + 247 : CLR »Return«<br>
+			POKE PEEK(44) * 256 + PEEK(43) + 1, PEEK(44) »Return« 63999 »Return«<br>
+			FOR I = PEEK(44) * 256 + PEEK(43) TO PEEK(46) * 256 + PEEK(45) : IF PEEK(I) OR PEEK(I + 1) OR PEEK(I + 2) THEN NEXT »Return«<br>
 			POKE 45, (I + 3) AND 255 : POKE 46, (I + 3) / 256 : CLR »Return«</p>
 
 		<p>Unter Umständen erhält man jetzt eine Fehlermeldung, aber das Programm ist jedenfalls wieder da!</p>
@@ -135,7 +136,7 @@
 
 		<h3>Basic-Programme retten</h3>
 
-		<p>Die Betriebssystemroutine »Angleich von Koppeladressen» ab Adresse 42291 ermöglicht ein schnelles und einfaches »UNNEW« nach einem versehentlichen »NEW« oder Reset:<br />
+		<p>Die Betriebssystemroutine »Angleich von Koppeladressen» ab Adresse 42291 ermöglicht ein schnelles und einfaches »UNNEW« nach einem versehentlichen »NEW« oder Reset:<br>
 			POKE 2049,1 : POKE 2050,1 : SYS 42291</p>
 
 		<p>Danach kann zumindest wieder geLISTet werden. Ein vollständiges »UNNEW» verlangt allerdings die Korrektur der Zeiger auf den Beginn der Variablen und Felder. Dazu wäre allerdings die Kenntnis der Programmlänge notwendig. Man kann sich aber behelfen, indem man das Programm notfalls in Teilen auf dem Bildschirm aufLISTet und die einzelnen Zeilen mit der RETURN-Taste neu übernimmt.</p>
@@ -144,7 +145,7 @@
 
 		<h3>Spezialeffekt</h3>
 
-		<p>Wenn man beim C 64 in die Speicherstelle 532 70 Werte zwischen 0 und 15 schreibt (POKE 53270,x), kann man den Bildschirm um bis zu sieben Bildpunkte nach links oder rechts scrollen lassen. Ist x kleiner als 8, dann scrollt der Bildschirmausschnitt um x Bildpunkte nach links, sonst um x-8 Bildpunkte nach rechts.<br />
+		<p>Wenn man beim C 64 in die Speicherstelle 532 70 Werte zwischen 0 und 15 schreibt (POKE 53270,x), kann man den Bildschirm um bis zu sieben Bildpunkte nach links oder rechts scrollen lassen. Ist x kleiner als 8, dann scrollt der Bildschirmausschnitt um x Bildpunkte nach links, sonst um x-8 Bildpunkte nach rechts.<br>
 			POKE 53270,8 stellt den Normalzustand wieder her.</p>
 
 		<p>Dieser Trick läßt sich gut bei Action-Spielen als optische Untermalung beispielsweise einer Explosion einsetzen.</p>
@@ -203,9 +204,9 @@
 
 		<p>Die Speicherstellen 57 und 58 enthalten die Zeilennummer der aktuellen Basic-Zeile. Die Abfrage geschieht mit PRINT PEEK(57) + 256 * PEEK(58).</p>
 
-		<p>Mit »PRINT PEEK(1)« kann abgefragt werden, ob eine Taste an der Datasette gedrückt ist. Es gibt drei mögliche Werte:<br />
-			7: Taste gedrückt,<br />
-			55: keine Taste gedrückt,<br />
+		<p>Mit »PRINT PEEK(1)« kann abgefragt werden, ob eine Taste an der Datasette gedrückt ist. Es gibt drei mögliche Werte:<br>
+			7: Taste gedrückt,<br>
+			55: keine Taste gedrückt,<br>
 			39: Taste gedrückt, aber Programmlauf unterbrochen.</p>
 
 		<p>Diese Abfragen sind für die benutzerfreundliche Programmierung von Kassettenoperationen recht nützlich.</p>
@@ -214,8 +215,8 @@
 
 		<h3>VC 20 — Grundversion simuliert</h3>
 
-		<p>Mit der folgenden kurzen Routine lassen sich die meisten Grundversions- oder +3 KByte-Programme auch mit einer 8 KByte-Erweiterung laden und ausführen:<br />
-			POKE 648, 30 : SYS 64821<br />
+		<p>Mit der folgenden kurzen Routine lassen sich die meisten Grundversions- oder +3 KByte-Programme auch mit einer 8 KByte-Erweiterung laden und ausführen:<br>
+			POKE 648, 30 : SYS 64821<br>
 			POKE 4096, 0 : POKE 44, 16 : NEW</p>
 
 		<p>Danach wird das Programm ganz normal geladen und gestartet. Da der Bildschirmspeicher durch die kleine Routine an der gleichen Stelle wie in der Grundversion liegt, sind die meisten Grundversions-Programme ohne weitere Änderungen direkt lauffähig.</p>
@@ -226,19 +227,19 @@
 
 		<p>Es gibt eine einfache Methode, um beim VC 20 mit mindestens 8 KByte-Erweiterung aus einem ganz normalen Basic-Programm scheinbar ein Maschinensprache-Programm zu machen.</p>
 
-		<p>Zunächst gibt man die folgende Zeile ein:<br />
+		<p>Zunächst gibt man die folgende Zeile ein:<br>
 			10 SYS 4621</p>
 
-		<p>Danach folgt im Direktmodus:<br />
+		<p>Danach folgt im Direktmodus:<br>
 			POKE 43, 1 : POKE 44, 19 : POKE 4864, 0 : NEW</p>
 
-		<p>Keine Angst, die Programmzeile 10 ist nicht verloren. Jetzt • muß das folgende kleine Programm eingegeben werden.<br />
-			10 FOR A = 4621 TO 4643<br />
-			20 READ D : S = S + D : POKE A, D<br />
-			30 NEXT<br />
-			40 IF S§(2039 THEN PRINT "FEHLER IN DATAS"<br />
-			50 DATA 169, 36, 133, 43, 169, 18, 133, 44<br />
-			60 DATA 169, 0, 141, 34, 3, 141, 35, 3, 32<br />
+		<p>Keine Angst, die Programmzeile 10 ist nicht verloren. Jetzt • muß das folgende kleine Programm eingegeben werden.<br>
+			10 FOR A = 4621 TO 4643<br>
+			20 READ D : S = S + D : POKE A, D<br>
+			30 NEXT<br>
+			40 IF S§(2039 THEN PRINT "FEHLER IN DATAS"<br>
+			50 DATA 169, 36, 133, 43, 169, 18, 133, 44<br>
+			60 DATA 169, 0, 141, 34, 3, 141, 35, 3, 32<br>
 			70 DATA 89, 198, 76, 174, 199, 0</p>
 
 		<p>Dieses Programm wird jetzt mit »RUN« gestartet. Anschließend wird im Direktmodus der Basic-Start verschoben: POKE 43, 36 : POKE 44, 18 : POKE 4643, 0 : NEW</p>
@@ -255,15 +256,15 @@
 
 		<p>Sehr oft kommt es vor, daß man eine PRINT-Ausgabe an eine bestimmte Bildschirmstelle schreiben will. Üblicherweise arbeitet man in solch einem Falle mit Cursor-Steuerzeichen, was aber einerseits recht langsam ist und andererseits auch die Übersichtlichkeit eines Programms nicht gerade erhöht. Eine Cursorsteuerung über SYS-Kommando unter Ausnutzung der entsprechenden Betriebssystem-Routine ist da schon komfortabler. Aber es geht auch viel einfacher.</p>
 
-		<p>Will man beispielsweise einen Text in die 14. Zeile, 5. Spalte schreiben, so geht das auch folgendermaßen:<br />
-			POKE 214, 13 : PRINT : PRINT TAB(5);"Text"<br />
+		<p>Will man beispielsweise einen Text in die 14. Zeile, 5. Spalte schreiben, so geht das auch folgendermaßen:<br>
+			POKE 214, 13 : PRINT : PRINT TAB(5);"Text"<br>
 			Adresse 214 enthält nämlich die Zeilenposition des Cursors. Um diese allerdings richtig einsetzen zu können, muß noch ein leerer PRINT-Befehl nachgeschickt werden. Der in Adresse 214 zu POKEnde Zahlenwert ist daher nicht die gewünschte Cursorzeile, sondern der um eins verminderte Wert.</p>
 
 		<address class="author">(Volker Bühn)</address>
 
 		<h3>Sequentielle Datei als Basic-Programm laden</h3>
 
-		<p>Es sind eine Reihe von Anwendungen denkbar, bei denen aus einer sequentiellen Datei auf Diskette oder Kassette ein lauffähiges Basic-Programm erstellt werden soll (Datenfernübertragung, Umwandlung von Textfiles in Basic-Programme). Der folgende Einzeiler macht»s möglich:<br />
+		<p>Es sind eine Reihe von Anwendungen denkbar, bei denen aus einer sequentiellen Datei auf Diskette oder Kassette ein lauffähiges Basic-Programm erstellt werden soll (Datenfernübertragung, Umwandlung von Textfiles in Basic-Programme). Der folgende Einzeiler macht»s möglich:<br>
 			OPEN 1, $Gerät(, $Sekundäradresse(, "$Name)" : POKE 812, 238 : POKE 781, 1 : SYS 65478</p>
 
 		<p>Dieses Miniprogramm öffnet das File Nummer 1 als Eingabefile (anstelle der Tastatur). Außerdem wird der CLALL-Vektor des Betriebssystems auf ein »RTS« gesetzt, so daß beim Einlesen von Programmzeilen keine Files geschlossen werden.</p>
@@ -272,7 +273,7 @@
 
 		<p>Um in den normalen Eingabemodus zurückzukehren, muß nur »POKE 812, 239 : CLR« eingegeben werden.</p>
 
-		<p>Zum Ausprobieren: Laden Sie ein beliebiges Basic-Programm und geben Sie danach im Direktmodus ein:<br />
+		<p>Zum Ausprobieren: Laden Sie ein beliebiges Basic-Programm und geben Sie danach im Direktmodus ein:<br>
 			OPEN 1,8,3,"LISTING,S,W": CMD 1 : LIST : PRINT#1 : CLOSE 1</p>
 
 		<p>Dadurch wird das momentan im Speicher befindliche Programm als sequentielles File auf Diskette gespeichert. Datasetten-Besitzer müssen den OPEN-Befehl abändern in »OPEN 1,1,2,"LISTING"«.</p>
@@ -295,8 +296,8 @@
 
 		<p>POKE 792, 34 : POKE 793, 3 - Nach Drücken der RESTORE-Taste führt der Computer einen Kaltstart aus.</p>
 
-		<p>SYS 65511 - Dieser Befehl schließt alle Dateien POKE 198, 0 : WAIT 198, 1 - Der Computer wartet, bis eine Taste gedrückt wird.<br />
-			SYS 64802 - Es wird ein vollständiger Kaltstart ausgeführt<br />
+		<p>SYS 65511 - Dieser Befehl schließt alle Dateien POKE 198, 0 : WAIT 198, 1 - Der Computer wartet, bis eine Taste gedrückt wird.<br>
+			SYS 64802 - Es wird ein vollständiger Kaltstart ausgeführt<br>
 			SYS 64818 - Kaltstart des VC 20, ist schneller als SYS 64802</p>
 
 		<p>POKE 818,34 : POKE 819,2 53 : POKE 37150,2 - Damit wird das Abspeichern von Programmen verhindert (Kopierschutz). Nach der Eingabe von »SAVE« führt der Computer einen Kaltstart durch.</p>
@@ -329,14 +330,14 @@
 
 		<p>Simons Basic bietet ja bekanntlich die Möglichkeit, die Funktionstasten mit beliebigen Zeichenketten zu belegen. Um nun die Funktionstasten nicht jedesmal nach dem Einschalten neu belegen zu müssen, wäre es sinnvoll, die Belegung auf Floppy abspeichern zu können.</p>
 
-		<p>Die Funktionstastenbelegung ist bei Simons Basic in dem von Basic nicht erreichbaren Speicherbereich $C64D bis $C74B (50765 bis 51019 dezimal) abgelegt. Mit dem folgenden kleinen Programm wird dieser Speicherbereich als Maschinenprogramm abgespeichert:<br />
-			10 INPUT "Filename "; X$<br />
-			20 OPEN 5, 8, 5, X$ + »,P,W»<br />
-			30 A = 50765 : E = 51019<br />
-			40 H = INT(A / 256) : L = A AND 255<br />
-			50 PRINT#5, CHR$(L); CHR$(H);<br />
-			60 FOR I = A TO E<br />
-			70 PRINT#5, CHR$(PEEK(I));<br />
+		<p>Die Funktionstastenbelegung ist bei Simons Basic in dem von Basic nicht erreichbaren Speicherbereich $C64D bis $C74B (50765 bis 51019 dezimal) abgelegt. Mit dem folgenden kleinen Programm wird dieser Speicherbereich als Maschinenprogramm abgespeichert:<br>
+			10 INPUT "Filename "; X$<br>
+			20 OPEN 5, 8, 5, X$ + »,P,W»<br>
+			30 A = 50765 : E = 51019<br>
+			40 H = INT(A / 256) : L = A AND 255<br>
+			50 PRINT#5, CHR$(L); CHR$(H);<br>
+			60 FOR I = A TO E<br>
+			70 PRINT#5, CHR$(PEEK(I));<br>
 			80 NEXT I :CLOSE 5</p>
 
 		<p>Mit LOAD "Name",8,1 kann die Funktionstastenbelegung nun jederzeit geladen werden, ohne ein eventuell vorhandenes Basic-Programm zu zerstören.</p>
@@ -353,11 +354,11 @@
 
 		<h3>Basic-Programme retten</h3>
 
-		<p>Ein durch NEW oder durch einen Reset gelöschtes Basic-Programm kann durch Eingabe folgender Zeilen im Direktmodus wieder zurückgeholt werden:<br />
-			POKE 46, PEEK(56) -1 : POKE 45, PEEK(55) + 247 : CLR (Return)<br />
-			POKE PEEK(44) * 256 + PEEK(43) + 1, PEEK(44) (Return)<br />
-			63999 (Return)<br />
-			FOR I = PEEK(44) * 2 56 + PEEK(43) TO PEEK(46) * 2 56 + PEEK(45) : IF PEEK(I) OR PEEK(I + 1) OR PEEK(I + 2) THEN NEXT (Return)<br />
+		<p>Ein durch NEW oder durch einen Reset gelöschtes Basic-Programm kann durch Eingabe folgender Zeilen im Direktmodus wieder zurückgeholt werden:<br>
+			POKE 46, PEEK(56) -1 : POKE 45, PEEK(55) + 247 : CLR (Return)<br>
+			POKE PEEK(44) * 256 + PEEK(43) + 1, PEEK(44) (Return)<br>
+			63999 (Return)<br>
+			FOR I = PEEK(44) * 2 56 + PEEK(43) TO PEEK(46) * 2 56 + PEEK(45) : IF PEEK(I) OR PEEK(I + 1) OR PEEK(I + 2) THEN NEXT (Return)<br>
 			POKE 45, (I + 3) AND 255 : POKE 46, (I + 3) / 256 : CLR (Return)</p>
 
 		<p>Diese »Rettungsmaßnahme« funktioniert sowohl beim VC 20 wie auch beim C 64.</p>
@@ -366,7 +367,7 @@
 
 		<h3>Cursor steuern</h3>
 
-		<p>Das Betriebssystem des C 64 enthält eine Routine, die man benutzen kann, um den Cursor an eine beliebige Stelle zu setzen. Geben Sie doch mal folgendes ein:<br />
+		<p>Das Betriebssystem des C 64 enthält eine Routine, die man benutzen kann, um den Cursor an eine beliebige Stelle zu setzen. Geben Sie doch mal folgendes ein:<br>
 			POKE 214, (Zeile) : POKE 211, (Spalte) : SYS 58640 : PRINT "TEXT"</p>
 
 		<address class="author">(Michael Keukert)</address>
@@ -379,10 +380,10 @@
 
 		<h3>Einige WAIT-Befehle</h3>
 
-		<p>Folgende Befehle warten auf spezielle Tasten:<br />
-			WAIT 198, 1 wartet auf beliebige Taste<br />
-			WAIT 653, 1 Wartet auf Shift<br />
-			WAIT 653, 2 Wartet auf Commodore-Taste<br />
+		<p>Folgende Befehle warten auf spezielle Tasten:<br>
+			WAIT 198, 1 wartet auf beliebige Taste<br>
+			WAIT 653, 1 Wartet auf Shift<br>
+			WAIT 653, 2 Wartet auf Commodore-Taste<br>
 			WAIT 653, 4 Wartet auf CNTRL</p>
 
 		<address class="author">(Michael Keukert)</address>
@@ -444,7 +445,7 @@
 
 		<p>Viele schätzen es, viele wünschen es sich: Einen berechneten GOTO-Befehl auf einen variablen Ausdruck anstelle einer Zeilennummer. Hier ist eine schnelle und sichere Methode, die nur 17 Bytes Speicherplatz benötigt.</p>
 
-		<p>Schreiben Sie als erste Programmzeile<br />
+		<p>Schreiben Sie als erste Programmzeile<br>
 			1 REM"*********" (mindestens neun Sternchen). Anschließend geben Sie im Direktmodus ein: "PRINT PEEK(43) + PEEK(44) * 256 + 6" (RETURN).</p>
 
 		<p>Die daraufhin angezeigte Adresse notieren Sie sich bitte. Ohne Erweiterung müßten Sie den Wert 4103 erhalten haben, mit 3 KByte Erweiterung 1031 und ab 8 KByte Erweiterung 4615.</p>
@@ -461,29 +462,29 @@
 
 		<h3>POKEs für den 64’er</h3>
 
-		<p>POKE 775,200 Listschutz ein<br />
-			POKE 775,167 Listschutz aus<br />
-			POKE 788,49 Run Stop ein<br />
-			POKE 788,52 Run Stop aus<br />
-			POKE 808,237 Run Stop Restore ein<br />
-			POKE 808,225 Run Stop Restore aus<br />
-			POKE 650,128 Dauerfunktion für alle Tasten<br />
+		<p>POKE 775,200 Listschutz ein<br>
+			POKE 775,167 Listschutz aus<br>
+			POKE 788,49 Run Stop ein<br>
+			POKE 788,52 Run Stop aus<br>
+			POKE 808,237 Run Stop Restore ein<br>
+			POKE 808,225 Run Stop Restore aus<br>
+			POKE 650,128 Dauerfunktion für alle Tasten<br>
 			POKE 650,0 Dauerfunktion nur für Space und Cursortasten POKE 650,64 Dauerfunktion aus für alle Tasten</p>
 
 		<h3>INPUT ohne Fragezeichen</h3>
 
-		<p>Die Ausgabe eines Fragezeichens beim INPUT-Befehl kann durch Öffnen einer Tastaturdatei unterdrückt werden:<br />
-			10 OPEN 1,0 : REM Tastaturdatei eröffnen<br />
-			20 INPUT#1,A$ : REM Einlesen von Tastatur ohne Fragezeichen<br />
+		<p>Die Ausgabe eines Fragezeichens beim INPUT-Befehl kann durch Öffnen einer Tastaturdatei unterdrückt werden:<br>
+			10 OPEN 1,0 : REM Tastaturdatei eröffnen<br>
+			20 INPUT#1,A$ : REM Einlesen von Tastatur ohne Fragezeichen<br>
 			30 REM Nicht vergessen, die Datei mit CLOSE 1 wieder zu schließen</p>
 
 		<h3>Zwei Einzeiler</h3>
 
 		<p>Zahlenkonvertierungen von Dezimal nach Hexadezimal braucht man recht häufig. Hier sind zwei Einzeiler zu diesem Thema:</p>
 
-		<p>— Hex $X nach dezimal X<br />
-			10 x=0:fori = 1tolen(x$):x0=asc(mid$(x$,i,1)):x=16<em>x+x0-48 + (x0(64)</em>7: next<br />
-			— Dezimal X nach hex $X<br />
+		<p>— Hex $X nach dezimal X<br>
+			10 x=0:fori = 1tolen(x$):x0=asc(mid$(x$,i,1)):x=16<em>x+x0-48 + (x0(64)</em>7: next<br>
+			— Dezimal X nach hex $X<br>
 			10 x$=":fori = 1to4:x0=x/16:x=x-int(x0)<em>16:x$=chr$(48+x-(x(9)</em>7) +x$:x=x0:next</p>
 
 		<address class="author">(Volker Everts)</address>
@@ -492,8 +493,8 @@
 
 		<p>Einen verblüffenden Listschutz für einzelne Zeilen erhält man, indem man an die eigentliche Programmzeile einen REM-Befehl anhängt und dahinter in Anführungszeichen eine Reihe reverser »T« gefolgt von einem Doppelpunkt und einem beliebigen Text schreibt.</p>
 
-		<p>Geben Sie doch einmal folgendes ein:<br />
-			10 PRINT"BAUM":REM19reverse T:<br />
+		<p>Geben Sie doch einmal folgendes ein:<br>
+			10 PRINT"BAUM":REM19reverse T:<br>
 			10 PRINT"BLUME"</p>
 
 		<p>Wenn Sie dieses kleine Programm starten, schreibt der Computer »Baum«, listen Sie aber das Programm, so sehen Sie nur die Zeile 10 PRINT»BLUME«.</p>
