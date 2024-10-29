@@ -24,33 +24,34 @@
 
         <p class="intro">Der Maschinensprache-Monitor SMON wird immer leistungsfähiger. Dieser 2. Teil erweitert ihn um wichtige Ausgabe-Routinen, läßt das Verschieben eines Programms mit und ohne Adreßumrechnung zu und kann Zahlen vom Dezimal- in das Binärsystem und umgekehrt umrechnen.</p>
 
-        <p>Wir hoffen, daß wir Ihnen in der letzten Ausgabe nicht zuviel zugemutet haben, und daß sich Ihre wunden Finger inzwischen wieder erholen konnten. Bestimmt haben Sie im vergangenen Monat schon eifrig mit dem neuen Monitor gearbeitet und sind inzwischen mit den bisherigen Befehlen vertraut. Denn nun folgt der zweite Teil und mit diesem natürlich wieder einige neue Befehle, die es zu erklären gilt.<br>
-            Und das bieten wir Ihnen heute:<br>
+        <p>Wir hoffen, daß wir Ihnen in der letzten Ausgabe nicht zuviel zugemutet haben, und daß sich Ihre wunden Finger inzwischen wieder erholen konnten. Bestimmt haben Sie im vergangenen Monat schon eifrig mit dem neuen Monitor gearbeitet und sind inzwischen mit den bisherigen Befehlen vertraut. Denn nun folgt der zweite Teil und mit diesem natürlich wieder einige neue Befehle, die es zu erklären gilt.</p>
+    
+        <p>Und das bieten wir Ihnen heute:<br>
             I/O-SET, LOAD, SAVE, PRINTER-SET, die verschiedenen Zahlenumrechnungen (HEX-DEZ-BIN-ADD-SUB), OCCUPY CONVERT, VERSCHIEBEN und WRITE.</p>
 
         <h3>I/O-SET</h3>
 
-        <p>I01 legt die Device-Nummer für LOAD und SAVE auf I (Kassette). Jedes Laden und Abspeichern erfolgt jetzt auf das angegebene Gerät. Die voreingestellte Device-Nummer ist 8 (für die Floppy also: I 08). Wenn Sie nur mit der Floppy arbeiten, brauchen Sie diesen Befehl also nicht.</p>
+        <p>I 01 legt die Device-Nummer für LOAD und SAVE auf 1 (Kassette). Jedes Laden und Abspeichern erfolgt jetzt auf das angegebene Gerät. Die voreingestellte Device-Nummer ist 8 (für die Floppy also: I 08). Wenn Sie nur mit der Floppy arbeiten, brauchen Sie diesen Befehl also nicht.</p>
 
         <h3>LOAD</h3>
 
-        <p>L ”Name” lädt ein Programm vom angegebenen Gerät (wie oben beschrieben) an die Originaladresse in den Speicher. Die Basic-Zeiger bleiben bei diesem Ladevorgang unbeeinflußt, das heißt, sie werden nicht verändert.</p>
+        <p>L "Name" lädt ein Programm vom angegebenen Gerät (wie oben beschrieben) an die Originaladresse in den Speicher. Die Basic-Zeiger bleiben bei diesem Ladevorgang unbeeinflußt, das heißt, sie werden nicht verändert.</p>
 
-        <p>Beispiel: Unser Monitor soll an seiner Originaladresse ($C000) im Speicher stehen. Also brauchen Sie ihn nur mit »L ”SMON”«zuladen, damit er dort erscheint. Wenn Sie einmal ein Programm an eine andere als die Originaladresse laden wollen, dann bietet Ihnen SMON dazu folgende Möglichkeit: ’L ”Name” ADRESSE lädt ein Programm an die angegebene Adresse. Nehmen Sie doch bitte noch einmal unser letztes Test-Programm und geben es mit dem Assembler ab Adresse $4000 ein. Speichern Sie es mit »’S ’’SUPERTEST” 4000 4023« ab und laden es dann</p>
+        <p>Beispiel: Unser Monitor soll an seiner Originaladresse ($C000) im Speicher stehen. Also brauchen Sie ihn nur mit »L "SMON"«zuladen, damit er dort erscheint. Wenn Sie einmal ein Programm an eine andere als die Originaladresse laden wollen, dann bietet Ihnen SMON dazu folgende Möglichkeit: ’L "Name" ADRESSE lädt ein Programm an die angegebene Adresse. Nehmen Sie doch bitte noch einmal unser letztes Test-Programm und geben es mit dem Assembler ab Adresse $4000 ein. Speichern Sie es mit »’S "SUPERTEST" 4000 4023« ab und laden es dann</p>
 
         <ol>
-            <li>an die Originaladresse (L &ldquo;SUPERTEST”) und</li>
-            <li>an eine andere Adresse (mit L ”SUPERTEST”5000 zum Beispiel nach $5000).</li>
+            <li>an die Originaladresse (L "SUPERTEST") und</li>
+            <li>an eine andere Adresse (mit L "SUPERTEST" 5000 zum Beispiel nach $5000).</li>
         </ol>
 
 
-        <p>Schauen Sie sich danach mit dem Disassembler-Befehl beide Routinen einmal an. Sie werden feststellen, daß beide Programme zwar bis auf die BRANCH-Befehle gleich aussehen, daß das Programm in $5000 aber nicht funktionieren kann, da es eine falsche Adresse verwendet (5002 LDA 400E,Y). Ein anderes Beispiel dazu: Ein Autostart-Programm beginnt bei $0120, läßt sich aber in diesem Bereich nicht untersuchen, da dort der Prozessor-STACK (im Bereich von $0100 bis $01FF) liegt, der vom Prozessor selbst ständig verändert wird. Wenn Sie nun L”Name” 4120 eingeben, befindet sich das Programm anschließend bei $4120 (nicht an der Originaladresse $0120) und Sie können es ohne Einschränkungen — von den falschen Absolut-Adressen abgesehen — disassemblieren.</p>
+        <p>Schauen Sie sich danach mit dem Disassembler-Befehl beide Routinen einmal an. Sie werden feststellen, daß beide Programme zwar bis auf die BRANCH-Befehle gleich aussehen, daß das Programm in $5000 aber nicht funktionieren kann, da es eine falsche Adresse verwendet (5002 LDA 400E,Y). Ein anderes Beispiel dazu: Ein Autostart-Programm beginnt bei $0120, läßt sich aber in diesem Bereich nicht untersuchen, da dort der Prozessor-STACK (im Bereich von $0100 bis $01FF) liegt, der vom Prozessor selbst ständig verändert wird. Wenn Sie nun L"Name" 4120 eingeben, befindet sich das Programm anschließend bei $4120 (nicht an der Originaladresse $0120) und Sie können es ohne Einschränkungen — von den falschen Absolut-Adressen abgesehen — disassemblieren.</p>
 
         <h3>SAVE</h3>
 
-        <p>S ”Name”, ANFADR ENDADR speichert ein Programm von ANFADR bis ENDADR-1 unter »Name« auf die Floppy ab, da diese — wie wir ja inzwischen wissen — das voreingestellte Gerät ist. Wenn Sie auf Kassette abspeichern wollen, setzen Sie vorher mit »I 01« die Device-Nummer auf 1.</p>
+        <p>S "Name", ANFADR ENDADR speichert ein Programm von ANFADR bis ENDADR-1 unter »Name« auf die Floppy ab, da diese — wie wir ja inzwischen wissen — das voreingestellte Gerät ist. Wenn Sie auf Kassette abspeichern wollen, setzen Sie vorher mit »I 01« die Device-Nummer auf 1.</p>
 
-        <p>Beispiel: S”SUPERTEST”4000 4020 speichert das Programm mit dem Namen »SUPERTEST« (es steht im Speicher von $4000 bis $401F) auf Diskette ab. Bitte beachten Sie auch bei diesem Befehl, daß die Endadresse auf das nächste Byte hinter dem Programm gesetzt wird.</p>
+        <p>Beispiel: S"SUPERTEST"4000 4020 speichert das Programm mit dem Namen »SUPERTEST« (es steht im Speicher von $4000 bis $401F) auf Diskette ab. Bitte beachten Sie auch bei diesem Befehl, daß die Endadresse auf das nächste Byte hinter dem Programm gesetzt wird.</p>
 
         <h3>PRINTER-SET</h3>
 
@@ -106,10 +107,12 @@
 
         <p>C (ANFADRalt ENDADRalt ANFADRneu ANFADRges END-ADRges) verschiebt das Programm von ANFADRalt bis ENDADRalt zur ANFADRneu und zwar mit Umrechnung der Adressen zwischen ANFADRges und ENDADRges</p>
 
-        <p>An unserem kleinen Testprogramm läßt sich wieder einmal demonstrieren, wie der Befehl eingesetzt wird. Laden Sie es also mit »L’SUPERTEST”« und schauen es mit »D 4000« an. Jetzt wollen wir an der Adresse $4008 einen 3-Byte-Befehl einfügen: C 4008 4020 400B 4000 4011 verschiebt das Programm von $4008 bis $4020 zur neuen Anfangsadresse $400B. Dabei werden im Bereich von $4000 bis $4011 (neue Endadresse des »aktiven« Programmes!) die Sprungadressen umgerechnet. Nun können Sie ab Adresse $4008 einen 3-Byte-Befehl einfügen, zum Beispiel STY 0286. Dazu geben Sie bitte ein:<br>
-            A 4008<br>
-            4008 STY 0286<br>
-            F</p>
+        <p>An unserem kleinen Testprogramm läßt sich wieder einmal demonstrieren, wie der Befehl eingesetzt wird. Laden Sie es also mit »L’SUPERTEST"« und schauen es mit »D 4000« an. Jetzt wollen wir an der Adresse $4008 einen 3-Byte-Befehl einfügen: C 4008 4020 400B 4000 4011 verschiebt das Programm von $4008 bis $4020 zur neuen Anfangsadresse $400B. Dabei werden im Bereich von $4000 bis $4011 (neue Endadresse des »aktiven« Programmes!) die Sprungadressen umgerechnet. Nun können Sie ab Adresse $4008 einen 3-Byte-Befehl einfügen, zum Beispiel STY 0286. Dazu geben Sie bitte ein:
+            <code>A 4008
+                4008 STY 0286
+                F
+            </code>
+        </p>
 
         <p>Überzeugen Sie sich davon, daß SMON die Befehle korrekt umgerechnet hat, indem Sie unser Beispiel disassemblieren (D 4000) und anschließend mit G 4000 starten. Besitzer eines Farbmonitors werden in helle Begeisterung ausbrechen. Vorsicht ist geboten, wenn Tabellen oder Text vorhanden sind. SMON wird versuchen, diese als Befehle zu disassemblieren und gegebenenfalls umzurechnen. Dabei können unvorhersehbare Verfälschungen auftreten. Aus diesem Grunde ist im Beispiel die Endadresse des zu ändernden Bereiches auf $4011 und nicht etwa auf $4023 gelegt worden. Wenn Sie größere Programme zu verschieben haben, sollten Sie die Kommandos W und V anwenden, beziehungsweise einen Assembler einsetzen, der es Ihnen gestattet, beliebige Einfügungen, Verschiebungen und sonstige Änderungen vorzunehmen. Das C-Kommando eignet sich in erster Linie für kleinere Änderungen innerhalb eines Programms.</p>
 
@@ -131,7 +134,7 @@
 
         <p>TODO</p>
 
-        <p>Da die Namenlänge um eins zu groß geraten ist (das letzte Zeichen war ein »”«), muß sie dekrementiert werden. Die gewählte oder voreingestellte I/O-Nummer (Device-Nummer) soll in $BA gespeichert werden, damit die Betriebssystemroutine nachher das richtige Gerät anspricht. Zum Abschluß überprüft der Compare-Befehl, ob das Kommando »S« gewählt ist, um dann dorthin zu verzweigen.</p>
+        <p>Da die Namenlänge um eins zu groß geraten ist (das letzte Zeichen war ein »"«), muß sie dekrementiert werden. Die gewählte oder voreingestellte I/O-Nummer (Device-Nummer) soll in $BA gespeichert werden, damit die Betriebssystemroutine nachher das richtige Gerät anspricht. Zum Abschluß überprüft der Compare-Befehl, ob das Kommando »S« gewählt ist, um dann dorthin zu verzweigen.</p>
 
         <p>TODO</p>
 
@@ -151,12 +154,13 @@
 
         <h3>Hinweise zum Abtippen</h3>
 
-        <p>Tippen Sie das Ladeprogramm sorgfältig ab, speichern Sie es (!) und starten Sie mit RUN. Sollte es sich wider Erwarten auf Anhieb mit READY melden, haben Sie das Schlimmste geschafft. Ansonsten beseitigen Sie nun alle Fehler bis es zum READY durchläuft. Jetzt laden Sie das alte Ladeprogramm aus der letzten Ausgabe und starten es. Nach dem READY starten Sie SMON mit SYS 49152. Als erstes probieren Sie nun den Befehl »S«, um SMON selbst abzuspeichern, diesmal nicht mehr als Basic-Lader, sondern als Maschinenprogramm.<br>
-            S ”SMON $C000” C000 CAB7</p>
+        <p>Tippen Sie das Ladeprogramm sorgfältig ab, speichern Sie es (!) und starten Sie mit RUN. Sollte es sich wider Erwarten auf Anhieb mit READY melden, haben Sie das Schlimmste geschafft. Ansonsten beseitigen Sie nun alle Fehler bis es zum READY durchläuft. Jetzt laden Sie das alte Ladeprogramm aus der letzten Ausgabe und starten es. Nach dem READY starten Sie SMON mit SYS 49152. Als erstes probieren Sie nun den Befehl »S«, um SMON selbst abzuspeichern, diesmal nicht mehr als Basic-Lader, sondern als Maschinenprogramm.
+            <code>S "SMON $C000" C000 CAB7</code>
+        </p>
 
-        <p>SMON belegt jetzt 11 Blöcke auf der Diskette. Ab jetzt können Sie SMON direkt mit »LOAD ”SMON $C000”,8,1« laden und mit SYS 49152 starten.</p>
+        <p>SMON belegt jetzt 11 Blöcke auf der Diskette. Ab jetzt können Sie SMON direkt mit »LOAD "SMON $C000",8,1« laden und mit SYS 49152 starten.</p>
 
-        <p>Noch zwei Hinweise in eigener Sache: Einige wenige (!) Leser haben uns darauf aufmerksam gemacht, daß die Druckerausgabe auf bestimmten (exotischen) Druckern bisweilen kleinere Unzulänglichkeiten aufweist. Kurz und schlecht, uns ist in der letzten Folge ein Programmierfehler unterlaufen: Beim Disassemblieren verschwindet die letzte Zeile vor dem Strich (&mdash;&ndash;) im Drucker und ward nicht mehr gesehen. So etwas passiert, wenn man kurz vor Redaktionsschluß noch auf die Schnelle kleine »Verbesserungen« vornimmt.</p>
+        <p>Noch zwei Hinweise in eigener Sache: Einige wenige (!) Leser haben uns darauf aufmerksam gemacht, daß die Druckerausgabe auf bestimmten (exotischen) Druckern bisweilen kleinere Unzulänglichkeiten aufweist. Kurz und schlecht, uns ist in der letzten Folge ein Programmierfehler unterlaufen: Beim Disassemblieren verschwindet die letzte Zeile vor dem Strich (----) im Drucker und ward nicht mehr gesehen. So etwas passiert, wenn man kurz vor Redaktionsschluß noch auf die Schnelle kleine »Verbesserungen« vornimmt.</p>
 
         <p>Für die Korrektur ist folgendes notwendig: Listen Sie mit »M C56C C57B« zwei Zeilen, gehen mit dem Cursor in die betreffenden Zeilen und geben folgende Änderung ein:</p>
 

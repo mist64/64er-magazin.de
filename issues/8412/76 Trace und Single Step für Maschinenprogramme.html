@@ -42,12 +42,14 @@
         </ol>
 
 
-        <p>Folgende Tastenfunktionen stehen zur Verfügung:<br>
-            <strong>Taste F7</strong> = Einzelschritt. Pro Tastendruck wird ein Befehl des Testprogramms ausgeführt (genauer gesagt beim Loslassen von F1). Danach werden wieder die Register angezeigt und disassembliert.<br>
-            <strong>Tast F5</strong> = Slow Trace. Solange diese Taste gedrückt ist, wird das Testprogramm Befehl für Befehl abgearbeitet, die Register angezeigt und pro Befehl noch zusätzlich um zirka 65 ms verzögert.<br>
-            <strong>Taste F3</strong> = Tast Trace. Wie F5 jedoch ohne Verzögerung.<br>
-            <strong>Taste F1</strong> = Set Register, Editmodus. Durch Drücken von F1 kommen Sie in den Editmodus.
-        </p>
+        <p>Folgende Tastenfunktionen stehen zur Verfügung:</p>
+
+        <ul class="plain">
+            <li><strong>Taste F7</strong> = Einzelschritt. Pro Tastendruck wird ein Befehl des Testprogramms ausgeführt (genauer gesagt beim Loslassen von F1). Danach werden wieder die Register angezeigt und disassembliert.</li>
+            <li><strong>Tast F5</strong> = Slow Trace. Solange diese Taste gedrückt ist, wird das Testprogramm Befehl für Befehl abgearbeitet, die Register angezeigt und pro Befehl noch zusätzlich um zirka 65 ms verzögert.</li>
+            <li><strong>Taste F3</strong> = Tast Trace. Wie F5 jedoch ohne Verzögerung.</li>
+            <li><strong>Taste F1</strong> = Set Register, Editmodus. Durch Drücken von F1 kommen Sie in den Editmodus.</li>
+        </ul>
 
         <h3>Beschreibung Editmodus</h3>
 
@@ -61,15 +63,22 @@
 
         <p>Siehe hierzu auch Assemblersourcelisting. Zuerst schalte ich den normalen Tastaturinterrupt über Timer A aus und benütze den Timer B in CIA 1 für meine Interruptroutine. Timer A läuft zwar weiter, aber sendet keine IRQ mehr. Dann setze ich den IRQ-Vektor auf Trace. Trace initialisiert beim Start den Stack und beginnt dann mit der eigentlichen Einzelschrittroutine. Diese Routine dient als neue Interruptroutine, da der IRQ-Vektor auf Trace geändert wurde. Der Interrupt wird aber nicht mehr alle 1/60 Sekunde durch den Timer A ausgelöst, sondern durch Timer B und zwar alle 25 Mikrosekunden nach Start des Timers.</p>
 
-        <p>In dieser Zeit kann der Prozessor das Ende der normalen IRQ-Routine durchlaufen (Register vom Stack holen). Jetzt bleibt aber nur mehr Zeit, um einen Befehl des Testprogramms abzuarbeiten, da Timer B ja schon in genau einer Mikrosekunde erneut einen IRQ sendet. Der Prozessor legt nach diesem einen Befehl alle Register auf den Stack und verzweigt entsprechend dem IRQ-Vektor wieder auf Trace. Für genauere Information siehe Listing. Innerhalb der Traceroutine wird ein IRQ nicht akzeptiert, da sich sonst das Programm immer selbst unterbrechen würde. Trace läßt sich also nur durch einen NMI unterbrechen.<br>
-            Beispiel:<br>
-            SYS 49152 = Trace starten. Disassembler an.<br>
-            Taste F1 drücken = Editmodus wählen.<br>
-            PC auf $AF08 setzen. Diese Systemroutine gibt »Syntax Error« aus. Sie können zum Spaß auch die Register verändern, benützen Sie auch die Cursorsteuertasten.</p>
+        <p>In dieser Zeit kann der Prozessor das Ende der normalen IRQ-Routine durchlaufen (Register vom Stack holen). Jetzt bleibt aber nur mehr Zeit, um einen Befehl des Testprogramms abzuarbeiten, da Timer B ja schon in genau einer Mikrosekunde erneut einen IRQ sendet. Der Prozessor legt nach diesem einen Befehl alle Register auf den Stack und verzweigt entsprechend dem IRQ-Vektor wieder auf Trace. Für genauere Information siehe Listing. Innerhalb der Traceroutine wird ein IRQ nicht akzeptiert, da sich sonst das Programm immer selbst unterbrechen würde. Trace läßt sich also nur durch einen NMI unterbrechen.</p>
 
-        <p>RETURN drücken = Edit für disassemblierte Zeile. Hier können Sie die Hexbytes editieren. Eine Änderung hätte aber keinen Sinn, da wir ja eine ROM-Routine tracen. Drücken Sie nur (RETURN), und Sie gelangen wieder in den Tracemodus.<br>
-            F7 drücken = Einen Befehl ab PC ausführen.<br>
-            F5 drücken = Trace. Anzeige läuft. Flags werden in schneller Folge geändert. Die disassemblierte Zeile ändert sich sehr schnell. Halten Sie die Taste gedrückt, nach ein paar Sekunden sehen Sie schön langsam Buchstabe für Buchstabe »Syntax Error« erscheinen. Befindet sich der Cursor zufällig gerade am unteren Bildschirmrand und ist der Bildschirm vollgeschrieben, dann kann man schön verfolgen, wie die Scrollroutine arbeitet, der Bildschirminhalt wird Zeile für Zeile nach oben geschoben, um Platz für die Meldung zu machen.</p>
+        <p class="noindent">Beispiel:</p>
+        
+        <ul class="plain">
+            <li>SYS 49152 = Trace starten. Disassembler an.</li>
+            <li>Taste F1 drücken = Editmodus wählen.</li>
+            <li>PC auf $AF08 setzen. Diese Systemroutine gibt »Syntax Error« aus. Sie können zum Spaß auch die Register verändern, benützen Sie auch die Cursorsteuertasten.</li>
+        </ul>
+
+        <p>RETURN drücken = Edit für disassemblierte Zeile. Hier können Sie die Hexbytes editieren. Eine Änderung hätte aber keinen Sinn, da wir ja eine ROM-Routine tracen. Drücken Sie nur (RETURN), und Sie gelangen wieder in den Tracemodus.</p>
+
+        <ul class="plain">
+            <li>F7 drücken = Einen Befehl ab PC ausführen.</li>
+            <li>F5 drücken = Trace. Anzeige läuft. Flags werden in schneller Folge geändert. Die disassemblierte Zeile ändert sich sehr schnell. Halten Sie die Taste gedrückt, nach ein paar Sekunden sehen Sie schön langsam Buchstabe für Buchstabe »Syntax Error« erscheinen. Befindet sich der Cursor zufällig gerade am unteren Bildschirmrand und ist der Bildschirm vollgeschrieben, dann kann man schön verfolgen, wie die Scrollroutine arbeitet, der Bildschirminhalt wird Zeile für Zeile nach oben geschoben, um Platz für die Meldung zu machen.</li>
+        </ul>
 
         <address class="author">(Jürgen Göbel/aa)</address>
 
