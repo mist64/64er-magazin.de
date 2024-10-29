@@ -81,6 +81,176 @@
 
 		<address class="author">(Volker Bühn / gk)</address>
 
+		<figure>
+			<p>Programmablauf-Plan:</p>
+			<table>
+				<tr>
+					<td>Zeile</td>
+					<td>Beschreibung</td>
+				</tr>
+				<tr>
+					<td>1-7</td>
+					<td>Programmname und Adresse des Autors</td>
+				</tr>
+				<tr>
+					<td>10-30</td>
+					<td>Einlesen und Aufruf der Maschinenroutine, die den Zeichensatz vom ROM ins RAM an die Adresse 51200 kopiert</td>
+				</tr>
+				<tr>
+					<td>40-140</td>
+					<td>Menü und Zeichenfeld werden gezeichnet</td>
+				</tr>
+				<tr>
+					<td>300-460</td>
+					<td>Abfrage der Tastatur:<br>
+						1. Zeichnen im Zeichenfeld<br>
+						2. Aufruf der einzelnen Programmfunktionen</td>
+				</tr>
+				<tr>
+					<td>500-520</td>
+					<td>Unterprogramm zum Printen des Zeichenfeldes</td>
+				</tr>
+				<tr>
+					<td>1000-1530</td>
+					<td>Die einzelnen Unterprogramme zur Steuerung des Cursors, der Space-Taste und des Sternchens, um im Zeichenfeld ein Zeichen zu erzeugen.</td>
+				</tr>
+				<tr>
+					<td>2000-8040</td>
+					<td><b>Einzelne Programmfunktionen:</b></td>
+				</tr>
+				<tr>
+					<td>2000-2120</td>
+					<td>Berechnung eines erstellten Zeichens; Zuordnung dieses neuen Zeichens in den Zeichensatz; Printen der Daten des Zeichens</td>
+				</tr>
+				<tr>
+					<td>3000-3150</td>
+					<td>Ausgabe eines Zeichens aus dem ROM- Zeichensatz; Printen der Daten dieses Zeichens</td>
+				</tr>
+				<tr>
+					<td>4000-4150</td>
+					<td>Ausgabe eines Zeichens aus dem kopierten Zeichensatz, Printen der Daten dieses Zeichens</td>
+				</tr>
+				<tr>
+					<td>5000-5050</td>
+					<td>Neuer Bildschirm zum Zeichen mit dem selbsterstellten Zeichensatz<br>Die Zeile 5050 dient zur Cursor- Steuerung und Ausdrucken eines Zeichens auf dem Bildschirm</td>
+				</tr>
+				<tr>
+					<td>6000-6120</td>
+					<td>Abspeichern eines selbsterstellten Zeichensatzes auf Diskette</td>
+				</tr>
+				<tr>
+					<td>7000-7120</td>
+					<td>Laden eines Zeichensatzes von Diskette</td>
+				</tr>
+				<tr>
+					<td>8000-8040</td>
+					<td>Eingabe von 8 Bytes zur Definition eines Zeichens<br>In 8030 wird sichergestellt, daß keine Zahl größer als 8 Bit ist</td>
+				</tr>
+				<tr>
+					<td>10000-10040</td>
+					<td>POKEn des Maschinenprogramms nach 828</td>
+				</tr>
+				<tr>
+					<td>10100-10150</td>
+					<td>DATA-Zeilen des Maschinenprogramms (in Hexcodes)</td>
+				</tr>
+			</table>
+		</figure>
+		<figure>
+			<p><b>Wichtige Programmzeilen:</b></p>
+			<p>Erstellung eines eigenen Zeichens:</p>
+			<table>
+				<tr>
+					<td>2050-2070</td>
+					<td>Hier werden die Bytes des selbsterstellten Zeichens aus dem Zeichenfeld gelesen, berechnet und in B(1) bis B(8) abgelegt.</td>
+				</tr>
+				<tr>
+					<td>2080</td>
+					<td>Die Bytes des Zeichens werden nun in die Stelle des Zeichensatzes gePOKEt, die der Benutzer durch die Tastenabfrage definiert hat.<br>ROM-Zeichen:</td>
+				</tr>
+				<tr>
+					<td>3050</td>
+					<td>Verhindern von Interrupts</td>
+				</tr>
+				<tr>
+					<td>3060-3070</td>
+					<td>lm ROM-Zeichensatz wird das vom Benutzer festgelegte Zeichen in B(1) bis B(8) sowie C(1) bis C(8) abgelegt</td>
+				</tr>
+				<tr>
+					<td>3080</td>
+					<td>Zulassen von Interrupts</td>
+				</tr>
+				<tr>
+					<td>3090-3110</td>
+					<td>Die Bytes B(1) bis B(8) werden in das Zeichenfeld in Form von Sternchen (*) hinein gePOKEt</td>
+				</tr>
+				<tr>
+					<td>Eigenes Zeichen holen:</td>
+				</tr>
+				<tr>
+					<td>4060-4070</td>
+					<td>wie 3060-3070, nur daß im kopierten Zei chensatz gesucht wird</td>
+				</tr>
+				<tr>
+					<td>4080-4100</td>
+					<td>wie 3090-3110<br>Bild zeichnen:</td>
+				</tr>
+				<tr>
+					<td>5050</td>
+					<td>In den Adressen 209,210 und 211 steht die aktuelle Cursorposition. Dies verhindert, daß der Cursur auf den Bildschirm wie ein normales Zeichen gePRINTet wird.</td>
+				</tr>
+			</table>
+		</figure>
+		<figure>
+			<p>Liste der wichtigsten Variablen</p>
+			<table>
+				<tr>
+					<td>Z</td>
+					<td>Position des anfänglichen Cursors im Zeichenfeld (ist immer 50776)</td>
+				</tr>
+				<tr>
+					<td>PU$<br>NO$</td>
+					<td>Strings, um Punkte beziehungsweise Leerstellen zu PRINTen</td>
+				</tr>
+				<tr>
+					<td>A</td>
+					<td>Variable, die die aktuelle Cursorposition im Zeichenfeld angibt</td>
+				</tr>
+				<tr>
+					<td>G$</td>
+					<td>Stringvariable zur Tastaturabfrage</td>
+				</tr>
+				<tr>
+					<td>B(1) bis B(8)<br>
+					C(1) bis C(8)</td>
+					<td>Arrays, die die 8 Bytes eines Zeichens enthalten</td>
+				</tr>
+				<tr>
+					<td>G</td>
+					<td>Bildschirmcode eines Zeichens</td>
+				</tr>
+				<tr>
+					<td>C</td>
+					<td>Cursorposition beim Bildzeichnen</td>
+				</tr>
+				<tr>
+					<td>N$</td>
+					<td>Name einer einzulesenden beziehungsweise abzuspeichernden Datei</td>
+				</tr>
+				<tr>
+					<td>A$</td>
+					<td>Hexcode aus den DATA-Zeilen</td>
+				</tr>
+				<tr>
+					<td>HN,LN</td>
+					<td>Hi-Nibble beziehungsweise Lo-Nibble von A$</td>
+				</tr>
+				<tr>
+					<td>I,J,K</td>
+					<td>Schleifenvariable</td>
+				</tr>
+			</table>
+		</figure>
 		<aside class="fehlerteufelchen" id="fehlerteufelchen">
 			<h2>Fehlerteufelchen</h2>
 			<p>In der Zeile 5020 muß die PRINT-Anweisung genauso, also mit der eckigen Klammer, eingegeben werden.</p>
