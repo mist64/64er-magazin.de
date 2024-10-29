@@ -136,7 +136,7 @@
 
 		<p>Häufig möchte man sich das Directory einer Diskette ansehen ohne das gerade im Speicher befindliche Programm zu zerstören. Wenn man das DOS 5.1 nicht geladen hat, behilft man sich meist mit der zeitaufwendigen Zwischenspeicherung des Programms auf der Diskette. Es geht jedoch auch einfacher und schneller. Geben Sie einfach den folgenden Befehl ein: POKE 44, PEEK(46) + 1</p>
 
-		<p>Damit wird der Basic-Anfang auf einen freien Speicherbereich gestellt. Sie können jetzt wie gewohnt mit »LOAD &ldquo;$&rdquo;,8« das Directory laden und anschließend auflisten.</p>
+		<p>Damit wird der Basic-Anfang auf einen freien Speicherbereich gestellt. Sie können jetzt wie gewohnt mit »LOAD "$",8« das Directory laden und anschließend auflisten.</p>
 
 		<p>Mit POKE 44,8 sind Sie dann wieder im eigentlichen Programm.</p>
 
@@ -201,7 +201,7 @@
 			10 FOR A = 4621 TO 4643<br />
 			20 READ D : S = S + D : POKE A, D<br />
 			30 NEXT<br />
-			40 IF S§(2039 THEN PRINT &ldquo;FEHLER IN DATAS&rdquo;<br />
+			40 IF S§(2039 THEN PRINT "FEHLER IN DATAS"<br />
 			50 DATA 169, 36, 133, 43, 169, 18, 133, 44<br />
 			60 DATA 169, 0, 141, 34, 3, 141, 35, 3, 32<br />
 			70 DATA 89, 198, 76, 174, 199, 0</p>
@@ -221,7 +221,7 @@
 		<p>Sehr oft kommt es vor, daß man eine PRINT-Ausgabe an eine bestimmte Bildschirmstelle schreiben will. Üblicherweise arbeitet man in solch einem Falle mit Cursor-Steuerzeichen, was aber einerseits recht langsam ist und andererseits auch die Übersichtlichkeit eines Programms nicht gerade erhöht. Eine Cursorsteuerung über SYS-Kommando unter Ausnutzung der entsprechenden Betriebssystem-Routine ist da schon komfortabler. Aber es geht auch viel einfacher.</p>
 
 		<p>Will man beispielsweise einen Text in die 14. Zeile, 5. Spalte schreiben, so geht das auch folgendermaßen:<br />
-			POKE 214, 13 : PRINT : PRINT TAB(5);&ldquo;Text&rdquo;<br />
+			POKE 214, 13 : PRINT : PRINT TAB(5);"Text"<br />
 			Adresse 214 enthält nämlich die Zeilenposition des Cursors. Um diese allerdings richtig einsetzen zu können, muß noch ein leerer PRINT-Befehl nachgeschickt werden. Der in Adresse 214 zu POKEnde Zahlenwert ist daher nicht die gewünschte Cursorzeile, sondern der um eins verminderte Wert.</p>
 
 		<address class="author">(Volker Bühn)</address>
@@ -229,7 +229,7 @@
 		<h3>Sequentielle Datei als Basic-Programm laden</h3>
 
 		<p>Es sind eine Reihe von Anwendungen denkbar, bei denen aus einer sequentiellen Datei auf Diskette oder Kassette ein lauffähiges Basic-Programm erstellt werden soll (Datenfernübertragung, Umwandlung von Textfiles in Basic-Programme). Der folgende Einzeiler macht»s möglich:<br />
-			OPEN 1, $Gerät(, $Sekundäradresse(, &ldquo;$Name)&rdquo; : POKE 812, 238 : POKE 781, 1 : SYS 65478</p>
+			OPEN 1, $Gerät(, $Sekundäradresse(, "$Name)" : POKE 812, 238 : POKE 781, 1 : SYS 65478</p>
 
 		<p>Dieses Miniprogramm öffnet das File Nummer 1 als Eingabefile (anstelle der Tastatur). Außerdem wird der CLALL-Vektor des Betriebssystems auf ein »RTS« gesetzt, so daß beim Einlesen von Programmzeilen keine Files geschlossen werden.</p>
 
@@ -238,15 +238,15 @@
 		<p>Um in den normalen Eingabemodus zurückzukehren, muß nur »POKE 812, 239 : CLR« eingegeben werden.</p>
 
 		<p>Zum Ausprobieren: Laden Sie ein beliebiges Basic-Programm und geben Sie danach im Direktmodus ein:<br />
-			OPEN 1,8,3,&ldquo;LISTING,S,W&rdquo;: CMD 1 : LIST : PRINT#1 : CLOSE 1</p>
+			OPEN 1,8,3,"LISTING,S,W": CMD 1 : LIST : PRINT#1 : CLOSE 1</p>
 
-		<p>Dadurch wird das momentan im Speicher befindliche Programm als sequentielles File auf Diskette gespeichert. Datasetten-Besitzer müssen den OPEN-Befehl abändern in »OPEN 1,1,2,&ldquo;LISTING"«.</p>
+		<p>Dadurch wird das momentan im Speicher befindliche Programm als sequentielles File auf Diskette gespeichert. Datasetten-Besitzer müssen den OPEN-Befehl abändern in »OPEN 1,1,2,"LISTING"«.</p>
 
 		<p>Löschen Sie jetzt den Arbeitsspeicher mit »NEW«. Wenden Sie nun unseren Einzeiler auf die sequentielle »LISTING«Datei an:</p>
 
-		<p>OPEN 1, 8 ,3, &ldquo;LISTING,S,R&rdquo; : POKE 812,238 : POKE 781,1 : SYS 65478</p>
+		<p>OPEN 1, 8 ,3, "LISTING,S,R" : POKE 812,238 : POKE 781,1 : SYS 65478</p>
 
-		<p>Bei der Datasette geben Sie stattdessen »OPEN 1,1,0, &ldquo;LISTING&rdquo; : &hellip;« ein (das Zurückspulen des Bandes nicht vergessen).</p>
+		<p>Bei der Datasette geben Sie stattdessen »OPEN 1,1,0, "LISTING" : &hellip;« ein (das Zurückspulen des Bandes nicht vergessen).</p>
 
 		<p>Nun werden alle Zeilen des sequentiellen Listings eingelesen, und Sie haben zum Schluß wieder das fertige Programm vor sich.</p>
 
@@ -270,7 +270,7 @@
 
 		<h3>Cursor abschalten</h3>
 
-		<p>Mit dem Befehl &ldquo;POKE 788,210&rdquo; wird beim VC 20 der Cursor abgeschaltet. Eine Rücksetzung in den Normalzustand ist mit RUN/STOP-RESTORE möglich.</p>
+		<p>Mit dem Befehl "POKE 788,210" wird beim VC 20 der Cursor abgeschaltet. Eine Rücksetzung in den Normalzustand ist mit RUN/STOP-RESTORE möglich.</p>
 
 		<address class="author">(Dietmar Roudaschl)</address>
 
@@ -295,7 +295,7 @@
 		<p>Simons Basic bietet ja bekanntlich die Möglichkeit, die Funktionstasten mit beliebigen Zeichenketten zu belegen. Um nun die Funktionstasten nicht jedesmal nach dem Einschalten neu belegen zu müssen, wäre es sinnvoll, die Belegung auf Floppy abspeichern zu können.</p>
 
 		<p>Die Funktionstastenbelegung ist bei Simons Basic in dem von Basic nicht erreichbaren Speicherbereich $C64D bis $C74B (50765 bis 51019 dezimal) abgelegt. Mit dem folgenden kleinen Programm wird dieser Speicherbereich als Maschinenprogramm abgespeichert:<br />
-			10 INPUT &ldquo;Filename &rdquo;; X$<br />
+			10 INPUT "Filename "; X$<br />
 			20 OPEN 5, 8, 5, X$ + »,P,W»<br />
 			30 A = 50765 : E = 51019<br />
 			40 H = INT(A / 256) : L = A AND 255<br />
@@ -304,7 +304,7 @@
 			70 PRINT#5, CHR$(PEEK(I));<br />
 			80 NEXT I :CLOSE 5</p>
 
-		<p>Mit LOAD &ldquo;Name&rdquo;,8,1 kann die Funktionstastenbelegung nun jederzeit geladen werden, ohne ein eventuell vorhandenes Basic-Programm zu zerstören.</p>
+		<p>Mit LOAD "Name",8,1 kann die Funktionstastenbelegung nun jederzeit geladen werden, ohne ein eventuell vorhandenes Basic-Programm zu zerstören.</p>
 
 		<address class="author">(Uwe Schwarz)</address>
 
@@ -332,7 +332,7 @@
 		<h3>Cursor steuern</h3>
 
 		<p>Das Betriebssystem des C 64 enthält eine Routine, die man benutzen kann, um den Cursor an eine beliebige Stelle zu setzen. Geben Sie doch mal folgendes ein:<br />
-			POKE 214, (Zeile) : POKE 211, (Spalte) : SYS 58640 : PRINT &ldquo;TEXT&rdquo;</p>
+			POKE 214, (Zeile) : POKE 211, (Spalte) : SYS 58640 : PRINT "TEXT"</p>
 
 		<address class="author">(Michael Keukert)</address>
 
@@ -359,7 +359,7 @@
 		<p>Möchte man ein Programm mit einem einfachen Listschutz versehen, so verfährt man folgendermaßen:</p>
 
 		<ol>
-			<li>Man ergänzt die Zeile, ab der der Listschutz wirksam werden soll, mit &ldquo;:REM&rdquo;.</li>
+			<li>Man ergänzt die Zeile, ab der der Listschutz wirksam werden soll, mit ":REM".</li>
 			<li>Man fährt mit dem Cursor auf das zweite Anführungszeichen und drückt fünfmal die Taste INST.</li>
 			<li>Nun wird ebenfalls fünfmal die Taste DEL gedrückt, so daß zwischen den Anführungszeichen fünf reverse T stehen. ..list</li>
 			<li>Zuletzt bewegt man den Cursor hinter das zweite Anführungszeichen und drückt die Tastenkombination SHIFT und L. Anschließend RETURN nicht vergessen.</li>
@@ -410,7 +410,7 @@
 		<p>Viele schätzen es, viele wünschen es sich: Einen berechneten GOTO-Befehl auf einen variablen Ausdruck anstelle einer Zeilennummer. Hier ist eine schnelle und sichere Methode, die nur 17 Bytes Speicherplatz benötigt.</p>
 
 		<p>Schreiben Sie als erste Programmzeile<br />
-			1 REM"*********&ldquo; (mindestens neun Sternchen). Anschließend geben Sie im Direktmodus ein: "PRINT PEEK(43) + PEEK(44) * 256 + 6&rdquo; (RETURN).</p>
+			1 REM"*********" (mindestens neun Sternchen). Anschließend geben Sie im Direktmodus ein: "PRINT PEEK(43) + PEEK(44) * 256 + 6" (RETURN).</p>
 
 		<p>Die daraufhin angezeigte Adresse notieren Sie sich bitte. Ohne Erweiterung müßten Sie den Wert 4103 erhalten haben, mit 3 KByte Erweiterung 1031 und ab 8 KByte Erweiterung 4615.</p>
 
@@ -449,7 +449,7 @@
 		<p>— Hex $X nach dezimal X<br />
 			10 x=0:fori = 1tolen(x$):x0=asc(mid$(x$,i,1)):x=16<em>x+x0-48 + (x0(64)</em>7: next<br />
 			— Dezimal X nach hex $X<br />
-			10 x$=&ldquo;:fori = 1to4:x0=x/16:x=x-int(x0)<em>16:x$=chr$(48+x-(x(9)</em>7) +x$:x=x0:next</p>
+			10 x$=":fori = 1to4:x0=x/16:x=x-int(x0)<em>16:x$=chr$(48+x-(x(9)</em>7) +x$:x=x0:next</p>
 
 		<address class="author">(Volker Everts)</address>
 
