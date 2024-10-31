@@ -35,7 +35,7 @@
         <p>TODO<br>
             128 1000 0000</p>
 
-        <h2>+ 130 + 1000 0010 </h2>
+        <p>+ 130 + 1000 0010 </p>
 
         <p>258 (1)0000 0010</p>
 
@@ -52,14 +52,16 @@
         <p>TODO<br>
             64 0100 0000</p>
 
-        <h2>+ 66 + 01000010 </h2>
+        <p>+ 66 + 01000010 </p>
 
         <p>(-126) 1000 0010</p>
 
         <p>Das ist offensichtlich falsch. Bei der Addition ist durch das Zusammenzählen der Bits 6 plötzlich Bit 7 gesetzt worden. Da wir es aber mit einer Zweierkomplementzahl zu tun haben, bei der dieses Bit 7 eine negative Zahl anzeigt, folgt ein Fehler. Es ist also von Bedeutung, so einen Überlauf (englisch: &lsquo;overflow&rsquo;) erkennen zu können um eine entsprechende programmtechnische Reaktion zu starten. Es wird die Überlauf-Flagge V auf 1 gesetzt. Leider ist die Sache aber nicht so einfach, daß sie immer gesetzt würde, wenn von Bit 6 nach Bit 7 ein Übertrag stattfindet. Gesetzt wird diese V-Flagge nur in folgenden zwei Fällen:</p>
 
-        <p>1) Es findet ein Übertrag von Bit 6 nächBit 7 statt, aber kein äußerer Übertrag (wie beim Carry)<br>
-            2) Es findet kein interner Übertrag von Bit 6 nach Bit 7 statt, aber ein äußerer Übertrag passiert.</p>
+        <ol>
+            <li>Es findet ein Übertrag von Bit 6 nach Bit 7 statt, aber kein äußerer Übertrag (wie beim Carry)</li>
+            <li>Es findet kein interner Übertrag von Bit 6 nach Bit 7 statt, aber ein äußerer Übertrag passiert.</li>
+        </ol>
 
         <p>Merken kann man sich das am besten so: Immer dann, wenn gewissermaßen das Vorzeichenbit 7 »versehentlich« verändert wurde, wird die V-Flagge auf 1 gesetzt. Das ist ein harter Brocken! Wir sind es ja gewohnt, daß wir uns um diese Dinge beim Computer eigentlich gar nicht mehr kümmern müssen. Außerdem würde das ja erfordern, daß man sich bei allen Operationen vorher überlegen muß, welche Zahlen auftreten können und welche Fehler also durch »versehentliches« Vorzeichenändern passieren können! Genauso ist es — in der Programmierpraxis wird Ihnen aber das ganze Problem nicht mehr so groß vorkommen. Wir wollen uns dieses Zusammenspiel der Überträge von Bit 6 nach Bit 7 und von Bit 7 nach Bit 8 (also ins Carry-Bit) noch anhand einiger Beispiele klarer machen.</p>
 
@@ -68,7 +70,7 @@
         <p>TODO<br>
             64 0000 0000 0100 0000</p>
 
-        <h2> + 66 + 0000 0000 0100 0010 </h2>
+        <p> + 66 + 0000 0000 0100 0010 </p>
 
         <p>130 0000 00001000 0010</p>
 
@@ -79,7 +81,7 @@
         <p>TODO<br>
             —125 1000 0011</p>
 
-        <h2>- 64 1100 0000 </h2>
+        <p>- 64 1100 0000 </p>
 
         <p>(+67) (1)01000011</p>
 
@@ -110,32 +112,37 @@
 
         <h3>Der Computer rechnet: ADC, CLC</h3>
 
-        <p>ADC ist der erste Arithmetik-Befehl des 6502 (und natürlich auch des 6510), den wir kennenlernen. Er bedeutet »add with carry«, also »addiere mit Carry-Bit«. An einem 8-Bit-Beispiel wollen wir uns das mal ansehen. ZAHL1 und ZAHL2 sollen addiert werden. Beide sollen positive 8-Bit-Zahlen sein, die so klein sind, daß kein Überlauf zu erwarten ist. Die ZAHL1 wird in den Akku gegeben:</p>
+        <p>ADC ist der erste Arithmetik-Befehl des 6502 (und natürlich auch des 6510), den wir kennenlernen. Er bedeutet »add with carry«, also »addiere mit Carry-Bit«. An einem 8-Bit-Beispiel wollen wir uns das mal ansehen. ZAHL1 und ZAHL2 sollen addiert werden. Beide sollen positive 8-Bit-Zahlen sein, die so klein sind, daß kein Überlauf zu erwarten ist. Die ZAHL1 wird in den Akku gegeben:
+            <code>LDA #ZAHL1</code>
+        </p>
 
-        <p>LDA #ZAHL1</p>
-
-        <p>Wenn wir nun den Befehl<br>
-            ADC #ZAHL2<br>
-            folgen lassen, sorgt die ALU (arithmetisch-logische Einheit, siehe Folge 1) dafür, daß beide Zahlen addiert werden und das Ergebnis im Akku erscheint. ZAHL1 ist dann vom Ergebnis überschrieben worden. An sich ist damit alles erledigt. Weil wir aber häufig wissen wollen, was denn nun bei der Addition herausgekommen ist, speichern wir den Akku-Inhalt noch irgendwo ab mittels »STA Speicherstelle«. Außerdem war da ja noch die Sache mit dem Carry-Bit. Wir haben oben festgestellt, daß bei einer 8-Bit-Addition kein Carry-Bit berücksichtigt werden soll. Nun gibt es aber eine ganze Menge von Vorgängen in einem Assembler-Programm, die das Carry-Bit beeinflussen. Man kann eigentlich vor einer Addition nie ganz sicher sein, ob es denn nun 1 oder 0 ist. Weil jedoch ADC auch das Carry-Bit mitaddiert, sollte man dafür sorgen, daß es vor dem Zusammenzählen wirklich gelöscht ist. Dazu gibt es den Befehl CLC was die Abkürzung für »clear carry«, also »lösche Carry-Bit« ist. Sei ZAHLl = 12 und ZAHL2 = 7, dann würde unser vollständiges 8-Bit-Additions-Progrämmchen also lauten:<br>
-            1200 CLC<br>
-            1201 LDA #$0C<br>
-            1203 ADC #$07<br>
-            1205 STA 1500</p>
+        <p>Wenn wir nun den Befehl
+            <code>ADC #ZAHL2</code>
+            folgen lassen, sorgt die ALU (arithmetisch-logische Einheit, siehe Folge 1) dafür, daß beide Zahlen addiert werden und das Ergebnis im Akku erscheint. ZAHL1 ist dann vom Ergebnis überschrieben worden. An sich ist damit alles erledigt. Weil wir aber häufig wissen wollen, was denn nun bei der Addition herausgekommen ist, speichern wir den Akku-Inhalt noch irgendwo ab mittels »STA Speicherstelle«. Außerdem war da ja noch die Sache mit dem Carry-Bit. Wir haben oben festgestellt, daß bei einer 8-Bit-Addition kein Carry-Bit berücksichtigt werden soll. Nun gibt es aber eine ganze Menge von Vorgängen in einem Assembler-Programm, die das Carry-Bit beeinflussen. Man kann eigentlich vor einer Addition nie ganz sicher sein, ob es denn nun 1 oder 0 ist. Weil jedoch ADC auch das Carry-Bit mitaddiert, sollte man dafür sorgen, daß es vor dem Zusammenzählen wirklich gelöscht ist. Dazu gibt es den Befehl CLC was die Abkürzung für »clear carry«, also »lösche Carry-Bit« ist. Sei ZAHLl = 12 und ZAHL2 = 7, dann würde unser vollständiges 8-Bit-Additions-Progrämmchen also lauten:
+            <code>1200 CLC
+                1201 LDA #$0C
+                1203 ADC #$07
+                1205 STA 1500
+            </code>
+        </p>
 
         <p>Sehen wir mal davon ab, daß dieses Programm natürlich unsinnig ist (das kann man ja im Kopf schneller rechnen!), dann erkennen wir: CLC ist ein 1-Byte-Befehl mit impliziter Adressierung, welcher sich nur auf die C-Flagge (also das Carry-Bit) auswirkt. ADC ist in der hier verwendeten Form ein 2-Byte-Befehl und liegt in der »unmittelbar« genannten Adressierung vor. Wie wir oben gesehen haben, kann ADC — je nach Art der Rechnung — auf einige Flaggen wirken: Da wären zunächst natürlich die V-Flagge und die C-Flagge. Dann aber kann beim Auftreten eines gesetzten Bit 7 auch die N-Flagge und beim Überschreiten von $FF eventuell auch die Z-Flagge verändert werden.</p>
 
-        <p>Viel interessanter wird unser Mini-Programm schon, wenn man anstelle von<br>
-            1201 LDA #$0C<br>
-            jetzt die absolute Adressierung verwendet, zum Beispiel<br>
-            1201 LDA 1400</p>
+        <p>Viel interessanter wird unser Mini-Programm schon, wenn man anstelle von
+            <code>1201 LDA #$0C</code>
+            jetzt die absolute Adressierung verwendet, zum Beispiel
+            <code>1201 LDA 1400</code>
+        </p>
 
         <p>Weil das ein 3-Byte-Befehl ist, verschiebt sich natürlich der Rest des Programmes um 1 Byte. So kann man immerhin schon zu unterschiedlichen Inhalten von 1400 den gleichen Betrag addieren.</p>
 
-        <p>Am interessantesten allerdings ist die Tatsache, daß auch ADC absolut adressierbar ist. Wir können so zum Beispiel den Inhalt der Speicherzelle 1300 zum Inhalt der Zeile 1400 hinzuzählen und dann das Ergebnis in 1500 ablegen:<br>
-            1200 CLC<br>
-            1201 LDA 1400<br>
-            1204 ADC 1300<br>
-            1207 STA 1500</p>
+        <p>Am interessantesten allerdings ist die Tatsache, daß auch ADC absolut adressierbar ist. Wir können so zum Beispiel den Inhalt der Speicherzelle 1300 zum Inhalt der Zeile 1400 hinzuzählen und dann das Ergebnis in 1500 ablegen:
+            <code>1200 CLC
+                1201 LDA 1400
+                1204 ADC 1300
+                1207 STA 1500
+            </code>
+        </p>
 
         <p>Hier ist der ADC-Befehl dann 3 Bytes lang geworden.</p>
 
@@ -143,18 +150,25 @@
 
         <p>Solche 8-Bit-Rechnungen kommen recht häufig vor: Wenn man in Schleifen nicht mit mehrfach wiederholten INX (beziehungsweise INY oder INC, DEX, DEY oder DEC) arbeiten will, addiert man eben immer die Sprungweite mittels ADC hinzu. Der Akku kann nicht als Zähler dienen, denn es gibt für ihn keinen Befehl, der dem INX und so weiter vergleichbar wäre, weswegen man ihn — sollte es nötig sein — mittels ADC hochzählt.</p>
 
-        <p>Häufiger und in der Praxis bedeutender sind 16-Bit-Rechnungen. Wie Sie sicher noch aus den vorangegangenen Folgen wissen, teilt man so eine 16-Bit-Zahl auf in zwei Bytes (das LSB und das MSB). Nehmem wir für unser nachfolgendes Beispiel wieder an, daß die Zahlen so gebaut sind, daß kein Überlauf zu befürchten ist. ZAHL1 hätten wir vorher in die Speicherstellen 1300 (LSB) und 1301 (MSB) gepackt, ZAHL2 liegt in den Zellen 1400 (LSB) und 1401 (MSB). Zunächst wieder die Vorbereitungsmaßnahmen:<br>
-            1200 CLD<br>
-            1201 CLC</p>
+        <p>Häufiger und in der Praxis bedeutender sind 16-Bit-Rechnungen. Wie Sie sicher noch aus den vorangegangenen Folgen wissen, teilt man so eine 16-Bit-Zahl auf in zwei Bytes (das LSB und das MSB). Nehmem wir für unser nachfolgendes Beispiel wieder an, daß die Zahlen so gebaut sind, daß kein Überlauf zu befürchten ist. ZAHL1 hätten wir vorher in die Speicherstellen 1300 (LSB) und 1301 (MSB) gepackt, ZAHL2 liegt in den Zellen 1400 (LSB) und 1401 (MSB). Zunächst wieder die Vorbereitungsmaßnahmen:
+            <code>1200 CLD
+                1201 CLC
+            </code>
+        </p>
 
-        <p>Dabei ist CLD nicht immer nötig, wie schon gesagt. Nun addieren wir zuerst die LSBs: 1202 LDA 1300<br>
-            1205 ADC 1400<br>
-            1208 STA 1500</p>
+        <p>Dabei ist CLD nicht immer nötig, wie schon gesagt. Nun addieren wir zuerst die LSBs:
+            <code>1202 LDA 1300
+                1205 ADC 1400
+                1208 STA 1500
+            </code>
+        </p>
 
-        <p>Ein Überlauf kann hier nicht stattgefunden haben, denn das Vorzeichenbit ist ja im MSB als Bit 15 enthalten, wohl aber kann ein Übertrag stattgefunden haben: Das Ergebnis könnte größer als 255 ($FF) gewesen sein. War das der Fall, dann ist jetzt eine 1 im Carry-Bit. Wir addieren nun die MSBs:<br>
-            120B LDA 1301<br>
-            120E ADC 1401<br>
-            1211 STA 1501</p>
+        <p>Ein Überlauf kann hier nicht stattgefunden haben, denn das Vorzeichenbit ist ja im MSB als Bit 15 enthalten, wohl aber kann ein Übertrag stattgefunden haben: Das Ergebnis könnte größer als 255 ($FF) gewesen sein. War das der Fall, dann ist jetzt eine 1 im Carry-Bit. Wir addieren nun die MSBs:
+            <code>120B LDA 1301
+                120E ADC 1401
+                1211 STA 1501
+            </code>
+        </p>
 
         <p>Egal, was im Carry-Bit stand: Es wurde jetzt hinzuaddiert. Das Ergebnis unserer Rechnung steht nun in 1500 (LSB) und 1501 (MSB). Sehen wir uns das ganze nochmal am Zahlenbeispiel an. Wir addieren die Zahlen 2176 (binär: 0000 1000 1000 0000) und 1009 (binär: 0000 0011 1111 0001). Die Speicherinhalte sind dann:</p>
 
@@ -193,32 +207,40 @@
 
         <h3>Merke: Vor einer Addition immer Löschen des Carry-Bits mit CLC, vor einer Subtraktion immer Setzen des Carry-Bits mit SEC!</h3>
 
-        <p>Zwei Beispiele für die Subtraktion sollen das bisher gesagte erläutern: Zunächst eine 8-Bit-Subtraktion von ZAHL1 (in Speicherzellle 1300) minus ZAHL2 (in Zelle 1400). Ds Ergebnis wird nach 1500 geschrieben:<br>
-            1200 CLD<br>
-            1201 SEC<br>
-            1202 LDA 1300<br>
-            1205 SBC 1400<br>
-            1208 STA 1500</p>
+        <p>Zwei Beispiele für die Subtraktion sollen das bisher gesagte erläutern: Zunächst eine 8-Bit-Subtraktion von ZAHL1 (in Speicherzellle 1300) minus ZAHL2 (in Zelle 1400). Ds Ergebnis wird nach 1500 geschrieben:
+            <code>1200 CLD
+                1201 SEC
+                1202 LDA 1300
+                1205 SBC 1400
+                1208 STA 1500
+            </code>
+        </p>
 
         <p>SBC kann — wie hier — absolut adressiert werden, aber auch unmittelbar (also zum Beispiel SBC $40). Der Befehl ist dann im ersten Fall ein 3-, im anderen Fall ein 2-Byte-Befehl. SEC ist ebenso wie vorher schon CLC ein implizit adressierbarer 1-Byte-Befehl.</p>
 
-        <p>Das zweite Beispiel ist eine 16-Bit Subtraktion. In den Speichern steht vor dem Aufruf dieser kleinen Routine:<br>
-            1300 ZAHL1 LSB<br>
-            1301 ZAHL1 MSB<br>
-            1400 ZAHL2 LSB<br>
-            1401 ZAHL2 MSB</p>
+        <p>Das zweite Beispiel ist eine 16-Bit Subtraktion. In den Speichern steht vor dem Aufruf dieser kleinen Routine:
+            <code>1300 ZAHL1 LSB
+                1301 ZAHL1 MSB
+                1400 ZAHL2 LSB
+                1401 ZAHL2 MSB
+            </code>
+        </p>
 
-        <p>Das Ergebnis soll nach 1500 (LSB) und 1501 (MSB) gebracht werden:<br>
-            1200 CLD<br>
-            1201 SEC<br>
-            1202 LDA 1300<br>
-            1205 SBC 1400<br>
-            1208 STA 1500</p>
+        <p>Das Ergebnis soll nach 1500 (LSB) und 1501 (MSB) gebracht werden:
+            <code>1200 CLD
+                1201 SEC
+                1202 LDA 1300
+                1205 SBC 1400
+                1208 STA 1500
+            </code>
+        </p>
 
-        <p>Jetzt sind die beiden LSBs voneinander abgezogen und die Differenz abgespeichert als LSB des Erebnisses.<br>
-            120B LDA 1301<br>
-            120E SBC 1401<br>
-            1211 STA 1501</p>
+        <p>Jetzt sind die beiden LSBs voneinander abgezogen und die Differenz abgespeichert als LSB des Erebnisses.
+            <code>120B LDA 1301
+                120E SBC 1401
+                1211 STA 1501
+            </code>
+        </p>
 
         <p>Damit ist die Aufgabe beendet. Auch die MSBs sind subtrahiert und das MSB des Ergebnisses steht in 1501.</p>
 
@@ -228,8 +250,10 @@
 
         <p>Damit die so kennengelernten Arithmetik-Befehle nicht so trocken auf weiter Flur stehen, wollen wir nun ein Programm entwickeln, aus dem zweierlei zu lernen ist:</p>
 
-        <p>1) Die Anwendung bisher gelernter Befehle und<br>
-            2) ein häufig angewendetes Verfahren, Assemblerprogramme in Basic-Programme einzubinden.</p>
+        <ol>
+            <li>Die Anwendung bisher gelernter Befehle und</li>
+            <li>ein häufig angewendetes Verfahren, Assemblerprogramme in Basic-Programme einzubinden.</li>
+        </ol>
 
         <p>Besonders dieser 2. Aspekt scheint noch vielen Lesern unklar zu sein (das zeigen mir Zuschriften). Es gibt eine ganze Reihe von Möglichkeiten, zum Einbau von Assembler-Routinen in Basic-Programme; die werden wir alle nach und nach kennenlernen. Von Ihnen sicherlich schon häufig angewendet wurde der SYS-Befehl (zum Beispiel für SYS 58640 und vorherigem POKE214,Zeile und POKE211, Spalte zum Setzen des Cursors an die Stelle Zeile, Spalte). Damit haben Sie ein Maschinenprogramm aufgerufen, das im System unseres Computers schon enthalten ist. 58640 ist die Startadresse des Programmes und man kann diesen SYS-Befehl eigentlich wie eine Art »GOTO Maschinenprogramm-Startadresse« ansehen. Nichts hindert uns also, auf diese Weise eigene Assembler-Programme anzuspringen! Das Problem liegt nun nur noch darin, wie man Parameter, die unsere Maschinenroutine benötigt, übergeben kann. Eine offensichtliche — aber leider auch relativ langsame — Methode ist das POKEn der Werte im LSB/MSB-Format in die Speicherzellen, aus denen sie sich unser ML-Programm dann abholt. Wir wollen dieses Verfahren nun an einem Programmbeispiel verwenden.</p>
 
@@ -251,37 +275,50 @@
             <figcaption>Bild 2. Flußdiagramm des Assemblerprogrammes »Summe einer arithmetischen Reihe«</figcaption>
         </figure>
 
-        <p>Wir bereiten den Ablauf vor, indem wir aus $1300 die Anzahl der Glieder ins X-Register laden und zur Vorbereitung der Addition das Carry-Bit löschen. Schalten Sie also bitte den SMON ein und tippen Sie A1200 <RETURN>. Es erscheint die Startadresse 1200. Jetzt können Sie Zeile für Zeile das Assembler-Programm eingeben (nach jeder Zeile ein RETURN, das die nächste Zeilennummer erzeugt):<br>
-                1200 LDX 1300<br>
-                1203 CLC</p>
+        <p>Wir bereiten den Ablauf vor, indem wir aus $1300 die Anzahl der Glieder ins X-Register laden und zur Vorbereitung der Addition das Carry-Bit löschen. Schalten Sie also bitte den SMON ein und tippen Sie A1200 &lt;RETURN&gt;. Es erscheint die Startadresse 1200. Jetzt können Sie Zeile für Zeile das Assembler-Programm eingeben (nach jeder Zeile ein RETURN, das die nächste Zeilennummer erzeugt):
+            <code>1200 LDX 1300
+                1203 CLC
+            </code>
+        </p>
 
-        <p>Die nächsten sechs Zeilen summieren jeweils das neueste Glied zur bis dahin erzeugten Summe. Jetzt zu Beginn ist $1400/1401 noch leer und in $1310/1311 steht noch das Anfangsglied A = 1. Später mit Durchlaufen der Schleife, steht in $1400/1401 immer die bis dahin gebildete Summe und in $1310/1311 das letzte Glied der Reihe. Es handelt sich um die oben kennengelernte 16-Bit-Addition:<br>
-            1204 LDA 1400<br>
-            1207 ADC 1310<br>
-            120A STA 1400</p>
+        <p>Die nächsten sechs Zeilen summieren jeweils das neueste Glied zur bis dahin erzeugten Summe. Jetzt zu Beginn ist $1400/1401 noch leer und in $1310/1311 steht noch das Anfangsglied A = 1. Später mit Durchlaufen der Schleife, steht in $1400/1401 immer die bis dahin gebildete Summe und in $1310/1311 das letzte Glied der Reihe. Es handelt sich um die oben kennengelernte 16-Bit-Addition:
+            <code>1204 LDA 1400
+                1207 ADC 1310
+                120A STA 1400
+            </code>
+        </p>
 
-        <p>Das neue LSB ist berechnet und in $1400 geschrieben.<br>
-            1200 LDA 1401<br>
-            1210 ADC 1311<br>
-            1213 STA 1401</p>
+        <p>Das neue LSB ist berechnet und in $1400 geschrieben.
+            <code>1200 LDA 1401
+                1210 ADC 1311
+                1213 STA 1401
+            </code>
+        </p>
 
-        <p>Das war nun noch das neue MSB. Als nächstes berechnen wir das momentan letzte Glied der Reihe durch Addieren von D zum alten letzten Glied. Das entspricht dem Basic-Befehl A = A + D in einer Schleife. Dies ist eine neue 16-Bit-Addition, weshalb wir wieder CLC vorgeben müssen:<br>
-            1216 CLC<br>
-            1217 LDA 1310<br>
-            121A ADC 1320<br>
-            121D STA 1310</p>
+        <p>Das war nun noch das neue MSB. Als nächstes berechnen wir das momentan letzte Glied der Reihe durch Addieren von D zum alten letzten Glied. Das entspricht dem Basic-Befehl A = A + D in einer Schleife. Dies ist eine neue 16-Bit-Addition, weshalb wir wieder CLC vorgeben müssen:
+            <code>1216 CLC
+                1217 LDA 1310
+                121A ADC 1320
+                121D STA 1310
+            </code>
+        </p>
 
-        <p>Das war wieder das LSB. Nun zum MSB:<br>
-            1220 LDA 1311<br>
-            1223 ADC 1321<br>
-            1226 STA 1311</p>
+        <p>Das war wieder das LSB. Nun zum MSB:
+            <code>1220 LDA 1311
+                1223 ADC 1321
+                1226 STA 1311
+            </code>
+        </p>
 
-        <p>Wir zählen nun das X-Register um 1 herunter und prüfen, ob es schon Null geworden ist, ob also schon alle N-Glieder summiert worden sind:<br>
-            1229 DEX<br>
-            122A BNE 1203</p>
+        <p>Wir zählen nun das X-Register um 1 herunter und prüfen, ob es schon Null geworden ist, ob also schon alle N-Glieder summiert worden sind:
+            <code>1229 DEX
+                122A BNE 1203
+            </code>
+        </p>
 
-        <p>Wenn noch nicht alle Glieder berechnet und summiert sind, kehren wir an den Schleifenanfang zurück. Ansonsten springen wir zurück ins Basic-Aufrufprogramm:<br>
-            122C RTS</p>
+        <p>Wenn noch nicht alle Glieder berechnet und summiert sind, kehren wir an den Schleifenanfang zurück. Ansonsten springen wir zurück ins Basic-Aufrufprogramm:
+            <code>122C RTS</code>
+        </p>
 
         <p>Wenn Sie beide Programme eingetippt haben, dann speichern Sie sie vorsichtshalber ab (das Assemblerprogramm mit dem S-Befehl des SMON). Beim neuen Einladen brauchen Sie den SMON nicht mehr. Nach dem Laden unseres Maschinenprogrammes (mit ,8,1 bei Diskette oder ,1,1 bei Kassette) geben Sie NEW <RETURN> ein, damit die Zeiger vor dem Einladen des Basic-Programmes wieder auf Normalwerte gesetzt werden. Zwischen dem dann eingeladenen Basic-Programm und unserer Assembler-Routine ist genug Platz. Sollten Sie aber irgendwann mal das Basic-Programm vergrößern, schützen Sie bitte unseren Bereich ab $1200.</p>
 
