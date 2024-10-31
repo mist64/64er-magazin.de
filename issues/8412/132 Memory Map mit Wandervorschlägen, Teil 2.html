@@ -101,19 +101,22 @@
 
         <p>Speicherzelle 9 wird von den Basic-Befehlen TAB und SPC verwendet. Vor ihrer Ausführung wird die Nummer der Spalte, in der sich der Cursor befindet, aus der Speicherzelle 211 ($D3) nach 9 gebracht, von wo sie geholt wird, um die Position des Cursors nach der Ausführung von TAB und SPC auszurechnen.</p>
 
-        <p>Diese komplizierte Erklärung können wir durch Ausprobieren deutlicher machen. Dazu PRINTen wir 16mal den Buchstaben X hintereinander (Semicolon !), allerdings mit SPC (2) jeweils um 2 Spalten versetzt.<br>
-            10 FOR I = 0 TO 15<br>
-            20 PRINT SPC (2) ”X”;<br>
-            30 PRINT PEEK (9);<br>
-            40 NEXT I<br>
-            Nach jedem X wird durch Zeile 30 die »alte« Cursor-Spaltenposition ausgedruckt und zwar in derselben Zeile, ausgelöst durch das Semicolon. Dadurch erhöht sich laufend die in Speicherzelle 9 stehende Positionsangabe des Cursors. Wir erhalten folgenden Ausdruck:</p>
+        <p>Diese komplizierte Erklärung können wir durch Ausprobieren deutlicher machen. Dazu PRINTen wir 16mal den Buchstaben X hintereinander (Semicolon !), allerdings mit SPC (2) jeweils um 2 Spalten versetzt.
+            <code>10 FOR I = 0 TO 15
+                20 PRINT SPC (2) "X";
+                30 PRINT PEEK (9);
+                40 NEXT I
+            </code>            
+            Nach jedem X wird durch Zeile 30 die »alte« Cursor-Spaltenposition ausgedruckt und zwar in derselben Zeile, ausgelöst durch das Semicolon. Dadurch erhöht sich laufend die in Speicherzelle 9 stehende Positionsangabe des Cursors. Wir erhalten folgenden Ausdruck:
+        </p>
 
         <p>Sie können die Positionsnummer nachrechnen. Berücksichtigen Sie bitte aber dabei, daß bei PRINT vor und nach jeder Zahl eine Stelle frei bleibt, die erste für das Vorzeichen, die zweite wegen des Abstandes.</p>
 
         <p>Wichtig ist außerdem, daß die maximal mögliche Spaltenzahl nicht die Bildschirmspaltenzahl, sondern die »logische« Spaltenzahl ist, also 88 beim VC 20 und 80 beim C 64.</p>
 
-        <p>Wir können die Cursorposition in Adresse 9 auch abfragen und ein Programm damit steuern. Fügen Sie einfach in das obige Programm die folgende Zeile 35 ein:<br>
-            35 IF PEEK (9) = 33 THEN PRINT »END«: END</p>
+        <p>Wir können die Cursorposition in Adresse 9 auch abfragen und ein Programm damit steuern. Fügen Sie einfach in das obige Programm die folgende Zeile 35 ein:
+            <code>35 IF PEEK (9) = 33 THEN PRINT »END«: END</code>
+        </p>
 
         <p>Sobald Position 33 erreicht ist, bleibt das Programm stehen.</p>
 
@@ -125,16 +128,18 @@
 
         <p>Erwähnenswert ist noch, daß das Betriebssystem in einer Art Nationalismus seine eigene Flagge aufzieht: Den Unterschied zwischen LOAD und VERIFY speichert es seinerseits in Zelle 147 ($93) ab. Soweit ich es sehen kann, sind Inhalt und Bedeutung beider Speicherzellen völlig identisch.</p>
 
-        <p>Ich habe für Sie zwar kein Kochrezept zur Anwendung der LOAD-VERIFY-Flagge in einem Programm vorrätig, möchte Sie aber trotzdem ein bißchen zum Spielen anregen. Um meine Erklärung nachzuvollziehen, tippen Sie bitte direkt LOAD ein. Den Ladevorgang brechen Sie mit der STOP-Taste ab und fragen dann den Inhalt der Zelle 10 ab mit</p>
-
-        <p>PRINT PEEK (10) Wir erhalten eine 0. Wiederholen Sie bitte diesen Vorgang, aber mit VERIFY. Wir erhalten jetzt eine 1 — Quod erat demonstrandum.</p>
+        <p>Ich habe für Sie zwar kein Kochrezept zur Anwendung der LOAD-VERIFY-Flagge in einem Programm vorrätig, möchte Sie aber trotzdem ein bißchen zum Spielen anregen. Um meine Erklärung nachzuvollziehen, tippen Sie bitte direkt LOAD ein. Den Ladevorgang brechen Sie mit der STOP-Taste ab und fragen dann den Inhalt der Zelle 10 ab mit
+            <code>PRINT PEEK (10)</code>
+        Wir erhalten eine 0. Wiederholen Sie bitte diesen Vorgang, aber mit VERIFY. Wir erhalten jetzt eine 1 — Quod erat demonstrandum.</p>
 
         <p>Wir können auch in die Zelle 10 hineinPOKEn. Die »Wachablösung« zwischen Basic und Betriebssystem unter Hissen der Flagge in Zelle 10 findet beim VC 20 in der Speicherzelle 57705, beim C 64 in 57708 statt. Bevor wir diese Maschinenroutine mit SYS 57705 (SYS 57708) starten, geben wir mit dem Inhalt der Speicherzelle 10 an, ob es ein LOAD oder ein VERIFY sein soll.</p>
 
-        <p>Legen Sie ein Band mit Programm in die Datasette. Um ein LOAD zu erzeugen, geben wir direkt ein:<br>
-            POKE 10,0:SYS 57705<br>
-            (POKE 10,0:SYS 57708)<br>
-            Entsprechend der Anweisung auf dem Bildschirm drücken Sie PLAY und das Auffinden des ersten Programms wird mit LOAD gemeldet. Machen Sie das Ganze noch einmal, diesmal aber POKEn Sie bitte eine 1 in die Zelle 10. Jetzt meldet das Betriebssystem das Auffinden des Programms mit VERIFY.</p>
+        <p>Legen Sie ein Band mit Programm in die Datasette. Um ein LOAD zu erzeugen, geben wir direkt ein:
+            <code>POKE 10,0:SYS 57705
+                (POKE 10,0:SYS 57708)
+            </code>
+            Entsprechend der Anweisung auf dem Bildschirm drücken Sie PLAY und das Auffinden des ersten Programms wird mit LOAD gemeldet. Machen Sie das Ganze noch einmal, diesmal aber POKEn Sie bitte eine 1 in die Zelle 10. Jetzt meldet das Betriebssystem das Auffinden des Programms mit VERIFY.
+        </p>
 
         <p>Wie gesagt, vielleicht fällt Ihnen eine Anwendung dafür ein.</p>
 
@@ -160,22 +165,31 @@
 
         <p>Sobald durch die Flagge in der vorherigen Zelle 13 eine Zahl signalisiert wird, steht hier die Zahl 128 ($80) wenn es sich um eine ganze Zahl handelt, während eine 0 die Zahl als Gleitkommazahl identifiziert.</p>
 
-        <p>Damit wollen wir ein bißchen experimentieren. Zeile 10 definiert eine Gleitkommazahl, Zeile 20 druckt sie und die Flagge aus Zelle 14 aus.<br>
-            10 A = 13.41<br>
-            20 PRINT A,PEEK (14)<br>
-            Wir erhalten die Zahl 13.41 und als Flagge eine 0.<br>
-            30 B = INT (A)<br>
-            40 PRINT B,PEEK (14)</p>
+        <p>Damit wollen wir ein bißchen experimentieren. Zeile 10 definiert eine Gleitkommazahl, Zeile 20 druckt sie und die Flagge aus Zelle 14 aus.
+            <code>10 A = 13.41
+                20 PRINT A,PEEK (14)
+            </code>
+            Wir erhalten die Zahl 13.41 und als Flagge eine 0.
+            <code>30 B = INT (A)  
+                40 PRINT B,PEEK (14)    
+            </code> 
+        </p>    
 
-        <p>INT bildet die ganze Zahl von 13.41. Also müßte die Flagge in Zelle 14 auf 128 stehen. Weit gefehlt! Da intern auch die 13 als Gleitkommazahl berechnet wird, erhalten wir immer noch eine 0.<br>
-            50 B% = A<br>
-            60 PRINT B%,PEEK (14)<br>
-            Erst die Definition der Variablen B als ganze Zahl (mit %) ergibt die Flagge 128.<br>
-            70 D = 16*B%<br>
-            80 PRINT D,PEEK (14)</p>
+        <p>INT bildet die ganze Zahl von 13.41. Also müßte die Flagge in Zelle 14 auf 128 stehen. Weit gefehlt! Da intern auch die 13 als Gleitkommazahl berechnet wird, erhalten wir immer noch eine 0.
+            <code>50 B% = A
+                60 PRINT B%,PEEK (14)
+            </code> 
+        </p>
 
-        <p>Die Multiplikation einer ganzen Zahl mit der Ganzzahl-Variablen B% fällt in dieselbe Kategorie wie Zeile 30 oben, da die Verarbeitung als Gleitkommazahl erfolgt. Also erhalten wir zu Recht eine 0. Erst wenn D als ganze Zahl (Zeile 90) ausgewiesen wird, steht die Flagge wieder auf 128: 90 D% = 16*B%<br>
-            100 PRINT D%, PEEK (14)</p>
+        <p>Erst die Definition der Variablen B als ganze Zahl (mit %) ergibt die Flagge 128.
+            <code>70 D = 16*B%
+                80 PRINT D,PEEK (14)
+            </code>
+        </p>
+
+        <p>Die Multiplikation einer ganzen Zahl mit der Ganzzahl-Variablen B% fällt in dieselbe Kategorie wie Zeile 30 oben, da die Verarbeitung als Gleitkommazahl erfolgt. Also erhalten wir zu Recht eine 0. Erst wenn D als ganze Zahl (Zeile 90) ausgewiesen wird, steht die Flagge wieder auf 128: 90 D% = 16*B%
+            <code>100 PRINT D%, PEEK (14)</code>
+        </p>
 
         <h3>Adresse 15 ($F)<br>Flagge bei LIST, Garbage Collection und Textumwandlung</h3>
 
@@ -193,13 +207,15 @@
 
         <p>Die Basic-Routinen für INPUT, GET und READ sind zum großen Teil identisch. Um Speicherplatz zu sparen, verwendet der Basic-Übersetzer die identischen Teile nur einmal. Um in die nichtidentischen Teile verzweigen zu können, wird in Zelle 17 angezeigt, um welchen der drei Befehle es sich gerade handelt. Die Flagge steht auf 0 für INPUT, auf 64 ($40) für GET und auf 152 ($98) für READ.</p>
 
-        <p>Mit dem folgenden kleinen Programm können wir das leicht nachprüfen:<br>
-            10 DATA 3<br>
-            20 READ A<br>
-            30 PRINT PEEK (17)<br>
-            40 INPUT B<br>
-            50 PRINT PEEK (17)<br>
-            80 GET C$:IF G$ = ””THEN 60 70 PRINT PEEK (17)</p>
+        <p>Mit dem folgenden kleinen Programm können wir das leicht nachprüfen:
+            <code>10 DATA 3
+                20 READ A
+                30 PRINT PEEK (17)
+                40 INPUT B
+                50 PRINT PEEK (17)
+                80 GET C$:IF G$ = ""THEN 60 70 PRINT PEEK (17)
+            </code>
+        </p>
 
         <p>Zeile 10 und 20, 40 sowie 60 sind Anwendungen der drei zur Debatte stehenden Basic-Befehle. Nach der Durchführung jedes Befehls wird in den Zeilen 30, 50 und 70 die jeweilige Flagge ausgelesen.</p>
 
