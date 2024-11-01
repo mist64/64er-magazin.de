@@ -1,0 +1,191 @@
+;fileprotect.prg ==0801==
+  360 gosub490
+  370 gosub770
+  380 gosub570
+  390 ifasc(a$)=140thensys64738
+  400 ifasc(a$)>135orasc(a$)<133then380
+  410 ifasc(a$)=134thenp=1
+  420 ifasc(a$)=135thenp=0
+  430 onasc(a$)-132gosub1470,2080,2080
+  440 goto370
+  450 end
+  490 bl$="                    "
+  500 poke53280,9
+  510 poke53281,9
+  520 printchr$(5);
+  530 return
+  570 a$=""
+  580 poke198,0:wait198,255
+  590 geta$
+  600 return
+  640 open15,8,15,"i0"
+  650 open2,8,2,"#"
+  660 return
+  700 x$=""
+  710 get#2,x$
+  720 ifx$=""thenx$=chr$(0)
+  730 return
+  770 printchr$(147);
+  780 printspc(13);"fileprotect 64"
+  790 printspc(12);"EEEEEEEEEEEEEEEE"
+  800 print
+  810 printspc(6);chr$(18);"scratch-schutz von files fuer";chr$(146)
+  820 printspc(13);chr$(18);"c-64 und  1541";chr$(146)
+  830 print
+  840 printchr$(144);"        (c) 1984  by jochen fette";chr$(5)
+  850 print:print:print:print
+  860 printspc(10);chr$(18);" f1 ";chr$(146);"   directory"
+  870 print
+  880 printspc(10);chr$(18);" f3 ";chr$(146);"   protect"
+  890 print
+  900 printspc(10);chr$(18);" f5 ";chr$(146);"   unprotect"
+  910 print
+  920 printspc(10);chr$(18);" f8 ";chr$(146);"   end"
+  930 print
+  940 print
+  950 printspc(10);"       ihre wahl ?";
+  960 return
+ 1000 print
+ 1010 print"disk einlegen und taste druecken . . ."
+ 1020 gosub570
+ 1030 open15,8,15,"i0"
+ 1040 input#15,rm
+ 1050 close15
+ 1060 ifrm<>0then1140
+ 1070 gosub640
+ 1080 print#15,"b-r";2;0;18;0
+ 1090 print#15,"b-w";2;0;18;0
+ 1100 input#15,rm
+ 1110 close15
+ 1120 close2
+ 1130 print
+ 1140 ifrm<>0orue=0then1180
+ 1150 print" typ  name"
+ 1160 print"EEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE"
+ 1170 ue=0
+ 1180 ifrm=0then1250
+ 1190 print
+ 1200 ifrm<>26thenprintchr$(144);"disk fehler !";chr$(5)
+ 1210 ifue=0andrm=26thenrm=0:goto1250:
+ 1220 ifrm=26thenprintchr$(144);"schreibschutz entfernen !";chr$(5):
+ 1230 forw=1to1500
+ 1240 nextw
+ 1250 return
+ 1290 gosub700
+ 1300 ft=0:ft$=""
+ 1310 ifasc(x$)=1thenft=1:ft$="*seq "
+ 1320 ifasc(x$)=2thenft=2:ft$="*prg "
+ 1330 ifasc(x$)=3thenft=3:ft$="*usr "
+ 1340 ifasc(x$)=4thenft=4:ft$="*rel "
+ 1350 ifasc(x$)=129thenft=129:ft$=" seq "
+ 1360 ifasc(x$)=130thenft=130:ft$=" prg "
+ 1370 ifasc(x$)=131thenft=131:ft$=" usr "
+ 1380 ifasc(x$)=132thenft=132:ft$=" rel "
+ 1390 ifasc(x$)=193thenft=193:ft$=" seq<"
+ 1400 ifasc(x$)=194thenft=194:ft$=" prg<"
+ 1410 ifasc(x$)=195thenft=195:ft$=" usr<"
+ 1420 ifasc(x$)=196thenft=196:ft$=" rel<"
+ 1430 return
+ 1470 printchr$(147)
+ 1480 printspc(6);chr$(18);"d i r e c t o r y";chr$(146)
+ 1490 print
+ 1500 ue=0
+ 1510 gosub1000
+ 1520 ifrm<>0then1470
+ 1530 gosub640
+ 1540 t=18:s=1
+ 1550 bb=0:fb=664
+ 1560 ze=0
+ 1570 print#15,"b-r";2;0;t;s
+ 1580 print#15,"b-p";2;0
+ 1590 gosub700
+ 1600 t=asc(x$)
+ 1610 gosub700
+ 1620 s=asc(x$)
+ 1630 fori=0to7
+ 1640 print#15,"b-p";2;i*32+2
+ 1650 gosub1290
+ 1660 ifft=0then1930
+ 1670 print#15,"b-p";2;i*32+30
+ 1680 gosub700
+ 1690 lb=asc(x$)
+ 1700 gosub700
+ 1710 hb=asc(x$)*256
+ 1720 bb=hb+lb
+ 1730 printstr$(bb)+left$(bl$,5-len(str$(bb)));
+ 1740 fb=fb-bb
+ 1750 print#15,"b-p";2;i*32+5
+ 1760 n$=""
+ 1770 fory=0to15
+ 1780 gosub700
+ 1790 ifasc(x$)=160theny=15:goto1810
+ 1800 n$=n$+x$
+ 1810 nexty
+ 1820 printn$+left$(bl$,20-len(n$));ft$
+ 1830 ze=ze+1
+ 1840 ifze<15then1930
+ 1850 ze=0
+ 1860 print
+ 1870 print"weitere eintraege"
+ 1880 print"bitte taste druecken . . .";
+ 1890 gosub570
+ 1900 printchr$(147)
+ 1910 printspc(6);chr$(18);"d i r e c t o r y";chr$(146)
+ 1920 print:print:print:print
+ 1930 nexti
+ 1940 ift<>0then1570
+ 1950 close2
+ 1960 close15
+ 1970 print
+ 1980 printfb;
+ 1990 iffb<>1thenprint"   freie bloecke"
+ 2000 iffb=1thenprint"   freier block"
+ 2010 print
+ 2020 print"taste druecken . . .";
+ 2030 gosub570
+ 2040 return
+ 2080 printchr$(147)
+ 2090 ifp=1thenprintspc(13);chr$(18);"p r o t e c t";chr$(146)
+ 2100 ifp=0thenprintspc(12);chr$(18);"u n p r o t e c t";chr$(146)
+ 2110 ue=1
+ 2120 gosub1000
+ 2130 ifrm<>0then2080
+ 2140 gosub640
+ 2150 t=18:s=1
+ 2160 print#15,"u1 2 0 18",s
+ 2170 gosub700
+ 2180 t=asc(x$)
+ 2190 gosub700
+ 2200 sa=s
+ 2210 s=asc(x$)
+ 2220 fori=2to226step32
+ 2230 print#15,"b-p";2;i
+ 2240 gosub1290
+ 2250 ifft>128andft<133andp=1thengosub2330
+ 2260 ifft>192andft<197andp=0thengosub2330
+ 2270 nexti
+ 2280 ifrm=1thenrm=0:print#15,"u2 2 0 18";sa
+ 2290 ift<>0then2160
+ 2300 close2
+ 2310 close15
+ 2320 return
+ 2330 gosub700:gosub700
+ 2340 n$=""
+ 2350 fory=0to15
+ 2360 gosub700
+ 2370 ifasc(x$)=0thenn$=n$+" "
+ 2380 ifasc(x$)<>0thenn$=n$+x$
+ 2390 nexty
+ 2400 ifp=1thenprintft$+" "+n$+"   protect (j/n)";
+ 2410 ifp=0thenprintft$+" "+n$+" unprotect (j/n)";
+ 2420 gosub570
+ 2430 ifa$="n"thenprint"n":goto2510
+ 2440 ifa$<>"j"then2420
+ 2450 print"j"
+ 2460 print#15,"b-p";2;i
+ 2470 ifp=1thenft=(ftor64)
+ 2480 ifp=0thenft=(ftand255-64)
+ 2490 print#2,chr$(ft);
+ 2500 rm=1
+ 2510 return
+

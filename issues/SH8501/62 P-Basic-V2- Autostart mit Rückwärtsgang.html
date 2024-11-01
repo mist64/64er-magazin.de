@@ -56,6 +56,116 @@
 
 		<address class="author">(Jan Kusch/gk)</address>
 
+		<figure>
+			<pre data-filename="autostart-64" data-name="P-Basic-V2"></pre>
+		</figure>
+		<figure>
+			<pre>  100 sys9*4096 : .opt oo
+  101 *=49152
+  102 ;
+  103 ;
+  104 ;
+  105 ;##############################
+  106 ;* * *  p - basic - v2.   * * *
+  107 ;##############################
+  108 ;
+  109 ; ****************************
+  110 ;*geschrieben1984von*
+  111 ;**
+  112 ;*jankusch(j-ksoft)*
+  113 ;**
+  114 ; ****************************
+  115 ;
+  116 ;
+  117 ;##############################
+  118 ;####### vektorsetzung ########
+  119 ;##############################
+  120 ;
+  121 lda #&lt;erkennung   : sta $0308
+  122 lda #&gt;erkennung   : sta $0309
+  123 ;
+  124 lda #&lt;datas       : ldy #&gt;datas
+  125 jmp $ab1e
+  126 ;
+  127 ;
+  128 ;##############################
+  129 ;######### erkennung ##########
+  130 ;##############################
+  131 erkennung jsr $0073 : cmp befehl
+  132 beq entscheidung
+  133 jmp $a7e7
+  134 ;
+  135 entscheidung jsr $0073
+  136 cmp #147   : beq load
+  137 cmp #148   : beq save
+  138 cmp #162   : beq new1
+  139 jmp $af08
+  140 ;
+  141 new1         jmp new
+  142 ;
+  143 ;
+  144 ;##############################
+  145 ;########### datas ############
+  146 ;##############################
+  147 datas .asc "{clr}{blk}{rvon} P-Basic-V2.  "
+  148 .byte 13 : .asc "C-64 & VC-1541"
+  149 .byte 13 : .asc "Copyright (c)"
+  150 .byte 9,14,8,0
+  151 ;
+  152 ;##############################
+  153 ;######## befehl .load ########
+  154 ;##############################
+  155 load lda #0 : sta $9d
+  156 jsr $0073   : jsr $e1d4
+  157 lda #00     : ldx $2b  : ldy $2c
+  158 sta $0a     : jsr $ffd5
+  159 stx $2d     : sty $2e
+  160 jmp new
+  161 ;
+  162 ;##############################
+  163 ;####### befehl .save #########
+  164 ;##############################
+  165 save lda #00
+  166 sta $9d     : jsr $0073 : jsr $e1d4
+  167 ;
+  168 ldx #00
+  169 verschiebung  lda routine,x
+  170 sta $0340,x : inx
+  171 cmp #$ff    : bne verschiebung
+  172 ;
+  173 lda #&lt;806   : sta $2b
+  174 lda #&gt;806   : sta $2c
+  175 lda #&lt;832   : sta 804   : sta 806
+  176 lda #&gt;832   : sta 805   : sta 807
+  177 ;
+  178 jsr $e544   : jsr $e159
+  179 ;
+  180 new lda #1  : sta $2b
+  181 lda #8      : sta $2c
+  182 lda #$57    : sta 804
+  183 lda #$f1    : sta 805   : sta 807
+  184 lda #$ca    : sta 806
+  185 lda #237    : sta 808
+  186 lda #0      : sta 198   : jmp $a831
+  187 ;
+  188 ;
+  189 ;******* steuerroutiene *******
+  190 ;
+  191 routine lda #1 : sta $2b
+  192 lda #8         : sta $2c
+  193 lda #$57       : sta 804
+  194 lda #$f1       : sta 805 : sta 807
+  195 lda #$ca       : sta 806
+  196 lda #225       : sta 808
+  197 ;
+  198 jsr $a659      : jmp $a7ae
+  199 ;
+  200 .byte $ff
+  201 ;
+  202 befehl .byte "!"
+  203 ;</pre>
+		</figure>
+
 	</article>
 
 </body>

@@ -1,0 +1,99 @@
+;disassembler.prg ==0801==
+    1 rem dezimal-disassembler
+    2 rem
+    3 rem stefan heine
+    4 rem wiesenredder 1
+    5 rem 2330 eckernfoerde
+    6 rem
+    7 rem
+   10 poke53280,0:poke53281,0
+   20 print"{clr}{gry3}         disassembler  1.5"
+   30 print"            by st.heine"
+   40 print:print:print
+   50 print"{yel}* adressen bitte dezimal "
+   60 print"  eingeben!!!":print
+   70 print"{grn}* adressen: w=weiter e=ende":print
+   80 print"* drucker : 'return'=nein"
+   90 print:print:print
+  100 rem    copyright * st.heine *
+  110 dimm$(255),l%(255),f%(255),f1$(12),f2$(12)
+  120 fori=0to255:readm$(i):next:fori=0to255:readl%(i):next:fori=0to255:readf%(i)
+  130 next:fori=0to12:readf1$(i),f2$(i):next:pc=0
+  140 ific=1thengosub360:ic=0
+  150 input"{lblu}# anfangsadresse";a$
+  160 input"{gry3}# ausgabe auf drucker";gc$
+  170 hc$=left$(gc$,1)
+  180 ifhc$="j"thenic=1
+  190 j=len(a$):ifj>5then140
+  200 ifa$="w"then230
+  210 ifa$="e"then900
+  220 pc=val(a$)
+  230 fori=1to24:dz=pc:print"{grn}";:p1=peek(pc)
+  240 onl%(p1)gosub260,270,330
+  250 next:goto140
+  260 printtab(1)"{red}";pc;:printtab(9)"{grn}";p1;:print"{blu}";tab(24);m$(p1):pc=pc+1:return
+  270 printtab(1)"{red}";pc;:printtab(9)"{grn}";p1;:p2=peek(pc+1):printtab(13)p2;
+  280 print"{blu}";tab(24)m$(p1);" {lblu}";
+  290 iff%(p1)=9thenp2=peek(pc+1):ifp2<128thenp2=pc+p2+2:goto310
+  300 iff%(p1)=9thenp2=pc-(255-p2)+1
+  310 printf1$(f%(p1));p2;:dz=p2:goto320
+  320 printf2$(f%(p1)):pc=pc+2:return
+  330 printtab(1)"{red}";pc;:printtab(9)"{grn}";p1;:p2=peek(pc+1):printtab(14)p2;
+  340 p3=peek(pc+2):printtab(19)p3;:print"{blu}";tab(24);m$(p1)"{lblu}";:p4=(p3*256)+p2
+  350 printp4;f1$(f%(p1));:dz=p3*256+p2:printf2$(f%(p1)):pc=pc+3:return
+  360 open4,4:print#4,chr$(15)
+  370 vb=1024:vc=55296
+  380 fori=vbtovb+999step40:p$=""
+  390 forj=0to39:x=peek(i+j)
+  400 ifx<32thenx=x+64:goto440
+  410 ifx<64then440
+  420 ifx<96thenx=x+32:goto440
+  430 ifx<128thenx=x+64:goto440
+  440 p$=p$+chr$(x)
+  450 next:print#4,p$:next:close4:return
+  460 rem*** datas befehlsliste ***
+  470 databrk,ora,???,???,???,ora,asl,???,php,ora,asl,???,???,ora,asl,???
+  480 databpl,ora,???,???,???,ora,asl,???,clc,ora,???,???,???,ora,asl,???
+  490 datajsr,and,???,???,bit,and,rol,???,plp,and,rol,???,bit,and,rol,???
+  500 databmi,and,???,???,???,and,rol,???,sec,and,???,???,???,and,rol,???
+  510 datarti,eor,???,???,???,eor,lsr,???,pha,eor,lsr,???,jmp,eor,lsr,???
+  520 databvc,eor,???,???,???,eor,lsr,???,cli,eor,???,???,???,eor,lsr,???
+  530 datarts,adc,???,???,???,adc,ror,???,pla,adc,ror,???,jmp,adc,ror,???
+  540 databvs,adc,???,???,???,adc,ror,???,sei,adc,???,???,???,adc,ror,???
+  550 data???,sta,???,???,sty,sta,stx,???,dey,???,txa,???,sty,sta,stx,???
+  560 databcc,sta,???,???,sty,sta,stx,???,tya,sta,txs,???,???,sta,???,???
+  570 dataldy,lda,ldx,???,ldy,lda,ldx,???,tay,lda,tax,???,ldy,lda,ldx,???
+  580 databcs,lda,???,???,ldy,lda,ldx,???,clv,lda,tsx,???,ldy,lda,ldx,???
+  590 datacpy,cmp,???,???,cpy,cmp,dec,???,iny,cmp,dex,???,cpy,cmp,dec,???
+  600 databne,cmp,???,???,???,cmp,dec,???,cld,cmp,???,???,???,cmp,dec,???
+  610 datacpx,sbc,???,???,cpx,sbc,inc,???,inx,sbc,nop,???,cpx,sbc,inc,???
+  620 databeq,sbc,???,???,???,sbc,inc,???,sed,sbc,???,???,???,sbc,inc,???
+  630 rem*** datas 1,2 oder 3 bit ***
+  640 data1,2,1,1,1,2,2,1,1,2,1,1,1,3,3,1,2,2,1,1,1,2,2,1,1,3,1,1,1,3,3,1
+  650 data3,2,1,1,2,2,2,1,1,2,1,1,3,3,3,1,2,2,1,1,1,2,2,1,1,3,1,1,1,3,3,1
+  660 data1,2,1,1,1,2,2,1,1,2,1,1,3,3,3,1,2,2,1,1,1,2,2,1,1,3,1,1,1,3,3,1
+  670 data1,2,1,1,1,2,2,1,1,2,1,1,3,3,3,1,2,2,1,1,1,2,2,1,1,3,1,1,1,3,3,1
+  680 data1,2,1,1,2,2,2,1,1,1,1,1,3,3,3,1,2,2,1,1,2,2,2,1,1,3,1,1,1,3,1,1
+  690 data2,2,2,1,2,2,2,1,1,2,1,1,3,3,3,1,2,2,1,1,2,2,2,1,1,3,1,1,3,3,3,1
+  700 data2,2,1,1,2,2,2,1,1,2,1,1,3,3,3,1,2,2,1,1,1,2,2,1,1,3,1,1,1,3,3,1
+  710 data2,2,1,1,2,2,2,1,1,2,1,1,3,3,3,1,2,2,1,1,1,2,2,1,1,3,1,1,1,3,3,1
+  720 rem*** datas befehlart (zeichen)***
+  730 data0,10,0,0,0,4,4,0,0,2,1,0,0,3,3,0
+  740 data9,11,0,0,0,5,5,0,0,8,0,0,0,7,7,0
+  750 data3,10,0,0,4,4,4,0,0,2,1,0,3,3,3,0
+  760 data9,11,0,0,0,5,5,0,0,8,0,0,0,7,7,0
+  770 data0,10,0,0,0,4,4,0,0,2,1,0,3,3,3,0
+  780 data9,11,0,0,0,5,5,0,0,8,0,0,0,7,7,0
+  790 data0,10,0,0,0,4,4,0,0,2,1,0,12,3,3,0
+  800 data9,11,0,0,0,5,5,0,0,8,0,0,0,7,7,0
+  810 data0,10,0,0,4,4,4,0,0,0,0,0,3,3,3,0
+  820 data9,11,0,0,5,5,6,0,0,8,0,0,0,7,0,0
+  830 data2,10,2,0,4,4,4,0,0,2,0,0,3,3,3,0
+  840 data9,11,0,0,5,5,6,0,0,8,0,0,7,7,8,0
+  850 data2,10,0,0,4,4,4,0,0,2,0,0,3,3,3,0
+  860 data9,11,0,0,0,5,5,0,0,8,0,0,0,7,7,0
+  870 data2,10,0,0,4,4,4,0,0,2,0,0,3,3,3,0
+  880 data9,11,0,0,0,5,5,0,0,8,0,0,0,7,7,0
+  890 data,,,,#,,,,,,,",x",,",y",,",x",,",y",,,(,",x)",(,"),y",(,),
+  900 end
+

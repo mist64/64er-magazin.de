@@ -1,0 +1,222 @@
+;eigenes basic.prg ==0801==
+50000 rem **************************
+50010 rem *                        *
+50020 rem *   befehlserweiterung   *
+50040 rem *   ------------------   *
+50050 rem *                        *
+50060 rem *       1984 by          *
+50070 rem *                        *
+50080 rem *   g. foertsch          *
+50090 rem *   dueppel-str. 84      *
+50100 rem *   5100 aachen          *
+50110 rem *                        *
+50120 rem *   tel.: 0241/507569    *
+50130 rem *                        *
+50140 rem **************************
+50150 rem
+50200 rem zunaechst folgt eine erlaeu-            terung der ab zeile 60860
+50210 rem als beispiele aufgefuehrten             befehlserweiterungen.
+50220 rem                                         befehl (1): grafic
+50230 rem der hochaufloesende grafik-             modus wird eingeschaltet. der
+50240 rem grafikspeicher beginnt bei              $2000 (dez8192).
+50250 rem                                         befehl (2): goff
+50260 rem der grafikmodus wird ausge-             schaltet.
+50270 rem                                         befehl (3): gclear
+50280 rem der grafikspeicher wird ge-             loescht. (falls sie diesen
+50290 rem ganzen rem-ramsch abgetippt             haben, ist dieser befehl mit
+50300 rem aeusserster vorsicht zu ge-             brauchen, da das programm we-
+50310 rem gen seiner laenge zerstoert             wird!!!)
+50320 rem                                         befehl (4): scolor(pf,hf)
+50330 rem im videoram wird die farbe ge-          setzt mit:
+50340 rem  pf...punktfarbe (0-15)                  hf...hintergrundfarbe (0-15)
+50350 rem                                         befehl (5): gtext
+50360 rem dieser befehl gestattet es ih-          nen, text und grafik zu
+50370 rem mischen. gtext schaltet diesen          modus ein. mit gtext(x1,x2)
+50380 rem koennen sie zwei parameter              uebergeben, die die lage des
+50390 rem grafikfensters auf dem bild-            schirm festlegen. fuer x1
+50400 rem bzw. x2 duerfen nur werte               zwischen 0 und 25 gewaehlt
+50410 rem werden. beispiel: gtext(3,20).          in den ersten 3 bildschirm-
+50420 rem zeilen und ab zeile 20 kann             text untergebracht werden,
+50430 rem dazwischen liegt das grafik-            fenster. (sollten sich der
+50440 rem text und die kanten des fen-            sters ueberlappen, muessten
+50450 rem sie das datum in zeile 61441            etwas variieren.)
+50460 rem                                         befehl (6): textoff
+50470 rem oben beschriebener modus wird           ausgeschaltet.
+50480 rem
+50490 rem wenn sie lust verspueren, die-          se befehle auszuprobieren,
+50500 rem starten sie das programm mit            run 60800 und initialisieren
+50510 rem sie die befehlserweiterung mit          sys49260. (ausgeschaltet wird
+50520 rem dieselbe durch sys49274.)
+50530 rem und wenn ihnen die befehlswor-          te nicht gefallen, koennen
+50540 rem sie diese ab zeile 60860 ohne           bedenken aendern. (achten sie
+50550 rem darauf, dass sie die routinen           durch goff bzw. textoff aus-
+50560 rem schalten, insbesondere dann,            falls sie beabsichtigen, die
+50570 rem daten als file zu speichern.)           *****************************
+50580 rem erlaeuterungen                          --------------
+50590 rem zu jedem befehl, den sie nun            definieren wollen, gehoeren
+50600 rem drei dinge:                             (1) das befehlswort,
+50610 rem (2) die entsprechende maschi-           nenroutine,
+50620 rem (3) die adresse dieser rou-             tine.
+50630 rem
+50640 rem zu (1):                                 die buchstaben eines befehls-
+50650 rem wortes werden als ascii-codes           gespeichert, wobei zu beach-
+50660 rem ten ist, dass im letzten buch-          staben das hoechste bit ge-
+50670 rem setzt sein muss. die tabelle            der befehlsworte wird mit ei-
+50680 rem ner null abgeschlossen. ab              zeile 60800 finden sie eine
+50690 rem basic-routine, die ihnen die-           se arbeit abnimmt. ergaenzen
+50700 rem sie die tabelle der befehls-            worte ab zeile 60860 mit ih-
+50710 rem ren befehlen und erhoehen sie           die variable x je nach anzahl
+50720 rem der befehle.
+50730 rem
+50740 rem zu (2):                                 der speicherbereich von $c000
+50750 rem bis einschliesslich zu der              adresse, in der sich die ab-
+50760 rem schlussnull der befehlswort-            tabelle befindet, ist fuer
+50770 rem sie tabu und ebenso derjenige           von $cd00 bis $ce41, falls
+50780 rem sie die befehle grafic bis              textoff verwenden wollen. an-
+50790 rem sonsten bestehen nur die nor-           malen einschraenkungen. sol-
+50792 rem len die maschinenprogramme in           datazeilen (am besten ab zei-
+50794 rem le 61700) gespeichert werden,           dann muessen sie noch einen
+50796 rem entsprechenden basic-lader ab           zeile 60900 schreiben.
+50800 rem
+50810 rem zu (3):                                 die adressen der maschinen-
+50820 rem routinen werden in lo- und              hi-byte aufgespalten und in
+50830 rem tabelle der befehlsadressen             ab zeile 60000 eingetragen.
+50840 rem dabei ist wichtig, dass von             der eigentlichen adresse eine
+50850 rem eins abgezogen wird!!! das              eintragen der befehlsworte
+50860 rem und der befehlsadressen in die          entsprechenden tabellen er-
+50870 rem folgt parallel!!! die adresse           von gclear als dritter befehl
+50880 rem z.b. ist in die 5. und 6.               stelle der tabelle eingetra-
+50890 rem gen worden, davor befinden              sich die adressen von grafic
+50900 rem und goff. rechenregel:                  (nr. des befehls)*2 - 1 gibt
+50910 rem die stelle an, in die das lo-           byte eingetragen wird, in die
+50920 rem darauffolgende stelle wird das          hi-byte eingetragen. (ueber-
+50925 rem schreiben der sich dort befin-          denden daten!)
+50930 rem
+50940 rem wenn sie alle punkte genau be-          achtet haben, wird die be-
+50950 rem fehlserweiterung, wie oben              schon erwaehnt wurde, mit
+50960 rem sys(49260) initialisiert.               (ausschalten mit sys(49274).)
+50970 rem *****************************
+50980 rem diese neu definierten befehle           sind wie basicbefehle zu
+50990 rem handhaben. sie koennen insge-           samt 51 befehle definieren,
+51000 rem welche dann die codes 204 bis           254 haben, d.h.,dass sie die-
+51010 rem se befehle auch poken koennen.          weiterhin koennen sie die be-
+51020 rem fehle beliebig abkuerzen, wo-           bei allerdings zweideutigkei-
+51030 rem ten vermieden werden sollten.           bsp.: scolor, code 207, moeg-
+51040 rem liche abkuerzung: sc<shifto>;                 return, code 142, moeg-
+51050 rem liche abkuerzung: ret<shiftu>.
+60000 rem
+60005 rem *** befehlsadressen
+60006 rem *** $c000 - $c065
+60007 rem
+60010 data255,204,008,205,024,205,044,205,171,205,016,206:rem adressen der
+60011 rem befehle grafic bis textoff
+60020 data182,163,182,163,182,163,182,163,182,163,182,163,182,163,182,163
+60030 data182,163,182,163,182,163,182,163,182,163,182,163,182,163,182,163
+60040 data182,163,182,163,182,163,182,163,182,163,182,163,182,163,182,163
+60050 data182,163,182,163,182,163,182,163,182,163,182,163,182,163,182,163
+60060 data182,163,182,163,182,163,182,163,182,163,182,163,182,163,182,163
+60070 data182,163,182,163,182,163,182,163,182,163
+60100 rem
+60105 rem *** zeiger
+60106 rem *** $c066 - $c06b
+60107 rem
+60110 data252,192,128,192,187,192
+60200 rem
+60205 rem *** initialisieren
+60206 rem *** $c06c - $c079
+60207 rem
+60210 data120,162,005,189,102,192,157,004,003,202,016,247,088,096
+60300 rem
+60305 rem *** ausschalten
+60306 rem *** $c07a - $c07f
+60307 rem
+60310 data120,032,083,228,088,096
+60400 rem
+60405 rem *** routine (1)
+60406 rem *** $c080 - $c0ba
+60407 rem
+60410 data016,050,201,255,240,046,036,015,048,042,201,204,048,042,056,233,203
+60420 data170,132,073,160,255,234,202,240,010,234,200,185,205,193,016,250,048
+60430 data244,234,200,185,205,193,048,006,032,071,171,208,245,234,076,239,166
+60440 data234,076,243,166,234,076,036,167
+60500 rem
+60505 rem *** routine (2)
+60506 rem *** $c0bb - $c0fb
+60507 rem
+60510 data032,115,000,032,196,192,076,174,167,240,012,233,128,144,012,201,035
+60520 data176,012,076,247,167,234,076,043,168,234,076,165,169,234,201,075,048
+60530 data006,208,008,076,018,168,234,076,008,175,234,201,127,240,248,056,233
+60540 data076,010,168,185,001,192,072,185,000,192,072,076,115,000
+60600 rem
+60605 rem *** routine (3)
+60606 rem *** $c0fc - $c1d1
+60607 rem
+60610 data166,122,160,004,132,015,189,000,002,016,007,201,255,240,065,232,208
+60620 data244,201,032,240,058,133,008,201,034,240,089,036,015,112,048,201,063
+60630 data208,004,169,153,208,040,201,048,144,004,201,060,144,032,076,150,193
+60640 data132,113,160,000,132,011,136,134,122,202,200,232,189,000,002,056,249
+60650 data158,160,240,245,201,128,208,048,005,011,164,113,232,200,153,251,001
+60660 data185,251,001,240,054,056,233,058,240,004,201,073,208,002,133,015,056
+60670 data233,085,208,156,133,008,189,000,002,240,223,197,008,240,219,200,153
+60680 data251,001,232,208,240,166,122,230,011,200,185,157,160,016,250,185,158
+60690 data160,208,180,189,000,002,016,190,153,253,001,198,123,169,255,133,122
+60700 data096,132,113,160,000,132,011,136,134,122,202,200,232,189,000,002,056
+60710 data249,205,193,240,245,201,128,208,008,005,011,024,105,076,076,074,193
+60720 data166,122,230,011,200,185,204,193,016,250,185,205,193,208,220,164,113
+60730 data166,122,076,047,193
+60800 rem
+60805 rem *** befehle speichern
+60806 rem
+60810 gosub60860
+60820 z=49613:l=0
+60830 fork=1tox:l=len(a$(k)):fori=0tol-2:pokez+i,asc(mid$(a$(k),i+1,1)):next
+60840 pokez+l-1,asc(right$(a$(k),1))or128:z=z+l:next:pokez,0
+60850 print"{clr}":gosub60900:print"daten gespeichert!":print"{down}{down}sys(49260){home}{down}":end
+60860 rem *** tabelle der befehlsworte
+60861 rem
+60862 x=6:dima$(x):ifx>51thenend
+60863 a$(1)="grafic": rem code 204
+60864 a$(2)="goff":   rem code 205
+60865 a$(3)="gclear": rem code 206
+60866 a$(4)="scolor": rem usw.
+60867 a$(5)="gtext"
+60868 a$(6)="textoff"
+60890 return
+60900 rem *** speicherung der daten
+60901 rem
+60905 z=49152
+60906 fori=0to460:readx:pokez+i,x:next
+60910 z=52480
+60911 fori=0to321:readx:pokez+i,x:next
+60990 return
+61000 rem *** grafic ($cd00)
+61010 data169,024,160,059,162,096,076,015,205
+61100 rem *** goff ($cd09)
+61110 data169,021,160,027,162,169,141,024,208,140,017,208,142,000,205,096
+61200 rem *** gclear ($cd19)
+61210 data169,000,162,032,133,253,134,254,168,145,253,200,208,251,230,254,202
+61220 data208,246,096
+61300 rem *** scolor ($cd2d)
+61310 data201,040,240,006,076,008,175,076,072,178,032,155,183,224,016,176,246
+61320 data138,010,010,010,010,133,251,032,241,183,224,016,176,232,138,005,251
+61330 data133,251,032,247,174,174,169,205,032,240,233,165,251,160,039,145,209
+61340 data136,016,251,232,236,170,205,048,238,096
+61400 rem *** gtext ($cd6a)
+61410 data173,025,208,141,025,208,048,007,173,013,220,088,076,049,234,173
+61420 data018,208,205,168,205,176,019,169,024,160,059,141,024,208,140,017,208
+61430 data173,168,205,141,018,208,076,188,254,169,021,160,027,141,024,208
+61440 data140,017,208,173,167,205,141,018,208,076,188,254,000,255,000,025
+61441 data050:rem rasterzeilenanfang
+61445 rem einsprung ($cdac)
+61450 data240,004,201,040,240,047,120,169,106,141,020,003,169,205,141,021,003
+61460 data169,000,141,018,208,173,017,208,041,127,141,017,208,169,129,141,026
+61470 data208,169,096,141,178,205,169,120,141,017,206,032,121,000,088,096,076
+61475 data072,178,032,155,183
+61480 data224,026,176,246,134,251,032,241,183,224,026,176,237,134,252,032,247
+61490 data174,166,251,228,252,176,226,162,001,181,251,157,169,205,010,010,010
+61500 data024,109,171,205,157,167,205,202,016,238,096
+61600 rem *** textoff ($ce11)
+61610 data096,169,049,160,234,141,020,003,140,021,003,169,096,141,017,206,169
+61620 data000,160,025,141,169,205,140,170,205,160,255,141,167,205,140,168,205
+61630 data141,026,208,169,120,141,178,205,169,024,032,002,205,088,096
+

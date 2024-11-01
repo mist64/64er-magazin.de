@@ -1,0 +1,118 @@
+;verschieber.prg ==1201==
+    1 rem adressen umrechnen
+    2 rem
+    3 rem wolfgang thauer
+    4 rem am schiedsberg 45
+    5 rem 5205 st.augustin 2
+    6 rem
+   10 :
+   20 rem das machinenprogramm ist 145 bytes lang
+   30 :
+   40 rem zeichererklaerung
+   50 rem chr$(147)= clear home
+   60 rem chr$(17) = cursor down
+   70 rem chr$(18) = reverse on
+   80 rem chr$(13)  = return
+   90 :
+  100 :
+  110 :
+  120 printchr$(147)
+  130 print"dieses programm rechnet die absoluten adressen in der maschinenrou";
+  135 print"tine fuer einen anderen speicherbereich um und poket es";
+  140 print"lauffaehig in diesen speicherbereich."
+  150 printchr$(17);"gebe die gewuenschte  anfangsadresse ein,ab"
+  160 print"der das maschinenpro- gramm im speicher     liegen soll."
+  170 printchr$(17);"(die normale adresse   ist 828 = kassetten-  puffer)."
+  180 printchr$(17):inputaa
+  190 printchr$(17);"die anfangsadresse    ist ";aa
+  200 printchr$(17);"ist das richtig ?"
+  210 input"(j/n)";a$
+  220 ifa$<>"j"anda$<>"n"then210
+  230 ifa$="n"thenprint:goto150
+  240 ab=aa-828
+  245 printchr$(147);"bitte warten"
+  250 gosub700
+  260 ifaa=828then490
+  270 :
+  280 rem angabe der zu aendernden datazeilen
+  290 rem diese datazeilen sind im listing durch ein angehaengtes   ':rem**'gekennzeichnet
+  300 :
+  310 printchr$(17);"die zu aendernden datazeilen mit den ent-   sprechenden neuen"
+  320 print"werten lauten:"
+  330 print
+  340 ad=aa+138:gosub630
+  350 print"10010 data";al;",";ah
+  360 print"10040 data";al;",";ah
+  370 print"10060 data";al;",";ah
+  380 print"10090 data";al;",";ah
+  390 ad=aa+38:gosub630
+  400 print"10120 data";al;",";ah
+  410 ad=aa+65:gosub630
+  420 print"10140 data";al;",";ah
+  430 ad=aa+132:gosub630
+  440 print"10170 data";al;",";ah
+  450 printchr$(17);"weiter mit <return>"
+  460 geta$:ifa$=""then460
+  470 ifa$<>chr$(13)then460
+  480 :
+  490 print
+  500 print"die startadressen der routinen lauten:"
+  510 printchr$(17);"goto n  = sys(";aa;")";chr$(17)
+  520 print"gosub n = sys(";aa+6;")";chr$(17)
+  530 print"restore n=sys(";aa+38;")";chr$(17)
+  540 print"restore d,a$":print"        = sys(";aa+62;")";chr$(17)
+  550 print"restore n,d,a$":print"        = sys(";aa+99;")";chr$(17)
+  560 print"pop     = sys(";aa+109;")"
+  570 end
+  580 :
+  590 :
+  600 rem subroutine
+  610 rem berechnung von low- und high-byte einer adresse
+  620 :
+  630 ah=int(ad/256):al=ad-ah*256:return
+  640 :
+  650 :
+  670 rem subroutine
+  680 rem maschinenprogramm wird in speicher gepoket
+  690 :
+  700 gosub10000
+  710 ifas=18413thenprintchr$(17);"pruefsumme korrekt.":return
+  712 rem  18413 = pruefsumme fuer vc 20
+  714 rem fuer c 64 ist die pruefsumme 17901
+  720 printchr$(147);"pruefsumme =";as
+  730 printchr$(17);"pruefsummenfehler !"
+  740 print
+  750 print"moegliche fehler-     quellen :"
+  760 print
+  770 print"*eine date wurde ver-  gessen oder falsch    einge-tippt."
+  780 print
+  790 print"*sie haben die  data-  zeilen geaendert, um  das maschinenprogramm";
+  800 print" an einen anderen      speicherbereich anzu- passen."
+  810 print"*sie haben die falsche pruefsumme in zeile   710 eingesetzt."
+  820 end
+  830 :
+  960 :
+  970 rem unterprogramm
+  980 rem basiclader
+  990 :
+10000 as=0:fori=828+abto(828+144)+ab:readap:pokei,ap:as=as+ap:nexti:return
+10005 data 32
+10010 data 198,3:rem**
+10020 data 76,163,200,169,3,32,251,195,165,123,72,165,122,72,165,58,72
+10030 data 165,57,72,169,141,72,32,121,0,32
+10040 data 198,3:rem**
+10050 data 32,163,200,76,174,199,32
+10060 data 198,3:rem**
+10070 data 32,19,198,176,3,76,227,200,165,95,233,1,133,65,165,96,233,0,133,66,96,32
+10080 data 29,200,32
+10090 data 198,3:rem**
+10100 data 165,20,133,253,166,21,232,134,254,32,253,206,32,6,204
+10110 data 198,253,240,11,32,28,204,198,253,208,249,198,254,208,245,96,32
+10120 data 98,3 :rem**
+10130 data 32,253,206,32
+10140 data 125,3:rem**
+10150 data 96,169,255,133,74,32
+10170 data 192,3:rem**
+10180 data 154,201,141,240,3,76,224,200,104
+10190 data 104,104,104,104,76,248,200,186,232,232,76,139,195,32,138,205,32,247,215,96
+

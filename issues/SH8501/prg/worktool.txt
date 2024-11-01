@@ -1,0 +1,126 @@
+;worktool.prg ==0801==
+    0 rem{del}{del}{del}{del}{del}worktool
+    1 rem{del}{del}{del}{del}{del}ulrich grothaus
+    2 rem{del}{del}{del}{del}{del}fallweg 18
+    3 rem{del}{del}{del}{del}{del}8450 amberg
+    4 :
+    5 :
+   10 rem --------------------------------
+   20 rem      abfrage der optionswerte
+   30 rem --------------------------------
+   40 :
+   50 :
+   60 restore:poke 53280,0:poke53281,0
+   70 printchr$(147):poke646,5:print"***************{wht}worktool{grn}*****************"
+   80 poke646,7:printtab(8)"von ulrich grothaus"
+   90 poke646,15:print:print:print:print"options:";,:poke646,10
+  100 print"f1=farbe setzen":print,"f3=zeit ausgeben":print,"f5=warnton ein"
+  110 print,"f7=warnton aus":print:print:poke646,14
+  120 input"farbcode rahmen";r
+  130 input"farbcode grund";g
+  140 input"farbcode cursor";c
+  150 :
+  160 :
+  170 rem -------------------------------
+  180 rem wertuebergabe maschinenprogramm
+  190 rem -------------------------------
+  200 :
+  210 :
+  220 poke49425,r:poke49426,g:poke49427,c
+  230 print:printtab(7);"hhmmss":printchr$(145);:input"zeit ";z$
+  240 def fnf(x)=int(x/10)*16+(x-int(x/10)*10)
+  250 h=val(left$(z$,2)):m=val(mid$(z$,3,2)):s=val(right$(z$,2))
+  260 poke56335,peek(56335)and127
+  270 poke56329,fnf(s):poke56330,fnf(m):poke56331,fnf(h):poke56328,0
+  280 poke56334,peek(56334)or128
+  290 :
+  300 :
+  310 rem -------------------------------
+  320 rem       einlesen der daten
+  330 rem -------------------------------
+  340 :
+  350 :
+  360 gosub 720
+  370 fort=1to4:sys36500:next
+  380 fort=1to40:print:next
+  390 poke646,13:print"das  einlesen  des maschinenprogrammes dauert 15 sekunden"
+  400 gosub 800
+  410 fort=1to4:sys36500:next
+  420 :
+  430 :
+  440 rem ------------------------------
+  450 rem      benutzerhinweise
+  460 rem ------------------------------
+  470 :
+  480 :
+  490 poke792,193:printchr$(147):poke646,7
+  500 print"aus programmtechnischen gruenden ist der {wht}nmi-interrupt";:poke646,7
+  510 print" ausgeschaltet(zeile 490)."
+  520 print"das worktool liegt bei 49152."
+  530 print"es sind 38911 bytes basic-ram free."
+  540 poke53280,0:poke646,3:print"{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}kann ich mich loeschen (j/n){$a0}?"
+  550 fort=1to11:getn$:next
+  560 geta$:ifa$=""then560
+  570 ifa$="n"thengoto60
+  580 :
+  590 :
+  600 rem -------------------------------
+  610 rem    loeschen des basicteils
+  620 rem   start der tool-irq routine
+  630 rem -------------------------------
+  640 :
+  650 :
+  660 poke53280,peek(49425):poke53281,peek(49426):poke646,peek(49427)
+  670 printchr$(147);"****************QworktoolQ**************"
+  680 print"       -----38634 bytes free----":print
+  690 print"*************1984 by groto**************"
+  700 geta$:ifa$=""then700
+  710 printchr$(147):fort=2048to2060:poket,0:next:poke45,3:poke46,8:sys49152:end
+  720 ps=0:forad= 36500 to 36519 :readda$
+  730 l=asc(left$(da$,1))-48:r=asc(right$(da$,1))-48
+  740 po=(l+(l>9)*7)*16+r+(r>9)*7:pokead,po:ps=ps+po:next
+  750 ifps<> 2456 thenprint"{clr}pruefsummenfehler im 1. datablock.":end
+  760 return
+  770 dataa0,00,a2,00,8e,20,d0,e8
+  780 dataf0,03,4c,98,8e,c8,f0,03
+  790 data4c,96,8e,60
+  800 ps=0:forad= 49152 to 49420 :readda$
+  810 l=asc(left$(da$,1))-48:r=asc(right$(da$,1))-48
+  820 po=(l+(l>9)*7)*16+r+(r>9)*7:pokead,po:ps=ps+po:next
+  830 ifps<> 32697 thenprint"{clr}pruefsummenfehler im 2. datablock.":end
+  840 return
+  850 dataea,78,a9,0e,8d,14,03,a9
+  860 datac0,8d,15,03,58,60,8d,04
+  870 datad4,ea,a9,04,c5,c5,f0,28
+  880 dataa9,05,c5,c5,f0,39,a9,06
+  890 datac5,c5,d0,03,8d,10,c1,a9
+  900 data03,c5,c5,d0,03,8d,10,c1
+  910 dataad,10,c1,c9,06,f0,5a,4c
+  920 data31,ea,60,00,ea,ea,ea,ea
+  930 dataad,11,c1,8d,20,d0,ad,12
+  940 datac1,8d,21,d0,ad,13,c1,8d
+  950 data86,02,4c,18,c0,ea,ea,ad
+  960 data0b,dc,29,7f,a2,10,20,78
+  970 datac0,ad,0a,dc,a2,13,20,78
+  980 datac0,ad,09,dc,a2,16,20,78
+  990 datac0,ad,08,dc,4c,31,ea,00
+ 1000 data48,29,f0,4a,4a,4a,4a,18
+ 1010 data69,b0,9d,00,04,68,29,0f
+ 1020 data18,69,b0,9d,01,04,60,ea
+ 1030 dataea,a5,d3,c9,23,f0,11,a5
+ 1040 datad3,c9,46,f0,2f,a5,d3,c9
+ 1050 data4f,f0,4d,4c,31,ea,60,00
+ 1060 dataea,ea,ea,a9,06,8d,00,d4
+ 1070 dataa9,78,8d,01,d4,a9,0a,8d
+ 1080 data18,d4,a9,33,8d,05,d4,a9
+ 1090 data00,8d,06,d4,a9,11,8d,04
+ 1100 datad4,4c,31,ea,ea,ea,ea,a9
+ 1110 data06,8d,00,d4,a9,32,8d,01
+ 1120 datad4,a9,0a,8d,18,d4,a9,63
+ 1130 data8d,05,d4,a9,00,8d,06,d4
+ 1140 dataa9,21,8d,04,d4,4c,31,ea
+ 1150 dataa9,01,8d,03,d4,a9,0f,8d
+ 1160 data18,d4,a9,ff,8d,06,d4,a9
+ 1170 data00,8d,05,d4,a9,41,8d,04
+ 1180 datad4,4c,31,ea,00
+
