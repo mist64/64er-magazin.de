@@ -1,0 +1,177 @@
+;zeichen-editor.prg ==0801==
+    1 rem ************************
+    2 rem * zeichen-editor/c64   *
+    3 rem * von    volker buehn  *
+    4 rem *        b2,14         *
+    5 rem *        6800 mannheim *
+    6 rem * am     6.7.1984      *
+    7 rem ************************
+   10 print"{clr}":print:print"  bitte warten!":restore:poke657,128:poke792,134:poke793,234
+   20 gosub10000:rem einlesen der                            maschinenroutine
+   30 sys828    :rem aufruf derselben
+   40 poke53280,0:poke53281,0:print"{clr}        {rvon}selbsterstellte zeichen{rvof}"
+   50 print:print"1 zeichen berechnen 6 abspeichern"
+   60 print"2 neues zeichen     7 laden"
+   70 print"3 rom-zeichen       8 restore"
+   80 print"4 zeichen holen     9 bild zeichnen"
+   90 print"5 datas eingeben    0 programmende"
+  100 z=50776
+  110 pu$="........                               "
+  120 no$="                            "
+  130 gosub510:iffl=1thenreturn
+  140 a=z:pokea,peek(a)or128
+  300 getg$:ifg$=""then300
+  310 ifg$="{up}"thengosub1020
+  320 ifg$="{down}"thengosub1120
+  330 ifg$="{rght}"thengosub1220
+  340 ifg$="{left}"thengosub1320
+  350 ifg$=" "thengosub1420
+  360 ifg$="*"thengosub1520
+  370 ifg$="1"thenpokea,peek(a)and127:goto2000
+  380 ifg$="2"thenrun100
+  390 ifg$="3"then3000
+  400 ifg$="4"then4000
+  405 ifg$="5"then8000
+  410 ifg$="6"then6000
+  420 ifg$="7"then7000
+  430 ifg$="8"then30
+  440 ifg$="9"then5000
+  450 ifg$="0"thenprint"{clr}":end
+  460 goto300
+  500 rem feld zeichnen
+  510 print"{home}":fori=1to14:print:next
+  520 fori=1to8:printpu$:next:return
+ 1000 :
+ 1010 rem cursor nach oben
+ 1020 ifpeek(a-40)=32thenreturn
+ 1030 pokea,peek(a)and127:a=a-40:pokea,peek(a)or128:return
+ 1100 :
+ 1110 rem cursor nach unten
+ 1120 ifpeek(a+40)=32thenreturn
+ 1130 pokea,peek(a)and127:a=a+40:pokea,peek(a)or128:return
+ 1200 :
+ 1210 rem cursor nach rechts
+ 1220 ifpeek(a+1)=32thenreturn
+ 1230 pokea,peek(a)and127:a=a+1:pokea,peek(a)or128:return
+ 1300 :
+ 1310 rem cursor nach links
+ 1320 ifpeek(a-1)=32thenreturn
+ 1330 pokea,peek(a)and127:a=a-1:pokea,peek(a)or128:return
+ 1400 :
+ 1410 rem space-taste im zeichenfeld
+ 1420 ifpeek(a+1)=32thenpokea,174:return
+ 1430 pokea,46:a=a+1:pokea,peek(a)or128:return
+ 1500 :
+ 1510 rem "*" im zeichenfeld
+ 1520 pokea,42:ifpeek(a+1)=32thenpokea,peek(a)or128:return
+ 1530 a=a+1:pokea,peek(a)or128:return
+ 2000 rem *******************
+ 2001 rem *zeichen berechnen*
+ 2002 rem *******************
+ 2010 poke214,14:print:printtab(14)"welche taste? ";
+ 2020 getg$:ifg$=""then2020
+ 2030 printg$:g=peek(z+28)*8:k=0:a=z
+ 2040 printtab(10);no$:printtab(10);no$:print"{up}{up}{up}{up}"
+ 2050 forj=1to8:fori=a+7toastep-1
+ 2060 ifpeek(i)=42thenb(j)=b(j)+2^k
+ 2070 k=k+1:nexti:a=a+40:k=0:nextj
+ 2080 fori=51200+gto51207+g:k=k+1:pokei,b(k):next
+ 2090 printtab(10);no$
+ 2100 printtab(15);b(1);b(2);b(3);b(4)
+ 2110 printtab(15);b(5);b(6);b(7);b(8)
+ 2120 poke(z+11),g/8:fori=1to8:b(i)=0:next:fl=0:goto140
+ 3000 rem **************
+ 3001 rem * rom-zeichen*
+ 3002 rem **************
+ 3010 gosub510
+ 3020 poke214,14:print:printtab(14)"welche taste? ";
+ 3030 getg$:ifg$=""then3030
+ 3040 k=0:a=z:printg$:g=peek(z+28)*8
+ 3050 poke56334,peek(56334)and254:poke1,peek(1)and251
+ 3060 fori=53248+gto53255+g
+ 3070 k=k+1:b(k)=peek(i):c(k)=b(k):next:k=0
+ 3080 poke1,peek(1)or4:poke56334,peek(56334)or1
+ 3090 forj=1to8:fori=7to0step-1
+ 3100 ifb(j)>=2^ithenb(j)=b(j)-2^i:poke(a+7-i),42
+ 3110 nexti:a=a+40:nextj
+ 3120 print"{up}"tab(10);no$
+ 3130 printtab(15);c(1);c(2);c(3);c(4)
+ 3140 printtab(15);c(5);c(6);c(7);c(8)
+ 3150 fori=1to8:b(i)=0:next:goto140
+ 4000 rem *************************
+ 4001 rem * eigenes zeichen holen *
+ 4002 rem *************************
+ 4010 gosub510
+ 4020 poke214,14:print:printtab(14)"welche taste? ";
+ 4030 getg$:ifg$=""then4030
+ 4040 printg$:g=peek(z+28)*8:k=0:a=z
+ 4050 iffl=1then4080
+ 4060 fori=51200+gto51207+g
+ 4070 k=k+1:b(k)=peek(i):c(k)=b(k):next:k=0
+ 4080 forj=1to8:fori=7to0step-1
+ 4090 ifc(j)>=2^ithenc(j)=c(j)-2^i:poke(a+7-i),42
+ 4100 nexti:a=a+40:nextj
+ 4110 print"{up}"tab(10);no$
+ 4120 iffl=1then2080
+ 4130 printtab(15);b(1);b(2);b(3);b(4)
+ 4140 printtab(15);b(5);b(6);b(7);b(8)
+ 4150 poke(z+11),g/8:fori=1to8:b(i)=0:next:goto140
+ 5000 rem ****************
+ 5001 rem *  bild malen  *
+ 5002 rem ****************
+ 5010 print"{clr}";:poke53280,0:poke53281,1:poke646,0:poke650,128
+ 5020 print"[home=zurueck]"
+ 5030 poke204,0:getg$:ifg$=""then5030
+ 5040 ifg$="{home}"thenpoke204,1:poke646,6:poke650,0:goto40
+ 5050 c=peek(209)+peek(210)*256+peek(211):pokec,peek(c)and127:printg$;:goto5030
+ 6000 rem *************
+ 6001 rem * speichern *
+ 6002 rem *************
+ 6010 print"{clr}":print:print"       speichern des zeichensatzes"
+ 6020 print:print"(input 'n' , wenn zurueck)"
+ 6030 print:print:print"  name der datei?"
+ 6040 inputn$
+ 6050 ifn$="n"then40
+ 6060 open2,8,2,n$+",s,w"
+ 6070 close1:open1,8,15:input#1,oa:ifoa<>0then6010
+ 6080 fori=51200to53248
+ 6090 s%=peek(i)
+ 6100 print#2,s%
+ 6110 nexti
+ 6120 close2:goto40
+ 7000 rem *********
+ 7001 rem * laden *
+ 7002 rem *********
+ 7010 print"{clr}":print:print"       laden eins zeichensatzes"
+ 7020 print:print"(input 'n', wenn zurueck)"
+ 7030 print:print:print"  name der datei?"
+ 7040 inputn$
+ 7050 ifn$="n"then40
+ 7060 open2,8,2,n$+",s,r"
+ 7070 close1:open1,8,15:input#1,oa:ifoa<>0then7010
+ 7080 fori=51200to53248
+ 7090 input#2,s%
+ 7100 pokei,s%
+ 7110 nexti
+ 7120 close2:goto40
+ 8000 rem ******************
+ 8001 rem * datas eingeben *
+ 8002 rem ******************
+ 8010 print"{clr}":print:print" daten fuer ein zeichen eingeben"
+ 8020 fori=1to8:printi". byte":inputb(i):c(i)=b(i)
+ 8030 ifb(i)>255orb(i)<0theni=i-1
+ 8040 next:fl=1:gosub40:goto4010
+10000 rem ****************************
+10001 rem * maschinenroutine-eingabe *
+10002 rem ****************************
+10010 fori=0to58:reada$
+10020 hn=(asc(left$(a$,1))-48)*16:ifhn>144thenhn=hn-112
+10030 ln=asc(right$(a$,1))-48:ifln>9thenln=ln-7
+10040 hn=hn+ln:poke(828+i),hn:next:return
+10100 data78,a9,31,85,01,a9,00,85,64,a9
+10110 datad0,85,63,a9,c8,85,65,a2,10,a0
+10120 data00,b1,62,91,64,c8,d0,f9,e6,63
+10130 datae6,65,ca,d0,f2,a9,37,85,01,58
+10140 dataa9,12,8d,18,d0,a9,94,8d,00,dd
+10150 dataa9,c4,8d,88,02,20,44,e5,60
+
