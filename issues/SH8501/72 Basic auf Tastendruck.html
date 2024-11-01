@@ -23,7 +23,7 @@
 
 		<p>Bei der Initialisierung mit SYS 49152, die der Basic-Lader automatisch vornimmt, werden die Vektoren auf die Routine »Basic-Statement ausführen« und die Tastaturabfrage auf $C014 beziehungsweise $C11D verbogen.</p>
 
-		<p>Die beiden neuen Befehle werden an einem vorangestellten »!« erkannt, anschließend prüft das Programm auf die Anfangsbuchstaben K und D ($C014 - $C02D).Folgt keiner dieser Buchstaben, so wird ein »SYNTAX ERROR« ausgegeben ($C02E). Andernfalls verzweigt es nach $C031 (KEY) beziehungsweise $C0A7 (DISPLAY).</p>
+		<p>Die beiden neuen Befehle werden an einem vorangestellten »!« erkannt, anschließend prüft das Programm auf die Anfangsbuchstaben K und D ($C014 - $C02D). Folgt keiner dieser Buchstaben, so wird ein »SYNTAX ERROR« ausgegeben ($C02E). Andernfalls verzweigt es nach $C031 (KEY) beziehungsweise $C0A7 (DISPLAY).</p>
 
 		<p>Der »KEY«-Befehl hat das Format !KEY N, »Befehl«. Hierbei muß N zwischen eins und zwölf liegen, der Befehl darf maximal neun Zeichen umfassen, wobei Anführungszeichen durch das Hochkomma zu ersetzen sind. Ein anschließendes RETURN erreicht man durch Eingabe von »£« als letztes Zeichen.</p>
 
@@ -33,11 +33,11 @@
 
 		<p>Der »DISPLAY«-Befehl hat das Format !DISPLAY und läßt sich ebenfalls auf eine Funktionstaste legen. Er bewirkt ein Löschen des Bildschirms und die Anzeige der Belegung der 12 Funktionstasten.</p>
 
-		<p>Die neue Tastaturabfrageroutine prüft zunächst, ob die Control-Taste gedrückt ist. Ist dies der Fall und ist die gleichzeitig gedrückte Taste belegt, so wird aus einer Tabelle ($C1A8-$C1DE) das Token des Befehls minus $7F geladen und mit dessen Hilfe der A8CII-Code der Buchstaben des Befehls aus der Tabelle der Basic-Befehlsworte geholt. Die einzelnen Buchstaben werden in den Tastaturpuffer geschrieben und ausgegeben.</p>
+		<p>Die neue Tastaturabfrageroutine prüft zunächst, ob die Control-Taste gedrückt ist. Ist dies der Fall und ist die gleichzeitig gedrückte Taste belegt, so wird aus einer Tabelle ($C1A8-$C1DE) das Token des Befehls minus $7F geladen und mit dessen Hilfe der ASCII-Code der Buchstaben des Befehls aus der Tabelle der Basic-Befehlsworte geholt. Die einzelnen Buchstaben werden in den Tastaturpuffer geschrieben und ausgegeben.</p>
 
 		<p>Ist die Control-Taste nicht gedrückt, so wird geprüft, ob eine Funktionstaste gedrückt ist. Wenn ja, wird mit Hilfe des Tasten-Codes die Adresse der Belegung berechnet und die einzelnen Zeichen in den Tastaturpuffer geschrieben und ausgegeben.</p>
 
-		<address class="author">(Klaus Russell/rg)</address>
+		<address class="author">(Klaus Russell / rg)</address>
 
 		<figure>
 			<p><b>Gliederung des Programms:</b></p>
@@ -51,7 +51,7 @@
 					<td>Prüfen auf »!«</td>
 				</tr>
 				<tr>
-					<td>$CO21-$C02D</td>
+					<td>$C021-$C02D</td>
 					<td>Prüfen auf »K« oder »D«</td>
 				</tr>
 				<tr>
@@ -67,7 +67,7 @@
 					<td>»DISPLAY«-Befehl</td>
 				</tr>
 				<tr>
-					<td>$C11d-$C1AA</td>
+					<td>$C11D-$C1AA</td>
 					<td>Tastaturabfrage</td>
 				</tr>
 				<tr>
@@ -122,7 +122,7 @@
 				</tr>
 				<tr>
 					<td>$EB48</td>
-					<td>Prüft aufSHIFT,CTRL,C =</td>
+					<td>Prüft auf SHIFT, CTRL, C=</td>
 				</tr>
 				<tr>
 					<td>$FFD2</td>
@@ -135,13 +135,12 @@
 			</table>
 		</figure>
 
-
 		<figure>
 			<p><b>Belegung der Tastatur (mit Control):</b></p>
 			<table>
 				<tr>
 					<td>Taste</td>
-					<td>Code(PEEK(203))</td>
+					<td>Code (PEEK(203))</td>
 					<td>Befehl</td>
 				</tr>
 				<tr>
@@ -351,7 +350,7 @@
 				</tr>
 			</table>
 
-			<p>Die Belegung läßt sich folgendermaßen ändern: Man sucht den Code der Taste, deren Belegung man ändern will, aus obiger Tabelle und addiert 49579 dazu. Nun subtrahiert man vom Token des gewünschten Befehls 12 7 und POKEt diesen Wert in die zuerst errechnete Adresse. Will man zum Beispiel die F1-Taste mit »VERIFY« belegen, so sieht das wie folgt aus: F1 hat den Code 4 (siehe Tabelle) Das Token für VERIFY ist 149.<br>
+			<p>Die Belegung läßt sich folgendermaßen ändern: Man sucht den Code der Taste, deren Belegung man ändern will, aus obiger Tabelle und addiert 49579 dazu. Nun subtrahiert man vom Token des gewünschten Befehls 127 und POKEt diesen Wert in die zuerst errechnete Adresse. Will man zum Beispiel die F1-Taste mit »VERIFY« belegen, so sieht das wie folgt aus: F1 hat den Code 4 (siehe Tabelle). Das Token für VERIFY ist 149.<br>
 				Nun gibt man ein: POKE 49579 + 4,(149-127)</p>
 
 			<p>Danach ergibt &lt;CTRL&gt; zusammen mit F1 die Ausgabe von »VERIFY« auf dem Bildschirm. Die so geänderte Belegung läßt sich dann mit einem Monitorprogramm abspeichern. Sollen auch die Belegungen der mit !KEY belegbaren F-Tasten gespeichert werden, so muß der Bereich $C000 bis $C26B geSAVEt werden.</p>
