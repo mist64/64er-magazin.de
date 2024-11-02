@@ -186,7 +186,10 @@ if LANG == "de":
   LABEL_ALL_ISSUES = "Alle Ausgaben"
   LABEL_ALL_ARTICLES = "Alle Artikel"
   LABEL_ALL_LISTINGS = "Alle Listings"
-  LABEL_CURRENT_ISSUE = "Das aktuelle Magazin"
+  LABEL_CURRENT_REGULAR_ISSUE = "Das aktuelle Magazin"
+  LABEL_CURRENT_SPECIAL_ISSUE = "Das aktuelle Sonderheft"
+  LABEL_REGULAR_MAGAZINES = "Stammagazin"
+  LABEL_SPECIAL_MAGAZINES = "Sonderhefte"
   LABEL_LATEST_LISTINGS = "Neueste Listings"
   LABEL_TOC_ISSUE = "Inhalt Ausgabe"
   LABEL_CATEGORY = "Kategorie"
@@ -283,7 +286,10 @@ elif LANG == "en":
   LABEL_ALL_ISSUES = "All Issues"
   LABEL_ALL_ARTICLES = "All Articles"
   LABEL_ALL_LISTINGS = "All Listings"
-  LABEL_CURRENT_ISSUE = "Current Issue"
+  LABEL_CURRENT_REGULAR_ISSUE = "Current Issue"
+  LABEL_CURRENT_SPECIAL_ISSUE = "Current Special Issue"
+  LABEL_REGULAR_MAGAZINES = "Main Magazine"
+  LABEL_SPECIAL_MAGAZINES = "Special Issues"
   LABEL_LATEST_LISTINGS = "Latest Listings"
   LABEL_TOC_ISSUE = "Table of Contents, Issue"
   LABEL_ARTICLE = "Article"
@@ -714,8 +720,19 @@ class ArticleDatabase:
                 self.issues[issue_key] = issue
                 self.articles.extend(issue.articles)
 
-    def latest_issue_key(self):
-            return max(self.issues.keys(), key=lambda k: self.issues[k].pubdate)
+    def latest_regular_issue_key(self):
+        return max(
+            (k for k in self.issues.keys() if k[0].isdigit()),
+            key=lambda k: self.issues[k].pubdate,
+            default=None
+        )
+
+    def latest_special_issue_key(self):
+        return max(
+            (k for k in self.issues.keys() if not k[0].isdigit()),
+            key=lambda k: self.issues[k].pubdate,
+            default=None
+        )
 
     def articles_by_index_categories(self, index_categories, issue_key=None):
         # toc_category hacks for Rubriken and Aktuell
@@ -813,13 +830,18 @@ def optional_issue_prefix(path, issue, prepend_issue_dir=False):
 
 ### Reusable HTML generation
 
-def html_generate_latest_issue(db):
-    latest_issue_key = db.latest_issue_key()
+def html_generate_latest_issue(db, special):
+    if special:
+        latest_issue_key = db.latest_special_issue_key()
+        label_current_issue = LABEL_CURRENT_SPECIAL_ISSUE
+    else:
+        latest_issue_key = db.latest_regular_issue_key()
+        label_current_issue = LABEL_CURRENT_REGULAR_ISSUE
     latest_issue = db.issues[latest_issue_key]
     issue_dir_name = os.path.basename(latest_issue.issue_dir_name)
     latest_title_image = os.path.join(issue_dir_name, "title.jpg")
     latest_html = f'''
-<h2>{LABEL_CURRENT_ISSUE}</h2>\n
+<h2>{label_current_issue}</h2>\n
 <hr>
 <a href="{issue_dir_name}">
     <img src="{latest_title_image}" alt="">
@@ -912,19 +934,38 @@ def html_generate_toc(db, issue_key, heading_level=1, prepend_issue_dir=False):
 
 ### HTML file content creation
 
+def html_generate_images_all_issues(db, special):
+    html_parts = []
+
+    if special:
+        issue_keys = (k for k in db.issues.keys() if not k[0].isdigit())
+    else:
+        issue_keys = (k for k in db.issues.keys() if k[0].isdigit())
+
+    for issue_key in sorted(issue_keys, key=lambda x: db.issues[x].pubdate, reverse=True):
+        issue = db.issues[issue_key]
+        title_image = html_generate_title_image(db, issue, 200, True)
+        html_parts.append(f"<a href=\"{issue.issue_dir_name}\">{title_image}</a>\n")
+    return ''.join(html_parts)
+
 def html_generate_tocs_all_issues(db):
+    # Once we have many "Sonderheft" issues, we may consider splitting
+    # them into a separate main tab, i.e.
+    # Ausgaben – Sonderhefte – Artikel – Listings
     html_parts = []
     html_parts.append(f"<main>\n")
 
     html_parts.append(f"<h1>{LABEL_ALL_ISSUES}</h1>\n")
 
-    # top: all issue title images
-    for issue_key in sorted(db.issues.keys(), key=lambda x: db.issues[x].pubdate, reverse=True):
-        issue = db.issues[issue_key]
-        title_image = html_generate_title_image(db, issue, 200, True)
-        html_parts.append(f"<a href=\"{issue.issue_dir_name}\">{title_image}</a>\n")
-
+    # top: all issue title images (first regular, then special)
+    if db.latest_special_issue_key():
+        html_parts.append(f"<h2>{LABEL_REGULAR_MAGAZINES}</h2>\n")
+    html_parts.append(html_generate_images_all_issues(db, False))
     html_parts.append("<hr>\n")
+    if db.latest_special_issue_key():
+        html_parts.append(f"<h2>{LABEL_SPECIAL_MAGAZINES}</h2>\n")
+        html_parts.append(html_generate_images_all_issues(db, True))
+        html_parts.append("<hr>\n")
 
     # below: all TOCs
     for issue_key in sorted(db.issues.keys(), key=lambda x: db.issues[x].pubdate, reverse=True):
@@ -1080,7 +1121,7 @@ def html_generate_all_article_previews(db):
 ### Write full HTML files
 
 def write_full_html_file(db, path, title, preview_img, body_html, body_class, comments=False, additional_head_tags=''):
-    latest_issue_path = db.issues[db.latest_issue_key()].issue_dir_name
+    latest_issue_path = db.issues[db.latest_regular_issue_key()].issue_dir_name
     impressum_path = os.path.join(latest_issue_path, f"{FILENAME_IMPRINT}.html")
 
     isso_id = path.removeprefix(OUT_DIRECTORY) # XXX hack :(
@@ -1272,8 +1313,12 @@ def generate_landing_html(db, out_directory):
 
     html_parts.append("<div class=\"column2\">\n")
     html_parts.append("<div class=\"current_sidebox\">\n");
-    html_parts.append(html_generate_latest_issue(db))
+    html_parts.append(html_generate_latest_issue(db, False))
     html_parts.append("</div>")
+    if db.latest_special_issue_key():
+        html_parts.append("<div class=\"current_sidebox\">\n");
+        html_parts.append(html_generate_latest_issue(db, True))
+        html_parts.append("</div>")
     html_parts.append("<div class=\"listings_sidebox\">\n");
     html_parts.append(html_generate_latest_downloads(db))
     html_parts.append("</div>")
