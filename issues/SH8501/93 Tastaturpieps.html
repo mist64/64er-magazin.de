@@ -2,37 +2,37 @@
 <html lang="de">
 
 <head>
-	<title>Tastaturpieps</title>
-	<meta charset="UTF-8">
-	<link rel="stylesheet" href="../style.css">
-	<meta name="author" content="Wolfgang Roth, rg">
-	<meta name="64er.issue" content="Sonderheft 1/85">
-	<meta name="64er.pages" content="93">
-	<meta name="64er.head1" content="Tastaturpieps">
-	<meta name="64er.head2" content="VC 20">
-	<meta name="64er.toc_title" content="Tastaturpieps (C 64)">
-	<meta name="64er.toc_category" content="">
-	<meta name="64er.index_category" content="Listings zum Abtippen|Tips & Tricks">
-	<meta name="64er.id" content="tastaturpieps">
+    <title>Tastaturpieps</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="Wolfgang Roth, rg">
+    <meta name="64er.issue" content="Sonderheft 1/85">
+    <meta name="64er.pages" content="93">
+    <meta name="64er.head1" content="Tastaturpieps">
+    <meta name="64er.head2" content="VC 20">
+    <meta name="64er.toc_title" content="Tastaturpieps (C 64)">
+    <meta name="64er.toc_category" content="">
+    <meta name="64er.index_category" content="Listings zum Abtippen|Tips & Tricks">
+    <meta name="64er.id" content="tastaturpieps">
 </head>
 
 <body>
-	<article>
-		<h1>Tastaturpieps</h1>
+    <article>
+        <h1>Tastaturpieps</h1>
 
-		<p class="intro">Bei einem Besuch in einer Bank sah ich dort einige größere Computer, die jeden Tastendruck des Bedieners mit einem Piepston quittierten. Dies wollte ich auch beim C 64 nachvollziehen.</p>
+        <p class="intro">Bei einem Besuch in einer Bank sah ich dort einige größere Computer, die jeden Tastendruck des Bedieners mit einem Piepston quittierten. Dies wollte ich auch beim C 64 nachvollziehen.</p>
 
-		<p>Dies sollte unabhängig von einem anderen Programm sein. Daher meine Idee, die Interruptroutine des C 64 zu verändern, da diese 60mal in der Sekunde angesprochen wird, um die Tastatur abzufragen. Dies konnte natürlich nur in Maschinensprache geschehen, da Basic zu langsam wäre. Es ist auch möglich, schon vorhandene Programme damit zu erweitern. Denkbar sind zum Beispiel Textprogramme, Spiele, Programme zum Erlernen des Schreibmaschinenschreibens oder auch nur zur Simulation einer echten Schreibmaschine, die ja auch nicht gerade geräuschlos arbeitet.</p>
+        <p>Dies sollte unabhängig von einem anderen Programm sein. Daher meine Idee, die Interruptroutine des C 64 zu verändern, da diese 60mal in der Sekunde angesprochen wird, um die Tastatur abzufragen. Dies konnte natürlich nur in Maschinensprache geschehen, da Basic zu langsam wäre. Es ist auch möglich, schon vorhandene Programme damit zu erweitern. Denkbar sind zum Beispiel Textprogramme, Spiele, Programme zum Erlernen des Schreibmaschinenschreibens oder auch nur zur Simulation einer echten Schreibmaschine, die ja auch nicht gerade geräuschlos arbeitet.</p>
 
-		<p>Zu Beginn des Programms ($033C-$0348) wird der Interruptvektor verbogen. Er zeigt jetzt auf unsere Routine ($0349-$039E). Da der Computer alle 1/60-Sekunde die Tastatur abfragt, und dazu einen Interrupt auslöst, wird unsere Routine ebenfalls so häufig angesprochen. In dieser Routine wird zuerst überprüft ob überhaupt eine Taste betätigt wurde. Dazu wird der Wert der Speicherstelle $CB in den Akkumulator geladen. Enthält diese den Wert $40, so wurde keine Taste gedrückt und es wird zur normalen Interruptroutine des C 64 gesprungen. Der Wert der Speicherstelle $CB wird zwischengespeichert. Man kann damit bei einem 2. Durchlauf dieser Routine feststellen, ob eine Taste nicht kurz zuvor (t &lt;1/60 sec.) schon einmal betätigt wurde. Dies dient dazu, daß bei Tasten mit Dauerfunktion nicht unaufhörlich der Pieps ertönt. Denn dies ist erstens entnervend und zweitens verzögert dies den Ablauf der Dauerfunktion so, daß man dabei einschlafen kann. Danach werden die verschiedenen Toneinstellungen vorgenommen. Der Verzögerungsteil ($037F-$0387) dient dazu, den Ton höher zu machen. Ansonsten wäre nur ein Knacken zu hören. Sie können also selbst damit experimentieren und einen für Sie angenehmen Ton einstellen. Das Programm läßt sich durch Drücken der Run/Stop- und der Restore-Taste unterbrechen und mit SYS 49152 reaktivieren.</p>
+        <p>Zu Beginn des Programms ($033C-$0348) wird der Interruptvektor verbogen. Er zeigt jetzt auf unsere Routine ($0349-$039E). Da der Computer alle 1/60-Sekunde die Tastatur abfragt, und dazu einen Interrupt auslöst, wird unsere Routine ebenfalls so häufig angesprochen. In dieser Routine wird zuerst überprüft ob überhaupt eine Taste betätigt wurde. Dazu wird der Wert der Speicherstelle $CB in den Akkumulator geladen. Enthält diese den Wert $40, so wurde keine Taste gedrückt und es wird zur normalen Interruptroutine des C 64 gesprungen. Der Wert der Speicherstelle $CB wird zwischengespeichert. Man kann damit bei einem 2. Durchlauf dieser Routine feststellen, ob eine Taste nicht kurz zuvor (t &lt;1/60 sec.) schon einmal betätigt wurde. Dies dient dazu, daß bei Tasten mit Dauerfunktion nicht unaufhörlich der Pieps ertönt. Denn dies ist erstens entnervend und zweitens verzögert dies den Ablauf der Dauerfunktion so, daß man dabei einschlafen kann. Danach werden die verschiedenen Toneinstellungen vorgenommen. Der Verzögerungsteil ($037F-$0387) dient dazu, den Ton höher zu machen. Ansonsten wäre nur ein Knacken zu hören. Sie können also selbst damit experimentieren und einen für Sie angenehmen Ton einstellen. Das Programm läßt sich durch Drücken der Run/Stop- und der Restore-Taste unterbrechen und mit SYS 49152 reaktivieren.</p>
 
-		<address class="author">(Wolfgang Roth / rg)</address>
+        <address class="author">(Wolfgang Roth / rg)</address>
 
-		<figure>
-			<pre data-filename="tastaturpieps" data-name="Tastaturpieps"></pre>
-		</figure>
+        <figure>
+            <pre data-filename="tastaturpieps" data-name="Tastaturpieps"></pre>
+        </figure>
 
-	</article>
+    </article>
 
 </body>
 

@@ -2,366 +2,366 @@
 <html lang="de">
 
 <head>
-	<title>Basic auf Tastendruck</title>
-	<meta charset="UTF-8">
-	<link rel="stylesheet" href="../style.css">
-	<meta name="author" content="Klaus Russell, rg">
-	<meta name="64er.issue" content="Sonderheft 1/85">
-	<meta name="64er.pages" content="72-73">
-	<meta name="64er.head1" content="Basic auf Tastendruck">
-	<meta name="64er.head2" content="C 64">
-	<meta name="64er.toc_title" content="Basic auf Tastendruck (C 64)">
-	<meta name="64er.toc_category" content="">
-	<meta name="64er.index_category" content="Listings zum Abtippen|Tips & Tricks">
-	<meta name="64er.id" content="tastendruck">
+    <title>Basic auf Tastendruck</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="Klaus Russell, rg">
+    <meta name="64er.issue" content="Sonderheft 1/85">
+    <meta name="64er.pages" content="72-73">
+    <meta name="64er.head1" content="Basic auf Tastendruck">
+    <meta name="64er.head2" content="C 64">
+    <meta name="64er.toc_title" content="Basic auf Tastendruck (C 64)">
+    <meta name="64er.toc_category" content="">
+    <meta name="64er.index_category" content="Listings zum Abtippen|Tips & Tricks">
+    <meta name="64er.id" content="tastendruck">
 </head>
 
 <body>
-	<article>
-		<h1>Basic auf Tastendruck</h1>
+    <article>
+        <h1>Basic auf Tastendruck</h1>
 
-		<p>Beim Programm KEYS handelt es sich um ein Maschinenprogramm, das den Bereich $C000 - $C26B benötigt. Es erweitert das Basic um die beiden Befehle »KEY« und »DISPLAY«, mit denen die Funktionstasten belegt werden können beziehungsweise diese Belegung angezeigt werden kann. Zusätzlich können die wichtigsten Basic-Befehle durch gleichzeitiges Drücken von CTRL und einer Buchstabentaste »auf Knopfdruck« auf den Bildschirm geschrieben werden, was die Programmierarbeit doch sehr vereinfachen kann.</p>
+        <p>Beim Programm KEYS handelt es sich um ein Maschinenprogramm, das den Bereich $C000 - $C26B benötigt. Es erweitert das Basic um die beiden Befehle »KEY« und »DISPLAY«, mit denen die Funktionstasten belegt werden können beziehungsweise diese Belegung angezeigt werden kann. Zusätzlich können die wichtigsten Basic-Befehle durch gleichzeitiges Drücken von CTRL und einer Buchstabentaste »auf Knopfdruck« auf den Bildschirm geschrieben werden, was die Programmierarbeit doch sehr vereinfachen kann.</p>
 
-		<p>Bei der Initialisierung mit SYS 49152, die der Basic-Lader automatisch vornimmt, werden die Vektoren auf die Routine »Basic-Statement ausführen« und die Tastaturabfrage auf $C014 beziehungsweise $C11D verbogen.</p>
+        <p>Bei der Initialisierung mit SYS 49152, die der Basic-Lader automatisch vornimmt, werden die Vektoren auf die Routine »Basic-Statement ausführen« und die Tastaturabfrage auf $C014 beziehungsweise $C11D verbogen.</p>
 
-		<p>Die beiden neuen Befehle werden an einem vorangestellten »!« erkannt, anschließend prüft das Programm auf die Anfangsbuchstaben K und D ($C014 - $C02D). Folgt keiner dieser Buchstaben, so wird ein »SYNTAX ERROR« ausgegeben ($C02E). Andernfalls verzweigt es nach $C031 (KEY) beziehungsweise $C0A7 (DISPLAY).</p>
+        <p>Die beiden neuen Befehle werden an einem vorangestellten »!« erkannt, anschließend prüft das Programm auf die Anfangsbuchstaben K und D ($C014 - $C02D). Folgt keiner dieser Buchstaben, so wird ein »SYNTAX ERROR« ausgegeben ($C02E). Andernfalls verzweigt es nach $C031 (KEY) beziehungsweise $C0A7 (DISPLAY).</p>
 
-		<p>Der »KEY«-Befehl hat das Format !KEY N, »Befehl«. Hierbei muß N zwischen eins und zwölf liegen, der Befehl darf maximal neun Zeichen umfassen, wobei Anführungszeichen durch das Hochkomma zu ersetzen sind. Ein anschließendes RETURN erreicht man durch Eingabe von »£« als letztes Zeichen.</p>
+        <p>Der »KEY«-Befehl hat das Format !KEY N, »Befehl«. Hierbei muß N zwischen eins und zwölf liegen, der Befehl darf maximal neun Zeichen umfassen, wobei Anführungszeichen durch das Hochkomma zu ersetzen sind. Ein anschließendes RETURN erreicht man durch Eingabe von »£« als letztes Zeichen.</p>
 
-		<p>Die Funktionstasten F1 bis F8 werden wie üblich, die Tasten F9 bis F12 durch gleichzeitiges Drücken von »C=« und einer F-Taste erreicht.</p>
+        <p>Die Funktionstasten F1 bis F8 werden wie üblich, die Tasten F9 bis F12 durch gleichzeitiges Drücken von »C=« und einer F-Taste erreicht.</p>
 
-		<p>Beispielsweise bewirkt !KEY 9, »RUN£«, daß nach gleichzeitigem Drücken von »C=« und »F1« ein Basic-Programm gestartet wird.</p>
+        <p>Beispielsweise bewirkt !KEY 9, »RUN£«, daß nach gleichzeitigem Drücken von »C=« und »F1« ein Basic-Programm gestartet wird.</p>
 
-		<p>Der »DISPLAY«-Befehl hat das Format !DISPLAY und läßt sich ebenfalls auf eine Funktionstaste legen. Er bewirkt ein Löschen des Bildschirms und die Anzeige der Belegung der 12 Funktionstasten.</p>
+        <p>Der »DISPLAY«-Befehl hat das Format !DISPLAY und läßt sich ebenfalls auf eine Funktionstaste legen. Er bewirkt ein Löschen des Bildschirms und die Anzeige der Belegung der 12 Funktionstasten.</p>
 
-		<p>Die neue Tastaturabfrageroutine prüft zunächst, ob die Control-Taste gedrückt ist. Ist dies der Fall und ist die gleichzeitig gedrückte Taste belegt, so wird aus einer Tabelle ($C1A8-$C1DE) das Token des Befehls minus $7F geladen und mit dessen Hilfe der ASCII-Code der Buchstaben des Befehls aus der Tabelle der Basic-Befehlsworte geholt. Die einzelnen Buchstaben werden in den Tastaturpuffer geschrieben und ausgegeben.</p>
+        <p>Die neue Tastaturabfrageroutine prüft zunächst, ob die Control-Taste gedrückt ist. Ist dies der Fall und ist die gleichzeitig gedrückte Taste belegt, so wird aus einer Tabelle ($C1A8-$C1DE) das Token des Befehls minus $7F geladen und mit dessen Hilfe der ASCII-Code der Buchstaben des Befehls aus der Tabelle der Basic-Befehlsworte geholt. Die einzelnen Buchstaben werden in den Tastaturpuffer geschrieben und ausgegeben.</p>
 
-		<p>Ist die Control-Taste nicht gedrückt, so wird geprüft, ob eine Funktionstaste gedrückt ist. Wenn ja, wird mit Hilfe des Tasten-Codes die Adresse der Belegung berechnet und die einzelnen Zeichen in den Tastaturpuffer geschrieben und ausgegeben.</p>
+        <p>Ist die Control-Taste nicht gedrückt, so wird geprüft, ob eine Funktionstaste gedrückt ist. Wenn ja, wird mit Hilfe des Tasten-Codes die Adresse der Belegung berechnet und die einzelnen Zeichen in den Tastaturpuffer geschrieben und ausgegeben.</p>
 
-		<address class="author">(Klaus Russell / rg)</address>
+        <address class="author">(Klaus Russell / rg)</address>
 
-		<figure>
-			<p><b>Gliederung des Programms:</b></p>
-			<table>
-				<tr>
-					<td>$C000-$C013</td>
-					<td>Initialisierung</td>
-				</tr>
-				<tr>
-					<td>$C014-$C020</td>
-					<td>Prüfen auf »!«</td>
-				</tr>
-				<tr>
-					<td>$C021-$C02D</td>
-					<td>Prüfen auf »K« oder »D«</td>
-				</tr>
-				<tr>
-					<td>$C02E</td>
-					<td>Ausgabe »SYNTAX ERROR«</td>
-				</tr>
-				<tr>
-					<td>$C031-$C0A6</td>
-					<td>»KEY«-Befehl</td>
-				</tr>
-				<tr>
-					<td>$C0A7-$C11C</td>
-					<td>»DISPLAY«-Befehl</td>
-				</tr>
-				<tr>
-					<td>$C11D-$C1AA</td>
-					<td>Tastaturabfrage</td>
-				</tr>
-				<tr>
-					<td>$C1AB-$C1DE</td>
-					<td>Tokens - $7F</td>
-				</tr>
-				<tr>
-					<td>$C1DF-$C1EA</td>
-					<td>[CLR/HOME] »!DISPLAY« 2*Carriage Return</td>
-				</tr>
-				<tr>
-					<td>$C1EB-$C1EF</td>
-					<td>»!KEY«</td>
-				</tr>
-				<tr>
-					<td>$C1F0-$C1FB</td>
-					<td>Hilfswerte zur Berechnung der Adressen der F-Tasten-Belegung</td>
-				</tr>
-				<tr>
-					<td>$C200-$C26C</td>
-					<td>Belegung F-Tasten</td>
-				</tr>
-			</table>
-		</figure>
+        <figure>
+            <p><b>Gliederung des Programms:</b></p>
+            <table>
+                <tr>
+                    <td>$C000-$C013</td>
+                    <td>Initialisierung</td>
+                </tr>
+                <tr>
+                    <td>$C014-$C020</td>
+                    <td>Prüfen auf »!«</td>
+                </tr>
+                <tr>
+                    <td>$C021-$C02D</td>
+                    <td>Prüfen auf »K« oder »D«</td>
+                </tr>
+                <tr>
+                    <td>$C02E</td>
+                    <td>Ausgabe »SYNTAX ERROR«</td>
+                </tr>
+                <tr>
+                    <td>$C031-$C0A6</td>
+                    <td>»KEY«-Befehl</td>
+                </tr>
+                <tr>
+                    <td>$C0A7-$C11C</td>
+                    <td>»DISPLAY«-Befehl</td>
+                </tr>
+                <tr>
+                    <td>$C11D-$C1AA</td>
+                    <td>Tastaturabfrage</td>
+                </tr>
+                <tr>
+                    <td>$C1AB-$C1DE</td>
+                    <td>Tokens - $7F</td>
+                </tr>
+                <tr>
+                    <td>$C1DF-$C1EA</td>
+                    <td>[CLR/HOME] »!DISPLAY« 2*Carriage Return</td>
+                </tr>
+                <tr>
+                    <td>$C1EB-$C1EF</td>
+                    <td>»!KEY«</td>
+                </tr>
+                <tr>
+                    <td>$C1F0-$C1FB</td>
+                    <td>Hilfswerte zur Berechnung der Adressen der F-Tasten-Belegung</td>
+                </tr>
+                <tr>
+                    <td>$C200-$C26C</td>
+                    <td>Belegung F-Tasten</td>
+                </tr>
+            </table>
+        </figure>
 
-		<figure>
-			<p><b>Benutzte Routinen:</b></p>
-			<table>
-				<tr>
-					<td>$A7E7</td>
-					<td>Basic-Statement ausführen</td>
-				</tr>
-				<tr>
-					<td>$AB1E</td>
-					<td>String ausgeben</td>
-				</tr>
-				<tr>
-					<td>$AEFD</td>
-					<td>Prüft auf Komma</td>
-				</tr>
-				<tr>
-					<td>$AF08</td>
-					<td>»SYNTAX ERROR« ausgeben</td>
-				</tr>
-				<tr>
-					<td>$B79E</td>
-					<td>Holt Byte-Wert nach X</td>
-				</tr>
-				<tr>
-					<td>$EB3C</td>
-					<td>$EB42, alte Tastaturabfrage</td>
-				</tr>
-				<tr>
-					<td>$EB48</td>
-					<td>Prüft auf SHIFT, CTRL, C=</td>
-				</tr>
-				<tr>
-					<td>$FFD2</td>
-					<td>Ausgabe eines Zeichens</td>
-				</tr>
-				<tr>
-					<td>$0073</td>
-					<td>Holt nächstes Zeichen</td>
-				</tr>
-			</table>
-		</figure>
+        <figure>
+            <p><b>Benutzte Routinen:</b></p>
+            <table>
+                <tr>
+                    <td>$A7E7</td>
+                    <td>Basic-Statement ausführen</td>
+                </tr>
+                <tr>
+                    <td>$AB1E</td>
+                    <td>String ausgeben</td>
+                </tr>
+                <tr>
+                    <td>$AEFD</td>
+                    <td>Prüft auf Komma</td>
+                </tr>
+                <tr>
+                    <td>$AF08</td>
+                    <td>»SYNTAX ERROR« ausgeben</td>
+                </tr>
+                <tr>
+                    <td>$B79E</td>
+                    <td>Holt Byte-Wert nach X</td>
+                </tr>
+                <tr>
+                    <td>$EB3C</td>
+                    <td>$EB42, alte Tastaturabfrage</td>
+                </tr>
+                <tr>
+                    <td>$EB48</td>
+                    <td>Prüft auf SHIFT, CTRL, C=</td>
+                </tr>
+                <tr>
+                    <td>$FFD2</td>
+                    <td>Ausgabe eines Zeichens</td>
+                </tr>
+                <tr>
+                    <td>$0073</td>
+                    <td>Holt nächstes Zeichen</td>
+                </tr>
+            </table>
+        </figure>
 
-		<figure>
-			<p><b>Belegung der Tastatur (mit Control):</b></p>
-			<table>
-				<tr>
-					<td>Taste</td>
-					<td>Code (PEEK(203))</td>
-					<td>Befehl</td>
-				</tr>
-				<tr>
-					<td>+</td>
-					<td>40</td>
-					<td>SIN</td>
-				</tr>
-				<tr>
-					<td>-</td>
-					<td>43</td>
-					<td>COS</td>
-				</tr>
-				<tr>
-					<td>£</td>
-					<td>48</td>
-					<td>TAN</td>
-				</tr>
-				<tr>
-					<td>F1</td>
-					<td>4</td>
-					<td>RUN</td>
-				</tr>
-				<tr>
-					<td>F3</td>
-					<td>5</td>
-					<td>LIST</td>
-				</tr>
-				<tr>
-					<td>F5</td>
-					<td>6</td>
-					<td>LOAD</td>
-				</tr>
-				<tr>
-					<td>F7</td>
-					<td>3</td>
-					<td>SAVE</td>
-				</tr>
-				<tr>
-					<td>W</td>
-					<td>9</td>
-					<td>WAIT</td>
-				</tr>
-				<tr>
-					<td>E</td>
-					<td>14</td>
-					<td>END</td>
-				</tr>
-				<tr>
-					<td>R</td>
-					<td>17</td>
-					<td>RETURN</td>
-				</tr>
-				<tr>
-					<td>T</td>
-					<td>22</td>
-					<td>TO</td>
-				</tr>
-				<tr>
-					<td>Y</td>
-					<td>25</td>
-					<td>SYS</td>
-				</tr>
-				<tr>
-					<td>U</td>
-					<td>30</td>
-					<td>USR</td>
-				</tr>
-				<tr>
-					<td>I</td>
-					<td>33</td>
-					<td>INPUT</td>
-				</tr>
-				<tr>
-					<td>0</td>
-					<td>38</td>
-					<td>OPEN</td>
-				</tr>
-				<tr>
-					<td>P</td>
-					<td>41</td>
-					<td>POKE</td>
-				</tr>
-				<tr>
-					<td>@</td>
-					<td>46</td>
-					<td>CONT</td>
-				</tr>
-				<tr>
-					<td>*</td>
-					<td>49</td>
-					<td>SQR</td>
-				</tr>
-				<tr>
-					<td>↑</td>
-					<td>54</td>
-					<td>---</td>
-				</tr>
-				<tr>
-					<td>A</td>
-					<td>10</td>
-					<td>ABS</td>
-				</tr>
-				<tr>
-					<td>S</td>
-					<td>13</td>
-					<td>STEP</td>
-				</tr>
-				<tr>
-					<td>D</td>
-					<td>18</td>
-					<td>DATA</td>
-				</tr>
-				<tr>
-					<td>F</td>
-					<td>21</td>
-					<td>FOR</td>
-				</tr>
-				<tr>
-					<td>G</td>
-					<td>26</td>
-					<td>GOTO</td>
-				</tr>
-				<tr>
-					<td>H</td>
-					<td>29</td>
-					<td>THEN</td>
-				</tr>
-				<tr>
-					<td>J</td>
-					<td>34</td>
-					<td>READ</td>
-				</tr>
-				<tr>
-					<td>K</td>
-					<td>37</td>
-					<td>RIGHT$</td>
-				</tr>
-				<tr>
-					<td>L</td>
-					<td>42</td>
-					<td>LEFT$</td>
-				</tr>
-				<tr>
-					<td>:</td>
-					<td>45</td>
-					<td>INT</td>
-				</tr>
-				<tr>
-					<td>;</td>
-					<td>50</td>
-					<td>LOG</td>
-				</tr>
-				<tr>
-					<td>Z</td>
-					<td>12</td>
-					<td>GOSUB</td>
-				</tr>
-				<tr>
-					<td>X</td>
-					<td>23</td>
-					<td>PEEK</td>
-				</tr>
-				<tr>
-					<td>C</td>
-					<td>20</td>
-					<td>CLOSE</td>
-				</tr>
-				<tr>
-					<td>V</td>
-					<td>31</td>
-					<td>VAL</td>
-				</tr>
-				<tr>
-					<td>B</td>
-					<td>28</td>
-					<td>RESTORE</td>
-				</tr>
-				<tr>
-					<td>N</td>
-					<td>39</td>
-					<td>NEXT</td>
-				</tr>
-				<tr>
-					<td>M</td>
-					<td>36</td>
-					<td>MID$</td>
-				</tr>
-				<tr>
-					<td>,</td>
-					<td>47</td>
-					<td>TAB(</td>
-				</tr>
-				<tr>
-					<td>.</td>
-					<td>44</td>
-					<td>SPC(</td>
-				</tr>
-				<tr>
-					<td>CRSR↕</td>
-					<td>7</td>
-					<td>EXP</td>
-				</tr>
-				<tr>
-					<td>CRSR↔</td>
-					<td>2</td>
-					<td>CONT</td>
-				</tr>
-			</table>
+        <figure>
+            <p><b>Belegung der Tastatur (mit Control):</b></p>
+            <table>
+                <tr>
+                    <td>Taste</td>
+                    <td>Code (PEEK(203))</td>
+                    <td>Befehl</td>
+                </tr>
+                <tr>
+                    <td>+</td>
+                    <td>40</td>
+                    <td>SIN</td>
+                </tr>
+                <tr>
+                    <td>-</td>
+                    <td>43</td>
+                    <td>COS</td>
+                </tr>
+                <tr>
+                    <td>£</td>
+                    <td>48</td>
+                    <td>TAN</td>
+                </tr>
+                <tr>
+                    <td>F1</td>
+                    <td>4</td>
+                    <td>RUN</td>
+                </tr>
+                <tr>
+                    <td>F3</td>
+                    <td>5</td>
+                    <td>LIST</td>
+                </tr>
+                <tr>
+                    <td>F5</td>
+                    <td>6</td>
+                    <td>LOAD</td>
+                </tr>
+                <tr>
+                    <td>F7</td>
+                    <td>3</td>
+                    <td>SAVE</td>
+                </tr>
+                <tr>
+                    <td>W</td>
+                    <td>9</td>
+                    <td>WAIT</td>
+                </tr>
+                <tr>
+                    <td>E</td>
+                    <td>14</td>
+                    <td>END</td>
+                </tr>
+                <tr>
+                    <td>R</td>
+                    <td>17</td>
+                    <td>RETURN</td>
+                </tr>
+                <tr>
+                    <td>T</td>
+                    <td>22</td>
+                    <td>TO</td>
+                </tr>
+                <tr>
+                    <td>Y</td>
+                    <td>25</td>
+                    <td>SYS</td>
+                </tr>
+                <tr>
+                    <td>U</td>
+                    <td>30</td>
+                    <td>USR</td>
+                </tr>
+                <tr>
+                    <td>I</td>
+                    <td>33</td>
+                    <td>INPUT</td>
+                </tr>
+                <tr>
+                    <td>0</td>
+                    <td>38</td>
+                    <td>OPEN</td>
+                </tr>
+                <tr>
+                    <td>P</td>
+                    <td>41</td>
+                    <td>POKE</td>
+                </tr>
+                <tr>
+                    <td>@</td>
+                    <td>46</td>
+                    <td>CONT</td>
+                </tr>
+                <tr>
+                    <td>*</td>
+                    <td>49</td>
+                    <td>SQR</td>
+                </tr>
+                <tr>
+                    <td>↑</td>
+                    <td>54</td>
+                    <td>---</td>
+                </tr>
+                <tr>
+                    <td>A</td>
+                    <td>10</td>
+                    <td>ABS</td>
+                </tr>
+                <tr>
+                    <td>S</td>
+                    <td>13</td>
+                    <td>STEP</td>
+                </tr>
+                <tr>
+                    <td>D</td>
+                    <td>18</td>
+                    <td>DATA</td>
+                </tr>
+                <tr>
+                    <td>F</td>
+                    <td>21</td>
+                    <td>FOR</td>
+                </tr>
+                <tr>
+                    <td>G</td>
+                    <td>26</td>
+                    <td>GOTO</td>
+                </tr>
+                <tr>
+                    <td>H</td>
+                    <td>29</td>
+                    <td>THEN</td>
+                </tr>
+                <tr>
+                    <td>J</td>
+                    <td>34</td>
+                    <td>READ</td>
+                </tr>
+                <tr>
+                    <td>K</td>
+                    <td>37</td>
+                    <td>RIGHT$</td>
+                </tr>
+                <tr>
+                    <td>L</td>
+                    <td>42</td>
+                    <td>LEFT$</td>
+                </tr>
+                <tr>
+                    <td>:</td>
+                    <td>45</td>
+                    <td>INT</td>
+                </tr>
+                <tr>
+                    <td>;</td>
+                    <td>50</td>
+                    <td>LOG</td>
+                </tr>
+                <tr>
+                    <td>Z</td>
+                    <td>12</td>
+                    <td>GOSUB</td>
+                </tr>
+                <tr>
+                    <td>X</td>
+                    <td>23</td>
+                    <td>PEEK</td>
+                </tr>
+                <tr>
+                    <td>C</td>
+                    <td>20</td>
+                    <td>CLOSE</td>
+                </tr>
+                <tr>
+                    <td>V</td>
+                    <td>31</td>
+                    <td>VAL</td>
+                </tr>
+                <tr>
+                    <td>B</td>
+                    <td>28</td>
+                    <td>RESTORE</td>
+                </tr>
+                <tr>
+                    <td>N</td>
+                    <td>39</td>
+                    <td>NEXT</td>
+                </tr>
+                <tr>
+                    <td>M</td>
+                    <td>36</td>
+                    <td>MID$</td>
+                </tr>
+                <tr>
+                    <td>,</td>
+                    <td>47</td>
+                    <td>TAB(</td>
+                </tr>
+                <tr>
+                    <td>.</td>
+                    <td>44</td>
+                    <td>SPC(</td>
+                </tr>
+                <tr>
+                    <td>CRSR↕</td>
+                    <td>7</td>
+                    <td>EXP</td>
+                </tr>
+                <tr>
+                    <td>CRSR↔</td>
+                    <td>2</td>
+                    <td>CONT</td>
+                </tr>
+            </table>
 
-			<p>Die Belegung läßt sich folgendermaßen ändern: Man sucht den Code der Taste, deren Belegung man ändern will, aus obiger Tabelle und addiert 49579 dazu. Nun subtrahiert man vom Token des gewünschten Befehls 127 und POKEt diesen Wert in die zuerst errechnete Adresse. Will man zum Beispiel die F1-Taste mit »VERIFY« belegen, so sieht das wie folgt aus: F1 hat den Code 4 (siehe Tabelle). Das Token für VERIFY ist 149.<br>
-				Nun gibt man ein: POKE 49579 + 4,(149-127)</p>
+            <p>Die Belegung läßt sich folgendermaßen ändern: Man sucht den Code der Taste, deren Belegung man ändern will, aus obiger Tabelle und addiert 49579 dazu. Nun subtrahiert man vom Token des gewünschten Befehls 127 und POKEt diesen Wert in die zuerst errechnete Adresse. Will man zum Beispiel die F1-Taste mit »VERIFY« belegen, so sieht das wie folgt aus: F1 hat den Code 4 (siehe Tabelle). Das Token für VERIFY ist 149.<br>
+                Nun gibt man ein: POKE 49579 + 4,(149-127)</p>
 
-			<p>Danach ergibt &lt;CTRL&gt; zusammen mit F1 die Ausgabe von »VERIFY« auf dem Bildschirm. Die so geänderte Belegung läßt sich dann mit einem Monitorprogramm abspeichern. Sollen auch die Belegungen der mit !KEY belegbaren F-Tasten gespeichert werden, so muß der Bereich $C000 bis $C26B geSAVEt werden.</p>
-		</figure>
+            <p>Danach ergibt &lt;CTRL&gt; zusammen mit F1 die Ausgabe von »VERIFY« auf dem Bildschirm. Die so geänderte Belegung läßt sich dann mit einem Monitorprogramm abspeichern. Sollen auch die Belegungen der mit !KEY belegbaren F-Tasten gespeichert werden, so muß der Bereich $C000 bis $C26B geSAVEt werden.</p>
+        </figure>
 
-		<figure>
-			<pre data-filename="tastendruck" data-name="KEYS"></pre>
-		</figure>
+        <figure>
+            <pre data-filename="tastendruck" data-name="KEYS"></pre>
+        </figure>
 
-	</article>
+    </article>
 
 </body>
 
