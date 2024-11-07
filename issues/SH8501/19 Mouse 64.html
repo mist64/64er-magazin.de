@@ -2,100 +2,101 @@
 <html lang="de">
 
 <head>
-	<title>Mouse 64</title>
-	<meta charset="UTF-8">
-	<link rel="stylesheet" href="../style.css">
-	<meta name="author" content="Peter Dreuw, rg">
-	<meta name="64er.issue" content="Sonderheft 1/85">
-	<meta name="64er.pages" content="19-21">
-	<meta name="64er.head1" content="Mouse 64">
-	<meta name="64er.head2" content="C 64">
-	<meta name="64er.toc_title" content="Mouse 64 (C 64)">
-	<meta name="64er.toc_category" content="">
-	<meta name="64er.id" content="mouse">
+    <title>Mouse 64</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="Peter Dreuw, rg">
+    <meta name="64er.issue" content="Sonderheft 1/85">
+    <meta name="64er.pages" content="19-21">
+    <meta name="64er.head1" content="Mouse 64">
+    <meta name="64er.head2" content="C 64">
+    <meta name="64er.toc_title" content="Mouse 64 (C 64)">
+    <meta name="64er.toc_category" content="">
+    <meta name="64er.index_category" content="Listings zum Abtippen|Tips & Tricks">
+    <meta name="64er.id" content="mouse">
 </head>
 
 <body>
-	<article>
-		<h1>Mouse 64</h1>
+    <article>
+        <h1>Mouse 64</h1>
 
-		<p>Das Programm Mouse 64 stellt eine Interrupt-Erweiterung des C64 dar und verträgt sich somit nicht ohne eine Anpassung mit anderen Interrupt-Erweiterungen. Das Programm erzeugt nach Aufruf eine »Maus« auf dem Bildschirm, die sich mit einem Joystick (Port II) steuern läßt. Die Abfrage erfolgt durch eine in den Interrupt eingebundene Routine, so daß die Tastatur weiterhin benutzbar bleibt.</p>
+        <p>Das Programm Mouse 64 stellt eine Interrupt-Erweiterung des C64 dar und verträgt sich somit nicht ohne eine Anpassung mit anderen Interrupt-Erweiterungen. Das Programm erzeugt nach Aufruf eine »Maus« auf dem Bildschirm, die sich mit einem Joystick (Port II) steuern läßt. Die Abfrage erfolgt durch eine in den Interrupt eingebundene Routine, so daß die Tastatur weiterhin benutzbar bleibt.</p>
 
-		<p>Mouse 64 ist vollständig in 6502/10-Assembler geschrieben und benötigt keinen Basic-Speicher, da Mouse 64 im freien RAM-Bereich von 49152 ($c000) bis 53272 ($cfff) liegt. Die Sprite-Daten liegen in Block 11 (dez. 704-767). Um die Maus darzustellen, wird Sprite 7 verwendet. Das Programm liefert folgende Daten:<br>
-			a) Den Bildschirmcode des Zeichens unter der Maus<br>
-			b) Die Bildschirm-X-Koordinate<br>
-			c) Die Bildschirm-Y-Koordinate<br>
-			d) Joystick#2-Zustand<br>
-			e) Feuerknopf # 2-Zustand</p>
-
-
-		<p>Das Programm Mouse 64 ist als Eingabe- und Steuerhilfe für Anwendungsprogramme gedacht (siehe Apple-Macintosh-Software und andere), kann aber auch durch zum Beispiel Änderung des Sprites in Spiele eingebunden werden, da bis auf die Vergrößerung alle Spriteparameter veränderlich bleiben.</p>
-		<h3>Zu Listing 1</h3>
-
-		<p>Das Listing 1 zeigt den Basic-Lader, der in zwei Schleifen die Daten für den Sprite und das Assemblerprogramm aus den DATA-Zeilen liest und in die entsprechenden Speicherstellen schreibt.</p>
-
-		<p>Bei einem Fehler der Daten bricht der Computer das Programm mit einer entsprechenden Meldung ab.</p>
-
-		<p>Nach Ablauf der beiden Schleifen wird das Assemblerprogramm direkt mit »SYS 49152« gestartet.</p>
-
-		<h3>Zu Listing 2</h3>
-
-		<p>Das zweite Listing zeigt die in Assembler geschriebene Initialisierungs-Routine. Diese Routine verändert die Interrupt-Zeiger so, daß sie auf die Maus-Routine zeigen. Ferner verändert sie die zu Sprite 7 gehörenden Parameter entsprechend.</p>
-
-		<p>Die Initialisierungsroutine gibt den Text:</p>
-
-		<p>PUT JOYSTICK IN PORT 2</p>
-
-		<p>AND PRESS ANY KEY<br>
-			aus. Wenn man diesem Folge geleistet hat erscheint eine »Maus« in der linken oberen Ecke und der Computer arbeitet normal im Programm beziehungsweise im Direktmodus weiter. Die Maus läßt sich — wie gesagt — mit dem Joystick#2 steuern.</p>
-
-		<h3>Zu Listing 3</h3>
-
-		<p>Listing 3 zeigt die eigentliche Interrupt-Erweiterung. Diese beginnt mit dem Auslesen des Joystickzustandes. Dazu muß bekanntlich die Tastatur abgeschaltet werden. Das Programm schaltet also die Tastatur ab, liest das Register für den 2. JoyStick aus und schaltet die Tastatur wieder ein. So bleibt die Tastatur weiterhin benutzbar.</p>
-
-		<p>Daraufhin wird anhand der Joystickstellung der Sprite 7, also die Maus, bewegt. Ist dies erfolgt, werden aus den Spritekoordinaten die Bildschirmkoordinaten errechnet. Sind diese bekannt, so wird daraus das entsprechende Byte unter der Maus errechnet und ausgelesen.</p>
-
-		<p>Diese Werte sind folgenden Registern zu entnehmen:</p>
-
-		<ol>
-			<li>Der Zeichencode des unter der Maus befindlichen Zeichens: 49659 ($c1fb)</li>
-			<li>Die Bildschirm-X-Koordinate : 49660 ($c1fc)</li>
-			<li>Die Bildschirm-Y-Koordinate : 49661 ($c1fd)</li>
-			<li>Der Feuerknopf #2 : 49662 ($c1fe) ( = 1: gedrückt / = 0 nicht gedrückt)</li>
-			<li>Der Zustand des Joysticks : 49663 ($c1ff)</li>
-		</ol>
+        <p>Mouse 64 ist vollständig in 6502/10-Assembler geschrieben und benötigt keinen Basic-Speicher, da Mouse 64 im freien RAM-Bereich von 49152 ($c000) bis 53272 ($cfff) liegt. Die Sprite-Daten liegen in Block 11 (dez. 704-767). Um die Maus darzustellen, wird Sprite 7 verwendet. Das Programm liefert folgende Daten:<br>
+            a) Den Bildschirmcode des Zeichens unter der Maus<br>
+            b) Die Bildschirm-X-Koordinate<br>
+            c) Die Bildschirm-Y-Koordinate<br>
+            d) Joystick#2-Zustand<br>
+            e) Feuerknopf # 2-Zustand</p>
 
 
-		<h3>Zu Listing 4</h3>
+        <p>Das Programm Mouse 64 ist als Eingabe- und Steuerhilfe für Anwendungsprogramme gedacht (siehe Apple-Macintosh-Software und andere), kann aber auch durch zum Beispiel Änderung des Sprites in Spiele eingebunden werden, da bis auf die Vergrößerung alle Spriteparameter veränderlich bleiben.</p>
+        <h3>Zu Listing 1</h3>
 
-		<p>Listing 4 zeigt den Hex-Dump des Assembler-Programms. Abschließend wäre noch zu sagen, daß es keinen Sinn hat, zu versuchen, das ProgrammandererComputer, die nicht wieder C 64 in der Lage sind, frei bewegliche Sprites zu erzeugen, da ein solcher Sprite nötig ist.</p>
+        <p>Das Listing 1 zeigt den Basic-Lader, der in zwei Schleifen die Daten für den Sprite und das Assemblerprogramm aus den DATA-Zeilen liest und in die entsprechenden Speicherstellen schreibt.</p>
 
-		<address class="author">(Peter Dreuw / rg)</address>
+        <p>Bei einem Fehler der Daten bricht der Computer das Programm mit einer entsprechenden Meldung ab.</p>
 
-		<figure>
-			<pre data-filename="mouse 64" data-name="Mouse 64"></pre>
-			<figcaption>Listing 1. Der Basic-Lader der «Mouse 64«</figcaption>
-		</figure>
+        <p>Nach Ablauf der beiden Schleifen wird das Assemblerprogramm direkt mit »SYS 49152« gestartet.</p>
 
-		<figure>
-			TODO
-			<pre></pre>
-			<figcaption>Listing 2. Die in Assembler geschriebene Initialisierungs-
-				routine von »Mouse 64«</figcaption>
-		</figure>
-		<figure>
-			TODO
-			<pre></pre>
-			<figcaption>Listing 3. Die eigentliche Interrupt-Erweiterung von »Mouse
-				64«</figcaption>
-		</figure>
-		<figure>
-			TODO
-			<pre></pre>
-			<figcaption>Listing 4. Der Hex-Dump des Assemblerlisting von »Mouse 64«</figcaption>
-		</figure>
+        <h3>Zu Listing 2</h3>
 
-	</article>
+        <p>Das zweite Listing zeigt die in Assembler geschriebene Initialisierungs-Routine. Diese Routine verändert die Interrupt-Zeiger so, daß sie auf die Maus-Routine zeigen. Ferner verändert sie die zu Sprite 7 gehörenden Parameter entsprechend.</p>
+
+        <p>Die Initialisierungsroutine gibt den Text:</p>
+
+        <p>PUT JOYSTICK IN PORT 2</p>
+
+        <p>AND PRESS ANY KEY<br>
+            aus. Wenn man diesem Folge geleistet hat erscheint eine »Maus« in der linken oberen Ecke und der Computer arbeitet normal im Programm beziehungsweise im Direktmodus weiter. Die Maus läßt sich — wie gesagt — mit dem Joystick#2 steuern.</p>
+
+        <h3>Zu Listing 3</h3>
+
+        <p>Listing 3 zeigt die eigentliche Interrupt-Erweiterung. Diese beginnt mit dem Auslesen des Joystickzustandes. Dazu muß bekanntlich die Tastatur abgeschaltet werden. Das Programm schaltet also die Tastatur ab, liest das Register für den 2. JoyStick aus und schaltet die Tastatur wieder ein. So bleibt die Tastatur weiterhin benutzbar.</p>
+
+        <p>Daraufhin wird anhand der Joystickstellung der Sprite 7, also die Maus, bewegt. Ist dies erfolgt, werden aus den Spritekoordinaten die Bildschirmkoordinaten errechnet. Sind diese bekannt, so wird daraus das entsprechende Byte unter der Maus errechnet und ausgelesen.</p>
+
+        <p>Diese Werte sind folgenden Registern zu entnehmen:</p>
+
+        <ol>
+            <li>Der Zeichencode des unter der Maus befindlichen Zeichens: 49659 ($c1fb)</li>
+            <li>Die Bildschirm-X-Koordinate : 49660 ($c1fc)</li>
+            <li>Die Bildschirm-Y-Koordinate : 49661 ($c1fd)</li>
+            <li>Der Feuerknopf #2 : 49662 ($c1fe) ( = 1: gedrückt / = 0 nicht gedrückt)</li>
+            <li>Der Zustand des Joysticks : 49663 ($c1ff)</li>
+        </ol>
+
+
+        <h3>Zu Listing 4</h3>
+
+        <p>Listing 4 zeigt den Hex-Dump des Assembler-Programms. Abschließend wäre noch zu sagen, daß es keinen Sinn hat, zu versuchen, das ProgrammandererComputer, die nicht wieder C 64 in der Lage sind, frei bewegliche Sprites zu erzeugen, da ein solcher Sprite nötig ist.</p>
+
+        <address class="author">(Peter Dreuw / rg)</address>
+
+        <figure>
+            <pre data-filename="mouse 64" data-name="Mouse 64"></pre>
+            <figcaption>Listing 1. Der Basic-Lader der «Mouse 64«</figcaption>
+        </figure>
+
+        <figure>
+            TODO
+            <pre></pre>
+            <figcaption>Listing 2. Die in Assembler geschriebene Initialisierungs-
+                routine von »Mouse 64«</figcaption>
+        </figure>
+        <figure>
+            TODO
+            <pre></pre>
+            <figcaption>Listing 3. Die eigentliche Interrupt-Erweiterung von »Mouse
+                64«</figcaption>
+        </figure>
+        <figure>
+            TODO
+            <pre></pre>
+            <figcaption>Listing 4. Der Hex-Dump des Assemblerlisting von »Mouse 64«</figcaption>
+        </figure>
+
+    </article>
 
 </body>
 
