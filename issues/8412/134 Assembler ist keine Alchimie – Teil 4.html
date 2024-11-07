@@ -32,12 +32,29 @@
 
         <p>Keine Angst, wir sind nicht ins Krimi- oder Agentenmilieu gewechselt! Wir haben es mit zwei Flaggen zu tun, der Carry- und der V-Flagge. »To carry« heißt auf deutsch etwa »tragen«. In der Registeranzeige ist diese Flagge immer mit C gekennzeichnet. Was wird denn hier getragen? Das ergründen wir am besten an einem Beispiel. Dazu rechnen wir mit normalen Binärzahlen (also ohne Rücksicht auf Vorzeichenbits). Wir zählen die Zahlen 128 und 130 zusammen:</p>
 
-        <p>TODO<br>
-            128 1000 0000</p>
-
-        <p>+ 130 + 1000 0010 </p>
-
-        <p>258 (1)0000 0010</p>
+        <table class="plain right1 right3 strong">
+            <tr>
+                <td></td>
+                <td>128</td>
+                <td></td>
+                <td>1000 0000</td>
+            </tr>
+            <tr>
+                <td>+</td>
+                <td>130</td>
+                <td>+</td>
+                <td>1000 0010</td>
+            </tr>
+            <tr>
+                <td class="separator" colspan="4"></td>
+            </tr>
+            <tr>
+                <td></td>
+                <td>258</td>
+                <td></td>
+                <td>(1) 0000 0010</td>
+            </tr>
+        </table>
 
         <p>Das Ergebnis 258 ist richtig — auch in der Binärdarstellung — nur es paßt nicht mehr in 8 Bits. Ein Bit wurde überTRAGEN in ein extra dafür vorgesehenes Plätzchen: In das Carry-Bit. Jedesmal also, wenn so ein Übertrag in einer Rechenoperation des C 64 stattfindet, zeigt die Carry-Flagge eine 1 (Bild 1).</p>
 
@@ -46,15 +63,33 @@
             <figcaption>Bild 1. Das Carry-Bit als Bit 8 einer Rechenoperation</figcaption>
         </figure>
 
-        <p>Je nach Art der von uns programmierten Aufgabe können wir nun dieses Carry-Bit weiterverarbeiten. Es gibt Situationen, in denen man es einfach ignorieren darf (dazu kommen wir gleich noch) oder aber solche, wo man es weiter in der Rechnung verwendet. Schließlich kann es auch noch einen Fehler anzeigen: Dann nämlich, wenn das größte zulässige Ergebnis 11111111 sein darf. Natürlich kann das Carry-Bit auch gesetzt werden, wenn man in der Zweierkomplementform rechnet. Die Verhältnisse sind dann aber für ein leicht überschaubares Beispiel des Übertrages zu verwickelt, wie Sie gleich sehen werden.<br>
-            Wenn wir nämlich mit den Zweierkomplement-Zahlen rechnen, dann interessieren uns auch Fälle wie bei der Addition von 64 und 66:</p>
+        <p>Je nach Art der von uns programmierten Aufgabe können wir nun dieses Carry-Bit weiterverarbeiten. Es gibt Situationen, in denen man es einfach ignorieren darf (dazu kommen wir gleich noch) oder aber solche, wo man es weiter in der Rechnung verwendet. Schließlich kann es auch noch einen Fehler anzeigen: Dann nämlich, wenn das größte zulässige Ergebnis 1111&nbsp;1111 sein darf. Natürlich kann das Carry-Bit auch gesetzt werden, wenn man in der Zweierkomplementform rechnet. Die Verhältnisse sind dann aber für ein leicht überschaubares Beispiel des Übertrages zu verwickelt, wie Sie gleich sehen werden.</p>
 
-        <p>TODO<br>
-            64 0100 0000</p>
+        <p>Wenn wir nämlich mit den Zweierkomplement-Zahlen rechnen, dann interessieren uns auch Fälle wie bei der Addition von 64 und 66:</p>
 
-        <p>+ 66 + 01000010 </p>
-
-        <p>(-126) 1000 0010</p>
+        <table class="plain right1 right3 strong">
+            <tr>
+                <td></td>
+                <td>64</td>
+                <td></td>
+                <td>0100 0000</td>
+            </tr>
+            <tr>
+                <td>+</td>
+                <td>66</td>
+                <td>+</td>
+                <td>0100 0010</td>
+            </tr>
+            <tr>
+                <td class="separator" colspan="4"></td>
+            </tr>
+            <tr>
+                <td></td>
+                <td>(—126)</td>
+                <td></td>
+                <td>1000 0010</td>
+            </tr>
+        </table>
 
         <p>Das ist offensichtlich falsch. Bei der Addition ist durch das Zusammenzählen der Bits 6 plötzlich Bit 7 gesetzt worden. Da wir es aber mit einer Zweierkomplementzahl zu tun haben, bei der dieses Bit 7 eine negative Zahl anzeigt, folgt ein Fehler. Es ist also von Bedeutung, so einen Überlauf (englisch: &lsquo;overflow&rsquo;) erkennen zu können um eine entsprechende programmtechnische Reaktion zu starten. Es wird die Überlauf-Flagge V auf 1 gesetzt. Leider ist die Sache aber nicht so einfach, daß sie immer gesetzt würde, wenn von Bit 6 nach Bit 7 ein Übertrag stattfindet. Gesetzt wird diese V-Flagge nur in folgenden zwei Fällen:</p>
 
@@ -67,23 +102,57 @@
 
         <p>Im obigen Beispiel der Addition von 64 und 66 haben wir einen Fall schon behandelt: Es fand ein Übertrag von Bit 6 nach Bit 7 statt, aber kein äußerer Übertrag ins Carry-Bit. Deswegen wurde dann auch die V-Flagge gesetzt. Das Problem läßt sich hier ganz einfach lösen zum Beispiel durch Verwendung von 16-Bit-Zahlen:</p>
 
-        <p>TODO<br>
-            64 0000 0000 0100 0000</p>
-
-        <p> + 66 + 0000 0000 0100 0010 </p>
-
-        <p>130 0000 00001000 0010</p>
+        <table class="plain right1 right3 strong">
+            <tr>
+                <td></td>
+                <td>64</td>
+                <td></td>
+                <td>0000 0000 0100 0000</td>
+            </tr>
+            <tr>
+                <td>+</td>
+                <td>66</td>
+                <td>+</td>
+                <td>0000 0000 0100 0010</td>
+            </tr>
+            <tr>
+                <td class="separator" colspan="4"></td>
+            </tr>
+            <tr>
+                <td></td>
+                <td>130</td>
+                <td></td>
+                <td>0000 0000 1000 0010</td>
+            </tr>
+        </table>
 
         <p>Bei 16-Bit-Zahlen ist ja Bit 15 das Vorzeichenbit, welches hier keine Änderung erfährt.</p>
 
         <p>Der andere Fall tritt auf bei der Addition von zwei negativen Zahlen wie —125 und —64:</p>
 
-        <p>TODO<br>
-            —125 1000 0011</p>
-
-        <p>- 64 1100 0000 </p>
-
-        <p>(+67) (1)01000011</p>
+        <table class="plain right1 right3 strong">
+            <tr>
+                <td></td>
+                <td>—125</td>
+                <td></td>
+                <td>1000 0011</td>
+            </tr>
+            <tr>
+                <td></td>
+                <td>—64</td>
+                <td></td>
+                <td>1100 0000</td>
+            </tr>
+            <tr>
+                <td class="separator" colspan="4"></td>
+            </tr>
+            <tr>
+                <td></td>
+                <td>(+67)</td>
+                <td></td>
+                <td>(1) 0100 0011</td>
+            </tr>
+        </table>
 
         <p>Auch das ist offensichtlich falsch: Es hat wieder »versehentlich« ein Vorzeichenwechsel stattgefunden. Dies ist also der Fall, wo zwar ein Übertrag ins Carry-Bit stattfand aber kein Übertrag von Bit 6 nach Bit 7. Auch dieses Problem läßt sich durch Verwendung von 16-Bit-Zahlen lösen. Eine kleine Trainingsaufgabe für Sie!</p>
 
@@ -91,18 +160,61 @@
 
         <p>Nun noch zum Ignorieren des Carry-Bits, das ich weiter oben erwähnt habe. Bei allen 8-Bit-Rechenoperationen mit Zweierkomplementzahlen kann das Carry-Bit vernachlässigt werden. Zwei Beispiele sollen das wieder illustrieren. Wir addieren +4 und —2:</p>
 
-        <p>TODO<br>
-            + 4 0000 0100<br>
-            -2 11111110<br>
-            + 2 (1)0000 0010</p>
+        <table class="plain right1 right3 strong">
+            <tr>
+                <td></td>
+                <td>+4</td>
+                <td></td>
+                <td>0000 0100</td>
+            </tr>
+            <tr>
+                <td></td>
+                <td>—2</td>
+                <td></td>
+                <td>1111 1110</td>
+            </tr>
+            <tr>
+                <td>+</td>
+                <td class="separator"></td>
+                <td>+</td>
+                <td class="separator"></td>
+            </tr>
+            <tr>
+                <td></td>
+                <td>—6</td>
+                <td></td>
+                <td>(1) 1111 1000</td>
+            </tr>
+        </table>
 
         <p>Das Carry-Bit wird außer acht gelassen. Anderes Beispiel: Wir addieren zwei negative Zahlen, —4 und —6:</p>
 
-        <p>TODO<br>
-            -4 11111010<br>
-            -2 11111110<br>
-            + +<br>
-            -6 (1)11111000</p>
+        <table class="plain right1 right3 strong">
+            <tr>
+                <td></td>
+                <td>—4</td>
+                <td></td>
+                <td>1111 1010</td>
+            </tr>
+            <tr>
+                <td></td>
+                <td>—2</td>
+                <td></td>
+                <td>1111 1110</td>
+            </tr>
+            <tr>
+                <td>+</td>
+                <td class="separator"></td>
+                <td>+</td>
+                <td class="separator"></td>
+            </tr>
+            <tr>
+                <td></td>
+                <td>—6</td>
+                <td></td>
+                <td>(1) 1111 1000</td>
+            </tr>
+        </table>
 
         <p>Auch hier kann man (sogar: muß man) das Carry-Bit vernachlässigen. Beide Ergebnisse sind richtig.</p>
 
@@ -118,31 +230,37 @@
 
         <p>Wenn wir nun den Befehl
             <code>ADC #ZAHL2</code>
-            folgen lassen, sorgt die ALU (arithmetisch-logische Einheit, siehe Folge 1) dafür, daß beide Zahlen addiert werden und das Ergebnis im Akku erscheint. ZAHL1 ist dann vom Ergebnis überschrieben worden. An sich ist damit alles erledigt. Weil wir aber häufig wissen wollen, was denn nun bei der Addition herausgekommen ist, speichern wir den Akku-Inhalt noch irgendwo ab mittels »STA Speicherstelle«. Außerdem war da ja noch die Sache mit dem Carry-Bit. Wir haben oben festgestellt, daß bei einer 8-Bit-Addition kein Carry-Bit berücksichtigt werden soll. Nun gibt es aber eine ganze Menge von Vorgängen in einem Assembler-Programm, die das Carry-Bit beeinflussen. Man kann eigentlich vor einer Addition nie ganz sicher sein, ob es denn nun 1 oder 0 ist. Weil jedoch ADC auch das Carry-Bit mitaddiert, sollte man dafür sorgen, daß es vor dem Zusammenzählen wirklich gelöscht ist. Dazu gibt es den Befehl CLC was die Abkürzung für »clear carry«, also »lösche Carry-Bit« ist. Sei ZAHLl = 12 und ZAHL2 = 7, dann würde unser vollständiges 8-Bit-Additions-Progrämmchen also lauten:
-            <code>1200 CLC
-                1201 LDA #$0C
-                1203 ADC #$07
-                1205 STA 1500
-            </code>
+            folgen lassen, sorgt die ALU (arithmetisch-logische Einheit, siehe Folge 1) dafür, daß beide Zahlen addiert werden und das Ergebnis im Akku erscheint. ZAHL1 ist dann vom Ergebnis überschrieben worden. An sich ist damit alles erledigt. Weil wir aber häufig wissen wollen, was denn nun bei der Addition herausgekommen ist, speichern wir den Akku-Inhalt noch irgendwo ab mittels »STA Speicherstelle«. Außerdem war da ja noch die Sache mit dem Carry-Bit. Wir haben oben festgestellt, daß bei einer 8-Bit-Addition kein Carry-Bit berücksichtigt werden soll. Nun gibt es aber eine ganze Menge von Vorgängen in einem Assembler-Programm, die das Carry-Bit beeinflussen. Man kann eigentlich vor einer Addition nie ganz sicher sein, ob es denn nun 1 oder 0 ist. Weil jedoch ADC auch das Carry-Bit mitaddiert, sollte man dafür sorgen, daß es vor dem Zusammenzählen wirklich gelöscht ist. Dazu gibt es den Befehl CLC was die Abkürzung für »clear carry«, also »lösche Carry-Bit« ist. Sei ZAHL1 = 12 und ZAHL2 = 7, dann würde unser vollständiges 8-Bit-Additions-Progrämmchen also lauten
         </p>
+
+        <table class="plain strong">
+            <tr><td>1200</td><td>CLC</td></tr>
+            <tr><td>1201</td><td>LDA</td><td>#$0C</td></tr>
+            <tr><td>1203</td><td>ADC</td><td>#$07</td></tr>
+            <tr><td>1205</td><td>STA</td><td>1500</td></tr>
+        </table>
 
         <p>Sehen wir mal davon ab, daß dieses Programm natürlich unsinnig ist (das kann man ja im Kopf schneller rechnen!), dann erkennen wir: CLC ist ein 1-Byte-Befehl mit impliziter Adressierung, welcher sich nur auf die C-Flagge (also das Carry-Bit) auswirkt. ADC ist in der hier verwendeten Form ein 2-Byte-Befehl und liegt in der »unmittelbar« genannten Adressierung vor. Wie wir oben gesehen haben, kann ADC — je nach Art der Rechnung — auf einige Flaggen wirken: Da wären zunächst natürlich die V-Flagge und die C-Flagge. Dann aber kann beim Auftreten eines gesetzten Bit 7 auch die N-Flagge und beim Überschreiten von $FF eventuell auch die Z-Flagge verändert werden.</p>
 
-        <p>Viel interessanter wird unser Mini-Programm schon, wenn man anstelle von
-            <code>1201 LDA #$0C</code>
-            jetzt die absolute Adressierung verwendet, zum Beispiel
-            <code>1201 LDA 1400</code>
-        </p>
+        <p>Viel interessanter wird unser Mini-Programm schon, wenn man anstelle von</p>
+        <table class="plain strong">
+            <tr><td>1201</td><td>LDA</td><td>#$0C</td></tr>
+        </table>
+        jetzt die absolute Adressierung verwendet, zum Beispiel
+        <table class="plain strong">
+            <tr><td>1201</td><td>LDA</td><td>1400</td></tr>
+        </table>
 
         <p>Weil das ein 3-Byte-Befehl ist, verschiebt sich natürlich der Rest des Programmes um 1 Byte. So kann man immerhin schon zu unterschiedlichen Inhalten von 1400 den gleichen Betrag addieren.</p>
 
-        <p>Am interessantesten allerdings ist die Tatsache, daß auch ADC absolut adressierbar ist. Wir können so zum Beispiel den Inhalt der Speicherzelle 1300 zum Inhalt der Zeile 1400 hinzuzählen und dann das Ergebnis in 1500 ablegen:
-            <code>1200 CLC
-                1201 LDA 1400
-                1204 ADC 1300
-                1207 STA 1500
-            </code>
-        </p>
+        <p>Am interessantesten allerdings ist die Tatsache, daß auch ADC absolut adressierbar ist. Wir können so zum Beispiel den Inhalt der Speicherzelle 1300 zum Inhalt der Zeile 1400 hinzuzählen und dann das Ergebnis in 1500 ablegen:</p>
+
+        <table class="plain strong">
+            <tr><td>1200</td><td>CLC</td></tr>
+            <tr><td>1201</td><td>LDA</td><td>1400</td></tr>
+            <tr><td>1204</td><td>ADC</td><td>1300</td></tr>
+            <tr><td>1207</td><td>STA</td><td>1500</td></tr>
+        </table>
 
         <p>Hier ist der ADC-Befehl dann 3 Bytes lang geworden.</p>
 
@@ -150,52 +268,60 @@
 
         <p>Solche 8-Bit-Rechnungen kommen recht häufig vor: Wenn man in Schleifen nicht mit mehrfach wiederholten INX (beziehungsweise INY oder INC, DEX, DEY oder DEC) arbeiten will, addiert man eben immer die Sprungweite mittels ADC hinzu. Der Akku kann nicht als Zähler dienen, denn es gibt für ihn keinen Befehl, der dem INX und so weiter vergleichbar wäre, weswegen man ihn — sollte es nötig sein — mittels ADC hochzählt.</p>
 
-        <p>Häufiger und in der Praxis bedeutender sind 16-Bit-Rechnungen. Wie Sie sicher noch aus den vorangegangenen Folgen wissen, teilt man so eine 16-Bit-Zahl auf in zwei Bytes (das LSB und das MSB). Nehmem wir für unser nachfolgendes Beispiel wieder an, daß die Zahlen so gebaut sind, daß kein Überlauf zu befürchten ist. ZAHL1 hätten wir vorher in die Speicherstellen 1300 (LSB) und 1301 (MSB) gepackt, ZAHL2 liegt in den Zellen 1400 (LSB) und 1401 (MSB). Zunächst wieder die Vorbereitungsmaßnahmen:
-            <code>1200 CLD
-                1201 CLC
-            </code>
-        </p>
+        <p>Häufiger und in der Praxis bedeutender sind 16-Bit-Rechnungen. Wie Sie sicher noch aus den vorangegangenen Folgen wissen, teilt man so eine 16-Bit-Zahl auf in zwei Bytes (das LSB und das MSB). Nehmem wir für unser nachfolgendes Beispiel wieder an, daß die Zahlen so gebaut sind, daß kein Überlauf zu befürchten ist. ZAHL1 hätten wir vorher in die Speicherstellen 1300 (LSB) und 1301 (MSB) gepackt, ZAHL2 liegt in den Zellen 1400 (LSB) und 1401 (MSB). Zunächst wieder die Vorbereitungsmaßnahmen:</p>
 
-        <p>Dabei ist CLD nicht immer nötig, wie schon gesagt. Nun addieren wir zuerst die LSBs:
-            <code>1202 LDA 1300
-                1205 ADC 1400
-                1208 STA 1500
-            </code>
-        </p>
+        <table class="plain strong">
+            <tr><td>1200</td><td>CLD</td></tr>
+            <tr><td>1201</td><td>CLC</td></tr>
+        </table>
 
-        <p>Ein Überlauf kann hier nicht stattgefunden haben, denn das Vorzeichenbit ist ja im MSB als Bit 15 enthalten, wohl aber kann ein Übertrag stattgefunden haben: Das Ergebnis könnte größer als 255 ($FF) gewesen sein. War das der Fall, dann ist jetzt eine 1 im Carry-Bit. Wir addieren nun die MSBs:
-            <code>120B LDA 1301
-                120E ADC 1401
-                1211 STA 1501
-            </code>
-        </p>
+        <p>Dabei ist CLD nicht immer nötig, wie schon gesagt. Nun addieren wir zuerst die LSBs:</p>
 
-        <p>Egal, was im Carry-Bit stand: Es wurde jetzt hinzuaddiert. Das Ergebnis unserer Rechnung steht nun in 1500 (LSB) und 1501 (MSB). Sehen wir uns das ganze nochmal am Zahlenbeispiel an. Wir addieren die Zahlen 2176 (binär: 0000 1000 1000 0000) und 1009 (binär: 0000 0011 1111 0001). Die Speicherinhalte sind dann:</p>
+        <table class="plain right1 strong">
+            <tr><td>1202</td><td>LDA</td><td>1300</td></tr>
+            <tr><td>1205</td><td>ADC</td><td>1400</td></tr>
+            <tr><td>1208</td><td>STA</td><td>1500</td></tr>
+        </table>
 
-        <p>TODO<br>
-            1300 1000 0000 LSB Zahl1<br>
-            1301 00001000 MSB<br>
-            1400 11110001 LSBZahl2<br>
-            1401 0000 0011 MSB</p>
+        <p>Ein Überlauf kann hier nicht stattgefunden haben, denn das Vorzeichenbit ist ja im MSB als Bit 15 enthalten, wohl aber kann ein Übertrag stattgefunden haben: Das Ergebnis könnte größer als 255 ($FF) gewesen sein. War das der Fall, dann ist jetzt eine 1 im Carry-Bit. Wir addieren nun die MSBs:</p>
 
+        <table class="plain right1 strong">
+            <tr><td>120B</td><td>LDA</td><td>1301</td></tr>
+            <tr><td>120E</td><td>ADC</td><td>1401</td></tr>
+            <tr><td>1211</td><td>STA</td><td>1501</td></tr>
+        </table>
+
+        <p>Egal, was im Carry-Bit stand: Es wurde jetzt hinzuaddiert. Das Ergebnis unserer Rechnung steht nun in 1500 (LSB) und 1501 (MSB). Sehen wir uns das ganze nochmal am Zahlenbeispiel an. Wir addieren die Zahlen 2176 (binär: 0000&nbsp;1000&nbsp;1000&nbsp;0000) und 1009 (binär: 0000&nbsp;0011&nbsp;1111&nbsp;0001). Die Speicherinhalte sind dann:</p>
+
+        <table class="plain strong">
+            <tr><td>1300</td><td>1000 0000</td><td>LSB Zahl1</td></tr>
+            <tr><td>1301</td><td>0000 1000</td><td>MSB</td></tr>
+            <tr><td>1400</td><td>1111 0001</td><td>LSB Zahl2</td></tr>
+            <tr><td>1401</td><td>0000 0011</td><td>MSB</td></tr>
+        </table>
+            
         <p>Jetzt addieren wir die LSBs:</p>
 
-        <p>TODO<br>
-            1300 1000 0000<br>
-            1400 11110001<br>
-            Carry 0<br>
-            1500 01110001<br>
-            Carry: 1</p>
+        <table class="plain right1 strong">
+            <tr><td>1300</td><td>1000 0000</td></tr>
+            <tr><td>1400</td><td>1111 0001</td></tr>
+            <tr><td>Carry</td><td>0</td></tr>
+            <tr><td class="separator" colspan="2"></td></tr>
+            <tr><td>1500</td><td>0111 0001</td></tr>
+            <tr><td>Carry:</td><td>1</td></tr>
+        </table>
 
         <p>Nun folgt der zweite Teil der Addition mit den MSBs:</p>
 
-        <p>TODO<br>
-            1301 00001000<br>
-            1401 00000011<br>
-            Carry: 1<br>
-            1501 00001100</p>
+        <table class="plain right1 strong">
+            <tr><td>1301</td><td>0000 1000</td></tr>
+            <tr><td>1401</td><td>0000 0011</td></tr>
+            <tr><td>Carry</td><td>1</td></tr>
+            <tr><td class="separator" colspan="2"></td></tr>
+            <tr><td>1501</td><td>0000 1100</td></tr>
+        </table>
 
-        <p>Damit steht nun das Ergebnis 3185 (binär 00001100 01110001) säuberlich aufgeteilt in LSB (Speicher 1500) und MSB (Speicher 1501) fest. Das Carry-Bit steht auch nach vollendeter Rechnung noch auf 1, so daß es vor erneuter Addition wieder mit CLC zu löschen ist.</p>
+        <p>Damit steht nun das Ergebnis 3185 (binär 0000&nbsp;1100&nbsp;0111&nbsp;0001) säuberlich aufgeteilt in LSB (Speicher 1500) und MSB (Speicher 1501) fest. Das Carry-Bit steht auch nach vollendeter Rechnung noch auf 1, so daß es vor erneuter Addition wieder mit CLC zu löschen ist.</p>
 
         <p>Damit wäre alles über die Addition berichtet. Wie immer in Programmiererkreisen die Empfehlung: Üben, üben,&hellip;.</p>
 
@@ -207,40 +333,44 @@
 
         <h3>Merke: Vor einer Addition immer Löschen des Carry-Bits mit CLC, vor einer Subtraktion immer Setzen des Carry-Bits mit SEC!</h3>
 
-        <p>Zwei Beispiele für die Subtraktion sollen das bisher gesagte erläutern: Zunächst eine 8-Bit-Subtraktion von ZAHL1 (in Speicherzellle 1300) minus ZAHL2 (in Zelle 1400). Ds Ergebnis wird nach 1500 geschrieben:
-            <code>1200 CLD
-                1201 SEC
-                1202 LDA 1300
-                1205 SBC 1400
-                1208 STA 1500
-            </code>
-        </p>
+        <p>Zwei Beispiele für die Subtraktion sollen das bisher gesagte erläutern: Zunächst eine 8-Bit-Subtraktion von ZAHL1 (in Speicherzellle 1300) minus ZAHL2 (in Zelle 1400). Ds Ergebnis wird nach 1500 geschrieben:</p>
+
+        <table class="plain strong">
+            <tr><td>1200</td><td>CLD</td></tr>
+            <tr><td>1201</td><td>SEC</td></tr>
+            <tr><td>1202</td><td>LDA</td><td>1300</td></tr>
+            <tr><td>1205</td><td>SBC</td><td>1400</td></tr>
+            <tr><td>1208</td><td>STA</td><td>1500</td></tr>
+        </table>
 
         <p>SBC kann — wie hier — absolut adressiert werden, aber auch unmittelbar (also zum Beispiel SBC $40). Der Befehl ist dann im ersten Fall ein 3-, im anderen Fall ein 2-Byte-Befehl. SEC ist ebenso wie vorher schon CLC ein implizit adressierbarer 1-Byte-Befehl.</p>
 
-        <p>Das zweite Beispiel ist eine 16-Bit Subtraktion. In den Speichern steht vor dem Aufruf dieser kleinen Routine:
-            <code>1300 ZAHL1 LSB
-                1301 ZAHL1 MSB
-                1400 ZAHL2 LSB
-                1401 ZAHL2 MSB
-            </code>
-        </p>
+        <p>Das zweite Beispiel ist eine 16-Bit Subtraktion. In den Speichern steht vor dem Aufruf dieser kleinen Routine:</p>
 
-        <p>Das Ergebnis soll nach 1500 (LSB) und 1501 (MSB) gebracht werden:
-            <code>1200 CLD
-                1201 SEC
-                1202 LDA 1300
-                1205 SBC 1400
-                1208 STA 1500
-            </code>
-        </p>
+        <table class="plain strong">
+            <tr><td>1300</td><td>ZAHL1</td><td>LSB</td></tr>
+            <tr><td>1301</td><td>ZAHL1</td><td>MSB</td></tr>
+            <tr><td>1400</td><td>ZAHL2</td><td>LSB</td></tr>
+            <tr><td>1401</td><td>ZAHL2</td><td>MSB</td></tr>
+        </table>
 
-        <p>Jetzt sind die beiden LSBs voneinander abgezogen und die Differenz abgespeichert als LSB des Erebnisses.
-            <code>120B LDA 1301
-                120E SBC 1401
-                1211 STA 1501
-            </code>
-        </p>
+        <p>Das Ergebnis soll nach 1500 (LSB) und 1501 (MSB) gebracht werden:</p>
+
+        <table class="plain strong">
+            <tr><td>1200</td><td>CLD</td></tr>
+            <tr><td>1201</td><td>SEC</td></tr>
+            <tr><td>1202</td><td>LDA</td><td>1300</td></tr>
+            <tr><td>1205</td><td>SBC</td><td>1400</td></tr>
+            <tr><td>1208</td><td>STA</td><td>1500</td></tr>
+        </table>
+
+        <p>Jetzt sind die beiden LSBs voneinander abgezogen und die Differenz abgespeichert als LSB des Erebnisses.</p>
+
+        <table class="plain strong">
+            <tr><td>120B</td><td>LDA</td><td>1301</td></tr>
+            <tr><td>120E</td><td>SBC</td><td>1401</td></tr>
+            <tr><td>1211</td><td>STA</td><td>1501</td></tr>
+        </table>
 
         <p>Damit ist die Aufgabe beendet. Auch die MSBs sind subtrahiert und das MSB des Ergebnisses steht in 1501.</p>
 
@@ -255,16 +385,31 @@
             <li>ein häufig angewendetes Verfahren, Assemblerprogramme in Basic-Programme einzubinden.</li>
         </ol>
 
-        <p>Besonders dieser 2. Aspekt scheint noch vielen Lesern unklar zu sein (das zeigen mir Zuschriften). Es gibt eine ganze Reihe von Möglichkeiten, zum Einbau von Assembler-Routinen in Basic-Programme; die werden wir alle nach und nach kennenlernen. Von Ihnen sicherlich schon häufig angewendet wurde der SYS-Befehl (zum Beispiel für SYS 58640 und vorherigem POKE214,Zeile und POKE211, Spalte zum Setzen des Cursors an die Stelle Zeile, Spalte). Damit haben Sie ein Maschinenprogramm aufgerufen, das im System unseres Computers schon enthalten ist. 58640 ist die Startadresse des Programmes und man kann diesen SYS-Befehl eigentlich wie eine Art »GOTO Maschinenprogramm-Startadresse« ansehen. Nichts hindert uns also, auf diese Weise eigene Assembler-Programme anzuspringen! Das Problem liegt nun nur noch darin, wie man Parameter, die unsere Maschinenroutine benötigt, übergeben kann. Eine offensichtliche — aber leider auch relativ langsame — Methode ist das POKEn der Werte im LSB/MSB-Format in die Speicherzellen, aus denen sie sich unser ML-Programm dann abholt. Wir wollen dieses Verfahren nun an einem Programmbeispiel verwenden.</p>
+        <p>Besonders dieser 2. Aspekt scheint noch vielen Lesern unklar zu sein (das zeigen mir Zuschriften). Es gibt eine ganze Reihe von Möglichkeiten, zum Einbau von Assembler-Routinen in Basic-Programme; die werden wir alle nach und nach kennenlernen. Von Ihnen sicherlich schon häufig angewendet wurde der SYS-Befehl (zum Beispiel für SYS 58640 und vorherigem POKE214,Zeile und POKE211,Spalte zum Setzen des Cursors an die Stelle Zeile, Spalte). Damit haben Sie ein Maschinenprogramm aufgerufen, das im System unseres Computers schon enthalten ist. 58640 ist die Startadresse des Programmes und man kann diesen SYS-Befehl eigentlich wie eine Art »GOTO Maschinenprogramm-Startadresse« ansehen. Nichts hindert uns also, auf diese Weise eigene Assembler-Programme anzuspringen! Das Problem liegt nun nur noch darin, wie man Parameter, die unsere Maschinenroutine benötigt, übergeben kann. Eine offensichtliche — aber leider auch relativ langsame — Methode ist das POKEn der Werte im LSB/MSB-Format in die Speicherzellen, aus denen sie sich unser ML-Programm dann abholt. Wir wollen dieses Verfahren nun an einem Programmbeispiel verwenden.</p>
 
-        <p>Eine arithmetische Reihe werden viele von Ihnen schon kennen. Wenn man A als erstes Glied, D als Differenz und N als die Anzahl der Glieder bezeichnet, dann ist die Summe einer solchen Reihe:<br>
-            S = A + (A + D) + (A + 2*D) + &hellip; usw&hellip;. + (A + (N-1)*D)</p>
+        <p>Eine arithmetische Reihe werden viele von Ihnen schon kennen. Wenn man A als erstes Glied, D als Differenz und N als die Anzahl der Glieder bezeichnet, dann ist die Summe einer solchen Reihe: S=A+(A+D)+(A+2*D)+&hellip;usw&hellip;.+(A+(N-1)*D)</p>
 
         <p>Ein Beispiel ist die Summe der ersten zehn ganzen Zahlen: S=1+2+3+4+5+6+7+8+9+10</p>
 
-        <p>Hier ist A = 1, D = 1 und N=10. Daß die Summe S im Beispiel 55 ist, kann man schnell berechnen, was aber, wenn wir wesentlich mehr als nur zehn Glieder haben? Es gibt natürlich auch Formeln zur Berechnung von S. Aber eigentlich ist es ganz reizvoll, ohne solche Formeln den Computer die Summe bilden zu lassen. Wir bauen also ein Programm zur Berechnung der Summe der ersten N ganze Zahlen, wobei N frei gewählt werden kann. Das Ergebnis soll eine 16-Bit-Zahl sein, also nicht größer als 32767. Das beschränkt uns bei N auf Werte von 1 bis 255 (Warum, können Sie ja mal mit dem fertigen Programm ausprobieren). N benötigt also nur 1 Byte Speicherplatz und soll in $1300 abrufbar sein. A soll 1 sein ebenso wie D. Für eventuelle Programmänderungen ist es aber sinnvoll, A und D als 16-Bit-Zahlen aufzubewahren und zwar in $1310/1311 (A in LSB/MSB-Format) und in $1320/1321 (D im gleichen Format). Das Ergebnis soll in $1400/1401 zu finden sein. Das Maschinenprogramm legen wir nach $1200.</p>
+        <p>Hier ist A=1, D=1 und N=10. Daß die Summe S im Beispiel 55 ist, kann man schnell berechnen, was aber, wenn wir wesentlich mehr als nur zehn Glieder haben? Es gibt natürlich auch Formeln zur Berechnung von S. Aber eigentlich ist es ganz reizvoll, ohne solche Formeln den Computer die Summe bilden zu lassen. Wir bauen also ein Programm zur Berechnung der Summe der ersten N ganze Zahlen, wobei N frei gewählt werden kann. Das Ergebnis soll eine 16-Bit-Zahl sein, also nicht größer als 32767. Das beschränkt uns bei N auf Werte von 1 bis 255 (Warum, können Sie ja mal mit dem fertigen Programm ausprobieren). N benötigt also nur 1 Byte Speicherplatz und soll in $1300 abrufbar sein. A soll 1 sein ebenso wie D. Für eventuelle Programmänderungen ist es aber sinnvoll, A und D als 16-Bit-Zahlen aufzubewahren und zwar in $1310/1311 (A in LSB/MSB-Format) und in $1320/1321 (D im gleichen Format). Das Ergebnis soll in $1400/1401 zu finden sein. Das Maschinenprogramm legen wir nach $1200.</p>
 
         <p>Zuerst kümmern wir uns um das Basic-Aufrufprogramm:</p>
+
+        <figure>
+            <p><code>10 REM **AUFRUF SUMME ARITHMETISCHE REIHE**
+                20 POKE5120,0:POKE5121,0:REM ERGEBNISSPEICHER AUF NULL
+                30 PRINTCHR$(147)CHR$(17)CHR$(17)
+                40 INPUT"ANZAHL DER GLIEDER N=";N
+                50 IFN<1 OR N>255 THEN PRINT CHR$(17)"1<=N<=255":GOTO40
+                60 POKE4864,N:REM EINSPEICHERN VON N
+                70 POKE4880,1:POKE4881,0:POKE4896,1:POKE4897,0:REM EINSPEICHERN VON A UND D
+                80 SYS4608:REM AUFRUF UNSERES MASCHINENPROGRAMMES
+                90 M=PEEK(5121):L=PEEK(5120):REM AUSLESEN DES ERGEBNISSES
+                100 E=256*M+L:PRINTCHR$(17)CHR$(17)
+                110 PRINT"DIE SUMME DER ERSTEN "N" GANZEN ZAHLEN IST:":PRINTE
+                120 END
+            </p></code>
+        </figure>
 
         <p>Zu diesem Programm gibt es nur noch zu bemerken, daß die Zahlen bei POKE, PEEK oder SYS die Dezimalwerte unserer oben gewählten Adressen sind.</p>
 
@@ -275,54 +420,62 @@
             <figcaption>Bild 2. Flußdiagramm des Assemblerprogrammes »Summe einer arithmetischen Reihe«</figcaption>
         </figure>
 
-        <p>Wir bereiten den Ablauf vor, indem wir aus $1300 die Anzahl der Glieder ins X-Register laden und zur Vorbereitung der Addition das Carry-Bit löschen. Schalten Sie also bitte den SMON ein und tippen Sie A1200 &lt;RETURN&gt;. Es erscheint die Startadresse 1200. Jetzt können Sie Zeile für Zeile das Assembler-Programm eingeben (nach jeder Zeile ein RETURN, das die nächste Zeilennummer erzeugt):
-            <code>1200 LDX 1300
-                1203 CLC
-            </code>
-        </p>
+        <p>Wir bereiten den Ablauf vor, indem wir aus $1300 die Anzahl der Glieder ins X-Register laden und zur Vorbereitung der Addition das Carry-Bit löschen. Schalten Sie also bitte den SMON ein und tippen Sie A1200 &lt;RETURN&gt;. Es erscheint die Startadresse 1200. Jetzt können Sie Zeile für Zeile das Assembler-Programm eingeben (nach jeder Zeile ein RETURN, das die nächste Zeilennummer erzeugt):</p>
 
-        <p>Die nächsten sechs Zeilen summieren jeweils das neueste Glied zur bis dahin erzeugten Summe. Jetzt zu Beginn ist $1400/1401 noch leer und in $1310/1311 steht noch das Anfangsglied A = 1. Später mit Durchlaufen der Schleife, steht in $1400/1401 immer die bis dahin gebildete Summe und in $1310/1311 das letzte Glied der Reihe. Es handelt sich um die oben kennengelernte 16-Bit-Addition:
-            <code>1204 LDA 1400
-                1207 ADC 1310
-                120A STA 1400
-            </code>
-        </p>
+        <table class="plain strong">
+            <tr><td>1200</td><td>LDX</td><td>1300</td></tr>
+            <tr><td>1203</td><td>CLC</td></tr>
+        </table>
 
-        <p>Das neue LSB ist berechnet und in $1400 geschrieben.
-            <code>1200 LDA 1401
-                1210 ADC 1311
-                1213 STA 1401
-            </code>
-        </p>
+        <p>Die nächsten sechs Zeilen summieren jeweils das neueste Glied zur bis dahin erzeugten Summe. Jetzt zu Beginn ist $1400/1401 noch leer und in $1310/1311 steht noch das Anfangsglied A = 1. Später mit Durchlaufen der Schleife, steht in $1400/1401 immer die bis dahin gebildete Summe und in $1310/1311 das letzte Glied der Reihe. Es handelt sich um die oben kennengelernte 16-Bit-Addition:</p>
 
-        <p>Das war nun noch das neue MSB. Als nächstes berechnen wir das momentan letzte Glied der Reihe durch Addieren von D zum alten letzten Glied. Das entspricht dem Basic-Befehl A = A + D in einer Schleife. Dies ist eine neue 16-Bit-Addition, weshalb wir wieder CLC vorgeben müssen:
-            <code>1216 CLC
-                1217 LDA 1310
-                121A ADC 1320
-                121D STA 1310
-            </code>
-        </p>
+        <table class="plain strong">
+            <tr><td>1204</td><td>LDA</td><td>1400</td></tr>
+            <tr><td>1207</td><td>ADC</td><td>1310</td></tr>
+            <tr><td>120A</td><td>STA</td><td>1400</td></tr>
+        </table>
 
-        <p>Das war wieder das LSB. Nun zum MSB:
-            <code>1220 LDA 1311
-                1223 ADC 1321
-                1226 STA 1311
-            </code>
-        </p>
+        <p>Das neue LSB ist berechnet und in $1400 geschrieben.</p>
 
-        <p>Wir zählen nun das X-Register um 1 herunter und prüfen, ob es schon Null geworden ist, ob also schon alle N-Glieder summiert worden sind:
-            <code>1229 DEX
-                122A BNE 1203
-            </code>
-        </p>
+        <table class="plain strong">
+            <tr><td>1200</td><td>LDA</td><td>1401</td></tr>
+            <tr><td>1210</td><td>ADC</td><td>1311</td></tr>
+            <tr><td>1213</td><td>STA</td><td>1401</td></tr>
+        </table>
 
-        <p>Wenn noch nicht alle Glieder berechnet und summiert sind, kehren wir an den Schleifenanfang zurück. Ansonsten springen wir zurück ins Basic-Aufrufprogramm:
-            <code>122C RTS</code>
-        </p>
+        <p>Das war nun noch das neue MSB. Als nächstes berechnen wir das momentan letzte Glied der Reihe durch Addieren von D zum alten letzten Glied. Das entspricht dem Basic-Befehl A=A+D in einer Schleife. Dies ist eine neue 16-Bit-Addition, weshalb wir wieder CLC vorgeben müssen:</p>
 
-        <p>Wenn Sie beide Programme eingetippt haben, dann speichern Sie sie vorsichtshalber ab (das Assemblerprogramm mit dem S-Befehl des SMON). Beim neuen Einladen brauchen Sie den SMON nicht mehr. Nach dem Laden unseres Maschinenprogrammes (mit ,8,1 bei Diskette oder ,1,1 bei Kassette) geben Sie NEW <RETURN> ein, damit die Zeiger vor dem Einladen des Basic-Programmes wieder auf Normalwerte gesetzt werden. Zwischen dem dann eingeladenen Basic-Programm und unserer Assembler-Routine ist genug Platz. Sollten Sie aber irgendwann mal das Basic-Programm vergrößern, schützen Sie bitte unseren Bereich ab $1200.</p>
+        <table class="plain strong">
+            <tr><td>1216</td><td>CLC</td></tr>
+            <tr><td>1217</td><td>LDA</td><td>1310</td></tr>
+            <tr><td>121A</td><td>ADC</td><td>1320</td></tr>
+            <tr><td>121D</td><td>STA</td><td>1310</td></tr>
+        </table>
 
-        <p>Unser Assembler-Beispiel ist so aufgebaut, daß auch A und D variabel gehalten sind. Sie müßten dann nur noch Eingabemöglichkeiten im Basic-Programm schaffen und anstelle der Werte 1 oder 0 in Zeile 70 die LSBs und MSBs der von Ihnen eingegebenen Größen A und D einPOKEn. Auf diese Weise sind dann beliebige ganzzahlige, arithmetische Reihen berechenbar, wie zum Beispiel S = 7+10 + 13 + 16+&hellip; und so weiter. Das überlasse ich Ihrer Basic-Programmierfertigkeit. Nur eines noch: Sie müssen darauf achten, daß die Summe S nicht größer als 32767 wird. Ihrer Phantasie sind — wie immer in diesem Metier — keine Grenzen gesetzt. Sie könnten sich ja mal überlegen, wie man größere Summen zulassen kann (wer sagt denn, daß wir Zahlen immer nur in 2 Bytes darstellen dürfen?). Oder Sie könnten sich überlegen, welches eindeutige Merkmal auftritt, sobald der Maximalwert überschritten wird (ein Tip: Lesen Sie doch mal den Abschnitt über die V-Flagge nach).</p>
+        <p>Das war wieder das LSB. Nun zum MSB:</p>
+
+        <table class="plain strong">
+            <tr><td>1220</td><td>LDA</td><td>1311</td></tr>
+            <tr><td>1223</td><td>ADC</td><td>1321</td></tr>
+            <tr><td>1226</td><td>STA</td><td>1311</td></tr>
+        </table>
+
+        <p>Wir zählen nun das X-Register um 1 herunter und prüfen, ob es schon Null geworden ist, ob also schon alle N-Glieder summiert worden sind:</p>
+
+        <table class="plain strong">
+            <tr><td>1229</td><td>DEX</td></tr>
+            <tr><td>122A</td><td>BNE</td><td>1203</td></tr>
+        </table>
+
+        <p>Wenn noch nicht alle Glieder berechnet und summiert sind, kehren wir an den Schleifenanfang zurück. Ansonsten springen wir zurück ins Basic-Aufrufprogramm:</p>
+
+        <table class="plain strong">
+            <tr><td>122C</td><td>RTS</td></tr>
+        </table>
+
+        <p>Wenn Sie beide Programme eingetippt haben, dann speichern Sie sie vorsichtshalber ab (das Assemblerprogramm mit dem S-Befehl des SMON). Beim neuen Einladen brauchen Sie den SMON nicht mehr. Nach dem Laden unseres Maschinenprogrammes (mit ,8,1 bei Diskette oder ,1,1 bei Kassette) geben Sie NEW &lt;RETURN&gt; ein, damit die Zeiger vor dem Einladen des Basic-Programmes wieder auf Normalwerte gesetzt werden. Zwischen dem dann eingeladenen Basic-Programm und unserer Assembler-Routine ist genug Platz. Sollten Sie aber irgendwann mal das Basic-Programm vergrößern, schützen Sie bitte unseren Bereich ab $1200.</p>
+
+        <p>Unser Assembler-Beispiel ist so aufgebaut, daß auch A und D variabel gehalten sind. Sie müßten dann nur noch Eingabemöglichkeiten im Basic-Programm schaffen und anstelle der Werte 1 oder 0 in Zeile 70 die LSBs und MSBs der von Ihnen eingegebenen Größen A und D einPOKEn. Auf diese Weise sind dann beliebige ganzzahlige, arithmetische Reihen berechenbar, wie zum Beispiel S = 7+10+13+16+&hellip; und so weiter. Das überlasse ich Ihrer Basic-Programmierfertigkeit. Nur eines noch: Sie müssen darauf achten, daß die Summe S nicht größer als 32767 wird. Ihrer Phantasie sind — wie immer in diesem Metier — keine Grenzen gesetzt. Sie könnten sich ja mal überlegen, wie man größere Summen zulassen kann (wer sagt denn, daß wir Zahlen immer nur in 2 Bytes darstellen dürfen?). Oder Sie könnten sich überlegen, welches eindeutige Merkmal auftritt, sobald der Maximalwert überschritten wird (ein Tip: Lesen Sie doch mal den Abschnitt über die V-Flagge nach).</p>
 
         <h2>Die Branch-Befehle</h2>
 
@@ -330,7 +483,7 @@
 
         <p>BNE und BEQ beziehen sich auf die Z-Flagge, die anzeigt,ob im Verlauf der letzten Operation eine Null aufgetreten ist. Ist das der Fall, steht in der Z-Flagge eine 1. BNE verzweigt zur angegebenen Adresse, wenn in der Z-Flagge eine 0 enthalten ist. BEQ (branch if equal zero = verzweige, wenn gleich Null) tut das dann, wenn die Z-Flagge auf 1 gesetzt ist. Da muß man etwas aufpassen, daß man sich nicht vertut!</p>
 
-        <p>BCC und BCSLaben ihre Aufmerksamkeit auf die C-Flagge, also das Carry-Bit gerichtet. BCC kommt vom englischen »branch if carry clear«, was heißt: »verzweige, wenn das Carry-Bit gelöscht ist«. Ein gesetztes Carry-Bit (also Inhalt = 1) veranlaßt BCS (»branch if carry set« = verzweige, wenn das Carry-Bit gesetzt ist) zum Sprung an die angegebene Adresse.</p>
+        <p>BCC und BCS haben ihre Aufmerksamkeit auf die C-Flagge, also das Carry-Bit gerichtet. BCC kommt vom englischen »branch if carry clear«, was heißt: »verzweige, wenn das Carry-Bit gelöscht ist«. Ein gesetztes Carry-Bit (also Inhalt = 1) veranlaßt BCS (»branch if carry set« = verzweige, wenn das Carry-Bit gesetzt ist) zum Sprung an die angegebene Adresse.</p>
 
         <p>Diese vier bedingten Verzweigungen sind an sich die bedeutsamsten und am häufigsten verwendeten Branch-Befehle. Man kann wohl getrost sagen, daß über 90% der von Programmierern verwendeten bedingten Sprünge, damit absolviert werden. R. Mansfield warnt sogar ausdrücklich in seinem Buch »Machine language for beginners«, einem in den USA sehr verbreitetem Werk, vor der Verwendung der Befehle BPL und BMI!</p>
 
@@ -349,7 +502,6 @@
         <address class="author">(Heimo Ponnath/gk)</address>
 
         <!-- TODO "Tabelle: Die 11 neuen Befehle" -->
-        <!-- TODO Listing S.136 -->
 
     </article>
 

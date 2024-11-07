@@ -20,11 +20,11 @@
 
         <h1>Kreuzworträtsel selber machen – 1000 Mark für den Gewinner</h1>
 
-        <p class="intro">Kreuzworträtsel sind bei jung und ah beliebt. Das beweisen die vielen Rätselzeitschriften. Aber ein Kreuzworträtselprogramm zu schreiben ist etwas ganz anderes, als ein Rätsel zu lösen. Diese Aufgabe ist eine Herausforderung für gute Programmierer. Das beste Ergebnis des Kreuzworträtsel-Wettbewerbs stellen wir Ihnen vor.</p>
+        <p class="intro">Kreuzworträtsel sind bei jung und alt beliebt. Das beweisen die vielen Rätselzeitschriften. Aber ein Kreuzworträtselprogramm zu schreiben ist etwas ganz anderes, als ein Rätsel zu lösen. Diese Aufgabe ist eine Herausforderung für gute Programmierer. Das beste Ergebnis des Kreuzworträtsel-Wettbewerbs stellen wir Ihnen vor.</p>
 
         <p>Es läßt kaum Wünsche offen. Der Bildschirmaufbau ist genauso gut gelöst wie die Druckerausgabe. Auch den Bedienungskomfort kann man sich kaum besser vorstellen.</p>
 
-        <p>Ein Kreuzworträtselprogramm zu schreiben ist eine knifflige Aufgabe. Nicht nur die für den Betrachter eines Rätsels selbstverständlichen Regeln, wie das Kreuzen von Worten senkrecht zueinander und die dichte Vernetzung von Wörtern, auch die Geschwindigkeit und der Komfort des Programmes spielen eine große Rolle. Damit blieb in diesem Falle nur der Einsatz von Maschinensprache übrig. Das Kreuzworträtselprogramm besteht also aus zwei Teilen. Einem Rahmenprogramm in Basic, sowie einer Maschinenroutine, die im Bereich ab $C000/ 49152 geladen wird und die die Schwerarbeit leistet (zirka 30 Wortvergleiche/Sekunde).</p>
+        <p>Ein Kreuzworträtselprogramm zu schreiben ist eine knifflige Aufgabe. Nicht nur die für den Betrachter eines Rätsels selbstverständlichen Regeln, wie das Kreuzen von Worten senkrecht zueinander und die dichte Vernetzung von Wörtern, auch die Geschwindigkeit und der Komfort des Programmes spielen eine große Rolle. Damit blieb in diesem Falle nur der Einsatz von Maschinensprache übrig. Das Kreuzworträtselprogramm besteht also aus zwei Teilen. Einem Rahmenprogramm in Basic, sowie einer Maschinenroutine, die im Bereich ab $C000/49152 geladen wird und die die Schwerarbeit leistet (zirka 30 Wortvergleiche/Sekunde).</p>
 
         <p>Um das Rätselprogramm nicht unnötig mit der Eingabe des Wortschatzes zu belasten, werden die Wörter vorher mit einem Editor eingegeben und bis zu 255 in einem File auf Diskette abgelegt. Das eigentliche Rätselprogramm liest diese Files dann ein und verwendet sie im Rätselfeld (Bild 1). Trotzdem ist die Eingabe von Hand möglich. Denn der große Wortschatz eines Menschen kann niemals auf Diskette gespeichert werden.</p>
 
@@ -44,7 +44,7 @@
 
         <p>So können Sie sich also im Laufe der Zeit eine ganze Bibliothek von Wortschätzen aufbauen, die beliebig während der Rätselerzeugung einzusetzen sind.</p>
 
-        <p>Eine Besonderheit ist die Verkettung von Dateien. Sie können Nachfolgedateien benennen, die im Rätselprogramm automatisch nachgeladen werden, sobald der Vorgängerwortschatz erschöpft ist. Beispiel: Sie wollen ein Rätsel zum Thema »Computer« basteln. Geben Sie jetzt mit Hilfe des Lexikon-Editors den ersten Teil des geplanten Wortschatzes ein und benennen ihn mit»Computer.l«. Der Folgewortschatz soll »Computer.2« sein. Nachdem Sie den 1. Teil abgespeichert haben, geben Sie den 2. Teil ein und benennen den Nachfolger mit »Computer.3« und so weiter. Wollen Sie diese Kette beenden, wird einfach ein »q« (Quit) für den Nachfolger angegeben. Das Rätselprogramm bricht dann später an dieser Stelle mit dem automatischen Nachladen ab.</p>
+        <p>Eine Besonderheit ist die Verkettung von Dateien. Sie können Nachfolgedateien benennen, die im Rätselprogramm automatisch nachgeladen werden, sobald der Vorgängerwortschatz erschöpft ist. Beispiel: Sie wollen ein Rätsel zum Thema »Computer« basteln. Geben Sie jetzt mit Hilfe des Lexikon-Editors den ersten Teil des geplanten Wortschatzes ein und benennen ihn mit »Computer.1«. Der Folgewortschatz soll »Computer.2« sein. Nachdem Sie den 1. Teil abgespeichert haben, geben Sie den 2. Teil ein und benennen den Nachfolger mit »Computer.3« und so weiter. Wollen Sie diese Kette beenden, wird einfach ein »q« (Quit) für den Nachfolger angegeben. Das Rätselprogramm bricht dann später an dieser Stelle mit dem automatischen Nachladen ab.</p>
 
         <p>Bei dieser Methode hängt die Qualität des Rätsels entscheidend von der Staffelung der Dateien ab, das heißt im ersten File sollten lange Wörter stehen und mit jedem Folgefile die durchschnittliche Wortlänge abnehmen. Die Erstellung des Rätsels gerät dadurch wesentlich flüssiger, denn mit zunehmender Dichte des Wortfeldes müssen die Wörter natürlich immer kürzer werden, damit sie noch einzubauen sind.</p>
 
@@ -53,15 +53,13 @@
             <li>Abbrechen. Mit Verlassen des Editors kann das Rätselprogramm geladen und gestartet werden, so daß ein fließender Übergang von der Worteingabe zur Rätselerstellung möglich ist.</li>
         </ol>
 
-        <p>Nun zum Kreuzworträtselprogramm. Wie schon gesagt, besteht dieses Programm aus zwei Teilen, einer Maschinenroutine und dem</p>
-
-        <p>Basic-Rahmenprogramm. Dieses Rahmenprogramm (Bild 3) will ich zuerst beschreiben.</p>
+        <p>Nun zum Kreuzworträtselprogramm. Wie schon gesagt, besteht dieses Programm aus zwei Teilen, einer Maschinenroutine und dem Basic-Rahmenprogramm. Dieses Rahmenprogramm (Bild 3) will ich zuerst beschreiben.</p>
 
         <p>Nach dem Start des Programmes beginnt zunächst eine Initialisierungsphase (Zeilen 27—39). In einem Unterprogramm (ab Zeile 970) werden die Maschinenroutine für das Kreuzworträtsel und Treibersoftware für den Drucker am User-Port geladen. Wenn Sie einen Drucker am IEC-Bus betreiben, ist dieser Programmteil (Zeile 976 + 979) natürlich nicht nötig und zu entfernen.</p>
 
         <p>Im folgenden Unterprogramm zur Dimensionierung der Variablen und Definition einiger Konstanten (Zeile 915—969) erfolgt der erste Sprung in die Maschinenroutine (Zeile 937), um sie zu initialisieren.</p>
 
-        <p>Nach dem Bildaufbau (Unterprogramm ab Zeile 600), ist auf dem Monitor ein Kreuzwortfeld von 20x20 Zeichen zu sehen. Das Programm fragt jetzt nach dem Startwort, das als erstes Wort im Feld eingetragen werden muß, um der Maschinenroutine einen Kristallisationspunkt zu bieten (Zeile 34— 35). Geben Sie ein möglichst langes Wort ein, das Sie zum Beispiel unbedingt im Rätsel verarbeiten möchten. Bei dieser Eingabe findet, wie schon beim Editor, ein Zeichencheck statt, der es unmöglich machen soll, unerlaubte Zeichen im Rätselfeld unterzubringen. Danach müssen Sie sich zwischen einer waagerechten oder senkrechten Eintragung entscheiden, und ein Cursor taucht im Wortfeld auf. Fahren Sie wie gewohnt mit den Cursortasten die gewünschte Wortposition an und drücken die RETURN-Taste. Da es das erste Wort ist und genügend Platz im Wortfeld herrscht, wird Ihr Wort ohne Protest sofort eingetragen. Jetzt noch schnell die zugehörige Fragestellung eingetippt, und das erste Wort ist korrekt eingetragen.</p>
+        <p>Nach dem Bildaufbau (Unterprogramm ab Zeile 600), ist auf dem Monitor ein Kreuzwortfeld von 20x20 Zeichen zu sehen. Das Programm fragt jetzt nach dem Startwort, das als erstes Wort im Feld eingetragen werden muß, um der Maschinenroutine einen Kristallisationspunkt zu bieten (Zeile 34—35). Geben Sie ein möglichst langes Wort ein, das Sie zum Beispiel unbedingt im Rätsel verarbeiten möchten. Bei dieser Eingabe findet, wie schon beim Editor, ein Zeichencheck statt, der es unmöglich machen soll, unerlaubte Zeichen im Rätselfeld unterzubringen. Danach müssen Sie sich zwischen einer waagerechten oder senkrechten Eintragung entscheiden, und ein Cursor taucht im Wortfeld auf. Fahren Sie wie gewohnt mit den Cursortasten die gewünschte Wortposition an und drücken die RETURN-Taste. Da es das erste Wort ist und genügend Platz im Wortfeld herrscht, wird Ihr Wort ohne Protest sofort eingetragen. Jetzt noch schnell die zugehörige Fragestellung eingetippt, und das erste Wort ist korrekt eingetragen.</p>
 
         <p>Sie können dieses Spiel beliebig fortsetzen und theoretisch das ganze Rätsel auf diese Weise per Hand erstellen. Alle Eingaben von Hand sind frei von dem Zwang, ein Wort mit einem anderen kreuzen zu müssen. Sie können Ihre Wörter also beliebig positionieren, sollte ein Wort allerdings nicht passen, wird es zurückgewiesen und der Handeingabe-Modus abgebrochen.</p>
 
@@ -79,11 +77,11 @@
 
         <p>Die Maschinenroutine sucht derweil ständig nach passenden Stellen im Wortfeld. Dieser Vorgang kann im Prinzip endlos sein, da irgendwann natürlich kein geeignetes Wort mehr zu finden ist. Aus diesem Grund hat das Programm eine »Geduld-Schwelle«, eine Anzahl von Suchversuchen, innerhalb derer ein passendes Wort gefunden werden muß. Ist die Versuchszahl ohne Erfolg abgelaufen, geht das Programm davon aus, daß der Wortschatz nicht mehr ausreicht. Diese »Geduld-Schwelle« können Sie in Zeile 964 selbst bestimmen.</p>
 
-        <p>Bevor allerdings in der obersten Bildzeile die Meldung »Wortschatz ungenügend« erscheint (Zeile 64/Unterprogramm 110—15 8), hebt das Programm noch die »Blausperre« auf (Zeile 66). Dieses Flag hat dem Maschinenprogramm bisher mitgeteilt, daß nur dann eine Eintragung erlaubt ist, wenn dabei auch ein blaues, unbesetztes Feld abgedeckt wird. Eine Maßnahme, um das Rätsel möglichst dicht zu packen. Ab sofort ist also auch das Einpassen eines Wortes nur auf besetzten Feldern möglich. Läßt sich auch jetzt kein Wort mehr finden, erscheint endgültig der Hinweis auf mangelnde Wortauswahl. Wenn Sie das »Autoladen« zugelassen haben, wird nun der Folgewortschatz, falls vorhanden, gelesen und das Spiel beginnt von Neuem. Selbstverständlich ist auch das Laden von Wortdateien vor Ablauf der »Geduld-Schwelle« machbar. Dazu dient die Fl-Taste. Aber Vorsicht, auf die Gefahr, daß Sie einen bereits verbrauchten Wortschatz nochmal laden, müssen Sie schon selbst achten.</p>
+        <p>Bevor allerdings in der obersten Bildzeile die Meldung »Wortschatz ungenügend« erscheint (Zeile 64/Unterprogramm 110—158), hebt das Programm noch die »Blausperre« auf (Zeile 66). Dieses Flag hat dem Maschinenprogramm bisher mitgeteilt, daß nur dann eine Eintragung erlaubt ist, wenn dabei auch ein blaues, unbesetztes Feld abgedeckt wird. Eine Maßnahme, um das Rätsel möglichst dicht zu packen. Ab sofort ist also auch das Einpassen eines Wortes nur auf besetzten Feldern möglich. Läßt sich auch jetzt kein Wort mehr finden, erscheint endgültig der Hinweis auf mangelnde Wortauswahl. Wenn Sie das »Autoladen« zugelassen haben, wird nun der Folgewortschatz, falls vorhanden, gelesen und das Spiel beginnt von Neuem. Selbstverständlich ist auch das Laden von Wortdateien vor Ablauf der »Geduld-Schwelle« machbar. Dazu dient die Fl-Taste. Aber Vorsicht, auf die Gefahr, daß Sie einen bereits verbrauchten Wortschatz nochmal laden, müssen Sie schon selbst achten.</p>
 
         <p>Es dauert gar nicht so lange, dann ist das Wortfeld so dicht gepackt, daß der Maschinenroutine keine Eintragung mehr gelingt. Jetzt sind Sie gefordert, und mit der F7-Taste wählen Sie die Handeingabe an. Genau wie bei der Eintragung der ersten Startwörter können Sie Ihre »Lückenfüller« positionieren und die Fragestellung dazu eingeben.</p>
 
-        <p>Zufrieden mit Ihrer Arbeit (hoffentlich!) bleibt nur noch der Ausdruck des Rätsels. Mit F4 wird er gestartet. Das Unterprogramm für die Druckausgabe nimmt im Programm den weitaus größten Platz ein (Zeile 740—914). Ich verwende einen Epson RX-80-Drucker, der mit Hilfe einer speziellen Treibersoftware (Epson Software-Interface) auch CBM-Sonderzeichen drucken kann. Dazu muß eine unübliche Geräteadresse (6) angegeben werden (Zeile 761 und 900). Sollten Sie also einen CBMgrafikfähigen Drucker am IEC-Bus betreiben, tauschen Sie diese Adresse gegen die gewohnte »4« (im Listing schon geändert).</p>
+        <p>Zufrieden mit Ihrer Arbeit (hoffentlich!) bleibt nur noch der Ausdruck des Rätsels. Mit F4 wird er gestartet. Das Unterprogramm für die Druckausgabe nimmt im Programm den weitaus größten Platz ein (Zeile 740—914). Ich verwende einen Epson RX-80-Drucker, der mit Hilfe einer speziellen Treibersoftware (Epson Software-Interface) auch CBM-Sonderzeichen drucken kann. Dazu muß eine unübliche Geräteadresse (6) angegeben werden (Zeile 761 und 900). Sollten Sie also einen CBM-grafikfähigen Drucker am IEC-Bus betreiben, tauschen Sie diese Adresse gegen die gewohnte »4« (im Listing schon geändert).</p>
 
         <p>Auch die Druckerinitialisierung ist von Drucker zu Drucker verschieden (Zeilen 754—758). Achten Sie darauf, daß Ihr Drucker hier folgende Einstellung erhält:</p>
 
@@ -93,7 +91,7 @@
             <li>Startposition des Druckkopfes = lr (Linker Rand, kann in Zeile 946 geändert werden).</li>
         </ul>
 
-        <p>Für den Ausdruck der Fragestellung wird der RX80 im Engschriftmodus versetzt, um Platz zu sparen (Zeile 824—827). Auf diesen Effekt können Sie natürlich verzichten, müssen dann aber die Zeilenlänge (cz, in Zeile 948) ändern, da der Ausdruck vom Programm mit Randausgleich versehen wird (Zeile 847 - 889).</p>
+        <p>Für den Ausdruck der Fragestellung wird der RX80 im Engschriftmodus versetzt, um Platz zu sparen (Zeile 824—827). Auf diesen Effekt können Sie natürlich verzichten, müssen dann aber die Zeilenlänge (cz, in Zeile 948) ändern, da der Ausdruck vom Programm mit Randausgleich versehen wird (Zeile 847—889).</p>
 
         <figure>
             <img src="150-4.png" alt="">
@@ -149,97 +147,44 @@
         </figure>
 
         <figure>
-            <p>In diesem Listing wurden die meisten Steuerzeichen umgesetzt in Buchstabenkombinationen, die in eckigen Klammern stehen. Es bedeuten:</p>
-            <table>
+            In diesem Listing wurden die meisten Steuerzeichen umgesetzt in Buchstabenkombinationen, die in eckigen Klammern stehen. Es bedeuten:
+            <table class="plain">
                 <tbody>
                     <tr>
-                        <td>
-                            clr
-                        </td>
-                        <td>
-                            = Shift Clear/Home-Taste
-                        </td>
-                        <td>
-                            rvof
-                        </td>
-                        <td>
-                            = Revers off
-                        </td>
+                        <td>clr</td>
+                        <td>= Shift Clear/Home-Taste</td>
+                        <td>rvon</td>
+                        <td>= Revers on</td>
                     </tr>
                     <tr>
-                        <td>
-                            home
-                        </td>
-                        <td>
-                            = Home-Taste
-                        </td>
-                        <td>
-                            crsr
-                        </td>
-                        <td>
-                            = Cursor rechts
-                        </td>
+                        <td>home</td>
+                        <td>= Home-Taste</td>
+                        <td>rvof</td>
+                        <td>= Revers off</td>
                     </tr>
                     <tr>
-                        <td>
-                            cyan
-                        </td>
-                        <td>
-                            = Control und 4
-                        </td>
-                        <td>
-                            crsl
-                        </td>
-                        <td>
-                            = Cursor links
-                        </td>
+                        <td>cyan</td>
+                        <td>= Control und 4</td>
+                        <td>crsr</td>
+                        <td>= Cursor rechts</td>
                     </tr>
                     <tr>
-                        <td>
-                            whit
-                        </td>
-                        <td>
-                            = Control und 2
-                        </td>
-                        <td>
-                        </td>
-                        <td>
-                            (crsl*28 = 28 mal
-                        </td>
+                        <td>whit</td>
+                        <td>= Control und 2</td>
+                        <td>crsl</td>
+                        <td>= Cursor links (crsl*28 = 28 mal Cursor links)</td>
                     </tr>
                     <tr>
-                        <td>
-                            red
-                        </td>
-                        <td>
-                            = Control und 3
-                        </td>
-                        <td>
-                        </td>
-                        <td>
-                            Cursor links)
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            rvon
-                        </td>
-                        <td>
-                            = Revers on
-                        </td>
-                        <td>
-                            crsd
-                        </td>
-                        <td>
-                            = Cursor unten
-                        </td>
+                        <td>red</td>
+                        <td>= Control und 3</td>
+                        <td>crsd</td>
+                        <td>= Cursor unten</td>
                     </tr>
                 </tbody>
             </table>
-            <p>In Zeile 51 bis 56 (Listing 3) bedeuten die Grafikzeichen (von
+            In Zeile 51 bis 56 (Listing 3) bedeuten die Grafikzeichen (von
                 oben nach unten) f7,f4,f1,f6,f8,f2.<br>
-                Ein reverses »Z« bedeutet die Farbe Hellblau = Commodore-
-                Taste und 7.</p>
+                Ein reverses »Z« bedeutet die Farbe Hellblau = Commodore-Taste und 7.
             <figcaption>Hinweise zum Eintippen</figcaption>
         </figure>
 

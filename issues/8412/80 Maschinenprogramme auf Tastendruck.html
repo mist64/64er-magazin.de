@@ -25,14 +25,12 @@
 
         <p>Im Interpreter existiert eine Schleife, die einen Basic-Befehl holt und ausführt.</p>
 
-        <figure>
-            <pre>
-A7E1    JMP (0308)  ; zeigt normalerweise auf A7E4
-A7E4    JSR 0073    ; nächstes Zeichen aus Basic-Text holen
-A7E7    JSR A7ED    ; Statement ausführen
-A7EA    JMP A7AE    ; zurück zur Interpreterschleife
-</pre>
-        </figure>
+        <table class="plain">
+            <tr><td>A7E1</td><td>JMP</td><td>(0308)</td><td>; zeigt normalerweise auf A7E4</td></tr>
+            <tr><td>A7E4</td><td>JSR</td><td>0073</td><td>; nächstes Zeichen aus Basic-Text holen</td></tr>
+            <tr><td>A7E7</td><td>JSR</td><td>A7ED</td><td>; Statement ausführen</td></tr>
+            <tr><td>A7EA</td><td>JMP</td><td>A7AE</td><td>; zurück zur Interpreterschleife</td></tr>
+        </table>
 
         <p>In den Speicherzellen 0308 und 0309 (776 und 777 dez) liegt ein Zeiger, der normalerweise auf den Beginn dieser Schleife zeigt. Verbiegt man nun den Zeiger auf eine eigene Routine, kann man den Basic-Befehl auf das eigene Zeichen überprüfen.</p>
 
@@ -42,37 +40,32 @@ A7EA    JMP A7AE    ; zurück zur Interpreterschleife
 
         <p>»Merge« belegt den Speicherbereich 50000 bis 50264. Die eigene Routine beginnt auf Adresse 49152 (C000 hex). Der Wert in den Adressen 0308 und 0309 muß deshalb auf C000 abgeändert werden. Der Computer durchläuft dann vor jedem Befehl, den er ausführen soll, folgende Schleife:</p>
 
-        <figure>
-            <pre>
-C000 JSR 0073 ;nächstes Zeichen holen
-C003 CMP 40   ; Vergleich mit @-Zeichen
-C005 BEQ      ; verzweigen wenn erkannt
-C007 JSR 0079 ; Flags setzen
-C00A JMP A7E7 ; Rücksprung
-COOD JSR 0073 ; nächstes Zeichen holen
-C010 JSR C350 ; zur eigenen Routine
-C013 JMP A7AE ; Rücksprung
-</pre>
-        </figure>
+        <table class="plain right2">
+            <tr><td>C000</td><td>JSR<td>0073</td></td><td>; nächstes Zeichen holen</td></tr>
+            <tr><td>C003</td><td>CMP<td>40</td></td><td>; Vergleich mit @-Zeichen</td></tr>
+            <tr><td>C005</td><td>BEQ<td></td></td><td>; verzweigen wenn erkannt</td></tr>
+            <tr><td>C007</td><td>JSR<td>0079</td></td><td>; Flags setzen</td></tr>
+            <tr><td>C00A</td><td>JMP<td>A7E7</td></td><td>; Rücksprung</td></tr>
+            <tr><td>C00D</td><td>JSR<td>0073</td></td><td>; nächstes Zeichen holen</td></tr>
+            <tr><td>C010</td><td>JSR<td>C350</td></td><td>; zur eigenen Routine</td></tr>
+            <tr><td>C013</td><td>JMP<td>A7AE</td></td><td>; Rücksprung</td></tr>
+        </table>
 
         <p>Nach dem Drücken von @ und RETURN wird nun das Programm ab Adresse 50000 (C350 Hex) ausgeführt. Auf die anderen Befehle hat diese Routine keinen Einfluß. Eine Hürde gibt es noch zu meistern. Die Änderung der Adressen 0308 und 0309 ist auf der Basic-Ebene mit POKE nicht möglich. Dies ist auch verständlich, da POKE auch ein Basic-Befehl ist und durch die Änderung der ersten Adresse der Einsprung verändert wird.</p>
 
         <p>Deshalb muß diese Adreßänderung in Maschinensprache durchgeführt werden.</p>
 
-        <figure>
-            <pre>
-C100 LDA 00   ; Lade Akku mit 00
-C102 STA 0308 ; Speichere Akku nach 0308
-C105 LDA C0   ; Lade Akku mit C0
-C107 STA 0309 ; Speichere Akku nach 0309
-C10A RTS      ; Rückkehr nach Basic
-</pre>
-        </figure>
-
-        <p>Basic-Lader für Befehlserweiterung</p>
+        <table class="plain right2">
+            <tr><td>C100</td><td>LDA</td><td>00</td><td>; Lade Akku mit 00</td></tr>
+            <tr><td>C102</td><td>STA</td><td>0308</td><td>; Speichere Akku nach 0308</td></tr>
+            <tr><td>C105</td><td>LDA</td><td>C0</td><td>; Lade Akku mit C0</td></tr>
+            <tr><td>C107</td><td>STA</td><td>0309</td><td>; Speichere Akku nach 0309</td></tr>
+            <tr><td>C10A</td><td>RTS</td><td></td><td>; Rückkehr nach Basic</td></tr>
+        </table>
 
         <figure>
             <pre data-filename="merge_fleig" data-name="Merge" data-range="240-325,11000-14000"></pre>
+            <figcaption>Basic-Lader für Befehlserweiterung</figcaption>
             <!-- Im Magazin sind 320 und 325 zu einer Zeile zusammengefasst. -->
         </figure>
 
