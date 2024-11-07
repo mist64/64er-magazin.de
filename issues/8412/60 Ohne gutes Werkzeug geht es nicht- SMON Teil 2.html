@@ -26,8 +26,8 @@
 
         <p>Wir hoffen, daß wir Ihnen in der letzten Ausgabe nicht zuviel zugemutet haben, und daß sich Ihre wunden Finger inzwischen wieder erholen konnten. Bestimmt haben Sie im vergangenen Monat schon eifrig mit dem neuen Monitor gearbeitet und sind inzwischen mit den bisherigen Befehlen vertraut. Denn nun folgt der zweite Teil und mit diesem natürlich wieder einige neue Befehle, die es zu erklären gilt.</p>
     
-        <p>Und das bieten wir Ihnen heute:<br>
-            I/O-SET, LOAD, SAVE, PRINTER-SET, die verschiedenen Zahlenumrechnungen (HEX-DEZ-BIN-ADD-SUB), OCCUPY CONVERT, VERSCHIEBEN und WRITE.</p>
+        <p class="noindent">Und das bieten wir Ihnen heute:<br>
+        I/O-SET, LOAD, SAVE, PRINTER-SET, die verschiedenen Zahlenumrechnungen (HEX-DEZ-BIN-ADD-SUB), OCCUPY, CONVERT, VERSCHIEBEN und WRITE.</p>
 
         <h3>I/O-SET</h3>
 
@@ -37,11 +37,11 @@
 
         <p>L "Name" lädt ein Programm vom angegebenen Gerät (wie oben beschrieben) an die Originaladresse in den Speicher. Die Basic-Zeiger bleiben bei diesem Ladevorgang unbeeinflußt, das heißt, sie werden nicht verändert.</p>
 
-        <p>Beispiel: Unser Monitor soll an seiner Originaladresse ($C000) im Speicher stehen. Also brauchen Sie ihn nur mit »L "SMON"«zuladen, damit er dort erscheint. Wenn Sie einmal ein Programm an eine andere als die Originaladresse laden wollen, dann bietet Ihnen SMON dazu folgende Möglichkeit: ’L "Name" ADRESSE lädt ein Programm an die angegebene Adresse. Nehmen Sie doch bitte noch einmal unser letztes Test-Programm und geben es mit dem Assembler ab Adresse $4000 ein. Speichern Sie es mit »’S "SUPERTEST" 4000 4023« ab und laden es dann</p>
+        <p>Beispiel: Unser Monitor soll an seiner Originaladresse ($C000) im Speicher stehen. Also brauchen Sie ihn nur mit »L "SMON"« zu laden, damit er dort erscheint. Wenn Sie einmal ein Programm an eine andere als die Originaladresse laden wollen, dann bietet Ihnen SMON dazu folgende Möglichkeit: ’L "Name" ADRESSE lädt ein Programm an die angegebene Adresse. Nehmen Sie doch bitte noch einmal unser letztes Test-Programm und geben es mit dem Assembler ab Adresse $4000 ein. Speichern Sie es mit »’S "SUPERTEST" 4000 4023« ab und laden es dann</p>
 
         <ol>
             <li>an die Originaladresse (L "SUPERTEST") und</li>
-            <li>an eine andere Adresse (mit L "SUPERTEST" 5000 zum Beispiel nach $5000).</li>
+            <li>an eine andere Adresse (mit L "SUPERTEST"5000 zum Beispiel nach $5000).</li>
         </ol>
 
 
@@ -61,23 +61,23 @@
 
         <p>Die folgende Befehlsgruppe enthält Befehle zur Zahlenumrechnung. Sie wissen ja: Der Mensch mit seinen zehn Fingern neigt eher zur dezimalen Rechenweise, aber der Computer bevorzugt das Binärsystem, weil er nur zwei Finger hat (siehe Netzstecker). Ein Kompromiß ist das Hexadezimalsystem, denn das versteht keiner von beiden. Um Verständnis-Schwierigkeiten mit Ihrem Liebling aus dem Weg zu gehen, haben Sie aber SMON.</p>
 
-        <h3>UMRECHNUNG DEZ → HEX</h3>
+        <h3>UMRECHNUNG DEZ→HEX</h3>
 
         <p># (Dezimalzahl) rechnet die Dezimalzahl in die entsprechende Hexadezimalzahl um. Hierbei können Sie die Eingabe in beliebiger Weise vornehmen, da SMON Zahlen bis 65 535 umrechnet. Beispiel: #12, #144, #3456, #65533 und so weiter.</p>
 
-        <h3>UMRECHNUNG HEX → DEZ</h3>
+        <h3>UMRECHNUNG HEX→DEZ</h3>
 
         <p>$ (Hexadezimalzahl) rechnet die Hexadezimalzahl in die entsprechende Dezimalzahl um. Die Eingabe muß hierbei zweistellig beziehungsweise vierstellig erfolgen. Ist diese Zahl kleiner als $100 ( = 255), wird zusätzlich auch der Binärwert ausgegeben.</p>
 
         <p>Beispiel: $12, $0012, $0D, $FFD2, etc. In den ersten drei Beispielen erfolgt die Anzeige auch in binärer Form.</p>
 
-        <h3>UMRECHNUNG BINÄR → HEX,DEZ</h3>
+        <h3>UMRECHNUNG BINÄR→HEX,DEZ</h3>
 
         <p>% (Binärzahl (achtstellig) rechnet die Binärzahl in die entsprechenden Hexa- und Dezimalzahlen um. Bei diesem Befehl müssen Sie genau acht Binärzahlen eingeben. Falls Sie einmal versehentlich mehr eingeben sollten, werden nur die ersten acht zur Umrechnung herangezogen. Beispiel: %00011111, %10101011</p>
 
         <h3>ADD-SUB</h3>
 
-        <p>? 2340 + 156D berechnet die Summe der beiden vier(!)-stelligen Hex-Zahlen. Neben der Addition ist auch Subtraktion möglich.</p>
+        <p>? 2340+156D berechnet die Summe der beiden vier(!)-stelligen Hex-Zahlen. Neben der Addition ist auch Subtraktion möglich.</p>
 
         <h2>Programme auf dem Rangierbahnhof</h2>
 
@@ -107,7 +107,7 @@
 
         <p>C (ANFADRalt ENDADRalt ANFADRneu ANFADRges END-ADRges) verschiebt das Programm von ANFADRalt bis ENDADRalt zur ANFADRneu und zwar mit Umrechnung der Adressen zwischen ANFADRges und ENDADRges</p>
 
-        <p>An unserem kleinen Testprogramm läßt sich wieder einmal demonstrieren, wie der Befehl eingesetzt wird. Laden Sie es also mit »L’SUPERTEST"« und schauen es mit »D 4000« an. Jetzt wollen wir an der Adresse $4008 einen 3-Byte-Befehl einfügen: C 4008 4020 400B 4000 4011 verschiebt das Programm von $4008 bis $4020 zur neuen Anfangsadresse $400B. Dabei werden im Bereich von $4000 bis $4011 (neue Endadresse des »aktiven« Programmes!) die Sprungadressen umgerechnet. Nun können Sie ab Adresse $4008 einen 3-Byte-Befehl einfügen, zum Beispiel STY 0286. Dazu geben Sie bitte ein:
+        <p>An unserem kleinen Testprogramm läßt sich wieder einmal demonstrieren, wie der Befehl eingesetzt wird. Laden Sie es also mit »L"SUPERTEST"« und schauen es mit »D 4000« an. Jetzt wollen wir an der Adresse $4008 einen 3-Byte-Befehl einfügen: C 4008 4020 400B 4000 4011 verschiebt das Programm von $4008 bis $4020 zur neuen Anfangsadresse $400B. Dabei werden im Bereich von $4000 bis $4011 (neue Endadresse des »aktiven« Programmes!) die Sprungadressen umgerechnet. Nun können Sie ab Adresse $4008 einen 3-Byte-Befehl einfügen, zum Beispiel STY 0286. Dazu geben Sie bitte ein:
             <code>A 4008
                 4008 STY 0286
                 F
@@ -120,25 +120,80 @@
 
         <p>Wie beim letzten Mal wollen wir noch einen kleinen Blick auf das Programm werfen. Wir haben zwei häufig vorkommende Programmteile ausgewählt. Wenn Sie nach erfolgreichem Eintippen der neuen DATAs einmal mit »D C84F« die »LOAD-SAVE«-Routine listen, sehen Sie, daß diese sehr wenig Platz beansprucht. Das Geheimnis dieser Beschränkung liegt in der Tatsache begründet, daß wir hier auf Betriebssystem-Routinen zurückgegriffen haben. Doch dazu nachher mehr; erst einmal die angesprochene Routine von Anfang an:</p>
 
-        <p>TODO</p>
+        <figure>
+            <table class="plain">
+                <tr><td>LOADSAVE</td><td>LDY</td><td>#$02</td></tr>
+                <tr><td></td>        <td>STY</td><td>*$BC</td></tr>
+                <tr><td></td>        <td>DEY</td><td></td></tr>
+                <tr><td></td>        <td>STY</td><td>*$B9</td></tr>
+                <tr><td></td>        <td>STY</td><td>*$BB</td></tr>
+                <tr><td></td>        <td>DEY</td><td></td></tr>
+                <tr><td></td>        <td>STY</td><td>*$B7</td></tr>
+            </table>
+        </figure>
 
         <p>Die Speicherstellen $BB/$BC enthalten jetzt die Adresse $0201, also den Beginn des Basic-Eingabepuffers. In $B9 befindet sich der Wert 01, das bedeutet, daß die Sekundäradresse für absolutes Laden voreingestellt ist. Die Speicherstelle $B7 enthält die Länge des Dateinamens, hier erst einmal 0.</p>
 
-        <p>TODO</p>
+        <figure>
+            <table class="plain">
+                <tr><td>JSR</td><td>GETCHRERR</td></tr>
+                <tr><td>CMP</td><td>#'"'</td></tr>
+                <tr><td>BNE</td><td>LSERROR</td></tr>
+            </table>
+        </figure>
 
         <p>Überprüft, ob Anführungsstriche eingegeben wurden. Falls nicht, springt unser Programm in die Routine »LSERROR« und bricht ab.</p>
 
-        <p>TODO</p>
+        <figure>
+            <table class="plain">
+                <tr><td>LS1</td><td>JSR</td><td>GETCHRERR</td></tr>
+                <tr><td></td>   <td>STA</td><td>($BB),Y</td></tr>
+                <tr><td></td>   <td>INY</td><td></td></tr>
+                <tr><td></td>   <td>INC</td><td>*$B7</td></tr>
+                <tr><td></td>   <td>CMP</td><td>#'"'</td></tr>
+                <tr><td></td>   <td>BNE</td><td>LS1</td></tr>
+            </table>
+        </figure>
 
         <p>In diesem Programmteil wird der Filename eingelesen und in die Adresse gespeichert, die in $BB/$BC enthalten ist ($0201). Gleichzeitig wird $B7 als Zähler für die Namenlänge so lange erhöht, bis das zweite Anführungszeichen auftaucht. Damit ist der Filename gespeichert, beginnend bei $0201.</p>
 
-        <p>TODO</p>
+        <figure>
+            <table class="plain">
+                <tr><td>DEC</td><td>*$B7</td></tr>
+                <tr><td>LDA</td><td>IO.NR</td></tr>
+                <tr><td>STA</td><td>*$BA</td></tr>
+                <tr><td>LDA</td><td>*COMMAND</td></tr>
+                <tr><td>CMP</td><td>#'S'</td></tr>
+                <tr><td>BEQ</td><td>SAVE</td></tr>
+            </table>
+        </figure>
 
         <p>Da die Namenlänge um eins zu groß geraten ist (das letzte Zeichen war ein »"«), muß sie dekrementiert werden. Die gewählte oder voreingestellte I/O-Nummer (Device-Nummer) soll in $BA gespeichert werden, damit die Betriebssystemroutine nachher das richtige Gerät anspricht. Zum Abschluß überprüft der Compare-Befehl, ob das Kommando »S« gewählt ist, um dann dorthin zu verzweigen.</p>
 
-        <p>TODO</p>
+        <figure>
+            <table class="plain">
+                <tr><td>LOAD</td><td>JSR</td><td>GETRET</td></tr>
+                <tr><td></td><td>BEQ</td><td>LOAD1</td></tr>
+                <tr><td></td><td>LDX</td><td>#$C3</td></tr>
+                <tr><td></td><td>JSR</td><td>GETADR</td></tr>
+                <tr><td></td><td>LDA</td><td>#$00</td></tr>
+                <tr><td></td><td>STA</td><td>*$B9</td></tr>
+            </table>
+        </figure>
 
         <p>Wir sind nun an der Stelle des Befehls angelangt, an der sich herausstellen muß, ob das Programm an seine Originaladresse (absolut) oder an eine andere Adresse geladen werden soll. Die Unterroutine »GETRET« prüft, ob unmittelbar nach dem Namen ein »RETURN« folgt und führt eine Verzweigung nach »LOAD1« durch, falls dieses eintritt. Ansonsten holen wir uns die Adresse und laden das vorgesehene Programm dorthin, nachdem in Speicherstelle *$B9 eine Null gespeichert ist, da ein absolutes Laden nicht erfolgt. Die Routine »GETADR« ist so aufgebaut, daß sie die nächsten 2 Bytes an die mit dem X-Register gewählte Stelle in der Zeropage ablegt. Dann führen wir ebenfalls »LOAD1« durch.</p>
+
+        <figure>
+            <table class="plain">
+                <tr><td>LOAD1</td><td>LDA</td><td>#$00</td></tr>
+                <tr><td></td>     <td>JMP</td><td>($0330)</td></tr>
+                <tr><td>SAVE</td> <td>LDX</td><td>#$C1</td></tr>
+                <tr><td></td>     <td>JSR</td><td>GETADR</td></tr>
+                <tr><td></td>     <td>LDX</td><td>#$AE</td></tr>
+                <tr><td></td>     <td>JSR</td><td>GETADR</td></tr>
+                <tr><td></td>     <td>JMP</td><td>($0332)</td></tr>
+            </table>
+        </figure>
 
         <p>In »LOAD1« erfolgt der indirekte Sprung über $0330 in die LOAD-Routine des Betriebssystems.</p>
 
@@ -146,7 +201,17 @@
 
         <p>Als zweites ein Vergleich, der in Maschinenprogrammen häufig und in allen Variationen auftaucht: Es handelt sich dabei um den Vergleich zweier Adressen. Nun sind Adressen leider 16-Bit-Werte, unser Prozessor aber kann nur 8 Bit auf einmal verarbeiten. Gehen wir einmal von folgenden Bedingungen aus: Ein Programm soll von $4000 bis $4020 gelistet werden. Die Zeiger für das Ende befinden sich in Speicherstelle ENDLO (Lowbyte) und ENDHI (Highbyte). »PCL« (Programm-Counter-Low) und »PCH« (Programm-Counter-High) geben den augenblicklichen Stand des Programmes an. Dann erfolgt die Abfrage auf erreichtes Ende mit dieser Befehlsfolge:</p>
 
-        <p>TODO</p>
+        <figure>
+            <table class="plain">
+                <tr><td>VERGL</td> <td>LDA</td><td>PCL</td></tr>
+                <tr><td></td>      <td>CMP</td><td>ENDLO</td></tr>
+                <tr><td></td>      <td>LDA</td><td>PCH</td></tr>
+                <tr><td></td>      <td>SBC</td><td>ENDHI</td></tr>
+                <tr><td></td>      <td>BCS</td><td>FERTIG</td></tr>
+                <tr><td>WEITER</td><td>JMP</td><td>AUSGABE</td></tr>
+                <tr><td>FERTIG</td><td>JMP</td><td>ENDE</td></tr>
+            </table>
+        </figure>
 
         <p>Solange PCL und PCH kleiner sind als die Endwerte geht das Programm »WEITER«.</p>
 
@@ -164,7 +229,14 @@
 
         <p>Für die Korrektur ist folgendes notwendig: Listen Sie mit »M C56C C57B« zwei Zeilen, gehen mit dem Cursor in die betreffenden Zeilen und geben folgende Änderung ein:</p>
 
-        <p>TODO</p>
+        <figure>
+            <table class="plain">
+                <tr><td>:C56C</td><td><b>09</b></td><td>C9</td>       <td><b>30</b></td><td>F0</td>       <td><b>05</b></td><td>C9</td><td>21</td><td><b>D0</b></td></tr>
+                <tr><td></td>     <td><b>—</b></td> <td>   </td>      <td><b>—</b></td> <td></td>         <td><b>—</b></td> <td></td>  <td></td>  <td><b>—</b></td></tr>
+                <tr><td>:C574</td><td><b>11</b></td><td><b>EA</b></td><td><b>20</b></td><td><b>94</b></td><td><b>C4</b></td><td>20</td><td>51</td><td>C3</td></tr>
+                <tr><td></td>     <td><b>—</b></td> <td><b>—</b></td> <td><b>—</b></td> <td><b>—</b></td> <td><b>—</b></td> <td></td>  <td></td>  <td></td></tr>
+            </table>
+        </figure>
 
         <p>Nur die fetten Werte müssen geändert werden, alle anderen können Sie stehen lassen. Denken Sie bitte bei jeder Änderung daran, daß Sie die Zeile nur mit Drücken der RETURN-Taste an den Computer übergeben. Zur Probe können Sie ja noch einmal listen&hellip;</p>
 
