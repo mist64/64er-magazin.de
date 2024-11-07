@@ -29,7 +29,6 @@
             d) Joystick#2-Zustand<br>
             e) Feuerknopf # 2-Zustand</p>
 
-
         <p>Das Programm Mouse 64 ist als Eingabe- und Steuerhilfe für Anwendungsprogramme gedacht (siehe Apple-Macintosh-Software und andere), kann aber auch durch zum Beispiel Änderung des Sprites in Spiele eingebunden werden, da bis auf die Vergrößerung alle Spriteparameter veränderlich bleiben.</p>
         <h3>Zu Listing 1</h3>
 
@@ -79,20 +78,204 @@
         </figure>
 
         <figure>
-            TODO
-            <pre></pre>
+            <!-- Eingetippt von ClausS und Endurion -->
+            <pre>.,  c000  a0 e7       ldy #$e7
+.,  c002  b9 75 bf    lda $bf75,y
+.,  c005  20 d2 ff    jsr $ffd2
+.,  c008  c8          iny
+.,  c009  d0 f7       bne $c002
+.,  c00b  a0 ee       ldy #$ee
+.,  c00d  b9 86 bf    lda $bf86,y
+.,  c010  20 d2 ff    jsr $ffd2
+.,  c013  c8          iny
+.,  c014  d0 f7       bne $c00d
+.,  c016  a5 c6       lda $c6
+.,  c018  c9 00       cmp #$00
+.,  c01a  f0 fa       beq $c016
+.,  c01c  a9 00       lda #$00
+.,  c01e  85 c6       sta $c6
+.,  c020  78          sei
+.,  c021  a9 89       lda #$89
+.,  c023  8d 14 03    sta $0314
+.,  c026  a9 c0       lda #$c0
+.,  c028  8d 15 03    sta $0315
+.,  c02b  a9 11       lda #$11
+.,  c02d  8d 0e d0    sta $d00e
+.,  c030  a9 2d       lda #$2d
+.,  c032  8d 0f d0    sta $d00f
+.,  c035  ad 15 d0    lda $d015
+.,  c038  09 80       ora #$80
+.,  c03a  8d 15 d0    sta $d015
+.,  c03d  ad 1b d0    lda $d01b
+.,  c040  29 7f       and #$7f
+.,  c042  8d 1b d0    sta $d01b
+.,  c045  ad 1c d0    lda $d01c
+.,  c048  29 7f       and #$7f
+.,  c04a  8d 1c d0    sta $d01c
+.,  c04d  a9 00       lda #$00
+.,  c04f  8d 2e d0    sta $d02e
+.,  c052  a9 0b       lda #$0b
+.,  c054  8d ff 07    sta $07ff
+.,  c057  58          cli
+.,  c058  60          rts</pre>
             <figcaption>Listing 2. Die in Assembler geschriebene Initialisierungs-
                 routine von »Mouse 64«</figcaption>
         </figure>
         <figure>
-            TODO
-            <pre></pre>
+            <!-- Eingetippt von ClausS und Endurion -->
+            <pre>.,  c089  a2 e0      ldx #$e0
+.,  c08b  8e 02 dc   stx $dc02
+.,  c08e  ad 00 dc   lda $dc00
+.,  c091  a2 ff      ldx #$ff
+.,  c093  8e 02 dc   stx $dc02
+.,  c096  8d ff c1   sta $c1ff
+.,  c099  29 01      and #$01
+.,  c09b  d0 0a      bne $c0a7
+.,  c09d  ad 0f d0   lda $d00f
+.,  c0a0  c9 2d      cmp #$2d
+.,  c0a2  90 03      bcc $c0a7
+.,  c0a4  ce 0f d0   dec $d00f
+.,  c0a7  ad ff c1   lda $c1ff
+.,  c0aa  29 02      and #$02
+.,  c0ac  d0 0a      bne $c0b8
+.,  c0ae  a9 ec      lda #$ec
+.,  c0b0  cd 0f d0   cmp $d00f
+.,  c0b3  90 03      bcc $c0b8
+.,  c0b5  ee 0f d0   inc $d00f
+.,  c0b8  ad ff c1   lda $c1ff
+.,  c0bb  29 04      and #$04
+.,  c0bd  d0 29      bne $c0e8
+.,  c0bf  ad 10 d0   lda $d010
+.,  c0c2  c9 80      cmp #$80
+.,  c0c4  90 18      bcc $c0de
+.,  c0c6  ad 0e d0   lda $d00e
+.,  c0c9  f0 05      beq $c0d0
+.,  c0cb  ce 0e d0   dec $d00e
+.,  c0ce  d0 18      bne $c0e8
+.,  c0d0  ad 10 d0   lda $d010
+.,  c0d3  29 7f      and #$7f
+.,  c0d5  8d 10 d0   sta $d010
+.,  c0d8  ce 0e d0   dec $d00e
+.,  c0db  4c e8 c0   jmp $c0e8
+.,  c0de  ad 0e d0   lda $d00e
+.,  c0e1  c9 12      cmp #$12
+.,  c0e3  90 03      bcc $c0e8
+.,  c0e5  ce 0e d0   dec $d00e
+.,  c0e8  ad ff c1   lda $c1ff
+.,  c0eb  29 08      and #$08
+.,  c0ed  d0 21      bne $c110
+.,  c0ef  ad 10 d0   lda $d010
+.,  c0f2  c9 80      cmp #$80
+.,  c0f4  90 0d      bcc $c103
+.,  c0f6  ad 0e d0   lda $d00e
+.,  c0f9  c9 48      cmp #$48
+.,  c0fb  f0 13      beq $c110
+.,  c0fd  ee 0e d0   inc $d00e
+.,  c100  4c 10 c1   jmp $c110
+.,  c103  ee 0e d0   inc $d00e
+.,  c106  d0 08      bne $c110
+.,  c108  ad 10 d0   lda $d010
+.,  c10b  09 80      ora #$80
+.,  c10d  8d 10 d0   sta $d010
+.,  c110  a2 00      ldx #$00
+.,  c112  ad ff c1   lda $c1ff
+.,  c115  29 10      and #$10
+.,  c117  d0 01      bne $c11a
+.,  c119  e8         inx
+.,  c11a  8e fe c1   stx $c1fe
+.,  c11d  ad 17 d0   lda $d017
+.,  c120  29 7f      and #$7f
+.,  c122  8d 17 d0   sta $d017
+.,  c125  ad 1d d0   lda $d01d
+.,  c128  29 7f      and #$7f
+.,  c12a  8d 1d d0   sta $d01d
+.,  c12d  ad 0f d0   lda $d00f
+.,  c130  a0 ff      ldy #$ff
+.,  c132  38         sec
+.,  c133  c8         iny
+.,  c134  e9 08      sbc #$08
+.,  c136  b0 fb      bcs $c133
+.,  c138  98         tya
+.,  c139  e9 04      sbc #$04
+.,  c13b  a8         tay
+.,  c13c  8c fd c1   sty $c1fd
+.,  c13f  ad 10 d0   lda $d010
+.,  c142  c9 80      cmp #$80
+.,  c144  90 14      bcc $c15a
+.,  c146  ad 0e d0   lda $d00e
+.,  c149  a2 ff      ldx #$ff
+.,  c14b  e8         inx
+.,  c14c  e9 08      sbc #$08
+.,  c14e  b0 fb      bcs $c14b
+.,  c150  8a         txa
+.,  c151  69 1e      adc #$1e
+.,  c153  aa         tax
+.,  c154  8e fc c1   stx $c1fc
+.,  c157  4c 6c c1   jmp $c16c
+.,  c15a  38         sec
+.,  c15b  ad 0e d0   lda $d00e
+.,  c15e  a2 ff      ldx #$ff
+.,  c160  e8         inx
+.,  c161  e9 08      sbc #$08
+.,  c163  b0 fb      bcs $c160
+.,  c165  8a         txa
+.,  c166  e9 01      sbc #$01
+.,  c168  aa         tax
+.,  c169  8e fc c1   stx $c1fc
+.,  c16c  a9 04      lda #$04
+.,  c16e  85 fc      sta $fc
+.,  c170  ea         nop
+.,  c171  86 fb      stx $fb
+.,  c173  c0 00      cpy #$00
+.,  c175  f0 10      beq $c187
+.,  c177  18         clc
+.,  c178  a9 28      lda #$28
+.,  c17a  65 fb      adc $fb
+.,  c17c  85 fb      sta $fb
+.,  c17e  a5 fc      lda $fc
+.,  c180  69 00      adc #$00
+.,  c182  85 fc      sta $fc
+.,  c184  88         dey
+.,  c185  d0 f0      bne $c177
+.,  c187  b1 fb      lda ($fb),y
+.,  c189  8d fb c1   sta $c1fb
+.,  c18c  a5 fc      lda $fc
+.,  c18e  4c 31 ea   jmp $ea31
+.,  c191  00         brk
+.</pre>
             <figcaption>Listing 3. Die eigentliche Interrupt-Erweiterung von »Mouse
                 64«</figcaption>
         </figure>
         <figure>
-            TODO
-            <pre></pre>
+            <!-- Eingetippt von ClausS und Endurion -->
+            <pre>.
+.:  c000 a0 e7 b9 75 bf 20 d2 ff c8 d0 f7 a0 ee b9 86 bf
+.:  c010 20 d2 ff c8 d0 f7 a5 c6 c9 00 f0 fa a9 00 85 c6
+.:  c020 78 a9 89 8d 14 03 a9 c0 8d 15 03 a9 11 8d 0e d0
+.:  c030 a9 2d 8d 0f d0 ad 15 d0 09 80 8d 15 d0 ad 1b d0
+.:  c040 29 7f 8d 1b d0 ad 1c d0 29 7f 8d 1c d0 a9 00 8d
+.:  c050 2e d0 a9 0b 8d ff 07 58 60 00 00 ff 50 55 54 20
+.:  c060 4a 4f 59 53 54 49 43 4b 20 49 4e 20 50 4f 52 54
+.:  c070 20 32 20 21 0d 41 4e 44 20 50 52 45 53 53 20 41
+.:  c080 4e 59 20 4b 45 59 00 00 00 a2 e0 8e 02 dc ad 00
+.:  c090 dc a2 ff 8e 02 dc 8d ff c1 29 01 d0 0a ad 0f d0
+.:  c0a0 c9 2d 90 03 ce 0f d0 ad ff c1 29 02 d0 0a a9 ec
+.:  c0b0 cd 0f d0 90 03 ee 0f d0 ad ff c1 29 04 d0 29 ad
+.:  c0c0 10 d0 c9 80 90 18 ad 0e d0 f0 05 ce 0e d0 d0 18
+.:  c0d0 ad 10 d0 29 7f 8d 10 d0 ce 0e d0 4c e8 c0 ad 0e
+.:  c0e0 d0 c9 12 90 03 ce 0e d0 ad ff c1 29 08 d0 21 ad
+.:  c0f0 10 d0 c9 80 90 0d ad 0e d0 c9 48 f0 13 ee 0e d0
+.:  c100 4c 10 c1 ee 0e d0 d0 08 ad 10 d0 09 80 8d 10 d0
+.:  c110 a2 00 ad ff c1 29 10 d0 01 e8 8e fe c1 ad 17 d0
+.:  c120 29 7f 8d 17 d0 ad 1d d0 29 7f 8d 1d d0 ad 0f d0
+.:  c130 a0 ff 38 c8 e9 08 b0 fb 98 e9 04 a8 8c fd c1 ad
+.:  c140 10 d0 c9 80 90 14 ad 0e d0 a2 ff e8 e9 08 b0 fb
+.:  c150 8a 69 1e aa 8e fc c1 4c 6c c1 38 ad 0e d0 a2 ff
+.:  c160 e8 e9 08 b0 fb 8a e9 01 aa 8e fc c1 a9 04 85 fc
+.:  c170 ea 86 fb c0 00 f0 10 18 a9 28 65 fb 85 fb a5 fc
+.:  c180 69 00 85 fc 88 d0 f0 b1 fb 8d fb c1 a5 fc 4c 31
+.:  c190 ea 00 00 00 00 00 00 00 00 00 00 00 00 00 00 4a
+.</pre>
             <figcaption>Listing 4. Der Hex-Dump des Assemblerlisting von »Mouse 64«</figcaption>
         </figure>
 
