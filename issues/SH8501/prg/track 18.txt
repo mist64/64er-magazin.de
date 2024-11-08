@@ -1,0 +1,407 @@
+;track 18.prg ==0801==
+;Eingetippt von goloMAK
+;Von der 2. Ausgabe
+    0 rem :::::::::::::::::::::::::::::::::
+    1 rem ::  track 18  manipulationen   ::
+    2 rem ::        - by matan -         ::
+    3 rem ::                             ::
+    4 rem ::  von     andreas koelbach   ::
+    5 rem ::          marburg (1984)     ::
+    6 rem ::          stadtwaldstr. 5    ::
+    7 rem :::::::::::::::::::::::::::::::::
+    8 rem
+    9 rem*********** initial **************
+   10 data 32,174,"",253,32,"seq",174,158,"prg",32,183,"usr",158,104,"rel",183,168
+   11 data"",138,24,"seq<",72,76,"prg<",32,240,"usr<",253,255,"rel<"
+   15 poke 53280,6:poke 53281,6:poke 646,1
+   20 dim n$ (145),c$(10)
+   21 u=1:p=828:o$=chr$(0):sp$="                    ":rem 20 spc
+   22 fr$=o$+o$+o$+"----- frei -----"+o$
+   23 for i=0 to 9:fr$=fr$+o$:read x,y,ty$(i):poke 828+i,x:poke 838+i,y:next i
+   25 goto 50000
+   34 rem****** einfaches get ************
+   35 poke 198,0:wait 198,1:get a$:a=asc(a$):return
+   49 rem********* getbild ***************
+   50 b$="":x=0
+   51 sys p,cx,cy
+   52 poke 207,0:rem blinkphase aus
+   53 poke 204,0:rem cursor ein
+   54 poke 198,0:wait 198,1:get a$:a=asc(a$)
+   55 poke 204,1:rem cursor aus
+   56 b=1024+peek(211)+peek(214)*40:poke b,peek(b)and 127
+   57 if a=20 and x>0 then cx=cx+(x<l):poke b+(x<l),bc:x=x-l:b$=left$(b$,x):goto 51
+   58 if a=13 then a=1:return
+   59 if a=133 then a=2:return
+   60 if a<g or a>h then 52
+   61 if x=l then b$=left$(b$,l-1)
+   62 print a$:b$=b$+a$:x=len(b$)
+   63 cx=cx-(x<l):goto 51
+   99 rem****** inhalt seitenweise *******
+  100 s=0
+  110 gosub 22000:print" nr."tab(5);"{rvon}"d$"{rvof}"
+  120 c=s*16+16*(s>9):x=0
+  130 c=c+1:if c>q then return
+  140 x=x+1
+  150 bl=asc(right$(n$(c),2))+asc(right$(n$(c),1))*256
+  160 a=asc(left$(n$(c),1)):a$=ty$((a and 7)-5*((a and 64)>0))
+  170 print c;tab(4)":";bl;tab(10);mid$(n$(c),4,16);tab(28);a$
+  180 if x<16 then 130
+  190 return
+  199 rem***** disknamen einlesen *******
+  200 gosub 260
+  205 open 1,8,15,"i":open 2,8,2,"#"
+  210 print#1,"u1 2 0 18 0"
+  220 print#1,"b-p 2 144"
+  230 dn$=""
+  240 for i=1 to 23:get#2,a$:dn$=dn$+a$:next i
+  250 return
+  259 rem******** check disk ************
+  260 open 1,8,15:close 1
+  265 if st<>0 then 280 rem angeschaltet ?
+  270 open 1,8,15,"i":input#1,a
+  275 if a=0 then close 1:return:rem disk eingelegt?
+  280 poke 53281,2:print"{clr}":sys p,13,12:print" laufwerk ok ?"
+  285 gosub 35:poke 53281,6:goto 50000
+  299 rem***** directory einlesen *******
+  300 print"{clr}        - directory  einlesen -"
+  320 gosub 200:d$=dn$:sys p,8,4:print"{rvon}"d$"{rvof}"
+  330 s=1:c=0
+  340 print#1,"u1 2 0 18";s
+  350 get#2,t$:get#2,s$:t=asc(t$+o$):s=asc(s$)
+  360 for i=0 to 7:c=c+1:n$(c)=""
+  370 print#1,"b-p 2";2+i*32
+  380 get#2,a$
+  390 if a$=""then n$(c)=fr$:goto 420
+  400 n$(c)=a$
+  410 for j=0 to 28:get#2,a$:n$(c)=n$(c)+left$(a$+o$,1):next j
+  420 sys p,0,8:print"nr."c
+  430 sys p,9,8:print mid$(n$(c),4,16)
+  440 next i
+  450 if t then 340
+  460 q=c:goto 50000
+  599 rem****** file schuetzen **********
+  600 p$="{clr}        - files  schuetzen -"
+  620 c$(3)="file schuetzen{rvof}"
+  630 c$(4)="file freigeben{rvof}"
+  640 cx=11:cy=11
+  650 gosub 18000
+  670 cx=0:cy=15:sys p,cx,cy:print"name des files : ................"
+  680 cx=17:l=16:g=32:h=127:bc=46:gosub 50
+  690 on a goto 700,50000
+  700 l=len(b$)
+  710 t=18:s=1:x=-1:gosub 260
+  720 open 1,8,15:open 2,8,2,"#"
+  730 t1=t:s1=s
+  740 print#1,"u1 2 0 18";s1
+  750 get#2,t$:get#2,s$:t=asc(t$+o$):s=asc(s$)
+  760 for i=0 to 7:c$=""
+  770 print#1,"b-p 2";2+32*i
+  780 get#2,a$:if a$=""then 810
+  790 print#1,"b-p 2";5+32*i:for j=1 to l:get#2,a$:c$=c$+a$:next j
+  800 if c$=b$then x=i:i=7
+  810 next i
+  820 if t=0 and x<0 then p$="file nicht gefunden !!":goto 930
+  830 if x<0 then 730
+  840 p$="- ok -"
+  850 print#1,"u1 2 0 18";s1
+  860 print#1,"b-p 2";x*32+2
+  870 get#2,a$:a=asc(a$)
+  880 if f=1 then a=a or 64
+  890 if f=2 then a=a and 191
+  900 print#1,"b-p 2";x*32+2
+  910 print#2,chr$(a);
+  920 print#1,"u2 2 0 18";s1
+  930 sys p,0,18:print p$:gosub 35:goto 50000
+  999 rem**** dir. zurueckschreiben *****
+ 1000 print"{clr}       - directory schreiben -"
+ 1010 gosub 260
+ 1020 sys p,10,12:print"sind sie sicher ?"
+ 1030 cy=15:gosub 20000
+ 1040 on f goto 1050,50000
+ 1050 if q=0 then sys p,5,12:print"{rvon}keine files eingelesen !!!{rvof}":gosub 35:goto 50000
+ 1060 c=0:t=18:s=1:a=t:b=s+3:a$=left$(fr$,2)
+ 1070 open 1,8,15
+ 1080 open 2,8,2,"#"
+ 1090 print#1,"b-p 2 0"
+ 1100 if c*8+8>=q then a=0:b=255
+ 1110 print#2,chr$(a);chr$(b);
+ 1120 for i=1 to 7:j=c*8+i
+ 1130 print#2,n$(j);a$;
+ 1140 next i
+ 1150 print#2,n$(j+1);
+ 1160 print#1,"u2 2 0";t;s
+ 1170 c=c+1:a=t:s=s+3:b=s+3
+ 1180 if s=21 then 1220
+ 1190 if s>18 then s=s-17
+ 1200 if b>18 then b=b-17
+ 1210 if c*8<q then 1090
+ 1220 goto 50000
+ 1499 rem****** disknamen aendern ******
+ 1500 print"{clr}    - diskettennamen  aendern -"
+ 1510 gosub 200:sys p,6,5:print"{rvon}"dn$"{rvof}"
+ 1520 sys p,0,10:print"name: ................"
+ 1530 print"{down}  id: .."
+ 1540 sys p,12,22:print"f1 = menue"
+ 1550 cx=6:cy=10:l=16:bc=46:g=32:h=127:gosub 50:on a goto 1560,1650
+ 1560 if b$=""then dn$=left$(dn$,len(dn$)-5):goto 1580
+ 1570 dn$=b$:for i=1 to 18-len(dn$):dn$=dn$+chr$(160):next
+ 1580 cx=6:cy=12:l=2:gosub 50
+ 1590 on a goto 1600,1650
+ 1600 dn$=dn$+b$
+ 1610 print#1,"u1 2 0 18 0"
+ 1620 print#1,"b-p 2 144"
+ 1630 print#2,dn$;
+ 1640 print#1,"u2 2 0 18 0"
+ 1650 goto 50000
+ 1999 rem***** kommentar auf disk ******
+ 2000 print"{clr}     - kommentar auf diskette -"
+ 2010 c$(3)="lesen{rvof}"
+ 2020 c$(4)="schreiben{rvof}"
+ 2030 cx=15:cy=13
+ 2040 gosub 18000
+ 2050 sys p,7,10:print"{$60}{$60}{$60}{$60}{$60}{$60}{$60}{$60}{$60}{$60}{$60}{$60}{$60}{$60}{$60}{$60}{$60}{$60}{$60}{$60}{$60}{$60}"
+ 2060 sys p,7,20:print"{$60}{$60}{$60}{$60}{$60}{$60}{$60}{$60}{$60}{$60}{$60}{$60}{$60}{$60}{$60}{$60}{$60}{$60}{$60}{$60}{$60}{$60}"
+ 2070 gosub 260:open 1,8,15:open 2,8,2,"#":rem lesen
+ 2080 print#1,"u1 2 0 18 0"
+ 2090 print#1,"b-p 2 175"
+ 2100 for i=1 to 4:c$(i)=""
+ 2110 for j=1 to 20:get#2,a$:c$(i)=c$(i)+left$(a$+" ",1):next j,i
+ 2120 if f=2 then 2140
+ 2130 cy=12:for i=1 to 4:sys p,8,cy:print c$(i):cy=cy+2:next:goto 2270
+ 2140 sys p,0,12:rem schreiben
+ 2150 for i=1 to 4:print"       >"c$(i)"<{down}":next
+ 2160 cx=8:cy=12:j=1
+ 2170 l=20:bc=32:g=32:h=127:gosub 50
+ 2180 on a goto 2190,2280
+ 2190 if len(b$)then b$=b$+left$(sp$,20-len(b$)):c$(j)=b$
+ 2200 cx=8:cy=cy+2:j=j+1
+ 2210 if j<5 then 2170
+ 2230 print#1,"u1 2 0 18 0"
+ 2240 print#1,"b-p 2 175"
+ 2250 print#2,c$(1);c$(2);c$(3);c$(4);
+ 2260 print#1,"u2 2 0 18 0"
+ 2270 sys p,8,21:print"- ok -":gosub 35
+ 2280 for i=1 to 4:c$(i)="":next:goto 50000
+ 2499 rem**** disk command ***********
+ 2500 gosub 260:open 1,8,15
+ 2510 print"{clr}":sys p,12,23:print"f1 = menue"
+;1. Ausgabe
+;2520 print"{home}        - disk command senden-":c=0:y=0
+ 2520 print"{home}        - disk command senden-":c=0:y=0
+ 2530 print"{down} ";:y=y+1
+ 2540 cx=2:cy=peek(214):bc=32:g=32:h=127:l=76:gosub 50:on a goto 2560,2550
+ 2550 goto 50000
+ 2560 print#1,b$;
+ 2570 input#1,a,b$,b,c
+ 2580 print:print"{down}"a;b$;b;c
+ 2590 if y<5 then 2530
+ 2600 gosub 35:goto 2510
+ 2999 rem**** directory von disk *******
+ 3000 gosub 260:open 2,8,15,"i":open 1,8,0,"$"
+ 3010 c=-1:o$=chr$(0):s$=chr$(34)
+ 3020 print"{clr}":sys p,12,22:print"f1 = menue"
+ 3030 x=0:print"{home} nr.  - alte reihenfolge -{down}"
+ 3040 if c=-1 then get#1,a$,b$:x=-1
+ 3050 get#1,a$,b$
+ 3060 get#1,a$,b$:x=x+1:c=c+1
+ 3070 b=asc(a$+o$)+asc(b$+o$)*256
+ 3080 print c":"tab(5);str$(b);tab(10);
+ 3090 get#1,b$:if st then 3190
+ 3100 if b$<>s$then 3090
+ 3110 get#1,b$:if b$<>s$then print b$;:goto 3110
+ 3120 get#1,b$:if b$=" "then 3120
+ 3130 c$=""
+ 3140 c$=c$+b$:get#1,b$:if b$<>""then 3140
+ 3150 print tab(27);"  "left$(c$,5)
+ 3160 get a$:if a$="{f1}"then 3230:rem f1
+ 3170 if x=16 then 3200
+ 3180 if st=0 then 3050
+ 3190 print"{rvon} blocks free {rvof}":gosub 35:goto 3230
+ 3200 sys p,4,20:print"bitte taste druecken ..."
+;1. Ausgabe
+;3210 sys p,9,22:print"f1 = menue"
+ 3210 sys p,12,22:print"f1 = menue"
+ 3220 gosub 35:if a<>133 then 3030
+ 3230 goto 50000
+ 3999 rem******* schreibschutz *********
+ 4000 print"{clr}           - schreibschutz -{down}"
+ 4010 gosub 200:print"{down}        {rvon}"dn$"{rvof}"
+ 4020 print#1,"m-r";chr$(1);chr$(1);chr$(1)
+ 4030 get#1,a$:if a$="a"or a$=""then 4130
+ 4040 print"{down}{down}{down}{down}diskette geschuetzt !"
+ 4050 print"{down}{down}soll die diskette freigegeben werden ?"
+ 4060 cy=18:gosub 20000
+ 4070 if f=2 then 50000
+ 4080 print#1,"m-w";chr$(1);chr$(1);chr$(1);chr$(65)
+ 4090 print#1,"b-p 2 2":print#2,chr$(65)
+ 4100 print#1,"b-p 2 165":print#2,chr$(50);chr$(65);
+ 4110 print#1,"u2 2 0 18 0"
+ 4120 goto 4200
+ 4130 print"{down}{down}{down}{down}diskette nicht geschuetzt !"
+ 4140 print"{down}{down}soll die diskette geschuetzt werden ?"
+ 4150 cy=18:gosub 20000
+ 4160 if f=2 then 50000
+ 4170 print#1,"b-p 2 2":print#2,chr$(66)
+ 4180 print#1,"b-p 2 165":print#2,chr$(60);chr$(60);
+ 4190 print#1,"u2 2 0 18 0"
+ 4200 sys p,14,23:print"- ok -"
+ 4210 gosub 35 :goto 50000
+ 4499 rem**** directory bearbeiten *****
+ 4500 p$="{home}      - directory bearbeiten -{down}"
+ 4510 gosub 100:goto 4530:rem seite 1 neu
+ 4520 gosub 110:rem seite s neu
+ 4530 gosub 35
+ 4540 if a=133 then 50000
+ 4550 if a=17 then s=s+1+(s*16>q):goto 4520
+ 4560 if a=145 then s=s-1-(s=0):goto 4520
+ 4570 if a=134 then 5000:rem sortieren
+ 4580 if a=135 then 6000:rem einfuegen
+ 4590 if a=136 then 7000:rem loeschen
+ 4600 goto 4530
+ 4999 rem********** sortieren **********
+ 5000 gosub 21000
+ 5010 cx=34:cy=7:l=3:g=48:h=57:bc=46:gosub 50:on a goto 5020,4520
+ 5020 f=val(b$)
+ 5030 if f>q then f=q
+ 5040 if f<1 then f=1
+ 5050 cx=34:cy=9:gosub 50:on a goto 5060,4520
+ 5060 r=val(b$)
+ 5070 if r>q then r=q
+ 5080 if r<1 then r=1
+ 5090 gosub 5110:goto 4520
+ 5100 rem -------------------
+ 5110 a$=n$(f)
+ 5120 if f>r then 5160
+ 5130 for i=f to r-1:rem f<r
+ 5140 n$(i)=n$(i+1)
+ 5150 next i:n$(r)=a$:return
+ 5160 for i=f to r+1 step-1:rem f>r
+ 5170 n$(i)=n$(i-1)
+ 5180 next i:n$(r)=a$:return
+ 5999 rem********* einfuegen ***********
+ 6000 a$="einfuegen":gosub 21500
+ 6010 cx=33:cy=7:l=3:g=48:h=57:bc=46:gosub 50:on a goto 6020,4520
+ 6020 r=val(b$)
+ 6030 if r>144 then 6010
+ 6040 if r<1 then r=1
+ 6050 sys p,6,20:print"text der bemerkung ?"
+ 6060 sys p,7,21:print"----------------"
+ 6070 cx=7:cy=21:l=16:g=5:h=255:bc=45:gosub 50:on a goto 6080,4520
+ 6080 if b$=""then b$="----------------"
+ 6090 if len(b$)<16 then for i=1 to 16-len(b$):b$=b$+" ":next
+ 6100 b$=chr$(130)+left$(fr$,2)+b$+right$(fr$,11)
+ 6110 if r>q then 6150
+ 6120 if n$(r)=fr$then n$(r)=b$:goto 4520
+ 6130 if n$(q)=fr$then f=q:n$(f)=b$:gosub 5110:goto 4520
+ 6140 if q<145 then f=q+1:n$(f)=b$:gosub 5110:goto 6170
+ 6150 if q>136 then 6010
+ 6160 n$(r)=b$
+ 6170 a=q+1
+ 6180 q=q+8:if r>q then 6180
+ 6190 for i=a to q:if n$(i)=""then n$(i)=fr$
+ 6200 next i
+ 6210 goto 4520
+ 6999 rem********** loeschen ***********
+ 7000 a$="loeschen":gosub 21500
+ 7010 cx=33:cy=7:l=3:g=48:h=57:bc=46:gosub 50:on a goto 7020,4520
+ 7020 f=val(b$):r=q
+ 7030 if f>q or f<1 then 7000
+ 7040 gosub 5110
+ 7050 n$(q)=fr$
+ 7060 a=q-7:g=0
+ 7070 for i=a to q:if n$(i)<>fr$then g=1
+ 7080 next i
+ 7090 if g=0 then q=q-8:n$(q+1)="":goto 7060
+ 7100 goto 4520
+17999 rem**** entscheidung vert ******
+18000 print p$
+18010 f=1:sys p,12,24:print"f1 = menue";
+18020 sys p,cx,5:c$(f)="{rvon}"
+18030 print c$(1)c$(3)
+18040 sys p,cy,7
+18050 print c$(2)c$(4)
+18060 c$(1)="":c$(2)=""
+18070 gosub 35
+18080 if a=17 then f=2:goto 18020
+18090 if a=145 then f=1:goto 18020
+18100 if a=133 then c$(3)="":c$(4)="":goto 50000
+18110 if a<>13 then 18070
+18120 c$(3)="":c$(4)=""
+18130 return
+19999 rem**** entscheidung horiz ******
+20000 f=1
+20010 c$(f)="{rvon}"
+20020 sys p,10,cy:print c$(1) " ja {rvon}":sys p,20,cy:print c$(2)" nein {rvof}"
+20030 c$(1)="":c$(2)=""
+20040 gosub 35
+20050 if a=29 or a=78 then f=2:goto 20010
+20060 if a=157 or a=74 then f=1:goto 20010
+20070 if a=13 then return
+20080 if a=133 then c$(1)="":c$(2)="":goto 50000
+20090 goto 20040
+20999 rem****** maske sortieren *******
+21000 print"{home}{down}{down}{down}";tab(28);"bitte nr."
+21010 print tab(28);"eingeben"
+21020 print tab(28);"         "
+21030 print tab(28);"file"
+21040 print tab(28);"nr.:  ..."
+21050 print tab(28);"         "
+21060 print tab(28);"nach: ..."
+21070 print tab(28);"         "
+21080 print tab(28);"sortieren"
+21090 for i=1 to 8:print tab(28);"           ":next:return
+21499 rem**** maske einf/loesch *******
+21500 print"{home}{down}{down}{down}"tab(28);"bemerkung"
+21510 print tab(28);a$
+21520 print tab(28);"an       "
+21530 print tab(28);"position "
+21540 print tab(28);"nr.: ... "
+21560 for i=1 to 12:print tab(28);"           ":next:return
+21999 rem**** maske letzte zeile ******
+22000 print"{clr}"
+22010 sys p,0,22
+22020 print" {CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}"
+22030 print" {rvon}blaettern {rvof}"
+22040 print" {rvon}mit cursor{rvof}";
+22050 sys p,14,24:print"f1 = menue";
+22060 sys p,26,21:print" {CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}"
+22080 sys p,26,22:print" {rvon}f3=sortier{rvof}"
+22090 sys p,26,23:print" {rvon}f5=einfueg{rvof}"
+22100 sys p,26,24:print" {rvon}f7=loesch {rvof}";
+22110 print"{home}"p$:return
+29999 rem********** ende **************
+30000 print"{clr}"
+30010 sys p,4,12:print"wollen sie wirklich beenden ?"
+30020 cy=15:gosub 20000
+30030 on f goto 30040,50000
+30040 print"{clr}":end
+49999 rem******* hauptmenue ***********
+50000 close 2:close1
+50005 print"{clr}        {CBM-A}{$60}{$60}{$60}{CBM-S}    {$75}{$60}{$60}{$60}{$60}{$60}{$60}{$60}{$60}{$60}{$60}{$60}{$60}{$69}"
+50010 print "        {$62} o {$62}    {$62}  track 18  {$62}"
+50020 print "        {$62}.{$77} {$62}    {$6a}{$60}{$60}{$60}{$60}{$60}{$60}{$60}{$60}{$60}{$60}{$60}{$60}{$6b}"
+50030 print "        {$62}{CBM-I} ^{$62}"
+50040 print "        {CBM-Z}{$60}{$60}{$60}{CBM-X}"
+50050 sys p,13,6:c$(u)="{rvon}":print"- by matan -"
+50060 print"      {$60}{$60}{$60}{$60}{$60}{$60}{$60}{$60}{$60}{$60}{$60}{$60}{$60}{$60}{$60}{$60}{$60}{$60}{$60}{$60}{$60}{$60}{$60}{$60}{$60}{$60}{$60}":print
+50070 print"       "c$(1)"directory einlesen{rvof}"
+50080 print"       "c$(2)"directory bearbeiten{rvof}"
+50090 print"       "c$(3)"neues directory schreiben{rvof}"
+50100 print"       "c$(4)"directory von disk{rvof}"
+50110 print
+50120 print"       "c$(5)"disk command senden{rvof}"
+50130 print"       "c$(6)"diskettennamen aendern{rvof}"
+50140 print"       "c$(7)"disk-kommentar{rvof}"
+50150 print"       "c$(8)"files schuetzen/freigeben{rvof}"
+50160 print"       "c$(9)"schreibschutz{rvof}"
+50200 print
+50210 print"      {$60}{$60}{$60}{$60}{$60}{$60}{$60}{$60}{$60}{$60}{$60}{$60}{$60}{$60}{$60}{$60}{$60}{$60}{$60}{$60}{$60}{$60}{$60}{$60}{$60}{$60}{$60}"
+50220 print"       "c$(10)" * ende * {rvof}"
+50230 sys p,11,3:poke 207,0:poke 204,0
+50240 gosub 35:poke 204,1:c$(u)=""
+50250 if a=17 then u=1-(u<10)*u
+50260 if a=145 then u=u-1-10*(u=1)
+50270 if a<>13 then 50050
+50280 on u goto 300,4500,1000,3000,2500,1500,2000,600,4000,30000
+50290 goto 50230
+
