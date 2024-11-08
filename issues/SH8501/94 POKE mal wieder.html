@@ -253,19 +253,35 @@
 
         <address class="author">(A. Kaminski)</address>
 
-        <h3>»PRINT AT« einfach gemacht</h3>
+        <span class="old_edition">
+            <h3>»PRINT AT« einfach gemacht</h3>
 
-        <p>Sehr oft kommt es vor, daß man eine PRINT-Ausgabe an eine bestimmte Bildschirmstelle schreiben will. Üblicherweise arbeitet man in solch einem Falle mit Cursor-Steuerzeichen, was aber einerseits recht langsam ist und andererseits auch die Übersichtlichkeit eines Programms nicht gerade erhöht. Eine Cursorsteuerung über SYS-Kommando unter Ausnutzung der entsprechenden Betriebssystem-Routine ist da schon komfortabler. Aber es geht auch viel einfacher.</p>
+            <p>Sehr oft kommt es vor, daß man eine PRINT-Ausgabe an eine bestimmte Bildschirmstelle schreiben will. Üblicherweise arbeitet man in solch einem Falle mit Cursor-Steuerzeichen, was aber einerseits recht langsam ist und andererseits auch die Übersichtlichkeit eines Programms nicht gerade erhöht. Eine Cursorsteuerung über SYS-Kommando unter Ausnutzung der entsprechenden Betriebssystem-Routine ist da schon komfortabler. Aber es geht auch viel einfacher.</p>
 
-        <p>Will man beispielsweise einen Text in die 14. Zeile, 5. Spalte schreiben, so geht das auch folgendermaßen:<br>
-            POKE 214, 13 : PRINT : PRINT TAB(5);"Text"<br>
-            Adresse 214 enthält nämlich die Zeilenposition des Cursors. Um diese allerdings richtig einsetzen zu können, muß noch ein leerer PRINT-Befehl nachgeschickt werden. Der in Adresse 214 zu POKEnde Zahlenwert ist daher nicht die gewünschte Cursorzeile, sondern der um eins verminderte Wert.</p>
+            <p>Will man beispielsweise einen Text in die 14. Zeile, 5. Spalte schreiben, so geht das auch folgendermaßen:<br>
+                POKE 214, 13 : PRINT : PRINT TAB(5);"Text"<br>
+                Adresse 214 enthält nämlich die Zeilenposition des Cursors. Um diese allerdings richtig einsetzen zu können, muß noch ein leerer PRINT-Befehl nachgeschickt werden. Der in Adresse 214 zu POKEnde Zahlenwert ist daher nicht die gewünschte Cursorzeile, sondern der um eins verminderte Wert.</p>
 
-        <address class="author">(Volker Bühn)</address>
+            <address class="author">(Volker Bühn)</address>
+        </span>
+
+        <span class="new_edition">
+            <h3>Antimerge für C 64</h3>
+
+            <p>Alle reden von Merge, aber niemand davon, daß man vielleicht auch mal ein Programm aufspalten will, zum Beispiel, um ein Unterprogramm aus einem größeren Programm herauszulösen.</p>
+
+            <p>Alle unnötigen Zeilen einzeln zu löschen ist meist zu aufwendig. Besser ist es, man ändert nur bei den Zeilen, die man noch braucht, die Zeilennummer, so daß diese Zeilen am Programmende zu stehen kommen. Zum Beispiel kann man aus 4321 die Zeilennummer 54321 machen. Die Sprungadressen ändert man natürlich mit.</p>
+
+            <p>Jetzt setzt man vor den Teil, den man behalten möchte, eine STOP-Zeile und macht dann ein »RUN« direkt auf diese Zeilennummer. Natürlich hält das Programm infolge des Stoppbefehls gleich wieder an, aber die Speicherzellen 61/62 enthalten jetzt die Adresse der Zeile. Mit »POKE 43,PEEK(61) +1 : POKE 44,PEEK(62) kann daher jetzt der untere (nicht benötigte) Teil des Programms abgeschnitten werden. Der Rest wird ganz normal mit »SAVE« gespeichert.</p>
+
+            <p>Natürlich geht das auch andersherum, indem die Zeilen, die man behalten möchte, an den Anfang des Programms gebracht werden und anschließend die Adressen 45 und 46 nach der durch PEEK(61) und PEEK(62) bestimmten Adresse verändert werden.</p>
+
+            <address class="author">(Rudolf Schmid-Fabian)</address>
+        </span>
 
         <h3>Sequentielle Datei als Basic-Programm laden</h3>
 
-        <p>Es sind eine Reihe von Anwendungen denkbar, bei denen aus einer sequentiellen Datei auf Diskette oder Kassette ein lauffähiges Basic-Programm erstellt werden soll (Datenfernübertragung, Umwandlung von Textfiles in Basic-Programme). Der folgende Einzeiler macht»s möglich:<br>
+        <p>Es sind eine Reihe von Anwendungen denkbar, bei denen aus einer sequentiellen Datei auf Diskette oder Kassette ein lauffähiges Basic-Programm erstellt werden soll (Datenfernübertragung, Umwandlung von Textfiles in Basic-Programme). Der folgende Einzeiler macht's<span class="new_edition"> beim VC 20</span> möglich:<br>
             OPEN 1, $Gerät(, $Sekundäradresse(, "$Name)" : POKE 812, 238 : POKE 781, 1 : SYS 65478</p>
 
         <p>Dieses Miniprogramm öffnet das File Nummer 1 als Eingabefile (anstelle der Tastatur). Außerdem wird der CLALL-Vektor des Betriebssystems auf ein »RTS« gesetzt, so daß beim Einlesen von Programmzeilen keine Files geschlossen werden.</p>
@@ -353,18 +369,30 @@
 
         <address class="author">(Andreas Klofanda)</address>
 
-        <h3>Basic-Programme retten</h3>
+        <span class="old_edition">
+            <h3>Basic-Programme retten</h3>
 
-        <p>Ein durch NEW oder durch einen Reset gelöschtes Basic-Programm kann durch Eingabe folgender Zeilen im Direktmodus wieder zurückgeholt werden:<br>
-            POKE 46, PEEK(56) -1 : POKE 45, PEEK(55) + 247 : CLR (Return)<br>
-            POKE PEEK(44) * 256 + PEEK(43) + 1, PEEK(44) (Return)<br>
-            63999 (Return)<br>
-            FOR I = PEEK(44) * 2 56 + PEEK(43) TO PEEK(46) * 2 56 + PEEK(45) : IF PEEK(I) OR PEEK(I + 1) OR PEEK(I + 2) THEN NEXT (Return)<br>
-            POKE 45, (I + 3) AND 255 : POKE 46, (I + 3) / 256 : CLR (Return)</p>
+            <p>Ein durch NEW oder durch einen Reset gelöschtes Basic-Programm kann durch Eingabe folgender Zeilen im Direktmodus wieder zurückgeholt werden:<br>
+                POKE 46, PEEK(56) -1 : POKE 45, PEEK(55) + 247 : CLR (Return)<br>
+                POKE PEEK(44) * 256 + PEEK(43) + 1, PEEK(44) (Return)<br>
+                63999 (Return)<br>
+                FOR I = PEEK(44) * 2 56 + PEEK(43) TO PEEK(46) * 2 56 + PEEK(45) : IF PEEK(I) OR PEEK(I + 1) OR PEEK(I + 2) THEN NEXT (Return)<br>
+                POKE 45, (I + 3) AND 255 : POKE 46, (I + 3) / 256 : CLR (Return)</p>
 
-        <p>Diese »Rettungsmaßnahme« funktioniert sowohl beim VC 20 wie auch beim C 64.</p>
+            <p>Diese »Rettungsmaßnahme« funktioniert sowohl beim VC 20 wie auch beim C 64.</p>
 
-        <address class="author">(Ralf Berle)</address>
+            <address class="author">(Ralf Berle)</address>
+        </span>
+
+        <span class="new_edition">
+            <h3>Programm retten bei »LOAD ERROR«</h3>
+
+            <p>Beim VC 2 0 ist es nach einem »LOAD ERROR« von der Datasette in vielen Fällen doch noch möglich, das Programm zu retten. Voraussetzung ist allerdings, daß es sich noch einwandfrei LISTen läßt. Ist das der Fall, dann kann man mit<br>
+                POKE 45,PEEK(831) : POKE 47,PEEK(831) : POKE 49, PEEK(831) :POKE (46),PEEK(832) : POKE 48,PEEK(832) : POKE 50,PEEK(832)<br>
+                das Programm mit ziemlicher Gewißheit wieder lauffähig machen.</p>
+
+            <address class="author">(T. Schmidiger)</address>
+        </span>
 
         <h3>Cursor steuern</h3>
 
@@ -419,28 +447,51 @@
 
         <p>Bei Ihrem Software-Test des Textomat von Data-Becker (Ausgabe 9/84) wurde als gravierender Nachteil angeführt, daß bei einmal gestartetem Ausdruck keine Unterbrechung mehr möglich ist. Ich arbeite in Zusammenhang mit Textomat mit einem Epson-Drucker RX 80 F/T. Um den begonnenen Ausdruck zu unterbrechen, kann man einfach den ON-LINE-Schalter betätigen und den Drucker anschließend ausschalten. Sekunden später meldet sich der Textomat am Bildschirm mit dem zu druckenden Text zurück.</p>
 
-        <h3>Basic-Programme verbinden</h3>
+        <span class="old_edition">
+            <h3>Basic-Programme verbinden</h3>
 
-        <p>So manch C 64-Besitzer wird es schon geärgert haben, daß sein Computer keinen MERGE-Befehl besitzt. Mit wenig Aufwand ist es aber dennoch möglich, Basic-Programme aneinanderzuhängen:</p>
+            <p>So manch C 64-Besitzer wird es schon geärgert haben, daß sein Computer keinen MERGE-Befehl besitzt. Mit wenig Aufwand ist es aber dennoch möglich, Basic-Programme aneinanderzuhängen:</p>
 
-        <ol>
-            <li>Im Direktmodus »PRINT PEEK(43); PEEK(44)« eingeben und sich die Ergebnisse merken.</li>
-            <li>Das erste Programm normal laden.</li>
-            <li>Erscheint jetzt nach »PRINT PEEK(45)« eine Null oder eine Eins, dann geben Sie »POKE 43, 2 56 4- PEEK(45) - 2 : POKE 44, PEEK(46) - 1 : NEW« ein. Im anderen Fall wird »POKE 43, PEEK(45) - 2 : POKE 44, PEEK(46) : NEW« eingegeben.</li>
-            <li>Nun wir das anzuhängende Programm geladen (Achtung! Das anzuhängende Programm muß die höheren Zeilennummern haben).</li>
-            <li>Jetzt POKEn Sie in die Speicherstellen 43 und 44 die zu Anfang gemerkten Werte.</li>
-        </ol>
+            <ol>
+                <li>Im Direktmodus »PRINT PEEK(43); PEEK(44)« eingeben und sich die Ergebnisse merken.</li>
+                <li>Das erste Programm normal laden.</li>
+                <li>Erscheint jetzt nach »PRINT PEEK(45)« eine Null oder eine Eins, dann geben Sie »POKE 43, 2 56 4- PEEK(45) - 2 : POKE 44, PEEK(46) - 1 : NEW« ein. Im anderen Fall wird »POKE 43, PEEK(45) - 2 : POKE 44, PEEK(46) : NEW« eingegeben.</li>
+                <li>Nun wir das anzuhängende Programm geladen (Achtung! Das anzuhängende Programm muß die höheren Zeilennummern haben).</li>
+                <li>Jetzt POKEn Sie in die Speicherstellen 43 und 44 die zu Anfang gemerkten Werte.</li>
+            </ol>
 
 
-        <p>Beide Programme sind nun verbunden und können ganz normal gehandhabt werden. Wichtig bei der ganzen Prozedur ist, daß keine Variablen definiert werden, da das MERGEn sonst nicht richtig funktioniert.</p>
+            <p>Beide Programme sind nun verbunden und können ganz normal gehandhabt werden. Wichtig bei der ganzen Prozedur ist, daß keine Variablen definiert werden, da das MERGEn sonst nicht richtig funktioniert.</p>
 
-        <address class="author">(Thomas Lopatic)</address>
+            <address class="author">(Thomas Lopatic)</address>
+        </span>
 
-        <h3>POKEs für den C 64</h3>
+        <span class="old_edition">
+            <h3>POKEs für den C 64</h3>
 
-        <p>Mit POKE 775, 1 ist ein (fast) perfekter Listschutz aktiviert. Auch ein SAVE-8chutz ist mit wenig Aufwand möglich: POKE 801,0 : POKE 802,0 : POKE 818,165. Nach diesen drei POKE-Befehlen kann das Programm weder auf Kassette noch auf Diskette kopiert werden. Schließlich gibt es noch eine Möglichkeit, die RUN/STOP-Taste abzuschalten, und zwar mit POKE 808,225. Wiedereinschalten ist mit POKE 808,237 möglich.</p>
+            <p>Mit POKE 775, 1 ist ein (fast) perfekter Listschutz aktiviert. Auch ein SAVE-8chutz ist mit wenig Aufwand möglich: POKE 801,0 : POKE 802,0 : POKE 818,165. Nach diesen drei POKE-Befehlen kann das Programm weder auf Kassette noch auf Diskette kopiert werden. Schließlich gibt es noch eine Möglichkeit, die RUN/STOP-Taste abzuschalten, und zwar mit POKE 808,225. Wiedereinschalten ist mit POKE 808,237 möglich.</p>
 
-        <address class="author">(Thomas Lopatic)</address>
+            <address class="author">(Thomas Lopatic)</address>
+        </span>
+
+        <span class="new_edition">
+            <h3>DOS 5.1 und Reset</h3>
+
+            <p>Fast alle Maschinenprogramme bleiben auch nach einem Reset erhalten und brauchen nur mit SYS &lt; Startadresse &gt; wieder aufgerufen zu werden. Nur bei dem viel benutzten DOS 5.1 geht es nicht. Warum ? Ganz einfach, weil dieses Programm die Zero-Page-Adresse $BA benutzt, in welcher die Gerätenummer steht, also normalerweise die »8« bei Verwendung einer einzelnen Floppy. Diese Speicherzelle wird nun bei einem Reset auf Null gesetzt, und nichts geht mehr. Erst nach dem Laden von der Floppy wird diese Adresse wieder mit »8« belegt.</p>
+
+            <p>Das gleiche muß man tun, wenn man nach einem Reset wieder mit dem DOS 5.1 arbeiten will, ohne es erneut zu laden: Nach »POKE 186,8 : SYS 52224« steht das DOS wieder zur Verfügung.</p>
+
+            <p>Eine dauerhafte Lösung erhält man durch Ergänzung des DOS mit zwei vorangestellten Befehlen, die das gleiche bewirken:<br>
+                LDA #8<br>
+                STA $BA<br>
+                oder in Form von POKEs:<br>
+                РОКЕ 52220,169 : РОКЕ 52221,8 : POKE 52222,133 : POKE 52223,186</p>
+
+            <p>Das so erweiterte DOS wird dann mit einem Monitorprogramm von $CBFC bis $CF58 abgespeichert.</p>
+
+            <p>Dieses »DOS 5.2« wird dann mit »SYS 52220« aufgerufen und benutzt zwangsweise die Gerätenummer 8. Natürlich kann das normale DOS 5.1 immer noch mit »SYS 52224« gestartet werden, ist allerdings natürlich nicht »Reset-fest«.</p>
+            <address class="author">(Helmut Weiser)</address>
+        </span>
 
         <h3>GOTO X für VC 20</h3>
 
@@ -461,16 +512,33 @@
 
         <address class="author">(Thomas Maul)</address>
 
-        <h3>POKEs für den 64’er</h3>
+        <span class="new_edition">
+            <h3>Bits hörbar gemacht</h3>
 
-        <p>POKE 775,200 Listschutz ein<br>
-            POKE 775,167 Listschutz aus<br>
-            POKE 788,49 Run Stop ein<br>
-            POKE 788,52 Run Stop aus<br>
-            POKE 808,237 Run Stop Restore ein<br>
-            POKE 808,225 Run Stop Restore aus<br>
-            POKE 650,128 Dauerfunktion für alle Tasten<br>
-            POKE 650,0 Dauerfunktion nur für Space und Cursortasten POKE 650,64 Dauerfunktion aus für alle Tasten</p>
+            <p>Die von der Datasette kommenden Signale können zur Kontrolle hörbar gemacht werden, indem ganz einfach der Lautstärkeregler des Sound-Chips auf maximale Lautstärke gesetzt wird, also durch »POKE 54296,15« beim C.64. Gleichzeitiges Betätigen der Tasten RUN/STOP und RESTORE versetzt den Computer wieder in den Normalzustand.</p>
+
+            <address class="author">(Holger Kierey)</address>
+        </span>
+
+        <span class="old_edition">
+            <h3>POKEs für den 64’er</h3>
+
+            <p>POKE 775,200 Listschutz ein<br>
+                POKE 775,167 Listschutz aus<br>
+                POKE 788,49 Run Stop ein<br>
+                POKE 788,52 Run Stop aus<br>
+                POKE 808,237 Run Stop Restore ein<br>
+                POKE 808,225 Run Stop Restore aus<br>
+                POKE 650,128 Dauerfunktion für alle Tasten<br>
+                POKE 650,0 Dauerfunktion nur für Space und Cursortasten POKE 650,64 Dauerfunktion aus für alle Tasten</p>
+        </span>
+        <span class="new_edition">
+            <h3>POKEs für den C 64</h3>
+
+            <p>Mit POKE 775, 1 ist ein (fast) perfekter Listschutz aktiviert. Auch ein SAVE-Schutz ist mit wenig Aufwand möglich: POKE 801,0 : POKE 802,0 : POKE 818,165. Nach diesen drei POKE-Befehlen kann das Programm weder auf Kassette noch auf Diskette kopiert werden. Schließlich gibt es noch eine Möglichkeit, die RUN/STOP-Taste abzuschalten, und zwar mit POKE 808,225. Wiedereinschalten ist mit POKE 808,237 möglich.</p>
+
+            <address class="author">(Thomas Lopatic)</address>
+        </span>
 
         <h3>INPUT ohne Fragezeichen</h3>
 
