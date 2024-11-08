@@ -1,0 +1,185 @@
+;rom change.prg ==0801==
+;Eingetippt von Endurion
+  100 rem speicherplatz fuer rom vor basic schuetzen
+  110 poke 55,0:poke 56,96:clr
+  120 poke 53272,23:poke 53280,2
+  130 gosub 1130
+  140 if peek(53247)<>33 then 160
+  150 if peek(53246)=0 then gosub 3600:goto 500
+  155 gosub 3700:goto 500
+  160 print"{down}{down}":print" Druecken sie":print
+  170 print:print tab(7);"1  um Kernal ($E000-$FFFF)"
+  180 print:print tab(7);"2  um Basic ($A000-$BFFF)"
+  190 print:print:print tab(11);"in RAM ab $6000 zu kopieren."
+  200 get a$:if a$=""then 200
+  210 if a$="1"then poke 32767,255:gosub 3600:goto 240
+  220 if a$<>"2"then 200
+  230 gosub 3700
+  240 gosub 1600
+  300 poke k+8,int(an/256)
+  310 poke k+29,int(en/256)
+  340 sys k :rem schieberoutine
+  500 poke 53280,5:gosub 1130:print:poke 53247,0
+  505 print:print:print"      Erweiterung des ROMs durch":print
+  506 print tab(8);"1: Data Zeilen einlesen"
+  510 print tab(8);"2: Programm von Disk"
+  520 print tab(8);"3: Hexmonitor"
+  530 print tab(8);"4: Eigenen Monitor"
+  540 print tab(8);"5: Abspeichern des neuen ROMs"
+  545 print tab(8);"6: Laden von geaendertem ROM"
+  546 print tab(8);"7: Starten des neuen ROMs"
+  547 print tab(8);"8: Programm beenden"
+  550 print:print:print tab(10);"Bitte waehlen sie!"
+  560 get a$:if a$=""then 560
+  570 i=val(a$):if i<1 or i>8 then 560
+  580 on i goto 1000,2000,3000,4000,5000,6000,2500,3500
+  999 rem data zeilen einlesen
+ 1000 print"{clr}":print:print tab(10);"Lesen der Data-Zeilen":print:print
+ 1010 gosub 1600
+ 1020 read a:if a=0 then 500
+ 1030 read b:rem anzahl der bytes
+ 1032 read p1:rem pruefsumme
+ 1033 p2=0
+ 1035 d=a:gosub 1300:print"$";a$;"-";:d=a+b-1:gosub 1300:print"$";a$;
+ 1040 for i=a-of to a-of-1+b
+ 1050 read d:poke i,d
+ 1051 p2=p2+d:if p2>65535 then p2=p2-65536
+ 1053 next i
+ 1055 if p2<>p1 then 1070
+ 1057 print"   ok"
+ 1060 goto 1020
+ 1070 print"pruefsumme falsch: ";p2
+ 1080 get a$:if a$=""then 1080
+ 1090 goto 1020
+ 1100 stop
+ 1130 print"{clr}":print tab(8);"Programm zum Aendern des":print
+ 1140 print tab(12)"Betriebssystems":print:print
+ 1150 print" geschrieben von Ernst Schoeberl (1984)"
+ 1160 return
+ 1199 rem hex in dez umwandlung
+ 1200 d=0:for j1=0 to len(a$)-1
+ 1210 b=asc(right$(a$,1)):a$=left$(a$,len(a$)-1)
+ 1220 b=b-48:if b>9 then b=b-7
+ 1230 if b<0 or b>16 then 1280
+ 1240 d=d+b+16^j1
+ 1250 next j1
+ 1260 return
+ 1280 d=-1:return
+ 1299 rem dez in hex
+ 1300 j2=int(log(d)/log(16)):a$=""
+ 1310 for j1=j2 to 0 step-1
+ 1320 k1=int(d/16^j1):d=d-k1*16^j1
+ 1330 if k1>9 then k1=k1+7
+ 1340 k1=k1+48:a$=a$+chr$(k1)
+ 1350 next j1
+ 1360 return
+ 1600 restore:k=828:for i=k to k+32:read a:poke i,a:next i
+ 1610 data 120,160,0,132,251,132,253,169,224,133,252,169,96,133,254,177,251,145
+ 1620 data 253,200,208,249,230,252,230,254,165,252,201,0,208,239,96
+ 1630 return
+ 1999 rem programm von disk in rom einfuegen
+ 2000 gosub 1130:print
+ 2010 print tab(2);"Einfuegen eines Programms von Disk"
+ 2020 print:print:print:input"Filename:";a$
+ 2030 open 1,8,0,a$
+ 2033 gosub 6100:i=asc(a$):gosub 6100:i=i+256*asc(a$):if st>0 then 6200
+ 2035 print:print"found ";a$
+ 2036 if i<an then 2110
+ 2040 get#1,a$:a$=a$+chr$(0)
+ 2050 if st>0 then 2100
+ 2060 poke i-of,asc(a$):i=i+1:goto 2040
+ 2100 close 1:goto 500
+ 2109 rem programm nicht in rombereich
+ 2110 print"ROM von $";:d=an:gosub 1300:print a$;"-";:d=an+8191:gosub 1300:print a$
+ 2120 print"Startadresse des Programms bei $";:d=i:gosub 1300:print a$
+ 2130 input"Neue Startadresse (muss im ROM-Bereich liegen:";a$
+ 2140 gosub 1200:if d=-1 or d<an then 2100
+ 2150 i=d:goto 2040
+ 2499 rem rom starten
+ 2500 gosub 1600
+ 2510 poke k+8,160:poke k+29,0
+ 2515 poke k+12,160
+ 2520 sys k
+ 2525 k=828
+ 2530 poke k+8,96
+ 2540 poke k+9,128
+ 2550 poke k+12,int(an/256)
+ 2560 sys k
+ 2565 print"{clr}":print">Neues Rom aktiviert":print
+ 2570 poke 1,53:input"Reset (j/n)";a$:if a$="j"then sys 64738
+ 2580 goto 500
+ 2999 rem monitor fuer einzelne speicherstellen
+ 3000 print"{clr}":print"*** Monitor {SHIFT-*}{SHIFT-*}{SHIFT-*}":print:print
+ 3010 input"Startadresse:";a$:gosub 1200
+ 3020 i=d-of:if i=-1 then 3010
+ 3030 d=i+of:gosub 1300:print a$;" ";:d=peek(i):gosub 1300:print a$;"    ";
+ 3040 input":";a$
+ 3050 if a$=chr$(13)then 3070
+ 3060 gosub 1200:if d=-1 or d>255 then 3090
+ 3065 poke i,d
+ 3070 i=i+1:goto 3030
+ 3090 print"Ende (j/n)"
+ 3095 get a$:if a$="n"then 3010
+ 3096 if a$<>"j"then 3095
+ 3100 goto 500
+ 3500 poke 53247,0:end
+ 3599 rem werte fuer kernal ram
+ 3600 an=14*4096:en=0:of=8*4096:poke 53246,0:return
+ 3699 rem werte fuer basic rom
+ 3700 an=10*4096:en=12*4096:of=4*4096:poke 53246,1:return
+ 3999 rem eigener monitor
+ 4000 print"{clr}":print:print"       Eigener Monitor"
+ 4010 print:print:input"startadresse (hex):";a$
+ 4020 if len(a$)>4 then 4000
+ 4030 gosub 1200:if d=-1 then 4000
+ 4040 sys d
+ 4050 goto 500
+ 4999 rem abspeichern des roms
+ 5000 gosub 1130:print
+ 5010 print tab(7);"Abspeichern des neuen ROMs"
+ 5020 print:print:print:input"Filename:";a$
+ 5030 open 1,8,1,a$
+ 5035 print:print"saving ";a$
+ 5040 print#1,chr$(0);chr$(96);
+ 5050 for i=6*4096 to 32767
+ 5060 print#1,chr$(peek(i));:next i
+ 5070 print#1,chr$(an-int(an/256)*256);
+ 5080 print#1,chr$(an/256)
+ 5090 close 1:goto 500
+ 5999 rem geaendertes rom laden
+ 6000 gosub 1330:print
+ 6010 print tab(10);"Laden eines neuen ROMs"
+ 6020 print:print:print:input"Filename:";a$
+ 6030 open 1,8,0,a$
+ 6040 gosub 6100:gosub 6100
+ 6042 if st>0 then 6200
+ 6043 print:print"loading ";a$
+ 6050 for i=6*4096 to 32767
+ 6060 get#1,a$:a$=a$+chr$(0)
+ 6070 poke i,asc(a$):next i
+ 6080 gosub 6100:an=asc(a$):gosub 6100:an=an+256*asc(a$)
+ 6090 of=an-6*4096:en=an+8192:close 1
+ 6095 if en>65535 then en=0
+ 6096 if an<14*4096 then poke 53246,1:goto 500
+ 6097 poke 53246,0:goto 500
+ 6100 get#1,a$:a$=a$+chr$(0):return
+ 6200 close 1:print
+ 6210 open 1,8,15
+ 6220 if st=64 then 6250
+ 6230 get#1,a$:print a$;:goto 6220
+ 6250 close 1
+ 6260 get a$:if a$=""then 6260
+ 6270 goto 500
+ 7990 rem ab hier datas
+ 8000 data 64226,126,14014
+ 8001 data 232,134,198,201,133,144,4,201,141,144,3,76,66,235,157,119,2,72,152
+ 8002 data 72,160,0,196,2,208,13,185,41,251,221,119,2,240,11,200,192,176,208
+ 8003 data 243,104,168,104,76,66,235,200,185,41,251,201,133,144,4,201,141,144
+ 8004 data 238,236,137,2,176,233,157,119,2,232,134,198,76,15,251,133,76,207
+ 8005 data 34,36,34,44,56,13,137,76,79,65,68,134,76,73,83,84,13,138,83,65,86
+ 8006 data 69,135,82,85,78,13,139,83,89,83,136,63,70,82,69,40,48,41,13,140,83
+ 8007 data 89,83,54,52,55,51,56,13,133,136
+ 8010 data 60223,3,552
+ 8011 data 76,226,250
+10000 data 0
+
