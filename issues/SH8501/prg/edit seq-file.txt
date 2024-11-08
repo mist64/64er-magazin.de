@@ -1,0 +1,236 @@
+;edit seq-file.prg ==0801==
+;Eingetippt von Endurion
+  100 rem ******************************
+  110 rem *       edit seq-file        *
+  120 rem *                            *
+  130 rem * editieren von sequentiellen*
+  140 rem *         dateien            *
+  150 rem ******************************
+  160 :
+  170 :
+  180 dim te$(900):rem max anzahl datensatz
+  190 open 15,8,15
+  200 print"{clr}"
+  210 print"{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}"
+  220 print"{down}      lesen und editieren"
+  230 print"{down}        einer seq. datei"
+  240 print"{down}{down}      l = lesen einer datei"
+  250 print"{down}      b = programmende "
+  260 print"{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}"
+  270 print"{down}{rvon} waehle:{rvof}"
+  280 get r$:if r$="" then 280
+  290 if r$="b" then close 2:close 15:end
+  300 if r$<>"l" then 280
+  310 :
+  320 rem ---- lesen einer seq-file -----
+  330 :
+  340 :
+  350 i=1
+  360 print"{down}{down} welche datei soll gelesen werden?"
+  370 input"dateiname = ";n$
+  380 fi$=n$+",s,r"
+  390 print"{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}"
+  400 print"{down}{down}  soll mit get oder mit input"
+  410 print"{down}  gelesen werden (g/i) ?"
+  420 get rr$:if rr$=""then 420
+  430 if rr$="g" then 480
+  440 if rr$="i" then 670
+  450 goto 420
+  460 :
+  470 rem ---------- get# ---------------
+  480 open 2,8,2,fi$
+  490 input#15, a1,a2$,a3,a4
+  500 if a1<>0 then gosub 2320:goto 350
+  510 print"{clr}"
+  520 print:print"        leertaste druecken !":print
+  530 print"        --------------------":print
+  540 print"{rvon}"i"{rvof}";
+  550 get r$:if r$<>" "then 550
+  560 get#2,a$
+  570 if a$=chr$(13)then print"*":i=i+1:goto 610
+  580 te$(i)=te$(i)+a$
+  590 print  a$;
+  600 goto 500
+  610 if st<>64 then 540
+  620 close 2
+  630 i=i-1
+  640 goto 800
+  650 :
+  660 :
+  670 rem -------input# ----------------
+  680 open 2,8,2,fi$
+  690 input#15, a1,a2$,a3,a4
+  700 if a1<>0 then gosub 2320:goto 350
+  710 print:print"        leertaste druecken !":print
+  720 get r$:if r$<>" "then 720
+  730 input#2,a$
+  740 te$(i)=a$
+  750 print"{rvon}"i"{rvof}";a$
+  760 if st<>64 then i=i+1:goto 720
+  770 close 2
+  780 :
+  790 :
+  800 rem ------ editieren -------------
+  810 :
+  820 flag=0
+  830 print"{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}"
+  840 print"{down}{down}  e = einfuegen einer zeile"
+  850 print"{down}  c = aendern einer zeile"
+  860 print"{down}  l = loeschen einer zeile"
+  870 print"{down}  d = druecken der datei    "
+  880 print"{down}  2 = weiter "
+  890 print"{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}"
+  900 print"{down}waehle"
+  910 get r$:if r$=""then 910
+  920 if r$="e"then gosub 1470
+  930 if r$="c"then gosub 1030
+  940 if r$="l"then gosub 1620
+  950 if r$="d"then gosub 1730
+  960 if r$="2"then 1960
+  970 goto 800
+  980 :
+  990 :
+ 1000 rem ------- aendern einer zeile --
+ 1010 print"{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}"
+ 1020 :
+ 1030 print"{clr}aendern einer zeile"
+ 1040 print"{down} i= mit input (kein komma !)"
+ 1050 print"{down} g= mit get (schreibfehler vermeiden!)"
+ 1060 print"{down} 2= weiter"
+ 1070 print"{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}"
+ 1080 print"{down}{down}waehle"
+ 1090 get r$:if r$=""then 1090
+ 1100 if r$="2"then return
+ 1110 if r$="g"then 1300
+ 1120 if r$="i"then 1140
+ 1130 goto 1030
+ 1140 rem --------input ---------------
+ 1150 if flag=1 then 1220
+ 1160 print"{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}"
+ 1170 print"welche zeile soll geaendert werden?"
+ 1180 input"nr:";n$:n=val(n$)
+ 1190 if n<1 or n>i then print:print tab(8)"nicht moeglich! ":print:print:goto 1160
+ 1200 print"alter inhalt: {rvon}"te$(n)
+ 1210 print
+ 1220 print"{down} geben sie jetzt den neuen inhalt ein (input) "
+ 1230 input a$
+ 1240 te$(n)=a$
+ 1250 print"{down}{rvon}"te$(n)
+ 1260 flag=0
+ 1270 return
+ 1280 rem ----mit get ----------------
+ 1290 print"{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}"
+ 1300 if flag=1 then 1330
+ 1310 print"welche zeile soll geaendert werden?"
+ 1320 input"nr:";n$:n=val(n$)
+ 1330 print"alter inhalt ";te$(n):te$(n)=""
+ 1340 print"{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}"
+ 1350 print"{down} geben sie jetzt den neuen inhalt ein (get):  ":print
+ 1360 geta$:if a$="" then 1360
+ 1370 if a$=chr$(13) then 1420
+ 1380 print a$;
+ 1390 te$(n)=te$(n)+a$
+ 1400 goto 1360
+ 1410 :
+ 1420 :
+ 1430 print"{down}{rvon}"te$(n)
+ 1440 flag=0
+ 1450 return
+ 1460 :
+ 1470 rem ------einfuegen einer zeile--
+ 1480 :
+ 1490 print"{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}"
+ 1500 print" hinter welcher zeile"
+ 1510 input n
+ 1520 n=n+1
+ 1530 for l=i to n step-1
+ 1540 :te$(l+1)=te$(l)
+ 1550 next l
+ 1560 i=i+1
+ 1570 flag=1
+ 1580 print"schreiben der neuen zeile "
+ 1590 goto 1040
+ 1600 :
+ 1610 :
+ 1620 rem-------loeschen---------------
+ 1630 :
+ 1640 print:print
+ 1650 print"{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}"
+ 1660 input" welche zeile loeschen?";n
+ 1670 if n>i then print"max= "i:goto 1710
+ 1680 for l=n to i:te$(l)=te$(l+1):next
+ 1690 i=i-1
+ 1700 print"zeile"n" ist geloescht"
+ 1710 return
+ 1720 :
+ 1730 rem ------ drucken der datei -----
+ 1740 print
+ 1750 print"{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}"
+ 1760 print"drucken der datei "
+ 1770 print"{down} 1= drucken"
+ 1780 print"{down} 2= weiter"
+ 1790 print"  waehle"
+ 1800 get r$:if r$=""then 1800
+ 1810 if r$<"1" or r$>"2" then 1800
+ 1820 if r$="2"then 1910
+ 1830 input"drucker ok?";r$
+ 1840 open 1,4:cmd 1
+ 1850 print"datei: "n$
+ 1860 for j=1 to i
+ 1870 :print j;te$(j)
+ 1880 next j
+ 1890 print:print:print:print
+ 1900 print#1:close 1
+ 1910 return
+ 1920 :
+ 1930 :
+ 1940 rem ----- speichern der datei ----
+ 1950 print"{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}"
+ 1960 print"soll der gesamte text erneut abgespeichert werden"
+ 1970 print"{down} 1= ja"
+ 1980 print"{down} 2= programmende"
+ 1990 print"{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}"
+ 2000 print"{down}{rvon}waehle"
+ 2010 get r$:if r$=""then 2010
+ 2020 if r$="2" then run
+ 2030 if r$<>"1"then 2010
+ 2040 print
+ 2050 print"welcher dateiname"
+ 2060 input n$
+ 2070 fi$=n$+",s,w"
+ 2080 print"{clr}"
+ 2090 close 2:open 2,8,2,fi$
+ 2100 input#15, a1,a2$,a3,a4
+ 2110 if a1=0 then 2200
+ 2120 if a1<>63 then gosub 2320:goto 1960
+ 2130 print:print" der name "n$" existiert schon!"
+ 2140 print:print" wollen sie diese datei ueberschreiben?"
+ 2150 print:print" waehle (j/n) "
+ 2160 get r$:if r$=""then 2160
+ 2170 if r$="j"then n$="@:"+n$:goto 2070
+ 2180 if r$<>"n"then 2160
+ 2190 print:print" versuchen sie es noch einmal":goto 1960
+ 2200 for j=1 to i
+ 2210 :  print#2,te$(j) :print"{home}{down}"j,i
+ 2220 next j
+ 2230 :
+ 2240 print"gespeichert!"
+ 2250 close 2
+ 2260 for i=1 to 1500:next
+ 2270 run
+ 2280 :
+ 2290 :
+ 2300 print"{clr}"
+ 2310 print"{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{down}{down}"
+ 2320 print"{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{down}{down}"
+ 2330 print"             diskettenfehler!{down}{down}"
+ 2340 print"{rvon} datei : "n$
+ 2350 print"{rvof}":rem revers off
+ 2360 print a1,a2$,a3;a4
+ 2370 close 2
+ 2380 print"{down}{down}       beheben sie den fehler und    "
+ 2390 print"{down}{down}  ........druecken sie f .........."
+ 2400 get r$:if r$<>"f" then 2400
+ 2410 print"{clr}"
+ 2420 return
+

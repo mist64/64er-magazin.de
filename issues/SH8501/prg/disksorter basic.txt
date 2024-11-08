@@ -1,0 +1,486 @@
+;disksorter basic.prg ==0801==
+;Eingetippt von Endurion
+;In der 2. Auflage wurde im Druck aus Zeilen 160 und 180 die Anschrift des Autors
+;entfernt, die Prüfsummen aber nicht angepasst.
+  100 rem ***********************
+  110 rem *                     *
+  120 rem * programm disksorter *
+  130 rem *                     *
+  140 rem *  bernhard winkler   *
+  150 rem *                     *
+  160 rem *  giessenerstr.42    *
+  170 rem *                     *
+  180 rem *  5000 koeln 91      *
+  190 rem *                     *
+  200 rem ***********************
+  210 rem
+  220 rem
+  230 print"{clr}{down}{wht}":poke 53280,0:poke 53281,0
+  240 print"QQ  QQQ QQQ Q Q QQQ QQQ QQQ QQQ QQQ QQQ"
+  250 print"Q Q  Q  Q   Q Q Q   Q Q Q Q  Q  Q   Q Q"
+  260 print"Q Q  Q  QQQ QQ  QQQ Q Q QQ   Q  QQ  QQ "
+  270 print"Q Q  Q    Q Q Q   Q Q Q Q Q  Q  Q   Q Q"
+  280 print"QQ  QQQ QQQ Q Q QQQ QQQ Q Q  Q  QQQ Q Q"
+  290 print"{down}{down}{down}{down}{rght}{rght}bitte taste druecken!":gosub 11000
+  300 rem *** variablen-definition ***
+  310 rem
+  320 s$="{down}{rght}{rght}{rght}{rght}{rght}":poke 53280,0:poke 53281,0:print"{grn}"
+  340 bf$="blocks free":ez$=" element":ex$=" nicht"
+  350 v$="{clr}{down}{down}{rght}{rght}{rvon} ":m$="{down}{down}{rght}{rght}{rght}":x$="{down}{down}{rght}{rght}{rvon} ":n$="{down}{rght}{rvon} ":zm$="{rvon} _ {rvof} {rvon}  zum menue "
+  360 fi$="standardkopf"
+  370 rem
+  380 rem *** standarfkof einlesen ***
+  390 rem
+  400 open 7,8,7,fi$+",s,r"
+  410 input#7,bn$,ba$,bw$,bt$:close 7:print x$;"datum ?";:gosub 18000:da$=k$
+  420 dim b$(850),ff$(200):open 3,8,15
+  430 rem
+  440 rem ***  menue  ***
+  450 n$="{down}{rght}{rvon} "
+  460 zk$="                          "
+  470 print n$;"{clr}{rght} (c)1983 {rvof} by b.winkler tel(0221)881373"
+  480 print n$;"f1 {rvof} daten per disk einlesen"
+  490 print n$;"f3 {rvof} daten erweitern / loeschen "
+  500 print n$;"f5 {rvof} liste editieren"
+  510 print n$;"f7 {rvof} liste sortieren"
+  520 print n$;"f2 {rvof} daten abspeichern"
+  530 print n$;"f4 {rvof} daten einlesen    {rvon} clr {rvof} quit"
+  540 print n$;"f6 {rvof} liste drucken     {rvon} % {rvof} spez.liste"
+  550 print n$;"f8 {rvof} liste auf screen  {rvon} & {rvof} disk oper."
+  560 print n$;"*  {rvof} ";bf$;"       {rvon} $ {rvof} directory """
+  570 print n$;"\  {rvof} andere bildschirm farbe"
+  580 print n$;"!  {rvof} aussortieren fremder liste "
+  590 gosub 11000
+  600 if a$=chr$(133)then i=0:bb=b:b=0:q=0:gosub 1000:if a$="_"then b=bb
+  610 if a$=chr$(138)then gosub 6000
+  620 if a$=chr$(37)then gosub 8200
+  630 if a$=chr$(135)then open 4,4:gosub 7000:close 4
+  640 if a$=chr$(38)then gosub 6300
+  650 if a$=chr$(33)then gosub 14000
+  660 if a$=chr$(36)then b=b+2:i=b:h=1:gt=1:g=0:gosub 1050:h=0:b=b-2:gt=0
+  670 if a$=chr$(136)then gosub 4000
+  680 if a$=chr$(147)then sys 64738
+  690 if a$=chr$(137)then gosub 5000
+  700 if a$=chr$(134)then gosub 9000
+  710 if a$=chr$(139)then open 4,4:gosub 3000:close 4
+  720 if a$=chr$(140)then gosub 8000
+  730 if a$=chr$(92)then gosub 2000
+  740 if a$=chr$(42)then bb=b:gosub 12000:b=bb
+  750 goto 450
+  760 rem
+ 1000 rem
+ 1010 rem *** diskleser ***
+ 1020 rem
+ 1030 g=0:print v$;"disk einlegen : daten komplett ":print x$;"oder einzeln ";
+ 1035 print"einlesen ? (k/e)":print x$;zm$:gosub 10000:if a$="e"then g=1
+ 1040 if a$="_"then return
+ 1050 print v$;"ich lese disk ":print x$;
+ 1060 open 1,8,0,"$0" :gb=1
+ 1070 gosub 16000:print" {rvon}"k$"{down}{down}":if t<>0 then gosub 10000:close 1:return
+ 1080 get#1,a$,f$
+ 1090 get#1,a$,f$:b$(i+1)=""
+ 1100 get#1,a$,f$
+ 1110 c=0:l$="   "
+ 1120 if a$<>""then c=asc(a$)
+ 1130 if f$<>""then c=c+asc(f$)*256
+ 1140 q$=mid$(str$(c),2):l$=left$(q$+l$,3)
+ 1150 get#1,f$:if f$=""then print"{down}{rght}{rght}{rvon}";l$;" ";bf$:goto 1295
+ 1160 if f$<>chr$(34)then 1150
+ 1170 get#1,f$:if f$<>chr$(34)then b$(i+q)=b$(i+q)+f$:goto 1170
+ 1180 if q=1 then b$(i+1)=""
+ 1190 get#1,f$:if f$=chr$(32)then 1190
+ 1200 c$=""
+ 1210 c$=c$+f$:get#1,f$:if f$<>""then 1210
+ 1220 if gb=1 then gb$=c$:gb=0
+ 1230 b$(i+q)=left$(b$(i+q)+zk$,17)+left$(gb$,3)+right$(zk$+q$,3)
+ 1240 print"{rght}{rght}";b$(i+q);"{rght}{rght}{rght}";"{rvon} ";:left$(c$,5);:if g=0 and gt=0 then print
+ 1250 if gt=1 then gt=0:b$(i)="":print:goto 1090
+ 1260 if q=1 then q=0:b$(i+1)=""
+ 1270 if g=1 and gt=0 and i>0 then print"{rvof} j/n{left}{left}{left}";:gosub 11000
+ 1280 i=i+1:if g=1 then print"{rvof} ja"
+ 1285 if i+q+1=850 then print x$;"speicher ist voll":print x$;zm$:close 1:gosub 11000:return
+ 1290 goto 1090
+ 1295 close 1:if h=1 then gosub 10000:return
+ 1300 print x$;"noch eine disk (j/n)"
+ 1310 qw$=str$(i-1)
+ 1320 print x$;"bisher wurden ";qw$;" daten gelesen {down}{down}{down}{down}"
+ 1330 gosub 11000
+ 1340 if a$="j"then gt=1:print v$;:goto 1060
+ 1350 if a$<>"n"then 1330
+ 1360 b=i-1:close 1
+ 1370 a$="":t=0
+ 1380 return
+ 2000 rem
+ 2010 rem *** farbwechsel ***
+ 2020 rem
+ 2030 i=0:f=0:j=0
+ 2040 print v$;"f1{rvof} {rvon}farbwechsel bildschirm"
+ 2050 print x$;"f3{rvof} {rvon}farbwechsel hintergrund"
+ 2060 print x$;"f5{rvof} {rvon}farbwechsel schrift"
+ 2070 print x$;zm$
+ 2080 gosub 11000
+ 2090 if a$=chr$(133)then i=i+1:poke 53280,i
+ 2100 if a$=chr$(134)then j=j+1:poke 53281,j
+ 2110 if a$=chr$(135)then f=f+1:poke 646,f
+ 2120 ifa$="_"then return
+ 2130 goto 2040
+ 3000 rem
+ 3010 rem *** drucker ausgabe ***
+ 3020 zk$=left$(zk$+zk$,33)
+ 3030 j$="{rvon} ja ":n$="{rvon}nein":f1$=n$:f3$=j$:f5$=j$:f7$=n$:f2$=n$:z$="{rght}{rght}{rght}{rght}{rght}"
+ 3040 y$="{down}"+z$:f4$=n$:dr=1
+ 3050 rem
+ 3060 t$="{rght}{rvon} "
+ 3070 st$="":an$="bitte funktion waehlen"
+ 3075 print"{clr}{rght}{rght}{rght}{rght}{rght}{rvon} drucker ausgabe {down}"
+ 3080 print f1$;t$;"f1 {rvof} druck-beginn {down}"
+ 3090 print f3$;t$;"f3 {rvof} stand.kopf mit drucken {down}"
+ 3100 print f5$;t$;"f5 {rvof} programm/liste drucken {down}"
+ 3110 print f7$;t$;"f7 {rvof} preis-liste drucken {down}"
+ 3120 print f2$;t$;"f2 {rvof} liste nach kriterium {down}"
+ 3130 print f4$;t$;"f4 {rvof} standardkopf aendern "
+ 3140 print x$;"{left}{left}";zm$
+ 3150 print"{down}{down}"
+ 3160 print"    U{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}I
+ 3170 print"    B                                 B
+ 3180 print"    {CBM-Q}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{CBM-W}
+ 3190 print"    B                                 B
+ 3200 print"    J{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}K
+ 3210 print"{home}";:for j=1 to 20:print"{down}";:next:print z$;;st$
+ 3220 print y$;an$
+ 3230 if c=1 then c=0:gosub 3450:f4$=n$:goto 3070
+ 3240 if f1$=j$then f1$=n$:gosub 3380:goto 3070
+ 3250 gosub 11000
+ 3260 if a$=chr$(133)and f1$=n$then f1$=j$:goto 3070
+ 3270 if a$=chr$(134)and f3$=j$then f3$=n$:goto 3070
+ 3280 if a$=chr$(134)and f3$=n$then f3$=j$:goto 3070
+ 3290 if a$=chr$(135)and f5$=n$then f5$=j$:f2$=n$:f7$=n$:goto 3070
+ 3300 if a$=chr$(135)and f5$=j$then f5$=n$:goto 3070
+ 3310 if a$=chr$(136)and f7$=j$then f7$=n$:goto 3070
+ 3320 if a$=chr$(136)and f7$=n$then f7$=j$:f2$=n$:f5$=n$:goto 3070
+ 3330 if a$=chr$(137)and f2$=n$then f2$=j$:f7$=n$:f5$=n$:goto 3070
+ 3340 if a$=chr$(137)and f2$=j$then f2$=n$:goto 3070
+ 3350 if a$=chr$(95)then dr=0:return
+ 3360 if a$=chr$(138)then f4$=j$:c=1:goto 3070
+ 3370 if a$<chr$(95)or a$>chr$(137)then 3250
+ 3380 print"{home}":for j=1 to 19:print"{down}";:next:print z$;zk$:print"{up}";z$;"ok ? (j/n)"
+ 3385 print y$;zk$:gosub 11000:if a$<>"j"then return
+ 3390 print"{home}":for j=1 to 19:print"{down}";:next:print z$;"wieviel zeilen pro seite ?>=15"
+ 3400 print y$;zk$:print"{up}{up}";y$;:gosub 18000:dz=val(k$):if dz<15 or dz>300 then 3390
+ 3405 if f2$=n$and f5$=n$and f7$=n$then return
+ 3410 if f3$=j$then 3530
+ 3420 if f3$=n$then 3590
+ 3430 if a$="_"then return
+ 3440 return
+ 3450 st$="datum ?":gosub 3510:da$=k$
+ 3460 st$="name ?":gosub 3510:bn$=k$
+ 3470 st$="strasse,nr. ?":gosub 3510:ba$=k$
+ 3480 st$="wohnort ?":gosub 3510:bw$=k$
+ 3490 st$="telefon ?":gosub 3510:bt$=k$
+ 3500 return
+ 3510 print"{home}":for j=1 to 19:print"{down}";:next:print z$;st$
+ 3515 print y$;zk$:print"{up}{up}";y$;:gosub 18000
+ 3520 print"{home}":for j=1 to 19:print"{down}";:next:print z$;zk$:print y$;zk$:return
+ 3530 zd=0:if f3$=j$then zd=15
+ 3540 print#4,chr$(14)"  ";bn$:print#4,"  ";ba$
+ 3550 print#4,"  ";bw$:print#4,"  ";:bt$:print#4
+ 3560 print#4,"  disketteninhalt vom ";da$
+ 3570 print#4:print#4,"  programme:";b;chr$(15)
+ 3580 print#4
+ 3590 iff2$=j$then 3760
+ 3595 iff7$=n$then 3610
+ 3600 qs$="prg.name        kb. preis ":goto 3620
+ 3610 qs$="prg.name         id bl.   "
+ 3620 zd$="  ":goto 3640
+ 3640 dd=int(b/3)+1
+ 3650 s=1
+ 3660 b$(b+1)="":b$(b+2)="":b$(b+3)=""
+ 3670 print#4,left$("    "+qs$+qs$+qs$,78)
+ 3680 print#4,"    ";:for t=1 to 74:print#4,chr$(101);:next:print#4
+ 3690 for t=1 to dd
+ 3700 print#4,"    ";b$(s);"   ";b$(s+dd);"   ";b$(s+2*dd)
+ 3710 zd=zd+1
+ 3720 s=s+1:if zd=dz then zd=0:gosub 3740
+ 3730 next:return
+ 3740 print"{home}":for j=1 to 19:print"{down}";:next:print z$;
+ 3750 print"druckerpapier justieren ? ":print y$;"taste druecken ";:gosub 11000:return
+ 3760 f=2:print"{home}":for i=1 to 19:print"{down}";:next:print z$;zk$:print y$;zk$:print"{up}{up}{up}{up}"
+ 3765 print z$;"id.code eingeben !":print y$;:gosub 18000
+ 3770 if right$(k$,1)="*"then f=1
+ 3780 k$=left$(k$+zk$,f)
+ 3790 for i=1 to b:if zd=dz then zd=0:gosub 3740
+ 3800 if mid$(b$(i),18,f)=k$then print#4,"    ";b$(i):zd=zd+1
+ 3810 next:print#4
+ 3820 return
+ 4000 rem
+ 4010 rem *** sortierroutine ***
+ 4020 rem
+ 4030 print v$;"sortier-routine laeuft!":b$(b+1)="zzzzzzzz":f=0
+ 4035 print x$;"alphabetisch oder nach id.nr. ?"
+ 4040 print x$;"(a/i)":print x$;zm$:gosub 11000:if a$="_"then return
+ 4055 if a$="i"then f=1
+ 4060 for c=1 to b
+ 4070 j=c+1:print x$;"element       {left}{left}{left}{left}";j-1;"{up}{up}{up}"
+ 4080 for d=j to b
+ 4090 if f=1 and righ$(b$(c),6)>right$(b$(d),6)then 4120
+ 4100 if b$(c)>b$(d)then 4120
+ 4110 goto 4130
+ 4120 c$(0)=b$(c):b$(c)=b$(d):b$(d)=c$(0)
+ 4130 next
+ 4140 next
+ 4150 print v$;"doppelte daten aussortieren (j/n) "
+ 4160 gosub 11000
+ 4170 if a$="j"then 4190
+ 4180 return
+ 4190 print v$;"es wird aussortiert ":j=1
+ 4200 print x$;"wieviele zeichen beruecksichtigen ?":print x$;:gosub 18000
+ 4210 ss=val(k$):if ss=0 or ss>25 then ss=25
+ 4220 if left$(b$(j),ss)=left$(b$(j+1),ss)then 4270
+ 4230 j=j+1
+ 4240 if j<=b-1 then 4220
+ 4250 for i=b+1 to b+10:b$(i)="":next
+ 4260 return
+ 4270 for i=j to b
+ 4280 b$(i)=b$(i+1)
+ 4290 next
+ 4300 j=j-1:b=b-1:goto 4230
+ 4310 return
+ 5000 rem
+ 5010 rem *** daten file speichern ***
+ 5020 rem
+ 5030 print v$;"daten werden gespeichert "
+ 5040 gosub 17000:i=0:print x$;"sicher ? (j/n)":gosub 11000:if a$<>"j"then return
+ 5050 open 2,8,2,fi$+",s,w"
+ 5060 gosub 16000:print x$;k$:if t<>0 then close 2:gosub 10000:return
+ 5070 print#2,b
+ 5080 if g=1 then for i=1 to z:print#2,ff$(i):goto 5100
+ 5090 for i=1 to b:print#2,b$(i)
+ 5100 next
+ 5110 close 2
+ 5120 return
+ 6000 rem
+ 6010 rem *** daten-file einlesen ***
+ 6020 rem
+ 6030 print v$;"daten werden gelesen ":print x$;zm$
+ 6040 gosub 17000:if k$="_"then return
+ 6050 print x$;"daten file ";fi$" einlesen (j/n) "
+ 6060 gosub 11000
+ 6070 if a$<>"j"then return
+ 6080 open 2,8,2,fi$+",s,r":print"{down}{down}{rght}{rght}{rght}";
+ 6090 gosub 16000:print" {rvon}"k$"{down}{down}":if t<>0 then gosub 10000:close 2:return
+ 6100 input#2,b
+ 6110 for i=fj+1 to b+fj
+ 6120 input#2,b$(i):next:close 2:b=b+fj:return
+ 6300 print v$;"disk operation mode"
+ 6310 print x$;"diskettenbefehle s,v,n,r,i "
+ 6320 print x$;"befehl ?";:gosub 18000:fi$=k$:print x$;"ausfuehren (j/n) ?"
+ 6325 gosub 11000
+ 6330 if a$="_"then return
+ 6340 if a$="j"then open15,8,15:print#15,fi$:close 15:gosub 16000:if t<>0 then print x$;k$:gosub 10000
+ 6345 if t=0 then return
+ 6350 print"{home}";x$:goto 6310
+ 7000 rem
+ 7010 rem *** editor ***
+ 7020 rem
+ 7030 poke 650,128
+ 7040 print s$;"{clr}{rght}{rght}{rght}{rght}{rght}{rvon} @ {rvof}  :  element loeschen"
+ 7050 print s$;"{rvon} \ {rvof}  :  element suchen"
+ 7060 print s$;"{rvon} * {rvof}  :  element verbessern"
+ 7070 print s$;"{rvon} _ {rvof}  :  ";right$(zm$,13)
+ 7080 print s$;"{rvon} p {rvof}  :  element drucken "
+ 7090 print s$;"{rvon}   {rvof}  :  ein element vor"
+ 7100 print s$;"{rvon} f1{rvof}  :  20 elemente vor "
+ 7110 print s$;"{rvon} f3{rvof}  :  20 elemente zurueck"
+ 7120 print s$;"{rvon} ^ {rvof}  :  ein element zurueck"
+ 7130 print s$;"{rvon} $ {rvof}  :  dm-liste erstellen"
+ 7135 print s$;"{rvon} + {rvof}  :  element einfuegen{down}{down} ":print
+ 7140 for i=1 to b
+ 7150 print"{up}{rght}{rght}{rght}";zk$;"{down}":print"{rght}{rght}{rght}  ";b$(i)
+ 7160 gosub 11000
+ 7170 if b$(1)=""and b>1 then a$="@":i=1
+ 7180 if a$="@"and b>1 then b$(i)=b$(b):b=b-1:a$=""
+ 7190 if a$=chr$(133)and i+20<b then i=i+20
+ 7200 if a$=chr$(134)and i-20>0 then i=i-20
+ 7210 if a$="*"then print"{up}{up}{rght}{rght}{rght}{rght}{rght}";"{rvon}korrekturelement":input"{rght}{rght}{rght}";b$(i)
+ 7220 if a$="*"then print"{up}{up}";zk$:print:if b$(i)=""then b$(i)="zzzz"
+ 7225 if a$="$"then gosub 7500:goto 7000
+ 7230 if a$="_"then a$="":poke 650,0:return
+ 7240 if a$="^"then i=i-2:if i<1 then i=b-1
+ 7250 if a$="+"then b=b+1:print"{rvon}{up}{up}{rght}{rght}{rght}{rght}{rght}neues element":input"{rght}{rght}{rght}";b$(b):print"{up}{up}";zk$:print
+ 7260 if a$="p"then print#4,"    ";b$(i)
+ 7270 if a$="\"then print v$;"nach welchem element suchen ?":print x$;:gosub 18000:gosub 7310:goto 7000
+ 7280 if left$(b$(b),4)="zzzz"and i>1 then b=b-1
+ 7290 print"{up}{up}{up}{rght}{rght}{rght}";zk$:next:goto 7140
+ 7300 return
+ 7310 if k$=""then return
+ 7320 f=0:if right$(k$,1)="*"then f=1
+ 7330 q=len(k$)-f:q$=left$(k$,q):ez=0
+ 7340 ee$=" kein weiteres":ey$=" vorhanden ":print
+ 7350 for k=1 to b
+ 7360 if left$(b$(k),q)=q$then ez=1:se=1:r=1
+ 7370 if se=0 then next
+ 7380 if se=1 then print"{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}";b$(k):se=0:next
+ 7390 if ez=0 then print"{rght}{rght}{down}{rvon}";ez$+ex$+ey$
+ 7400 if ez=1 then print"{down}{down}":print"{rght}{rght}{rvon}";ee$+ez$+ey$:print"{rght}{rght}";ws$
+ 7410 print x$;zm$:gosub 11000
+ 7420 return
+ 7500 print"{clr}{down}{down}{rght}{rght}{rvon} dm-listenerstelleung {rvof}{down}{down}":print"{down}{down}";x$;zm$:print"{home}{down}{down}{down}{down}{down}"
+ 7510 for j=1 to b:print"  ";:c$=left$(b$(j),17):print c$;
+ 7520 f$=right$(zk$+str$(int(val(right$(b$(j),3))/4+.5)),2):print f$;
+ 7530 print" 000{left}{left}{left}";:gosub 18000:if k$="_"then return
+ 7540 b$(j)=c$+f$+" "+left$(k$+zk$,3)
+ 7550 print"{up}";:next:return
+ 8000 rem
+ 8010 rem *** bildschirm-ausgabe ***
+ 8020 rem
+ 8030 print v$;"inhalt einer disk listen ":print x$;"oder alle disk daten listen (e/a) "
+ 8040 gosub 11000
+ 8050 :if a$="e"then 8120
+ 8060 print v$;zm$;:print:z=1
+ 8070 for i=1 to b:z=z+1
+ 8080 print"{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}";b$(i):if peek(631)=95 then poke198,0:return
+ 8090 if z=23 then gosub 11000:z=1:if h=1 then return
+ 8100 next:gosub 10000
+ 8110 return
+ 8120 print v$;"welche disk listen ":print x$;"id.nr eingeben ";:gosub 18000
+ 8130 for i=1 to b:if k$=mid$(b$(i),18,2)then print"{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}";b$(i)
+ 8140 next
+ 8150 gosub 10000
+ 8160 print x$;"noch eine disk listen (j/n) ":gosub 11000:if a$="j"then 8120
+ 8170 return
+ 8200 rem
+ 8210 rem *** listen nach id kriterium erstellen ***
+ 8220 rem
+ 8230 print v$;"listen nach id kriterium erstellen ":print x$;zm$
+ 8240 print x$;"nach welchem kriterium suchen ?";:gosub 18000:f$=left$(k$,1)
+ 8250 if f$="_"then return
+ 8260 print x$;"datendiskette einlegen ":gosub 17000:fi$="@:"+fi$
+ 8270 x=0:for i=1 to b:if mid$(b$(i),18,1)=f$then x=x+1
+ 8280 next
+ 8290 if x=0 then print x$;"kein element vorh.":gosub 10000:return
+ 8300 open 1,8,1,fi$+",s,w":print#1,x
+ 8310 gosub 16000:if t<>0 then gosub 10000:close 1:return
+ 8320 for i=1 to b:if mid$(b$(i),18,1)=f$then print"        ";b$(i):print#1,b$(i)
+ 8330 next:close 1:return
+ 9000 rem
+ 9010 rem *** daten erweiter/loeschen ***
+ 9020 rem
+ 9030 print v$;"f1 {rvof} daten erweitern "
+ 9040 print x$;"f3 {rvof} daten file zuladen
+ 9050 print x$;"f5 {rvof} daten loeschen (id.nr.) "
+ 9060 print x$;"f7 {rvof} standardkopf speichern "
+ 9070 print x$;zm$
+ 9080 gosub 11000
+ 9090 if a$=chr$(95)then return
+ 9100 if a$=chr$(133)then gt=1:i=b+1:goto 1000
+ 9110 if a$=chr$(134)then fj=b:gosub 6000:fj=0:return
+ 9120 if a$=chr$(135)then 9160
+ 9130 if a$=chr$(136)then open 7,8,7,"@:standardkopf,s,w":print#7,bn$:print#7,ba$
+ 9140 if a$=chr$(136)then print#7,bw$:print#7,bt$:close 7
+ 9150 goto 9030
+ 9160 print v$;"eingabe der zu loeschenden id nr. ? ":print x$;
+ 9170 gosub 18000
+ 9180 print x$;"soll ";k$;" geloscht werden (j/n) ? "
+ 9190 gosub 11000:if a$<>"j"then return
+ 9200 for i=1 to b
+ 9210 if k$=mid$(b$(i),18,2)then gosub 9240
+ 9220 next
+ 9230 return
+ 9240 for j=i to b:b$(j)=b$(j+1):next
+ 9250 i=i-1:b=b-1:return
+10000 print x$;"taste druecken ":t=0:gosub 11000:return
+11000 get a$:if a$=""then 11000
+11010 return
+12000 rem
+12010 rem *** blocks free routine ***
+12020 rem
+12030 print v$;bf$;" funktion"
+12040 fi$="@:"+bf$:for i=1 to 200:ff$(i)="":next
+12050 ff=1:k=2:i=2:br$="funktion ende"
+12060 print x$;"bitte warten bis ";br$:ff$(1)=mid$(b$(1),18,2)
+12070 ff$(i)=mid$(b$(k),18,2)
+12080 for j=1 to i-1
+12090 if ff$(i)=ff$(j)then 12120
+12100 next
+12110 i=i+1
+12120 k=k+1:if k>b then 12140
+12130 goto 12070
+12140 z=i-1
+12150 for c=1 to z-1
+12160 j=c+1:print x$;"element       {left}{left}{left}{left}";j-1;"{up}{up}{up}"
+12170 for d=j to z
+12180 if ff$(c)>ff$(d)then 12200
+12190 goto 12210
+12200 c$(0)=ff$(c):ff$(c)=ff$(d):ff$(d)=c$(0)
+12210 next
+12220 next
+12230 print x$;"blocks werden addiert":bl$="{rvon}disk ":bm$="{rvon}"+bf$
+12240 j=1
+12250 for i=1 to b:if i=1 then gs=0
+12260 if mid$(b$(i),18,2)=ff$(j)then gosub 12350
+12270 next:ff$(j)=bf$+" disk "+ff$(j)+" "+right$(zk$+str$(664-gs),3):j=j+1
+12280 if j<z+1 then 12250
+12290 print x$;br$
+12300 print x$,"drucker oder screen (d/s) ":gosub 11000:print
+12310 if a$<>"s"and a$<>"d"then gosub 11000:goto 12320
+12320 if a$="d"then 12380
+12330 for i=1 to z:print"{rght}{rght}{rght}{rght}";ff$(i)
+12340 gosub 11000:next:goto 12420
+12350 g=0:g=val(right$(b$(i),3))
+12360 gs=gs+g
+12370 return
+12380 print x$;"drucker einschalten ! "
+12390 gosub 10000
+12400 open 4,4
+12410 for i=1 to z:print#4,"     ";ff$(i):next:print#4:close 4
+12420 print v$;"daten auf disk speichern ? (j/n)":gosub 11000:if a$<>"j"then return
+12430 print x$;"daten diskette einlegen "
+12440 gosub 10000:open 2,8,2,fi$+",s,w":print#2,z
+12450 for i=1 to z:print#2,ff$(i):next:close 2
+12460 return
+14000 rem
+14010 rem *** aussortieren fremder listen ***
+14020 rem
+14030 if b<2 then return
+14040 print v$;"aussortieren fremder listen":di$="@:differenz":li$="liste":x=1
+14050 print x$;"mit welcher liste vergleichen ?":gosub 17000
+14060 print x$;"wieviel zeichen vergleichen (1/20) ";:gosub 18000:sk=val(k$)
+14070 if sk>25 then sk=25
+14080 open 5,8,5,fi$+",s,r":gosub 16000:if t<>0 then 14100
+14090 open 2,8,2,"@:liste"+",s,w":gosub 16000
+14100 if t<>0 then close 5:close 2:print x$;k$:print x$,zm$:gosub 11000:return
+14110 input#5,c
+14120 for j=1 to c
+14130 input#5,d$:print"{rght}{rght}{rght}{rght}{rght}";d$
+14140 for i=1 to b
+14150 if left$(d$,sk)=left$(b$(i),sk)then 14300
+14160 next i
+14170 print#2,d$:x=x+1
+14180 next j
+14190 close 5:close 2:x=x-1
+14200 if x=0 then print"{clr}{down}{rvon} kein neues element gefunden":goto 10000
+14210 open 7,8,7,di$+",s,w"
+14220 print#7,x
+14230 open 5,8,5,li$+",s,r"
+14240 for i=1 to x:input#5,d$:print#7,d$:next
+14250 close 7:close 5
+14260 print v$;"das aussortieren ist beendet "
+14270 print x$;"das datenfile < differenz > "
+14280 print x$;"kann geladen erden "
+14290 open 15,8,15,"s0:liste":close 15:gosub 16000:return
+14300 if j=c then 14190
+14310 next j
+14320 return
+15000 rem
+15010 rem *** abfrage routinen ***
+15020 rem
+16000 input#3,t,k$,o,o:return
+17000 print x$;"file name ";:f=1:gosub 18000:f=0:fi$=k$:return
+18000 k$=""
+18010 gosub 11000:if a$=chr$(13)then print:return
+18020 if a$=chr$(20)and len(k$)<>0 then k$=left$(k$,len(k$)-1):print a$;
+18030 if dr=1 and len(k$)=33 then 18010
+18040 if f=1 and len(k$)=18 then 18010
+18050 if a$>chr$(31)then k$=k$+a$:print a$;
+18060 goto 18010
+
