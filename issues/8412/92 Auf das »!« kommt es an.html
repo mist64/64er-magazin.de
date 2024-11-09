@@ -110,10 +110,204 @@
         <figure>
             <pre data-filename="! startadresse" data-name="! Startadresse"></pre>
             <figcaption>Ändern der Startadresse. Lesen Sie hierzu die »Hinweise
-zum Abtippen«.</figcaption>
+                zum Abtippen«.</figcaption>
         </figure>
         <figure>
-            TODO
+            <!-- Eingetippt von goloMAK -->
+            <pre>0020;**********************
+0030;*                    *
+0040;* LADEPROGRAMM !     *
+0050;* MAI 1984           *
+0060;* N.MANN &AMP; D.WEINECK *
+0070;* FLEETRADE 40       *
+0080;* 2800 BREMEN        *
+0090;* TEL. 0421 / 493090 *
+0100;*                    *
+0110;**********************
+0120;
+0130;
+0140NUMOUT     .DE $BDCD
+0150BASICLOAD  .DE $E16F
+0160SETLFS     .DE $FFBA
+0170SETNAM     .DE $FFBD
+0180LOAD       .DE $FFD5
+0190CHRIN      .DE $FFCF
+0200CHROUT     .DE $FFD2
+0210;
+0220BUFFER     .DE $0340
+0230USE        .DE $39
+0240NEXT       .DE $3B
+0250FILENR     .DE $FB
+0260ABSFLG     .DE $FC
+0270FILEANZ    .DE $FD
+0280ENDFLG     .DE $FE
+0290;
+0300           .BA $010A
+0310           .MC $C00A
+0320           .OS
+0330;
+0340;
+0350DIROUT     LDA *$2B
+0360           STA *USE
+0370           LDA *$2C
+0380           STA *USE+1
+0390DIR1       LDA #$0D
+0400           JSR CHROUT
+0410           LDY #$00
+0420           LDA (USE),Y
+0430           STA *NEXT
+0440           INY
+0450           LDA (USE),Y
+0460           STA *NEXT+1
+0470           INY
+0480           LDA (USE),Y
+0490           TAX
+0500           INY
+0510           LDA (USE),Y
+0520           JSR NUMOUT
+0530           LDY #$03
+0540DIR2       INY
+0550           LDA (USE),Y
+0560           BEQ DIR3
+0570           JSR CHROUT
+0580           BNE DIR2
+0590DIR3       LDA *NEXT
+0600           STA *USE
+0610           LDA *NEXT+1
+0620           STA *USE+1
+0630           LDY #$01
+0640           LDA (USE),Y
+0650           BEQ DIR4
+0660           LDA #$1B
+0670           STA *$D3
+0680           LDA #$00
+0690           LDX *FILENR
+0700           JSR NUMOUT
+0710           INC *FILENR
+0720           INC *FILEANZ
+0730           LDA *FILEANZ
+0740           CMP #$15
+0750           BCC DIR1
+0760           LDA #$80
+0770DIR4       STA *ENDFLG
+0780           LDA #$0D
+0790           JSR CHROUT
+0800;
+0810;
+0820WAHL       LDX #$00
+0830WAHL1      JSR CHRIN
+0840           STA BUFFER,X
+0850           INX
+0860           CMP #$0D
+0870           BNE WAHL1
+0880           DEX
+0890           DEX
+0900           LDA BUFFER,X
+0910           CMP #'+'
+0920           BNE WAHL2
+0930           LDA #$00
+0940           STA *FILEANZ
+0950           BIT *ENDFLG
+0960           BMI DIR1
+0970           STA *FILENR
+0980           BPL DIROUT
+0990WAHL2      CMP #'L'
+1000           BNE WAHL3
+1010           LDA #$00
+1020           STA *ABSFLG
+1030           BEQ WAHL4
+1040WAHL3      CMP #'A'
+1050           BNE WAHL
+1060           LDA #$80
+1070           STA *ABSFLG
+1080WAHL4      DEX
+1090           LDA BUFFER,X
+1100           AND #$0F
+1110           STA *FILENR
+1120           DEX
+1130           BMI LADEN
+1140           LDA BUFFER,X
+1150           AND #$0F
+1160           TAX
+1170           CLC
+1180WAHL5      LDA *FILENR
+1190           ADC #$0A
+1200           STA *FILENR
+1210           DEX
+1220           BNE WAHL5
+1230;
+1240;
+1250LADEN      LDX *FILENR
+1260           CLC
+1270           LDA *$2B
+1280           ADC #$23
+1290           STA *USE
+1300           LDA *$2C
+1310           STA *USE+1
+1320LAD1       DEX
+1330           BEQ LAD2
+1340           CLC
+1350           LDA *USE
+1360           ADC #$20
+1370           STA *USE
+1380           BCC LAD1
+1390           INC *USE+1
+1400           BCS LAD1
+1410;
+1420;
+1430TEXT1      .BY '$'
+1440;
+1450;
+1460           .BY 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2
+1470           .BY 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2
+1480           .BY 2 2 2 2 2 2 2 2 2 2 2 2 2 2
+1490;
+1500;
+1510DIRIN      LDA #$01
+1520           LDX #L,TEXT1
+1530           LDY #H,TEXT1
+1540           JSR SETNAM
+1550           LDX #$08
+1560           LDY #$00
+1570           JSR SETLFS
+1580           TYA
+1590           STA *FILEANZ
+1600           STA *FILENR
+1610           LDX *$2B
+1620           LDY *$2C
+1630           JSR LOAD
+1640           JSR $A533
+1650           JMP DIROUT
+1660;
+1670;
+1680FINDA.E    LDY #$00
+1690CMP1       LDA (USE),Y
+1700           CMP #$22
+1710           BEQ CMP2
+1720           INY
+1730           BNE CMP1
+1740CMP2       TYA
+1750           RTS
+1760;
+1770;
+1780LAD2       JSR FINDA.E
+1790           SEC
+1800           ADC *USE
+1810           STA *USE
+1820           JSR FINDA.E
+1830           LDX *USE
+1840           LDY *USE+1
+1850           JSR SETNAM
+1860           LDA #$01
+1870           LDX #$08
+1880           LDY #$00
+1890           STY *$0A
+1900           BIT *ABSFLG
+1910           BPL LAD3
+1920           LDY #$01
+1930LAD3       JSR SETLFS
+1940           JMP BASICLOAD
+1950           .EN</pre>
             <figcaption>Das Assemblerlisting zum Ladeprogramm</figcaption>
         </figure>
 
