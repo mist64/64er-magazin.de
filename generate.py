@@ -1149,8 +1149,6 @@ def write_full_html_file(db, path, title, preview_img, body_html, body_class, co
       if not preview_img:
         preview_img = "logo.png"
 
-    mastodon_link = share_on_mastodon_link(title, url)
-
     if CONFIG.deploy:
       fav_icon_html = f"""
         <link rel="icon" href="/{BASE_DIR}favicon.ico" sizes="32x32">
@@ -1202,7 +1200,7 @@ def write_full_html_file(db, path, title, preview_img, body_html, body_class, co
         <a href="/{BASE_DIR}{FILENAME_LISTINGS}.html">{LABEL_LISTINGS}</a>
       </nav>
       <div class="social_and_search">
-        <a href="{mastodon_link}">
+        <a rel="me" href="https://mastodon.social/@64er">
           <img src="/{BASE_DIR}mastodon.svg" alt="Mastodon" class="social_image">
         </a>
         <a href="/{BASE_DIR}64er.rss">
