@@ -145,7 +145,8 @@ Die Eingabe-Ausgaben werden aus `issues` gelesen, die Website wird nach `out` ge
     * Formatierung, Metadaten, OCR-Fixes
         * [thierer](https://www.forum64.de/wcf/index.php?user/26370-thierer/)
     * Abtippen der Listings
-        * ...
+        * [Endurion](https://www.forum64.de/wcf/index.php?user/1964-endurion/)
+        * [thierer](https://www.forum64.de/wcf/index.php?user/26370-thierer/)
 * Sonderheft 1/1985:
     * Abtippen der Listings
         * [Kalle861](https://www.forum64.de/wcf/index.php?user/18972-kalle861/)

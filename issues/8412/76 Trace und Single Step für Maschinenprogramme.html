@@ -66,7 +66,7 @@
         <p>In dieser Zeit kann der Prozessor das Ende der normalen IRQ-Routine durchlaufen (Register vom Stack holen). Jetzt bleibt aber nur mehr Zeit, um einen Befehl des Testprogramms abzuarbeiten, da Timer B ja schon in genau einer Mikrosekunde erneut einen IRQ sendet. Der Prozessor legt nach diesem einen Befehl alle Register auf den Stack und verzweigt entsprechend dem IRQ-Vektor wieder auf Trace. Für genauere Information siehe Listing. Innerhalb der Traceroutine wird ein IRQ nicht akzeptiert, da sich sonst das Programm immer selbst unterbrechen würde. Trace läßt sich also nur durch einen NMI unterbrechen.</p>
 
         <p class="noindent">Beispiel:</p>
-        
+
         <ul class="plain">
             <li>SYS 49152 = Trace starten. Disassembler an.</li>
             <li>Taste F1 drücken = Editmodus wählen.</li>
@@ -88,233 +88,596 @@
         </figure>
 
         <figure>
-            <pre>80 open1,4
-90 sys9*4096
-100 *=49152
-110 ;:;:;trace / single step fuer c64          9.84
-120 ;:;   +disassembler / editor
-130 ;:;       juergen goebel:;:;       8 muenchen 82:;:;       groschenweg 19:;:;
-140 ;:;      tel. 089 / 432709:;:;
-150 .opt oo,p
-160 irqvek =$314:stack =$100:col =55296;hintergrundfarbe
-170 screen =1024:ready =$a474-1
-180 cia =$dc00:tl =cia+6;timerwerte:th =cia+7:tast =$ea87;tastaturrout.
-190 ddrb =$dd03
-200 icr =cia+13;interr.controlreg.:crb =cia+15:tstart =*+$0500
-210 nop:lda #0:sta dison:beq go
-220 lda #255:sta dison
-230 go sei:lda #&lt;trace:sta irqvek;irq vektor
-240 lda #>trace:sta irqvek+1;auf trace
-250 lda #130:sta icr;timer b interrupt erlaubt:ldx #255:txs;stack initial.
-260 lda #>ready;stack fuer trace:pha;vorbereiten:lda #&lt;ready:pha
-270 lda #$c0;pc=$c000:pha:lda #0:pha
-280 lda #32:pha:lda #0:pha:pha:pha
-290 trace cld:ldy #0:titel lda text,y;kopfzeile
-300 jsr prizei;ausgeben:cpy #40:bne titel
-310 tsx:lda stack+6,x;pc ausgeben:sta tmp+3:jsr prbyte
-320 lda stack+5,x:sta tmp+4:jsr prbyte
-330 lda dison:bmi disoff
-340 jsr disas:disoff jsr space:txa;sp ausgeben
-350 jsr prbyte
-360 register jsr space:lda stack+1,x:jsr prbyte
-370 inx:cpy #56:bcc register:jsr space
-380 lda stack+1,x;prozessorstatus-flags anzeigen
-390 ldx #8
-400 cont1 asl:pha:lda #94;pfeil:bcs flsetz
-410 lda #45;minus:flsetz jsr prizei:pla
-420 dex:bne cont1:jsr space:ldx #8;userport anzeigen
-430 lda ddrb-2
-440 cont2 asl:pha:lda #$31:bcs usetz
-450 lda #$30:usetz jsr prizei:pla
-460 dex:bne cont2:ldx #8;datenrichtungsregister:lda ddrb;laden
-470 cont3 asl screen+65,x:lsr;entsprechende bits der anzeige
-480 ror screen+65,x;werden invertiert:dex:bne cont3
-490 wait jsr get;wartet auf:cmp #23;f1,f3,f5,f7 oder x:beq exit
-500 cmp #5:beq fast;und verzweigt entsprechend
-510 cmp #6:beq slow
-520 cmp #3:beq waitl:cmp #4:bne wait
-530 jmp set
-540 waitl jsr get;wartet bis f7 wieder losgelassen:cmp #64:bne waitl
-550 fast lda #$16:sta tl
-560 lda #0;timer laden:sta th:lda #17:sta crb;und starten:lda $dc0d;ende irq
-570 pla:tay:pla:tax
-580 pla:rti
-590 slow ldx #0:cont4 dex:bne cont4:dey:bne cont4
-600 beq fast
-610 exit lda #2;x taste:sta icr:lda #$31:sta irqvek;setzt irq vektor auf
-620 lda #$ea;alten wert:sta irqvek+1:lda #4:sta $028b:lda #16;repeat korrig.
-630 sta $028c:cli:jmp ready+1;sprung zu basic
-640 prbyte pha;1 byte als 2 hexz. auf schirm:stx tmp:lsr:lsr:lsr:lsr
-650 tax:lda hex,x:jsr prizei
-660 pla:and #$0f:tax:lda hex,x:ldx tmp
-670 jmp prizei
-680 space lda #$20
-690 prizei and #$3f;wegen bildschirmcode
-700 sta screen,y:lda #1;farbe setzen:sta col,y:iny:rts
-710 get jsr tast;holt tastencode:lda $cb:rts
-720 set jsr disas:ldy #40;f1 taste
-730 start lda screen,y:ora #128:sta screen,y:sty tmp
-740 jsr zeichhol;eingaberout.:ldy tmp:cmp #13:bne links
-750 cpy #100:bpl mread:jmp read:mread rts;zur leseroutine
-760 reverse lda screen,y;invertieren
-770 and #127:sta screen,y:rts
-780 links cmp #17;cursor links:bne rechts:jsr reverse:dey:bne start
-790 rechts cmp #29;cursor rechts:bne cont6:jsr reverse:iny:bne start
-800 cont6 jsr prizei;wert anzeigen:bne start:zeichhol lda #0;tast.abfrage
-810 sta $c6:jsr tast:lda $277
-820 cmp #0:beq zeichhol:ldy #0:sty $277;tastaturpufferstart
-830 cmp #$85;f1 taste:beq zeichhol
-840 ldy #64;verzoegerung repeatzaehler:sty $28b:sty $28c:rts
-850 read jsr reverse:ldy #40;pc lesen:tsx:jsr byt:sta stack+6,x
-860 sta tmp+3:iny:jsr byt
-870 sta stack+5,x:sta tmp+4:iny:iny;sp ueberlesen:iny:iny
-880 loop iny;register lesen:jsr byt:sta stack+1,x:iny:inx
-890 cpy #56:bne loop
-900 iny:lda #0:sta tmp:loop1 lda screen,y;flags lesen:and #%00011111
-910 cmp #30:rol tmp
-920 iny:cpy #65:bne loop1:tsx:lda tmp:and #%11111011;i flag loeschen
-930 sta stack+4,x:jsr disas:jsr readpc:jsr disas:jmp wait
-940 byt jsr lbit;8 bit zahl von screen holen:asl:asl:asl:asl:iny:sta tmp
-950 jsr lbit:clc:adc tmp:rts
-960 lbit lda screen,y;1 byte von screen in hex:cmp #48:bcs zahl:adc #57
-970 sec:zahl sbc #48:rts
-980 ;berechnet abs. adressen bei branches
-990 offset lda cod2:bmi bminus
-1000 clc;branch vor:adc #2:adc tmp+4:sta tmp1:lda tmp+3
-1010 adc #0:jsr prbyte:lda tmp1:jsr prbyte:rts:;branch rueck
-1020 bminus eor #255:sec:sbc #1:sta tmp
-1030 lda tmp+4:sbc tmp:sta tmp1:lda tmp+3
-1040 sbc #0:jsr prbyte:lda tmp1:jsr prbyte:rts;ende offset
-1050 ;laenge opcode
-1060 ;berechnet befehlslaenge (1,2 od. 3 bytes)
-1070 ;opcode in akku uebergeben
-1080 ;im y-reg. steht dann befehlslaenge
-1090 laenge ldy #1
-1100 cmp #$20:beq loo1:and #$9f:beq loo3
-1110 and #$1f:cmp #9:beq loo2:cmp #$19
-1120 beq loo1:and #$0d:cmp #8:beq loo3
-1130 and #8:beq loo2
-1140 loo1 iny:loo2 iny:loo3 rts
-1150 disas sty oldy:stx oldx;register retten
-1160 ldx #20:lda #" ":cle1 sta screen+120,x;zeile fuer disas. loeschen
-1170 dex:bne cle1
-1180 ;pc l/h in tmp+4 / tmp+3:;belegt 'ram' pointer zum lesen
-1190 lda tmp+4:sta ppoin1+1:sta tmp+6 :lda tmp+3:sta ppoin1+2:sta tmp+5
-1200 inc tmp+6:lda tmp+6:sta ppoin2+1:bne loo5
-1210 inc tmp+5:loo5 lda tmp+5:sta ppoin2+2:inc tmp+6
-1220 lda tmp+6:sta ppoin3+1:bne loo6
-1230 inc tmp+5:loo6 lda tmp+5:sta ppoin3+2
-1240 ppoin1 lda $c000:sta cod1;liest opcodes
-1250 ppoin2 lda $c000:sta cod2
-1260 ppoin3 lda $c000:sta cod3
-1270 lda cod1:jsr laenge:tya:sta codel:tax:ldy #120;bytes ab pc ausgeben
-1280 lda cod1:jsr prbyte:jsr space:dex
-1290 beq loo7:lda cod2:jsr prbyte:jsr space
-1300 dex:beq loo7:lda cod3:jsr prbyte
-1310 loo7 ldy #129:lda cod1;gibt opcode (3 buchstaben) aus
-1320 clc:lda #>tstart:sta tmp:lda cod1:adc cod1:bcc loo8
-1330 inc tmp:loo8 clc:adc cod1:bcc loo9:inc tmp:loo9 sta opp+1;pointer belegen
-1340 lda tmp:sta opp+2:ldx #0:opp lda $c000,x:jsr prizei:inx
-1350 cpx #3:bne opp:jsr space
-1360 lda codel:cmp #2:bpl code2:jmp endas
-1370 code2 ldx cod1:lda tadr,x;adress. feststellen:tax
-1380 ; '#$','$' od.'($' ausgeben
-1390 cpx #6:bmi loo10:lda #"(":jsr prizei
-1400 loo10 cpx #2:bne loo11:lda #"#"
-1410 jsr prizei:loo11 lda #"$":jsr prizei
-1420 cpx #1:bpl loo12:jsr offset:jmp endas
-1430 loo12 lda codel;operanden ausgeben:cmp #3:beq codl3
-1440 lda cod2:jsr prbyte:jmp loo13
-1450 codl3 lda cod3:jsr prbyte:lda cod2:jsr prbyte
-1460 loo13 cpx #4:bmi endas
-1470 ; ',x',',y',',x)','),y' od. ')' ausgeben
-1480 bne loo14:lda #",":jsr prizei
-1490 lda #"x":jsr prizei:jmp endas
-1500 loo14 cpx #5:bne loo15
-1510 lda #",":jsr prizei:lda #"y":jsr prizei:jmp endas
-1520 loo15 cpx #6:bne loo16:lda #",":jsr prizei
-1530 lda #"x":jsr prizei:lda #")":jsr prizei:jmp endas
-1540 loo16 lda #")":jsr prizei
-1550 cpx #8:beq endas:lda #",":jsr prizei
-1560 lda #"y":jsr prizei
-1570 endas ldy oldy;reg. holen:ldx oldx:rts;ende disas
-1580 readpc ldy #120:jsr start;dis.zeile edit.:jsr reverse:ldy #120
-1590 ;liest bytes und speichert in ram
-1600 jsr byt:sta cod1:iny:iny:jsr byt
-1610 sta cod2:iny:iny:jsr byt:sta cod3
-1620 lda tmp+4:sta pread1+1
-1630 lda tmp+3:sta pread1+2:lda cod1:pread1 sta $c000
-1640 ldy codel:cpy #2:bmi eread
-1650 lda tmp+4:clc:adc #1:sta pread2+1
-1660 lda tmp+3:adc #0:sta pread2+2
-1670 lda cod2:pread2 sta $c000
-1680 cpy #3:bmi eread
-1690 lda tmp+4:clc:adc #2:sta pread3+1
-1700 lda tmp+3:adc #0:sta pread3+2
-1710 lda cod3:pread3 sta $c000
-1720 eread rts;alle bytes gelesen. ende readpc
-1730 text .asc " pc  sp yr xr ac nv-bdizc 76543210      "
-1740 hex .asc "0123456789abcdef"
-1750 tmp .byt 0,0,0,0,0,0,0;arbeitsvariablen
-1760 tmp1 .byt 0
-1770 oldy .byt 0
-1780 oldx .byt 0
-1790 cod1 .byt 0:cod2 .byt 0:cod3 .byt 0
-1800 codel .byt 0:dison .byt 0
-1810 *=tstart:;tab. opcodes (l-byte tstart muss 0 sein)
-1820 .asc "brkora?????????oraasl???phporaasl"
-1830 .asc "??????oraasl???bplora??????"
-1840 .asc "???oraasl???clcora?????????"
-1850 .asc "oraasl???jsrand??????bitand"
-1860 .asc "rol???plpandrol???bitandrol"
-1870 .asc "???bmiand?????????androl???"
-1880 .asc "secand?????????androl???rti"
-1890 .asc "eor?????????eorlsr???phaeor"
-1900 .asc "lsr???jmpeorlsr???bvceor???"
-1910 .asc "??????eorlsr???clieor??????"
-1920 .asc "???eorlsr???rtsadc?????????"
-1930 .asc "adcror???plaadcror???jmpadc"
-1940 .asc "ror???bvsadc?????????adcror"
-1950 .asc "???seiadc?????????adcror???"
-1960 .asc "???sta??????stystastx???dey"
-1970 .asc "???txa???stystastx???bccsta"
-1980 .asc "??????stystastx???tyastatxs"
-1990 .asc "??????sta??????ldyldaldx???"
-2000 .asc "ldyldaldx???tayldatax???ldy"
-2010 .asc "ldaldx???bcslda??????ldylda"
-2020 .asc "ldx???clvldatsx???ldyldaldx"
-2030 .asc "???cpycmp??????cpycmpdec???"
-2040 .asc "inycmpdex???cpycmpdec???bne"
-2050 .asc "cmp?????????cmpdec???cldcmp"
-2060 .asc "?????????cmpdec???cpxsbc???"
-2070 .asc "???cpxsbcinc???inxsbcnop???"
-2080 .asc "cpxsbcinc???beqsbc?????????"
-2090 .asc "sbcinc???sedsbc?????????sbc"
-2100 .asc "inc???"
-2110 ;tabelle adressierung (keine standardwerte nur fuer disas)
-2120 tadr .byt 1,6,1,1,1,3,3,1,1,2,1,1
-2130 .byt 1,3,3,1,0,7,1,1,1,4,4,1,1,5
-2140 .byt 1,1,1,4,4,1,3,6,1,1,3,3,3,1
-2150 .byt 1,2,1,1,3,3,3,1,0,7,1,1,1,4
-2160 .byt 4,1,1,5,1,1,1,4,4,1,1,6,1,1
-2170 .byt 1,3,3,1,1,2,1,1,3,3,3,1,0,7
-2180 .byt 1,1,1,4,4,1,1,5,1,1,1,4,4,1
-2190 .byt 1,6,1,1,1,3,3,1,1,2,1,1,8,3
-2200 .byt 3,1,0,7,1,1,1,4,4,1,1,5,1,1,1
-2210 .byt 4,4,1,1,6,1,1,3,3,3,1,1,1,1
-2220 .byt 1,3,3,3,1,0,7,1,1,4,4,5,1,1
-2230 .byt 5,1,1,1,4,1,1,2,6,2,1,3,3,3
-2240 .byt 1,1,2,1,1,3,3,3,1,0,7,1,1,4
-2250 .byt 4,5,1,1,5,1,1,4,4,5,1,2,6,1
-2260 .byt 1,3,3,3,1,1,2,1,1,3,3,3,1,0
-2270 .byt 7,1,1,1,4,4,1,1,5,1,1,1,4,4
-2280 .byt 1,2,6,1,1,3,3,3,1,1,2,1,1,3
-2290 .byt 3,3,1,0,7,1,1,1,4,4,1,1,5,1
-2300 .byt 1,1,4,4,1
-2310 .end
-2320 end
-2330 inputa:printpeek(a+51456):goto2330
-            </pre>
+            <!-- Eingetippt von Endurion -->
+            <pre>100:   C000                   * = 49152
+                      ;
+                      ;
+                      ;TRACE / SINGLE STEP FUER C64            9.84
+                      ;
+                      ;   +DISASSEMBLER / EDITOR
+                      ;
+                      ;       JUERGEN GOEBEL
+                      ;
+                      ;       8 MUENCHEN 82
+                      ;
+                      ;       GROSCHENWEG 19
+                      ;
+                      ;
+                      ;
+                      ;      TEL. 089 / 432709
+                      ;
+                      ;
+150:   C000                   .OPT 00,P1
+160:   C000          IRQVEK   =    $314
+160:   C000          STACK    =    $100
+160:   C000          COL      =    55296   ;HINTERGRUNDFARBE
+170:   C000          SCREEN   =    1024
+170:   C000          READY    =    $A474-1
+180:   C000          CIA      =    $DC00
+180:   C000          TL       =    CIA+6
+180:   C000          TH       =    CIA+7
+180:   C000          TAST     =    $EA87   ;TASTATURROUT.
+180:   C000          DDRB     =    $DD03
+200:   C000          ICR      =    CIA+13  ;INTERR.CONTROLREG.
+200:   C000          CRB      =    CIA+15
+200:   C000          TSTART   =    *+$0500
+210:   C000 EA                NOP
+210:   C001 A9 00             LDA  #0
+210:   C003 8D 87 C4          STA  DISON
+210:   C006 F0 05             BEQ  GO
+220:   C008 A9 FF             LDA  #255
+220:   C00A 8D 87 C4          STA  DISON
+230:   C00D 78       GO       SEI
+230:   C00E A9 34             LDA  #&lt;TRACE
+230:   C010 8D 14 03          STA  IRQVEK  ;IRQ VEKTOR
+240:   C013 A9 C0             LDA  #&gt;TRACE
+240:   C015 8D 15 03          STA  IRQVEK+1 ;AUF TRACE
+250:   C018 A9 82             LDA  #130
+250:   C01A 8D 0D DC          STA  ICR     ;TIMER B INTERRUPT ERLAUBT
+250:   C01D A2 FF             LDX  #255
+250:   C01F 9A                TXS          ;STACK INITIAL.
+260:   C020 A9 A4             LDA  #&gt;READY ;STACK FUER TRACE
+260:   C022 48                PHA          ;VORBEREITEN
+260:   C023 A9 73             LDA  #&lt;READY
+260:   C025 48                PHA
+270:   C026 A9 C0             LDA  #$C0    ;PC=$C000
+270:   C028 48                PHA
+270:   C029 A9 00             LDA  #0
+270:   C02B 48                PHA
+280:   C02C A9 20             LDA  #32
+280:   C02E 48                PHA
+280:   C02F A9 00             LDA  #0
+280:   C031 48                PHA
+280:   C032 48                PHA
+280:   C033 48                PHA
+290:   C034 D8       TRACE    CLD
+290:   C035 A0 00             LDY  #0
+290:   C037 B9 41 C4 TITEL    LDA  TEXT,Y  ;KOPFZEILE
+300:   C03A 20 2C C1          JSR  PRIZEI  ;AUSGEBEN
+300:   C03D C0 28             CPY  #40
+300:   C03F D0 F6             BNE  TITEL
+310:   C041 BA                TSX
+310:   C042 BD 06 01          LDA  STACK+6,X ;PC AUSGEBEN
+310:   C045 8D 7C C4          STA  TMP+3
+310:   C048 20 0E C1          JSR  PRBYTE
+320:   C04B BD 05 01          LDA  STACK+5,X
+320:   C04E 8D 7D C4          STA  TMP+4
+320:   C051 20 0E C1          JSR  PRBYTE
+330:   C054 AD 87 C4          LDA  DISON
+330:   C057 30 03             BMI  DISOFF
+340:   C059 20 74 C2          JSR  DISAS
+340:   C05C 20 2A C1 DISOFF   JSR  SPACE
+340:   C05F 8A                TXA          ;SP AUSGEBEN
+350:   C060 20 0E C1          JSR  PRBYTE
+360:   C063 20 2A C1 REGISTER JSR  SPACE
+360:   C066 BD 01 01          LDA  STACK+1,X
+360:   C069 20 0E C1          JSR  PRBYTE
+370:   C06C E8                INX
+370:   C06D C0 38             CPY  #56
+370:   C06F 90 F2             BCC  REGISTER
+370:   C071 20 2A C1          JSR  SPACE
+380:   C074 BD 01 01          LDA  STACK+1,X ;PROZESSORSTATUS-FLAGS ANZEIGEN
+390:   C077 A2 08             LDX  #8
+400:   C079 0A       CONT1    ASL
+400:   C07A 48                PHA
+400:   C07B A9 5E             LDA  #94     ;PFEIL
+400:   C07D B0 02             BCS  FLSETZ
+410:   C07F A9 2D             LDA  #45     ;MINUS
+410:   C081 20 2C C1 FLSETZ   JSR  PRIZEI
+410:   C084 68                PLA
+420:   C085 CA                DEX
+420:   C086 D0 F1             BNE  CONT1
+420:   C088 20 2A C1          JSR  SPACE
+420:   C08B A2 08             LDX  #8      ;USERPORT ANZEIGEN
+430:   C08D AD 01 DD          LDA  DDRB-2
+440:   C090 0A       CONT2    ASL
+440:   C091 48                PHA
+440:   C092 A9 31             LDA  #$31
+440:   C094 B0 02             BCS  USETZ
+450:   C096 A9 30             LDA  #$30
+450:   C098 20 2C C1 USETZ    JSR  PRIZEI
+450:   C09B 68                PLA
+460:   C09C CA                DEX
+460:   C09D D0 F1             BNE  CONT2
+460:   C09F A2 08             LDX  #8      ;DATENRICHTUNGSREGISTER
+460:   C0A1 AD 03 DD          LDA  DDRB    ;LADEN
+470:   C0A4 1E 41 04 CONT3    ASL  SCREEN+65,X
+470:   C0A7 4A                LSR          ;ENTSPRECHENDE BITS DER ANZEIGE
+480:   C0A8 7E 41 04          ROR  SCREEN+65,X ;WERDEN INVERTIERT
+480:   C0AB CA                DEX
+480:   C0AC D0 F6             BNE  CONT3
+490:   C0AE 20 38 C1 WAIT     JSR  GET     ;WARTET AUF
+490:   C0B1 C9 17             CMP  #23     ;F1,F3,F5,F7 ODER X
+490:   C0B3 F0 3C             BEQ  EXIT
+500:   C0B5 C9 05             CMP  #5
+500:   C0B7 F0 16             BEQ  FAST    ;UND VERZWEIGT ENTSPRECHEND
+510:   C0B9 C9 06             CMP  #6
+510:   C0BB F0 2A             BEQ  SLOW
+520:   C0BD C9 03             CMP  #3
+520:   C0BF F0 07             BEQ  WAITL
+520:   C0C1 C9 04             CMP  #4
+520:   C0C3 D0 E9             BNE  WAIT
+530:   C0C5 4C 3E C1          JMP  SET
+540:   C0C8 20 38 C1 WAITL    JSR  GET     ;WARTET BIS F7 WIEDER LOSGELASSEN
+540:   C0CB C9 40             CMP  #64
+540:   C0CD D0 F9             BNE  WAITL
+550:   C0CF A9 16    FAST     LDA  #$16
+550:   C0D1 8D 06 DC          STA  TL
+560:   C0D4 A9 00             LDA  #0      ;TIMER LADEN
+560:   C0D6 8D 07 DC          STA  TH
+560:   C0D9 A9 11             LDA  #17
+560:   C0DB 8D 0F DC          STA  CRB     ;UND STARTEN
+560:   C0DE AD 0D DC          LDA  $DC0D   ;ENDE IRQ
+570:   C0E1 68                PLA
+570:   C0E2 A8                TAY
+570:   C0E3 68                PLA
+570:   C0E4 AA                TAX
+580:   C0E5 68                PLA
+580:   C0E6 40                RTI
+590:   C0E7 A2 00    SLOW     LDX  #0
+590:   C0E9 CA       CONT4    DEX
+590:   C0EA D0 FD             BNE  CONT4
+590:   C0EC 88                DEY
+590:   C0ED D0 FA             BNE  CONT4
+600:   C0EF F0 DE             BEQ  FAST
+610:   C0F1 A9 02    EXIT     LDA  #2      ;X TASTE
+610:   C0F3 8D 0D DC          STA  ICR
+610:   C0F6 A9 31             LDA  #$31
+610:   C0F8 8D 14 03          STA  IRQVEK  ;SETZT DEN IRQ VEKTOR
+620:   C0FB A9 EA             LDA  #$EA    ;ALTEN WERT
+620:   C0FD 8D 15 03          STA  IRQVEK+1
+620:   C100 A9 04             LDA  #4
+620:   C102 8D 8B 02          STA  $028B
+620:   C105 A9 10             LDA  #16     ;REPEAT KORRIG.
+630:   C107 8D 8C 02          STA  $028C
+630:   C10A 58                CLI
+630:   C10B 4C 74 A4          JMP  READY+1 ;SPRUNG ZU BASIC
+640:   C10E 48       PRBYTE   PHA          ;1 BYTE ALS 2 HEXZ. AUF SCHIRM
+640:   C10F 8E 79 C4          STX  TMP
+640:   C112 4A                LSR
+640:   C113 4A                LSR
+640:   C114 4A                LSR
+640:   C115 4A                LSR
+650:   C116 AA                TAX
+650:   C117 BD 69 C4          LDA  HEX,X
+650:   C11A 20 2C C1          JSR  PRIZEI
+660:   C11D 68                PLA
+660:   C11E 29 0F             AND  #$0F
+660:   C120 AA                TAX
+660:   C121 BD 69 C4          LDA  HEX,X
+660:   C124 AE 79 C4          LDX  TMP
+670:   C127 4C 2C C1          JMP  PRIZEI
+680:   C12A A9 20    SPACE    LDA  #$20
+690:   C12C 29 3F    PRIZEI   AND  #$3F    ;WEGEN BILDSCHIRMCODE
+700:   C12E 99 00 04          STA  SCREEN,Y
+700:   C131 A9 01             LDA  #1      ;FARBE SETZEN
+700:   C133 99 00 D8          STA  COL,Y
+700:   C136 C8                INY
+700:   C137 60                RTS
+710:   C138 20 87 EA GET      JSR  TAST    ;HOLT TASTENCODE
+710:   C13B A5 CB             LDA  $CB
+710:   C13D 60                RTS
+720:   C13E 20 74 C2 SET      JSR  DISAS
+720:   C141 A0 28             LDY  #40     ;F1 TASTE
+730:   C143 B9 00 04 START    LDA  SCREEN,Y
+730:   C146 09 80             ORA  #128
+730:   C148 99 00 04          STA  SCREEN,Y
+730:   C14B 8C 79 C4          STY  TMP
+740:   C14E 20 82 C1          JSR  ZEICHHOL ;EINGABEROUT.
+740:   C151 AC 79 C4          LDY  TMP
+740:   C154 C9 0D             CMP  #13
+740:   C156 D0 11             BNE  LINKS
+750:   C158 C0 64             CPY  #100
+750:   C15A 10 03             BPL  MREAD
+750:   C15C 4C A2 C1          JMP  READ
+750:   C15F 60       MREAD    RTS          ;ZUR LESEROUTINE
+760:   C160 B9 00 04 REVERSE  LDA  SCREEN,Y ;INVERTIEREN
+770:   C163 29 7F             AND  #127
+770:   C165 99 00 04          STA  SCREEN,Y
+770:   C168 60                RTS
+780:   C169 C9 11    LINKS    CMP  #17     ;CURSOR LINKS
+780:   C16B D0 06             BNE  RECHTS
+780:   C16D 20 60 C1          JSR  REVERSE
+780:   C170 88                DEY
+780:   C171 D0 D0             BNE  START
+790:   C173 C9 1D    RECHTS   CMP  #29     ;CURSOR RECHTS
+790:   C175 D0 06             BNE  CONT6
+790:   C177 20 60 C1          JSR  REVERSE
+790:   C17A C8                INY
+790:   C17B D0 C6             BNE  START
+800:   C17D 20 2C C1 CONT6    JSR  PRIZEI  ;WERT ANZEIGEN
+800:   C180 D0 C1             BNE  START
+800:   C182 A9 00    ZEICHHOL LDA  #0      ;TAST.ABFRAGE
+810:   C184 85 C6             STA  $C6
+810:   C186 20 87 EA          JSR  TAST
+810:   C189 AD 77 02          LDA  $0277
+820:   C18C C9 00             CMP  #0
+820:   C18E F0 F2             BEQ  ZEICHHOL
+820:   C190 A0 00             LDY  #0
+820:   C192 8C 77 02          STY  $0277   ;TASTATURPUFFERSTART
+830:   C195 C9 85             CMP  #$85    ;F1 TASTE
+830:   C197 F0 E9             BEQ  ZEICHHOL
+840:   C199 A0 40             LDY  #64     ;VERZOEGERUNG REPEATZAEHLER
+840:   C19B 8C 8B 02          STY  $028B
+840:   C19E 8C 8C 02          STY  $028C
+840:   C1A1 60                RTS
+850:   C1A2 20 60 C1 READ     JSR  REVERSE
+850:   C1A5 A0 28             LDY  #40     ;PC LESEN
+850:   C1A7 BA                TSX
+850:   C1A8 20 F6 C1          JSR  BYT
+850:   C1AB 9D 06 01          STA  STACK+6,X
+860:   C1AE 8D 7C C4          STA  TMP+3
+860:   C1B1 C8                INY
+860:   C1B2 20 F6 C1          JSR  BYT
+870:   C1B5 9D 05 01          STA  STACK+5,X
+870:   C1B8 8D 7D C4          STA  TMP+4
+870:   C1BB C8                INY
+870:   C1BC C8                INY          ;STACK UEBERLESEN
+870:   C1BD C8                INY
+870:   C1BE C8                INY
+880:   C1BF C8       LOOP     INY          ;REGISTER LESEN
+880:   C1C0 20 F6 C1          JSR  BYT
+880:   C1C3 9D 01 01          STA  STACK+1,X
+880:   C1C6 C8                INY
+880:   C1C7 E8                INX
+890:   C1C8 C0 38             CPY  #56
+890:   C1CA D0 F3             BNE  LOOP
+900:   C1CC C8                INY
+900:   C1CD A9 00             LDA  #0
+900:   C1CF 8D 79 C4          STA  TMP
+900:   C1D2 B9 00 04 LOOP1    LDA  SCREEN,Y ;FLAGS LESEN
+900:   C1D5 29 1F             AND  #%00011111
+910:   C1D7 C9 1E             CMP  #30
+910:   C1D9 2E 79 C4          ROL  TMP
+920:   C1DC C8                INY
+920:   C1DD C0 41             CPY  #65
+920:   C1DF D0 F1             BNE  LOOP1
+920:   C1E1 BA                TSX
+920:   C1E2 AD 79 C4          LDA  TMP
+920:   C1E5 29 FB             AND  #%11111011 ;I FLAG LOESCHEN
+930:   C1E7 9D 04 01          STA  STACK+4,X
+930:   C1EA 20 74 C2          JSR  DISAS
+930:   C1ED 20 D5 C3          JSR  READPC
+930:   C1F0 20 74 C2          JSR  DISAS
+930:   C1F3 4C AE C0          JMP  WAIT
+940:   C1F6 20 09 C2 BYT      JSR  LBIT    ;8 BIT ZAHL VON SCREEN HOLEN
+940:   C1F9 0A                ASL
+940:   C1FA 0A                ASL
+940:   C1FB 0A                ASL
+940:   C1FC 0A                ASL
+940:   C1FD C8                INY
+940:   C1FE 8D 79 C4          STA  TMP
+950:   C201 20 09 C2          JSR  LBIT
+950:   C204 18                CLC
+950:   C205 6D 79 C4          ADC  TMP
+950:   C208 60                RTS
+960:   C209 B9 00 04 LBIT     LDA  SCREEN,Y ;1 BYTE VON SCREEN IN HEXs
+960:   C20C C9 30             CMP  #48
+960:   C20E B0 03             BCS  ZAHL
+960:   C210 69 39             ADC  #57
+970:   C212 38                SEC
+970:   C213 E9 30    ZAHL     SBC  #48
+970:   C215 60                RTS
+                       ;BERECHNET ABS. ADRESSEN BEI BRANCHES
+990:    C216 AD 84 C4 OFFSET   LDA  COD2
+990:    C219 30 18             BMI  BMINUS
+1000:   C21B 18                CLC          ;BRANCH VOR
+1000:   C21C 69 02             ADC  #2
+1000:   C21E 6D 7D C4          ADC  TMP+4
+1000:   C221 8D 80 C4          STA  TMP1
+1000:   C224 AD 7C C4          LDA  TMP+3
+1010:   C227 69 00             ADC  #0
+1010:   C229 20 0E C1          JSR  PRBYTE
+1010:   C22C AD 80 C4          LDA  TMP1
+1010:   C22F 20 0E C1          JSR  PRBYTE
+1010:   C232 60                RTS
+                       ;BRANCH RUECK
+1020:   C233 49 FF    BMINUS   EOR  #255
+1020:   C235 38                SEC
+1020:   C236 E9 01             SBC  #1
+1020:   C238 8D 79 C4          STA  TMP
+1030:   C23B AD 7D C4          LDA  TMP+4
+1030:   C23E ED 79 C4          SBC  TMP
+1030:   C241 8D 80 C4          STA  TMP1
+1030:   C244 AD 7C C4          LDA  TMP+3
+1040:   C247 E9 00             SBC  #0
+1040:   C249 20 0E C1          JSR  PRBYTE
+1040:   C24C AD 80 C4          LDA  TMP1
+1040:   C24F 20 0E C1          JSR  PRBYTE
+1040:   C252 60                RTS          ;ENDE OFFSET
+                       ;LAENGE OPCODE
+                       ;BERECHNET BEFEHLSLAENGE (1,2 OD. 3 BYTES)
+                       ;OPCODE IN AKKU UEBERGEBEN
+                       ;IM Y-REG. STEHT DANN BEFEHLSLAENGE
+1090:   C253 A0 01    LAENGE   LDY  #1
+1100:   C255 C9 20             CMP  #$20
+1100:   C257 F0 18             BEQ  L001
+1100:   C259 29 9F             AND  #$9F
+1100:   C25B F0 16             BEQ  L003
+1110:   C25D 29 1F             AND  #$1F
+1110:   C25F C9 09             CMP  #9
+1110:   C261 F0 0F             BEQ  L002
+1110:   C263 C9 19             CMP  #$19
+1120:   C265 F0 0A             BEQ  L001
+1120:   C267 29 0D             AND  #$0D
+1120:   C269 C9 08             CMP  #8
+1120:   C26B F0 06             BEQ  L003
+1130:   C26D 29 08             AND  #8
+1130:   C26F F0 01             BEQ  L002
+1140:   C271 C8       L001     INY
+1140:   C272 C8       L002     INY
+1140:   C273 60       L003     RTS
+1150:   C274 8C 81 C4 DISAS    STY  OLDY
+1150:   C277 8E 82 C4          STX  OLDX    ;REGISTER RETTEN
+1160:   C27A A2 14             LDX  #20
+1160:   C27C A9 20             LDA  #' '
+1160:   C27E 9D 78 04 CLE1     STA  SCREEN+120,X ;ZEILE FUER DISAS. LOESCHEN
+1170:   C281 CA                DEX
+1170:   C282 D0 FA             BNE  CLE1
+                       ;PC L/H IN TMP+4 / TMP+3
+                       ;BELEGT 'RAM' POINTER ZUM LESEN
+1190:   C284 AD 7D C4          LDA  TMP+4
+1190:   C287 8D BF C2          STA  PPOIN1+1
+1190:   C28A 8D 7F C4          STA  TMP+6
+1190:   C28D AD 7C C4          LDA  TMP+3
+1190:   C290 8D C0 C2          STA  PPOIN1+2
+1190:   C293 8D 7E C4          STA  TMP+5
+1200:   C296 EE 7F C4          INC  TMP+6
+1200:   C299 AD 7F C4          LDA  TMP+6
+1200:   C29C 8D C5 C2          STA  PPOIN2+1
+1200:   C29F D0 03             BNE  L005
+1210:   C2A1 EE 7E C4          INC  TMP+5
+1210:   C2A4 AD 7E C4 L005     LDA  TMP+5
+1210:   C2A7 8D C6 C2          STA  PPOIN2+2
+1210:   C2AA EE 7F C4          INC  TMP+6
+1220:   C2AD AD 7F C4          LDA  TMP+6
+1220:   C2B0 8D CB C2          STA  PPOIN3+1
+1220:   C2B3 D0 03             BNE  L006
+1230:   C2B5 EE 7E C4          INC  TMP+5
+1230:   C2B8 AD 7E C4 L006     LDA  TMP+5
+1230:   C2BB 8D CC C2          STA  PPOIN3+2
+1240:   C2BE AD 00 C0 PPOIN1   LDA  $C000
+1240:   C2C1 8D 83 C4          STA  COD1      ;LIEST OPCODES
+1250:   C2C4 AD 00 C0          LDA  $C000
+1250:   C2C7 8D 84 C4          STA  COD2
+1260:   C2CA AD 00 C0          LDA  $C000
+1260:   C2CD 8D 85 C4          STA  COD3
+1270:   C2D0 AD 83 C4          LDA  COP1
+1270:   C2D3 20 53 C2          JSR  LAENGE
+1270:   C2D6 98                TYA
+1270:   C2D7 8D 86 C4          STA  CODEL
+1270:   C2DA AA                TAX
+1270:   C2DB A0 78             LDY  #120      ;BYTES AB PC AUSGEBEN
+1280:   C2DD AD 83 C4          LDA  COD1
+1280:   C2E0 20 0E C1          JSR  PRBYTE
+1280:   C2E3 20 2A C1          JSR  SPACE
+1280:   C2E6 CA                DEX
+1290:   C2E7 F0 12             BEQ  L007
+1290:   C2E9 AD 84 C4          LDA  COD2
+1290:   C2EC 20 0E C1          JSR  PRBYTE
+1290:   C2EF 20 2A C1          JSR  SPACE
+1300:   C2F2 CA                DEX
+1300:   C2F3 F0 06             BEQ  L007
+1300:   C2F5 AD 85 C4          LDA  COD3
+1300:   C2F8 20 0E C1          JSR  PRBYTE
+1310:   C2FB A0 81    L007     LDY  #129
+1310:   C2FD AD 83 C4          LDA  COD1      ;GIBT OPCODE (3 BUCHSTABEN) AUS
+1320:   C300 18                CLC
+1320:   C301 A9 C5             LDA  #&gt;TSTART
+1320:   C303 8D 79 C4          STA  TMP
+1320:   C306 AD 83 C4          LDA  COD1
+1320:   C309 6D 83 C4          ADC  COD1
+1320:   C30C 90 03             BCC  L008
+1330:   C30E EE 79 C4          INC  TMP
+1330:   C311 18       L008     CLC
+1330:   C312 6D 83 C4          ADC  COD1
+1330:   C315 90 03             BCC  L009
+1330:   C317 EE 79 C4          INC  TMP
+1330:   C31A 8D 26 C3 L009     STA  OPP+1     ;POINTER BELEGEN
+1340:   C31D AD 79 C4          LDA  TMP
+1340:   C320 8D 27 C3          STA  OPP+2
+1340:   C323 A2 00             LDX  #0
+1340:   C325 BD 00 C0 OPP      LDA  $C000,X
+1340:   C328 20 2C C1          JSR  PRIZEI
+1340:   C32B E8                INX
+1350:   C32C E0 03             CPX  #3
+1350:   C32E D0 F5             BNE  OPP
+1350:   C330 20 2A C1          JSR  SPACE
+1360:   C333 AD 86 C4          LDA  CODEL
+1360:   C336 C9 02             CMP  #2
+1360:   C338 10 03             BPL  CODE2
+1360:   C33A 4C CE C3          JMP  ENDAS
+1370:   C33D AE 83 C4 CODE2    LDX  COD1
+1370:   C340 BD 00 C8          LDA  TADR,X    ;ADRESS. FESTSTELLEN
+1370:   C343 AA                TAX
+                       ; '#$','$' OD.'($' AUSGEBEN
+1390:   C344 E0 06             CPX  #6
+1390:   C346 30 05             BMI  L0010
+1390:   C348 A9 28             LDA  #"("
+1390:   C34A 20 2C C1          JSR  PRIZEI
+1400:   C34D E0 02    L0010    CPX  #2
+1400:   C34F D0 05             BNE  L0011
+1400:   C351 A9 23             LDA  #'#'
+1410:   C353 20 2C C1          JSR  PRIZEI
+1410:   C356 A9 24    L0011    LDA  #'$'
+1410:   C358 20 2C C1          JSR  PRIZEI
+1420:   C35B E0 01             CPX  #1
+1420:   C35D 10 06             BPL  L0012
+1420:   C35F 20 16 C2          JSR  OFFSET
+1420:   C362 4C CE C3          JMP  ENDAS
+1430:   C365 AD 86 C4 L0012    LDA  CODEL     ;OPERANDEN AUSGEBEN
+1430:   C368 C9 03             CMP  #3
+1430:   C36A F0 09             BEQ  CODL3
+1440:   C36C AD 84 C4          LDA  COD2
+1440:   C36F 20 0E C1          JSR  PRBYTE
+1440:   C372 4C 81 C3          JMP  L0013
+1450:   C375 AD 85 C4 CODL3    LDA  COD3
+1450:   C378 20 0E C1          JSR  PRBYTE
+1450:   C37B AD 84 C4          LDA  COD2
+1450:   C37E 20 0E C1          JSR  PRBYTE
+1460:   C381 E0 04    L0013    CPX  #4
+1460:   C383 30 49             BMI  ENDAS
+                       ; ',X',',Y',',X)','),Y' OD. ')' AUSGEBEN
+1480:   C385 D0 0D             BNE  L0014
+1480:   C387 A9 2C             LDA  #","
+1480:   C389 20 2C C1          JSR  PRIZEI
+1490:   C38C A9 58             LDA  #"X"
+1490:   C38E 20 2C C1          JSR  PRIZEI
+1490:   C391 4C CE C3          JMP  ENDAS
+1500:   C394 E0 05    L0014    CPX  #5
+1500:   C396 D0 0D             BNE  L0015
+1510:   C398 A9 2C             LDA  #","
+1510:   C39A 20 2C C1          JSR  PRIZEI
+1510:   C39D A9 59             LDA  #"Y"
+1510:   C39F 20 2C C1          JSR  PRIZEI
+1510:   C3A2 4C CE C3          JMP  ENDAS
+1520:   C3A5 E0 06    L0015    CPX  #6
+1520:   C3A7 D0 12             BNE  L0016
+1520:   C3A9 A9 2C             LDA  #","
+1520:   C3AB 20 2C C1          JSR  PRIZEI
+1530:   C3AE A9 58             LDA  #"X"
+1530:   C3B0 20 2C C1          JSR  PRIZEI
+1530:   C3B3 A9 29             LDA  #")"
+1530:   C3B5 20 2C C1          JSR  PRIZEI
+1530:   C3B8 4C CE C3          JMP  ENDAS
+1540:   C3BB A9 29    L0016    LDA  #")"
+1540:   C3BD 20 2C C1          JSR  PRIZEI
+1550:   C3C0 E0 08             CPX  #8
+1550:   C3C2 F0 0A             BEQ  ENDAS
+1550:   C3C4 A9 2C             LDA  #","
+1550:   C3C6 20 2C C1          JSR  PRIZEI
+1560:   C3C9 A9 59             LDA  #"Y"
+1560:   C3CB 20 2C C1          JSR  PRIZEI
+1570:   C3CE AC 81 C4 ENDAS    LDY  OLDY      ;REG. HOLEN
+1570:   C3D1 AE 82 C4          LDX  OLDX
+1570:   C3D4 60                RTS            ;ENDE DISAS
+1580:   C3D5 A0 78    READPC   LDY  #120
+1580:   C3D7 20 43 C1          JSR  START     ;DIS.ZEILE EDIT.
+1580:   C3DA 20 60 C1          JSR  REVERSE
+1580:   C3DD A0 78             LDY  #120
+                       ;LIEST BYTES UND SPEICHERT IN RAM
+1600:   C3DF 20 F6 C1          JSR  BYT
+1600:   C3E2 8D 83 C4          STA  COD1
+1600:   C3E5 C8                INY
+1600:   C3E6 C8                INY
+1600:   C3E7 20 F6 C1          JSR  BYT
+1610:   C3EA 8D 84 C4          STA  COD2
+1610:   C3ED C8                INY
+1610:   C3EE C8                INY
+1610:   C3EF 20 F6 C1          JSR  BYT
+1610:   C3F2 8D 85 C4          STA  COD3
+1620:   C3F5 AD 7D C4          LDA  TMP+4
+1620:   C3F8 8D 05 C4          STA  PREAD1+1
+1630:   C3FB AD 7C C4          LDA  TMP+3
+1630:   C3FE 8D 06 C4          STA  PREAD1+2
+1630:   C401 AD 83 C4          LDA  COD1
+1630:   C404 8D 00 C0 PREAD1   STA  $C000
+1640:   C407 AC 86 C4          LDY  CODEL
+1640:   C40A C0 02             CPY  #2
+1640:   C40C 30 32             BMI  EREAD
+1650:   C40E AD 7D C4          LDA  TMP+4
+1650:   C411 18                CLC
+1650:   C412 69 01             ADC  #1
+1650:   C414 8D 23 C4          STA  PREAD2+1
+1660:   C417 AD 7C C4          LDA  TMP+3
+1660:   C41A 69 00             ADC  #0
+1660:   C41C 8D 24 C4          STA  PREAD2+2
+1670:   C41F AD 84 C4          LDA  COD2
+1670:   C422 8D 00 C0 PREAD2   STA  $C000
+1680:   C425 C0 03             CPY  #3
+1680:   C427 30 17             BMI  EREAD
+1690:   C429 AD 7D C4          LDA  TMP+4
+1690:   C42C 18                CLC
+1690:   C42D 69 02             ADC  #2
+1690:   C42F 8D 3E C4          STA  PREAD3+1
+1700:   C432 AD 7C C4          LDA  TMP+3
+1700:   C435 69 00             ADC  #0
+1700:   C437 8D 3F C4          STA  PREAD3+2
+1710:   C43A AD 85 C4          LDA  COD3
+1710:   C43D 8D 00 C0 PREAD3   STA  $C000
+1720:   C440 60       EREAD    RTS            ;ALLE BYTES GELESEN. ENDE READPC
+1730:   C441 20 54 43 TEXT     .ASC " PC  SP YR XR AC NV-BDIZC 76543210      "
+1740:   C469 30 31 32 HEX      .ASC "0123456789ABCDEF"
+1750:   C479 00 00 00 TMP      .BYT 0,0,0,0,0,0,0 ;ARBEITSVARIABLEN
+1760:   C480 00       TMP1     .BYT 0
+1770:   C481 00       OLDY     .BYT 0
+1780:   C482 00       OLDX     .BYT 0
+1790:   C483 00       COD1     .BYT 0
+1790:   C484 00       COD2     .BYT 0
+1790:   C485 00       COD3     .BYT 0
+1800:   C486 00       CODEL    .BYT 0
+1800:   C487 00       DISON    .BYT 0
+1810:   C500                   *=   TSTART
+                       ;TAB. OPCODES (L-BYTE TSTART MUSS 0 SEIN)
+1820:   C500 42 52 4B          .ASC "BRKORA?????????ORAASL???PHPORAASL"
+1830:   C521 3F 3F 3F          .ASC "??????ORAASL???BPLORA??????"
+1840:   C53C 3F 3F 3F          .ASC "???ORAASL???CLCORA?????????"
+1850:   C557 4F 52 41          .ASC "ORAASL???JSRAND??????BITAND"
+1860:   C572 52 4F 4C          .ASC "ROL???PLPANDROL???BITANDROL"
+1870:   C58D 3F 3F 3F          .ASC "???BMIAND?????????ANDROL???"
+1880:   C5A8 53 45 43          .ASC "SECAND?????????ANDROL???RTI"
+1890:   C5C3 45 4F 52          .ASC "EOR?????????EORLSR???PHAEOR"
+1900:   C5DE 4C 53 52          .ASC "LSR???KMPEORLSR???BVCEOR???"
+1910:   C5F9 3F 3F 3F          .ASC "??????EORLSR???CLIEOR??????"
+1920:   C614 3F 3F 3F          .ASC "???EORLSR???RTSADC?????????"
+1930:   C62F 41 44 43          .ASC "ADCROR???PLAADCROR???JMPADC"
+1940:   C64A 52 4F 52          .ASC "ROR???BVSADC?????????ADCROR"
+1950:   C665 3F 3F 3F          .ASC "???SEIADC?????????ADCROR???"
+1960:   C680 3F 3F 3F          .ASC "???STA??????STYSTASTX???DEY"
+1970:   C69B 3F 3F 3F          .ASC "???TXA???STYSTASTX???BCCSTA"
+1980:   C6B6 3F 3F 3F          .ASC "??????STYSTASTX???TYASTATXS"
+1990:   C6D1 3F 3F 3F          .ASC "??????STA??????LDYLDALDX???"
+2000:   C6EC 4C 44 59          .ASC "LDYLDALDX???TAYLDATAX???LDY"
+2010:   C707 4C 44 41          .ASC "LDALDX???BCSLDA??????LDYLDA"
+2020:   C722 4C 44 58          .ASC "LDX???CLVLDATSX???LDYLDALDX"
+2030:   C73D 3F 3F 3F          .ASC "???CPYCMP??????CYPCMPDEC???"
+2040:   C758 49 4E 59          .ASC "INYCMPDEX???CPYCMPDEC???BNE"
+2050:   C773 43 4D 50          .ASC "CMP?????????CMPDEC???CLDCMP"
+2060:   C78E 3F 3F 3F          .ASC "?????????CMPDEC???CPXSBC???"
+2070:   C7A9 3F 3F 3F          .ASC "???CPXSBCINC???INXSBCNOP???"
+2080:   C7C4 43 50 58          .ASC "CPXSBCINC???BEQSBC?????????"
+2090:   C7DF 53 42 43          .ASC "SBCINC???SEDSBC?????????SBC"
+2100:   C7FA 49 4E 43          .ASC "INC???"
+                       ;TABELLE ADRESSIERUNG (KEINE STANDARDWERTE NUR FUER DISAS)
+2120:   C800 01 06 01 TADR     .BYT 1,6,1,1,1,3,3,1,1,2,1,1
+2130:   C80C 01 03 03          .BYT 1,3,3,1,0,7,1,1,1,4,4,1,1,5
+2140:   C81A 01 01 01          .BYT 1,1,1,4,4,1,3,6,1,1,3,3,3,1
+2150:   C828 01 02 01          .BYT 1,2,1,1,3,3,3,1,0,7,1,1,1,4
+2160:   C836 04 01 01          .BYT 4,1,1,5,1,1,1,4,4,1,1,6,1,1
+2170:   C844 01 03 03          .BYT 1,3,3,1,1,2,1,1,3,3,3,1,0,7
+2180:   C852 01 01 01          .BYT 1,1,1,4,4,1,1,5,1,1,1,4,4,1
+2190:   C860 01 06 01          .BYT 1,6,1,1,1,3,3,1,1,2,1,1,8,3
+2200:   C86E 03 01 00          .BYT 3,1,0,7,1,1,1,4,4,1,1,5,1,1,1
+2210:   C87D 04 04 01          .BYT 4,4,1,1,6,1,1,3,3,3,1,1,1,1
+2220:   C88B 01 03 03          .BYT 1,3,3,3,1,0,7,1,1,4,4,5,1,1
+2230:   C899 05 01 01          .BYT 5,1,1,1,4,1,1,2,6,2,1,3,3,3
+2240:   C8A7 01 01 02          .BYT 1,1,2,1,1,3,3,3,1,0,7,1,1,4
+2250:   C8B5 04 05 01          .BYT 4,5,1,1,5,1,1,4,4,5,1,2,6,1
+2260:   C8C3 01 03 03          .BYT 1,3,3,3,1,1,2,1,1,3,3,3,1,0
+2270:   C8D1 07 01 01          .BYT 7,1,1,1,4,4,1,1,5,1,1,1,4,4
+2280:   C8DF 01 02 06          .BYT 1,2,6,1,1,3,3,3,1,1,2,1,1,3
+2290:   C8ED 03 03 01          .BYT 3,3,1,0,7,1,1,1,4,4,1,1,5,1
+2300:   C8FB 01 01 04          .BYT 1,1,4,4,1</pre>
             <figcaption>Listing von »Trace und Single Step«</figcaption>
             <!-- TODO Im Magazin ist es das LST davon -->
         </figure>
