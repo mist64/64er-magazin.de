@@ -144,7 +144,6 @@ BASE_DIR = CONFIG.base_dir
 LANG = CONFIG.lang
 
 NEW_DOWNLOADS = 15
-HOURS_PER_ARTICLE = 16
 
 RSS_BASE_URL = "https://www.64er-magazin.de/"
 MASTODON_HASHTAGS = "#c64 #retrocomputing #64er"
@@ -441,7 +440,14 @@ class Article:
 
     def article_pubdate(self):
         issue = db.issues[self.issue_key]
-        pubdate = issue.pubdate + timedelta(hours=HOURS_PER_ARTICLE * self.sort_index)
+        if self.issue_key.endswith("/84") and self.issue_key != "12/84":
+            # until 8411: every 16 hours
+            # (we can remove this code path once 11/84 is through)
+            hours_per_article = 16
+        else:
+            # starting with 8412: spread over 30 days
+            hours_per_article = int(30*24 / len(issue.articles))
+        pubdate = issue.pubdate + timedelta(hours=hours_per_article * self.sort_index)
         return pubdate
 
     def is_category_listings(self):
