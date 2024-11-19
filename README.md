@@ -78,11 +78,12 @@ source .venv/bin/activate                   # activate it
 python3 -m pip install -r requirements.txt  # install the required packages
 ```
 
-Die Eingabe-Ausgaben werden aus `issues` gelesen, die Website wird nach `out` geschrieben. Befindet man sich gerade auf einem git-Branch (außer `main`), ist die Website in `out/pre/<Name des Branches>`.
+Die Eingabe-Ausgaben werden aus `issues` gelesen, die Website wird nach `out` geschrieben.
 
 * `/generate.py` generiert nur die Website.
 * `./generate.py local` startet zudem einen lokalen Webserver.
-* `./generate.py upload` lädt die Website auf den Server. Befindet man sich auf einem Branch, wird nach `/pre/<Name des Branches>` hochgeladen.
+* `./generate.py upload` lädt die Website auf den Server.
+* Das Argument `--future` vor `local`/`upload` bezieht auch Ausgaben mit ein, deren Veröffentlichungsdatum in der Zukunft liegt. Beim Upload landen die Daten in einem Unterverzeichnis namens `test/`.
 
 `local` und `upload` öffnen danach ein Browserfenster mit der Seite (nur macOS).
 
@@ -153,6 +154,9 @@ Die Eingabe-Ausgaben werden aus `issues` gelesen, die Website wird nach `out` ge
         * [Endurion](https://www.forum64.de/wcf/index.php?user/1964-endurion/)
         * [goloMAK](https://www.forum64.de/wcf/index.php?user/28439-golomak/)
         * [ClausS](https://www.forum64.de/wcf/index.php?user/28399-clauss/)
+* Sonderheft 2/1985:
+    * OCR
+        * [Drachen](https://www.forum64.de/wcf/index.php?user/9125-drachen/)
 
 ![](screenshot1.png)
 
