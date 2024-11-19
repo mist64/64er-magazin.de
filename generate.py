@@ -143,7 +143,7 @@ SERVER = CONFIG.server
 BASE_DIR = CONFIG.base_dir
 LANG = CONFIG.lang
 
-NEW_DOWNLOADS = 15
+NEW_DOWNLOADS = 20
 
 RSS_BASE_URL = "https://www.64er-magazin.de/"
 MASTODON_HASHTAGS = "#c64 #retrocomputing #64er"
@@ -858,7 +858,7 @@ def html_generate_latest_issue(db, special):
 
 def html_generate_latest_downloads(db):
     articles_with_downloads = db.articles_with_downloads()
-    sorted_articles = sorted(articles_with_downloads, key=lambda x: (x.issue_key, x.first_page_number()), reverse=True)[:NEW_DOWNLOADS]
+    sorted_articles = sorted(articles_with_downloads, key=lambda x: x.article_pubdate(), reverse=True)[:NEW_DOWNLOADS]
     html_parts = [f"<h2>{LABEL_LATEST_LISTINGS}</h2><hr><ul>"]
 
     for article in sorted_articles:
