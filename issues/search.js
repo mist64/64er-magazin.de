@@ -20,17 +20,11 @@ async function fetchJsonData(url) {
 
 async function initSearchIndex() {
   try {
-    const url = '/' + BASE_DIR + 'search.json';
-    fetchJsonData(url).then(p => {
+    fetchJsonData('/' + BASE_DIR + 'search.json').then(p => {
       pagesIndex = p
-      searchIndex = lunr(function() {
-        this.field("title");
-        this.field("categories");
-        this.field("content");
-        this.ref("href");
-        pagesIndex.forEach((page) => this.add(page));
-      });
-      console.log(JSON.stringify(searchIndex));
+    });
+    fetchJsonData('/' + BASE_DIR + 'search_idx.json').then(s => {
+      searchIndex = lunr.Index.load(s)
     });
   } catch (e) {
     console.log(e);
