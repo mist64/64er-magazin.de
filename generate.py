@@ -15,6 +15,7 @@ import hashlib
 import urllib.parse
 import pytz
 import argparse
+import lunr
 from dataclasses import dataclass, field
 from collections import defaultdict, OrderedDict
 from bs4 import BeautifulSoup, NavigableString
@@ -1784,6 +1785,15 @@ def generate_search_json(db, out_directory):
     # Save the array as JSON
     with open(os.path.join(out_directory, 'search.json'), 'w', encoding='utf-8') as f:
         json.dump(articles_info, f, ensure_ascii=False, indent=4)
+
+    idx = lunr.lunr(
+        ref='href',
+        fields=['title', 'categories', 'content'],
+        documents=articles_info,
+    )
+    serialized_idx = idx.serialize()
+    with open(os.path.join(out_directory, 'search_idx.json'), 'w', encoding='utf-8') as f:
+        json.dump(serialized_idx, f, ensure_ascii=False)
 
 def generate_author_pages(db, out_directory):
     known_authors = {}
