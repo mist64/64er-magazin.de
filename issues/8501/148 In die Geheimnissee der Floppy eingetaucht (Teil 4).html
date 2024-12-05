@@ -1,0 +1,136 @@
+<h1>In die Geheimnissee der Floppy eingetaucht (Teil 4)</h1>
+
+<p class="intro">In dieser Folge beschäftigen wir uns das erste Mal mit dem DOS der Floppystation. Wir wollen uns die Technik der Diskettenaufzeichnung ansehen und die Funktionsweise des DOS genauer unter die Lupe nehmen.</p>
+
+<p>Zuerst wollen wir uns mit dem Aufzeichnungsformat der Diskette beschäftigen: Für einen einwandfreien Betrieb der Floppystation ist es unumgänglich, daß sich Markierungen auf der Diskette befinden. Diese Markierung braucht das Laufwerk, um bestimmte Daten schnell finden zu können. Hierfür gibt es prinzipiell zwei Möglichkeiten: die Hardsektorierung und die Softsektorierung.</p>
+
+<p>Hardsektorierte Disketten erkennt man daran, daß diese eine ganze Anzahl von Indexlöchern besitzen. Damit sind die kleinen Löcher nahe am Innenrand der Magnetscheibe gemeint. Mit einer Fotozelle können nun diese Löcher abgetastet werden, um die jeweilige Position der Diskette festzustellen. Dieses Verfahren hat den Vorteil, daß die Diskettenkapazität voll ausgenutzt werden kann. Es können so bis zu 5 MBytes Daten auf eine 5¼-Zoll-Diskette geschrieben werden. Allerdings erfordert diese Methode einen enormen Hardwareaufwand, der den Preis in die Höhe schnellen läßt. Für preiswerte Laufwerke (wie die 1541) geht man daher einen anderen Weg: die Softsektorierung. Hier besitzt die Diskette nur ein Indexloch zur Drehzahlüberwachung. Bei der 1541 ist sogar noch nicht einmal dieses erforderlich. Die notwendigen Markierungen werden beim Formatierungsvorgang softwaremäßig auf die Diskette aufgebracht, wobei natürlich wertvoller Speicherplatz verloren geht. Softsektorierte Disketten im 5¼-Zoll-Format verfügen daher über zur Zeit maximal 1 MByte Speicherkapazität.</p>
+
+<p>Uns soll also im weiteren die Softsektorierung beschäftigen, wobei in Bild 1 eine Diskette schematisch dagestellt ist, nachdem sie auf der 1541 formatiert wurde. Sie ist in 35 konzentrische Spuren, nachfolgend Tracks genannt, aufgeteilt. Jeder dieser Tracks enthält wiederum eine bestimmte Anzahl von Sektoren, die von außen nach innen abnimmt. Diese Tatsachen sind Ihnen aber schon aus der ersten Folge bekannt. Nun wollen wir genauer auf den Aufbau der Sektoren einer Diskette eingehen.</p>
+
+<p>Jeder Sektor besteht aus einem Blockheader und dem dazugehörigen Datenblock; eine schematische Darstellung zeigt Bild 2. Angeführt werden die Sektoren einer Diskette von den schon erwähnten Markierungen, die der Orientierung dienen. Diese Marken bezeichnet man als Synchron (SYNC)-Markierungen, sie bestehen aus mehreren $FF auf der Diskette. Erkennt der Schreib-/Lesekopf der Floppy also eine solche Marke, dann »weiß« die Foppystation, daß entweder ein Blockheader oder ein Datenblock nachfolgt. Nun müssen wir nur noch diese beiden voneinander unterscheiden können.</p>
+
+<p>Hierzu dient das nächste Kennzeichen auf Diskette. Es folgt direkt nach der SYNC-Markierung und meldet dem Diskcontroller (DC) ob ein Blockheader oder ein Datenblock vorliegt. Hat das Kennzeichen den Wert $08, so handelt es sich um einen Blockheader; findet der Kopf hingegen den Wert $07, so handelt es sich um den Beginn eines Datenblocks.</p>
+
+<p>Wir nehmen jetzt einmal an, der DC hätte das Kennzeichen $08 entdeckt; es handelt sich also um den Header eines Datenblocks. Dann folgt als nächstes Byte die Prüfsumme über den Header, die zur Kontrolle auf Lesefehler dient. Die Reihenfolge der Headerbytes, wie sie im Commodore-Handbuch angegeben ist, stimmt nicht mit der Aufzeichnung auf Diskette überein.</p>
+
+<p>Die nächsten 2 Bytes stellen Sektor- und Tracknummer dieses Sektors dar. Anhand dieser Werte kann der DC bei Trackwechsel sehr schnell die Position des Schreib-/Lesekopfes ausfindig machen.</p>
+
+<p>Das 5. und 6. Byte des Blockheaders geben jeweils einen Teil der ID der Diskette an, und zwar folgen zuerst das zweite und dann das erste Zeichen der ID, die beim Formatieren festgelegt wurden. Mit diesen Angaben ist die Behandlung des Headers bereits abgeschlossen. Es folgen jetzt noch ein paar Bytes, die eine Lücke darstellen.</p>
+
+<p>Mit der nächsten SYNC-Markierung wird der Beginn des eigentlichen Datenblocks eingeleitet. Nach der SYNC-Marke folgt das Datenblockkennzeichen $07. Die nächsten zwei Bytes sind uns bestens bekannt. Sie können mit jedem Diskmonitor angesehen werden und geben Track- und Sektornummer des nächsten Blocks im File an. Man bezeichnet sie deshalb als Linker oder Linkadressen (engl.: to link = verbinden).</p>
+
+<p>Nun erst folgen die eigentlichen Daten auf Diskette, die in jedem Block 254 Byte ausmachen.</p>
+
+<p>Hinter diesen Datenbytes steht die Prüfsumme des Datenblocks, die wiederum zum Erkennen von eventuellen Lesefehlern dient. Werden solche Fehler festgestellt, so versucht die Floppystation noch mehrere Male, den Block doch zu lesen. Erst wenn viele Versuche kein befriedigendes Ergebnis bringen, steigt sie mit einer Fehlermeldung aus.</p>
+
+<p>Nach der Prüfsumme des Datenblocks folgt wieder eine Lücke auf der Diskette, bevor die SYNC-Markierung des nächsten Blockheaders kommt. Wenn wir uns diesen Aufbau eines Sektors betrachten, wird klar, warum die Speicherkapazität bei softsektorierten Disketten gegenüber hardsektorierteri Disketten deutlich abnimmt.</p>
+
+<p>Jetzt werden sie vielleicht auch die Beschreibung der Fehlermeldungen im Floppyhandbuch verstehen, die wir hier nicht mehr aufführen, da sie dort sehr genau und richtig erläutert werden.</p>
+
+<p>Das Verständnis des Diskettenaufbaus ist für die weitere Behandlung des Floppy-DOS unerläßlich, da wir nur so die Funktionsweise begreifen lernen.</p>
+
+<p>Jetzt wollen wir uns aber einmal mit der grundlegenden Arbeitsweise des Floppybetriebssystems (DOS) befassen, die um einiges komplizierter ist, als die im Computer.</p>
+
+<p>Wenn wir die Floppy einschalten, passiert zunächst das gleiche, wie im Computer. Die RE-SET-Leitung geht auf Low und der Mikroprozessor, hier ein 6502, holt sich seine Systemstartadresse. Danach läuft das RESET-Programm an, wobei die Floppy einen Selbsttest durchführt. Erkennen können Sie dies daran, daß für kurze Zeit der Motor anläuft und die rote LED leuchtet. Wurde kein Defekt registriert, so erlischt die Leuchtdiode wieder, und der Motor geht aus. Jetzt wird der RAM-Bereich der Floppy initialisiert und alle wichtigen Zeiger werden hergestellt. Danach ist die 1541 betriebsbereit.</p>
+
+<p>Von jetzt an laufen quasi drei Programme gleichzeitig ab: — das Hauptprogramm läuft in emer Schleife, die nur bei der Ausführung von Befehlen verlassen wird;</p>
+
+<p>— das Diskcontrollerprogramm wird über den IRQ gesteuert und durch den Timer des DC alle 10 ms aufgerufen;<br/>
+— die Routinen des Buscontrollers (BC) schließlich, werden nur im Bedarfsfall aufgerufen, nämlich, wenn die ATN-Leitung des seriellen Bus auf Low geht.</p>
+
+<p>Wir wollen uns die Funktion dieser Routinen nun einmal etwas genauer betrachten.</p>
+
+<h3>Das Hauptprogramm</h3>
+
+<p>Das Hauptprogramm hängt, wie schon gesagt, in einer Warteschleife, bis ein Befehl vom Computer kommt. Dieser aktiviert zuerst die Busroutinen, die die gesendeten Bytes dann entgegennehmen und abspeichern. Jetzt bekommt das Hauptprogramm, das übrigens den Zustand der beiden IRQ-Routinen (DC und BC) ständig überwacht, die Meldung, daß ein Befehl anliegt. Es verzweigt nun zur Befehlsauswertung, ähnlich dem Basic-Interpreter, und führt gegebenenfalls einen Befehl aus, sofern ein Syntaxfehler entdeckt wurde. In diesem Fall würde sonst eine Fehlermeldung generiert, die dann vom Computer ausgelesen werden kann.</p>
+
+<p>Ist ein Befehl korrekt ausgeführt worden, so werden die Befehlsparameter wieder gelöscht, und das Hauptprogramm kehrt in die Warteschleife zurück.</p>
+
+<h3>Das Diskcontrollerprogramm</h3>
+
+<p>Der Diskcontroller enthält den Baustein VIA 6522, durch den er mit dem Mikroprozessor in Kontakt steht. Dieser Baustein enthält auch Timer, die in einem eingestellten Rhythmus einen IRQ auslösen können. Einer dieser Timer ist in der 1541 so eingestellt, daß er ungefähr alle 10 ms einen IRQ auslöst, der dann seinerseits das Diskcontrollerprogramm aufruft.</p>
+
+<p>Es soll an dieser Stelle der Unterschied zwischen Diskcontroller und Diskcontrollerprogramm erläutert werden: Als Diskcontroller (DC) bezeichnet man die Hardware in der Floppy, die für den Laufwerksbetrieb zuständig ist.</p>
+
+<p>Unter dem Diskcontrollerprogramm versteht man den Programmteil im DOS, der, durch IRQ geregelt, die Ansteuerung des DC übernimmt.</p>
+
+<p>Eine vollständige Trennung dieser beiden Begriffe ist jedoch weder notwendig noch zweckmäßig, so daß wir mit dem Ausdruck »DC« immer die Gesamtheit von Hard- und Software beschreiben wollen. Nun aber wieder zu den Aufgaben des DC.</p>
+
+<p>Auch dieses Programm hat eine Art Wartezustand, solange kein Befehl vom Computer anliegt. Wird nämlich das Hauptprogramm über den Bus aktiviert, so wertet dieses die Befehle aus und gibt sie an den DC weiter, der dann seinerseits dafür sorgt, daß das Laufwerk aktiviert wird. Er steuert den Laufwerk- und den Stepper (Schreib-/ Lesekopf)-Motor und bedient die Daten, die vom und zum Tonkopf gehen. Die gesamten Vorgänge am Laufwerk werden also interruptgesteuert vorgenommen.</p>
+
+<h3>Die Busroutinen</h3>
+
+<p>Die Routinen des Buscontrollers (BC) werden ebenfalls über die IRQ-Leitung gesteuert. Auch der BC enthält einen VIA 6522-Baustein. Hier wird der Aufruf der Routinen allerdings nicht über den Timer organisiert, sondern, wie schon erwähnt, über die ATN-Leitung des seriellen Busses. Zieht der Computer also diese Leitung auf Low, so wird in der Floppy (und in allen anderen Peripheriegeräten ebenso) ein IRQ ausgelöst. Dann erfolgt die Abfrage, ob dieser IRQ vom Timer des DC kam. Ist dies nicht der Fall, so wird die BC-Routine aufgerufen, die dann den weiteren Busbetrieb übernimmt. Sollte die Floppy gerade einen Befehl bearbeiten, während schon ein neuer vom Computer gesendet wird, so wartet der BC solang mit der Annahme, bis die Floppy wieder in den Bereitschaftszustand zurückgekehrt ist.</p>
+
+<p>Wie Sie sehen, stellt das DOS eine ziemlich komplizierte Einheit dar, deren Schema in Bild 3 zu sehen ist.</p>
+
+<p><aside><br/>
+Wie Sie vielleicht bemerkt haben, ist uns in Folge 2 ein Fehler unterlaufen. Das abgedruckte Listing 6 wäre eigentlich Listing 5 gewesen. Als tatsächliches Listing 6 liefern wir Ihnen heute das Directory-Sortierprogramm nach, das Sie in Listing 1 abgedruckt finden.<br/>
+</aside></p>
+
+<p>Wollen wir also in dieses System einsteigen, um dort eigene Programme ausführen zu lassen, so ist es natürlich unerläßlich, daß wir die »Spielregeln« dieses Prozessorsystems genau kennen, da es sonst leicht zu kleinen Katastrophen kommen kann.</p>
+
+<p>Zu Ihrer weiteren Arbeit mit der 1541 noch ein paar Tips: Wenn Sie vorhaben, Programme in der Floppy ablaufen zu lassen, sollten Sie Ihre Floppy öffnen und ohne Deckel betreiben. So können Sie genau beobachten, wie der Kopf positioniert wird und was bei Lesefehlern geschieht. Sie werden unter anderem auch entdecken, daß Disketten nicht etwa auf der Seite beschrieben werden, auf der sich das Etikett befindet, sondern auf der Rückseite. Dies ist um so bemerkenswerter, als man eine Diskette immer nur auf der Vorderseite schonend behandelt, die ja eigentlich nicht benutzt wird. Auch wir mußten die Erfahrung machen, daß wir Disketten lange Zeit mit der wertvollen Seite auf Tische gelegt haben, stets darauf achtend, daß ja kein Staubkorn auf die von uns so gehütete Vorderseite kam.</p>
+
+<h2>Disketten werden auf ihrer Rückseite beschrieben!</h2>
+
+<p>Das Betreiben des Laufwerks ohne Deckel hat auch den Vorteil besserer Wärmeableitung. Die ICs werden es Ihnen danken.</p>
+
+<p>Nachdem Sie Ihre 1541 also auf »Arbeitsbetrieb« getrimmt haben, wollen wir gleich einmal mit kleinen Programmen beginnen. In Tabelle 1 sehen Sie eine Aufstellung einiger wichtiger Zeropageadressen, die uns im weiteren Verlauf noch beschäftigen werden. Für einDOS-Listing ist in unserer Serie natürlich kein Platz vorhanden; auch können wir nur mit kleinen Beispielen versuchen, Ihnen die Programmierung der Floppy nahezubringen. Für diejenigen unter Ihnen, die jedoch vorhaben, tiefer in die Floppyprogrammierung einzusteigen, sei an dieser Stelle ein Buch angesprochen, das voraussichtlich im Februar 1985 von Markt &amp; Technik herausgegeben wird. Es behandelt die 1541 bis ins kleinste Detail, ist unter anderem mit einem ausführlichst kommentierten DOS-Listing ausgestattet und geht weit über das in dieser Reihe besprochene hinaus.</p>
+
+<h3>Programmieren der Floppy</h3>
+
+<p>So, jetzt soll es aber endlich losgehen. Wir wollen unser erstes Programm schreiben und in der Floppy ablaufen lassen.</p>
+
+<p>Es handelt sich um Listing 2. Dieses »Miniprogramm« schreiben wir in den Puffer 0 der Floppy, das heißt ab Adresse $0300. Das Basic-Programm haben wir der Kürze halber gleich an den Assemblercode angehängt. Wenn Sie das Programm starten, wird das Bit abgefragt, das beim DC für den Zustand der Schreibschutzplakette verantwortlich ist. Sie werden vielleicht wissen, daß die Floppy die Schreibschutzkerbe bei den Disketten mit Hilfe einer Lichtschranke abfragt. Ist die Lichtschranke unterbrochen, das heißt es liegt eine Diskette mit Schreibschutzaufkleber im Laufwerk, dann steht das entsprechende Bit auf 0.</p>
+
+<p>Unser Programm schiebt nun einfach das Bit der Lichtschranke an die Stelle des Bits für die rote LED und speichert diesen Wert wieder ab. Starten Sie einmal unser kleines Programm, dann werden Sie feststellen, daß die Leuchtdiode am Laufwerk erlischt, wenn die Lichtschranke unterbrochen wird. Holen Sie die Diskette dagegen aus dem Laufwerk oder legen Sie eine Diskette ohne Schreibschutzplakette ein, so beginnt die rote LED zu leuchten.</p>
+
+<p>Mit diesem Programm können Sie also testen, ob von Ihnen selbst angefertigte Schreibschutzkerben in der Diskettenhülle an der richtigen Stelle liegen, um eine Diskette eventuell doppelseitig benutzen zu können.</p>
+
+<p>Da unser Programm aus einer Endlosschleife besteht, können Sie die Floppy nur durch einen RESET wieder in einen ansprechbaren Zustand versetzen.</p>
+
+<p>Das Programm hat aber einen Schönheitsfehler; es beeinflußt nämlich nicht nur die beiden LED-Bits in Speicherstelle $lC00, sondern löscht beijedem Durchgang auch alle anderen Bits dieses Registers, deren Belegung Sie Tabelle 2 entnehmen können. Für unsere Testzwecke ist diese »Pfuscherei« jedoch unwesentlich.</p>
+
+<h3>Der »&amp;«-Befehl</h3>
+
+<p>Nach diesem aufregenden Beispiel wollen wir Sie nun mit einem Befehl bekanntmachen, den Sie sehr wahrscheinlich noch nicht kennen. Er nennt sich »&amp;« und wird unverständlicherweise in noch keinem uns bekannten Buch beschrieben. Der &amp;-Befehl entspricht in gewisser Weise einem BLOCK-EXECUTE-Befehl; auch hier wird ein Programm von Diskette geladen und sofort ausgeführt.</p>
+
+<p>Der Unterschied besteht nur darin, daß mit dem &amp;-Befehl nicht nur ein Block, sondern ein ganzes File, das im Directory verzeichnet ist, geladen und im Puffer als Programm ausgeführt wird.</p>
+
+<p>Außerdem müssen die Files, die mit dem Befehl »&amp;« gestartet werden sollen, speziell gekennzeichnet sein. Sie enthalten als erstes Zeichen im Filenamen das Zeichen »&amp;«. Soll also zum Beispiel ein File mit dem Namen »Test« als Autostartprogramm in der Floppy ausgeführt werden, so geben Sie diesem File den Namen »&amp;Test« und starten Sie es danach mit: OPEN1,8,15,"&amp;TEST"</p>
+
+<p>Haben Sie nur ein einziges Autostartfile auf Diskette, so können Sie es auch nur mit »&amp;« abspeichern und ebenso mit OPENl,8,15,"&amp;" starten.</p>
+
+<p>Leider erwartet die Floppy von Autostartfiles eine spezielle Syntax, die in Tabelle 3 zu sehen ist.</p>
+
+<p>Als Listing 3 haben wir noch einmal unser LED-Testprogramm; nur wird diese Routine durch das Basic-Programm als &amp;-File auf Diskette geschrieben und kann danach durch den schon erwähnten Befehl direkt von Diskette in den Pufferspeicher geschrieben und dort gestartet werden.</p>
+
+<p>Zu Tabelle 3 noch einige Anmerkungen:</p>
+
+<p>Zuerst muß die Startadresse des Programms im Pufferspeicher der Floppy in das File geschrieben werden. Danach folgt die Anzahl der Bytes im Programm. Jetzt werden die Programmbytes abgespeichert, und schließlich folgt noch eine Prüfsumme, die sich wie folgt errechnet:</p>
+
+<p>Es werden alle Bytes des Programms addiert und zum Ergebnis noch die zwei Bytes der Startadresse und die Anzahl der Bytes im Programm hinzugezählt. Dieses Ergebnis ist als Integerzahl zu verstehen und besteht also aus einem niederwertigen (LO) und einem höherwertigen (HI) Byte. Das niederwertige Byte ist die Prüfsumme, zu der noch der Übertrag im höherwertigen Byte addiert werden muß. Diese Berechnung klingt kompliziert; ist es aber nicht. In Listing 4 wird Ihnen diese Rechnerei abgenommen. Die allgemeine Formel hier noch einmal:<br/>
+HB = INT(SUMME/256)<br/>
+LB = SUMME-HB*256</p>
+
+<p>dabei bedeuten:<br/>
+HB — das höherwertige Byte<br/>
+LB — das niederwertige Byte<br/>
+SUMME — die Gesamtsumme der Programmbytes</p>
+
+<p>Achtung: Die Übertragsberechnung muß nach jedem neu dazugezählten Wert erfolgen, da das Endergebnis kleiner als 256 sein muß! Wie Sie sehen, ist das Anlegen eines &amp;-Files nicht ganz einfach. Bisher wurde diese Fileart fast nur von Profis zum Programmschutz angewandt, da sie, wie schon erwähnt, nahezu unbekannt war.</p>
+
+<p>Zu erwähnen wären noch zwei seltsame Fehlermeldungen der Floppy:</p>
+
+<p>»OVERFLOW IN RECORD« erscheint, wenn die Anzahl der tatsächlichen Bytes mit der Angabe nicht übereinstimmt.</p>
+
+<p>»RECORD NOT PRESENT« erscheint, wenn die Prüfsumme nicht stimmt.</p>
+
+<p>Da wir stets darum bemüht sind, Ihnen die Arbeit mit der Floppy so angenehm wie möglich zu machen, haben wir unserem Artikel noch Listing 4 beigefügt. Es handelt sich hier um ein Programm, das es Ihnen gestattet, auf einfachste Weise &amp;-Files zu erstellen. Diese können sogar länger als 256 Byte sein, da das Programm dann automatisch eine Prüfsumme und die Anschlußadresse einfügt. Ununterbrochene &amp;-Files, die länger als 256 Zeichen sind, kann es ja nicht geben, da die Anzahl der Programmbytes im File nur in einem Byte abgespeichert wird.</p>
+
+<p>Mit dieser neuen Fileart wollen wir Sie für dieses Mal entlassen. Ruhen Sie sich für die nächste Folge aus. Wir werden dann auf die Technik der Jobschleifenprogrammierung eingehen, die Ihnen eine Fülle von Anwendungen eröffnen wird.</p>
+
+<p>(K. Schramm/B. Schneider/gk)</p>
+

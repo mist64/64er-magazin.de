@@ -1,0 +1,105 @@
+<h1>Hypra-Load mal vier</h1>
+
+<p class="intro">Selten hat ein Programm so viele Leserreaktionen hervorgerufen wie Hypra-Load. Deswegen führen wir Ihnen heute vor, was man mit Hypra-Load noch so alles machen kann.</p>
+
+<p>Hätten wir doch bloß nicht unsere Telefonnummern angegeben. Das war unser beherrschender Gedanke in den ersten Tagen nach Erscheinen der Ausgabe 10/84 des 64’er-Magazins. Doch nach und nach begannen wir am Telefonieren Gefallen zu finden, wohl auch deswegen, weil fast alle Anrufer so nett und höflich waren, und uns einige gute Tips und konstruktive Kritik gaben. Uns erreichten sogar Telefonate aus der Schweiz, Österreich, Holland und Dänemark.</p>
+
+<p>Viele Anrufer hatten ein gemeinsames Problem: Nach RUN meldete sich der Basic-Lader immer mit FEHLER IN DATENBLOCK 100-109, obwohl dort garantiert kein Fehler vorlag. Manche Leser haben diesen DATA-Block mehrere Male eingetippt, und sogar von Hand aufaddiert und verglichen, konnten aber keinen Fehler finden. Hatte vielleicht unser Druckfehlerteufelchen zugeschlagen? Nein, das hatte genug Respektvor der DATA-Wüste, um sie zu verschonen. Des Rätsels Lösung: Uns unterlief ein Denkfehler im Prüfsummenprogramm. Denn das arbeitet nur dann korrekt, wenn alle Zeilen und alle Kommata eingegeben werden, sonst meldet die total verwirrte Prüfsummenroutine einen Fehler, wo gar keiner ist. Entgegen unserer Aussage, daß Hypra-Load mit dem SX 64 nicht funktioniert, hatten einige SX 64-Besitzer keine Probleme. Es scheint drei oder vier verschiedene SX 64-Versionen zu geben, von denen sich mindestens eine nicht mit Hypra-Load verträgt. Wir wollen die genauen Gründe noch erforschen, und bitten alle SX 64-Besitzer um ihre Hilfe. Schreiben sie uns ihre Erfahrungen mit ihrem SX 64. Welche Programme laufen, welche nicht? Insbesondere würde uns dann die Seriennummer ihres SX 64 interessieren.</p>
+
+<p>Unsere Bemühungen, Hypra-Load für den VC 20 umzuschreiben, scheiterten bisher an dessen Busstruktur.</p>
+
+<p>Ein Fehler schlich sich in der Beschreibung zu Hypra-Load ein. Um es nach einem RESET mit einem Taster wieder einzuschalten, muß als erstes POKE 40960, PEEK (40960) eingegeben werden. Dann darf mit POKE 1,53 eingeschaltet werden.</p>
+
+<p>So, nach dieser langen Vorrede aber endlich zu den versprochenen Änderungen an Hypra-Load.</p>
+
+<h2>Hypra-Boot</h2>
+
+<p>Manche Leser ärgerten sich darüber, daß, wolle man ein bestimmtes, langes Programm schnell laden, zwei LOAD- und zwei RUN-Befehle notwendig sind. Deswegen haben wir Hypra-Load zu Hypra-Boot umgeschrieben. Wie funktioniert Hypra-Boot? Nach dem Laden und Starten von Hypra-Boot wird automatisch ein weiteres Programm von Diskette nachgeladen und gestartet. Dieses Programm muß, wenn es kein Basic, sondern ein Maschinenprogramm ist, allerdings am Basic-Start mit zumindest einem SYS-Befehl vertreten sein, da Hypra-Boot den RUN-Befehl simuliert.</p>
+
+<p>Und so geben sie Hypro-Boot ein: Laden Sie den Basic-Lader, das heißt, das in Ausgabe 10/84 abgedruckte Programm. Geben Sie nun die in Listing 1 abgedruckten Änderungen ein.</p>
+
+<p>Damit Sie beliebige Programme nachladen können, müssen Sie natürlich noch den Filenamen des nachzuladenden Programms angeben. Dies geschieht wie folgt in der Zeile 276. Geben Sie als DATA-Werte die ASCII-Codes der ersten sieben Buchstaben des Filenamens und als achten Wert 042 (ASCII-Code für *) ein. Kürzere Filenamen sind erlaubt, dann muß der Stern aber auch früher stehen, soll kein FILE NOT FOUND ERROR gemeldet werden.</p>
+
+<p>Da die DATA-Zeilen schon mit Prüfsummen für unseren Checksummer versehen sind, nimmt das Programm selbst keinen Prüfsummencheck vor!</p>
+
+<p>Es wird auch nicht mit RUN, sondern mit GOTO 520 gestartet. Danach speichern Sie Hypra-Boot unter dem gewünschten Namen.</p>
+
+<p>Hypra-Boot kann nicht nur Einzelprogramme,.sondern zum Beispiel auch ein Menü-Programm oder ähnliches laden.</p>
+
+<p>Ganz Verwegene können Hypra-Boot noch mit einem Autostart versehen. Allerdings ist Vorsicht geboten, sollen Autostart-Programme nachgeladen werden. Wenn diese den Stack überschreiben, kann es Konflikte mit Hypra-Boot geben. Am besten, Sie probieren es einfach aus. Hypra-Boot lädt immer wie LOAD"name",8,1!</p>
+
+<p>Es kann ab und zu passieren, das Hypra-Boot beim Nachladen »VERIFYlNG« anzeigt. Dies hat nichts zu bedeuten und tritt nur auf, wenn Hypra-Boot selber ein Autostart-Programm ist. Es empfiehlt sich, Hypra-Boot so zu nennen, wie das nachzuladende Programm. Dieses erhält dann einen Namen wie "101" oder ähnliches. Dann können mehrere Hypra-Boot-Programme auf einer Diskette stehen.</p>
+
+<p>Sollten Sie den Basic-Lader nicht besitzen, so wird es etwas kompliziert. Sie müssen, nach dem Laden von Hypra-Load, die entsprechenden DATA-Werte von Hand an die Speicherstellen von 3385 bis 3464 POKEn. Sie tippen also ein:<br/>
+POKE 3385, 245<br/>
+POKE 3386, 169<br/>
+&hellip;<br/>
+POKE 3464, 000</p>
+
+<p>Vergessen Sie dabei nicht, sich vorher die DATA-Werte für den Filenamen zu notieren!</p>
+
+<h2>Hypra-Track 18</h2>
+
+<p>Wer sich weder ein Modul brennen, noch das Betriebssystem austauschen möchte, wäre froh, wenn er Hypra-Load auf jeder Diskette abspeichern könnte, um sich Diskettenwechsel zu ersparen. Aber da gibt es doch immer einige Disketten, die sich strikt weigern, Hypra-Load noch aufzunehmen, da weniger als 6 Blöcke frei sind. Was soll man tun? Weiterhin Disketten wechseln, den Inhalt auf zwei Disketten verteilen, oder auf Hypra-Load verzichten?</p>
+
+<p>Es gibt noch eine letzte Rettung: Hypra-Load wird ins Directory-Track geschrieben. Normalerweise passen in ein Directory 144 Einträge. Wenn Hypra-Load am Ende des Directory-Tracks steht, ist dieses auf 88 Einträge begrenzt. Die normale Funktion des Directory wird dadurch nicht beeinträchtigt! Das Programm überprüft natürlich, ob weniger als 88 Einträge vorhanden sind, damit nichts aus Versehen gelöscht wird.</p>
+
+<p>Das als Listing 2 abgedruckte Programm schreibt Hypra-Load in folgende Sektoren der Spur 18: 3,6,9,12,15,18.</p>
+
+<p>Der Filename, den Hypra-Load tatsächlich erhalten soll, ist frei wählbar. An diesen wird »",8:« angehängt Somit ist es möglich, bei gelistetem Directory nur mit dem Cursor auf diesen Fileeintrag zu fahren, LOAD zu schreiben und RETURN zu drücken. Nach dem Laden startet man es, wie gewöhnlich, mit RUN.</p>
+
+<p>Und so geben sie Listing 2 ein:</p>
+
+<ol>
+<li>Laden Sie den Basic-Lader von Hypra-Load, abgedruckt in Ausgabe 10/84</li>
+<li>Löschen Sie alle Zeilen außer die Zeilen von 100 bis 279</li>
+<li>Geben Sie nun Listing 2 zusätzlich ein.</li>
+<li>Speichern Sie das Ganze auf Diskette.</li>
+</ol>
+
+
+<p>Wir empfehlen, unbedingt einen Testlauf mit einer leeren formatierten Diskette zu machen, da sich Tippfehler eingeschlichen haben könnten. Es wird kein Prüfsummenvergleich vorgenommen! Nach erfolgreichem Testlauf kann Hypra-Load auf praktisch alle Disketten überspielt werden.</p>
+
+<h2>Hypra-ROM</h2>
+
+<p>Manchmal ärgerten sogar wir uns darüber, daß Hypra-Load dann und wann neu geladen werden muß, sei es, weil der Computer eingeschaltet wurde, sei es, weil irgendein Programm mal wieder Hypra-Load oder das Basic-RAM überschrieben hatte. Hypra-Load resident machen, hieß also die Devise. Und wenn man nicht gerade das Betriebssystem auswechseln möchte, bietet es sich geradezu an, Hypra-Load in ein Modul zu brennen.</p>
+
+<p>Hierzu sind weit weniger Änderungen nötig, als erwartet. Ganze vier DATA-Werte müssen modifiziert werden, soll Hypra-Load nicht ab $0800 sondern ab $8000 im Speicher stehen.</p>
+
+<p>Es sind dies folgende Werte:</p>
+
+<p>TODO</p>
+
+<p>In den entsprechenden Bereich schreiben Sie Hypra-Load wie folgt:<br/>
+FOR I = 32 769 TO 34207 : READ A : POKE I,A : NEXT I</p>
+
+<p>Bitte führen sie keinen RUN aus, daja nun die Checksummen nicht mehr stimmen. Gestartet wird das Ganze nun mit SYS 33958. Hypra-Load meldet sich wie gewohnt. Dieses Programm kann auch in ein Modul gebrannt werden. Auf einen Autostart im Modul wurde verzichtet, da es ja einige Programme gibt, die sich mit Hypra-Load nicht vertragen (zum Beispiel Simons Basic).</p>
+
+<p>Hier noch die POKEs für alle, die nur das Maschinenprogramm haben:<br/>
+POKE 3301, 130: POKE 3332, 128<br/>
+POKE 3356, 133: POKE 3343, 132</p>
+
+<p>Danach muß der Speicherbereich von $0800 bis $0E00 nach $8000 verschoben werden, am besten mit einem Monitor oder einer FOR-NEXT-Schleife.</p>
+
+<p>Dieser Bereich kann nun auch in ein EPROM gebrannt werden.</p>
+
+<p>Wer Hypra-Load in andere Bereiche verschieben möchte, der sollte sich mit einem Disassembler das Umfeld der vier angegeben Adressen ansehen, und die Angleichungen selber vornehmen. Zu beachten ist nur, daß all diese Versionen immer noch das Betriebssystem ins RAM kopieren und dort verändern. Auf diese Art und Weise ist es nicht möglich, das Betriebssystem im ROM zu ändern!</p>
+
+<h2>Schnelles Laden ohne Laden</h2>
+
+<p>Das Arbeiten mit Hypra-Load und dem Diskettenlaufwerk 1541 ist für viele Commodore-Besitzer schon zur unverzichtbaren Gewohnheit geworden. Leider muß das Programm zuvor immer noch von Diskette geladen werden. Fest im Betriebssystem einprogrammiert entfällt dieser Nachteil.</p>
+
+<p>Jedes Programm, daß die Datenübertragungsgeschwindigkeit vom Diskettenlaufwerk zum Computer beschleunigt, büßt einen Teil seines Geschwindigkeitsvorteils ein, weil es erst geladen und gestartet werden muß. Wesentlich angenehmer ist es, wenn der Computer schon nach dem Einschalten die gewünschte Laderoutine verwenden kann. Um zu diesem Ziel zu gelangen, sind zwei Wege denkbar. Zum einen kann man sich, ähnlich einem Spielmodul, eine Steckplatine mit EPROMs bauen und diese am Expansion-Port anschließen. Zum anderen besteht aber die Möglichkeit, den Computer intern zu verändern, indem ein neues Betriebssystem eingebaut wird. Die Vorteile der zweiten Methode sind beachtlich.</p>
+
+<p>Dadurch, daß die Änderung des Betriebssystems nicht mehr im RAM-Bereich von $EOOO-$FFFF liegt, sondern im gleichen, darüberliegenden ROM-Bereich, steigt die Kompatibilität mit jeder Art von Programmen enorm. Die Erklärung dafür ist einfach. Viele Programme verwenden den $E000-Bereich, indem sie ihn kopieren und für ihre eigenen Zwecke modifizieren. Jedes dort befindliche Programm wird damit selbstverständlich überschrieben. Dazu gehören aber leider immer Betriebssystemänderungen wie beispielsweise das Hypra-Load. Steht die Veränderung aber im darüberliegenden ROM, so entstehen diese Probleme kaum noch, denn der beschriebene RAM-Bereich steht, wie bei jedem Original-Betriebssystem, frei zur Verfügung.</p>
+
+<p>Natürlich ist zum Einbau des neuen Betriebssystems ein Eingriff in den Computer notwendig. Das alte Kernal-ROM muß gegen das neue ausgetauscht werden. Wie das gemacht wird, haben wir in der letzten Ausgabe ausführlich beschrieben. Die wichtigsten Arbeitsschritte werden aber trotzdem nocheinmal erklärt. Zunächst ist es notwendig, das abgebildete Basic-Programm einzugeben und zu starten. Wenn es fehlerfrei funktioniert, kann esabgespeichertwerden. Als nächstes wird ein EPROM-Programmiergerät benötigt, das in der Lage ist, EPROMs vom Typ 2764 zu brennen. Dieses Programmiergerät wird nun angeschlossen. Der nächste Arbeitsgang besteht aus der eigentlichen Veränderung des Betriebssystems. Alle notwendigen Programmierungen werden vom abgedruckten Programm selbständig durchgeführt. Dazu wird zunächst der Bereich $EOOO-$FFFF nach $6000-$7FFF kopiert. In Overlaytechnik werden anschließend sowohl das Hypra-Load als auch eine Funktionstastenbelegung programmiert. Wer auf die Funktionstastenbelegung verzichten möchte, braucht im Listing übrigens nur die Zeilen 8000 bis 9000 wegzulassen. Nachdem das Programm durchgelaufen ist, befindet sich im Bereich $6000 bis $7FFF ein komplettes, neues Betriebssystem, das lediglich noch in ein EPROM gebrannt werden muß. Selbstverständlich darf die Treibersoftware für das EPROM-Programmiergerät nicht in diesem Bereich liegen.</p>
+
+<p>Das fertig gebrannte EPROM wird einfach im Steckplatz U4 auf der Computerplatine mit einem Adapter eingesteckt. Der Adapter ist leider wegen der unterschiedlichen Pinbelegung der Commodore-ROMs und des EPROMs unabdingbar. Auch wenn die Herstellung eines solchen Zwischenstücks etwas Geschick erfordert, stellt sie doch kein unüberbrückbares Problem dar.</p>
+
+<p>Wenn der Computer nun nach dem Einschalten seine Bereitschaftsmeldung zeigt, steht dem schnellen Laden nichts mehr im Weg. Andernfalls sollten Sie das EPROM löschen und den Vorgang wiederholen. Die Belegung der Funktionstasten entspricht der in der letzten Ausgabe veröffentlichten, hinzugekommen istaber die Belegung der RUN-Taste. Durch einmaliges Betätigen sind wieder die langsamen Laderoutinen aktiviert. Ein zweiter Druck auf die gleichen Tasten schaltet wieder auf Hypra-Load. Leider muß gelegentlich, besonders bei Autostartprogrammen, von dieser Funktion Gebrauch gemacht werden. Auch sollte zum Laden von Programmen nur ein Peripheriegerät eingeschaltet sein, da sonst eine Fehlermeldung ausgegeben wird. Die Belegung der Funktionstasten kann bei Bedarf mit Poke 2,1 ausgeschaltet und mit Poke 2,0 wieder angeschaltet werden.</p>
+
+<p>Abgesehen von diesen Nachteilen und den nicht mehr möglichen Betrieb eines Datenrecorders, läßt sich mit dem neuen Betriebssystem sehr gut arbeiten. In einer der nächsten Ausgaben werden wir dem Commodore 64 und dem MPS 802 zusätzlich noch einen deutschen Zeichensatz verleihen. Schnelles Laden und eine Funktionstastenbelegung — der Commodore macht sich.</p>
+
+<p>(Günther Reimuth/Uwe Schönewolf/Boris Schneider/Erich Schöberl/Arnd Wängler/gk)</p>
+

@@ -1,0 +1,63 @@
+<h1>Vier Pseudo-VICs mit 32 Sprites</h1>
+
+<p class="intro">Sie wollen mit 32 Sprites und vier Bildschirmbereichen gleichzeitig arbeiten? Nichts leichter als das. Mit Provic 64 können simultan Grafik, Text oder veränderte Zeichensätze dargestellt werden.</p>
+
+<p>Die Autoren (Jürgen, 21, Physikstudent, und Stefan, 18, Schüler) haben sich Mitte 1983 einen Commodore 64 angeschafft. Schon nach kurzer Zeit stellte sich der bei den C 64-Fans übliche Frust über die schlechte Dokumentation und die schwierige Informationsbeschaffung ein, besonders wenn es um die speziellen Grafikfähigkeiten dieses Computers geht. So sitzen wir oft stundenlang vor dem Bildschirm, der nur undefinierbare Zeichen zeigt, weil wir bei dem Versuch, die Geheimnisse des C 64 zu enträtseln, in irgendeinen unbekannten Darstellungsmodus geraten sind.</p>
+
+<p>Dabei entdeckten wir, daß der C 64 nicht nur acht, sondern auch 16, 24, 32 oder noch mehr Sprites gleichzeitig zeigen kann. Zusätzlich ergibt sich die Möglichkeit, mehrere Bildschirmmodi zu mischen.</p>
+
+<p>Nun haben wir uns entschlossen, den Kunstgriff, der dies ermöglicht, anderen C 64-Fans nicht vorzuenthalten. Also entwickelten wir ein Programm in Maschinensprache und dazu ein kleines Demonstrationsprogramm in Basic.</p>
+
+<h3>Zum Programm</h3>
+
+<p>Durch Aufruf der Initialisierungsroutine wird der Interruptmechanismus des C 64 verändert. Nicht mehr der Timer der CIA 1, sondern der VIC 6567 löstjetzt den Interrupt aus, und zwar synchron zum Takt des Bildschirmsignals. Außerdem werden vier sogenannte Pseudo-VICs eingerichtet. Alle PO-KEs, von Spritebewegung über Bildschirmfarbe bis zur Grafikkonfiguration, müssen abjetzt in diese Pseudo-VICs erfolgen. Jeder dieser Pseudo-VICs ist für einen der vier Bildschirmbereiche zuständig:</p>
+
+<p>Der Bildschirm wird in vier waagerechte Bereiche aufgeteilt, deren Grenzlinien fast beliebig nach oben oder unten verschoben werden können. Jedereinzelne Bereich kann acht Sprites darstellen und eine eigene Farb- und Grafikkonfiguration aufweisen. So können zum Beispiel Normalschrift, HiRes-Grafik, Multicolor-Grafik und eventuell ein selbstdefinierter Zeichensatz gleichzeitig auf dem Bildschirm gezeigt werden.</p>
+
+<p>Provic 64 kann selbstverständlich wieder abgeschaltet werden (bei Kassetten- oder Diskettenoperationen nötig).</p>
+
+<p>Für Maschinensprachefreaks nun eine kurze Funktionsbeschreibung der Interruptroutine:</p>
+
+<p>Bei Aufruf der Einschaltroutine (SYS 52544) wird der IRQ-Vektor auf die Hauptroutine des Provic 64 gestellt und der bisherige Interrupt durch den Timer A der CIA 1 verboten, während der Raster-IRQ des VIC 6567 erlaubt wird.</p>
+
+<p>Sobald der Bildschirmstrahl die eingestellte Rasterzeile erreicht, wird ein Interrupt ausgelöst und der Prozessor bearbeitet die Hauptroutine des Provic 64. In dieser wird zunächst anhand eines Zählers ($ CFFF) festgestellt, welcher Bildschirmbereich an der Reihe ist. Dann wird die Rasterzeile, die das Ende dieses Bildschirms kennzeichnet, eingestellt.</p>
+
+<p>Anschließend werden, falls ein entsprechendes Flag gesetzt ist, die Sprite- und andere Bildschirmparameter in den VIC 6567 übertragen. Nach dem Weiterzählen des IR-Zählers ($ CFFF) wird entweder der Interrupt beendet, oder zur IRQ-Routine des Betriebssystems gesprungen (nach jedem vierten Interrupt). So werden in der Sekunde 200 Interrupts (vier pro Fersehbild) ausgelöst und 50 mal in der Sekunde (einmal pro Bild) die normale IRQ-Routine abgearbeitet. Dadurch zählt die interne UhrTI in 50stel Sekunden und Tl$ wird unbrauchbar.</p>
+
+<p>Beim Aufruf der Ausschaltroutine wird der Raster-IRQ des VIC 6567 unterbunden, der Interrupt des Timers A in CIA 1 erlaubt und der IRQ-Vektor auf die IRQ-Routine des Betriebssystems eingestellt.</p>
+
+<h2>Handhabung der Pseudo-VICs</h2>
+
+<p>Im Grunde ist jeder der vier Pseudo-VICs wie der echte VIC zu behandeln. Ausnahmen sind hier nur die Register 30 (Sprite-Sprite-Kollision) und 31 (Sprite-Hintergrund-Kollision), die sich auf den jeweils vorausgegangenen Bildschirmbereich beziehen. Die Register 19 und 20 (Lightpenkoordinaten), sowie 25 und 26 (IRQ-Flags und -maske) werden nicht behandelt, da diese Funktionen nur direkt über den VIC 6567 sinnvoll gehandhabt werden können. Außerdem hatjeder Pseudo-VIC noch zusätzliche Register für zwei Flags (REG 47 und REG 57), acht Sprite-Pointer (REG 48 bis REG 55), Videomatrix-Anfangsadresse Highbyte (REG 56) und die CIA 2, REG 0, Bits 0 und 1 (REG 58) (Adreßbits 14 und 15 des VIC 6567).</p>
+
+<h3>Übergang eines Sprites zwischen zwei Bildschirmbereichen:</h3>
+
+<p>Soll ein Sprite zwischen zwei Bildschirmbereichen wechseln, muß in beiden Bereichen derselbe Sprite (also zum Beispiel beidesmal Sprite 4) die gleiche Position besitzen, und zwar so lange, wie der Sprite die Trennlinie zwischen den Bereichen überdeckt. Wird dies nicht beachtet, werden die entsprechenden Sprites zerschnitten und verschoben.</p>
+
+<p>Aktivieren von Provic 64: Von Basic aus mit SYS 52544 und von Maschinensprache aus mit JSR $CD40.</p>
+
+<p>Ausschalten von Provic 64: Von Basic aus mit SYS 52970 und von Maschinensprache aus mit JSR $CEEA.</p>
+
+<h3>Der Basic-Lader:</h3>
+
+<p>Der Lader erzeugt Provic 64 aus den DATA-Zeilen und falls kein Prüfsummenfehler vorliegt, wird Provic 64 sofort als Maschinenprogramm auf Floppy oder Datasette (Zeile 400 entsprechend ändern!) abgespeichert. Dieses Maschinenprogramm enthält auch gleich die Standardwerte der Pseudo-VICs.</p>
+
+<p>Laden von Provic 64: lm Programm am besten mit der Zeile IF PEEK(52544)>&lt;120 THEN LOAD "PROVIC64",Gerätenummer, 1 die am Anfang des Basic-Programms stehen sollte.</p>
+
+<p>Das Demonstrationsprogramm zeigt einige der Vorzüge von Provic 64. Es ist nur als Anregung gedacht, deshalb verzichten wir hier auf eine nähere Beschreibung.</p>
+
+<p>Provic 64 ist nicht nur für Basic-Programmierer, sondern vor allem auch für Maschinensprache-Freaks gedacht, da erst durch schnelle Maschinenprogramme die Möglichkeiten von Provic 64 voll ausgeschöpft werden können.</p>
+
+<p>(Jürgen und Stefan Haas/rg)</p>
+
+<p>Die vier Basisadressen der PVICs sind:<br/>
+PVIC 1  52992 ($ CF00)  = REG 0<br/>
+PVIC 2  53056 ($ CF40)  = REG 0<br/>
+PVIC 3  53120 ($ CF80)  = REG 0<br/>
+PVIC 4  53184 ($ CFC0)  = REG 0<br/>
+TODO</p>
+
+<p>Da die Pseudo-VICs praktisch gleichberechtigt sind, hier die Registerbeschreibung eines Pseudo-VICs:</p>
+
+<p>TODO</p>
+

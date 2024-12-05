@@ -1,0 +1,77 @@
+<h1>Speichertuning für VC 20</h1>
+
+<p class="intro">Eine neuartige 64 KByte-RAM-Karte für den VC 20 stelK 32 KByte freien Basic-Speicher zur Verfügung und ermöglicht Änderungen am Betriebssystem. Wird der VC 20 damit dem C 64 ebenbürtig?</p>
+
+<p>Es gibt Computer wie den Sharp MZ-700 oder die meisten CP/M-Systeme, die sich dem Benutzer nach dem Einschalten völlig nackt präsentieren, das heißt fast der gesamte Speicherbereich besteht aus freiem RAM. Lediglich ein kleines Betriebssystem im ROM sorgt für das Laden der eigentlichen Programmiersprache.</p>
+
+<p>Dieses Prinzip der reinen RAM-Maschine fand auch bei der Konzeption der Speichererweiterungskarte MR 64 von Roßmöller Verwendung (Bild 1). Die Organisation ähnelt der des C 64, der ROM-Bereich des Computers wird nämlich mit RAM überlagert.</p>
+
+<p>Diese Erweiterungskarte für den VC 20 unterscheidet sich also sowohl von der Verwaltung des Speichers, als auch von der Art des Einbaus von den anderen beiden, in Ausgabe 9/84 getesteten, 64 KByte-Erweiterungen. Sie wird nämlich nicht in den Expansionsport eingesteckt, sondern in den Computer eingebaut. Damit bleibt der Erweiterungsanschluß für Module frei.</p>
+
+<h2>Einfacher Einbau</h2>
+
+<p>Zum Einbau wird das Gehäuse (freilich erst nach Ablauf der Garantiefrist) geöffnet und die CPU mit Hilfe eines Schraubenziehers aus ihrem angestammten Sockel entfernt. An deren Stelle steckt man den Verbindungsstecker ein, der über ein Flachbandkabel mit der MR 64-Platine verbunden ist.</p>
+
+<p>Die 6502-CPU wird danach einfach wieder in den neuen Sockel auf der Speicherplatine eingesteckt — kinderleicht. Wer sich jedoch nicht auf den Umgang mit ICs versteht, kann die CPU durch falsche Polung in den Tod schicken, denn weder in der etwas mageren Beschreibung noch auf der Platine ist die Polungsrichtung der CPU angegeben. Also habe ich die 6502-CPU in der Richtung eingesteckt, wie ich sie aus dem Sockel gehebelt habe, und die war glücklicherweise richtig.</p>
+
+<p>Nach dem Einschalten zeigt die Initialisierungsanzeige 28159 freie Bytes an, welches die größtmögliche — herstellerseitig vorgesehene Ausbauversion — ist. In diesem Punkt ist die MR 64 also identisch mit den üblichen Speicherweiterungen.</p>
+
+<p>Einzelne Speicherbereiche wie zum Beispiel 3, 8, 16 KByte oder Modulspeicher können über DIL-Schalter ein- beziehungsweise ausgeschaltet werden. Bei eingebauter Karte ist dies sicherlich ein diffiziles Unterfangen; Roßmöller schlägt deshalb vor, Schalter ins Computergehäuse einzubauen (gehören nicht zum Lieferumfang).</p>
+
+<h2>Der Zugriff auf den Speicher</h2>
+
+<p>Wie — so wird sich mancher fragen — bewerkstelligt man den Zugriff auf andere Speicherbereiche?</p>
+
+<p>Wie anfangs erwähnt, lehnt sich die Organisation des RAM an die des C 64 an. Damit kann man auch im ROM-Bereich Daten abspeichern, was Bild 2 verdeutlicht.</p>
+
+<p>Über die Adresse 40959 (vergleichbar mit Speicherstelle 1 beim C 64) können bestimmte ROM-Abschnitte auf Schreib-/Lesespeicher softwaremäßig umgeschaltet werden. Im Umgang mit dieser Speicherstelle ist jedoch Vorsicht geboten, denn wird beispielsweise das Basic-ROM ausgeblendet, dann befindet sich an dieser Stelle nur noch leeres RAM. Dies hat in etwa den gleicher Effekt, wie das Absägen eines Astes, auf dem man gerade sitzt. Aus diesem Grund ist auch gleich ein Reset-Taster mit eingebaut worden.</p>
+
+<p>Somit hat man also die Möglichkeit, den gesamten — vom Prozessor adressierbaren — Bereich auf RAM umzuschalten. Ohne erhebliche Erfahrung in Maschinensprache sollte man damit aber vorsichtig sein.</p>
+
+<p>Zum Beispiel kann man den Basic-Interpreter und das Betriebssystem ins RAM kopieren und in diesem Bereich die Änderungen vornehmen. Dies kann über folgendes Programm geschehen:<br/>
+FOR 1= 49152 TO 65535: POKE I, PEEK (I): NEXT</p>
+
+<p>Diese Zeile sieht auf Anhieb etwas seltsam aus, denn warum POKEt man in eine Speicherstelle einen Wert, der sich sowieso schon dort befindet? Ganz einfach. Mit PEEK liest man den Inhalt des ROMs aus und schreibt ihn mit POKE ins darunterliegende RAM. Da diese Übertragung in Basic sehr langsam ist (man muß ja immerhin 16 KByte kopieren) gehört zum Lieferumfang dieser Karte ein Maschinenprogramm, das diese Aufgabe in Sekunden erledigt.</p>
+
+<p>Die gesamte Systemsoftware liegt nun im RAM und kann beliebig abgeändert werden. So kann beispielsweise der ASC-Befehl mit PO-KE 55183,5 entschärft werden, damit bei einem Leerstring ("") nicht »Illegal Quantity Error« — wie es normalerweise der Fall ist — sondern eine Null ausgegeben wird.</p>
+
+<p>Natürlich sind auch weitergehende Ergänzungen und Änderungen auf diese Weise realisierbar. Lediglich beim Abspeichern gibt es Probleme, denn dieser Adreßbereich wird vom Betriebssystem nicht ohne weiteres auf Band aufgezeichnet. Commodore wollte damit verhindern, daß ein Spielmodul abgespeichert werden kann.</p>
+
+<p>Diese Karte überlagert aber nicht nur die Systemsoftware ($C000 bis $FFFF) wie eben beschrieben, sondern auch den Zeichengenerator und den Ein-/Ausgabe-Bereich mit RAM.</p>
+
+<h2>Zusätzlicher Basic-Speicher</h2>
+
+<p>Mit dem 4 KByte-Zeichengenerator-ROM hat es eine besondere Bewandtnis. Wer denkt, daß man auch hier die Zeicheninformationen wie die Betriebssoftware überschreiben kann, der irrt. Aufgrund des eigenständigen Zugriffs des Video Interface Chip auf den Charactergenerator, der sich (wie in Bild 2 zu sehen) direkt an den Basic-Speicher anschließt, ist dies nämlich nicht möglich. Dafür kann man diesen Bereich für Basic nutzen, denn der Basic-Interpreter läßt sich dementsprechend ändern. Daher meldet sich der VC 20 nach dem Starten des beigefügten Maschinenprogramms mit 32255 freien Bytes.</p>
+
+<p>Schließlich ist auch der I/O-Bereich ($9000-$9FFF), der die VIC-Register, den Farbspeicher und die Ein-/Ausgaberegister enthält mit RAM-Speicher überlagerbar. Da dieser Speicherabschnitt bei meinem Testmodell nicht funktionierte, konnte ich nicht mit ihm arbeiten. Nach Auskunft des Herstellers kann man ihn sowieso nur mit einem bestimmten Programmiertrick nutzen, da der Prozessor während des Interrupts ständig auf diesen Bereich zugreift.</p>
+
+<p>Da zu diesem Speicherabschnitt auch das Umschaltregister (Adresse $9FFF) gehört, kann es bei Bedarf über den mitgelieferten Schalter in eine ganz normale Speicherstelle umgewandelt werden.</p>
+
+<p>An fertiger Software ist nach Angaben des Herstellers ein Forth-Compiler in Vorbereitung. In erster Linie ist man aber wohl auf seine eigenen Programmierkünste angewiesen. Prinzipiell kann man auch daran denken, Programme von C 64 auf den so erweiterten VC 20 umzuschreiben (wobei unterschiedliche Grafik- und Tonerzeugungsmethoden beachtet werden müssen).</p>
+
+<p>Fazit: Will man diese Speicherweiterung voll ausnutzen, so benötigt man fundierte Maschinensprachekenntnisse. Unter diesem Gesichtspunkt gesehen bietet sie für Otto Normalbenutzer kaum Vorteile gegenüber den herkömmlichen 64 KByte-Karten. Werjedoch das erforderliche Wissen besitzt, dem eröffnen sich mit dieser Karte völlig neue Aspekte der Programmierung, denn man hat — wie beim C 64 — die Organisation des ganzen Systems in der Hand.</p>
+
+<p>(Christoph Sauer/ev)</p>
+
+<p>Vorteile:</p>
+
+<ul>
+<li>Epansionsport bleibt frei</li>
+<li>vergrößerter Basic-Speicher</li>
+<li>Betriebssoftware ist änderbar</li>
+<li>Speicher-ICs sind gesockelt</li>
+<li>Alle Ausbaustufen des VC 20 können simuliert werden</li>
+</ul>
+
+
+<p>Nachteile:</p>
+
+<ul>
+<li>Polungsrichtung für die CPU nicht angegeben</li>
+<li>nur für Maschinensprachenprofis voll nutzbar</li>
+</ul>
+
+
+<p>Preis: 295 Mark<br/>
+Roßmöller GmbH, Finkenweg 1, 5309 Meckenheim</p>
+
