@@ -14,179 +14,179 @@
 <body>
     <article>
 
-<h1>Der gläserne VC 20: Teil 4</h1>
+        <h1>Der gläserne VC 20: Teil 4</h1>
 
-<p class="intro">Nachdem wir in der letzten Folge Funktion und Sinn verschiedener Vektoren erläutert haben, wenden wir uns heute einem nicht minder interessanten Kapitel, nämlich den verschiedenen hochauflösenden Grafikmodi zu.</p>
+        <p class="intro">Nachdem wir in der letzten Folge Funktion und Sinn verschiedener Vektoren erläutert haben, wenden wir uns heute einem nicht minder interessanten Kapitel, nämlich den verschiedenen hochauflösenden Grafikmodi zu.</p>
 
-<p>Dieser Teil unserer Serie soll schrittweise zur Gestaltung des Bildschirmes in hochauflösender beziehungsweise vielfarbiger Grafik hinführen. Dazu ist eine genaue Kenntnis der VIC-Register und des Speicheraufbaus notwendig. Wer sich nochmals eine Übersicht über die Aufteilung des Speichers verschaffen will, der kann jetzt in Teil 1 und 3 dieser Serie nachschlagen.</p>
+        <p>Dieser Teil unserer Serie soll schrittweise zur Gestaltung des Bildschirmes in hochauflösender beziehungsweise vielfarbiger Grafik hinführen. Dazu ist eine genaue Kenntnis der VIC-Register und des Speicheraufbaus notwendig. Wer sich nochmals eine Übersicht über die Aufteilung des Speichers verschaffen will, der kann jetzt in Teil 1 und 3 dieser Serie nachschlagen.</p>
 
-<h2>Der VC 20-Zeichensatz</h2>
+        <h2>Der VC 20-Zeichensatz</h2>
 
-<p>Wenn man den Computer einschaltet, so stehen »serienmäßig« zwei Zeichensätze zur Verfügung (Großschreibung mit Grafikzeichen oder Groß- und Kleinschreibung). Die Umschaltung zwischen beiden erfolgt, wie bekannt, unter anderem über die Tastenkombination CBM + SHIFT.</p>
+        <p>Wenn man den Computer einschaltet, so stehen »serienmäßig« zwei Zeichensätze zur Verfügung (Großschreibung mit Grafikzeichen oder Groß- und Kleinschreibung). Die Umschaltung zwischen beiden erfolgt, wie bekannt, unter anderem über die Tastenkombination CBM + SHIFT.</p>
 
-<p>Was geschieht bei dieser Umschaltung, und warum lassen sich beide Zeichensätze (normalerweise) nicht gleichzeitig darstellen? Um diese Fragen zu klären, betrachten wir im folgenden das Innenleben des VIC (Video Interface Chip).</p>
+        <p>Was geschieht bei dieser Umschaltung, und warum lassen sich beide Zeichensätze (normalerweise) nicht gleichzeitig darstellen? Um diese Fragen zu klären, betrachten wir im folgenden das Innenleben des VIC (Video Interface Chip).</p>
 
-<p>Dieser Baustein kümmert sich um alles, was mit der Informationsweitergabe an das angeschlossene Fernsehgerät zu tun hat, also Bild, Farbe und Ton. Da er — wie bereits das letzte Mal kurz angedeutet — eigenständig, das heißt unabhängig von der CPU arbeitet, muß der VIC selbständig auf Informationen zurückgreifen können. Diese sind zum einen in den internen Registern, zum anderen in den normalen Speicherstellen enthalten. Die Register speichern Parameter für die Bildschirmgröße, die Tongeneratoren, die Lage des Bildschirm-, Farb- und Zeichenspeichers. Ferner können aus ihnen die Zustandswerte des Paddels und des Lichtgriffels ausgelesen werden (Tabelle 1).</p>
+        <p>Dieser Baustein kümmert sich um alles, was mit der Informationsweitergabe an das angeschlossene Fernsehgerät zu tun hat, also Bild, Farbe und Ton. Da er — wie bereits das letzte Mal kurz angedeutet — eigenständig, das heißt unabhängig von der CPU arbeitet, muß der VIC selbständig auf Informationen zurückgreifen können. Diese sind zum einen in den internen Registern, zum anderen in den normalen Speicherstellen enthalten. Die Register speichern Parameter für die Bildschirmgröße, die Tongeneratoren, die Lage des Bildschirm-, Farb- und Zeichenspeichers. Ferner können aus ihnen die Zustandswerte des Paddels und des Lichtgriffels ausgelesen werden (Tabelle 1).</p>
 
-<p>Nun wollen wir sehen, wie man die Startadressen der einzelnen VIC-externen Speicherstellen ermitteln kann. Beginnen wir mit dem Videospeicher.</p>
+        <p>Nun wollen wir sehen, wie man die Startadressen der einzelnen VIC-externen Speicherstellen ermitteln kann. Beginnen wir mit dem Videospeicher.</p>
 
-<p>Wenn man Bild 1 betrachtet merkt man schon, wie haarig die Berechnung mit Hilfe der einzelnen Bits ist. Aus den beiden hier beteiligten Registern Nummer (#) 2, Adresse 36865, und Nummer 5 (Adresse 36869) müssen jeweils bestimmte Bits für die Erstellung der Adresse herangezogen werden. Bild 1 zeigt nun, wie die jeweiligen Bits (die vier höchstwertigen aus Register # 5 und Bit 7 aus Register # 2) in das High-Byte-Schema »eingebaut« werden. Ferner muß Bit 7 aus Register #2invertiert werden, das heißt aus der Null wird eine Eins und umgekehrt.</p>
+        <p>Wenn man Bild 1 betrachtet merkt man schon, wie haarig die Berechnung mit Hilfe der einzelnen Bits ist. Aus den beiden hier beteiligten Registern Nummer (#) 2, Adresse 36865, und Nummer 5 (Adresse 36869) müssen jeweils bestimmte Bits für die Erstellung der Adresse herangezogen werden. Bild 1 zeigt nun, wie die jeweiligen Bits (die vier höchstwertigen aus Register # 5 und Bit 7 aus Register # 2) in das High-Byte-Schema »eingebaut« werden. Ferner muß Bit 7 aus Register #2invertiert werden, das heißt aus der Null wird eine Eins und umgekehrt.</p>
 
-<p>Fassen wir noch einmal zusammen: Aus bestimmten Bits der Register 2 und 5 entsteht das High-Byte der Bildschirmspeicheranfangsadresse (ein Low-Byte gibt’s hier nicht). Außerdem sind bestimmte Bits aus diesem Adreßschema immer auf Null. Die Konsequenz daraus ist, daß der Videobereich nur in bestimmten Speicherbereichen angesiedelt werden kann. Tabelle 2 zeigt die möglichen Adressen, die sich aus Bild 1 ergeben. Zu beachten ist, daß das untere Nibble (1 Nibble = 4 Bits) im Register #5 dem Zeichenspeicher zugeordnet ist, dieses darf vorläufig noch nicht angetastet werden.</p>
+        <p>Fassen wir noch einmal zusammen: Aus bestimmten Bits der Register 2 und 5 entsteht das High-Byte der Bildschirmspeicheranfangsadresse (ein Low-Byte gibt’s hier nicht). Außerdem sind bestimmte Bits aus diesem Adreßschema immer auf Null. Die Konsequenz daraus ist, daß der Videobereich nur in bestimmten Speicherbereichen angesiedelt werden kann. Tabelle 2 zeigt die möglichen Adressen, die sich aus Bild 1 ergeben. Zu beachten ist, daß das untere Nibble (1 Nibble = 4 Bits) im Register #5 dem Zeichenspeicher zugeordnet ist, dieses darf vorläufig noch nicht angetastet werden.</p>
 
-<h2>Kompliziertes — Die Adreßermittlung</h2>
+        <h2>Kompliziertes — Die Adreßermittlung</h2>
 
-<p>In gleicher Weise wie für den Bildschirm wird auch die Adresse des Farbspeichers ermittelt. Auch hier gibt es ein Adreßschema (Bild 1), in das Bit 7 aus Register #2 eingesetzt wird. Daher erklärt sich auch, warum sich bei einer Erweiterung von mehr als 8 KByte der Farbspeicher verschiebt. Liegt der Bildschirmspeicher bei Adresse 4096, dann hat Bit 7 aus Register # 2 den Wert Null, wodurch sich eine Coloradresse von 37888 ergibt. Im anderen Fall (Bildschirmstartadresse 7680) ist genau dieses Bit auf eins, wodurch es eine Verschiebung nach 38400 gibt.</p>
+        <p>In gleicher Weise wie für den Bildschirm wird auch die Adresse des Farbspeichers ermittelt. Auch hier gibt es ein Adreßschema (Bild 1), in das Bit 7 aus Register #2 eingesetzt wird. Daher erklärt sich auch, warum sich bei einer Erweiterung von mehr als 8 KByte der Farbspeicher verschiebt. Liegt der Bildschirmspeicher bei Adresse 4096, dann hat Bit 7 aus Register # 2 den Wert Null, wodurch sich eine Coloradresse von 37888 ergibt. Im anderen Fall (Bildschirmstartadresse 7680) ist genau dieses Bit auf eins, wodurch es eine Verschiebung nach 38400 gibt.</p>
 
-<p>Kommen wir nun zum Zeichenspeicher. Er erhält Informationen über jedes Zeichen, das auf dem Bildschirm darstellbar ist. Auch hier kann über das untere Nibble von Register #5 die Startadresse ermitteln. (Bild 2). Wenn die Bits 0-3 auf Null gesetzt sind, liegt sie bei 32768, also im Zeichengenerator-ROM (Normalstellung). Dort sind alle beim VC 20 verfügbaren Zeichen abgelegt (in welcher Form dies geschieht, werden wir später noch sehen).</p>
+        <p>Kommen wir nun zum Zeichenspeicher. Er erhält Informationen über jedes Zeichen, das auf dem Bildschirm darstellbar ist. Auch hier kann über das untere Nibble von Register #5 die Startadresse ermitteln. (Bild 2). Wenn die Bits 0-3 auf Null gesetzt sind, liegt sie bei 32768, also im Zeichengenerator-ROM (Normalstellung). Dort sind alle beim VC 20 verfügbaren Zeichen abgelegt (in welcher Form dies geschieht, werden wir später noch sehen).</p>
 
-<p>Wie sie bestimmt schon bemerkt haben, spielt bei der Verwaltung des Bildschirms die Adresse 36869 (Register # 5) eine bedeutende Rolle. Fragt man sie mit PEEK ab, so erhalten wir in der Grundversion oder bei einer 3-KByte-Erweiterung den Wert 240, bei einem um 8 KByte erweiterten Speicher 192. Zerlegt man diese Zahlen wie in Bild 2, so erhält man jedes Mal die gleiche Adresse für den Zeichenspeicher. Setzen wir nun Bit 1 auf 1 (= 242 in GV beziehungsweise 194 bei 8 KByte), liegt die Anfangsadresse des Zeichenspeichers bei Adresse 34816 (Tabelle 3), wodurch wir auf einmal Groß- und Kleinschrift auf dem Bildschirm haben. Die eine der zwei zu Anfang gestellten Fragen haben wir damit beantwortet.</p>
+        <p>Wie sie bestimmt schon bemerkt haben, spielt bei der Verwaltung des Bildschirms die Adresse 36869 (Register # 5) eine bedeutende Rolle. Fragt man sie mit PEEK ab, so erhalten wir in der Grundversion oder bei einer 3-KByte-Erweiterung den Wert 240, bei einem um 8 KByte erweiterten Speicher 192. Zerlegt man diese Zahlen wie in Bild 2, so erhält man jedes Mal die gleiche Adresse für den Zeichenspeicher. Setzen wir nun Bit 1 auf 1 (= 242 in GV beziehungsweise 194 bei 8 KByte), liegt die Anfangsadresse des Zeichenspeichers bei Adresse 34816 (Tabelle 3), wodurch wir auf einmal Groß- und Kleinschrift auf dem Bildschirm haben. Die eine der zwei zu Anfang gestellten Fragen haben wir damit beantwortet.</p>
 
-<p>Wie sind die im Zeichengenerator abrufbaren Zeichen eigentlich aufgebaut? Spätestens hier müssen wir ein Zeichen (im wahrsten Sinne des Wortes) unter die Lupe nehmen (Bild 3). Die vergrößerte Darstellung läßt erkennen, daß jedes Zeichen aus acht Zeilen mit je acht Spalten (8 x 8 Matrix) zusammengesetzt ist. Innerhalb dieses Gitters sind einzelne Punkte gesetzt beziehungsweise gelöscht. Jede Zeile innerhalb dieser Matrix ist als Byte (mit verschieden gesetzten Bits) im Zeichengenerator-ROM abgelegt (ROM natürlich deshalb, damit die Zeichen nach dem Abschalten erhalten bleiben).</p>
+        <p>Wie sind die im Zeichengenerator abrufbaren Zeichen eigentlich aufgebaut? Spätestens hier müssen wir ein Zeichen (im wahrsten Sinne des Wortes) unter die Lupe nehmen (Bild 3). Die vergrößerte Darstellung läßt erkennen, daß jedes Zeichen aus acht Zeilen mit je acht Spalten (8 x 8 Matrix) zusammengesetzt ist. Innerhalb dieses Gitters sind einzelne Punkte gesetzt beziehungsweise gelöscht. Jede Zeile innerhalb dieser Matrix ist als Byte (mit verschieden gesetzten Bits) im Zeichengenerator-ROM abgelegt (ROM natürlich deshalb, damit die Zeichen nach dem Abschalten erhalten bleiben).</p>
 
-<h2>Punkt für Punkt — der Zeichenaufbau</h2>
+        <h2>Punkt für Punkt — der Zeichenaufbau</h2>
 
-<p>Im unteren Teil von Bild 3 sieht man sehr gut, daß ein gesetzter Punkt der 1, ein nicht gesetzter (gelöschter) Punkt der 0 entspricht. Die Zeile wird dann in einen normalen Zahlenwert zwischen 0 und 255 umgerechnet. In dieser Form und in der Zeilenreihenfolge von oben nach unten sind sie nun im ROM abgelegt. Der »Klammeraffe« @ (Bildschirmcode 0) ist als erstes Zeichen dort zu finden. Folglich enthält die Startadresse des Zeichengenerators (Adresse 32768) die 0-te Zeile des Zeichens — also 28, Adresse 32769 enthält 34 und so weiter. Damit machen wir folgende Rechnung auf:<br/>
-Ein Zeichen: 8 Byte<br/>
-Anzahl: 128 Zeichen<br/>
-Invers: 128 Zeichen</p>
+        <p>Im unteren Teil von Bild 3 sieht man sehr gut, daß ein gesetzter Punkt der 1, ein nicht gesetzter (gelöschter) Punkt der 0 entspricht. Die Zeile wird dann in einen normalen Zahlenwert zwischen 0 und 255 umgerechnet. In dieser Form und in der Zeilenreihenfolge von oben nach unten sind sie nun im ROM abgelegt. Der »Klammeraffe« @ (Bildschirmcode 0) ist als erstes Zeichen dort zu finden. Folglich enthält die Startadresse des Zeichengenerators (Adresse 32768) die 0-te Zeile des Zeichens — also 28, Adresse 32769 enthält 34 und so weiter. Damit machen wir folgende Rechnung auf:<br />
+            Ein Zeichen: 8 Byte<br />
+            Anzahl: 128 Zeichen<br />
+            Invers: 128 Zeichen</p>
 
-<p>Also 256 Charakter pro Zeichensatz mal 8 Bytes = 2048 Bytes Platzbedarf für Großbuchstaben und Grafikzeichen mit deren inversen Gegenstücken. Dazu kommen nocheinmal so viele Bytes für den zweiten Zeichensatz, womit sich ein Speicherbedarf von 4 KByte für den gesamten Zeichenvorrat des VC ergibt.</p>
+        <p>Also 256 Charakter pro Zeichensatz mal 8 Bytes = 2048 Bytes Platzbedarf für Großbuchstaben und Grafikzeichen mit deren inversen Gegenstücken. Dazu kommen nocheinmal so viele Bytes für den zweiten Zeichensatz, womit sich ein Speicherbedarf von 4 KByte für den gesamten Zeichenvorrat des VC ergibt.</p>
 
-<h2>Die Platznummern</h2>
+        <h2>Die Platznummern</h2>
 
-<p>Jedes Zeichen hat nun eine (eben durch die Reihenfolge im ROM) bestimmte Platznummer zugewiesen bekommen. Der Klammeraffe (@) hat die 0, der Buchstabe A die 1, B die 2 und so weiter.</p>
+        <p>Jedes Zeichen hat nun eine (eben durch die Reihenfolge im ROM) bestimmte Platznummer zugewiesen bekommen. Der Klammeraffe (@) hat die 0, der Buchstabe A die 1, B die 2 und so weiter.</p>
 
-<p>Diese Platznummern stehen als Bildschirmcodes im Handbuch auf Seite 141. POKEt man nämlich ein Zeichen ins Bildschirm-RAM, so multipliziert der VIC den Bildschirmcode mit 8 und addiert die Startadresse des Zeichengenerators hinzu.</p>
+        <p>Diese Platznummern stehen als Bildschirmcodes im Handbuch auf Seite 141. POKEt man nämlich ein Zeichen ins Bildschirm-RAM, so multipliziert der VIC den Bildschirmcode mit 8 und addiert die Startadresse des Zeichengenerators hinzu.</p>
 
-<p>Beispiel: Das Zeichen $ (Bildschirmcode 36) ist ab folgender Adresse abgespeichert (Formel 1).<br/>
-AD = BC * 8 + ZG<br/>
-36 * 8 + 32768 33056<br/>
-TODO</p>
+        <p>Beispiel: Das Zeichen $ (Bildschirmcode 36) ist ab folgender Adresse abgespeichert (Formel 1).<br />
+            AD = BC * 8 + ZG<br />
+            36 * 8 + 32768 33056<br />
+            TODO</p>
 
-<p>Diese Formel müssen wir im Hinterkopf behalten, denn wir benötigen sie später noch.</p>
+        <p>Diese Formel müssen wir im Hinterkopf behalten, denn wir benötigen sie später noch.</p>
 
-<p>Weiterhin ist anzumerken, daß jeweils nur 256 Zeichen gleichzeitig dargestellt werden können (eine Ausnahme davon lernen wir nächstes Mal kennen).</p>
+        <p>Weiterhin ist anzumerken, daß jeweils nur 256 Zeichen gleichzeitig dargestellt werden können (eine Ausnahme davon lernen wir nächstes Mal kennen).</p>
 
-<h2>Characterstyling: Eigene Sonderzeichen</h2>
+        <h2>Characterstyling: Eigene Sonderzeichen</h2>
 
-<p>Schön wäre es nun, wenn man jedes Zeichen nach eigenen Wünschen abändern könnte. Dies gehi (wie sich inzwischen wohl herumgesprochen hat), indem man den Zeichengenerator (also die Zeicheninformationen) ins RAM verlegt und das Register #5 ändert.</p>
+        <p>Schön wäre es nun, wenn man jedes Zeichen nach eigenen Wünschen abändern könnte. Dies gehi (wie sich inzwischen wohl herumgesprochen hat), indem man den Zeichengenerator (also die Zeicheninformationen) ins RAM verlegt und das Register #5 ändert.</p>
 
-<p>Dazu müssen wir uns anhand einer Grafik des Speicheraufbaus (Bild 4) überlegen, wo wir diese Zeichen abspeichern, denn wie in Tabelle 2 zu sehen ist, lassen sie sich nicht überall, sondern nur an bestimmten Stellen unterbringen. Auch hier muß man zwischen den beiden Ausbaustufen Grundversion /+3 KByte und ab 8 KByte unterscheiden.</p>
+        <p>Dazu müssen wir uns anhand einer Grafik des Speicheraufbaus (Bild 4) überlegen, wo wir diese Zeichen abspeichern, denn wie in Tabelle 2 zu sehen ist, lassen sie sich nicht überall, sondern nur an bestimmten Stellen unterbringen. Auch hier muß man zwischen den beiden Ausbaustufen Grundversion /+3 KByte und ab 8 KByte unterscheiden.</p>
 
-<h2>Nachhilfe — Die logischen Funktionen</h2>
+        <h2>Nachhilfe — Die logischen Funktionen</h2>
 
-<p>Aufgrund der Zweiteilung des Registers # 5 sollte man alle Änderungen nur mit Hilfe logischer Funktionen durchführen, dazu ein kleiner Exkurs.</p>
+        <p>Aufgrund der Zweiteilung des Registers # 5 sollte man alle Änderungen nur mit Hilfe logischer Funktionen durchführen, dazu ein kleiner Exkurs.</p>
 
-<p>Gerade bei unserem Fall, aber auch bei anderen Gelegenheiten, will man nur bestimmte Bits einer Speicherstelle ändern. Mit den boolschen Operationen OR und AND lassen sich jeweils die gewünschten Bits Ein- beziehungsweise Ausschalten.</p>
+        <p>Gerade bei unserem Fall, aber auch bei anderen Gelegenheiten, will man nur bestimmte Bits einer Speicherstelle ändern. Mit den boolschen Operationen OR und AND lassen sich jeweils die gewünschten Bits Ein- beziehungsweise Ausschalten.</p>
 
-<p>Die erste wichtige Verknüpfungsoperation ist die ODER- (in Basic OR) Operation, die zwei Bits nach der in Tabelle 4a abgebildeten Wahrheitstabelle verknüpft. Haben wir nun eine Kette von 8 Bit (also ein Byte), so kann man mit Hilfe dieser Operation bestimmte Bits »einschalten«. Dazu ein Beispiel: Von einer Speicherstelle sollen die Bits 1 und 6 eingeschaltet werden. Da Basic die Binärzahlen nicht direkt, sondern nur als Dezimalzahlen verarbeiten kann, müssen wir zunächst alle Werte in dieses Zahlensystem umwandeln.</p>
+        <p>Die erste wichtige Verknüpfungsoperation ist die ODER- (in Basic OR) Operation, die zwei Bits nach der in Tabelle 4a abgebildeten Wahrheitstabelle verknüpft. Haben wir nun eine Kette von 8 Bit (also ein Byte), so kann man mit Hilfe dieser Operation bestimmte Bits »einschalten«. Dazu ein Beispiel: Von einer Speicherstelle sollen die Bits 1 und 6 eingeschaltet werden. Da Basic die Binärzahlen nicht direkt, sondern nur als Dezimalzahlen verarbeiten kann, müssen wir zunächst alle Werte in dieses Zahlensystem umwandeln.</p>
 
-<p>TODO</p>
+        <p>TODO</p>
 
-<p>Durch Addition der Wertigkeiten der zu setzenden Bits ergibt sich der Wert 66 (= 64 + 2). Durch die OR-Verknüpfung der Speicherstelle mit 66 ergibt sich folgende Bitstruktur (für den ursprünglichen Inhalt der Speicherstelle nehmen wir einmal 229 an):</p>
+        <p>Durch Addition der Wertigkeiten der zu setzenden Bits ergibt sich der Wert 66 (= 64 + 2). Durch die OR-Verknüpfung der Speicherstelle mit 66 ergibt sich folgende Bitstruktur (für den ursprünglichen Inhalt der Speicherstelle nehmen wir einmal 229 an):</p>
 
-<p>TODO</p>
+        <p>TODO</p>
 
-<p>Der gewünschte Effekt ist eingetreten, das heißt die Bits 1 und 6 wurden gesetzt (da Bit 6 bereits eingeschaltet war, ergab sich hier keine Änderung).</p>
+        <p>Der gewünschte Effekt ist eingetreten, das heißt die Bits 1 und 6 wurden gesetzt (da Bit 6 bereits eingeschaltet war, ergab sich hier keine Änderung).</p>
 
-<p>Analog verfährt man beim Löschen bestimmter Bits. Dazu wird dann allerdings die UND-Operation (Basic-Befehl AND) verwendet. Wie Tabelle 4b zeigt, bleiben nur die Bits unverändert, die mit 1 »verANDet« werden. Auch hierzu ein Rechenbeispiel, bei dem die Bits 1 und 6 gelöscht werden sollen:</p>
+        <p>Analog verfährt man beim Löschen bestimmter Bits. Dazu wird dann allerdings die UND-Operation (Basic-Befehl AND) verwendet. Wie Tabelle 4b zeigt, bleiben nur die Bits unverändert, die mit 1 »verANDet« werden. Auch hierzu ein Rechenbeispiel, bei dem die Bits 1 und 6 gelöscht werden sollen:</p>
 
-<p>TODO</p>
+        <p>TODO</p>
 
-<p>Auch hierbei muß man sich vor der Verknüpfung ein Bitmuster berechnen, in dem die zu löschenden Bits auf Null, die nicht zu verändernden auf 1 gesetzt werden müssen. Wem dies noch nicht restlos klar ist, der sollte anhand von einigen Rechenbeispielen diese Operationen üben, denn wir benötigen diese in der nächsten Folge, wenn es darum geht, jeden Grafikpunkt einzeln anzusteuern (beispielsweise über Koordinaten).</p>
+        <p>Auch hierbei muß man sich vor der Verknüpfung ein Bitmuster berechnen, in dem die zu löschenden Bits auf Null, die nicht zu verändernden auf 1 gesetzt werden müssen. Wem dies noch nicht restlos klar ist, der sollte anhand von einigen Rechenbeispielen diese Operationen üben, denn wir benötigen diese in der nächsten Folge, wenn es darum geht, jeden Grafikpunkt einzeln anzusteuern (beispielsweise über Koordinaten).</p>
 
-<p>Aber auch das Register #5 kann damit wesentlich eleganter geändert werden. So schaltet POKE 36869,PEEK (36869) OR 1 auf Groß-/Kleinschreibung um (überlegen Sie mal, warum dies so ist), wobei man keine Unterscheidung zwischen verschiedenen Speicherausbaustufen treffen muß.</p>
+        <p>Aber auch das Register #5 kann damit wesentlich eleganter geändert werden. So schaltet POKE 36869,PEEK (36869) OR 1 auf Groß-/Kleinschreibung um (überlegen Sie mal, warum dies so ist), wobei man keine Unterscheidung zwischen verschiedenen Speicherausbaustufen treffen muß.</p>
 
-<p>Fassen wir das bis jetzt behandelte noch einmal kurz zusammen: Wir haben also die Möglichkeit, den gesamten Zeichensatz ins RAM zu verlegen. Dort kann er dann nach eigenen Wünschen verändert werden. Bevor man jedoch irgendeine Änderung vornehmen kann, müssen die Zeichen in das bisher ja »leere« RAM kopiert werden.</p>
+        <p>Fassen wir das bis jetzt behandelte noch einmal kurz zusammen: Wir haben also die Möglichkeit, den gesamten Zeichensatz ins RAM zu verlegen. Dort kann er dann nach eigenen Wünschen verändert werden. Bevor man jedoch irgendeine Änderung vornehmen kann, müssen die Zeichen in das bisher ja »leere« RAM kopiert werden.</p>
 
-<p>Das in Listing 1 abgedruckte Basic-Programm erfüllt diese Aufgabe. Die Routine ist so aufgebaut, daß lediglich die Variable RG eingesetzt werden muß. Sie wurde mit Absicht so allgemein gehalten, damit sie für alle Speichererweiterungen einsetzbar ist.</p>
+        <p>Das in Listing 1 abgedruckte Basic-Programm erfüllt diese Aufgabe. Die Routine ist so aufgebaut, daß lediglich die Variable RG eingesetzt werden muß. Sie wurde mit Absicht so allgemein gehalten, damit sie für alle Speichererweiterungen einsetzbar ist.</p>
 
-<p>Hier nun eine Auflistung der einsetzbaren Werte (sie entsprechen im übrigen denen in Tabelle 2):</p>
+        <p>Hier nun eine Auflistung der einsetzbaren Werte (sie entsprechen im übrigen denen in Tabelle 2):</p>
 
-<p>RG = 12: Aus diesem Registerwert errechnete sich das Programm die Zeichenspeicheradresse 4096. Die Zeichen füllen bei dieser Einstellung also den gesamten Grundversionsspeicher aus (aber wer benötigt schon 512 verschiedene Zeichen?). Man nutzt diese Zeichenfülle also nur bei einem um mindestens 3 KByte erweiterten Speicher aus. In diesem Fall (und auch bei einer 8-KByte-Erweiterung) darf man den Bildschirmspeicher nicht außer acht lassen, denn dieser befindet sich ja auch im Bereich zwischen 4096 und 8192 (je nach Erweiterung). In beiden Fällen ergeben sich also Überschneidungen zwischen den beiden Speichern. So können bei einem 8-KByte-Speicher die unteren 512 Byte nicht für Zeicheninformationen verwendet werden (da dort ja der Bildschirmspeicher liegt). Also reduziert sich die Anzahl der verfügbaren Zeichen um 64.</p>
+        <p>RG = 12: Aus diesem Registerwert errechnete sich das Programm die Zeichenspeicheradresse 4096. Die Zeichen füllen bei dieser Einstellung also den gesamten Grundversionsspeicher aus (aber wer benötigt schon 512 verschiedene Zeichen?). Man nutzt diese Zeichenfülle also nur bei einem um mindestens 3 KByte erweiterten Speicher aus. In diesem Fall (und auch bei einer 8-KByte-Erweiterung) darf man den Bildschirmspeicher nicht außer acht lassen, denn dieser befindet sich ja auch im Bereich zwischen 4096 und 8192 (je nach Erweiterung). In beiden Fällen ergeben sich also Überschneidungen zwischen den beiden Speichern. So können bei einem 8-KByte-Speicher die unteren 512 Byte nicht für Zeicheninformationen verwendet werden (da dort ja der Bildschirmspeicher liegt). Also reduziert sich die Anzahl der verfügbaren Zeichen um 64.</p>
 
-<p>Bei einer 3-KByte-Erweiterung wird man mit dem gleichen Problem konfrontiert.In diesem Fall werden die obersten 512 Bytes vom Videospeicher in Beschlag genommen.</p>
+        <p>Bei einer 3-KByte-Erweiterung wird man mit dem gleichen Problem konfrontiert.In diesem Fall werden die obersten 512 Bytes vom Videospeicher in Beschlag genommen.</p>
 
-<p><strong>ZG = 13</strong> (Startadresse 5120): Mit diesen 384 Zeichen kommt man in der Regel gut aus (wie man alle auf den Bildschirm bringt, sehen wir in der nächsten Folge). Bezüglich der Nutzbarkeit der Zeichen ergibt sich nur bei der Grundversion beziehungsweise 3-KByte-Erweiterung das Problem, daß der obere Bereich (also Adresse 7680 bis 8192) vom Bildschirmspeicher belegt werden. Das betrifft die Bildschirmcodes 64 bis 128 im Klein-/Großschriftmodus.</p>
+        <p><strong>ZG = 13</strong> (Startadresse 5120): Mit diesen 384 Zeichen kommt man in der Regel gut aus (wie man alle auf den Bildschirm bringt, sehen wir in der nächsten Folge). Bezüglich der Nutzbarkeit der Zeichen ergibt sich nur bei der Grundversion beziehungsweise 3-KByte-Erweiterung das Problem, daß der obere Bereich (also Adresse 7680 bis 8192) vom Bildschirmspeicher belegt werden. Das betrifft die Bildschirmcodes 64 bis 128 im Klein-/Großschriftmodus.</p>
 
-<p><strong>ZG = 14</strong> (Startadresse 6144): Hier haben wir Platz für 256 Zeichen, die bei 8 KByte voll nutzbar sind. Im anderen Fall sind wiederum 64 Zeichen für den Videospeicher zu subtrahieren.</p>
+        <p><strong>ZG = 14</strong> (Startadresse 6144): Hier haben wir Platz für 256 Zeichen, die bei 8 KByte voll nutzbar sind. Im anderen Fall sind wiederum 64 Zeichen für den Videospeicher zu subtrahieren.</p>
 
-<p><strong>ZG = 15</strong> (Startadresse 7168): Diese Zeichenmenge wird üblicherweise in der Grundversion verwendet. Hierbei reduziert sich der Programmspeicher nämlich nur um 512 Byte (also 64 Zeichen). Die anderen 64 Zeichen fallen ja wiederum dem Bildschirmspeicher zum Opfer. .</p>
+        <p><strong>ZG = 15</strong> (Startadresse 7168): Diese Zeichenmenge wird üblicherweise in der Grundversion verwendet. Hierbei reduziert sich der Programmspeicher nämlich nur um 512 Byte (also 64 Zeichen). Die anderen 64 Zeichen fallen ja wiederum dem Bildschirmspeicher zum Opfer. .</p>
 
-<p>Da das Zeichenkopieren fast immer notwendig ist, verwendet man anstelle des Basicprogramms aus Geschwindigkeitsgründen besser eine Maschinenroutine (Listing 2 und 3). Das Programm kann mit Hilfe des Laders in ihre eigene Grafikroutine eingebaut werden. Auch speicherplatzmäßig ergeben sich, da das Maschinenprogramm recht kurz ist, keine Probleme, denn es liegt im Bandpuffer (Adresse 828).</p>
+        <p>Da das Zeichenkopieren fast immer notwendig ist, verwendet man anstelle des Basicprogramms aus Geschwindigkeitsgründen besser eine Maschinenroutine (Listing 2 und 3). Das Programm kann mit Hilfe des Laders in ihre eigene Grafikroutine eingebaut werden. Auch speicherplatzmäßig ergeben sich, da das Maschinenprogramm recht kurz ist, keine Probleme, denn es liegt im Bandpuffer (Adresse 828).</p>
 
-<h3>Das Ändern der Sonderzeichen</h3>
+        <h3>Das Ändern der Sonderzeichen</h3>
 
-<p>Nun sind wir an einer Stelle angelangt, von der aus wir die Zeichen nach eigenen Wünschen abändern können, seien es mathematische Sonderzeichen, deutsche Umlaute oder Grafikzeichen für eigene Spielprogramme.</p>
+        <p>Nun sind wir an einer Stelle angelangt, von der aus wir die Zeichen nach eigenen Wünschen abändern können, seien es mathematische Sonderzeichen, deutsche Umlaute oder Grafikzeichen für eigene Spielprogramme.</p>
 
-<p>Am Anfang steht der Entwurf eines Zeichens mit Hilfe einer 8 x 8 Matrix (Bild 5). Hier in unserem Beispiel soll das Pfundzeichen £ (Bildschirmcode 28) durch das Copyrightzeichen ersetzt werden.</p>
+        <p>Am Anfang steht der Entwurf eines Zeichens mit Hilfe einer 8 x 8 Matrix (Bild 5). Hier in unserem Beispiel soll das Pfundzeichen £ (Bildschirmcode 28) durch das Copyrightzeichen ersetzt werden.</p>
 
-<p>Dazu wird unser Beispielprogramm aus Listing 1 um folgende 5 Zeilen ergänzt:<br/>
-60 CH = 28: AD = CH * 8 + ZG: REM Formel #1<br/>
-70 FOR Z = 0 TO 7<br/>
-80 READ D<br/>
-90 POKE AD*Z,D: NEXT<br/>
-100 DATA 60, 66, 153, 161, 153, 66, 60</p>
+        <p>Dazu wird unser Beispielprogramm aus Listing 1 um folgende 5 Zeilen ergänzt:<br />
+            60 CH = 28: AD = CH * 8 + ZG: REM Formel #1<br />
+            70 FOR Z = 0 TO 7<br />
+            80 READ D<br />
+            90 POKE AD*Z,D: NEXT<br />
+            100 DATA 60, 66, 153, 161, 153, 66, 60</p>
 
-<p>Der Bildschirmcode des Zeichens wird durch die Variable CH übergeben. Daraus errechnet sich das Programm die Startadresse des Zeichens, indem es den Bildschirmcode mit 8 multipliziert und die Anfangsadresse des Zeichenspeichers dazuaddiert (in unserem Fall 6144).</p>
+        <p>Der Bildschirmcode des Zeichens wird durch die Variable CH übergeben. Daraus errechnet sich das Programm die Startadresse des Zeichens, indem es den Bildschirmcode mit 8 multipliziert und die Anfangsadresse des Zeichenspeichers dazuaddiert (in unserem Fall 6144).</p>
 
-<h3>Das Abspeichern der Zeichen</h3>
+        <h3>Das Abspeichern der Zeichen</h3>
 
-<p>Im allgemeinen erstellt man solche Zeichen nicht aus Spaß an der Freude, sondern man möchte sie in Spielen oder anderen Programmen verwenden. Dazu müssen sie in irgendeiner Form abgespeichert werden. Hierfür gibt es wieder zweierlei Möglichkeiten. Entweder man schreibt die Zeicheninformationen in Form von DATA-Zeilen ins Programm oder man SAVEt sie direkt auf Band oder Diskette ab.</p>
+        <p>Im allgemeinen erstellt man solche Zeichen nicht aus Spaß an der Freude, sondern man möchte sie in Spielen oder anderen Programmen verwenden. Dazu müssen sie in irgendeiner Form abgespeichert werden. Hierfür gibt es wieder zweierlei Möglichkeiten. Entweder man schreibt die Zeicheninformationen in Form von DATA-Zeilen ins Programm oder man SAVEt sie direkt auf Band oder Diskette ab.</p>
 
-<p>Beide Verfahrensweisen eignen sich für bestimmte Anwendungsgebiete besonders gut, für andere weniger gut.</p>
+        <p>Beide Verfahrensweisen eignen sich für bestimmte Anwendungsgebiete besonders gut, für andere weniger gut.</p>
 
-<p>Die DATA-Zeilen-Methode eignet sich dann, wenn es darum geht, lediglich 3 oder 4 Zeichen abzuändern (beispielsweise für ein Textverarbeitungsprogramm mit deutschen Umlauten). Diese werden dann — wie in dem Beispiel oben — als DATA-Zeilen ins Programm geschrieben.</p>
+        <p>Die DATA-Zeilen-Methode eignet sich dann, wenn es darum geht, lediglich 3 oder 4 Zeichen abzuändern (beispielsweise für ein Textverarbeitungsprogramm mit deutschen Umlauten). Diese werden dann — wie in dem Beispiel oben — als DATA-Zeilen ins Programm geschrieben.</p>
 
-<p>Für größere Änderungen am Zeichenvorrat ist diese Methode aber aus Geschwindigkeits- und Platzgründen (sie benötigt etwa viermal so viel Platz) denkbar ungeeignet.</p>
+        <p>Für größere Änderungen am Zeichenvorrat ist diese Methode aber aus Geschwindigkeits- und Platzgründen (sie benötigt etwa viermal so viel Platz) denkbar ungeeignet.</p>
 
-<p>Bei der anderen Methode werden die Zeicheninformationen wie ein Programm einfach auf Band abgespeichert. Dazu besinnen wir uns wieder auf Folge 1 in Ausgabe 9, wo von den Basic-Zeigern die Rede war. Ferner ist dort beschrieben, wie man Platz für Maschinenprogramme und Sonderzeichen schafft, und sie vor dem Zugriff des Basicinterpreters schützt. Auch hier muß man — wie so oft, wenn es um Grafik oder Bildschirm geht — zwischen den zwei grundsätzlichen Ausbauversionen unterscheiden.</p>
+        <p>Bei der anderen Methode werden die Zeicheninformationen wie ein Programm einfach auf Band abgespeichert. Dazu besinnen wir uns wieder auf Folge 1 in Ausgabe 9, wo von den Basic-Zeigern die Rede war. Ferner ist dort beschrieben, wie man Platz für Maschinenprogramme und Sonderzeichen schafft, und sie vor dem Zugriff des Basicinterpreters schützt. Auch hier muß man — wie so oft, wenn es um Grafik oder Bildschirm geht — zwischen den zwei grundsätzlichen Ausbauversionen unterscheiden.</p>
 
-<p>All diese Vorgänge möchte ich anhand von Bild 6 erklären (6a für die Grundversion, 6b für die 8-KByte-Erweiterung):</p>
+        <p>All diese Vorgänge möchte ich anhand von Bild 6 erklären (6a für die Grundversion, 6b für die 8-KByte-Erweiterung):</p>
 
-<p>Grundversion (Bild 6a): Der dunkelgelb unterlegte Teil der Speichergrafik stellt den Adreßbereich dar, auf den der Interpreter zurückgreift. Dieser geht normalerweise bis Adresse 7680 (zu erkennen an der hellgelben Farbe).</p>
+        <p>Grundversion (Bild 6a): Der dunkelgelb unterlegte Teil der Speichergrafik stellt den Adreßbereich dar, auf den der Interpreter zurückgreift. Dieser geht normalerweise bis Adresse 7680 (zu erkennen an der hellgelben Farbe).</p>
 
-<p>Durch die Umstellung mit PO-KE 55,0: POKE 56, 28:CLR hat man Platz für 64 Zeichen (= 512 Byte) geschaffen, die vom Interpreter nicht angetastet werden (dies haben wir ja in Folge 1 schon besprochen).</p>
+        <p>Durch die Umstellung mit PO-KE 55,0: POKE 56, 28:CLR hat man Platz für 64 Zeichen (= 512 Byte) geschaffen, die vom Interpreter nicht angetastet werden (dies haben wir ja in Folge 1 schon besprochen).</p>
 
-<p>Nun aber zu dem Abspeichern des Zeichensatzes. Auch beim SAVEn richtet sich der VC nach diesen Zeropagezeigern, denn er speichert alles ab, was er zwischen den beiden Adreßpaaren 43, 44 (Basic-Anfang) und 45,45 (Programmende) findet. Folglich gibt das erste Paar die Anfangs-, das andere die Endadresse der zu speichernden Daten an. Normalerweise sind diese Daten das Basic-Programm, welches sich zwischen diesen Zeigern befindet. Durch eine Änderung der beiden Zeropagespeicherstellen 45 und 46 auf das Ende des Zeichensatzs (Adresse 7680) bewirkt man, daß das gesamte Programm mit Variablenbereich und Zeichensatz abgespeichert wird (Bild 6a — rote Markierung).</p>
+        <p>Nun aber zu dem Abspeichern des Zeichensatzes. Auch beim SAVEn richtet sich der VC nach diesen Zeropagezeigern, denn er speichert alles ab, was er zwischen den beiden Adreßpaaren 43, 44 (Basic-Anfang) und 45,45 (Programmende) findet. Folglich gibt das erste Paar die Anfangs-, das andere die Endadresse der zu speichernden Daten an. Normalerweise sind diese Daten das Basic-Programm, welches sich zwischen diesen Zeigern befindet. Durch eine Änderung der beiden Zeropagespeicherstellen 45 und 46 auf das Ende des Zeichensatzs (Adresse 7680) bewirkt man, daß das gesamte Programm mit Variablenbereich und Zeichensatz abgespeichert wird (Bild 6a — rote Markierung).</p>
 
-<h2>Schritt für Schritt auf Band</h2>
+        <h2>Schritt für Schritt auf Band</h2>
 
-<p>Hier noch einmal die nötigen Programmschritte:</p>
+        <p>Hier noch einmal die nötigen Programmschritte:</p>
 
-<ol>
-<li>Programm um Zeile 5 ergänzen.<br>5 POKE 45, XXX: POKE 46, XX: POKE 55, 0: POKE 56, 28: CLR<br>Warum muß das Programm um eine Zeile ergänzt werden? Nun, da sich der Computer bei der Variablenverwaltung nach diesen Zeigern richtet, müssen diese nach dem Ladevorgang wieder auf den alten Wert — der auf das wirkliche Programmende zeigt — gesetzt werden, damit der Computer nicht mit der Verwaltung durcheinander kommt. Auch die Zeichen selbst müssen nach dem Laden wieder vor dem Interpreterzugriff geschützt werden, welches durch die Veränderung der Zeiger 55, 56 geschieht.</li>
-<li>Nun stellen wir quasi »zu Fuß« den Inhalt von Adresse 45 und 46 fest:<br>PRINT PEEK(45), PEEK(46)</li>
-<li>Diese Werte werden nun nachträglich (statt »xxx«) in Zeile 5 geschrieben, wobei zu beachten ist, daß der Wert von Adresse 45 ein-, zwei- oder dreistellig sein kann (oben wurden drei Stellen angenommen). Sollten es nun nicht drei Ziffern sein, so ist der Rest mit Nullen zu ergänzen (zum Beispiel 2= 002 oder 34 = 034). Wichtig ist, daß sich die Zeilenlänge nicht ändert, da sich damit auch das Programmende verschieben würde.</li>
-<li>Die Zeiger werden nun zum Abspeichern vorbereitet: POKE 45, 0: POKE 46, 30: CLR: SAVE»&hellip;«.</li>
-</ol>
+        <ol>
+            <li>Programm um Zeile 5 ergänzen.<br>5 POKE 45, XXX: POKE 46, XX: POKE 55, 0: POKE 56, 28: CLR<br>Warum muß das Programm um eine Zeile ergänzt werden? Nun, da sich der Computer bei der Variablenverwaltung nach diesen Zeigern richtet, müssen diese nach dem Ladevorgang wieder auf den alten Wert — der auf das wirkliche Programmende zeigt — gesetzt werden, damit der Computer nicht mit der Verwaltung durcheinander kommt. Auch die Zeichen selbst müssen nach dem Laden wieder vor dem Interpreterzugriff geschützt werden, welches durch die Veränderung der Zeiger 55, 56 geschieht.</li>
+            <li>Nun stellen wir quasi »zu Fuß« den Inhalt von Adresse 45 und 46 fest:<br>PRINT PEEK(45), PEEK(46)</li>
+            <li>Diese Werte werden nun nachträglich (statt »xxx«) in Zeile 5 geschrieben, wobei zu beachten ist, daß der Wert von Adresse 45 ein-, zwei- oder dreistellig sein kann (oben wurden drei Stellen angenommen). Sollten es nun nicht drei Ziffern sein, so ist der Rest mit Nullen zu ergänzen (zum Beispiel 2= 002 oder 34 = 034). Wichtig ist, daß sich die Zeilenlänge nicht ändert, da sich damit auch das Programmende verschieben würde.</li>
+            <li>Die Zeiger werden nun zum Abspeichern vorbereitet: POKE 45, 0: POKE 46, 30: CLR: SAVE»&hellip;«.</li>
+        </ol>
 
 
-<p>Wie man sieht, befindet sich das Programm vor den Sonderzeichen im Speicher. Die Zeiger müssen zum Abspeichern also nach oben gesetzt werden. Bei einer 8-KByte-Erweiterung liegt der Fall genau anders herum. Dort liegt der Zeichensatz nämlich vor dem Programm. Folglich muß hier der Basic-Anfang beim Abspeichern nach unten gelegt werden, aber dies besprechen wir jetzt im Folgenden noch genauer:</p>
+        <p>Wie man sieht, befindet sich das Programm vor den Sonderzeichen im Speicher. Die Zeiger müssen zum Abspeichern also nach oben gesetzt werden. Bei einer 8-KByte-Erweiterung liegt der Fall genau anders herum. Dort liegt der Zeichensatz nämlich vor dem Programm. Folglich muß hier der Basic-Anfang beim Abspeichern nach unten gelegt werden, aber dies besprechen wir jetzt im Folgenden noch genauer:</p>
 
-<p>8-KByte-Erweiterung (Bild 6b): Auch hier ist die erste Handlung das Verstellen eines Basic-Zeigers. Auffällig ist, daß die Sonderzeichen — wie oben bereits angesprochen — nicht mehr oberhalb des Basic-Programms (also wie in Bild 6a zu sehen an dessen Ende), sondern unterhalb liegen. Daher muß die Basic-Anfangsadresse so geändert werden, daß auch hier kein zerstörendes Eingreifen mehr möglich ist. Durch das Hochsetzen der Startadresse von 4608 auf 8129 wird dies erreicht: POKE 44, 32: POKE 8192,0: NEW</p>
+        <p>8-KByte-Erweiterung (Bild 6b): Auch hier ist die erste Handlung das Verstellen eines Basic-Zeigers. Auffällig ist, daß die Sonderzeichen — wie oben bereits angesprochen — nicht mehr oberhalb des Basic-Programms (also wie in Bild 6a zu sehen an dessen Ende), sondern unterhalb liegen. Daher muß die Basic-Anfangsadresse so geändert werden, daß auch hier kein zerstörendes Eingreifen mehr möglich ist. Durch das Hochsetzen der Startadresse von 4608 auf 8129 wird dies erreicht: POKE 44, 32: POKE 8192,0: NEW</p>
 
-<p>Diese Anweisung ist vor dem Laden oder der Eingabe des Programms notwendig, denn wie man sieht, muß nach der erstmaligen Umschaltung der Programmspeicher mit NEW gelöscht werden.</p>
+        <p>Diese Anweisung ist vor dem Laden oder der Eingabe des Programms notwendig, denn wie man sieht, muß nach der erstmaligen Umschaltung der Programmspeicher mit NEW gelöscht werden.</p>
 
-<p>Nachdem sich nun das Programm und die Sonderzeichen im Speicher befinden, können beide zusammen wieder abge-SAVEt werden; auch dazu ein »Rezept«:</p>
+        <p>Nachdem sich nun das Programm und die Sonderzeichen im Speicher befinden, können beide zusammen wieder abge-SAVEt werden; auch dazu ein »Rezept«:</p>
 
-<ol>
-<li>Den Inhalt von Zeigerpaar 45,46 feststellen und notieren.</li>
-<li>Basic-Anfang auf 4608 (Ursprungswert) zurückstellen: POKE 44,18: NEW</li>
-<li>Zeile eingeben:<br>10 POKE 44,32: RUN</li>
-<li>Den notierten Zeigerinhalt in die beiden Zeropagespeicherstellen zurückschreiben:<br>POKE 45,Low-Byte: POKE 46, High-Byte: CLR</li>
-<li>Die Zeichen mit dem Programm abspeichern (SAVE).</li>
-</ol>
+        <ol>
+            <li>Den Inhalt von Zeigerpaar 45,46 feststellen und notieren.</li>
+            <li>Basic-Anfang auf 4608 (Ursprungswert) zurückstellen: POKE 44,18: NEW</li>
+            <li>Zeile eingeben:<br>10 POKE 44,32: RUN</li>
+            <li>Den notierten Zeigerinhalt in die beiden Zeropagespeicherstellen zurückschreiben:<br>POKE 45,Low-Byte: POKE 46, High-Byte: CLR</li>
+            <li>Die Zeichen mit dem Programm abspeichern (SAVE).</li>
+        </ol>
 
 
-<p>Lädt man das Programm wieder in den Speicher, so muß das High-Byte des Basic-Anfangszeigers (44) auf 32 gestellt werden, denn dort befindet sich ja das eigentliche Programm. Zeile 10 in Schritt 3 hat diese Aufgabe. Die Zeile befindet sich am zurückgestellten Programmbeginn (4608), also noch vor dem Zeichensatz, der erst bei Adresse 5120 beginnt. Das hat den Vorteil, daß man das Programm direkt mit RUN starten kann.</p>
+        <p>Lädt man das Programm wieder in den Speicher, so muß das High-Byte des Basic-Anfangszeigers (44) auf 32 gestellt werden, denn dort befindet sich ja das eigentliche Programm. Zeile 10 in Schritt 3 hat diese Aufgabe. Die Zeile befindet sich am zurückgestellten Programmbeginn (4608), also noch vor dem Zeichensatz, der erst bei Adresse 5120 beginnt. Das hat den Vorteil, daß man das Programm direkt mit RUN starten kann.</p>
 
-<p>Soweit der wichtige Abschnitt über das Abspeichern der Sonderzeichen, der mit Absicht etwas umfangreich ausgefallen ist, denn auch derjenige, der nicht so viele Kenntnisse über den VC 20 hat, soll in der Lage sein, seine grafischen Werke auf Band zu bringen.</p>
+        <p>Soweit der wichtige Abschnitt über das Abspeichern der Sonderzeichen, der mit Absicht etwas umfangreich ausgefallen ist, denn auch derjenige, der nicht so viele Kenntnisse über den VC 20 hat, soll in der Lage sein, seine grafischen Werke auf Band zu bringen.</p>
 
-<p>Mit dieser Erkenntnis beschließen wir die Einführung in die ’Grafikfähigkeit des VC 20. Das nächste Mal benutzen wir die bisher gewonnenen Grundlagen, um voll in die Materie einzusteigen.</p>
+        <p>Mit dieser Erkenntnis beschließen wir die Einführung in die ’Grafikfähigkeit des VC 20. Das nächste Mal benutzen wir die bisher gewonnenen Grundlagen, um voll in die Materie einzusteigen.</p>
 
-<p>(Christoph Sauer/ev)</p>
+        <p>(Christoph Sauer/ev)</p>
     </article>
 
 </body>
