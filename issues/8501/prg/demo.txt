@@ -1,0 +1,92 @@
+;demo.prg ==0801==
+;Quelle: 8501.D64
+    6 rem  dieses kurze demo-programm soll
+    8 rem  ein paar darstellungsformen
+   10 rem zeigen, wie sie mit provic-64
+   12 rem relativ einfach erreichbar sind.
+   14 rem       1984 by gebr. haas
+   19 rem
+   20 rem laden der provic-64 routine
+   21 rem
+   30 ifpeek(52544)=120then100
+   40 print"{down}{down} auf welchem datentraeger ist provic-64"
+   50 print"{down} verfuegbar ( floppy =8 / datasette =1 )"
+   60 input" ";a$:a=val(a$)
+   70 if a<>1 and a<>8 then40
+   80 load"provic 64",a,1
+   99 rem
+  100 rem pseudo-vic's initialisieren
+  101 rem
+  110 p1=52992:p2=53056:p3=53120:p4=53184:rem basisadressen der pseudo-vic's
+  120 pokep1+21,255:pokep1+24,22:pokep1+47,1:pokep1+27,255:pokep2+21,255
+  130 pokep2+17,59:pokep2+24,24:pokep2+32,7:pokep2+47,1:pokep2+27,255
+  140 pokep3+21,255:pokep3+32,9:pokep3+47,1:pokep3+27,255:pokep4+32,5
+  150 pokep4+21,255:pokep4+24,22:pokep4+47,1:pokep4+18,230:pokep4+27,255
+  199 rem
+  200 rem sprite-daten uebertragen
+  201 rem
+  210 restore
+  220 fora=0to126
+  230 read wert
+  240 poke832+a,wert
+  250 nexta
+  299 rem
+  300 rem bilschirm aufbauen
+  301 rem
+  310 print"{clr}{wht}{down}{rvon}{rght}{rght}{rght}{rght}{rght}{rght}{rght}P{$a0}R{$a0}O{$a0}V{$a0}I{$a0}C{$a0}{$a0}{$a0}6{$a0}4{$a0}{$a0}{$a0}D{$a0}E{$a0}M{$a0}O"
+  320 print"{down}{down} In diesem Bereich: GROSS/klein-Schrift{down}":
+  330 fora=0to7:print"{blu}rrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr{wht}";:nexta
+  335 fora=0to14:poke1289+a,34:nexta
+  340 print"      ^ dort oben: hires-grafik-modus ^"
+  350 print"{down}             hier: gross-schrift/grafik"
+  360 print"{down} QWERTYUIO{SHIFT-@}{SHIFT-*}~LKJHFSAZXCVBNM{CBM-Q}{CBM-W}{CBM-E}{CBM-R}{CBM-T}{CBM-F}{CBM-G}{CBM-Z}{CBM-X}{CBM-C}{CBM-V}{CBM-B}"
+  370 print"{down}{down}{down}{down}{down}      ^ Dort oben: Laufschrift ^{up}{up}{up}":printtab(6);
+  390 sys52544:rem provic-64 activieren
+  399 rem
+  400 rem hires-grafik zeichnen
+  401 rem
+  410 fora=10110to12360:pokea,0:nexta
+  420 fora=0to8*~step.08
+  430 x=3+a/.08:y=77-11*sin(a)-9*cos(a/.7)
+  440 av=8192+320*int(y/8)+(y and7)+8*int(x/8)
+  450 pokeav,peek(av) or 2^(7-(x and 7))
+  460 nexta
+  470 la$="*** von HaasiSoft ***  Fuer das 64'er Magazin   "
+  480 la$=la$+"***   P{$a0}R{$a0}O{$a0}V{$a0}I{$a0}C{$a0}{$a0}{$a0}6 4   "
+  490 la$=la$+left$(la$,25):r=53266
+  499 rem
+  500 rem demonstratins-schleife
+  501 rem
+  510 rem sprites setzen
+  511 rem
+  520 fora=0to7
+  530 pokep1+2*a,30+24*a+7*rnd(1):pokep1+2*a+1,60+6*rnd(1)
+  540 pokep1+39+a,rnd(1)*16:pokep1+48+a,13.5+rnd(1)
+  550 pokep2+2*a,30+24*a+7*rnd(1):pokep2+2*a+1,110+6*rnd(1)
+  560 pokep2+39+a,rnd(1)*16:pokep2+48+a,13.5+rnd(1)
+  570 pokep3+2*a,30+24*a+7*rnd(1):pokep3+2*a+1,160+6*rnd(1)
+  580 pokep3+39+a,rnd(1)*16:pokep3+48+a,13.5+rnd(1)
+  590 pokep4+2*a,30+24*a+7*rnd(1):pokep4+2*a+1,207+6*rnd(1)
+  600 pokep4+39+a,rnd(1)*16:pokep4+48+a,13.5+rnd(1)
+  610 nexta
+  619 rem
+  620 rem laufschrift setzen
+  621 rem
+  625 forlp=1tolen(la$)-25
+  630 lz=lz-1:iflz>0thenpokep4+22,lz or 8:fora=0to9:nexta:goto630
+  640 printtab(6);:wait53265,128:wait53266,64:poke53206,15:printlf$:print"{up}{up}"
+  660 lz=7:lf$=mid$(la$,lp,25)
+  670 nextlp
+  680 geta$:ifa$=""then500
+  690 sys52970:rem provic-64 desaktivieren
+  999 rem
+ 1000 rem sprite-daten
+ 1001 rem
+ 1002 data0,0,0,0,126,0,1,255,128,7,255,224,15,255,240,15,253,240,31,255,248
+ 1003 data31,255,248,63,255,252,63,255,252,63,243,252,63,252,0,63,255,252,63
+ 1004 data255,252,31,255,248,31,255,248,15,255,240,15,255,240,7,255,224,1,255
+ 1005 data128,0,126,0,0,0,0,0,0,126,0,1,255,128,7,255,224,15,255,240,15,251
+ 1006 data240,31,255,248,31,255,248,63,255,240,63,255,0,63,240,0,63,252,0,63
+ 1007 data255,0,63,255,224,31,255,248,31,255,248,15,255,240,15,255,240,7,255
+ 1008 data224,1,255,128,0,126,0
+
