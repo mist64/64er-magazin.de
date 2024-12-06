@@ -18,11 +18,6 @@
 
         <p class="intro">In dieser Folge des Assembler-Kurses wird die relative Adressierung erklärt. Damit verbunden sind auch die wichtigen Vergleichsoperationen. Anhand einer sehr häufig verwendeten Betriebssystem-Routine können Sie Ihr neu erworbenes Wissen testen.</p>
 
-        <figure>
-            <img src="142-3.png" alt="">
-            <figcaption>Bild 3. Die Grafikzeichen zu den entsprechenden CHRS-Codes</figcaption>
-        </figure>
-
         <p>In der letzten Ausgabe haben wir die Branch-Befehle kennengelernt. Heute wollen wir uns mit der relativen Adressierung dieser Befehle und noch einer anderen Art der Adressierung befassen. Weiterhin werden Sie einige neue Assembler-Worte lernen, nämlich die Vergleichsbefehle. Wie ganze Zahlen im Computer gespeichert sind, wissen wir bereits. Heute untersuchen wir die Speicherung von Zeichen. Schließlich werden wir unsere Nase noch ein wenig in die eingebaute Software des C 64 stecken.</p>
 
         <h3>Die relative Adressierung</h3>
@@ -73,7 +68,75 @@
 
         <p>Das sieht reichlich kompliziert aus, aber zum einen haben Sie ja einen ganz freundlichen Assembler und nur in seltenen Notfällen müssen Sie den Offset berechnen. Zum anderen gibt es noch eine Faustregel, mit der man sich das ganze vereinfachen kann. Die soll durch folgendes Schema erläutert werden:</p>
 
-        <p>TODO</p>
+        <table>
+            <tbody>
+                <tr>
+                    <td>Byte</td>
+                    <td>Inhalt</td>
+                    <td>Offset</td>
+                </tr>
+                <tr>
+                    <td>...</td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td>1995</td>
+                    <td></td>
+                    <td>F9</td>
+                </tr>
+                <tr>
+                    <td>1996</td>
+                    <td></td>
+                    <td>FA</td>
+                </tr>
+                <tr>
+                    <td>1997</td>
+                    <td></td>
+                    <td>FB</td>
+                </tr>
+                <tr>
+                    <td>1998</td>
+                    <td></td>
+                    <td>FC</td>
+                </tr>
+                <tr>
+                    <td>1999</td>
+                    <td></td>
+                    <td>FD</td>
+                </tr>
+                <tr>
+                    <td>2000</td>
+                    <td>BNE</td>
+                    <td>FE</td>
+                </tr>
+                <tr>
+                    <td>2001</td>
+                    <td>Offset</td>
+                    <td>FF</td>
+                </tr>
+                <tr>
+                    <td>2002</td>
+                    <td>Programmzählerstand</td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td>2003</td>
+                    <td></td>
+                    <td>01</td>
+                </tr>
+                <tr>
+                    <td>2004</td>
+                    <td></td>
+                    <td>02</td>
+                </tr>
+                <tr>
+                    <td>2005</td>
+                    <td></td>
+                    <td>03</td>
+                </tr>
+            </tbody>
+        </table>
 
         <p>Bei Vorwärtssprüngen ist ohnehin alles klar: Bei einem Sprung nach Adresse 2005 müßte man in vorliegendem Fall einen Offset von 03 eingeben. Bei Rückwärts-Verzweigungen zählt man einfach von $FF an rückwärts bis zur Zieladresse. Eine Verzweigung nach 1996 würde im vorliegenden Fall also einen Offset von $FA erfordern.</p>
 
@@ -103,6 +166,183 @@
             LDA, LDX, LDY, STA, STX, STY, INC, DEC, ADC und SBC</p>
 
         <p>Sie können sich merken, daß man (bis auf zwei Ausnahmen, die wir noch kennenlernen werden) alle absolut adressierbaren Befehle auch Zeropage-absolut anwenden kann. Genauere Angaben über die Codes, die Ausführungszeiten und die Beeinflussung der Flaggen (letztere ist identisch mit der absoluten Adressierung) entnehmen Sie bitte der angefügten Tabelle 1.</p>
+
+        <figure>
+            <table>
+                <tbody>
+                    <tr>
+                        <td rowspan="2">Befehlswort</td>
+                        <td rowspan="2">Adressierung</td>
+                        <td rowspan="2">Byteanzahl</td>
+                        <td colspan="2">Code</td>
+                        <td rowspan="2">Dauer in Taktzyklen</td>
+                        <td rowspan="2">Beeinflussung von Flaggen</td>
+                    </tr>
+                    <tr>
+                        <td>Hex</td>
+                        <td>Dez</td>
+                    </tr>
+                    <tr>
+                        <td>LDA</td>
+                        <td>0-Page, abs.</td>
+                        <td>2</td>
+                        <td>A5</td>
+                        <td>165</td>
+                        <td>3</td>
+                        <td>N,Z</td>
+                    </tr>
+                    <tr>
+                        <td>LDX</td>
+                        <td>0-Page, abs.</td>
+                        <td>2</td>
+                        <td>A6</td>
+                        <td>166</td>
+                        <td>3</td>
+                        <td>N,Z</td>
+                    </tr>
+                    <tr>
+                        <td>LDY</td>
+                        <td>0-Page, abs.</td>
+                        <td>2</td>
+                        <td>A4</td>
+                        <td>164</td>
+                        <td>3</td>
+                        <td>N,Z</td>
+                    </tr>
+                    <tr>
+                        <td>STA</td>
+                        <td>0-Page, abs.</td>
+                        <td>2</td>
+                        <td>85</td>
+                        <td>133</td>
+                        <td>3</td>
+                        <td>–</td>
+                    </tr>
+                    <tr>
+                        <td>STX</td>
+                        <td>0-Page, abs.</td>
+                        <td>2</td>
+                        <td>86</td>
+                        <td>134</td>
+                        <td>3</td>
+                        <td>–</td>
+                    </tr>
+                    <tr>
+                        <td>STY</td>
+                        <td>0-Page, abs.</td>
+                        <td>2</td>
+                        <td>84</td>
+                        <td>132</td>
+                        <td>3</td>
+                        <td>–</td>
+                    </tr>
+                    <tr>
+                        <td>INC</td>
+                        <td>0-Page, abs.</td>
+                        <td>2</td>
+                        <td>E6</td>
+                        <td>230</td>
+                        <td>5</td>
+                        <td>N,Z</td>
+                    </tr>
+                    <tr>
+                        <td>DEC</td>
+                        <td>0-Page, abs.</td>
+                        <td>2</td>
+                        <td>C6</td>
+                        <td>198</td>
+                        <td>5</td>
+                        <td>N,Z</td>
+                    </tr>
+                    <tr>
+                        <td>ADC</td>
+                        <td>0-Page, abs.</td>
+                        <td>2</td>
+                        <td>65</td>
+                        <td>101</td>
+                        <td>3</td>
+                        <td>N,V,Z,C</td>
+                    </tr>
+                    <tr>
+                        <td>SBC</td>
+                        <td>0-Page, abs.</td>
+                        <td>2</td>
+                        <td>E5</td>
+                        <td>229</td>
+                        <td>3</td>
+                        <td>N,V,Z,C</td>
+                    </tr>
+                    <tr>
+                        <td rowspan="3">CMP</td>
+                        <td>Unmittelbar</td>
+                        <td>2</td>
+                        <td>C9</td>
+                        <td>201</td>
+                        <td>2</td>
+                        <td rowspan="9">N,Z,C</td>
+                    </tr>
+                    <tr>
+                        <td>absolut</td>
+                        <td>3</td>
+                        <td>CD</td>
+                        <td>205</td>
+                        <td>4</td>
+                    </tr>
+                    <tr>
+                        <td>0-Page, abs.</td>
+                        <td>2</td>
+                        <td>C5</td>
+                        <td>197</td>
+                        <td>3</td>
+                    </tr>
+                    <tr>
+                        <td rowspan="3">CPX</td>
+                        <td>unmittelbar</td>
+                        <td>2</td>
+                        <td>E0</td>
+                        <td>224</td>
+                        <td>2</td>
+                    </tr>
+                    <tr>
+                        <td>absolut</td>
+                        <td>3</td>
+                        <td>EC</td>
+                        <td>236</td>
+                        <td>4</td>
+                    </tr>
+                    <tr>
+                        <td>0-Page, abs.</td>
+                        <td>2</td>
+                        <td>E4</td>
+                        <td>228</td>
+                        <td>3</td>
+                    </tr>
+                    <tr>
+                        <td rowspan="3">CPY</td>
+                        <td>unmittelbar</td>
+                        <td>2</td>
+                        <td>C0</td>
+                        <td>192</td>
+                        <td>2</td>
+                    </tr>
+                    <tr>
+                        <td>absolut</td>
+                        <td>3</td>
+                        <td>CC</td>
+                        <td>204</td>
+                        <td>4</td>
+                    </tr>
+                    <tr>
+                        <td>0-Page, abs.</td>
+                        <td>2</td>
+                        <td>C4</td>
+                        <td>196</td>
+                        <td>3</td>
+                    </tr>
+                </tbody>
+            </table>
+            <figcaption>Tabelle 1: Kenndaten der neuen Befehle und Adressierungen</figcaption>
+        </figure>
 
         <p>Zum Thema Geschwindigkeit: Wenn Sie die benötigten Taktzyklen von absolut und von 0-absolut adressierten Befehlen in den Tabellen miteinander vergleichen, werden Sie jeweils einen Unterschied von einem Zyklus feststellen. Das mag Ihnen läppisch vorkommen. Bedenken Sie aber, daß Sie sehr häufig Schleifen programmieren müssen, die mehrere 100 Mal durchlaufen werden, die vielleicht als oft zu verwendende Unterprogramme dienen&hellip; Sie werden bald feststellen, daß da schnell beachtliche Zeitunterschiede auftreten können: Für zeitkritische Programme ist die Verwendung der Zeropage-Adressierung dringend geboten.</p>
 
@@ -142,24 +382,528 @@
 
         <p>ASCII ist die Abkürzung von »American Standard Code for Information Interchange« und das heißt auf deutsch »amerikanischer Standard-Code zum Informations-Austausch«. Diese Zeichenverschlüsselungsart ist international als ISO-7-Bit-Code genormt, und es wäre wirklich nett, wenn alle sich daran halten würden. Tatsächlich aber finden wir zum Beispiel bei unserem C 64 eine Abart des Normcodes, den Commodore-ASCII-Code. Über die damit erzwungenen Umrechnungen können alle diejenigen Dramen erzählen, die zum erstenmal einen (Nicht-Commodore-)Drucker an ihr Gerät anschließen oder aber blauäugig in den Online-Betrieb mit anderen Computern eintreten wollten.</p>
 
-        <p>Sehen wir uns zunächst einmal den ASCII-Code an. Es handelt sich um einen 7-Bit-Code, das heißt 128 Zeichen können in nur 7 Bits untergebracht werden (0000 0000 bis 01111111). Das achte Bit dient bei manchen Operationen mit Computer-Peripherie als Paritäts-Bit. Bei dieser Gelegenheit soll auch gleich erklärt werden, was Parität in diesem Zusammenhang bedeutet. Werden Daten übertragen, muß immer mit Übermittlungsfehlern gerechnet werden. Das Paritätsbit dient dazu festzustellen, ob ein Byte korrekt angekommen ist. Bei der sogenannten geraden Parität zählt man die Einser im Byte zusammen und setzt Bit 7 auf 1 wenn sich eine ungerade Zahl ergibt. Mit dem Paritätsbit haben wir dann eine gerade Zahl. Ist die Quersumme des Byte schon gerade, bleibt Bit 7 eine Null. Ebensogut kann man die ungerade Parität verwenden, indem dann Bit 7 so gewählt wird, daß sich immer eine ungerade Zahl ergibt. Welche Art der Parität zur Anwendung kommt, ist Vereinbarungssache. Nehmen wir mal an, es sei gerade Parität gefordert und ein Byte mit der Information 00010110 soll übermittelt werden. Die Quersumme ist 3, also ungerade. Das Paritätsbit muß auf 1 gesetzt werden. Wir senden das Byte 10010110. Der Empfänger überprüft zunächst auf gerade Parität und verwendet dann nur die Bits 0 bis 6. Doppelfehler, die mittels des Paritätsverfahrens nicht festgestellt werden können, sind sehr selten. Leider kann auf diese Weise nur bemerkt werden, daß ein Übertragungsfehler aufgetreten sein muß, aber nicht welcher. Die Information muß dann neu angefordert werden.<br />
-            Sehen wir uns nun den Commodore-ASCII-Code an. Durch die Einbindung der Grafikzeichen brauchen wir mehr als die 128 Kombinationen. Commodore benutzt deswegen einen 8-Bit-Code. Mit dem Basic-Befehl CHR$(x) können Sie sich alle 256 Möglichkeiten ansehen. Erschwerend kommt aber noch hinzu, daß wir nicht nur einen Zeichensatz, sondern deren vier zur Verfügung haben, die durch den jeweiligen Schreibmodus ansprechbar sind (Klein-/Großschriftmodus, Großschriftmodus, beide Modi mit Reverse-ON oder OFF). Im Zeichen-ROM liegen insgesamt 512 Muster abrufbereit. Zu diesen kommen beim CHR$-Befehl noch eine ganze Reihe von Steuerzeichen hinzu&hellip; die Verwirrung ist perfekt! Wir wollen an dieser Stelle keine Entwirrung vornehmen, sondern wir durchschlagen den Gordischen Knoten, indem wir nur die ersten 128 Zeichen mit den ASCII-Zeichen vergleichen. In Bild 2 und 3 finden Sie unsere Gegenüberstellung.<br />
-            Einige Kombinationen dienen als Steuer-Codes. (Die Bedeutung der dabei verwendeten Abkürzungen sehen Sie unten.<br />
-            Nur ein Teil dieser Codes wird tatsächlich genutzt. Andere haben — je nach Gerät an das sie gesandt werden — unterschiedliche Bedeutungen. Denken Sie dabei nur mal an die verschiedenen Betriebssysteme des Commodore-Druckers 1526, wo man bei dem einen mit CHR$(1), bei dem anderen mit CHR$(14) den Breitschrift-Modus anschaltet. Innerhalb unseres Computers werden offensichtlich bestimmte Codes anders genutzt. Das sind:</p>
+        <p>Sehen wir uns zunächst einmal den ASCII-Code an. Es handelt sich um einen 7-Bit-Code, das heißt 128 Zeichen können in nur 7 Bits untergebracht werden (0000 0000 bis 01111111). Das achte Bit dient bei manchen Operationen mit Computer-Peripherie als Paritäts-Bit. Bei dieser Gelegenheit soll auch gleich erklärt werden, was Parität in diesem Zusammenhang bedeutet. Werden Daten übertragen, muß immer mit Übermittlungsfehlern gerechnet werden. Das Paritätsbit dient dazu festzustellen, ob ein Byte korrekt angekommen ist. Bei der sogenannten geraden Parität zählt man die Einser im Byte zusammen und setzt Bit 7 auf 1 wenn sich eine ungerade Zahl ergibt. Mit dem Paritätsbit haben wir dann eine gerade Zahl. Ist die Quersumme des Byte schon gerade, bleibt Bit 7 eine Null. Ebensogut kann man die ungerade Parität verwenden, indem dann Bit 7 so gewählt wird, daß sich immer eine ungerade Zahl ergibt. Welche Art der Parität zur Anwendung kommt, ist Vereinbarungssache. Nehmen wir mal an, es sei gerade Parität gefordert und ein Byte mit der Information 00010110 soll übermittelt werden. Die Quersumme ist 3, also ungerade. Das Paritätsbit muß auf 1 gesetzt werden. Wir senden das Byte 10010110. Der Empfänger überprüft zunächst auf gerade Parität und verwendet dann nur die Bits 0 bis 6. Doppelfehler, die mittels des Paritätsverfahrens nicht festgestellt werden können, sind sehr selten. Leider kann auf diese Weise nur bemerkt werden, daß ein Übertragungsfehler aufgetreten sein muß, aber nicht welcher. Die Information muß dann neu angefordert werden.</p>
 
-        <p>Anstelle von | geschieht folgendes<br />
-            ENQ | Zeichen weiß<br />
-            BS | Blockieren der Umschaltung Klein-/Großschrift<br />
-            HT |Zulassen der obigen Umschalt.<br />
-            DC1 | Cursor abwärts<br />
-            DC2 | Reverse-Modus an<br />
-            DC3 | Cursor in HOME-Position<br />
-            DC4 | INST/DEL<br />
-            FS | Zeichen rot<br />
-            GS | Cursor rechts<br />
-            RS | Zeichen grün<br />
-            US | Zeichen blau<br />
-            TODO</p>
+        <p>Sehen wir uns nun den Commodore-ASCII-Code an. Durch die Einbindung der Grafikzeichen brauchen wir mehr als die 128 Kombinationen. Commodore benutzt deswegen einen 8-Bit-Code. Mit dem Basic-Befehl CHR$(x) können Sie sich alle 256 Möglichkeiten ansehen. Erschwerend kommt aber noch hinzu, daß wir nicht nur einen Zeichensatz, sondern deren vier zur Verfügung haben, die durch den jeweiligen Schreibmodus ansprechbar sind (Klein-/Großschriftmodus, Großschriftmodus, beide Modi mit Reverse-ON oder OFF). Im Zeichen-ROM liegen insgesamt 512 Muster abrufbereit. Zu diesen kommen beim CHR$-Befehl noch eine ganze Reihe von Steuerzeichen hinzu&hellip; die Verwirrung ist perfekt! Wir wollen an dieser Stelle keine Entwirrung vornehmen, sondern wir durchschlagen den Gordischen Knoten, indem wir nur die ersten 128 Zeichen mit den ASCII-Zeichen vergleichen. In Bild 2 und 3 finden Sie unsere Gegenüberstellung.</p>
+
+        <figure>
+            <table>
+                <tbody>
+                    <tr>
+                        <td>msn</td>
+                        <td>lsn</td>
+                        <td>$</td>
+                        <td>0</td>
+                        <td>1</td>
+                        <td>2</td>
+                        <td>3</td>
+                        <td>4</td>
+                        <td>5</td>
+                        <td>6</td>
+                        <td>7</td>
+                    </tr>
+                    <tr>
+                        <td colspan="2">$</td>
+                        <td>binär</td>
+                        <td>0000
+                        </td>
+                        <td>0001
+                        </td>
+                        <td>0010
+                        </td>
+                        <td>0011
+                        </td>
+                        <td>0100
+                        </td>
+                        <td>0101
+                        </td>
+                        <td>0110
+                        </td>
+                        <td>0111
+                        </td>
+                    </tr>
+                    <tr>
+                        <td rowspan="2">0
+                        </td>
+                        <td rowspan="2">0
+                        </td>
+                        <td rowspan="2">000
+                        </td>
+                        <td>NUL</td>
+                        <td>DLE</td>
+                        <td>SP</td>
+                        <td>0</td>
+                        <td>@</td>
+                        <td>P</td>
+                        <td><br></td>
+                        <td>P</td>
+                    </tr>
+                    <tr>
+                        <td>NULL</td>
+                        <td>DLE</td>
+                        <td>SP</td>
+                        <td>0</td>
+                        <td>@</td>
+                        <td>P</td>
+                        <td>CHR$(96)</td>
+                        <td>CHR$(112)</td>
+                    </tr>
+                    <tr>
+                        <td rowspan="2">1
+                        </td>
+                        <td rowspan="2">0
+                        </td>
+                        <td rowspan="2">001
+                        </td>
+                        <td>SOH</td>
+                        <td>DC1</td>
+                        <td>!</td>
+                        <td>1</td>
+                        <td>A</td>
+                        <td>Q</td>
+                        <td>a</td>
+                        <td>q</td>
+                    </tr>
+                    <tr>
+                        <td>SOH</td>
+                        <td>DC1</td>
+                        <td>!</td>
+                        <td>1</td>
+                        <td>A</td>
+                        <td>Q</td>
+                        <td>CHR$(97)</td>
+                        <td>CHR$(113)</td>
+                    </tr>
+                    <tr>
+                        <td rowspan="2">2
+                        </td>
+                        <td rowspan="2">0
+                        </td>
+                        <td rowspan="2">010
+                        </td>
+                        <td>STX</td>
+                        <td>DC2</td>
+                        <td>"</td>
+                        <td>2</td>
+                        <td>B</td>
+                        <td>R</td>
+                        <td>b</td>
+                        <td>r</td>
+                    </tr>
+                    <tr>
+                        <td>STX</td>
+                        <td>DC2</td>
+                        <td>"</td>
+                        <td>2</td>
+                        <td>B</td>
+                        <td>R</td>
+                        <td>CHR$(98)</td>
+                        <td>CHR$(114)</td>
+                    </tr>
+                    <tr>
+                        <td rowspan="2">3
+                        </td>
+                        <td rowspan="2">0
+                        </td>
+                        <td rowspan="2">011
+                        </td>
+                        <td>ETX</td>
+                        <td>DC3</td>
+                        <td>#</td>
+                        <td>3</td>
+                        <td>C</td>
+                        <td>S</td>
+                        <td>c</td>
+                        <td>s</td>
+                    </tr>
+                    <tr>
+                        <td>ETX</td>
+                        <td>DC3</td>
+                        <td>#</td>
+                        <td>3</td>
+                        <td>C</td>
+                        <td>S</td>
+                        <td>CHR$(99)</td>
+                        <td>CHR$(115)</td>
+                    </tr>
+                    <tr>
+                        <td rowspan="2">4
+                        </td>
+                        <td rowspan="2">0
+                        </td>
+                        <td rowspan="2">100
+                        </td>
+                        <td>EOT</td>
+                        <td>DC4</td>
+                        <td>$</td>
+                        <td>4</td>
+                        <td>D</td>
+                        <td>T</td>
+                        <td>d</td>
+                        <td>t</td>
+                    </tr>
+                    <tr>
+                        <td>EOT</td>
+                        <td>DC4</td>
+                        <td>$</td>
+                        <td>4</td>
+                        <td>D</td>
+                        <td>T</td>
+                        <td>CHR$(100)</td>
+                        <td>CHR$(116)</td>
+                    </tr>
+                    <tr>
+                        <td rowspan="2">5
+                        </td>
+                        <td rowspan="2">0
+                        </td>
+                        <td rowspan="2">101
+                        </td>
+                        <td>ENQ</td>
+                        <td>NAK</td>
+                        <td>%</td>
+                        <td>5</td>
+                        <td>E</td>
+                        <td>U</td>
+                        <td>e</td>
+                        <td>u</td>
+                    </tr>
+                    <tr>
+                        <td>ENQ</td>
+                        <td>NAK</td>
+                        <td>%</td>
+                        <td>5</td>
+                        <td>E</td>
+                        <td>U</td>
+                        <td>CHR$(101)</td>
+                        <td>CHR$(117)</td>
+                    </tr>
+                    <tr>
+                        <td rowspan="2">6
+                        </td>
+                        <td rowspan="2">0
+                        </td>
+                        <td rowspan="2">110
+                        </td>
+                        <td>ACK</td>
+                        <td>SYN</td>
+                        <td>&amp;</td>
+                        <td>6</td>
+                        <td>F</td>
+                        <td>V</td>
+                        <td>f</td>
+                        <td>v</td>
+                    </tr>
+                    <tr>
+                        <td>ACK</td>
+                        <td>SYN</td>
+                        <td>&amp;</td>
+                        <td>6</td>
+                        <td>F</td>
+                        <td>V</td>
+                        <td>CHR$(102)</td>
+                        <td>CHR$(118)</td>
+                    </tr>
+                    <tr>
+                        <td rowspan="2">7
+                        </td>
+                        <td rowspan="2">0
+                        </td>
+                        <td rowspan="2">111
+                        </td>
+                        <td>BEL</td>
+                        <td>ETB</td>
+                        <td>'</td>
+                        <td>7</td>
+                        <td>G</td>
+                        <td>W</td>
+                        <td>g</td>
+                        <td>w</td>
+                    </tr>
+                    <tr>
+                        <td>BEL</td>
+                        <td>ETB</td>
+                        <td>'</td>
+                        <td>7</td>
+                        <td>G</td>
+                        <td>W</td>
+                        <td>CHR$(103)</td>
+                        <td>CHR$(119)</td>
+                    </tr>
+                    <tr>
+                        <td rowspan="2">8
+                        </td>
+                        <td rowspan="2">1
+                        </td>
+                        <td rowspan="2">000
+                        </td>
+                        <td>BS</td>
+                        <td>CAN</td>
+                        <td>(</td>
+                        <td>8</td>
+                        <td>H</td>
+                        <td>X</td>
+                        <td>h</td>
+                        <td>x</td>
+                    </tr>
+                    <tr>
+                        <td>BS</td>
+                        <td>CAN</td>
+                        <td>(</td>
+                        <td>8</td>
+                        <td>H</td>
+                        <td>X</td>
+                        <td>CHR$(104)</td>
+                        <td>CHR$(120)</td>
+                    </tr>
+                    <tr>
+                        <td rowspan="2">9
+                        </td>
+                        <td rowspan="2">1
+                        </td>
+                        <td rowspan="2">001
+                        </td>
+                        <td>HT</td>
+                        <td>EM</td>
+                        <td>)</td>
+                        <td>9</td>
+                        <td>I</td>
+                        <td>Y</td>
+                        <td>i</td>
+                        <td>y</td>
+                    </tr>
+                    <tr>
+                        <td>HT</td>
+                        <td>EM</td>
+                        <td>)</td>
+                        <td>9</td>
+                        <td>I</td>
+                        <td>Y</td>
+                        <td>CHR$(105)</td>
+                        <td>CHR$(121)</td>
+                    </tr>
+                    <tr>
+                        <td rowspan="2">A
+                        </td>
+                        <td rowspan="2">1
+                        </td>
+                        <td rowspan="2">010
+                        </td>
+                        <td>LF</td>
+                        <td>SUB</td>
+                        <td>*</td>
+                        <td>:</td>
+                        <td>J</td>
+                        <td>Z</td>
+                        <td>j</td>
+                        <td>z</td>
+                    </tr>
+                    <tr>
+                        <td>LF</td>
+                        <td>SUB</td>
+                        <td>*</td>
+                        <td>:</td>
+                        <td>J</td>
+                        <td>Z</td>
+                        <td>CHR$(106)</td>
+                        <td>CHR$(122)</td>
+                    </tr>
+                    <tr>
+                        <td rowspan="2">B
+                        </td>
+                        <td rowspan="2">1
+                        </td>
+                        <td rowspan="2">011
+                        </td>
+                        <td>VT</td>
+                        <td>ESC</td>
+                        <td>+</td>
+                        <td>;</td>
+                        <td>K</td>
+                        <td>[</td>
+                        <td>k</td>
+                        <td>{</td>
+                    </tr>
+                    <tr>
+                        <td>VT</td>
+                        <td>ESC</td>
+                        <td>+</td>
+                        <td>;</td>
+                        <td>K</td>
+                        <td>[</td>
+                        <td>CHR$(107)</td>
+                        <td>CHR$(123)</td>
+                    </tr>
+                    <tr>
+                        <td rowspan="2">C
+                        </td>
+                        <td rowspan="2">1
+                        </td>
+                        <td rowspan="2">100
+                        </td>
+                        <td>FF</td>
+                        <td>FS</td>
+                        <td>,</td>
+                        <td>&lt;</td>
+                        <td>L</td>
+                        <td>\</td>
+                        <td>l</td>
+                        <td>|</td>
+                    </tr>
+                    <tr>
+                        <td>FF</td>
+                        <td>FS</td>
+                        <td>,</td>
+                        <td>&lt;</td>
+                        <td>L</td>
+                        <td>£</td>
+                        <td>CHR$(108)</td>
+                        <td>CHR$(124)</td>
+                    </tr>
+                    <tr>
+                        <td rowspan="2">D
+                        </td>
+                        <td rowspan="2">1
+                        </td>
+                        <td rowspan="2">101
+                        </td>
+                        <td>CR</td>
+                        <td>GS</td>
+                        <td>—</td>
+                        <td>=</td>
+                        <td>M</td>
+                        <td>]</td>
+                        <td>m</td>
+                        <td>}</td>
+                    </tr>
+                    <tr>
+                        <td>CR</td>
+                        <td>GS</td>
+                        <td>—</td>
+                        <td>=</td>
+                        <td>M</td>
+                        <td>1</td>
+                        <td>CHR$(109)</td>
+                        <td>CHR$(125)</td>
+                    </tr>
+                    <tr>
+                        <td rowspan="2">E
+                        </td>
+                        <td rowspan="2">1
+                        </td>
+                        <td rowspan="2">110
+                        </td>
+                        <td>SO</td>
+                        <td>RS</td>
+                        <td>.</td>
+                        <td>&gt;</td>
+                        <td>N</td>
+                        <td>↑</td>
+                        <td>n</td>
+                        <td>~</td>
+                    </tr>
+                    <tr>
+                        <td>SO</td>
+                        <td>RS</td>
+                        <td>.</td>
+                        <td>&gt;</td>
+                        <td>N</td>
+                        <td>↑</td>
+                        <td>CHR$(110)</td>
+                        <td>CHR$(126)</td>
+                    </tr>
+                    <tr>
+                        <td rowspan="2">F
+                        </td>
+                        <td rowspan="2">1
+                        </td>
+                        <td rowspan="2">111
+                        </td>
+                        <td>SI</td>
+                        <td>US</td>
+                        <td>/</td>
+                        <td>?</td>
+                        <td>O</td>
+                        <td>_</td>
+                        <td>o</td>
+                        <td>DEL</td>
+                    </tr>
+                    <tr>
+                        <td>SI</td>
+                        <td>US</td>
+                        <td>/</td>
+                        <td>?</td>
+                        <td>O</td>
+                        <td>←</td>
+                        <td>CHR$(111)</td>
+                        <td>CHR$(127)</td>
+                    </tr>
+                </tbody>
+            </table>
+            <figcaption>Bild 2: ASCII-Code (jeweils oben) und Commodore ASCII-Code jeweils unten) (msn = most significant nibble; lsn = least significant nibble)</figcaption>
+        </figure>
+
+        <figure>
+            <img src="142-3.png" alt="">
+            <figcaption>Bild 3. Die Grafikzeichen zu den entsprechenden CHRS-Codes</figcaption>
+        </figure>
+
+        <p>Einige Kombinationen dienen als Steuer-Codes. (Die Bedeutung der dabei verwendeten Abkürzungen sehen Sie unten.</p>
+
+        <p>Nur ein Teil dieser Codes wird tatsächlich genutzt. Andere haben — je nach Gerät an das sie gesandt werden — unterschiedliche Bedeutungen. Denken Sie dabei nur mal an die verschiedenen Betriebssysteme des Commodore-Druckers 1526, wo man bei dem einen mit CHR$(1), bei dem anderen mit CHR$(14) den Breitschrift-Modus anschaltet. Innerhalb unseres Computers werden offensichtlich bestimmte Codes anders genutzt. Das sind:</p>
+
+        <table>
+            <tbody>
+                <tr>
+                    <td>Anstelle von</td>
+                    <td>geschieht folgendes:</td>
+                </tr>
+                <tr>
+                    <td>ENQ</td>
+                    <td>Zeichen weiß</td>
+                </tr>
+                <tr>
+                    <td>BS</td>
+                    <td>Blockieren der Umschaltung Klein-/Großschrift</td>
+                </tr>
+                <tr>
+                    <td>HT</td>
+                    <td>Zulassen der obigen Umschalt.</td>
+                </tr>
+                <tr>
+                    <td>DC1</td>
+                    <td>Cursor abwärts</td>
+                </tr>
+                <tr>
+                    <td>DC2</td>
+                    <td>Reverse-Modus an</td>
+                </tr>
+                <tr>
+                    <td>DC3</td>
+                    <td>Cursor in HOME-Position</td>
+                </tr>
+                <tr>
+                    <td>DC4</td>
+                    <td>INST/DEL</td>
+                </tr>
+                <tr>
+                    <td>FS</td>
+                    <td>Zeichen rot</td>
+                </tr>
+                <tr>
+                    <td>GS</td>
+                    <td>Cursor rechts</td>
+                </tr>
+                <tr>
+                    <td>RS</td>
+                    <td>Zeichen grün</td>
+                </tr>
+                <tr>
+                    <td>US</td>
+                    <td>Zeichen blau</td>
+                </tr>
+            </tbody>
+        </table>
 
         <p>Der auffälligste Unterschied ist der, daß beim CommodoreASCII anstelle der Kleinbuchstaben Grafikzeichen liegen. Sollte anstelle des Normalmodus der Klein-/Großschriftmodus eingeschaltet sein, findet man anstelle der Großbuchstaben die kleinen.</p>
 
@@ -253,6 +997,170 @@
         <p>Damit sei es für diesmal genug. Als Assembler-Alchimisten gehören Sie jetzt zu den fortgeschrittenen Eleven, denn Sie können immerhin schon so trickreiche Programme wie die CHRGET-Routine nachvollziehen.</p>
 
         <p>(Heimo Ponnath/gk)</p>
+
+        <figure>
+            <table>
+                <tbody>
+                    <tr>
+                        <td>NUL</td>
+                        <td>Null</td>
+                        <td><br></td>
+                    </tr>
+                    <tr>
+                        <td>SOH</td>
+                        <td>Start of heading</td>
+                        <td>Beginn des Kopfes</td>
+                    </tr>
+                    <tr>
+                        <td>STX</td>
+                        <td>Start of text</td>
+                        <td>Textbeginn</td>
+                    </tr>
+                    <tr>
+                        <td>ETX</td>
+                        <td>End of text</td>
+                        <td>Textende</td>
+                    </tr>
+                    <tr>
+                        <td>EOT</td>
+                        <td>End of transmission</td>
+                        <td>Übertragungsende</td>
+                    </tr>
+                    <tr>
+                        <td>ENQ</td>
+                        <td>Inquiry</td>
+                        <td>Anfrage</td>
+                    </tr>
+                    <tr>
+                        <td>ACK</td>
+                        <td>Acknowledge</td>
+                        <td>Bestätigung</td>
+                    </tr>
+                    <tr>
+                        <td>BEL</td>
+                        <td>Bell</td>
+                        <td>Klingel</td>
+                    </tr>
+                    <tr>
+                        <td>BS</td>
+                        <td>Backspace</td>
+                        <td>Zurücksetzen</td>
+                    </tr>
+                    <tr>
+                        <td>HT</td>
+                        <td>Horizontal tabul.</td>
+                        <td>Horizontaltabulator</td>
+                    </tr>
+                    <tr>
+                        <td>LF</td>
+                        <td>Line feed</td>
+                        <td>Zeilenvorschub</td>
+                    </tr>
+                    <tr>
+                        <td>VT</td>
+                        <td>Vertical tabulator</td>
+                        <td>Vertikaltabulator</td>
+                    </tr>
+                    <tr>
+                        <td>FF</td>
+                        <td>Form feed</td>
+                        <td>Formatvorschub</td>
+                    </tr>
+                    <tr>
+                        <td>CR</td>
+                        <td>Carriage return</td>
+                        <td>Wagenrücklauf/Zeilenwechsel</td>
+                    </tr>
+                    <tr>
+                        <td>SO</td>
+                        <td>Shift out</td>
+                        <td>Rückschaltung</td>
+                    </tr>
+                    <tr>
+                        <td>SI</td>
+                        <td>Shift in</td>
+                        <td>Dauerumschaltung</td>
+                    </tr>
+                    <tr>
+                        <td>DLE</td>
+                        <td>Data link escape</td>
+                        <td>Datenverbindungsumschaltung</td>
+                    </tr>
+                    <tr>
+                        <td>DC1-4</td>
+                        <td>Device control</td>
+                        <td>Gerätesteuerung</td>
+                    </tr>
+                    <tr>
+                        <td>NAK</td>
+                        <td>Negative acknowl.</td>
+                        <td>Negativ-Bestätigung</td>
+                    </tr>
+                    <tr>
+                        <td>SYN</td>
+                        <td>Synchronous idle</td>
+                        <td>Synchronisations-Leerlauf</td>
+                    </tr>
+                    <tr>
+                        <td>ETB</td>
+                        <td>End of transmission block</td>
+                        <td>Ende des Übertragungsblockes</td>
+                    </tr>
+                    <tr>
+                        <td>CAN</td>
+                        <td>Cancel</td>
+                        <td>Annullieren</td>
+                    </tr>
+                    <tr>
+                        <td>EM</td>
+                        <td>End of medium</td>
+                        <td>Datenträgerende</td>
+                    </tr>
+                    <tr>
+                        <td>SUB</td>
+                        <td>Substitute</td>
+                        <td>Ersetzen</td>
+                    </tr>
+                    <tr>
+                        <td>ESC</td>
+                        <td>Escape</td>
+                        <td>Umschaltung</td>
+                    </tr>
+                    <tr>
+                        <td>FS</td>
+                        <td>File separator</td>
+                        <td>Dateitrennzeichen</td>
+                    </tr>
+                    <tr>
+                        <td>GS</td>
+                        <td>Group separator</td>
+                        <td>Gruppentrennzeichen</td>
+                    </tr>
+                    <tr>
+                        <td>RS</td>
+                        <td>Record separator</td>
+                        <td>Satztrennzeichen</td>
+                    </tr>
+                    <tr>
+                        <td>US</td>
+                        <td>Unit separator</td>
+                        <td>Einheiten-Trennz.</td>
+                    </tr>
+                    <tr>
+                        <td>SP</td>
+                        <td>Space</td>
+                        <td>Leerzeichen</td>
+                    </tr>
+                    <tr>
+                        <td>DEL</td>
+                        <td>Delete</td>
+                        <td>Löschzeichen</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <figcaption>Bild 4. Die Bedeutung der Abkürzungen im ASCII-Code</figcaption>
+        </figure>
 
     </article>
 

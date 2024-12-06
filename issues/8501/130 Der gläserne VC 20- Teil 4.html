@@ -18,32 +18,6 @@
 
         <p class="intro">Nachdem wir in der letzten Folge Funktion und Sinn verschiedener Vektoren erläutert haben, wenden wir uns heute einem nicht minder interessanten Kapitel, nämlich den verschiedenen hochauflösenden Grafikmodi zu.</p>
 
-        <figure>
-            <img src="130-1.png" alt="">
-            <figcaption>Bild 1. So werden die Bits aus den Registern #2 und #5 in die Adreßschemata eingebaut</figcaption>
-        </figure>
-        <figure>
-            <img src="130-2.png" alt="">
-            <figcaption>Bild 2. Auch die Anfangsadresse des Zeichengenerators wird mit Hilfe eines Adreßschemas ermittelt</figcaption>
-        </figure>
-        <figure>
-            <img src="130-3.png" alt="">
-            <figcaption>Bild 3. Diese Grafik zeigt den Aufbau eines VC 20-Zeichens innerhalb der 8 x 8 Matrix</figcaption>
-        </figure>
-        <figure>
-            <img src="130-4.png" alt="">
-            <figcaption>Bild 4. So können die 512 Zeichen im Grundversions-RAM verteilt werden</figcaption>
-        </figure>
-        <figure>
-            <img src="130-5.png" alt="">
-            <figcaption>Bild 5. Auch die eigenen Zeichen muß man mit HIHe der Matrix entwerfen
-(hier als Beispiel das Copyright-Zeichen)</figcaption>
-        </figure>
-        <figure>
-            <img src="130-6.png" alt="">
-            <figcaption>Bild 6. Durch die Verlegung der Basic-Zeiger SAVEt der Computer auch die Sonderzeichen mit ab: (a) bei Grundversion / 3-KByte-Erweiterung, (b) ab 8 KByte Speicherausbau</figcaption>
-        </figure>
-
         <p>Dieser Teil unserer Serie soll schrittweise zur Gestaltung des Bildschirmes in hochauflösender beziehungsweise vielfarbiger Grafik hinführen. Dazu ist eine genaue Kenntnis der VIC-Register und des Speicheraufbaus notwendig. Wer sich nochmals eine Übersicht über die Aufteilung des Speichers verschaffen will, der kann jetzt in Teil 1 und 3 dieser Serie nachschlagen.</p>
 
         <h2>Der VC 20-Zeichensatz</h2>
@@ -54,11 +28,306 @@
 
         <p>Dieser Baustein kümmert sich um alles, was mit der Informationsweitergabe an das angeschlossene Fernsehgerät zu tun hat, also Bild, Farbe und Ton. Da er — wie bereits das letzte Mal kurz angedeutet — eigenständig, das heißt unabhängig von der CPU arbeitet, muß der VIC selbständig auf Informationen zurückgreifen können. Diese sind zum einen in den internen Registern, zum anderen in den normalen Speicherstellen enthalten. Die Register speichern Parameter für die Bildschirmgröße, die Tongeneratoren, die Lage des Bildschirm-, Farb- und Zeichenspeichers. Ferner können aus ihnen die Zustandswerte des Paddels und des Lichtgriffels ausgelesen werden (Tabelle 1).</p>
 
+        <figure>
+            <table>
+                <tbody>
+                    <tr>
+                        <td><b>Register</b></td>
+                        <td><b>Registerfunktion</b></td>
+                        <td><b>Normalwert</b></td>
+                    </tr>
+                    <tr>
+                        <td>0. 36864</td>
+                        <td>ABBB BBBB</td>
+                        <td>5</td>
+                    </tr>
+                    <tr>
+                        <td>1. 36865</td>
+                        <td>CCCC CCCC</td>
+                        <td>25</td>
+                    </tr>
+                    <tr>
+                        <td>2. 36866</td>
+                        <td>HDDD DDDD</td>
+                        <td>150</td>
+                    </tr>
+                    <tr>
+                        <td>3. 36867</td>
+                        <td>GEEE EEEF</td>
+                        <td>46 oder 176</td>
+                    </tr>
+                    <tr>
+                        <td>4. 36868</td>
+                        <td>GGGG GGGG</td>
+                        <td><br></td>
+                    </tr>
+                    <tr>
+                        <td>5. 36869</td>
+                        <td>HHHH IIII</td>
+                        <td>240</td>
+                    </tr>
+                    <tr>
+                        <td>6. 36870</td>
+                        <td>KKKK KKKK</td>
+                        <td>0</td>
+                    </tr>
+                    <tr>
+                        <td>7. 36871</td>
+                        <td><b>LLLI.</b><b> T,T.T.T.</b></td>
+                        <td>0</td>
+                    </tr>
+                    <tr>
+                        <td>8. 36872</td>
+                        <td>MMMM MMMM</td>
+                        <td>255</td>
+                    </tr>
+                    <tr>
+                        <td>9. 36873</td>
+                        <td>NNNN NNNN</td>
+                        <td>255</td>
+                    </tr>
+                    <tr>
+                        <td>10. 36874</td>
+                        <td>JRRR RRRR</td>
+                        <td>0</td>
+                    </tr>
+                    <tr>
+                        <td>11. 36875</td>
+                        <td>OSSS SSSS</td>
+                        <td>0</td>
+                    </tr>
+                    <tr>
+                        <td>12. 36876</td>
+                        <td>PTTT TTTT</td>
+                        <td>0</td>
+                    </tr>
+                    <tr>
+                        <td>13. 36877</td>
+                        <td>QUUU UUUU</td>
+                        <td>0</td>
+                    </tr>
+                    <tr>
+                        <td>14. 36878</td>
+                        <td>WWWWVVW</td>
+                        <td>0</td>
+                    </tr>
+                    <tr>
+                        <td>15. 36879</td>
+                        <td>XXXX YZZZ</td>
+                        <td>27</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <table>
+                <tbody>
+                    <tr>
+                        <td>A:</td>
+                        <td>Einblendungsmodus</td>
+                    </tr>
+                    <tr>
+                        <td>B:</td>
+                        <td>Horizontale Bildschirmzentrierung</td>
+                    </tr>
+                    <tr>
+                        <td>C:</td>
+                        <td>Vertikale Bildschirmzentrierung</td>
+                    </tr>
+                    <tr>
+                        <td>D:</td>
+                        <td>Zahl der Bildschirmspalten</td>
+                    </tr>
+                    <tr>
+                        <td>E:</td>
+                        <td>Zahl der Bildschirmzeilen</td>
+                    </tr>
+                    <tr>
+                        <td>F:</td>
+                        <td>Zeichengröße (8x8 oder 8x16)</td>
+                    </tr>
+                    <tr>
+                        <td>G:</td>
+                        <td>Lichtgriffelraster</td>
+                    </tr>
+                    <tr>
+                        <td>H:</td>
+                        <td>Bildschirmspeicheradresse</td>
+                    </tr>
+                    <tr>
+                        <td>I:</td>
+                        <td>Zeichenspeicheradresse</td>
+                    </tr>
+                    <tr>
+                        <td>K:</td>
+                        <td>Lichtgriffel (horizontal)</td>
+                    </tr>
+                    <tr>
+                        <td>L:</td>
+                        <td>Lichtgriffel (vertikal)</td>
+                    </tr>
+                    <tr>
+                        <td>M:</td>
+                        <td>Paddel (X)</td>
+                    </tr>
+                    <tr>
+                        <td>N:</td>
+                        <td>Paddel (Y)</td>
+                    </tr>
+                    <tr>
+                        <td>J,O,P,Q:</td>
+                        <td>Tongenerator 1-4 ein/aus</td>
+                    </tr>
+                    <tr>
+                        <td>R,S,T,U:</td>
+                        <td>Frequenz Tongenerator 1-4</td>
+                    </tr>
+                    <tr>
+                        <td>V:</td>
+                        <td>Lautstärke</td>
+                    </tr>
+                    <tr>
+                        <td>W:</td>
+                        <td>Hilfsfarbe</td>
+                    </tr>
+                    <tr>
+                        <td>X:</td>
+                        <td>Bildschirmfarbe</td>
+                    </tr>
+                    <tr>
+                        <td>Y:</td>
+                        <td>RVS-Modus</td>
+                    </tr>
+                    <tr>
+                        <td>Z:</td>
+                        <td>Rahmenfarbe</td>
+                    </tr>
+                </tbody>
+            </table>
+
+
+            <figcaption>Tabelle 1. Die einzelnen Registerbelegungen im VIC</figcaption>
+        </figure>
+
         <p>Nun wollen wir sehen, wie man die Startadressen der einzelnen VIC-externen Speicherstellen ermitteln kann. Beginnen wir mit dem Videospeicher.</p>
 
         <p>Wenn man Bild 1 betrachtet merkt man schon, wie haarig die Berechnung mit Hilfe der einzelnen Bits ist. Aus den beiden hier beteiligten Registern Nummer (#) 2, Adresse 36865, und Nummer 5 (Adresse 36869) müssen jeweils bestimmte Bits für die Erstellung der Adresse herangezogen werden. Bild 1 zeigt nun, wie die jeweiligen Bits (die vier höchstwertigen aus Register # 5 und Bit 7 aus Register # 2) in das High-Byte-Schema »eingebaut« werden. Ferner muß Bit 7 aus Register #2invertiert werden, das heißt aus der Null wird eine Eins und umgekehrt.</p>
 
+        <figure>
+            <img src="130-1.png" alt="">
+            <figcaption>Bild 1. So werden die Bits aus den Registern #2 und #5 in die Adreßschemata eingebaut</figcaption>
+        </figure>
+
         <p>Fassen wir noch einmal zusammen: Aus bestimmten Bits der Register 2 und 5 entsteht das High-Byte der Bildschirmspeicheranfangsadresse (ein Low-Byte gibt’s hier nicht). Außerdem sind bestimmte Bits aus diesem Adreßschema immer auf Null. Die Konsequenz daraus ist, daß der Videobereich nur in bestimmten Speicherbereichen angesiedelt werden kann. Tabelle 2 zeigt die möglichen Adressen, die sich aus Bild 1 ergeben. Zu beachten ist, daß das untere Nibble (1 Nibble = 4 Bits) im Register #5 dem Zeichenspeicher zugeordnet ist, dieses darf vorläufig noch nicht angetastet werden.</p>
+
+        <figure>
+            <table>
+                <tbody>
+                    <tr>
+                        <td><b>Register #5 Bit 4-7</b></td>
+                        <td><b>Register #2 Bit7</b></td>
+                        <td><b>Adresse</b></td>
+                        <td><b>Bemerkung</b></td>
+                    </tr>
+                    <tr>
+                        <td>1000</td>
+                        <td>0</td>
+                        <td>0</td>
+                        <td>Zeropage (nicht nutzbar)</td>
+                    </tr>
+                    <tr>
+                        <td>1000</td>
+                        <td>1</td>
+                        <td>512</td>
+                        <td>Stack (nicht nutzbar)</td>
+                    </tr>
+                    <tr>
+                        <td>1001</td>
+                        <td>0</td>
+                        <td>1024</td>
+                        <td><br></td>
+                    </tr>
+                    <tr>
+                        <td>1001</td>
+                        <td>1</td>
+                        <td>1536</td>
+                        <td><br></td>
+                    </tr>
+                    <tr>
+                        <td>1010</td>
+                        <td>0</td>
+                        <td>2048</td>
+                        <td><br></td>
+                    </tr>
+                    <tr>
+                        <td>1010</td>
+                        <td>1</td>
+                        <td>2560</td>
+                        <td>3 KByte Erweiterung</td>
+                    </tr>
+                    <tr>
+                        <td>1011</td>
+                        <td>0</td>
+                        <td>3073</td>
+                        <td><br></td>
+                    </tr>
+                    <tr>
+                        <td>1011</td>
+                        <td>1</td>
+                        <td>3584</td>
+                        <td><br></td>
+                    </tr>
+                    <tr>
+                        <td>1100</td>
+                        <td>0</td>
+                        <td>4096</td>
+                        <td><br></td>
+                    </tr>
+                    <tr>
+                        <td>1100</td>
+                        <td>1</td>
+                        <td>4608</td>
+                        <td><br></td>
+                    </tr>
+                    <tr>
+                        <td>1101</td>
+                        <td>0</td>
+                        <td>5120</td>
+                        <td><br></td>
+                    </tr>
+                    <tr>
+                        <td>1101</td>
+                        <td>1</td>
+                        <td>5632</td>
+                        <td>Grundversions</td>
+                    </tr>
+                    <tr>
+                        <td>1110</td>
+                        <td>0</td>
+                        <td>6144</td>
+                        <td>speicher</td>
+                    </tr>
+                    <tr>
+                        <td>1110</td>
+                        <td>1</td>
+                        <td>6656</td>
+                        <td><br></td>
+                    </tr>
+                    <tr>
+                        <td>1111</td>
+                        <td>0</td>
+                        <td>7168</td>
+                        <td><br></td>
+                    </tr>
+                    <tr>
+                        <td>1111</td>
+                        <td>1</td>
+                        <td>7680</td>
+                        <td><br></td>
+                    </tr>
+                </tbody>
+            </table>
+            <figcaption>Tabelle 2. Oiese Tabelle zeigt die möglichen Bildschirmspeicherstellen</figcaption>
+        </figure>
 
         <h2>Kompliziertes — Die Adreßermittlung</h2>
 
@@ -66,9 +335,24 @@
 
         <p>Kommen wir nun zum Zeichenspeicher. Er erhält Informationen über jedes Zeichen, das auf dem Bildschirm darstellbar ist. Auch hier kann über das untere Nibble von Register #5 die Startadresse ermitteln. (Bild 2). Wenn die Bits 0-3 auf Null gesetzt sind, liegt sie bei 32768, also im Zeichengenerator-ROM (Normalstellung). Dort sind alle beim VC 20 verfügbaren Zeichen abgelegt (in welcher Form dies geschieht, werden wir später noch sehen).</p>
 
+        <figure>
+            <img src="130-2.png" alt="">
+            <figcaption>Bild 2. Auch die Anfangsadresse des Zeichengenerators wird mit Hilfe eines Adreßschemas ermittelt</figcaption>
+        </figure>
+
         <p>Wie sie bestimmt schon bemerkt haben, spielt bei der Verwaltung des Bildschirms die Adresse 36869 (Register # 5) eine bedeutende Rolle. Fragt man sie mit PEEK ab, so erhalten wir in der Grundversion oder bei einer 3-KByte-Erweiterung den Wert 240, bei einem um 8 KByte erweiterten Speicher 192. Zerlegt man diese Zahlen wie in Bild 2, so erhält man jedes Mal die gleiche Adresse für den Zeichenspeicher. Setzen wir nun Bit 1 auf 1 (= 242 in GV beziehungsweise 194 bei 8 KByte), liegt die Anfangsadresse des Zeichenspeichers bei Adresse 34816 (Tabelle 3), wodurch wir auf einmal Groß- und Kleinschrift auf dem Bildschirm haben. Die eine der zwei zu Anfang gestellten Fragen haben wir damit beantwortet.</p>
 
+        <figure>
+            TODO
+            <figcaption>Tabelle 3. Die möglichen Zeichengeneratoranfangsadressen (jedoch sind nicht alle möglichen Adressen auch sinnvoll)</figcaption>
+        </figure>
+
         <p>Wie sind die im Zeichengenerator abrufbaren Zeichen eigentlich aufgebaut? Spätestens hier müssen wir ein Zeichen (im wahrsten Sinne des Wortes) unter die Lupe nehmen (Bild 3). Die vergrößerte Darstellung läßt erkennen, daß jedes Zeichen aus acht Zeilen mit je acht Spalten (8 x 8 Matrix) zusammengesetzt ist. Innerhalb dieses Gitters sind einzelne Punkte gesetzt beziehungsweise gelöscht. Jede Zeile innerhalb dieser Matrix ist als Byte (mit verschieden gesetzten Bits) im Zeichengenerator-ROM abgelegt (ROM natürlich deshalb, damit die Zeichen nach dem Abschalten erhalten bleiben).</p>
+
+        <figure>
+            <img src="130-3.png" alt="">
+            <figcaption>Bild 3. Diese Grafik zeigt den Aufbau eines VC 20-Zeichens innerhalb der 8 x 8 Matrix</figcaption>
+        </figure>
 
         <h2>Punkt für Punkt — der Zeichenaufbau</h2>
 
@@ -100,6 +384,11 @@
 
         <p>Dazu müssen wir uns anhand einer Grafik des Speicheraufbaus (Bild 4) überlegen, wo wir diese Zeichen abspeichern, denn wie in Tabelle 2 zu sehen ist, lassen sie sich nicht überall, sondern nur an bestimmten Stellen unterbringen. Auch hier muß man zwischen den beiden Ausbaustufen Grundversion /+3 KByte und ab 8 KByte unterscheiden.</p>
 
+        <figure>
+            <img src="130-4.png" alt="">
+            <figcaption>Bild 4. So können die 512 Zeichen im Grundversions-RAM verteilt werden</figcaption>
+        </figure>
+
         <h2>Nachhilfe — Die logischen Funktionen</h2>
 
         <p>Aufgrund der Zweiteilung des Registers # 5 sollte man alle Änderungen nur mit Hilfe logischer Funktionen durchführen, dazu ein kleiner Exkurs.</p>
@@ -108,19 +397,198 @@
 
         <p>Die erste wichtige Verknüpfungsoperation ist die ODER- (in Basic OR) Operation, die zwei Bits nach der in Tabelle 4a abgebildeten Wahrheitstabelle verknüpft. Haben wir nun eine Kette von 8 Bit (also ein Byte), so kann man mit Hilfe dieser Operation bestimmte Bits »einschalten«. Dazu ein Beispiel: Von einer Speicherstelle sollen die Bits 1 und 6 eingeschaltet werden. Da Basic die Binärzahlen nicht direkt, sondern nur als Dezimalzahlen verarbeiten kann, müssen wir zunächst alle Werte in dieses Zahlensystem umwandeln.</p>
 
-        <p>TODO</p>
+        <table>
+            <tbody>
+                <tr>
+                    <td>Bit</td>
+                    <td>7</td>
+                    <td>6</td>
+                    <td>5</td>
+                    <td>4</td>
+                    <td>3</td>
+                    <td>2</td>
+                    <td>1</td>
+                    <td>0</td>
+                </tr>
+                <tr>
+                    <td>Wertigkeit</td>
+                    <td>128</td>
+                    <td>64</td>
+                    <td>32</td>
+                    <td>16</td>
+                    <td>8</td>
+                    <td>4</td>
+                    <td>2</td>
+                    <td>1</td>
+                </tr>
+                <tr>
+                    <td><br></td>
+                    <td>0</td>
+                    <td>1</td>
+                    <td>0</td>
+                    <td>0</td>
+                    <td>0</td>
+                    <td>0</td>
+                    <td>1</td>
+                    <td>0</td>
+                </tr>
+            </tbody>
+        </table>
 
         <p>Durch Addition der Wertigkeiten der zu setzenden Bits ergibt sich der Wert 66 (= 64 + 2). Durch die OR-Verknüpfung der Speicherstelle mit 66 ergibt sich folgende Bitstruktur (für den ursprünglichen Inhalt der Speicherstelle nehmen wir einmal 229 an):</p>
 
-        <p>TODO</p>
+        <table>
+            <tbody>
+                <tr>
+                    <td>Speicherstelle</td>
+                    <td>1</td>
+                    <td>1</td>
+                    <td>1</td>
+                    <td>0</td>
+                    <td>0</td>
+                    <td>1</td>
+                    <td>0</td>
+                    <td>1</td>
+                    <td>= 229</td>
+                </tr>
+                <tr>
+                    <td>Bit 1 + 6 setzen:</td>
+                    <td>0</td>
+                    <td>1</td>
+                    <td>0</td>
+                    <td>0</td>
+                    <td>0</td>
+                    <td>0</td>
+                    <td>1</td>
+                    <td>0</td>
+                    <td>= 66</td>
+                </tr>
+                <tr>
+                    <td>229 OR 66:</td>
+                    <td>1</td>
+                    <td>1</td>
+                    <td>1</td>
+                    <td>0</td>
+                    <td>0</td>
+                    <td>1</td>
+                    <td>1</td>
+                    <td>1</td>
+                    <td>= 231</td>
+                </tr>
+            </tbody>
+        </table>
 
         <p>Der gewünschte Effekt ist eingetreten, das heißt die Bits 1 und 6 wurden gesetzt (da Bit 6 bereits eingeschaltet war, ergab sich hier keine Änderung).</p>
 
         <p>Analog verfährt man beim Löschen bestimmter Bits. Dazu wird dann allerdings die UND-Operation (Basic-Befehl AND) verwendet. Wie Tabelle 4b zeigt, bleiben nur die Bits unverändert, die mit 1 »verANDet« werden. Auch hierzu ein Rechenbeispiel, bei dem die Bits 1 und 6 gelöscht werden sollen:</p>
 
-        <p>TODO</p>
+        <table>
+            <tbody>
+                <tr>
+                    <td>Speicherstelle:</td>
+                    <td>1</td>
+                    <td>1</td>
+                    <td>1</td>
+                    <td>0</td>
+                    <td>0</td>
+                    <td>1</td>
+                    <td>1</td>
+                    <td>1</td>
+                    <td>= 231</td>
+                </tr>
+                <tr>
+                    <td>Bit 1 + 6 löschen:</td>
+                    <td>1</td>
+                    <td>0</td>
+                    <td>1</td>
+                    <td>1</td>
+                    <td>1</td>
+                    <td>1</td>
+                    <td>0</td>
+                    <td>1</td>
+                    <td>= 189</td>
+                </tr>
+                <tr>
+                    <td>231 AND 189:</td>
+                    <td>1</td>
+                    <td>0</td>
+                    <td>1</td>
+                    <td>0</td>
+                    <td>0</td>
+                    <td>1</td>
+                    <td>0</td>
+                    <td>1</td>
+                    <td>= 165</td>
+                </tr>
+            </tbody>
+        </table>
 
         <p>Auch hierbei muß man sich vor der Verknüpfung ein Bitmuster berechnen, in dem die zu löschenden Bits auf Null, die nicht zu verändernden auf 1 gesetzt werden müssen. Wem dies noch nicht restlos klar ist, der sollte anhand von einigen Rechenbeispielen diese Operationen üben, denn wir benötigen diese in der nächsten Folge, wenn es darum geht, jeden Grafikpunkt einzeln anzusteuern (beispielsweise über Koordinaten).</p>
+
+        <figure>
+            <table>
+                <tbody>
+                    <tr>
+                        <td><b>Wert 1</b></td>
+                        <td><b>Wert 2</b></td>
+                        <td><b>Verknüpfung</b></td>
+                    </tr>
+                    <tr>
+                        <td>0</td>
+                        <td>0</td>
+                        <td>0</td>
+                    </tr>
+                    <tr>
+                        <td>0</td>
+                        <td>1</td>
+                        <td>1</td>
+                    </tr>
+                    <tr>
+                        <td>1</td>
+                        <td>0</td>
+                        <td>1</td>
+                    </tr>
+                    <tr>
+                        <td>1</td>
+                        <td>1</td>
+                        <td>1</td>
+                    </tr>
+                </tbody>
+            </table>
+            <figcaption>Tabelle 4a. Die Wahrheitstabelle der ODER-Operation</figcaption>
+        </figure>
+        <figure>
+            <table>
+                <tbody>
+                    <tr>
+                        <td><b>Wert 1</b></td>
+                        <td><b>Wert 2</b></td>
+                        <td><b>Verknüpfung</b></td>
+                    </tr>
+                    <tr>
+                        <td>0</td>
+                        <td>0</td>
+                        <td>0</td>
+                    </tr>
+                    <tr>
+                        <td>0</td>
+                        <td>1</td>
+                        <td>0</td>
+                    </tr>
+                    <tr>
+                        <td>1</td>
+                        <td>0</td>
+                        <td>0</td>
+                    </tr>
+                    <tr>
+                        <td>1</td>
+                        <td>1</td>
+                        <td>1</td>
+                    </tr>
+                </tbody>
+            </table>
+            <figcaption>Tabelle 4b. Die Wahrheitstabelle der UND-Operation</figcaption>
+        </figure>
 
         <p>Aber auch das Register #5 kann damit wesentlich eleganter geändert werden. So schaltet POKE 36869,PEEK (36869) OR 1 auf Groß-/Kleinschreibung um (überlegen Sie mal, warum dies so ist), wobei man keine Unterscheidung zwischen verschiedenen Speicherausbaustufen treffen muß.</p>
 
@@ -148,6 +616,12 @@
 
         <p>Am Anfang steht der Entwurf eines Zeichens mit Hilfe einer 8 x 8 Matrix (Bild 5). Hier in unserem Beispiel soll das Pfundzeichen £ (Bildschirmcode 28) durch das Copyrightzeichen ersetzt werden.</p>
 
+        <figure>
+            <img src="130-5.png" alt="">
+            <figcaption>Bild 5. Auch die eigenen Zeichen muß man mit HIHe der Matrix entwerfen
+                (hier als Beispiel das Copyright-Zeichen)</figcaption>
+        </figure>
+
         <p>Dazu wird unser Beispielprogramm aus Listing 1 um folgende 5 Zeilen ergänzt:<br />
             60 CH = 28: AD = CH * 8 + ZG: REM Formel #1<br />
             70 FOR Z = 0 TO 7<br />
@@ -170,6 +644,11 @@
         <p>Bei der anderen Methode werden die Zeicheninformationen wie ein Programm einfach auf Band abgespeichert. Dazu besinnen wir uns wieder auf Folge 1 in Ausgabe 9, wo von den Basic-Zeigern die Rede war. Ferner ist dort beschrieben, wie man Platz für Maschinenprogramme und Sonderzeichen schafft, und sie vor dem Zugriff des Basicinterpreters schützt. Auch hier muß man — wie so oft, wenn es um Grafik oder Bildschirm geht — zwischen den zwei grundsätzlichen Ausbauversionen unterscheiden.</p>
 
         <p>All diese Vorgänge möchte ich anhand von Bild 6 erklären (6a für die Grundversion, 6b für die 8-KByte-Erweiterung):</p>
+
+        <figure>
+            <img src="130-6.png" alt="">
+            <figcaption>Bild 6. Durch die Verlegung der Basic-Zeiger SAVEt der Computer auch die Sonderzeichen mit ab: (a) bei Grundversion / 3-KByte-Erweiterung, (b) ab 8 KByte Speicherausbau</figcaption>
+        </figure>
 
         <p>Grundversion (Bild 6a): Der dunkelgelb unterlegte Teil der Speichergrafik stellt den Adreßbereich dar, auf den der Interpreter zurückgreift. Dieser geht normalerweise bis Adresse 7680 (zu erkennen an der hellgelben Farbe).</p>
 

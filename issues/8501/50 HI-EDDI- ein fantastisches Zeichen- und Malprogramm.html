@@ -22,22 +22,6 @@
             <img src="50-1.png" alt="">
             <figcaption>Es lassen sich nicht nur Bilder zeichnen, sondern auch technische Zeichnungen realisieren. Text kann ebenso eingefügt werden wie Sprites und selbstdefinierte Zeichensätze.</figcaption>
         </figure>
-        <figure>
-            <img src="50-2.png" alt="">
-            <figcaption>Solche oder auch ganz andere Menüs können Sie sich selbst erstellen. Auf der Diskette zu dieser Ausgabe finden Sie diese und noch andere Beispiele.</figcaption>
-        </figure>
-        <figure>
-            <img src="50-3.png" alt="">
-            <figcaption>Wenn Sie dieses Bild sechsmal im Speicher ablegen (mit wenigen Tasten möglich) und in jedem Bild die Stellung der Kolben ändern, kann mit dem Walk-Befehl ein Zeichentrickfilm-ähnlicher Effekt erzielt werden (zirka sieben Bilder pro Sekunde).</figcaption>
-        </figure>
-        <figure>
-            <img src="61-1.png" alt="">
-            <figcaption>Bild 1. In dieser Hardcopy wurden zwei Bilder untereinander ausgedruckt. Dies geschieht nahtlos. Es können zwei Bilder nebeneinader und unbegrenzt viele untereinander gesetzt werden. Siehe dazu auch Bild 2.</figcaption>
-        </figure>
-        <figure>
-            <img src="61-2.png" alt="">
-            <figcaption>Bild 2. Dieser verkleinerte Schaltplan wurde aus insgesamt sechs verschiedenen Bildern zusammengesetzt. Je zwei nebeneinander und drei untereinander. Auch ein reverser Ausdruck ist mit einem Tastendruck möglich. Die Symbole aus dem Construction-Set können einzeln in jedes beliebige Bild hineinkopiert werden.</figcaption>
-        </figure>
 
         <p>Hier eine Aufstellung der herausragenden Eigenschaften:</p>
 
@@ -55,6 +39,15 @@
         <p>Natürlich ist klar, daß sowas nur in Maschinensprache geht, und die ist mit rund 4700 DATAs nicht gerade kurz. Gemessen an den Möglichkeiten des Programms ist es allerdings auch nicht viel. Die Bilder auf diesen Seiten lassen die Vielfältigkeit von HI-EDDI nur ahnen. Dabei lassen sich nicht nur mit HI-EDDI erzeugte Bilder laden und bearbeiten, sondern auch Grafikbilder anderer Programme, wie von Koala oder Paint Magic, zum Beispiel die der Dia-Show.</p>
 
         <p>(Hans Haberl/gk)</p>
+
+        <figure>
+            <img src="50-2.png" alt="">
+            <figcaption>Solche oder auch ganz andere Menüs können Sie sich selbst erstellen. Auf der Diskette zu dieser Ausgabe finden Sie diese und noch andere Beispiele.</figcaption>
+        </figure>
+        <figure>
+            <img src="50-3.png" alt="">
+            <figcaption>Wenn Sie dieses Bild sechsmal im Speicher ablegen (mit wenigen Tasten möglich) und in jedem Bild die Stellung der Kolben ändern, kann mit dem Walk-Befehl ein Zeichentrickfilm-ähnlicher Effekt erzielt werden (zirka sieben Bilder pro Sekunde).</figcaption>
+        </figure>
 
         <aside>
 
@@ -257,19 +250,134 @@
 
         <p>Vor und nach dem Ausdruck werden keine zusätzlichen Zeilenvorschübe ausgegeben, aufeinanderfolgende Ausdrucke hängen somit nahtlos aneinander (Bild 1). So läßt sich zum Beispiel mit sechs Bildern eine Superhardcopy mit 640 x 600 Punkten erstellen (Bild 2), lädt man zwischendurch weitere Bilder von Diskette nach, kann man meterlange Bilder ausdrucken.</p>
 
+        <figure>
+            <img src="61-1.png" alt="">
+            <figcaption>Bild 1. In dieser Hardcopy wurden zwei Bilder untereinander ausgedruckt. Dies geschieht nahtlos. Es können zwei Bilder nebeneinader und unbegrenzt viele untereinander gesetzt werden. Siehe dazu auch Bild 2.</figcaption>
+        </figure>
+
         <p>Leider ist Drucker nicht gleich Drucker! Die vorliegende Druckerroutine (Listing 1) läßt sich nur für Epson-Drucker und kompatible mit Interface verwenden. Deshalb möchte ich im folgenden Kapitel Hinweise zur Erstellung einer Druckerroutine für andere Konfigurationen geben.</p>
 
         <p>Die Speicherbelegung von HI-EDDI<br />
             Die Speicherbelegung von HI-EDDI sieht folgendermaßen aus:</p>
 
-        <p>TODO</p>
+        <table>
+            <tbody>
+                <tr>
+                    <td>$57-$60 und $F9-$FE:</td>
+                    <td>Temporäre Speicherzellen</td>
+                </tr>
+                <tr>
+                    <td>$2C0-$2FE:</td>
+                    <td>Residenter Datenbereich (Sprite-Inhalt)</td>
+                </tr>
+                <tr>
+                    <td>$340-$3FE:</td>
+                    <td>Temporärer Datenbereich (Kreuz-, großes und kleines Rahmen-Sprite</td>
+                </tr>
+                <tr>
+                    <td>$801-$CFF:</td>
+                    <td>Basic-Speicher</td>
+                </tr>
+                <tr>
+                    <td>$D00-$1F4C:</td>
+                    <td>Maschinenprogramm</td>
+                </tr>
+                <tr>
+                    <td>$1F80-$1FFF:</td>
+                    <td>Residenter Datenbereich (Betriebszustände etc.)</td>
+                </tr>
+                <tr>
+                    <td>$2000, $4000, $6000 etc.:</td>
+                    <td>Grafikspeicher</td>
+                </tr>
+            </tbody>
+        </table>
 
-        <p>Die Druckerroutine wird in denselben Bereich wie HI-EXE geladen, also ab $D00, nach Beendigung des Druckvorganges wird wieder HI-EXE geladen (Listing 1 und 2).<br />
-            Die vorliegende Druckerroutine enthält auch ein Software-Interface, das den User-Port zur Centronics-Schnittstelle umfunktioniert. Dazu muß ein Kabel mit folgender Pinbelegung verwendet werden:</p>
+        <p>Die Druckerroutine wird in denselben Bereich wie HI-EXE geladen, also ab $D00, nach Beendigung des Druckvorganges wird wieder HI-EXE geladen (Listing 1 und 2).</p>
 
-        <p>TODO</p>
+        <p>Die vorliegende Druckerroutine enthält auch ein Software-Interface, das den User-Port zur Centronics-Schnittstelle umfunktioniert. Dazu muß ein Kabel mit folgender Pinbelegung verwendet werden:</p>
+
+        <table>
+            <tbody>
+                <tr>
+                    <td colspan="2"><b>Pin am User-Port</b></td>
+                    <td colspan="2"><b>Pin am Centronics-Stecker</b></td>
+                </tr>
+                <tr>
+                    <td>M</td>
+                    <td>(PA2)</td>
+                    <td>1</td>
+                    <td>(Strobe)</td>
+                </tr>
+                <tr>
+                    <td>C</td>
+                    <td>(PBO)</td>
+                    <td>2</td>
+                    <td>(DATA 1)</td>
+                </tr>
+                <tr>
+                    <td>D</td>
+                    <td>(PB1)</td>
+                    <td>3</td>
+                    <td>(DATA 2)</td>
+                </tr>
+                <tr>
+                    <td>E</td>
+                    <td>(PB2)</td>
+                    <td>4</td>
+                    <td>(DATA 3)</td>
+                </tr>
+                <tr>
+                    <td>F</td>
+                    <td>(PB3)</td>
+                    <td>5</td>
+                    <td>(DATA 4)</td>
+                </tr>
+                <tr>
+                    <td>H</td>
+                    <td>(PB4)</td>
+                    <td>6</td>
+                    <td>(DATA 5)</td>
+                </tr>
+                <tr>
+                    <td>J</td>
+                    <td>(PB5)</td>
+                    <td>7</td>
+                    <td>(DATA 6)</td>
+                </tr>
+                <tr>
+                    <td>K</td>
+                    <td>(PB6)</td>
+                    <td>8</td>
+                    <td>(DATA 7)</td>
+                </tr>
+                <tr>
+                    <td>L</td>
+                    <td>(PB7)</td>
+                    <td>9</td>
+                    <td>(DATA 8)</td>
+                </tr>
+                <tr>
+                    <td>B</td>
+                    <td>(FLAG2)</td>
+                    <td>10 oder 11</td>
+                    <td>(ACKNLG oder BUSY)</td>
+                </tr>
+                <tr>
+                    <td>A</td>
+                    <td>(GND)</td>
+                    <td>16</td>
+                    <td><br></td>
+                </tr>
+            </tbody>
+        </table>
 
         <p>Will man eine Routine für andere Drucker schreiben, so darf diese den gesamten Speicherbereich von $D00 bis $1F7F belegen, lediglich die residenten Speicherbereiche und der Basic-Speicher sind tabu. Die Information darüber, wo welcher Bildschirm im Speicher liegt, steht in den 7 Bytes von $1F96 bis $1F9C: In $1F96 steht die Nummer des Bildes, das ab $2000 in Speicher liegt (das ist das sichtbare Bild!), in Zelle $1F97 steht die Nummer des Bildes ab $4 000 und so weiter. Beispiel: Soll Bild Nummer 2 ausgedruckt werden, so sucht man in der Tabelle nach der 2. Steht sie zum Beispiel in Zelle $1F9A, so liegt Bild 2 im Bereich ab $A000 (unter dem Basic-ROM). Im Farb-Betrieb steht in Zelle $1F97 eine 0, weil im Bereich $4 000 bis $6 000 dann die Farbinformationen für die sechs Bilder liegen und dieser Bereich für Grafikbilder somit gesperrt sein muß.</p>
+
+        <figure>
+            <img src="61-2.png" alt="">
+            <figcaption>Bild 2. Dieser verkleinerte Schaltplan wurde aus insgesamt sechs verschiedenen Bildern zusammengesetzt. Je zwei nebeneinander und drei untereinander. Auch ein reverser Ausdruck ist mit einem Tastendruck möglich. Die Symbole aus dem Construction-Set können einzeln in jedes beliebige Bild hineinkopiert werden.</figcaption>
+        </figure>
 
         <p>Für den nicht Maschinenspracheerfahrenen Leser sind dies sicherlich alles spanische Dörfer, aber vielleicht sind einige »Maschinen-Profis« so nett und schicken Lösungen für andere Drucker ein.</p>
 
@@ -279,14 +387,45 @@
 
         <p>Doch zunächst zurück zu dem Bytewert, der bei Programmstart auf die Frage »Betriebsart« eingegeben werden muß. Er setzt sich wie folgt zusammen:</p>
 
-        <p>Bit 7: =0 : Schwarzweiß-Betrieb<br />
-            = 1 : Farb-Betrieb<br />
-            Bit 6 : =0 : nur Tastatureingabe<br />
-            = 1 : Menü-Eingabe<br />
-            Bit 5-1 : keine Funktion<br />
-            Bit 0 : =0 : Beim Start werden alle Bildschirmspeicher gelöscht<br />
-            = 1 : Es wird nichts gelöscht, im Speicher befindliche Bilder bleiben erhalten<br />
-            TODO</p>
+        <table>
+            <tbody>
+                <tr>
+                    <td>Bit 7:</td>
+                    <td>= 0 :</td>
+                    <td>Schwarzweiß-Betrieb</td>
+                </tr>
+                <tr>
+                    <td><br></td>
+                    <td>= 1 :</td>
+                    <td>Farb-Betrieb</td>
+                </tr>
+                <tr>
+                    <td>Bit 6:</td>
+                    <td>= 0 :</td>
+                    <td>nur Tastatureingabe</td>
+                </tr>
+                <tr>
+                    <td><br></td>
+                    <td>= 1 :</td>
+                    <td>Menü-Eingabe</td>
+                </tr>
+                <tr>
+                    <td>Bit 5-1:</td>
+                    <td></td>
+                    <td>keine Funktion</td>
+                </tr>
+                <tr>
+                    <td>Bit 0:</td>
+                    <td>= 0 :</td>
+                    <td>Beim Start werden alle Bildschirmspeicher gelöscht</td>
+                </tr>
+                <tr>
+                    <td><br></td>
+                    <td>= 1 :</td>
+                    <td>Es wird nichts gelöscht, im Speicher befindliche Bilder bleiben erhalten</td>
+                </tr>
+            </tbody>
+        </table>
 
         <p>Für Farbe und Menü zum Beispiel muß 192 eingegeben werden. Ich finde die Menü-Eingabe nur in Farbe sinnvoll, ein Schwarzweiß-Menü sieht recht langweilig aus. Ist das Bit 6 gesetzt, also die Menü-Betriebsart angewählt, so muß sich auf der Diskette unter dem Namen »MENUE« die Menütafel befinden, die beim Start automatisch nachgeladen wird. Das Erstellen einer solchen Menütafel soll nun erklärt werden:</p>
 
