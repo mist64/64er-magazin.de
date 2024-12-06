@@ -108,7 +108,603 @@
 
         <p>Das Betreiben des Laufwerks ohne Deckel hat auch den Vorteil besserer Wärmeableitung. Die ICs werden es Ihnen danken.</p>
 
-        <p>Nachdem Sie Ihre 1541 also auf »Arbeitsbetrieb« getrimmt haben, wollen wir gleich einmal mit kleinen Programmen beginnen. In Tabelle 1 sehen Sie eine Aufstellung einiger wichtiger Zeropageadressen, die uns im weiteren Verlauf noch beschäftigen werden. Für einDOS-Listing ist in unserer Serie natürlich kein Platz vorhanden; auch können wir nur mit kleinen Beispielen versuchen, Ihnen die Programmierung der Floppy nahezubringen. Für diejenigen unter Ihnen, die jedoch vorhaben, tiefer in die Floppyprogrammierung einzusteigen, sei an dieser Stelle ein Buch angesprochen, das voraussichtlich im Februar 1985 von Markt &amp; Technik herausgegeben wird. Es behandelt die 1541 bis ins kleinste Detail, ist unter anderem mit einem ausführlichst kommentierten DOS-Listing ausgestattet und geht weit über das in dieser Reihe besprochene hinaus.</p>
+        <p>Nachdem Sie Ihre 1541 also auf »Arbeitsbetrieb« getrimmt haben, wollen wir gleich einmal mit kleinen Programmen beginnen. In Tabelle 1 sehen Sie eine Aufstellung einiger wichtiger Zeropageadressen, die uns im weiteren Verlauf noch beschäftigen werden. Für ein DOS-Listing ist in unserer Serie natürlich kein Platz vorhanden; auch können wir nur mit kleinen Beispielen versuchen, Ihnen die Programmierung der Floppy nahezubringen. Für diejenigen unter Ihnen, die jedoch vorhaben, tiefer in die Floppyprogrammierung einzusteigen, sei an dieser Stelle ein Buch angesprochen, das voraussichtlich im Februar 1985 von Markt &amp; Technik herausgegeben wird. Es behandelt die 1541 bis ins kleinste Detail, ist unter anderem mit einem ausführlichst kommentierten DOS-Listing ausgestattet und geht weit über das in dieser Reihe besprochene hinaus.</p>
+
+        <figure>
+            <table>
+                <tbody>
+                    <tr>
+                        <td>$0000</td>
+                        <td>Jobspeicher für Puffer 0</td>
+                    </tr>
+                    <tr>
+                        <td>$0001</td>
+                        <td>Jobspeicher für Puffer 1</td>
+                    </tr>
+                    <tr>
+                        <td>$0002</td>
+                        <td>Jobspeicher für Puffer 2</td>
+                    </tr>
+                    <tr>
+                        <td>$0003</td>
+                        <td>Jobspeicher für Puffer 3</td>
+                    </tr>
+                    <tr>
+                        <td>$0004</td>
+                        <td>Jobspeicher für Puffer 4</td>
+                    </tr>
+                    <tr>
+                        <td>$0005</td>
+                        <td>Jobspeicher für Puffer 5 (im RAM nicht vorhanden)</td>
+                    </tr>
+                    <tr>
+                        <td>$0006/7</td>
+                        <td>Spur- und Sektornummer für Befehl in Puffer 0</td>
+                    </tr>
+                    <tr>
+                        <td>$0008/9</td>
+                        <td>Spur- und Sektornummer für Befehl in Puffer 1</td>
+                    </tr>
+                    <tr>
+                        <td>$000A/B</td>
+                        <td>Spur- und Sektornummer für Befehl in Puffer 2</td>
+                    </tr>
+                    <tr>
+                        <td>$000C/D</td>
+                        <td>Spur- und Sektornummer für Befehl in Puffer 3</td>
+                    </tr>
+                    <tr>
+                        <td>$000E/F</td>
+                        <td>Spur- und Sektornummer für Befehl in Puffer 4</td>
+                    </tr>
+                    <tr>
+                        <td>$0010/1</td>
+                        <td>Spur— und Sektornummer für Befehl in Puffer 5</td>
+                    </tr>
+                    <tr>
+                        <td>$0012/3</td>
+                        <td>ID der Diskette im ASCII-Code; die beiden Zeichen der aktuellen ID werden bei .jedem Blocksuchbefehl gelesen und hier aktualisiert abgespeichert. Auch das Initia- lisierkommando benutzt diesen Befehl und bringt die ID dadurch auf den neuesten Stand.</td>
+                    </tr>
+                    <tr>
+                        <td>$0016- $001A</td>
+                        <td>Hier sind die Bytes für den aktuellen Blockheader gespeichert, und zwar sind dies;<br>
+                            $0016 erstes'Zeichen der ID<br>
+                            $0017 zweites Zeichen der ID<br>
+                            $0018 Spurnummer des Blocks<br>
+                            $0019 Sektornummer des Blocks<br>
+                            $001A Prüfsumme über den Blockheader<br>
+                            Auf der Diskette stehen diese Werte in der umgekehrten Rei henfolge!</td>
+                    </tr>
+                    <tr>
+                        <td>$001C</td>
+                        <td>Flag für Änderung beim Schreibschutz der Diskette</td>
+                    </tr>
+                    <tr>
+                        <td>$002E/F</td>
+                        <td>Zwischenspeicher für aktuelle Zeiger</td>
+                    </tr>
+                    <tr>
+                        <td>$0030/1</td>
+                        <td>Zeiger in aktuellen Puffer</td>
+                    </tr>
+                    <tr>
+                        <td>$0032/3</td>
+                        <td>Zeiger auf aktuellen Blackheader beim Schreiben</td>
+                    </tr>
+                    <tr>
+                        <td>$0038</td>
+                        <td>Kennzeichen ($07) für Beginn eines Datenblocks</td>
+                    </tr>
+                    <tr>
+                        <td>$0039</td>
+                        <td>Kennzeichen ($08) für Beginn eines Blockheader^</td>
+                    </tr>
+                    <tr>
+                        <td>$003A</td>
+                        <td>Zwischenspeicher für Prüfsummen</td>
+                    </tr>
+                    <tr>
+                        <td>$003D</td>
+                        <td>aktuelle Laufwerksnummer; bei der VC 1541 immer 0</td>
+                    </tr>
+                    <tr>
+                        <td>$003E</td>
+                        <td>gerade arbeitendes Laufwerk ($FF = kein Laufwerk)</td>
+                    </tr>
+                    <tr>
+                        <td>$003F</td>
+                        <td>Puffernummer des eben ausgeführten Befehls (0-5)</td>
+                    </tr>
+                    <tr>
+                        <td>$0043</td>
+                        <td>zählt die Anzahl der Sektoren bei der Formatierung</td>
+                    </tr>
+                    <tr>
+                        <td>$0044</td>
+                        <td>Zwischenspeicher beim Arbeiten</td>
+                    </tr>
+                    <tr>
+                        <td>$0045</td>
+                        <td>Zwischenspeicher für aktuellen Befehlscode</td>
+                    </tr>
+                    <tr>
+                        <td>$0047</td>
+                        <td>enthält aktuelles Kennzeichen für Beginn eines Datenblocks. wird nur bei RESET einmal auf $07 gesetzt und kann vom Benutzer verändert werden, wobei das Hi-Nybble des Wertes immer auf 0 ($0-) stehen sollte, um Leseprobleme des DC zu vermeiden. Wird versucht, einen Datenblock mit einer anderen, als der hier gespeicherten, Nummer zu lesen, so erfolgt der Fehlercode $04 des DC und die Floppy sendet Fehlermeldung Nummer 22 zum Bus.</td>
+                    </tr>
+                    <tr>
+                        <td>$0049</td>
+                        <td>Zwischenspeicher für den Stackpointer</td>
+                    </tr>
+                    <tr>
+                        <td>$004A</td>
+                        <td>Zähler für Kopftransport; Zahlen bis 127 bewegen den Kopf nach außen; Zahlen von 128 bis 255 bewegen ihn nach innen (höhere Spurnummer).</td>
+                    </tr>
+                    <tr>
+                        <td>$0051</td>
+                        <td>aktuelle Spurnummer bei der Formatierung; stehtauf $FF, wenn keine Formatierung erfolgt.</td>
+                    </tr>
+                    <tr>
+                        <td>$0065/6</td>
+                        <td>Zeiger auf die NMI-Routine; wird bei einem RESET ge- stel1t.</td>
+                    </tr>
+                    <tr>
+                        <td>$0067</td>
+                        <td>Flag zum Anzeigen eines NMI</td>
+                    </tr>
+                    <tr>
+                        <td>$0068</td>
+                        <td>Flag zum Ermöglichen (0) oder Sperren (1) der automatischen Initialisierung einer Diskette, falls ein ID Type Mismatch Error erkannt wurde</td>
+                    </tr>
+                    <tr>
+                        <td>$0069</td>
+                        <td>Abstand der Sektoren bei der Zuteilung; erhält bei einem RESET den Wert 10.</td>
+                    </tr>
+                    <tr>
+                        <td>$006A</td>
+                        <td>Anzahl der Leseversuche eines Sektors; steht nach RESET auf 5.</td>
+                    </tr>
+                    <tr>
+                        <td>$006B/C</td>
+                        <td>Zeiger auf Sprungtabelle der USER—Befehle; steht normalerweise auf $FFF6 nach einem RESET.</td>
+                    </tr>
+                    <tr>
+                        <td>$006D/E</td>
+                        <td>Zeiger auf den Beginn der 'Bit Map'; steht auf $0400 und wird beim Initialisieren gesetzt.</td>
+                    </tr>
+                    <tr>
+                        <td>$006F</td>
+                        <td>Zwischenspeicher; steht nach RESET auf $6F</td>
+                    </tr>
+                    <tr>
+                        <td>$0070</td>
+                        <td>Zwi schenspeicher</td>
+                    </tr>
+                    <tr>
+                        <td>$0071</td>
+                        <td>Zwi schenspei cher</td>
+                    </tr>
+                    <tr>
+                        <td>$0072</td>
+                        <td>Zwischenspeicher; steht nach RESET auf $FF</td>
+                    </tr>
+                    <tr>
+                        <td>$0073</td>
+                        <td>Zwi schenspei cher</td>
+                    </tr>
+                    <tr>
+                        <td>$0074</td>
+                        <td>Zwi schenspeicher</td>
+                    </tr>
+                    <tr>
+                        <td>$0075/6</td>
+                        <td>Indirekter Zeiger auf $0100; wird bei RESET gestellt</td>
+                    </tr>
+                    <tr>
+                        <td>$0077</td>
+                        <td>Gerätenummer + $20 für das LISTEN-Kommando</td>
+                    </tr>
+                    <tr>
+                        <td>$0078</td>
+                        <td>Gerätenummer + $40 für das TALK-Kommando</td>
+                    </tr>
+                    <tr>
+                        <td>$0079</td>
+                        <td>Flag für LISTEN (1/0)</td>
+                    </tr>
+                    <tr>
+                        <td>$007A</td>
+                        <td>Flag für TALK (1/0)</td>
+                    </tr>
+                    <tr>
+                        <td>$007B</td>
+                        <td>Flag für Adressierung</td>
+                    </tr>
+                    <tr>
+                        <td>$007C</td>
+                        <td>Flag für ATN-Signal vom seriellen Bus</td>
+                    </tr>
+                    <tr>
+                        <td>$007D</td>
+                        <td>Flag für Prozessor im ATN-Modus</td>
+                    </tr>
+                    <tr>
+                        <td>$007F</td>
+                        <td>Aktuelle Laufwerksnummer; hier immer 0</td>
+                    </tr>
+                    <tr>
+                        <td>$0080</td>
+                        <td>Aktuelle Spurnummer; enthält $00 nach Ausführung</td>
+                    </tr>
+                    <tr>
+                        <td>$0081</td>
+                        <td>Aktuelle Sektornummer; enthält $00 nach Ausführung</td>
+                    </tr>
+                    <tr>
+                        <td>$0082</td>
+                        <td>Aktuel1e Kanalnummer</td>
+                    </tr>
+                    <tr>
+                        <td>$0083</td>
+                        <td>Aktuelle Sekundäradresse</td>
+                    </tr>
+                    <tr>
+                        <td>$0084</td>
+                        <td>übliche Sekundäradresse</td>
+                    </tr>
+                    <tr>
+                        <td>$0085</td>
+                        <td>Aktuelles Datenbyte</td>
+                    </tr>
+                    <tr>
+                        <td>$0086</td>
+                        <td>Speicher für Zwischenergebnisse</td>
+                    </tr>
+                    <tr>
+                        <td>$0087</td>
+                        <td>Speicher für Zwischenergebnisse</td>
+                    </tr>
+                    <tr>
+                        <td>$0088</td>
+                        <td>Speicher für Zwischenergebnisse</td>
+                    </tr>
+                    <tr>
+                        <td>$0089</td>
+                        <td>Speicher für Zwischenergebnisse</td>
+                    </tr>
+                    <tr>
+                        <td>$008A</td>
+                        <td>Speicher für Zwischenergebnisse</td>
+                    </tr>
+                    <tr>
+                        <td>$008B- $008E</td>
+                        <td>Speicher für Ergebnisse bei Berechnungen</td>
+                    </tr>
+                    <tr>
+                        <td>$008F- $0093</td>
+                        <td>Akkumulator für Berec-hnungen</td>
+                    </tr>
+                    <tr>
+                        <td>$0094/5</td>
+                        <td>Zeiger auf Directory-Puffer; enthält $05/02</td>
+                    </tr>
+                    <tr>
+                        <td>$0096</td>
+                        <td>Kommando vom IEEE-Bus; hier unbenutzt</td>
+                    </tr>
+                    <tr>
+                        <td>$0098</td>
+                        <td>Bitzähler für seriellen Bus</td>
+                    </tr>
+                    <tr>
+                        <td>$0099/A</td>
+                        <td>Buffer-Pointer für Puffer 0; steht auf $0300</td>
+                    </tr>
+                    <tr>
+                        <td>$009B/C</td>
+                        <td>Buffer-Pointer für Puffer 1; steht auf $0400</td>
+                    </tr>
+                    <tr>
+                        <td>$009D/E</td>
+                        <td>Buffer-Pointer für Puffer 2; steht auf $0500</td>
+                    </tr>
+                    <tr>
+                        <td>$009F/0</td>
+                        <td>Buffer-Pointer für Puffer 3; steht auf $0600</td>
+                    </tr>
+                    <tr>
+                        <td>$00A1/2</td>
+                        <td>Buffer-Pointer für Puffer 4; steht auf $0700<br>
+                            Alle diese Pointer werden durch den B-P-Befehl verändert !</td>
+                    </tr>
+                    <tr>
+                        <td>$00A3/4</td>
+                        <td>Zeiger auf nächstes Zeichen im INPUT-BUFFER ($0200)</td>
+                    </tr>
+                    <tr>
+                        <td>$00A5/6</td>
+                        <td>Zeiger auf nächstes Zeichen im ERROR-BUFFER ($02D6)</td>
+                    </tr>
+                    <tr>
+                        <td>$00A7- $00AD</td>
+                        <td>Tabelle; enthält für jeden aktiven Puffer die entsprechende Kanalnummer. Kanalnummer = $FF, wenn Puffer unbenutzt.</td>
+                    </tr>
+                    <tr>
+                        <td>$00AE- $00B4</td>
+                        <td>Tabelle; enthält für jeden aktiven Puffer die entsprechende Kanalnummer. Kanalnummer =* $FF, wenn Puffer unbenutzt.</td>
+                    </tr>
+                    <tr>
+                        <td>$00B5- $00BA</td>
+                        <td>Tabelle der Lo-Bytes der Recordnummern für jeden Puffer-</td>
+                    </tr>
+                    <tr>
+                        <td>$00BB- $00CO</td>
+                        <td>Tabelle der Hi--Bytes der Recordnummern für jeden Puffer</td>
+                    </tr>
+                    <tr>
+                        <td>$00C1- $00C6</td>
+                        <td>Tabelle der nächsten zu bearbeitenden Recordnummern für jeden Puffer</td>
+                    </tr>
+                    <tr>
+                        <td>$00C7- $00CC</td>
+                        <td>Tabelle der Recordlängen für jeden Puffer</td>
+                    </tr>
+                    <tr>
+                        <td>$00CD- $00D2</td>
+                        <td>Tabelle der Side-Sektoren für jeden Puffer</td>
+                    </tr>
+                    <tr>
+                        <td>$00E2- $00E6</td>
+                        <td>Standardwerte für Laufwerk; hier alle O</td>
+                    </tr>
+                    <tr>
+                        <td>$00E7- $00EB</td>
+                        <td>Tabelle der Filetypen</td>
+                    </tr>
+                    <tr>
+                        <td>$00EC- $00F1</td>
+                        <td>Kanal Filetyp</td>
+                    </tr>
+                    <tr>
+                        <td>$00F2- $00F7</td>
+                        <td>Kanalstatus</td>
+                    </tr>
+                    <tr>
+                        <td>$00F8</td>
+                        <td>Zwischenspeicher fürEOI</td>
+                    </tr>
+                    <tr>
+                        <td>$00F9</td>
+                        <td>Aktuelle Puffernummer für Befehlscode</td>
+                    </tr>
+                    <tr>
+                        <td>$0101</td>
+                        <td>Formatkennzeichen von Spur 18 Sektor 0</td>
+                    </tr>
+                    <tr>
+                        <td>$0104-<br>
+                            $0145</td>
+                        <td>Bereich des Hardware-Stack; nicht benutzbar</td>
+                    </tr>
+                    <tr>
+                        <td>$0200- $0229</td>
+                        <td>INPUT-BUFFER; hier werden alle Befehlsstrings vom Computer zwischengespeichert und nach Syntaxprüfung aus gef ührt</td>
+                    </tr>
+                    <tr>
+                        <td>.$022A</td>
+                        <td>Codenummer des auszuführenden Befehls</td>
+                    </tr>
+                    <tr>
+                        <td>$022B-</td>
+                        <td>Kanaltabelle; diese Tabelle enthält für jede mögliche</td>
+                    </tr>
+                    <tr>
+                        <td>$023E- $0243</td>
+                        <td>Aktuelles Datenbyte für jeden Kanal; Belegung der Adressen wie bei der Kanalstatustabelle ($022B)</td>
+                    </tr>
+                    <tr>
+                        <td>$0244- $0249</td>
+                        <td>Tabelle der Zeiger auf das letzte aktuelle Zeichen in jedem, für den Kanal zuständigen, Pufferspeicher</td>
+                    </tr>
+                    <tr>
+                        <td>$024A</td>
+                        <td>Gerade behandelter Filetyp</td>
+                    </tr>
+                    <tr>
+                        <td>$024B</td>
+                        <td>Länge des Befehlsstrings</td>
+                    </tr>
+                    <tr>
+                        <td>$024C</td>
+                        <td>Zwischenspeicher für Sekundäradresse</td>
+                    </tr>
+                    <tr>
+                        <td>$024D</td>
+                        <td>Zwischenspeicher für Befehlscode</td>
+                    </tr>
+                    <tr>
+                        <td>$024E</td>
+                        <td>Arbeitsspeicher beim Suchen des nächsten Sektors</td>
+                    </tr>
+                    <tr>
+                        <td>$024F/0</td>
+                        <td>Pufferbelegungsspeicher; 1 = Puffer belegt</td>
+                    </tr>
+                    <tr>
+                        <td>$0253</td>
+                        <td>Flag für Directory-Eintrag gefunden</td>
+                    </tr>
+                    <tr>
+                        <td>$0254</td>
+                        <td>Flag für $-Befehl zum Listen des Directory</td>
+                    </tr>
+                    <tr>
+                        <td>$0255</td>
+                        <td>Flag für Befehlsausführung (&lt;&gt;$00, wenn Befehl anliegt)</td>
+                    </tr>
+                    <tr>
+                        <td>$0257</td>
+                        <td>Nummer des letzten benutzten Puffers</td>
+                    </tr>
+                    <tr>
+                        <td>$0258</td>
+                        <td>Recordlänge</td>
+                    </tr>
+                    <tr>
+                        <td>$0259</td>
+                        <td>Side-Sector Spur</td>
+                    </tr>
+                    <tr>
+                        <td>$025A</td>
+                        <td>Side-Sector Sektor</td>
+                    </tr>
+                    <tr>
+                        <td>$025B- $025F</td>
+                        <td>Tabelle; enthält den letzten Befehlscode der Puffer</td>
+                    </tr>
+                    <tr>
+                        <td>$0260- $0265</td>
+                        <td>Sektornummern der Directoryeinträge in den Puffern</td>
+                    </tr>
+                    <tr>
+                        <td>$0266- $026B</td>
+                        <td>Zeiger auf die Directoryeinträge in den Puffern</td>
+                    </tr>
+                    <tr>
+                        <td>$026D</td>
+                        <td>Flag für LED Blinken bei Fehler</td>
+                    </tr>
+                    <tr>
+                        <td>$026E</td>
+                        <td>Nummer des letzten aktiven Laufwerks</td>
+                    </tr>
+                    <tr>
+                        <td>$026F</td>
+                        <td>Nummer des letzten bearbeitenden Sektors</td>
+                    </tr>
+                    <tr>
+                        <td>$0270</td>
+                        <td>aktueller Schreibkanal</td>
+                    </tr>
+                    <tr>
+                        <td>$0271</td>
+                        <td>aktuel1 er Lesekanal</td>
+                    </tr>
+                    <tr>
+                        <td>$0274</td>
+                        <td>Länge des Befehlsstrings im INPUT-BUFFER</td>
+                    </tr>
+                    <tr>
+                        <td>$027A- $027F</td>
+                        <td>Tabelle der Zeiger auf die Filenamen</td>
+                    </tr>
+                    <tr>
+                        <td>$0280- $0284</td>
+                        <td>Spurnummern der Files für den aktuellen Puffer</td>
+                    </tr>
+                    <tr>
+                        <td>$0285- $0289</td>
+                        <td>Sektornummern der Files für den aktuellen Puffer</td>
+                    </tr>
+                    <tr>
+                        <td>$028A</td>
+                        <td>Joker (*) Flag</td>
+                    </tr>
+                    <tr>
+                        <td>$028E</td>
+                        <td>Standardwert für die Nummer des Laufwerks</td>
+                    </tr>
+                    <tr>
+                        <td>$028F</td>
+                        <td>Flag für Fileeinträg im Directory gefunden</td>
+                    </tr>
+                    <tr>
+                        <td>$0290</td>
+                        <td>Sektornummer des aktuellen Directory Sektors</td>
+                    </tr>
+                    <tr>
+                        <td>$0291</td>
+                        <td>Sektornummer des ersten Directoryeintrags</td>
+                    </tr>
+                    <tr>
+                        <td>$0292</td>
+                        <td>Zeiger auf ersten gültigen Directoryeintrag</td>
+                    </tr>
+                    <tr>
+                        <td>$0293</td>
+                        <td>Zeigt letzten Block an; enthält dann 0</td>
+                    </tr>
+                    <tr>
+                        <td>$0294</td>
+                        <td>Aktueller Pufferzeiqer</td>
+                    </tr>
+                    <tr>
+                        <td>$0295</td>
+                        <td>Zähler für Fileeinträge</td>
+                    </tr>
+                    <tr>
+                        <td>$0297</td>
+                        <td>Betriebsart des aktuellen Files (Lesen/Schreiben)</td>
+                    </tr>
+                    <tr>
+                        <td>$029D/E</td>
+                        <td>Spurnummer der BAM</td>
+                    </tr>
+                    <tr>
+                        <td>$02Al-</td>
+                        <td>Zwischenspeicher für BAM Eintragungen</td>
+                    </tr>
+                    <tr>
+                        <td>$02B0</td>
+                        <td><br></td>
+                    </tr>
+                    <tr>
+                        <td>$02B1- $02D4</td>
+                        <td>Puffer für Directory</td>
+                    </tr>
+                    <tr>
+                        <td>$02D5- $02F8</td>
+                        <td>ERROR-BUFFER; enthält auszugebende Fehlermeldung</td>
+                    </tr>
+                    <tr>
+                        <td>$02FA</td>
+                        <td>Lo-Byte der Anzahl der freien Blocks auf Diskette</td>
+                    </tr>
+                    <tr>
+                        <td>$02FC</td>
+                        <td>Hi-Byte der Anzahl der freien Blocks auf Diskette</td>
+                    </tr>
+                    <tr>
+                        <td>$0300- $03FF</td>
+                        <td>Puffer 0</td>
+                    </tr>
+                    <tr>
+                        <td>$0400-<br>
+                            $04FF</td>
+                        <td>Puffer 1</td>
+                    </tr>
+                    <tr>
+                        <td>$0500-<br>
+                            $05FF</td>
+                        <td>Puffer 2</td>
+                    </tr>
+                    <tr>
+                        <td>$0600-<br>
+                            $06FF</td>
+                        <td>Puffer 3</td>
+                    </tr>
+                    <tr>
+                        <td>$0700- $07FF</td>
+                        <td>Puffer 4 (enthält normalerweise die BAM)</td>
+                    </tr>
+                    <tr>
+                        <td>$0800“ $FFFF</td>
+                        <td>Nicht mit RAM belegt</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <figcaption>Tabelle 1. Die wichtigsten Zeropageadressen der Floppy</figcaption>
+        </figure>
 
         <h3>Programmieren der Floppy</h3>
 
@@ -124,6 +720,85 @@
 
         <p>Das Programm hat aber einen Schönheitsfehler; es beeinflußt nämlich nicht nur die beiden LED-Bits in Speicherstelle $lC00, sondern löscht beijedem Durchgang auch alle anderen Bits dieses Registers, deren Belegung Sie Tabelle 2 entnehmen können. Für unsere Testzwecke ist diese »Pfuscherei« jedoch unwesentlich.</p>
 
+        <figure>
+            DISKCONTROLLER (DC)
+            <table>
+                <tbody>
+                    <tr>
+                        <td><b>Bit #</b></td>
+                        <td><b>Bedeutung</b></td>
+                    </tr>
+                    <tr>
+                        <td>0</td>
+                        <td>DATA IN</td>
+                    </tr>
+                    <tr>
+                        <td>1</td>
+                        <td>DATA OUT</td>
+                    </tr>
+                    <tr>
+                        <td>2</td>
+                        <td>CLOCK IN</td>
+                    </tr>
+                    <tr>
+                        <td>3</td>
+                        <td>CLOCK OUT</td>
+                    </tr>
+                    <tr>
+                        <td>4</td>
+                        <td>ATN OUT</td>
+                    </tr>
+                    <tr>
+                        <td>5<br>6</td>
+                        <td>GERÄTENUMMER</td>
+                    </tr>
+                    <tr>
+                        <td>7</td>
+                        <td>ATN IN (CB 2)</td>
+                    </tr>
+                </tbody>
+            </table>
+            BUSCONTROLLER (BC)
+            <table>
+                <tbody>
+                    <tr>
+                        <td><b>Bit #</b></td>
+                        <td><b>Bedeutung</b></td>
+                    </tr>
+                    <tr>
+                        <td>0</td>
+                        <td>Steppermotor für Laufwerk 1 (n.v.)</td>
+                    </tr>
+                    <tr>
+                        <td>1</td>
+                        <td>Steppermotor für Laufwerk 0</td>
+                    </tr>
+                    <tr>
+                        <td>2</td>
+                        <td>Laufwerksmotor</td>
+                    </tr>
+                    <tr>
+                        <td>3</td>
+                        <td>LED am Laufwerk (rot)</td>
+                    </tr>
+                    <tr>
+                        <td>4</td>
+                        <td>Schreibschutzkennung</td>
+                    </tr>
+                    <tr>
+                        <td>5<br>6</td>
+                        <td>Bitsynchronisation für DC bei den vier Spurbereichen</td>
+                    </tr>
+                    <tr>
+                        <td>7</td>
+                        <td>SYNC-Signal</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <figcaption>Tabelle 2. Belegung der beiden Controll-Ports der 1541</figcaption>
+        </figure>
+
         <h3>Der »&amp;«-Befehl</h3>
 
         <p>Nach diesem aufregenden Beispiel wollen wir Sie nun mit einem Befehl bekanntmachen, den Sie sehr wahrscheinlich noch nicht kennen. Er nennt sich »&amp;« und wird unverständlicherweise in noch keinem uns bekannten Buch beschrieben. Der &amp;-Befehl entspricht in gewisser Weise einem BLOCK-EXECUTE-Befehl; auch hier wird ein Programm von Diskette geladen und sofort ausgeführt.</p>
@@ -135,6 +810,11 @@
         <p>Haben Sie nur ein einziges Autostartfile auf Diskette, so können Sie es auch nur mit »&amp;« abspeichern und ebenso mit OPENl,8,15,"&amp;" starten.</p>
 
         <p>Leider erwartet die Floppy von Autostartfiles eine spezielle Syntax, die in Tabelle 3 zu sehen ist.</p>
+
+        <figure>
+            TODO
+            <figcaption>Tabelle 3. Aufbau eines &-Files. In dieser Tabelle sind die Linker- beziehungsweise Endekennzeichen, die in den ersten beiden Bytes eines Datenblocks stehen, nicht enthalten, da sie beim Öffnen und Beschreiben eines &-Files automatisch gesetzt werden.</figcaption>
+        </figure>
 
         <p>Als Listing 3 haben wir noch einmal unser LED-Testprogramm; nur wird diese Routine durch das Basic-Programm als &amp;-File auf Diskette geschrieben und kann danach durch den schon erwähnten Befehl direkt von Diskette in den Pufferspeicher geschrieben und dort gestartet werden.</p>
 

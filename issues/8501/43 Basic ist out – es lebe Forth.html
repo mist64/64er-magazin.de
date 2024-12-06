@@ -18,15 +18,6 @@
 
         <p class="intro">Viele sind des Basic überdrüssig geworden. Die Sprache Forth ist eine Afternative. Unsere Einführung in Forth beginnt an einem konkreten Beispiel: der Programmierung des Decompilers.</p>
 
-        <figure>
-            <img src="43-1.png" alt="">
-            <figcaption>Bild 1. Der Aufbau des neuen Wortes »NIP«. Die angegebenen Adressen sind von der Forth-Version und der aktuellen Belegung des Dictionarys abhängig.</figcaption>
-        </figure>
-        <figure>
-            <img src="43-2.png" alt="">
-            <figcaption>Bild 2. Das erste Byte im Namensfeld unter der Lupe</figcaption>
-        </figure>
-
         <p>Vor einiger Zeit erhielt ich ein Programm, das sich nach dem Starten mit »FIG-FORTH« meldete.<br />
             Forth, soviel wußte ich schon, soll eine neue, ungewöhnliche Programmiersprache sein. Nichts Genaues weiß ich nicht. Also gebe ich ein: LIST und RUN und PRINT 5*3 und NEW und &hellip; nichts passierte, außer, daß mein Computer antwortet: »MESS # 0« oder »MESS # 1« oder manchmal auch »OK«. Also erst einmal zur Seite damit &hellip;</p>
 
@@ -60,6 +51,15 @@
             86 F 7D F 33 E 4 44 &hellip; . 3 . . D</p>
 
         <p>Das sieht zunächst etwas wirr aus, doch sind die Bytes bei näherer Betrachtung sinnvoll. Ordnen wir den Speicherdump anders an und ergänzen ihn durch einige Kommentare, dann erhalten wir einen Aufbau wie in Bild 1. Im ersten Byte ist das höchstwertige Bit 7 immer gesetzt, Bit 6 und 5 haben besondere Bedeutung und die Bits 4 bis 0 enthalten die Länge des Namens, hier 3 (Bild 2). Die nächsten drei Byte enthalten dann tatsächlich auch den Namen NIP, nur das Bit 7 des letzten Buchstabens ist wieder gesetzt. Diese 4 Byte bilden das Namensfeld von NIR gekennzeichnet durch die Namens-Feld-Adresse NFA. Die nächsten beiden Bytes sind das Linkfeld, markiert durch die Link-Feld-Adresse LEA. Im Linkfeld steht ein Zeiger auf das Namensfeld eines vorhergehenden Wortes. Die nun folgenden zwei Bytes bilden das Codefeld, adressiert durch die Code-Feld-Adresse CFA. Im Codefeld befindet sich ein Zeiger auf Maschinencode des jeweiligen Mikroprozessors.</p>
+
+        <figure>
+            <img src="43-1.png" alt="">
+            <figcaption>Bild 1. Der Aufbau des neuen Wortes »NIP«. Die angegebenen Adressen sind von der Forth-Version und der aktuellen Belegung des Dictionarys abhängig.</figcaption>
+        </figure>
+        <figure>
+            <img src="43-2.png" alt="">
+            <figcaption>Bild 2. Das erste Byte im Namensfeld unter der Lupe</figcaption>
+        </figure>
 
         <p>Diese drei Felder bilden den Kopf des Wortes. Das Namensfeld dient dem Interpreter zum Wiedererkennen von »NIP«. Mit Hilfe des Linkfeldes findet der Interpreter zum vorhergehenden Wort, und von dort handelt er sich auf die gleiche Art weiter durch das Wörterbuch. Der Inhalt des Codefeldes schließlich bestimmt den Charakter von »NIP«. Es gibt nämlich außer »normalen« Forth-Worten (die durch»:« eingeleitet und mit»;«beendet wurden) noch andere, zum Beispiel »Konstanten« (CONSTANT), »Variable« (VARIABLE) und reine Maschinencodeworte (CODE), wie zum Beispiel »SWAP« und »DROP«. Bei allen »normalen« Worten zeigt der Inhalt des Codefeldes jedoch immer auf denselben kurzen Maschinencode, der bewirkt, daß die im Speicher folgende Liste von Arbeitsanweisungen abgearbeitet wird.</p>
 
