@@ -1,0 +1,128 @@
+;form.eingabe.prg ==0801==
+;Quelle: 8501.D64
+    1 rem" O{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}P
+    2 rem" {CBM-H}  up  -  formatierte eingabe  {CBM-N}
+    3 rem" L{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{SHIFT-@}
+    4 rem" O{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}P
+    5 rem" {CBM-H}  q1  =  zeile der eingabe    {CBM-N}
+    6 rem" {CBM-H}  q2  =  spalte der eingabe   {CBM-N}
+    7 rem" {CBM-H}  q3  =  max. laenge d. eing. {CBM-N}
+    8 rem" {CBM-H}  q4  =  1 _ leereingabe nicht{CBM-N}
+    9 rem" {CBM-H}             erlaubt          {CBM-N}
+   10 rem"{CBM-H}  q5  =  1 _ nur numerische   {CBM-N}
+   11 rem"{CBM-H}             eingabe erlaubt  {CBM-N}
+   12 rem"{CBM-H}  q6  =  1 _ bei numerischer  {CBM-N}
+   13 rem"{CBM-H}             eingabe ist ein  {CBM-N}
+   14 rem"{CBM-H}             punkt erlaubt    {CBM-N}
+   15 rem"{CBM-H}                              {CBM-N}
+   16 rem"{CBM-H}  y3$ =  muss einmal am anfang{CBM-N}
+   17 rem"{CBM-H}         des hauptprogrammes  {CBM-N}
+   18 rem"{CBM-H}         definiert werden. ein{CBM-N}
+   19 rem"{CBM-H}         punktestring, der die{CBM-N}
+   20 rem"{CBM-H}         laenge der laengsten {CBM-N}
+   21 rem"{CBM-H}         eingabe im hauptprog.{CBM-N}
+   22 rem"{CBM-H}         hat. zusaetzlich muss{CBM-N}
+   23 rem"{CBM-H}         am ende des strings  {CBM-N}
+   24 rem"{CBM-H}         das zeichen '_'      {CBM-N}
+   25 rem"{CBM-H}         stehen. beispiel :   {CBM-N}
+   26 rem"{CBM-H}         y3$=''............_''{CBM-N}
+   27 rem"{CBM-H}                              {CBM-N}
+   28 rem"{CBM-H}  y4$ =  wie 'y3$', jedoch    {CBM-N}
+   29 rem"{CBM-H}         werden statt punkte  {CBM-N}
+   30 rem"{CBM-H}         spaces gesetzt. das  {CBM-N}
+   31 rem"{CBM-H}         zeichen '_' entfaellt{CBM-N}
+   32 rem"{CBM-H}         beispiel :           {CBM-N}
+   33 rem"{CBM-H}         y4$=''             ''{CBM-N}
+   34 rem"L{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{SHIFT-@}
+   35 rem"O{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}P
+   36 rem"{CBM-H}  ii  =  laufvariable         {CBM-N}
+   37 rem"{CBM-H}  jj  =  laufvariable         {CBM-N}
+   38 rem"{CBM-H}  q7  =  zaehler, der angibt, {CBM-N}
+   39 rem"{CBM-H}         an welcher stelle ein{CBM-N}
+   40 rem"{CBM-H}         punkt gesetzt wurde  {CBM-N}
+   41 rem"{CBM-H}                              {CBM-N}
+   42 rem"{CBM-H}  y1$ =  inhalt der eingabe   {CBM-N}
+   43 rem"{CBM-H}         wird vom unterprog.  {CBM-N}
+   44 rem"{CBM-H}         an das hauptprog.    {CBM-N}
+   45 rem"{CBM-H}         uebergeben.          {CBM-N}
+   46 rem"{CBM-H}                              {CBM-N}
+   47 rem"{CBM-H}  y2$ =  enthaelt das jeweils {CBM-N}
+   48 rem"{CBM-H}         eingegebene zeichen  {CBM-N}
+   49 rem"L{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{SHIFT-@}
+   50 rem"O{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}P
+   51 rem"{CBM-H}  formatierte eingabe, bei der{CBM-N}
+   52 rem"{CBM-H}  jedes eingegebene zeichen   {CBM-N}
+   53 rem"{CBM-H}  ueberprueft und falls noetig{CBM-N}
+   54 rem"{CBM-H}  zurueckgewiesen werden kann.{CBM-N}
+   55 rem"{CBM-H}  die angegebenen parameter   {CBM-N}
+   56 rem"{CBM-H}  muessen zum teil (q1,q2,q3, {CBM-N}
+   57 rem"{CBM-H}  y3$,y4$) eingegeben werden, {CBM-N}
+   58 rem"{CBM-H}  oder koennen bei bedarf     {CBM-N}
+   59 rem"{CBM-H}  uebergeben werden (q4,q5,q6){CBM-N}
+   60 rem"{CBM-H}  vor dem ruecksprung ins     {CBM-N}
+   61 rem"{CBM-H}  hauptprogramm werden alle   {CBM-N}
+   62 rem"{CBM-H}  parameter auf null gesetzt. {CBM-N}
+   63 rem"{CBM-H}  das ergebnis der eingabe-   {CBM-N}
+   64 rem"{CBM-H}  routine, die eingabe wird in{CBM-N}
+   65 rem"{CBM-H}  der variablen 'y1$' an das  {CBM-N}
+   66 rem"{CBM-H}  hauptprogramm uebergeben.   {CBM-N}
+   67 rem"L{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{SHIFT-@}
+   68 rem
+   69 rem
+   70 rem
+  100 rem   ***************************
+  102 rem   *** formatierte eingabe ***
+  104 rem   *** copyright (c) 1984  ***
+  106 rem   ***    rolf hilchner    ***
+  108 rem   ***   rheydter str.48   ***
+  109 rem   ***     4040 neuss 1    ***
+  110 rem   ***************************
+  120 poke650,255:y1$="":q2=q2-1:poke214,q1:poke211,q2:print"{up}{CBM-I}";right$(y3$,q3)
+  130 forii=1toq3+1
+  140 gety2$:ify2$=""then140
+  150 ifasc(y2$)=20andii>1theny1$=left$(y1$,len(y1$)-1):ii=ii-2:goto250
+  160 ifasc(y2$)=13andii=1andq4=1thengosub280:goto140
+  170 ifasc(y2$)<>13andii=q3+1thengosub280:goto140
+  180 ifasc(y2$)=13goto260
+  190 ifasc(y2$)<32orasc(y2$)>93thengosub280:goto140
+  200 ifq5=1andasc(y2$)=45andii=1goto240
+  210 ifii<=q7thenq7=0:q6=1
+  220 ifq5=1andasc(y2$)=46andq6=1thenq6=0::q7=ii:goto240
+  230 ifq5=1andasc(y2$)<48orq5=1andasc(y2$)>57thengosub280:goto140
+  240 y1$=y1$+y2$
+  250 poke214,q1:poke211,q2:print"{up}";left$(y1$+"{CBM-I}"+y3$,q3)+"_";:nextii
+  260 poke214,q1:poke211,q2:print"{up}";y1$+left$(y4$,q3-len(y1$)+1)
+  270 q1=0:q2=0:q3=0:q4=0:q5=0:q6=0:q7=0:poke650,0:return:'<--- ausgang aus up
+  280 poke54296,15:poke54277,6:poke54278,0:poke54275,8:poke54274,0
+  290 poke54273,92:poke54272,237:poke54276,65:forjj=1to150:nextjj:poke54276,0
+  300 return:'<--- ausgang aus piep-up
+  310 rem"O{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}P
+  320 rem"{CBM-H}beispiel 1 fuer den aufruf : {CBM-N}
+  330 rem"{CBM-H}                             {CBM-N}
+  340 rem"{CBM-H}10 y3$=''.........._'':y4$=''{CBM-N}
+  350 rem"{CBM-H}             ''              {CBM-N}
+  360 rem"{CBM-H}20 print''{clr}'':poke214,5:poke {CBM-N}
+  370 rem"{CBM-H}   211,15:print''{up}name :''   {CBM-N}
+  380 rem"{CBM-H}30 q1=5:q2=23:q3=10:gosub 100{CBM-N}
+  390 rem"{CBM-H}40 print:print''sie heissen''{CBM-N}
+  400 rem"{CBM-H}   ;y1$:end                  {CBM-N}
+  410 rem"{CBM-H}                             {CBM-N}
+  420 rem"{CBM-H}beispiel 2 fuer den aufruf : {CBM-N}
+  430 rem"{CBM-H}                             {CBM-N}
+  440 rem"{CBM-H}10 y3$=''.........._'':y4$=''{CBM-N}
+  460 rem"{CBM-H}20 print''{clr}'':poke214,5:poke {CBM-N}
+  470 rem"{CBM-H}   211,15:print''{up}alter :''  {CBM-N}
+  480 rem"{CBM-H}30 q1=5:q2=24:q3=10:q4=1:    {CBM-N}
+  490 rem"{CBM-H}   q5=1:gosub 100            {CBM-N}
+  500 rem"{CBM-H}40 print:print''sie sind'';  {CBM-N}
+  510 rem"{CBM-H}   val(y1$);''jahre alt'':end{CBM-N}
+  520 rem"{CBM-H}                             {CBM-N}
+  530 rem"{CBM-H}hinweis :                    {CBM-N}
+  540 rem"{CBM-H}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}                    {CBM-N}
+  550 rem"{CBM-H}poke 214,y bewirkt, dass der {CBM-N}
+  560 rem"{CBM-H}cursor in die zeile y springt{CBM-N}
+  570 rem"{CBM-H}                             {CBM-N}
+  580 rem"{CBM-H}poke 211,x bewirkt, dass der {CBM-N}
+  590 rem"{CBM-H}cursor an d. spalte x springt{CBM-N}
+  600 rem"L{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{SHIFT-@}
+

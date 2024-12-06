@@ -1,0 +1,38 @@
+;hi-eddi.prg ==0801==
+;Quelle: 8501.D64
+   50 ifa<2thena=a+2:load"hi-exe",8,1
+   60 ifa=3then150
+   70 ifa=4then650
+  100 input"betriebsart";c:poke780,c:poke56,13:clr:w$="123456":sys3328
+  110 ifpeek(8073)and64thena=3:load"menue",8,1
+  150 sys3337:a=peek(8064)
+  160 ona+1gosub200,250,300,290,400,600,290,290,500,510,300:goto150
+  200 open3,8,0,"$0":get#3,c$,c$
+  210 get#3,c$,c$,l$,h$:ifc$=""thenclose3:wait198,1:return
+  220 print256*asc(h$+chr$(0))+asc(l$+chr$(0));:sys3334:goto210
+  250 print"{clr}{down}sequenz:":print"{down}  "w$:input"{home}{down}{down}{down}";w$:iflen(w$)<2then250
+  290 return
+  300 poke8115,8:print"{clr}{down}g=grafikbild":ifpeek(8073)>127thenprint"f=farbbild"
+  310 print"s=sprite":print"z=zeichensatz":print"{down} -->";
+  320 getc$:ifc$<>"g"andc$<>"f"andc$<>"s"andc$<>"z"then320
+  330 printc$:poke780,asc(c$):h$=w$:input"{down}filename";w$:sys3331:w$=h$:h$=""
+  340 open1,8,15,h$:input#1,a,h$:printa;h$:ifa>0thenwait198,1
+  350 close1:return
+  400 poke631,34:poke198,1:h$="":input"{clr}{down}";h$:goto340
+  500 a=8075:goto520
+  510 a=8079
+  520 d=peek(8074):c=peek(a+d):print"{clr}{down}f"2*d+1:print"schrittweite:"c,
+  530 inputc:ifc<1orc>160then530
+  540 pokea+d,c:return
+  600 input"{clr}{down}nummer 1.bild";d:c=(dand7)
+  610 input"{down}nummer 2.bild (0=nur 1 bild)";d:c=c+8*(dand7):ifd>0thenc=c+64
+  620 ifd=0thenprint"{down}gross";:gosub800:ifc$="j"thenc=c+128
+  630 print"{down}drucken";:gosub800:ifc$="n"then660
+  640 ifa=5thena=4:load"hi-print",8,1
+  650 poke780,c:sys3328:print"{down}nochmal";:gosub800:ifc$="j"then600
+  660 ifa=5thenreturn
+  670 a=1:goto50
+  800 print" ? (j/n)";
+  810 getc$:ifc$<>"j"andc$<>"n"then810
+  820 printc$:return
+

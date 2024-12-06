@@ -18,26 +18,23 @@
 
         <p class="intro">In dieser Folge beschäftigen wir uns das erste Mal mit dem DOS der Floppystation. Wir wollen uns die Technik der Diskettenaufzeichnung ansehen und die Funktionsweise des DOS genauer unter die Lupe nehmen.</p>
 
-        <figure>
-            <img src="148-1.png" alt="">
-            <figcaption>Bild 1. Aufbau einer formatierten Diskette</figcaption>
-        </figure>
-        <figure>
-            <img src="148-2.png" alt="">
-            <figcaption>Bild 2. Aufbau eines Sektors</figcaption>
-        </figure>
-        <figure>
-            <img src="148-3.png" alt="">
-            <figcaption>Bild 3. Schematischer Aufbau der 1541</figcaption>
-        </figure>
-
         <p>Zuerst wollen wir uns mit dem Aufzeichnungsformat der Diskette beschäftigen: Für einen einwandfreien Betrieb der Floppystation ist es unumgänglich, daß sich Markierungen auf der Diskette befinden. Diese Markierung braucht das Laufwerk, um bestimmte Daten schnell finden zu können. Hierfür gibt es prinzipiell zwei Möglichkeiten: die Hardsektorierung und die Softsektorierung.</p>
 
         <p>Hardsektorierte Disketten erkennt man daran, daß diese eine ganze Anzahl von Indexlöchern besitzen. Damit sind die kleinen Löcher nahe am Innenrand der Magnetscheibe gemeint. Mit einer Fotozelle können nun diese Löcher abgetastet werden, um die jeweilige Position der Diskette festzustellen. Dieses Verfahren hat den Vorteil, daß die Diskettenkapazität voll ausgenutzt werden kann. Es können so bis zu 5 MBytes Daten auf eine 5¼-Zoll-Diskette geschrieben werden. Allerdings erfordert diese Methode einen enormen Hardwareaufwand, der den Preis in die Höhe schnellen läßt. Für preiswerte Laufwerke (wie die 1541) geht man daher einen anderen Weg: die Softsektorierung. Hier besitzt die Diskette nur ein Indexloch zur Drehzahlüberwachung. Bei der 1541 ist sogar noch nicht einmal dieses erforderlich. Die notwendigen Markierungen werden beim Formatierungsvorgang softwaremäßig auf die Diskette aufgebracht, wobei natürlich wertvoller Speicherplatz verloren geht. Softsektorierte Disketten im 5¼-Zoll-Format verfügen daher über zur Zeit maximal 1 MByte Speicherkapazität.</p>
 
         <p>Uns soll also im weiteren die Softsektorierung beschäftigen, wobei in Bild 1 eine Diskette schematisch dagestellt ist, nachdem sie auf der 1541 formatiert wurde. Sie ist in 35 konzentrische Spuren, nachfolgend Tracks genannt, aufgeteilt. Jeder dieser Tracks enthält wiederum eine bestimmte Anzahl von Sektoren, die von außen nach innen abnimmt. Diese Tatsachen sind Ihnen aber schon aus der ersten Folge bekannt. Nun wollen wir genauer auf den Aufbau der Sektoren einer Diskette eingehen.</p>
 
+        <figure>
+            <img src="148-1.png" alt="">
+            <figcaption>Bild 1. Aufbau einer formatierten Diskette</figcaption>
+        </figure>
+
         <p>Jeder Sektor besteht aus einem Blockheader und dem dazugehörigen Datenblock; eine schematische Darstellung zeigt Bild 2. Angeführt werden die Sektoren einer Diskette von den schon erwähnten Markierungen, die der Orientierung dienen. Diese Marken bezeichnet man als Synchron (SYNC)-Markierungen, sie bestehen aus mehreren $FF auf der Diskette. Erkennt der Schreib-/Lesekopf der Floppy also eine solche Marke, dann »weiß« die Foppystation, daß entweder ein Blockheader oder ein Datenblock nachfolgt. Nun müssen wir nur noch diese beiden voneinander unterscheiden können.</p>
+
+        <figure>
+            <img src="148-2.png" alt="">
+            <figcaption>Bild 2. Aufbau eines Sektors</figcaption>
+        </figure>
 
         <p>Hierzu dient das nächste Kennzeichen auf Diskette. Es folgt direkt nach der SYNC-Markierung und meldet dem Diskcontroller (DC) ob ein Blockheader oder ein Datenblock vorliegt. Hat das Kennzeichen den Wert $08, so handelt es sich um einen Blockheader; findet der Kopf hingegen den Wert $07, so handelt es sich um den Beginn eines Datenblocks.</p>
 
@@ -94,11 +91,19 @@
 
         <p>Wie Sie sehen, stellt das DOS eine ziemlich komplizierte Einheit dar, deren Schema in Bild 3 zu sehen ist.</p>
 
-        <p>
-        <aside><br />
-            Wie Sie vielleicht bemerkt haben, ist uns in Folge 2 ein Fehler unterlaufen. Das abgedruckte Listing 6 wäre eigentlich Listing 5 gewesen. Als tatsächliches Listing 6 liefern wir Ihnen heute das Directory-Sortierprogramm nach, das Sie in Listing 1 abgedruckt finden.<br />
+        <figure>
+            <img src="148-3.png" alt="">
+            <figcaption>Bild 3. Schematischer Aufbau der 1541</figcaption>
+        </figure>
+
+        <aside>
+            <p>Wie Sie vielleicht bemerkt haben, ist uns in Folge 2 ein Fehler unterlaufen. Das abgedruckte Listing 6 wäre eigentlich Listing 5 gewesen. Als tatsächliches Listing 6 liefern wir Ihnen heute das Directory-Sortierprogramm nach, das Sie in Listing 1 abgedruckt finden.</p>
         </aside>
-        </p>
+
+        <figure>
+            <pre data-filename="floppyk.listing1" data-name="Directory sortieren"></pre>
+            <figcaption>Listing 1. Dieses Listing fehlte in Ausgabe 11/84</figcaption>
+        </figure>
 
         <p>Wollen wir also in dieses System einsteigen, um dort eigene Programme ausführen zu lassen, so ist es natürlich unerläßlich, daß wir die »Spielregeln« dieses Prozessorsystems genau kennen, da es sonst leicht zu kleinen Katastrophen kommen kann.</p>
 
@@ -712,6 +717,11 @@
 
         <p>Es handelt sich um Listing 2. Dieses »Miniprogramm« schreiben wir in den Puffer 0 der Floppy, das heißt ab Adresse $0300. Das Basic-Programm haben wir der Kürze halber gleich an den Assemblercode angehängt. Wenn Sie das Programm starten, wird das Bit abgefragt, das beim DC für den Zustand der Schreibschutzplakette verantwortlich ist. Sie werden vielleicht wissen, daß die Floppy die Schreibschutzkerbe bei den Disketten mit Hilfe einer Lichtschranke abfragt. Ist die Lichtschranke unterbrochen, das heißt es liegt eine Diskette mit Schreibschutzaufkleber im Laufwerk, dann steht das entsprechende Bit auf 0.</p>
 
+        <figure>
+            <pre data-filename="led-test_l2" data-name="Floppy-Maschinenprogramm"></pre>
+            <figcaption>Listing 2. Unser erstes Floppy-Maschinenprogramm</figcaption>
+        </figure>
+
         <p>Unser Programm schiebt nun einfach das Bit der Lichtschranke an die Stelle des Bits für die rote LED und speichert diesen Wert wieder ab. Starten Sie einmal unser kleines Programm, dann werden Sie feststellen, daß die Leuchtdiode am Laufwerk erlischt, wenn die Lichtschranke unterbrochen wird. Holen Sie die Diskette dagegen aus dem Laufwerk oder legen Sie eine Diskette ohne Schreibschutzplakette ein, so beginnt die rote LED zu leuchten.</p>
 
         <p>Mit diesem Programm können Sie also testen, ob von Ihnen selbst angefertigte Schreibschutzkerben in der Diskettenhülle an der richtigen Stelle liegen, um eine Diskette eventuell doppelseitig benutzen zu können.</p>
@@ -845,6 +855,11 @@
 
         <p>Als Listing 3 haben wir noch einmal unser LED-Testprogramm; nur wird diese Routine durch das Basic-Programm als &amp;-File auf Diskette geschrieben und kann danach durch den schon erwähnten Befehl direkt von Diskette in den Pufferspeicher geschrieben und dort gestartet werden.</p>
 
+        <figure>
+            <pre data-filename="und-generator" data-name="&-Generator"></pre>
+            <figcaption>Listing 3. So macht man Listing 2 zu einem »&-File«</figcaption>
+        </figure>
+
         <p>Zu Tabelle 3 noch einige Anmerkungen:</p>
 
         <p>Zuerst muß die Startadresse des Programms im Pufferspeicher der Floppy in das File geschrieben werden. Danach folgt die Anzahl der Bytes im Programm. Jetzt werden die Programmbytes abgespeichert, und schließlich folgt noch eine Prüfsumme, die sich wie folgt errechnet:</p>
@@ -867,6 +882,11 @@
         <p>»RECORD NOT PRESENT« erscheint, wenn die Prüfsumme nicht stimmt.</p>
 
         <p>Da wir stets darum bemüht sind, Ihnen die Arbeit mit der Floppy so angenehm wie möglich zu machen, haben wir unserem Artikel noch Listing 4 beigefügt. Es handelt sich hier um ein Programm, das es Ihnen gestattet, auf einfachste Weise &amp;-Files zu erstellen. Diese können sogar länger als 256 Byte sein, da das Programm dann automatisch eine Prüfsumme und die Anschlußadresse einfügt. Ununterbrochene &amp;-Files, die länger als 256 Zeichen sind, kann es ja nicht geben, da die Anzahl der Programmbytes im File nur in einem Byte abgespeichert wird.</p>
+
+        <figure>
+            <pre data-filename="auto-&-maker" data-name="Auto-&-Maker"></pre>
+            <figcaption>Listing 4. Komfortable »&-Files« erzeugen</figcaption>
+        </figure>
 
         <p>Mit dieser neuen Fileart wollen wir Sie für dieses Mal entlassen. Ruhen Sie sich für die nächste Folge aus. Wir werden dann auf die Technik der Jobschleifenprogrammierung eingehen, die Ihnen eine Fülle von Anwendungen eröffnen wird.</p>
 

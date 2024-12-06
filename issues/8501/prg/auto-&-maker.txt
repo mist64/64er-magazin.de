@@ -1,0 +1,42 @@
+;auto-&-maker.prg ==0801==
+;Quelle: 8501.D64
+  100 rem auto-'&'-maker
+  110 rem --------------
+  120 rem
+  130 rem  03.11.84.  boris schneider
+  140 :
+  150 :
+  160 rem initialisierung
+  170 input"startadresse des &-files";sa
+  180 input"name des &-files";na$
+  190 if len(na$)>15 then 180na$
+  200 open1,8,2,"&"+na$+",u,w"
+  210 dimx(256)
+  220 print"bitte geben sie jetzt ihre daten ein"
+  230 print"abschluss mit -1!"
+  240 :
+  250 rem dateneingabe und test auf
+  260 rem ueberlauf
+  270 y=1
+  280 inputx(y)
+  290 ifx(y)<0theny=y-1:goto 350
+  300 pr=pr+x(y):ifpr>255then pr=pr-255
+  305 y=y+1:ify>254 then 350
+  310 goto 280
+  320 :
+  330 rem abspeichern der vorhandenen
+  340 rem daten in das usr-file
+  350 sh=int(sa/256)
+  360 sl=sa-256*sh
+  370 pr=pr+sh+sl+y
+  380 print#1,chr$(sl);chr$(sh);
+  390 print#1,chr$(y);
+  400 fori=1toy
+  410 print#1,chr$(x(i));
+  420 next
+  430 pr=pr-(255*int(pr/256))
+  440 print#1,chr$(pr);
+  450 if x(y+1)<0thengoto470
+  460 sa=sa+y:pr=0:goto270
+  470 close1
+

@@ -1,0 +1,132 @@
+;hypra.load-track.prg ==0801==
+ 1000 clr
+ 1010 rem
+ 1020 rem ********************************
+ 1030 rem ***                          ***
+ 1040 rem ***       hypra-load         ***
+ 1050 rem *** mit 0 bloecken auf disk  ***
+ 1060 rem ***                          ***
+ 1070 rem ***          by              ***
+ 1080 rem ***    uwe schoenewolf       ***
+ 1090 rem ***    guenther reimuth      ***
+ 1100 rem ***                          ***
+ 1110 rem ********************************
+ 1120 rem
+ 1130 poke53280,0:poke53281,6
+ 1140 na$=chr$(130)+chr$(18)+chr$(3)
+ 1150 nb$=",8:"
+ 1160 print"{clr}{wht}{down}  hypra load mit 0 blocks auf diskette"
+ 1170 print"{down}          {gry3}von: uwe schoenewolf"
+ 1180 print"          {gry3}     guenther reimuth{yel}"
+ 1190 a$="":input"{down}{down}{down} hypra load auf diskette schreiben{rght}{rght}  j{left}{left}{left}";a$
+ 1200 ifa$="j"thenprint"{down}{down}":goto1220
+ 1210 sys64738
+ 1220 open1,0
+ 1230 n$="":print"{up}{up}{down}{rght}{rght}file name max. 1-12 >hypra load{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}";:input#1,n$
+ 1240 la=len(n$)
+ 1250 close1
+ 1260 ifla>12orla<1then1220
+ 1270 open1,8,15
+ 1280 open2,8,2,n$
+ 1290 input#1,a
+ 1300 close2
+ 1310 close1
+ 1320 ifa=0thenprint:print"{down}{down} {rvon} file schon vorhanden {rvof}":goto1670
+ 1330 na$=na$+n$+chr$(160)+nb$
+ 1340 la=len(na$)
+ 1350 fori=19-lato1step-1
+ 1360 na$=na$+chr$(160)
+ 1370 next
+ 1380 fori=1to12
+ 1390 na$=na$+chr$(0):next
+ 1400 rem *********************
+ 1410 rem * test auf freiraum *
+ 1420 rem * fuer hypra-load   *
+ 1430 rem *********************
+ 1440 t=18:s=1:y=1
+ 1450 open1,8,15
+ 1460 open2,8,2,"#"
+ 1470 print#1,"u1 2 0";t;s
+ 1480 print#1,"b-p";2;0
+ 1490 get#2,t1$:ift1$=""thent1$=chr$(0)
+ 1500 get#2,s1$:ifs1$=""thens1$=chr$(0)
+ 1510 t1=asc(t1$):s1=asc(s1$)
+ 1520 ift1<>0thent=t1:s=s1:y=y+1:goto1470
+ 1530 ify>12thenprint:print"{down}{down} {rvon} kein platz mehr auf diskete {rvof}":goto1570
+ 1540 close2
+ 1550 close1
+ 1560 goto1630
+ 1570 close2
+ 1580 close1
+ 1590 goto1670
+ 1600 rem *****************************
+ 1610 rem * h-load auf disk schreiben *
+ 1620 rem *****************************
+ 1630 gosub1730
+ 1640 gosub2010
+ 1650 print
+ 1660 print"{down} fertig"
+ 1670 print"{down} weiter mit [ space ]"
+ 1680 geta$:ifa$=""then1680
+ 1690 goto1130
+ 1700 rem ******************
+ 1710 rem * name schreiben *
+ 1720 rem ******************
+ 1730 t=18:s=1:y=1
+ 1740 open1,8,15
+ 1750 open2,8,2,"#"
+ 1760 print#1,"u1 2 0";t;s
+ 1770 print#1,"b-p";2;0
+ 1780 get#2,t1$:ift1$=""thent1$=chr$(0)
+ 1790 get#2,s1$:ifs1$=""thens1$=chr$(0)
+ 1800 t1=asc(t1$)
+ 1810 s1=asc(s1$)
+ 1820 forq=0to7
+ 1830 print#1,"b-p";2;q*32+2
+ 1840 get#2,x$
+ 1850 ifx$=""thenx$=chr$(0)
+ 1860 ifasc(x$)=0then1960
+ 1870 next
+ 1880 ift1<>0thent=t1:s=s1:y=y+1:goto1760
+ 1890 ify>12thenprint:print"{down}{down} {rvon}zuviele files auf der diskette{rvof}":goto1990
+ 1900 ifq<8then1960
+ 1910 print#1,"b-p";2;0
+ 1920 print#2,chr$(t)+chr$(s+3);
+ 1930 print#1,"u2 2 0";t;s
+ 1940 s=s+3
+ 1950 print#1,"u1 2 0";t;s
+ 1960 print#1,"b-p";2;q*32+2
+ 1970 print#2,na$;
+ 1980 print#1,"u2 2 0";t;s
+ 1990 close2:close1:return
+ 2000 rem *********************
+ 2010 rem * datas abspeichern *
+ 2020 rem *********************
+ 2030 restore
+ 2040 open1,8,15
+ 2050 open2,8,2,"#"
+ 2060 fors=3to15step3
+ 2070 print#1,"b-p 2 0"
+ 2080 a$="":a$=a$+chr$(18)+chr$(s+3)
+ 2090 print#2,a$
+ 2100 print#1,"b-p 2 2"
+ 2110 a$=""
+ 2120 en=253
+ 2130 ifs=3thenprint#2,chr$(1);chr$(8);:en=251
+ 2140 fori=0toen
+ 2150 readx
+ 2160 a$=a$+chr$(x)
+ 2170 next
+ 2180 print#2,a$;
+ 2190 print#1,"u2 2 0 18";s
+ 2200 next
+ 2210 print#1,"b-p 2 0"
+ 2220 a$="":a$=a$+chr$(0)+chr$(170)
+ 2230 fori=1to170
+ 2240 readx
+ 2250 a$=a$+chr$(x)
+ 2260 next
+ 2270 print#2,a$;
+ 2280 print#1,"u2 2 0 18";s
+ 2290 close2:close1:return
+
