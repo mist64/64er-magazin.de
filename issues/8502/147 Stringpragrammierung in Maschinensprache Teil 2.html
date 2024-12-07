@@ -1,0 +1,125 @@
+<h1>Stringpragrammierung in Maschinensprache Teil 2</h1>
+
+<p class="intro">Hier ist ein weiterer Beitrag über effektives Programmieren. Auch er beschäftigt sich mit Strings und enthält einige neue T1ps zur Garbage Collection.</p>
+
+<p>Diesmal geht es darum, wie man Stringfunktionen selbst programmieren kann. Hierbei werden wir streng darauf achten, die Müllstrings im Zaum zu halten, um unserem »Erzfeind«, der Garbage Collection, wenig Arbeit zu lassen.</p>
+
+<h3>Noch einmal: Garbage Collection</h3>
+
+<p>Ich möchte aber vorher noch etwas richtigstellen, was ich in der letzten Ausgabe wohl nicht klar genug ausgedrückt habe. Von vielen Leuten hört man den Vorschlag, ab und zu per FRE(0) eine Garbage Collection auszulösen, um ein Ansammeln von Müllstrings und eine lange Garbage Collection zu vermeiden.</p>
+
+<p>Wer allerdings den Beitrag aus der letzten Ausgabe aufmerksam gelesen hat, wird mir zustimmen: Dies ist absolut falsch! Denn die Dauer der Garbage Collection richtet sich ja hauptsächlich nach der Anzahl der definierten Strings und nicht nach der der Müllstrings. Die von Hand ausgelöste Garbage Collection ist also nur unwesentlich kürzer als die automatisch durchgeführte. Jede von Hand ausgelöste Müllabfuhr ist damit unnötig und kostet nur Zeit! Also: Lieber sehr viel Müll ansammeln lassen und dafür mit möglichst wenig Stringvariablen arbeiten. Eine Ausnahme ist natürlich klar. Sollten Sie zeitkritische Teile in einem Programm haben, in denen Sie sich gar keine Garbage Collection erlauben können, so lohnt es sich, kurz vorher PRINT FRE(0) einzugeben.</p>
+
+<h3>Problem: Strings auffüllen</h3>
+
+<p>Vielleicht haben auch Sie in einigen Programmen diese oder eine ähnliche Zeile entdeckt:<br/>
+170 IF LEN(A$)&lt;40 THEN A$=A$+&ldquo; &rdquo;: GOTO 170</p>
+
+<p>Die Bedeutung ist klar: Hier soll der String A$ auf 40 Zeichen Länge aufgefüllt werden. Aber schon jetzt müßte es Ihnen eiskalt den Rücken herunterlaufen. Angenommen, A$ hätte zu Anfang 20 Zeichen, dann werden mindestens 20 Müllstrings durch die ständige Zuweisung erzeugt. Sollte diese Auffüllung öfter durchgeführt werden, darf man sich nicht wundern, wenn bald der ganze Speicher voll ist.</p>
+
+<p>Eine weitere Lösung sieht meist so aus:<br/>
+10 H$ = &ldquo;40 * space&rdquo;<br/>
+170 A$ = A$ + LEFT$(H$,40-LEN (A$))</p>
+
+<p>Schon sehr viel besser! Es entstehen zwei Müllstrings (der alte Wert von A$ und einer, der durch die LEFT$-Funktion entsteht und nur Leerzeichen enthält). Es wird außerdem eine Variable H$ benötigt.</p>
+
+<p>Kurz ein paar Worte zur Entstehung des zweiten Müllstrings. Stringfunktionen werden über einen String-Stack abgewickelt. Auf diesem werden die Stringdescriptoren der Zwischenergebnisse bei längeren Stringoperationen abgelegt. In unserem Fall wird zuerst der A$-Descriptor auf diesen String-Stack gelegt, dann der LEFT$-String erstellt und dessen Descriptor abgelegt. Danach erst wird die »+ «-Verknüpfung durchgeführt, die einen neuen String erstellt. Die beiden Descriptoren werden vom String-Stack entfernt, und die zugehörigen Strings finden sich als Müll im Speicher wieder. Das Prinzip des String-Stacks ermöglicht eine hierarchische Abarbeitung von Stringfunktionen. Es gilt dabei die Regel:</p>
+
+<p>Erst LEFT$, RIGHT$, MID$, dann + ähnlich dem »Punkt vor Strich« aus der Mathematik.</p>
+
+<p>Deswegen dürfen auch bei Stringoperationen Klammern gesetzt werden.</p>
+
+<p>Wir werden uns im folgenden nicht mehr mit dem String-Stack beschäftigen, weil Sie ihn bei selbstprogrammierten Funktionen wohl nie benötigen werden. Außerdem ist der Umgang mit ihm nicht ganz so einfach, wie es im ersten Augenblick klingt.</p>
+
+<p>Nun aber zu unserem Beispiel. Will man auf der Basic-Ebene ohne PEEK und POKE arbeiten, ist die zweite Lösung die effektivste. Aber ich gebe mich, unersättlich wie ich bin, immer noch nicht zufrieden, denn es geht 1. noch etwas schneller und 2. mit nur einem einzigen Müllstring.</p>
+
+<p>Dazu müssen wir aber auf die Maschinensprachen-Ebene herunter. Werfen Sie mal einen Blick auf Listing 1.</p>
+
+<p>Diese FORMAT-Routine simuliert einen neuen Basic-Befehl. FORMAT füllt einen String mit Leerzeichen, bis eine definierte Länge erreicht ist. Wenn ein String länger ist, wird er abgeschnitten. Der Aufruf muß allerdings über einen SYS-Befehl erfolgen. Steht FORMAT beispielsweise im Kassettenpuffer, so führt<br/>
+CLR: SYS 826 (A$,250,A$)<br/>
+dazu, daß A$ 250 Leerzeichen enthält.</p>
+
+<p>A$ = &ldquo;HALLO&rdquo;: SYS 826 (A$,10,B$)<br/>
+läßt A$ wie es war, B$ enthält aber »HALLO« und 5 angehängte Leerzeichen, hat also die Länge 10.</p>
+
+<p>A$ = &ldquo;TEST&rdquo;:N = l:SYS 826 (A$, N,B$(0))<br/>
+hinterläßt in B$(0) ein einsames T, der Rest wird abgeschnitten.</p>
+
+<p>Zusammengefaßt läßt sich also sagen, daß bei der Parameterübergabe:<br/>
+(Stringl, N, String2)<br/>
+in String2 genau N Zeichen aus Stringl stehen, und daß gegebenenfalls String2 mit Leerzeichen aufgefüllt wird.</p>
+
+<p>Nur wenn »Stringl« den gleichen Namen hat wie »String2«, entsteht ein Müllstring, nämlich der alte Inhalt der Stringvariablen. Für die, die es nun gar nicht mehr erwarten können, dieses Programm auszuprobieren, gibt es in Listing 2 einen Basic-Lader. Listing 1 kann direkt mit einem Assembler oder auch mit dem SMON eingegeben werden. Anhand dieses Programms, das alle wichtigen ROM-Routinen, die mit Strings zu tun haben, aufruft, wollen wir nun die Programmierung solcher Routinen erarbeiten.</p>
+
+<h3>FORMAT analysiert</h3>
+
+<p>Nehmen wir uns erst einmal die grundsätzliche Funktionsweise von FORMAT vor. Ein einfaches Flußdiagramm ist in Bild 1 dargestellt. Dieszeigt aber nur die Verfahrensweise von FORMAT Die eingebauten Sicherheitsüberprüfungen sind hier nicht enthalten. Bekannt sind am Start der Stringl, seine Länge 1 und die gewünschte Länge des String2.</p>
+
+<p>Im ersten Schritt werden N Bytes für den String2 reserviert. Sodann werden solange Zeichen vom Stringl in den String2 kopiert, bis entweder der Stringl komplett kopiert wurde, oder der String2 schon voll ist. Im ersten Fall wird dann in einer zweiten Schleife der String2 mit Leerzeichen aufgefüllt. Ganz zum Schluß wird der Descriptor der zweiten Stringvariablen auf den String2 gerichtet. Das klingt alles ganz einfach, die Realisierung nach diesem Schema ist jedoch etwas umfangreicher.</p>
+
+<h3>Parameterübergaben</h3>
+
+<p>Sehen wir uns nun die ersten Zeilen des Listing 1 an. Der erste Befehl ist ein Sprung nach $AEFA. Dort steht eine ROM-Routine, die überprüft, ob als nächstes Zeichen ein »(« folgt. Dies ist an sich nicht notwendig, trägt aber erheblich zur Übersichtlichkeit solcher Routinen bei. Fehlt das »(«, so wird SYNTAX ERROR ausgegeben.</p>
+
+<p>Die nächsten zwei Sprungbefehle gehören zusammen. $AD9E wertet einen beliebigen Term, Zahlenrechnung oder String aus und hinterläßt wichtige Parameter für $B79E. Diese Routine prüft, ob der vorherige Term ein String war, und stellt dann im X-Register die LO- und im Y-Register die HI-Adresse des resultierenden Strings, sowie im Akku die Länge des Strings bereit. Diese beiden Sprungbefehle werten auch Ausdrücke wie LEFT$(A$ + B$,8) oder ähnliche aus, so daß auch solche Ausdrücke an selbstentwickelte Routinen weitergegeben werden können. Auch können Array-Werte wie A$(14) übergeben werden, ohne daß eine Spezialbehandlung nötig wäre. TYPE MISMATCH und ähnliche Fehlermeldungen werden vollautomatisch ausgegeben.</p>
+
+<p>Die soeben gewonnenen Parameter des ersten Strings werden nun zwischengespeichert. $AEFD prüft auf ein Komma, und verhält sich ansonsten genauso wie $AEFA.</p>
+
+<p>Mit $B79E wird ein Ein-Byte-Wert, das heißt eine Zahl zwischen 0 und 255, in das X-Register geholt. Bei größeren Zahlen wird ILLEGAL QUANTITY angezeigt. Auch hier dürfen wieder Berechnungen oder Variablen stehen.</p>
+
+<p>Damit wäre die Parameterübergabe vorläufig beendet, die weiteren Parameter für String2 besorgen wir uns erst, wenn wir sie tatsächlich brauchen.</p>
+
+<h3>Erstellen von String2</h3>
+
+<p>Erinnern wir uns noch einmal an den Artikel aus der letzten Ausgabe. Dort wurde gesagt, daß Strings im Speicher von oben nach unten wachsen, während es beim Programm und bei den Variablen genau umgekehrt ist.</p>
+
+<p>An sich müßten wir nun an der unteren Grenze der Strings genügend Bytes für String2 durch Verändern der entsprechenden Pointer herstellen. Es geht aber auch einfacher. $B47D reserviert so viele Bytes an der entsprechenden Stelle, wie ihr im Akku übergeben werden. Es wird sogar, wenn nötig, eine Garbage Collection durchgeführt, und schlimmstenfalls OUT OF MEMORY angezeigt, falls der Speicherplatz nicht reicht. Nach dem Aufruf der Routine $B47D stehen in den Bytes $62/$63 die Startadressen für den neuen String und in $61 dessen Länge, die wir ja festgelegt haben. Wenn Sie genauer hinschauen, bemerken Sie, daß dies schon der komplette Descriptor ist, der später nur noch in die Stringvariable, die String2 enthalten soll, einkopiert werden muß. Somit ist es recht einfach, String2 zu erstellen, da wir ja jetzt seinen Bestimmungsort kennen und die Länge für spätere Vergleiche zwischengespeichert wurde. Diese Routine ist wohl der Kernpunkt eines jeden Maschinenprogramms, das Strings verwalten soll.</p>
+
+<p>Nun folgen zwei Schleifen, die genauso aufgebaut sind, wie die entsprechenden Teile im Flußdiagramm. Die erste kopiert Zeichen von Stringl in String2, die zweite füllt String2 mit Leerzeichen auf.</p>
+
+<p>Sollten Sie die etwas unlogische Struktur oder die beiden unbedingten Sprünge BNE nach den Inkrementanweisungen stören: Dieses Programm durfte, damit es frei verschiebbar ist, keine JMP-Befehle enthalten. Außerdem werden ohne Spezialabfrage sämtliche Sonderfälle (Länge eines oder beider Strings gleich Null) berücksichtigt.</p>
+
+<h3>Parameterübergabe II</h3>
+
+<p>Nachdem String2 fertiggestellt wurde, folgt der abschließende Teil, der den Descriptor von String2 in die entsprechende Stringvariable hineinkopieren soll.</p>
+
+<p>Doch zuerst wieder der Test auf ein Komma. Die Routine $B08B nimmt die Schlüsselposition in der Übergabe von Strings an den Basic-Text ein. Sie versucht eine Variable im Speicher und gibt deren Adresse im Akku (LO-Byte) und Y-Register (HI-Byte) zurück. Leider funktioniert diese Routine auch mit numerischen Variablen. Die nächsten beiden Befehle fangen diesen Fall ab. In der Zelle $0D steht (handelt es sich um eine Zahl), $00, bei einem String $FF. Haben wir keine Stringvariable vor uns, so müssen wir selber in die Routine springen, die TYPE MISMATCH ERROR ausgibt ($AD 99). Falls eine gesuchte Variable noch nicht existiert, wird sie in der Routine $B08B angelegt.</p>
+
+<p>Anschließend speichern wir in den zwei nun überflüssig gewordenen Speicherstellen $FB/ $FC die Adresse der Variablen ab. Dies ist an sich nicht die genaue Adresse der Variablen, sondern, zu unserem Glück, die Adresse, an der der Stringdescriptor stehen muß. Im vorletzten Schritt kopieren wir also den schon lange vorhandenen Descriptor in die entsprechenden Speicherstellen. Somit ist die Arbeit faktisch beendet, und wir prüfen noch, weil’s ordentlicher aussieht, ob auch ein »)« vorhanden ist. Dadurch, daß wir mit JMP springen, ersparen wir uns auch noch ein RTS, das ja am Ende der Klammerzu-Betriebssystem-Routine steht.</p>
+
+<p>Ich glaube, daß ich mit diesem Beispiel das angenehme mit dem nützlichen verbunden habe, und hoffe, daß Sie jetzt sowohl ein wenig schlauer, als auch um ein nützliches Programm reicher sind.</p>
+
+<h2>So nicht!</h2>
+
+<p>Bevor noch einmal alle wichtigen ROM-Routinen zusammengefaßt werden, möchte ich Ihnen ein Beispiel geben, wie man sehr leicht Fehler in eine Stringfunktion einbauen kann, die nicht sofort erkennbar sind. Auch hier ist ein Blick auf die Garbage Collection angebracht.</p>
+
+<p>Wie oben schon erklärt wurde, erzeugt die Zuweisung<br/>
+B$ = LEFT$(A$,3)<br/>
+einen zweiten String, der nur die drei ersten Zeichen von A$ enthält und auf den Descriptor von B$ zeigt. Manche Leser mögen jetzt folgende Ideen haben:</p>
+
+<p>Theoretisch ist es ja nicht notwendig, einen zweiten String mit den drei Zeichen zu erstellen. Vielmehr könnte man ja den Descriptor von B$ auf dieselbe Position wie den von A$ zeigen lassen. Im B$-Descriptor wird dann die Stringlänge 3 angegeben, während die in A$ gleich bleibt.</p>
+
+<p>Sodann wäre der Teilstring B$ in A$ enthalten und müßte nicht noch einmal im Speicher stehen. Ähnliches ließe sich auch mit den Routinen erreichen, die dann RIGHT$ und MID$ ersetzen.</p>
+
+<p>Doch vielleicht ahnt der eine oder andere unter Ihnen schon den Haken an dieser Geschichte. Es ist wieder einmal (was sonst) die Garbage Collection, die uns einen Strich durch die Rechnung macht.</p>
+
+<p>Findet, aus welchem Grund auch immer, eine Garbage Collection statt, so passiert folgendes: A$ und B$ zeigen auf denselben Stringdescriptor. Je nachdem welcher String als erster im Programm definiert wurde, wird einer der beiden zuerst aufgeräumt, nehmen wir mal an, es sei B$. Wenn B$ nun aufgeräumt ist, wird sein Inhalt an die aktuelle »Aufräumgrenze« hochkopiert. Diese aktuelle Aufräumgrenze kann allerdings so ungünstig hegen, daß A$ von B$ teilweise überschrieben wird. Im nächsten Aufräumschritt würde A$ nicht an die aktuelle Aufräumgrenze hoch, sondern unter sie herunter kopiert und somit weitere Stnngs zerstört&hellip; Dieses Spielchen würde sich dann bis zum Ende der Garbage Collection hinziehen. (Oder bis einmal tatsächlich Müllstrings an den kritischen Stellen stehen, die ja überschrieben werden dürfen).</p>
+
+<p>Zugegeben, ich habe mir gerade den Worst Case, den allerschlimmsten Fall, herausgesucht. Er zeigt aber ganz deutlich folgende Grundregel, die beim Programmieren von Stringfunktionen beachtet werden soll:</p>
+
+<p>Zwei Stringdescriptoren dürfen niemals auf denselben String zeigen, sonst kann die Garbage Collection Stringinhalte zerstören.</p>
+
+<p>Sie können sich ja spaßeshalber vor Augen führen, was man so alles an Stringsalat produzieren kann, indem Sie mal solch eine Routine programmieren. Mit den oben gegebenen Informationen dürfte das nicht schwerfallen.</p>
+
+<p>Noch fehleranfälliger als die neue LEFT$-Routine wären solche, die RIGHT$ und MID$ ersetzen sollen, weil da nämlich sowohl Länge als auch Adresse im Stringedescriptor unterschiedlich sind. Dann kann eine Garbage Collection zum völligen Chaos führen, es entsteht im wahrsten Sinne des Wortes Stringmüll.</p>
+
+<p>In solchen Fällen muß man, wie in unserer FORMAT-Routine, einfach den Teil des Strings kopieren, der weiterbearbeitet werden soll. Dies machen ja schließlich auch die originalen LEFT$-, RIGHT$- und MID$-Routinen.</p>
+
+<p>Bild 2 enthält noch einmal eine Kurzbeschreibung aller verwendeten Routinen, damit Sie bei der Programmierung von Funktionen nicht immer in der Beschreibung des Beispiels nachsehen müssen.</p>
+
+<p>Mit diesen Routinen läßt sich meiner Ansicht nach jede nur erdenkliche Stringmanipulation durchführen, auch wenn der Aufwand teilweise durch weitere ROM-Routinen eingeschränkt werden kann. Aber das Arbeiten über die Descriptoren der zu bearbeitenden Strings selbst, wie wir es in unseren Beispielen immer gemacht haben, reicht völlig aus. Auch benötigen wir nicht den schon erwähnten String-Stack. Wer trotzdem mehr über die interne Stringverarbeitung des C 64 wissen möchte, der sollte sich ein ROM-Listing zur Hand nehmen und versuchen, die einzelnen Routinen nachzuverfolgen.</p>
+
+<p>So, ich glaube für heute reicht’s wirklich. Aber ich entlasse Sie nicht, ohne Ihnen einen Vorgeschmack auf die nächste Ausgabe zu geben. Dort werden wir uns etwas genauer mit Arrays beschäftigen, allerdings nicht gar so ausführlich wie mit den Strings. Im Mittelpunkt steht nämlich das Suchprogramm IN-TELLISEARCH. Dieses Suchprogramm bietet, neben einem sehr schnellen Suchalgorithmus, viele Besonderheiten, die jede INSTR- oder ähnliche Funktion vor Neid erblassen läßt. Das Ganze natürlich ausführlich dokumentiert.</p>
+
+<p>(Boris Schneider/gk)</p>
+

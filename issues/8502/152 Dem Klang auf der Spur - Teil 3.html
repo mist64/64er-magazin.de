@@ -1,0 +1,144 @@
+<h1>Dem Klang auf der Spur - Teil 3</h1>
+
+<p class="intro">Nachdem im zweiten Teil dieser Reihe einige allgemeine Grundlagen aus dem Themenkomplex »Musik und Computer« dargestelK worden sind, wird in dieser Folge ausführlich der Synthesizer Chip SID (Sound Interface Device) 6581 vorgestellt.</p>
+
+<p>Der SID (Sound Interface Device) ist funktionell an das klassische Konzept von Moog angelehnt. Dadurch ist seine Arbeitsweise leicht verständlich. Bild 1 zeigt das Blockschema des SID. Dieses Schema dient dazu, den Fluß der Audio-Signale zu veranschaulichen. Die Funktionsblöcke waren in ähnlicher Form bereits Bestandteile des Synthesizer-Schemas aus Teil 2. Den linken Teil des Schemas bilden drei identische, voneinander unabhängige, Funktionsgruppen.</p>
+
+<p>Eine solche Gruppe setzt sich aus einem DCO (Digital Controlled Oscillator), einem Amplitudenmodulator (oder auch DCA = Digital Controlled Amplifier) und einem Hüllkurvengenerator (EG = Envelope Generator) zusammen. Der DCO kann wahlweise eine von vier Kurvenformen erzeugen: Dreieck, Sägezahn, Rechteck und Rauschen. Dabei ist das Tastverhältnis der Rechteckkurve steuerbar. Unter dem Tastverhältnis versteht man das Verhältnis zwischen der Länge des Kurvenabschnitts mit hoher Spannung zur gesamten Periodenlänge. Eine symmetrische Rechteckkurve hat demnach ein Tastverhältnis von 50 Prozent. Eine Veränderung im Tastverhältnis T bewirkt eine Klangfarbenänderung. So klingt eine Rechteckkurve mit T = 50 Prozent voluminös. Bewegt man sich mit T in Richtung 0 Prozent oder 100 Prozent, so wird der Klang zunehmend obertonreicher aber dünner, da der Anteil des Grundtons abnimmt. Einen besonders lebendigen Klang erhält man durch dynamische Veränderung des Tastverhältnisses, wras zwar in der SID-Hardware nicht realisiert, aber softwaremäßig möglich ist.</p>
+
+<h2>Funktioneller Aufbau des SID</h2>
+
+<p>Der Hüllkurvengenerator beeinflußt über den Amplitudenmodulator den zeitlichen Lautstärkeverlauf der vom DCO kommenden Kurve. Die Hüllkurve wird nach dem bekannten ADSR-Schema parametrisiert.</p>
+
+<h3>Synchronisation und Ringmodulation</h3>
+
+<p>Die senkrechten Verbindungen von DCO1 zu DCO2, von DCO2 zu DCO3 und von DCO3 zurück zu DCO1 können einzeln zu- oder abgeschaltet werden. Sie dienen Spezialeffekten, die das Spektrum des SID beträchtlich erweitern. Im Normalfall, wenn diese Steuerpfade unwirksam geschaltet sind, schwingen die drei DCOs unabhängig voneinander, jeder in seiner vorprogrammierten Frequenz und Kurvenform. Im Falle der <strong>Synchronisation</strong> zwingt der synchronisierende DCO einen weiteren DCO dazu, gleichphasig zu schwingen. In Bild 2 erzeugt DCO1 eine Sägezahnschwingung von 100 Hz und synchronisiert DCO2, der ebenfalls auf Sägezahn, aber 350 Hz eingestellt ist. Nach jeweils dreieinhalb Perioden wird DCO 2 gezwungen, eine neue Periode anzufangen. DCO2 erzeugt so eine viel komplexere Kurvenform, als er es ohne Synchronisation tun würde. Variiert man nun noch die Frequenz eines der beiden DCOs, während man die des anderen konstant hält, so erzeugt DCO2 ständig andere Kurvenformen. Man erhält damit schwer zu beschreibende, aber meistens »elektronisch« (im Sinne von »unnatürlich«) klingende Muster.</p>
+
+<p>Wenn man zu jedem Zeitpunkt die Werte zweier Kurvenzüge miteinander multipliziert, so spricht man von <strong>Ringmodulation</strong> Dieser Vorgang hat eine Ähnlichkeit mit der Modulation einer Schwingung mit einer Hüllkurve, wie sie im SID auch vorkommt. Die Hüllkurve ist aber eine Funktion, die sich, verglichen mit dem Signal das sie moduliert, nurlangsamverändert. Dadurch bleibt bei dieser Modulation der Klangcharakter des modulierten Signals erhalten, es ändert sich nur seine Lautstärke.</p>
+
+<p>Bei der Ringmodulation dagegen ist das modulierende Signal von ähnlicher Beschaffenheit wie das modulierte Signal. Beide Signale dürfen ähnliche Frequenzen haben und als Kurvenzüge auch positive und negative Werte annehmen, wogegen eine Hüllkurve immer nur nichtnegative Werte hat. Bei der Ringmodulation geht im Allgemeinen der Klangcharakter beider beteiligten Kurven verloren; es entsteht ein ganz neuer Klang. Man macht sich das am besten anhand zweier Sinusschwingungen klar:</p>
+
+<p>sin(aqt)sin(a<sup>t</sup>) = y2(c0s(aq-a^)t — cos(wj + ü?2)t)<br/>
+TODO</p>
+
+<p>Das bedeutet, daß man durch Multiplikation zweier Sinusschwingungen ein Signalgemisch erhält, das aus Schwingungen mit der Summe und der Differenz der ursprünglichen Frequenzen besteht. Die ursprünglichen Frequenzen verschwinden dabei vollkommen. Die Formel liefert auf der rechten Seite zwar Cosinus-Terme, für den Klang ist das allerdings unerheblich, da sich Sinus und Cosinus nur durch eine Phasenverschiebung unterscheiden. Unterzieht man nun andere Kurvenformen einer Ringmodulation, so muß man alle Obertöne der einen Kurve mit allen Obertönen der anderen Kurve gemäß der obigen Formel verrechnen. Dadurch entsteht ein sehr reichhaltiges neues Obertonspektrum. Die neuen Obertöne stehen dabei nicht mehr in harmonischen, das heißt ganzzahligen Verhältnissen zueinander. Aus diesem Grund eignen sich Ringmodulatorklänge auch kaum zur Wiedergabe von Melodien. Im natürlichen Umfeld findet man unharmonische Obertonverhältnisse zum Beispiel bei Glocken, Gongs und schwingenden Metallplatten. Zu deren Nachahmung eignen sich die Ringmodulatorklänge.</p>
+
+<p>Beim SID steht zur Ringmodulation nur die Dreiecksschwingung zur Verfügung. Wenn DCO1 den DCO2 moduliert, ist das Ringmodulatorprodukt nur dann hörbar, wenn DCO2 auf Dreieckskurve eingestellt ist. Noch komplexere Klänge erhält man beim SID durch Einbeziehen aller drei DCOs in die Modulationskette, wobei man durch den Signalpfad DCO3 nach DCO1 den Kreis auch noch schließen kann. Die Ergebnisse werden dann allerdings schwer vorhersagbar, lassen also noch genug Räum für Experimente und Überraschungen.</p>
+
+<h3>Filterung</h3>
+
+<p>Leider hat der SID nur ein gemeinsames Filter für die drei DCO-EG-AM-Gruppen. Möchte man unterschiedliche Klangbilder zur gleichen Zeit erzeugen, so kann man nur durch die Wahl von Kurvenform und Hüllkurve differenzieren. Man hat aber immerhin die Wahl, ob man die DCO-EG-AM-Produkte überhaupt durch das Filter schickt oder am Filter vorbei direkt zum Ausgang. Diese Funktion erfüllen im Blockschema die Schalter »FILTER 1«, »FILTER 2« und »FILTER 3«. Das Filter kann als Hochpaß, als Bandpaß oder als Tiefpaß wirken, wobei die Funktionen auch parallel schaltbar sind. So erhält man zum Beispiel aus der Kombination Hochpaß und Tiefpaß eine sogenannte Bandsperre (oder »Notch-Filter«), die ein schmales Band aus dem Gesamtspektrum unterdrückt. Es sind die Parameter <strong>Eck</strong>- beziehungsweise <strong>Mittenfrequenz</strong> (für HP, BP und TP gemeinsam) sowie die <strong>Resonanz</strong> programmierbar. Ein weiteres Qualitätskriterium eines Filters ist seine Steilheit. Diese Größe beschreibt, wie schnell ein Filter in der Umgebung der Eck- beziehungsweise Mittenfrequenz vom durchlassenden in den sperrenden Zustand übergeht.</p>
+
+<p>Als Faustregel gilt, daß ein Filter um so »besser« klingt, je steiler es ist. Beim Hoch- und Tiefpaß des SID beträgt die Steilheit 12 db/Oktave, beim Bandpaß 6 dB/Oktave. 12 dB/Oktave bedeuten, daß zum Beispiel im Übergangsbereich des Tiefpasses ein Signal um das Vierfache abgeschwächt wird, wenn seine Frequenz verdoppelt wird. 6 dB/Oktave bedeuten eine Abschwächung (oder Anhebung) um das Zweifache bei Frequenzverdopplung. Die Filtersteilheit ist im Allgemeinen und auch beim SID fest vorgegeben. Zur Orientierung sei noch erwähnt, daß die Filter im professionellen Synthesizer meistens eine Steilheit von 24 dB/Oktave haben.</p>
+
+<p>Die gefilterten oder ungefilterten Signale im SID werden auf einen DCA geführt, wo man noch die Gesamtamplitude des Ausgangssignals programmieren kann. Über einen Analogeingang kann man auch noch ein externes Signal gefiltert oder ungefiltert zumischen. Dieses Signal könnte zum Beispiel von einem zweiten SID stammen.</p>
+
+<p>Gegenüber dem im ersten Teil vorgestellten klassischen Synthesizerkonzept findet man im SID keinen LFO, mit dem man Frequenz, Amplitude oder einen Filterparameter modulieren könnte. Diese Funktion kann man aber rein softwaremäßig realisieren. Eine Hilfe dazu können DCO3 und EG3 sein. Man kann zu jedem Zeitpunkt den Amplitudenwert von DCO3 und von EG3 abfragen. Programmiert man DCO3 als LFO, das heißt auf eine sehr niedrige Frequenz, so kann man die Amplitudenwerte von DCO3 (mit geeigneter Skalierung) zur Frequenz von DCO1 oder DCO2 addieren. Tut man das in regelmäßigen Zeitabständen und mehrfach innerhalb einer Periodendauer von DCO3, so kann man damit ein Vibrato realisieren.</p>
+
+<p>Auf gleiche Weise kann man auch die von EG3 gelieferte Hüllkurve zur Modulation beispielsweise des Filters heranziehen. Beide Möglichkeiten erfordern allerdings zusätzliche schnelle Programme, die sich nur in Maschinensprache realisieren lassen.</p>
+
+<p>Wenn man DCO3 und/oder EG3 zu Modulationszwecken benützt, möchte man das von AM3 produzierte Signal unter Umständen nicht hören. Dazu kann man es mit dem zusätzlichen Schalter »AUS« unterdrücken.</p>
+
+<p>Im letzten Teil wurde schon angesprochen, daß ein digitaler Synthesizer wie der SID nicht durch Potentiometer und durch Spannungen beeinflußt wird, sondern durch digitalisierte Parameter. Dazu besitzt der SID 29 Register mit einer Länge von 8 Bit. Davon können 25 nur beschrieben werden (ihre Inhalte steuern das Verhalten des SID) und 4 nur gelesen werden. Die 29 Register werden durch die Adreß-Decodierungs-Hardware auf dem CPU-Speicherbereich $D400 bis $D41C abgebildet (dezimal: 54272 bis 54300).</p>
+
+<h2>Die Steuerung des SID</h2>
+
+<p>Die SID-Register lassen sich so mit allen hauptspeicherbezogenen Maschinenbefehlen oder mit PEEK und POKE ansprechen. Da in einzelnen Registern oft mehrere Bits mit unterschiedlicher Bedeutung zusammengefaßt sind, erfordert ihre Programmierung ein hohes Maß an maschinennahem Denken, egal ob in Basic oder in Maschinensprache programmiert wird.</p>
+
+<p>Die Tabelle 1 zeigt die Bedeutung der einzelnen Register im Detail. Der Registersatz gliedert sich in drei mal sieben Register zur Steuerung der drei DCO-EG-AM-Gruppen für die drei Stimmen, in vier Register zur Filtersteuerung und in vier Leseregister. Die sieben Register zur Steuerung einer DCO-EG-AM-Gruppe haben für alle drei Stimmen den gleichen Aufbau und die gleiche Bedeutung.</p>
+
+<h3>Frequenz low/high (Register 0 und 1)</h3>
+
+<p>Die beiden Register 0 und 1 steuern die Frequenz von DCO1 mit einer Genauigkeit von 16 Bit. Register 0 enthält das niederwertige, Register 1 das höherwertige Byte einer 16-Bit-Größe F. Zwischen der Ausgangsfrequenz f und der Zahl F besteht der Zusammenhang:<br/>
+(1) f = FxT/2↑24(Hz)</p>
+
+<p>Dabei ist T die Taktfrequenz der CPU, die auch am SID anliegt. Sie beträgt bei der deutschen Version des C 64 0,985248 MHz<br/>
+Damit gilt:<br/>
+(2) f = F x 0,0587254 (Hz) oder<br/>
+(3) F = f x 17,0284</p>
+
+<p>Die Gleichungen (2) und (3) zeigen, daß sich die Frequenzen der DCOs sehr fein, in Schritten zu zirka 1/17 Hz, programmieren lassen. Möchte man eine vorgegebene Frequenz f (im Beispiel FAUS) erzeugen, so errechnet man F nach (3),<br/>
+10 FAUS = 440<br/>
+20 F = FAUS * 17.0284<br/>
+man zerlegt F in das Low- und das High-Byte,<br/>
+30 F = INT(F + 0.5) :REM RUNDUNG<br/>
+40 HI = INT(F/256)<br/>
+50 LO = F - 256*HI<br/>
+und besetzt Register 0 und 1 damit<br/>
+60 SID = 54272 :REM BASISADRESSE<br/>
+70 POKE SID,LO<br/>
+80 POKE SID + 1,HI</p>
+
+<h3>Pulsweite low/high (Register 2 und 3)</h3>
+
+<p>Der Inhalt dieser Register steuert das Tastverhältnis der Rechteckkurve. Er ist nur dann bedeutend, wenn als Kurvenform das Rechteck gewählt wird. Die Pulsweite kann auf 12 Bit genau festgelegt werden. Register 2 enthält das Low-Byte, Register 3 das High-Byte, von dem nur die unteren 4 Bits (P8 bis P11) berücksichtigt werden. Zwischen der 12-Bit-Größe P und dem Tastverhältnis PAUS besteht der Zusammenhang:<br/>
+(4) PAUS = P / 40.95 (%)<br/>
+oder<br/>
+(5) P = PAUS * 40.95</p>
+
+<p>Die Programmierung gestaltet sich dann in der Praxis analog zu der der Frequenz:<br/>
+90 PAUS = 50<br/>
+100 P = PAUS * 40.95<br/>
+110 P = INT(P + 0.5) :REM RUNDUNG<br/>
+120 HI = INT (P/256)<br/>
+130 LO = P - 256*HI<br/>
+140 POKE SID + 2,LO<br/>
+150 POKE SID + 3,HI</p>
+
+<h3>Kontrollregister (Register 4)</h3>
+
+<p>Jedes Bit dieses Registers hat eine eigene Bedeutung.<br/>
+GATE (Bit 0)</p>
+
+<p>Dieses Bit steuert den Hüllkurvengenerator EG 1. Wird es gesetzt, startet EG1 eine Ättack-Decay-Sequenz. Die Hüllkurve bleibt anschließend auf dem programmierten Sustain-Pegel, bis das GATE-Bit zurückgesetzt wird. Durch das Zurücksetzen geht die Hüllkurve in die Release-(Auskling-)Phase.</p>
+
+<h4>Synchronisation (Bit 1)</h4>
+
+<p>Wird es gesetzt, so wird DCO1 von DCO3, wie schon beschrieben, synchronisiert.</p>
+
+<h4>Ringmodulation (Bid 2)</h4>
+
+<p>Wird es gesetzt, so erzeugt DCO1 das Ringmodulatorprodukt der Dreieckskurven von DCO3 und DCO1. Diese wird allerdings nur dann hörbar, wenn als Kurvenform von DCO1 das Dreieck gewählt wird.</p>
+
+<h4>Test (Bit 3)</h4>
+
+<p>Bei gesetztem Test-Bit wird DCO1 auf Nullpegel gezwungen. Er erzeugt in diesem Zustand keine Schwingung. Man kann DCO1 damit softwaregesteuert synchronisieren, um, ähnlich wie durch die Synchronisation durch DCO3, komplexere Kurvenformen zu erhalten.</p>
+
+<h4>Kurvenform (Bit 4 bis 7)</h4>
+
+<p>Durch Setzen eines dieser 4 Bits wählt man eine der Kurvenformen Dreieck, Sägezahn, Rechteck oder Rauschen. Es muß mindestens eines dieser Bits gesetzt sein, damit überhaupt etwas hörbar wird. Eine Eigenart des SID ist es, daß sich die Kurvenformen <strong>nicht</strong> additiv verhalten. Werden mehrere der Bits 4 bis 7 zugleich gesetzt, so erzeugt der SID eine Kurvenform, deren Amplitudenwerte man durch logische AND-Verknüpfung der Amplitudenwerte der einzelnen Kurven erhält. Diese AND-Verknüpfung muß man sich bitweise auf die Amplitudenwerte darstellenden Bytes angewandt vorstellen.</p>
+
+<p>Das <strong>Rauschen</strong> verdient noch eine besondere Betrachtung. Bei Rauschen kann man nicht von einer Frequenz im üblichen Sinne reden. Dennoch ist der Charakter des SID-Rauschens über die Größe F in Register 0 und 1 beeinflußbar. Rauschen wird im SID durch eine Quasi-Zufallsfolge von numerischen Werten realisiert. Die Rate, mit der der DCO diese Zufallszahlen erzeugt, ist genau die durch F programmierte Frequenz. Ein Rauschen mit »hoher Frequenz« klingt heller oder »weißer« als Rauschen mit niedriger Frequenz.</p>
+
+<p>Bei der Programmierung des Kontrollregisters muß man sich vorher den Wert jedes einzelnen Bits zurechtlegen und in das Byte packen. Das Anstoßen eines Rechteckklanges beispielsweise wird durch Setzen von Bit 0 und Bit 6 erreicht. Der numerische Wert des Kontrollbytes ist dann: 2↑0 + 2↑6 = 65 also: 240 POKE SID + 4,65</p>
+
+<p>Ein hörbares Resultat wird aber auch erst dann erzielt, wenn vorher die Hüllkurvenparameter vernünftig gesetzt sind.</p>
+
+<h4>ADSR (Register 5 und 6)</h4>
+
+<p>Die Parameter A, D, S und R können in 16 Abstufungen entsprechend 4 Bit Auflösung programmiert werden. Die Stufung für den Sustain-Pegel ist linear. S = 0 entspricht dem Ruhepegel, S = 15 entspricht dem Maximalpegel nach Attack. Bei S = 15 besitzt die Hüllkurve keine Decay-Phase. Die Abstufungen für die Attack-, Decay- und Release-Zeiten sind vernünftigerweise nicht linear, um sehr kurze und sehr lange Zeiten gleichermaßen zu ermöglichen. Tabelle 2 enthält die realisierbaren Attack-, Decay- und Release-Zeiten.</p>
+
+<p>Decay und Release können direkt in die Register 5 und 6 geschrieben werden, während Attack und Sustain vorher mit 16 zu multiplizieren sind, was einer Linksverschiebung um vier binäre Stellen entspricht. Ein Beispiel:<br/>
+160 A = 2   :REM 16 MS<br/>
+170 D = 12  :REM 3 S<br/>
+180 S = 1<br/>
+190 R = 10 :REM 1.5 S<br/>
+200 POKE SID + 5,A*16 + D<br/>
+210 POKE SID + 6,S*16 + R</p>
+
+<p>Nach vorläufigem Umgehen des Filters und Setzen der maximalen Lautstärke<br/>
+220 POKE SID + 23,0 :REM FILTER AUS<br/>
+230 POKE SID + 24,15 :REM LAUTSTÄRKE<br/>
+führt das Setzen des GATE-Bits:<br/>
+240 POKE SID + 4,65 :REM GATE AN<br/>
+zu einem vernünftigen Resultat. Zum Abschalten des Klanges kann man einfach das Kontrollregister mit 0 besetzen,<br/>
+270 POKE SID + 4,0<br/>
+doch dann hat DCO1 keine Gelegenheit, der Release-Phase entsprechend auszuklingen, da auch das Kurvenform-Bit (Nr. 6) zurückgesetzt ist. Besser ist also, Bit 6 gesetzt zu lassen: 250GETA$:IFA$ = &ldquo; "THEN 160<br/>
+260 REM WARTE AUF EINE TASTE<br/>
+270 POKE SID + 4,64 :REM GATE AUS<br/>
+Die Basic-Zeilen zeigen natürlich keinen effizienten Programmierstil; sie sollen nur die Vorgehensweise darstellen.</p>
+
+<p>Auf die Steuerung des Filters und auf die Anwendung der Leseregister wird im nächsten Teil noch ausführlich eingegangen werden. So ist die Abfrage eines analogen Gebers (zum Beispiel Paddle) erst durch den SID möglich. Die sechs kleinen Beispielprogramme demonstrieren einige Effekte, die man mit den bis hierher beschriebenen Registern realisieren kann.</p>
+
+<p>(Thomas Krätzig/aa)</p>
+

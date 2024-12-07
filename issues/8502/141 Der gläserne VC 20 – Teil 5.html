@@ -1,0 +1,144 @@
+<h1>Der gläserne VC 20 – Teil 5</h1>
+
+<p class="intro">In Folge 4 haben wir die Grundlagen für das Arbeiten mit selbstdefinierten Grafikzeichen besprochen. Diesmal werden wir sehen, welche Fähigkeiten der VIC in bezug auf Grafik sonst noch besitzt.</p>
+
+<p>Beginnen wollen wir heute mit dem Bitmapping, also dem Arbeiten mit hochauflösender Grafik. Hochauflösend deshalb, weil die einzelnen Grafikpunkte sehr klein und das Gesamtbild dadurch sehr fein (eben hochauflösend) ist. Vorher aber noch eine Begriffserklärung: Bitmapping (engl. Map = Landkarte) bedeutet etwa soviel, wie den Bildschirm zu kartografieren, das heißt jede Bildschirmposition ist in hochauflösender Grafik über eine Koordinate erreichbar. Wer das Superexpander-Modul (VC 1211A) besitzt, der kann mittels einfacher Befehle wie PLOT, DRAW, CIRCLE etc. mit der Hires-(high resolution) Grafik arbeiten. Beim »nackten« VC 20 ist dies jedoch nicht so einfach möglich.</p>
+
+<h2>Das Bitmapping</h2>
+
+<p>Im Gegensatz zu anderen Computern unterstützt der VC 20 diese Art Grafik überhaupt nicht; man muß sich also eine Softwarelösung einfallen lassen.</p>
+
+<p>Die einzige Möglichkeit, einzelne Grafikpunkte (auch Pixels genannt) — aus denen sich ja jedes Zeichen zusammensetzt — anzusprechen, haben wir in der letzten Folge kennengelernt. Ich spreche von der Möglichkeit, sich Zeichen selbst zu definieren.</p>
+
+<p>Wollen wir also Bitmapping betreiben, so bleibt uns nichts anderes übrig, als den gesamten Bildschirm mit verschiedenen Sonderzeichen vollzuschreiben und diese dann umzudefinieren, so daß ein komplettes, neues Bild in Hires-Grafik entsteht.</p>
+
+<p>Doch mit diesem Vorhaben stößt man bereits auf erste Schwierigkeiten, denn der VC 20 kann ja nur 256 verschiedene Zeichen auf einmal auf dem Bildschirm darstellen. Daher müßte man sich mit einer relativ kleinen Fläche für die hochauflösenden Pixels zufrieden geben.</p>
+
+<p>Da die Anzahl der darstellbaren Zeichen (diese setzen sich — um dies noch einmal zu wiederholen — aus 8 x 8 Pixels zusammen) auf 256 beschränkt ist, muß man sich eine andere Lösung einfallen lassen. Diese ist aber — man wird es kaum glauben — bereits in den VIC eingebaut worden. Das sieht praktisch so aus: Man vergrößert die im Bildschirmspeicher abgelegten Zeichen von 8 x 8 auf 16 x 8 Pixels (bei gleicher Auflösung), wodurch sich gleichzeitig die zur Verfügung stehende Zeichenfläche erhöht. Diese Vergrößerung wird über ein bestimmtes Bit im VIC-Kontrollregister #3 eingestellt (vergleiche Folge 4, Tabelle 3). Ist Bit 0 dieser Speicherstelle auf 0, so bleibt alles wie es war, das heißt jedes Zeichen wird innerhalb einer 8 x 8-Matrix dargestellt.</p>
+
+<p>Setzt man dieses Bit nun aber mit »POKE 36867, PEEK (36867) OR 1« auf 1, so sind alle Zeichen plötzlich doppelt so hoch. Ein Charakter wird nämlich innerhalb eines 16 x 8-Gitters abgebildet (Bild 1). Das ist nun alles schön und gut, einen Nachteil hat dieser Betriebszustand aber (wer es selbst ausprobiert hat wird es sicherlich schon bemerkt haben). Denn mit dem normalen Zeichensatz kommt auf dem Bildschirm keine vernünftige Zeichenfolge mehr zustande. So wird beispielsweise aus dem @ (Klammeraffe) das Zeichen</p>
+
+<p>@<br/>
+A
+aus dem A das Zeichen<br/>
+B
+C</p>
+
+<p>und so fort. Drückt man nun eine Taste, so wird nicht der entsprechende Buchstabe abgebildet, sondern irgendwelche anderen Zeichen, die, wie eben beschrieben, übereinander gestapelt sind.</p>
+
+<h2>Doppelt hohe Zeichendarstellung</h2>
+
+<p>Die Erklärung dafür ist im Prinzip ganz einfach. Wie wir das letzte Mal gesehen haben, errechnet sich der VIC die relative Adresse eines Charakters im Zeichengenerator (relativ deshalb, weil die Adreßangaben auf eine Anfangsadresse bezogen sind), indem er den Bildschirmcode (auch hier erinnern wir uns daran, daß der Bildschirmcode die Reihenfolge der Zeichen im Charaktergenerator ist) jeweils mit 8 multipliziert.</p>
+
+<p>Durch die Umschaltung auf 16-zeilige Zeichen liest der VIC für einen Charakter 16 Zeilen aus dem ROM. Daher werden — da das Zeichengenerator-ROM auf achtzeilige Zeichen ausgelegt ist — eben die Informationen von ursprünglich zwei Zeichen in einem dargestellt. Folglich multipliziert der VIC bei der Adreßermittlung den Bildschirmcode nicht mehr mit 8, sondern mit 16.</p>
+
+<p>Auf diese Weise erklärt sich auch der Zahlensalat in diesem Betriebsmodus. Diese Darstellungsart hat jedoch den erheblichen Vorteil, daß jetzt mehr Zeichen als normalerweise abgebildet werden können. Es sind nämlich bereits in 128 Zeichen die Informationen von ursprünglich 256 Zeichen enthalten. Bei dem 129. Zeichen (RVS ON und @) beginnt daher schon der zweite Zeichensatz des VC. Somit lassen sich diese zwei erstmalig gemeinsam auf dem Bildschirm ausdrucken. Statt bisher 256 »normaler« Zeichen läßt sich nun die gleiche Menge in doppelter Höhe (das entspricht also 512 regulären Zeichen) abbilden. Damit sind wir jetzt in der Lage, den gesamten Bildschirm füllen zu können. Darauf gehen wir aber später noch ausführlicher ein.</p>
+
+<p>Das Naheliegendste wäre es ja nun, den Zeichengenerator ins RAM zu verlegen und dabei die Zeichen so umzubauen, daß man sie wieder richtig lesen kann. Dazu muß beim Kopieren jede Zeile verdoppelt werden; sonst bleibt ja alles beim Alten.</p>
+
+<p>Das Programm in Listing 1 enthält zwei Zähler. Der eine zählt die ROM-, der andere die RAM-Speicherplätze, wobei letzterer genau doppelt so schnell läuft, denn eine ROM-Zeile soll ja zweimal hintereinander ins RAM geschrieben werden (dieses »Strecken« eines Zeichens ist in Bild 2 zu sehen). Da diese Schriftart natürlich besonders auffällig ist, eignet sie sich beispielsweise für Schaufensterwerbung oder ähnliches.</p>
+
+<p>Wir wollen uns aber nun wieder unserem eigentlichen Thema — dem Bitmapping — zuwenden. Wie so oft stellt sich auch hier wieder die Frage nach dem Speicherplatz. Denn egal mit welcher Speicherausbauversion man gerade arbeitet, immer kommt es zu Kollisionen zwischen dem Zeichen- und dem Bildschirmspeicher. Daher müssen wir hier die Anzahl der verfügbaren Zeichen dementsprechend reduzieren. Wenn wir möglichst den ganzen Bildschirm füllen wollen, so muß es immer zu einem Kompromiß zwischen Bildschirmgröße und Speicherplatz kommen — logisch, dennje größer die verfügbare Hires-Fläche sein soll, um so mehr Speicherplatz benötigt man für die Sonderzeichen, über die das Bitmapping abgewickelt wird.</p>
+
+<p>Ich glaube, mit 189 je 16 x 8 Bit-Zeichen einen solchen Kompromiß gefunden zu haben. Anhand von Listing 2, das in mehrere Teile gegliedert ist, möchte ich das Verfahren beim Bitmapping erklären. Programmteil 2 beschreibt den Bildschirm mit den veranschlagten 189 Zeichen. Vorher wird der Rahmen noch entsprechend der etwas »krummen« Zeichenzahl angepaßt. Denn da eben nicht der gesamte Bildschirm genutzt werden kann, wird der leere Rest einfach abgeschnitten, was durch Verkleinerung der Bildschirmfläche geschieht. Wenn man die Zeilen 240 — 260 aus dem Programm herausläßt, sieht man das ganz deutlich. In Teil 3 des Listings wird dann schließlich der gesamte Zeichengenerator von Adresse 5120 bis 8192 gelöscht, damit der Bildschirm auch wirklich restlos leer ist.</p>
+
+<p>Damit sind alle Vorbereitungen getroffen, die wir vor dem eigentlichen Plotten durchführen müssen. Nun geht es darum, die eingegebenen Koordinaten aus den Variablen X und Y so umzuwandeln, daß die entsprechende Zeichenzeile im Charaktergenerator verändert werden kann. Als erstes verschaffen wir uns einen Überblick, wie die Zeichen auf dem Bildschirm angeordnet sind (Bild 3).</p>
+
+<p>Durch die Verkleinerung der Fläche ergeben sich bei 189 verteilten Zeichen 21 Spalten und 9 Zeilen. Eine Spalte ist immer noch 8 Bit breit, denn sie rührt ja von der Zeichenbreite her. Daher ergibt sich durch Multiplikation eine Gesamtbreite von 168 Pixels. Analog verhält es sich mit der Zeilenzahl: 9 Zeilen ä 16 Zeichenzeilen ergibt 144 als maximale Y-Koordinate. Übrigens hat das Koordinatensystem seinen Ursprung (X = 0/ Y=0) nicht — wie in der Mathematik — links unten, sondern links oben.</p>
+
+<p>Die Koordinaten müssen aus programmtechnischen Gründen in zwei Teile aufgespalten werden; nämlich in den sogenannten Grob- (oder auch Zeichen-) anteil und in den Feinanteil (auch Pixelposition genannt).</p>
+
+<h2>Die Koordinatenumrechnung</h2>
+
+<p>Der Grobanteil ist nötig, damit zunächst einmal die Anfangsadresse eines Zeichens im Zeichengenerator festgestellt werden kann. Mit Hilfe des Feinanteils adressiert man dann die benötigte Zeichenzeile und in dieser dann die Pixelposition (aber dazu später mehr).</p>
+
+<p>Anhand eines konkreten Beispiels wollen wir den zur Berechnung nötigen Algorithmus entwickeln: Der Punkt mit den Koordinaten X = 43 und Y= 106 soll auf dem Bildschirm gesetzt werden.</p>
+
+<p>Nun wird als erstes festgestellt, in welchem Zeichen eine Änderung vorgenommen werden muß. Zu diesem Zweck wird die Koordinate in die besagten Grobanteile aufgespalten, was durch einfache Division geschieht. Die Spaltenkoordinate wird durch 8 (Zeichenbreite), der Zeilenanteil wird durch 16 (Zeilenhöhe) dividiert:<br/>
+X: 43 ÷ 8 = 5 Rest 3<br/>
+Y: 106 ÷ 16 = 6 Rest 10</p>
+
+<p>Das Ergebnis ist jeweils der Grobanteil, der Rest ist dann automatisch die Pixelposition ( = Feinanteil). Der erste Teil dieser Rechnung wird in Listing 2 in den Zeilen 640 und 650 durchgeführt.</p>
+
+<p>Danach wird die relative Position eines Zeichens im Charaktergenerator ermittelt. Die dafür nötigen »Formeln« haben wir ja bereits das letzte Mal besprochen:<br/>
+Position = ZY x Zeichen pro Zeile + ZX<br/>
+= 6 × 21 ÷ 5 = 131.</p>
+
+<p>Das betreffende Zeichen hat also den Bildschirmcode 131. Da ein Charakter (nach der Umschaltung auf eine 16 x 8 Matrix) den Platzbedarf von 16 Byte hat, kann man auch ganz leicht die Anfangsadresse der ersten Zeichenzeile errechnen:<br/>
+ADRESSE = Position x Platzbedarf + Basisadresse = 131 × 16 + 5120 = 7216<br/>
+Dann ermitteln wir als nächstes über den Pixelanteil der Y-Koordinate die benötigte Zeichenzeile. In unserem Beispiel muß zur Zeichenadresse der Wert von PY — also 10 — dazuaddiert werden. Damit haben wir die endgültige Adresse der angewählten Zeichenzeile berechnet. Dies klingt alles viel komplizierter, als es in Wirklichkeit ist, denn alle drei Schritte können zu einem (Zeile 690) zusammengefaßt werden.</p>
+
+<p>Damit sind wir schon fast am Ziel (das kann man hier sogar wörtlich nehmen) angelangt. Als letztes muß das durch die Pixel-X-Koordinate vorgegebene Bit in der Zeichenzeile gesetzt werden. Dies wird durch eine ODER-Verknüpfung des Wertes mit der Zeichenzeile erreicht.</p>
+
+<p>Vorher ist aber noch eine letzte Hürde zu überwinden, die Koordinate ist nämlich nicht Byte-identisch. Was bedeutet das? Nun, unser Bildschirm entspricht beim Bitmapping ja auch einem Koordinatensystem. Denn über die horizontale (X-) und die vertikale (Y-) Koordinate läßt sich jeder beliebige Pixelpunkt durch ein Zahlenpaar (eben durch den X- und Y-Wert) eindeutig adressieren. Dabei hat der Punkt links oben die Koordinaten (0/0), der rechts unten die Koordinaten (167/143).</p>
+
+<p>Für die X-Achse bedeutet dies, daß der Wert nach rechts ansteigt. Für die Fein-X-Koordinate gilt natürlich das Gleiche; sie kann von links nach rechts folgende Positionen annehmen: 0,1,2,3,4,5,6,7.</p>
+
+<p>Hier liegt nun der springende Punkt. Position 0 entspricht nämlich Bit 7 in der Zeichenzeile, Position 1 Bit 6, die Position 2 Bit 5 und so fort. Diese Bits laufen also genau in entgegengesetzter Richtung. Folglich muß die Pixel-X-Koordinate dementsprechend »umgepolt« werden. Dies wird ganz einfach dadurch erreicht, indem man diesen Wert von der 7 subtrahiert:<br/>
+Bitformat = 7 — (Pixel-X-Koordinate)</p>
+
+<p>In unserem Beispiel ergibt sich: Bitposition= 7 — 3 = 4</p>
+
+<p>Bit 4 soll nun in der Zeichenzeile gesetzt werden. Dies erreichen wir — wie bereits erwähnt — durch die ODER-Verknüpfung des Wertes mit dem Zeichenbyte. Wer den letzten Teil aufmerksam verfolgt hat, dem wird dies nicht schwerfallen. Da Bit 4 die Wertigkeit 16(= 24) hat, wird die Zeichenzeile eben mit 16 ODER-verknüpft.</p>
+
+<p>Wenn man alle drei Schritte zusammenfaßt, ergibt sich folgende Zeile:<br/>
+POKE AD, PEEK (AD) OR 2 t (7-PX).</p>
+
+<p>Damit ist der entsprechende Pixelpunkt gesetzt. Mit diesem letzten Teilstück haben wir nun endlich den kompletten Routinenteil beieinander, um ihn als Unterprogramm in Teil 4 von Listing 2 zu verwenden. Natürlich können mit Hilfe dieser Methode auch Punkte gelöscht oder abgefragt werden. Das Löschen wird mit Hilfe der AND-Operation bewerkstelligt. Das zu löschende Bit muß im Operanden auf Null, alle anderen, die unberührt bleiben sollen, auf eins gesetzt werden. Folgende Zeile löscht den adressierten Pixelpunkt:<br/>
+POKE AD, PEEK (AD) AND 255-2i (7-PX).</p>
+
+<p>Die Abfrage von Punkten wird ebenfalls über die AND-Operation abgewickelt. Das gewünschte Bit wird im Operanden gesetzt und danach mit der Speicherstelle UND-verknüpft. Ist das adressierte Pixel gesetzt, so ist die IF-THEN-Bedingung erfüllt, ansonsten nicht:<br/>
+IF 21 (7-PX) = (PEEK(AD) AND 21 (7-PX)) THEN&hellip;</p>
+
+<p>Natürlich sollte man anstelle des Ausdrucks 2t (7-PX) eine Variable definieren, damit das Programm kürzer und schneller wird.</p>
+
+<h2>Zeichnen auf dem Bildschirm — der Joypainter</h2>
+
+<p>Soweit also die Erklärung des Bitmapping beim VC 20. Um einmal zu zeigen, was man mit diesen Erkenntnissen anfangen kann, habe ich ein Joypainter-Programm in Maschinensprache entwickelt. Der Basic-Lader (Listing 3 und 4) transferiert das Programm aus den DATA-Zeilen automatisch in die Speicherbereiche ab $2000 und nur dort ist es lauffähig (Der Speicher muß also um mindestens 8 KByte erweitert sein). Beide Listings müssen nacheinander geladen und gestartet werden. Zunächst zur Bedienung der Routine, die mit »SYS 9682« gestartet wird.</p>
+
+<p>Der Joystickpainter arbeitet — wie der Name bereits sagt — mit dem Joystick. Der kleine »Zeichencursor« kann mit dem Steuerknüppel in alle vier Himmelsrichtungen und in alle Diagonalen bewegt werden.</p>
+
+<p>Es ist aber auch möglich, den Cursor über die Tasten E, S, D und X zu bewegen (ganz nach Belieben). Auch die Cursortasten können für die Steuerung herangezogen werden, über die Tastatur hat man allerdings nur vier Bewegungsrichtungen für den Zeichencursor zur Verfügung. Die Tasten verwendet man sinnvollerweise dann, wenn es darum geht, besonders exakt zu zeichnen. Aus diesem Grund kann man auch die Bewegungsgeschwindigkeit über die Funktionstasten F5 und F7 auf schnell beziehungsweise langsam stellen.</p>
+
+<p>Gezeichnet wird mit den Funktionstasten F1 und F3. Die obere setzt einen Punkt (und rückt den Cursor um eins nach rechts), die andere löscht einen Punkt (diese Tasten haben eine Wiederholungsfunktion). Auch der Feuerknopf kann zum Zeichnen verwendet werden. Ein kurzer Druck bewirkt das Setzen, ein langer das Löschen eines Pixels. Über die CTRL-Taste können darüber hinaus noch andere Funktionen wie Dauerzeichnen oder Dauerlöschen angewählt werden. Tabelle 1 zeigt den kompletten Befehlsvorrat.</p>
+
+<p>Natürlich fehlen diesem Programm — da es nicht allzu lang ist — einige Funktionen, die es noch komfortabler machen würden, wie beispielsweise die Verschiebung eines Zeichenblocks auf dem Bildschirm. Solch ein Programm würde aber samt Erklärung den Rahmen dieses Kurses sprengen.</p>
+
+<p>Diejenigen, die einige Routinen wie das Bitmapping-Unterprogramm oder ähnliches in ihren eigenen Programmen verwenden möchten, finden in Tabelle 2 eine Auflistung der wichtigsten Programmteile.</p>
+
+<p>Das Unterprogramm zur Joystickabfrage wird übrigens in der nächsten Folge ausführlicher besprochen. Einen bedeutenden Nachteil hat die Hires-Grafik aber, sie ist nämlich ziemlich farblos. Warum ist dies so?</p>
+
+<p>Da sich diese Grafikart aus den 8 x 8- (oder 16 x 8-) Basiszeichen zusammensetzt, kann man — wie es auch bei »normalen« Buchstaben und Grafikzeichen üblich ist — jeder Videospeicherposition über das FarbRAM jeweils nur eine Farbe (von 0 bis 7) zuweisen.</p>
+
+<p>Die Darstellung von verschiedenen Farben innerhalb eines Zeichens ist also nicht möglich. Für manche Zwecke benötigt man aber nun gerade mehrere Farben innerhalb einer Zeichenmatrix. In diesem Fall wird dann ganz einfach auf den Multicolormodus — den wir im folgenden genauer besprechen werden — umgeschaltet.</p>
+
+<h2>Buntes Alleriei: Multicolor</h2>
+
+<p>Ist innerhalb eines 8 x 8 Zeichengitters irgendwo ein Bit mit dem Wert 1, so wird die entsprechende Bildschirmzelle mit dem Farbwert, der in der zugehörigen Farbspeicherstelle steht, ausgefüllt. Befindet sich in dieser Pixelzelle der Binärwert 0, so wird diese in der Hintergrundfarbe auf dem Bildschirm abgebildet (sie ist also nicht zu sehen).</p>
+
+<p>In einem normalen hochauflösenden Zeichen können also zwei verschiedene Farben dargestellt werden:<br/>
+Bit auf 0: Pixeldarstellung in Hintergrundfarbe<br/>
+Bit auf 1: Pixeldarstellung in Vordergrundfarbe (Farb-RAM)</p>
+
+<p>Wie Sie sehen, kann man die zwei Zustände auch als Farbcodes interpretieren. Ebenso verhält es sich im Multicolormodus: Hier werden nun zwei Bit in einer Zeichenzeile zusammengefaßt, die ebenfalls einen solchen Farbcode (allerdings für vier Farben) bilden. Ein Pixel ist in diesem Fall dann aber auch doppelt so breit wie normal, wodurch sich auch die Auflösung um die Hälfte reduziert. Bild 4 verdeutlicht den Unterschied zwischen diesen beiden Grafikarten. Diese vier möglichen Farbcodes sind auch hierbei wiederum nur die Zeiger auf Speicherstellen, in denen die eigentlichen Farbinformationen enthalten sind. Hier die möglichen Kombinationen:<br/>
+00 : Hintergrundfarbe<br/>
+01 : Rahmenfarbe<br/>
+10 : Zeichenfarbe<br/>
+11 : Hilfsfarbe</p>
+
+<p>Die Werte 00 und 01, also Hintergrund- und Rahmenfarbe zeigen auf das VIC-Register # 15 (36879), in demja die Informationen über Rahmen- und Hintergrundfarbe abgelegt sind. Diese Farben sind also für alle Multicolorzeichen einheitlich vorgewählt. Auch der Code 11 — die Hilfsfarbe — wird einheitlich vorgewählt. Dieser Farbwert wird allerdings in einem Register gespeichert, das eigentlich mit Grafik überhaupt nichts zu tun hat, nämlich dem VIC-Register # 14(36878), mit demja auch die Lautstärke festgelegt wird. Die Bits 0 bis 3 enthalten also den Lautstärkewert, die oberen vier Bit die Hilfsfarbe. Diese muß demnach speziell für Multicolor eingestellt werden, denn normalerweise ist diese Speicherstelle auf Null gesetzt (damit die Lautstärke ebenfalls null ist).</p>
+
+<p>Schließlich ist noch Farbcode 10 zu erwähnen. Dieser wird für jedes Zeichen einzeln in der entsprechenden Farbspeicherstelle — wie wir es ja von den Hires-Zeichen her kennen — bestimmt. Die Bits 0 bis 2 speichern die gewünschte Farbe, Bit 3 hat eine besondere Funktion: Über dieses Bit wird — und das ist neu — der Grafikmodus ausgewählt. Ist es auf 0 (wasja der Normalfall ist), so stellt der Computer den in der dazugehörigen Videospeicherposition abgelegten Charakter im Zweifarbmodus (also in Hires-Grafik) dar. Setzt man das Bit 3 nun aber auf 1, so wird der Vierfarbmodus für dieses Zeichen eingeschaltet.</p>
+
+<p>Folglich kann also die Darstellungsart für jedes Zeichen im Farb-RAM selektiert werden. Daher kann also sowohl der eine, als auch der andere Grafiktyp gleichzeitig auf dem Bildschirm abgebildet werden.</p>
+
+<p>Probieren Sie es gleich einmal aus: die 1, also das Zeichen A, wird in die Bildschirmspeicherstelle 7680 (4096) gePOKEt. Danach ist in der entsprechenden Farbspeicherstelle der Colorwert mit POKE 38400,6 (beziehungsweise 37888,6) zu vermerken. In der linken oberen Ecke steht also nun ein blaues »A«. Als nächstes wird Bit 3 im Farb-RAM für diese Zeichen gesetzt: POKE 38400, PEEK (38400) OR 8.</p>
+
+<p>Nun verschwimmen die Konturen des Charakters und ein farbiges Gebilde erscheint, das nur noch entfernt an den Buchstaben A erinnert. Nun, wie Sie schon bei den doppelt hohen Zeichen gesehen haben, ist das Zeichengenerator-ROM für eine bestimmte Betriebsart konzipiert. Natürlich werden die Zeichen deshalb in hochauflösender Grafik dargestellt, damit sie besser unterscheidbar sind. Da der Zeichengenerator wiederum nur für Hires-Zeichen konzipiert wurde, kann man in Multicolor nicht viel mit ihnen anfangen.</p>
+
+<p>Wegen ihrer geringen Auflösung eignet sich diese Betriebsart sowieso nur für Spielfiguren oder ähnliche Zeichen. Dazu muß der Zeichengenerator wieder ins RAM verlegt werden, was ja durch eine Änderung im Register #5 geschieht. Dann können die Zeichen wie in Bild 4 programmiert werden. In Listing 5 ist eine solche Routine zu finden. Sie erzeugt ein kleines Multicolor-Männchen (der Klammeraffe @ wird entsprechend umdefiniert).</p>
+
+<p>Soweit unser etwas ausgedehnter Exkurs in die Welt der VC 20-Grafik, mit dem ich diese Folge beschließen möchte. In der nächsten Folge unseres Kurses möchte ich noch einmal auf das Betriebssystem und dessen Routinen eingehen, denn auch hier tut sich dem Programmierer ein weites Betätigungsfeld auf.</p>
+
+<p>(Christoph Sauer/ev)</p>
+

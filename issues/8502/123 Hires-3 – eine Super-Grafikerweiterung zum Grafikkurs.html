@@ -1,0 +1,137 @@
+<h1>Hires-3 – eine Super-Grafikerweiterung zum Grafikkurs</h1>
+
+<p class="intro">Diese Erweiterung bietet wesentlich mehr als ein einfaches Hilfsprogramm. Sie stellt einen umfangreichen Befehlskatalog für die Erzeugung von Grafiken zur Verfügung. Und sie liefert außerdem etliche Programmierhilfen.</p>
+
+<p>Es hat ein bißchen gedauert, doch nun will ich mein Versprechen einlösen: Dornröschen ihre Behäbigkeit mit einem grafikunterstützenden Maschinenprogramm zu nehmen. Zuvor noch zwei erfreuliche und eine weniger gute Nachricht: Leider ist das Grafik-Hilfsprogramm so lang, daß es Ihnen in zwei Teilen vorgelegt werden muß. Dann die beiden frohen Botschaften: Sie bekommen etwas viel besseres als nur eine kleine Grafikhilfe und die Grafikserie wird fortgesetzt.</p>
+
+<p>Viele Briefe zeigten uns, daß Sie noch mehr wissen möchten. Zu speziellen Grafikthemen soll daher in lockerer Reihenfolge weiterhin Dornröschen aufgeputzt werden. Wenn sie also spezielle Grafikwünsche haben, dann schreiben Sie. Der C 64 kann viel mehr als Sie vielleicht glauben! Was Apple kann — behaupte ich mal ganz frech — das kann unser Computer auch — nur viel preiswerter.</p>
+
+<p>Wieso bekommen Sie etwas viel besseres als ursprünglich vorgesehen? Das zunächst vorgesehene Grafik-Hilfsprogramm ist Ende 1983 fertiggestellt worden und hieß Hires-1. Es war der Auslöser für diese Serie. Ich hatte es entwickelt, um meine eigenen Grafikbedürfnisse (Punkte setzen, Linien ziehen etc.) auf schnelle Art mit SYS-Aufrufen zu erfüllen. Die Entwicklung blieb aber nicht stehen. Hires-2 holte sich bereits alle nötigen Werte zum Zeichnen mit den USR-Kommandos und die SYS-Befehle wurden überflüssig. Was Sie jetzt bekommen, das ist Hires-3. Aufrufe der einzelnen Routinen (es sind über 40) erfolgen mit neu geschaffenen Basic-Befehlsworten, die sowohl im Direktmodus als auch in Programmen verwendet werden. Kenner werden feststellen, daß Hires-3 sozusagen organisch gewachsen ist, wie es halt vielen großen Programmprojekten ergeht, die immer weiter verbessert werden: Nebenbei bemerkt: Momentan arbeite ich an Hires-4.</p>
+
+<p>Hires-3 wurde mit dem Gedanken entworfen, das Schreiben von Grafikprogrammen einfacher zu gestalten. Deswegen sind nicht nur ausgesprochene Grafikbefehle dabei, sondern auch OLD, MERGE, RENUMBER, AUTONUMBER, PAUSE, UHR etc. Die Grafik-Unterstützung ist für alle Anwendungsbereiche gedacht, wobei der Schwerpunkt allerdings weniger auf »Spielen« und »künstlerische Anwendungen« liegt. Deswegen sind keine Joystick-, keine Lightpen- und keine Sprite-Befehle enthalten. Schließlich spielte es noch eine große Rolle, daß viel Speicherplatz für Basic-Programme und Daten frei bleiben sollte, ebenso wie der für Maschinensprache interessante Bereich von $C000 bis $D000.</p>
+
+<p>Deswegen liegt das Programm Hires-3 ab $8000 (dez.32768) bis $89B5 (dez.35253) und von $9000 (dez.36864) bis $9DCB (dez.40395). Es fängt also dort an, wo auch Module ihren Platz haben. Der Bildschirm für hochauflösende Grafik liegt von $8000 (dez.35840) bis $8FFF (dez.36863), der für den Normalbetrieb bleibt an der gewohnte Stelle (1024&hellip;). Die 8 000 Byte lange Bit-Map kommt uns nicht mehr in die Quere: Sie ist unter dem Basic-ROM versteckt. Wir haben also trotz 44 neuer Befehle und Funktionen und einer stets präsenten hochauflösenden Grafik auf einem zweiten Bildschirm immer noch 30 KByte RAM für Basic frei und zusätzlich auch noch den Bereich $C000 bis $D000 für Maschinenprogramme.</p>
+
+<p>Hires-3 wird mit dem MSE eingegeben (Seite 68). Nach der Eingabe des Programms empfiehlt es sich, das Ganze erstmal auf einem Massenspeicher (Kassette oder Diskette) sicher abzulegen.</p>
+
+<p>Bevor Sie ein neues Basic-Programm schreiben, sichern Sie bitte noch HIRES-3 durch die in den vergangenen Grafik-Folgen vorgestellten Schutz-POKEs:<br/>
+POKE52,128:POKE56,128</p>
+
+<p>Mit SYS36864 starten Sie Hires-3. Außer der READY-Meldung werden Sie erstmal nichts Neues sehen. Sie haben nämlich nichts anderes getan, als den Funktionstasten Befehle zuzuteilen. Deshalb fangen wir jetzt mit der Erklärung der Befehle an und zwar mit eben diesen Funktionstasten: Vorsicht! Nicht alles gleich ausprobieren! Sehen Sie vorher noch in der Tabelle 1 nach, welche Befehle erst in der nächsten Folge von Hires-3 eingebaut werden.</p>
+
+<p>Wenn Sie die vorher benutzen, stürzt das Programm wahrscheinlich ab. Es erfolgt dann ein Programmsprung ins Leere — und das wollen wir unserem Computer doch nicht zumuten!</p>
+
+<h3>1.  Hilfsfunktionen</h3>
+
+<h4>1.1    Funktionstastenbelegung</h4>
+
+<p>Genau genommen schaltet man durch SYS 36864 nur die Belegung der Funktionstasten ein. Ausschalten erfolgt durch gleichzeitiges Drücken der RUN/STOP- und der RESTORE-Tasten. Nun zur Belegung im einzelnen:</p>
+
+<h3>F1 RUN</h3>
+
+<p>Startet ein im Basic-Speicher stehendes Programm sofort.</p>
+
+<h3>F2 RENUMBER-Befehl</h3>
+
+<p>Auf dem Bildschirm erscheint SYS33256. Man schreibt nun:<br/>
+SYS33256,Abz,Nbz,Sch.</p>
+
+<p>Dabei bedeuten:<br/>
+Abz = erste alte Basic-Zeile, von der an neu numeriert werden soll.<br/>
+Nbz = erste neue Basic-Zeilennummer<br/>
+Sch = Schrittweite</p>
+
+<p>Dieser Befehl numeriert auch alle GOTO, GOSUB, IF..THEN&hellip;, RUN&hellip; etc. neu.<br/>
+Beispiel:<br/>
+SYS33256,1,10,5 numeriert ein Programm ab der alten Zeilennummer 1, welche nun 10 heißt, in 5er-Schritten neu durch.</p>
+
+<h3>F3 Aktivieren der neuen Basic-Befehle</h3>
+
+<p>Auf dem Bildschirm erscheint SYS37498 und READY. Jetzt sind alle neuen Basic-Befehlsworte verfügbar. Verwendet man eines der neuen Befehlsworte vorher, erzeugt das einen SYNTAX ERROR. Das Abschalten der neuen Befehle geschieht mittels »AUS«.</p>
+
+<h3>F4 OLD-Befehl</h3>
+
+<p>Auf dem Bildschirm erscheint SYS37227 und ein durch NEW oder einem RESET gelöschtes Basic-Programm wird wieder gelistet und funktionsfähig (vorausgesetzt, daß es nicht durch Überschreiben zerstört wurde). Störungen können auftreten, wenn noch kein Basic-Programm im Speicher enthalten ist. Nach der Verwendung dieses Befehls sollte überprüft werden, ob durch das vorangegangene Löschen die Schutz-POKEs 52 und 56 verändert worden sind.</p>
+
+<h3>F5 AUTONUMBER-Befehl</h3>
+
+<p>Auf dem Bildschirm erscheint SYS37018 und eine Zeilennummer. Diese Funktion setzt automatisch nach jedem RETURN eine neue Zeilennummer, die sich an die letzte im Programm vorhandene anschließt. Im Normalfall wird dabei in 10er-Schritten gearbeitet, eine andere Schrittweite wird durch POKE37169, Sch erzeugt (dabei ist Sch die Schrittweite). Die AUTONUM-BER-Funktion wird durch Drücken von RETURN direkt nach einer Zeilennummer abgeschaltet.</p>
+
+<h3>F6 MERGE-Befehl</h3>
+
+<p>SYS37306 erscheint auf dem Bildschirm und die Information: »<strong><em>MERGE</em></strong>, BEREIT ZUM KOPPELN! READY.« Das Basic-Programm läßt sich allerdings nicht Listen oder Starten. Denn die Zeiger sind nun auf das Ende des Programms gestellt. Der Computer wartet auf das Laden des anzuhängenden Programms, was durch eine normale Ladeoperation stattfindet. Man drückt nun erneut F6 und auf dem Bildschirm erscheint: SYS37306 und der Text: »<strong><em>MERGE</em></strong> PROGRAMME GEKOPPELT! READY«. Wenn man nun listet, zeigt es sich, daß beide Programme aneinandergehängt sind. Man sollte darauf achten, daß das anzuhängende Programm höhere Zeilennummern aufweist als das erste, denn sonst kommt es bei GOTO oder GOSUB-Sprüngen zu Fehlern.</p>
+
+<h3>F7 Startet Maschinenprogramme,</h3>
+
+<p>die bei $C000 (dezimal 49152) liegen. Auf dem Bildschirm erscheint SYS49152.</p>
+
+<h3>F8 Startet Maschinenprogramme,</h3>
+
+<p>die bei $7000 (dez. 28672) liegen. Auf dem Bildschirm erscheint SYS 28672.</p>
+
+<p>Achtung! Diese beiden Tasten sollte man nur betätigen, wenn an den Ansprungadressen auch wirklich ein Programm startet, denn sonst stürzt der Computer unter Umständen ab. Sehr praktisch sind diese beiden Funktionstasten, wenn an den Startadressen andere Sprachen verfügbar sind, zum Beispiel bei $C000 ein Maschinensprache-Monitor liegt oder ähnliches. Auch zum schnellen Starten von unfertigen Assembler-Programmen, die an einer der beiden Stellen anfangen. Für solche Tests sind F7 und F8 gut einzusetzen.</p>
+
+<h4>1.2    Hilfsfunktionen als neue Basic-Befehle</h4>
+
+<p>Das sind fünf Befehle: PAU, DEEK, AUS, DUMP und UHR<br/>
+<strong>Aus</strong>: Schaltet die Befehlserweitungen aus. Das beschleunigt den Ablauf eines Basic-Programms. Der Interpreter muß nun nicht mehr den Umweg über die hier vorgestellten Befehlserweiterungen laufen. Der Zeitunterschied ist allerdings minimal und nur bei zeitkritischen Abläufen interessant.<br/>
+<strong>DEEK</strong>: Ist eine modifizierte PEEK-Funktion, die das RAM unter den ROM-Bausteinen ausliest und in Speicherstelle 2 ablegt. Syntax: DEEK, Speicherstelle Beispiel:<br/>
+DEEK, 53272:PRINTPEEK(2) ergibt 255, den Inhalt des RAM unter dem ROM, wogegen PRINTPEEK(53272) den ROM-Inhalt 21 ergibt.<br/>
+<strong>PAU</strong>: Pausen-Befehl. PAU,10 erzeugt eine Pause von 10 Sekunden.<br/>
+<strong>DUMP</strong>: Gibt alle definierten Variablen mit ihren aktuellen Werten aus. Arrays werden nicht berücksichtigt.<br/>
+<strong>UHR</strong>: Zeigt in der rechten oberen Bildschirmecke eine Uhr an.<br/>
+Stellen: UHR, »hhmmss«, Zeichenfarbe<br/>
+Ausschalten: UHR<br/>
+Wieder einschalten: UHR</p>
+
+<p>Vor der Verwendung des Hochauflösungs-Modus sollte die UHR ausgeschaltet werden, ebenso vor dem Aufruf des Hardcopy-Befehls.</p>
+
+<h3>2.  Grafik-Befehle</h3>
+
+<h4>2.1    Einrichten der Grafik</h4>
+
+<p><strong>HFL,Zf,Hf</strong>: Der Befehl richtet den Hochauflösungs-Grafikmodus ein, setzt die Zeichenfarbe (Zf) und die Hintergrundfarbe (Hf) und löscht ein eventuell vorhandenes Hochauflösungsbild aus. Dabei liegt der Bildschirm von $8000 bis $8FE7 (dezimal 35840 bis 36839) und die Bit-Map unter dem Basic-ROM ($A000-$C000).<br/>
+<strong>HAN</strong>: Schaltet nur den Hochauflösungs-Modus an.<br/>
+<strong>FAR,Zf,Hf</strong>: Setzt nur die Farben im Hochauflösungsbild.<br/>
+<strong>LOE</strong>: Löscht nur das Hochauflösungsbild.<br/>
+<strong>HOF</strong>: Schaltet des Hochauflösungsbild aus und richtet den Normalmodus wieder ein.</p>
+
+<h4>2.2    Zeichnen im Bildschirmsystem</h4>
+
+<p>(dabei x von 0 bis 319, y von 0 bis 199). Erinnern Sie sich bitte an das Bildschirmkoordinatensystem. Alle x- und y-Koordinaten, die unter 2.2 und 2.3benutzt werden, beziehen sich auf dieses System (Bild 1).<br/>
+<strong>PKT,x,y</strong>: Zeichnet an der durch x und y angegebenen Stelle des Bildschirmes einen Punkt. Die Bedeutung der Bezeichnungen folgen aus Bild 2. Wegen der Eigenart des Bildschirmsystems ist darauf zu achten, daß x und y nie kleiner als 0, x nie größer als 319 und y nie größer als 199 werden. Koordinaten-Eingaben, die größer als 319 (beziehungsweise 199) sind, führen lediglich dazu, daß kein Punkt gezeichnet wird. Eingaben kleiner als Null ergeben einen SYNTAX ERROR.<br/>
+<strong>LIN,xa,ya,xb,yb</strong><br/>
+Zeichnet eine Linie vom Punkt A mit den Koordinaten xa, ya bis zum Punkt B mit den Koordinaten xb, yb (siehe Bild 3). Die Richtung der Linie ist beliebig. Die Bemerkung zur Größe der Koordinaten gilt hier entsprechend.<br/>
+<strong>REC,xa,ya,xb,yb</strong><br/>
+Zeichnet ein Rechteck, das durch den linken oberen Punkt A(xa,ya) und den rechten unteren Punkt B(xb,yb) gekennzeichnet ist (siehe Bild 4). Für die Koordinatengrenzwerte gilt dasselbe wie beim Befehl PKT.<br/>
+<strong>BLO,xa,ya,xb,yb</strong><br/>
+Füllt ein Rechteck der angegebenen Maße (siehe REC für die Bezeichnungen) mit der Zeichenfarbe aus.<br/>
+<strong>CIR,xm,ym,rx,ry,w</strong><br/>
+Zeichnet eine Ellipse oder einen Kreis (Sonderfall der Ellipse mit rx = ry) mit den folgenden Merkmalen: xm,ym = Koordinaten des Mittelpunktes M, rx,ry = Halbmesser in x- beziehungsweise y-Richtung.<br/>
+w = Zeichenwinkel (Bogenmaß). Zur Erläuterung der einzelnen Bezeichnungen dient Bild 5. Äußer negativen xm und ym-Koordinaten sind alle Eingaben zulässig.<br/>
+<strong>RAD,xm,ym,rx,ry,w</strong><br/>
+Zeichnet in die Ellipse einen Radius ein. Die Bezeichnungen sind dieselben wie für den CIR-Befehl. w zeigt hier aber an, an welche Stelle im Ellipsenbogen der Radius gezeichnet werden soll (siehe Bild 6).</p>
+
+<h4>2.3    Löschen im Bildschirmsystem</h4>
+
+<p><strong>LPK,x,y</strong>: Löscht den angegebenen Punkt x,y<br/>
+<strong>LLN,xa,ya,xb,yb</strong>: Löscht die Linie von xaya bis xb,yb<br/>
+<strong>LRE,xa,ya,xb,yb</strong>: Löscht das Rechteck (Bezeichnungen wie bei REC)<br/>
+<strong>LBK,xa,ya,xb,yb</strong>: Löscht das ausgefüllte Rechteck.<br/>
+<strong>LKR,xm,ym,rx,ry,w</strong>: Löscht die Ellipse (Bezeichnungen wie bei CIR) LRA,xm,ym,rx,ry,w: Löscht den Ellipsenradius</p>
+
+<h3>3.  Abspeichern/Laden von Hochauflösungsbildern</h3>
+
+<p><strong>HIS, &ldquo;Name"gn,sa</strong><br/>
+SAVEn des Hochauflösungsbildes mit »Name« auf dem Gerät mit der Gerätenummer gn. Es gelten die gleichen Regeln wie beim normalen SAVE-Vorgang.<br/>
+<strong>HIL, "Name&rdquo;,gn,sa</strong><br/>
+Laden eines Hochauflösungsbildes vom Speichermedium mit der Gerätenummer gn. Es gelten die gleichen Regeln wie für den normalen Ladevorgang.</p>
+
+<p>Diese neuen Befehle sollen für diese Folge ausreichen. In der nächsten Ausgabe werden die anderen Befehle beschrieben, die HIRES-3 von allen mir bekannten Grafik-Software-Paketen unterscheidet.</p>
+
+<p>Zur Praxis: Bedenken Sie bitte beim Ausprobieren dieser neuen Befehle, daß Sie alle auch im Direktmodus verwenden können. Das ist — gerade beim Testen — mitunter ganz bequem. Allerdings sind die Befehlsworte auf dem Hochauflösungsbildschirm nur als farbige Quadrate zu erkennen (Warum? Siehe vorangegangene Grafik-Folgen). Wenn Sie mal das Gefühl haben, Sie hätten sich beim Eintippen eines Befehls vergaloppiert, dann löschen Sie auch im Hochauflösungs-Modus den Bildschirm einfach mit SHIFT/CLR-HOME. Sie werden dann immer noch das Hochauflösungsbild sehen (die Bit-Map wird ja nur durch LOE gelöscht). Mit dem FAR-Befehl bringen Sie wieder neue Farbe ins Bild. Sollte ein Programm im Hochauflösungs-Modus auf einen Fehler laufen und aussteigen, dann kommen Sie mit HOF leicht wieder in den Normalmodus zurück.</p>
+
+<p>Außer Hires-3 ist dieser Folge auch noch ein kleines Programm angefügt, mit dem Sie alle bisher vorgestellten Grafik-Befehle auf ihre Funktionsfähigkeit testen können. Nun noch ein Wort an die Spezialisten: In der nächsten Folge wird eine Aufstellung aller benötigten Zeropage-Plätze und der verwendeten Sub-Routinen erscheinen. Zur Selbstkritik: Einige Befehle fehlen, nämlich etwa zum Ausfüllen von umrandeten Flächen, dann eine Möglichkeit, Texte ins Hochauflösungsbild zu schreiben und anderes. Außerdem ist in puncto Geschwindigkeit noch lange nicht das Optimum erreicht&hellip; aber irgend etwas muß für Hires-4 auch noch zu tun bleiben.</p>
+
+<p>(Heimo Ponnath/gk)</p>
+
