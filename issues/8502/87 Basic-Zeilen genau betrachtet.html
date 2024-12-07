@@ -18,11 +18,6 @@
 
         <p class="intro">Wenn Sie eine Basic-Zeile eingeben und anschließend RETURN drücken, legt der Interpreter die Zeile im Speicher ab. Will man Basic-Zeilen durch ein Maschinenprogramm erzeugen oder in einem Basic-Programm nach bestimmten Befehlen suchen, muß man wissen, wie und wo Basic-Zeilen gespeichert sind.</p>
 
-        <figure>
-            <img src="87-1.png" alt="">
-            <figcaption>Bild 2. Das kleine Basic-Programm mit SMON betrachtet.</figcaption>
-        </figure>
-
         <p>In den Speicherzellen 43/44 steht die Anfangsadresse des Basic-Speichers. Die Adresse, bei der Basic beginnt, erfahren Sie durch die Abfrage PRINT PEEK(43) + 256 * PEEK(44). Sie erhalten den Wert 2049. Das ist die Adresse, ab der die erste Basic-Zeile vom Interpreter gespeichert wird. Wie Basic-Zeilen im Speicher vorliegen, soll am folgenden Beispielprogramm erläutert werden.<br />
             10 Print &ldquo;PROBE&rdquo;<br />
             300 REMC-64<br />
@@ -31,11 +26,25 @@
 
         <p>Bild 1 und 2 zeigen, wie der Interpreter diese vier Basic-Zeilen ab der Adresse 2049 speichert. Die Werte in Klammern sind die Startadressen der einzelnen Basic-Zeilen und dienen nur dem besseren Überblick. Alle Werte sind dezimal und hexadezimal angegeben.</p>
 
+        <figure>
+            TODO
+            <figcaption>Bild 1. So legt der Interpreter Basic-Zeilen im Speicher ab. </figcaption>
+        </figure>
+        <figure>
+            <img src="87-1.png" alt="">
+            <figcaption>Bild 2. Das kleine Basic-Programm mit SMON betrachtet.</figcaption>
+        </figure>
+
         <p>Die ersten beiden Bytesjeder Zeile heißen Linkpointer oder einfach Verbindungszeiger, manche sprechen auch von Koppeladressen. Der Wert dieser beiden Bytes entspricht immer der Startadresse der nächsten Zeile. Das erste Byte ist das Low- und das zweite das High-Byte der Adresse. In Bild 1 ergeben die ersten 2 Byte der ersten Zeile den Wert 15+8x256 = 2063, also die Adresse, beiderdiezweite Zeile beginnt. Der Linkpointer der vierten Zeile (47+8x256) zeigt auf die Speicherstelle 2095. Die beiden Null-Codes in 2095 und 2096 (der Linkpointerderfünften Zeile) signalisieren dem Interpreter das Programmende.</p>
 
         <p>Byte 3 und 4 jeder Zeile ergeben die Zeilennummer der jeweiligen Basic-Zeile. In der ersten Zeile ergeben diese 2 Byte 10 + 0 x 256 = 10.</p>
 
         <p>Im Beispielprogramm steht, nach dem Linkpointer und der Zeilennummer, als fünftes Byte, das Token für PRINT (99). Um Speicherplatz zu sparen und eine schnelle Programmabarbeitung zu erzielen, werden alle Basic-Befehle (PRINT, REM, END,&hellip;) in nur 1 Byte übersetzt. Ein 1-Byte-Befehlswort heißt Token. Der Interpreter holt sich die Information, welches Token einem bestimmten Befehlswort entspricht, aus einer Zuordnungstabelle im ROM. Die Tabelle beginnt ab Adresse 41118 ($A090). Bild 3 zeigt einen Überblick über alle Basic-Befehle und deren Token. Die Leerstelle nach der Zeilennummer, die nach dem LIST-Befehl am Bildschirm zu sehen ist, wird nicht berücksichtigt. Die Leerstelle zwischen PRINT und dem Anführungszeichen steht als ASCII-Code 32 im sechsten Byte. Auf die gleiche Weise werden das Anführungszeichen, das Wort PROBE und das Schlußzeichen im ASCII-Code gespeichert. Das Beispiel zeigt, daß der Interpreter alle Zeichen, außer Befehlswörtern, im ASCII-Code speichert. Das gilt auch für Befehlswörter in Anführungszeichen (&ldquo;PRINT&rdquo;). Diese Unterscheidung können Sie in der dritten Zeile deutlich erkennen. Das erste Gleichheitszeichen stuft der Interpreter als Operatorein (Token 178, $B2), das Gleichheitszeichen in Anführungsstrichen als ASCII-Code 61 ($3D). Eine Aufstellung der ASCII-Codes finden Sie Ihrem Handbuch zum C 64 auf Seite 135.</p>
+
+        <figure>
+            TODO
+            <figcaption>Bild 3. Basic-Befehle und deren Token</figcaption>
+        </figure>
 
         <p>Das Ende jeder Programmzeile ist durch eine Null markiert. Der Interpreter erkennt daran das Zeilenende und nimmt sich die nächste Zeile vor. Enthalten die beiden Bytes für den Linkpointer Null-Codes, ist für den Interpreter das Programm zu Ende. Im Beispiel sind es die Adressen 2095 und 2096 ($082F, $0830).</p>
 
