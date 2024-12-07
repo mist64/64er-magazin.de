@@ -611,11 +611,37 @@
         <p>Da das Zeichenkopieren fast immer notwendig ist, verwendet man anstelle des Basicprogramms aus Geschwindigkeitsgründen besser eine Maschinenroutine (Listing 2 und 3). Das Programm kann mit Hilfe des Laders in ihre eigene Grafikroutine eingebaut werden. Auch speicherplatzmäßig ergeben sich, da das Maschinenprogramm recht kurz ist, keine Probleme, denn es liegt im Bandpuffer (Adresse 828).</p>
 
         <figure>
-            <!-- TODO <pre data-filename="zs kopieren" data-name="Zeichensatz kopieren"></pre> -->
+            <pre data-filename="zs kopieren" data-name="Zeichensatz kopieren"></pre>
             <figcaption>Listing 2. Zeichensatz kopieren (Basic-Lader)</figcaption>
         </figure>
         <figure>
-            TODO
+            <pre>****************** character copy
+033c  lda #$00   ; pointer init
+033e  sta $00
+0340  sta $02
+0342  lda #$80   ; zeiger auf zeichen—
+0344  sta $01    ; generator rom
+0346  lda $04    ; rg variable holen
+0348  sec
+0349  sbc #$08   ; umrechnung in h-byte
+034b  asl        ; multiplikation mit 4
+034c  asl
+034d  sta $03
+034f  ldx $04    ; schleifenzaehler
+0351  ldy #$00
+0353  lda ($00),y; zeichen laden
+0355  sta ($02),y; im ram abspeichern
+0357  inc $00    ; low-byte inc.
+0359  inc $02
+035b  bne $0353  ; uebertrag ?
+035d  inc $01    ; ja, dann high—byte
+035f  inc $03    ; inkrementieren
+0361  dex        ; zaehlschleife
+0362  bne $0353
+0364  lda $9005  ; auf ram-zeichen um-
+0367  ora $04    ; schalten
+0369  sta $9005
+036c  rts</pre>
             <figcaption>Listing 3. Zeichensatz kopieren (Assembler-Darstellung)</figcaption>
         </figure>
 

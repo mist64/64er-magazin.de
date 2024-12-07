@@ -1,0 +1,78 @@
+;hi-print.bas.prg ==0801==
+;EIngetippt von pgeorgi
+   10 rem********************************
+   20 rem*                              *
+   30 rem*           hi-eddi            *
+   40 rem*       von hans haberl        *
+   50 rem*                              *
+   60 rem*   data-lader zur erzeugung   *
+   70 rem*der druckerroutine "hi-print",*
+   80 rem*  wird auf diskette abgelegt  *
+   90 rem********************************
+  100 :
+  110 rem checksummen, nicht vertippen !!
+  120 data-205,164,-457,322,689,-834,-49,290,-87,17
+  130 :
+  140 rem m-code programm
+  150 data 0,13,133,91,173,105,14,240,34,120,169,255,141,3,221,173,2,221,9,4
+  160 data 141,2,221,173,0,221,9,4,141,0,221,169,16,141,13,221,173,13,221,88,-1
+  170 data 76,68,13,32,204,255,169,4,174,106,14,172,107,14,32,186,255,169,0
+  180 data 32,189,255,32,192,255,162,4,32,201,255,169,4,133,94,160,3,32,34,14,-1
+  190 data 169,128,133,95,169,2,133,96,165,91,41,192,208,4,70,95,70,96,165,91
+  200 data 41,7,162,0,32,48,14,165,91,48,3,74,74,74,41,7,162,2,32,48,14,169,-1
+  210 data 25,133,92,165,95,48,10,160,20,169,32,32,71,14,136,208,250,160,8,32
+  220 data 34,14,165,95,32,71,14,165,96,32,71,14,169,40,133,93,120,169,52,133,-1
+  230 data 1,160,7,177,87,153,125,14,136,16,248,169,55,133,1,88,165,87,24,105
+  240 data 8,133,87,144,2,230,88,160,8,162,0,62,125,14,8,42,232,40,36,91,48,-1
+  250 data 6,224,8,208,241,240,8,42,228,94,208,234,32,71,14,32,71,14,136,208
+  260 data 223,198,93,208,186,165,95,16,38,162,1,180,87,181,89,149,87,148,89,-1
+  270 data 202,16,245,165,94,73,12,133,94,201,4,240,15,165,91,48,3,76,151,13
+  280 data 160,0,32,34,14,76,122,13,198,92,208,244,160,0,32,34,14,160,13,32,-1
+  290 data 34,14,32,204,255,169,4,32,195,255,96,185,108,14,201,255,240,6,32
+  300 data 71,14,200,208,243,96,160,6,217,150,31,240,3,136,208,248,169,0,149,-1
+  310 data 87,24,105,32,136,16,251,149,88,96,174,105,14,208,3,76,210,255,72
+  320 data 141,1,221,173,0,221,41,251,141,0,221,9,4,141,0,221,173,13,221,41,-1
+  330 data 16,240,249,104,96,-1
+  340 :
+  350 rem die folgenden datas muessen an
+  360 rem den drucker angepasst werden!!
+  370 rem (die angegebenen werte sind
+  380 rem fuer einen epson rx-80 mit
+  390 rem data becker interface)
+  400 :
+  410 rem 0=ser. bus, 1=userport
+  420 data 0
+  430 rem geraeteadresse
+  440 data 4
+  450 rem sekundaeradresse (direktmodus)
+  460 data 1
+  470 rem die laenge der folgenden data-
+  480 rem zeilen darf nicht veraendert
+  490 rem werden, ggf. mit 255 auffuellen
+  500 rem (mind. ein 255 muss in jeder
+  510 rem zeile bleiben, ist endekennz.)
+  520 rem carriage return line feed
+  530 data 13,10,255
+  540 rem zeilenabstand fuer grafik
+  550 data 27,51,23,255,255
+  560 rem crt-grafik (640 punkte/zeile)
+  570 rem (ohne byte-anzahlen!)
+  580 data 27,42,4,255,255
+  590 rem normaler zeilenabstand
+  600 data 27,50,255,255
+  610 data-2:rem data-ende
+  620 :
+  630 rem checksummenpruefung
+  640 v=1:for i=0 to 9:read s(i):next
+  650 for b=0 to 9
+  660 read a:if a>=0 then s=s+a*v:v=-v:goto 660
+  670 if s<>s(b)then print"data-fehler in zeile"150+20*b"oder"160+20*b:end
+  680 s=0:next:print"datas ok"
+  690 :
+  700 rem file-ablage
+  710 restore:for i=0 to 9:read a:next
+  720 open 2,8,2,"hi-print,p,w"
+  730 read a:if a>=0 then print#2,chr$(a);
+  740 if a>-2 then 730
+  750 close 2:end
+
