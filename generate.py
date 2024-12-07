@@ -1187,6 +1187,8 @@ def write_full_html_file(db, path, title, preview_img, body_html, body_class, co
     </script>
     <script src="/{BASE_DIR}lunr.js"></script>
     <script src="/{BASE_DIR}search.js"></script>
+    <script src="/{BASE_DIR}mathjax/es5/tex-mml-chtml.js"></script>
+
 
     {additional_head_tags}
 
@@ -1621,6 +1623,7 @@ def copy_articles_and_assets(db, in_directory, out_directory):
     shutil.copy('filter_rss.py', out_directory)
     shutil.copy('filter_index.py', out_directory)
     shutil.copy('tootpick.html', out_directory)
+    shutil.copytree('mathjax', out_directory + '/mathjax/')
 
     # Copy the complete "fonts" folder
     fonts_source_path = os.path.join(in_directory, "fonts")
