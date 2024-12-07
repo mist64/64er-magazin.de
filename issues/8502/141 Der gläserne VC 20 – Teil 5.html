@@ -18,23 +18,6 @@
 
         <p class="intro">In Folge 4 haben wir die Grundlagen für das Arbeiten mit selbstdefinierten Grafikzeichen besprochen. Diesmal werden wir sehen, welche Fähigkeiten der VIC in bezug auf Grafik sonst noch besitzt.</p>
 
-        <figure>
-            <img src="141-1.png" alt="">
-            <figcaption>Bild 1. Ein typisches 16 x 8 Bit Zeichen</figcaption>
-        </figure>
-        <figure>
-            <img src="141-2.png" alt="">
-            <figcaption>Bild 2. Durch die Verdoppelung (»Strecken«) eines normalen Zeichens, kann man auch doppelt hohe Zeichen darstellen</figcaption>
-        </figure>
-        <figure>
-            <img src="141-3.png" alt="">
-            <figcaption>Bild 3. Durch das Beschreiben des Bildschirms mit 189 aufeinanderfolgenden Zeichen kann das Bitmapping realisiert werden</figcaption>
-        </figure>
-        <figure>
-            <img src="141-4.png" alt="">
-            <figcaption>Bild 4. Das Hires-Zeichen »A« (4a) wird im Multicolormodus (4b) zu einem mehrfarbigen Gebilde. Der Vielfarb-modus eignet sich aber besonders für Spielfiguren (4c) oder ähnliches.</figcaption>
-        </figure>
-
         <p>Beginnen wollen wir heute mit dem Bitmapping, also dem Arbeiten mit hochauflösender Grafik. Hochauflösend deshalb, weil die einzelnen Grafikpunkte sehr klein und das Gesamtbild dadurch sehr fein (eben hochauflösend) ist. Vorher aber noch eine Begriffserklärung: Bitmapping (engl. Map = Landkarte) bedeutet etwa soviel, wie den Bildschirm zu kartografieren, das heißt jede Bildschirmposition ist in hochauflösender Grafik über eine Koordinate erreichbar. Wer das Superexpander-Modul (VC 1211A) besitzt, der kann mittels einfacher Befehle wie PLOT, DRAW, CIRCLE etc. mit der Hires-(high resolution) Grafik arbeiten. Beim »nackten« VC 20 ist dies jedoch nicht so einfach möglich.</p>
 
         <h2>Das Bitmapping</h2>
@@ -49,15 +32,16 @@
 
         <p>Da die Anzahl der darstellbaren Zeichen (diese setzen sich — um dies noch einmal zu wiederholen — aus 8 x 8 Pixels zusammen) auf 256 beschränkt ist, muß man sich eine andere Lösung einfallen lassen. Diese ist aber — man wird es kaum glauben — bereits in den VIC eingebaut worden. Das sieht praktisch so aus: Man vergrößert die im Bildschirmspeicher abgelegten Zeichen von 8 x 8 auf 16 x 8 Pixels (bei gleicher Auflösung), wodurch sich gleichzeitig die zur Verfügung stehende Zeichenfläche erhöht. Diese Vergrößerung wird über ein bestimmtes Bit im VIC-Kontrollregister #3 eingestellt (vergleiche Folge 4, Tabelle 3). Ist Bit 0 dieser Speicherstelle auf 0, so bleibt alles wie es war, das heißt jedes Zeichen wird innerhalb einer 8 x 8-Matrix dargestellt.</p>
 
-        <p>Setzt man dieses Bit nun aber mit »POKE 36867, PEEK (36867) OR 1« auf 1, so sind alle Zeichen plötzlich doppelt so hoch. Ein Charakter wird nämlich innerhalb eines 16 x 8-Gitters abgebildet (Bild 1). Das ist nun alles schön und gut, einen Nachteil hat dieser Betriebszustand aber (wer es selbst ausprobiert hat wird es sicherlich schon bemerkt haben). Denn mit dem normalen Zeichensatz kommt auf dem Bildschirm keine vernünftige Zeichenfolge mehr zustande. So wird beispielsweise aus dem @ (Klammeraffe) das Zeichen</p>
-
-        <p>@<br />
+        <p>Setzt man dieses Bit nun aber mit »POKE 36867, PEEK (36867) OR 1« auf 1, so sind alle Zeichen plötzlich doppelt so hoch. Ein Charakter wird nämlich innerhalb eines 16 x 8-Gitters abgebildet (Bild 1). Das ist nun alles schön und gut, einen Nachteil hat dieser Betriebszustand aber (wer es selbst ausprobiert hat wird es sicherlich schon bemerkt haben). Denn mit dem normalen Zeichensatz kommt auf dem Bildschirm keine vernünftige Zeichenfolge mehr zustande. So wird beispielsweise aus dem @ (Klammeraffe) das Zeichen<br>@<br />
             A
             aus dem A das Zeichen<br />
             B
-            C</p>
+            C<br>und so fort. Drückt man nun eine Taste, so wird nicht der entsprechende Buchstabe abgebildet, sondern irgendwelche anderen Zeichen, die, wie eben beschrieben, übereinander gestapelt sind.</p>
 
-        <p>und so fort. Drückt man nun eine Taste, so wird nicht der entsprechende Buchstabe abgebildet, sondern irgendwelche anderen Zeichen, die, wie eben beschrieben, übereinander gestapelt sind.</p>
+        <figure>
+            <img src="141-1.png" alt="">
+            <figcaption>Bild 1. Ein typisches 16 x 8 Bit Zeichen</figcaption>
+        </figure>
 
         <h2>Doppelt hohe Zeichendarstellung</h2>
 
@@ -71,11 +55,21 @@
 
         <p>Das Programm in Listing 1 enthält zwei Zähler. Der eine zählt die ROM-, der andere die RAM-Speicherplätze, wobei letzterer genau doppelt so schnell läuft, denn eine ROM-Zeile soll ja zweimal hintereinander ins RAM geschrieben werden (dieses »Strecken« eines Zeichens ist in Bild 2 zu sehen). Da diese Schriftart natürlich besonders auffällig ist, eignet sie sich beispielsweise für Schaufensterwerbung oder ähnliches.</p>
 
+        <figure>
+            <img src="141-2.png" alt="">
+            <figcaption>Bild 2. Durch die Verdoppelung (»Strecken«) eines normalen Zeichens, kann man auch doppelt hohe Zeichen darstellen</figcaption>
+        </figure>
+
         <p>Wir wollen uns aber nun wieder unserem eigentlichen Thema — dem Bitmapping — zuwenden. Wie so oft stellt sich auch hier wieder die Frage nach dem Speicherplatz. Denn egal mit welcher Speicherausbauversion man gerade arbeitet, immer kommt es zu Kollisionen zwischen dem Zeichen- und dem Bildschirmspeicher. Daher müssen wir hier die Anzahl der verfügbaren Zeichen dementsprechend reduzieren. Wenn wir möglichst den ganzen Bildschirm füllen wollen, so muß es immer zu einem Kompromiß zwischen Bildschirmgröße und Speicherplatz kommen — logisch, dennje größer die verfügbare Hires-Fläche sein soll, um so mehr Speicherplatz benötigt man für die Sonderzeichen, über die das Bitmapping abgewickelt wird.</p>
 
         <p>Ich glaube, mit 189 je 16 x 8 Bit-Zeichen einen solchen Kompromiß gefunden zu haben. Anhand von Listing 2, das in mehrere Teile gegliedert ist, möchte ich das Verfahren beim Bitmapping erklären. Programmteil 2 beschreibt den Bildschirm mit den veranschlagten 189 Zeichen. Vorher wird der Rahmen noch entsprechend der etwas »krummen« Zeichenzahl angepaßt. Denn da eben nicht der gesamte Bildschirm genutzt werden kann, wird der leere Rest einfach abgeschnitten, was durch Verkleinerung der Bildschirmfläche geschieht. Wenn man die Zeilen 240 — 260 aus dem Programm herausläßt, sieht man das ganz deutlich. In Teil 3 des Listings wird dann schließlich der gesamte Zeichengenerator von Adresse 5120 bis 8192 gelöscht, damit der Bildschirm auch wirklich restlos leer ist.</p>
 
         <p>Damit sind alle Vorbereitungen getroffen, die wir vor dem eigentlichen Plotten durchführen müssen. Nun geht es darum, die eingegebenen Koordinaten aus den Variablen X und Y so umzuwandeln, daß die entsprechende Zeichenzeile im Charaktergenerator verändert werden kann. Als erstes verschaffen wir uns einen Überblick, wie die Zeichen auf dem Bildschirm angeordnet sind (Bild 3).</p>
+
+                <figure>
+            <img src="141-3.png" alt="">
+            <figcaption>Bild 3. Durch das Beschreiben des Bildschirms mit 189 aufeinanderfolgenden Zeichen kann das Bitmapping realisiert werden</figcaption>
+        </figure>
 
         <p>Durch die Verkleinerung der Fläche ergeben sich bei 189 verteilten Zeichen 21 Spalten und 9 Zeilen. Eine Spalte ist immer noch 8 Bit breit, denn sie rührt ja von der Zeichenbreite her. Daher ergibt sich durch Multiplikation eine Gesamtbreite von 168 Pixels. Analog verhält es sich mit der Zeilenzahl: 9 Zeilen ä 16 Zeichenzeilen ergibt 144 als maximale Y-Koordinate. Übrigens hat das Koordinatensystem seinen Ursprung (X = 0/ Y=0) nicht — wie in der Mathematik — links unten, sondern links oben.</p>
 
@@ -158,6 +152,11 @@
             01 : Rahmenfarbe<br />
             10 : Zeichenfarbe<br />
             11 : Hilfsfarbe</p>
+
+        <figure>
+            <img src="141-4.png" alt="">
+            <figcaption>Bild 4. Das Hires-Zeichen »A« (4a) wird im Multicolormodus (4b) zu einem mehrfarbigen Gebilde. Der Vielfarb-modus eignet sich aber besonders für Spielfiguren (4c) oder ähnliches.</figcaption>
+        </figure>
 
         <p>Die Werte 00 und 01, also Hintergrund- und Rahmenfarbe zeigen auf das VIC-Register # 15 (36879), in demja die Informationen über Rahmen- und Hintergrundfarbe abgelegt sind. Diese Farben sind also für alle Multicolorzeichen einheitlich vorgewählt. Auch der Code 11 — die Hilfsfarbe — wird einheitlich vorgewählt. Dieser Farbwert wird allerdings in einem Register gespeichert, das eigentlich mit Grafik überhaupt nichts zu tun hat, nämlich dem VIC-Register # 14(36878), mit demja auch die Lautstärke festgelegt wird. Die Bits 0 bis 3 enthalten also den Lautstärkewert, die oberen vier Bit die Hilfsfarbe. Diese muß demnach speziell für Multicolor eingestellt werden, denn normalerweise ist diese Speicherstelle auf Null gesetzt (damit die Lautstärke ebenfalls null ist).</p>
 

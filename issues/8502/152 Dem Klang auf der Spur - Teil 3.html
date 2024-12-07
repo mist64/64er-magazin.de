@@ -18,20 +18,12 @@
 
         <p class="intro">Nachdem im zweiten Teil dieser Reihe einige allgemeine Grundlagen aus dem Themenkomplex »Musik und Computer« dargestelK worden sind, wird in dieser Folge ausführlich der Synthesizer Chip SID (Sound Interface Device) 6581 vorgestellt.</p>
 
+        <p>Der SID (Sound Interface Device) ist funktionell an das klassische Konzept von Moog angelehnt. Dadurch ist seine Arbeitsweise leicht verständlich. Bild 1 zeigt das Blockschema des SID. Dieses Schema dient dazu, den Fluß der Audio-Signale zu veranschaulichen. Die Funktionsblöcke waren in ähnlicher Form bereits Bestandteile des Synthesizer-Schemas aus Teil 2. Den linken Teil des Schemas bilden drei identische, voneinander unabhängige, Funktionsgruppen.</p>
+
         <figure>
             <img src="152-1.png" alt="">
             <figcaption>Bild 1. Blockschema des SID</figcaption>
         </figure>
-        <figure>
-            <img src="152-2.png" alt="">
-            <figcaption>Bild 2. Die Synchronisation</figcaption>
-        </figure>
-        <figure>
-            <img src="152-3.png" alt="">
-            <figcaption>Tabelle 1. Die Register des SID</figcaption>
-        </figure>
-
-        <p>Der SID (Sound Interface Device) ist funktionell an das klassische Konzept von Moog angelehnt. Dadurch ist seine Arbeitsweise leicht verständlich. Bild 1 zeigt das Blockschema des SID. Dieses Schema dient dazu, den Fluß der Audio-Signale zu veranschaulichen. Die Funktionsblöcke waren in ähnlicher Form bereits Bestandteile des Synthesizer-Schemas aus Teil 2. Den linken Teil des Schemas bilden drei identische, voneinander unabhängige, Funktionsgruppen.</p>
 
         <p>Eine solche Gruppe setzt sich aus einem DCO (Digital Controlled Oscillator), einem Amplitudenmodulator (oder auch DCA = Digital Controlled Amplifier) und einem Hüllkurvengenerator (EG = Envelope Generator) zusammen. Der DCO kann wahlweise eine von vier Kurvenformen erzeugen: Dreieck, Sägezahn, Rechteck und Rauschen. Dabei ist das Tastverhältnis der Rechteckkurve steuerbar. Unter dem Tastverhältnis versteht man das Verhältnis zwischen der Länge des Kurvenabschnitts mit hoher Spannung zur gesamten Periodenlänge. Eine symmetrische Rechteckkurve hat demnach ein Tastverhältnis von 50 Prozent. Eine Veränderung im Tastverhältnis T bewirkt eine Klangfarbenänderung. So klingt eine Rechteckkurve mit T = 50 Prozent voluminös. Bewegt man sich mit T in Richtung 0 Prozent oder 100 Prozent, so wird der Klang zunehmend obertonreicher aber dünner, da der Anteil des Grundtons abnimmt. Einen besonders lebendigen Klang erhält man durch dynamische Veränderung des Tastverhältnisses, wras zwar in der SID-Hardware nicht realisiert, aber softwaremäßig möglich ist.</p>
 
@@ -42,6 +34,11 @@
         <h3>Synchronisation und Ringmodulation</h3>
 
         <p>Die senkrechten Verbindungen von DCO1 zu DCO2, von DCO2 zu DCO3 und von DCO3 zurück zu DCO1 können einzeln zu- oder abgeschaltet werden. Sie dienen Spezialeffekten, die das Spektrum des SID beträchtlich erweitern. Im Normalfall, wenn diese Steuerpfade unwirksam geschaltet sind, schwingen die drei DCOs unabhängig voneinander, jeder in seiner vorprogrammierten Frequenz und Kurvenform. Im Falle der <strong>Synchronisation</strong> zwingt der synchronisierende DCO einen weiteren DCO dazu, gleichphasig zu schwingen. In Bild 2 erzeugt DCO1 eine Sägezahnschwingung von 100 Hz und synchronisiert DCO2, der ebenfalls auf Sägezahn, aber 350 Hz eingestellt ist. Nach jeweils dreieinhalb Perioden wird DCO 2 gezwungen, eine neue Periode anzufangen. DCO2 erzeugt so eine viel komplexere Kurvenform, als er es ohne Synchronisation tun würde. Variiert man nun noch die Frequenz eines der beiden DCOs, während man die des anderen konstant hält, so erzeugt DCO2 ständig andere Kurvenformen. Man erhält damit schwer zu beschreibende, aber meistens »elektronisch« (im Sinne von »unnatürlich«) klingende Muster.</p>
+
+        <figure>
+            <img src="152-2.png" alt="">
+            <figcaption>Bild 2. Die Synchronisation</figcaption>
+        </figure>
 
         <p>Wenn man zu jedem Zeitpunkt die Werte zweier Kurvenzüge miteinander multipliziert, so spricht man von <strong>Ringmodulation</strong> Dieser Vorgang hat eine Ähnlichkeit mit der Modulation einer Schwingung mit einer Hüllkurve, wie sie im SID auch vorkommt. Die Hüllkurve ist aber eine Funktion, die sich, verglichen mit dem Signal das sie moduliert, nurlangsamverändert. Dadurch bleibt bei dieser Modulation der Klangcharakter des modulierten Signals erhalten, es ändert sich nur seine Lautstärke.</p>
 
@@ -75,6 +72,11 @@
         <p>Die SID-Register lassen sich so mit allen hauptspeicherbezogenen Maschinenbefehlen oder mit PEEK und POKE ansprechen. Da in einzelnen Registern oft mehrere Bits mit unterschiedlicher Bedeutung zusammengefaßt sind, erfordert ihre Programmierung ein hohes Maß an maschinennahem Denken, egal ob in Basic oder in Maschinensprache programmiert wird.</p>
 
         <p>Die Tabelle 1 zeigt die Bedeutung der einzelnen Register im Detail. Der Registersatz gliedert sich in drei mal sieben Register zur Steuerung der drei DCO-EG-AM-Gruppen für die drei Stimmen, in vier Register zur Filtersteuerung und in vier Leseregister. Die sieben Register zur Steuerung einer DCO-EG-AM-Gruppe haben für alle drei Stimmen den gleichen Aufbau und die gleiche Bedeutung.</p>
+
+        <figure>
+            <img src="152-3.png" alt="">
+            <figcaption>Tabelle 1. Die Register des SID</figcaption>
+        </figure>
 
         <h3>Frequenz low/high (Register 0 und 1)</h3>
 
