@@ -2,12 +2,18 @@
 <html lang="de">
 
 <head>
-    <title>XXX</title>
+    <title>Müllabfuhr im Computer: Die Garbage Collection</title>
     <meta charset="UTF-8">
     <link rel="stylesheet" href="../style.css">
-    <meta name="author" content="XXX">
-    <meta name="64er.issue" content="01/85">
-    <meta name="64er.pages" content="999">
+    <meta name="author" content="Boris Schneider, gk">
+    <meta name="64er.issue" content="1/85">
+    <meta name="64er.pages" content="122-126">
+    <meta name="64er.head1" content="Effektives Programmieren">
+    <meta name="64er.head2" content="C 64">
+    <meta name="64er.toc_title" content="<b>Neuer Kurs: Effektives Programmieren<br>Alles über Strings</b>">
+    <meta name="64er.toc_category" content="Kurse">
+    <meta name="64er.index_title" content="Müllabfuhr im Computer: Die Garbagge Collection (Teil 1)">
+    <meta name="64er.index_category" content="Kurse|Eff. Prog.">
     <meta name="64er.id" content="garbage">
 </head>
 
@@ -30,11 +36,11 @@
 
         <p>Ein String hat immer eine bestimmte Länge, sie entspricht der Anzahl der in ihm enthaltenen Zeichen. Die Länge darf zwischen 0 und 255 betragen, weil der Computer nur über Umwege mehr als 255 Zeichen auf einmal überblicken könnte. Bei einer Länge von Null spricht man übrigens auch von einem Leerstring, weil keine Zeichen in ihm enthalten sind, nicht zu verwechseln mit einem String, der Leerzeichen (Spaces, Blanks) enthält.</p>
 
-        <p>Da es unpraktisch wäre, jedesmal, wenn ich einen bestimmten String bearbeiten will, diesen vollständig einzugeben, gibt es die Stringvariablen. Eine Stringvariable ist nichts anderes als ein Platzhalter für einen String. Wenn ich beispielsweise der Stringvariablen A$ den String »BORIS SCHNEIDER« zuteilen möchte, so schreibe ich:<br />
+        <p>Da es unpraktisch wäre, jedesmal, wenn ich einen bestimmten String bearbeiten will, diesen vollständig einzugeben, gibt es die Stringvariablen. Eine Stringvariable ist nichts anderes als ein Platzhalter für einen String. Wenn ich beispielsweise der Stringvariablen A$ den String »BORIS SCHNEIDER« zuteilen möchte, so schreibe ich:<br>
             A$="BORIS SCHNEIDER"</p>
 
-        <p>Das Dollarzeichen hinter dem Variablennamen zeigt dem Computer an, daß es sich hier um eine Stringvariable handelt. Nun kann ich im weiteren Verlauf jedesmal, wenn ich »BORIS SCHNEIDER« eingeben müßte, A$ dafür schreiben. Allerdings können Basic-Befehle so nicht abgekürzt werden. Wenn ich eingebe:<br />
-            A$ = "PRINT":A$ 3*5<br />
+        <p>Das Dollarzeichen hinter dem Variablennamen zeigt dem Computer an, daß es sich hier um eine Stringvariable handelt. Nun kann ich im weiteren Verlauf jedesmal, wenn ich »BORIS SCHNEIDER« eingeben müßte, A$ dafür schreiben. Allerdings können Basic-Befehle so nicht abgekürzt werden. Wenn ich eingebe:<br>
+            A$ = "PRINT":A$ 3*5<br>
             so erhalte ich nicht das gewünschte Ergebnis, 15, sondern schlicht und einfach SYNTAX ERROR. Das liegt daran, daß Basic-Befehle intern anders codiert sind als Strings.</p>
 
         <h3>Aufbau einer Stringvariablen</h3>
@@ -46,16 +52,16 @@
             <figcaption>Bild 1. So ist der Basic-Speicher im Prinzip aufgeteilt. Bekannt sind normalerweise nur die Anfangs- und Endadresse des Speichers (2049/40960). Mit den Zeigern in der Zero-Page können alle Adressen abgefragt werden. Die Basic-Anfangsadresse errechnet sich zum Beispiel aus PRINT PEEK(43)+PEEE K(44)x256, der Variablenanfang aus PRINT PEEK(45)+PEEK(46)x256 und so weiter.</figcaption>
         </figure>
 
-        <p>Beim Ablauf eines Programms läßt sich der Speicher in folgende fünf Bereiche aufteilen, deren Grenzen allerdings flexibel sind und sich laufend ändern:<br />
-            — Basic-Programm<br />
-            Das gerade im Speicher befindliche Programm liegt ganz unten, angefangen bei den kleinsten erreichbaren Adressen.<br />
-            — Variable<br />
-            In diesem Bereich befinden sich alle Variablen, Zahlvariablen wie auch Stringvariablen. In den Stringvariablen ist allerdings nicht der String selbst enthalten, sondern nur ein Zeiger auf die Adresse, wo sich der eigentliche String befindet.<br />
-            — Arrays<br />
-            Hier befinden sich die Arrays, auch Felder genannt. Wenn Sie mehr als elf Elemente enthalten sollen, müssen Sie vor ihrer Benutzung erst durch den DIM-Befehl definiert werden, damit der Basic-Interpreter genügend Speicherplatz in diesem Bereich bereitstellt.<br />
-            — Freier Speicher<br />
-            Freier Speicher existiert interessanterweise nicht am oberen oder unteren Ende des Speichers, sondern in der Mitte, zwischen Arrays und Strings. Das hat aber enorme Vorteile, wie wir noch sehen werden.<br />
-            — Strings<br />
+        <p>Beim Ablauf eines Programms läßt sich der Speicher in folgende fünf Bereiche aufteilen, deren Grenzen allerdings flexibel sind und sich laufend ändern:<br>
+            — Basic-Programm<br>
+            Das gerade im Speicher befindliche Programm liegt ganz unten, angefangen bei den kleinsten erreichbaren Adressen.<br>
+            — Variable<br>
+            In diesem Bereich befinden sich alle Variablen, Zahlvariablen wie auch Stringvariablen. In den Stringvariablen ist allerdings nicht der String selbst enthalten, sondern nur ein Zeiger auf die Adresse, wo sich der eigentliche String befindet.<br>
+            — Arrays<br>
+            Hier befinden sich die Arrays, auch Felder genannt. Wenn Sie mehr als elf Elemente enthalten sollen, müssen Sie vor ihrer Benutzung erst durch den DIM-Befehl definiert werden, damit der Basic-Interpreter genügend Speicherplatz in diesem Bereich bereitstellt.<br>
+            — Freier Speicher<br>
+            Freier Speicher existiert interessanterweise nicht am oberen oder unteren Ende des Speichers, sondern in der Mitte, zwischen Arrays und Strings. Das hat aber enorme Vorteile, wie wir noch sehen werden.<br>
+            — Strings<br>
             Hier sind sie endlich, am oberen Ende des Speichers, die von uns gesuchten Strings. In diesem Bereich befinden sich, dicht aneinander gepackt, die Inhalte der Stringvariablen (mit einer Ausnahme, aber davon später).</p>
 
         <p>Nun kommen wir aber wieder auf die Stringvariablen selbst zurück.</p>
@@ -105,7 +111,7 @@
 
         <p>Das dritte Byte gibt die Länge des Strings an. Dies ist notwendig, da die eigentlichen Strings in ihrem Speicherbereich ohne Trennzeichen einfach aneinandergehängt sind. Wüßte der Computer nicht, wie lang der gefragte String ist, so könnte er auch nicht sein Ende feststellen. Da kein Trennzeichen verwendet wird, darf in einem String auch jedes Zeichen, das der Computer kennt, vorkommen. Außerdem wird so der Speicherplatz am besten ausgenutzt.</p>
 
-        <p>Die Bytes 4 und 5 enthalten die Adresse des Strings im Low/High-Byte-Format. Um diese beiden Bytes in die entsprechende Zahl umzuwandeln, müßte folgende Rechnung durchgeführt werden:<br />
+        <p>Die Bytes 4 und 5 enthalten die Adresse des Strings im Low/High-Byte-Format. Um diese beiden Bytes in die entsprechende Zahl umzuwandeln, müßte folgende Rechnung durchgeführt werden:<br>
             Byte 4 + (256 x Byte 5)</p>
 
         <p>Die Bytes 6 und 7 enthalten beide den Wert Null. Wenn Sie nach dem Sinn und Zweck fragen, so ist die Antwort, daß es für den Computer einfacher ist, wenn alle Variablentypen, Zahlen wie Strings, die gleiche Länge haben. Eine Zahlvariable belegt nun genau 7 Bytes, deswegen werden Stringvariable auf diese Länge aufgefüllt.</p>
@@ -195,7 +201,7 @@
 
         <p>Wie schon erwähnt, stimmen die Adressenangaben, die ich bei unserer Beispielspeicherbelegung gemacht habe, nicht. Der Beginn eines Basic-Programms liegt normalerweise an der Adresse 2048, das Ende des Speichers bei 40959.</p>
 
-        <p>Die Grenzen zwischen den einzelnen Bereichen sind, wie gesagt, nicht exakt festlegbar, da sie sich laufend ändern. Sollten Sie sich für die gerade bestehenden Grenzen interessieren, so können Sie sie mittels PEEK erfragen. In den in Tabelle 3 angegebenen Speicherstellen stehen die jeweiligen Grenzen im schon erwähnten Low/High-Format. Um also beipielsweise den Beginn der Strings auszudrucken, müssen Sie folgendes eingeben:<br />
+        <p>Die Grenzen zwischen den einzelnen Bereichen sind, wie gesagt, nicht exakt festlegbar, da sie sich laufend ändern. Sollten Sie sich für die gerade bestehenden Grenzen interessieren, so können Sie sie mittels PEEK erfragen. In den in Tabelle 3 angegebenen Speicherstellen stehen die jeweiligen Grenzen im schon erwähnten Low/High-Format. Um also beipielsweise den Beginn der Strings auszudrucken, müssen Sie folgendes eingeben:<br>
             PRINT PEEK(51) + 256xPEEK(52)</p>
 
         <figure>
@@ -268,14 +274,14 @@
 
         <p>Diese Sequenz vertauscht die Inhalte der zwei Stringvariablen A$ und B$. So zu tauschen ist der einfachste Weg, er hat aber auch zwei große Nachteile:</p>
 
-        <p>— Es wird eine zusätzliche Hilfsvariable, hier H$ benötigt.<br />
+        <p>— Es wird eine zusätzliche Hilfsvariable, hier H$ benötigt.<br>
             — Es entsteht eine Menge Stringmüll, nämlich 150 Prozent!</p>
 
         <p>Schauen wir uns mal genau an, was bei der oben genannten Sequenz im Speicher passiert.</p>
 
         <p>Wenn Sie es selbst am Bildschirm verfolgen wollen, geben Sie bitte nochmals die oben genannten POKE-Befehle ein. Ansonsten betrachten Sie bitte Bild 2 bis 6.</p>
 
-        <p>Zuerst definieren wir die zwei Strings A$ und B$:<br />
+        <p>Zuerst definieren wir die zwei Strings A$ und B$:<br>
             A$ = "BORIS" : B$ = "SCHNEIDER" (Sie können selbstverständlich jeden anderen Stringinhalt wählen.) Sie sehen, daß das Betriebssystem zwei Strings im Speicher abgelegt hat; die Descriptoren der entsprechenden Variablen zeigen auf diese (Bild 2).</p>
 
         <figure>
@@ -349,9 +355,9 @@
 
         <p>Sie werden jetzt vielleicht fragen, wo denn der Haken bei der Garbage Collection liegt, denn sie war ja unwahrscheinlich schnell.</p>
 
-        <p>Nun, wir hatten aber auch nur zwei Strings im Speicher, die aufgeräumt werden mußten. Wenn Sie Ihren Computer mal beschäftigen wollen, so probieren Sie folgendes:<br />
-            DIM A$(9000)<br />
-            FOR I = 0 TO 9000:A$(I)="A": NEXTI<br />
+        <p>Nun, wir hatten aber auch nur zwei Strings im Speicher, die aufgeräumt werden mußten. Wenn Sie Ihren Computer mal beschäftigen wollen, so probieren Sie folgendes:<br>
+            DIM A$(9000)<br>
+            FOR I = 0 TO 9000:A$(I)="A": NEXTI<br>
             TI$="000000":?FRE(0):?TI$</p>
 
         <p>Bitte tippen Sie das nur, wenn die normale Speicherbelegung eingeschaltet ist, sonst erhalten Sie sofort einen OUT OF MEMORY ERROR.</p>
@@ -360,8 +366,8 @@
 
         <p>Die Zeit, die die Garbage Collection benötigt, ist proportional zum Quadrat der vorhandenen Stringvariablen. Für die Nicht-Mathematiker unter uns: Die Garbage Collection muß so viele Durchgänge machen, wie Stringvariablen vorhanden sind, da in jedem Durchgang nur eine aufgeräumt wird. In jedem Durchgang muß aber auch jede Stringvariable angeschaut werden, ob sie:</p>
 
-        <p>— schon aufgeräumt ist; dann liegt ihr Descriptor über der gemerkten Grenze.<br />
-            — jetzt aufgeräumt werden soll; dann hat sie den höchsten Descriptor unter der Grenze.<br />
+        <p>— schon aufgeräumt ist; dann liegt ihr Descriptor über der gemerkten Grenze.<br>
+            — jetzt aufgeräumt werden soll; dann hat sie den höchsten Descriptor unter der Grenze.<br>
             — erst später aufgeräumt wird, dann trifft keiner der beiden ohigen Fälle zu.</p>
 
         <p>Also werden soviele Vergleiche benötigt, wie die Anzahl der vorhandenen Stingvariablen im Quadrat, von der Anzahl der Speicherverschiebungen mal abgesehen, denn sie entspricht der Anzahl der Stringvariablen.</p>
@@ -374,9 +380,9 @@
 
         <p>Es gibt mehrere Möglichkeiten, die Garbage Collection kurz zu halten:</p>
 
-        <p>— Benutzen Sie so wenig Strings wie möglich, dann braucht die Garbage Collection weniger Zeit, außerdem muß sie nicht so oft aufgerufen werden, da ja mehr Platz für Müllstrings ist.<br />
-            — Strings wenn möglich im Programm definieren, und dann nie mehr verändern, dann entsteht weniger Stringmüll<br />
-            — Weitere Stringmüll verursachende Befehlssequenzen meiden, wie zum Beispiel A$ = A$ und ähnliches.<br />
+        <p>— Benutzen Sie so wenig Strings wie möglich, dann braucht die Garbage Collection weniger Zeit, außerdem muß sie nicht so oft aufgerufen werden, da ja mehr Platz für Müllstrings ist.<br>
+            — Strings wenn möglich im Programm definieren, und dann nie mehr verändern, dann entsteht weniger Stringmüll<br>
+            — Weitere Stringmüll verursachende Befehlssequenzen meiden, wie zum Beispiel A$ = A$ und ähnliches.<br>
             — Sollen Strings vertauscht werden, SWAP-Routine verwenden.</p>
 
         <p>Halt, werden Sie jetzt sagen, was ist denn eine SWAP-Routine?</p>
@@ -406,7 +412,7 @@ Stringmüll entsteht.</figcaption>
 
         <p>Wenn Sie das Thema Stringverarbeitung und neue Stringfunktionen in Maschinensprache mehr interessiert: Darauf werde ich in der nächsten Ausgabe genauer eingehen, ebenso wie auf die genaue Funktionsweise der SWAP-Routine.</p>
 
-        <p>(Boris Schneider/gk)</p>
+        <address class="author">(Boris Schneider/gk)</address>
 
     </article>
 

@@ -2,12 +2,18 @@
 <html lang="de">
 
 <head>
-    <title>XXX</title>
+    <title>Assembler ist keine Alchimie: Teil 5</title>
     <meta charset="UTF-8">
     <link rel="stylesheet" href="../style.css">
-    <meta name="author" content="XXX">
-    <meta name="64er.issue" content="01/85">
-    <meta name="64er.pages" content="999">
+    <meta name="author" content="Heimo Ponnath, gk">
+    <meta name="64er.issue" content="1/85">
+    <meta name="64er.pages" content="142-147">
+    <meta name="64er.head1" content="Assembler-Kurs">
+    <meta name="64er.head2" content="C 64/VC 20">
+    <meta name="64er.toc_title" content="Assembler ist keine Alchimie (Teil 5)">
+    <meta name="64er.toc_category" content="Kurse">
+    <meta name="64er.index_title" content="Assembler ist keine Alchimie (Teil 5)">
+    <meta name="64er.index_category" content="Kurse|Assembler">
     <meta name="64er.id" content="assembler">
 </head>
 
@@ -42,7 +48,7 @@
 
         <p>Zur Klärung von Frage 2 listen wir uns mal Byte für Byte unser Programm auf:</p>
 
-        <p>TODO<br />
+        <p>TODO<br>
             TODO</p>
 
         <p>Neben der Byte-Nummer ist noch die Entfernung zu 2005 geschrieben. Daraus ist deutlich zu erkennen, daß die Sprungweite, die zum Programmzähler addiert wird, 05 sein muß, wenn der Sprung zum RTS erfolgen soll. Für Vorwärts-Verzweigungen gilt also: Von der Adresse des Befehls an, der auf den Branch-Befehl folgt, zählt man die Byte-Anzahl bis zum Sprungziel. Das Ergebnis ist der Offset.</p>
@@ -57,11 +63,11 @@
 
         <p>TODO</p>
 
-        <p>Wieder ist neben der Bytenummer die Entfernung vom aktuellen Programmzählerstand angegeben. Wir müssen also vom Inhalt des Programmzählers 3 abziehen, um zum INX-Befehl in Byte 1002 zu gelangen. Das kennen wir aber schon aus den vergangenen Ausgaben: Wenn der Computer eine Zahl abzieht, dann addiert er das Zweierkomplement dieser Zahl. Hier soll nun 3 subtrahiert werden. Wir berechnen das Zweierkomplement:<br />
-            3 = 0000 0011 (binär)<br />
-            Das Einerkomplement davon ist:<br />
-            1111 1100<br />
-            Dann wird eine 1 addiert<br />
+        <p>Wieder ist neben der Bytenummer die Entfernung vom aktuellen Programmzählerstand angegeben. Wir müssen also vom Inhalt des Programmzählers 3 abziehen, um zum INX-Befehl in Byte 1002 zu gelangen. Das kennen wir aber schon aus den vergangenen Ausgaben: Wenn der Computer eine Zahl abzieht, dann addiert er das Zweierkomplement dieser Zahl. Hier soll nun 3 subtrahiert werden. Wir berechnen das Zweierkomplement:<br>
+            3 = 0000 0011 (binär)<br>
+            Das Einerkomplement davon ist:<br>
+            1111 1100<br>
+            Dann wird eine 1 addiert<br>
             1111 1101</p>
 
         <p>Dies ist das Zweierkomplement. In hexadezimal ausgedrückt heißt diese Zahl $FD und ist unser Offset. Für Rückwärts-Verzweigungen gilt also: Von der auf die Branch-Anweisung folgenden Speicherstelle an zählt man die Bytes zurück bis zum Sprungziel. Das Zweierkomplement der sich dadurch ergebenden Byte-Anzahl ist der Offset.</p>
@@ -140,14 +146,14 @@
 
         <p>Bei Vorwärtssprüngen ist ohnehin alles klar: Bei einem Sprung nach Adresse 2005 müßte man in vorliegendem Fall einen Offset von 03 eingeben. Bei Rückwärts-Verzweigungen zählt man einfach von $FF an rückwärts bis zur Zieladresse. Eine Verzweigung nach 1996 würde im vorliegenden Fall also einen Offset von $FA erfordern.</p>
 
-        <p>Eine Einschränkung der relativen Adressierung können Sie nun auch sofort verstehen, wenn Sie an Zweierkomplementzahlen denken: Der Offset belegt ein Byte. Die größte positive Zahl in einem Byte ist<br />
-            0111 1111 = +127 = $7F<br />
-            und die kleinste negative Zahl ist<br />
+        <p>Eine Einschränkung der relativen Adressierung können Sie nun auch sofort verstehen, wenn Sie an Zweierkomplementzahlen denken: Der Offset belegt ein Byte. Die größte positive Zahl in einem Byte ist<br>
+            0111 1111 = +127 = $7F<br>
+            und die kleinste negative Zahl ist<br>
             1000 0000 = -128 = ($80)</p>
 
         <p>Es sind keine größeren Vorwärts-Verzweigungen als um 127 Bytes möglich, weil in diesem Fall ein Offset größer als $7F, also mit einem Bit 7 gleich 1 nötig wäre, was aber wieder als negative Zweierkomplementzahl verstanden und einen Rückwärtssprung verursachen würde. Ähnliches gilt anders herum: Es ist kein weiterer Rücksprung als um 128 Bytes möglich, weil das im Offset zum gelöschten Bit 7 führen würde, also zu einem Offset kleiner als $80, was wiederum anstelle des Rücksprunges eine Vorwärts-Verzweigung herbeiführen würde.</p>
 
-        <p>Darauf sollte man achten beim Erstellen eines Assembler-Programmes, daß man nie weitere Rückwärtssprünge als um 128, beziehungsweise Vorwärtssprünge um 127 Bytes verlangt. Auch wenn man im Assembler gar nicht auf relative Adressierung Rücksicht nehmen muß, weil der Assembler sich mit den Absolutadressen begnügt, sollte man wissen, daß zum Beispiel folgende Zeile aufgrund dieser Einschränkung nicht möglich ist:<br />
+        <p>Darauf sollte man achten beim Erstellen eines Assembler-Programmes, daß man nie weitere Rückwärtssprünge als um 128, beziehungsweise Vorwärtssprünge um 127 Bytes verlangt. Auch wenn man im Assembler gar nicht auf relative Adressierung Rücksicht nehmen muß, weil der Assembler sich mit den Absolutadressen begnügt, sollte man wissen, daß zum Beispiel folgende Zeile aufgrund dieser Einschränkung nicht möglich ist:<br>
             3000 BNE 1000</p>
 
         <p>Die meisten Assembler reagieren auf solch eine Zeile mit einer Fehlermeldung oder so wie der SMON, der klammheimlich die Programmstartadresse statt 1000 einsetzt. Aber es ist doch ärgerlich, wenn man auf dem Papier ein Programm fertig hat und erst beim Eintippen feststellt, daß der Computer das so nicht haben will.</p>
@@ -156,13 +162,13 @@
 
         <p>Weil wir nun gerade mit der Adressierung so schön in Schwung sind, stelle ich Ihnen noch eine andere vor: Die Adressierung der Zeropage. Was ist die Zeropage? Auf deutsch heißt das Nullseite. Am besten versteht man das, wenn man sich in Erinnerung ruft, wie Adressen in unserem Computer verwaltet werden. Da haben wir doch ein LSB (Least Significant Byte) und ein MSB (Most Significant Byte), zum Beispiel $lF 04 (mit lF als MSB und 04 als LSB). Nun hat unser C 64 65535 Adressen von $0000 bis $FFFF. Bei den ersten 256 Adressen von $0000 bis $00FF ist das MSB $00. Man nennt so einen 256-Byte-Block eine Seite (engl. page). Weil hier für alle Adressen dieser ersten Seite des MSB Null ist heißt sie Nullseite = Zeropage. Messerscharf werden Sie schließen, daß man die Seite mit den MSBs $01 als erste Seite bezeichnet, die mit den MSBs $02 als 2. Seite und so weiter.</p>
 
-        <p>Wenn wir nun zum Beispiel den Akku mit dem Inhalt der Zeropage-Adresse $00FA laden wollen, dann könnten wir schreiben:<br />
+        <p>Wenn wir nun zum Beispiel den Akku mit dem Inhalt der Zeropage-Adresse $00FA laden wollen, dann könnten wir schreiben:<br>
             3000 LDA 00FA</p>
 
-        <p>Unser Mikroprozessor versteht uns aber auch, wenn wir nur schreiben:<br />
+        <p>Unser Mikroprozessor versteht uns aber auch, wenn wir nur schreiben:<br>
             3000 LDA FA</p>
 
-        <p>Das ist sie, die Zeropage-Adressierung. Anstelle eines 3-Byte-Befehls ist das jetzt ein 2-Byte-Befehl, was Speicherplatz und vor allem Rechenzeit einspart. Auf diese Weise kann man von den bisher kennengelernten Befehlen folgende adressieren:<br />
+        <p>Das ist sie, die Zeropage-Adressierung. Anstelle eines 3-Byte-Befehls ist das jetzt ein 2-Byte-Befehl, was Speicherplatz und vor allem Rechenzeit einspart. Auf diese Weise kann man von den bisher kennengelernten Befehlen folgende adressieren:<br>
             LDA, LDX, LDY, STA, STX, STY, INC, DEC, ADC und SBC</p>
 
         <p>Sie können sich merken, daß man (bis auf zwei Ausnahmen, die wir noch kennenlernen werden) alle absolut adressierbaren Befehle auch Zeropage-absolut anwenden kann. Genauere Angaben über die Codes, die Ausführungszeiten und die Beeinflussung der Flaggen (letztere ist identisch mit der absoluten Adressierung) entnehmen Sie bitte der angefügten Tabelle 1.</p>
@@ -358,18 +364,18 @@
 
         <h3>Die Vergleichsbefehle: CMP, CPX, CPY</h3>
 
-        <p>Vergleichen heißt in englischer Sprache »to compare«, woraus Sie unschwer erkennen können, woher die Bezeichnung CMP und die CPs in CPX beziehungsweise CPY kommen. Verglichen wird jeweils der Akku-Inhalt (bei CMP), der Inhalt des X- (bei CPX) oder des Y-Registers (bei CPY) mit Daten, die der Compare-Befehl adressiert. Einige Beispiele werden Ihnen das klarer machen:<br />
-            CMP #FF<br />
-            vergleicht den Akku-Inhalt mit der Zahl $FF. Hier liegt die unmittelbare Adressierung vor, die ebenso für CPX und CPY verwendbar ist. Außerdem ist das dann ein 2-Byte-Befehl.<br />
-            CPX 3000<br />
-            vergleicht den Inhalt des X-Registers mit dem Inhalt der Speicherstelle $3000. Die absolute Adressierung ist also auch anwendbar (natürlich auch für CMP und CPY). Der Compare-Befehl besteht so aus 3 Bytes.<br />
-            CPY A8<br />
+        <p>Vergleichen heißt in englischer Sprache »to compare«, woraus Sie unschwer erkennen können, woher die Bezeichnung CMP und die CPs in CPX beziehungsweise CPY kommen. Verglichen wird jeweils der Akku-Inhalt (bei CMP), der Inhalt des X- (bei CPX) oder des Y-Registers (bei CPY) mit Daten, die der Compare-Befehl adressiert. Einige Beispiele werden Ihnen das klarer machen:<br>
+            CMP #FF<br>
+            vergleicht den Akku-Inhalt mit der Zahl $FF. Hier liegt die unmittelbare Adressierung vor, die ebenso für CPX und CPY verwendbar ist. Außerdem ist das dann ein 2-Byte-Befehl.<br>
+            CPX 3000<br>
+            vergleicht den Inhalt des X-Registers mit dem Inhalt der Speicherstelle $3000. Die absolute Adressierung ist also auch anwendbar (natürlich auch für CMP und CPY). Der Compare-Befehl besteht so aus 3 Bytes.<br>
+            CPY A8<br>
             vergleicht den Inhalt des Y-Registers mit dem Inhalt der Zeropage-Stelle $A8. Diese soeben frisch gelernte Zeropage-Adressierung ist bei allen drei Vergleichsbefehlen möglich und macht aus ihnen 2-Byte-Befehle.</p>
 
         <p>Für CPX und CPY sind das alle Möglichkeiten der Adressierung. CMP erlaubt weitere, die wir noch kennenlernen werden. Nun interessiert uns natürlich noch, wie das Vergleichsergebnis zu erhalten ist! Bei diesen Befehlen geschieht merkwürdiges: Die Vergleichsdaten werden vom Inhalt des Akkus (beziehungsweise X- oder Y-Registers) abgezogen, aber: Weder wird dieser Inhalt noch werden die adressierten Daten verändert! Der Trick ist, daß drei Flaggen das Ergebnis anzeigen: Die Negativ-Flagge N, die Null-Flage Z und das Carry-Bit C. Diese Anzeige geschieht so:</p>
 
-        <p>1) Der Registerinhalt (Akku, X-, Y-Register) ist größer als die Vergleichsdaten:<br>Dann ist das Carry-Bit = 1, die N- und die Z-Flagge = 0.<br />
-            2) Der Registerinhalt ist gleich den Vergleichsdaten:<br>Dann sind Carry- und Z-Flagge = 1, die N-Flagge = 0.<br />
+        <p>1) Der Registerinhalt (Akku, X-, Y-Register) ist größer als die Vergleichsdaten:<br>Dann ist das Carry-Bit = 1, die N- und die Z-Flagge = 0.<br>
+            2) Der Registerinhalt ist gleich den Vergleichsdaten:<br>Dann sind Carry- und Z-Flagge = 1, die N-Flagge = 0.<br>
             3) Der Registerinhalt ist kleiner als die Vergleichsdaten:<br>Die N-Flagge ist dann = 1, Carry- und Zero-Flagge sind 0.</p>
 
         <p>Damit Sie die Übersicht behalten können, ist in Bild 1 das ganze als Schema gezeigt.</p>
@@ -911,19 +917,19 @@
 
         <h3>Die CHRGET-Routine</h3>
 
-        <p>Das Kürzel CHRGET kommt von »Get a character«, was bei uns heißt: »Hole ein Zeichen«. Es handelt sich um eine sehr häufig benutzte Routine unseres Basic-Interpreters, die — wie schon vorhin erwähnt — komplett in der Zeropage steht. Wenn Sie mit dem SMON mal nachsehen wollen, dann geben Sie den Befehl<br />
-            D 0073 008B<br />
+        <p>Das Kürzel CHRGET kommt von »Get a character«, was bei uns heißt: »Hole ein Zeichen«. Es handelt sich um eine sehr häufig benutzte Routine unseres Basic-Interpreters, die — wie schon vorhin erwähnt — komplett in der Zeropage steht. Wenn Sie mit dem SMON mal nachsehen wollen, dann geben Sie den Befehl<br>
+            D 0073 008B<br>
             ein. Sie haben dann die komplette Routine vor sich:</p>
 
         <p>TODO</p>
 
         <p>Eventuell sieht die Zeile 0079 bei Ihnen anders aus. Das liegt dann an den Speicherstellen 7A und 7B, welche einen Zeiger darstellen (LSB = 7A und MSB = 7B), der bei Ihnen gerade auf einen anderen Platz zeigt als auf $0225.</p>
 
-        <p>Diese CHRGET-Routine besteht aus drei Teilen:<br />
+        <p>Diese CHRGET-Routine besteht aus drei Teilen:<br>
             Zeilen 0073 bis 0079</p>
 
-        <p>Weiterstellen des CHRGET-Zeigers und Einladen des dadurch angezeigten Speicherzelleninhaltes in den Akku.<br />
-            Zeilen 007G bis 0082 Prüfroutinen<br />
+        <p>Weiterstellen des CHRGET-Zeigers und Einladen des dadurch angezeigten Speicherzelleninhaltes in den Akku.<br>
+            Zeilen 007G bis 0082 Prüfroutinen<br>
             Zeilen 0084 bis 008A Flaggen-Routinen</p>
 
         <p>Im ersten Teil haben wir schon gleich etwas neues vor uns: Ein sich selbst veränderndes Programm. Die Speicherstelle (aus dem Basic-Eingabepuffer), aus der der Akku ein Zeichen holt, wird um 1 weitergezählt mit INC 7A.</p>
@@ -934,14 +940,14 @@
 
         <p>In beiden Fällen ist nun der Zeiger 7A/7B um eine Stelle weitergerückt und der Inhalt der dadurch angezeigten Speicherstelle wird in den Akku geladen. Zwei Dinge können wir uns aus diesem kurzen Programmteil merken:</p>
 
-        <p>1) Wie man eine 16-Bit-Zahl hoch-(oder auch herunter-) zählt und<br />
+        <p>1) Wie man eine 16-Bit-Zahl hoch-(oder auch herunter-) zählt und<br>
             2) eine Möglichkeit, Zeiger einzusetzen. Wir werden noch eine Reihe anderer Zeigertypen kennenlernen und sehen, daß es nicht immer so direkt zugeht wie hier.</p>
 
-        <p>Im zweiten Teil finden wir die Prüfroutinen. Die Vergleichsbefehle beschränken sich auf den Akkuinhalt, also CMP.<br />
+        <p>Im zweiten Teil finden wir die Prüfroutinen. Die Vergleichsbefehle beschränken sich auf den Akkuinhalt, also CMP.<br>
             CMP # 3A testet, in welcher Beziehung das im Akku befindliche Zeichen zum Wert $3A = dezimal 58 steht. Erinnern wir uns an das Schema in Bild 1:</p>
 
-        <p>1) Commodore-ASCII-Code im Akku größer als 58, also Zeichen hinter dem Doppelpunkt (Buchstaben, Grafikzeichen, einige Sonderzeichen). Dann ist die Carry-Flagge = 1, N- und Z-Flagge sind 0.<br />
-            2) Im Akku steht genau der Code 58, also der Doppelpunkt. Dann sind Carry-Bit und Z-Flagge = 1, nur die N-Flagge = 0.<br />
+        <p>1) Commodore-ASCII-Code im Akku größer als 58, also Zeichen hinter dem Doppelpunkt (Buchstaben, Grafikzeichen, einige Sonderzeichen). Dann ist die Carry-Flagge = 1, N- und Z-Flagge sind 0.<br>
+            2) Im Akku steht genau der Code 58, also der Doppelpunkt. Dann sind Carry-Bit und Z-Flagge = 1, nur die N-Flagge = 0.<br>
             3) Der Code des Zeichens im Akku ist kleiner als 58 (das wären alle Zahlen, einige Sonderzeichen und Steuerzeichen). In diesem Fall ist die N-Flagge = 1. Die beiden anderen Flaggen zeigen Null.</p>
 
         <p>Der nun folgende Befehl BCS 008A überprüft die Carry-Flagge. Wenn sie gesetzt ist, wenn also der Code im Akku größer oder gleich dem eines Doppelpunktes (58) ist, springt der Programmzähler zum RTS. Der Code (und auch die Flaggen) wird unverändert zum aufrufenden Hauptprogramm weitergegeben. Zur Übung können Sie ja nochmal den Offset nachrechnen. Der Rest des Programms wird nur noch durchlaufen, wenn Codes kleiner als 58 im Akku stehen.</p>
@@ -950,8 +956,8 @@
 
         <p>Durch zwei aufeinanderfolgende Subtraktionen, die insgesamt den Wert im Akku unverändert lassen (es wird 256 abgezogen), wird die Carry-Flagge beeinflußt. Verfolgen wir, was da passiert:</p>
 
-        <p>SEC dient als Vorbereitung für die folgende Subtraktion.<br />
-            SBC # 30 zieht vom Akku-Inhalt $30 = dezimal 48 ab. Wir wissen inzwischen, daß das der Addition des Zweierkomplementes entspricht. Dieses ist (rechnen Sie mal nach!) 1101 0000.<br />
+        <p>SEC dient als Vorbereitung für die folgende Subtraktion.<br>
+            SBC # 30 zieht vom Akku-Inhalt $30 = dezimal 48 ab. Wir wissen inzwischen, daß das der Addition des Zweierkomplementes entspricht. Dieses ist (rechnen Sie mal nach!) 1101 0000.<br>
             Nehmen wir mal an, wir hätten den Code der Zahl 4 (also dezimal 52 oder $34) im Akku stehen. Die Rechnung sieht dann so aus:</p>
 
         <p>TODO</p>
@@ -966,8 +972,8 @@
 
         <p>Alle Codes, die nicht für Zahlen stehen, haben nach dieser Subtraktion ein negatives Ergebnis im Akku hinterlassen und durch das »Borgen« das Carry-Bit gelöscht.</p>
 
-        <p>Nun machen wir weiter ab Zeile 0087:<br />
-            SEC<br />
+        <p>Nun machen wir weiter ab Zeile 0087:<br>
+            SEC<br>
             SBC #D0</p>
 
         <p>Wir ziehen $D0 = dezimal 208 ab. Das Zweierkomplement ist: &hellip;Doch da kommen wir ins Stocken! Denn dieses Zweierkomplement ist nicht mehr mit 8-Bit-Zahlen darzustellen. Schon die Zahl 208 im Binärformat (1101 0000) würde als negative Zahl angesehen werden, weil Bit 7 gleich 1 ist. Wir machen es uns einfach und sagen, daß sich das Zweierkomplement wie bisher bilden läßt, aber dabei das Carry-Bit mit einbezogen wird. Unser Zweierkomplement ist dann also: 0011 0000 und das Carry-Bit ist gelöscht. Nun nehmen wir unser erstes Beispiel. Dort war nach der Subtraktion im Akku eine 4 verblieben:</p>
@@ -982,8 +988,8 @@
 
         <p>Da haben wir wieder den Code für das Ausrufungszeichen ($21 = dezimal 33) im Akku und ein gesetztes Carry-Bit. Was kommt also bei der CHRGET-Routine heraus?</p>
 
-        <p>1) Alle Zeichen außer dem Space werden unverändert an das aufrufende Programm über den Akku weitergegeben. Space wird unterdrückt.<br />
-            2) Bei allen Zeichen außer bei den Zahlen ist das Carry-Bit gesetzt.<br />
+        <p>1) Alle Zeichen außer dem Space werden unverändert an das aufrufende Programm über den Akku weitergegeben. Space wird unterdrückt.<br>
+            2) Bei allen Zeichen außer bei den Zahlen ist das Carry-Bit gesetzt.<br>
             3) Manche der aufrufenden Routinen überprüfen außer dem Zustand der Carry-Flagge auch den der Z- oder N-Flagge, die ja beim ersten CMP-Befehl ebenfalls gesetzt werden. So liefert die CHRGET-Routine noch weitere Informationen.</p>
 
         <p>In der einschlägigen Literatur stoßen Sie auch auf eine Routine, die CHRGOT genannt wird. Es handelt sich dabei ebenfalls um die hier beschriebene CHRGET-Routine, nur erfolgt der Einsprung nicht bei $0073, sondern bei $0079.</p>
@@ -996,7 +1002,7 @@
 
         <p>Damit sei es für diesmal genug. Als Assembler-Alchimisten gehören Sie jetzt zu den fortgeschrittenen Eleven, denn Sie können immerhin schon so trickreiche Programme wie die CHRGET-Routine nachvollziehen.</p>
 
-        <p>(Heimo Ponnath/gk)</p>
+        <address class="author">(Heimo Ponnath/gk)</address>
 
         <figure>
             <table>
