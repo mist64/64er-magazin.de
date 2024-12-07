@@ -1,32 +1,53 @@
-<h1>Maschinenprogramme auf Diskette speichern</h1>
+<!DOCTYPE html>
+<html lang="de">
 
-<p class="intro">Reine Maschinenprogramme haben gegenüber einem Basic-Lader zwei entscheidende Vorteile. Sie sind wesentlich kürzer und können direkt, ohne zeitraubendes POKEn, geladen werden. Dieses Programm soll Ihnen helfen, Maschinenprogramme auf Diskette zu speichern.</p>
+<head>
+    <title>XXX</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="XXX">
+    <meta name="64er.issue" content="2/85">
+    <meta name="64er.pages" content="999">
+    <meta name="64er.id" content="XXX">
+</head>
 
-<p>Ein einfacher Basic-Lader besteht aus einer READ/POKE-Schleife, in der DATAs in den Speicher geschrieben werden. Jeder Wert, der in dieser Schleife gePOKEt wird, ist ein Byte eines Maschinenprogramms, ein Maschinenbefehl oder ein Teil davon. Anstatt die DATAs in den Speicher zu POKEn, kann ein Basic-Lader dazu benutzt werden, das Maschinenprogramm auf Diskette abzuspeichern. Der Lader wird dazu nur etwas geändert.</p>
+<body>
+    <article>
 
-<p>Ein Maschinenprogrammfile auf Diskette enthält, vor den Maschinenbefehlen, in den ersten beiden Bytes, die Startadresse des Programms. Der Computer erkennt daran, ab welcher Speicherstelle er das Programm laden soll.</p>
+        <h1>Maschinenprogramme auf Diskette speichern</h1>
 
-<p>Der Basic-Lader muß also ein Programmfile eröffnen, die Startadresse des Maschinenprogramms ins File schreiben und anschließend alle Werte aus den DATA-Zeilen. Wie das im einzelnen programmiert wird, können Sie am Listing des Beispielprogramms sehen, das Sie ohne weiteres an jedes Ladeprogramm anpassen können.</p>
+        <p class="intro">Reine Maschinenprogramme haben gegenüber einem Basic-Lader zwei entscheidende Vorteile. Sie sind wesentlich kürzer und können direkt, ohne zeitraubendes POKEn, geladen werden. Dieses Programm soll Ihnen helfen, Maschinenprogramme auf Diskette zu speichern.</p>
 
-<p>Der wichtigste Befehl in diesem Beipiel steht in Zeile 50130: OPEN 1,8,1, &ldquo;Programmname&rdquo;</p>
+        <p>Ein einfacher Basic-Lader besteht aus einer READ/POKE-Schleife, in der DATAs in den Speicher geschrieben werden. Jeder Wert, der in dieser Schleife gePOKEt wird, ist ein Byte eines Maschinenprogramms, ein Maschinenbefehl oder ein Teil davon. Anstatt die DATAs in den Speicher zu POKEn, kann ein Basic-Lader dazu benutzt werden, das Maschinenprogramm auf Diskette abzuspeichern. Der Lader wird dazu nur etwas geändert.</p>
 
-<p>Er öffnet eine Datei. Allerdings keine sequentielle, sondern eine Programmdatei. Die Sekundäradresse 1 sagt der Floppy 1541, daß nun ein Programm (NAME.PRG) geschrieben wird. Häufig findet man für diesen Befehl die Syntax OPEN 2,8,2, &ldquo;Programmname,P, W&rdquo;</p>
+        <p>Ein Maschinenprogrammfile auf Diskette enthält, vor den Maschinenbefehlen, in den ersten beiden Bytes, die Startadresse des Programms. Der Computer erkennt daran, ab welcher Speicherstelle er das Programm laden soll.</p>
 
-<p>bei der man die Sekundäradresse frei wählen darf. Hier muß jedoch nach dem Namen angegeben werden, daß eine Programmdatei (P) geöffnet werden soll, in die geschrieben wird (Write). Entsprechend kann bei sequentiellen Dateien optional »S,W« bei Schreib- oder »S,R« bei Lesezugriffen angegeben werden.</p>
+        <p>Der Basic-Lader muß also ein Programmfile eröffnen, die Startadresse des Maschinenprogramms ins File schreiben und anschließend alle Werte aus den DATA-Zeilen. Wie das im einzelnen programmiert wird, können Sie am Listing des Beispielprogramms sehen, das Sie ohne weiteres an jedes Ladeprogramm anpassen können.</p>
 
-<p>Nachdem in Zeile 50130 die Programmdatei angelegt wurde, muß die Startadresse des Maschinenprogrammes gespeichert werden. Die Startadresse wird dazu in den Zeilen 50170 und 50180 in Low- und High-Byte zerlegt und die zwei Byte in Zeile 50190 in das Programmfile geschrieben. Jetzt wird das eigentliche Programm gespeichert. Die numerischen Werte müssen dazu mit der CHR$-Funktion in die entsprechenden Strings übersetzt werden. Um die erforderliche Datendichte beim Schreiben des Files zu erreichen, muß jedem String ein Semikolon »,«folgen. Ohne Semikolon ist das Programm später nicht lauffähig. Sindalle Werte, die der Basic-Lader in den Speicher gePOKEt hätte, gespeichert, wird die Datei mit CLOSE geschlossen. Damit ist das Maschinenprogramm auf Diskette gespeichert und kann mit<br/>
-LOAD &ldquo;NAME&rdquo;,8,1</p>
+        <p>Der wichtigste Befehl in diesem Beipiel steht in Zeile 50130: OPEN 1,8,1, &ldquo;Programmname&rdquo;</p>
 
-<p>geladen und, wenn dies notwendig ist, mit dem entsprechenden SYS-Befehl gestartet werden.</p>
+        <p>Er öffnet eine Datei. Allerdings keine sequentielle, sondern eine Programmdatei. Die Sekundäradresse 1 sagt der Floppy 1541, daß nun ein Programm (NAME.PRG) geschrieben wird. Häufig findet man für diesen Befehl die Syntax OPEN 2,8,2, &ldquo;Programmname,P, W&rdquo;</p>
 
-<h3>Laden von Maschinenprogrammen in Basic</h3>
+        <p>bei der man die Sekundäradresse frei wählen darf. Hier muß jedoch nach dem Namen angegeben werden, daß eine Programmdatei (P) geöffnet werden soll, in die geschrieben wird (Write). Entsprechend kann bei sequentiellen Dateien optional »S,W« bei Schreib- oder »S,R« bei Lesezugriffen angegeben werden.</p>
 
-<p>Sie können Maschinenroutinen mit Hilfe von Basic-Programmen laden, ohne sie zu zerstören. Dabei ist zu beachten, daß nach dem Laden das Basic-Programm von Neuem startet. Die Basic-Zeile<br/>
-10 LOAD &ldquo;KEIN ENDE&rdquo;,8,1</p>
+        <p>Nachdem in Zeile 50130 die Programmdatei angelegt wurde, muß die Startadresse des Maschinenprogrammes gespeichert werden. Die Startadresse wird dazu in den Zeilen 50170 und 50180 in Low- und High-Byte zerlegt und die zwei Byte in Zeile 50190 in das Programmfile geschrieben. Jetzt wird das eigentliche Programm gespeichert. Die numerischen Werte müssen dazu mit der CHR$-Funktion in die entsprechenden Strings übersetzt werden. Um die erforderliche Datendichte beim Schreiben des Files zu erreichen, muß jedem String ein Semikolon »,«folgen. Ohne Semikolon ist das Programm später nicht lauffähig. Sindalle Werte, die der Basic-Lader in den Speicher gePOKEt hätte, gespeichert, wird die Datei mit CLOSE geschlossen. Damit ist das Maschinenprogramm auf Diskette gespeichert und kann mit<br />
+            LOAD &ldquo;NAME&rdquo;,8,1</p>
 
-<p>bewirkt deshalb eine Endlosschleife, die immer wieder das Maschinenprogramm »KEIN ENDE« lädt. Da angelegte Variablen dabei erhalten bleiben, kann mit<br/>
-10 IF A=0 THEN A=1:LOAD &ldquo;KEIN ENDE"8,1<br/>
-ein mehrmaliges Laden verhindert werden, da beim Neustart A=1 ist.</p>
+        <p>geladen und, wenn dies notwendig ist, mit dem entsprechenden SYS-Befehl gestartet werden.</p>
 
-<p>(S. Wengler/hm)</p>
+        <h3>Laden von Maschinenprogrammen in Basic</h3>
 
+        <p>Sie können Maschinenroutinen mit Hilfe von Basic-Programmen laden, ohne sie zu zerstören. Dabei ist zu beachten, daß nach dem Laden das Basic-Programm von Neuem startet. Die Basic-Zeile<br />
+            10 LOAD &ldquo;KEIN ENDE&rdquo;,8,1</p>
+
+        <p>bewirkt deshalb eine Endlosschleife, die immer wieder das Maschinenprogramm »KEIN ENDE« lädt. Da angelegte Variablen dabei erhalten bleiben, kann mit<br />
+            10 IF A=0 THEN A=1:LOAD &ldquo;KEIN ENDE"8,1<br />
+            ein mehrmaliges Laden verhindert werden, da beim Neustart A=1 ist.</p>
+
+        <p>(S. Wengler/hm)</p>
+
+    </article>
+
+</body>
+
+</html>
