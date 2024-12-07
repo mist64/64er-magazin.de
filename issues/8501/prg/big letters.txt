@@ -1,0 +1,54 @@
+;big letters.prg ==0801==
+;Eingetippt von pgeorgi
+    0 rem *********************************
+    1 rem *    b i g -- l e t t e r s     *
+    2 rem *       1984 by mkb-soft        *
+    3 rem * matthias baldauf 06361/7162   *
+    4 rem *      luitpoldstrasse 62       *
+    5 rem *      6760 rockenhausen        *
+    6 rem *********************************
+    7 data 134,64,169,0,133,254,162,48,134,255,162,0,145,254,200,208,251
+    8 data 230,255,166,255,224,56,208,241,96
+    9 fort=52500to52500+25:reada:poket,a:next
+   10 sys52500: rem * zeichen ram auf 0 damit fliesender aufbau
+   20 v=53248:x=12288:print"{clr}":rem * x ist startadresse des neuen zeichensatzes
+   22 pokev+24,29
+   25 pokev+32,0:pokev+33,0
+   30 d=82:rem * bildschirmcode ab dem zeichen umdefiniert werden
+   40 y=x+82*8
+   55 gosub300
+   60 fori=1toza:rem * anzahl einzulesender buchstaben
+   70 poke1,55:poke56334,l:q=1
+   80 forj=0to1:rem * 2 mal da zeichen jetzt doppelt so hoch
+   85 ifd>255then400
+   90 pokec+i+j*40,d:rem * setzen des zeichens
+  100 pokee+i+j*40,fa(q):rem * setzen der farben
+  110 q=q+1:d=d+1:next
+  120 reads
+  130 poke56334,0:poke1,51
+  140 forj=0to7:m=peek(53248+(s*8)+j):rem * auslesen des alten zeichens (klein)
+  150 fork=0to1:rem * verdoppeln
+  160 pokey,m:y=y+1:nextk,j,i
+  170 poke1,55:poke56334,1
+  180 goto55
+  300 rem *** anfang setzen ***
+  301 :
+  305 readsp,ze,za,fa(1),fa(2):rem spalte,zeile,anzahl der zeichen,farbe 1,farbe 2
+  306 ifsp=-lthen400
+  310 c=1024+sp+ze*40:rem * wo text auf screen steht * spalte und zeile*40
+  320 e=55296+sp+ze*40:rem * dasselbe im farbbspeicher
+  330 return
+  400 rem *** einlesen beenden ***
+  401 :
+  402 end
+  403 rem ** hier geht spaeter programm weiter
+  500 rem *** schrift datas ***
+  501 rem *** spalte * zeile * anzahl der zeichen * farbe 1 * farbe 2 * schrift
+  502 :
+  503 data 10,4,19,7,10,42,32,20,8,5,32,2,9,7,32,12,5,20,20,5,18,19,32,42
+  505 data 17,8,4,8,9,49,57,56,52
+  510 data 9,11,21,14,6,3,15,16,25,18,9,7,8,20,32,2,25,32,13,11,2,45,19,15,6,20
+  520 data 8,19,23,4,4,22,9,5,12,32,19,16,1,19,19,32,2,5,9,13,32,20,5,19,20
+  530 data 32,33,33
+10000 data-1,-1,-1,-1,-1
+
