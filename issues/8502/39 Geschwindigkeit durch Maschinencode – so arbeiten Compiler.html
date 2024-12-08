@@ -8,7 +8,7 @@
     <meta name="author" content="XXX">
     <meta name="64er.issue" content="2/85">
     <meta name="64er.pages" content="999">
-    <meta name="64er.id" content="XXX">
+    <meta name="64er.id" content="compiler">
 </head>
 
 <body>
@@ -18,9 +18,9 @@
 
         <p class="intro">Programme komfortabel in Basic schreiben, aber mit der Geschwindigkeit von Maschinensprache ausführen lassen — Compiler machen’s möglich.</p>
 
-        <p>Es ist schon erstaunlich. Da gibt es Programme, die andere Programme als Eingabedaten verwenden und diese in reinen Maschi-.nencode übersetzen, der von der CPU direkt ausgeführt werden kann. Das ist durchaus von Vorteil:</p>
+        <p>Es ist schon erstaunlich. Da gibt es Programme, die andere Programme als Eingabedaten verwenden und diese in reinen Maschinencode übersetzen, der von der CPU direkt ausgeführt werden kann. Das ist durchaus von Vorteil:</p>
         <p>Basic-Programme sind nämlich einfach zu schreiben, aber langsam in der Ausführung. Maschinensprache ist dagegen sehr schnell, aber schwierig zu programmieren. Compiler bilden praktisch die Brücke zwischen den beiden grundsätzlichen Anforderungen nach einfacher Programmerstellung und hoher Ausführungsgeschwindigkeit.</p>
-        <p>Auf den ersten Blick drängt sich der Vergleich mit einem Assembler auf, der ja auch in Klartext gegebene Befehle in Maschinencode übersetzt. Doch der Vergleich hinkt, denn die Aufgabe eines Assemblers ist vergleichsweise trivial. Zu jedem Klartextbefehl (Mnemonic) wie zum Beispiel LDA gibt es nämlich genau einen Opcode. Der Assembler macht daher im wesentlichen nichts anderes, als in einer zweispaltigen Tabelle das Mnemonic zu suchen und bei Erfolg aus der zweiten Spalte den zugehörigen Opcode zu entnehmen. ZwischenAssembler-Mnemonic und erzeugtem Maschinencode besteht also ein Verhältnis eins zu eins.</p>
+        <p>Auf den ersten Blick drängt sich der Vergleich mit einem Assembler auf, der ja auch in Klartext gegebene Befehle in Maschinencode übersetzt. Doch der Vergleich hinkt, denn die Aufgabe eines Assemblers ist vergleichsweise trivial. Zu jedem Klartextbefehl (Mnemonic) wie zum Beispiel LDA gibt es nämlich genau einen Opcode. Der Assembler macht daher im wesentlichen nichts anderes, als in einer zweispaltigen Tabelle das Mnemonic zu suchen und bei Erfolg aus der zweiten Spalte den zugehörigen Opcode zu entnehmen. Zwischen Assembler-Mnemonic und erzeugtem Maschinencode besteht also ein Verhältnis eins zu eins.</p>
         <p>Bei sehr maschinennahen Befehlen wie beispielsweise beim Basic-Befehl GOTO hat es der Compiler ähnlich einfach: »GOTO (Zeilennummer)« würde von einem 6502-Basic-Compiler übersetzt in »JMP Adresse)«. Bei Befehlen wie »IF X = A + 3 THEN Z = 5« wird die Sache schon etwas komplizierter. Eine solche Anweisung kann allein schon deshalb nicht direkt übersetzt werden, weil der 6502-Prozessor keinen Maschinenbefehl »IF« kennt.</p>
         <p>Hier muß der Compiler also wesentlich mehr leisten, als nur Opcodes zu bestimmten Schlüsselwörtern herauszusuchen. In der Regel entspricht einem Befehl in einer höheren Programmiersprache eine ganze Befehlssequenz auf der Maschinenebene. Die Aufgabe eines Compilers wird daher mit Recht als Übersetzung statt Assemblierung (Zusammenfügung) bezeichnet.</p>
         <p>Übersetzt wird immer aus einer höheren Programmiersprache (beispielsweise Basic) in eine maschinennahe »Sprache«, meistens direkt in Maschinencode. Einer Programmiersprache liegt — wie auch jeder natürlichen Sprache — ein Vokabular und eine Grammatik zugrunde.</p>
@@ -53,6 +53,103 @@
         <p>Was hat das Ganze nun mit Compilern zu tun? Sehr viel, denn eigentlich sind wir schon mittendrin im Thema. Jeder Compiler verfügt nämlich über einen sogenannten »Parser«, ein wichtiges Teilprogramm, das die syntaktische Analyse übernimmt. Dazu ist es notwendig, daß der Parser die Syntax genau »kennt«. Das sieht dann so aus, daß der Parser bei der Programmanalyse bildlich gesprochen den Linien der Syntax-Diagramme folgt. Stößt er dabei auf ein Kästchen mit einer Syntax-Regel, dann wird sofort das entsprechende Unterprogramm zur Analyse oder Übersetzung dieser Regel aufgerufen. Die Eingabe für den Parser ist also der Programm-Quelltext, als Ausgabe liefert er einen Zwischencode, also eine Art vor-übersetztes Programm.</p>
         <p>Bei diesem Zwischencode handelt es sich in der Regel — man höre und staune — um den Maschinenbefehlssatz eines Computers, den es gar nicht gibt. Tabelle 1 zeigt, wie der Befehlssatz eines solchen hypothetischen Computers aussehen könnte. Natürlich erzeugt der Compiler intern nicht die ASCII-Zeichenfolge für diese Befehle, sondern legt jeden Befehl in einem Byte codiert ab. Ein solches oft als »Token« bezeichnetes Byte ist im folgenden immer gemeint, wenn von einem vom Compiler erzeugten Zwischencode die Rede ist.</p>
         <p>Intern arbeitet der »Ghost-Computer«, dessen Befehlssatz gerade der Zwischencode ist, mit einem Stack, wie er jedem Forth-Programmierer, aber auch jedem Benutzer von Hewlett-Packard-Taschenrechnern vertraut sein dürfte. Diesen Rechenstack kann man sich bildlich als Papierstapel vorstellen. Während der Berechnung eines mehr oder minder komplizierten arithmetischen Ausdrucks können Zettel mit Zwischenergebnissen auf den Stapel gelegt oder aber von oben weggenommen werden.</p>
+
+        <figure>
+            <table>
+                <tbody>
+                    <tr>
+                        <td><b>Befehl</b></td>
+                        <td><b>Bedeutung</b></td>
+                    </tr>
+                    <tr>
+                        <td>LITn</td>
+                        <td>Konstante n auf Stack legen</td>
+                    </tr>
+                    <tr>
+                        <td>RCLx</td>
+                        <td>Inhalt der Variablen x auf Stack legen</td>
+                    </tr>
+                    <tr>
+                        <td>STOx</td>
+                        <td>obersten Stapelwert nach x speichern</td>
+                    </tr>
+                    <tr>
+                        <td>ADD</td>
+                        <td>die obersten beiden Stapelwerte addieren</td>
+                    </tr>
+                    <tr>
+                        <td>SUB</td>
+                        <td>die obersten beiden Stapelwerte subtrahieren</td>
+                    </tr>
+                    <tr>
+                        <td>MUL</td>
+                        <td>die obersten beiden Stapelwerte multiplizieren</td>
+                    </tr>
+                    <tr>
+                        <td>DIV</td>
+                        <td>die obersten beiden Stapelwerte dividieren</td>
+                    </tr>
+                    <tr>
+                        <td>JMPa</td>
+                        <td>unbedingter Sprung zur Adresse a</td>
+                    </tr>
+                    <tr>
+                        <td>JEQa</td>
+                        <td>Sprung, falls oberstes Stapelelement Null</td>
+                    </tr>
+                    <tr>
+                        <td>JNEa</td>
+                        <td>Sprung, falls oberstes Stapelelement nicht Null</td>
+                    </tr>
+                    <tr>
+                        <td>JGEa</td>
+                        <td>Sprung, falls oberstes Stapelelement positiv</td>
+                    </tr>
+                    <tr>
+                        <td>JLTa</td>
+                        <td>Sprung, falls oberstes Stapelelement negativ</td>
+                    </tr>
+                    <tr>
+                        <td>JSRa</td>
+                        <td>U nterprogrammaufruf</td>
+                    </tr>
+                    <tr>
+                        <td>RTS</td>
+                        <td>Rückkehr vom Unterprogramm</td>
+                    </tr>
+                    <tr>
+                        <td>SQR</td>
+                        <td>Quadratwurzel aus oberstem Stapelelement</td>
+                    </tr>
+                    <tr>
+                        <td>SIN</td>
+                        <td>Sinus des obersten Stapelelements</td>
+                    </tr>
+                    <tr>
+                        <td>COS</td>
+                        <td>Cosinus des obersten Stapelelements</td>
+                    </tr>
+                    <tr>
+                        <td>TAN</td>
+                        <td>Tangens des obersten Stapelelements</td>
+                    </tr>
+                    <tr>
+                        <td>ATN</td>
+                        <td>Arcustangens des obersten Stapelelements</td>
+                    </tr>
+                    <tr>
+                        <td>LOG</td>
+                        <td>Logarithmus des obersten Stapelelements</td>
+                    </tr>
+                    <tr>
+                        <td>EXP</td>
+                        <td>Exponentialfunktion des obersten Stapelelements</td>
+                    </tr>
+                </tbody>
+            </table>
+            <figcaption>Tabelle 1. Typische Befehle eines einfachen Zwischencodes</figcaption>
+        </figure>
+
         <p>Natürlich kann man mit den Befehlen aus Tabelle 1 arithmetische Ausdrücke nicht in der gewohnten Schreibweise berechnen, sondern es muß zuvor eine Umwandlung in die sogenannte »umgekehrte polnische Notation« (UPN) erfolgen. Ein Ausdruck wie »2 + 3 x 5« würde beispielsweise folgenden Zwischencode ergeben (Stackinhalt in Klammern):</p>
 
         <table class="plain">
@@ -86,6 +183,41 @@
         </figure>
 
         <p>Tabelle 2 zeigt einige Beispiele für die Übersetzung von Basic-Anweisungen in Zwischencode. Natürlich ist der hier vorgestellte Zwischencode nur ein (unvollständiges) Beispiel. Sie sollten daher nicht erwarten, daß Ihr Basic-Compiler genau diesen speziellen Code erzeugt.</p>
+
+        <figure>
+            <table>
+                <tbody>
+                    <tr>
+                        <td><b>Basic-Befehl</b></td>
+                        <td><b>erzeugter Zwischencode</b></td>
+                    </tr>
+                    <tr>
+                        <td>A = 3 + 5*X</td>
+                        <td>LIT 3, LIT 5, RCL X, MUL, ADD, STO A</td>
+                    </tr>
+                    <tr>
+                        <td>GOTO 123</td>
+                        <td>JMP xxxx</td>
+                    </tr>
+                    <tr>
+                        <td>GOSUB 500</td>
+                        <td>JSR xxxx</td>
+                    </tr>
+                    <tr>
+                        <td>RETURN</td>
+                        <td>RTS</td>
+                    </tr>
+                    <tr>
+                        <td>IFA = 0THEN 50</td>
+                        <td>RCL A, JEQ xxxx</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <figcaption>Tabelle 2. Beispiele zur Übersetzung von Basic
+                in Zwischencode</figcaption>
+        </figure>
+
         <p>Ist Ihnen bis hierhin etwas aufgefallen ? In der bisherigen Beschreibung der Funktionsweise eines Compilers wurde weder darauf eingegangen, in welcher Sprache der Compiler selbst geschrieben ist, und vor allemnicht, fürwelchen Prozessor die Übersetzung durchgeführt wird. Der Grund dafür ist einfach: Ein Compiler ist ein Programm, das einem bestimmten Algorithmus realisiert. Es ist also völlig gleichgültig, in welcher Programmiersprache der Compiler geschrieben wurde. So kann ein Pascal-Compiler durchaus in Basic geschrieben werden, wenn das aus verschiedenen Gründen auch nicht besonders sinnvoll wäre. Außerdem haben wir bisher auch noch keinen wirklichen Maschinencode erzeugt, es ist also egal, für welchen Prozessor die Übersetzung stattfinden soll.</p>
         <p>Einige Compiler belassen es sogar bei diesem Zwischencode. Es wird dann ein spezielles Interpreterprogramm benötigt, das diesen Zwischencode interpretiert (»Run-Time-Modul«). Derartige Compiler sind besonders bei 8-Bit-Computern verbreitet, da der Zwischencode sehr kompakt ist (ein Byte pro Befehl). Nachteilig ist natürlich, daß dieser Code immer noch interpretiert werden muß, wenngleich das wegen der sehr einfachen Struktur recht schnell geht. Derartige Zwischencode-Programme sind in der Ausführungszeit etwa zwei- bis zehnmal so schnell wie Basic, bei vermindertem Platzbedarf. Der sogenannte »P-Code«, den Pascal-Compiler erzeugen, ist übrigens ebenfalls ein solcher Zwischencode.</p>
 
