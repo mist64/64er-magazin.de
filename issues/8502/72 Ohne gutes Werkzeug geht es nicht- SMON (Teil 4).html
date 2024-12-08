@@ -105,11 +105,28 @@
 
         <p>Sollten Sie nicht zu den glücklichen Gewinnern zählen, geben wir Ihnen im folgenden die Speicherstellen an, in denen die Voreinstellungen stehen. Diese können Sie dann mit dem »M«-Befehl Ihren Wünschen entsprechend abändern.</p>
 
-        <p>Vergessen Sie aber nicht, Ihre geänderte Version mit »S &ldquo;@:SMON $C000&rdquo; C000 CE09« abzuspeichern.<br />
-            Hintergrund-Farbe $C220<br />
-            Schreibfarbe $C228<br />
-            Ger. Adr. Drucker $C21B<br />
-            Ger. Adr. F1/Cass : $C216</p>
+        <p>Vergessen Sie aber nicht, Ihre geänderte Version mit »S &ldquo;@:SMON $C000&rdquo; C000 CE09« abzuspeichern.</p>
+
+        <table class="plain">
+            <tbody>
+                <tr>
+                    <td>Hintergrund-Farbe</td>
+                    <td>$C220</td>
+                </tr>
+                <tr>
+                    <td>Schreibfarbe</td>
+                    <td>$C228</td>
+                </tr>
+                <tr>
+                    <td>Ger. Adr. Drucker</td>
+                    <td>$C21B</td>
+                </tr>
+                <tr>
+                    <td>Ger. Adr. F1/Cass</td>
+                    <td>$C216</td>
+                </tr>
+            </tbody>
+        </table>
 
         <h3>Wer steht wo ? — Wegweiser durch SMON</h3>
 
@@ -143,7 +160,70 @@
 
         <p>Dazu gehören in erster Linie die oben erwähnten Einsprungadressen, deren High-Byte natürlich geändert werden muß, wenn SMON in einem anderen Speicherbereich laufen soll. Es gibt aber auch Befehle, die eine Adresse im Programm in einem Vektor ablegen müssen. Disassemblieren Sie einmal den Anfang von SMON mit »D C000 COOB«. Sie erhalten</p>
 
-        <p>TODO</p>
+        <table class="plain">
+            <tbody>
+                <tr>
+                    <td>9005</td>
+                    <td>LDA #C2</td>
+                    <td>ändern</td>
+                </tr>
+                <tr>
+                    <td>9124</td>
+                    <td>CPX #C0</td>
+                    <td>nicht ändern</td>
+                </tr>
+                <tr>
+                    <td>9386</td>
+                    <td>LDY #C0</td>
+                    <td>ändern</td>
+                </tr>
+                <tr>
+                    <td>9441</td>
+                    <td>CMP #C0</td>
+                    <td>nicht ändern</td>
+                </tr>
+                <tr>
+                    <td>987F</td>
+                    <td>LDX #C3</td>
+                    <td>nicht ändern</td>
+                </tr>
+                <tr>
+                    <td>988D</td>
+                    <td>LDX #C1</td>
+                    <td>nicht ändern</td>
+                </tr>
+                <tr>
+                    <td>9992</td>
+                    <td>LDA #C1</td>
+                    <td>nicht ändern</td>
+                </tr>
+                <tr>
+                    <td>9C2C</td>
+                    <td>LDA #CC</td>
+                    <td>ändern</td>
+                </tr>
+                <tr>
+                    <td>9C5B</td>
+                    <td>LDA #C2</td>
+                    <td>ändern</td>
+                </tr>
+                <tr>
+                    <td>9CF4</td>
+                    <td>LDA #CC</td>
+                    <td>ändern</td>
+                </tr>
+                <tr>
+                    <td>9DA1</td>
+                    <td>LDX #CC</td>
+                    <td>ändern</td>
+                </tr>
+                <tr>
+                    <td>9E03</td>
+                    <td>LDA #CC</td>
+                    <td>ändern</td>
+                </tr>
+            </tbody>
+        </table>
 
         <p>Damit wird der Break-Vektor des Betriebssystems auf den SMON gesetzt und mit dem anschließenden — und jedem weiteren BRK-Befehl—springt das Programm in SMONs BREAK-Routine. Wenn SMON in einem anderen Bereich als $C000 laufen soll, dann müssen diese Befehle geändert werden. Heraussuchen kann man sie mit »FIC*,COOO D000«. Sie wissen doch noch, was diese Anweisung bedeutet: Suche mir alle Befehle, die ein Register unmittelbar mit einem Wert laden, der mit $C beginnt. Aber Vorsicht! Nicht alles, was da angezeigt wird, muß auch geändert werden! Um Ihnen weitere Stunden sinnlosen Herumbrütens zu ersparen, wollen wir als Beispiel zeigen, wie man SMON in den Bereich $9000 bis $A000 verlegen kann. Natürlich geht das im Prinzip für jeden anderen Bereich genauso; wir selbst haben insgesamt fünf SMON-Versionen für fünf verschiedene Speicherbereiche, von denen eine immer paßt.</p>
 
@@ -187,68 +267,90 @@
 
         <p>(N. Mann/D. Weineck/gk)</p>
 
+        <figure>
+            <li><b>A 4000 (Assembler)</b><br>
+                symbolischer Assembler (Verarbeitung von Labels möglich) Startadresse $4000<br />
+            </li>
+            <li><b>B 4000 4200 (Basic-DATA)</b><br>
+                erzeugt Basic-DATA-Zeilen aus Maschinenprogramm im Bereich von$4000-$41FF<br />
+            </li>
+            <li><b>C 4010 4200 4013 4000 4200 (Convert)</b><br>
+                in ein Programm, das von $4000 - $4200 im Speicher steht, soll bei $4010 ein 3-Byte-Befehl eingefügt werden. Dazu wird das Programm ab $4010 - $4200 auf die neue Adresse $4013 verschoben. Alle absoluten Adressen, die innerhalb des Programmbereichs ($4000 - $4200) stehen, werden umgerechnet, so daß die Sprungziele stimmen.<br />
+            </li>
+            <li><b>D 4000 (4100) (Disassembler)</b><br>
+                disassembliert den Bereich von $4000 (- $4100) mit Ausgabe der Hex-Werte. Änderungen sind durch Überschreiben der Befehle möglich.<br />
+            </li>
+            <li><b>F (Find)</b><br>
+                findet Zeichenketten (F), absolute Adressen (FA), relative Sprünge (FR), Tabellen (FT), Zeropageadressen (FZ) und lmmediate-Befehle (Fl)<br />
+            </li>
+            <li><b>G (4000) (Go)</b><br>
+                startet ein Maschinenprogramm, das bei $4000 im Speicher beginnt.<br />
+            </li>
+            <li><b>I 01 (I/O-Gerät)</b><br>
+                stellt die Gerätenummer für Floppy (08 oder 09) oder Datasette (01) ein.<br />
+            </li>
+            <li><b>K A000 (A500) (Kontrolle)</b><br>
+                zum schnellen Durchsuchen des Bereichs von $A000 (-$A500) nach ASCII-Zeichen (32 Byte pro Zeile). Änderungen sind durch Überschreiben der ASCII-Zeichen möglich.<br />
+            </li>
+            <li><b>L (4000) (Load)</b><br>
+                lädt ein Maschinenprogramm an die richtige oder eine angegebene Adresse ($4000)<br />
+            </li>
+            <li><b>M 4000 (4400) (Memory-Dump)</b><br>
+                gibt den Inhalt des Speichers von $4000 (- $43FF) in Hex-Bytes und ASCII-Code aus. Änderungen sind durch Überschreiben der Hex-Zahlen möglich.<br />
+            </li>
+            <li><b>0 4000 4500 AA (Occupy)</b><br>
+                füllt den Speicherbereich von $4000 - $4500 mit vorgegebenem Byte ($AA) aus<br />
+            </li>
+            <li><b>P 02 (Printer)</b><br>
+                setzt Geräteadresse 2 für Drucker<br />
+            </li>
+            <li><b>R (Register)</b><br>
+                zeigt die Registerinhalte und Flags an. Änderungen sind durch Überschreiben möglich.<br />
+            </li>
+            <li><b>S &ldquo;Test&rdquo; 4000 5000 (Save)</b><br>
+                speichert ein Programm von $4000 - $4FFF unter dem Namen ’Test’ ab<br />
+            </li>
+            <li><b>TW (4000) (Trace Walk)</b><br>
+                führt auf Tastendruck den jeweils nächsten Maschinenbefehl aus und zeigt die Registerinhalte an. Subroutinen können in Echtzeit durchlaufen werden (J’). Wird keine Startadresse eingegeben, beginnt ’TW’ bei der letzten mit ’R’ angezeigten Adresse.<br />
+            </li>
+            <li><b>TB 4010 05 (Trace Break)</b><br>
+                setzt einen Haltepunkt für den Schnellschrittmodus bei $4010. Der Schnellschrittmodus wird unterbrochen, nachdem $4010 zum 5. Mal erreicht worden ist.<br />
+            </li>
+            <li><b>TQ 4000 (Trace quick)</b><br>
+                Schnellschrittmodus, springt beim Erreichen eines Haltepunktes in den Einzelschrittmodus.<br />
+            </li>
+            <li><b>TS 4000 4020 (Trace stop)</b><br>
+                arbeitet ein Programm ab $4000 in Echtzeit ab und springt beim Erreichen von $4020 in die Registeranzeige. Von dort aus kann (nach evtl. Änderung der Register) mit »G« oder »TW« fortgefahren werden. »TS« arbeitet nur im RAM-Speicher.<br />
+            </li>
+            <li><b>V 6000 6200 4000 4100 4200 (Verschieben)</b><br>
+                ändert in einem Programm von $4100 - $41FF alle absoluten Adressen, die sich auf den Bereich von $6000 - $6200 beziehen, auf einen neuen Bereich, der bei $4000 beginnt.<br />
+            </li>
+            <li><b>W 4000 4300 5000 (Write)</b><br>
+                verschiebt den Speicherinhalt von $4000 -$42FF nach $5000 ohne Umrechnung der Adressen (zum Beispiel Tabellen)<br />
+            </li>
+            <li><b>X (Exit)</b><br>
+                springt aus dem Monitor-Programm ins Basic zurück<br />
+            </li>
+            <li><b># 49152</b><br>
+                Dezimalzahl umrechnen<br />
+            </li>
+            <li><b>$ 002B</b><br>
+                4-stellige Hex-Zahl umrechnen<br />
+            </li>
+            <li><b>% 01101010</b><br>
+                8-stellige Binärzahl umrechnen<br />
+            </li>
+            <li><b>? 0344 + 5234</b><br>
+                Addition oder Subtraktion zweier 4-stelliger Hex-Zahlen<br />
+            </li>
+            <li><b>= 4000 5000 (Vergleich)</b><br>
+                vergleicht den Speicherinhalt ab $4000 mit dem ab $5000.<br />
+            </li>
+            <figcaption>Bild 1. SMON-Befehlsubersicht</figcaption>
+        </figure>
         <h3>Hinweise zu Bild 1</h3>
 
         <p>Alle Eingaben erfolgen in der hexadezimalen Schreibweise. In Klammern angegebene Adreßeingaben können entfallen. SMON benutzt dann sinnvolle vorgegebene Werte. Bei allen Ausgabe-Befehlen ist gleichzeitig die Ausgabe auf einen Drucker möglich. Dazu werden die Befehle geSHIFTet eingegeben.</p>
-
-        <p>
-        <figure><br />
-            Bild 1. SMON-Befehlsubersicht<br />
-            — A 4000 (Assembler)<br />
-            symbolischer Assembler (Verarbeitung von Labels möglich) Startadresse $4000<br />
-            — B 4000 4200 (Basic-DATA)<br />
-            erzeugt Basic-DATA-Zeilen aus Maschinenprogramm im Bereich von$4000-$41FF<br />
-            — C 4010 4200 4013 4000 4200 (Convert)<br />
-            in ein Programm, das von $4000 - $4200 im Speicher steht, soll bei $4010 ein 3-Byte-Befehl eingefügt werden. Dazu wird das Programm ab $4010 - $4200 auf die neue Adresse $4013 verschoben. Alle absoluten Adressen, die innerhalb des Programmbereichs ($4000 - $4200) stehen, werden umgerechnet, so daß die Sprungziele stimmen.<br />
-            — D 4000 (4100) (Disassembler)<br />
-            disassembliert den Bereich von $4000 (- $4100) mit Ausgabe der Hex-Werte. Änderungen sind durch Überschreiben der Befehle möglich.<br />
-            - F (Find)<br />
-            findet Zeichenketten (F), absolute Adressen (FA), relative Sprünge (FR), Tabellen (FT), Zeropageadressen (FZ) und lmmediate-Befehle (Fl)<br />
-            — G (4000) (Go)<br />
-            startet ein Maschinenprogramm, das bei $4000 im Speicher beginnt.<br />
-            — I 01 (l/O-Gerät)<br />
-            stellt die Gerätenummer für Floppy (08 oder 09) oder Datasette (01) ein.<br />
-            — K A000 (A500) (Kontrolle)<br />
-            zum schnellen Durchsuchen des Bereichs von $A000 (-$A500) nach ASCII-Zeichen (32 Byte pro Zeile). Änderungen sind durch Überschreiben der ASCII-Zeichen möglich.<br />
-            — L (4000) (Load)<br />
-            lädt ein Maschinenprogramm an die richtige oder eine angegebene Adresse ($4000)<br />
-            — M 4000 (4400) (Memory-Dump)<br />
-            gibt den Inhalt des Speichers von $4000 (- $43FF) in Hex-Bytes und ASCII-Code aus. Änderungen sind durch Überschreiben der Hex-Zahlen möglich.<br />
-            — 0 4000 4500 AA (Occupy)<br />
-            füllt den Speicherbereich von $4000 - $4500 mit vorgegebenem Byte ($AA) aus<br />
-            — P 02 (Printer)<br />
-            setzt Geräteadresse 2 für Drucker<br />
-            — R (Register)<br />
-            zeigt die Registerinhalte und Flags an. Änderungen sind durch Überschreiben möglich.<br />
-            — S &ldquo;Test&rdquo; 4000 5000 (Save)<br />
-            speichert ein Programm von $4000 - $4FFF unter dem Namen ’Test’ ab<br />
-            — TW (4000) (Trace Walk)<br />
-            führt auf Tastendruck den jeweils nächsten Maschinenbefehl aus und zeigt die Registerinhalte an. Subroutinen können in Echtzeit durchlaufen werden (J’). Wird keine Startadresse eingegeben, beginnt ’TW’ bei der letzten mit ’R’ angezeigten Adresse.<br />
-            — TB 4010 05 (Trace Break)<br />
-            setzt einen Haltepunkt für den Schnellschrittmodus bei $4010. Der Schnellschrittmodus wird unterbrochen, nachdem $4010 zum 5. Mal erreicht worden ist.<br />
-            — TQ 4000 (Trace quick)<br />
-            Schnellschrittmodus, springt beim Erreichen eines Haltepunktes in den Einzelschrittmodus.<br />
-            — TS 4000 4020 (Trace stop)<br />
-            arbeitet ein Programm ab $4000 in Echtzeit ab und springt<br />
-            beim Erreichen von $4020 in die Registeranzeige. Von dort aus kann (nach evtl. Änderung der Register) mit »G« oder »TW« fortgefahren werden. »TS« arbeitet nur im RAM-Speicher.<br />
-            — V 6000 6200 4000 4100 4200 (Verschieben)<br />
-            ändert in einem Programm von $4100 - $41FF alle absoluten Adressen, die sich auf den Bereich von $6000 - $6200 beziehen, auf einen neuen Bereich, der bei $4000 beginnt.<br />
-            — W 4000 4300 5000 (Write)<br />
-            verschiebt den Speicherinhalt von $4000 -$42FF nach $5000 ohne Umrechnung der Adressen (zum Beispiel Tabellen)<br />
-            - X (Exit)<br />
-            springt aus dem Monitor-Programm ins Basic zurück<br />
-            — # 49152<br />
-            Dezimalzahl umrechnen<br />
-            — $ 002B<br />
-            4-stellige Hex-Zahl umrechnen<br />
-            — % 01101010<br />
-            8-stellige Binärzahl umrechnen<br />
-            — ? 0344 + 5234<br />
-            Addition oder Subtraktion zweier 4-stelliger Hex-Zahlen<br />
-            — = 4000 5000 (Vergleich)<br />
-            vergleicht den Speicherinhalt ab $4000 mit dem ab $5000.<br />
-        </figure>
-        </p>
 
     </article>
 
