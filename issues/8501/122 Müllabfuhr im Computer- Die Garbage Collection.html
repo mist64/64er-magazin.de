@@ -52,17 +52,19 @@
             <figcaption>Bild 1. So ist der Basic-Speicher im Prinzip aufgeteilt. Bekannt sind normalerweise nur die Anfangs- und Endadresse des Speichers (2049/40960). Mit den Zeigern in der Zero-Page können alle Adressen abgefragt werden. Die Basic-Anfangsadresse errechnet sich zum Beispiel aus PRINT PEEK(43)+PEEE K(44)x256, der Variablenanfang aus PRINT PEEK(45)+PEEK(46)x256 und so weiter.</figcaption>
         </figure>
 
-        <p>Beim Ablauf eines Programms läßt sich der Speicher in folgende fünf Bereiche aufteilen, deren Grenzen allerdings flexibel sind und sich laufend ändern:<br>
-            — Basic-Programm<br>
-            Das gerade im Speicher befindliche Programm liegt ganz unten, angefangen bei den kleinsten erreichbaren Adressen.<br>
-            — Variable<br>
-            In diesem Bereich befinden sich alle Variablen, Zahlvariablen wie auch Stringvariablen. In den Stringvariablen ist allerdings nicht der String selbst enthalten, sondern nur ein Zeiger auf die Adresse, wo sich der eigentliche String befindet.<br>
-            — Arrays<br>
-            Hier befinden sich die Arrays, auch Felder genannt. Wenn Sie mehr als elf Elemente enthalten sollen, müssen Sie vor ihrer Benutzung erst durch den DIM-Befehl definiert werden, damit der Basic-Interpreter genügend Speicherplatz in diesem Bereich bereitstellt.<br>
-            — Freier Speicher<br>
-            Freier Speicher existiert interessanterweise nicht am oberen oder unteren Ende des Speichers, sondern in der Mitte, zwischen Arrays und Strings. Das hat aber enorme Vorteile, wie wir noch sehen werden.<br>
-            — Strings<br>
-            Hier sind sie endlich, am oberen Ende des Speichers, die von uns gesuchten Strings. In diesem Bereich befinden sich, dicht aneinander gepackt, die Inhalte der Stringvariablen (mit einer Ausnahme, aber davon später).</p>
+        <p>Beim Ablauf eines Programms läßt sich der Speicher in folgende fünf Bereiche aufteilen, deren Grenzen allerdings flexibel sind und sich laufend ändern:</p>
+        <ul>
+            <li>Basic-Programm<br>
+                Das gerade im Speicher befindliche Programm liegt ganz unten, angefangen bei den kleinsten erreichbaren Adressen.</li>
+            <li>Variable<br>
+                In diesem Bereich befinden sich alle Variablen, Zahlvariablen wie auch Stringvariablen. In den Stringvariablen ist allerdings nicht der String selbst enthalten, sondern nur ein Zeiger auf die Adresse, wo sich der eigentliche String befindet.</li>
+            <li>Arrays<br>
+                Hier befinden sich die Arrays, auch Felder genannt. Wenn Sie mehr als elf Elemente enthalten sollen, müssen Sie vor ihrer Benutzung erst durch den DIM-Befehl definiert werden, damit der Basic-Interpreter genügend Speicherplatz in diesem Bereich bereitstellt.</li>
+            <li>Freier Speicher<br>
+                Freier Speicher existiert interessanterweise nicht am oberen oder unteren Ende des Speichers, sondern in der Mitte, zwischen Arrays und Strings. Das hat aber enorme Vorteile, wie wir noch sehen werden.</li>
+            <li>Strings<br>
+                Hier sind sie endlich, am oberen Ende des Speichers, die von uns gesuchten Strings. In diesem Bereich befinden sich, dicht aneinander gepackt, die Inhalte der Stringvariablen (mit einer Ausnahme, aber davon später).</li>
+        </ul>
 
         <p>Nun kommen wir aber wieder auf die Stringvariablen selbst zurück.</p>
 
@@ -274,8 +276,10 @@
 
         <p>Diese Sequenz vertauscht die Inhalte der zwei Stringvariablen A$ und B$. So zu tauschen ist der einfachste Weg, er hat aber auch zwei große Nachteile:</p>
 
-        <p>— Es wird eine zusätzliche Hilfsvariable, hier H$ benötigt.<br>
-            — Es entsteht eine Menge Stringmüll, nämlich 150 Prozent!</p>
+        <ul>
+            <li>Es wird eine zusätzliche Hilfsvariable, hier H$ benötigt.</li>
+            <li>Es entsteht eine Menge Stringmüll, nämlich 150 Prozent!</li>
+        </ul>
 
         <p>Schauen wir uns mal genau an, was bei der oben genannten Sequenz im Speicher passiert.</p>
 
@@ -366,9 +370,11 @@
 
         <p>Die Zeit, die die Garbage Collection benötigt, ist proportional zum Quadrat der vorhandenen Stringvariablen. Für die Nicht-Mathematiker unter uns: Die Garbage Collection muß so viele Durchgänge machen, wie Stringvariablen vorhanden sind, da in jedem Durchgang nur eine aufgeräumt wird. In jedem Durchgang muß aber auch jede Stringvariable angeschaut werden, ob sie:</p>
 
-        <p>— schon aufgeräumt ist; dann liegt ihr Descriptor über der gemerkten Grenze.<br>
-            — jetzt aufgeräumt werden soll; dann hat sie den höchsten Descriptor unter der Grenze.<br>
-            — erst später aufgeräumt wird, dann trifft keiner der beiden ohigen Fälle zu.</p>
+        <ul>
+            <li>schon aufgeräumt ist; dann liegt ihr Descriptor über der gemerkten Grenze.</li>
+            <li>jetzt aufgeräumt werden soll; dann hat sie den höchsten Descriptor unter der Grenze.</li>
+            <li>erst später aufgeräumt wird, dann trifft keiner der beiden ohigen Fälle zu.</li>
+        </ul>
 
         <p>Also werden soviele Vergleiche benötigt, wie die Anzahl der vorhandenen Stingvariablen im Quadrat, von der Anzahl der Speicherverschiebungen mal abgesehen, denn sie entspricht der Anzahl der Stringvariablen.</p>
 
@@ -380,10 +386,12 @@
 
         <p>Es gibt mehrere Möglichkeiten, die Garbage Collection kurz zu halten:</p>
 
-        <p>— Benutzen Sie so wenig Strings wie möglich, dann braucht die Garbage Collection weniger Zeit, außerdem muß sie nicht so oft aufgerufen werden, da ja mehr Platz für Müllstrings ist.<br>
-            — Strings wenn möglich im Programm definieren, und dann nie mehr verändern, dann entsteht weniger Stringmüll<br>
-            — Weitere Stringmüll verursachende Befehlssequenzen meiden, wie zum Beispiel A$ = A$ und ähnliches.<br>
-            — Sollen Strings vertauscht werden, SWAP-Routine verwenden.</p>
+        <ul>
+            <li>Benutzen Sie so wenig Strings wie möglich, dann braucht die Garbage Collection weniger Zeit, außerdem muß sie nicht so oft aufgerufen werden, da ja mehr Platz für Müllstrings ist.</li>
+            <li>Strings wenn möglich im Programm definieren, und dann nie mehr verändern, dann entsteht weniger Stringmüll</li>
+            <li>Weitere Stringmüll verursachende Befehlssequenzen meiden, wie zum Beispiel A$ = A$ und ähnliches.</li>
+            <li>Sollen Strings vertauscht werden, SWAP-Routine verwenden.</li>
+        </ul>
 
         <p>Halt, werden Sie jetzt sagen, was ist denn eine SWAP-Routine?</p>
 
@@ -396,7 +404,7 @@
         <figure>
             <pre data-filename="strings tauschen" data-name="Strings tauschen"></pre>
             <figcaption>Listing 1. Mit diesem Programm können Sie Strings vertauschen, ohne daß dabei
-Stringmüll entsteht.</figcaption>
+                Stringmüll entsteht.</figcaption>
         </figure>
 
         <p>Wie Sie die SWAP-Routine anwenden, steht in den REM-Zeilen des Listings, die Arbeitsweise verdeutlichen die Bilder 9 und 10.</p>
