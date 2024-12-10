@@ -60,7 +60,7 @@
             <figcaption>Bild 2. Durch die Verdoppelung (»Strecken«) eines normalen Zeichens, kann man auch doppelt hohe Zeichen darstellen</figcaption>
         </figure>
 
-        <p>Wir wollen uns aber nun wieder unserem eigentlichen Thema — dem Bitmapping — zuwenden. Wie so oft stellt sich auch hier wieder die Frage nach dem Speicherplatz. Denn egal mit welcher Speicherausbauversion man gerade arbeitet, immer kommt es zu Kollisionen zwischen dem Zeichen- und dem Bildschirmspeicher. Daher müssen wir hier die Anzahl der verfügbaren Zeichen dementsprechend reduzieren. Wenn wir möglichst den ganzen Bildschirm füllen wollen, so muß es immer zu einem Kompromiß zwischen Bildschirmgröße und Speicherplatz kommen — logisch, dennje größer die verfügbare Hires-Fläche sein soll, um so mehr Speicherplatz benötigt man für die Sonderzeichen, über die das Bitmapping abgewickelt wird.</p>
+        <p>Wir wollen uns aber nun wieder unserem eigentlichen Thema — dem Bitmapping — zuwenden. Wie so oft stellt sich auch hier wieder die Frage nach dem Speicherplatz. Denn egal mit welcher Speicherausbauversion man gerade arbeitet, immer kommt es zu Kollisionen zwischen dem Zeichen- und dem Bildschirmspeicher. Daher müssen wir hier die Anzahl der verfügbaren Zeichen dementsprechend reduzieren. Wenn wir möglichst den ganzen Bildschirm füllen wollen, so muß es immer zu einem Kompromiß zwischen Bildschirmgröße und Speicherplatz kommen — logisch, denn je größer die verfügbare Hires-Fläche sein soll, um so mehr Speicherplatz benötigt man für die Sonderzeichen, über die das Bitmapping abgewickelt wird.</p>
 
         <p>Ich glaube, mit 189 je 16 x 8 Bit-Zeichen einen solchen Kompromiß gefunden zu haben. Anhand von Listing 2, das in mehrere Teile gegliedert ist, möchte ich das Verfahren beim Bitmapping erklären. Programmteil 2 beschreibt den Bildschirm mit den veranschlagten 189 Zeichen. Vorher wird der Rahmen noch entsprechend der etwas »krummen« Zeichenzahl angepaßt. Denn da eben nicht der gesamte Bildschirm genutzt werden kann, wird der leere Rest einfach abgeschnitten, was durch Verkleinerung der Bildschirmfläche geschieht. Wenn man die Zeilen 240 — 260 aus dem Programm herausläßt, sieht man das ganz deutlich. In Teil 3 des Listings wird dann schließlich der gesamte Zeichengenerator von Adresse 5120 bis 8192 gelöscht, damit der Bildschirm auch wirklich restlos leer ist.</p>
 
@@ -242,7 +242,7 @@
                     </tr>
                     <tr>
                         <td>$22D9</td>
-                        <td>Feuerknopf Verarbeitung Q&lt;urzer Druck, langer Druck)</td>
+                        <td>Feuerknopf Verarbeitung (kurzer Druck, langer Druck)</td>
                     </tr>
                     <tr>
                         <td>$233D</td>
@@ -263,7 +263,7 @@
 
         <p>Das Unterprogramm zur Joystickabfrage wird übrigens in der nächsten Folge ausführlicher besprochen. Einen bedeutenden Nachteil hat die Hires-Grafik aber, sie ist nämlich ziemlich farblos. Warum ist dies so?</p>
 
-        <p>Da sich diese Grafikart aus den 8 x 8- (oder 16 x 8-) Basiszeichen zusammensetzt, kann man — wie es auch bei »normalen« Buchstaben und Grafikzeichen üblich ist — jeder Videospeicherposition über das FarbRAM jeweils nur eine Farbe (von 0 bis 7) zuweisen.</p>
+        <p>Da sich diese Grafikart aus den 8 x 8- (oder 16 x 8-) Basiszeichen zusammensetzt, kann man — wie es auch bei »normalen« Buchstaben und Grafikzeichen üblich ist — jeder Videospeicherposition über das Farb-RAM jeweils nur eine Farbe (von 0 bis 7) zuweisen.</p>
 
         <p>Die Darstellung von verschiedenen Farben innerhalb eines Zeichens ist also nicht möglich. Für manche Zwecke benötigt man aber nun gerade mehrere Farben innerhalb einer Zeichenmatrix. In diesem Fall wird dann ganz einfach auf den Multicolormodus — den wir im folgenden genauer besprechen werden — umgeschaltet.</p>
 
@@ -286,7 +286,7 @@
             <figcaption>Bild 4. Das Hires-Zeichen »A« (4a) wird im Multicolormodus (4b) zu einem mehrfarbigen Gebilde. Der Vielfarb-modus eignet sich aber besonders für Spielfiguren (4c) oder ähnliches.</figcaption>
         </figure>
 
-        <p>Die Werte 00 und 01, also Hintergrund- und Rahmenfarbe zeigen auf das VIC-Register # 15 (36879), in demja die Informationen über Rahmen- und Hintergrundfarbe abgelegt sind. Diese Farben sind also für alle Multicolorzeichen einheitlich vorgewählt. Auch der Code 11 — die Hilfsfarbe — wird einheitlich vorgewählt. Dieser Farbwert wird allerdings in einem Register gespeichert, das eigentlich mit Grafik überhaupt nichts zu tun hat, nämlich dem VIC-Register # 14(36878), mit demja auch die Lautstärke festgelegt wird. Die Bits 0 bis 3 enthalten also den Lautstärkewert, die oberen vier Bit die Hilfsfarbe. Diese muß demnach speziell für Multicolor eingestellt werden, denn normalerweise ist diese Speicherstelle auf Null gesetzt (damit die Lautstärke ebenfalls null ist).</p>
+        <p>Die Werte 00 und 01, also Hintergrund- und Rahmenfarbe zeigen auf das VIC-Register # 15 (36879), in dem ja die Informationen über Rahmen- und Hintergrundfarbe abgelegt sind. Diese Farben sind also für alle Multicolorzeichen einheitlich vorgewählt. Auch der Code 11 — die Hilfsfarbe — wird einheitlich vorgewählt. Dieser Farbwert wird allerdings in einem Register gespeichert, das eigentlich mit Grafik überhaupt nichts zu tun hat, nämlich dem VIC-Register # 14(36878), mit dem ja auch die Lautstärke festgelegt wird. Die Bits 0 bis 3 enthalten also den Lautstärkewert, die oberen vier Bit die Hilfsfarbe. Diese muß demnach speziell für Multicolor eingestellt werden, denn normalerweise ist diese Speicherstelle auf Null gesetzt (damit die Lautstärke ebenfalls null ist).</p>
 
         <p>Schließlich ist noch Farbcode 10 zu erwähnen. Dieser wird für jedes Zeichen einzeln in der entsprechenden Farbspeicherstelle — wie wir es ja von den Hires-Zeichen her kennen — bestimmt. Die Bits 0 bis 2 speichern die gewünschte Farbe, Bit 3 hat eine besondere Funktion: Über dieses Bit wird — und das ist neu — der Grafikmodus ausgewählt. Ist es auf 0 (wasja der Normalfall ist), so stellt der Computer den in der dazugehörigen Videospeicherposition abgelegten Charakter im Zweifarbmodus (also in Hires-Grafik) dar. Setzt man das Bit 3 nun aber auf 1, so wird der Vierfarbmodus für dieses Zeichen eingeschaltet.</p>
 
