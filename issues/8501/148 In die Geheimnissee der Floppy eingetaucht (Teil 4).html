@@ -1,0 +1,908 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>In die Geheimnissee der Floppy eingetaucht (Teil 4)</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="Boris Schneider, Karsten Schramm, gk">
+    <meta name="64er.issue" content="1/85">
+    <meta name="64er.pages" content="148-152">
+    <meta name="64er.head1" content="Floppy-Kurs">
+    <meta name="64er.head2" content="C 64">
+    <meta name="64er.toc_title" content="In die Geheimnisse der Floppy eingetaucht (Teil 4)">
+    <meta name="64er.toc_category" content="Kurse">
+    <meta name="64er.index_title" content="In die Geheimnisse der Floppy eingetaucht (Teil 4)">
+    <meta name="64er.index_category" content="Kurse|Floppy">
+    <meta name="64er.id" content="floppy">
+</head>
+
+<body>
+    <article>
+
+        <h1>In die Geheimnissee der Floppy eingetaucht (Teil 4)</h1>
+
+        <p class="intro">In dieser Folge beschäftigen wir uns das erste Mal mit dem DOS der Floppystation. Wir wollen uns die Technik der Diskettenaufzeichnung ansehen und die Funktionsweise des DOS genauer unter die Lupe nehmen.</p>
+
+        <p>Zuerst wollen wir uns mit dem Aufzeichnungsformat der Diskette beschäftigen: Für einen einwandfreien Betrieb der Floppystation ist es unumgänglich, daß sich Markierungen auf der Diskette befinden. Diese Markierung braucht das Laufwerk, um bestimmte Daten schnell finden zu können. Hierfür gibt es prinzipiell zwei Möglichkeiten: die Hardsektorierung und die Softsektorierung.</p>
+
+        <p>Hardsektorierte Disketten erkennt man daran, daß diese eine ganze Anzahl von Indexlöchern besitzen. Damit sind die kleinen Löcher nahe am Innenrand der Magnetscheibe gemeint. Mit einer Fotozelle können nun diese Löcher abgetastet werden, um die jeweilige Position der Diskette festzustellen. Dieses Verfahren hat den Vorteil, daß die Diskettenkapazität voll ausgenutzt werden kann. Es können so bis zu 5 MBytes Daten auf eine 5¼-Zoll-Diskette geschrieben werden. Allerdings erfordert diese Methode einen enormen Hardwareaufwand, der den Preis in die Höhe schnellen läßt. Für preiswerte Laufwerke (wie die 1541) geht man daher einen anderen Weg: die Softsektorierung. Hier besitzt die Diskette nur ein Indexloch zur Drehzahlüberwachung. Bei der 1541 ist sogar noch nicht einmal dieses erforderlich. Die notwendigen Markierungen werden beim Formatierungsvorgang softwaremäßig auf die Diskette aufgebracht, wobei natürlich wertvoller Speicherplatz verloren geht. Softsektorierte Disketten im 5¼-Zoll-Format verfügen daher über zur Zeit maximal 1 MByte Speicherkapazität.</p>
+
+        <p>Uns soll also im weiteren die Softsektorierung beschäftigen, wobei in Bild 1 eine Diskette schematisch dagestellt ist, nachdem sie auf der 1541 formatiert wurde. Sie ist in 35 konzentrische Spuren, nachfolgend Tracks genannt, aufgeteilt. Jeder dieser Tracks enthält wiederum eine bestimmte Anzahl von Sektoren, die von außen nach innen abnimmt. Diese Tatsachen sind Ihnen aber schon aus der ersten Folge bekannt. Nun wollen wir genauer auf den Aufbau der Sektoren einer Diskette eingehen.</p>
+
+        <figure>
+            <img src="148-1.png" alt="">
+            <figcaption>Bild 1. Aufbau einer formatierten Diskette</figcaption>
+        </figure>
+
+        <p>Jeder Sektor besteht aus einem Blockheader und dem dazugehörigen Datenblock; eine schematische Darstellung zeigt Bild 2. Angeführt werden die Sektoren einer Diskette von den schon erwähnten Markierungen, die der Orientierung dienen. Diese Marken bezeichnet man als Synchron (SYNC)-Markierungen, sie bestehen aus mehreren $FF auf der Diskette. Erkennt der Schreib-/Lesekopf der Floppy also eine solche Marke, dann »weiß« die Foppystation, daß entweder ein Blockheader oder ein Datenblock nachfolgt. Nun müssen wir nur noch diese beiden voneinander unterscheiden können.</p>
+
+        <figure>
+            <img src="148-2.png" alt="">
+            <figcaption>Bild 2. Aufbau eines Sektors</figcaption>
+        </figure>
+
+        <p>Hierzu dient das nächste Kennzeichen auf Diskette. Es folgt direkt nach der SYNC-Markierung und meldet dem Diskcontroller (DC) ob ein Blockheader oder ein Datenblock vorliegt. Hat das Kennzeichen den Wert $08, so handelt es sich um einen Blockheader; findet der Kopf hingegen den Wert $07, so handelt es sich um den Beginn eines Datenblocks.</p>
+
+        <p>Wir nehmen jetzt einmal an, der DC hätte das Kennzeichen $08 entdeckt; es handelt sich also um den Header eines Datenblocks. Dann folgt als nächstes Byte die Prüfsumme über den Header, die zur Kontrolle auf Lesefehler dient. Die Reihenfolge der Headerbytes, wie sie im Commodore-Handbuch angegeben ist, stimmt nicht mit der Aufzeichnung auf Diskette überein.</p>
+
+        <p>Die nächsten 2 Bytes stellen Sektor- und Tracknummer dieses Sektors dar. Anhand dieser Werte kann der DC bei Trackwechsel sehr schnell die Position des Schreib-/Lesekopfes ausfindig machen.</p>
+
+        <p>Das 5. und 6. Byte des Blockheaders geben jeweils einen Teil der ID der Diskette an, und zwar folgen zuerst das zweite und dann das erste Zeichen der ID, die beim Formatieren festgelegt wurden. Mit diesen Angaben ist die Behandlung des Headers bereits abgeschlossen. Es folgen jetzt noch ein paar Bytes, die eine Lücke darstellen.</p>
+
+        <p>Mit der nächsten SYNC-Markierung wird der Beginn des eigentlichen Datenblocks eingeleitet. Nach der SYNC-Marke folgt das Datenblockkennzeichen $07. Die nächsten zwei Bytes sind uns bestens bekannt. Sie können mit jedem Diskmonitor angesehen werden und geben Track- und Sektornummer des nächsten Blocks im File an. Man bezeichnet sie deshalb als Linker oder Linkadressen (engl.: to link = verbinden).</p>
+
+        <p>Nun erst folgen die eigentlichen Daten auf Diskette, die in jedem Block 254 Byte ausmachen.</p>
+
+        <p>Hinter diesen Datenbytes steht die Prüfsumme des Datenblocks, die wiederum zum Erkennen von eventuellen Lesefehlern dient. Werden solche Fehler festgestellt, so versucht die Floppystation noch mehrere Male, den Block doch zu lesen. Erst wenn viele Versuche kein befriedigendes Ergebnis bringen, steigt sie mit einer Fehlermeldung aus.</p>
+
+        <p>Nach der Prüfsumme des Datenblocks folgt wieder eine Lücke auf der Diskette, bevor die SYNC-Markierung des nächsten Blockheaders kommt. Wenn wir uns diesen Aufbau eines Sektors betrachten, wird klar, warum die Speicherkapazität bei softsektorierten Disketten gegenüber hardsektorierteri Disketten deutlich abnimmt.</p>
+
+        <p>Jetzt werden sie vielleicht auch die Beschreibung der Fehlermeldungen im Floppyhandbuch verstehen, die wir hier nicht mehr aufführen, da sie dort sehr genau und richtig erläutert werden.</p>
+
+        <p>Das Verständnis des Diskettenaufbaus ist für die weitere Behandlung des Floppy-DOS unerläßlich, da wir nur so die Funktionsweise begreifen lernen.</p>
+
+        <p>Jetzt wollen wir uns aber einmal mit der grundlegenden Arbeitsweise des Floppybetriebssystems (DOS) befassen, die um einiges komplizierter ist, als die im Computer.</p>
+
+        <p>Wenn wir die Floppy einschalten, passiert zunächst das gleiche, wie im Computer. Die RE-SET-Leitung geht auf Low und der Mikroprozessor, hier ein 6502, holt sich seine Systemstartadresse. Danach läuft das RESET-Programm an, wobei die Floppy einen Selbsttest durchführt. Erkennen können Sie dies daran, daß für kurze Zeit der Motor anläuft und die rote LED leuchtet. Wurde kein Defekt registriert, so erlischt die Leuchtdiode wieder, und der Motor geht aus. Jetzt wird der RAM-Bereich der Floppy initialisiert und alle wichtigen Zeiger werden hergestellt. Danach ist die 1541 betriebsbereit.</p>
+
+        <p>Von jetzt an laufen quasi drei Programme gleichzeitig ab:</p>
+
+        <ul>
+            <li>das Hauptprogramm läuft in emer Schleife, die nur bei der Ausführung von Befehlen verlassen wird;</li>
+            <li>das Diskcontrollerprogramm wird über den IRQ gesteuert und durch den Timer des DC alle 10 ms aufgerufen;</li>
+            <li>die Routinen des Buscontrollers (BC) schließlich, werden nur im Bedarfsfall aufgerufen, nämlich, wenn die ATN-Leitung des seriellen Bus auf Low geht.</li>
+        </ul>
+
+        <p>Wir wollen uns die Funktion dieser Routinen nun einmal etwas genauer betrachten.</p>
+
+        <h3>Das Hauptprogramm</h3>
+
+        <p>Das Hauptprogramm hängt, wie schon gesagt, in einer Warteschleife, bis ein Befehl vom Computer kommt. Dieser aktiviert zuerst die Busroutinen, die die gesendeten Bytes dann entgegennehmen und abspeichern. Jetzt bekommt das Hauptprogramm, das übrigens den Zustand der beiden IRQ-Routinen (DC und BC) ständig überwacht, die Meldung, daß ein Befehl anliegt. Es verzweigt nun zur Befehlsauswertung, ähnlich dem Basic-Interpreter, und führt gegebenenfalls einen Befehl aus, sofern ein Syntaxfehler entdeckt wurde. In diesem Fall würde sonst eine Fehlermeldung generiert, die dann vom Computer ausgelesen werden kann.</p>
+
+        <p>Ist ein Befehl korrekt ausgeführt worden, so werden die Befehlsparameter wieder gelöscht, und das Hauptprogramm kehrt in die Warteschleife zurück.</p>
+
+        <h3>Das Diskcontrollerprogramm</h3>
+
+        <p>Der Diskcontroller enthält den Baustein VIA 6522, durch den er mit dem Mikroprozessor in Kontakt steht. Dieser Baustein enthält auch Timer, die in einem eingestellten Rhythmus einen IRQ auslösen können. Einer dieser Timer ist in der 1541 so eingestellt, daß er ungefähr alle 10 ms einen IRQ auslöst, der dann seinerseits das Diskcontrollerprogramm aufruft.</p>
+
+        <p>Es soll an dieser Stelle der Unterschied zwischen Diskcontroller und Diskcontrollerprogramm erläutert werden: Als Diskcontroller (DC) bezeichnet man die Hardware in der Floppy, die für den Laufwerksbetrieb zuständig ist.</p>
+
+        <p>Unter dem Diskcontrollerprogramm versteht man den Programmteil im DOS, der, durch IRQ geregelt, die Ansteuerung des DC übernimmt.</p>
+
+        <p>Eine vollständige Trennung dieser beiden Begriffe ist jedoch weder notwendig noch zweckmäßig, so daß wir mit dem Ausdruck »DC« immer die Gesamtheit von Hard- und Software beschreiben wollen. Nun aber wieder zu den Aufgaben des DC.</p>
+
+        <p>Auch dieses Programm hat eine Art Wartezustand, solange kein Befehl vom Computer anliegt. Wird nämlich das Hauptprogramm über den Bus aktiviert, so wertet dieses die Befehle aus und gibt sie an den DC weiter, der dann seinerseits dafür sorgt, daß das Laufwerk aktiviert wird. Er steuert den Laufwerk- und den Stepper (Schreib-/ Lesekopf)-Motor und bedient die Daten, die vom und zum Tonkopf gehen. Die gesamten Vorgänge am Laufwerk werden also interruptgesteuert vorgenommen.</p>
+
+        <h3>Die Busroutinen</h3>
+
+        <p>Die Routinen des Buscontrollers (BC) werden ebenfalls über die IRQ-Leitung gesteuert. Auch der BC enthält einen VIA 6522-Baustein. Hier wird der Aufruf der Routinen allerdings nicht über den Timer organisiert, sondern, wie schon erwähnt, über die ATN-Leitung des seriellen Busses. Zieht der Computer also diese Leitung auf Low, so wird in der Floppy (und in allen anderen Peripheriegeräten ebenso) ein IRQ ausgelöst. Dann erfolgt die Abfrage, ob dieser IRQ vom Timer des DC kam. Ist dies nicht der Fall, so wird die BC-Routine aufgerufen, die dann den weiteren Busbetrieb übernimmt. Sollte die Floppy gerade einen Befehl bearbeiten, während schon ein neuer vom Computer gesendet wird, so wartet der BC solang mit der Annahme, bis die Floppy wieder in den Bereitschaftszustand zurückgekehrt ist.</p>
+
+        <p>Wie Sie sehen, stellt das DOS eine ziemlich komplizierte Einheit dar, deren Schema in Bild 3 zu sehen ist.</p>
+
+        <figure>
+            <img src="148-3.png" alt="">
+            <figcaption>Bild 3. Schematischer Aufbau der 1541</figcaption>
+        </figure>
+
+        <aside>
+            <p>Wie Sie vielleicht bemerkt haben, ist uns in Folge 2 ein Fehler unterlaufen. Das abgedruckte Listing 6 wäre eigentlich Listing 5 gewesen. Als tatsächliches Listing 6 liefern wir Ihnen heute das Directory-Sortierprogramm nach, das Sie in Listing 1 abgedruckt finden.</p>
+        </aside>
+
+        <figure>
+            <pre data-filename="floppyk.listing1" data-name="Directory sortieren"></pre>
+            <figcaption>Listing 1. Dieses Listing fehlte in Ausgabe 11/84</figcaption>
+        </figure>
+
+        <p>Wollen wir also in dieses System einsteigen, um dort eigene Programme ausführen zu lassen, so ist es natürlich unerläßlich, daß wir die »Spielregeln« dieses Prozessorsystems genau kennen, da es sonst leicht zu kleinen Katastrophen kommen kann.</p>
+
+        <p>Zu Ihrer weiteren Arbeit mit der 1541 noch ein paar Tips: Wenn Sie vorhaben, Programme in der Floppy ablaufen zu lassen, sollten Sie Ihre Floppy öffnen und ohne Deckel betreiben. So können Sie genau beobachten, wie der Kopf positioniert wird und was bei Lesefehlern geschieht. Sie werden unter anderem auch entdecken, daß Disketten nicht etwa auf der Seite beschrieben werden, auf der sich das Etikett befindet, sondern auf der Rückseite. Dies ist um so bemerkenswerter, als man eine Diskette immer nur auf der Vorderseite schonend behandelt, die ja eigentlich nicht benutzt wird. Auch wir mußten die Erfahrung machen, daß wir Disketten lange Zeit mit der wertvollen Seite auf Tische gelegt haben, stets darauf achtend, daß ja kein Staubkorn auf die von uns so gehütete Vorderseite kam.</p>
+
+        <h2>Disketten werden auf ihrer Rückseite beschrieben!</h2>
+
+        <p>Das Betreiben des Laufwerks ohne Deckel hat auch den Vorteil besserer Wärmeableitung. Die ICs werden es Ihnen danken.</p>
+
+        <p>Nachdem Sie Ihre 1541 also auf »Arbeitsbetrieb« getrimmt haben, wollen wir gleich einmal mit kleinen Programmen beginnen. In Tabelle 1 sehen Sie eine Aufstellung einiger wichtiger Zeropageadressen, die uns im weiteren Verlauf noch beschäftigen werden. Für ein DOS-Listing ist in unserer Serie natürlich kein Platz vorhanden; auch können wir nur mit kleinen Beispielen versuchen, Ihnen die Programmierung der Floppy nahezubringen. Für diejenigen unter Ihnen, die jedoch vorhaben, tiefer in die Floppyprogrammierung einzusteigen, sei an dieser Stelle ein Buch angesprochen, das voraussichtlich im Februar 1985 von Markt &amp; Technik herausgegeben wird. Es behandelt die 1541 bis ins kleinste Detail, ist unter anderem mit einem ausführlichst kommentierten DOS-Listing ausgestattet und geht weit über das in dieser Reihe besprochene hinaus.</p>
+
+        <figure>
+            <table>
+                <tbody>
+                    <tr>
+                        <td>$0000</td>
+                        <td>Jobspeicher für Puffer 0</td>
+                    </tr>
+                    <tr>
+                        <td>$0001</td>
+                        <td>Jobspeicher für Puffer 1</td>
+                    </tr>
+                    <tr>
+                        <td>$0002</td>
+                        <td>Jobspeicher für Puffer 2</td>
+                    </tr>
+                    <tr>
+                        <td>$0003</td>
+                        <td>Jobspeicher für Puffer 3</td>
+                    </tr>
+                    <tr>
+                        <td>$0004</td>
+                        <td>Jobspeicher für Puffer 4</td>
+                    </tr>
+                    <tr>
+                        <td>$0005</td>
+                        <td>Jobspeicher für Puffer 5 (im RAM nicht vorhanden)</td>
+                    </tr>
+                    <tr>
+                        <td>$0006/7</td>
+                        <td>Spur- und Sektornummer für Befehl in Puffer 0</td>
+                    </tr>
+                    <tr>
+                        <td>$0008/9</td>
+                        <td>Spur- und Sektornummer für Befehl in Puffer 1</td>
+                    </tr>
+                    <tr>
+                        <td>$000A/B</td>
+                        <td>Spur- und Sektornummer für Befehl in Puffer 2</td>
+                    </tr>
+                    <tr>
+                        <td>$000C/D</td>
+                        <td>Spur- und Sektornummer für Befehl in Puffer 3</td>
+                    </tr>
+                    <tr>
+                        <td>$000E/F</td>
+                        <td>Spur- und Sektornummer für Befehl in Puffer 4</td>
+                    </tr>
+                    <tr>
+                        <td>$0010/1</td>
+                        <td>Spur— und Sektornummer für Befehl in Puffer 5</td>
+                    </tr>
+                    <tr>
+                        <td>$0012/3</td>
+                        <td>ID der Diskette im ASCII-Code; die beiden Zeichen der aktuellen ID werden bei .jedem Blocksuchbefehl gelesen und hier aktualisiert abgespeichert. Auch das Initia- lisierkommando benutzt diesen Befehl und bringt die ID dadurch auf den neuesten Stand.</td>
+                    </tr>
+                    <tr>
+                        <td>$0016- $001A</td>
+                        <td>Hier sind die Bytes für den aktuellen Blockheader gespeichert, und zwar sind dies;<br>
+                            $0016 erstes'Zeichen der ID<br>
+                            $0017 zweites Zeichen der ID<br>
+                            $0018 Spurnummer des Blocks<br>
+                            $0019 Sektornummer des Blocks<br>
+                            $001A Prüfsumme über den Blockheader<br>
+                            Auf der Diskette stehen diese Werte in der umgekehrten Rei henfolge!</td>
+                    </tr>
+                    <tr>
+                        <td>$001C</td>
+                        <td>Flag für Änderung beim Schreibschutz der Diskette</td>
+                    </tr>
+                    <tr>
+                        <td>$002E/F</td>
+                        <td>Zwischenspeicher für aktuelle Zeiger</td>
+                    </tr>
+                    <tr>
+                        <td>$0030/1</td>
+                        <td>Zeiger in aktuellen Puffer</td>
+                    </tr>
+                    <tr>
+                        <td>$0032/3</td>
+                        <td>Zeiger auf aktuellen Blackheader beim Schreiben</td>
+                    </tr>
+                    <tr>
+                        <td>$0038</td>
+                        <td>Kennzeichen ($07) für Beginn eines Datenblocks</td>
+                    </tr>
+                    <tr>
+                        <td>$0039</td>
+                        <td>Kennzeichen ($08) für Beginn eines Blockheader^</td>
+                    </tr>
+                    <tr>
+                        <td>$003A</td>
+                        <td>Zwischenspeicher für Prüfsummen</td>
+                    </tr>
+                    <tr>
+                        <td>$003D</td>
+                        <td>aktuelle Laufwerksnummer; bei der VC 1541 immer 0</td>
+                    </tr>
+                    <tr>
+                        <td>$003E</td>
+                        <td>gerade arbeitendes Laufwerk ($FF = kein Laufwerk)</td>
+                    </tr>
+                    <tr>
+                        <td>$003F</td>
+                        <td>Puffernummer des eben ausgeführten Befehls (0-5)</td>
+                    </tr>
+                    <tr>
+                        <td>$0043</td>
+                        <td>zählt die Anzahl der Sektoren bei der Formatierung</td>
+                    </tr>
+                    <tr>
+                        <td>$0044</td>
+                        <td>Zwischenspeicher beim Arbeiten</td>
+                    </tr>
+                    <tr>
+                        <td>$0045</td>
+                        <td>Zwischenspeicher für aktuellen Befehlscode</td>
+                    </tr>
+                    <tr>
+                        <td>$0047</td>
+                        <td>enthält aktuelles Kennzeichen für Beginn eines Datenblocks. wird nur bei RESET einmal auf $07 gesetzt und kann vom Benutzer verändert werden, wobei das Hi-Nybble des Wertes immer auf 0 ($0-) stehen sollte, um Leseprobleme des DC zu vermeiden. Wird versucht, einen Datenblock mit einer anderen, als der hier gespeicherten, Nummer zu lesen, so erfolgt der Fehlercode $04 des DC und die Floppy sendet Fehlermeldung Nummer 22 zum Bus.</td>
+                    </tr>
+                    <tr>
+                        <td>$0049</td>
+                        <td>Zwischenspeicher für den Stackpointer</td>
+                    </tr>
+                    <tr>
+                        <td>$004A</td>
+                        <td>Zähler für Kopftransport; Zahlen bis 127 bewegen den Kopf nach außen; Zahlen von 128 bis 255 bewegen ihn nach innen (höhere Spurnummer).</td>
+                    </tr>
+                    <tr>
+                        <td>$0051</td>
+                        <td>aktuelle Spurnummer bei der Formatierung; stehtauf $FF, wenn keine Formatierung erfolgt.</td>
+                    </tr>
+                    <tr>
+                        <td>$0065/6</td>
+                        <td>Zeiger auf die NMI-Routine; wird bei einem RESET ge- stel1t.</td>
+                    </tr>
+                    <tr>
+                        <td>$0067</td>
+                        <td>Flag zum Anzeigen eines NMI</td>
+                    </tr>
+                    <tr>
+                        <td>$0068</td>
+                        <td>Flag zum Ermöglichen (0) oder Sperren (1) der automatischen Initialisierung einer Diskette, falls ein ID Type Mismatch Error erkannt wurde</td>
+                    </tr>
+                    <tr>
+                        <td>$0069</td>
+                        <td>Abstand der Sektoren bei der Zuteilung; erhält bei einem RESET den Wert 10.</td>
+                    </tr>
+                    <tr>
+                        <td>$006A</td>
+                        <td>Anzahl der Leseversuche eines Sektors; steht nach RESET auf 5.</td>
+                    </tr>
+                    <tr>
+                        <td>$006B/C</td>
+                        <td>Zeiger auf Sprungtabelle der USER—Befehle; steht normalerweise auf $FFF6 nach einem RESET.</td>
+                    </tr>
+                    <tr>
+                        <td>$006D/E</td>
+                        <td>Zeiger auf den Beginn der 'Bit Map'; steht auf $0400 und wird beim Initialisieren gesetzt.</td>
+                    </tr>
+                    <tr>
+                        <td>$006F</td>
+                        <td>Zwischenspeicher; steht nach RESET auf $6F</td>
+                    </tr>
+                    <tr>
+                        <td>$0070</td>
+                        <td>Zwi schenspeicher</td>
+                    </tr>
+                    <tr>
+                        <td>$0071</td>
+                        <td>Zwi schenspei cher</td>
+                    </tr>
+                    <tr>
+                        <td>$0072</td>
+                        <td>Zwischenspeicher; steht nach RESET auf $FF</td>
+                    </tr>
+                    <tr>
+                        <td>$0073</td>
+                        <td>Zwi schenspei cher</td>
+                    </tr>
+                    <tr>
+                        <td>$0074</td>
+                        <td>Zwi schenspeicher</td>
+                    </tr>
+                    <tr>
+                        <td>$0075/6</td>
+                        <td>Indirekter Zeiger auf $0100; wird bei RESET gestellt</td>
+                    </tr>
+                    <tr>
+                        <td>$0077</td>
+                        <td>Gerätenummer + $20 für das LISTEN-Kommando</td>
+                    </tr>
+                    <tr>
+                        <td>$0078</td>
+                        <td>Gerätenummer + $40 für das TALK-Kommando</td>
+                    </tr>
+                    <tr>
+                        <td>$0079</td>
+                        <td>Flag für LISTEN (1/0)</td>
+                    </tr>
+                    <tr>
+                        <td>$007A</td>
+                        <td>Flag für TALK (1/0)</td>
+                    </tr>
+                    <tr>
+                        <td>$007B</td>
+                        <td>Flag für Adressierung</td>
+                    </tr>
+                    <tr>
+                        <td>$007C</td>
+                        <td>Flag für ATN-Signal vom seriellen Bus</td>
+                    </tr>
+                    <tr>
+                        <td>$007D</td>
+                        <td>Flag für Prozessor im ATN-Modus</td>
+                    </tr>
+                    <tr>
+                        <td>$007F</td>
+                        <td>Aktuelle Laufwerksnummer; hier immer 0</td>
+                    </tr>
+                    <tr>
+                        <td>$0080</td>
+                        <td>Aktuelle Spurnummer; enthält $00 nach Ausführung</td>
+                    </tr>
+                    <tr>
+                        <td>$0081</td>
+                        <td>Aktuelle Sektornummer; enthält $00 nach Ausführung</td>
+                    </tr>
+                    <tr>
+                        <td>$0082</td>
+                        <td>Aktuel1e Kanalnummer</td>
+                    </tr>
+                    <tr>
+                        <td>$0083</td>
+                        <td>Aktuelle Sekundäradresse</td>
+                    </tr>
+                    <tr>
+                        <td>$0084</td>
+                        <td>übliche Sekundäradresse</td>
+                    </tr>
+                    <tr>
+                        <td>$0085</td>
+                        <td>Aktuelles Datenbyte</td>
+                    </tr>
+                    <tr>
+                        <td>$0086</td>
+                        <td>Speicher für Zwischenergebnisse</td>
+                    </tr>
+                    <tr>
+                        <td>$0087</td>
+                        <td>Speicher für Zwischenergebnisse</td>
+                    </tr>
+                    <tr>
+                        <td>$0088</td>
+                        <td>Speicher für Zwischenergebnisse</td>
+                    </tr>
+                    <tr>
+                        <td>$0089</td>
+                        <td>Speicher für Zwischenergebnisse</td>
+                    </tr>
+                    <tr>
+                        <td>$008A</td>
+                        <td>Speicher für Zwischenergebnisse</td>
+                    </tr>
+                    <tr>
+                        <td>$008B- $008E</td>
+                        <td>Speicher für Ergebnisse bei Berechnungen</td>
+                    </tr>
+                    <tr>
+                        <td>$008F- $0093</td>
+                        <td>Akkumulator für Berec-hnungen</td>
+                    </tr>
+                    <tr>
+                        <td>$0094/5</td>
+                        <td>Zeiger auf Directory-Puffer; enthält $05/02</td>
+                    </tr>
+                    <tr>
+                        <td>$0096</td>
+                        <td>Kommando vom IEEE-Bus; hier unbenutzt</td>
+                    </tr>
+                    <tr>
+                        <td>$0098</td>
+                        <td>Bitzähler für seriellen Bus</td>
+                    </tr>
+                    <tr>
+                        <td>$0099/A</td>
+                        <td>Buffer-Pointer für Puffer 0; steht auf $0300</td>
+                    </tr>
+                    <tr>
+                        <td>$009B/C</td>
+                        <td>Buffer-Pointer für Puffer 1; steht auf $0400</td>
+                    </tr>
+                    <tr>
+                        <td>$009D/E</td>
+                        <td>Buffer-Pointer für Puffer 2; steht auf $0500</td>
+                    </tr>
+                    <tr>
+                        <td>$009F/0</td>
+                        <td>Buffer-Pointer für Puffer 3; steht auf $0600</td>
+                    </tr>
+                    <tr>
+                        <td>$00A1/2</td>
+                        <td>Buffer-Pointer für Puffer 4; steht auf $0700<br>
+                            Alle diese Pointer werden durch den B-P-Befehl verändert !</td>
+                    </tr>
+                    <tr>
+                        <td>$00A3/4</td>
+                        <td>Zeiger auf nächstes Zeichen im INPUT-BUFFER ($0200)</td>
+                    </tr>
+                    <tr>
+                        <td>$00A5/6</td>
+                        <td>Zeiger auf nächstes Zeichen im ERROR-BUFFER ($02D6)</td>
+                    </tr>
+                    <tr>
+                        <td>$00A7- $00AD</td>
+                        <td>Tabelle; enthält für jeden aktiven Puffer die entsprechende Kanalnummer. Kanalnummer = $FF, wenn Puffer unbenutzt.</td>
+                    </tr>
+                    <tr>
+                        <td>$00AE- $00B4</td>
+                        <td>Tabelle; enthält für jeden aktiven Puffer die entsprechende Kanalnummer. Kanalnummer =* $FF, wenn Puffer unbenutzt.</td>
+                    </tr>
+                    <tr>
+                        <td>$00B5- $00BA</td>
+                        <td>Tabelle der Lo-Bytes der Recordnummern für jeden Puffer-</td>
+                    </tr>
+                    <tr>
+                        <td>$00BB- $00CO</td>
+                        <td>Tabelle der Hi--Bytes der Recordnummern für jeden Puffer</td>
+                    </tr>
+                    <tr>
+                        <td>$00C1- $00C6</td>
+                        <td>Tabelle der nächsten zu bearbeitenden Recordnummern für jeden Puffer</td>
+                    </tr>
+                    <tr>
+                        <td>$00C7- $00CC</td>
+                        <td>Tabelle der Recordlängen für jeden Puffer</td>
+                    </tr>
+                    <tr>
+                        <td>$00CD- $00D2</td>
+                        <td>Tabelle der Side-Sektoren für jeden Puffer</td>
+                    </tr>
+                    <tr>
+                        <td>$00E2- $00E6</td>
+                        <td>Standardwerte für Laufwerk; hier alle O</td>
+                    </tr>
+                    <tr>
+                        <td>$00E7- $00EB</td>
+                        <td>Tabelle der Filetypen</td>
+                    </tr>
+                    <tr>
+                        <td>$00EC- $00F1</td>
+                        <td>Kanal Filetyp</td>
+                    </tr>
+                    <tr>
+                        <td>$00F2- $00F7</td>
+                        <td>Kanalstatus</td>
+                    </tr>
+                    <tr>
+                        <td>$00F8</td>
+                        <td>Zwischenspeicher fürEOI</td>
+                    </tr>
+                    <tr>
+                        <td>$00F9</td>
+                        <td>Aktuelle Puffernummer für Befehlscode</td>
+                    </tr>
+                    <tr>
+                        <td>$0101</td>
+                        <td>Formatkennzeichen von Spur 18 Sektor 0</td>
+                    </tr>
+                    <tr>
+                        <td>$0104-<br>
+                            $0145</td>
+                        <td>Bereich des Hardware-Stack; nicht benutzbar</td>
+                    </tr>
+                    <tr>
+                        <td>$0200- $0229</td>
+                        <td>INPUT-BUFFER; hier werden alle Befehlsstrings vom Computer zwischengespeichert und nach Syntaxprüfung aus gef ührt</td>
+                    </tr>
+                    <tr>
+                        <td>.$022A</td>
+                        <td>Codenummer des auszuführenden Befehls</td>
+                    </tr>
+                    <tr>
+                        <td>$022B-</td>
+                        <td>Kanaltabelle; diese Tabelle enthält für jede mögliche</td>
+                    </tr>
+                    <tr>
+                        <td>$023E- $0243</td>
+                        <td>Aktuelles Datenbyte für jeden Kanal; Belegung der Adressen wie bei der Kanalstatustabelle ($022B)</td>
+                    </tr>
+                    <tr>
+                        <td>$0244- $0249</td>
+                        <td>Tabelle der Zeiger auf das letzte aktuelle Zeichen in jedem, für den Kanal zuständigen, Pufferspeicher</td>
+                    </tr>
+                    <tr>
+                        <td>$024A</td>
+                        <td>Gerade behandelter Filetyp</td>
+                    </tr>
+                    <tr>
+                        <td>$024B</td>
+                        <td>Länge des Befehlsstrings</td>
+                    </tr>
+                    <tr>
+                        <td>$024C</td>
+                        <td>Zwischenspeicher für Sekundäradresse</td>
+                    </tr>
+                    <tr>
+                        <td>$024D</td>
+                        <td>Zwischenspeicher für Befehlscode</td>
+                    </tr>
+                    <tr>
+                        <td>$024E</td>
+                        <td>Arbeitsspeicher beim Suchen des nächsten Sektors</td>
+                    </tr>
+                    <tr>
+                        <td>$024F/0</td>
+                        <td>Pufferbelegungsspeicher; 1 = Puffer belegt</td>
+                    </tr>
+                    <tr>
+                        <td>$0253</td>
+                        <td>Flag für Directory-Eintrag gefunden</td>
+                    </tr>
+                    <tr>
+                        <td>$0254</td>
+                        <td>Flag für $-Befehl zum Listen des Directory</td>
+                    </tr>
+                    <tr>
+                        <td>$0255</td>
+                        <td>Flag für Befehlsausführung (&lt;&gt;$00, wenn Befehl anliegt)</td>
+                    </tr>
+                    <tr>
+                        <td>$0257</td>
+                        <td>Nummer des letzten benutzten Puffers</td>
+                    </tr>
+                    <tr>
+                        <td>$0258</td>
+                        <td>Recordlänge</td>
+                    </tr>
+                    <tr>
+                        <td>$0259</td>
+                        <td>Side-Sector Spur</td>
+                    </tr>
+                    <tr>
+                        <td>$025A</td>
+                        <td>Side-Sector Sektor</td>
+                    </tr>
+                    <tr>
+                        <td>$025B- $025F</td>
+                        <td>Tabelle; enthält den letzten Befehlscode der Puffer</td>
+                    </tr>
+                    <tr>
+                        <td>$0260- $0265</td>
+                        <td>Sektornummern der Directoryeinträge in den Puffern</td>
+                    </tr>
+                    <tr>
+                        <td>$0266- $026B</td>
+                        <td>Zeiger auf die Directoryeinträge in den Puffern</td>
+                    </tr>
+                    <tr>
+                        <td>$026D</td>
+                        <td>Flag für LED Blinken bei Fehler</td>
+                    </tr>
+                    <tr>
+                        <td>$026E</td>
+                        <td>Nummer des letzten aktiven Laufwerks</td>
+                    </tr>
+                    <tr>
+                        <td>$026F</td>
+                        <td>Nummer des letzten bearbeitenden Sektors</td>
+                    </tr>
+                    <tr>
+                        <td>$0270</td>
+                        <td>aktueller Schreibkanal</td>
+                    </tr>
+                    <tr>
+                        <td>$0271</td>
+                        <td>aktuel1 er Lesekanal</td>
+                    </tr>
+                    <tr>
+                        <td>$0274</td>
+                        <td>Länge des Befehlsstrings im INPUT-BUFFER</td>
+                    </tr>
+                    <tr>
+                        <td>$027A- $027F</td>
+                        <td>Tabelle der Zeiger auf die Filenamen</td>
+                    </tr>
+                    <tr>
+                        <td>$0280- $0284</td>
+                        <td>Spurnummern der Files für den aktuellen Puffer</td>
+                    </tr>
+                    <tr>
+                        <td>$0285- $0289</td>
+                        <td>Sektornummern der Files für den aktuellen Puffer</td>
+                    </tr>
+                    <tr>
+                        <td>$028A</td>
+                        <td>Joker (*) Flag</td>
+                    </tr>
+                    <tr>
+                        <td>$028E</td>
+                        <td>Standardwert für die Nummer des Laufwerks</td>
+                    </tr>
+                    <tr>
+                        <td>$028F</td>
+                        <td>Flag für Fileeinträg im Directory gefunden</td>
+                    </tr>
+                    <tr>
+                        <td>$0290</td>
+                        <td>Sektornummer des aktuellen Directory Sektors</td>
+                    </tr>
+                    <tr>
+                        <td>$0291</td>
+                        <td>Sektornummer des ersten Directoryeintrags</td>
+                    </tr>
+                    <tr>
+                        <td>$0292</td>
+                        <td>Zeiger auf ersten gültigen Directoryeintrag</td>
+                    </tr>
+                    <tr>
+                        <td>$0293</td>
+                        <td>Zeigt letzten Block an; enthält dann 0</td>
+                    </tr>
+                    <tr>
+                        <td>$0294</td>
+                        <td>Aktueller Pufferzeiqer</td>
+                    </tr>
+                    <tr>
+                        <td>$0295</td>
+                        <td>Zähler für Fileeinträge</td>
+                    </tr>
+                    <tr>
+                        <td>$0297</td>
+                        <td>Betriebsart des aktuellen Files (Lesen/Schreiben)</td>
+                    </tr>
+                    <tr>
+                        <td>$029D/E</td>
+                        <td>Spurnummer der BAM</td>
+                    </tr>
+                    <tr>
+                        <td>$02Al-</td>
+                        <td>Zwischenspeicher für BAM Eintragungen</td>
+                    </tr>
+                    <tr>
+                        <td>$02B0</td>
+                        <td><br></td>
+                    </tr>
+                    <tr>
+                        <td>$02B1- $02D4</td>
+                        <td>Puffer für Directory</td>
+                    </tr>
+                    <tr>
+                        <td>$02D5- $02F8</td>
+                        <td>ERROR-BUFFER; enthält auszugebende Fehlermeldung</td>
+                    </tr>
+                    <tr>
+                        <td>$02FA</td>
+                        <td>Lo-Byte der Anzahl der freien Blocks auf Diskette</td>
+                    </tr>
+                    <tr>
+                        <td>$02FC</td>
+                        <td>Hi-Byte der Anzahl der freien Blocks auf Diskette</td>
+                    </tr>
+                    <tr>
+                        <td>$0300- $03FF</td>
+                        <td>Puffer 0</td>
+                    </tr>
+                    <tr>
+                        <td>$0400-<br>
+                            $04FF</td>
+                        <td>Puffer 1</td>
+                    </tr>
+                    <tr>
+                        <td>$0500-<br>
+                            $05FF</td>
+                        <td>Puffer 2</td>
+                    </tr>
+                    <tr>
+                        <td>$0600-<br>
+                            $06FF</td>
+                        <td>Puffer 3</td>
+                    </tr>
+                    <tr>
+                        <td>$0700- $07FF</td>
+                        <td>Puffer 4 (enthält normalerweise die BAM)</td>
+                    </tr>
+                    <tr>
+                        <td>$0800“ $FFFF</td>
+                        <td>Nicht mit RAM belegt</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <figcaption>Tabelle 1. Die wichtigsten Zeropageadressen der Floppy</figcaption>
+        </figure>
+
+        <h3>Programmieren der Floppy</h3>
+
+        <p>So, jetzt soll es aber endlich losgehen. Wir wollen unser erstes Programm schreiben und in der Floppy ablaufen lassen.</p>
+
+        <p>Es handelt sich um Listing 2. Dieses »Miniprogramm« schreiben wir in den Puffer 0 der Floppy, das heißt ab Adresse $0300. Das Basic-Programm haben wir der Kürze halber gleich an den Assemblercode angehängt. Wenn Sie das Programm starten, wird das Bit abgefragt, das beim DC für den Zustand der Schreibschutzplakette verantwortlich ist. Sie werden vielleicht wissen, daß die Floppy die Schreibschutzkerbe bei den Disketten mit Hilfe einer Lichtschranke abfragt. Ist die Lichtschranke unterbrochen, das heißt es liegt eine Diskette mit Schreibschutzaufkleber im Laufwerk, dann steht das entsprechende Bit auf 0.</p>
+
+        <figure>
+            <pre data-filename="led-test_l2" data-name="Floppy-Maschinenprogramm"></pre>
+            <figcaption>Listing 2. Unser erstes Floppy-Maschinenprogramm</figcaption>
+        </figure>
+
+        <p>Unser Programm schiebt nun einfach das Bit der Lichtschranke an die Stelle des Bits für die rote LED und speichert diesen Wert wieder ab. Starten Sie einmal unser kleines Programm, dann werden Sie feststellen, daß die Leuchtdiode am Laufwerk erlischt, wenn die Lichtschranke unterbrochen wird. Holen Sie die Diskette dagegen aus dem Laufwerk oder legen Sie eine Diskette ohne Schreibschutzplakette ein, so beginnt die rote LED zu leuchten.</p>
+
+        <p>Mit diesem Programm können Sie also testen, ob von Ihnen selbst angefertigte Schreibschutzkerben in der Diskettenhülle an der richtigen Stelle liegen, um eine Diskette eventuell doppelseitig benutzen zu können.</p>
+
+        <p>Da unser Programm aus einer Endlosschleife besteht, können Sie die Floppy nur durch einen RESET wieder in einen ansprechbaren Zustand versetzen.</p>
+
+        <p>Das Programm hat aber einen Schönheitsfehler; es beeinflußt nämlich nicht nur die beiden LED-Bits in Speicherstelle $lC00, sondern löscht beijedem Durchgang auch alle anderen Bits dieses Registers, deren Belegung Sie Tabelle 2 entnehmen können. Für unsere Testzwecke ist diese »Pfuscherei« jedoch unwesentlich.</p>
+
+        <figure>
+            DISKCONTROLLER (DC)
+            <table>
+                <tbody>
+                    <tr>
+                        <td><b>Bit #</b></td>
+                        <td><b>Bedeutung</b></td>
+                    </tr>
+                    <tr>
+                        <td>0</td>
+                        <td>DATA IN</td>
+                    </tr>
+                    <tr>
+                        <td>1</td>
+                        <td>DATA OUT</td>
+                    </tr>
+                    <tr>
+                        <td>2</td>
+                        <td>CLOCK IN</td>
+                    </tr>
+                    <tr>
+                        <td>3</td>
+                        <td>CLOCK OUT</td>
+                    </tr>
+                    <tr>
+                        <td>4</td>
+                        <td>ATN OUT</td>
+                    </tr>
+                    <tr>
+                        <td>5<br>6</td>
+                        <td>GERÄTENUMMER</td>
+                    </tr>
+                    <tr>
+                        <td>7</td>
+                        <td>ATN IN (CB 2)</td>
+                    </tr>
+                </tbody>
+            </table>
+            BUSCONTROLLER (BC)
+            <table>
+                <tbody>
+                    <tr>
+                        <td><b>Bit #</b></td>
+                        <td><b>Bedeutung</b></td>
+                    </tr>
+                    <tr>
+                        <td>0</td>
+                        <td>Steppermotor für Laufwerk 1 (n.v.)</td>
+                    </tr>
+                    <tr>
+                        <td>1</td>
+                        <td>Steppermotor für Laufwerk 0</td>
+                    </tr>
+                    <tr>
+                        <td>2</td>
+                        <td>Laufwerksmotor</td>
+                    </tr>
+                    <tr>
+                        <td>3</td>
+                        <td>LED am Laufwerk (rot)</td>
+                    </tr>
+                    <tr>
+                        <td>4</td>
+                        <td>Schreibschutzkennung</td>
+                    </tr>
+                    <tr>
+                        <td>5<br>6</td>
+                        <td>Bitsynchronisation für DC bei den vier Spurbereichen</td>
+                    </tr>
+                    <tr>
+                        <td>7</td>
+                        <td>SYNC-Signal</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <figcaption>Tabelle 2. Belegung der beiden Controll-Ports der 1541</figcaption>
+        </figure>
+
+        <h3>Der »&amp;«-Befehl</h3>
+
+        <p>Nach diesem aufregenden Beispiel wollen wir Sie nun mit einem Befehl bekanntmachen, den Sie sehr wahrscheinlich noch nicht kennen. Er nennt sich »&amp;« und wird unverständlicherweise in noch keinem uns bekannten Buch beschrieben. Der &amp;-Befehl entspricht in gewisser Weise einem BLOCK-EXECUTE-Befehl; auch hier wird ein Programm von Diskette geladen und sofort ausgeführt.</p>
+
+        <p>Der Unterschied besteht nur darin, daß mit dem &amp;-Befehl nicht nur ein Block, sondern ein ganzes File, das im Directory verzeichnet ist, geladen und im Puffer als Programm ausgeführt wird.</p>
+
+        <p>Außerdem müssen die Files, die mit dem Befehl »&amp;« gestartet werden sollen, speziell gekennzeichnet sein. Sie enthalten als erstes Zeichen im Filenamen das Zeichen »&amp;«. Soll also zum Beispiel ein File mit dem Namen »Test« als Autostartprogramm in der Floppy ausgeführt werden, so geben Sie diesem File den Namen »&amp;Test« und starten Sie es danach mit: OPEN1,8,15,"&amp;TEST"</p>
+
+        <p>Haben Sie nur ein einziges Autostartfile auf Diskette, so können Sie es auch nur mit »&amp;« abspeichern und ebenso mit OPEN1,8,15,"&amp;" starten.</p>
+
+        <p>Leider erwartet die Floppy von Autostartfiles eine spezielle Syntax, die in Tabelle 3 zu sehen ist.</p>
+
+        <figure>
+
+            <table>
+                <tr>
+                    Byte Bedeutung
+                </tr>
+                <tr>
+                    <td>1-2</td>
+                    <td>Startadresse in der 1541 im HI/LO-Format</td>
+                </tr>
+                <tr>
+                    <td>3</td>
+                    <td>Anzahl der folgenden Programmbytes</td>
+                </tr>
+                <tr>
+                    <td>4-N</td>
+                    <td>Programm</td>
+                </tr>
+                <tr>
+                    <td>N+1</td>
+                    <td>Prüfsumme</td>
+                </tr>
+                <tr>
+                    <td>N+2</td>
+                    <td>Hier kann bei längeren Programmen ein weiterer Teil eingefügt werden. Format: wieder bei Byte 1 beginnend.</td>
+                </tr>
+            </table>
+
+
+            <figcaption>Tabelle 3. Aufbau eines &-Files. In dieser Tabelle sind die Linker- beziehungsweise Endekennzeichen, die in den ersten beiden Bytes eines Datenblocks stehen, nicht enthalten, da sie beim Öffnen und Beschreiben eines &-Files automatisch gesetzt werden.</figcaption>
+        </figure>
+
+        <p>Als Listing 3 haben wir noch einmal unser LED-Testprogramm; nur wird diese Routine durch das Basic-Programm als &amp;-File auf Diskette geschrieben und kann danach durch den schon erwähnten Befehl direkt von Diskette in den Pufferspeicher geschrieben und dort gestartet werden.</p>
+
+        <figure>
+            <pre data-filename="und-generator" data-name="&-Generator"></pre>
+            <figcaption>Listing 3. So macht man Listing 2 zu einem »&-File«</figcaption>
+        </figure>
+
+        <p>Zu Tabelle 3 noch einige Anmerkungen:</p>
+
+        <p>Zuerst muß die Startadresse des Programms im Pufferspeicher der Floppy in das File geschrieben werden. Danach folgt die Anzahl der Bytes im Programm. Jetzt werden die Programmbytes abgespeichert, und schließlich folgt noch eine Prüfsumme, die sich wie folgt errechnet:</p>
+
+        <p>Es werden alle Bytes des Programms addiert und zum Ergebnis noch die zwei Bytes der Startadresse und die Anzahl der Bytes im Programm hinzugezählt. Dieses Ergebnis ist als Integerzahl zu verstehen und besteht also aus einem niederwertigen (LO) und einem höherwertigen (HI) Byte. Das niederwertige Byte ist die Prüfsumme, zu der noch der Übertrag im höherwertigen Byte addiert werden muß. Diese Berechnung klingt kompliziert; ist es aber nicht. In Listing 4 wird Ihnen diese Rechnerei abgenommen. Die allgemeine Formel hier noch einmal:<br>
+            HB = INT(SUMME/256)<br>
+            LB = SUMME-HB*256</p>
+
+        <p>dabei bedeuten:<br>
+            HB — das höherwertige Byte<br>
+            LB — das niederwertige Byte<br>
+            SUMME — die Gesamtsumme der Programmbytes</p>
+
+        <p>Achtung: Die Übertragsberechnung muß nach jedem neu dazugezählten Wert erfolgen, da das Endergebnis kleiner als 256 sein muß! Wie Sie sehen, ist das Anlegen eines &amp;-Files nicht ganz einfach. Bisher wurde diese Fileart fast nur von Profis zum Programmschutz angewandt, da sie, wie schon erwähnt, nahezu unbekannt war.</p>
+
+        <p>Zu erwähnen wären noch zwei seltsame Fehlermeldungen der Floppy:</p>
+
+        <p>»OVERFLOW IN RECORD« erscheint, wenn die Anzahl der tatsächlichen Bytes mit der Angabe nicht übereinstimmt.</p>
+
+        <p>»RECORD NOT PRESENT« erscheint, wenn die Prüfsumme nicht stimmt.</p>
+
+        <p>Da wir stets darum bemüht sind, Ihnen die Arbeit mit der Floppy so angenehm wie möglich zu machen, haben wir unserem Artikel noch Listing 4 beigefügt. Es handelt sich hier um ein Programm, das es Ihnen gestattet, auf einfachste Weise &amp;-Files zu erstellen. Diese können sogar länger als 256 Byte sein, da das Programm dann automatisch eine Prüfsumme und die Anschlußadresse einfügt. Ununterbrochene &amp;-Files, die länger als 256 Zeichen sind, kann es ja nicht geben, da die Anzahl der Programmbytes im File nur in einem Byte abgespeichert wird.</p>
+
+        <figure>
+            <pre data-filename="auto-&-maker" data-name="Auto-&-Maker"></pre>
+            <figcaption>Listing 4. Komfortable »&-Files« erzeugen</figcaption>
+        </figure>
+
+        <p>Mit dieser neuen Fileart wollen wir Sie für dieses Mal entlassen. Ruhen Sie sich für die nächste Folge aus. Wir werden dann auf die Technik der Jobschleifenprogrammierung eingehen, die Ihnen eine Fülle von Anwendungen eröffnen wird.</p>
+
+        <address class="author">(K. Schramm/B. Schneider/gk)</address>
+
+    </article>
+
+</body>
+
+</html>

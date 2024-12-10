@@ -34,12 +34,12 @@
         <p>Dieser Baustein kümmert sich um alles, was mit der Informationsweitergabe an das angeschlossene Fernsehgerät zu tun hat, also Bild, Farbe und Ton. Da er — wie bereits das letzte Mal kurz angedeutet — eigenständig, das heißt unabhängig von der CPU arbeitet, muß der VIC selbständig auf Informationen zurückgreifen können. Diese sind zum einen in den internen Registern, zum anderen in den normalen Speicherstellen enthalten. Die Register speichern Parameter für die Bildschirmgröße, die Tongeneratoren, die Lage des Bildschirm-, Farb- und Zeichenspeichers. Ferner können aus ihnen die Zustandswerte des Paddels und des Lichtgriffels ausgelesen werden (Tabelle 1).</p>
 
         <figure>
-            <table>
+            <table class="plain right0">
                 <tbody>
-                    <tr>
-                        <td><b>Register</b></td>
-                        <td><b>Registerfunktion</b></td>
-                        <td><b>Normalwert</b></td>
+                    <tr class="separator strong">
+                        <td>Register</td>
+                        <td>Registerfunktion</td>
+                        <td>Normalwert</td>
                     </tr>
                     <tr>
                         <td>0. 36864</td>
@@ -64,7 +64,7 @@
                     <tr>
                         <td>4. 36868</td>
                         <td>GGGG GGGG</td>
-                        <td><br></td>
+                        <td></td>
                     </tr>
                     <tr>
                         <td>5. 36869</td>
@@ -116,7 +116,7 @@
                         <td>WWWW VVVV</td>
                         <td>0</td>
                     </tr>
-                    <tr>
+                    <tr class="separator">
                         <td>15. 36879</td>
                         <td>XXXX YZZZ</td>
                         <td>27</td>
@@ -124,7 +124,7 @@
                 </tbody>
             </table>
 
-            <table>
+            <table class="plain">
                 <tbody>
                     <tr>
                         <td>A:</td>
@@ -225,13 +225,19 @@
         <p>Fassen wir noch einmal zusammen: Aus bestimmten Bits der Register 2 und 5 entsteht das High-Byte der Bildschirmspeicheranfangsadresse (ein Low-Byte gibt’s hier nicht). Außerdem sind bestimmte Bits aus diesem Adreßschema immer auf Null. Die Konsequenz daraus ist, daß der Videobereich nur in bestimmten Speicherbereichen angesiedelt werden kann. Tabelle 2 zeigt die möglichen Adressen, die sich aus Bild 1 ergeben. Zu beachten ist, daß das untere Nibble (1 Nibble = 4 Bits) im Register #5 dem Zeichenspeicher zugeordnet ist, dieses darf vorläufig noch nicht angetastet werden.</p>
 
         <figure>
-            <table>
+            <table class="plain">
                 <tbody>
-                    <tr>
-                        <td><b>Register #5<br>Bit 4-7</b></td>
-                        <td><b>Register #2<br>Bit 7</b></td>
-                        <td><b>Adresse</b></td>
-                        <td><b>Bemerkung</b></td>
+                    <tr class="strong">
+                        <td>Register #5</td>
+                        <td>Register #2</td>
+                        <td>Adresse</td>
+                        <td>Bemerkung</td>
+                    </tr>
+                    <tr class="strong separator">
+                        <td>Bit 4-7</td>
+                        <td>Bit 7</td>
+                        <td></td>
+                        <td></td>
                     </tr>
                     <tr>
                         <td>1000</td>
@@ -239,7 +245,7 @@
                         <td>0</td>
                         <td>Zeropage (nicht nutzbar)</td>
                     </tr>
-                    <tr>
+                    <tr class="separator">
                         <td>1000</td>
                         <td>1</td>
                         <td>512</td>
@@ -249,7 +255,7 @@
                         <td>1001</td>
                         <td>0</td>
                         <td>1024</td>
-                        <td rowspan="6">3 KByte Erweiterung</td>
+                        <td rowspan="6" class="separator vcenter">3 KByte Erweiterung</td>
                     </tr>
                     <tr>
                         <td>1001</td>
@@ -271,7 +277,7 @@
                         <td>0</td>
                         <td>3073</td>
                     </tr>
-                    <tr>
+                    <tr class="separator">
                         <td>1011</td>
                         <td>1</td>
                         <td>3584</td>
@@ -280,7 +286,7 @@
                         <td>1100</td>
                         <td>0</td>
                         <td>4096</td>
-                        <td rowspan="8">Grundversionsspeicher</td>
+                        <td rowspan="8" class="vcenter">Grundversionsspeicher</td>
                     </tr>
                     <tr>
                         <td>1100</td>
@@ -336,17 +342,18 @@
         <p>Wie sie bestimmt schon bemerkt haben, spielt bei der Verwaltung des Bildschirms die Adresse 36869 (Register # 5) eine bedeutende Rolle. Fragt man sie mit PEEK ab, so erhalten wir in der Grundversion oder bei einer 3-KByte-Erweiterung den Wert 240, bei einem um 8 KByte erweiterten Speicher 192. Zerlegt man diese Zahlen wie in Bild 2, so erhält man jedes Mal die gleiche Adresse für den Zeichenspeicher. Setzen wir nun Bit 1 auf 1 (= 242 in GV beziehungsweise 194 bei 8 KByte), liegt die Anfangsadresse des Zeichenspeichers bei Adresse 34816 (Tabelle 3), wodurch wir auf einmal Groß- und Kleinschrift auf dem Bildschirm haben. Die eine der zwei zu Anfang gestellten Fragen haben wir damit beantwortet.</p>
 
         <figure>
-            <table>
+            <table class="plain">
                 <tbody>
-                    <tr>
-                        <td rowspan="2"><b>Register #5<br>Bits 0-3</b></td>
-                        <td rowspan="2"><b>Adresse</b></td>
-                        <td colspan="2"><b>POKE 36869,</b></td>
-                        <td rowspan="2"><b>Belegung</b></td>
+                    <tr class="strong">
+                        <td>Register #5</td>
+                        <td rowspan="2" class="separator">Adresse</td>
+                        <td colspan="2">POKE 36869,</td>
+                        <td rowspan="2" class="separator">Belegung</td>
                     </tr>
-                    <tr>
-                        <td><b>(GV)</b></td>
-                        <td><b>(8KByte)</b></td>
+                    <tr class="strong separator">
+                        <td>Bits 0-3</td>
+                        <td>(GV)</td>
+                        <td>(8KByte)</td>
                     </tr>
                     <tr>
                         <td>0000</td>
@@ -381,7 +388,7 @@
                         <td>36864</td>
                         <td>244</td>
                         <td>196</td>
-                        <td rowspan="4">Nicht verwendbar, da belegt</td>
+                        <td rowspan="4" class="separator">Nicht verwendbar, da belegt</td>
                     </tr>
                     <tr>
                         <td>0101</td>
@@ -395,7 +402,7 @@
                         <td>246</td>
                         <td>198</td>
                     </tr>
-                    <tr>
+                    <tr class="separator">
                         <td>0111</td>
                         <td>39936</td>
                         <td>247</td>
@@ -413,7 +420,7 @@
                         <td>1024</td>
                         <td>249</td>
                         <td>201</td>
-                        <td rowspan="3">3 KByte Erweiterung</td>
+                        <td rowspan="3" class="separator">3 KByte Erweiterung</td>
                     </tr>
                     <tr>
                         <td>1010</td>
@@ -421,7 +428,7 @@
                         <td>250</td>
                         <td>202</td>
                     </tr>
-                    <tr>
+                    <tr class="separator">
                         <td>1011</td>
                         <td>3072</td>
                         <td>251</td>
@@ -467,10 +474,13 @@
 
         <h2>Punkt für Punkt — der Zeichenaufbau</h2>
 
-        <p>Im unteren Teil von Bild 3 sieht man sehr gut, daß ein gesetzter Punkt der 1, ein nicht gesetzter (gelöschter) Punkt der 0 entspricht. Die Zeile wird dann in einen normalen Zahlenwert zwischen 0 und 255 umgerechnet. In dieser Form und in der Zeilenreihenfolge von oben nach unten sind sie nun im ROM abgelegt. Der »Klammeraffe« @ (Bildschirmcode 0) ist als erstes Zeichen dort zu finden. Folglich enthält die Startadresse des Zeichengenerators (Adresse 32768) die 0-te Zeile des Zeichens — also 28, Adresse 32769 enthält 34 und so weiter. Damit machen wir folgende Rechnung auf:<br>
-            Ein Zeichen: 8 Byte<br>
-            Anzahl: 128 Zeichen<br>
-            Invers: 128 Zeichen</p>
+        <p>Im unteren Teil von Bild 3 sieht man sehr gut, daß ein gesetzter Punkt der 1, ein nicht gesetzter (gelöschter) Punkt der 0 entspricht. Die Zeile wird dann in einen normalen Zahlenwert zwischen 0 und 255 umgerechnet. In dieser Form und in der Zeilenreihenfolge von oben nach unten sind sie nun im ROM abgelegt. Der »Klammeraffe« @ (Bildschirmcode 0) ist als erstes Zeichen dort zu finden. Folglich enthält die Startadresse des Zeichengenerators (Adresse 32768) die 0-te Zeile des Zeichens — also 28, Adresse 32769 enthält 34 und so weiter. Damit machen wir folgende Rechnung auf:</p>
+
+        <ul class="plain">
+            <li>Ein Zeichen: 8 Byte</li>
+            <li>Anzahl: 128 Zeichen</li>
+            <li>Invers: 128 Zeichen</li>
+        </ul>
 
         <p>Also 256 Charakter pro Zeichensatz mal 8 Bytes = 2048 Bytes Platzbedarf für Großbuchstaben und Grafikzeichen mit deren inversen Gegenstücken. Dazu kommen nocheinmal so viele Bytes für den zweiten Zeichensatz, womit sich ein Speicherbedarf von 4 KByte für den gesamten Zeichenvorrat des VC ergibt.</p>
 
@@ -480,10 +490,13 @@
 
         <p>Diese Platznummern stehen als Bildschirmcodes im Handbuch auf Seite 141. POKEt man nämlich ein Zeichen ins Bildschirm-RAM, so multipliziert der VIC den Bildschirmcode mit 8 und addiert die Startadresse des Zeichengenerators hinzu.</p>
 
-        <p>Beispiel: Das Zeichen $ (Bildschirmcode 36) ist ab folgender Adresse abgespeichert (Formel 1).<br>
-            AD = BC * 8 + ZG<br>
-            36 * 8 + 32768 33056<br>
-            TODO</p>
+        <p>Beispiel: Das Zeichen $ (Bildschirmcode 36) ist ab folgender Adresse abgespeichert (Formel 1).</p>
+
+        <table class="plain">
+            <tr><td>AD =</td><td>BC * 8 + ZG</td></tr>
+            <tr><td></td><td>36 * 8 + 32768</td></tr>
+            <tr><td></td><td>33056</td></tr>
+        </table>
 
         <p>Diese Formel müssen wir im Hinterkopf behalten, denn wir benötigen sie später noch.</p>
 
@@ -508,7 +521,7 @@
 
         <p>Die erste wichtige Verknüpfungsoperation ist die ODER- (in Basic OR) Operation, die zwei Bits nach der in Tabelle 4a abgebildeten Wahrheitstabelle verknüpft. Haben wir nun eine Kette von 8 Bit (also ein Byte), so kann man mit Hilfe dieser Operation bestimmte Bits »einschalten«. Dazu ein Beispiel: Von einer Speicherstelle sollen die Bits 1 und 6 eingeschaltet werden. Da Basic die Binärzahlen nicht direkt, sondern nur als Dezimalzahlen verarbeiten kann, müssen wir zunächst alle Werte in dieses Zahlensystem umwandeln.</p>
 
-        <table>
+        <table class="plain center1 center2 center1 center3 center4 center5 center6 center7 center8">
             <tbody>
                 <tr>
                     <td>Bit</td>
@@ -533,7 +546,7 @@
                     <td>1</td>
                 </tr>
                 <tr>
-                    <td><br></td>
+                    <td></td>
                     <td>0</td>
                     <td>1</td>
                     <td>0</td>
@@ -548,101 +561,105 @@
 
         <p>Durch Addition der Wertigkeiten der zu setzenden Bits ergibt sich der Wert 66 (= 64 + 2). Durch die OR-Verknüpfung der Speicherstelle mit 66 ergibt sich folgende Bitstruktur (für den ursprünglichen Inhalt der Speicherstelle nehmen wir einmal 229 an):</p>
 
-        <table>
-            <tbody>
-                <tr>
-                    <td>Speicherstelle</td>
-                    <td>1</td>
-                    <td>1</td>
-                    <td>1</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>1</td>
-                    <td>0</td>
-                    <td>1</td>
-                    <td>= 229</td>
-                </tr>
-                <tr>
-                    <td>Bit 1 + 6 setzen:</td>
-                    <td>0</td>
-                    <td>1</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>1</td>
-                    <td>0</td>
-                    <td>= 66</td>
-                </tr>
-                <tr>
-                    <td>229 OR 66:</td>
-                    <td>1</td>
-                    <td>1</td>
-                    <td>1</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>1</td>
-                    <td>1</td>
-                    <td>1</td>
-                    <td>= 231</td>
-                </tr>
-            </tbody>
-        </table>
+        <figure>
+            <table class="plain center1 center2 center1 center3 center4 center5 center6 center7 center8">
+                <tbody>
+                    <tr>
+                        <td>Speicherstelle</td>
+                        <td>1</td>
+                        <td>1</td>
+                        <td>1</td>
+                        <td>0</td>
+                        <td>0</td>
+                        <td>1</td>
+                        <td>0</td>
+                        <td>1</td>
+                        <td>= 229</td>
+                    </tr>
+                    <tr class="separator">
+                        <td>Bit 1 + 6 setzen:</td>
+                        <td>0</td>
+                        <td>1</td>
+                        <td>0</td>
+                        <td>0</td>
+                        <td>0</td>
+                        <td>0</td>
+                        <td>1</td>
+                        <td>0</td>
+                        <td>= 66</td>
+                    </tr>
+                    <tr>
+                        <td>229 OR 66:</td>
+                        <td>1</td>
+                        <td>1</td>
+                        <td>1</td>
+                        <td>0</td>
+                        <td>0</td>
+                        <td>1</td>
+                        <td>1</td>
+                        <td>1</td>
+                        <td>= 231</td>
+                    </tr>
+                </tbody>
+            </table>
+        </figure>
 
         <p>Der gewünschte Effekt ist eingetreten, das heißt die Bits 1 und 6 wurden gesetzt (da Bit 6 bereits eingeschaltet war, ergab sich hier keine Änderung).</p>
 
         <p>Analog verfährt man beim Löschen bestimmter Bits. Dazu wird dann allerdings die UND-Operation (Basic-Befehl AND) verwendet. Wie Tabelle 4b zeigt, bleiben nur die Bits unverändert, die mit 1 »verANDet« werden. Auch hierzu ein Rechenbeispiel, bei dem die Bits 1 und 6 gelöscht werden sollen:</p>
 
-        <table>
-            <tbody>
-                <tr>
-                    <td>Speicherstelle:</td>
-                    <td>1</td>
-                    <td>1</td>
-                    <td>1</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>1</td>
-                    <td>1</td>
-                    <td>1</td>
-                    <td>= 231</td>
-                </tr>
-                <tr>
-                    <td>Bit 1 + 6 löschen:</td>
-                    <td>1</td>
-                    <td>0</td>
-                    <td>1</td>
-                    <td>1</td>
-                    <td>1</td>
-                    <td>1</td>
-                    <td>0</td>
-                    <td>1</td>
-                    <td>= 189</td>
-                </tr>
-                <tr>
-                    <td>231 AND 189:</td>
-                    <td>1</td>
-                    <td>0</td>
-                    <td>1</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>1</td>
-                    <td>0</td>
-                    <td>1</td>
-                    <td>= 165</td>
-                </tr>
-            </tbody>
-        </table>
+        <figure>
+            <table class="plain">
+                <tbody>
+                    <tr>
+                        <td>Speicherstelle:</td>
+                        <td>1</td>
+                        <td>1</td>
+                        <td>1</td>
+                        <td>0</td>
+                        <td>0</td>
+                        <td>1</td>
+                        <td>1</td>
+                        <td>1</td>
+                        <td>= 231</td>
+                    </tr>
+                    <tr>
+                        <td>Bit 1 + 6 löschen:</td>
+                        <td>1</td>
+                        <td>0</td>
+                        <td>1</td>
+                        <td>1</td>
+                        <td>1</td>
+                        <td>1</td>
+                        <td>0</td>
+                        <td>1</td>
+                        <td>= 189</td>
+                    </tr>
+                    <tr>
+                        <td>231 AND 189:</td>
+                        <td>1</td>
+                        <td>0</td>
+                        <td>1</td>
+                        <td>0</td>
+                        <td>0</td>
+                        <td>1</td>
+                        <td>0</td>
+                        <td>1</td>
+                        <td>= 165</td>
+                    </tr>
+                </tbody>
+            </table>
+        </figure>
 
         <p>Auch hierbei muß man sich vor der Verknüpfung ein Bitmuster berechnen, in dem die zu löschenden Bits auf Null, die nicht zu verändernden auf 1 gesetzt werden müssen. Wem dies noch nicht restlos klar ist, der sollte anhand von einigen Rechenbeispielen diese Operationen üben, denn wir benötigen diese in der nächsten Folge, wenn es darum geht, jeden Grafikpunkt einzeln anzusteuern (beispielsweise über Koordinaten).</p>
 
         <figure>
-            <table>
+            <table class="plain">
                 <tbody>
-                    <tr>
-                        <td><b>Wert 1</b></td>
-                        <td><b>Wert 2</b></td>
-                        <td><b>Verknüpfung</b></td>
+                    <tr class="separator strong">
+                        <td>Wert 1</td>
+                        <td>Wert 2</td>
+                        <td>Verknüpfung</td>
                     </tr>
                     <tr>
                         <td>0</td>
@@ -669,12 +686,12 @@
             <figcaption>Tabelle 4a. Die Wahrheitstabelle der ODER-Operation</figcaption>
         </figure>
         <figure>
-            <table>
+            <table class="plain">
                 <tbody>
-                    <tr>
-                        <td><b>Wert 1</b></td>
-                        <td><b>Wert 2</b></td>
-                        <td><b>Verknüpfung</b></td>
+                    <tr class="separator strong">
+                        <td>Wert 1</td>
+                        <td>Wert 2</td>
+                        <td>Verknüpfung</td>
                     </tr>
                     <tr>
                         <td>0</td>
@@ -722,7 +739,7 @@
 
         <p><strong>ZG = 14</strong> (Startadresse 6144): Hier haben wir Platz für 256 Zeichen, die bei 8 KByte voll nutzbar sind. Im anderen Fall sind wiederum 64 Zeichen für den Videospeicher zu subtrahieren.</p>
 
-        <p><strong>ZG = 15</strong> (Startadresse 7168): Diese Zeichenmenge wird üblicherweise in der Grundversion verwendet. Hierbei reduziert sich der Programmspeicher nämlich nur um 512 Byte (also 64 Zeichen). Die anderen 64 Zeichen fallen ja wiederum dem Bildschirmspeicher zum Opfer. .</p>
+        <p><strong>ZG = 15</strong> (Startadresse 7168): Diese Zeichenmenge wird üblicherweise in der Grundversion verwendet. Hierbei reduziert sich der Programmspeicher nämlich nur um 512 Byte (also 64 Zeichen). Die anderen 64 Zeichen fallen ja wiederum dem Bildschirmspeicher zum Opfer.</p>
 
         <p>Da das Zeichenkopieren fast immer notwendig ist, verwendet man anstelle des Basicprogramms aus Geschwindigkeitsgründen besser eine Maschinenroutine (Listing 2 und 3). Das Programm kann mit Hilfe des Laders in ihre eigene Grafikroutine eingebaut werden. Auch speicherplatzmäßig ergeben sich, da das Maschinenprogramm recht kurz ist, keine Probleme, denn es liegt im Bandpuffer (Adresse 828).</p>
 
@@ -774,12 +791,14 @@
                 (hier als Beispiel das Copyright-Zeichen)</figcaption>
         </figure>
 
-        <p>Dazu wird unser Beispielprogramm aus Listing 1 um folgende 5 Zeilen ergänzt:<br>
-            60 CH = 28: AD = CH * 8 + ZG: REM Formel #1<br>
-            70 FOR Z = 0 TO 7<br>
-            80 READ D<br>
-            90 POKE AD*Z,D: NEXT<br>
-            100 DATA 60, 66, 153, 161, 153, 66, 60</p>
+        <p>Dazu wird unser Beispielprogramm aus Listing 1 um folgende 5 Zeilen ergänzt:
+            <code>60 CH = 28: AD = CH * 8 + ZG: REM Formel #1
+                70 FOR Z = 0 TO 7
+                80 READ D
+                90 POKE AD*Z,D: NEXT
+                100 DATA 60, 66, 153, 161, 153, 66, 60
+            </code>
+        </p>
 
         <p>Der Bildschirmcode des Zeichens wird durch die Variable CH übergeben. Daraus errechnet sich das Programm die Startadresse des Zeichens, indem es den Bildschirmcode mit 8 multipliziert und die Anfangsadresse des Zeichenspeichers dazuaddiert (in unserem Fall 6144).</p>
 
@@ -802,7 +821,7 @@
             <figcaption>Bild 6. Durch die Verlegung der Basic-Zeiger SAVEt der Computer auch die Sonderzeichen mit ab: (a) bei Grundversion / 3-KByte-Erweiterung, (b) ab 8 KByte Speicherausbau</figcaption>
         </figure>
 
-        <p>Grundversion (Bild 6a): Der dunkelgelb unterlegte Teil der Speichergrafik stellt den Adreßbereich dar, auf den der Interpreter zurückgreift. Dieser geht normalerweise bis Adresse 7680 (zu erkennen an der hellgelben Farbe).</p>
+        <p><strong>Grundversion (Bild 6a):</strong> Der dunkelgelb unterlegte Teil der Speichergrafik stellt den Adreßbereich dar, auf den der Interpreter zurückgreift. Dieser geht normalerweise bis Adresse 7680 (zu erkennen an der hellgelben Farbe).</p>
 
         <p>Durch die Umstellung mit POKE 55,0: POKE 56, 28:CLR hat man Platz für 64 Zeichen (= 512 Byte) geschaffen, die vom Interpreter nicht angetastet werden (dies haben wir ja in Folge 1 schon besprochen).</p>
 
@@ -813,8 +832,14 @@
         <p>Hier noch einmal die nötigen Programmschritte:</p>
 
         <ol>
-            <li>Programm um Zeile 5 ergänzen.<br>5 POKE 45, XXX: POKE 46, XX: POKE 55, 0: POKE 56, 28: CLR<br>Warum muß das Programm um eine Zeile ergänzt werden? Nun, da sich der Computer bei der Variablenverwaltung nach diesen Zeigern richtet, müssen diese nach dem Ladevorgang wieder auf den alten Wert — der auf das wirkliche Programmende zeigt — gesetzt werden, damit der Computer nicht mit der Verwaltung durcheinander kommt. Auch die Zeichen selbst müssen nach dem Laden wieder vor dem Interpreterzugriff geschützt werden, welches durch die Veränderung der Zeiger 55, 56 geschieht.</li>
-            <li>Nun stellen wir quasi »zu Fuß« den Inhalt von Adresse 45 und 46 fest:<br>PRINT PEEK(45), PEEK(46)</li>
+            <li>Programm um Zeile 5 ergänzen.
+                <p><code>5 POKE 45, XXX: POKE 46, XX: POKE 55, 0: POKE 56, 28: CLR</code></p>
+
+                <p>Warum muß das Programm um eine Zeile ergänzt werden? Nun, da sich der Computer bei der Variablenverwaltung nach diesen Zeigern richtet, müssen diese nach dem Ladevorgang wieder auf den alten Wert — der auf das wirkliche Programmende zeigt — gesetzt werden, damit der Computer nicht mit der Verwaltung durcheinander kommt. Auch die Zeichen selbst müssen nach dem Laden wieder vor dem Interpreterzugriff geschützt werden, welches durch die Veränderung der Zeiger 55, 56 geschieht.</p>
+            </li>
+            <li>Nun stellen wir quasi »zu Fuß« den Inhalt von Adresse 45 und 46 fest:
+                <p><code>PRINT PEEK(45), PEEK(46)</code></p>
+            </li>
             <li>Diese Werte werden nun nachträglich (statt »xxx«) in Zeile 5 geschrieben, wobei zu beachten ist, daß der Wert von Adresse 45 ein-, zwei- oder dreistellig sein kann (oben wurden drei Stellen angenommen). Sollten es nun nicht drei Ziffern sein, so ist der Rest mit Nullen zu ergänzen (zum Beispiel 2= 002 oder 34 = 034). Wichtig ist, daß sich die Zeilenlänge nicht ändert, da sich damit auch das Programmende verschieben würde.</li>
             <li>Die Zeiger werden nun zum Abspeichern vorbereitet: POKE 45, 0: POKE 46, 30: CLR: SAVE»&hellip;«.</li>
         </ol>
@@ -822,7 +847,7 @@
 
         <p>Wie man sieht, befindet sich das Programm vor den Sonderzeichen im Speicher. Die Zeiger müssen zum Abspeichern also nach oben gesetzt werden. Bei einer 8-KByte-Erweiterung liegt der Fall genau anders herum. Dort liegt der Zeichensatz nämlich vor dem Programm. Folglich muß hier der Basic-Anfang beim Abspeichern nach unten gelegt werden, aber dies besprechen wir jetzt im Folgenden noch genauer:</p>
 
-        <p>8-KByte-Erweiterung (Bild 6b): Auch hier ist die erste Handlung das Verstellen eines Basic-Zeigers. Auffällig ist, daß die Sonderzeichen — wie oben bereits angesprochen — nicht mehr oberhalb des Basic-Programms (also wie in Bild 6a zu sehen an dessen Ende), sondern unterhalb liegen. Daher muß die Basic-Anfangsadresse so geändert werden, daß auch hier kein zerstörendes Eingreifen mehr möglich ist. Durch das Hochsetzen der Startadresse von 4608 auf 8129 wird dies erreicht: POKE 44, 32: POKE 8192,0: NEW</p>
+        <p><strong>8-KByte-Erweiterung (Bild 6b):</strong> Auch hier ist die erste Handlung das Verstellen eines Basic-Zeigers. Auffällig ist, daß die Sonderzeichen — wie oben bereits angesprochen — nicht mehr oberhalb des Basic-Programms (also wie in Bild 6a zu sehen an dessen Ende), sondern unterhalb liegen. Daher muß die Basic-Anfangsadresse so geändert werden, daß auch hier kein zerstörendes Eingreifen mehr möglich ist. Durch das Hochsetzen der Startadresse von 4608 auf 8129 wird dies erreicht: POKE 44, 32: POKE 8192,0: NEW</p>
 
         <p>Diese Anweisung ist vor dem Laden oder der Eingabe des Programms notwendig, denn wie man sieht, muß nach der erstmaligen Umschaltung der Programmspeicher mit NEW gelöscht werden.</p>
 
@@ -830,9 +855,9 @@
 
         <ol>
             <li>Den Inhalt von Zeigerpaar 45,46 feststellen und notieren.</li>
-            <li>Basic-Anfang auf 4608 (Ursprungswert) zurückstellen: POKE 44,18: NEW</li>
-            <li>Zeile eingeben:<br>10 POKE 44,32: RUN</li>
-            <li>Den notierten Zeigerinhalt in die beiden Zeropagespeicherstellen zurückschreiben:<br>POKE 45,Low-Byte: POKE 46, High-Byte: CLR</li>
+            <li>Basic-Anfang auf 4608 (Ursprungswert) zurückstellen: <code>POKE 44,18: NEW</code></li>
+            <li>Zeile eingeben:<code>10 POKE 44,32: RUN</code></li>
+            <li>Den notierten Zeigerinhalt in die beiden Zeropagespeicherstellen zurückschreiben: <code>POKE 45,Low-Byte: POKE 46, High-Byte: CLR</code></li>
             <li>Die Zeichen mit dem Programm abspeichern (SAVE).</li>
         </ol>
 

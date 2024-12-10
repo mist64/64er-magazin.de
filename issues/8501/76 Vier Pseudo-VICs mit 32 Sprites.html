@@ -2,12 +2,17 @@
 <html lang="de">
 
 <head>
-    <title>XXX</title>
+    <title>Vier Pseudo-VICs mit 32 Sprites</title>
     <meta charset="UTF-8">
     <link rel="stylesheet" href="../style.css">
-    <meta name="author" content="XXX">
-    <meta name="64er.issue" content="01/85">
-    <meta name="64er.pages" content="999">
+    <meta name="author" content="Jürgen Haas, Stefan Haas, rg">
+    <meta name="64er.issue" content="1/85">
+    <meta name="64er.pages" content="76-79">
+    <meta name="64er.head1" content="Grafik">
+    <meta name="64er.head2" content="C 64">
+    <meta name="64er.toc_category" content="Programme zum Abtippen|Grafik">
+    <meta name="64er.index_title" content="Vier Pseudo-VICs mit 32 Sprites">
+    <meta name="64er.index_category" content="Listings zum Abtippen|Grafik|Sprites">
     <meta name="64er.id" content="provic">
 </head>
 
@@ -52,7 +57,7 @@
         <p>Im Grunde ist jeder der vier Pseudo-VICs wie der echte VIC zu behandeln. Ausnahmen sind hier nur die Register 30 (Sprite-Sprite-Kollision) und 31 (Sprite-Hintergrund-Kollision), die sich auf den jeweils vorausgegangenen Bildschirmbereich beziehen. Die Register 19 und 20 (Lightpenkoordinaten), sowie 25 und 26 (IRQ-Flags und -maske) werden nicht behandelt, da diese Funktionen nur direkt über den VIC 6567 sinnvoll gehandhabt werden können. Außerdem hat jeder Pseudo-VIC noch zusätzliche Register für zwei Flags (REG 47 und REG 57), acht Sprite-Pointer (REG 48 bis REG 55), Videomatrix-Anfangsadresse Highbyte (REG 56) und die CIA 2, REG 0, Bits 0 und 1 (REG 58) (Adreßbits 14 und 15 des VIC 6567).</p>
 
         <p>Die vier Basisadressen der PVICs sind:</p>
-        <table>
+        <table class="plain">
             <tr>
                 <td>PVIC 1</td>
                 <td>52992 ($ CF00)</td>
@@ -77,124 +82,129 @@
 
         <p>Da die Pseudo-VICs praktisch gleichberechtigt sind, hier die Registerbeschreibung eines Pseudo-VICs:</p>
 
-        <table>
+        <table class="plain nobreak0 strong0">
             <tbody>
                 <tr>
-                    <td><b>REG 0:</b></td>
+                    <td>REG 0:</td>
                     <td>X-Koordinate des Sprite 0</td>
                 </tr>
                 <tr>
-                    <td><b>REG 1:</b></td>
+                    <td>REG 1:</td>
                     <td>Y-Koordinate des Sprite 0<br>
                         Beachte: Die Y-Koordinaten sollten im Bereich des zugehörigen Bildschirmbereichs liegen, sonst ist der Sprite nicht zu sehen. Näheres siehe unten.</td>
                 </tr>
                 <tr>
-                    <td><b>REG 2 bis 15:</b></td>
+                    <td>REG 2 bis 15:</td>
                     <td>Wie REG 0 und 1, aber für Sprites 1 — 7</td>
                 </tr>
                 <tr>
-                    <td><b>REG 16:</b></td>
+                    <td>REG 16:</td>
                     <td>MSB (höchstes Bit) der X-Koordinaten</td>
                 </tr>
                 <tr>
-                    <td><b>REG 17:</b></td>
+                    <td>REG 17:</td>
                     <td>Bits 0 bis 2: Y-Abstand der Zeichen vom oberen Bildrand in Rasterzeilen (Softscrolling!)</td>
                 </tr>
                 <tr>
-                    <td><b>REG 17:</b></td>
-                    <td>Bit 3: Umschaltung 24/25-Zeilendarstellung<br>
-                        Bit 4: Bild an/aus: es hat keinen Sinn, das Bild teilweise ausschalten zu wollen, da der VIC dieses Bit nur einmal pro Fernsehbild prüft (also entweder das ganze Bild an oder aus) Bit 5: HiRes-Grafik-Modus an<br>
-                        Bit 6: Hintergrundmehrfarb-Modus an<br>
-                        Bit 7: Nummer der Interrupt-Rasterzeile Bit 8; es hat wenig Sinn, dieses Bit zu setzen, da so nur Rasterzeilen angesprochen werden, die unterhalb des Bildschirms liegen. Ist in irgendeinem Pseudo-VIC die 9-Bit-Zahl für die Rasterzeile größer als 311, so wird überhaupt kein IRQ mehr ausgelöst.</td>
+                    <td>REG 17:</td>
+                    <td><ul class="plain">
+                        <li>Bit 3: Umschaltung 24/25-Zeilendarstellung</li>
+                        <li>Bit 4: Bild an/aus: es hat keinen Sinn, das Bild teilweise ausschalten zu wollen, da der VIC dieses Bit nur einmal pro Fernsehbild prüft (also entweder das ganze Bild an oder aus) Bit 5: HiRes-Grafik-Modus an</li>
+                        <li>Bit 6: Hintergrundmehrfarb-Modus an</li>
+                        <li>Bit 7: Nummer der Interrupt-Rasterzeile Bit 8; es hat wenig Sinn, dieses Bit zu setzen, da so nur Rasterzeilen angesprochen werden, die unterhalb des Bildschirms liegen. Ist in irgendeinem Pseudo-VIC die 9-Bit-Zahl für die Rasterzeile größer als 311, so wird überhaupt kein IRQ mehr ausgelöst.</li>
+                    </ul></td>
                 </tr>
                 <tr>
-                    <td><b>REG 18:</b></td>
+                    <td>REG 18:</td>
                     <td>Nummer der Rasterzeile Bits 0 — 7; hier ist anzugeben, wann der nächste Interrupt ausgelöst werden soll, das heißt wo der Bildschirmbereich dieses PVICs zu Ende sein soll. Dabei sollte folgende Reihenfolge eingehalten werden: REG 18: PVIC 1 &lt; PVIC 2 &lt; PVIC 3 &lt;PVIC 4 (Zyklische Vertauschungen möglich!)</td>
                 </tr>
                 <tr>
-                    <td><b>REG 19 und 20:</b></td>
+                    <td>REG 19 und 20:</td>
                     <td>nicht verwendet (siehe oben)</td>
                 </tr>
                 <tr>
-                    <td><b>REG 21:</b></td>
+                    <td>REG 21:</td>
                     <td>Sprite enable (einschalten)</td>
                 </tr>
                 <tr>
-                    <td><b>REG 22:</b></td>
-                    <td>Bits 0 bis 2: Softscrolling in X-Richtung<br>
-                        Bit 3: Umschaltungen 38/40-Spaltendarstellung<br>
-                        Bit 4: Multicolor-Modus ein<br>
-                        Bit 5 bis 7: unbenutzt</td>
+                    <td>REG 22:</td>
+                    <td><ul class="plain">
+                        <li>Bits 0 bis 2: Softscrolling in X-Richtung</li>
+                        <li>Bit 3: Umschaltungen 38/40-Spaltendarstellung</li>
+                        <li>Bit 4: Multicolor-Modus ein</li>
+                        <li>Bit 5 bis 7: unbenutzt</li>
+                    </ul></td>
                 </tr>
                 <tr>
-                    <td><b>REG 23:</b></td>
+                    <td>REG 23:</td>
                     <td>Sprite vergrößern in Y-Richtung</td>
                 </tr>
                 <tr>
-                    <td><b>REG 24:</b></td>
-                    <td>Bits 1 bis 3: Adresse Zeichengenerator (Bits 11<br>
-                        bis 13)<br>
-                        Bits 4 bis 7: Adresse Video-RAM (Bits 10 bis 13)</td>
+                    <td>REG 24:</td>
+                    <td><ul class="plain">
+                        <li>Bits 1 bis 3: Adresse Zeichengenerator (Bits 11 bis 13)</li>
+                        <li>Bits 4 bis 7: Adresse Video-RAM (Bits 10 bis 13)</li>
+                    </ul></td>
                 </tr>
                 <tr>
-                    <td><b>REG 25 und 26:</b></td>
+                    <td>REG 25 und 26:</td>
                     <td>nicht verwendet (siehe oben)</td>
                 </tr>
                 <tr>
-                    <td><b>REG 27:</b></td>
+                    <td>REG 27:</td>
                     <td>Sprite-Priorität vor Hintergrund</td>
                 </tr>
                 <tr>
-                    <td><b>REG 28:</b></td>
+                    <td>REG 28:</td>
                     <td>Flags für Multicolor-Sprites</td>
                 </tr>
                 <tr>
-                    <td><b>REG 29:</b></td>
+                    <td>REG 29:</td>
                     <td>Sprite vergrößern in X-Richtung</td>
                 </tr>
                 <tr>
-                    <td><b>REG 30:</b></td>
+                    <td>REG 30:</td>
                     <td>Sprite-Sprite-Kollision</td>
                 </tr>
                 <tr>
-                    <td><b>REG 31:</b></td>
+                    <td>REG 31:</td>
                     <td>Sprite-Hintergrund-Kollision<br>
                         Achtung: Geben die Kollisionen des vorangegangenen Bildschirmbereichs an: Findet im Bereich von PVIC 3 eine Kollision statt, wird dies im PVIC 4 registriert. Kollisionen im Bereich von PVIC 4 werden im PVIC 1 registriert. Dieses Register muß gelöscht werden, um neue Kollisionen anzeigen zu können!</td>
                 </tr>
                 <tr>
-                    <td><b>REG 32:</b></td>
+                    <td>REG 32:</td>
                     <td>Rahmenfarbe</td>
                 </tr>
                 <tr>
-                    <td><b>REG 33 bis 36:</b></td>
+                    <td>REG 33 bis 36:</td>
                     <td>Hintergrundfarben 0 bis 3</td>
                 </tr>
                 <tr>
-                    <td><b>REG 37 und 38:</b></td>
+                    <td>REG 37 und 38:</td>
                     <td>Multicolor-Sprite-Farben 0 und 1</td>
                 </tr>
                 <tr>
-                    <td><b>REG 39 bis 46:</b></td>
+                    <td>REG 39 bis 46:</td>
                     <td>Farben für Sprites 0 bis 7</td>
                 </tr>
                 <tr>
-                    <td><b>REG 47:</b></td>
+                    <td>REG 47:</td>
                     <td>Flag für Spritebehandlung; nur wenn der Inhalt dieses Registers nicht Null ist, werden die Register, die etwas mit Sprites zu tun haben, vom PVIC in den VIC 6567 übertragen. Das sind REG 0 bis REG 16, REG 21, REG 23, REG 27 bis REG 31, REG 37 bis 46 sowie REG 48 bis 55. Ist der Inhalt Null, gelten für die Sprites die Werte des vorherigen PVICs, während die Kollisionen erst im nächsten PVIC, in dem REG 48 ungleich Null ist, angezeigt werden.</td>
                 </tr>
                 <tr>
-                    <td><b>REG 48 bis 55:</b></td>
+                    <td>REG 48 bis 55:</td>
                     <td>Sprite-Pointer für Sprites 0 bis 7; Die Pointer auf die Bitmuster der Sprites werden nicht mehr in die Speicherzellen 2040 bis 2047 geschrieben, sondern in diese Register des PVICs.</td>
                 </tr>
                 <tr>
-                    <td><b>REG 56:</b></td>
+                    <td>REG 56:</td>
                     <td>In diesem Register muß das Highbyte der Video- RAM-Anfangsadresse plus 3 stehen; normalerweise also 4 + 3 = 7 (da der Bildschirm nach dem Einschalten des Computers bei 1024 beginnt, 1024 = $ 0400). Bei Verlegung des Video-RAMs ist also der Inhalt dieses Registers zu korrigieren.</td>
                 </tr>
                 <tr>
-                    <td><b>REG 57:</b></td>
+                    <td>REG 57:</td>
                     <td>Flag für Bildschirmparameter-Behandlung; nur wenn der Inhalt dieses Registers nicht Null ist, werden die REG 17, 22, 24, sowie 32 bis 36 und REG 58 in den VIC 6567 übertragen.</td>
                 </tr>
                 <tr>
-                    <td><b>REG 58:</b></td>
+                    <td>REG 58:</td>
                     <td>Bits 0 und 1: Adressbits 14 und 15 des VIC 6557; werden nach CIA 2 REG 0 Bits 0 und 1 übertragen. Mit diesen Bits kann Video-RAM, Charaktergenerator, Grafik-Bitmap in 16-KByte- Schritten verschoben werden. Da die Bits low- aktiv sind, sind sie beim Einschalten gesetzt (also REG 58 = 3). Bits 2 bis 7: unbenutzt, immer 0.</td>
                 </tr>
 
@@ -223,7 +233,7 @@
 
         <figure>
             Belegter Adreßraum:
-            <table>
+            <table class="plain">
                 <tbody>
                     <tr>
                         <td>$CD40</td>
@@ -233,7 +243,7 @@
                         <td>$CD58</td>
                         <td>Interruptroutine</td>
                     </tr>
-                    <tr>
+                    <tr  class="separator">
                         <td>$CEEA</td>
                         <td>Ausschaltroutine</td>
                     </tr>
@@ -259,24 +269,31 @@
                     </tr>
                 </tbody>
             </table>
-            Provic 64 einschalten:<br>
-            in Basic: SYS 52544<br>
-            in Maschinensprache: JSR $CD40<br>
-            Provic 64 ausschalten:<br>
-            in Basic: SYS 52970<br>
-            in Maschinensprache JSR $CEEA<br>
-            Benutzte RAM-Adressen:<br>
-            in der Zero-Page: 187 ($BB)<br>
-            188 ($BC)<br>
+            Provic 64 einschalten:
+
+            <ul class="plain">
+                <li>in Basic: SYS 52544</li>
+                <li>in Maschinensprache: JSR $CD40</li>            
+            </ul>
+            Provic 64 ausschalten:
+            <ul class="plain">
+                <li>in Basic: SYS 52970</li>
+                <li>in Maschinensprache JSR $CEEA</li>
+            </ul>
+            Benutzte RAM-Adressen:
+            <ul class="plain">
+                <li>in der Zero-Page: 187 ($BB)</li>
+                <li>188 ($BC)</li>
+            </ul>
             Rechenzeitzuwachs bei aktiviertem Provic 64:
-            <table>
+            <table class="plain">
                 <tbody>
                     <tr>
                         <td>alle Spriteflags (REG 47) und Bildschirmparameterflags (REG 57) gelöscht:</td>
                         <td>+ 2,5%</td>
                     </tr>
                     <tr>
-                        <td>für jedes gesetzte Spriteflag (REG 47)':</td>
+                        <td>für jedes gesetzte Spriteflag (REG 47):</td>
                         <td>zirka + 2,4%</td>
                     </tr>
                     <tr>
@@ -285,11 +302,17 @@
                     </tr>
                     <tr>
                         <td>alle Sprite- und Bildschirmflags gesetzt:</td>
-                        <td>zirka<br>
-                            + 15,0%</td>
+                        <td>zirka + 15,0%</td>
                     </tr>
                 </tbody>
             </table>
+            <ul class="plain">
+                <li>Falls der Rechner abstürzt rettet Run-Stop/Restore!</li>
+                <li>Die Zeitvariable Tl zählt bei aktiviertem Provic 64 in 50stel Sekunden (statt 60stel);</li>
+                <li>TI$ wird somit unbrauchbar.</li>
+                <li>Zeiger für Interruptaussprung von PVIC 3 bis PVIC 4: $CEE5</li>
+                <li>Zeiger für Interruptaussprung von PVIC 1: $CEE8</li>
+            </ul>
             <figcaption>Tabellarische Übersicht zu Provic</figcaption>
         </figure>
 
