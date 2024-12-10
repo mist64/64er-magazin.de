@@ -62,21 +62,21 @@
             hinterläßt in B$(0) ein einsames T, der Rest wird abgeschnitten.</p>
 
         <p>Zusammengefaßt läßt sich also sagen, daß bei der Parameterübergabe:<br />
-            (Stringl, N, String2)<br />
-            in String2 genau N Zeichen aus Stringl stehen, und daß gegebenenfalls String2 mit Leerzeichen aufgefüllt wird.</p>
+            (String1, N, String2)<br />
+            in String2 genau N Zeichen aus String1 stehen, und daß gegebenenfalls String2 mit Leerzeichen aufgefüllt wird.</p>
 
-        <p>Nur wenn »Stringl« den gleichen Namen hat wie »String2«, entsteht ein Müllstring, nämlich der alte Inhalt der Stringvariablen. Für die, die es nun gar nicht mehr erwarten können, dieses Programm auszuprobieren, gibt es in Listing 2 einen Basic-Lader. Listing 1 kann direkt mit einem Assembler oder auch mit dem SMON eingegeben werden. Anhand dieses Programms, das alle wichtigen ROM-Routinen, die mit Strings zu tun haben, aufruft, wollen wir nun die Programmierung solcher Routinen erarbeiten.</p>
+        <p>Nur wenn »String1« den gleichen Namen hat wie »String2«, entsteht ein Müllstring, nämlich der alte Inhalt der Stringvariablen. Für die, die es nun gar nicht mehr erwarten können, dieses Programm auszuprobieren, gibt es in Listing 2 einen Basic-Lader. Listing 1 kann direkt mit einem Assembler oder auch mit dem SMON eingegeben werden. Anhand dieses Programms, das alle wichtigen ROM-Routinen, die mit Strings zu tun haben, aufruft, wollen wir nun die Programmierung solcher Routinen erarbeiten.</p>
 
         <h3>FORMAT analysiert</h3>
 
-        <p>Nehmen wir uns erst einmal die grundsätzliche Funktionsweise von FORMAT vor. Ein einfaches Flußdiagramm ist in Bild 1 dargestellt. Dieszeigt aber nur die Verfahrensweise von FORMAT Die eingebauten Sicherheitsüberprüfungen sind hier nicht enthalten. Bekannt sind am Start der Stringl, seine Länge 1 und die gewünschte Länge des String2.</p>
+        <p>Nehmen wir uns erst einmal die grundsätzliche Funktionsweise von FORMAT vor. Ein einfaches Flußdiagramm ist in Bild 1 dargestellt. Dieszeigt aber nur die Verfahrensweise von FORMAT Die eingebauten Sicherheitsüberprüfungen sind hier nicht enthalten. Bekannt sind am Start der String1, seine Länge 1 und die gewünschte Länge des String2.</p>
 
         <figure>
             <img src="147-1.png" alt="">
             <figcaption>Bild 1. FluBdiagramm der FORMAT-Routine</figcaption>
         </figure>
 
-        <p>Im ersten Schritt werden N Bytes für den String2 reserviert. Sodann werden solange Zeichen vom Stringl in den String2 kopiert, bis entweder der Stringl komplett kopiert wurde, oder der String2 schon voll ist. Im ersten Fall wird dann in einer zweiten Schleife der String2 mit Leerzeichen aufgefüllt. Ganz zum Schluß wird der Descriptor der zweiten Stringvariablen auf den String2 gerichtet. Das klingt alles ganz einfach, die Realisierung nach diesem Schema ist jedoch etwas umfangreicher.</p>
+        <p>Im ersten Schritt werden N Bytes für den String2 reserviert. Sodann werden solange Zeichen vom String1 in den String2 kopiert, bis entweder der String1 komplett kopiert wurde, oder der String2 schon voll ist. Im ersten Fall wird dann in einer zweiten Schleife der String2 mit Leerzeichen aufgefüllt. Ganz zum Schluß wird der Descriptor der zweiten Stringvariablen auf den String2 gerichtet. Das klingt alles ganz einfach, die Realisierung nach diesem Schema ist jedoch etwas umfangreicher.</p>
 
         <h3>Parameterübergaben</h3>
 
@@ -96,7 +96,7 @@
 
         <p>An sich müßten wir nun an der unteren Grenze der Strings genügend Bytes für String2 durch Verändern der entsprechenden Pointer herstellen. Es geht aber auch einfacher. $B47D reserviert so viele Bytes an der entsprechenden Stelle, wie ihr im Akku übergeben werden. Es wird sogar, wenn nötig, eine Garbage Collection durchgeführt, und schlimmstenfalls OUT OF MEMORY angezeigt, falls der Speicherplatz nicht reicht. Nach dem Aufruf der Routine $B47D stehen in den Bytes $62/$63 die Startadressen für den neuen String und in $61 dessen Länge, die wir ja festgelegt haben. Wenn Sie genauer hinschauen, bemerken Sie, daß dies schon der komplette Descriptor ist, der später nur noch in die Stringvariable, die String2 enthalten soll, einkopiert werden muß. Somit ist es recht einfach, String2 zu erstellen, da wir ja jetzt seinen Bestimmungsort kennen und die Länge für spätere Vergleiche zwischengespeichert wurde. Diese Routine ist wohl der Kernpunkt eines jeden Maschinenprogramms, das Strings verwalten soll.</p>
 
-        <p>Nun folgen zwei Schleifen, die genauso aufgebaut sind, wie die entsprechenden Teile im Flußdiagramm. Die erste kopiert Zeichen von Stringl in String2, die zweite füllt String2 mit Leerzeichen auf.</p>
+        <p>Nun folgen zwei Schleifen, die genauso aufgebaut sind, wie die entsprechenden Teile im Flußdiagramm. Die erste kopiert Zeichen von String1 in String2, die zweite füllt String2 mit Leerzeichen auf.</p>
 
         <p>Sollten Sie die etwas unlogische Struktur oder die beiden unbedingten Sprünge BNE nach den Inkrementanweisungen stören: Dieses Programm durfte, damit es frei verschiebbar ist, keine JMP-Befehle enthalten. Außerdem werden ohne Spezialabfrage sämtliche Sonderfälle (Länge eines oder beider Strings gleich Null) berücksichtigt.</p>
 
@@ -124,7 +124,7 @@
 
         <p>Doch vielleicht ahnt der eine oder andere unter Ihnen schon den Haken an dieser Geschichte. Es ist wieder einmal (was sonst) die Garbage Collection, die uns einen Strich durch die Rechnung macht.</p>
 
-        <p>Findet, aus welchem Grund auch immer, eine Garbage Collection statt, so passiert folgendes: A$ und B$ zeigen auf denselben Stringdescriptor. Je nachdem welcher String als erster im Programm definiert wurde, wird einer der beiden zuerst aufgeräumt, nehmen wir mal an, es sei B$. Wenn B$ nun aufgeräumt ist, wird sein Inhalt an die aktuelle »Aufräumgrenze« hochkopiert. Diese aktuelle Aufräumgrenze kann allerdings so ungünstig hegen, daß A$ von B$ teilweise überschrieben wird. Im nächsten Aufräumschritt würde A$ nicht an die aktuelle Aufräumgrenze hoch, sondern unter sie herunter kopiert und somit weitere Stnngs zerstört&hellip; Dieses Spielchen würde sich dann bis zum Ende der Garbage Collection hinziehen. (Oder bis einmal tatsächlich Müllstrings an den kritischen Stellen stehen, die ja überschrieben werden dürfen).</p>
+        <p>Findet, aus welchem Grund auch immer, eine Garbage Collection statt, so passiert folgendes: A$ und B$ zeigen auf denselben Stringdescriptor. Je nachdem welcher String als erster im Programm definiert wurde, wird einer der beiden zuerst aufgeräumt, nehmen wir mal an, es sei B$. Wenn B$ nun aufgeräumt ist, wird sein Inhalt an die aktuelle »Aufräumgrenze« hochkopiert. Diese aktuelle Aufräumgrenze kann allerdings so ungünstig hegen, daß A$ von B$ teilweise überschrieben wird. Im nächsten Aufräumschritt würde A$ nicht an die aktuelle Aufräumgrenze hoch, sondern unter sie herunter kopiert und somit weitere Strings zerstört&hellip; Dieses Spielchen würde sich dann bis zum Ende der Garbage Collection hinziehen. (Oder bis einmal tatsächlich Müllstrings an den kritischen Stellen stehen, die ja überschrieben werden dürfen).</p>
 
         <p>Zugegeben, ich habe mir gerade den Worst Case, den allerschlimmsten Fall, herausgesucht. Er zeigt aber ganz deutlich folgende Grundregel, die beim Programmieren von Stringfunktionen beachtet werden soll:</p>
 
@@ -184,7 +184,7 @@
 
         <p>Mit diesen Routinen läßt sich meiner Ansicht nach jede nur erdenkliche Stringmanipulation durchführen, auch wenn der Aufwand teilweise durch weitere ROM-Routinen eingeschränkt werden kann. Aber das Arbeiten über die Descriptoren der zu bearbeitenden Strings selbst, wie wir es in unseren Beispielen immer gemacht haben, reicht völlig aus. Auch benötigen wir nicht den schon erwähnten String-Stack. Wer trotzdem mehr über die interne Stringverarbeitung des C 64 wissen möchte, der sollte sich ein ROM-Listing zur Hand nehmen und versuchen, die einzelnen Routinen nachzuverfolgen.</p>
 
-        <p>So, ich glaube für heute reicht’s wirklich. Aber ich entlasse Sie nicht, ohne Ihnen einen Vorgeschmack auf die nächste Ausgabe zu geben. Dort werden wir uns etwas genauer mit Arrays beschäftigen, allerdings nicht gar so ausführlich wie mit den Strings. Im Mittelpunkt steht nämlich das Suchprogramm IN-TELLISEARCH. Dieses Suchprogramm bietet, neben einem sehr schnellen Suchalgorithmus, viele Besonderheiten, die jede INSTR- oder ähnliche Funktion vor Neid erblassen läßt. Das Ganze natürlich ausführlich dokumentiert.</p>
+        <p>So, ich glaube für heute reicht’s wirklich. Aber ich entlasse Sie nicht, ohne Ihnen einen Vorgeschmack auf die nächste Ausgabe zu geben. Dort werden wir uns etwas genauer mit Arrays beschäftigen, allerdings nicht gar so ausführlich wie mit den Strings. Im Mittelpunkt steht nämlich das Suchprogramm INTELLISEARCH. Dieses Suchprogramm bietet, neben einem sehr schnellen Suchalgorithmus, viele Besonderheiten, die jede INSTR- oder ähnliche Funktion vor Neid erblassen läßt. Das Ganze natürlich ausführlich dokumentiert.</p>
 
         <p>(Boris Schneider/gk)</p>
 
