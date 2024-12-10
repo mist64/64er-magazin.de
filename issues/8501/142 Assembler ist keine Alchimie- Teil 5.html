@@ -38,7 +38,33 @@
 
         <p>Zur Klärung verwenden wir ein hypothetisches Programmsegment mit einem Sprungbefehl und sehen uns das Disassembler-Listing an:</p>
 
-        <p>TODO</p>
+        <table class="plain">
+            <tr>
+                <td>2000</td>
+                <td>AD 00 30</td>
+                <td>LDA 3000</td>
+            </tr>
+            <tr>
+                <td>2003</td>
+                <td>F0 05</td>
+                <td>BEQ 200A</td>
+            </tr>
+            <tr>
+                <td>2005</td>
+                <td>A9 00</td>
+                <td>LDA #00</td>
+            </tr>
+            <tr>
+                <td>2007</td>
+                <td>8D 00 30</td>
+                <td>STA 3000</td>
+            </tr>
+            <tr>
+                <td>200A</td>
+                <td>60</td>
+                <td>RTS</td>
+            </tr>
+        </table>
 
         <p>Dieses Programm-Teilchen lädt den Inhalt der Speicherstelle 3000 in den Akku, überprüft dann, ob dieser Inhalt null ist und verzweigt beim Vorliegen der Null zum Rücksprung (RTS). Ist der Inhalt von 3000 nicht Null, dann wird 3000 auf Null gesetzt. 3000 könnte zum Beispiel eine Flagge sein.</p>
 
@@ -48,20 +74,165 @@
 
         <p>Zur Klärung von Frage 2 listen wir uns mal Byte für Byte unser Programm auf:</p>
 
-        <p>TODO<br>
-            TODO</p>
+        <table class="plain">
+            <tr>
+                <td>Byte</td>
+                <td></td>
+                <td>Inhalt</td>
+                <td>Bedeutung</td>
+            </tr>
+            <tr>
+                <td>2000</td>
+                <td></td>
+                <td>AD</td>
+                <td>LDA</td>
+            </tr>
+            <tr>
+                <td>2001</td>
+                <td></td>
+                <td>00</td>
+                <td>LSB von 3000</td>
+            </tr>
+            <tr>
+                <td>2002</td>
+                <td></td>
+                <td>30</td>
+                <td>MSB von 3000</td>
+            </tr>
+            <tr>
+                <td>2003</td>
+                <td></td>
+                <td>F0</td>
+                <td>BEQ</td>
+            </tr>
+            <tr>
+                <td>2004</td>
+                <td></td>
+                <td>05</td>
+                <td>Offset</td>
+            </tr>
+            <tr>
+                <td>2005</td>
+                <td></td>
+                <td>A9</td>
+                <td>LDA #</td>
+            </tr>
+            <tr>
+                <td>2006</td>
+                <td>1</td>
+                <td>00</td>
+            </tr>
+        </table>
+
+        <table class="plain">
+            <tr>
+                <td>Byte</td>
+                <td></td>
+                <td>Inhalt</td>
+                <td>Bedeutung</td>
+            </tr>
+            <tr>
+                <td>2007</td>
+                <td>2</td>
+                <td>8D</td>
+                <td>STA</td>
+            </tr>
+            <tr>
+                <td>2008</td>
+                <td>3</td>
+                <td>00</td>
+                <td>LSB von 3000</td>
+            </tr>
+            <tr>
+                <td>2009</td>
+                <td>4</td>
+                <td>30</td>
+                <td>MSB von 3000</td>
+            </tr>
+            <tr>
+                <td>200A</td>
+                <td>5</td>
+                <td>60</td>
+                <td>RTS</td>
+            </tr>
+        </table>
 
         <p>Neben der Byte-Nummer ist noch die Entfernung zu 2005 geschrieben. Daraus ist deutlich zu erkennen, daß die Sprungweite, die zum Programmzähler addiert wird, 05 sein muß, wenn der Sprung zum RTS erfolgen soll. Für Vorwärts-Verzweigungen gilt also: Von der Adresse des Befehls an, der auf den Branch-Befehl folgt, zählt man die Byte-Anzahl bis zum Sprungziel. Das Ergebnis ist der Offset.</p>
 
         <p>Nun gibt es genauso häufig Rückwärts-Sprünge. In den bisher gezeigten Programmen sind sie mehrmals aufgetreten. Wie berechnet man den Offset in diesen Fällen? Sehen wir uns wieder das Disassembler-Listing eines solchen Programmsegmentes an:</p>
 
-        <p>TODO</p>
+        <table class="plain">
+            <tr>
+                <td>1000</td>
+                <td>A2 00</td>
+                <td>LDX #00</td>
+            </tr>
+            <tr>
+                <td>1002</td>
+                <td>E8</td>
+                <td>INX</td>
+            </tr>
+            <tr>
+                <td>1003</td>
+                <td>D0FD</td>
+                <td>BNE 1002</td>
+            </tr>
+            <tr>
+                <td>1005</td>
+                <td>00</td>
+                <td>BRK</td>
+            </tr>
+            <tr>
+                <td>...</td>
+            </tr>
+        </table>
 
         <p>Dieses Progrämmchen tut nichts anderes, als das vorher auf Null gesetzte X-Register hochzuzählen, bis es über 255 läuft (dann tritt ja wieder 0 auf!). Solange der Inhalt des X-Registers ungleich Null ist, erfolgt ein Sprung zurück bis zur INX-Anweisung in Zeile 1002. Erst wenn die Null durch den Überlauf aufgetreten ist, endet das Programm mit einem BRK in Zeile 1005.</p>
 
         <p>Wir wissen schon, daß der Programmzähler beim Verarbeiten des BNE-Befehls auf 1005 steht. Sehen wir uns auch dieses Programm Byte für Byte an:</p>
 
-        <p>TODO</p>
+        <table class="plain">
+            <tr>
+                <td>Byte</td>
+                <td></td>
+                <td>Inhalt</td>
+                <td>Bedeutung</td>
+            </tr>
+            <tr>
+                <td>1000</td>
+                <td></td>
+                <td>A2</td>
+                <td>LDX #</td>
+            </tr>
+            <tr>
+                <td>1001</td>
+                <td></td>
+                <td>00</td>
+            </tr>
+            <tr>
+                <td>1002</td>
+                <td>3</td>
+                <td>E8</td>
+                <td>INX</td>
+            </tr>
+            <tr>
+                <td>1003</td>
+                <td>2</td>
+                <td>D0</td>
+                <td>BNE</td>
+            </tr>
+            <tr>
+                <td>1004</td>
+                <td>1</td>
+                <td>FD</td>
+                <td>Offset</td>
+            </tr>
+            <tr>
+                <td>1005</td>
+                <td>00</td>
+                <td>BRK</td>
+            </tr>
+        </table>
 
         <p>Wieder ist neben der Bytenummer die Entfernung vom aktuellen Programmzählerstand angegeben. Wir müssen also vom Inhalt des Programmzählers 3 abziehen, um zum INX-Befehl in Byte 1002 zu gelangen. Das kennen wir aber schon aus den vergangenen Ausgaben: Wenn der Computer eine Zahl abzieht, dann addiert er das Zweierkomplement dieser Zahl. Hier soll nun 3 subtrahiert werden. Wir berechnen das Zweierkomplement:<br>
             3 = 0000 0011 (binär)<br>
@@ -74,7 +245,7 @@
 
         <p>Das sieht reichlich kompliziert aus, aber zum einen haben Sie ja einen ganz freundlichen Assembler und nur in seltenen Notfällen müssen Sie den Offset berechnen. Zum anderen gibt es noch eine Faustregel, mit der man sich das ganze vereinfachen kann. Die soll durch folgendes Schema erläutert werden:</p>
 
-        <table>
+        <table class="plain">
             <tbody>
                 <tr>
                     <td>Byte</td>
@@ -921,7 +1092,74 @@
             D 0073 008B<br>
             ein. Sie haben dann die komplette Routine vor sich:</p>
 
-        <p>TODO</p>
+        <table class="plain">
+            <tr>
+                <td>0073</td>
+                <td>E6 7A</td>
+                <td>INC 7A</td>
+            </tr>
+            <tr>
+                <td>0075</td>
+                <td>D0 02</td>
+                <td>BNE 0079</td>
+            </tr>
+            <tr>
+                <td>0077</td>
+                <td>E6 7B</td>
+                <td>INC 7B</td>
+            </tr>
+            <tr>
+                <td>0079</td>
+                <td>AD 2502</td>
+                <td>LDA 0225</td>
+            </tr>
+            <tr>
+                <td>007C</td>
+                <td>C9 3A</td>
+                <td>CMP #3A</td>
+            </tr>
+            <tr>
+                <td>007E</td>
+                <td>B0 0A</td>
+                <td>BCS 008A</td>
+            </tr>
+            <tr>
+                <td>0080</td>
+                <td>C9 20</td>
+                <td>CMP #20</td>
+            </tr>
+            <tr>
+                <td>0082</td>
+                <td>F0 EF</td>
+                <td>BEQ 0073</td>
+            </tr>
+            <tr>
+                <td>0084</td>
+                <td>38</td>
+                <td>SEC</td>
+            </tr>
+            <tr>
+                <td>0085</td>
+                <td>E9 30</td>
+                <td>SBC #30</td>
+            </tr>
+            <tr>
+                <td>0087</td>
+                <td>38</td>
+                <td>SEC</td>
+            </tr>
+            <tr>
+                <td>0088</td>
+                <td>E9 D0</td>
+                <td>SBC #D0</td>
+            </tr>
+            <tr>
+                <td>008A</td>
+                <td>60</td>
+                <td>RTS</td>
+            </tr>
+        </table>
+
 
         <p>Eventuell sieht die Zeile 0079 bei Ihnen anders aus. Das liegt dann an den Speicherstellen 7A und 7B, welche einen Zeiger darstellen (LSB = 7A und MSB = 7B), der bei Ihnen gerade auf einen anderen Platz zeigt als auf $0225.</p>
 
