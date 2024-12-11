@@ -30,13 +30,15 @@
 
         <h2>BASIC-DATA</h2>
 
-        <p><strong>B (ANFADR ENDADR)</strong> wandelt das Maschinenprogramm von ANFADR bis ENDADR-1 in Basic-DATA-Zeilen um.<br>
-            B 4000 4020</p>
+        <p><strong>B (ANFADR ENDADR)</strong> wandelt das Maschinenprogramm von ANFADR bis ENDADR-1 in Basic-DATA-Zeilen um.
+            <code>B 4000 4020</code>
+        </p>
 
         <p>Unser Testprogramm (Sie erinnern sich doch noch an unser kleines Programm aus 11/84?) wird in DATA-Werte umgerechnet und dann mit Zeilennummer 32000 beginnend im Basic-Speicher abgelegt. Ein im Speicher befindliches Basic-Programm (zum Beispiel ein Basic-Lader) mit kleineren Zeilennummern kann dann diese DATA-Zeilen benutzen.</p>
 
-        <p>Wenn Sie das Testprogramm wie oben beschrieben umgewandelt haben, verlassen Sie nun mit »X« den SMON und überzeugen sich mit »LIST« von der Ausführung. Dann können Sie folgendes eingeben:<br>
-            10 FOR 1 = 16384 TO 16415 : READ D :POKE I,D : NEXT</p>
+        <p>Wenn Sie das Testprogramm wie oben beschrieben umgewandelt haben, verlassen Sie nun mit »X« den SMON und überzeugen sich mit »LIST« von der Ausführung. Dann können Sie folgendes eingeben:
+            <code>10 FOR 1 = 16384 TO 16415 : READ D :POKE I,D : NEXT</code>
+        </p>
 
         <p>In Verbindung mit den oben erzeugten DATA-Zeilen (und RUN!) hätten Sie wieder das ursprüngliche Maschinenprogramm im Speicher. Falls Sie dieses Beispiel durchführen wollen, denken Sie bitte daran, daß Sie nach Erstellung der DATAs, das Originalprogramm zum Beispiel mit OCCUPY (0 4000 4020 AA) überschreiben, damit Sie die richtige Ausführung überprüfen können. Der BRK-Befehl am Ende des Testprogramms bewirkt einen Sprung zum SMON zurück. Wollen Sie ein Maschinenprogramm von Basic aus starten und auch wieder dorthin zurückgelangen, muß der letzte Befehl ein RTS sein. Probieren Sie es aus, indem Sie das Basic-Programm um 20 SYS 16384 erweitern.</p>
 
@@ -44,49 +46,64 @@
 
         <p><strong>K (ANFADR ENDADR)</strong> listet die ASCII-Zeichen im gewünschten Bereich. Es werden jeweils 32 Zeichen pro Zeile ausgegeben, so daß man sich einen schnellen Überblick über Texte oder Tabellen verschaffen kann.</p>
 
-        <p>Beispiel:<br>
-            K 4000 listet die ersten 32 Zeichen unseres Programms. Die weitere Ausgabe ist genau wie beim Disassemblieren durch Druck auf SPACE oder RETURN möglich. Auch hier können Sie wie bei den anderen Bildschirm-Ausgabebefehlen Änderungen durch einfaches Überschreiben vornehmen (natürlich nicht im ROM und nur mit ASCII-Zeichen!).</p>
+        <p>Beispiel:</p>
 
-        <p>Als Beispiel wollen wir einmal im Basic »herumpfuschen«: Das geht natürlich nicht so ohne weiteres, weil das Basic im ROM steht und damit nicht verändert werden kann. Tippen Sie bitte folgendes ein:<br>
-            W A000 C000 A000</p>
+        <p class="noindent">K 4000 listet die ersten 32 Zeichen unseres Programms. Die weitere Ausgabe ist genau wie beim Disassemblieren durch Druck auf SPACE oder RETURN möglich. Auch hier können Sie wie bei den anderen Bildschirm-Ausgabebefehlen Änderungen durch einfaches Überschreiben vornehmen (natürlich nicht im ROM und nur mit ASCII-Zeichen!).</p>
 
-        <p>Auf den ersten Blick eine unsinnige Anweisung; der Speicher soll von A000 bis C000 nach A000 verschoben werden. Dieser Befehl entspricht exakt der Basic-Schleife<br>
-            FOR I = 40960 TO 49152 : POKE I, PEEK (I) : NEXT</p>
+        <p>Als Beispiel wollen wir einmal im Basic »herumpfuschen«: Das geht natürlich nicht so ohne weiteres, weil das Basic im ROM steht und damit nicht verändert werden kann. Tippen Sie bitte folgendes ein:
+            <code>W A000 C000 A000</code>
+        </p>
+
+        <p>Auf den ersten Blick eine unsinnige Anweisung; der Speicher soll von A000 bis C000 nach A000 verschoben werden. Dieser Befehl entspricht exakt der Basic-Schleife
+            <code>FOR I = 40960 TO 49152 : POKE I, PEEK (I) : NEXT</code>
+        </p>
 
         <p>Nun ist es aber so, daß beim PEEK das ROM gelesen, beim POKE aber ins darunterliegende RAM geschrieben wird. Wir erreichen also, daß das Basic ins RAM kopiert wird. Jetzt müssen wir dafür sorgen, daß das Betriebssystem sein Basic aus dem RAM und nicht aus dem ROM holt. Zuständig dafür ist die Speicherstelle 0001. Geben Sie bitte »M 0001« ein, und überschreiben Sie die »37« mit »36«.</p>
 
-        <p>Es passiert gar nichts. Jetzt tritt unser K-Kommando in Aktion. Geben Sie ein: K A100 A360<br>
-            Was Sie sehen, sind die Basic-Befehlswörter und -Meldungen. Schalten Sie mit SHIFT/CBM auf Kleinschrift, dann erkennen Sie, daß der jeweils letzte Buchstabe eines Befehlswortes groß geschrieben ist (Endekennung). Jetzt ändern Sie durch Überschreiben das »LIST« (A100) in »LUST« und »ER-ROR« (A360) in »FAELER«. (Bei »FAELER« müssen Sie ein Zeichen vor »ERROR« beginnen, sonst paßt es nicht.)<br>
-            Verlassen Sie jetzt SMON mit »X« und geben Sie danach ein:<br>
-            POKE 1,54<br>
-            SMON schaltet nämlich beim »X«-Befehl immer auf das Basic-ROM zurück, daher müssen wir wieder auf unser geändertes Basic umschalten. Schreiben Sie nun einen Basic-Dreizeiler und versuchen Sie, diesen zu LISTen. Ergebnis? Versuchen Sie es jetzt einmal mit »LUST«. Ihrer weiteren Phantasie sind keine Grenzen mehr gesetzt&hellip;<br>
-            Wie oben angesprochen stellt SMON eine Reihe verschiedener Suchroutinen zur Verfügung, die im Folgenden an vielen Beispielen beschrieben werden. Alle diese Befehle bestehen aus zwei Zeichen und beginnen mit dem Buchstaben »F«.</p>
+        <p>Es passiert gar nichts. Jetzt tritt unser K-Kommando in Aktion. Geben Sie ein: K A100 A360</p>
+
+        <p class="noindent">Was Sie sehen, sind die Basic-Befehlswörter und -Meldungen. Schalten Sie mit SHIFT/CBM auf Kleinschrift, dann erkennen Sie, daß der jeweils letzte Buchstabe eines Befehlswortes groß geschrieben ist (Endekennung). Jetzt ändern Sie durch Überschreiben das »LIST« (A100) in »LUST« und »ERROR« (A360) in »FAELER«. (Bei »FAELER« müssen Sie ein Zeichen vor »ERROR« beginnen, sonst paßt es nicht.)</p>
+
+        <p class="noindent">Verlassen Sie jetzt SMON mit »X« und geben Sie danach ein:
+            <code>POKE 1,54</code>
+            SMON schaltet nämlich beim »X«-Befehl immer auf das Basic-ROM zurück, daher müssen wir wieder auf unser geändertes Basic umschalten. Schreiben Sie nun einen Basic-Dreizeiler und versuchen Sie, diesen zu LISTen. Ergebnis? Versuchen Sie es jetzt einmal mit »LUST«. Ihrer weiteren Phantasie sind keine Grenzen mehr gesetzt&hellip;</p>
+
+        <p class="noindent">Wie oben angesprochen stellt SMON eine Reihe verschiedener Suchroutinen zur Verfügung, die im Folgenden an vielen Beispielen beschrieben werden. Alle diese Befehle bestehen aus zwei Zeichen und beginnen mit dem Buchstaben »F«.</p>
 
         <h2>FIND</h2>
 
-        <p><strong>F (HEX-WERT(e), ANFADR ENDADR)</strong> sucht nach einzelnen HEX-Werten innerhalb eines bestimmten Bereichs. Das zweite Zeichen (hinter F) ist hier ein Leerzeichen und darf nicht weggelassen werden! Die Bereichsangabe kann wie bei allen folgenden Befehlen entfallen, dann wird der gesamte Speicher durchsucht.<br>
-            Beispiel: Wir suchen alle Befehle LDY # 01, also die Werte A0 01 im Bereich von $2000 bis $6000.</p>
+        <p><strong>F (HEX-WERT(e), ANFADR ENDADR)</strong> sucht nach einzelnen HEX-Werten innerhalb eines bestimmten Bereichs. Daszweite Zeichen (hinter F) ist hier ein Leerzeichen und darf nicht weggelassen werden! Die Bereichsangabe kann wie bei allen folgenden Befehlen entfallen, dann wird der gesamte Speicher durchsucht.</p>
 
-        <p>F A0 01, 2000 6000 (Die Leerzeichen zwischen den Hexbytes dürfen nicht weggelassen werden !). Es erscheinen alle Speicherstellen, die die gesuchten Bytes enthalten, also zum Beispiel 4000.</p>
+        <p class="noindent">Beispiel: Wir suchen alle Befehle LDY # 01, also die Werte A0 01 im Bereich von $2000 bis $6000.</p>
+
+        <p class="noindent">F A0 01, 2000 6000 (Die Leerzeichen zwischen den Hexbytes dürfen nicht weggelassen werden !). Es erscheinen alle Speicherstellen, die die gesuchten Bytes enthalten, also zum Beispiel 4000.</p>
 
         <p><strong>FA (Adresse, ANFADR ENDADR)</strong> sucht alle Befehle, die eine bestimmte Adresse als Operanden haben (absolut). Die Adresse braucht nicht vollständig angegeben zu werden, es kann das Jokerzeichen »*« benutzt werden.</p>
 
         <ol>
-            <li>Beispiel: Wir suchen alle JSR FFD2-Befehle im Bereich $2000 bis $6000.<br>FAFFD2,2000 6000<br>Es erscheinen alle Befehle disassembliert, die FFD2 im Operanden enthalten (also auch LDA FFD2 oder STA FFD2,Y&hellip;).</li>
-            <li>Beispiel: Wir suchen alle Befehle, die auf den Grafikbereich ($D000 bis $DFFF) zugreifen.<br>FAD***,2000 6000<br>Der Joker kann aber auch zum Beispiel zur Suche im Bereich $D000 bis $D0FF dienen: FAD***,2000 6000</li>
+            <li>Beispiel: Wir suchen alle JSR FFD2-Befehle im Bereich $2000 bis $6000.
+                <code>FAFFD2,2000 6000</code>
+                Es erscheinen alle Befehle disassembliert, die FFD2 im Operanden enthalten (also auch LDA FFD2 oder STA FFD2,Y&hellip;).</li>
+            <li>Beispiel: Wir suchen alle Befehle, die auf den Grafikbereich ($D000 bis $DFFF) zugreifen.
+                <code>FAD***,2000 6000</code>
+                Der Joker kann aber auch zum Beispiel zur Suche im Bereich $D000 bis $D0FF dienen: FAD***,2000 6000</li>
         </ol>
 
 
-        <p><strong>FR (ADR, ANFADR ENDADR)</strong> sucht nach relativen Sprungzielen. Anders als bei absoluten Sprüngen (JMP, JSR) benutzen die Branch-Befehle eine relative Adressierung, also zum Beispiel »Verzweige 10 vor« oder »37 zurück«. Solche Sprünge lassen sich mit dem FA-Kommando nicht finden. Hier wird »FR« eingesetzt.<br>
-            Beispiel: Gesucht werden alle Branch-Befehle, die die Adresse $4002 anspringen.<br>
-            FR4002,2000 6000<br>
-            Natürlich können solche Befehle nur höchstens 128 Byte vom Sprungziel entfernt sein. Die Bereichsangabe ist hier also viel zu groß gewählt (SMON stört dies allerdings nicht). Der Einsatz des Jokers ist hier ebenfalls wie oben beschrieben möglich.</p>
+        <p class="noindent"><strong>FR (ADR, ANFADR ENDADR)</strong> sucht nach relativen Sprungzielen. Anders als bei absoluten Sprüngen (JMP, JSR) benutzen die Branch-Befehle eine relative Adressierung, also zum Beispiel »Verzweige 10 vor« oder »37 zurück«. Solche Sprünge lassen sich mit dem FA-Kommando nicht finden. Hier wird »FR« eingesetzt.</p>
 
-        <p><strong>FT (ANFADR ENDADR)</strong> sucht Tabellen im angegebenen Bereich. SMON behandelt dabei alles, was sich nicht disassemblieren läßt, als Tabelle.<br>
-            Beispiel: Wir suchen Tabellen oder Text im Bereich $2000 bis $6000.<br>
-            FT 2000 6000<br>
-            <strong>FZ (Adr, ANFADR ENDADR)</strong> sucht alle Befehle, die Zeropage-Adressen haben.
+        <p class="noindent">Beispiel: Gesucht werden alle Branch-Befehle, die die Adresse $4002 anspringen.
+            <code>FR4002,2000 6000</code>
+            Natürlich können solche Befehle nur höchstens 128 Byte vom Sprungziel entfernt sein. Die Bereichsangabe ist hier also viel zu groß gewählt (SMON stört dies allerdings nicht). Der Einsatz des Jokers ist hier ebenfalls wie oben beschrieben möglich.
         </p>
+
+        <p class="noindent"><strong>FT (ANFADR ENDADR)</strong> sucht Tabellen im angegebenen Bereich. SMON behandelt dabei alles, was sich nicht disassemblieren läßt, als Tabelle.</p>
+
+        <p class="noindent">Beispiel: Wir suchen Tabellen oder Text im Bereich $2000 bis $6000.
+            <code>FT 2000 6000</code>
+        </p>
+
+        <p class="noindent"><strong>FZ (Adr, ANFADR ENDADR)</strong> sucht alle Befehle, die Zeropage-Adressen haben.</p>
 
         <ol>
             <li>Beispiel: FZC5,2000 6000 findet alle Befehle, die C5 adressieren, also zum Beispiel BIT $C5, LDA (05), Y etc.</li>
@@ -94,9 +111,9 @@
             <li>Beispiel: FZ**,2000 6000 findet sämtliche Befehle mit Zeropage-Adressierung.</li>
         </ol>
 
+        <p class="noindent"><strong>FI (Operand, ANFADR ENDADR)</strong> sucht alle Befehle mit unmittelbarer Adressierung (immediate).</p>
 
-        <p><strong>FI (Operand, ANFADR ENDADR)</strong> sucht alle Befehle mit unmittelbarer Adressierung (immediate).<br>
-            Beispiel: Gesucht werden Befehle, die zum Beispiel das Y-Register mit 01 laden. FI01,2000 6000 findet LDY #01 in Adresse $4000.</p>
+        <p class="noindent">Beispiel: Gesucht werden Befehle, die zum Beispiel das Y-Register mit 01 laden. FI01,2000 6000 findet LDY #01 in Adresse $4000.</p>
 
         <p>Sie sehen, SMON bietet eine Fülle von verschiedensten FIND-Routinen, mit denen alles gesucht und auch gefunden (!) werden kann. Zum Üben wollen wir ein großes Preisausschreiben veranstalten, bei dem Sie zumindest an Erfahrung gewinnen können! Hier sind die Aufgaben, die es zu lösen gilt:</p>
 
@@ -114,11 +131,14 @@
 
         <p>Auch heute werden Sie nicht entlassen, ohne daß wir Ihnen einige Tips für eigene Assemblerprogramme mitgeben. Erinnern Sie sich noch an den in der letzten Ausgabe angesprochenen 16-Bit-Vergleich? Dieser wird im SMON zum Beispiel dazu benutzt, festzustellen, ob ein Programmteil weiter durchlaufen werden soll, oder ob das Ende erreicht ist. Das prüft SMON bei fast allen Befehlen, jüngstes Beispiel sind die FIND-Kommandos. Zur Erinnerung: Wir wollten zwei 16-Bit-Zahlen vergleichen, der Prozessor kann aber nur mit 8-Bit-Zahlen umgehen.</p>
 
-        <p>Wir brauchen dazu einen hochlaufenden Zähler (er heißt in unserem Beispiel »Programmzähler« PC und besteht aus Highbyte PCH und Lowbyte PCL) und einen End-Zeiger (ENDHI und ENDLO). Unser Programm dafür sah folgendermaßen aus:<br>
-            LDA PCL<br>
-            CMP ENDLO<br>
-            LDA PCH<br>
-            SBC ENDHI</p>
+        <p>Wir brauchen dazu einen hochlaufenden Zähler (er heißt in unserem Beispiel »Programmzähler« PC und besteht aus Highbyte PCH und Lowbyte PCL) und einen End-Zeiger (ENDHI und ENDLO). Unser Programm dafür sah folgendermaßen aus:</p>
+
+        <table class="plain">
+            <tr><td>LDA</td><td>PCL</td></tr>
+            <tr><td>CMP</td><td>ENDLO</td></tr>
+            <tr><td>LDA</td><td>PCH</td></tr>
+            <tr><td>SBC</td><td>ENDHI</td></tr>
+        </table>
 
         <p>Anschließend haben wir das Carry-Flag überprüft und festgestellt, daß schon bei Übereinstimmung beider Adressen dieses Flag gesetzt war. In unserem Falle würde also ein Beenden des Programmteils mit »BCS ENDE« zu einer »Unterschlagung« des letzten noch auszuführenden Befehls führen. Um hier einen Weg aus dem Dilemma zu finden, wollen wir uns das Verhalten der Zero- und Carry-Flagge im Status-Register einmal genauer ansehen. Und zwar in Abhängigkeit von PC und dem ENDE-Zeiger.</p>
 
@@ -126,50 +146,75 @@
 
         <p>Speichern Sie jetzt dieses Programm mit »S "CMP-TEST" 4100 4112« ab und starten es mit »G4100«. Nachdem das Programm gelaufen ist, meldet es sich mit der Registeranzeige zurück. Achten Sie dabei vor allem auf die Statusregister-। Anzeige rechts, uns interessieren die Werte für Z und C (Zero- und Carry-Flagge).</p>
 
-        <hr>
+        <figure>
+            <p>Tippen Sie bitte einmal folgendes Programm ein (mit »A 4100«):</p>
+            <table class="plain">
+                <tr><td>4100</td><td>LDA</td><td>#00 </td><td></td></tr>
+                <tr><td>4102</td><td>STA</td><td>FB  </td><td>(=PCL)</td></tr>
+                <tr><td>4104</td><td>STA</td><td>FD  </td><td>(=ENDLO)</td></tr>
+                <tr><td>4106</td><td>LDA</td><td>#C0 </td><td></td></tr>
+                <tr><td>4108</td><td>STA</td><td>FC  </td><td>(=PCH)</td></tr>
+                <tr><td>410A</td><td>LDA</td><td>#C1 </td><td></td></tr>
+                <tr><td>410C</td><td>STA</td><td>FE  </td><td>(=ENDHI)</td></tr>
+                <tr><td>410E</td><td>JSR</td><td>C466</td><td>(=CMPEND)</td></tr>
+                <tr><td>4111</td><td>BRK</td><td>    </td><td></td></tr>
+                <tr><td></td><td></td><td></td><td></td></tr>
+            </table>
+            <figcaption>Listing 1.</figcaption>
+        </figure>
 
-        <hr <p>Wir wollen herausfinden, was passiert, wenn der Programmzähler (PC) kleiner, gleich oder größer als ENDE ist. Wenn Sie jetzt in Speicherstelle $4106 für PCH den Wert C1 einsetzen, können Sie den Vorgang wiederholen und die Änderung der i Flaggen notieren. Anschließend setzen Sie C2 für PCH in $4106 ein. Tippen Sie »D4100 4112«, gehen mit dem Cursor in die Zeile 4106 und überschreiben den Wert #C0 mit dem neuen Wert #C1 beziehungsweise #C2.</p>
+        <p>Wir wollen herausfinden, was passiert, wenn der Programmzähler (PC) kleiner, gleich oder größer als ENDE ist. Wenn Sie jetzt in Speicherstelle $4106 für PCH den Wert C1 einsetzen, können Sie den Vorgang wiederholen und die Änderung der i Flaggen notieren. Anschließend setzen Sie C2 für PCH in $4106 ein. Tippen Sie »D4100 4112«, gehen mit dem Cursor in die Zeile 4106 und überschreiben den Wert #C0 mit dem neuen Wert #C1 beziehungsweise #C2.</p>
 
-        <table>
-            <tbody>
-                <tr>
-                    <td><br></td>
-                    <td><br></td>
-                    <td>PC &lt; END</td>
-                    <td>PC = END</td>
-                    <td>PC &gt; END</td>
-                </tr>
-                <tr>
-                    <td>PC</td>
-                    <td>FC/FB</td>
-                    <td>C0/00</td>
-                    <td>C1/00</td>
-                    <td>C2/00</td>
-                </tr>
-                <tr>
-                    <td>END</td>
-                    <td>FE/FD</td>
-                    <td>C1/00</td>
-                    <td>C1/00</td>
-                    <td>C1/00</td>
-                </tr>
-                <tr>
-                    <td></td>
-                    <td></td>
-                    <td>ZC<br>00</td>
-                    <td>ZC<br>11</td>
-                    <td>ZC<br>01</td>
-                </tr>
-            </tbody>
-        </table>
+        <figure>
+            <table class="plain">
+                <tbody>
+                    <tr class="separator">
+                        <td></td>
+                        <td></td>
+                        <td>PC &lt; END</td>
+                        <td>PC = END</td>
+                        <td>PC &gt; END</td>
+                    </tr>
+                    <tr>
+                        <td>PC</td>
+                        <td>FC/FB</td>
+                        <td>C0/00</td>
+                        <td>C1/00</td>
+                        <td>C2/00</td>
+                    </tr>
+                    <tr class="separator">
+                        <td>END</td>
+                        <td>FE/FD</td>
+                        <td>C1/00</td>
+                        <td>C1/00</td>
+                        <td>C1/00</td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td></td>
+                        <td>ZC</td>
+                        <td>ZC</td>
+                        <td>ZC</td>
+                    </tr>
+                    <tr class="separator">
+                        <td></td>
+                        <td></td>
+                        <td>00</td>
+                        <td>11</td>
+                        <td>01</td>
+                    </tr>
+                </tbody>
+            </table>
+        </figure>
 
         <p>So sollte Ihre Tabelle zum Schluß aussehen. Im ersten Fall (PC ist kleiner als END) ist das Carry-Flag gelöscht. Dann (PC ist gleich END) sind Z- und C-Flagge gesetzt, zum Schluß ist nur noch das C-Flag 1. Jetzt können wir unseren Vorstellungen entsprechend reagieren und mit den Branch-Befehlen verzweigen. Sehen Sie sich mit dem Disassembler auch einmal andere Routinen im SMON daraufhin an.</p>
 
         <h3>Hinweise zum Abtippen</h3>
 
-        <p>Aus vielen Telefonanrufen ist uns klar geworden, daß der bisherige DATA-Lader oft die Fehlerquellen nicht genau genug aufzeigte. Mit diesem Lader dürften Sie beim Abtippen keine Schwierigkeiten mehr haben. Danach sollten Sie das Ladeprogramm auf alle Fälle auf Diskette oder Kassette abspeichern. Nach Eingabe von RUN muß der Lader bis zum READY durchlaufen. Um den neuen Teil an SMON anzukoppeln, müssen Sie jetzt den SMON vom letzten Mal mit »,8,1« laden und mit SYS 49152 starten. Jetzt können Sie mit<br>
-            S "SMON $C000" C000 CBF1<br>
-            das bis hier komplette Programm abspeichern. Natürlich müssen Diskettenbesitzer eine andere Diskette einlegen oder das alte SMON-Programm nach dem Laden (!) löschen. Und bis zum nächsten Mal: Üben, üben, üben!</p>
+        <p>Aus vielen Telefonanrufen ist uns klar geworden, daß der bisherige DATA-Lader oft die Fehlerquellen nicht genau genug aufzeigte. Mit diesem Lader dürften Sie beim Abtippen keine Schwierigkeiten mehr haben. Danach sollten Sie das Ladeprogramm auf alle Fälle auf Diskette oder Kassette abspeichern. Nach Eingabe von RUN muß der Lader bis zum READY durchlaufen. Um den neuen Teil an SMON anzukoppeln, müssen Sie jetzt den SMON vom letzten Mal mit »,8,1« laden und mit SYS 49152 starten. Jetzt können Sie mit
+            <code>S "SMON $C000" C000 CBF1</code>
+            das bis hier komplette Programm abspeichern. Natürlich müssen Diskettenbesitzer eine andere Diskette einlegen oder das alte SMON-Programm nach dem Laden (!) löschen. Und bis zum nächsten Mal: Üben, üben, üben!
+        </p>
 
         <address class="author">(N. Mann/D. Weineck/gk)</address>
 
