@@ -23,40 +23,58 @@
 
         <p class="intro">Der SYS-Befehl läßt es zu, daß neben der Startadresse des Maschinenprogrammes auch Parameter übergeben werden.</p>
 
-        <p>Das kann zum Beispiel so aussehen: SYS adresse,p1,p2,p3,&hellip; . Wobei »adresse« Startadresse bedeutet und p1 bis p3 die Parameter sind. Für die Verarbeitung der Parameter ist es wichtig zwischen 1-Byte- und 2-Byte-Parametern zu unterscheiden, da unterschiedliche Interpreterroutinen nötig sind.<br>
-            Hier sind die benötigten Interpreterroutinen:<br>
-            Komma = $AEFD<br>
-            1byte = $B79E<br>
-            2byte = $B7EB<br>
-            Dabei ist die Routine »Komma« nötig, um die Kommas vor den Parametern zu erkennnen und die Parameter zu trennen. Anschließend können dann die Parameter mit »1byte« oder »2byte« eingelesen werden.</p>
+        <p>Das kann zum Beispiel so aussehen: SYS adresse,p1,p2,p3,&hellip; . Wobei »adresse« Startadresse bedeutet und p1 bis p3 die Parameter sind. Für die Verarbeitung der Parameter ist es wichtig zwischen 1-Byte- und 2-Byte-Parametern zu unterscheiden, da unterschiedliche Interpreterroutinen nötig sind.</p>
+
+        <p class="noindent">Hier sind die benötigten Interpreterroutinen:</p>
+
+        <ul class="plain">
+            <li>Komma = $AEFD</li>
+            <li>1byte = $B79E</li>
+            <li>2byte = $B7EB</li>
+        </ul>
+
+        <p>Dabei ist die Routine »Komma« nötig, um die Kommas vor den Parametern zu erkennnen und die Parameter zu trennen. Anschließend können dann die Parameter mit »1byte« oder »2byte« eingelesen werden.</p>
 
         <h3>Übergabe von 1-Byte-Werten</h3>
 
-        <p>Die Befehle<br>
-            JSR $AEFD ; Komma<br>
-            JSR $B79E ; 1byte<br>
-            laden den Parameter bei SYS&hellip;,p1 ins X-Register des Prozessors, wo er für die weitere Verarbeitung bereitsteht. Jetzt ist es zum Beispiel möglich p1 zu verarbeiten und mit JSR Komma : JSR 1byte den nächsten Parameter (p2) zu holen. Angewandt wird dies im Beispielprogramm Cursorsetzen.</p>
+        <p class="noindent">Die Befehle</p>
 
-        <p>Folgendes passiert: Nacheinander werden »zeile« (120,130) und »spalte« (160,170) eingelesen und schließlich verarbeitet. Die Routine $FFFO setzt bei gelöschtem Carry-Flag den Cursor nach den Werten im X- und Y-Register an die gewünschte Position, wie schon in Ausgabe 7/84 beschrieben.</p>
+        <ul class="plain">
+            <li>JSR $AEFD ; Komma</li>
+            <li>JSR $B79E ; 1byte</li>
+        </ul>
 
-        <p>Aufruf des Hilfsprogrammes das im Kassettenpuffer liegt: SYS 828,zeile,spalte<br>
-            (siehe Listing 1)<br>
-            SYS 828,10,5:PRINT CHR$(42) setzt den Stern * auf Zeile 10, Spalte 5.</p>
+        <p class="noindent">laden den Parameter bei SYS&hellip;,p1 ins X-Register des Prozessors, wo er für die weitere Verarbeitung bereitsteht. Jetzt ist es zum Beispiel möglich p1 zu verarbeiten und mit JSR Komma : JSR 1byte den nächsten Parameter (p2) zu holen. Angewandt wird dies im Beispielprogramm Cursorsetzen.</p>
+
+        <p class="noindent">Folgendes passiert: Nacheinander werden »zeile« (120,130) und »spalte« (160,170) eingelesen und schließlich verarbeitet. Die Routine $FFFO setzt bei gelöschtem Carry-Flag den Cursor nach den Werten im X- und Y-Register an die gewünschte Position, wie schon in Ausgabe 7/84 beschrieben.</p>
+
+        <p>Aufruf des Hilfsprogrammes das im Kassettenpuffer liegt:
+            <code>SYS 828,zeile,spalte</code>
+            (siehe Listing 1)
+        </p>
+
+        <p class="noindent">SYS 828,10,5:PRINT CHR$(42) setzt den Stern * auf Zeile 10, Spalte 5.</p>
 
         <h3>Übergabe von 2-Byte-Werten</h3>
 
-        <p>Die Befehle<br>
-            JSR $AEFD ; Komma<br>
-            JSR $B7EB ; 2byte<br>
-            bringen den ersten Parameter bei SYS&hellip;,p1,p2 auf die Zeropage Adresse $14/$15, und den zweiten ins X-Register, da die Routine $B79E : 1byte (siehe oben) mit aufgerufen wird. Hierbei wird p1 nach Low- und High-Byte getrennt abgespeichert. Sein Wert kann also zwischen 0 und 65535 (= 2↑15) liegen. Der Interpreter benutzt diese Routine, um zum Beispiel bei POKE Speicherzellen mit bestimmten Werten zu laden.</p>
+        <p class="noindent">Die Befehle</p>
 
-        <p>Das nächste kleine Programm soll nun den Gebrauch der Routine 2byte = $B7EB demonstrieren. Es erspart das doppelte POKEn von Bildschirm- und Farb-RAM. Der Aufruf hat die Form:<br>
-            SYS 828,position, zeichen,farbe</p>
+        <ul class="plain">
+            <li>JSR $AEFD ; Komma</li>
+            <li>JSR $B7EB ; 2byte</li>
+        </ul>
 
-        <p>Da »position« hier ein 2-Byte-Wert ist, muß die Routine $B7EB benutzt werden, gleichzeitig wird dadurch »zeichen« ins X-Register geladen. »Farbe« wird dann später in Zeile 210 über $B79E geladen (siehe Listing 2).<br>
-            SYS828,1063,1,1 setzt ein weißes A in die rechte obere Ecke des Bildschirms.</p>
+        <p class="noindent">bringen den ersten Parameter bei SYS&hellip;,p1,p2 auf die Zeropage Adresse $14/$15, und den zweiten ins X-Register, da die Routine $B79E : 1byte (siehe oben) mit aufgerufen wird. Hierbei wird p1 nach Low- und High-Byte getrennt abgespeichert. Sein Wert kann also zwischen 0 und 65535 (= 2↑15) liegen. Der Interpreter benutzt diese Routine, um zum Beispiel bei POKE Speicherzellen mit bestimmten Werten zu laden.</p>
 
-        <p>Zum Schlußnoch die Basic-Lader der Demoprogramme, für diejenigen, die keinen Assembler oder Monitor besitzen, aber die Routinen gebrauchen können. Sie liegen jeweils im Kassettenpuffer (ab 828). Durch Verändern der Werte in Zeile 110 lassen sie sich jedoch nach Bedarf verschieben.</p>
+        <p>Das nächste kleine Programm soll nun den Gebrauch der Routine 2byte = $B7EB demonstrieren. Es erspart das doppelte POKEn von Bildschirm- und Farb-RAM. Der Aufruf hat die Form:
+            <code>SYS 828,position, zeichen,farbe</code>
+        </p>
+
+        <p>Da »position« hier ein 2-Byte-Wert ist, muß die Routine $B7EB benutzt werden, gleichzeitig wird dadurch »zeichen« ins X-Register geladen. »Farbe« wird dann später in Zeile 210 über $B79E geladen (siehe Listing 2).</p>
+
+        <p class="noindent">SYS828,1063,1,1 setzt ein weißes A in die rechte obere Ecke des Bildschirms.</p>
+
+        <p>Zum Schluß noch die Basic-Lader der Demoprogramme, für diejenigen, die keinen Assembler oder Monitor besitzen, aber die Routinen gebrauchen können. Sie liegen jeweils im Kassettenpuffer (ab 828). Durch Verändern der Werte in Zeile 110 lassen sie sich jedoch nach Bedarf verschieben.</p>
 
         <address class="author">(Markus Kuhn/rg)</address>
 

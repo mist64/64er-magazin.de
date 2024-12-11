@@ -24,8 +24,7 @@
 
         <p class="intro">Viele sind des Basic überdrüssig geworden. Die Sprache Forth ist eine Afternative. Unsere Einführung in Forth beginnt an einem konkreten Beispiel: der Programmierung des Decompilers.</p>
 
-        <p>Vor einiger Zeit erhielt ich ein Programm, das sich nach dem Starten mit »FIG-FORTH« meldete.<br>
-            Forth, soviel wußte ich schon, soll eine neue, ungewöhnliche Programmiersprache sein. Nichts Genaues weiß ich nicht. Also gebe ich ein: LIST und RUN und PRINT 5*3 und NEW und &hellip; nichts passierte, außer, daß mein Computer antwortet: »MESS # 0« oder »MESS # 1« oder manchmal auch »OK«. Also erst einmal zur Seite damit &hellip;</p>
+        <p>Vor einiger Zeit erhielt ich ein Programm, das sich nach dem Starten mit »FIG-FORTH« meldete. Forth, soviel wußte ich schon, soll eine neue, ungewöhnliche Programmiersprache sein. Nichts Genaues weiß ich nicht. Also gebe ich ein: LIST und RUN und PRINT 5*3 und NEW und &hellip; nichts passierte, außer, daß mein Computer antwortet: »MESS # 0« oder »MESS # 1« oder manchmal auch »OK«. Also erst einmal zur Seite damit &hellip;</p>
 
         <p>Aber diese Sprache läßt mich nicht los — eben weil ich nicht weiß, was ich damit anstellen kann. Bis ein Freund anruft: »Versuch mal VLIST. Ich habe da was gelesen &hellip;« Der Bann ist gebrochen: Nun flitzen plötzlich Worte über den Bildschirm: AND und BASE und BUFFER und CONSTANT und IF und HEX und noch viel mehr, über 200 Worte. Das ist offensichtlich die Befehlsliste von Forth. Und dann bekomme ich die Fotokopie einer Kopie einer Kopie der Kurz-Befehlsbeschreibung eines FIG-Forth-Systems, kaum lesbar, in englisch, aber immerhin. Ich lese die Beschreibung — nein, ich buchstabiere sie beim ersten Mal, zu neu ist das Konzept dieser Sprache. Beim zweiten Lesen fasziniert mich Forth schon; nach dem dritten Lesen steht für mich fest: Basic ist out, Forth ist die Sprache der Zukunft.</p>
 
@@ -47,14 +46,17 @@
 
         <p>Das Eintragen von Zeigern macht der Compiler so lange, bis er wieder ausgeschaltet wird. Auch für diesen Zweck gibt es Worte: »;« schließt Worte ab, die mit»:« angefangen wurden. Es schaltet den Compiler wieder ab und den Interpreter ein. Im Wörterbuch ist jetzt ein neues Wort eingetragen, dessen Arbeitsanweisung aus einer Liste von Zeigern auf andere Worte besteht.</p>
 
-        <p>Ein praktisches Beispiel: Wir wollen von zwei Zahlen auf dem Stapel die oberste behalten, die zweite jedoch wegwerfen. Offenbar erfüllt die Befehlsfolge »SWAP DROP« genau diese Forderung, was der Leser bitte selbst prüfen mag. Wir wollen jedoch ein neues Wort NIP einführen, das unsere Forderung erfüllt:<br>
-            : NIP (N1 N2 - N2) SWAP DROP;</p>
+        <p>Ein praktisches Beispiel: Wir wollen von zwei Zahlen auf dem Stapel die oberste behalten, die zweite jedoch wegwerfen. Offenbar erfüllt die Befehlsfolge »SWAP DROP« genau diese Forderung, was der Leser bitte selbst prüfen mag. Wir wollen jedoch ein neues Wort NIP einführen, das unsere Forderung erfüllt:
+            <code>: NIP (N1 N2 - N2) SWAP DROP;</code>
+        </p>
 
-        <p>Wir drücken RETURN, und Forth meldet sich nach dem Compilieren mit »OK«. Nun sehen wir uns an, was der Compiler aus diesem »Kurzbrief« gemacht hat. Dazu dumpen wir den Speicherinhalt mit der Befehlsfolge:<br>
-            CR HEX ’ NIP NFA 0E DUMP<br>
-            und erhalten das folgende Listing:<br>
-            83 4E 49 D0 37 58 3F 10 . NIP7X? .<br>
-            86 F 7D F 33 E 4 44 &hellip; . 3 . . D</p>
+        <p>Wir drücken RETURN, und Forth meldet sich nach dem Compilieren mit »OK«. Nun sehen wir uns an, was der Compiler aus diesem »Kurzbrief« gemacht hat. Dazu dumpen wir den Speicherinhalt mit der Befehlsfolge:
+            <code>CR HEX ’ NIP NFA 0E DUMP</code>            
+            und erhalten das folgende Listing:
+            <code>83 4E 49 D0 37 58 3F 10 . NIP7X? .
+                86 F 7D F 33 E 4 44 &hellip; . 3 . . D
+            </code>
+        </p>
 
         <p>Das sieht zunächst etwas wirr aus, doch sind die Bytes bei näherer Betrachtung sinnvoll. Ordnen wir den Speicherdump anders an und ergänzen ihn durch einige Kommentare, dann erhalten wir einen Aufbau wie in Bild 1. Im ersten Byte ist das höchstwertige Bit 7 immer gesetzt, Bit 6 und 5 haben besondere Bedeutung und die Bits 4 bis 0 enthalten die Länge des Namens, hier 3 (Bild 2). Die nächsten drei Byte enthalten dann tatsächlich auch den Namen NIP, nur das Bit 7 des letzten Buchstabens ist wieder gesetzt. Diese 4 Byte bilden das Namensfeld von NIR gekennzeichnet durch die Namens-Feld-Adresse NFA. Die nächsten beiden Bytes sind das Linkfeld, markiert durch die Link-Feld-Adresse LEA. Im Linkfeld steht ein Zeiger auf das Namensfeld eines vorhergehenden Wortes. Die nun folgenden zwei Bytes bilden das Codefeld, adressiert durch die Code-Feld-Adresse CFA. Im Codefeld befindet sich ein Zeiger auf Maschinencode des jeweiligen Mikroprozessors.</p>
 
@@ -77,17 +79,19 @@
 
         <p>Forth ist ein Baukasten, der die wichtigsten Funktionen schon als Bausteine enthält — sie müssen nur noch richtig zusammengesetzt werden. Also basteln wir uns ein Wort, das aus der CFA eines Wortes seinen Namen druckt. Zur Verfügung haben wir ein Wort »ID«, das aus NFA eines Wortes seinen Namen druckt. Das Problem reduziert sich also auf das Verbiegen der CFA auf die NFA, da die Namen verschieden lang sein können, Forth läßt bis 31 Zeichen zu. Auch hierfür gibt es schon ein Bauklötzchen, das verschieden lange Namen berücksichtigt: Habe ich eine PFA, so kann ich sie in die NFA umwandeln mit dem sinnfälligen Wort »NFA«. Unser Problem reduziert sich also weiter auf die Umwandlung einer CFA in die PFA. Das Codefeld enthält immer einen 16-Bit-Zeiger, ist also immer 2 Byte lang. Das Parameterfeld schließt sich immer an das Codefeld an. Also addieren wir zwei zur CFA, auch dafür gibt es ein Klötzchen namens »2 +«, und erhalten die PFA, führen dann »NFA« aus und erhalten die NFA; danach drucken wir den Namen mit »ID« und ein trennendes Leerzeichen mit »SPACE«. Diesen neuen Befehl nennen wir »= =« (Listing 1).</p>
 
-        <p>Nun können wir schon ein bißchen decompilieren: Wir suchen uns die Rumpfadresse von NIP mit:<br>
-            ’ NIP<br>
-            sichern uns die Adresse, holen uns den ersten Zeiger mit:<br>
-            DUP @<br>
-            und drucken aus der geholten CFA den zugehörigen Namen mit:<br>
-            = =</p>
+        <p>Nun können wir schon ein bißchen decompilieren: Wir suchen uns die Rumpfadresse von NIP mit:
+            <code>’ NIP</code>            
+            sichern uns die Adresse, holen uns den ersten Zeiger mit:
+            <code>DUP @</code>        
+            und drucken aus der geholten CFA den zugehörigen Namen mit:
+            <code>= =</code>
+        </p>
 
-        <p>Auf dem Bildschirm erscheint »SWAP OK«. Jetzt erhöhen wir die Adresse um 2, damit sie auf den nächsten Zeiger weist, mit:<br>
-            2 +<br>
-            und decompilieren das nächste Wort mit:<br>
-            DUP @ = =</p>
+        <p>Auf dem Bildschirm erscheint »SWAP OK«. Jetzt erhöhen wir die Adresse um 2, damit sie auf den nächsten Zeiger weist, mit:
+            <code>2 +</code>            
+            und decompilieren das nächste Wort mit:
+            <code>DUP @ = =</code>
+        </p>
 
         <p>So könnten wir uns weiter durch NIP oder andere Worte tasten.</p>
 
@@ -97,49 +101,58 @@
 
         <p>Bei ».NAME« sind immerhin fünf Zeichen zu tippen, das ist jedem Forth-Programmierer zuviel. Außerdem hätten wir noch gerne gewußt, wo wir uns im Speicher gerade aufhalten und das ewige »OK« am Ende wollen wir uns beim Decompilieren auch sparen. Die Folge dieser Gedanken ist das Wort »N« aus Listing 1. Das »DUP U.« druckt uns die Adresse, die wir gerade decompilieren (ohne Vorzeichen), das ».NAME« den Namen und das »QUIT« am Ende unterdrückt die OK-Meldung. Es macht aber noch mehr, es bricht die Ausführung von Worten sofort ab, wirft den Rest der Eingangspost weg und kehrt in den Interpreter zurück. Nur der Zahlenstapel bleibt unangetastet.</p>
 
-        <p>Nun können wir NIP schon komfortabel decompilieren:<br>
-            ’ NIP findet den Rumpf von NIP,<br>
-            Ausgabe: OK<br>
-            N decompiliert Namen,<br>
-            Ausgabe: adrl SWAP<br>
-            N decompiliert Namen,<br>
-            Ausgabe: adr2 DROP<br>
-            N decompiliert Namen,<br>
-            Ausgabe: adr3 ;S</p>
+        <p>Nun können wir NIP schon komfortabel decompilieren:</p>
 
-        <p>Versuchen wir ein anderes Beispiel: Wir wollen uns ein Wort bilden, das zu einer gegebenen Adresse auf dem Stapel genau 1024 hinzuzählt, so daß wir uns in l-KByte-Schritten durch den Speicher bewegen.<br>
-            DECIMAL<br>
-            : 1024+ (ADR-ADR + 1024)<br>
-            1024 + ;</p>
+        <ul class="plain">
+            <li>’ NIP findet den Rumpf von NIP,</li>
+            <li>Ausgabe: OK</li>
+            <li>N decompiliert Namen,</li>
+            <li>Ausgabe: adrl SWAP</li>
+            <li>N decompiliert Namen,</li>
+            <li>Ausgabe: adr2 DROP</li>
+            <li>N decompiliert Namen,</li>
+            <li>Ausgabe: adr3 ;S</li>
+        </ul>
+
+        <p>Versuchen wir ein anderes Beispiel: Wir wollen uns ein Wort bilden, das zu einer gegebenen Adresse auf dem Stapel genau 1024 hinzuzählt, so daß wir uns in l-KByte-Schritten durch den Speicher bewegen.
+            <code>DECIMAL
+                : 1024+ (ADR-ADR + 1024)
+                1024 + ;
+            </code>
+        </p>
 
         <p>Decompilieren wir nun unser Wort »1024 +«, so erhalten wir als ersten Namen die Buchstabenfolge »LIT«, als zweiten Namen irgendwelchen Unsinn, als dritten Namen ein » + « und als vierten Namen ein »;S«. Das»+«und »;S« bedürfen keiner Erklärung, aber woher kommt das »LIT« und das, was sich da als Name nicht decompilieren läßt? Es ist unsere Zahl 1024, die sich durch das vorangestellte »LIT« als 16-Bit-Zahl zu erkennen gibt. Die Zahl selbst steht in den beiden Bytes, die der CFA von »LIT« folgen. Würde beim Compilieren die Zahl einfach nur ins Wörterbuch geschrieben, könnte bei der späteren Ausführung nicht mehr erkannt werden, daß es sich dabei eben nicht um die CFA eines Wortes handelt, sondern um eine Zahl, die auf den Stapel zu legen ist. Die praktische Folge: Stoßen wir beim Decompilieren auf »LIT«, so dürfen wir die nächsten beiden Bytes nicht als Name auffassen, sondern müssen sie als 16-Bit-Zahl einfach ausdrucken.</p>
 
-        <p>Basteln wir uns wieder die dazu nötigen Worte, zunächst ein<br>
-            .LIT(ADR-ADR + 2)<br>
-            das die Adresse, die wir gerade bearbeiten, rettet und die beiden Bytes holt, die unter dieser Adresse zuhause sind. Diese beiden Bytes müssen dann als Zahl (mit Vorzeichen) ausgedruckt und anschließend die Adresse um 2 erhöht werden. Weiterhin ein kurzes Wort<br>
-            L(ADR-ADR + 2)<br>
-            das ».LIT« benutzt (siehe wieder Listing 1).</p>
+        <p>Basteln wir uns wieder die dazu nötigen Worte, zunächst ein
+            <code>.LIT(ADR-ADR + 2)</code>            
+            das die Adresse, die wir gerade bearbeiten, rettet und die beiden Bytes holt, die unter dieser Adresse zuhause sind. Diese beiden Bytes müssen dann als Zahl (mit Vorzeichen) ausgedruckt und anschließend die Adresse um 2 erhöht werden. Weiterhin ein kurzes Wort
+            <code>L(ADR-ADR + 2)</code>            
+            das ».LIT« benutzt (siehe wieder Listing 1).
+        </p>
 
-        <p>Da sich Zahlen von 0 bis 255 in einem Byte darstellen lassen, compiliert Forth solche Zahlen, um Platz zu sparen, mit dem besonderen Wort »CLIT«. Dessen CFA folgt dann die Zahl in nur einem Byte. Auch dafür brauchen wir passende Worte (siehe Listing 2).<br>
-            .CLIT(ADR-ADR + 1)<br>
-            und<br>
-            C(ADR-ADR + 1)</p>
+        <p>Da sich Zahlen von 0 bis 255 in einem Byte darstellen lassen, compiliert Forth solche Zahlen, um Platz zu sparen, mit dem besonderen Wort »CLIT«. Dessen CFA folgt dann die Zahl in nur einem Byte. Auch dafür brauchen wir passende Worte (siehe Listing 2).
+            <code>.CLIT(ADR-ADR + 1)</code>            
+            und
+            <code>C(ADR-ADR + 1)</code>
+        </p>
 
         <p>Nun gibt es noch eine Reihe von Worten, denen bei der Compilation eine nachfolgende 16-Bit-Zahl mitgegeben wird. Das sind die Verzweigungs-Befehle BRANCH, 0BRANCH, (LOOP) und ( + LOOP). Die mitgegebene Zahl ist die Sprungadresse; jedoch ist sie nicht absolut angegeben, sondern als Offset zur Adresse, an der der Befehl compiliert wurde.</p>
 
-        <p>Schwierig? Wir müssen uns nur den Offset holen und die gerade laufende Adresse, an der wir decompilieren, addieren. Dies macht das Wort:<br>
-            .BRANCH (ADR - ADR+2)<br>
-            als Grundlage für:<br>
-            B(ADR-ADR + 2)<br>
-            (siehe Listing 2).</p>
+        <p>Schwierig? Wir müssen uns nur den Offset holen und die gerade laufende Adresse, an der wir decompilieren, addieren. Dies macht das Wort:
+            <code>.BRANCH (ADR - ADR+2)</code>            
+            als Grundlage für:
+            <code>B(ADR-ADR + 2)</code>            
+            (siehe Listing 2).
+        </p>
 
-        <p>Noch ein Wort würde uns beim Decompilieren Schwierigkeiten bereiten, wenn wir uns nicht ein »Gegenwort« basteln würden: das »."«. Ihm folgt ein Forth-String, der zur Ausführungszeit ausgedruckt wird und den wir ebenfalls ausdrucken und die laufende Adresse entsprechend erhöhen müssen. Ein Forth-String ist ähnlich aufgebaut wie das Namensfeld eines Forth-Wortes: Das erste Byte enthält die Länge des Strings, in den folgenden Bytes befinden sich die ASCII-Codes des Strings. Zum Ausdrucken von Strings bietet Forth zwei häufig benutzte Worte an: Haben wir die Adresse, bei der die ASCII-Zeichen des Strings beginnen und wissen wir die Länge, so druckt<br>
-            TYPE (ADR Länge -)<br>
-            den String aus. Haben wir jedoch nur die Adresse, unter der wir das Längenbyte eines Forth-Strings finden, so liefert<br>
-            COUNT (ADR - ADR + 1 Länge)<br>
-            uns die um 1 erhöhte Adresse und das benötigte Längenbyte, so daß ein folgendes »TYPE« richtig vorbereitet ist. Diese beiden Worte benutzen wir in unserem<br>
-            .STRING (ADR1 - ADR2)<br>
-            aus Listing 2. Wir dürfen dabei nicht vergessen, die laufende Adresse um die Länge des Strings zu erhöhen, damit wir richtig weiter decompilieren können. Diesem Zweck dient das »2DUP« und das»+«am Ende von ».STRING«. Die Länge des Strings drucken wir uns vor dem String selbst aus. Das bedienerfreundliche Wort S (ADR1 — ADR2) aus Listing 2 benutzt dann wieder ».STRING«.</p>
+        <p>Noch ein Wort würde uns beim Decompilieren Schwierigkeiten bereiten, wenn wir uns nicht ein »Gegenwort« basteln würden: das »."«. Ihm folgt ein Forth-String, der zur Ausführungszeit ausgedruckt wird und den wir ebenfalls ausdrucken und die laufende Adresse entsprechend erhöhen müssen. Ein Forth-String ist ähnlich aufgebaut wie das Namensfeld eines Forth-Wortes: Das erste Byte enthält die Länge des Strings, in den folgenden Bytes befinden sich die ASCII-Codes des Strings. Zum Ausdrucken von Strings bietet Forth zwei häufig benutzte Worte an: Haben wir die Adresse, bei der die ASCII-Zeichen des Strings beginnen und wissen wir die Länge, so druckt
+            <code>TYPE (ADR Länge -)</code>
+            den String aus. Haben wir jedoch nur die Adresse, unter der wir das Längenbyte eines Forth-Strings finden, so liefert
+            <code>COUNT (ADR - ADR + 1 Länge)</code>
+            uns die um 1 erhöhte Adresse und das benötigte Längenbyte, so daß ein folgendes »TYPE« richtig vorbereitet ist. Diese beiden Worte benutzen wir in unserem
+            <code>.STRING (ADR1 - ADR2)</code>
+            aus Listing 2. Wir dürfen dabei nicht vergessen, die laufende Adresse um die Länge des Strings zu erhöhen, damit wir richtig weiter decompilieren können. Diesem Zweck dient das »2DUP« und das»+«am Ende von ».STRING«. Die Länge des Strings drucken wir uns vor dem String selbst aus. Das bedienerfreundliche Wort S (ADR1 — ADR2) aus Listing 2 benutzt dann wieder ».STRING«.
+        </p>
 
         <p>Werfen wir nochmals einen Blick auf das »CLIT«. Dort finden wir auch unser »COUNT« wieder. Nun geht es bei »CLIT« überhaupt nicht um Strings, das zweckentfremdete »COUNT« erfüllt aber genau das Geforderte: Das Byte unter der laufenden Adresse wird geholt, und die Adresse wird um eins erhöht.</p>
 
@@ -149,24 +162,26 @@
 
         <address class="author">(Georg Rehfeld/ev)</address>
 
-        <aside>
-            ### Das Stapeln ist ein Forth-Prinzip: Bemerkungen zum Stapel.
+        <figure>
+            <h3>Das Stapeln ist ein Forth-Prinzip: Bemerkungen zum Stapel.</h3>
 
-            Betrachten wir den Daten-Stapel etwas näher. Forth-Worte, die Eingangsvariable brauchen oder Ausgangsvariable liefern, benutzen in der Regel den Stapel, um diese Zahlen zu übergeben. Der Additions-Befehl » + « zum Beispiel nimmt die beiden obersten Zahlen vom Stapel, addiert sie und legt die Summe wieder oben auf den Stapel. Dies führt zu einer besonderen Schreibweise von Formeln, der Umgekehrten Polnischen Notation (UPN), wie sie auch bei den Taschenrechnern einer bekannten Firma in Gebrauch ist. Die Basic-Schreibweise »PRINT 2 + 3« liest sich in Forth: »2 3 + .«
+            <p>Betrachten wir den Daten-Stapel etwas näher. Forth-Worte, die Eingangsvariable brauchen oder Ausgangsvariable liefern, benutzen in der Regel den Stapel, um diese Zahlen zu übergeben. Der Additions-Befehl » + « zum Beispiel nimmt die beiden obersten Zahlen vom Stapel, addiert sie und legt die Summe wieder oben auf den Stapel. Dies führt zu einer besonderen Schreibweise von Formeln, der Umgekehrten Polnischen Notation (UPN), wie sie auch bei den Taschenrechnern einer bekannten Firma in Gebrauch ist. Die Basic-Schreibweise »PRINT 2 + 3« liest sich in Forth: »2 3 + .«</p>
 
-            Der Einfluß eines Forth-Wortes auf den Daten-Stapel wird im Quelltext bei jedem Wort als Kommentar angegeben. Das Wort » + « hat demzufolge den Stapel-Kommentar:
-            + (N1 N2 - N3)
+            <p>Der Einfluß eines Forth-Wortes auf den Daten-Stapel wird im Quelltext bei jedem Wort als Kommentar angegeben. Das Wort » + « hat demzufolge den Stapel-Kommentar:
+                <code>+ (N1 N2 - N3)</code>
+            </p>
 
-            N1 und N2 sind dabei die Summanden, die vom Stapel genommen werden, die drei Bindestriche deuten die Operation an und N3 ist die Summe, die auf dem Stapel hinterlassen wird. Das oberste Element des Stapels (TOS) steht bei dieser Schreibweise rechts, vor der Ausführung von »+«ist also N2 Stapel-Spitze, danach N3.
-            Wichtige Befehle zur Stack-Kontrolle sind:
-            DUP (N - NN) dupliziert TOS
-            DROP (N — ) entfernt TOS vom Stapel
-            SWAP (N1 N2 - N2 N1) vertauscht die beiden obersten Werte des Stapels
-            OVER (N1 N2 - N1 N2 N1) kopiert zweites Stapelelement als neuen TOS
-            ROT (N1 N2 N3 - N2 N3 N1) rotiert die obersten drei Stapelelemente
-        </aside>
+            <p>N1 und N2 sind dabei die Summanden, die vom Stapel genommen werden, die drei Bindestriche deuten die Operation an und N3 ist die Summe, die auf dem Stapel hinterlassen wird. Das oberste Element des Stapels (TOS) steht bei dieser Schreibweise rechts, vor der Ausführung von »+«ist also N2 Stapel-Spitze, danach N3.
+            Wichtige Befehle zur Stack-Kontrolle sind:</p>
 
-
+            <ul class="plain">
+                <li>DUP (N - NN) dupliziert TOS</li>
+                <li>DROP (N — ) entfernt TOS vom Stapel</li>
+                <li>SWAP (N1 N2 - N2 N1) vertauscht die beiden obersten Werte des Stapels</li>
+                <li>OVER (N1 N2 - N1 N2 N1) kopiert zweites Stapelelement als neuen TOS</li>
+                <li>ROT (N1 N2 N3 - N2 N3 N1) rotiert die obersten drei Stapelelemente</li>
+            </ul>
+        </figure>
     </article>
 
 </body>

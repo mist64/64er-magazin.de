@@ -36,12 +36,13 @@
 
         <p>Ein String hat immer eine bestimmte Länge, sie entspricht der Anzahl der in ihm enthaltenen Zeichen. Die Länge darf zwischen 0 und 255 betragen, weil der Computer nur über Umwege mehr als 255 Zeichen auf einmal überblicken könnte. Bei einer Länge von Null spricht man übrigens auch von einem Leerstring, weil keine Zeichen in ihm enthalten sind, nicht zu verwechseln mit einem String, der Leerzeichen (Spaces, Blanks) enthält.</p>
 
-        <p>Da es unpraktisch wäre, jedesmal, wenn ich einen bestimmten String bearbeiten will, diesen vollständig einzugeben, gibt es die Stringvariablen. Eine Stringvariable ist nichts anderes als ein Platzhalter für einen String. Wenn ich beispielsweise der Stringvariablen A$ den String »BORIS SCHNEIDER« zuteilen möchte, so schreibe ich:<br>
-            A$="BORIS SCHNEIDER"</p>
+        <p>Da es unpraktisch wäre, jedesmal, wenn ich einen bestimmten String bearbeiten will, diesen vollständig einzugeben, gibt es die Stringvariablen. Eine Stringvariable ist nichts anderes als ein Platzhalter für einen String. Wenn ich beispielsweise der Stringvariablen A$ den String »BORIS SCHNEIDER« zuteilen möchte, so schreibe ich:
+            <code>A$="BORIS SCHNEIDER"</code>
+        </p>
 
-        <p>Das Dollarzeichen hinter dem Variablennamen zeigt dem Computer an, daß es sich hier um eine Stringvariable handelt. Nun kann ich im weiteren Verlauf jedesmal, wenn ich »BORIS SCHNEIDER« eingeben müßte, A$ dafür schreiben. Allerdings können Basic-Befehle so nicht abgekürzt werden. Wenn ich eingebe:<br>
-            A$ = "PRINT":A$ 3*5<br>
-            so erhalte ich nicht das gewünschte Ergebnis, 15, sondern schlicht und einfach SYNTAX ERROR. Das liegt daran, daß Basic-Befehle intern anders codiert sind als Strings.</p>
+        <p>Das Dollarzeichen hinter dem Variablennamen zeigt dem Computer an, daß es sich hier um eine Stringvariable handelt. Nun kann ich im weiteren Verlauf jedesmal, wenn ich »BORIS SCHNEIDER« eingeben müßte, A$ dafür schreiben. Allerdings können Basic-Befehle so nicht abgekürzt werden. Wenn ich eingebe:
+            <code>A$ = "PRINT":A$ 3*5</code>
+        so erhalte ich nicht das gewünschte Ergebnis, 15, sondern schlicht und einfach SYNTAX ERROR. Das liegt daran, daß Basic-Befehle intern anders codiert sind als Strings.</p>
 
         <h3>Aufbau einer Stringvariablen</h3>
 
@@ -53,31 +54,35 @@
         </figure>
 
         <p>Beim Ablauf eines Programms läßt sich der Speicher in folgende fünf Bereiche aufteilen, deren Grenzen allerdings flexibel sind und sich laufend ändern:</p>
+
         <ul>
-            <li>Basic-Programm<br>
-                Das gerade im Speicher befindliche Programm liegt ganz unten, angefangen bei den kleinsten erreichbaren Adressen.</li>
-            <li>Variable<br>
-                In diesem Bereich befinden sich alle Variablen, Zahlvariablen wie auch Stringvariablen. In den Stringvariablen ist allerdings nicht der String selbst enthalten, sondern nur ein Zeiger auf die Adresse, wo sich der eigentliche String befindet.</li>
-            <li>Arrays<br>
-                Hier befinden sich die Arrays, auch Felder genannt. Wenn Sie mehr als elf Elemente enthalten sollen, müssen Sie vor ihrer Benutzung erst durch den DIM-Befehl definiert werden, damit der Basic-Interpreter genügend Speicherplatz in diesem Bereich bereitstellt.</li>
-            <li>Freier Speicher<br>
-                Freier Speicher existiert interessanterweise nicht am oberen oder unteren Ende des Speichers, sondern in der Mitte, zwischen Arrays und Strings. Das hat aber enorme Vorteile, wie wir noch sehen werden.</li>
-            <li>Strings<br>
-                Hier sind sie endlich, am oberen Ende des Speichers, die von uns gesuchten Strings. In diesem Bereich befinden sich, dicht aneinander gepackt, die Inhalte der Stringvariablen (mit einer Ausnahme, aber davon später).</li>
+            <li>Basic-Programm
+                <p>Das gerade im Speicher befindliche Programm liegt ganz unten, angefangen bei den kleinsten erreichbaren Adressen.</p>
+            </li>
+            <li>Variable
+                <p>In diesem Bereich befinden sich alle Variablen, Zahlvariablen wie auch Stringvariablen. In den Stringvariablen ist allerdings nicht der String selbst enthalten, sondern nur ein Zeiger auf die Adresse, wo sich der eigentliche String befindet.</p>
+            </li>
+            <li>Arrays
+                <p>Hier befinden sich die Arrays, auch Felder genannt. Wenn Sie mehr als elf Elemente enthalten sollen, müssen Sie vor ihrer Benutzung erst durch den DIM-Befehl definiert werden, damit der Basic-Interpreter genügend Speicherplatz in diesem Bereich bereitstellt.</p>
+            </li>
+            <li>Freier Speicher
+                <p>Freier Speicher existiert interessanterweise nicht am oberen oder unteren Ende des Speichers, sondern in der Mitte, zwischen Arrays und Strings. Das hat aber enorme Vorteile, wie wir noch sehen werden.</p>
+            </li>
+            <li>Strings
+                <p>Hier sind sie endlich, am oberen Ende des Speichers, die von uns gesuchten Strings. In diesem Bereich befinden sich, dicht aneinander gepackt, die Inhalte der Stringvariablen (mit einer Ausnahme, aber davon später).</p>
+            </li>
         </ul>
 
         <p>Nun kommen wir aber wieder auf die Stringvariablen selbst zurück.</p>
 
         <p>Wie schon erwähnt, steht, speichertechnisch gesehen, in einer Stringvariablen gar kein String, sondern nur die Adresse, wo wir den Inhalt der Stringvariablen finden können. Das bemerken wir allerdings normalerweise nicht, da der Basic-Interpreter für uns automatisch den String an der entsprechenden Adresse abholt.</p>
 
-        <p>Der genaue Aufbau einer Stringvariablen steht in Tabelle 1. Hier einige Erläuterungen dazu:</p>
-
         <figure>
-            <table>
+            <table class="plain nobreak0">
                 <tbody>
-                    <tr>
-                        <td><b>Byte</b></td>
-                        <td><b>Bedeutung</b></td>
+                    <tr class="strong">
+                        <td>Byte</td>
+                        <td>Bedeutung</td>
                     </tr>
                     <tr>
                         <td>1</td>
@@ -100,7 +105,7 @@
                         <td>MSB der Adresse des Strings</td>
                     </tr>
                     <tr>
-                        <td>6&amp;7</td>
+                        <td>6 &amp; 7</td>
                         <td>Auffüllbytes, immer =0</td>
                     </tr>
                 </tbody>
@@ -109,12 +114,15 @@
             <figcaption>Tabelle 1. Der Aufbau einer normalen Stringvariablen.</figcaption>
         </figure>
 
+        <p>Der genaue Aufbau einer Stringvariablen steht in Tabelle 1. Hier einige Erläuterungen dazu:</p>
+
         <p>Jede Variable ist durch eine Zweizeichen-Kombination gekennzeichnet. Das erste Zeichen muß ein Buchstabe, das zweite Zeichen darf auch eine Ziffer sein. Durch das Anhängen eines »$« definieren Sie die vorstehende Variable als Stringvariable. Intern speichert der Computer nun das Dollarzeichen nicht mit, sondern kennzeichnet eine Stringvariable, indem er zum Code des zweiten Buchstabens 128 addiert. So werden nur zwei Speicherstellen benötigt, um den Variablennamen zu speichern. Bei Zahlvariablen wird nichts addiert, bei Integervariablen (Ganzzahl) zu beiden Codes jeweils 128.</p>
 
         <p>Das dritte Byte gibt die Länge des Strings an. Dies ist notwendig, da die eigentlichen Strings in ihrem Speicherbereich ohne Trennzeichen einfach aneinandergehängt sind. Wüßte der Computer nicht, wie lang der gefragte String ist, so könnte er auch nicht sein Ende feststellen. Da kein Trennzeichen verwendet wird, darf in einem String auch jedes Zeichen, das der Computer kennt, vorkommen. Außerdem wird so der Speicherplatz am besten ausgenutzt.</p>
 
-        <p>Die Bytes 4 und 5 enthalten die Adresse des Strings im Low/High-Byte-Format. Um diese beiden Bytes in die entsprechende Zahl umzuwandeln, müßte folgende Rechnung durchgeführt werden:<br>
-            Byte 4 + (256 x Byte 5)</p>
+        <p>Die Bytes 4 und 5 enthalten die Adresse des Strings im Low/High-Byte-Format. Um diese beiden Bytes in die entsprechende Zahl umzuwandeln, müßte folgende Rechnung durchgeführt werden:
+            <code>Byte 4 + (256 x Byte 5)</code>
+        </p>
 
         <p>Die Bytes 6 und 7 enthalten beide den Wert Null. Wenn Sie nach dem Sinn und Zweck fragen, so ist die Antwort, daß es für den Computer einfacher ist, wenn alle Variablentypen, Zahlen wie Strings, die gleiche Länge haben. Eine Zahlvariable belegt nun genau 7 Bytes, deswegen werden Stringvariable auf diese Länge aufgefüllt.</p>
 
@@ -127,11 +135,11 @@
         <p>Auch hierzu habe ich wieder eine Tabelle zusammengestellt (Tabelle 2).</p>
 
         <figure>
-            <table>
+            <table class="plain nobreak0">
                 <tbody>
-                    <tr>
-                        <td><b>Byte</b></td>
-                        <td><b>Bedeutung</b></td>
+                    <tr class="strong">
+                        <td>Byte</td>
+                        <td>Bedeutung</td>
                     </tr>
                     <tr>
                         <td>1</td>
@@ -203,15 +211,16 @@
 
         <p>Wie schon erwähnt, stimmen die Adressenangaben, die ich bei unserer Beispielspeicherbelegung gemacht habe, nicht. Der Beginn eines Basic-Programms liegt normalerweise an der Adresse 2048, das Ende des Speichers bei 40959.</p>
 
-        <p>Die Grenzen zwischen den einzelnen Bereichen sind, wie gesagt, nicht exakt festlegbar, da sie sich laufend ändern. Sollten Sie sich für die gerade bestehenden Grenzen interessieren, so können Sie sie mittels PEEK erfragen. In den in Tabelle 3 angegebenen Speicherstellen stehen die jeweiligen Grenzen im schon erwähnten Low/High-Format. Um also beipielsweise den Beginn der Strings auszudrucken, müssen Sie folgendes eingeben:<br>
-            PRINT PEEK(51) + 256xPEEK(52)</p>
+        <p>Die Grenzen zwischen den einzelnen Bereichen sind, wie gesagt, nicht exakt festlegbar, da sie sich laufend ändern. Sollten Sie sich für die gerade bestehenden Grenzen interessieren, so können Sie sie mittels PEEK erfragen. In den in Tabelle 3 angegebenen Speicherstellen stehen die jeweiligen Grenzen im schon erwähnten Low/High-Format. Um also beipielsweise den Beginn der Strings auszudrucken, müssen Sie folgendes eingeben:
+            <code>PRINT PEEK(51) + 256xPEEK(52)</code>
+        </p>
 
         <figure>
-            <table>
+            <table class="plain nobreak0">
                 <tbody>
-                    <tr>
-                        <td><b>Adresse</b></td>
-                        <td><b>Bedeutung</b></td>
+                    <tr class="strong">
+                        <td>Adresse</td>
+                        <td>Bedeutung</td>
                     </tr>
                     <tr>
                         <td>43,44</td>
@@ -244,7 +253,9 @@
         </figure>
         <p>Wir beschreiten nun einen sehr ungewöhnlichen, aber wirkungsvollen Weg. Wir verkleinern unseren Speicher so, daß er auf den Bildschirm paßt, und legen den Bildschirmspeicher an diese Stelle. Wir können dann zwar nicht mehr sehen, was wir eintippen, haben aber einen vollen Überblick über den Speicher.</p>
 
-        <p>Geben Sie bitte folgendes ein: FORI = 2060T03072:POKEI,32: NEXTI, POKE 56,11:POKE 53272, 37:CLR.</p>
+        <p>Geben Sie bitte folgendes ein: 
+            <code>FORI = 2060T03072:POKEI,32: NEXTI, POKE 56,11:POKE 53272,37:CLR.</code>
+        </p>
 
         <p>Sie haben im Augenblick zirka 750 Bytes freien Speicherplatz, der Rest wurde vorhin für Basic gesperrt.</p>
 
@@ -272,7 +283,9 @@
 
         <p>Bei der Garbage Collection wird sämtlicher vorhandener Stringmüll entfernt; so wird der größtmögliche Speicherplatz frei.</p>
 
-        <p>Wie arbeitet nun die Garbage Collection? Auch dies zeigt man am besten an einem Beispiel. Am praktischsten finde ich das Stringvertauschen. Sie wissen ja wahrscheinlich, wie man normalerweise zwei Strings vertauscht: H$ = A$ : A$ = B$ : B$ = H$</p>
+        <p>Wie arbeitet nun die Garbage Collection? Auch dies zeigt man am besten an einem Beispiel. Am praktischsten finde ich das Stringvertauschen. Sie wissen ja wahrscheinlich, wie man normalerweise zwei Strings vertauscht:
+            <code>H$ = A$ : A$ = B$ : B$ = H$</code>
+        </p>
 
         <p>Diese Sequenz vertauscht die Inhalte der zwei Stringvariablen A$ und B$. So zu tauschen ist der einfachste Weg, er hat aber auch zwei große Nachteile:</p>
 
@@ -285,8 +298,7 @@
 
         <p>Wenn Sie es selbst am Bildschirm verfolgen wollen, geben Sie bitte nochmals die oben genannten POKE-Befehle ein. Ansonsten betrachten Sie bitte Bild 2 bis 6.</p>
 
-        <p>Zuerst definieren wir die zwei Strings A$ und B$:<br>
-            A$ = "BORIS" : B$ = "SCHNEIDER" (Sie können selbstverständlich jeden anderen Stringinhalt wählen.) Sie sehen, daß das Betriebssystem zwei Strings im Speicher abgelegt hat; die Descriptoren der entsprechenden Variablen zeigen auf diese (Bild 2).</p>
+        <p>Zuerst definieren wir die zwei Strings A$ und B$: A$ = "BORIS" : B$ = "SCHNEIDER" (Sie können selbstverständlich jeden anderen Stringinhalt wählen.) Sie sehen, daß das Betriebssystem zwei Strings im Speicher abgelegt hat; die Descriptoren der entsprechenden Variablen zeigen auf diese (Bild 2).</p>
 
         <figure>
             <img src="122-2.png" alt="">
@@ -359,10 +371,12 @@
 
         <p>Sie werden jetzt vielleicht fragen, wo denn der Haken bei der Garbage Collection liegt, denn sie war ja unwahrscheinlich schnell.</p>
 
-        <p>Nun, wir hatten aber auch nur zwei Strings im Speicher, die aufgeräumt werden mußten. Wenn Sie Ihren Computer mal beschäftigen wollen, so probieren Sie folgendes:<br>
-            DIM A$(9000)<br>
-            FOR I = 0 TO 9000:A$(I)="A": NEXTI<br>
-            TI$="000000":?FRE(0):?TI$</p>
+        <p>Nun, wir hatten aber auch nur zwei Strings im Speicher, die aufgeräumt werden mußten. Wenn Sie Ihren Computer mal beschäftigen wollen, so probieren Sie folgendes:
+            <code>DIM A$(9000)
+                FOR I = 0 TO 9000:A$(I)="A": NEXTI
+                TI$="000000":?FRE(0):?TI$
+            </code>
+        </p>
 
         <p>Bitte tippen Sie das nur, wenn die normale Speicherbelegung eingeschaltet ist, sonst erhalten Sie sofort einen OUT OF MEMORY ERROR.</p>
 
