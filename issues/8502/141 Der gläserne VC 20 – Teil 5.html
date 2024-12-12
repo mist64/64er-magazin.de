@@ -32,9 +32,9 @@
 
         <p>Da die Anzahl der darstellbaren Zeichen (diese setzen sich — um dies noch einmal zu wiederholen — aus 8 x 8 Pixels zusammen) auf 256 beschränkt ist, muß man sich eine andere Lösung einfallen lassen. Diese ist aber — man wird es kaum glauben — bereits in den VIC eingebaut worden. Das sieht praktisch so aus: Man vergrößert die im Bildschirmspeicher abgelegten Zeichen von 8 x 8 auf 16 x 8 Pixels (bei gleicher Auflösung), wodurch sich gleichzeitig die zur Verfügung stehende Zeichenfläche erhöht. Diese Vergrößerung wird über ein bestimmtes Bit im VIC-Kontrollregister #3 eingestellt (vergleiche Folge 4, Tabelle 3). Ist Bit 0 dieser Speicherstelle auf 0, so bleibt alles wie es war, das heißt jedes Zeichen wird innerhalb einer 8 x 8-Matrix dargestellt.</p>
 
-        <p>Setzt man dieses Bit nun aber mit »POKE 36867, PEEK (36867) OR 1« auf 1, so sind alle Zeichen plötzlich doppelt so hoch. Ein Charakter wird nämlich innerhalb eines 16 x 8-Gitters abgebildet (Bild 1). Das ist nun alles schön und gut, einen Nachteil hat dieser Betriebszustand aber (wer es selbst ausprobiert hat wird es sicherlich schon bemerkt haben). Denn mit dem normalen Zeichensatz kommt auf dem Bildschirm keine vernünftige Zeichenfolge mehr zustande. So wird beispielsweise aus dem @ (Klammeraffe) das Zeichen<br>@<br />
+        <p>Setzt man dieses Bit nun aber mit »POKE 36867, PEEK (36867) OR 1« auf 1, so sind alle Zeichen plötzlich doppelt so hoch. Ein Charakter wird nämlich innerhalb eines 16 x 8-Gitters abgebildet (Bild 1). Das ist nun alles schön und gut, einen Nachteil hat dieser Betriebszustand aber (wer es selbst ausprobiert hat wird es sicherlich schon bemerkt haben). Denn mit dem normalen Zeichensatz kommt auf dem Bildschirm keine vernünftige Zeichenfolge mehr zustande. So wird beispielsweise aus dem @ (Klammeraffe) das Zeichen<br>@<br>
             A
-            aus dem A das Zeichen<br />
+            aus dem A das Zeichen<br>
             B
             C<br>und so fort. Drückt man nun eine Taste, so wird nicht der entsprechende Buchstabe abgebildet, sondern irgendwelche anderen Zeichen, die, wie eben beschrieben, übereinander gestapelt sind.</p>
 
@@ -86,18 +86,18 @@
 
         <p>Anhand eines konkreten Beispiels wollen wir den zur Berechnung nötigen Algorithmus entwickeln: Der Punkt mit den Koordinaten X = 43 und Y= 106 soll auf dem Bildschirm gesetzt werden.</p>
 
-        <p>Nun wird als erstes festgestellt, in welchem Zeichen eine Änderung vorgenommen werden muß. Zu diesem Zweck wird die Koordinate in die besagten Grobanteile aufgespalten, was durch einfache Division geschieht. Die Spaltenkoordinate wird durch 8 (Zeichenbreite), der Zeilenanteil wird durch 16 (Zeilenhöhe) dividiert:<br />
-            X: 43 ÷ 8 = 5 Rest 3<br />
+        <p>Nun wird als erstes festgestellt, in welchem Zeichen eine Änderung vorgenommen werden muß. Zu diesem Zweck wird die Koordinate in die besagten Grobanteile aufgespalten, was durch einfache Division geschieht. Die Spaltenkoordinate wird durch 8 (Zeichenbreite), der Zeilenanteil wird durch 16 (Zeilenhöhe) dividiert:<br>
+            X: 43 ÷ 8 = 5 Rest 3<br>
             Y: 106 ÷ 16 = 6 Rest 10</p>
 
         <p>Das Ergebnis ist jeweils der Grobanteil, der Rest ist dann automatisch die Pixelposition ( = Feinanteil). Der erste Teil dieser Rechnung wird in Listing 2 in den Zeilen 640 und 650 durchgeführt.</p>
 
-        <p>Danach wird die relative Position eines Zeichens im Charaktergenerator ermittelt. Die dafür nötigen »Formeln« haben wir ja bereits das letzte Mal besprochen:<br />
-            Position = ZY x Zeichen pro Zeile + ZX<br />
+        <p>Danach wird die relative Position eines Zeichens im Charaktergenerator ermittelt. Die dafür nötigen »Formeln« haben wir ja bereits das letzte Mal besprochen:<br>
+            Position = ZY x Zeichen pro Zeile + ZX<br>
             = 6 × 21 ÷ 5 = 131.</p>
 
-        <p>Das betreffende Zeichen hat also den Bildschirmcode 131. Da ein Charakter (nach der Umschaltung auf eine 16 x 8 Matrix) den Platzbedarf von 16 Byte hat, kann man auch ganz leicht die Anfangsadresse der ersten Zeichenzeile errechnen:<br />
-            ADRESSE = Position x Platzbedarf + Basisadresse = 131 × 16 + 5120 = 7216<br />
+        <p>Das betreffende Zeichen hat also den Bildschirmcode 131. Da ein Charakter (nach der Umschaltung auf eine 16 x 8 Matrix) den Platzbedarf von 16 Byte hat, kann man auch ganz leicht die Anfangsadresse der ersten Zeichenzeile errechnen:<br>
+            ADRESSE = Position x Platzbedarf + Basisadresse = 131 × 16 + 5120 = 7216<br>
             Dann ermitteln wir als nächstes über den Pixelanteil der Y-Koordinate die benötigte Zeichenzeile. In unserem Beispiel muß zur Zeichenadresse der Wert von PY — also 10 — dazuaddiert werden. Damit haben wir die endgültige Adresse der angewählten Zeichenzeile berechnet. Dies klingt alles viel komplizierter, als es in Wirklichkeit ist, denn alle drei Schritte können zu einem (Zeile 690) zusammengefaßt werden.</p>
 
         <p>Damit sind wir schon fast am Ziel (das kann man hier sogar wörtlich nehmen) angelangt. Als letztes muß das durch die Pixel-X-Koordinate vorgegebene Bit in der Zeichenzeile gesetzt werden. Dies wird durch eine ODER-Verknüpfung des Wertes mit der Zeichenzeile erreicht.</p>
@@ -106,20 +106,20 @@
 
         <p>Für die X-Achse bedeutet dies, daß der Wert nach rechts ansteigt. Für die Fein-X-Koordinate gilt natürlich das Gleiche; sie kann von links nach rechts folgende Positionen annehmen: 0,1,2,3,4,5,6,7.</p>
 
-        <p>Hier liegt nun der springende Punkt. Position 0 entspricht nämlich Bit 7 in der Zeichenzeile, Position 1 Bit 6, die Position 2 Bit 5 und so fort. Diese Bits laufen also genau in entgegengesetzter Richtung. Folglich muß die Pixel-X-Koordinate dementsprechend »umgepolt« werden. Dies wird ganz einfach dadurch erreicht, indem man diesen Wert von der 7 subtrahiert:<br />
+        <p>Hier liegt nun der springende Punkt. Position 0 entspricht nämlich Bit 7 in der Zeichenzeile, Position 1 Bit 6, die Position 2 Bit 5 und so fort. Diese Bits laufen also genau in entgegengesetzter Richtung. Folglich muß die Pixel-X-Koordinate dementsprechend »umgepolt« werden. Dies wird ganz einfach dadurch erreicht, indem man diesen Wert von der 7 subtrahiert:<br>
             Bitformat = 7 — (Pixel-X-Koordinate)</p>
 
         <p>In unserem Beispiel ergibt sich: Bitposition= 7 — 3 = 4</p>
 
         <p>Bit 4 soll nun in der Zeichenzeile gesetzt werden. Dies erreichen wir — wie bereits erwähnt — durch die ODER-Verknüpfung des Wertes mit dem Zeichenbyte. Wer den letzten Teil aufmerksam verfolgt hat, dem wird dies nicht schwerfallen. Da Bit 4 die Wertigkeit 16(= 24) hat, wird die Zeichenzeile eben mit 16 ODER-verknüpft.</p>
 
-        <p>Wenn man alle drei Schritte zusammenfaßt, ergibt sich folgende Zeile:<br />
+        <p>Wenn man alle drei Schritte zusammenfaßt, ergibt sich folgende Zeile:<br>
             POKE AD, PEEK (AD) OR 2 t (7-PX).</p>
 
-        <p>Damit ist der entsprechende Pixelpunkt gesetzt. Mit diesem letzten Teilstück haben wir nun endlich den kompletten Routinenteil beieinander, um ihn als Unterprogramm in Teil 4 von Listing 2 zu verwenden. Natürlich können mit Hilfe dieser Methode auch Punkte gelöscht oder abgefragt werden. Das Löschen wird mit Hilfe der AND-Operation bewerkstelligt. Das zu löschende Bit muß im Operanden auf Null, alle anderen, die unberührt bleiben sollen, auf eins gesetzt werden. Folgende Zeile löscht den adressierten Pixelpunkt:<br />
+        <p>Damit ist der entsprechende Pixelpunkt gesetzt. Mit diesem letzten Teilstück haben wir nun endlich den kompletten Routinenteil beieinander, um ihn als Unterprogramm in Teil 4 von Listing 2 zu verwenden. Natürlich können mit Hilfe dieser Methode auch Punkte gelöscht oder abgefragt werden. Das Löschen wird mit Hilfe der AND-Operation bewerkstelligt. Das zu löschende Bit muß im Operanden auf Null, alle anderen, die unberührt bleiben sollen, auf eins gesetzt werden. Folgende Zeile löscht den adressierten Pixelpunkt:<br>
             POKE AD, PEEK (AD) AND 255-2i (7-PX).</p>
 
-        <p>Die Abfrage von Punkten wird ebenfalls über die AND-Operation abgewickelt. Das gewünschte Bit wird im Operanden gesetzt und danach mit der Speicherstelle UND-verknüpft. Ist das adressierte Pixel gesetzt, so ist die IF-THEN-Bedingung erfüllt, ansonsten nicht:<br />
+        <p>Die Abfrage von Punkten wird ebenfalls über die AND-Operation abgewickelt. Das gewünschte Bit wird im Operanden gesetzt und danach mit der Speicherstelle UND-verknüpft. Ist das adressierte Pixel gesetzt, so ist die IF-THEN-Bedingung erfüllt, ansonsten nicht:<br>
             IF 21 (7-PX) = (PEEK(AD) AND 21 (7-PX)) THEN&hellip;</p>
 
         <p>Natürlich sollte man anstelle des Ausdrucks 2t (7-PX) eine Variable definieren, damit das Programm kürzer und schneller wird.</p>
@@ -276,14 +276,14 @@
 
         <p>Ist innerhalb eines 8 x 8 Zeichengitters irgendwo ein Bit mit dem Wert 1, so wird die entsprechende Bildschirmzelle mit dem Farbwert, der in der zugehörigen Farbspeicherstelle steht, ausgefüllt. Befindet sich in dieser Pixelzelle der Binärwert 0, so wird diese in der Hintergrundfarbe auf dem Bildschirm abgebildet (sie ist also nicht zu sehen).</p>
 
-        <p>In einem normalen hochauflösenden Zeichen können also zwei verschiedene Farben dargestellt werden:<br />
-            Bit auf 0: Pixeldarstellung in Hintergrundfarbe<br />
+        <p>In einem normalen hochauflösenden Zeichen können also zwei verschiedene Farben dargestellt werden:<br>
+            Bit auf 0: Pixeldarstellung in Hintergrundfarbe<br>
             Bit auf 1: Pixeldarstellung in Vordergrundfarbe (Farb-RAM)</p>
 
-        <p>Wie Sie sehen, kann man die zwei Zustände auch als Farbcodes interpretieren. Ebenso verhält es sich im Multicolormodus: Hier werden nun zwei Bit in einer Zeichenzeile zusammengefaßt, die ebenfalls einen solchen Farbcode (allerdings für vier Farben) bilden. Ein Pixel ist in diesem Fall dann aber auch doppelt so breit wie normal, wodurch sich auch die Auflösung um die Hälfte reduziert. Bild 4 verdeutlicht den Unterschied zwischen diesen beiden Grafikarten. Diese vier möglichen Farbcodes sind auch hierbei wiederum nur die Zeiger auf Speicherstellen, in denen die eigentlichen Farbinformationen enthalten sind. Hier die möglichen Kombinationen:<br />
-            00 : Hintergrundfarbe<br />
-            01 : Rahmenfarbe<br />
-            10 : Zeichenfarbe<br />
+        <p>Wie Sie sehen, kann man die zwei Zustände auch als Farbcodes interpretieren. Ebenso verhält es sich im Multicolormodus: Hier werden nun zwei Bit in einer Zeichenzeile zusammengefaßt, die ebenfalls einen solchen Farbcode (allerdings für vier Farben) bilden. Ein Pixel ist in diesem Fall dann aber auch doppelt so breit wie normal, wodurch sich auch die Auflösung um die Hälfte reduziert. Bild 4 verdeutlicht den Unterschied zwischen diesen beiden Grafikarten. Diese vier möglichen Farbcodes sind auch hierbei wiederum nur die Zeiger auf Speicherstellen, in denen die eigentlichen Farbinformationen enthalten sind. Hier die möglichen Kombinationen:<br>
+            00 : Hintergrundfarbe<br>
+            01 : Rahmenfarbe<br>
+            10 : Zeichenfarbe<br>
             11 : Hilfsfarbe</p>
 
         <figure>
