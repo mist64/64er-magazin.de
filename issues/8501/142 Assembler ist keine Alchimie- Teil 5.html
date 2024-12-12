@@ -236,11 +236,11 @@
         <p>Wieder ist neben der Bytenummer die Entfernung vom aktuellen Programmzählerstand angegeben. Wir müssen also vom Inhalt des Programmzählers 3 abziehen, um zum INX-Befehl in Byte 1002 zu gelangen. Das kennen wir aber schon aus den vergangenen Ausgaben: Wenn der Computer eine Zahl abzieht, dann addiert er das Zweierkomplement dieser Zahl. Hier soll nun 3 subtrahiert werden. Wir berechnen das Zweierkomplement:</p>
 
         <table class="plain">
-            <tr><td>3 =</td><td>0000 0011 (binär)</td></tr>
+            <tr><td>3 =</td><td>0000&nbsp;0011 (binär)</td></tr>
             <tr><td colspan="2">Das Einerkomplement davon ist:</td></tr>
-            <tr><td></td><td>1111 1100</td></tr>
+            <tr><td></td><td>1111&nbsp;1100</td></tr>
             <tr><td colspan="2">Dann wird eine 1 addiert</td></tr>
-            <tr><td></td><td>1111 1101</td></tr>
+            <tr><td></td><td>1111&nbsp;1101</td></tr>
         </table>
 
         <p>Dies ist das Zweierkomplement. In hexadezimal ausgedrückt heißt diese Zahl $FD und ist unser Offset. Für Rückwärts-Verzweigungen gilt also: Von der auf die Branch-Anweisung folgenden Speicherstelle an zählt man die Bytes zurück bis zum Sprungziel. Das Zweierkomplement der sich dadurch ergebenden Byte-Anzahl ist der Offset.</p>
@@ -323,9 +323,9 @@
 
         <p>Eine Einschränkung der relativen Adressierung können Sie nun auch sofort verstehen, wenn Sie an Zweierkomplementzahlen denken: Der Offset belegt ein Byte. Die größte positive Zahl in einem Byte ist</p>
 
-        <p class="noindent">0111 1111 = +127 = $7F</p>
+        <p class="noindent">0111&nbsp;1111 = +127 = $7F</p>
         <p class="noindent">und die kleinste negative Zahl ist</p>
-        <p class="noindent">1000 0000 = -128 = ($80)</p>
+        <p class="noindent">1000&nbsp;0000 = -128 = ($80)</p>
 
         <p>Es sind keine größeren Vorwärts-Verzweigungen als um 127 Bytes möglich, weil in diesem Fall ein Offset größer als $7F, also mit einem Bit 7 gleich 1 nötig wäre, was aber wieder als negative Zweierkomplementzahl verstanden und einen Rückwärtssprung verursachen würde. Ähnliches gilt anders herum: Es ist kein weiterer Rücksprung als um 128 Bytes möglich, weil das im Offset zum gelöschten Bit 7 führen würde, also zu einem Offset kleiner als $80, was wiederum anstelle des Rücksprunges eine Vorwärts-Verzweigung herbeiführen würde.</p>
 
@@ -544,19 +544,28 @@
 
         <h3>Die Vergleichsbefehle: CMP, CPX, CPY</h3>
 
-        <p>Vergleichen heißt in englischer Sprache »to compare«, woraus Sie unschwer erkennen können, woher die Bezeichnung CMP und die CPs in CPX beziehungsweise CPY kommen. Verglichen wird jeweils der Akku-Inhalt (bei CMP), der Inhalt des X- (bei CPX) oder des Y-Registers (bei CPY) mit Daten, die der Compare-Befehl adressiert. Einige Beispiele werden Ihnen das klarer machen:<br>
-            CMP #FF<br>
-            vergleicht den Akku-Inhalt mit der Zahl $FF. Hier liegt die unmittelbare Adressierung vor, die ebenso für CPX und CPY verwendbar ist. Außerdem ist das dann ein 2-Byte-Befehl.<br>
-            CPX 3000<br>
-            vergleicht den Inhalt des X-Registers mit dem Inhalt der Speicherstelle $3000. Die absolute Adressierung ist also auch anwendbar (natürlich auch für CMP und CPY). Der Compare-Befehl besteht so aus 3 Bytes.<br>
-            CPY A8<br>
-            vergleicht den Inhalt des Y-Registers mit dem Inhalt der Zeropage-Stelle $A8. Diese soeben frisch gelernte Zeropage-Adressierung ist bei allen drei Vergleichsbefehlen möglich und macht aus ihnen 2-Byte-Befehle.</p>
+        <p>Vergleichen heißt in englischer Sprache »to compare«, woraus Sie unschwer erkennen können, woher die Bezeichnung CMP und die CPs in CPX beziehungsweise CPY kommen. Verglichen wird jeweils der Akku-Inhalt (bei CMP), der Inhalt des X- (bei CPX) oder des Y-Registers (bei CPY) mit Daten, die der Compare-Befehl adressiert. Einige Beispiele werden Ihnen das klarer machen:
+            <code>CMP #FF</code>
+            vergleicht den Akku-Inhalt mit der Zahl $FF. Hier liegt die unmittelbare Adressierung vor, die ebenso für CPX und CPY verwendbar ist. Außerdem ist das dann ein 2-Byte-Befehl.
+            <code>CPX 3000</code>
+            vergleicht den Inhalt des X-Registers mit dem Inhalt der Speicherstelle $3000. Die absolute Adressierung ist also auch anwendbar (natürlich auch für CMP und CPY). Der Compare-Befehl besteht so aus 3 Bytes.
+            <code>CPY A8</code>
+            vergleicht den Inhalt des Y-Registers mit dem Inhalt der Zeropage-Stelle $A8. Diese soeben frisch gelernte Zeropage-Adressierung ist bei allen drei Vergleichsbefehlen möglich und macht aus ihnen 2-Byte-Befehle.
+        </p>
 
         <p>Für CPX und CPY sind das alle Möglichkeiten der Adressierung. CMP erlaubt weitere, die wir noch kennenlernen werden. Nun interessiert uns natürlich noch, wie das Vergleichsergebnis zu erhalten ist! Bei diesen Befehlen geschieht merkwürdiges: Die Vergleichsdaten werden vom Inhalt des Akkus (beziehungsweise X- oder Y-Registers) abgezogen, aber: Weder wird dieser Inhalt noch werden die adressierten Daten verändert! Der Trick ist, daß drei Flaggen das Ergebnis anzeigen: Die Negativ-Flagge N, die Null-Flage Z und das Carry-Bit C. Diese Anzeige geschieht so:</p>
 
-        <p>1) Der Registerinhalt (Akku, X-, Y-Register) ist größer als die Vergleichsdaten:<br>Dann ist das Carry-Bit = 1, die N- und die Z-Flagge = 0.<br>
-            2) Der Registerinhalt ist gleich den Vergleichsdaten:<br>Dann sind Carry- und Z-Flagge = 1, die N-Flagge = 0.<br>
-            3) Der Registerinhalt ist kleiner als die Vergleichsdaten:<br>Die N-Flagge ist dann = 1, Carry- und Zero-Flagge sind 0.</p>
+        <ol>
+            <li>Der Registerinhalt (Akku, X-, Y-Register) ist größer als die Vergleichsdaten:
+                <p class="noindent">Dann ist das Carry-Bit = 1, die N- und die Z-Flagge = 0.</p>
+            </li>
+            <li>Der Registerinhalt ist gleich den Vergleichsdaten:
+                <p class="noindent">Dann sind Carry- und Z-Flagge = 1, die N-Flagge = 0.</p>
+            </li>
+            <li>Der Registerinhalt ist kleiner als die Vergleichsdaten:
+                <p class="noindent">Die N-Flagge ist dann = 1, Carry- und Zero-Flagge sind 0.</p>
+            </li>
+        </ol>
 
         <p>Damit Sie die Übersicht behalten können, ist in Bild 1 das ganze als Schema gezeigt.</p>
 
@@ -568,7 +577,7 @@
 
         <p>ASCII ist die Abkürzung von »American Standard Code for Information Interchange« und das heißt auf deutsch »amerikanischer Standard-Code zum Informations-Austausch«. Diese Zeichenverschlüsselungsart ist international als ISO-7-Bit-Code genormt, und es wäre wirklich nett, wenn alle sich daran halten würden. Tatsächlich aber finden wir zum Beispiel bei unserem C 64 eine Abart des Normcodes, den Commodore-ASCII-Code. Über die damit erzwungenen Umrechnungen können alle diejenigen Dramen erzählen, die zum erstenmal einen (Nicht-Commodore-)Drucker an ihr Gerät anschließen oder aber blauäugig in den Online-Betrieb mit anderen Computern eintreten wollten.</p>
 
-        <p>Sehen wir uns zunächst einmal den ASCII-Code an. Es handelt sich um einen 7-Bit-Code, das heißt 128 Zeichen können in nur 7 Bits untergebracht werden (0000 0000 bis 01111111). Das achte Bit dient bei manchen Operationen mit Computer-Peripherie als Paritäts-Bit. Bei dieser Gelegenheit soll auch gleich erklärt werden, was Parität in diesem Zusammenhang bedeutet. Werden Daten übertragen, muß immer mit Übermittlungsfehlern gerechnet werden. Das Paritätsbit dient dazu festzustellen, ob ein Byte korrekt angekommen ist. Bei der sogenannten geraden Parität zählt man die Einser im Byte zusammen und setzt Bit 7 auf 1 wenn sich eine ungerade Zahl ergibt. Mit dem Paritätsbit haben wir dann eine gerade Zahl. Ist die Quersumme des Byte schon gerade, bleibt Bit 7 eine Null. Ebensogut kann man die ungerade Parität verwenden, indem dann Bit 7 so gewählt wird, daß sich immer eine ungerade Zahl ergibt. Welche Art der Parität zur Anwendung kommt, ist Vereinbarungssache. Nehmen wir mal an, es sei gerade Parität gefordert und ein Byte mit der Information 00010110 soll übermittelt werden. Die Quersumme ist 3, also ungerade. Das Paritätsbit muß auf 1 gesetzt werden. Wir senden das Byte 10010110. Der Empfänger überprüft zunächst auf gerade Parität und verwendet dann nur die Bits 0 bis 6. Doppelfehler, die mittels des Paritätsverfahrens nicht festgestellt werden können, sind sehr selten. Leider kann auf diese Weise nur bemerkt werden, daß ein Übertragungsfehler aufgetreten sein muß, aber nicht welcher. Die Information muß dann neu angefordert werden.</p>
+        <p>Sehen wir uns zunächst einmal den ASCII-Code an. Es handelt sich um einen 7-Bit-Code, das heißt 128 Zeichen können in nur 7 Bits untergebracht werden (0000&nbsp;0000 bis 01111111). Das achte Bit dient bei manchen Operationen mit Computer-Peripherie als Paritäts-Bit. Bei dieser Gelegenheit soll auch gleich erklärt werden, was Parität in diesem Zusammenhang bedeutet. Werden Daten übertragen, muß immer mit Übermittlungsfehlern gerechnet werden. Das Paritätsbit dient dazu festzustellen, ob ein Byte korrekt angekommen ist. Bei der sogenannten geraden Parität zählt man die Einser im Byte zusammen und setzt Bit 7 auf 1 wenn sich eine ungerade Zahl ergibt. Mit dem Paritätsbit haben wir dann eine gerade Zahl. Ist die Quersumme des Byte schon gerade, bleibt Bit 7 eine Null. Ebensogut kann man die ungerade Parität verwenden, indem dann Bit 7 so gewählt wird, daß sich immer eine ungerade Zahl ergibt. Welche Art der Parität zur Anwendung kommt, ist Vereinbarungssache. Nehmen wir mal an, es sei gerade Parität gefordert und ein Byte mit der Information 00010110 soll übermittelt werden. Die Quersumme ist 3, also ungerade. Das Paritätsbit muß auf 1 gesetzt werden. Wir senden das Byte 10010110. Der Empfänger überprüft zunächst auf gerade Parität und verwendet dann nur die Bits 0 bis 6. Doppelfehler, die mittels des Paritätsverfahrens nicht festgestellt werden können, sind sehr selten. Leider kann auf diese Weise nur bemerkt werden, daß ein Übertragungsfehler aufgetreten sein muß, aber nicht welcher. Die Information muß dann neu angefordert werden.</p>
 
         <p>Sehen wir uns nun den Commodore-ASCII-Code an. Durch die Einbindung der Grafikzeichen brauchen wir mehr als die 128 Kombinationen. Commodore benutzt deswegen einen 8-Bit-Code. Mit dem Basic-Befehl CHR$(x) können Sie sich alle 256 Möglichkeiten ansehen. Erschwerend kommt aber noch hinzu, daß wir nicht nur einen Zeichensatz, sondern deren vier zur Verfügung haben, die durch den jeweiligen Schreibmodus ansprechbar sind (Klein-/Großschriftmodus, Großschriftmodus, beide Modi mit Reverse-ON oder OFF). Im Zeichen-ROM liegen insgesamt 512 Muster abrufbereit. Zu diesen kommen beim CHR$-Befehl noch eine ganze Reihe von Steuerzeichen hinzu&hellip; die Verwirrung ist perfekt! Wir wollen an dieser Stelle keine Entwirrung vornehmen, sondern wir durchschlagen den Gordischen Knoten, indem wir nur die ersten 128 Zeichen mit den ASCII-Zeichen vergleichen. In Bild 2 und 3 finden Sie unsere Gegenüberstellung.</p>
 
@@ -621,7 +630,7 @@
                         <td>0</td>
                         <td>@</td>
                         <td>P</td>
-                        <td><br></td>
+                        <td></td>
                         <td>P</td>
                     </tr>
                     <tr>
@@ -1196,15 +1205,20 @@
 
         <p>In beiden Fällen ist nun der Zeiger 7A/7B um eine Stelle weitergerückt und der Inhalt der dadurch angezeigten Speicherstelle wird in den Akku geladen. Zwei Dinge können wir uns aus diesem kurzen Programmteil merken:</p>
 
-        <p>1) Wie man eine 16-Bit-Zahl hoch-(oder auch herunter-) zählt und<br>
-            2) eine Möglichkeit, Zeiger einzusetzen. Wir werden noch eine Reihe anderer Zeigertypen kennenlernen und sehen, daß es nicht immer so direkt zugeht wie hier.</p>
+        <ol>
+            <li>Wie man eine 16-Bit-Zahl hoch-(oder auch herunter-) zählt und</li>
+            <li>eine Möglichkeit, Zeiger einzusetzen. Wir werden noch eine Reihe anderer Zeigertypen kennenlernen und sehen, daß es nicht immer so direkt zugeht wie hier.</li>
+        </ol>
 
-        <p>Im zweiten Teil finden wir die Prüfroutinen. Die Vergleichsbefehle beschränken sich auf den Akkuinhalt, also CMP.<br>
-            CMP # 3A testet, in welcher Beziehung das im Akku befindliche Zeichen zum Wert $3A = dezimal 58 steht. Erinnern wir uns an das Schema in Bild 1:</p>
+        <p>Im zweiten Teil finden wir die Prüfroutinen. Die Vergleichsbefehle beschränken sich auf den Akkuinhalt, also CMP.</p>
 
-        <p>1) Commodore-ASCII-Code im Akku größer als 58, also Zeichen hinter dem Doppelpunkt (Buchstaben, Grafikzeichen, einige Sonderzeichen). Dann ist die Carry-Flagge = 1, N- und Z-Flagge sind 0.<br>
-            2) Im Akku steht genau der Code 58, also der Doppelpunkt. Dann sind Carry-Bit und Z-Flagge = 1, nur die N-Flagge = 0.<br>
-            3) Der Code des Zeichens im Akku ist kleiner als 58 (das wären alle Zahlen, einige Sonderzeichen und Steuerzeichen). In diesem Fall ist die N-Flagge = 1. Die beiden anderen Flaggen zeigen Null.</p>
+        <p class="noindent">CMP # 3A testet, in welcher Beziehung das im Akku befindliche Zeichen zum Wert $3A = dezimal 58 steht. Erinnern wir uns an das Schema in Bild 1:</p>
+
+        <ol>
+            <li>Commodore-ASCII-Code im Akku größer als 58, also Zeichen hinter dem Doppelpunkt (Buchstaben, Grafikzeichen, einige Sonderzeichen). Dann ist die Carry-Flagge = 1, N- und Z-Flagge sind 0.</li>
+            <li>Im Akku steht genau der Code 58, also der Doppelpunkt. Dann sind Carry-Bit und Z-Flagge = 1, nur die N-Flagge = 0.</li>
+            <li>Der Code des Zeichens im Akku ist kleiner als 58 (das wären alle Zahlen, einige Sonderzeichen und Steuerzeichen). In diesem Fall ist die N-Flagge = 1. Die beiden anderen Flaggen zeigen Null.</li>
+        </ol>
 
         <p>Der nun folgende Befehl BCS 008A überprüft die Carry-Flagge. Wenn sie gesetzt ist, wenn also der Code im Akku größer oder gleich dem eines Doppelpunktes (58) ist, springt der Programmzähler zum RTS. Der Code (und auch die Flaggen) wird unverändert zum aufrufenden Hauptprogramm weitergegeben. Zur Übung können Sie ja nochmal den Offset nachrechnen. Der Rest des Programms wird nur noch durchlaufen, wenn Codes kleiner als 58 im Akku stehen.</p>
 
@@ -1212,41 +1226,72 @@
 
         <p>Durch zwei aufeinanderfolgende Subtraktionen, die insgesamt den Wert im Akku unverändert lassen (es wird 256 abgezogen), wird die Carry-Flagge beeinflußt. Verfolgen wir, was da passiert:</p>
 
-        <p>SEC dient als Vorbereitung für die folgende Subtraktion.<br>
-            SBC # 30 zieht vom Akku-Inhalt $30 = dezimal 48 ab. Wir wissen inzwischen, daß das der Addition des Zweierkomplementes entspricht. Dieses ist (rechnen Sie mal nach!) 1101 0000.<br>
-            Nehmen wir mal an, wir hätten den Code der Zahl 4 (also dezimal 52 oder $34) im Akku stehen. Die Rechnung sieht dann so aus:</p>
+        <ul class="plain">
+            <li>SEC dient als Vorbereitung für die folgende Subtraktion.</li>
+            <li>SBC # 30 zieht vom Akku-Inhalt $30 = dezimal 48 ab. Wir wissen inzwischen, daß das der Addition des Zweierkomplementes entspricht. Dieses ist (rechnen Sie mal nach!) 1101&nbsp;0000.</li>
+        </ul>
 
-        <p>TODO</p>
+        <p class="noindent">Nehmen wir mal an, wir hätten den Code der Zahl 4 (also dezimal 52 oder $34) im Akku stehen. Die Rechnung sieht dann so aus:</p>
+
+        <figure>
+            <table class="plain center1">
+                <tr><td>52</td><td></td><td>0011</td><td>0100</td></tr>
+                <tr><td></td><td>+</td><td class="separator">1101</td><td class="separator">0000</td></tr>
+                <tr><td></td><td>(1)</td><td>0000</td><td>0100</td></tr>
+            </table>
+        </figure>
 
         <p>Das Ergebnis ist also 4, der Übertrag wird vernachlässigt.</p>
 
-        <p>Als anderes Beispiel sei nun der Code für das Ausrufungszeichen im Akku (dezimal 33 = $21 = binär 0010 0001). Die Rechnung ist dann:</p>
+        <p>Als anderes Beispiel sei nun der Code für das Ausrufungszeichen im Akku (dezimal 33 = $21 = binär 0010&nbsp;0001). Die Rechnung ist dann:</p>
 
-        <p>TODO</p>
+        <figure>
+            <table class="plain">
+                <tr><td>33</td><td>0010</td><td>0001</td></tr>
+                <tr><td>+</td><td class="separator">1101</td><td class="separator">0000</td></tr>
+                <tr><td></td><td>1111</td><td>0001</td></tr>
+            </table>
+        </figure>
 
         <p>Das Ergebnis ist —15.</p>
 
         <p>Alle Codes, die nicht für Zahlen stehen, haben nach dieser Subtraktion ein negatives Ergebnis im Akku hinterlassen und durch das »Borgen« das Carry-Bit gelöscht.</p>
 
-        <p>Nun machen wir weiter ab Zeile 0087:<br>
-            SEC<br>
-            SBC #D0</p>
+        <p>Nun machen wir weiter ab Zeile 0087:
+            <code>SEC
+                SBC #D0
+            </code>
+        </p>
 
         <p>Wir ziehen $D0 = dezimal 208 ab. Das Zweierkomplement ist: &hellip;Doch da kommen wir ins Stocken! Denn dieses Zweierkomplement ist nicht mehr mit 8-Bit-Zahlen darzustellen. Schon die Zahl 208 im Binärformat (1101 0000) würde als negative Zahl angesehen werden, weil Bit 7 gleich 1 ist. Wir machen es uns einfach und sagen, daß sich das Zweierkomplement wie bisher bilden läßt, aber dabei das Carry-Bit mit einbezogen wird. Unser Zweierkomplement ist dann also: 0011 0000 und das Carry-Bit ist gelöscht. Nun nehmen wir unser erstes Beispiel. Dort war nach der Subtraktion im Akku eine 4 verblieben:</p>
 
-        <p>TODO</p>
+        <figure>
+            <table class="plain center0">
+                <tr><td></td><td>0000</td><td>0100</td></tr>
+                <tr><td>+</td><td class="separator">0011</td><td class="separator">0000</td></tr>
+                <tr><td></td><td>0011</td><td>0100</td></tr>
+            </table>
+        </figure>
 
         <p>Das ist wieder unser ursprünglicher Wert dezimal 52 = $34 = Code für die Zahl 4. Das Carry-Bit bleibt gelöscht.</p>
 
         <p>Im zweiten Beispiel mit dem Ausrufungszeichen stand noch im Akku eine —15:</p>
 
-        <p>TODO</p>
+        <figure>
+            <table class="plain center0">
+                <tr><td></td><td>1111</td><td>0001</td></tr>
+                <tr><td>+</td><td class="separator">0011</td><td class="separator">0000</td></tr>
+                <tr><td>(1)</td><td>0010</td><td>0001</td></tr>
+            </table>
+        </figure>
 
         <p>Da haben wir wieder den Code für das Ausrufungszeichen ($21 = dezimal 33) im Akku und ein gesetztes Carry-Bit. Was kommt also bei der CHRGET-Routine heraus?</p>
 
-        <p>1) Alle Zeichen außer dem Space werden unverändert an das aufrufende Programm über den Akku weitergegeben. Space wird unterdrückt.<br>
-            2) Bei allen Zeichen außer bei den Zahlen ist das Carry-Bit gesetzt.<br>
-            3) Manche der aufrufenden Routinen überprüfen außer dem Zustand der Carry-Flagge auch den der Z- oder N-Flagge, die ja beim ersten CMP-Befehl ebenfalls gesetzt werden. So liefert die CHRGET-Routine noch weitere Informationen.</p>
+        <ol>
+            <li>Alle Zeichen außer dem Space werden unverändert an das aufrufende Programm über den Akku weitergegeben. Space wird unterdrückt.</li>
+            <li>Bei allen Zeichen außer bei den Zahlen ist das Carry-Bit gesetzt.</li>
+            <li>Manche der aufrufenden Routinen überprüfen außer dem Zustand der Carry-Flagge auch den der Z- oder N-Flagge, die ja beim ersten CMP-Befehl ebenfalls gesetzt werden. So liefert die CHRGET-Routine noch weitere Informationen.</li>
+        </ol>
 
         <p>In der einschlägigen Literatur stoßen Sie auch auf eine Routine, die CHRGOT genannt wird. Es handelt sich dabei ebenfalls um die hier beschriebene CHRGET-Routine, nur erfolgt der Einsprung nicht bei $0073, sondern bei $0079.</p>
 

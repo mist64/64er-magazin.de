@@ -32,7 +32,7 @@
 
         <h2>AS-64: auf Modul und Diskette</h2>
 
-        <p>Ansonsten gibt es alles, was man von Textverarbeitungen her kennt: »Cursor up« und »Cursor down« ermöglichen zeilenweises, »Home« und Fl seitenweises »Blättern« vorwärts und rückwärts. Mit »SHIFT Home« gelangt man an den Anfang des Textes, mit F2 ans Ende. Mit F3 wird eine ganze Zeile eingefügt, mit F4 gelöscht. Die Tasten F7 und F8 erfüllen eine Spezialfunktion für Labels. Mit F7 werden sechs Leerzeichen eingefügt, mit F8 kann man von der Cursorposition bis zum linken Rand löschen. Damit lassen sich bequem zusätzliche Labels einbauen oder löschen. Wie der Assembler ist auch der Editor auf maximale Geschwindigkeit ausgelegt. Der Quelltext wird als Bildschirmcode im Speicher abgelegt, so entfällt eine dauernde Umrechnung in ASCII. Die damit erreichte Geschwindigkeit ist enorm. 30 KByte, das entspricht zirka 35 A4 Seiten Quelltext, kann man mit Fl in weniger als 10 (!) Sekunden durchblättern. Ich kenne kein Textsystem, mit dem das möglich wäre.</p>
+        <p>Ansonsten gibt es alles, was man von Textverarbeitungen her kennt: »Cursor up« und »Cursor down« ermöglichen zeilenweises, »Home« und F1 seitenweises »Blättern« vorwärts und rückwärts. Mit »SHIFT Home« gelangt man an den Anfang des Textes, mit F2 ans Ende. Mit F3 wird eine ganze Zeile eingefügt, mit F4 gelöscht. Die Tasten F7 und F8 erfüllen eine Spezialfunktion für Labels. Mit F7 werden sechs Leerzeichen eingefügt, mit F8 kann man von der Cursorposition bis zum linken Rand löschen. Damit lassen sich bequem zusätzliche Labels einbauen oder löschen. Wie der Assembler ist auch der Editor auf maximale Geschwindigkeit ausgelegt. Der Quelltext wird als Bildschirmcode im Speicher abgelegt, so entfällt eine dauernde Umrechnung in ASCII. Die damit erreichte Geschwindigkeit ist enorm. 30 KByte, das entspricht zirka 35 A4 Seiten Quelltext, kann man mit Fl in weniger als 10 (!) Sekunden durchblättern. Ich kenne kein Textsystem, mit dem das möglich wäre.</p>
 
         <p>Natürlich hat dies seinen Preis: Schreibt man bei einer Änderung nämlich über ein Zeilenende hinaus, ohne vorher mit »Insert« die erforderliche Anzahl Leerzeichen einzufügen, springt der Editor in die nächste Zeile und überschreibt den dort stehenden Text. Eingewöhnung ist also nötig. Besser wäre hier eine Art »Insert-Modus«, mit dem man automatisch Text einfügen könnte.</p>
 
@@ -54,7 +54,7 @@
 
         <p>Einen 14 KByte langen Quelltext (Super Copy) assembliert AS-64 in fünf (!) Sekunden. Der bisher schnellste mir bekannte Assembler (MAE) braucht dafür immerhin 65 Sekunden. Aus einem 29 KByte langen Quelltext macht AS-64 in 11 Sekunden zirka 5 KByte Objektcode.</p>
 
-        <p>Erhöhter Zeitbedarf ergibt sich nur dann, wenn die Quelltexte länger als 30 KByte werden. Dann müssen nämlich Teile von Diskette nachgeladen werden. Auch diese Art der Assemblierung unterstützt AS-64: Wird ein Quelltext nicht mit ».EN«, sondern mit »CT "name"« abgeschlossen, wird automatisch das Quelltextteil »name« von Diskette geholt und assembliert. Damit ist die Verarbeitung von beliebig langen Maschinenprogrammen möglich. Allerdings dürfte das nur in den seltensten Fällen nötig sein. Durch geschickte Speicherverwaltung sind bei AS-64 nämlich Quelltexte bis zu 30 KByte Länge möglich. Beim Assemblieren wird der Editor abgeschaltet, so daß im darunterliegenden RAM die Labeltabelle angelegt werden kann. Der erzeugte Objectcode kann mit dem Pseudo-Opcode ».MC« zum Beispiel nach $E000 unter das Betriebssystem gelegt und von dort später mit einer Spezialfunktion des Monitors wieder an die richtige Adresse verschoben werden. Dies ist das zweite große Plus von AS-64.</p>
+        <p>Erhöhter Zeitbedarf ergibt sich nur dann, wenn die Quelltexte länger als 30 KByte werden. Dann müssen nämlich Teile von Diskette nachgeladen werden. Auch diese Art der Assemblierung unterstützt AS-64: Wird ein Quelltext nicht mit ».EN«, sondern mit ».CT "name"« abgeschlossen, wird automatisch das Quelltextteil »name« von Diskette geholt und assembliert. Damit ist die Verarbeitung von beliebig langen Maschinenprogrammen möglich. Allerdings dürfte das nur in den seltensten Fällen nötig sein. Durch geschickte Speicherverwaltung sind bei AS-64 nämlich Quelltexte bis zu 30 KByte Länge möglich. Beim Assemblieren wird der Editor abgeschaltet, so daß im darunterliegenden RAM die Labeltabelle angelegt werden kann. Der erzeugte Objectcode kann mit dem Pseudo-Opcode ».MC« zum Beispiel nach $E000 unter das Betriebssystem gelegt und von dort später mit einer Spezialfunktion des Monitors wieder an die richtige Adresse verschoben werden. Dies ist das zweite große Plus von AS-64.</p>
 
         <p>Fehlermeldungen bei der Assemblierung werden übrigens im Klartext und auf Deutsch ausgegeben (Sprung zu weit, Label doppelt etc.). Der Assembler stoppt dann die weitere Assemblierung. Allerdings erhält man keinen Hinweis darauf, an welcher Stelle im Quelltext der Fehler aufgetreten ist, vielmehr ist man auf die »FIND«-Funktion des Editors angewiesen. Angenehmer wäre es, wenn bei einem Fehler automatisch der Editor angesprungen und die fehlerhafte Zeile markiert würde.</p>
 
@@ -161,7 +161,7 @@
 
         <h3>Makros</h3>
 
-        <p>Auch bei den Makros hapert es ein wenig. Es ist zwar eine beliebige Verschachtelung von Makros erlaubt, (bis auf Selbstaufrufe), aber es gibt keine Möglichkeit, in einem Makro lokale Label zu definieren, ohne sie nicht als Parameter zu übergeben. Also schon eine einfache Schleife in einem Makro, die über einen Labelsprung erfolgen soll, ist äußerst kompliziert und unübersichtlich zu programmieren. Jedes Makro mit internen Labeln dürfte nur einmal aufgerufen werden, soll kein LABEL DECLARED TWICE-Fehler auftreten. In diesen Fällen sollte man bei T.EX.AS. lieber auf Makros verzichten. Dafür ist der Aufbau einer Makrobibliothek sehr einfach, weiljedes Makro als Einzelfile auf der Diskette stehen und bei Bedarf aufgerufen werden kann.</p>
+        <p>Auch bei den Makros hapert es ein wenig. Es ist zwar eine beliebige Verschachtelung von Makros erlaubt, (bis auf Selbstaufrufe), aber es gibt keine Möglichkeit, in einem Makro lokale Label zu definieren, ohne sie nicht als Parameter zu übergeben. Also schon eine einfache Schleife in einem Makro, die über einen Labelsprung erfolgen soll, ist äußerst kompliziert und unübersichtlich zu programmieren. Jedes Makro mit internen Labeln dürfte nur einmal aufgerufen werden, soll kein LABEL DECLARED TWICE-Fehler auftreten. In diesen Fällen sollte man bei T.EX.AS. lieber auf Makros verzichten. Dafür ist der Aufbau einer Makrobibliothek sehr einfach, weil jedes Makro als Einzelfile auf der Diskette stehen und bei Bedarf aufgerufen werden kann.</p>
 
         <h3>Monitorähnliche Funktionen</h3>
 
@@ -189,9 +189,12 @@
 
         <h3>Dokumentation</h3>
 
-        <p>T.EX.AS. ist der wohl einzige Assembler, der auch mit einem, auf ihn abgestimmten, Assemblerlehrbuch ausgeliefert wird. Es ist ziemlich ausführlich und fängt wirklich bei Null an. Auch die Anleitung selbst ist nicht schlecht. An manchen Stellen, die Anfängern Schwierigrkeiten bereiten könnten, wird auf die entsprechenden Kapitel im anderen Buch verwiesen. Wenn ich ein ehrliches Fazit ziehen soll, muß ich sagen, daß T.EX.AS zu teuer ist. Mit 298 Mark ist T.EX.AS. zwar ein gutes Lehrsystem, aber professionelle Programmierer, und solche die es werden wollen, werden bei T.EX.AS. einiges vermissen. (Boris Schneider/gk) Bezugsquelle:</p>
+        <p>T.EX.AS. ist der wohl einzige Assembler, der auch mit einem, auf ihn abgestimmten, Assemblerlehrbuch ausgeliefert wird. Es ist ziemlich ausführlich und fängt wirklich bei Null an. Auch die Anleitung selbst ist nicht schlecht. An manchen Stellen, die Anfängern Schwierigrkeiten bereiten könnten, wird auf die entsprechenden Kapitel im anderen Buch verwiesen. Wenn ich ein ehrliches Fazit ziehen soll, muß ich sagen, daß T.EX.AS zu teuer ist. Mit 298 Mark ist T.EX.AS. zwar ein gutes Lehrsystem, aber professionelle Programmierer, und solche die es werden wollen, werden bei T.EX.AS. einiges vermissen.</p>
 
-        <p class="source">Interface Age Verlag GmbH, Vohburgerstr. 1, 8000 München 21, Preis: 298 Mark</p>
+        <address class="author">(Boris Schneider/gk)</address>
+
+        <p class="source">Bezugsquelle<br>
+            Interface Age Verlag GmbH, Vohburgerstr. 1, 8000 München 21, Preis: 298 Mark</p>
 
         <h2>ASSI/M</h2>
 
@@ -227,13 +230,13 @@
 
         <p>Und weil die Definition von Makro-Bibliotheken genauso einfach geht, wie die schon oben erwähnte von Unterprogrammen, werden zwei Makrobibliotheken mitgeliefert. Die eine enthält 17 Makros, die hauptsächlich der 16-Bit-Arithmetik dienen, sowie einen User-Stack definieren, auf dem, ähnlich dem normalen Stack, Daten nach dem First in/Last out Prinzip gespeichert werden können.</p>
 
-        <p>Die andere ist fast schon sensationell zu nennen, denn sie ermöglicht strukturierte Assemblerprogrammierung. Es stehen dann Befehle wie IF..THEN..ELSE..,REPEAT..EXIT, REPEAT. UNTIL und ähnliches in Assembler zur Verfügung. Da diese Bibliotheken jederzeit erweitert werden können, bilden sie einen idealen Grundstock für jeden Assemblerprogrammierer.</p>
+        <p>Die andere ist fast schon sensationell zu nennen, denn sie ermöglicht strukturierte Assemblerprogrammierung. Es stehen dann Befehle wie IF..THEN..ELSE..,REPEAT..EXIT,REPEAT..UNTIL und ähnliches in Assembler zur Verfügung. Da diese Bibliotheken jederzeit erweitert werden können, bilden sie einen idealen Grundstock für jeden Assemblerprogrammierer.</p>
 
         <h3>Der Monitor (DEMON)</h3>
 
         <p>Und auch das dritte Programm fügt sich nahtlos in das System ein. DEMON ist ein sehr komfortabler Maschinensprachemonitor. Er ist ideal zum Austesten von Programmen geeignet. Schwerpunkte sind die hervorragende Breakpointbehandlung und die Trace-Modi.</p>
 
-        <p>Beim Austesten eines Programmes können bis zu fünf normale Breakpoints gesetzt werden. Gelangt der Programmcounter an einen Breakpoint, so wird automatisch in den Einzelschrittmodus des DEMON gesprungen, wo Sie sich den weiteren Verlauf des Programms Schritt für Schritt anschauen können. Zusätzlich ist ein User-Breakpoint definierbar. Sie stellen zum Beispiel den Fehler fest, daß Ihr Programm bestimmte Speicherstellen überschreibt, die wichtig sind. Nun schreiben Sie ein kleines User-Breakpointprogramm, das nach Abarbeitung jedes Befehls angesprungen wird und diese Speicherstellen überwacht. So können Sie in wenigen Minuten Fehler ausfindig machen, an denen Sie sonst Stunden herumknobeln würden. Auch ganz verrückte Abfragen wie: »Wann ist die Summe von X und Y Register kleiner als $93 ?«sind als Userbreakpoint realisierbar. Schon kurz angesprochen wurde der Einzelschrittmodus. Außer dem normalen Abarbeiten und Anzeigen jedes Befehls ist es möglich, Sprünge, die über eine bestimmte Adresse hinaus gehen, direkt ausführen zu lassen. Das spart ernorm Zeit, wenn viele ROM-Routinen verwendet werden.</p>
+        <p>Beim Austesten eines Programmes können bis zu fünf normale Breakpoints gesetzt werden. Gelangt der Programmcounter an einen Breakpoint, so wird automatisch in den Einzelschrittmodus des DEMON gesprungen, wo Sie sich den weiteren Verlauf des Programms Schritt für Schritt anschauen können. Zusätzlich ist ein User-Breakpoint definierbar. Sie stellen zum Beispiel den Fehler fest, daß Ihr Programm bestimmte Speicherstellen überschreibt, die wichtig sind. Nun schreiben Sie ein kleines User-Breakpointprogramm, das nach Abarbeitung jedes Befehls angesprungen wird und diese Speicherstellen überwacht. So können Sie in wenigen Minuten Fehler ausfindig machen, an denen Sie sonst Stunden herumknobeln würden. Auch ganz verrückte Abfragen wie: »Wann ist die Summe von X und Y Register kleiner als $93 ?« sind als Userbreakpoint realisierbar. Schon kurz angesprochen wurde der Einzelschrittmodus. Außer dem normalen Abarbeiten und Anzeigen jedes Befehls ist es möglich, Sprünge, die über eine bestimmte Adresse hinaus gehen, direkt ausführen zu lassen. Das spart ernorm Zeit, wenn viele ROM-Routinen verwendet werden.</p>
 
         <p>Natürlich sind sämtliche Monitor-Standardfunktionen wie Hex-Dumps, Disassemblieren, Suchen von Bytes und Zeichenketten, Laden und Speichern, Vergleichen und Verschieben von Speicherbereichen (auch mit Adreßangleichung bei Programmen), ein Mini-Assembler, Registeranzeige etc. integriert.</p>
 
@@ -275,21 +278,17 @@
                         <td>max. 16 Zeichen</td>
                     </tr>
                     <tr>
-                        <td valign="middle">
-                            <p>Monitor
-                        </td>
+                        <td>Monitor</td>
                         <td>je nach Version nachladbar oder resident</td>
                         <td>DEMON wird mitgeliefert</td>
-                        <td valign="middle">
-                            <p>—
-                        </td>
+                        <td class="center">—</td>
                         <td>viele monitorähnliche Funktionen</td>
                     </tr>
                     <tr>
                         <td>Re-Assembler</td>
                         <td>wird mitgeliefert</td>
-                        <td>—</td>
-                        <td></td>
+                        <td class="center">—</td>
+                        <td class="center">—</td>
                         <td>eingebaut</td>
                     </tr>
                     <tr>
