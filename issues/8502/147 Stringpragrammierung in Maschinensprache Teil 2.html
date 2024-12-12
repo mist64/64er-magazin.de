@@ -28,13 +28,13 @@
 
         <h3>Problem: Strings auffüllen</h3>
 
-        <p>Vielleicht haben auch Sie in einigen Programmen diese oder eine ähnliche Zeile entdeckt:<br />
+        <p>Vielleicht haben auch Sie in einigen Programmen diese oder eine ähnliche Zeile entdeckt:<br>
             170 IF LEN(A$)&lt;40 THEN A$=A$+&ldquo; &rdquo;: GOTO 170</p>
 
         <p>Die Bedeutung ist klar: Hier soll der String A$ auf 40 Zeichen Länge aufgefüllt werden. Aber schon jetzt müßte es Ihnen eiskalt den Rücken herunterlaufen. Angenommen, A$ hätte zu Anfang 20 Zeichen, dann werden mindestens 20 Müllstrings durch die ständige Zuweisung erzeugt. Sollte diese Auffüllung öfter durchgeführt werden, darf man sich nicht wundern, wenn bald der ganze Speicher voll ist.</p>
 
-        <p>Eine weitere Lösung sieht meist so aus:<br />
-            10 H$ = &ldquo;40 * space&rdquo;<br />
+        <p>Eine weitere Lösung sieht meist so aus:<br>
+            10 H$ = &ldquo;40 * space&rdquo;<br>
             170 A$ = A$ + LEFT$(H$,40-LEN (A$))</p>
 
         <p>Schon sehr viel besser! Es entstehen zwei Müllstrings (der alte Wert von A$ und einer, der durch die LEFT$-Funktion entsteht und nur Leerzeichen enthält). Es wird außerdem eine Variable H$ benötigt.</p>
@@ -56,18 +56,18 @@
             <figcaption>Listing 1. Die FORMATRoutine (nähere Erklärung im Text).</figcaption>
         </figure>
 
-        <p>Diese FORMAT-Routine simuliert einen neuen Basic-Befehl. FORMAT füllt einen String mit Leerzeichen, bis eine definierte Länge erreicht ist. Wenn ein String länger ist, wird er abgeschnitten. Der Aufruf muß allerdings über einen SYS-Befehl erfolgen. Steht FORMAT beispielsweise im Kassettenpuffer, so führt<br />
-            CLR: SYS 826 (A$,250,A$)<br />
+        <p>Diese FORMAT-Routine simuliert einen neuen Basic-Befehl. FORMAT füllt einen String mit Leerzeichen, bis eine definierte Länge erreicht ist. Wenn ein String länger ist, wird er abgeschnitten. Der Aufruf muß allerdings über einen SYS-Befehl erfolgen. Steht FORMAT beispielsweise im Kassettenpuffer, so führt<br>
+            CLR: SYS 826 (A$,250,A$)<br>
             dazu, daß A$ 250 Leerzeichen enthält.</p>
 
-        <p>A$ = &ldquo;HALLO&rdquo;: SYS 826 (A$,10,B$)<br />
+        <p>A$ = &ldquo;HALLO&rdquo;: SYS 826 (A$,10,B$)<br>
             läßt A$ wie es war, B$ enthält aber »HALLO« und 5 angehängte Leerzeichen, hat also die Länge 10.</p>
 
-        <p>A$ = &ldquo;TEST&rdquo;:N = l:SYS 826 (A$, N,B$(0))<br />
+        <p>A$ = &ldquo;TEST&rdquo;:N = l:SYS 826 (A$, N,B$(0))<br>
             hinterläßt in B$(0) ein einsames T, der Rest wird abgeschnitten.</p>
 
-        <p>Zusammengefaßt läßt sich also sagen, daß bei der Parameterübergabe:<br />
-            (String1, N, String2)<br />
+        <p>Zusammengefaßt läßt sich also sagen, daß bei der Parameterübergabe:<br>
+            (String1, N, String2)<br>
             in String2 genau N Zeichen aus String1 stehen, und daß gegebenenfalls String2 mit Leerzeichen aufgefüllt wird.</p>
 
         <p>Nur wenn »String1« den gleichen Namen hat wie »String2«, entsteht ein Müllstring, nämlich der alte Inhalt der Stringvariablen. Für die, die es nun gar nicht mehr erwarten können, dieses Programm auszuprobieren, gibt es in Listing 2 einen Basic-Lader. Listing 1 kann direkt mit einem Assembler oder auch mit dem SMON eingegeben werden. Anhand dieses Programms, das alle wichtigen ROM-Routinen, die mit Strings zu tun haben, aufruft, wollen wir nun die Programmierung solcher Routinen erarbeiten.</p>
@@ -124,8 +124,8 @@
 
         <p>Bevor noch einmal alle wichtigen ROM-Routinen zusammengefaßt werden, möchte ich Ihnen ein Beispiel geben, wie man sehr leicht Fehler in eine Stringfunktion einbauen kann, die nicht sofort erkennbar sind. Auch hier ist ein Blick auf die Garbage Collection angebracht.</p>
 
-        <p>Wie oben schon erklärt wurde, erzeugt die Zuweisung<br />
-            B$ = LEFT$(A$,3)<br />
+        <p>Wie oben schon erklärt wurde, erzeugt die Zuweisung<br>
+            B$ = LEFT$(A$,3)<br>
             einen zweiten String, der nur die drei ersten Zeichen von A$ enthält und auf den Descriptor von B$ zeigt. Manche Leser mögen jetzt folgende Ideen haben:</p>
 
         <p>Theoretisch ist es ja nicht notwendig, einen zweiten String mit den drei Zeichen zu erstellen. Vielmehr könnte man ja den Descriptor von B$ auf dieselbe Position wie den von A$ zeigen lassen. Im B$-Descriptor wird dann die Stringlänge 3 angegeben, während die in A$ gleich bleibt.</p>

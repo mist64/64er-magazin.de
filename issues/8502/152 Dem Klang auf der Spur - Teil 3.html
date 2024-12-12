@@ -81,45 +81,45 @@
 
         <h3>Frequenz low/high (Register 0 und 1)</h3>
 
-        <p>Die beiden Register 0 und 1 steuern die Frequenz von DCO1 mit einer Genauigkeit von 16 Bit. Register 0 enthält das niederwertige, Register 1 das höherwertige Byte einer 16-Bit-Größe F. Zwischen der Ausgangsfrequenz f und der Zahl F besteht der Zusammenhang:<br />
+        <p>Die beiden Register 0 und 1 steuern die Frequenz von DCO1 mit einer Genauigkeit von 16 Bit. Register 0 enthält das niederwertige, Register 1 das höherwertige Byte einer 16-Bit-Größe F. Zwischen der Ausgangsfrequenz f und der Zahl F besteht der Zusammenhang:<br>
             (1) f = F × T/2↑24(Hz)</p>
 
-        <p>Dabei ist T die Taktfrequenz der CPU, die auch am SID anliegt. Sie beträgt bei der deutschen Version des C 64 0,985248 MHz<br />
-            Damit gilt:<br />
-            (2) f = F × 0,0587254 (Hz) oder<br />
+        <p>Dabei ist T die Taktfrequenz der CPU, die auch am SID anliegt. Sie beträgt bei der deutschen Version des C 64 0,985248 MHz<br>
+            Damit gilt:<br>
+            (2) f = F × 0,0587254 (Hz) oder<br>
             (3) F = f × 17,0284</p>
 
-        <p>Die Gleichungen (2) und (3) zeigen, daß sich die Frequenzen der DCOs sehr fein, in Schritten zu zirka 1/17 Hz, programmieren lassen. Möchte man eine vorgegebene Frequenz f (im Beispiel FAUS) erzeugen, so errechnet man F nach (3),<br />
-            10 FAUS = 440<br />
-            20 F = FAUS * 17.0284<br />
-            man zerlegt F in das Low- und das High-Byte,<br />
-            30 F = INT(F + 0.5) :REM RUNDUNG<br />
-            40 HI = INT(F/256)<br />
-            50 LO = F - 256*HI<br />
-            und besetzt Register 0 und 1 damit<br />
-            60 SID = 54272 :REM BASISADRESSE<br />
-            70 POKE SID,LO<br />
+        <p>Die Gleichungen (2) und (3) zeigen, daß sich die Frequenzen der DCOs sehr fein, in Schritten zu zirka 1/17 Hz, programmieren lassen. Möchte man eine vorgegebene Frequenz f (im Beispiel FAUS) erzeugen, so errechnet man F nach (3),<br>
+            10 FAUS = 440<br>
+            20 F = FAUS * 17.0284<br>
+            man zerlegt F in das Low- und das High-Byte,<br>
+            30 F = INT(F + 0.5) :REM RUNDUNG<br>
+            40 HI = INT(F/256)<br>
+            50 LO = F - 256*HI<br>
+            und besetzt Register 0 und 1 damit<br>
+            60 SID = 54272 :REM BASISADRESSE<br>
+            70 POKE SID,LO<br>
             80 POKE SID + 1,HI</p>
 
         <h3>Pulsweite low/high (Register 2 und 3)</h3>
 
-        <p>Der Inhalt dieser Register steuert das Tastverhältnis der Rechteckkurve. Er ist nur dann bedeutend, wenn als Kurvenform das Rechteck gewählt wird. Die Pulsweite kann auf 12 Bit genau festgelegt werden. Register 2 enthält das Low-Byte, Register 3 das High-Byte, von dem nur die unteren 4 Bits (P8 bis P11) berücksichtigt werden. Zwischen der 12-Bit-Größe P und dem Tastverhältnis PAUS besteht der Zusammenhang:<br />
-            (4) PAUS = P / 40.95 (%)<br />
-            oder<br />
+        <p>Der Inhalt dieser Register steuert das Tastverhältnis der Rechteckkurve. Er ist nur dann bedeutend, wenn als Kurvenform das Rechteck gewählt wird. Die Pulsweite kann auf 12 Bit genau festgelegt werden. Register 2 enthält das Low-Byte, Register 3 das High-Byte, von dem nur die unteren 4 Bits (P8 bis P11) berücksichtigt werden. Zwischen der 12-Bit-Größe P und dem Tastverhältnis PAUS besteht der Zusammenhang:<br>
+            (4) PAUS = P / 40.95 (%)<br>
+            oder<br>
             (5) P = PAUS * 40.95</p>
 
-        <p>Die Programmierung gestaltet sich dann in der Praxis analog zu der der Frequenz:<br />
-            90 PAUS = 50<br />
-            100 P = PAUS * 40.95<br />
-            110 P = INT(P + 0.5) :REM RUNDUNG<br />
-            120 HI = INT (P/256)<br />
-            130 LO = P - 256*HI<br />
-            140 POKE SID + 2,LO<br />
+        <p>Die Programmierung gestaltet sich dann in der Praxis analog zu der der Frequenz:<br>
+            90 PAUS = 50<br>
+            100 P = PAUS * 40.95<br>
+            110 P = INT(P + 0.5) :REM RUNDUNG<br>
+            120 HI = INT (P/256)<br>
+            130 LO = P - 256*HI<br>
+            140 POKE SID + 2,LO<br>
             150 POKE SID + 3,HI</p>
 
         <h3>Kontrollregister (Register 4)</h3>
 
-        <p>Jedes Bit dieses Registers hat eine eigene Bedeutung.<br />
+        <p>Jedes Bit dieses Registers hat eine eigene Bedeutung.<br>
             GATE (Bit 0)</p>
 
         <p>Dieses Bit steuert den Hüllkurvengenerator EG 1. Wird es gesetzt, startet EG1 eine Ättack-Decay-Sequenz. Die Hüllkurve bleibt anschließend auf dem programmierten Sustain-Pegel, bis das GATE-Bit zurückgesetzt wird. Durch das Zurücksetzen geht die Hüllkurve in die Release-(Auskling-)Phase.</p>
@@ -263,24 +263,24 @@
             <figcaption>Tabelle 2. Hüllkurvengeschwindigkeiten</figcaption>
         </figure>
 
-        <p>Decay und Release können direkt in die Register 5 und 6 geschrieben werden, während Attack und Sustain vorher mit 16 zu multiplizieren sind, was einer Linksverschiebung um vier binäre Stellen entspricht. Ein Beispiel:<br />
-            160 A = 2 :REM 16 MS<br />
-            170 D = 12 :REM 3 S<br />
-            180 S = 1<br />
-            190 R = 10 :REM 1.5 S<br />
-            200 POKE SID + 5,A*16 + D<br />
+        <p>Decay und Release können direkt in die Register 5 und 6 geschrieben werden, während Attack und Sustain vorher mit 16 zu multiplizieren sind, was einer Linksverschiebung um vier binäre Stellen entspricht. Ein Beispiel:<br>
+            160 A = 2 :REM 16 MS<br>
+            170 D = 12 :REM 3 S<br>
+            180 S = 1<br>
+            190 R = 10 :REM 1.5 S<br>
+            200 POKE SID + 5,A*16 + D<br>
             210 POKE SID + 6,S*16 + R</p>
 
-        <p>Nach vorläufigem Umgehen des Filters und Setzen der maximalen Lautstärke<br />
-            220 POKE SID + 23,0 :REM FILTER AUS<br />
-            230 POKE SID + 24,15 :REM LAUTSTÄRKE<br />
-            führt das Setzen des GATE-Bits:<br />
-            240 POKE SID + 4,65 :REM GATE AN<br />
-            zu einem vernünftigen Resultat. Zum Abschalten des Klanges kann man einfach das Kontrollregister mit 0 besetzen,<br />
-            270 POKE SID + 4,0<br />
-            doch dann hat DCO1 keine Gelegenheit, der Release-Phase entsprechend auszuklingen, da auch das Kurvenform-Bit (Nr. 6) zurückgesetzt ist. Besser ist also, Bit 6 gesetzt zu lassen: 250GETA$:IFA$ = &ldquo; "THEN 160<br />
-            260 REM WARTE AUF EINE TASTE<br />
-            270 POKE SID + 4,64 :REM GATE AUS<br />
+        <p>Nach vorläufigem Umgehen des Filters und Setzen der maximalen Lautstärke<br>
+            220 POKE SID + 23,0 :REM FILTER AUS<br>
+            230 POKE SID + 24,15 :REM LAUTSTÄRKE<br>
+            führt das Setzen des GATE-Bits:<br>
+            240 POKE SID + 4,65 :REM GATE AN<br>
+            zu einem vernünftigen Resultat. Zum Abschalten des Klanges kann man einfach das Kontrollregister mit 0 besetzen,<br>
+            270 POKE SID + 4,0<br>
+            doch dann hat DCO1 keine Gelegenheit, der Release-Phase entsprechend auszuklingen, da auch das Kurvenform-Bit (Nr. 6) zurückgesetzt ist. Besser ist also, Bit 6 gesetzt zu lassen: 250GETA$:IFA$ = &ldquo; "THEN 160<br>
+            260 REM WARTE AUF EINE TASTE<br>
+            270 POKE SID + 4,64 :REM GATE AUS<br>
             Die Basic-Zeilen zeigen natürlich keinen effizienten Programmierstil; sie sollen nur die Vorgehensweise darstellen.</p>
 
         <p>Auf die Steuerung des Filters und auf die Anwendung der Leseregister wird im nächsten Teil noch ausführlich eingegangen werden. So ist die Abfrage eines analogen Gebers (zum Beispiel Paddle) erst durch den SID möglich. Die sechs kleinen Beispielprogramme demonstrieren einige Effekte, die man mit den bis hierher beschriebenen Registern realisieren kann.</p>
