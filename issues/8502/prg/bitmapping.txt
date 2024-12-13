@@ -1,0 +1,71 @@
+
+
+;bitmapping ==1201==
+  100 rem *******************************
+  110 rem *** vc 20 bitmappingroutine ***
+  120 rem *** fuer speicher  >8 kbyte ***
+  130 rem ***                         ***
+  140 rem ***    a c h t u n g !      ***
+  150 rem ***    vor  dem  laden      ***
+  160 rem ***   >> poke  44,32 <<     ***
+  170 rem ***     eingeben !!!!       ***
+  180 rem *******************************
+  190 rem
+  200 rem
+  210 rem ---------- teil 1 -------------
+  220 rem
+  230 rem *** bildschirm einrichten
+  240 poke36864,13  : rem linker rand
+  250 poke36865,44  : rem oberer rand
+  260 poke36866,21  : rem 21 spalten
+  270 poke36867,19  : rem 18 zeilen (16*8)
+  280 poke36869,205 : rem zeichen ab 5120
+  290 rem
+  300 rem ---------- teil 2 -------------
+  310 rem
+  320 rem *** 189 zeichen in den bild-
+  330 rem *** schirmspeicher poken.
+  340 fort=0to188:poke4096+t,t
+  350 poke37888+t,6:next
+  360 rem
+  370 rem ---------- teil 3 -------------
+  380 rem
+  390 rem *** hiresscreen loeschen
+  400 fort=0to3024:poke5120+t,0:next
+  410 rem
+  420 rem ---------- teil 4 -------------
+  430 rem
+  440 rem
+  450 rem *** hier  wurde  als  demon-
+  460 rem *** strationsbeispiel   eine
+  470 rem *** sin-funktion eingesetzt.
+  480 forx=0to167
+  490 y=(sin(x*2*~/167)+1)*71.7
+  500 gosub 640
+  510 next
+  520 goto520
+  530 rem
+  540 rem ---------- teil 5 -------------
+  550 rem
+  560 rem ***    bitmappingroutine
+  570 rem ***    =================
+  580 rem *** die hochaufloesenden pixels
+  590 rem *** koennen  ueber  koordinaten
+  600 rem *** angesprochen werden.
+  610 rem *** die x-koordinate muss <168,
+  620 rem *** y muss  <144 sein.
+  630 rem
+  640 zx=int(x/8) : px=x-zx*8
+  650 zy=int(y/16): py=y-zy*16
+  660 rem *** die koordinaten  werden in
+  670 rem *** einen zeichen-  und  einen
+  680 rem *** pixelanteil aufgespalten.
+  690 ad=5120 +zx*16 +zy*336 +py
+  700 rem *** ad  ist  die zeilenadresse
+  710 rem *** eines  chatnrakters  im zei-
+  720 rem *** chengeneraror ram.
+  730 poke ad,peek (ad) or (2^ (7-px))
+  740 rem *** in dieser  zeile wird  das
+  750 rem *** gewuenschte pixel gesetzt.
+  760 return
+

@@ -1,0 +1,165 @@
+
+
+;familienplanung ==1201==
+   10 rem**********************
+   20 rem** familienplanung  **
+   30 rem** fuer vc 20       **
+   40 rem** bearbeitet von   **
+   50 rem** peter sprockhoff **
+   60 rem** roonstr. 11      **
+   70 rem** 4790 paderborn   **
+   80 rem** 4614 bytes       **
+   90 rem**********************
+  100 dima(24):rem werte fuer 2 jahre
+  110 print"{clr}** familienplanung **"
+  120 print"{down}{down}alle verwendeten datenmuessen zwischen dem"
+  130 print"1.1.1973 - 31.12.1999 liegen."
+  140 print"{down}die reihenfolge der   daten darf nicht unterbrochen werden."
+  150 print"{down}die jahresangabe muss 4-stellig erfolgen."
+  160 print"{down}sind daten auf disk ? ":gosub930
+  170 x=0:fori=1to1000:next:print"{clr}"
+  180 ifa=1theninput"{down} name: ";f$:gosub1310:goto200
+  190 ifa<>1theninput"{down}fuer wen sollen die   daten erfasst werden ?{down}";f$:goto270
+  200 print"{down}sollen weitere daten  hinzugefuegt werden ?":gosub930
+  210 :
+  220 rem pruefung ob nur 1 wert
+  230 :
+  240 ifa<>1andx<2thenprint"{clr}{down}ein wert ist nicht    ausreichend !":goto270
+  250 ifa<>1then330
+  260 ifx=1anda=0then310
+  270 ifx>=1anda=1thenprint"{clr}"
+  280 :
+  290 rem eingabe datum & zeit mit "," getrennt
+  300 :
+  310 x=x+1:print"{down}bitte den"x".ten wert eingeben."
+  320 print"tag,monat,jahr,zeit   ":inputd,m,y,t:gosub860:a(x)=h:goto200
+  330 gosub980:ifa<>1then350
+  340 gosub1380
+  350 print"{clr}{down}berechnung ("x"werte)":v=0:w=0:aa=0
+  360 z=(a(x)-a(1))/(x-1):b=0
+  370 :
+  380 rem maskenaufbau
+  390 :
+  400 print"{down}datum   {SHIFT--}uhr-{SHIFT--}dau{SHIFT--}ab-"
+  410 printtab(8)"{SHIFT--}zeit"tab(13)"{SHIFT--}er"tab(17)"{SHIFT--}weic        {SHIFT--}    {SHIFT--}   {SHIFT--}hung"
+  420 fori=0to21:printtab(i)"{up}-":next
+  430 fork=1tox:h=a(k):gosub1030:gosub1470:ifk=1thenprint"{up}":nextk
+  440 s=a(k)-a(k-1):print"{up}"tab(14)int((s/2.4)/10)
+  450 :
+  460 rem berechnung dauer und abweichung
+  470 :
+  480 u=s-z:a$=str$(int(u)):print"{up}"tab(18)a$
+  490 b=b+u*u
+  500 ifu>wthenw=u
+  510 ifu<vthenv=u
+  520 nextk:gosub960:ifa=0then110
+  530 ifa=1thenaa=1
+  540 :
+  550 rem ausgabe der dauer und abweichung
+  560 :
+  570 print"{clr}{down}ergebnisse:":print:w=int(0.5+w):v=-int(0.5+abs(v))
+  580 h=z:gosub1220:print"mittel"d;"tage";t;"std.";"{down}       (+";w;"/";v;")"
+  590 a=b/(x-1):a=sqr(a):print"{down}streuung"int(10*a+0.5)/10;"std."
+  600 :
+  610 rem pruefen ob werte geeignet
+  620 :
+  630 b$="sehr gut":ifa>14thenb$="gut"
+  640 ifa>24thenb$="befriedigend"
+  650 ifa>44thenb$="mangelhaft"
+  660 ifa>54thenb$="ungenuegend"
+  670 print"{down}bemerkung: werte sind "
+  680 print"     "+b$+".":print
+  690 print"{down}{down}{down}{down}{down}{down} bitte taste druecken"
+  700 poke198,0:wait198,1
+  710 :
+  720 rem ausgabe der pause und naechste daten
+  730 :
+  740 print"{clr}":s=a(x)+z
+  750 h=s-a-410:b$="pause von   ":gosub1270
+  760 h=s+a-300:b$="      bis   ":gosub1270
+  770 h=s:b$="naechste p. ":gosub1270
+  780 h=s-336:b$="eisprung    ":gosub1270
+  790 h=s+6048:b$="geburt      ":gosub1270
+  800 print:gosub970:ifa=1then350
+  810 ifa=0thenclr:print"{clr}"spc(225)"danke schoen":end
+  820 end
+  830 :
+  840 rem berechnung der stunden seit 1.1.1972 0.00 uhr
+  850 :
+  860 y=y-1972:ify<1ory>27thenprint"jahr ist unzulaessig !":stop
+  870 h=24*(365*y+int(y/4)+d)+t:if(int(y/4)=y/4)andm<3thenh=h-24
+  880 fori=1tom:readd:next:restore:h=h+24*d:return
+  890 data0,31,59,90,120,151,181,212,243,273,304,334,365
+  900 :
+  910 rem frage mit ja oder nein beantworten
+  920 :
+  930 j=1:n=0:input"{down}(j/n)";a$:ifa$="j"thena=1:return
+  940 ifa$="n"thena=0:return
+  950 print"{down}mit j oder n antworten":goto930
+  960 print"{down}sind die werte brauch-bar ?":gosub930:return
+  970 print"{down}wollen sie die terminenoch mal sehen ?":gosub930:return
+  980 print"{down}sollen daten abgespei-chert werden ?":gosub930:return
+  990 :
+ 1000 rem berechnung des absoluten datums aus h (seit 1972)
+ 1010 rem berechnung des jahres
+ 1020 :
+ 1030 y=1972:h=h-8784:ifh<0thenprint"fehler !":stop
+ 1040 y=y+1:ifh<8760then1100
+ 1050 ifint(y/4)<>y/4thenh=h-8760:goto1040
+ 1060 ifh>=8784thenh=h-8784:goto1040
+ 1070 :
+ 1080 rem berechnung des monats
+ 1090 :
+ 1100 m=-1
+ 1110 m=m+1:n=j:readj:ifm>1andint(y/4)=y/4thenj=j+1
+ 1120 ifh>=j*24then1110
+ 1130 restore:h=h-n*24
+ 1140 :
+ 1150 rem berechnung von tag und uhrzeit
+ 1160 :
+ 1170 gosub1220:d=d+1
+ 1180 return
+ 1190 :
+ 1200 rem umwandlung von stunden in tage und stunden
+ 1210 :
+ 1220 ifh>2000orh<0thenprint"{down}stunden ausserhalb desbereichs !":stop
+ 1230 d=int(h/24):t=int(h-24*d):return
+ 1240 :
+ 1250 rem berechnung und ausdruck von datum mit hinweis
+ 1260 :
+ 1270 gosub1030:gosub1460:print:return
+ 1280 :
+ 1290 rem file von diskette lesen
+ 1300 :
+ 1310 open2,8,2,f$+",s,r"
+ 1320 input#2,f$:input#2,x
+ 1330 forj=1tox:input#2,a(j):next
+ 1340 close2:return
+ 1350 :
+ 1360 rem file auf diskette schreiben
+ 1370 :
+ 1380 open2,8,2,"@:"+f$+",s,w"
+ 1390 print#2,f$:print#2,x
+ 1400 forj=1tox:print#2,a(j):next
+ 1410 close2:return
+ 1420 :
+ 1430 rem ausdruck von datum und hinweis
+ 1440 rem umrechnung von d,m,y,t in string
+ 1450 :
+ 1460 printb$;
+ 1470 d$=str$(d):m$=str$(m):y$=str$(y-1900):t$=str$(int(t+0.5)):k$=".":u$=".00"
+ 1480 y$=right$(y$,2)
+ 1490 iflen(t$)=2thent$=right$(t$,1)
+ 1500 iflen(t$)>2thent$=right$(t$,2)
+ 1510 iflen(d$)=3andlen(m$)=2then1550
+ 1520 iflen(d$)=2andlen(m$)=3then1560
+ 1530 iflen(d$)=3andlen(m$)=3then1570
+ 1540 d$=right$(d$,1):m$=right$(m$,1):goto1580
+ 1550 d$=right$(d$,2):m$=right$(m$,1):goto1580
+ 1560 d$=right$(d$,1):m$=right$(m$,2):goto1580
+ 1570 d$=right$(d$,2):m$=right$(m$,2):goto1580
+ 1580 ifaa=1then1600
+ 1590 printd$+k$+m$+k$+y$tab(9)t$+u$:return
+ 1600 printd$+k$+m$+k$+y$
+ 1610 printtab(12)t$+u$;" uhr":return
+
