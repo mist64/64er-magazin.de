@@ -1,0 +1,98 @@
+
+
+;super 8 ==1201==
+    1 rem super 8 steuerung
+    2 rem
+    3 rem
+    4 rem wolf-d.robrahn
+    5 rem beethovenstr.18
+    6 rem 2200 elmshorn
+    7 rem tel: 04121/74735
+    8 rem
+    9 rem
+   19 poke37138,255
+   20 poke37136,0
+   25 c=0:t2=200
+   27 rem **********************
+   28 rem belegung der f-tasten*
+   29 rem **********************
+   30 print"{clr}{down}{down}{down}{down}bildfrequenz"
+   35 print"{down}fuer  f1-";
+   40 inputk(1)
+   45 print"fuer  f3-";
+   50 inputk(2)
+   55 print"fuer  f5-";
+   60 inputk(3)
+   70 print"fuer  f7-";
+   75 inputk(4)
+   80 rem *************************
+   82 rem aufbau des bildschirmes *
+   83 rem *************************
+   84 print"{clr}"
+   85 print"{home}{rght}{rght}{rght}f1="k(1)" bilder"
+   90 print"{rght}{rght}{rght}f3="k(2)" bilder"
+   95 print"{rght}{rght}{rght}f5="k(3)" bilder"
+   96 print"{rght}{rght}{rght}f7="k(4)" bilder"
+   97 forq=1to22:print"Z";:next
+  100 print"{down}{rght}jetzige bildfrequenz:"
+  110 print"  ****  "
+  115 print"{down}{rght}zaehler:"
+  120 print"{down}{down}{rght}{rght}druecken sie eine         f- taste             fuer start"
+  122 print"{down}{down}{down}"tab(7)"bilder total"
+  123 print"{down}"tab(7)"laufzeit sec."
+  124 rem ******************
+  125 rem tastatur abfrage *
+  126 rem ******************
+  127 geta$
+  130 ifa$<>chr$(133)anda$<>chr$(134)anda$<>chr$(135)anda$<>chr$(136)anda$<>"a"then125
+  140 ifa$=chr$(133)thena=k(1):gosub1000
+  150 ifa$=chr$(134)thena=k(2):gosub1000
+  160 ifa$=chr$(135)thena=k(3):gosub1000
+  170 ifa$=chr$(136)thena=k(4):gosub1000
+  180 ifa$="a"then2000
+  190 rem ******************
+  192 rem steuerungsablauf *
+  193 rem ******************
+  200 forx=1toa
+  210 poke37136,1
+  212 print"{home}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}     "
+  214 print"{home}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}"x
+  220 poke36878,10
+  230 poke36874,231
+  240 fort=1to10:next
+  250 poke36874,0:poke36878,0
+  260 fort=1tot2:next
+  270 poke37136,0
+  275 fort=1tot2:next
+  280 next
+  285 c=c+a:print"{home}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}"c
+  286 print"{down}      "
+  287 print"{up}"int(c*10/18)/10
+  290 goto85
+  997 rem ****************************************
+  998 rem zeilen loeschen + anzeige der frequenz *
+  999 rem ****************************************
+ 1000 print"{home}{down}{down}{down}{down}{down}{down}{down}{down}{rght}{rght}    "
+ 1001 print"{home}{down}{down}{down}{down}{down}{down}{down}{down}{rght}{rght}"a
+ 1002 print"{home}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}                                                              "
+ 1003 return
+ 1997 rem *************
+ 1998 rem aenderungen *
+ 1999 rem *************
+ 2000 print"{clr}sie wollen die bild-  frequenz aendern?"
+ 2005 geta$:ifa$<>"j"anda$<>"n"then2005
+ 2006 ifa$="n"then3000
+ 2010 print"{down}{down}fuer"
+ 2020 print"        {rvon}<1>{rvof}= f1"
+ 2030 print"{down}        {rvon}<2>{rvof}= f3"
+ 2040 print"{down}        {rvon}<3>{rvof}= f5"
+ 2050 print"{down}        {rvon}<4>{rvof}= f7"
+ 2060 input"{down}{down}";p1
+ 2065 print"{up}alte frequenz:"k(p1)
+ 2070 input"{down}{down}neu: ";k(p1)
+ 2090 goto80
+ 3000 print"{clr}{down}{down}sie wollen die bild-  folge aendern!"
+ 3010 print"{down}{down}momentane schleifen-  laenge"t2
+ 3030 input"{down}{down}neue schleifenlaenge";t2
+ 3050 goto80
+

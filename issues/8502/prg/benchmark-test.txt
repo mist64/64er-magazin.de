@@ -1,0 +1,127 @@
+
+
+;benchmark-test ==0801==
+   10 input"wieviel werte";q1
+   20 dimff$(1000)
+   30 t1=ti
+   40 fori=1toq1
+   50 ff$(i)=chr$(int(rnd(0)*26+64))
+   60 next
+   70 t2=ti
+   80 gosub930
+   90 t3=ti
+  100 print:print
+  110 fori=1toq1
+  120 printff$(i);
+  130 next
+  140 t4=ti
+  150 gosub330
+  160 print:print
+  170 print"anzahl werte= "q1:print
+  180 print"einlesezeit=   "(t2-t1)/60
+  190 print"sortierzeit=   "(t3-t2)/60
+  200 print"anzeigezeit=   "(t4-t3)/60
+  210 print"gesamt zeit=   "(t4-t1)/60
+  215 print:print
+  220 print"bench1     =   "(b1-b0)/60
+  230 print"bench2     =   "(b2-b1)/60
+  240 print"bench3     =   "(b3-b2)/60
+  250 print"bench4     =   "(b4-b3)/60
+  260 print"bench5     =   "(b5-b4)/60
+  270 print"bench6     =   "(b6-b5)/60
+  280 print"bench7     =   "(b7-b6)/60
+  290 print"bench8     =   "(b8-b7)/60
+  300 print"gesamt zeit=   "(b8-t1)/60
+  310 iff=1thenprint:print:print:print:print#1:close1:end
+  320 open1,4:cmd1:f=1:goto170
+  330 rem----------------------------
+  340 rem    benchmarks
+  350 rem--------------------1-------
+  360 rem
+  370 b0=ti
+  380 fork=1to1000
+  390 nextk
+  400 b1=ti
+  410 rem--------------------2---------
+  420 k=0
+  430 k=k+1
+  440 ifk<1000then430
+  450 b2=ti
+  451 rem--------------------3---------
+  452 k=0
+  453 k=k+1
+  454 a=k/k*k+k-k
+  455 ifk<1000then453
+  456 b3=ti
+  460 rem--------------------4---------
+  470 k=0
+  480 k=k+1
+  490 a=k/2*3+4-5
+  500 ifk<1000 then480
+  510 b4=ti
+  520 rem--------------------5---------
+  530 k=0
+  540 k=k+1
+  550 a=k/2*3+4-5
+  560 gosub600
+  570 ifk<1000 then540
+  580 b5=ti
+  590 goto620
+  600 return
+  610 rem--------------------6---------
+  620 k=0
+  630 k=k+1
+  640 a=k/2*3+4-5
+  650 gosub710
+  660 forl=1to5
+  670 nextl
+  680 ifk<1000 then630
+  690 b6=ti
+  700 goto730
+  710 return
+  720 rem---------------------7--------
+  725 dim m(10)
+  730 k=0
+  740 k=k+1
+  750 a=k/2*3+4-5
+  760 gosub830
+  770 forl=1to5
+  780 m(l)=a
+  790 nextl
+  800 ifk<1000 then740
+  810 b7=ti
+  820 goto850
+  830 return
+  840 rem---------------------8--------
+  850 k=0
+  860 k=k+1
+  870 a=k^2
+  880 b=log(k)
+  890 c=sin(k)
+  900 if k<1000 then860
+  910 b8=ti
+  920 return
+  930 rem -----------------------------
+  940 rem -        up sortieren       -
+  950 rem -----------------------------
+  960 rem -   q1    = anzahl elemente -
+  970 rem -   ff$() = sortierfeld     -
+  980 rem -----------------------------
+  990 :
+ 1000 rem jj,ll = laufvariable
+ 1010 rem q2$   = zwischenspeicher
+ 1020 :
+ 1030 rem sortiert das feld ff$ mit
+ 1040 rem q1 elementen in alphabe -
+ 1050 rem tischer folge
+ 1060 :
+ 1070 forjj=1toq1-1
+ 1080 forll=jj+1toq1
+ 1090 ifff$(jj)<=ff$(ll)then1130
+ 1100 q2$=ff$(jj)
+ 1110 ff$(jj)=ff$(ll)
+ 1120 ff$(ll)=q2$
+ 1130 nextll
+ 1140 nextjj
+ 1150 return
+
