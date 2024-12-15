@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>Memory Map mit Wandervorschlägen – Teil 5</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="Dr. Helmuth Hauck, gk">
+    <meta name="64er.issue" content="3/85">
+    <meta name="64er.pages" content="144,146-148">
+    <meta name="64er.toc_category" content="XXX">
+    <!-- <meta name="64er.toc_title" content="XXX"> -->
+    <meta name="64er.id" content="XXX">
+</head>
+
+<body>
+    <article>
+        <h1>Memory Map mit Wandervorschlägen – Teil 5</h1>
+<p class="intro">Auf unserer Reise durch den Speicherdschungel unserer beiden Commodore-Computer treffen wir diesmal auf die Speicherstellen 47 bis 56. Sie teilen uns sehr interessante und wichtige Informationen über Variablen-Felder mit.</p>
+
+<p>TODO ASIDE</p>
+
+<p>Bevor wir unsere Wanderung beginnen, möchte ich Ihnen, lieber Leser, kurz in eigener Sache etwas erklären. Erst nachdem ich diesen fünften Teil des Kurses bereits geschrieben, aber noch nicht abgeliefert hatte, bekam ich die Ausgabe 1/85 des 64'er in die Hände &hellip;und darin fand ich den ausgezeichneten Aufsatz von Boris Schneider über das Thema der »Garbage Collection« (Seite 122 ff). Vieles, was er beschreibt, beschreibe ich im 5. Teil dieser Serie auch. Und einige meiner Erklärungen von heute hätte ich mir auch sparen können, wenn ich den Aufsatz von Boris Schneider gekannt hätte.</p>
+
+<p>Und genau darum geht es mir in meiner Erklärung: Die Autoren im 64’er wissen voneinander nichts, und es ist reiner Zufall, wenn dasselbe Thema von zwei Seiten gleichzeitig aufgegriffen wird. Nun, was soll man da machen? Die Redaktion jedenfalls hat mich ermutigt, dies ruhig geschehen zu lassen, da wichtige Themen, von verschiedenen Seiten betrachtet, sicher an Verständlichkeit gewinnen. Jetzt, wo Sie mir hoffentlich glauben, daß Duplizitäten nicht abgesprochen sind, will ich natürlich auf die hauptsächliche Duplizität zwischen Herrn Schneider und mir hinweisen. Wir stellen beide eine Methode vor, wie man die im Arbeitsspeicher stehenden Variablen und Zeichenketten sichtbar machen kann. Die Grundidee ist bei uns beiden gleich, nicht aber die Ausführung. Da diese Duplizität so schön demonstriert, daß dieselbe Idee in der Computerei oft auf verschiedene Weise gelöst werden kann, lasse ich die Erklärung meiner Methode in ihrer Ausführlichkeit bestehen.</p>
+
+<p>In der letzten Folge haben wir die Bedeutung der Speicherzellen 45-46 für den Speicherbereich der Ganzzahl-, Gleitkomma- und Stringvariablen behandelt.</p>
+
+<p>Zur »Sichtbarmachung« habe ich Ihnen ein Kochrezept gezeigt, mit dem wir die Variablen, so wie sie im Rechner stehen, auf dem Bildschirm anschauen können. Allerdings galt diese Methode nur für den C 64. Heute liefere ich Ihnen das entsprechende Kochrezept für den VC 20 nach (siehe Texteinschub 1).</p>
+
+<p>Alle interessierten VC 20-Besitzer sollten sich jetzt noch einmal den letzten Teil des Kurses vornehmen und sich die normalen Variablen ansehen.</p>
+
+<p>Heute kommen wir zu weiteren Zeigern im Speicherbereich 0 bis 1024, welche ebenfalls den Variablenspeicher beeinflussen.</p>
+
+<h3>Adresse 47-48 ($2F-$30)<br>Zeiger auf die Anfangsadresse des Speicherbereichs für Felder (Arrays)</h3>
+
+<p>Dieser Zeiger, in der Low/ High-Byte-Darstellung, gibt dem Basic-Übersetzer (Interpreter) an, ab welcher Speicherzelle die Felder (Arrays) eines Basic-Programms gespeichert sind. Da die Felder direkt nach den normalen Variablen gespeichert werden, zeigt dieser Zeiger natürlich gleichzeitig auf das Ende des Speichers für normale Variablen.</p>
+
+<p>Durch POKEn einer Adresse in die Speicherzellen 47-48 kann der Speicherbereich am Anfang eines Programms beinahe beliebig verschoben werden, beinahe deswegen, weil die Verschiebung im Zusammenhang mit den anderen Bereichen (siehe Bild 1) einen Sinn haben muß. Im übrigen gilt für diesen Zeiger dasselbe, was schon für den Zeiger in 45-46 gesagt worden ist. Die Darstellung der Feld-Variablen selbst kann mit den genannten Methoden angesehen werden, ihre Erklärung finden Sie im Texteinschub 2 und 3.</p>
+
+<p>Wie aus den Erklärungen hervorgeht, wird bei Feldern mit Zeichenketten (Strings) in dem von Zeiger 47-48 bezeichneten Speicherbereich nur die Definition beziehungsweise die Dimensionierung gespeichert. Die eigentlichen Zeichenketten stehen wie bei den normalen Variablen im 4. Block, vom Speicherende rückwärts angeordnet.</p>
+
+<h3>Adresse 49-50 ($31-$32)<br>Zeiger auf die Endadresse (+1) des Speicherbereichs für Felder (Arrays)</h3>
+
+<p>Der Inhalt dieser Speicherzellen zeigt auf die Adresse, wo der Speicherbereich für Felder aufhört. Wie aus Bild 1 hervorgeht, werden die Zeichenketten vom Ende des verfügbaren RAM-Speichers rückwärts abgespeichert. Man kann also auch sagen, daß der Zeiger in 49-50 die letzte mögliche Adresse für Zeichenketten angibt. Wenn in einem Programm neue Variablen definiert werden, rutscht diese Adresse weiter nach oben und nähert sich dem Ende der Zeichenketten, die durch den Zeiger in 51-52 angegeben wird.</p>
+
+<p>Wenn sich die Speicherbereiche der Felder und Zeichenketten berühren, bleibt der Computer stehen und führt die »Garbage Collection« (Müllabfuhr) durch — ein Prozeß, in dem nicht mehr gebrauchte Zeichenketten entfernt und der Zeichenketten-Speicher reduziert wird. Ist danach immer noch kein Platz, wird OUT OF MEMORY gegeben.</p>
+
+<p>Der Befehl FRE löst immer eine solche Garbage Collection aus und gibt dann die Differenz zwischen den Adressen in den Zeigern 49-50 und 51-52 als verbleibenden noch verfügbaren Speicherbereich aus.</p>
+
+<h3>Adresse 51-52 ($33-$34)<br>Zeiger auf die untere Grenze des Speicherbereichs für den Text der Zeichenketten-Variablen</h3>
+
+<p>Der Inhalt dieser Speicherzellen zeigt in Low/High-Byte-Darstellung auf dasjeweilige untere Ende (siehe Bild 1) des Textspeichers von Zeichenketten, er bezeichnet aber zugleich auch das obere Ende des frei verfügbaren RAM-Bereichs. Das entsteht dadurch, daß der Text der Zeichenketten vom Ende des RAM-Bereichs nach unten abgespeichert wird. In Bild 1 ist das durch den Pfeil dargestellt.</p>
+
+<p>Beim Einschalten des Computers und nach einem RESET wird dieser Zeiger auf das oberste Ende des RAM-Bereichs gesetzt. Beim C 64 ist das 40960 ($A000). Beim VC 20 hängt es von den eingesetzten Speichererweiterungen ab, ohne Erweiterung ist die Adresse 7680 ($1E00).</p>
+
+<p>Der Befehl CLR setzt den Zeiger auf die Adresse, welche durch den Zeiger in den Speicherzellen 55-56 als das Ende des Basic-Speichers angegeben wird. Wozu das dient, erkläre ich Ihnen bei der Beschreibung dieses Zeigers weiter unten.</p>
+
+<h3>Adresse 53-54 ($35-$36)<br>Zeiger auf die Adresse der zuletzt eingegebenen Zeichenkette</h3>
+
+<p>In diesen Speicherplätzen steht die Adresse (im 4. Block, siehe Bild 1) der Zeichenkette, die als letzte von Routinen (Programme, Direkteingabe) zur String-Manipulation abgespeichert worden ist. Mit dem folgenden kleinen Programm können Sie das genau sehen:</p>
+
+<code>10 PRINT PEEK(53) + 256*PEEK (54),<br/>
+20 PRINT PEEK(51) + 256*PEEK (52)<br/>
+30 INPUT A$<br/>
+40 GOTO 10</code>
+
+<p>Zeile 10 druckt uns zuerst (links) den Zeiger auf die zuletzt eingegebene Zeichenkette aus, Zeile 20 rechts daneben den Zeiger auf die untere Speichergrenze der Zeichenketten. Zeile 30 fordert zur Eingabe einer Zeichenkette auf.</p>
+
+<p>Wenn Sie bei frisch eingeschaltetem Computer das Programm starten, sehen Sie eine 0 (= vorher noch kein String eingeben) und daneben die Adresse dez. 40960 (C 64) beziehungsweise dez. 7680 (VC 20 ohne Erweiterung). Wenn Sie auf das Fragezeichen des INPUT hin zum Beispiel ein A eintippen, erhalten Sie links den vorigen Wert von rechts und rechts jetzt eine um 1 kleinere Zahl. Eine weitere Eingabe von zum Beispiel XXXXX schiebt die alte rechte Zahl nach links und die neue wird um die Anzahl der Zeichen, also 5, verringert.</p>
+
+<h3>Adresse 55-56 ($37-$38)<br>Zeiger auf das Ende des für Basic-Programme verfügbaren Speichers</h3>
+
+<p>Dieser Zeiger, in der Low/ High-Byte-Darstellung, gibt dem Basic-Übersetzer an, welches die höchste von Basic verwendbare Speicheradresse ist. Wie aus Bild 1 ersichtlich ist, ist diese Adresse zugleich der Anfang der als Variable abgespeicherten Zeichenkette (Strings).</p>
+
+<p>Normalerweise ist diese Adresse fest vorgegeben. Die folgende Tabelle gibt darüber Auskunft:</p>
+
+<p>TODO TABLE &ldquo;Ende des Programmspeichers&rdquo;</p>
+
+<p>Beim Einschalten des Computers überprüft das Betriebssystem den gesamten RAM-Speicher, bis es zur ersten ROM-Speicherzelle kommt, setzt den Zeiger in 55-56 auf diese Adresse und druckt den bekannten Kopf mit der verfügbaren Speicherangabe auf den Bildschirm.</p>
+
+<p>Normalerweise wird dieser Zeiger nicht geändert.</p>
+
+<p>Es gibt aber zwei Gelegenheiten, bei denen eine Änderung dieses Zeigers sinnvoll beziehungsweise notwendig ist.<br/>
+Anwendung 1:</p>
+
+<p>Es kommt oft vor, daß der gesamte Speicher nicht ausschließlich für Basic benötigt wird, sondern daß ein freier Speicherbereich geschaffen wird, um zum Beispiel Maschinenprogramme, selbst definierte Zeichen oder hochaufgelöste Grafik unterzubringen, die aber nicht vom Basic-Programm überschrieben werden können.</p>
+
+<p>Bei der Besprechung der Zeiger in 43-44 haben wir das auch schon gemacht, allerdings durch »Hochschieben« des Speicheranfangs. Mit dem Zeiger in 55-56 erreichen wir denselben Effekt, diesmal durch »Hinunterdrücken« des Speicherendes. Gegenüber den vier Schritten beim Hochschieben ist das Hinunterdrücken einfacher. Mit dem Befehl:<br/>
+POKE 56,PEEK(56)-1:CLR<br/>
+schieben wir das Speicherende um 256 Byte nach unten, egal für welchen Computer und welche Speichererweiterung. Mit —2 verschiebt sich das Ende um 512, mit —4 um 1024 Byte (also 1 KByte) nach unten. Wenn Sie eine feinere Verschiebung als Vielfache von 256 benötigen, kommen Sie mit dem High-Byte in 56 allein nicht aus, sondern Sie müssen auch einen entsprechenden Wert in 55 hineinPOKEn.</p>
+
+<p>Der Befehl CLR ist absolut notwendig, denn er setzt den Zeiger der Zellen 51-52 (siehe dort), das heißt das untere Ende des Speicherbereichs für Zeichenketten auf dieselbe Adresse wie Zeiger 55-56. Dadurch wird erzwungen, daß die Zeichenkette sozusagen als Ausgangslage unterhalb des heruntergedrückten Speicherendes abgelegt werden.<br/>
+Anwendung 2:</p>
+
+<p>Über den User-Port (Steckerleiste an der Rückseite, neben dem Datasetten-Anschluß) können VC 20 und C 64 mit anderen Geräten verbunden werden. Der Datentransfer über diese Verbindung — sie heißt RS232-Schnittstelle — muß allerdings programmiert werden. Diese RS232-Schnittstelle hat die Gerätenummer 2 (so wie der Drucker Nummer 4 und das Diskettengerät die Nummer 8 hat).</p>
+
+<p>Wenn nun ein Gerät Nummer 2 mit einem OPEN-Befehl angewählt wird, wird automatisch der Zeiger in 55-56 und der Zeiger in 643 um 512 Bytes heruntergedrückt, um je einen Eingangsund Ausgangspufferspeicher zu erzeugen. Da der Inhalt dieser Pufferspeicher alle Variable in diesen 512 Bytes überschreiben würde, wird auch der CLR-Befehl automatisch gegeben.</p>
+
+<p>Es gilt daher als Vorschrift, daß bei RS232-Verbindungen zuerst der Datenkanal durch OPEN eröffnet werden muß, bevor Variable, Felder und Zeichenketten definiert werden.</p>
+
+<p>Dieser Zeiger beschließt die Gruppe der Speicherzeiger. Das nächste Mal machen wir ab Adresse 57 weiter.</p>
+
+<address class="author">(Dr. Helmuth Hauck/gk)</address>
+
+<hr />
+
+<p>TODO ASIDE</p>
+
+<h2>Texteinschub 1<br>Darstellung der normalen Variablen beim VC 20</h2>
+
+<p>In der letzten Folge habe ich Ihnen gezeigt, wie die drei Typen der normalen Variablen auf dem Bildschirm sichtbar gemacht werden können, auch wenn kein Disassembler oder Monitor-Programm zur Verfügung steht. Die Erklärung galt aber nur für den C 64.</p>
+
+<p>Heute ist die Methode für den VC 20 an der Reihe. Die Grundidee ist natürlich dieselbe wie beim C 64:</p>
+
+<p>Wir legen den Bildschirmspeicher in den Speicherbereich, der für die Variablen reserviert ist, und schon sehen wir alle Variablen in der vom Computer verwendeten internen Darstellung.</p>
+
+<p>Alle Angaben gelten für den VC 20 ohne Speichererweiterung, also ziehen Sie bitte alle Speichermodule heraus. Der Speicherbereich für Programme und deren Variablen beginnt jetzt ab Adresse 4096, das ist Block 1 im Bild 1. Der Bildschirmspeicher beginnt ab 7680. Wir verlegen jetzt den Bildschirmspeicher in den Block 1, so daß er ebenfalls ab Adresse 4096 beginnt. Danach müssen wir noch eine Farbe — am besten Schwarz — in den Farbspeicher POKEn, der in dieser neuen Konfiguration von 37888 bis 38399 liegt. Warum das so ist, erklärt Christoph Sauer in seinem Aufsatz »Der gläserne VC 20« Teil 4 im 64’er 1/85 Seite 131.</p>
+
+<p>Das High-Byte der Adresse, inwelcher der Bildschirmspeicher beginnt, steht in der Speicherzelle 648. Sie können das jederzeit mit PRINT PEEK(648) nachprüfen. Umgekehrt können wir eine Zahl hineinPOKEn, wodurch der Bildschirmspeicher verschoben wird. In unserem Fall erhalten wir das High-Byte für 4096 durch 4096/256 = 16.</p>
+
+<p>Machen Sie jetzt bitte folgende Schritte:</p>
+
+<p>1) direkt emgeben: POKE 648,16 (RETURN),<br/>
+2) RUN/STOP und RESTORE drücken, bis der Cursor wieder da ist,<br/>
+3) direkt eingeben:<br>FOR J = 37888 TO 38399: POKE J,0: NEXT J (RETURN),<br/>
+4) mit der DELETE-Taste (nicht mit CLR !) den ganzen Text des Bildschirms löschen,<br/>
+5) mit dem Cursor etwa acht Zeilen nach unten gehen,<br/>
+6) mit der Commodore- und SHIFT-Taste zusammen auf die Groß- und Kleinschrift umstellen,</p>
+
+<p>Schritt 1 und 3 habe ich oben schon erklärt. Schritt 4 ist nicht absolut notwendig, aber ein leerer Bildschirm ist für uns besser. Die CLR-Taste würde Schritt 3 zunichte machen. Schritt 5 erlaubt uns, weiter unten auf dem Bildschirm Variablen einzugeben, ohne den oberen Teil vollzuschreiben. Schritt 6 schließlich erleichtert das Erkennen der Variablen-Darstellung.</p>
+
+<p>Geben Sie jetzt bitte direkt ein:<br/>
+VARIABLE = 3<br/>
+und drücken Sie die RETURN-Taste. Was jetzt passiert und alle folgenden Erklärungen sind identisch mit dem Texteinschub für den C 64 in der letzten Folge. Ich verweise deshalb darauf, ohne sie zu wiederholen.</p>
+
+<hr />
+
+<p>TODO ASIDE</p>
+
+<h2>Texteinschub 2<br>Darstellung der Felder-(Array)-Variablen</h2>
+
+<p>Die Felder-Variablen kommen in drei Arten vor:</p>
+
+<ul>
+<li>als ganze Zahlen,<br/>
+— als Gleitkomma-Zahlen,<br/>
+— als Zeichenketten,</li>
+</ul>
+
+
+<p>Sie sind in dem Texteinschub 3 »Felder in Basic« kurz beschrieben.</p>
+
+<p>Wir wollen sie uns hier mit den Methoden anschauen, welche ich das letzte Mal für den C 64 und heute für den VC 20 in den Texteinschüben »Darstellung der normalen Variablen« beschrieben habe.</p>
+
+<p>Beim C 64 ist allerdings ein Zusatz dabei. Sie müssen, ambesten gleich am Anfang, noch eingeben:<br/>
+POKE 44,4:NEW</p>
+
+<p>Ein eventuell auftretender SYNTAX ERROR soll uns nicht weiter stören.</p>
+
+<p>Wenn Sie also das jeweilige Kochrezept ausgeführt und damit den Bildschirm- und den Variablenspeicher auf dieselbe Adresse gelegt haben, können wir anfangen.</p>
+
+<h3>Gleitkomma-Feld</h3>
+
+<p>Geben Sie direkt ein:<br/>
+DIM AB(1,2,3)</p>
+
+<p>Wir dimensionieren also ein Feld mit dem Namen AB, es hat drei Dimensionen, die erste Dimension hat zwei (0,1) Werte, die zweite hat drei und die dritte hat vier Werte. Sobald Sie die RETURN-Taste drücken, erscheint das Feld auf dem Bildschirm. Wir sehen:<br/>
+&hellip;(plus 120 Klammeraffen @ &hellip;)</p>
+
+<p>Die ersten zwei Stellen sind der Name des Feldes in der Darstellung für Gleitkomma-Variable, wie m der letzten Folge beschrieben wurde. Die dritte und vierte Stelle geben im Bildschirmcode als Low- und High-Byte die Länge des Feldes an (das inverse c = 131, das @ = 0, bitte nachzählen). Die fünfte Stelle zeigt die Anzahl der Dimensionen (c = 3) an. Ab der sechsten Stelle stehen die Anzahl der Elemente der Dimension (diesmal als High- und Low-Byte) und zwar beginnend mit der letzten Dimension. In unserem Falle ist das also in Stelle 6 und 7 ein @ und d (0 — 3 = 4 = d), Stelle 8 und 9 sind dasselbe für die zweite Dimension und schließlich Stelle 10 und 11 für die erste Dimension (0 — 1 ^ 2=b). Danach folgen entsprechend der Anzahl der dimensionierten Elemente (2x3x4 = 24) fünf Bytes pro Element (24x5 -120), die vorerst auf 0 = @ stehen, die aber mit den Werten der Elemente aufgefüllt werden.</p>
+
+<p>Dieses Auffüllen wollen wir nachvollziehen. Geben Sie bitte direkt ein:<br/>
+AB(0,0,0)=5</p>
+
+<p>Wir weisen damit dem allerersten Element des Feldes den Wert 5 zu.</p>
+
+<p>In der oberen Darstellung des Feldes AB ändern sich dadurch Byte 12 und 13. Das neu erschienene inverse C und die Leerstelle mit den drei nachfolgenden @ ist die Gleitkommadarstellung (Mantisse und Exponent) der Zahl 5, Auf diese Darstellung werde ich später im Verlauf dieses Kurses bei der Besprechung der Speicherzelle 97 noch genauer eingehen.</p>
+
+<p>Wenn wir jetzt (durch Überschreiben der vorigen Anweisung) zusätzlich noch eingeben:<br/>
+AB(1,0,0) = 6<br/>
+erreichen wireine entsprechende Änderung der Bytes 17 und 18, also des zweiten Elements des Feldes.</p>
+
+<p>In Bild 2 sind die Stellen eines Gleitkomma-Feldes grafisch dargestellt.</p>
+
+<h3>Ganzzahliges Feld</h3>
+
+<p>Im Vergleich zu dem Gleitkomma-Feld dimensionieren wir als nächstes ein ganzzahliges Feld:<br/>
+DIM AB%(1,2,3)</p>
+
+<p>Jetzt erscheint auf dem Bildschirm gleich anschließend an das erste Feld eine neue Darstellung:<br/>
+&hellip; (plus 48 Klammeraffen @) &hellip;</p>
+
+<p>Die ersten elf Byte haben dieselbe Bedeutung wie beim Gleitkomma-Feld, aber nur deswegen, weil wir dieselben drei Dimensionen mit identischer Elementenzahl dimensioniert haben. Bei mehr Dimensionen wäre dieser Kopf natürlich länger. Die inverse Darstellung des Feldnamens signalisiert ein ganzzahliges Feld. Die dritte Stelle zeigt das »;« — im Bildschirmcode ist das die 59. In der Tat ist das Feld nur 59 Byte lang, also wesentlich weniger als das Gleitkomma-Feld. Die 2x3x4 = 24 Elemente benötigen in der Ganzzahl-Darstellung nur je zwei Byte (24x2 = 48 + 11 = 59). Womit bewiesen ist, daß eine Ganzzahl-Darstellung mit dem Zeichen % erheblich Speicherplatz spart — allerdings nur bei Feldern!</p>
+
+<p>Jetzt wollen wir noch den Inhalt des Feldes füllen, so wie vorher mit:<br/>
+AB%(0,0,0) = 5<br/>
+&hellip; und prompt ändert sich Byte Nummer 13 in ein e (e = 5).</p>
+
+<p>Eine Eingabe für das zweite Element:<br/>
+AB%(1,0,0) = 6<br/>
+verändert das 15. Byte in ein f.</p>
+
+<p>In Bild 3 ist der Inhalt eines Ganzzahl-Feldes grafisch dargestellt.</p>
+
+<h3>Felder mit Zeichenketten</h3>
+
+<p>Die Dimensionierung eines Feldes mit Zeichenketten sieht so aus:<br/>
+DIM AB$(1,2,3)</p>
+
+<p>Auf dem Bildschirm erscheint jetzt ein Feld in folgender Darstellung:<br/>
+&hellip; (plus 72 Klammeraffen @) &hellip;</p>
+
+<p>Auch hier zeigen die ersten elf Stellen dieselbe Information wie bei den anderen Feldern. Zur Kennzeichnung des Zeichenketten-Feldes ist das zweite Zeichen des Feldnamens invers dargestellt. Zeichen 3 und 4 geben wieder die Länge des Feldes an. Das S hat den Bildschirmcode 83. (Vorsicht! Da wir im Groß-/Kleinbuchstaben-Modus sind, müssen wir die jeweils rechte Seite der Spalten in der Code-Tabelle nehmen). Die Länge 83 minus 11 Kopfstellen ergibt 72 Bytes, geteilt durch 24 (2x3x4 = 24 Elemente) erhalten wir 3 Byte zur Darstellung eines Elements.</p>
+
+<p>Das erste Byte gibt die Länge der Zeichenkette an, das zweite und dritte Byte (Low/High-Byte) die Adresse, ab der die Zeichenkette im vierten Block (siehe Bild 1) gespeichert ist.</p>
+
+<p>Die Methode ist also dieselbe wie bei den »normalen« Zeichenketten-Variablen. Das wollen wir uns auch noch ansehen. Geben Sie direkt ein:<br/>
+AB$(0,0,0)=&lsquo;AAAAAA&rsquo;</p>
+
+<p>In der Darstellung des Feldes ändern sich dadurch die Stellen 12, 13 und 14, und wir sehen</p>
+
+<ul>
+<li>beim C 64:</li>
+<li>beim VC 20:</li>
+</ul>
+
+
+<p>Im Bildschirm steht dafür:</p>
+
+<ul>
+<li>C 64: 6 250 159 das heißt 6 Zeichen, ab Adresse 250 + 159x256 = 40959</li>
+<li>VC 20: 6 250 29 das heißt 6 Zeichen ab Adresse 250 + 29x256=7674</li>
+</ul>
+
+
+<p>Jetzt weisen wir dem letzten Element auch noch eine Zeichenkette zu:<br/>
+AB$(1,2,3)&ldquo;BB&rdquo;</p>
+
+<p>Die letzten drei Stellen des Feldes ändern sich ebenfalls, wobei die erste mit dem b eine Zeichenkettenlänge von 2 angibt, dementsprechend muß die Anfangsadresse um 2 niedriger sein als die vorher definierte Kette; Das Low-Byte 250 — 2 = 248, in der Codetabelle finden wir dafür das, was auch im Feld steht. Das High-Byte bleibt unverändert.</p>
+
+<p>Bild 4 zeigt die grafische Darstellung des Zeichenketten-Feldes.</p>
+
+<p>Als letztes zeige ich Ihnen noch die im vierten Block abgespeicherten Zeichenketten. Wir drucken einfach den CHR$-Wert der in den betreffenden Speicherzellen stehenden Codezahlen aus mit:<br/>
+- VC 20: FORI = 248 TO 255:PRINT CHR$(PEEK(29*256 + I));:NEXT<br/>
+- C64: FOR 1 = 248 TO 255:PRINTCHR$(PEEK(159*256+I));:NEXT<br/>
+&hellip; und wir erhalten die beiden Zeichenketten in umgekehrter Reihenfolge, also vom Speicherende her eingespeichert. Interessant ist, daß sich vor die Felder — wenn Sie sie noch auf dem Bildschirm hatten — die neu definierte Gleitkomma-Variable I@ geschoben hat. Auch das ist eine Demonstration des Speicherverfahrens der Variablen, genau so wie ich es Ihnen in der letzten Folge erklärt habe.</p>
+
+<hr />
+
+<p>TODO ASIDE</p>
+
+<h2>Texteinschub 3<br>Felder in Basic</h2>
+
+<p>Zur Wiederholung: Es gibt zwei Arten von Variablen, normale Variable und Felder. Jede der beiden Arten ihrerseits kann aus Gleitkomma-Zahlen, ganzen Zahlen oder Zeichenketten bestehen.</p>
+
+<p>Eine normale Variable kann immer nur einen Wert haben, ein Feld enthält gleichzeitig viele Werte, alle unter demselben Variablen-Namen.</p>
+
+<p>Wir können uns ein Feld mit dem Namen KARLSTRASSE als eine Liste vorstellen, in der jedes Element zwar auch den Namen Karlstraße hat, sich aber von den anderen Elementen durch eine eigene Hausnummer unterscheidet. Jede Variable in einer Hausnummer hat einen bestimmten Wert.</p>
+
+<p>Während eine normale Variable einfach mit A = 3 einen Wert zugewiesen bekommt, muß ein Feld erst definiert werden, nämlich wie viele Elemente es enthält. Wir machen das mit dem Befehl<br/>
+DIM KARLSTRASSE (12)</p>
+
+<p>Dieses Feld hat 13 Elemente (von 0 bis 12). Jedem Element kann nun ein Variablenwert zugewiesen werden durch KARLSTRASSE (0) = 25<br/>
+KARLSTRASSE (1) = 56</p>
+
+<p>Das Feld KARLSTRASSE hat in der Klammer nur eine Zahl, man sagt, es hat nur eine Dimension.</p>
+
+<p>Ein zweidimensionales Feld entspricht einem Schachbrett, mit Zahlen in der einen und Buchstaben in der anderen Dimension. Wir definieren es mit:<br/>
+DIM AX (7,7)</p>
+
+<p>AX ist der Name, jede Dimension hat acht Elemente, insgesamt kann das Feld 64 Werte enthalten.</p>
+
+<p>Ein dreidimensionales Feld entspricht einem Quader, oder bei gleicher Elementenzahl pro Dimension (Seite) einem Würfel. Dieses wird dimensioniert mit<br/>
+DIM BY (125,6,2)</p>
+
+<p>Die Anzahl der Dimensionen wird nur begrenzt durch den verfügbaren Speicherplatz. Wieviel Bytes pro Feld gebraucht werden, entnehmen Sie bitte der Erklärung bei der Darstellung der Feld-Variablen (Texteinschub Nummer 2).</p>
+
+<p>Ein Feld, das wie bisher gezeigt dimensioniert wird, enthält Gleitkomma-Zahlen.</p>
+
+<p>Ein Feld mit ganzen Zahlen wird durch das Zeichen % nach dem Namen gekennzeichnet, also:<br/>
+DIM CZ%(.,.,.)</p>
+
+<p>Ein Feld mit Zeichenketten dagegen hat nach dem Namen das übliche Zeichen $, also:<br/>
+DIM DT$(..,..,..)</p>
+
+<p>»Wozu brauche ich Felder, wenn ich auch normale Variable verwenden kann?«, werden Sie vielleicht noch fragen.</p>
+
+<p>Felder haben den großen Vorteil, daß immer dann, wenn viele Variable in einem Programm vorkommen, die alle einen gewissen Zusammenhang haben, viel Speicherplatz gespart werden kann.</p>
+
+<p>Eine normale Variable braucht sieben Byte, eine Feld-Variable nur fünf oder bei ganzen Zahlen sogar nur zwei Byte. Zugegeben, vorher steht noch ein längerer Kopf, aber halt nur einmal. Und das zahlt sich bei vielen Variablen sehr rasch aus.</p>
+
+<p>Und schließlich muß ich noch darauf hinweisen, daß die »Hausnummern« oder Indizes der Elemente innerhalb eines Programms durch mathematische Operationen verändert und manipuliert werden können. Aber das ist natürlich höhere Programmierkunst und geht über diese kurze Einführung hinaus.</p>
+    </article>
+</body>
+</html>

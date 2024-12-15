@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>Tips und Erweiterungen zu Hi-Eddi und Simons Basic</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="Hans Haberl, gk">
+    <meta name="64er.issue" content="3/85">
+    <meta name="64er.pages" content="88-90">
+    <meta name="64er.toc_category" content="XXX">
+    <!-- <meta name="64er.toc_title" content="XXX"> -->
+    <meta name="64er.id" content="XXX">
+</head>
+
+<body>
+    <article>
+        <h1>Tips und Erweiterungen zu Hi-Eddi und Simons Basic</h1>
+<p class="intro">Sie haben sicher schon selbst festgestellt, wie hervorragend das Listing des Monats aus der Ausgabe 1/85 ist, unser »fantastisches Zeichen- und Mal-Programm«. Der Autor des Hi-Eddi hat jedoch noch etwas weitergearbeitet und stellt kleine Programme vor, die es ermöglichen, mit Simons Basic erstellte Bilder in Hi-Eddi zu laden. Außerdem gibt es eine Reihe von Tips, die die Arbeit mit Hi-Eddi erleichtern.</p>
+
+<p>Simons Basic bietet leider keine Möglichkeit, High-Resolution-Bilder auf Diskette zu speichern und zu laden. Dies ist jedoch Voraussetzung, um Bilder, die mit Simons Basic erstelltwurden, auch in Hi-Eddi und andere Programme zu laden.</p>
+
+<p>Ich habe deshalb das Programm »Screensave« (Listing1) geschrieben, das die Simons-Basic-Befehle »SCRSV« und »SCRLD« um die Fähigkeit, Hires-Bilder zu laden und zu speichern, erweitert. Leider funktioniert das nicht für die Modul-Version, da direkt das Simons Basic modifiziert wird. Dafür wird kein Speicherplatz außerhalb des Simons Basic gebraucht. Außerdem ist die modifizierte Version abspeicherbar, nach ihrem Laden stehen die erweiterten Befehle sofort zur Verfügung, ohne ein weiteres Programm nachladen zu müssen.</p>
+
+<h3>Hinweise zum Eintippen:</h3>
+
+<ul>
+<li>Simons Basic starten</li>
+<li>»Screensave« eintippen, sicherheitshalber abspeichern und starten</li>
+<li>Nachdem alle DATA-Fehler beseitigt wurden, stehen die erweiterten Befehle »SCRSV« und »SCRLD« zur Verfügung: Die Syntax ist dieselbe wie bisher, mit der Sekundäradresse wird jetzt der Bildschirm gewählt:<br/>
+Sekundäradresse = 2: Low-Resolution-Bildschirm,<br/>
+Sekundäradresse = 3: High-Resolution-Bildschirm</li>
+</ul>
+
+
+<p>Das Aufzeichnungsformat des Low-Resolution-Bildschirmes ist leider nicht kompatibel mit dem der alten Befehle. Das des High-Resolution-Bildschirmes ist dasselbe wie bei Hi-Eddi, Diashow und anderen Grafikprogrammen. Dazu muß das Bild aber unbedingt als PGM-File, also zum Beispiel mit:</p>
+
+<code>SCRSV1,8,3,»NAME,P,W«</code>
+
+<p>abgespeichert werden, da Hi-Eddi keine SEQ-Files laden kann.</p>
+
+<p>Zum Abspeichern des »neuen« Simons Basic dient das Programm »Saver« (Listing 2). Dieses Programm speichert nicht nur das komplette Simons Basic, das übrigens auch noch andere Modifikationen, zum Beispiel die aus 64’er Ausgabe 11/84, enthalten kann, sondern auch die Funktionstastenbelegung mit ab. Nach dem Laden der mit »Saver« erstellten Simons-Basic-Version stehen somit nicht nur die neuen Befehle, sondern auch die individuelle Funktionstastenbelegung sofort zur Verfügung.</p>
+
+<h3>Hinweise zum Eintippen:</h3>
+
+<ul>
+<li>Funktionstasten nach eigenen Wünschen belegen</li>
+<li>»Saver« eintippen, abspeichern, eine Diskette mit mindestens 66 freien Blocks einlegen und Programm starten. Nun fragt der »Saver« nach dem Namen, unter dem er die neue Version ablegen soll. Diese neue Version ist um einen Block länger als die alte (66 statt 65), da die Funktionstastenbelegung hinzugekommen ist.</li>
+</ul>
+
+
+<h2>Tips zu Hi-Eddi</h2>
+
+<p>Erfreulicherweise ging das Druckfehlerteufelchen bei den Listings offensichtlich leer aus, denn schon einige Tage nach Erscheinen des Heftes meldete sich der erste, der nicht nur das komplette Programm abgetippt, sondern auch gleich das Beispiel-Menü abgepinselt hatte und alles lief einwandfrei. Im folgenden möchte ich auf die Fragen der Anrufer eingehen.</p>
+
+<h3>Druckeranpassung</h3>
+
+<p>Die Anleitung in den REM-Zeilen des Programms»Hi-PRINT.DATA« ist zugegebenermaßen etwas dürftig ausgefallen, so daß eine ausführlichere Erklärung dringend nötig ist:</p>
+
+<p>Wie schon in der Bedienungsanleitung erwähnt, beschränkt sich die Anpaßbarkeit dieses Programms auf 8-Nadel-Drucker mit »vernünftiger« Einzelnadelansteuerung, wie zum Beispiel Drucker von Epson oder Mannesmann (im Gegensatz zum 1526/MPS 802). Mit dem Datum in Zeile 420 wird zwischen dem seriellen Bus (also Hardware-Interface) oder dem User-Port gewählt. Im ersten Fall muß mit den Daten in Zeile 440 (Primäradresse) und 460 (Sekundäradresse) das Interface auf Direktmodus gestellt werden. Hardwareinterfaces bieten in der Regel verschiedene Betriebsmodi (zum Beispiel Emulation eines Commodore-Druckers, spezielle List- oder Grafikmodi und eben den Direktmodus oder Linearmodus), die meist über die Sekundäradresse angewählt werden. »Hi-PRINT« braucht den Direktmodus, in dem sich das Interface wie ein einfaches Kabel verhält und die Bytes vom Computer unverändert an den Drucker übergibt. Für das Data-Becker-Interface muß zum Beispiel die Sekundäradresse 1 eingegeben werden, für das Görlitz-Interface 4 oder 12 (ohne beziehungsweise mit Auto-Linefeed). Beim Anschluß an den User-Port sind die Daten in Zeile 440 und 460 zwar nicht relevant, man darf sie jedoch nicht weglassen, da sonst die nachfolgenden DATAs verschoben würden.</p>
+
+<p>Aus dem gleichen Grund dürfen auch die Längen der folgenden DATA-Zeilen nichtverändertwerden, sie müssen nach Bedarf mit 255 aufgefüllt werden. Außerdem muß jede dieser Zeilen mit mindestens einem 255 enden, da diese Zahl als Ende-Kennzeichen einer Sequenz dient.</p>
+
+<p>Die Zeile 530 legt die Sequenz für einen Carriage-Return Linefeed fest, sie ist 13,255,255 für Drucker mit Auto-Linefeed und 13,10,255 für Drucker ohne Auto-Linefeed.</p>
+
+<p>Zeile 550 stellt den Drucker auf den für Grafik passenden Zeilenvorschub ein. Für den Epson RX-80 ist dies zum Beispiel ESC »3« 23 oder in Zahlen 27,51,23, aufgefüllt mit 255 auf die erforderliche Länge.</p>
+
+<p>In Zeile 580 wird der Grafikmodus (Bit-Image-Mode) für 640 Punkte/Zeile angesteuert. Beispiele:</p>
+
+<p>Epson RX-80: ESC »*« 4 entspricht 27,42,4 Mannesmann<br/>
+MT-80: ESC »K« entspricht 27,75<br/>
+TODO</p>
+
+<p>In Zeile 600 wird wieder der normale Zeilenabstand eingestellt (ESC »2«) und die -2 in Zeile 610 signalisiert für den DATA-Lader das Ende der DATAs.</p>
+
+<h3>Betrieb mit der Datasette</h3>
+
+<p>Ich besitze selbst keine Datasette, so daß die hier gegebenen Hinweise nicht getestet sind:</p>
+
+<p>Zunächst muß in den Listings 1 und 2 (Hi-Exe und Hi-PRINT) die »8« in den OPEN-Befehlen durch eine »1« ersetzt werden. Dasgleichegiltfüralle LOAD-Befehleim Listing 3 (Hi-Eddi). An diesem Listing müssen außerdem noch die folgenden Änderungen vorgenommen werden:<br/>
+Zeile 300: POKE8115,8 durch POKE8115,1 ersetzen<br/>
+Folgende Zeilen müssen gelöscht werden:<br/>
+200,210,220,340,400<br/>
+Folgende Zeilen müssen dafür eingefügt werden:<br/>
+200 RETURN<br/>
+400 RETURN</p>
+
+<p>Auf der Programmkassette speichert man die Files dann am besten in folgender Reihenfolge ab:</p>
+
+<ol>
+<li>Hi-Eddi (Listing 3)</li>
+<li>Hi-Exe (Das von Listing 2 erzeugte Maschinenprogramm, nicht den Data-Lader!)</li>
+<li>Menü</li>
+<li>Hi-PRINT (Das von Listing 1 erzeugte Maschinenprogramm)</li>
+</ol>
+
+
+<p>Die Overlay-Technik gestaltet sich mit der Datasette natürlich nicht so komfortabel wie mit der Diskette: Nachdem zu Beginn eines Druckvorganges die Druckerroutine geladen wurde, muß die Kassette wieder zurückgespult werden, damit nach dem Drucken das Maschinenprogramm »Hi-Exe« wieder geladen werden kann.</p>
+
+<h3>Koala- und Paint-Magic-Bilder</h3>
+
+<p>In Ausgabe 1/85 wurde schon erwähnt, daß auch die Bilder von Paint Magic und Koalapainter geladen werden können. Das ist richtig, aber man muß einiges dazu wissen:</p>
+
+<h2>Laden von Bildern</h2>
+
+<p>Bei Schwarzweiß-Bildern, wie die der Diashow, Supergrafik oder natürlich des erweiterten Simons Basic geht’s problemlos. Bei Grafikprogrammen, die im Multicolour-Modus arbeiten, treten zwei Schwierigkeiten auf:</p>
+
+<ol>
+<li>Da Hi-Eddi im High-Resolution-Modus arbeitet, sehen Multicolour-Bilder recht ungewöhnlich aus. Dabei kommt es vor allem auch auf die Farborganisation des betreffenden Programmes an: Die des Koalapainter ist so chaotisch, daß dessen Bilder im »Hi-Eddi« fast unbrauchbar sind (Ein und dieselbe Farbe erhält verschiedene Multicolour-Codes). Paint-Magic-Bilder sind dagegen sofort »druckreif«.</li>
+<li>Für Multicolour-Bilder gibt es kein einheitliches Format für die Speicherung auf Diskette, so daß viele Bilder nicht direkt von »Hi-Eddi« geladen werden können.</li>
+</ol>
+
+
+<p>Für den Koalapainter tritt die 2. Schwierigkeit nicht auf, seine Bilder lassen sich sofort laden. Den Filenamen gibt man dabei in der Form »?PIC&hellip;« ein, um das Steuerzeichen am Anfang auszutricksen. Dajedoch Koala-Bilder länger sind als die vom »Hi-Eddi«, werden Farbinformationen nicht nur des geladenen, sondern noch eines weiteren Bildes überschrieben. Nach dem Laden eines Koala-Bildes herrscht somit buntes Chaos im Computer, das erst durch Neu-Einfärben beseitigt werden muß.</p>
+
+<p>Etwas komplizierter wird’s bei Paint Magic, dessen Bilder sich nicht direkt laden lassen, da sie in Form eines Basic-Laders abgespeichert werden. Man muß erst ein Bild mit »LOAD"..&ldquo;,8« laden, dann mit RUN starten, anschließend »Hi-Eddi« laden und in Betriebsart 1 starten. Die 1 ist nötig, damit »Hi-Eddi« das im Speicher befindliche Bild nicht löscht. Außerdem darf »Hi-Eddi« nicht im Farbbetrieb gestartet werden, da das Paint-Magic-Bild im Speicherbereich $4000-$6000 liegt, wo »Hi-Eddi« sonst seine Farbinformationen ablegen würde. Nach dem Start ist das Bild in Speicher Nummer 7 zu finden.</p>
+
+<p>Lädt man übrigens im Schwarzweiß-Betrieb ein Farbbild (36 Blocks), dann wird auch hier durch die Farbinformation ein Teil eines anderen Bildes überschrieben, was sich durch »Gerümpel« in den ersten paar Zeilen dieses Bildes bemerkbar macht.</p>
+
+<h3>Laden von »Hi-Eddi«-Bildern in Basic-Programmen</h3>
+
+<p>Will man »Hi-Eddi«-Bilder in normalen Basic-Programmen (oder mit der Simons Basic Modulversion) laden, dann tut’s das Listing »Pic-Lader (Listing 3), das natürlich in eigene Programme eingebaut werden kann. Das Bild wird unter das Betriebssystem-ROM gelegt, der Farbspeicher ab $C000 (=49152, wie bei Simons Basic). Damit wird kein Basic-Speicherplatz belegt. Allerdings dürfen nur Schwarzweiß-Bilder (33 Blocks) geladen werden, bei Farbbildern gibt’s einen Absturz.</p>
+
+<h3>Fehler</h3>
+
+<p>Falls Sie erwartet haben, daß ich Ihnen jetzt irgendwelche schwerwiegende Fehler mitteile, muß ich Sie enttäuschen. Lediglich ein paar Kleinigkeiten sind mir aufgefallen:</p>
+
+<p>Auf Seite 51, in der Bildüberschrift zum Ottomotor, steht »sieben Bilder pro Sekunde«. Das gilt jedoch für große Bilder. Die Viertelbilder dagegen werden mit maximal 24 Bilder pro Sekunde abgearbeitet. Und auf Seite 60, rechts oben, vierte Zeile, müßte es natürlich heißen »Felder« und nicht »Fehler«.</p>
+
+<p>Auch am Programm selbst sind mir noch vier Kleinigkeiten aufgefallen:</p>
+
+<ol>
+<li>Bei einem STOP/RESTORE schreibt das Betriebssystem ein paar Bytes in den RAM-Bereich über $E000. Diese sind dann in einem der Bilder am unteren Rand als »Gerümpel« zu sehen.</li>
+<li>Beim Befehl »Paint« kann es bei extrem verwinkelten Flächen vorkommen, daß Teile übersehen werden (Grund dafür ist der begrenzte Stack des 6510). Diese müssen eben extra aufgefüllt werden.</li>
+<li>Der Sequenzstring sollte nicht länger als zirka 40 Zeichen werden, sonst könnte es bei LOAD oder SAVE zu einem OUT OF MEMORY ERROR kommen. Sollte das passieren, so muß Hi-Eddi mit GOTO 150 gestartet und der Sequenzstring verkürzt werden.</li>
+<li>Bei gewaltigem »Herumwürgen« am Joystick kann es vorkommen, daß der Computer meint, es wurde eine Taste gedrückt. Ergebnis istdann eine Befehlsausführung, die man gar nicht wollte. Allerdings passiert das äußerst selten, vielleicht liegt’s auch nur an meinem mickrigen Joystick. Wenn ansonsten mal ein Befehl nicht das tut, was er sollte, dann liegt es meistens an einer eingerasteten SHIFT-LOCK-Taste. Bei Befehlen, die die SHIFT-Taste nicht benutzen, fällt es gar nicht auf. Will man jedoch zum Beispiel den Före-Modus anwählen und färbt statt dessen das ganze Bild ein, dann war’s SHIFT-LOCK!</li>
+</ol>
+
+
+<address class="author">(Hans Haberl/gk)</address>
+
+<p>TODO ASIDE</p>
+
+<h2>Änderungsvörschlag zur Turtle-Grafik</h2>
+
+<p>Ich habe Ihnen folgenden Anderungsvorschlag zur Turtle-Grafik (Ausgabe 11/34) zu machen: Diese Änderung bewirkt, daß ein Maschinenprogramm am Anfang des Basic-Speichers erzeugt wird und dieses wie ein Basic-Programm abspeicherbar ist.</p>
+
+<p>Folgendes ist zu beachten: Der Basic-Lader muß vor dem Starten abgespeichert werden und nach POKE 44, 18: POKE 18 256,0: NEW wieder geladen werden. Dann kann gestartet werden.</p>
+
+<p>Folgende Programmzeilen müssen geändert oder hinzugefügt werden:</p>
+
+<code>300 AN=2048<br/>
+301 ZI=4320<br/>
+360 S=ANZ=960<br/>
+580 PRINT &ldquo;MIT SAVE ABSPEICHERN&rdquo;<br/>
+590 PRINT &ldquo;MIT &lsquo;RUN&rsquo; STARTEN&rdquo;<br/>
+600 POKE 45,234: POKE 46,16: POKE 44,8<br/>
+610 END<br/>
+960 DATA 0,25,8,192,7.158,50,48,55,53,3,2,84,85,82,84,76,1039<br/>
+970 DATA 69,45,71,82,65,70,73,75,0,0,0,169,0,168,133,252,1272<br/>
+980 DATA 169,192,133,253,169,64,133,254,169,8,133,255,162,9,177,254,2534<br/>
+990 DATA 145,252,136,208,249,230,253,23,0,255,202,208,242,76,0,192,234,3112<br/>
+1030 DATA 83,190.190,29,29,66,89,32,80,46,77,46,32,38,32,66,1125<br/>
+1040 DATA 46,82,46,190,190,29,51,56,57,49,49,32 66,65,83,1120</code>
+
+<address class="author">(Hans Haberl/gk)</address>
+    </article>
+</body>
+</html>

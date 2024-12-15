@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>Der gläserne VC 20 — Teil 6</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="Christoph Sauer, ev">
+    <meta name="64er.issue" content="3/85">
+    <meta name="64er.pages" content="155-160">
+    <meta name="64er.toc_category" content="XXX">
+    <!-- <meta name="64er.toc_title" content="XXX"> -->
+    <meta name="64er.id" content="XXX">
+</head>
+
+<body>
+    <article>
+        <h1>Der gläserne VC 20 — Teil 6</h1>
+<p class="intro">Als Abschluß unseres Kurses beschäftigen wir uns mit Interruptmechanismus und Betriebssystem des Volkscomputers. Damit haben wir in den sechs Teilen den VC 20 aus jeder Perspektive durchleuchtet und wirklich zum »gläsernen« Computer gemacht.</p>
+
+<p>Ein Betriebssystem, so sagt ja bereits der Name, ist für die elementaren Funktionen des Computers wie zum Beispiel Bildschirmverwaltung, Tastaturabfrage, laden und speichern von Daten und vielem mehr verantwortlich. Natürlich ist auch im VC 20 solch ein Systemprogramm eingebaut: Es befindet sich im ROM zwischen Adresse $E429 und $FFFF, der restliche ROM-Bereich (von $C000 bis $E428) wird vom Basic-Interpreter beansprucht. Diese zwei Programmblöcke sind bei diesem Computer so miteinander verzahnt, daß kein Teil für sich alleine arbeiten kann.</p>
+
+<h2>Was beim Einschalten alles geschieht</h2>
+
+<p>Als erstes möchte ich nun die Vorgänge beschreiben, die sich beim Einschalten des Systems abspielen.</p>
+
+<p>Zunächst wird die Resetleitung der CPU von der Elektronik des Computers auf Low gezogen (genau das Gleiche geschieht übrigens beim Betätigen eines eventuell eingebauten Reset-Tasters), wodurch die wichtigsten Systemkomponenten (CPU, VIC und die Ein-/ Ausgabebausteine) in einen definierten Betriebszustand versetzt werden.</p>
+
+<p>Danach sucht sich die 6502-Zentraleinheit aus den Speicherstellen $FFFC und $FFFD die Startadresse des Betriebssystems heraus und beginnt die Programmausführung an der dort abgespeicherten Stelle (beim VC 20 $FD22). Diese Vektoren sind hardwaremäßig in der CPU festgelegt worden und können daher nicht durch ein Programm geändert werden.</p>
+
+<p>Die Einschaltroutine hat nun die verschiedensten Aufgaben zu bewältigen. Am wichtigsten ist zunächst die Initialisierung des Prozessorstacks, also des Stapelspeichers, der die Rücksprungadressen beim Befehl JSR verwaltet (damit der Computer aus den Unterprogrammen wieder ins Hauptprogramm zurückfindet).</p>
+
+<p>Der nächste Schritt in der Reset-Routine ist die Modulabfrage, in der die Modulidentifikation abgefragt wird. Findet der VC 20 im Bereich $A004 bis $A009 die Zeichenfolge »aOCBM« (die den Bytes 41 30 C3 C2 und CD entspricht), so gibt das Betriebssystem die Kontrolle an das Modulprogramm ab. Auch hierbei spielen wieder Vektoren ein Rolle, denn die Startadresse des Moduls muß in den beiden Speicherstellen $A000 und $A001 abgelegt sein.</p>
+
+<p>Mit Hilfe eines solchen Modulprogramms, das automatisch gestartet wird, kann man nun den Computer ganz nach seinen Wünschen gestalten. Dies kann zum Beispiel in Form einer Basic-Erweiterung geschehen, wie sie an dieser Stelle ja schon besprochen worden ist.</p>
+
+<p>Findet die Einschaltroutine — um wieder zum Reset zurückzukommen — keine Modulmarkierung, so wird die Initialisierung ganz normal fortgesetzt. Diese besteht im wesentlichen aus vier Unterprogrammen, die auch in einem Autostartprogramm nacheinander aufgerufen werden sollten. Da ist als erstes eine Routine ($FD8D), die die Aufgabe hat, in der Zeropage bestimmte Startwerte einzutragen und den verfügbaren Speicher festzustellen. Dieser RAM-Test ist für den VC 20 besonders wichtig, denn auf diese Weise kann er erstens die Funktionsweise des Speichers überprüfen und zweitens die momentane Ausbauversion feststellen. Wird tatsächlich einmal ein Defekt in einer oder mehreren Speicherstellen des Grundversions-RAMs festgestellt, dann »hängt« sich das Betriebssystem in einer Endlosschleife auf, und der Bildschirm bleibt dunkel.</p>
+
+<p>Nach dieser Prüfung, die bei voll ausgebautem Speicher einige Sekunden in Anspruch nimmt, werden in einer weiteren Unterroutine ($FD52) die Kernal-Vektoren im Bereich zwischen $0314 und $0355 installiert (einige dieser Zeiger werden wir später noch genauer kennenlernen). Zum Schluß müssen natürlich auch in den Registern der Peripheriebausteine die benötigten Werte abgespeichert werden. Dafür sind die zwei letzten Unterprogramme der Einschaltroutine zuständig. Das eine ($FDF9) initialisiert die I/O-Register, damit Interrupts und Tastaturoperationen stattfinden können, und das andere ($E518) kümmert sich um die Grundeinstellung des VIC.</p>
+
+<p>Dies waren im wesentlichen die Schritte, die nach dem Einschalten des Computers ablaufen; damit ist nun das Betriebssystem einsatzbereit und gibt nun die Kontrolle an den Basic-Interpreter ($E378) ab. Der wiederum setzt als erstes die in Folge 3 angesprochenen Basic-Vektoren, damit die essentiellen Operationen (wie zum Beispiel die Umwandlung einer Zeile in Interpretertoken) über diese abgewickelt werden können.</p>
+
+<p>Bevor die bekannte Einschaltmeldung (CBM BASIC..) auf dem Bildschirm ausgegeben wird, initialisiert der Interpreter den Basic-Teil der Zeropage und des Speichers nach seinen Bedürfnissen. Dabei werden zum Beispiel verschiedene Zeiger (Adresse 43, 44, 45, &hellip;) gesetzt und der erste Verbindungszeiger im Programmspeicher gelöscht (daher kann ein Basic-Programm nach einem Reset nicht mehr gelistet werden).</p>
+
+<h2>Unterbrechung? Ja, bitte!</h2>
+
+<p>Nachdem die Systemmeldung auf dem Bildschirm ausgegeben wurde, verzweigt die Interpreterroutine in die sogenannte Eingabewarteschleife ($C474), die wirja bereits in Folge 3 näher beleuchtet haben. Damit ist der Computer bereit, Anweisungen des Benutzers zu empfangen.</p>
+
+<p>Soweit die Beschreibung der Resetroutine, die durch ein Signal an einem Prozessoreingang gestartet wurde. Auch die Interrupts, auf die ich genauer eingehen möchte, werden über die Hardware ausgelöst. Der Plural bei Interrupts verrät bereits, daß es mehrere — genauer gesagt sogar 3 — Unterbrechungen von dieser Sorte gibt.</p>
+
+<p>Da ist zunächst der Systeminterrupt, der vom VC 20 alle 60steF Sekunde durchlaufen wird (ein Timer in dem 6522-Ausgabebaustein ist für dessen Auslösung verantwortlich). Durch diese Interruptanfrage — sie wird auch IRQ (Interrupt Request) genannt — wird die Zentraleinheit veranlaßt, das gerade laufende Programm zu unterbrechen, um in eine Abarbeitungsroutine zu verzweigen. Auch hierbei besorgt sich die CPU über den Hardwarevektor ($FFFE und $FFFF) die entsprechende Startadresse ($FF72).</p>
+
+<p>Dort werden als erstes alle CPU-Register auf den Stack gerettet, denn die dort gespeicherten Werte werden ja später bei der Wiederaufnahme des regulären Programmablaufs benötigt. Danach verzweigt die Routine über einen eigenen Vektor (Interrupt-Vektor $0314,$0315) in das eigentliche Abarbeitungsunterprogramm (Adresse $EABF).</p>
+
+<p>Hier wird zunächst die interne Uhr (TI) um eins hochgezählt und bei dieser Gelegenheit auch gleich der Zustand der STOP-Taste abgefragt. Ist diese gedrückt, dann setzt die Unterroutine ein Flag in der Zeropage, und der Interpreter unterbricht — nachdem der Interrupt zu Ende bearbeitet worden ist — das laufende Basic-Programm. Durch »verbiegen« des erwähnten Sprungvektors kann dieses Unterprogramm in der Abarbeitungsroutine so übersprungen werden, daß keine Abfrage der STOPTaste mehr stattfindet, womit bewirkt wird, daß man ein Basic-Programm nicht mehr auf normalem Wege anhalten kann (dieses nur als eine Programmschutzvariante).</p>
+
+<p>Nun aber wieder zurück zu unserer Abarbeitungsroutine. Hier wird als nächstes der sogenannte Cursorblinkzähler, der bei jedem Interrupt um eins dekrementiert wird, abgefragt. Ist dieser auf Null, so wird der momentane Zustand des Cursors geändert; das heißt aus revers wird normal oder umgekehrt (auf diese Weise wird ein Blinken des Zeigers erreicht).</p>
+
+<p>Abschließend wird — und das ist das Wichtigste an dem ganzen Interrupt — die Tastatur des Computers abgefragt. Drückt der Benutzer irgendeine Taste, so wandelt die Routine diesen Tastencode in den entsprechenden ASCII-Wert und speichert das Ergebnis im Tastaturpuffer ab. Dieser bleibt solange dort, bis ein Zeichen von der Tastatur angefordert wird. Das ist entweder im Direktmodus der Fall oder bei den Basic-Befehlen INPUT und GET (oder den entsprechenden Unterprogrammen im Betriebssystem).</p>
+
+<p>Damit hat die Interrupt-Routine ihren Zweck erfüllt, und der VC 20 kann die Arbeit an dem eigentlichen (Basic-) Programm wieder aufnehmen. Vorher werden allerdings noch die CPU-Register wiederhergestellt (deren Inhalte befinden sich ja immer noch auf dem Stack) und dann gibt das Interrupt-Unterprogramm über den Befehl RTI (Return From Interrupt) die Kontrolle wieder an das eigentliche Hauptprogramm ab. Diese Einschnitte mittels Interrupt haben für den Benutzer den Vorteil, daß er sich nicht um die, in einem gewissen Zeitabstand immer wiederkehrenden, Tastaturabfragen zu kümmern braucht. Außerdem kann kein noch so kurzer Tastendruck verloren gehen, wie es der Fall wäre, wenn die Tastatur in unregelmäßigen, längeren Abständen abgefragt werden würde.</p>
+
+<h2>Eingriff ins Eingemachte</h2>
+
+<p>Wie wir bereits gesehen haben, springt der Computer über einen Vektor ($0314-$0315) in die Bearbeitungsroutine ein. Dadurch können wirjetzt in den Ablauf eingreifen, indem wir dort zusätzliche Unterprogramme einbetten. Als Beispiel für solch einen Eingriff möchte ich nun eine Routine besprechen, die den regelmäßigen Interruptzyklus benützt, um die aktuelle Uhrzeit auf dem Bildschirm anzuzeigen. Dazu bedienen wir uns einer speziellen Eigenschaft des VIC, die es erlaubt, mehr als 23 Zeilen auf dem Bildschirm anzuzeigen. Mit Hilfe des Registers # 4 (Adresse 36867 beziehungsweise $9003) kann man die anzeigbare Zeilenzahl vergrößern oder verkleinern. Für unseren Zweck genügt es, die verfügbaren Zeilen auf 25 zu erhöhen. In diesen Zeilen wird dann später die Uhrzeit angezeigt werden. Mittels POKE 36867,50 wird diese Umschaltung realisiert. Meine Routine kann mit dem Lader (Listing 1) irgendwo im Speicher plaziert werden (das Programm gibt die günstigste Adresse vor). Den wichtigsten Teil der Initialisierungsroutine — also dem Unterprogramm, das den Interrupt-Vektor »verbiegt« — möchte ich kurz anhand von Listing 2 beschreiben. Dort wird gleich als erstes eine Unterroutine aufgerufen, die ein eventuell vorhandenes Basic-Programm im Speicher verschieben soll. Das hat seinen guten Grund, denn die zwei zusätzlichen Bildschirmzeilen nehmen, um ihre Zeichen ablegen zu können, den Anfang des Basic-Speichers in Beschlag, so daß ein dort stehendes Programm teilweise überschrieben werden würde. Diese Verschiebe-Routine ist so universell, daß sie auch für andere Anwendungen nützlich sein kann (um beispielsweise ein Basic-Programm zu verschieben, damit Platz für einen Grafikspeicher ist). Die Anzahl der zu verschiebenden Bytes ist, bei einer anderweitigen Verwendung, in die Additionsroutine in $210E einzusetzen.</p>
+
+<p>Nachdem die 24. und 25. Zeile zugeschaltet worden ist, wird der Interruptvektor auf den Anfang unserer Uhrenroutine gestellt, damit sie beim nächsten Aufruf mit abgearbeitet wird. Bevor man diesen Zeiger jedoch verändert, muß man mittels des Befehls SEI dafür sorgen, daß zeitweise keine Interrupts mehr akzeptiert werden. Sonst könnte es passieren, daß die — zufällig gerade zu dieser Zeit ausgelöste — Interruptroutine ihren Vektor sucht, und wir sind gerade dabei, ihn zu verändern, wodurch der Computer eine falsche Adresse finden und damit abstürzen würde. Das ist auch der Grund, warum man niemals versuchen darf, Interrupt-Vektoren von Basic aus mit POKE-Befehlen zu verändern.</p>
+
+<p>Der Maschinenbefehl SEI (Set Interrupt-disable Flag) setzt das entsprechende Flag im Statusregister der CPU. Wird nun ein IRQ ausgelöst, so testet die Zentraleinheit zuerst dieses Flag; ist es gesetzt, dann wird die Interruptanfrage ignoriert. Das Gegenstück dazu ist der Befehl CLI, der dieses Flag löscht, damit Interrupts wieder möglich werden.</p>
+
+<h2>Interrupt auf Tastendruck</h2>
+
+<p>Ich habe ja eingangs bereits erwähnt, daß es auch andere Interrupts gibt — diesen wollen wir uns jetzt zuwenden. Wer wird es glauben, auch die RESTORE-Taste löst einen Interrupt aus. Über den Hardwarevektor in $FFFA und $FFFB bezieht die CPU die Anfangsadresse der NMI-Abarbeitungsroutine (NMI bedeutet »nicht maskierbarer Interrupt«). Dieser Interrupt unterscheidet sich von dem IRQ in der Weise, daß er nicht per Spezialbefehl abschaltbar ist. Die Abarbeitungsroutine ($FEAD), die wiederum über einen Vektor in $0318, $0319 angesprungen wird, prüft nun als erstes, ob sie etwa ein Modulprogramm unterbrochen hat. Ist dies der Fall, so verzweigt die Routine in die NMI-Bearbeitung des Modulprogramms (dazu ist in $A002, $A003 die entsprechende Startadresse anzugeben). Dadurch ist es für den Programmierer eines solchen Moduls möglich, alle Unterbrechungen, die durch das Drücken der RESTORE-Taste entstehen, abzublocken, womit natürlich auch ein gewisser Programmschutz gewährleistet ist.</p>
+
+<p>Sollte ein solches Modulprogramm nicht vorhanden sein, so wird die NMI-Routine normal fortgesetzt. Als erstes wird dann die STOP-Taste des Computers abgefragt, denn ein Programmabbruch soll ja nur durch das Drücken der Tastenkombination RUN/STOP-RESTORE möglich sein. Wenn auch diese Klippe genommen ist, beginnt der eigentliche Warmstart des Computers, der die Vektoren neu setzt und die Zeropage ordnet (daher wird auch unser Uhrenprogramm nach dem Drücken dieser Tastenkombination abgeschaltet).</p>
+
+<p>Natürlich kann auch der NMI für unsere Programme mißbraucht werden. Dazu muß nur wieder (wie soll es auch anders sein) der entsprechende Vektor geändert werden, so daß er auf ein eigenes Maschinenprogramm zeigt. In Folge 3 ist eine sehr kurze und effiziente Anwendung der RESTORE-Taste erläutert worden. Damals ging es darum, sich innerhalb von Hochkommas (&ldquo;) von den lästigen Cursor-Steuerzeichen zu befreien. Durch das Drücken der RESTORE-Taste, die dann quasi als zusätzliche Funktionstaste arbeitet, kann man also auch Aktionen auslösen.</p>
+
+<h2>Aller guten Dinge sind drei</h2>
+
+<p>Der Vollständigkeit halber möchte ich jetzt auch noch den dritten Interrupttyp anführen, der allerdings nicht durch irgendwelche Signale in der Hardware ausgelöst wird. Ich spreche von dem Maschinenbefehl BRK. Dieser wird in der CPU wie ein Interrupt-Aufruf (IRQ) behandelt, und deshalb benutzt er auch den gleichen Hardwarevektor, nämlich $FFFE. Das Betriebssystem im VC 20 hingegen trifft eine Unterscheidung zwischen diesen beiden Interrupttypen, denn der Befehl BRK soll beim VC 20 einen Warmstart bewirken. Auch diese Abarbeitung wird (ich traue mich es schon nicht mehr zu sagen) über einen Vektor ($0316, $0317) geleitet. Damit bietet sich die Möglichkeit, dieses Kommando dazu zu benutzen, ein Unterprogramm über einen Ein-Byte-Befehl (!) aufzurufen. Durch die Angabe der Startadresse in diesem Vektor kann man jedes beliebige Unterprogramm adressieren und mit BRK aufrufen.</p>
+
+<p>Soweit zu den Interrupts. Ich möchte Ihnen zum Schluß noch, da wir gerade beim Betriebssystem sind, einige sehr nützliche Unterprogramme aus dem Interpreter vorstellen. Diese Routinen können nämlich sehr gut in eigenen Maschinenprogrammen Verwendung finden, und dies spart enormen Platz- und Programmieraufwand.</p>
+
+<h2>Nützliche Routinen im Betriebssystem</h2>
+
+<p><strong>Verschieberoutine ($C3B8)</strong>: Genau diese wurde in meinem Beispielprogramm verwendet, um das eventuell im Speicher vorhandene Basic-Programm zu verschieben. Die Benutzung dieser Routine ist verhältnismäßig einfach. Die Anfangsadresse des zu verschiebenden Speicherbereichs muß in den beiden Zeropagespeicherstellen $5F und $60 abgelegt werden. Um das Ende zu markieren, vermerkt man die entsprechende Adresse plus 1 (!) in den Speicherstellen $5A und $5B. Schließlich ist auch noch die neue Anfangsadresse in $58 und $59 abzulegen. Auch hierbei ist darauf zu achten, daß eins dazuaddiert wird, denn die Routine ist dementsprechend konzipiert. Der Aufruf der Routine geschieht schließlich mit »JSR $C3B8«.</p>
+
+<p><strong>Fehlermeldung ausgeben ($C437)</strong>: Oftmals ist es nötig, eine Basic-Fehlermeldung auszugeben (zum Beispiel in einer Befehlserweiterung, in der ein Komma abzufragen ist). Wenn dieses nicht vorhanden ist oder sonst ein Fehler vorliegt, dann soll eine Fehlermeldung ausgedruckt werden. Alles, was man bei dieser Routine zu tun hat, ist die Eingabe der Fehlernummer ins X-Register. Alle möglichen Meldungen und die dazugehörigen Nummern sind in Tabelle 1 zu finden. Dann wird die Abarbeitungsroutine mit JMP $C437 angesprungen. Zu beachten ist, daß ein Maschinenprogramm auf diese Weise beendet wird (der Interpreter springt nämlich in die Eingabewarteschleife zurück). Möchte man nur eine Meldung ausgeben (ohne das Programm anzuhalten), so ist die Nachricht mit einer anderen Routine, die noch besprochen wird, zu erzeugen. Zwei oft benötigte Fehlermeldungen (Syntax- und Illegal Quantity Error) sind noch einfacher zu bekommen. Um den Syntax Error zu erzeugen springt man mit JMP $CF08 in eine Unterroutine ein, die bereits die Fehlernummer enthält (auf diese Weise spart der Interpreter Speicherplatz). Auch für den Illegal Quantity Error gibt es solch ein Unterprogramm: JMP $D248. Für beide Abkürzungen gilt im übrigen — dies noch als Ergänzung — das oben zum Programmabbruch gesagte.</p>
+
+<p><strong>Programmzeilen neu ordnen ($C533)</strong>: Dies ist eine der praktischsten Routinen, die mir im gesamten Basic-Interpreter untergekommen ist. Das kleine unscheinbare Unterprogramm kann mehr, als zunächst zu vermuten ist. Es ist wahrscheinlich jedem schon einmal passiert, daß plötzlich aus irgendeinem Grund ein verstümmeltes Basic-Programm im Speicher steht. Das kann durch falsches Laden vom Band oder auch durch unvorsichtiges POKEn im Basic-Speicher geschehen. Der Grund für diesen »Zeilensalat« ist eine Veränderung der Verbindungszeiger (Koppeladressen), die am Beginn jeder (Basic-) Programmzeile stehen, und die im Normalfall auf die Adresse der jeweils folgenden Zeile zeigen (siehe auch Folge 1 dieses Kurses). Das Unterprogramm ab $C533 hat nun die nützliche Eigenschaft, fast alle auf diese Weise beschädigten Programme wieder zu restaurieren. Man ruft es einfach von Basic aus mit SYS 53483 auf, und schon ist das Programm zumindest wieder LISTbar (jedenfalls in den meisten Fällen). Damit aber noch nicht genug. Bei dieser Gelegenheit stellt die Routine auch noch die Länge des Programmes fest und übergibt die Endadresse den Speicherstellen $22 und $23. Damit ist es möglich, die durch einen Reset oder durch NEW scheinbar verlorenen Programme völlig wiederherzustellen. Dazu ist lediglich der erste Verbindungszeiger zu rekonstruieren (das macht unsere Unterroutine), und das Programmende muß in den Speicherstellen $2D und $2E vermerkt werden. Die nachfolgende Programmzeile ist das kürzeste Rekonstruktionsprogramm, das mir bekannt ist. Ich habe es bereits in Folge 1 besprochen und möchte es in diesem Zusammenhang noch einmal erwähnen.<br/>
+SYS 50483:POKE 46,PEEK(35): POKE 45,PEEK(781) + 2:CLR</p>
+
+<p>Bevor diese Zeile eingegeben wird, muß man den Anfang des Basic-Programms im Speicher markieren, denn sonst wird es von der Routine nicht gefunden: POKE (Basic-Anfangsadresse) + 1,1.</p>
+
+<p>Natürlich ist diese Routine auch im C 64 zu finden. Dort ist die Startadresse $A533.</p>
+
+<p><strong>String ausgeben ($CB1E)</strong>: Mit diesem Unterprogramm ist es in einfacher Weise möglich, Texte in einem Maschinenprogramm auszugeben. Dadurch entfallen die sonst nötigen langwierigen Druckschleifen, mit denen man sich sonst herumschlagen muß. Auch bei dieser Unterroutine ist die Handhabung wieder ganz einfach. Der auszugebende Text, der natürlich auch Sonderund Steuerzeichen enthalten darf, muß im ASCII-Format irgendwo im Speicher stehen. Das Textende muß mit einer Null markiert sein. Ist diese Voraussetzung erfüllt, braucht man nur noch den Akku mit dem Low-Byte, das Y-Register mit dem High-Byte der Anfangsadresse zu laden und das Unterprogramm mit JSR $CBlE aufzurufen: Schon steht der Text auf dem Bildschirm. Auch Fehlermeldungen können auf diese einfache Weise ausgegeben werden (die Möglichkeit hatte ich ja oben schon angekündigt). Die Adressen der einzelnen Fehlernachrichten sind Tabelle 1 zu entnehmen.</p>
+
+<p>Es soll nicht verschwiegen werden, daß es in seltenen Fällen zu einem Problem kommen kann: Weil dieses Unterprogramm auf String-Basis arbeitet, wird der Text als Variable zwischengespeichert. Wurden die Zeiger $37 und $38 (dezimal 55, 56) verändert, so kommt es manchmal dazu, daß irgendwelche unsinnigen Zeichen, aber nicht der gewünschte Text ausgegeben werden. In solch einem Fall müssen die Zeichen konventionell, das heißt über die Kernalroutine $FFD2 ausgegeben werden.</p>
+
+<h2>Nachlese</h2>
+
+<p>Zum Schluß möchte ich nochmals ein Thema aufgreifen, das ich schon einmal angesprochen hatte — ich spreche von dem Autostartprogramm aus Folge 1. Damals wurde ein Programm abgedruckt, das mir viele Leserzuschriften eingebracht hat. Einige berichteten mir, daß es bei ihnen nicht möglich gewesen sei, diese Routine ordnungsgemäß laufen zu lassen. Da dieses Programm bei mir tadellos arbeitet, kann ich mir die geschilderten Fehler nicht erklären. Dennoch möchte ich diese Thematik nochmals aufgreifen, denn es gab eine Reihe von Anfragen nach einer Version für andere Commodore-Computer.</p>
+
+<p>Um möglichst allen Wünschen gerechtzu werden, erläutere ich nun eine neuartige, kürzere Methode, in der auf sämtliche Programmschutzmaßnahmen, wie zum Beispiel das Abschalten der RESTORE-Taste, verzichtet wurde.</p>
+
+<p>Für diese selbststartenden Programme nutzen wir eine besondere Eigenschaft des Kassettenpuffers aus. Der ist nämlich in der Lage, einen Programmnamen mit einer Länge von bis zu 187 Zeichen zu speichern. Davon werden allerdings nur die bekannten 16 Zeichen auf dem Bildschirm angezeigt; der Rest bleibt im Verborgenen. Da der gesamte Inhalt des Kassettenpuffers als Vorspann zu jedem Programm abgespeichert wird, kann man aber tatsächlich einen sehr viel längeren Filenamen mit dem Programm übertragen. Der Trick ist nun folgender: Neben dem Programmnamen mit einer Länge von 16 Zeichen wird auch ein kleines Maschinenprogramm im Bandpuffer generiert. Dieses wird nach der Beendigung des Ladevorganges von dem geänderten Kernal INPUT-Vektor angesprungen (siehe dazu auch Folge 1). Die kleine Maschinenroutine macht nun nichts anderes, als diesen Zeiger auf seinen Ursprungswert zurückzustellen und den Tastaturpuffer mit den Zeichen LOAD (CR) und RUN (CR) zu füllen. Das ist im Prinzip nichts anderes, als wenn man über die Tastatur SHIFT RUN/STOP eingeben würde, nur mit dem Unterschied, daß dies hier automatisch geschieht.</p>
+
+<p>Im einzelnen wird also Folgendes gemacht: Man generiert einen kurzen Vorspann (ohne Programm) auf Band. Dieser enthält lediglich den präparierten Filenamen. Nachdem dieser Vorspann geladen worden ist, verzweigt der Computer über den INPUT-Vektor in das sich im Bandpuffer befindliche Maschinenprogramm, das wiederum einen neuen Ladebefehl erzeugt, mit dem das eigentliche Programm nachgeladen und automatisch gestartet wird.</p>
+
+<p>Dazu jetzt die einzelnen Schritte, mit denen man einen solchen Vorspann generieren kann:</p>
+
+<ol>
+<li>Eingabe des Ladeprogramms (Listing 3)</li>
+<li>Programm testen und abspeichern</li>
+<li>Lader starten</li>
+<li>Programmnamen eingeben</li>
+<li>Die auf dem Bildschirm ausgedruckten Zeilen nacheinander mit RETURN ausführen</li>
+<li>Vorspann abspeichern</li>
+<li>Wenn auf dem Bildschirm »SEARCHING« erscheint, muß der beginnende Ladevorgang mit der STOP-Taste abgebrochen werden</li>
+<li>Hauptprogramm nachladen und abspeichern</li>
+</ol>
+
+
+<p>Listing 4 zeigt das kleine Maschinenprogramm aus den DATA-Zeilen 360 bis 380 des Basic-Laders im Assembler-Format. Wer den C 64 dazu bringen will, das Gleiche zu tun, den möchte ich auf die REM-Zeilen am Ende des Programms aufmerksam machen, in denen die nötigen Änderungen beschrieben sind.</p>
+
+<p>Zwei Anmerkungen wären zu dieser Methode noch zu machen:</p>
+
+<p>Erstens: Die demonstrierte Autostartroutine funktioniert nur im Kassettenbetrieb. Die Floppystation nutzt diesen Puffer nicht, folglich funktioniert auch diese Methode nicht.</p>
+
+<p>Zweitens: Da das Maschinenprogramm an einen festen Speicherplatz im Kassettenpuffer gebunden ist, muß auch der Filename eine feste Länge haben, denn an diesen schließt sich die Maschinenroutine an. Daher ergänzt der Lader den Programmnamen auf 16 Zeichen.</p>
+
+<p>Mit diesem Ausflug in Betriebssystem und Interruptmechanismus ist der VC 20, so meine ich, genug durchleuchtet worden. Ich hoffe, daß Sie in den sechs Folgen dieses Kurses einen Eindruck von den Geschehnissen im Inneren Ihres Computers bekommen haben, so daß dieser Kurs seinen Namen auch wirklich verdient hat.</p>
+
+<address class="author">(Christoph Sauer/ev)</address>
+
+<p>TODO ASIDE</p>
+
+<p>PS. Uns interessiert Ihre Meinung zum Thema VC 20 im 64’er-Magazin im allgemeinen und zu diesem Kurs im besonderen. Wie wär&rsquo;s, schreiben Sie uns eine Mitmachkarte?</p>
+    </article>
+</body>
+</html>
