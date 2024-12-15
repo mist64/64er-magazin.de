@@ -16,197 +16,198 @@
 <body>
     <article>
         <h1>Finden mit System - Eine neuartige Suchmethode</h1>
-<!-- Effektives Programmieren -->
+        <!-- Effektives Programmieren -->
 
 
-<p class="intro">Nachdem wir uns in den letzten beiden Folgen mit grundlegenden programmiertechnischen Fragen befaßt haben, sollen jetzt konkrete Anwendungen im Mittelpunkt stehen. Diesmal ist es das Suchen von Zeichenketten mit einer erst vor kurzen entwickelten Methode.</p>
+        <p class="intro">Nachdem wir uns in den letzten beiden Folgen mit grundlegenden programmiertechnischen Fragen befaßt haben, sollen jetzt konkrete Anwendungen im Mittelpunkt stehen. Diesmal ist es das Suchen von Zeichenketten mit einer erst vor kurzen entwickelten Methode.</p>
 
-<p>Wie versprochen, stelle ich Ihnen diesmal ein Suchprogramm vor, mit dem eine schnelle »intelligente« Suche von Strings möglich wird. Doch bevor wir uns mit der Praxis, sprich dem Programm, beschäftigen können, müssen wir uns ein wenig mit der Theorie des Suchens befassen.</p>
+        <p>Wie versprochen, stelle ich Ihnen diesmal ein Suchprogramm vor, mit dem eine schnelle »intelligente« Suche von Strings möglich wird. Doch bevor wir uns mit der Praxis, sprich dem Programm, beschäftigen können, müssen wir uns ein wenig mit der Theorie des Suchens befassen.</p>
 
-<h3>Wie sucht man eigentlich?</h3>
+        <h3>Wie sucht man eigentlich?</h3>
 
-<p>Nun, uns soll hier nicht interessieren, wie der eine oder andere mit seiner häuslichen (Un-) Ordnung fertig wird. Uns geht es hier um das Suchen und möglichst auch Finden von einer Zeichenkette in einer anderen. Einigen wir uns jetzt schon auf zwei Begriffe, damit wir später keine Schwierigkeiten bekommen. Der Suchstring ist der String, nach dem wir suchen. Dies kann eine beliebige Zeichenkette, also ein Wort, eine Zahl, Grafikzeichen oder ein Gemisch aus alledem sein. Der Durchsuchstring ist derjenige, in dem wir suchen.</p>
+        <p>Nun, uns soll hier nicht interessieren, wie der eine oder andere mit seiner häuslichen (Un-) Ordnung fertig wird. Uns geht es hier um das Suchen und möglichst auch Finden von einer Zeichenkette in einer anderen. Einigen wir uns jetzt schon auf zwei Begriffe, damit wir später keine Schwierigkeiten bekommen. Der Suchstring ist der String, nach dem wir suchen. Dies kann eine beliebige Zeichenkette, also ein Wort, eine Zahl, Grafikzeichen oder ein Gemisch aus alledem sein. Der Durchsuchstring ist derjenige, in dem wir suchen.</p>
 
-<p>Das landläufige Suchverfahren sieht folgendermaßen aus: Der Anfang des Suchstring wird an den Anfang des Durchsuchstrings angelegt. Dann werden die beiden ersten Buchstaben verglichen. Sind diese gleich, werden die beiden zweiten Buchstaben verglichen, und so weiter. Dieses Spielchen wiederholt sich so lange, bis sich die beiden Buchstaben nicht gleichen. Dann wird der Suchstring um eine Position am Durchsuchstring verschoben, und somit der erste Buchstabe des Suchstrings mit dem zweiten des Durchsuchstrings und so weiter, verglichen. Wird beim Suchen festgestellt, daß alle Buchstaben übereinstimmen, so hat man den Suchstring im Durchsuchstring gefunden. Stellt man aber fest, daß das Ende des Suchstrings über den Durchsuchstring hinausragt, so muß man die Suche abbrechen, da der Suchstring nicht im Durchsuchstring vorhanden sein kann.</p>
+        <p>Das landläufige Suchverfahren sieht folgendermaßen aus: Der Anfang des Suchstring wird an den Anfang des Durchsuchstrings angelegt. Dann werden die beiden ersten Buchstaben verglichen. Sind diese gleich, werden die beiden zweiten Buchstaben verglichen, und so weiter. Dieses Spielchen wiederholt sich so lange, bis sich die beiden Buchstaben nicht gleichen. Dann wird der Suchstring um eine Position am Durchsuchstring verschoben, und somit der erste Buchstabe des Suchstrings mit dem zweiten des Durchsuchstrings und so weiter, verglichen. Wird beim Suchen festgestellt, daß alle Buchstaben übereinstimmen, so hat man den Suchstring im Durchsuchstring gefunden. Stellt man aber fest, daß das Ende des Suchstrings über den Durchsuchstring hinausragt, so muß man die Suche abbrechen, da der Suchstring nicht im Durchsuchstring vorhanden sein kann.</p>
 
-<p>Dieses Suchverfahren war jahrelang das einzige verwendete, da es relativ einfach zu programmieren und relativ schnell war.</p>
+        <p>Dieses Suchverfahren war jahrelang das einzige verwendete, da es relativ einfach zu programmieren und relativ schnell war.</p>
 
-<h3>Es geht auch anders</h3>
+        <h3>Es geht auch anders</h3>
 
-<p>In der November-Ausgabe der Zeitschrift Spektrum der Wissenschaft wurde nun ein völlig neuer Suchalgorithmus vorgestellt. Dieser ist erst vor kurzem von zwei amerikanischen Forschern entwickelt worden, und kann mit noch vertretbarem Aufwand in Maschinensprache formuliert werden. Noch einmal das Prinzip des alten Algorithmus: Man verschiebt den Suchstring am Durchsuchstring immer nur um eine einzige Position, braucht also mindestens so viele Vergleiche, wie Zeichen im Suchstring minus Zeichen im Durchsuchstring (bei Überhang wird ja abgebrochen). Findet man einen Weg, den Suchstring immer gleich um mehrere Positionen zu verschieben, ohne daß dabei ein Auftauchen des Suchstrings im Durchsuchstring übersehen werden kann, läßt sich der Suchvorgang rapide beschleunigen. Einfach um einen größeren konstanten Faktor zu verschieben, etwa um 2, klappt natürlich nicht, weil dann nur alle ungeraden Positionen abgefragt werden. Beginnt der Suchstring aber auf einer geraden Position, wird er nicht gefunden. Dieser Verschiebefaktor muß also variabel sein. Um ihn zu ermitteln, stellen wir mal fest, wie weit in einigen Fällen maximal verschoben werden darf, um den Suchstring nicht zu verpassen.</p>
+        <p>In der November-Ausgabe der Zeitschrift Spektrum der Wissenschaft wurde nun ein völlig neuer Suchalgorithmus vorgestellt. Dieser ist erst vor kurzem von zwei amerikanischen Forschern entwickelt worden, und kann mit noch vertretbarem Aufwand in Maschinensprache formuliert werden. Noch einmal das Prinzip des alten Algorithmus: Man verschiebt den Suchstring am Durchsuchstring immer nur um eine einzige Position, braucht also mindestens so viele Vergleiche, wie Zeichen im Suchstring minus Zeichen im Durchsuchstring (bei Überhang wird ja abgebrochen). Findet man einen Weg, den Suchstring immer gleich um mehrere Positionen zu verschieben, ohne daß dabei ein Auftauchen des Suchstrings im Durchsuchstring übersehen werden kann, läßt sich der Suchvorgang rapide beschleunigen. Einfach um einen größeren konstanten Faktor zu verschieben, etwa um 2, klappt natürlich nicht, weil dann nur alle ungeraden Positionen abgefragt werden. Beginnt der Suchstring aber auf einer geraden Position, wird er nicht gefunden. Dieser Verschiebefaktor muß also variabel sein. Um ihn zu ermitteln, stellen wir mal fest, wie weit in einigen Fällen maximal verschoben werden darf, um den Suchstring nicht zu verpassen.</p>
 
-<p>Im folgenden werden wir immer nach dem Wort »HALLO« suchen. Wenn wir das Wort »HALLO« im String »SCHÖNES WETTER HEUTE« suchen, dann legen wir erstmal »HALLO« ganz normal an der ersten Position an. Nun vergleichen wir von hinten! Die beiden letzten Buchstaben, »N« und »O« stimmen offensichtlich nicht miteinander überein. Also kann »Hallo« nicht am Anfang des Strings stehen, und darf somit gleich um fünf Positionen, dies ist gleich der Länge von »Hallo« verschoben werden.</p>
+        <p>Im folgenden werden wir immer nach dem Wort »HALLO« suchen. Wenn wir das Wort »HALLO« im String »SCHÖNES WETTER HEUTE« suchen, dann legen wir erstmal »HALLO« ganz normal an der ersten Position an. Nun vergleichen wir von hinten! Die beiden letzten Buchstaben, »N« und »O« stimmen offensichtlich nicht miteinander überein. Also kann »Hallo« nicht am Anfang des Strings stehen, und darf somit gleich um fünf Positionen, dies ist gleich der Länge von »Hallo« verschoben werden.</p>
 
-<p>Hier das Ganze im Bild:</p>
+        <p>Hier das Ganze im Bild:</p>
 
-<p>SCHÖNES WETTER HEUTE<br/>
-HALLO<br/>
-HALLO<br/>
-HALLO&hellip;<br/>
-TODO</p>
+        <p>SCHÖNES WETTER HEUTE<br />
+            HALLO<br />
+            HALLO<br />
+            HALLO&hellip;<br />
+            TODO</p>
 
-<p>Doch es ist nicht immer ganz so einfach. Suchen wir mal im String »DU HALLODRI«. Beim Anlegen und Vergleichen trifft das »O« aus »HALLO» auf das »A« von »DU HALLODRI«. Würden wir jetzt, da die beiden ja ungleich sind, »HALLO« um fünf Positionen verschieben, würden wir leider das »HALLO« in »HALLODRI« übersehen, da wir schon zu weit verschoben haben:</p>
+        <p>Doch es ist nicht immer ganz so einfach. Suchen wir mal im String »DU HALLODRI«. Beim Anlegen und Vergleichen trifft das »O« aus »HALLO» auf das »A« von »DU HALLODRI«. Würden wir jetzt, da die beiden ja ungleich sind, »HALLO« um fünf Positionen verschieben, würden wir leider das »HALLO« in »HALLODRI« übersehen, da wir schon zu weit verschoben haben:</p>
 
-<p>DU HALLODRI<br/>
-HALLO<br/>
-HALLO<br/>
-TODO</p>
+        <p>DU HALLODRI<br />
+            HALLO<br />
+            HALLO<br />
+            TODO</p>
 
-<p>Wie weit darf man in diesem Fall verschieben? Nun, um maximal drei Positionen, dann liegt das »HALLO« nämlich genau an der richtigen Stelle:</p>
+        <p>Wie weit darf man in diesem Fall verschieben? Nun, um maximal drei Positionen, dann liegt das »HALLO« nämlich genau an der richtigen Stelle:</p>
 
-<p>DU HALLODRI<br/>
-HALLO<br/>
-HALLO<br/>
-TODO</p>
+        <p>DU HALLODRI<br />
+            HALLO<br />
+            HALLO<br />
+            TODO</p>
 
-<p>Das ist ja ganz schön und gut, daß wir wissen, daß jetzt maximal um drei Positionen verschoben werden darf, aber wie sag ich’s dem Computer? Auf die Lösung zu kommen ist genial und deshalb verblüffend einfach. Zählen wir einmal die Buchstaben von »HALLO« von hinten mit Null beginnend durch.</p>
+        <p>Das ist ja ganz schön und gut, daß wir wissen, daß jetzt maximal um drei Positionen verschoben werden darf, aber wie sag ich’s dem Computer? Auf die Lösung zu kommen ist genial und deshalb verblüffend einfach. Zählen wir einmal die Buchstaben von »HALLO« von hinten mit Null beginnend durch.</p>
 
-<p>H A L L O<br/>
-4 3 2 1 0<br/>
-TODO</p>
+        <p>H A L L O<br />
+            4 3 2 1 0<br />
+            TODO</p>
 
-<p>Das A erhält dann die Stellungsnummer 3. Diese stimmt aber nun mit dem maximalen Verschiebefaktor überein. Zufall? Nun machen wir noch ein Beispiel. Suchen wir PUTER in COMPUTER.<br/>
-Erst einmal durchzählen:</p>
+        <p>Das A erhält dann die Stellungsnummer 3. Diese stimmt aber nun mit dem maximalen Verschiebefaktor überein. Zufall? Nun machen wir noch ein Beispiel. Suchen wir PUTER in COMPUTER.<br />
+            Erst einmal durchzählen:</p>
 
-<p>P U T E R<br/>
-4 3 2 1 0<br/>
-TODO</p>
+        <p>P U T E R<br />
+            4 3 2 1 0<br />
+            TODO</p>
 
-<p>Und dann:</p>
+        <p>Und dann:</p>
 
-<p>C O M P U T E R<br/>
-P U T E R<br/>
-P U T E R<br/>
-TODO</p>
+        <p>C O M P U T E R<br />
+            P U T E R<br />
+            P U T E R<br />
+            TODO</p>
 
-<p>Der letzte Buchstabe in PUTER, das R stößt auf ein U im Computer. Dessen Stellungsnummer ist aber wieder 3, es darf also wieder um drei Positionen verschoben werden. Daß das tatsächlich immer funktioniert, kann man auch mathematisch beweisen, würde jedoch hier den Rahmen sprengen.</p>
+        <p>Der letzte Buchstabe in PUTER, das R stößt auf ein U im Computer. Dessen Stellungsnummer ist aber wieder 3, es darf also wieder um drei Positionen verschoben werden. Daß das tatsächlich immer funktioniert, kann man auch mathematisch beweisen, würde jedoch hier den Rahmen sprengen.</p>
 
-<p>Das Verfahren, den maximalen Verschiebefaktor herauszufinden, sieht im groben also so aus: Bevor der Suchvorgang gestartet wird, wird eine Tabelle mit den Stellungsnummern der Buchstaben im Suchstring angelegt. Zwei Sonderfälle haben wir noch nicht betrachtet, die beim Tabellenanlegen aber automatisch mitberücksichtigt werden:</p>
+        <p>Das Verfahren, den maximalen Verschiebefaktor herauszufinden, sieht im groben also so aus: Bevor der Suchvorgang gestartet wird, wird eine Tabelle mit den Stellungsnummern der Buchstaben im Suchstring angelegt. Zwei Sonderfälle haben wir noch nicht betrachtet, die beim Tabellenanlegen aber automatisch mitberücksichtigt werden:</p>
 
-<p>Sollten Buchstaben im Suchstring doppelt auftauchen, so wird für einen Buchstaben immer die kleinste Stellungsnummer gespeichert. Dies läßt sich sehr einfach dadurch erreichen, daß der Suchstring beim Anlegen der Tabelle von vorne nach hinten durchgegangen wird. Taucht dann ein Buchstabe ein zweites Mal auf, so wird automatisch die größere Stellungsnummer von der kleineren überschrieben. Ein Beispiel:</p>
+        <p>Sollten Buchstaben im Suchstring doppelt auftauchen, so wird für einen Buchstaben immer die kleinste Stellungsnummer gespeichert. Dies läßt sich sehr einfach dadurch erreichen, daß der Suchstring beim Anlegen der Tabelle von vorne nach hinten durchgegangen wird. Taucht dann ein Buchstabe ein zweites Mal auf, so wird automatisch die größere Stellungsnummer von der kleineren überschrieben. Ein Beispiel:</p>
 
-<p>Suchen wir mal »COMMODORE« in » COMMODORE«. TODO</p>
+        <p>Suchen wir mal »COMMODORE« in » COMMODORE«. TODO</p>
 
-<p>Zuerst einmal durchzählen:</p>
+        <p>Zuerst einmal durchzählen:</p>
 
-<p>C O M M O D O R E<br/>
-8 7 6 5 4 3 2 1 0<br/>
-COMMODORE COMMODORE<br/>
-TODO</p>
+        <p>C O M M O D O R E<br />
+            8 7 6 5 4 3 2 1 0<br />
+            COMMODORE COMMODORE<br />
+            TODO</p>
 
-<p>Das »E« stößt nun auf ein »O«. Nun gibt es aber drei »O«. Welche Stellungsnummer darf hier genommen werden? Die des letzten »O«, die »2«. Mit einer Verschiebung von zwei haben wir dann ja auch die Übereinstimmung gefunden. Durch den Tabellen-Algorithmus wird immer automatisch die Stellungsnummer des letzten »O« genommen.</p>
+        <p>Das »E« stößt nun auf ein »O«. Nun gibt es aber drei »O«. Welche Stellungsnummer darf hier genommen werden? Die des letzten »O«, die »2«. Mit einer Verschiebung von zwei haben wir dann ja auch die Übereinstimmung gefunden. Durch den Tabellen-Algorithmus wird immer automatisch die Stellungsnummer des letzten »O« genommen.</p>
 
-<p>Die zweite Regel befaßt sich mit den Buchstaben. Die erhalten als Stellungsnummer die Länge des Suchstrings, da ja in diesem Fall um die gesamte Suchstringlänge verschoben werden kann. (Siehe auch unser allererstes Beispiel). Somit ist der Algorithmus zur Tabellenbildung schon formulierbar. Er ist in Bild 1 als Flußdiagramm dargestellt.</p>
+        <p>Die zweite Regel befaßt sich mit den Buchstaben. Die erhalten als Stellungsnummer die Länge des Suchstrings, da ja in diesem Fall um die gesamte Suchstringlänge verschoben werden kann. (Siehe auch unser allererstes Beispiel). Somit ist der Algorithmus zur Tabellenbildung schon formulierbar. Er ist in Bild 1 als Flußdiagramm dargestellt.</p>
 
-<p>Bis jetzt habe ich immer von einem maximalen Verschiebefaktor gesprochen. Denn nicht immer darf um den vollen Faktor verschoben werden. Wir haben bisher nämlich noch nicht den Fall betrachtet, daß teilweise oder volle Übereinstimmung von Such- und Durchsuchstring eintritt.</p>
+        <p>Bis jetzt habe ich immer von einem maximalen Verschiebefaktor gesprochen. Denn nicht immer darf um den vollen Faktor verschoben werden. Wir haben bisher nämlich noch nicht den Fall betrachtet, daß teilweise oder volle Übereinstimmung von Such- und Durchsuchstring eintritt.</p>
 
-<p>Suchen wir mal »HOHO« in »HIHOHOHI«. Beim ersten Anlegen von »HOHO« stimmen die letzten beiden Buchstaben überein, der zweite aber nicht. Würde jetzt um den Tabellenwert — bei dem »I« ist er 4, verschoben, so würden wir um zwei Buchstaben zu weit verschoben haben!:</p>
+        <p>Suchen wir mal »HOHO« in »HIHOHOHI«. Beim ersten Anlegen von »HOHO« stimmen die letzten beiden Buchstaben überein, der zweite aber nicht. Würde jetzt um den Tabellenwert — bei dem »I« ist er 4, verschoben, so würden wir um zwei Buchstaben zu weit verschoben haben!:</p>
 
-<p>H I H O H O H I<br/>
-H O H O<br/>
-H O H O<br/>
-TODO</p>
+        <p>H I H O H O H I<br />
+            H O H O<br />
+            H O H O<br />
+            TODO</p>
 
-<p>Um dies zu vermeiden, müssen wir einen weiteren Begriff einführen, die Suchtiefe. Die Suchtiefe bezeichnet nichts anderes, als die Anzahl der positiv ausgefallen Vergleiche. In unserem Beispiel wäre sie 2, da zwei Vergleiche, »O« mit »O« und »H« mit »H«, positiv ausgefallen sind. Der dritte Vergleich »I« mit »O« ist nun negativ, das heißt, daß der Suchbegriff dort nicht auftauchen kann, und nun verschoben werden muß. Um den tatsächlichen Verschiebefaktor zu ermitteln, muß nun noch von dem aus der Tabelle entnommenen Wert die Suchtiefe subtrahiert werden. In unserem Fall wäre das 4 minus 2 = 2. Und das stimmt wieder:</p>
+        <p>Um dies zu vermeiden, müssen wir einen weiteren Begriff einführen, die Suchtiefe. Die Suchtiefe bezeichnet nichts anderes, als die Anzahl der positiv ausgefallen Vergleiche. In unserem Beispiel wäre sie 2, da zwei Vergleiche, »O« mit »O« und »H« mit »H«, positiv ausgefallen sind. Der dritte Vergleich »I« mit »O« ist nun negativ, das heißt, daß der Suchbegriff dort nicht auftauchen kann, und nun verschoben werden muß. Um den tatsächlichen Verschiebefaktor zu ermitteln, muß nun noch von dem aus der Tabelle entnommenen Wert die Suchtiefe subtrahiert werden. In unserem Fall wäre das 4 minus 2 = 2. Und das stimmt wieder:</p>
 
-<p>H I H O H O H I<br/>
-H O H O<br/>
-H O H O<br/>
-TODO</p>
+        <p>H I H O H O H I<br />
+            H O H O<br />
+            H O H O<br />
+            TODO</p>
 
-<p>Verschieben wir um zwei Positionen, so liegt unser »HOHO« genau an der richtigen Stelle. Die Suchtiefe kann minimal Null werden, wenn schon der erste Vergleich negativ ausfällt, und maximal gleich der Länge des Suchstrings, wenn nämlich völlige Übereinstimmung herrscht, der Begriff also gefunden wurde.</p>
+        <p>Verschieben wir um zwei Positionen, so liegt unser »HOHO« genau an der richtigen Stelle. Die Suchtiefe kann minimal Null werden, wenn schon der erste Vergleich negativ ausfällt, und maximal gleich der Länge des Suchstrings, wenn nämlich völlige Übereinstimmung herrscht, der Begriff also gefunden wurde.</p>
 
-<p>Das wäre an sich schon alles. Theoretisch ließe sich auch schon jetzt der Suchalgorithmus formulieren. Aber eine Kleinigkeit würde unsjetzt noch Schwierigkeiten machen. Gemeint ist das Suchen mit ]oker. Den Floppybesitzern unter Ihnen wird es wahrscheinlich schon bekannt sein.</p>
+        <p>Das wäre an sich schon alles. Theoretisch ließe sich auch schon jetzt der Suchalgorithmus formulieren. Aber eine Kleinigkeit würde unsjetzt noch Schwierigkeiten machen. Gemeint ist das Suchen mit ]oker. Den Floppybesitzern unter Ihnen wird es wahrscheinlich schon bekannt sein.</p>
 
-<h3>Probleme mit dem Joker</h3>
+        <h3>Probleme mit dem Joker</h3>
 
-<p>Nehmen wir einmal an, Sie führen eine Adressendatei und würden nun gerne die Adresse von einem Herrn Maier haben. Dummerweise wissen Sie nun nicht mehr, ob es Herr Maier oder vielleicht Herr Meier oder gar Herr Mayer war. Beim Durchsuchen wäre also ein Joker sehr praktisch. Dann suchen sie nach Herrn M??er. Die Suchroutine müßte ihnen nun alle nur erdenklichen Formen des Namens Maier heraussuchen. Dummerweise ist ein Joker in unserem Suchalgorithmus gar nicht so einfach zu installieren, und wirft uns auch, wie wir noch sehen werden, geschwindigkeitsmäßig zurück.</p>
+        <p>Nehmen wir einmal an, Sie führen eine Adressendatei und würden nun gerne die Adresse von einem Herrn Maier haben. Dummerweise wissen Sie nun nicht mehr, ob es Herr Maier oder vielleicht Herr Meier oder gar Herr Mayer war. Beim Durchsuchen wäre also ein Joker sehr praktisch. Dann suchen sie nach Herrn M??er. Die Suchroutine müßte ihnen nun alle nur erdenklichen Formen des Namens Maier heraussuchen. Dummerweise ist ein Joker in unserem Suchalgorithmus gar nicht so einfach zu installieren, und wirft uns auch, wie wir noch sehen werden, geschwindigkeitsmäßig zurück.</p>
 
-<p>Konstruieren wir uns mal wieder ein Beispiel. Wir suchen nach »H?HI« in »HIHXHI«. Beim ersten Anlege- und Vergleichsvorgang wird das »I« mit einem »X« verglichen. Da der Vergleich ungleich ausfällt, und »X«, da nicht im Suchstring enthalten, einen Maximalverschiebefaktor von 4 liefert, und die Suchtiefe hier auch noch 0 ist, würde um vier Zeichen verschoben, und das Auftauchen von »HXHI« an der Position 3 völlig übersehen.</p>
+        <p>Konstruieren wir uns mal wieder ein Beispiel. Wir suchen nach »H?HI« in »HIHXHI«. Beim ersten Anlege- und Vergleichsvorgang wird das »I« mit einem »X« verglichen. Da der Vergleich ungleich ausfällt, und »X«, da nicht im Suchstring enthalten, einen Maximalverschiebefaktor von 4 liefert, und die Suchtiefe hier auch noch 0 ist, würde um vier Zeichen verschoben, und das Auftauchen von »HXHI« an der Position 3 völlig übersehen.</p>
 
-<p>H I H X H I<br/>
-H ? H I<br/>
-H ? H I<br/>
-TODO</p>
+        <p>H I H X H I<br />
+            H ? H I<br />
+            H ? H I<br />
+            TODO</p>
 
-<p>Fragen wir uns also wieder einmal, um wieviel hier maximal verschoben werden kann. Die Antwort lautet 2, da ja »HXHI« an der Position 3 steht.</p>
+        <p>Fragen wir uns also wieder einmal, um wieviel hier maximal verschoben werden kann. Die Antwort lautet 2, da ja »HXHI« an der Position 3 steht.</p>
 
-<p>H   I   H   X   H   I<br/>
-H   ?   H   I<br/>
-H   ?   H   I<br/>
-TODO</p>
+        <p>H I H X H I<br />
+            H ? H I<br />
+            H ? H I<br />
+            TODO</p>
 
-<p>Nun ist die Stellungsnummer des Jokers gerade aber auch 2. Ohne näheren Beweis und Erklärung muß der Algorithmus noch folgende Regel zusätzlich enthalten:</p>
+        <p>Nun ist die Stellungsnummer des Jokers gerade aber auch 2. Ohne näheren Beweis und Erklärung muß der Algorithmus noch folgende Regel zusätzlich enthalten:</p>
 
-<p>Es darf maximal um die Stellungsnummer des Jokers im Suchstring verschoben werden. Damit läßt sich der Suchalgorithmus als Flußdiagramm formulieren. Dies ist in Bild 2 dargestellt. Das Flußdiagramm ist übrigens parallel zur Suchroutine im Suchprogramm zu sehen, da sich beide in der Struktur gleichen. Diese Suchroutine steht in den Speicherzellen $C12B-$0179. Deswegen ist das Flußdiagramm auch nicht ganz so elegant, wie es eigentlich sein könnte.</p>
+        <p>Es darf maximal um die Stellungsnummer des Jokers im Suchstring verschoben werden. Damit läßt sich der Suchalgorithmus als Flußdiagramm formulieren. Dies ist in Bild 2 dargestellt. Das Flußdiagramm ist übrigens parallel zur Suchroutine im Suchprogramm zu sehen, da sich beide in der Struktur gleichen. Diese Suchroutine steht in den Speicherzellen $C12B-$0179. Deswegen ist das Flußdiagramm auch nicht ganz so elegant, wie es eigentlich sein könnte.</p>
 
-<h3>Lohnt sich das überhaupt?</h3>
+        <h3>Lohnt sich das überhaupt?</h3>
 
-<p>Das ist jetzt natürlich die entscheidende Frage. Was haben wir dabei eigentlich gewonnen? Dem Verschieben können um mehrere Positionen, steht ein ungleich hoher Aufwand gegenüber. Dazu sei gleich gesagt, daß es Unsinn wäre, das Ganze in eine normale INSTR-Funktion, wie in Ex-, Simons- und GBasic enthalten, einzubauen. Dann lohnt sich der Aufwand eben nicht. Ich habe einmal überschlagsweise mein Programm (das ich »Intellisearch« = intelligentes Suchen genannt habe) mit diesen Erweiterungen verglichen, indem ich einen String in einem anderen gesucht habe. Fazit: Fast alle sind ungefähr fünfmal so schnell wie Intellisearch.</p>
+        <p>Das ist jetzt natürlich die entscheidende Frage. Was haben wir dabei eigentlich gewonnen? Dem Verschieben können um mehrere Positionen, steht ein ungleich hoher Aufwand gegenüber. Dazu sei gleich gesagt, daß es Unsinn wäre, das Ganze in eine normale INSTR-Funktion, wie in Ex-, Simons- und GBasic enthalten, einzubauen. Dann lohnt sich der Aufwand eben nicht. Ich habe einmal überschlagsweise mein Programm (das ich »Intellisearch« = intelligentes Suchen genannt habe) mit diesen Erweiterungen verglichen, indem ich einen String in einem anderen gesucht habe. Fazit: Fast alle sind ungefähr fünfmal so schnell wie Intellisearch.</p>
 
-<p>Aber: Diese INSTR-Funktionen lassen sich nur jeweils auf einen einzigen String anwenden. Will man eine größere Anzahl von Strings durchsuchen, etwa in einem Feld (Array), ist eine FOR-NEXT-Schleife notwendig. Im Gegensatz dazu ist Intellisearch darauf »abgerichtet«, Stringarrays zu durchsuchen. Und dann kommt man auf einmal auf Suchgeschwindigkeiten, die alles andere in den Schatten stellen. Zur Entlastung von Intellisearch muß nämlich folgendes gesagt werden. Die Parameterauswertung bei Intellisearch ist ungleich umfangreicher, als bei den INSTR-Funktionen. Außerdem wird Intellisearch über den SYS-Befehl aufgerufen, was ebenfalls sehr zeitintensiv ist (Zeitintensiver als der Aufruf über einen neuen Basic-Befehl auf jeden Fall).</p>
+        <p>Aber: Diese INSTR-Funktionen lassen sich nur jeweils auf einen einzigen String anwenden. Will man eine größere Anzahl von Strings durchsuchen, etwa in einem Feld (Array), ist eine FOR-NEXT-Schleife notwendig. Im Gegensatz dazu ist Intellisearch darauf »abgerichtet«, Stringarrays zu durchsuchen. Und dann kommt man auf einmal auf Suchgeschwindigkeiten, die alles andere in den Schatten stellen. Zur Entlastung von Intellisearch muß nämlich folgendes gesagt werden. Die Parameterauswertung bei Intellisearch ist ungleich umfangreicher, als bei den INSTR-Funktionen. Außerdem wird Intellisearch über den SYS-Befehl aufgerufen, was ebenfalls sehr zeitintensiv ist (Zeitintensiver als der Aufruf über einen neuen Basic-Befehl auf jeden Fall).</p>
 
-<p>Am allerwichtigsten aber: Ein Zeitverlust entsteht noch durch das Aufstellen der Tabelle. Der Suchalgorithmus selbst ist nämlich tatsächlich schneller. Aber da ja zuerst die Tabelle der Stellungsnummern aufgestellt werden muß, haben bei kurzen Durchsuchstrings die INSTR-Funktionen einen recht großen Zeitvorsprung, bevor Intellisearch mit dem Suchen anfangen kann. Die Anwendung lohnt sich also nur bei recht großen zu durchsuchenden Strings, oder gleich bei einer großen Anzahl zu durchsuchender Strings, am besten Arrays. Je mehr Strings durchsucht werden müssen, desto eher lohnt sich der Einsatz des Programms. Dann kann der Suchalgorithmus den gegebenen Zeitvorsprung locker wieder wettmachen, und um Faktoren von 2 bis 10, je nach Länge des Suchstrings, schneller sein. Denn je länger der Suchstring, desto weiter kann er bei völliger Nichtübereinstimmung in einem Schub verschoben werden, während der alte Algorithmus immer nur um 1 verschieben kann.</p>
+        <p>Am allerwichtigsten aber: Ein Zeitverlust entsteht noch durch das Aufstellen der Tabelle. Der Suchalgorithmus selbst ist nämlich tatsächlich schneller. Aber da ja zuerst die Tabelle der Stellungsnummern aufgestellt werden muß, haben bei kurzen Durchsuchstrings die INSTR-Funktionen einen recht großen Zeitvorsprung, bevor Intellisearch mit dem Suchen anfangen kann. Die Anwendung lohnt sich also nur bei recht großen zu durchsuchenden Strings, oder gleich bei einer großen Anzahl zu durchsuchender Strings, am besten Arrays. Je mehr Strings durchsucht werden müssen, desto eher lohnt sich der Einsatz des Programms. Dann kann der Suchalgorithmus den gegebenen Zeitvorsprung locker wieder wettmachen, und um Faktoren von 2 bis 10, je nach Länge des Suchstrings, schneller sein. Denn je länger der Suchstring, desto weiter kann er bei völliger Nichtübereinstimmung in einem Schub verschoben werden, während der alte Algorithmus immer nur um 1 verschieben kann.</p>
 
-<p>Es ist übrigens noch eine Erweiterung eingebaut, die auch verlangsamend wirken kann:</p>
+        <p>Es ist übrigens noch eine Erweiterung eingebaut, die auch verlangsamend wirken kann:</p>
 
-<p>Das Füllsel.</p>
+        <p>Das Füllsel.</p>
 
-<h3>Was ist ein Füllsel?</h3>
+        <h3>Was ist ein Füllsel?</h3>
 
-<p>Manchmal hat mich bei der Floppy die Filenamenabkürzung mit »*« gestört. So organisiere ich meine Artikel meist indem ich ihnen einen Namen und dann Anhängsel wie «.LSTOl« oder »TXT« gebe. Möchte ich nun einen Überblick über sämtliche auf der Diskette befindlichen Texte, ginge das nur, wenn das »TXT« immer die letzten vier Buchstaben eines 16stelligen Filenamens wäre. Dann könnte ich nach »?????????????.TXT« suchen. Und das ist mir zuviel Tipparbeit. Einfacher wäre es da, wenn man nach »*.TXT« suchen könnte. Aber nach dem »*« nimmt die Floppy 1541 keine weiteren Zeichen an.</p>
+        <p>Manchmal hat mich bei der Floppy die Filenamenabkürzung mit »*« gestört. So organisiere ich meine Artikel meist indem ich ihnen einen Namen und dann Anhängsel wie «.LSTOl« oder »TXT« gebe. Möchte ich nun einen Überblick über sämtliche auf der Diskette befindlichen Texte, ginge das nur, wenn das »TXT« immer die letzten vier Buchstaben eines 16stelligen Filenamens wäre. Dann könnte ich nach »?????????????.TXT« suchen. Und das ist mir zuviel Tipparbeit. Einfacher wäre es da, wenn man nach »*.TXT« suchen könnte. Aber nach dem »*« nimmt die Floppy 1541 keine weiteren Zeichen an.</p>
 
-<p>Nun, in der Floppy 1541 kann ich das natürlich nicht so ohne weiteres ändern, aber immerhin in mein Suchprogramm einbauen. Suchen Sie also nach »HA*LO«, so wird sowohl »HALLO«, wie auch »HALLIHALLO«, und sogar »HALO« gefunden.</p>
+        <p>Nun, in der Floppy 1541 kann ich das natürlich nicht so ohne weiteres ändern, aber immerhin in mein Suchprogramm einbauen. Suchen Sie also nach »HA*LO«, so wird sowohl »HALLO«, wie auch »HALLIHALLO«, und sogar »HALO« gefunden.</p>
 
-<p>Eine Einschränkung muß dabei aber gemacht werden. Es ist nur ein Füllsel im Suchstring erlaubt, da der Speicherplatz in der Zeropage zu klein ist, noch mehr Werte ungefährlich zwischenzuspeichern. Denn Intellisearch zerlegt einen solchen String in zwei Teilstrings. Wird in einem String der erste Teilstring gefunden, so wird nach dem zweiten gesucht. Ist auch dieser vorhanden, so hat man gefunden was man sucht. Sonst muß die Suche beim nächsten Durchsuchstring wieder mit dem ersten Teilstring beginnen. Verständlicherweise benötigt das Zerlegen in zwei Teilstrings, und das ab und zu notwendige Erstellen der Tabelle eine gewisse Zeit, so daß das Suchen mit Füllsel etwas langsamer als das normale Suchen ist.</p>
+        <p>Eine Einschränkung muß dabei aber gemacht werden. Es ist nur ein Füllsel im Suchstring erlaubt, da der Speicherplatz in der Zeropage zu klein ist, noch mehr Werte ungefährlich zwischenzuspeichern. Denn Intellisearch zerlegt einen solchen String in zwei Teilstrings. Wird in einem String der erste Teilstring gefunden, so wird nach dem zweiten gesucht. Ist auch dieser vorhanden, so hat man gefunden was man sucht. Sonst muß die Suche beim nächsten Durchsuchstring wieder mit dem ersten Teilstring beginnen. Verständlicherweise benötigt das Zerlegen in zwei Teilstrings, und das ab und zu notwendige Erstellen der Tabelle eine gewisse Zeit, so daß das Suchen mit Füllsel etwas langsamer als das normale Suchen ist.</p>
 
-<h3>So arbeitet man mit Intellisearch</h3>
+        <h3>So arbeitet man mit Intellisearch</h3>
 
-<p>Nach all der grauen Theorie doch nun etwas Praxis. Intellisearch belegt die Speicherbereiche $C000 bis $C2FF. Das Programm selbst belegt dabei nur die Speicherstellen $C000 bis $C17A, um die Tabellenroutinen jedoch einfacher und somit das Programm einigermaßen verschieblich zu halten, liegt die Tabelle von $C200 bis $C2FF. Wer will, kann ja die Tabelle direkt hinter das Programm legen, um Platz zu sparen.</p>
+        <p>Nach all der grauen Theorie doch nun etwas Praxis. Intellisearch belegt die Speicherbereiche $C000 bis $C2FF. Das Programm selbst belegt dabei nur die Speicherstellen $C000 bis $C17A, um die Tabellenroutinen jedoch einfacher und somit das Programm einigermaßen verschieblich zu halten, liegt die Tabelle von $C200 bis $C2FF. Wer will, kann ja die Tabelle direkt hinter das Programm legen, um Platz zu sparen.</p>
 
-<p>Sollte dieser Speicherbereich von Ihrem eigenen Programm oder einer Basic-Erweiterung anderweitig benötigt werden, so müssen Sie leider selber die Anpassungen an einen anderen Speicherbereich vornehmen. Mit dem dokumentierten Listing und dem SMON dürfte das aber kein Problem sein.</p>
+        <p>Sollte dieser Speicherbereich von Ihrem eigenen Programm oder einer Basic-Erweiterung anderweitig benötigt werden, so müssen Sie leider selber die Anpassungen an einen anderen Speicherbereich vornehmen. Mit dem dokumentierten Listing und dem SMON dürfte das aber kein Problem sein.</p>
 
-<p>Im Vertrauen auf den MSE ist kein Basic-Lader mehr notwendig, das MSE-Listing ist also Listing 1. Im Programm werden zwei kleine Tricks verwendet, die vielleicht dem einen oder anderen von Ihnen nicht bekannt sind. Es sind dies die Maskierung des SEC-Befehls über den Bit-Befehl gegen Ende des Listings, und der recht brutale Aussprung aus der Zähler-Erhöhen-Routine ($C0E2), wenn die Suche beendet werden soll. Dort wird eine Rücksprungadresse über PLA PLA »vernichtet«, so daß ordnungsgemäß mit JMP »Klammer zu?« ausgesprungen werden kann. Dies entspricht einem POP oder DISPOSE RETURN bei den Basic-Erweiterungen G- und ExBasic, mit denen ein Unterprogramm, das über GOSUB aufgerufen wurde, mit GOTO und nicht mit RETURN verlassen werden kann. So, nun aber zum Aufruf der Routine. Dieser erfolgt über:</p>
+        <p>Im Vertrauen auf den MSE ist kein Basic-Lader mehr notwendig, das MSE-Listing ist also Listing 1. Im Programm werden zwei kleine Tricks verwendet, die vielleicht dem einen oder anderen von Ihnen nicht bekannt sind. Es sind dies die Maskierung des SEC-Befehls über den Bit-Befehl gegen Ende des Listings, und der recht brutale Aussprung aus der Zähler-Erhöhen-Routine ($C0E2), wenn die Suche beendet werden soll. Dort wird eine Rücksprungadresse über PLA PLA »vernichtet«, so daß ordnungsgemäß mit JMP »Klammer zu?« ausgesprungen werden kann. Dies entspricht einem POP oder DISPOSE RETURN bei den Basic-Erweiterungen G- und ExBasic, mit denen ein Unterprogramm, das über GOSUB aufgerufen wurde, mit GOTO und nicht mit RETURN verlassen werden kann. So, nun aber zum Aufruf der Routine. Dieser erfolgt über:</p>
 
-<h3>SYS 49152 (A$,B$(O),P,Q,X%,Y%)</h3>
+        <h3>SYS 49152 (A$,B$(O),P,Q,X%,Y%)</h3>
 
-<p>Die Variablennamen sind hier ganz willkürlich gewählt, können also von Ihnen verändert werden.</p>
+        <p>Die Variablennamen sind hier ganz willkürlich gewählt, können also von Ihnen verändert werden.</p>
 
-<p><strong>A$</strong> bezeichnet den zu suchenden String. Hier ist wohl keine besondere Erklärung nötig, außer daß wie schon erwähnt »?« als Joker und »*« als Füllsel gilt.</p>
+        <p><strong>A$</strong> bezeichnet den zu suchenden String. Hier ist wohl keine besondere Erklärung nötig, außer daß wie schon erwähnt »?« als Joker und »*« als Füllsel gilt.</p>
 
-<p><strong>B$(0)</strong> bezeichnet das zu durchsuchende Array. Soll, waswenig sinnvoll ist, ein einzelner String durchsucht werden, darf hier auch einfach B$ stehen. Will man die Suche erst beim siebten Arrayelement starten, weil der String zum Beispiel schon im sechsten Element gefunden wurde ( = B$(5), Zählung beginnt bei 0), darf dort auch B$(6) stehen. Dies ist dann der erste durchsuchte String.</p>
+        <p><strong>B$(0)</strong> bezeichnet das zu durchsuchende Array. Soll, waswenig sinnvoll ist, ein einzelner String durchsucht werden, darf hier auch einfach B$ stehen. Will man die Suche erst beim siebten Arrayelement starten, weil der String zum Beispiel schon im sechsten Element gefunden wurde ( = B$(5), Zählung beginnt bei 0), darf dort auch B$(6) stehen. Dies ist dann der erste durchsuchte String.</p>
 
-<p><strong>P</strong> gibt die Anzahl der zu durchsuchenden Strings an. Wird beispielsweise bei B$(0) begonnen, und hat P den Wert 100, so wird nach dem Durchsuchen von B$(99) abgebrochen. Bei einem Startwert B$(17) wäre dies dann analog bei B$(116) der Fall. Diese Angabe ist stets sorgfältig zu handhaben, da Intellisearch nicht die Größe des zu durchsuchenden Arrays feststellt, und somit aus Versehen über das Array hinaus gesucht werden kann. Dies kann im ärgsten Fall zum Absturz führen!</p>
+        <p><strong>P</strong> gibt die Anzahl der zu durchsuchenden Strings an. Wird beispielsweise bei B$(0) begonnen, und hat P den Wert 100, so wird nach dem Durchsuchen von B$(99) abgebrochen. Bei einem Startwert B$(17) wäre dies dann analog bei B$(116) der Fall. Diese Angabe ist stets sorgfältig zu handhaben, da Intellisearch nicht die Größe des zu durchsuchenden Arrays feststellt, und somit aus Versehen über das Array hinaus gesucht werden kann. Dies kann im ärgsten Fall zum Absturz führen!</p>
 
-<p><strong>Q</strong> ist die Startposition der Suche. Dies kann bei mehreren Daten in einem String recht nützlich sein. Steht etwa ein Name immer ab der 14ten Stelle im Array, so brauchen die ersten 13 Stellen nicht durchsucht zu werden, wenn nach einem Namen gesucht wird. Dann sollte Q den Wert 14 enthalten.</p>
+        <p><strong>Q</strong> ist die Startposition der Suche. Dies kann bei mehreren Daten in einem String recht nützlich sein. Steht etwa ein Name immer ab der 14ten Stelle im Array, so brauchen die ersten 13 Stellen nicht durchsucht zu werden, wenn nach einem Namen gesucht wird. Dann sollte Q den Wert 14 enthalten.</p>
 
-<p>In <strong>X%</strong> und <strong>Y%</strong> wird am Ende das Ergebnis der Suche festgehalten. In X% steht die Nummer des Strings, in dem der Suchstring gefunden wurde, wenn mit B$(0) gestartet wurde, ansonsten muß zu X% noch P addiert werden, um die Position im Array zu bekommen.</p>
+        <p>In <strong>X%</strong> und <strong>Y%</strong> wird am Ende das Ergebnis der Suche festgehalten. In X% steht die Nummer des Strings, in dem der Suchstring gefunden wurde, wenn mit B$(0) gestartet wurde, ansonsten muß zu X% noch P addiert werden, um die Position im Array zu bekommen.</p>
 
-<p>Y% gibt schließlich die Position im String selbst an. Wird die Suche abgebrochen, das heißt Suchstring nicht gefunden, steht in X% -1, in Y% bleibt der alte Wert erhalten.</p>
+        <p>Y% gibt schließlich die Position im String selbst an. Wird die Suche abgebrochen, das heißt Suchstring nicht gefunden, steht in X% -1, in Y% bleibt der alte Wert erhalten.</p>
 
-<h3>Und so geht’s</h3>
+        <h3>Und so geht’s</h3>
 
-<p>Im folgenden werden wir uns noch ein wenig mit der Funktionsweise des Programms beschäftigen. Dazu dienen uns Bild 3, das ein Flußdiagramm der Kontrollroutine zeigt, sowie Listing 2, und Tabelle 1, die alle verwendeten Zeropage-Adressen aufschlüsselt. Ich weiß leider nicht, ob nach der Benutzung ein einwandfreier Kassettenbetrieb möglich ist, da einige der Kassetten-Zeropage-Adressen verwendet werden. Hier wäre ich für Hinweise dankbar.</p>
+        <p>Im folgenden werden wir uns noch ein wenig mit der Funktionsweise des Programms beschäftigen. Dazu dienen uns Bild 3, das ein Flußdiagramm der Kontrollroutine zeigt, sowie Listing 2, und Tabelle 1, die alle verwendeten Zeropage-Adressen aufschlüsselt. Ich weiß leider nicht, ob nach der Benutzung ein einwandfreier Kassettenbetrieb möglich ist, da einige der Kassetten-Zeropage-Adressen verwendet werden. Hier wäre ich für Hinweise dankbar.</p>
 
-<p>Als erstes wird der Suchstring geholt, und auf Füllsel untersucht. Bei der Verwendung dieser Routine ($AD9A) kann es unter Umständen bei manchen C 64 zu einem FORMULAR TOO COMPLEX ERROR kommen. Ist ein solches Füllsel vorhanden, erfolgt die Teilung in zwei Teilstrings. Die Länge des Teilstrings 2 ist später gleichzeitig das Kennzeichen dafür, ob ein Füllsel vorlag. Ist die Länge gleich 0, ist das nicht der Fall.</p>
+        <p>Als erstes wird der Suchstring geholt, und auf Füllsel untersucht. Bei der Verwendung dieser Routine ($AD9A) kann es unter Umständen bei manchen C 64 zu einem FORMULAR TOO COMPLEX ERROR kommen. Ist ein solches Füllsel vorhanden, erfolgt die Teilung in zwei Teilstrings. Die Länge des Teilstrings 2 ist später gleichzeitig das Kennzeichen dafür, ob ein Füllsel vorlag. Ist die Länge gleich 0, ist das nicht der Fall.</p>
 
-<p>Alsdann wird der Pointer auf den Startdurchsuchstring gespeichert. Dies erfolgt auch über die uns schon bekannte Routine $AD9A. Wenn keine direkte Auswertung vorgenommen wird, steht in $64/$65 ein Zeiger auf den Stringdescriptor, oder den Variablendescriptor. Achtung! Hier wird nicht überprüft, ob es sich überhaupt um einen String oder ein Stringarray handelt. Hier kann man also die Routine zum »Ausflippen« bringen.</p>
+        <p>Alsdann wird der Pointer auf den Startdurchsuchstring gespeichert. Dies erfolgt auch über die uns schon bekannte Routine $AD9A. Wenn keine direkte Auswertung vorgenommen wird, steht in $64/$65 ein Zeiger auf den Stringdescriptor, oder den Variablendescriptor. Achtung! Hier wird nicht überprüft, ob es sich überhaupt um einen String oder ein Stringarray handelt. Hier kann man also die Routine zum »Ausflippen« bringen.</p>
 
-<p>Später wird zu diesem Pointer einfach 3 addiert, um den nächsten Stringdescriptor zu bekommen. Dies funktioniert bei Arrays einwandfrei, solange nicht die Array-Obergrenze überschritten wird. Theoretisch ließen sich hier auch mehrdimensionale Arrays durchsuchen. Wer dies vor hat, möge sich nochmal den Aufbau von Stringarrays im Artikel über die Carbage Collection zu Gemüte führen (64’er, Ausgabe 1/85).</p>
+        <p>Später wird zu diesem Pointer einfach 3 addiert, um den nächsten Stringdescriptor zu bekommen. Dies funktioniert bei Arrays einwandfrei, solange nicht die Array-Obergrenze überschritten wird. Theoretisch ließen sich hier auch mehrdimensionale Arrays durchsuchen. Wer dies vor hat, möge sich nochmal den Aufbau von Stringarrays im Artikel über die Carbage Collection zu Gemüte führen (64’er, Ausgabe 1/85).</p>
 
-<p>Als nächstes werden die zwei numerischen Parameter geholt, beide als Bytewert. Deswegen sind hier auch nur Werte kleiner 256 erlaubt. Mehr ist sowieso kaum sinnvoll.</p>
+        <p>Als nächstes werden die zwei numerischen Parameter geholt, beide als Bytewert. Deswegen sind hier auch nur Werte kleiner 256 erlaubt. Mehr ist sowieso kaum sinnvoll.</p>
 
-<p>Nun wird der aktuelle Durchsuchstringdescriptor in den Arbeitsspeicher kopiert, die Tabelle angelegt und die Suche nach Teilstring 1 gestartet. Wird Teilstring 1 gefunden, wird nach der zu durchsuchenden Strings erreicht wird. Dann wird die Rücksprungadresse vom Stack entfernt, und nach dem Einkopieren von —1 in die erste der beiden Integervariablen die Routine verlassen.</p>
+        <p>Nun wird der aktuelle Durchsuchstringdescriptor in den Arbeitsspeicher kopiert, die Tabelle angelegt und die Suche nach Teilstring 1 gestartet. Wird Teilstring 1 gefunden, wird nach der zu durchsuchenden Strings erreicht wird. Dann wird die Rücksprungadresse vom Stack entfernt, und nach dem Einkopieren von —1 in die erste der beiden Integervariablen die Routine verlassen.</p>
 
-<p>Die beiden letzten Teile des Programms sind das Tabellenanlegen und die eigentliche Suchroutine. Hier verweise ich auf die beiden Flußdiagramme und die obigen Erklärungen.</p>
+        <p>Die beiden letzten Teile des Programms sind das Tabellenanlegen und die eigentliche Suchroutine. Hier verweise ich auf die beiden Flußdiagramme und die obigen Erklärungen.</p>
 
-<p>So, damit hätten wir uns wohl durch das Programm durchgekämpft.</p>
+        <p>So, damit hätten wir uns wohl durch das Programm durchgekämpft.</p>
 
-<p>Noch einige Tips: Das Füllselzeichen kann in der Speicherstelle $C01E geändert werden. Beim Jokerzeichen sind einige Änderungen mehr notwendig. Diese betreffen die Speicherstellen $C14A, $C160 und $C165. Dort muß dann jeweils der ASCII-Code des Jokers stehen.</p>
+        <p>Noch einige Tips: Das Füllselzeichen kann in der Speicherstelle $C01E geändert werden. Beim Jokerzeichen sind einige Änderungen mehr notwendig. Diese betreffen die Speicherstellen $C14A, $C160 und $C165. Dort muß dann jeweils der ASCII-Code des Jokers stehen.</p>
 
-<p>Das nächste Mal geht’s wieder um Strings, dann allerdings um Sortieren. Karsten Schramm wird dann die gängigsten Sortieralgorithmen vorstellen und vergleichen.</p>
+        <p>Das nächste Mal geht’s wieder um Strings, dann allerdings um Sortieren. Karsten Schramm wird dann die gängigsten Sortieralgorithmen vorstellen und vergleichen.</p>
 
-<address class="author">(B. Schneider/gk)</address>
+        <address class="author">(B. Schneider/gk)</address>
     </article>
 </body>
+
 </html>

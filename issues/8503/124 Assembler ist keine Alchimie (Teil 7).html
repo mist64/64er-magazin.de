@@ -16,446 +16,447 @@
 <body>
     <article>
         <h1>Assembler ist keine Alchimie (Teil 7)</h1>
-<p class="intro">ln diesem Teil werden wir drei Themen besprechen: den Stapel und die indirekte Adressierung. Ferner zeigen wir an einem ausführlichen Beispiel, wie Text auf dem Bildschirm und auf dem Drucker ausgegeben werden kann.</p>
+        <p class="intro">ln diesem Teil werden wir drei Themen besprechen: den Stapel und die indirekte Adressierung. Ferner zeigen wir an einem ausführlichen Beispiel, wie Text auf dem Bildschirm und auf dem Drucker ausgegeben werden kann.</p>
 
-<p>Die Assembler-Folge in der letzten Ausgabe hat einige Fragen offengelassen, die dieses Mal beantwortet werden sollen: Die Sache mit dem Stapel wird geklärt, und Sie werden Befehle zu gebrauchen lernen, die uns Stapeloperationen ermöglichen. In unserem ersten Programmprojekt-Teil gab es für Sie unverständliche Sequenzen, die mit der Speicherstelle 1 zu tun hatten. Auch das werden Sie diesmal verstehen.</p>
+        <p>Die Assembler-Folge in der letzten Ausgabe hat einige Fragen offengelassen, die dieses Mal beantwortet werden sollen: Die Sache mit dem Stapel wird geklärt, und Sie werden Befehle zu gebrauchen lernen, die uns Stapeloperationen ermöglichen. In unserem ersten Programmprojekt-Teil gab es für Sie unverständliche Sequenzen, die mit der Speicherstelle 1 zu tun hatten. Auch das werden Sie diesmal verstehen.</p>
 
-<p>Sie beherrschen inzwischen fast alle Arten der Adressierung: Nach dieser Folge fehlt keine mehr. Ich habe Ihnen hoffentlich das Wasser im Munde zusammenlaufen lassen mit der Liste aller Kernal-Routinen: Nun sollen uns die ersten davon munden.</p>
+        <p>Sie beherrschen inzwischen fast alle Arten der Adressierung: Nach dieser Folge fehlt keine mehr. Ich habe Ihnen hoffentlich das Wasser im Munde zusammenlaufen lassen mit der Liste aller Kernal-Routinen: Nun sollen uns die ersten davon munden.</p>
 
-<h3>Wir stapeln</h3>
+        <h3>Wir stapeln</h3>
 
-<p>In der vorangegangenen Ausgabe haben wir beim JSR-Befehl schon den Stapel etwas kennengelernt. Aber so ganz genau wissen wir’s ja noch nicht, was das ist. Deswegenjetzt mal im Detail: Der Stapel, auch Prozessorstack genannt, ist der Speicherbereich von dezimal 256 ($100) bis dezimal 511 ($1FF), der direkt von unserer CPU verwaltet wird. Das ist also die gesamte Page 1. Ähnlich wie bei der String-Verwaltung geschieht auch hier das Füllen von oben nach unten. Das erste Byte, welches in den Stack geschoben wird, kommt also nach $1FF, das nächste nach $1FE und so weiter. Voll ist der Stapel, wenn auch $100 besetzt wurde (siehe Bild 1).</p>
+        <p>In der vorangegangenen Ausgabe haben wir beim JSR-Befehl schon den Stapel etwas kennengelernt. Aber so ganz genau wissen wir’s ja noch nicht, was das ist. Deswegenjetzt mal im Detail: Der Stapel, auch Prozessorstack genannt, ist der Speicherbereich von dezimal 256 ($100) bis dezimal 511 ($1FF), der direkt von unserer CPU verwaltet wird. Das ist also die gesamte Page 1. Ähnlich wie bei der String-Verwaltung geschieht auch hier das Füllen von oben nach unten. Das erste Byte, welches in den Stack geschoben wird, kommt also nach $1FF, das nächste nach $1FE und so weiter. Voll ist der Stapel, wenn auch $100 besetzt wurde (siehe Bild 1).</p>
 
-<p>Warum heißt das Ding nun eigentlich Stapel? Das erklärt sich aus dem Zugriffs-Prinzip. Man spricht von einer LIFO-Struktur, von »Last In — First Out«, zu deutsch »zuletzt hinein — zuerst heraus«. Das zuerst hineingebrachte Byte befindet sich am Speicherboden ($1FF), das zuletzt eingebrachte an der Speicherspitze. Stellen Sie sich einen Stapel Akten vor (Bild 2).</p>
+        <p>Warum heißt das Ding nun eigentlich Stapel? Das erklärt sich aus dem Zugriffs-Prinzip. Man spricht von einer LIFO-Struktur, von »Last In — First Out«, zu deutsch »zuletzt hinein — zuerst heraus«. Das zuerst hineingebrachte Byte befindet sich am Speicherboden ($1FF), das zuletzt eingebrachte an der Speicherspitze. Stellen Sie sich einen Stapel Akten vor (Bild 2).</p>
 
-<p>Offensichtlich wurde der 4. Aktenordner zuletzt auf den Stapel gesteckt. Er kann zuerst heruntergeholt werden. An die Akte 1 kommen wir erst heran, wenn alle anderen heruntergenommen worden sind. Genauso verhält es sich mit dem Prozessorstack: Um an das unterste Byte des Stapels heranzukommen, müssen erst Byte für Byte die darüberliegenden (nach Bild 1 eigentlich die darunterliegenden) weggeschafft werden.</p>
+        <p>Offensichtlich wurde der 4. Aktenordner zuletzt auf den Stapel gesteckt. Er kann zuerst heruntergeholt werden. An die Akte 1 kommen wir erst heran, wenn alle anderen heruntergenommen worden sind. Genauso verhält es sich mit dem Prozessorstack: Um an das unterste Byte des Stapels heranzukommen, müssen erst Byte für Byte die darüberliegenden (nach Bild 1 eigentlich die darunterliegenden) weggeschafft werden.</p>
 
-<p>Mit dem Prinzip des Stapelspeichers werden Sie sich auskennen, wenn Sie schon mal andere Programmiersprachen als Basic ausprobiert haben: In Forth beispielweise operieren Sie ständig mit Stapeln.</p>
+        <p>Mit dem Prinzip des Stapelspeichers werden Sie sich auskennen, wenn Sie schon mal andere Programmiersprachen als Basic ausprobiert haben: In Forth beispielweise operieren Sie ständig mit Stapeln.</p>
 
-<h2>Der Stapel: Das Gedächtnis des Prozessors</h2>
+        <h2>Der Stapel: Das Gedächtnis des Prozessors</h2>
 
-<p>Damit wir — und der Prozessor — den Überblick über den Stack behalten, gibt es dankenswerterweise noch einen Stapelzeiger (stackpointer), der jeweils auf den nächsten freien Platz des Stapels weist. Da gibt’s nun aber ein kleines Problem: Der Stapel belegt die komplette Seite 1.</p>
+        <p>Damit wir — und der Prozessor — den Überblick über den Stack behalten, gibt es dankenswerterweise noch einen Stapelzeiger (stackpointer), der jeweils auf den nächsten freien Platz des Stapels weist. Da gibt’s nun aber ein kleines Problem: Der Stapel belegt die komplette Seite 1.</p>
 
-<p>Ein Stapelzeiger, der auf zum Beispiel $01FE zeigen soll, müßte das MSB (also 01) und das LSB (also FE) in zwei Bytes lagern. Der Stapelzeiger ist aber nur 8 Bit groß &hellip; Freundlicherweise sorgt unser Mikroprozessor automatisch für das neunte Bit. Der Zeiger zählt also immer von $FF an rückwärts bis $00 und weist dabei von $1FF bis $100.</p>
+        <p>Ein Stapelzeiger, der auf zum Beispiel $01FE zeigen soll, müßte das MSB (also 01) und das LSB (also FE) in zwei Bytes lagern. Der Stapelzeiger ist aber nur 8 Bit groß &hellip; Freundlicherweise sorgt unser Mikroprozessor automatisch für das neunte Bit. Der Zeiger zählt also immer von $FF an rückwärts bis $00 und weist dabei von $1FF bis $100.</p>
 
-<p>Der Stack hat in unserem Computer drei Aufgaben zu erfüllen:</p>
+        <p>Der Stack hat in unserem Computer drei Aufgaben zu erfüllen:</p>
 
-<p>1) Organisation von Unterprogramm-Adressen<br/>
-2) Zwischenspeicherung bei Unterbrechungen (Interrupts)<br/>
-3) vorübergehende Datenspeicherung</p>
+        <p>1) Organisation von Unterprogramm-Adressen<br />
+            2) Zwischenspeicherung bei Unterbrechungen (Interrupts)<br />
+            3) vorübergehende Datenspeicherung</p>
 
-<p>Die Rolle des Stapels bei Unterprogramm-Aufrufen haben wir in der letzten Folge schon ausgiebig behandelt. Die sogenannten Interrupts heben wir uns noch für später auf — dazu fehlen uns noch ein paar Kenntnisse. Mit der vorübergehenden Speicherung von Daten befassen wir uns gleich, wenn wir an die Befehle zur Stackbehandlung herangehen.</p>
+        <p>Die Rolle des Stapels bei Unterprogramm-Aufrufen haben wir in der letzten Folge schon ausgiebig behandelt. Die sogenannten Interrupts heben wir uns noch für später auf — dazu fehlen uns noch ein paar Kenntnisse. Mit der vorübergehenden Speicherung von Daten befassen wir uns gleich, wenn wir an die Befehle zur Stackbehandlung herangehen.</p>
 
-<p>Zuvor — weil das hier gerade ganz gut paßt — noch ein paar Gedanken zur rekursiven Programmierung. Gemeint ist damit eine Programmstruktur, in der sich ein Unterprogramm selbst aufruft. Auch GOSUB-Befehle in Basic bewirken Einträge der Rücksprungadressen im Stapel. Auf diese Weise ergibt sich für unseren Computer eine begrenzte Verschachtelungstiefe bei Unterprogrammaufrufen. Diese wird bei Rekursion besonders schnell erreicht, und das bewirkt die Ausgabe einer OUT OF MEMORY-Fehlermeldung.</p>
+        <p>Zuvor — weil das hier gerade ganz gut paßt — noch ein paar Gedanken zur rekursiven Programmierung. Gemeint ist damit eine Programmstruktur, in der sich ein Unterprogramm selbst aufruft. Auch GOSUB-Befehle in Basic bewirken Einträge der Rücksprungadressen im Stapel. Auf diese Weise ergibt sich für unseren Computer eine begrenzte Verschachtelungstiefe bei Unterprogrammaufrufen. Diese wird bei Rekursion besonders schnell erreicht, und das bewirkt die Ausgabe einer OUT OF MEMORY-Fehlermeldung.</p>
 
-<h3>Aktives Stapeln mit PHA, PLA, PHP, PLP, TSX und TXS</h3>
+        <h3>Aktives Stapeln mit PHA, PLA, PHP, PLP, TSX und TXS</h3>
 
-<p>Mit dem Stapel haben wir 256 Speicherplätze für eine schnelle Zwischenspeicherung aller möglichen Daten zur Verfügung. Weil der 6510 (und natürlich auch der 6502) diesen Speicherbereich wie die Zeropage behandelt, geht das Speichern sehr schnell. Man muß nur immer die spezielle LIFO-Struktur berücksichtigen.</p>
+        <p>Mit dem Stapel haben wir 256 Speicherplätze für eine schnelle Zwischenspeicherung aller möglichen Daten zur Verfügung. Weil der 6510 (und natürlich auch der 6502) diesen Speicherbereich wie die Zeropage behandelt, geht das Speichern sehr schnell. Man muß nur immer die spezielle LIFO-Struktur berücksichtigen.</p>
 
-<p>Im Grunde braucht man eigentlich nur zwei Befehle: Etwas auf den Stapel schieben (in der Literatur oft als Push-Befehl bezeichnet) und etwas herunterziehen, das nennt man dann Pulloder auch Pop-Befehl.</p>
+        <p>Im Grunde braucht man eigentlich nur zwei Befehle: Etwas auf den Stapel schieben (in der Literatur oft als Push-Befehl bezeichnet) und etwas herunterziehen, das nennt man dann Pulloder auch Pop-Befehl.</p>
 
-<p>Unser Prozessor kennt insgesamt sechs auf den Stapel wirkende Anweisungen:</p>
+        <p>Unser Prozessor kennt insgesamt sechs auf den Stapel wirkende Anweisungen:</p>
 
-<p><strong>PHA</strong> Damit schreibt man den Akku-Inhalt in den Stapel (»push-accumulator«). Der Stapelzeiger wird automatisch eine Position heruntergezählt (er rechnet ja von $FF an abwärts!). Der Inhalt des Akku wird dabei nicht verändert. Deswegen bleibt auch das Status-Register (also die ganzen Flaggen: N V B D I Z C) unbeeinflußt.</p>
+        <p><strong>PHA</strong> Damit schreibt man den Akku-Inhalt in den Stapel (»push-accumulator«). Der Stapelzeiger wird automatisch eine Position heruntergezählt (er rechnet ja von $FF an abwärts!). Der Inhalt des Akku wird dabei nicht verändert. Deswegen bleibt auch das Status-Register (also die ganzen Flaggen: N V B D I Z C) unbeeinflußt.</p>
 
-<p><strong>PLA</strong> »Pull accumulator«. Das ist der umgekehrte Weg: Das, was zuoberst auf dem Stapel liegt, wird in den Akku geschrieben. Dadurch wird ein Stapelplatz frei, was den Stapelzeiger veranlaßt, um 1 zu wachsen. Weil das, was da in den Akku geladen wird, 0 sein kann oder auch negativ (also mit gesetztem Bit 7), wird unter Umständen auch die N- oder die Z-Flagge verändert.</p>
+        <p><strong>PLA</strong> »Pull accumulator«. Das ist der umgekehrte Weg: Das, was zuoberst auf dem Stapel liegt, wird in den Akku geschrieben. Dadurch wird ein Stapelplatz frei, was den Stapelzeiger veranlaßt, um 1 zu wachsen. Weil das, was da in den Akku geladen wird, 0 sein kann oder auch negativ (also mit gesetztem Bit 7), wird unter Umständen auch die N- oder die Z-Flagge verändert.</p>
 
-<p>Weniger mit Datenzwischenspeicherung haben die anderen Befehle zur Stapel-Manipulation zu tun:</p>
+        <p>Weniger mit Datenzwischenspeicherung haben die anderen Befehle zur Stapel-Manipulation zu tun:</p>
 
-<p><strong>PHP</strong> Das steht für »push processor status«, also »schiebe das Prozessor-Status-Register auf den Stapel«. Der aktuelle Flaggenstand kann damit aufbewahrt werden. Das Status-Byte ändert seinen Inhalt dabei ebensowenig wie der Akku bei PHA. Auch hier wird der Stapelzeiger freundlicherweise um 1 herabgezählt.</p>
+        <p><strong>PHP</strong> Das steht für »push processor status«, also »schiebe das Prozessor-Status-Register auf den Stapel«. Der aktuelle Flaggenstand kann damit aufbewahrt werden. Das Status-Byte ändert seinen Inhalt dabei ebensowenig wie der Akku bei PHA. Auch hier wird der Stapelzeiger freundlicherweise um 1 herabgezählt.</p>
 
-<p><strong>PLP</strong> »Pull processor status«, »hole den Prozessor-Status vom Stapel«, ist der umgekehrte Befehl, der (wie bei PLA in den Akku) den Wert, der zuoberst im Stapel liegt, in das Flaggen-Register schreibt. Da sollte man höllisch aufpassen, was man damit einlädt: Das ist eine feine Gelegenheit für den Computer abzustürzen. Der Stapelzeiger wird — wie gehabt — um 1 erhöht.</p>
+        <p><strong>PLP</strong> »Pull processor status«, »hole den Prozessor-Status vom Stapel«, ist der umgekehrte Befehl, der (wie bei PLA in den Akku) den Wert, der zuoberst im Stapel liegt, in das Flaggen-Register schreibt. Da sollte man höllisch aufpassen, was man damit einlädt: Das ist eine feine Gelegenheit für den Computer abzustürzen. Der Stapelzeiger wird — wie gehabt — um 1 erhöht.</p>
 
-<p>Nicht direkt mit dem Stapel, sondern mit dem Stapelzeiger befassen sich die beiden folgenden Befehle:</p>
+        <p>Nicht direkt mit dem Stapel, sondern mit dem Stapelzeiger befassen sich die beiden folgenden Befehle:</p>
 
-<p><strong>TSX</strong> »Transfer stackpointer into X«, zu deutsch, »schiebe den Stapelzeiger ins X-Register« eröffnet die Möglichkeit, den Stapelzeiger zu lesen. Dabei bleibt er selbst unverändert erhalten. Weil nun im X-Register alle Werte zwischen $FF und 0 auftreten können, werden auch die Flaggen beeinflußt (N- und Z-Flagge).</p>
+        <p><strong>TSX</strong> »Transfer stackpointer into X«, zu deutsch, »schiebe den Stapelzeiger ins X-Register« eröffnet die Möglichkeit, den Stapelzeiger zu lesen. Dabei bleibt er selbst unverändert erhalten. Weil nun im X-Register alle Werte zwischen $FF und 0 auftreten können, werden auch die Flaggen beeinflußt (N- und Z-Flagge).</p>
 
-<p><strong>TXS</strong> Den umgekehrten Weg geht »transfer X into stackpointer« = »übertrage X-Register-Inhalt in den Stapelzeiger«. Das ist der einzige Befehl, der es erlaubt, den Stapelzeiger mit einem von uns kontrollierten Wert zu laden. Der Inhalt des X-Registers bleibt dabei unverändert, demzufolge interessieren sich auch die Flaggen nicht dafür.</p>
+        <p><strong>TXS</strong> Den umgekehrten Weg geht »transfer X into stackpointer« = »übertrage X-Register-Inhalt in den Stapelzeiger«. Das ist der einzige Befehl, der es erlaubt, den Stapelzeiger mit einem von uns kontrollierten Wert zu laden. Der Inhalt des X-Registers bleibt dabei unverändert, demzufolge interessieren sich auch die Flaggen nicht dafür.</p>
 
-<p>Alle sechs Anweisungen bestehen nur aus einem Byte und sind implizit adressiert. Die Stapelzeiger-Befehle TXS und TSX benötigen zwei Taktzyklen, die Push-Befehle je drei und die Pull-Befehle vier Taktzyklen zur Bearbeitung.</p>
+        <p>Alle sechs Anweisungen bestehen nur aus einem Byte und sind implizit adressiert. Die Stapelzeiger-Befehle TXS und TSX benötigen zwei Taktzyklen, die Push-Befehle je drei und die Pull-Befehle vier Taktzyklen zur Bearbeitung.</p>
 
-<p>Es ist etwas schwierig, Stapel-Operationen direkt zu verfolgen. Die meisten Assembler — so anscheinend auch der SMON — gebrauchen ebenfalls diesen Speicherbereich. Verlangt man beispielsweise mit dem SMON-Kommando M 0100 01FF eine Darstellung des Stapelinhaltes, dann findet man eine ganze Menge Spuren der Arbeit des Assemblers. Versucht man die zu löschen oder zu überschreiben, zum Beispiel mit dem nachfolgenden kleinen Programm, dann hat der Assembler die Mühe schon wieder zunichte gemacht, wie man durch erneutes M 0100 01FF schnell sehen kann. Dieses kleine Programm soll unterhalb des durch den Stapelzeiger bezeichneten Bereichs 32 Nullen in den Stapel schreiben:</p>
+        <p>Es ist etwas schwierig, Stapel-Operationen direkt zu verfolgen. Die meisten Assembler — so anscheinend auch der SMON — gebrauchen ebenfalls diesen Speicherbereich. Verlangt man beispielsweise mit dem SMON-Kommando M 0100 01FF eine Darstellung des Stapelinhaltes, dann findet man eine ganze Menge Spuren der Arbeit des Assemblers. Versucht man die zu löschen oder zu überschreiben, zum Beispiel mit dem nachfolgenden kleinen Programm, dann hat der Assembler die Mühe schon wieder zunichte gemacht, wie man durch erneutes M 0100 01FF schnell sehen kann. Dieses kleine Programm soll unterhalb des durch den Stapelzeiger bezeichneten Bereichs 32 Nullen in den Stapel schreiben:</p>
 
-<code>8000    LDA #00<br/>
-8002    TSX</code>
+        <code>8000 LDA #00<br />
+            8002 TSX</code>
 
-<p>Der Stapelzeiger wird ins X-Register gerettet.</p>
+        <p>Der Stapelzeiger wird ins X-Register gerettet.</p>
 
-<code>8003    LDY #20<br/>
-8005    PHA</code>
+        <code>8003 LDY #20<br />
+            8005 PHA</code>
 
-<p>Wir schieben eine Null auf den Stapel.</p>
+        <p>Wir schieben eine Null auf den Stapel.</p>
 
-<code>8006    DEY<br/>
-8007    BNE 8005<br/>
-8009    TXS</code>
+        <code>8006 DEY<br />
+            8007 BNE 8005<br />
+            8009 TXS</code>
 
-<p>Nach 32 Eintragungen von Nullen stellen wir den alten Stapelzeiger wieder her.</p>
+        <p>Nach 32 Eintragungen von Nullen stellen wir den alten Stapelzeiger wieder her.</p>
 
-<code>800A BRK</code>
+        <code>800A BRK</code>
 
-<p>Erneutes Kommando M 0100 01FF zeigt keine Nullen. Erst wenn wir anstelle des TXS in Zeile 8009 ein BRK schreiben, den Stapelzeiger also nicht zurückschreiben, erscheinen unsere Nullen. Sieht man genau hin, dann stellt man fest, daß unterhalb des durch den Stapelzeiger bezeichneten Bereichs genau der gleiche Inhalt zu finden ist wie vorher, nur eben mit dem Stapelzeiger verschoben.</p>
+        <p>Erneutes Kommando M 0100 01FF zeigt keine Nullen. Erst wenn wir anstelle des TXS in Zeile 8009 ein BRK schreiben, den Stapelzeiger also nicht zurückschreiben, erscheinen unsere Nullen. Sieht man genau hin, dann stellt man fest, daß unterhalb des durch den Stapelzeiger bezeichneten Bereichs genau der gleiche Inhalt zu finden ist wie vorher, nur eben mit dem Stapelzeiger verschoben.</p>
 
-<p>Ganz konnte ich dies Rätsel noch nicht lösen, muß ich gestehen, aber für den Gebrauch des Stapels ändert sich dadurch für uns nichts. Worauf muß man achten bei Stapeloperationen? Ganz einfach: Zwischen dem Ablagern eines Wertes auf dem Stapel und dem Zurückholen muß für jeden Push-Befehl ein Pull-Befehl vorhanden sein, für jedes weitere PHA ein PLA, für jedes JSR ein RTS. Nur wenn wir auf diese Symmetrie der Push- und der Pull-Befehle achten (und wie Sie noch aus der vorhergegangenen Ausgabe wissen, sind ja JSR und RTS ebenfalls dazuzurechnen), können wir sicher sein, daß der Stapelzeiger zum Zeitpunkt des Rückholens eines Wertes vom Stapel auch wirklich darauf deutet. Wenn man also nicht ganz genau weiß, wie der verwendete Assembler den Stapel nutzt, sollte man auf Operationen mit den Befehlen TSX und TXS verzichten.</p>
+        <p>Ganz konnte ich dies Rätsel noch nicht lösen, muß ich gestehen, aber für den Gebrauch des Stapels ändert sich dadurch für uns nichts. Worauf muß man achten bei Stapeloperationen? Ganz einfach: Zwischen dem Ablagern eines Wertes auf dem Stapel und dem Zurückholen muß für jeden Push-Befehl ein Pull-Befehl vorhanden sein, für jedes weitere PHA ein PLA, für jedes JSR ein RTS. Nur wenn wir auf diese Symmetrie der Push- und der Pull-Befehle achten (und wie Sie noch aus der vorhergegangenen Ausgabe wissen, sind ja JSR und RTS ebenfalls dazuzurechnen), können wir sicher sein, daß der Stapelzeiger zum Zeitpunkt des Rückholens eines Wertes vom Stapel auch wirklich darauf deutet. Wenn man also nicht ganz genau weiß, wie der verwendete Assembler den Stapel nutzt, sollte man auf Operationen mit den Befehlen TSX und TXS verzichten.</p>
 
-<p>Nun können Sie schon einen Teil der bislang unbekannten Programmsequenz aus der letzten Folge verstehen. Im zweiten Programmteil hatten wir mit</p>
+        <p>Nun können Sie schon einen Teil der bislang unbekannten Programmsequenz aus der letzten Folge verstehen. Im zweiten Programmteil hatten wir mit</p>
 
-<code>02CE LDA 01<br/>
-02D0 PHA</code>
+        <code>02CE LDA 01<br />
+            02D0 PHA</code>
 
-<p>den Inhalt der Speicherstelle 01 in den Akku geladen und auf den Stapel geschoben. Später — nach einigen weiteren Operationen — wurde dann dieser Speicherinhalt wiederhergestellt durch</p>
+        <p>den Inhalt der Speicherstelle 01 in den Akku geladen und auf den Stapel geschoben. Später — nach einigen weiteren Operationen — wurde dann dieser Speicherinhalt wiederhergestellt durch</p>
 
-<code>02E7 PLA<br/>
-02E8 STA 01</code>
+        <code>02E7 PLA<br />
+            02E8 STA 01</code>
 
-<p>Was aber hat es mit dieser Speicherstelle 01 auf sich? Das soll nun als nächstes erklärt werden.</p>
+        <p>Was aber hat es mit dieser Speicherstelle 01 auf sich? Das soll nun als nächstes erklärt werden.</p>
 
-<h3>Sein oder Nichtsein: Das Rätsel des Prozessorports</h3>
+        <h3>Sein oder Nichtsein: Das Rätsel des Prozessorports</h3>
 
-<p>Der Commodore 64 hat 64 KByte an RAM zu bieten. Außerdem aber verfügen wir beim normalen Programmieren über weitere 24 KByte, in denen das Betriebssystem, der Basic-Interpreter, Ein- und Ausgabebausteine und der Zeichenspeicher stecken. Wie Sie aus der ersten Assemblerfolge wissen, umfaßt der Adreßbus aber nur 16 Bits, was uns lediglich 65536 Speicherzellen, also 64 KByte adressieren läßt/Des Rätsels Lösung liegt darin, daß einige Adressenbereiche mehrfach belegt sind. Man kann das vergleichen mit dem Trick des Kastens mit dem doppelten Boden. Welcher Kasteninhalt gerade dem Prozessorzugriff offensteht, wird durch den Prozessorport, das sind die Speicherstellen 00 und 01, gesteuert.</p>
+        <p>Der Commodore 64 hat 64 KByte an RAM zu bieten. Außerdem aber verfügen wir beim normalen Programmieren über weitere 24 KByte, in denen das Betriebssystem, der Basic-Interpreter, Ein- und Ausgabebausteine und der Zeichenspeicher stecken. Wie Sie aus der ersten Assemblerfolge wissen, umfaßt der Adreßbus aber nur 16 Bits, was uns lediglich 65536 Speicherzellen, also 64 KByte adressieren läßt/Des Rätsels Lösung liegt darin, daß einige Adressenbereiche mehrfach belegt sind. Man kann das vergleichen mit dem Trick des Kastens mit dem doppelten Boden. Welcher Kasteninhalt gerade dem Prozessorzugriff offensteht, wird durch den Prozessorport, das sind die Speicherstellen 00 und 01, gesteuert.</p>
 
-<p>Dr. Helmuth Hauck hat in seiner Serie »Memory Map mit Wandervorschlägen« (64'er, Ausgabe 11 (1984), Seite 135 ff.) die genaue Funktion jedes Bits dieser beiden Speicherstellen erklärt. Wer noch mehr wissen möchte — auch über die Wirkungsweise der beiden Leitungen »Game« und »Exrom« — sollte das nachlesen im »Commodore 64 Programmers Reference Guide« ab Seite 260. Für uns als angehende Assembler-Alchimisten ist die Speicherstelle 1 aber so wichtig, daß wir ganz kurz hier nochmal darauf eingehen.</p>
+        <p>Dr. Helmuth Hauck hat in seiner Serie »Memory Map mit Wandervorschlägen« (64'er, Ausgabe 11 (1984), Seite 135 ff.) die genaue Funktion jedes Bits dieser beiden Speicherstellen erklärt. Wer noch mehr wissen möchte — auch über die Wirkungsweise der beiden Leitungen »Game« und »Exrom« — sollte das nachlesen im »Commodore 64 Programmers Reference Guide« ab Seite 260. Für uns als angehende Assembler-Alchimisten ist die Speicherstelle 1 aber so wichtig, daß wir ganz kurz hier nochmal darauf eingehen.</p>
 
-<p>Die Speichersteuerfunktionen haben die Bits 0 bis 2 der Speicherstelle 1. Je nach Belegung dieser Bits gestaltet sich die 64-KByte-Landschaft unseres Computers wie in Tabelle 1 gezeigt.</p>
+        <p>Die Speichersteuerfunktionen haben die Bits 0 bis 2 der Speicherstelle 1. Je nach Belegung dieser Bits gestaltet sich die 64-KByte-Landschaft unseres Computers wie in Tabelle 1 gezeigt.</p>
 
-<p>Was können wir als Maschinen-Programmierer mit dieser Kenntnis anfangen? Theoretisch stehen uns für unsere Programme damit 64 KByte offen. Praktisch werden wir nur in den seltensten Fällen auf die Ein- und Ausgabe-Bausteine verzichten können. Lassen wir ein reines Maschinenprogramm laufen, ohne jeglichen Rückgriff auf Interpreter oder Betriebssystem, dann haben wir immerhin noch zirka 60 KByte zur freien Verfügung. Benutzen wir Routinen aus diesen beiden ROM-Bausteinen, dann müssen wir sie allerdings — zumindest für den Zeitpunkt des Routineaufrufs — wieder einschalten. Wenn wir — was wohl meistens der Fall sein wird — Kombinationen von Basic- und Assemblersprache verwenden, können wir den gesamten Basic-Speicher bis $A000 frei halten, können auch den bei allen Beispielprogrammen so beliebten Bereich $C000 bis $D000 leer lassen und packen unsere Routinen weitgehend unter die ROMs, die dann jeweils beim Aufruf abgeschaltet werden. So haben wir eine Menge zusätzlichen Speicherplatz ergattert.</p>
+        <p>Was können wir als Maschinen-Programmierer mit dieser Kenntnis anfangen? Theoretisch stehen uns für unsere Programme damit 64 KByte offen. Praktisch werden wir nur in den seltensten Fällen auf die Ein- und Ausgabe-Bausteine verzichten können. Lassen wir ein reines Maschinenprogramm laufen, ohne jeglichen Rückgriff auf Interpreter oder Betriebssystem, dann haben wir immerhin noch zirka 60 KByte zur freien Verfügung. Benutzen wir Routinen aus diesen beiden ROM-Bausteinen, dann müssen wir sie allerdings — zumindest für den Zeitpunkt des Routineaufrufs — wieder einschalten. Wenn wir — was wohl meistens der Fall sein wird — Kombinationen von Basic- und Assemblersprache verwenden, können wir den gesamten Basic-Speicher bis $A000 frei halten, können auch den bei allen Beispielprogrammen so beliebten Bereich $C000 bis $D000 leer lassen und packen unsere Routinen weitgehend unter die ROMs, die dann jeweils beim Aufruf abgeschaltet werden. So haben wir eine Menge zusätzlichen Speicherplatz ergattert.</p>
 
-<p>Nun können wir auch den letzten Rest des bislang unklaren Programms aus der letzten Folge verstehen. Nachdem wir den Inhalt der Speicherstelle 1 auf den Stapel gerettet haben (Zeilen $02CE und $02D0), schreiben wir $35 in den Prozessorport:</p>
+        <p>Nun können wir auch den letzten Rest des bislang unklaren Programms aus der letzten Folge verstehen. Nachdem wir den Inhalt der Speicherstelle 1 auf den Stapel gerettet haben (Zeilen $02CE und $02D0), schreiben wir $35 in den Prozessorport:</p>
 
-<code>02D1 LDA #35<br/>
-02D3 STA 01</code>
+        <code>02D1 LDA #35<br />
+            02D3 STA 01</code>
 
-<p>$35 ist binär 0011 0101. Die Bits 0 bis 2, auf die es uns in diesem Zusammenhang ankommt, bewirken nun das Ausschalten des Interpreters und des Betriebssystems. Die Ein- und Ausgabe-Bausteine bleiben aktiv. Im weiteren Programmverlauf lesen wir die Speicherinhalte ab $E000, wobei wir nun den RAM-Inhalt erfassen. Das sollte vielleicht nochmal klargestellt werden: Jedes Hineinschreiben in die mehrfach belegten Speicherbereiche (dabei sind die Ein- und Ausgabe-Bausteine aber ausgenommen) wird automatisch in den RAM-Bereich umgelenkt. Das ist ja auch klar: In ein ROM kann eben nicht geschrieben werden. Deshalb braucht man dabei die ROMs nicht auszuschalten. Jeder Lesevorgang greift aber auf die ROMs zu, weshalb man sie in unserem Fall ausschalten muß. Wie schon oben beim Stapel erklärt, schalten wir durch das Zurückholen des vorher dorthin geretteten alten Inhalts der Speicherstelle 1 in den Prozessorport wieder den Normalzustand ein.</p>
+        <p>$35 ist binär 0011 0101. Die Bits 0 bis 2, auf die es uns in diesem Zusammenhang ankommt, bewirken nun das Ausschalten des Interpreters und des Betriebssystems. Die Ein- und Ausgabe-Bausteine bleiben aktiv. Im weiteren Programmverlauf lesen wir die Speicherinhalte ab $E000, wobei wir nun den RAM-Inhalt erfassen. Das sollte vielleicht nochmal klargestellt werden: Jedes Hineinschreiben in die mehrfach belegten Speicherbereiche (dabei sind die Ein- und Ausgabe-Bausteine aber ausgenommen) wird automatisch in den RAM-Bereich umgelenkt. Das ist ja auch klar: In ein ROM kann eben nicht geschrieben werden. Deshalb braucht man dabei die ROMs nicht auszuschalten. Jeder Lesevorgang greift aber auf die ROMs zu, weshalb man sie in unserem Fall ausschalten muß. Wie schon oben beim Stapel erklärt, schalten wir durch das Zurückholen des vorher dorthin geretteten alten Inhalts der Speicherstelle 1 in den Prozessorport wieder den Normalzustand ein.</p>
 
-<h2>Die wandernden toten Briefkästen der Assembler-Alchimisten</h2>
+        <h2>Die wandernden toten Briefkästen der Assembler-Alchimisten</h2>
 
-<p>Wir werden nun die beiden letzten noch ausstehenden Arten der Adressierung kennenlernen. Beides sind sogenannte indirekte Adressierungsarten. Mit dem indirekten JMP-Befehl (zum Beispiel JMP(0300)) sind wir in der letzten Folge schon vertraut geworden. Wir hatten auch gelernt, daß es sich hierbei um einen absoluten Einzelgänger handelt, der nur für so einen Sprung erlaubt ist. Ebenso haben wir die indizierte Adressierung zu beherrschen gelernt: Das war die Sache mit den Indexregistern X oder Y. Eine Kombination aus beiden (also der indirekten und der indizierten) Adressierungsarten sind die indiziert-indirekte und die indirekt-indizierte Adressierung.</p>
+        <p>Wir werden nun die beiden letzten noch ausstehenden Arten der Adressierung kennenlernen. Beides sind sogenannte indirekte Adressierungsarten. Mit dem indirekten JMP-Befehl (zum Beispiel JMP(0300)) sind wir in der letzten Folge schon vertraut geworden. Wir hatten auch gelernt, daß es sich hierbei um einen absoluten Einzelgänger handelt, der nur für so einen Sprung erlaubt ist. Ebenso haben wir die indizierte Adressierung zu beherrschen gelernt: Das war die Sache mit den Indexregistern X oder Y. Eine Kombination aus beiden (also der indirekten und der indizierten) Adressierungsarten sind die indiziert-indirekte und die indirekt-indizierte Adressierung.</p>
 
-<h3>Die indirekt-indizierte Adressierung</h3>
+        <h3>Die indirekt-indizierte Adressierung</h3>
 
-<p>Fangen wir mit der sehr häufig benutzten indirekt-indizierten Adressierung an: Man nennt sie auch »indirekt Y« oder »nachindizierte indirekte« Adressierung. Am besten sehen wir uns mal so einen Befehl an:</p>
+        <p>Fangen wir mit der sehr häufig benutzten indirekt-indizierten Adressierung an: Man nennt sie auch »indirekt Y« oder »nachindizierte indirekte« Adressierung. Am besten sehen wir uns mal so einen Befehl an:</p>
 
-<code>LDA (FA),Y</code>
+        <code>LDA (FA),Y</code>
 
-<p>Die Klammer erinnert uns an den indirekten JMP-Befehl. Tatsächlich hat sie hier auch dieselbe Funktion: In FA und FB steht ein Zeiger auf eine Adresse. Nehmen wir mal an, die Belegung der Speicher wäre:</p>
+        <p>Die Klammer erinnert uns an den indirekten JMP-Befehl. Tatsächlich hat sie hier auch dieselbe Funktion: In FA und FB steht ein Zeiger auf eine Adresse. Nehmen wir mal an, die Belegung der Speicher wäre:</p>
 
-<code>FA 01<br/>
-FB 80</code>
+        <code>FA 01<br />
+            FB 80</code>
 
-<p>und im Y-Register stünde eine 5. Der Zeiger FA/FB weist also auf die Speicherstelle 8001. Da haben wir also wieder das Prinzip des toten Briefkastens. Der Computer guckt in den hohlen Baum FA/FB (LSB in FA, MSB in FB) und findet dort die Treffpunktadresse. Nun sind diese toten Briefkästen aber auch den gegnerischen Alchimisten-Agenten bekannt. Es kommt also noch ein Trick dazu: Zur dort aufgefundenen Adresse wird der Inhalt des Y-Registers addiert. In unserem Fall fanden wir also in FA/FB die Adresse 8001, im Y-Register steht eine 5, somit ist die endgültige Adresse 8001 + 5 = 8006. Unser Beispiel »LDA(FA),Y« bewirkt daher, daß in den Akku der Inhalt der Speicherstelle 8006 geladen wird. Nachindiziert nennen manche die Adressierung deswegen, weil zunächst dem Zeiger nachgegangen wird, der in unserem Beispiel auf 8001 weist, und erst danach durch Addition des Inhalts des Y-Registers die endgültige Speicherstelle (hier also 8006) berechnet wird.</p>
+        <p>und im Y-Register stünde eine 5. Der Zeiger FA/FB weist also auf die Speicherstelle 8001. Da haben wir also wieder das Prinzip des toten Briefkastens. Der Computer guckt in den hohlen Baum FA/FB (LSB in FA, MSB in FB) und findet dort die Treffpunktadresse. Nun sind diese toten Briefkästen aber auch den gegnerischen Alchimisten-Agenten bekannt. Es kommt also noch ein Trick dazu: Zur dort aufgefundenen Adresse wird der Inhalt des Y-Registers addiert. In unserem Fall fanden wir also in FA/FB die Adresse 8001, im Y-Register steht eine 5, somit ist die endgültige Adresse 8001 + 5 = 8006. Unser Beispiel »LDA(FA),Y« bewirkt daher, daß in den Akku der Inhalt der Speicherstelle 8006 geladen wird. Nachindiziert nennen manche die Adressierung deswegen, weil zunächst dem Zeiger nachgegangen wird, der in unserem Beispiel auf 8001 weist, und erst danach durch Addition des Inhalts des Y-Registers die endgültige Speicherstelle (hier also 8006) berechnet wird.</p>
 
-<p>Als Zeiger (also die Adresse in der Klammer) sind nur Zeropagespeicherstellen verwendbar, als Indexregister darf man hier nur das Y-Register gebrauchen. Von den bisher behandelten Befehlen können ADC, CMP, LDA, SBC und STA mit dieser Adressierungsart verwendet werden. Genaueres finden Sie wieder in der Tabelle mit der Befehlsübersicht (Tabelle 2).</p>
+        <p>Als Zeiger (also die Adresse in der Klammer) sind nur Zeropagespeicherstellen verwendbar, als Indexregister darf man hier nur das Y-Register gebrauchen. Von den bisher behandelten Befehlen können ADC, CMP, LDA, SBC und STA mit dieser Adressierungsart verwendet werden. Genaueres finden Sie wieder in der Tabelle mit der Befehlsübersicht (Tabelle 2).</p>
 
-<p>Bevor wir uns dem anderen indirekten Adreß-Modus zuwenden, wollen wir uns überlegen, wozu man die indirekt-indizierte Adressierung verwendet. Wie Sie sich natürlich erinnern können, konnte man mit der normalen indizierten Adressierung, zum Beispiel mit</p>
+        <p>Bevor wir uns dem anderen indirekten Adreß-Modus zuwenden, wollen wir uns überlegen, wozu man die indirekt-indizierte Adressierung verwendet. Wie Sie sich natürlich erinnern können, konnte man mit der normalen indizierten Adressierung, zum Beispiel mit</p>
 
-<code>LDA 8000,Y</code>
+        <code>LDA 8000,Y</code>
 
-<p>durch Variation des Indexregisters (hier das Y-Register) 256 Speicherstellen erfassen (Y von FF herunter bis 00). Will man mehr als diese 256 berücksichtigen, dann muß eine neue Basis (im Beispiel also anstelle der 8000) gewählt werden. Um das zu illustrieren, sehen wir uns mal den Anfang eines Programms an, welches den gesamten Bildschirminhalt ausliest und nach E000 schreibt:</p>
+        <p>durch Variation des Indexregisters (hier das Y-Register) 256 Speicherstellen erfassen (Y von FF herunter bis 00). Will man mehr als diese 256 berücksichtigen, dann muß eine neue Basis (im Beispiel also anstelle der 8000) gewählt werden. Um das zu illustrieren, sehen wir uns mal den Anfang eines Programms an, welches den gesamten Bildschirminhalt ausliest und nach E000 schreibt:</p>
 
-<code>1000    LDY #00<br/>
-1002    LDA 0400,Y<br/>
-1005    STA E000,Y<br/>
-1008    LDA 0500,Y<br/>
-100B    STA E100,Y<br/>
-100E    LDA 0600,Y<br/>
-1011    STA E200,Y<br/>
-1014    LDA 0700,Y<br/>
-1017    STA E300,Y<br/>
-101A    DEY<br/>
-101B    BNE 1002<br/>
-&hellip;</code>
+        <code>1000 LDY #00<br />
+            1002 LDA 0400,Y<br />
+            1005 STA E000,Y<br />
+            1008 LDA 0500,Y<br />
+            100B STA E100,Y<br />
+            100E LDA 0600,Y<br />
+            1011 STA E200,Y<br />
+            1014 LDA 0700,Y<br />
+            1017 STA E300,Y<br />
+            101A DEY<br />
+            101B BNE 1002<br />
+            &hellip;</code>
 
-<p>Wie Sie sehen, erfordert das durch die Tatsache, daß vier Blöcke zu je 256 Bytes übertragen werden müssen, immerhin schon 28 Bytes Programmtext. Nun soll die indirekt-indizierte Adressierung verwendet werden, um dieselbe Aufgabe zu lösen. Wir legen zunächst zwei Zeiger auf der Zeropage fest:<br/>
-FA/FB sollen die Bildschirmadresse enthalten<br/>
-FC/FD die Zieladresse ab E000.</p>
+        <p>Wie Sie sehen, erfordert das durch die Tatsache, daß vier Blöcke zu je 256 Bytes übertragen werden müssen, immerhin schon 28 Bytes Programmtext. Nun soll die indirekt-indizierte Adressierung verwendet werden, um dieselbe Aufgabe zu lösen. Wir legen zunächst zwei Zeiger auf der Zeropage fest:<br />
+            FA/FB sollen die Bildschirmadresse enthalten<br />
+            FC/FD die Zieladresse ab E000.</p>
 
-<code>1000    LDA #00<br/>
-1002    STA FA<br/>
-1004    STA FC</code>
+        <code>1000 LDA #00<br />
+            1002 STA FA<br />
+            1004 STA FC</code>
 
-<p>Das waren die LSBs der Zeiger, es folgen die MSBs:</p>
+        <p>Das waren die LSBs der Zeiger, es folgen die MSBs:</p>
 
-<code>1006    LDA #04<br/>
-1008    STA FB<br/>
-100A    LDA #E0<br/>
-100C    STA FD</code>
+        <code>1006 LDA #04<br />
+            1008 STA FB<br />
+            100A LDA #E0<br />
+            100C STA FD</code>
 
-<p>Damit sind die Zeiger festgelegt. Es sind vier Blöcke zuje 256 Bytes zu übertragen. Diese Blockanzahl legen wir ins X-Register als Zähler:</p>
+        <p>Damit sind die Zeiger festgelegt. Es sind vier Blöcke zuje 256 Bytes zu übertragen. Diese Blockanzahl legen wir ins X-Register als Zähler:</p>
 
-<code>100E LDX #04</code>
+        <code>100E LDX #04</code>
 
-<p>Dann laden wir ins Y-Register ebenfalls einen Zähler (den Index):</p>
+        <p>Dann laden wir ins Y-Register ebenfalls einen Zähler (den Index):</p>
 
-<code>1010 LDY #00</code>
+        <code>1010 LDY #00</code>
 
-<p>Jetzt kann die eigentliche Übertragungsschleife starten:</p>
+        <p>Jetzt kann die eigentliche Übertragungsschleife starten:</p>
 
-<code>1012    LDA (FA),Y<br/>
-1014    STA (FC),Y<br/>
-1016    DEY<br/>
-1017    BNE 1012</code>
+        <code>1012 LDA (FA),Y<br />
+            1014 STA (FC),Y<br />
+            1016 DEY<br />
+            1017 BNE 1012</code>
 
-<p>Wenn das Y-Register wieder bei 0 angekommen ist (von der ersten 0 nach einem Unterlauf— siehe dazu Folge 3 — über FF, FE und so weiter bis 0), ist der erste Block übertragen. Wir erhöhen nun das MSB beider Zeiger um 1:</p>
+        <p>Wenn das Y-Register wieder bei 0 angekommen ist (von der ersten 0 nach einem Unterlauf— siehe dazu Folge 3 — über FF, FE und so weiter bis 0), ist der erste Block übertragen. Wir erhöhen nun das MSB beider Zeiger um 1:</p>
 
-<code>1019    INC FB<br/>
-101B    INC FD</code>
+        <code>1019 INC FB<br />
+            101B INC FD</code>
 
-<p>Außerdem zählen wir den Blockzähler um 1 herunter:</p>
+        <p>Außerdem zählen wir den Blockzähler um 1 herunter:</p>
 
-<code>101D    DEX<br/>
-101E    BNE 1012</code>
+        <code>101D DEX<br />
+            101E BNE 1012</code>
 
-<p>Wenn das Programm auf diese Weise auch drei Bytes mehr Speicherplatz braucht, ist doch leicht der Vorteil zu sehen: Müssen wir nämlich (statt nur vier) mehr Blöcke übertragen (bis zu 255), dann verändert sich unser zweites Programm um keinen Deut (außer dem Zähler im X-Register, der nun mit der jeweils anderen Block-Anzahl geladen wird), während die erste Programmtechnik für jeden weiteren Block um sechs Bytes erweitert werden muß.</p>
+        <p>Wenn das Programm auf diese Weise auch drei Bytes mehr Speicherplatz braucht, ist doch leicht der Vorteil zu sehen: Müssen wir nämlich (statt nur vier) mehr Blöcke übertragen (bis zu 255), dann verändert sich unser zweites Programm um keinen Deut (außer dem Zähler im X-Register, der nun mit der jeweils anderen Block-Anzahl geladen wird), während die erste Programmtechnik für jeden weiteren Block um sechs Bytes erweitert werden muß.</p>
 
-<p>Es gibt noch eine ganze Reihe von Anwendungsmöglichkeiten, die die indirekt-indizierte Adressierung so attraktiv machen. Für Geschwindigkeitsfanatiker (ich selbst bin bei Grafik-Fragen auch einer!) muß aber gesagt werden, daß dem Speicherplatzvorteil ein Geschwindigkeitsnachteil gegenübersteht. Jeder indirekt-indiziert adressierte Befehl braucht einen Taktzyklus länger als der vergleichbare absolut-indizierte Befehl. Zu diesen Feinheiten werden wir aber in späteren Folgen noch kommen.</p>
+        <p>Es gibt noch eine ganze Reihe von Anwendungsmöglichkeiten, die die indirekt-indizierte Adressierung so attraktiv machen. Für Geschwindigkeitsfanatiker (ich selbst bin bei Grafik-Fragen auch einer!) muß aber gesagt werden, daß dem Speicherplatzvorteil ein Geschwindigkeitsnachteil gegenübersteht. Jeder indirekt-indiziert adressierte Befehl braucht einen Taktzyklus länger als der vergleichbare absolut-indizierte Befehl. Zu diesen Feinheiten werden wir aber in späteren Folgen noch kommen.</p>
 
-<h3>Die indiziert-indirekte Adressierung</h3>
+        <h3>Die indiziert-indirekte Adressierung</h3>
 
-<p>Wenden wir uns nun der letzten noch fehlenden Adressierungsart zu, der indiziertindirekten. Man nennt sie auch »vorindizierte indirekte« oder »indirekt X« Adressierung. Sehen wir auch hier zunächst ein Beispiel an:</p>
+        <p>Wenden wir uns nun der letzten noch fehlenden Adressierungsart zu, der indiziertindirekten. Man nennt sie auch »vorindizierte indirekte« oder »indirekt X« Adressierung. Sehen wir auch hier zunächst ein Beispiel an:</p>
 
-<p>STA (FA,X)</p>
+        <p>STA (FA,X)</p>
 
-<p>Auch hier drückt die Klammer wieder aus, daß der Klammerinhalt ein Zeiger ist. Das ist jetzt aber nicht das Bytepaar FA/FB, sondern zur angegebenen Adresse FA soll noch der Inhalt des X-Registers addiert werden. Nehmen wir mal an, dort stünde eine 2, dann wird der Zeiger FC/FD mit diesem Befehl angesprochen, denn FA + 2 = FC und entsprechend FB + 2 = FD. Wenn in den Speicherstellen FA bis FF folgender Inhalt zu finden ist:</p>
+        <p>Auch hier drückt die Klammer wieder aus, daß der Klammerinhalt ein Zeiger ist. Das ist jetzt aber nicht das Bytepaar FA/FB, sondern zur angegebenen Adresse FA soll noch der Inhalt des X-Registers addiert werden. Nehmen wir mal an, dort stünde eine 2, dann wird der Zeiger FC/FD mit diesem Befehl angesprochen, denn FA + 2 = FC und entsprechend FB + 2 = FD. Wenn in den Speicherstellen FA bis FF folgender Inhalt zu finden ist:</p>
 
-<code>00FA 00<br/>
-00FB 04 FA/FB = 0400<br/>
-00FC 00<br/>
-00FD E0 FC/FD = E000<br/>
-00FE 10<br/>
-00FF 80 FE/FF = 8010</code>
+        <code>00FA 00<br />
+            00FB 04 FA/FB = 0400<br />
+            00FC 00<br />
+            00FD E0 FC/FD = E000<br />
+            00FE 10<br />
+            00FF 80 FE/FF = 8010</code>
 
-<p>dann könnte das eine ganze Tabelle von Zeigern sein, die jeweils durch den X-Registerinhalt angesprochen werden. Der Akkuinhalt wird in unserem Beispiel nach 0400 geschrieben, wenn im X-Register 0 steht, nach E000, wenn das X-Register eine 1 enthält und nach 8010, wenn statt dessen eine 2 im X-Register zu finden ist.</p>
+        <p>dann könnte das eine ganze Tabelle von Zeigern sein, die jeweils durch den X-Registerinhalt angesprochen werden. Der Akkuinhalt wird in unserem Beispiel nach 0400 geschrieben, wenn im X-Register 0 steht, nach E000, wenn das X-Register eine 1 enthält und nach 8010, wenn statt dessen eine 2 im X-Register zu finden ist.</p>
 
-<p>Sie werden sich vielleicht auch bei diesem Beispiel gefragt haben, was passiert, wenn im X-Register unseres Beispiels eine 3 steht. Nun, unser 8-Bit-Prozessor läuft über, und wir finden einen Zeiger 00/01.</p>
+        <p>Sie werden sich vielleicht auch bei diesem Beispiel gefragt haben, was passiert, wenn im X-Register unseres Beispiels eine 3 steht. Nun, unser 8-Bit-Prozessor läuft über, und wir finden einen Zeiger 00/01.</p>
 
-<p>Rein theoretisch ist diese Adressierungsweise ganz interessant. Aber auf der Zeropage ist’s reichlich eng, und nur selten kommt man daher in die Lage, dort eine Zeigertabelle einzurichten, die man mittels des X-Registerinhalts und der indiziert-indirekten Adressierung abgreifen kann. Die Bedeutung dieser Adressierungsart ist also nur recht gering. Außerdem erfordert sie sechs Taktzyklen zur Bearbeitung und ist somit auch noch recht langsam. Von den bisher bekannten Befehlen sind die folgenden damit verwendbar: ADC, CMP, LDA und STA.</p>
+        <p>Rein theoretisch ist diese Adressierungsweise ganz interessant. Aber auf der Zeropage ist’s reichlich eng, und nur selten kommt man daher in die Lage, dort eine Zeigertabelle einzurichten, die man mittels des X-Registerinhalts und der indiziert-indirekten Adressierung abgreifen kann. Die Bedeutung dieser Adressierungsart ist also nur recht gering. Außerdem erfordert sie sechs Taktzyklen zur Bearbeitung und ist somit auch noch recht langsam. Von den bisher bekannten Befehlen sind die folgenden damit verwendbar: ADC, CMP, LDA und STA.</p>
 
-<p>Bevor wir die Adressierung zu den Akten legen, sei noch erwähnt, daß manche Lehrbücher noch eine weitere Art, die Akkumulator-Adressierung, unterscheiden. Betroffen sind davon vier l-Byte-Befehle, die wir noch kennenlernen werden und die man ebensogut als implizit adressiert ansehen kann.</p>
+        <p>Bevor wir die Adressierung zu den Akten legen, sei noch erwähnt, daß manche Lehrbücher noch eine weitere Art, die Akkumulator-Adressierung, unterscheiden. Betroffen sind davon vier l-Byte-Befehle, die wir noch kennenlernen werden und die man ebensogut als implizit adressiert ansehen kann.</p>
 
-<h3>Die ersten Kernal-Routinen</h3>
+        <h3>Die ersten Kernal-Routinen</h3>
 
-<p>Sicher werden Sie alle schon von der Kernal-Routine FFD2 gehört haben und sie vielleicht auch schon verwenden. Wenn nicht, um so besser, denn dann sind Sie noch nicht vom einseitigen Gebrauch dieses Instruments verdorben. Die meisten Kernal-Adressen sind nämlich sehr vielseitig verwendbar, je nach den Vorgaben. Das ist wie mit einem Haushaltsgerät, das immer nur zum Rühren von Kuchenteig eingesetzt wird. Dabei kann man damit auch noch Saft machen, Gurken schnitzeln, Getränke mixen &hellip; Genauso wie man in diesem etwas schiefen Vergleich die Gebrauchsanleitung kennen sollte, um die ganzen anderen Funktionen ausnutzen zu können, muß man hier noch einige Dinge über die Kernal-Aufrufe beherzigen.</p>
+        <p>Sicher werden Sie alle schon von der Kernal-Routine FFD2 gehört haben und sie vielleicht auch schon verwenden. Wenn nicht, um so besser, denn dann sind Sie noch nicht vom einseitigen Gebrauch dieses Instruments verdorben. Die meisten Kernal-Adressen sind nämlich sehr vielseitig verwendbar, je nach den Vorgaben. Das ist wie mit einem Haushaltsgerät, das immer nur zum Rühren von Kuchenteig eingesetzt wird. Dabei kann man damit auch noch Saft machen, Gurken schnitzeln, Getränke mixen &hellip; Genauso wie man in diesem etwas schiefen Vergleich die Gebrauchsanleitung kennen sollte, um die ganzen anderen Funktionen ausnutzen zu können, muß man hier noch einige Dinge über die Kernal-Aufrufe beherzigen.</p>
 
-<p>Für jede Verwendung der Kernal-Sprungtabelle sollte man sich angewöhnen, dies in drei Schritten zu tun:</p>
+        <p>Für jede Verwendung der Kernal-Sprungtabelle sollte man sich angewöhnen, dies in drei Schritten zu tun:</p>
 
-<p>1) die nötigen Vorbereitungen treffen<br/>
-2) Routineaufruf<br/>
-3) Fehlerabfrage und -behandlung</p>
+        <p>1) die nötigen Vorbereitungen treffen<br />
+            2) Routineaufruf<br />
+            3) Fehlerabfrage und -behandlung</p>
 
-<p>Fangen wir mit dem Punkt »Vorbereitungen« an. Einige Routinen brauchen Informationen, die ihnen erst durch andere Kernal-Routmen beschafft werden. Ruft man diese anderen Routinen vorher nicht auf, dann funktioniert auch der erwünschte Aufruf nicht richtig. Wenn die Routine einen bestimmten Wert im Y-Register erwartet, dann muß der dort auch stehen. Wenn nicht, dann geht das Programm in die Hose. Bei jeder Kernal-Routine, die hier beschrieben wird, gebe ich alle nötigen Vorbereitungen an.</p>
+        <p>Fangen wir mit dem Punkt »Vorbereitungen« an. Einige Routinen brauchen Informationen, die ihnen erst durch andere Kernal-Routmen beschafft werden. Ruft man diese anderen Routinen vorher nicht auf, dann funktioniert auch der erwünschte Aufruf nicht richtig. Wenn die Routine einen bestimmten Wert im Y-Register erwartet, dann muß der dort auch stehen. Wenn nicht, dann geht das Programm in die Hose. Bei jeder Kernal-Routine, die hier beschrieben wird, gebe ich alle nötigen Vorbereitungen an.</p>
 
-<p>Der Routinenaufruf sollte immer mittels ]SR erfolgen. Alle auf diese Weise aus der Kernal-Sprungtabelle abzurufenden Programme enden nämlich mit einem RTS. Damit keine wichtigen Werte aus dem Aufrufprogramm überschrieben werden, man sie also vor dem Aufruf der Kernal-Routine irgendwohin retten kann, gebe ich auch noch an, welche Register durch die Routine verändert werden und wieviel Stapelspeicherplatz bereitgehalten werden muß.</p>
+        <p>Der Routinenaufruf sollte immer mittels ]SR erfolgen. Alle auf diese Weise aus der Kernal-Sprungtabelle abzurufenden Programme enden nämlich mit einem RTS. Damit keine wichtigen Werte aus dem Aufrufprogramm überschrieben werden, man sie also vor dem Aufruf der Kernal-Routine irgendwohin retten kann, gebe ich auch noch an, welche Register durch die Routine verändert werden und wieviel Stapelspeicherplatz bereitgehalten werden muß.</p>
 
-<p>Die Routinen sind so konstruiert, daß beim Auftreten eines Fehlers nach der Rückkehr das Carry-Bit gesetzt ist. Durch Untersuchen des Carry können so Fehler rechtzeitig erkannt und behandelt werden. Im Akku findet man in dem Fall dann eine Fehlernummer. Die Ausgabe der Fehlermeldung erfolgt also nicht — wie im Basic — in Klarschrift. In Tabelle 3 sind die Fehlernummern und ihre Bedeutung aufgelistet.</p>
+        <p>Die Routinen sind so konstruiert, daß beim Auftreten eines Fehlers nach der Rückkehr das Carry-Bit gesetzt ist. Durch Untersuchen des Carry können so Fehler rechtzeitig erkannt und behandelt werden. Im Akku findet man in dem Fall dann eine Fehlernummer. Die Ausgabe der Fehlermeldung erfolgt also nicht — wie im Basic — in Klarschrift. In Tabelle 3 sind die Fehlernummern und ihre Bedeutung aufgelistet.</p>
 
-<p>Welche Fehlernummern eine Routine ausgeben kann, wird ebenfalls von mir bei jeder Routinen-Besprechung angegeben.</p>
+        <p>Welche Fehlernummern eine Routine ausgeben kann, wird ebenfalls von mir bei jeder Routinen-Besprechung angegeben.</p>
 
-<p>Nun aber zur ersten Routine FFD2, die wie einen Rattenschwanz eine Reihe weiterer nach sich zieht:</p>
+        <p>Nun aber zur ersten Routine FFD2, die wie einen Rattenschwanz eine Reihe weiterer nach sich zieht:</p>
 
-<p>Name CHROUT<br/>
-Zweck Ausgabe eines Zeichens<br/>
-Adresse $FFD2<br/>
-dez. 65490<br/>
-Vorbe- (CHKOUT,OPEN) reitungenZeichen im Akku<br/>
-Fehler 0<br/>
-Stapel- 8 bedarf<br/>
-Register Akku<br/>
-TODO</p>
+        <p>Name CHROUT<br />
+            Zweck Ausgabe eines Zeichens<br />
+            Adresse $FFD2<br />
+            dez. 65490<br />
+            Vorbe- (CHKOUT,OPEN) reitungenZeichen im Akku<br />
+            Fehler 0<br />
+            Stapel- 8 bedarf<br />
+            Register Akku<br />
+            TODO</p>
 
-<p>Falls Sie diese Routine schon einmal benutzt haben, dann geschah es vermutlich ohne die Vorbereitungen CHKOUT und OPEN. Freundlicherweise hat unser Computer einige Voreinstellungen schon für uns getroffen. Denn normalerweise sendet CHROUT ein Zeichen über einen schon geöffneten Ausgabekanal, und der ist zum Bildschirm geschaltet. Ein kleines Beispielprogramm soll das illustrieren. Zunächst laden Sie bitte den SMON ein und starten Sie ihn. Nun soll eine Texttabelle angelegt werden. Das funktioniert beim SMON am bequemsten über das K-Kommando. Geben Sie ein K 6000. Der SMON antwortet mit:</p>
+        <p>Falls Sie diese Routine schon einmal benutzt haben, dann geschah es vermutlich ohne die Vorbereitungen CHKOUT und OPEN. Freundlicherweise hat unser Computer einige Voreinstellungen schon für uns getroffen. Denn normalerweise sendet CHROUT ein Zeichen über einen schon geöffneten Ausgabekanal, und der ist zum Bildschirm geschaltet. Ein kleines Beispielprogramm soll das illustrieren. Zunächst laden Sie bitte den SMON ein und starten Sie ihn. Nun soll eine Texttabelle angelegt werden. Das funktioniert beim SMON am bequemsten über das K-Kommando. Geben Sie ein K 6000. Der SMON antwortet mit:</p>
 
-<code>&lsquo;6000 &hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;..</code>
+        <code>&lsquo;6000 &hellip;&hellip;&hellip;&hellip;&hellip;&hellip;&hellip;..</code>
 
-<p>Wenn Sie nun die RUN/STOP-Taste drücken, können Sie mit dem Cursor in diese Punktzeile fahren und einen Text schreiben:</p>
+        <p>Wenn Sie nun die RUN/STOP-Taste drücken, können Sie mit dem Cursor in diese Punktzeile fahren und einen Text schreiben:</p>
 
-<code>&lsquo;6000 HALLO ASSEMBLER-ALCHIMIST &hellip;&hellip;&hellip;&hellip;&hellip;.</code>
+        <code>&lsquo;6000 HALLO ASSEMBLER-ALCHIMIST &hellip;&hellip;&hellip;&hellip;&hellip;.</code>
 
-<p>Sinnvoll — vor allem für die weitere Verwendung dieses Textes — ist es, ein (RETURN), also dezimal 13 oder $0D anzuschließen. Dazu gibt es natürlich den Weg über den Assemblerbefehl. Zur Übung wollen wir aber das M-Kommando verwenden. Geben Sie ein (zuerst die »RETURN«-Taste betätigen) M6018, dann wieder RUN/STOP, und fahren Sie mit dem Cursor auf Speicherstelle 601A (falls Sie in 6019 kein Leerzeichen $20 stehen haben, dann fügen Sie’s jetzt noch ein). Geben Sie nun anstelle des dort stehenden Bytes 0D ein, und drücken Sie die RETURN-Taste. Der Monitor sollte jetzt zeigen:</p>
+        <p>Sinnvoll — vor allem für die weitere Verwendung dieses Textes — ist es, ein (RETURN), also dezimal 13 oder $0D anzuschließen. Dazu gibt es natürlich den Weg über den Assemblerbefehl. Zur Übung wollen wir aber das M-Kommando verwenden. Geben Sie ein (zuerst die »RETURN«-Taste betätigen) M6018, dann wieder RUN/STOP, und fahren Sie mit dem Cursor auf Speicherstelle 601A (falls Sie in 6019 kein Leerzeichen $20 stehen haben, dann fügen Sie’s jetzt noch ein). Geben Sie nun anstelle des dort stehenden Bytes 0D ein, und drücken Sie die RETURN-Taste. Der Monitor sollte jetzt zeigen:</p>
 
-<code>:6018 54 20 0D etc.</code>
+        <code>:6018 54 20 0D etc.</code>
 
-<p>Unser Text soll mit einem BRK enden. Deshalb gehen wir jetzt in den Assembler-Modus mit dem SMON-Kommando A 601B und schreiben:</p>
+        <p>Unser Text soll mit einem BRK enden. Deshalb gehen wir jetzt in den Assembler-Modus mit dem SMON-Kommando A 601B und schreiben:</p>
 
-<code>601B BRK</code>
+        <code>601B BRK</code>
 
-<p>Nun folgt das eigentliche Progrämmchen, das Byte für Byte bis zur Null (BRK) den Text aus der gerade erstellten Texttabelle liest und mittels FFD2 auf den Bildschirm bringt:</p>
+        <p>Nun folgt das eigentliche Progrämmchen, das Byte für Byte bis zur Null (BRK) den Text aus der gerade erstellten Texttabelle liest und mittels FFD2 auf den Bildschirm bringt:</p>
 
-<code>601C    LDY #00<br/>
-601E    LDA 6000,Y<br/>
-6021    BEQ 602C</code>
+        <code>601C LDY #00<br />
+            601E LDA 6000,Y<br />
+            6021 BEQ 602C</code>
 
-<p>Das Y-Register wird als Index initialisiert, dann die Texttabelle in den Akku geladen. Wenn das Programm dabei auf die Null stößt, verzweigt es zum Ende. Jetzt folgt die Routine zur Bildschirmausgabe:</p>
+        <p>Das Y-Register wird als Index initialisiert, dann die Texttabelle in den Akku geladen. Wenn das Programm dabei auf die Null stößt, verzweigt es zum Ende. Jetzt folgt die Routine zur Bildschirmausgabe:</p>
 
-<code>6023    JSR FFD2<br/>
-6026    BCS 602D</code>
+        <code>6023 JSR FFD2<br />
+            6026 BCS 602D</code>
 
-<p>Falls bei der Kernal-Routine etwas schiefgelaufen ist, wird das Carry-Bit gesetzt, was wir überprüfen und zu einem BRK-Kommando verzweigen (das ist natürlich nur sinnvoll, solange ein Monitor oder Assembler wie der SMON aktiv ist). Nun erhöhen wir das Index-Register und das ganze beginnt von vorne:</p>
+        <p>Falls bei der Kernal-Routine etwas schiefgelaufen ist, wird das Carry-Bit gesetzt, was wir überprüfen und zu einem BRK-Kommando verzweigen (das ist natürlich nur sinnvoll, solange ein Monitor oder Assembler wie der SMON aktiv ist). Nun erhöhen wir das Index-Register und das ganze beginnt von vorne:</p>
 
-<code>6028    INY<br/>
-6029    JMP 601E<br/>
-602C    RTS<br/>
-602D    BRK</code>
+        <code>6028 INY<br />
+            6029 JMP 601E<br />
+            602C RTS<br />
+            602D BRK</code>
 
-<p>Wenn wir nun aus dem SMON mit F und anschließendem X aussteigen und ein kleines Basic-Aufrufprogramm machen (Bei OUT OF MEMORY ERROR bitte NEW eingeben):</p>
+        <p>Wenn wir nun aus dem SMON mit F und anschließendem X aussteigen und ein kleines Basic-Aufrufprogramm machen (Bei OUT OF MEMORY ERROR bitte NEW eingeben):</p>
 
-<code>10 PRINTCHR$(147)<br/>
-20 SYS 24604 :REM = $601C<br/>
-30 END</code>
+        <code>10 PRINTCHR$(147)<br />
+            20 SYS 24604 :REM = $601C<br />
+            30 END</code>
 
-<p>dann können wir uns die Wirkung unseres Programms ansehen: Nach RUN wird der Bildschirm gelöscht und unser Text ausgedruckt.</p>
+        <p>dann können wir uns die Wirkung unseres Programms ansehen: Nach RUN wird der Bildschirm gelöscht und unser Text ausgedruckt.</p>
 
-<p>FFD2 nimmt uns also eine Menge Arbeit ab: Automatisch legt diese Routine in den Bildschirmspeicher den Bildschirmcode (sie rechnet also auch gleich ASCII, das wir ja eingegeben haben, in den POKE-Code um) und in die dazugehörige Bildschirmfarbspeicherstelle den aktuellen Farbcode. Sie setzt außerdem noch den Cursor weiter.</p>
+        <p>FFD2 nimmt uns also eine Menge Arbeit ab: Automatisch legt diese Routine in den Bildschirmspeicher den Bildschirmcode (sie rechnet also auch gleich ASCII, das wir ja eingegeben haben, in den POKE-Code um) und in die dazugehörige Bildschirmfarbspeicherstelle den aktuellen Farbcode. Sie setzt außerdem noch den Cursor weiter.</p>
 
-<p>Mit FFD2 kann man aber noch viel mehr machen! Schließlich ist ja der Bildschirm (Gerätenummer 3) nicht der einzige mögliche Empfänger. Wir wollen als nächstes mal eine Ausgabe mittels FFD2 auf den Drucker erzielen. Hier sind die Vorbereitungen allerdings nötig. Zunächst mal müssen wir uns noch zwei weitere Kernal-Routinen ansehen, nämlich CHKOUT und OPEN.</p>
+        <p>Mit FFD2 kann man aber noch viel mehr machen! Schließlich ist ja der Bildschirm (Gerätenummer 3) nicht der einzige mögliche Empfänger. Wir wollen als nächstes mal eine Ausgabe mittels FFD2 auf den Drucker erzielen. Hier sind die Vorbereitungen allerdings nötig. Zunächst mal müssen wir uns noch zwei weitere Kernal-Routinen ansehen, nämlich CHKOUT und OPEN.</p>
 
-<p>Name CHKOUT<br/>
-Zweck Kanal zum Ausgang definieren<br/>
-Adresse $FFC9 dez. 65481 Vorberei- OPEN tungen log. Filenummer<br/>
-ins X-Register<br/>
-Fehler 0,3,5,7<br/>
-Stapel- 4 bedarf<br/>
-Register Akku, X-Register<br/>
-TODO</p>
+        <p>Name CHKOUT<br />
+            Zweck Kanal zum Ausgang definieren<br />
+            Adresse $FFC9 dez. 65481 Vorberei- OPEN tungen log. Filenummer<br />
+            ins X-Register<br />
+            Fehler 0,3,5,7<br />
+            Stapel- 4 bedarf<br />
+            Register Akku, X-Register<br />
+            TODO</p>
 
-<p>Mit aieser Routine kann jedes File, der zuvor durch OPEN spezifiziert worden ist, zum Ausgabefile erklärt werden. Natürlich muß dann das derart angesprochene Gerät auch ein Ausgabegerät sein. Andernfalls ergibt sich ein Fehler. Bevor man Daten über einen Kanal senden will, muß CHKOUT durchgeführt werden. Wenn die mittels OPEN übergebene Geräteadresse größer als 3 ist, sendet diese Routine automatisch auch ein LISTEN-Kommando an das Ausgabegerät. LISTEN setzt dann zum Beispiel den Drucker in Empfangsbereitschaft. Die Durchführung von CHKOUT ist einfach (vorausgesetzt, man hat vorher OPEN aufgerufen): In das X-Register wird die logische Filenummer geschrieben und dann perJSR FFC3 CHKOUT angesteuert.</p>
+        <p>Mit aieser Routine kann jedes File, der zuvor durch OPEN spezifiziert worden ist, zum Ausgabefile erklärt werden. Natürlich muß dann das derart angesprochene Gerät auch ein Ausgabegerät sein. Andernfalls ergibt sich ein Fehler. Bevor man Daten über einen Kanal senden will, muß CHKOUT durchgeführt werden. Wenn die mittels OPEN übergebene Geräteadresse größer als 3 ist, sendet diese Routine automatisch auch ein LISTEN-Kommando an das Ausgabegerät. LISTEN setzt dann zum Beispiel den Drucker in Empfangsbereitschaft. Die Durchführung von CHKOUT ist einfach (vorausgesetzt, man hat vorher OPEN aufgerufen): In das X-Register wird die logische Filenummer geschrieben und dann perJSR FFC3 CHKOUT angesteuert.</p>
 
-<p>Nun zur anderen Vorbereitung von FFD2, zu OPEN:</p>
+        <p>Nun zur anderen Vorbereitung von FFD2, zu OPEN:</p>
 
-<p>Name OPEN<br/>
-Zweck Öffnen eines logischen Files<br/>
-Adresse $FFC0 dez. 65472 Vorberel SETLFS,SETNAM tungen<br/>
-Fehler 1,2,4,5,6<br/>
-Register Akku, X- und Y-Register<br/>
-TODO</p>
+        <p>Name OPEN<br />
+            Zweck Öffnen eines logischen Files<br />
+            Adresse $FFC0 dez. 65472 Vorberel SETLFS,SETNAM tungen<br />
+            Fehler 1,2,4,5,6<br />
+            Register Akku, X- und Y-Register<br />
+            TODO</p>
 
-<p>Die Routine OPEN an sich anzusprechen, ist relativ einfach. Es genügt ein JSR FFC0. Zuvor allerdings — der Rattenschwanz wird länger — muß mit SETNAM der Filename und mit SETLFS die logische Filenummer, die Geräteadresse und eventuell eine Sekundäradresse festgelegt sein. Erst danach kann das File geöffnet werden durch OPEN. Also sehen wir uns noch SETLFS und SETNAM an:</p>
+        <p>Die Routine OPEN an sich anzusprechen, ist relativ einfach. Es genügt ein JSR FFC0. Zuvor allerdings — der Rattenschwanz wird länger — muß mit SETNAM der Filename und mit SETLFS die logische Filenummer, die Geräteadresse und eventuell eine Sekundäradresse festgelegt sein. Erst danach kann das File geöffnet werden durch OPEN. Also sehen wir uns noch SETLFS und SETNAM an:</p>
 
-<p>Name    SETLFS<br/>
-Zweck   Spezifikationen eines logischen Files<br/>
-Adresse $FFBA dez. 65466<br/>
-Vorbe-  logische Filenum-<br/>
-reitun- mer in Akku<br/>
-gen Gerätenummer ins X-Register Sekundäradresse ins Y-Register<br/>
-Fehler  keine<br/>
-Stapelbedarf 2<br/>
-Register keine<br/>
-TODO</p>
+        <p>Name SETLFS<br />
+            Zweck Spezifikationen eines logischen Files<br />
+            Adresse $FFBA dez. 65466<br />
+            Vorbe- logische Filenum-<br />
+            reitun- mer in Akku<br />
+            gen Gerätenummer ins X-Register Sekundäradresse ins Y-Register<br />
+            Fehler keine<br />
+            Stapelbedarf 2<br />
+            Register keine<br />
+            TODO</p>
 
-<p>SETLFS legt für die anderen Kernal-Routinen logische Filenummer, Gerätenummer und Sekundäradresse fest. Die logische Filenummer ist dabei eine Schlüsselzahl, die in eine durch OPEN angelegte File-Tabelle weist. Die Gerätenummer kann zwischen 0 und 31 liegen, dabei sind folgende Zuordnungen vorgesehen:</p>
+        <p>SETLFS legt für die anderen Kernal-Routinen logische Filenummer, Gerätenummer und Sekundäradresse fest. Die logische Filenummer ist dabei eine Schlüsselzahl, die in eine durch OPEN angelegte File-Tabelle weist. Die Gerätenummer kann zwischen 0 und 31 liegen, dabei sind folgende Zuordnungen vorgesehen:</p>
 
-<p>0 Tastatur<br/>
-1 Datasette<br/>
-2 RS232C-Kanal<br/>
-3 Bildschirm</p>
+        <p>0 Tastatur<br />
+            1 Datasette<br />
+            2 RS232C-Kanal<br />
+            3 Bildschirm</p>
 
-<p>Gerätenummern ab 4 beziehen sich automatisch auf Geräte am seriellen Bus. Dabei gilt im allgemeinen:</p>
+        <p>Gerätenummern ab 4 beziehen sich automatisch auf Geräte am seriellen Bus. Dabei gilt im allgemeinen:</p>
 
-<p>4   Drucker<br/>
-8   Diskettenstation</p>
+        <p>4 Drucker<br />
+            8 Diskettenstation</p>
 
-<p>Die Sekundäradresse ist eine Kommandonummer, die für das jeweils angesproche Gerät spezifisch ist, zum Beispiel 10 bewirkt beim Drucker Commodore 1526, daß das Gerät in die Grundstellung geht (siehe jeweiliges Handbuch). Will man keine Sekundäradresse verwenden, dann muß FF ins Y-Register geschrieben werden. Der Aufruf von SETLFS geschieht also in folgender Weise: In den Akku lädt man die gewünschte logische Filenummer, ins X-Register die Geräteadresse und ins Y-Register FF oder aber die Sekundäradresse. Danach erfolgt der Sprung mit JSR FFBA.</p>
+        <p>Die Sekundäradresse ist eine Kommandonummer, die für das jeweils angesproche Gerät spezifisch ist, zum Beispiel 10 bewirkt beim Drucker Commodore 1526, daß das Gerät in die Grundstellung geht (siehe jeweiliges Handbuch). Will man keine Sekundäradresse verwenden, dann muß FF ins Y-Register geschrieben werden. Der Aufruf von SETLFS geschieht also in folgender Weise: In den Akku lädt man die gewünschte logische Filenummer, ins X-Register die Geräteadresse und ins Y-Register FF oder aber die Sekundäradresse. Danach erfolgt der Sprung mit JSR FFBA.</p>
 
-<p>Schließlich noch zu SETNAM:</p>
+        <p>Schließlich noch zu SETNAM:</p>
 
-<p>Name    SETNAM<br/>
-Zweck   Filenamen festlegen<br/>
-Adresse FFBD dez. 65469<br/>
-Vorbe-  Namenslänge in<br/>
-reitun- den Akku<br/>
-gen LSB des Namenstextes in X-Register MSB des Namenstextes in Y-Register<br/>
-Fehler  keine<br/>
-Stapel- 2<br/>
-bedarf<br/>
-Register Akku, X- und Y-Register<br/>
-TODO</p>
+        <p>Name SETNAM<br />
+            Zweck Filenamen festlegen<br />
+            Adresse FFBD dez. 65469<br />
+            Vorbe- Namenslänge in<br />
+            reitun- den Akku<br />
+            gen LSB des Namenstextes in X-Register MSB des Namenstextes in Y-Register<br />
+            Fehler keine<br />
+            Stapel- 2<br />
+            bedarf<br />
+            Register Akku, X- und Y-Register<br />
+            TODO</p>
 
-<p>Vor der Eröffnung eines Files mittels OPEN muß diese Routine den Filenamen festlegen. Dazu schreibt man in den Akku die Länge des Namens und in die Register X, Y die Startadresse (LSB ins X-Register, MSB ins Y-Register) der Namenstext-Tabelle. Der Ort dieser Tabelle ist frei wählbar. Wird kein Filename gewünscht, dann gibt man dem Akku die Länge 0 an. X- und Y-Register sind in dem Fall ohne Bedeutung.</p>
+        <p>Vor der Eröffnung eines Files mittels OPEN muß diese Routine den Filenamen festlegen. Dazu schreibt man in den Akku die Länge des Namens und in die Register X, Y die Startadresse (LSB ins X-Register, MSB ins Y-Register) der Namenstext-Tabelle. Der Ort dieser Tabelle ist frei wählbar. Wird kein Filename gewünscht, dann gibt man dem Akku die Länge 0 an. X- und Y-Register sind in dem Fall ohne Bedeutung.</p>
 
-<p>Damit — sollte man meinen — hätten wir nun alle Bedingungen erfüllt, FFD2 zur Ausgabe auf den Drucker zu bewegen. Leider ist das noch nicht der Fall: FFD2 schließt nämlich das File und den Ausgabekanal nicht. Das kann — wenn man’s nicht beachtet — zu Fehlern oder zur weiteren Ansprache des Druckers führen, auch wenn die gar nicht mehr erwünscht ist. Deswegen sollten noch zwei KernalRoutinen angehängt werden, von denen die eine (CLRCHN) alle Ein- und Ausgabekanäle wieder in den Ausgangszustand zurückführt, und die andere (CLOSE) das File ordnungsgemäß schließt:</p>
+        <p>Damit — sollte man meinen — hätten wir nun alle Bedingungen erfüllt, FFD2 zur Ausgabe auf den Drucker zu bewegen. Leider ist das noch nicht der Fall: FFD2 schließt nämlich das File und den Ausgabekanal nicht. Das kann — wenn man’s nicht beachtet — zu Fehlern oder zur weiteren Ansprache des Druckers führen, auch wenn die gar nicht mehr erwünscht ist. Deswegen sollten noch zwei KernalRoutinen angehängt werden, von denen die eine (CLRCHN) alle Ein- und Ausgabekanäle wieder in den Ausgangszustand zurückführt, und die andere (CLOSE) das File ordnungsgemäß schließt:</p>
 
-<p>Name CLRCHN<br/>
-Zweck Ein- und Ausgabekanäle in Ausgangsstellung bringen<br/>
-Adresse $FFCC dez. 65484<br/>
-Vorberei- keine<br/>
-tung<br/>
-Fehler keine<br/>
-Stapel- 9 bedarf<br/>
-Register Akku, X-Register<br/>
-TODO</p>
+        <p>Name CLRCHN<br />
+            Zweck Ein- und Ausgabekanäle in Ausgangsstellung bringen<br />
+            Adresse $FFCC dez. 65484<br />
+            Vorberei- keine<br />
+            tung<br />
+            Fehler keine<br />
+            Stapel- 9 bedarf<br />
+            Register Akku, X-Register<br />
+            TODO</p>
 
-<p>Der Aufruf von CLRCHN erfolgt einfach durch JSR FFCC. Die Wirkung ist enorm: Mit einem Schlag werden alle Kanäle freigeräumt. Eingangskanälen wird ein UNTALK (dem Gerät wird gesagt: Halt den Mund), Ausgangskanälen ein UNLISTEN (das bedeutet soviel wie: Hör nicht mehr zu) übermittelt. Der Ausgangszustand stellt sich wieder her: Tastatur als Eingabe-Bildschirm als Ausgabegerät.</p>
+        <p>Der Aufruf von CLRCHN erfolgt einfach durch JSR FFCC. Die Wirkung ist enorm: Mit einem Schlag werden alle Kanäle freigeräumt. Eingangskanälen wird ein UNTALK (dem Gerät wird gesagt: Halt den Mund), Ausgangskanälen ein UNLISTEN (das bedeutet soviel wie: Hör nicht mehr zu) übermittelt. Der Ausgangszustand stellt sich wieder her: Tastatur als Eingabe-Bildschirm als Ausgabegerät.</p>
 
-<p>Die endgültig letzte Routine für diesmal ist CLOSE:</p>
+        <p>Die endgültig letzte Routine für diesmal ist CLOSE:</p>
 
-<p>Name CLOSE<br/>
-Zweck Schließen logischer Files<br/>
-Adresse $FFC3dez.65475 Vorbe- logische Filenum-reitun- mer in Akku<br/>
-gen<br/>
-Fehler 0<br/>
-Stapel- 2 bedarf<br/>
-Register Akku, X- und Y-Register<br/>
-TODO</p>
+        <p>Name CLOSE<br />
+            Zweck Schließen logischer Files<br />
+            Adresse $FFC3dez.65475 Vorbe- logische Filenum-reitun- mer in Akku<br />
+            gen<br />
+            Fehler 0<br />
+            Stapel- 2 bedarf<br />
+            Register Akku, X- und Y-Register<br />
+            TODO</p>
 
-<p>Wenn für ein File alle Ein- und Ausgabeoperationen beendet sind, kann es — nach Einschreiben der Filenummer in den Akku — mittels CLOSE ordnungsgemäß geschlossen werden. Der Eintrag in der Filetabelle wird auf diese Weise gelöscht.</p>
+        <p>Wenn für ein File alle Ein- und Ausgabeoperationen beendet sind, kann es — nach Einschreiben der Filenummer in den Akku — mittels CLOSE ordnungsgemäß geschlossen werden. Der Eintrag in der Filetabelle wird auf diese Weise gelöscht.</p>
 
-<p>So, jetzt sind wir soweit, daß wir die Textausgabe auf dem Drucker programmieren können. Bild 3 faßt die einzelnen Schritte nochmal zusammen.</p>
+        <p>So, jetzt sind wir soweit, daß wir die Textausgabe auf dem Drucker programmieren können. Bild 3 faßt die einzelnen Schritte nochmal zusammen.</p>
 
-<p>Und hier das Programm dazu. Wir verwenden die im anderen Beispiel schon aufgebaute Texttabelle weiter. Zunächst also SETNAM:</p>
+        <p>Und hier das Programm dazu. Wir verwenden die im anderen Beispiel schon aufgebaute Texttabelle weiter. Zunächst also SETNAM:</p>
 
-<code>601C LDA #00<br/>
-601E JSR FFBD<br/>
-6021 BCS 6053</code>
+        <code>601C LDA #00<br />
+            601E JSR FFBD<br />
+            6021 BCS 6053</code>
 
-<p>Wenn ein Fehler aufgetreten ist, findet man ein gesetztes Carry-Bit. In dem Fall wird verzweigt zu einem BRK-Kommando (was die Anwesenheit eines Monitors erforderlich macht, solange man sich noch nicht sicher ist, ob Fehlermeldungen auftauchen). Die Null im Akku besagt, daß kein Filename gewünscht ist. Dann kommt SETLFS:</p>
+        <p>Wenn ein Fehler aufgetreten ist, findet man ein gesetztes Carry-Bit. In dem Fall wird verzweigt zu einem BRK-Kommando (was die Anwesenheit eines Monitors erforderlich macht, solange man sich noch nicht sicher ist, ob Fehlermeldungen auftauchen). Die Null im Akku besagt, daß kein Filename gewünscht ist. Dann kommt SETLFS:</p>
 
-<code>6023    LDA #04<br/>
-6025    LDX #04<br/>
-6027    LDY #FF<br/>
-6029    JSR FFBA<br/>
-602C    BCS 6053</code>
+        <code>6023 LDA #04<br />
+            6025 LDX #04<br />
+            6027 LDY #FF<br />
+            6029 JSR FFBA<br />
+            602C BCS 6053</code>
 
-<p>Es wurde ein File festgelegt mit der logischen Filenummer 4, der Geräteadresse 4 und ohne Sekundäradresse. Jetzt geben wir das OPEN-Kommando:</p>
+        <p>Es wurde ein File festgelegt mit der logischen Filenummer 4, der Geräteadresse 4 und ohne Sekundäradresse. Jetzt geben wir das OPEN-Kommando:</p>
 
-<code>602E    JSR FFC0<br/>
-6031    BCS 6053</code>
+        <code>602E JSR FFC0<br />
+            6031 BCS 6053</code>
 
-<p>Der Ausgabekanal wird definiert mit CHKOUT:</p>
+        <p>Der Ausgabekanal wird definiert mit CHKOUT:</p>
 
-<code>6033    LDX #04<br/>
-6035    JSR FFC9<br/>
-6038    BCS 6053</code>
+        <code>6033 LDX #04<br />
+            6035 JSR FFC9<br />
+            6038 BCS 6053</code>
 
-<p>Damit sind alle Vorbereitungen erledigt, und die Zeichenausgabe kann wie im ersten Programm durchgeführt werden mit CHROUT:</p>
+        <p>Damit sind alle Vorbereitungen erledigt, und die Zeichenausgabe kann wie im ersten Programm durchgeführt werden mit CHROUT:</p>
 
-<code>603A    LDY #00<br/>
-603C    LDA 6000,Y<br/>
-603F    BEQ 604A<br/>
-6041    JSR FFD2<br/>
-6044    BCS 6053<br/>
-6046    INY
-6047    JMP 603C</code>
+        <code>603A LDY #00<br />
+            603C LDA 6000,Y<br />
+            603F BEQ 604A<br />
+            6041 JSR FFD2<br />
+            6044 BCS 6053<br />
+            6046 INY
+            6047 JMP 603C</code>
 
-<p>Alle Zeichen sind nun ausgedruckt. Wir rufen CLRCHN auf:</p>
+        <p>Alle Zeichen sind nun ausgedruckt. Wir rufen CLRCHN auf:</p>
 
-<code>604A JSR FFCC</code>
+        <code>604A JSR FFCC</code>
 
-<p>Als letzte Routine folgt nun noch CLOSE:</p>
+        <p>Als letzte Routine folgt nun noch CLOSE:</p>
 
-<code>604D    LDA # 04<br/>
-604F    JSR FFC3<br/>
-6052 RTS</code>
+        <code>604D LDA # 04<br />
+            604F JSR FFC3<br />
+            6052 RTS</code>
 
-<p>Damit wurde das File Nummer 4 geschlossen. Anschließend erfolgte der Rücksprung aus dem Programm. Für die Fehlerbehandlung habe ich nur einen BRK vorgesehen, der sofortigen Registerüberblick erlaubt, wenn zum Beispiel der SMON im Speicher enthalten ist.</p>
+        <p>Damit wurde das File Nummer 4 geschlossen. Anschließend erfolgte der Rücksprung aus dem Programm. Für die Fehlerbehandlung habe ich nur einen BRK vorgesehen, der sofortigen Registerüberblick erlaubt, wenn zum Beispiel der SMON im Speicher enthalten ist.</p>
 
-<p>6053 BRK</p>
+        <p>6053 BRK</p>
 
-<p>Ohne Monitor im Speicher kann der Computer allerdings abstürzen oder im besten Fall einen Basic-Warmstart durchführen. Wenn Sie sowas also für Ihre Zwecke programmieren möchten, sollten Sie einen anderen Weg suchen, die Fehler aufzufangen. Man hat ja nicht immer einen Monitor eingeladen.</p>
+        <p>Ohne Monitor im Speicher kann der Computer allerdings abstürzen oder im besten Fall einen Basic-Warmstart durchführen. Wenn Sie sowas also für Ihre Zwecke programmieren möchten, sollten Sie einen anderen Weg suchen, die Fehler aufzufangen. Man hat ja nicht immer einen Monitor eingeladen.</p>
 
-<p>Mit diesen sieben Kernal-Routinen soll’s für diesmal genug sein. In der Dezember-Ausgabe des 64’er haben B. Schneider und K. Schramm in ihrer Serie »In die Geheimnisse der Floppy eingetaucht« gezeigt, wie man mittels der besprochenen Routinen, und einiger anderer, auch die Diskettenstation ansprechen oder sogar Floppy und Drucker zum »Spooling« veranlassen kann. Das habe ich zwar schon öfter gesagt, muß es aber trotzdem immer wieder tun: Durch das Nachvollziehen fremder Programme kann man sehr viel lernen.</p>
+        <p>Mit diesen sieben Kernal-Routinen soll’s für diesmal genug sein. In der Dezember-Ausgabe des 64’er haben B. Schneider und K. Schramm in ihrer Serie »In die Geheimnisse der Floppy eingetaucht« gezeigt, wie man mittels der besprochenen Routinen, und einiger anderer, auch die Diskettenstation ansprechen oder sogar Floppy und Drucker zum »Spooling« veranlassen kann. Das habe ich zwar schon öfter gesagt, muß es aber trotzdem immer wieder tun: Durch das Nachvollziehen fremder Programme kann man sehr viel lernen.</p>
 
-<p>Oje, mein Versprechen, diesmal mit den Fließkommazahlen weiterzumachen, kann ich nicht halten. Auch unser Programmprojekt kommt nicht mehr dran. Beides hätte den Umfang dieser Folge mit Sicherheit gesprengt. Ich gebe Ihnen aber mein großes Ehrenwort, daß wir in der nächsten Ausgabe beide Themen weiterbehandeln.</p>
+        <p>Oje, mein Versprechen, diesmal mit den Fließkommazahlen weiterzumachen, kann ich nicht halten. Auch unser Programmprojekt kommt nicht mehr dran. Beides hätte den Umfang dieser Folge mit Sicherheit gesprengt. Ich gebe Ihnen aber mein großes Ehrenwort, daß wir in der nächsten Ausgabe beide Themen weiterbehandeln.</p>
 
-<address class="author">(Heimo Ponnath/gk)</address>
+        <address class="author">(Heimo Ponnath/gk)</address>
     </article>
 </body>
+
 </html>

@@ -16,33 +16,34 @@
 <body>
     <article>
         <h1>Hexereien: undefinierte Opcodes beim 6502</h1>
-<p class="intro">Im folgenden Artikel sollen einmal diejenigen Hex-Zahlen unter die Lupe genommen werden, die ein 6502-Disassembler normalerweise nur mit einem höhnischen Fragezeichen quittiert.</p>
+        <p class="intro">Im folgenden Artikel sollen einmal diejenigen Hex-Zahlen unter die Lupe genommen werden, die ein 6502-Disassembler normalerweise nur mit einem höhnischen Fragezeichen quittiert.</p>
 
-<p>Sicherlich ist Ihnen, sofern Sie sich mit Maschinensprache befassen, schon aufgefallen, daß der bekannte Befehlssatz des 6502-Mikroprozessors nicht alle 256 Bitkombinationen eines Bytes ausnutzt. Es existieren neben den bekannten, in jedem Assembler-Handbuch dokumentierten 6502-Befehlen noch eine ganze Reihe undefinierter Opcodes. Der Begriff »undefiniert« bedeutet dabei nur soviel wie »nicht dokumentiert«, denn diese Opcodes haben in vielen Fällen durchaus eine sinnvolle Wirkung.</p>
+        <p>Sicherlich ist Ihnen, sofern Sie sich mit Maschinensprache befassen, schon aufgefallen, daß der bekannte Befehlssatz des 6502-Mikroprozessors nicht alle 256 Bitkombinationen eines Bytes ausnutzt. Es existieren neben den bekannten, in jedem Assembler-Handbuch dokumentierten 6502-Befehlen noch eine ganze Reihe undefinierter Opcodes. Der Begriff »undefiniert« bedeutet dabei nur soviel wie »nicht dokumentiert«, denn diese Opcodes haben in vielen Fällen durchaus eine sinnvolle Wirkung.</p>
 
-<p>Da viele Commodore-Systeme mit dem 6502 arbeiten, habe ich mir einmal die Mühe gemacht, die für diese CPU offiziell nicht implementierten Hex-Zahlen, die sich immer wieder vereinzelt zwischen die bekannten 6502-0pcodes einschieben, auf ihre Wirkung hin zu untersuchen. Dabei hat sich manch unscheinbare Hex-Zahl als recht brauchbar entpuppt. Nachfolgende Erkenntnisse habe ich auf meinem C 64 gesammelt, der ja mit einem 6510 bestückt ist, die Ergebnisse sind aber auch auf den 6502 übertragbar.</p>
+        <p>Da viele Commodore-Systeme mit dem 6502 arbeiten, habe ich mir einmal die Mühe gemacht, die für diese CPU offiziell nicht implementierten Hex-Zahlen, die sich immer wieder vereinzelt zwischen die bekannten 6502-0pcodes einschieben, auf ihre Wirkung hin zu untersuchen. Dabei hat sich manch unscheinbare Hex-Zahl als recht brauchbar entpuppt. Nachfolgende Erkenntnisse habe ich auf meinem C 64 gesammelt, der ja mit einem 6510 bestückt ist, die Ergebnisse sind aber auch auf den 6502 übertragbar.</p>
 
-<p>Die untersuchten Bit-Kombinationen lassen sich in vier Befehlskategorien unterteilen:</p>
+        <p>Die untersuchten Bit-Kombinationen lassen sich in vier Befehlskategorien unterteilen:</p>
 
-<p><strong>Gruppe 1</strong>: Diese Befehle führen den Prozessor zu einem Systemabsturz, Sie können dann den Computer nur noch mit einem RESET aus seinem Dornröschenschlaf befreien (oder das Gerät ausschalten). Alle »Absturzbefehle« sind dadurch kenntlich, daß ihr niederwertiges Nibble (1 Nibble = 4 Bit) »2« ist (Beispiel: $02,$12). Aber: Nicht alle Hexzahlen mit niederwertigem Nibble »2« führen zum Absturz (Beispiel: $A2 entspricht in Assemblersprache »LDX«),</p>
+        <p><strong>Gruppe 1</strong>: Diese Befehle führen den Prozessor zu einem Systemabsturz, Sie können dann den Computer nur noch mit einem RESET aus seinem Dornröschenschlaf befreien (oder das Gerät ausschalten). Alle »Absturzbefehle« sind dadurch kenntlich, daß ihr niederwertiges Nibble (1 Nibble = 4 Bit) »2« ist (Beispiel: $02,$12). Aber: Nicht alle Hexzahlen mit niederwertigem Nibble »2« führen zum Absturz (Beispiel: $A2 entspricht in Assemblersprache »LDX«),</p>
 
-<p><strong>Gruppe 2</strong>: Diese Befehlsgruppe bewirkt rein gar nichts, es gibtsie in 3-, 2- und 1-Byte-Ausführungen, zu den letztgenannten gehört ja auch unser gutes altes »NOP«.</p>
+        <p><strong>Gruppe 2</strong>: Diese Befehlsgruppe bewirkt rein gar nichts, es gibtsie in 3-, 2- und 1-Byte-Ausführungen, zu den letztgenannten gehört ja auch unser gutes altes »NOP«.</p>
 
-<p>Die Befehle der Gruppen 1 und 2 sind in Tabelle 1 zusammengestellt.</p>
+        <p>Die Befehle der Gruppen 1 und 2 sind in Tabelle 1 zusammengestellt.</p>
 
-<p><strong>Gruppe 3</strong>: Nun wird’s interessant. Der Prozessor führt zwei »offizielle« Befehle unmittelbar hintereinander aus. Diese verwenden die gleiche Adressierungsart. Ein Beispiel: Die Hex-Zahlenkombination E7 DD führt die beiden Assemblerbefehle »INC DD;SBC DD« (Zeropageadressierung) aus, sie bewerkstelligt dieses in 2 Byte, wozu der »offizielle« Befehlssatz 4 Byte benötigte. Es sind alle vom »STA«-Befehl her bekannten Adressierungsarten auf die Befehlsgruppe 3 anwendbar. Daraus resultiert folgendes Phänomen: Die Hexkombination E3 DD führt die Assemblerbefehle »INC (DD,X)« aus, obwohl es die indirekt-indizierte Adressierung für den »INC«-Befehl eigentlich gar nicht gibt.</p>
+        <p><strong>Gruppe 3</strong>: Nun wird’s interessant. Der Prozessor führt zwei »offizielle« Befehle unmittelbar hintereinander aus. Diese verwenden die gleiche Adressierungsart. Ein Beispiel: Die Hex-Zahlenkombination E7 DD führt die beiden Assemblerbefehle »INC DD;SBC DD« (Zeropageadressierung) aus, sie bewerkstelligt dieses in 2 Byte, wozu der »offizielle« Befehlssatz 4 Byte benötigte. Es sind alle vom »STA«-Befehl her bekannten Adressierungsarten auf die Befehlsgruppe 3 anwendbar. Daraus resultiert folgendes Phänomen: Die Hexkombination E3 DD führt die Assemblerbefehle »INC (DD,X)« aus, obwohl es die indirekt-indizierte Adressierung für den »INC«-Befehl eigentlich gar nicht gibt.</p>
 
-<p>Tabelle 2 zeigt alle möglichen Kombinationen. Beispiel: Sie möchten wissen, was geschieht, wenn der 6502 auf die Hex-Zahl C7 trifft. Dazu suchen Sie diese Zahl in der Tabelle 2. Sie steht in der letzten Spalte der Zeile 5. Am linken Zeilenrand finden Sie nun die Befehlskombination, die obersten beiden Zeilen der letzten Spalte geben die Adressierungsart sowie die Befehlslänge in Bytes an. C7 MM würde also dieselbe Wirkung haben, wie die Assemblerbefehle »DEC MM:CMP MM« zusammen.</p>
+        <p>Tabelle 2 zeigt alle möglichen Kombinationen. Beispiel: Sie möchten wissen, was geschieht, wenn der 6502 auf die Hex-Zahl C7 trifft. Dazu suchen Sie diese Zahl in der Tabelle 2. Sie steht in der letzten Spalte der Zeile 5. Am linken Zeilenrand finden Sie nun die Befehlskombination, die obersten beiden Zeilen der letzten Spalte geben die Adressierungsart sowie die Befehlslänge in Bytes an. C7 MM würde also dieselbe Wirkung haben, wie die Assemblerbefehle »DEC MM:CMP MM« zusammen.</p>
 
-<p>Die Ausführungszeit der Befehle der dritten Befehlsgruppe ist dieselbe, als wenn nur ein offizieller Opcode der gleichen Adressierungsart ausgeführt würde. E7 DD ist in der Ausführung also genauso schnell wie der Assemblerbefehl »INC DD«.</p>
+        <p>Die Ausführungszeit der Befehle der dritten Befehlsgruppe ist dieselbe, als wenn nur ein offizieller Opcode der gleichen Adressierungsart ausgeführt würde. E7 DD ist in der Ausführung also genauso schnell wie der Assemblerbefehl »INC DD«.</p>
 
-<p>Als besonders brauchbar würde ich die Befehlskombination »DEC &hellip;: CMP&hellip;«(für Schleifenzwecke) und Rotations/Schiebebefehle in den hierfür sonst nicht vorhandenen Adressierungsarten »(..,X)« und »(..),Y« (für hochauflösende Grafik) bezeichnen.</p>
+        <p>Als besonders brauchbar würde ich die Befehlskombination »DEC &hellip;: CMP&hellip;«(für Schleifenzwecke) und Rotations/Schiebebefehle in den hierfür sonst nicht vorhandenen Adressierungsarten »(..,X)« und »(..),Y« (für hochauflösende Grafik) bezeichnen.</p>
 
-<p><strong>Gruppe 4</strong>: Diese Befehle sind nur sehr schlecht durch bekannte Opcodes zu ersetzen; sie sind in Tabelle 3 beschrieben.</p>
+        <p><strong>Gruppe 4</strong>: Diese Befehle sind nur sehr schlecht durch bekannte Opcodes zu ersetzen; sie sind in Tabelle 3 beschrieben.</p>
 
-<p>Zum Abschluß noch eine Warnung. Überlegen Sie sich den Gebrauch dieser neuen Befehle gut, denn sie machen jedes noch so gut strukturierte Programm zunichte. Insbesondere ist zu beachten, daß die hier beschriebenen undefinierten Opcodes nicht bei jeder Prozessorversion die gleiche Wirkung haben müssen. Schließlich handelt es sich dabei ja nur um unbeabsichtigte Nebenprodukte bei der Implementierung des 6502-Standard-Befehlssatzes.</p>
+        <p>Zum Abschluß noch eine Warnung. Überlegen Sie sich den Gebrauch dieser neuen Befehle gut, denn sie machen jedes noch so gut strukturierte Programm zunichte. Insbesondere ist zu beachten, daß die hier beschriebenen undefinierten Opcodes nicht bei jeder Prozessorversion die gleiche Wirkung haben müssen. Schließlich handelt es sich dabei ja nur um unbeabsichtigte Nebenprodukte bei der Implementierung des 6502-Standard-Befehlssatzes.</p>
 
-<address class="author">(Jürgen Urban/ev)</address>
+        <address class="author">(Jürgen Urban/ev)</address>
     </article>
 </body>
+
 </html>
