@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>22 Read Error - Theorie und Praxis</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="Andreas Wurf, rg">
+    <meta name="64er.issue" content="3/85">
+    <meta name="64er.pages" content="41-43">
+    <meta name="64er.toc_category" content="XXX">
+    <!-- <meta name="64er.toc_title" content="XXX"> -->
+    <meta name="64er.id" content="XXX">
+</head>
+
+<body>
+    <article>
+        <h1>22 Read Error - Theorie und Praxis</h1>
+<p class="intro">Ein Programm läßt sich wirkungsvoll vor dem Kopieren schützen, indem man einen Sektor zerstört und in diesem Bereich wichtige Daten unterbringt.</p>
+
+<p>Bei Software, die auf Diskette gespeichert wird, dominiert eine Methode des Programmschutzes mit folgendem Prinzip:</p>
+
+<p>Auf der Diskette mit diesem Programm ist ein Block mit Absicht zerstört worden. Wird jetzt dieses Programm geladen und gestartet, so wird vom Programm dieser fehlerhafte Block mit einem Direktzugriffsbefehl auf die Diskette abgefragt. Ist der Fehler vorhanden (was sich meist durch Blinken der Floppy-LED und Rattern des Schrittmotors äußert), so wird dies vom Programm erkannt. Es »merkt« dadurch sozusagen, daß »es« ein Original ist. Diese Methode funktioniert natürlich nur so lange, wie es nicht möglich ist, diesen fehlerhaften Block mitzukopieren. Bei älteren Kopierprogrammen ist dies nicht möglich. In letzter Zeit jedoch gibt es Kopierprogramme, die auf das Kopieren solcher Blöcke vorbereitet sind, indem sie die zerstörten Blöcke (in Form von Lesefehlern) erkennen und auf die Kopie »raufzaubern«. Bei dieser Prozedur wird aber in den meisten Fällen der Inhalt dieser Blöcke zerstört (auch zerstörte Blöcke können einen Inhalt haben).</p>
+
+<p>Und hier zeigt sich ein Ansatzpunkt: Man müßte in diesen zerstörten Blöcken Daten unterbringen, die vom Originalprogramm gelesen werden können, von einer Kopie jedoch nicht. Das heißt, man macht sich den Effekt zunutze, daß diese zerstörten Blöcke durch das DOS nicht korrekt kopiert werden können. Wie aber kann man das DOS trotzdem dazu bringen, einen zerstörten Block kurzzeitig wieder lesbar zu machen?</p>
+
+<p>Diese Frage läßt sich nur nach intensivem Studium des DOS der C 1541 beantworten. Nur wenn die Zusammenhänge und der Aufbau dieses Operations-Systems klar sind, kann auf eine solche Frage eine befriedigende Antwort gefunden werden. Der Autor fand folgende Lösung: In dem Bild ist der interne Aufbau eines Diskettenblocks dargestellt. Für uns ist die Konstante zum Beginn des Datenblocks ($07) wichtig. Das DOS braucht diese Konstante zur Erkennung des Anfangs eines Datenblocks. Sollte diese Konstante einen anderen Wert erhalten, so kann das DOS diesen Block nicht mehr lesen, das heißt er ist zerstört. Der Vergleichswert für diese Konstante liegt in der Zero-Page der Floppy (das heißt im RAM) und kann also geändert werden.</p>
+
+<p>Man hat also durch Manipulation dieses Vergleichswertes die Möglichkeit, einen Block zu zerstören oder zu reparieren. Stellen Sie sich einmal folgendes vor:</p>
+
+<ol>
+<li>Sie lesen einen Diskettenblock ein mit dem »U1: &hellip;«-Befehl der Floppy.</li>
+<li>Sie ändern den Vergleichswert für die Konstante $07 in der Zero-Page in irgend eine Zahl zwischen 0 und 255 außer 7.</li>
+<li>Sie schreiben den Block auf die Diskette zurück, mit dem USR-Befehl »U2: &hellip;«und</li>
+<li>Sie setzen den Vergleichswert in der Zero-Page auf 7 zurück.</li>
+</ol>
+
+
+<p>Sie haben jetzt folgendes gemacht: In dem Diskettenblock, den Sie eingelesen haben, stand bisher die Konstante $07. Dann haben Sie den Vergleichswert für die Konstante geändert, den Block wieder auf die Diskette geschrieben (wobei die geänderte Konstante auf die Diskette geschrieben wurde) und den Vergleichswert wieder auf den Normalwert gesetzt. Im Endeffekt haben Sie also auf der Diskette eine andere Konstante stehen, als in der Vergleichs-Speicherzelle der Floppy-Zero-Page. Versuchen Sie jetzt, diesen Block zu lesen, so werden Sie merken, daß das Laufwerk nur Spot- und Blinkeffekte hervorbringt. Mit anderen Worten: Sie haben diesen Block zerstört, und zwar mit dem Fehler Nummer 22, der das Fehlen eines Datenblockheaders anzeigt.</p>
+
+<p>Dieser Diskettenfehler könnte jetzt wie oben beschrieben von dem zu schützenden Programm abgefragt werden.</p>
+
+<p>Einigen Lesern wird wahrscheinlich jetzt schon klar sein, was passiert, wenn wir nun den Vergleichswert in der Floppy-Zero-Page auf den Wert setzen, den wir vorhin auf die Diskette geschrieben haben. Wir gehen also jetzt wie folgt vor:</p>
+
+<ol>
+<li>Vergleichswert in der Floppy-Zero-Page auf den Wert setzen, mit dem der Block vorhin auf die Diskette zurückgeschrieben wurde.</li>
+<li>Den Block mit dem »U1: &hellip;«-Befehl einlesen und eventuell auch mittels »GET #« in den Computer holen.</li>
+<li>Den Vergleichswert wieder auf den Standard-Wert $07 setzen.</li>
+</ol>
+
+
+<p>Wir haben den zerstörten Block kurzfristig lesbar gemacht, indem wir der Floppy einen anderen Vergleichswert untergejubelt haben, als der Standard-Wert. Somit »denkt« die Floppy beim Einlesen des Blocks, es sei alles in Ordnung. Nachdem der Block dann weiterverarbeitet wurde, haben wir den Vergleichswert für die Konstante wieder auf den normalen Wert gesetzt. Der fragliche Block gilt jetzt also wieder als zerstört.</p>
+
+<p>Wichtig dabei ist, daß nach wie vor die 256 Bytes Inhalt des Blocks unverändert vorliegen, das heißt durch die »Zerstörung« des Blocks wurde an seinem Inhalt nichts geändert.</p>
+
+<p>Das ist der Grundgedanke dieser Erweiterung bekannter Methoden zum Schützen von Software. Dieses Prinzip läßt sich jetzt vielfach variieren:</p>
+
+<ul>
+<li>Das zu schützende Programm könnte beispielsweise (das heißt ohne Verkettungsadressen auf den nächsten Block) abgespeichert und die davon belegten Blöcke zerstört werden. Von einem Vorprogramm aus werden dann die Blöcke einzeln restauriert, eingelesen und wieder zerstört (aus Sicherheitsgründen).</li>
+<li>Man könnte für jeden Block verschiedene Konstanten benutzen, die sich nach einem Algorithmus errechnen lassen (zum Beispiel Spur, EXOR, Sektor).</li>
+</ul>
+
+
+<p>Eines muß hier ganz deutlich gesagt werden: Es hängt nur von der Programmierfähigkeit des »Schützers« ab, wie wirksam der Schutz ist. Die hier vorgestellte Methode liefert eben doch nur das Prinzip.</p>
+
+<p>Noch ein Hinweis: Ein Programmschutz kann nur dann wirksam sein, wenn es keine Möglichkeit gibt, das Programm nach dem Ladevorgang einfach abzubrechen und abzuspeichern. Versuchen Sie daher, Ihre Lade- beziehungsweise Vorprogramme so zu schützen, daß sie möglichst keine Art der Einsicht erlauben. Bewährt hat sich in diesem Zusammenhang compiliertes Basic. Schreiben Sie also Ihre Ladeprogramme ruhig m Basic und compilieren Sie sie dann oder lassen sie compilieren.</p>
+
+<p>Das Programm »Son of Destroyer« soll den Einstieg in diese Technik des Programmschutzes erleichtern und dessen Arbeitsweise verdeutlichen. Es ist gewissermaßen ein Programm zum Experimentieren und Sammeln von Erfahrungen. Es bietet folgendes: Man kann eine Diskette zerstören und wieder restaurieren, wobei die Bereiche der Diskette, die behandelt werden sollen, grafisch auf dem Bildschirm dargestellt werden können. Dazu bietet »Son of Destroyer« folgende Kommandos:<br/>
+F1: Block als belegt kennzeichnen<br/>
+F3: Block als frei kennzeichnen<br/>
+F5: Spur als belegt kennzeichnen<br/>
+F7: Spur als frei kennzeichnen<br/>
+F2: Die als belegt gekennzeichneten Blöcke einer Diskette zerstören<br/>
+F4: Die als belegt gekennzeichneten Blöcke einer Diskette restaurieren<br/>
+»*«: Bricht die Funktionen F2 und F4 vorzeitig ab.<br/>
+»h«: Zeigt die Befehlsliste an. Die Belegung einzelner Blöcke auf dem Bildschirm geht dabei verloren!<br/>
+»s«: Speichert das Arbeitsfeld auf die Diskette, die sich momentan im aktuellen Laufwerk befindet.<br/>
+»l«: Lädt das Arbeitsfeld.<br/>
+F8: Beendet das Programm.</p>
+
+<p>Das Programm fragt Sie nach der Gerätenummer der aktuellen Floppy und nach der Konstante, die Sie als neuen Wert auf dem Header der Blöcke stehen haben wollen, die Sie zerstören. Danach sehen Sie das Arbeitsfeld vor sich und links unten blinkt ein Cursor. Diesen Cursor können Sie jetzt wie gewohnt mit den Cursor-Steuertasten bewegen. Wenn Sie auf dem Block oder der Spur angelangt sind, die zerstört (oder restauriert) werden sollen, dann drücken Sie Fl zum Belegen dieses Blockes oder F5 zum Belegen der ganzen Spur. Das Rücksetzen geschieht analog dazu mit F3 beziehungsweise F7.</p>
+
+<p>Danach können Sie mit F2 beziehungsweise F4 die als belegt gekennzeichneten Blöcke der im Laufwerk befindlichen Diskette zerstören beziehungsweise restaurieren.</p>
+
+<p>Die beiden letztgenannten Funktionen können durch Druck auf die »*«-Taste vorzeitig beendet werden.</p>
+
+<p>Mit »s« oder »l« kann das momentane Arbeitsfeld auf Diskette gespeichert beziehungsweise von Diskette geladen werden.</p>
+
+<p>Mit »h« ist es Ihnen jederzeit möglich, sich eine Kommandoübersicht zu verschaffen, wobei allerdings das Arbeitsfeld gelöscht wird. Mit F8 schließlich beenden Sie das Programm.</p>
+
+<p>Sie müssen beim Zerstören beziehungsweise Restaurieren der Diskette nur auf zwei Dinge achten:</p>
+
+<ol>
+<li>Die Konstante, die Sie eingeben, muß beim Zerstören dieselbe sein wie beim Restaurieren und</li>
+<li>Sie müssen beim Zerstören und Restaurieren immer dieselben Blöcke als belegt kennzeichnen.</li>
+</ol>
+
+
+<p>Bleibt noch, Ihnen beim Erproben dieser Methode viel Spaß und Erfolg zu wünschen. Auch wenn’s beim ersten Mal nicht klappt: Bleiben Sie am Ball. Es lohnt sich!</p>
+
+<address class="author">(Andreas Wurf/rg)</address>
+    </article>
+</body>
+</html>

@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>Autoboot beim C 64</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="Prof. Hartmut Ginnow-Merkert, ev">
+    <meta name="64er.issue" content="3/85">
+    <meta name="64er.pages" content="86">
+    <meta name="64er.toc_category" content="XXX">
+    <!-- <meta name="64er.toc_title" content="XXX"> -->
+    <meta name="64er.id" content="XXX">
+</head>
+
+<body>
+    <article>
+        <h1>Autoboot beim C 64</h1>
+<p class="intro">Tippen Sie zwei Zeilen im Direktmodus ein, und Ihr Programm verhält sich wie die meisten professionellen Programme — es startet nach dem Laden der Diskette von selbst.</p>
+
+<p>Es gibt verschiedene Techniken zum automatischen Booten von Programmen. Die hier vorgestellte zeichnet sich dabei durch besondere Einfachheit aus.</p>
+
+<p>Denken Sie sich zunächst einen neuen Namen für das Programm aus, das Sie autobootfähig machen wollen. Laden Sie nun Ihr Programm in den Computer. Tippen Sie sodann den folgenden Text:</p>
+
+<code>PRINT"{CLR}POKE45,&ldquo;PEEK(45)&rdquo;:POKE46,&ldquo;PEEK(46)&rdquo; :RUN".</code>
+
+<p>Drücken Sie RETURN. Dies löscht den Bildschirm und schreibt folgendes in die oberste Zeile:</p>
+
+<code>POKE45, n1 :POKE46, n2 :RUN</code>
+
+<p>wobei anstelle von n1 und n2 die Inhalte der Speicherstellen 45 und 46 als Zahlenwerte erscheinen, die von der Länge Ihres Programmes abhängig sind. Zwei Zeilen tiefer steht dann »READY« mit dem blinkenden Cursor darunter.</p>
+
+<p>Gehen Sie mit der CURSOR DOWN-Taste zwei Zeilen tiefer und schreiben Sie:<br/>
+POKE631,19:POKE632,13:POKE198,2:POKE43,198: POKE44,0:SAVE"0:NEUER NAME",8<br/>
+und drücken Sie die RETURN-Taste. Natürlich können Sie jeden beliebigen Namen statt »Neuer Name« verwenden.</p>
+
+<p>Ihr Autoboot-Programm wird nun auf Diskette gespeichert. Die »SYNTAX ERROR«-Meldung, die Sie nach dem Speichern erhalten, können Sie ignorieren. Gehen Sie jetzt mit dem Cur- 1 sor auf eine leere Zeile, wo Sie POKE43,1:POKE44,8 tippen und RETURN drücken. Dann ist alles wieder beim alten, und der Computer befindet sich im Ausgangszustand.</p>
+
+<p>Das Programm kann nun jederzeit mit »LOAD"NEUER NAME",8,1« wieder geladen werden. Vergessen Sie dabei nicht, zuvor NEW zu schreiben und bedenken Sie, daß die Sekundäradresse 1 in »LOAD"NN",8,1« unbedingt erforderlich ist, um alles an den richtigen Platz zu bringen.</p>
+
+<p>Das eben beschriebene Verfahren funktioniert wie folgt: Durch »POKE 43,198:POKE44,0« wird der Basic-Anfang heruntergesetzt und so das Programm zusammen mit allen Speicherplätzen ab 198 auf Diskette gespeichert, inklusive den Speicherstellen 631 und 632 des Tastaturpuffers, der Speicherstelle 198 für die Anzahl der im Tastaturpuffer gespeicherten Zeichen sowie dem Bildschirmspeicher von 1024 bis 2023. Dies ermöglicht die Benutzung der »Dynamic Keyboard«-Technik, so daß der Computer gleich nach dem Laden die in den Textspeicher geschriebenen Befehle durchführt.</p>
+
+<p>Der Cursor wird durch das POKE631,19 auf die Home-Position geführt, findet dort die Zeile POKE45,n1:POKE46,n2: RUN vor, und das POKE632,13 läßt ihn genau diese Zeile ausführen.</p>
+
+<p>Die POKEs in 45 und 46 sind dabei notwendig, um den Vektor für das Programmende wieder richtig zu setzen. Das vom RUN automatisch mit ausgeführte CLR setzt auch die übrigen Vektoren von 47 bis 52 auf die richtigen Werte. Ein Gratis- | Bonbon, das Sie mit dieser Technik erhalten, ist die Möglichkeit, mit POKE808,234 in der ersten Zeile Ihres Programmes das Anhalten und Listen verhindern zu können, so daß kein Unbefugter Ihr Programm kopieren kann.</p>
+
+<address class="author">(Prof. Hartmut Ginnow-Merkert/ev)</address>
+    </article>
+</body>
+</html>
