@@ -16,21 +16,22 @@
 <body>
     <article>
         <h1>Verbindungsfreundlich</h1>
-<p class="intro">Es ist allgemein bekannt, daß der VC 20 über eine serielle Schnittstelle verfügt. Weniger bekannt ist, daß er auch mit einem parallelen Interface ausgestattet ist. Beide sollen hier beschrieben werden.</p>
+        <p class="intro">Es ist allgemein bekannt, daß der VC 20 über eine serielle Schnittstelle verfügt. Weniger bekannt ist, daß er auch mit einem parallelen Interface ausgestattet ist. Beide sollen hier beschrieben werden.</p>
 
-<p>Die Schnittstellen des VC 20 werden von einem 6522-Chip gesteuert. Dieser verfügt über 16 Register, mit deren Hilfe zwei 8-Bit-Datenports, zwei 16-Bit-Timer, ein Schieberegister und verschiedene Steuerleitungen gehandhabt werden können. Für die parallele Schnittstelle benötigen wir nur die Register 0 und 2.</p>
+        <p>Die Schnittstellen des VC 20 werden von einem 6522-Chip gesteuert. Dieser verfügt über 16 Register, mit deren Hilfe zwei 8-Bit-Datenports, zwei 16-Bit-Timer, ein Schieberegister und verschiedene Steuerleitungen gehandhabt werden können. Für die parallele Schnittstelle benötigen wir nur die Register 0 und 2.</p>
 
-<p>Das Register 0 gibt den Zustand des Datenports B (PB 0 bis PB 7 am User-Port) wieder. Es kann sowohl gelesen als auch geladen werden. Es liegt bei dezimal 37 136 ($ 9110). Die Pin-Belegung des User-Ports geht aus Tabelle 1 hervor. Mit dem Register 2 können die Leitungen des Datenports individuell auf Ein- oder Ausgabe geschaltet werden. Ist zum Beispiel das Bit 0 gesetzt, so ist die korrespondierende Datenleitung (in diesem Fall PB 0) auf Ausgabe programmiert. Die anderen Leitungen stehen auf Eingabe, weil Bit 1 bis Bit 7 nicht gesetzt sind.</p>
+        <p>Das Register 0 gibt den Zustand des Datenports B (PB 0 bis PB 7 am User-Port) wieder. Es kann sowohl gelesen als auch geladen werden. Es liegt bei dezimal 37 136 ($ 9110). Die Pin-Belegung des User-Ports geht aus Tabelle 1 hervor. Mit dem Register 2 können die Leitungen des Datenports individuell auf Ein- oder Ausgabe geschaltet werden. Ist zum Beispiel das Bit 0 gesetzt, so ist die korrespondierende Datenleitung (in diesem Fall PB 0) auf Ausgabe programmiert. Die anderen Leitungen stehen auf Eingabe, weil Bit 1 bis Bit 7 nicht gesetzt sind.</p>
 
-<p>Das Ganze sieht in Basic wie in Listing 1 aus. Etwas schwieriger ist es, die serielle Schnittstelle zu programmieren. Sie hat einen Aus- und einen Eingang. Am User-Port ist CB 2 der Aus- und CB 1 der Eingang. Mit dem Basic-Befehl OPEN 2,2,0, CHR$ (Byte 1) + CHR$ (Byte 2) wird die serielle Schnittstelle eröffnet und programmiert. Die Bezeichnungen Byte 1 und Byte 2 stehen für das Kontroll- und das Befehlsregister. Die beiden Register werden nach den Tabellen 2 (Kontrollregister) und 3 (Befehlsregister) programmiert.</p>
+        <p>Das Ganze sieht in Basic wie in Listing 1 aus. Etwas schwieriger ist es, die serielle Schnittstelle zu programmieren. Sie hat einen Aus- und einen Eingang. Am User-Port ist CB 2 der Aus- und CB 1 der Eingang. Mit dem Basic-Befehl OPEN 2,2,0, CHR$ (Byte 1) + CHR$ (Byte 2) wird die serielle Schnittstelle eröffnet und programmiert. Die Bezeichnungen Byte 1 und Byte 2 stehen für das Kontroll- und das Befehlsregister. Die beiden Register werden nach den Tabellen 2 (Kontrollregister) und 3 (Befehlsregister) programmiert.</p>
 
-<p>Wenn ich zum Beispiel das Kontrollregister auf 300 Baud, 7 Daten- und 2 Stoppbits programmieren möchte, muß ich die Bits 1, 2, 5 und 7 setzen. Man rechnet also 21 + 22 + 25 + 27 = 2 + 4 + 32 4- 128 = 166 und setzt diesen Wert bei Byte 1 ein. Genauso macht man es mit dem Befehlsregister, also: alle Werte zusammenzählen und in Byte 2 einsetzen.</p>
+        <p>Wenn ich zum Beispiel das Kontrollregister auf 300 Baud, 7 Daten- und 2 Stoppbits programmieren möchte, muß ich die Bits 1, 2, 5 und 7 setzen. Man rechnet also 21 + 22 + 25 + 27 = 2 + 4 + 32 4- 128 = 166 und setzt diesen Wert bei Byte 1 ein. Genauso macht man es mit dem Befehlsregister, also: alle Werte zusammenzählen und in Byte 2 einsetzen.</p>
 
-<p>Nun ist die serielle Schnittstelle programmiert. Ausgaben macht man über den Befehl PRINT # 2, CHR$ (x), wobei x der ASCII-Code des zu sendenden Buchstabens ist. Lesen kann man die Schnittstelle mit dem Befehl GET # 2, x$, wobei x$ das zuletzt gelesene Zeichen ist.</p>
+        <p>Nun ist die serielle Schnittstelle programmiert. Ausgaben macht man über den Befehl PRINT # 2, CHR$ (x), wobei x der ASCII-Code des zu sendenden Buchstabens ist. Lesen kann man die Schnittstelle mit dem Befehl GET # 2, x$, wobei x$ das zuletzt gelesene Zeichen ist.</p>
 
-<p>Ein Basic-Programm, das den VC 20 mit anderen Computern, zum Beispiel über ein Telefonmodem, kommunizieren läßt, ist als Listing 2 abgedruckt. Bei diesem Programm können falsche Eingaben mit der DEL-Taste gelöscht werden. Nun viel Spaß mit Ihren Schnittstellen.</p>
+        <p>Ein Basic-Programm, das den VC 20 mit anderen Computern, zum Beispiel über ein Telefonmodem, kommunizieren läßt, ist als Listing 2 abgedruckt. Bei diesem Programm können falsche Eingaben mit der DEL-Taste gelöscht werden. Nun viel Spaß mit Ihren Schnittstellen.</p>
 
-<address class="author">(Andrej Dvorak/ev)</address>
+        <address class="author">(Andrej Dvorak/ev)</address>
     </article>
 </body>
+
 </html>
