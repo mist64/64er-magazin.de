@@ -36,7 +36,7 @@ def split_html(input_file, issue):
     <meta name="author" content="XXX">
     <meta name="64er.issue" content="{issue}">
     <meta name="64er.pages" content="XXX">
-    <meta name="64er.toc_category" content="XXX">
+    <!-- <meta name="64er.toc_category" content="XXX"> -->
     <!-- <meta name="64er.toc_title" content="XXX"> -->
     <meta name="64er.id" content="XXX">
 </head>
