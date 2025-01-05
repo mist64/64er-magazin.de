@@ -223,6 +223,20 @@
 
         <p>Wir werden jetzt den Jobcode für Lesen des Blocks 18,1 in Puffer 0 übergeben und uns dann die Rückmeldung und den Inhalt des Blocks ansehen. Mit dem POKE-Befehl im Programm schreiben wir den Inhalt des Puffers direkt in den Bildschirmspeicher, was für unsere Kontrolle langen soll:</p>
 
+        <figure>
+            <code>1 OPEN1,8,15,”I”<br>
+            2 PRINT#1,”M-W”CHR$(6)CHR$(0)CHR$(2)CHR$(18)CHR$(1)<br>
+            3 PRINT#1,”M-W”CHR$(0)CHR$(0)CHR$(1)CHR$(128)<br>
+            4 FORX=0TO2000:NEXTX<br>
+            5 PRINT#1,”M-R”CHR$(0)CHR$(0)CHR$(1)<br>
+            6 GET#1,A$: PRINT ASC(A$ + CHR$(0))<br>
+            7 FORX=0TO255<br>
+            8 PRINT#1,”M-R”CHR$(X)CHR$(3)CHR$(1)<br>
+            9 GET#1,A$: POKE1024+X,ASC(A$+CHR$(0))<br>
+            10 NEXTX<br>
+            11 CLOSE 1</code>
+        </figure>
+
         <p>Dieses kleine Programm initialisiert die Diskette im Laufwerk. Anschließend werden Track und Sektor (18,1) übergeben und schließlich der Jobcode in Adresse $0000 geschrieben, der dafür sorgt, daß unser Block in Puffer 0 geladen wird. Nach einer kleinen Warteschleife, in der die Floppy Zeit zur Befehlsausführung hat, wird der Jobspeicher wieder ausgelesen. Anhand von Tabelle 2 können Sie erkennen, daß der Job ordnungsgemäß ausgeführt wurde, wenn Sie als Rückmeldung eine »1« bekommen.</p>
 
         <p>Auf dem Bildschirm erscheint der Inhalt des Puffers, wobei unter anderem auch Teile des Directory der Diskette zum Vorschein kommen sollten.</p>

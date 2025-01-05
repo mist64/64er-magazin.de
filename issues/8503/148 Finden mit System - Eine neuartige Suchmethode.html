@@ -19,7 +19,6 @@
         <h1>Finden mit System - Eine neuartige Suchmethode</h1>
         <!-- Effektives Programmieren -->
 
-
         <p class="intro">Nachdem wir uns in den letzten beiden Folgen mit grundlegenden programmiertechnischen Fragen befaßt haben, sollen jetzt konkrete Anwendungen im Mittelpunkt stehen. Diesmal ist es das Suchen von Zeichenketten mit einer erst vor kurzen entwickelten Methode.</p>
 
         <p>Wie versprochen, stelle ich Ihnen diesmal ein Suchprogramm vor, mit dem eine schnelle »intelligente« Suche von Strings möglich wird. Doch bevor wir uns mit der Praxis, sprich dem Programm, beschäftigen können, müssen wir uns ein wenig mit der Theorie des Suchens befassen.</p>
@@ -188,6 +187,99 @@
         <h3>Und so geht’s</h3>
 
         <p>Im folgenden werden wir uns noch ein wenig mit der Funktionsweise des Programms beschäftigen. Dazu dienen uns Bild 3, das ein Flußdiagramm der Kontrollroutine zeigt, sowie Listing 2, und Tabelle 1, die alle verwendeten Zeropage-Adressen aufschlüsselt. Ich weiß leider nicht, ob nach der Benutzung ein einwandfreier Kassettenbetrieb möglich ist, da einige der Kassetten-Zeropage-Adressen verwendet werden. Hier wäre ich für Hinweise dankbar.</p>
+
+        <figure>
+            <table>
+                <tbody>
+                    <tr>
+                        <td>$02</td>
+                        <td>Zwischenspeicher für Füllselposi- tion/Suchtiefe</td>
+                    </tr>
+                    <tr>
+                        <td>$b0</td>
+                        <td>Startposition der Suche</td>
+                    </tr>
+                    <tr>
+                        <td>$b1</td>
+                        <td>Position im Array</td>
+                    </tr>
+                    <tr>
+                        <td>$b2</td>
+                        <td>Low-Byte Adresse Teilstr. 1</td>
+                    </tr>
+                    <tr>
+                        <td>$b3</td>
+                        <td>High-Byte Adresse</td>
+                    </tr>
+                    <tr>
+                        <td>$b4</td>
+                        <td>Länge Teilstr. 1</td>
+                    </tr>
+                    <tr>
+                        <td>$b5</td>
+                        <td>Low-Byte Adresse Teilstr. 2</td>
+                    </tr>
+                    <tr>
+                        <td>$b6</td>
+                        <td>High-Byte</td>
+                    </tr>
+                    <tr>
+                        <td>$b7</td>
+                        <td>Länge Teilstr. 2</td>
+                    </tr>
+                    <tr>
+                        <td>$b8</td>
+                        <td>Anzahl der zu durchsuchenden Strings</td>
+                    </tr>
+                    <tr>
+                        <td>$b9</td>
+                        <td>Pointer auf aktuellen Descr. Low-Byte</td>
+                    </tr>
+                    <tr>
+                        <td>$ba</td>
+                        <td>Pointer High-Byte</td>
+                    </tr>
+                    <tr>
+                        <td>$f7</td>
+                        <td>Low-Byte Adr. Suchstring</td>
+                    </tr>
+                    <tr>
+                        <td>$f8</td>
+                        <td>High-Byte</td>
+                    </tr>
+                    <tr>
+                        <td>$f9</td>
+                        <td>Länge Suchstring</td>
+                    </tr>
+                    <tr>
+                        <td>$fa</td>
+                        <td>Länge Durchsuchstring</td>
+                    </tr>
+                    <tr>
+                        <td>$fb</td>
+                        <td>Adr, Low-Byte Durchsuchstring</td>
+                    </tr>
+                    <tr>
+                        <td>$fc</td>
+                        <td>High-Byte</td>
+                    </tr>
+                    <tr>
+                        <td>$fd</td>
+                        <td>Anlegepostion des ersten Buchstaben</td>
+                    </tr>
+                    <tr>
+                        <td>$fe</td>
+                        <td>Position des akt. Buchstaben im Suchstring</td>
+                    </tr>
+                    <tr>
+                        <td>$ff</td>
+                        <td>Zwischenspeicher Stellungsnummer/Buchstabe</td>
+                    </tr>
+                </tbody>
+            </table>
+            <figcaption>Tabelle 1. Diese Zeropageadresse
+                benutzt Intellisearch</figcaption>
+        </figure>
 
         <p>Als erstes wird der Suchstring geholt, und auf Füllsel untersucht. Bei der Verwendung dieser Routine ($AD9A) kann es unter Umständen bei manchen C 64 zu einem FORMULAR TOO COMPLEX ERROR kommen. Ist ein solches Füllsel vorhanden, erfolgt die Teilung in zwei Teilstrings. Die Länge des Teilstrings 2 ist später gleichzeitig das Kennzeichen dafür, ob ein Füllsel vorlag. Ist die Länge gleich 0, ist das nicht der Fall.</p>
 

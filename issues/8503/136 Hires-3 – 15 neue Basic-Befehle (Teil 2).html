@@ -22,7 +22,7 @@
 
         <p>Wieder ist das Programm (Listing 1) mit dem MSE, den Sie an anderer Stelle in diesem Heft finden, einzugeben. Danach sollten Sie alles zunächst auf Kassette oder Diskette speichern.</p>
 
-        <p>Sie werden sofort bemerkt haben, daß Sie damit auch den Bereich zwischen $89B7 und $9000 abspeichern, in dem kein Maschinenprogramm enthalten ist. Das ist ein Manko, das sich aus der Entstehungsgeschichte von Hires-3 erklärt. Andererseits kannjede Erweiterung in diesen Bereich gelegt werden, ohne daß man sich immer wieder neue Start- oder Endadressen merken muß.</p>
+        <p>Sie werden sofort bemerkt haben, daß Sie damit auch den Bereich zwischen $89B7 und $9000 abspeichern, in dem kein Maschinenprogramm enthalten ist. Das ist ein Manko, das sich aus der Entstehungsgeschichte von Hires-3 erklärt. Andererseits kann jede Erweiterung in diesen Bereich gelegt werden, ohne daß man sich immer wieder neue Start- oder Endadressen merken muß.</p>
 
         <p>Jedesmal, wenn Sie jetzt Hires-3 benötigen, laden Sie es (mit Sekundäradresse 1); stellen Sie danach die Basic-Zeiger mittels NEW zurück, schützen Sie Hires-3 durch POKE52, 128:POKE56, 128, und starten Sie es dann mit SYS 36864. (Das wurde schon in der vorangegangenen Ausgabe beschrieben.)</p>
 
@@ -139,9 +139,476 @@
 
         <p>Tabelle 1 gibt alle durch Hires-3 ausdrücklich verwendeten Zeropage-Adressen an. Ausdrücklich deshalb, weil im Rahmen von Interpreter- oder Betriebssystem-Routinen ebenfalls Zeropage-Adressen angesprochen werden, die aber hier nicht benannt sind (es handelt sich dann ja um die normale Ansprache dieser Speicherstellen, wie sie ständig auch vom herkömmlichen Basic aus geschieht). Die meisten Zeropage-Speicherplätze werden in derselben Weise benutzt, wie es Interpreter und Betriebssystem vorgeben. Nur dort, wo Hires-3 eine andere Bedeutung eingeführt, ist das dann angegeben. Die Seiten 1 bis 3 unseres Speichers bergen ebenfalls wichtige Parameter unseres Computers. Deshalb ist die Tabelle 2 angefügt, die Auskunft gibt über Aktivitäten von Hires-3 in diesem Bereich.</p>
 
+        <figure>
+            <table>
+                <tbody>
+                    <tr>
+                        <th>Speicherstelle (hex.)</th>
+                        <th>Normale Verwendung</th>
+                        <th>Hires-3-Verwendung</th>
+                    </tr>
+                    <tr>
+                        <td>01</td>
+                        <td>Prozessor-Port</td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td>02</td>
+                        <td>leer</td>
+                        <td>DEEK-Ergebnis<br>Farbcodespeicher</td>
+                    </tr>
+                    <tr>
+                        <td>10</td>
+                        <td>Flagge: Sperren der Annahme von Integer- oder Feldvariablen</td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td>14/15</td>
+                        <td>Zwischenspeicher für Adressen und Integers</td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td>22/23</td>
+                        <td>Diverse Zeiger</td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td>24/25</td>
+                        <td>Zwischenspeicher bei NEXT</td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td>26</td>
+                        <td>Ergebnis bei Gleitkommarechungen (*,/)</td>
+                        <td>Zwischenspeicher bei DUMP</td>
+                    </tr>
+                    <tr>
+                        <td>2B/2C</td>
+                        <td>Zeiger auf Basic-Start</td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td>’ 2D/2E</td>
+                        <td>Zeiger auf Basic-Variablen-Start</td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td>2F/30</td>
+                        <td>Zeiger auf Basic-Array-Start</td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td>37/38</td>
+                        <td>Zeiger auf Basic-Speicher-Ende</td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td>3D/3E</td>
+                        <td>Zeiger: Aktueller Basic-Befehl (für CONT)</td>
+                        <td>Zwischenspeicher für RENUMBER</td>
+                    </tr>
+                    <tr>
+                        <td>3F/40</td>
+                        <td>Zeiger: Aktuelle DATA- Zeile</td>
+                        <td>Zwischenspeicher für RENUMBER</td>
+                    </tr>
+                    <tr>
+                        <td>41/42</td>
+                        <td>Zeiger: Nächstes DATA- Element</td>
+                        <td>Zwischenspeicher für RENUMBER</td>
+                    </tr>
+                    <tr>
+                        <td>43/44</td>
+                        <td>Zeiger Auswertung einer Eingabequelle (INPUT, GET, READ)</td>
+                        <td>Zwischenspeicher für RENUMBER<br></td>
+                    </tr>
+                    <tr>
+                        <td>45/46</td>
+                        <td>Zeiger: Aktueller Basic-<br>Variablen-Name</td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td>47</td>
+                        <td>Tabellenzeiger Zwischenspeicher</td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td>47/48</td>
+                        <td>Zeiger: Aktueller Basic-Variablen-Wert</td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td>4E/4F</td>
+                        <td>Zeiger: FN-Variable<br>Auch als Zwischenspeicher bei Gleitkommaoperationen</td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td rowspan="2">57-5B<br>58/59</td>
+                        <td>Fließkommaregister (Polynomauswertung, TAN)</td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td>Diverse Zeiger</td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td>57/58</td>
+                        <td></td>
+                        <td>Ergebnis des UP 16-Bit-Multiplikation Diverse Zwischenspeicher</td>
+                    </tr>
+                    <tr>
+                        <td>5C-60</td>
+                        <td>Fließkommaregister (Zwischenspeicher Polynomauswertung)</td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td>5D,5F</td>
+                        <td>Diverse Zähler und Flaggen (TI$, 16-Bit-Multiplik., STRFAC, FACSTR)</td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td>5F,60</td>
+                        <td>Startadresse einer Programmzeile, Variablenverw., Stringtransfer</td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td>60</td>
+                        <td>Vorzeichen des Exponenten</td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td>5C,5D</td>
+                        <td></td>
+                        <td>Ergebnis des UP 16-Bit-Division Diverse Zwischenspeicher</td>
+                    </tr>
+                    <tr>
+                        <td>61-66</td>
+                        <td>FAC</td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td>69-6E</td>
+                        <td>ARG</td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td>7A/7B</td>
+                        <td>CHRGET-Zeiger</td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td>8B-8F</td>
+                        <td>Gleitkommawert der letzten RND-Zahl</td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td>8E,8F</td>
+                        <td></td>
+                        <td>UP 16-Bit-Division: Divisionsrest</td>
+                    </tr>
+                    <tr>
+                        <td>B9</td>
+                        <td>Aktuelle Sekundäradresse</td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td>C5</td>
+                        <td>SCNKEY (Aktueller Wert des Tastatur-Matrixcodes) = gedrückte Taste</td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td>C6</td>
+                        <td>Anzahl gültiger Zeichen im Tastaturpuffer</td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td>CB</td>
+                        <td>Tastatur-Matrixcode, Zeiger in Decodierungstabelle für Tastatur</td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td>CE</td>
+                        <td>Zeichen unter dem Cursor</td>
+                        <td>Zwischenspeicher für RENUMBER</td>
+                    </tr>
+                    <tr>
+                        <td>D1/D2</td>
+                        <td>Zeiger: Aktueller Anfang der Cursor-Zeile im Bildschirm-RAM</td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td>D3</td>
+                        <td>Cursorspalte innerhalb der Cursorzeile</td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td>FB-FE</td>
+                        <td>leer</td>
+                        <td>Diverse Zwischenspeicher und Zeiger</td>
+                    </tr>
+                    <tr>
+                        <td colspan="3">Die Hires-3-Verwendung ist nur dann angegeben, wenn sie von der normalen Verwendung abweicht.</td>
+                    </tr>
+                </tbody>
+            </table>
+            <figcaption>Tabelle 1. Von Hires-3 verwendete Zeropage-Adressen</figcaption>
+        </figure>
+
+        <figure>
+            <table>
+                <tbody>
+                    <tr>
+                        <th>Speicherstelle (hex.)</th>
+                        <th>Normale Verwendung</th>
+                        <th>Hires-3-</b><br><b>Verwendung</th>
+                    </tr>
+                    <tr>
+                        <th colspan="3">Page 1</th>
+                    </tr>
+                    <tr>
+                        <td>101 und folgende</td>
+                        <td>Prozessorstack (auch für Datenspeicherung bei FOR...NEXT und GOSUB</td>
+                        <td>Zwischenspeicher für RENUMBER</td>
+                    </tr>
+                    <tr>
+                        <th colspan="3">Page 2</th>
+                    </tr>
+                    <tr>
+                        <td>277 ff.</td>
+                        <td>Tastaturpuffer</td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td>288</td>
+                        <td>Startseite der Videomatrix</td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td>28D</td>
+                        <td>Flagge für Shift, Commodore</td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td>28F/290</td>
+                        <td>Vektor: Tastaturabfrage</td>
+                        <td>Wird verbogen auf 900B</td>
+                    </tr>
+                    <tr>
+                        <td>2A7-2FF<br>2A7,2AF-2B5</td>
+                        <td>leer</td>
+                        <td>Diverse Zwischenspeicher und Zeiger</td>
+                    </tr>
+                    <tr>
+                        <th colspan="3">Page 3</th>
+                    </tr>
+                    <tr>
+                        <td>302/303</td>
+                        <td>Vektor: Eingabewarteschleife (nach READY)</td>
+                        <td>AUTONUMBER verbiegt nach $90BC und zurück zum Normalwert $A483</td>
+                    </tr>
+                    <tr>
+                        <td>308/309</td>
+                        <td>Vektor: Routinenaufruf (Interpreter)</td>
+                        <td>Die Basic- Befehlserweiterungen verbiegen nach $9292 und zurück zum Normalwert $A7E4</td>
+                    </tr>
+                    <tr>
+                        <td>314/315</td>
+                        <td>IRQ-Vektor</td>
+                        <td>UHR verbiegt nach $852D und zurück zum Normalwert $EA31</td>
+                    </tr>
+                    <tr>
+                        <td colspan="3">Die Hires-3-Verwendung ist nur dann angegeben, wenn sie von der normalen Verwendung abweicht.</td>
+                    </tr>
+                </tbody>
+            </table>
+            <figcaption>Tabelle 2. Von Hires-3 verwendete Adressen der Seiten 1 bis 3</figcaption>
+        </figure>
+
         <p>Einige Zeiger werden verbogen und durch Hires-3 auch wieder gerade gerückt. Das geschieht zum Beispiel mittels AUS oder aber spätestens bei RUN/ STOP und RESTORE.</p>
 
         <p>Tabelle 3 gibt einen Überblick über alle durch Hires-3 angesteuerten Interpreter-Routinen. Es wird jeweils die verwendete Einsprung-Adresse und die Bedeutung dieser Programmsegmente angegeben.</p>
+
+        <figure>
+            <table>
+                <tbody>
+                    <tr>
+                        <th>Einsprungadresse (hex.)</th>
+                        <th>Interpreter-Routine</th>
+                    </tr>
+
+                    <tr>
+                        <td>A3BF</td>
+                        <td>Block-Verschiebe-Routine</td>
+                    </tr>
+                    <tr>
+                        <td>A437</td>
+                        <td>Ausdruck einer Fehlermeldung und READY</td>
+                    </tr>
+                    <tr>
+                        <td>A483</td>
+                        <td>Eingabewarteschleife</td>
+                    </tr>
+                    <tr>
+                        <td>A533</td>
+                        <td>Neuberechnung des Linkpointers für Basic-Zeilen</td>
+                    </tr>
+                    <tr>
+                        <td>A613</td>
+                        <td>Berechnung der Startadresse einer Basic-Zeilennummer</td>
+                    </tr>
+                    <tr>
+                        <td>A6S5</td>
+                        <td>Zurücksetzen des CHRGET-Zeigers und Ausführen von CLR</td>
+                    </tr>
+                    <tr>
+                        <td>A660</td>
+                        <td>Ausführen von CLR</td>
+                    </tr>
+                    <tr>
+                        <td>A68E</td>
+                        <td>Zurücksetzen des CHRGET-Zeigers auf den Programmstart</td>
+                    </tr>
+                    <tr>
+                        <td>A69C</td>
+                        <td>LIST-Routine</td>
+                    </tr>
+                    <tr>
+                        <td>A7AE</td>
+                        <td>Interpreterschleife. Routinenaufruf</td>
+                    </tr>
+                    <tr>
+                        <td>A7E7</td>
+                        <td>Interpretation und Routinenaufruf, danach Interpreterschleife</td>
+                    </tr>
+                    <tr>
+                        <td>A96B</td>
+                        <td>Lesen eines Zeichens aus einer Basic-Textzeile und Umwandlung in 16-Bit-Integer</td>
+                    </tr>
+                    <tr>
+                        <td>AB1E</td>
+                        <td>Ausdrucken eines Strings</td>
+                    </tr>
+                    <tr>
+                        <td>AD8A</td>
+                        <td>Auswerten und Prüfen von Ausdrücken</td>
+                    </tr>
+                    <tr>
+                        <td>AD9E</td>
+                        <td>Auswerten von Ausdrücken</td>
+                    </tr>
+                    <tr>
+                        <td>AEFD</td>
+                        <td>Prüfen auf Komma</td>
+                    </tr>
+                    <tr>
+                        <td>AF08</td>
+                        <td>Ausdrucken von SYNTAX ERROR und Herstellen des READY-Zustandes</td>
+                    </tr>
+                    <tr>
+                        <td>B113</td>
+                        <td>Prüfung, ob Zeichen im Akku ein Buchstabe ist</td>
+                    </tr>
+                    <tr>
+                        <td>B248</td>
+                        <td>Ausdrucken von ILLEGAL QUANTITY ERROR und Herstellen des READY-Zustandes</td>
+                    </tr>
+                    <tr>
+                        <td>B391</td>
+                        <td>Umwandlung einer 16-Bit-Integer-Zahl in eine Gleitkommazahl</td>
+                    </tr>
+                    <tr>
+                        <td>B3A2</td>
+                        <td>Umwandlung einer 8-Bit-Integer-Zahl in eine Gleitkommazahl</td>
+                    </tr>
+                    <tr>
+                        <td>B44F</td>
+                        <td>Alten Wert der FN-Variablen wiederherstellen = Abschluß der FN-Auswertung</td>
+                    </tr>
+                    <tr>
+                        <td>B6A3</td>
+                        <td>Stringverwaltungsroutine</td>
+                    </tr>
+                    <tr>
+                        <td>B79B</td>
+                        <td>Liest eine Zahl zwischen 0 und 255 aus dem Basic-Text ins X-Register ein</td>
+                    </tr>
+                    <tr>
+                        <td>B79E</td>
+                        <td>Wertet einen numerischen Ausdruck (0 bis 255) aus</td>
+                    </tr>
+                    <tr>
+                        <td>B7EB</td>
+                        <td>Lesen einer Adresse und eines Bytes aus dem Basic-Text</td>
+                    </tr>
+                    <tr>
+                        <td>B7F7</td>
+                        <td>Lesen einer Adresse (0 bis 65535) aus dem Basic-Text</td>
+                    </tr>
+                    <tr>
+                        <td>B850</td>
+                        <td>Gleitkommasubtraktion, Variante 1</td>
+                    </tr>
+                    <tr>
+                        <td>B853</td>
+                        <td>Gleitkommasubtraktion, Variante 2</td>
+                    </tr>
+                    <tr>
+                        <td>B867</td>
+                        <td>Gleitkommaaddition</td>
+                    </tr>
+                    <tr>
+                        <td>BA28</td>
+                        <td>Gleitkommamultiplikation</td>
+                    </tr>
+                    <tr>
+                        <td>BB05</td>
+                        <td>Gleitkommadivision, Variante 1</td>
+                    </tr>
+                    <tr>
+                        <td>BB0F</td>
+                        <td>Gleitkommadivision, Variante 2</td>
+                    </tr>
+                    <tr>
+                        <td>BBA2</td>
+                        <td>Konstante in den FAC laden als Gleitkommazahl</td>
+                    </tr>
+                    <tr>
+                        <td>BBD4</td>
+                        <td>FAC abspeichern</td>
+                    </tr>
+                    <tr>
+                        <td>BC0C</td>
+                        <td>FAC nach ARG übertragen</td>
+                    </tr>
+                    <tr>
+                        <td>BC2B</td>
+                        <td>Vorzeichen der Gleitkommazahl im FAC prüfen</td>
+                    </tr>
+                    <tr>
+                        <td>BC44</td>
+                        <td>Umwandlung Integerzahl in Gleitkommazahl im FAC</td>
+                    </tr>
+                    <tr>
+                        <td>BC5B</td>
+                        <td>Zahlenvergleich FAC mit Konstante</td>
+                    </tr>
+                    <tr>
+                        <td>BC9B</td>
+                        <td>Umwandlung einer Gleitkommazahl in eine 4-Byte-Integerzahl</td>
+                    </tr>
+                    <tr>
+                        <td>BDCD</td>
+                        <td>Ausdruck der laufenden Zeilennummer</td>
+                    </tr>
+                    <tr>
+                        <td>BDDD</td>
+                        <td>Umwandlung des FAC-Inhaltes in einen Zahlenstring</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <figcaption>Tabelle 3. Von Hires-3 verwendete Interpreter-Routine</figcaption>
+        </figure>
 
         <p>Aus zwei Gründen ist diese Tabelle interessant: Zum einen gibt sie Assembler-Programmierern eine kleine Orientierungshilfe für eigene Programme. Das kann in diesem Zusammenhang aber nur in relativ kurzer Form geschehen. Ausführlich wird zu einem späteren Zeitpunkt in der Serie »Assembler ist keine Alchimie« uns dieser ganze Komplex noch beschäftigen. Sie sind herzlich eingeladen, daran teilzunehmen.</p>
 
@@ -149,13 +616,345 @@
 
         <p>Routinen aus dem oberen ROM-Bereich $E000 bis $FFFF, die Hires-3 anwendet, zeigt die Tabelle 4.</p>
 
-        <h2>ROM-Anderungen bei Commodore</h2>
+        <figure>
+            <table>
+                <tbody>
+                    <tr>
+                        <th>Einsprungadresse (hex.)</th>
+                        <th>ROM-Routine</th>
+                    </tr>
+                    <tr>
+                        <td>E1D4</td>
+                        <td>Parameter für LOAD, SAVE, VERIFY aus Basic-Text lesen</td>
+                    </tr>
+                    <tr>
+                        <td>E264</td>
+                        <td>Basic-Funktion COS</td>
+                    </tr>
+                    <tr>
+                        <td>E26B</td>
+                        <td>Basic-Funktion SIN</td>
+                    </tr>
+                    <tr>
+                        <td>E716</td>
+                        <td>Ausgabe eines Zeichens auf den Bildschirm</td>
+                    </tr>
+                    <tr>
+                        <td>EA31</td>
+                        <td>IRQ-Routine</td>
+                    </tr>
+                    <tr>
+                        <td>EB42</td>
+                        <td>Abschluß der Tastaturabfrage</td>
+                    </tr>
+                    <tr>
+                        <td>EB48</td>
+                        <td>Umschaltung auf Decodierungstabelle per Shift, Commodore, CTRL</td>
+                    </tr>
+                    <tr>
+                        <td>F6ED</td>
+                        <td>Abfrage der RUN/STOP-Taste</td>
+                    </tr>
+                    <tr>
+                        <th colspan="2">Kernal-Routinen</th>
+                    </tr>
+                    <tr>
+                        <td>FFBA</td>
+                        <td>SETLFS: Festsetzung der Parameter für OPEN</td>
+                    </tr>
+                    <tr>
+                        <td>FFBD</td>
+                        <td>SETNAM: Festsetzung des File-Namens</td>
+                    </tr>
+                    <tr>
+                        <td>FFC0</td>
+                        <td>OPEN: Spezifiziertes File setzen</td>
+                    </tr>
+                    <tr>
+                        <td>FFC3</td>
+                        <td>CLOSE: File schließen</td>
+                    </tr>
+                    <tr>
+                        <td>FFC9</td>
+                        <td>CHKOUT: Vorbereitung der File-Ausgabe</td>
+                    </tr>
+                    <tr>
+                        <td>FFCC</td>
+                        <td>CLRCHN: Schließen der aktiven Ein-/Ausga- bekanäle</td>
+                    </tr>
+                    <tr>
+                        <td>FFD2</td>
+                        <td>CHROUT: Ausgabe des Akku-Inhaltes auf aktiven Ausgabekanal</td>
+                    </tr>
+                    <tr>
+                        <td>FFD5</td>
+                        <td>LOAD: Load und Verify von Programmen</td>
+                    </tr>
+                    <tr>
+                        <td>FFD8</td>
+                        <td>SAVE: Abspeichern von Programmen</td>
+                    </tr>
+                </tbody>
+            </table>
+            <figcaption>Tabelle 4. Von Hires-3 verwendete Routinen aus dem oberen ROM-Bereich</figcaption>
+        </figure>
+
+        <h2>ROM-Änderungen bei Commodore</h2>
 
         <p>Der untere Teil dieser Tabelle enthält die sogenannten Kernal-Sprungadressen. Für diesen Bereich garantiert Commodore, keine Änderungen durchzuführen. Leider — wie man aus dem vorangegangenen schnell ersehen kann — ist die Aufgabenvielfalt dieser Kernal-Adressen recht begrenzt. Man kommt ohne die anderen Routinen kaum aus.</p>
 
         <p>Es wäre ja mal etwas völlig Neues, wenn Commodore etwas Vergleichbares wie die Kernal-Adressen auch für Gleitkomma- und auch andere Operationen einrichten würde. Dem steht aber die allgemein bekannte Publikationsfreundlichkeit des Hauses Commodore entgegen.</p>
 
         <p>Im Gegensatz dazu sollen Sie Hires-3 geradezu durchleuchten können. Daher ist als Tabelle 5 noch eine Liste aller Teile von Hires-3 angegeben.</p>
+
+        <figure>
+            <table>
+                <tbody>
+                    <tr>
+                        <th>Startadresse</th>
+                        <th colspan="2">Unterprogramm</th>
+                    </tr>
+                    <tr>
+                        <td>9000</td>
+                        <td colspan="2">Belegung der Funktionstasten</td>
+                    </tr>
+                    <tr>
+                        <td>909A</td>
+                        <td colspan="2">Autonumber</td>
+                    </tr>
+                    <tr>
+                        <td>916B</td>
+                        <td colspan="2">Old</td>
+                    </tr>
+                    <tr>
+                        <td>91BA</td>
+                        <td colspan="2">Merge</td>
+                    </tr>
+                    <tr>
+                        <td>927A</td>
+                        <td colspan="2">Basic-Befehlserweiterungen</td>
+                    </tr>
+                    <tr>
+                        <td>93E7</td>
+                        <td>DEEK</td>
+                        <td>PEEK für RAM unter ROM</td>
+                    </tr>
+                    <tr>
+                        <td>9410</td>
+                        <td colspan="2">16-Bit-Multiplikation</td>
+                    </tr>
+                    <tr>
+                        <td>9434</td>
+                        <td colspan="2">16-Bit-Division</td>
+                    </tr>
+                    <tr>
+                        <td>9522</td>
+                        <td>FAR</td>
+                        <td>Farbgebung für Hochauflösungsbild</td>
+                    </tr>
+                    <tr>
+                        <td>9546</td>
+                        <td>LOE</td>
+                        <td>Bit-Map löschen</td>
+                    </tr>
+                    <tr>
+                        <td>955D</td>
+                        <td>HAN</td>
+                        <td>Hochauflösung an</td>
+                    </tr>
+                    <tr>
+                        <td>9572</td>
+                        <td>HOF</td>
+                        <td>Hochauflösung aus</td>
+                    </tr>
+                    <tr>
+                        <td>9587</td>
+                        <td>HFL</td>
+                        <td>Kombination aus HAN, FAR und LOE</td>
+                    </tr>
+                    <tr>
+                        <td>9590</td>
+                        <td>PKT</td>
+                        <td>Punkt setzen</td>
+                    </tr>
+                    <tr>
+                        <td>961C</td>
+                        <td>LIN</td>
+                        <td>Linie zeichnen</td>
+                    </tr>
+                    <tr>
+                        <td>97D2</td>
+                        <td>REC</td>
+                        <td>Rechteck zeichnen</td>
+                    </tr>
+                    <tr>
+                        <td>9888</td>
+                        <td>BLO</td>
+                        <td>Rechteck ausfüllen</td>
+                    </tr>
+                    <tr>
+                        <td>98FA</td>
+                        <td>CIR</td>
+                        <td>Ellipse (Kreis) zeichnen</td>
+                    </tr>
+                    <tr>
+                        <td>99E8</td>
+                        <td>RAD</td>
+                        <td>Radiusvektor zeichnen</td>
+                    </tr>
+                    <tr>
+                        <td>9A74</td>
+                        <td>PAU</td>
+                        <td>Pause machen</td>
+                    </tr>
+                    <tr>
+                        <td>9AC4</td>
+                        <td>HIS</td>
+                        <td>Hochauflösungsbild extern abspeichern</td>
+                    </tr>
+                    <tr>
+                        <td>9AE8</td>
+                        <td>HIL</td>
+                        <td>Hochauflösungsbild einladen</td>
+                    </tr>
+                    <tr>
+                        <td>9AF7</td>
+                        <td>LPK</td>
+                        <td>Punkt löschen</td>
+                    </tr>
+                    <tr>
+                        <td>9AFF</td>
+                        <td>LLN</td>
+                        <td>Linie löschen</td>
+                    </tr>
+                    <tr>
+                        <td>9B07</td>
+                        <td>LRE</td>
+                        <td>Rechteck löschen</td>
+                    </tr>
+                    <tr>
+                        <td>9B0F</td>
+                        <td></td>
+                        <td>Ausgefülltes Rechteck löschen</td>
+                    </tr>
+                    <tr>
+                        <td>9B17</td>
+                        <td>LKR</td>
+                        <td>Ellipse (Kreis) löschen</td>
+                    </tr>
+                    <tr>
+                        <td>9BlF</td>
+                        <td>LRA</td>
+                        <td>Radiusvektor löschen</td>
+                    </tr>
+                    <tr>
+                        <td>9B27</td>
+                        <td>TRS</td>
+                        <td>Transformation</td>
+                    </tr>
+                    <tr>
+                        <td>9BA6</td>
+                        <td><b>TPK</b></td>
+                        <td>Punkt in transformiertes System zeichnen</td>
+                    </tr>
+                    <tr>
+                        <td>9C0B</td>
+                        <td>TLN</td>
+                        <td>Linie in transformiertes System zeichnen</td>
+                    </tr>
+                    <tr>
+                        <td>9CEB</td>
+                        <td>TRE</td>
+                        <td>Rechteck in transformiertes System zeichnen</td>
+                    </tr>
+                    <tr>
+                        <td>8000</td>
+                        <td>TBK</td>
+                        <td>Ausgefülltes Rechteck in transformiertes System zeichnen</td>
+                    </tr>
+                    <tr>
+                        <td>80E0</td>
+                        <td>TKR</td>
+                        <td>Ellipse (Kreis) in transformiertes System zeichnen</td>
+                    </tr>
+                    <tr>
+                        <td>814C</td>
+                        <td>TRA</td>
+                        <td>Radiusvektor in transformiertes System zeichnen</td>
+                    </tr>
+                    <tr>
+                        <td>81B8</td>
+                        <td>LTP</td>
+                        <td>Punkt im transformierten System löschen</td>
+                    </tr>
+                    <tr>
+                        <td>81C0</td>
+                        <td>LTL</td>
+                        <td>Linie im transformierten System löschen</td>
+                    </tr>
+                    <tr>
+                        <td>81C8</td>
+                        <td>LTR</td>
+                        <td>Rechteck im transformierten System löschen</td>
+                    </tr>
+                    <tr>
+                        <td>81D0</td>
+                        <td>LTB</td>
+                        <td>Ausgefülltes Rechteck im transformierten System löschen</td>
+                    </tr>
+                    <tr>
+                        <td>81D8</td>
+                        <td>LTK</td>
+                        <td>Ellipse (Kreis) im transformierten System löschen</td>
+                    </tr>
+                    <tr>
+                        <td>81E0</td>
+                        <td>LTV</td>
+                        <td>Radiusvektor im transformierten System löschen</td>
+                    </tr>
+                    <tr>
+                        <td>81E8</td>
+                        <td colspan="2">Renumber</td>
+                    </tr>
+                    <tr>
+                        <td>83DA</td>
+                        <td>DUMP</td>
+                        <td>Anzeige aller einfachen Variablen</td>
+                    </tr>
+                    <tr>
+                        <td>849D</td>
+                        <td>UHR</td>
+                        <td>Anzeige einer Uhrzeit</td>
+                    </tr>
+                    <tr>
+                        <td>85B8</td>
+                        <td>FUNKT</td>
+                        <td>Zeichnen einer vorher definierten Funktion im transformierten System</td>
+                    </tr>
+                    <tr>
+                        <td>874F</td>
+                        <td>LFUNK</td>
+                        <td>Löschen einer vorher definierten<br>Funktion im transformierten System</td>
+                    </tr>
+                    <tr>
+                        <td>8757</td>
+                        <td colspan="2">Rahmen mit Kopfzeile</td>
+                    </tr>
+                    <tr>
+                        <td>87FE-8830</td>
+                        <td colspan="2">Texttabelle für Kopfzeile</td>
+                    </tr>
+                    <tr>
+                        <td>8831</td>
+                        <td colspan="2">Hardcopy des Hochauflösungsbildes auf Drucker Commodore 1526</td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                    </tr>
+                </tbody>
+            </table>
+            <figcaption>Tabelle 5. Die einzelnen Routinen von Hires-3</figcaption>
+        </figure>
 
         <p>Sollten Sie bei der Gelegenheit noch Bugs (Programmfehler) finden, dann würde ich mich über Information darüber freuen. Außerdem sollen Sie durch einige schwächere Programmteile animiert werden, sich bessere Lösungen auszudenken. Da gibt es viele Möglichkeiten. Veröffentlichungen — denke ich — können hervorragend dazu dienen, daß jeder etwas neues lernen kann, Anregungen für seine eigenen Programme erhält, etc.</p>
 
