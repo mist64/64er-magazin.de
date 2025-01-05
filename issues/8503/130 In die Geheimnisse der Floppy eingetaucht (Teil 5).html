@@ -34,17 +34,152 @@
 
         <p>Da wir in unserem Kurs verständlicherweise kein DOS-Listing abdrucken können, habe ich die wichtigsten Adressen, die wir benötigen, in Tabelle 1 zusammengefaßt und mit einer kurzen Erläuterung versehen, damit Sie sich mit der Anwendung der DOS-Routinen vertraut machen können.</p>
 
+        <figure>
+            Wichtige Adressen des DOS:
+            <table>
+                <tbody>
+                    <tr>
+                        <td>$FD9E</td>
+                        <td>— Rücksprung in die Jobschleife</td>
+                    </tr>
+                    <tr>
+                        <td>$F556</td>
+                        <td>— Sync-Signal auf Diskette abwarten</td>
+                    </tr>
+                    <tr>
+                        <td>$FEOO</td>
+                        <td>— PCR auf lesen umschalten</td>
+                    </tr>
+                    <tr>
+                        <td>$FEOE</td>
+                        <td>— Track mit $55 vollschreiben</td>
+                    </tr>
+                    <tr>
+                        <td>$FDA3</td>
+                        <td>— Track mit Sync vollschreiben</td>
+                    </tr>
+                    <tr>
+                        <td>$F510</td>
+                        <td>— Blockheader lesen:<br>+ Diskette muß initialisiert sein<br>+ $32/33 muß die Adresse der Track- und Sektornummer enthalten (L/H); zum Beispiel $00/03, wenn die Nummern in $0300/0301 abgespeichert sind.<br>+ Rückkehr nur bei fehlerfreier Durchführung des Lesens</td>
+                    </tr>
+                    <tr>
+                        <td>$F527</td>
+                        <td>— Blockheader lesen:<br>+ Diskette muß initialisiert sein<br>+ zuvor muß $12 nach $16 und $13 nach $17 gebracht Werden<br>+ Track- und Sektornummer in $18 und $19<br>+ Rückkehr nur bei fehlerfreier Durchführung des Lesens</td>
+                    </tr>
+                    <tr>
+                        <td>$F50A</td>
+                        <td>— Datenblockanfang suchen:<br>+ Parameter siehe $F510</td>
+                    </tr>
+                </tbody>
+            </table>
+            <figcaption>Tabelle 1. Einige Unterprogramme des DOS</figcaption>
+        </figure>
+
         <p>Ein weiteres »Werkzeug« ist die RAM-Belegung der wichtigsten Speicherstellen, die in der letzten Folge 3 (64’er Ausgabe 1/1985) abgedruckt worden ist.</p>
 
         <p>Um den Einstieg zu finden, fangen wir gleich einmal mit der Übergabe der Kommandos an den DC an. Wie bewerkstelligt es das Hauptprogramm, die unterschiedlichsten Befehle wie Lesen, Schreiben, Suchen, Kopf bewegen, Laufwerksmotor an, Formatieren und so weiter an den Disk-Controller zu übergeben?</p>
 
         <p>Um eine Antwort auf diese Frage zu finden, betrachten Sie sich bitte die Tabelle 2. Sie enthält eine Aufstellung aller Jobcodes der Floppy 1541. Mit Jobcodes sind hierbei die Kommandos gemeint, die dafür sorgen, daß ein bestimmter Job zur Ausführung kommt.</p>
 
+        <figure>
+            Jobcodes des DOS:
+            <table>
+                <tbody>
+                    <tr>
+                        <td>$80</td>
+                        <td>— Lesen eines Blocks in einen Puffer</td>
+                    </tr>
+                    <tr>
+                        <td>$90</td>
+                        <td>— Schreiben eines Blocks aus einem Puffer</td>
+                    </tr>
+                    <tr>
+                        <td>$A0</td>
+                        <td>— Verify eines Sektors mit einem Pufferinhalt</td>
+                    </tr>
+                    <tr>
+                        <td>$B0</td>
+                        <td>— Testen eines Sektors auf Vorhandensein</td>
+                    </tr>
+                    <tr>
+                        <td>$C0</td>
+                        <td>— ’Bump’ des Tonkopfes</td>
+                    </tr>
+                    <tr>
+                        <td>$D0</td>
+                        <td>— Maschinenprogramm im Puffer ausführen</td>
+                    </tr>
+                    <tr>
+                        <td>$E0</td>
+                        <td>— Programm im Puffer ausführen, nachdem das Laufwerk hochgefahren ist</td>
+                    </tr>
+                </tbody>
+            </table>
+            <figcaption>Tabelle 2. Zeigt alle Jobcodes mit deren Aufgaben</figcaption>
+        </figure>
+
         <p>Nehmen Sie jetzt einmal die Belegung der Zeropage zur Hand. Wenn Sie sich die Speicherstellen $0000 bis $0005 betrachten, so merken Sie schon am Namen, daß diese Adressen etwas mit unserer Sache zu tun haben. Es handelt sich hierbei um die Jobspeicher, die die Aufgabe haben, für den Dialog zwischen Hauptprogramm und DC zu sorgen.</p>
 
         <p>Habe ich eben etwas von Dialog (nicht etwa Monolog) gesagt? Genau! Die Jobspeicher dienen nicht nur der Übergabe der Kommandos vom Hauptprogramm an den Disk-Controller; sie enthalten nach der Ausführung des Jobs auch die Rückmeldung des DC, an der das Hauptprogramm erkennen kann, ob der Job erfolgreich, das heißt fehlerlos durchgeführt worden ist.</p>
 
         <p>Die Rückmeldungen des Disk-Controllers sind komplett in Tabelle 3 aufgeführt. Wenn Sie sich einmal die Bitmuster der Jobcodes und der Rückmeldungen ansehen und beide Typen miteinander vergleichen, so werden Sie sehr schnell einen Unterschied feststellen, der von entscheidender Bedeutung ist:</p>
+
+        <figure>
+            Rückmeldungen der Jobschleife:
+            <table>
+                <tbody>
+                    <tr>
+                        <td>$01</td>
+                        <td>— Fehlerfreie Durchführung (00, OK)</td>
+                    </tr>
+                    <tr>
+                        <td>$02</td>
+                        <td>— Blockheader wurde nicht gefunden (20, Read Error)</td>
+                    </tr>
+                    <tr>
+                        <td>$03</td>
+                        <td>— Sync-Markierung nicht gefunden (21, Read Error)</td>
+                    </tr>
+                    <tr>
+                        <td>$04</td>
+                        <td>— Datenblock wurde nicht gefunden (22, Read Error)</td>
+                    </tr>
+                    <tr>
+                        <td>$05</td>
+                        <td>— Datenprüfsumme ist falsch (23, Read Error)</td>
+                    </tr>
+                    <tr>
+                        <td>$07</td>
+                        <td>— Fehler nach einem Verify (25, Write Error)</td>
+                    </tr>
+                    <tr>
+                        <td>$08</td>
+                        <td>— Diskette ist Schreibgeschützt (26, Write Peotect on)</td>
+                    </tr>
+                    <tr>
+                        <td>$09</td>
+                        <td>— Prüfsumme im Header falsch (27, Read Error)</td>
+                    </tr>
+                    <tr>
+                        <td>$0A</td>
+                        <td>— Datenblock auf Diskette zu lang (28, Write Error)</td>
+                    </tr>
+                    <tr>
+                        <td>$0B</td>
+                        <td>— Falsche ID im Blockheader (29, Disk ID Mismatch)</td>
+                    </tr>
+                    <tr>
+                        <td>$0F</td>
+                        <td>— Keine Diskette im Laufwerk (74, Drive not ready)</td>
+                    </tr>
+                    <tr>
+                        <td>$10</td>
+                        <td>— Fehler bei Dekodierung (24, Read Error)</td>
+                    </tr>
+                </tbody>
+            </table>
+            <figcaption>Tabelle 3. Zeigt alle Rückmeldungen des DC, wobei in Klammern die zugehörige Fehlermeldung steht.</figcaption>
+        </figure>
 
         <p>Die Befehlscodes sind ausschließlich negative Werte, das heißt Werte, die größer als $80 (128) sind. Das Kennzeichen solcher Zahlen ist das gesetzte Bit 7 im Byte, das deshalb auch als »negative bit« bezeichnet wird und bei jeder Befehlsausführung in Maschinensprache direkt in das Prozessorstatusregister übernommen wird (N-Flag).</p>
 

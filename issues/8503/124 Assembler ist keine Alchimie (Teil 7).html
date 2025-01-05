@@ -118,6 +118,99 @@
 
         <p>Die Speichersteuerfunktionen haben die Bits 0 bis 2 der Speicherstelle 1. Je nach Belegung dieser Bits gestaltet sich die 64-KByte-Landschaft unseres Computers wie in Tabelle 1 gezeigt.</p>
 
+        <figure>
+            <table>
+                <tbody>
+                    <tr>
+                        <th colspan="4">Speicherstelle 1</th>
+                        <th>$A000-$BFFF</th>
+                        <th>$D000-$DFFF</th>
+                        <th>$E000-$FFFF</th>
+                    </tr>
+                    <tr>
+                        <th>Bits</th>
+                        <th>2</th>
+                        <th>1</th>
+                        <th>0</th>
+                        <th colspan="3"></th>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td>1</td>
+                        <td>1</td>
+                        <td>1</td>
+                        <td>Basic</td>
+                        <td>I/O</td>
+                        <td>Kernal</td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td>1</td>
+                        <td>1</td>
+                        <td>0</td>
+                        <td>RAM</td>
+                        <td>I/O</td>
+                        <td>Kernal</td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td>1</td>
+                        <td>0</td>
+                        <td>1</td>
+                        <td>RAM</td>
+                        <td>I/O</td>
+                        <td>RAM</td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td>1</td>
+                        <td>0</td>
+                        <td>0</td>
+                        <td>RAM</td>
+                        <td>RAM</td>
+                        <td>RAM</td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td>0</td>
+                        <td>1</td>
+                        <td>1</td>
+                        <td>Basic</td>
+                        <td>Zeichen</td>
+                        <td>Kernal</td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td>0</td>
+                        <td>1</td>
+                        <td>0</td>
+                        <td>RAM</td>
+                        <td>Zeichen</td>
+                        <td>Kernal</td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td>0</td>
+                        <td>0</td>
+                        <td>1</td>
+                        <td>RAM</td>
+                        <td>Zeichen</td>
+                        <td>RAM</td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td>0</td>
+                        <td>0</td>
+                        <td>0</td>
+                        <td>RAM</td>
+                        <td>RAM</td>
+                        <td>RAM</td>
+                    </tr>
+                </tbody>
+            </table>
+            <figcaption>Tabelle 1 zeigt, welche Bausteine bei verschiedener Belegung der Bits 0 bis 2 des Prozessorports (Speicherstelle 1) eingeschaltet sind. (Frei nach Dr. Hauck, 64'er Ausgabe 11/84, Seite 136)</figcaption>
+        </figure>
+
         <p>Was können wir als Maschinen-Programmierer mit dieser Kenntnis anfangen? Theoretisch stehen uns für unsere Programme damit 64 KByte offen. Praktisch werden wir nur in den seltensten Fällen auf die Ein- und Ausgabe-Bausteine verzichten können. Lassen wir ein reines Maschinenprogramm laufen, ohne jeglichen Rückgriff auf Interpreter oder Betriebssystem, dann haben wir immerhin noch zirka 60 KByte zur freien Verfügung. Benutzen wir Routinen aus diesen beiden ROM-Bausteinen, dann müssen wir sie allerdings — zumindest für den Zeitpunkt des Routineaufrufs — wieder einschalten. Wenn wir — was wohl meistens der Fall sein wird — Kombinationen von Basic- und Assemblersprache verwenden, können wir den gesamten Basic-Speicher bis $A000 frei halten, können auch den bei allen Beispielprogrammen so beliebten Bereich $C000 bis $D000 leer lassen und packen unsere Routinen weitgehend unter die ROMs, die dann jeweils beim Aufruf abgeschaltet werden. So haben wir eine Menge zusätzlichen Speicherplatz ergattert.</p>
 
         <p>Nun können wir auch den letzten Rest des bislang unklaren Programms aus der letzten Folge verstehen. Nachdem wir den Inhalt der Speicherstelle 1 auf den Stapel gerettet haben (Zeilen $02CE und $02D0), schreiben wir $35 in den Prozessorport:</p>
@@ -145,6 +238,171 @@
         <p>und im Y-Register stünde eine 5. Der Zeiger FA/FB weist also auf die Speicherstelle 8001. Da haben wir also wieder das Prinzip des toten Briefkastens. Der Computer guckt in den hohlen Baum FA/FB (LSB in FA, MSB in FB) und findet dort die Treffpunktadresse. Nun sind diese toten Briefkästen aber auch den gegnerischen Alchimisten-Agenten bekannt. Es kommt also noch ein Trick dazu: Zur dort aufgefundenen Adresse wird der Inhalt des Y-Registers addiert. In unserem Fall fanden wir also in FA/FB die Adresse 8001, im Y-Register steht eine 5, somit ist die endgültige Adresse 8001 + 5 = 8006. Unser Beispiel »LDA(FA),Y« bewirkt daher, daß in den Akku der Inhalt der Speicherstelle 8006 geladen wird. Nachindiziert nennen manche die Adressierung deswegen, weil zunächst dem Zeiger nachgegangen wird, der in unserem Beispiel auf 8001 weist, und erst danach durch Addition des Inhalts des Y-Registers die endgültige Speicherstelle (hier also 8006) berechnet wird.</p>
 
         <p>Als Zeiger (also die Adresse in der Klammer) sind nur Zeropagespeicherstellen verwendbar, als Indexregister darf man hier nur das Y-Register gebrauchen. Von den bisher behandelten Befehlen können ADC, CMP, LDA, SBC und STA mit dieser Adressierungsart verwendet werden. Genaueres finden Sie wieder in der Tabelle mit der Befehlsübersicht (Tabelle 2).</p>
+
+        <figure>
+            <table>
+                <tbody>
+                    <tr>
+                        <th rowspan="2">Befehlswort</th>
+                        <th rowspan="2">Adressierung</th>
+                        <th rowspan="2">Bytezahl</th>
+                        <th colspan="2">Code</th>
+                        <th rowspan="2">Taktzyklen</th>
+                        <th rowspan="2">Beeinflussung v. Flaggen</th>
+                    </tr>
+                    <tr>
+                        <th>Hex</th>
+                        <th>Dez</th>
+                    </tr>
+                    <tr>
+                        <td>LDA</td>
+                        <td>indirekt X</td>
+                        <td>2</td>
+                        <td>A1</td>
+                        <td>KH</td>
+                        <td>6</td>
+                        <td>N,Z</td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td>indirekt Y</td>
+                        <td>2</td>
+                        <td>B1</td>
+                        <td>177</td>
+                        <td>5*</td>
+                        <td>N,Z</td>
+                    </tr>
+                    <tr>
+                        <td>STA</td>
+                        <td>indirekt X</td>
+                        <td>2</td>
+                        <td>81</td>
+                        <td>129</td>
+                        <td>6</td>
+                        <td>—</td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td>indirekt Y</td>
+                        <td>2</td>
+                        <td>91</td>
+                        <td>145</td>
+                        <td>6</td>
+                        <td>—</td>
+                    </tr>
+                    <tr>
+                        <td>ADC</td>
+                        <td>indirekt X</td>
+                        <td>2</td>
+                        <td>61</td>
+                        <td>97</td>
+                        <td>6</td>
+                        <td>N,V,Z,C</td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td>indirket Y</td>
+                        <td>2</td>
+                        <td>71</td>
+                        <td>113</td>
+                        <td>5*</td>
+                        <td>N,V,Z,C</td>
+                    </tr>
+                    <tr>
+                        <td>SBC</td>
+                        <td>indirekt X</td>
+                        <td>2</td>
+                        <td>El</td>
+                        <td>225</td>
+                        <td>6</td>
+                        <td>N,V,Z,C</td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td>indirekt Y</td>
+                        <td>2</td>
+                        <td>Fl</td>
+                        <td>241</td>
+                        <td>5*</td>
+                        <td>N,V,Z,C</td>
+                    </tr>
+                    <tr>
+                        <td>CMP</td>
+                        <td>indirekt X</td>
+                        <td>2</td>
+                        <td>C1</td>
+                        <td>193</td>
+                        <td>6</td>
+                        <td>N,Z,C</td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td>indirekt Y</td>
+                        <td>2</td>
+                        <td>Dl</td>
+                        <td>209</td>
+                        <td>5*</td>
+                        <td>N,Z,C</td>
+                    </tr>
+                    <tr>
+                        <td>PHA</td>
+                        <td>implizit</td>
+                        <td>1</td>
+                        <td>48</td>
+                        <td>72</td>
+                        <td>3</td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td>PLA</td>
+                        <td>implizit</td>
+                        <td>1</td>
+                        <td>68</td>
+                        <td>104</td>
+                        <td>4</td>
+                        <td>N,Z</td>
+                    </tr>
+                    <tr>
+                        <td>PHP</td>
+                        <td>implizit</td>
+                        <td>1</td>
+                        <td>08</td>
+                        <td>8</td>
+                        <td>3</td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td>PLP</td>
+                        <td>implizit</td>
+                        <td>1</td>
+                        <td>28</td>
+                        <td>40</td>
+                        <td>4</td>
+                        <td>alle</td>
+                    </tr>
+                    <tr>
+                        <td>TSX</td>
+                        <td>implizit</td>
+                        <td>1</td>
+                        <td>BA</td>
+                        <td>186</td>
+                        <td>2</td>
+                        <td>N,Z</td>
+                    </tr>
+                    <tr>
+                        <td>TXS</td>
+                        <td>implizit</td>
+                        <td>1</td>
+                        <td>9A</td>
+                        <td>154</td>
+                        <td>2</td>
+                        <td>—</td>
+                    </tr>
+                </tbody>
+            </table>
+            *Wenn bei der Befehlsausführung eine Page-Grenze überschritten wird, muß noch ein Taktzyklus dazugerechnet werden.
+            <figcaption>Tabelle 2. Übersicht der in dieser Folge vorgestellten Befehle</figcaption>
+        </figure>
 
         <p>Bevor wir uns dem anderen indirekten Adreß-Modus zuwenden, wollen wir uns überlegen, wozu man die indirekt-indizierte Adressierung verwendet. Wie Sie sich natürlich erinnern können, konnte man mit der normalen indizierten Adressierung, zum Beispiel mit</p>
 
@@ -247,6 +505,69 @@
         <p>Der Routinenaufruf sollte immer mittels ]SR erfolgen. Alle auf diese Weise aus der Kernal-Sprungtabelle abzurufenden Programme enden nämlich mit einem RTS. Damit keine wichtigen Werte aus dem Aufrufprogramm überschrieben werden, man sie also vor dem Aufruf der Kernal-Routine irgendwohin retten kann, gebe ich auch noch an, welche Register durch die Routine verändert werden und wieviel Stapelspeicherplatz bereitgehalten werden muß.</p>
 
         <p>Die Routinen sind so konstruiert, daß beim Auftreten eines Fehlers nach der Rückkehr das Carry-Bit gesetzt ist. Durch Untersuchen des Carry können so Fehler rechtzeitig erkannt und behandelt werden. Im Akku findet man in dem Fall dann eine Fehlernummer. Die Ausgabe der Fehlermeldung erfolgt also nicht — wie im Basic — in Klarschrift. In Tabelle 3 sind die Fehlernummern und ihre Bedeutung aufgelistet.</p>
+
+        <figure>
+            <table>
+                <tbody>
+                    <tr>
+                        <th>Nummer</th>
+                        <th>Text</th>
+                        <th>Bedeutung</th>
+                    </tr>
+                    <tr>
+                        <td>0</td>
+                        <td>BREAK</td>
+                        <td>Während des Programms wurde die RUN/STOP-Taste gedrückt</td>
+                    </tr>
+                    <tr>
+                        <td>1</td>
+                        <td>TOO MANY FILES</td>
+                        <td>Man kann maximal 10 offene Files einrichten</td>
+                    </tr>
+                    <tr>
+                        <td>2</td>
+                        <td>FILE OPEN</td>
+                        <td>Ein bereits geöffnetes File wird nochmals geöffnet</td>
+                    </tr>
+                    <tr>
+                        <td>3</td>
+                        <td>FILE NOT OPEN</td>
+                        <td>Auf ein noch nicht geöffnetes File sollte zugegriffen werden</td>
+                    </tr>
+                    <tr>
+                        <td>4</td>
+                        <td>FILE NOT FOUND</td>
+                        <td>Das geforderte File ist nicht verfügbar</td>
+                    </tr>
+                    <tr>
+                        <td>5</td>
+                        <td>DEVICE NOT PRESENT</td>
+                        <td>Das angesprochene Gerät zeigt keine Reaktion</td>
+                    </tr>
+                    <tr>
+                        <td>6</td>
+                        <td>NOT INPUT FILE</td>
+                        <td>Aus einem Schreibfile kann nicht gelesen werden</td>
+                    </tr>
+                    <tr>
+                        <td>7</td>
+                        <td>NOT OUTPUT FILE</td>
+                        <td>In ein Lesefile kann nicht geschrieben werden</td>
+                    </tr>
+                    <tr>
+                        <td>8</td>
+                        <td>MISSING FILE NAME</td>
+                        <td>Bei Operationen, die einen Filenamen erfordern, fehlt dieser</td>
+                    </tr>
+                    <tr>
+                        <td>9</td>
+                        <td>ILLEGAL DEVICE NUMBER</td>
+                        <td>Das versuchte Kommando ist beim angesprochenen Gerät nicht möglich</td>
+                    </tr>
+                </tbody>
+            </table>
+            <figcaption>Tabelle 3. Fehlernummern und ihre Bedeutung Die Nummern findet man bei gesetztem Carry im Akku</figcaption>
+        </figure>
 
         <p>Welche Fehlernummern eine Routine ausgeben kann, wird ebenfalls von mir bei jeder Routinen-Besprechung angegeben.</p>
 
