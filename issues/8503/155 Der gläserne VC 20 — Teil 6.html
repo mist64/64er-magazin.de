@@ -89,6 +89,164 @@
 
         <p><strong>Fehlermeldung ausgeben ($C437)</strong>: Oftmals ist es nötig, eine Basic-Fehlermeldung auszugeben (zum Beispiel in einer Befehlserweiterung, in der ein Komma abzufragen ist). Wenn dieses nicht vorhanden ist oder sonst ein Fehler vorliegt, dann soll eine Fehlermeldung ausgedruckt werden. Alles, was man bei dieser Routine zu tun hat, ist die Eingabe der Fehlernummer ins X-Register. Alle möglichen Meldungen und die dazugehörigen Nummern sind in Tabelle 1 zu finden. Dann wird die Abarbeitungsroutine mit JMP $C437 angesprungen. Zu beachten ist, daß ein Maschinenprogramm auf diese Weise beendet wird (der Interpreter springt nämlich in die Eingabewarteschleife zurück). Möchte man nur eine Meldung ausgeben (ohne das Programm anzuhalten), so ist die Nachricht mit einer anderen Routine, die noch besprochen wird, zu erzeugen. Zwei oft benötigte Fehlermeldungen (Syntax- und Illegal Quantity Error) sind noch einfacher zu bekommen. Um den Syntax Error zu erzeugen springt man mit JMP $CF08 in eine Unterroutine ein, die bereits die Fehlernummer enthält (auf diese Weise spart der Interpreter Speicherplatz). Auch für den Illegal Quantity Error gibt es solch ein Unterprogramm: JMP $D248. Für beide Abkürzungen gilt im übrigen — dies noch als Ergänzung — das oben zum Programmabbruch gesagte.</p>
 
+        <figure>
+            <table>
+                <tbody>
+                    <tr>
+                        <th>Nummer</th>
+                        <th>Fehlermeldung</th>
+                        <th>Adresse</th>
+                    </tr>
+                    <tr>
+                        <td>01</td>
+                        <td>TOO MANY FILES OPEN</td>
+                        <td>$C19E</td>
+                    </tr>
+                    <tr>
+                        <td>02</td>
+                        <td>FILE OPEN</td>
+                        <td>$ClAD</td>
+                    </tr>
+                    <tr>
+                        <td>03</td>
+                        <td>FILE NOT OPEN</td>
+                        <td>$ClB5</td>
+                    </tr>
+                    <tr>
+                        <td>04</td>
+                        <td>FILE NOT FOUND</td>
+                        <td>$ClC2</td>
+                    </tr>
+                    <tr>
+                        <td>05</td>
+                        <td>DEVICE NOT PRESENT</td>
+                        <td>$ClD0</td>
+                    </tr>
+                    <tr>
+                        <td>06</td>
+                        <td>NOT INPUT FILE</td>
+                        <td>$ClE2</td>
+                    </tr>
+                    <tr>
+                        <td>07</td>
+                        <td>NOT OUTPUT FILE</td>
+                        <td>$ClF0</td>
+                    </tr>
+                    <tr>
+                        <td>08</td>
+                        <td>MISSING FILE NAME</td>
+                        <td>$ClFF</td>
+                    </tr>
+                    <tr>
+                        <td>09</td>
+                        <td>ILLEGAL DEVICE NUMBER</td>
+                        <td>$C210</td>
+                    </tr>
+                    <tr>
+                        <td>0A</td>
+                        <td>NEXT WITHOUT FOR</td>
+                        <td>$C225</td>
+                    </tr>
+                    <tr>
+                        <td>0B</td>
+                        <td>SYNTAX</td>
+                        <td>$C235</td>
+                    </tr>
+                    <tr>
+                        <td>0C</td>
+                        <td>RETURN WITHOUT GOSUB</td>
+                        <td>$C23B</td>
+                    </tr>
+                    <tr>
+                        <td>0D</td>
+                        <td>OUT OF DATA</td>
+                        <td>$C24F</td>
+                    </tr>
+                    <tr>
+                        <td>0E</td>
+                        <td>ILLEGAL QUANTITY</td>
+                        <td>$C25A</td>
+                    </tr>
+                    <tr>
+                        <td>0F</td>
+                        <td>OVERFLOW</td>
+                        <td>$C26A</td>
+                    </tr>
+                    <tr>
+                        <td>10</td>
+                        <td>OUT OF MEMORY</td>
+                        <td>$C272</td>
+                    </tr>
+                    <tr>
+                        <td>11</td>
+                        <td>UNDEF’D STATEMENT</td>
+                        <td>$C27F</td>
+                    </tr>
+                    <tr>
+                        <td>12</td>
+                        <td>BAD SUBSCRIPT</td>
+                        <td>$C290</td>
+                    </tr>
+                    <tr>
+                        <td>13</td>
+                        <td>REDIM’D ARRAY</td>
+                        <td>$C29D</td>
+                    </tr>
+                    <tr>
+                        <td>14</td>
+                        <td>DIVISION BY ZERO</td>
+                        <td>$C2AA</td>
+                    </tr>
+                    <tr>
+                        <td>15</td>
+                        <td>ILLEGAL DIRECT</td>
+                        <td>$C2BA</td>
+                    </tr>
+                    <tr>
+                        <td>16</td>
+                        <td>TYPE MISMATCH</td>
+                        <td>$C2C8</td>
+                    </tr>
+                    <tr>
+                        <td>17</td>
+                        <td>STRING TOO LONG</td>
+                        <td>$C2D5</td>
+                    </tr>
+                    <tr>
+                        <td>18</td>
+                        <td>FILE DATA</td>
+                        <td>$C2E4</td>
+                    </tr>
+                    <tr>
+                        <td>19</td>
+                        <td>FORMULA TOO COMPLEX</td>
+                        <td>$C2ED</td>
+                    </tr>
+                    <tr>
+                        <td>lA</td>
+                        <td>CAN’T CONTINUE</td>
+                        <td>$C300</td>
+                    </tr>
+                    <tr>
+                        <td>lB</td>
+                        <td>UNDEF’D FUNCTION</td>
+                        <td>$C30E</td>
+                    </tr>
+                    <tr>
+                        <td>lC</td>
+                        <td>VERIFY</td>
+                        <td>$C31E</td>
+                    </tr>
+                    <tr>
+                        <td>lD</td>
+                        <td>LOAD</td>
+                        <td>$C324</td>
+                    </tr>
+                </tbody>
+            </table>
+            <figcaption>Tabelle 1. Sämtliche Fehlermeldungen und ihre Adressen</figcaption>
+        </figure>
+
         <p><strong>Programmzeilen neu ordnen ($C533)</strong>: Dies ist eine der praktischsten Routinen, die mir im gesamten Basic-Interpreter untergekommen ist. Das kleine unscheinbare Unterprogramm kann mehr, als zunächst zu vermuten ist. Es ist wahrscheinlich jedem schon einmal passiert, daß plötzlich aus irgendeinem Grund ein verstümmeltes Basic-Programm im Speicher steht. Das kann durch falsches Laden vom Band oder auch durch unvorsichtiges POKEn im Basic-Speicher geschehen. Der Grund für diesen »Zeilensalat« ist eine Veränderung der Verbindungszeiger (Koppeladressen), die am Beginn jeder (Basic-) Programmzeile stehen, und die im Normalfall auf die Adresse der jeweils folgenden Zeile zeigen (siehe auch Folge 1 dieses Kurses). Das Unterprogramm ab $C533 hat nun die nützliche Eigenschaft, fast alle auf diese Weise beschädigten Programme wieder zu restaurieren. Man ruft es einfach von Basic aus mit SYS 53483 auf, und schon ist das Programm zumindest wieder LISTbar (jedenfalls in den meisten Fällen). Damit aber noch nicht genug. Bei dieser Gelegenheit stellt die Routine auch noch die Länge des Programmes fest und übergibt die Endadresse den Speicherstellen $22 und $23. Damit ist es möglich, die durch einen Reset oder durch NEW scheinbar verlorenen Programme völlig wiederherzustellen. Dazu ist lediglich der erste Verbindungszeiger zu rekonstruieren (das macht unsere Unterroutine), und das Programmende muß in den Speicherstellen $2D und $2E vermerkt werden. Die nachfolgende Programmzeile ist das kürzeste Rekonstruktionsprogramm, das mir bekannt ist. Ich habe es bereits in Folge 1 besprochen und möchte es in diesem Zusammenhang noch einmal erwähnen.<br />
             SYS 50483:POKE 46,PEEK(35): POKE 45,PEEK(781) + 2:CLR</p>
 
