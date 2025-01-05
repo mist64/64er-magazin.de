@@ -20,25 +20,248 @@
 
         <p>Sicherlich ist Ihnen, sofern Sie sich mit Maschinensprache befassen, schon aufgefallen, daß der bekannte Befehlssatz des 6502-Mikroprozessors nicht alle 256 Bitkombinationen eines Bytes ausnutzt. Es existieren neben den bekannten, in jedem Assembler-Handbuch dokumentierten 6502-Befehlen noch eine ganze Reihe undefinierter Opcodes. Der Begriff »undefiniert« bedeutet dabei nur soviel wie »nicht dokumentiert«, denn diese Opcodes haben in vielen Fällen durchaus eine sinnvolle Wirkung.</p>
 
-        <p>Da viele Commodore-Systeme mit dem 6502 arbeiten, habe ich mir einmal die Mühe gemacht, die für diese CPU offiziell nicht implementierten Hex-Zahlen, die sich immer wieder vereinzelt zwischen die bekannten 6502-0pcodes einschieben, auf ihre Wirkung hin zu untersuchen. Dabei hat sich manch unscheinbare Hex-Zahl als recht brauchbar entpuppt. Nachfolgende Erkenntnisse habe ich auf meinem C 64 gesammelt, der ja mit einem 6510 bestückt ist, die Ergebnisse sind aber auch auf den 6502 übertragbar.</p>
+        <p>Da viele Commodore-Systeme mit dem 6502 arbeiten, habe ich mir einmal die Mühe gemacht, die für diese CPU offiziell nicht implementierten Hex-Zahlen, die sich immer wieder vereinzelt zwischen die bekannten 6502-Opcodes einschieben, auf ihre Wirkung hin zu untersuchen. Dabei hat sich manch unscheinbare Hex-Zahl als recht brauchbar entpuppt. Nachfolgende Erkenntnisse habe ich auf meinem C 64 gesammelt, der ja mit einem 6510 bestückt ist, die Ergebnisse sind aber auch auf den 6502 übertragbar.</p>
 
         <p>Die untersuchten Bit-Kombinationen lassen sich in vier Befehlskategorien unterteilen:</p>
 
         <p><strong>Gruppe 1</strong>: Diese Befehle führen den Prozessor zu einem Systemabsturz, Sie können dann den Computer nur noch mit einem RESET aus seinem Dornröschenschlaf befreien (oder das Gerät ausschalten). Alle »Absturzbefehle« sind dadurch kenntlich, daß ihr niederwertiges Nibble (1 Nibble = 4 Bit) »2« ist (Beispiel: $02,$12). Aber: Nicht alle Hexzahlen mit niederwertigem Nibble »2« führen zum Absturz (Beispiel: $A2 entspricht in Assemblersprache »LDX«),</p>
 
-        <p><strong>Gruppe 2</strong>: Diese Befehlsgruppe bewirkt rein gar nichts, es gibtsie in 3-, 2- und 1-Byte-Ausführungen, zu den letztgenannten gehört ja auch unser gutes altes »NOP«.</p>
+        <p><strong>Gruppe 2</strong>: Diese Befehlsgruppe bewirkt rein gar nichts, es gibt sie in 3-, 2- und 1-Byte-Ausführungen, zu den letztgenannten gehört ja auch unser gutes altes »NOP«.</p>
 
         <p>Die Befehle der Gruppen 1 und 2 sind in Tabelle 1 zusammengestellt.</p>
+
+        <figure>
+            <table>
+                <tbody>
+                    <tr>
+                        <th>Wirkung</th>
+                        <th>Hex-Zahlen</th>
+                    </tr>
+                    <tr>
+                        <td>Absturz</td>
+                        <td>02,12,22,32,42,52,62,72,92,B2,D2,F2</td>
+                    </tr>
+                    <tr>
+                        <td>keine<br>(1 Byte)</td>
+                        <td>1A,3A,5A,7A,DA,EA(NOP),FA</td>
+                    </tr>
+                    <tr>
+                        <td>keine<br>(2 Byte)</td>
+                        <td>04,14,34,44,54,64,74,80,82,89,C2,D4,E2,F4</td>
+                    </tr>
+                    <tr>
+                        <td>keine<br>(3 Byte)</td>
+                        <td>0C,1C,3C,5C,7C,DC,FC</td>
+                    </tr>
+                </tbody>
+            </table>
+            <figcaption>Tabelle 1. Die Befehle der Gruppen 1 und 2</figcaption>
+        </figure>
 
         <p><strong>Gruppe 3</strong>: Nun wird’s interessant. Der Prozessor führt zwei »offizielle« Befehle unmittelbar hintereinander aus. Diese verwenden die gleiche Adressierungsart. Ein Beispiel: Die Hex-Zahlenkombination E7 DD führt die beiden Assemblerbefehle »INC DD;SBC DD« (Zeropageadressierung) aus, sie bewerkstelligt dieses in 2 Byte, wozu der »offizielle« Befehlssatz 4 Byte benötigte. Es sind alle vom »STA«-Befehl her bekannten Adressierungsarten auf die Befehlsgruppe 3 anwendbar. Daraus resultiert folgendes Phänomen: Die Hexkombination E3 DD führt die Assemblerbefehle »INC (DD,X)« aus, obwohl es die indirekt-indizierte Adressierung für den »INC«-Befehl eigentlich gar nicht gibt.</p>
 
         <p>Tabelle 2 zeigt alle möglichen Kombinationen. Beispiel: Sie möchten wissen, was geschieht, wenn der 6502 auf die Hex-Zahl C7 trifft. Dazu suchen Sie diese Zahl in der Tabelle 2. Sie steht in der letzten Spalte der Zeile 5. Am linken Zeilenrand finden Sie nun die Befehlskombination, die obersten beiden Zeilen der letzten Spalte geben die Adressierungsart sowie die Befehlslänge in Bytes an. C7 MM würde also dieselbe Wirkung haben, wie die Assemblerbefehle »DEC MM:CMP MM« zusammen.</p>
+
+        <figure>
+            <table>
+                <tbody>
+                    <tr>
+                        <td rowspan="2"></td>
+                        <td>(IND,X)</td>
+                        <td>(IND),Y</td>
+                        <td>ABSOLUT</td>
+                        <td>ABSOLUT,X</td>
+                        <td>ABSOLUT,Y</td>
+                        <td>ZEROPAGE,X</td>
+                        <td>ZEROPAGE</td>
+                    </tr>
+                    <tr>
+                        <td>2</td>
+                        <td>2</td>
+                        <td>3</td>
+                        <td>3</td>
+                        <td>3</td>
+                        <td>2</td>
+                        <td>2</td>
+                    </tr>
+                    <tr>
+                        <td>ASL:ORA</td>
+                        <td>03</td>
+                        <td>13</td>
+                        <td>0F</td>
+                        <td>1F</td>
+                        <td>1B</td>
+                        <td>17</td>
+                        <td>07</td>
+                    </tr>
+                    <tr>
+                        <td>ROL:AND</td>
+                        <td>23</td>
+                        <td>33</td>
+                        <td>2F</td>
+                        <td>3F</td>
+                        <td>3B</td>
+                        <td>37</td>
+                        <td>27</td>
+                    </tr>
+                    <tr>
+                        <td>LSR:EOR</td>
+                        <td>43</td>
+                        <td>53</td>
+                        <td>4F</td>
+                        <td>5F</td>
+                        <td>5B</td>
+                        <td>57</td>
+                        <td>47</td>
+                    </tr>
+                    <tr>
+                        <td>ROR:ADC</td>
+                        <td>63</td>
+                        <td>73</td>
+                        <td>6F</td>
+                        <td>7F</td>
+                        <td>7B</td>
+                        <td>77</td>
+                        <td>67</td>
+                    </tr>
+                    <tr>
+                        <td>DEC:CMP</td>
+                        <td>C3</td>
+                        <td>D3</td>
+                        <td>CF</td>
+                        <td>DF</td>
+                        <td>DB</td>
+                        <td>D7</td>
+                        <td>C7</td>
+                    </tr>
+                    <tr>
+                        <td>INC:SBC</td>
+                        <td>E3</td>
+                        <td>F3</td>
+                        <td>EF</td>
+                        <td>FF</td>
+                        <td>FB</td>
+                        <td>F7</td>
+                        <td>E7</td>
+                    </tr>
+                </tbody>
+            </table>
+            <figcaption>Tabelle 2. Die Befehle der Gruppe 3 fassen jeweils zwei Standard-Befehle in einem Opcode zusammen.</figcaption>
+        </figure>
 
         <p>Die Ausführungszeit der Befehle der dritten Befehlsgruppe ist dieselbe, als wenn nur ein offizieller Opcode der gleichen Adressierungsart ausgeführt würde. E7 DD ist in der Ausführung also genauso schnell wie der Assemblerbefehl »INC DD«.</p>
 
         <p>Als besonders brauchbar würde ich die Befehlskombination »DEC &hellip;: CMP&hellip;«(für Schleifenzwecke) und Rotations/Schiebebefehle in den hierfür sonst nicht vorhandenen Adressierungsarten »(..,X)« und »(..),Y« (für hochauflösende Grafik) bezeichnen.</p>
 
         <p><strong>Gruppe 4</strong>: Diese Befehle sind nur sehr schlecht durch bekannte Opcodes zu ersetzen; sie sind in Tabelle 3 beschrieben.</p>
+
+        <figure>
+            <table>
+                <tbody>
+                    <tr>
+                        <th>Befehl</th>
+                        <th>Beschreibung</th>
+                    </tr>
+                    <tr>
+                        <td>0B MM</td>
+                        <td>führt »AND MM« aus und transportiert Negativflag ins Carry</td>
+                    </tr>
+                    <tr>
+                        <td>2B MM</td>
+                        <td>wie OB MM</td>
+                    </tr>
+                    <tr>
+                        <td>4B MM</td>
+                        <td>führt »AND #MM : LSR A« aus</td>
+                    </tr>
+                    <tr>
+                        <td>6B MM</td>
+                        <td>wenn Dezimalflag =0: führt »AND #MM : ROR A« aus, danach kommt Bit 0 des Akkus ins Carry und das Overflowflag ist eine EXCLUSIV-ODER Verbindung des Bits 5 mit Bit 6 des Akkus.<br>Wenn Dezimalflag =1: Wirkung noch nicht ermittelt.</td>
+                    </tr>
+                    <tr>
+                        <td>83 MM</td>
+                        <td>die UND-Verknüpfung zwischen Akku und X-Register wird in (MM,X) gespeichert</td>
+                    </tr>
+                    <tr>
+                        <td>87 MM</td>
+                        <td>die UND-Verknüpfung zwischen Akku und X-Register wird in der Zeropage in MM gespeichert</td>
+                    </tr>
+                    <tr>
+                        <td>8B MM</td>
+                        <td>führt »TXA : AND #MM« aus</td>
+                    </tr>
+                    <tr>
+                        <td>8F MM NN</td>
+                        <td>die UND-Verknüpfung zwischen Akku und X-Register wird in NNMM gespeichert</td>
+                    </tr>
+                    <tr>
+                        <td>93 MM</td>
+                        <td>die UND-Verknüpfung zwischen Akku, X-Register und der Summe aus 1 und dem Inhalt der Speicherzelle MM+1 wird in (MM),y gespeichert</td>
+                    </tr>
+                    <tr>
+                        <td>97 MM</td>
+                        <td>die UND-Verknüpfung zwischen Akku und X-Register wird in MM,X gespeichert</td>
+                    </tr>
+                    <tr>
+                        <td>9B MM NN</td>
+                        <td>die UND-Verknüpfung zwischen Akku und X-Register wird im Stackpointer abgelegt, danach wird die UND-Verknüpfung zwischen Stackpointer und #NN+1 in NNMM,Y gespeichert</td>
+                    </tr>
+                    <tr>
+                        <td>9C MM NN</td>
+                        <td>die UND-Verknüpfung zwischen Y-Register und #NN+1 wird in NNMM,X gespeichert</td>
+                    </tr>
+                    <tr>
+                        <td>9E MM NN</td>
+                        <td>wie 9C MM NN, nur mit vertauschten Bedeutungen für X- und Y-Register</td>
+                    </tr>
+                    <tr>
+                        <td>9F MM NN</td>
+                        <td>die UND-Verknüpfung zwischen Akku, X-Register und #NN+1 wird in NNMM,Y gespeichert</td>
+                    </tr>
+                    <tr>
+                        <td>A3 MM</td>
+                        <td>führt »LDA (MM,X):TAX« aus</td>
+                    </tr>
+                    <tr>
+                        <td>A7 MM</td>
+                        <td>führt »LDA MM:TAX« aus</td>
+                    </tr>
+                    <tr>
+                        <td>AB MM</td>
+                        <td>Wirkung noch nicht ermittelt</td>
+                    </tr>
+                    <tr>
+                        <td>AF MM NN</td>
+                        <td>führt »LDA NNMM:TAX« aus</td>
+                    </tr>
+                    <tr>
+                        <td>B3 MM</td>
+                        <td>führt »LDA (MM),Y:TAX« aus</td>
+                    </tr>
+                    <tr>
+                        <td>B7 MM</td>
+                        <td>führt »LDA MM,Y:TAX« aus</td>
+                    </tr>
+                    <tr>
+                        <td>BB MM NN</td>
+                        <td>die UND-Verknüpfung zwischen Stackpointer und der Speicherzelle NNMM,Y wird im X-Register abgelegt, danach wird »TXS:TXA« ausgeführt</td>
+                    </tr>
+                    <tr>
+                        <td>BF MM NN</td>
+                        <td>führt »LDA NNMM,Y:TAX« aus</td>
+                    </tr>
+                    <tr>
+                        <td>CB MM</td>
+                        <td>die UND-Verknüpfung zwischen X-Register und Akku wird im X-Register abgelegt, danach wird vom X- Register #MM ohne Berücksichtigung des Carry-Flag subtrahiert</td>
+                    </tr>
+                    <tr>
+                        <td>EB MM</td>
+                        <td>entspricht dem Assemblerbefehl »SBC #MM«</td>
+                    </tr>
+                </tbody>
+            </table>
+            <figcaption>Tabelle 3. Diese Gruppe enthält Befehle, die teilweise recht komplexe Operationen durchführen. Bei einigen speziellen Kombinationen konnte die genaue Wirkung noch nicht ermittelt werden. Für Hinweise ist die Redaktion jederzeit dankbar.</figcaption>
+        </figure>
 
         <p>Zum Abschluß noch eine Warnung. Überlegen Sie sich den Gebrauch dieser neuen Befehle gut, denn sie machen jedes noch so gut strukturierte Programm zunichte. Insbesondere ist zu beachten, daß die hier beschriebenen undefinierten Opcodes nicht bei jeder Prozessorversion die gleiche Wirkung haben müssen. Schließlich handelt es sich dabei ja nur um unbeabsichtigte Nebenprodukte bei der Implementierung des 6502-Standard-Befehlssatzes.</p>
 
