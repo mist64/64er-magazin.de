@@ -1,0 +1,44 @@
+;musik 1.prg ==0801==
+;Eingetippt von Endurion
+  100 si=54272   :rem basisadresse
+  110 :
+  120 rem frequenz
+  130 read faus :f=int(faus*17.0284+0.5)
+  140 hi=int(f/256) :lo=f-256*hi
+  150 poke si,lo :poke si+1,hi
+  160 :
+  170 rem pulsweite (tastverhaeltnis)
+  180 read paus :p=int(paus*40.95+0.5)
+  190 hi=int(p/256) :lo=p-256*hi
+  200 poke si+2,lo :poke si+3,hi
+  210 :
+  220 rem wellenform
+  230 read wf:wf=wf and 254 :rem gate aus
+  240 :
+  250 rem a d s r
+  260 read a:read d:poke si+5,16*a+d
+  270 read s:read r:poke si+6,16*s+r
+  280 :
+  290 rem filter aus, lautstaerke max
+  300 poke si+23,0:poke si+24,15
+  310 :
+  320 rem auf tastendruck warten
+  330 rem und adsr sequenz ausloesen
+  340 read t
+  350 get a$:if a$="" then 350
+  360 poke si+4,wf or 1
+  370 for i=1 to t:next
+  380 poke si+4,wf:goto 350
+  500 rem================================
+  510 rem klangparameter
+  520 rem================================
+  530 data 440   :rem frequenz (hz)
+  540 data 50    :rem tastverhaeltnis (%)
+  550 data 64    :rem kurvenform
+  560 data 2     :rem attack
+  570 data 8     :rem decay
+  580 data 0     :rem sustain
+  590 data 8     :rem release
+  600 data 150   :rem zeit zwischen
+  610 rem             attack und release
+

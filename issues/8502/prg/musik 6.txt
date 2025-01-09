@@ -1,0 +1,34 @@
+;musik 6.prg ==0801==
+;Eingetippt von Endurion
+  100 dim f(24)  :rem array f. frequenzen
+  110 sid=54272  :rem basisadresse
+  120 par=36930:ein=36986:aus=37025
+  130 :
+  140 rem tonleiter-frequenzen berechnen
+  150 faus=110:h=2^(1/12)
+  160 for i=0 to 24
+  170 :  f(i)=int(faus*17.0284+0.5)
+  180 :  faus=faus*h
+  190 next i
+  200 :
+  210 rem parameter festlegen
+  220 pw=2048       :rem pulsweite
+  230 k =32         :rem kurvenform
+  240 a=0: d=9: s=0 :r=9
+  250 sys par,1,pw,k,a,d,s,r
+  260 sys par,2,pw,k,a,d,s,r
+  270 sys par,3,pw,k,a,d,s,r
+  280 :
+  290 rem filter aus und lautstaerke max.
+  300 poke si+23,0:poke si+24,15
+  310 :
+  320 rem zufallsmelodie
+  330 i=1
+  340 n=int(rnd(1)*25)
+  350 sys ein,i,f(n)
+  360 for j=0 to 20:next j
+  370 sys aus,i
+  380 for j=0 to 20:next j
+  390 i=i+1:if i=4 then i=1
+  400 goto 340
+
