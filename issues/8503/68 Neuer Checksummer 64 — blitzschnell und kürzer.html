@@ -83,58 +83,59 @@
 
         <p>Viel Spaß beim Eintippen von Programmen mit dem neuen Checksummer!</p>
 
-        <p>TODO ASIDE</p>
+        <address class="author">(F. Lonczewski/gk)</address>
 
-        <p>Herrschaften!</p>
+        <aside>
+            <p>Herrschaften!</p>
 
-        <address class="author">(Nehmen Sie mir den Ton dieses Schreibens bitte nicht übel; ich meine es nicht so ganz ernst!)</address>
+            <address class="author">(Nehmen Sie mir den Ton dieses Schreibens bitte nicht übel; ich meine es nicht so ganz ernst!)</address>
 
-        <p>&hellip;da veröffentlicht Ihr in Eurer Zeitschrift Programme wie HYPRA-LOAD und so weiter, weil die geschätzten Fans, überwiegend wohl Hobbyisten, nicht genug Zeit haben (0 tempora, omores!), aufdielahme, dafüraberbillige 1541 zuwarten, und dann schockt Ihr einen mit einer für den Genuß Eures Magazins lebenswichtigen Utility, nämlich dem Checksummer, während deren Setup man einen ausgedehnten Mittagsschlaf halten kann. Mein C 64-Interpreter (der übrigens Wert darauf legt, auf der 2. Silbe betont zu werden, was einerseits richtig, andererseits wenig bekannt ist) behauptetjedenfalls, er brauche für den Programmlauf 1 Minute 18 Sekunden&hellip;</p>
+            <p>&hellip;da veröffentlicht Ihr in Eurer Zeitschrift Programme wie HYPRA-LOAD und so weiter, weil die geschätzten Fans, überwiegend wohl Hobbyisten, nicht genug Zeit haben (O tempora, omores!), auf die lahme, dafür aber billige 1541 zuwarten, und dann schockt Ihr einen mit einer für den Genuß Eures Magazins lebenswichtigen Utility, nämlich dem Checksummer, während deren Setup man einen ausgedehnten Mittagsschlaf halten kann. Mein C 64-Interpreter (der übrigens Wert darauf legt, auf der 2. Silbe betont zu werden, was einerseits richtig, andererseits wenig bekannt ist) behauptet jedenfalls, er brauche für den Programmlauf 1 Minute 18 Sekunden&hellip;</p>
 
-        <p>Wenn Ihr Euch jetzt auf die Füße getrampelt fühlt und um konstruktive Kritik bittet, bitte:</p>
+            <p>Wenn Ihr Euch jetzt auf die Füße getrampelt fühlt und um konstruktive Kritik bittet, bitte:</p>
 
-        <p>Der erste Blick ins Listing entlarvt den ersten Übeltäter in den Zeilen 130 und 140 (wohlgemerkt: die C 64-Version!):</p>
+            <p>Der erste Blick ins Listing entlarvt den ersten Übeltäter in den Zeilen 130 und 140 (wohlgemerkt: die C 64-Version!):</p>
 
-        <p>16 KByte in einer Basic-Schleife kopieren! Puh! Warum nicht gleich von Hand ein POKEn?! Dieser Anschlag auf die Geduld des geneigten Lesers und Anwenders ist um so verwerflicher, als daß doch der Interpreter ab Adresse dezimal 41912 ($A3B8) eine Block-Verschiebe-Routine anbietet, mit der man nur umzugehen wissen muß.<br>
-            Also:</p>
+            <p>16 KByte in einer Basic-Schleife kopieren! Puh! Warum nicht gleich von Hand ein POKEn?! Dieser Anschlag auf die Geduld des geneigten Lesers und Anwenders ist um so verwerflicher, als daß doch der Interpreter ab Adresse dezimal 41912 ($A3B8) eine Block-Verschiebe-Routine anbietet, mit der man nur umzugehen wissen muß.<br>
+                Also:</p>
 
-        <p>Die ersten 3 Befehle der Routine vergessen wir — die werden nur gebraucht, wenn die Routine in der üblichen Weise verwendet wird. Der richtige Einsprung-Punkt für unsere Zwecke ist also dezimal 41919 ($A3BF).<br>
-            Die Routine verlangt nun folgende Übergabe-Parameter<br>
-            (in der üblichen Reihenfolge low — high):<br>
-            a) Stertadresse des zu verschiebenden (hier bloß in das darunterliegende RAM zu kopierenden) Blocks in dezimal 95/96 ($5F/60),<br>
-            b) Endadresse+1 des zu verschiebenden Blocks in dezimal 90/91 ($5A/5B),<br>
-            c) Endadresse+1 des Bereichs, in den verschoben werden soll, in dezimal 88/89 ($58/59).<br>
-            Getrennt für jeden ROM-Bereich POKEn wir also die Parameter in die angegebenen Adressen, wobei<br>
-            a) in unserem speziellen Falle die Endadresse des Quell- und Zielbereichs (+1) natürlich identisch ist.<br>
-            b) wir im 2. Falle anstelle der richtigen, aber leider unmöglichen, Endadresse+1 einfach naßforsch 0 eingeben, getreu dem — in diesem Falle richtigen — Motto: Für den Computer ist dezimal 65535 ($FFFF) + 1 = 0!</p>
+            <p>Die ersten 3 Befehle der Routine vergessen wir — die werden nur gebraucht, wenn die Routine in der üblichen Weise verwendet wird. Der richtige Einsprung-Punkt für unsere Zwecke ist also dezimal 41919 ($A3BF).<br>
+                Die Routine verlangt nun folgende Übergabe-Parameter<br>
+                (in der üblichen Reihenfolge low — high):<br>
+                a) Stertadresse des zu verschiebenden (hier bloß in das darunterliegende RAM zu kopierenden) Blocks in dezimal 95/96 ($5F/60),<br>
+                b) Endadresse+1 des zu verschiebenden Blocks in dezimal 90/91 ($5A/5B),<br>
+                c) Endadresse+1 des Bereichs, in den verschoben werden soll, in dezimal 88/89 ($58/59).<br>
+                Getrennt für jeden ROM-Bereich POKEn wir also die Parameter in die angegebenen Adressen, wobei<br>
+                a) in unserem speziellen Falle die Endadresse des Quell- und Zielbereichs (+1) natürlich identisch ist.<br>
+                b) wir im 2. Falle anstelle der richtigen, aber leider unmöglichen, Endadresse+1 einfach naßforsch 0 eingeben, getreu dem — in diesem Falle richtigen — Motto: Für den Computer ist dezimal 65535 ($FFFF) + 1 = 0!</p>
 
-        <p>Aber&hellip; (vor den Ruhm haben die Götter die Schweißfüße gesetzt!) das funktioniert natürlich (von Basic aus) nicht! Der Grund ist für den Kundigen klar: Der Aufruf der SYS-Routine mißhandelt in brutalster Weise die gerade mühsam gePOKEte Startadresse. Das entmutigt unsjedoch in keinster Weise. Wir übergeben die Startadresse in dezimal 780/781 ($030C/030D) an Akku und X-Register und springen zunächst eine selbstgestrickte Mini-Maschinenroutine von insgesamt 7 Byte Länge an, die die Startadresse abliefert und dann die eigentliche Routine anspringt: STA $5F, STX $60, JMP $A3BF. Diese 7 Byte, die wir natürlich im Programm vorher mittels einer READ-Schleife einPOKEn, verstecken wir nichtstörend vor dem Kassetten-Puffer ab dezimal 820 ($0334). Wem dieses stille Örtchen nicht paßt: lm beigefügten Listing (Checksummer für den C 64) habe ich diese Startadresse netterweise parametrisiert.</p>
+            <p>Aber&hellip; (vor den Ruhm haben die Götter die Schweißfüße gesetzt!) das funktioniert natürlich (von Basic aus) nicht! Der Grund ist für den Kundigen klar: Der Aufruf der SYS-Routine mißhandelt in brutalster Weise die gerade mühsam gePOKEte Startadresse. Das entmutigt unsjedoch in keinster Weise. Wir übergeben die Startadresse in dezimal 780/781 ($030C/030D) an Akku und X-Register und springen zunächst eine selbstgestrickte Mini-Maschinenroutine von insgesamt 7 Byte Länge an, die die Startadresse abliefert und dann die eigentliche Routine anspringt: STA $5F, STX $60, JMP $A3BF. Diese 7 Byte, die wir natürlich im Programm vorher mittels einer READ-Schleife einPOKEn, verstecken wir nichtstörend vor dem Kassetten-Puffer ab dezimal 820 ($0334). Wem dieses stille Örtchen nicht paßt: lm beigefügten Listing (Checksummer für den C 64) habe ich diese Startadresse netterweise parametrisiert.</p>
 
-        <p>That’s all! Hört sich komplizierter an, als es ist!</p>
+            <p>That’s all! Hört sich komplizierter an, als es ist!</p>
 
-        <p>Fragt sich (mit Fug und Recht): Was bringt’s?</p>
+            <p>Fragt sich (mit Fug und Recht): Was bringt’s?</p>
 
-        <p>Antwort: Das so verunstaltete Programm behelligt den Computer für nur noch 7 Sekunden anstelle von vorher 1 Minute 18 Sekunden.</p>
+            <p>Antwort: Das so verunstaltete Programm behelligt den Computer für nur noch 7 Sekunden anstelle von vorher 1 Minute 18 Sekunden.</p>
 
-        <p>Das ist natürlich noch viel zu lang!!!</p>
+            <p>Das ist natürlich noch viel zu lang!!!</p>
 
-        <p>Ein zweiter Blick ins ursprüngliche Listing entlarvt den zweiten Übeltäter. Die Hex-Zahlen in den DATAs samt den dazugehörigen Programmzeilen. Was Ihr Euch dabei gedacht habt, wißt Ihr und die Götter — ich nicht! Jedenfalls sind hier die Nebenwirkungen schlimmer als der Heileffekt.<br>
-            Also.</p>
+            <p>Ein zweiter Blick ins ursprüngliche Listing entlarvt den zweiten Übeltäter. Die Hex-Zahlen in den DATAs samt den dazugehörigen Programmzeilen. Was Ihr Euch dabei gedacht habt, wißt Ihr und die Götter — ich nicht! Jedenfalls sind hier die Nebenwirkungen schlimmer als der Heileffekt.<br>
+                Also.</p>
 
-        <p>Wir ersetzen die Hex-Zahlen durch stinknormale Dezimalzahlen, schmeißen natürlich die dann überflüssige Umwandlungs-Routine weg und entledigen uns letztlich (spätestens, nachdem wir die korrekte Eingabe der Zahlen gecheckt haben) der Prüfsummen-Befehle.</p>
+            <p>Wir ersetzen die Hex-Zahlen durch stinknormale Dezimalzahlen, schmeißen natürlich die dann überflüssige Umwandlungs-Routine weg und entledigen uns letztlich (spätestens, nachdem wir die korrekte Eingabe der Zahlen gecheckt haben) der Prüfsummen-Befehle.</p>
 
-        <p>Ich verweise den entsetzten Leser auch insoweit auf das abgedruckte Listing.<br>
-            Was bringt’s?</p>
+            <p>Ich verweise den entsetzten Leser auch insoweit auf das abgedruckte Listing.<br>
+                Was bringt’s?</p>
 
-        <p>Das Programm vergeudet nun nur noch zirka 1 Sekunde!</p>
+            <p>Das Programm vergeudet nun nur noch zirka 1 Sekunde!</p>
 
-        <p>Und damit wollen wir es genug sein lassen.</p>
+            <p>Und damit wollen wir es genug sein lassen.</p>
 
-        <address class="author">(Werner Wenzel)</address>
+            <address class="author">(Werner Wenzel)</address>
+        </aside>
 
         <p>TODO Tabelle</p>
 
-        <address class="author">(F. Lonczewski/gk)</address>
     </article>
 </body>
 
