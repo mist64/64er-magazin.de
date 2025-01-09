@@ -18,16 +18,16 @@
         <h1>22 Read Error - Theorie und Praxis</h1>
         <p class="intro">Ein Programm läßt sich wirkungsvoll vor dem Kopieren schützen, indem man einen Sektor zerstört und in diesem Bereich wichtige Daten unterbringt.</p>
 
-        <figure>
-            <img src="41-1.png" alt="">
-            <figcaption>Interner Aufbau eines Disketten-Sektors bei der 1541 (DOS 2A)</figcaption>
-        </figure>
-
-       Î <p>Bei Software, die auf Diskette gespeichert wird, dominiert eine Methode des Programmschutzes mit folgendem Prinzip:</p>
+       <p>Bei Software, die auf Diskette gespeichert wird, dominiert eine Methode des Programmschutzes mit folgendem Prinzip:</p>
 
         <p>Auf der Diskette mit diesem Programm ist ein Block mit Absicht zerstört worden. Wird jetzt dieses Programm geladen und gestartet, so wird vom Programm dieser fehlerhafte Block mit einem Direktzugriffsbefehl auf die Diskette abgefragt. Ist der Fehler vorhanden (was sich meist durch Blinken der Floppy-LED und Rattern des Schrittmotors äußert), so wird dies vom Programm erkannt. Es »merkt« dadurch sozusagen, daß »es« ein Original ist. Diese Methode funktioniert natürlich nur so lange, wie es nicht möglich ist, diesen fehlerhaften Block mitzukopieren. Bei älteren Kopierprogrammen ist dies nicht möglich. In letzter Zeit jedoch gibt es Kopierprogramme, die auf das Kopieren solcher Blöcke vorbereitet sind, indem sie die zerstörten Blöcke (in Form von Lesefehlern) erkennen und auf die Kopie »raufzaubern«. Bei dieser Prozedur wird aber in den meisten Fällen der Inhalt dieser Blöcke zerstört (auch zerstörte Blöcke können einen Inhalt haben).</p>
 
         <p>Und hier zeigt sich ein Ansatzpunkt: Man müßte in diesen zerstörten Blöcken Daten unterbringen, die vom Originalprogramm gelesen werden können, von einer Kopie jedoch nicht. Das heißt, man macht sich den Effekt zunutze, daß diese zerstörten Blöcke durch das DOS nicht korrekt kopiert werden können. Wie aber kann man das DOS trotzdem dazu bringen, einen zerstörten Block kurzzeitig wieder lesbar zu machen?</p>
+
+        <figure>
+            <img src="41-1.png" alt="">
+            <figcaption>Interner Aufbau eines Disketten-Sektors bei der 1541 (DOS 2A)</figcaption>
+        </figure>
 
         <p>Diese Frage läßt sich nur nach intensivem Studium des DOS der C 1541 beantworten. Nur wenn die Zusammenhänge und der Aufbau dieses Operations-Systems klar sind, kann auf eine solche Frage eine befriedigende Antwort gefunden werden. Der Autor fand folgende Lösung: In dem Bild ist der interne Aufbau eines Diskettenblocks dargestellt. Für uns ist die Konstante zum Beginn des Datenblocks ($07) wichtig. Das DOS braucht diese Konstante zur Erkennung des Anfangs eines Datenblocks. Sollte diese Konstante einen anderen Wert erhalten, so kann das DOS diesen Block nicht mehr lesen, das heißt er ist zerstört. Der Vergleichswert für diese Konstante liegt in der Zero-Page der Floppy (das heißt im RAM) und kann also geändert werden.</p>
 

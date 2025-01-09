@@ -18,19 +18,6 @@
         <h1>Assembler ist keine Alchimie (Teil 7)</h1>
         <p class="intro">ln diesem Teil werden wir drei Themen besprechen: den Stapel und die indirekte Adressierung. Ferner zeigen wir an einem ausführlichen Beispiel, wie Text auf dem Bildschirm und auf dem Drucker ausgegeben werden kann.</p>
 
-        <figure>
-            <img src="124-1.png" alt="">
-            <figcaption>Bild 1. So wird der Stapel gefüllt</figcaption>
-        </figure>
-        <figure>
-            <img src="124-2.png" alt="">
-            <figcaption>Bild 2. Der Aktenstapel</figcaption>
-        </figure>
-        <figure>
-            <img src="124-3.png" alt="">
-            <figcaption>Bild 3. Die Ablolge der Routineaufrufe</figcaption>
-        </figure>
-
         <p>Die Assembler-Folge in der letzten Ausgabe hat einige Fragen offengelassen, die dieses Mal beantwortet werden sollen: Die Sache mit dem Stapel wird geklärt, und Sie werden Befehle zu gebrauchen lernen, die uns Stapeloperationen ermöglichen. In unserem ersten Programmprojekt-Teil gab es für Sie unverständliche Sequenzen, die mit der Speicherstelle 1 zu tun hatten. Auch das werden Sie diesmal verstehen.</p>
 
         <p>Sie beherrschen inzwischen fast alle Arten der Adressierung: Nach dieser Folge fehlt keine mehr. Ich habe Ihnen hoffentlich das Wasser im Munde zusammenlaufen lassen mit der Liste aller Kernal-Routinen: Nun sollen uns die ersten davon munden.</p>
@@ -39,7 +26,17 @@
 
         <p>In der vorangegangenen Ausgabe haben wir beim JSR-Befehl schon den Stapel etwas kennengelernt. Aber so ganz genau wissen wir’s ja noch nicht, was das ist. Deswegenjetzt mal im Detail: Der Stapel, auch Prozessorstack genannt, ist der Speicherbereich von dezimal 256 ($100) bis dezimal 511 ($1FF), der direkt von unserer CPU verwaltet wird. Das ist also die gesamte Page 1. Ähnlich wie bei der String-Verwaltung geschieht auch hier das Füllen von oben nach unten. Das erste Byte, welches in den Stack geschoben wird, kommt also nach $1FF, das nächste nach $1FE und so weiter. Voll ist der Stapel, wenn auch $100 besetzt wurde (siehe Bild 1).</p>
 
+        <figure>
+            <img src="124-1.png" alt="">
+            <figcaption>Bild 1. So wird der Stapel gefüllt</figcaption>
+        </figure>
+
         <p>Warum heißt das Ding nun eigentlich Stapel? Das erklärt sich aus dem Zugriffs-Prinzip. Man spricht von einer LIFO-Struktur, von »Last In — First Out«, zu deutsch »zuletzt hinein — zuerst heraus«. Das zuerst hineingebrachte Byte befindet sich am Speicherboden ($1FF), das zuletzt eingebrachte an der Speicherspitze. Stellen Sie sich einen Stapel Akten vor (Bild 2).</p>
+
+        <figure>
+            <img src="124-2.png" alt="">
+            <figcaption>Bild 2. Der Aktenstapel</figcaption>
+        </figure>
 
         <p>Offensichtlich wurde der 4. Aktenordner zuletzt auf den Stapel gesteckt. Er kann zuerst heruntergeholt werden. An die Akte 1 kommen wir erst heran, wenn alle anderen heruntergenommen worden sind. Genauso verhält es sich mit dem Prozessorstack: Um an das unterste Byte des Stapels heranzukommen, müssen erst Byte für Byte die darüberliegenden (nach Bild 1 eigentlich die darunterliegenden) weggeschafft werden.</p>
 
@@ -733,6 +730,11 @@
         <p>Wenn für ein File alle Ein- und Ausgabeoperationen beendet sind, kann es — nach Einschreiben der Filenummer in den Akku — mittels CLOSE ordnungsgemäß geschlossen werden. Der Eintrag in der Filetabelle wird auf diese Weise gelöscht.</p>
 
         <p>So, jetzt sind wir soweit, daß wir die Textausgabe auf dem Drucker programmieren können. Bild 3 faßt die einzelnen Schritte nochmal zusammen.</p>
+
+        <figure>
+            <img src="124-3.png" alt="">
+            <figcaption>Bild 3. Die Ablolge der Routineaufrufe</figcaption>
+        </figure>
 
         <p>Und hier das Programm dazu. Wir verwenden die im anderen Beispiel schon aufgebaute Texttabelle weiter. Zunächst also SETNAM:</p>
 
