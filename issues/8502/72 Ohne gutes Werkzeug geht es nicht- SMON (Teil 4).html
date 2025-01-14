@@ -11,7 +11,7 @@
     <meta name="64er.head1" content="Anwendung">
     <meta name="64er.head2" content="C 64">
     <meta name="64er.toc_title" content="Ohne gutes Werkzeug geht es nicht: SMON (4)">
-    <meta name="64er.toc_category" content="Programme zum Abtippen|Anwendung">
+    <meta name="64er.toc_category" content="Listings zum Abtippen|Anwendung">
     <meta name="64er.index_title" content="Ohne gutes Werkzeug geht es nicht: SMON (Teil 4)">
     <meta name="64er.index_category" content="Listings zum Abtippen|Anwendung|Monitor">
     <meta name="64er.id" content="smon">
@@ -24,54 +24,76 @@
 
         <p class="intro">Der Trace-Modus, also das Abarbeiten von Maschinenprogrammen Schritt für Schritt, ist das wohl wichtigste Hilfsmittel beim Austesten von Maschinenprogrammen. SMON bietet sogar drei verschiedene Trace-Möglichkeiten, die in diesem vierten Teil dargestellt werden. Außerdem erhalten Sie eine Übersicht aller Befehle, und wir zeigen Ihnen, wie Sie SMON in einen anderen Bereich verschieben können.</p>
 
-        <p>Einen Befehl haben wir Ihnen bisher unterschlagen, der zwar bereits vorhanden, aber noch nicht beschrieben war. Es handelt sich um den Vergleich zweier Speicherbereiche. Die Syntax ist sehr einfach:<br>
-            = 4000 6000<br>
-            vergleicht den Speicherinhalt ab $4000 mit dem ab $6000. Das erste nicht übereinstimmende Byte wird angezeigt, und der Vergleich wird abgebrochen.</p>
+        <p>Einen Befehl haben wir Ihnen bisher unterschlagen, der zwar bereits vorhanden, aber noch nicht beschrieben war. Es handelt sich um den Vergleich zweier Speicherbereiche. Die Syntax ist sehr einfach:
+            <code><strong>= 4000 6000</strong></code>
+            vergleicht den Speicherinhalt ab $4000 mit dem ab $6000. Das erste nicht übereinstimmende Byte wird angezeigt, und der Vergleich wird abgebrochen.
+        </p>
 
         <p>Wenn Sie also ein Maschinenprogramm geschrieben und überarbeitet haben und Sie wissen nicht mehr genau, worin eigentlich der Unterschied zwischen der 76. und der 77. Version besteht, gehen Sie so vor: Laden Sie zuerst Version 76 und verschieben Sie diese mit dem »W«-Befehl in einen freien Speicherbereich. Laden Sie dann Version 77 und führen Sie den »=«-Befehl durch. Sofort finden Sie den Unterschied und können mit der Arbeit an Version 78 beginnen&hellip;.</p>
 
         <p>Wir wollen uns bei der Beschreibung der Trace-Befehle auf Anwendungsbeispiele konzentrieren. Zum Aufbau der Routine sei nur so viel gesagt: Gesteuert wird sie mit Hilfe des Prozessor-Interrupts, weil nur damit ein Eingriff ins laufende Maschinenprogramm möglich ist. Während des Trace-Ablaufs wird deswegen der Bildschirm kurzfristig aus- und eingeschaltet, weil alle anderen Interruptanforderungen wie zum Beispiel durch den Video-Chip, verhindert werden müssen. Da die Befehle eines Programms nicht nur angezeigt, sondern auch wirklich ausgeführt werden, ist der »SEI«-Befehl mit großer Vorsicht zu verwenden. Doch dazu später mehr. Wir wollen ein neues, besser geeignetes Beispiel verwenden als bisher. Tippen Sie also das folgende Miniprogramm mit dem Assembler ein (A 4000):</p>
 
-        <p>TODO</p>
+        <figure>
+            <table class="plain">
+                <tr><td>4000</td><td>LDA</td><td>#30</td><td>lade den Akku mit (ASCII-) 0</td></tr>
+                <tr><td>4002</td><td>JSR</td><td>FFD2</td><td>gib Akku auf dem Bildschirm aus</td></tr>
+                <tr><td>4005</td><td>CLC</td><td></td><td></td></tr>
+                <tr><td>4006</td><td>ADC</td><td>#01</td><td>erhöhe Akku um 1</td></tr>
+                <tr><td>4008</td><td>CMP</td><td>#39</td><td>vergleiche Akku mit (ASCII-) 9</td></tr>
+                <tr><td>400A</td><td>BCC</td><td>4002</td><td>springe, wenn Akku kleiner, zurück</td></tr>
+                <tr><td>400C</td><td>BRK</td><td></td><td>springe in SMON zurück</td></tr>
+            </table>
+        </figure>
 
         <p>Starten Sie das Programm mit »G 4000«. Es muß die Zahlen von 0 bis 8 auf den Bildschirm schreiben.</p>
 
         <h3>Trace-Stop</h3>
 
-        <p>TS (Startadresse Stoppadresse)<br>
-            Starten Sie nun unser Programm mit<br>
-            TS 4000 4009</p>
+        <p class="noindent">TS (Startadresse Stoppadresse)</p>
+
+        <p class="noindent">Starten Sie nun unser Programm mit
+            <code>TS 4000 4009</code>
+        </p>
 
         <p>Die ersten Befehle werden ausgeführt (die Null ausgegeben, der Akku erhöht etc.), dann stoppt das Programm bei Adresse $4009 und springt in die Registeranzeige.</p>
 
-        <p>Genau genommen ist »TS« gar kein Trace-Befehl, das Programm läuft nämlich bis zur gewählten Stoppadresse in Echtzeit durch. Dort angekommen, können Sie die Register prüfen und gegebenfalls durch Überschreiben ändern. Mit »G«, »TW« oder >TB« (wird später erklärt) ohne weitere Adresseneingaben können Sie dann im Programmlauf fortfahren. SMON merkt sich nämlich, wo er stehen geblieben ist und arbeitet ab dieser Adresse weiter, wenn Sie nicht eine neue angeben.</p>
+        <p>Genau genommen ist »TS« gar kein Trace-Befehl, das Programm läuft nämlich bis zur gewählten Stoppadresse in Echtzeit durch. Dort angekommen, können Sie die Register prüfen und gegebenfalls durch Überschreiben ändern. Mit »G«, »TW« oder »TB« (wird später erklärt) ohne weitere Adresseneingaben können Sie dann im Programmlauf fortfahren. SMON merkt sich nämlich, wo er stehen geblieben ist und arbeitet ab dieser Adresse weiter, wenn Sie nicht eine neue angeben.</p>
 
-        <p>Sinnvoll ist dieser Befehl immer dann, wenn in einem längeren Programm nur bestimmte Teile »getraced« werden sollen, der Anfang aber durchlaufen werden muß, um Variable zu setzen oder Benutzereingaben zu erfragen. Auch wenn man nicht ganz sicher ist, ob eine bestimmte Passage überhaupt jemals durchlaufen wird, kann man das mit >TS« überprüfen.</p>
+        <p>Sinnvoll ist dieser Befehl immer dann, wenn in einem längeren Programm nur bestimmte Teile »getraced« werden sollen, der Anfang aber durchlaufen werden muß, um Variable zu setzen oder Benutzereingaben zu erfragen. Auch wenn man nicht ganz sicher ist, ob eine bestimmte Passage überhaupt jemals durchlaufen wird, kann man das mit »TS« überprüfen.</p>
 
-        <p>Zwei Einschränkungen gibt es allerdings wegen der Arbeitsweise dieses Befehls: SMON setzt im Programm an die Stoppadresse einen BRK-Befehl und merkt sich, welcher Befehl dort stand, um ihn wieder zurückzuschreiben. Deshalb funktioniert >TS« nur im RAM, nicht aber zum Beispiel im Basic oder im Betriebssystem. Auch darf die Speicherstelle, in der sich SMON den ausgetauschten Befehl merkt ($02BC) vom Programm nicht verändert werden, sonst ist eine korrekte Reparatur nicht mehr möglich.</p>
+        <p>Zwei Einschränkungen gibt es allerdings wegen der Arbeitsweise dieses Befehls: SMON setzt im Programm an die Stoppadresse einen BRK-Befehl und merkt sich, welcher Befehl dort stand, um ihn wieder zurückzuschreiben. Deshalb funktioniert »TS« nur im RAM, nicht aber zum Beispiel im Basic oder im Betriebssystem. Auch darf die Speicherstelle, in der sich SMON den ausgetauschten Befehl merkt ($02BC) vom Programm nicht verändert werden, sonst ist eine korrekte Reparatur nicht mehr möglich.</p>
 
         <p>Der wohl am häufigsten und vielseitigsten eingesetzte Trace-Befehl ist sicherlich »TW«.</p>
 
         <h3>Trace Walk</h3>
 
-        <p>TW (Startadresse)<br>
-            Starten Sie unser Beispiel jetzt mit TW 4000</p>
+        <p class="noindent">TW (Startadresse)</p>
+        <p class="noindent">Starten Sie unser Beispiel jetzt mit TW 4000</p>
 
         <p>Der erste Befehl (LDA # 30 in Adresse $4000) wird ausgeführt, SMON stoppt und zeigt dann die Inhalte aller Register in der gleichen Reihenfolge wie beim »R«-Kommando sowie den nächsten Befehl an. Im Akku steht jetzt 30, der Programmzähler zeigt auf $4002. Jetzt drücken Sie eine Taste. Der nächste Befehl (JSR FFD2) wird ausgeführt, der Programmzähler zeigt auf $FFD2. Achten Sie auf den Stackpointer: Sein Inhalt hat sich um 2 vermindert, weil der Prozessor auf dem Stack die Adresse abgelegt hat, an die er nach Beendigung der Subroutine zurückspringen soll. Der nächste angezeigte Befehl ist ein indirekter Sprung über $0326. Mit dem nächsten Tastendruck wird er durchgeführt.</p>
 
-        <p>Und so geht es munter weiter. Verzweifeln Sie nicht, wenn Sie auch nach den nächsten zehn Tastendrücken immer noch irgendwo im Betriebssystem »herumtracen« und von unserem Beispielprogramm weit und breit nichts mehr zu sehen ist. Ausnahmsweise ist unser Liebling einmal nicht im »Land der Träume« verschwunden, sondern tut, was er soll: Er arbeitet brav einen Befehl nach dem anderen alles ab, was zur Routine $FFD2 gehört, und das ist reichlich viel. Also bewegen Sie Ihre Finger, Sie haben’sja nicht anders gewollt. Irgendwann einmal, nach mehreren hundert gedrückten Tasten, befinden Sie sich plötzlich wieder in der Registeranzeige von SMON. Das Programm ist beendet. Nun werden Sie enttäuscht fragen, was man wohl mit einem Trace-Modus anfangen soll, der schon bei kleinsten Beispielprogrammen ein völlig undurchschaubares Chaos erzeugt? Nur Geduld, die Rettung naht in Gestalt der Taste »J«.</p>
+        <p>Und so geht es munter weiter. Verzweifeln Sie nicht, wenn Sie auch nach den nächsten zehn Tastendrücken immer noch irgendwo im Betriebssystem »herumtracen« und von unserem Beispielprogramm weit und breit nichts mehr zu sehen ist. Ausnahmsweise ist unser Liebling einmal nicht im »Land der Träume« verschwunden, sondern tut, was er soll: Er arbeitet brav einen Befehl nach dem anderen alles ab, was zur Routine $FFD2 gehört, und das ist reichlich viel. Also bewegen Sie Ihre Finger, Sie haben’s ja nicht anders gewollt. Irgendwann einmal, nach mehreren hundert gedrückten Tasten, befinden Sie sich plötzlich wieder in der Registeranzeige von SMON. Das Programm ist beendet. Nun werden Sie enttäuscht fragen, was man wohl mit einem Trace-Modus anfangen soll, der schon bei kleinsten Beispielprogrammen ein völlig undurchschaubares Chaos erzeugt? Nur Geduld, die Rettung naht in Gestalt der Taste »J«.</p>
 
-        <p>Falls ihre Hand noch nicht in Gips liegt, starten Sie das Ganze nochmal von vorn mit >TW 4000«. Diesmal drücken Sie aber jedesmal, wenn als nächster Befehl »JSR FFD2« angezeigt wird, auf »J«. Der Effekt ist, daß die gesamte Subroutine auf einen Schlag abgearbeitet wird und Sie sofort wieder auf dem nächsten Befehl unseres Beispiels landen. Daß wir nicht gemogelt und die Befehle von »JSR FFD2« einfach unterschlagen haben, sehen Sie daran, daß der Akku tatsächlich auf dem Bildschirm ausgegeben worden ist (rechts neben FFD2). Jetzt können Sie unser Beispiel in aller Ruhe bis zu Ende durchgehen und verfolgen, wie der Akku erhöht wird, wie der Vergleich das Statusregister beeinflußt und wie dementsprechend der Rücksprung in die Schleife erfolgt.</p>
+        <p>Falls ihre Hand noch nicht in Gips liegt, starten Sie das Ganze nochmal von vorn mit »TW 4000«. Diesmal drücken Sie aber jedesmal, wenn als nächster Befehl »JSR FFD2« angezeigt wird, auf »J«. Der Effekt ist, daß die gesamte Subroutine auf einen Schlag abgearbeitet wird und Sie sofort wieder auf dem nächsten Befehl unseres Beispiels landen. Daß wir nicht gemogelt und die Befehle von »JSR FFD2« einfach unterschlagen haben, sehen Sie daran, daß der Akku tatsächlich auf dem Bildschirm ausgegeben worden ist (rechts neben FFD2). Jetzt können Sie unser Beispiel in aller Ruhe bis zu Ende durchgehen und verfolgen, wie der Akku erhöht wird, wie der Vergleich das Statusregister beeinflußt und wie dementsprechend der Rücksprung in die Schleife erfolgt.</p>
 
         <p>Sie dürfen die »J«-Taste auch dann benutzen, wenn Sie schon mitten in der Subroutine sind. Aber hierbei ist äußerste Vorsicht geboten: Die Rücksprungadresse muß unbedingt oben auf dem Stack liegen, wenn Sie »J« drücken. Hat nämlich der Prozessor Werte auf dem Stack abgelegt (mit PHA oder PHP), dann erfolgt der Sprung irgendwo hin, nur nicht zurück ins Programm. Achten Sie deshalb genau auf die Anzeige des Stackpointers. Wenn dessen Wert genau so groß ist wie bei Beginn der Subroutine, kann nichts passieren. Sonst hilft nur noch der Reset-Taster, den Sie ja inzwischen hoffentlich eingebaut haben, oder eine ruhige Hand, die die Büroklammer an Pin 1 und 3 des User-Ports hält (Kostenpunkt der Reparatur bei Abrutschen zirka 100 Mark&hellip;)</p>
 
         <p>»TW« bricht automatisch mit der Registeranzeige ab, wenn im Programm ein »BRK«-Befehl auftaucht. Wenn Ihnen das zu lange dauert oder Sie zwischendurch ein Register ändern möchten, können Sie den Trace-Modus jederzeit mit der Stopp-Taste verlassen. Anschließend können Sie wie bei »TS« beschrieben fortfahren.</p>
 
-        <p>Im Gegensatz zu »TS« können Sie mit >TW« auch im ROM herumstöbern; Sie haben es ja bei der Subroutine $FFD2 bereits getan. Einzige Einschränkung beim »TW«-Befehl: Ihr Programm darf keinen »SEI« enthalten, da dieser den Interrupt und damit auch den Trace-Modus lahmlegt. Verlassen Sie in diesem Falle »TW« mit STOP und starten erneut hinter dem »SEI«-Befehl. Allerdings müssen Sie in Kauf nehmen, daß das Programm normalerweise nicht mehr korrekt arbeitet.</p>
+        <p>Im Gegensatz zu »TS« können Sie mit »TW« auch im ROM herumstöbern; Sie haben es ja bei der Subroutine $FFD2 bereits getan. Einzige Einschränkung beim »TW«-Befehl: Ihr Programm darf keinen »SEI« enthalten, da dieser den Interrupt und damit auch den Trace-Modus lahmlegt. Verlassen Sie in diesem Falle »TW« mit STOP und starten erneut hinter dem »SEI«-Befehl. Allerdings müssen Sie in Kauf nehmen, daß das Programm normalerweise nicht mehr korrekt arbeitet.</p>
 
         <p>Das nächste Programm soll als weiteres Beispiel für den TW-Modus dienen. Geben Sie es folgendermaßen ein:</p>
 
-        <p>TODO</p>
+        <figure>
+            <table class="plain">
+                <tr><td>5000</td><td>LDA</td><td>#00</td><td>lädt den Akku mit »0«</td></tr>
+                <tr><td>5002</td><td>TAX</td><td></td><td>überträgt den Akku ins X-Register</td></tr>
+                <tr><td>5003</td><td>.0C</td><td></td><td>ein mysteriöses Byte</td></tr>
+                <tr><td>5004</td><td>LDA</td><td>#04</td><td>lädt den Akku mit »4«</td></tr>
+                <tr><td>5006</td><td>TAY</td><td></td><td>überträgt den Akku ins Y-Register</td></tr>
+                <tr><td>5007</td><td>BRK</td><td></td><td>springt in SMON</td></tr>
+            </table>
+        </figure>
 
         <p>Wenn wir dieses kleine Programm abarbeiten, müßte das X-Register auf »0« stehen, während Akku und Y-Register mit »4« geladen sind. Starten wir also das Programm mit »G 5000« und schauen uns die Register an.</p>
 
@@ -79,35 +101,49 @@
 
         <p>Dann starten wir mit »G 5000« ein zweites Mal. Gegen alle Gesetze der Vernunft erscheint wieder das »falsche« Ergebnis — alle drei Register sind »0«. Hier soll uns jetzt der TW-Modus weiterhelfen, indem er uns zeigt, was in Wirklichkeit passiert.</p>
 
-        <p>Geben wir »TW 5000« ein. Der erste Befehl (LDA #00) ist durchgeführt, im Akku erscheint die Null. Jetzt steht der Programmzähler auf dem folgenden Befehl »5002 TAX«. Nach Drücken einer Taste wird dieser Befehl ausgeführt und es erscheint die Null im X-Register. Beim folgenden Befehl müssen wir feststellen, daß der Disassembler nicht in der Lage ist, ihn zu interpretieren — er gibt drei Sternchen aus. Hierbei handelt es sich um unser Byte »00«.</p>
+        <p>Geben wir »TW 5000« ein. Der erste Befehl (LDA #00) ist durchgeführt, im Akku erscheint die Null. Jetzt steht der Programmzähler auf dem folgenden Befehl »5002 TAX«. Nach Drücken einer Taste wird dieser Befehl ausgeführt und es erscheint die Null im X-Register. Beim folgenden Befehl müssen wir feststellen, daß der Disassembler nicht in der Lage ist, ihn zu interpretieren — er gibt drei Sternchen aus. Hierbei handelt es sich um unser Byte »0C«.</p>
 
-        <p>Wieder ein Tastendruck; und dann erkennen wir, daß etwas Merkwürdiges passiert ist. Der Prozessor hat augenscheinlich den nächsten Befehl (LDA #04) übersprungen und steht schon auf dem folgenden »TAY«. So also wird unser Programm abgearbeitet. Damit ist auch das »falsche« Ergebnis erklärt. Bleibt nur noch die Frage nach dem Grund für dieses seltsame Verhalten. Und der ist sicherlich in dem mysteriösen Byte »OC« zu suchen. Hierbei handelt es sich um einen der »inoffiziellen« Opcodes (auch Pseudo-Opcodes genannt), die aufgrund der Prozessorarchitektur vorhanden sind und in manchen Programmen ihr Unwesen treiben — wie wir zu unserem Leidwesen erfahren mußten. Das Byte »OC« wirkt wie ein »NOP«, der eine Länge von 3 Byte hat. Deshalb wird der folgende 2-Byte-Befehl (LDA #04) verschluckt.</p>
+        <p>Wieder ein Tastendruck; und dann erkennen wir, daß etwas Merkwürdiges passiert ist. Der Prozessor hat augenscheinlich den nächsten Befehl (LDA #04) übersprungen und steht schon auf dem folgenden »TAY«. So also wird unser Programm abgearbeitet. Damit ist auch das »falsche« Ergebnis erklärt. Bleibt nur noch die Frage nach dem Grund für dieses seltsame Verhalten. Und der ist sicherlich in dem mysteriösen Byte »0C« zu suchen. Hierbei handelt es sich um einen der »inoffiziellen« Opcodes (auch Pseudo-Opcodes genannt), die aufgrund der Prozessorarchitektur vorhanden sind und in manchen Programmen ihr Unwesen treiben — wie wir zu unserem Leidwesen erfahren mußten. Das Byte »0C« wirkt wie ein »NOP«, der eine Länge von 3 Byte hat. Deshalb wird der folgende 2-Byte-Befehl (LDA #04) verschluckt.</p>
 
         <p>Es gibt noch einiges zu entdecken am 6502 und 6510 — TW macht’s möglich.</p>
 
-        <p>Häufig ist es nicht sinnvoll, ein Programm von Anfang an im TW-Modus laufen zu lassen. Zum anderen sind gerade Schleifen, die per Hand mit >TW« durchlaufen werden müssen, eine ermüdende Angelegenheit. Hier bietet SMON neben dem bereits beschriebenen »TS« eine weitere Trace-Möglichkeit an:</p>
+        <p>Häufig ist es nicht sinnvoll, ein Programm von Anfang an im TW-Modus laufen zu lassen. Zum anderen sind gerade Schleifen, die per Hand mit »TW« durchlaufen werden müssen, eine ermüdende Angelegenheit. Hier bietet SMON neben dem bereits beschriebenen »TS« eine weitere Trace-Möglichkeit an:</p>
 
         <h3>Trace Break</h3>
 
-        <p>TB (Adresse Anzahl der Durchläufe)</p>
+        <p class="noindent">TB (Adresse Anzahl der Durchläufe)</p>
 
         <h3>Trace Quick</h3>
 
-        <p>TQ (Adresse)<br>
-            Geben Sie als Beispiel folgendes Programm ein:</p>
+        <p class="noindent">TQ (Adresse)</p>
+        <p class="noindent">Geben Sie als Beispiel folgendes Programm ein:</p>
 
-        <p>TODO</p>
+        <figure>
+            <table class="plain">
+                <tr><td>6000</td><td>LDY</td><td>#00</td><td>Y als Zähler auf »0«</td></tr>
+                <tr><td>6002</td><td>LDA</td><td>600E,Y</td><td>Werte von $600E ff. sollen geladen werden</td></tr>
+                <tr><td>6005</td><td>JSR</td><td>FFD2</td><td>Ausgabe der Zeichen auf dem Bildschirm</td></tr>
+                <tr><td>6008</td><td>INY</td><td></td><td>der Zähler wird erhöht</td></tr>
+                <tr><td>6009</td><td>CPY</td><td>#0E</td><td>Zähler schon »14«?</td></tr>
+                <tr><td>600B</td><td>BCC</td><td>6000</td><td>wenn nein, dann nächsten Wert holen</td></tr>
+                <tr><td>601D</td><td>BRK</td><td></td><td></td></tr>
+            </table>
+        </figure>
 
-        <p>Bei $600E soll nun ein Text stehen, den das Programm ausgibt. Die einfachste Art, mit SMON Texte in den Speicher zu schreiben, besteht im »K«-Befehl. Geben Sie K600E ein (danach natürlich Return) und drücken Sie die STOP-Taste. Fahren Sie mit dem Cursor an das erste ausgegebene Zeichen (vermutlich ein Punkt) und schreiben Sie — ohne Anführungszeichen:<br>
-            »FEHLER BEHOBEN«</p>
+        <p>Bei $600E soll nun ein Text stehen, den das Programm ausgibt. Die einfachste Art, mit SMON Texte in den Speicher zu schreiben, besteht im »K«-Befehl. Geben Sie 
+            <code>K 600E</code> 
+        ein (danach natürlich Return) und drücken Sie die STOP-Taste. Fahren Sie mit dem Cursor an das erste ausgegebene Zeichen (vermutlich ein Punkt) und schreiben Sie — ohne Anführungszeichen:
+            <code>»FEHLER BEHOBEN«</code>
+        </p>
 
         <p>Drücken Sie dann Return, um die Zeile an den Rechner zu übergeben. Wenn Sie das Programm starten, werden Sie wieder einmal Gelegenheit haben, sich in Ruhe etwas zu trinken zu holen (Prost!), denn das Programm enthält einen dummen Fehler und beschäftigt den Computer für eine lange, lange Zeit. Genauer gesagt, bis Sie ihn mit Reset (zum Beispiel durch RUN/STOP-RESTORE) erlösen.</p>
 
-        <p>Nun soll SMON helfen, diesen Fehler zu lokalisieren. Setzen Sie zuerst einmal einen Breakpoint bei $6002 und begrenzen die Durchläufe auf die maximale Anzahl:</p>
+        <p>Nun soll SMON helfen, diesen Fehler zu lokalisieren. Setzen Sie zuerst einmal einen Breakpoint bei $6002 und begrenzen die Durchläufe auf die maximale Anzahl:
+            <code>TB 6002 0E</code>
+            und starten mit 
+            <code>TQ 6000</code> den Quicktrace bei $6000: Das Programm läuft so lange, bis zum 14. Mal die Adresse $6002 erreicht wird und springt dann in den TW-Modus. Wenn Sie sich jetzt die Registerinhalte genau anschauen, müßte ihnen der Fehler geradezu ins Auge springen. Wie groß sollte denn das Y-Register sein? Welchen Wert sollte der Akku haben? NA?! (Auflösung erfolgt mit der Bekanntgabe der Gewinner des großen Preisausschreibens aus dem letzten Heft&hellip;)</p>
 
-        <p>TB 6002 0E und starten mit TQ 6000 den Quicktrace bei $6000: Das Programm läuft so lange, bis zum 14. Mal die Adresse $6002 erreicht wird und springt dann in den TW-Modus. Wenn Sie sichjetzt die Registerinhalte genau anschauen, müßte ihnen der Fehler geradezu ins Auge springen. Wie groß sollte denn das Y-Register sein? Welchen Wert sollte der Akku haben? NA?! (Auflösung erfolgt mit der Bekanntgabe der Gewinner des großen Preisausschreibens aus dem letzten Heft&hellip;)</p>
-
-        <p>Wenn Sie eine Zeitlang mit SMON gearbeitet haben, werden Ihnen eventuell einige Voreinstellungen nicht gefallen. Besitzer einer Datasette zum Beispiel müssen jedesmal mit »101« auf ihre Geräteadresse einstellen. Wenn Sie sich an unserem »Preisauschreiben« vom letzten Mal beteiligt haben, dürften Ihnen diese Speicherstellen bereits bekannt sein. Übrigens sind zirka 235.982 richtige Lösungen eingegangen; wir haben daraufhin ein Programm geschrieben, um den Gewinner zu ermitteln. Dieses läuft zur Zeit auf einem Großrechner in den USA, da der Speicher des C 64 nicht ausreichte. Wir werden Sie nach Abschluß des Programmlaufes, den wir für Mitte Juni dieses Jahres erwarten, informieren&hellip;.</p>
+        <p>Wenn Sie eine Zeitlang mit SMON gearbeitet haben, werden Ihnen eventuell einige Voreinstellungen nicht gefallen. Besitzer einer Datasette zum Beispiel müssen jedesmal mit »I 01« auf ihre Geräteadresse einstellen. Wenn Sie sich an unserem »Preisauschreiben« vom letzten Mal beteiligt haben, dürften Ihnen diese Speicherstellen bereits bekannt sein. Übrigens sind zirka 235.982 richtige Lösungen eingegangen; wir haben daraufhin ein Programm geschrieben, um den Gewinner zu ermitteln. Dieses läuft zur Zeit auf einem Großrechner in den USA, da der Speicher des C 64 nicht ausreichte. Wir werden Sie nach Abschluß des Programmlaufes, den wir für Mitte Juni dieses Jahres erwarten, informieren&hellip;.</p>
 
         <p>Sollten Sie nicht zu den glücklichen Gewinnern zählen, geben wir Ihnen im folgenden die Speicherstellen an, in denen die Voreinstellungen stehen. Diese können Sie dann mit dem »M«-Befehl Ihren Wünschen entsprechend abändern.</p>
 
@@ -117,19 +153,19 @@
             <tbody>
                 <tr>
                     <td>Hintergrund-Farbe</td>
-                    <td>$C220</td>
+                    <td>: $C220</td>
                 </tr>
                 <tr>
                     <td>Schreibfarbe</td>
-                    <td>$C228</td>
+                    <td>: $C228</td>
                 </tr>
                 <tr>
                     <td>Ger. Adr. Drucker</td>
-                    <td>$C21B</td>
+                    <td>: $C21B</td>
                 </tr>
                 <tr>
                     <td>Ger. Adr. F1/Cass</td>
-                    <td>$C216</td>
+                    <td>: $C216</td>
                 </tr>
             </tbody>
         </table>
@@ -138,15 +174,27 @@
 
         <p>Wollen Sie Routinen in SMON analysieren oder verändern, müssen Sie die Einsprungadressen der einzelnen Befehle kennen. Diese lassen sich leicht finden:</p>
 
-        <p>Am Anfang des Programms (ab $COOB) befindet sich eine Liste aller Kommandos gefolgt von den Adressen (ab $C02B), bei denen diese Befehle beginnen. Lassen Sie sich mit »M COOB C02B« die Befehlsliste anzeigen (siehe Bild 1). Sie sehen, daß am Ende 5 Nullen stehen; hier können Sie eigene neue Befehle einbauen. Mit »M C02B C06B« erhalten Sie die Liste der Einsprungadressen, immer in der Reihenfolge Low-Byte — Hig-Byte, diesmal mit 10 Nullen am Ende, weil ja zu jedem Befehl 2 Byte für die Adresse gehören.</p>
+        <p>Am Anfang des Programms (ab $C00B) befindet sich eine Liste aller Kommandos gefolgt von den Adressen (ab $C02B), bei denen diese Befehle beginnen. Lassen Sie sich mit »M C00B C02B« die Befehlsliste anzeigen (siehe Bild 1). Sie sehen, daß am Ende 5 Nullen stehen; hier können Sie eigene neue Befehle einbauen. Mit »M C02B C06B« erhalten Sie die Liste der Einsprungadressen, immer in der Reihenfolge Low-Byte — Hig-Byte, diesmal mit 10 Nullen am Ende, weil ja zu jedem Befehl 2 Byte für die Adresse gehören.</p>
 
-        <p>Wir wollen nun als Beispiel heraussuchen, wo die Routine zum Füllen eines Speicherbereichs mit einem vorgegebenen Byte steht. Der Befehl dazu ist »O«, also der 20. Befehl ($CO1E). Die zugehörige Adresse ist ebenfalls die 2Ö. in der Liste also $C9C0 (in Speicherstelle $C051/$C052). Die Routine beginnt allerdings immer erst ein Byte später, in unserem Fall also bei $C9C1.</p>
+        <p>Wir wollen nun als Beispiel heraussuchen, wo die Routine zum Füllen eines Speicherbereichs mit einem vorgegebenen Byte steht. Der Befehl dazu ist »O«, also der 20. Befehl ($C01E). Die zugehörige Adresse ist ebenfalls die 20. in der Liste also $C9C0 (in Speicherstelle $C051/$C052). Die Routine beginnt allerdings immer erst ein Byte später, in unserem Fall also bei $C9C1.</p>
 
         <p>Disassemblieren Sie jetzt diese Routine mit »C C9C1 C9D3«. Sie erhalten folgende Befehle (natürlich ohne Kommentare):</p>
 
-        <p>TODO</p>
+        <figure>
+            <table class="plain">
+                <tr><td></td><td>JSR</td><td>C27A</td><td>holt zwei Adressen nach $FB/FC und $FD/FE</td></tr>
+                <tr><td></td><td>JSR</td><td>C28D</td><td>holt das gewünschte Byte in den Akku</td></tr>
+                <tr><td></td><td>LDX</td><td>#00</td><td>initialisiert X-Register als Zähler</td></tr>
+                <tr><td>LOOP</td><td>STA</td><td>(FB,X)</td><td>speichert den Akku-Inhalt in der ersten Adresse ab</td></tr>
+                <tr><td></td><td>PHA</td><td></td><td>merkt sich den Akku-Inhalt</td></tr>
+                <tr><td></td><td>JSR</td><td>0463</td><td>erhöht die Adresse und vergleicht mit der Endadresse</td></tr>
+                <tr><td></td><td>PLA</td><td></td><td>holt Akku-Inhalt zurück</td></tr>
+                <tr><td></td><td>BCC</td><td>C9C9</td><td>wenn Ende nicht erreicht, dann Sprung auf LOOP</td></tr>
+                <tr><td></td><td>RTS</td><td></td><td></td></tr>
+            </table>
+        </figure>
 
-        <p>Wenn Sie nun zum Beispiel den »O«-Befehl nur zum Löschen verwenden möchten, könnten Sie die Routine so abändern, daß nur die beiden Adressen eingegeben werden müssen. Überschreiben Sie einfach den Befehl JSR C28D mit LDA # 00 im Disassemblerlisting, disassemblieren Sie erneut mit »D C9C1 C9D3« und überschreiben Sie die drei Sternchen bei C9C6 mit einem »NOP«, um die entstandene Lücke (3-Byte-Befehl wurde durch 2-Byte-Befehl ersetzt) aufzufüllen. Nun können Sie Ihre veränderte Routine ausprobieren. Geben Sie zum Beispiel »O 5000 5200« ein und überzeugen Sie sich mit »M 5000 5200« von der korrekten Ausführung. Sie können auch die so veränderte Routine mit »W C9C1 C9D3 CE09« ans Programmende kopieren und sich einen neuen Befehl »E« (Erase) schaffen. Sie brauchen dann nur in die erste Null am Ende der Kommandotabelle »45« (für »E«) und in die ersten beiden Nullen der Adreßtabelle »08« und »CE« zu schreiben (für die Adresse $CE09).</p>
+        <p>Wenn Sie nun zum Beispiel den »O«-Befehl nur zum Löschen verwenden möchten, könnten Sie die Routine so abändern, daß nur die beiden Adressen eingegeben werden müssen. Überschreiben Sie einfach den Befehl JSR C28D mit LDA #00 im Disassemblerlisting, disassemblieren Sie erneut mit »D C9C1 C9D3« und überschreiben Sie die drei Sternchen bei C9C6 mit einem »NOP«, um die entstandene Lücke (3-Byte-Befehl wurde durch 2-Byte-Befehl ersetzt) aufzufüllen. Nun können Sie Ihre veränderte Routine ausprobieren. Geben Sie zum Beispiel »O 5000 5200« ein und überzeugen Sie sich mit »M 5000 5200« von der korrekten Ausführung. Sie können auch die so veränderte Routine mit »W C9C1 C9D3 CE09« ans Programmende kopieren und sich einen neuen Befehl »E« (Erase) schaffen. Sie brauchen dann nur in die erste Null am Ende der Kommandotabelle »45« (für »E«) und in die ersten beiden Nullen der Adreßtabelle »08« und »CE« zu schreiben (für die Adresse $CE09).</p>
 
         <p>Machen Sie sich ruhig einmal die Mühe, auch andere Routinen im SMON auf diese Art und Weise zu analysieren und zu ändern. Erstens macht es Spaß und zweitens können Sie SMON Ihren eigenen Wünschen anpassen. Vielleichtfallen Ihnen ja noch Routinen ein, die in SMON fehlen. Wir würden uns über Verbesserungsvorschläge freuen.</p>
 
@@ -154,7 +202,7 @@
 
         <p>Wenn Sie Programme mit SMON untersuchen oder verändern wollen, müssen Sie noch wissen, welche Speicherstellen SMON verwendet. Es soll ja Monitorprogramme geben, die die Basic-Zeiger als Arbeitsspeicher benutzen, so daß ein Basic-Programm nach dem Rücksprung aus dem Monitor gelöscht ist. SMON tut so etwas nicht. Aber natürlich braucht er auch Speicherstellen, um sich Werte merken zu können. Damit Sie Konflikten von Anfang an aus dem Wege gehen können, sind die wichtigsten hier dargestellt.</p>
 
-        <p>In der Zeropage belegt SMON den Bereich von $00A4 bis $00B6. Dort stehen Systemvariable für die Kassettenspeicherung und die RS232-Schnittstelle. Diese werden nur während des Betriebs der Kassette oder von RS232 gebraucht, sind ansonsten aber frei. Außerdem werden die Speicherstellen $OOFB bis $OOFF benutzt, die sowieso zur freien Verfügung des Anwenders vorgesehen sind. Alle anderen Zeiger in der Zeropage, also insbesondere die Speicherverwaltung für Basic bieiben unbeeinflußt.</p>
+        <p>In der Zeropage belegt SMON den Bereich von $00A4 bis $00B6. Dort stehen Systemvariable für die Kassettenspeicherung und die RS232-Schnittstelle. Diese werden nur während des Betriebs der Kassette oder von RS232 gebraucht, sind ansonsten aber frei. Außerdem werden die Speicherstellen $00FB bis $00FF benutzt, die sowieso zur freien Verfügung des Anwenders vorgesehen sind. Alle anderen Zeiger in der Zeropage, also insbesondere die Speicherverwaltung für Basic bieiben unbeeinflußt.</p>
 
         <p>Als weiteren Arbeitsspeicher benutzt SMON den Bereich von $02A8 bis $02C0. Auch dieser Bereich wird vom Betriebssystem nicht benutzt, so daß keine Konflikte entstehen dürften. Beim Assemblieren wird zusätzlich noch der Kassettenpuffer als Speicher für die Labels benötigt. Dieser bleibt ansonsten aberauch unverändert; das istwichtig, wenn Maschinenroutinen dort abgelegt werden sollen.</p>
 
@@ -166,89 +214,99 @@
 
         <p>Dazu gehören in erster Linie die oben erwähnten Einsprungadressen, deren High-Byte natürlich geändert werden muß, wenn SMON in einem anderen Speicherbereich laufen soll. Es gibt aber auch Befehle, die eine Adresse im Programm in einem Vektor ablegen müssen. Disassemblieren Sie einmal den Anfang von SMON mit »D C000 COOB«. Sie erhalten</p>
 
-        <table class="plain">
-            <tbody>
-                <tr>
-                    <td>9005</td>
-                    <td>LDA #C2</td>
-                    <td>ändern</td>
-                </tr>
-                <tr>
-                    <td>9124</td>
-                    <td>CPX #C0</td>
-                    <td>nicht ändern</td>
-                </tr>
-                <tr>
-                    <td>9386</td>
-                    <td>LDY #C0</td>
-                    <td>ändern</td>
-                </tr>
-                <tr>
-                    <td>9441</td>
-                    <td>CMP #C0</td>
-                    <td>nicht ändern</td>
-                </tr>
-                <tr>
-                    <td>987F</td>
-                    <td>LDX #C3</td>
-                    <td>nicht ändern</td>
-                </tr>
-                <tr>
-                    <td>988D</td>
-                    <td>LDX #C1</td>
-                    <td>nicht ändern</td>
-                </tr>
-                <tr>
-                    <td>9992</td>
-                    <td>LDA #C1</td>
-                    <td>nicht ändern</td>
-                </tr>
-                <tr>
-                    <td>9C2C</td>
-                    <td>LDA #CC</td>
-                    <td>ändern</td>
-                </tr>
-                <tr>
-                    <td>9C5B</td>
-                    <td>LDA #C2</td>
-                    <td>ändern</td>
-                </tr>
-                <tr>
-                    <td>9CF4</td>
-                    <td>LDA #CC</td>
-                    <td>ändern</td>
-                </tr>
-                <tr>
-                    <td>9DA1</td>
-                    <td>LDX #CC</td>
-                    <td>ändern</td>
-                </tr>
-                <tr>
-                    <td>9E03</td>
-                    <td>LDA #CC</td>
-                    <td>ändern</td>
-                </tr>
-            </tbody>
-        </table>
+        <figure>
+            <table class="plain">
+                <tr><td>LDA</td><td>#14</td><td>Low-Byte der BREAK-Routine von SMON</td></tr>
+                <tr><td>STA</td><td>0316</td><td>im Break-Vektor abspeichern</td></tr>
+                <tr><td>LDA</td><td>#C2</td><td>High-Byte (!) siehe oben</td></tr>
+                <tr><td>STA</td><td>0317</td><td>siehe oben</td></tr>
+                <tr><td>BRK</td><td></td><td></td></tr>
+            </table>
+        </figure>
 
         <p>Damit wird der Break-Vektor des Betriebssystems auf den SMON gesetzt und mit dem anschließenden — und jedem weiteren BRK-Befehl—springt das Programm in SMONs BREAK-Routine. Wenn SMON in einem anderen Bereich als $C000 laufen soll, dann müssen diese Befehle geändert werden. Heraussuchen kann man sie mit »FIC*,COOO D000«. Sie wissen doch noch, was diese Anweisung bedeutet: Suche mir alle Befehle, die ein Register unmittelbar mit einem Wert laden, der mit $C beginnt. Aber Vorsicht! Nicht alles, was da angezeigt wird, muß auch geändert werden! Um Ihnen weitere Stunden sinnlosen Herumbrütens zu ersparen, wollen wir als Beispiel zeigen, wie man SMON in den Bereich $9000 bis $A000 verlegen kann. Natürlich geht das im Prinzip für jeden anderen Bereich genauso; wir selbst haben insgesamt fünf SMON-Versionen für fünf verschiedene Speicherbereiche, von denen eine immer paßt.</p>
 
         <ol>
-            <li>Wir verschieben zuerst das ganze Programm ohne Umrechnen in den neuen Bereich:<br>W C000 CE09 9000</li>
-            <li>Nun lassen wiralle absoluten (3-Byte) Befehle umrechnen. Die Tabellen am Anfang von SMON bleiben verschont:<br>V C000 CE09 9000 9214 9E09</li>
-            <li>Als nächstes ändern wir die High-Bytes der Befehlsadressen. Geben Sie<br>M 902B 906B<br>ein und ändern Sie in jedem zweiten Byte das »C« durch Überschreiben in »9«. Vergessen Sie nicht, am Ende jeder Zeile »Return« zu drücken, damit Ihre Änderung auch übernommen wird.</li>
-            <li>Als letztes bleiben noch die oben beschriebenen Direktlade-Befehle. Sie müssen so geändert werden, daß sie sich auf den neuen Bereich $9&hellip; beziehen. Suchen Sie sie mit<br>FIC*,9000 9E09<br>heraus. Sie erhalten</li>
+            <li>Wir verschieben zuerst das ganze Programm ohne Umrechnen in den neuen Bereich:<code>W C000 CE09 9000</code>
+            <li>Nun lassen wir alle absoluten (3-Byte) Befehle umrechnen. Die Tabellen am Anfang von SMON bleiben verschont: <code>V C000 CE09 9000 9214 9E09</code></li>
+            <li>Als nächstes ändern wir die High-Bytes der Befehlsadressen. Geben Sie<code>M 902B 906B</code> ein und ändern Sie in jedem zweiten Byte das »C« durch Überschreiben in »9«. Vergessen Sie nicht, am Ende jeder Zeile »Return« zu drücken, damit Ihre Änderung auch übernommen wird.</li>
+            <li>Als letztes bleiben noch die oben beschriebenen Direktlade-Befehle. Sie müssen so geändert werden, daß sie sich auf den neuen Bereich $9&hellip; beziehen. Suchen Sie sie mit <code>FIC*,9000 9E09</code> heraus. Sie erhalten</li>
         </ol>
 
-
-        <p>TODO</p>
+        <figure>
+            <table class="plain">
+                <tbody>
+                    <tr>
+                        <td>9005</td>
+                        <td>LDA #C2</td>
+                        <td>ändern</td>
+                    </tr>
+                    <tr>
+                        <td>9124</td>
+                        <td>CPX #C0</td>
+                        <td>nicht ändern</td>
+                    </tr>
+                    <tr>
+                        <td>9386</td>
+                        <td>LDY #C0</td>
+                        <td>ändern</td>
+                    </tr>
+                    <tr>
+                        <td>9441</td>
+                        <td>CMP #C0</td>
+                        <td>nicht ändern</td>
+                    </tr>
+                    <tr>
+                        <td>987F</td>
+                        <td>LDX #C3</td>
+                        <td>nicht ändern</td>
+                    </tr>
+                    <tr>
+                        <td>988D</td>
+                        <td>LDX #C1</td>
+                        <td>nicht ändern</td>
+                    </tr>
+                    <tr>
+                        <td>9992</td>
+                        <td>LDA #C1</td>
+                        <td>nicht ändern</td>
+                    </tr>
+                    <tr>
+                        <td>9C2C</td>
+                        <td>LDA #CC</td>
+                        <td>ändern</td>
+                    </tr>
+                    <tr>
+                        <td>9C5B</td>
+                        <td>LDA #C2</td>
+                        <td>ändern</td>
+                    </tr>
+                    <tr>
+                        <td>9CF4</td>
+                        <td>LDA #CC</td>
+                        <td>ändern</td>
+                    </tr>
+                    <tr>
+                        <td>9DA1</td>
+                        <td>LDX #CC</td>
+                        <td>ändern</td>
+                    </tr>
+                    <tr>
+                        <td>9E03</td>
+                        <td>LDA #CC</td>
+                        <td>ändern</td>
+                    </tr>
+                </tbody>
+            </table>
+        </figure>
 
         <p>Ändern Sie nur in den gekennzeichneten Zeilen das »C« in »9« um. Sie sehen, es gibt keine Regel, welche Befehle zu ändern sind und welche nicht. Aus diesem Grunde müssen Sie diese Änderungen »von Hand« vornehmen.</p>
 
-        <p>Speichern Sie jetzt die fertige Version unbedingt mit »S &ldquo;SMON $9000&rdquo; 9000 9E09« ab. Nun starten Sie die 9000-Version mit »G 9000« oder von Basic aus mit SYS 36864 (SYS 9 x4 096). Löschen Sie dann den alten SMON mit »O C000 D000 00«. Nur so können Sie sicher sein, daß der verschobene SMON auch einwandfrei arbeitet und Sie nichts übersehen haben.</p>
+        <p>Speichern Sie jetzt die fertige Version unbedingt mit »S &ldquo;SMON $9000&rdquo; 9000 9E09« ab. Nun starten Sie die 9000-Version mit »G 9000« oder von Basic aus mit SYS 36864 (SYS 9 x 4096). Löschen Sie dann den alten SMON mit »O C000 D000 00«. Nur so können Sie sicher sein, daß der verschobene SMON auch einwandfrei arbeitet und Sie nichts übersehen haben.</p>
 
-        <p>Probieren Sie nun alle Befehle durch. Sie müssen genauso arbeiten wie bisher. Vor allem können Sie jetzt auch Programme wie »DOS 5.1« oder »Turbo Tape« untersuchen, die im $COOO-Bereich stehen. Achten Sie aber, wenn Sie »SMON $9000« von Basic aus benutzen, darauf, daß das Basic ihn nicht überschreibt. String-Variable werden nämlich von $A000 nach unten hin aufgebaut und bis $9E09 ist nicht viel Platz. Schützen Sie im Zweifelsfalle den Bereich, indem Sie nach dem Laden des SMON $9000 eingeben:<br>
-            NEW : POKE 56,144 : POKE 55,0</p>
+        <p>Probieren Sie nun alle Befehle durch. Sie müssen genauso arbeiten wie bisher. Vor allem können Sie jetzt auch Programme wie »DOS 5.1« oder »Turbo Tape« untersuchen, die im $C000-Bereich stehen. Achten Sie aber, wenn Sie »SMON $9000« von Basic aus benutzen, darauf, daß das Basic ihn nicht überschreibt. String-Variable werden nämlich von $A000 nach unten hin aufgebaut und bis $9E09 ist nicht viel Platz. Schützen Sie im Zweifelsfalle den Bereich, indem Sie nach dem Laden des SMON $9000 eingeben:
+            <code>NEW : POKE 56,144 : POKE 55,0</code>
+        </p>
 
         <p>Damit ist SMON vor Überschreiben geschützt. Das ist natürlich bei dem SMON $C000 nicht nötig, weil Basic in diesen Bereich nicht hineinkommt.</p>
 
@@ -257,16 +315,16 @@
         <ul>
             <li>daß er im Listing in Zeile 150 ein REM eingeschummelt hat, das dort überhaupt nichts zu suchen hat. Es verhindert nämlich, daß die Checksumme geprüft wird und Eingabefehler erkannt werden.</li>
             <li>daß er auf Seite 62 fälschlich behauptet hat, die »LOAD«-Routine beginne bei $C84F. In Wirklichkeit beginnt Sie bei $C84E.</li>
-            <li>daß er auf Seite 63 bei den Hinweisen in eigener Sache empfiehlt, man möge bei»&hellip; Error in 40« (oder in 70) die DATAs kontrollieren. Natürlich tritt der Fehler nicht in den REM-Zeilen, sondern in Zeile 140 oder 180 auf.</li>
+            <li>daß er auf Seite 63 bei den Hinweisen in eigener Sache empfiehlt, man möge bei »&hellip; Error in 40« (oder in 70) die DATAs kontrollieren. Natürlich tritt der Fehler nicht in den REM-Zeilen, sondern in Zeile 140 oder 180 auf.</li>
             <li>daß er schließlich schon vorgearbeitet hat und in der Januar-Ausgabe sein schändliches Handwerk getrieben hat. Dort steht bei der Beschreibung des 16-Bit-Vergleichs, das Zero-Flag sei gesetzt, wenn beide Werte gleich seien. Das stimmt auch, aber Sie wissen ja selbst, wo der Teufel steckt, nämlich im Detail, und der Druckfehlerteufel macht da keine Ausnahme. Er verführt uns nämlich zu dem eigentlich logischen Schluß, man könne auf die beschriebene Art und Weise prüfen, ob zwei 16-Bit-Werte gleich sind. Und genau das geht nicht. Das Zero-Flag hat nämlich die unangenehme Eigenschaft, auch dann gesetzt zu sein, wenn der erste Wert bis zu 255 größer (!) ist als der zweite. Will man also zuverlässig auf Gleichheit testen, muß man die beiden Werte voneinander abziehen und nachsehen, ob das Ergebnis Null ist.</li>
         </ul>
 
         <h2>Hinweise zum Abtippen</h2>
 
-        <p>Wir geloben Besserung und als Zeichen tätiger Reue haben wir Ihnen das Eintippen der DATAs leichter gemacht. An anderer Stelle in diesem Heft finden Sie das Programm »MSE«. Damit ist ein Vertippen nahezu ausgeschlossen, und schneller und bequemer geht’s obendrein auch noch. Sie finden also auf der nächsten Seite nicht mehr den gewohnten Basic-Lader, sondern statt dessen eine Art Hexdump, das Sie mit »MSE« eintippen können. Wie das genau geht, erfahren Sie in dem zugehörigen Artikel. Nach Beendigung der Tipparbeit speichern Sie Ihr Werk ab. Laden Sie nun das SMON-Maschinenprogramm vom letzten Mal und starten Sie es mit SYS 49152. Hängen Sie den neuen Teil mit<br>
-            »L &ldquo;SMON TEIL 4"«<br>
-            dahinter und speichern Sie das Ganze mit<br>
-            S &rdquo;@:SMON $0000" C000 CE09«<br>
+        <p>Wir geloben Besserung und als Zeichen tätiger Reue haben wir Ihnen das Eintippen der DATAs leichter gemacht. An anderer Stelle in diesem Heft finden Sie das Programm »MSE«. Damit ist ein Vertippen nahezu ausgeschlossen, und schneller und bequemer geht’s obendrein auch noch. Sie finden also auf der nächsten Seite nicht mehr den gewohnten Basic-Lader, sondern statt dessen eine Art Hexdump, das Sie mit »MSE« eintippen können. Wie das genau geht, erfahren Sie in dem zugehörigen Artikel. Nach Beendigung der Tipparbeit speichern Sie Ihr Werk ab. Laden Sie nun das SMON-Maschinenprogramm vom letzten Mal und starten Sie es mit SYS 49152. Hängen Sie den neuen Teil mit
+            <code>»L &ldquo;SMON TEIL 4"«</code>
+            dahinter und speichern Sie das Ganze mit
+            <code>S &rdquo;@:SMON $0000" C000 CE09«</code>
             wieder ab. Sie haben dann das vollständige Programm (15 Blöcke auf der Diskette) zur Verfügung.</p>
 
         <p>Wir hoffen, Ihnen mit SMON ein wirklich brauchbares Werkzeug an die Hand gegeben zu haben. Die vielen Zuschriften und Anrufe, die wir im Verlauf dieser Serie erhalten haben, bestätigen uns in dieser Auffassung. Viele Leser sind nach unserem Eindruck dabei, in die Maschinensprache einzusteigen und deren Möglichkeiten zu nutzen. Und genau das wollten wir erreichen.</p>
@@ -277,89 +335,89 @@
 
         <figure>
             <li><b>A 4000 (Assembler)</b><br>
-                symbolischer Assembler (Verarbeitung von Labels möglich) Startadresse $4000<br>
+                symbolischer Assembler (Verarbeitung von Labels möglich) Startadresse $4000
             </li>
             <li><b>B 4000 4200 (Basic-DATA)</b><br>
-                erzeugt Basic-DATA-Zeilen aus Maschinenprogramm im Bereich von$4000-$41FF<br>
+                erzeugt Basic-DATA-Zeilen aus Maschinenprogramm im Bereich von $4000-$41FF
             </li>
             <li><b>C 4010 4200 4013 4000 4200 (Convert)</b><br>
-                in ein Programm, das von $4000 - $4200 im Speicher steht, soll bei $4010 ein 3-Byte-Befehl eingefügt werden. Dazu wird das Programm ab $4010 - $4200 auf die neue Adresse $4013 verschoben. Alle absoluten Adressen, die innerhalb des Programmbereichs ($4000 - $4200) stehen, werden umgerechnet, so daß die Sprungziele stimmen.<br>
+                in ein Programm, das von $4000 - $4200 im Speicher steht, soll bei $4010 ein 3-Byte-Befehl eingefügt werden. Dazu wird das Programm ab $4010 - $4200 auf die neue Adresse $4013 verschoben. Alle absoluten Adressen, die innerhalb des Programmbereichs ($4000 - $4200) stehen, werden umgerechnet, so daß die Sprungziele stimmen.
             </li>
             <li><b>D 4000 (4100) (Disassembler)</b><br>
-                disassembliert den Bereich von $4000 (- $4100) mit Ausgabe der Hex-Werte. Änderungen sind durch Überschreiben der Befehle möglich.<br>
+                disassembliert den Bereich von $4000 (- $4100) mit Ausgabe der Hex-Werte. Änderungen sind durch Überschreiben der Befehle möglich.
             </li>
             <li><b>F (Find)</b><br>
-                findet Zeichenketten (F), absolute Adressen (FA), relative Sprünge (FR), Tabellen (FT), Zeropageadressen (FZ) und Immediate-Befehle (Fl)<br>
+                findet Zeichenketten (F), absolute Adressen (FA), relative Sprünge (FR), Tabellen (FT), Zeropageadressen (FZ) und Immediate-Befehle (Fl)
             </li>
             <li><b>G (4000) (Go)</b><br>
-                startet ein Maschinenprogramm, das bei $4000 im Speicher beginnt.<br>
+                startet ein Maschinenprogramm, das bei $4000 im Speicher beginnt.
             </li>
             <li><b>I 01 (I/O-Gerät)</b><br>
-                stellt die Gerätenummer für Floppy (08 oder 09) oder Datasette (01) ein.<br>
+                stellt die Gerätenummer für Floppy (08 oder 09) oder Datasette (01) ein.
             </li>
             <li><b>K A000 (A500) (Kontrolle)</b><br>
-                zum schnellen Durchsuchen des Bereichs von $A000 (-$A500) nach ASCII-Zeichen (32 Byte pro Zeile). Änderungen sind durch Überschreiben der ASCII-Zeichen möglich.<br>
+                zum schnellen Durchsuchen des Bereichs von $A000 (-$A500) nach ASCII-Zeichen (32 Byte pro Zeile). Änderungen sind durch Überschreiben der ASCII-Zeichen möglich.
             </li>
             <li><b>L (4000) (Load)</b><br>
-                lädt ein Maschinenprogramm an die richtige oder eine angegebene Adresse ($4000)<br>
+                lädt ein Maschinenprogramm an die richtige oder eine angegebene Adresse ($4000)
             </li>
             <li><b>M 4000 (4400) (Memory-Dump)</b><br>
-                gibt den Inhalt des Speichers von $4000 (- $43FF) in Hex-Bytes und ASCII-Code aus. Änderungen sind durch Überschreiben der Hex-Zahlen möglich.<br>
+                gibt den Inhalt des Speichers von $4000 (- $43FF) in Hex-Bytes und ASCII-Code aus. Änderungen sind durch Überschreiben der Hex-Zahlen möglich.
             </li>
             <li><b>0 4000 4500 AA (Occupy)</b><br>
-                füllt den Speicherbereich von $4000 - $4500 mit vorgegebenem Byte ($AA) aus<br>
+                füllt den Speicherbereich von $4000 - $4500 mit vorgegebenem Byte ($AA) aus
             </li>
             <li><b>P 02 (Printer)</b><br>
-                setzt Geräteadresse 2 für Drucker<br>
+                setzt Geräteadresse 2 für Drucker
             </li>
             <li><b>R (Register)</b><br>
-                zeigt die Registerinhalte und Flags an. Änderungen sind durch Überschreiben möglich.<br>
+                zeigt die Registerinhalte und Flags an. Änderungen sind durch Überschreiben möglich.
             </li>
             <li><b>S &ldquo;Test&rdquo; 4000 5000 (Save)</b><br>
-                speichert ein Programm von $4000 - $4FFF unter dem Namen ’Test’ ab<br>
+                speichert ein Programm von $4000 - $4FFF unter dem Namen ’Test’ ab
             </li>
             <li><b>TW (4000) (Trace Walk)</b><br>
-                führt auf Tastendruck den jeweils nächsten Maschinenbefehl aus und zeigt die Registerinhalte an. Subroutinen können in Echtzeit durchlaufen werden (’J’). Wird keine Startadresse eingegeben, beginnt ’TW’ bei der letzten mit ’R’ angezeigten Adresse.<br>
+                führt auf Tastendruck den jeweils nächsten Maschinenbefehl aus und zeigt die Registerinhalte an. Subroutinen können in Echtzeit durchlaufen werden (’J’). Wird keine Startadresse eingegeben, beginnt ’TW’ bei der letzten mit ’R’ angezeigten Adresse.
             </li>
             <li><b>TB 4010 05 (Trace Break)</b><br>
-                setzt einen Haltepunkt für den Schnellschrittmodus bei $4010. Der Schnellschrittmodus wird unterbrochen, nachdem $4010 zum 5. Mal erreicht worden ist.<br>
+                setzt einen Haltepunkt für den Schnellschrittmodus bei $4010. Der Schnellschrittmodus wird unterbrochen, nachdem $4010 zum 5. Mal erreicht worden ist.
             </li>
             <li><b>TQ 4000 (Trace quick)</b><br>
-                Schnellschrittmodus, springt beim Erreichen eines Haltepunktes in den Einzelschrittmodus.<br>
+                Schnellschrittmodus, springt beim Erreichen eines Haltepunktes in den Einzelschrittmodus.
             </li>
             <li><b>TS 4000 4020 (Trace stop)</b><br>
-                arbeitet ein Programm ab $4000 in Echtzeit ab und springt beim Erreichen von $4020 in die Registeranzeige. Von dort aus kann (nach evtl. Änderung der Register) mit »G« oder »TW« fortgefahren werden. »TS« arbeitet nur im RAM-Speicher.<br>
+                arbeitet ein Programm ab $4000 in Echtzeit ab und springt beim Erreichen von $4020 in die Registeranzeige. Von dort aus kann (nach evtl. Änderung der Register) mit »G« oder »TW« fortgefahren werden. »TS« arbeitet nur im RAM-Speicher.
             </li>
             <li><b>V 6000 6200 4000 4100 4200 (Verschieben)</b><br>
-                ändert in einem Programm von $4100 - $41FF alle absoluten Adressen, die sich auf den Bereich von $6000 - $6200 beziehen, auf einen neuen Bereich, der bei $4000 beginnt.<br>
+                ändert in einem Programm von $4100 - $41FF alle absoluten Adressen, die sich auf den Bereich von $6000 - $6200 beziehen, auf einen neuen Bereich, der bei $4000 beginnt.
             </li>
             <li><b>W 4000 4300 5000 (Write)</b><br>
-                verschiebt den Speicherinhalt von $4000 -$42FF nach $5000 ohne Umrechnung der Adressen (zum Beispiel Tabellen)<br>
+                verschiebt den Speicherinhalt von $4000 -$42FF nach $5000 ohne Umrechnung der Adressen (zum Beispiel Tabellen)
             </li>
             <li><b>X (Exit)</b><br>
-                springt aus dem Monitor-Programm ins Basic zurück<br>
+                springt aus dem Monitor-Programm ins Basic zurück
             </li>
             <li><b># 49152</b><br>
-                Dezimalzahl umrechnen<br>
+                Dezimalzahl umrechnen
             </li>
             <li><b>$ 002B</b><br>
-                4-stellige Hex-Zahl umrechnen<br>
+                4-stellige Hex-Zahl umrechnen
             </li>
             <li><b>% 01101010</b><br>
-                8-stellige Binärzahl umrechnen<br>
+                8-stellige Binärzahl umrechnen
             </li>
             <li><b>? 0344 + 5234</b><br>
-                Addition oder Subtraktion zweier 4-stelliger Hex-Zahlen<br>
+                Addition oder Subtraktion zweier 4-stelliger Hex-Zahlen
             </li>
             <li><b>= 4000 5000 (Vergleich)</b><br>
-                vergleicht den Speicherinhalt ab $4000 mit dem ab $5000.<br>
+                vergleicht den Speicherinhalt ab $4000 mit dem ab $5000.
             </li>
             <figcaption>Bild 1. SMON-Befehlsübersicht</figcaption>
         </figure>
 
         <h3>Hinweise zu Bild 1</h3>
 
-        <p>Alle Eingaben erfolgen in der hexadezimalen Schreibweise. In Klammern angegebene Adreßeingaben können entfallen. SMON benutzt dann sinnvolle vorgegebene Werte. Bei allen Ausgabe-Befehlen ist gleichzeitig die Ausgabe auf einen Drucker möglich. Dazu werden die Befehle geSHIFTet eingegeben.</p>
+        <p class="source">Alle Eingaben erfolgen in der hexadezimalen Schreibweise. In Klammern angegebene Adreßeingaben können entfallen. SMON benutzt dann sinnvolle vorgegebene Werte. Bei allen Ausgabe-Befehlen ist gleichzeitig die Ausgabe auf einen Drucker möglich. Dazu werden die Befehle geSHIFTet eingegeben.</p>
 
         <figure>
             TODO MSE
