@@ -34,14 +34,17 @@
 
         <h3>Problem: Strings auffüllen</h3>
 
-        <p>Vielleicht haben auch Sie in einigen Programmen diese oder eine ähnliche Zeile entdeckt:<br>
-            170 IF LEN(A$)&lt;40 THEN A$=A$+&ldquo; &rdquo;: GOTO 170</p>
+        <p>Vielleicht haben auch Sie in einigen Programmen diese oder eine ähnliche Zeile entdeckt:
+            <code>170 IF LEN(A$)&lt;40 THEN A$=A$+&ldquo; &rdquo;: GOTO 170</code>
+        </p>
 
         <p>Die Bedeutung ist klar: Hier soll der String A$ auf 40 Zeichen Länge aufgefüllt werden. Aber schon jetzt müßte es Ihnen eiskalt den Rücken herunterlaufen. Angenommen, A$ hätte zu Anfang 20 Zeichen, dann werden mindestens 20 Müllstrings durch die ständige Zuweisung erzeugt. Sollte diese Auffüllung öfter durchgeführt werden, darf man sich nicht wundern, wenn bald der ganze Speicher voll ist.</p>
 
-        <p>Eine weitere Lösung sieht meist so aus:<br>
-            10 H$ = &ldquo;40 * space&rdquo;<br>
-            170 A$ = A$ + LEFT$(H$,40-LEN (A$))</p>
+        <p>Eine weitere Lösung sieht meist so aus:
+            <code>10 H$ = &ldquo;40 * space&rdquo;
+                170 A$ = A$ + LEFT$(H$,40-LEN (A$))
+            </code>
+        </p>
 
         <p>Schon sehr viel besser! Es entstehen zwei Müllstrings (der alte Wert von A$ und einer, der durch die LEFT$-Funktion entsteht und nur Leerzeichen enthält). Es wird außerdem eine Variable H$ benötigt.</p>
 
@@ -62,18 +65,18 @@
             <figcaption>Listing 1. Die FORMAT-Routine (nähere Erklärung im Text).</figcaption>
         </figure>
 
-        <p>Diese FORMAT-Routine simuliert einen neuen Basic-Befehl. FORMAT füllt einen String mit Leerzeichen, bis eine definierte Länge erreicht ist. Wenn ein String länger ist, wird er abgeschnitten. Der Aufruf muß allerdings über einen SYS-Befehl erfolgen. Steht FORMAT beispielsweise im Kassettenpuffer, so führt<br>
-            CLR: SYS 826 (A$,250,A$)<br>
+        <p>Diese FORMAT-Routine simuliert einen neuen Basic-Befehl. FORMAT füllt einen String mit Leerzeichen, bis eine definierte Länge erreicht ist. Wenn ein String länger ist, wird er abgeschnitten. Der Aufruf muß allerdings über einen SYS-Befehl erfolgen. Steht FORMAT beispielsweise im Kassettenpuffer, so führt
+            <code>CLR: SYS 826 (A$,250,A$)</code>
             dazu, daß A$ 250 Leerzeichen enthält.</p>
 
-        <p>A$ = &ldquo;HALLO&rdquo;: SYS 826 (A$,10,B$)<br>
+        <p><code>A$ = &ldquo;HALLO&rdquo;: SYS 826 (A$,10,B$)</code>
             läßt A$ wie es war, B$ enthält aber »HALLO« und 5 angehängte Leerzeichen, hat also die Länge 10.</p>
 
-        <p>A$ = &ldquo;TEST&rdquo;:N = l:SYS 826 (A$, N,B$(0))<br>
+        <p><code>A$ = &ldquo;TEST&rdquo;:N = l:SYS 826 (A$, N,B$(0))</code>
             hinterläßt in B$(0) ein einsames T, der Rest wird abgeschnitten.</p>
 
-        <p>Zusammengefaßt läßt sich also sagen, daß bei der Parameterübergabe:<br>
-            (String1, N, String2)<br>
+        <p>Zusammengefaßt läßt sich also sagen, daß bei der Parameterübergabe:
+            <code>(String1, N, String2)</code>
             in String2 genau N Zeichen aus String1 stehen, und daß gegebenenfalls String2 mit Leerzeichen aufgefüllt wird.</p>
 
         <p>Nur wenn »String1« den gleichen Namen hat wie »String2«, entsteht ein Müllstring, nämlich der alte Inhalt der Stringvariablen. Für die, die es nun gar nicht mehr erwarten können, dieses Programm auszuprobieren, gibt es in Listing 2 einen Basic-Lader. Listing 1 kann direkt mit einem Assembler oder auch mit dem SMON eingegeben werden. Anhand dieses Programms, das alle wichtigen ROM-Routinen, die mit Strings zu tun haben, aufruft, wollen wir nun die Programmierung solcher Routinen erarbeiten.</p>
@@ -85,7 +88,7 @@
 
         <h3>FORMAT analysiert</h3>
 
-        <p>Nehmen wir uns erst einmal die grundsätzliche Funktionsweise von FORMAT vor. Ein einfaches Flußdiagramm ist in Bild 1 dargestellt. Dies zeigt aber nur die Verfahrensweise von FORMAT Die eingebauten Sicherheitsüberprüfungen sind hier nicht enthalten. Bekannt sind am Start der String1, seine Länge 1 und die gewünschte Länge des String2.</p>
+        <p>Nehmen wir uns erst einmal die grundsätzliche Funktionsweise von FORMAT vor. Ein einfaches Flußdiagramm ist in Bild 1 dargestellt. Dies zeigt aber nur die Verfahrensweise von FORMAT. Die eingebauten Sicherheitsüberprüfungen sind hier nicht enthalten. Bekannt sind am Start der String1, seine Länge 1 und die gewünschte Länge des String2.</p>
 
         <figure>
             <img src="147-1.png" alt="">
@@ -120,9 +123,9 @@
 
         <p>Nachdem String2 fertiggestellt wurde, folgt der abschließende Teil, der den Descriptor von String2 in die entsprechende Stringvariable hineinkopieren soll.</p>
 
-        <p>Doch zuerst wieder der Test auf ein Komma. Die Routine $B08B nimmt die Schlüsselposition in der Übergabe von Strings an den Basic-Text ein. Sie versucht eine Variable im Speicher und gibt deren Adresse im Akku (LO-Byte) und Y-Register (HI-Byte) zurück. Leider funktioniert diese Routine auch mit numerischen Variablen. Die nächsten beiden Befehle fangen diesen Fall ab. In der Zelle $0D steht (handelt es sich um eine Zahl), $00, bei einem String $FF. Haben wir keine Stringvariable vor uns, so müssen wir selber in die Routine springen, die TYPE MISMATCH ERROR ausgibt ($AD 99). Falls eine gesuchte Variable noch nicht existiert, wird sie in der Routine $B08B angelegt.</p>
+        <p>Doch zuerst wieder der Test auf ein Komma. Die Routine $B08B nimmt die Schlüsselposition in der Übergabe von Strings an den Basic-Text ein. Sie versucht eine Variable im Speicher und gibt deren Adresse im Akku (LO-Byte) und Y-Register (HI-Byte) zurück. Leider funktioniert diese Routine auch mit numerischen Variablen. Die nächsten beiden Befehle fangen diesen Fall ab. In der Zelle $0D steht (handelt es sich um eine Zahl), $00, bei einem String $FF. Haben wir keine Stringvariable vor uns, so müssen wir selber in die Routine springen, die TYPE MISMATCH ERROR ausgibt ($AD99). Falls eine gesuchte Variable noch nicht existiert, wird sie in der Routine $B08B angelegt.</p>
 
-        <p>Anschließend speichern wir in den zwei nun überflüssig gewordenen Speicherstellen $FB/ $FC die Adresse der Variablen ab. Dies ist an sich nicht die genaue Adresse der Variablen, sondern, zu unserem Glück, die Adresse, an der der Stringdescriptor stehen muß. Im vorletzten Schritt kopieren wir also den schon lange vorhandenen Descriptor in die entsprechenden Speicherstellen. Somit ist die Arbeit faktisch beendet, und wir prüfen noch, weil’s ordentlicher aussieht, ob auch ein »)« vorhanden ist. Dadurch, daß wir mit JMP springen, ersparen wir uns auch noch ein RTS, das ja am Ende der Klammerzu-Betriebssystem-Routine steht.</p>
+        <p>Anschließend speichern wir in den zwei nun überflüssig gewordenen Speicherstellen $FB/$FC die Adresse der Variablen ab. Dies ist an sich nicht die genaue Adresse der Variablen, sondern, zu unserem Glück, die Adresse, an der der Stringdescriptor stehen muß. Im vorletzten Schritt kopieren wir also den schon lange vorhandenen Descriptor in die entsprechenden Speicherstellen. Somit ist die Arbeit faktisch beendet, und wir prüfen noch, weil’s ordentlicher aussieht, ob auch ein »)« vorhanden ist. Dadurch, daß wir mit JMP springen, ersparen wir uns auch noch ein RTS, das ja am Ende der Klammerzu-Betriebssystem-Routine steht.</p>
 
         <p>Ich glaube, daß ich mit diesem Beispiel das angenehme mit dem nützlichen verbunden habe, und hoffe, daß Sie jetzt sowohl ein wenig schlauer, als auch um ein nützliches Programm reicher sind.</p>
 
@@ -130,8 +133,8 @@
 
         <p>Bevor noch einmal alle wichtigen ROM-Routinen zusammengefaßt werden, möchte ich Ihnen ein Beispiel geben, wie man sehr leicht Fehler in eine Stringfunktion einbauen kann, die nicht sofort erkennbar sind. Auch hier ist ein Blick auf die Garbage Collection angebracht.</p>
 
-        <p>Wie oben schon erklärt wurde, erzeugt die Zuweisung<br>
-            B$ = LEFT$(A$,3)<br>
+        <p>Wie oben schon erklärt wurde, erzeugt die Zuweisung
+            <code>B$ = LEFT$(A$,3)</code>
             einen zweiten String, der nur die drei ersten Zeichen von A$ enthält und auf den Descriptor von B$ zeigt. Manche Leser mögen jetzt folgende Ideen haben:</p>
 
         <p>Theoretisch ist es ja nicht notwendig, einen zweiten String mit den drei Zeichen zu erstellen. Vielmehr könnte man ja den Descriptor von B$ auf dieselbe Position wie den von A$ zeigen lassen. Im B$-Descriptor wird dann die Stringlänge 3 angegeben, während die in A$ gleich bleibt.</p>
@@ -155,7 +158,7 @@
         <p>Bild 2 enthält noch einmal eine Kurzbeschreibung aller verwendeten Routinen, damit Sie bei der Programmierung von Funktionen nicht immer in der Beschreibung des Beispiels nachsehen müssen.</p>
 
         <figure>
-            <table>
+            <table class="plain">
                 <tbody>
                     <tr>
                         <td>$AEFA</td>
@@ -175,7 +178,13 @@
                     </tr>
                     <tr>
                         <td>$B6A3</td>
-                        <td>Weitere Auswertung eines Stringausdrucks, nachher:<br>Akku: Länge des Strings,<br>X-Reg: Adresse LO-Byte,<br>Y-Reg: Adresse HI-Byte</td>
+                        <td>Weitere Auswertung eines Stringausdrucks, nachher:
+                            <ul class="plain">
+                                <li>Akku: Länge des Strings,</li>
+                                <li>X-Reg: Adresse LO-Byte,</li>
+                                <li>Y-Reg: Adresse HI-Byte</li>
+                            </ul>
+                        </td>
                     </tr>
                     <tr>
                         <td>$B79E</td>
@@ -183,11 +192,21 @@
                     </tr>
                     <tr>
                         <td>$B47D</td>
-                        <td>Reserviert Speicher für einen String am Ende des Stringspeichers, Anzahl der Zeichen muß vorher im Akku stehen. Nachher stehen in $61: Länge des reservierten Bereichs, $62: Adresse LO-Byte, $63: Adresse HI-Byte des reservierten Bereichs.</td>
+                        <td>Reserviert Speicher für einen String am Ende des Stringspeichers, Anzahl der Zeichen muß vorher im Akku stehen. Nachher stehen in
+                            <ul class="plain">
+                                <li>$61: Länge des reservierten Bereichs,</li>
+                                <li>$62: Adresse LO-Byte,</li>
+                                <li>$63: Adresse HI-Byte des reservierten Bereichs.</li>
+                            </ul>
                     </tr>
                     <tr>
                         <td>$B08B</td>
-                        <td>Holt sich Variablennamen aus Basic-Text, sucht diese Variable im Speicher. Ist sie nicht vorhanden, wird sie automatisch angelegt. Es stehen dann in:<br>$0D: Das Typflag dieser Variablen.<br>(Strings = $FF, Zahl = $00),<br>Akku: LO-Byte,<br>Y-Reg: HI-Byte der Adresse, an der, war es ein String, der Stringdescriptor beginnt.</td>
+                        <td>Holt sich Variablennamen aus Basic-Text, sucht diese Variable im Speicher. Ist sie nicht vorhanden, wird sie automatisch angelegt. Es stehen dann in:
+                            <ul class="plain">
+                                <li>$0D: Das Typflag dieser Variablen. (Strings = $FF, Zahl = $00),</li>
+                                <li>Akku: LO-Byte,</li>
+                                <li>Y-Reg: HI-Byte der Adresse, an der, war es ein String, der Stringdescriptor beginnt.</li>
+                            </ul>
                     </tr>
                     <tr>
                         <td>$AD99</td>

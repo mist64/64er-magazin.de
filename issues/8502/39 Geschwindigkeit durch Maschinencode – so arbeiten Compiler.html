@@ -27,7 +27,7 @@
         <p>Es ist schon erstaunlich. Da gibt es Programme, die andere Programme als Eingabedaten verwenden und diese in reinen Maschinencode übersetzen, der von der CPU direkt ausgeführt werden kann. Das ist durchaus von Vorteil:</p>
         <p>Basic-Programme sind nämlich einfach zu schreiben, aber langsam in der Ausführung. Maschinensprache ist dagegen sehr schnell, aber schwierig zu programmieren. Compiler bilden praktisch die Brücke zwischen den beiden grundsätzlichen Anforderungen nach einfacher Programmerstellung und hoher Ausführungsgeschwindigkeit.</p>
         <p>Auf den ersten Blick drängt sich der Vergleich mit einem Assembler auf, der ja auch in Klartext gegebene Befehle in Maschinencode übersetzt. Doch der Vergleich hinkt, denn die Aufgabe eines Assemblers ist vergleichsweise trivial. Zu jedem Klartextbefehl (Mnemonic) wie zum Beispiel LDA gibt es nämlich genau einen Opcode. Der Assembler macht daher im wesentlichen nichts anderes, als in einer zweispaltigen Tabelle das Mnemonic zu suchen und bei Erfolg aus der zweiten Spalte den zugehörigen Opcode zu entnehmen. Zwischen Assembler-Mnemonic und erzeugtem Maschinencode besteht also ein Verhältnis eins zu eins.</p>
-        <p>Bei sehr maschinennahen Befehlen wie beispielsweise beim Basic-Befehl GOTO hat es der Compiler ähnlich einfach: »GOTO (Zeilennummer)« würde von einem 6502-Basic-Compiler übersetzt in »JMP Adresse)«. Bei Befehlen wie »IF X = A + 3 THEN Z = 5« wird die Sache schon etwas komplizierter. Eine solche Anweisung kann allein schon deshalb nicht direkt übersetzt werden, weil der 6502-Prozessor keinen Maschinenbefehl »IF« kennt.</p>
+        <p>Bei sehr maschinennahen Befehlen wie beispielsweise beim Basic-Befehl GOTO hat es der Compiler ähnlich einfach: »GOTO (Zeilennummer)« würde von einem 6502-Basic-Compiler übersetzt in »JMP &lt;Adresse&gt;«. Bei Befehlen wie »IF X = A + 3 THEN Z = 5« wird die Sache schon etwas komplizierter. Eine solche Anweisung kann allein schon deshalb nicht direkt übersetzt werden, weil der 6502-Prozessor keinen Maschinenbefehl »IF« kennt.</p>
         <p>Hier muß der Compiler also wesentlich mehr leisten, als nur Opcodes zu bestimmten Schlüsselwörtern herauszusuchen. In der Regel entspricht einem Befehl in einer höheren Programmiersprache eine ganze Befehlssequenz auf der Maschinenebene. Die Aufgabe eines Compilers wird daher mit Recht als Übersetzung statt Assemblierung (Zusammenfügung) bezeichnet.</p>
         <p>Übersetzt wird immer aus einer höheren Programmiersprache (beispielsweise Basic) in eine maschinennahe »Sprache«, meistens direkt in Maschinencode. Einer Programmiersprache liegt — wie auch jeder natürlichen Sprache — ein Vokabular und eine Grammatik zugrunde.</p>
 
@@ -35,19 +35,33 @@
 
         <p>Vokabeln der Sprache Basic sind zum Beispiel GOTO, PRINT, DATA, aber auch Zahlen und Variablennamen gehören dazu. Daneben gibt es bestimmte »Satzzeichen« wie »=«, »:« etc.</p>
         <p>Eine Grammatik ist ja nichts anderes als eine Menge von Regeln, die angeben, wie aus den zur Verfügung stehenden Zeichen und Wörtern korrekte »Sätze« gebildet werden. Folgende drei Regeln bilden zum Beispiel eine einfache Grammatik:</p>
-        <p>Regel 1: Ein Satz besteht aus einem Subjekt, gefolgt von einem Prädikat.</p>
-        <p>Regel 2: Ein Subjekt ist eines der Worte HUNDE, COMPUTER, MENSCHEN.</p>
-        <p>Regel 3: Ein Prädikat ist eines der Worte LESEN, RECHNEN, BELLEN, SCHLAFEN.</p>
-        <p>In der sogenannten Backus-Naur-Form, die zur Definition der Programmiersprache Algol entwickelt wurde, lassen sich die drei Regeln kürzer und eindeutiger darstellen:<br>
-        1. ⟨Satz) ::= ⟨Subjekt⟩ ⟨Prädikat⟩<br>
-        2. ⟨Subjekt⟩ ::= HUNDE | COMPUTER | MENSCHEN<br>
-        3. ⟨Prädikat⟩ ::= LESEN | RECHNEN | BELLEN | SCHLAFEN</p>
+
+        <ul class="plain">
+            <li><p>Regel 1: Ein Satz besteht aus einem Subjekt, gefolgt von einem Prädikat.</p></li>
+            <li><p>Regel 2: Ein Subjekt ist eines der Worte HUNDE, COMPUTER, MENSCHEN.</p></li>
+            <li><p>Regel 3: Ein Prädikat ist eines der Worte LESEN, RECHNEN, BELLEN, SCHLAFEN.</p></li>
+        </ul>
+
+        <p>In der sogenannten Backus-Naur-Form, die zur Definition der Programmiersprache Algol entwickelt wurde, lassen sich die drei Regeln kürzer und eindeutiger darstellen:</p>
+
+        <ul class="plain">
+            <li>1. &lt;Satz&gt; ::= &lt;Subjekt&gt; &lt;Prädikat&gt;</li>
+            <li>2. &lt;Subjekt&gt; ::= HUNDE | COMPUTER | MENSCHEN</li>
+            <li>3. &lt;Prädikat&gt; ::= LESEN | RECHNEN | BELLEN | SCHLAFEN</li>
+        </ul>
+
         <p>In spitzen Klammern stehen dabei immer Verweise auf andere Regeln, die senkrechten Striche trennen verschiedene Alternativen.</p>
+
         <p>Mit dieser Grammatik können durch einfache Anwendung der Regeln Sätze erzeugt werden wie »HUNDE BELLEN« oder »MENSCHEN LESEN« und einige mehr.</p>
-        <p>Nach Regeln dieser Art ist auch die Basic-Grammatik aufgebaut. Um alle syntaktisch korrekten Sprungbefehle zu beschreiben, genügen folgende Regeln:<br>
-            1. ⟨Sprungbefehl⟩ ::= GOTO ⟨Zeilennummer⟩<br>
-            2. ⟨Zeilennummer⟩ ::= {⟨Ziffer⟩]<br>
-            3. ⟨Ziffer⟩:: = 0|1|2|3|4|5|6|7|8|9</p>
+
+        <p>Nach Regeln dieser Art ist auch die Basic-Grammatik aufgebaut. Um alle syntaktisch korrekten Sprungbefehle zu beschreiben, genügen folgende Regeln:</p>
+
+        <ul class="plain">
+            <li>1. &lt;Sprungbefehl&gt; ::= GOTO &lt;Zeilennummer&gt;</li>
+            <li>2. &lt;Zeilennummer&gt; ::= {&lt;Ziffer&gt;}</li>
+            <li>3. &lt;Ziffer&gt; ::= 0|1|2|3|4|5|6|7|8|9</li>
+        </ul>
+
         <p>Regel 1 bestimmt, daß ein Sprungbefehl aus dem Schlüsselwort GOTO, gefolgt von einer Zeilennummer, besteht. Regel 2 besagt, daß eine Zeilennummer aus einer Folge von Ziffern besteht (die geschweiften Klammern deuten die Wiederholung an). Regel 3 schließlich definiert, was eine Ziffer ist. Bleibt noch zu bemerken, daß eine Zeilennummer 999999 zum Beispiel syntaktisch richtig ist, aber aus anderen Gründen nicht zulässig ist.</p>
         <p>Häufig werden anstelle der Backus-Naur-Form Syntax-Graphen als anschaulichere Art der Darstellung gewählt. Bild 1 zeigt den Anfang einer syntaktischen Definition des allgemeinen Begriffes »Basic-Programm«, und zwar die ersten drei Regeln. Die Diagramme werden grundsätzlich von links nach rechts gelesen, jede andere Richtung muß durch entsprechende Markierungen angegeben werden.</p>
         <p>Regel 1 aus Bild 1 besagt, daß ein Basic-Programm zunächst aus einer Programmzeile besteht. Dann kann entweder bereits Schluß sein, oder aber eine weitere Programmzeile folgen und so fort. Regel 2 definiert den Begriff der Basic-Zeile, bestehend aus Zeilennummer und einer Anweisung, worauf ein Doppelpunkt und eine Anweisung etc. folgen können.</p>
@@ -62,18 +76,18 @@
         <p>Intern arbeitet der »Ghost-Computer«, dessen Befehlssatz gerade der Zwischencode ist, mit einem Stack, wie er jedem Forth-Programmierer, aber auch jedem Benutzer von Hewlett-Packard-Taschenrechnern vertraut sein dürfte. Diesen Rechenstack kann man sich bildlich als Papierstapel vorstellen. Während der Berechnung eines mehr oder minder komplizierten arithmetischen Ausdrucks können Zettel mit Zwischenergebnissen auf den Stapel gelegt oder aber von oben weggenommen werden.</p>
 
         <figure>
-            <table>
+            <table class="plain">
                 <tbody>
-                    <tr>
-                        <td><b>Befehl</b></td>
-                        <td><b>Bedeutung</b></td>
+                    <tr class="separator strong">
+                        <td>Befehl</td>
+                        <td>Bedeutung</td>
                     </tr>
                     <tr>
-                        <td>LITn</td>
+                        <td>LIT n</td>
                         <td>Konstante n auf Stack legen</td>
                     </tr>
                     <tr>
-                        <td>RCLx</td>
+                        <td>RCL x</td>
                         <td>Inhalt der Variablen x auf Stack legen</td>
                     </tr>
                     <tr>
@@ -97,27 +111,27 @@
                         <td>die obersten beiden Stapelwerte dividieren</td>
                     </tr>
                     <tr>
-                        <td>JMPa</td>
+                        <td>JMP a</td>
                         <td>unbedingter Sprung zur Adresse a</td>
                     </tr>
                     <tr>
-                        <td>JEQa</td>
+                        <td>JEQ a</td>
                         <td>Sprung, falls oberstes Stapelelement Null</td>
                     </tr>
                     <tr>
-                        <td>JNEa</td>
+                        <td>JNE a</td>
                         <td>Sprung, falls oberstes Stapelelement nicht Null</td>
                     </tr>
                     <tr>
-                        <td>JGEa</td>
+                        <td>JGE a</td>
                         <td>Sprung, falls oberstes Stapelelement positiv</td>
                     </tr>
                     <tr>
-                        <td>JLTa</td>
+                        <td>JLT a</td>
                         <td>Sprung, falls oberstes Stapelelement negativ</td>
                     </tr>
                     <tr>
-                        <td>JSRa</td>
+                        <td>JSR a</td>
                         <td>Unterprogrammaufruf</td>
                     </tr>
                     <tr>
@@ -192,11 +206,11 @@
         <p>Tabelle 2 zeigt einige Beispiele für die Übersetzung von Basic-Anweisungen in Zwischencode. Natürlich ist der hier vorgestellte Zwischencode nur ein (unvollständiges) Beispiel. Sie sollten daher nicht erwarten, daß Ihr Basic-Compiler genau diesen speziellen Code erzeugt.</p>
 
         <figure>
-            <table>
+            <table class="plain">
                 <tbody>
-                    <tr>
-                        <td><b>Basic-Befehl</b></td>
-                        <td><b>erzeugter Zwischencode</b></td>
+                    <tr class="separator strong">
+                        <td>Basic-Befehl</td>
+                        <td>erzeugter Zwischencode</td>
                     </tr>
                     <tr>
                         <td>A = 3 + 5*X</td>
