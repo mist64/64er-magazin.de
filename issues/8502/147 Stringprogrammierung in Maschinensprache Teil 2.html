@@ -61,7 +61,52 @@
         <p>Dazu müssen wir aber auf die Maschinensprachen-Ebene herunter. Werfen Sie mal einen Blick auf Listing 1.</p>
 
         <figure>
-            TODO
+            <pre>     JSR $AEFA   Klammer auf?
+     JSR $AD9E   Auswerten eines beliebigen Ausdrucks
+     JSR $B6A3   Weitere Auswertung für Strings
+     STX $FB     Stringadresse LO-Byte
+     STY $FC     Stringadresse HI-Byte
+     STA $FD     Länge des Strings
+     JSR $AEFD   Komma?
+     JSR $B79E   Hole Bytewert in X
+     TXA
+     JSR $B47D   Reserviere Speicherplatz für Endstring Adresse
+                 in $62/$63, Länge in $61
+     LDY #$00
+LBL1
+     CPY $61     Länge des Endstrings erreicht?
+     BEQ LBL3
+     CPY $FD     Startstring komplett kopiert?
+     BEQ LBL2
+     LDA ($FB),Y kopieren des Startstrings
+     STA ($62),Y in den Endstring
+     INY
+     BNE LBL1    unbedingter Sprung
+LBL2
+     LDA #$20    Leerzeichen zum Auffüllen
+     STA ($62),Y Auffüllen
+     CPY $61     Endstring voll?
+     BEQ LBL3
+     INY
+     BNE LBL2    Unbedingter Sprung
+LBL3
+     JSR $AEFD   Komma?
+     JSR $B08B   Variable suchen/einrichten
+     LDX $0D
+     BEQ LBL5    Wenn kein String dann TYPE MISMATCH
+     STA $FB     Variablenadresse LO
+     STY $FC     Variablenadresse HI
+     LDX #$02
+     LDY #$02    drei Werte sind zu übertragen
+LBL4
+     LDA $61,X   kopieren des Descriptors von Endstring
+     STA ($FB),Y in die Stringvariable
+     DEX
+     DEY
+     BPL LBL4
+     JMP $AEF7   Klammer zu? Rücksprung zu Basic
+LBL5
+     JMP $AD99   »TYPE MISMATCH ERROR«</pre>
             <figcaption>Listing 1. Die FORMAT-Routine (nähere Erklärung im Text).</figcaption>
         </figure>
 
