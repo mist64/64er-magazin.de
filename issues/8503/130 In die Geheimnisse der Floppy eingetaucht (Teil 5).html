@@ -341,11 +341,31 @@
 
         <p>Einen Error 22 beispielsweise würden Sie dadurch herstellen, daß Sie die Routine zum Finden des Datenblocks aufrufen. Diese kehrt bei gefundenem Datenblock mit RTS zurück. Jetzt schalten Sie auf Schreiben um (in Bild 1 dargestellt) und bringen ein paar Bytes ohne Konzept auf die Diskette. Versucht der DC diesen Datenblock später einmal zu lesen, so erfolgt ein Fehler 22, da sie die Datenblockkennung, die direkt hinter der SYNC-Markierung steht, zerstört haben.</p>
 
+        <figure>
+            <pre>AUF SCHREIBEN UMSCHALTEN:
+
+     LDA $1C0C  ; PCR
+     AND #$1F   ; AUF SCHREIBMODUS
+     ORA #$C0   ;
+     STA $1C0C  ; UMSCHALTEN
+     LDA #$FF   ;
+     STA $1C03  ; PORT A AUF AUSGANG
+
+AUF LESEN UMSCHALTEN:
+
+     LDA $1C0C  ; PCR
+     ORA #$E0   ; AUF LESEMODUS
+     STA $1C0C  ; UMSCHALTEN
+     LDA #$00   ;
+     STA $1C03  ; PORT A AUF EINGANG</pre>
+            <figcaption>Bild 1. Diese Programme können für das Umschalten zwischen Schreiben und Lesen verwendet werden.</figcaption>
+        </figure>
+
         <p>Wollen Sie einen Fehler mit der Nummer 23, dann ist es erforderlich, daß Sie den Vorspann des Datenblocks überspringen und erst inmitten der gespeicherten Daten einen Schreibzugriff durchführen. Durch diesen Zugriff, der in der Prüfsumme am Blockende natürlich nicht verzeichnet wird, folgt die Meldung »23, READ ERROR«, als Zeichen eines Prüfsummenfehlers.</p>
 
         <p>Listing 2a und 3a zeigen Ihnen Programme, die einen Error 22 und einen Error 23 erzeugen (Listing 2 b und 3 b sind die zugehörigen Quellprogramme).</p>
 
-        <p>Der Vorteil eines Fehlers mit der Nummer 23 ist, daß die Daten in der Regel schon im Puffer stehen, bevor der Fehler erkanntwird, dasheißt, Sie können einen Datenblock auf Diskette gezielt mit einem Fehler versehen, obwohl dieser noch lesbare Inhalte enthält.</p>
+        <p>Der Vorteil eines Fehlers mit der Nummer 23 ist, daß die Daten in der Regel schon im Puffer stehen, bevor der Fehler erkannt wird, das heißt, Sie können einen Datenblock auf Diskette gezielt mit einem Fehler versehen, obwohl dieser noch lesbare Inhalte enthält.</p>
 
         <p>Die eben besprochenen Fehler auf Diskette eignen sich hervorragend für einen Kopierschutz. Am wirkungsvollsten sind dabei mit Sicherheit solche Fehler, die zusätzlich noch Daten enthalten. Es gibt nämlich schon eine ganze Menge von Programmen, die Fehler übernehmen und auf der Kopie wieder simulieren.</p>
 
@@ -360,6 +380,35 @@
         <p>Allein schon an den kleinen Anwendungen können Sie erkennen, wie vielseitig und vielfältig die Möglichkeiten sind, die einem in der Programmierung offenstehen. Wenn Sie intensiv mit der Floppy arbeiten, werden Sie bald schon neue Anwendungsmöglichkeiten kennenlernen. Aus der 1541 läßt sich noch eine Menge herausholen, wie wir noch feststellen werden, wobei der Kopierschutz von Disketten sicher nur einen kleinen Teil der vielfältigen Möglichkeiten darstellt.</p>
 
         <address class="author">(Karsten Schramm/gk)</address>
+
+        <figure>
+            <!-- TODO <pre data-filename="read error 22" data-name="READ ERROR 22 erzeugen"></pre> -->
+            <figcaption>Listing 2a. Ein READ ERROR 22 wird erzeugt (in einem beliebigen Sektor)</figcaption>
+        </figure>
+        <figure>
+            <pre>TODO</pre>
+            <figcaption>Listing 2b. Herstellen eines »22, READ ERROR« (Assemblerprogramm)</figcaption>
+        </figure>
+        <figure>
+            <!-- TODO <pre data-filename="read error 23" data-name="READ ERROR 23 erzeugen"></pre> -->
+            <figcaption>Listing 3a. Ein READ ERROR 23 wird erzeugt</figcaption>
+        </figure>
+        <figure>
+            <pre>TODO</pre>
+            <figcaption>Listing 3b. Herstellen eines »23, READ ERROR« (Assemblerprogramm)</figcaption>
+        </figure>
+        <figure>
+            <pre>0500      JSR $FDA3 ; TRACK LOESCHEN
+0503      JMP $FD9E ; ZUR JOBSCHLEIFE
+0506      LDA #$01  ; TRACKNUMMER
+0508      STA $0A   ; IN JOBSPEICHER
+050A      LDA #$E0  ; JOBCODE
+050C WAIT STA $02   ; UEBERGEBEN
+050E      LDA $02   ; RUECKMELDUNG
+0510      BMI WAIT  ; ENDE ABWARTEN
+0512      RTS       ; PROGRAMMENDE</pre>
+            <figcaption>Listing 4. Ein »Killertrack« wird erzeugt. Startadresse bei $0506.</figcaption>
+        </figure>
     </article>
 </body>
 
