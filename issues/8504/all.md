@@ -1282,55 +1282,815 @@ Sprites — Die Bitmuster von sbl 1 und sbl 2 werden verknüpft, wobei das Ergeb
 ### 1.3. Spritegrafik SPRITE
 
 Syntax: SPRITE snr, x, y sbl, col, mod
-Effekt: Das Sprite mit der Nummer snr (0 bis 7) wird an der durch x (0-511) und y (0 bis 255) festgelegten Position auf den Bildschirm gebracht. Es hat die Farbe col und bezieht sein Bitmuster aus sbl. Ist mod 0, so wird das Sprite im HRG-Modus, ist mod 1, wird es im Multicolormo-dUS dargeStellt.
+Effekt: Das Sprite mit der Nummer snr (0 bis 7) wird an der durch x (0-511) und y (0 bis 255) festgelegten Position auf den Bildschirm gebracht. Es hat die Farbe col und bezieht sein Bitmuster aus sbl. Ist mod 0, so wird das Sprite im HRG-Modus, ist mod 1, wird es im Multicolormo-dUS dargestellt.
+**MOBEX** Syntax: MOBEX snr,ex,ey
 
+Effekt: Das Sprite mit der Nummer snr wird expandiert. Bei ex gleich 1 wird es in X-Richtung expandiert, bei ey gleich 1 in Y-Richtung.
+**MULTI** Syntax: MULTI col1,col2
 
-***** TODO Fortsetzung auf Seite 59 *****
+Effekt: Es werden die beiden zusätzlichen Farben col1 und col2 für Multicolorsprites festgelegt.
+**CLEAR** Syntax: CLEAR oder CLEAR snr
+Effekt: lm ersten Fall werden alle Sprites vom Bildschirm gelöscht, im zweiten nur das Sprite mit der Nummer snr.
 
+### 1.4.	Sonstige Grafikbefehle
 
+**HCOPY** Syntax: HCOPY
 
+Effekt: Es wird eine Hardcopy vom Textschirm im Groß-/Gra-fikmodus erzeugt (Gerätenummer 4).
 
+### 2.	Befehle für die Tonerzeugung
 
+**VOL** Syntax: VOL lt
 
+Effekt: Setzt Lautstärke It (0-15) für alle 3 Stimmen.
+**WAVE** Syntax: WAVE st,wf,fl
 
+Effekt: Für die Stimme st (T3) wird die Wellenform wf (16,32,64 oder 128 gesetzt, fl schaltetdie Stimme ein (fl = 1) oder aus (fl = 0).
+**ENVELOPE** Syntax: ENVELOPE st,an,ab,ha,au
 
+Effekt: Setzt die Hüllkurve für Stimme st. Die Parameter an (Anschlag), ab (Abschwellen), ha (Halten) und au (Ausklingen) dürfen im Bereich von 0 bis 15 liegen.
+Anmerkung: Wird bei WAVE eine ungültige Wellenform angegeben, so meldet xBasic 64 »?NOT EXISTING WAVE«
 
+### 3.	Programmierhilfen
 
+**HELP** Syntax: HELP
 
+Effekt: Es werden alle von Exbasic 64 verstandenen Befehle aufgelistet.
+**MEMORY** Syntax: MEMORY
 
+Effekt: Die momentane Speicheraufteilung wird angezeigt (Programm, Variable etc.).
+**DUMP** Syntax: DUMP
 
+Effekt: Alle Variable und deren Inhalt werden ausgegeben (Real,lnteger=%,Strings=$,Funktionen=*).
+**START** Syntax: START
 
+Effekt: xBasic 64 wird neu initialisiert. Das derzeitig im Speicher befindliche Programm kann mit RESCUE gerettet werden.
+**RESCUE** Syntax: RESCUE
 
+Effekt: Zurückholen eines Programms nach NEW oder START.
+**RENUMBER** Syntax: RENUMBER stz,sw
 
+Effekt: Das im Speicher befindliche Basic-Programm wird neu durchnumeriert. Dabei ist stz die erste Zeile des »neuen« Programms und sw die Schrittweite. Wird der für Zeilennummern erlaubte Bereich überschritten, so wird die erste nicht mehr unterzubringende Zeile mit der Nummer 0 belegt und »?ILLEGAL LINENUMBER« ausgegeben.
 
+### 4. Diskettenbefehle
 
+**DIR** Syntax: DIR
 
+Effekt: Das Directory der momentan eingelegten Diskette wird angezeigt, ohne das im Speicher befindliche Programm zu löschen.
+**ERROR** Syntax: ERROR
 
+Effekt: Tritt ein Diskettenfehler auf, so wird mit diesem Befehl die Fehlernummer, der Fehlertext, der Sektor und die Spur geholt, in der der Fehler auftrat. Das Ganze wird durch Kommata getrennt ausgegeben.
 
+### 5. Befehle für strukturiertes Programmieren
 
+**REPEAT...UNTIL**
+Syntax: REPEAT (beliebigeAnweisungen) UNTIL(Bedingung)
 
+Effekt: Die Anweisung(en) zwischen REPEAT und UNTIL werden solange ausgeführt, bis die Bedingung hinter UNTIL erfüllt ist. Die Befehle dürfen in zwei Zeilen stehen.
 
+Es dürfen maximal 32 REPEAT...UNTIL-Schleifen geschachtelt werden. Ansonsten erfolgt die Meldung »?TOO MANY RE-PEAT..UNTIL«. Ein UNTIL ohne vorhergehendes REPEAT führt zu dem Fehler »?UNTIL WITHOUT REPEAT«.
+**JUMP** Syntax: JUMP Label
 
+Effekt: Es erfolgt ein Sprung zum Label (Label). Dieses muß in einer PROCEDURE-Zeile stehen. Ein JUMP ohne nachfolgendes Label verursacht den Fehler ?»?MISSING LABEL«. Wird versucht, zu einem nicht existierenden Label zu verzweigen, wird ?»?PROCEDURE NOT FOUND« gemeldet.
+**PROCEDURE** Syntax: PROCEDURE Label
 
+Effekt: Markiert eine Zeile als Labelzeile. Der Befehl selbst wird wie ein REM behandelt. Deshalb dürfen vor und hinter PROCEDURE keine anderen Statements stehen.
+**CALL...SUBEND** Syntax: CALL Label...SUBEND
 
+Effekt: Hierbei handelt es sich um eine Art GOSUB...RE-TURN. Jedoch wird hier nichtzu einerZeilennummer, sondern zu der durch Label gekennzeichneten Labelzeile gesprungen. Bei SUBEND springt das Programm dann auf das Statement, das unmittelbar hinter dem entsprechenden CALL steht. Auch hier gilt: maximal 32 CALL..SUBEND-Aufrufe schachteln, sonst gibt’s einen ?TOO MANY CALL...SUBEND-Fehler.
+Ein SUBEND ohne CALL gibt »7SUBEND WITHOUT CALL«.
+**EXIT** Syntax: EXIT Zeilennummer
 
+Effekt: Mit diesem Befehl kann beliebig oftaus einem Unterprogramm ohne RETURN herausgesprungen werden. Das Programm verzweigt zu der hinter EXIT angegebenen Zeilennummer. Fehlt sie, so wird ein ?MISSING LINENUMBER-Fehler ausgegeben.
+**BRANCH** Syntax: BRANCH Zeilennummer
 
+Effekt: Ermöglicht ein Verlassen eines Unterprogrammes ohne SUBEND. Ansonsten gilt das bei EXIT Gesagte.
 
+xBasic 64 ermöglicht außerdem das Setzen des DATA-Zeigers auf eine bestimmte Zeilennummer mit RESTORE. Auch Variable sind als Ausdruck zugelassen. Das gleiche gilt auch für GOTO und GOSUB.
 
+Ein Nachteil von xBasic 64 ist, daß ein xBasic 64-Befehl bei einer IF...THEN-Anweisung durch einen Doppelpunkt vom THEN getrennt werden muß.
+Beispiel:
 
+100 IF A=SIN(45) THEN:EXIT 500
 
+### Zur Beachtung:
 
+Verwechseln Sie bei den Spritebefehlen nicht Spritenummer und Spritedatenblocknummer. Die Spritenummer bezieht sich auf die auf dem Schirm darstellbaren Sprites, während sich die Spritedatenblocknummer auf den Datenblock bezieht, aus welchem die Sprites ihre Bitmuster beziehen können. Die Spritenummer darf im Bereich von 0 bis 7 liegen, während die Datenblocknummer Werte von 0 bis 511 annehmen kann. Achten Sie jedoch darauf, daß die im freien RAM liegenden Blöcke vor dem Überschreiben geschützt werden. Die Blöcke 0 bis 10 bitte nicht benutzen!
 
+Der Spritepointer kann natürlich nur die Blöcke 0 bis 255 adressieren. Um auf die anderen Blöcke zugreifen zu können, müssen diese erst mit MOVE in den entsprechenden Bereich geschoben werden.
 
+xBasic 64 arbeitet mit drei verschiedenen Video-RAMs. Das »normale« Video-RAM ab $0400, das HRG-Video-RAM, das als Farb-RAM dient, ab $C000 und das Video-RAM bei Gebrauch der UDG ab $C400.
 
+Weiter belegt xBasic 64 die Bereiche $8E00-8E7F als RE-PEAT...UNTIL-Stack und $8E80-8EFF als CALL...SUBEND-Stack.
 
+## Programmtechnische Details
 
+Zur Initialisierung bedient sich xBasic 64 eines weitverbreiteten Verfahrens: Damit der Commodore 64 ein ROM-Modul beim Einschalten erkennt, muß dieses ab Adresse $8004 das Kennwort »CBM80« enthalten. Die beim Einschalten angesprungene RESET-Routine ruft ihrerseits eine Routine auf, die den erwähnten Speicherbereich nach dem Wort durchsucht. Wird es gefunden, so springt der Computer in der Programmausführung an eine Adresse, die in den Speicherstellen $8000 und $8001 abgelegt ist. Durch Einstecken einer ROM-Kassette am Expansionsport wird der Eingang EXROM auf 0 gesetzt. Dadurch wird der 64er auf ROM umgestellt. Ist EXROM gleich 1, so wird bei einem RESET einfach der RAM-Bereich ab $8004 auf das Kennwort untersucht. Und genau hier setzt xBasic 64 ein. Es enthält nämlich an dieser Stelle das geforderte Kennwort. Der Computer springt also nicht auf den im ROM stehenden Vektor ($A000), sondern auf den von xBasic 64 bereitgestellten ($8000). Dieser zeigt auf eine eigene RESET-Routine. Diese kopiert zum Beispiel das Basic-ROM in das darunterliegende RAM. Nun werden die Veränderungen an den Routinen GOTO, GOSUB und RESTORE vorgenommen. Also Maschinenprogrammierer Vorsicht! In Verbindung mit xBasic 64 ist der Bereich von $A000 bis $BFFF tabu!
 
+Oberhalb von xBasic 64 ist der für Maschinenprogramme freie Teil nur der Bereich von $9000 bis $9FFF.
 
+xBasic 64 besitzt einige neue Fehlermeldungen. Die entsprechende Routine liegt ab $8184. Sie wird mit der Nummer der Fehlermeldung im Akku angesprungen. Sie holt sich dann die Adresse der Fehlermeldung aus einer Tabelle ($8DE0).
 
+Geben Sie einmal folgendes ein:
+POKE 780,2:SYS 33156
 
+Sie müßten die Meldung »7ILLEGAL LINENUMBER ERROR« erhalten. Das ist die Fehlermeldung mit der Nummer 2. Die Nummern 0 bis 12 werden von xBasic 64 belegt, die restlichen sind jedoch für eigene Fehlermeldungen frei.
 
+Für die Befehle REPEAT...UNTIL und CALL...SUBEND benutzt xBasic 64 zwei Stacks. Auf diesen Stacks wird beim Aufruf von REPEAT oder CALL die momentane Zeilennummer und der Programmzeiger abgelegt.
 
+Die Befehle UNTIL und SUBEND holen diese Werte wieder zurück. Jeder Stack hat seinen Pointer, der auf die Elemente im Stack zeigt. Die beiden Pointer liegen bei $07E8 (RU-Stack) und $07E9 (CS-Stack). Die beiden Stacks liegen ab $8E00 (RU) und 8E80 (CS).
+
+Mit den von xBasic 64 zur Verfügung gestellten Routinen sollte es keine Schwierigkeit sein, eigene Befehle einzubauen. Mit dem entsprechenden Algorithmus und den Routinen Koordinaten holen und Punkt setzen, ist es bestimmt nicht sehr kompliziert, eine LINE-Routine oder andere Grafikbefehle zu implementieren (siehe auch Tabelle 1).
+
+(Stephan Blietz/gk)
+
+TODO ASIDE
+
+Die Eingabe von xBasic 64
+xBasic 64 muß mit dem MSE eingegeben werden, den Sie ebenfalls in diesem Heft finden oder bereits aus den vorhergehenden 64’er-Ausgaben kennen. Nach dem Abtippen speichern Sie das Programm auf jeden Fall vor dem ersten Test.
+xBasic 64 läßt sich mit LOAD ”Name”,8,1 von der Diskette (oder LOAD von der Kassette) laden und mit SYS 64738 (!) starten.
+
+/TODO ASIDE
+
+# 64 — Tastaturänderung
+
+> Wenn Sie die Tastaturbelegung auf Ihrem C 64 ändern möchten, gibt es eine einfache Methode, um jeder beliebigen Taste eine andere Bedeutung zu geben.
+
+Wie Sie sicher schon wissen, ist der Checksummer, der in jedem 64’er abgedruckt ist, eine wichtige Hilfe bei der Eingabe der Listings. Da bei diesem Programm das Basic-ROM und das Betriebssystem ins RAM kopiert werden, kann man die Tastaturbelegung ganz einfach ändern.
+
+Wollen sie zum Beispiel die Y-Taste und die Z-Taste vertauschen, so sind dazu lediglich zwei POKE-Befehle notwendig:
+**POKE 60289+25,ASC(”Z”):POKE 60289+12,ASC(”Y”)**
+
+Wie Siejede andere Taste umbelegen, sehen Sie aus der folgenden Tabelle:
+**POKE 60289+ X ,ASC(” gewünschtes Zeichen ”);** ergibt Tasten ohne Shift
+**POKE 60354+ X ,ASC(” gewünschtes Zeichen ”);** ergibt Tasten mit Shift
+**POKE 60419+ X ,ASC(” gewünschtes Zeichen ”);** ergibt Tasten mit C=
+**POKE 60536+ X ,ASC(” gewünschtes Zeichen ”);** ergibt Tasten mit CTRL
+
+(Helmut Pilz/gk)
+
+# Ohne gutes Werkzeug geht es nicht: SMON Teil 5
+
+> Dies ist der letzte Teil unserer SMON-Serie mit der versprochenen Zugaba Die zirka noch freien 500 Byte sollen mit einem kleinen Diskettenmonitor gefüllt werden. Parallel zur Serie über die »Geheimnisse der Floppy« wollen wir Ihnen außerdem an einigen Beispielen zeigen, was man mit so einem Disk-Monitor alles anstellen kann.
+
+Nun sind 500 Byte nicht gerade viel—sie entsprechen etwa 10 Zeilen Basic — und das stellte uns vor einige Probleme. Wir haben schließlich auf allen Komfort verzichten müssen: Deshalb gibt es keine Directory-Ausgabe, keine Übermittlung von Disk-Kommandos ä la DOS 5.1 und was dergleichen schöne Dinge mehr sind. Niemand kann Sie allerdings davon abhalten, solche Programme gleichzeitig mit SMON zu verwenden. Sollte SMON dabei im Wege sein, können Sie ihn ja seit der letzten Ausgabe auf einen anderen Speicherbereich verschieben. Wir haben also nur solche Befehle eingebaut, die Basic-Befehlser-weiterungen nicht bieten und die für den Maschinensprach-Programmierer von besonderem Interesse sind. Glücklicherweise sind gerade für solche Zwecke im SMON ja bereits reichlich Routinen vorhanden, die wir benutzen können, etwa Eingabe-Routinen oder Hexdump von Speicherbereichen.
+
+### Die Befehle des Disk-Monitors
+
+Da das Arbeiten mit dem Disk-Monitor besondere Aufmerksamkeit verlangt (nach Murphys Gesetzen führen Fehleingaben in der Regel zu unlesbaren Disketten), wird er mit einem eigenen Kommando eingeschaltet. Leider waren alle halbwegs sinnvollen Buchstaben (»D« wie Diskette oder »F« wie Floppy) schon vergeben, deshalb haben wir uns für ein schlichtes »Z« wie Zuversicht entschieden.
+
+### —Z schaltet den Disk-Monitor ein.
+
+Die Rahmenfarbe ändert sich auf Gelb, der gewohnte ».« am Anfang einer Zeile ändert sich in »*«. Dies alles hat den Zweck, Ihnen deutlich zu machen, daß es jetzt ernst wird. Intern wird jetzt das Basic abgeschaltet, weil der Disk-Monitor einen 256 Byte großen Puffer benötigt. Dieser liegt von $BF00—$C000 im RAM unter dem Basic, weil er dort am wenigsten stören kann.
+
+### READ: R (Track Sektor)
+
+Liest einen Block von der Diskette in den Computer. Track und Sektor müssen als Hexzahlen eingegeben werden. Die erste Zeile des Blocks wird ausgegeben. Da wir dazu normale SMON-Routinen verwenden, steht als Speicheradresse $BF00. Das »BF« können Sie vorerst ignorieren. Die weitere Ausgabe des Hexdump erfolgt anders als gewohnt mit der Taste »SHIFT«. STOP bricht die Ausgabe ab. Sie können die Hexbytes überschreiben und damit ändern. Eine dauerhafte Änderung erfolgt aber erst beim Zurückschreiben auf die Diskette (siehe Befehl »W«). Geben Sie nur »R« ohne Track und Sektor ein, wird der logisch (!) nächste Block eingelesen.
+
+### MEMORY-DUMP: M
+
+Zeigt den gerade im Puffer befindlichen Block nochmals auf dem Bildschirm an.
+
+Genau wie beim R-Befehl können Sie die Ausgabe mit »SHIFT« und »STOP« steuern und Änderungen vornehmen.
+
+### WRITE: W (Track Sektor)
+
+Schreibt einen Block aus dem Puffer auf die Diskette zurück. Ähnlich wie bei »R« kann die Angabe von Track und Sektor entfallen. Es wird dann der Track und Sektor des letzten R-Befehls benutzt. Das ist in fast allen Fällen auch der richtige.
+
+### ERROR: @
+
+Liest den Fehlerkanal aus, gibt ihn aber nur aus, wenn wirklich ein Fehler vorhanden war. (»00, OK, 00, 00« wird unterdrückt.)
+
+### EXIT: X
+
+Verläßt den Disk-Monitor und springt in den SMON zurück. Dabei wird die Rahmenfarbe auf Blau zurückgeschaltet und es erscheint wieder der ».« am Anfang der Zeile. Das Basic wird wieder eingeschaltet. Wollen Sie nun mit SMON-Kommandos auf den Puffer zugreifen, müssen Sie Basic wieder abschalten ($36 in Speicherstelle $0001).
+
+Die folgenden Beispiele sollen Ihnen die Arbeit mit dem Disk-Monitor verdeutlichen.
+
+Achtung! Benutzen Sie unbedingtzum Üben eine Diskette, die Sie nicht mehr brauchen!
+
+Weder wir noch der Verlag haften dafür, wenn Ihr Lieblingsprogramm oder die mühsam erstellte Adreßdatei unwiederbringlich dahin sind. Daß das sehr sehr schnell gehen kann, wissen wir aus eigener Erfahrung ...
+
+Am besten machen Sie von einer Ihrer Diskette eine Kopie, die Sie zum Üben benutzen können.
+
+## Reparatur eines gelöschten Files
+
+Sicher ist Ihnen das auch schon passiert: Sie wollen Ihr Programm mit Namen »Schrott« löschen, geben als Abkürzung »S:S*« ein und merken in dem Moment, in dem Sie »RETURN« drücken, daß auf der Diskette auch alle Versionen von »SMON« waren, außerdem auch noch »Springvogel«, »Soccer« etc. Verzweifeln müssen Sie nur, wenn auch diese letzte SMON-Version mit dem Disk-Monitor dabei war. Ansonsten behalten Sie die Ruhe und verfahren Sie wie im folgenden beschrieben.
+
+Laden Sie alsojetzt SMON, legen Sie Ihre »Übungsdiskette« (!) ins Laufwerk und löschen Sie eins der ersten Programme mit dem üblichen Scratch-Kommando. Nun starten Sie SMON und drücken »Z«. Der Bildschirm ändert seine Farbe wie beschrieben, und am Anfang der Zeile erscheint der »*«. Jetzt geben Sie ein:
+
+### R 12 00
+
+Auf dem Bildschirm erscheint die erste Zeile der BAM, die bei jeder Diskette auf Track 18, Sektor 0 abgelegt ist. Die ersten beiden Bytes enthalten »12 01« und geben damit den logisch nächsten Block an. In diesem Falle wäre das der erste Block des Directory. Wenn Sie mit »SHIFT« die Bildschirmausgabe fortsetzen, erkennen Sie etwa in der Mitte den Diskettennamen. Lassen Sie die Ausgabe durchlaufen, bis wieder der »*«erscheint. Nun geben Sie »R« ohne weitere Angaben ein. Damit erhalten Sie den Koppel-Block, also Track 18, Sektor 1, den ersten Directory-Block. (Natürlich hätten Sie auch gleich »R 12 01« eintippen können, aber wir wollen ja zeigen, wie die Befehle funktionieren.)
+
+In diesem Block stehen die ersten acht Programme Ihrer Übungsdiskette, auch der Name des soeben gelöschten ist dabei.
+
+Trotzdem ist dieses Programm tatsächlich gelöscht und erscheint nicht mehr, wenn Sie sich das Directory anzeigen lassen. Vergleichen Sie den Eintrag des gelöschten Programms mit den anderen, fällt auf, daß 3 Byte vor Beginn des Namens bei allen anderen »82« steht (sofern es sich um Programmfiles handelt), bei dem gelöschten aber »00«. Die Reparatur ist nun denkbar einfach: Sie brauchen lediglich die »00« mit »82« zu überschreiben. Einen Haken hat die Sache allerdings noch. Beim SCRATCHEN sind die vom Programm belegten Blöcke in der BAM als frei gekennzeichnet worden und jeder neue Eintrag würde das als gelöscht gekennzeichnete File endgültig überschreiben. Um das zu verhindern, müssen Sie nach erfolgter Reparatur die Diskette validieren (von Basic aus mit Kommando: OPEN 1, 8, 15, ”V”). Dabei wird die BAM neu erzeugt und korrigiert.
+
+## Schützen eines Files
+
+Da wir gerade dabei sind, wollen wir unser repariertes gelöschtes File gleich ein für allemal gegen Löschen schützen. Diese Möglichkeit des Diskettenoperationssystems (DOS) ist zwar nicht im Handbuch beschrieben, funktioniert aber trotzdem ausgezeichnet. Laden Sie dazu nochmals die erste Seite des Directory mit R 12 01
+
+und ändern Sie die »82« vor dem Fileeintrag in »C2«. Geben Sie »W« ein, um die Änderung auf Diskette zu schreiben. Verlassen Sie nun SMON mit »X« und lassen Sie sich ein Directory anzeigen. Das geschützte File ist mit einem » > « gekennzeichnet. Versuchen Sie nun, dieses Programm mit dem Scratch-Kommando zu löschen. Es geht nicht! Zum »Entriegeln« brauchen Sie nur das »C2« wieder in »82« zu ändern. Der »>« im Directory verschwindet und das File ist nicht mehr geschützt.
+
+## Schützen einer Diskette
+
+Wollen Sie eine ganze Diskette vor versehentlichem Löschen oder Formatieren schützen, gibt es die Möglichkeit, die Löschschutzkerbe abzukleben. Es geht jedoch auch anders. **Achtung! Die im folgenden beschriebene Prozedur läßt sich nicht mehr rückgängig machen, auch nicht mit dem Disk-Monitor!**
+
+Nehmen Sie also eine Diskette, die Sie anschließend »hart formatieren« können (also mit Eingabe einer ID). Starten Sie nun den Disk-Monitor und lesen Sie die BAM mit »R 12 00« ein. Das dritte Byte enthält »41«. Diese »41« ist ein Kennzeichen für das DOS der 1541- oder 4040-Floppy. Ändern Sie diese Bytes durch Überschreiben in »45« und speichern Sie die Änderung mit »W« auf die Diskette zurück. Verlassen Sie nun SMON und versuchen Sie, etwas zu löschen. Ergebnis siehe oben. Versuchen Sie auch, die Diskette »weich«, also zum Beispiel mit OPEN 1,8,15,”N:TEST” zu formatieren. Auch das ist jetzt nicht mehr möglich. Aber es kommt noch besser: Starten Sie noch einmal den Disk-Monitor und versuchen Sie, die Änderung durch Zurückschreiben der »41« an Stelle der »45« rückgängig zu machen.
+
+Auch das ist nicht mehr möglich, wir hatten Sie bereits gewarnt! Es bleibt lediglich die Möglichkeit, die Diskette »hart«, zum Beispiel mit OPEN 1,8,15,”N:TESTTE”
+zu formatieren. Sollten Sie nun entgegen allen Warnungen doch Ihre Master-Diskette gegen Schreibzugriffe gesichert haben, verraten wir Ihnen ausnahmsweise, wie Sie den Eingriff trotzdem rückgängig machen können. Dazu überlisten wir das DOS des 1541-Laufwerkes, indem wir ihm vorgaukeln, es hätte eine Diskette im Normalformat vor sich. Wir verwenden den Memory-Write-Befehl, mit dem wir in die Speicherstelle 0101 (Zero-Page Adresse) des 1541-RAM einfach ein »A« schreiben. Der CHR$-Code des »A« ist 65, oder in hexadezimaler Schreibweise 41. Erinnern Sie sich? Dieser Wert stand ursprünglich im dritten Byte des Tracks 18, Sektor 0. Mit folgendem kleinen Programm umgehen wir einfach die DOS-Kenn-zeichnung und wir können die Diskette wieder normal beschreiben. Am sinnvollsten ist es, sofort den SMON zu starten, das vorher in 45 abgeänderte Byte wieder in 41 zu verwandeln und abzuspeichern. Die Diskette kann dann wieder zum Lesen und Schreiben verwendet werden. Hier nun das kleine Programm:
+10 OPEN 1,8,15
+20 PRINT#1, ”M-W”CHR$(1)CHR$(1)CHR$(1)CHR$(65)
+30 CLOSE1
+
+## Ändern des Diskettennamens oder der ID
+
+Wir haben bereits oben gesehen, daß in Spur 18, Sektor 0 einer Diskette etwa in der Mitte der Diskettenname gespeichert wird. Dieser Name kann durch einfaches Überschreiben geändert werden; er darf bekanntlich bis zu 16 Zeichen enthalten. Hat Ihr neuer Name weniger Buchstaben als der alte, müssen Sie die Lücken mit »A0« und nicht mit »20« als Leerzeichen ausfüllen. Dies gilt vor allem, wenn Sie mit dieser Methode Filenamen ändern wollen. Das geht natürlich im Prinzip genauso wie eben beschrieben. Hinter dem Diskettennamen ist in Spur 18, Sektor 0 die ID abgelegt. Sie wird beim Formatieren vorje-den Sektor in einen sogenannten Header geschrieben und dient dem DOS zur Identifikation der Diskette. Zusätzlich wird sie noch in der BAM gespeichert, damit sie beim Laden eines Directory mit angezeigt werden kann. Nun ist es grundsätzlich nicht möglich, die ID im Header eines Sektors ohne Formatieren zu ändern, wohl aber die Eintragung in der BAM und damit die ID, die im Directory angezeigt wird. Genau wie beim Namen ist dies durch einfaches Überschreiben in der BAM möglich.
+
+## Ändern eines Filetyps
+
+Wenn Sie einmal versucht haben, ein sequentielles File, etwa eine Datei, mit LOAD zu laden, werden Sie gemerkt haben, daß dies nicht möglich ist. Das DOS behauptet einfach, ein solches File existiere nicht und der Rechner meldet »FILE NOT FOUND«. Viele Spiele zum Beispiel legen die »Hall of Fame« oder Highscore-Liste als sequentielle Datei ab. Mit dem Disk-Monitor ist es nun aber möglich, den Filetyp im Directory zu verändern. Erinnern Sie sich an die »82«, die im Directory vor jedem Filenamen steht. Bei sequentiellen Files steht dort »81«. Was zu tun ist, werden Sie sich denken können. Na klar, die »81« wird in »82« geändert, und schon ist die Datei ohne weiteres ladbar, natürlich wieder erst nach dem Zurückschreiben mit »W«.
+
+Sinnvoll ist dies natürlich nur von SMON aus (mit Eingabe einer Ladeadresse). Mit »M« oder »K« können Sie dann die Datei ansehen und natürlich auch ändern. Vergessen Sie nicht, die geänderte Datei nach dem Zurückschreiben wieder in ein sequentielles File zu verwandeln. Verblüffen Sie Ihre Freunde doch mal mit einem auf diese Weise »errungenen« Highscore. Die Anerkennung Ihrer Umwelt ist Ihnen sicher.
+
+## Ändern der Startadresse eines Programms
+
+Wir haben uns bisher auf Manipulationen in der BAM oder im Directory beschränkt. Wollen wir in einem Programm selbst Änderungen vornehmen, müssen wir etwas tiefer in die »Geheimnisse der Floppy« eindringen. So ist es bisweilen interessant, die Startadresse eines Maschinenprogramms zu kennen oder zu ändern. Dazu gehen wir folgendermaßen vor: Zunächst suchen wir mit »R 12 01« und eventuell weiteren Folgesektoren (12 04,12 07...) den Fileeintrag im Directory. Die beiden Bytes hinter der »82« direkt vor dem Programmnamen geben an, in welcher Spur und in welchem Sektor das Programm startet. Wenn dort zum Beispiel »0A 04« steht, beginnt das Programm in Spur 10, Sektor 4. Lesen Sie nun diesen Block mit »R 0A 04« ein. Die ersten beiden Bytes dieses Blocks zeigen auf den nächsten Block des Programms, die beiden nächsten Bytes enthalten die Startadresse in der üblichen Low-Highbyte-Reihenfolge. Zum Ändern der Startadresse überschreiben Sie die Bytes mit der neuen und speichern den Block mit »W« auf die Diskette zurück.
+
+## Die Zusammenarbeit mit SMON
+
+Mit all diesen Beispielen sind die Möglichkeiten des Disk-Monitors noch lange nicht erschöpft. Sie sollten Ihnen als Anregung für eigene Experimente dienen. Üben Sie aber unbedingt so lange, bis sie alle Kommandos aus dem »FF« (oder dezimal 255) beherrschen. Sie ersparen sich damit unnötigen Ärger und durchweinte Nächte. Besonders interessant ist es, von SMON aus auf den Puffer zuzugreifen und die SMON-Befehle auf den Puffer anzuwenden. Erwähnen möchte ich nur die Möglichkeit, Programme für das DOS direkt zu assem-blieren und in einem bestimmten Sektor ablegen zu können, die Find-Routinen oder das »K«-Kommando für Textänderungen. Da der Puffer im RAM unter dem Basic liegt, muß Basic in solchen Fällen abgeschaltet werden. Ändern Sie dazu mit dem »M«-Befehl in Speicherstelle 0001 die »37« in »36«.
+
+Haben Sie die Arbeit mit SMON beendet, können Sie mit »Z« in den Disk-Monitor schalten und den Pufferbereich mit »W« (Spur, Sektor) abspeichern.
+
+## Die Ausgabe von Diskettenfehlern
+
+Beim Arbeiten mit dem Disk-Monitor werden sämtliche Fehler vom Laufwerk direkt, auch ohne Eingabe von »@«, ausgegeben, zum Beispiel »ILLEGAL TRACK OR SECTOR«, wenn Sie mit »R« einen Block lesen wollen, den es gar nicht gibt. Einen Fehler hat das Programm allerdings, den wir nicht verschweigen wollen. Der letzte Block eines Files enthält als Koppeladresse »00 FF«. Da es einen solchen Block nicht geben kann, »weiß« das DOS, daß es am Ende angelangt ist. Versuchen Sie aber, den nächsten Block (Spur 0, Sektor 255!!) mit »R« zu lesen, erscheint als Fehlermeldung nicht, wie es sein müßte, »ILLEGAL BLOCK OR SECTOR«, sondern »SYNTAX ERROR«. Das ist zwar eigentlich unerheblich, sollte aber erwähnt werden. Der Fehler liegt in der Routine, die unsere Zahleneingaben in das richtige Diskettenformat wandelt. Es fehlte einfach der Platz im Programm für eine »korrekte« Umwandlung, wir mußten uns mit einer »Sparroutine« behelfen.
+
+Abschließend noch ein SMON-Trick, den wir einem aufmerksamen Leser verdanken. Für eine Directory-Ausgabe fehlte der Platz im SMON. Es geht aber hilfsweise so: Laden Sie das Directory zum Beispiel mit
+**L ”$” 8000**
+an einen freien Speicherplatz. Mit »M« oder »K« können Sie jetzt das Directory »lesen«. Damit sind alle wichtigen Funktionen für den Umgang mit der Diskette im SMON enthalten.
+
+## Hinweise zum Abtippen
+
+Mit dem neuen »MSE« dürften nun wirklich keine Fehler beim Abtippen mehr auftreten — nur noch ein letztes Mal, nämlich beim Abtippen von »MSE«. Starten Sie dann MSE und geben Sie als Start- und Endadresse die beiden Zahlen im Kopf des SMON-Listings an, also $CE09 als Start und $CFFA als Ende. Nach Beendigung der Tipperei speichern Sie den fertigen Programmteil auf Diskette oder Kassette ab. Nun müssen wir noch den neuen Teil in SMON »einbinden«. Dazu laden Sie Ihren alten »SMON $C000« und starten ihn. Noch ein Tip an dieser Stelle: Wenn Sie SMON mit »X« verlassen, um ins Basic zurückzuspringen, wird in aller Regel bereits Ihre erste Eingabe von Basic aus mit einem
+**»OUT OF MEMORY ERROR«**
+quittiert.
+
+Beim Laden von SMON setzt das Betriebssystem nämlich die Zeiger für das Basic-Programmende auf das SMON-Ende, also irgendwo in den $C...-Bereich.
+
+Damit ist aber jede weitere Eingabe von Basic-Zeilen unmöglich und führt zu dem oben angegebenen Fehler. Das ist nebenbei auch der Grund, wenn der SMON-Befehl »B« zum Erzeugen von DATA-Zeilen einmal nicht funktionieren will. Abhilfe schafft ein simples »NEW« unmittelbar nach dem Laden von SMON. SMON selbst bleibt dabei unbeeinträchtigt, denn er liegt ja nicht im Basic-Bereich. SMON ist also jetzt ordnungsgemäß geladen und kann mit »SYS 49152« wie gewohnt gestartet werden. Laden Sie nun den neuen Teil mit
+**L ”SMON TEIL 5”**
+ohne Eingabe einer weiteren Adresse. Damit steht er automatisch an der richtigen Stelle. Jetzt müssen wir SMON noch klarmachen, daß er über den neuen Befehl »Z« zum Aufruf unseres Disk-Monitors verfügt. Geben Sie dazu
+**M C020**
+ein, brechen Sie mit STOP ab und ändern Sie die »00« nach »58« (Speicherstelle $C026) in »5A«. Das ist der ASCII-Wert für »Z«. Zum Einbinden der Startadresse des Disk-Monitors geben Sie
+**M C060**
+ein, unterbrechen mitSTOP und ändern die ersten beiden Nullen (Speicherstelle $C061/$C062) in »08 CE«. Die Startadresse ist $CE09, SMON braucht aber bekanntlich die um 1 erniedrigte Adresse in der Form Lowbyte-Highbyte.
+
+Der Disk-Monitor ist damit integriert und der nunmehr komplette SMON kann mit
+**S ”SMON $C000” C000 CFFA**
+abgespeichert werden.
+
+## Noch einmal: SMON verschieben
+
+Sicher haben Sie nach der Beschreibung im letzten Heft SMON-Versionen für andere Speicherbereiche hergestellt und auch zum Laufen gebracht. Durch den neuen Teil ergeben sich für die Verschiebung einige Veränderungen. Daher beschreiben wir noch einmal, wie sich ein »SMON $9000« herstellen läßt.
+
+1. Wir beginnen mit<br>W C000 CFFA 9000<br>da SMON jetzt ja etwas länger geworden ist.
+2. Nun folgt die Umrechnung der absoluten Adressen:<br>V C000 CFFA 9000 920B 9FD2
+3. Die Änderung der Einsprungadressen bleibt so wie beschrieben, nur ist jetzt eine Adresse (für »Z«) hinzugekommen.
+4. Bei den Befehlen mit unmittelbarer Adressierung (zum Beispiel LDA #CC) hat sich gar nichts geändert.
+5. Neu hinzugekommen ist aber eine Sprungtabelle für den Disk-Monitor. Ähnlich wie in Punkt 3 beschrieben, müssen Sie sechs Adressen ändern. Geben Sie dazu<br>M CFD8 CFE4<br>ein und überschreiben Sie in jedem 2. Byte das »C« mit »9«.
+
+Das war’s. Wir glauben, wir haben am Anfang dieser Serie nicht zu viel versprochen: Wenn Sie alle fünf Folgen durchgearbeitet haben, liegt Ihnen mit SMON jetzt ein Maschinenmonitor mit wirklich außergewöhnlichen Leistungsmerkmalen vor, der wohl jedem Vergleich standhält
+
+Viele Leser haben SMON zum Einstieg in die Maschinensprache genutzt, und das war auch unser Ziel. Natürlich werden Sie, vor allem wenn Sie noch Anfänger sind, nicht sofort alle Möglichkeiten von SMON ausnutzen können; eine Weile werden Sie mit Disassembler und Memory-Dump vollauf beschäftigt sein. Aber je tiefer Sie mit SMON in die Maschinensprache eindringen, desto mehr werden Sie seine Fähigkeiten zu schätzen wissen.
+
+Wir werden in einer der nächsten Ausgaben der 64’er noch einmal auf Fragen aus dem Leserkreis, die sich bei der Arbeit mit SMON ergeben haben, eingehen. Vielleicht haben Sie auch noch Verbesserungsvorschläge oder Tricks im Umgang mit SMON entdeckt. Haben Sie aber bitte Verständnis, wenn wirnichtaufjedeZuschriftantworten können. Wirhaben inzwischen schon mehrere hundert (!) schriftliche oder telefonische Anfragen bekommen, und auch für uns ist die Computerei nur ein Hobby, nicht mehr und nicht weniger.
+
+(N. Mann/D. Weineck/gk)
+
+# Schachmeister erweitert
+
+> »Schach-Profis« werden bei dem Listing »Schachmeister« wohl schon festgestellt haben, daß noch nicht alle Regeln des königlichen Spiels berücksichtigt waren. Dies ändert sich nun.
+
+Als Schachspieler (ich habe bereits über 100 Meisterschaftspartien gespielt) fand ich die Anwendung des Monats »Schachmeister«aus 11/84geradezu ideal fürdieLeute, dieih-re Partien statistisch aufführen. Ich selbst habe mich gleich daranbegeben, meine Partien abzuspeichern. Leider stellten sich gleich mehrere Unvollkommenheiten des Programms heraus, die für einen ernstzunehmenden Schachspieler unentbehrlich sind. Als erstes die Sache mit dem Remis! Ein Remis kann durch mehrere Möglichkeiten entstehen:
+
+1.	durch Übereinkunft der Spieler
+2.	durch ein Patt (wenn ein Spieler nur noch die Möglichkeit hat, den König zu ziehen, dieser aber dann immer im Schach stehen würde),
+3.	wenn eine Stellung dreimal vorkommt,
+4.	wenn innerhalb von 50 Zügen kein Bauernzug gemacht wurde.
+
+Ich verweise hier für diese und für die noch kommenden Ergänzungen auf die internationalen Schachregeln. Zur Schreibweise im Programm:
+DATA E5E6R (=REMIS, steht für Übereinkunft der Spieler),
+DATAB6B7P (=PATT)
+DATA C4C5W (=dreimal wiederholte Stellung)
+DATA A1C1Z (=50-Züge-Regel)
+
+Nun zum Tauschen auf der Grundlinie. Es geht wirklich nicht an, nur den Dametausch zu berücksichtigen. Sicher kommt das am häufigsten vor, aber wer berühmte Partien eingeben will, der kommt mit Sicherheit mal an die Stelle, wo der Bauer zum Beispiel in einen Springer umgewandelt wird. Folgende Erläuterung zum Tausch auf der Grundlinie:
+DATA A7A8T (= Bauer in einen Turm)
+DATA B7B8H (= Bauer in einen Springer (Horse))
+DATA C7C8L (= Bauer in einen Läufer)
+
+## »En-passant«-Regel berücksichtigt
+
+Sehr wichtig ist auch die sogenannte »en-passant«-Regel. Jch habe schon oft die Erfahrung gemacht, daß viele Neu-Schachspieler, manchmal sogar auch welche, die schon zwei bis vier Jahre Schach spielen, diese Regel nicht kennen. Sie waren regelrecht erstaunt, wenn ich diesen Zug angewandt habe und wollten mir nicht glauben, daß jene Regel wirklich existiert. Diese Regel ist keine besondere Definition für Meisterschaftskämpfe, sondern sie ist eine Grundregel wie jeder andere Zug auch. Ich will hier deshalb das »en-passant«-Schlagen noch einmal erklären: Diese besondere Form des Schlagens kanri Verwendung finden, wenn ein Bauer aus der Ausgangsstellung in der zweiten Reihe zwei Felder vorwärts neben einen gegnerischen Bauern zieht. Dieser gegnerische Bauer kann nun den anderen Bauern so schlagen, als ob dieser nur ein Feld vorwärts gegangen wäre. Wenn der umgangene Bauer nicht sofort en-passant schlagen will, kann er es später nicht mehr tun.
+
+En-passant bedeutet zu deutsch: Schlagen im Vorbeigehen. In der einzugebenden Partie wird dieser Zug mit einem »V« gekennzeichnet. Beispiel: DATA G4H3V
+
+Das Programm muß, um die erläuterten Erweiterungen zu besitzen, durch die im Listing angegebenen Zeilen ergänzt beziehungsweise ersetzt werden.
+
+(Heiko Becke/rg)
+
+# Funktionen im Netz
+
+> 3-D-Funktionsdiagramme sehen nicht nur gut aus, sie liefern auch viele Informationen über mathematische Funktionen.
+
+Mit diesem Programm können Sie Kurven als 3-D-Netzgrafi-ken zeichnen lassen, in Abhängigkeitvon zwei Variablen X und Y. Die Geschwindigkeit, mit der das Maschinenprogramm die notwendigen Bildpunkte berechnet und auf den Bildschirm bringt, läßt die »Kurvendiskussion« zu einem Vergnügen werden. Vor dieses haben die Götter aber bekanntlich die Arbeit gesetzt: Zuerst ist nämlich der umfangreiche Lader mit dem MSE abzutippen. Das Maschinenprogramm selbst ist etwa 2 KByte lang und belegt den Bereich von $C000-$C77F. Es verträgt sich deshalb nicht mit Erweiterungen wie DOS 5.1 und Simons Basic. Für den Aufbau der Grafik wird der gesamte RAM-Bereich von $COOO-$FFFF gebraucht Der gesamte Basic-Speicher mit 38 KByte bleibt also erhalten. Braucht man zusätzlich eigene Grafikroutinen, wie Hardcopy und Beschriftung, müssen diese in den Basic-Speicher gelegt und das Ende des Basic-RAMs herabgesetzt werden. Das Basic-Ende wird durch den lnhaltderSpeicherzellen 55 (Low-Byte) und 56 (High-Byte der Endadresse) festgelegt.
+
+Die Funktionen des Zeichenprogrammes werden durch SYS-Befehle in Bild 1 gestartet.
+
+TODO BILD1
+NEU=49152 EIN=49241
+AUS=49252 GSV=49271
+GLD=49333 ROT=50316
+XY=50672
+Adressen der Befehle
+SYS NEU, Farbe — löscht Hires-Grafik, setzt Farbe, initiali-siertTabellen. Farbe = 16xPunktfarbe + Hintergrundfarbe SYS EIN — schaltet Grafikmodus ein
+SYS AUS — schaltet Grafikmodus aus
+SYS GSV, »Name«, 8 oder 1 — speichert Grafik ab. Da die Grafik unter dem Betriebssystem liegt (ab $E000), wird sie erst nach $A000 kopiert und von dort aus abgespeichert. SYS GLD, »Name«, 8 oder 1 — lädt Grafik mit beliebiger Startadresse
+Bild 1. Einsprung-Adressen und deren Funktionen
+
+Sehr elegant wurde die Übergabe von Parametern, wie Definitionsgrenzen und Linienanzahl, an das Maschinenprogramm gelöst. Die einzelnen 3-D-Routinen holen sich die jeweils benötigten Werte aus bestimmten Variablen und der Kurvenfunktion, die Sie im Basic-Programm definieren müssen, bevor Sie mit SYS ROT oder SYS XY die Berechungs- und Zeichenroutine aufrufen. Auf welche Art das Programm eine Funktionsgrafik zeichnet, wird nun gezeigt.
+
+## Einfachste Parameterübergabe
+
+Stellen Sie sich einen großen, leeren Raum vor. Auf dem Fußboden sei ein Raster von sagen wir 10x10 Linien gezeichnet. Auf jeden Kreuzungspunkt wird ein Stab mit einer bestimmten Länge gestellt. Die Stablänge entspricht dabei der Höhe eines Funktionswertes an dieser Stelle. Sind alle Stäbe aufgestellt, verbindet man die oberen Enden der Stäbe ebenso wie die unteren und erhält wieder ein Netz. Dieses Netz kann im Gegensatz zum unteren geschwungen sein und stellt die erwünschte dreidimensionale Funktionsgrafik dar. Das Problem der 3-D-Grafik besteht eigentlich aus zwei:
+1. Das Berechnen der Funktionswerte (Stablängen)
+2. Das Zeichnen des oberen Netzes, wobei Linien die »hinter einem Berg« liegen, nicht gezeichnet werden sollen.
+
+### Berechnung der Funktionswerte
+
+Nach dem Aufruf mit ROT oder XY berechnet das Programm die benötigten Funktionswerte. Sie müssen dem Programm nur sagen, welche Funktion es berechnen soll. Dazu definieren Sie in einem Basic-Programm einfach die gewünschte Funktion mit DEF FNR(EGAL) und geben einige Parameter an. Das 3-D-Programm holt sich dann selbsttätig die Informationen aus den angelegten Variablen. Das Zeichenprogramm kann, wie bereits erwähnt, auf zwei Arten aufgerufen werden. Mit SYS XY werden X und Y variiert und der dazugehörige Z-Wert (Stablänge) berechnet. Der Vektor vom Ursprung zu einem Kreuzungspunkt auf dem ein Stab steht wird mit dem Satz von Phythagoras berechnet: r2 = x2 + y2. SYS ROT variiert nur X und kann deshalb nur für Funktionen mit einer Variable verwendet werden. In der obigen Gleichung ist Y=X, was bedeutet, daß das Programm in Y-Richtung die gleichen Werte wie in X-Richtung durchläuft um einen 3-D-Effekt zu bekommen. Dies führt zu einer rotationssymmetrischen Figur. Es reicht deshalb aus, nur ein achtel der Figur zu berechnen und dieses dreimal zu spiegeln. Andere Variablen als X werden als Konstanten betrachtet. Die ROT-Routine benötigt neben der Funktion noch die Parameter in Bild 2 und einige Angaben zur Lage der Grafik am Bildschirm. Wenn Sie die beiden Demo-Programme (SYS ROT und SYS XY) abtippen und dort Ihre Funktionen einsetzen, brauchen Sie sich um die folgenden Parameter nicht zu kümmern: Sie werden in diesen Programmen entsprechend Ihren Angaben berechnet.
+
+TODO BILD2
+NN% = Anzahl der Netzlinien in X-und Y-Richtung KK% = NN%/2+0,5; halbe Linienanzahl. Mit 0,5 wird gerundet.
+DD = Faktor für Funktionswert
+PP = Faktor für Argument
+Bild 2. Parameter für SYS ROT
+
+Mit NN% sagen Sie der Routine, aus wievielen Linien das Netz bestehen soll, sowohl in X- und Y-Richtung. KK% teilt der Routine mit, wieviel Linien das in jede Richtung sind; gerechnet von der Mitte des Bildschirms.
+
+DD ist der Maßstab in dem gezeichnet wird. DD gibt an, wie-viele Bildpunkte ein Funktionswert von 1 »hoch sein« soll. DD=80 heißt, daß ein Funktionswert von 1 auf dem Bildschirm eine Höhe von 80 Punkten (Pixels) hat.
+
+PP ist der Faktor für den positiven Grenzwert der Funktion. Es gilt: PPxKK%=X<sub>max</sub>. Dabei ist zu beachten, daß nach Phythagoras das Argument in den Ecken um Wurzel 2 größer ist als in X-Richtung (Diagonale eines Quadrates).
+
+Bei SYS XY werden X und Y variiert. In der Funktionsdefinition DEF FNR(EGAL)=SIN(X)*A*COS(Y) werden X und Y verändert; A bleibt während aller Berechnungen konstant und hat den zuletzt zugewiesenen Wert. Die formale Variable EGAL kann nach Lust und Laune benannt werden.
+
+TODO BILD3
+FF — Abstand zwischen zwei X-Linien LL — Abstand zwischen zwei Y-Linien X — Startwert von X (Xmjn)
+YY — Startwert von Y (Ymin)
+Bild 3. Parameter für SYS XY
+
+Die XY-Routine benötigt anstelle des Funktionsarguments PP einige Angaben (Bild 3).
+
+In der Netzgrafik werden nur sichtbare Linien gezeichnet. Für Interessierte der Algorithmus dazu:
+
+## Der Zeichen-Algorithmus
+
+Die Grafik muß von vorne nach hinten gezeichnet werden. Zu jeder Bildschirmspalte muß die Y-Koordinate des höchsten und des tiefsten Punktes gemerkt werden. Soll nun ein Punkt gezeichnet werden, so wird überprüft, ob er zwischen diesen Grenzen liegt. Wenn ja, dann liegt er logischerweise »hinter« der Geraden, die die beiden Extrempunkte verbindet und ist nicht sichtbar. Liegt er nicht auf der Geraden, wird er gezeichnet und als neuer Extremwert gespeichert.
+
+### Parameter für SYS ROT und SYS XY
+
+Damit die Lage der Netzgrafik auf dem Bildschirm verändert werden kann, sind noch weitere Parameter nötig, die an das Maschinenprogramm übergeben werden müssen. Mit diesen Angaben kann der Aufsicht- und der Drehwinkel der Grafik festgelegt werden. Mit Änderung des Drehwinkels können Sie die Grafik in XY-Richtung um den Startpunkt P (Bild 4) drehen. Und zwar bis zu 45° im Uhrzeigersinn bis zu 90° im Gegenuhrzeigersinn. Der Aufsichtswinkel liegt im Bereich von 0-90 °. Bei 90 ° sehen Sie genau von oben auf das Netz.
+
+Die Lage des Ursprung-Punktes P0 bestimmen Sie durch Angabe von XX% und YY% (0,0 ist oben links am Bildschirm). Den Drehwinkel können Sie leider nicht direkt in Grad angeben, sondern nur in Form von vier dazu proportionalen Verschiebungsfaktoren, AA%, EE%, BB% und CC%, die vonein-anderabhängig sind. Bild 5 zeigt Ihnen die Wirkung dieser Faktoren AA% und EE% die für die Y-Verschiebung zuständig sind. In den beiden Demo-Listings sehen Sie, wie die Winkelangabe Grad in diesen Faktor umgerechnet werden.
+
+Eine Zusammenfassung der Parameter zeigt Bild 6.
+
+TODO BILD 6
+XX% — X-Koordinate des Ursprungs
+YY% — Y-Koordinate des Ursprungs
+AA%, EE% Verschiebungsfaktoren in Y-Richtung
+BB%, CC% Verschiebungsfaktoren in X-Richtung
+Bild 6. Parameter für die Lage der Grafik am Bildschirm. Die Demo-Programme berechnen alle Faktoren aus Ihren Angaben für Aufsichts-, Drehwinkel, Linienzahl und Variablengrenzen.
+
+### Allgemeines
+
+1.	Die Linienzahl der Netzgrafik ist auf 60 begrenzt, da die Koordinaten eines jeden Gitterpunktes in einer Tabelle abgespeichert werden. Bei mehr Linien kann die Tabelle solche Ausmaße erreichen, daß das Maschinenprogramm überschrieben wird. Abgesehen davon wird die Bildschirmdarstellung bei mehr als 30 Linien ziemlich unansehnlich. Zu spitze Extremwerte sollten durch eine Verkleinerung der Variable DD sowie durch Erhöhung der Linienzahl verringert werden.
+2.	Befindet sich in der Funktion FNR ein Schreibfehler, wird die 3-D-Routine beendet. Da der I/O-Bereich während der Arbeit des Maschinenprogramms abgeschaltet ist, kann keine Fehlermeldung ausgegeben werden. RUN-STOP/RESTORE ist nötig.
+3.	Sind die Berechnungen abgeschlossen, wird vor dem Zeichnen der Grafik der Grafikmodus eingeschaltet.
+
+Nun genug der langen Erklärung. Am Besten ist es immer noch, ein wenig mit den Demo-Programmen herumzuprobieren. Wichtige Parameter sind, neben denen die abgefragt werden, noch DD, die Längen LX und LY und die Mittelpunktskoordinaten MY und MX. Durch MY kann die gesamte Grafik am Bildschirm rauf und runter bewegt werden. Bild 7 wurde mit der SYS XY-Routine gezeichnet. Solche Funktionsgraphen können Sie mit dem Demoprogramm auch erzeugen. Probieren Sie einfach mal verschiedene Funktionen aus. Das Bild kann sich schon erheblich ändern, wenn Sie die Parametergrenzen einer Funktion wechseln.
+
+(Martin Rogge/hm)
+
+# Supergrafik III
+
+> Klein, aber oho! Dreidimensionale Grafiken sind auch mit der Grundversion des VC 20 möglich.
+
+Das vorliegende Programm ist eine Anwendung des im 64’er, Ausgabe 11/84, Seite 73 abgedruckten Programms »Supergrafik II« für hochauflösende Grafik (200 x 256 Punkte) auf dem VC 20. Es ermöglicht die Darstellung dreidimensionaler Funktionsgrafiken auf dem Bildschirm.
+
+Eine kurze Erläuterung der 3-D-Technik:
+Der Graph einer Funktion zweier Variablen in einem X-Y-Z-Dia-gramm ist in grafischer Darstellung ein gekrümmtes Flächenstück. Das Problem besteht nun darin, diese Fläche im Raum auf den zweidimensionalen Bildschirm abzubilden.
+
+Das Programm verwendet den 1. Oktanten eines rechtshändigen dreidimensionalen Koordinatensystems, dessen Y-Z-Ebene (Projektionsebene) parallel zum Bildschirm verläuft. Die Länge der Achsen beträgt zehn Einheiten.
+
+Vor dem eigentlichen Programmlauf werden in Zeile 1 die räumlichen Koordinaten des gedachten Auges A(XA;YA;ZA) und in Zeile 300 die gewünschte Funktion eingegeben. Eine Änderung des »Augpunktes« A führt zu einer anderen Perspektive. Die Projektion besteht nun darin, daß ein Punkt des Graphen, der nicht in der Y-Z-Ebene liegt, in diese vom Augpunkt A aus projiziert wird. Der VC 20 ermittelt die Koordinaten des projizierten Punktes und bringt diesen auf den Bildschirm (Bild 1).
+
+Die relevanten Punkte des Funktionsgraphen werden gewonnen durch Wahl eines Punktes (X,Y,0) auf einem 10 x 10 Gitternetz in der X-Y-Koordinatenebene und Berechnung der Z-Koordinate mit Hilfe der Funktionsgleichung. Dies ergibt die plastische Wirkung, vergleichbar mit dem Schatten eines Gitternetzes auf dem Funktionsgraphen (Bild 1).
+
+Einen recht reizvollen Eindruck (Bild 2) gewinnt man alternativ, wenn die Koordinaten X und Y zufällig per RND-Funktion ausgewählt werden. Dazu ist die Programmzeile 250 zu ersetzen durch:
+
+250 X = 10 * RND(1): Y = 10*RND(1):GOSUB 300:GOTO 250
+
+Die Programmzeilen 260 und 280 können dann gelöscht werden.
+
+Um Speicherplatz zu sparen, wurde auf Kommentare im Programm und Grundsätze zur übersichtlichen Programmmierung bewußt verzichtet.
+
+(Rudolf Dörr/ev)
+
+# Tips & Tricks gesucht
+
+Jeder Computer und jedes Programm hat seine speziellen Schwachstellen und Unzulänglichkeiten. Allerdings ist kaum ein Programmierer oder Anwender auf Dauer bereit, sich damit abzufinden. Wo auch sorgfältigste Lektüre von Handbüchern nicht weiterhilft, da wird so manche Stunde experimentiert, um eine Lösung zu finden (die oft in einer Basic-Zeile Platz hat).
+
+Wir suchen solche Tips und Tricks, um sie allen Lesern zugänglich zu machen. Schließlich ist es wenig sinnvoll, sich wochenlang mit Problemen herumzuschlagen, die andere bereits gelöst haben.
+
+Wenn Sie also interessante Tips für den Umgang mit Computer, Floppy, Drucker oder sonstiger Hardware haben, wenn Sie bei kommerzieller Software einige Kniffe kennen, die nicht in der Anleitung stehen, oder wenn Sie interessante Problemlösungen statt in vier Seiten Listing in ein oder zwei Basic-Zeilen untergebracht haben, dann sollten Sie uns auf jeden Fall einmal schreiben.
+
+Bitte geben Sie genau den Computertyp und die Gerätekonfiguration oder die Software an, und senden Sie Ihren Tip oder Trick an die
+Redaktion 64’er
+Markt&Technik Verlag Aktiengesellschaft
+Hans-Pinsel-Str. 2
+8013 Haar bei München
+
+# Neues vom Hypra-Load: Hypra-Perfekt
+
+>> Es ist uns schon fast zur lieben Gewohnheit geworden, Ihnen das Hypra-Load in ständig verbesserter Form vorzustellen. Wir hoffen, daß wir die neueste Version nicht zu Unrecht »Hypra-Perfekt« genannt haben.
+
+Hypra-Load ist zweifellos eines der interessantesten Programme, die jemals für den Commodore 64 verfügbar waren. Die zahlreichen Leserzuschriften und Telefonanrufe zu diesem Thema belegen die überwiegend positive Resonanz eines weiten Leserfeldes. Trotzdem muß zugegeben werden, daß auch ein gutes Programm noch verbessert werden kann. Mit Hypra-Perfekt haben wir nun eine Version entwickelt, die Ihnen hoffentlich ebenso gut gefällt wie uns.
+
+Da eine reine Diskettenversion zwar die einfachste, aber leider nicht die kompatibelste Lösung ist, haben wir die Form des Kernal-ROMs gewählt. Das heißt, das Betriebssystem des Computers wird durch Austausch des Kernal-Speicherbau-steins verändert. Als neuer Programmträger dient ein 2764-EPROM, dessen Inhalt mit dem nachfolgend abgedruckten Programm erzeugt wird. Wie das vonstatten geht, ist mit wenigen Worten erklärt. Das Betriebssystem (auch Kernal genannt) des Commodore 64 befindet sich im Speicherbereich von 57344 ($E000) bis 65535 ($FFFF). Es hat damit genau die Länge von 8 KByte. Das gesamte Kernal (Assemblerlisting) abzudrucken würde natürlich den Rahmen des Heftes sprengen. Ein kompletter Abdruck ist auch gar nicht notwendig, denn es werden ja nur bestimmte Teile des Betriebssystems verändert.
+
+Das abgedruckte Programm kopiert dazu zunächst in den Speicherbereich 24576 ($6000) bis 49151 ($7FFF). Wer einen anderen Speicherbereich verwenden möchte, muß die Leseschleife in Zeile 30 und den Offset (OF) in Zeile 15 verändern. Soll das Kernal beispielsweise im Speicherbereich ab $5000 stehen, lautet die Zeile 30:
+30 FOR I = 5*4096 T07*4096-1 POKE I, PEEK(I+OF): NEXTI
+
+Der Offset beträgt in diesem Fall 36864. Nach dem Kopieren befindet sich im Speicher ein genaues Abbild des Kernal-ROMs. Der nächste Schritt, der automatisch vom Programm ausgeführt wird, ist das Verändern der einzelnen Speicherstellen. Der gesamte Vorgang läuft automatisch ab, bis unser neues Kernal im Speicher steht. Am besten ist es, den Speicherbereich von $6000 bis $8000 nun mit einem Monitor abzuspeichern. Wer im Besitz eines EPROM-Programmiergerätes ist, sollte nicht lange warten und das neue Kernal auf ein 2764-EPROM brennen.
+
+Bis hierhin war eigentlich alles relativ einfach, jetzt aber kommt die schwierigste Hürde auf dem Weg zum neuen Betriebssystem. Ein Adaptersockel muß eingebaut werden, denn leider sind die Pin-Belegungen des Original-ICs und die des 2764 nicht identisch. Solche Sockel kann man entweder kaufen (beispielsweise Roßmöller MR 2764) oder aber selbst bauen. Bild 1 zeigt, welche Pins des 24poligen Sockels mit denen des 28poligen verbunden werden. Das Ganze sieht nach der Fertigstellung wie ein kleiner Doppeldeckerbus mit überhängendem Dach aus. Im oberen Stockwerk dieses »Busses« nimmt nun der 2764 mit unserem neuen Betriebssystem Platz. Die 24 Pins des unteren Fahrwerks finden im (hoffentlich gesockelten) U4-Steckplatz des Computers ihre Heimat. Das überhängende Dach zeigt, zusammen mit der EPROM-Kerbe, in Richtung des User-Ports.
+
+Sollte sich (was sehr erfreulich wäre) der Computer mit geändertem Farbbild, aber sonst gewohnter Anzeige melden, haben Sie es geschafft. Ihnen steht nun eine recht leistungsfähige Variante des Hypra-Load zur Verfügung. Drucker, Plotter und weitere Laufwerke können jetzt beim Laden eingeschaltet bleiben. Die Funktionstasten sind belegt (Bild 2) und eine etwa sechsfache Ladegeschwindigkeit wird erreicht. Der Directory zerstört ein im Speicher befindliches Programm nicht mehr. Um die Kompatibilität zu fertigen Softwareprodukten so hoch wie möglich zu machen, wurde eine Umschaltautomatik mitprogrammiert. Sie schaltet auf langsame Ladegeschwindigkeit um, wenn ein schnelles Laden nicht möglich ist. Sollte dennoch einmal ein Programm nicht funktionieren, ist noch lange nichtallerTage Abend. Die Speicherzelle 2, die zum Steuerregister umprogrammiert worden ist, schaltet die einzelnen Funktionen des Hypra-ROMs aus und an. Je nachdem, welcher Wert hier hineingeschrieben wird, schaltet sich eine Funktion nach der anderen aus. Im einzelnen bewirken:
+
+POKE 2,32 = Funktionstasten abschalten
+POKE 2,64 = Directory wird normal geladen (mit Programmverlust)
+POKE 2,128 = Abschalten des Fast-Load-Modus
+POKE 2,0 = Zurücksetzen in den Einschaltzustand
+TODO
+
+Natürlich sind auch Kombinationen möglich, beispielsweise:
+**POKE 2,32 + 64.**
+
+Alles in allem müßte das neue Hypra-ROM mit beinahe 99 Prozent aller erhältlichen Programme funktionieren. Was nicht geht, ist der Betrieb eines Datenrecorders; es sei denn, das neue Kernal wird auf einer Umschaltplatine in den Computer gesteckt. Solche Platinen werden von verschiedenen Herstellern angeboten und bieten Platz für zwei oder mehr Betriebssysteme, die über einen Drehschalter anwählbar sind. Prinzi-piellgenügtesaber, bei Bedarf auf das Original-Kernal zurückzugreifen. Übrigens: Wer sich sein Kernal in einer individuellen Farbkombination brennen möchte, braucht lediglich die Farbwerte in Zeile 50 bis 70 zu ändern. Und nun viel Freude mit »Hypra-Perfekt«.
+
+(Arnd Wängler/Ernst Schöberl/gk)
+
+# Print-List
+
+> Ein kurzes Programm, das nicht nur formatierte Listings mit Seitenzahlangabe und Überspringen der Perforation bei Endlospapier druckt. Es erklärt auch, was »programmierter Direktmodus« ist.
+
+Seit kurzem bin ich stolzer Besitzer eines MPS 801. Eine der ersten Anwendungen war das Drucken von Listings, was einerseits die Fehlersuche in Programmen enorm erleichtert und andererseits eine perfekte Datensicherung darstellt. Doch schon beiListings, die länger als eine Druckseite waren, begann der Ärger: Die Perforation wurde bedruckt oder der Ausdruck war eine endlose Papierschlange, die ich nicht trennen durfte; nach einigen Tagen hätte ich nicht mehr gewußt, welche Seite zu welchem Listing gehört.
+
+Schließlich habe ich ein Unterprogramm geschrieben, das meiner Meinung nach recht brauchbar ist, um die angeschnittenen Probleme ein für allemal zu beseitigen. Die Routine wird dem zu listenden Basic-Programm angehängt und mit RUN 63974 gestartet. Das Anhängen des Unterprogramms geschieht am besten mit einer MERGE-Routine wie im 64’er, Ausgabe 4/84. Beachten Sie dabei bitte, daß die letzte Zeilennummer in Ihrem Programm nicht größer als 63973 sein darf.
+
+Nach dem Start des Unterprogramms können Sie eine Überschrift eingeben, die dann mit einer Seitenangabe aufjeder Listingseite erscheint. Zusätzlich wird die Perforation des Endlospapiers übersprungen, indem nach jeweils 60 Zeilen ein Seitenvorschub ausgelöst wird. Gelistet wird nur bis zur Zeilennummer 63973, damit die Routine selbst nicht im Listing erscheint.
+
+## Direktmodus im Programm
+
+Im wesentlichen besteht Print-List darin, daß zunächst die Nummer der ersten Basic-Zeile und dann der Linkpointer (64’er, 2/85) der nächsten Zeile ermittelt wird. Dies geschieht insgesamt 60mal. Danach steht die Zeilennummer der 60. Zeile fest und es können mittels des CMD- und LIST-Befehls die ermittelten 60 Zeilen ausgedruckt werden. Dazu werden die Befehle CMD und LI8T von, bis in die erste Bildschirmzeile gedruckt und die ASC-Werte der Befehle »Cursor home«, »Return«, GOTO 63995 und »Return« in den Tastaturpuffer gePO-KEt (Zeile 63993). Da nach der PRINT-Anweisung zum Druck von CMD und LIST ein END steht (Zeile 63994), gibt der Computer sein READY und wartet auf eine Eingabe im Direktmodus. Erschautdazu ständig in Speicherzelle 198 nach, wieviel Tasten gedrückt und noch nicht bearbeitet wurden. In diesem Fall sind es zehn. Die ASC-Codes der Tasten selbst werden im Speicher bei den Adressen 631 bis 640 gepuffert, das heißt zwischengespeichert bis der Computer sie verarbeiten kann. Ist der Puffer voll — in 198 steht 10 — registriert der Computer einfach keinen Tastendruck mehr. Holt der C 64 Daten aus dem Tastaturpuffer, erniedrigt er den Pufferzeiger in Speicherzelle 198.
+
+Das Programm Print-List sorgt nun dafür, daß der C 64 nach dem END die Anweisungen »Cursor Home« (ASC=19) und Wagenrücklauf (Carriage Return, ASC = 13) findet, was bewirkt, daß die Befehle in der ersten Zeile ausgeführt werden. Sind CMD und LIST abgearbeitet, werden die Kommandos im Tastaturpuffer bis zum nächsten Wagenrücklauf (13) ausgeführt. Die ASC-Werte, die der Computerjetzt findet, sind 71 und 207, die Abkürzung des GOTO-Befehls, gefolgt von den Werten der einzelnen Ziffern der Zeilennummer 63995 und einem Carriage Return (13). Das Unterprogramm wird dadurch wieder mit GOTO 63995 aufgerufen. Solange, bis die ermittelte Zeilennummer größer als 63973 ist.
+
+Mit etwas Probieren können Sie auf ähnliche Weise Basic-Programme nachladen, ohne daß Sie auf verschiedene Zeiger acht geben müssen. Sie müssen dazu nur LOAD »na-me«, 8 in die erste Bildschirmzeile schreiben und mit CHR$(19) den Cursor in die »Home«-Position zu bringen. Findet der Computer dann nach einer END-Anweisung ein Carriage Return im Tastaturpuffer, wird das gewünschte Programm geladen. Wiederholen Sie das Spiel mit RUN, so startet das Programm noch »von selbst«.
+
+(Peter Zuser/hm)
+
+# Befehlserweiterung für den C 64
+
+> Neue BasioAnweisungen zur Bildschirmsteuerung und für maskierte Dateneingaben: TAB (X,Y) I CHR$ (!) / INPUT (!), ” ....
+
+Die vorgestellten Zusatzbefehle wurden ursprünglich zur Unterstützung eines kleineren Dateiprogramms entwickelt. Natürlich sind — besonders für die Bildschirmsteuerungen — andere Einsatzmöglichkeiten denkbar. Im Handbuch des C 64 finden Sie im Anhang F eine Tabelle der ASCII- und CHR$-Codes. Da einige Zeichen nicht belegt sind, bietet es sich an, diesen die neuen Steueranweisungen zuzuordnen.
+
+Tabelle 1 zeigt die neuen CHR$-Codes.
+
+Sicherlich haben Sie schon einmal die Erfahrung gemacht, daß Freunde bei selbstgeschriebenen Programmen erstaunlich schnell die STOP-Taste finden. Die »Treffsicherheit« steigt dabei mit zunehmender Unkenntnis über Computer. Mit den letzten vier—in der Tabelle aufgeführten — CHR$-Codes können die STOP-Taste und die STOP-RESTORE-Funktion ein- und ausgeschaltet werden.
+
+Aber Vorsicht: Das folgende Beispielprogramm kann nach RUN nicht wieder unterbrochen werden.
+10 PRINT CHR$(12);CHR$(16)
+20 GOTO 20
+
+Nur durch RESET oder ROSOF (Reset On Switch On ofF) kann der Computer zurückgeholt werden; das Programm ist jedoch in beiden Fällen verloren.
+
+Nebenbei beziehen sich die neuen CHR$-Codes nur auf den Bildschirm. Da viele Drucker nicht in der Lage sind, einen einmal ausgedruckten Text beispielsweise nach links zu verschieben, werden die neu belegten CHR$-Codes unverändert an die Schnittstelle weitergegeben.
+
+Die nächste Erweiterung betrifft den TAB-Befehl. Folgt zwischen den Klammern nur eine Angabe, so wird die Befehlsführung weiterhin dem Commodore-Basic überlassen. Falls der Klammerausdruck zwei Koordinaten (erst X, dann Y) enthält, wird TAB durch das Maschinenprogramm ausgeführt. Der Cursor wird in diesem Fall auf die Bildschirmkoordinaten X, Y gesetzt. Der Befehl »PRINT TAB (0,0);”TEST”« schreibt beispielsweise »TEST« an den oberen linken Bildschirmrand.
+
+Als weitere Neuerung kann der INPUT-Befehl nun durch Angabe einer Feldbreite »maskiert« werden. Das funktioniert folgendermaßen: Der maskierte INPUT-Befehl wird durch eine Längenangabe — in Klammern — gekennzeichnet. Falls beispielsweise eine Eingabe auf zehn Zeichen begrenzt werden soll, muß die Anweisung wie folgt lauten: »10 INPUT (10),”EINGABE”; E$«.
+
+Die Feldgrenzen können anschließend nicht mehr überschritten werden. Außerdem unterdrückt das Programm die Eingaben HOME, CLR HOME, CURSOR UP/DOWN sowie das Anführungszeichen. Die Tasten DELete und INST verändern nur die Maske; also in dem Beispiel die ersten zehn Positionen hinter dem Text »EINGABE«.
+
+## Bildschirmmasken ohne Probleme
+
+Zusätzlich kann in dem Feld eine Maske unterlegt werden. Hierzu das folgende Testprogramm:
+10 PRINT ”12345678......TEST";CHR$(7);
+20 INPUT (10), "EINGABE”; D$
+30 D$ = LEFT$(D$,10) : PRINT D$
+
+Der PRINT-Befehl schreibt zuerst die Zahlen 1-8, dann zehn Punkte (als Maske) und zuletzt das Wort »TEST«. Durch CHR$(7) folgt anschließend ein RETURN auf der Bildschirm-Zeile. Der Text »EINGABE« des INPUT-Befehls überschreibt dann die Zahlen 1 bis 8 und das Ergebnis sieht wie folgt aus: EINGABE?.........TEST
+
+Falls Sie nun einige Zeichen eingeben und anschließend mit der DEL-Taste löschen, werden am Maskenende neue Punkte »nachgeschoben«. Das Wörtchen >TEST< bleibt jedoch unverändert, da sich die Eingaben DEL und INST nur auf die Eingabemaske beziehen. Nach RETURN wird die Maske (mit SPA-CEs) gelöscht. In der Zeile 30 muß der String zuletzt auf die Maskenlänge begrenzt werden, da das Wort »TEST« ebenfalls in die Variable übernommen wurde.
+
+Nachdem Sie jetzt wissen was das Programm macht, brauchen Sie »nur« noch das Basic-Ladeprogramm einzugeben. Die Daten sind als Hexadezimalwerte aufgeführt. Bei dem letzten Wert handelt es sich um die Prüfsumme der entsprechenden Zeile. Nach »RUN« meldet das Programm beispielsweise »Zeile 1009 PRUEFSUMMENFEHLER«, so daß Sie genau erfahren, in welcher DATA-Zeile Sie das Maschinenprogramm »umgeschrieben« haben.
+
+Das Programm wird mit SYS 49152 gestartet. Die neuen Funktionen stehen dann sofort zur Verfügung.
+
+(Heino Velder/ev)
+
+# Reverse Hardcopy MPS 801/ VC 1515/ GP 100VC
+
+In der Ausgabe 10/84 des 64’er Magazins veröffentlichten wir eine Hardcopy-Routine für die Drucker MPS801, VC 1515 und GP 1OOVC. Folgende Zeilen sollten geändert werden, um einen reversen Ausdruck zu erreichen:
+470 DATA9,128,32,0,197,70,151,144,223,165,176,105,6,133,176,144,2,230,177
+620 IF B<>45343 THENPRINT"FEHLER IN DATENZEILE!"
+630 FOR I=50432 TO 50437:READ A:POKE I,A:NEXT
+640 DATA 73,127,32,210,255,96
+
+(Dipl.-Ing, Reinhard Zinn/rg)
+
+# Hardcopy mit einer Zeile
+
+> Dieser Einzeiler gibt den Text einer Bildschirmseite des C 64 auf einem MPS 801 aus. Ganz ohne PEEKs, POKEs und SYS-Befehle. Trotzdem überrascht das Programm mit einer hohen Druckgeschwindigkeit.
+
+Mittlerweile existiert eine Vielzahl von Hardcopy-Routinen für die verschiedenen Drucker und Bildschirmformate. Ich kannte aber bisher kein Druck-Programm, das universell einsetzbar ist, keine POKEs und PEEKs braucht und auch nicht in Maschinensprache geschrieben ist Diese Eigenschaften weist dieser Einzeiler (Zeile 9 des Listings) auf. Das »Programm« enthält nur Basic-Befehle.
+
+Die Programmidee basiert auf der Tatsache, daß der Bildschirm des C 64 wie eine Datei behandelt werden kann. Ähnlich wie der Drucker die Adresse 4 hat und die Floppy mit Adresse 8 angesprochen wird, ist dem Bildschirm die Geräteadresse 3 zugeordnet; fest vom Betriebssystem. Mit OPEN 2,3 wird die Bildschirmdatei eröffnet und mit INPUT#2 oder GET # 2 der Inhalt der Datei gelesen. Beim INPUT #-Befehl ist, wie bei jedem anderen INPUT zu beachten, daß die Anweisung bei einem Kommaodereinem Doppelpunktabgebrochen wird. Aus diesem Grund habe ich den INPUT- durch den GET-Befehl ersetzt. Eine GET Schleife liest ab der aktuellen Cursorposition sämtliche Zeichen als ASCII-Code. Die gelesenen Codes addiert man darauf in einer Variablen. Zum Beispiel durch die Anweisung A$=A$+B$, bei der immer wieder ein neues B$ zu A$ addiert wird. Eine einfache Sache sollte man meinen, aber die Schwierigkeiten beginnen erst an dieser Stelle. GET liest nämlich immer als letztes Zeichen einer Zeile grundsätzlich ein Carriage Return, CHR$(13). Egal, welches Zeichen sich dort befindet. Ferner ist der 80-Zeichen-Editor des C 64 zu beachten, der bei diesem Vorhaben zusätzliche Schwierigkeiten bereitet: Eine Zeile besteht trotz der 40-Zeichen-Darstellung auf dem Bildschirm innerhalb des C 64 aus 80 Zeichen. Denken Sie nuran die Eingabevon langen Programmzeilen. Nach dem Öffnen der Bildschirmdatei wird Zeichen für Zeichen gelesen, beginnend in der oberen linken Bildschirmecke. Dabei werden in einem Schleifendurchgang immer zwei Zeichen geholt und den Variablen A$ und B$ zugeordnet. Ist A$ gelesen, wird mittels der DELete-Funktion, CHR$(20), der restliche Zeileninhalt um eine Stelle nach links geschoben, um das letzte Zeichen einer Zeile eindeutig zu erkennen. Nach dem Einlesen von B$ wird durch die INSert-Funktion, CHR$(148), der ursprüngliche Zeilenzustand wieder hergestellt. Danach wird der ASCII-Code in den beiden Variablen an den Drucker gesandt. Durch ständige, schnell ablaufendeZeilenverschiebung ist deutlich sichtbar, wo der Computer jeweils »arbeitet«; ein brauchbarer Nebeneffekt.
+
+Ein Einzeiler kann natürlich kein perfektes Programm sein. Deshalb sollten auch die Nachteile herausgestellt werden: Die Routine kann keine reversen Zeichen auf dem Drucker darstellen. Reverse Zeichen werden normal gedruckt. Innerhalb des Textes, von dem eine Hardcopy angefertigtwerden soll, dürfen keine Anführungsstriche, CHR$(34), vorkommen. Da der Code 34 innerhalb eines Programms recht selten vorkommt, ist diese Einschränkung aber nur von geringer Bedeutung. An- ^ ders in Programmlistings, die aber meistens mit OPEN1,4: CMD1:LIST gedruckt werden.
+
+Der Einzeiler ist dafür gedacht, als Unterprogramm Daten auszudrucken; einfach vom Bildschirm weg.
+
+### Tips zur Eingabe
+
+Das reverse »t« steht für DELete, CHR$(20). Um diesen Code in der erforderlichen Form eingeben zu können, bedarf es eines kleinen Tricks: An der gewünschten Stelle tippt man zu-erstzwei aufeinanderfolgende Anführungszeichen »”« ein. Danach drückt man einmal Cursor-Links, damit der Cursor über dem zweiten Anführungszeichen steht und einmal INSert und DELete. Mit Cursor-Rechts geht man in die ursprüngliche Schreibposition zurück. Beachten Sie dabei bitte, daß das re-verse »t« nur im Moment der Zeilenerfassung sichtbar ist. Nach LIST wird dieser Code vom Editor nicht gezeigt, sondern ausgeführt. Was zu der verstümmelten Version PRINT”; führt. Die anderen beiden revers dargestellten Steuerzeichen sind Cursor-Links, CHR$(157) und INSert, CHR$(148). Nach dem ersten Anführungszeichen drücken Sie dazu Cursor-Links und anschließend INSert. Sollten Sie mit der Eingabe der Steuerzeichen Probleme haben, können Sie sie durch CHR$()-Befehle ersetzen. Sie benötigen dann allerdings mindestens zwei Zeilen.
+
+Die Zeile 4 dient lediglich zum Füllen des Bildschirms für Demo-Zwecke. Zeile 7 ist ein Beispiel für den Aufruf der Hardcopy-Routine. Zunächst wird der Cursor in die Home-Position gebracht und mit OPEN1,4,7 die Drucker- und mit OPEN 2,3 die Bildschirmdatei eröffnet. GOSUB 9 startet schließlich die Hardcopy-Zeile. Wie Sie an den beiden FOR-NEXT-Schleifen erkennen können, werden nacheinander alle Spalten und Zeilen des Bildschirms »abgetastet«. Nach dem Druck werden die beiden Dateien wieder mit CLOSE geschlossen.
+
+(Karl-Heinz Heß/hm)
+
+# VC 20-Programme schützen
+
+> Einige Gedanken zum Copyright-Schutz mit Break, Autostart und einigen nützlichen POKEs und PEEKs. Experimentieren ist gestattet.
+
+Wer möchte schon, daß sein Copyright mißbraucht wird? Viele Programmierer trauen sich nicht, ihr Programm zu veröffentlichen oder zu tauschen, weil dieses ja dann von Raubkopierern vervielfältigt werden könnte. Für solch einen Fall habe ich eine fast narrensichere Hilfe geschaffen.
+
+Zunächst wäre es möglich, daß man seine Programme mit einem LOAD-, SAVE-, LIST-Schutz gegen Kopieren sichert. Aber damit hat man die unbefugte Benutzung noch nicht ausgeschaltet. Die Lösung liegt da, daß man einen Code abfragt, wobei die Abfrage im Listing natürlich unsichtbar ist. Anschließend schalten wir noch die RUN/STOP-RESTORE-Funktion außer Betrieb und mit einem Datasetten-Autostart sind wir schon fast fertig. Werfen wir nun alles in einen Topf, so haben wir doch ein ziemlich sicheres Programm (Listing 1). Die benötigten PEEKs und POKEs sind in Tabelle 1 zu finden. Das Programm ist selbstverständlich nur eine Demo-Version, um das Prinzip zu zeigen. Bauen 8ie die Routinen doch einmal in eines Ihrer Programme ein.
+
+Das Prinzip des Datasetten-Autostarts wurde bereits im VC 20-Kurs ausführlich beschrieben. Eine sehr einfache Methode ist es beispielsweise, das Hauptprogramm von einem Ladeprogramm aus nachladen zu lassen. Den Nachlade-Befehl kann man dabei noch in einem Maschinenprogramm unauffällig verstecken (Listing 2).
+
+Zumindest bei Spielen für den VC 20 wird in den meisten Fällen ein neuer Zeichensatz definiert, um die grafische Darstellung zu verbessern. Diese Zeichendefinition wird in der Regel über DATA-Zeilen durchgeführt. So fällt es kaum auf, wenn da eine zusätzliche DATA-Zeile eingebaut wird, die den Nachlade-Befehl in Maschinensprache enthält.
+
+Zum Abschluß noch ein Tip:
+
+POKEn Sie doch einmal verschiedene Werte in die Speicherstelle 808. Sie werden verblüffende Ergebnisse erzielen.
+
+(Ralf Brinkmann/ev)
+
+# Jahresinhaltsverzei<hnis 1984/85
+
+In diesem Inhaltsverzeichnis sind alle wesentlichen Artikel enthalten, die in den Ausgaben 4/84 bis 3/85 vom 64’er erschienen sind. Das Verzeichnis ist in zehn Hauptabschnitte unterteilt. Die Rubrik »Listings zum Abtippen« besteht außerdem aus den Unterabschnitten Anwendung, Grafik, Spiel und Tips&Tricks. Einige Artikel finden sich als themenübergreifende Beiträge unter verschiedenen Stichworten wieder. Nicht enthalten sind im Inhaltsverzeichnis kurze Meldungen sowie Beiträge aus den Rubriken Leserforum, Bücher, Aufrufe und Fehlerteufel. Um zwölfMonatsausgaben im Verzeichnis aufzuführen, wurden die Ausgaben 1/85, 2/85 und 3/85 mit aufgenommen. Diese tauchen auch wieder im Jahresinhaltsverzeichnis von 1985, das in der Ausgabe 1/86 erscheint, auf.
+
+# Window 64: Fenstertechnik für den Commodore
+
+> Bekanntlich besitzt der C 64 nicht die bei einigen anderen (vor allem bei teureren) Computern mögliche Definierung von Fenstern. Mit diesem Programm können Sie mit einfachen, aber leistungsstarken Befehlen bis zu acht solcher Fenster einsetzen.
+
+Mit Fenster- (auch Window-) Technik bezeichnet man die Fähigkeit eines Computers, seinen Bildschirm in mehrere, voneinander unabhängige Zonen aufzuteilen. Diese Art der Bildschirmaufteilung gab es zum ersten Mal richtig bei der Lisa von Apple. Später dann wurde sie auch bei anderen Computern, wie etwa beim IBM-PC und vergleichbaren Systemen eingesetzt. Nun gibt es die Fenster-Technik auch auf dem C 64.
+
+Window 64 ist ein 4 KByte langes Maschinenprogramm, das nach entsprechender Anpassung in jedem RAM-Bereich lauffähig ist und nach Aktivierung den Basic-Wortschatz um sechs Befehle erweitert.
+
+Window 64 ermöglicht nicht nur die vertikale Aufteilung des Bildschirms in bis zu acht sich einander nicht beeinflussende Sektoren, sondern versetzt den Benutzer darüber hinaus noch in die Lage, den Schirm in bis zu vier Raster-IRQ-gesteuerte Zonen zu unterteilen, deren jede einen x-beliebigen RAM-Bereich im Text- oder im Grafikmodus sichtbar machen kann.
+
+Sämtliche Funktionen sind derart menügesteuert, daß bei der Bedienung — insbesondere der recht komplexen Raster-IRQ-gesteuerten Option — absolut keine Fehleingaben möglich sein sollten.
+
+Das Demopaket läuft nur mit der Window 64-($7000-$7FFF-)Version! Es wird folgendermaßen aktiviert:
+
+1. Window 64 absolut laden (also LOAD”WINDOW64”,8,1)
+2. Starten des Programms (SYS7*4096).<br>Damit ist das Programm aktiviert. Jetzt können Sie schon die beschriebenen Befehle nutzen.
+3. Wenn Sie das Demoprogramm ausprobieren möchten, laden Sie zuerst das Programm LINE PLOT absolut, also mit »,8,1«. Dieses Programm ist nur auf der Diskette des Leserser-vices enthalten. Es ist nicht unbedingt notwendig. Das Demoprogramm funktioniert auch ohne LINE PLOT, allerdings ohne Demonstration der Vermischung von hochauflösender Grafik mit Text.
+4.	Demoprogramm laden und starten.
+
+Das Demoprogramm läuft nur mit der abgedruckten $7000er-Version. Window 64 kann jedoch auch in einen anderen Speicherbereich verschoben werden.
+
+### Window 64-Bedienungsanleitung
+
+Window 64 ist eine Basic-Erweiterung, die sich mit einem geeigneten Monitor praktisch in jeden RAM-Bereich verschieben läßt. Das Programm wird mit »SYS 7*4096« plus »RETURN« (oder allgemein nach entsprechender Verlagerung mit »SYS ANFANGSADRESSE«) gestartet. Alle das Basic-RAM nach oben hin begrenzenden Vektoren werden automatisch angepaßt. Zu beachten ist, daß jedes eventuell noch vorhandene Basic-Programm gelöscht wird.
+
+Window 64 verfügt über folgende Eigenschaften:
+
+Aufteilung des Bildschirms in bis zu acht in der vertikalen Größe einstellbare, sich untereinander nicht beeinflussende Fenster. In einem durch >WM plus RETURN aufzurufenden Menü können Anzahl und Größen (gemessen in Zeilen) bestimmt werden. Sämtliche Eingaben haben in hexadezimaler Form zu erfolgen. Nach Verlassen des Menüs wird der Fenster-Modus aktiviert, wobei der nun erscheinende Strich-Cursor (!) automatisch ins erste Fenster springt. Direkt nach der ersten Tastenbetätigung fällt das mit jeden Tastendruck verbundene »Klick«-Geräusch angenehm auf. Die im Menü festgelegten Begrenzungen werden markiert durch je eine am oberen und unteren Rand des Fensters befindliche, durch Sprites realisierte Linie. In jedem Fenster stehen einem nun alle die Editor-Funktionen zur Verfügung, die man auch von der Grundversion her kennt! Es gibt zwei Möglichkeiten, das gerade aktuelle Fenster zu verlassen, um in einem anderen'weiter-zuarbeiten:
+a) Durch gleichzeitige Betätigung der CTRL- und der —-Taste springt man automatisch ins jeweils nächste Fenster, wobei — eine Besonderheit dieses Programms — man im neuen Fenster wieder alle jenen Parameter wie zum Beispiel Cursor-Position, Zeichenfarbe, Hochkomma-Modus, RVS-on/off-Modus, Tastenwiederholung ein/aus etc. so vorfindet, wie man sie eventuell in diesem Fenster vorher gesetzt hatte.
+b) Durch >WAx plus RETURN springt man in das durch die Zahl oder den Ausdruck »x« numerierte Fenster. Bei zu kleinem oder zu großem x wird ein »Illegal Quantity Error« ausgegeben. Nach Desaktivierung des Fenster-Modus durch »>WD« plus »RETURN« kann mit diesem Befehl wieder direkt ins entsprechende Fenster gesprungen werden. Bis auf Cursor-Position, Hochkomma- und RVS-Modus gilt das oben über die verschiedenen Parameter Gesagte.
+
+Bemerkung: Der >WAx-Befehl istzu Beginn noch so lange blockiert, bis das Menü zum ersten Mal aufgerufen wird! Durch den Befehl > WD plus RETURN desaktiviert man den Fenster-Modus, wonach man den vollständig gelöschten Bildschirm wieder uneingeschränkt benutzen kann.
+
+TODO Tabelle
+
+Neben der beschriebenen Fenster-Technik bietet Window 64 darüber hinaus eine von mir »Schirmzonentechnik« genannte Option. Und zwar wird der Benutzer in die Lage versetzt, unabhängig von obiger Aufteilung, in maximal acht Fenster den Bildschirm weiterhin in bis zu vier Zonen zu unterteilen, deren Größen ebenfalls variabel sind. Jede Zone kann beliebig im Text- oder Grafik-Modus betrieben werden, wobei im ersten Fall Charakter- und Video-RAM-Basis, im anderen Fall Hires- und Farb-RAM-Basis frei wählbar sind.
+
+Ferner ist für jede Zone noch eine Hintergrundfarbe festzulegen und zu überlegen, ob man im Multi-Color- beziehungsweise Extended-Color-Modus arbeiten möchte. Wie im Window-Menü müssen auch im durch >ZM plus RETURN zu aktivierenden Schirmzonenmenü alle Zahlen in hexadezimaler Form eingegeben werden. Zurück zu den verschiedenen Basen:
+
+Das Menü achtet strengstens darauf, daß weder syntaktische noch logische (!) Fehleingaben getätigt werden. Hat man sich bei einer Zone für den Text-Modus entschieden, muß anschließend die Charakter-Basis festgelegt werden: Normalerweise ist somit $1000 (beziehungsweise $9000) für das Charakter-ROM einzugeben (oder $1800 ($9800) für Klein-/Großschrift). Als Video-RAM-Basis kommt gewöhnlich $0400( = 1024) in Frage. Dajedoch die Bits 14,15 bei beiden Basen übereinstimmen müssen, kann in diesem Fall für die Charakter-Basis nicht $9000 eingegeben werden (ansonsten würde die $0400 ignoriert).
+
+Ähnlich steht es mit den Hires- und Farb-RAM-Basen im Grafik-Modus. Auch bei ihnen müssen Bit 14,15 übereinstimmen... Sie können jedoch das Menü fehlerfrei bedienen, da es sorgfältig auf die Einhaltung der Regeln achtet. Weiterhin ist es (zum Beispiel bei der Eingabe einer Hires-Basis) nicht notwendig, redundante Nullen am Ende explizit einzutippen. Bei der Hires-Basis-Eingabe reicht beispielsweise schon das Eintippen einer geraden Ziffer zur eindeutigen Identifizierung des Hires-Bereichs. Bei der Bedienung des Schirmzonen- wie auch Window-Menüs ist noch zu beachten, daß versehentlich falsche Zahleneingaben durch die DEL-Taste vollständig gelöschtwerden können (jedoch erst dann, wenn auch die letzte Ziffer der Zahl eingetippt wurde).
+
+Nach Verlassen des Schirmzonenmenüs wird der Schirmzo-nen-Mode automatisch eingeschaltet. >ZD plus RETURN schaltet diesen Modus wieder ab, während >ZA plus RETURN ihn wieder reaktiviert.
+
+(Engin Gülen/gk)
+
+TODO Tabelle Die drei Schirmzonenbefehle im Überblick:
+
+# Fehlerteufelchen
+
+Diesmal konnte ich mich gar nicht richtig austoben. Am meisten Spaß hat mir das Abschnippeln beim Programm Floppy-Lister gemacht.
+
+### Floppy-Lister, Ausgabe 3/85, Seite 82
+
+Hier ist der fehlende Teil des Programms »Floppy-Lister«.
+
+TODO Listing
+
+### Erst ein IEC-Bus öffnet Tür und Tor, Ausgabe 3/85, Seite 24
+
+In der Tabelle auf Seite 26 wurde der Preis für das Tewi-IEC-Interface um 100 Mark zu hoch angegeben. Das Interface kostet also 239 Mark.
+
+### Ohne gutes Werkzeug geht es nicht: SMON (Teil 4), Ausgabe 2/85, Seite 72
+
+Es fehlte in der Tabelle auf Seite 75 der Änderungshinweis der Speicherzelle 908B. In der 9000er-Version (und anderen Versionen entsprechend) muß die Speicherstelle 908B (JMP C97D) in JMP 997D geändert werden. Dadurch funktioniert der B-Befehl (Basic-Data) wieder einwandfrei.
+
+### Floppy-Kurs, Ausgabe 3/85, Seite 135
+
+Auf der Seite 135 wurden die beiden Bildunterschriften Listing 2b und 3b vertauscht.
+In beiden Listings muß in der Speicherstelle 050C LDA #$ ... stehen.
+
+# Dem Klang auf der Spur, Teil 4
+
+> Der SID ist einer der vielseitigsten Sound-Chips auf dem Markt. Dennoch kann man mit ein paar Tricks Klänae mit mehr Volumen, Weichheit und Komplexität erzeugen. Der hier vorgestente Modulator ist der Kern eines in den nächsten Folgen zu entwicKelnden, interruptgesteuerten Synthesizer- und Sequenzerprogramms mit professionellen Ansprüchen.
+
+Die Beschreibung der Register des Synthesizer-Chips SID 6581 wird hier abgeschlossen. Es wird das Programm »Modulator« vorgestellt, das die Fähigkeiten des SID stark erweitern wird. »Modulator« ist interruptgetrieben und läuft daher parallel zu anderen Programmen.
+
+### Fiitersteuerung
+
+Das Filter des SID wurde in seiner Funktion in Teil 3 schon beschrieben. Gesteuert werden diese Funktionen über den Inhalt der vier Register 21-24. (Wir beziehen uns hier auf Tabelle 1 aus dem 64'er, Ausgabe 2/85, Seite 153.) Die Grenzfrequenz (auch Eck- oder Mittenfrequenz, je nach Filtermodus) wird über eine ll-Bit-Größe in den Registern 21 und 22 beeinflußt. Die Grenzfrequenz läßt sich im Bereich 30 Hz bis 12 kHz einstellen. Etwas ungewohnt ist die Verteilung der 11 Bits auf die beiden Register: 3 niederwertige und 8 höherwertige. Da man die Filterfrequenz bei weitem nicht so fein steuern muß wie die Oszillatorfrequenz, kann man sich hier auf Register 22 beschränken. Man wird dann Register 21 zum Beispiel fest mit 0 besetzen.
+
+### Filterresonanz (Register 23 Bit 4-7)
+
+Die Filterresonanz kann über 4 Bits in 16 Stufen eingestellt werden. Man muß dabei aber die vier im selben Register angesiedelten Bits FILTEX, FILTER 3, 2 und 1 im Auge behalten, damit man sie nicht versehentlich mit nicht beabsichtigten Werten belegt.
+
+### Die Schalter FILTER 1, 2, 3 und FILTEX
+
+Ist das Bit im FILTER 1 auf 0 gesetzt, wird das Signal von Stimme 1 am Filter vorbei direkt zum DCA geleitet, wo es ungefiltert zum gesamten Ausgangssignal zugemischt wird. Hat FILTER 1 den Wert 1, so gelangt Stimme 1 gefiltert zum Ausgang. Das gleiche gilt bei FILTER 2 und 3 entsprechend für Stimme 2 und 3. FILTEX bestimmt, ob ein externes Eingangssignal gefiltert oder ungefiltert zum Ausgang gemischt wird. Dieses externe Signal kann über Pin 26 an den SID gelegt werden. Dieser Eingang ist beim C 64 über einen 10-µF-Kondensator an Pin 5 (Audio in) der Audio/Video-Buchse herausgeführt. Nach SID-Spezi-fikationen sollte das Signal einen Gleichspannungsanteil von 6 V haben und eine Wechselspannungsamplitude von 3 V nicht überschreiten. Ein solches Signal könnte zum Beispiel von einem weiteren SID aus einem zweiten C 64 stammen.
+
+### AUS (Register 24 Bit 7)
+
+Wird dieses Bit auf 1 und gleichzeitig FILTER 3 auf 0 gesetzt, erscheint Stimme 3 nicht am Ausgang. Stimme 3 kann dann zum Beispiel Stimme 1 synchronisieren oder ringmodulieren, ohne selbst hörbar zu sein.
+
+### Hochpaß (Bit 6), Bandpaß (Bit 5) und Tiefpaß (Bit 4)
+
+Ist eines dieser Bits gesetzt, verhält sich das Filter als Hoch-Band- oder Tiefpaß. Die Funktionen sind additiv, das heißt, daß man auch mit mehreren gleichzeitig gesetzten Bits ein sinnvolles Filter erhält. So ergeben zum Beispiel Hoch- und Tiefpaß zusammen eine Bandsperre, ein Filter, das alles bis auf einen schmalen Frequenzbereich durchläßt. Die Bandsperre (englisch Notch) ist sozusagen das Gegenstück zum Bandpaß. Es muß mindestens eines dieser Bits gesetzt sein, damit das Filter überhaupt wirksam wird.
+
+### Lautstärke (Register 24, Bit 0-3)
+
+Über diese Bits wird die Gesamtlautstärke des SID in 16 Stufen von stumm = 0 bis maxi-mal = 15 eingestellt. Meistens wird man 15 wählen, weil dann der Störabstand des SID-Signals am besten ist.
+
+## Die Leseregister
+
+### Potentiometer X und Y (Register 25 und 26)
+
+An Pin 24 (entsprechend X) und Pin 23 (entsprechend Y) des SID könne RC-Glieder angeschlossen werden. Dabei sind die beiden Pins jeweils mit einem Kondensator mit Masse und mit einem Potentiometer mit + 5 V zu verbinden. Im SID werden durch Messungen der RC-Zeit-konstanten (das sind die Zeiten, in denen die Kondensatoren über die Potentiometer auf eine bestimmte Spannung aufgeladen werden) 8-Bit-Digitalwerte abgeleitet, die den Stellungen der Potentiometer entsprechen. Diese 8-Bit-Werte sind über die Register 25 und 26 von der CPU lesbar. Die Messungen werden alle 512 Systemtaktzyklen wiederholt. Bei einer Taktfrequenz von 1 MHz sind das knapp 2 000 Messungen pro Sekunde. Die SID-Potentiometer-Anschlüsse sind an den Joystickports gemul-tiplext herausgeführt. Es können dort bis zu vier Potentiometer angeschlossen werden, zum Beispiel in Form zweier Steuerknüppel, wie man sie von Funkfernsteuerungen her kennt. Damit wäre eine viel feinfühligere Steuerung möglich als mit Joysticks, doch das soll nicht Gegenstand dieser Reihe sein.
+
+### Oszillator 3 (Register 27)
+
+Über dieses Register kann zu jedem Zeitpunkt der Digitalwert der zu Stimme 3 gehörenden Kurvenform gelesen werden. Man kann diese Werte zur Modulation anderer Parameter verwenden, wie in Teil 3 schon erwähnt wurde. Weil dadurch aber Stimme 3 meistens nicht mehr direkt brauchbar ist (man würde sie durch AUS = 1 unhörbar machen), werden wir hier einen anderen Weg gehen. Zu Modulationen brauchbare Kurven kann man auch rein softwaremäßig errechnen. Das Verfahren ist zwar aufwendiger, aber auch viel leistungsfähiger.
+
+### Hüllkurve 3 (Register 28)
+
+Auch der aktuelle Wert des zu Stimme 3 gehörenden Hüllkurvengenerators ist über dieses Register abgreifbar und kann so zu Modulationszwecken genutzt werden. Auch diese Funktion werden wir softwaremäßig nachbilden, damit uns Stimme 3 samt Hüllkurve weiterhin voll zur Verfügung steht.
+
+## Das Modulator-Konzept
+
+Die Lebendigkeit von Naturklängen resultiert aus ihrer Unregelmäßigkeit. Keine zwei Perioden gleichen sich wie ein Ei dem anderen. Naturklänge weisen immer Schwankungen in der Lautstärke und in der Tonhöhe auf. Es soll zwar nicht unser Ziel sein, mit dem C 64 Naturklänge nachzumachen (dazu ist der SID-Chip bei weitem nicht in der Lage), man kann aber durch Modulation von SID-Parametern Klänge mit mehr Komplexität, Weichheit und Volumen erzeugen. Zur Modulation geeignete Parameter sind Frequenz, Lautstärke, Filterfrequenz und die Pulsweite bei Rechteckklängen. Da die Pulsweite die spektrale Zusammensetzung eines Rechteckklanges beeinflußt, moduliert man durch die Pulsweite eigentlich die Klangfarbe. Modulation von Frequenz (Vibrato) und Lautstärke (Tremolo) sind auch bei natürlichen Instrumenten zu beobachten. Die Modulation der Filterfrequenz ist dagegen ein typischer Synthesizereffekt. Bild 1 zeigt das Funktionsschema des erweiterten SID-Chips in unserem Konzept. Der rechte untere Teil stellt vereinfacht den SID dar, wie er in der letzten Folge auf Bild 1 schon beschrieben wurde. Nur dieser Teil des Schemas ist in der Hardware realisiert, die anderen Funktionsblöcke werden durch Software verwirklicht. Zuerst sollen die Blöcke funktionell beschrieben werden. Anschließend wird etwas über ihre Ansteuerung gesagt. Im nächsten Teil wird die softwaremäßige Realisierung besprochen. Neben Kenntnissen zur Verwirklichung weiterer Effekte werden dabei auch allgemein nützliche Informationen für Assembler-Programmierer anfallen.
+
+### Modulationsquellen und -Ziele
+
+Als Quellen von Modulationssignalen stehen ein Hüllkurvengenerator und 7 LFOs (Low Frequency Oscillator) zur Verfügung. Der Hüllkurvengenerator, im folgenden EG (Envelope Generator) genannt, erzeugt eine Hüllkurve nach dem ADSR-Schema. Der Hüllkurvenverlauf kann zu jeder Zeit angehalten, zurückgesetzt oder sogar gespiegelt werden. Die 7 LFOs sind identisch aufgebaut. Sie können vier Kurvenformen erzeugen:
+
+Dreieck TRIAN, aufsteigender Sägezahn SAWUP, abfallender Sägezahn SAWDOWN, Rechteck mit einstellbarer Pulsweite SQUARE
+
+Auch bei den LFOs können die Kurvenverläufe jederzeit angehalten und zurückgesetzt werden. Des weiteren sind die Amplituden der Modulationssignale einstellbar. Über diese Amplitude wird die Stärke oder Tiefe, wie man auch sagt, der Modulation gesteuert.
+
+Als Modulationsziele kommen vier Parameter in Frage:
+
+* Frequenzen der drei Stimmen
+* Pulsweiten der drei Stimmen
+* Filtergrenzfrequenz
+* Ausgangslautstärke.
+
+Jede Modulationsquelle kann auf jedes Modulationsziel geschaltet werden. Dazu dient ein sogenannter Kreuzschienenverteiler. Man kann sich diesen als eine Anordnung von acht waagrechten (Zeilen) und acht senkrechten Drähten (Spalten) vorstellen. Dabei sind die Spalten mit den Modulationsquellen und die Zeilen mit den Modulationszielen verbunden. An den 64 Kreuzungspunkten befinden sich Buchsen, an denen man über Kurzschlußstecker beliebige Verbindungen von Modulationsquellen zu Modulationszielen herstellen kann. Dabei werden entlang einer Zeile die Signale von Modulationsquellen gemischt, wo an entsprechender Stelle ein Stecker sitzt.
+
+Im Bild wird zum Beispiel die Frequenz von Stimme 1 durch LFO 0, LFO 3 und LFO 5 gleichzeitig moduliert. Die Filterfre-quenz wird nur vom EG moduliert. Durch das Kreuzschienen-Konzept können Modulationsquellen auch mehrfach genutzt werden. So trägt im Bild zum Beispiel LFO 5 zur Modulation der Frequenz von Stimme 1 bei, moduliert die Pulsweite von Stimme 2 und dazu noch die Ausgangslautstärke.
+
+### Portamento
+
+Bei fast jedem Synthesizer kann man die gespielten Tonhöhen »schleifen« lassen. Das heißt, daß bei zwei aufeinanderfolgenden, verschiedenen Tönen die Frequenz nicht unmittelbar wechselt, sondern in einstellbarer Zeit von der alten zur neuen Tonhöhe kontinuierlich gleitet. Der Portamento-Block verwirklicht dies für alle drei Stimmen. Dabei sind die Portamento-Raten der Stimmen unabhängig voneinander einstellbar.
+
+### Arbeitsweise von »Modulator«
+
+»Modulator« (Listing 1) für sich allein ist noch kein abgeschlossenes Programm so wie der SID alleine noch kein vollständiger Synthesizer ist. SID 6581 und CPU 6510 bilden die hardwaremäßige Grundlage eines Synthesizers, der erst durch Software zum Leben erwacht. Das Steuerprogramm »Modulator« erweitert die Möglichkeiten dieser Hardware durch sinnvolle Effekte und ist als Kern eines später folgenden Synthesizer- und Sequenzerprogramms aufzufassen. Die Effektmöglichkeiten von Modulator allein sind allerdings schon so reichhaltig, daß sie für jede Spiele-Geräuschku-lisse ausreichen dürften, solange man auf vollständige Melodien verzichtet.
+
+### Schritt für Schritt
+
+Damit »Modulator« richtig arbeiten kann, muß es in regelmäßigen Zeitabständen immer wieder aufgerufen werden. Das Programm rechnet alle Modulationsquellen (LFOs und EG) Schritt für Schritt als Folge von Abtastwerten aus. Bei einem Aufruf wird dabei immer genau ein weiterer Abtastwert für alle aktiven Quellen errechnet. Ein Modulationsziel, zum Beispiel Frequenz Stimme 1 gewinnt das Programm dann dadurch, daß die Frequenzvorgabe für Stimme 1 entsprechend dem neuen (aktuellen) Wert der Modulationsquelle nach oben oder unten verschoben wird. Die so errechnete Größe wird dann von »Modulator« in die SID-Register geschrieben. Wenn man mit dem Modulator arbeitet, darf man also die zu modulierenden Größen nicht direkt in den SID schreiben (von dort könnten sie auch gar nicht mehr gelesen werden), sondern muß sie in andere, fest vereinbarte Speicherstellen schreiben, aus denen dann »Modulator« seine Vorgaben bezieht. Nun kann man das Programm nicht einfach in einer Schleife endlos aufrufen. Erstens könnte der Computer dabei nichts anderes mehr tun und zweitens wäre eine solche Aufruffolge zeitlich nicht regelmäßig.
+
+Ein »Modulator«-Schritt benötigt zirka 1 bis 10 ms, je nachdem, wieviele Quellen aktiv sind und wieviele Ziele moduliert werden müssen. Es ist naheliegend, die Aufrufe von »Modulator«-Schrit-ten nicht einem anderen Programm zu überantworten, sondern dazu einen programmierbaren Zeitgeber einzusetzen, der dann in völlig regelmäßiger Folge Aufrufe von »Modulator« auslöst.
+
+### Interrupts
+
+Die beiden CIAs 6526 enthalten insgesamt vier Timer, die sich so programmieren lassen, daß sie in regelmäßigen Zeitabständen Interrupts auslösen. Zum Begriff Interrupt sei hier nur soviel gesagt: Ein Interrupt ist ein Unterprogrammsprung, der nicht von einem laufenden Programm ausgelöst wird, sondern von einem elektrischen Signal, das von außen an die CPU angelegt wird. Es kann dabei nicht vorhergesagt werden, an welcher Stelle im laufenden Programm ein Interrupt eintritt. Die CPU trägt dafür Sorge, daß sie nach Beendigung des durch den Interrupt aufgerufenen Programms an die Stelle im alten Programm zurückfindet, an der sie unterbrochen wurde. Normalerweise erzeugt Timer A von CIA 1 60mal in der Sekunde einen Interrupt, den sogenannten Systeminterrupt. Das dabei aufgerufene Programm fragt die Tastatur ab, läßt den Cursor blinken und aktualisiert die Werte der Zeitveriablen TI und TI$. In gleicher Weise wird nun auch »Modulator« aufgerufen. Da die SID-Parameter nicht kontinuierlich, sondern zeitlich gestuft moduliert werden, sollten die »Mo-dulator«-Zeitschritte möglichst klein sein, damit die Abstufung unhörbar bleibt. Andererseits müssen die Zeitabstände zwischen zwei »Modulator«-Aufru-fen mindestens so groß sein wie der Zeitbedarf eines Modulatorschritts, also mindestens 10 ms. Die Aufruffrequenz des Systeminterrupts von 16,6 ms erweist sich als ein guter Kompromiß. »Modulator« und Systeminterrupt-Programm kann man also durch denselben Interrupt auslösen. Bei 60 Modulationsschritten pro Sekunde ist eine zeitliche Quantelung bei der Klang-qualität des SID nicht hörbar. Zum anderen bleibt der CPU zwischen den Schritten noch Zeit für andere Aufgaben. Werden alle Register bei »Modulator« gezogen, benötigt ein Schritt knapp 10 ms. Da das Systeminterrupt-Programm auch noch etwas Zeit benötigt, ergibt sich so eine CPU-Auslastung von zirka 70 Prozent. Man merkt das daran, daß alle anderen Vorgänge, zum Beispiel das Listen von Programmen stark verzögert ablaufen, wenn der Modulator voll aktiv ist. Man wird in der Praxis allerdings selten alle Modulationsmöglichkeiten gleichzeitig ausnützen.
+
+### Timesharing
+
+Alle Programme, die selbst nicht interruptgetrieben sind, laufen problemlos quasiparallel zusammen mit »Modulator«. Mit dem Problem mehrerer konkurrierender Interrupts werden wir uns in einer späteren Folge im Zusammenhang mit dem Sequenzerprogramm befassen. Die CPU-Belastung durch den Modulator kann man leicht ermitteln, da das Programm bei jedem Schritt seine eigene Laufzeit mißt.
+
+### Ansteuerung von »Modulator«
+
+Um sich mit dem Programm vertraut zu machen, sollte man es bei der Lektüre gleich ausprobieren. Zunächst muß man das Programm mit Hilfe des MSE (in dieser Ausgabe) in den Speicher bringen. Man kann nun mit Hilfe eines Monitors, oder komfortabler, mit dem Testprogramm zu »Modulator« (siehe Listing 2) die Modulationsmöglichkeiten ausprobieren. »Modulator« wird mit SYS 12 x 4096 + 1033 aktiviert. Von da an verbraucht das Programm Rechenzeit, egal ob etwas hörbar ist oder nicht. Abgeschaltet wird Modulator mit SYS 12 x 4096 + 1046. »Modulator« wird wie der SID über Registerinhalte gesteuert. Der Inhalt von 73 Speicherstellen nimmt Einfluß auf »Modulator« und darüber hinaus auch auf den SID. Im Registerschema in Bild 2 kann man zwischen Steuerparametern und dynamischen Parametern unterscheiden. Steuerparameter werden von »Modulator« nur gelesen. Über sie wird das Programm gesteuert. Dynamische Parameter werden ständig verändert. Durch Auslesen dieser Werte kann man beobachen, wie »Modulator« arbeitet. Man kann diese Register natürlich auch beschreiben. Dadurch greift man direkt in die Arbeit von »Modulator« ein. Für weitere Spezialeffekte kann das sinnvoll sein. Mehr davon im nächsten Teil.
+
+Da die meisten SID-Register von »Modulator« gesteuert werden, muß man nur noch wenige direkt ansprechen. Es sind dies:
+Die Kontrollregister: 4, 11, 18
+ADSR-Register: 5, 6, 12, 13, 19, 20
+Resonanz/Filter: 23
+Die Leseregister: 25, 26, 27, 28
+
+Die anderen SID-Register findet man mit ähnlichem Aufbau unter den Steuerparametern von »Modulator«. Das Basic-Testprogramm enthält einen vollständigen Parametersatz für SID und »Modulator« in den Zeilen 20 bis 41. Diese Zeilen sind so gestaltet, daß sie mit LIST -41 gerade einen Bildschirm füllen. Die DATA-Zeilen sind mit Kommentaren durchsetzt, so daß man den Zusammenhang mit dem Registerschema in Bild 2 leicht herstellen kann. Beim Testprogramm geht man am besten so vor:
+
+— Modulator laden
+— Testprogramm laden
+- LIST -41
+
+Jetzt kann man den Parametersatz studieren und verändern.
+
+— Cursor auf die Zeile mit READY bringen
+- RUN (SPACE), (SPACE)
+
+Dadurch bleibt der DATA-Block am Bildschirm stehen. Nach einiger Zeit wird die Dauer eines »Modulator«-Schrittes und die daraus resultierende CPU-Belastung angezeigt. Jetzt kann man mit den Tasten Fl, F3, F5 Stimme 1, 2, oder 3 auswählen und über die oberen beiden Tastenreihen einen Ton erklingen lassen. Der Ton klingt so lange weiter, bis mit der SPACE-Taste das GATE-Bit der gewählten Stimme zurückgesetzt wird. Das GATE-Bit des Software-EG wird ebenfalls gesetzt und rückgesetzt. Das einfache Basic-Programm reagiert nicht gerade flott, es ist aber auch nur zum Experimentieren mit »Modulator«-Klangbildern gedacht, nicht für virtuoses Spiel. Mit RUN/STOP wird das Programm abgebrochen. Während »Modulator« weiterarbeitet, kann man die Parameter in den DATA-Zeilen ändern, um das Programm neu zu starten.
+
+### Die Parameter
+
+Es gibt zunächst drei identische Blöcke für die drei Stimmen. Frequenz **F** und Pulsweite **PW** sind die gleichen 16 (beziehungsweise 12)-Bit-Größen wie beim SID. Das Byte **PORTA** steuert das Tempo, mit dem verschiedene Tonhöhen ineinander übergehen:
+
+PORTA = 1 sehr langsam
+PORTA = 255 sehr schnell
+PORTA = 0 kein Portamento
+
+**FP** ist ein dynamischer Wert. Er enthält die aktuelle Frequenz, die gemäß der PORTA-Rate immer in Richtung F gezogen wird, bis F und FP übereinstimmen.
+
+**FILT** enthält, wie beim SID, die Grenzfrequenz in der Aufteilung: 3 niederwertige Bits und 8 höherwertige Bits.
+
+**MOD/LAUT** entspricht genau dem SID-Register 24.
+
+Der Kreuzschienen-Verteiler wird durch 8 Bytes realisiert. Ein Byte entspricht einer Zeile im KSV (Kreuzschienenverteiler). Die 8 Bitpositionen entsprechen den Spalten des KSV. Eine 1 an Bitposition N in Byte M entspricht einem Kurzschlußstecker an Spalte N und Zeile M.
+
+Die sieben LFOs werden durch sieben gleichartige Blöcke gesteuert.
+
+**LFOF** Mit 16 Bit kann die LFO-Frequenz sehr fein im Bereich 0-60 Hz eingestellt werden. Oberhalb von 10 Hz ergeben sich Aliasing-Effekte über die in der nächsten Folge noch etwas gesagt werden wird.
+
+**LFOP** Dieses Byte steuert die Pulsweite, wenn als Kurvenform SQARE gewählt wurde. LFOP = 128 ergibt ein symmetrisches Rechteck.
+
+**LFOA** steuert die Amplitude des LFO-Signals. LFOA = 103 entspricht übrigens einer Frequenzmodulation um eine Oktave. LFOA = 0 ist nicht sinnvoll, da der LFO dann kein Ausgangssignal liefert, aber Rechenzeit verbraucht.
+
+**LFOC** Dieses Steuerbyte bestimmt Kurvenform und Betriebsart des LFO gemäß Tabelle. RUN ist die normale Betriebsart, HOLD hält den letzten aktuellen Kurvenwert fest und RESET setzt den Kurvenwert in die Neutralstellung 0. In den Betriebsarten HOLD und RESET benötigen die LFOs sehr wenig Rechenzeit. Man sollte daher nicht benötigte LFOs in HOLD oder RESET »betreiben«.
+
+Der **EG-Steuerblock** enthält die gewohnten ADSR-Parameter. A soll sich im Bereich 0..128, alle anderen im vollen Bereich 0..255 bewegen.
+
+**EGA** Auch die Amplitude der ADSR-Kurve ist steuerbar.
+
+**EGC** steuet die Betriebsart. Für HOLD und RESET gilt hier das oben Gesagte (auch in Bezug auf die Rechenzeit). GATE hat hier die gleiche Funktion wie auch im SID. Mit ± kann man zwischen einer positiven und negativen Hüllkurve umschalten.
+
+Es folgen sieben dynamische LFO-Blöcke, deren Registerinhalte den aktuellen Kurvenverlauf wiederspiegeln. In **SAWUP** befinden sich die Werte des aufsteigenden Sägezahn mit maximaler Amplitude. Aus ihnen werden die anderen Kurvenformen abgeleitet. In **KURVE** steht der aktuelle Wert der gewählten Kurvenform.
+
+Entsprechendes gilt für die Register **E** und **EKURVE** im dynamischen Hüllkurvenblock. Die Flagge **EPHASE** wird benötigt, um zwischen ATTACK und DECAY zu unterscheiden.
+
+In der nächsten Folge wird das Source-Listing zu »Modulator« besprochen. Wenn man die Arbeitsweise des Programms kennt, kann man seine Möglichkeiten noch weiter ausschlachten, als das über die Steuerregister möglich ist. Außerdem werden wir konkrete Steuerparametersätze besprechen.
+
+(Thomas Krätzig/aa)
 
 
 
