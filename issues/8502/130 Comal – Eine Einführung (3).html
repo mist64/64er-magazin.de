@@ -172,7 +172,20 @@
         <p>Natürlich ist die Grafikerzeugung mit dieser sehr direkten Methode auf die Dauer entschieden zu langwierig. Wenn Sie das kleine Programm aus Listing 1 einmal ausprobieren, werden Sie feststellen, daß effektvolle Grafikprogramme in Comal weder besonders komplex noch langsam zu sein brauchen. Experimentieren Sie ruhig mit ähnlichen Programmen; Sie werden sehr schnell ein gewisses Gespür dafür entwickeln, wie Sie durch Wiederholung einfacher Grundfiguren mit jeweils einem etwas geänderten Parameter interessante grafische Effekte erzielen können.</p>
 
         <figure>
-            TODO
+            <pre>0001 //
+0002 // Grafik-Demo
+0003 //
+0010 print chr$(147)
+0020 pencolor 1
+0030 input " Abstand: 1{left}": abstand
+0040 input " Winkel : 89{left}{left}": winkel
+0050 input " Inkrement: 1{left}": i
+0060 setgraphic 0
+0070 while abstand&lt;365 do
+0080  forward abstand
+0090  left winkel
+0100  abstand:=abstand+i
+0110 endwhi1e</pre>
             <figcaption>Listing 1. Eine kleine Demonstration der Turtle Grafik</figcaption>
         </figure>
 
@@ -187,7 +200,94 @@
         <p>Zur Spriteerzeugung dient der Befehl »DEFINE«. Als Parameter wird eine Definitions-Nummer sowie ein String angegeben. Die Definitions-Nummer kann irgendeine Zahl von 0 bis 95 sein, denn Comal kann bis zu 96 verschiedene Spritemuster verwalten. Der anzugebende String muß eine Länge von 64 Zeichen haben und das Punktmuster des Sprites enthalten. Das Beispielprogramm in Listing 2 zeigt, wie man in Comal mit Sprites umgeht.</p>
 
         <figure>
-            TODO
+            <pre>0010 // -----------------------
+0020 // Turtle- und Sprite-Demo
+0030 // -----------------------
+0040 //
+0050 //
+0060 settext
+0070 input "Rahmenfarbe: ": rahmen
+0080 border rahmen
+0090 input "Hintergrundfarbe: ": grund
+0100 background grund
+0110 setgraphic 0
+0120 dim sprite$ of 63
+0130 dim ein$ of 4
+0140 //
+0150 // Turtle initialisieren
+0160 //
+0170 penup
+0180 setxy 160,160
+0190 pendown
+0200 turtlesize 10
+0210 showturtle
+0220 //
+0230 // Einfaches Sprite-Bild erzeugen
+0240 //
+0250 sprite$:=""
+0260 ein$:=chr$(255)+chr$(0)+chr$(255)
+0270 y:=50
+0280 for i:=1 to 63/3 do
+0290  sprite$:=sprite$+eint
+0300 endfor i
+0310 //
+0320 // Zwei Sprites definieren
+0330 //
+0340 define 0,sprite$+chr$(0)
+0350 sprite$(62):=chr$(255)
+0360 sprite$(2):=chr$(255)
+0370 define 1,sprite$+chr$(0)
+0380 //
+0390 // Vier Sprites aus zwei Bildern
+0400 //
+0410 identify 0,0
+0420 identify 1,0
+0430 identify 2,1
+0440 identify 3,1
+0450 //
+0460 // Spritefarbe setzen
+0470 //
+0480 spritecolor 0,0
+0490 spritecolor 1,2
+0500 spritecolor 2,7
+0510 spritecolor 3,1
+0520 //
+0530 // Demo laeuft bis Taste gedrueckt wird
+0540 //
+0550 repeat
+0560  pencolor rnd(0,15)
+0570  bewegung
+0580  penup
+0590  right 45
+0600  forward 80
+0610  pendown
+0620 until keyt&lt;&gt;chr$(0) // Taste gedrueckt
+0630 //
+0640 // Sprites und Turtle bewegen
+0650 //
+0660 proc bewegung
+0670  //
+0680  // Spritegroesse zufaellig aendern
+0690  //
+0700  spritesize 0,rnd(0,1),rnd(0,1)
+0710  spritesize l,rnd(0,1),rnd(0,1)
+0720  spritesize 2,rnd(0,1),rnd(0,1)
+0730  spritesize 3,rnd(0,1),rnd(0,1)
+0740  for x:=1 to 300 step 5 do
+0750   //
+0760   // Turtle bewegen
+0770   //
+0780   left 88
+0790   forward 50
+0800   //
+0810   // Sprites bewegen
+0820   //
+0830   spritepos 0,x,y
+0840   spritepos l,300-x,y+50+x/3
+0850   spritepos 2,x,y+50+x/3
+0860   spritepos 3,300-x,y
+0870  endfor x
+0880 endproc bewegung</pre>
             <figcaption>Listing 2. Turtle-Grafik und Sprites: So einfach und übersichtlich ist die Programmierung</figcaption>
         </figure>
 
