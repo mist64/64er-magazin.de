@@ -34,7 +34,95 @@
             <figcaption>Listing zu »Cursorsteuerung leicht gemacht«. Das Programm muß mit dem MSE auf Seite 68 eingegeben werden.</figcaption>
         </figure>
         <figure>
-            TODO
+            <pre>10 REM*********************************
+20 REM*    CURSOR STEUEREUNG          *
+30 REM*                               *
+65 REM*       PETER SIEPEN            *
+70 REM*                               *
+75 REM*     VON-STEPHAN-STR.6         *
+80 REM*                               *
+82 REM*     4200 OBERHAUSEN 1         *
+84 REM*                               *
+85 REM*  TELEFON :(0208)/26555        *
+90 REM*********************************
+95 :
+100 SYS9*4096
+110 .OPT P,OO
+111 :
+112 :
+113 :
+114 :
+120 *= $C000
+125 :
+130 :
+140 :
+150 TEST  = $02         ;ZAEHLVARIABLE
+160 JOY   = 56320       ;PORT #2
+170 AZITP = $C6         ;ANZAHL ZEICHEN IM PUFFER
+174 :
+175 :
+180 LDA #&lt;BEGINN;INTERUPTVEKTOR
+185 STA $314
+190 LDA #&gt;BEGINN;AUF NEUE
+195 STA $315    ;ADDRESSE SETZEN
+200 LDA #$06    ;ZAEHLVARIABLE
+205 STA TEST    ;HOCHSETZEN
+210 RTS         ;ZURUECK ZU BASIC
+215 :
+220 :
+225 :
+300 BEGINN   DEC TEST
+320 :        BEQ START   ;GENUG LEER IRR
+330 :        JMP $EA31   ;NEIN WEITER MIT IRR
+340 START    LDA #$06    ;ZAEHLVARIABLE HOCHSETZEN
+350 :        STA TEST
+360 :        LDX AZITP   ;TASTATURPUFFER
+370 :        CPX #$08    ;VOLL
+380 :        BCC WEITER
+390 :        JMP $EA31   ;JA WEITER MIT INTERUPT
+400 WEITER   LDA JOY     ;WENN JOY NICHT
+410 :        AND #1      ;NACH OBEN
+420 :        CMP #0      ;WEITER
+430 :        BNE NOBEN
+440 :        LDA #"{up}" ;WENN JA STEUERZEICHEN
+450 :        JSR AUSG    ;AUSGEBEN
+460 NOBEN    LDA JOY
+470 :        AND #2
+480 :        CMP #0
+490 :        BNE NUNTEN
+500 :        LDA #"{up}"
+510 :        JSR AUSG
+520 NUNTEN   LDA JOY
+530 :        AND #4
+540 :        CMP #0
+550 :        BNE NLINKS
+560 :        LDA #"{left}"
+570 :        JSR AUSG
+580 NLINKS   LDA JOY
+590 :        AND #8
+600 :        CMP #0
+700 :        BNE NRECHTS
+710 :        LDA #"{right}"
+720 :        JSR AUSG
+730 NRECHTS  JMP $EA31
+740 :
+750 :
+760 :
+770 :
+780 :
+790 :
+800 AUSG     LDX $C6     ;X-REG FUER
+810 :        STA $277,X  ;INDIZIERTE
+820 :        INC AZITP   ;ADDRESSIERUNG
+830 :        RTS         ;LADEN
+840 :                    ;IN TASTPUFFER
+850 :                    ;SCHREIBEN
+860 :                    ;ANZAHL ZEICHEN
+870 :                    ;IM TASTPUFFER
+880 :                    ;ERHOEHEN
+890 :
+900 :
+READY.</pre>
             <figcaption>Assemblerprogramm der Cursorsteuerung</figcaption>
         </figure>
 
