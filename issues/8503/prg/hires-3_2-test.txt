@@ -1,0 +1,81 @@
+;hires-3_2-test.prg ==0801==
+    1 rem *********************************
+    2 rem *                               *
+    3 rem *       grafik test-demo        *
+    4 rem *             zum               *
+    5 rem *   2.teil von h i r e s - 3    *
+    6 rem * (laeuft nur zusammen mit dem  *
+    7 rem *     1. teil von hires-3)      *
+    8 rem * heimo ponnath,2102 hh 93,1984 *
+    9 rem *                               *
+   10 rem*********************************
+   20 poke52,128:poke56,128:sys37498:printchr$(147)
+   24 rem
+   25 rem ++++++ der rahmen ++++++++++++++
+   26 rem
+   30 sys34647:poke646,14:sp=4:z=5:gosub1000
+   35 print"dies ist der rahmen mit kopfzeile":z=6:gosub1000
+   40 print"---------------------------------":pau,1:z=8:gosub1000
+   45 print"trs und funkt fuer zoom-effekt":pau,2
+   47 rem
+   48 rem +++ trs,funkt,tln,lfunk,tbk,ltl+++
+   49 rem
+   50 deffna(x)=x^x
+   55 hfl,6,14:trs,-1,10,-1,30:funkt,a,0,3
+   60 tln,-1,0,5,0:tln,0,-1,0,30:tre,-.5,2,1.5,-.5
+   65 trs,-3,1.8,-2.5,2.5:tbk,-.5,2,1.5,-.5
+   70 lfunk,a,0,1.5:ltl,-.5,0,1.5,0:ltl,0,-.5,0,2:rec,0,0,319,199
+   80 pau,3:hof:sp=7:z=10:gosub1000:print"rechts ausschnittvergroesserung"
+   85 z=11:gosub1000:print"mit minimum bei .3679":pau,2:han:fori=1to5
+   90 tln,.3679,0,.3679,fna(.3679):pau,1:ltl,.3679,0,.3679,fna(.3679):nexti
+   95 pau,3:hof:sp=5:z=18:gosub1000:print"wuenschen sie eine hardcopy(j/n)?"
+  100 gosub2000:ifa$="j"thengosub3000
+  108 rem
+  109 rem +++++ tpk,tre ++++++++++++++++++
+  110 deffnx(t)=3*sin(4*t):deffny(t)=3*sin(9*t):printchr$(147):sp=5:z=10
+  115 sys34647:gosub1000:print"lissajous-figuren mit tpk":pau,2:hfl,1,6
+  120 trs,-5,5,-5,5:fort=0to2*~step.01:tpk,fnx(t),fny(t):nextt
+  125 fori=5to3.5step-.25:tre,-i,i,i,-i:nexti
+  130 pau,3:hof:poke646,14:z=18:gosub1000:print"hardcopy erwuenscht(j/n)?"
+  135 gosub2000:ifa$="j"thengosub3000
+  138 rem
+  139 rem +++++ tra,tkr,ltv,ltk ++++++++++
+  140 printchr$(147):sys34647:poke646,14:sp=5:z=10:gosub1000
+  145 print"polare kurven mittels tra":z=12:gosub1000:print"hier:vierblaettriger klee"
+  150 pau,2:hfl,1,2:deffnb(x)=-a*sin(2*x)/2
+  155 a=5:trs,-4,4,-4,4:forx=0to2*~step.1:tra,0,0,fnb(x),fnb(x),x:nextx
+  160 ltk,0,0,.25,.25,2*~:tkr,0,0,4,4,2*~:fori=0to2*~step.1:ltv,0,0,.2,.2,i:nexti
+  165 rec,0,0,319,199:pau,3:hof
+  170 z=20:gosub1000:print"diesmal eine hardcopy(j/n)?":gosub2000
+  175 ifa$="j"thengosub3000
+  178 rem
+  179 rem +++++++ ltp,ltr,ltb ++++++++++++
+  180 printchr$(147):sys34647:poke646,14:sp=5:z=8:gosub1000
+  185 print"gewoehnliche zykloide mittels ltp":pau,2
+  190 deffnc(t)=3*(t-sin(t)):deffnd(t)=3*(1-cos(t)):trs,-3,40,-3,50
+  195 hfl,14,6:tbk,-1,10,38,-2:ltr,0,9,37,0
+  200 fort=0to2*~+3step.1:ltp,fnc(t),fnd(t):nextt:ltb,30,8,36,.5
+  300 pau,3:hof:z=10:gosub1000:print"abschliessend noch:":z=12:gosub1000
+  305 print"3d-darstellung mittels":z=13:gosub1000:print"trs und funkt":pau,3
+  310 deffne(x)=exp(x/z)*sin(x):han:rec,0,0,319,199
+  315 trs,-3,5,-5,9:tln,-2,0,4,0:tln,0,-1,0,8:tln,-1,-1,2,2:d=1/20
+  320 fori=0to20:z=5-4*i*d:trs,-3-i*d,5-i*d,-5-i*d,9-i*d:funkt,e,-.5,3.31:nexti
+  325 pau,4:hof:sp=3:z=18:gosub1000:print"solls jetzt eine hardcopy sein(j/n)?"
+  330 gosub2000:ifa$="j"thengosub3000
+  398 rem
+  399 rem +++++++ ende +++++++++++++++++++
+  400 printchr$(147):sys34647:poke646,14:sp=10:z=12:gosub1000:print"das wars !"
+  405 pau,5:printchr$(147):aus:end
+  996 rem
+  997 rem ++++++ unterprogramme ++++++++++
+  998 rem
+  999 rem ++++++ cursor setzen +++++++++++
+ 1000 poke211,sp:poke214,z:sys58640:return
+ 1998 rem
+ 1999 rem +++++++ get-abfrage +++++++++++
+ 2000 geta$:ifa$=""then2000
+ 2100 return
+ 2998 rem
+ 2999 rem ++++++ hardcopy +++++++++++++++
+ 3000 open1,4,10:print#1:close1:han:sys34865:hof:return
+

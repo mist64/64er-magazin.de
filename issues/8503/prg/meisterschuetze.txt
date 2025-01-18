@@ -1,0 +1,669 @@
+;meisterschuetze.prg ==0801==
+   10 rem #########################
+   11 rem #   meister (schuetze)  #
+   12 rem # geschr. am 24.11.1984 #
+   13 rem # von   merk  ernst     #
+   14 rem # 7912  weissenhorn     #
+   15 rem # kohlstattstrasse 3    #
+   16 rem #########################
+   40 goto100
+   50 close5:open5,4,1:print#5,chr$(27);chr$(69);:close5:open5,4,2:return
+   60 close5:open5,4,1:print#5,chr$(27);chr$(70);:close5:open5,4,2:return
+  100 printchr$(147)
+  140 :
+  150 :
+  160 gosub30000
+  170 close1:open1,8,2,fr$+",l,"+chr$(dl)
+  180 close3:open3,8,8,fi$+",s,r"
+  190 gosub10000:rem disk fehler
+  200 if a1<>0thenrun
+  210 input#3,in$:mx$=left$(in$,15)
+  220 mx=val(mx$)
+  230 :
+  240 in$(0)=in$
+  250 printchr$(147)
+  260 print:print:print
+  270 print"         Information"
+  280 print:print
+  290 print"  Bisherige Dateigroesse: ";mx
+  300 print:print:
+  310 print"       Bitte Warten"
+  320 i=0
+  330 fori=1tomx
+  340 :input#3,in$(i),pl%(i),te$(i)
+  342 :
+  344 :
+  346 :print" "itab(7)mxtab(15);in$(i)
+  350 next:ii=0
+  351 close3:open3,8,8,"@:gruppen,s,r"
+  352 fr$="gruppen":fi$=fr$+"index":gosub10000:fr$="sch.rel":fi$=fr$+"index"
+  353 iffs=1then359
+  354 ii=ii+1:ifii>15then359
+  356 input#3,gr$(ii):print"     "gr$(ii)
+  358 ifst<>64then354:  close3
+  359 close3:open3,8,8,fi$+",s,r"
+  360 gosub10000
+  365 print:print
+  370 print" Druecken Sie eine Taste"
+  380 poke198,0:wait198,1
+  390 rem ----------------
+ 1000 rem  meneu
+ 1010 rem ---------------
+ 1020 :
+ 1030 printchr$(147)"{rvon}      ***   Schuetzen - Datei   ***     {rvof}"
+ 1050 print"   Haupt - Menue :   "
+ 1055 print"  {CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}"
+ 1060 print
+ 1080 print"   X = Programm-Ende"
+ 1085 print
+ 1087 print"   B = Freier Speicherplatz"
+ 1090 print
+ 1100 print"   G = Anzeigen ges. Datei"
+ 1110 print
+ 1120 print"   S = Suchen"
+ 1122 print
+ 1125 print"   D = Gruppen definieren"
+ 1130 print
+ 1140 print"   N = Neue Namen eingeben"
+ 1142 print
+ 1145 print"   E = Ergebnisse eingeben"
+ 1146 print
+ 1147 print"   A = Ausdruck d.Ergeb."
+ 1150 print
+ 1160 print"   ! = Neue Datei anlegen"
+ 1170 print:print
+ 1180 print"Waehlen Sie ";
+ 1190 poke198,0
+ 1200 get r$:ifr$=""then1200
+ 1210 ifr$="x"thenclose1:gosub15000:close15:printchr$(147)chr$(142):end
+ 1220 ifr$="g"then3500
+ 1225 ifr$="d"then17000
+ 1230 ifr$="s"then3000
+ 1240 ifr$="n"then1800
+ 1245 ifr$="e"then16000
+ 1247 ifr$="a"then20000
+ 1250 ifr$="!"then11000
+ 1260 ifr$="b"thenprintchr$(147)"{rvon}{down}{down}{down}{down}Freier Speicher :{rvof}"fre(o)" Byte":forii=0to3500:next
+ 1270 goto390
+ 1800 rem -----------------------
+ 1810 rem eingabe
+ 1820 rem -----------------------
+ 1821 nn$="":rc$=""
+ 1822 fori=1to5:rc$=rc$+" ... ... ... ... ... ... ... ... ... ...":next
+ 1827 printchr$(147)"{rvon}     Name u. Vorname eingeben :         {down}{rvof}"
+ 1828 bl$="                           "
+ 1830 inputnn$:ifnn$=""then390
+ 1832 printchr$(147)"{rvon} Gruppe  auswaehlen < NR. 1-15 > :      {rvof}";
+ 1833 print"{rvon} Alle anderen Nummern = << RETURN >> !!!{rvof}"
+ 1834 printchr$(19)"{down}{down}{down}{down}{down}{down}****************************************"
+ 1836 forii=1to15:printii,gr$(ii):next:nn$=left$(nn$,25)
+ 1838 printchr$(19)"{down}{down}Name   :  "nn$:print
+ 1840 input"Gruppe :";r$:
+ 1842 te=val(r$):ifte<1orte>15then1000
+ 1844 printchr$(145),gr$(te)
+ 1846 nn$=nn$+left$(bl$,25-len(nn$)):
+ 1850 rc$=nn$+rc$
+ 1860 rem bestimmung satz nr.
+ 1870 lz$="    ":lz=4
+ 1880 i=0
+ 1890 i=i+1:ifi>mxthen1980
+ 1900 :
+ 1910 if in$(i)<>"*"then1890
+ 1920 i$=str$(i):te$(i)=str$(te)
+ 1930 i$=mid$(i$,2)+left$(lz$,lz-len(i$)+1)
+ 1940 in$(i)=i$+nn$
+ 1950 rn$=str$(i)
+ 1960 gosub14000
+ 1970 gosub8000:
+ 1980 if i>=mxthenprintchr$(147);"Datei voll !":goto11500
+ 1990 goto1000
+ 2000 rem -------------------
+ 2010 rem ausgabe 1.datensatz
+ 2020 rem -------------------
+ 2030 printchr$(19)"{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}                                                "
+ 2040 printchr$(19);chr$(17)"{down}{down}{down}{down}{down}****************************************";
+ 2045 print"    Anzeige Datensatz";rn
+ 2050 print:print
+ 2060 print" Nachname   :"nn$
+ 2065 te=val(te$(rn)):te=abs(te)
+ 2070 print" Gruppe     :"gr$(te)
+ 2080 print" Ergebnisse :":print:printsr$:print
+ 2100 print" Summe der 10 h. Ergeb.:        {left}{left}{left}{left}{left}{left}{left}{left}"pl%(i)
+ 2130 return
+ 2500 rem -------------
+ 2510 rem drucken
+ 2520 rem -------------
+ 2530 printchr$(19);"*************** Hardcopy ***************";
+ 2532 foru=1to4:print"                                        ";:next
+ 2540 printchr$(18)"Ist Drucker eingeschaltet Taste druecken";chr$(146);chr$(145);
+ 2550 getr$:ifr$=""then2550
+ 2560 print"                                        ";
+ 2630 close5:open5,4,0
+ 2640 fory=1024to1984step40
+ 2650 bz$=""
+ 2660 forx=0to39
+ 2670 z%=peek(y+x)
+ 2680 ifz%<32thenz%=z%+64
+ 2690 bz$=bz$+chr$(z%)
+ 2700 next
+ 2710 print#5,bz$
+ 2720 next
+ 2730 close5:printchr$(19);:goto3180
+ 3000 rem -------------
+ 3010 rem suchen
+ 3015 rem -------------
+ 3020 n$=""
+ 3030 printchr$(147);
+ 3040 print"{rvon}            ---   Suchen  ---           {rvon}"
+ 3050 print:print
+ 3060 input" Nachname";n$
+ 3070 n=len(n$)
+ 3080 s1=1
+ 3090 fori=s1tomx
+ 3100 :ifin$(i)="*"then3120
+ 3110 :ifmid$(in$(i),5,n)=n$then3180
+ 3120 next
+ 3130 ifs1>1thenprint:printchr$(147)"{rvon} Suche beendet !!{rvof}":print:goto 3150
+ 3140 print:printn$" nicht gefunden":print
+ 3150 print"Druecke Taste"
+ 3160 get r$:ifr$=""then3160
+ 3170 goto 1000
+ 3180 rn$=left$(in$(i),4):printchr$(147)
+ 3185 iflen(rn$)=0then3230
+ 3190 gosub14000 :rem satznr aufteilen
+ 3200 gosub 9000 :rem lesen / aufteilen
+ 3220 gosub 2000 :rem anzeigen
+ 3225 print
+ 3230 printchr$(19)"{rvon}         ---   Datensatz   ---          {rvof}"
+ 3240 w$="                   {rvon} Waehle :{rvof} "
+ 3250 print"(W)eitersuchen  (Z)urueck"
+ 3260 print"(A)endern       (L)oeschen"
+ 3270 print"(D)rucken"
+ 3280 printw$
+ 3290 get r$:ifr$=""then3290
+ 3300 w$="                   {rvon} Warten !{rvof} "
+ 3310 printchr$(145);w$;chr$(17)
+ 3320 if r$="z"then3170
+ 3330 if r$="w"thens1=i+1:goto3090
+ 3340 if r$="a"then6000
+ 3350 if r$="l"thenprintchr$(147);:goto4000
+ 3360 if r$="d"thengoto2500
+ 3370 goto3230
+ 3500 rem ---------------------
+ 3510 rem lesen ges. datei
+ 3520 rem ---------------------
+ 3530 printchr$(147):rn=0
+ 3540 rn=rn+1:i=rn
+ 3550 :hb=int(rn/256)
+ 3560 :lb=rn-hb*256
+ 3570 :gosub9000 :rem lesen
+ 3580 :if er=50 thenprintchr$(147);"Datei-Ende !!!":print:print:print:goto3620
+ 3590 :if f=2thenprintchr$(19)"{down}{down}{down}{down}{down}{rvon} Nicht belegt: Datensatz-Nr. ";rn;"{rvof} ":goto3540
+ 3610 :gosub 2000:rem anzeigen
+ 3620 :print"Druecke Taste"
+ 3630 :get r$:ifr$=""then3630
+ 3640 :r$=""
+ 3650 if er<>50 then3540
+ 3660 goto1000
+ 4000 rem ---------------------
+ 4010 rem loeschen datensatz
+ 4020 rem ---------------------
+ 4030 :
+ 4040 in$(i)="*":pl%(i)=0
+ 4050 rc$="~"
+ 4060 gosub8000:rem speichern
+ 4070 nn$=".":nv$=".":ot$=".":sr$="."
+ 4080 :
+ 4100 goto3220
+ 5000 rem ------------------------------
+ 5010 rem aufteilen datensatz in feldern
+ 5020 rem ------------------------------
+ 5030 :
+ 5050 nn$=mid$(rc$,1,25)
+ 5070 sr$=mid$(rc$,26,200)
+ 5110 return
+ 6000 rem ----------------------
+ 6010 rem - eingabe neue daten
+ 6020 rem ----------------------
+ 6030 :
+ 6040 printchr$(147);:nv$="":ifj=0thenj=1
+ 6045 gosub2000
+ 6050 print"{home}{rvon}     Eingabe - Schiessergebnisse :      {rvof}";
+ 6060 print"                                        ";
+ 6070 print" F7=Zurueck / Cursor ^_ =Schiesstag !!! ";
+ 6080 print"                                        ";
+ 6090 print"{rvon} Schiesstag : {rvof}   {left}{left}{left}"j,"{rvon}Ergebniss : {rvof}     {left}{left}{left}{left}"nv$
+ 6100 getr$
+ 6110 ifr$="{up}"thenj=j-1:ifj<1thenj=1
+ 6120 ifr$="{down}"thenj=j+1:ifj>50thenj=50
+ 6130 ifr$="{f7}"then6300
+ 6140 ifr$=>"0"andr$<="9"thennv$=nv$+r$:iflen(nv$)>3thennv$=left$(nv$,3)
+ 6150 ifr$=chr$(20)andlen(nv$)>0thennv$=left$(nv$,(len(nv$)-1))
+ 6160 ifr$=chr$(13)then6200
+ 6180 goto6050
+ 6200 rem ergebnis einsortieren
+ 6210 nv$=left$(bl$,4-len(nv$))+nv$
+ 6215 ifnv$="    "thennv$=" ..."
+ 6220 ii=(j-1)*4:ifii<1then6240
+ 6230 sr$=mid$(sr$,1,ii)+nv$+mid$(sr$,ii+5):goto6260
+ 6240 sr$=nv$+mid$(sr$,j+4)
+ 6260 gosub2000:rc$=nn$+sr$
+ 6270 nv$="":goto6050
+ 6300 printchr$(147)
+ 6301 print"{rvon}      Bitte haben Sie etwas Geduld !    {rvof}":print:print
+ 6303 goto18000:rem 10 h. ergeb.
+ 6305 gosub14000
+ 6310 gosub8000
+ 6990 goto16213
+ 8000 rem ---------------------------
+ 8010 rem daten speicher auf disk
+ 8020 rem ---------------------------
+ 8030 :
+ 8080 print#15,"p"+chr$(2)+chr$(lb)+chr$(hb)+chr$(1)
+ 8100 print#1,rc$
+ 8110 fs=1:rem flag speichern
+ 8170 return
+ 8180 :
+ 9000 rem ---------------------
+ 9010 rem lesen von disk
+ 9020 rem ---------------------
+ 9030 f=0
+ 9040 print#15,"p"+chr$(2)+chr$(lb)+chr$(hb)+chr$(1)
+ 9050 input#15,er
+ 9060 if er =50then9110
+ 9070 input* 1,226,rc$
+ 9080 ifleft$(rc$,1)="~"thenf=2:goto9110
+ 9090 f=1:
+ 9100 :
+ 9110 goto5000
+ 9999 close15:open15,8,15
+10000 rem ------------------
+10010 rem disketten-fehler
+10020 rem ------------------
+10030 printchr$(147)
+10040 input#15,a1,a2$,a3,a4
+10050 ifa1=0then10180
+10055 ifa1=62andfr$="gruppen"thenfs=1:goto 10180
+10060 ifa1=62thengosub10200:goto10180
+10070 print
+10080 printa1,a2$,a3,a4
+10090 print:print
+10100 print"        Disketten-Fehler"
+10110 print:print
+10120 print"    Beheben Sie den Fehler"
+10130 print"    und druecken Sie"
+10140 print"          << F >>"
+10160 getr$:ifr$=""then10160
+10170 printchr$(147)
+10180 return
+10190 :
+10200 printchr$(147)
+10210 print:print:print:print
+10220 print" Die Datei        "fr$
+10230 print
+10240 print" oder             "fi$
+10250 print
+10260 print" Existieren nicht !"
+10270 print:print
+10280 print"  L = Datendisk einlegen"
+10290 print
+10300 print"  N = Datei neu anlegen"
+10310 getr$:ifr$=""then10310
+10320 ifr$="l"thenreturn
+10330 ifr$="n"thengoto11000
+10340 goto10310
+11000 rem ------------------
+11010 rem neue datei anlegen
+11020 rem ------------------
+11030 :
+11040 printchr$(147):print
+11050 ifa1=0then11070
+11060 print" "
+11070 print" Achtung,die gesamte Disk wird "
+11080 print" geloescht !!!"
+11090 print:print
+11100 print" N = neue Datei     X = Ende"
+11110 getr$:ifr$=""then11110
+11120 ifr$="x"then close1:gosub15000:close15:printchr$(147):end
+11130 ifr$<>"n"then11110
+11140 print:print"      Bitte Warten !":
+11150 print#15,"s:sch.rel"
+11160 clr:gosub30000
+11170 close1:open1,8,2,fr$+",l,"+chr$(dl)
+11180 print"Wieviele Datensaetze soll die Datei"
+11190 print"verwalten ";
+11200 inputrn$:rn=abs(int(val(rn$)))
+11210 ifrn<=mxthen11180
+11220 hb=int(rn/256)
+11230 lb=rn-hb*256
+11240 print" Bitte Warten !"
+11250 print#15,"p"+chr$(2)+chr$(lb)+chr$(hb)+chr$(1)
+11260 print#1,chr$(255)
+11270 mx=rn
+11280 mx$=str$(rn)
+11290 close1
+11300 :
+11310 print"{home}                                       "
+11320 fori=am+1tomx
+11330 :in$(i)="*"
+11340 print"{home}     "mx;i,in$(i)
+11350 next
+11360 in$(0)=mx$:am=1
+11380 gosub15040:rem seq datei speichern
+11420 run
+11430 :
+11500 rem ------------------
+11510 rem datei erweitern
+11520 rem ------------------
+11530 am=mx
+11540 mx=mx+25
+11550 print:print" Erweitern der Datei"
+11560 print:print" Bisherige Groesse = "am
+11570 print:print" Neue Groesse      = "mx
+11580 rn=mx
+11590 goto 11220
+14000 rem --------------------------
+14010 rem auteilen datensatznummer
+14020 rem --------------------------
+14030 :
+14040 rn=abs(int(val(rn$)))
+14100 hb=int(rn/256)
+14110 lb=rn-hb*256
+14130 return
+14150 :
+15000 rem -----------------------
+15010 rem speichern seq datei
+15020 rem -----------------------
+15030 if fs<>1then15120
+15040 close3:open3,8,8,"@:"+fi$+",s,w"
+15050 gosub10000:rem fehlerkanal
+15060 ifa1<>0then15040
+15065 print#3,str$(mx)
+15070 fori=1tomx
+15080 :print#3,in$(i)","pl%(i)","te$(i)
+15085 printchr$(147)i,"n:"in$(i),"s:"pl%(i),"gr:"te$(i)
+15090 next
+15092 close3:open3,8,8,"@:gruppen,s,w"
+15094 fr$="gruppen":fi$="gruppen":gosub10000:fr$="sch.rel":fi$=fr$+"index"
+15100 fori=1to15:print#3,gr$(i):next
+15110 close3
+15120 return
+15130 :
+15500 rem ---------------------
+15510 rem lesen seq datei
+15520 rem ---------------------
+15530 close3:open3,8,8,"@:"+fi$+",s,r"
+15540 gosub10000:rem fehlerkanal
+15550 ifa1<>0then15530
+15560 fori=1tomx
+15570 print#3,in$(i),pl%(i),te$(i)
+15580 :print" "i;mx;in$(i)
+15590 next
+15592 close3:open3,8,8,"gruppen,s,r"
+15594 fr$="gruppen:fi$="gruppen":goS10000:fr$="sch.rel":fi$=fr$+"index"
+15595 fori=1to15:input#3,gr$(i):printgr$(i):next
+15600 close3
+15610 return
+15620 :
+16000 rem -------------------
+16010 rem ergebnisse eingeben
+16020 rem -------------------
+16022 printchr$(147)
+16030 goto16250
+16100 getr$
+16110 ifr$="{f1}"theni=i+1:goto16201
+16120 ifr$="{f2}"theni=i-1:goto16206
+16130 ifr$="{f7}"andi>0andi<=mxandleft$(in$(i),1)<>"*"then6000
+16140 ifr$="{f8}"then1000
+16200 goto16100
+16201 ifi>mxtheni=i-1:goto16100
+16203 ifin$(i)<>"*"then16213
+16205 i=i+1:goto16201
+16206 ifi<1theni=i+1:goto16100
+16208 ifin$(i)<>"*"then16213
+16210 i=i-1:goto 16206
+16213 printchr$(147):ifi<0ori>mxthen16100
+16214 rn$=str$(i):
+16215 gosub14000:rem satznr.auft
+16220 gosub9000:rem lesen / aufteilen
+16240 gosub2000:rem anzeigen
+16250 printchr$(19);
+16255 print"{rvon}        ---   Eingabe - Meneu  ---      {rvof}";
+16260 print" F1 = Naechster Datensatz"
+16270 print" F2 = Letzter   Datensatz"
+16280 print" F7 = Datensatz aendern"
+16285 print" F8 = Zurueck Hauptmenue"
+16290 print"{rvon} Waehle :{rvof}"
+16300 goto16100
+17000 rem--------------------
+17010 rem gruppen definieren
+17020 rem--------------------
+17030 printchr$(147);:fs=1
+17040 print"{rvon}           Gruppen definieren :         {rvof}":print"{down}{down}{down}{down}";
+17045 print"****************************************"
+17050 forii=1to15
+17060 printii,gr$(ii)
+17070 next
+17080 printchr$(19)"{down} F1 = Eingabe "
+17090 print" F7 = Zurueck Haupt-Menue"
+17095 print" F2 = Gruppe loeschen "
+17098 print"{rvon} Waehle:{rvof}"
+17100 getr$:ifr$=""then17100
+17110 ifr$="{f7}"then1000
+17120 ifr$="{f2}"then17500
+17130 ifr$<>"{f1}"then17100
+17140 forii=1to15:ifgr$(ii)="."then17160
+17150 next:printchr$(147)"{down}{rvon} Alle Gruppen belegt !{rvof}":goto17080
+17160 printchr$(147)"{down}{down} Welcher Name :":print
+17170 inputgr$(ii):goto17030
+17500 printchr$(19);:forii=1to6:print"                                        ";:next
+17510 printchr$(19):print" Welche Gruppe soll geloescht werden :"
+17520 input"{rvon} NR.: {rvof}";r$:ii=val(r$):ifii>15orii<1then17030
+17530 gr$(ii)=".":goto17030
+18000 rem-------------------------
+18010 rem erm. 10 hoechsten serien
+18020 rem-------------------------
+18022 h%=0:pl%=0:
+18025 forii=1to200step4
+18030 ifii=1thensr$=" "+mid$(sr$,ii+1):goto18038
+18031 sr$=left$(sr$,ii-1)+" "+mid$(sr$,ii+1)
+18038 next
+18040 fori1=1to10
+18050 forii=1to200step4
+18060 r%=val(mid$(sr$,ii,4))
+18070 ifr%>h%thenh%=r%:hh%=ii
+18080 next:ifhh%=0then18125
+18090 pl%=pl%+h%
+18092 h$=str$(h%)
+18093 h$=left$(bl$,4-len(h$))+h$
+18094 h$="-"+mid$(h$,2,3)
+18100 ifhh%=1thensr$=h$+mid$(sr$,5):goto18120
+18110 sr$=left$(sr$,hh%-1)+h$+mid$(sr$,hh%+4)
+18120 h%=0:h$="":hh%=0
+18125 next
+18130 pl%(i)=pl%:rc$=nn$+sr$:
+18140 goto6305
+20000 rem---------
+20010 rem ausdruck
+20020 rem---------
+20030 close1:gosub15000
+20035 close1:open1,8,2,fr$+",l,"+chr$(dl)
+20040 printchr$(147)"{rvon}      ###   Drucker-Ausgabe   ###       {rvof}"
+20050 print:print:print"{rvon}        Bitte Warten !!!                {rvof}";
+20100 printchr$(145)" Bitte waehlen Sie :                    ":print:print
+20110 print" F7 = Zurueck Hauptmene":print
+20120 print" 1  = Gesammt Ausdruck":print
+20130 print" 2  = Ausdruck Gruppe von / bis":print
+20135 print:print"{rvon} Bitte Drucker einschalten !!!        {rvof}":print
+20140 getr$:ifr$=""then20140
+20145 close5:open5,8,1:print#5,chr$(27);chr$(64);:close5
+20150 ifr$="{f7}"then1000
+20160 ifr$="1"then20260
+20170 ifr$<>"2"then20140
+20200 printchr$(147)"{rvon}         Ausdruck :                     {rvof}"
+20210 forii=1to15:printii,gr$(ii):next:print:print
+20220 input"Nr.-Von :";r$:v%=abs(int(val(r$)))
+20230 input"Nr.-Bis :";r$:b%=abs(int(val(r$)))
+20240 ifv%<1orv%>15orb%<1orb%>15orv%>b%then20200
+20250 goto20300
+20260 v%=1:b%=15:rr$="vm":rem ges. ausdruck
+20300 close5:gosub50
+20310 print#5,"########################################";
+20320 print#5,"########################################";
+20330 print#5,"#                    Schuetzenverein Obe";
+20340 print#5,"rreichenbach e.V.                      #";
+20350 print#5,"########################################";
+20360 print#5,"########################################"
+20370 gosub60:print#5,chr$(10):print:r$=""
+20380 input"Datum :";r$
+20390 print#5,"Schiesssaison bis : ";r$;:gosub50:print#5,chr$(10):print#5,,,
+20400 ifrr$="vm"thenprint#5,"******* VEREINS-MEISTER : *******"
+20410 ifrr$="vm"thengosub50:print#5,,;:close5:z%=0:gosub22000:gosub60:close5
+20500 fori1=v%tob%
+20510 ifgr$(i1)="."then20600
+20520 close5:open5,4,7
+20530 gosub50:print#5:print#5,gr$(i1);" :":gosub60:close5:open5,4,7
+20535 h=len(gr$(i1))+2
+20540 forii=1toh:print#5,"{CBM-U}";:next:
+20550 print#5:close5:z%=i1
+20560 gosub22000
+20600 next:
+20610 gosub50:print#5,
+20620 forii=1to80:print#5,"+";:next
+20630 print#5,"+  COMMODORE - COMPUTER - Sotfware von M";
+20640 print#5,"ERK ERNST / geschrieben am 24.11.1984  +";
+20650 forii=1to80:print#5,"+";:next:print#5,chr$(10):close5
+20660 goto29999
+22000 rem -----------
+22010 rem platzierung
+22020 rem -----------
+22030 f%=1:
+22040 h%=0:hh%=0:iz=0:hf=0:w=0:
+22050 fori=1tomx
+22060 tc%=val(te$(i))
+22070 ifz%=0thentc%=0
+22080 ifpl%(i)>h%andtc%=z%thenh%=pl%(i):iz=i
+22085 next:
+22090 ifh%=0thenreturn
+22095 tt(0,0)=iz:tt(0,11)=pl%(iz):pl%(iz)=0:hh%=hh%+1
+22110 forw=1tomx
+22120 tc%=val(te$(w))
+22130 ifz%=0thentc%=0
+22140 ifpl%(w)=h%andtc%=z%thengoto22145
+22141 goto22150
+22145 i=w:gosub31000:hh%=hh%+1:ifhh%>9then22200
+22150 next
+22200 ifhh%=1theni=tt(0,0):pl%(i)=tt(0,11):gosub50000:goto22210
+22205 iz=hh%:i=tt(0,0):pl%(i)=tt(0,10):hh%=0:j%=1:gosub31060:hh%=iz
+22208 goto23000
+22210 ifz%=0then29998
+22220 f%=f%+1
+22230 iff%>mxthen29998
+22240 goto22040
+23000 rem ---- weitere sortierstufe
+23020 fory=0tohh%
+23030 forx=1to8
+23040 foru=x+1to9
+23050 iftt(y,x)<tt(y,u)thenh%=tt(y,x):tt(y,x)=tt(y,u):tt(y,u)=h%
+23060 next:next:next
+23100 fory=0tohh%
+23110 h%=0
+23120 forx=9to1step-1
+23130 s(y)=s(y)+(2^h%*tt(y,x))
+23140 h%=h%+1
+23150 next:next
+23200 hf=0
+23210 fory=0tohh%
+23220 ifs(y)>hfthenhf=s(y):iz=y
+23230 next:u=0
+23240 i=tt(iz,0):pl%(i)=tt(iz,11):s(iz)=0
+23250 gosub50000
+23300 fory=0tohh%
+23310 ifs(y)=hftheni=tt(y,0):pl%(i)=tt(y,11):s(y)=0:gosub50:close5:gosub50000:u=u+1
+23320 next
+23400 fory=0tohh%
+23410 ifs(y)>0andz%=0theni=tt(y,0):pl%(i)=tt(y,11):s(y)=0:goto23430
+23420 ifs(y)>0andz%>0thenf%=f%+1:goto23200
+23430 next
+23500 fory=0to10
+23510 forx=0to10
+23520 tt(y,x)=0
+23530 next:next
+23540 f%=f%+1:f%=f%+u
+23550 ifz%<>0then22040
+29998 return
+29999 close1:close15:printchr$(147)chr$(142):end
+30000 rem ----------------
+30010 rem initialisierung
+30020 rem ----------------
+30040 dl=226:rem datensatzlaenge
+30050 rn=1
+30070 bl$="                               "
+30080 bl=len(bl$)
+30090 print"{red}"chr$(14):poke53281,10:poke53280,10
+30100 fr$="sch.rel"
+30110 fi$=fr$+"index"
+30120 dimin$(400),te$(400),pl%(400),gr$(16),tt(10,12)
+30125 fori=1to15:gr$(i)=".":next
+30130 fori=828to922
+30140 read x:pokei,x:s=s+x:next
+30150 data169,71,160,3,141,8,3,140,9,3,96,32
+30160 data115,0,201,133,240,6,32,121,0,76,231,167
+30170 data32,115,0,201,172,240,6,32,191,171,76,174
+30180 data167,32,155,183,32,30,225,32,253,174,32,158
+30190 data183,138,72,32,253,174,32,139,176,133,73,132
+30200 data74,32,163,182,104,32,117,180,160,2,185,97
+30210 data0,145,73,136,16,248,200,32,18,225,145,98
+30220 data200,196,97,208,246,32,204,255,76,174,167
+30230 ifs<>11096thenprint"fehler in datas !!":end
+30240 sys 828
+30250 close15:open15,8,15
+30330 return
+31000 rem -----------
+31010 rem 10 h.ergebnisse von schuetze
+31020 rem -----------
+31050 tt(hh%,0)=i:tt(hh%,11)=pl%(i):j%=1:pl%(i)=0
+31060 rn$=left$(in$(i),4)
+31065 close1:open1,8,2,fr$+",l,"+chr$(dl)
+31070 gosub14000:gosub9000:gosub5000
+31080 forii=1to200step4
+31090 ifmid$(sr$,ii,1)<>"-"then31120
+31100 tt(hh%,j%)=val(mid$(sr$,ii+1,3))
+31110 j%=j%+1
+31120 next
+31130 return
+50000 rem ---------------
+50010 rem ausdruck/papier
+50020 rem ---------------
+50025 ds%=0:d1%=0:d2%=0:lz=0
+50030 rn$=left$(in$(i),4)
+50040 gosub14000
+50050 gosub9000
+50100 open5,4,2
+50110 print#5,chr$(10)
+50120 ifz%<>0thengosub50:print#5,f%;" Platz :  ";
+50130 print#5,,nn$;:gosub60:print#5,chr$(10)
+50240 forw=1to200step4
+50250 ifw=81orw=161thenprint#5,chr$(10);
+50260 w$=mid$(sr$,w,4)
+50270 ifleft$(w$,1)="-"thengosub50:print#5," ";right$(w$,3);:gosub60
+52280 ifleft$(w$,1)="-"thend1%=d1%+1:goto52360
+52290 ifright$(w$,3)="..."thenprint#5," ";right$(w$,3);:goto52360
+52300 fs=val(right$(w$,3))
+52305 iffs=0thenlz=lz+1
+52310 iffs>0thends%=ds%+fs:d2%=d2%+1
+52320 print#5," ";right$(w$,3);
+52360 next
+52370 ds%=ds%+pl%(i):ii=int(pl%(i)/d1%*100+.5)/100
+52380 h=int(ds%/(d1%+d2%)*100+.5)/100
+52400 print#5,chr$(10)
+52410 print#5,"Summe    aus den hoechsten 10 Serien :";pl%(i);chr$(10);
+52420 print#5,"Durchschnitt der hoechsten 10 Serien :";ii;chr$(10);
+52430 print#5,"Durchschnitt aller Serien            :";h;chr$(10);
+52440 print#5,"Anzahl der Schiess-Abende            :";(d1%+d2%+lz);chr$(10);
+52450 print#5,chr$(10);
+52460 close5:printchr$(147);
+52470 gosub2000
+52480 pl%(i)=0
+52490 return
+

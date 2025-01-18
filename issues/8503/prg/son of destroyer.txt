@@ -1,0 +1,174 @@
+;son of destroyer.prg ==0801==
+    0 rem" ******************************
+    1 rem" **                          **
+    2 rem" *      Son of Destroyer      *
+    3 rem" *      ----------------      *
+    4 rem" *     C64 - Version 1.19     *
+    5 rem" *  Entwurf und Programm von  *
+    6 rem" *        Andreas Wurf        *
+    7 rem" *                            *
+    8 rem" **                          **
+    9 rem" ******************************
+   10 :
+   11 :
+   15 gosub 10000:rem             title
+   20 gosub 20000:rem             helppage
+   30 gosub 30000:rem             set vars
+   35 gosub 40000:rem             params
+   40 gosub 50000:rem             workfield
+   45 aw$="slh{f1}{f3}{f5}{f7}{f2}{f4}{f8}{up}{down}{left}{rght}":dim fu$(len(aw$))
+   47 dw$="{home}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}":fori=1 to len(aw$):read fu$(i):next
+   50 poke vi,peek(vi) or 128
+   60 poke 198,0:wait 198,1:get t$
+   70 poke vi,peek(vi)and not 128
+   80 for i=1 to len(aw$):if t$=mid$(aw$,i,1)then 87
+   85 next:goto 50
+   87 print dw$"{wht}Function: {rvon}"fu$(i)"{rvof}            {lblu}{home}"
+   90 on i gosub 4000,5000,200,500,800,1000,1300,1600,1900,2500,3000,3100,3200,3300
+   95 goto 50
+  200 gosub 20000:gosub 50000:return
+  500 poke vi,42:return
+  800 poke vi,46:return
+ 1000 for i=0 to 20:if peek(vi+i*40)<>46 and peek(vi+i*40)<>42 then 1010
+ 1005 poke vi+i*40,42:next
+ 1010 for i=1 to 20:if peek(vi-i*40)<>46 and peek(vi-i*40)<>42 then 1020
+ 1015 poke vi-i*40,42:next
+ 1020 return
+ 1300 for i=0 to 20:if peek(vi+i*40)<>46 and peek(vi+i*40)<>42 then 1310
+ 1305 poke vi+i*40,46:next
+ 1310 for i=1 to 20:if peek(vi-i*40)<>46 and peek(vi-i*40)<>42 then 1320
+ 1315 poke vi-i*40,46:next
+ 1320 return
+ 1600 open 15,gn,15:open 2,gn,2,"#":v=1868
+ 1605 for t=0 to 34:for s=0 to 20
+ 1610 p=peek(v-(s*40)+t):poke v-(s*40)+t,peek(v-(s*40)+t) or 128
+ 1620 if p<>42 then 1665
+ 1630 print#15,"u1:"2;0;t+1;s
+ 1640 print#15,"m-w";chr$(me);chr$(0);chr$(1);chr$(ko)
+ 1650 print#15,"u2:"2;0;t+1;s
+ 1660 print#15,"m-w";chr$(me);chr$(0);chr$(1);chr$(kn)
+ 1665 poke v-(s*40)+t,peek(v-(s*40)+t) and 127
+ 1666 get t$:if t$<>"*" then 1670
+ 1668 printdw$;"{wht}{rvon} Function aborted {rvof}{lblu}          {home}":close2:close15:return
+ 1670 next s,t:input#15,f1$,f2$,f3$,f4$:print"{home}{rght}{rght}{rght}{rght}{rght}{rght}{rvon}"f1$" "f2$" "f3$" "f4$
+ 1680 close 2:close 15:return
+ 1900 open 15,gn,15:open 2,gn,2,"#":v=1868
+ 1905 for t=0 to 34:for s=0 to 20
+ 1910 p=peek(v-(s*40)+t):poke v-(s*40)+t,peek(v-(s*40)+t) or 128
+ 1920 if p<>42 then 1945
+ 1925 print#15,"m-w";chr$(me);chr$(0);chr$(1);chr$(ko)
+ 1930 print#15,"u1:"2;0;t+1;s
+ 1935 print#15,"m-w";chr$(me);chr$(0);chr$(1);chr$(kn)
+ 1940 print#15,"u2:"2;0;t+1;s
+ 1945 poke v-(s*40)+t,peek(v-(s*40)+t) and 127
+ 1950 get t$:if t$<>"*" then 1970
+ 1960 printdw$;"{wht}{rvon} Function aborted {rvof}{lblu}          {home}":close2:close15:return
+ 1970 next s,t:input#15,f1$,f2$,f3$,f4$:print"{home}{rght}{rght}{rght}{rght}{rght}{rght}{rvon}"f1$" "f2$" "f3$" "f4$
+ 1980 close 2:close 15:return
+ 2100 gosub 40000:goto 50
+ 2500 print dw$"          {rvon}{wht}       Goodbye       {home}":end
+ 3000 if peek(vi-40)=42 or peek(vi-40)=46then vi=vi-40:return
+ 3005 return
+ 3100 if peek(vi+40)=42 or peek(vi+40)=46then vi=vi+40:return
+ 3105 return
+ 3200 if peek(vi-1)=42 or peek(vi-1)=46 then vi=vi-1:return
+ 3205 return
+ 3300 if peek(vi+1)=42 or peek(vi+1)=46 then vi=vi+1:return
+ 3305 return
+ 4000 rem ** save workpage **
+ 4010 :
+ 4020 open 15,gn,15:v=1868
+ 4030 print#15,"s:sod.temp":open 2,8,2,"sod.temp,u,w":print#2,gn:print#2,ko
+ 4040 for t=0 to 34:for s=0 to 20
+ 4050 print#2,chr$(peek(v-(s*40)+t));
+ 4060 next s,t:close 2
+ 4070 input#15,f1$,f2$,f3$,f4$:close 15
+ 4080 print"{home}{rght}{rght}{rght}{rght}{rght}{rght}{rvon}"f1$" "f2$" "f3$" "f4$
+ 4090 return
+ 5000 rem ** load workpage **
+ 5010 :
+ 5020 open 15,gn,15:v=1868:open 2,gn,2,"sod.temp,u,r":input#2,gn:input#2,ko
+ 5030 for t=0 to 34:for s=0 to 20
+ 5040 get#2,a$:a$=a$+chr$(0)
+ 5050 poke v-(s*40)+t,asc(a$)
+ 5060 next s,t:close 2
+ 5070 input#15,f1$,f2$,f3$,f4$:close 15
+ 5080 print"{home}{rght}{rght}{rght}{rght}{rght}{rght}{rvon}"f1$" "f2$" "f3$" "f4$
+ 5090 return
+ 9999 stop
+10000 rem ** ausgabe des kopfblattes **
+10001 rem ** und vorbereiten des     **
+10002 rem ** des bildschirms         **
+10003 :
+10010 poke 646,peek(53280):print"{clr}"chr$(9);chr$(14);chr$(8);
+10020 print"{rvon}    S O N    O F    D E S T R O Y E R   "
+10030 print"{up}{rvon}    =================================   "
+10040 print"{up}{rvon}                                        "
+10050 print"{up}{rvon}    ***                           ***   "
+10060 print"{down}{down}{down}   Ein Programm zum Zerstoeren und"
+10070 print"   Wiederherstellen von Disk-Blocks."
+10075 print"{down}   Der Inhalt dieser Blocks bleibt"
+10077 print"   vollstaendig erhalten."
+10080 print"{down}{down}{down}{down}{down}{down}{down}       *** Druecke {rvon}RETURN{rvof} ***
+10090 get t$:if t$<>chr$(13) then 10090
+10095 return
+10096 :
+10097 :
+20000 rem ** ausgabe des helpblattes **
+20003 :
+20020 print"{clr}{rvon}    S O N    O F    D E S T R O Y E R   "
+20030 print"{up}{rvon}    =================================   "
+20040 print"{up}{rvon}              Help - Page               "
+20050 print"{down}{down}  Allocate Block  =>  {rvon} F1 {rvof}
+20060 print"  Free Block      =>  {rvon} F3 {rvof}
+20070 print"  Allocate Track  =>  {rvon} F5 {rvof}
+20080 print"  Free Track      =>  {rvon} F7 {rvof}
+20090 print"  Destroy Disk    =>  {rvon} F2 {rvof}
+20100 print"  Rebuild  Disk   =>  {rvon} F4 {rvof}
+20110 print"{down}  Abort Function  =>  {rvon} * {rvof}
+20115 print"  Help-Page       =>  {rvon} h {rvof}
+20117 print"  Save Page       =>  {rvon} s {rvof}
+20118 print"  Load Page       =>  {rvon} l {rvof}
+20120 print"{down}{down}  Quit Program    =>  {rvon} F8 {rvof}
+20140 print"{down}{down}        ***  Press {rvon}RETURN{rvof}  ***"
+20150 wait 198,1:get t$:if t$<>chr$(13) then 20150
+20160 return
+20161 :
+20162 :
+30000 rem ** setzen der parameter **
+30001 :
+30010 gn=8:ko=139:vi=1868:me=71:kn=7:return
+30011 :
+30012 :
+40000 rem ** anpassen der parameter **
+40001 :
+40010 print"{clr}{rvon}    S O N    O F    D E S T R O Y E R   "
+40020 print"{up}{rvon}    =================================   "
+40030 print"{up}{rvon}             Set Parameters             "
+40040 open 1,0:print"{down}{down}"
+40050 print"  Device #     :"gn"{up}":print"{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}";:input#1,gn:print"{down}"
+40070 print"  Constant     :"ko"{up}":print"{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}";:input#1,ko:print"{down}"
+40080 close 1:if gn<8 or gn>14 then 40010
+40100 if ko<0 or ko>255 then 40010
+40110 return
+50000 print"{clr}";
+50005 print"{rvon} I/O: 00 ok 00 00                       {up}":print"{up}";
+50010 tr$="    ..................................."
+50020 for i=0 to 20:print tr$:next
+50030 print"{home}{down}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}XXXXXXXXXXXXXXXXXX
+50035 print"{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}XXXXXXXXXXXXXXXXXX
+50040 print"{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}XXXXXXXXXXX
+50050 print"{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}XXXXX
+50060 print"{home}{down}";:for i=20 to 0 step-1:print" "i:next
+50070 print"{rght}{rght}{rght}{rght}12345678901234567890123456789012345"
+50080 print"    {rvon}Tracks{rvof}   11111111112222222222333333"
+50090 print"{home}{down}{down}{down}{down}{down}{down}":tr$="Sectors"
+50095 for i=1 to len(tr$):print"{rvon}"mid$(tr$,i,1):next:return
+63040 :
+63050 rem ** data's fuer funktionen **
+63060 :
+63065 data "Save Page","Load Page"
+63070 data "Help-Page","Allocate Block","Free Block","Allocate Track"
+63080 data "Free Track","Destroy Disk","Rebuild Disk"
+63090 data "Quit Program","up","down","left","right"
+

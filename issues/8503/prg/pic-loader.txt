@@ -1,0 +1,27 @@
+;pic-loader.prg ==0801==
+   10 rem*******************************
+   20 rem*                             *
+   30 rem*  laden von hi-eddi-bildern  *
+   40 rem*     in  basicprogrammen     *
+   50 rem*                             *
+   60 rem*******************************
+  100 input"filename";n$
+  110 poke781,8:rem  geraeteadresse
+  120 poke782,0:rem  sekundaeradresse
+  130 sys65466:rem  fileparameter setzen
+  140 poke780,len(n$)
+  150 poke781,192:poke782,2:rem  pointer auf filenamen
+  160 fori=1tolen(n$):poke703+i,asc(mid$(n$,i)):next:rem  filename
+  170 sys65469:rem  namensparameter setzen
+  180 poke780,0:rem  load-flag
+  190 poke781,0:poke782,224:rem  adresse=$e000
+  200 sys65493:rem  load
+  210 rem  grafik einschalten
+  220 m1=peek(56576):poke56576,m1 and 252:rem  vic-adressbereich ab $c000
+  230 m2=peek(53272):poke53272,8:rem  videoram- und grafik-adressen
+  240 m3=peek(53265):poke53265,m3or32:rem  hires einschalten
+  250 f=16*7+6:rem  16*vordergrundfarbe+hintergrundfarbe
+  260 fori=49152to50152:pokei,f:next
+  270 poke198,0:wait198,1:rem  auf taste warten
+  280 poke56576,m1:poke53272,m2:poke53265,m3:rem  wieder normalzustand
+
