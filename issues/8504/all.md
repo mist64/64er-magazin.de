@@ -2358,18 +2358,729 @@ Das alles aber, liebe Leser, erfahren Sie erst beim nächsten mal. Für heute wa
 
 (Heimo Ponnath/gk)
 
+# Memory Mop mit Wandervorschlägen
 
+> Weiter geht's mit der Erkundung der Speichenandschaft. Die Adressen 57 bis 79 tragen zum Funktionieren eines Basic-Programms bei.
 
+Heute sind eine Gruppe von Zeigern an der Reihe, die vom Betriebssystem des Computers während der Abarbeitung einzelner Programmzeilen verwendet werden.
 
+## Adresse 57 und 58 ($39 und $3A)
+### Nummer der laufenden Basic-Programmzeile
 
+Diese Speicherzellen enthalten die Zeilennummer in Low-/ High-Byte-Darstellung derjenigen Basic-Anweisung, welche gerade ausgeführt wird.
 
+Ein kurzes Programm macht das deutlich:
+10 PRINT "ZEILE 10”, PEEK(57) + 256*PEEK(58)
+20 A = 3:PRINT A,PEEK(57) + 256*PEEK(58)
+30 B = 5:PRINT B,PEEK(57) + 256*PEEK(58)
+40 PRINT A*B,PEEK(57) + 256*PEEK(58)
+In jeder Zeile wird zuerst etwas gePRINTet, nämlich Text, Variable und ein Rechenresultat. Durch das Komma getrennt wird in der 2. Bildschirmhälfte (VC 20) beziehungsweise Bildschirmviertel (C 64) der Inhalt der Speicherzellen 57/58 ausgedruckt. Das Resultat zeigt in der Tat die jeweilige Zeilennummer an.
 
+Die Basic-Befehle GOTO, GO-SUB-RETURN, FOR-NEXT, END, STOP, CONT und die Betätigung der STOP-Taste während eines Programmlaufes verwenden alle den Inhalt dieser Speicherzellen, um entweder zu der laufenden Zeile zurückzufinden oder um die Unterbrechung mit BREAK IN... anzuzeigen. Auch die meisten Fehlermeldungen verwenden diese Zellen.
 
+In vielen Basic-Erweiterungen und Programmierhilfen wird ein Befehl TRACE oder STEP angeboten, welcher ein schrittweises Abarbeiten eines Programms bei gleichzeitiger Anzeige der gerade aktiven Zeilennummer erlaubt. Dieses TRACE verwendet natürlich auch den Inhalt der Zellen 57/58.
 
+Schließlich sei noch erwähnt, daß im direkten Modus, also bei direkt eingetippten Aktionen des Computers ohne Programmzeilen, in der Zelle 58 immer die Zahl 255 steht. Diejenigen Basic-Befehle, welche im direkten Modus nicht erlaubt sind (INPUT, GET, DEF) prüfen in Zelle 58, ob sie im direkten Modus oder während eines Programmlaufes aufgetreten sind.
 
+## Adresse 59 und 60 ($3B und $3C)
+### Zeilennummer der letzten Programmunterbrechung
 
+Immer dann, wenn ein Programmablauf durch die Befehle END oder STOP oder aber mit der STOP-Taste abgebrochen wird, wird die Nummer der gerade ausgeführten Programmzeile nach 59/60 gebracht und bleibt dort so lange, bis eine neue Unterbrechung erfolgt.
 
+Das läßt sich am besten mit der STOP-Taste und nachfolgendem CONT zeigen. Nehmen Sie bitte dazu das kleine Demo-Programm der Zellen 57/58 und ändern Sie alle PEEK-Adressen in 59/60 um. Fügen Sie außerdem noch eine Zeile 50 hinzu:
+50 GOTO 10
 
+Den dadurch erzeugten kontinuierlichen Lauf des Programms bremsen Sie dann mit der STOP-Taste und lassen ihn danach mit CONT weiterlaufen.
 
+Auf der rechten Seite erscheint jetzt die Zeilennummer, bei der das Programm vorher unterbrochen worden ist.
 
+## Adresse 61 und 62 ($3D und $3E)
+###Zeiger auf die Adresse, ab welcher der Text der laufenden Basic-Zeile abgespeichert ist.
 
+Die Abarbeitung der einzelnen Basic-Zeilen während eines Programmlaufs wird von einem kleinen Maschinencode-Pro-gramm, welches in den Speicherzellen 115 bis 138 steht (wir kommen noch dahin), gesteuert. In den Zellen 122/123 enthält es die Adresse, ab der die gerade bearbeitete Basic-Zeile gespeichert ist.
+
+Sobald eine neue Basic-Zeile verarbeitet wird, holt das Betriebssystem diese Adresse aus 122/123 und speichert sie in den hier zur Diskussion stehenden Speicherzellen 61/62 ab, wie üblich als Low-/High-Byte.
+
+Dasselbe geschieht beijedem Befehl END, STOP, bei Fehlern mit dem Befehl INPUT und durch das Drücken der STOP-Taste. Der Befehl CONT hingegen schaut in 61/62 nach und bringt die darin befindliche Adresse zurück in die Speicherzellen 122/123 zur Fortsetzung des Programms. Wenn aber in Zelle 62 inzwischen eine 0 steht — und das geschieht bei einem LOAD-Befehl, durch Programm-Abbruch mit Fehlermeldung und durch Eingabe neuer Basic-Zeilen beziehungsweise deren Veränderungen mit abschließender RETURN-Taste — dann wird der CONT-Befehl nicht ausgeführt.
+
+Zur besseren Erklärung dieser in 61/62 als Zeiger stehenden Adresse einer Basic-Zeile möchte ich Sie an den dritten Teil dieses Kurses in Ausgabe 1/85 erinnern, in dem ich in einem separaten Texteinschub den Basic-Programmspeicher »sichtbar« gemacht habe, um die Wirkung der Verschiebung des Zeigers in den Zellen 43/44 zu demonstrieren.
+
+Wir nehmen dazu bitte noch einmal das kleine Demo-Programm für die Adressen 57/58 oben her und ersetzen die PEEK-Werte durch 61 und 62. Das Ausdrucken des Inhalts von 61/62 legen wir aber an den Anfang jeder Zeile. Das Programm sieht dann so aus:
+10 PRINT PEEK(61) + 256*PEEK (62),"ZEILE 10"
+20 PRINT PEEK(61) + 256*PEEK (62),:A = 3:PRINTA
+30 PRINT PEEK(61) + 256*PEEK (62),:B = 5:PRINTB
+40 PRINT PEEK(61) + 256*PEEK (62),A*B
+
+Nach RUN erhalten wir jetzt auf der linken Seite Zahlen, die den jeweiligen Basic-Speicher angeben, ab dem diese Zeile gespeichert ist. Wenn Sie ab diesen Adressen mit der gerade erwähnten Methode aus der Ausgabe 1/85 nachschauen, finden Sie genau die Zeilen des kleinen Demo-Programms wieder. Zur Anwendung dieses Zeigers kann ich wenig sagen. Ihn durch POKE zu verändern, geht in Basic nicht, weil das Betriebssystem die richtigen Werte immer neu eingibt. Man kann ihn allerdings abfragen.
+
+## Adresse 63 und 64 ($3F und $40)
+### Zeilennummer eines gerade laufenden DATA-Befehls
+
+Diese Speicherzellen enthalten die Nummer der Basic-Zeile, in der gerade ein DATA-Befehl mit READ gelesen wird. Sobald in einer DATA-Zeile ein Fehler gefunden wird, kommt diese Zeilennummer aus 63/64 in die Speicherzellen 57/58, um in der Fehlermeldung die fehlerhafte DATA-Zeile und nicht die laufende READ-Zeile anzuzeigen. Auf diese Weise werden Syntax-Fehler in einer DATA-Zeile angezeigt. Um andere Fehler, wie zum Beispiel ein fehlendes Komma zwischen zwei DATA-Anga-ben anzuzeigen, können die Speicherzellen 63/64 eingesetzt werden.
+
+In dem folgenden Programm wird in Zeile 20 geprüft, ob die DATA-Angaben größer als 255 sind. Da bei einem fehlenden Komma die beiden Zahlen als eine Zahl gelesen werden, wird dieser Fall erkannt und mit einem F versehen die Nummer der DATA-Zeile ausgedruckt, in der das Komma fehlt.
+10 FOR X = 1 TO 10:READ A:PRINT A
+20 IF A>255 THEN PRINT "F” PEEK(63) + 256*PEEK(64) 30 NEXT X
+40 DATA 10,20,30
+50 DATA 40,50,60
+60 DATA 70,80,90,100
+
+Sie können jetzt in den DATA-Zeilen Kommafehler einbauen, die vom Programm angezeigt werden. Ein anderer häufiger Fehler, nämlich ein Komma am Ende einer DATA-Zeile, kann damit leider nicht erkannt werden. Aber vielleicht fällt Ihnen eine Prüfformel dazu ein.
+
+## Adresse 65 und 66 ($41 und $42)
+### Zeiger auf die Adresse, ab der die laufende DATA-Angabe gespeichert ist.
+
+Diese Speicherzellen enthalten in der Low-/High-Byte-Dar-stellung die Adresse im Basic-Programmspeicher, ab welcher der READ-Befehl nach der nächsten DATA-Zeile sucht.
+
+Zu Beginn eines Programms steht in 65/66 als Adresse der Beginn des Basic-Speichers, also derselbe Wert wie in den Speicherzellen 43/44. Der Befehl RESTORE setzt den Zeiger immer auf diesen Anfangswert zurück. Ein Demo-Programm zeigt uns das an (die Kommata sind wichtig für das Format der Darstellung auf dem Bildschirm!):
+10 PRINT, PEEK(65) + 256*PEEK (66)
+20 FORX = 1 TO 10:READA 30 PRINT A,PEEK(65) + 256* PEEK(66)
+40 NEXT X
+50 DATA 10,20,30,40,50,60,70,80, 90,100
+60 RESTORE
+70 PRINT,PEEK(65) + 256*PEEK (66)
+
+Durch Verändern dieses Zeigers in 65/66 kann die Reihenfolge, mit der DATA-Angaben gelesen werden, verändert werden, allerdings nur zeilenweise.
+
+Wir brauchen dazu die oben beschriebenen Speicherzellen 61/62, deren jeweiligen Inhalt wir ja mit PEEK abfragen können. Wenn wir das vor jeder DATA-Zeile machen und diesen Wert einer Variablen zuweisen, haben wir die Adresse gespeichert, hinter welcher die DATA-Zeile kommt. Durch POKEn dieser Adressen in die Speicherzellen 65/66 vor einem READ-Befehl, wird diesem READ die nächste DATA-Zeile vorgegeben und wir können so die Reihenfolge der DATA-Zeilen ändern.
+10 A1 = PEEK(61):B1 = PEEK(62)
+20 DATA DAS IST DIE 1. ZEILE
+30 A2 = PEEK(61):B2 = PEEK(62)
+40 DATA DAS IST DIE 2.ZEILE
+50 A3 = PEEK(61):B3 = PEEK(62)
+60 DATA DAS IST DIE 3.ZEILE
+70 POKE 65,A3:POKE 66,B3: READ A$:PRINT A$
+80 POKE 65,A1:POKE 66,B1: READ A$:PRINT A$
+90 POKE 65,A2:POKE 66,B2: READ A$:PRINT A$
+
+Mit den Zeilen 70 bis 90 werden für jede DATA-Zeile eigene READ-Anweisungen gegeben. Welche DATA-Zeile gelesen werden soll, wird durch die Variablen Ax und Bx (x = l,2,3) bestimmt, mit denen der Zeiger in 65/66 »verbogen« wird.
+
+## Adresse 67 und 68 ($43 und $44)
+### Zeiger auf die Adresse, aus welcher die Befehle INPUT, GET und READ die Zei-chen/Zahlen holen
+
+INPUT und GET verlangen Angaben, die per Tastatur eingegeben werden. Tastatur-Eingaben im direkten Modus, also, wenn kein Programm läuft, werden im Eingabe-Pufferspeicher des Editors (der Teil des Betriebssystems, welcher für die Zeilendarstellung auf dem Bildschirm verantwortlich ist) ab Speicherzelle 512 bis 600 zwischengespeichert.
+
+Der Zeiger in 67/68 zeigt auf die jeweilige Adresse in diesem Eingabe-Pufferspeicher. Bei READ ist 67/68 identisch mit 65/66. Der Inhalt dieser Speicherzellen kann mit PEEK ausgelesen werden.
+
+## Adresse 69 und 70 ($45 und $46)
+### Name der gerade aufgerufenen Basic-Variablen
+
+Wenn beim Ablauf eines Programms eine Variable auftaucht, muß ihr derzeitiger Wert im Variablen-Speicher gesucht werden. Während dieses Suchvorgangs wird der Name der Variablen in 69/70 zwischengespeichert. Die Form der Zwischenspeicherung ist dieselbe 2-Byte-Darstellung, wie im Va-riablenspeicher, beschrieben bei der Behandlung der Speicherzellen 45/46 im 4. Teil des Kurses (Ausgabe 2/85).
+
+## Adresse 71 und 72 ($47 und $48)
+### Zeiger auf die Adresse des Wertes der gerade aufgerufenen Basic-Variablen
+
+Ähnlich wie bei 69/70 wird hier während des Anrufes einer Variablen durch ein Programm ein Wert zwischengespeichert, diesmal aber nicht der Name der Variablen, sondern der 2-Byte-Wert, welcher direkt hinter dem Variablennamen steht. Nähere Einzelheiten sind im Text der Speicherzellen 45/46 beschrieben (Teil 4, Ausgabe 2/85).
+
+Davon ausgenommen sind selbstdefinierte Funktionen. Wie im nebenstehenden Textblock »Darstellung der Variablen einer selbstdefinierten Funktion« gezeigt ist, erscheinen diese ebenfalls im Variablen-speicher in einer Darstellung, welche den normalen Variablen sehr ähnlich ist.
+
+Damit nun eine normale oder Feld-Variable denselben Namen haben kann wie eine Funktion, wird die oben genannte Zwischenspeicherung in 69/70 bei Funktionen unterdrückt.
+
+## Adresse 73 und 74 ($49 und $4A)
+### Zwischenspeicher für Variable einer FOR-NEXT-Schleife und für diverse Basic-Befehle
+
+Die Adresse einer Schleifenvariablen wird zuerst hier gespeichert, bevor sie auf den Stapelspeicher ab Speicherzelle 256 ($100) gebracht wird. Die Funktion und Arbeitsweise des Stapelspeichers werden wir bei diesen Adressen behandeln. Etliche Basic-Befehle, wie LIST, WAIT, GET, INPUT, OPEN, CLOSE und andere, verwenden die Speicherzellen 73/74 für Zwischenspeicherungen. Diese Adressen sind für den Basic-Programmierer daher nicht verwendbar.
+
+## Adresse 75 und 76 ($4B und $4C)
+### Zwischenspeicher für Zeiger bei READ und mathematischen Operationen
+
+Während der Auswertung eines mathematischen Ausdrucks durch die Routine FRMEVL des Basic-Übersetzers, wird der Platz des betroffenen mathematischen Operators in einer Tabelle, hier in 75/76, zwischengespeichert. Dieser Platz wird dabei als Abstand zum Beginn der Tabelle dargestellt. Außerdem verwendet der READ-Befehl diese Adressen als Zwischenspeicher für einen Programmzeiger. Die Speicherzeilen 75/76 sind in Basic nicht verwendbar.
+
+## Adresse 77 ($4D)
+### Hilfsspeicher für Vergleichs-Operationen
+
+Die bei 75/76 schon erwähnte Auswertungs-Routine FRMEVL erzeugt in der Speicherzelle 77 einen Wert, der angibt, ob es sich bei einer Vergleichsoperation um den Fall »Kleiner als« (<), »gleich wie« ( = ) oder »größer als« (>) handelt. Diese Speicherzelle ist nur im Maschinen-code erreichbar.
+
+## Adresse 78 und 79 ($4E und $4F)
+### Zeiger auf Adresse, ab welcher der Wert der Variablen einer selbstdefinierten Funktion gespeichert ist.
+
+Basic erlaubt es bekanntlich, mit dem Befehl DEF selbst erfundene Funktionen zu definieren, welche die Form FN gefolgt von einem Variablennamen haben, zum Beispiel
+DEF FNAA(X).
+
+Im nebenstehenden Textblock »Darstellung von Variablen selbstdefinierter Funktionen« wird gezeigt beziehungsweise sichtbar gemacht, wie derartige Funktionen und ihre Variablen abgespeichert werden. Während der Definition einer Funktion steht in 78/79 die Adresse, ab welcher die Funktion und der Wert ihrer Variablen abgespeichert ist. Der Inhalt dieser Adressen ist identisch mit den Zeichen hinter dem Namen der Funktion (1. Gruppe im nebenstehenden Beispiel).
+
+Nach der Ausführung der Funktion sieht in 78/79 allerdings die Adresse, ab welche der Zahlenwert der Funktion selbst abgespeichert ist. Er ist identisch mit den Zeichen der 2. Gruppe.
+
+Diesen Zusammenhang können Sie überprüfen, indem Sie im Programm des Texteinschubes folgende Zeilen hinzufügen:
+25 PRINT PEEK(78) + 256*PEEK (79)
+35 PRINT PEEK(78) + 256*PEEK (79)
+
+Nach RUN erhalten Sie zwei Adressen, die Sie mit direkter Eingabe abfragen:
+FOR I = 0TO 4:PRINT PEEK (1.Adresse + I);:NEXTI: FORJ=OTO 4:PRINT PEEK (2.Adresse + J);:NEXTJ
+
+Sie werden sehen, daß der Inhalt der beiden Adressen genau die Werte der Zeichen 3 bis 7 der beiden Gruppen entspricht, allerdings im Bildschirmcode.
+
+Das nächste Mal machen wir mit Speicherzellen 80 und 81 weiter und werden dann zu dem schon öfter erwähnten FLOATING POINT ACCUMULATOR kommen.
+
+(Dr. H. Hauck/aa)
+
+TODO ASIDE
+
+## Nachtrag zu den sichtbaren Variablen
+
+Frau Dr. Beyer aus Düren, auf deren Methode ich meine Sichtbarmachung der gespeicherten Variablen in den letzten beiden Folgen des Kurses aufgebaut habe, hat mir freundlicherweise zwei Verbesserungen mitgeteilt, die ich Ihnen nicht vorenthalten möchte.
+
+Die erste Verbesserung bezieht sich auf die Methode für den C 64, dargestellt in Teil 4 auf Seite 151, 3. Zeile von oben.
+Statt POKE 46,4:POKE 48,4
+kann man auch schreiben: POKE 46,4: CLR
+
+Wie bei den Speicherzellen 55/56 erklärt, setzt der Befehl CLR auch die Zeiger in 48 und 50 zurück, so daß der 2. POKE entfallen kann.
+
+Die zweite Verbesserung bezieht sich auf die Methode für den VC 20 in Teil 5 in Ausgabe 3/85.
+
+Im Textblock »Darstellung der normalen Variablen beim VC 20« habe ich erklärt, daß wir zur Sichtbarmachung der Zeichen eine Farbe in den Farbspeicher POKEn müssen, und das wurde dann auch im Schritt 3 ausgeführt.
+
+Dieser Schritt 3 kann entfallen. Schritt 4 — Löschen des Bildschirms — kann jetzt aber mit der CLR-Taste gemacht werden, was natürlich viel schneller geht. Vor dem Schritt 5 wird der Cursor per SPACE-Taste über die ersten vier bis sechs Zeilen gejagt. Dadurch werden diese Zeilen sozusagen mit einer unsichtbaren Farbe gefüllt. Die weiteren Aktionen bleiben gleich und die Zeichen erscheinen oben am Bildschirm.
+
+Das ist natürlich die eleganteste Methode.
+
+## Darstellung der Variablen einer selbstdefinierten Funktion
+
+In den vorigen Folgen habe ich Ihnen gezeigt, wie im Programmspeicher abgelegte normale Variablen und Felder-Variablen sichtbar gemacht werden können. Damit konnten wir den Aufbau und die Darstellung der einzelnen Variablenarten studieren.
+
+Heute will ich einen weiteren Variablentyp vorstellen, nämlich den der selbstdefinierten Funktionen.
+
+Sie erinnern sich vielleicht, mit dem Basic-Befehl »DEF FN (Na-me)(Variable)« können wir komplizierte Funktionen selbst erfinden, definieren und später als »FN (Name)(Variable)« weiter verarbeiten. Diesen Typ wollen wir uns anschauen, wie er im Speicher steht.
+
+Im Prinzip verwenden wir dieselben Methoden zur Sichtbarmachung, wie die letzten Male, verbessert natürlich mit den Vorschlägen des Texteinschubs 1.
+
+Aber ein Unterschied kommt noch dazu. Der Befehl DEF kann leider nicht direkt eingegeben werden, sondern muß immer als Teil einer Programmzeile mit einer Zeilennummer versehen sein.
+
+Deshalb schreiben wir zuerst ein kleines Programm zur Definition der Funktion plus Variable, bevor wir den Variablenspeicher mit dem Bildschirmspeicher zusammenlegen:
+10 DEF FNAA(X) = 3*SIN(X) + COS(X)
+20 X = 5
+30 PRINT FNAA(X)
+
+Die Funktion hat also den Namen »AA«. Bevor wir weitermachen, überprüfen Sie bitte mit RUN, ob alles stimmt. Nun wird der Speicher verschoben.
+
+### Für den C 64 gilt:
+
+1.	POKE 46,4:CLR
+2.	Bildschirm löschen mit CLR-Taste
+3.	Cursor auf die Mitte fahren
+4.	LIST (es erscheint das Programm)
+5.	auf den 2. Zeichensatz umschalten (mit C= und SHIFT-Taste)
+6.	RUN
+
+### Für den VC 20 (ohne Erweiterung) gilt:
+
+Nur den Bildschirm auf 4096 zu verschieben, wie das letzte Mal, geht diesmal nicht, da wir ja für DEF ein kleines Programm schreiben müssen.
+
+Also legen wir Bild- und Variablenspeicher ab Adresse 5120 (5120/256 = 20).
+
+1.	POKE 46,20:CLR
+2.	POKE 648,20
+3.	STOP/RESTORE-Tasten, bis Cursor wieder da ist.
+4.	Bildschirm löschen mit CLR-Taste
+5.	die ersten vier bis sechs Zeilen mit SPACE-Taste überfahren.
+6.	Cursor ein paar Zeilen nach unten
+7.	LIST (es erscheint das Programm)
+8.	mit Commodore- und SHIFT-Taste auf 2. Zeichensatz umschalten
+9.	RUN
+
+Wir sehen jetzt oben zwei Gruppen mit je sieben Zeichen, wie üblich.
+
+Die erste Gruppe stellt die Funktion FNAA(x) dar. Sie ist gekennzeichnet durch das invertierte erste Zeichen des Namens, während das zweite Zeichen normal erscheint.
+
+Das dritte und vierte Zeichen gibt in Low-/High-Byte-Darstellung (im Bildschirmcode) die Adresse an, ab der die Funktion FNAA(x) im Programmspeicher abgelegt ist. Mit PEEK(3.Zeichen) + 256*PEEK(4.Zeichen) kann das abgefragt werden.
+
+Das fünfte und sechste Zeichen nennt die Adresse, an welcher der Zahlenwert der Funktions-Variablen X anfängt. Das siebente Zeichen schließlich ist das erste Zeichen der Funktion selbst (in unserem Beispiel die 3).
+
+Die zweite Gruppe beschreibt die Variable X der Funktion. Die normale Darstellung der beiden ersten Zeichen, die den Namen darstellen, gibt uns an, daß es sich um eine Gleitkomma-Variable handelt, deren Wert als Mantisse und Exponent dargestellt ist.
+
+Der Aufbau einer Funktion läßt sich also so zusammenfassen:
+
+TODO Table
+
+# Effektives Programmieren (4): Daten sortieren mit dem Computer — Methoden, Techniken, Programme
+
+> Wie sortiere ich meine Daten am besten? Dieses Problem ist so alt wie der Computer, und entsprechend vielfältig sind die Lösungsvorschläge. Wir stellen Ihnen in mehreren Folgen die wichtigsten und bekanntesten Sortiermethoden und dazu jeweils ein entsprechendes Listing vor.
+
+Wie oft haben Sie wohl schon ein Telefonbuch oder ein Adressenverzeichnis aufgeschlagen, um nach einem bestimmten Namen zu suchen? Eine Frage, die wohl kaum zu beantworten ist.
+
+Es passiert alle Augenblicke, daß man etwa ein Lexikon zur Hand nimmt, um ein Fremdwort nachzuschlagen oder daß man den Fahrplan einer Buslinie nach der nächsten Abfahrtszeit durchsucht.
+
+Stellen Sie sich jetzt einmal vor, Sie hätten ein Lexikon in der Hand, das nicht, wie üblich, in alphabetisch sortierter Form vorliegt, sondern alle Stichwörter völlig durcheinander enthält.
+
+Sie werden wohl zugeben, daß sich die Suche nach einem bestimmten Wort nun als ziemlich hoffnungslos herausstellen wird.
+
+Mit dieser Feststellung sind wir aber schon beim Thema.
+
+Heutzutage wird die Verwaltung und Weiterverarbeitung großer Datenmengen fast ausschließlich von Computern vorgenommen. Alle Stichwörter eines Lexikons sind zum Beispiel in Großrechenanlagen gespeichert und werden vollelektronisch in den Satz gegeben.
+
+Nun wird Datenverarbeitung aber nicht nur auf Großrechenanlagen durchgeführt, sondern auch durchaus auf Mikrocomputern; sei es als Kundendatei oder als elektronisches Notizbuch.
+
+Die Notwendigkeit einer Ordnung in diesen Datenbeständen wurde schon zur Sprache gebracht. Uns soll nun in dieser Folge interessieren, was es für Methoden des Ordnens von Daten gibt.
+
+Wir werden uns also im Laufe dieser Reihe mit den verschiedensten Sortieralgorithmen beschäftigen; angefangen beim Sortieren durch direktes Einfügen (straight insertion) bis hin zum schnellsten Algorithmus, der zur Zeit existiert, dem Sortieren durch Zerlegen (Quicksort).
+
+Jede Sortiermethode soll dabei bis ins Detail erklärt werden, und Sie werden sehr schnell erkennen, daß Sortieren nicht gleich Sortieren ist.
+
+Haben wir ein großes Varia-blenfeld angelegt, so gibt es generell zwei verschiedene Methoden beim Suchen eines bestimmten Elements:
+
+1)	Durchsuchen sämtlicher Elemente
+2)	binäre Suche
+
+Die erste Methode ist uns klar. Hierbei werden einfach alle Elemente des Feldes vom Anfang bis zum Ende durchgekämmt, um das gewünschte herauszufinden. Bei der Geschwindigkeit, mit der ein Computer seine Va-riablenfelder durchgehen kann, müssen schon gewichtige Gründe für das Sortieren sprechen.
+
+Diese Gründe gibt es auch. Einer davon ist das Verwalten großer Datenmengen.
+
+## Sortieren von Feldern
+
+Auch ein »Superrechner« benötigt viel Zeit, um einige Millionen Daten durchzusehen. Dieser Zeitfaktor wird noch erhöht, wenn man nur nach bestimmten Teilen einer Datei suchen möchte, also nach bestimmten Buchstabenfolgen oder Zahlenkombinationen.
+
+Gehen wir jetzt einmal davon aus, ein Feld wäre sortiert. Der Computer kann jetzt binär suchen, was selbst bei vielen tausend Elementen nur eine kurze Zeit benötigt. Unter binärer Suche versteht man folgendes: Wenn der Computer zum Beispiel nach einer bestimmten Zahl sucht, so geht er erst einmal zur Mitte des gesamten Feldes. Jetzt kann er anhand eines einfachen Größenvergleichs herausfinden ob die gesuchte Zahl in der einen oder in der anderen Hälfte des Feldes liegen muß. Hat er das herausgefunden, so wird diese Feldhälfte wiederum in der Mitte geteilt, und wieder wird festgestellt, in welcher Hälfte des Feldes die Zahl zu finden sein muß. Dies geht immer so weiter, bis nur noch zwei Zahlen übrigbleiben, von denen eine die gesuchte ist.
+
+Diese Methode der binären Suche ist sehr effektiv und erlaubt selbst bei großen Datenmengen eine geringe Suchzeit. Ein kleines Rechenbeispiel:
+
+Wir haben 100 Elemente und wollen eines davon binär suchen. Durch unser Suchsystem sinkt die Anzahl der zu durchsuchenden Elemente auf folgende Art und Weise: 100:50:25:13:8:4:2:1.
+
+Dies war der ungünstigste Fall, bei dem sich der zu suchende Wert immer in der Hälfte des übriggebliebenen Feldes befand.
+
+Bei 100 Elementen haben wir also maximal sieben Zugriffe, bis der Wert gefunden wird. Nun durchsuchen wir auf die gleiche Weise 1000 Elemente.
+
+Es gilt jetzt die absteigende Reihe:
+1000:500:250:125:63:32:16:8:4:2:1.
+
+Wie Sie sehen sind nur drei Zugriffe hinzugekommen, obwohl sich die Anzahl der Elemente verzehnfacht (!) hat.
+
+Mit der anderen Suchmethode hätten wir im Mittel 50 beziehungsweise 500 Zugriffe gehabt, wenn man davon ausgeht, daß die Auswahl gleichverteilt erfolgt. Es lohnt sich also bei größeren Feldern durchaus, diese vorher zu sortieren, wobei wir bei allen Sortiermethoden nur ein Ziel haben werden:
+
+Die Zeit des Sortierens muß möglichst gering bleiben!
+
+Maßgeblich für die Zeitdauer eines Algorithmus sind folgende zwei Kriterien:
+
+1) die Anzahl der Vergleiche
+2) die Anzahl der Bewegungen
+
+Außer diesen generellen Kriterien werden wir auch feststellen, daß es eine Rolle spielt, in welcher Form das Feld vor dem Sortieren vorlag. Insgesamt kann man die Sortiermethoden in vier grobe Klassen unterteilen:
+
+1) Sortieren durch Einfügen
+2) Sortieren durch Auswählen
+3) Sortiern durch Austauschen
+4) Sortieren durch Zerlegen
+
+Jede dieser Sortiermethoden hat bestimmte Vorzüge und wiederum auch spezielle Nachteile. Das hängt, wie schon erwähnt, von der anfänglichen Struktur eines Feldes ab. Wir müssen an dieser Stelle zwischen drei verschiedenen Anfangszuständen unterscheiden:
+
+1) Das Feld ist bereits sortiert
+2) das Feld ist völlig unsortiert
+3) das Feld ist genau entgegengesetzt sortiert.
+
+Manche Sortieralgorithmen sind um so schneller, je sortierter ein Feld vorliegt. Bei anderen Algorithmen kann das genau umgekehrt sein. Quicksort ist zum Beispiel am effektivsten, wenn es sich um zufällig durchmischte Felder handelt.
+
+### Direktes Einfügen
+
+Nun aber zu unserem ersten Sortieralgorithmus, einer Sortiermethode, die Ihnen auch im täglichen Leben sicherlich am geläufigsten ist.
+
+Es handelt sich um das Sortieren durch direktes Einfügen (straight insertion). Die hochtrabende Bezeichnung beschreibt einen eigentlich ganz einfachen Vorgang: Sie haben ein Feld aus zufällig durchmischten Elementen. Das Sortierprogramm beginnt jetzt beim zweiten Element und vergleicht dies mit dem ersten; ist es kleiner, so wird getauscht. Die ersten beiden Elemente dieses Feldes sind also schon sortiert.
+
+Jetzt wird das dritte Element geholt und mit dem zweiten verglichen. Ist es größer, so bleibt es an seinem Platz; ansonsten wird es in die Reihe der vorherigen an den richigen Platz geschoben und eingefügt.
+
+Das geht weiter, bis zum letzten Element, und mit einem Durchlauf werden alle Variablen in aufsteigender Reihenfolge sortiert.
+
+Dieses Sortieren wenden Sie zum Beispiel immer beim Kartenspielen an, wobei Sie Ihr Blatt systematisch durchgehen, alle verkehrt sitzenden Karten herausnehmen und an der richtigen Stelle einordnen.
+
+In Listing 1 sehen Sie ein Programm abgedruckt, das für alle weiteren Sortierprogramme als Rahmen dienen soll. Es hat die Aufgabe, ein Feld zu erstellen und die Ausgabe auf Drucker oder Bildschirm festzulegen. Das Feld kann wahlweise zufällig oder von Hand bestimmt werden und besteht aus Stringvariablen der Länge 3.
+
+In Listing 2 sehen Sie den Abschluß des Sortierprogramms. Alle Algorithmen sind nur mit diesen Rahmenprogrammen lauffähig.
+
+Listing 3 schließlich zeigt ein Programm für das Sortieren durch direktes Einfügen. Wie Sie aus dem Listing erkennen können, ist es wichtig, daß das erste Element des Feldes nicht, oder als das absolut kleinste Element definiert wird, da es die letzte und höchste Vergleichstufe darstellt und somit nicht mehr vertauscht werden kann, da das Programm sonst über die Grenzen des Feldes hinaus arbeiten müßte. In unserem Fall ist dieses Element (A$(0)) ein Leerstring C”).
+
+Bild 1 zeigt, wie Straight Insertion arbeitet. Die Elemente, die jeweils behandelt werden, sind unterstrichen.
+
+Aus Bild 1 können Sie aber noch mehrere Informationen über den Sortieralgorithmus erhalten. Es wird zum Beispiel deutlich, daß das Sortieren durch direktes Einfügen bei a Elementen genau a-1 Elemente durchgehen muß, um vollständig zu arbeiten.
+
+Diese Zahl ergibt für die Berechnung der Anzahl der notwendigen Vergleiche folgende Formel:
+
+(a<sup>2</sup>+a)/4
+
+Wir haben in unserem Beispiel (Bild 1) mit 10 Elementen gearbeitet. Die Anzahl der Vergleiche beträgt also nach dieser Formel 28.
+
+Für die Anzahl der Bewegungen im Variablenfeld sieht die Sache folgendermaßen aus:
+
+(a<sub>2</sup>+9a)/4
+
+Hier kommen wir gar auf 48 Bewegungen innerhalb unserer 10 Feldelemente.
+
+Diese Formeln lassen an sich gar nichts Schlimmes vermuten. Wenn wir sie jedoch einmal genauer unter die Lupe nehmen, so werden wir eine bestürzende Feststellung machen: beide Formeln haben im Nenner jeweils einen Faktor a2 stehen.
+
+Anders ausgedrückt heißt das; wenn wir die Anzahl der Elemente verdoppeln, vervierfacht sich die Anzahl der Bewegungen, der Vergleiche und ebenso natürlich die Sortierdauer.
+
+Bei einer dreifachen Anzahl müssen wir schon neunmal (!) solange warten, wie zu Beginn.
+
+Wie schon erwähnt, besteht das Ziel des effektiven Sortierens darin, die Zeitdauer möglichst gering zu halten. In der Praxis werden wir versuchen, die Anzahl der Bewegungen und Vergleiche auf ein Mindestmaß zu drücken, und wir werden erkennen, daß sich die Proportionalität von a zu a2 auf a zu log2 (a) (Logarithmus der Basis 2) vermindern läßt, wenn man entsprechende Algorithmen einsetzt.
+
+### Bubblesort
+
+Nachdem wir einen sehr einfachen Algorithmus bereits kennengelernt haben, soll uns nun eine weitere, recht einfache Sortiermethode interessieren. Es handelt sich hierbei um ein Sortieren durch Austauschen.
+
+Bubblesort zählt mit zu den bekanntesten Sortieralgorithmen und arbeitet nach folgendem Prinzip:
+
+Wir fangen mit dem gesamten Variablenfeld an. Hier nehmen wir nun das erste Element und vergleichen es mit dem zweiten. Ist es größer, so wird getauscht; ansonsten bleiben die beiden Elemente, so wie sie sind, stehen. Jetzt gehen wir eine Position weiter und vergleichen das jetzige zweite Element (das auch das vorherige erste sein kann) mit dem dritten der Reihe und tauschen gegebenfalls aus. Das geht immer so weiter, bis zum Ende des Feldes.
+
+Sie werden sicherlich erkannt haben, daß sich auf diese Weise das allergrößte Element immer weiter nach unten bewegt hat und nach Abschluß dieses Durchgangs an lezter Stelle zu finden (also bereits richtig einsortiert) ist.
+
+Jetzt begrenzen wir also das gesamte Feld auf alle Variablen, bis auf die letzte (a = a-1) und wiederholen den Vorgang. Als Ergebnis steht nun das zweitgrößte Element an der vorletzten Stelle und wir vermindern die Gesamtzahl wiederum um 1.
+
+Das geht so weiter, bis die Länge des Feldes auf 1 geschrumpft ist; wir also nur noch das kleinste Element übrig haben. Damit ist der Sortiervorgang beendet.
+
+Der Name von Bubblesort kommt übrigens von der Eigenschaft dieses Verfahrens, die größten Elemente quasi bis ans Ende des Feldes »durchzuperlen«. Dreht man das Feld um und hat man die größten Elemente am Anfang, so kann man diese Bewegungen innerhalb der Variablen durchaus mit dem Aufsteigen von Blasen (»bubbles«) vergleichen.
+
+Listing 4 zeigt das Programm für den einfachen Bubblesort-Algorithmus, und in Bild 2 können Sie wiederum einen Beispielausdruck mit 10 Elementen sehen. Der erste Unterschied zwischen Bubblesort und unserem vorherigen Straight Insertion wird sofort klar, wenn Sie sich die beiden Ausdrucke im Vergleich betrachten.
+
+Während sich das Feld bei Straight Insertion vom Anfang her aufbaut und beim kleinsten Element zu sortieren beginnt, fängt Bubblesort beim größten Element an und bringt dieses zuerst an dessen Platz.
+
+Die Zeitbedingungen für Bubblesort sind denen von Straight Insertion ziemlich ähnlich. Auch hier haben wir den Faktor a2 als zeitbestimmenden Faktor in den Formeln.
+
+Die Formel für die Anzahl der Vergleiche lautet jetzt:
+
+(a<sup>2</sup>-a)/2
+
+Um die Anzahl der Bewegungen zu berechnen dient folgende Formel:
+
+3/4*(a<sup>2</sup>-a)
+
+Bild 3 und 4 zeigen einen Programmablaufplan der beiden Sortiermethoden, so daß eine Umstellung auf andere Programmiersprachen kein Problem darstellen sollte.
+
+An dieser Stelle wollen wir den ersten Abschnitt unserer Folge bereits beenden. Überlegen Sie sich bis zum nächsten-mal, wie man Bubblesort vielleicht noch verbessern könnte; wir bringen dann nämlich eine Version, die einige Nachteile der jetzigen nicht mehr besitzt.
+
+Oder vielleicht fallen Ihnen inzwischen auch einige Methoden zum günstigen Sortieren von Feldern ein?
+
+Sicherlich werden Sie die eine oder andere Möglichkeit im Laufe unserer Reihe noch finden, wenn auch unter einem vielleicht noch unbekannten Namen.
+
+(Karsten Schramm/gk)
+
+TODO ASIDE
+
+## Wichtige Begriffe in diesem Artikel
+
+### Feld, Variablenfeld
+
+(auch Matrix, Tabelle, indizierte Variable)
+
+In einem Feld wird eine Gruppe von in der Regel gleichartigen Werten (Daten) zusammengefaßt. Felder müssen dimensioniert werden. Dabei wird entsprechend der Datenmenge Speicherplatz reserviert. Im Commodore-Basic können sowohl numerische als auch alphanumerische Felder definiert werden.
+
+### Algorithmus
+
+Ein Begriff aus der Mathematik, der genau festlegt, wie ein Problem zu lösen ist. Im einfachsten Fall ist das eine Formel, zum Beispiel FLÄCHE = LÄNGE x BREITE. Aber selbst ein komplettes Programm kann als Algorithmus bezeichnet werden, denn es wird ein Problem nach vorgegebenen Regeln gelöst.
+
+### Binäre Suche
+
+Die binäre Suche ist eine sehr schnelle Suchmethode, die ein sortiertes Feld voraussetzt. Dabei wird, vom gesamten Feld ausgehend, immer auf das Element in der Mitte des Feldes zugegriffen. Je nachdem, ob der gesuchte Wert (oder Wort) kleiner oder größer ist, wird entweder die übrigbleibende obere oder untere Hälfte wiederum halbiert und auf das mittlere Element in dieser verbleibenden Hälfte zugegriffen und mit dem gesuchten Begriff verglichen. Dieses Spiel wiederholt sich so lange, bis der Begriff gefunden wurde. Die maximale Anzahl der Suchschritte errechnet sich aus max = INT (LN(anz. Elemente)/LN(2)) + 1.
+
+# 11 neue Einzeiler!
+
+> Der Einzeiler-Wettbewerb regt immer noch eine ganze Reihe Leser an, möglichst interessante Lösungen in eine Basic-Zeile zu packen. Wir haben wieder die besten für Sie ausgewählt.
+
+Der Einzeiler-Wettbewerb ist nicht klein zu kriegen — und das wollen wir auch nicht. Viele Einsender nahmen die bisher veröffentlichten Mini-Programme als Anregung für Ihre nächsten »Schöpfungen«. Vor allem »Das kürzeste Adventure der Welt« erhielt große Resonanzen und Nachahmer, sowohl positive als auch negative. Natürlich kann man so eine Idee nur einmal verwerten — es war halt ein gelungener Einfall und mehr als Scherz gemeint. Doch diesmal haben wir wieder »ernste« Einzeiler herausgesucht, vielleicht bis auf den »aufgeregten Marsmenschen«. Auch die VC 2O-Besitzer kommen diesmal nicht zu kurz. Doch lassen Sie sich überraschen!
+
+## Aufgeregter Marsmensch (VC 20 und C 64)
+
+Das Programm spricht für sich selbst. Lediglich der POKE-Befehl verdient eine zusätzliche Anmerkung: Der Standardwert für die Speicherstelle 37877 ist 72. Indem man ihm auf 0 setzt, wird eine wirkungsvolle Verlangsamung des Programmablaufes erreicht.
+
+(Gerhard Silberbach)
+
+## Grafik-Bilder invertieren
+
+Dieser Einzeiler invertiert eine Hires-Grafik an der Adresse A. Um das besser begreifen zu können, sollten Sie eine Hires-Grafik laden. Nehmen wir als Beispiel ein Bild aus der Dia-Show und laden es mit LOAD”Name”,8,1 ab der Adresse $2000 (dezimal 8192) ein. Tippen Siejetzt NEW ein und geben den Einzeiler ein. Jetzt geben Sie der Variable A den Wert des Grafik-Anfangs, als A=8192. Springen Sie dann mit GOTO1 in den Einzeiler. Die Grafik istjetzt also invertiert, Sie können den Bereich 8192 bis 16384 als invertierte Grafik wieder abspeichern.
+
+Erklärung der Zeile: Der String A$ enthält ein Maschinenprogramm, das durch den Print-Befehl in den Bildschirmspeicher ab 1024 gebracht wird. Die aktuelle mit EXOR FF zu verknüpfende Speicherstelle wird mit POKE 780,x im Akku abgelegt. Nach SYS 1024 steht dann der Wert in 780 und wird mit dem anschließenden POKE in die entsprechende Speicherstelle als invertiertes Bitmuster gebracht.
+
+Noch eine Bemerkung: Die Grafik darf natürlich nicht unter einem ROM liegen, da dann das Problem nur in reiner Maschinensprache zu lösen ist (das ROM müßte abgeschaltet werden).
+
+(Guido Leister/gk)
+
+## Zeilen löschen am Bildschirm
+
+Dieser kleine Einzeiler löscht bestimmte Zeilen auf dem Bildschirm. Dabei wird eine Maschinenroutine des C 64 benutzt, die eine Zeile vom Bildschirm löscht, deren Zeilennummer im X-Register steht. Zunächst wird die Zeilennummer (hier wird von 0 bis 24 gezählt) in die Speicherzelle gePOKEt, deren Inhalt der SYS-Befehl in das X-Register übernimmt. Hierbei bleibt die Position des Cursors unbeeinflußt.
+
+Variablen:
+LN	=	Zeilennummer (0	bis 24)
+V	=	Von Zeile
+B	=	Bis Zeile
+TODO
+
+(Stefan Keimeier/gk)
+
+## Ein einfaches Renumber
+
+Dieser Einzeiler kann sich zwar nicht mit einem komfortablen Renumber-Programmmessen, abererfunktioniert. Eswerden die Zeilennummern eines Basic-Programms, das nicht länger als 255 Zeilen sein darf, in nur wenigen Sekunden neu umnumeriert (erste Zeilennummer = 0, Schrittweite = 1). Die Sprungadressen der Befehle GOTO und GOSUB bleiben jedoch unverändert. Beim Abtippen des Einzeilers ist zu beachten, daß die Basic-Befehle FOR, PEEK, POKE und NEXTab-gekürzt werden müssen (siehe C 64-Handbuch, Anhang D).
+
+Nun zur Erklärung des Einzeilers: Um die Zeilen eines Programms umnumerieren zu können, muß man zunächst wissen, an welchen Speicherstellen es sich befindet. Jedes Basic-Programm belegt die Speicherplätze 2048 bis PEEK(45) + PEEK(46)*256-3. PEEK(2049) + PEEK(2050)*256 gibt an, bei welcher Adresse die erste Zeile aufhört. Die Adressen 2051 und 2052 geben Aufschluß über die erste Zeilennummer (=PEEK(2051) + PEEK(2052)*256). Die zweite Zeilennummer findet man im Speicher an den Adressen PEEK (2049 + PEEK(2050)*256 + 2 und PEEK(2049) + PEEK (2050)*256 + 3.
+
+Zurück zum Renumber-Programm: Die Zeilennummern befinden sichjeweils an den Adressen A+2 (Low Byte) und A+3 (High Byte). Aus Platzgründen POKE ich an die Stelle A+2 den Wert z (z= 0,1,2..., n-1; n-1 steht für die Anzahl der Zeilen des Basic-Programms, das umnumeriert werden soll, inklusive dem Einzeiler) und an die Stelle A+3 den Wert 0. Daher darf das Basic-Programm 255 Zeilen nicht überschreiten, denn dann müßte ich den Einzeiler zum Zweizeiler abändern:
+
+1 FOR A=2049 TO PEEK(45)+ PEEK(46)*256-3:POKE A+3,z/256:POKE A+2, z-INT(z/256)*256
+2 A=PEEK(A)+ PEEK(A+1)*256-1:z=z + 1:NEXT
+
+(Georg Wichert/gk)
+
+## Datum wandeln in Wochentag
+
+Dieser Einzeiler berechnet nach Eingabe eines Datums den entsprechenden Wochentag.
+
+Es bedeutet: 0 Sonntag, 1 Montag etc.
+
+Benutzte Variablen:
+T,M,J fürTag, Monat, Jahr
+
+Die benutzte Gleichung ist eine Vereinfachung der folgenden:
+T=T+365*J + INT((J + (M>3))/4)+31*M-31+2*(M>2)-INT((M-1+(M>8))/2))
+
+Die erste INT-Funktion ersetze ich durch die lntegerviariable T%. Weitere Vereinfachungen ergeben sich durch den Gebrauch der Modulo-Funktion, die in der Print-Anweisung benutzt wird. Es kommt durch Anwendung bestimmter Rechenregeln der Mod-Funktion zu folgenden Vereinfachungen: 365 *J ergibt J, aus 31 * M-31 wird 3 * M-3.
+
+Mit der jetzt erhaltenen Formel würde man schon auskommen. Um aber eine gebräuchliche Zahl-Wochentagszuordnung zu erhalten, addiere ich noch 2 zu T%.
+Zur Erklärung der Gleichung:
+
+Es wird die Gesamtzahl aller Tage von 0.0.0000 bis einschließlich des eingegebenen Datums berechnet. Nach Division durch 7 ergibt der ganzzahlige Rest den gesuchten Wert. Der Rest wird in der Print-Anweisung durchgeführt (Mod-Funktion). Die Gleichung selber ist wie folgt aufgebaut:
+
+TODO Tabelle
+
+Alle Teile werden addiert und so wie oben beschrieben umgeformt.
+
+(Wilfried Mintrop/gk)
+
+## Soft-Scrolling beim C 64
+
+Mit diesem Einzeiler kann ein beliebiger Text von rechts nach links punktweise über den Bildschirm verschoben werden.
+
+Als Variablen werden verwendet:
+
+A=53270 Register für horizontales Smooth-Scrolling
+L=40	Anzahl der Zeichen, die gleichzeitig auf dem Bild-
+schirm erscheinen sollen. (40 für gesamte Bildschirmbreite; weniger für kleineren Textausschnitt.)
+A$	Soll den zu zeigenden Text enthalten. Letztes Zeichen
+des Strings sollte ein SPACE sein, weil das rechtsbündige Zeichen des Strings sich auf dem Bildschirm dupliziert, da es nicht gelöscht wird.
+TODO
+
+Das Prinzip: Der Text wird auf dem Bildschirm ausgegeben. Nun wird der Bildschirminhalt mit Hilfe des Smooth-Scrolling Registers punktweise nach links gezogen, bis er 7 Punkte verschoben worden ist. Jetzt wird der gesamte Text nach links geschoben und (fast) gleichzeitig das Scroll-Register zurückgesetzt, so daß es aussieht, als sei der Text um den achten Punkt verschoben worden.
+
+Hinweis:
+
+— Vor der Benutzung empfiehlt es sich, den Bildschirm zu löschen, da auch der restliche Bildschirminhalt verschoben würde.
+— Außer dem verwendeten HOME können noch andere Cursor-Steuerzeichen eingesetzt werden, um den Text zu positionieren.
+
+(Georg Brandt/gk)
+
+## Zugriffszeit der Floppy verkürzen
+
+Der vorliegende Einzeiler dient dazu, die Zugriffszeit der Floppy-Disk 1541 drastisch zu verkürzen. Der Schrittmotor, der den Schreib-Lesekopf bewegt, kann erfahrungsgemäß wesentlich schneller arbeiten, ohne daß eine sichere Funktion der Floppy gefährdet wird. Da der Schrittmotor im Interrupt bedient wird, genügt es, die Größe des Interruptintervalls zu verändern, um die Drehzahl des Motors zu beeinflussen. Standardmäßig wird etwa alle 15 Millisekunden ein Interrupt ausgelöst, der den Stepper um eine Viertelspur bewegt. Durch das vorliegende Programm wird diese Zeit auf etwa 4 Millisekunden verkürzt. Alle Bewegungen des Kopfes werden dadurch fast viermal schneller. Das hat neben der Zeitersparnis noch zwei weitere wesentliche Vorteile: Das Laufgeräusch des Kopfes wird angenehm leise und kurz, und im Falle einer Kopfjustage (MG-salvenartiges Geräusch) fährt der Kopf mit erheblich verminderter Kraft gegen den Anschlag, so daß die Gefahr einer Dejustage deutlich gemindert ist.
+
+(Robert Loos/gk)
+
+## Input mit Komma
+
+### Die Idee:
+
+Eine INPUT-Routine, die den normalen INPUT-Befehl ersetzt, aber zusätzlich Satzzeichen wie Komma, Doppelpunkt und Strichpunktals Eingabe erlaubt. Alle sonstigen Vor- und Nachteile bleiben erhalten.
+
+### Die Wirkung:
+
+Alle Zeichen der Tastatur werden übernommen, auch Leerzeichen vor beginnendem Text (führende Leerzeichen).
+
+### Variablenliste:
+
+AA	= aktueller ASCII-Code der Eingabe
+II	= Laufvariable für Schleife
+XX$	= enthält eingegebenen Text
+TODO
+
+### Programmbeschreibung:
+
+Das »Herz« des Programms bildet die Eingaberoutine ab Adresse 42336. Diese schreibt alle, von einer Bildschirmzeile (80 Zeichen) erfaßten Zeichen in den Basic-Eingabepuffer, welcher bei Adresse 512 beginnt. Das Eingabeende wird im Puffer mit einer 0 gekennzeichnet. Der Rest des Programms liest nun Zeichen für Zeichen bis zur genannten 0 den Eingabepuffer aus, und stellt dabei den String XX$ zusammen. Die Schleife ist zwar auf 88 Durchläufe programmiert, wird aber niemals soweit kommen, da die Zeichenzahl durch den Bildschirm begrenzt wird (2*40 Zeichen/Zeile=80 Zeichen). Erfolgt keine Eingabe (es wird nur die RETURN-Taste betätigt), so wird das Programm mit XX$ = CHR$(32) verlassen. Ansonsten enthält XX$ alle sichtbaren, eingegebenön Zeichen. Also alle außer Steuerzeichen.
+
+(Jürgen Reinert/gk)
+
+## Spiralen mit dem Plotter 1520
+
+Das Programm malt mit dem Plotter 1520 eine Spirale, die aus lauter Dreiecken entsteht. Zugrunde liegt eigentlich die Berechnung eines Kreises, da die X-Koordinaten mit SIN und die Y-Koordinaten mit COS ermittelt werden.
+
+Heraus kommtjedoch eine Spirale, da X und Y mit der Laufvariablen I multipliziert werden.
+
+Wird der Faktor »2« innerhalb der Sinus und Cosinus-Klammern gegen einen anderen Wert vertauscht, so ändert sich auch das Aussehen der Grafik.
+
+Auch dieser Einzeiler muß wieder mit den abgekürzten Basic-Befehlen eingegeben werden.
+
+(Christoph von Rhein/gk)
+
+## Doppelt großer Zeichensatz für den VC 20
+
+Mit dieser kleinen Routine ist es möglich, sich einen neuen Zeichensatz zu erstellen. Die neuen Zeichen haben die gleiche Breite, jedoch die doppelte Höhe. Es lassen sich alle Zeichen (mit Ausnahme der Sonderzeichen) darstellen.
+
+Alle vier POKEs müssen abgekürzt werden: P geshiftetes 0, ebenso PEEK:P geshiftetes E und PRINT:?
+
+Mit POKE36867,25 wird die Video-Matrix der Zeichen auf eine 16x8-Matrixumgestellt. POKE36869,205bestimmtdie Lage des Zeichensatzes (bei Grundversion ...,255). »a« beinhaltet den Wert der Speicherzellen 32768 bis 33279. »x« ist die Laufvariable. Die neuen Zeichen werden letztlich mit den zwei POKEs definiert.
+
+Bei Verwendung der Grundversion muß man die Commodore- und die Shift-Taste nach dem Start zusammen drücken.
+
+(Heiko Schmidt/gk)
+
+## Schlagzeug für VC 20
+
+Dieser Einzeiler macht aus dem VC 20 ein heißes Schlagzeug, das bei entsprechender Lautstärke kaum noch von einem echten zu unterscheiden ist.
+
+Das Programm ist auf jeder Speicherausbau-Version lauffähig und braucht wohl nicht extra erklärt zu werden, denn so kompliziert ist es nicht. Dennoch ist es erstaunlich, was es aus dem VC 20 macht.
+
+Es ist ein Beispiel für ein Programm mit guter Idee, relativ einfacher Umsetzung und erstaunlicher Wirkung.
+
+(Hannes Kaltenbach/ev)
+
+TODO ASIDE
+
+Einige Einzeiler enthalten Steuer- und Grafikzeichen, die aus Gründen der Übersichtlichkeit als Klartext ausgegeben sind. Bitte beachten Sie unseren Beitrag über den Checksummer.
+
+## VC 20-Tips
+
+SYS 64802 Wirkt wie ein Reset
+SYS 64821 Stellt Einschaltmodus wieder her
+SYS 65499 Setzt >TI$« und »Tl« wieder auf Null
+SYS 65511 Schließt alle Files
+? PEEK(152) Ergibt die Anzahl der offenen Dateien
+? PEEK(182) Ergibt nach »LOAD« die Anzahl der Lesefehler
+? PEEK(186) Ergibt die zuletzt benutzte Gerätenummer
+? PEEK(2O2)Ergibt die Cursorspalte
+? PEEK(214) Ergibt die Cursorzeile
+POKE 792,34 :POKE 793,253 Reset nach RESTORE-Taste
+POKE 792,173:POKE 793,254 RESTORE wieder normal
+POKE 818,34 :POKE 819,253 SAVE-Schutz einschalten
+POKE 818,133:POKE 819,246 SAVE-Schutz ausschalten
+
+(Herbert Lickes)
+
+## Mehr Struktur mit Spaces
+
+Die Strukturierung von Basic-Programmen wird bei Commodore-Computern dadurch etwas behindert, daß der Interpreter führende Leerzeichen zwischen Zeilennummer und Basic-Befehl einfach überliest. Beim LI8Ten erscheint stets genau ein Space nach der Zeilennummer, was immer dann unerwünscht ist, wenn der Übersicht halber einige Programmzeilen eingerückt erscheinen sollen. In der Regel hilft man sich in solchen Fällen, indem ein Doppelpunkt an den Zeilenanfang geschrieben wird, auf den dann die gewünschte Anzahl von Leerzeichen folgt.
+
+Es geht jedoch auch wesentlich eleganter. Man kann sich einfach die Tatsache zunutze machen, daß der Basic-lnterpreter bei der Zeileneingabe Grafikzeichen einfach überliest. Tippen Sie nach der Zeilennummer irgendein Grafikzeichen (oder der Einfachheit halber SHIFT und SPACE gleichzeitig), danach die gewünschte Anzahl führender Spaces und dann die vorgesehenen Basic-Befehle. Zwar steht zunächst noch das Grafikzeichen mit auf dem Bildschirm, beim AufLI-STen werden Sie jedoch feststellen, daß das Grafikzeichen nicht in den Programmtext übernommen wurde. Dennoch erscheint die Zeile um die gewünschte Anzahl von Leerstellen eingerückt.
+
+Mit dieser Methode lassen sich übrigens auch echte Leerzeilen erzeugen. Geben Sie zur Demonstration einmal folgendes ein:
+
+Irgendeine Zeilennummer, gefolgt von einem beliebigen Grafikzeichen, ein Space und zum Schluß nochmals ein Grafikzeichen. Nach Drücken der RETURN-Taste wird nur das eine Space in die Zeile übernommen, wodurch nach LIST eine Zeile erscheint, die nur aus der Zeilennummer besteht.
+
+Zum Schluß in diesem Zusammenhang noch ein POKE-Befehl:
+
+Nach »POKE 129,58« werden Basic-Zeilen, die nicht in Anführungszeichen stehende Spaces enthalten, einfach nicht mehr ausgeführt. Der Interpreter meldet dann nur noch »?SYNTAX ERROR«. Mit »POKE 129,32« erreicht man wieder den Normalzustand.
+
+(Herbert Heise)
+
+## Nützliche POKEs für den C 64
+
+POKE 650,100 Cursor blinkt langsam
+POKE 788,81 Cursor bleibt stehen
+POKE 788,52 Cursor blinkt schnell
+POKE 788,51 Cursor abgeschaltet
+POKE 788,49 Cursor blinkt normal
+POKE 775,199 LIST abgeschaltet
+POKE 775,167 LIST normal
+POKE 792,193 RESTORE-Taste aus
+POKE 792,71 RESTORE-Taste ein
+POKE 657,128 COMMODORE-Taste aus
+POKE 657,0 COMMODORE-Taste ein
+
+(Peter Gaß)
+
+# 2 KByte am Handgelenk zu gewinnen
+
+> Großer Ideenwettbewerb: 10 programmierbare Uhren locken
+
+Es gibt mittlerweile Uhren, die von einem Computer, hier der C 64, mit Daten gefüttert werden können.
+
+Wir suchen Ideen, um diese Art des Computereinsatzes mehr oder weniger zu rechtfertigen. Was würden Sie in 2KByte am Handgelenk speichern?
+
+Zunächst die Fakten: Zu der Seiko-Uhr RC-1000 wird Software und ein Verbindungskabel mitgeliefert, um Daten vom Computer in die Uhr am Handgelenk zu übertragen. Es können insgesamt 2000 Zeichen im Speicher der Uhr abgelegt werden. Die Anzeige der Daten findet in zwei Teilen ä 12 Zeichen statt, das entspricht einer Seite. Insgesamt stehen 80 Seiten zur Verfügung.
+
+Die Art der Daten läßt sich in vier Rubriken aufteilen. Die Memo-Funktion dient zur Anzeige von Telefonnummern (mit Namen), Flugplänen, Notizen oder anderen beliebigen Informationen, der Agenda-Alarm speichert bis zu 80 Termine eines Jahres im voraus. Es wird der Alarm zu einem vorgegebenen Zeitpunkt, mit einer dazugehörigen Mitteilung (maximal 12 Zeichen!), ausgegeben. Der wöchentliche Alarm erinnert Sie mit dem betreffenden Speicherinhalt an periodisch wiederkehrende Termine im Wochenrhythmus. Als letztes dient die Weltzeit-Funktion dazu, Reisende darüber zu informieren, wie spät es gerade in San Francisco oder, falls man sich auf Reisen befindet, zu Hause ist. Jede dieser Informationen belegt eine Anzeigenseite. Ihre Aufgabe besteht nun darin, die sinnvollste Kombination zusammenzustellen. Was würden Sie in diesen 2 KByte, bestehend aus 80 Seiten ä 24 Zeilen, unterbringen? Jede Weltzeit kostet 24 Zeichen, ebenso jede Telefonnummer oder jeder wöchentliche Alarm. Sie können also beispielsweise 30 Telefonnummern mit Namen, 10 Weltzeiten mit Städten und 20 Geburtsdaten mit Jahresalarm programmieren und haben dann immer noch 20 Seiten frei.
+
+Gefragt ist die für Ihren speziellen Anwendungsfall beste Lösung. Begründen Sie, warum gerade diese Ansammlung von Daten in dieser Uhr für Sie sinnvoll ist.
+
+Senden Sie Ihre Lösungsvorschläge an:
+
+Markt & Technik Verlag AG
+Redaktion 64’er
+Stichwort: Seiko-Uhr
+Hans-Pinsel-Str. 2 8013 Haar bei München
+
+Einsendeschluß ist der
+15. April 1985.
+
+Der Rechtsweg ist ausgeschlossen.
+
+# Gelungener Einstieg
+
+> Am Gymnasium Unterpaffenhofen klappte der Einstieg in den praktischen Informatik-Unterricht. Ein Pascal- und ein Basic-Kurs kämpfen dort um die Computer.
+
+Der freiwillige Informatikunterricht der 9. Klassen fing gerade an, als ich am Gymnasium Unterpfaffenhofen ankam. Der stellvertretende Rektor Meinrad Höng-dobler lud mich ein, nochmal die Schulbank zu drücken. Die Cursorpositionierung mit dem WRITELN-Befehl stand auf der Tagesordnung.
+
+Als ich durch die Runde blicke, habe ich das Gefühl im Kaufhaus vor einem Computerstand zu stehen. Fünf Mädchen und zwölf Jungs im Alter von 14 bis 15 Jahren scharen sich neugierig um einen, erhöht stehenden, Commodore 4032, den Studiendirektor Höngdobler für den Pascal-Unterricht benutzt. Von mangelndem Interesse keine Spur; besonders wenn man überlegt, daß es 14.30 Uhr nachmittags ist und die Schüler freiwillig den Unterricht besuchen.
+
+## Basic und Rascal im eigenen Computerraum
+
+Für den anfangs geplanten Basic-Kurs hatten sich 64 Schüler gemeldet. Zuviele für den vorhandenen Raum und zuviele für einen vernünftigen Unterricht. Die Schule beschloß deshalb zwei Kurse anzubieten: Pascal und Basic. Den Basic-Kurs gibt ein Kollege von Meinrad Höngdobler, Oberstudienrat Neuhäusler. Den Zulauf des Basic-Kurses beschränkte man dadurch, daß nur Schüler des sprachlichen Zweiges daran teilnehmen durften. Im Gegensatz zum naturwissenschaftlichen Zweig, können die »Sprachler« nicht mehr in der 10. Klasse im Mathematikunterricht zwischen Informatik oder darstellender Geometrie wählen.
+
+Der Unterricht findet in einem eigens eingerichteten Computerraum statt, mit einer Ausstattung, von der in vielen anderen Schulen nicht mal geträumt wird: drei C 64 mit einem Erweiterungsmodul an einem Festplattenlaufwerk angeschlossen, ein Commodore 8032, zwei Commodore 4032, ein Apple IIe mit zwei Laufwerken, ein älterer Wang, ein CP/M-Kompatibler, zwei Drucker und ein XY-Plotter.
+
+Die meisten Geräte wurden durch Eigeninitiative der Schule und Eltern angeschafft. Vom Kultusministerium wurde in neuerer Zeit nur der Apple mit einem Laufwerk bewilligt, das zweite Laufwerk finanzierte man ebenfalls aus eigenem Etat. Für den Apple entschloß man sich wegen des dafür erhältlichen Apple-Pascal-Compilers mit ladbaren Grafikroutinen. Die sehr große Auswahl an Geräten geht auf einen guten Kontakt der Schule zur Firma Ad-comp zurück, die den Informatikkursen einige Geräte zur Verfügung stellt, wie das 10-MByte-Festplatten-laufwerk, einem Plotter und den Druckern. Adcomp bekommt dafür von der Schule laufend Erfahrungsberichte über die eigenen Peripheriegeräte.
+
+## Drei C 64 und eine Harddisk
+
+Die drei C 64 werden mit einem Erweiterungsmodul von Adcomp an die Harddisk angeschlossen. Von diesem Modul findet man in Unterpfaffenhofen immer die neueste Version, die dort auf ihre Zuverlässigkeit geprüft wird. Durch das Festplattenlaufwerk erspart sich das Gymnasium Unterpaffenhofen den Kauf von mehrern Einzellaufwerken und die Schüler sind von den kurzen Zeiten begeistert, die die Harddisk zum Speichern und Laden braucht. Das Laden und Speichern von Pro grammen geht, im Vergleich zu ei nem 1541-Laufwerk, etwa 15ma schneller. Außerdem beinhaltet da: Modul einen Toolkit auf EPROM der nach dem Einschalten des C 6Z initialisiert wird. Der Toolkit beinhal tet Basic 4.0, das den Umgang mit ei nem Diskettenlaufwerk vereinfacht Befehle für Grafik, eine Hardcopy funktion, eine Softscrolling-Routine die den Bildschirm punktweise ver schiebt, den von anderen Commo dore-Computern bekannten TIM Monitor und einen IOSEL-Befehl mit dem das angesprochene Gerä (1541, Harddisk, Plotter) ausgewähl wird. Das Erweiterungsmodul be legt nicht den seriellen IEC-Bus de: C 64, so daß ein 1541-Diskettenlauf werk zusätzlich angeschlossen wer den kann. Am User-Port steht eine Centronics-Schnittstelle zur Verfü gung. Man erspart sich dadurcl den Kauf von externen Hardware Interfaces.
+
+Bei den gebotenen Möglichkeiter ist es eigentlich klar, daß nach de: Informatikstunde die Schüler nich gleich nach Hause rennen, sonderr erst richtig loslegen. Das Entwerfer von Programmen und vor allem das Eintippen macht den Schülern mehi Spaß als der theoretische Unter richt. »Nur noch SAVEn«, diesen Sah wird Meinrad Höngdobler wahrscheinlich oft zu hören bekommen, wenn er zum Schlußmachen mahnt.
+
+Für den Unterricht in anderen Fächern steht eine fahrbare Anlage bereit: Ein Regalschrank auf Rollen, in dem ein C 64, eine Datasette, ein Diskettenlaufwerk und ein Fernseher steht. Zur Zeit wird damit im Mathematikunterricht die Kurvendiskussion unterstützt. Sind in Physik und Chemie geeignete Programme fertiggestellt, wird der »fahrbare« C 64 auch in diesen Fächern Einzug halten. Außerhalb des Unterrichts benutzt Studiendirektor Meinrad Höngdobler einen C 64 und einen Commodore 4032 zur Erstellung von Stunden- und Vertretungsplänen und zeichnet mit der Kombination C 64/Plotter Kurvendiagramme für den Mathematikunterricht auf Overheadfolien.
+
+Wie sich der Informatikunterricht in den 10. Klassen entwickeln wird, weiß man in Unterpaffenhofen bis jetzt noch nicht genau. Man wird sich jedoch bald entscheiden müssen, ob nun darstellende Geometrie oder Informatik als Wahlpflichtteil im Mathematikunterricht gegeben wird. Ginge es nach den Schülern, wäre dies wahrscheinlich keine Frage. Ein Problem, das man in Unterpfaffenhofen mit sich trägt, ist die Erweiterung des Schulgebäudes des noch im Aufbau befindlichen Gymnasiums. Während der Bauzeit wird nämlich der jetzige Computerraum zur Baustelle und es ist kein anderer Platz vorhanden.
+
+## Wissensstand erhöhen
+
+Das Beispiel des Gymnasiums in Unterpfaffenhofen zeigt deutlich, daß es geht, Computer mit in den Unterricht zu integrieren. Einige andere Schulen hinken aber der Entwicklung auf dem Gebiet noch hinterher, so daß es längere Zeit dauern wird, bis jede Realschule und jedes Gymnasium in Bayern die geplanten acht bis zehn Computer hat. Die Schuld an diesem Rückstand liegt in den meisten Fällen an zu knapp fließenden Mittel. Die Lehrpläne sollen in absehbarer Zeit an den heutigen Stand der EDV-Ent-wicklung angepaßt sein. Inzwischen laufen schon Modellversuche mit Ausbildungsangeboten, die umfassende Kenntnisse vermitteln sollen, über die Verwendungsmöglichkeiten von Mikroprozessoren und Computern und der Gewährleistung der Datensicherheit. Das heute übliche Lehrangebot begrenzt sich auf 40 Wochenstunden in der 10. Klasse Gymnasium und in der Kollegstufe auf drei Stunden pro Woche (Bayern). Bis der Computer aber in den naturwissenschaftlichen Fächern einen festen Platz haben wird, vergeht wahrscheinlich noch etwas Zeit.
+
+## Eigeninitiative gefragt
+
+Es wird also in nächster Zeit die Angelegenheit von Eltern und Lehrern bleiben, für einen engeren Kontakt der Schüler mit dem Computer zu sorgen, wie das Unterpfaffenhofener Beispiel zeigt. Denn stehen für den Kauf von Computern nicht genügend Geldmittel von den Kommunen bereit, hilft eben nur noch eigene Initiative. Möglichkeiten gibt es einige. Man kann versuchen Computer und Peripherie-Geräte von der Industrie zu bekommen, als Spende oder zur Erpro-bungim Dauereinsatz. Besteht keine Möglichkeit dazu, helfen private Geldspenden. Zu hoffen bleibt, daß der in einigen Bundesländern geplante Ausbau des Computerunterrichts und die Modellversuche schnell in die Praxis umgesetzt und bundesweit eingeführt werden.
+
+(hm)
+
+# Vorschau
+
+## Vollen Sound	
+
+können Sie dem C 64 entlocken, wenn Sie ihn an Ihre Stereoanlage anschließen. Ein Spiel bekommt dadurch neue Dimensionen. Alles was Sie dazu benötigen, ist ein Kabel mit zwei Steckern. Die Bauanleitung finden Sie in der nächsten Ausgabe.
+
+## Funktionen für Anfänger
+
+Auch in Basic kann man Befehle selber definieren. Dazu braucht man keinen Assembler und keine Maschinensprache, sondern nur den gesunden Menschenverstand, wie man ihn auch sonst beim Programmieren einsetzt. Dazu gibt es die »benutzerdefinierten Funktionen«. Und wenn Sie die bisher noch nicht eingesetzt haben, dann liegt es meist an den mangelhaften Erklärungen im Handbuch. Deshalb fangen wir nochmal von vorne an und machen Ihnen die Benutzung des Funktions-Befehls DEF FN schmackhaft. Sie werden erstaunt sein, wie einfach man damit umgehen kann.
+
+## Alles über Matrixdrucker
+
+Was können die Bil-lig-Drucker? Lohnt sich der Kauf? Antworten auf diese Fragen möchten wir Ihnen in einem Vergleich von Druckern der Preisklasse bis 700 Mark geben. Eine Übersicht von Matrixdruckern für den C 64 wird Ihnen das Angebot am deutschen Markt zeigen. Wo liegen die Preise und was ist die Leistung.
+
+In einem ausführlichen Test stellen wir Ihnen außerdem drei neue Drucker von Star vor: Den SG-10, den SD-10 und den SR-10. Jeder dieser Drucker hat einen Schönschriftmodus, der weit über den Standard hinausgeht. Können Sie einen Typenraddrucker ersetzen? Außerdem testen wir den H-80 von Centronics und den D-80X von Decam. Der D-80X verspricht ein gutes Preis/ Leistungs-Verhältnis: Er ist an den C 64 angepaßt, hat acht Zeichensätze, Unterlängen und kann hoch- und tiefgestellte Zeichen drucken und kostet 899 Mark.
+
+## Moderne Programmiersprachen
+
+Die modernen Programmiersprachen sind im Kommen. Die Stichworte lauten Logo, Pascal, Ada, Forth, C, Lisp und Modula.
+
+Jede dieser Sprachen ist auf bestimmte Anwendungen und Programmiertechniken zugeschnitten, was sich in der ganzen Sprachstruktur bemerkbar macht. Die unterschiedlichen Programm- und Datenkonzeptionen dieser Sprachen werden vorgestellt, ebenso die möglichen Anwendungsgebiete und die Entwicklungsgeschichte.
+
+Damit das Ganze keine Trockenübung bleiben muß, haben wir für Sie das Commodore-Logo und den Ada-Trainingskurs von Data-Becker getestet. Logo glänzt durch einfache Grafik-Programmierung, während Ada als »Supersprache« für Großrechner bekannt wurde. Sie erfahren, wie es sich mit diesen Sprachen auf dem C 64 arbeitet, für wen die Anschaffung interessant ist und was sich in der Praxis damit anfangen läßt.
+
+## Leuchtfeuer
+
+Eine kleine elektronische Schaltung schafft Klarheit am User-Port. Zehn LEDs zeigen die logischen Zustände der Ein- oder Ausgänge an. Anstelle der LEDs können auch Opto-Koppler, kleine Relais oder Transistortreiber eingesetzt werden, um vielfältige Meßsteuerungsaufgaben zu bestätigen. Schalten Sie den User-Port als Eingang, können Sie Ihren C 64 auch als Meßgerät verwenden. Anwendungen gibt es viele. Ob Sie nun zu einer bestimmten Zeit eine Radiosendung aufnehmen oder eine Lichtorgel bauen möchten, die über alle denkbaren Funktionen verfügt, die Schaltung macht’s möglich.
+
+## Das Wichtigste über Dateiverwaltungen
+
+Daten zu verarbeiten und zu verwalten ist für viele ein notwendiges Übel, für andere eine Gelegenheit, Ordnung zu schaffen. Der Computer ist dabei nicht nur ein Ersatz für ein Karteisystem, sondern noch viel mehr. Er kann Arbeiten übernehmen, die ohne ihn nicht nur viel zeitaufwendiger, sondern sogar fast unmöglich sind. Dabei gibt es verschiedene Methoden, die alle ihre Vor- und Nachteile haben. Damit Sie keinen allzu großen Frust erleiden, wenn Sie sich ein solches Programm anschaffen wollen, sollten Sie vor dem Kauf einige wichtige Punkte beachten. Wir erklären Ihnen die wichtigsten Begriffe, geben Tips und Anregungen und eine Einführung in die Funktionsweise der Dateiverwaltung.
+
+## Clubs gefunden
+
+Jeder C 64-Besitzer sollte, will er das meiste aus seinem Computer herausholen, in einem Club Mitglied sein. Wir bringen Ihnen eine Liste deutscher Clubs mit den fünf bis sechs Schwerpunkten, mit denen er sich beschäftigt. Daraus können Sie den geeigneten Club auswählen.
+
+## Außerdem ...
+
+— Bauanleitung für den C 16
+— Test eines neuen Textverarbeitungsprogramms mit 80 Zeichen auf dem Bildschirm
+— ein intelligentes Programm, das sich mit Ihnen unterhält
+— sechs lehrreiche Kurse für Anfänger und Profis
+— und wieder viel Tips und Tricks für den VC 20, C 16 und C64
