@@ -1,4 +1,4 @@
-# Jedermann-Computer
+# Jedermann-Computer [8]
 
 Mit dem PC 128 beginnt die Zeit der »Jedermann-Computer«, der Systeme, die einerseits billig genug sind, daß man sie sich privat leisten kann — und deren Leistung andererseits für zahlreiche berufliche Anwendungen ausreicht. Am besten läßt sich das am Beispiel Textverarbeitungzeigen: DerPC 128 kann am Bildschirm 80 Zeichen/Zeile darstellen; er hat genügend Tasten, daß (deutsche oder andere) Sonderzeichen keine Probleme mehr machen — und er erlaubt im CP/M-Modus den Einsatz bewährter professioneller Programme. Der Fortschritt läßt sich leicht ermessen, wenn man nach der Lektüre des Testberichtes einen Blick auf die Übersichten über 80-Zeichen-Karten und Textprogramme wirft — und sich dann noch des Ärgers mit dem CP/M-Modul für den 64er erinnert.
 
@@ -8,7 +8,7 @@ Der PC 128 ist für alle interessant, die vom C 64 aufsteigen wollen, ferner fü
 
 Michael Pauly, Chefredakteur
 
-# Musikmesse Frankfurt
+# Musikmesse Frankfurt [8-9]
 
 > Auch auf der diesjährigen Frankfurter Musikmesse war der C 64 wieder der Star unter den Homecomputern. Neben unzähliaen Midiprogrammen gab es auch einiges an interessanter Software, die ohne teure Zusatzhardware läuft.
 
@@ -42,13 +42,15 @@ Eines ist absolut sicher — die zunehmende Computerisierung der Musik ist nicht
 
 (Richard Aicher/aa)
 
-# Die Sportler kommen
+# Die Sportler kommen [9]
 
 > Auf der Consumer Electronics Show in Las Vegas haben sich die Sportspiele eine Menge Fans an Land gezogen. Die sportliche Betätigung bei Rugby, Baseball, Golf oder Tennis ist wieaer gefragt, zumindest auf dem Bildschirm.
 
 Microcomputer Games hat für Boxfans das »Computer Title Bout«, für Baseballfans das »Computer Statis pro Baseball«, für Footballfans das »Computer Football Strategy« und für Golffans das »Tournament Golf« im Angebot. Auch Imagic ist mit »Touchdown Football«, »Tournament Tennis« und »Grand Slam Baseball« kräftig vertreten. Epyx wartete mit zwei Nachfolgern für bekannte Sportpiele auf: Summer Games II, mit Radrennen, Fechten oder Tunierreiten. Der Basketballhit One-on-One wird jetzt durch Two-on-Two ergänzt. Activision setzt nach wie vor mit »Decathon« auf den Zehnkampf. In Deutschland dürften diese Spiele es etwas schwer haben, sich durchzusetzen. Zum einen sind die meisten Sportarten wie Baseball, American Football oder Basketball nicht sehr bekannt, zum anderen ist das Regelwerk oft äußerst kompliziert (auch in den Computerspielen). Dennoch ist die Ausführung dieser Spiele sehr gut gelungen.
 
 (aa)
+
+# Aktuell [10]
 
 ## Ferien mit dem Computer
 
@@ -129,7 +131,7 @@ Wir wollen hier von Fall zu Fall in der Kuriositäten-Ecke über lustige Dinge, 
 - Dieselbe Zeitschrift schrieb zum Eintritt des Politikers Alexander Haig in den Commodore-Vorstand die bissige Bemerkung »Buy the Plus/4 or eat lead, commies!« (Kommunisten, kauft den Plus/4 oder es gibt Blei!).
 - Wußten Sie, daß es im Textabenteuer »Sorcerer« 70 verschiedene Todesarten gibt? — Das übertrifft alle bisherigen Adventures, eingenommen Zork (28), Planetfall (41) und Deadline (nur zwei Todesarten).
 
-# Leserforum
+# Leserforum [11]
 
 ## Forth-Computer gesucht
 
@@ -211,7 +213,7 @@ Und natürlich nehmen wir uns auch im 64’er-Magazin des C 16 an. Ab der nächs
 
 Selbst bei sorgfältiger Lektüre von Handbüchern und Programmbeschreibungen bleiben beim Anwender immer wieder Fragen offen. Viel mehr Fragen ergeben sich bei Computer-Interessenten, die noch keine festen Kontakte zu Händlern, Herstellern oder Computerclubs haben. Sie können der Redaktion Ihre Fragen schreiben oder Probleme schildern (am einfachsten auf der Karte »Lesermeinung«). Wirveranlassen, daß sie von einem Fachmann beantwortet werden. Allgemein interessierende Fragen und Antworten werden veröffentlicht, die übrigen brieflich beantwortet.
 
-# PC 128 - der Profi
+# PC 128 - der Profi [12-15]
 
 > 128 KByte RAM, 64 KByte ROM, voll kompatibel zum C 64 und CP/M-fähig — mit dem neuen PC 128 setzt Commodore wieder einmal Maßstäbe. Welche Maßstäbe das sind, erfahren Sie in diesem ersten Testbericht.
 
@@ -341,7 +343,7 @@ Doch das ist noch Zukunftsmusik. Fest steht jedoch, daß der Markt der Heim- und
 
 (ev)
 
-# Mit 80 fängt das Leben an
+# Mit 80 fängt das Leben an [17-20]
 
 > Gemeint sind 80 Zeichen pro Zeile auf dem Bildschirm. Sehr gute Leistungen versprechen neue 80-Zeichenkarten mit den entsprechenden, darauf abgestimmten Textverarbeitungs- und Kalkulationsprogrammen.
 
@@ -395,7 +397,7 @@ Gute Beispiele für gelungene Spezialentwicklungen sind die Textverarbeitungspro
 
 (Arnd Wängler/aa/hm)
 
-# Der Bildschirm wird zur Leinwand
+# Der Bildschirm wird zur Leinwand [21]
 
 > Lichtgriffel haben bisher eine untergeordnete Rolle beim C 64 aespielt. Der Tech-Sketch-Lightpen mit guter Software könnte das ändern.
 
@@ -415,7 +417,7 @@ Info: Softline, Schwarzwaldstr. 8a, 7602 Oberkirch, Tel. 0 78 02/37 07
 
 Preis: LP15: 369 Mark; LP10: 159 Mark
 
-# Schnell wie der Wind, die 1541-Turbo-Floppy
+# Schnell wie der Wind, die 1541-Turbo-Floppy [22-25]
 
 > Ein Traum wird wahr, die 1541 als schnelles, zuverlässiges und komfortables Diskettenlaufwerk. Zwei Zauberwörter sind es, die diese Verwandlung möglich machen — TurboAccess und Speeddos. Im Vergleich zeigen beide ihre Stärken und Schwächen.
 
@@ -481,7 +483,7 @@ Beide Systeme sind wahrscheinlich die interessantesten Neuerungen, die in letzte
 
 (Arnd Wängler/gk)
 
-# Der C 64 als Speicheroszilloskop
+# Der C 64 als Speicheroszilloskop [26-28]
 
 > Mit einem Bausatz können Sie Ihren C 64 zu einem Speicheroszilloskop ausbauen. Aperiodische Vorgänge bis zu 1,5 Stunden können erfaßt werden.
 
@@ -545,7 +547,7 @@ Der Bausatz kostet 298 Mark, das Fertiggerät 398 Mark. Es lohnt sich also, das 
 
 Info: Bezugsquelle: Pitt Jörn Brockner, Computer Peripherien, Heidelbergerstr. 6, 8000 München 40, Tel. 0 89/36 8197
 
-# Eine klare Sache
+# Eine klare Sache [28-29]
 
 > Zu einem Farbcomputer gehört ein Farbmonitor. Die Fähigkeiten des Commodore 64 in diesem Bereich werden durch den Phönix-Monitor bestens unterstützt.
 
@@ -575,7 +577,7 @@ TODO ASIDE
 
 In Kürze wird eine neue Version dieses Monitors in den Handel kommen. Der Bildpunktabstand soll dann von 0,65 mm auf 0,43 mm herabgesetzt sein.
 
-# C 16 — großer oder kleiner Bruder des C 64?
+# C 16 — großer oder kleiner Bruder des C 64? [29-30]
 
 > Starkes Basic 3.5, aber weniger Speicherplatz als beim C 64 — wo ist der C 16 einzuordnen?
 
@@ -602,7 +604,7 @@ Zusammenfassend kann man sagen, daß die Vorteile des C 64 zur Zeit in erster Li
 
 (Dieter Hein/ev)
 
-# Verbunden mit der ganzen Welt
+# Verbunden mit der ganzen Welt [30]
 
 > Zur Datenfernübertragung über das Telefonnetz mit dem C 64 ist im Normalrall eine RS232-Schnittstelle nötig. Denn sie ermöglicht erst den Anschluß eines Modems oder Akustikkopplers.
 
@@ -616,7 +618,7 @@ Die dem Interface beiliegende Kurzanleitung enthält eine Zeichnung, die den Sig
 
 Info: Mükra, Schönebergerstraße 5, 1000 Berlin 42, Tel. 0 30/7 52 9150. Preis: 129,-
 
-# Alte Datasette am C 16
+# Alte Datasette am C 16 [31]
 
 > Der neue Datasetten-Anschluß des C 16 ist ein Ärgernis für alle Besitzer einer »alten« Datasette. Mit wenig Aufwand läßt sich jedoch ein Adapter basteln.
 
@@ -628,7 +630,7 @@ Als letztes muß die Kabelverbindung zwischen Recorder- und Computerstecker herg
 
 (Peter Schneider/ev)
 
-# Tips und Tricks für C 16/C 116
+# Tips und Tricks für C 16/C 116 [31]
 
 Die »nur« 2 KByte Speicher im Grafikmodus verleiten dazu, die Technik des Programm-Chaining anzuwenden. Dies bedeutet nichts anderes, als daß ein Programm das nächste nachlädt. Dies kann allerdings zum totalen Chaos führen, wenn das nachgeladene Programm auch nur ein Byte länger als das vorhergehende ist. Dann tauchen Fehlermeldungen wie »FORMULA TOO COMPLEX« während des Listens und ähnliches auf. Ein Editieren des nachgeladenen Programms führt dann schließlich zu einem totalen System-Zusammenbruch nach dem Nichts-geht-mehr-Prinzip. Auch der inzwischen schon relativ bekannte Trick, einen Reset bei gedrückter STOP- und Commodore-Taste auszulösen, um so im Monitor zu landen, mit X wieder herauszugehen und schon ist das Programm wieder da, kann hier nicht mehr helfen. Also aufgepaßt beim Chaining. Ist das Hauptprogramm allerdings länger als das nachzuladende Programm, dann treten keine Schwierigkeiten auf. Es bleiben sogar alle Variablen (auch Stringvariable) erhalten. Im Zweifelsfalle empfiehlt es sich daher, das Hauptprogramm mit REM-Zeilen künstlich zu verlängern.
 
@@ -640,7 +642,7 @@ Zum Schluß noch ein Hardwaretip: Wenn der C 16 mal nicht so tut wie er soll, da
 
 (Peter Schneider/ev)
 
-# Ich glaub, mein Drucker pfeift
+# Ich glaub, mein Drucker pfeift [34-35]
 
 > Wer seinen Drucker bisher nur benutzte, um Listings zu Rapier zu bringen, dem zeigt der Print Shop, was so ein Drucker eigentlich alles kann.
 
@@ -701,7 +703,7 @@ Commodore 1525/MPS 801
 Print Shop arbeitet mit diesen und allen dazu kompatiblen Druckern zusammen.
 TODO /ASIDE
 
-# Basic 64 — ein vielseitiger Basic-Compiler
+# Basic 64 — ein vielseitiger Basic-Compiler [36-37]
 
 > Die Stärken dieses neuen Compilers sind ohne Zweifel seine vielen Funktionen. Obwohl es einige Mühe macht, sie alle auszunutzen, kommt aber auch ein Anfänger ohne Probleme mit diesem Compiler zurecht.
 
@@ -777,7 +779,7 @@ Insgesamt gesehen also viel Leistung für 99 Mark.
 
 (Karsten Schramm/gk)
 
-# Texte gut im Griff
+# Texte gut im Griff [38-40]
 
 > Haben Sie es satt, ständig Tippfehler zu verbessern oder gar ganze Seiten von neuem zu schreiben, dann sollten Sie Ihre Texte mit dem Computer bearbeiten.
 
@@ -825,7 +827,7 @@ Die aufgeführten Leitungsmerkmale sollen Ihnen den Standard eines Textverarbeit
 
 (hm)
 
-# Malkasten ade!
+# Malkasten ade! [40-41]
 
 > Aus der inzwischen doch recht ansehnlichen Masse der Zeichenprogramme ragt »Blazing Paddles« heraus.
 
@@ -871,7 +873,7 @@ Ansonsten aber erwies sich Blazing Paddles als das leistungsfähigste Zeichenpro
 
 Info: Softline, Schwarzwaldstr. 8a, 7602 Oberkirch, Tel. 0 78 02/37 07, Preis: 169 Mark
 
-# Aztec Basic — von jedem etwas
+# Aztec Basic — von jedem etwas [42]
 
 > Wer eine leistungsfähige Befehlserweiterung für den C 64 sucht, die mit Simons Basic konkurrieren kann, der hat sie mit diesem Programm gefunden.
 
@@ -927,7 +929,7 @@ Ein Konkurrent für andere Befehlserweiterungen wird Aztec Basic sicher sein. Mi
 
 Info: Aztec Software: Howard Dutton, Auf der Heide 18, OT Rohden, 3253 Hess, Oldendorf 5.
 
-# Ein modemes Abenteuer — Mailboxen in Deutschland
+# Ein modemes Abenteuer — Mailboxen in Deutschland [43-46]
 
 > Kommen Sie mit uns auf die Reise durch Deutschlands Mailboxen. Einer Reise ins Abenteuer mit Computer und Akustikkoppler. Unser Mailboxtest zeigt Ihnen, wie aufregend das legale Stöbern in fremden Computern ist.
 
@@ -1074,7 +1076,7 @@ TODO Tabelle 4
 
 /TODO Tabelle 4
 
-# Sprachen für Computer
+# Sprachen für Computer [47-49]
 
 > Warum braucht man überhaupt eine Programmiersprache ? Welche Sprache ist tür welchen Zweck geeignet ? Welche Sprachen gibt es für Commodore-Computer ? Der folgende Artikel gibt Auskunft.
 
@@ -1163,7 +1165,7 @@ Eine Marktübersicht finden Sie in einer der nächsten Ausgaben.
 
 (ev)
 
-# Amazon — Das besondere Adventure
+# Amazon — Das besondere Adventure [49]
 
 > Amazon ist das erste aus einer Reihe von Abenteuerspielen, die gemeinsam mit bekannten Romanautoren produziert wurden. Was dahinter steckt, ist beachtlich.
 
@@ -1177,7 +1179,7 @@ Amazon kann auf drei verschiedenen Schwierigkeitsgraden gespielt werden, was bei
 
 Quelle: Fun-Tastic Videospielversand, Tannhäuserplatz 22, 8000 München 81, Preis: 99 Mark
 
-# Epson bedruckt Ostereier
+# Epson bedruckt Ostereier [50-51]
 
 > Auch der Osterhase sollte mit der Zeit gehen. Wozu in mühseliger Kleinarbeit die Ostereier von Hana bemalen, wenn man sowohl Computer als auch Drucker zur Verfügung hat. Ein neuartiger Umrüstsatz für Epson-Drucker macht's möglich.
 
@@ -1193,7 +1195,7 @@ Der Umrüstsatz ist vorerst leider nur für Epson JX-80 und FX-80 / RX-80 erhäl
 
 (Jürgen Kruse/Arnd Wängler/ev)
 
-# C 16/116-Listings gesucht
+# C 16/116-Listings gesucht [51]
 
 Der neue Commodore C 16/116 ist inzwischen schon in größeren Stückzahlen verkauft worden. Gehören Sie vielleicht zu den Käufern der ersten Stunde und haben deshalb schon Erfahrungen damit sammeln können? Oder haben Sie vielleicht schon interessante Programme für diesen Computer entwickelt?
 
@@ -1211,7 +1213,7 @@ Ein oder zwei Tage, nachdem Sie den Brief zur Post gebracht haben, kommt er bei 
 
 So ist allen geholfen: Unsere Leser finden ständig interessante Programme in ihrem 64’er Magazin, wir Redakteure haben Arbeit und Sie bekommen bares Geld — 100, 200, 300 oder auch 2 000 Mark.
 
-# xBasic 64: eine Super-Bask-Enweiterung
+# xBasic 64: eine Super-Bask-Enweiterung [52,59-63]
 
 > Schon oft wurden Basic-Erweiterungen veröffentlicht, die aber immer nur einen bestimmten Bereich bevorzugten. xBasic 64 dagegen umfaßt das gesamte Spektrum des C 64 und stent insgesamt 44 neue Befehle zur Verfugung.
 
@@ -1418,7 +1420,7 @@ xBasic 64 läßt sich mit LOAD "Name",8,1 von der Diskette (oder LOAD von der Ka
 
 /TODO ASIDE
 
-# Neuer Checksummer 64 — blitzschnell und kürzer
+# Neuer Checksummer 64 — blitzschnell und kürzer [54-56]
 
 > Der Checksummer überprüft jede eingegebene Basic-Zeile und erspart Ihnen deshalb eine langwierige Fehlersuche. Und neu ist der Checksummer, weil die Initialisierung zirka einhundertmal schneller ist als die alte.
 
@@ -1493,7 +1495,17 @@ Sie können die Programme auch weiterhin ohne den Checksummer eintippen.
 
 TODO "Die Steuerbefehle im Klartext"
 
-# MSE — Abtippen sicher und leicht gemacht
+# Clubs gesucht [56]
+
+Uns erreicht eine Unmenge an Zuschriften von Lesern, die einen Anschluß an einen Club in ihrer Nähe suchen. Soweit Clubs in dieser Stadt oder dem Postleitzahlengebiet bekannt sind, geben wir die Adressen natürlich gerne weiter. Doch es wird sicherlich noch genügend andere Commodore-Besitzer geben, die in einem Club mitmachen wollen.
+
+Deshalb der **Aufruf an alle Commodore-Clubs** sich bei uns zu melden. Wichtig sind dabei neben der Adresse auch die Schwerpunkte, mit denen sich der Club befaßt. Seien dies nun der Erfahrungs- oder Programmaustauch, die DFÜ, die Hardware oder eine eigene Clubzeitschrift. Um möglichst alle Clubs in der geplanten Übersicht veröffentlichen zu können, sollten Sie sich bei Ihren Angaben auf das Notwendigste beschränken. Also Adresse und vier oder fünf Stichpunkte, etwa nach diesem Schema:
+C 64 User-Club POKE-Freunde, Basic-Str. 1, 1024 Commodorestadt,
+Clubtreffen, monatliche Zeitschrift, Softwarebibliothek, Hardware, Funker, DFÜ, etc.
+
+Diese Infos schicken Sie bitte an: Markt & Technik Verlag AG, Redaktion 64’er, Stichwort: Club, Hans-Pinsel-Str. 2, 8013 Haar bei München.
+
+# MSE — Abtippen sicher und leicht gemacht [57-59]
 
 > Ähnlich wie der »Checksummer« ist auch der MSE ein Hilfsmittel bei der Eingabe von Listings, diesmal jedoch bei reinen Maschinensprache-Programmen.
 
@@ -1534,7 +1546,7 @@ CTRL-N erlaubt die Eingabe einer neuen Adresse zum Weitertippen.
 CTRL-P gibt ein MSE-Listing auf dem Drucker aus.
 Die Befehle des MSE auf einen Blick
 
-# 64 — Tastaturänderung
+# 64 — Tastaturänderung [63]
 
 > Wenn Sie die Tastaturbelegung auf Ihrem C 64 ändern möchten, gibt es eine einfache Methode, um jeder beliebigen Taste eine andere Bedeutung zu geben.
 
@@ -1551,7 +1563,7 @@ Wie Siejede andere Taste umbelegen, sehen Sie aus der folgenden Tabelle:
 
 (Helmut Pilz/gk)
 
-# Ohne gutes Werkzeug geht es nicht: SMON Teil 5
+# Ohne gutes Werkzeug geht es nicht: SMON Teil 5 [64-67]
 
 > Dies ist der letzte Teil unserer SMON-Serie mit der versprochenen Zugaba Die zirka noch freien 500 Byte sollen mit einem kleinen Diskettenmonitor gefüllt werden. Parallel zur Serie über die »Geheimnisse der Floppy« wollen wir Ihnen außerdem an einigen Beispielen zeigen, was man mit so einem Disk-Monitor alles anstellen kann.
 
@@ -1693,7 +1705,7 @@ Wir werden in einer der nächsten Ausgaben der 64’er noch einmal auf Fragen au
 
 (N. Mann/D. Weineck/gk)
 
-# Schachmeister erweitert
+# Schachmeister erweitert [68]
 
 > »Schach-Profis« werden bei dem Listing »Schachmeister« wohl schon festgestellt haben, daß noch nicht alle Regeln des königlichen Spiels berücksichtigt waren. Dies ändert sich nun.
 
@@ -1725,7 +1737,7 @@ Das Programm muß, um die erläuterten Erweiterungen zu besitzen, durch die im L
 
 (Heiko Becke/rg)
 
-# Funktionen im Netz
+# Funktionen im Netz [69-73]
 
 > 3-D-Funktionsdiagramme sehen nicht nur gut aus, sie liefern auch viele Informationen über mathematische Funktionen.
 
@@ -1808,7 +1820,7 @@ Nun genug der langen Erklärung. Am Besten ist es immer noch, ein wenig mit den 
 
 (Martin Rogge/hm)
 
-# Supergrafik III
+# Supergrafik III [73-74]
 
 > Klein, aber oho! Dreidimensionale Grafiken sind auch mit der Grundversion des VC 20 möglich.
 
@@ -1833,7 +1845,7 @@ Um Speicherplatz zu sparen, wurde auf Kommentare im Programm und Grundsätze zur
 
 (Rudolf Dörr/ev)
 
-# Tips & Tricks gesucht
+# Tips & Tricks gesucht [74]
 
 Jeder Computer und jedes Programm hat seine speziellen Schwachstellen und Unzulänglichkeiten. Allerdings ist kaum ein Programmierer oder Anwender auf Dauer bereit, sich damit abzufinden. Wo auch sorgfältigste Lektüre von Handbüchern nicht weiterhilft, da wird so manche Stunde experimentiert, um eine Lösung zu finden (die oft in einer Basic-Zeile Platz hat).
 
@@ -1847,7 +1859,7 @@ Markt&Technik Verlag Aktiengesellschaft
 Hans-Pinsel-Str. 2
 8013 Haar bei München
 
-# Neues vom Hypra-Load: Hypra-Perfekt
+# Neues vom Hypra-Load: Hypra-Perfekt [75-77]
 
 > Es ist uns schon fast zur lieben Gewohnheit geworden, Ihnen das Hypra-Load in ständig verbesserter Form vorzustellen. Wir hoffen, daß wir die neueste Version nicht zu Unrecht »Hypra-Perfekt« genannt haben.
 
@@ -1877,7 +1889,7 @@ Alles in allem müßte das neue Hypra-ROM mit beinahe 99 Prozent aller erhältli
 
 (Arnd Wängler/Ernst Schöberl/gk)
 
-# Print-List
+# Print-List [79]
 
 > Ein kurzes Programm, das nicht nur formatierte Listings mit Seitenzahlangabe und Überspringen der Perforation bei Endlospapier druckt. Es erklärt auch, was »programmierter Direktmodus« ist.
 
@@ -1897,7 +1909,7 @@ Mit etwas Probieren können Sie auf ähnliche Weise Basic-Programme nachladen, o
 
 (Peter Zuser/hm)
 
-# Befehlserweiterung für den C 64
+# Befehlserweiterung für den C 64 [80-81]
 
 > Neue Basic-Anweisungen zur Bildschirmsteuerung und für maskierte Dateneingaben: TAB (X,Y) I CHR$ (!) / INPUT (!), " ....
 
@@ -1938,7 +1950,7 @@ Das Programm wird mit SYS 49152 gestartet. Die neuen Funktionen stehen dann sofo
 
 (Heino Velder/ev)
 
-# Reverse Hardcopy MPS 801/ VC 1515/ GP 100VC
+# Reverse Hardcopy MPS 801/VC 1515/GP 100VC [81]
 
 In der Ausgabe 10/84 des 64’er Magazins veröffentlichten wir eine Hardcopy-Routine für die Drucker MPS801, VC 1515 und GP 1OOVC. Folgende Zeilen sollten geändert werden, um einen reversen Ausdruck zu erreichen:
 470 DATA9,128,32,0,197,70,151,144,223,165,176,105,6,133,176,144,2,230,177
@@ -1948,7 +1960,7 @@ In der Ausgabe 10/84 des 64’er Magazins veröffentlichten wir eine Hardcopy-Ro
 
 (Dipl.-Ing, Reinhard Zinn/rg)
 
-# Hardcopy mit einer Zeile
+# Hardcopy mit einer Zeile [82]
 
 > Dieser Einzeiler gibt den Text einer Bildschirmseite des C 64 auf einem MPS 801 aus. Ganz ohne PEEKs, POKEs und SYS-Befehle. Trotzdem überrascht das Programm mit einer hohen Druckgeschwindigkeit.
 
@@ -1968,7 +1980,7 @@ Die Zeile 4 dient lediglich zum Füllen des Bildschirms für Demo-Zwecke. Zeile 
 
 (Karl-Heinz Heß/hm)
 
-# VC 20-Programme schützen
+# VC 20-Programme schützen [83]
 
 > Einige Gedanken zum Copyright-Schutz mit Break, Autostart und einigen nützlichen POKEs und PEEKs. Experimentieren ist gestattet.
 
@@ -1986,11 +1998,11 @@ POKEn Sie doch einmal verschiedene Werte in die Speicherstelle 808. Sie werden v
 
 (Ralf Brinkmann/ev)
 
-# Jahresinhaltsverzeichnis 1984/85
+# Jahresinhaltsverzeichnis 1984/85 [84-86]
 
 In diesem Inhaltsverzeichnis sind alle wesentlichen Artikel enthalten, die in den Ausgaben 4/84 bis 3/85 vom 64’er erschienen sind. Das Verzeichnis ist in zehn Hauptabschnitte unterteilt. Die Rubrik »Listings zum Abtippen« besteht außerdem aus den Unterabschnitten Anwendung, Grafik, Spiel und Tips&Tricks. Einige Artikel finden sich als themenübergreifende Beiträge unter verschiedenen Stichworten wieder. Nicht enthalten sind im Inhaltsverzeichnis kurze Meldungen sowie Beiträge aus den Rubriken Leserforum, Bücher, Aufrufe und Fehlerteufel. Um zwölf Monatsausgaben im Verzeichnis aufzuführen, wurden die Ausgaben 1/85, 2/85 und 3/85 mit aufgenommen. Diese tauchen auch wieder im Jahresinhaltsverzeichnis von 1985, das in der Ausgabe 1/86 erscheint, auf.
 
-# Window 64: Fenstertechnik für den Commodore
+# Window 64: Fenstertechnik für den Commodore [87-91]
 
 > Bekanntlich besitzt der C 64 nicht die bei einigen anderen (vor allem bei teureren) Computern mögliche Definierung von Fenstern. Mit diesem Programm können Sie mit einfachen, aber leistungsstarken Befehlen bis zu acht solcher Fenster einsetzen.
 
@@ -2039,7 +2051,7 @@ Nach Verlassen des Schirmzonenmenüs wird der Schirmzonen-Mode automatisch einge
 
 TODO Tabelle Die drei Schirmzonenbefehle im Überblick:
 
-# Fehlerteufelchen
+# Fehlerteufelchen [92]
 
 Diesmal konnte ich mich gar nicht richtig austoben. Am meisten Spaß hat mir das Abschnippeln beim Programm Floppy-Lister gemacht.
 
@@ -2062,7 +2074,7 @@ Es fehlte in der Tabelle auf Seite 75 der Änderungshinweis der Speicherzelle 90
 Auf der Seite 135 wurden die beiden Bildunterschriften Listing 2b und 3b vertauscht.
 In beiden Listings muß in der Speicherstelle 050C LDA #$ ... stehen.
 
-# Dem Klang auf der Spur, Teil 4
+# Dem Klang auf der Spur, Teil 4 [131-136]
 
 > Der SID ist einer der vielseitigsten Sound-Chips auf dem Markt. Dennoch kann man mit ein paar Tricks Klänae mit mehr Volumen, Weichheit und Komplexität erzeugen. Der hier vorgestente Modulator ist der Kern eines in den nächsten Folgen zu entwickelnden, interruptgesteuerten Synthesizer- und Sequenzerprogramms mit professionellen Ansprüchen.
 
@@ -2214,7 +2226,7 @@ In der nächsten Folge wird das Source-Listing zu »Modulator« besprochen. Wenn
 
 (Thomas Krätzig/aa)
 
-# Assembler ist keine Alchimie — Teil 8
+# Assembler ist keine Alchimie — Teil 8 [138-140,143-144]
 
 Irgendwann brauchen Sie sie bestimmt, die Rechnung mit Fließkommazahlen. Auch den Umgang mit loaischen Ausdrücken wie AND, ORA oder EOR und wie man mit dem Schiebe-Befehl ASL multipliziert, sollen Sie beherrschen. Das alles erfahren Sie im achten Teil dieses Kurses.
 
@@ -2480,7 +2492,7 @@ Das alles aber, liebe Leser, erfahren Sie erst beim nächsten mal. Für heute wa
 
 (Heimo Ponnath/gk)
 
-# Memory Mop mit Wandervorschlägen
+# Memory Mop mit Wandervorschlägen [144-146]
 
 > Weiter geht's mit der Erkundung der Speichenandschaft. Die Adressen 57 bis 79 tragen zum Funktionieren eines Basic-Programms bei.
 
@@ -2714,7 +2726,7 @@ Der Aufbau einer Funktion läßt sich also so zusammenfassen:
 
 TODO Table
 
-# Effektives Programmieren (4): Daten sortieren mit dem Computer — Methoden, Techniken, Programme
+# Effektives Programmieren (4): Daten sortieren mit dem Computer — Methoden, Techniken, Programme [148-151]
 
 > Wie sortiere ich meine Daten am besten? Dieses Problem ist so alt wie der Computer, und entsprechend vielfältig sind die Lösungsvorschläge. Wir stellen Ihnen in mehreren Folgen die wichtigsten und bekanntesten Sortiermethoden und dazu jeweils ein entsprechendes Listing vor.
 
@@ -2890,7 +2902,7 @@ Ein Begriff aus der Mathematik, der genau festlegt, wie ein Problem zu lösen is
 
 Die binäre Suche ist eine sehr schnelle Suchmethode, die ein sortiertes Feld voraussetzt. Dabei wird, vom gesamten Feld ausgehend, immer auf das Element in der Mitte des Feldes zugegriffen. Je nachdem, ob der gesuchte Wert (oder Wort) kleiner oder größer ist, wird entweder die übrigbleibende obere oder untere Hälfte wiederum halbiert und auf das mittlere Element in dieser verbleibenden Hälfte zugegriffen und mit dem gesuchten Begriff verglichen. Dieses Spiel wiederholt sich so lange, bis der Begriff gefunden wurde. Die maximale Anzahl der Suchschritte errechnet sich aus max = INT (LN(anz. Elemente)/LN(2)) + 1.
 
-# 11 neue Einzeiler!
+# 11 neue Einzeiler! [153-155]
 
 > Der Einzeiler-Wettbewerb regt immer noch eine ganze Reihe Leser an, möglichst interessante Lösungen in eine Basic-Zeile zu packen. Wir haben wieder die besten für Sie ausgewählt.
 
@@ -3101,7 +3113,7 @@ POKE 657,0 COMMODORE-Taste ein
 
 (Peter Gaß)
 
-# 2 KByte am Handgelenk zu gewinnen
+# 2 KByte am Handgelenk zu gewinnen [156]
 
 > Großer Ideenwettbewerb: 10 programmierbare Uhren locken
 
@@ -3127,7 +3139,7 @@ Einsendeschluß ist der
 
 Der Rechtsweg ist ausgeschlossen.
 
-# Gelungener Einstieg
+# Gelungener Einstieg [159-160]
 
 > Am Gymnasium Unterpaffenhofen klappte der Einstieg in den praktischen Informatik-Unterricht. Ein Pascal- und ein Basic-Kurs kämpfen dort um die Computer.
 
@@ -3163,7 +3175,7 @@ Es wird also in nächster Zeit die Angelegenheit von Eltern und Lehrern bleiben,
 
 (hm)
 
-# Vorschau
+# Vorschau [164]
 
 ## Vollen Sound	
 
