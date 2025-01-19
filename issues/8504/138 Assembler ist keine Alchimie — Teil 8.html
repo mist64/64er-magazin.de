@@ -71,6 +71,95 @@
 
         <p>Im 6. Teil dieser Serie ist schon mal der FAC erwähnt worden, der Fließkomma-Akkumulator 1, welcher die Speicherstellen dez. 97 bis 102 ($61 bis $66) belegt. Ein zweiter Fließkomma-Akkumulator, AFAC oder ARG genannt, belegt die Plätze dez. 105 bis 110 ($69 bis $6E). Diese Akkumulatoren haben für die Fließkommarechnungen eine ähnliche Bedeutung wie der Akku für die l-Byte-Rechnungen. Dort werden fast alle Ergebnisse abgelegt oder Zahlen abgerufen. Wir sehen, daß wir darin 6 Byte zur Verfügung haben. In Byte 97 liegt der Exponent in der von uns ermittelten Form. Byte 98 bis 101 sind die vier Mantissenbytes. Was ist in Byte 102? Das Vorzeichen! Bit 7 dieses Bytes ist 0, wenn eine positive, und 1 wenn eine negative Zahl vorliegt. Das galt für den FAC, wie Sie aus den Speicherstellen schon gesehen haben. Für den ARG ist das aber ganz genauso. Sehen wir uns nun in Bild 1 unsere Beispielzahl im FAC und im ARG nochmal an.</p>
 
+        <figure>
+            <table>
+                <tbody>
+                    <tr>
+                        <td>FAC $</td>
+                        <td>61</td>
+                        <td>62</td>
+                        <td>63</td>
+                        <td>64</td>
+                        <td>65</td>
+                        <td>66</td>
+                    </tr>
+                    <tr>
+                        <td>FAC dez</td>
+                        <td>97</td>
+                        <td>98</td>
+                        <td>99</td>
+                        <td>100</td>
+                        <td>101</td>
+                        <td>102</td>
+                    </tr>
+                    <tr>
+                        <td>ARG $</td>
+                        <td>69</td>
+                        <td>6A</td>
+                        <td>6B</td>
+                        <td>6C</td>
+                        <td>6D</td>
+                        <td>6E</td>
+                    </tr>
+                    <tr>
+                        <td>ARG dez.</td>
+                        <td>105</td>
+                        <td>106</td>
+                        <td>107</td>
+                        <td>108</td>
+                        <td>109</td>
+                        <td>110</td>
+                    </tr>
+                    <tr>
+                        <td colspan="7">INHALT</td>
+                    </tr>
+                    <tr>
+                        <td>BINÄR</td>
+                        <td>1000 1011</td>
+                        <td>1111 1000</td>
+                        <td>0010 0100</td>
+                        <td>0000 0000</td>
+                        <td>0000 0000</td>
+                        <td>0... ... </td>
+                    </tr>
+                    <tr>
+                        <td>HEX.</td>
+                        <td>8B</td>
+                        <td>F8</td>
+                        <td>24</td>
+                        <td>00</td>
+                        <td>00</td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td>DEZ.</td>
+                        <td>139</td>
+                        <td>248</td>
+                        <td>36</td>
+                        <td>0</td>
+                        <td>0</td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td>BYTE Nr.</td>
+                        <td>1</td>
+                        <td>2</td>
+                        <td>3</td>
+                        <td>4</td>
+                        <td>5</td>
+                        <td>6</td>
+                    </tr>
+                    <tr>
+                        <td>ERLÄUTERUNG</td>
+                        <td>Exponent</td>
+                        <td colspan="4">MANTISSE</td>
+                        <td>Vorzeichen</td>
+                    </tr>
+                </tbody>
+            </table>
+            <figcaption>Bild 1. So sieht die Zahl 1985,125 komplex im FAC und ARG aus</figcaption>
+        </figure>
+
         <p>Im Bild ist auch angedeutet, daß die restlichen 7 Bit (Bits 0 bis 6) des Vorzeichenbytes keine Rolle spielen. Sie werden später direkt in diese Akkumulatoren hineinsehen und allerlei Bit-Müll darin finden. Lediglich Bit 7 ist für uns von Bedeutung.</p>
 
         <p>Eigentlich ist das ja eine ganz schöne Verschwendung, von einem Byte wie diesem Vorzeichenbyte lediglich ein einziges Bit zu nutzen. Wenn eine beliebige Fließkommazahl irgendwo im Computer abgespeichert wird, dann gilt ein anderes Format, das MFLPT-Format (von <strong>M</strong>emory-<strong>FL</strong>oating <strong>P</strong>oin<strong>T</strong>). Man speichert hier nur in 5 Byte. Das Vorzeichenbyte fällt weg. Wie aber merkt sich der Computer das Vorzeichen? Das ist ganz schlau eingefädelt: Es gibt nämlich in den 5 Byte (1 Exponentenbyte + 4 Mantissenbyte) ein überflüssiges Bit. Sie werden sich sicher erstaunt fragen, wo?</p>
@@ -176,6 +265,29 @@
 
         <p>Damit haben wir eine ganze Menge an Möglichkeiten. Erinnern Sie sich noch an die Regeln einer UND-Verknüpfung? Wenn nicht, dann sehen Sie sich nochmal die Tabelle 1 an.</p>
 
+        <figure>
+            <table>
+                <tbody>
+                    <tr>
+                        <td>AND</td>
+                        <td>0</td>
+                        <td>1</td>
+                    </tr>
+                    <tr>
+                        <td>0</td>
+                        <td>0</td>
+                        <td>0</td>
+                    </tr>
+                    <tr>
+                        <td>1</td>
+                        <td>0</td>
+                        <td>1</td>
+                    </tr>
+                </tbody>
+            </table>
+            <figcaption>Tabelle 1. Wahrheitstabelle zur AND-Verknüpfung</figcaption>
+        </figure>
+
         <p>Sie erkennen, daß zwei miteinander AND-verknüpfte Bits nur dann als Ergebnis 1 haben, wenn in beiden Bits der Wert 1 steht. Man kann mittels AND ganz gezielt Bits löschen. Nehmen wir mal als Beispiel an, wir wollten geshiftete Zeichen (das sind die mit den Codes größer als 128) in normale Zeichen umwandeln. Dazu bringen wir die Zeichencodesin den Akku und löschen Bit 7. Übrig bleibt dann der Code für das ungeshiftete Zeichen. Für das Löschen von Bit 7 brauchen wir eine sogenannte UND-Maske, die dafür sorgt, daß alle anderen Bits unverändert bleiben. An den Stellen muß in dieser Maske also eine 1 stehen (denn 0 AND 1 ergibt 0, 1 AND 1 ergibt 1). Lediglich Bit 7 der Maske muß 0 sein. Die Maske muß also heißen:<br />
             <strong>0111 1111 $7F dez. 127</strong>
         </p>
@@ -196,7 +308,28 @@
 
         <p>Auch hier ist eine sogenannte Wahrheitstabelle recht einprägsam (siehe Tabelle 2).</p>
 
-        <p>TODO</p>
+        <figure>
+            <table>
+                <tbody>
+                    <tr>
+                        <td>ORA</td>
+                        <td>0</td>
+                        <td>1</td>
+                    </tr>
+                    <tr>
+                        <td>0</td>
+                        <td>0</td>
+                        <td>1</td>
+                    </tr>
+                    <tr>
+                        <td>1</td>
+                        <td>1</td>
+                        <td>1</td>
+                    </tr>
+                </tbody>
+            </table>
+            <figcaption>Tabelle 2. Wahrheitstabelle zur ORA-Verknüpfung</figcaption>
+        </figure>
 
         <p>Während man mit AND gezielt Bits löschen kann, ist es mit ORA möglich, Bits zu setzen. Auch dazu verwendet man eine Maske, die an allen Stellen, an denen Bits unverändert bleiben sollen, eine 0, sonst aber eine 1 enthält. Nehmen wir nochmal das Beispiel von vorhin und wandeln nun das ungeshiftete Zeichen in ein geshiftetes um. Wir müssen also Bit 7 wieder setzen: Da muß in der Maske dann eine 1 stehen. Alle anderen Bits bleiben unverändert, wenn die Maske dort eine Null aufweist. Die Maske muß daher heißen:<br />
             <strong>1000 0000 $80 dez. 128</strong>
@@ -219,6 +352,29 @@
             TODO</p>
 
         <p>Eine Wahrheitstabelle dazu sehen Sie in Tabelle 3.</p>
+
+        <figure>
+            <table>
+                <tbody>
+                    <tr>
+                        <td>EOR</td>
+                        <td>0</td>
+                        <td>1</td>
+                    </tr>
+                    <tr>
+                        <td>0</td>
+                        <td>0</td>
+                        <td>1</td>
+                    </tr>
+                    <tr>
+                        <td>1</td>
+                        <td>1</td>
+                        <td>0</td>
+                    </tr>
+                </tbody>
+            </table>
+            <figcaption>Tabelle 3. Wahrheitstabelle zur EOR-Verknüpfung</figcaption>
+        </figure>
 
         <p>Wozu verwendet man EOR? Es fällt Ihnen vielleicht auf, daß wir die aus Basic bekannte NOT-Funktion nicht in Assembler vorliegen haben. Obwohl EOR einige viel weitergehendere Verwendungsmöglichkeiten aufweist als NOT (aber auf Boolesche Algebra wollen wir hier nicht eingehen), kann man es mit gleicher Wirkung einsetzen. Wir haben beispielsweise in den ersten Folgen dieses Kurses negative Zahlen durch Komplementieren erzeugt. Dabei sollte jedes Bit in sein Gegenteil verkehrt werden. Das wäre die Aufgabe einer NOT-Funktion. Durch ein EOR FF können wir dasselbe erreichen. Sehen wir uns wieder ein Beispiel an. Im Akku steht dez. 15 ($0F, bin. 0000 1111):</p>
 
@@ -293,6 +449,266 @@
         <p>Das alles aber, liebe Leser, erfahren Sie erst beim nächsten mal. Für heute war’s lang und schwer genug! Wir werden dann einen eleganten Weg der 16-Bit-Multiplikation und Division erarbeiten. Und unser Programmprojekt soll natürlich endlich weiter gedeihen. Abschließend finden Sie in Tabelle 4 noch alles Wissenswerte zu den neuen Befehlen.</p>
 
         <address class="author">(Heimo Ponnath/gk)</address>
+
+        <figure>
+            <table border="1">
+                <tbody>
+                    <tr>
+                        <th rowspan="2">Befehlswort</th>
+                        <th rowspan="2">Adressierung</th>
+                        <th rowspan="2">Bytezahl</th>
+                        <th colspan="2">Code</b>
+                        <th rowspan="2">Taktzyklen</th>
+                        <th rowspan="2">Beinflussung von Flaggen</th>
+                    </tr>
+                    <tr>
+                        <th>Hex</th>
+                        <th>Dez</th>
+                    </tr>
+                    <tr>
+                        <th rowspan="8">AND</th>
+                        <td>absolut</td>
+                        <td>3</td>
+                        <td>2D</td>
+                        <td>45</td>
+                        <td>4</td>
+                        <td>N, Z</td>
+                    </tr>
+                    <tr>
+                        <td>0-page-abs</td>
+                        <td>2</td>
+                        <td>25</td>
+                        <td>37</td>
+                        <td>3</td>
+                        <td>N, Z</td>
+                    </tr>
+                    <tr>
+                        <td>unmittelbar</td>
+                        <td>2</td>
+                        <td>29</td>
+                        <td>41</td>
+                        <td>2</td>
+                        <td>N, Z</td>
+                    </tr>
+                    <tr>
+                        <td>abs.-X-indiz.</td>
+                        <td>3</td>
+                        <td>3D</td>
+                        <td>61</td>
+                        <td>4*</td>
+                        <td>N, Z</td>
+                    </tr>
+                    <tr>
+                        <td>abs.-Y-indiz.</td>
+                        <td>3</td>
+                        <td>39</td>
+                        <td>57</td>
+                        <td>4*</td>
+                        <td>N, Z</td>
+                    </tr>
+                    <tr>
+                        <td>indiz.-indir.</td>
+                        <td>2</td>
+                        <td>21</td>
+                        <td>33</td>
+                        <td>6</td>
+                        <td>N, Z</td>
+                    </tr>
+                    <tr>
+                        <td>indir.-indiz.</td>
+                        <td>2</td>
+                        <td>31</td>
+                        <td>49</td>
+                        <td>5*</td>
+                        <td>N, Z</td>
+                    </tr>
+                    <tr>
+                        <td>0-page-X-indiz</td>
+                        <td>2</td>
+                        <td>35</td>
+                        <td>53</td>
+                        <td>4</td>
+                        <td>N, Z</td>
+                    </tr>
+                    <tr>
+                        <th rowspan="8">ORA</th>
+                        <td>absolut</td>
+                        <td>3</td>
+                        <td>0D</td>
+                        <td>13</td>
+                        <td>4</td>
+                        <td>N, Z</td>
+                    </tr>
+                    <tr>
+                        <td>0-page-abs.</td>
+                        <td>2</td>
+                        <td>05</td>
+                        <td>05</td>
+                        <td>3</td>
+                        <td>N, Z</td>
+                    </tr>
+                    <tr>
+                        <td>unmittelbar</td>
+                        <td>2</td>
+                        <td>09</td>
+                        <td>09</td>
+                        <td>2</td>
+                        <td>N, Z</td>
+                    </tr>
+                    <tr>
+                        <td>abs.-X-indiz.</td>
+                        <td>3</td>
+                        <td>1D</td>
+                        <td>29</td>
+                        <td>4*</td>
+                        <td>N, Z</td>
+                    </tr>
+                    <tr>
+                        <td>abs.-Y-indiz.</td>
+                        <td>3</td>
+                        <td>19</td>
+                        <td>25</td>
+                        <td>4*</td>
+                        <td>N, Z</td>
+                    </tr>
+                    <tr>
+                        <td>indiz.-indir.</td>
+                        <td>2</td>
+                        <td>01</td>
+                        <td>01</td>
+                        <td>6</td>
+                        <td>N, Z</td>
+                    </tr>
+                    <tr>
+                        <td>indir.-indiz.</td>
+                        <td>2</td>
+                        <td>11</td>
+                        <td>17</td>
+                        <td>5*</td>
+                        <td>N, Z</td>
+                    </tr>
+
+
+                    <tr>
+                        <td>0-page-X-indiz</td>
+                        <td>2</td>
+                        <td>15</td>
+                        <td>21</td>
+                        <td>4</td>
+                        <td>N, Z</td>
+                    </tr>
+                    <tr>
+                        <th rowspan="8">EOR</th>
+                        <td>absolut</td>
+                        <td>3</td>
+                        <td>4D</td>
+                        <td>77</td>
+                        <td>4</td>
+                        <td>N, Z</td>
+                    </tr>
+                    <tr>
+                        <td>0-page abs.</td>
+                        <td>2</td>
+                        <td>45</td>
+                        <td>69</td>
+                        <td>3</td>
+                        <td>N, Z</td>
+                    </tr>
+                    <tr>
+                        <td>unmittelbar</td>
+                        <td>2</td>
+                        <td>49</td>
+                        <td>73</td>
+                        <td>2</td>
+                        <td>N, Z</td>
+                    </tr>
+                    <tr>
+                        <td>abs.-X-indiz.</td>
+                        <td>3</td>
+                        <td>5D</td>
+                        <td>93</td>
+                        <td>4*</td>
+                        <td>N, Z</td>
+                    </tr>
+                    <tr>
+                        <td>abs.-Y-indiz.</td>
+                        <td>3</td>
+                        <td>59</td>
+                        <td>89</td>
+                        <td>4*</td>
+                        <td>N, Z</td>
+                    </tr>
+                    <tr>
+                        <td>indiz.-indir.</td>
+                        <td>2</td>
+                        <td>41</td>
+                        <td>65</td>
+                        <td>6</td>
+                        <td>N, Z</td>
+                    </tr>
+                    <tr>
+                        <td>indir.-indiz.</td>
+                        <td>2</td>
+                        <td>51</td>
+                        <td>81</td>
+                        <td>5*</td>
+                        <td>N, Z</td>
+                    </tr>
+                    <tr>
+                        <td>0-page-X-indiz</td>
+                        <td>2</td>
+                        <td>55</td>
+                        <td>85</td>
+                        <td>4</td>
+                        <td>N, Z</td>
+                    </tr>
+                    <tr>
+                        <th rowspan="5">ASL</th>
+                        <td>»Akkumulator«</td>
+                        <td>1</td>
+                        <td>0A</td>
+                        <td>10</td>
+                        <td>2</td>
+                        <td>N, Z, C</td>
+                    </tr>
+                    <tr>
+                        <td>absolut</td>
+                        <td>3</td>
+                        <td>0E</td>
+                        <td>14</td>
+                        <td>6</td>
+                        <td>N, Z, C</td>
+                    </tr>
+                    <tr>
+                        <td>0-page-abs.</td>
+                        <td>2</td>
+                        <td>06</td>
+                        <td>06</td>
+                        <td>5</td>
+                        <td>N, Z, C</td>
+                    </tr>
+                    <tr>
+                        <td>abs.-X-indiz.</td>
+                        <td>3</td>
+                        <td>1E</td>
+                        <td>30</td>
+                        <td>7</td>
+                        <td>N, Z, C</td>
+                    </tr>
+                    <tr>
+                        <td>0-page-X-indiz</td>
+                        <td>2</td>
+                        <td>16</td>
+                        <td>22</td>
+                        <td>6</td>
+                        <td>N, Z, C</td>
+                    </tr>
+                </tbody>
+            </table>
+            <figcaption>Tabelle 4. Alles Wissenswerte der neuen</th>
+                <th>Assembler-Befehle
+            </figcaption>
+        </figure>
     </article>
 </body>
 
