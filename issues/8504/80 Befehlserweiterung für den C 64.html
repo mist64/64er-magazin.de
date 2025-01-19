@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>Befehlserweiterung für den C 64</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="Heino Velder, ev">
+    <meta name="64er.issue" content="4/85">
+    <meta name="64er.pages" content="80-81">
+    <!-- <meta name="64er.toc_category" content="XXX"> -->
+    <!-- <meta name="64er.toc_title" content="XXX"> -->
+    <meta name="64er.id" content="XXX">
+</head>
+
+<body>
+    <article>
+        <h1>Befehlserweiterung für den C 64</h1>
+        <blockquote>
+            <p>Neue Basic-Anweisungen zur Bildschirmsteuerung und für maskierte Dateneingaben: TAB (X,Y) I CHR$ (!) / INPUT (!), &ldquo; &hellip;.</p>
+        </blockquote>
+
+        <p>Die vorgestellten Zusatzbefehle wurden ursprünglich zur Unterstützung eines kleineren Dateiprogramms entwickelt. Natürlich sind — besonders für die Bildschirmsteuerungen — andere Einsatzmöglichkeiten denkbar. Im Handbuch des C 64 finden Sie im Anhang F eine Tabelle der ASCII- und CHR$-Codes. Da einige Zeichen nicht belegt sind, bietet es sich an, diesen die neuen Steueranweisungen zuzuordnen.</p>
+
+        <p>Tabelle 1 zeigt die neuen CHR$-Codes.</p>
+
+        <p>Sicherlich haben Sie schon einmal die Erfahrung gemacht, daß Freunde bei selbstgeschriebenen Programmen erstaunlich schnell die STOP-Taste finden. Die »Treffsicherheit« steigt dabei mit zunehmender Unkenntnis über Computer. Mit den letzten vier—in der Tabelle aufgeführten — CHR$-Codes können die STOP-Taste und die STOP-RESTORE-Funktion ein- und ausgeschaltet werden.</p>
+
+        <p>Aber Vorsicht: Das folgende Beispielprogramm kann nach RUN nicht wieder unterbrochen werden.<br />
+            10 PRINT CHR$(12);CHR$(16)<br />
+            20 GOTO 20</p>
+
+        <p>Nur durch RESET oder ROSOF (Reset On Switch On ofF) kann der Computer zurückgeholt werden; das Programm ist jedoch in beiden Fällen verloren.</p>
+
+        <p>Nebenbei beziehen sich die neuen CHR$-Codes nur auf den Bildschirm. Da viele Drucker nicht in der Lage sind, einen einmal ausgedruckten Text beispielsweise nach links zu verschieben, werden die neu belegten CHR$-Codes unverändert an die Schnittstelle weitergegeben.</p>
+
+        <p>Die nächste Erweiterung betrifft den TAB-Befehl. Folgt zwischen den Klammern nur eine Angabe, so wird die Befehlsführung weiterhin dem Commodore-Basic überlassen. Falls der Klammerausdruck zwei Koordinaten (erst X, dann Y) enthält, wird TAB durch das Maschinenprogramm ausgeführt. Der Cursor wird in diesem Fall auf die Bildschirmkoordinaten X, Y gesetzt. Der Befehl »PRINT TAB (0,0);&ldquo;TEST"« schreibt beispielsweise »TEST« an den oberen linken Bildschirmrand.</p>
+
+        <p>Als weitere Neuerung kann der INPUT-Befehl nun durch Angabe einer Feldbreite »maskiert« werden. Das funktioniert folgendermaßen: Der maskierte INPUT-Befehl wird durch eine Längenangabe — in Klammern — gekennzeichnet. Falls beispielsweise eine Eingabe auf zehn Zeichen begrenzt werden soll, muß die Anweisung wie folgt lauten: »10 INPUT (10),&ldquo;EINGABE&rdquo;; E$«.</p>
+
+        <p>Die Feldgrenzen können anschließend nicht mehr überschritten werden. Außerdem unterdrückt das Programm die Eingaben HOME, CLR HOME, CURSOR UP/DOWN sowie das Anführungszeichen. Die Tasten DELete und INST verändern nur die Maske; also in dem Beispiel die ersten zehn Positionen hinter dem Text »EINGABE«.</p>
+
+        <h2>Bildschirmmasken ohne Probleme</h2>
+
+        <p>Zusätzlich kann in dem Feld eine Maske unterlegt werden. Hierzu das folgende Testprogramm:<br />
+            10 PRINT &ldquo;12345678&hellip;&hellip;TEST&rdquo;;CHR$(7);<br />
+            20 INPUT (10), &ldquo;EINGABE&rdquo;; D$<br />
+            30 D$ = LEFT$(D$,10) : PRINT D$</p>
+
+        <p>Der PRINT-Befehl schreibt zuerst die Zahlen 1-8, dann zehn Punkte (als Maske) und zuletzt das Wort »TEST«. Durch CHR$(7) folgt anschließend ein RETURN auf der Bildschirm-Zeile. Der Text »EINGABE« des INPUT-Befehls überschreibt dann die Zahlen 1 bis 8 und das Ergebnis sieht wie folgt aus: EINGABE?&hellip;&hellip;&hellip;TEST</p>
+
+        <p>Falls Sie nun einige Zeichen eingeben und anschließend mit der DEL-Taste löschen, werden am Maskenende neue Punkte »nachgeschoben«. Das Wörtchen >TEST&lt; bleibt jedoch unverändert, da sich die Eingaben DEL und INST nur auf die Eingabemaske beziehen. Nach RETURN wird die Maske (mit SPACEs) gelöscht. In der Zeile 30 muß der String zuletzt auf die Maskenlänge begrenzt werden, da das Wort »TEST« ebenfalls in die Variable übernommen wurde.</p>
+
+        <p>Nachdem Sie jetzt wissen was das Programm macht, brauchen Sie »nur« noch das Basic-Ladeprogramm einzugeben. Die Daten sind als Hexadezimalwerte aufgeführt. Bei dem letzten Wert handelt es sich um die Prüfsumme der entsprechenden Zeile. Nach »RUN« meldet das Programm beispielsweise »Zeile 1009 PRUEFSUMMENFEHLER«, so daß Sie genau erfahren, in welcher DATA-Zeile Sie das Maschinenprogramm »umgeschrieben« haben.</p>
+
+        <p>Das Programm wird mit SYS 49152 gestartet. Die neuen Funktionen stehen dann sofort zur Verfügung.</p>
+
+        <address class="author">(Heino Velder/ev)</address>
+    </article>
+</body>
+
+</html>

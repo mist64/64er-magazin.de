@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>Effektives Programmieren (4): Daten sortieren mit dem Computer — Methoden, Techniken, Programme</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="Karsten Schramm, gk, auch Matrix, Tabelle, indizierte Variable">
+    <meta name="64er.issue" content="4/85">
+    <meta name="64er.pages" content="148-151">
+    <!-- <meta name="64er.toc_category" content="XXX"> -->
+    <!-- <meta name="64er.toc_title" content="XXX"> -->
+    <meta name="64er.id" content="XXX">
+</head>
+
+<body>
+    <article>
+        <h1>Effektives Programmieren (4): Daten sortieren mit dem Computer — Methoden, Techniken, Programme</h1>
+        <blockquote>
+            <p>Wie sortiere ich meine Daten am besten? Dieses Problem ist so alt wie der Computer, und entsprechend vielfältig sind die Lösungsvorschläge. Wir stellen Ihnen in mehreren Folgen die wichtigsten und bekanntesten Sortiermethoden und dazu jeweils ein entsprechendes Listing vor.</p>
+        </blockquote>
+
+        <p>Wie oft haben Sie wohl schon ein Telefonbuch oder ein Adressenverzeichnis aufgeschlagen, um nach einem bestimmten Namen zu suchen? Eine Frage, die wohl kaum zu beantworten ist.</p>
+
+        <p>Es passiert alle Augenblicke, daß man etwa ein Lexikon zur Hand nimmt, um ein Fremdwort nachzuschlagen oder daß man den Fahrplan einer Buslinie nach der nächsten Abfahrtszeit durchsucht.</p>
+
+        <p>Stellen Sie sich jetzt einmal vor, Sie hätten ein Lexikon in der Hand, das nicht, wie üblich, in alphabetisch sortierter Form vorliegt, sondern alle Stichwörter völlig durcheinander enthält.</p>
+
+        <p>Sie werden wohl zugeben, daß sich die Suche nach einem bestimmten Wort nun als ziemlich hoffnungslos herausstellen wird.</p>
+
+        <p>Mit dieser Feststellung sind wir aber schon beim Thema.</p>
+
+        <p>Heutzutage wird die Verwaltung und Weiterverarbeitung großer Datenmengen fast ausschließlich von Computern vorgenommen. Alle Stichwörter eines Lexikons sind zum Beispiel in Großrechenanlagen gespeichert und werden vollelektronisch in den Satz gegeben.</p>
+
+        <p>Nun wird Datenverarbeitung aber nicht nur auf Großrechenanlagen durchgeführt, sondern auch durchaus auf Mikrocomputern; sei es als Kundendatei oder als elektronisches Notizbuch.</p>
+
+        <p>Die Notwendigkeit einer Ordnung in diesen Datenbeständen wurde schon zur Sprache gebracht. Uns soll nun in dieser Folge interessieren, was es für Methoden des Ordnens von Daten gibt.</p>
+
+        <p>Wir werden uns also im Laufe dieser Reihe mit den verschiedensten Sortieralgorithmen beschäftigen; angefangen beim Sortieren durch direktes Einfügen (straight insertion) bis hin zum schnellsten Algorithmus, der zur Zeit existiert, dem Sortieren durch Zerlegen (Quicksort).</p>
+
+        <p>Jede Sortiermethode soll dabei bis ins Detail erklärt werden, und Sie werden sehr schnell erkennen, daß Sortieren nicht gleich Sortieren ist.</p>
+
+        <p>Haben wir ein großes Variablenfeld angelegt, so gibt es generell zwei verschiedene Methoden beim Suchen eines bestimmten Elements:</p>
+
+        <p>1) Durchsuchen sämtlicher Elemente<br />
+            2) binäre Suche</p>
+
+        <p>Die erste Methode ist uns klar. Hierbei werden einfach alle Elemente des Feldes vom Anfang bis zum Ende durchgekämmt, um das gewünschte herauszufinden. Bei der Geschwindigkeit, mit der ein Computer seine Variablenfelder durchgehen kann, müssen schon gewichtige Gründe für das Sortieren sprechen.</p>
+
+        <p>Diese Gründe gibt es auch. Einer davon ist das Verwalten großer Datenmengen.</p>
+
+        <h2>Sortieren von Feldern</h2>
+
+        <p>Auch ein »Superrechner« benötigt viel Zeit, um einige Millionen Daten durchzusehen. Dieser Zeitfaktor wird noch erhöht, wenn man nur nach bestimmten Teilen einer Datei suchen möchte, also nach bestimmten Buchstabenfolgen oder Zahlenkombinationen.</p>
+
+        <p>Gehen wir jetzt einmal davon aus, ein Feld wäre sortiert. Der Computer kann jetzt binär suchen, was selbst bei vielen tausend Elementen nur eine kurze Zeit benötigt. Unter binärer Suche versteht man folgendes: Wenn der Computer zum Beispiel nach einer bestimmten Zahl sucht, so geht er erst einmal zur Mitte des gesamten Feldes. Jetzt kann er anhand eines einfachen Größenvergleichs herausfinden ob die gesuchte Zahl in der einen oder in der anderen Hälfte des Feldes liegen muß. Hat er das herausgefunden, so wird diese Feldhälfte wiederum in der Mitte geteilt, und wieder wird festgestellt, in welcher Hälfte des Feldes die Zahl zu finden sein muß. Dies geht immer so weiter, bis nur noch zwei Zahlen übrigbleiben, von denen eine die gesuchte ist.</p>
+
+        <p>Diese Methode der binären Suche ist sehr effektiv und erlaubt selbst bei großen Datenmengen eine geringe Suchzeit. Ein kleines Rechenbeispiel:</p>
+
+        <p>Wir haben 100 Elemente und wollen eines davon binär suchen. Durch unser Suchsystem sinkt die Anzahl der zu durchsuchenden Elemente auf folgende Art und Weise: 100:50:25:13:8:4:2:1.</p>
+
+        <p>Dies war der ungünstigste Fall, bei dem sich der zu suchende Wert immer in der Hälfte des übriggebliebenen Feldes befand.</p>
+
+        <p>Bei 100 Elementen haben wir also maximal sieben Zugriffe, bis der Wert gefunden wird. Nun durchsuchen wir auf die gleiche Weise 1000 Elemente.</p>
+
+        <p>Es gilt jetzt die absteigende Reihe:<br />
+            1000:500:250:125:63:32:16:8:4:2:1.</p>
+
+        <p>Wie Sie sehen sind nur drei Zugriffe hinzugekommen, obwohl sich die Anzahl der Elemente verzehnfacht (!) hat.</p>
+
+        <p>Mit der anderen Suchmethode hätten wir im Mittel 50 beziehungsweise 500 Zugriffe gehabt, wenn man davon ausgeht, daß die Auswahl gleichverteilt erfolgt. Es lohnt sich also bei größeren Feldern durchaus, diese vorher zu sortieren, wobei wir bei allen Sortiermethoden nur ein Ziel haben werden:</p>
+
+        <p>Die Zeit des Sortierens muß möglichst gering bleiben!</p>
+
+        <p>Maßgeblich für die Zeitdauer eines Algorithmus sind folgende zwei Kriterien:</p>
+
+        <p>1) die Anzahl der Vergleiche<br />
+            2) die Anzahl der Bewegungen</p>
+
+        <p>Außer diesen generellen Kriterien werden wir auch feststellen, daß es eine Rolle spielt, in welcher Form das Feld vor dem Sortieren vorlag. Insgesamt kann man die Sortiermethoden in vier grobe Klassen unterteilen:</p>
+
+        <p>1) Sortieren durch Einfügen<br />
+            2) Sortieren durch Auswählen<br />
+            3) Sortiern durch Austauschen<br />
+            4) Sortieren durch Zerlegen</p>
+
+        <p>Jede dieser Sortiermethoden hat bestimmte Vorzüge und wiederum auch spezielle Nachteile. Das hängt, wie schon erwähnt, von der anfänglichen Struktur eines Feldes ab. Wir müssen an dieser Stelle zwischen drei verschiedenen Anfangszuständen unterscheiden:</p>
+
+        <p>1) Das Feld ist bereits sortiert<br />
+            2) das Feld ist völlig unsortiert<br />
+            3) das Feld ist genau entgegengesetzt sortiert.</p>
+
+        <p>Manche Sortieralgorithmen sind um so schneller, je sortierter ein Feld vorliegt. Bei anderen Algorithmen kann das genau umgekehrt sein. Quicksort ist zum Beispiel am effektivsten, wenn es sich um zufällig durchmischte Felder handelt.</p>
+
+        <h3>Direktes Einfügen</h3>
+
+        <p>Nun aber zu unserem ersten Sortieralgorithmus, einer Sortiermethode, die Ihnen auch im täglichen Leben sicherlich am geläufigsten ist.</p>
+
+        <p>Es handelt sich um das Sortieren durch direktes Einfügen (straight insertion). Die hochtrabende Bezeichnung beschreibt einen eigentlich ganz einfachen Vorgang: Sie haben ein Feld aus zufällig durchmischten Elementen. Das Sortierprogramm beginnt jetzt beim zweiten Element und vergleicht dies mit dem ersten; ist es kleiner, so wird getauscht. Die ersten beiden Elemente dieses Feldes sind also schon sortiert.</p>
+
+        <p>Jetzt wird das dritte Element geholt und mit dem zweiten verglichen. Ist es größer, so bleibt es an seinem Platz; ansonsten wird es in die Reihe der vorherigen an den richigen Platz geschoben und eingefügt.</p>
+
+        <p>Das geht weiter, bis zum letzten Element, und mit einem Durchlauf werden alle Variablen in aufsteigender Reihenfolge sortiert.</p>
+
+        <p>Dieses Sortieren wenden Sie zum Beispiel immer beim Kartenspielen an, wobei Sie Ihr Blatt systematisch durchgehen, alle verkehrt sitzenden Karten herausnehmen und an der richtigen Stelle einordnen.</p>
+
+        <p>In Listing 1 sehen Sie ein Programm abgedruckt, das für alle weiteren Sortierprogramme als Rahmen dienen soll. Es hat die Aufgabe, ein Feld zu erstellen und die Ausgabe auf Drucker oder Bildschirm festzulegen. Das Feld kann wahlweise zufällig oder von Hand bestimmt werden und besteht aus Stringvariablen der Länge 3.</p>
+
+        <p>In Listing 2 sehen Sie den Abschluß des Sortierprogramms. Alle Algorithmen sind nur mit diesen Rahmenprogrammen lauffähig.</p>
+
+        <p>Listing 3 schließlich zeigt ein Programm für das Sortieren durch direktes Einfügen. Wie Sie aus dem Listing erkennen können, ist es wichtig, daß das erste Element des Feldes nicht, oder als das absolut kleinste Element definiert wird, da es die letzte und höchste Vergleichstufe darstellt und somit nicht mehr vertauscht werden kann, da das Programm sonst über die Grenzen des Feldes hinaus arbeiten müßte. In unserem Fall ist dieses Element (A$(0)) ein Leerstring C").</p>
+
+        <p>Bild 1 zeigt, wie Straight Insertion arbeitet. Die Elemente, die jeweils behandelt werden, sind unterstrichen.</p>
+
+        <p>Aus Bild 1 können Sie aber noch mehrere Informationen über den Sortieralgorithmus erhalten. Es wird zum Beispiel deutlich, daß das Sortieren durch direktes Einfügen bei a Elementen genau a-1 Elemente durchgehen muß, um vollständig zu arbeiten.</p>
+
+        <p>Diese Zahl ergibt für die Berechnung der Anzahl der notwendigen Vergleiche folgende Formel:</p>
+
+        <p>(a<sup>2</sup>+a)/4</p>
+
+        <p>Wir haben in unserem Beispiel (Bild 1) mit 10 Elementen gearbeitet. Die Anzahl der Vergleiche beträgt also nach dieser Formel 28.</p>
+
+        <p>Für die Anzahl der Bewegungen im Variablenfeld sieht die Sache folgendermaßen aus:</p>
+
+        <p>(a<sub>2</sup>+9a)/4</p>
+
+        <p>Hier kommen wir gar auf 48 Bewegungen innerhalb unserer 10 Feldelemente.</p>
+
+        <p>Diese Formeln lassen an sich gar nichts Schlimmes vermuten. Wenn wir sie jedoch einmal genauer unter die Lupe nehmen, so werden wir eine bestürzende Feststellung machen: beide Formeln haben im Nenner jeweils einen Faktor a2 stehen.</p>
+
+        <p>Anders ausgedrückt heißt das; wenn wir die Anzahl der Elemente verdoppeln, vervierfacht sich die Anzahl der Bewegungen, der Vergleiche und ebenso natürlich die Sortierdauer.</p>
+
+        <p>Bei einer dreifachen Anzahl müssen wir schon neunmal (!) solange warten, wie zu Beginn.</p>
+
+        <p>Wie schon erwähnt, besteht das Ziel des effektiven Sortierens darin, die Zeitdauer möglichst gering zu halten. In der Praxis werden wir versuchen, die Anzahl der Bewegungen und Vergleiche auf ein Mindestmaß zu drücken, und wir werden erkennen, daß sich die Proportionalität von a zu a2 auf a zu log2 (a) (Logarithmus der Basis 2) vermindern läßt, wenn man entsprechende Algorithmen einsetzt.</p>
+
+        <h3>Bubblesort</h3>
+
+        <p>Nachdem wir einen sehr einfachen Algorithmus bereits kennengelernt haben, soll uns nun eine weitere, recht einfache Sortiermethode interessieren. Es handelt sich hierbei um ein Sortieren durch Austauschen.</p>
+
+        <p>Bubblesort zählt mit zu den bekanntesten Sortieralgorithmen und arbeitet nach folgendem Prinzip:</p>
+
+        <p>Wir fangen mit dem gesamten Variablenfeld an. Hier nehmen wir nun das erste Element und vergleichen es mit dem zweiten. Ist es größer, so wird getauscht; ansonsten bleiben die beiden Elemente, so wie sie sind, stehen. Jetzt gehen wir eine Position weiter und vergleichen das jetzige zweite Element (das auch das vorherige erste sein kann) mit dem dritten der Reihe und tauschen gegebenfalls aus. Das geht immer so weiter, bis zum Ende des Feldes.</p>
+
+        <p>Sie werden sicherlich erkannt haben, daß sich auf diese Weise das allergrößte Element immer weiter nach unten bewegt hat und nach Abschluß dieses Durchgangs an lezter Stelle zu finden (also bereits richtig einsortiert) ist.</p>
+
+        <p>Jetzt begrenzen wir also das gesamte Feld auf alle Variablen, bis auf die letzte (a = a-1) und wiederholen den Vorgang. Als Ergebnis steht nun das zweitgrößte Element an der vorletzten Stelle und wir vermindern die Gesamtzahl wiederum um 1.</p>
+
+        <p>Das geht so weiter, bis die Länge des Feldes auf 1 geschrumpft ist; wir also nur noch das kleinste Element übrig haben. Damit ist der Sortiervorgang beendet.</p>
+
+        <p>Der Name von Bubblesort kommt übrigens von der Eigenschaft dieses Verfahrens, die größten Elemente quasi bis ans Ende des Feldes »durchzuperlen«. Dreht man das Feld um und hat man die größten Elemente am Anfang, so kann man diese Bewegungen innerhalb der Variablen durchaus mit dem Aufsteigen von Blasen (»bubbles«) vergleichen.</p>
+
+        <p>Listing 4 zeigt das Programm für den einfachen Bubblesort-Algorithmus, und in Bild 2 können Sie wiederum einen Beispielausdruck mit 10 Elementen sehen. Der erste Unterschied zwischen Bubblesort und unserem vorherigen Straight Insertion wird sofort klar, wenn Sie sich die beiden Ausdrucke im Vergleich betrachten.</p>
+
+        <p>Während sich das Feld bei Straight Insertion vom Anfang her aufbaut und beim kleinsten Element zu sortieren beginnt, fängt Bubblesort beim größten Element an und bringt dieses zuerst an dessen Platz.</p>
+
+        <p>Die Zeitbedingungen für Bubblesort sind denen von Straight Insertion ziemlich ähnlich. Auch hier haben wir den Faktor a2 als zeitbestimmenden Faktor in den Formeln.</p>
+
+        <p>Die Formel für die Anzahl der Vergleiche lautet jetzt:</p>
+
+        <p>(a<sup>2</sup>-a)/2</p>
+
+        <p>Um die Anzahl der Bewegungen zu berechnen dient folgende Formel:</p>
+
+        <p>&frac34;*(a<sup>2</sup>-a)</p>
+
+        <p>Bild 3 und 4 zeigen einen Programmablaufplan der beiden Sortiermethoden, so daß eine Umstellung auf andere Programmiersprachen kein Problem darstellen sollte.</p>
+
+        <p>An dieser Stelle wollen wir den ersten Abschnitt unserer Folge bereits beenden. Überlegen Sie sich bis zum nächstenmal, wie man Bubblesort vielleicht noch verbessern könnte; wir bringen dann nämlich eine Version, die einige Nachteile der jetzigen nicht mehr besitzt.</p>
+
+        <p>Oder vielleicht fallen Ihnen inzwischen auch einige Methoden zum günstigen Sortieren von Feldern ein?</p>
+
+        <p>Sicherlich werden Sie die eine oder andere Möglichkeit im Laufe unserer Reihe noch finden, wenn auch unter einem vielleicht noch unbekannten Namen.</p>
+
+        <address class="author">(Karsten Schramm/gk)</address>
+
+        <p>TODO ASIDE</p>
+
+        <h2>Wichtige Begriffe in diesem Artikel</h2>
+
+        <h3>Feld, Variablenfeld</h3>
+
+        <address class="author">(auch Matrix, Tabelle, indizierte Variable)</address>
+
+        <p>In einem Feld wird eine Gruppe von in der Regel gleichartigen Werten (Daten) zusammengefaßt. Felder müssen dimensioniert werden. Dabei wird entsprechend der Datenmenge Speicherplatz reserviert. Im Commodore-Basic können sowohl numerische als auch alphanumerische Felder definiert werden.</p>
+
+        <h3>Algorithmus</h3>
+
+        <p>Ein Begriff aus der Mathematik, der genau festlegt, wie ein Problem zu lösen ist. Im einfachsten Fall ist das eine Formel, zum Beispiel FLÄCHE = LÄNGE x BREITE. Aber selbst ein komplettes Programm kann als Algorithmus bezeichnet werden, denn es wird ein Problem nach vorgegebenen Regeln gelöst.</p>
+
+        <h3>Binäre Suche</h3>
+
+        <p>Die binäre Suche ist eine sehr schnelle Suchmethode, die ein sortiertes Feld voraussetzt. Dabei wird, vom gesamten Feld ausgehend, immer auf das Element in der Mitte des Feldes zugegriffen. Je nachdem, ob der gesuchte Wert (oder Wort) kleiner oder größer ist, wird entweder die übrigbleibende obere oder untere Hälfte wiederum halbiert und auf das mittlere Element in dieser verbleibenden Hälfte zugegriffen und mit dem gesuchten Begriff verglichen. Dieses Spiel wiederholt sich so lange, bis der Begriff gefunden wurde. Die maximale Anzahl der Suchschritte errechnet sich aus max = INT (LN(anz. Elemente)/LN(2)) + 1.</p>
+    </article>
+</body>
+
+</html>

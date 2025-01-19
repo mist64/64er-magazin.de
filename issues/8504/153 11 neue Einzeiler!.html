@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>11 neue Einzeiler!</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="Christoph von Rhein, gk, Georg Brandt, gk, Georg Wichert, gk, Gerhard Silberbach, Guido Leister, gk, Hannes Kaltenbach, ev, Heiko Schmidt, gk, Herbert Heise, Herbert Lickes, Jürgen Reinert, gk, Peter Gaß, Robert Loos, gk, Stefan Keimeier, gk, Wilfried Mintrop, gk">
+    <meta name="64er.issue" content="4/85">
+    <meta name="64er.pages" content="153-155">
+    <!-- <meta name="64er.toc_category" content="XXX"> -->
+    <!-- <meta name="64er.toc_title" content="XXX"> -->
+    <meta name="64er.id" content="XXX">
+</head>
+
+<body>
+    <article>
+        <h1>11 neue Einzeiler!</h1>
+        <blockquote>
+            <p>Der Einzeiler-Wettbewerb regt immer noch eine ganze Reihe Leser an, möglichst interessante Lösungen in eine Basic-Zeile zu packen. Wir haben wieder die besten für Sie ausgewählt.</p>
+        </blockquote>
+
+        <p>Der Einzeiler-Wettbewerb ist nicht klein zu kriegen — und das wollen wir auch nicht. Viele Einsender nahmen die bisher veröffentlichten Mini-Programme als Anregung für Ihre nächsten »Schöpfungen«. Vor allem »Das kürzeste Adventure der Welt« erhielt große Resonanzen und Nachahmer, sowohl positive als auch negative. Natürlich kann man so eine Idee nur einmal verwerten — es war halt ein gelungener Einfall und mehr als Scherz gemeint. Doch diesmal haben wir wieder »ernste« Einzeiler herausgesucht, vielleicht bis auf den »aufgeregten Marsmenschen«. Auch die VC 2O-Besitzer kommen diesmal nicht zu kurz. Doch lassen Sie sich überraschen!</p>
+
+        <h2>Aufgeregter Marsmensch (VC 20 und C 64)</h2>
+
+        <p>Das Programm spricht für sich selbst. Lediglich der POKE-Befehl verdient eine zusätzliche Anmerkung: Der Standardwert für die Speicherstelle 37877 ist 72. Indem man ihm auf 0 setzt, wird eine wirkungsvolle Verlangsamung des Programmablaufes erreicht.</p>
+
+        <address class="author">(Gerhard Silberbach)</address>
+
+        <h2>Grafik-Bilder invertieren</h2>
+
+        <p>Dieser Einzeiler invertiert eine Hires-Grafik an der Adresse A. Um das besser begreifen zu können, sollten Sie eine Hires-Grafik laden. Nehmen wir als Beispiel ein Bild aus der Dia-Show und laden es mit LOAD"Name",8,1 ab der Adresse $2000 (dezimal 8192) ein. Tippen Siejetzt NEW ein und geben den Einzeiler ein. Jetzt geben Sie der Variable A den Wert des Grafik-Anfangs, als A=8192. Springen Sie dann mit GOTO1 in den Einzeiler. Die Grafik istjetzt also invertiert, Sie können den Bereich 8192 bis 16384 als invertierte Grafik wieder abspeichern.</p>
+
+        <p>Erklärung der Zeile: Der String A$ enthält ein Maschinenprogramm, das durch den Print-Befehl in den Bildschirmspeicher ab 1024 gebracht wird. Die aktuelle mit EXOR FF zu verknüpfende Speicherstelle wird mit POKE 780,x im Akku abgelegt. Nach SYS 1024 steht dann der Wert in 780 und wird mit dem anschließenden POKE in die entsprechende Speicherstelle als invertiertes Bitmuster gebracht.</p>
+
+        <p>Noch eine Bemerkung: Die Grafik darf natürlich nicht unter einem ROM liegen, da dann das Problem nur in reiner Maschinensprache zu lösen ist (das ROM müßte abgeschaltet werden).</p>
+
+        <address class="author">(Guido Leister/gk)</address>
+
+        <h2>Zeilen löschen am Bildschirm</h2>
+
+        <p>Dieser kleine Einzeiler löscht bestimmte Zeilen auf dem Bildschirm. Dabei wird eine Maschinenroutine des C 64 benutzt, die eine Zeile vom Bildschirm löscht, deren Zeilennummer im X-Register steht. Zunächst wird die Zeilennummer (hier wird von 0 bis 24 gezählt) in die Speicherzelle gePOKEt, deren Inhalt der SYS-Befehl in das X-Register übernimmt. Hierbei bleibt die Position des Cursors unbeeinflußt.</p>
+
+        <p>Variablen:<br />
+            LN = Zeilennummer (0 bis 24)<br />
+            V = Von Zeile<br />
+            B = Bis Zeile<br />
+            TODO</p>
+
+        <address class="author">(Stefan Keimeier/gk)</address>
+
+        <h2>Ein einfaches Renumber</h2>
+
+        <p>Dieser Einzeiler kann sich zwar nicht mit einem komfortablen Renumber-Programmmessen, abererfunktioniert. Eswerden die Zeilennummern eines Basic-Programms, das nicht länger als 255 Zeilen sein darf, in nur wenigen Sekunden neu umnumeriert (erste Zeilennummer = 0, Schrittweite = 1). Die Sprungadressen der Befehle GOTO und GOSUB bleiben jedoch unverändert. Beim Abtippen des Einzeilers ist zu beachten, daß die Basic-Befehle FOR, PEEK, POKE und NEXT abgekürzt werden müssen (siehe C 64-Handbuch, Anhang D).</p>
+
+        <p>Nun zur Erklärung des Einzeilers: Um die Zeilen eines Programms umnumerieren zu können, muß man zunächst wissen, an welchen Speicherstellen es sich befindet. Jedes Basic-Programm belegt die Speicherplätze 2048 bis PEEK(45) + PEEK(46)*256-3. PEEK(2049) + PEEK(2050)*256 gibt an, bei welcher Adresse die erste Zeile aufhört. Die Adressen 2051 und 2052 geben Aufschluß über die erste Zeilennummer (=PEEK(2051) + PEEK(2052)*256). Die zweite Zeilennummer findet man im Speicher an den Adressen PEEK (2049 + PEEK(2050)*256 + 2 und PEEK(2049) + PEEK (2050)*256 + 3.</p>
+
+        <p>Zurück zum Renumber-Programm: Die Zeilennummern befinden sichjeweils an den Adressen A+2 (Low Byte) und A+3 (High Byte). Aus Platzgründen POKE ich an die Stelle A+2 den Wert z (z= 0,1,2&hellip;, n-1; n-1 steht für die Anzahl der Zeilen des Basic-Programms, das umnumeriert werden soll, inklusive dem Einzeiler) und an die Stelle A+3 den Wert 0. Daher darf das Basic-Programm 255 Zeilen nicht überschreiten, denn dann müßte ich den Einzeiler zum Zweizeiler abändern:</p>
+
+        <p>1 FOR A=2049 TO PEEK(45)+ PEEK(46)*256-3:POKE A+3,z/256:POKE A+2, z-INT(z/256)*256<br />
+            2 A=PEEK(A)+ PEEK(A+1)*256-1:z=z + 1:NEXT</p>
+
+        <address class="author">(Georg Wichert/gk)</address>
+
+        <h2>Datum wandeln in Wochentag</h2>
+
+        <p>Dieser Einzeiler berechnet nach Eingabe eines Datums den entsprechenden Wochentag.</p>
+
+        <p>Es bedeutet: 0 Sonntag, 1 Montag etc.</p>
+
+        <p>Benutzte Variablen:<br />
+            T,M,J für Tag, Monat, Jahr</p>
+
+        <p>Die benutzte Gleichung ist eine Vereinfachung der folgenden:<br />
+            T=T+365*J + INT((J + (M>3))/4)+31*M-31+2*(M>2)-INT((M-1+(M>8))/2))</p>
+
+        <p>Die erste INT-Funktion ersetze ich durch die lntegerviariable T%. Weitere Vereinfachungen ergeben sich durch den Gebrauch der Modulo-Funktion, die in der Print-Anweisung benutzt wird. Es kommt durch Anwendung bestimmter Rechenregeln der Mod-Funktion zu folgenden Vereinfachungen: 365 *J ergibt J, aus 31 * M-31 wird 3 * M-3.</p>
+
+        <p>Mit der jetzt erhaltenen Formel würde man schon auskommen. Um aber eine gebräuchliche Zahl-Wochentagszuordnung zu erhalten, addiere ich noch 2 zu T%.<br />
+            Zur Erklärung der Gleichung:</p>
+
+        <p>Es wird die Gesamtzahl aller Tage von 0.0.0000 bis einschließlich des eingegebenen Datums berechnet. Nach Division durch 7 ergibt der ganzzahlige Rest den gesuchten Wert. Der Rest wird in der Print-Anweisung durchgeführt (Mod-Funktion). Die Gleichung selber ist wie folgt aufgebaut:</p>
+
+        <p>TODO Tabelle</p>
+
+        <p>Alle Teile werden addiert und so wie oben beschrieben umgeformt.</p>
+
+        <address class="author">(Wilfried Mintrop/gk)</address>
+
+        <h2>Soft-Scrolling beim C 64</h2>
+
+        <p>Mit diesem Einzeiler kann ein beliebiger Text von rechts nach links punktweise über den Bildschirm verschoben werden.</p>
+
+        <p>Als Variablen werden verwendet:</p>
+
+        <p>A=53270 Register für horizontales Smooth-Scrolling<br />
+            L=40 Anzahl der Zeichen, die gleichzeitig auf dem Bild-<br />
+            schirm erscheinen sollen. (40 für gesamte Bildschirmbreite; weniger für kleineren Textausschnitt.)<br />
+            A$ Soll den zu zeigenden Text enthalten. Letztes Zeichen<br />
+            des Strings sollte ein SPACE sein, weil das rechtsbündige Zeichen des Strings sich auf dem Bildschirm dupliziert, da es nicht gelöscht wird.<br />
+            TODO</p>
+
+        <p>Das Prinzip: Der Text wird auf dem Bildschirm ausgegeben. Nun wird der Bildschirminhalt mit Hilfe des Smooth-Scrolling Registers punktweise nach links gezogen, bis er 7 Punkte verschoben worden ist. Jetzt wird der gesamte Text nach links geschoben und (fast) gleichzeitig das Scroll-Register zurückgesetzt, so daß es aussieht, als sei der Text um den achten Punkt verschoben worden.</p>
+
+        <p>Hinweis:</p>
+
+        <p>— Vor der Benutzung empfiehlt es sich, den Bildschirm zu löschen, da auch der restliche Bildschirminhalt verschoben würde.<br />
+            — Außer dem verwendeten HOME können noch andere Cursor-Steuerzeichen eingesetzt werden, um den Text zu positionieren.</p>
+
+        <address class="author">(Georg Brandt/gk)</address>
+
+        <h2>Zugriffszeit der Floppy verkürzen</h2>
+
+        <p>Der vorliegende Einzeiler dient dazu, die Zugriffszeit der Floppy-Disk 1541 drastisch zu verkürzen. Der Schrittmotor, der den Schreib-Lesekopf bewegt, kann erfahrungsgemäß wesentlich schneller arbeiten, ohne daß eine sichere Funktion der Floppy gefährdet wird. Da der Schrittmotor im Interrupt bedient wird, genügt es, die Größe des Interruptintervalls zu verändern, um die Drehzahl des Motors zu beeinflussen. Standardmäßig wird etwa alle 15 Millisekunden ein Interrupt ausgelöst, der den Stepper um eine Viertelspur bewegt. Durch das vorliegende Programm wird diese Zeit auf etwa 4 Millisekunden verkürzt. Alle Bewegungen des Kopfes werden dadurch fast viermal schneller. Das hat neben der Zeitersparnis noch zwei weitere wesentliche Vorteile: Das Laufgeräusch des Kopfes wird angenehm leise und kurz, und im Falle einer Kopfjustage (MG-salvenartiges Geräusch) fährt der Kopf mit erheblich verminderter Kraft gegen den Anschlag, so daß die Gefahr einer Dejustage deutlich gemindert ist.</p>
+
+        <address class="author">(Robert Loos/gk)</address>
+
+        <h2>Input mit Komma</h2>
+
+        <h3>Die Idee:</h3>
+
+        <p>Eine INPUT-Routine, die den normalen INPUT-Befehl ersetzt, aber zusätzlich Satzzeichen wie Komma, Doppelpunkt und Strichpunktals Eingabe erlaubt. Alle sonstigen Vor- und Nachteile bleiben erhalten.</p>
+
+        <h3>Die Wirkung:</h3>
+
+        <p>Alle Zeichen der Tastatur werden übernommen, auch Leerzeichen vor beginnendem Text (führende Leerzeichen).</p>
+
+        <h3>Variablenliste:</h3>
+
+        <p>AA = aktueller ASCII-Code der Eingabe<br />
+            II = Laufvariable für Schleife<br />
+            XX$ = enthält eingegebenen Text<br />
+            TODO</p>
+
+        <h3>Programmbeschreibung:</h3>
+
+        <p>Das »Herz« des Programms bildet die Eingaberoutine ab Adresse 42336. Diese schreibt alle, von einer Bildschirmzeile (80 Zeichen) erfaßten Zeichen in den Basic-Eingabepuffer, welcher bei Adresse 512 beginnt. Das Eingabeende wird im Puffer mit einer 0 gekennzeichnet. Der Rest des Programms liest nun Zeichen für Zeichen bis zur genannten 0 den Eingabepuffer aus, und stellt dabei den String XX$ zusammen. Die Schleife ist zwar auf 88 Durchläufe programmiert, wird aber niemals soweit kommen, da die Zeichenzahl durch den Bildschirm begrenzt wird (2*40 Zeichen/Zeile=80 Zeichen). Erfolgt keine Eingabe (es wird nur die RETURN-Taste betätigt), so wird das Programm mit XX$ = CHR$(32) verlassen. Ansonsten enthält XX$ alle sichtbaren, eingegebenön Zeichen. Also alle außer Steuerzeichen.</p>
+
+        <address class="author">(Jürgen Reinert/gk)</address>
+
+        <h2>Spiralen mit dem Plotter 1520</h2>
+
+        <p>Das Programm malt mit dem Plotter 1520 eine Spirale, die aus lauter Dreiecken entsteht. Zugrunde liegt eigentlich die Berechnung eines Kreises, da die X-Koordinaten mit SIN und die Y-Koordinaten mit COS ermittelt werden.</p>
+
+        <p>Heraus kommtjedoch eine Spirale, da X und Y mit der Laufvariablen I multipliziert werden.</p>
+
+        <p>Wird der Faktor »2« innerhalb der Sinus und Cosinus-Klammern gegen einen anderen Wert vertauscht, so ändert sich auch das Aussehen der Grafik.</p>
+
+        <p>Auch dieser Einzeiler muß wieder mit den abgekürzten Basic-Befehlen eingegeben werden.</p>
+
+        <address class="author">(Christoph von Rhein/gk)</address>
+
+        <h2>Doppelt großer Zeichensatz für den VC 20</h2>
+
+        <p>Mit dieser kleinen Routine ist es möglich, sich einen neuen Zeichensatz zu erstellen. Die neuen Zeichen haben die gleiche Breite, jedoch die doppelte Höhe. Es lassen sich alle Zeichen (mit Ausnahme der Sonderzeichen) darstellen.</p>
+
+        <p>Alle vier POKEs müssen abgekürzt werden: P geshiftetes 0, ebenso PEEK:P geshiftetes E und PRINT:?</p>
+
+        <p>Mit POKE36867,25 wird die Video-Matrix der Zeichen auf eine 16x8-Matrixumgestellt. POKE36869,205bestimmtdie Lage des Zeichensatzes (bei Grundversion &hellip;,255). »a« beinhaltet den Wert der Speicherzellen 32768 bis 33279. »x« ist die Laufvariable. Die neuen Zeichen werden letztlich mit den zwei POKEs definiert.</p>
+
+        <p>Bei Verwendung der Grundversion muß man die Commodore- und die Shift-Taste nach dem Start zusammen drücken.</p>
+
+        <address class="author">(Heiko Schmidt/gk)</address>
+
+        <h2>Schlagzeug für VC 20</h2>
+
+        <p>Dieser Einzeiler macht aus dem VC 20 ein heißes Schlagzeug, das bei entsprechender Lautstärke kaum noch von einem echten zu unterscheiden ist.</p>
+
+        <p>Das Programm ist auf jeder Speicherausbau-Version lauffähig und braucht wohl nicht extra erklärt zu werden, denn so kompliziert ist es nicht. Dennoch ist es erstaunlich, was es aus dem VC 20 macht.</p>
+
+        <p>Es ist ein Beispiel für ein Programm mit guter Idee, relativ einfacher Umsetzung und erstaunlicher Wirkung.</p>
+
+        <address class="author">(Hannes Kaltenbach/ev)</address>
+
+        <p>TODO ASIDE</p>
+
+        <p>Einige Einzeiler enthalten Steuer- und Grafikzeichen, die aus Gründen der Übersichtlichkeit als Klartext ausgegeben sind. Bitte beachten Sie unseren Beitrag über den Checksummer.</p>
+
+        <h2>VC 20-Tips</h2>
+
+        <p>SYS 64802 Wirkt wie ein Reset<br />
+            SYS 64821 Stellt Einschaltmodus wieder her<br />
+            SYS 65499 Setzt »TI$« und »TI« wieder auf Null<br />
+            SYS 65511 Schließt alle Files<br />
+            ? PEEK(152) Ergibt die Anzahl der offenen Dateien<br />
+            ? PEEK(182) Ergibt nach »LOAD« die Anzahl der Lesefehler<br />
+            ? PEEK(186) Ergibt die zuletzt benutzte Gerätenummer<br />
+            ? PEEK(2O2)Ergibt die Cursorspalte<br />
+            ? PEEK(214) Ergibt die Cursorzeile<br />
+            POKE 792,34 :POKE 793,253 Reset nach RESTORE-Taste<br />
+            POKE 792,173:POKE 793,254 RESTORE wieder normal<br />
+            POKE 818,34 :POKE 819,253 SAVE-Schutz einschalten<br />
+            POKE 818,133:POKE 819,246 SAVE-Schutz ausschalten</p>
+
+        <address class="author">(Herbert Lickes)</address>
+
+        <h2>Mehr Struktur mit Spaces</h2>
+
+        <p>Die Strukturierung von Basic-Programmen wird bei Commodore-Computern dadurch etwas behindert, daß der Interpreter führende Leerzeichen zwischen Zeilennummer und Basic-Befehl einfach überliest. Beim LI8Ten erscheint stets genau ein Space nach der Zeilennummer, was immer dann unerwünscht ist, wenn der Übersicht halber einige Programmzeilen eingerückt erscheinen sollen. In der Regel hilft man sich in solchen Fällen, indem ein Doppelpunkt an den Zeilenanfang geschrieben wird, auf den dann die gewünschte Anzahl von Leerzeichen folgt.</p>
+
+        <p>Es geht jedoch auch wesentlich eleganter. Man kann sich einfach die Tatsache zunutze machen, daß der Basic-Interpreter bei der Zeileneingabe Grafikzeichen einfach überliest. Tippen Sie nach der Zeilennummer irgendein Grafikzeichen (oder der Einfachheit halber SHIFT und SPACE gleichzeitig), danach die gewünschte Anzahl führender Spaces und dann die vorgesehenen Basic-Befehle. Zwar steht zunächst noch das Grafikzeichen mit auf dem Bildschirm, beim AufLISTen werden Sie jedoch feststellen, daß das Grafikzeichen nicht in den Programmtext übernommen wurde. Dennoch erscheint die Zeile um die gewünschte Anzahl von Leerstellen eingerückt.</p>
+
+        <p>Mit dieser Methode lassen sich übrigens auch echte Leerzeilen erzeugen. Geben Sie zur Demonstration einmal folgendes ein:</p>
+
+        <p>Irgendeine Zeilennummer, gefolgt von einem beliebigen Grafikzeichen, ein Space und zum Schluß nochmals ein Grafikzeichen. Nach Drücken der RETURN-Taste wird nur das eine Space in die Zeile übernommen, wodurch nach LIST eine Zeile erscheint, die nur aus der Zeilennummer besteht.</p>
+
+        <p>Zum Schluß in diesem Zusammenhang noch ein POKE-Befehl:</p>
+
+        <p>Nach »POKE 129,58« werden Basic-Zeilen, die nicht in Anführungszeichen stehende Spaces enthalten, einfach nicht mehr ausgeführt. Der Interpreter meldet dann nur noch »?SYNTAX ERROR«. Mit »POKE 129,32« erreicht man wieder den Normalzustand.</p>
+
+        <address class="author">(Herbert Heise)</address>
+
+        <h2>Nützliche POKEs für den C 64</h2>
+
+        <p>POKE 650,100 Cursor blinkt langsam<br />
+            POKE 788,81 Cursor bleibt stehen<br />
+            POKE 788,52 Cursor blinkt schnell<br />
+            POKE 788,51 Cursor abgeschaltet<br />
+            POKE 788,49 Cursor blinkt normal<br />
+            POKE 775,199 LIST abgeschaltet<br />
+            POKE 775,167 LIST normal<br />
+            POKE 792,193 RESTORE-Taste aus<br />
+            POKE 792,71 RESTORE-Taste ein<br />
+            POKE 657,128 COMMODORE-Taste aus<br />
+            POKE 657,0 COMMODORE-Taste ein</p>
+
+        <address class="author">(Peter Gaß)</address>
+    </article>
+</body>
+
+</html>
