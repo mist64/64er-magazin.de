@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>Effektives Programmieren (5): Sortieren in Basic — Teil 2</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="Karsten Schramm, gk">
+    <meta name="64er.issue" content="5/85">
+    <meta name="64er.pages" content="159,161-162">
+    <!-- <meta name="64er.toc_category" content="XXX"> -->
+    <!-- <meta name="64er.toc_title" content="XXX"> -->
+    <meta name="64er.id" content="XXX">
+</head>
+
+<body>
+    <article>
+        <h1>Effektives Programmieren (5): Sortieren in Basic — Teil 2</h1>
+<p class="intro">Einfache Sortieralgorithmen sind leider auch die langsamsten. Dennoch lassen sie sich durch einige kleinere Änderungen noch erheblich verbessern, so zum Beispiel Bubblesort. Wesentlich komplizierter ist da schon Shellsort, dafür aber auch schneller. Wir zeigen Ihnen, wie es funktioniert.</p>
+
+<p>In der ietzten Folge beschäftigten wir uns mit straight insertion und mit Bubblesort, zwei sehr einfachen Sortieralgorithmen. Diesmal wollen wir das Niveau schon ein wenig anheben, um uns dem eigentlichen Ziel unseres Kurses langsam zu nähern. Letztendlich geht es uns nur darum, eine möglichst schnelle und effektive Sortiermethode für praktische Anwendungen zu suchen. Fangen wir deshalb gleich einmal mit der Verbesserung eines Sortieralgorithmus an, der letztes Mal besprochen wurde.</p>
+
+<p>Haben Sie sich mit Bubblesort schon intensiver beschäftigt? Wenn ja, werden Sie auch ganz bestimmt dessen Schwächen ausfindig gemacht haben. Wir erinnern uns: Bubblesort fängt am Anfang eines Variablenfeldes an und vergleicht die beiden ersten Variablen. Steht die größere der beiden weiter vorne, so werden die Variablen vertauscht. Jetzt vergleicht er die zweite mit der dritten Variablen des Arrays und setzt dieses Vergleichen und Austauschen solange fort, bis das gesamte Feld durchgearbeitet ist und die größte Variable jetzt am Ende des Arrays steht. Als nächstes wird das Variablenfeld um die letzte Variable vermindert, so daß jetzt der zweitgrößte String auf die gleiche Art und Weise »nach unten« befördert wird. Diese Vorgänge wiederholen sich so lange, bis nur noch eine Variable übrigbleibt, die jetzt die kleinste ist.</p>
+
+<h2>Bubblesort optimiert</h2>
+
+<p>Nun aber zu den Schwächen von Bubblesort. Ist Ihnen beim Ausprobieren des Programms aus der letzten Folge vielleicht aufgefallen, daß Bubblesort sehr »stur« arbeitet? Es kann nämlich ohne weiteres passieren, daß ein Feld bereits nach dem dritten Durchgang vollständig sortiert vorliegt. Dies wird von Bubblesort jedoch nicht erkannt. Der Computer »sortiert« weiter, bis alle Durchläufe erledigt sind.</p>
+
+<p>Dieses Problem können wir ganz einfach lösen, indem wir ein Flag einsetzen, das uns anzeigt, ob im letzten Durchgang noch eine Vertauschung stattgefunden hat. Wurde kein Tausch mehr vorgenommen, so wird der Sortiervorgang beendet. Dieses Flag ist schon eine ziemliche Verbesserung gegenüber der Rohversion, aber wir wollen uns damit noch nicht zufriedengeben.</p>
+
+<p>Es kann beim Sortieren auch durchaus der Fall eintreten, daß im letzten Durchlauf nur noch beispielsweise drei Vertauschungen im ersten Drittel des Feldes stattgefunden haben. Die letzten beiden Drittel des Feldes sind also bereits sortiert.</p>
+
+<p>Damit Bubblesort auch diesen Fall erkennt, wird eine zweite zusätzliche Variable eingeführt, die die Position der jeweils letzten Vertauschung eines Durchlaufes beinhaltet. Es wird nun im weiteren Verlauf immer nur bis zu dieser Position gearbeitet, da der Rest des Feldes bereits sortiert vorliegen muß.</p>
+
+<p>Mit diesen beiden Verbesserungen wollen wir es aber bereits gut sein lassen (Listing 1, Bild 1). Der neue Bubblesort-Algorithmus arbeitet besonders bei schon teilsortierten Feldern ziemlich effizient; ist der »alten« Version jedoch bei total vermischten Feldern infolge der zusätzlichen (Zeit verbrauchenden) »Erweiterungen« unterlegen.</p>
+
+<p>Bubblesort soll uns nun nicht weiter beschäftigen, denn trotz seines wohlklingenden Namens ist er so ziemlich der langsamste Algorithmus, den es gibt.</p>
+
+<p>An dieser Stelle gleich einmal ein paar Bemerkungen zur Zeitmessung: Die jetzt vorgestellten Algorithmen, die Sie jeweils als Listings abgedruckt finden, sind in der Form zur Zeitmessung natürlich nicht geeignet. Das liegt daran, daß die Programme so aufgebaut sind, daß Sie den Algorithmus leicht nachvollziehen können, was natürlich auf Kosten der Geschwindigkeit geht und die Ergebnisse verfälschen würde.</p>
+
+<p>Im abschließenden Artikel über die Sortiermethoden werden wir die einzelnen Programme jedoch auch unter dem Aspekt »Zeit« einander gegenüberstellen. Hier werden wir auch auf das Problem der Garbage Collection eingehen, die uns beim Sortieren von größeren Feldern, je nach Algorithmus, ganz schön in Schwierigkeiten bringen kann, wenn es um eine Zeitmessung geht.</p>
+
+<p>Ein weiteres Problem bei der Zeitmessung ist aber auch die Eigenart der einzelnen Sortiermethoden. Ich erwähnte schon in der letzten Folge, daß es natürliche und unnatürliche Algorithmen gibt, wobei die natürlichen dann am schnellsten arbeiten, wenn das Feld schon sortiert vorliegt.</p>
+
+<p>Für die Mathematiker unter Ihnen istjedem Sortieralgorithmus eine kleine Formel zur Berechnung der mittleren (!) Sortierzeit beigefügt. Diese Formel dient nur der Gesamtbetrachtung und zeigt jeweils, warum die einen Algorithmen so langsam und andere wesentlich schneller sind.</p>
+
+<h2>straight selection</h2>
+
+<p>Nun aber zu einer neuen Sortiermethode. Es handelt sich hierbei um ein Sortieren durch direktes Auswählen, was durch einen englischen Ausdruck wieder passend beschrieben wird: straight selection.</p>
+
+<p>Auch straight selection ist ein relativ einfacher Algorithmus, dessen Funktionsweise wir uns gleich etwas näher betrachten wollen (Bild 2).</p>
+
+<p>Im ersten Durchgang sucht der Computer nach dem größten Element im Feld. Wird dieses gefunden, so erfolgt eine Vertauschung zwischen diesem Element und dem allerletzten des Feldes, da die größte Variable logischerweise am Schluß stehen muß. Jetzt wird die Länge des Feldes durch Wegnahme des letzten Elements um 1 vermindert. Danach wird in diesem »Rest-Array« wiederum nach dem größten Element gesucht und dieses ebenfalls mit dem letzten Element (das jetzt das vorletzte des Gesamtfeldes ist) vertauscht. Dieser Vorgang wiederholt sich so lange, bis die Länge des Restfeldes 1 ist und wir an erster Position zwangsläufig das kleinste Element erhalten.</p>
+
+<p>In Bild 3 können Sie die Arbeitsweise von straight selection an einem praktischen Beispiel nachvollziehen, wobei immer jene Elemente unterstrichen sind, die im nächsten Schritt einsortiert werden.</p>
+
+<p>Natürlich funktioniert straight selection auch andersherum, das heißt Sie können jeweils nach dem kleinsten Element suchen und dieses dann mit dem an erster Stelle stehenden Element vertauschen.</p>
+
+<p>Um Ihnen auch die Zeitverhältnisse zu beschreiben, oder um Ihren mathematischen Geist zu beflügeln (wie Sie wollen), seien an dieser Stelle einmal wieder zwei Formeln über straight selection aufgestellt.</p>
+
+<p>Für seine Arbeit benötigt straight selection eine mittlere Anzahl von Vergleichen, die in etwa durch die folgende Formel angenähert werden, wenn wir davon ausgehen, daß a die Anzahl der zu sortierenden Elemente enthält:<br/>
+Anzahl Vergleiche: $$\frac{a<sup>2</sup> - a}{2}$$</p>
+
+<p>Für die Anzahl der Bewegungen innerhalb der Arrays gilt folgende Beschreibung:<br/>
+Anzahl Bewegungen: $$a - 1$$</p>
+
+<p>Mit straight selection haben wir unter anderem gleich das erste Beispiel für einen unnatürlichen Sortieralgorithmus. Wenn wir ein Feld bearbeiten wollen, das schon sortiert vorliegt, so braucht unser Programm sehr lange, um das größte Element ausfindig zu machen, da wir von vorne mit dem Suchen beginnen. Bearbeiten Sie also meistens schon teilsortierte Felder, so ist es ratsam, mit der Suche des größten Elements von hinten zu beginnen. Die Umstellung des Programms in Listing 2 dürfte Ihnen keine Schwierigkeiten bereiten, da lediglich die Suchschleife umzudrehen und mit STEP1 zu versehen ist.</p>
+
+<p>So, das wäre auch schon alles, was zu straight selection zu sagen ist. Wie Sie sehen, ist das immer noch ein sehr einfacher Algorithmus, der in etwa mit straight insertion gleichzusetzen ist, was die Effektivität betrifft. Diese Gleichsetzung gilt aber natürlich nur für zufallsbesetzte Felder.</p>
+
+<h2>Shellsort</h2>
+
+<p>Der nächste Sortieralgorithmus trägt den Namen seines Erfinders (D.L.Shell) und wurde 1959 entwickelt. Es handelt sich hierbei schon um einen komplizierteren Algorithmus, den wir deshalb sehr ausführlich besprechen wollen (Bild 4). Shellsort ist ein Sortieren durch direktes Einfügen und gehört damit der gleichen »Familie« wie straight insertion an.</p>
+
+<p>Durch entsprechende Berechnungen hatte Shell herausgefunden, daß sich Sortiervorgänge beschleunigen lassen, wenn nicht nur benachbarte Elemente miteinander verglichen werden, sondern auch weiter voneinander entfernte. Wir vergleichen also beispielsweise nicht mehr das erste Element mit dem zweiten, sondern vielmehr das erste mit dem fünften.</p>
+
+<p>Durch diese Methode erreicht man eine gewisse »Grobsortierung«, die sich jedoch gleichmäßig über das gesamte Feld verteilt. Das so neu entstandene Variablenfeld wird wiederum sortiert, wobei jetzt aber das erste mit dem dritten Element verglichen wird. Die Sortierung wird also durch abnehmende Abstände zunehmend »feiner«, bis beim Abstand 1 die letzte, absolute Sortierung erfolgt.</p>
+
+<p>Unklar? Keine Angst, wir werden das gleich einmal an einem praktischen Beispiel erläutern.</p>
+
+<p>Sehen Sie sich Bild 5 an. Hier haben wir ein zufällig geordnetes Feld mit zehn Elementen. Als ersten Abstandswert nimmt Shellsort üblicherweise a/2, also die Hälfte der Gesamtanzahl der Elemente. In unserem Fall ist das 5.</p>
+
+<p>Aus diesem umsortierten Feld holen wir jetzt alle Zahlen zu Untereinheiten zusammen, die den Abstand (besser: die Schrittweite) 5 haben. In Bild 5 sehen Sie diese Zusammenstellungen: Es wurde also jeweils das 1. mit dem 6., das 2. mit dem 7., das 3. mit dem 8., das 4. mit dem 9. und das 5. mit dem 10. Element zu einer Einheit zusammengefaßt.</p>
+
+<p>Da die Schrittweite 5 ist, kann jede Untereinheit verständlicherweise nur zwei Elemente enthalten. Nun, was sollen wir jetzt mit diesen Untereinheiten machen?</p>
+
+<p>Diese werden sortiert, und zwar verwenden wir dabei einen einfachen und unkomplizierten Sortieralgorithmus, wie zum Beispiel straight insertion.</p>
+
+<p>Wir sortieren also die erste Untereinheit, aus(9,7) wird (7,9). Jetzt schreiben wir diese Untereinheit wieder an die gleiche Position in unser Feld zurück, wobei jedoch die 7 dort steht, wo vorher die 9 stand und umgekehrt. Dann sortieren wir die zweite Untereinheit und schreiben sie ebenso zurück. Das geschieht so lange, bis alle Untereinheiten abgearbeitet worden sind und wir wieder ein vollständiges Array erhalten.</p>
+
+<p>Jetzt wird die Schrittweite 5 halbiert und die Nachkommastelle des Ergebnisses abgeschnitten. Wir erhalten als neue Schrittweite 2. Wieder legen wir uns Untereinheiten an, wobei wir jedoch nur mehr zwei Untereinheiten zu je fünf Elementen bekommen. Wichtig für die Programmentwicklung ist an dieser Stelle die Entdeckung, daß die Anzahl der Untereinheiten grundsätzlich der Schrittweite entspricht.</p>
+
+<p>Auch hier wird mit den Untereinheiten wieder verfahren, wie oben. Sie werden sortiert und wieder in das ursprüngliche Array zurückgeschrieben. Das Ergebnis des letzten Durchlaufes können Sie wieder in Bild 5 ablesen. Der nächste Durchlauf ist schon der letzte; hier ist die Schrittweite nunmehr 1 und es erfolgt eine Schlußsortierung des gesamten Feldes.</p>
+
+<p>Daß Shellsort so schnell ist, obwohl er einige vollständige Sortierläufe als Unterprogramme verwendet, liegt daran, daß das Sortierunterprogramm jeweils ziemlich optimierte Einheiten zur Bearbeitung bekommt. Auch beim letzten Durchgang, wo ja nochmals das gesamte Feld durchsortiert wird, sind die Elemente schon so angeordnet, daß eine Sortierung ohne viele Bewegungen möglich ist. Listing 3 enthält die Shellsortroutine, wobei als Unterprogramm ab Zeile 20 000 straight insertion verwendet wird. Sie können einmal verschiedene Algorithmen in Shellsort verwenden; vielleicht finden Sie eine optimale Zusammenstellung? Das Unterprogramm bearbeitet das Array AA$(x) und erwartet die Anzahl der Elemente in AA.</p>
+
+<p>Wenn Sie sich einmal den Beispielausdruck zu Shellsort betrachten (Bild 6), so werden Sie feststellen, daß dieser Algorithmus nur mehr drei Durchgänge für zehn Elemente benötigt. Diese Zahl läßt auf ein gutes Ergebnis hoffen. In der Tat haben wir mit Shellsort schon ein sehr gutes Sortierprogramm, das vielen praktischen Anwendungen gewachsen sein dürfte. Gegenüber der vorher besprochenen Sortieralgorithmen arbeitet Shellsort um einiges schneller, was besonders bei größeren Feldern angenehm auffällt. Für die Schrittweite können übrigens auch andere abfallende Reihen verwendet werden, die mit 1 aufhören. Es hat sich nämlich gezeigt, daß die Wahl der richtigen Reihe entscheidend zur Geschwindigkeit von Shellsort beiträgt.</p>
+
+<p>Wollen wir zu Shellsort eine mathematische Berechnung liefern, wird’s schwierig. Dieser Algorithmus ist bereits dermaßen komplex, daß eine Berechnung fast unmöglich wird. Es kann an dieser Stelle nur eine Aussage über die mittlere Sortierzeit gemacht werden, die sich in etwa im Bereich um aL2 bewegt, wobei a wiederum die Anzahl der zu sortierenden Elemente darstellt.</p>
+
+<p>So, mit Shellsort haben wir uns nun endgültig von den einfachen Sortieralgorithmen losgesagt. Wie Sie sehen, kann eine höhere Komplexität der Programme und ein damit verbundener größerer Zeitbedarf, ohne weiteres die Nachteile von einfacheren Programmen aufwiegen. Aber auch hier kommt es natürlich auf die Art der Aufgabenstellung an. Shellsort verträgt zum Beispiel keine umgekehrt sortierten Arrays. Hier wird auch dieser schnelle Sortieralgorithmus langsam.</p>
+
+<p>In der nächsten Folge wollen wir uns ausschließlich mit einem einzigen Sortierprogramm beschäftigen. Es handelt sich um Heapsort. Dieser Algorithmus arbeitet nach dem »Baumprinzip« und ist sehr kompliziert. Aus diesem Grund wollen wir uns ausführlich mit ihm beschäftigen, denn wir haben es dann mit einem der schnellsten Algorithmen zu tun, den es gibt.</p>
+
+<address class="author">(Karsten Schramm/gk)</address>
+    </article>
+</body>
+</html>

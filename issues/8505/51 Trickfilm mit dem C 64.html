@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>Trickfilm mit dem C 64</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="Armin und Dirk Biernaczyk, rg, Dirk und Armin Biernaczyk, Dirk und Armin Biernaczyk, rg">
+    <meta name="64er.issue" content="5/85">
+    <meta name="64er.pages" content="51,64-67">
+    <!-- <meta name="64er.toc_category" content="XXX"> -->
+    <!-- <meta name="64er.toc_title" content="XXX"> -->
+    <meta name="64er.id" content="XXX">
+</head>
+
+<body>
+    <article>
+        <h1>Trickfilm mit dem C 64</h1>
+<p class="intro">In die vierte Dimension, die bewegte dreidimensionale Grafik, dringen Sie mit diesem Programm vor.<br/>
+Sie können so mit einfachsten Mitteln Trickfilme mit verblüffenden Eigenschaften erstellen.</p>
+
+<p>Die Idee zu diesem Programm kam uns, als wir zum zweiten Mal die Sendung »Das Bild, das aus dem Rechner kam« sahen.</p>
+
+<p>Die erste noch in Comal geschriebene Version berechnete jeweils ein Bild und zeichnete es sofort. Das Ergebnis: nur alle 7 Sekunden ein Bild! Auch als erst alle Linien berechnet und dann gezeichnet wurden, konnte von einem flüssigen Bewegungsablaufkeine Rede sein. Bei der jetztigen Version wird der Teil des Zeichnens von einer Maschinencode-Routine übernommen, die eine Geschwindigkeit von 3 bis 10 Bilder/s erlaubt. Die Unterschiede gegenüber anderen Trickfilmgeneratoren:</p>
+
+<ul>
+<li>Es muß nur ein Bild eingegeben werden, alle anderen Bilder berechnet der Computer aus diesem Bild.</li>
+<li>Auch komplizierte Bewegungsabläufe können mühelos erzeugt werden (zum Beispiel, um einen Körper um die Z- und X-Achse zu drehen, dabei heranzuholen und nach links zu bewegen, bis er den Bildschirm verläßt, braucht man nur eine DATA-Zeile!).</li>
+<li>Es können sehr viele (bis zu 255) und große Bilder gespeichert werden, da nur die Linienkoordinaten gespeichert werden.</li>
+<li>Es werden keine Basic-Erweiterungen benötigt.</li>
+</ul>
+
+
+<address class="author">(Dirk und Armin Biernaczyk/rg)</address>
+
+<p>TODO ASIDE</p>
+
+<p>Wir erblickten am 14.4.1968 das Licht der Welt. Und nicht nur das, sondern jeder noch ein anderes Geschöpf: wir waren Zwillinge. Nachdem wir sechs Jahre zusammen mehr oder weniger ruhig verbracht hatten, wurden wir 1974 in die Grundschule West eingeschult. Dort überstanden wir die ersten 4 Jahre unseres Schullebens ohne Komplikationen. 1978 wechselten wir aufs Märkische Gymnasium, was keine große Umstellung bedeutete, denn auch hier reichte das Zeugnis immer aus, um die Geldbeutel der Verwandten zu öffnen. Meinen ersten Kontakt mit Computern hatte ich (Dirk) in der Schule in der 10. Klasse mit Logo, was meinem Bruder allerdings aufgrund seiner Wahl für Latein in der Klasse 9 nicht möglich war. Kurze Zeit darauf sammelten wir zusammen in der Volkshochschule Bochum unsere ersten Basic-Kenntnisse. Fasziniert von der Computerei kauften wir uns Ende 1983 einen C 64 mit Diskettenlaufwerk. Da wir nach Abschluß der 10. Klasse von der Schule immer noch nicht die Nase voll hatten, machten wir weiter und besuchen heute die 11. Klasse und versuchen dort im Informatikunterricht, mittlerweile zusammen und in Pascal, den Wurm im Apfel II zu dressieren. Zu Hause schlagen wir uns lieber mit Basic, Assembler und ein wenig Comal herum. Das Ergebnis unserer Programmierwut ist dieses Programm.</p>
+
+<address class="author">(Dirk und Armin Biernaczyk)</address>
+
+<p>TODO END ASIDE</p>
+
+<p class="intro">In die vierte Dimension, die bewegte dreidimensionale Grafik, dringen Sie mit unserem Listing des Monats vor.</p>
+
+<p>Der »3D-Movie Maker« muß in zwei Teilen eingegeben werden: zuerst das Maschinenprogramm, dann der Basic-Teil. Wenn das Maschinenprogramm eingegeben und gestartet wurde, so speichert es sich, falls kein Prüfsummenfehler auftrat, selbst als >TRICK.OBJ« ab. Man braucht sich nun nicht mehr darum zu kümmern. Bei dem Basic-Teil, der nun eingegeben werden kann, dürfen alle REM-Zeilen ersatzlos wegfallen. Beim Start des Basic-Teils wird automatisch der Maschinenteil, der sich auf Diskette befinden sollte, nachgeladen.</p>
+
+<h3>Bedienung - Eingabe des Körpers</h3>
+
+<p>Vor der Benutzung des Programmes, müssen die Punkte Verbindungs- und Bewegungsvorschrift des Körpers in den DATA-Zeilen ab 8000 festgelegt werden. Dies ist notwendig, damit bei Änderungen oder einem erneuten Start nicht alles wieder neu eingegeben werden muß. Die DATA-Zeilen, die das Listing momentan enthält, erzeugen den auf dem Bildschirm herumfliegenden Schriftzug »64’er«. Die Punkte werden mitX, Y und Z-Koordinaten eingegeben. Als Endmarke dient hier dreimal die 1000. Bei der Verbindungsvorschrift wird jeweils der Anfangs- und Endpunkt angegeben zum Beispiel: Von Punkt 1 nachPunkt2 = DATA 1,2. Hierdientzweimaldie 1000 als Endmarkierung.</p>
+
+<p>Beispiel: Man will ein Kreuz erzeugen.<br/>
+Punkte: DATA0,10,0,10,0,0,-10,0<br/>
+DATA—10, 0,0, 1000,1000,1000<br/>
+Verbindungsvorschrift: DATA 1,3,2,4,1000,1000</p>
+
+<p>Bei der Bewegungsvorschrift ist es allerdings etwas komplizierter. Hier müssen zweimal drei Verschiebungsarten, drei Drehungsarten und die Dauer des Vorgangs angegeben werden. Zuerst kommt die erste Verschiebung in X-, Y- und Z-Richtung, dann die Drehung um die drei Achsen, nun die zweite Verschiebung und zum Schluß die Dauer des Ganzen. Diese Reihenfolge hat folgenden Sinn:</p>
+
+<p>Wird zuerstverschoben und dann gedreht, drehtsich die Figur um den Bildschirmmittelpunkt. Bei umgekehrter Reihenfolge dreht sich die Figur an beliebiger Stelle um ihren eigenen Mittelpunkt. Hier ein Beispiel einer DATA-Zeile:<br/>
+DATA0,0,0,5,0,0, 0,5,0, 10</p>
+
+<p>Die Figur bewegt sich 10 Bilder lang um jeweils 5 Stellen nach oben und dreht sich dabei um jeweils fünf Grad um die X-Achse. Einen Zoomeffekt erreicht man durch Verschieben in der Z-Achse, so kann man zum Beispiel mit DATA 0,0,0,0,0,0,0,0,1,50 eine Figur langsam vergrößern. Hier bildet einmal die 1000 die Schlußmarkierung. Um die vielen verschiedenen Möglichkeiten der Bewegung zu entdecken, lohnt es sich, die verschiedenen Kombinationen auszuprobieren (und dabei mit einfachen Bewegungen anzufangen).</p>
+
+<h3>Bedienung — Ablauf des Programms</h3>
+
+<p>Der »3D-Movie-Maker« stellt vier Menüpunkte zur Wahl:<br/>
+1. Erzeugen einer Grafik</p>
+
+<p>Hierbei berechnet der Computer die Anzahl der Bilder und fragt diese noch einmal ab. Sollen alle Bilder gezeichnet werden, braucht nur RETURN eingegeben werden. Nun wird der Speicherbedarf berechnet; reicht der vorhandene Speicher von 23 KByte aus, so beginnt der Rechenvorgang. Dabei wird die Anzahl der fertigen Bilder angezeigt. Ist der Rechenvorgang beendet (bei 150 Bildern mit je 10 Punkten zirka eine halbe Stunde) kehrt das Programm ins Menü zurück. Durch das Drücken der Leertaste kann man sich während der Berechnungen den Film ansehen und dann durch nochmaliges Betätigen fortfahren.<br/>
+2./3. Laden/ Speichern</p>
+
+<p>Da das Erstellen eines Films recht lange dauert, kann man fertige Filme abspeichern und laden. Das Programm hängt an den Filenamen automatisch ein »GRA« an, so daß die Dateien in der Directory sofort erkennbar sind. Tritt ein Disk-Error beim Laden oder Speichern auf, landet man wieder in der »INPUT FILENAME«-Zeile. Hier noch ein Hinweis zur LOAD-Routine: Da das Einlesen von 23 KByte mit einer GET-Schleife nicht einwandfrei funktionierte und 15 Minuten dauerte, verwendet die jetzige Version die LOAD-Routine des Betriebssystems.<br/>
+4. Abspielen</p>
+
+<p>Beim Aufruf dieser Funktion wird man zuerst nach der Anzahl der Durchläufe (maximal 255) und nach der Anzahl der Bilder je Lauf gefragt. Beim letzteren braucht man nur RETURN eingeben, um alle Bilder ablaufen zu lassen.</p>
+
+<h3>Der Algorithmus</h3>
+
+<p>Das eigentliche Kernstück des Programms ist ein Algorithmus, der die Punkte um einen Winkel dreht, die X-, Y- und Z-Kcordinaten in Bildschirmkoordinaten umrechnet und dann die außerhalb liegenden Teile der Linien wegstreicht. Beim Drehen (hier um die Z-Achse) werden erst X- und Y-Koordinaten in Radius und Winkel (im Bogenmaß) umgerechnet; bezogen auf den Koordinatenursprung (siehe Bild 1). Nun wird der Winkel, um den gedreht werden soll, addiert und die neuen Koordinaten werden aus dem neuen Winkel und dem Radius errechnet (siehe Bild 2).</p>
+
+<p>Beim Umrechnen in Bildschirmkoordinaten wird einfach die Z-Koordinate auf die X und Y-Koordinate so aufgerechnet, daß Punkte, die weiter vorne liegen, vom Mittelpunkt wegrücken. Außerdem wird der Koordinatenursprung in die Bildschirmmitte verlegt Durch dieses Verfahren wird die Figur mit einem Fluchtpunkt in der Mitte des Bildschirms dargestellt Das nun folgende Wegstreichen der außerhalb liegenden Linien und Linienstücke geschieht mit Hilfe einer Gradengleichung. Falls nur Teile der Geraden außerhalb des Bildschirms liegen, wird der äußerste Wert für X beziehungsweise Y angenommen und die fehlende Koordinate errechnet (siehe Bild 3).</p>
+
+<h3>Beschreibung der Maschinenroutine</h3>
+
+<p>Die Zeichenroutine des »3D-Movie-Makers« übernimmt die Verwaltung der Grafik und ist, zum Erreichen eines Trickfilmeffekts, ganz auf Geschwindigkeit ausgelegt Aus diesem Grund erhielt sie die folgenden Merkmale:</p>
+
+<ul>
+<li>Sie ist in Assembler geschrieben.</li>
+<li>Sie berechnet keine Punkte, sondern zeichnet nur.</li>
+<li>Die Koordinaten werden nicht geprüft, das heißt: das Basic-Programm darf keine »unmöglichen« Koordinaten übermitteln.</li>
+<li>Der Bildschirm wird nur so weit gelöscht, wie es nötig ist</li>
+<li>Die Zeropage-Addressierung wird in breitem Umfang benutzt.</li>
+<li>Der IRQ wird abgestellt.</li>
+</ul>
+
+
+<p>Das wichtigste Mittel zur Erzeugung eines flüssigen Bilderablaufs und die Grundidee der Routine ist jedoch das »verdeckte Zeichnen«. Dafür werden zwei Bitmaps benötigt (bei unserem Programm ab $A000 und $E000). Während nun eine der beiden zu sehen ist, wird auf der anderen gezeichnet Nun wird das neue Bild sichtbar gemacht und das alte, welches nicht mehr zu sehen ist, wird gelöscht Dieser Vorgang wiederholt sich, bis alle Bilder abgearbeitet sind. Hier noch eine Anmerkung: die Lineroutine haben wir mit einigen Änderungen dem Artikel »Ein schneller Drawline-Algorithmus« aus dem 64’er, 4/84 entnommen. Die Funktion läßt sich am besten dort nachvollziehen.</p>
+
+<address class="author">(Armin und Dirk Biernaczyk/rg)</address>
+    </article>
+</body>
+</html>

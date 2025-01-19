@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>6510 — Die Suche nach dem Prozessor</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="Harald Beine, Arne Jansen, rg">
+    <meta name="64er.issue" content="5/85">
+    <meta name="64er.pages" content="70-74,76">
+    <!-- <meta name="64er.toc_category" content="XXX"> -->
+    <!-- <meta name="64er.toc_title" content="XXX"> -->
+    <meta name="64er.id" content="XXX">
+</head>
+
+<body>
+    <article>
+        <h1>6510 — Die Suche nach dem Prozessor</h1>
+<p class="intro">Mit einem Raumschiff fliegen Sie durch ein Höhlenlabyrinth. Ihre Aufgabe: Finden Sie den Prozessor 6510 und setzen ihn in seinen Sockel.</p>
+
+<p>Wem das HöhlerbSystem nicht gefällt, der kann sich selbst neue erstellen.</p>
+
+<p>Ziel des Spiels ist es, einen IC am Ende eines Labyrinthes aufzunehmen, und diesen in seine Fassung einzusetzen.Es gehört viel Geschicklichkeit dazu, die sechs Labyrinthe zu durchqueren. Außerdem machen einem Hindernisse wie Laser, Gravitation und Fuel das Leben schwer. Mitden Funktionstasten kann man die Geschwindigkeit, die Stärke der Gravitation, Anzahl der Schiffe, sowie die Fuelabnahme einstellen. Zu Beginn befindet man sich in einem kuppelähnlichem Raum, in dem sich die IC-Fassung befindet. Durch Drücken des Feuerknopfes kann das Fahrwerk ein- beziehungsweise ausgefahren werden. Unfallfreies Landen ist jedoch nur auf den dafür vorgesehenen Fuel-Plattformen zum Auftanken möglich.</p>
+
+<h3>Zum Eintippen:</h3>
+
+<p>Da das Lesen der Daten mit Prüfsummenroutine viel mehr Zeit beansprucht, als ohne diese, empfiehlt es sich, sämtliche »GOSUB3440« nach dem ersten einwandfreien Durchlauf zu entfernen. Ebenso ist es notwendig, alle Prüfsummen, das heißt DATAs über 255 zu entfernen. Durch das Entfernen des REMs aus Zeile 810, entfällt das blinde Eintippen von »POKE648,4« nach dem Drücken von »RUN/STOP + RESTORE«. Dieser »POKE« wäre notwendig, um wieder auf den normalen Bildschirm zu kommen. Falls jemandem die Labyrinthe zu schwierig sein sollten, können diese geändert werden.</p>
+
+<p>Eine Besonderheit an »6510« ist unter anderem die Unterbringung der FuelsäuIe.Diese befindet sich außerhalb des Bildschirmfensters. Dieses wurde mit Hilfe des IRQ (Interrupt Request), des Rasterzeileninterrupts verwirklicht. Mit einer ähnlichen Interruptroutine wurde auch die Steuerung und der Ablauf der Melodie möglich.</p>
+
+<p>Das Prinzip eines solchen Interrupts ist folgendes:</p>
+
+<p>Das Bild, das man auf einem Fernsehgerät oder einem Monitor sieht, wird aus vielen einzelnen Zeilen zusammengesetzt (Rasterzeilen). Diese Zeilen werden beim Fernseher zirka 25 mal pro Sekunde aufgebaut, so daß ein flimmerfreies Bild entsteht. Beim C 64 übernimmt der VIC (Video-Interface-Chip) diese Aufgabe. Wird nun eine ganz bestimmte Zeile aufgebaut, verzweigt der Prozessor zu einer Interruptroutine. Bei »6510« wird in dieser Routine die Rahmenfarbe ab einer bestimmten Rasterzeile auf den Wert 5 (grün) beziehungsweise den Wert 0 (schwarz) gesetzt. Die Rasterzeile, ab der auf Grün geschaltet wird, ist von der Menge des vorhandenen Fuels abhängig. Mit dem Timer-Interrupt wird die Hauptschleife gesteuert. Dieser Interrupt wird unter anderem durch den in der Speicherstelle 56549 abgelegten Wert geregelt. Hierdurch besteht auch die Möglichkeit, die Geschwindigkeit des Cursors zu manipulieren (Tl$ wird ebenfalls beeinflußt). Der Timer-Interrupt wird von den CIAs (Complex Interface Adapter) ausgelöst. Diese zählen von dem in 56549 stehendem Wert auf Null herunter, wonach sie einen Interrupt auslösen und wieder mit dem Zählen beginnen.</p>
+
+<p>Die Daten für die Melodie werden ab $C500 bis $C6FF abgelegt.</p>
+
+<h3>Hinweise zum Ändern und Hinzufügen von Labyrinthen</h3>
+
+<p>Um überhaupt Labyrinthe ändern oder hinzufügen zu können, muß vor die POKEs in Zeile 810 ein »REM« gesetzt werden. Danach startet man das Programm. Sobald das Auswahlmenü erscheint, drückt man die RUN/STOP-Taste. Nun hat man den umdefinierten Zeichensatz zur Verfügung.</p>
+
+<h3>Ändern von Labyrinthen</h3>
+
+<p>Die Labyrinthe liegen in den Zeilen 3530 bis 5170. Sollen Labyrinthe geändert werden, so listet man das zu ändernde Labyrinth (siehe Listing). Nun kann das Labyrinth wie ein normales Basic-Programm editiert werden.</p>
+
+<p>Hinzufügen von Labyrinthen</p>
+
+<p>Das Hinzufügen von Labyrinthen ist etwas komplizierter. Zuerst sind im Programm folgende Änderungen nötig (angegeben ist jeweils die gesamte Zeile):<br/>
+1) Zeile 400:<br/>
+400 RI=0:CO=0:CK=1:V=53248:SI = 54272:LM = 6 + Anzahl der hinzugefügten Labyrinthe<br/>
+2) Zeile 1810:<br/>
+1810 ON LA GOSUB 3520, 3750, Zeile1, Zeile2, &hellip;, Zeile n,4020,4280,4550,4890</p>
+
+<p>Dabei entspricht »Zeilel« der Anfangszeile des ersten hinzugefügten Labyrinths, »Zeile2« der Anfangszeile des 2. hinzugefügten Labyrinths und so weiter.<br/>
+3) Zeile 2060:<br/>
+2060 A=0:ON LA GOTO 2190,2070,&hellip;,2070,2070,2700, 2080</p>
+
+<p>Nach der ersten »2070« müssen soviele »2070« eingefügt werden, wie neue Labyrinthe hinzugefügt wurden. Nicht vergessen, die »2070« durch Kommata zu trennen!</p>
+
+<p>Jetzt können die neuen Labyrinthe an den Schluß des Programms (ab Zeile 8000) angefügt werden. Dabei ist folgendes Format einzuhalten:<br/>
+22 PRINT-Zeilen, in denen das Labyrinth gePRINTet wird. In den nachfolgenden Zeilen müssen die Koordinaten des Raumschiffs, der Laser und der Fuel-Plattform gesetzt werden (Tabelle 1). DieX-Koordinatendürfen den Wert 255 nicht überschreiten. Dies demonstrieren wir am besten an einem Beispiel.</p>
+
+<p>Die Bedeutung der Variablen und POKEs ist in Tabelle 1 erläutert. Der Variablen MB muß immer der Wert 15 zugeordnet werden.</p>
+
+<p>Soll keine Fuel-Plattform erscheinen, so sind die Koordinaten auf 0 zu POKEn. Außerdem ist darauf zu achten, daß sich keine Sprites überschneiden, da sonst die Kollisionsabfrage nicht einwandfrei arbeitet.</p>
+
+<h3>Hinweise zum Erstellen eines Labyrinths</h3>
+
+<p>Erst wird — wie bereits beschrieben — der Zeichensatz eingeschaltet. Dann löscht man den Bildschirm und baut das Labyrinth aus den umdefinierten Zeichen auf. Dabei istzu beachten, daß der Bildschirm nicht nach unten scrollt (dies kann passieren, wenn man ein Zeichen an die letzte Position der Zeile setzt). Dieses Scrollen kann verhindert werden, indem man das Zeichen an die vorletzte Position der Zeile setzt, den Cursor vor das Zeichen positioniert und mit der INSERT-Funktion um eine Stelle nach rechts verschiebt. Außerdem müssen die untersten drei Zeilen frei bleiben (SCORE, TIME&hellip;). Auch darf das Raumschiff weder den oberen noch den unteren Bildschirmrand verlassen, da dies nicht in der Hauptschleife überprüft wird. Ist das Labyrinth fertig erstellt, muß es in das Programm eingefügt werden. Dazu wird der Cursor in die linke obere Ecke des Bildschirms gebracht. Dann wird mit »INSERT« Platz für die Zeilennummer, ein Fragezeichen für »PRINT« und ein Anführungszeichen geschaffen. Nun wird die Zeilennummer, das Fragezeichen und das Anführungszeichen in den gerade geschaffenen Platz eingefügt. Nun drückt man »RETURN«. Jetzt fährt man mit dem Cursor vorsichtig an den unteren Rand des Bildschirms und läßt die obere Zeile aus dem Bildschirmfenster nach oben herausscrollen. Mit den verbliebenen Zeilen verfährt man genauso. Man sollte allerdings nicht vergessen, die Zeilennummer laufend zu erhöhen.</p>
+
+<address class="author">(Harald Beine/Arne Jansen/rg)</address>
+    </article>
+</body>
+</html>
