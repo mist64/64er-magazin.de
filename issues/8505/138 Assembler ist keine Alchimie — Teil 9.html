@@ -16,200 +16,201 @@
 <body>
     <article>
         <h1>Assembler ist keine Alchimie — Teil 9</h1>
-<p class="intro">Multiplizieren und Dividieren größerer Zahlen ist weder mit dem Taschenrechner noch in Basic ein Problem. Mit Assembler sieht die Sache anfangs schon nicht mehr so einfach aus. Doch auch diese Hürde wird genommen. Einige Betriebssystemroutinen des C 64 nehmen uns dabei erhebliche Arbeit ab, man muß sie nur kennen.</p>
+        <p class="intro">Multiplizieren und Dividieren größerer Zahlen ist weder mit dem Taschenrechner noch in Basic ein Problem. Mit Assembler sieht die Sache anfangs schon nicht mehr so einfach aus. Doch auch diese Hürde wird genommen. Einige Betriebssystemroutinen des C 64 nehmen uns dabei erhebliche Arbeit ab, man muß sie nur kennen.</p>
 
-<p>Einige Versprechen sollen diesmal eingelöst werden:</p>
+        <p>Einige Versprechen sollen diesmal eingelöst werden:</p>
 
-<p>Die restlichen Bit-Verschiebe-Befehle werden Ihnen vorgestellt und auch gleich ein paar Anwendungen wie die 16-Bit-Multiplikation und auch die 16-Bit-Division. Außerdem soll endlich das Programmprojekt weitergeführt werden. Diesmal erzeugen wir einen Hilfsbildschirm und legen ihn abrufbereit unter den oberen ROM-Bereich. Bei der Gelegenheit lernen Sie auch gleich noch ein paar Interpreter-Routinen kennen.</p>
+        <p>Die restlichen Bit-Verschiebe-Befehle werden Ihnen vorgestellt und auch gleich ein paar Anwendungen wie die 16-Bit-Multiplikation und auch die 16-Bit-Division. Außerdem soll endlich das Programmprojekt weitergeführt werden. Diesmal erzeugen wir einen Hilfsbildschirm und legen ihn abrufbereit unter den oberen ROM-Bereich. Bei der Gelegenheit lernen Sie auch gleich noch ein paar Interpreter-Routinen kennen.</p>
 
-<h3>Die restlichen Bit-Verschiebe-Operationen</h3>
+        <h3>Die restlichen Bit-Verschiebe-Operationen</h3>
 
-<p>Da wäre zunächst einmal das Gegenstück zu ASL. Den Befehl haben wir in der letzten Ausga-.be kennengelernt. Dort ging es ja um das Nach-Links-Schieben. Jetzt schieben wir nach rechts. LSR heißt der dazu nötige Befehl. Das kommt von »logical shift right« und heißt zu deutsch »logisches Rechtsschieben«. Fragen Sie mich bitte nicht, weshalb »logisches«. Jedenfalls ist LSR ebenso für logische Bitprüfungen geeignet wie ASL.</p>
+        <p>Da wäre zunächst einmal das Gegenstück zu ASL. Den Befehl haben wir in der letzten Ausga-.be kennengelernt. Dort ging es ja um das Nach-Links-Schieben. Jetzt schieben wir nach rechts. LSR heißt der dazu nötige Befehl. Das kommt von »logical shift right« und heißt zu deutsch »logisches Rechtsschieben«. Fragen Sie mich bitte nicht, weshalb »logisches«. Jedenfalls ist LSR ebenso für logische Bitprüfungen geeignet wie ASL.</p>
 
-<p>Mittels LSR wird jedes Bit der adressierten Speicherstelle um einen Platz nach rechts geschoben. An die Stelle des Bit 7 tritt eine Null und Bit 0 wandert in das Carry-Bit (siehe Bild 1).</p>
+        <p>Mittels LSR wird jedes Bit der adressierten Speicherstelle um einen Platz nach rechts geschoben. An die Stelle des Bit 7 tritt eine Null und Bit 0 wandert in das Carry-Bit (siehe Bild 1).</p>
 
-<p>Erinnern Sie sich noch an das dezimale Linksschieben mit ASL aus der letzten Folge? Wir hatten festgestellt, daß jedes Linksschieben einer Dezimalzahl einer Multiplikation mit 10 entspricht. Hier im umgekehrten Fall, also beim Rechtsschieben, muß jedes LSR einer Division durch 10 entsprechen:</p>
+        <p>Erinnern Sie sich noch an das dezimale Linksschieben mit ASL aus der letzten Folge? Wir hatten festgestellt, daß jedes Linksschieben einer Dezimalzahl einer Multiplikation mit 10 entspricht. Hier im umgekehrten Fall, also beim Rechtsschieben, muß jedes LSR einer Division durch 10 entsprechen:</p>
 
-<p>TODO</p>
+        <p>TODO</p>
 
-<p>Geht man von der Ausgangszahl (25000) aus, dann ergibt sich der erste rechts verschobene Wert durch Division mit</p>
+        <p>Geht man von der Ausgangszahl (25000) aus, dann ergibt sich der erste rechts verschobene Wert durch Division mit</p>
 
-<p>TODO</p>
+        <p>TODO</p>
 
-<p>Es wird also durch Potenzen der Zahlenbasis 10 geteilt. Haben wir es — wie im Computer — mit Binärzahlen zu tun, deren Basis die 2 ist, dann teilen wir mit jedem LSR durch 2. Je nachdem, wie oft hintereinander das LSR auf eine Zahl ausgeübt wird, teilt man dann durch 2<sup>1</sup>=2, 2<sup>2</sup>=4, 2<sup>3</sup> = 8, etc. Das konnte man sich alles ja schon vorstellen, nachdem ASL zur Multiplikation verwendet wurde. Auch hier muß man immer das Carry-Bit abfragen, denn die Division kann ja unter Umständen nicht aufgehen, wie das folgende Beispiel der Division von 3 durch 2 zeigt:</p>
+        <p>Es wird also durch Potenzen der Zahlenbasis 10 geteilt. Haben wir es — wie im Computer — mit Binärzahlen zu tun, deren Basis die 2 ist, dann teilen wir mit jedem LSR durch 2. Je nachdem, wie oft hintereinander das LSR auf eine Zahl ausgeübt wird, teilt man dann durch 2<sup>1</sup>=2, 2<sup>2</sup>=4, 2<sup>3</sup> = 8, etc. Das konnte man sich alles ja schon vorstellen, nachdem ASL zur Multiplikation verwendet wurde. Auch hier muß man immer das Carry-Bit abfragen, denn die Division kann ja unter Umständen nicht aufgehen, wie das folgende Beispiel der Division von 3 durch 2 zeigt:</p>
 
-<p>(3) 0000 0011 ergibt durch LSR: 0000 0001 und 1 im Carry-Bit. Das Ergebnis ist schon richtig, nämlich 1. Im Carry steht der Rest dieser Division, die 1. Weil der Rest für manche Berechnungen von Bedeutung ist, muß das Carry-Bit irgendwie erfaßt werden. Wie man das erreicht, lernen wir später noch. Leider ist diese Art der Division mittels LSR nicht so einfach verwendbar wie die Multiplikation mittels ASL. Während man dort durch geschicktes Aufteilen des Faktors ASL auch bei anderen Multiplikatoren als reine Zweierpotenzen anwenden konnte, ist das hier nicht so ohne weiteres möglich. Bei Divisionen geht man deshalb lieber andere Wege. Die zeige ich Ihnen ebenfalls etwas später.</p>
+        <p>(3) 0000 0011 ergibt durch LSR: 0000 0001 und 1 im Carry-Bit. Das Ergebnis ist schon richtig, nämlich 1. Im Carry steht der Rest dieser Division, die 1. Weil der Rest für manche Berechnungen von Bedeutung ist, muß das Carry-Bit irgendwie erfaßt werden. Wie man das erreicht, lernen wir später noch. Leider ist diese Art der Division mittels LSR nicht so einfach verwendbar wie die Multiplikation mittels ASL. Während man dort durch geschicktes Aufteilen des Faktors ASL auch bei anderen Multiplikatoren als reine Zweierpotenzen anwenden konnte, ist das hier nicht so ohne weiteres möglich. Bei Divisionen geht man deshalb lieber andere Wege. Die zeige ich Ihnen ebenfalls etwas später.</p>
 
-<p>LSR kann auf die gleiche Weise adressiert werden wie ASL:</p>
+        <p>LSR kann auf die gleiche Weise adressiert werden wie ASL:</p>
 
-<p>TODO</p>
+        <p>TODO</p>
 
-<p>Im ersten Fall steht das Ergebnis im Akku, in den anderen Fällen in der jeweils adressierten Speicherstelle. Außer der N-Flagge, die in jedem Fall 0 wird, beeinflußt LSR auch die Carry-Flagge und unter Umständen die Z-Flagge. Je nach Adressierungsart liegt LSR als l-Byte-, 2-Byte- oder 3-Byte-Befehl vor.</p>
+        <p>Im ersten Fall steht das Ergebnis im Akku, in den anderen Fällen in der jeweils adressierten Speicherstelle. Außer der N-Flagge, die in jedem Fall 0 wird, beeinflußt LSR auch die Carry-Flagge und unter Umständen die Z-Flagge. Je nach Adressierungsart liegt LSR als l-Byte-, 2-Byte- oder 3-Byte-Befehl vor.</p>
 
-<p>Sowohl bei ASL als auch bei LSR hatten wir festgestellt, daß man herausgeschobene Bits, falls sie noch von Bedeutung sind, irgendwie aus dem Carry-Bit (dort sind sie ja gelandet) an einen sinnvollen Ort schaffen muß. Das ist natürlich möglich über eine Befehlskette, in der zunächst das Carry-Bit abgefragt wird:<br/>
-zum Beispiel:</p>
+        <p>Sowohl bei ASL als auch bei LSR hatten wir festgestellt, daß man herausgeschobene Bits, falls sie noch von Bedeutung sind, irgendwie aus dem Carry-Bit (dort sind sie ja gelandet) an einen sinnvollen Ort schaffen muß. Das ist natürlich möglich über eine Befehlskette, in der zunächst das Carry-Bit abgefragt wird:<br />
+            zum Beispiel:</p>
 
-<p>6000 BCC 6007<br/>
-6002 LDA #01<br/>
-6004 STA 8000<br/>
-6007 etc.<br/>
-TODO</p>
+        <p>6000 BCC 6007<br />
+            6002 LDA #01<br />
+            6004 STA 8000<br />
+            6007 etc.<br />
+            TODO</p>
 
-<p>Wenn das Carry-Bit frei ist, wird alles weitere übersprungen. Wenn da drin etwas aufgetaucht ist, lädt man eine 1 (die ist ja im Carry-Bit) an die benötigte Speicherstelle (hier zum Beispiel 8000). Das kostet aber einige Bytes Speicherplatz und einige Taktzeiten Rechendauer. Außerdem erschwert sich die Programmierung, wenn man eine Zahl öfter verschiebt und dann nach 8000 alle Carry-Inhalte packen will. So kompliziert brauchen wir auch gar nicht zu arbeiten, denn unsere CPU kennt zwei Befehle, die das Bit-Verschieben und das Carry-Verschieben für uns machen. Das sind:<br/>
-ROL rotate left Linksrotieren ROR rotate right Rechtsrotieren</p>
+        <p>Wenn das Carry-Bit frei ist, wird alles weitere übersprungen. Wenn da drin etwas aufgetaucht ist, lädt man eine 1 (die ist ja im Carry-Bit) an die benötigte Speicherstelle (hier zum Beispiel 8000). Das kostet aber einige Bytes Speicherplatz und einige Taktzeiten Rechendauer. Außerdem erschwert sich die Programmierung, wenn man eine Zahl öfter verschiebt und dann nach 8000 alle Carry-Inhalte packen will. So kompliziert brauchen wir auch gar nicht zu arbeiten, denn unsere CPU kennt zwei Befehle, die das Bit-Verschieben und das Carry-Verschieben für uns machen. Das sind:<br />
+            ROL rotate left Linksrotieren ROR rotate right Rechtsrotieren</p>
 
-<p>Sehen wir uns zunächst mal ROL (Bild 2) an:</p>
+        <p>Sehen wir uns zunächst mal ROL (Bild 2) an:</p>
 
-<p>Wie bei ASL wandert jedes Bit um eine Position nach links. Das Bit 7 wird dabei in das Carry-Bit verschoben. In Bit 0 gelangt aber hier nicht eine 0 (wie bei ASL), sondern der Inhalt des Carry-Bit (wohlgemerkt der Inhalt, der dort war, bevor dort hinein Bit 7 geschoben wurde). Bevor wir auf den praktischen Nährwert dieses Befehls eingehen, sollen erstmal die Adressierungsmöglichkeiten aufgeführt werden:</p>
+        <p>Wie bei ASL wandert jedes Bit um eine Position nach links. Das Bit 7 wird dabei in das Carry-Bit verschoben. In Bit 0 gelangt aber hier nicht eine 0 (wie bei ASL), sondern der Inhalt des Carry-Bit (wohlgemerkt der Inhalt, der dort war, bevor dort hinein Bit 7 geschoben wurde). Bevor wir auf den praktischen Nährwert dieses Befehls eingehen, sollen erstmal die Adressierungsmöglichkeiten aufgeführt werden:</p>
 
-<p>TODO</p>
+        <p>TODO</p>
 
-<p>Je nach Adressierung kann es sich dann wieder um einen l-Byte- bis 3-Byte-Befehl handeln. Die N-, Z- und natürlich die Carry-Flagge sind beeinflußt und das Ergebnis des Befehls ist im Akku zu finden (erste Adressierungsart) oder in der angesprochenen Speicherstelle.</p>
+        <p>Je nach Adressierung kann es sich dann wieder um einen l-Byte- bis 3-Byte-Befehl handeln. Die N-, Z- und natürlich die Carry-Flagge sind beeinflußt und das Ergebnis des Befehls ist im Akku zu finden (erste Adressierungsart) oder in der angesprochenen Speicherstelle.</p>
 
-<p>Wozu das Ganze? Abgesehen von der Möglichkeit, einzelne Bits auf diese Weise ohne Verlust aus einem Byte durch das Carry-Bit herausschieben zu können, um sie Prüfungen zu unterziehen, gibt es noch die Möglichkeit, einen Überlauf bei Rechenoperationen aufzufangen. Erinnern Sie sich an die letzte Folge, wo wir mittels ASL Multiplikationen durchgeführt hatten? Dort kann es unter gewissen Umständen ja leicht geschehen, daß ein Byte für das Ergebnis nicht mehr ausreicht. Wir haben in den Beispielen schon die Überlegung durchgeführt, daß man mittels BCC oder BCS prüfen sollte, ob man eine signifikante Stelle (also eine führende 1) aus dem Byte herausgeschoben hat. Ist das der Fall, dann gibt es zwei Wege:<br/>
-1)  Man veranlaßt den Ausdruck eines OVERFLOW ERROR, wenn nur l-Byte-Zahlen zulässig sind, oder<br/>
-2)  man schaltet um auf 2-Byte-Zahlen.</p>
+        <p>Wozu das Ganze? Abgesehen von der Möglichkeit, einzelne Bits auf diese Weise ohne Verlust aus einem Byte durch das Carry-Bit herausschieben zu können, um sie Prüfungen zu unterziehen, gibt es noch die Möglichkeit, einen Überlauf bei Rechenoperationen aufzufangen. Erinnern Sie sich an die letzte Folge, wo wir mittels ASL Multiplikationen durchgeführt hatten? Dort kann es unter gewissen Umständen ja leicht geschehen, daß ein Byte für das Ergebnis nicht mehr ausreicht. Wir haben in den Beispielen schon die Überlegung durchgeführt, daß man mittels BCC oder BCS prüfen sollte, ob man eine signifikante Stelle (also eine führende 1) aus dem Byte herausgeschoben hat. Ist das der Fall, dann gibt es zwei Wege:<br />
+            1) Man veranlaßt den Ausdruck eines OVERFLOW ERROR, wenn nur l-Byte-Zahlen zulässig sind, oder<br />
+            2) man schaltet um auf 2-Byte-Zahlen.</p>
 
-<p>Sehen wir uns das mal an dem Schritt 7 des Beispiels aus der letzten Folge an. Dort hatten wir die Zahl 192 (binär 1100 0000) vorliegen (zum Beispiel in Speicherstelle 7000). Im Computer werden 2-Byte-Integers in der Form LSB/MSB verarbeitet. Wir schaffen also die Speicherstelle für das MSB von 192 in 7001. Jetzt muß dort noch 0 drin stehen. Um bei nochmaliger Multiplikation mit 2 eine 16-Bit-Zahl als Ergebnis zu erhalten, verfährt man wie folgt:</p>
+        <p>Sehen wir uns das mal an dem Schritt 7 des Beispiels aus der letzten Folge an. Dort hatten wir die Zahl 192 (binär 1100 0000) vorliegen (zum Beispiel in Speicherstelle 7000). Im Computer werden 2-Byte-Integers in der Form LSB/MSB verarbeitet. Wir schaffen also die Speicherstelle für das MSB von 192 in 7001. Jetzt muß dort noch 0 drin stehen. Um bei nochmaliger Multiplikation mit 2 eine 16-Bit-Zahl als Ergebnis zu erhalten, verfährt man wie folgt:</p>
 
-<p>TODO</p>
+        <p>TODO</p>
 
-<p>Die Funktion dieser Befehlssequenz können Sie aus Bild 3 entnehmen.</p>
+        <p>Die Funktion dieser Befehlssequenz können Sie aus Bild 3 entnehmen.</p>
 
-<p>Diesem Befehl werden wir später bei der 16-Bit-Multiplikation und Division noch häufig begegnen.</p>
+        <p>Diesem Befehl werden wir später bei der 16-Bit-Multiplikation und Division noch häufig begegnen.</p>
 
-<p>Sehen wir uns nun noch den letzten der Bit-Verschiebebefehle an: ROR. In Bild 4 ist schematisch gezeigt, wie rotiert wird.</p>
+        <p>Sehen wir uns nun noch den letzten der Bit-Verschiebebefehle an: ROR. In Bild 4 ist schematisch gezeigt, wie rotiert wird.</p>
 
-<p>Jedes Bit wandert, wie bei LSR, um eine Stelle nach rechts. Als Bit 7 kommt (im Gegensatz zu LSR) der Inhalt des Carry-Bit herein. Bit 0 wird ins Carry-Bit geschoben. Adressiert werden kann ROR ebenso wie ROL:</p>
+        <p>Jedes Bit wandert, wie bei LSR, um eine Stelle nach rechts. Als Bit 7 kommt (im Gegensatz zu LSR) der Inhalt des Carry-Bit herein. Bit 0 wird ins Carry-Bit geschoben. Adressiert werden kann ROR ebenso wie ROL:</p>
 
-<p>TODO</p>
+        <p>TODO</p>
 
-<p>Auch für die Byteanzahl, den Ort des Ergebnisses und die Flaggenbeanspruchung gilt dasselbe wie für ROL.</p>
+        <p>Auch für die Byteanzahl, den Ort des Ergebnisses und die Flaggenbeanspruchung gilt dasselbe wie für ROL.</p>
 
-<p>Die Einsatzmöglichkeiten für ROR sind allerings geringer. Bei 16-Bit-Divisionen kann man zwar ROR einsetzen, um einen Unterlauf des MSB ins LSB aufzufangen. Weil man aber meist ohnehin andere Divisionsverfahren verwendet als das oben gezeigte mit LSR, erübrigt sich diese Anwendung in den meisten Fällen. Gut kann man ROR zu Bitprüfungen einsetzen. Das soll im nächsten Abschnitt an einem kleinen Beispiel gezeigt werden.</p>
+        <p>Die Einsatzmöglichkeiten für ROR sind allerings geringer. Bei 16-Bit-Divisionen kann man zwar ROR einsetzen, um einen Unterlauf des MSB ins LSB aufzufangen. Weil man aber meist ohnehin andere Divisionsverfahren verwendet als das oben gezeigte mit LSR, erübrigt sich diese Anwendung in den meisten Fällen. Gut kann man ROR zu Bitprüfungen einsetzen. Das soll im nächsten Abschnitt an einem kleinen Beispiel gezeigt werden.</p>
 
-<p>Zuvor aber noch eine Bemerkung: Wir sind nun durch den Befehlssatz des 6502-Assemblers fast hindurchgedrungen. Es fehlen uns nur noch — wenn ich mich nicht versehen habe — vier Befehle. Die allerdings hängen eng mit dem sogenannten Interrupthandling zusammen, das uns wohl einige Zeit beschäftigen wird.</p>
+        <p>Zuvor aber noch eine Bemerkung: Wir sind nun durch den Befehlssatz des 6502-Assemblers fast hindurchgedrungen. Es fehlen uns nur noch — wenn ich mich nicht versehen habe — vier Befehle. Die allerdings hängen eng mit dem sogenannten Interrupthandling zusammen, das uns wohl einige Zeit beschäftigen wird.</p>
 
-<h3>Schneller Joystick</h3>
+        <h3>Schneller Joystick</h3>
 
-<p>Vor einiger Zeit (64’er, Ausgabe 2/85) veröffentlichte P. Siepen eine Routine zur Abfrage des Joystickports, die eine interessante Leserbrief-Reaktion hervorrief. M. Hartig sandte nämlich einen Verbesserungsvorschlag, in dem der uns interessierende Befehl ROR die Hauptrolle spielt. Bevor ich die allerdings vorstelle, muß erst noch geklärt werden, was und wie abgefragt wird.</p>
+        <p>Vor einiger Zeit (64’er, Ausgabe 2/85) veröffentlichte P. Siepen eine Routine zur Abfrage des Joystickports, die eine interessante Leserbrief-Reaktion hervorrief. M. Hartig sandte nämlich einen Verbesserungsvorschlag, in dem der uns interessierende Befehl ROR die Hauptrolle spielt. Bevor ich die allerdings vorstelle, muß erst noch geklärt werden, was und wie abgefragt wird.</p>
 
-<p>Signale vom Joystick landen in den DATA-Ports A oder B des CIA 1. CIA heißt »Complex Interface Adapter« und ist die Institution unseres Computers, die den Verkehr mit der Außenwelt erlaubt. Wir haben zwei Stück davon (CIA 1 und CIA 2). Je nachdem, in welchen Port der Joystick gesteckt wurde, laufen die Signale in den Registern DC00 oder DC01 (dezimal 56320 oder 56321) ein. Wir nehmen im weiteren mal DC00 an. Die Bits 0 bis 4 beziehen sich auf den Joystick:</p>
+        <p>Signale vom Joystick landen in den DATA-Ports A oder B des CIA 1. CIA heißt »Complex Interface Adapter« und ist die Institution unseres Computers, die den Verkehr mit der Außenwelt erlaubt. Wir haben zwei Stück davon (CIA 1 und CIA 2). Je nachdem, in welchen Port der Joystick gesteckt wurde, laufen die Signale in den Registern DC00 oder DC01 (dezimal 56320 oder 56321) ein. Wir nehmen im weiteren mal DC00 an. Die Bits 0 bis 4 beziehen sich auf den Joystick:</p>
 
-<p>Bit 0   oben<br/>
-Bit 1   unten<br/>
-Bit 2   links<br/>
-Bit 3   rechts<br/>
-Bit 4   Feuerknopf<br/>
-TODO</p>
+        <p>Bit 0 oben<br />
+            Bit 1 unten<br />
+            Bit 2 links<br />
+            Bit 3 rechts<br />
+            Bit 4 Feuerknopf<br />
+            TODO</p>
 
-<p>Wenn keine dieser Möglichkeiten angesprochen ist, enthalten diese Bits den Wert 1. Drückt man beispielsweise den Feuerknopf, dann wechselt der Inhalt von Bit 4 zum Wert 0. Man muß also ständig diese Bits überprüfen und reagieren, sobald eines davon 0 wird. Die Lösung von P. Siepen, diese Abfrage in das Interruptprogramm einzubauen, ist sehr brauchbar. Dadurch hat der Computer die Möglichkeit, trotzdem an anderen Aufgaben weiterzuarbeiten. Wir werden in den nächsten Folgen auf diese Programmiertechnik eingehen. Die Verbesserung von M. Hartig besteht darin, daß er nicht durch CMP-Befehle den Inhalt von DC00 prüft (was Zeit und auch Speicherplatz kostet), sondern mittels ROR Bit für Bit nach rechts in das Carry-Bit schiebt und dieses dann mit BCC abfragt. Sobald die Carry-Flagge nämlich frei ist, ist die zu dem Bit gehörige Joystickfunktion gefragt.</p>
+        <p>Wenn keine dieser Möglichkeiten angesprochen ist, enthalten diese Bits den Wert 1. Drückt man beispielsweise den Feuerknopf, dann wechselt der Inhalt von Bit 4 zum Wert 0. Man muß also ständig diese Bits überprüfen und reagieren, sobald eines davon 0 wird. Die Lösung von P. Siepen, diese Abfrage in das Interruptprogramm einzubauen, ist sehr brauchbar. Dadurch hat der Computer die Möglichkeit, trotzdem an anderen Aufgaben weiterzuarbeiten. Wir werden in den nächsten Folgen auf diese Programmiertechnik eingehen. Die Verbesserung von M. Hartig besteht darin, daß er nicht durch CMP-Befehle den Inhalt von DC00 prüft (was Zeit und auch Speicherplatz kostet), sondern mittels ROR Bit für Bit nach rechts in das Carry-Bit schiebt und dieses dann mit BCC abfragt. Sobald die Carry-Flagge nämlich frei ist, ist die zu dem Bit gehörige Joystickfunktion gefragt.</p>
 
-<p>Nun die Abfrageroutine:</p>
+        <p>Nun die Abfrageroutine:</p>
 
-<p>TODO</p>
+        <p>TODO</p>
 
-<p>Der Vorteil dieser nur 18 Byte langen Unterroutine liegt in ihrer Schnelligkeit: Sie braucht nur 24 Taktzyklen, wenn nicht verzweigt wird, beziehungsweise 25, wenn verzweigt wird. Natürlich wäre anstelle von ROR auch die Verwendung von LSR möglich gewesen, denn die herausgeschobenen Bits werden nicht mehr benötigt. Im Falle, daß man nach einer solchen Abfrage wieder den Ausgangszustand des Akku oder der Speicherstelle herstellen will, muß man eine entsprechende Anzahl ROR-Anweisungen anschließen, bis Bit 0 wieder in seine Ausgangslage rotiert ist.</p>
+        <p>Der Vorteil dieser nur 18 Byte langen Unterroutine liegt in ihrer Schnelligkeit: Sie braucht nur 24 Taktzyklen, wenn nicht verzweigt wird, beziehungsweise 25, wenn verzweigt wird. Natürlich wäre anstelle von ROR auch die Verwendung von LSR möglich gewesen, denn die herausgeschobenen Bits werden nicht mehr benötigt. Im Falle, daß man nach einer solchen Abfrage wieder den Ausgangszustand des Akku oder der Speicherstelle herstellen will, muß man eine entsprechende Anzahl ROR-Anweisungen anschließen, bis Bit 0 wieder in seine Ausgangslage rotiert ist.</p>
 
-<h3>Die 16-Bit-Multiplikation</h3>
+        <h3>Die 16-Bit-Multiplikation</h3>
 
-<p>Wir haben in der letzten und in dieser Folge gelernt, wie man 8-Bit-Zahlen miteinander malnehmen kann um 8- oder 16-Bit-Zahlen zu erhalten. Dabei ist unbefriedigend, daß man sich über jede Zahl Gedanken machen muß, wie man sie am besten multipliziert. Was fehlt, ist ein allgemein gültiges Programm, das in der Lage ist, jede Zahlenkombination (solange es sich um 2-Byte-Integers handelt und das Ergebnis als 16-Bit-Zahl darstellbar ist) zu verarbeiten. Und da haben wir mal wieder Glück: Gut versteckt befindet sich so etwas bereits fertig in unserem Computer. Ab dez. 45900 ($B34C) liegt im Interpreter solch eine Routine und ihr Einsprungspunkt ist für uns bei dez. 45911 ($B357). Bevor wir aber detailliert darauf eingehen, soll noch das Prinzip erklärt werden, das dabei genutzt wird.</p>
+        <p>Wir haben in der letzten und in dieser Folge gelernt, wie man 8-Bit-Zahlen miteinander malnehmen kann um 8- oder 16-Bit-Zahlen zu erhalten. Dabei ist unbefriedigend, daß man sich über jede Zahl Gedanken machen muß, wie man sie am besten multipliziert. Was fehlt, ist ein allgemein gültiges Programm, das in der Lage ist, jede Zahlenkombination (solange es sich um 2-Byte-Integers handelt und das Ergebnis als 16-Bit-Zahl darstellbar ist) zu verarbeiten. Und da haben wir mal wieder Glück: Gut versteckt befindet sich so etwas bereits fertig in unserem Computer. Ab dez. 45900 ($B34C) liegt im Interpreter solch eine Routine und ihr Einsprungspunkt ist für uns bei dez. 45911 ($B357). Bevor wir aber detailliert darauf eingehen, soll noch das Prinzip erklärt werden, das dabei genutzt wird.</p>
 
-<p>Jeden Tag rechnen Sie wahrscheinlich völlig automatisch Multiplikationsaufgaben, ohne noch Gedanken daran zu verschwenden, wieviel Schweiß das Erlernen dieser Technik früher mal gekostet hat. Könnten Sie heute nochjemandem genau erklären, warum man da was wie macht? Genau das müssen wir aber tun, damit der Binärautomat (unser C 64) multiplizieren lernt. Nehmen wir mal eine Multiplikation von 16x15:</p>
+        <p>Jeden Tag rechnen Sie wahrscheinlich völlig automatisch Multiplikationsaufgaben, ohne noch Gedanken daran zu verschwenden, wieviel Schweiß das Erlernen dieser Technik früher mal gekostet hat. Könnten Sie heute nochjemandem genau erklären, warum man da was wie macht? Genau das müssen wir aber tun, damit der Binärautomat (unser C 64) multiplizieren lernt. Nehmen wir mal eine Multiplikation von 16x15:</p>
 
-<p>TODO</p>
+        <p>TODO</p>
 
-<p>Daß wir nicht so genau wissen, was wir da tun, liegt am ziemlich komplizierten Zehnersystem. Damit das alles einfacher und überschaubarer wird, wechseln wir mal ins Binärsystem: 16 = 10000, 15 = 1111. Die Aufgabe sieht dann so aus:</p>
+        <p>Daß wir nicht so genau wissen, was wir da tun, liegt am ziemlich komplizierten Zehnersystem. Damit das alles einfacher und überschaubarer wird, wechseln wir mal ins Binärsystem: 16 = 10000, 15 = 1111. Die Aufgabe sieht dann so aus:</p>
 
-<p>TODO</p>
+        <p>TODO</p>
 
-<p>Jetzt wird schon deutlicher, was wir getan haben. Der Faktor auf der rechten Seite wurde vom MSB an Bit für Bit durchgesehen. Jedesmal, wenn wir auf eine 1 gestoßen sind (hier waren nur Einsen), haben wir den links stehenden Faktor notiert. Dabei sind wir von mal zu mal um eine Stelle nach rechts gerückt, was zu tun hat mit dem Stellenwert des im rechten Faktor gerade betrachteten Bits. Das geschah so lange, bis alle Bits des rechten Faktors durchgearbeitet waren. Die sich auf diese Weise ergebene Kolonne wird dann addiert und führt zum Ergebnis. Vergleichen Sie, 240 ist wirklich binär 1111 0000.</p>
+        <p>Jetzt wird schon deutlicher, was wir getan haben. Der Faktor auf der rechten Seite wurde vom MSB an Bit für Bit durchgesehen. Jedesmal, wenn wir auf eine 1 gestoßen sind (hier waren nur Einsen), haben wir den links stehenden Faktor notiert. Dabei sind wir von mal zu mal um eine Stelle nach rechts gerückt, was zu tun hat mit dem Stellenwert des im rechten Faktor gerade betrachteten Bits. Das geschah so lange, bis alle Bits des rechten Faktors durchgearbeitet waren. Die sich auf diese Weise ergebene Kolonne wird dann addiert und führt zum Ergebnis. Vergleichen Sie, 240 ist wirklich binär 1111 0000.</p>
 
-<p>Genauso wie hier beschrieben, arbeitet das Multiplikationsprogramm. Ein Unterschied tritt auf, nämlich daß nicht bis zum Schluß mit der Addition gewartet, sondern jede neue Zwischenzahl sofort addiert wird. Bild 5a zeigt die Beschreibung der Interpreterroutine:</p>
+        <p>Genauso wie hier beschrieben, arbeitet das Multiplikationsprogramm. Ein Unterschied tritt auf, nämlich daß nicht bis zum Schluß mit der Addition gewartet, sondern jede neue Zwischenzahl sofort addiert wird. Bild 5a zeigt die Beschreibung der Interpreterroutine:</p>
 
-<p>Diese Routine hier abzudrucken, wäre reine Platzverschwendung. Schalten Sie einfach den SMON ein und verlangen Sie von ihm ein Disassemblerlisting ab B357. Dort haben Sie dann für die weitere Besprechung alles parat. In Bild 5 finden Sie noch ein Flußdiagramm der UMULT-Routine.</p>
+        <p>Diese Routine hier abzudrucken, wäre reine Platzverschwendung. Schalten Sie einfach den SMON ein und verlangen Sie von ihm ein Disassemblerlisting ab B357. Dort haben Sie dann für die weitere Besprechung alles parat. In Bild 5 finden Sie noch ein Flußdiagramm der UMULT-Routine.</p>
 
-<p>Das Ergebnis der Multiplikation befindet sich in LSB/MSB-Form in den X/Y-Registern. Programm und Flußdiagramm wollen wir an einem Beispiel nachspielen. Dazu sollen die beiden Zahlen 321 und 65 (binär 0000 0001 0100 0001 und 0100 0001) miteinander multipliziert werden, was bekanntlich 20865 (binär 0101 0001 1000 0001) ergibt. Was Ihnen im Bild 6 als undurchdringlicher Bit-Dschungel entgegenstrahlt, ist das schrittweise Verfolgen des Programms in Computerformat, also binär.</p>
+        <p>Das Ergebnis der Multiplikation befindet sich in LSB/MSB-Form in den X/Y-Registern. Programm und Flußdiagramm wollen wir an einem Beispiel nachspielen. Dazu sollen die beiden Zahlen 321 und 65 (binär 0000 0001 0100 0001 und 0100 0001) miteinander multipliziert werden, was bekanntlich 20865 (binär 0101 0001 1000 0001) ergibt. Was Ihnen im Bild 6 als undurchdringlicher Bit-Dschungel entgegenstrahlt, ist das schrittweise Verfolgen des Programms in Computerformat, also binär.</p>
 
-<p>In Bild 6 sind die Speicheradressen alle dezimal angegeben. Dort finden Sie zunächst die Ausgangslage. In Speicherstelle 40/41 steht die ganze Operation über unverändert die Zahl 321. In 113/114 finden Sie (wegen des LSB/MSB-Formates umgedreht als 114/113) unseren Faktor 65. Akku und Speicherstelle 93 stehen auf 16, dem Bitzähler. In das X- und Y-Register wurde eine Null eingelesen. Im Flußdiagramm ist diese Situation mit einer 1 gekennzeichnet. Ganz unten im Diagramm sehen Sie, daß der Bitzähler 93 erniedrigt und danach geprüft wird, ob er schon gleich Null sei. Daraus folgt, daß die große Schleife 16mal durchlaufen wird. Den ersten Durchlauf (gekennzeichnet durch kleine Buchstaben) verfolgen wir im einzelnen.<br/>
-a)  X-Register wird zur Bearbeitung in den Akku geschoben.<br/>
-b)  Mittels ASL wird das Bit 7 in die Carry-Flagge geschoben, was einen Carry-Inhalt von 0 bewirkt.<br/>
-c)  Der solchermaßen bearbeitete Akku-Inhalt (der sich hier nicht weiter verändert hat) geht wieder zurück ins X-Register.<br/>
-d)  Nun ist das Y-Register zur Bearbeitung dran. Es gelangt in den Akku.<br/>
-e)  Mittels ROL wandert nun das MSB des X-Registers aus dem Carry-Bit in die O-Bit-Position des Akku<br/>
-f)  und alles zusammen wieder ins Y-Register. Insgesamt wird dadurch die 16-Bit-Zahl im X/Y-Register um eine Stellenzahl erhöht, was der Vorbereitung zur Addition dient. (Erinnern Sie sich bitte: Die Kolonne der Einzelergebnisse wird ja addiert). Im Diagramm (ohne Buchstabenkennzeichnung) schließt sich hier noch einePrüfung auf einen eventuellen Überlauf an, der dann mit einer Fehlermeldung beantwortet wird.<br/>
-g)  Nun wird das MSB der Speicherstelle 113 nach links ins Carry geschoben. Das ist auch hier noch eine Null.<br/>
-h)  Anschließend wandert dieser Carry-Inhalt als Bit 0 in Speicherstelle 114. Bit 7 von 114 landet dafür im Carry. Auch hier wird auf diese Weise die ganze 16-Bit-Zahl 113/114 um ein Bit nach links geschoben und im nächsten Schritt — im Flußdiagramm wieder ohne Buchstabe — geprüft, ob da eine 1 oder eine 0 ins Carry-Bit geshiftet wurde. Wenn lediglich eine Null auftrat — wie hier —, dann springt das Programm sofort zum Herabzählen des Bitzählers 93. Tritt aber eine 1 auf, dann addiert sich der Inhalt von 40/41 zu X/Y.<br/>
-i)  Hier wird der Zustand der betroffenen Speicherstellen und Register nach dem ersten Schleifendurchlauf gezeigt.</p>
+        <p>In Bild 6 sind die Speicheradressen alle dezimal angegeben. Dort finden Sie zunächst die Ausgangslage. In Speicherstelle 40/41 steht die ganze Operation über unverändert die Zahl 321. In 113/114 finden Sie (wegen des LSB/MSB-Formates umgedreht als 114/113) unseren Faktor 65. Akku und Speicherstelle 93 stehen auf 16, dem Bitzähler. In das X- und Y-Register wurde eine Null eingelesen. Im Flußdiagramm ist diese Situation mit einer 1 gekennzeichnet. Ganz unten im Diagramm sehen Sie, daß der Bitzähler 93 erniedrigt und danach geprüft wird, ob er schon gleich Null sei. Daraus folgt, daß die große Schleife 16mal durchlaufen wird. Den ersten Durchlauf (gekennzeichnet durch kleine Buchstaben) verfolgen wir im einzelnen.<br />
+            a) X-Register wird zur Bearbeitung in den Akku geschoben.<br />
+            b) Mittels ASL wird das Bit 7 in die Carry-Flagge geschoben, was einen Carry-Inhalt von 0 bewirkt.<br />
+            c) Der solchermaßen bearbeitete Akku-Inhalt (der sich hier nicht weiter verändert hat) geht wieder zurück ins X-Register.<br />
+            d) Nun ist das Y-Register zur Bearbeitung dran. Es gelangt in den Akku.<br />
+            e) Mittels ROL wandert nun das MSB des X-Registers aus dem Carry-Bit in die O-Bit-Position des Akku<br />
+            f) und alles zusammen wieder ins Y-Register. Insgesamt wird dadurch die 16-Bit-Zahl im X/Y-Register um eine Stellenzahl erhöht, was der Vorbereitung zur Addition dient. (Erinnern Sie sich bitte: Die Kolonne der Einzelergebnisse wird ja addiert). Im Diagramm (ohne Buchstabenkennzeichnung) schließt sich hier noch einePrüfung auf einen eventuellen Überlauf an, der dann mit einer Fehlermeldung beantwortet wird.<br />
+            g) Nun wird das MSB der Speicherstelle 113 nach links ins Carry geschoben. Das ist auch hier noch eine Null.<br />
+            h) Anschließend wandert dieser Carry-Inhalt als Bit 0 in Speicherstelle 114. Bit 7 von 114 landet dafür im Carry. Auch hier wird auf diese Weise die ganze 16-Bit-Zahl 113/114 um ein Bit nach links geschoben und im nächsten Schritt — im Flußdiagramm wieder ohne Buchstabe — geprüft, ob da eine 1 oder eine 0 ins Carry-Bit geshiftet wurde. Wenn lediglich eine Null auftrat — wie hier —, dann springt das Programm sofort zum Herabzählen des Bitzählers 93. Tritt aber eine 1 auf, dann addiert sich der Inhalt von 40/41 zu X/Y.<br />
+            i) Hier wird der Zustand der betroffenen Speicherstellen und Register nach dem ersten Schleifendurchlauf gezeigt.</p>
 
-<p>Römisch II bis XVI zeigen nun jeweils den Zustand nach dem 2. bis 16. Durcharbeiten der großen Schleife. Wenn Sie verstehen möchten, was da passiert, sollten Sie versuchen, Bild 6 nur als Kontrolle zu verwenden und ansonsten mal selbst alle Schritte nachzuvollziehen.</p>
+        <p>Römisch II bis XVI zeigen nun jeweils den Zustand nach dem 2. bis 16. Durcharbeiten der großen Schleife. Wenn Sie verstehen möchten, was da passiert, sollten Sie versuchen, Bild 6 nur als Kontrolle zu verwenden und ansonsten mal selbst alle Schritte nachzuvollziehen.</p>
 
-<h3>16-Bit-Division</h3>
+        <h3>16-Bit-Division</h3>
 
-<p>Beim umgekehrten Weg, nämlich der Teilung von zwei 16-Bit-Zahlen, haben wir nicht so viel Glück: Ich konnte keine derartige Routine im Interpreter entdecken. Nun gibt es aber fast in jedem Lehrbuch der Maschinensprache die Vorstellung eines solchen Programms, so daß man sich das schönste aussuchen kann. Das Prinzip ist auch da dasselbe, wie wir es von der normalen Division gewohnt sind: Der Divisor wird Schritt für Schritt vom Dividenden abgezogen. In der Literatur [1] fand ich eine sehr kurze Routine, die ich Ihnen leicht modifiziert als Programm 1 vorstellen will.</p>
+        <p>Beim umgekehrten Weg, nämlich der Teilung von zwei 16-Bit-Zahlen, haben wir nicht so viel Glück: Ich konnte keine derartige Routine im Interpreter entdecken. Nun gibt es aber fast in jedem Lehrbuch der Maschinensprache die Vorstellung eines solchen Programms, so daß man sich das schönste aussuchen kann. Das Prinzip ist auch da dasselbe, wie wir es von der normalen Division gewohnt sind: Der Divisor wird Schritt für Schritt vom Dividenden abgezogen. In der Literatur [1] fand ich eine sehr kurze Routine, die ich Ihnen leicht modifiziert als Programm 1 vorstellen will.</p>
 
-<p>In Bild 7 ist ein Flußdiagramm dieser Routine gezeigt und in Bild 8 lacht Ihnen wieder das Bit-Gewirr entgegen, das Sie schon von der Multiplikation her kennen, hier aber für die Division.</p>
+        <p>In Bild 7 ist ein Flußdiagramm dieser Routine gezeigt und in Bild 8 lacht Ihnen wieder das Bit-Gewirr entgegen, das Sie schon von der Multiplikation her kennen, hier aber für die Division.</p>
 
-<p>Damit Sie wissen, wo was hinein- oder herauskommt:</p>
+        <p>Damit Sie wissen, wo was hinein- oder herauskommt:</p>
 
-<p>TODO</p>
+        <p>TODO</p>
 
-<p>An dem folgenden Beispiel soll der Programmverlauf getestet werden: Wir teilen 20867 durch 321. Dabei kommt nach Adam Riese heraus: 65, Rest 2.</p>
+        <p>An dem folgenden Beispiel soll der Programmverlauf getestet werden: Wir teilen 20867 durch 321. Dabei kommt nach Adam Riese heraus: 65, Rest 2.</p>
 
-<p>In folgender Weise wird in die Speicherzellen die Aufgabe eingespeist:</p>
+        <p>In folgender Weise wird in die Speicherzellen die Aufgabe eingespeist:</p>
 
-<p>TODO</p>
+        <p>TODO</p>
 
-<p>Als Bit-Zähler dient hier das Y-Register.<br/>
-b)  Erstes Linksschieben des LSB mittels ASL. Dabei gelangt die 1 in das Carry-Bit.<br/>
-c)  Hineinrotieren der 1 aus dem Carry in das MSB mittels ROL. d), e) Linksrotieren der 16-Bit-Zahl in $5C/5D, die jetzt noch 0 ist.<br/>
-f) Situation am Ende der ersten Schleife. Der Bitzähler ist um 1 reduziert.</p>
+        <p>Als Bit-Zähler dient hier das Y-Register.<br />
+            b) Erstes Linksschieben des LSB mittels ASL. Dabei gelangt die 1 in das Carry-Bit.<br />
+            c) Hineinrotieren der 1 aus dem Carry in das MSB mittels ROL. d), e) Linksrotieren der 16-Bit-Zahl in $5C/5D, die jetzt noch 0 ist.<br />
+            f) Situation am Ende der ersten Schleife. Der Bitzähler ist um 1 reduziert.</p>
 
-<p>Im folgenden wird dann jeweils die Situation am Ende der Schleife gezeigt. Beim Berechnen der Differenz muß jeweils darauf geachtet werden, daß die Subtraktion einer Zahl als Addition des Zweierkomplements ausgeführt wird. Das haben wir in den Folgen 3 und 4 der Serie kennengelernt. Allerdings muß an dieser Stelle nochmal gesagt werden, daß die 1, die zum Einerkomplement hinzuaddiert wird, um das Zweierkomplement zu erhalten, das gesetzte Carry-Bit ist. Nun dürfte es für Sie eigentlich keine Probleme mehr geben, was das Nachvollziehen der Divisionsroutine betrifft.</p>
+        <p>Im folgenden wird dann jeweils die Situation am Ende der Schleife gezeigt. Beim Berechnen der Differenz muß jeweils darauf geachtet werden, daß die Subtraktion einer Zahl als Addition des Zweierkomplements ausgeführt wird. Das haben wir in den Folgen 3 und 4 der Serie kennengelernt. Allerdings muß an dieser Stelle nochmal gesagt werden, daß die 1, die zum Einerkomplement hinzuaddiert wird, um das Zweierkomplement zu erhalten, das gesetzte Carry-Bit ist. Nun dürfte es für Sie eigentlich keine Probleme mehr geben, was das Nachvollziehen der Divisionsroutine betrifft.</p>
 
-<p>Damit dürfen wir getrost die 16-Bit-Arithmetik abschließen. Alle vier Grundrechnungsarten können Sie jetzt programmieren. Weitere Rechenarten, wie Potenzieren, das Ziehen von Wurzeln, Logarithmen etc. bedingen ohnehin, daß die Argumente oder Ergebnisse keine Integerzahlen sind. Hier werden wir dann mit Fließkommaarithmetik arbeiten und den dazu vorgesehenen Interpreterroutinen.</p>
+        <p>Damit dürfen wir getrost die 16-Bit-Arithmetik abschließen. Alle vier Grundrechnungsarten können Sie jetzt programmieren. Weitere Rechenarten, wie Potenzieren, das Ziehen von Wurzeln, Logarithmen etc. bedingen ohnehin, daß die Argumente oder Ergebnisse keine Integerzahlen sind. Hier werden wir dann mit Fließkommaarithmetik arbeiten und den dazu vorgesehenen Interpreterroutinen.</p>
 
-<h3>Das Programmprojekt wird fortgeführt</h3>
+        <h3>Das Programmprojekt wird fortgeführt</h3>
 
-<p>Im 6. Teil dieser Serie haben wir ein Projekt gestartet, das dort eine Kopfzeile rückholbar unter den oberen ROM-Bereich verschob. Unser Wissen ist seither gestiegen und damit auch unsere Ansprüche. Eine Kopfzeile reicht nicht mehr, jetzt soll es ein ganzer Hilfsbildschirm sein, den wir erst in aller Ruhe erstellen wollen, um ihn dann jederzeit abrufbar unter das Betriebssystem zu packen. Den Aufruf wollen wir wieder mit der USR-Funktion steuern. Diesmal soll aber so programmiert werden, daß der Hilfsbildschirm erhalten bleibt, man ihn also mehrfach einblenden kann. Über die Nützlichkeit einer solchen Routine braucht man sicherlich nicht viele Worte zu verlieren: Denken Sie da nur mal an Programme, die irgendwelche Tasten mit besonderen Funktionen belegen, für die Sie eine Gedächtnisstütze brauchen, oder &hellip;</p>
+        <p>Im 6. Teil dieser Serie haben wir ein Projekt gestartet, das dort eine Kopfzeile rückholbar unter den oberen ROM-Bereich verschob. Unser Wissen ist seither gestiegen und damit auch unsere Ansprüche. Eine Kopfzeile reicht nicht mehr, jetzt soll es ein ganzer Hilfsbildschirm sein, den wir erst in aller Ruhe erstellen wollen, um ihn dann jederzeit abrufbar unter das Betriebssystem zu packen. Den Aufruf wollen wir wieder mit der USR-Funktion steuern. Diesmal soll aber so programmiert werden, daß der Hilfsbildschirm erhalten bleibt, man ihn also mehrfach einblenden kann. Über die Nützlichkeit einer solchen Routine braucht man sicherlich nicht viele Worte zu verlieren: Denken Sie da nur mal an Programme, die irgendwelche Tasten mit besonderen Funktionen belegen, für die Sie eine Gedächtnisstütze brauchen, oder &hellip;</p>
 
-<p>Als Programm 2 ist ein kleines Demo-Programm abgedruckt, welches zuerst einen Bildschirm erstellt, dann die Routine »Verschieben« aufruft, den Bildschirm löscht und neu beschreibt und schließlich mit einem weiteren USR den alten Bildschirm einblendet (vorher Programm 3 und 4 laden).</p>
+        <p>Als Programm 2 ist ein kleines Demo-Programm abgedruckt, welches zuerst einen Bildschirm erstellt, dann die Routine »Verschieben« aufruft, den Bildschirm löscht und neu beschreibt und schließlich mit einem weiteren USR den alten Bildschirm einblendet (vorher Programm 3 und 4 laden).</p>
 
-<p>Von nun an können Sie immer — auch im Direktmodus — durch ein USR-Kommando diesen Bildschirm abbilden. Zum Programm in der Folge 6 sind noch zwei Dinge zu bemerken, die hier geändert werden sollen. Erstens eine Frage: Ist Ihnen der Computer mal abgestürzt beim Aufruf des Programms? Die Wahrscheinlichkeit dafür ist ungefähr 1 : 60, wenn nämlich ein Interrupt stattfindet, während die Speicherstelle 1 geändert wird. Obwohl wir erst in den nächsten Folgen auf Interrupts eingehen werden, wollen wir die Wahrscheinlichkeit für so einen Absturz auf Null reduzieren. Eine andere Sache ist der Ort, an dem sich das Programm befand. Es hat sich nämlich herausgestellt, daß anscheinend die Nutzung dieses dort gewählten Speicherbereichs nicht ganz so problemlos ist. Bei einigen Anrufen wurde mir erzählt, daß zumindest der Anfang ab $02A7 bei bestimmten Konstellationen überschrieben wird. Deswegen packen wir unser Programm ganz unkonventionell nach $6000, von wo Sie es — das beherrschen Sie ja mit dem SMON inzwischen sicher — dorthin schieben können, wo es Ihnen gefällt. Allerdings müssen dann auch die USR-Adressen geändert werden. Aber auch das dürfte für Sie inzwischen kein Problem mehr sein.</p>
+        <p>Von nun an können Sie immer — auch im Direktmodus — durch ein USR-Kommando diesen Bildschirm abbilden. Zum Programm in der Folge 6 sind noch zwei Dinge zu bemerken, die hier geändert werden sollen. Erstens eine Frage: Ist Ihnen der Computer mal abgestürzt beim Aufruf des Programms? Die Wahrscheinlichkeit dafür ist ungefähr 1 : 60, wenn nämlich ein Interrupt stattfindet, während die Speicherstelle 1 geändert wird. Obwohl wir erst in den nächsten Folgen auf Interrupts eingehen werden, wollen wir die Wahrscheinlichkeit für so einen Absturz auf Null reduzieren. Eine andere Sache ist der Ort, an dem sich das Programm befand. Es hat sich nämlich herausgestellt, daß anscheinend die Nutzung dieses dort gewählten Speicherbereichs nicht ganz so problemlos ist. Bei einigen Anrufen wurde mir erzählt, daß zumindest der Anfang ab $02A7 bei bestimmten Konstellationen überschrieben wird. Deswegen packen wir unser Programm ganz unkonventionell nach $6000, von wo Sie es — das beherrschen Sie ja mit dem SMON inzwischen sicher — dorthin schieben können, wo es Ihnen gefällt. Allerdings müssen dann auch die USR-Adressen geändert werden. Aber auch das dürfte für Sie inzwischen kein Problem mehr sein.</p>
 
-<p>Um diese immerhin schon 2 000 Byte (1000 für den Bildschirm und nochmal 1000 für das Farb-RAM) zu verschieben, bedienen wir uns einer Interpreter-Routine, die seit Ausgabe 3/85 des 64’er auch beim Checksummer verwendet wird — der Blockverschiebe-Routine (Bild 9a).</p>
+        <p>Um diese immerhin schon 2 000 Byte (1000 für den Bildschirm und nochmal 1000 für das Farb-RAM) zu verschieben, bedienen wir uns einer Interpreter-Routine, die seit Ausgabe 3/85 des 64’er auch beim Checksummer verwendet wird — der Blockverschiebe-Routine (Bild 9a).</p>
 
-<p>Wieder besteht unser Programm aus zwei Teilen. Im ersten wird der aktuelle Bildschirm nach oben geschoben. Dieser Teil speist lediglich zuerst die Adressen des Bildschirms und des Betriebssystem-ROM in die Abholspeicherstellen der danach aufgerufenen Routine BLTUC und wiederholt diesen Vorgang für die Bildschirmfarbspeicheradressen. Danach verstellen wir noch den USR-Vektor und kehren mit TRS ins Basic-Programm zurück (siehe Programm 3).</p>
+        <p>Wieder besteht unser Programm aus zwei Teilen. Im ersten wird der aktuelle Bildschirm nach oben geschoben. Dieser Teil speist lediglich zuerst die Adressen des Bildschirms und des Betriebssystem-ROM in die Abholspeicherstellen der danach aufgerufenen Routine BLTUC und wiederholt diesen Vorgang für die Bildschirmfarbspeicheradressen. Danach verstellen wir noch den USR-Vektor und kehren mit TRS ins Basic-Programm zurück (siehe Programm 3).</p>
 
-<p>Komplexer ist der zweite Teil. Um nämlich die Informationen unter dem ROM lesen zu können, muß dieses ausgeschaltet werden. Leider läßt sich das Betriebssystem-ROM nur zusammen mit dem Basic-Interpreter ausschalten. $A3BF ist aber eine Interpreter-Routine! Da bleibt uns nichts anderes übrig, als diese Routine in unser Programm einzubauen, was uns die Gelegenheit gibt, sie uns mal etwas anzusehen. Als Bild 9 ist sie im Flußdiagramm abgebildet.</p>
+        <p>Komplexer ist der zweite Teil. Um nämlich die Informationen unter dem ROM lesen zu können, muß dieses ausgeschaltet werden. Leider läßt sich das Betriebssystem-ROM nur zusammen mit dem Basic-Interpreter ausschalten. $A3BF ist aber eine Interpreter-Routine! Da bleibt uns nichts anderes übrig, als diese Routine in unser Programm einzubauen, was uns die Gelegenheit gibt, sie uns mal etwas anzusehen. Als Bild 9 ist sie im Flußdiagramm abgebildet.</p>
 
-<p>Programm 4 zeigt den zweiten Teil unseres Hilfsbildschirm-Programms.</p>
+        <p>Programm 4 zeigt den zweiten Teil unseres Hilfsbildschirm-Programms.</p>
 
-<p>Von $6040 an, wohin wir am Ende des ersten Teils den USR-Vektor gerichtet haben, wird zunächst wieder Quell- und Zielbereich in den Abholspeicherstellen spezifiziert und jeweils danach zuerst für den Bildschirm, dann für das Farb-RAM, das übernommene Unterprogramm angesprungen. Ab $6077 liegt dann das modifizierte Unterprogramm. Die Befehle SEI und CLI gehören zu den wenigen, die Sie erst noch kennenlernen. Sie sind es, die die Absturzwahrscheinlichkeit auf Null bringen. Jedenfalls wird zuerst das ROM aus und dafür RAM eingeschaltet. Ab $607F bis $60B9 befindet sich die Interpreter-Routine <strong>BLTUC</strong>. Darin wird zunächst die Länge des zu verschiebenden Bereichs berechnet, dann festgestellt, ob nur ganze Pages (Seiten) oder auch ein Restbereich verschoben werden soll. Falls ein solcher Restbereich vorhanden ist, wird auch seine Länge berechnet und zuerst dieser verschoben. Daran schließt sich das Verschieben der ganzen Pages an. Das X- und das Y-Register dienen dabei als Zähler.</p>
+        <p>Von $6040 an, wohin wir am Ende des ersten Teils den USR-Vektor gerichtet haben, wird zunächst wieder Quell- und Zielbereich in den Abholspeicherstellen spezifiziert und jeweils danach zuerst für den Bildschirm, dann für das Farb-RAM, das übernommene Unterprogramm angesprungen. Ab $6077 liegt dann das modifizierte Unterprogramm. Die Befehle SEI und CLI gehören zu den wenigen, die Sie erst noch kennenlernen. Sie sind es, die die Absturzwahrscheinlichkeit auf Null bringen. Jedenfalls wird zuerst das ROM aus und dafür RAM eingeschaltet. Ab $607F bis $60B9 befindet sich die Interpreter-Routine <strong>BLTUC</strong>. Darin wird zunächst die Länge des zu verschiebenden Bereichs berechnet, dann festgestellt, ob nur ganze Pages (Seiten) oder auch ein Restbereich verschoben werden soll. Falls ein solcher Restbereich vorhanden ist, wird auch seine Länge berechnet und zuerst dieser verschoben. Daran schließt sich das Verschieben der ganzen Pages an. Das X- und das Y-Register dienen dabei als Zähler.</p>
 
-<p>Ab $60BB schließt sich wieder unsere eigene Routine an, in der wir die ROMs wieder einschalten. Auf diese Weise lassen sich noch mehrere Hilfsbildschirme unter ROM-Bereiche packen. Vielleicht überlegen Sie sich mal dazu einen Weg?</p>
+        <p>Ab $60BB schließt sich wieder unsere eigene Routine an, in der wir die ROMs wieder einschalten. Auf diese Weise lassen sich noch mehrere Hilfsbildschirme unter ROM-Bereiche packen. Vielleicht überlegen Sie sich mal dazu einen Weg?</p>
 
-<h3>Die ROM-Bereiche als Datenquelle</h3>
+        <h3>Die ROM-Bereiche als Datenquelle</h3>
 
-<p>Die ROM-Bereiche enthalten nicht nur ausgeklügelte Maschinenprogramme, sondern auch eine Menge Daten. Sollten Sie mal in die Verlegenheit kommen, beispielsweise die Zahl Pi im MFLPT-Format verwenden zu müssen, dann erfordert das einen ganz schönen Aufwand an Rechen- und Programmarbeit, oder Sie möchten bestimmte Texte wie beispielsweise eine Fehlermeldung verfügbar halten &hellip;. und so weiter. Viele von diesen Daten sind schon in der Firmware enthalten und wir werden im folgenden festhalten, wo sie sich befinden und welches Format man vorfindet. Sehen wir uns zunächst Zahlen an (Tabelle 1). Es existieren noch weitere Zahlentabellen in den ROM-Bereichen, die aber selten von Interesse sind. Ebenso wie Zahlen, findet man auch Texte im ROM als ASCII-Werte abgelegt (Tabelle 2):</p>
+        <p>Die ROM-Bereiche enthalten nicht nur ausgeklügelte Maschinenprogramme, sondern auch eine Menge Daten. Sollten Sie mal in die Verlegenheit kommen, beispielsweise die Zahl Pi im MFLPT-Format verwenden zu müssen, dann erfordert das einen ganz schönen Aufwand an Rechen- und Programmarbeit, oder Sie möchten bestimmte Texte wie beispielsweise eine Fehlermeldung verfügbar halten &hellip;. und so weiter. Viele von diesen Daten sind schon in der Firmware enthalten und wir werden im folgenden festhalten, wo sie sich befinden und welches Format man vorfindet. Sehen wir uns zunächst Zahlen an (Tabelle 1). Es existieren noch weitere Zahlentabellen in den ROM-Bereichen, die aber selten von Interesse sind. Ebenso wie Zahlen, findet man auch Texte im ROM als ASCII-Werte abgelegt (Tabelle 2):</p>
 
-<p>Sollten Sie mal in die Verlegenheit kommen, solche Texte ausgeben zu wollen, dann legen Sie sie nicht nochmal in einer eigenen Texttabelle ab, sondern schöpfen Sie aus dem Fundus, den wir im ROM-Bereich fix und fertig haben.</p>
+        <p>Sollten Sie mal in die Verlegenheit kommen, solche Texte ausgeben zu wollen, dann legen Sie sie nicht nochmal in einer eigenen Texttabelle ab, sondern schöpfen Sie aus dem Fundus, den wir im ROM-Bereich fix und fertig haben.</p>
 
-<p>Diese Folge soll nicht abgeschlossen werden, ohne eine Korrektur. Auf einen Fehler, dem ich aufgesessen bin (in der Literatur befinde ich mich aber in guter Gesellschaft, andere sind auch davon betroffen), haben mich zwei aufmerksame Leser hingewiesen. Es dreht sich um die Flaggensetzung bei Compare-Befehlen. Die N-Flagge ist nämlich nicht nur vom Ergebnis des Vergleichs, sondern auch noch von den aktuellen Akku- beziehungsweise Registerinhalten bestimmt.</p>
+        <p>Diese Folge soll nicht abgeschlossen werden, ohne eine Korrektur. Auf einen Fehler, dem ich aufgesessen bin (in der Literatur befinde ich mich aber in guter Gesellschaft, andere sind auch davon betroffen), haben mich zwei aufmerksame Leser hingewiesen. Es dreht sich um die Flaggensetzung bei Compare-Befehlen. Die N-Flagge ist nämlich nicht nur vom Ergebnis des Vergleichs, sondern auch noch von den aktuellen Akku- beziehungsweise Registerinhalten bestimmt.</p>
 
-<p>Bild 1 in der 5. Folge muß deshalb korrigiert werden:<br/>
-(A,X,Y) größer als die Daten: N kann 0 oder 1 sein<br/>
-(A,X,Y) = Daten N = 0<br/>
-(A,X,Y) kleiner als die Daten: N kann 0 oder 1 sein.</p>
+        <p>Bild 1 in der 5. Folge muß deshalb korrigiert werden:<br />
+            (A,X,Y) größer als die Daten: N kann 0 oder 1 sein<br />
+            (A,X,Y) = Daten N = 0<br />
+            (A,X,Y) kleiner als die Daten: N kann 0 oder 1 sein.</p>
 
-<p>Das stammt aus dem offziellen MOS-Technology-Handbuch und entspricht somit hoffentlich der Wahrheit [2]. Das bedeutet, daß man bei den Abfragen durch Branch-Befehle nach den Vergleichsbefehlen etwas vorsichtig sein sollte, was die N-Flagge angeht.</p>
+        <p>Das stammt aus dem offziellen MOS-Technology-Handbuch und entspricht somit hoffentlich der Wahrheit [2]. Das bedeutet, daß man bei den Abfragen durch Branch-Befehle nach den Vergleichsbefehlen etwas vorsichtig sein sollte, was die N-Flagge angeht.</p>
 
-<p>Zum Schluß noch, wie üblich, die Tabelle 3 mit den neuen Assembler-Befehlen.</p>
+        <p>Zum Schluß noch, wie üblich, die Tabelle 3 mit den neuen Assembler-Befehlen.</p>
 
-<address class="author">(Heimo Ponnath/gk)</address>
+        <address class="author">(Heimo Ponnath/gk)</address>
 
-<p>[1]    »Computerspiele und Wissenswertes Commodore 64«, Haar bei München: Markt &amp; Technik Verlag, 1984. Das ist die von P. Lücke besorgte Übersetzung des amerikanischen Buches »More on the sixtyfour« und ist jedem Assembler-Programmierer warm zu empfehlen.<br/>
-[2]    »MOS Microcomputers Programmier-Handbuch«, Frankfurt: Commodore MOS Technology</p>
+        <p>[1] »Computerspiele und Wissenswertes Commodore 64«, Haar bei München: Markt &amp; Technik Verlag, 1984. Das ist die von P. Lücke besorgte Übersetzung des amerikanischen Buches »More on the sixtyfour« und ist jedem Assembler-Programmierer warm zu empfehlen.<br />
+            [2] »MOS Microcomputers Programmier-Handbuch«, Frankfurt: Commodore MOS Technology</p>
     </article>
 </body>
+
 </html>

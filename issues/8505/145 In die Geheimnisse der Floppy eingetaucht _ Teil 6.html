@@ -16,153 +16,154 @@
 <body>
     <article>
         <h1>In die Geheimnisse der Floppy eingetaucht _ Teil 6</h1>
-<p class="intro">Formatieren einer Diskette ist für jeden Floppy-Besitzer das erste, was er mit ihr macht. Was beim Formatieren passiert und weshalb die Floppy so nervig rattert, warum es so lange dauert und wie es schneller geht, erfahren Sie in folgendem Artikel.</p>
+        <p class="intro">Formatieren einer Diskette ist für jeden Floppy-Besitzer das erste, was er mit ihr macht. Was beim Formatieren passiert und weshalb die Floppy so nervig rattert, warum es so lange dauert und wie es schneller geht, erfahren Sie in folgendem Artikel.</p>
 
-<p>Wie jedem Floppy-Besitzer bekannt ist, muß eine Diskette vor dem ersten Speichern von Daten formatiert werden. Wie eine Diskette nach einem solchen Formatiervorgang aussieht, wurde schon besprochen.</p>
+        <p>Wie jedem Floppy-Besitzer bekannt ist, muß eine Diskette vor dem ersten Speichern von Daten formatiert werden. Wie eine Diskette nach einem solchen Formatiervorgang aussieht, wurde schon besprochen.</p>
 
-<p>Uns soll nun interessieren, was während des Formatierens so alles in der Floppy passiert und warum die 1541 so lange für einen eigentlich sehr einfachen Vorgang benötigt.</p>
+        <p>Uns soll nun interessieren, was während des Formatierens so alles in der Floppy passiert und warum die 1541 so lange für einen eigentlich sehr einfachen Vorgang benötigt.</p>
 
-<p>Zur Wiederholung: Beim Formatieren werden vom DOS alle wichtigen Markierungen auf die Diskette gebracht und außerdem sämtliche Sektoren in ihrer späteren Form angelegt.</p>
+        <p>Zur Wiederholung: Beim Formatieren werden vom DOS alle wichtigen Markierungen auf die Diskette gebracht und außerdem sämtliche Sektoren in ihrer späteren Form angelegt.</p>
 
-<p>Der Vorgang des Formatierens verwendet zu seiner Ausführung einen uns schon bekannten Jobcode, nämlich $E0.</p>
+        <p>Der Vorgang des Formatierens verwendet zu seiner Ausführung einen uns schon bekannten Jobcode, nämlich $E0.</p>
 
-<p>Bevor das DOS den eigentlichen Formatiervorgang startet, wird ab $0600 (also im Puffer 3) ein Sprungbefehl abgelegt: JMP $FAC7.</p>
+        <p>Bevor das DOS den eigentlichen Formatiervorgang startet, wird ab $0600 (also im Puffer 3) ein Sprungbefehl abgelegt: JMP $FAC7.</p>
 
-<p>Dieser Sprungbefehl ist eine Art Vektor, der im RAM liegt und somit verändert werden kann. Er bietet dem Benutzer die Möglichkeit, eine eigene Routine einzubauen, die dann bei jedem Trackwechsel angesprungen wird, um so einige wirksame Manipulationen an der Formatierung vorzunehmen, indem zum Beispiel Werte in der Zeropage verändert werden, doch dazu später. Üblicherweise zeigt dieser Vektor direkt auf eine Jobroutine, die für das Formatieren zuständig ist. Diese Routine wird nun vom Hauptprogramm mit dem Jobcode $E0, der in Speicherstelle $03 geschrieben wird, aufgerufen.</p>
+        <p>Dieser Sprungbefehl ist eine Art Vektor, der im RAM liegt und somit verändert werden kann. Er bietet dem Benutzer die Möglichkeit, eine eigene Routine einzubauen, die dann bei jedem Trackwechsel angesprungen wird, um so einige wirksame Manipulationen an der Formatierung vorzunehmen, indem zum Beispiel Werte in der Zeropage verändert werden, doch dazu später. Üblicherweise zeigt dieser Vektor direkt auf eine Jobroutine, die für das Formatieren zuständig ist. Diese Routine wird nun vom Hauptprogramm mit dem Jobcode $E0, der in Speicherstelle $03 geschrieben wird, aufgerufen.</p>
 
-<h3>Formatieren in der Jobschleife</h3>
+        <h3>Formatieren in der Jobschleife</h3>
 
-<p>Am Anfang der Jobroutine steht nun die Abfrage, ob schon mindestens ein Track formatiert wurde oder ob dieser Einsprung der allererste ist. Ist dieser Einsprung der erste, so werden alle Parameter für den Steppermotor gesetzt; danach erfolgt ein Rücksprung in die Jobschleife. Hier wird der Tonkopf nun 45 (!) Tracks zurückgefahren, was sich in jenem charakteristischen Rattern der Floppystation äußert.</p>
+        <p>Am Anfang der Jobroutine steht nun die Abfrage, ob schon mindestens ein Track formatiert wurde oder ob dieser Einsprung der allererste ist. Ist dieser Einsprung der erste, so werden alle Parameter für den Steppermotor gesetzt; danach erfolgt ein Rücksprung in die Jobschleife. Hier wird der Tonkopf nun 45 (!) Tracks zurückgefahren, was sich in jenem charakteristischen Rattern der Floppystation äußert.</p>
 
-<p>Nun, können Sie sagen, es würde auch reichen, wenn der Kopf nur 35 oder 40 Spuren zurücktransportiert würde. In der Tat ist der Wert 45 sehr hoch. Man muß aber bedenken, daß es passieren kann, daß der Schreib-/Lesekopf der Floppy durch eine defekte Diskette oder einen Programmierfehler zu weit nach innen gefahren und beispielsweise auf Track 42 am Anschlag gelandet ist, daß ein Zurückfahren um 40 Tracks einfach nicht ausreicht, um den Tonkopf richtig zu positionieren.</p>
+        <p>Nun, können Sie sagen, es würde auch reichen, wenn der Kopf nur 35 oder 40 Spuren zurücktransportiert würde. In der Tat ist der Wert 45 sehr hoch. Man muß aber bedenken, daß es passieren kann, daß der Schreib-/Lesekopf der Floppy durch eine defekte Diskette oder einen Programmierfehler zu weit nach innen gefahren und beispielsweise auf Track 42 am Anschlag gelandet ist, daß ein Zurückfahren um 40 Tracks einfach nicht ausreicht, um den Tonkopf richtig zu positionieren.</p>
 
-<p>Der Wert von 45 Tracks enthält also eine Sicherheitsreserve, die ein Positionieren auf Spur 1 mit Sicherheit ermöglicht.</p>
+        <p>Der Wert von 45 Tracks enthält also eine Sicherheitsreserve, die ein Positionieren auf Spur 1 mit Sicherheit ermöglicht.</p>
 
-<p>Wurde der Kopf also auf Track 1 positioniert, so erfolgt erneut ein Einsprung in die Formatierungsroutine; eine Speicherstelle zeigt jetzt an, daß der Kopf auf Track 1 positioniert wurde und das Formatieren starten kann.</p>
+        <p>Wurde der Kopf also auf Track 1 positioniert, so erfolgt erneut ein Einsprung in die Formatierungsroutine; eine Speicherstelle zeigt jetzt an, daß der Kopf auf Track 1 positioniert wurde und das Formatieren starten kann.</p>
 
-<p>Jetzt wird noch geprüft, ob auf die nächste Spur umgeschaltet werden soll, da die aktuelle bereits formatiert wurde (wenn ja, erfolgt wieder ein Einsprung in die Jobschleife, um das Nötige zu tun).</p>
+        <p>Jetzt wird noch geprüft, ob auf die nächste Spur umgeschaltet werden soll, da die aktuelle bereits formatiert wurde (wenn ja, erfolgt wieder ein Einsprung in die Jobschleife, um das Nötige zu tun).</p>
 
-<p>Diese Abfragen am Anfang der Formatierungsroutine scheinen umständlich und überflüssig zu sein; das Gefühl täuscht jedoch. Wir dürfen ja nicht vergessen, daß die Routine immer nur jeweils einen Track formatiert und danach zur Jobschleife zurückkehrt, damit der Tonkopf weitergeführt werden kann. Wir haben also gewissermaßen eine Endlosschleife, die nur durch die Feststellung, daß Spur 35 fertig formatiert wurde, beendet wird.</p>
+        <p>Diese Abfragen am Anfang der Formatierungsroutine scheinen umständlich und überflüssig zu sein; das Gefühl täuscht jedoch. Wir dürfen ja nicht vergessen, daß die Routine immer nur jeweils einen Track formatiert und danach zur Jobschleife zurückkehrt, damit der Tonkopf weitergeführt werden kann. Wir haben also gewissermaßen eine Endlosschleife, die nur durch die Feststellung, daß Spur 35 fertig formatiert wurde, beendet wird.</p>
 
-<h3>Ausmessen einer Spur</h3>
+        <h3>Ausmessen einer Spur</h3>
 
-<p>Jetzt haben wir aber endlich alle Voraussetzungen zum Formatieren eines Tracks erfüllt und wollen an die Arbeit gehen. Der Abschnitt, der jetzt besprochen wird, ist übrigens für die langwierige Formatierung verantwortlich und sorgt für die ausgedehnten Wartezeiten.</p>
+        <p>Jetzt haben wir aber endlich alle Voraussetzungen zum Formatieren eines Tracks erfüllt und wollen an die Arbeit gehen. Der Abschnitt, der jetzt besprochen wird, ist übrigens für die langwierige Formatierung verantwortlich und sorgt für die ausgedehnten Wartezeiten.</p>
 
-<p>Bevor die SYNC-Markierungen und Sektoren auf eine Spur geschrieben werden, wird diese Spur vom DOS »ausgemessen«.</p>
+        <p>Bevor die SYNC-Markierungen und Sektoren auf eine Spur geschrieben werden, wird diese Spur vom DOS »ausgemessen«.</p>
 
-<p>Das Betriebssystem der 1541 »weiß« im Normalfall genau, wieviele Bytes für die SYNC-Markierungen und Sektoren einer Spur benötigt, beziehungsweise verbraucht werden.</p>
+        <p>Das Betriebssystem der 1541 »weiß« im Normalfall genau, wieviele Bytes für die SYNC-Markierungen und Sektoren einer Spur benötigt, beziehungsweise verbraucht werden.</p>
 
-<p>Jetzt ist es aber so, daß die Sektoren nicht genau auf jede Spur abgemessen sind; vielmehr hat die Diskette pro Spur eine etwas höhere Kapazität, als eigentlich benötigt wird. Aus dieser Tatsache folgt natürlich, daß zwischen den einzelnen Sektoren »Leerstellen« entstehen, die keine Daten enthalten.</p>
+        <p>Jetzt ist es aber so, daß die Sektoren nicht genau auf jede Spur abgemessen sind; vielmehr hat die Diskette pro Spur eine etwas höhere Kapazität, als eigentlich benötigt wird. Aus dieser Tatsache folgt natürlich, daß zwischen den einzelnen Sektoren »Leerstellen« entstehen, die keine Daten enthalten.</p>
 
-<p>Da jetzt aber die Länge der Tracks von außen (Track 1) nach innen (Track 35) kontinuierlich abnimmt, werden diese Leerstellen immer kleiner; wir haben also unterschiedliche Anzahlen von »Leerbytes« zwischen den Sektoren.</p>
+        <p>Da jetzt aber die Länge der Tracks von außen (Track 1) nach innen (Track 35) kontinuierlich abnimmt, werden diese Leerstellen immer kleiner; wir haben also unterschiedliche Anzahlen von »Leerbytes« zwischen den Sektoren.</p>
 
-<p>Das DOS ist nun bestrebt, die Sektoren jeder Spur möglichst symmetrisch anzuordnen, also immer den gleichen Abstand zwischen zwei Sektoren eines Tracks zu haben. Bild 1 zeigt, was passiert, wenn keine vorherige Ausmessung stattfindet.</p>
+        <p>Das DOS ist nun bestrebt, die Sektoren jeder Spur möglichst symmetrisch anzuordnen, also immer den gleichen Abstand zwischen zwei Sektoren eines Tracks zu haben. Bild 1 zeigt, was passiert, wenn keine vorherige Ausmessung stattfindet.</p>
 
-<p>Um das Ziel einer »symmetrisch« formatierten Diskette zu erreichen, stellt das DOS durch einige komplizierte Schreib- und Lesevorgänge das Verhältnis zwischen benötigtem und vorhandenem Platz einer Spur fest. Aus diesem Verhältnis kann nun anhand einer einfachen Rechnung festgestellt werden, wieviel Platz zwischen den einzelnen Sektoren freigelassen werden muß.</p>
+        <p>Um das Ziel einer »symmetrisch« formatierten Diskette zu erreichen, stellt das DOS durch einige komplizierte Schreib- und Lesevorgänge das Verhältnis zwischen benötigtem und vorhandenem Platz einer Spur fest. Aus diesem Verhältnis kann nun anhand einer einfachen Rechnung festgestellt werden, wieviel Platz zwischen den einzelnen Sektoren freigelassen werden muß.</p>
 
-<p>Nachdem diese komplizierte Vermessung stattgefunden hat, die mehrere Diskettenumdrehungen und damit Zeit erfordert, beginnt nun das eigentliche Formatieren der Diskette, das mit allem Drum und Dran normalerweise nicht mehr als eine y3 Sekunde für eine Track benötigt.</p>
+        <p>Nachdem diese komplizierte Vermessung stattgefunden hat, die mehrere Diskettenumdrehungen und damit Zeit erfordert, beginnt nun das eigentliche Formatieren der Diskette, das mit allem Drum und Dran normalerweise nicht mehr als eine y3 Sekunde für eine Track benötigt.</p>
 
-<h3>Das Anlegen der Sektoren im Puffer</h3>
+        <h3>Das Anlegen der Sektoren im Puffer</h3>
 
-<p>Bevor geschrieben werden kann, müssen die Sektoren erst einmal im Pufferspeicher der 1541 hergestellt werden. Da sich die einzelnen Sektoren nur durch deren Header unterscheiden, reicht das Anlegen der Blockheader; die Inhalte der Datenblöcke sind bei jedem Sektor gleich und bestehen aus dem schon bekannten Muster $4B gefolgt von 255 $01-Bytes.</p>
+        <p>Bevor geschrieben werden kann, müssen die Sektoren erst einmal im Pufferspeicher der 1541 hergestellt werden. Da sich die einzelnen Sektoren nur durch deren Header unterscheiden, reicht das Anlegen der Blockheader; die Inhalte der Datenblöcke sind bei jedem Sektor gleich und bestehen aus dem schon bekannten Muster $4B gefolgt von 255 $01-Bytes.</p>
 
-<p>Die Blockheader werden alle in einem Pufferspeicher ($0300-$03FF) abgelegt; der Inhalt der Datenblöcke steht ab $0500 bis $05FF.</p>
+        <p>Die Blockheader werden alle in einem Pufferspeicher ($0300-$03FF) abgelegt; der Inhalt der Datenblöcke steht ab $0500 bis $05FF.</p>
 
-<h3>Schreiben eines Tracks auf Diskette</h3>
+        <h3>Schreiben eines Tracks auf Diskette</h3>
 
-<p>So, alle Vorarbeiten wären jetzt abgeschlossen. Wir können mit dem Schreiben auf Diskette beginnen. Zuerst wird der Disk-Controller auf Schreibmodus gestellt und die Spur der Diskette gelöscht.</p>
+        <p>So, alle Vorarbeiten wären jetzt abgeschlossen. Wir können mit dem Schreiben auf Diskette beginnen. Zuerst wird der Disk-Controller auf Schreibmodus gestellt und die Spur der Diskette gelöscht.</p>
 
-<p>Der gesamte Spurinhalt wird nun während einer einzigen Diskettenumdrehung (% Sekunde) auf die Diskette gebracht, wobei zuerst die SYNC-Markierung für den Blockheader, danach der Blockheader selbst geschrieben werden. Nach einer Lücke von 9 Byte folgt die SYNC-Markierung des Datenblocks mit den zugehörigen Datenbyte. Den Abschluß eines Sektors bildet der schon erwähnte »Leerraum«, der aus der vorher errechneten Anzahl von Byte besteht.</p>
+        <p>Der gesamte Spurinhalt wird nun während einer einzigen Diskettenumdrehung (% Sekunde) auf die Diskette gebracht, wobei zuerst die SYNC-Markierung für den Blockheader, danach der Blockheader selbst geschrieben werden. Nach einer Lücke von 9 Byte folgt die SYNC-Markierung des Datenblocks mit den zugehörigen Datenbyte. Den Abschluß eines Sektors bildet der schon erwähnte »Leerraum«, der aus der vorher errechneten Anzahl von Byte besteht.</p>
 
-<p>Zur Sicherheit erfolgt nach dem Schreiben eine Verify-Routine, die auf eventuelle Disketten- oder Schreibfehler kontrolliert und bei deren Auftreten einen »24, READ ERROR« ausgibt.</p>
+        <p>Zur Sicherheit erfolgt nach dem Schreiben eine Verify-Routine, die auf eventuelle Disketten- oder Schreibfehler kontrolliert und bei deren Auftreten einen »24, READ ERROR« ausgibt.</p>
 
-<p>Mit dieser letzten Maßnahme ist eine Spur einer Diskette fertig formatiert worden, und es wird auf Erreichen der Spur 35 abgefragt. Wurde Spur 35 formatiert, so werden alle Flags für das Formatieren zurückgesetzt, die Jobschleife verlassen und ins Hauptprogramm zurückgekehrt.</p>
+        <p>Mit dieser letzten Maßnahme ist eine Spur einer Diskette fertig formatiert worden, und es wird auf Erreichen der Spur 35 abgefragt. Wurde Spur 35 formatiert, so werden alle Flags für das Formatieren zurückgesetzt, die Jobschleife verlassen und ins Hauptprogramm zurückgekehrt.</p>
 
-<h3>Formatieren ohne ID</h3>
+        <h3>Formatieren ohne ID</h3>
 
-<p>Im Hauptprogramm wird nun auf Track 18 positioniert. Die BAM der Diskette wird hergestellt und in Block 18,0 abgelegt. Anschließend wird noch der erste Directory-Block (18,1) mit Nullen vollgefüllt und ebenfalls abgespeichert, womit das Formatieren abgeschlossen wäre.</p>
+        <p>Im Hauptprogramm wird nun auf Track 18 positioniert. Die BAM der Diskette wird hergestellt und in Block 18,0 abgelegt. Anschließend wird noch der erste Directory-Block (18,1) mit Nullen vollgefüllt und ebenfalls abgespeichert, womit das Formatieren abgeschlossen wäre.</p>
 
-<p>Formatiert man eine Diskette nur kurz, das heißt ohne Angabe einer ID beim N-Befehl, so werden alle anfänglichen Schritte weggelassen. Es wird in diesem Fall nur auf das richtige Formatkennzeichen in der BAM ($41/ 65/A) kontrolliert und danach der eben beschriebene Vorgang auf Track 18 durchgeführt.</p>
+        <p>Formatiert man eine Diskette nur kurz, das heißt ohne Angabe einer ID beim N-Befehl, so werden alle anfänglichen Schritte weggelassen. Es wird in diesem Fall nur auf das richtige Formatkennzeichen in der BAM ($41/ 65/A) kontrolliert und danach der eben beschriebene Vorgang auf Track 18 durchgeführt.</p>
 
-<h3>Formatieren mit »Variationen«</h3>
+        <h3>Formatieren mit »Variationen«</h3>
 
-<p>Nun wäre unser Floppykurs natürlich kein Floppykurs, wenn wir unsere neu gewonnenen theoretischen Kenntnisse nicht sofort in die Praxis umsetzen wollten.</p>
+        <p>Nun wäre unser Floppykurs natürlich kein Floppykurs, wenn wir unsere neu gewonnenen theoretischen Kenntnisse nicht sofort in die Praxis umsetzen wollten.</p>
 
-<p>In der Tat kann man mit Hilfe der Formatierroutine im DOS einige nette »Scherze« auf eine Diskette bringen, die entweder dem Spieltrieb oder dem Softwareschutz dienen können.</p>
+        <p>In der Tat kann man mit Hilfe der Formatierroutine im DOS einige nette »Scherze« auf eine Diskette bringen, die entweder dem Spieltrieb oder dem Softwareschutz dienen können.</p>
 
-<p>Ich habe vorhin schon erwähnt, daß die Formatierroutine jeweils über einen Sprungbefehl bei $0600 im RAM der Floppy aufgerufen wird.</p>
+        <p>Ich habe vorhin schon erwähnt, daß die Formatierroutine jeweils über einen Sprungbefehl bei $0600 im RAM der Floppy aufgerufen wird.</p>
 
-<p>Diese Adresse wird beijedem neuen Track angesprungen und bietet so die Möglichkeit, Tracks zu erzeugen, die in ihrem Aufbau voneinander abweichen, wenn entsprechende Eingriffe vorgenommen werden.</p>
+        <p>Diese Adresse wird beijedem neuen Track angesprungen und bietet so die Möglichkeit, Tracks zu erzeugen, die in ihrem Aufbau voneinander abweichen, wenn entsprechende Eingriffe vorgenommen werden.</p>
 
-<p>Diese Möglichkeit eines Eingriffes wollen wir an dieser Stelle aber gar nicht erst weiter diskutieren, da es ziemlich aussichtslos ist, hier ohne dokumentiertes DOS-Listing an die Arbeit zu gehen.</p>
+        <p>Diese Möglichkeit eines Eingriffes wollen wir an dieser Stelle aber gar nicht erst weiter diskutieren, da es ziemlich aussichtslos ist, hier ohne dokumentiertes DOS-Listing an die Arbeit zu gehen.</p>
 
-<p>Daß wir kein DOS Listing besitzen, soll aber noch lange nicht heißen, daß wir nicht in der Lage sind, auf anderem Weg, Eingriffe in die Formatierung vorzunehmen. Wenn wir nicht effektiv mit der fest eingebauten Routine zusammenarbeiten können, dann schreiben wir uns eben ein vollständig eigenes Programm, das im RAM der Floppy abgelegt wird und uns für Abänderungen unendlich viele Möglichkeiten bietet.</p>
+        <p>Daß wir kein DOS Listing besitzen, soll aber noch lange nicht heißen, daß wir nicht in der Lage sind, auf anderem Weg, Eingriffe in die Formatierung vorzunehmen. Wenn wir nicht effektiv mit der fest eingebauten Routine zusammenarbeiten können, dann schreiben wir uns eben ein vollständig eigenes Programm, das im RAM der Floppy abgelegt wird und uns für Abänderungen unendlich viele Möglichkeiten bietet.</p>
 
-<h3>Formatierung »selbst gebaut«</h3>
+        <h3>Formatierung »selbst gebaut«</h3>
 
-<p>Sehen Sie sich einmal Listing 1 an. Ich habe hier ein Formatiersystem entwickelt, das einfacher und schneller arbeitet als die DOS-Routine und trotzdem ein paar zusätzliche Möglichkeiten bietet.</p>
+        <p>Sehen Sie sich einmal Listing 1 an. Ich habe hier ein Formatiersystem entwickelt, das einfacher und schneller arbeitet als die DOS-Routine und trotzdem ein paar zusätzliche Möglichkeiten bietet.</p>
 
-<p>Da das Gesamtprinzip aber fast 100prozentig mit der im DOS eingebauten Routine übereinstimmt, können Sie sich anhand des Source-Code-Listings einmal die »praktische Ausführung« einer Formatierroutine ansehen.</p>
+        <p>Da das Gesamtprinzip aber fast 100prozentig mit der im DOS eingebauten Routine übereinstimmt, können Sie sich anhand des Source-Code-Listings einmal die »praktische Ausführung« einer Formatierroutine ansehen.</p>
 
-<p>Um Ihnen die Eingabe des Programms zu erleichtern, habe ich einen DATA-Lader als Listing 2 beigefügt, wobei ich Ihnen empfehlen möchte, diesen gleich einmal einzutippen.</p>
+        <p>Um Ihnen die Eingabe des Programms zu erleichtern, habe ich einen DATA-Lader als Listing 2 beigefügt, wobei ich Ihnen empfehlen möchte, diesen gleich einmal einzutippen.</p>
 
-<p>Das Programm wird nur aktiviert, wenn alle DATAs richtig eingetippt wurden. Haben Sie alles richtig gemacht, so steht nach der Ausführung des Laders ein Maschinenprogramm am Basic-Anfang, dem eine Basic-Zeile beigefügt ist. Das Programm sollten Sie sich jetzt mit SAVE auf eine Diskette speichern und danach mit RUN starten.</p>
+        <p>Das Programm wird nur aktiviert, wenn alle DATAs richtig eingetippt wurden. Haben Sie alles richtig gemacht, so steht nach der Ausführung des Laders ein Maschinenprogramm am Basic-Anfang, dem eine Basic-Zeile beigefügt ist. Das Programm sollten Sie sich jetzt mit SAVE auf eine Diskette speichern und danach mit RUN starten.</p>
 
-<p>Nach einer winzigen Verzögerung erscheint die READY-Meldung und der Cursor wieder. Das Formatierungsprogramm wurde jetzt in den Bereich ab $C000 (49152) geschoben und der SAVE-Vektor abgeändert.</p>
+        <p>Nach einer winzigen Verzögerung erscheint die READY-Meldung und der Cursor wieder. Das Formatierungsprogramm wurde jetzt in den Bereich ab $C000 (49152) geschoben und der SAVE-Vektor abgeändert.</p>
 
-<p>Tippen Sie jetzt einfach den Befehl SAVE — ohne Anführungszeichen und Filenamen — ein und drücken Sie RETURN. Es erscheint nun die Startmeldung des Formatprogrammes. Sie könnenjetzt einen Namen für eine Diskette eingeben (maximal 16 Zeichen werden angenommen). Danach erwartet der Computer eine zweistellige ID. Schließlich, und das ist das besondere an diesem Programm, können Sie noch den ersten und letzten zu formatierenden Track eingeben. Diese Eingabe muß hexadezimal erfolgen und erlaubt einen Bereich von $01 bis $FF.</p>
+        <p>Tippen Sie jetzt einfach den Befehl SAVE — ohne Anführungszeichen und Filenamen — ein und drücken Sie RETURN. Es erscheint nun die Startmeldung des Formatprogrammes. Sie könnenjetzt einen Namen für eine Diskette eingeben (maximal 16 Zeichen werden angenommen). Danach erwartet der Computer eine zweistellige ID. Schließlich, und das ist das besondere an diesem Programm, können Sie noch den ersten und letzten zu formatierenden Track eingeben. Diese Eingabe muß hexadezimal erfolgen und erlaubt einen Bereich von $01 bis $FF.</p>
 
-<p><strong>Achtung!</strong> Wird eine Zahl größer als $29 (41) eingegeben, wird es in der Regel kritisch. Der Kopf ist dann nämlich am oberen Anschlagpunkt angelangt.</p>
+        <p><strong>Achtung!</strong> Wird eine Zahl größer als $29 (41) eingegeben, wird es in der Regel kritisch. Der Kopf ist dann nämlich am oberen Anschlagpunkt angelangt.</p>
 
-<p>Etwas ist noch zu beachten: Ein Nachformatieren einer Spur auf einer gefüllten Diskette ist mit dem Programm ohne Änderung nicht möglich, da das Directory auf jeden Fall neu geschrieben wird. Wird die Diskette nicht vollständig formatiert, so ist darauf zu achten, daß die gleiche ID eingegeben wird, wie sie schon für die übrige Diskette Gültigkeit hat, da es sonst einen »29, DISK ID MISMATCH ERROR« gibt.</p>
+        <p>Etwas ist noch zu beachten: Ein Nachformatieren einer Spur auf einer gefüllten Diskette ist mit dem Programm ohne Änderung nicht möglich, da das Directory auf jeden Fall neu geschrieben wird. Wird die Diskette nicht vollständig formatiert, so ist darauf zu achten, daß die gleiche ID eingegeben wird, wie sie schon für die übrige Diskette Gültigkeit hat, da es sonst einen »29, DISK ID MISMATCH ERROR« gibt.</p>
 
-<p>Wollen Sie dennoch einen Einzeltrack neu formatieren, ohne das Directory zu zerstören, so könnenSie das durch eine einfache Änderung im Floppy-Programm erreichen. Sie gehen in Listing la an die Adresse $06B5. Den Befehl JSR $EE40 und das nachfolgende RTS ersetzen Sie durch lauter NOPs.</p>
+        <p>Wollen Sie dennoch einen Einzeltrack neu formatieren, ohne das Directory zu zerstören, so könnenSie das durch eine einfache Änderung im Floppy-Programm erreichen. Sie gehen in Listing la an die Adresse $06B5. Den Befehl JSR $EE40 und das nachfolgende RTS ersetzen Sie durch lauter NOPs.</p>
 
-<p>Eine Änderung des Directory-Track unterbleibt jetzt, sofern Sie die Tracknummern zur Formatierung entsprechend wählen, da dieser Befehl die Routine zum kurzen Formatieren im DOS aufgerufen hätte.</p>
+        <p>Eine Änderung des Directory-Track unterbleibt jetzt, sofern Sie die Tracknummern zur Formatierung entsprechend wählen, da dieser Befehl die Routine zum kurzen Formatieren im DOS aufgerufen hätte.</p>
 
-<p>In jedem Fall gilt aber: Bei Formatieren von Einzeltracks müssen diese die gleiche ID wie die übrige Diskette erhalten.</p>
+        <p>In jedem Fall gilt aber: Bei Formatieren von Einzeltracks müssen diese die gleiche ID wie die übrige Diskette erhalten.</p>
 
-<p>Eine weitere Möglichkeit dient der Schonung des Laufwerks. Wenn Sie sich das Floppy-Programm noch einmal betrachten, dann finden Sie bei Adresse $0696 den Befehl an den Disk-Controller, einen BUMP auszuführen. Wenn Sie hier das $C0 durch ein $00 ersetzen, dann unterbleibt dieses Anschlagen des Tonkopfes am Anfang des Formatierens. Diese Maßnahme ist immer dann nützlich, wenn mehrere Disketten hintereinander formatiert werden sollen.</p>
+        <p>Eine weitere Möglichkeit dient der Schonung des Laufwerks. Wenn Sie sich das Floppy-Programm noch einmal betrachten, dann finden Sie bei Adresse $0696 den Befehl an den Disk-Controller, einen BUMP auszuführen. Wenn Sie hier das $C0 durch ein $00 ersetzen, dann unterbleibt dieses Anschlagen des Tonkopfes am Anfang des Formatierens. Diese Maßnahme ist immer dann nützlich, wenn mehrere Disketten hintereinander formatiert werden sollen.</p>
 
-<p>Zur Zeitdauer ist noch zu sagen, daß das Programm für eine Diskette zirka 30 Sekunden benötigt und damit um einiges schneller ist als das Programm im DOS der 1541. Warum das so ist, wollen wir gleich erfahren.</p>
+        <p>Zur Zeitdauer ist noch zu sagen, daß das Programm für eine Diskette zirka 30 Sekunden benötigt und damit um einiges schneller ist als das Programm im DOS der 1541. Warum das so ist, wollen wir gleich erfahren.</p>
 
-<h3>Geschwindigkeit; aber wie?</h3>
+        <h3>Geschwindigkeit; aber wie?</h3>
 
-<p>In meinem Formatierprogramm wurde die Berechnung der Lücke zwischen zwei Sektoren weggelassen. Wir können nämlich davon ausgehen, daß diese Lücken auf jeder Diskette in etwa gleich sind. Aus diesem Grund verwende ich einfach einen Erfahrungswert für die Länge der Lücke, der zusätzlich noch einen Sicherheitsbereich enthält. Diesen Wert sehen Sie in Listing la an der Adresse $05DF.</p>
+        <p>In meinem Formatierprogramm wurde die Berechnung der Lücke zwischen zwei Sektoren weggelassen. Wir können nämlich davon ausgehen, daß diese Lücken auf jeder Diskette in etwa gleich sind. Aus diesem Grund verwende ich einfach einen Erfahrungswert für die Länge der Lücke, der zusätzlich noch einen Sicherheitsbereich enthält. Diesen Wert sehen Sie in Listing la an der Adresse $05DF.</p>
 
-<p>Wenn Sie mit dem Programm Disketten formatieren, werden Sie feststellen, daß die Datensicherheit auch weiterhin voll gewährleistet ist.</p>
+        <p>Wenn Sie mit dem Programm Disketten formatieren, werden Sie feststellen, daß die Datensicherheit auch weiterhin voll gewährleistet ist.</p>
 
-<p>Im Gegensatz zu anderen schnellen Formatierprogrammen habe ich aber nicht auf ein Verify verzichtet, da das Formatieren die einzige Möglichkeit bietet, defekte Disketten rechtzeitig zu erkennen, ohne daß dabei wichtige Daten verlorengehen. Einmal ganz davon abgesehen, macht das Verifizieren außerdem nur einen sehr kleinen Teil am Geschwindigkeitsverlust aus, so daß die Sicherheit vor einigen Sekunden Zeitgewinn Vorrang haben sollte.</p>
+        <p>Im Gegensatz zu anderen schnellen Formatierprogrammen habe ich aber nicht auf ein Verify verzichtet, da das Formatieren die einzige Möglichkeit bietet, defekte Disketten rechtzeitig zu erkennen, ohne daß dabei wichtige Daten verlorengehen. Einmal ganz davon abgesehen, macht das Verifizieren außerdem nur einen sehr kleinen Teil am Geschwindigkeitsverlust aus, so daß die Sicherheit vor einigen Sekunden Zeitgewinn Vorrang haben sollte.</p>
 
-<p>Wollen Sie die Zeit dennoch einmal ohne Verify messen, so »klemmen« sie den Rest der Formatierungsroutine ab $05FD ganz einfach ab, indem Sie an dieser Stelle nach JMP $FE00 ein JMP $FD9E einfügen. Eine weitere Verbesserung gegenüber dem DOS 2.6 der 1541 hat eigentlich mehr kosmetischen Charakter.</p>
+        <p>Wollen Sie die Zeit dennoch einmal ohne Verify messen, so »klemmen« sie den Rest der Formatierungsroutine ab $05FD ganz einfach ab, indem Sie an dieser Stelle nach JMP $FE00 ein JMP $FD9E einfügen. Eine weitere Verbesserung gegenüber dem DOS 2.6 der 1541 hat eigentlich mehr kosmetischen Charakter.</p>
 
-<p>Es geht hier um den Leerinhalt von Datenblöcken, nachdem eine Diskette neu formatiert wurde. Den Inhalt werden Sie höchstwahrscheinlich schon kennen: Es steht am Anfang des Datenblocks ein $4B gefolgt von 255 $01-Bytes.</p>
+        <p>Es geht hier um den Leerinhalt von Datenblöcken, nachdem eine Diskette neu formatiert wurde. Den Inhalt werden Sie höchstwahrscheinlich schon kennen: Es steht am Anfang des Datenblocks ein $4B gefolgt von 255 $01-Bytes.</p>
 
-<p>Dieser Inhalt ist eigentlich auf einen Fehler im DOS zurückzuführen; er müßte, wie auch bei den großen Commodore-Floppies aus 256 $00-Bytes bestehen.</p>
+        <p>Dieser Inhalt ist eigentlich auf einen Fehler im DOS zurückzuführen; er müßte, wie auch bei den großen Commodore-Floppies aus 256 $00-Bytes bestehen.</p>
 
-<p>In meinem Programm fülle ich alle Sektoren mit dem üblichen Wert $00.</p>
+        <p>In meinem Programm fülle ich alle Sektoren mit dem üblichen Wert $00.</p>
 
-<p>Noch ein paar Hinweise zur Benutzung des Formatierprogramms.</p>
+        <p>Noch ein paar Hinweise zur Benutzung des Formatierprogramms.</p>
 
-<p>Nach RUN wird automatisch der SAVE-Vektor auf den Programmstart der Formatierroutine gestellt. Wird kein Filename angegeben, so erfolgt ein Sprung in das Formatierprogramm. Durch Drücken von RUN STOP/RESTORE läßt sich der SAVE-Vektor wieder richtig »hinbiegen«. Hierzu dürfte jedoch kein Anlaß bestehen, da bei fehlendem Filenamen kein Programm gestartet wird.</p>
+        <p>Nach RUN wird automatisch der SAVE-Vektor auf den Programmstart der Formatierroutine gestellt. Wird kein Filename angegeben, so erfolgt ein Sprung in das Formatierprogramm. Durch Drücken von RUN STOP/RESTORE läßt sich der SAVE-Vektor wieder richtig »hinbiegen«. Hierzu dürfte jedoch kein Anlaß bestehen, da bei fehlendem Filenamen kein Programm gestartet wird.</p>
 
-<p>Mußten Sie dennoch einmal RESTORE drücken, so läßt sich das Formatier-System mit SYS 49664 ($C200) erneut starten; nach Beendigung wird unter anderem auch der SAVE-Vektor wieder auf das Programm zurückgestellt.</p>
+        <p>Mußten Sie dennoch einmal RESTORE drücken, so läßt sich das Formatier-System mit SYS 49664 ($C200) erneut starten; nach Beendigung wird unter anderem auch der SAVE-Vektor wieder auf das Programm zurückgestellt.</p>
 
-<p>Wollen Sie sich den Disk-Status anzeigen lassen, so tippen Sie SYS49962. Es erscheint danach auch die Frage nach einem weiteren Formatiervorgang, die Sie entsprechend beantworten. Nach dieser Anzeige wird der SAVE-Vektor ebenfalls wieder hergestellt.</p>
+        <p>Wollen Sie sich den Disk-Status anzeigen lassen, so tippen Sie SYS49962. Es erscheint danach auch die Frage nach einem weiteren Formatiervorgang, die Sie entsprechend beantworten. Nach dieser Anzeige wird der SAVE-Vektor ebenfalls wieder hergestellt.</p>
 
-<p>Ich möchte Sie an dieser Stelle auf ein paar Speicherstellen in der Zeropage der 1541 aufmerksam machen. Wie Sie wissen, werden dort nach einem RESET ein paar Konstanten abgelegt, die vom Benutzer (beliebig) verändert werden können. Mit den Konstanten meine ich zum Beispiel $08 als Kennzeichen eines Blockheaders oder $07 als Kennzeichen eines Datenblocks.</p>
+        <p>Ich möchte Sie an dieser Stelle auf ein paar Speicherstellen in der Zeropage der 1541 aufmerksam machen. Wie Sie wissen, werden dort nach einem RESET ein paar Konstanten abgelegt, die vom Benutzer (beliebig) verändert werden können. Mit den Konstanten meine ich zum Beispiel $08 als Kennzeichen eines Blockheaders oder $07 als Kennzeichen eines Datenblocks.</p>
 
-<p>Wie Sie aus der Zeropage-Belegung in der 64’er-Ausgabe 1/1985, Seite 151 entnehmen können, werden diese beiden Werte in den Speicherstellen $38 (Wert 07) und $39 (Wert 08) abgelegt und können nun abgeändert werden. Der neue Wert, den Sie vielleicht in diese Speicherstellen eintragen, sollte sich jedoch im Bereich von $00 bis $0F bewegen, da es sonst Schwierigkeiten beim Lesen geben kann. Die Folge eines Leseversuchs mit normalen Werten, wenn eine Diskette anders formatiert wurde, sind entweder ein »20, READ ERROR« oder ein »22, READ ERROR«.</p>
+        <p>Wie Sie aus der Zeropage-Belegung in der 64’er-Ausgabe 1/1985, Seite 151 entnehmen können, werden diese beiden Werte in den Speicherstellen $38 (Wert 07) und $39 (Wert 08) abgelegt und können nun abgeändert werden. Der neue Wert, den Sie vielleicht in diese Speicherstellen eintragen, sollte sich jedoch im Bereich von $00 bis $0F bewegen, da es sonst Schwierigkeiten beim Lesen geben kann. Die Folge eines Leseversuchs mit normalen Werten, wenn eine Diskette anders formatiert wurde, sind entweder ein »20, READ ERROR« oder ein »22, READ ERROR«.</p>
 
-<p>Der Vorteil dieser Errors ist jedoch die Möglichkeit, den Blöcken auch Inhalte mitzugeben, womit ein sehr wirkungsvoller Kopierschutz konstruiert werden kann.</p>
+        <p>Der Vorteil dieser Errors ist jedoch die Möglichkeit, den Blöcken auch Inhalte mitzugeben, womit ein sehr wirkungsvoller Kopierschutz konstruiert werden kann.</p>
 
-<p>Zum Lesen oder Beschreiben der Diskette müssen die Werte in den beiden Speicherstellen nur jeweils richtig gestellt werden; dann kann ein ganz normaler Zugriff stattfinden.</p>
+        <p>Zum Lesen oder Beschreiben der Diskette müssen die Werte in den beiden Speicherstellen nur jeweils richtig gestellt werden; dann kann ein ganz normaler Zugriff stattfinden.</p>
 
-<p>Mit Hilfe des Formatierprogramms können Sie jetzt auch noch zusätzlich illegale Spuren beschreiben. Hierbei müssen Sie allerdings, wie in der letzten Folge besprochen, auf Jobschleifenebene arbeiten, um die Begrenzung auf die Spuren 1 bis 35 zu umgehen.</p>
+        <p>Mit Hilfe des Formatierprogramms können Sie jetzt auch noch zusätzlich illegale Spuren beschreiben. Hierbei müssen Sie allerdings, wie in der letzten Folge besprochen, auf Jobschleifenebene arbeiten, um die Begrenzung auf die Spuren 1 bis 35 zu umgehen.</p>
 
-<p>In der nächsten Folge möchte ich Ihnen etwas vorstellen, das sich GCR-Codierung nennt. Wir werden dann erfahren, daß Daten keineswegs so auf Diskette geschrieben werden, wie sie im Puffer vorliegen, sondern, daß vorher eine Codierung erfolgt.</p>
+        <p>In der nächsten Folge möchte ich Ihnen etwas vorstellen, das sich GCR-Codierung nennt. Wir werden dann erfahren, daß Daten keineswegs so auf Diskette geschrieben werden, wie sie im Puffer vorliegen, sondern, daß vorher eine Codierung erfolgt.</p>
 
-<address class="author">(Karsten Schramm/gk)</address>
+        <address class="author">(Karsten Schramm/gk)</address>
     </article>
 </body>
+
 </html>
