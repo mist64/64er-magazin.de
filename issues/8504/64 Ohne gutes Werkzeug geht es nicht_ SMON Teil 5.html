@@ -70,7 +70,7 @@
 
         <p>In diesem Block stehen die ersten acht Programme Ihrer Übungsdiskette, auch der Name des soeben gelöschten ist dabei.</p>
 
-        <p>Trotzdem ist dieses Programm tatsächlich gelöscht und erscheint nicht mehr, wenn Sie sich das Directory anzeigen lassen. Vergleichen Sie den Eintrag des gelöschten Programms mit den anderen, fällt auf, daß 3 Byte vor Beginn des Namens bei allen anderen »82« steht (sofern es sich um Programmfiles handelt), bei dem gelöschten aber »00«. Die Reparatur ist nun denkbar einfach: Sie brauchen lediglich die »00« mit »82« zu überschreiben. Einen Haken hat die Sache allerdings noch. Beim SCRATCHEN sind die vom Programm belegten Blöcke in der BAM als frei gekennzeichnet worden und jeder neue Eintrag würde das als gelöscht gekennzeichnete File endgültig überschreiben. Um das zu verhindern, müssen Sie nach erfolgter Reparatur die Diskette validieren (von Basic aus mit Kommando: OPEN 1, 8, 15, &ldquo;V&rdquo;). Dabei wird die BAM neu erzeugt und korrigiert.</p>
+        <p>Trotzdem ist dieses Programm tatsächlich gelöscht und erscheint nicht mehr, wenn Sie sich das Directory anzeigen lassen. Vergleichen Sie den Eintrag des gelöschten Programms mit den anderen, fällt auf, daß 3 Byte vor Beginn des Namens bei allen anderen »82« steht (sofern es sich um Programmfiles handelt), bei dem gelöschten aber »00«. Die Reparatur ist nun denkbar einfach: Sie brauchen lediglich die »00« mit »82« zu überschreiben. Einen Haken hat die Sache allerdings noch. Beim SCRATCHEN sind die vom Programm belegten Blöcke in der BAM als frei gekennzeichnet worden und jeder neue Eintrag würde das als gelöscht gekennzeichnete File endgültig überschreiben. Um das zu verhindern, müssen Sie nach erfolgter Reparatur die Diskette validieren (von Basic aus mit Kommando: OPEN 1, 8, 15, "V"). Dabei wird die BAM neu erzeugt und korrigiert.</p>
 
         <h2>Schützen eines Files</h2>
 
@@ -82,12 +82,12 @@
 
         <p>Wollen Sie eine ganze Diskette vor versehentlichem Löschen oder Formatieren schützen, gibt es die Möglichkeit, die Löschschutzkerbe abzukleben. Es geht jedoch auch anders. <strong>Achtung! Die im folgenden beschriebene Prozedur läßt sich nicht mehr rückgängig machen, auch nicht mit dem Disk-Monitor!</strong></p>
 
-        <p>Nehmen Sie also eine Diskette, die Sie anschließend »hart formatieren« können (also mit Eingabe einer ID). Starten Sie nun den Disk-Monitor und lesen Sie die BAM mit »R 12 00« ein. Das dritte Byte enthält »41«. Diese »41« ist ein Kennzeichen für das DOS der 1541- oder 4040-Floppy. Ändern Sie diese Bytes durch Überschreiben in »45« und speichern Sie die Änderung mit »W« auf die Diskette zurück. Verlassen Sie nun SMON und versuchen Sie, etwas zu löschen. Ergebnis siehe oben. Versuchen Sie auch, die Diskette »weich«, also zum Beispiel mit OPEN 1,8,15,&ldquo;N:TEST&rdquo; zu formatieren. Auch das ist jetzt nicht mehr möglich. Aber es kommt noch besser: Starten Sie noch einmal den Disk-Monitor und versuchen Sie, die Änderung durch Zurückschreiben der »41« an Stelle der »45« rückgängig zu machen.</p>
+        <p>Nehmen Sie also eine Diskette, die Sie anschließend »hart formatieren« können (also mit Eingabe einer ID). Starten Sie nun den Disk-Monitor und lesen Sie die BAM mit »R 12 00« ein. Das dritte Byte enthält »41«. Diese »41« ist ein Kennzeichen für das DOS der 1541- oder 4040-Floppy. Ändern Sie diese Bytes durch Überschreiben in »45« und speichern Sie die Änderung mit »W« auf die Diskette zurück. Verlassen Sie nun SMON und versuchen Sie, etwas zu löschen. Ergebnis siehe oben. Versuchen Sie auch, die Diskette »weich«, also zum Beispiel mit OPEN 1,8,15,"N:TEST" zu formatieren. Auch das ist jetzt nicht mehr möglich. Aber es kommt noch besser: Starten Sie noch einmal den Disk-Monitor und versuchen Sie, die Änderung durch Zurückschreiben der »41« an Stelle der »45« rückgängig zu machen.</p>
 
-        <p>Auch das ist nicht mehr möglich, wir hatten Sie bereits gewarnt! Es bleibt lediglich die Möglichkeit, die Diskette »hart«, zum Beispiel mit OPEN 1,8,15,&ldquo;N:TESTTE&rdquo;<br>
+        <p>Auch das ist nicht mehr möglich, wir hatten Sie bereits gewarnt! Es bleibt lediglich die Möglichkeit, die Diskette »hart«, zum Beispiel mit OPEN 1,8,15,"N:TESTTE"<br>
             zu formatieren. Sollten Sie nun entgegen allen Warnungen doch Ihre Master-Diskette gegen Schreibzugriffe gesichert haben, verraten wir Ihnen ausnahmsweise, wie Sie den Eingriff trotzdem rückgängig machen können. Dazu überlisten wir das DOS des 1541-Laufwerkes, indem wir ihm vorgaukeln, es hätte eine Diskette im Normalformat vor sich. Wir verwenden den Memory-Write-Befehl, mit dem wir in die Speicherstelle 0101 (Zero-Page Adresse) des 1541-RAM einfach ein »A« schreiben. Der CHR$-Code des »A« ist 65, oder in hexadezimaler Schreibweise 41. Erinnern Sie sich? Dieser Wert stand ursprünglich im dritten Byte des Tracks 18, Sektor 0. Mit folgendem kleinen Programm umgehen wir einfach die DOS-Kennzeichnung und wir können die Diskette wieder normal beschreiben. Am sinnvollsten ist es, sofort den SMON zu starten, das vorher in 45 abgeänderte Byte wieder in 41 zu verwandeln und abzuspeichern. Die Diskette kann dann wieder zum Lesen und Schreiben verwendet werden. Hier nun das kleine Programm:<br>
             10 OPEN 1,8,15<br>
-            20 PRINT#1, &ldquo;M-W"CHR$(1)CHR$(1)CHR$(1)CHR$(65)<br>
+            20 PRINT#1, "M-W"CHR$(1)CHR$(1)CHR$(1)CHR$(65)<br>
             30 CLOSE1</p>
 
         <h2>Ändern des Diskettennamens oder der ID</h2>
@@ -115,7 +115,7 @@
         <p>Beim Arbeiten mit dem Disk-Monitor werden sämtliche Fehler vom Laufwerk direkt, auch ohne Eingabe von »@«, ausgegeben, zum Beispiel »ILLEGAL TRACK OR SECTOR«, wenn Sie mit »R« einen Block lesen wollen, den es gar nicht gibt. Einen Fehler hat das Programm allerdings, den wir nicht verschweigen wollen. Der letzte Block eines Files enthält als Koppeladresse »00 FF«. Da es einen solchen Block nicht geben kann, »weiß« das DOS, daß es am Ende angelangt ist. Versuchen Sie aber, den nächsten Block (Spur 0, Sektor 255!!) mit »R« zu lesen, erscheint als Fehlermeldung nicht, wie es sein müßte, »ILLEGAL BLOCK OR SECTOR«, sondern »SYNTAX ERROR«. Das ist zwar eigentlich unerheblich, sollte aber erwähnt werden. Der Fehler liegt in der Routine, die unsere Zahleneingaben in das richtige Diskettenformat wandelt. Es fehlte einfach der Platz im Programm für eine »korrekte« Umwandlung, wir mußten uns mit einer »Sparroutine« behelfen.</p>
 
         <p>Abschließend noch ein SMON-Trick, den wir einem aufmerksamen Leser verdanken. Für eine Directory-Ausgabe fehlte der Platz im SMON. Es geht aber hilfsweise so: Laden Sie das Directory zum Beispiel mit<br>
-            <strong>L &ldquo;$&rdquo; 8000</strong><br>
+            <strong>L "$" 8000</strong><br>
             an einen freien Speicherplatz. Mit »M« oder »K« können Sie jetzt das Directory »lesen«. Damit sind alle wichtigen Funktionen für den Umgang mit der Diskette im SMON enthalten.
         </p>
 
@@ -129,7 +129,7 @@
         <p>Beim Laden von SMON setzt das Betriebssystem nämlich die Zeiger für das Basic-Programmende auf das SMON-Ende, also irgendwo in den $C&hellip;-Bereich.</p>
 
         <p>Damit ist aber jede weitere Eingabe von Basic-Zeilen unmöglich und führt zu dem oben angegebenen Fehler. Das ist nebenbei auch der Grund, wenn der SMON-Befehl »B« zum Erzeugen von DATA-Zeilen einmal nicht funktionieren will. Abhilfe schafft ein simples »NEW« unmittelbar nach dem Laden von SMON. SMON selbst bleibt dabei unbeeinträchtigt, denn er liegt ja nicht im Basic-Bereich. SMON ist also jetzt ordnungsgemäß geladen und kann mit »SYS 49152« wie gewohnt gestartet werden. Laden Sie nun den neuen Teil mit<br>
-            <strong>L &ldquo;SMON TEIL 5&rdquo;</strong><br>
+            <strong>L "SMON TEIL 5"</strong><br>
             ohne Eingabe einer weiteren Adresse. Damit steht er automatisch an der richtigen Stelle. Jetzt müssen wir SMON noch klarmachen, daß er über den neuen Befehl »Z« zum Aufruf unseres Disk-Monitors verfügt. Geben Sie dazu<br>
             <strong>M C020</strong><br>
             ein, brechen Sie mit STOP ab und ändern Sie die »00« nach »58« (Speicherstelle $C026) in »5A«. Das ist der ASCII-Wert für »Z«. Zum Einbinden der Startadresse des Disk-Monitors geben Sie<br>
@@ -138,7 +138,7 @@
         </p>
 
         <p>Der Disk-Monitor ist damit integriert und der nunmehr komplette SMON kann mit<br>
-            <strong>S &ldquo;SMON $C000&rdquo; C000 CFFA</strong><br>
+            <strong>S "SMON $C000" C000 CFFA</strong><br>
             abgespeichert werden.
         </p>
 
