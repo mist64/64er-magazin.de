@@ -1,4 +1,4 @@
-# Künstlich intelligent?
+# Künstlich intelligent? [8]
 
 »Eliza«, die wir als Anregung für unseren Programmierwettbewerb (das Ergebnis finden Sie in dieser Ausgabe) genommen haben, ist einer der klassischen Versuche auf dem Gebiet der Künstlichen Intelligenz. Das Programm und vor allem die Reaktion des Publikums zeigten schon vor Jahren, daß der Computer für intelligent gehalten wird, weil der Mensch in die programmierten Fragen und Antworten Intelligenz, das heißt einen bestimmten Sinn hineininterpretiert. Derartige Effekte nutzte man aber schon in der Antike beim Orakel von Delphi ganz ohne Rechner...
 
@@ -8,7 +8,7 @@ Ob es um automatische Übersetzung, akustische Spracheingabe oder Programmieren 
 
 Michael Pauly, Chefredakteur
 
-# Die neue Abmahnmasche: Vorsicht bei Programmangeboten
+# Die neue Abmahnmasche: Vorsicht bei Programmangeboten [8]
 
 > Die neueste Abmahn-Masche, mit der unterbeschäftigte Rechtsanwälte hart am Rande der Legalität zu Geld zu kommen suchen, trifft die Programmierer
 
@@ -30,7 +30,7 @@ Mit einem Abmahnschwindel besonderer Art tat sich im vergangenen Jahr eine »R +
 
 (py)
 
-# Aktuell
+# Aktuell [9-10]
 
 ## Software fast umsonst
 
@@ -129,7 +129,7 @@ Interessantes, Seltsames und sonstige Ungereimtheiten aus dem Computer-Dschungel
 
 Nachdem wir dieses Mal nur über Firmen berichtet haben, wird unsere nächste Kuriositätenecke wieder etwas bunter gemischt sein. Was zu erwarten ist, wollen wir noch nicht verraten. Wenn Sie etwas Interessantes, Kurioses oder Witziges herausfinden sollten, dann schreiben Sie uns ruhig (Ihre Informtionen sollten auf der Wahrheit beruhen und nachprüfbar sein).
 
-# Leserforum
+# Leserforum [11-13]
 
 ## Wie funktioniert Multicolor beim VC 20?
 
@@ -145,22 +145,22 @@ Wesentlich ausführlicher ist das Problem bereits im VC 20-Kurs in der Ausgabe 3
 
 ## Probleme mit Super Line?
 
-Ich habe das Programm SUPER LINE aus dem 64’er Sonderheft (Tips & Tricks) abgetippt und die richtigen Checksummen erhalten. Es wurde auch keine Fehlermeldung ausgegeben. Nach dem Befehl »O« und RETURN erscheint jedoch nur ein wirres Muster. Nach »F« ist derBildschirm im normalen Zustand mit Cursor und »Ready«. Nach einem erneuten »O« und einem RUN/STOP-RESTORE erscheint ein ganzer Bildschirm voller As.
+Ich habe das Programm SUPER LINE aus dem 64’er Sonderheft (Tips & Tricks) abgetippt und die richtigen Checksummen erhalten. Es wurde auch keine Fehlermeldung ausgegeben. Nach dem Befehl »O« und RETURN erscheint jedoch nur ein wirres Muster. Nach »F« ist der Bildschirm im normalen Zustand mit Cursor und »Ready«. Nach einem erneuten »O« und einem RUN/STOP-RESTORE erscheint ein ganzer Bildschirm voller As.
 
 Eine Eingabe eines Zeichens mit 80 Zeichen pro Zeile ist nicht möglich. Ich habe aber angenommen, daß das mit obigem Programm möglich sein sollte.
 
 Kurt Lüscher-Feldmann
 
-Viele Leser haben das gleiche Problem: Sie lesen die Anleitung nicht ganz durch. In der Anleitung zu Super Line steht ganz deutlich, daß Text mit dem Befehl »W, x, y, ’’Text’« im 80-Zeichen-Modus ausgegeben werden kann. Von Eintippen im 80-Zeichenmodus war nicht die Rede. Aber früher oder später wird uns vielleicht ein Leser ein 80-Zeichen-Programm mit dieser Möglichkeit einschicken?!
+Viele Leser haben das gleiche Problem: Sie lesen die Anleitung nicht ganz durch. In der Anleitung zu Super Line steht ganz deutlich, daß Text mit dem Befehl »W, x, y, "Text"« im 80-Zeichen-Modus ausgegeben werden kann. Von Eintippen im 80-Zeichenmodus war nicht die Rede. Aber früher oder später wird uns vielleicht ein Leser ein 80-Zeichen-Programm mit dieser Möglichkeit einschicken?!
 
 ## Nochmals »Graphics Basic«
 
 Zu Ihrem Artikel über »Graphics Basic« in Ausgabe 12/84 habe ich einige Fragen:
 
 1.	Wo kann man Graphics Basic beziehen und wieviel kostet diese Erweiterung genau?
-2.	Kann man die anderen Basic-Befehle (zum Beispiel PO-KEs fürListschutz) einsetzen?
+2.	Kann man die anderen Basic-Befehle (zum Beispiel POKEs fürListschutz) einsetzen?
 3.	Wieviele Farben sind mit Graphics Basic realisierbar?
-4.	Kann man mit dem Window-Befehl den Bildschirm in verschiedene Aktivitätszonen wie bei Dallas Quest (Oben Grafik, unten Text, derunterderGrafik verschwindet) aufteilen?
+4.	Kann man mit dem Window-Befehl den Bildschirm in verschiedene Aktivitätszonen wie bei Dallas Quest (Oben Grafik, unten Text, der unter der Grafik verschwindet) aufteilen?
 5.	In wieviele Aktivitätszonen kann man den Bildschirm unterteilen? Ulrich Reiter
 
 Die Firma Ariolasoft, die das Programm ursprünglich vertreiben wollte, konnte sich nicht dazu entschließen, das Programm auf den deutschen Markt zu bringen. Vielleicht, weil die Herstellerfirma »HES« wegen Bankrott versteigert wurde.
@@ -197,7 +197,7 @@ In der nächsten 64’er finden Sie Druckerroutinen für MPS 801 und 802.
 
 ## Vizawrite-Hilfe gesucht
 
-Seit einigerZeit verarbeite ich meine Texte mit einer englischen Version von Vizawrite. Mit ein paar Kunstgriffen läßt sich dieses Programm ganz gut handhaben. Es gibt aber einen Schönheitsfehler: Auf dem Bildschirm erscheinen nicht die deutschen Umlaute, und meine bisherigen Versuche, selbst Bildschirmzeichen zu definieren, schlugen fehl, da diese von Vizawrite wieder überschrieben werden. Wer kennt eine nicht allzu komplizierte Lösung für mein Problem?
+Seit einiger Zeit verarbeite ich meine Texte mit einer englischen Version von Vizawrite. Mit ein paar Kunstgriffen läßt sich dieses Programm ganz gut handhaben. Es gibt aber einen Schönheitsfehler: Auf dem Bildschirm erscheinen nicht die deutschen Umlaute, und meine bisherigen Versuche, selbst Bildschirmzeichen zu definieren, schlugen fehl, da diese von Vizawrite wieder überschrieben werden. Wer kennt eine nicht allzu komplizierte Lösung für mein Problem?
 
 Bertram Hafner
 
@@ -335,7 +335,7 @@ Bisher haben wir leider keinen Schaltplan oder eine Bezugsquelle für eine derar
 
 Falls Sie jedoch auch mit einem akkugepufferten Zusatzspeicher zufrieden sind, ist vielleicht das Xtend 64-Modul von Roßmöller das richtige für Sie. Dieses Modul erweitert den C 64 wahlweise um 32 KByte RAM (akkugepuffert) oder 128 KByte EPROM. EPROM und RAM können auch gemischt eingesteckt werden.
 
-# Leser fragen - Willi Brechtl antwortet
+# Leser fragen - Willi Brechtl antwortet [13]
 
 > Hallo liebe Leser, hier bin ich wieder, um Eure Fragen zu beantworten.
 
@@ -343,7 +343,7 @@ Ich werde mich hauptsächlich um Leserbriefe kümmern, die nicht in das sachlich
 
 Also: Wenn Sie als Anfänger Probleme mit Computer, Software oder Handbuch haben, dann wenden Sie sich in Zukunft doch einfach vertrauensvoll direkt an mich.
 
-## Fragen zum C 6
+## Fragen zum C 16
 
 Ich habe mirerst kürzlich den C16 zugelegt, und habe zu diesem einige Fragen:
 
@@ -368,7 +368,7 @@ Kingsoft, Fritz Schäfer, Schnackebusch 4, 5106 Roetgen
 
 ## »Load Error« bei Datasette?
 
-Ich habe folgendes Problem mit meinerDatasette: Sie macht andauernd »? LOAD ERROR« trotz Kassettenwechsel. Mit meiner Datasette ist alles in Ordnung. Man hat mir nun gesagt, daß vielleicht etwas mit meinem Mikroprozessor im C 64nichtstimmt. Kann es tatsächlich daran liegen? Ronny Gaab
+Ich habe folgendes Problem mit meiner Datasette: Sie macht andauernd »? LOAD ERROR« trotz Kassettenwechsel. Mit meiner Datasette ist alles in Ordnung. Man hat mir nun gesagt, daß vielleicht etwas mit meinem Mikroprozessor im C 64nichtstimmt. Kann es tatsächlich daran liegen? Ronny Gaab
 
 Leider kann man bei so allgemeinen Angaben nur vage Vermutungen über die Fehlerursache anstellen. Tritt der Lesefehler nur bei fremden Programmen auf oder auch bei selbst abgespeicherten? Wurde die Abspeicherung mit VERIFY überprüft, und mit welchem Ergebnis? Können nur vereinzelt Programme nicht gelesen werden oder funktioniert gar nichts mehr?
 
@@ -380,7 +380,7 @@ Bei der Aufzeichnung denken Sie bitte unbedingt immer an das VERIFY, daß nach j
 
 ## Ordnungs-Probleme
 
-Ich nehme an einem Fernkurs für Basic teil und erhalte jeweils ein paar Lehrbriefemit Übungs-(programmier-)aufgaben. Seit ich nun eine Diskettenstation habe, speichere ich diese Übungsprogramme auf Diskette ab. Nun habe ich aber ein fürchterliches Durcheinander auf meinen Disketten. Daher habe ich mit meinen jetzigen Fähigkeiten ein Disketten-Verwaltungsprogramm geschrieben, mit dem ich die gewünschte Übungsaufgabe aufAnhieb finden kann. Wenn ich allerdings die Übung geladen und korrigiert habe, ist natürlich anschließend mein Verwaltungsprogramm nicht mehr im Speicher, so daß ich es immer wieder nachladen muß, was recht viel Zeit kostet (immerhin 63 Blöcke). Was kann ich dagegen tun? Gibt es einen Speicher, in dem ich mein Verwaltungsprogramm ablegen und jederzeit wieder hervorrufen kann, ohne es umständlich wieder von Diskette laden zu müssen ? Wie gelange ich in diesen Speicher und wie funktioniert das Ganze?
+Ich nehme an einem Fernkurs für Basic teil und erhalte jeweils ein paar Lehrbriefemit Übungs-(programmier-)aufgaben. Seit ich nun eine Diskettenstation habe, speichere ich diese Übungsprogramme auf Diskette ab. Nun habe ich aber ein fürchterliches Durcheinander auf meinen Disketten. Daher habe ich mit meinen jetzigen Fähigkeiten ein Disketten-Verwaltungsprogramm geschrieben, mit dem ich die gewünschte Übungsaufgabe auf Anhieb finden kann. Wenn ich allerdings die Übung geladen und korrigiert habe, ist natürlich anschließend mein Verwaltungsprogramm nicht mehr im Speicher, so daß ich es immer wieder nachladen muß, was recht viel Zeit kostet (immerhin 63 Blöcke). Was kann ich dagegen tun? Gibt es einen Speicher, in dem ich mein Verwaltungsprogramm ablegen und jederzeit wieder hervorrufen kann, ohne es umständlich wieder von Diskette laden zu müssen ? Wie gelange ich in diesen Speicher und wie funktioniert das Ganze?
 
 Christian Wüger
 
@@ -388,7 +388,7 @@ Ein solcher Speicher ist vom Betriebssystem her nicht vorgesehen, kann aber auf 
 
 Eine viel einfachere Methode ist es jedoch, für jede Diskette eine Karteikarte mit den Programmnamen anzulegen. Diese Karte können Sie in der Diskettenhülle mit unterbringen. Wenn Sie dann noch von vorneherein für Ordnung sorgen, indem Sie jeweils logisch irgendwie zusammengehörende Programme auf einer Diskette zusammenfassen (also beispielsweise Übungsaufgaben zu Lektionen 1-5 auf Diskette 1) und dies auf dem Diskettenaufkleber vermerken, werden Sie nie Probleme mit dem Suchen nach Programmen haben und können den Computer für sinnvollere Dinge als die Verwaltung der Verwaltungssoftware einsetzen.
 
-# Welcher Drucker ist der richtige?
+# Welcher Drucker ist der richtige? [15-17,150]
 
 > Einen Drucker müßte man haben, aber welchen? Ein vielschichtiges und verwirrendes Angebot macht die Entscheidung wr ein Druckermodell nicht gerade einfach. Wir stellen Ihnen die wichtigsten Typen vor und sagen Ihnen, worauf Sie beim Kauf achten müssen.
 
@@ -414,7 +414,7 @@ Den Nachteil früherer Druckergenerationen, ein Druckbild zu liefern, bei dem je
 
 ### Die Typenraddrucker
 
-Manchen sicher schon von seiner Schreibmaschine her bekannt ist das Typenradprinzip. Die Drucktypen sind auf elastischen Armen (Speichen) eines Typenrades aus Metall oder Kunststoff befestigt. Durch Drehung wird das Rad in die richtige Druckposition gebracht. Dann schlägt ein Hammer die Typen gegen Farbband und Papier. Obwohl in der Zwischenzeit auch die Matrixdrucker über gute Druckqualitäten verfügen, ist das Schriftbild eines guten Typenraddruckers bisher unerreicht. Die Domäne der Typenraddrucker liegt demzufolge auch in derTextverarbeitung. Dabei sind solche Drucker relativ langsam. Preiswerte Modelle arbeiten mit Druckgeschwindigkeiten um 20 Zeichen pro Sekunde, die professionellen Geräte schaffen teilweise über hundert Zeichen in der Sekunde. Auch bei den Typenraddruckern läßt sich die Druckqualität noch durch verschiedene Maßnahmen verbessern. Eine solche Maßnahme ist der Doppeldruck, bei dem jedes Zeichen zweimal angeschlagen wird, oder die Schattenschrift, die jedes Zeichen zweimal, aber etwas versetzt, druckt. Auch die Typenraddrucker gehören der unüberhörbaren Kategorie an. Trotzdem gibt es Unterschiede, die hauptsächlich auf die Bauart (Dämpfung, Rollenmaterial) zurückzuführen sind. Leider beherrschen die Typenraddrucker keine Grafik wie die Matrixdrucker. Sie sind vielmehr auf die Zeichen ihres Typenrades begrenzt und können keine beliebigen Punktmuster auf dem Papier drucken. Einfache Grafiken mit diesen Zeichen sind dafür nur ein unzureichender Ersatz. Größter Vorteil, neben dem Schriftbild, ist die Vielfalt der verfügbaren Schriften. Durch einfaches Wechseln des Typenrades steht ein völlig neuer Zeichensatz zur Verfügung. Andere Sprachen, wissenschaftliche Zeichen und viele Sonderzeichen stehen für die meisten Typenraddrucker zur Auswahl. Eine Sonderform des Typenraddruckers ist die Schreibmaschine mit eingebauter Schnittstelle zum Computer. Im Gegensatz zum Typenraddrucker hat die Schreibmaschine ein eigenes Tastenfeld, über das sie, auch ohne Computer, bedient werden kann. Diesen Vorteil muß man allerdings, bei gleichem Leistungsniveau auch mitbezahlen.
+Manchen sicher schon von seiner Schreibmaschine her bekannt ist das Typenradprinzip. Die Drucktypen sind auf elastischen Armen (Speichen) eines Typenrades aus Metall oder Kunststoff befestigt. Durch Drehung wird das Rad in die richtige Druckposition gebracht. Dann schlägt ein Hammer die Typen gegen Farbband und Papier. Obwohl in der Zwischenzeit auch die Matrixdrucker über gute Druckqualitäten verfügen, ist das Schriftbild eines guten Typenraddruckers bisher unerreicht. Die Domäne der Typenraddrucker liegt demzufolge auch in der Textverarbeitung. Dabei sind solche Drucker relativ langsam. Preiswerte Modelle arbeiten mit Druckgeschwindigkeiten um 20 Zeichen pro Sekunde, die professionellen Geräte schaffen teilweise über hundert Zeichen in der Sekunde. Auch bei den Typenraddruckern läßt sich die Druckqualität noch durch verschiedene Maßnahmen verbessern. Eine solche Maßnahme ist der Doppeldruck, bei dem jedes Zeichen zweimal angeschlagen wird, oder die Schattenschrift, die jedes Zeichen zweimal, aber etwas versetzt, druckt. Auch die Typenraddrucker gehören der unüberhörbaren Kategorie an. Trotzdem gibt es Unterschiede, die hauptsächlich auf die Bauart (Dämpfung, Rollenmaterial) zurückzuführen sind. Leider beherrschen die Typenraddrucker keine Grafik wie die Matrixdrucker. Sie sind vielmehr auf die Zeichen ihres Typenrades begrenzt und können keine beliebigen Punktmuster auf dem Papier drucken. Einfache Grafiken mit diesen Zeichen sind dafür nur ein unzureichender Ersatz. Größter Vorteil, neben dem Schriftbild, ist die Vielfalt der verfügbaren Schriften. Durch einfaches Wechseln des Typenrades steht ein völlig neuer Zeichensatz zur Verfügung. Andere Sprachen, wissenschaftliche Zeichen und viele Sonderzeichen stehen für die meisten Typenraddrucker zur Auswahl. Eine Sonderform des Typenraddruckers ist die Schreibmaschine mit eingebauter Schnittstelle zum Computer. Im Gegensatz zum Typenraddrucker hat die Schreibmaschine ein eigenes Tastenfeld, über das sie, auch ohne Computer, bedient werden kann. Diesen Vorteil muß man allerdings, bei gleichem Leistungsniveau auch mitbezahlen.
 
 ### Die Thermodrucker
 
@@ -474,7 +474,7 @@ Sie sehen, ein Druckerkauf ist Planungssache. Je nachdem auf welches Gebiet (Tex
 
 (Arnd Wängler/aa)
 
-# Vergleich: Drucker unter 700 Mark
+# Vergleich: Drucker unter 700 Mark [18-21]
 
 > Lohnt sich der Kauf eines Billigdruckers? Wir haben sieben Drucker der unteren Preisklasse getestet und wollen Ihnen eine Antwort auf diese Frage geben.
 
@@ -525,7 +525,7 @@ Commodore, Lyonerstr. 38, 6000 Frankfurt 71, (0 69) 6 63 80;
 Epson, Am Seestern 24, 4000 Düsseldorf, Tel. (0211) 5 95 2110;
 Microscan, (Seikosha-Drucker), Oberseering 31, 2000 Hamburg 60, Tel. (040) 6320030.
 
-# Superdrucker mit frechem Preis
+# Superdrucker mit frechem Preis [22-23]
 
 > Kaum vier Jahre, nachdem Star mit dem Gemini 10 sein Debüt auf dem Peripherie-Markt gab, wurden auf der CES in Las Vegas die Drucker einer neuen Generation vorgestellt. SG, SD und SR heißen die Modelle, die mit außergewöhnlichen Leistungen und günstigen Preisen neue Maßstäbe setzen.
 
@@ -555,7 +555,7 @@ Die Leistungsmarken der neuen Star-Drucker sind derzeit noch unübertroffen. Mit
 
 (Arnd Wängler/aa)
 
-# Zu neuen Horizonten
+# Zu neuen Horizonten [24]
 
 > Centronics ist nicht nur eine Schnittstelle, sondern auch ein Drucker-Hersteller. Mit dem H80A stellen wir einen Drucker der gehobenen Klasse vor.
 
@@ -581,7 +581,7 @@ Mit seiner hohen Druckgeschwindigkeit bei relativ niedrigem Geräuschpegel (60 d
 
 Info: Centronics Data Computer, Lyoner Str. 44-48, 6000 Frankfurt 71, Tel. (0 69) 6 66 67 48
 
-# Beeindruckend: D-80X
+# Beeindruckend: D-80X [25,30]
 
 > Gute Drucker müssen nicht teuer sein. Der D-80X überrascht durch sehr gute Schriftqualität und viele Anschlußmöglichkeitenoei günstigem Preis.
 
@@ -611,7 +611,7 @@ Trotz einiger kleiner Schwächen ist der Decam D-80X der zur Zeit interessantest
 
 Info: Decam GmbH, Postfach 12 32, 7505 Ettlingen, Tel. (0 72 43) 6 92 64, Preis 899 Mark.
 
-# Marktübersicht: Matrixdrucker
+# Marktübersicht: Matrixdrucker [26-30]
 
 > Ständig steigt das Angebot von Matrixdruckern für Heimcomputer. Ein Grund, den Druckermarkt zu durchleuchten und Ihnen eine Einkaufshilfe zu geben.
 
@@ -627,7 +627,7 @@ Wie Sie sehen, Drucker ist nicht gleich Drucker. Ein hoher Qualitätsstandard mu
 
 (hm)
 
-# Der MPS 802 lemt deutsch
+# Der MPS 802 lernt deutsch [30-31]
 
 > Der MPS 802 ist als zuverlässiger Drucker mit ansprechendem Schriftbild bekannt. Leider kennt er keine deutschen Umlaute. Unser kleines Programm ändert das: Der MPS 802 lernt deutsch.
 
@@ -648,7 +648,7 @@ Die noch verbleibenden Arbeiten sind schnell durchgeführt. Mit einem EPROM-Prog
 
 (Ernst Schöberl/Arnd Wängler/gk)
 
-# Die Videowerkstatt
+# Die Videowerkstatt [32]
 
 > Mit Computer, Kamera und Video-Digitizer erschließen sich neue Dimensionen — der C 64 lernt das »Sehen«. Ungeahnte Möglichkeiten stecken hinter dieser Technik.
 
@@ -674,7 +674,7 @@ Der VD 64 ist mehr als nur eine sinnvolle Ergänzung des C 64. Es ist ein Vorbot
 
 Bezugsquelle: Merkens, Fuchsstraße 6A, 6231 Schwalbach, Tel. (0 6196) 8 30 30 + 30 26, Preis 575,— + Mehrwertsteuer
 
-# Mit 5 Mark zu neuen Dimensionen
+# Mit 5 Mark zu neuen Dimensionen [34-35]
 
 > Völlig neue Klangdimensionen schafft der C 64 an einer Stereoanlage. Die neue Spielegeneration mit ihrer hervorragenden Tonuntermalung gewinnt stark an Reiz. Zusätzlich können Sie nun Ihre Kompositionen mit bestmöglicher Qualität aufzeichnen.
 
@@ -706,7 +706,7 @@ Nach einer Schlußüberprüfung des Adapterkabels steht der neuen Klangdimension
 
 (hm)
 
-# Alter Joystick am C 16
+# Alter Joystick am C 16 [35]
 
 > Inkompatibilität bestimmt den C 16 — auch bei den Joystickports. Mit ein wenig Geschick läßt sich jeaoch ein Adapter herstellen.
 
@@ -720,7 +720,7 @@ Beide Stecker erhalten Sie in jedem guten Elektronikfachgeschäft. Die beiden St
 
 (Peter Schneider/ev)
 
-# User-Port-Display
+# User-Port-Display [36-38]
 
 > Eine kleine elektronische Schaltung setzt den User-Rort ins richtige Licht. Sie zeigt auch, wie der User-Pört für Steuerungsaufgaben eingesetzt werden kann.
 
@@ -750,7 +750,7 @@ Mit POKE DDRB,255 werden alle acht Ports zu Ausgabeleitungen, da dezimal 255 in 
 
 ### Die Ausgabe von Daten
 
-Nachdem das Datenrichtungsregister auf Ausgabe programmiert ist, können die Daten über die Speicherstelle PRB = 56577 (VC 20: PRB = 37136) ausgeben werden. Der entsprechende Befehl hierzu lautet PO-KE PRB,X. Auch hier kann X eine Dezimalzahl zwischen 0 und 255 sein. Die entsprechende Binärzahl erscheint an den Ports und bringt die dazugehörigen LEDs zum Leuchten. High-Pegel bedeutet jetzt Aufleuchten der LED. Mit Listing 1 kann dies leicht überprüft werden. In Zeile 10 werden alle Ports PB0 bis PB7 auf Ausgabe geschaltet. In Zeile 20 erfolgt die Zahleneingabe (Zahl zwischen 0 und 255). In Zeile 30 wird diese Zahl in die Speicherstelle PRB gePOKEt und an den Ports als Binärzahl ausgegeben. Gleichzeitig stehen diese Signale an der 13poligen Buchsenleiste an, wo Interfaces für die vielfältigsten Schalt- und Kontrollaufgaben angeschlossen werden können.
+Nachdem das Datenrichtungsregister auf Ausgabe programmiert ist, können die Daten über die Speicherstelle PRB = 56577 (VC 20: PRB = 37136) ausgeben werden. Der entsprechende Befehl hierzu lautet POKE PRB,X. Auch hier kann X eine Dezimalzahl zwischen 0 und 255 sein. Die entsprechende Binärzahl erscheint an den Ports und bringt die dazugehörigen LEDs zum Leuchten. High-Pegel bedeutet jetzt Aufleuchten der LED. Mit Listing 1 kann dies leicht überprüft werden. In Zeile 10 werden alle Ports PB0 bis PB7 auf Ausgabe geschaltet. In Zeile 20 erfolgt die Zahleneingabe (Zahl zwischen 0 und 255). In Zeile 30 wird diese Zahl in die Speicherstelle PRB gePOKEt und an den Ports als Binärzahl ausgegeben. Gleichzeitig stehen diese Signale an der 13poligen Buchsenleiste an, wo Interfaces für die vielfältigsten Schalt- und Kontrollaufgaben angeschlossen werden können.
 
 ### Die Ausgabe-Handshakeleitung
 
@@ -787,7 +787,7 @@ In Bild 3 sind zwei Interface-Schaltungen gezeigt, die den C 64 oder VC 20 mit d
 
 (Dipl.-Ing. Richard Kurzhals/hm)
 
-# Dateiverwaltungen: Was Sie beim Kauf beachten sollten
+# Dateiverwaltungen: Was Sie beim Kauf beachten sollten [40-43]
 
 > Der Kauf einer Dateiverwaltung ist risikoreich. Denn die Schwächen eines solchen Programms tauchen oft erst auf, wenn schon eine große Anzahl von Daten eingegeben wurde. Der Entwickler des »Datenmanager 64« gibt wertvolle Ratschläge.
 
@@ -952,7 +952,7 @@ Dateien müssen teilweise aktualisiert werden. Dieser Vorgang wird als Reorganis
 
 (Said Baloui/gk)
 
-# Dateiverwaltung ist nicht gleich Datenbank
+# Dateiverwaltung ist nicht gleich Datenbank [44-45]
 
 > Alle reden über Dateiverwaltung. Über die vielfältigen Anwendungsmöglichkeiten und über Vor- und Nachteile der verschiedenen Programme. Wenig verbreitet ist jedoch das Wissen darum, was eine Dateiverwaltung eigentlich ist und welche Unterschiede zu Datenbanken bestehen.
 
@@ -972,7 +972,7 @@ Diese beiden Merkmale einer Datenbank, das Verknüpfen von Dateien, und die fest
 
 Sollten Sie aufgrund der Tatsache, daß Dateiverwaltungen nicht so leistungsfähig wie Datenbanken sind, nun der Ansicht sein, daß die Programmierung einer Dateiverwaltung wohl recht einfach sein müßte, muß ich Sie jedoch enttäuschen. Es gibt unzählige Möglichkeiten, eine Dateiverwaltung zu erstellen, die vor allem von den gewählten Datenstrukturen abhängen; und die Auswahl an Datenstrukturen ist fast unbegrenzt. Es gibt Listenstrukturen, Baumstrukturen, Hashing-Verfahren etc. Die Wahl der geeigneten Datenstrukturen entscheidet über die spätere Leistungsfähigkeit einer Dateiverwaltung und kann im Nachhinein kaum geändert werden. Es ist meist leichter, ein Programm neu zu schreiben, als die verwendeten Datenstrukturen eines fertigen Programms zu ändern, weil Sie sich als nicht leistungsfähig genug erwiesen haben.
 
-Die meist verwendeten Datenstrukturen will ich kurz näher erläutern (einige zum Verständnis nötige Begriffe wie »binär«, »Zeiger« etc. sind im Lexikon in dieser Ausgabe erläutert). Sollte dieser Artikel bei Ihnen Appetit auf »mehr« wecken, so möchte ich Sie auf das Buch »Alles über Datenbanken und Dateiverwaltung mit dem C 64«, erschienen bei Data Becker, hinweisen. Kommen wir nun zu den versprochenen Datenstrukturen fTabelle 2).
+Die meist verwendeten Datenstrukturen will ich kurz näher erläutern (einige zum Verständnis nötige Begriffe wie »binär«, »Zeiger« etc. sind im Lexikon in dieser Ausgabe erläutert). Sollte dieser Artikel bei Ihnen Appetit auf »mehr« wecken, so möchte ich Sie auf das Buch »Alles über Datenbanken und Dateiverwaltung mit dem C 64«, erschienen bei Data Becker, hinweisen. Kommen wir nun zu den versprochenen Datenstrukturen (Tabelle 2).
 
 **Listenstrukturen** können Sie sich als eine Aneinanderreihung von Datensätzen vorstellen, vergleichbar mit der Anordnung von Daten in einem Telefonbuch. Diese Aneinanderreihung kann ungeordnet oder geordnet sein (meist alphabetisch). Geordnete Listen haben den Vorteil, daß sie schneller durchsucht werden können als ungeordnete. Sie können die Suche in einer geordneten Liste mit der Suche in einem Telefonbuch vergleichen, bei der Sie wohl kaum auf der ersten Seite mit der Suche nach »Maier« beginnen, sondern wesentlich effizienter suchen, eben (fast) binär. Problematisch an geordneten Listen ist das Eintragen und Löschen von Datensätzen. Um einen neuen Datensatz einzutragen, müssen alle alphabetisch nachfolgenden Datensätze verschoben werden, um Platz zu schaffen. Aus diesem Grund wird die Ordnung bei verketteten Listen nicht durch die Reihenfolge, sondern durch Zeiger hergestellt. Jedes Element der Liste besitzt einen solchen Zeiger, der auf den Ort weist, an dem der (alphabetisch) nachfolgende Datensatz abgespeichert ist. Da die Reihenfolge der Elemente unerheblich ist, kann ein neu einzutragender Datensatz einfach an das Ende der Liste angehängt werden. Er muß allerdings einen Zeiger auf den alphabetisch nachfolgenden Datensatz bekommen, und der vorhergehende Datensatz einen Zeiger auf den gerade neu eingetragenen. Eine verkettete Liste läßt sich leider nicht binär durchsuchen, sie muß sequentiell, also Element für Element, durchsucht werden. Dafür erlaubt sie das schnelle Eintragen und Löschen von Datensätzen. Da sie geordnet ist, kann sich der Benutzer einer solchen Dateiverwaltung jederzeit den alphabetisch nächsten oder vorhergehenden Datensatz zeigen lassen.
 
@@ -990,7 +990,7 @@ Bei der Floppy gibt es diese Einschränkungen nicht. Sie hat nurzwei Grenzen; zu
 
 (Said Baloui/gk)
 
-# Sprachen für Computer (2)
+# Sprachen für Computer (2) [46-48]
 
 > Diesmal sollen uns bei unserem Überblick über die Welt der Programmiersprachen die modernen Sprachen interessieren. Sie erfahren, was Ada kann und was man sich unter Modula oder Lisp vorzustellen hat.
 
@@ -1016,7 +1016,7 @@ Modula, entwickelt von Professor N. Wirth, dem Schöpfer der Sprache Pascal, ist
 
 Jedes Modula-Programm ist selbst ein Modul und kann dementsprechend andere Programme als Untermodule verwenden. Dabei gibt es keinen Unterschied zwischen den Standard-Modulen, die die Sprache dem Benutzer zur Verfügung stellt und selbstgeschriebenen (Programm-)Modulen. Jedes Modul ist in sich vollständig abgeschlossen, daß heißt Vereinbarungen über Datentypen, Funktionen und Variable gelten nur innerhalb des Moduls. Sollen die in einem Modul getroffenen Definitionen anderen Modulen zugänglich gemacht werden, dann müssen sie vom Modul »exportiert«, von den anderen Modulen »importiert« werden. Damit werden alle unerwünschten Nebeneffekte, wie sie etwa bei Basic-Unterprogrammen häufig auftreten können, vollständig ausgeschlossen.
 
-Selbstverständlich sind die einzelnen Module intern ebenfalls völlig strukturiert aufgebaut. Den Befehl GOTO sollte man als Modula-Programmierer schnellstens vergessen; dafür stehen die von Pascal gewohnten Schleifenstrukturen (FOR...TO... DO...END, REPEAT...UNTIL, WHI-LE...END) zur Verfügung, zusätzlich noch die LOOP...EXIT...END-Schleife, die alle Befehle zwischen LOOP und END so lange durchläuft, bis die bei EXIT angegebene Bedingung erfüllt ist. Diese Schleifenstrukturen sind übrigens ohne Ausnahme auch im Commodore 3.5-Basic des C 16, oder im 7.0-Basic des C 128 vorhanden, ein sicheres Zeichen, daß sich das Konzept der strukturierten Programmierung auch im Bereich der Basic-Heimcomputer immer mehr durchsetzt. Leider ist Modula noch nicht für Commodore-Computer erhältlich.
+Selbstverständlich sind die einzelnen Module intern ebenfalls völlig strukturiert aufgebaut. Den Befehl GOTO sollte man als Modula-Programmierer schnellstens vergessen; dafür stehen die von Pascal gewohnten Schleifenstrukturen (FOR...TO... DO...END, REPEAT...UNTIL, WHILE...END) zur Verfügung, zusätzlich noch die LOOP...EXIT...END-Schleife, die alle Befehle zwischen LOOP und END so lange durchläuft, bis die bei EXIT angegebene Bedingung erfüllt ist. Diese Schleifenstrukturen sind übrigens ohne Ausnahme auch im Commodore 3.5-Basic des C 16, oder im 7.0-Basic des C 128 vorhanden, ein sicheres Zeichen, daß sich das Konzept der strukturierten Programmierung auch im Bereich der Basic-Heimcomputer immer mehr durchsetzt. Leider ist Modula noch nicht für Commodore-Computer erhältlich.
 
 ## Die Krönung: Ada
 
@@ -1081,7 +1081,7 @@ Speziell für den C 64 wird es sicher in naher Zukunft eine Reihe weiterer Sprac
 
 (ev)
 
-# Infocom-Geheimnisse gelüftet?
+# Infocom-Geheimnisse gelüftet? [49-50]
 
 > Bekannt dürften sie mittlerweile sein, die Adventurespiele von Infocom. Gelöst sind sie noch lange nicht. Ein Grund, Ihnen Tips dazu zu geben.
 
@@ -1171,7 +1171,7 @@ Die oben genannten Hinweise zu den Adventures sind, wie gesagt nur minimale Denk
 
 (M. Kohlen/rg)
 
-# Trickfilm mit dem C 64
+# Trickfilm mit dem C 64 [51,64-67]
 
 > In die vierte Dimension, die bewegte dreidimensionale Grafik, dringen Sie mit diesem Programm vor.
 Sie können so mit einfachsten Mitteln Trickfilme mit verblüffenden Eigenschaften erstellen.
@@ -1249,7 +1249,7 @@ Das wichtigste Mittel zur Erzeugung eines flüssigen Bilderablaufs und die Grund
 
 (Armin und Dirk Biernaczyk/rg)
 
-# Weißt Du wieviel Sternlein stehen...
+# Weißt Du wieviel Sternlein stehen... [52,57-60,62-63]
 
 > Der C 64 als elektronische Sternenkarte bringt Klarheit ins Dunkel der Nacht. Das Programm zeigt Ihnen, wo Planeten una Sternbilder am Himmel stehen.
 
@@ -1318,7 +1318,7 @@ Wird ein Name, oder ein Teil eines Namens eingegeben, verzweigt das Programm in 
 
 (Horst Hinkelmann/hm)
 
-# Checksummer 64
+# Checksummer 64 [54]
 
 > Der Checksummer 64 überprüft jede Basic-Zeile direkt nach der Eingabe und erspart deshalb eine aufwendige Fehlersucha
 
@@ -1339,7 +1339,7 @@ Eine ausführliche Beschreibung finden Sie in den Ausgaben 1 bis 4/85. Ebenso de
 
 TODO Tabelle "Die Steuerbefehle im Klartext"
 
-# MSE-Abtippen sicher und leicht gemacht
+# MSE-Abtippen sicher und leicht gemacht [55-56]
 
 > Ähnlich wie der »Checksummer« ist auch der MSE ein Hilfsmittel bei der Eingabe von Listings, diesmal jedoch bei reinen Maschinensprache-Programmen.
 
@@ -1376,7 +1376,7 @@ CTRL-M listet den Speicherinhalt. Abbruch mit STOP-Taste, weiter mit Leertaste.
 CTRL-N erlaubt die Eingabe einer neuen Adresse zum Weitertippen.
 CTRL-P gibt ein MSE-Listing auf dem Drucker aus.
 
-# Hier gibt’s Clubs
+# Hier gibt’s Clubs [68]
 
 Um Euch und den Clubs unnötige Kosten und Zeit zu ersparen, einige Hinweise. Bei schriftlichen Anfragen an die Clubs, ist generell ein ausreichend frankierter Umschlag beizufügen. Bevor man einem Club beitritt, sollte man sich über dessen Status, Mitgliederzahl, Beitragssätzen (soweit nicht mit aufgeführt) und Gebühren für Lehrgänge informieren lassen. Aus Platzgründen und der Übersichtlichkeit wegen sind neben den Adressen nur einige zusätzliche Schwerpunkte mit angegeben. Die Adressen sind nach Postleitzahlen geordnet.
 
@@ -1464,7 +1464,7 @@ Schulung, Software, Hardware, Steuern, DFÜ, Clubtreffen;
 Sicher sind das noch nicht alle Clubs in Deutschland. Wir bitten daher die nicht aufgeführten Clubs, sich zu melden.
 In der nächsten Ausgabe sind die Clubs aus dem benachbarten Ausland an der Reihe.
 
-# Mini-Grafik VC 20
+# Mini-Grafik VC 20 [69]
 
 > Diese kleine Grafik-Hilfe läuft auf der Grundversion des VC 20.
 
@@ -1474,7 +1474,7 @@ Zur Anwendung der Grafikhilfe: Man nehme das Programm-Listing, tippe es in den V
 
 @ON	schaltet den Bildschirm auf Grafikdarstellung um, wobei die momentane Zeichenfarbe zur Plotfarbe wird
 @CLR	löscht den Grafik-Speicher
-@f,x,y	setzt (f ^ 0) oder löscht (f=0) einen Punkt mit der Koordinate (x,y). Für f gilt: 0 < = f < 256, für x wie für y gilt: 0 < = x < 128. f, x und y können beliebige Variable oder Formeln sein
+@f,x,y	setzt (f ≠ 0) oder löscht (f=0) einen Punkt mit der Koordinate (x,y). Für f gilt: 0 < = f < 256, für x wie für y gilt: 0 < = x < 128. f, x und y können beliebige Variable oder Formeln sein
 @(x,y)	ist eine Funktion, welche testet, ob der Punkt mit der Koordinate (x,y) gesetzt (Ergebnis = —1) oder nicht gesetzt(Ergebnis = 0) ist. Beispiel: »PRINT @ (5,7)«
 @RETURN	schaltet den Bildschirm schließlich wieder auf normalen Print-Modus
 TODO
@@ -1483,7 +1483,7 @@ Das Programm implementiert sich nach dem Start des einzugebenden Basic-Laders (L
 
 (Wolfgang Wirth/ev)
 
-# 6510 — Die Suche nach dem Prozessor
+# 6510 — Die Suche nach dem Prozessor [70-74,76]
 
 > Mit einem Raumschiff fliegen Sie durch ein Höhlenlabyrinth. Ihre Aufgabe: Finden Sie den Prozessor 6510 und setzen ihn in seinen Sockel.
 
@@ -1528,7 +1528,7 @@ Nach der ersten »2070« müssen soviele »2070« eingefügt werden, wie neue La
 Jetzt können die neuen Labyrinthe an den Schluß des Programms (ab Zeile 8000) angefügt werden. Dabei ist folgendes Format einzuhalten:
 22 PRINT-Zeilen, in denen das Labyrinth gePRINTet wird. In den nachfolgenden Zeilen müssen die Koordinaten des Raumschiffs, der Laser und der Fuel-Plattform gesetzt werden (Tabelle 1). DieX-Koordinatendürfen den Wert 255 nicht überschreiten. Dies demonstrieren wir am besten an einem Beispiel.
 
-Die Bedeutung der Variablen und POKEs ist in Tabelle 1 erläutert. Der Variablen MB muß immer derWert 15 zugeordnet werden.
+Die Bedeutung der Variablen und POKEs ist in Tabelle 1 erläutert. Der Variablen MB muß immer der Wert 15 zugeordnet werden.
 
 Soll keine Fuel-Plattform erscheinen, so sind die Koordinaten auf 0 zu POKEn. Außerdem ist darauf zu achten, daß sich keine Sprites überschneiden, da sonst die Kollisionsabfrage nicht einwandfrei arbeitet.
 
@@ -1538,7 +1538,7 @@ Erst wird — wie bereits beschrieben — der Zeichensatz eingeschaltet. Dann l�
 
 (Harald Beine/Arne Jansen/rg)
 
-# Ordnung ist das halbe Leben
+# Ordnung ist das halbe Leben [77-78]
 
 > Mit diesem Programm bringen Sie auf bequeme Weise Ordnung in die Directories Ihrer Disketten.
 
@@ -1564,7 +1564,7 @@ Durch Abspeichern des Speicherbereichs von $CF00 bis $CFFF kann diese Routine au
 
 (Edwin Göbel/hm)
 
-# Basic-Befehle im Griff
+# Basic-Befehle im Griff [79-80]
 
 > Gerade für den Anfänger ist es nicht immer leicht, sich alle Basic-Befehle zu merken. Man denke nur an ausgefallene Befehle wie CMD oder POS(X).
 
@@ -1572,13 +1572,13 @@ Exbasic Level II kennt als Abhilfe den Befehl HELP, mit dem eine Liste sämtlich
 
 Wie geschieht das nun im einzelnen?
 
-Eine unmittelbare Ausgabe aller Basic-Befehle auf dem Bildschirm per PRINT-Anweisungen hätte zwar gegenüber den neuen zu besprechenden drei Methoden den Vorteil, daß man diese Liste alphabetisch ordnen könnte. Sie wäre aber viel zu langsam (in der Größenordnung 5 Sekunden) und das generierte Basic-Programm wäre viel zu lang: Eine Liste aller aneinandergereihten Basic-Befehle, mitTrennzeichen zwischen Befehl und Befehl, umfaßt 331 Bytes. Einschließlich PRINT-Befehle, Hochkommata und Zeilennumerierungen würde ein solches Programm also mindestens 375 Bytes benötigen.
+Eine unmittelbare Ausgabe aller Basic-Befehle auf dem Bildschirm per PRINT-Anweisungen hätte zwar gegenüber den neuen zu besprechenden drei Methoden den Vorteil, daß man diese Liste alphabetisch ordnen könnte. Sie wäre aber viel zu langsam (in der Größenordnung 5 Sekunden) und das generierte Basic-Programm wäre viel zu lang: Eine Liste aller aneinandergereihten Basic-Befehle, mit Trennzeichen zwischen Befehl und Befehl, umfaßt 331 Bytes. Einschließlich PRINT-Befehle, Hochkommata und Zeilennumerierungen würde ein solches Programm also mindestens 375 Bytes benötigen.
 
 Nun enthältaber das Betriebssystem bereits eine Tabelle aller Basic-Befehle: 49310-49565 ($C09E-$C19D). Diese hat lediglich den Nachteil, daß sie keine Trennzeichen verwendet, sondern das Ende eines Basic-Befehlswortes dadurch kennzeichnet, daß der ASCII-Code des betreffenden Zeichens um den Wert 128 (Bit 7 gesetzt) erhöht wird. Das Vorhandensein einer solchen Tabelle wollen wir in den folgenden drei Vorschlägen zur Simulation von HELP ausnützen.
 
 ## Methode 1: »HELP« in Basic
 
-Das Basic-Programm nach Listing 1 ist der kürzeste unserer drei Vorschläge (nur 80 Bytes lang), es hat aber den Nachteil, daß es zum Aufbau der Basic-Befehlsliste mehr also vier Sekunden benötigt. Es wird (im Direktmodus oder vom Hauptprogramm aus) per GOSUB500 aufgerufen und PRINTet Zeichen für Zeichen der Tabelle 49310 — 49565, wobei es darauf achtet, daß immerwenn ein Befehlswortzu Ende ist, das betreffende Zeichen vor dem Ausdrucken (auf dem Bildschirm) zuerst normalisiert wird und daß dann zusätzlich noch ein Befehlsworttrennzeichen eingefügt wird (in Listing 1 an der Stelle X$=”. ”, welches Symbol vom Leser beliebig abgeändert und individuellem Geschmack angepaßt werden kann). Nachteilig ist bei allen drei zu besprechenden Vorschlägen, daß man sich sinnvollerweise mit der durch die CBM-Tabelle vorgegebenen Unordnung zufriedengeben muß.
+Das Basic-Programm nach Listing 1 ist der kürzeste unserer drei Vorschläge (nur 80 Bytes lang), es hat aber den Nachteil, daß es zum Aufbau der Basic-Befehlsliste mehr also vier Sekunden benötigt. Es wird (im Direktmodus oder vom Hauptprogramm aus) per GOSUB500 aufgerufen und PRINTet Zeichen für Zeichen der Tabelle 49310 — 49565, wobei es darauf achtet, daß immerwenn ein Befehlswortzu Ende ist, das betreffende Zeichen vor dem Ausdrucken (auf dem Bildschirm) zuerst normalisiert wird und daß dann zusätzlich noch ein Befehlsworttrennzeichen eingefügt wird (in Listing 1 an der Stelle X$=".", welches Symbol vom Leser beliebig abgeändert und individuellem Geschmack angepaßt werden kann). Nachteilig ist bei allen drei zu besprechenden Vorschlägen, daß man sich sinnvollerweise mit der durch die CBM-Tabelle vorgegebenen Unordnung zufriedengeben muß.
 
 ## Methode 2: »HELP« per Maschinensprogramm
 
@@ -1586,11 +1586,11 @@ Das in Listing 2 aufgeführte Maschinensprogramm zur Ausgabe der Basic-Befehlsli
 
 ## Methode 3: Maschinenprogrammerzeuger ohne Datenzeilen
 
-Will man das Maschinenprogramm in den Kassettenpuffer legen, so muß man es gegebenenfalls (bei zwischenzeitlicher Ausführung von LOAD, SAVE oder VERIFY) oder, wenn sich mehrere Hilfsprogramme den Kassettenpuffer teilen) vor jedem Aufruf neu generieren. Die Schwierigkeiten, die dadurch entstehen, daß der Basic-Datenzeiger per RESTORE nur immer an den Datenanfang gesetzt werden kann, lassen sich beispielsweise durch ein in Computer persönlich, Ausgabe 10/84, Seite 52, beschriebenes Hilfsprogramm beseitigen, mit welchem der Datenzeiger an beliebige Stellen gesetzt werden kann. Das nun noch zu beschreibende Programm nach Listing 4 vermeidet die Schwierigkeiten durch ausschließliche Verwendung von POKE-Anweisungen anstelle von DATA-Zeilen. Um den Aufwand so gering wie möglich zu halten, wurde angestrebt, mit möglichst weniger POKE-Anweisungen auszukommen. Das wurde mit einem Trick erreicht: Das für die Rückübersetzung derToken beim Ausdrucken nach dem LIST-Befehl zuständige Maschinenunterprogramm des Betriebssystems enthält fast alle Befehlssequenzen, die wir für unsere Zwecke benötigen. Das Programm in Listing 4 lädt den Maschinenprogrammabschnitt 50929 bis 51008 (C6F1 — C740), der zugegebenermaßen viel für unsere Zwecke überflüssigen Ballast enthält, mit einer einfachen FOR-NEXT-Schleife in den Kassettenpuffer, (Es wird mit GOSUB700 angesprungen). Jeder zweite und weitere Ansprung kann mit GOSUB730 erfolgen und wird dann in kaum wahrnehmbaren Bruchteilen einer Sekunde ausgeführt.
+Will man das Maschinenprogramm in den Kassettenpuffer legen, so muß man es gegebenenfalls (bei zwischenzeitlicher Ausführung von LOAD, SAVE oder VERIFY) oder, wenn sich mehrere Hilfsprogramme den Kassettenpuffer teilen) vor jedem Aufruf neu generieren. Die Schwierigkeiten, die dadurch entstehen, daß der Basic-Datenzeiger per RESTORE nur immer an den Datenanfang gesetzt werden kann, lassen sich beispielsweise durch ein in Computer persönlich, Ausgabe 10/84, Seite 52, beschriebenes Hilfsprogramm beseitigen, mit welchem der Datenzeiger an beliebige Stellen gesetzt werden kann. Das nun noch zu beschreibende Programm nach Listing 4 vermeidet die Schwierigkeiten durch ausschließliche Verwendung von POKE-Anweisungen anstelle von DATA-Zeilen. Um den Aufwand so gering wie möglich zu halten, wurde angestrebt, mit möglichst weniger POKE-Anweisungen auszukommen. Das wurde mit einem Trick erreicht: Das für die Rückübersetzung der Token beim Ausdrucken nach dem LIST-Befehl zuständige Maschinenunterprogramm des Betriebssystems enthält fast alle Befehlssequenzen, die wir für unsere Zwecke benötigen. Das Programm in Listing 4 lädt den Maschinenprogrammabschnitt 50929 bis 51008 (C6F1 — C740), der zugegebenermaßen viel für unsere Zwecke überflüssigen Ballast enthält, mit einer einfachen FOR-NEXT-Schleife in den Kassettenpuffer, (Es wird mit GOSUB700 angesprungen). Jeder zweite und weitere Ansprung kann mit GOSUB730 erfolgen und wird dann in kaum wahrnehmbaren Bruchteilen einer Sekunde ausgeführt.
 
 (Fred Behringer/ev)
 
-# Genau betrachtet: RS232/V.24-Schnittstelle
+# Genau betrachtet: RS232/V.24-Schnittstelle [80-82]
 
 > Eine kurze und bündige Beschreibung der RS232-Schnittstelle Ihres C 64. Was machen die Signale, wie sind die Pin-Belegungen?
 
@@ -1655,7 +1655,7 @@ Das Betriebssystem des C 64 verfügt über eine Fehlerbehandlung der RS232-Schni
 
 (Jens Maßmann/hm)
 
-# Longscreen VC20
+# Longscreen VC 20 [83]
 
 > Diese kleine Utility wird sicher bei alien Anwendern Freude finden, die das unproportionale Breitschriftformat des VC 20 stört.
 
@@ -1691,7 +1691,7 @@ Sollte die RESTORE-Taste betätigt worden sein, so befindet sich der Rechnerwied
 
 (Wolfgang W. Wirth/ev)
 
-# C 16: HELP und TRACE verbessert
+# C 16: HELP und TRACE verbessert [84]
 
 > Dieses kleine Programm implementiert eine wesentlich erweiterte TRACE-Funktion. Auch HELP wird damit um einiges übersichtlicher.
 
@@ -1705,7 +1705,7 @@ Vor allem für Basic-Anfänger ist dieses verbesserte Trace eine wertvolle Hilfe
 
 (Wolfgang W. Wirth/ev)
 
-# Bücher
+# Bücher [86]
 
 ## Basic-Wegweiser für den Commodore 64
 
@@ -1767,7 +1767,95 @@ Ein klares Fazit: Empfehlenswert für jeden, der Grafik nicht nur verstehen, son
 
 Walter Bachmann, Grafik auf dem C 64, Westermann-Verlag 1984, 204 Seiten, ISBN 3-14-508811-4, 39 Mark.
 
-# Der Ada-Trainingskurs auf dem C 64
+# Tips & Tricks [90]
+
+## Einige POKEs für den VC 20
+Im folgenden ist X immer eine Zahl zwischen 0 und 255.
+
+POKE 36865,X: Zentriert den Bildschirm in vertikaler Richtung. Man kann dadurch den Bildschirm nach oben oder unten verschieben. Der Normalzustand wird mit X=38 erreicht.
+
+POKE 36864,X: Dieser Befehl ist für die horizontale Bildzentrierung zuständig. Er verschiebt den Bildschirm nach links oder rechts. Der Normalwert ist X=12.
+
+POKE 37879,X: Mit diesem Befehl wird die interne Uhr des VC 20 beeinflußt. Man kann sie schnelleroder langsamer laufen lassen. Die letzte Möglichkeit ist besonders beim LISTen interessant. Drückt man nämlich bei verlangsamtem Zeitgeber zusätzlich noch die CTRL-Taste, dann kann man sich einzelne Zeilen fast beliebig lange betrachten. POKE 37879,72 stellt den Normalzustand wieder her. 
+
+(Detlef Krischak)
+
+## Basic-Programme retten
+
+Die Betriebssystemroutine »Angleich von Koppeladressen« ab Adresse 42291 ermöglicht ein schnelles und einfaches »UNNEW« nach einem versehentlichen »NEW« oder Reset:
+POKE 2049,1 : POKE 2050,1 : SYS 42291
+
+Danach kann zumindestwieder geLISTetwerden. Ein vollständiges »UNNEW« verlangt allerdings die Korrektur der Zeiger auf den Beginn der Variablen und Felder. Dazu wäre die Kenntnis der Programmlänge notwendig. Man kann sich aber behelfen, indem man das Programm notfalls in Teilen auf dem Bildschirm auf LISTet und die einzelnen Zeilen mit der RETURN-Taste neu übernimmt.
+
+(Gerhard Wagner)
+
+## Spezialeffekt
+
+Wenn man beim C 64 in die Speicherstelle 53270 Werte zwischen 0 und 15 schreibt (POKE 53270,x), kann man den Bildschirm um bis zu sieben Bildpunkte nach links oder rechts scrollen lassen. Ist x kleiner als 8, dann scrollt der Bildschirmausschnitt um x Bildpunkte nach links, sonst um x-8 Bildpunkte nach rechts.
+
+POKE 53270,8 stellt den Normalzustand wieder her.
+
+Dieser Trick läßt sich gut bei Action-Spielen als optische Untermalung beispielsweise einer Explosion einsetzen.
+
+(Michael Keukert)
+
+## In C 64-Spielen gePOKEt
+
+Hier sind einige interessante POKE-Befehle, mit denen man jeden Highscore überbieten kann. Doch Vorsicht, diese Befehle funktionieren nicht bei allen Versionen dieser Spiele. * FortApocalypse: »POKE 14697,0 : POKE 14760,0 : POKE 36366,0«. Danach hat man beliebig viele Hubschrauber, einen unendlichen Treibstoffvorrat, und der Bonus wird nie erniedrigt.
+
+* Hunchback: »POKE 9521,234 : POKE 9522,234 : POKE 9523,234«. Hier hat man unendlich viele Helden zur Verfügung.
+* Neptune: »POKE 7870,60«. Mit diesem POKE hat man auf einen Schlag 60 Taucher.
+* Jungle Hunt: »POKE 2242,234 : POKE 2243,234«. Der Held hat unendlich viele Leben.
+
+(Frank Bastian)
+
+# Fehlerteufelchen
+
+Nachdem es nach Erscheinen der Ausgabe 4/85 des 64’er Magazins einige Tage verdächtig ruhig blieb (hatte das Fehlerteufelchen Urlaub genommen?), zerrann die Hoffnung auf eine fehlerfreie Ausgabe dann doch noch. Hier die Korrekturen:
+
+## Epson bedruckt Ostereier, Ausgabe 4/85, Seite 50
+
+Die meisten Leser haben erkannt, daß es sich bei diesem Artikel um unseren Beitrag zum 1. April handelte. Alle Anfragen bezüglich des Bausatzes oder Abänderungen für Orangen oder Kieselsteine sind daher leider negativ zu beantworten.
+
+## 11 neue Einzeiler, Ausgabe 4/85, Seite 153
+
+Beim Einzeiler »Zeilen löschen am Bildschirm« muß es in Zeile 50 POKE 781,ZN heißen.
+
+Der Einzeiler »Zugriffszeit der Floppy verkürzen« bringt wegen des Funktionsprinzips bei sequentiellen Dateien natürlich keinen Geschwindigkeitsgewinn.
+
+## Basic-Programme auf Trab gebracht -Compiler im Test, Ausgabe 2/85, Seite 38
+
+Die vollständige Adresse, unter der der Petspeed bestellt werden kann, lautet:
+Infotronik, Dipl.-Ing. Rolf Dahlen, Birkenstr. 40, 4100 Duisburg 17.
+
+Durch die fehlende Ortskennzahl waren einige Briefe etwas länger unterwegs, als dies normalerweise üblich ist.
+
+## xBasic 64, Ausgabe 4/85, Seite 52
+
+Aufgrund einer Vertauschung paßt die abgedruckte Befehlserklärung in einigen Punkten nichtzu dem Programm. Folgende Änderungen ergeben sich dadurch:
+Beim Befehl HRG entfallen die Parameter x und y.
+Der Befehl »TEXT« muß heißen »NRM«. Der Befehl »NEGATE« muß heißen »INVERS«. Der Befehl »INVERS« wird ersetzt durch »RESET«.
+Syntax: RESET (x,y). Es gilt das unter SET gesagte, jedoch wird der Punkt gelöscht.
+Der Befehl »AT« muß heißen: @ PRINT.
+Syntax: @ PRINT s,z, "Text" oder @ PRINT s,z,Variable.
+
+Hinzu kommt der Befehl ROM. Effekt: Nach Ausführung dieses Befehls holt sich der Computer die Bitmuster für die Zeichendarstellung wieder aus dem ROM.
+
+Die Befehle KILL, DELETE, AUTO, DOKE aus Tabelle 1 haben in der abgedruckten Version keine Bedeutung.
+
+## SMON — Teil 5, Ausgabe 4/85, Seite 64
+
+Punkt 4, Seite 67, ist leider falsch. Es muß beim Verschieben der »LDY #CF« in Adresse $9f71 in »LDY #9F« geändert werden.
+
+Unter Punkt 5 ist der Bereich falsch angegeben. Es muß natürlich »M 9FD8 9FE4« eingegeben werden, sonst wird der alte und nicht der neue SMON geändert. Unangenehmer ist ein Programmfehler: Beim Einlesen eines Blocks wird das letzte Byte nicht (!) in den Speicher übernommen, wohl aber beim Zurückschreiben ein zufälliger Wert als 256. Byte. Abhilfe:
+
+Zwei Befehle müssen mit »NOP« überschrieben werden. Zuerst mit SMON »O CED8 CEDC EA« eingeben, dann das Programmmit»S ":SMON $C000 D000« wieder abspeichern.
+
+## Text gut im Griff, Ausgabe 4/85, Seite 38
+
+Die einzelnen Bewertungen des Textverarbeitungsprogramms »Protext 64« von S + S Soft bezogen sich auf Angaben des Herstellers. Die mit »Ja« beantworteten Kriterien sind deshalb mit Vorsicht zu genießen. Es entsteht der Eindruck, daß dieses 9,80 Mark-Programm mit wesentlich teureren konkurrieren könnte. Ein Test in einer der nächsten Ausgaben wird dies klarstellen.
+
+# Der Ada-Trainingskurs auf dem C 64 [129-130,132]
 
 > Ada wurde im Jahre 1975 vom amerikanischen Verteidigungsministerium in Auftrag gegeben, um die Schwierigkeiten und die hohen Kosten in den Griff zu bekommen, welche durch die Vielfalt konkurrierender Programmmiersprachen entstanden sind. Jetzt gibt es auch auf dem C 64 die Möglichkeit, mit dieser modernen Sprache zu arbeiten.
 
@@ -1922,7 +2010,7 @@ Nicht verschwiegen werden soll auch, daß eine Ada-Version für einen Heimcomput
 
 (Dr. Helmuth Hauck/ev)
 
-# Protext-Textprofi mit 80 Zeichen
+# Protext-Textprofi mit 80 Zeichen [133-134]
 
 > Einen entscheidenden Schritt in Richtung professionelle Textverarbeitung macht Protext. Wichtigstes Hauptmerkmal: 80 Zeichen ohne Kompromisse.
 
@@ -1979,7 +2067,7 @@ Wer sich nicht scheut, etwas mehr Geld auszugeben und sich die ungewöhnliche Ta
 Info:
 Decam, Postfach 12 32, 7505 Ettlingen, Tel. 0 72 43/6 92 64 Preis: 198Markohne80-Zeichen-Karte. 80-ZK-plus: 298 Mark
 
-# Logo — die Sprache für Einsteiger
+# Logo — die Sprache für Einsteiger [135,137]
 
 > Bekanntgeworden ist Logo in erster Linie als Grafik-Programmiersprache für Anfänger. Spektakuläre Fotos von Vorschulkindern, die in Logo programmieren, gingen bereits durch die Fachpresse. Wir zeigen, was Logo wirklich kann.
 
@@ -1989,9 +2077,9 @@ Nun bietet Commodore eine Version der Sprache Logo für den C 64 an. Entwickelt 
 
 Logo wird auf zwei Disketten, einer Programm- und einer Utility-Disk, geliefert. Was nach dem Laden des Programms sofort auffällt, ist die Tatsache, daß Logo im Interpreter-Modus arbeitet, was seine Vor- und Nachteile hat. Einerseits ist es dadurch möglich, im Direktmodus Befehle einzugeben und Fehler sofort festzustellen. So lernt man den richtigen Umgang mit der Sprache und erspart sich das bei Compilersprachen umständliche Verbessern und erneute Compilieren. Andererseits kann ein Interpreter nie die Geschwindigkeit eines compilierten Programmes erreichen.
 
-Logo arbeitet mit der sogenannten Turtle-Grafik, manchem vielleicht bekannt aus der Sendereihe »Mikroelektronik«. Dabei erscheint auf dem Hires-Bildschirm ein Dreieck, eben die Turtle (Schildkröte). Diese kann nun auf dem Bildschirm bewegt werden und hinterläßt dabei eine Spur. Die Befehle FORWARD, BACK, RIGHTTURN, LEFT-TURN, denen jeweils eine Zahl folgen muß, lassen die Turtle auf dem Bildschirm herumwandern oder eine Drehung ausführen. Der eingegebene Parameter bestimmt dabei die Anzahl der Schritte. Wer sich schon einmal mit dem Ausrechnen von Koordinaten bei anderen Grafik-Erweiterungen herumgequält hat, wird die Turtle-Methode bestimmt als Erleichterung empfinden.
+Logo arbeitet mit der sogenannten Turtle-Grafik, manchem vielleicht bekannt aus der Sendereihe »Mikroelektronik«. Dabei erscheint auf dem Hires-Bildschirm ein Dreieck, eben die Turtle (Schildkröte). Diese kann nun auf dem Bildschirm bewegt werden und hinterläßt dabei eine Spur. Die Befehle FORWARD, BACK, RIGHTTURN, LEFTTURN, denen jeweils eine Zahl folgen muß, lassen die Turtle auf dem Bildschirm herumwandern oder eine Drehung ausführen. Der eingegebene Parameter bestimmt dabei die Anzahl der Schritte. Wer sich schon einmal mit dem Ausrechnen von Koordinaten bei anderen Grafik-Erweiterungen herumgequält hat, wird die Turtle-Methode bestimmt als Erleichterung empfinden.
 
-Die Turtle kann aber auch durch Koordinaten-Eingabe bewegt werden. Mittels der Befehle SETX, SETY und SETXY verändert man den Standpunkt der Turtle, die Befehle XCOR und YCOR liefern die Koordinaten der momentanen Turtle-Position. So bekommt einerseits der Anfänger bereits nach den ersten Tippversuchen sichtbare Ergebnisse (Bild 1), andererseits kann man mit der Turtle bei Anwendung der entsprechenden mathematischen Formeln auch komplizierte Darstellungen realisieren. Die so erstellten Grafiken lassen sich mit SA-VEPICT direkt abspeichern, beziehungsweise mit READPICT wieder einlesen.
+Die Turtle kann aber auch durch Koordinaten-Eingabe bewegt werden. Mittels der Befehle SETX, SETY und SETXY verändert man den Standpunkt der Turtle, die Befehle XCOR und YCOR liefern die Koordinaten der momentanen Turtle-Position. So bekommt einerseits der Anfänger bereits nach den ersten Tippversuchen sichtbare Ergebnisse (Bild 1), andererseits kann man mit der Turtle bei Anwendung der entsprechenden mathematischen Formeln auch komplizierte Darstellungen realisieren. Die so erstellten Grafiken lassen sich mit SAVEPICT direkt abspeichern, beziehungsweise mit READPICT wieder einlesen.
 
 Das Erstellen von Programmen birgt für den Basic-gewohnten C 64-Benutzer einige angenehme Überraschungen. Um in den Edit-Modus zu gelangen, tippt man TO und einen Programmnamen. Der Name kann frei gewählt werden und dient später zum Aufrufen des Programms. Es empfiehlt sich, Namen zu wählen, die den Zweck des Programms erkennen lassen; durch die besondere Speicherart von Logo hat die Länge des Namens keinen Einfluß auf den Speicherplatzverbrauch. Logo-Programme haben keine Zeilennummern. Sie werden, wenn sie getippt sind, durch das Verlassen des Editors definiert (abgespeichert).
 
@@ -2023,7 +2111,7 @@ Alles in allem ist Logo eine Sprache, die wirklich eine Menge bietet. Turtle-Gra
 
 Info: Logo gibt’s bei Ihrem Commodore-Händler zum Preis von 159 Mark nur auf Diskette für den Commodore 64.
 
-# Assembler ist keine Alchimie — Teil 9
+# Assembler ist keine Alchimie — Teil 9 [138-144]
 
 > Multiplizieren und Dividieren größerer Zahlen ist weder mit dem Taschenrechner noch in Basic ein Problem. Mit Assembler sieht die Sache anfangs schon nicht mehr so einfach aus. Doch auch diese Hürde wird genommen. Einige Betriebssystemroutinen des C 64 nehmen uns dabei erhebliche Arbeit ab, man muß sie nur kennen.
 
@@ -2220,7 +2308,7 @@ Zum Schluß noch, wie üblich, die Tabelle 3 mit den neuen Assembler-Befehlen.
 [1]	»Computerspiele und Wissenswertes Commodore 64«, Haar bei München: Markt & Technik Verlag, 1984. Das ist die von P. Lücke besorgte Übersetzung des amerikanischen Buches »More on the sixtyfour« und ist jedem Assembler-Programmierer warm zu empfehlen.
 [2]	»MOS Microcomputers Programmier-Handbuch«, Frankfurt: Commodore MOS Technology
 
-# Tips & Tricks gesucht
+# Tips & Tricks gesucht [144]
 
 Jeder Computer und jedes Programm hat seine speziellen Schwachstellen und Unzulänglichkeiten. Allerdings ist kaum ein Programmierer oder Anwender auf Dauer bereit, sich damit abzufinden. Wo auch sorgfältigste Lektüre von Handbüchern nicht weiterhilft, da wird so manche Stunde experimentiert, um eine Lösung zu finden (die oft in einer Basic-Zeile Platz hat).
 
@@ -2234,7 +2322,7 @@ Markt & Technik Verlag Aktiengesellschaft
 Hans-Pinsel-Str. 2
 8013 Haar bei München
 
-# In die Geheimnisse der Floppy eingetaucht _ Teil 6
+# In die Geheimnisse der Floppy eingetaucht _ Teil 6 [145-150]
 
 > Formatieren einer Diskette ist für jeden Floppy-Besitzer das erste, was er mit ihr macht. Was beim Formatieren passiert und weshalb die Floppy so nervig rattert, warum es so lange dauert und wie es schneller geht, erfahren Sie in folgendem Artikel.
 
@@ -2258,7 +2346,7 @@ Nun, können Sie sagen, es würde auch reichen, wenn der Kopf nur 35 oder 40 Spu
 
 Der Wert von 45 Tracks enthält also eine Sicherheitsreserve, die ein Positionieren auf Spur 1 mit Sicherheit ermöglicht.
 
-Wurde der Kopf also aufTrack 1 positioniert, so erfolgt erneut ein Einsprung in die Formatierungsroutine; eine Speicherstelle zeigt jetzt an, daß der Kopf auf Track 1 positioniert wurde und das Formatieren starten kann.
+Wurde der Kopf also auf Track 1 positioniert, so erfolgt erneut ein Einsprung in die Formatierungsroutine; eine Speicherstelle zeigt jetzt an, daß der Kopf auf Track 1 positioniert wurde und das Formatieren starten kann.
 
 Jetzt wird noch geprüft, ob auf die nächste Spur umgeschaltet werden soll, da die aktuelle bereits formatiert wurde (wenn ja, erfolgt wieder ein Einsprung in die Jobschleife, um das Nötige zu tun).
 
@@ -2302,7 +2390,7 @@ Mit dieser letzten Maßnahme ist eine Spur einer Diskette fertig formatiert word
 
 Im Hauptprogramm wird nun auf Track 18 positioniert. Die BAM der Diskette wird hergestellt und in Block 18,0 abgelegt. Anschließend wird noch der erste Directory-Block (18,1) mit Nullen vollgefüllt und ebenfalls abgespeichert, womit das Formatieren abgeschlossen wäre.
 
-Formatiert man eine Diskette nur kurz, das heißt ohne Angabe einer ID beim N-Befehl, so werden alle anfänglichen Schritte weggelassen. Es wird in diesem Fall nur auf das richtige Formatkennzeichen in der BAM ($41/ 65/A) kontrolliert und danach der eben beschriebene Vorgang aufTrack 18 durchgeführt.
+Formatiert man eine Diskette nur kurz, das heißt ohne Angabe einer ID beim N-Befehl, so werden alle anfänglichen Schritte weggelassen. Es wird in diesem Fall nur auf das richtige Formatkennzeichen in der BAM ($41/ 65/A) kontrolliert und danach der eben beschriebene Vorgang auf Track 18 durchgeführt.
 
 ### Formatieren mit »Variationen«
 
@@ -2383,7 +2471,7 @@ In der nächsten Folge möchte ich Ihnen etwas vorstellen, das sich GCR-Codierun
 
 (Karsten Schramm/gk)
 
-# Dem Klang auf der Spur (Teil 5)
+# Dem Klang auf der Spur (Teil 5) [152-157]
 
 > Dieser Teil des Musikkurses ist auch für all jene interessant, die sich nicht ausschließlich für Musik interessieren. Es werden Algorithmen zur Generierung verschiedener Signale vorgestellt.
 
@@ -2518,7 +2606,7 @@ Nach diesem etwas anstrengenden theoretischen Teil werden wir uns in der nächst
 
 (Thomas Krätzig/aa)
 
-# Effektives Programmieren (5): Sortieren in Basic — Teil 2
+# Effektives Programmieren (5): Sortieren in Basic — Teil 2 [159,161-162]
 
 > Einfache Sortieralgorithmen sind leider auch die langsamsten. Dennoch lassen sie sich durch einige kleinere Änderungen noch erheblich verbessern, so zum Beispiel Bubblesort. Wesentlich komplizierter ist da schon Shellsort, dafür aber auch schneller. Wir zeigen Ihnen, wie es funktioniert.
 
@@ -2540,7 +2628,7 @@ Mit diesen beiden Verbesserungen wollen wir es aber bereits gut sein lassen (Lis
 
 Bubblesort soll uns nun nicht weiter beschäftigen, denn trotz seines wohlklingenden Namens ist er so ziemlich der langsamste Algorithmus, den es gibt.
 
-An dieser Stelle gleich einmal ein paar Bemerkungen zur Zeitmessung: Die jetzt vorgestellten Algorithmen, die Sie jeweils als Listings abgedruckt finden, sind in der Form zur Zeitmessung natürlich nicht geeignet. Das liegt daran, daß die Programme so aufgebaut sind, daß Sie den Algorithmus leicht nachvollziehen können, was natürlich aufKosten der Geschwindigkeit geht und die Ergebnisse verfälschen würde.
+An dieser Stelle gleich einmal ein paar Bemerkungen zur Zeitmessung: Die jetzt vorgestellten Algorithmen, die Sie jeweils als Listings abgedruckt finden, sind in der Form zur Zeitmessung natürlich nicht geeignet. Das liegt daran, daß die Programme so aufgebaut sind, daß Sie den Algorithmus leicht nachvollziehen können, was natürlich auf Kosten der Geschwindigkeit geht und die Ergebnisse verfälschen würde.
 
 Im abschließenden Artikel über die Sortiermethoden werden wir die einzelnen Programme jedoch auch unter dem Aspekt »Zeit« einander gegenüberstellen. Hier werden wir auch auf das Problem der Garbage Collection eingehen, die uns beim Sortieren von größeren Feldern, je nach Algorithmus, ganz schön in Schwierigkeiten bringen kann, wenn es um eine Zeitmessung geht.
 
@@ -2608,7 +2696,7 @@ In der nächsten Folge wollen wir uns ausschließlich mit einem einzigen Sortier
 
 (Karsten Schramm/gk)
 
-# Funktionen für Anfänger
+# Funktionen für Anfänger [164,167-169]
 
 > Auch in Basic kann man Befehle selber entwickeln, zumindest einen bestimmten Typ von Befehl. Und dazu braucht man keine Maschinensprache und keinen Assembler, sondern nur den gesunden Menschenverstand, wie man ihn auch sonst beim Programmieren einsetzt. Gemeint sind die »benutzerdefinierten Funktionen«.
 
@@ -2647,9 +2735,9 @@ Nicht im Papierkorb landet die Eingabezahl, die Sie zum Beispiel der Funktion SQ
 
 Ebensowenig ignoriert wird eine Mitteilung, die Sie der Ausgabe-Funktion PEEK mitgeben. In diesem Fall wird die Information als Arbeitshinweis aufgefaßt: PEEK (2048) schaut in der Speicherzelle 2048 nach und sagt Ihnen dann, welchen Inhalt es gefunden hat.
 
-Manchmal benötigt eine Funktion beide Arten von Information, so etwa die Funktion LEFT$. Sie muß zuerst wissen, was für ein String bearbeitet werden soll, und dann, wie lang der auszugebende String zu sein hat: LEFT$ (”Commodore”,4) ergibt den Ausgabe-String "Comm”. Mehrere Mitteilungen werden durch Kommata voneinander getrennt.
+Manchmal benötigt eine Funktion beide Arten von Information, so etwa die Funktion LEFT$. Sie muß zuerst wissen, was für ein String bearbeitet werden soll, und dann, wie lang der auszugebende String zu sein hat: LEFT$ ("Commodore",4) ergibt den Ausgabe-String "Comm". Mehrere Mitteilungen werden durch Kommata voneinander getrennt.
 
-Natürlich können auch mehr als zwei Mitteilungen mitgegeben werden. Die Funktion MID$ benötigt, wie Sie wissen, im Normalfall drei: das Eingabedatum und zwei Arbeitshinweise (an welcher Stelle der Schnitt im Eingabe-String gemacht werden und wie lang der Ausgabe-String sein soll). MID$ ("Commodore",4,5) ergibt also "modor”.
+Natürlich können auch mehr als zwei Mitteilungen mitgegeben werden. Die Funktion MID$ benötigt, wie Sie wissen, im Normalfall drei: das Eingabedatum und zwei Arbeitshinweise (an welcher Stelle der Schnitt im Eingabe-String gemacht werden und wie lang der Ausgabe-String sein soll). MID$ ("Commodore",4,5) ergibt also "modor".
 
 Vielleicht sollte zum Schluß noch angemerkt werden, daß Art und Anzahl der Informationen, die einer Funktion mitgeteilt werden können, natürlich nicht dem Belieben des Programmierers anheimgestellt, sondern für jede Funktion vorgegeben sind. Dasselbe gilt für die Reihenfolge, in der die verschiedenen Informationen angegeben werden.
 
@@ -2659,7 +2747,7 @@ Nun weiß eine Funktion also alles, was sie wissen muß, um ihre Arbeit zur Zufr
 
 Das Datum, das eine Funktion erzeugt, eine Zahl oder ein Text, muß ihr irgendwie abgenommen werden.
 
-Man kann das Ergebnis auf den Bildschirm bringen, zum Beispiel PRINT INT (12.78); man kann es einer Variablen zuordnen, zum Beispiel B$ = MID$ (”Commodore”,4,5); man kann es für einen Vergleich benutzen, zum Beispiel IF PEEK (214) = 24 THEN PRINT CHR$ (147).
+Man kann das Ergebnis auf den Bildschirm bringen, zum Beispiel PRINT INT (12.78); man kann es einer Variablen zuordnen, zum Beispiel B$ = MID$ ("Commodore",4,5); man kann es für einen Vergleich benutzen, zum Beispiel IF PEEK (214) = 24 THEN PRINT CHR$ (147).
 
 Mit einem Wort: Die durch Funktionen erzeugten Zahlen und Zeichenketten werden genauso verwendet wie Zahlen und Zeichenketten. Genauso wenig wie der Computer die isolierte Zahl 3.5 oder den isolierten String »Commodore« verstehen würde, genauso wenig versteht er ein alleinstehendes INT (12.78). Man muß ihm immer sagen, was er mit einer Zahl, einem Text oder einer Funktion (das heißt mit dem Ergebnis, das sie erzeugt) tun soll.
 
@@ -2932,24 +3020,24 @@ DEF FN EO R (X)
 
 = ABS ((FN Bl (0) AND FN B2 (0)) < > (FN Bl (0) OR FN B2 (0)))
 
-Als einander ausschließende Bedingungen seien A$ = "Amalie” und B$ = ”Otto” für die beiden ersten Funktionen definiert worden. Dann ergibt die Funktion FN EO R den Wert 1 zum Beispiel bei folgender Situation:
-A$ = "Amalie” : B$ = "Emilia” : PRINT FN EO R (0)
+Als einander ausschließende Bedingungen seien A$ = "Amalie" und B$ = "Otto" für die beiden ersten Funktionen definiert worden. Dann ergibt die Funktion FN EO R den Wert 1 zum Beispiel bei folgender Situation:
+A$ = "Amalie" : B$ = "Emilia" : PRINT FN EO R (0)
 Anmerkung: Der Name der Funktion ist EO R, weil EOR das Basic-Wort OR enthielte, was zu einer Fehlermeldung führen würde.
 
 ### 14.	ASCII-Wert eines Zeichens innerhalb eines Strings bestimmen
 
 DEF FN AS C (PS) = ASC (MID$ (S$,PS,1))
-S$ = ’’Commodore”: PRINT FN AS C (6) ergibt den ASCII-Wert von »d«, also 68.
+S$ = "Commodore": PRINT FN AS C (6) ergibt den ASCII-Wert von »d«, also 68.
 
 ### 15.	Einen Teilstring aus einem String »herausschneiden« und dessen Wert bestimmen
 
-DEF FN WERT (PS) = VAL (MID$ (S$,PS,LAENGE)) S$ = ”028255063”: LAENGE = 3: PRINT FN WERT (4) ergibt den Wert 255.
+DEF FN WERT (PS) = VAL (MID$ (S$,PS,LAENGE)) S$ = "028255063": LAENGE = 3: PRINT FN WERT (4) ergibt den Wert 255.
 
-# VIC — Das »intelligente« Programm
+# VIC — Das »intelligente« Programm [173-176,178]
 
 > Ein Computerproaramm zu schreiben, mit dem man sicn einfach in normaler Umgangssprache unterhalten kann — das war die Aufgabe in unserem Programmierwettbewerb vom November '84. Ein Programm war »intelligener« als alle anderen.
 
-Der Ausgangspunkt für diesen Programmierwettbewerb war die »Eliza-Story«. Im Jahre 1966 entwickelte Joseph Weizenbaum am Massachusetts Institute ofTechnology ein Program names »Eliza«, das — vereinfacht gesagt — einen Psychoanalytiker simuliert. Der Mensch begibt sich also in der Rolle des Patienten an die Computer-Tastatur und wird aufgefordert, von seinen Schwierigkeiten zu berichten. Aufgrund der Eingaben gibt Eliza dann durchaus differenzierte Antworten und stellt auch schon mal Zwischenfragen, so daß ein regelrechter Dialog zustande kommt. Das Eliza-Programm hat inzwischen eine große Verbreitung gefunden und existiert in unzähligen Versionen für alle gängigen Heimcomputer. Mit unserem Programmierwettbewerb wollten wir dazu anregen, ähnliche — und womöglich bessere — Programme für den C 64/VC 20 zu entwickeln. Wir erhielten auch eine ganze Reihe wirklich brauchbarer Programme — nur leider, leider handelte es sich bei vielen dieser Einsendungen um Programme, die eindeutig auf dem Original-Eliza basierten. Diese Programme gelangten natürlich gar nicht erst in die engere Wahl, denn bei unseren Wettbewerben ist immer noch die eigene Kreativität gefragt. Sieger wurde schließlich »VIC«, ein Programm, das sich in zwei wesentlichen Punkten von der Konkurrenz abhebt.
+Der Ausgangspunkt für diesen Programmierwettbewerb war die »Eliza-Story«. Im Jahre 1966 entwickelte Joseph Weizenbaum am Massachusetts Institute of Technology ein Program names »Eliza«, das — vereinfacht gesagt — einen Psychoanalytiker simuliert. Der Mensch begibt sich also in der Rolle des Patienten an die Computer-Tastatur und wird aufgefordert, von seinen Schwierigkeiten zu berichten. Aufgrund der Eingaben gibt Eliza dann durchaus differenzierte Antworten und stellt auch schon mal Zwischenfragen, so daß ein regelrechter Dialog zustande kommt. Das Eliza-Programm hat inzwischen eine große Verbreitung gefunden und existiert in unzähligen Versionen für alle gängigen Heimcomputer. Mit unserem Programmierwettbewerb wollten wir dazu anregen, ähnliche — und womöglich bessere — Programme für den C 64/VC 20 zu entwickeln. Wir erhielten auch eine ganze Reihe wirklich brauchbarer Programme — nur leider, leider handelte es sich bei vielen dieser Einsendungen um Programme, die eindeutig auf dem Original-Eliza basierten. Diese Programme gelangten natürlich gar nicht erst in die engere Wahl, denn bei unseren Wettbewerben ist immer noch die eigene Kreativität gefragt. Sieger wurde schließlich »VIC«, ein Programm, das sich in zwei wesentlichen Punkten von der Konkurrenz abhebt.
 
 Zunächst einmal ist »VIC« sehr schnell. Auch bei längeren Eingaben werden für die Antwort selten mehr als vier bis fünf Sekunden gebraucht. »VIC«war damit, obwohl vollständig in Basic geschrieben, um ein vielfaches schneller als alle anderen Programme, die zum Teil sogar Maschinenroutinen verwendeten. Ein gutes Beispiel dafür, daß durch gut durchdachte Programmierung auch in Basic überraschend effektive Ergebnisse erzielt werden können. Zum anderen ist »VIC« sehr vielseitig. Man kann mit ihm über viele Themen reden, er bezieht sich in seinen Antworten in den meisten Fällen auf den Eingabesatz und manchmal sind seine Antworten nicht ohne Witz.
 
@@ -2984,7 +3072,7 @@ Meine Hobbies: Klavier (Jazz), Tennis, Ski, Schach, Computer-Spiele, Pokern.
 
 TODO END ASIDE
 
-# Vorschau
+# Vorschau [180]
 
 ## Dokumentation von Programmen leicht gemacht
 
