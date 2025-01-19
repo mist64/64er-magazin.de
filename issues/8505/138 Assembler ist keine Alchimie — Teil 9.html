@@ -18,51 +18,6 @@
         <h1>Assembler ist keine Alchimie — Teil 9</h1>
         <p class="intro">Multiplizieren und Dividieren größerer Zahlen ist weder mit dem Taschenrechner noch in Basic ein Problem. Mit Assembler sieht die Sache anfangs schon nicht mehr so einfach aus. Doch auch diese Hürde wird genommen. Einige Betriebssystemroutinen des C 64 nehmen uns dabei erhebliche Arbeit ab, man muß sie nur kennen.</p>
 
-        <figure>
-            <img src="138-1.png" alt="">
-            <figcaption>Bild 1. Wirkung von LSR auf ein Byte</figcaption>
-        </figure>
-        <figure>
-            <img src="138-2.png" alt="">
-            <figcaption>Bild 2. Wirkung von ROL auf ein Byte</figcaption>
-        </figure>
-        <figure>
-            <img src="138-3.png" alt="">
-            <figcaption>Bild 3. Wirkung der Befehlskombination ASL(-) und ROL(-) auf 2 Byte (LSB/MSB)</figcaption>
-        </figure>
-        <figure>
-            <img src="138-4.png" alt="">
-            <figcaption>Bild 4. Wirkung von ROR auf ein Byte</figcaption>
-        </figure>
-        <figure>
-            <img src="138-5.png" alt="">
-            <figcaption>Bild 5. Flußdiagramm zur Betriebssystemroutine UMULT<br>Faktor 1: 40/41<br>Faktor 2: 113/114<br>Ergebnis: X/Y</figcaption>
-        </figure>
-        <figure>
-            TODO
-            <figcaption>Bild 5a. Interpreterroutine UMULT</figcaption>
-        </figure>
-        <figure>
-            <img src="138-6.png" alt="">
-            <figcaption>Bild 6. UMULT am Beispiel der Multiplikation 321 x 65 = 20865</figcaption>
-        </figure>
-        <figure>
-            <img src="138-7.png" alt="">
-            <figcaption>Bild 7. Flußdiagramm des Programms zur 16-Bit-Division</figcaption>
-        </figure>
-        <figure>
-            <img src="138-8.png" alt="">
-            <figcaption>Bild 8. 16-Bit-Division Schritt für Schritt am Beispiel 20867:321=65 Rest 2</figcaption>
-        </figure>
-        <figure>
-            <img src="138-9a.png" alt="">
-            <img src="138-9b.png" alt="">
-            <figcaption>Bild 9. Flußdiagramm zur Betriebsroutine BLTUC</figcaption>
-        </figure>
-        <figure>
-            TODO
-            <figcaption>Bild 9a. BLTUC</figcaption>
-        </figure>
 
         <p>Einige Versprechen sollen diesmal eingelöst werden:</p>
 
@@ -70,9 +25,14 @@
 
         <h3>Die restlichen Bit-Verschiebe-Operationen</h3>
 
-        <p>Da wäre zunächst einmal das Gegenstück zu ASL. Den Befehl haben wir in der letzten Ausga-.be kennengelernt. Dort ging es ja um das Nach-Links-Schieben. Jetzt schieben wir nach rechts. LSR heißt der dazu nötige Befehl. Das kommt von »logical shift right« und heißt zu deutsch »logisches Rechtsschieben«. Fragen Sie mich bitte nicht, weshalb »logisches«. Jedenfalls ist LSR ebenso für logische Bitprüfungen geeignet wie ASL.</p>
+        <p>Da wäre zunächst einmal das Gegenstück zu ASL. Den Befehl haben wir in der letzten Ausgabe kennengelernt. Dort ging es ja um das Nach-Links-Schieben. Jetzt schieben wir nach rechts. LSR heißt der dazu nötige Befehl. Das kommt von »logical shift right« und heißt zu deutsch »logisches Rechtsschieben«. Fragen Sie mich bitte nicht, weshalb »logisches«. Jedenfalls ist LSR ebenso für logische Bitprüfungen geeignet wie ASL.</p>
 
         <p>Mittels LSR wird jedes Bit der adressierten Speicherstelle um einen Platz nach rechts geschoben. An die Stelle des Bit 7 tritt eine Null und Bit 0 wandert in das Carry-Bit (siehe Bild 1).</p>
+
+        <figure>
+            <img src="138-1.png" alt="">
+            <figcaption>Bild 1. Wirkung von LSR auf ein Byte</figcaption>
+        </figure>
 
         <p>Erinnern Sie sich noch an das dezimale Linksschieben mit ASL aus der letzten Folge? Wir hatten festgestellt, daß jedes Linksschieben einer Dezimalzahl einer Multiplikation mit 10 entspricht. Hier im umgekehrten Fall, also beim Rechtsschieben, muß jedes LSR einer Division durch 10 entsprechen:</p>
 
@@ -106,6 +66,11 @@
 
         <p>Sehen wir uns zunächst mal ROL (Bild 2) an:</p>
 
+        <figure>
+            <img src="138-2.png" alt="">
+            <figcaption>Bild 2. Wirkung von ROL auf ein Byte</figcaption>
+        </figure>
+
         <p>Wie bei ASL wandert jedes Bit um eine Position nach links. Das Bit 7 wird dabei in das Carry-Bit verschoben. In Bit 0 gelangt aber hier nicht eine 0 (wie bei ASL), sondern der Inhalt des Carry-Bit (wohlgemerkt der Inhalt, der dort war, bevor dort hinein Bit 7 geschoben wurde). Bevor wir auf den praktischen Nährwert dieses Befehls eingehen, sollen erstmal die Adressierungsmöglichkeiten aufgeführt werden:</p>
 
         <p>TODO</p>
@@ -122,9 +87,19 @@
 
         <p>Die Funktion dieser Befehlssequenz können Sie aus Bild 3 entnehmen.</p>
 
+        <figure>
+            <img src="138-3.png" alt="">
+            <figcaption>Bild 3. Wirkung der Befehlskombination ASL(-) und ROL(-) auf 2 Byte (LSB/MSB)</figcaption>
+        </figure>
+
         <p>Diesem Befehl werden wir später bei der 16-Bit-Multiplikation und Division noch häufig begegnen.</p>
 
         <p>Sehen wir uns nun noch den letzten der Bit-Verschiebebefehle an: ROR. In Bild 4 ist schematisch gezeigt, wie rotiert wird.</p>
+
+        <figure>
+            <img src="138-4.png" alt="">
+            <figcaption>Bild 4. Wirkung von ROR auf ein Byte</figcaption>
+        </figure>
 
         <p>Jedes Bit wandert, wie bei LSR, um eine Stelle nach rechts. Als Bit 7 kommt (im Gegensatz zu LSR) der Inhalt des Carry-Bit herein. Bit 0 wird ins Carry-Bit geschoben. Adressiert werden kann ROR ebenso wie ROL:</p>
 
@@ -173,9 +148,24 @@
 
         <p>Genauso wie hier beschrieben, arbeitet das Multiplikationsprogramm. Ein Unterschied tritt auf, nämlich daß nicht bis zum Schluß mit der Addition gewartet, sondern jede neue Zwischenzahl sofort addiert wird. Bild 5a zeigt die Beschreibung der Interpreterroutine:</p>
 
+        <figure>
+            TODO
+            <figcaption>Bild 5a. Interpreterroutine UMULT</figcaption>
+        </figure>
+
         <p>Diese Routine hier abzudrucken, wäre reine Platzverschwendung. Schalten Sie einfach den SMON ein und verlangen Sie von ihm ein Disassemblerlisting ab B357. Dort haben Sie dann für die weitere Besprechung alles parat. In Bild 5 finden Sie noch ein Flußdiagramm der UMULT-Routine.</p>
 
+        <figure>
+            <img src="138-5.png" alt="">
+            <figcaption>Bild 5. Flußdiagramm zur Betriebssystemroutine UMULT<br>Faktor 1: 40/41<br>Faktor 2: 113/114<br>Ergebnis: X/Y</figcaption>
+        </figure>
+
         <p>Das Ergebnis der Multiplikation befindet sich in LSB/MSB-Form in den X/Y-Registern. Programm und Flußdiagramm wollen wir an einem Beispiel nachspielen. Dazu sollen die beiden Zahlen 321 und 65 (binär 0000 0001 0100 0001 und 0100 0001) miteinander multipliziert werden, was bekanntlich 20865 (binär 0101 0001 1000 0001) ergibt. Was Ihnen im Bild 6 als undurchdringlicher Bit-Dschungel entgegenstrahlt, ist das schrittweise Verfolgen des Programms in Computerformat, also binär.</p>
+
+        <figure>
+            <img src="138-6.png" alt="">
+            <figcaption>Bild 6. UMULT am Beispiel der Multiplikation 321 x 65 = 20865</figcaption>
+        </figure>
 
         <p>In Bild 6 sind die Speicheradressen alle dezimal angegeben. Dort finden Sie zunächst die Ausgangslage. In Speicherstelle 40/41 steht die ganze Operation über unverändert die Zahl 321. In 113/114 finden Sie (wegen des LSB/MSB-Formates umgedreht als 114/113) unseren Faktor 65. Akku und Speicherstelle 93 stehen auf 16, dem Bitzähler. In das X- und Y-Register wurde eine Null eingelesen. Im Flußdiagramm ist diese Situation mit einer 1 gekennzeichnet. Ganz unten im Diagramm sehen Sie, daß der Bitzähler 93 erniedrigt und danach geprüft wird, ob er schon gleich Null sei. Daraus folgt, daß die große Schleife 16mal durchlaufen wird. Den ersten Durchlauf (gekennzeichnet durch kleine Buchstaben) verfolgen wir im einzelnen.<br />
             a) X-Register wird zur Bearbeitung in den Akku geschoben.<br />
@@ -195,6 +185,15 @@
         <p>Beim umgekehrten Weg, nämlich der Teilung von zwei 16-Bit-Zahlen, haben wir nicht so viel Glück: Ich konnte keine derartige Routine im Interpreter entdecken. Nun gibt es aber fast in jedem Lehrbuch der Maschinensprache die Vorstellung eines solchen Programms, so daß man sich das schönste aussuchen kann. Das Prinzip ist auch da dasselbe, wie wir es von der normalen Division gewohnt sind: Der Divisor wird Schritt für Schritt vom Dividenden abgezogen. In der Literatur [1] fand ich eine sehr kurze Routine, die ich Ihnen leicht modifiziert als Programm 1 vorstellen will.</p>
 
         <p>In Bild 7 ist ein Flußdiagramm dieser Routine gezeigt und in Bild 8 lacht Ihnen wieder das Bit-Gewirr entgegen, das Sie schon von der Multiplikation her kennen, hier aber für die Division.</p>
+
+        <figure>
+            <img src="138-7.png" alt="">
+            <figcaption>Bild 7. Flußdiagramm des Programms zur 16-Bit-Division</figcaption>
+        </figure>
+        <figure>
+            <img src="138-8.png" alt="">
+            <figcaption>Bild 8. 16-Bit-Division Schritt für Schritt am Beispiel 20867:321=65 Rest 2</figcaption>
+        </figure>
 
         <p>Damit Sie wissen, wo was hinein- oder herauskommt:</p>
 
@@ -225,9 +224,20 @@
 
         <p>Um diese immerhin schon 2 000 Byte (1000 für den Bildschirm und nochmal 1000 für das Farb-RAM) zu verschieben, bedienen wir uns einer Interpreter-Routine, die seit Ausgabe 3/85 des 64’er auch beim Checksummer verwendet wird — der Blockverschiebe-Routine (Bild 9a).</p>
 
+        <figure>
+            TODO
+            <figcaption>Bild 9a. BLTUC</figcaption>
+        </figure>
+
         <p>Wieder besteht unser Programm aus zwei Teilen. Im ersten wird der aktuelle Bildschirm nach oben geschoben. Dieser Teil speist lediglich zuerst die Adressen des Bildschirms und des Betriebssystem-ROM in die Abholspeicherstellen der danach aufgerufenen Routine BLTUC und wiederholt diesen Vorgang für die Bildschirmfarbspeicheradressen. Danach verstellen wir noch den USR-Vektor und kehren mit TRS ins Basic-Programm zurück (siehe Programm 3).</p>
 
         <p>Komplexer ist der zweite Teil. Um nämlich die Informationen unter dem ROM lesen zu können, muß dieses ausgeschaltet werden. Leider läßt sich das Betriebssystem-ROM nur zusammen mit dem Basic-Interpreter ausschalten. $A3BF ist aber eine Interpreter-Routine! Da bleibt uns nichts anderes übrig, als diese Routine in unser Programm einzubauen, was uns die Gelegenheit gibt, sie uns mal etwas anzusehen. Als Bild 9 ist sie im Flußdiagramm abgebildet.</p>
+
+        <figure>
+            <img src="138-9a.png" alt="">
+            <img src="138-9b.png" alt="">
+            <figcaption>Bild 9. Flußdiagramm zur Betriebsroutine BLTUC</figcaption>
+        </figure>
 
         <p>Programm 4 zeigt den zweiten Teil unseres Hilfsbildschirm-Programms.</p>
 
