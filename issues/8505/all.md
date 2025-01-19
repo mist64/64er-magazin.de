@@ -1922,9 +1922,106 @@ Nicht verschwiegen werden soll auch, daß eine Ada-Version für einen Heimcomput
 
 (Dr. Helmuth Hauck/ev)
 
+# Protext-Textprofi mit 80 Zeichen
 
+> Einen entscheidenden Schritt in Richtung professionelle Textverarbeitung macht Protext. Wichtigstes Hauptmerkmal: 80 Zeichen ohne Kompromisse.
 
+Textverarbeitungsprogramme für den C 64 gibt es inzwischen wie Sand am Meer. Und fast alle haben eines gemeinsam: Will man den Text in seiner endgültigen Form sehen, so muß man ihn ausdrucken. Es gibt bisher keine befriedigende Lösung, mit den beschränkten Fähigkeiten des VIC-Chips eine saubere 80-Zeichen-Darstellung auf dem Bildschirm zu erhalten, um die-gesamte Textbreite vor Augen zu haben. Horizontales Scrolling oder softwaremäßig simulierte 80 Zeichen sind nur Kompromisse. Das einzig Wahre ist eine 80-Zeichen-Karte; eine Hardwarelösung also. Doch leider vertragen sich die meisten Textverarbeitungsprogramme nicht mit diesen Karten.
 
+Doch damit ist jetzt Schluß. Zumindest, wenn man es übers Herz bringt, rund 500 Mark auf den Tisch zu blätternund die 80-Zeichen-Karte »80-ZK-plus« sowie das dafür geschriebene Programm »Protext« zu erwerben. Nicht nur die 80 Zeichen sind es, die dem Ganzen das Prädikat »Textprofi« verleihen. Auch die enorme Vielfalt an Funktionen hebt Protext aus der Masse der Textverarbeitungsprogramme heraus.
+
+## Befehlsvielfalt
+
+Wer klein anfangen will, der tippt nach dem Laden des Programmes seine Texte so ein, wie er sie später auf dem Papier sehen will und nimmt etwaige Formatierungen und Einrückungen von Hand vor. Dann nur noch zwei Tasten berührt (Fl und A) und schon wird gedruckt. Kurze Zeit später hält man schwarz auf weiß genau das in Händen, was auf dem Monitor stand.
+
+Besonders angenehm bei der Texteingabe ist das Word-Wrapp-ing: Wörter, die nicht mehr in die aktuelle Zeile passen, werden automatisch in die nächste Zeile übernommen. Diese Funktion kann auch abgeschaltet werden. Zur Texteingabe steht ein sehr umfangreicher Befehlssatz zur Verfügung. So lassen sich zum Beispiel einzelne Buchstaben, Wörter, ganze Bereiche oder der gesamte Text löschen. Auch das Gegenteil, das Einfügen von Textstücken ist möglich, die Handhabung aber etwas kompliziert: Hat man den Einfügemodus eingeschaltet, so darf maximal eine Zeile (80 Zeichen) eingefügt werden. Für längere Einfügungen muß der Einfügemodus entsprechend oft ein- und wieder ausgeschaltet werden. In diesem Fall besteht auch die Möglichkeit, einige Leerzeilen zu setzen und dort den Text nachzutragen. Anschließend können alle überflüssigen Leerzeichen aus dem aktuellen Absatz entfernt werden. Das kann über die Optimierungsfunktion automatisch geschehen.
+
+Sehr nützlich sind auch die von Schreibmaschinen bekannten Tabulatoren. Es sind beliebig viele setzbar und es gibt drei verschiedene Typen: normale Text-, Zahlen-und Spaltentabulatoren. Die Zahlentabulatoren helfen, Zahlen untereinander zu setzen, so daß der Dezimalpunkt (oder wahlweise Komma) immer sauber untereinander steht. Mit den Spaltentabulatoren läßt sich der Arbeitsbereich in senkrechte Spalten einteilen, in denen voneinander unabhängig die Texteingabe erfolgt. Da von Spalte zu Spalte gesprungen werden kann, ist ein problemloses Erstellen von Tabellen und Gegenüberstellungen möglich.
+
+Komplette Textbereiche kann man im Speicher kopieren oder verschieben. Einzelne Buchstabengruppen lassen sich im Text suchen und gegen andere ersetzen. Schließlich besteht die Möglichkeit, mit dem Cursor bestimmte Zeilen direkt anzuspringen.
+
+Sehr praktisch ist die Scroll-Funktion. Möchte man sich einen Überblick über den schon geschriebenen Text verschaffen, so kann man ihn mit enormer Geschwindigkeit (über 20 Zeilen pro Sekunde) scrollen. Die Position des Cursors wird dabei nicht verändert, so daß auch schnelle RichtungS-wechsel möglich sind. Soweit die Befehle, die ständig benötigt werden. Der Rest des Befehlssatzes dient Spezialanwendungen. Erwähnt werden soll hier nur noch, daß jederzeit beliebige Texte auf Diskette, ohne Textverlust, eingesehen werden können. So auch ein mitgelieferter Hilfstext mit einer Kurzbeschreibung der vorhandenen Befehle.
+
+### Exzellente Formatierung
+
+Neben den vielen Befehlen zur Texteingabe gibt es eine Gruppe von Befehlen, die sich erst beim Ausdruck bemerkbar machen: die Anweisungen zur Formatierung des Textes. Neben den fast schon simplen Einstellungen für linken oder rechten Rand kann der Text im Blocksatz, also mit glattem rechten und linken Rand gedruckt werden. Zusätzlich kann Protext bei der Textausgabe lange Wörter trennen. Es werden alle deutschen Trennregeln und die wichtigsten Ausnahmen berücksichtigt. Allerdings können auch unsinnige Trennungen entstehen, die der Benutzer selber abfangen muß, indem er Protext anweist, die entsprechenden Wörter nicht oder anders zu trennen.
+
+Die bedruckbare Länge einer Seite und die Anzahl der Zeilen, die tatsächlich bedruckt werden sollen, können einzeln angegeben werden. Der Text wird dann auf jeder einzelnen Seite automatisch vertikal zentriert. Zusätzlich kann ein Seitenumbruch jederzeit oder bedingt erzwungen werden. Bedingt erzwungen bedeutet, daß ein Seitenumbruch stattfindet, wenn beispielsweise nur die Überschrift eines Absatzes auf die vorherige Seite kommen würde. Außerdem können Kopf- und Fußzeilen definiert werden, die am Anfang und am Ende jeder Seite gedruckt werden. Eine automatische Seitenzählung ist vorhanden, so daß die Kopf- oder Fußzeile jederzeit die aktuelle Seitenzahl enthalten können. Einspaltige Ein- und Ausrückungen, beispielsweise für Überschriften oder Kapitelnummern, sind ebenso möglich wie die horizontale Zentrierung einzelner Textzeilen.
+
+Die Formatierung kann in einem Text beliebig oft geändert oder zeitweise ganz abgeschaltet werden.
+
+Die Möglichkeiten sind damit noch nicht ganz erschöpft. Diese umfangreiche Übersicht soll aber genügen. Will man die Formatierung überprüfen, kann man den Ausdruck am Bildschirm simulieren. Hier macht sich der Kauf der 80-Zeichen-Karte bezahlt; spart man doch Unmengen von Druckerpapier für Probedrucke.
+
+### Jeder Drucker ist geeignet
+
+Bleiben wir beim Thema Drucker, dem wunden Punkt vieler Textverarbeitungsprogramme. Entweder arbeiten sie nur mit wenig Druckern zusammen oder sie nutzen deren Möglichkeiten nicht aus. Protext hat variable Druckertreiber, die sich auf fast jeden erhältlichen Drucker zurechtschneidern lassen. Dadurch kann der Text nicht nur vernünftig ausgedruckt, sondern auch sämtliche Möglichkeiten des Druckers ausgenutzt werden. Das Erstellen des Treibers ist allerdings etwas kompliziert und langwierig, aber nur ein einmaliger Vorgang.
+
+Im Druckertreiber-Menü werden zuerst einmal alle »normalen« Druckerparameter eingestellt. Dazu gehören die Geräte- und Sekundäradresse des Druckers sowie Werte für Zeilenabstand, Papierlänge, Einzelblatteinzug und automatischen Zeilenvorschub.
+
+Als nächstes folgt eine Code-Wandlungs-Tabelle. Jedem der 255 C 64-ASCII-Codes wird ein Druk-kercode zugeordnet. Diese Tabelle ist äußerst wichtig, da ja der C 64-ASCII-Code, den auch die 80-Zeichen-Karte verwendet, unterschiedlich zum Standard-ASCII-Co-de der meisten Drucker ist. Es können auch Steuersequenzen angegeben werden, die zu Beginn und am Ende des Textes sowie für jede einzelne Druckzeile gesendet werden.
+
+Weitere Optionen im Treiber-Me-nü beziehen sich auf die von Protext »serienmäßig« unterstützten Schrifttypen »Unterstreichen« und »Fettdruck«, deren Steuercodes ja auch für jeden Drucker anders sind. Schließlich lassen sich noch Codes für die verschiedensten druckerspezifischen Eigenschaften definieren. So ist beispielsweise das Hoch-und Tiefstellen von Zeichen möglich, indem man entsprechende Steuercode-Sequenzen auf bestimmte Tasten legt (beispielsweise CTRL + S). Auch frei definierbare Zeichen des Druckers können angesprochen werden. Der erstellte Druckertreiber wird auf Diskette gespeichert und kann jederzeit benutzt werden.
+
+### Unterstützung von Floppy und Modem
+
+Die Bedienungeiner Diskettenstation gestaltet sich ebenso komfortabel wie die des Druckers. Es werden sowohl die 1541 wie auch das 4040-Doppellaufwerk am IEC-Bus unterstützt. Texte können gespeichert und geladen oder in den aktuellen Text eingefügt werden. Zusätzlich ist das Lesen von Daten aus einem sequentiellen File beim Ausdruck von Serienbriefen und das Arbeiten mit Textbausteinen (Modulen) möglich. Längere Texte, die nicht mehr in den Arbeitsspeicher passen, können direkt miteinander verkettet oder in einem Jobfile zusammengefaßt werden. Daß Directories angezeigt und Befehle an die Floppy gesandt werden können, ist fast schon selbstverständlich.
+
+Einen weiteren Pluspunkt handelt sich Protext durch seine Kommunikationsfähigkeiten ein: Terminalbetrieb wird voll unterstützt. Einerseits kann ein Datenverkehr mit Mailboxen aufgenommen werden, indem man Mitteilungen mit Protext erstellt und danach an die Mailbox sendet. Weiterhin können zwei Computer mit Protext über Telefon Texte austauschen. Dazu ist sogar eine automatische Fehlerkorrektur vorhanden.
+
+Nachdem wir die wichtigsten der vorhandenen Funktionen beleuchtet haben, wollen wir Ihnen noch einige Punkte mitteilen, die uns positiv oder negativ aufgefallen sind. Besonders gut gefallen hat uns der mit 40000 Zeichen wirklich großzügig bemessene Arbeitsspeicher. Überzeugen konnte auch die sehr hohe Arbeitsgeschwindigkeit in allen Funktionen. Weniger gefallen haben uns aber die teilweise recht umständliche Bedienung und besonders die exotische Tastaturbelegung. Die Umlaute und das »ß« befinden sich an total unüblichen Stellen, an die man sich nur sehr schwer gewöhnen kann. Dies ist zwar nicht durch das Textprogramm bedingt, sondern durch die 80-Zeichen-Karte, aber trotzdem ein großes Minus. Hier sei nochmals daraufhinge-wiesen, daß der Betrieb von Protext nur mit der Decam-80-Zeichen-Kar-te und sonst keiner möglich ist.
+
+Einige Worte noch zum Handbuch: Dies ist ein umfangreiches und hervorragendes Nachschlagewerk. Zum Einarbeiten für einen Textverarbeitungs-Neuling ist es allerdings weniger geeignet, da die Befehle stur in alphabetischer Reihenfolge und nicht gerade didaktisch günstig erklärt werden.
+
+Wer sich nicht scheut, etwas mehr Geld auszugeben und sich die ungewöhnliche Tastaturbelegung gefallen läßt, der wird in Protext einen zuverlässigen und äußerst vielseitigen Partner zur Textverarbeitung finden.
+
+(Boris Schneider/hm)
+
+Info:
+Decam, Postfach 12 32, 7505 Ettlingen, Tel. 0 72 43/6 92 64 Preis: 198Markohne80-Zeichen-Karte. 80-ZK-plus: 298 Mark
+
+# Logo — die Sprache für Einsteiger
+
+> Bekanntgeworden ist Logo in erster Linie als Grafik-Programmiersprache für Anfänger. Spektakuläre Fotos von Vorschulkindern, die in Logo programmieren, gingen bereits durch die Fachpresse. Wir zeigen, was Logo wirklich kann.
+
+Eigentlich sollte man meinen, daß der C 64 auch softwaremäßig endgültig ausgereizt ist. Dennoch gibt es immer wieder Leute, die weder mit dem C 64-Basic, noch mit der massenhaft vorhandenen Software so recht zufrieden sind. Vor allem die von Basic schlecht unterstützte Grafik macht gerade den Einsteigern, die mit Maschinensprache nicht umgehen können, immer wieder Kummer.
+
+Nun bietet Commodore eine Version der Sprache Logo für den C 64 an. Entwickelt vom renommierten Massachusetts Institute of Technology ermöglicht Logo, so das Handbuch, eine sehr einfache und dabei höchst wirkungsvolle Handhabung von Grafik und Listen (Wort- und Zahlenreihen). Grund genug, einmal festzustellen, was Logo wirklich leistet.
+
+Logo wird auf zwei Disketten, einer Programm- und einer Utility-Disk, geliefert. Was nach dem Laden des Programms sofort auffällt, ist die Tatsache, daß Logo im Interpreter-Modus arbeitet, was seine Vor- und Nachteile hat. Einerseits ist es dadurch möglich, im Direktmodus Befehle einzugeben und Fehler sofort festzustellen. So lernt man den richtigen Umgang mit der Sprache und erspart sich das bei Compilersprachen umständliche Verbessern und erneute Compilieren. Andererseits kann ein Interpreter nie die Geschwindigkeit eines compilierten Programmes erreichen.
+
+Logo arbeitet mit der sogenannten Turtle-Grafik, manchem vielleicht bekannt aus der Sendereihe »Mikroelektronik«. Dabei erscheint auf dem Hires-Bildschirm ein Dreieck, eben die Turtle (Schildkröte). Diese kann nun auf dem Bildschirm bewegt werden und hinterläßt dabei eine Spur. Die Befehle FORWARD, BACK, RIGHTTURN, LEFT-TURN, denen jeweils eine Zahl folgen muß, lassen die Turtle auf dem Bildschirm herumwandern oder eine Drehung ausführen. Der eingegebene Parameter bestimmt dabei die Anzahl der Schritte. Wer sich schon einmal mit dem Ausrechnen von Koordinaten bei anderen Gra-fik-Erweiterungen herumgequält hat, wird die Turtle-Methode bestimmt als Erleichterung empfinden.
+
+Die Turtle kann aber auch durch Koordinaten-Eingabe bewegt werden. Mittels der Befehle SETX, SETY und SETXY verändert man den Standpunkt der Turtle, die Befehle XCOR und YCOR liefern die Koordinaten der momentanen Turtle-Position. So bekommt einerseits der Anfänger bereits nach den ersten Tippversuchen sichtbare Ergebnisse (Bild 1), andererseits kann man mit der Turtle bei Anwendung der entsprechenden mathematischen Formeln auch komplizierte Darstellungen realisieren. Die so erstellten Grafiken lassen sich mit SA-VEPICT direkt abspeichern, beziehungsweise mit READPICT wieder einlesen.
+
+Das Erstellen von Programmen birgt für den Basic-gewohnten C 64-Benutzer einige angenehme Überraschungen. Um in den Edit-Modus zu gelangen, tippt man TO und einen Programmnamen. Der Name kann frei gewählt werden und dient später zum Aufrufen des Programms. Es empfiehlt sich, Namen zu wählen, die den Zweck des Programms erkennen lassen; durch die besondere Speicherart von Logo hat die Länge des Namens keinen Einfluß auf den Speicherplatzverbrauch. Logo-Programme haben keine Zeilennummern. Sie werden, wenn sie getippt sind, durch das Verlassen des Editors definiert (abgespeichert).
+
+Das grundliegende Konzept von Logo-Programmen ist folgendes: Ein Logo-Programm kann sowohl im Direktmodus, als auch von anderen Programmen aus jederzeit aufgerufen werden. Dadurch ist es möglich, ein Programm in viele Einzelprogramme zu zerlegen und gesondert zu programmieren. Diese Einzelprogramme können unabhängig voneinander abgespeichert werden. Solche »Bausteine« lassen sich auch problemlos in andere Programme einbauen. Ein Logo-Programm besteht also immer aus einer Reihe von Einzelprogrammen.
+
+Die wohl interessanteste Neuerung beim Programmieren ist die Möglichkeit, neue Befehle selbst zu definieren. Nehmen wir an, Sie haben ein Programm zur Errechnung beliebiger Hochzahlen geschrieben, dessen Name »HOCH« ist. Sie haben nun ein anderes Programm, in dem häufig Hochzahlen zu berechnen sind. Es ist möglich, in Ihrem zweiten Programm an den betreffenden Stellen einfach das Programm »HOCH« aufzurufen, das dann die Hochzahl berechnet und an Ihr zweites Programm übergibt. Sie rufen das Hochzahlenprogramm auf, indem Sie »HOCH«, gefolgt von Basis und Exponent als Parameter tippen; der Programmname wird also regelrecht als Befehl benutzt.
+
+## Rekursionen
+
+Wer sich im Grafik-Kapitel des Handbuches nach vorne arbeitet, wird bald auf den Begriff »Rekursion« stoßen. Grundlage der Rekursion ist ein Programm, das sich so lange selbst aufruft, bis eine Abbruchbedingung erfüllt ist.
+
+Um nun wieder zum Toplevel, nämlich in den Direktmodus zu gelangen, muß das Programm nach Erfüllung der Abbruchbedingung die Stufen, die es sich hinabgearbeitet hat, wieder hochsteigen. Dabei werden alle Befehle, die nach dem Selbstaufruf stehen, ausgeführt. Sicher ist das zu Anfang kompliziert, aber was sich damit anstellen läßt, zeigt Bild 2. Dabei handelt es sich um einen Binärbaum, vereinfacht gesagt um ein »V«, an dessen Spitze jeweils ein kleineres »V« sitzt etc., bis eine bestimmte Minimallänge erreicht ist. Das Bild wurde mit einem nur wenige Zeilen umfassenden Programm erstellt, das einfach einen Zweig zeichnet und sich jeweils selbst wieder aufruft, um einen weiteren (kleineren) Zweig zu zeichnen.
+
+Ein weiterer Schwerpunkt der Logo-Anwendung liegt in der Listenverwaltung. Listen sind für Logo alle Zahlen, Buchstaben oder Zeichen, die zwischen eckigen Klammern stehen. Logo kann nun mit insgesamt 15 Listenbefehlen einzelne Listen und Wörter miteinander vergleichen, kombinieren und verändern. Wenn man die Befehle miteinander kombiniert, läßt sich schon einiges anstellen: Denkbar sind Grammatik-Übungsprogramme, Adreßdateien mit den unterschiedlichsten Suchkriterien, Text-Adven-tures oder einfache Dolmetscher-Programme. Die Befehle FIRST, LAST, BUTFIRST, BUTLAST und ITEM ermöglichen beispielsweise ein Herausnehmen einzelner Wörter oder Listenteile aus Listen. Mit den Befehlen SENTENCE und WORD lassen sich Listenteile und Buchstaben zu neuen Wörtern und Sätzen zusammenbauen.
+
+Neben Listenbehandlung und Grafik bietet Logo auch verschiedene Befehle für Musik und Sprites. Der Hersteller macht dabei ausgiebigen Gebrauch von der Möglichkeit, Befehle von Logo aus zu definieren: Für den Umgang mit Sprites sind die Dateien SPRITES und SPRED, für die Musikprogrammie-rung die Datei MUSIC von der mitgelieferten Utility-Diskette einzulesen. Danach steht dem Benutzer neben den verschiedenen Sprite-Be-fehlen ein durchschnittlicher Sprite-Editor zur Verfügung. Die entworfenen Kobolde (so werden die Sprites im Logo-Handbuch bezeichnet) können mit SAVESHAPES abgespeichert und mit READSHAPES wieder eingelesen werden. Für Musikprogramme kann man mittels der vordefinierten Befehle Tondauer, Tonhöhe, Attack, Decay, Sustain und Release bestimmen.
+
+## Logo — ein vorbildlich dokumentiertes Programm
+
+An dieser Stelle muß ein Wort zur Dokumentation von Logo verloren werden, die wirklich hervorragend ist. Ganz im Gegensatz zur sonst üblichen Commodore-Hauspolitik, nach der der Anwender mit Informationsmengen versorgt wird, die zum Leben zu wenig und zum Sterben zuviel sind, ist diesmal im Lieferumfang ein 351 DIN-A4-Seiten starkes Handbuch enthalten. Es erklärt verständlich und ausführlich die Logo-Befehle; didaktisch gut sind die Programmieraufgaben in jedem Kapitel, die im Anhang gelöst und besprochen werden. Anhand dieses Leitfadens kann man sich ziemlich schnell und gut in Logo einarbeiten. Abgesehen davon, daß sich der Befehl SAVESHAPES nicht in der Datei SPRITES befindet, wie das Handbuch angibt, sondern in der Datei SPRED und die Datei MUSIK sich nur laden läßt, wenn man aus dem »k« ein »c« macht, sind keine Fehler aufgefallen. Ebenfalls nicht selbstverständlich ist die mitgelieferte Utility-Diskette, auf der sich neben zahlreichen Programmierhilfen und Beispielprogrammen, auch ein Drucker- und ein Plotter-Ansteuerungsprogramm und sogar ein Assembler befindet. Da aber der Speicherplatz für Maschinenroutinen mit 447 Byte nicht gerade exzessiv ausgefallen ist und außerdem auch noch von Sprites benutzt wird, so daß man in Sprite-Programme keine Maschinenroutinen einbauen kann, wird der Assembler wohl nicht so häufig benutzt werden.
+
+Neben vielen Vorteilen hat Logo aber auch einige Nachteile. Bedingt durch den Interpreter weist Logo Zeichen- und Ladegeschwindigkeiten auf, die manchmal an das Tempo einer Wanderdüne erinnern. Zum Zeichnen eines Vollkreises (genauer: eines 360-Ecks) brauchte Logo 31 Sekunden; Simons Basic erledigte das in annähernd drei Sekunden. Auch die Ladegeschwindigkeit der Diskette ist mit etwa 2,5 Sekunden pro Block nicht gerade ein neuer Rekord (gerechnet wurde die Zeit vom Ladebefehl bis zur Meldung des Interpreters oder Programmes).
+
+Ein Hindernis für umfangreiche Anwendungen ist wohl der zur Verfügung stehende Speicherplatz. Von ausschlaggebender Bedeutung sind hier die sogenannten »Speicherknoten«. Jeder Gebrauch eines Wortes belegt einen dieser Knoten, und auch ein Programm benötigt eine bestimmte Anzahl davon. In den Arbeitsspeicher kann man 35 Blocks, also etwa 9 KByte laden. Läßt man dann ein Programm laufen, so sind die wenigen übriggebliebenen Knoten durch die Benutzung von Wörtern bald aufgebraucht und Logo meldet »No storage left!« Der vorhandene Speicherplatz mag für Grafikprogramme, selbst für umfangreichere, noch hingehen; ein wirklich brauchbares Dolmetscherprogramm mit ausreichendem Wortschatz beispielsweise, läßt sich so aber kaum erstellen.
+
+Alles in allem ist Logo eine Sprache, die wirklich eine Menge bietet. Turtle-Grafik und Rekursion ermöglichen vielseitige Bildschirmgrafiken, die leicht abzuspeichern sind, und auch die anderen Besonderheiten von Logo sind zum Teil beeindruckend. So kann man die Sprache sicherlich allen empfehlen, die Grafik besser nutzen wollen, sich aber nicht auf Assembler verstehen. Auch die Listenbehandlung in Logo bietet mit etwas Übung interessante Möglichkeiten. Wer dann noch die genannten Einschränkungen in Kauf zu nehmen bereit ist, wird mit Logo bestimmt zufrieden sein.
+
+(Christof Bachmair/ev)
+
+Info: Logo gibt’s bei Ihrem Commodore-Händler zum Preis von 159 Mark nur auf Diskette für den Commodore 64.
 
 
 
