@@ -18,27 +18,6 @@
         <h1>Dem Klang auf der Spur (Teil 5)</h1>
         <p class="intro">Dieser Teil des Musikkurses ist auch für all jene interessant, die sich nicht ausschließlich für Musik interessieren. Es werden Algorithmen zur Generierung verschiedener Signale vorgestellt.</p>
 
-<figure>
-    <img src="152-1.png" alt="">
-    <figcaption>Bild 1. Schema einer 8 x 8-Bit-Multiplikation</figcaption>
-</figure>
-<figure>
-    <img src="152-2.png" alt="">
-    <figcaption>Bild 2. Schema der 16 x 8-Bit-Multiplikation</figcaption>
-</figure>
-<figure>
-    <img src="152-3.png" alt="">
-    <figcaption>Bild 3. So gehen die von einem Software-LFO erzeugbaren Kurven aus SAWAP hervor</figcaption>
-</figure>
-<figure>
-    <img src="152-4.png" alt="">
-    <figcaption>Bild 4. Demonstration des Aliasing-Effekts</figcaption>
-</figure>
-<figure>
-    <img src="152-t1.png" alt="">
-    <figcaption>Tabelle 1. Ausführungszeiten der 6502/6510-Maschinenbefehle (in Taktzyklen)</figcaption>
-</figure>
-
         <p>Dabei wird anhand des Source-Listings des Programms Modulator gezeigt, wie man diese Algorithmen unter zeitkritischen Nebenbedingungen programmieren kann.</p>
 
         <p>Im zweiten Teil dieser Reihe wurde schon erwähnt, daß man jeden Signalverlauf durch eine Folge von Stützwerten beschreiben kann. Da man diese Stützwerte digital codieren kann, wird so die Signalerzeugung und -verarbeitung mit dem Computer möglich. Man muß dabei allerdings mit einer Abtastfrequenz arbeiten, die mindestens doppelt so hoch ist wie die höchste Frequenz, die im verarbeiteten Signal vorkommt. Für Audio-Signale in HiFi-Qulität ist somit eine Abtastfrequenz von mindestens 40 kHz erforderlich. Stellen wir dieser Frequenz einmal die Taktfrequenz von 1 MHz in unserem C 64 gegenüber: Eine Abtastperiode dauert bei 40 kHz 25 gs. Diese Zeit entspricht genau 25 Taktzyklen im C 64. Ein 6510-Maschinenbefehl dauert zwischen zwei und sieben Taktzyklen, das heißt, daß die CPU während einer Abtastperiode gerade vier bis maximal zwölf Befehle abarbeiten kann; zuwenig, um damit schon sinnvoll einen Signalabtastwert weiterzuverarbeiten. Die digitale Verarbeitung von Audiosignalen bleibt also zunächst einmal Hochleistungsrechnern und Spezialprozessoren vorenthalten.</p>
@@ -93,11 +72,21 @@
 
         <p>Wir wollen diesen Algorithmus nun konkret in Maschinensprache realisieren. Wenn MD und MR zunächst auf 8 Bit begrenzt werden, kann man auf sie mit einem einzigen Maschinenbefehl zugreifen. Die Variable SUM hält man am besten im Akkumulator, weil man sie zum Addieren sowieso dorthin laden müßte. Auch die Linksverschiebung des Akkumulators ist wesentlich schneller als die einer Speicherzelle. Beim Addieren in den Akkumulator und beim Linksverschieben treten allerdings Überträge auf, die nicht verloren gehen dürfen, da diese je gerade die höherwertigen Bits von SUM darstellen. Das Endprodukt, das sich in SUM bildet, kann bis zu 16 Bit lang werden. (In unserem Beispiel sind es immerhin schon 9 Bit.) Bild 1 zeigt eine elegante Realisierung des Algorithmus, die mit nur zwei Speicherplätzen auskommt.</p>
 
+        <figure>
+            <img src="152-1.png" alt="">
+            <figcaption>Bild 1. Schema einer 8 x 8-Bit-Multiplikation</figcaption>
+        </figure>
+
         <p>Die langen Rechtecke stellen die Speicherstellen MD, MR und den Akkumulator dar, fette Linien stehen für Bytepfade, dünne für Bitpfade.»+« versinnbildlicht die Addition A : = A + MD. In diesem Schema werden MR und A zusammen (wie ein 16-Bit-Register) nach links geschoben. Dadurch erscheinen die Bits von MR nacheinander in der Carry-Flagge und können so leicht abgefragt werden. MD wird nur dann zum Akku addiert, wenn das durch Linksverschiebungen aus MR gewonnene Bit Eins ist. Ein Übertrag bei der Addition in den Akku muß natürlich nach MR weitergegeben werden, da MR gleichzeitig auch die höherwertigen Bits von SUM enthält. Durch die doppelte Nutzung der Speicherstelle MR wird der Multiplikator zwar durch das höherwertige Byte von SUM überschrieben, man spart sich dadurch aber einen Schiebebefehl und einen Speicherplatz. Da wir wegen schnelleren Zugriffs MD und MR in der Zero-Page plazieren werden, und da der freie Platz dort knapp ist, ist die Einsparung von Speicherplatz durchaus gerechtfertigt. Hier das Programm, das ausführlich besprochen werden soll:</p>
 
         <p>TODO</p>
 
         <p>Die Zahlen in Klammern geben die Ausführungszeiten der Befehle in Taktzyklen an. Sie sind aus Tabelle 1 entnommen. Bei den Verzweigungen nehmen wir der Einfachheit halber an, daß keine Page-Grenzen übersprungen werden, sonst müßte man im Falle eines Sprunges vier statt drei Takte in Rechnung stellen. Zur Arbeitsweise des Programms: Zuerst wird SUM mit 0 vorbesetzt. Dazu genügt es, den Akku mit 0 zu besetzen, da die höherwertigen Bits von SUM erst durch den Schiebeprozeß entstehen. Das X-Register zählt die Schleifendurchläufe. Innerhalb der Schleife wird zunächst das Registerpaar (MR.A) durch das Befehlspaar ASL,ROL nach links verschoben. Beide Befehle schieben nach links, wobei Bit 7 in die Carry-Flagge geschoben wird. Der Unterschied der beiden Befehle besteht aber darin, daß ASL das Bit 0 immer mit Null besetzt, während ROL Bit 0 mit dem Wert besetzt, den die Carry-Flagge vor dem ROL-Befehl hatte. In unserem Fall ist das gerade das aus dem vorhergehenden ASL stammende Bit 7 vom Akku. Nach der Verschiebung zeigt das aus MR stammende Carry-Bit an, ob MD zu SUM addiert werden soll oder nicht. Falls nicht, wird mit BCC NEXT die Addition übersprungen. Die Addition selbst berücksichtigt durch ein weiteres BCC NEXT/ INC MR einen eventuell auftretenden Übertrag nach MR. Die Speicherstelle MR enthält zwar gleichzeitig Teile vom Multiplikator und von SUM, man kann sich aber überlegen, daß ein Übertrag nach MR nur den SUM-Teil, aber nicht den Multiplikator-Teil beeinflußt. Nach dem Verlassen der Schleife steht schließlich das 16-Bit-Produkt (die Variable SUM) im Registerpaar (MR.A). Der Multiplikator wurde überschrieben, der Multiplikant in MD dagegen ist unverändert erhalten geblieben.</p>
+
+        <figure>
+            <img src="152-t1.png" alt="">
+            <figcaption>Tabelle 1. Ausführungszeiten der 6502/6510-Maschinenbefehle (in Taktzyklen)</figcaption>
+        </figure>
 
         <h3>Zeitbedarf</h3>
 
@@ -138,6 +127,11 @@
 
         <p>In Modulator wird ein anderer Weg eingeschlagen. Er wird durch Bild 2 beschrieben. Dieses erscheint zwar zunächst sehr kompliziert, daszugehörige Programm benötigt aber eine geringere Ausführungszeit. Vorgegeben sind ein 16-Bit-Multiplikator im Registerpaar (MR + 1.MR) und ein 8-Bit-Multiplikant in MD (Der Einfachheit halber werden hier Zero-Page-Speicherplätze »Register« genannt.) Das Ergebnis des Programms soll ein 24-Bit-Produkt im Register Tripel (MR + 1.MR.A) sein.</p>
 
+        <figure>
+            <img src="152-2.png" alt="">
+            <figcaption>Bild 2. Schema der 16 x 8-Bit-Multiplikation</figcaption>
+        </figure>
+
         <p>Zuerst wird das niederwertige Teilprodukt MR x MD gebildet. Das Rechteck mit dem Kreuz steht für das Verfahren aus Bild 1, welche wie schon beschrieben, ein 8 x 8-Bit-Produkt in (MR.A) liefert. A wird im Y-Register zwischengspeichert. Anschließend werden MR +1 und MD ebenfalls nach Bild 1 multipliziert. Das Ergebnis ist das höherwertige Teilprodukt in (MR + l.A). Schließlich müssen die Teilprodukte nur noch mit richtiger Skalierung addiert werden. Dazu wird das höherwertige Byte des niederwertigen Teilprodukts, das in MR steht, zum niederwertigen Byte des höherwertigen Teilprodukts, das sich schon im Akku befindet, addiert. Dabei muß ein eventueller Übertrag nach MR +1 berücksichtigt werden. Das niederwertige Byte des niederwertigen Teilprodukts wird nur noch vom Y-Register in den Akku übertragen, wo es den niederwertigsten Teil des Endprodukts darstellt. In Modulator werden allerdings grundsätzlich nur 16-Bit-Größen weiterverarbeitet, so daß diese untersten 8 Bit des Produktes unberücksichtigt bleiben.</p>
 
         <p>Im Source Listing zu Modulator steht das zugehörige Programm MULU in den Zeilen 1680 bis 1970. Zunächst steht dort zweimal hintereinander das schon vorgestellte 8 x 8 Bit-Multiplikationsprogramm, anschließend werden ab Zeile 1910 die Teilprodukte addiert. Eine Analyse ergibt eine Laufzeit von minimal <strong>282</strong> Takten und maximal <strong>446</strong> Takten.</p>
@@ -150,6 +144,11 @@
 
         <p>Rechnerisch kann man einen Sägezahnförmigen Wertverlauf besonders einfach erzeugen. Bei Modulator wird einfach ein 16-Bit-Wert zyklisch hochgezählt. Zyklisch bedeutet, daß immer wieder beim Minimalwert angefangen wird, wenn der Maximalwert überschritten wird. Das geschieht bei begrenzter Wortlänge automatisch durch Überlauf, den man hier absichtlich unberücksichtigt läßt. Im Modulator-Programm wird der Werteverlauf durch das Wort (= Bytepaar) SAWUP repräsentiert. SAWUP wird einfach um den Betrag im Wort LFOF hochgezählt. Dadurch ist die resultierende Frequenz der Sägezahnkurve direkt proportional zum Wert LFOF. Im Programm wird in Zeile 2300 bis 2420 erst das Steuerregister LFOC abgefragt. Im Falle des HOLD- oder RESET-Status braucht nichts berechnet zu werden. Im Falle des RUN-Status wird SAWUP in den Zeilen 2430 bis 2510 hochgezählt. Der aufsteigende Sägezahn wird dann gewissermaßen als »Master« für die anderen Kurvenformen herangezogen. Bild 3 zeigt, wie diese aus SAWUP gewonnen werden.</p>
 
+        <figure>
+            <img src="152-3.png" alt="">
+            <figcaption>Bild 3. So gehen die von einem Software-LFO erzeugbaren Kurven aus SAWAP hervor</figcaption>
+        </figure>
+
         <p>Interessant ist, daß gleichgültig, ob man die SAWUP-Werte im Zweierkomplement oder grundsätzlich positiv interpretiert, sich immer der gleiche Kurvenverlauf ergibt (gestrichelte und durchgezogene Kurve bei SAWUP).</p>
 
         <p>Die Rechteckkurve entsteht dadurch, daß man, gesteuert durch SAWU, zwischen den Extremwerten + LFOA x 2 (hoch) 7 und -LFOA x 2 (hoch) 7 hin- und herschaltet. Man spart sich so die sonst anschließend fällige Multiplikation mit der LFO-Amplitude (= Modulationstiefe) LFOA. Hin- und hergeschaltet wird, wenn der Sägezahnwert einen vorgegebenen Schwellwert über- beziehungsweise unterschreitet. Dieser Schwellwert ist nichts anderes als die Pulsweite LFOP. SAWDOWN erhält man einfach durch Negieren von SAWUP. Bildet man das Maximum von SAWUP und SAWDOWN, so erhält man einen dreieckförmigen Kurvenverlauf, der allerdings nur positive Werte annimmt. Durch Verdoppeln dieser Werte und Verschiebung um 2 (hoch) 15 nach unten erhält man dann eine symmetrische Dreieckskurve maximaler Amplitude.</p>
@@ -159,6 +158,11 @@
         <h3>Aliasing-Parasitäre Frequenzen</h3>
 
         <p>Bei der eben beschriebenen Erzeugung der LFO-Kurvenformen tritt bei etwas höheren Frequenzen, etwa ab 10 Hz, noch ein interessantes Phänomen auf. Man kann die Erzeugung eines Sägezahnverlaufs durch zyklisches Hochzählen eines Wortes auch als Abtastung einer hypothetischen, kontinuierlichen Sägezahnkurfe auffassen. Die Abtastfrequenz ist in unserem Fall mit 60 Hz fest. Die Frequenz der hypothetischen Sägezahnkurve kann man aber durch den Parameter LFOF sehr feinstufig zwischen 0 und 60 Hz variieren. Wie soll aber zum Beispiel eine LFO-Kurve mit 50 Hz aussehen, wenn man nur 60 Äbtastwerte pro Sekunde hat? Die Antwort gibt Bild 4. Man erhält den gestrichelten Verlauf mit einer Frequenz von nur 10 Hz. Noch seltsamer sieht das Resultat bei einer LFO-Frequenz von 25 Hz aus. Die Folge der Abtastwerte schwingt zwar ungefähr im Rhythmus von 25 Hz, dieser Bewegung ist aber zusätzlich ein Auf und Ab im 10-Hz-Rhythmus überlagert.</p>
+
+        <figure>
+            <img src="152-4.png" alt="">
+            <figcaption>Bild 4. Demonstration des Aliasing-Effekts</figcaption>
+        </figure>
 
         <p>Der theoretische Hintergrund dieser Erscheinung sei hier nur gestreift: Nach dem Abtasttheorem muß die Abtastfrequenz mindestens doppelt so hoch sein, wie die höchste im abzutastenden Signal vorkommende Frequenz, damit die Abtastfolge dieses Signal richtig repräsentiert. Andernfalls weist die Abtastfolge Frequenzanteile auf, die im Originalsignal gar nicht vorkommen. Man nennt diesen Effekt Aliasing (von lat. alias = anderswo). In unserem Fall können die Bedingungen des Abtasttheorems nie vollständig erfüllt werden, da der ideale Sägezahn Obertöne beliebig hoher Ordnung enthält. Im ersten Fall von Bild 4 wird das Abtasttheorem grob verletzt: Die Abtastfrequenz ist bei weitem nicht doppelt so groß wie die Signalfrequenz. Als Resultat tritt nur eine Aliasing-Frequenz von 10 Hz auf. Im zweiten Fall wird das Abtasttheorem immerhin für die Grundschwingung des Signals erfüllt. 60 Hz ist mehr als doppelt so groß wie 25 Hz. Die 25 Hz sind in der Folge der Abtastwerte auch erkennbar. Die zweite Harmonische des Signals ist aber mit 50 Hz schon zu hoch für die Abtastung. Ihre Amplitude beträgt immerhin die Hälfte der Amplitude der Grundschwingung, wie eine Fourier-Analyse ergibt. Und genau diese Harmonische findet man auch hier als eine Aliasing-Frequenz von 10 Hz in der Folge der Abtastwerte wieder.</p>
 
