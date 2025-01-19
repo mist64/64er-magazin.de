@@ -1,0 +1,147 @@
+
+
+;modulator.test.prg ==0801==
+   10 rem--------------------------------
+   11 rem rahmenprogramm zum test von
+   12 rem m o d u l a t o r
+   13 rem
+   14 rem thomas kraetzig   februar 1985
+   15 rem--------------------------------
+   20 rem  sid f  pw port wf  a  d  s  r
+   21 data   110, 50, 32, 64, 1,10, 8,10
+   22 data   220, 50, 48, 64, 1,10, 8,10
+   23 data   440, 50, 64, 32, 1,10, 8,10
+   24 :
+   25 rem  filter  f  res  filt mod laut
+   26 data        64,  12,    7,  1,  15
+   27 :
+   28 rem lfo f   p   a  c    f   p   a  c
+   29 data 5000,128,  6, 6,7000,128,  6, 6
+   30 data  800,128,128, 6,9000,128,  8, 6
+   31 data 6000,128,103,30,1000,128,196, 6
+   32 data   15,128,128, 0
+   33 :
+   34 rem  eg  a   d   s   r   ega   egc
+   35 data    20, 15, 32, 20,  128,   06
+   36 :
+   37 rem   ksv
+   38 data  00000001,f1,    00000010,f2
+   39 data  00001000,f3,    00000100,pw1
+   40 data  00000000,pw2,   00000000,pw3
+   41 data  10000000,filt,  00000000,laut
+  245 :
+  250 b=12*4096 :rem basis fuer parameter
+  255 si=13*4096+1024 :rem sid-basis
+  260 :
+  265 rem datas einlesen, sid- und
+  270 rem modulator-register besetzen
+  275 :
+  280 for ss=0 to 2 :rem 3 stimmen
+  285 :
+  290 : rem frequenz
+  295 : read f:f=int(f*17.0284+0.5)
+  300 : hi=int(f/256):lo=f-256*hi
+  305 : poke b+7*ss,lo:poke b+1+7*ss,hi
+  310 : bf(ss)=f    :rem basisfrequenz
+  315 :
+  320 : rem pulsweite
+  325 : read p:p=int(p*40.95+0.5)
+  330 : hi=int(p/256):lo=p-256*hi
+  335 : poke b+2+7*ss,lo
+  340 : poke b+3+7*ss,hi
+  345 :
+  350 : rem porta
+  355 : read p:poke b+4+7*ss,p
+  360 :
+  365 : rem wellenform
+  370 : read wf(ss):wf(ss)=wf(ss) and 254
+  375 :
+  380 : rem a d s r - huellkurve
+  385 : reada:readd:pokesi+7*ss+5,16*a+d
+  390 : reads:readr:pokesi+7*ss+6,16*s+r
+  395 :
+  400 next ss
+  405 :
+  410 rem filter, lautstaerke
+  415 read f:hi=int(f/8):lo=f-8*hi
+  420 poke b+21,lo:poke b+22,hi
+  425 read res:read filt
+  430 poke si+23,16*res+filt
+  435 read mod:read laut
+  440 poke b+23,16*mod+laut
+  445 :
+  450 rem lfo
+  455 for i=0 to 6
+  460 : read f:hi=int(f/256):lo=f-256*hi
+  465 : poke b+32+5*i,lo
+  470 : poke b+33+5*i,hi
+  475 : read p:poke b+34+5*i,p
+  480 : read a:poke b+35+5*i,a
+  485 : read c:poke b+36+5*i,c
+  490 next i
+  495 :
+  500 rem eg (a d s r)
+  505 for i=0 to 4:read x:poke b+67+i,x
+  510 next i
+  515 read ec      :rem steuerbyte merken
+  520 ec=ec and 254:rem gate=0
+  525 poke b+72,ec
+  530 :
+  535 rem ksv
+  540 for i=0 to 7
+  545 : read a$:a=0
+  550 : for j=1 to 8
+  555 :  a=2*a
+  560 :  if mid$(a$,j,1)="1"then a=a+1
+  565 : next j
+  570 : poke b+24+i,a
+  575 : read a$    :rem ueberlesen
+  580 next i
+  585 :
+  590 rem eingabezeichen fuer noten
+  595 n$="q2w3er5t6y7ui9o0p@-*\^"
+  600 :
+  610 rem relative tonhoehen
+  615 dim th(21)
+  620 for i=0 to 21
+  625 : th(i)=2^(i/12)
+  630 next i
+  635 :
+  640 sys b+1024+9 :rem modulator starten
+  642 :
+  645 rem zeitmessung auswerten
+  650 t=peek(b+113)+256*peek(b+114)
+  655 t1=int(t/100)/10
+  660 t2=int(1000*t/16421)/10
+  665 print"zeitbedarf:";t1;"ms";
+  670 print"  auslastung:";t2;"%{up}{up}{up}";
+  671 :
+  672 rem tasteneingaben auswerten
+  673 rem q-^    toene (weisse tasten)
+  674 rem 2-\    toene (schwarze tasten)
+  675 rem space  gate aus
+  676 rem f1,2,3 stimme 1,2,3
+  677 :
+  680 s=0
+  685 get a$:if a$="" then 685
+  690 if a$<>" " then 715
+  695 poke b+72,ec :rem eg gate aus
+  700 poke si+4+7*s,wf(s):rem gate aus
+  705 goto 685
+  710 rem n$ nach eingabe durchsuchen
+  715 i=0
+  720 i=i+1:if i>=22 then 770
+  725 if a$<>mid$(n$,i,1) then 720
+  730 f=bf(s)*th(i-1)
+  735 hi=int(f/256):lo=f-256*hi
+  740 poke si+4+7*s,wf(s):rem gate aus
+  745 poke b+72,ec  :rem eg gate aus
+  750 poke b+7*s,lo :poke b+1+7*s,hi
+  755 poke si+4+7*s,wf(s)+1
+  760 poke b+72,ec+1:rem eg gate an
+  765 goto 685
+  770 if a$="{f1}" then s=0 :rem f1,stimme 1
+  775 if a$="{f3}" then s=1 :rem f3,stimme 2
+  780 if a$="{f5}" then s=2 :rem f5,stimme 3
+  785 goto 685
+
