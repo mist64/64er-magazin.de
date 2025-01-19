@@ -16,16 +16,7 @@
 <body>
     <article>
         <h1>Dem Klang auf der Spur, Teil 4</h1>
-        <p class="intro">Der SID ist einer der vielseitigsten Sound-Chips auf dem Markt. Dennoch kann man mit ein paar Tricks Klänae mit mehr Volumen, Weichheit und Komplexität erzeugen. Der hier vorgestente Modulator ist der Kern eines in den nächsten Folgen zu entwickelnden, interruptgesteuerten Synthesizer- und Sequenzerprogramms mit professionellen Ansprüchen.</p>
-
-        <figure>
-            <img src="131-1.png" alt="">
-            <figcaption>Bild 1. Funktionsschema des erweiterten SID</figcaption>
-        </figure>
-        <figure>
-            <img src="131-2.png" alt="">
-            <figcaption>Bild 2. Steuerparameter und dynamische Parameter in »Modulator«</figcaption>
-        </figure>
+        <p class="intro">Der SID ist einer der vielseitigsten Sound-Chips auf dem Markt. Dennoch kann man mit ein paar Tricks Klänge mit mehr Volumen, Weichheit und Komplexität erzeugen. Der hier vorgestellte Modulator ist der Kern eines in den nächsten Folgen zu entwickelnden, interruptgesteuerten Synthesizer- und Sequenzerprogramms mit professionellen Ansprüchen.</p>
 
         <p>Die Beschreibung der Register des Synthesizer-Chips SID 6581 wird hier abgeschlossen. Es wird das Programm »Modulator« vorgestellt, das die Fähigkeiten des SID stark erweitern wird. »Modulator« ist interruptgetrieben und läuft daher parallel zu anderen Programmen.</p>
 
@@ -70,6 +61,11 @@
         <h2>Das Modulator-Konzept</h2>
 
         <p>Die Lebendigkeit von Naturklängen resultiert aus ihrer Unregelmäßigkeit. Keine zwei Perioden gleichen sich wie ein Ei dem anderen. Naturklänge weisen immer Schwankungen in der Lautstärke und in der Tonhöhe auf. Es soll zwar nicht unser Ziel sein, mit dem C 64 Naturklänge nachzumachen (dazu ist der SID-Chip bei weitem nicht in der Lage), man kann aber durch Modulation von SID-Parametern Klänge mit mehr Komplexität, Weichheit und Volumen erzeugen. Zur Modulation geeignete Parameter sind Frequenz, Lautstärke, Filterfrequenz und die Pulsweite bei Rechteckklängen. Da die Pulsweite die spektrale Zusammensetzung eines Rechteckklanges beeinflußt, moduliert man durch die Pulsweite eigentlich die Klangfarbe. Modulation von Frequenz (Vibrato) und Lautstärke (Tremolo) sind auch bei natürlichen Instrumenten zu beobachten. Die Modulation der Filterfrequenz ist dagegen ein typischer Synthesizereffekt. Bild 1 zeigt das Funktionsschema des erweiterten SID-Chips in unserem Konzept. Der rechte untere Teil stellt vereinfacht den SID dar, wie er in der letzten Folge auf Bild 1 schon beschrieben wurde. Nur dieser Teil des Schemas ist in der Hardware realisiert, die anderen Funktionsblöcke werden durch Software verwirklicht. Zuerst sollen die Blöcke funktionell beschrieben werden. Anschließend wird etwas über ihre Ansteuerung gesagt. Im nächsten Teil wird die softwaremäßige Realisierung besprochen. Neben Kenntnissen zur Verwirklichung weiterer Effekte werden dabei auch allgemein nützliche Informationen für Assembler-Programmierer anfallen.</p>
+
+        <figure>
+            <img src="131-1.png" alt="">
+            <figcaption>Bild 1. Funktionsschema des erweiterten SID</figcaption>
+        </figure>
 
         <h3>Modulationsquellen und -Ziele</h3>
 
@@ -119,6 +115,11 @@
 
         <p>Um sich mit dem Programm vertraut zu machen, sollte man es bei der Lektüre gleich ausprobieren. Zunächst muß man das Programm mit Hilfe des MSE (in dieser Ausgabe) in den Speicher bringen. Man kann nun mit Hilfe eines Monitors, oder komfortabler, mit dem Testprogramm zu »Modulator« (siehe Listing 2) die Modulationsmöglichkeiten ausprobieren. »Modulator« wird mit SYS 12 x 4096 + 1033 aktiviert. Von da an verbraucht das Programm Rechenzeit, egal ob etwas hörbar ist oder nicht. Abgeschaltet wird Modulator mit SYS 12 x 4096 + 1046. »Modulator« wird wie der SID über Registerinhalte gesteuert. Der Inhalt von 73 Speicherstellen nimmt Einfluß auf »Modulator« und darüber hinaus auch auf den SID. Im Registerschema in Bild 2 kann man zwischen Steuerparametern und dynamischen Parametern unterscheiden. Steuerparameter werden von »Modulator« nur gelesen. Über sie wird das Programm gesteuert. Dynamische Parameter werden ständig verändert. Durch Auslesen dieser Werte kann man beobachen, wie »Modulator« arbeitet. Man kann diese Register natürlich auch beschreiben. Dadurch greift man direkt in die Arbeit von »Modulator« ein. Für weitere Spezialeffekte kann das sinnvoll sein. Mehr davon im nächsten Teil.</p>
 
+        <figure>
+            <img src="131-2.png" alt="">
+            <figcaption>Bild 2. Steuerparameter und dynamische Parameter in »Modulator«</figcaption>
+        </figure>
+
         <p>Da die meisten SID-Register von »Modulator« gesteuert werden, muß man nur noch wenige direkt ansprechen. Es sind dies:<br />
             Die Kontrollregister: 4, 11, 18<br />
             ADSR-Register: 5, 6, 12, 13, 19, 20<br />
@@ -127,14 +128,18 @@
 
         <p>Die anderen SID-Register findet man mit ähnlichem Aufbau unter den Steuerparametern von »Modulator«. Das Basic-Testprogramm enthält einen vollständigen Parametersatz für SID und »Modulator« in den Zeilen 20 bis 41. Diese Zeilen sind so gestaltet, daß sie mit LIST -41 gerade einen Bildschirm füllen. Die DATA-Zeilen sind mit Kommentaren durchsetzt, so daß man den Zusammenhang mit dem Registerschema in Bild 2 leicht herstellen kann. Beim Testprogramm geht man am besten so vor:</p>
 
-        <p>— Modulator laden<br />
-            — Testprogramm laden<br />
-            - LIST -41</p>
+        <ul>
+            <li>Modulator laden</li>
+            <li>Testprogramm laden</li>
+            <li>LIST -41</li>
+        </ul>
 
         <p>Jetzt kann man den Parametersatz studieren und verändern.</p>
 
-        <p>— Cursor auf die Zeile mit READY bringen<br />
-            - RUN (SPACE), (SPACE)</p>
+        <ul>
+            <li>Cursor auf die Zeile mit READY bringen</li>
+            <li>RUN (SPACE), (SPACE)</li>
+        </ul>
 
         <p>Dadurch bleibt der DATA-Block am Bildschirm stehen. Nach einiger Zeit wird die Dauer eines »Modulator«-Schrittes und die daraus resultierende CPU-Belastung angezeigt. Jetzt kann man mit den Tasten Fl, F3, F5 Stimme 1, 2, oder 3 auswählen und über die oberen beiden Tastenreihen einen Ton erklingen lassen. Der Ton klingt so lange weiter, bis mit der SPACE-Taste das GATE-Bit der gewählten Stimme zurückgesetzt wird. Das GATE-Bit des Software-EG wird ebenfalls gesetzt und rückgesetzt. Das einfache Basic-Programm reagiert nicht gerade flott, es ist aber auch nur zum Experimentieren mit »Modulator«-Klangbildern gedacht, nicht für virtuoses Spiel. Mit RUN/STOP wird das Programm abgebrochen. Während »Modulator« weiterarbeitet, kann man die Parameter in den DATA-Zeilen ändern, um das Programm neu zu starten.</p>
 

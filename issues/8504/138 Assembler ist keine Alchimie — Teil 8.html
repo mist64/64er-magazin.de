@@ -18,11 +18,6 @@
         <h1>Assembler ist keine Alchimie — Teil 8</h1>
         <p>Irgendwann brauchen Sie sie bestimmt, die Rechnung mit Fließkommazahlen. Auch den Umgang mit logischen Ausdrücken wie AND, ORA oder EOR und wie man mit dem Schiebe-Befehl ASL multipliziert, sollen Sie beherrschen. Das alles erfahren Sie im achten Teil dieses Kurses.</p>
 
-        <figure>
-            <img src="138-2.png" alt="">
-            <figcaption>Bild 2. Wirkung des ASL-Befehls: Arithmetisches Linksschieben</figcaption>
-        </figure>
-
         <p>Inzwischen wissen Sie ja, daß alle Daten im Computer im Binärformat enthalten sind. Wie man eine normale, ganze Zahl zur binären umrechnet, wurde schon im Grafik-Kurs (64’er, Ausgaben 4 und 5 von 1984) gezeigt. Da aber viele Leser dieses Assemblerkurses die genannten Ausgaben nicht besitzen, soll doch nochmal vorgestellt werden, welcher Rechenweg der einfachste ist. Als Beispiel nehmen wir die Zahl 1985. Man teilt diese Zahl so lange durch 2, bis das Ergebnis 0 wird. Jedesmal notiert man sich den Rest, der entweder 0 oder 1 sein kann:</p>
 
         <p>TODO Tabelle</p>
@@ -401,6 +396,11 @@
         <p>Jedesmal, wenn zum Beispiel A &lt; 64 ist, tritt anstelle der Klammer ein —1 auf. Übrigens ist diese Formel eine schöne kurze Möglichkeit, ASCII-Code (hier A als Variable) in den Bildschirmcode umzurechnen (der Bildschirmcode steht dann in der Variablen C).</p>
 
         <p>Kommen wir nun zur zweiten Gruppe von Assembler-Befehlen, die Bit-Manipulationen erlauben: den Verschiebe-Befehlen. Fangen wir dabei mit ASL an, was vom englischen »arithmetic shift left« kommt. Zu deutsch heißt das dann »arithmetisches nach links schieben«. Davon sind wir aber auch noch nicht schlauer. Sehen wir uns an, was dieser Befehl tut (Bild 2).</p>
+
+        <figure>
+            <img src="138-2.png" alt="">
+            <figcaption>Bild 2. Wirkung des ASL-Befehls: Arithmetisches Linksschieben</figcaption>
+        </figure>
 
         <p>Der gesamte Inhalt des Akku beziehungsweise der Speicherstelle (je nach Adressierung) wird um eine Bit-Position nach links verschoben. Das vorherige Bit 7 wandert in die Carry-Flagge, alle anderen Bits erhalten eine um 1 höhere Position, das freigewordene Bit 0 wird mit einer 0 aufgefüllt. Toll! Aber was soll das? Zur Erklärung machen wir nochmal einen kurzen Ausflug zu unserem normalen dezimalen Zahlensystem. Nehmen wir mal die Zahl 123. Bei der Einführung in die Fließkommazahlen hatten wir das Komma zu verschieben gelernt. 123 ist ja dasselbe wie 123,00. Wenn wir das Komma um eine Stelle nach rechtsverschieben, erhalten wir 1230,0 (dabei lassen wir jetzt mal den Exponenten außer acht, der wäre ja —1, weil 123,00 = 1230,0 x10<sup>-1</sup>). Man kann das Ganze auch andersherum sehen: Wir haben die Zahl 123 eine Stelle nach links verschoben und die freigewordene Stelle ganz rechts mit einer Null aufgefüllt. 1230,0 ist das Zehnfache von 123,00. Die Verschiebung um eine Stelle nach links hat also zur Multiplikation unserer Zahl mit der Basis unseres Zahlensystems (also 10) geführt. Eine zweimalige Linksverschiebung führ tzu 12300, den 100fachen Wert unserer Ausgangszahl. Wir haben also die Zahl 123,00 mal 10 mal 10 genommen, das sind 10<sup>2</sup>. Jede Linksverschiebung erhöht unseren Ausgangswert um eine Zehnerpotenz, oder — anders ausgedrückt — erhöht den Multiplikator um eine Zehnerpotenz und deshalb natürlich auch das Ergebnis (einmal linksschieben: Multiplikator = 10 = 10<sup>4</sup>, zweimal linksschieben: Multiplikator: 100 = 10<sup>2</sup> und so weiter).</p>
 
