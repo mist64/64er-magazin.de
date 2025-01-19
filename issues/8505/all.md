@@ -952,39 +952,975 @@ Dateien müssen teilweise aktualisiert werden. Dieser Vorgang wird als Reorganis
 
 (Said Baloui/gk)
 
+# Dateiverwaltung ist nicht gleich Datenbank
 
+> Alle reden über Dateiverwaltung. Über die vielfältigen Anwendungsmöglich-keiten und über Vor- und Nachteile der verschiedenen Programme. Wenig verbreitet ist jedoch das Wissen darum, was eine Dateiverwaltung eigentlich ist und welche Unterschiede zu Datenbanken bestehen.
 
+Zuerst sei folgendes erklärt: eine Datenbank ist nicht einfach eine Art »bessere Dateiverwaltung«. Zwischen Datenbank und Dateiverwaltung bestehen nicht nur graduelle Unterschiede. Beiden gemeinsam ist die Aufgabe, eine Menge gleichartiger Daten, das heißt Dateien zu verwalten, ob es sich bei diesen Daten nun um Artikel, Schallplatten oder Videotitel handelt. Das Verwalten besteht im sogenannten »Änderungsdienst«, dem Ändern und Löschen von Datensätzen, dem Sortieren von Dateien und der möglichst komfortablen Beantwortung von Anfragen des Benutzers, also dem Selektieren bestimmter Datensätze aus der Gesamtmenge.
 
+Mit einer leistungsfähigen Dateiverwaltung läßt sich nicht nur eine spezifische Datei verwalten, sondern der Benutzer kann beliebig viele verschiedene Dateien aufbauen. Mit einer Datenbank ist es jedoch möglich, mehrere Dateien miteinander zu verknüpfen (siehe Übersicht Tabelle 1).
 
+Ein Beispiel: Stellen Sie sich vor, Sie seien der Inhaber eines Zeitungsvertriebs und seit kurzem stolzer Besitzer eines Computers. Diesen wollen Sie dazu verwenden, das Schreiben von Rechnungen an die Abonnenten zu automatisieren. Sie erwerben eine Datenbank wie zum Beispiel dBase II und bauen zwei Dateien auf: Eine Kundendatei, in der Sie Ihre Abonnenten führen (Kundennummer, Anschrift des Kunden, abonnierte Zeitschrift) und eine Zeitschriftendatei (Zeitschrift, Abonnentenpreis). Bisher verlief das Schreiben von Rechnungen so: Sie suchen in dem Karteikasten »Kunden« den jeweiligen Abonnenten, tragen dessen vollständige Anschrift in die Rechnung ein, merken sich den Namen der abonnierten Zeitschrift, suchen in dem Karteikasten »Zeitschriften« nach der entsprechenden Karteikarte und tragen den Abonnentenpreis in die Rechnung ein. Ein sehr zeitaufwendiger Vorgang, wenn die Dateien groß sind.
 
+Der Datenbank müssen Sie nur angeben; »Suche in der Kundendatei nach dem Kunden xyz, merke dir die abonnierte Zeitschrift und suche in der Datei »Zeitschriften« nach diesem Titel. Die Datenbank verfügt nun über alle Informationen, um eine vollständige Rechnung auszudrucken.
 
+Die gestellte Aufgabe erfordert die Verknüpfung von Kunden- und Zeitschriftendatei. Gute Datenbanken sind sogar in der Lage, mehr als zwei Dateien gleichzeitig zu bearbeiten und somit noch weitaus komplexere Anfragen zu beantworten.
 
+Sollten Sie im Besitz einer Dateiverwaltung sein, müssen Sie auf diese Möglichkeiten der Verknüpfung von Dateien leider verzichten. Sie müssen ebenfalls darauf verzichten, sich mit Hilfe einer Datenbanksprache ein Abfrageprogramm zu schreiben, das genau auf Ihre spezielle Anwendung zugeschnitten ist. Jede Datenbank bietet eine solche Datenbanksprache. Mit Ihrer Hilfe lassen sich immer wiederkehrende Abläufe fest einprogrammieren. In unserem Beispiel könnte ein solches Programm so aussehen: die Datenbank wartet auf die Eingabe der Kundennummer, durchsucht daraufhin selbständig Kunden- und Zeitschriftendatei nach dem vorgegebenen Schema und druckt die Rechnung aus; anschließend wird auf die Eingabe der nächsten Kundennummer gewartet. Die Arbeit mit einer Dateiverwaltung hingegen geschieht im Dialog mit dem System. Der Benutzer muß sich auch bei immer wiederkehrenden Abläufen durch eine Vielzahl von Menüs hindurcharbeiten, um eine bestimmte Funktion anzuwählen.
 
+Diese beiden Merkmale einer Datenbank, das Verknüpfen von Dateien, und die feste Programmierung immer gleicher Arbeitsabläufe sind jedoch nur für den kommerziellen Anwender interessant. Der private Benutzer, der seine Adressen oder Schallplatten verwaltet, wird mit einer leistungsfähigen Dateiverwaltung wohl immer zufrieden sein.
 
+Sollten Sie aufgrund der Tatsache, daß Dateiverwaltungen nicht so leistungsfähig wie Datenbanken sind, nun der Ansicht sein, daß die Programmierung einer Dateiverwaltung wohl recht einfach sein müßte, muß ich Sie jedoch enttäuschen. Es gibt unzählige Möglichkeiten, eine Dateiverwaltung zu erstellen, die vor allem von den gewählten Datenstrukturen abhängen; und die Auswahl an Datenstrukturen ist fast unbegrenzt. Es gibt Listenstrukturen, Baumstrukturen, Hashing-Verfahren etc. Die Wahl der geeigneten Datenstrukturen entscheidet über die spätere Leistungsfähigkeit einer Dateiverwaltung und kann im Nachhinein kaum geändert werden. Es ist meist leichter, ein Programm neu zu schreiben, als die verwendeten Datenstrukturen eines fertigen Programms zu ändern, weil Sie sich als nicht leistungsfähig genug erwiesen haben.
 
+Die meist verwendeten Datenstrukturen will ich kurz näher erläutern (einige zum Verständnis nötige Begriffe wie »binär«, »Zeiger« etc. sind im Lexikon in dieser Ausgabe erläutert). Sollte dieser Artikel bei Ihnen Appetit auf »mehr« wecken, so möchte ich Sie auf das Buch »Alles über Datenbanken und Dateiverwaltung mit dem C 64«, erschienen bei Data Becker, hinweisen. Kommen wir nun zu den versprochenen Datenstrukturen fTabelle 2).
 
+**Listenstrukturen** können Sie sich als eine Aneinanderreihung von Datensätzen vorstellen, vergleichbar mit der Anordnung von Daten in einem Telefonbuch. Diese Aneinanderreihung kann ungeordnet oder geordnet sein (meist alphabetisch). Geordnete Listen haben den Vorteil, daß sie schneller durchsucht werden können als ungeordnete. Sie können die Suche in einer geordneten Liste mit der Suche in einem Telefonbuch vergleichen, bei der Sie wohl kaum auf der ersten Seite mit der Suche nach »Maier« beginnen, sondern wesentlich effizienter suchen, eben (fast) binär. Problematisch an geordneten Listen ist das Eintragen und Löschen von Datensätzen. Um einen neuen Datensatz einzutragen, müssen alle alphabetisch nachfolgenden Datensätze verschoben werden, um Platz zu schaffen. Aus diesem Grund wird die Ordnung bei verketteten Listen nicht durch die Reihenfolge, sondern durch Zeiger hergestellt. Jedes Element der Liste besitzt einen solchen Zeiger, der auf den Ort weist, an dem der (alphabetisch) nachfolgende Datensatz abgespeichert ist. Da die Reihenfolge der Elemente unerheblich ist, kann ein neu einzutragender Datensatz einfach an das Ende der Liste angehängt werden. Er muß allerdings einen Zeiger auf den alphabetisch nachfolgenden Datensatz bekommen, und der vorhergehende Datensatz einen Zeiger auf den gerade neu eingetragenen. Eine verkettete Liste läßt sich leider nicht binär durchsuchen, sie muß sequentiell, also Element für Element, durchsucht werden. Dafür erlaubt sie das schnelle Eintragen und Löschen von Datensätzen. Da sie geordnet ist, kann sich der Benutzer einer solchen Dateiverwaltung jederzeit den alphabetisch nächsten oder vorhergehenden Datensatz zeigen lassen.
 
+**Baumstrukturen** sind im Grunde genommen nur eine besondere Form von geordneten Listen, bei der die einzelnen Elemente, allerdings durch mehr als einen Zeiger, miteinander verkettet werden. Zum Einfügen eines neuen oder Löschen eines alten Elementes müssen nur wenige Zeiger verändert werden; das Verschieben von Elementen ist nicht nötig. Die Suche nach bestimmten Elementen ist schnell, da der Baum binär durchsucht wird. Aufgrund Ihrer Vorteile gehören Baumstrukturen zu den beliebtesten Datenstrukturen.
 
+**Hashing**: Das sogenannte »Hash-Verfahren« hat mit den bisher geschilderten Datenstrukturen keinerlei Gemeinsamkeiten. Es beruht darauf, daß mit Hilfe eines geeigneten Algorithmus direkt aus dem abzuspeichernden Datensatz die Adresse gewonnen wird, an dem dieser abgelegt wird. Ein Beispiel: der einfachste denkbare Hash-Algorithmus bestünde darin, die Quersumme der einzelnen ASCII-Werte für ein einzelnes Datensatzfeld, zum Beispiel »maier«, zu bilden. Die ermittelte Zahl (366) könnte nun als Recordnummer oder als Index für einen String verwendet werden (a$(366) = "maier;georg;münchen"). Bei der Suche nach einer bestimmten Adresse wird nun dieser Algorithmus auf den Namen angewandt, und der String mit diesem Index oder aber der jeweilige Record eingelesen. Der Vorteil des Hash-Verfahrens liegt in der Geschwindigkeit: in den meisten Fällen ist keinerlei Suche nach bestimmten Daten mehr nötig, sondern es kann direkt auf den gewünschten Datensatz zugegriffen werden. Nachteilig ist, daß die Daten völlig ungeordnet sind.
 
+Diese kurze Vorstellung verschiedener Datenstrukturen sollte vor allem eines zeigen: Die Wahl einer bestimmten Datenstruktur hängt von derjeweiligen Aufgabenstellung ab. Wenn der entscheidende Gesichtspunkt bei der Verwaltung von Daten die Zugriffsgeschwindigkeit ist, empfiehlt sich das Hash-Verfahren. Muß die Datei jedoch unbedingt alphabetisch durchblättert werden können, so bieten sich Listen- oder Baumstrukturen an.
 
+### Handicap für Kassettenrecorder
 
+Kurz erwähnt werden sollte noch die Art des Zugriffs auf Daten. Man unterscheidet hauptsächlich den direkten und den sequentiellen Zugriff (Tabelle 3). Mit einem Kassettenrecorder geht es nur sequentiell: Um einen bestimmten Datensatz zu finden, müssen alle in der Datei vorhergehenden Elemente gelesen werden. Damit ist weder die indexsequentielle Datei, bei der über einen Zeiger direkt auf den gewünschten Datensatz zugegriffen werden kann, noch die Hashing-Datei, die ebenfalls direkten Zugriff voraussetzt, möglich.
 
+Bei der Floppy gibt es diese Einschränkungen nicht. Sie hat nurzwei Grenzen; zum einen die Speicherkapazität und zum anderen die Geschwindigkeit, mit der Daten übertragen werden. Und diese beiden Punkte sind es auch, die die Verwendung von Datenbanken auf dem C 64 fraglich machen. Die Verwendung mehrerer Dateien ist sehr speicherintensiv, und die Verknüpfung dieser Dateien erfordert einen häufigen Zugriff auf die Diskette und ist daher auch ein Zeitproblem. Interessant dürften Datenbanken eher beim neuen PC 128 werden. Warten wir's ab.
 
+(Said Baloui/gk)
 
+# Sprachen für Computer (2)
 
+> Diesmal sollen uns bei unserem Überblick über die Welt der Programmiersprachen die modernen Sprachen interessieren. Sie erfahren, was Ada kann und was man sich unter Modula oder Lisp vorzustellen hat.
 
+Die »klassischen« alten Programmiersprachen wie Fortran, Co-bol oder Algol haben viel mehr miteinander gemeinsam, als man beim oberflächlichen Betrachten von Programmen in einer dieser Sprachen erwarten würde. So können zum Beispiel nur numerische Datentypen verwendet werden, eine Einschränkung, in der sich die unzulänglichen Hardwaremöglichkeiten der fünfziger Jahre wiederspiegeln. Tatsächlich war Rechenzeit und Speicherplatz damals Mangelware, und niemand dachte auch nur im entferntesten daran, die teure Rechnerkapazität für andere Dinge als schwierige numerische Berechnungen einzusetzen. Das führte dann später in den sechziger und siebziger Jahren zur Unsitte, rein numerisch orientierte Sprachen wie Fortran schließlich für alle möglichen Zwecke einzusetzen. Die Sprache war halt einmal vorhanden, Rechenkapazität verfügbar und so wurden sogar ganze Textverarbeitungsprogramme in Fortran geschrieben, Buchstabe für Buchstabe fein säuberlich als Zahlenwert codiert und in einem numerischen Datenfeld abgelegt.
 
+Da war eine Sprache wie Basic, das 1965 am Dartmouth College entwickelt worden ist, schon ein gewisser Fortschritt. Basic bietet neben numerischen Datentypen auch noch Strings, also Zeichenketten, als Datentyp an und stellt auch spezielle Operatoren dafür zur Verfügung. Tatsächlich ist mit der Möglichkeit, numerische Daten und Texte zu bearbeiten, schon ein großer Teil der (damals) denkbaren Computer-Anwendungen abgedeckt. Moderne Programmiersprachen stellen aber noch weitaus mehr Komfort zur Verfügung. Es können beliebige eigene Datentypen definiert werden, es gibt sogenannte »Verbundvariable«, zusammengesetzt aus mehreren Variablen verschiedener Datentypen, und schließlich können auch komplexe Datenstrukturen wie verkettete Listen oder Suchbäume einfach dargestellt werden. Die erste Sprache, die diese Möglichkeiten konsequent verwirklichte, war Pascal, auf das schon im ersten Teil ausführlicher eingegangen wurde. Im folgenden wollen wir uns etwas näher mit den Nachfolgern von Pascal beschäftigen, aber auch auf völlig andersartige Konzepte eingehen.
 
+## Pascal in Kurzform: C
 
+Die Entwicklung der Sprache C ist eng verbunden mit der Geschichte des 16-Bit-Betriebssystems Unix, das selbst vollständig in C geschrieben ist. Der Name dieser Sprache hat eine verblüffend einfache Herkunft. Zur Programmier-Unterstützung auf Minicomputern von Digital Equipment wurden um 1970 Spezialsprachen entwickelt, die einfach nach dem Alphabet die Bezeichnungen A und B erhielten. Die B-Sprache wurde 1971 dazu benutzt, Unix, das damals noch in Assembler geschrieben war, auf einfache Art und Weise auf andere Computer zu übertragen. Schließlich erkannte Dennis Ritchie, ein Programmierer bei Bell Labs, die Fähigkeiten der Sprache B, erweiterte und verfeinerte sie und nannte das Resultat C.
 
+Kurz darauf (1973) wurde Unix auf C umgeschrieben — das erste Betriebssystem, das in einer höheren Programmiersprache abgefaßt war. Das war nur möglich, weil C ein strukturiertes Sprachkonzept bei gleichzeitiger größtmöglicher Effizienz der Programme zur Verfügung stellt. In C geschriebene Programme sind einerseits sehr kompakt (geringer Speicherbedarf), andererseits sehr schnell (typischerweise etwa 50 mal so schnell wie Basic).
 
+Programmierung in C besteht im wesentlichen im Schreiben von Funktionen, die jeweils Teilbereiche des Problems lösen. Die Gesamtlösung ergibt sich dann durch zweckmäßigen Einsatz dieser Funktionen. Dementsprechend ist C einerseits stark an Pascal angelehnt, verfügt andererseits aber über zusätzliche Befehle und Operatoren, die der verbesserten Ausnutzung der vorhandenen Hardware (= des Prozessors) dienen. So bietet C spezielle, an die Assembler-Programmierung angelehnte Befehle zum Inkrementieren und Dekrementieren (erhöhen/erniedrigen) von Varia-blenwerten und als einzige der verbreiteten höheren Programmiersprachen die Option, Variable als Register-Variable zu deklarieren. Das bedeutet, daß solche Variablen nach Möglichkeiten in internen Prozessor-Registern gehalten werden, was einen wesentlich schnelleren Zugriff als bei den normalerweise verwendeten Speichervariablen ermöglicht. An dieser Stelle merken Sie wahrscheinlich schon, daß bei der Entwicklung der Sprache nicht unbedingt an den 6502-Prozessor gedacht wurde, der mit seinen bescheidenen drei Registern (A,X,Y) in dieser Beziehung nicht gerade überwältigende Möglichkeiten bietet. Allerdings würde sich als Register-Ersatz die Zero-Page anbieten, bei der der Zugriffja auch etwas schneller ist. Andererseits wurde C auch nicht gerade für 64-Bit-Superprozessoren konzipiert. Derartige in Großrechnern verwendete Prozessoren verfügen in der Regel über eine sehr große Zahl von Registern, und ein guter Fortran-Com-piler für so einen Großrechner verwendet natürlich auch diese Register für die Programmoptimierung. So wird C in der Regel auf 16- oder 32-Bit-Maschinen eingesetzt. Bei den 8-Bit-Prozessoren ist C praktisch nur für den Z80 verbreitet (unter CP/M), allerdings soll eine Version für den C 64 in Vorbereitung sein. Wir werden Sie im 64'er Magazin darüber auf dem laufenden halten.
 
+## Modulare Programmierung: Modula
 
+Das Grundkonzept aller modernen Programmiersprachen heißt Modularisierung der Programmentwicklung. Damit ist gemeint, Probleme nicht mit immensem Aufwand in umfangreichen Programmen zu lösen (die ja für jedes Problem wieder neu geschrieben werden müssen), sondern Teilaspekte des Problems in möglichst allgemeiner Form in eigenständigen Teilprogrammen, eben den sogenannten Modulen, zu lösen. Der Vorteil dieser Art der Software-Entwicklung liegt auf der Hand: Ein Teilproblem muß nur ein einziges Mal gelöst werden; tritt das gleiche Teilproblem irgendwann einmal wieder bei der Programmierung auf, kann man auf das fertige Modul zurückgreifen. Außerdem ist es natürlich zumeist viel einfacher, mehrere kleinere Probleme zu lösen als ein großes. Bei konsequentem Einsatz der »modularisierten Programmierung« lassen sich Programme somit auf lange Sicht wesentlich rationeller entwickeln.
 
+Allerdings gibt es einige Voraussetzungen für die Modularisierung: Die einzelnen Module müssen über genau definierte »Schnittstellen« nach »außen« verfügen, damit sie zweckmäßig ausgewählt und eingesetzt werden können. Andererseits darf aber das »Innenleben« der Module auf keinen Fall irgendwelche Dinge »außen« beeinflussen. Basic ist daher zum Beispiel sehr schlecht für diese Art der Programmierung geeignet: Unterprogramme haben keine Namen, sondern werden über Zeilennummern aufgerufen (schlechte Dokumentation), es gibt keine Parameterübergabe, also keine feste Schnittstelle, und schließlich ist jede Variable, die im Unterprogramm verändert wird, anschließend auch im Hauptprogramm verändert.
 
+Modula, entwickelt von Professor N. Wirth, dem Schöpfer der Sprache Pascal, ist eine der ersten Sprachen, die das Konzept der Modularisierung, das zum Teil ja auch schon in Pascal enthalten ist, konsequent durchführt.
 
+Jedes Modula-Programm ist selbst ein Modul und kann dementsprechend andere Programme als Untermodule verwenden. Dabei gibt es keinen Unterschied zwischen den Standard-Modulen, die die Sprache dem Benutzer zur Verfügung stellt und selbstgeschriebenen (Programm-)Modulen. Jedes Modul ist in sich vollständig abgeschlossen, daß heißt Vereinbarungen über Datentypen, Funktionen und Variable gelten nur innerhalb des Moduls. Sollen die in einem Modul getroffenen Definitionen anderen Modulen zugänglich gemacht werden, dann müssen sie vom Modul »exportiert«, von den anderen Modulen »importiert« werden. Damit werden alle unerwünschten Nebeneffekte, wie sie etwa bei Basic-Unterprogrammen häufig auftreten können, vollständig ausgeschlossen.
 
+Selbstverständlich sind die einzelnen Module intern ebenfalls völlig strukturiert aufgebaut. Den Befehl GOTO sollte man als Modula-Pro-grammierer schnellstens vergessen; dafür stehen die von Pascal gewohnten Schleifenstrukturen (FOR...TO... DO...END, REPEAT...UNTIL, WHI-LE...END) zur Verfügung, zusätzlich noch die LOOP...EXIT...END-Schlei-fe, die alle Befehle zwischen LOOP und END so lange durchläuft, bis die bei EXIT angegebene Bedingung erfüllt ist. Diese Schleifenstrukturen sind übrigens ohne Ausnahme auch im Commodore 3.5-Basic des C 16, oder im 7.0-Basic des C 128 vorhanden, ein sicheres Zeichen, daß sich das Konzept der strukturierten Programmierung auch im Bereich der Basic-Heimcomputer immer mehr durchsetzt. Leider ist Modula noch nicht für Commodore-Computer erhältlich.
 
+## Die Krönung: Ada
+
+Den bisherigen Höhepunkt bei der Entwicklung moderner, modularer Programmiersprachen stellt ohne Zweifel die Sprache Ada dar.
+
+Die Sprache hat ihren Namen nach der Countess Augasta Ada Lovelace, die sich als erste Frau bereits im vorigen Jahrhundert (!) mit Algorithmen und Rechenmaschinen beschäftigte. Bekannt wurde sie in erster Linie, indem sie ein »Rechenkalkül« für die von Charles Babbage entworfene mechanische Rechenmaschine entwarf. Dieses Kalkül kann man im weitesten Sinne als den ersten Algorithmus für eine Maschine bezeichnen.
+
+Ada wurde erst in jüngster Zeit im Auftrag des amerikanischen Verteidigungsministeriums entwickelt und baut ebenso wie C und Modula auf dem Konzept von Pascal auf. Die Sprache ist ebenso wie Modula streng modular und strukturiert aufgebaut, geht aber von den Fähigkeiten weit über Modula hinaus.
+
+Wie in Modula gehören praktisch alle Funktionen, insbesondere auch die Ein-/Ausgabe-Operationen nicht direkt zur Sprache, sondern werden in besonderen Modulen, den sogenannten Packages (Pakete) bereitgehalten. Das hat den Vorteil, daß der Anwender im Bedarfsfalle fast alle Funktionen selber neu schreiben kann, wenn ihm die Standard-Funktionen nicht gefallen. Alle Packages, ob selbstgeschrieben oder vom System bereitgestellt, müssen ins Programm, das seiner-seit ein Package darstellt, importiert werden. Dies geschieht sehr einfach durch Angabe des entsprechenden Paket-Namens. Um zum Beispiel die Standard-Routinen für die Ein- und Ausgabe von Texten zu importieren, verwendet man die Anweisung:
+TEXT_IO IS PACKAGE
+STANDARD_TEXT_IO
+
+Durch diese Angabe werden die im Modul STANDARD_TEXT_IO enthaltenen Funktionen dem Programm-Modul unter dem Namen TEXT	IO bekanntgemacht. Das Standard-Modul enthält beispielsweise die Funktionen WRITE und READ zum Drucken und Einlesen von Daten.
+
+Durch die Anweisung USE TEXT	10 werden dann bei Bedarf (wenn WRITE oder READ im Programm vorkommt) die entsprechenden Funktionen aus dem STANDARD_TEXT_IO-Modul (das ja innerhalb des Programms den Namen TEXT	IO erhalten hat) entnommen und ins Programm eingefügt. Will man aber an einer bestimmten Stelle nicht die Standardfunktion verwenden, sondern eine selbstgeschriebene, dann braucht man das eigene Modul nur mit
+MEIN_TEXT IS PACKAGE
+EIGENE_TEXT_IO
+anzumelden und im Programm mit
+USE MEIN_TEXT
+auf die selbstgeschriebenen Routinen umzuschalten. Dabei wird die Ada-Fähigkeit des »Überladens« von Funktionen verwendet, was nichts anderes bedeutet, als daß ein- und dasselbe Schlüsselwort (oder Zeichen) je nach Kontext grundverschiedene Funktionen bezeichnet. Nach Umschaltung mittels »USE« heißt die Ausgabefunktion in unserem Beispiel zwar immer noch »WRITE«, es wird aber die selbstgeschriebene Funktion aufgerufen und nicht die Standard-Funktion.
+
+Natürlich kann man diese Technik auf alle möglichen Bereiche ausdehnen. Damit wird zusammen mit der Möglichkeit sich eigene Datentypen, wie in Pascal oder Modula, zu definieren, ein sehr hoher Grad an Flexibilität gewährleistet. Zum Beispiel kann man sich bei Bedarf einen Datentyp COMPLEX für komplexe Zahlen definieren und die Operatoren »+«,»-«, »*« und»/«durch Überladen auch auf diesen neuen Datentyp anwenden.
+
+Zwei weitere Aspekte von Ada sind noch besonders erwähnenswert: Zum einen existieren sehr komfortable Möglichkeiten, Ausnahmesituationen im Programm (sogenannte Exceptions) ohne Abbruch unter Kontrolle zu bringen. In der Regel dient das zum Abfangen von Fehlerbedingungen, die innerhalb eines Programms auftauchen können (in etwa vergleichbar mit »ON ERROR« oder »TRAP« in Basic). Eine solche Fehlerbehandlung ist bei Compilersprachen bislang sehr selten, für die Zwecke des amerikanischen Verteidigungsministeriums aber natürlich unabdingbar. Man stelle sich nur vor, in kritischen Situationen würden Radarstationen keine Informationen mehr weitergeben wegen eines »DIVISION BY ZERO ERROR« ...
+
+Der zweite zusätzliche Aspekt von Ada ist die Fähigkeit, parallele Prozesse automatisch durchführen zu können (Multitasking). Damit ist gemeint, daß bestimmte Operationen gleichzeitig ablaufen können (sofern der Computer mit mehreren Prozessoren ausgestattet ist, sonst ergibt sich natürlich nur eine »Pseudo-Gleichzeitigkeit«), Das bringt natürlich eine unter Umständen immense Erhöhung der Verarbeitungsgeschwindigkeit, allerdings auf Kosten eines hohen Hardwareaufwandes.
+
+Wer sich etwas näher mit Ada beschäftigen will und einen C 64 besitzt, der findet im Ada-Trainings-kurs von Data Becker (siehe Test in dieser Ausgabe) einen brauchbaren Einstieg.
+
+Es gibt ganz grob eingeteilt zwei grundverschiedene Linien unter den Programmiersprachen.
+
+Da sind einmal die sogenannten Anweisungs-Sprachen, zum anderen die funktionalen Sprachen. Zu den Anweisungs-Srachen gehören alle »klassischen« Programmiersprachen einschließlich Basic, daneben natürlich Pascal, Modula, Ada und C. Alle diesen Sprachen sind von Ihrer Struktur her mehr oder weniger stark an die Hardware-Organisation der heutigen Computer angelehnt (Befehl holen — Befehl ausführen — Programmzeiger auf nächsten Befehl setzen). Funktionale Sprachen verlangen demgegenüber nicht die Ausführung spezieller, einzelner Befehle, sondern beschreiben Strukturen und bilden neue Strukturen.
+
+Vertreter dieser Sprachen sind zum Beispiel Lisp (eine listenverarbeitende Sprache), Snobol (eine symbolische Simulations-Sprache) und eine Unzahl kleiner, außerhalb der Universitäten völlig unbekannten Spezialsprachen.
+
+Lisp ist sicherlich der bekannteste Vertreter dieser Sprachenklasse. Für den Laien besteht Lisp in erster Linie aus einer Unzahl von öffnenden und schließenden Klammern, ab und zu findet sich dazwischen auch mal ein anderes Zeichen. Die Ursache dafür ist die funktionale Struktur der Sprache. Es gibt in Lisp keine Befehle, sondern nur Funktionen, die aus primitivsten Grundelementen sehr komplexe Strukturen aufbauen können. Ausgangspunkt ist immer die kleinste, unteilbare Lisp-Struktur, das Atom. Ein Atom kann eigentlich alles sein, was man über eine Tastatur in einen Computer hineinbekommt. Mit (ATOM APFEL) wird ein »DING« namens Apfel definiert, daß weder interne Struktur noch Beziehungen zu irgendwelchen anderen Daten hat. Diese Beziehungen zu anderen Daten werden erst im folgenden durch Funktionen definiert. Wesentliches Element von Lisp (List Processing Language) ist die Fähigkeit, Listen zu bilden. Eine Liste ist eine geordnete Aufzählung von Elementen. Diese Elemente sind im einfachsten Fall Atome, es kann sich dabei aber auch um andere Listen oder gar um Funktionen handeln. Mit
+( SETQ OBST (APFEL BIRNE KIRSCHE))
+wird eine Liste OBST definiert, die aus den Atomen Apfel, Birne und Kirsche besteht (die natürlich vorher als Atome vereinbart worden sind).
+
+## Funktionale Sprachen
+
+Es gibt jetzt eine Menge vordefinierter Funktionen, um diese Listen weiter zu verarbeiten. Es können einzelne Elemente oder ganze Listen zu neuen Listen umgewandelt werden, es können Bedingungen festgelegt werden, unter denen das geschieht und so fort. Dabei können sehr komplexe Strukturen, regelrechte logische Netzwerke, entstehen.
+
+Dadurch wird in gewisser Weise der in erster Linie assoziativ arbeitende Mechanismus des menschlichen Denkens viel besser simuliert, als durch schrittweise Abarbeitung von Befehlen.
+
+Lisp wird denn auch mit durchaus beachtenswerten Erfolgen bei praktisch allen KI-(künstliche Intelli-genz-)Projekten eingesetzt. Die Sprache liefert vor allem auf den Gebieten der symbolischen Datenverarbeitung (nicht-numerische Mathematik), der Erkennung von Mustern und dem logischen Folgern gute Ergebnisse.
+
+Für den C 64 ist Lisp nicht erhältlich, jedoch ist mit Logo eine andere Sprache verfügbar, die ebenfalls Listenverarbeitung unterstützt.
+
+Dieser Aspekt der Listenverarbeitung ist allerdings bei Logo längst nicht so konsequent implementiert wie in Lisp, aber dafür auch für den Einsteiger recht schnell zu durchschauen. Bekannt geworden ist Logo allerdings in erster Linie durch die »Turtle-Grafik«, die schon zum Markenzeichen dieser Sprache geworden ist.
+
+Die Turtle (Schildkröte) wird in der Regel durch ein kleines Dreieck am Bildschirm dargestellt, das mit Befehlen wie FORWARD, BACK, LEFT und RIGHT in alle Richtungen bewegt werden kann. Dabei hinterläßt die Schildkröte eine sichtbare Linie auf dem Bildschirm und kann so zum bequemen Zeichnen auch von komplexen Grafiken eingesetzt werden.
+
+Wie bei Basic, so handelt es sich auch bei Logo (übrigens auch bei Lisp) um einen Interpreter, was ein sehr bequemes Vorgehen beim Programmieren erlaubt. Alle Programmbefehle können auch im Direktmodus eingesetzt werden, und so kann man alle Routinen direkt im Dialog mit dem Computer austesten, ohne das gesamte Programm wie bei einem Compiler nach jeder Änderung ständig wieder neu übersetzen zu müssen.
+
+Die einfache Handhabung der Grafik ist sicherlich einer der Hauptgründe, die speziell beim C 64 für die Verwendung von Logo sprechen. Wenn Sie sich für Logo interessieren, dürfen wir Ihnen unseren Testbericht über das Commodore-Logo in dieser Ausgabe empfehlen.
+
+Natürlich ist es mit den hier behandelten Sprachen noch nicht getan. Es existiert eine Unmenge weiterer Programmiersprachen, mit deren Behandlung man ganze Bücher füllen könnte. Dieser Bericht sollte Ihnen aber einen allgemeinen Überblick gegeben haben, wo’s bei den Programmiersprachen lang geht.
+
+Speziell für den C 64 wird es sicher in naher Zukunft eine Reihe weiterer Sprachen geben. Interessant wird die Angelegenheit natürlich auch im Hinblick auf den neuen Commodore 128 PC, der ja die ganze Welt der Programmiersprachen unter CP/M zugänglich macht. Ganz sicher werden wir das Thema »Programmiersprachen« unter diesem Aspekt nochmals aufgreifen.
+
+(ev)
+
+# Infocom-Geheimnisse gelüftet?
+
+> Bekannt dürften sie mittlerweile sein, die Adventurespiele von Infocom. Gelöst sind sie noch lange nicht. Ein Grund, Ihnen Tips dazu zu geben.
+
+Die Infocom-Adventures sind wohl die besten Text-Abenteu-erspiele, die es gibt. Sie verstehen in der Regel einen Wortschatz von über 800 Wörtern, akzeptieren ganze Sätze und lesen sich wie spannende Romane — kein Wunder, denn Infocom läßt auch Romanautoren für sich arbeiten. Was für die einen der Unterschied zwischen Bilderbuch und ausgereiftem Roman, ist für die Adventurefans die Unterscheidung zwischen Grafik- und Textabenteuer. Die Textadventures verbrauchen keinen Speicherplatz für Grafiken und bieten deswegen viel mehr andere Möglichkeiten. Dieser für die anderen Dinge freie Speicherplatz wird meist ausgenutzt, um einen enormen Umfang an Räumen, Gegenständen und Aufgaben unterzubringen. Und da die Infocom-Adventures genau dies tun, sind sie sehr schwer lösbar. Daher unsere Tips.
+
+## Tips für alle Infocoms
+
+Als erstes erhalten Sie ein paar allgemeine Tips, die Sie eigentlich für alle Infocom-Adventures benutzen können.
+
+Der Parser ist, einfach gesehen, das Stück des Programms, das die Eingabe der Sprache steuert. Der Infocom-Parser ist zwar einer der besten seiner Art; aber was immer auch so toll daran sein mag — es ist zu empfehlen, den Infocom-Parser einfach wie bei einem Zwei-Wort-Adventure anzusehen. Das spart eine Menge Zeit. Mit dem Wortschatz herumprobieren sollten Sie trotzdem: In jedem Infocom-Aben-teuer gibt es Worte, die die anderen Adventures aus diesem Softwarehaus nicht haben, und die manchmal zum Ziel führen können.
+
+Und noch etwas: Denken Sie nie daran, was Sie machen würden, wenn Sie tatsächlich so ein Abenteuer durchleben müßten. Überlegen Sie sich, was der Autor an Gemeinheiten eingebaut haben könnte — das führt Sie viel eher zum Ziel.
+
+Außerdem gibt es sehr selten zwei Methoden, ein Problem zu lösen. Speichern Sie also immer Ihr Spiel ab, bevor Sie mit etwas herumexperimentieren. Beispiel: Wenn Sie einen Gegenstand an einem Ort falsch benutzen und später einen Ort erreichen, an dem Sie den Gegenstand (oder Zauberspruch) unbedingt benötigen, müssen Sie den abgespeicherten Spielstand wieder laden (weil der Gegenstand oder Zauberspruch abgenutzt oder verbraucht ist). Es sei denn, Sie wollen von vorn beginnen.
+
+### Gegenstände:
+
+Untersuchen Sie alle Gegenstände sehr genau. Viele Dinge können manipuliert und verändert werden, andere haben ein »Innenleben«, das heißt sie können Flüssigkeiten oder andere Gegenstände beinhalten. Ein Eigenleben der Objekte ist auch nie auszuschließen; achten Sie also auf alles, was eigenständig sein könnte. Das Schwert aus der Zork-Serie leuchtet beispielsweise blau, wenn Gefahr nahe ist, und rot, wenn der Träger des Schwertes verärgert ist. Legen Sie die Gegenstände immer ab, wenn Sie sie einmal sinnvoll benutzt haben. In Infocom-Adventures werden sie meistens kein zweites Mal benötigt. Wenn Sie einen Gegenstand mehrmals untersuchen, und keine nähere Beschreibung folgt, können Sie den Gegenstand ruhig als unwichtig betrachten und vergessen. Letzteres gilt für alle Infocom-Adventures außer »Hitchhikers Guide to the Galaxy«, das extrem von der Firmennorm abweicht.
+
+### Personen:
+
+Um zu jemandem zu sprechen, müssen Sie als erstes den Namen der Person eingeben. Um beispielsweise den Dieb zu fragen, ob er Ihnen das Stilett geben würde, müssen Sie tippen:»Thief, give me the sti-letto«.
+
+Fragen Sie die Leute nach Gegenständen, anderen Personen und speziellen Ereignissen. Untersuchen Sie auch die Personen genau (mit EXAMINE).
+
+Soweit zu allgemeinen Tips. Zu den für die einzelnen Abenteuer angegebenen Hinweisen ist noch zu sagen, daß wir hier nur kleine Denkstützen geben wollen. Wer mehr erfahren will, kann sich die in Geheimtinte gedruckten »Hint Books« von Infocom selbst bestellen. Wir für unseren Teil arbeiteten völlig ohne Lösungsbücher, befragten dafür aber viele Abenteurer, aus deren Erfahrungen sich die folgenden Tips zu den speziellen Infocom-Adventures ergeben.
+
+### ZORK I
+
+Zork ist ein Spiel, bei dem es darum geht, zwanzig Schätze zu finden und sie in einer Schatzkiste abzulegen. Ein Dieb ist das Haupthindernis dabei, weil er versucht, Sie auszurauben oder umzubringen. Er kann zwar getötet werden, aber nur, wenn Sie stark genug sind (was von der Anzahl der Schätze in der Schatzkiste abhängt) und wenn Sie die richtige Waffe besitzen. Diese Waffe ist scharf, aber nicht das Schwert! Sobald Sie einen Schatz finden, sollten Sie Richtung Haus gehen.
+
+### ZORK II
+
+Hier gibt es zehn Schätze, aber das Hauptziel ist es, den Zauberer von »Frobozz« zu vernichten. Es ist sehr wichtig, herauszufinden, was im Irrgarten der seltsam verwinkelten Räume vor sich geht. Außerdem sollten Sie den Zweck des Korbs mit dem Wäschebeutel kennen.
+
+### ZORK III
+
+Sie können in diesem Spiel nur sieben Punkte bekommen. Und wenn Sie die alle haben, bedeutet das noch lange nicht, daß Sie gewonnen haben. Die Punkteverteilung ist auf eine »potentielle« Aufgabenlösung ausgelegt. Das bedeutet, daß Sie einen Punkt schon bekommen, wenn das Programm denkt, Sie wären nahe daran, ein Problem zu lösen. Philosophie spielt eine große Rolle in Zork III. Sie sollten sich sehr höflich und mildtätig benehmen — aber trotzdem mutig sein.
+
+### INFIDEL
+
+Sie müssen eine ägyptische Pyramide erforschen, in der Hieroglyphen an die Wand geschrieben sind. Lernen Sie die Hieroglyphen gut, denn in ihnen steht die Lösung aller Probleme. Entziffert ergeben sie übrigens reines Englisch. Tip: Viele Objekte haben ein einzelnes Hieroglyphen-Zeichen, das für sie steht. Nehmen Sie in der Pyramide alles mit, was Sie finden können, besonders den Mast. Übrigens: Die Pyramide steht fast neben dem Camp.
+
+### STARCROSS
+
+In diesem Spiel wurde viel Wert auf die Manipulation von Gegenständen gelegt. Viele Gegenstände sind farbig, um die Unterscheidung für den Spieler einfacher zu machen. Karten zu zeichnen ist hier wesentlich einfacher als bei den Zorks. Die farbigen Stäbe dienen als »Schätze« und müssen in die richtigen Slots gesteckt werden. Ein bißchen Wissen aus der Chemie (Atomhülle, Elektronen etc.) wird Ihnen helfen. Bevor Sie das Schiff verlassen, sollten Sie die vier farbigen »docking ports« des Alien-Raum-schiffs genau untersuchen. Geben Sie Ihren Raumanzug dem Chef, und folgen Sie ihm durch den »maze« zu einem anderen docking ports.
+
+### PLANETFALL
+
+Dieses Spiel basiert mehr auf Komplexität als auf schwierigen Problemen. Floyd muß sterben, bevor Sie gewinnen können. Betrachten Sie genau das Loch in der Wand und das verdächtige Gemälde, das in einem der Büros hängt.
+
+### SUSPENDED
+
+Sie kontrollieren sechs Roboter, die Ihnen Informationen senden. Jeder davon hat seine eigenen speziellen Fähigkeiten, die, richtig verstanden und angewandt, des Rätsels Lösung sein können. Iris kann zum Beispiel ein TV-Bild von dem, was sie sieht, senden. Konzentrieren Sie sich also ständig auf Iris. Die Farben der Gegenstände helfen Ihnen, herauszufinden wie man sie benutzt. Steuern Sie die Roboter so, daß die Menschen in unvermeidbare Fallen laufen.
+
+### ENCHANTER
+
+Enchanter läßt sich nur mit Hilfe von Zaubersprüchen lösen. Die »ewige Treppe« muß zerstört werden. Sie benötigen auch unbedingt die Hilfe des Abenteurers, der Ihnen begegnet. An einer anderen Stelle sollten Sie Bleistift und Radiergummi benutzen. Genaueres zu Enchanter finden Sie im 64’er, Ausgabe 3/85.
+
+### SORCERER
+
+Noch mehr Magie — und das schwerste aller Infocom-Adventu-res. »Beleuchten« Sie sich selbst (Zauberspruch »Frotz«), und gehen Sie dann los, um Belboz zu suchen. Benützen Sie den Infotater, um die Schatzkiste zu öffnen. Manche Zaubersprüche müssen zweimal gelernt werden, um die gewünschten Resultate zu erzielen. Speichern Sie nach jedem gelösten Problem ab, denn Sorcerer ist sehr schwer. Sie benötigen unbedingt die orange Flüssigkeit, bevor Sie den »Yonk«-Spell an einer bestimmten Stelle benutzen. Heben Sie sich den »Vezza«-Spell bis ganz zum Schluß auf.
+
+### DEADLINE und WITNESS
+
+In beiden Spielen wird kriminalistischer Spürsinn verlangt. Hauptarbeit ist es, die Leute über andere Personen und bestimmte Situationen auszufragen. Folgen Sie den Leuten unauffällig.
+
+In Deadline müssen Sie »George« einen bestimmten Gegenstand zeigen, und zwar vor der Testamentsverlesung. Es gibt außerdem einen Geheimgang und einen versteckten Safe.
+
+In Witness sollten Sie sich im Arbeitszimmer aufhalten, wenn »Monica« eintritt. Täter ist (wie immer) derjenige, der am wenigsten danach aussieht.
+
+### HITCHHIKER'S GUIDE TO THE GALAXY
+
+Dieses Spiel weicht stark von der »Infocom-Norm« ab, weil es sehr gemein und heimtückisch gemacht wurde.
+
+Legen Sie sich vor dem Bulldozer in den Dreck und warten Sie. Nehmen Sie nicht das Handtuch, das Ihnen angeboten wird. Später im Adventure sollten Sie Ihre Sinne genau nachzählen; benutzen Sie den, der nicht auf dem Bildschirm steht. Manchmal werden Sie vom Programm angelogen. Versuchen Sie also alles mehrmals.
+
+## SUSPECT
+
+Dieses Spiel läuft ähnlich wie Deadline und Witness ab. Allerdings sind Sie diesmal der Mordverdächtige und müssen sich innerhalb ein paar Stunden vom Verdacht befreien. Achten Sie sehr genau auf Gespräche anderer Leute (auch Wortfetzen fügen sich mitunter zu wichtigen Indizien zusammen). Fragen Sie jeden über alles aus, was Ihnen einfällt. Besonders viel erzählt der Barkeeper, dem Sie sich als erstes zuwenden sollten.
+
+## CUTTHROATS
+
+Dieses Adventure ist eines der neuesten aus der Infocom-Reihe. Daher läßt sich hierzu noch nicht viel sagen. Wenn Sie einen Tip dazu haben — immer her damit!
+
+Die oben genannten Hinweise zu den Adventures sind, wie gesagt nur minimale Denkanstöße für den Abenteuerspieler. Wer mehr wissen will, sollte sich die »Hint Booklets« von Infocom aus USA bestellen. Die Lieferzeiten sind allerdings sehr lang.
+
+(M. Kohlen/rg)
+
+# Trickfilm mit dem C 64
+
+> In die vierte Dimension, die bewegte dreidimensionale Grafik, dringen Sie mit diesem Programm vor.
+Sie können so mit einfachsten Mitteln Trickfilme mit verblüffenden Eigenschaften erstellen.
+
+Die Idee zu diesem Programm kam uns, als wir zum zweiten Mal die Sendung »Das Bild, das aus dem Rechner kam« sahen.
+
+Die erste noch in Comal geschriebene Version berechnete jeweils ein Bild und zeichnete es sofort. Das Ergebnis: nur alle 7 Sekunden ein Bild! Auch als erst alle Linien berechnet und dann gezeichnet wurden, konnte von einem flüssigen Be-wegungsablaufkeine Rede sein. Bei der jetztigen Version wird der Teil des Zeichnens von einer Maschi-nencode-Routine übernommen, die eine Geschwindigkeit von 3 bis 10 Bilder/s erlaubt. Die Unterschiede gegenüber anderen Trickfilmgeneratoren:
+
+* Es muß nur ein Bild eingegeben werden, alle anderen Bilder berechnet der Computer aus diesem Bild.
+* Auch komplizierte Bewegungsabläufe können mühelos erzeugt werden (zum Beispiel, um einen Körper um die Z- und X-Achse zu drehen, dabei heranzuholen und nach links zu bewegen, bis er den Bildschirm verläßt, braucht man nur eine DATA-Zeile!).
+* Es können sehr viele (bis zu 255) und große Bilder gespeichert werden, da nur die Linienkoordinaten gespeichert werden.
+* Es werden keine Basic-Erweite-rungen benötigt.
+
+(Dirk und Armin Biernaczyk/rg)
+
+TODO ASIDE
+
+Wir erblickten am 14.4.1968 das Licht der Welt. Und nicht nur das, sondern jeder noch ein anderes Geschöpf: wir waren Zwillinge. Nachdem wir sechs Jahre zusammen mehr oder weniger ruhig verbracht hatten, wurden wir 1974 in die Grundschule West eingeschult. Dort überstanden wir die ersten 4 Jahre unseres Schullebens ohne Komplikationen. 1978 wechselten wir aufs Märkische Gymnasium, was keine große Umstellung bedeutete, denn auch hier reichte das Zeugnis immer aus, um die Geldbeutel der Verwandten zu öffnen. Meinen ersten Kontakt mit Computern hatte ich (Dirk) in der Schule in der 10. Klasse mit Logo, was meinem Bruder allerdings aufgrund seiner Wahl für Latein in der Klasse 9 nicht möglich war. Kurze Zeit darauf sammelten wir zusammen in der Volkshochschule Bochum unsere ersten Basic-Kenntnisse. Fasziniert von der Computerei kauften wir uns Ende 1983 einen C 64 mit Diskettenlaufwerk. Da wir nach Abschluß der 10. Klasse von der Schule immer noch nicht die Nase voll hatten, machten wir weiter und besuchen heute die 11. Klasse und versuchen dort im Informatikunterricht, mittlerweile zusammen und in Pascal, den Wurm im Apfel II zu dressieren. Zu Hause schlagen wir uns lieber mit Basic, Assembler und ein wenig Comal herum. Das Ergebnis unserer Programmierwut ist dieses Programm.
+
+(Dirk und Armin Biernaczyk)
+
+TODO END ASIDE
+
+> In die vierte Dimension, die bewegte dreidimensionale Grafik, dringen Sie mit unserem Listing des Monats vor.
+
+Der »3D-Movie Maker« muß in zwei Teilen eingegeben werden: zuerst das Maschinenprogramm, dann der Basic-Teil. Wenn das Maschinenprogramm eingegeben und gestartet wurde, so speichert es sich, falls kein Prüfsummenfehler auftrat, selbst als >TRICK.OBJ« ab. Man braucht sich nun nicht mehr darum zu kümmern. Bei dem Basic-Teil, der nun eingegeben werden kann, dürfen alle REM-Zeilen ersatzlos wegfallen. Beim Start des Basic-Teils wird automatisch der Maschinenteil, der sich auf Diskette befinden sollte, nachgeladen.
+
+### Bedienung - Eingabe des Körpers
+
+Vor der Benutzung des Programmes, müssen die Punkte Verbindungs- und Bewegungsvorschrift des Körpers in den DATA-Zeilen ab 8000 festgelegt werden. Dies ist notwendig, damit bei Änderungen oder einem erneuten Start nicht alles wieder neu eingegeben werden muß. Die DATA-Zeilen, die das Listing momentan enthält, erzeugen den auf dem Bildschirm herumfliegenden Schriftzug »64’er«. Die Punkte werden mitX, Y und Z-Koordinaten eingegeben. Als Endmarke dient hier dreimal die 1000. Bei der Verbindungsvorschrift wird jeweils der Anfangs- und Endpunkt angegeben zum Beispiel: Von Punkt 1 nachPunkt2 = DATA 1,2. Hierdientzweimaldie 1000 als Endmarkierung.
+
+Beispiel: Man will ein Kreuz erzeugen.
+Punkte: DATA0,10,0,10,0,0,-10,0
+DATA—10, 0,0, 1000,1000,1000
+Verbindungsvorschrift: DATA 1,3,2,4,1000,1000
+
+Bei der Bewegungsvorschrift ist es allerdings etwas komplizierter. Hier müssen zweimal drei Verschiebungsarten, drei Drehungsarten und die Dauer des Vorgangs angegeben werden. Zuerst kommt die erste Verschiebung in X-, Y- und Z-Richtung, dann die Drehung um die drei Achsen, nun die zweite Verschiebung und zum Schluß die Dauer des Ganzen. Diese Reihenfolge hat folgenden Sinn:
+
+Wird zuerstverschoben und dann gedreht, drehtsich die Figur um den Bildschirmmittelpunkt. Bei umgekehrter Reihenfolge dreht sich die Figur an beliebiger Stelle um ihren eigenen Mittelpunkt. Hier ein Beispiel einer DATA-Zeile:
+DATA0,0,0,5,0,0, 0,5,0, 10
+
+Die Figur bewegt sich 10 Bilder lang um jeweils 5 Stellen nach oben und dreht sich dabei um jeweils fünf Grad um die X-Achse. Einen Zoomeffekt erreicht man durch Verschieben in der Z-Achse, so kann man zum Beispiel mit DATA 0,0,0,0,0,0,0,0,1,50 eine Figur langsam vergrößern. Hier bildet einmal die 1000 die Schlußmarkierung. Um die vielen verschiedenen Möglichkeiten der Bewegung zu entdecken, lohnt es sich, die verschiedenen Kombinationen auszuprobieren (und dabei mit einfachen Bewegungen anzufangen).
+
+### Bedienung — Ablauf des Programms
+
+Der »3D-Movie-Maker« stellt vier Menüpunkte zur Wahl:
+1. Erzeugen einer Grafik
+
+Hierbei berechnet der Computer die Anzahl der Bilder und fragt diese noch einmal ab. Sollen alle Bilder gezeichnet werden, braucht nur RETURN eingegeben werden. Nun wird der Speicherbedarf berechnet; reicht der vorhandene Speicher von 23 KByte aus, so beginnt der Rechenvorgang. Dabei wird die Anzahl der fertigen Bilder angezeigt. Ist der Rechenvorgang beendet (bei 150 Bildern mit je 10 Punkten zirka eine halbe Stunde) kehrt das Programm ins Menü zurück. Durch das Drücken der Leertaste kann man sich während der Berechnungen den Film ansehen und dann durch nochmaliges Betätigen fortfahren.
+2./3. Laden/ Speichern
+
+Da das Erstellen eines Films recht lange dauert, kann man fertige Filme abspeichern und laden. Das Programm hängt an den Filenamen automatisch ein »GRA« an, so daß die Dateien in der Directory sofort erkennbar sind. Tritt ein Disk-Error beim Laden oder Speichern auf, landet man wieder in der »INPUT FILENAME«-Zeile. Hier noch ein Hinweis zur LOAD-Routine: Da das Einlesen von 23 KByte mit einer GET-Schleife nicht einwandfrei funktionierte und 15 Minuten dauerte, verwendet die jetzige Version die LOAD-Routine des Betriebssystems.
+4. Abspielen
+
+Beim Aufruf dieser Funktion wird man zuerst nach der Anzahl der Durchläufe (maximal 255) und nach der Anzahl der Bilder je Lauf gefragt. Beim letzteren braucht man nur RETURN eingeben, um alle Bilder ablaufen zu lassen.
+
+### Der Algorithmus
+
+Das eigentliche Kernstück des Programms ist ein Algorithmus, der die Punkte um einen Winkel dreht, die X-, Y- und Z-Kcordinaten in Bildschirmkoordinaten umrechnet und dann die außerhalb liegenden Teile der Linien wegstreicht. Beim Drehen (hier um die Z-Achse) werden erst X- und Y-Koordi-naten in Radius und Winkel (im Bogenmaß) umgerechnet; bezogen auf den Koordinatenursprung (siehe Bild 1). Nun wird der Winkel, um den gedreht werden soll, addiert und die neuen Koordinaten werden aus dem neuen Winkel und dem Radius errechnet (siehe Bild 2).
+
+Beim Umrechnen in Bildschirmkoordinaten wird einfach die Z-Koordinate auf die X und Y-Koordinate so aufgerechnet, daß Punkte, die weiter vorne liegen, vom Mittelpunkt wegrücken. Außerdem wird der Koordinatenursprung in die Bildschirmmitte verlegt Durch dieses Verfahren wird die Figur mit einem Fluchtpunkt in der Mitte des Bildschirms dargestellt Das nun folgende Wegstreichen der außerhalb liegenden Linien und Linienstücke geschieht mit Hilfe einer Gradengleichung. Falls nur Teile der Geraden außerhalb des Bildschirms liegen, wird der äußerste Wert für X beziehungsweise Y angenommen und die fehlende Koordinate errechnet (siehe Bild 3).
+
+### Beschreibung der Maschinenroutine
+
+Die Zeichenroutine des »3D-Movie-Makers« übernimmt die Verwaltung der Grafik und ist, zum Erreichen eines Trickfilmeffekts, ganz auf Geschwindigkeit ausgelegt Aus diesem Grund erhielt sie die folgenden Merkmale:
+
+* Sie ist in Assembler geschrieben.
+* Sie berechnet keine Punkte, sondern zeichnet nur.
+* Die Koordinaten werden nicht geprüft, das heißt: das Basic-Programm darf keine »unmöglichen« Koordinaten übermitteln.
+* Der Bildschirm wird nur so weit gelöscht, wie es nötig ist
+* Die Zeropage-Addressierung wird in breitem Umfang benutzt.
+* Der IRQ wird abgestellt.
+
+Das wichtigste Mittel zur Erzeugung eines flüssigen Bilderablaufs und die Grundidee der Routine ist jedoch das »verdeckte Zeichnen«. Dafür werden zwei Bitmaps benötigt (bei unserem Programm ab $A000 und $E000). Während nun eine der beiden zu sehen ist, wird auf der anderen gezeichnet Nun wird das neue Bild sichtbar gemacht und das alte, welches nicht mehr zu sehen ist, wird gelöscht Dieser Vorgang wiederholt sich, bis alle Bilder abgearbeitet sind. Hier noch eine Anmerkung: die Lineroutine haben wir mit einigen Änderungen dem Artikel »Ein schneller Drawline-Algorithmus« aus dem 64’er, 4/84 entnommen. Die Funktion läßt sich am besten dort nachvollziehen.
+
+(Armin und Dirk Biernaczyk/rg)
+
+# Weißt Du wieviel Sternlein stehen...
+
+> Der C 64 als elektronische Sternenkarte bringt Klarheit ins Dunkel der Nacht. Das Programm zeigt Ihnen, wo Planeten una Sternbilder am Himmel stehen.
+
+Das Programm entstand aus dem Bedürfnis, den Standort von Sternen, Sternbildern und Planeten zu ermitteln. Vor allem die Planeten lassen sich so ohne weiteres mit dem bloßen Auge, nicht erkennen. Man kann sie nur identifizieren, wenn man genaue Informationen über ihren jeweiligen Standort hat. Deshalb wurde die Berechnung der Planetenbahnen, der Bahn der Sonne und der des Mondes in das Programm aufgenommen. Das Programm erstellt eine Sternenkarte für einen eingegebenen Standort zum gewünschten Beobachtungszeitpunkt.
+
+Die Sternenkarte enthält die hellsten und bekanntesten Fixsterne beziehungsweise Sternbilder des nördlichen Sternenhimmels.
+
+Sehr interessant ist es, neben der Ausgabe der Sternenkarte für eigene Beobachtungen, sich die Sternenkarte für jeden Punkt der Erde zeichnen zu lassen.
+
+So kann man sich zum Beispiel in Gedanken auf den Nordpol versetzen. Der Polarstern (Polaris) steht im Zenit, also genau über dem Beobachter. Gibt man als Beobachtungszeitpunkt den 21. März (Frühlingsanfang für die Nordhalbkugel) ein, kann man feststellen, daß die Sonne den ganzen Tag über scheint.
+
+Am Nordpol hat der Tag begonnen. Die Sonne scheint nun ein halbes Jahr ohne Unterbrechung. Erst zum Herbstanfang geht sie wieder unter. Es ist dann für ein halbes Jahr Nacht. Auch die Verhältnisse am Äquator (Breite 0°) sind sehr interessant.
+
+(H. Hinkelmann/hm)
+
+TODO ASIDE
+
+## Lebenslauf
+
+Ich wurde am 02.10.26 in Ahlen (Westfalen) geboren und lebe seit 1951 in Hamm. Seit dem 01.04.43 bin ich in der Finanzverwaltung und dort seit 1955 als Betriebsprüfer tätig.
+
+Bereits als Kind interessierte ich mich sehr für Naturwissenschaften und Technik. Ich baute mir selbst ein Fernrohr, um die Sterne beobachten zu können. Ende der 60er Jahre begann ich mit dem Basteln in der Mikroelektronik. Es entstand eine Digitaluhr mit Kalenderfunktion. Diese stellte sich automatisch nach dem Zeitzeichen des WDR. Mein erster »Computer« war der programmierbare Taschenrechner Casio FX 501 mit 112 (!) Programmschritten. Es folgte der Sharp CP 1211 und dann der VC 20. Meinen C 64 besitze ich seit etwa einem Jahr. Von Anfang an wurden die Computer bei den Betriebsprüfungen und hier insbesondere bei den Prüfungsvorbereitungen und den Berichtsabfassungen eingesetzt. Seit einiger Zeit bin ich Mitglied des Arbeitskreises EDV bei der Oberfinanzdirektion Münster und für die Einführung der Datenverarbeitung im Prüfdienst tätig.
+
+Die ersten Steuerberechnungen nahm ich noch mit dem Taschenrechner vor. Es folgten dann Programme für den VC 20 und nun für den C 64. Inzwischen habe ich kaum noch Zeit, private Programme zu entwickeln.
+
+(Horst Hinkelmann)
+
+TODO END ASIDE
+
+> Um über die Positionen von Fixsternen und Planeten informiert zu sein, schrieb Horst Hinkelmann dieses Programm für den C 64 mit Simons Basic.
+
+Nach dem Start des Programms werden zunächst das aktuelle Datum sowie die aktuelle Uhrzeit (MEZ) und die geografischen Koordinaten des Beobachtungsortes eingegeben. Dabei müssen nördliche Breiten und westliche Längen positiv, südliche Breiten und östliche Längen negativ angegeben werden. Nun kann man den Beobachtungszeitpunkt wählen, wenn sich dieser vom bereits im Programm festgelegten Zeitpunkt unterscheidet.
+
+Es folgt eine kurze Erläuterung des Programmablaufs und das Zeichnen der Sternkarte. Mit den Cursor-Tasten kann über ein Kreuz jedes Objekt der Sternkarte angesteuert werden. Die Bewegungsgeschwindigkeit ist abhängig von der Dauer des Tastendrucks; das heißt je länger eine Cursortaste gedrückt wird, desto schneller bewegt sich das Kreuz. Drückt man nach der Wahl die Funktionstaste F1, gibt der Computer den Namen des Sterns oder Planeten, der dem Kreuz am nächsten ist, an. Dabei wird der Cursor genau auf das Objekt positioniert. Möchte man wissen, um welches Sternbild es sich bei einer bestimmten Konstellation handelt, bringt man das Kreuz auf das betreffende Sternbild und drückt die Funktionstaste F3. Der Computer positioniert den Cursor auf den nächsten Stern des Sternbildes und zeigt den Namen des Sternes und des Sternbildes an. Das gesamte Sternbild blinkt. Es besteht auch die Möglichkeit, einen Stern, ein Sternbild oder einen Planeten nach dem Namen suchen zu lassen. Dazu gibt man einfach mit der Tastatur den Namen oder einen Teil des Namens des gesuchten Objekts ein und schließt die Eingabe mit der RETURN-Taste ab. Der Computer positioniert das Kreuz auf dieses Objekt und gibt den vollständigen Namen aus. Ist das gesuchte Objekt nicht gespeichert oder zum Be-obachtungszeitpunktam Beobachtungsortnichtzu sehen, erhält man eine entsprechende Fehlermeldung.
+
+Will man die Sternkarte für einen anderen Beobachtungsort oder einen anderen Beobachtungszeitpunkt erstellen lassen, drückt man die Funktionstaste F7.
+
+Mit F5 wird die Sternkarte auf einen MPS 801 gedruckt
+
+### Programmerläuterung
+
+Auf die Formeln, die den Berechnungen zugrunde liegen, soll verzichtet werden. Diese Berechnungen sind (zumindest für Mond- und Planetenpositionen) ziemlich kompliziert und können bei Interesse jedem größeren Werk über Astronomie entnommen werden.
+
+Von programmtechnischem Interesse dürften allerdings die Suchroutinen sein. Deren Funktionsweise soll deshalb erläutert werden.
+
+Zum Suchen werden die folgenden Arrays verwendet:
+
+P$	Namen der Planeten
+Z$	Namen der Sternbilder
+P	Bildschirmkoordinaten der Planeten
+Z%	Bildschirmkoordinaten der Fixsterne
+Z	Zeiger auf Fixsterne (fürjedes Sternbild)
+TODO
+
+### Suchen Fixstern/Planet (Funktionstaste F1)
+
+Zunächst werden die Bildschirmkoordinaten des Kreuzes (X,Y) mit denen der Planeten (X mit P(0), P(2), ..., Y mit P(1), P(3), ...) verglichen. Bei Übereinstimmung ist XX=0 und die Suche kann abgebrochen werden. In Zeile 42090 verzweigt das Programm nach 45000, wo der Name des Planeten geschrieben wird. Liegt keine Übereinstimmung vor, wird der Planet mit dem geringsten Abstand gespeichert (XP = Abstand<sup>2</sup>, ZP = Kennziffer des Planeten). Nun werden die Fixsterne in gleicher Weise überprüft. Der Stern mit dem geringsten Abstand wird gespeichert (Z = Kennziffer des Sterns; Zeile 44020). Wird kein Stern mit geringerem Abstand als der nächste Planet gefunden, wird der gespeicherte Planet genannt (Zeilen 44070 bis 45010). Dabei wird ab der Zeile 500 das Kreuz exakt auf den Planeten beziehungsweise Stern positioniert und dessen Bezeichnungen ausgegeben. Der Name eines Planeten ergibt sich aus dem Array P$ mit dem Index ZP. Der Name eines Sternes wird durch berechnetes RESET (Zeile 44080) aus den DATA-Zeilen 60000 bis 61240 ermittelt. Die 8chreibroutine befindet sich ab Zeile 300.
+
+### Suchen Sternbild (Funktionstaste F3)
+
+Zunächst wird die Suchroutine für Sterne mit Ausnahme des Abschnitts für die Planeten durchlaufen. Der gefundene nächste Stern bestimmt das Sternbild. Die Kennziffer Z des Sterns wird in Z1, die letzte Ziffer des gelesenen Datensatzes für den Stern (D; Zeile 44090) wird in Z gespeichert. Das Programm verzweigt nun in die Blink-Routine (Zeile 48060 bis 48250). Dort werden die zum Sternbild gehörenden Sterne (Punkte) abwechselnd gesetzt und gelöscht (Zeile 48170).
+
+### Suchen nach Namen
+
+Wird ein Name, oder ein Teil eines Namens eingegeben, verzweigt das Programm in 40100 nach Zeile 47000. Das komplizierte Löschen des zu überschreibenden Textes (GOSUB 340, GOSUB 360 in Zeile 47030) ist erforderlich, da Simons Basic Text mit den auf dem Grafik-Bildschirm gesetzten Punkten ODER- verknüpft. Aus diesem Grund wird der vorige Text erst gelöscht Nun wird geprüft, ob ein Planetenname mit der eingegebenen Bezeichnung übereinstimmt (47060 bis 47090). Ist dies der Fall, werden die Bildschirmkoordinaten des Planeten zu denen des Kreuzes (Zeile 47120). Ist der Planet zur Beobachtungszeit nicht sichtbar, dann ist X = 0 und eine Fehlermeldung wird ausgegeben (47140). Ansonsten wird das Kreuz auf den Planeten positioniert und in die Eingaberoutine gesprungen (47150). Handelt es sich bei der eingegebenen Bezeichnung um keinen Planeten, wird die Suchroutine in 48000 fortgesetzt. Dort werden zunächst die Namen der Sternbilder (deutsch und lateinisch) auf Übereinstimmung untersucht. Wird keine Übereinstimmung gefunden, springt das Programm in die Zeile 49000. Hier werden nun die Sternbezeichnungen eingelesen und mit der Eingabe verglichen. Kommt es zu keiner Übereinstimmung, wird die Fehlermeldung »... nicht gespeichert« ausgegeben und das Kreuz in die linke obere Ecke des Bildschirms gesetzt (Zeile 49050). Darauf kehrt das Programm in die Eingaberoutine (ab Zeile 40000) zurück.
+
+(Horst Hinkelmann/hm)
+
+# Checksummer 64
+
+> Der Checksummer 64 überprüft jede Basic-Zeile direkt nach der Eingabe und erspart deshalb eine aufwendige Fehlersucha
+
+Der Checksummer 64 ist ein kleines Maschinenprogramm, das Sie sofort unterrichtet, ob Sie diejeweilige Programmzeile korrekt eingegeben haben.
+
+So gehen Sie vor:
+
+1.	Programm abtippen und speichern. ,
+2.	starten mit RUN
+3.	nach kurzer Zeit sehen Sie am Bildschirm:<br>Checksummer 64, Checksummer aktiviert, ausschalten mit Poke 1,55, anschalten mit Poke 1,53, Ready.
+4.	Anschalten des Checksummer 64 mit Poke 1,53.
+5.	Test: Geben Sie in einer freien Zeile ein: »1 REM« und drücken die Return-Taste. Am Bildschirm oben links sollten Sie die Prüfsumme <144> sehen.
+6.	Geben Sie ein Listing aus unserem Heft ein. Nach jeder Zeile wird die Zahl, die im Listing in Klammern < > steht, in den Bildschirm eingeblendet. Stimmen die Zahlen nicht überein, so liegt vermutlich ein Eingabefehler vor. **Die Zahl in den Klammern und auch die Klammern selbst dürfen beim Abtippen nicht mit eingegeben werden!**
+7.	Achten Sie bitte darauf, Zahlen und Zeichen nicht zu vertauschen. So ergibt zum Beispiel die Zahl 210 in einer Basic-Zeile die gleiche Prüfsumme wie 201.
+8.	Unsere Basic-Listings enthalten keine Grafikzeichen mehr. Diese werden ersetzt durch Klartext und stehen zwischen geschweiften Klammern. Deshalb sind weder die Klammern noch was dazwischen steht, abzutippen, sondern die in der Tabelle aufgeführten Tasten zu drücken. Auf Ihrem Bildschirm erhalten Sie dann wieder die entsprechenden Grafikzeichen.
+
+Eine ausführliche Beschreibung finden Sie in den Ausgaben 1 bis 4/85. Ebenso den Checksummer für den VC 20.
+
+TODO Tabelle "Die Steuerbefehle im Klartext"
+
+# MSE-Abtippen sicher und leicht gemacht
+
+> Ähnlich wie der »Checksummer« ist auch der MSE ein Hilfsmittel bei der Eingabe von Listings, diesmal jedoch bei reinen Maschinensprache-Programmen.
+
+Im Gegensatz zum »Checksummer« aber ist die Eingabe nicht ohne den MSE möglich. Der MSE verringert die Tipparbeit um ein Drittel und schließt Fehleingaben vollkommen aus. Außerdem können Sie die DATAs blind eingeben, ohne andauernd auf den Bildschirm schauen zu müssen. Dies wird durch akustische Meldungen realisiert.
+
+MSE ist ein Maschinenspracheditor, mit dem ein Vertippen ausgeschlossen ist. Eine abgetippte Zeile wird nur angenommen, wenn sie richtig ist. Eine Checksumme am Ende jeder Zeile prüft, ob die richtigen Werte in der richtigen Zeile an der richtigen Stelle stehen. Wenn nicht, ertönt ein Warnsignal, und man beseitigt den Fehler.
+
+War die Zeile korrekt, erklingt ein Gong, und die nächste Zeilennummer wird ausgegeben. Damit ist also auch »blindes« Eintippen möglich; Sie können sich voll auf den Text konzentrieren.
+
+### So arbeitet man mit MSE
+
+Laden und starten Sie MSE. Zuerst wird der Programmname und die Start- und Endadresse erfragt. **Diese Angaben entnehmen Sie dem Kopf des jeweiligen abgedruckten Listings.** MSE meldet sich dann mit der Zeilennummer der ersten Zeile. Wenn Sie die Zeile richtig eingegeben haben, erscheint die nächste Zeilennummer und so weiter bis zum Ende. Zum Schluß wird das fertige Programm mit »CTRL-S« auf Diskette oder Kassette abgespeichert. Dazu sind keine weiteren Angaben mehr erforderlich. Das Programm kann dann ganz normal wieder geladen und gestartet werden. Wenn Sie nicht alles auf einmal tippen wollen, können Siejederzeit unterbrechen und den eingetippten Teil mit »CTRL-S« abspeichern. Wollen Sie weiterarbeiten, laden und starten Sie MSE wieder.
+
+Geben Sie auf die Frage nach der Startadresse aber jetzt »L« ein, um Ihr Teilprogramm zu laden. Jetzt können Sie mit »CTRL-N« die Adresse eingeben, an der Sie weitertippen müssen. Wenn Sie sich nicht gemerkt haben, wie weit Sie gekommen sind, geben Sie nach dem Laden »CTRL-M« ein.
+
+Auf die Frage nach der Startadresse antworten Sie mit der Anfangsadresse, die links in der Kopfzeile auf dem Bildschirm steht. Nun wird Ihr Programm aufgelistet. Mit »SPACE« wird das Listen fortgesetzt, mit »STOP« abgebrochen. Das Ende Ihres Programmteils erkennen Sie sehr einfach daran, daß nur noch der Wert »AA« in der Zeile steht. Die Adresse dieser Zeile müssen Sie anschließend mit »CTRL-N« eingeben. Das Programm ist nur mit »STOP/RESTORE« zu verlassen. Speichern Sie aber vorher unbedingt immer Ihren Text ab.
+
+### Hinweise zum Abtippen
+
+Vor dem Abtippen oder späteren Wiederladen des MSE-**Laders** müssen Sie unbedingt folgende Zeile eingeben:
+**POKE 43,1:POKE 44,32:POKE 8192,0 NEW**
+
+Starten Sie das Programm mit RUN. Fehlerhafte Zeilen werden angezeigt und müssen korrigiert werden, bis der Lader zum »READY« durchläuft. Jetzt müssen Sie das fertige MSE-Programm abspeichern. Dazu brauchen Sie nur »RETURN« zu drücken, weil die erforderlichen Angaben schon auf dem Bildschirm stehen. (Kassettenbesitzer müssen in Zeile 343 die letzte Zahl in »1«abändern). Abjetzt können Sie »MSE V1.0« direkt, also ohne den DATA-Lader, benutzen, MSE V1.0 wird ganz normal mit »,8« geladen (keine POKEs notwendig).
+
+(N. Mann /D. Weineck/gk)
+
+TODO TABELLE
+
+MSE-Befehle:
+DEL löscht die letzt Eingabe.
+CTRL-S speichert das eingetippte Programm ab.
+CTRL-L lädt ein Programm. Start- und Endadresse werden automatisch ermittelt.
+CTRL-M listet den Speicherinhalt. Abbruch mit STOP-Taste, weiter mit Leertaste.
+CTRL-N erlaubt die Eingabe einer neuen Adresse zum Weitertippen.
+CTRL-P gibt ein MSE-Listing auf dem Drucker aus.
+
+# Hier gibt’s Clubs
+
+Um Euch und den Clubs unnötige Kosten und Zeit zu ersparen, einige Hinweise. Bei schriftlichen Anfragen an die Clubs, ist generell ein ausreichend frankierter Umschlag beizufügen. Bevor man einem Club beitritt, sollte man sich über dessen Status, Mitgliederzahl, Beitragssätzen (soweit nicht mit aufgeführt) und Gebühren für Lehrgänge informieren lassen. Aus Platzgründen und der Übersichtlichkeit wegen sind neben den Adressen nur einige zusätzliche Schwerpunkte mit angegeben. Die Adressen sind nach Postleitzahlen geordnet.
+
+**Computerbox**, Eichenallee 61, 1000 Berlin 19,
+2monatlich erscheinende Computerzeitschrift, Hardware-Berichte, Softwaretests, Basic-Kurs, Berichte zu aktuellen Anlässen, Rätsel;
+**C 64-Club »Die Bit Teufel«**, Tel. Berlin 3618491,
+Erfahrungsaustausch, Spiele, Anwendersoftware, Drucker, DFÜ, Gerätebörse;
+**C 64 Programmer Club**, Martin Paff, Hammer Str. 69, 2000 Hamburg 70,
+Clubzeitschrift, Treffen, Erstellung von Software, Bibliothek;
+**C-64-INFO-Club L A W A**, T. H. Zibell, Wakendorferweg 32, 2000 Hamburg 62,Tel. (0 40) 5 29 2127
+**Magicclub 64**, Arne Palke, Eichenbuchstr. 45, 2057 Reinbek b. Hamburg,
+Clubzeitschrift, Softwarebibliothek, Treffen;
+**C 64-Club ACCS**, Erlenweg 51, 2083 Halstenbek,
+Clubzeitschrift, PRG-Bibliothek, verbilligte Disketten, Auslandskontakte, DFÜ;
+**HBS-Computerclub**, Am Steingrab 45, 2150 Buxtehude,
+Programmtausch, PRG-Biblio-thek, Softwareentwicklung, eventuell Eröffnung einer Mailbox;
+**C 64-User-Club Lübeck**, Matthias Koerner, Fregattenstr. 60, 2400 Lübeck,
+Clubzeitschrift, Unterstützung beim Programmieren, Akustikkoppler, Programmtausch, Tips, Tricks;
+**Georg Körster**, Herm-Ehlers-Str. 8, 2903 Ofen,
+Clubzeitschrift, PRG-Bibliothek, Meinungs-, Erfahrungs- und Adressentausch, Lösung von Soft- und Hardwareproblemen;
+**SCORA-Computerclub Aurich**, Manfred Janßen, Dellingstr. 10, 2965 Ihlow/Riepe
+Clubtreffen, Arbeitsgruppen, Erfahrungsaustausch, Bibliothek, Softwarebibliothek, Robotersteuerung;
+**Sascha Troggler**, Kreuzfeld 20, 3250 Hameln 1, Mailboxnr. (05151) 63687,
+Clubtreffen, Erfahrungsaustausch, DFÜ, Hilfestellung bei Problemlösungen, eigene Mailbox;
+**Christian Hülsmann**, Fliederweg 10, 3380 Goslar 1, Tel. (0 53 21) 48 98, Softwareerstellung, bald eigene Mailbox;
+**Christiane Canisius**, COMAL User Club, Freiheitsstr. 30, 4000 Düsseldorf 12,
+COMAL-NEWS, COMAL-Lite-ratur, Problemhilfe;
+**C 64-Softentwurf-Club**, Cedric Volkmer, Konkordiastr. 24, 4000 Düsseldorf 1,
+Softwareentwurf, Spiele, Anwender und so weiter;
+**Ghostbusters Dorsten**, Glückaufstr. 252,	4270 Dorsten 21,
+Clubtreffen, Briefkastenonkel, Knacken von Adventures, Softwarebibliothek, etc.;
+**64 User Club Osnabrück**, Ulf Henke, Am Gretescher Turm 6, 4500 Osnabrück,
+Clubtreffen (14tägig), monatliche Zeitschrift, Clubbibliothek, Softwareentwicklung (Basic, Pascal, Maschinensprache), Hardware;
+**Laborsoft & -Hardware**, J.U.Busch-mann, Schneiderstr. 80, 4600 Dortmund 50, Tel. 02 31/73 54 96 Mailbox, Clubzeitschrift, Clubtreffen, Ausflüge zu Computerveranstaltungen, gemeinsame Herstellung/Verkauf von Soft& Hardware, schnelles Erlangen von neuester Soft- und Hardware, wegen guter Auslandsverbindung, kein Clubbeitrag;
+**CCR (Computer-Club Reschke)**, Hohe Str. 21A, 4600 Dortmund 1, Tel. (0231) 160014
+Commodore C 64, Clubräume, Clubbeitrag 10 Mark, Basic-Programmierkurse;
+**64'er Adventure Club**, Christian Paas, Nordring 54, 4630 Bochum, 2monatlich erscheinende Zeitschirft, 15 Mark Jahresbeitrag, Lösen von Adventures, schriftlicher Informationsaustausch;
+**DATEX**
+Commodore Software Club Uwe Thielker, Glückaufstr. 6, 4670 Lünen
+Erfahrungsaustausch, Tips und Tricks, Hilfen für Einsteiger, spezielle Problemlösungen, evtl. Clubzeitschrift
+**VC 20-User Club**, Ulf Kriewett, Thuermchenswall 71, 5000 Köln 1, Tel. (0221) 121634, Clubzeitschrift, Softwarebibliothek, Hardware, Tips und Tricks;
+**C 64/Club Compy**
+Clubmagazin etc., Aufbau einer Softwarebibl.
+Thomas Spieler/D., Porzerfeld 20, 5000 Köln 90;
+**Udo Künstler**, Geilenkirchener Str. 87, 5120 Herzogenrath, Tel. (0 24 06) 50 45,
+monatliches Clubtreffen, Clubzeitschrift, Beratung und Hilfestellung, Tips & Tricks, immer neue Informationen;
+**S.C.O.U.T.-Computerclub**, Martin Mirgel, Victoriastr. 20, 5400 Koblenz,
+monatliches Clubtreffen, Kontakt zu Zeitschriften, Hardware, Elektronik-Kurse für Anfänger, DFÜ, Softwarebibliothek;
+**C 64-Club Montabaur**, Michael Bromund, Saarstr. 13, 5430 Montabaur,
+Clubzeitschrift, Clubtreffen, DFÜ, Software- und Literaturbibliothek, Hardware;
+**Atomos-Soft**, Rene Klöckner, Klagenfurtstr. 19, 5800 Hagen 7, C 64, Clubtreffen, monatl. Zeitschrift, Software, etc.;
+**Klaus-Dieter Friedrich**, DH1FAB, Ber-nadottestr. 3, 6000 Frankfurt 50, Tel. (069) 571381, Mailbox OTIS (06181) 48884 Nr. 222 und 1014, Amateurfunkthemen, Treffen, Clubzeitschrift, Informationsaustausch über das Mailboxsystem »OTIS«, Btx, Seitennummer *208247 #, Jahresbeitrag von 15 Mark;
+**C 64-Weiterbildung**, c/o Albert Pflüger, Eckenheimer Landstr. 13, 6000 Frankfurt/Main 1,
+Koordination von Informationen zu C 64-Anwendungen in der Weiterbildung, unregelmäßige Mitteilungen und Treffen;
+**Futuresoft**, Wiesenstr. 49, 6090 Rüsselsheim, Tel. (0 6142) 5 33 20, Soft- und Hardware;
+**Stefan Roos**, Pfarrgasse 6, 6097 Trebur 3,
+Treff 2mal monatlich, Beitrag 10 Mark pro Jahr, Clubzeitschrift, Software- und Bücherbibliothek; Mark-Oliver Faßmann, Sudetenstr. 19, 6108 Weiterstadt 1, Programmbibliothek, Modem, Clubinfo, halbjährlicher Clubbeitrag (etwa 10 Mark);
+**Deutsche Commodore-User**, Peters-wälderstr. 8, 6452 Hainburg,
+Soft- und Hardwareentwick-lung/-Tausch, Problemlösungen für alle Computer, monatliche Clubzeitung, Programmbibliothek, Beitrag 80 Pfennig pro Monat + fünf Programme im Jahr;
+**Heidelberger 64'er**, Wolfgang Agostini, Karl-Metz-Str. 11, 6904 Eppelheim,
+Clubtreffen, Erfahrungs- und Programmtausch, jedes Semester wechselnder Schwerpunkt: Adventures, Assembler, kleine Hardware-Tricks;
+**Commodore-User-Club**, Wend.-Berberich-Str. 3, 6968 Walldürn, Infoblatt (C 64), Programmaustausch (Floppy), schriftlicher Fragenaustausch;
+**BNT e.V. — Öffentlichkeitsarbeit**, Postfach 40 08 46, Marktstr. 48, 7000 Stuttgart-Bad Cannstatt, Tel. (0711) 55 83 91, (Mo-Fr: 9-16), Mailbox: (0711) 55 83 92,
+Jungendarbeit, Fortbildung, Zeitschrift, Schulungen und Kurse, Computercamps, Datenfernübertragung, Bildung von Gruppen und Treffen;
+**64'er Club**, Michael Frieser, Hoffmannstr. 12, 7015 Korntal 1 (bei Stuttgart),
+Clubtreffen, Zeitschift und Bibliothek in Vorbereitung, Hardware, Tips und Tricks, monatliche Software;
+**Micro Computerclub Singen**, Emil Grass, Hauptstr. 34, 7709 Hilzin-gen, Tel. (0 77 31) 6 7819,
+Clubtreffen, Assemblerkurs, Erfahrungs- und PRG-Tausch, DFÜ;
+**Computerclub »New Line«**, Postfach 8007, 7910 Neu-Ulm 8,
+Speziell für Anfänger;
+**C 64 - ACM (e.V.)**, c/o Gerald Gerlich, Grasmeierstr. 25/220, 8000 München 40,
+monatliche Clubzeitung, Buch-und Softwarebibliothek, Schulungen (Basic, Assembler), Hardwarebastelkreis, Sammelbestellungen, Kaufberatungen, Soft- und Hardwareentwicklungen, eigene Mailbox, Reparaturen;
+**CBM-64-Userclub München**, Walliserstr. 13, 8000 München 71, Tel. (0 89) 76 24 24;
+Treffen nach Vereinbarung, kein Beitrag, Maschinensprache, Hardware;
+**C 64-User Club »Flanuk«**, O. Sahlmann, Irisstr. 1, 8000 München 45,
+Softwaretausch, Clubzeitung (in Vorbereitung), Erfahrungsaustausch, gemeinsame Softwareproduktionen;
+**Marathon-Soft(ware)**, c/o Raimund C. Ohnemus, Daiserstr. 49, 8000 München 70,
+Gemeinsames Erlernen neuer Programmiersprachen (Maschinencode, Comal, Forth, Pascal), Austausch von Kenntnissen, Gemeinsamer Softwarekauf, kein Clubbeitrag, Aufnahme von Anfängern, Umbau von Commodore-Joysticks Uoyboards für Linkshänder, Dauerfeuer);
+**C 64-Club PAF**, CCP, Jahnhöhe 33, 8068 Pfaffenhofen 1,
+Clubtreffen, Software, Clubzeitschrift;
+**Rüdiger Lang**, Obingerstr. 4, 8201 Aindorf,
+Schulung, Software, Hardware, Steuern, DFÜ, Clubtreffen;
+**Commodore-Club Lohr**, Christian Rosenkranz, Hauptstr. 6, 8770 Lohr/Main;
+
+Sicher sind das noch nicht alle Clubs in Deutschland. Wir bitten daher die nicht aufgeführten Clubs, sich zu melden.
+In der nächsten Ausgabe sind die Clubs aus dem benachbarten Ausland an der Reihe.
+
+# Mini-Grafik VC 20
+
+> Diese kleine Grafik-Hilfe läuft auf der Grundversion des VC 20.
+
+Wie der Name schon sagt, handelt es sich um eine Grafik-Erweiterung im kleinen Stil. Damit wird Grafik-Programmierung auch ohne große Speichererweiterung oder (teures) Grafik-Modul möglich. Da in Maschinensprache geschrieben, ist diese Basic-Erweiterung überdies sehr schnell. Minutenlange Wartezeiten auf die Fertigstellung einer Bildschirmgrafik entfallen damit.
+
+Zur Anwendung der Grafikhilfe: Man nehme das Programm-Listing, tippe es in den VC 20 und erfreue sich folgender Befehle und Funktionen:
+
+@ON	schaltet den Bildschirm auf Grafikdarstellung um, wobei die momentane Zeichenfarbe zur Plotfarbe wird
+@CLR	löscht den Grafik-Speicher
+@f,x,y	setzt (f ^ 0) oder löscht (f=0) einen Punkt mit der Koordinate (x,y). Für f gilt: 0 < = f < 256, für x wie für y gilt: 0 < = x < 128. f, x und y können beliebige Variable oder Formeln sein
+@(x,y)	ist eine Funktion, welche testet, ob der Punkt mit der Koordinate (x,y) gesetzt (Ergebnis = —1) oder nicht gesetzt(Ergebnis = 0) ist. Beispiel: »PRINT @ (5,7)«
+@RETURN	schaltet den Bildschirm schließlich wieder auf normalen Print-Modus
+TODO
+
+Das Programm implementiert sich nach dem Start des einzugebenden Basic-Laders (Listing 1) von selbst und ist absolut absturzsicher. Es hat, man lese und staune, eine Länge von nur 256 Byte. Für eine Auflösungvon 128mal 128 Punkten sind 2 KByte RAM unerläßlich. Somit verbleiben in der Grundversion 1279 Byte und mit 3 KByte Erweiterung sage und schreibe 4351 Byte Basic-RAM. Zugegeben, das ist nicht die Welt, aber für den Anfang durchaus ausreichend, und dafür wurde die Routine schließlich konzipiert. Überdies wird der Kassetten-Puffer nicht benutzt, und man kann von einem Programm aus mit »LOAD« ein weiteres nachladen. Listing 2 ist ein kleines Demo-Programm, um die Fähigkeiten der »Mini-Grafik« einmal vorzuführen (siehe Bild).
+
+(Wolfgang Wirth/ev)
+
+# 6510 — Die Suche nach dem Prozessor
+
+> Mit einem Raumschiff fliegen Sie durch ein Höhlenlabyrinth. Ihre Aufgabe: Finden Sie den Prozessor 6510 und setzen ihn in seinen Sockel.
+
+Wem das HöhlerbSystem nicht gefällt, der kann sich selbst neue erstellen.
+
+Ziel des Spiels ist es, einen IC am Ende eines Labyrinthes aufzunehmen, und diesen in seine Fassung einzusetzen.Es gehört viel Geschicklichkeit dazu, die sechs Labyrinthe zu durchqueren. Außerdem machen einem Hindernisse wie Laser, Gravitation und Fuel das Leben schwer. Mitden Funktionstasten kann man die Geschwindigkeit, die Stärke der Gravitation, Anzahl der Schiffe, sowie die Fuelabnahme einstellen. Zu Beginn befindet man sich in einem kuppelähnlichem Raum, in dem sich die IC-Fassung befindet. Durch Drücken des Feuerknopfes kann das Fahrwerk ein- beziehungsweise ausgefahren werden. Unfallfreies Landen ist jedoch nur auf den dafür vorgesehenen Fuel-Plattformen zum Auftanken möglich.
+
+### Zum Eintippen:
+
+Da das Lesen der Daten mit Prüfsummenroutine viel mehr Zeit beansprucht, als ohne diese, empfiehlt es sich, sämtliche »GOSUB3440« nach dem ersten einwandfreien Durchlauf zu entfernen. Ebenso ist es notwendig, alle Prüfsummen, das heißt DATAs über 255 zu entfernen. Durch das Entfernen des REMs aus Zeile 810, entfällt das blinde Eintippen von »POKE648,4« nach dem Drücken von »RUN/STOP + RESTORE«. Dieser »POKE« wäre notwendig, um wieder auf den normalen Bildschirm zu kommen. Falls jemandem die Labyrinthe zu schwierig sein sollten, können diese geändert werden.
+
+Eine Besonderheit an »6510« ist unter anderem die Unterbringung der FuelsäuIe.Diese befindet sich außerhalb des Bildschirmfensters. Dieses wurde mit Hilfe des IRQ (Interrupt Request), des Rasterzeileninterrupts verwirklicht. Mit einer ähnlichen Interruptroutine wurde auch die Steuerung und der Ablauf der Melodie möglich.
+
+Das Prinzip eines solchen Interrupts ist folgendes:
+
+Das Bild, das man auf einem Fernsehgerät oder einem Monitor sieht, wird aus vielen einzelnen Zeilen zusammengesetzt (Rasterzeilen). Diese Zeilen werden beim Fernseher zirka 25 mal pro Sekunde aufgebaut, so daß ein flimmerfreies Bild entsteht. Beim C 64 übernimmt der VIC (Video-Interface-Chip) diese Aufgabe. Wird nun eine ganz bestimmte Zeile aufgebaut, verzweigt der Prozessor zu einer Interruptroutine. Bei »6510« wird in dieser Routine die Rahmenfarbe ab einer bestimmten Rasterzeile auf den Wert 5 (grün) beziehungsweise den Wert 0 (schwarz) gesetzt. Die Rasterzeile, ab der auf Grün geschaltet wird, ist von der Menge des vorhandenen Fuels abhängig. Mit dem Timer-Interrupt wird die Hauptschleife gesteuert. Dieser Interrupt wird unter anderem durch den in der Speicherstelle 56549 abgelegten Wert geregelt. Hierdurch besteht auch die Möglichkeit, die Geschwindigkeit des Cursors zu manipulieren (Tl$ wird ebenfalls beeinflußt). Der Timer-Interrupt wird von den CIAs (Complex Interface Adapter) ausgelöst. Diese zählen von dem in 56549 stehendem Wert auf Null herunter, wonach sie einen Interrupt auslösen und wieder mit dem Zählen beginnen.
+
+Die Daten für die Melodie werden ab $C500 bis $C6FF abgelegt.
+
+### Hinweise zum Ändern und Hinzufügen von Labyrinthen
+
+Um überhaupt Labyrinthe ändern oder hinzufügen zu können, muß vor die POKEs in Zeile 810 ein »REM« gesetzt werden. Danach startet man das Programm. Sobald das Auswahlmenü erscheint, drückt man die RUN/STOP-Taste. Nun hat man den umdefinierten Zeichensatz zur Verfügung.
+
+### Ändern von Labyrinthen
+
+Die Labyrinthe liegen in den Zeilen 3530 bis 5170. Sollen Labyrinthe geändert werden, so listet man das zu ändernde Labyrinth (siehe Listing). Nun kann das Labyrinth wie ein normales Basic-Programm editiert werden.
+
+Hinzufügen von Labyrinthen
+
+Das Hinzufügen von Labyrinthen ist etwas komplizierter. Zuerst sind im Programm folgende Änderungen nötig (angegeben ist jeweils die gesamte Zeile):
+1) Zeile 400:
+400 RI=0:CO=0:CK=1:V=53248:SI = 54272:LM = 6 + Anzahl der hinzugefügten Labyrinthe
+2) Zeile 1810:
+1810 ON LA GOSUB 3520, 3750, Zeile1, Zeile2, ..., Zeile n,4020,4280,4550,4890
+
+Dabei entspricht »Zeilel« der Anfangszeile des ersten hinzugefügten Labyrinths, »Zeile2« der Anfangszeile des 2. hinzugefügten Labyrinths und so weiter.
+3) Zeile 2060:
+2060 A=0:ON LA GOTO 2190,2070,...,2070,2070,2700, 2080
+
+Nach der ersten »2070« müssen soviele »2070« eingefügt werden, wie neue Labyrinthe hinzugefügt wurden. Nicht vergessen, die »2070« durch Kommata zu trennen!
+
+Jetzt können die neuen Labyrinthe an den Schluß des Programms (ab Zeile 8000) angefügt werden. Dabei ist folgendes Format einzuhalten:
+22 PRINT-Zeilen, in denen das Labyrinth gePRINTet wird. In den nachfolgenden Zeilen müssen die Koordinaten des Raumschiffs, der Laser und der Fuel-Plattform gesetzt werden (Tabelle 1). DieX-Koordinatendürfen denWert255nichtüber-schreiten. Dies demonstrieren wir am besten an einem Beispiel.
+
+Die Bedeutung der Variablen und POKEs ist in Tabelle 1 erläutert. Der Variablen MB muß immer derWert 15 zugeordnet werden.
+
+Soll keine Fuel-Plattform erscheinen, so sind die Koordinaten auf 0 zu POKEn. Außerdem ist darauf zu achten, daß sich keine Sprites überschneiden, da sonst die Kollisionsabfrage nicht einwandfrei arbeitet.
+
+### Hinweise zum Erstellen eines Labyrinths
+
+Erst wird — wie bereits beschrieben — der Zeichensatz eingeschaltet. Dann löscht man den Bildschirm und baut das Labyrinth aus den umdefinierten Zeichen auf. Dabei istzu beachten, daß der Bildschirm nicht nach unten scrollt (dies kann passieren, wenn man ein Zeichen an die letzte Position der Zeile setzt). Dieses Scrollen kann verhindert werden, indem man das Zeichen an die vorletzte Position der Zeile setzt, den Cursor vor das Zeichen positioniert und mit der INSERT-Funktion um eine Stelle nach rechts verschiebt. Außerdem müssen die untersten drei Zeilen frei bleiben (SCORE, TIME...). Auch darf das Raumschiff weder den oberen noch den unteren Bildschirmrand verlassen, da dies nicht in der Hauptschleife überprüft wird. Ist das Labyrinth fertig erstellt, muß es in das Programm eingefügt werden. Dazu wird der Cursor in die linke obere Ecke des Bildschirms gebracht. Dann wird mit »INSERT« Platz für die Zeilennummer, ein Fragezeichen für »PRINT« und ein Anführungszeichen geschaffen. Nun wird die Zeilennummer, das Fragezeichen und das Anführungszeichen in den gerade geschaffenen Platz eingefügt. Nun drückt man »RETURN«. Jetzt fährt man mit dem Cursor vorsichtig an den unteren Rand des Bildschirms und läßt die obere Zeile aus dem Bildschirmfenster nach oben herausscrollen. Mit den verbliebenen Zeilen verfährt man genauso. Man sollte allerdings nicht vergessen, die Zeilennummer laufend zu erhöhen.
+
+(Harald Beine/Arne Jansen/rg)
+
+# Ordnung ist das halbe Leben
+
+> Mit diesem Programm bringen Sie auf bequeme Weise Ordnung in die Directories Ihrer Disketten.
+
+Ist Ihnen das auch schon mehrmals passiert: Sie hatten auf einer Diskette ein schön geordnetes Directory und beim Abspeichern eines weiteren Files stand dieses nicht sauber am Schluß des Directory, sondern mitten zwischen den anderen Programmen. Mit dem hier vorgestellten Directory-Sortierprogramm ist es nun möglich, diese »falsch hineingeratenen« Files herauszunehmen und an geeigneter Stelle wieder einzusetzen. Auch das Einfügen von Trennstrichen ist möglich. Bild 1 und Bild 2 zeigt Ihnen den Unterschied eines unsortierten zu einem sortierten Directory.
+
+Nach dem Starten des Programms legt man die Diskette ein, die sortiert werden soll, und drückt eine Taste. In der linken oberen Ecke wird nun die Sektornummer des Directory-Blocks angezeigt, den der Computer gerade einliest, rechts daneben die Anzahl der in den Speicher eingelesenen Files. Nach beendetem Einlesen erscheint links vom obersten File ein schwarzer Pfeil, der sich mit den Funktionstasten F3 nach oben und F5 nach unten bewegen läßt. Mittels F1 kann nun ein mit diesem Pfeil gekennzeichnetes File nach rechts herausgeschoben und mit F3 und F5 verschoben werden. An gewünschter Stelle wird es mit F1 wieder eingefügt. Somit ist ein beliebiges Vertauschen aller Files im Directory möglich.
+
+F8 schreibt das sortierte Directory wieder auf die Diskette zurück. Will man das gänderte Directory nicht abgespeichert haben, so kann statt dessen mit F6 noch einmal das alte oder ein anderes eingelesen werden.
+
+Zur optischen Abgrenzung mehrerer Files dient der Trennstrich, den man mit F2 erzeugen, mit F3 und F5 verschieben und schließlich wieder mit F1 einfügen kann. Wem übrigens ein anderer Trennstrich besser gefällt, der kann in Zeile 500 für die Minuszeichen andere einsetzen, zum Beispiel SHIFT+*. SHIFT 4- C ist nicht zu empfehlen, da dieser Strich bei Groß-Kleinschrift-Umschaltung ein großes »C« ergibt. Der Trennstrich belegt keinen Block auf der Diskette und ist zur besseren Unterscheidung mit DEL im Directory gekennzeichnet. Ein versehentlich mit »F2« erzeugter Trennstrich kann, wenn er nach rechts gebracht wird, mit F4 wieder gelöscht werden. In gleicher Weise können auch Files aus dem Directory gelöscht werden. Dabei werden aber die von dem File belegten Blöcke nicht wieder freigegeben, so daß ein abschließendes »VALIDATE« der Diskette erforderlich ist, wenn man ein File gelöscht hat.
+
+Nun zum Aufbau des Programms. Es istvorwiegend in Basic geschrieben und enthält zwei kurze Maschinensprache-Routinen. Die erste dient zum Einlesen der Filenamen und Fi-leparameterund wirdmit8YS52992, log. Filenummer, Länge, String aufgerufen. Das Lesen mit GET # in Basic wäre dafür viel zu langsam. Mit dem zweiten Maschinenprogramm werden die am Bildschirm angezeigten Files nach oben oder unten gescrollt. Aufgerufen wird es mit 8YS 53056,r,oz,ls,uz,rs.
+
+Dabei haben die Parameter folgende Bedeutung:
+
+r = Scrollrichtungen: 0 für nach oben und 1 für nach unten
+oz = oberste Zeile,
+ls = linke Spalte,
+uz = unterste Zeile,
+rs = rechte Spalte.
+
+Durch Abspeichern des Speicherbereichs von $CF00 bis $CFFF kann diese Routine auch in andere Basic- oder Maschinenprogramme eingebunden werden.
+
+(Edwin Göbel/hm)
+
+# Basic-Befehle im Griff
+
+> Gerade für den Anfänger ist es nicht immer leicht, sich alle Basic-Befehle zu merken. Man denke nur an ausgefallene Befehle wie CMD oder POS(X).
+
+Exbasic Level II kennt als Abhilfe den Befehl HELP, mit dem eine Liste sämtlicher Exbasicbefehle auf den Bildschirm gebracht werden kann. Die folgenden kurzen Programme (drei Lösungsmöglichkeiten für dasselbe Problem), die sich als Hilfsprogramme (Utility) zum Einbau in ein zu entwickelndes längeres Hauptprogramm verstehen, simulieren diesen Befehl HELP für das reine Basic, das heißt, sie geben eine Liste aller Befehle auf dem Bildschirm aus.
+
+Wie geschieht das nun im einzelnen?
+
+Eine unmittelbare Ausgabe aller Basic-Befehle auf dem Bildschirm per PRINT-Anweisungen hätte zwar gegenüber den neuen zu besprechenden drei Methoden den Vorteil, daß man diese Liste alphabetisch ordnen könnte. Sie wäre aber viel zu langsam (in der Größenordnung 5 Sekunden) und das generierte Basic-Programm wäre viel zu lang: Eine Liste aller aneinandergereihten Basic-Befehle, mitTrennzeichen zwischen Befehl und Befehl, umfaßt 331 Bytes. Einschließlich PRINT-Be-fehle, Hochkommata und Zeilennumerierungen würde ein solches Programm also mindestens 375 Bytes benötigen.
+
+Nun enthältaber das Betriebssystem bereits eine Tabelle aller Basic-Befehle: 49310-49565 ($C09E-$C19D). Diese hat lediglich den Nachteil, daß sie keine Trennzeichen verwendet, sondern das Ende eines Basic-Befehlswortes dadurch kennzeichnet, daß der ASCII-Code des betreffenden Zeichens um den Wert 128 (Bit 7 gesetzt) erhöht wird. Das Vorhandensein einer solchen Tabelle wollen wir in den folgenden drei Vorschlägen zur Simulation von HELP ausnützen.
+
+## Methode 1: »HELP« in Basic
+
+Das Basic-Programm nach Listing 1 ist der kürzeste unserer drei Vorschläge (nur 80 Bytes lang), es hat aber den Nachteil, daß es zum Aufbau der Basic-Befehlsliste mehr also vier Sekunden benötigt. Es wird (im Direktmodus oder vom Hauptprogramm aus) per GOSUB500 aufgerufen und PRINTet Zeichen für Zeichen der Tabelle 49310 — 49565, wobei es darauf achtet, daß immerwenn ein Befehlswortzu Ende ist, das betreffende Zeichen vor dem Ausdrucken (auf dem Bildschirm) zuerst normalisiert wird und daß dann zusätzlich noch ein Befehlsworttrennzeichen eingefügt wird (in Listing 1 an der Stelle X$=”. ”, welches Symbol vom Leser beliebig abgeändert und individuellem Geschmack angepaßt werden kann). Nachteilig ist bei allen drei zu besprechenden Vorschlägen, daß man sich sinnvollerweise mit der durch die CBM-Tabelle vorgegebenen Unordnung zufriedengeben muß.
+
+## Methode 2: »HELP« per Maschinensprogramm
+
+Das in Listing 2 aufgeführte Maschinensprogramm zur Ausgabe der Basic-Befehlsliste auf dem Bildschirm ist zwar ein wenig länger als das Basic-Programm in Listing 1, nämlich 106 Bytes lang. Dafür benötigt es aber zum Einlesen der Data-Zeilen deutlich weniger als % Sekunde und erzeugt die Basic-Befehlsliste nach dem Aufruf per SYS700 in einem kaum wahrnehmbaren Bruchteil einer Sekunde. Das eigentliche Maschinenprogramm ist nur 21 Bytes lang und kann (voll verschiebbar) überall abgelegt werden, wo es nicht stört, zum Beispiel in einem durch Herabsetzen der RAM-Grenzen geschützten Maschinensprachbereich oder im Kassettenpuffer oder eben auch dort, wo wir es hingelegt haben, nämlich in den für den Benutzer freien Bereich 678-767 (02A6-02FF). Wir haben es als mit SYS700 aufrufbar gestaltet. Bei Ablage an anderer Stelle aaaa müßte POKE700+I,X in Zeile 610 von Listing 2 durch POKEaaaa+l,X ersetzt und das Programm per SYSaaaa aufgerufen werden. Legt man das Programm nicht in den Kassettenpuffer, sondern wie hier vorgeschlagen, nach 7OOff., dann kann man das generierende Basic-Programm aus Listing 2 natürlich nach dem Einlesen des Maschinenprogramms wieder löschen (ein Maschinenprogramm für größere Löschvorhaben wurde im 64’er Ausgabe 5/84, Seite 85, veröffentlicht). Listing 3 gibt eine ausführlich kommentierte Darstellung des Maschinensprogramms in Assemblernotierung.
+
+## Methode 3: Maschinenprogrammerzeuger ohne Datenzeilen
+
+Will man das Maschinenprogramm in den Kassettenpuffer legen, so muß man es gegebenenfalls (bei zwischenzeitlicher Ausführung von LOAD, SAVE oder VERIFY) oder, wenn sich mehrere Hilfsprogramme den Kassettenpuffer teilen) vor jedem Aufruf neu generieren. Die Schwierigkeiten, die dadurch entstehen, daß der Basic-Datenzeiger per RESTORE nur immer an den Datenanfang gesetzt werden kann, lassen sich beispielsweise durch ein in Computer persönlich, Ausgabe 10/84, Seite 52, beschriebenes Hilfsprogramm beseitigen, mit welchem der Datenzeiger an beliebige Stellen gesetzt werden kann. Das nun noch zu beschreibende Programm nach Listing 4 vermeidet die Schwierigkeiten durch ausschließliche Verwendung von POKE-Anweisungen anstelle von DATA-Zei-len. Um den Aufwand so gering wie möglich zu halten, wurde angestrebt, mit möglichst weniger POKE-Anweisungen auszukommen. Das wurde mit einem Trick erreicht: Das für die Rückübersetzung derToken beim Ausdrucken nach dem LIST-Befehl zuständige Maschinenunterprogramm des Betriebssystems enthält fast alle Befehlssequenzen, die wir für unsere Zwecke benötigen. Das Programm in Listing 4 lädt den Maschinenprogrammabschnitt 50929 bis 51008 (C6F1 — C740), der zugegebenermaßen viel für unsere Zwecke überflüssigen Ballast enthält, mit einer einfachen FOR-NEXT-Schleife in den Kassettenpuffer, (Es wird mit GOSUB700 angesprungen). Jeder zweite und weitere Ansprung kann mit GOSUB730 erfolgen und wird dann in kaum wahrnehmbaren Bruchteilen einer Sekunde ausgeführt.
+
+(Fred Behringer/ev)
+
+# Genau betrachtet: RS232/V.24-Schnittstelle
+
+> Eine kurze und bündige Beschreibung der RS232-Schnittstelle Ihres C 64. Was machen die Signale, wie sind die Pin-Belegungen?
+
+Bei der RS232-Schnittstelle werden die Daten Bit für Bit übertragen, im Gegensatz zur Centronics- oder IEEE-488-Norm, bei der ganze Bytes übergeben werden. Die Bits werden als eine Folge von Spannungsimpulsen mit einer bestimmten Dauer übertragen. In der Praxis werden dabei Pakete von 5 bis 8 Datenbit übertragen, die von einem Startbit und 1 bis 2 Stop-Biteingerahmtsind(Bild 1). DasStartbithatgrundsätzlich logischen Low- und die Stop-Bits High-Pegel. Vor dem Stop-Bit kann ein sogenanntes Paritäts-Bit vereinbart werden, das die Anzahl der High-Zustände im Datenwort immer gerade oder ungerade macht.
+
+Beispiel: Sind in einer 8-Bit-Übertragung 5 Bit gesetzt, wird das Paritäts-Bit ebenfalls gesetzt, wenn gerade Parität vereinbart wurde.
+
+## Päckchenweise Übertragung
+
+Um die Störungs-Anfälligkeit der Übertragung zu mindern, wird logisch »Eins« (gesetztes Bit) nicht durch +5V (TTL-Pegel) realisiert, sondern mit einer Spannung von —3 bis —12V und logisch »Null« mit + 3 bis +12V (RS232 nach DIN 66020). Eine andere Norm ist die RS232/TTY, die gegen äußere Störungen recht unempfindlich ist. Bei dieser Norm werden die logischen Zustände durch das Fließen oder Fehlen eines Stromes (20mA) dargestellt. Der C 64 hat zwar die nötige Software füreine RS232-Schnittstelle im Betriebssystem integriert, verfügt aber nicht über die entsprechenden Spannungspegel. Im C 64 gibt es nur zwei Spannungen: +5V (TTL) und 9V Wechselspannung. Es ist also ein Interface zur Spannungskonvertierung nötig. Links in Bild 2 finden Sie den Schaltplan eines solchen Interfaces (Bauanleitung in Ausgabe 3/85). Rechts im Bild die diskrete Lösung, für die Konvertierung von 0/5V auf ±12V (oben) und von ±12V auf 0/5V (unten). Beachten Sie, daß jede Sende- und Empfangsleitung die entsprechende Transistorschaltung braucht.
+
+Mit einer Masse- und einer Datenleitung könnte schon eine Übertragung von Texten an einen Drucker erfolgen. Was ist aber, wenn die Datenübertragung schneller ist, als der Drucker die Zeichen zu Papier bringen kann? Der Drucker muß dem Computer sagen, wenn er zuviel Arbeit bekommt. Er kann dies auf drei verschiedene Arten tun:
+
+### — Software-Protokoll mit XON/XOFF
+
+Es wird eine zusätzliche Leitung zwischen Computer und Peripherie eingerichtet, über die das empfangende Gerät den Code $13 (XOFF) sendet, wenn es keine Daten mehr annehmen kann. Dieses Signal hat die gleiche Aufgabe wie die Busy-Leitung einer Centronics-Schnittstelle; es stoppt die Datenübertragung. Die Freigabe erfolgt mit dem Code $11 (XON). Die Codes $11 und $13 entsprechen den ASCII-Codes DC1 und DC2.
+
+Die neue Leitung kann natürlich auch zur Übertragung von mehr Informationen verwendet werden. Sende- und Empfangsgerät müssen dann allerdings in der Lage sein, zwei Leitungen (XON/XOFF und die normale Datenleitung) gleichzeitig zu verwalten. Mit dieser zusätzlichen Leitung wird auch der sogenannte Vollduplex-Betrieb möglich. Vollduplex heißt, daß beide Geräte gleichzeitig senden oder empfangen können. Im Gegensatz zum Halbduplex-Betrieb, bei dem zur gleichen Zeit nur in eine Richtung übertragen werden kann.
+
+### — Software-Protokoll mit ETX/ACK
+
+Auch bei dieser Lösung kommt man nicht ohne eine zusätzliche Leitung aus. Sie heißt DTR (Data Terminal Ready). Ist zum Beispiel der angeschlossene Drucker bereit, Daten anzunehmen, aktiviert er die DTR-Leitung und sendet $06 (ACKnow-ledge). DerComputerschicktnun eine Reihe Datenworte über die Sendeleitung und schließt die Übertragung mit $03 zwischendurch immer wieder ab. Den nächsten Datenblock sendet er erst dann, wenn der Drucker sein ACK gegeben hat. Damit die Übertragung nicht in einem Chaos entartet, muß der Sende-Computer über das Puffervermögen des Empfängers informiert sein, um rechtzeitig ein ETX (End Of Text) senden zu können. Nur so kann ein Überlauf des Puffers und der damit einhergehende Datenverlust verhindert werden.
+
+Hat das Empfangsgerät ein ETX festgestellt, werden die empfangenen Daten bearbeitet. Kann der Empfänger neue Daten aufnehmen, sendet er ein ACK an den Computer und die Übertragung beginnt von Neuem.
+
+### — Hardware-Protokoll
+
+Spätestens hier wird es unübersichtlich. Es hilft nur noch Tabelle 1 zur Erklärung der ganzen Signale. Als üblicher Stecker für V.24-Signale hat sich ein 25-poliger D-Sub-Stecker (im Laborslang Cannon gennant) durchgesetzt. Die Bezeichnung der Kontakte ist gleich dreimal genormt: DIN 66020, CCITT V.24 (Comite Consultatif International Telegraphique et Tele-phonique) und EIA RS232C (Electronic Industries Association). Die Bedeutung der Signale ist bei allen Normen gleich, nur die Signalpegel differieren. Die deutsche Norm verlangt, im Gegensatz zu den anderen, negative Logik.
+
+Zum Anschluß einer RS232/V.24-Schnittstelle ist es in den allermeisten Fällen nicht nötig, alle Leitungen zu benutzen. So werden nur wenige unter Ihnen eine synchrone Datenübertragung mit zusätzlichem Clock-Signal realisieren, wie beim seriellen lEC-Bus des C 64. Normalerweise reichen die folgenden Leitungen aus:
+
+1.	eine Masseleitung
+2.	je Richtung eine Datenleitung
+3.	je Richtung eine Busyleitung
+
+Punkt 1 und 2 dürften klar sein. Punkt 3 kann auf vielfältige Art realisiert werden. In aller Regel werden die Kontakte S2 (RTS) und M2 (CTS) benutzt. Die Erklärung erfolgt am besten an einem Beispiel: Der Drucker zeigt seine Empfangsbereitschaft an, indem er M2 aktiviert. Dieses Signal fragt der Computer ständig am Anschluß S2 ab. Ist M2 inaktiv, stoppt der Computer die Datenübertragung. Nehmen wir an, anstelle des Druckers sei ein Meßgerät angeschlossen, das nur ab und zu Anweisungen vom Computer bekommt und ansonsten sich um interne Aufgaben kümmert. Dann wäre es wenig vorteilhaft, wenn das Meßgerät ständig Befehle vom Computer erwartet; für die eigentlichen Meßaufgaben bliebe zu wenig Zeit. In diesem Fall gestattet das einfache Abfragen des Kontaktes S1 (per Interrupttechnik) eine fast ungestörte Bearbeitung eines Programmes. S1 istmitRTS (RequestToSend) identisch. Aktiviert der Computer S1, »spitzt das Meßgerät die Ohren« und das Meßprogramm verzweigt in die Datenempfangsroutine.
+
+### Nicht auf die Norm verlassen
+
+Die Hersteller von V.24-Schnittstellen scheinen sich nicht immer völlig einig zu sein, wie die Belegung und Bedeutung der einzelnen Stecker-Pins ist. So sind diesem Beitrag hauptsächlich Praxiserfahrungen zugrunde gelegt. Besser als Normblätter ist die Überprüfung der Schnittstelle mit einem Speicheroszilloskop oder einem Digital-Analyzer. Zumal die Steuerleitungen ab und zu mit Fantasienamen belegt oder nicht eindeutig als Sende- oder Empfangsleitung gekennzeichnet werden. Zum störungsfreien Betrieb einer Schnittstelle sollten nichtbenutzte Leitungen auf ein festes Potential gelegt werden. Man verhindert dadurch, daß die Übertragung bei einer eventuellen Abfrage einer solchen Leitung, mit Undefiniertem logischen Zustand, nicht unterbrochen wird.
+
+## V.24 beim C 64
+
+Beim C 64 kann diese Schnittstelle als Gerät der Nummer 2 angesteuert werden. Zur Bestimmung der Kontrollparameter sind zwei Register vorhanden, die auch von Basic aus erreicht werden können.
+
+### Einstellparameter
+
+Mit Tabelle 2 können Sie die Werte bestimmen, die Sie in Kommando- und Kontrollregister schreiben müssen, um ein bestimmtes Übertragungsprotokoll zu bewerkstelligen. Eine »1« bedeutet ein gesetztes Bit.
+
+Das Einschalten der RS232-Schnittstelle geschieht beim C 64 mit OPEN filenr.,2,0,CHR$(Kontrollreg.)+CHR$(Kommandoreg.).
+Beispiel: OPEN20,2,0,CHR$(64 + 4 + 2)+CHR$(32 + 1).
+
+Mit dieser Anweisung wird für Filenummer 20 vereinbart: 1 Stop-Bit, 6 Datenbit, 300 Baud, ungerade Parität, Vollduplex und Hardwareprotokoll.
+
+Wird eine Filenummer größer als 128 verwendet, sendet der Computer (wie üblich) nach jedem Carriage Return ($0D) ein Linefeed ($0A). Sollten diese Einstellmöglichkeiten nichtaus-reichen, können Sie direkt in die RS232-Routine eingreifen. Einige Speicherstellen finden Sie in Tabelle 3.
+
+Übertragungsraten größer als 2400 Baud, können nur mit eigenen Maschinenprogrammen realisiert werden.
+
+### Fehlerabfrage
+
+Das Betriebssystem des C 64 verfügt über eine Fehlerbehandlung der RS232-Schnittstelle. Der Status dazu kann entweder durch die Variable ST abgefragt werden, oder direkt mit Speicherzelle $0297. Die Bedeutung der einzelnen Bits von ST finden Sie in Tabelle 4.
+
+(Jens Maßmann/hm)
+
+# Longscreen VC20
+
+> Diese kleine Utility wird sicher bei alien Anwendern Freude finden, die das unproportionale Breitschriftformat des VC 20 stört.
+
+Die Routine dreht den kompletten Zeichen, Farb- und Bildschirmspeicher um 90 °. Das Ergebnis ist eine hervorragend lesbare Bildschirmmatrix mit herrlich schlanken Zeichen (siehe Bild). Natürlich sind nach wie vor beide Zeichensätze vorhanden.
+
+Für das Programm benötigt man mindestens eine 8-KByte-RAM-Erweiterung. Nach dem Start wird folgende Speicheraufteilung vorgenommen:
+
+Basic-RAM
+	 $1d18(7448)
+Maschinenprogramm
+	 $1c00(7168)
+Grafik-
+RAM (2K)
+	 $1400{5120)
+Video-RAM
+	 $1200(4608)
+Print-RAM
+	 $1000(4096)
+TODO
+
+Die Position des Speichers für Print-Operationen bleibt also. Falls in diesen Bereich gePOKEt wird, werden solche Zeichen auch übertragen. Der VIC zeigtjetzt allerdings nicht mehr das Print-RAM, sondern das Video-RAM, wo der Inhalt des PrintRAM um 90 Grad gedreht dargestellt wird. Die Routine wird über das IRQ-Signal gesteuert. Das Bild wird 12mal pro Sekunde aufgebaut.
+
+Folgende RAM-Adressen werden benutzt:
+$00/01	Zeiger in Video-RAM
+$02/03	Zeiger in Print-RAM
+$06/07	Zeiger in Video-Farb-RAM
+$08/09	Zeiger in Print-Farb-RAM
+$04	Y-Hilfsregister für Print-RAM
+$05	Y-Zeiger in Video-RAM
+TODO
+
+Sollte die RESTORE-Taste betätigt worden sein, so befindet sich der Rechnerwieder im Normalmodus. Durch Eingabe des Befehls »SYS 7410« kann die Routine ohne Programm-Verlust wieder gestartet werden. Die Umschaltung in den Grafik-/ Großschrift-Modus erfolgt über »PRINT CHR$ (142)«, in den Textmodus zurück gelangt man über »PRINT CHR$ (14)«.
+
+(Wolfgang W. Wirth/ev)
+
+# C 16: HELP und TRACE verbessert
+
+> Dieses kleine Programm implementiert eine wesentlich erweiterte TRACE-Funktion. Auch HELP wird damit um einiges übersichtlicher.
+
+Nachteilig bei der bisherigen Fehlersuche durch »HELP« ist das entnervende Blinken der Fehlerstelle und aller nachfolgenden Zeichen. Eine konzentrierte Fehlersuche ist kaum möglich. Durch die Änderung dieser Routine wird die Fehlerstelle fortan nicht mehr blinkend, sondern in reverser Schreibweise ausgegeben und auch nur diese einzige Stelle, nicht mehr die gesamte Restzeile. Der Fehler ist somit mit einem einzigen Blick zu erfassen.
+
+Das C16-Tracing mag etwas für Leute mit Facettenaugen sein, aber wohl nichts für die Mehrzahl der Anwender. In der durch dieses Programm erzeugten neuen Version werden nicht mehr wild die abgearbeiteten Zeilennummern ausgegeben, sondern die gesamte aktuelle Programmzeile gezeigt. Der Befehl, auf dem der Programmzeiger gerade steht, erscheint revers geschrieben. Nach jeder Zeilenausgabe stoppt das abzuarbeitende Programm, und die Trace-Routine wartet auf irgendeinen Tastendruck.
+
+Danach wird die angezeigte Zeile bis zum folgenden Trennzeichen ausgeführt. Dieser Vorgang wiederholt sich bis zum Programmende. Der Programmablauf läßt sich wie gewohnt mit der STOP-Taste unterbrechen.
+
+Vor allem für Basic-Anfänger ist dieses verbesserte Trace eine wertvolle Hilfe, da sich das Programm bei der Ausführung von Befehl zu Befehl direkt verfolgen läßt.
+
+(Wolfgang W. Wirth/ev)
+
+# Bücher
+
+## Basic-Wegweiser für den Commodore 64
+
+Hinter diesem eher bescheiden wirkenden Titel verbirgt sich mehr als ein bloßes Remake des C 64-Handbuchs, wie es zur Zeit leider allzu oft in der nahezu unüberschaubaren Fachbuchlandschaft anzutreffen ist. Vielmehr bietet dieses im Rahmen der »Wegweiser«-Reihe des Wiesbadener Vieweg-Verlags erschienene Buch auf 244 Seiten einen interessanten Einstieg in das weite Feld der Datenverarbeitung, der nicht nur dem Laien einiges Neue vermitteln mag.
+
+Beginnend mit grundlegenden Begriffsklärungen wie »Was ist Hardware, Software, Firmware?« oder »Welche Unterschiede gibt es zwischen Großrechnern und Mikrocomputern?«, erläutert Autor Dr. Ekkehard Kaier dem Leser ausführlich die Funktion von Betriebssystem und Anwenderprogramm und stellt kurz die derzeit wichtigsten Programmiersprachen vor. Auch auf die fundamentalen Techniken des Anlegens von Programm- und Datenstrukturen wird in diesem ersten von drei Abschnitten des Buches eingegangen. Erst nachdem der Benutzer seinen Computer in den Gesamtrahmen der Informatik einzuordnen vermag, wird er von Expertenhand behutsam in die Welt seines C 64 geführt.
+
+Dies macht sich der zweite Teil der Lektüre zur Aufgabe, an dessen Anfang eine gründliche Einweisung in Tastatur, Bildschirm und Diskettengerät steht. Anschließend lernt der Leser anhand kleiner Beispielroutinen den gesamten Basic-Wortschatz seines C 64 kennen und erstellt sein erstes Programm. In diesem Zusammenhang wird auch kurz auf die Spracherweiterungen Basic 4.0 und Simons Basic, sowie auf die Kompatibilität von C 64-Programmen zu Computern der anderen Commodore-Serien hingewiesen. Nach dem Studium dieses zweiten Abschnitts sollte der Benutzer seinen C 64 selbst bedienen und einfache Programme erstellen können.
+
+Im dritten und mit 128 Seiten weitaus umfangreichsten Teil des »Basic-Wegweisers« erfolgt eine gründliche Einarbeitung in die Basic-Programmierung des C 64. Der Einsatz von Folge-Auswahl-, Wiederholungs- und Unterprogrammstrukturen, das Suchen, Sortieren und Mischen von Daten lehrt den Leser systematisch zu programmieren. Probleme der Stringverarbeitung werden hier erörtert, Wege zur Behandlung sequentieller und Direktzugriffsdateien aufgezeigt. Alle theoretisch erarbeiteten Inhalte erhalten durch aussagefähige Beispielprogramme praktischen Bezug. Bei einem abschließenden Ausflug in Simons Basic soll sich der Benutzer mit Musikprogrammierung, hochauflösender- und Spritegrafik vertraut machen. Unglücklicherweise ist dieses Kapitel für Nichtbesitzer von Simons Basic — vermutlich die Mehrzahl der Leser gänzlich nutzlos.
+
+Von diesem geringfügigen Mangel abgesehen, präsentiert sich mit »Basic-Wegweiser für den Commodore 64« ein außergewöhnlich klar strukturiertes und inhaltsstarkes Buch, von dem selbst bei einem Preis von 38 Mark nicht nur der Verleger profitiert.
+
+Die im Buch abgedruckten Lehrprogramme können gegen 42 Mark bei Vieweg auf Diskette angefordert werden.
+
+(Jörg Veit)
+
+Dr. E. Kaier, Basic-Wegweiser für den Commodore 64, Vieweg & Sohn Verlag GmbH, 244 Seiten, ISBN 3-528-04303-2, 38 Mark.
+
+## Dienstprogramme VC 20, Commodore 64 und Executive
+
+Im Verlauf der letzten 12 Monate hat es sich herumgesprochen, daß Computerliteratur ein Renner auf dem Büchermarkt ist. Das hat zu allerlei merkwürdigen »Buchblüten« geführt: Papier ist geduldig! Der durch Schulbücher und wissenschaftliche Werke renommierte Vieweg-Verlag hat die Zeichen der Zeit erkannt. Auf einen Vertrauensvorschuß beim Käufer bauend, bietet er inzwischen den 8. Band seiner Reihe »Anwendung von Mikrocomputern« an, wobei er großzügig auch Homecomputer wie den VC 20 oder den Commodore 64 einschließt.
+
+Ernst-Friedrich Reinking wendet sich mit diesem Buch sowohl an den »weniger vorgebildeten« als auch an den »guten« Programmierer. Tatsächlich bietet er auch jedem etwas:
+
+Ein Drittel des Inhaltes führt in die Assembler-Programmierung ein. Wer allerdings erwartet, hier auf knapp 32 Seiten wirklich Assembler-Programmierung lernen zu können, muß enttäuscht werden: Mehr als eine kleine Gedächtnisstütze ist auf so wenig Platz nicht unterzubringen. Ganz nett ist die Auflistung der Kernal-Routinen, die jeweils noch mit einem kleinen Beispiel gewürzt sind.
+
+Danach geht’s erst richtig los: Wem noch Utilities wie AUTONUMBER, RENUMBER (mit GOTO, GOSUB,...), MERGE, TRACE oder SINGLE-STEP in seiner Programmsammlung fehlen, der findet diese Ergänzungen hier. Und das in Maschinensprache, sauber programmiert und sehr gut erklärt. Außerdem findet man noch eine DUMP-Funk-tion (für die einfachen Variablen), ein Programm zum Hervorheben von REM-Zeilen und SEARCH, was erlaubt, aus einem Basic-Programm beliebige Suchbegriffe mit Angabe der Zeilennummer herauszufinden. Die Eingabe des Gesuchten ist allerdings etwas eigentümlich: Eine Zeile 0 mit dem Suchbegriff muß vor das Basic-Programm gehängt werden.
+
+Kritik finden muß auch eine ziemlich unsinnige Routine, die sich etwas hochtrabend »+ /-Scrolling« nennt, aber nichtswei-ter tut, als ein Programm auf reichlich unbequeme Weise Zeile für Zeile zu listen.
+
+Und weil gerade das Negative dran ist: Warum kann Reinking die an sich ganz nützlichen Sortierroutinen HEAPSORT nicht auch in Maschinensprache anbieten? In Basic sind sie wirklich zu langsam! Außerdem ist es ein Jammer, daß er gerade hier von der Praxis alles sehr deutlich zu erklären abweicht und den Leser mit einem etwas undurchschaubaren Flußdiagramm abspeist. Durch ein Programm »Sortiertes Directory« (in Basic) und ein weiteres, »Unscratch«, welches — zwar auch langsam, weil in Basic — versehentlich gelöschte Files auf der Diskette wieder herstellt, wird man allerdings ganz gut entschädigt. Ein »UNNEW«, durch das mittels NEW oder Reset gelöschte Basic-Programm vom Interpreter wiedergefunden werden, eine Hardcopy-Routine, die den Inhalt des normalen Bildschirmes per Drucker für die Nachwelt fixiert (allerdings mit anderem Zeilenabstand, was sich bei Grafiken nachteilig auswirkt) fehlen ebensowenig wie ein kleiner Disassembler (ebenfalls in Basic).
+
+Alle Programme sind sowohl für den VC 20, als auch den C 64 und den Executive (SX 64) ausgelegt. Lediglich zwei wurden speziell auf den VC 20 zugeschnitten: Ein Hardcopy-Pro-gramm, das einen selbstdefinierten Zeichensatz mitberücksichtigt und ein Programm zum Zeichnen von Funktionen auf dem Bildschirm, was alle VC 20-Besitzer ohne Supererweiterung freuen wird. Im Anhang findet sich noch eine Liste von nützlichen Interpreter-Routinen. Leider kann man aber ohne ROM-Listing nicht viel damit anfangen: Es fehlen alle Angaben darüber, wie man Parameter übergibt oder Ergebnisse abruft.
+
+Resümee: Ein trotz der geschilderten Kritik empfehlenswertes Buch für den fortgeschrittenen Anfänger, der aus den vorgestellten Assembler-Routinen viel lernen kann.
+
+(Heimo Ponnath)
+
+Info: Ernst Friedrich Reinking, Dienstprogramme VC 20, Commodore 64 und Executive, Vieweg & Sohn 1984, ISBN 3-528-04299-0, 26,80 Mark.
+
+## Grafik auf dem Commodore 64
+
+Geht man in eine Buchhandlung und blickt in die Sammlung von Büchern über den Commodore 64, so sieht man auf den Titeln immer wieder zwei Wörter: Basic und Grafik.
+
+Mit letzterem beschäftigt sich eine Veröffentlichung des durch seine Schulbücher bekannten Westermann-Verlags.
+
+In »Grafik auf dem C 64« wird allerdings nicht, wie schon öfters geschehen, erklärt, wie man selbige mit viel POKEs und Tricks auf die heimische Mattscheibe bekommt. Vielmehr beschäftigt es sich mit den vielfältigen Anwendungsmöglichkeiten der Grafikbefehle von Simons Basic.
+
+Und so wimmelt es denn auf den vorliegenden 210 Seiten nur so von Programmbeispielen. Dabei sind unter anderem ein hervorragender Funktionsplotter, der allerdings noch einiges mehr kann, oder ein Programm zum Zeichnen dreidimensionaler Funktionen ohne die sogenannten »verdeckten Linien«.
+
+Doch bei alledem kommt auch die Theorie nicht zu kurz. So erfährt man beispielsweise wie man Kurven, also nicht einfach Kreise oder Ellipsen, sondern beliebig gekrümmte verschlungene Gebilde nach dem Bezier-Verfahren zeichnen kann, oder wie man ein Niveaulinienbild einer dreidimensionalen Funktion erhält. Manchmal wird allerdings über das Ziel hinausgeschossen, wenn es um Differentialgleichungen oder gar Differentialgleichungssysteme geht. Hier ist zum genauen Verständnis schon ein gehöriger Schuß Oberstufenmathematik notwendig. Insgesamt gesehen ist das Buch doch recht mathematisch gehalten, aber immer noch ganz gut lesbar.
+
+Zu erwähnen wäre vielleicht noch, daß natürlich alle Programmbeispiele erklärt werden. Sogar der Befehlssatz von Simons Basic wird, sofern er die Grafik betrifft, verständlich gemacht.
+
+Ein klares Fazit: Empfehlenswert für jeden, der Grafik nicht nur verstehen, sondern auch ausnutzen möchte.
+
+(Boris Schneider)
+
+Walter Bachmann, Grafik auf dem C 64, Westermann-Verlag 1984, 204 Seiten, ISBN 3-14-508811-4, 39 Mark.
+
+# Der Ada-Trainingskurs auf dem C 64
+
+> Ada wurde im Jahre 1975 vom amerikanischen Verteidigungsministerium in Auftrag gegeben, um die Schwierigkeiten und die hohen Kosten in den Griff zu bekommen, welche durch die Vielfalt konkurrierender Programmmiersprachen entstanden sind. Jetzt gibt es auch auf dem C 64 die Möglichkeit, mit dieser modernen Sprache zu arbeiten.
+
+Nur einige wenige Programmiersprachen — sogenannte Hochsprachen — haben eine weite Verbreitung gefunden. Cobol in der Wirtschaft, Fortran und Pascal in der Naturwissenschaft und Basic in der Home-Computerei.
+
+Im riesigen Anwendungsgebiet der Industrie und Technik aber sind Hochsprachen selten zu finden.
+
+Warum? Nun, die meisten für Steuerungen eingesetzten Computer sind nur mit einer bestimmten Hochsprache ausgestattet, die aber spezielle Eigenschaften des Computers oft nicht oder nur umständlich ausnutzt. Eine solche Hochsprache ist daher für diese Zwecke in der Regel nicht genügend effizient, zu langsam und zu aufwendig im Speicherbedarf.
+
+Industrie-Programmierer greifen deshalb viel lieber auf Assemblersprachen zurück, mit dem Ergebnis, daß Programme nicht auf andere Computer übertragbar sind, meistens nur vom Autor selber verstanden und verbessert und nicht zu größeren Programmblöcken zusammengefügt werden können.
+
+Selbst dann, wenn Programmierer die gleiche Hochsprache benutzen, müssen sie oft den Umgang mit neuen Betriebssystemen und anderen Programmentwicklungsmitteln lernen, beispielsweise Text-Editoren, Grafiksysteme, Konfigurationskontrollen und Fehlersuchhilfen. Schließlich sind Programme, die es gestatten, von einem System in ein anderes zu übersetzen, sehr aufwendig und teuer, genauso wie das Um- und Dazulernen der Programmierer.
+
+Kein Wunder also, daß ein so großer Auftraggeber und Selbstverbraucher von Software wie das Verteidigungsministerium in den USA eine Hochsprache forderte, die alle diese Mängel abstellen sollte. Ganz nebenbei sollte diese Sprache stark strukturiert sein, eine einfache Fehlerbehandlung ermöglichen, mit unterschiedlicher Hardware zusammenarbeiten und schließlich auch noch die parallele Bearbeitung von Prozessen erlauben.
+
+Die Antwort auf diese Herausforderung ist Ada: eine neue Standardsprache, die alle anderen Hochsprachen ablösen soll.
+
+Um das zu erreichen, oder besser gesagt, um zu verhindern, daß Ada auch nur wieder eine Hochsprache von vielen wird, wurden die begabtesten Sprachexperten aus Wissenschaft und Industrie zur Entwicklung herangezogen. Diese Entwickler haben der Sprache Ada viele erprobte und bewährte Elemente anderer Hochsprachen einverleibt, mit dem Ziel, »modern software practices«, das heißt also, moderne Methoden der Software-Entwicklung zu ermöglichen.
+
+## Das Ada-Konzept
+
+Die prinzipiellen Eigenschaften von Ada lassen sich in mehreren Gruppen zusammenfassen:
+1. Definition von Datentypen, wie:
+TAGE_IM_MONAT: INTEGER RANGE 20..31;
+erzeugt hier eine Variable mit dem Namen »TAGE_IM_MONAT«, welche nur die ganzzahligen Werte von 20 bis 31 annehmen kann. Damit kann der Programmierer seine eigenen Datentypen erfinden und sie dann zur Benennung von Variablen hernehmen.
+
+Die Datentypen können auch ihre eigenen Werte explizit benennen, wie zum Beispiel:
+TYPE MONAT IS (JAN,FEB,MAR,APR);
+DER_BESTE_MONAT : MONAT;
+Dann kann man schreiben:
+IF DER_BESTE_MONAT = APR THEN ....
+
+Diese Eigenschaft von Ada erhöht nich nur die Lesbarkeit, sondern erleichtert es dem Programmierer, die Übersicht zu behalten und erlaubt anderen Leuten, das Programm zu verstehen.
+2. Das Konzept der Programmstruktur stellt Befehle wie IF..THEN..ELSE..ENDIF und CASE..WHEN..END-CASE zur Verfügung, welche zusammen mit der Schleifenbildungjeden logischen Programmfluß ohne GOTO zulassen.
+3. Um zu erreichen, daß mehrere Leute Programmteile schreiben können, die später zusammenfüg-bar sind, hat ein Programm getrennte Merkmale »nach außen« (specification) und »nach innen« (body). Zum Beispiel kann ein Programmierer ein Programm zur Quadratwurzel schreiben. Die »specification« definiert genau, was andere Benutzer wissen müssen (welche Angaben es braucht und welche Angaben es liefert). Im »body« können Methoden und Formeln verwendet werden, die niemanden außer den Autoren selbst interessieren.
+4. Ada-Programme bestehen aus »Paketen«, das heißt sie sind blockstrukturiert. In einem Paket sind beliebige Daten und Anweisungen zusammengefaßt, die eine ganz bestimmte Aufgabe erfüllen. Ein Paket kann in verschiedenen Systemen verwendet werden. Es ist letztendlich möglich, Software-Pakete genauso in bestehende Systeme »einzustecken«, wie man das heute mit integrierten Chips macht.
+5. Schließlich soll Ada auch Multitasking erlauben. Darunter versteht man die Möglichkeit, mehrere Programmteile gleichzeitig und unabhängig voneinander ablaufen zu lasen und sie nur an ganz bestimmten Stellen zusammenzubinden.
+
+Soviel zur Sprache Ada selbst. Was aber ist der Stand der Entwicklung heute?
+
+Ada wird jetzt gerade eingeführt, aber nicht nur vom Militär und nicht nur in den USA.
+
+Europäische Aktivitäten konzentrieren sich auf Frankreich, Deutschland, Finnland und Großbritannien. Es haben sich schon User-Groups gebildet, Universitäten beschäftigen sich mit Anwendungsstudien und viele Organisationen bemühen sich um die Entwicklung von Lehr- und Trainingsprogrammen.
+
+Eins haben alle diese Aktivitäten gemeinsam: sie beziehen sich ausschließlich auf große und mittlere Computeranlagen und beschränken auf diese Weise den Zugang zu Ada nur auf den exklusiven Kreis der Profis.
+
+## Ada auf dem C 64
+
+In dieser Situation bildet der Ada-Trainingskurs für den C 64 von Data Becker eine hochzulobende Ausnahme, denn er führt erstmalig Ada in die Welt der Home-Computer ein. Der Trainingskurs besteht aus einem Handbuch und einer Programmdiskette, mit deren Hilfe Ada so erklärt wird, daß komplette Programme in dieser Sprache geschrieben werden können.
+
+Die Programmdiskette enthält fünf Programme:
+
+* einen Editor
+* einen Syntax-Prüfer
+* einen Semantik-Prüfer plus Code-Generator
+* einen Assembler (Übersetzer) — einen Disassembler
+
+Für einen Hobby-Programmierer, der nur Basic kennt, ist das sehr verwirrend. Aber ich bitte zu bedenken, daß auch Basic nicht einfach so abläuft, wenn »RUN« eingetippt wird, sondern daß jede Basic-Zeile vom Computer intern in einen komplizierten Vorgang analysiert werden muß. Dieser Analyse-Vorgang ist in den Commodore-Computern fest eingebaut. Für Ada muß der Trainingskurs einen entsprechenden Übersetzer separat zur Verfügung stellen — eben den oben aufgelisteten Code-Generator und den Assembler.
+
+Außerdem ist jedem Basic-Pro-grammierer geläufig, daß der Rechner merkt, wenn ein Befehl falsch geschrieben worden ist, ein Komma fehlt oder in einer Zeile sonst irgend ein Fehler gemacht worden ist. Die nicht immer verständlichen englischen Fehlermeldungen sind ja oft genug Grund zur Frustration.
+
+Diese Überprüfung besorgt beim Ada-Trainingskurs das Syntax- und das Semantik-Prüfprogramm, welche auf Einhaltung der Rechtschreibung und der Grammatik von Ada achten.
+
+Der Editor steht genau wie bei Basic am Anfang aller Aktivitäten. Bei Basic denken wir nicht lange nach und nehmen es als gegeben hin, daß wie per Tastatur Zeichen, Zahlen und Texte schreiben und eingeben können, daß der Cursor bewegt werden kann und daß uns alle möglichen Steuertasten zur Verfügung stehen. Das eingebaute Betriebssystem stellt uns diese Editor-Funktion zur Verfügung.
+
+Für Ada muß das alles extra gemacht werden und dazu dient das Editor-Programm.
+
+Der Disassembler schließlich ist ein Luxus, der zusätzlich zum Assembler angeboten wird, für ein Ada-Programm aber nicht unbedingt benötigt wird. Soviel sei zur Programmdiskette gesagt.
+
+Meine Meinung über das Handbuch ist zweigeteilt. Einerseits finde ich die Einführung in Ada und die Programmierung sehr gelungen, verständlich und gut lesbar. Die Übungsbeispiele sind klar dokumentiert und erläutert.
+
+Andererseits aber sind die Anweisungen, wie die Übersetzungsprogramme zu bedienen sind, vermischt mit einer sehr detaillierten Beschreibung der Arbeitsweise eben dieser Programme, die nur für Fachleute verständlich ist. Das hat zur Folge, daß der Ada-Anwender, der sich nur für die Sprache selbst interessiert, in Erklärungen ertrinkt, welche für das Verständnis und die Anwendung von Ada allein nicht notwendig sind.
+
+Ich selbst habe mehrere Abende gebraucht, um ein erstes kleines Ada-Programm zum Laufen zu bringen und dafür — ich bin so frei — gebe ich dem Handbuch die Schuld.
+
+Zusätzlich enthalten die Teilprogramme einige kleine Unzulänglichkeiten, auf die ich im folgenden noch eingehe.
+
+### Das erste Ada-Programm
+
+Zunächst aber möchte ich beschreiben, wie man zum ersten Ada-Erfolgserlebnis kommt.
+
+Zuerst wird der Editor geladen. Er meldet sich nach kurzer Ladezeit von selbst und muß nicht — wie im Handbuch beschrieben — mit »RUN« gestartet werden.
+
+Der Editor, und noch viel mehr die anderen Programmteile, haben zum Teil ziemlich lange Ladezeiten, die weder im Text noch auf dem Bildschirm angekündigt werden. So ist man häufig im Zweifel, ob man noch warten soll, oder ob das Programm abgestürzt ist, was leider zuweilen auch vorkommt.
+
+Erfreulich, weil leicht verständlich und übersichtlich, sind die verschiedenen Menüs.
+
+Abgesehen von anfänglichen Farbeinstellungen zeigt das Editor-Menü die Befehle für zwei Aktionsgebiete an:
+
+* Schreiben beziehungsweise Ändern des Ada-Programmtextes
+* Weiterverarbeiten des Ada-Programms, Ein- und Ausgabe
+
+Beide Befehlssätze bedienen sich der Funktionstasten. Da jede Funktionstaste dadurch zwei Bedeutungen hat, muß der Lernende am Anfang ziemlich oft die Menüs aufrufen, um seinem Gedächtnis auf die Sprünge zu helfen.
+
+### Der Editor
+
+Das Schreiben und Ändern verfügt über sehr komfortable Hilfsmittel, wie automatische Zeilennumerierung, Einfügen von Zeilen, vor-und rückwärts.
+
+Ein Programm, auch ein unfertiges, kann mit dem zweiten Befehlssatz ausgedruckt oder auf Diskette abgespeichert werden. Ein abgespeichertes Programm ist von Diskette wieder ladbar. Überhaupt stehen alle gängigen Anweisungen an die Diskettenstation zur Verfügung.
+
+Wenn man schließlich glaubt, daß ein Programm fertig und natürlich fehlerfrei ist, wird es zum Übersetzen geschickt.
+
+Die entsprechende Funktionstaste zaubert neue Anweisungen auf den Bildschirm, welche abfragen, ob man wirklich übersetzen will und wenn ja, ob das Programm zu allererst abgespeichert werden soll. Die erste Frage bietet eine belächelbare, die zweite Frage eine sehr sinnvolle Sicherung gegen Programmverlust.
+
+Die dritte Frage nach einer »Spur« erscheint im Textbuch nicht. Ich habe weder sie noch ihre Auswirkungen irgendwo finden können. Natürlich ist es durch Experimentieren letztlich möglich, den Sinn der »Spur«-Entscheidung herauszutüfteln. Aber hier muß die Frage erlaubt sein, ob das im Sinne eines Lernprogramms ist? Für alle Interessierten: Mit der »Spur«-Option wird der Compiler angewiesen, zusätzliche Textangaben, die Auskunft über die gerade abgearbeiteten Zeilen geben, in den erzeugten Code einzucompilieren. Es handelt sich also um eine Art »Trace«-Funktion für Maschinensprache.
+
+Doch weiter: Immer noch als Teil des Editors erfolgt jetzt eine »lexikalische Analyse«, welche (Zitat) »die einzelnen Worte des Programms erkennen und Worte, die in Ada keinen Sinn ergeben, ausfiltert«.
+
+Bevor mitgeteilt wird, ob diese Analyse erfolgreich war oder Fehler aufgespürt wurden, wird erst einmal die Programmdiskette verlangt, von welcher der nächste Programmteil, nämlich der Syntax-Prüfer eingelesen und nach einer längeren angsterfüllten Wartezeit gestartet wird.
+
+Die Syntax-Analyse prüft, ob ein Programm den grammatischen Regeln von Ada entspricht.
+
+Ein »lexikalischer« Fehler (»kroce-dure« statt »procedure«) führt prompt zu einer Fehlermeldung, gefolgt von der Frage, ob der »Stack« ausgegeben werden soll. Im Handbuch ist zwar, eingebettet in eine ausführliche, an den Fachmann gerichtete Beschreibung der Arbeitsweise des Syntax-Prüfers, diese Ausgabemöglichkeit erwähnt aber nicht, wie sie herbeigeführt wird. Mehrfaches Drücken der RETURN-Taste brachte in der Tat Zahlenreihen auf den Schirm, deren Bedeutung zwar im Detail beschrieben wird, dem Laien aber nicht weiterhilft.
+
+Ausgezeichnet dagegen ist die nachfolgende Fehlerdiskussion, welche die fehlerhafte Zeile, den Fehler und mögliche Abhilfen und Korrekturen aufzeigt.
+
+Die Syntax-Prüfungwird abgebrochen, und es kommt die Aufforderung, wieder die Programmdiskette einzulegen. Es leuchtet natürlich ein, daß von ihr wieder der Editor eingelesen wird, um den Fehler beheben zu können. Was nicht einleuchtet, ist, daß nach dem Laden das Programm hängen bleibt: Absturz!
+
+Bei Entdeckung eines syntaktischen Fehlers (zum Beispiel ein fehlendes Semikolon) läuft dieselbe Prozedur ab, jedoch mit zwei großen Ausnahmen. Zum ersten wird nach der Fehlerdiskussion die Syntax-Prüfung fortgesetzt, um noch das restliche Programm zu analysieren. Zum zweiten stürzt das Programm beim Wiedereinladen des Editors jetzt erfreulicherweise nicht ab. Natürlich kann in beiden Fällen das fehlerhafte Ada-Programm wieder geladen werden. Aber ein Absturz ist halt einfach ärgerlich.
+
+Sind alle lexikalischen und syntaktischen Fehler ausgemerzt, folgt die Aufforderung, von der Programmdiskette den dritten Teil, nämlich den Semantik-Prüfer, einzulesen. Dieser prüft, ob das Programm vom Aufbau her korrekt ist. Zum Beispiel ist eine Anweisung an den Drucker, die das fehlerhafte Wort »Dricker« verwendet, lexikalisch und syntaktisch richtig, wird aber von der semantischen Analyse erwischt.
+
+Trotz eventueller Fehler übersetzt der Code-Generator des Semantik-Prüfers in einem ersten Durchgang das Ada-Programm in ein Assemblerprogramm. Dieses kann entweder mit dem Assembler endgültig in ein Maschinenprogramm übersetzt werden, oder es muß mit dem Editor erst noch korrigiert werden. Für Assemblercode-Spezialisten kann auch das Assemblerprogramm geladen und direkt verbessert werden. Nur eins, die Befolgung der Aufforderung, eine dieser drei Optionen zu benützen, führt unweigerlich zum Absturz. Es hat einige Versuche gekostet, bis als einzige Vorgehensweise feststand, den Computer zuerst durch Ausschalten zurückzusetzen — wahrhaft keine elegante Methode in einem Trainingskurs.
+
+Ist das Ada-Programm endlich fehlerfrei, wird der Assembler geladen. Er fragt nach dem Namen des vorläufigen Assemblerprogramms — und wehe, Sie denken nicht daran, unaufgefordert die Datendisket-'te einzulegen, auf der das besagte, zu übersetzende Programm gespeichert ist. Diese kleine Unaufmerksamkeit wird wieder mit Absturz des Programms bestraft.
+
+Wenn Sie es aber richtig machen, übersetzt der Assembler in einem zweiten Durchgang das Programm in echten Maschinencode, der mit »RUN« gestartet und sonst wie ein normales Maschinenprogramm behandelt werden kann.
+
+Wie eingangs erwähnt, braucht man den Programmteil Disassembler für Ada nicht, es sei denn, der Kursteilnehmer will, was der Autor empfiehlt, gleich die Gelegenheit nutzen und Maschinensprache lernen. Dann allerdings kommt ihm die ausführliche Beschreibung von Assembler und Disassembler, die unabhängig von Ada auf eigenen Füssen stehen, sehr zugute.
+
+## Zusammenfassung
+
+Ich bin begeistert von der Möglichkeit, die Sprache Ada zu lernen, und in ihr auf dem C 64 programmieren zu können.
+
+Die Lehrmethode einer schrittweisen Einführung in die Sprache ist auch für Laien geeignet, die bisher nur in Basic gearbeitet haben.
+
+Die Übersetzungsmethode ist zwangsläufig etwas langwierig, die vielen Diskettenwechsel lassen sich durch den begrenzten Speicher des C 64 nicht vermeiden. Und wenn man einmal den Dreh gefunden hat, ist das nicht mehr störend.
+
+Bis dahin allerdings ist es ein steiniger Weg. Die Programme sind leider nicht laiensicher. Ein Lernprogramm muß einfach dem dümmsten Bedienungsfehler Rechnung tragen und nicht, wie in diesem Trainingskurs, immer wieder zum Absturz führen.
+
+Der begreifliche Stolz des Autors auf die für meine Begriffe fantastische Leistung, die Prüf- und Übersetzungsprogramme geschrieben zu haben, drängt die Beschreibung derselben zu sehr in den Vordergrund. Auch das Argument, daß dadurch wichtige Grundkenntnisse der Assembler- und Maschinensprache erlernbar sind, zieht meines Erachtens nicht. Denn mit dem Trainingskurs — für den stolzen Preis von 198 Mark — will ich Ada lernen und nicht Assemblersprache.
+
+Es wäre Data Becker dringend zu empfehlen, sowohl das Handbuch als auch die Programme zu revidieren und davon eine zweite Version herauszugeben. Die kritisierten Mängel sind alle leicht korrigierbar, wenn man sich die Zeit nimmt und die Bedürfnisse von Laien vor Augen hält.
+
+Dieses ausgezeichnete Unterfangen, die Zukunftssprache Ada den Home-Computern zu eröffnen, darf einfach nicht an ärgerlichen Programmiermängeln und inkonsequenten Erklärungen scheitern.
+
+## Ada — für wen?
+
+Der Ada-Trainingskurs kann allen an modernen Programmiersprachen interessierten Anwendern empfohlen werden. Auch wer sich für Compilerbau interessiert, ist mit diesem Kurs gut beraten, da das Handbuch sehr ausführlich auf allgemeine Prinzipien der Compilierung eingeht. Allerdings sollte man die Fähigkeiten dieser Ada-Trai-ningsversion nicht überschätzen. Der Ada-Trainingskurs eignet sich entschieden besser zum Lernen von Ada als für größere Programmierungsprojekte.
+
+Nicht verschwiegen werden soll auch, daß eine Ada-Version für einen Heimcomputer immer nur die wichtigsten Aspekte der Sprache unterstützen kann. So unterstützt Ada als Trainingskurs beispielsweise kein Multitasking, also keine Parallelverarbeitung bestimmter Programmabschnitte. Doch damit kann man leben. Entscheidend ist die Möglichkeit, eine moderne Sprache wie Ada mit dem C 64 lernen zu können.
+
+(Dr. Helmuth Hauck/ev)
 
 
 
