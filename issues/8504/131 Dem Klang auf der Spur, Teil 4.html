@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>Dem Klang auf der Spur, Teil 4</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="Thomas Krätzig, aa">
+    <meta name="64er.issue" content="4/85">
+    <meta name="64er.pages" content="131-136">
+    <!-- <meta name="64er.toc_category" content="XXX"> -->
+    <!-- <meta name="64er.toc_title" content="XXX"> -->
+    <meta name="64er.id" content="XXX">
+</head>
+
+<body>
+    <article>
+        <h1>Dem Klang auf der Spur, Teil 4</h1>
+        <blockquote>
+            <p>Der SID ist einer der vielseitigsten Sound-Chips auf dem Markt. Dennoch kann man mit ein paar Tricks Klänae mit mehr Volumen, Weichheit und Komplexität erzeugen. Der hier vorgestente Modulator ist der Kern eines in den nächsten Folgen zu entwickelnden, interruptgesteuerten Synthesizer- und Sequenzerprogramms mit professionellen Ansprüchen.</p>
+        </blockquote>
+
+        <p>Die Beschreibung der Register des Synthesizer-Chips SID 6581 wird hier abgeschlossen. Es wird das Programm »Modulator« vorgestellt, das die Fähigkeiten des SID stark erweitern wird. »Modulator« ist interruptgetrieben und läuft daher parallel zu anderen Programmen.</p>
+
+        <h3>Fiitersteuerung</h3>
+
+        <p>Das Filter des SID wurde in seiner Funktion in Teil 3 schon beschrieben. Gesteuert werden diese Funktionen über den Inhalt der vier Register 21-24. (Wir beziehen uns hier auf Tabelle 1 aus dem 64'er, Ausgabe 2/85, Seite 153.) Die Grenzfrequenz (auch Eck- oder Mittenfrequenz, je nach Filtermodus) wird über eine ll-Bit-Größe in den Registern 21 und 22 beeinflußt. Die Grenzfrequenz läßt sich im Bereich 30 Hz bis 12 kHz einstellen. Etwas ungewohnt ist die Verteilung der 11 Bits auf die beiden Register: 3 niederwertige und 8 höherwertige. Da man die Filterfrequenz bei weitem nicht so fein steuern muß wie die Oszillatorfrequenz, kann man sich hier auf Register 22 beschränken. Man wird dann Register 21 zum Beispiel fest mit 0 besetzen.</p>
+
+        <h3>Filterresonanz (Register 23 Bit 4-7)</h3>
+
+        <p>Die Filterresonanz kann über 4 Bits in 16 Stufen eingestellt werden. Man muß dabei aber die vier im selben Register angesiedelten Bits FILTEX, FILTER 3, 2 und 1 im Auge behalten, damit man sie nicht versehentlich mit nicht beabsichtigten Werten belegt.</p>
+
+        <h3>Die Schalter FILTER 1, 2, 3 und FILTEX</h3>
+
+        <p>Ist das Bit im FILTER 1 auf 0 gesetzt, wird das Signal von Stimme 1 am Filter vorbei direkt zum DCA geleitet, wo es ungefiltert zum gesamten Ausgangssignal zugemischt wird. Hat FILTER 1 den Wert 1, so gelangt Stimme 1 gefiltert zum Ausgang. Das gleiche gilt bei FILTER 2 und 3 entsprechend für Stimme 2 und 3. FILTEX bestimmt, ob ein externes Eingangssignal gefiltert oder ungefiltert zum Ausgang gemischt wird. Dieses externe Signal kann über Pin 26 an den SID gelegt werden. Dieser Eingang ist beim C 64 über einen 10-µF-Kondensator an Pin 5 (Audio in) der Audio/Video-Buchse herausgeführt. Nach SID-Spezifikationen sollte das Signal einen Gleichspannungsanteil von 6 V haben und eine Wechselspannungsamplitude von 3 V nicht überschreiten. Ein solches Signal könnte zum Beispiel von einem weiteren SID aus einem zweiten C 64 stammen.</p>
+
+        <h3>AUS (Register 24 Bit 7)</h3>
+
+        <p>Wird dieses Bit auf 1 und gleichzeitig FILTER 3 auf 0 gesetzt, erscheint Stimme 3 nicht am Ausgang. Stimme 3 kann dann zum Beispiel Stimme 1 synchronisieren oder ringmodulieren, ohne selbst hörbar zu sein.</p>
+
+        <h3>Hochpaß (Bit 6), Bandpaß (Bit 5) und Tiefpaß (Bit 4)</h3>
+
+        <p>Ist eines dieser Bits gesetzt, verhält sich das Filter als Hoch-Band- oder Tiefpaß. Die Funktionen sind additiv, das heißt, daß man auch mit mehreren gleichzeitig gesetzten Bits ein sinnvolles Filter erhält. So ergeben zum Beispiel Hoch- und Tiefpaß zusammen eine Bandsperre, ein Filter, das alles bis auf einen schmalen Frequenzbereich durchläßt. Die Bandsperre (englisch Notch) ist sozusagen das Gegenstück zum Bandpaß. Es muß mindestens eines dieser Bits gesetzt sein, damit das Filter überhaupt wirksam wird.</p>
+
+        <h3>Lautstärke (Register 24, Bit 0-3)</h3>
+
+        <p>Über diese Bits wird die Gesamtlautstärke des SID in 16 Stufen von stumm = 0 bis maximal = 15 eingestellt. Meistens wird man 15 wählen, weil dann der Störabstand des SID-Signals am besten ist.</p>
+
+        <h2>Die Leseregister</h2>
+
+        <h3>Potentiometer X und Y (Register 25 und 26)</h3>
+
+        <p>An Pin 24 (entsprechend X) und Pin 23 (entsprechend Y) des SID könne RC-Glieder angeschlossen werden. Dabei sind die beiden Pins jeweils mit einem Kondensator mit Masse und mit einem Potentiometer mit + 5 V zu verbinden. Im SID werden durch Messungen der RC-Zeitkonstanten (das sind die Zeiten, in denen die Kondensatoren über die Potentiometer auf eine bestimmte Spannung aufgeladen werden) 8-Bit-Digitalwerte abgeleitet, die den Stellungen der Potentiometer entsprechen. Diese 8-Bit-Werte sind über die Register 25 und 26 von der CPU lesbar. Die Messungen werden alle 512 Systemtaktzyklen wiederholt. Bei einer Taktfrequenz von 1 MHz sind das knapp 2 000 Messungen pro Sekunde. Die SID-Potentiometer-Anschlüsse sind an den Joystickports gemultiplext herausgeführt. Es können dort bis zu vier Potentiometer angeschlossen werden, zum Beispiel in Form zweier Steuerknüppel, wie man sie von Funkfernsteuerungen her kennt. Damit wäre eine viel feinfühligere Steuerung möglich als mit Joysticks, doch das soll nicht Gegenstand dieser Reihe sein.</p>
+
+        <h3>Oszillator 3 (Register 27)</h3>
+
+        <p>Über dieses Register kann zu jedem Zeitpunkt der Digitalwert der zu Stimme 3 gehörenden Kurvenform gelesen werden. Man kann diese Werte zur Modulation anderer Parameter verwenden, wie in Teil 3 schon erwähnt wurde. Weil dadurch aber Stimme 3 meistens nicht mehr direkt brauchbar ist (man würde sie durch AUS = 1 unhörbar machen), werden wir hier einen anderen Weg gehen. Zu Modulationen brauchbare Kurven kann man auch rein softwaremäßig errechnen. Das Verfahren ist zwar aufwendiger, aber auch viel leistungsfähiger.</p>
+
+        <h3>Hüllkurve 3 (Register 28)</h3>
+
+        <p>Auch der aktuelle Wert des zu Stimme 3 gehörenden Hüllkurvengenerators ist über dieses Register abgreifbar und kann so zu Modulationszwecken genutzt werden. Auch diese Funktion werden wir softwaremäßig nachbilden, damit uns Stimme 3 samt Hüllkurve weiterhin voll zur Verfügung steht.</p>
+
+        <h2>Das Modulator-Konzept</h2>
+
+        <p>Die Lebendigkeit von Naturklängen resultiert aus ihrer Unregelmäßigkeit. Keine zwei Perioden gleichen sich wie ein Ei dem anderen. Naturklänge weisen immer Schwankungen in der Lautstärke und in der Tonhöhe auf. Es soll zwar nicht unser Ziel sein, mit dem C 64 Naturklänge nachzumachen (dazu ist der SID-Chip bei weitem nicht in der Lage), man kann aber durch Modulation von SID-Parametern Klänge mit mehr Komplexität, Weichheit und Volumen erzeugen. Zur Modulation geeignete Parameter sind Frequenz, Lautstärke, Filterfrequenz und die Pulsweite bei Rechteckklängen. Da die Pulsweite die spektrale Zusammensetzung eines Rechteckklanges beeinflußt, moduliert man durch die Pulsweite eigentlich die Klangfarbe. Modulation von Frequenz (Vibrato) und Lautstärke (Tremolo) sind auch bei natürlichen Instrumenten zu beobachten. Die Modulation der Filterfrequenz ist dagegen ein typischer Synthesizereffekt. Bild 1 zeigt das Funktionsschema des erweiterten SID-Chips in unserem Konzept. Der rechte untere Teil stellt vereinfacht den SID dar, wie er in der letzten Folge auf Bild 1 schon beschrieben wurde. Nur dieser Teil des Schemas ist in der Hardware realisiert, die anderen Funktionsblöcke werden durch Software verwirklicht. Zuerst sollen die Blöcke funktionell beschrieben werden. Anschließend wird etwas über ihre Ansteuerung gesagt. Im nächsten Teil wird die softwaremäßige Realisierung besprochen. Neben Kenntnissen zur Verwirklichung weiterer Effekte werden dabei auch allgemein nützliche Informationen für Assembler-Programmierer anfallen.</p>
+
+        <h3>Modulationsquellen und -Ziele</h3>
+
+        <p>Als Quellen von Modulationssignalen stehen ein Hüllkurvengenerator und 7 LFOs (Low Frequency Oscillator) zur Verfügung. Der Hüllkurvengenerator, im folgenden EG (Envelope Generator) genannt, erzeugt eine Hüllkurve nach dem ADSR-Schema. Der Hüllkurvenverlauf kann zu jeder Zeit angehalten, zurückgesetzt oder sogar gespiegelt werden. Die 7 LFOs sind identisch aufgebaut. Sie können vier Kurvenformen erzeugen:</p>
+
+        <p>Dreieck TRIAN, aufsteigender Sägezahn SAWUP, abfallender Sägezahn SAWDOWN, Rechteck mit einstellbarer Pulsweite SQUARE</p>
+
+        <p>Auch bei den LFOs können die Kurvenverläufe jederzeit angehalten und zurückgesetzt werden. Des weiteren sind die Amplituden der Modulationssignale einstellbar. Über diese Amplitude wird die Stärke oder Tiefe, wie man auch sagt, der Modulation gesteuert.</p>
+
+        <p>Als Modulationsziele kommen vier Parameter in Frage:</p>
+
+        <ul>
+            <li>Frequenzen der drei Stimmen</li>
+            <li>Pulsweiten der drei Stimmen</li>
+            <li>Filtergrenzfrequenz</li>
+            <li>Ausgangslautstärke.</li>
+        </ul>
+
+
+        <p>Jede Modulationsquelle kann auf jedes Modulationsziel geschaltet werden. Dazu dient ein sogenannter Kreuzschienenverteiler. Man kann sich diesen als eine Anordnung von acht waagrechten (Zeilen) und acht senkrechten Drähten (Spalten) vorstellen. Dabei sind die Spalten mit den Modulationsquellen und die Zeilen mit den Modulationszielen verbunden. An den 64 Kreuzungspunkten befinden sich Buchsen, an denen man über Kurzschlußstecker beliebige Verbindungen von Modulationsquellen zu Modulationszielen herstellen kann. Dabei werden entlang einer Zeile die Signale von Modulationsquellen gemischt, wo an entsprechender Stelle ein Stecker sitzt.</p>
+
+        <p>Im Bild wird zum Beispiel die Frequenz von Stimme 1 durch LFO 0, LFO 3 und LFO 5 gleichzeitig moduliert. Die Filterfrequenz wird nur vom EG moduliert. Durch das Kreuzschienen-Konzept können Modulationsquellen auch mehrfach genutzt werden. So trägt im Bild zum Beispiel LFO 5 zur Modulation der Frequenz von Stimme 1 bei, moduliert die Pulsweite von Stimme 2 und dazu noch die Ausgangslautstärke.</p>
+
+        <h3>Portamento</h3>
+
+        <p>Bei fast jedem Synthesizer kann man die gespielten Tonhöhen »schleifen« lassen. Das heißt, daß bei zwei aufeinanderfolgenden, verschiedenen Tönen die Frequenz nicht unmittelbar wechselt, sondern in einstellbarer Zeit von der alten zur neuen Tonhöhe kontinuierlich gleitet. Der Portamento-Block verwirklicht dies für alle drei Stimmen. Dabei sind die Portamento-Raten der Stimmen unabhängig voneinander einstellbar.</p>
+
+        <h3>Arbeitsweise von »Modulator«</h3>
+
+        <p>»Modulator« (Listing 1) für sich allein ist noch kein abgeschlossenes Programm so wie der SID alleine noch kein vollständiger Synthesizer ist. SID 6581 und CPU 6510 bilden die hardwaremäßige Grundlage eines Synthesizers, der erst durch Software zum Leben erwacht. Das Steuerprogramm »Modulator« erweitert die Möglichkeiten dieser Hardware durch sinnvolle Effekte und ist als Kern eines später folgenden Synthesizer- und Sequenzerprogramms aufzufassen. Die Effektmöglichkeiten von Modulator allein sind allerdings schon so reichhaltig, daß sie für jede Spiele-Geräuschkulisse ausreichen dürften, solange man auf vollständige Melodien verzichtet.</p>
+
+        <h3>Schritt für Schritt</h3>
+
+        <p>Damit »Modulator« richtig arbeiten kann, muß es in regelmäßigen Zeitabständen immer wieder aufgerufen werden. Das Programm rechnet alle Modulationsquellen (LFOs und EG) Schritt für Schritt als Folge von Abtastwerten aus. Bei einem Aufruf wird dabei immer genau ein weiterer Abtastwert für alle aktiven Quellen errechnet. Ein Modulationsziel, zum Beispiel Frequenz Stimme 1 gewinnt das Programm dann dadurch, daß die Frequenzvorgabe für Stimme 1 entsprechend dem neuen (aktuellen) Wert der Modulationsquelle nach oben oder unten verschoben wird. Die so errechnete Größe wird dann von »Modulator« in die SID-Register geschrieben. Wenn man mit dem Modulator arbeitet, darf man also die zu modulierenden Größen nicht direkt in den SID schreiben (von dort könnten sie auch gar nicht mehr gelesen werden), sondern muß sie in andere, fest vereinbarte Speicherstellen schreiben, aus denen dann »Modulator« seine Vorgaben bezieht. Nun kann man das Programm nicht einfach in einer Schleife endlos aufrufen. Erstens könnte der Computer dabei nichts anderes mehr tun und zweitens wäre eine solche Aufruffolge zeitlich nicht regelmäßig.</p>
+
+        <p>Ein »Modulator«-Schritt benötigt zirka 1 bis 10 ms, je nachdem, wieviele Quellen aktiv sind und wieviele Ziele moduliert werden müssen. Es ist naheliegend, die Aufrufe von »Modulator«-Schritten nicht einem anderen Programm zu überantworten, sondern dazu einen programmierbaren Zeitgeber einzusetzen, der dann in völlig regelmäßiger Folge Aufrufe von »Modulator« auslöst.</p>
+
+        <h3>Interrupts</h3>
+
+        <p>Die beiden CIAs 6526 enthalten insgesamt vier Timer, die sich so programmieren lassen, daß sie in regelmäßigen Zeitabständen Interrupts auslösen. Zum Begriff Interrupt sei hier nur soviel gesagt: Ein Interrupt ist ein Unterprogrammsprung, der nicht von einem laufenden Programm ausgelöst wird, sondern von einem elektrischen Signal, das von außen an die CPU angelegt wird. Es kann dabei nicht vorhergesagt werden, an welcher Stelle im laufenden Programm ein Interrupt eintritt. Die CPU trägt dafür Sorge, daß sie nach Beendigung des durch den Interrupt aufgerufenen Programms an die Stelle im alten Programm zurückfindet, an der sie unterbrochen wurde. Normalerweise erzeugt Timer A von CIA 1 60mal in der Sekunde einen Interrupt, den sogenannten Systeminterrupt. Das dabei aufgerufene Programm fragt die Tastatur ab, läßt den Cursor blinken und aktualisiert die Werte der Zeitveriablen TI und TI$. In gleicher Weise wird nun auch »Modulator« aufgerufen. Da die SID-Parameter nicht kontinuierlich, sondern zeitlich gestuft moduliert werden, sollten die »Modulator«-Zeitschritte möglichst klein sein, damit die Abstufung unhörbar bleibt. Andererseits müssen die Zeitabstände zwischen zwei »Modulator«-Aufrufen mindestens so groß sein wie der Zeitbedarf eines Modulatorschritts, also mindestens 10 ms. Die Aufruffrequenz des Systeminterrupts von 16,6 ms erweist sich als ein guter Kompromiß. »Modulator« und Systeminterrupt-Programm kann man also durch denselben Interrupt auslösen. Bei 60 Modulationsschritten pro Sekunde ist eine zeitliche Quantelung bei der Klangqualität des SID nicht hörbar. Zum anderen bleibt der CPU zwischen den Schritten noch Zeit für andere Aufgaben. Werden alle Register bei »Modulator« gezogen, benötigt ein Schritt knapp 10 ms. Da das Systeminterrupt-Programm auch noch etwas Zeit benötigt, ergibt sich so eine CPU-Auslastung von zirka 70 Prozent. Man merkt das daran, daß alle anderen Vorgänge, zum Beispiel das Listen von Programmen stark verzögert ablaufen, wenn der Modulator voll aktiv ist. Man wird in der Praxis allerdings selten alle Modulationsmöglichkeiten gleichzeitig ausnützen.</p>
+
+        <h3>Timesharing</h3>
+
+        <p>Alle Programme, die selbst nicht interruptgetrieben sind, laufen problemlos quasiparallel zusammen mit »Modulator«. Mit dem Problem mehrerer konkurrierender Interrupts werden wir uns in einer späteren Folge im Zusammenhang mit dem Sequenzerprogramm befassen. Die CPU-Belastung durch den Modulator kann man leicht ermitteln, da das Programm bei jedem Schritt seine eigene Laufzeit mißt.</p>
+
+        <h3>Ansteuerung von »Modulator«</h3>
+
+        <p>Um sich mit dem Programm vertraut zu machen, sollte man es bei der Lektüre gleich ausprobieren. Zunächst muß man das Programm mit Hilfe des MSE (in dieser Ausgabe) in den Speicher bringen. Man kann nun mit Hilfe eines Monitors, oder komfortabler, mit dem Testprogramm zu »Modulator« (siehe Listing 2) die Modulationsmöglichkeiten ausprobieren. »Modulator« wird mit SYS 12 x 4096 + 1033 aktiviert. Von da an verbraucht das Programm Rechenzeit, egal ob etwas hörbar ist oder nicht. Abgeschaltet wird Modulator mit SYS 12 x 4096 + 1046. »Modulator« wird wie der SID über Registerinhalte gesteuert. Der Inhalt von 73 Speicherstellen nimmt Einfluß auf »Modulator« und darüber hinaus auch auf den SID. Im Registerschema in Bild 2 kann man zwischen Steuerparametern und dynamischen Parametern unterscheiden. Steuerparameter werden von »Modulator« nur gelesen. Über sie wird das Programm gesteuert. Dynamische Parameter werden ständig verändert. Durch Auslesen dieser Werte kann man beobachen, wie »Modulator« arbeitet. Man kann diese Register natürlich auch beschreiben. Dadurch greift man direkt in die Arbeit von »Modulator« ein. Für weitere Spezialeffekte kann das sinnvoll sein. Mehr davon im nächsten Teil.</p>
+
+        <p>Da die meisten SID-Register von »Modulator« gesteuert werden, muß man nur noch wenige direkt ansprechen. Es sind dies:<br />
+            Die Kontrollregister: 4, 11, 18<br />
+            ADSR-Register: 5, 6, 12, 13, 19, 20<br />
+            Resonanz/Filter: 23<br />
+            Die Leseregister: 25, 26, 27, 28</p>
+
+        <p>Die anderen SID-Register findet man mit ähnlichem Aufbau unter den Steuerparametern von »Modulator«. Das Basic-Testprogramm enthält einen vollständigen Parametersatz für SID und »Modulator« in den Zeilen 20 bis 41. Diese Zeilen sind so gestaltet, daß sie mit LIST -41 gerade einen Bildschirm füllen. Die DATA-Zeilen sind mit Kommentaren durchsetzt, so daß man den Zusammenhang mit dem Registerschema in Bild 2 leicht herstellen kann. Beim Testprogramm geht man am besten so vor:</p>
+
+        <p>— Modulator laden<br />
+            — Testprogramm laden<br />
+            - LIST -41</p>
+
+        <p>Jetzt kann man den Parametersatz studieren und verändern.</p>
+
+        <p>— Cursor auf die Zeile mit READY bringen<br />
+            - RUN (SPACE), (SPACE)</p>
+
+        <p>Dadurch bleibt der DATA-Block am Bildschirm stehen. Nach einiger Zeit wird die Dauer eines »Modulator«-Schrittes und die daraus resultierende CPU-Belastung angezeigt. Jetzt kann man mit den Tasten Fl, F3, F5 Stimme 1, 2, oder 3 auswählen und über die oberen beiden Tastenreihen einen Ton erklingen lassen. Der Ton klingt so lange weiter, bis mit der SPACE-Taste das GATE-Bit der gewählten Stimme zurückgesetzt wird. Das GATE-Bit des Software-EG wird ebenfalls gesetzt und rückgesetzt. Das einfache Basic-Programm reagiert nicht gerade flott, es ist aber auch nur zum Experimentieren mit »Modulator«-Klangbildern gedacht, nicht für virtuoses Spiel. Mit RUN/STOP wird das Programm abgebrochen. Während »Modulator« weiterarbeitet, kann man die Parameter in den DATA-Zeilen ändern, um das Programm neu zu starten.</p>
+
+        <h3>Die Parameter</h3>
+
+        <p>Es gibt zunächst drei identische Blöcke für die drei Stimmen. Frequenz <strong>F</strong> und Pulsweite <strong>PW</strong> sind die gleichen 16 (beziehungsweise 12)-Bit-Größen wie beim SID. Das Byte <strong>PORTA</strong> steuert das Tempo, mit dem verschiedene Tonhöhen ineinander übergehen:</p>
+
+        <p>PORTA = 1 sehr langsam<br />
+            PORTA = 255 sehr schnell<br />
+            PORTA = 0 kein Portamento</p>
+
+        <p><strong>FP</strong> ist ein dynamischer Wert. Er enthält die aktuelle Frequenz, die gemäß der PORTA-Rate immer in Richtung F gezogen wird, bis F und FP übereinstimmen.</p>
+
+        <p><strong>FILT</strong> enthält, wie beim SID, die Grenzfrequenz in der Aufteilung: 3 niederwertige Bits und 8 höherwertige Bits.</p>
+
+        <p><strong>MOD/LAUT</strong> entspricht genau dem SID-Register 24.</p>
+
+        <p>Der Kreuzschienen-Verteiler wird durch 8 Bytes realisiert. Ein Byte entspricht einer Zeile im KSV (Kreuzschienenverteiler). Die 8 Bitpositionen entsprechen den Spalten des KSV. Eine 1 an Bitposition N in Byte M entspricht einem Kurzschlußstecker an Spalte N und Zeile M.</p>
+
+        <p>Die sieben LFOs werden durch sieben gleichartige Blöcke gesteuert.</p>
+
+        <p><strong>LFOF</strong> Mit 16 Bit kann die LFO-Frequenz sehr fein im Bereich 0-60 Hz eingestellt werden. Oberhalb von 10 Hz ergeben sich Aliasing-Effekte über die in der nächsten Folge noch etwas gesagt werden wird.</p>
+
+        <p><strong>LFOP</strong> Dieses Byte steuert die Pulsweite, wenn als Kurvenform SQARE gewählt wurde. LFOP = 128 ergibt ein symmetrisches Rechteck.</p>
+
+        <p><strong>LFOA</strong> steuert die Amplitude des LFO-Signals. LFOA = 103 entspricht übrigens einer Frequenzmodulation um eine Oktave. LFOA = 0 ist nicht sinnvoll, da der LFO dann kein Ausgangssignal liefert, aber Rechenzeit verbraucht.</p>
+
+        <p><strong>LFOC</strong> Dieses Steuerbyte bestimmt Kurvenform und Betriebsart des LFO gemäß Tabelle. RUN ist die normale Betriebsart, HOLD hält den letzten aktuellen Kurvenwert fest und RESET setzt den Kurvenwert in die Neutralstellung 0. In den Betriebsarten HOLD und RESET benötigen die LFOs sehr wenig Rechenzeit. Man sollte daher nicht benötigte LFOs in HOLD oder RESET »betreiben«.</p>
+
+        <p>Der <strong>EG-Steuerblock</strong> enthält die gewohnten ADSR-Parameter. A soll sich im Bereich 0..128, alle anderen im vollen Bereich 0..255 bewegen.</p>
+
+        <p><strong>EGA</strong> Auch die Amplitude der ADSR-Kurve ist steuerbar.</p>
+
+        <p><strong>EGC</strong> steuet die Betriebsart. Für HOLD und RESET gilt hier das oben Gesagte (auch in Bezug auf die Rechenzeit). GATE hat hier die gleiche Funktion wie auch im SID. Mit ± kann man zwischen einer positiven und negativen Hüllkurve umschalten.</p>
+
+        <p>Es folgen sieben dynamische LFO-Blöcke, deren Registerinhalte den aktuellen Kurvenverlauf wiederspiegeln. In <strong>SAWUP</strong> befinden sich die Werte des aufsteigenden Sägezahn mit maximaler Amplitude. Aus ihnen werden die anderen Kurvenformen abgeleitet. In <strong>KURVE</strong> steht der aktuelle Wert der gewählten Kurvenform.</p>
+
+        <p>Entsprechendes gilt für die Register <strong>E</strong> und <strong>EKURVE</strong> im dynamischen Hüllkurvenblock. Die Flagge <strong>EPHASE</strong> wird benötigt, um zwischen ATTACK und DECAY zu unterscheiden.</p>
+
+        <p>In der nächsten Folge wird das Source-Listing zu »Modulator« besprochen. Wenn man die Arbeitsweise des Programms kennt, kann man seine Möglichkeiten noch weiter ausschlachten, als das über die Steuerregister möglich ist. Außerdem werden wir konkrete Steuerparametersätze besprechen.</p>
+
+        <address class="author">(Thomas Krätzig/aa)</address>
+    </article>
+</body>
+
+</html>

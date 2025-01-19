@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>Hardcopy mit einer Zeile</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="Karl-Heinz Heß, hm">
+    <meta name="64er.issue" content="4/85">
+    <meta name="64er.pages" content="82">
+    <!-- <meta name="64er.toc_category" content="XXX"> -->
+    <!-- <meta name="64er.toc_title" content="XXX"> -->
+    <meta name="64er.id" content="XXX">
+</head>
+
+<body>
+    <article>
+        <h1>Hardcopy mit einer Zeile</h1>
+        <blockquote>
+            <p>Dieser Einzeiler gibt den Text einer Bildschirmseite des C 64 auf einem MPS 801 aus. Ganz ohne PEEKs, POKEs und SYS-Befehle. Trotzdem überrascht das Programm mit einer hohen Druckgeschwindigkeit.</p>
+        </blockquote>
+
+        <p>Mittlerweile existiert eine Vielzahl von Hardcopy-Routinen für die verschiedenen Drucker und Bildschirmformate. Ich kannte aber bisher kein Druck-Programm, das universell einsetzbar ist, keine POKEs und PEEKs braucht und auch nicht in Maschinensprache geschrieben ist Diese Eigenschaften weist dieser Einzeiler (Zeile 9 des Listings) auf. Das »Programm« enthält nur Basic-Befehle.</p>
+
+        <p>Die Programmidee basiert auf der Tatsache, daß der Bildschirm des C 64 wie eine Datei behandelt werden kann. Ähnlich wie der Drucker die Adresse 4 hat und die Floppy mit Adresse 8 angesprochen wird, ist dem Bildschirm die Geräteadresse 3 zugeordnet; fest vom Betriebssystem. Mit OPEN 2,3 wird die Bildschirmdatei eröffnet und mit INPUT#2 oder GET # 2 der Inhalt der Datei gelesen. Beim INPUT #-Befehl ist, wie bei jedem anderen INPUT zu beachten, daß die Anweisung bei einem Kommaodereinem Doppelpunktabgebrochen wird. Aus diesem Grund habe ich den INPUT- durch den GET-Befehl ersetzt. Eine GET Schleife liest ab der aktuellen Cursorposition sämtliche Zeichen als ASCII-Code. Die gelesenen Codes addiert man darauf in einer Variablen. Zum Beispiel durch die Anweisung A$=A$+B$, bei der immer wieder ein neues B$ zu A$ addiert wird. Eine einfache Sache sollte man meinen, aber die Schwierigkeiten beginnen erst an dieser Stelle. GET liest nämlich immer als letztes Zeichen einer Zeile grundsätzlich ein Carriage Return, CHR$(13). Egal, welches Zeichen sich dort befindet. Ferner ist der 80-Zeichen-Editor des C 64 zu beachten, der bei diesem Vorhaben zusätzliche Schwierigkeiten bereitet: Eine Zeile besteht trotz der 40-Zeichen-Darstellung auf dem Bildschirm innerhalb des C 64 aus 80 Zeichen. Denken Sie nuran die Eingabevon langen Programmzeilen. Nach dem Öffnen der Bildschirmdatei wird Zeichen für Zeichen gelesen, beginnend in der oberen linken Bildschirmecke. Dabei werden in einem Schleifendurchgang immer zwei Zeichen geholt und den Variablen A$ und B$ zugeordnet. Ist A$ gelesen, wird mittels der DELete-Funktion, CHR$(20), der restliche Zeileninhalt um eine Stelle nach links geschoben, um das letzte Zeichen einer Zeile eindeutig zu erkennen. Nach dem Einlesen von B$ wird durch die INSert-Funktion, CHR$(148), der ursprüngliche Zeilenzustand wieder hergestellt. Danach wird der ASCII-Code in den beiden Variablen an den Drucker gesandt. Durch ständige, schnell ablaufende Zeilenverschiebung ist deutlich sichtbar, wo der Computer jeweils »arbeitet«; ein brauchbarer Nebeneffekt.</p>
+
+        <p>Ein Einzeiler kann natürlich kein perfektes Programm sein. Deshalb sollten auch die Nachteile herausgestellt werden: Die Routine kann keine reversen Zeichen auf dem Drucker darstellen. Reverse Zeichen werden normal gedruckt. Innerhalb des Textes, von dem eine Hardcopy angefertigtwerden soll, dürfen keine Anführungsstriche, CHR$(34), vorkommen. Da der Code 34 innerhalb eines Programms recht selten vorkommt, ist diese Einschränkung aber nur von geringer Bedeutung. An- ^ ders in Programmlistings, die aber meistens mit OPEN1,4: CMD1:LIST gedruckt werden.</p>
+
+        <p>Der Einzeiler ist dafür gedacht, als Unterprogramm Daten auszudrucken; einfach vom Bildschirm weg.</p>
+
+        <h3>Tips zur Eingabe</h3>
+
+        <p>Das reverse »t« steht für DELete, CHR$(20). Um diesen Code in der erforderlichen Form eingeben zu können, bedarf es eines kleinen Tricks: An der gewünschten Stelle tippt man zuerst zwei aufeinanderfolgende Anführungszeichen »"« ein. Danach drückt man einmal Cursor-Links, damit der Cursor über dem zweiten Anführungszeichen steht und einmal INSert und DELete. Mit Cursor-Rechts geht man in die ursprüngliche Schreibposition zurück. Beachten Sie dabei bitte, daß das reverse »t« nur im Moment der Zeilenerfassung sichtbar ist. Nach LIST wird dieser Code vom Editor nicht gezeigt, sondern ausgeführt. Was zu der verstümmelten Version PRINT"; führt. Die anderen beiden revers dargestellten Steuerzeichen sind Cursor-Links, CHR$(157) und INSert, CHR$(148). Nach dem ersten Anführungszeichen drücken Sie dazu Cursor-Links und anschließend INSert. Sollten Sie mit der Eingabe der Steuerzeichen Probleme haben, können Sie sie durch CHR$()-Befehle ersetzen. Sie benötigen dann allerdings mindestens zwei Zeilen.</p>
+
+        <p>Die Zeile 4 dient lediglich zum Füllen des Bildschirms für Demo-Zwecke. Zeile 7 ist ein Beispiel für den Aufruf der Hardcopy-Routine. Zunächst wird der Cursor in die Home-Position gebracht und mit OPEN1,4,7 die Drucker- und mit OPEN 2,3 die Bildschirmdatei eröffnet. GOSUB 9 startet schließlich die Hardcopy-Zeile. Wie Sie an den beiden FOR-NEXT-Schleifen erkennen können, werden nacheinander alle Spalten und Zeilen des Bildschirms »abgetastet«. Nach dem Druck werden die beiden Dateien wieder mit CLOSE geschlossen.</p>
+
+        <address class="author">(Karl-Heinz Heß/hm)</address>
+    </article>
+</body>
+
+</html>

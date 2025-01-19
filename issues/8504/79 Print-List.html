@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>Print-List</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="Peter Zuser, hm">
+    <meta name="64er.issue" content="4/85">
+    <meta name="64er.pages" content="79">
+    <!-- <meta name="64er.toc_category" content="XXX"> -->
+    <!-- <meta name="64er.toc_title" content="XXX"> -->
+    <meta name="64er.id" content="XXX">
+</head>
+
+<body>
+    <article>
+        <h1>Print-List</h1>
+        <blockquote>
+            <p>Ein kurzes Programm, das nicht nur formatierte Listings mit Seitenzahlangabe und Überspringen der Perforation bei Endlospapier druckt. Es erklärt auch, was »programmierter Direktmodus« ist.</p>
+        </blockquote>
+
+        <p>Seit kurzem bin ich stolzer Besitzer eines MPS 801. Eine der ersten Anwendungen war das Drucken von Listings, was einerseits die Fehlersuche in Programmen enorm erleichtert und andererseits eine perfekte Datensicherung darstellt. Doch schon bei Listings, die länger als eine Druckseite waren, begann der Ärger: Die Perforation wurde bedruckt oder der Ausdruck war eine endlose Papierschlange, die ich nicht trennen durfte; nach einigen Tagen hätte ich nicht mehr gewußt, welche Seite zu welchem Listing gehört.</p>
+
+        <p>Schließlich habe ich ein Unterprogramm geschrieben, das meiner Meinung nach recht brauchbar ist, um die angeschnittenen Probleme ein für allemal zu beseitigen. Die Routine wird dem zu listenden Basic-Programm angehängt und mit RUN 63974 gestartet. Das Anhängen des Unterprogramms geschieht am besten mit einer MERGE-Routine wie im 64’er, Ausgabe 4/84. Beachten Sie dabei bitte, daß die letzte Zeilennummer in Ihrem Programm nicht größer als 63973 sein darf.</p>
+
+        <p>Nach dem Start des Unterprogramms können Sie eine Überschrift eingeben, die dann mit einer Seitenangabe aufjeder Listingseite erscheint. Zusätzlich wird die Perforation des Endlospapiers übersprungen, indem nach jeweils 60 Zeilen ein Seitenvorschub ausgelöst wird. Gelistet wird nur bis zur Zeilennummer 63973, damit die Routine selbst nicht im Listing erscheint.</p>
+
+        <h2>Direktmodus im Programm</h2>
+
+        <p>Im wesentlichen besteht Print-List darin, daß zunächst die Nummer der ersten Basic-Zeile und dann der Linkpointer (64’er, 2/85) der nächsten Zeile ermittelt wird. Dies geschieht insgesamt 60mal. Danach steht die Zeilennummer der 60. Zeile fest und es können mittels des CMD- und LIST-Befehls die ermittelten 60 Zeilen ausgedruckt werden. Dazu werden die Befehle CMD und LI8T von, bis in die erste Bildschirmzeile gedruckt und die ASC-Werte der Befehle »Cursor home«, »Return«, GOTO 63995 und »Return« in den Tastaturpuffer gePOKEt (Zeile 63993). Da nach der PRINT-Anweisung zum Druck von CMD und LIST ein END steht (Zeile 63994), gibt der Computer sein READY und wartet auf eine Eingabe im Direktmodus. Erschautdazu ständig in Speicherzelle 198 nach, wieviel Tasten gedrückt und noch nicht bearbeitet wurden. In diesem Fall sind es zehn. Die ASC-Codes der Tasten selbst werden im Speicher bei den Adressen 631 bis 640 gepuffert, das heißt zwischengespeichert bis der Computer sie verarbeiten kann. Ist der Puffer voll — in 198 steht 10 — registriert der Computer einfach keinen Tastendruck mehr. Holt der C 64 Daten aus dem Tastaturpuffer, erniedrigt er den Pufferzeiger in Speicherzelle 198.</p>
+
+        <p>Das Programm Print-List sorgt nun dafür, daß der C 64 nach dem END die Anweisungen »Cursor Home« (ASC=19) und Wagenrücklauf (Carriage Return, ASC = 13) findet, was bewirkt, daß die Befehle in der ersten Zeile ausgeführt werden. Sind CMD und LIST abgearbeitet, werden die Kommandos im Tastaturpuffer bis zum nächsten Wagenrücklauf (13) ausgeführt. Die ASC-Werte, die der Computerjetzt findet, sind 71 und 207, die Abkürzung des GOTO-Befehls, gefolgt von den Werten der einzelnen Ziffern der Zeilennummer 63995 und einem Carriage Return (13). Das Unterprogramm wird dadurch wieder mit GOTO 63995 aufgerufen. Solange, bis die ermittelte Zeilennummer größer als 63973 ist.</p>
+
+        <p>Mit etwas Probieren können Sie auf ähnliche Weise Basic-Programme nachladen, ohne daß Sie auf verschiedene Zeiger acht geben müssen. Sie müssen dazu nur LOAD »name«, 8 in die erste Bildschirmzeile schreiben und mit CHR$(19) den Cursor in die »Home«-Position zu bringen. Findet der Computer dann nach einer END-Anweisung ein Carriage Return im Tastaturpuffer, wird das gewünschte Programm geladen. Wiederholen Sie das Spiel mit RUN, so startet das Programm noch »von selbst«.</p>
+
+        <address class="author">(Peter Zuser/hm)</address>
+    </article>
+</body>
+
+</html>
