@@ -39,6 +39,10 @@ Zum 40jährigen Jubiläum des *64'er Magazins* präsentieren wir das Kunstprojek
 -->
 usw.
 
+* Sonderheft 1/85 (Tips & Tricks)
+* Sonderheft 2/85 (Abenteuerspiele): 25. März 1985 <!-- 8504/S.30 -->
+usw.
+
 Auf der modernen Homepage gibt es
 
 * durchsuchbare PDF-Dateien der einzelnen Ausgaben

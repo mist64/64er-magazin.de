@@ -569,6 +569,12 @@ Obwohl der Monitor mit einem Preis von zirka 900 Mark nicht gerade als »billige
 
 Bezugsquelle: Holmatic, Postfach 1104 06, 2800 Bremen, Tel. 04 21/49 04 64
 
+TODO ASIDE
+
+## Der Phönix I-Monitor
+
+In Kürze wird eine neue Version dieses Monitors in den Handel kommen. Der Bildpunktabstand soll dann von 0,65 mm auf 0,43 mm herabgesetzt sein.
+
 # C 16 — großer oder kleiner Bruder des C 64?
 
 > Starkes Basic 3.5, aber weniger Speicherplatz als beim C 64 — wo ist der C 16 einzuordnen?
@@ -1411,6 +1417,122 @@ xBasic 64 muß mit dem MSE eingegeben werden, den Sie ebenfalls in diesem Heft f
 xBasic 64 läßt sich mit LOAD ”Name”,8,1 von der Diskette (oder LOAD von der Kassette) laden und mit SYS 64738 (!) starten.
 
 /TODO ASIDE
+
+# Neuer Checksummer 64 — blitzschnell und kürzer
+
+> Der Checksummer überprüft jede eingegebene Basic-Zeile und erspart Ihnen deshalb eine langwierige Fehlersuche. Und neu ist der Checksummer, weil die Initialisierung zirka einhundertmal schneller ist als die alte.
+
+Der Checksummer 64 ist ein kleines Maschinenprogramm, das, wenn es aktiviert ist, Sie sofort davon unterrichtet, ob Sie die jeweilige Programmzeile korrekt eingegeben haben.
+
+1. Tippen Sie den Basic-Lader sorgfältig ein. Es gibt zwei Versionen: Eine für den Commodore 64 und eine für den VC 20.
+2. Bevor Sie »RUN« eingeben, speichern Sie den Basic-Lader bitte erst ab, denn wenn Sie zum Beispiel einen Fehler bei den eingetippten POKE-Anweisungen gemacht haben, ist es möglich, daß der Rechner aussteigt. Heben Sie sich den abgespeicherten Checksummer 64 auf — Sie werden ihn immer wieder brauchen, wenn Sie ein Basic-Programm aus dem 64’ereintip-pen wollen.
+3. Nach Initialisierung des Maschinenprogramms ist der Checksummer 64 aktiviert. Er steht innerhalb des Betriebssystems und verbraucht kein einziges Byte Speicherplatz. Es sei hier für Interessierte gesagt, daß selbst alle Sprungvektoren unverändert bleiben, das Programm also mit einer Vielzahl von Programmier-Spracherweiterungen problemlos zusammenarbeitet. Achten Sie aber darauf, daß bestimmte Spracherweiterungen das hinter dem ROM liegende RAM für Hires-Grafiken benutzen. Wird zum Beispiel eine Hires-Grafik von Simons Basic aus angesprochen, so wird der Checksummer 64 zerstört.
+4. Wenn Sie den Checksummer 64 zwischenzeitlich nicht benutzen, können Sie ihn jederzeit mit »POKE 1, 55« desaktivieren. Auch durch Drücken der Run-Stop- und der Restore-Taste wird der Checksummer 64 desaktiviert. Wollen Sie, daß der Checksummer 64 auch noch nach Drücken dieser Tastenkombination erhalten bleibt, so geben Sie bei aktiviertem Checksummer 64 »POKE64982.53« ein. Der Checksummer 64 ist dann nur durch »POKE1, 55« abschaltbar.<br>Wollen Sie den Checksummer 64 wieder einschalten, so geben Sie bitte »POKE 1, 53« ein.<br>Das Maschinenprogramm bleibt solange erhalten, bis der Computer ausgeschaltet, oder wenn von anderen Programmen auf das hinter dem ROM liegende RAM zugegriffen wird.
+5. Eine Checksumme wird nur dann ausgegeben, wenn der Commodore 64 (VC 20) eindeutig erkennt, daß Sie eine Zeile, bestehend aus der Zeilennummer und zumindestens einem alphanumerischen Zeichen, eingegeben haben. Ansonsten reagiert der Commodore 64 normal.
+
+**Hinweis**: Wenn Sie bei aktivertem Checksummer 64 ein Programm mit »LOAD« in den Speicher holen, wird auch eine Checksumme ausgegeben. Dies liegtjedoch an rechnerinternen Routinen und hat keine weitere Bedeutung, stellt insbesondere keine Gefahr für das geladene Programm dar, da alle Pointer richtig gesetzt werden.
+
+Nach Eingabe von RUN wird zunächst einmal das ROM in das RAM des Commodore 64 verschoben, wonach der Basic-lnterpreter modifiziert wird. Dadurch hat man den Vorteil, trotz einer zusätzlichen Routine das gesamte RAM des Rechners zur Verfügung zu haben. Nach ordnungsgemäßem Ablauf des Programms können Sie sofort mit Eingaben beginnen. Für Maschinensprache-Spezialisten: die Einschaltmeldungen des Rechners werden nur nach einem Reset generiert. Der Textbereich, in dem die Meldung steht, wird von dem erzeugten Maschinenprogramm überschrieben.
+
+Alle veröffentlichten Listings sind mit einer Checksumme versehen, dieam Ende jeder Programmzeile steht. **Diese Checksumme steht zwischen < und >. Sie wird beim Eintippen des Programms nicht mit eingegeben**. Die Zahl zwischen den beiden Zeichen stellt lediglich eine Information für Sie dar. Wenn Sie diese Checksumme dennoch mit eintippen, werden Sie schnell bemerken, daß Sie etwas falsch gemacht haben. Bei aktiviertem Checksummer 64 wird nämlich nach Eingabe einer Basic-Zeile, die mit Return beendet wird, in die linke obere Bildschirmecke die Checksumme eingeblendet, die mit der Summe aus dem veröffentlichten Listing übereinstimmen muß. Ist das nicht der Fall, haben Sie die Zeile anders eingegeben, als sie im Listing dargestellt ist. Vergessen Sie also bitte nicht, daß die am Ende einer Zeile zwischen < und > stehende Prüfsumme nicht mit eingegeben werden darf.
+
+Der Checksummer 64 ist so ausgelegt, daß er abhängig von der Zeilennummer und dem Text der Zeile eine Checksumme ausgibt. Beim Bilden dieser Checksumme werden Spaces (Leertaste) überlesen, was für Sie bedeutet, daß es egal ist, wieviel Leerzeichen Sie zwischen den Worten lassen, da sie für den Programmablauf ohnehin keine Bedeutung haben. Aber manchmal ist das richtige Setzen von Leerzeichen doch wichtig, besonders innerhalb von Strings (Zeichenketten), die gedruckt werden sollen. Seien Sie deshalb besonders genau bei Leerzeichen, die innerhalb von Anführungszeichen stehen, denn meistens ermöglichen nur die richtig gesetzten Spaces eine sinnvolle Textausgabe auf dem Bildschirm.
+
+Beachten Sie auch, daß es durchaus erlaubt ist, Abkürzungen für die Commodore-Befehlswörter zu verwenden. So führt die Eingabe von »?« als Kurzschreibweise für »PRINT« nicht etwa zu einem Checksummen-Fehler, sondern wird korrekt verarbeitet und dementsprechend die Checksumme generiert. Zahlendreherwerden allerdings nichterkannt. Eine 320 in der DATA-Zeile ergibt also dieselbe Prüfsumme wie 230! Nachdem Sie ein Listing eingegeben haben, sollten Sie es aus Sicherheitsgründen vor dem Starten abspeichern. Sie brauchen hierfür jedoch nicht den Checksummer 64 zu desaktivieren.
+
+## Wichtiger Hinweis für alle Listings in unseren Heften!
+
+Um Ihnen die Eingabe unserer Listings zu erleichtern, gibt es weder Steuerzeichen noch andere Grafikzeichen. 8ie werden ersetzt durch Klartext. In der Tabelle finden Sie die Erklärung der übersetzten Steuerzeichen.
+
+Beispiel 1:
+In einem Listing sehen Sie folgende Zeile:
+
+TODO
+
+Dann dürfen Sie weder die geschweiften Klammern eintippen (es gibt sie eh nicht auf der Tastatur) und auch nicht die Wörter CLEAR, 13SPACE, RVSON oder RVOFF, sondern Sie müssen die diesen Wörtern zugeordneten Tasten drücken. In der Tabelle sehen Sie zum Beispiel für CLEAR = Shift-Taste und 2. Taste ganz rechts oben.
+
+Gemeint ist also, daß Sie anstelle des Wortes CLEAR die Taste CLR/HOME drücken müssen, gefolgtvon 13maligem Betätigen der Leertaste (13SPACE) und so weiter. Auf Ihrem Bildschirm erscheint dann als erstes ein revers dargestelltes Herz. Entsprechendes gilt für alle anderen Wörter innerhalb der geschweiften Klammern.
+Beispiel 2:
+
+In manchen Listings tauchen ganz seltsame unterstrichene und manchmal auch überstrichene Zeichen auf, zum Beispiel:
+
+TODO
+
+Das unterstrichene U bedeutet, daß Sie die Shift-Taste und die Taste U drücken müssen.
+
+Der überstrichene Stern bedeutet, daß Sie die Commodore-Taste und die Taste mit dem Stern drücken müssen. Das Zeichen davor ist nicht etwa ein unterstrichenes kleines f, sondern ein unterstrichenes Pfund-Zeichen (Sie drücken deshalb die Shift-Taste und die 3. Taste oben rechts).
+
+Also, unterstrichen bedeutet Shift-Taste und den entsprechenden Buchstaben (oder Zeichen), überstrichen bedeutet die CommodoreTaste und den entsprechenden Buchstaben (oder Zeichen). Auf dem Bildschirm sollten Sie dann natürlich die zugehörigen Grafik-Zeichen sehen.
+
+Die beiden Programm-Zeilen von oben sehen später (auf dem Drucker oder ähnlich auf dem Bildschirm) so aus:
+
+TODO
+
+## Checksummer VC 20
+
+Der Checksummer VC 20 ist im Prinzip genauso aufgebaut wie der Checksummer 64. Da beim VC 20 jedoch nicht die Möglichkeit besteht, das ROM softwaremäßig zu modifizieren, mußte ein anderer Weg als beim Commodore 64 gewählt werden, um die Checksumme zu generieren.
+
+In Ihrer Funktionsweise unterscheiden sich der Checksum-mer VC 20 und der Checksummer 64 nicht. Es gelten folgende Sonderregelungen bei der Benutzung des Checksummer VC 20:
+
+— Da der Basic-Bereich nicht belegt werden soll, ist das Programm im Kassettenpuffer abgelegt.
+— Angeschaltet wird der Checksummer VC 20 mit »SYS 955«.
+— Abschaltung des Checksummer VC 20 wird mit »SYS 58459« vollzogen.
+
+Achtung: Nehmen Sie keine Kassetten-Operationen vor, wenn der Checksummer VC 20 eingeschaltet ist. Da das Betriebssystem den Kassettenpuffer mit Daten belegt, kann der Checksummer VC 20 überschrieben werden, was zur Folge hat, daß sich der Computer bei aktiviertem Checksummer VC 20 »aufhängt«. Wollen Sie deshalb ein Programm auf (von) Kassette abspeichern (laden), so müssen Sie erst den Checksummer VC 20 abschalten (SYS 58459).
+
+Daraufhin kann der Kassettenpuffer mit Daten überschrieben werden, ohne daß der Computer »aussteigt«.
+
+Als Sicherung wird bei der Initialisierung geprüft, ob das zuletzt angesprochene Peripherie-Gerät der Kassettenrecorder war. Ist das der Fall, so werden die Betriebssystemroutinen LOAD und SAVE für die Benutzung gesperrt. Der Rechner meldet bei Aufruf einer dieser beiden Routinen READY, ohne weitere Aktionen durchzuführen. Diese Sicherung kann man nach derTipparbeitaufheben, wenn man den Checksummer VC 20 mit SYS 58459 abschaltet. Dadurch wird der Kassettenpuffer für andere Daten freigemacht. Weiterhin wird dann durch gleichzeitiges Drücken der Tasten »Run-Stop & Restore« erreicht, daß die Betriebssystemroutinen LOAD und SAVE wieder eingerichtet werden.
+
+— Bei Benutzung einer Diskettenstation brauchen Sie nicht darauf zu achten, daß bei LOAD beziehungsweise SAVE der Checksummer VC 20 überschrieben wird, da der Kassettenpuffer für die Diskettenstation normalerweise nicht genutzt wird. Deshalb können Sie die beiden Routinen weiterhin normal nutzen, sofern der Rechner bei der Initialisierung des Checksummer VC 20 feststellt, daß das zuletzt angesprochene Peripherie-Gerät nicht der Kassettenrecorder war.
+— Bedingt durch den anderen Aufbau des Checksummer VC 20 wird anders als beim Checksummer 64 nach der LOAD-Routine keine Checksumme ausgegeben.
+— Wird eine Zeile gelöscht, also eine Zahl zwischen 0 und 65999 eingegeben, und danach Return gedrückt, so wird eine Checksumme ausgegeben, die aber keine Bedeutung hat.
+Sie können die Programme auch weiterhin ohne den Checksummer eintippen.
+
+(F. Lonczewski/gk)
+
+TODO "Die Steuerbefehle im Klartext"
+
+# MSE — Abtippen sicher und leicht gemacht
+
+> Ähnlich wie der »Checksummer« ist auch der MSE ein Hilfsmittel bei der Eingabe von Listings, diesmal jedoch bei reinen Maschinensprache-Programmen.
+
+Im Gegensatz zum »Checksummer« aber ist die Eingabe nicht ohne den MSE möglich. Der MSE verringert die Tipparbeit um ein Drittel und schließt Fehleingaben vollkommen aus. Außerdem können Sie die DATAs blind eingeben, ohne andauernd auf den Bildschirm schauen zu müssen. Dies wird durch akustische Meldungen realisiert.
+
+Sicher kennen Sie die Situation: Man hat ein langes Listing mit DATA-Zeilen abgetippt, versucht es, das erste Mal zu starten und — nichts läuft. Dann beginnt nach der mühseligen Tipperei die noch mühseligere Fehlersuche. Als letzter Ausweg bleibt dann nur noch der Anruf bei der Redaktion oder dem Verfasser, ob vielleicht doch ein Druckfehler...
+
+Damit ist esjetzt vorbei. Ab dieser Ausgabe werden die Maschinenprogramme im 64’er mit dem MSE abgedruckt. MSE ist einMaschinenspracheditor, mit dem ein Vertippen ausgeschlossen ist. Eine abgetippte Zeile wird nur angenommen, wenn sie richtig ist. Wie ist das möglich ? Eine Checksumme am Ende jeder Zeile prüft, ob die richtigen Werte in der richtigen Zeile an der richtigen Stelle stehen. Wenn nicht, ertönt ein Warnsignal, und man beseitigt den Fehler.
+
+War die Zeile korrekt, erklingt ein Gong, und die nächste Zei--lennummer wird ausgegeben. Damit ist also auch »blindes« Eintippen möglich; Sie können sich voll auf den Text konzentrieren.
+
+MSE verringert die Tipparbeit um ein Drittel. Anstelle von dreistelligen DATAs brauchen Sie nur noch zweistellige Hex-Zahlen einzugeben, die direkt in den Speicher gePOKEt werden.
+
+### So arbeitet man mit MSE
+
+Laden und starten Sie MSE. Zuerst wird der Programmname und die Start- und Endadresse erfragt. Diese Angaben entnehmen Sie dem Kopf des jeweiligen abgedruckten Listings. MSE meldet sich dann mit der Zeilennummer der ersten Zeile. Wenn Sie die Zeile richtig eingegeben haben, erscheint die nächste Zeilennummer und so weiter bis zum Ende. Zum Schluß wird das fertige Programm mit »CTRL-S« auf Diskette oder Kassette abgespeichert. Dazu sind keine weiteren Angaben mehr erforderlich. Das Programm kann dann ganz normal wieder absolut geladen und gestartet werden. Wenn Sie nicht alles auf einmal tippen wollen, können Sie jederzeit unterbrechen und den eingetippten Teil mit »CTRL-S« abspeichern. Wollen Sie weiterarbeiten, laden und starten Sie MSE wieder. Geben Sie auf die Frage nach der Startadresse aber jetzt »L« ein, um lhrTeilprogramm zu laden. Jetzt können Sie mit »CTRL-N« die Adresse eingeben, an der Sie weitertippen müssen. Wenn Sie sich nicht gemerkt haben, wie weit Sie gekommen sind, geben Sie nach dem Laden »CTRL-M« ein.
+
+Auf die Frage nach der Startadresse antworten Sie mit der Anfangsadresse, die links in der Kopfzeile auf dem Bildschirm steht. Nun wird Ihr Programm aufgelistet. Mit »SPACE« wird das Listen fortgesetzt, mit »STOP« abgebrochen. Das Ende Ihres Programmteils erkennen Sie sehr einfach daran, daß nur noch der Wert »AA« in der Zeile steht. Die Adresse dieser Zeile müssen Sie anschließend mit »CTRL-N« eingeben. Das Programm ist nur mit »STOP/RESTORE« zu verlassen. Speichern Sie aber vorher unbedingt immer Ihren Text ab.
+
+Wollen Sie selbst Programme mit MSE ausdrucken, laden Sie Ihr Programm wie oben beschrieben und geben anschließend »CTRL-P« ein. Die Druckausgabe läßt sich mit »STOP« jederzeit abbrechen.
+
+### Hinweise zum Abtippen
+
+Vor dem Abtippen oder späteren Wiederladen des MSE-Laders müssen Sie unbedingt folgende Zeile eingeben:
+**POKE 43,1: POKE 44,32: POKE 8192,0: NEW**
+
+Beachten Sie bei der Eingabe die Hinweise im »Checksummer«. Speichern Sie den »MSE Lader« nach dem Abtippen unbedingt ab. Starten Sie das Programm mit RUN. Fehlerhafte Zeilen werden angezeigt und müssen korrigiert werden, bis der Lader zum »READY« durchläuft. Jetzt müssen Sie das fertige MSE-Programm abspeichern. Dazu brauchen Sie nur »RETURN« zu drücken, weil die erforderlichen Angaben schon auf dem Bildschirm stehen. (Kassettenbesitzer müssen in Zeile 343 die letzte Zahl in »1« abändern). Abjetzt können Sie »MSE V1.0« direkt, also ohne den DATA-Lader benutzen. MSE V1.0 wird ganz normal mit »,8« geladen. Heben Sie das Programm gut auf, Sie werden es noch häufig brauchen.
+
+(N. Mann/D. Weineck/gk)
+
+TODO ASIDE
+MSE-Befehle:
+DEL löscht die letzte Eingabe.
+CTRL-S speichert das eingetippte Programm ab.
+CTRL-L lädt ein Programm. Start- und Endadresse werden automatisch ermittelt.
+CTRL-M listet den Speicherinhalt. Abbruch mit STOP-Taste, weiter mit Leertaste
+CTRL-N erlaubt die Eingabe einer neuen Adresse zum Weitertippen.
+CTRL-P gibt ein MSE-Listing auf dem Drucker aus.
+Die Befehle des MSE auf einen Blick
 
 # 64 — Tastaturänderung
 
