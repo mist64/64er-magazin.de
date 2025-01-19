@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>User-Port-Display</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="Dipl.-Ing. Richard Kurzhals, hm">
+    <meta name="64er.issue" content="5/85">
+    <meta name="64er.pages" content="36-38">
+    <!-- <meta name="64er.toc_category" content="XXX"> -->
+    <!-- <meta name="64er.toc_title" content="XXX"> -->
+    <meta name="64er.id" content="XXX">
+</head>
+
+<body>
+    <article>
+        <h1>User-Port-Display</h1>
+<p class="intro">Eine kleine elektronische Schaltung setzt den User-Rort ins richtige Licht. Sie zeigt auch, wie der User-Pört für Steuerungsaufgaben eingesetzt werden kann.</p>
+
+<p>Die Computer VC 20 und C 64 haben als Verbindung zur Außenwelt an der Gehäuse-Rückseite den User-Port. Dieser 8 Bit breite parallele Port besteht aus acht programmierbaren Anschlüssen PB0 bis PB7, die als Eingabe- oder Ausgabeleitung geschaltet werden können. Weiterhin stehen noch die Eingabe-Handshakeleitung FLAG2 (CA1 beim VC 20) und die Ausgabe-Handshakeleitung PA2 (VC 20: CB2) für diese acht Leitungen zur Verfügung.</p>
+
+<p>Diese Anschlüsse sind vom User-Port aus mit dem universellen Interface-Baustein (VIA) 6522 direkt verbunden (VIA = Versatile Interface Adapter). Sie erlauben den Anschluß von externen Schaltungen und Geräten. Das User-Port-Display, das noch als universeller Ein-/Ausgabe-Adapter verwendet werden kann, wird an dieser Platinen-Steckerleiste am besten über einen Platinenstecker der Bezeichnung 251-12-50-170 angeklemmt. Die einzelnen Port-Leitungen PB0 bis PB7 haben eine bestimmte binäre Wertigkeit, wie in Tabelle 1 gezeigt. Die Belegung des User-Ports entnehmen Sie bitte dem Handbuch zum C 64. Die Handshakeleitung FLAG2 (CA1) kann bei der Eingabe, die Handshakeleitung PA2 (CB2) bei der Ausgabe von Datenwörtern als Quittierungssignal benutzt werden.</p>
+
+<h3>Die Schaltung des User-Port-Displays</h3>
+
+<p>Zur Überwachung der logischen Zustände bei der Programmierung der einzelnen Ports wurde die in Bild 1 gezeigte Schaltung entworfen. Dadurch werden die Eingabe- und Ausgabe-Datenwörter an den Ports PB0 bis PB7 durch Leuchtdioden (LEDs) sichtbar gemacht. Gleichermaßen werden die logischen Zustände der Handshakeleitungen angezeigt. Eine Stückliste für den I/O-Adapter (Input/Output) finden Sie in Tabelle 2. High-Pegel, also logisch »Eins«, werden durch Leuchten, Low-Pegel (logisch »Null«) durch Verlöschen der entsprechenden LED signalisiert.</p>
+
+<p>Die Schaltung besteht aus zehn Invertern (2 x 74LS04, Bild 2), an die über je einen Widerstand von 330 Ohm die LED an + 5 V angeschlossen sind. Ein Inverter kehrt das Eingangssignal um. Aus + 5 V werden 0 V, aus 0 V werden + 5 V.</p>
+
+<h3>Spannungsversorgung und Aufbau</h3>
+
+<p>Zur Spannungsversorgung für die Anzeigeeinheit wird die an Pin 2 des User-Port anliegende Spannung von +5 V benutzt. Es ist darauf zu achten, daß der Stromverbrauch der gesamten Anordnung 100 mA nicht übersteigt. In Fällen größerer Stromentnahme wird ein separates Netzteil erforderlich.</p>
+
+<h3>Aufbau der Schaltung</h3>
+
+<p>Da es sich bei dieser Schaltung um eine relativ einfach aufzubauende Einheit handelt, wurde auf ein Platinenlayout verzichtet. Statt dessen kann die Schaltung auf eine Lochrasterplatte (Rastermaß: 2,51 mm) aufgebaut werden. Die entsprechenden Verbindungen werden dann mit Drahtverbindungen ausgeführt. Entweder durch Löten von Drahtstücken, oder mit Wire-Wrapping. Bei der letzteren Technik umwickelt man mit einer speziellen Maschine die Anschlußbeine mit Kupferlackdraht und stellt so die Verbindungen her. Die Anzeigeeinheit und die 13polige Buchsenleiste kann in einem kleinen Gehäuse untergebracht werden. Über ein 12adriges Kabel wird nun der User-Port mit dem Display verbunden. Zusätzlich ist es sinnvoll, die + 5-V-Spannung und die Masse auf separate Buchse zu legen, um ein eigenes Netzteil anschließen zu können. Pin 2 des User-Ports muß dann natürlich abgeklemmt werden.</p>
+
+<h2>Die Programmierung des User-Ports</h2>
+
+<p>Wie bereits erwähnt, lassen sich die acht Port-Leitungen als Ein-/Ausgabeleitungen programmieren. Nach dem Einschalten des Computers werden alle Ports automatisch auf Eingabe geschaltet. Dies läßt sich leicht daran erkennen, daß alle acht LEDs des User-Port-Displays leuchten. Über das Datenrichtungsregister, Adresse DDRB = 56579 (VC 20 = 37138), lassen sich die einzelnen acht Ports so programmieren, daß sie entweder als Ein- oder Ausgabeleitung arbeiten. Mit dem Befehl POKE DDRB,X wird die Programmierung vorgenommen. Hierbei ist »X« eine Dezimalzahl zwischen 0 und 255. Die der Dezimalzahl entsprechende Binärzahl erscheint dann am User-Port an den Ausgängen PB0 bis PB7. In der Binärzahl stellt die logische »0« einen Eingabe-, die logische »1« einen Ausgabeport dar. Als logische Pegel liegen allerdings die invertierten Pegel an, da der C 64 und VC 20-Computer mit negativer Logik arbeitet; also High-Pegel bei logisch »0« und umgekehrt.</p>
+
+<p>Mit POKE DDRB,255 werden alle acht Ports zu Ausgabeleitungen, da dezimal 255 in Binärdarstellung 11111111 ist. Die Programmierung mit POKE DDRB,0 ergibt entsprechend 00000000 und alle acht Ports sind Eingabeleitungen. POKEt man in die Speicherstelle DDRB die Dezimalzahl 240, so ergibt dies die Binärzahl 11110000. Dies bedeutet, daß die Ports PB0 bis PB3 Eingabeleitungen und die Ports PB4 bis PB7 Ausgabeleitungen sind. So lassen sich durch POKEn einer Zahl zwischen 0 und 255 in die Speicherstelle DDRB die jeweils gewünschten Ein-/Ausgabekombinationen einstellen.</p>
+
+<h3>Die Ausgabe von Daten</h3>
+
+<p>Nachdem das Datenrichtungsregister auf Ausgabe programmiert ist, können die Daten über die Speicherstelle PRB = 56577 (VC 20: PRB = 37136) ausgeben werden. Der entsprechende Befehl hierzu lautet POKE PRB,X. Auch hier kann X eine Dezimalzahl zwischen 0 und 255 sein. Die entsprechende Binärzahl erscheint an den Ports und bringt die dazugehörigen LEDs zum Leuchten. High-Pegel bedeutet jetzt Aufleuchten der LED. Mit Listing 1 kann dies leicht überprüft werden. In Zeile 10 werden alle Ports PB0 bis PB7 auf Ausgabe geschaltet. In Zeile 20 erfolgt die Zahleneingabe (Zahl zwischen 0 und 255). In Zeile 30 wird diese Zahl in die Speicherstelle PRB gePOKEt und an den Ports als Binärzahl ausgegeben. Gleichzeitig stehen diese Signale an der 13poligen Buchsenleiste an, wo Interfaces für die vielfältigsten Schalt- und Kontrollaufgaben angeschlossen werden können.</p>
+
+<h3>Die Ausgabe-Handshakeleitung</h3>
+
+<p>Mit der Ausgabe-Handshakeleitung PA2 (VC 20: CB2) kann man die Ausgabe von Datenwörtern zu Steuerzwecken quittieren. So kann ein angeschlossenes Gerät durch diese Handshakeleitung zur Übernahme der Daten freigegeben werden.</p>
+
+<p>Mit POKE 37148,220 wird an Port CB2 des VC 20 Low-Pegel, mit dem Befehl POKE 37148,255 High-Pegel gelegt. Beim C 64 sind dies die Befehle POKE 56576,147 für Low-Pegel und POKE 56576,151 für High-Pegel an Port PA2. Eine spezielle Anwendung bleibt dem Benutzer überlassen. Der Befehl kann in einem Programm an die Stelle eingefügt werden, wo er eine Schaltfunktion übernehmen soll. Listing 2 soll die Wirkungsweise von CB2 und PA2 veranschaulichen.</p>
+
+<p>In Zeile 10 werden die Ports auf Ausgabe programmiert. In Zeile 20 wird die auszugebende Binärzahl als Dezimalzahl in die Speicherstelle PRB geschrieben. In Zeile 30 erfolgt dann der Quittungsbefehl. In diesem Fall wird ein Low-Pegel am Port PA2 oder CB2 ausgegeben. Nach dem Durchlauf einer Warteschleife in Zeile 40 wird PA2 (CB2) wieder auf High-Pegel zurückgesetzt, und die grüne LED leuchtet.</p>
+
+<h3>Eingabe von Daten</h3>
+
+<p>Das Datenrichtungsregister wird zu diesem Zweck mit POKE DDRB,0 auf Eingabe programmiert. Dies wird deutlich durch das Aufleuchten der LED angezeigt. Die entsprechenden Ports können nun auf Low-Pegel gelegt werden und bilden hierdurch eine bestimmmte Binärkombination. Mit den LEDs läßt sich die eingestellte Binärzahl anschaulich ablesen. Über den Befehl PRINT PEEK(PRB) wird der logische Zustand an den Ports abgefragt und auf dem Bildschirm erscheint die Zahl 189.</p>
+
+<p>Das nachstehende Programm verdeutlicht noch einmal diese Möglichkeit der Dateneingabe:<br/>
+10 POKE DDRB,0<br/>
+20 PRINT &ldquo;Ausgabe des Datenwortes&rdquo;; PEEK(PRB)<br/>
+30 GOTO 20</p>
+
+<p>In Zeile 10 werden die Ports auf Eingabe programmiert. In Zeile 20 werden die angelegten Daten eingelesen und auf dem Bildschirm angezeigt.</p>
+
+<h3>Die Eingabe-Handshake-Leitung</h3>
+
+<p>Mit einem weiteren Befehl kann der Computer veranlaßt werden, das Basic-Programm anzuhalten und zu warten, bis eine Dateneingabe erfolgt ist. Hierzu ist die Eingabe-Handshake-Leitung CA1FLAG2 (VC 20: CA1) als Quittungssignal vorhanden. Bei einem Flankenwechsel von High nach Low werden die anliegenden Daten eingelesen. Mit Hilfe von Listing 3 läßt sich dieser Vorgang bewerkstelligen.</p>
+
+<p>In Zeile 10 werden die Ports auf Eingabe programmiert. In Zeile 30 wird das Basic-Programm solange angehalten, bis der Flankenwechsel am Port FLAG2 (CA1) erfolgt. Danach wird das Programm wieder fortgesetzt, und in Zeile 40 das angelegte Datenwort auf dem Bildschirm angezeigt.</p>
+
+<h3>Daten-Ein- und -Ausgabe kombiniert</h3>
+
+<p>Mit der Kombination von Daten-Ein- und Ausgabe können vielfältige Steuer- und Kontrollaufgaben gelöst werden. Hierbei werden Datenwörter eingelesen, im Computer verarbeitet und zur Steuerung wieder ausgegeben. Listing 4 zeigt dies beispielhaft. In Zeile 10 wird eine eventuell bestehende Kombination gelöscht. In 20 werden die Ports PB0 bis PB3 auf Eingabe und die Ports PB4 bis PB7 auf Ausgabe programmiert. In Zeile 40 wird das Programm solange angehalten, bis ein Flankenwechsel von High nach Low an Port FLAG2 (VC 20: CA1) erfolgt. In Zeile 50 wird die eingegebene Binärkombination mit der vorgegebenen Dezimalzahl 11 verglichen. Bei Erfüllung dieser Bedingung wird ein Steuerbefehl zum Port PB4 gesendet, der dann irgendeine Funktion auslösen kann. Bei Nichterfüllung der vorgegebenen Bedingung wird in Zeile 60 eine Rücksprunganweisung zur Zeile 50 gegeben. Mit Listing 5 können Sie den C 64 in eine Lichtorgel umfunktionieren.</p>
+
+<h3>Ausblick</h3>
+
+<p>In Bild 3 sind zwei Interface-Schaltungen gezeigt, die den C 64 oder VC 20 mit der Außenwelt verbinden. Hüten Sie sich bei Ihren Experimenten vor Netzspannung. Nicht nur der Computer kann damit ins Jenseits befördert werden.</p>
+
+<address class="author">(Dipl.-Ing. Richard Kurzhals/hm)</address>
+    </article>
+</body>
+</html>

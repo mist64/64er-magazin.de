@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>Genau betrachtet: RS232/V.24-Schnittstelle</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="Jens Maßmann, hm">
+    <meta name="64er.issue" content="5/85">
+    <meta name="64er.pages" content="80-82">
+    <!-- <meta name="64er.toc_category" content="XXX"> -->
+    <!-- <meta name="64er.toc_title" content="XXX"> -->
+    <meta name="64er.id" content="XXX">
+</head>
+
+<body>
+    <article>
+        <h1>Genau betrachtet: RS232/V.24-Schnittstelle</h1>
+<p class="intro">Eine kurze und bündige Beschreibung der RS232-Schnittstelle Ihres C 64. Was machen die Signale, wie sind die Pin-Belegungen?</p>
+
+<p>Bei der RS232-Schnittstelle werden die Daten Bit für Bit übertragen, im Gegensatz zur Centronics- oder IEEE-488-Norm, bei der ganze Bytes übergeben werden. Die Bits werden als eine Folge von Spannungsimpulsen mit einer bestimmten Dauer übertragen. In der Praxis werden dabei Pakete von 5 bis 8 Datenbit übertragen, die von einem Startbit und 1 bis 2 Stop-Biteingerahmtsind(Bild 1). DasStartbithatgrundsätzlich logischen Low- und die Stop-Bits High-Pegel. Vor dem Stop-Bit kann ein sogenanntes Paritäts-Bit vereinbart werden, das die Anzahl der High-Zustände im Datenwort immer gerade oder ungerade macht.</p>
+
+<p>Beispiel: Sind in einer 8-Bit-Übertragung 5 Bit gesetzt, wird das Paritäts-Bit ebenfalls gesetzt, wenn gerade Parität vereinbart wurde.</p>
+
+<h2>Päckchenweise Übertragung</h2>
+
+<p>Um die Störungs-Anfälligkeit der Übertragung zu mindern, wird logisch »Eins« (gesetztes Bit) nicht durch +5V (TTL-Pegel) realisiert, sondern mit einer Spannung von —3 bis —12V und logisch »Null« mit + 3 bis +12V (RS232 nach DIN 66020). Eine andere Norm ist die RS232/TTY, die gegen äußere Störungen recht unempfindlich ist. Bei dieser Norm werden die logischen Zustände durch das Fließen oder Fehlen eines Stromes (20mA) dargestellt. Der C 64 hat zwar die nötige Software füreine RS232-Schnittstelle im Betriebssystem integriert, verfügt aber nicht über die entsprechenden Spannungspegel. Im C 64 gibt es nur zwei Spannungen: +5V (TTL) und 9V Wechselspannung. Es ist also ein Interface zur Spannungskonvertierung nötig. Links in Bild 2 finden Sie den Schaltplan eines solchen Interfaces (Bauanleitung in Ausgabe 3/85). Rechts im Bild die diskrete Lösung, für die Konvertierung von 0/5V auf ±12V (oben) und von ±12V auf 0/5V (unten). Beachten Sie, daß jede Sende- und Empfangsleitung die entsprechende Transistorschaltung braucht.</p>
+
+<p>Mit einer Masse- und einer Datenleitung könnte schon eine Übertragung von Texten an einen Drucker erfolgen. Was ist aber, wenn die Datenübertragung schneller ist, als der Drucker die Zeichen zu Papier bringen kann? Der Drucker muß dem Computer sagen, wenn er zuviel Arbeit bekommt. Er kann dies auf drei verschiedene Arten tun:</p>
+
+<h3>— Software-Protokoll mit XON/XOFF</h3>
+
+<p>Es wird eine zusätzliche Leitung zwischen Computer und Peripherie eingerichtet, über die das empfangende Gerät den Code $13 (XOFF) sendet, wenn es keine Daten mehr annehmen kann. Dieses Signal hat die gleiche Aufgabe wie die Busy-Leitung einer Centronics-Schnittstelle; es stoppt die Datenübertragung. Die Freigabe erfolgt mit dem Code $11 (XON). Die Codes $11 und $13 entsprechen den ASCII-Codes DC1 und DC2.</p>
+
+<p>Die neue Leitung kann natürlich auch zur Übertragung von mehr Informationen verwendet werden. Sende- und Empfangsgerät müssen dann allerdings in der Lage sein, zwei Leitungen (XON/XOFF und die normale Datenleitung) gleichzeitig zu verwalten. Mit dieser zusätzlichen Leitung wird auch der sogenannte Vollduplex-Betrieb möglich. Vollduplex heißt, daß beide Geräte gleichzeitig senden oder empfangen können. Im Gegensatz zum Halbduplex-Betrieb, bei dem zur gleichen Zeit nur in eine Richtung übertragen werden kann.</p>
+
+<h3>— Software-Protokoll mit ETX/ACK</h3>
+
+<p>Auch bei dieser Lösung kommt man nicht ohne eine zusätzliche Leitung aus. Sie heißt DTR (Data Terminal Ready). Ist zum Beispiel der angeschlossene Drucker bereit, Daten anzunehmen, aktiviert er die DTR-Leitung und sendet $06 (ACKnowledge). DerComputerschicktnun eine Reihe Datenworte über die Sendeleitung und schließt die Übertragung mit $03 zwischendurch immer wieder ab. Den nächsten Datenblock sendet er erst dann, wenn der Drucker sein ACK gegeben hat. Damit die Übertragung nicht in einem Chaos entartet, muß der Sende-Computer über das Puffervermögen des Empfängers informiert sein, um rechtzeitig ein ETX (End Of Text) senden zu können. Nur so kann ein Überlauf des Puffers und der damit einhergehende Datenverlust verhindert werden.</p>
+
+<p>Hat das Empfangsgerät ein ETX festgestellt, werden die empfangenen Daten bearbeitet. Kann der Empfänger neue Daten aufnehmen, sendet er ein ACK an den Computer und die Übertragung beginnt von Neuem.</p>
+
+<h3>— Hardware-Protokoll</h3>
+
+<p>Spätestens hier wird es unübersichtlich. Es hilft nur noch Tabelle 1 zur Erklärung der ganzen Signale. Als üblicher Stecker für V.24-Signale hat sich ein 25-poliger D-Sub-Stecker (im Laborslang Cannon gennant) durchgesetzt. Die Bezeichnung der Kontakte ist gleich dreimal genormt: DIN 66020, CCITT V.24 (Comite Consultatif International Telegraphique et Telephonique) und EIA RS232C (Electronic Industries Association). Die Bedeutung der Signale ist bei allen Normen gleich, nur die Signalpegel differieren. Die deutsche Norm verlangt, im Gegensatz zu den anderen, negative Logik.</p>
+
+<p>Zum Anschluß einer RS232/V.24-Schnittstelle ist es in den allermeisten Fällen nicht nötig, alle Leitungen zu benutzen. So werden nur wenige unter Ihnen eine synchrone Datenübertragung mit zusätzlichem Clock-Signal realisieren, wie beim seriellen lEC-Bus des C 64. Normalerweise reichen die folgenden Leitungen aus:</p>
+
+<ol>
+<li>eine Masseleitung</li>
+<li>je Richtung eine Datenleitung</li>
+<li>je Richtung eine Busyleitung</li>
+</ol>
+
+
+<p>Punkt 1 und 2 dürften klar sein. Punkt 3 kann auf vielfältige Art realisiert werden. In aller Regel werden die Kontakte S2 (RTS) und M2 (CTS) benutzt. Die Erklärung erfolgt am besten an einem Beispiel: Der Drucker zeigt seine Empfangsbereitschaft an, indem er M2 aktiviert. Dieses Signal fragt der Computer ständig am Anschluß S2 ab. Ist M2 inaktiv, stoppt der Computer die Datenübertragung. Nehmen wir an, anstelle des Druckers sei ein Meßgerät angeschlossen, das nur ab und zu Anweisungen vom Computer bekommt und ansonsten sich um interne Aufgaben kümmert. Dann wäre es wenig vorteilhaft, wenn das Meßgerät ständig Befehle vom Computer erwartet; für die eigentlichen Meßaufgaben bliebe zu wenig Zeit. In diesem Fall gestattet das einfache Abfragen des Kontaktes S1 (per Interrupttechnik) eine fast ungestörte Bearbeitung eines Programmes. S1 istmitRTS (RequestToSend) identisch. Aktiviert der Computer S1, »spitzt das Meßgerät die Ohren« und das Meßprogramm verzweigt in die Datenempfangsroutine.</p>
+
+<h3>Nicht auf die Norm verlassen</h3>
+
+<p>Die Hersteller von V.24-Schnittstellen scheinen sich nicht immer völlig einig zu sein, wie die Belegung und Bedeutung der einzelnen Stecker-Pins ist. So sind diesem Beitrag hauptsächlich Praxiserfahrungen zugrunde gelegt. Besser als Normblätter ist die Überprüfung der Schnittstelle mit einem Speicheroszilloskop oder einem Digital-Analyzer. Zumal die Steuerleitungen ab und zu mit Fantasienamen belegt oder nicht eindeutig als Sende- oder Empfangsleitung gekennzeichnet werden. Zum störungsfreien Betrieb einer Schnittstelle sollten nichtbenutzte Leitungen auf ein festes Potential gelegt werden. Man verhindert dadurch, daß die Übertragung bei einer eventuellen Abfrage einer solchen Leitung, mit Undefiniertem logischen Zustand, nicht unterbrochen wird.</p>
+
+<h2>V.24 beim C 64</h2>
+
+<p>Beim C 64 kann diese Schnittstelle als Gerät der Nummer 2 angesteuert werden. Zur Bestimmung der Kontrollparameter sind zwei Register vorhanden, die auch von Basic aus erreicht werden können.</p>
+
+<h3>Einstellparameter</h3>
+
+<p>Mit Tabelle 2 können Sie die Werte bestimmen, die Sie in Kommando- und Kontrollregister schreiben müssen, um ein bestimmtes Übertragungsprotokoll zu bewerkstelligen. Eine »1« bedeutet ein gesetztes Bit.</p>
+
+<p>Das Einschalten der RS232-Schnittstelle geschieht beim C 64 mit OPEN filenr.,2,0,CHR$(Kontrollreg.)+CHR$(Kommandoreg.).<br/>
+Beispiel: OPEN20,2,0,CHR$(64 + 4 + 2)+CHR$(32 + 1).</p>
+
+<p>Mit dieser Anweisung wird für Filenummer 20 vereinbart: 1 Stop-Bit, 6 Datenbit, 300 Baud, ungerade Parität, Vollduplex und Hardwareprotokoll.</p>
+
+<p>Wird eine Filenummer größer als 128 verwendet, sendet der Computer (wie üblich) nach jedem Carriage Return ($0D) ein Linefeed ($0A). Sollten diese Einstellmöglichkeiten nicht ausreichen, können Sie direkt in die RS232-Routine eingreifen. Einige Speicherstellen finden Sie in Tabelle 3.</p>
+
+<p>Übertragungsraten größer als 2400 Baud, können nur mit eigenen Maschinenprogrammen realisiert werden.</p>
+
+<h3>Fehlerabfrage</h3>
+
+<p>Das Betriebssystem des C 64 verfügt über eine Fehlerbehandlung der RS232-Schnittstelle. Der Status dazu kann entweder durch die Variable ST abgefragt werden, oder direkt mit Speicherzelle $0297. Die Bedeutung der einzelnen Bits von ST finden Sie in Tabelle 4.</p>
+
+<address class="author">(Jens Maßmann/hm)</address>
+    </article>
+</body>
+</html>

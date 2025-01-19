@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>Der MPS 802 lernt deutsch</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="Ernst Schöberl, Arnd Wängler, gk">
+    <meta name="64er.issue" content="5/85">
+    <meta name="64er.pages" content="30-31">
+    <!-- <meta name="64er.toc_category" content="XXX"> -->
+    <!-- <meta name="64er.toc_title" content="XXX"> -->
+    <meta name="64er.id" content="XXX">
+</head>
+
+<body>
+    <article>
+        <h1>Der MPS 802 lernt deutsch</h1>
+<p class="intro">Der MPS 802 ist als zuverlässiger Drucker mit ansprechendem Schriftbild bekannt. Leider kennt er keine deutschen Umlaute. Unser kleines Programm ändert das: Der MPS 802 lernt deutsch.</p>
+
+<p>Die Geschichte des MPS 802 ist interessant und abwechslungsreich wie kaum eine andere. Entstanden ist er aus dem CBM 4022/4023 der für die PET-Generation geschaffen wurde und noch einen parallelen IEC-Bus (IEEE 488) besaß. Daraus entstand der 1526 (mit serieller Schnittstelle), der mit immer neuen Gerüchten über seine Fähigkeiten und seine Fehler überraschte. Von einem zweiten Modus war die Rede, und sogar von einer vollen Grafikfähigkeit. Wie aber jeder weiß, kann sowohl der 1526 als auch der MPS 802 Grafiken nur im »Zitter-Rumpel-Verfahren« erzeugen. Soll heißen, seine Grafikfähigkeit beschränkt sich auf ein einziges Zeichen, das ständig umprogrammiert wird. Seit der Hannover-Messe 1984 nennt sich der 1526 nun MPS 802 (Bild 1), ist aber rein technisch gesehen unverändert geblieben. Was neu ist, ist die sogenannte Firmware, oder um es gleich beim richtigen Namen zu nennen, das Betriebssystem. Es ist müßig, die vielen Fehler der verschiedenen 1526-Versionen aufzuzählen, beim MPS 802 sind sie jedenfalls ausgemerzt. Deshalb ist es auch für jeden Besitzer des 1526 empfehlenswert, sein Kernal-ROM durch das des MPS 802 zu ersetzen, es funktioniert einwandfrei. Der Austausch ist ein einfaches Unterfangen, aber dazu später mehr. Schauen wir uns zunächst einmal die Hardware des MPS 802 an. Gesteuert wird das kleine Druckwunder durch einen zum 6510 softwarekompatiblen 6504-Prozessor. Außer dem 6504 befinden sich noch zwei 6532-RIOT (RAM Input/Output Timer) und eine 6522-VIA (Variable Interface Adapter) auf der Hauptplatine. Das Betriebssystem befindet sich in einem 8-KByte-EPROM vom Typ 2764, wie er überall im Handel erhältlich ist. Im einzelnen ist die Speicheraufteilung des MPS 802 in Bild 2 dargestellt.</p>
+
+<p>Genug der Theorie. Im praktischen Betrieb fällt bald schon das Fehlen der deutschen Umlaute schmerzlich auf. Dem kann abgeholfen werden. Nachstehend abgedrucktes Programm (Listing 1) verändert in der schon vom Hypra-Perfekt (Ausgabe 4/85) bekannten Overlay-Methode das Original-Betriebssystem. Dazu müssen wir allerdings erst einmal in den Besitz des Kernals kommen. Lösen Sie die vier Schrauben des Gehäuses und nehmen Sie (nach dem Farbband) vorsichtig das Gehäuseoberteil ab (Vorsicht! Garantieverlust bei neuen Geräten). Nachdem Sie sich gemerkt haben, wie das Verbindungskabel vom Deckel zur Hauptplatine eingesteckt war, können Sie auch dieses entfernen. Auf der linken, hinteren Seite des Druckers ist eine ebenfalls abschraubbare Verkleidung aus Blech angebracht — weg damit. Jetzt braucht nur noch der 2764-EPROM in der rechten hinteren Ecke der Platine (Bild 3) geortet und vorsichtig herausgehebelt werden. Die Besitzer eines EPROM-Programmiergerätes wissen jetzt sicherlich schon was kommt — das EPROM wird ausgelesen und abgespeichert. Im folgenden wird deshalb davon ausgegangen, daß der Inhalt des MPS 802-EPROMs von $6000 bis $7FFF im Speicher des C 64 steht.</p>
+
+<p>Die Zeichenmatrizen, daß heißt die Informationen über das Aussehen der einzelnen Zeichen, stehen nun im Bereich von $6400 bis $69FF. Aber in welcher Form? Da der MPS 802 einen Druckkopf mit 8 Nadeln besitzt, besteht jedes Zeichen aus 8 mal 8 Punkten. Jedes Zeichen belegt also 8 Byte. Jedes Byte definiert eine Spalte des Zeichens, da die Nadeln im Druckkopf senkrecht angebracht sind. Ist ein Bit gesetzt, so wird die entsprechende Nadel beim Druck des Zeichens aktiviert. Steht das entsprechende Bit auf Null, wird natürlich auch kein Punkt gedruckt. Das Leerzeichen besteht beispielsweise aus acht mal Byte 0. Etwas deutlicher wird das Ganze, wenn wir uns einmal das Zeichen »A« genauer anschauen. Die Zeichenmatrix für das A steht von $6408 bis $640F.</p>
+
+<p>Ein Monitor liefert uns für diesen Bereich die Werte:<br/>
+3E 50 90 90 50 3E 00 00</p>
+
+<p>Jede Hexadezimalzahl repräsentiert die Summe einer Spalte (Bild 4). Man erkennt, welcher Zusammenhang zwischen der Hexadezimalzahl (Bitmuster) und der gedruckten Matrix besteht. Das Programm aus Listing 1 verändert die vorhandene Zeichenmatrix so, daß es die deutschen Umlaute an Stelle einiger Grafikzeichen zusammen mit der deutschen Version von Vizawrite druckt. Außerdem werden die Steuercodes für Breitschrift von CHR$(1) auf CHR$(14) und die Rückstellung auf Normalschrift von CHR$(129) auf CHR$(16) geändert, was gebräuchlicher ist. Wer aber dennoch selber den Zeichensatz abändern möchte, findet die einzelnen Zeichensätze an folgenden Speicherstellen:</p>
+
+<p>Von $6400-$6407 steht der Klammeraffe. Darauf folgen die Großbuchstaben von A—Z ($6408— $34DF). Ab $34E0 kommen die Sonder- und Grafikzeichen. Die Kleinbuchstaben beginnen bei $6808 (mit dem kleinen a). Leider hat der Drucker kein RAM, mit dem man eine Veränderung des Zeichensatzes ausprobieren könnte. Beim Entwerfen des eigenen Zeichensatzes ist ferner auf folgendes zu achten: Der Drucker führt nach dem Einschalten einen Selbsttest durch. Dabei wird auch das ROM geprüft, indem die Prüfsumme über den Bereich $6400 bis $7FFF ermittelt wird. Listing 2 dient in diesem Fall dazu, die Prüfsumme eines bereits veränderten, im Bereich von $6000 bis $7FFF stehenden ROMs anzupassen. Diese Anpassung ist natürlich nur dann notwendig, wenn eigene Veränderungen vorgenommen wurden.</p>
+
+<p>Die noch verbleibenden Arbeiten sind schnell durchgeführt. Mit einem EPROM-Programmiergerät wird ein 2764-EPROM mit dem Inhalt der Speicherstellen $6000 bis $7000 gebrannt. Das neue Betriebssystem wird dann anstelle des alten in den Drucker eingesteckt (Kerbe auf Kerbe). Ob alles programmgemäß abgelaufen ist, läßt sich am einfachsten mit dem Selbsttest feststellen. Sollten Sie nun unter den vielen Zeichen tatsächlich die deutschen Umlaute finden, dann dürfen Sie sich ruhig ein kleines Päuschen genehmigen, denn Sie haben nun etwas Einzigartiges: Den MPS 802 in deutscher Version.</p>
+
+<address class="author">(Ernst Schöberl/Arnd Wängler/gk)</address>
+    </article>
+</body>
+</html>
