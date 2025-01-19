@@ -26,11 +26,11 @@
 
         <p>Diese Speicherzellen enthalten die Zeilennummer in Low-/ High-Byte-Darstellung derjenigen Basic-Anweisung, welche gerade ausgeführt wird.</p>
 
-        <p>Ein kurzes Programm macht das deutlich:<br />
-            10 PRINT &ldquo;ZEILE 10&rdquo;, PEEK(57) + 256*PEEK(58)<br />
-            20 A = 3:PRINT A,PEEK(57) + 256*PEEK(58)<br />
-            30 B = 5:PRINT B,PEEK(57) + 256*PEEK(58)<br />
-            40 PRINT A*B,PEEK(57) + 256*PEEK(58)<br />
+        <p>Ein kurzes Programm macht das deutlich:<br>
+            10 PRINT &ldquo;ZEILE 10&rdquo;, PEEK(57) + 256*PEEK(58)<br>
+            20 A = 3:PRINT A,PEEK(57) + 256*PEEK(58)<br>
+            30 B = 5:PRINT B,PEEK(57) + 256*PEEK(58)<br>
+            40 PRINT A*B,PEEK(57) + 256*PEEK(58)<br>
             In jeder Zeile wird zuerst etwas gePRINTet, nämlich Text, Variable und ein Rechenresultat. Durch das Komma getrennt wird in der 2. Bildschirmhälfte (VC 20) beziehungsweise Bildschirmviertel (C 64) der Inhalt der Speicherzellen 57/58 ausgedruckt. Das Resultat zeigt in der Tat die jeweilige Zeilennummer an.</p>
 
         <p>Die Basic-Befehle GOTO, GOSUB-RETURN, FOR-NEXT, END, STOP, CONT und die Betätigung der STOP-Taste während eines Programmlaufes verwenden alle den Inhalt dieser Speicherzellen, um entweder zu der laufenden Zeile zurückzufinden oder um die Unterbrechung mit BREAK IN&hellip; anzuzeigen. Auch die meisten Fehlermeldungen verwenden diese Zellen.</p>
@@ -45,7 +45,7 @@
 
         <p>Immer dann, wenn ein Programmablauf durch die Befehle END oder STOP oder aber mit der STOP-Taste abgebrochen wird, wird die Nummer der gerade ausgeführten Programmzeile nach 59/60 gebracht und bleibt dort so lange, bis eine neue Unterbrechung erfolgt.</p>
 
-        <p>Das läßt sich am besten mit der STOP-Taste und nachfolgendem CONT zeigen. Nehmen Sie bitte dazu das kleine Demo-Programm der Zellen 57/58 und ändern Sie alle PEEK-Adressen in 59/60 um. Fügen Sie außerdem noch eine Zeile 50 hinzu:<br />
+        <p>Das läßt sich am besten mit der STOP-Taste und nachfolgendem CONT zeigen. Nehmen Sie bitte dazu das kleine Demo-Programm der Zellen 57/58 und ändern Sie alle PEEK-Adressen in 59/60 um. Fügen Sie außerdem noch eine Zeile 50 hinzu:<br>
             50 GOTO 10</p>
 
         <p>Den dadurch erzeugten kontinuierlichen Lauf des Programms bremsen Sie dann mit der STOP-Taste und lassen ihn danach mit CONT weiterlaufen.</p>
@@ -64,10 +64,10 @@
 
         <p>Zur besseren Erklärung dieser in 61/62 als Zeiger stehenden Adresse einer Basic-Zeile möchte ich Sie an den dritten Teil dieses Kurses in Ausgabe 1/85 erinnern, in dem ich in einem separaten Texteinschub den Basic-Programmspeicher »sichtbar« gemacht habe, um die Wirkung der Verschiebung des Zeigers in den Zellen 43/44 zu demonstrieren.</p>
 
-        <p>Wir nehmen dazu bitte noch einmal das kleine Demo-Programm für die Adressen 57/58 oben her und ersetzen die PEEK-Werte durch 61 und 62. Das Ausdrucken des Inhalts von 61/62 legen wir aber an den Anfang jeder Zeile. Das Programm sieht dann so aus:<br />
-            10 PRINT PEEK(61) + 256*PEEK (62),&ldquo;ZEILE 10&rdquo;<br />
-            20 PRINT PEEK(61) + 256*PEEK (62),:A = 3:PRINTA<br />
-            30 PRINT PEEK(61) + 256*PEEK (62),:B = 5:PRINTB<br />
+        <p>Wir nehmen dazu bitte noch einmal das kleine Demo-Programm für die Adressen 57/58 oben her und ersetzen die PEEK-Werte durch 61 und 62. Das Ausdrucken des Inhalts von 61/62 legen wir aber an den Anfang jeder Zeile. Das Programm sieht dann so aus:<br>
+            10 PRINT PEEK(61) + 256*PEEK (62),&ldquo;ZEILE 10&rdquo;<br>
+            20 PRINT PEEK(61) + 256*PEEK (62),:A = 3:PRINTA<br>
+            30 PRINT PEEK(61) + 256*PEEK (62),:B = 5:PRINTB<br>
             40 PRINT PEEK(61) + 256*PEEK (62),A*B</p>
 
         <p>Nach RUN erhalten wir jetzt auf der linken Seite Zahlen, die den jeweiligen Basic-Speicher angeben, ab dem diese Zeile gespeichert ist. Wenn Sie ab diesen Adressen mit der gerade erwähnten Methode aus der Ausgabe 1/85 nachschauen, finden Sie genau die Zeilen des kleinen Demo-Programms wieder. Zur Anwendung dieses Zeigers kann ich wenig sagen. Ihn durch POKE zu verändern, geht in Basic nicht, weil das Betriebssystem die richtigen Werte immer neu eingibt. Man kann ihn allerdings abfragen.</p>
@@ -78,11 +78,11 @@
 
         <p>Diese Speicherzellen enthalten die Nummer der Basic-Zeile, in der gerade ein DATA-Befehl mit READ gelesen wird. Sobald in einer DATA-Zeile ein Fehler gefunden wird, kommt diese Zeilennummer aus 63/64 in die Speicherzellen 57/58, um in der Fehlermeldung die fehlerhafte DATA-Zeile und nicht die laufende READ-Zeile anzuzeigen. Auf diese Weise werden Syntax-Fehler in einer DATA-Zeile angezeigt. Um andere Fehler, wie zum Beispiel ein fehlendes Komma zwischen zwei DATA-Angaben anzuzeigen, können die Speicherzellen 63/64 eingesetzt werden.</p>
 
-        <p>In dem folgenden Programm wird in Zeile 20 geprüft, ob die DATA-Angaben größer als 255 sind. Da bei einem fehlenden Komma die beiden Zahlen als eine Zahl gelesen werden, wird dieser Fall erkannt und mit einem F versehen die Nummer der DATA-Zeile ausgedruckt, in der das Komma fehlt.<br />
-            10 FOR X = 1 TO 10:READ A:PRINT A<br />
-            20 IF A>255 THEN PRINT &ldquo;F&rdquo; PEEK(63) + 256*PEEK(64) 30 NEXT X<br />
-            40 DATA 10,20,30<br />
-            50 DATA 40,50,60<br />
+        <p>In dem folgenden Programm wird in Zeile 20 geprüft, ob die DATA-Angaben größer als 255 sind. Da bei einem fehlenden Komma die beiden Zahlen als eine Zahl gelesen werden, wird dieser Fall erkannt und mit einem F versehen die Nummer der DATA-Zeile ausgedruckt, in der das Komma fehlt.<br>
+            10 FOR X = 1 TO 10:READ A:PRINT A<br>
+            20 IF A>255 THEN PRINT &ldquo;F&rdquo; PEEK(63) + 256*PEEK(64) 30 NEXT X<br>
+            40 DATA 10,20,30<br>
+            50 DATA 40,50,60<br>
             60 DATA 70,80,90,100</p>
 
         <p>Sie können jetzt in den DATA-Zeilen Kommafehler einbauen, die vom Programm angezeigt werden. Ein anderer häufiger Fehler, nämlich ein Komma am Ende einer DATA-Zeile, kann damit leider nicht erkannt werden. Aber vielleicht fällt Ihnen eine Prüfformel dazu ein.</p>
@@ -93,25 +93,25 @@
 
         <p>Diese Speicherzellen enthalten in der Low-/High-Byte-Darstellung die Adresse im Basic-Programmspeicher, ab welcher der READ-Befehl nach der nächsten DATA-Zeile sucht.</p>
 
-        <p>Zu Beginn eines Programms steht in 65/66 als Adresse der Beginn des Basic-Speichers, also derselbe Wert wie in den Speicherzellen 43/44. Der Befehl RESTORE setzt den Zeiger immer auf diesen Anfangswert zurück. Ein Demo-Programm zeigt uns das an (die Kommata sind wichtig für das Format der Darstellung auf dem Bildschirm!):<br />
-            10 PRINT, PEEK(65) + 256*PEEK (66)<br />
-            20 FORX = 1 TO 10:READA 30 PRINT A,PEEK(65) + 256* PEEK(66)<br />
-            40 NEXT X<br />
-            50 DATA 10,20,30,40,50,60,70,80, 90,100<br />
-            60 RESTORE<br />
+        <p>Zu Beginn eines Programms steht in 65/66 als Adresse der Beginn des Basic-Speichers, also derselbe Wert wie in den Speicherzellen 43/44. Der Befehl RESTORE setzt den Zeiger immer auf diesen Anfangswert zurück. Ein Demo-Programm zeigt uns das an (die Kommata sind wichtig für das Format der Darstellung auf dem Bildschirm!):<br>
+            10 PRINT, PEEK(65) + 256*PEEK (66)<br>
+            20 FORX = 1 TO 10:READA 30 PRINT A,PEEK(65) + 256* PEEK(66)<br>
+            40 NEXT X<br>
+            50 DATA 10,20,30,40,50,60,70,80, 90,100<br>
+            60 RESTORE<br>
             70 PRINT,PEEK(65) + 256*PEEK (66)</p>
 
         <p>Durch Verändern dieses Zeigers in 65/66 kann die Reihenfolge, mit der DATA-Angaben gelesen werden, verändert werden, allerdings nur zeilenweise.</p>
 
-        <p>Wir brauchen dazu die oben beschriebenen Speicherzellen 61/62, deren jeweiligen Inhalt wir ja mit PEEK abfragen können. Wenn wir das vor jeder DATA-Zeile machen und diesen Wert einer Variablen zuweisen, haben wir die Adresse gespeichert, hinter welcher die DATA-Zeile kommt. Durch POKEn dieser Adressen in die Speicherzellen 65/66 vor einem READ-Befehl, wird diesem READ die nächste DATA-Zeile vorgegeben und wir können so die Reihenfolge der DATA-Zeilen ändern.<br />
-            10 A1 = PEEK(61):B1 = PEEK(62)<br />
-            20 DATA DAS IST DIE 1. ZEILE<br />
-            30 A2 = PEEK(61):B2 = PEEK(62)<br />
-            40 DATA DAS IST DIE 2.ZEILE<br />
-            50 A3 = PEEK(61):B3 = PEEK(62)<br />
-            60 DATA DAS IST DIE 3.ZEILE<br />
-            70 POKE 65,A3:POKE 66,B3: READ A$:PRINT A$<br />
-            80 POKE 65,A1:POKE 66,B1: READ A$:PRINT A$<br />
+        <p>Wir brauchen dazu die oben beschriebenen Speicherzellen 61/62, deren jeweiligen Inhalt wir ja mit PEEK abfragen können. Wenn wir das vor jeder DATA-Zeile machen und diesen Wert einer Variablen zuweisen, haben wir die Adresse gespeichert, hinter welcher die DATA-Zeile kommt. Durch POKEn dieser Adressen in die Speicherzellen 65/66 vor einem READ-Befehl, wird diesem READ die nächste DATA-Zeile vorgegeben und wir können so die Reihenfolge der DATA-Zeilen ändern.<br>
+            10 A1 = PEEK(61):B1 = PEEK(62)<br>
+            20 DATA DAS IST DIE 1. ZEILE<br>
+            30 A2 = PEEK(61):B2 = PEEK(62)<br>
+            40 DATA DAS IST DIE 2.ZEILE<br>
+            50 A3 = PEEK(61):B3 = PEEK(62)<br>
+            60 DATA DAS IST DIE 3.ZEILE<br>
+            70 POKE 65,A3:POKE 66,B3: READ A$:PRINT A$<br>
+            80 POKE 65,A1:POKE 66,B1: READ A$:PRINT A$<br>
             90 POKE 65,A2:POKE 66,B2: READ A$:PRINT A$</p>
 
         <p>Mit den Zeilen 70 bis 90 werden für jede DATA-Zeile eigene READ-Anweisungen gegeben. Welche DATA-Zeile gelesen werden soll, wird durch die Variablen Ax und Bx (x = l,2,3) bestimmt, mit denen der Zeiger in 65/66 »verbogen« wird.</p>
@@ -162,18 +162,18 @@
 
         <h3>Zeiger auf Adresse, ab welcher der Wert der Variablen einer selbstdefinierten Funktion gespeichert ist.</h3>
 
-        <p>Basic erlaubt es bekanntlich, mit dem Befehl DEF selbst erfundene Funktionen zu definieren, welche die Form FN gefolgt von einem Variablennamen haben, zum Beispiel<br />
+        <p>Basic erlaubt es bekanntlich, mit dem Befehl DEF selbst erfundene Funktionen zu definieren, welche die Form FN gefolgt von einem Variablennamen haben, zum Beispiel<br>
             DEF FNAA(X).</p>
 
         <p>Im nebenstehenden Textblock »Darstellung von Variablen selbstdefinierter Funktionen« wird gezeigt beziehungsweise sichtbar gemacht, wie derartige Funktionen und ihre Variablen abgespeichert werden. Während der Definition einer Funktion steht in 78/79 die Adresse, ab welcher die Funktion und der Wert ihrer Variablen abgespeichert ist. Der Inhalt dieser Adressen ist identisch mit den Zeichen hinter dem Namen der Funktion (1. Gruppe im nebenstehenden Beispiel).</p>
 
         <p>Nach der Ausführung der Funktion sieht in 78/79 allerdings die Adresse, ab welche der Zahlenwert der Funktion selbst abgespeichert ist. Er ist identisch mit den Zeichen der 2. Gruppe.</p>
 
-        <p>Diesen Zusammenhang können Sie überprüfen, indem Sie im Programm des Texteinschubes folgende Zeilen hinzufügen:<br />
-            25 PRINT PEEK(78) + 256*PEEK (79)<br />
+        <p>Diesen Zusammenhang können Sie überprüfen, indem Sie im Programm des Texteinschubes folgende Zeilen hinzufügen:<br>
+            25 PRINT PEEK(78) + 256*PEEK (79)<br>
             35 PRINT PEEK(78) + 256*PEEK (79)</p>
 
-        <p>Nach RUN erhalten Sie zwei Adressen, die Sie mit direkter Eingabe abfragen:<br />
+        <p>Nach RUN erhalten Sie zwei Adressen, die Sie mit direkter Eingabe abfragen:<br>
             FOR I = 0TO 4:PRINT PEEK (1.Adresse + I);:NEXTI: FORJ=OTO 4:PRINT PEEK (2.Adresse + J);:NEXTJ</p>
 
         <p>Sie werden sehen, daß der Inhalt der beiden Adressen genau die Werte der Zeichen 3 bis 7 der beiden Gruppen entspricht, allerdings im Bildschirmcode.</p>
@@ -182,120 +182,120 @@
 
         <address class="author">(Dr. H. Hauck/aa)</address>
 
-        <p>TODO ASIDE</p>
+        <aside>
+            <h2>Nachtrag zu den sichtbaren Variablen</h2>
 
-        <h2>Nachtrag zu den sichtbaren Variablen</h2>
+            <p>Frau Dr. Beyer aus Düren, auf deren Methode ich meine Sichtbarmachung der gespeicherten Variablen in den letzten beiden Folgen des Kurses aufgebaut habe, hat mir freundlicherweise zwei Verbesserungen mitgeteilt, die ich Ihnen nicht vorenthalten möchte.</p>
 
-        <p>Frau Dr. Beyer aus Düren, auf deren Methode ich meine Sichtbarmachung der gespeicherten Variablen in den letzten beiden Folgen des Kurses aufgebaut habe, hat mir freundlicherweise zwei Verbesserungen mitgeteilt, die ich Ihnen nicht vorenthalten möchte.</p>
+            <p>Die erste Verbesserung bezieht sich auf die Methode für den C 64, dargestellt in Teil 4 auf Seite 151, 3. Zeile von oben.<br>
+                Statt POKE 46,4:POKE 48,4<br>
+                kann man auch schreiben: POKE 46,4: CLR</p>
 
-        <p>Die erste Verbesserung bezieht sich auf die Methode für den C 64, dargestellt in Teil 4 auf Seite 151, 3. Zeile von oben.<br />
-            Statt POKE 46,4:POKE 48,4<br />
-            kann man auch schreiben: POKE 46,4: CLR</p>
+            <p>Wie bei den Speicherzellen 55/56 erklärt, setzt der Befehl CLR auch die Zeiger in 48 und 50 zurück, so daß der 2. POKE entfallen kann.</p>
 
-        <p>Wie bei den Speicherzellen 55/56 erklärt, setzt der Befehl CLR auch die Zeiger in 48 und 50 zurück, so daß der 2. POKE entfallen kann.</p>
+            <p>Die zweite Verbesserung bezieht sich auf die Methode für den VC 20 in Teil 5 in Ausgabe 3/85.</p>
 
-        <p>Die zweite Verbesserung bezieht sich auf die Methode für den VC 20 in Teil 5 in Ausgabe 3/85.</p>
+            <p>Im Textblock »Darstellung der normalen Variablen beim VC 20« habe ich erklärt, daß wir zur Sichtbarmachung der Zeichen eine Farbe in den Farbspeicher POKEn müssen, und das wurde dann auch im Schritt 3 ausgeführt.</p>
 
-        <p>Im Textblock »Darstellung der normalen Variablen beim VC 20« habe ich erklärt, daß wir zur Sichtbarmachung der Zeichen eine Farbe in den Farbspeicher POKEn müssen, und das wurde dann auch im Schritt 3 ausgeführt.</p>
+            <p>Dieser Schritt 3 kann entfallen. Schritt 4 — Löschen des Bildschirms — kann jetzt aber mit der CLR-Taste gemacht werden, was natürlich viel schneller geht. Vor dem Schritt 5 wird der Cursor per SPACE-Taste über die ersten vier bis sechs Zeilen gejagt. Dadurch werden diese Zeilen sozusagen mit einer unsichtbaren Farbe gefüllt. Die weiteren Aktionen bleiben gleich und die Zeichen erscheinen oben am Bildschirm.</p>
 
-        <p>Dieser Schritt 3 kann entfallen. Schritt 4 — Löschen des Bildschirms — kann jetzt aber mit der CLR-Taste gemacht werden, was natürlich viel schneller geht. Vor dem Schritt 5 wird der Cursor per SPACE-Taste über die ersten vier bis sechs Zeilen gejagt. Dadurch werden diese Zeilen sozusagen mit einer unsichtbaren Farbe gefüllt. Die weiteren Aktionen bleiben gleich und die Zeichen erscheinen oben am Bildschirm.</p>
+            <p>Das ist natürlich die eleganteste Methode.</p>
 
-        <p>Das ist natürlich die eleganteste Methode.</p>
+            <h2>Darstellung der Variablen einer selbstdefinierten Funktion</h2>
 
-        <h2>Darstellung der Variablen einer selbstdefinierten Funktion</h2>
+            <p>In den vorigen Folgen habe ich Ihnen gezeigt, wie im Programmspeicher abgelegte normale Variablen und Felder-Variablen sichtbar gemacht werden können. Damit konnten wir den Aufbau und die Darstellung der einzelnen Variablenarten studieren.</p>
 
-        <p>In den vorigen Folgen habe ich Ihnen gezeigt, wie im Programmspeicher abgelegte normale Variablen und Felder-Variablen sichtbar gemacht werden können. Damit konnten wir den Aufbau und die Darstellung der einzelnen Variablenarten studieren.</p>
+            <p>Heute will ich einen weiteren Variablentyp vorstellen, nämlich den der selbstdefinierten Funktionen.</p>
 
-        <p>Heute will ich einen weiteren Variablentyp vorstellen, nämlich den der selbstdefinierten Funktionen.</p>
+            <p>Sie erinnern sich vielleicht, mit dem Basic-Befehl »DEF FN (Name)(Variable)« können wir komplizierte Funktionen selbst erfinden, definieren und später als »FN (Name)(Variable)« weiter verarbeiten. Diesen Typ wollen wir uns anschauen, wie er im Speicher steht.</p>
 
-        <p>Sie erinnern sich vielleicht, mit dem Basic-Befehl »DEF FN (Name)(Variable)« können wir komplizierte Funktionen selbst erfinden, definieren und später als »FN (Name)(Variable)« weiter verarbeiten. Diesen Typ wollen wir uns anschauen, wie er im Speicher steht.</p>
+            <p>Im Prinzip verwenden wir dieselben Methoden zur Sichtbarmachung, wie die letzten Male, verbessert natürlich mit den Vorschlägen des Texteinschubs 1.</p>
 
-        <p>Im Prinzip verwenden wir dieselben Methoden zur Sichtbarmachung, wie die letzten Male, verbessert natürlich mit den Vorschlägen des Texteinschubs 1.</p>
+            <p>Aber ein Unterschied kommt noch dazu. Der Befehl DEF kann leider nicht direkt eingegeben werden, sondern muß immer als Teil einer Programmzeile mit einer Zeilennummer versehen sein.</p>
 
-        <p>Aber ein Unterschied kommt noch dazu. Der Befehl DEF kann leider nicht direkt eingegeben werden, sondern muß immer als Teil einer Programmzeile mit einer Zeilennummer versehen sein.</p>
+            <p>Deshalb schreiben wir zuerst ein kleines Programm zur Definition der Funktion plus Variable, bevor wir den Variablenspeicher mit dem Bildschirmspeicher zusammenlegen:<br>
+                10 DEF FNAA(X) = 3*SIN(X) + COS(X)<br>
+                20 X = 5<br>
+                30 PRINT FNAA(X)</p>
 
-        <p>Deshalb schreiben wir zuerst ein kleines Programm zur Definition der Funktion plus Variable, bevor wir den Variablenspeicher mit dem Bildschirmspeicher zusammenlegen:<br />
-            10 DEF FNAA(X) = 3*SIN(X) + COS(X)<br />
-            20 X = 5<br />
-            30 PRINT FNAA(X)</p>
+            <p>Die Funktion hat also den Namen »AA«. Bevor wir weitermachen, überprüfen Sie bitte mit RUN, ob alles stimmt. Nun wird der Speicher verschoben.</p>
 
-        <p>Die Funktion hat also den Namen »AA«. Bevor wir weitermachen, überprüfen Sie bitte mit RUN, ob alles stimmt. Nun wird der Speicher verschoben.</p>
+            <h3>Für den C 64 gilt:</h3>
 
-        <h3>Für den C 64 gilt:</h3>
-
-        <ol>
-            <li>POKE 46,4:CLR</li>
-            <li>Bildschirm löschen mit CLR-Taste</li>
-            <li>Cursor auf die Mitte fahren</li>
-            <li>LIST (es erscheint das Programm)</li>
-            <li>auf den 2. Zeichensatz umschalten (mit C= und SHIFT-Taste)</li>
-            <li>RUN</li>
-        </ol>
-
-
-        <h3>Für den VC 20 (ohne Erweiterung) gilt:</h3>
-
-        <p>Nur den Bildschirm auf 4096 zu verschieben, wie das letzte Mal, geht diesmal nicht, da wir ja für DEF ein kleines Programm schreiben müssen.</p>
-
-        <p>Also legen wir Bild- und Variablenspeicher ab Adresse 5120 (5120/256 = 20).</p>
-
-        <ol>
-            <li>POKE 46,20:CLR</li>
-            <li>POKE 648,20</li>
-            <li>STOP/RESTORE-Tasten, bis Cursor wieder da ist.</li>
-            <li>Bildschirm löschen mit CLR-Taste</li>
-            <li>die ersten vier bis sechs Zeilen mit SPACE-Taste überfahren.</li>
-            <li>Cursor ein paar Zeilen nach unten</li>
-            <li>LIST (es erscheint das Programm)</li>
-            <li>mit Commodore- und SHIFT-Taste auf 2. Zeichensatz umschalten</li>
-            <li>RUN</li>
-        </ol>
+            <ol>
+                <li>POKE 46,4:CLR</li>
+                <li>Bildschirm löschen mit CLR-Taste</li>
+                <li>Cursor auf die Mitte fahren</li>
+                <li>LIST (es erscheint das Programm)</li>
+                <li>auf den 2. Zeichensatz umschalten (mit C= und SHIFT-Taste)</li>
+                <li>RUN</li>
+            </ol>
 
 
-        <p>Wir sehen jetzt oben zwei Gruppen mit je sieben Zeichen, wie üblich.</p>
+            <h3>Für den VC 20 (ohne Erweiterung) gilt:</h3>
 
-        <p>Die erste Gruppe stellt die Funktion FNAA(x) dar. Sie ist gekennzeichnet durch das invertierte erste Zeichen des Namens, während das zweite Zeichen normal erscheint.</p>
+            <p>Nur den Bildschirm auf 4096 zu verschieben, wie das letzte Mal, geht diesmal nicht, da wir ja für DEF ein kleines Programm schreiben müssen.</p>
 
-        <p>Das dritte und vierte Zeichen gibt in Low-/High-Byte-Darstellung (im Bildschirmcode) die Adresse an, ab der die Funktion FNAA(x) im Programmspeicher abgelegt ist. Mit PEEK(3.Zeichen) + 256*PEEK(4.Zeichen) kann das abgefragt werden.</p>
+            <p>Also legen wir Bild- und Variablenspeicher ab Adresse 5120 (5120/256 = 20).</p>
 
-        <p>Das fünfte und sechste Zeichen nennt die Adresse, an welcher der Zahlenwert der Funktions-Variablen X anfängt. Das siebente Zeichen schließlich ist das erste Zeichen der Funktion selbst (in unserem Beispiel die 3).</p>
+            <ol>
+                <li>POKE 46,20:CLR</li>
+                <li>POKE 648,20</li>
+                <li>STOP/RESTORE-Tasten, bis Cursor wieder da ist.</li>
+                <li>Bildschirm löschen mit CLR-Taste</li>
+                <li>die ersten vier bis sechs Zeilen mit SPACE-Taste überfahren.</li>
+                <li>Cursor ein paar Zeilen nach unten</li>
+                <li>LIST (es erscheint das Programm)</li>
+                <li>mit Commodore- und SHIFT-Taste auf 2. Zeichensatz umschalten</li>
+                <li>RUN</li>
+            </ol>
 
-        <p>Die zweite Gruppe beschreibt die Variable X der Funktion. Die normale Darstellung der beiden ersten Zeichen, die den Namen darstellen, gibt uns an, daß es sich um eine Gleitkomma-Variable handelt, deren Wert als Mantisse und Exponent dargestellt ist.</p>
 
-        <p>Der Aufbau einer Funktion läßt sich also so zusammenfassen:</p>
+            <p>Wir sehen jetzt oben zwei Gruppen mit je sieben Zeichen, wie üblich.</p>
 
-        <table>
-            <tbody>
-                <tr>
-                    <td>1</td>
-                    <td>2</td>
-                    <td>3</td>
-                    <td>4</td>
-                    <td>5</td>
-                    <td>6</td>
-                    <td>7</td>
-                </tr>
-                <tr>
-                    <td>Erstes</td>
-                    <td>Zweites</td>
-                    <td>Low-</td>
-                    <td>High-</td>
-                    <td>Low-</td>
-                    <td>High-</td>
-                    <td rowspan="3">1. Zeichen der Funktion</td>
-                </tr>
-                <tr>
-                    <td colspan="2">Zeichen des Funktionsnamens<!-- <br>8 --></td>
-                    <td colspan="2" rowspan="2">Byte der Adresse, ab der die Funktion abgespeichert ist<!-- <br>9 --></td>
-                    <td colspan="2" rowspan="2">Byte der Adresse, ab dem der jeweilige Wert der Funktionsvariablen X abgespeichert ist<!-- <br>10 --></td>
-                </tr>
-                <tr>
-                    <td>ASCII-Wert + 128</td>
-                    <td>ASCII-Wert</td>
-                </tr>
-                <!-- TODO unclear what 8/9/10 mean, so I removed them -->
-            </tbody>
-        </table>
+            <p>Die erste Gruppe stellt die Funktion FNAA(x) dar. Sie ist gekennzeichnet durch das invertierte erste Zeichen des Namens, während das zweite Zeichen normal erscheint.</p>
+
+            <p>Das dritte und vierte Zeichen gibt in Low-/High-Byte-Darstellung (im Bildschirmcode) die Adresse an, ab der die Funktion FNAA(x) im Programmspeicher abgelegt ist. Mit PEEK(3.Zeichen) + 256*PEEK(4.Zeichen) kann das abgefragt werden.</p>
+
+            <p>Das fünfte und sechste Zeichen nennt die Adresse, an welcher der Zahlenwert der Funktions-Variablen X anfängt. Das siebente Zeichen schließlich ist das erste Zeichen der Funktion selbst (in unserem Beispiel die 3).</p>
+
+            <p>Die zweite Gruppe beschreibt die Variable X der Funktion. Die normale Darstellung der beiden ersten Zeichen, die den Namen darstellen, gibt uns an, daß es sich um eine Gleitkomma-Variable handelt, deren Wert als Mantisse und Exponent dargestellt ist.</p>
+
+            <p>Der Aufbau einer Funktion läßt sich also so zusammenfassen:</p>
+
+            <table>
+                <tbody>
+                    <tr>
+                        <td>1</td>
+                        <td>2</td>
+                        <td>3</td>
+                        <td>4</td>
+                        <td>5</td>
+                        <td>6</td>
+                        <td>7</td>
+                    </tr>
+                    <tr>
+                        <td>Erstes</td>
+                        <td>Zweites</td>
+                        <td>Low-</td>
+                        <td>High-</td>
+                        <td>Low-</td>
+                        <td>High-</td>
+                        <td rowspan="3">1. Zeichen der Funktion</td>
+                    </tr>
+                    <tr>
+                        <td colspan="2">Zeichen des Funktionsnamens<!-- <br>8 --></td>
+                        <td colspan="2" rowspan="2">Byte der Adresse, ab der die Funktion abgespeichert ist<!-- <br>9 --></td>
+                        <td colspan="2" rowspan="2">Byte der Adresse, ab dem der jeweilige Wert der Funktionsvariablen X abgespeichert ist<!-- <br>10 --></td>
+                    </tr>
+                    <tr>
+                        <td>ASCII-Wert + 128</td>
+                        <td>ASCII-Wert</td>
+                    </tr>
+                    <!-- TODO unclear what 8/9/10 mean, so I removed them -->
+                </tbody>
+            </table>
+        </aside>
     </article>
 </body>
 
