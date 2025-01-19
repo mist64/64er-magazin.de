@@ -2383,72 +2383,643 @@ In der nächsten Folge möchte ich Ihnen etwas vorstellen, das sich GCR-Codierun
 
 (Karsten Schramm/gk)
 
+# Dem Klang auf der Spur (Teil 5)
 
+> Dieser Teil des Musikkurses ist auch für all jene interessant, die sich nicht ausschließlich für Musik interessieren. Es werden Algorithmen zur Generierung verschiedener Signale vorgestellt.
 
+Dabei wird anhand des Source-Listings des Programms Modulator gezeigt, wie man diese Algorithmen unter zeitkritischen Nebenbedingungen programmieren kann.
 
+Im zweiten Teil dieser Reihe wurde schon erwähnt, daß man jeden Signalverlauf durch eine Folge von Stützwerten beschreiben kann. Da man diese Stützwerte digital codieren kann, wird so die Signalerzeugung und -verarbeitung mit dem Computer möglich. Man muß dabei allerdings mit einer Abtastfrequenz arbeiten, die mindestens doppelt so hoch ist wie die höchste Frequenz, die imverarbeite-ten Signal vorkommt. Für Audio-Signale in HiFi-Qulität ist somit eine Abtastfrequenz von mindestens 40 kHz erforderlich. Stellen wir dieser Frequenz einmal die Taktfrequenz von 1 MHz in unserem C 64 gegenüber: Eine Abtastperiode dauert bei 40 kHz 25 gs. Diese Zeit entspricht genau 25 Taktzyklen im C 64. Ein 6510-Maschinenbefehl dauert zwischen zwei und sieben Taktzyklen, das heißt, daß die CPU während einer Abtastperiode gerade vier bis maximal zwölf Befehle abarbeiten kann; zuwenig, um damit schon sinnvoll einen Signalabtastwert weiterzuverarbeiten. Die digitale Verarbeitung von Audiosignalen bleibt also zunächst einmal Hochleistungsrechnern und Spezialprozessoren vorenthal-ten.
 
+### Dreh- und Angelpunkt: Integer-Arithmetik
 
+Wenn man sich aber wie bei dem in der letzten Folge vorgestellten Programm Modulator auf eine Abtastfrequenz von 60 Hz beschränkt, dann sieht die Sache schon sehr viel günstiger aus. Während einer Abtastperiode von 16,6 ms (entsprechend 16 600 Taktzyklen) kann man bei geeigneter Programmierung schon eine ganze Menge machen. Die Abtastfrequenz ist aber nicht das einzig wichtige Kriterium bei der Signalverarbeitung. Eine Rolle spielt auch die **Genauigkeit**, mit der die Abtastwerte dargestellt und verrechnet werden. Natürlich gilt hier: Je genauer, desto besser. Genauigkeit kostet aber wieder Rechenzeit, sobald man die Wortlänge des verfügbaren Prozessors (hier leider nur 8 Bit) überschreitet. Die Arithmetik-Routinen des Basic-Interpreters arbeitet zum Beispiel im Fließkommaformat mit 32-Bit-Mantis-se. Sie bietet damit eine Genauigkeit, die selbst für sehr anspruchsvolle Probleme aus der Signalverarbeitung mehr als genug sein dürfte. Diese Routinen sind jedoch so langsam, daß sie auch in 16,6 ms nichts Vernünftiges tun können. Wir werden also unsere eigenen Arithmetik-Befehlsfolgen programmieren müssen und dabei einen Kompromiß zwischen Genauigkeit und Geschwindigkeit machen. Gleitkomma-Arithmetik ist zu aufwendig und für unsere Zwecke auch gar nicht erforderlich. Eine Genauigkeit von nur 8 Bit reicht allerdings auch nicht immer aus. So haben ja auch manche SID-Parameter eine Länge von 12 oder 16 Bit. Im Programm Modulator wird größtenteils mit 16-Bit-Zweierkomplex-Größen gerechnet. Es sei in diesem Zusammenhang auf dem Assembler-Kurs (Teil 3 im 64’er, Ausgabe 11/84) verwiesen, wo ausführlich beschrieben wird, wie man negative Zahlen im Zweierkomplement darstellt. Addition und Subtraktion von Zweierkomplement-Größen werden direkt durch die CPU-Befehle ADC und SBC sowie durch drei Flaggen (Negativ, Carry und Overflow) unterstützt. Für die Multiplikation gibt es dagegen keinen Maschinenbefehl. Da die Multiplikation in Modulator aber eine zentrale Rolle spielt, benötigen wir für sie ein effizientes (das heißt möglichst schnelles) Maschinenprogramm.
 
+### Die Multiplikation
 
+Was ist 43 x 13? Die wenigsten Menschen dürften die Antwort auf einen Schlag parat haben, so wie zum Beispiel auf die Frage, was 3 x 7 ist. Wir brauchen 3 x 7 nicht auszurechnen, weil wir es auswendig wissen. Den Wert des Produkts 43 x 13 werden die wenigsten auswendig kennen und daher zu rechnen anfangen. Eine solche Rechnung könnte (ausführlich) so aussehen:
 
+TODO
 
+In Zeile (1) stehen dabei noch einmal die Faktoren. Zeile (2) stellt das Teilprodukt 43 x 10 = 430 dar, Zeile (3) das Teilprodukt 43 x 3 = 129. Durch geeignetes Einrücken braucht man die Null bei 430 in Zeile (2) nicht mitschreiben. In Zeile (4) werden schließlich die Teilprodukte addiert. Dieser vertrauten Rechenweise liegt das **Distributivgesetz** zugrunde, welches die Bildungvon Teilprodukten erlaubt:
 
+(5)	43x(10 + 3)=(43x10)+(43x3)
+TODO
 
+Die »komplizierte« Multiplikation 43 x 13 wird also auf »einfachere« Multiplikationen 43 x 10 und 43 x 3 zurückgeführt. Bezeichnen wir in unserem Beispiel die Zahl 43 als Multiplikant (MD) und 13 als Multiplikator (MR), so können wir das Multiplikationsschema so formulieren: »Multipliziere MD mit den einzelnen Dezimalstellen von MR und addiere die Teilproduktion, die mit den entsprechenden Zehnerpotenzen 1,10,1000 etc. zu skalieren sind. Die Skalierung erreicht man aber einfach durch Linksverschieben um 0,1,2 etc. Dezimalstellen.«
 
+Man kann den Multiplikator aber auch anders zerlegen, zum Beispiel in Zweierpotenzen:
+13 = 8 + 4 + 1
+und so multiplizieren:
 
+(6)	43x13 = 8x43 + 4x43 + 1x43
+= 344 + 172 + 43
+= 599
+TODO
 
+Man benötigt hier als Summanden Produkte von MD mit Zweierpotenzen, die man leicht durch wiederholtes Verdoppeln von MD erhalten kann. Auf diese Weise sollen übrigens schon die alten Ägypter multipliziert haben. Wenn man nun MD und MR im Binärsystem darstellt, kann man besonders einfach multiplizieren: Die Produkte von MD mit Zweierpotenzen erhält man ganz einfach durch wiederholtes Linksverschieben. In unserem Beispiel gilt in binärer Schreibweise: MD = 101011, MR = 1101. Es ergibt sich das Schema:
 
+TODO
 
+In Zeile (7) stehen MD und MR. Die Zeilen (8), (9) und (10) entsprechen den Teilpodukten 43 x 8, 43 x 4 und 43 x 1, die durch Linksverschiebung aus MD hervorgehen. Die Summe in Zeile (11) ist genau die Binärdarstellung von 559 (nachrechnen!).
 
+Nach diesem Schema kann man nun einen Algorithmus formulieren: Es sei dazu N die Zahl der Binärstellen von MR:
 
+1 SUM: = 0;
+2 FOR I: = N-1 DOWNTO 0 DO
+3 BEGIN
+4 SUM := LINKS(SUM);
+5 IF MR(I)=1 THEN SUM: = SUM + MD
+6 END
 
+Der Algorithmus ist hier formal in einem Pascal-ähnlichen Stil dargestellt. SUM wird zunächst mit 0 vorbesetzt und dann N-mal nach links geschoben. Immer wenn dabei, von links nach rechts gezählt, in MR eine Eins auftritt, wird MD zu SUM addiert.
 
+Sehen wir uns für unser Beispiel einen Trace des Programms an:
+MD = 101011 MR = 1101 N = 4
 
+TODO
 
+Wir wollen diesen Algorithmus nun konkret in Maschinensprache realisieren. Wenn MD und MR zunächst auf 8 Bit begrenzt werden, kann man auf sie mit einem einzigen Maschinenbefehl zugreifen. Die Variable SUM hält man am besten im Akkumulator, weil man sie zum Addieren sowieso dorthin laden müßte. Auch die Linksverschiebung des Akkumulators ist wesentlich schneller als die einer Speicherzelle. Beim Addieren in den Akkumulator und beim Linksverschieben treten allerdings Überträge auf, die nicht verloren gehen dürfen, da diese je gerade die höherwertigen Bits von SUM darstellen. Das Endprodukt, das sich in SUM bildet, kann bis zu 16 Bit lang werden. (In unserem Beispiel sind es immerhin schon 9 Bit.) Bild 1 zeigt eine elegante Realisierung des Algorithmus, die mit nur zwei Speicherplätzen auskommt.
 
+Die langen Rechtecke stellen die Speicherstellen MD, MR und den Akkumulator dar, fette Linien stehen für Bytepfade, dünne für Bitpfade.»+« versinnbildlicht die Addition A : = A + MD. In diesem Schema werden MR und A zusammen (wie ein 16-Bit-Register) nach links geschoben. Dadurch erscheinen die Bits von MR nacheinander in der Carry-Flagge und können so leicht abgefragt werden. MD wird nur dann zum Akku addiert, wenn das durch Linksverschiebungen aus MR gewonnene Bit Eins ist. Ein Übertrag bei der Addition in den Akku muß natürlich nach MR weitergegeben werden, da MR gleichzeitig auch die höherwertigen Bits von SUM enthält. Durch die doppelte Nutzung der Speicherstelle MR wird der Multiplikator zwar durch das höherwertige Byte von SUM überschrieben, man spart sich dadurch aber einen Schiebebefehl und einen Speicherplatz. Da wir wegen schnelleren Zugriffs MD und MR in der Zero-Page plazieren werden, und da der freie Platz dort knapp ist, ist die Einsparung von Speicherplatz durchaus gerechtfertigt. Hier das Programm, das ausführlich besprochen werden soll:
 
+TODO
 
+Die Zahlen in Klammern geben die Ausführungszeiten der Befehle in Taktzyklen an. Sie sind aus Tabelle 1 entnommen. Bei den Verzweigungen nehmen wir der Einfachheit halber an, daß keine Page-Grenzen übersprungen werden, sonst müßte man im Falle eines Sprunges vier statt drei Takte in Rechnung stellen. Zur Arbeitsweise des Programms: Zuerst wird SUM mit 0 vorbesetzt. Dazu genügt es, den Akku mit 0 zu besetzen, da die höherwertigen Bits von SUM erst durch den Schiebeprozeß entstehen. Das X-Register zählt die Schleifendurchläufe. Innerhalb der Schleife wird zunächst das Registerpaar (MR.A) durch das Befehlspaar ASL,ROL nach links verschoben. Beide Befehle schieben nach links, wobei Bit 7 in die Carry-Flagge geschoben wird. Der Unterschied der beiden Befehle besteht aber darin, daß ASL das Bit 0 immer mit Null besetzt, während ROL Bit 0 mit dem Wert besetzt, den die Carry-Flagge vor dem ROL-Be-fehl hatte. In unserem Fall ist das gerade das aus dem vorhergehenden ASL stammende Bit 7 vom Akku. Nach der Verschiebung zeigt das aus MR stammende Carry-Bit an, ob MD zu SUM addiert werden soll oder nicht. Falls nicht, wird mit BCC NEXT die Addition übersprungen. Die Addition selbst berücksichtigt durch ein weiteres BCC NEXT/ INC MR einen eventuell auftretenden Übertrag nach MR. Die Speicherstelle MR enthält zwar gleichzeitig Teile vom Multiplikator und von SUM, man kann sich aber überlegen, daß ein Übertrag nach MR nur den SUM-Teil, aber nicht den Multiplikator-Teil beeinflußt. Nach dem Verlassen der Schleife steht schließlich das 16-Bit-Produkt (die Variable SUM) im Registerpaar (MR.A). Der Multiplikator wurde überschrieben, der Multiplikant in MD dagegen ist unverändert erhalten geblieben.
 
+### Zeitbedarf
 
+Es soll hier exemplarisch gezeigt werden, wie man den genauen Zeitbedarf eines Maschinenprogramms ermittelt. Die Ausführungszeit des Multiplikationsprogramms ist nicht einheitlich. Sie hängt von den Anfangswerten von MR und MD ab, welche das Verhalten des Programms an den beiden Verzweigungsstellen (BCC NEXT) beeinflussen. Wir werden hier also den günstigsten (in bezug auf die Rechenzeit) und den ungünstigsten Fall untersuchen. Im ungünstigsten Fall muß bei jedem Schleifendurchlauf addiert werden, und zusätzlich tritt bei jeder Additon ein Übertrag auf. Der Zeitbedarf eines Schleifendurchlaufes beträgt dann:
+2(ASL) + 5(ROL) + 2(BCC) + 2(CLC) + 3(ADC) + 2(BCC) + 5 (INC) + 2(DEX) + 3(BNE) = 26 Takte
 
+Die Gesamtdauer der Multiplikation ergibt sich dann so:
+2(LDA) + 2(LDX) + 8*26(Schleife) -1 = **211**
 
+Die -1 kommt dadurch zustande, daß beim letzten Schleifendurchlauf bei BNE nicht gesprungen wird und dadurch nur 2 statt 3 Takte benötigt werden.
 
+Im günstigsten Fall (MR = 0, die Addition wird immer übersprungen) braucht die Schleife:
+2(ASL) + 5(ROL) + 3(BCC) + 2(DEX) + 3(BNE) = 16 Takte
+Gesamtdauer:
+2(LDA) + 2(LDX) + 8*16 (Schleife)-1 = 131
 
+Die Ausführungszeit der Multiplikation liegt also immer zwischen 131 und 211 Takten, wobei die Grenzwerte wohl selten erreicht werden dürften. Man kann im Mittel wohl mit zirka 170 Takten rechnen. Es ist für unsere Zwecke sehr wichtig, diese Größe zu kennen. Wenn wir in unserem Programm Modulator für einen Schritt eine Zeit von maximal 16,6 ms zur Verfügung haben, so können wir daraus eine theoretische Obergrenze für die Anzahl der in einem Schritt ausführbaren Multiplikationen ableiten. Sie liegt bei unserer 8-mal-8-Bit-Multiplikation etwa bei 75, wenn man den ungünstigsten Fall zugrundelegt.
 
+### Multiplikation mit größerer Wortlänge
 
+Bei Modulator wird die Multiplikation für folgende Zwecke benötigt: Die LFOs und der Hüllkurvengenerator erzeugen Werteverläufe mit maximaler Amplitude. Das bedeutet bei der 16-Bit-Zweierkomplement-Arithmetik, in der hauptsächlich gerechnet wird, daß die Werte den zur Verfügung stehenden Bereich von -32768 bis +32767 meistens voll ausschöpfen. Nun möchte man aber oft das Modulationsziel, zum Beispiel die Frequenz einer SID-Stimme, nur um einige Hertz nach oben und unten modulieren. Man möchte die Tiefe dieser Modulation aber auch möglichst kontinuierlich steuern können, so daß zum Beispiel auch Modulationstiefen von einer Quinte oder gar einer Oktave möglich sind. Aus diesem Grund muß das Modulationssignal erst mit einem geeigneten Skalierungsfaktor multipliziert werden. Anschließend kann es durch einfache Addition zur Zielgröße diese in dem gewünschten Sinn modulieren.
 
+Bei der Modulation von Tonhöhen ergibt sich außerdem noch ein weiteres Problem: Dort kommt es nicht auf absolute, sondern auf relative Frequenzverschiebungen an. Ein Beispiel: Ein 500-Hz-Ton wird um ±5 Hz moduliert. Um bei einem 1000-Hz-Ton den gleichen Effekt zu erzielen, muß man ihn um ± 10 Hz modulieren. Der Modulationsbetrag muß also bei Tonhöhen zusätzlich mit der zu modulierenden Frequenz selbst skaliert werden, was eine weitere Multiplikation erforderlich macht.
 
+Die Wortlängen der Modulationsziele sind:
 
+Tonfrequenzen	16 Bit
+Pulsweiten	12	Bit
+Filterfrequenz	8	Bit
+Lautstärke	4	Bit
+TODO
 
+Die Filterfrequenz ist beim SID zwar eine ll-Bit-Größe, da aber feine Frequenzunterschiede in der Filterfrequenz nicht hörbar sind, werden nur die oberen 8 Bit moduliert.
 
+Zur Steuerung der Modulationstiefe genügen 8-Bit. Eine fein gestufte Modulation ist ohnehin nur bei der Tonhöhenmodulation erforderlich. Hier genügt es aber, wenn das Modulationssignal selbst einen fein gestuften Verlauf (16 Bit) hat. Die durch 8 Bit realisierbaren 255 verschiedenen Modulationstiefen reichen aus, um alles vom feinsten Vibrato über Tonhöhensprünge in allen musikalisch sinnvollen Intervallen bis hin zur Sirene mit weitem Frequenzbereich zu verwirklichen.
 
+Wir benötigen also eine 16 x 8-Bit-Multiplikation. Der Algorithmus von Bild 1 ließe sich in diese Richtung leicht erweitern. Man kann etnweder MR auf 16 Bit verlängern und benötigt dann 16 statt 8 Schleifendurchläufe oder man verlängert MD und A auf 16 Bit. In letzterem Fall benötigt man weiterhin nur 8 Schleifendurchläufe wobei aber, im Falle einer Eins aus MR, zwei 16-Bit-Größen (MD und A) addiert werden müssen. Natürlich braucht man für das höherwertige Byte von A einen weiteren Speicherplatz in der Zero-Page.
 
+In Modulator wird ein anderer Weg eingeschlagen. Er wird durch Bild 2 beschrieben. Dieses erscheint zwar zunächst sehr kompliziert, daszugehörige Programm benötigt aber eine geringere Ausführungszeit. Vorgegeben sind ein 16-Bit-Multiplikator im Registerpaar (MR + 1.MR) und ein 8-Bit-Multiplikant in MD (Der Einfachheit halber werden hier Zero-Page-Speicherplätze »Register« genannt.) Das Ergebnis des Programms soll ein 24-Bit-Produkt im Register Tripel (MR + 1.MR.A) sein.
 
+Zuerst wird das niederwertige Teilprodukt MR x MD gebildet. Das Rechteck mit dem Kreuz steht für das Verfahren aus Bild 1, welche wie schon beschrieben, ein 8 x 8-Bit-Produkt in (MR.A) liefert. A wird im Y-Register zwischengspeichert. Anschließend werden MR +1 und MD ebenfalls nach Bild 1 multipliziert. Das Ergebnis ist das höherwertige Teilprodukt in (MR + l.A). Schließlich müssen die Teilprodukte nur noch mit richtiger Skalierung addiert werden. Dazu wird das höherwertige Byte des niederwertigen Teilprodukts, das in MR steht, zum niederwertigen Byte des höherwertigen Teilprodukts, das sich schon im Akku befindet, addiert. Dabei muß ein eventueller Übertrag nach MR +1 berücksichtigt werden. Das niederwertige Byte des niederwertigen Teilprodukts wird nur noch vom Y-Register in den Akku übertragen, wo es den niederwertigsten Teil des Endprodukts darstellt. In Modulator werden allerdings grundsätzlich nur 16-Bit-Größen weiterverarbeitet, so daß diese untersten 8 Bit des Produktes unberücksichtigt bleiben.
 
+Im Source Listing zu Modulator steht das zugehörige Programm MULU in den Zeilen 1680 bis 1970. Zunächst steht dort zweimal hintereinander das schon vorgestellte 8 x 8 Bit-Multiplikationsprogramm, anschließend werden ab Zeile 1910 die Teilprodukte addiert. Eine Analyse ergibt eine Laufzeit von minimal **282** Takten und maximal **446** Takten.
 
+Alle bisher beschriebenen Multiplizierer arbeiten nur dann korrekt, wenn man die Faktoren als positive Ganzzahlen interpretiert. Sie sind ohne Ergänzung nicht für Zweierkomplement-Größen geeignet. Das Programm MULS ab Zeile 2020 ist eine solche Ergänzung. Es berücksichtigt das Vorzeichen des Multiplikators. Ist dieser positiv, so wird sofort nach MULU verzweigt. Ein negativer Multiplikator wird zunächst negiert, wodurch er positiv wird (Zeile 2040 bis 2100), MULU wird als Unterprogramm aufgerufen, und schließlich wird das positive Produkt noch einmal negiert, was dann ein korrektes Resultat liefert. Der 8-Bit-Multiplikant wird aber nach wie vor nur als positive Zahl behandelt.
 
+### Die LFOs
 
+Sie erzeugen die für Modulationen sinnvollen Kurvenverläufe als Folge von 16-Bit-Zweierkomplement-Zahlen. Am häufigsten wird die Dreieckskurve benötigt, da sie keine Sprünge macht und daher bei Anwendung auf Tonhöhen und auf Pulsweiten am angenehmsten klingt. Der Sägezahn eignet sich mehr für »härtere Effekte und für Videospiele, wo stark und schnell modulierte Töne oft zu hören sind. Die Rechteckkurve eignet sich für Triller (bei Frequenzmodulation), für mandolinenartige Effekte (bei Modulation von Lautstärke und Filterfrequenz) sowie für rhythmische Effekte (bei Frequenzmodulation mit größerer Modulationstiefe).
 
+Rechnerisch kann man einen Sägezahnförmigen Wertverlauf besonders einfach erzeugen. Bei Modulator wird einfach ein 16-Bit-Wert zyklisch hochgezählt. Zyklisch bedeutet, daß immer wieder beim Minimalwert angefangen wird, wenn der Maximalwert überschritten wird. Das geschieht bei begrenzterWortlän-ge automatisch durch Überlauf, den man hier absichtlich unberücksichtigt läßt. Im Modulator-Programm wird der Werteverlauf durch das Wort (= Bytepaar) SAWUP repräsentiert. SAWUP wird einfach um den Betrag im Wort LFOF hochgezählt. Dadurch ist die resultierende Frequenz der Sägezahnkurve direkt proportional zum Wert LFOF. Im Programm wird in Zeile 2300 bis 2420 erst das Steuerregister LFOC abgefragt. Im Falle des HOLD- oder RESET-Status braucht nichts berechnet zu werden. Im Falle des RUN-Status wird SAWUP in den Zeilen 2430 bis 2510 hochgezählt. Der aufsteigende Sägezahn wird dann gewissermaßen als »Master« für die anderen Kurvenformen herangezogen. Bild 3 zeigt, wie diese aus SAWUP gewonnen werden.
 
+Interessant ist, daß gleichgültig, ob man die SAWUP-Werte im Zweierkomplement oder grundsätzlich positiv interpretiert, sich immer der gleiche Kurvenverlauf ergibt (gestrichelte und durchgezogene Kurve bei SAWUP).
 
+Die Rechteckkurve entsteht dadurch, daß man, gesteuert durch SAWU, zwischen den Extremwerten + LFOA x 2 (hoch) 7 und -LFOA x 2 (hoch) 7 hin- und herschaltet. Man spart sich so die sonst anschließend fällige Multiplikation mit der LFO-Amplitude (= Modulationstiefe) LFOA. Hin- und hergeschaltet wird, wenn der Sägezahnwert einen vorgegebenen Schwellwert über- beziehungsweise unterschreitet. Dieser Schwellwert ist nichts anderes als die Pulsweite LFOP. SAWDOWN erhält man einfach durch Negieren von SAWUP. Bildet man das Maximum von SAWUP und SAWDOWN, so erhält man einen dreieckförmigen Kurvenverlauf, der allerdings nur positive Werte annimmt. Durch Verdoppeln dieser Werte und Verschiebung um 2 (hoch) 15 nach unten erhält man dann eine symmetrische Dreieckskurve maximaler Amplitude.
 
+Im Programm wird in Zeile 2530 bis 2590 aus LFOC ermittelt, welche Kurvenform überhaupt erzeugt werden soll, und entsprechend weiterverzweigt. Mit Ausnahme des Rechtecks, das schon mit seiner endgültigen Amplitude aufwartet, wird der errechnete Wert noch mit der Amplitude LFOA multipliziert (Zeile 3090 bis 3170). Das LFO-Programm rechnet alle 7 LFOs. Dabei wird auf die jeweiligen Parameter indiziert zugegriffen. Das Byte LFONR enthält dazu einen Adreß-Offset, der vom LFO-Programm in das X-Register geladen wird. Dieser Offset muß vom Programm, welches das LFO-Programm aufruft, korrekt zur Verfügung gestellt werden.
 
+### Aliasing-Parasitäre Frequenzen
 
+Bei der eben beschriebenen Erzeugung der LFO-Kurvenfor-men tritt bei etwas höheren Frequenzen, etwa ab 10 Hz, noch ein interessantes Phänomen auf. Man kann die Erzeugung eines Sägezahnverlaufs durch zyklisches Hochzählen eines Wortes auch als Abtastung einer hypothetischen, kontinuierlichen Sägezahnkurfe auffassen. Die Abtastfrequenz ist in unserem Fall mit 60 Hz fest. Die Frequenz der hypothetischen Sägezahnkurve kann man aber durch den Parameter LFOF sehr feinstufig zwischen 0 und 60 Hz variieren. Wie soll aber zum Beispiel eine LFO-Kurve mit 50 Hz aussehen, wenn man nur 60 Äbtastwerte pro Sekunde hat? Die Antwort gibt Bild 4. Man erhält den gestrichelten Verlauf mit einer Frequenz von nur 10 Hz. Noch seltsamer sieht das Resultat bei einer LFO-Fre-quenz von 25 Hz aus. Die Folge der Abtastwerte schwingt zwar ungefähr im Rhythmus von 25 Hz, dieser Bewegung ist aber zusätzlich ein Auf und Ab im 10-Hz-Rhythmus überlagert.
 
+Der theoretische Hintergrund dieser Erscheinung sei hier nur gestreift: Nach dem Abtasttheorem muß die Abtastfrequenz mindestens doppelt so hoch sein, wie die höchste im abzutastenden Signal vorkommende Frequenz, damit die Abtastfolge dieses Signal richtig repräsentiert. Andernfalls weist die Abtastfolge Frequenzanteile auf, die im Originalsignal gar nicht vorkommen. Man nennt diesen Effekt Aliasing (von lat. alias = anderswo). In unserem Fall können die Bedingungen des Abtasttheorems nie vollständig erfüllt werden, da der ideale Sägezahn Obertöne beliebig hoher Ordnung enthält. Im ersten Fall von Bild 4 wird das Abtasttheorem grob verletzt: Die Abtastfrequenz ist bei weitem nicht doppelt so groß wie die Signalfrequenz. Als Resultat tritt nur eine Aliasing-Frequenz von 10 Hz auf. Im zweiten Fall wird das Abtasttheorem immerhin für die Grundschwingung des Signals erfüllt. 60 Hz ist mehr als doppelt so groß wie 25 Hz. Die 25 Hz sind in der Folge der Abtastwerte auch erkennbar. Die zweite Harmonische des Signals ist aber mit 50 Hz schon zu hoch für die Abtastung. Ihre Amplitude beträgt immerhin die Hälfte der Amplitude der Grundschwingung, wie eine Fourier-Analyse ergibt. Und genau diese Harmonische findet man auch hier als eine Aliasing-Frequenz von 10 Hz in der Folge der Abtastwerte wieder.
 
+Aliasing tritt auch schon bei niedrigeren LFO-Frequenzen als 25 Hz auf. Der Effekt wird dann aber schwächer, weil die dafür verantwortlichen Obertöne von höherer Ordnung und damit von niedrigerer Amplitude sind. Mit dem Aliasing-Effekt kann man bei bewußtem Einsatz zusätzliche interessante Modulationen verwirklichen.
 
+### Wie es weitergeht
 
+Nach diesem etwas anstrengenden theoretischen Teil werden wir uns in der nächsten Folge wieder der Tonerzeugung selbst zuwenden. Zunächst werden noch der Hüllkurvengenerator und der Portamento-Me-chanismus von Modulator beschrieben, anschließend wird ein komfortables Editorprogramm vorgestellt, das ein schnelles, interaktives Manipu-leren aller Modulator- und SID-Parameter ermöglicht. Mit dem Programm kann direkt über die Tastatur gespielt werden, und es können Sound-Parametersätze auf Diskette verwaltet werden. Dieses Programm soll dann in einer weiteren Folge zu einem kompletten dreistimmigen Sequenzer erweitert werden. Als Besonderheit wird dieses Programm unabhängige Melodier/ Sound-Files erzeugen können, die für sich allein lauffähig sind. Die so erstellten Klangschöpfungen können dann in andere Programme eingebaut werden.
 
+(Thomas Krätzig/aa)
 
+# Effektives Programmieren (5): Sortieren in Basic — Teil 2
 
+> Einfache Sortieralgorithmen sind leider auch die langsamsten. Dennoch lassen sie sich durch einige kleinere Änderungen noch erheblich verbessern, so zum Beispiel Bubblesort. Wesentlich komplizierter ist da schon Shellsort, dafür aber auch schneller. Wir zeigen Ihnen, wie es funktioniert.
 
+In der ietzten Folge beschäftigten wir uns mit straight insertion und mit Bubblesort, zwei sehr einfachen Sortieralgorithmen. Diesmal wollen wir das Niveau schon ein wenig anheben, um uns dem eigentlichen Ziel unseres Kurses langsam zu nähern. Letztendlich geht es uns nur darum, eine möglichst schnelle und effektive Sortiermethode für praktische Anwendungen zu suchen. Fangen wir deshalb gleich einmal mit der Verbesserung eines Sortieralgorithmus an, der letztes Mal besprochen wurde.
 
+Haben Sie sich mit Bubblesort schon intensiver beschäftigt? Wenn ja, werden Sie auch ganz bestimmt dessen Schwächen ausfindig gemacht haben. Wir erinnern uns: Bubblesort fängt am Anfang eines Variablenfel-des an und vergleicht die beiden ersten Variablen. Steht die größere der beiden weiter vorne, so werden die Variablen vertauscht. Jetzt vergleicht er die zweite mit der dritten Variablen des Arrays und setzt dieses Vergleichen und Austauschen solange fort, bis das gesamte Feld durchgearbeitet ist und die größte Variable jetzt am Ende des Arrays steht. Als nächstes wird das Variablenfeld um die letzte Variable vermindert, so daß jetzt der zweitgrößte String auf die gleiche Art und Weise »nach unten« befördert wird. Diese Vorgänge wiederholen sich so lange, bis nur noch eine Variable übrigbleibt, die jetzt die kleinste ist.
 
+## Bubblesort optimiert
 
+Nun aber zu den Schwächen von Bubblesort. Ist Ihnen beim Ausprobieren des Programms aus der letzten Folge vielleicht aufgefallen, daß Bubblesort sehr »stur« arbeitet? Es kann nämlich ohne weiteres passieren, daß ein Feld bereits nach dem dritten Durchgang vollständig sortiert vorliegt. Dies wird von Bubblesort jedoch nicht erkannt. Der Computer »sortiert« weiter, bis alle Durchläufe erledigt sind.
 
+Dieses Problem können wir ganz einfach lösen, indem wir ein Flag einsetzen, das uns anzeigt, ob im letzten Durchgang noch eine Vertauschung stattgefunden hat. Wurde kein Tausch mehr vorgenommen, so wird der Sortiervorgang beendet. Dieses Flag ist schon eine ziemliche Verbesserung gegenüber der Rohversion, aber wir wollen uns damit noch nicht zufriedengeben.
 
+Es kann beim Sortieren auch durchaus der Fall eintreten, daß im letzten Durchlauf nur noch beispielsweise drei Vertauschungen im ersten Drittel des Feldes stattgefunden haben. Die letzten beiden Drittel des Feldes sind also bereits sortiert.
 
+Damit Bubblesort auch diesen Fall erkennt, wird eine zweite zusätzliche Variable eingeführt, die die Position der jeweils letzten Vertauschung eines Durchlaufes beinhaltet. Es wird nun im weiteren Verlauf immer nur bis zu dieser Position gearbeitet, da der Rest des Feldes bereits sortiert vorliegen muß.
 
+Mit diesen beiden Verbesserungen wollen wir es aber bereits gut sein lassen (Listing 1, Bild 1). Der neue Bubblesort-Algorithmus arbeitet besonders bei schon teilsortierten Feldern ziemlich effizient; ist der »alten« Version jedoch bei total vermischten Feldern infolge der zusätzlichen (Zeit verbrauchenden) »Erweiterungen« unterlegen.
 
+Bubblesort soll uns nun nicht weiter beschäftigen, denn trotz seines wohlklingenden Namens ist er so ziemlich der langsamste Algorithmus, den es gibt.
 
+An dieser Stelle gleich einmal ein paar Bemerkungen zur Zeitmessung: Die jetzt vorgestellten Algorithmen, die Sie jeweils als Listings abgedruckt finden, sind in der Form zur Zeitmessung natürlich nicht geeignet. Das liegt daran, daß die Programme so aufgebaut sind, daß Sie den Algorithmus leicht nachvollziehen können, was natürlich aufKosten der Geschwindigkeit geht und die Ergebnisse verfälschen würde.
+
+Im abschließenden Artikel über die Sortiermethoden werden wir die einzelnen Programme jedoch auch unter dem Aspekt »Zeit« einander gegenüberstellen. Hier werden wir auch auf das Problem der Garbage Collection eingehen, die uns beim Sortieren von größeren Feldern, je nach Algorithmus, ganz schön in Schwierigkeiten bringen kann, wenn es um eine Zeitmessung geht.
+
+Ein weiteres Problem bei der Zeitmessung ist aber auch die Eigenart der einzelnen Sortiermethoden. Ich erwähnte schon in der letzten Folge, daß es natürliche und unnatürliche Algorithmen gibt, wobei die natürlichen dann am schnellsten arbeiten, wenn das Feld schon sortiert vorliegt.
+
+Für die Mathematiker unter Ihnen istjedem Sortieralgorithmus eine kleine Formel zur Berechnung der mittleren (!) Sortierzeit beigefügt. Diese Formel dient nur der Gesamtbetrachtung und zeigt jeweils, warum die einen Algorithmen so langsam und andere wesentlich schneller sind.
+
+## straight selection
+
+Nun aber zu einer neuen Sortiermethode. Es handelt sich hierbei um ein Sortieren durch direktes Auswählen, was durch einen englischen Ausdruck wieder passend beschrieben wird: straight selection.
+
+Auch straight selection ist ein relativ einfacher Algorithmus, dessen Funktionsweise wir uns gleich etwas näher betrachten wollen (Bild 2).
+
+Im ersten Durchgang sucht der Computer nach dem größten Element im Feld. Wird dieses gefunden, so erfolgt eine Vertauschung zwischen diesem Element und dem allerletzten des Feldes, da die größte Variable logischerweise am Schluß stehen muß. Jetzt wird die Länge des Feldes durch Wegnahme des letzten Elements um 1 vermindert. Danach wird in diesem »Rest-Array« wiederum nach dem größten Element gesucht und dieses ebenfalls mit dem letzten Element (das jetzt das vorletzte des Gesamtfeldes ist) vertauscht. Dieser Vorgang wiederholt sich so lange, bis die Länge des Restfeldes 1 ist und wir an erster Position zwangsläufig das kleinste Element erhalten.
+
+In Bild 3 können Sie die Arbeitsweise von straight selection an einem praktischen Beispiel nachvollziehen, wobei immer jene Elemente unterstrichen sind, die im nächsten Schritt einsortiert werden.
+
+Natürlich funktioniert straight selection auch andersherum, das heißt Sie können jeweils nach dem kleinsten Element suchen und dieses dann mit dem an erster Stelle stehenden Element vertauschen.
+
+Um Ihnen auch die Zeitver-hältnisse zu beschreiben, oder um Ihren mathematischen Geist zu beflügeln (wie Sie wollen), seien an dieser Stelle einmal wieder zwei Formeln über straight selection aufgestellt.
+
+Für seine Arbeit benötigt straight selection eine mittlere Anzahl von Vergleichen, die in etwa durch die folgende Formel angenähert werden, wenn wir davon ausgehen, daß a die Anzahl der zu sortierenden Elemente enthält:
+Anzahl Vergleiche: $$\frac{a^2 - a}{2}$$
+
+Für die Anzahl der Bewegungen innerhalb der Arrays gilt folgende Beschreibung:
+Anzahl Bewegungen: $$a - 1$$
+
+Mit straight selection haben wir unter anderem gleich das erste Beispiel für einen unnatürlichen Sortieralgorithmus. Wenn wir ein Feld bearbeiten wollen, das schon sortiert vorliegt, so braucht unser Programm sehr lange, um das größte Element ausfindig zu machen, da wir von vorne mit dem Suchen beginnen. Bearbeiten Sie also meistens schon teilsortierte Felder, so ist es ratsam, mit der Suche des größten Elements von hinten zu beginnen. Die Umstellung des Programms in Listing 2 dürfte Ihnen keine Schwierigkeiten bereiten, da lediglich die Suchschleife umzudrehen und mit STEP1 zu versehen ist.
+
+So, das wäre auch schon alles, was zu straight selection zu sagen ist. Wie Sie sehen, ist das immer noch ein sehr einfacher Algorithmus, der in etwa mit straight insertion gleichzusetzen ist, was die Effektivität betrifft. Diese Gleichsetzung gilt aber natürlich nur für zufallsbesetzte Felder.
+
+## Shellsort
+
+Der nächste Sortieralgorithmus trägt den Namen seines Erfinders (D.L.Shell) und wurde 1959 entwickelt. Es handelt sich hierbei schon um einen komplizierteren Algorithmus, den wir deshalb sehr ausführlich besprechen wollen (Bild 4). Shellsort ist ein Sortieren durch direktes Einfügen und gehört damit der gleichen »Familie« wie straight insertion an.
+
+Durch entsprechende Berechnungen hatte Shell herausgefunden, daß sich Sortiervor-gänge beschleunigen lassen, wenn nicht nur benachbarte Elemente miteinander verglichen werden, sondern auch weiter voneinander entfernte. Wir vergleichen also beispielsweise nicht mehr das erste Element mit dem zweiten, sondern vielmehr das erste mit dem fünften.
+
+Durch diese Methode erreicht man eine gewisse »Grobsortierung«, die sich jedoch gleichmäßig über das gesamte Feld verteilt. Das so neu entstandene Va-riablenfeld wird wiederum sortiert, wobei jetzt aber das erste mit dem dritten Element verglichen wird. Die Sortierung wird also durch abnehmende Abstände zunehmend »feiner«, bis beim Abstand 1 die letzte, absolute Sortierung erfolgt.
+
+Unklar? Keine Angst, wir werden das gleich einmal an einem praktischen Beispiel erläutern.
+
+Sehen Sie sich Bild 5 an. Hier haben wir ein zufällig geordnetes Feld mit zehn Elementen. Als ersten Abstandswert nimmt Shellsort üblicherweise a/2, also die Hälfte der Gesamtanzahl der Elemente. In unserem Fall ist das 5.
+
+Aus diesem umsortierten Feld holen wir jetzt alle Zahlen zu Untereinheiten zusammen, die den Abstand (besser: die Schrittweite) 5 haben. In Bild 5 sehen Sie diese Zusammenstellungen: Es wurde also jeweils das 1. mit dem 6., das 2. mit dem 7., das 3. mit dem 8., das 4. mit dem 9. und das 5. mit dem 10. Element zu einer Einheit zusammengefaßt.
+
+Da die Schrittweite 5 ist, kann jede Untereinheit verständlicherweise nur zwei Elemente enthalten. Nun, was sollen wir jetzt mit diesen Untereinheiten machen?
+
+Diese werden sortiert, und zwar verwenden wir dabei einen einfachen und unkomplizierten Sortieralgorithmus, wie zum Beispiel straight insertion.
+
+Wir sortieren also die erste Untereinheit, aus(9,7) wird (7,9). Jetzt schreiben wir diese Untereinheit wieder an die gleiche Position in unser Feld zurück, wobei jedoch die 7 dort steht, wo vorher die 9 stand und umgekehrt. Dann sortieren wir die zweite Untereinheit und schreiben sie ebenso zurück. Das geschieht so lange, bis alle Untereinheiten abgearbeitet worden sind und wir wieder ein vollständiges Array erhalten.
+
+Jetzt wird die Schrittweite 5 halbiert und die Nachkommastelle des Ergebnisses abgeschnitten. Wir erhalten als neue Schrittweite 2. Wieder legen wir uns Untereinheiten an, wobei wir jedoch nur mehr zwei Untereinheiten zu je fünf Elementen bekommen. Wichtig für die Programmentwicklung ist an dieser Stelle die Entdeckung, daß die Anzahl der Untereinheiten grundsätzlich der Schrittweite entspricht.
+
+Auch hier wird mit den Untereinheiten wieder verfahren, wie oben. Sie werden sortiert und wieder in das ursprüngliche Array zurückgeschrieben. Das Ergebnis des letzten Durchlaufes können Sie wieder in Bild 5 ablesen. Der nächste Durchlauf ist schon der letzte; hier ist die Schrittweite nunmehr 1 und es erfolgt eine Schlußsortierung des gesamten Feldes.
+
+Daß Shellsort so schnell ist, obwohl er einige vollständige Sortierläufe als Unterprogramme verwendet, liegt daran, daß das Sortierunterprogramm jeweils ziemlich optimierte Einheiten zur Bearbeitung bekommt. Auch beim letzten Durchgang, wo ja nochmals das gesamte Feld durchsortiert wird, sind die Elemente schon so angeordnet, daß eine Sortierung ohne viele Bewegungen möglich ist. Listing 3 enthält die Shellsortroutine, wobei als Unterprogramm ab Zeile 20 000 straight insertion verwendet wird. Sie können einmal verschiedene Algorithmen in Shellsort verwenden; vielleicht finden Sie eine optimale Zusammenstellung? Das Unterprogramm bearbeitet das Array AA$(x) und erwartet die Anzahl der Elemente in AA.
+
+Wenn Sie sich einmal den Beispielausdruck zu Shellsort betrachten (Bild 6), so werden Sie feststellen, daß dieser Algorithmus nur mehr drei Durchgänge für zehn Elemente benötigt. Diese Zahl läßt auf ein gutes Ergebnis hoffen. In der Tat haben wir mit Shellsort schon ein sehr gutes Sortierprogramm, das vielen praktischen Anwendungen gewachsen sein dürfte. Gegenüber der vorher besprochenen Sortieralgorithmen arbeitet Shellsort um einiges schneller, was besonders bei größeren Feldern angenehm auffällt. Für die Schrittweite können übrigens auch andere abfallende Reihen verwendet werden, die mit 1 aufhören. Es hat sich nämlich gezeigt, daß die Wahl der richtigen Reihe entscheidend zur Geschwindigkeit von Shellsort beiträgt.
+
+Wollen wir zu Shellsort eine mathematische Berechnung liefern, wird’s schwierig. Dieser Algorithmus ist bereits dermaßen komplex, daß eine Berechnung fast unmöglich wird. Es kann an dieser Stelle nur eine Aussage über die mittlere Sortierzeit gemacht werden, die sich in etwa im Bereich um aL2 bewegt, wobei a wiederum die Anzahl der zu sortierenden Elemente darstellt.
+
+So, mit Shellsort haben wir uns nun endgültig von den einfachen Sortieralgorithmen losgesagt. Wie Sie sehen, kann eine höhere Komplexität der Programme und ein damit verbundener größerer Zeitbedarf, ohne weiteres die Nachteile von einfacheren Programmen aufwiegen. Aber auch hier kommt es natürlich auf die Art der Aufgabenstellung an. Shellsort verträgt zum Beispiel keine umgekehrt sortierten Arrays. Hier wird auch dieser schnelle Sortieralgorithmus langsam.
+
+In der nächsten Folge wollen wir uns ausschließlich mit einem einzigen Sortierprogramm beschäftigen. Es handelt sich um Heapsort. Dieser Algorithmus arbeitet nach dem »Baumprinzip« und ist sehr kompliziert. Aus diesem Grund wollen wir uns ausführlich mit ihm beschäftigen, denn wir haben es dann mit einem der schnellsten Algorithmen zu tun, den es gibt.
+
+(Karsten Schramm/gk)
+
+# Funktionen für Anfänger
+
+> Auch in Basic kann man Befehle selber entwickeln, zumindest einen bestimmten Typ von Befehl. Und dazu braucht man keine Maschinensprache und keinen Assembler, sondern nur den gesunden Menschenverstand, wie man ihn auch sonst beim Programmieren einsetzt. Gemeint sind die »benutzerdefinierten Funktionen«.
+
+Anfänger haben mit der Definition von neuen Befehlen oft Schwierigkeiten. Das liegt aber nicht an den Anfängern, sondern eher an den meist recht verwirrenden Erklärungen der Handbücher. Handbücher sind zumeist von Computerexperten geschrieben, die oft vergessen, daß ihre Leser erst noch Experten werden wollen und deshalb zunächst mit Begriffen wie »Dummy-Variable« oder »Übergabeparameter« und was es sonst noch an stolzen Termini gibt, nichts anfangen können. Ich jedenfalls konnte es nicht und habe deshalb lange gebraucht, bis ich selbstgestrickte Funktionen so selbstverständlich in meinen Programmen benutzte wie zum Beispiel PRINT.
+
+Vergessen Sie also alles, was Sie bisher verwirrt haben mag, und fangen Sie, zusammen mit mir, noch einmal von vorne zu denken an.
+
+Ich will in drei Schritten vorgehen. Wir wollen zunächst klären, was Funktionen überhaupt sind, was für Eigenschaften sie haben, was sie tun, wofür man sie braucht. Auf dem Hintergrund dieser allgemeineren Informationen wollen wir uns in einem zweiten Schritt der Herstellung eigener Funktionen widmen. Ein drittes Kapitel soll dann ein paar speziellere Hinweise geben. Ein kleiner Anhang schließlich wird ein paar einfache Funktionen zusammenstellen, die nicht die Welt bewegen, sondern nur Sie anregen sollen, sich eine eigene Funktionen-Bi-bliothek aufzubauen.
+
+## 1.	Funktionen in Basic
+
+### 1.1	Was ist eine Funktion?
+
+Eine Funktion ist ein Befehl, der den Computer anweist, eine Zahl oder einen Text (Zeichenkette, »String«) zu erzeugen. Die RND-Funktion zum Beispiel erzeugt eine Zufahszahl; die Funktion LEFT$ erzeugt eine Zeichenkette.
+
+Es gibt zwei Grundtypen von Funktionen: solche, die lediglich Daten (Zahlen oder Zeichenketten) ausgeben, und solche, denen man Daten (Zahlen oder Zeichenketten) eingibt, die sie dann in anderer Form wieder ausgeben. Wir wollen die einen Ausgabe-Funktionen nennen und die anderen Eingabe-Ausgabe-Funktionen (Bild 1).
+
+Die oben genannte RND-Funktion ist in diesem Sinne eine reine Ausgabe-Funktion. Ausgegeben wird eine Zufallszahl zwischen 0 und 1. Die INT-Funktion hingegen ist eine Eingabe-Ausgabe-Funktion. Eingegeben wird eine Zahl, zum Beispiel 12.78, ausgegeben werden die Ziffern vor dem Komma, also 12 (Bild 2).
+
+Die Funktion INT erzeugt eine Zahl aus einer anderen Zahl; die Funktion LEFT$ erzeugt einen Text aus einem Text. Es geht aber auch »überkreuz«. Die Funktion LEN erhält als Eingabedatum einen Text und gibt eine Zahl aus, während umgekehrt die Funktion STR$ aus einer Zahl einen Text macht (Bild 3).
+
+Fassen wir zusammen: In (Commodore-) Basic finden wir die folgenden sechs Typen von Funktionen (Bild 4).
+
+Eine kleine Anmerkung noch: Die Befehle SPC und TAB, im Commodore-Handbuch unter der Überschrift »Funktionen« aufgeführt, sind in unserem Sinne keine Funktionen, da sie keine Daten erzeugen, sondern etwas bewirken, so wie zum Beispiel PRINT etwas bewirkt.
+
+### 1.2	Mitteilungen an die Funktion
+
+Wenn eine Funktion eine Zahl in eine andere umwandeln soll, dann muß ihr die Zahl in irgendeiner Weise mitgeteilt werden. Für Mitteilungen an Funktionen ist ein bestimmter Platz vorgesehen, nämlich die Klammern, die jedem Funktionsnamen (in Basic) folgen (Bild 5).
+
+Die Information, die eine Funktion braucht (sofern sie überhaupt eine braucht), kann von zweierlei Art sein: Es kann sich einmal um ein Eingabedatum handeln, das von der Funktion bearbeitet werden soll (zum Beispiel INT (12.78)), oder um Informationen darüber, wie die Funktion arbeiten soll. Daraus ergeben sich die folgenden Möglichkeiten (Bild 6).
+
+Ein paar Beispiele zur Illustration:
+Die Funktion POS, die ausgibt, in welcher Bildschirmspalte sich der Cursor gerade befindet, weiß alles, was sie wissen muß, um ihre Aufgabe erfüllen zu können; der Programmierer muß ihr also keinerlei Informationen mitgeben. Da POS nun aber eine Funktion ist, ist ein Platz für Mitteilungen vorgesehen, das heißt der Programmierer muß die dem Funktionsnamen folgenden Klammern mit irgend etwas füllen. Der Einfachheit halber nimmt man dafür »0«: POS (0). Wenn Sie unbedingt wollen, können Sie auch irgend etwas anderes in die Klammern stecken, zum Beispiel »X« oder Ihren Namen — die Mitteilung landet in jedem Fall im Papierkorb, der Computer ignoriert sie.
+
+Nicht im Papierkorb landet die Eingabezahl, die Sie zum Beispiel der Funktion SQR mitgeben. So berechnet SQR (25) die Wurzel aus 25, erzeugt also die Zahl 5.
+
+Ebensowenig ignoriert wird eine Mitteilung, die Sie der Ausgabe-Funktion PEEK mitgeben. In diesem Fall wird die Information als Arbeitshinweis aufgefaßt: PEEK (2048) schaut in der Speicherzelle 2048 nach und sagt Ihnen dann, welchen Inhalt es gefunden hat.
+
+Manchmal benötigt eine Funktion beide Arten von Information, so etwa die Funktion LEFT$. Sie muß zuerst wissen, was für ein String bearbeitet werden soll, und dann, wie lang der auszugebende String zu sein hat: LEFT$ (”Commodore”,4) ergibt den Ausgabe-String "Comm”. Mehrere Mitteilungen werden durch Kommata voneinander getrennt.
+
+Natürlich können auch mehr als zwei Mitteilungen mitgegeben werden. Die Funktion MID$ benötigt, wie Sie wissen, im Normalfall drei: das Eingabedatum und zwei Arbeitshinweise (an welcher Stelle der Schnitt im Eingabe-String gemacht werden und wie lang der Ausgabe-String sein soll). MID$ ("Commo-dore",4,5) ergibt also "modor”.
+
+Vielleicht sollte zum Schluß noch angemerkt werden, daß Art und Anzahl der Informationen, die einer Funktion mitgeteilt werden können, natürlich nicht dem Belieben des Programmierers anheimgestellt, sondern für jede Funktion vorgegeben sind. Dasselbe gilt für die Reihenfolge, in der die verschiedenen Informationen angegeben werden.
+
+Nun weiß eine Funktion also alles, was sie wissen muß, um ihre Arbeit zur Zufriedenheit des Programmierers zu tun — aber wohin mit dem Ergebnis, das sie erzeugt?
+
+### 1.3	Wohin mit dem Ergebnis?
+
+Das Datum, das eine Funktion erzeugt, eine Zahl oder ein Text, muß ihr irgendwie abgenommen werden.
+
+Man kann das Ergebnis auf den Bildschirm bringen, zum Beispiel PRINT INT (12.78); man kann es einer Variablen zuordnen, zum Beispiel B$ = MID$ (”Commodore”,4,5); man kann es für einen Vergleich benutzen, zum Beispiel IF PEEK (214) = 24 THEN PRINT CHR$ (147).
+
+Mit einem Wort: Die durch Funktionen erzeugten Zahlen und Zeichenketten werden genauso verwendet wie Zahlen und Zeichenketten. Genauso wenig wie der Computer die isolierte Zahl 3.5 oder den isolierten String »Commodore« verstehen würde, genauso wenig versteht er ein alleinstehendes INT (12.78). Man muß ihm immer sagen, was er mit einer Zahl, einem Text oder einer Funktion (das heißt mit dem Ergebnis, das sie erzeugt) tun soll.
+
+Und wozu überhaupt Funktionen?
+
+### 1.4	Der Daseinszweck von Funktionen
+
+Je mehr Funktionen eine Programmiersprache zur Verfügung stellt, um so leichter ist das Programmieren. Funktionen nehmen Programmierarbeit ab. Lassen Sie mich dies an zwei Beispielen illustrieren.
+
+#### Beispiel 1: Die Funktion ABS
+
+Die Funktion ABS erzeugt aus einer Zahl deren absoluten Wert, zum Beispiel aus 5 oder —5 den Wert 5. Ein Commodore-Programmierer schreibt also einfach:
+**110 WERT = ABS (ZAHL)**
+
+Es gibt aber Computer, die diese Funktion nicht kennen; in diesem Fall muß der Programmierer eine spezielle Programmroutine schreiben, und das sieht dann zum Beispiel so aus (Bild 7).
+
+Die armen Programmierer, die keinen Commodore haben! Andererseits sind wir Commodore-Programmierer arm dran, wenn wir zum Beispiel wissen wollen, ob die Zeichenkette B$ (»UTE«) in der Zeichenkette A$ (»COMPUTER«) enthalten ist, und wenn ja, ab welcher Stelle. Das geht ungefähr so (Bild 8).
+
+#### Beispiel 2: Die Funktion INSTR
+
+PO enthält den Wert 5, was bedeutet, daß »UTE« gefunden wurde und in Position 5 beginnt. Wenn PO = 0 bleibt, dann wurde der Suchstring gefunden.
+
+Ach, gäbe es doch eine Funktion, die uns diese ganze Programmierarbeit abnimmt! Tatsächlich gibt es sie bei anderen Computern, und sie heißt meist INSTR. Wenn der Programmierer sie hat, dann schreibt er zum Beispiel einfach
+**140 PO = INSTR(A$,B$)**
+
+Daß Funktionen das Programmieren erleichtern, daß sie dazu Programme kürzer, übersichtlicher und lesbarer machen, daß sie schließlich den Programmablauf beschleunigen, dürfte nun leicht einleuchten.
+
+Es ist deshalb kein Wunder, daß es viele Versuche gibt, das eingebaute Basic durch zusätzliche Funktionen zu erweitern; zum Beispiel durch einzelne Routinen in Maschinensprache, die eine einzelne erwünschte Funktion zur Verfügung stellen; oder durch spezielle Basic-Erweiterungen wie Simons Basic (für den C 64) oder Exbasic Level II oder Macro Basic.
+
+Wer Maschinensprache beherrscht und seinen Computer kennt, kann sich seine Erweiterungen jeweils nach Bedarf selber anfertigen. Wer beides nicht beherrscht, braucht aber auch nicht zu verzweifeln; denn, wie zu Beginn angedeutet: Es gibt auch in Basic die Möglichkeit, Funktionen selber zu basteln. Und wenn auch die Möglichkeiten von Commodore-Basic nicht das sind, was sie vielleicht sein könnten, sie sind noch immer größer als der Anfänger im allgemeinen weiß.
+
+## 2.	Selbstdefinierte Funktionen
+
+### 2.1	Die möglichen Typen
+
+Im Commodore-Basic können Funktionen, die Zahlen ausgeben, selber gemacht werden, und zwar sowohl vom Typ Ausgabe-Funktion als auch vom Typ Eingabe-Ausgabe-Funktion. Die letzteren sind auf die Eingabe von Zahlen beschränkt.
+
+Die Mitteilungsmöglichkeiten sind ebenfalls beschränkt: Es kann maximal eine Information mitgegeben werden, und sie muß vom Typ »Eingabedatum« sein. Daß nur Zahlen Eingabedaten sein können, wurde schon erwähnt.
+
+### 2.2	Die Syntax
+
+Selbstgestrickte Funktionen werden gekennzeichnet durch FN, dem ein individueller Name folgt, zum Beispiel
+
+#### FN KREISUMFANG
+
+Für den Namen gelten die üblichen Regeln für Variablenna-men, das heißt, nur die beiden ersten Zeichen eines Namens werden berücksichtigt. Die obige Funktion kann also ebensogut folgendermaßen geschrieben werden:
+
+#### FN KR
+
+Dem Funktionnamen FN KR folgen dann, wie bei Funktionen üblich, die Klammern, die für die Mitteilung eines eventuellen Eingabedatums zur Verfügung stehen.
+
+### 2.3	Die Benutzung
+
+Selbstgestrickte Funktionen werden genauso benutzt wie vorgefertigte. So könnte eine Programmroutine, die einen Würfel simuliert, so aussehen:
+**10 PRINTFNWUERFEL(O)**
+**20 GOTO10**
+
+Die Funktion FN WUERFEL ist eine reine Ausgabe-Funktion, weshalb ich als Mitteilung die nichtssagende 0 gewählt habe.
+
+Die im folgenden besprochene Funktion FN KREISUMFANG ist eine Eingabe-Ausgabe-Funktion, derjeweils der Radius mitgeteilt werden muß. Ein Programm könnte so aussehen:
+
+**10 INPUT'WHESISTDER RADIUS"; RD**
+**20 UM = FN KREISUMFANG (RD)**
+**30 PRINT "UMFANG BETRAEGT" UM**
+
+Aber woher weiß der Computer eigentlich, daß in der Funktion FN WUERFEL die Mitteilung in der Klammer ignoriert werden soll und daß sie andererseits bei der Funktion FN KREISUMFANG den Radius meint? Und woher weiß der Computer überhaupt, wie er die Ausgabe-Zahl erzeugen soll?
+
+### 2.4	Die Definition
+
+Bevor Sie eine selbstgestrickte Funktion einsetzen können, müssen Sie sie erst einmal definieren. Das muß logischerweise **vor** der Benutzung geschehen, am besten gleich zu Angang des Programms.
+
+Dazu steht der Befehl DEF zur Verfügung. Lassen Sie uns zuerst die Funktion FN KREISUMFANG definieren. Das geht so:
+**DEF FN KREISUMFANG (RD) = 2 * PI * RD**
+
+Die Variable RD in der Klammer auf der linken Seite der »Gleichung« bezieht sich auf das Eingabedatum, also den Radius, der der Funktion mitgeteilt wird, wenn sie im Programm erscheint. Das Interessante dabei ist, daß der Radius nachher bei der Benutzung der Funktion keineswegs RD heißen muß. Man kann ihm jeden Namen geben, der einem in den Sinn kommt, und bei jedem Einsatz der Funktion kann man sich einen neuen einfallen lassen. Was allein wesentlich ist, das ist die Beziehung zwischen der Variablen RD in der Klammer auf der linken Seite und der Variablen RD auf der rechten Seite der Definitionsgleichung. Das bedeutet, daß man bei der Definition einer Funktion jede beliebige Variable benutzen kann. Es muß nur darauf geachtet werden, daß links und rechts dieselbe Variable benutzt wird. Die meisten Leute nehmen einfach' X, was aber nicht in jedem Fall zu empfehlen ist. Ich komme darauf noch zurück.
+
+Lassen Sie uns nun als nächstes die Ausgabe-Funktion FN WUERFEL definieren. Hier haben wir ein Problem: Wir geben ja dieser Funktion keine Information mit. Was also schreiben wir in die Klammer auf der linken Seite, die ja auf jeden Fall gefüllt werden muß? Nun, dieses Mal können wir ohne Bedenken X benutzen:
+**DEF FN WUERFEL (X) = INT (RND (1) * 6) + 1**
+
+Wie Sie sehen, erscheint auf der rechten Seite kein X. Aus dieser Tatsache schließt der Computer elektronenscharf, daß er bei der Benutzung dieser Funktion das, was in Klammern mitgeliefert wird, zu ignorieren hat.
+
+In Commodore-Basic, so sahen wir, können wir einer selbstdefinierten Funktion also entweder gar keine Information mitgeben (Ausgabe-Funktion) oder einen Zahlenwert (Eingabe-Ausgabe-Funktion). Was aber, wenn wir zwei oder mehr Eingabedaten mitgeben möchten, sagen wir etwa bei einer Funktion FN RECHTECKINHALT? Nun, dies ist eben nicht möglich, aber wir können uns wie folgt aus der Affäre ziehen. Wir definieren zum Beispiel:
+**DEF FN RECHTECKINHALT (BREITE) = BREITE * LAENGE**
+
+Wenn wir die Funktion später aufrufen, müssenwireinfach dafür sorgen, daß die Länge dem Programm an dieser Stelle schon bekannt ist:
+**100 LAENGE = 5 : PRINT FN RECHTECKINHALT (BREITE)**
+
+Bei Funktionen dieser Art wird es vielleicht besonders deutlich: Wenn man eine Funktion benutzt, muß man sich darüber im klaren sein, welchen Eingabewert man ihr mitteilen muß. Deshalb ist es immer besser, bei der Definition einer Funktion »sprechende« Variablen zu benutzen statt des nichtssagenden X. Die folgende Definition verstehen Sie nach einem Jahr mit großer Wahrscheinlichkeit nicht mehr:
+**DEF FN A (X) = INT ((INT (X) + (X-INT (X)) * .6) + 100 + .5) / 100**
+
+Das bedeutungsleere X hat seine Berechtigung allein in reinen Ausgabe-Funktionen wie FN WUERFEL, und das ist auch die Konvention, an die ich mich selber halte.
+
+Übrigens — wenn Sie einen Fehler bei der Definition einer Funktion machen, kann es sein, daß dieser erst beim Einsatz der Funktion angezeigt wird. Manch einen Anfänger hat dies schon zur Verzweiflung gebracht. Angenommen, Sie erhalten einen SYNTAX ERROR IN 220; Sie schauen sich die Zeile an:
+**220 PRINTFNA(5)**
+Sie können absolut keinen Fehler erkennen. Klar, der Fehler liegt ja auch ganz woanders, in Zeile 10 nämlich, wo Sie folgendermaßen definiert hatten:
+**10 DEF FN A (T) = T * WAND**
+
+Ihre Variable WAND enthält AND, was in Variablen nicht vorkommen darf, weil es ein Basic-Wort ist. Wenn also ein Syntax Error angezeigt wird für eine Zeile, die einen Funktionsaufruf enthält, schauen Sie sich zuerst einmal die dazugehörige Definition an, bevor Sie den Computer an die Wand werfen.
+
+## 3.	Der Wert ist der springende Punkt
+
+Eigenbaufunktionen erzeugen Zahlen aus Zahlen, oder richtiger: sie erzeugen Zahlenwerte aus Zahlenwerten. Es ist wichtig, daß man sich folgendes ganz klar macht: Worauf es ankommt, ist der **Wert**. In welcher Form der Wert ausgedrückt wird, ist hingegen unerheblich. Das kann eine Zahl sein, aber ebenso eine Variable, ein mathematischer Ausdruck oder sogar eine Funktion. Die Länge des Radius eines Kreises könnte also zum Beispiel in einem Basic-Programm (und also auch im Zusammenhang mit Funktionen) folgendermaßen erscheinen:
+**10.5**
+**RD**
+**DURCHMESSER / 2**
+**LEN (LINIE$)**
+**FN HM (Y)**
+Bei der Definition einer Funktion ist also alles erlaubt — solange das Ergebnis ein Zahlenwert ist. Zwei Beispiele sollen dies deutlich machen.
+
+#### Beispiel 1: Text zentrieren
+
+Wir wollen eine Funktion definieren, die berechnet, ab welcher Bildschirmspalte ein Text gedruckt werden soll, um in der Mitte des Bildschirms zu erscheinen.
+
+Beim C 64 hat die Bildschirmzeile 40 Spalten, die Mitte liegt bei Spalte 20. Die halbe Zeichenkette muß also vor der Mitte, die andere Hälfte nach der Mitte gedruckt werden. Die Funktion kann folgendermaßen definiert und benutzt werden:
+**10 DEF FN MITTE (X) = 20 - LEN (TEXT$) / 2**
+**...**
+**...**
+**300 PRINT TAB(FN MITTE (0)); TEXT$**
+
+Unsere Funktion ist leider noch nicht vollkommen definiert, was deutlich wird, wenn die zu druckende Zeichenkette länger als die Bildschirmzeile ist, zum Beispiel 42 Zeichen lang. In diesem Fall erzeugt unsere Funktion ein negatives Ergebnis (—1), was TAB nicht verträgt, und was deshalb zu einer Fehlermeldung führt. Also müssen wir dafür sorgen, daß unsere Funktion nur dann rechnet, wenn die Zeichenkette gleich oder kleiner als 40 Zeichen lang ist. Wir könnten dieses Problem folgendermaßen lösen:
+**300 IF LEN (TEXT$) > 40 THEN PRINT TEXT$: GOTO 320**
+**310 PRINT TAB(FN MITTE (0)); TEXT$ 320 ...**
+
+Es gibt jedoch eine sinnvollere Möglichkeit, die es erlaubt, die Entscheidung, ob die Funktion rechnet oder nicht, sozusagen von der Funktion selber treffen zu lassen.
+
+Dies erreichen wir, indem wir einen logischen Ausdruck in die Definition einbauen. Der Ausdruck
+**(LEN (TEXT$) <= 40)**
+ergibt den Wert —1, wenn er wahr ist, das heißt wenn TEXT$ 40 Zeichen lang ist oder kürzer. Wenn TEXT$ länger ist, ergibt der Ausdruck den Wert 0.
+
+Unsere Definition lautet also:
+**10 DEF FN MITTE (X) = (20 - LEN (TEXT$) / 2) * ABS (LEN (TEXT$) < = 40)**
+
+FN MITTE ergibt den Wert 0, wenn TEXT$ länger als 40 Zeichen ist, und der Druck der Zeichenkette beginnt in der ersten Bildschirmspalte.
+
+Das Beispiel zeigt, daß durchaus Strings in der Definition von Funktionen vorkommen können, wenn gewährleistet ist, daß das Endergebnis des Ausdrucks auf der rechten Seite der »Gleichung« ein Wert ist.
+
+#### Beispiel 2: Kleinbuchstaben in Großbuchstaben verwandeln
+
+Im Commodore-Basic kann die Definition einer Funktion höchstens eine Zeile lang sein. Diese Beschränkung läßt sich bis zu einem gewissen Grade umgehen, indem wir einfach mehrere Funktionen definieren und sie ineinander einbetten.
+
+Es soll eine Funktion programmiert werden, mit deren Hilfe wir Kleinbuchstaben in Großbuchstaben verwandeln können. Wir benutzen dazu wieder logische Ausdrücke.
+
+Wir gehen in zwei Schritten vor. Im ersten Schritt prüfen wir, ob das untersuchte Zeichen überhaupt ein Buchstabe ist. Das ist der Fall, wenn sein ASCII-Wert zwischen 65 und 93 oder 193 und 221 liegt:
+**10 DEFFNBU(Z) = (Z>64ANDZ< 91) OR (Z > 192ANDZ < 219)**
+
+Das Ergebnis der Funktion FN BU ist —1, wenn der Ausdruck zutrifft. Das heißt, wenn die Funktion den Wert —1 erzeugt, dann ist das geprüfte Zeichen ein Buchstabe.
+
+In Schritt 2 untersuchen wir, ob es sich um einen Kleinbuchstaben (dann muß er umgewandelt werden) oder einen Großbuchstaben handelt (dann darf er sich nicht verändern).
+
+Kleinbuchstaben liegen zwischen 65 und 90. Das heißt, wenn der ASCII-Wert des geprüften Zeichens kleiner als 128 ist, haben wir es mit einem Kleinbuchstaben zu tun, und es muß 128 addiert werden. Das aber nur dann, wenn das Zeichen ein Buchstabe ist, das heißt, wenn FN BU den Wert —1 hat. Die Definition:
+**20 DEF FN KG (Z) = Z + (Z < 128) * 128 * FNBU (Z)**
+
+Die Funktion, die im Programm benutzt wird, ist natürlich lediglich die letztere; daß sie eine zweite Funktion enthält, braucht uns jetzt nicht mehr zu kümmern:
+**300 Z = ASC("a") 310 Z = FN KG (Z) 320 PRINTCHR$(Z)**
+
+Die Tatsache, daß es bei einer Funktion nur auf den Wert ankommt und nicht etwa darauf, daß dieser in Form einer Zahl ausgedrückt wird, betrifft nicht etwa nur die Definition von Funktionen, sondern auch ihre Anwendung. Was ich sagen will ist, daß es bei der einer Funktion mitgeteilten Information völlig gleichgültig ist, in welcher Form der mitgeteilte Wert ausgedrückt ist. Beispiele:
+**400 PRINTFNKG(65)**
+**400 PRINTFNKG(A)**
+**400 PRINTFNKG(A-128)**
+**400 PRINTFNKG("a")**
+**400 PRINTFNKG(FNC(Y))**
+
+Ein Anwendungsbeispiel:
+
+Um einen Namen, der in Kleinbuchstaben gespeichert ist, mit einem großen Anfangsbuchstaben zu versehen, könnte die Basic-Zeile 510 verwendet werden:
+**500 N$ = "commodore"**
+**510 N$ = CHR$ (FN KG (ASC (N$))) + MID$ (N$,2)**
+
+ASC ergibt den ASCII-Wert des ersten Buchstabens von »commodore«, also 67; FN KG addiert 128 und erzeugt den Wert 195; CHR$ ergibt das Zeichen »C«; dies wird mit Hilfe von MID$ mit »ommodore« verknüpft und der Variablen N$ zugeordnet, die also schließlich die Zeichenkette »Commodore« enthält. Die ganze Transaktion wird übrigens nur mit Hilfe von (vorgefertigten und selbstdedinier-ten) Funktionen durchgeführt.
+
+## 4.	Legen Sie sich eine Funktionen-Bibliothek an
+
+Die Möglichkeiten, die das Commodore-Basic für die Herstellung selbstdefinierter Funktionen zur Verfügung stellt, sind beschränkt — andere Basic-Dia-lekte sind da oft großzügiger. Da lassen sich Funktionen definieren, die auf Zeichenketten wirken; da können Definitionen viele Zeilen lang sein; da kann mehr als eine Information mitgegeben werden — aber wir wollen uns den Mund nicht wässrig machen.
+
+Auch unsere Funktionen sind ein »mächtiges« Werkzeug (oder richtig deutsch) ein leistungsfähiges Werkzeug und keineswegs auf die Verarbeitung mathematischer Formeln beschränkt, wie man häufig annimmt. Man muß die Möglichkeiten nur nutzen.
+
+Es lohnt sich, eine individuelle Bibliothek von Funktionsdefinitionen anzulegen, die man je nach Bedarf in seine Programme einbaut. Funktionen ersparen, wenn sie einmal zur Verfügung stehen, viel Programmierarbeit.
+
+Im Anhang habe ich ein paar Funktionsdefinitionen zusammengestellt, die ich immer wieder in Programmen benutze. Da ist nichts Weltbewegendes dabei, aber ich habe mir dadurch schon manch unnötige, weil sich wiederholende, Denkarbeit erspart. Und das ist es, worauf es ankommt.
+
+Welches sind Ihre Lieblingsfunktionen?
+
+(Prof.Dr. Leuschner/gk)
+
+TODO ASIDE
+
+## Anhang: Einige einfache Funktionen zur Anregung
+### 1.	Zufallszahl zwischen 1 und ENDZAHL
+
+DEF FN RD (ENDZAHL) = INT (RND (1) * ENDZAHL) + 1
+PRINT FN RD (6) würfelt eine Zahl zwischen 1 und 6.
+Anmerkung: Damit der Zufallsgenerator mit einer zufälligen Zufallszahl anfängt, sollte man zu Beginn des Programms folgende Zeile einfügen:
+
+X = RND (-RND (0))
+### 2.	Zufallszahl zwischen ANFZAHL und ENDZAHL
+
+DEF FN ZUFALL (ENDZAHL)
+= INT(RND(l)*(ENDZAHL-ANFZAHL)) + ANFZAHL +1
+ANFZAHL = 65 : PRINT CHR$ (FN ZUFALL (90)) erzeugt einen zufälligen Kleinbuchstaben.
+
+### 3.	Kommazahl zu Ganzzahl aufrunden
+
+DEF FN AUFRUNDEN (ZAHL) = - INT (- ZAHL)
+PRINT FN AUFRUNDEN (23.05) ergibt 24.
+Anmerkung: Zum Abrunden benutzt man die einfache INT-Funktion.
+
+### 4.	Zahl mit festgelegter Anzahl von Nachkommastellen mit Rundung
+
+DEF FN KOMMA (ZAHL)
+= INT (ZAHL * 10 t NACHKOMMA + .5) / 10 ↑ NACHKOMMA
+NACHKOMMA = 2: PRINTFNKOMMA(25/6) ergibt 4.17.
+
+### 5.	Zahl mit festgelegter Anzahl signifikanter Ziffern (2 Funktionen)
+
+DEF FN SG (ZAHL)
+= 10 ↑ (1 - ZIFFERN + INT (LOG (ABS (ZAHL)) / LOG (10)))
+DEF FN SIGNI (ZAHL)
+= INT (ZAHL / FN SG (ZAHL) + .5) * FN SG (ZAHL)
+ZIFFERN = 4 : PRINT FN SIGNI (ZAHL) ergibt bei ZAHL = 1234567 die Zahl 1235000, bei ZAHL = 12.345 die Zahl 12.35, etc.
+
+### 6.	Zahlen in einer Spalte drucken (PRINT US ING)
+
+DEF FN US ING (ZAHL)
+= SPALTE-ABS((ZAHL > 10) + (ZAHL > 100) + (ZAHL > 1000) + (ZAHL > 10t4) + (ZAHL > 10t5) + (ZAHL > 10↑6)) SPALTE = 20 : PRINT TAB(FN US ING (ZAHL)); ZAHL druckt Zahlen bis zu einer Million richtig als Kolonne.
+Anmerkung: Wenn Sie die Variablen abkürzen, paßt die Definition in eine Zeile. Zwischen US und ING **muß** eine Leerstelle stehen!
+
+### 7.	Ungerade oder gerade Zahl?
+
+DEF FN ODD (ZAHL) = ZAHL AND 1
+PRINT FN ODD (25) ergibt den Wert 1, da 25 eine ungerade Zahl ist. Gerade Zahlen ergeben 0.
+
+### 8.	Modulus (Rest bei einer Division)
+
+DEF FN MOD (ZAHL)
+= INT (((ZAHL / TEILER - INT (ZAHL / TEILER)) * TEILER) + .5)
+TEILER = 6: PRINT FN MOD (25) ergibt den Divisionsrest 1.
+
+### 9.	Uhrzeit dezimal darstellen
+
+DEF FN DEZUHR (HR)
+= INT ((INT (HR) + (HR - INT (HR)) / .6) * 100 + .5) / 100 H = FN DEZUHR (17.30) ergibt den Dezimalwert 17.5, mit dem man dann normal rechnen kann.
+
+### 10.	Dezimal ausgedrückte Uhrzeit als normale Uhrzeit darstellen
+
+DEF FN UHR (DEZZT)
+= INT((INT(DEZZT) + (DEZZT-INT(DEZZT))*.6)*100 + .5) / 100
+PRINT FN UHR (17.25) ergibt die normale Uhrzeit 17.15 Uhr.
+
+### 11.	ASCII-Code eines Zeichens in den Bildschirm-Code umwandeln
+
+DEF FN SCREEN (AS) = (AS AND 128) / 2 OR (AS AND 63)
+POKE 1024, FN SCREEN (ASC("A")) POKEt in die linke obere Ecke des C 64-Bildschirms den Buchstaben A.
+
+### 12.	Inhalt einer Bildschirmspeicherzelle lesen
+
+DEF FN CRT (SPALTE)
+= PEEK (1024 + (ZEILE - 1) * 40 + (SPALTE - 1)) ZEILE = 5: PRINT FN CRT (20) ergibt den Inhalt der Speicherzelle der 20. Spalte in der 5. Zeile.
+
+### 13.	Exklusives Oder: Von zwei Bedingungen darf nur eine zutreffen.
+
+Beispiel: Wenn Tante Amalie allein kommt, oder wenn Onkel Otto allein kommt, dann gehen wir auch zum Fest. Wenn aber beide kommen, dann gibt's Streit zwischen den beiden, also bleiben wir daheim. Wenn keiner von den beiden kommt, wird’s langweilig, dann bleiben wir auch daheim. (Drei Funktionen werden dafür definiert.)
+
+DEF FN B1 (X) = (A = AWERT) oder sonst eine Bedingung
+
+DEF FN B2 (X) = (B = BWERT) oder sonst eine Bedingung
+
+DEF FN EO R (X)
+
+= ABS ((FN Bl (0) AND FN B2 (0)) < > (FN Bl (0) OR FN B2 (0)))
+
+Als einander ausschließende Bedingungen seien A$ = "Amalie” und B$ = ”Otto” für die beiden ersten Funktionen definiert worden. Dann ergibt die Funktion FN EO R den Wert 1 zum Beispiel bei folgender Situation:
+A$ = "Amalie” : B$ = "Emilia” : PRINT FN EO R (0)
+Anmerkung: Der Name der Funktion ist EO R, weil EOR das Basic-Wort OR enthielte, was zu einer Fehlermeldung führen würde.
+
+### 14.	ASCII-Wert eines Zeichens innerhalb eines Strings bestimmen
+
+DEF FN AS C (PS) = ASC (MID$ (S$,PS,1))
+S$ = ’’Commodore”: PRINT FN AS C (6) ergibt den ASCII-Wert von »d«, also 68.
+
+### 15.	Einen Teilstring aus einem String »herausschneiden« und dessen Wert bestimmen
+
+DEF FN WERT (PS) = VAL (MID$ (S$,PS,LAENGE)) S$ = ”028255063”: LAENGE = 3: PRINT FN WERT (4) ergibt den Wert 255.
+
+# VIC — Das »intelligente« Programm
+
+> Ein Computerproaramm zu schreiben, mit dem man sicn einfach in normaler Umgangssprache unterhalten kann — das war die Aufgabe in unserem Programmierwettbewerb vom November '84. Ein Programm war »intelligener« als alle anderen.
+
+Der Ausgangspunkt für diesen Programmierwettbewerb war die »Eliza-Story«. Im Jahre 1966 entwickelte Joseph Weizenbaum am Massachusetts Institute ofTechnology ein Program names »Eliza«, das — vereinfacht gesagt — einen Psychoanalytiker simuliert. Der Mensch begibt sich also in der Rolle des Patienten an die Computer-Tastatur und wird aufgefordert, von seinen Schwierigkeiten zu berichten. Aufgrund der Eingaben gibt Eliza dann durchaus differenzierte Antworten und stellt auch schon mal Zwischenfragen, so daß ein regelrechter Dialog zustande kommt. Das Eliza-Programm hat inzwischen eine große Verbreitung gefunden und existiert in unzähligen Versionen für alle gängigen Heimcomputer. Mit unserem Programmierwettbewerb wollten wir dazu anregen, ähnliche — und womöglich bessere — Programme für den C 64/VC 20 zu entwickeln. Wir erhielten auch eine ganze Reihe wirklich brauchbarer Programme — nur leider, leider handelte es sich bei vielen dieser Einsendungen um Programme, die eindeutig auf dem Original-Eliza basierten. Diese Programme gelangten natürlich gar nicht erst in die engere Wahl, denn bei unseren Wettbewerben ist immer noch die eigene Kreativität gefragt. Sieger wurde schließlich »VIC«, ein Programm, das sich in zwei wesentlichen Punkten von der Konkurrenz abhebt.
+
+Zunächst einmal ist »VIC« sehr schnell. Auch bei längeren Eingaben werden für die Antwort selten mehr als vier bis fünf Sekunden gebraucht. »VIC«war damit, obwohl vollständig in Basic geschrieben, um ein vielfaches schneller als alle anderen Programme, die zum Teil sogar Maschinenroutinen verwendeten. Ein gutes Beispiel dafür, daß durch gut durchdachte Programmierung auch in Basic überraschend effektive Ergebnisse erzielt werden können. Zum anderen ist »VIC« sehr vielseitig. Man kann mit ihm über viele Themen reden, er bezieht sich in seinen Antworten in den meisten Fällen auf den Eingabesatz und manchmal sind seine Antworten nicht ohne Witz.
+
+Natürlich ist das Programm — ebenso wie »Eliza« — nicht wirklich intelligent. Es sucht nach bestimmten Stichworten im Eingabesatz und erzeugt dann aus einer Reihe von Alternativen die Antworten, die mitunter gar nicht schlecht sind.
+
+»VIC« gehört zu einer Minderheit der zu diesem Wettbewerb eingeschickten Programme — es handelt sich dabei nämlich um eines der wenigen VC 20-Listings, die uns zu diesem Wettbewerb erreichten. Es wurde geschrieben für den VC 20 mit mindestens 8 KByte Erweiterung, läuft aber ohne Änderungen auch auf dem C 64.
+
+### Hinweise zur Bedienung:
+
+* Bei der Eingabe kann je nach Belieben über das Zeilenende hinausgeschrieben oder mit »—« getrennt werden.
+* Es darfjeweils nur ein Satz eingegeben werden, der allerdings beliebige Satzzeichen enthalten kann.
+* Ein Satz (und damit die Eingabe) wird abgeschlossen mit Return, Punkt, Ausrufezeichen oder Fragezeichen. — Mit der DEL-Taste kann die Eingabe korrigiert werden. Alle anderen Steuerzeichen werden ignoriert. Tabelle 3 zeigt einen Beispieldialog mit »VIC«, wie sie ihn nach Eingabe des Listings ebenfalls führen können.
+
+Ihr Computer als »intelligenter« Gesprächspartner — wenn das keine Abwechslung im Software-Eintopf ist?
+
+(Robert Treichler/ev)
+
+
+TODO ASIDE
+
+## Der Autor von »VIC«, stellt sich vor
+
+Mit meinen 37 Jahren zähle ich zwar nicht mehr zur jüngsten Hacker-Generation. Trotzdem bin ich ein begeisteter Computerspiele-Fan. Besonders gut gemachte Grafik-Adventures können mich stundenlang vor den Bildschirm fesseln. Mittlerweile ist auch meine Frau schon von der Adventuritis befallen, was schon mal dazu führen kann, daß das Abendessen erst nach Mitternacht stattfindet. Man muß doch vorher erst einmal aus diesem verflixten Tunnel herauskommen!
+
+Das erste Mal kam mir vor 17 Jahren ein Computer in die Quere. Damals, nach abgeschlossener Berufslehre als Elektroniker, war ich im Studium etwas knapp bei Kasse und beschloß, diesem Mißstandmit einer Teilzeitarbeit zu begegnen. Es war in einem Platzreservations-System einer großen Fluggesellschaft. Zwei identische Computer-Anlagen waren dort installiert, um bei Ausfall des einen Computers sofort auf den anderen umschalten zu können. Dieses Umschalten war meine Aufgabe. Das kam dann so alle drei bis fünf Tage einmal vor. Die restliche Zeit konnte ich auf einem mitgebrachten Feldbett, neben dem Computer schlafen oder eben an meinem Studium weiterarbeiten. Dachte ich mir zumindest! Da stand aber die ganze Zeit einer der beiden Computer nutzlos herum und wartete nur darauf, von mir beschäftigt zu werden. Der Rest ist schnell erzählt: Einige Wochen später hatte ich mein Studium — für einen, für meine damaligen Verhältnisse, unwiderstehlichen Zahltag als Programmierer — an den Nagel gehängt.
+
+Nach 10 Jahren EDV habe ich wieder zur Elektronik zurückgefunden. Seit 1978 besitze ich ein eigenes Geschäft und befasse mich mit der Entwicklung und dem Vertrieb von Medizin-Elektronik.
+
+Meine Hobbies: Klavier (Jazz), Tennis, Ski, Schach, Computer-Spiele, Pokern.
+
+(Robert Treichler)
+
+TODO END ASIDE
+
+# Vorschau
+
+## Dokumentation von Programmen leicht gemacht
+
+Sie erinnern sich noch? Im 64'er, Ausgabe 12/84 riefen wir auf zum Erstellen eines Programms, daß bei der Dokumentation eigener und anderer Programme hilfreich sein sollte. Das Programm des Siegers ist wirklich gelungen. Es findet alle Variablen, die man zusätzlich kommentieren kann, zeigt sämtliche Sprungadressen und noch vieles mehr.
+
+## Datenfernübertragung für jedermann
+
+Die Datenfernübertragung (DFÜ) nimmt einen immer größeren Stellenwert im Leben eines modernen Menschen ein. Deshalb sagen wir Ihnen, wie Sie mit Datex-R Btx, Telebox und ISDN arbeiten, wie teuerdaswird, und ob es sich überhaupt lohnt.
+
+## Drucker lernt das Lesen
+
+Mit wenigen Handgriffen können Sie einen Epson-Drucker in den billigsten Scanner umrüsten, den es je gegeben hat. Mit dieser Hardwareerweiterung für den C 64 läßt sich alles, was auf ein DIN-A4-Blatt paßt, digitalisieren. Mit Hi-Eddi können Sie dann der Compu-ter-Grafik den letzten Schliff geben.
+
+## Langsam, aber schön
+
+Typen raddrucker sind eine Klasse für sich: Mit ihrem gestochen scharfen Schriftbild sind sie für jede Art von Korrespondenz geeignet. Besonders interessant sind Schreibmaschinen, die auch als Drucker verwendet werden können.
+
+## Hi-Eddi mit MPS 801 und MPS 802
+
+Bilder von Hi-Eddi, dem fantastischen Zeichen- und Malprogramm aus 64’er 1/85, konnten bisher nur mit einem Epson-kompatiblen Drucker ausgegeben werden. Viele Leser fragten deshalb nach einer Druckerroutine für andere Drucker. Und sie sollten nicht vergebens warten. Wir veröffentlichen Routinen für MPS 801 (und kompatible, zum Beispiel Seikosha) und MPS 802/1526.
+
+## Textomat Plus
+
+Schon seit langem angekündigt wurde die erweiterte Version des Textverarbeitungsprogramms Textomat von Data Becker. Wenn das Programm hält, was die Werbung verspricht, dürften keine Wünsche mehr offenbleiben. Aber Textomat Plus ist auch mehr als zweieinhalbmal so teuer wie der alte Textomat. Damit steigen natürlich auch die Ansprüche. Die Frage lautet also: Was leistet Textomat Plus wirklich und wie gut läßt sich mit ihm arbeiten?
+
+## Macro-Basic: mal was ganz anderes
+
+Was stört eigentlich immer bei Basic-Erweiterungen? Man hat nie alles, was gebraucht wird. Nicht so Macro-Basic. Macro-Basic ist kein einzelnes Programm, sondern besteht aus zirka 160 verschiedenen kleinen Modulen. Mit diesen Modulen können Sie sich für jedes Programm Ihre eigene persönlich zugeschnittene Erweiterung zusammenstellen und verzichten damit auf unnötigen Ballast.
+
+## Tolle Preise für über 15000 Mark
+
+Machen Sie mit bei zwei großen Wettbewerben! Es locken zwei Reisen nach Berlin, ein Btx-Fernseher und jede Menge Diskettenlaufwerke 1541.
+
+## Außerdem ...
+
+* neue Turbo-Floppy getestet
+* IEEE-Interface zum Selberbauen
+* Lösung von Amazon
+* und wieder viele Tips und Tricks für VC 20, C 16 und C 64
 
