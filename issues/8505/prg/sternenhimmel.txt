@@ -1,0 +1,600 @@
+;sternenhimmel.prg ==0801==
+;version=simons
+    0 rem ********************************
+    1 rem *                              *
+    2 rem *        sternenhimmel         *
+    3 rem *                              *
+    4 rem *      horst  hinkelmann       *
+    5 rem *        nicolaistr. 6         *
+    6 rem *         4700 hamm 1          *
+    7 rem *     telefon  02385/1653      *
+    8 rem *                              *
+    9 rem ********************************
+   10 goto50000
+   96 rem **********************
+   97 rem *    stern setzen    *
+   98 rem **********************
+  100 rem ** stundenwinkel **
+  120 sw=fnmo(ar-re-l)
+  130 rem ** bogenmass **
+  140 sw=sw*p1
+  150 rem ** koordinaten-transformation **
+  160 h=fnas(sb*sin(de)+cb*cos(de)*cos(sw))
+  170 ifh<0thenx=0:y=0:return
+  180 a=fnac((sin(de)-sb*sin(h))/(cb*cos(h)))
+  190 ifsw<pithena=-a
+  200 rem ** gradmass **
+  210 r=99-h*198/pi:w=-a-pi/2
+  220 x=int(cos(w)*r*1.1+159.5)
+  230 y=int(sin(w)*r+99.5)
+  240 plotx,y,1
+  296 rem ***********************
+  297 rem * text ueberschreiben *
+  298 rem ***********************
+  300 n$=left$(n$,13)
+  310 ifn3$<>n$thengosub340
+  320 ifn4$<>n1$thengosub360
+  330 return
+  340 n3$=n$:block0,184,103,191,0
+  350 text0,184,n$,1,0,8:return
+  360 n4$=n1$:block0,192,119,199,0
+  370 block216,192,319,199,0
+  380 text0,192,n1$,1,0,8
+  390 text319-8*len(n2$),192,n2$,1,0,8
+  395 return
+  396 rem ***********************
+  397 rem *   fehlermeldungen   *
+  398 rem ***********************
+  400 n1$=left$(n1$,9)
+  410 text0,192,n1$+" nicht",1,0,8
+  420 text232,192,"sichtbar",1,0,8
+  430 goto41000
+  450 n$=left$(n$,9)
+  460 text0,192,n$+" nicht",1,0,8
+  470 text232,192,"gespeichert",1,0,8
+  480 goto41000
+  496 rem ***********************
+  497 rem *    kreuz bewegen    *
+  498 rem ***********************
+  500 hn=x+19:vn=y+46
+  510 mmob1,hv,vv,hn,vn,0,100
+  520 goto300
+  596 rem ***********************
+  597 rem * buchstaben loeschen *
+  598 rem ***********************
+  600 le=len(n$)-1
+  610 blockle*8,184,le*8+7,199,0
+  620 n$=left$(n$,le)
+  630 return
+  996 rem ************************
+  997 rem * bildschirm erstellen *
+  998 rem ************************
+ 1000 hires7,6
+ 1010 circle160,100,110,100,1
+ 1020 hu=0:ifb<0thenhu=200
+ 1030 ifb<0thencircle160,hu+b/9*10,2,2,1
+ 1040 text1,0,mid$(str$(t),2)+"."+mid$(str$(m),2)+"."+mid$(str$(j),2),1,0,8
+ 1050 text1,8,"oz"+oz$,1,0,8
+ 1060 text1,16,"wz"+wz$,1,0,8
+ 1070 t$=mid$(str$(int(b+.5)),2,4)
+ 1080 sp$=right$("   ",3-len(t$))
+ 1090 text216,0,"breite "+sp$+t$,1,0,8
+ 1100 t$=mid$(str$(int(l+.5)),2,4)
+ 1110 sp$=right$("   ",3-len(t$))
+ 1120 b$="n":ifb<0thenb$="s"
+ 1130 text304,0,b$,1,0,8
+ 1140 text216,8,"laenge "+sp$+t$,1,0,8
+ 1150 l$="w":ifl<0thenl$="o"
+ 1160 text304,8,l$,1,0,8
+ 1170 text32,96,"o",1,0,8
+ 1180 text280,96,"w",1,0,8
+ 1190 gosub2010
+ 1200 gosub2110
+ 1210 text288,128,"f5 =",1,0,8
+ 1220 text288,136,"copy",1,0,8
+ 1230 text288,152,"f7 =",1,0,8
+ 1240 text256,160,"neustart",1,0,8
+ 1250 return
+ 2000 block0,128,39,143,0
+ 2010 text0,128,"f1 =",1,0,8
+ 2020 text0,136,"stern",1,0,8
+ 2030 return
+ 2050 block0,128,39,143,0
+ 2060 text0,128,"{rvon}sucht",1,0,8
+ 2070 text0,136,"{rvon}stern",1,0,8
+ 2080 return
+ 2100 block0,152,39,159,0
+ 2110 block0,160,71,167,0
+ 2120 text0,152,"f3 =",1,0,8
+ 2130 text0,160,"sternbild",1,0,8
+ 2140 return
+ 2150 block0,152,39,159,0
+ 2160 block0,160,71,167,0
+ 2170 text0,152,"{rvon}sucht",1,0,8
+ 2180 text0,160,"{rvon}sternbild",1,0,8
+ 2190 return
+ 4996 rem **********************
+ 4997 rem *    hires kreuz     *
+ 4998 rem **********************
+ 5000 design 0,32*64+49152
+ 5020 @.....b..................
+ 5030 @.....b..................
+ 5040 @.....b..................
+ 5050 @.....b..................
+ 5060 @b.b.b.b.b.b.............
+ 5070 @.....b..................
+ 5080 @.....b..................
+ 5090 @.....b..................
+ 5100 @.....b..................
+ 5110 @........................
+ 5120 @........................
+ 5130 @........................
+ 5140 @........................
+ 5150 @........................
+ 5160 @........................
+ 5170 @........................
+ 5180 @........................
+ 5190 @........................
+ 5200 @........................
+ 5210 @........................
+ 5220 @........................
+ 5230 mob set 1,32,0,1,0
+ 5240 hn=179:vn=145
+ 5250 mmob1,hv,vv,hn,vn,0,0
+ 5260 return
+ 9996 rem *********************
+ 9997 rem *  erde/sonne/mond  *
+ 9998 rem *********************
+10000 rem ** erde **
+10100 be=fnmo(tg*.985609121+99.18)
+10200 el=fnmo(be+sin((be-102.2)*p1)*1.845)
+10300 ea=1+sin((el-192.2)*p1)*.0167
+11000 rem ** sonne **
+11200 ls=fnmo(el+180)
+12000 rem ** mond **
+12010 lm=tg*13.1763976+51.23
+12020 pm=tg*.111399014+208.9
+12030 km=372.1-tg*.052953643
+12040 lm=fnmo(lm)
+12050 pm=fnmo(pm)
+12060 km=fnmo(km)
+12070 am=lm-pm
+12080 km=km-sin(as*p1)*.16
+12090 ms=(lm-ls)*2-am
+12100 am=am+sin(ms*p1)*1.27388889-sin(as*p1)*(.18638889+.36)
+12110 lm=lm+sin(ms*p1)*1.27388889-sin(as*p1)*.18638889+sin(am*p1)*6.28833333
+12120 m1=lm-ls
+12130 lm=lm+sin(m1*2*p1)*.658333333
+12140 m2=lm-km
+12150 lm=lm-sin(m2*2*p1)*.12
+12160 bm=sin(m2*p1)*5.14539
+12170 m3=(lm-ls)*2-m2
+12180 bm=bm+sin(m3*p1)*.15
+15000 n$="sonne":al=ls:ab=0:gosub30000
+15010 ifx=0goto15040
+15020 circlex,y,4,3,1
+15030 paintx+1,y,1
+15040 n$="mond":al=lm:ab=bm:gosub30000
+15050 ifx=0goto15080
+15060 plotx,y,0
+15070 circlex,y,4,3,1
+15080 return
+19996 rem *********************
+19997 rem *      planeten     *
+19998 rem *********************
+20000 reset62500
+20010 forz=0to5
+20020 readn$,tb,ep,ph,mp,e,kn,i,ae
+20030 p$(z)=n$
+20040 ml=fnmo(tb*tg+ep)
+20050 wl=ml+sin((ml-ph)*p1)*mp
+20060 sp=ae+sin((wl-ph-90)*p1)*e*ae
+20070 ws=fnmo(c+el-wl)*p1:si=sin(ws)
+20080 fl=ea/sp-cos(ws)
+20090 we=atn(si/fl)*p2
+20100 al=fnmo(el+we-180*(fl>=0))
+20110 wt=sin((wl-kn)*p1)*i
+20120 ab=atn(tan(wt*p1)*abs(sin(we*p1)/si))*p2
+20130 gosub30000
+20140 p(2*z)=x:p(2*z+1)=y
+20150 next
+20160 return
+24996 rem *********************
+24997 rem *     fixsterne     *
+24998 rem *********************
+25000 reset60000
+25010 fors=1toi1
+25020 readre,de,n$,a
+25030 de=de*p1
+25040 n1$=z$(a,1):n2$=z$(a,0)
+25050 gosub100
+25060 z%(s)=x:z%(s+i2)=y
+25070 next
+25080 return
+29996 rem *********************
+29997 rem *  rektas./deklin.  *
+29998 rem *********************
+30000 sn=sin(ab*p1):cs=cos(ab*p1)
+30010 sl=sin(al*p1):cl=cos(al*p1)
+30020 de=fnas(ec*sn+es*cs*sl)
+30030 re=2*atn((ec*cs*sl-es*sn)/(cos(de)+cs*cl))
+30040 re=fnmo(re*p2)
+30050 goto100
+39996 rem *********************
+39997 rem *     eingaben      *
+39998 rem *********************
+40000 getg$:ifg$=""thenv=1:goto40000
+40010 p=asc(g$)
+40020 ifp=17thenvn=vn+v:goto41000
+40030 ifp=145thenvn=vn-v:goto41000
+40040 ifp=29thenhn=hn+v:goto41000
+40050 ifp=157thenhn=hn-v:goto41000
+40060 ifp=133thengosub2050:goto42000
+40070 ifp=134thengosub2150:goto42000
+40080 ifp=135goto57000
+40090 ifp=136goto58000
+40100 ifp>64andp<91goto47000
+40110 goto40000
+41000 v=v+.5
+41010 mmob1,hn,vn,hn,vn,0,0
+41020 goto40000
+42000 x=int(hn-19):y=int(vn-46)
+42010 xm=200000
+42020 ifp=134goto44000
+42030 fora=0to10step2
+42035 f=p(a)-x:h=p(a+1)-y
+42040 xx=f*f+h*h
+42050 ifxx<xmthenxm=xx:zp=a
+42060 ifxx=0thena=12
+42070 next
+42080 n$=p$(zp/2):n1$=" ":n2$=" "
+42090 ifxx=0goto45000
+44000 xp=xm
+44010 fora=0toi1
+44015 f=z%(a)-x:h=z%(a+i2)-y
+44020 xx=f*f+h*h
+44030 ifxx<xmthenxm=xx:z=a
+44040 ifxx=0thena=i2
+44050 next
+44060 x=p(zp):y=p(zp+1)
+44070 ifxp=xmgoto45000
+44080 x=z%(z):y=z%(z+i2)
+44090 reset60000+z*10
+44100 readre,de,n$,d
+44110 n1$=z$(d,1):n2$=z$(d,0)
+44120 ifp=134thenz1=z:z=d:gosub2100:goto48060
+45000 gosub2000
+45010 hv=hn:vv=vn:gosub500:goto40000
+47000 n$=g$:n1$=" ":n2$=" "
+47010 gosub340:gosub360
+47020 getg$:ifg$=""goto47020
+47030 ifasc(g$)=20thengosub600:goto47020
+47040 ifasc(g$)=13goto47060
+47050 n$=n$+g$:gosub350:goto47020
+47060 p=0:z=-1
+47070 fors=0to5
+47080 ifplace(n$,p$(s))thenz=s:s=5
+47090 next
+47100 ifz<0goto48000
+47110 hv=hn:vv=vn
+47120 x=p(2*z):y=p(2*z+1)
+47130 n1$=p$(z):n2$=" "
+47140 ifx=0goto400
+47150 gosub500:goto40000
+48000 fors=0toi3
+48010 ifplace(n$,z$(s,0))thenz=s:s=i3
+48020 ifplace(n$,z$(s,1))thenz=s:s=i3
+48030 next
+48040 ifz<0goto49000
+48050 z1=-1
+48060 a1=z(z,1):a2=a1+z(z,0)
+48070 ifz1>=0goto48120
+48080 fora=a1toa2
+48090 ifz%(a)thenz1=a:a=a2
+48100 next
+48110 ifz1<0thenn1$=z$(z,1):goto400
+48120 f=0:hv=hn:vv=vn
+48130 n1$=z$(z,1):n2$=z$(z,0)
+48140 x=z%(z1):y=z%(z1+i2):gosub500
+48150 fora=a1toa2
+48160 x=z%(a)
+48170 ifxthenplotx,z%(a+i2),f
+48180 next
+48190 f=1-f
+48200 iff=1goto48150
+48210 getg$:p=asc(g$+chr$(0))
+48220 ifpgoto40020
+48240 fora=1to1000*f+10:next
+48250 goto48150
+49000 reset60000
+49010 fors=1toi1
+49020 readre,de,s$,a
+49030 ifplace(n$,s$)thenz=s:s=i2
+49040 next
+49050 ifz<0thenhn=x+19:vn=y+46:goto450
+49060 ifz%(z)=0thenn1$=s$:goto400
+49070 hv=hn:vv=vn
+49080 x=z%(z):y=z%(z+i2)
+49090 n$=s$:n1$=z$(a,1):n2$=z$(a,0)
+49100 gosub500:goto40000
+49996 rem ********************
+49997 rem *  programmbeginn  *
+49998 rem ********************
+50000 cset1
+50010 ifpeek(900)>0andpeek(900)<11then50110
+50020 print"{clr}{down}Heutiges Datum"
+50030 input"{down}Jahr ";j$
+50035 j$="19"+right$(j$,2)
+50040 input"Monat";m$
+50050 input"Tag  ";t$
+50060 a$=t$+"."+m$+"."+j$
+50070 fora=1tolen(a$)
+50080 poke900+a,asc(mid$(a$,a,1))
+50090 poke900,a
+50100 next
+50110 t$=left$(ti$,4)
+50120 print"{clr}{down}Uhrzeit HHMM"
+50130 printtab(8)t$
+50140 print"{up}"tab(6);:inputt1$:
+50150 ift$<>t1$thenti$=right$("0"+t1$+"00",6)
+50160 a$=""
+50170 fora=0topeek(900)
+50180 a$=a$+chr$(peek(900+a))
+50190 next
+50200 i1=124:i2=125:i3=22:f=1
+50210 pi=~:p1=pi/180:p2=180/pi:c=360
+50220 dimz$(i3,1),z(i3,1),p(11),z%(2*i2)
+50300 print"{clr}"
+50301 printtab(11)"{rvon}{CBM-M}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-G}"
+50302 printtab(11)"{rvon}{CBM-M} Sternenhimmel {CBM-G}"
+50304 printtab(11)"{rvon}{CBM-M}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-G}"
+50310 print"{down}Breite  90 (noerdl) bis  -90 (suedl.)"
+50320 print"Laenge 180 (westl.) bis -180 (oestl.)"
+50330 print"{down}Vorgegeben sind die Werte von Hamm und  die heutige Zeit.{down}{down}"
+50340 print"Breite     "52:print"{up}"tab(10);:inputb
+50350 ifabs(b)>=90then50340
+50360 print"Laenge      ";-8:print"{up}"tab(10);:inputl
+50370 ifabs(l)>180then50360
+50380 sb=sin(b*p1):cb=cos(b*p1)
+50390 print"Jahr        "right$(a$,4)
+50400 print"{up}"tab(10);:inputj
+50410 t=int(val(mid$(a$,2)))
+50420 m=int(val(mid$(a$,len(str$(t))+2,2)))
+50430 print"Monat      "m
+50440 print"{up}"tab(10);:inputm
+50450 ifm>12orm<1then50440
+50460 print"Tag        ";t
+50470 print"{up}"tab(10);:inputt
+50480 ift<1ort>31then50470
+50490 wz=int(val(ti$)/100)-100
+50495 ifwz<100thenwz=wz+2400
+50500 print"Weltzeit    hhmm"
+50505 printtab(12)right$(str$(wz),4)
+50510 print"{up}"tab(10);:inputwz$:wz=val(wz$)/100
+50520 ifwz<0orwz>24goto50510
+50530 zt=int(wz)+frac(wz)/.6
+50600 i=m<3
+50610 k=t+int((153*m-11*i-162)/5)+int((1461*j+i)/4)+(j>=0)*366
+50620 ifk>577736thenk=k-int((int((j+i)/100)*3-5)/4)
+50630 ta=k-693596:tg=k-711858+zt/24:i=ta/36525
+50640 e=23.452294-i*.013125-i*i*1.639e-6+i*i*i*5.028e-7
+50650 es=sin(e*p1):ec=cos(e*p1)
+52000 rem ** funktionen definieren **
+52010 rem **  arcsin  **
+52020 deffnas(x)=atn(x/sqr(1-x*x))
+52030 rem **  arccos  **
+52040 deffnac(x)=pi/2-atn(x/sqr(1-x*x))
+52050 rem **  modulo  **
+52060 deffnmo(x)=x-int(x/c)*c
+54000 rem ** zeit **
+54010 wz$=mid$(str$(int(frac(wz)*100+.5)),2)
+54020 wz$=right$("0"+wz$,2)
+54030 wz$=right$(" "+str$(int(wz)),3)+":"+wz$
+54040 lo=int(l/15)*15
+54050 oz=fnmo(zt*15-lo)/15
+54060 oz$=right$(" "+str$(int(oz)),3)+right$(wz$,3)
+54200 rem aries
+54210 ar=zt*360.985647/24+frac(ta/1461)*1440.02509
+54220 ar=ar+int(ta/1461)*.0307572+99.2018973
+54230 ar=fnmo(ar)
+54300 rem daten sternbilder
+54310 reset62000
+54320 fora=0toi3
+54330 readz$(a,0),z$(a,1),z(a,0),z(a,1)
+54340 next
+54350 ifwhgoto56000
+55000 rem ** anleitung **
+55010 print"{clr}{down}Dieses Programm zeichnet eine Sternen-"
+55020 print"karte mit der Sonne, dem Mond, den"
+55030 print"Planeten und den Fixsternen.":print
+55040 print"Die Namen der Sterne oder deren"
+55050 print"Standorte koennen wie folgt gesucht"
+55060 print"werden:":print
+55080 print"Mit den Cursor-Tasten das Kreuz auf"
+55090 print"oder in die Naehe des Sternes fuehren"
+55100 print"und f1 druecken.":print
+55110 print"Wenn das ganze Sternzeichen gesucht"
+55120 print"wird, dann f3 druecken.":print
+55130 print"Wenn der Name oder ein Teil des Namens"
+55140 print"eines Sterns oder Sternbildes eingegeben";
+55150 print"wird, geht das Kreuz alleine auf den":print"Stern"
+55160 print"Bei einem Sternbild blinken die dazu-"
+55170 print"gehoerigen Sterne.":print
+55180 print"Weiter = Taste druecken!";
+55200 poke198,0:wait198,1
+56000 gosub 1000:rem bildschirm
+56010 gosub10000:rem sonne mond
+56020 gosub20000:rem planeten
+56030 gosub25000:rem fixsterne
+56040 gosub 5000:rem kreuz
+56050 goto40000
+57000 rem ** hardcopy **
+57100 copy
+57110 goto40000
+58000 rem ** neustart **
+58010 nrm:cset1:mob off 1:wh=1
+58020 goto50300
+60000 rem ** daten fixsterne **
+60010 data037.8,89.3,polaris,0
+60020 data269.8,86.0,umi2,0
+60030 data252.5,82.2,umi3,0
+60040 data246.3,75.5,umi4,0
+60050 data238.5,78.0,umi5,0
+60060 data230.2,71.8,pherkad,0
+60070 data222.7,74.2,kochab,0
+60080 data206.9,49.3,benetnasch,1
+60090 data201.0,54.9,mizar,1
+60100 data193.5,56.0,alioth,1
+60110 data183.9,57.0,megrez,1
+60120 data178.5,53.7,phekda,1
+60130 data165.9,61.8,dubhe,1
+60140 data165.5,56.4,merak,1
+60150 data28.6,63.7,cas1,2
+60160 data21.5,60.2,cas2,2
+60170 data14.2,60.7,cas3,2
+60180 data10.1,56.5,schedir,2
+60190 data2.3,59.2,caph,2
+60200 data  3.3,15.2,algenib,3
+60210 data346.2,15.2,markab,3
+60220 data345.9,28.1,scheat,3
+60230 data311.6,34.0,cyg1,4
+60240 data310.4,45.3,deneb,4
+60250 data305.6,40.3,schedir,4
+60260 data296.2,45.1,cyg4,4
+60270 data292.7,28.0,albireo,4
+60280 data302.8,-0.8,aql1,5
+60290 data297.7,08.9,atair,5
+60300 data296.6,10.6,aql3,5
+60310 data292.0,03.5,aql4,5
+60320 data286.6,-4.9,aql5,5
+60330 data286.4,13.9,aql6,5
+60340 data284.7,32.7,lyr1,6
+60350 data283.0,37.0,lyr2,6
+60360 data282.5,33.4,lyr3,6
+60370 data280.2,38.8,lyr4,6
+60380 data279.2,38.8,wega,6
+60390 data265.6,-39.0,sco1,7
+60400 data264.3,-43.0,sco2,7
+60410 data263.4,-37.1,sco3,7
+60420 data262.7,-37.3,sco4,7
+60430 data252.5,-34.3,sco5,7
+60440 data249.0,-28.2,sco6,7
+60450 data247.3,-26.4,antares,7
+60460 data241.4,-19.8,acrab,7
+60470 data240.1,-22.6,sco9,7
+60480 data239.7,-26.1,sco10,7
+60490 data228.9,33.3,boo1,8
+60500 data225.0,41.0,boo2,8
+60510 data221.2,27.1,boo3,8
+60520 data218.0,38.3,boo4,8
+60530 data218.0,30.5,boo5,8
+60540 data213.9,19.2,arktur,8
+60550 data201.3,-11.2,spika,9
+60560 data198.0, -7.5,vir2,9
+60570 data195.5, 11.0,vir3,9
+60580 data193.9,  3.4,vir4,9
+60590 data190.0, -1.0,vir5,9
+60600 data185.0,  0.0,vir6,9
+60610 data177.0,  2.0,vir7,9
+60620 data191.9,-59.7,cru1,10
+60630 data187.8,-57.1,cru2,10
+60640 data186.7,-63.1,cru3,10
+60650 data183.8,-58.8,cru4,10
+60660 data177.3,14.5,denebola,11
+60670 data168.6,15.4,leo2,11
+60680 data168.5,20.5,leo3,11
+60690 data155.0,19.9,leo4,11
+60700 data152.1,12.0,regulus,11
+60710 data151.8,16.8,leo7,11
+60720 data146.5,23.8,leo6,11
+60730 data116.3,28.0,pollux,12
+60740 data113.7,31.9,kastor,12
+60750 data101.3,12.9,gem3,12
+60760 data101.0,25.1,gem4,12
+60770 data 99.4,16.4,gem5,12
+60780 data 95.7,22.5,gem6,12
+60790 data111.0,-29.3,cma1,13
+60800 data107.1,-26.4,cma2,13
+60810 data104.7,-29.0,cma3,13
+60820 data101.3,-16.7,sirius,13
+60830 data 98.2,-18.0,cma5,13
+60840 data90.0,37.2,aur1,14
+60850 data89.9,45.0,aur2,14
+60860 data79.2,46.0,capella,14
+60870 data75.5,43.8,aur4,14
+60880 data74.3,33.2,aur5,14
+60890 data88.8, 7.4,beteigeuze,15
+60900 data86.9,-9.1,ori2,15
+60910 data85.2,-2.0,ori3,15
+60920 data84.1,-1.2,ori4,15
+60930 data83.0,-0.3,ori5,15
+60940 data81.3, 6.4,bellatrix,15
+60950 data78.6,-8.2,rigel,15
+60960 data59.5,40.0,per1,16
+60970 data58.5,31.9,per2,16
+60980 data55.7,47.8,per3,16
+60990 data51.1,49.9,algenib,16
+61000 data47.0,41.0,algol,16
+61010 data46.2,53.5,per6,16
+61020 data31.0,42.0,alamak,17
+61030 data17.4,35.6,mirach,17
+61040 data 9.8,31.9,and3,17
+61050 data 2.1,29.1,sirrah,17
+61060 data354.8,77.6,cep1,18
+61070 data342.5,66.0,cep2,18
+61080 data322.2,70.6,alfrik,18
+61090 data319.6,62.6,alderamin,18
+61100 data269.2,51.5,dra1,19
+61110 data262.6,52.3,dra2,19
+61120 data231.2,59.0,dra3,19
+61130 data246.0,61.5,dra4,19
+61140 data257.2,65.7,dra5,19
+61150 data288.1,67.7,dra6,19
+61160 data31.8,23.5,hamal,20
+61170 data28.7,20.8,ari2,20
+61180 data84.4,21.2,tau1,21
+61190 data81.6,28.6,elnath,21
+61200 data69.0,16.5,aldebaran,21
+61210 data58.8,12.5,tau4,21
+61220 data56.9,24.1,plejaden,21
+61230 data114.8,5.2,prokyon,22
+61240 data111.8,8.3,cmi2,22
+62000 rem ** daten sternbilder **
+62010 dataursa minor,kleiner wagen,6,1
+62020 dataursa maior,grosser wagen,6,8
+62030 datacassiopeia,kassiopeia,4,15
+62040 datapegasus,pegasus,2,20
+62050 datacygnus,schwan,4,23
+62060 dataaquilla,adler,5,28
+62070 datalyra,leier,4,34
+62080 datascorpius,skorpion,9,39
+62090 databootes,bootes,5,49
+62100 datavirgio,jungfrau,6,55
+62110 datacrux,kreuz sueden,3,62
+62120 dataleo,loewe,6,66
+62130 datagemini,zwillinge,5,73
+62140 datacanis maior,grosser hund,4,79
+62150 dataauriga,fuhrmann,4,84
+62160 dataorion,orion,6,89
+62170 dataperseus,perseus,5,96
+62180 dataandromeda,andromeda,3,102
+62190 datacepheus,kepheus,3,106
+62200 datadraco,drache,5,110
+62210 dataaries,widder,1,116
+62220 datataurus,stier,4,118
+62230 datacanis minor,kleiner hund,1,123
+62500 rem ** daten planeten **
+62510 datamerkur,4.0923, 31.19, 76.987
+62520 data23.00,.2056, 47.826,7.004, 0.3871
+62530 datavenus ,1.6021, 80.85,131.149
+62540 data 0.76,.0068, 76.410,3.394, 0.7233
+62550 datamars  ,0.5240,144.14,335.507
+62560 data11.00,.0934, 49.326,1.850, 1.5237
+62570 datajupiter,.0831,316.19, 13.839
+62580 data 5.30,.0485,100.146,1.305, 5.2028
+62590 datasaturn,0.0335,158.36, 92.460
+62600 data 5.50,.0557,113.511,2.486, 9.5810
+62610 datauranus,0.0117, 98.38,170.173
+62620 data 5.70,.0472, 73.847,0.773,19.1823
+62700 rem ** e n d e **
+

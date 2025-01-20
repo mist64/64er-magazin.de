@@ -1,0 +1,722 @@
+
+
+;6510 i.prg ==0801==
+  100 rem  ******************************
+  110 rem  *            6510            *
+  120 rem  ******************************
+  130 rem  *     (c) copyright 1984     *
+  140 rem  * harald beine & arne jansen *
+  150 rem  *  schoettelkotter  damm 13  *
+  160 rem  *         4432   gronau      *
+  170 rem  *>tausch von c-64 programmen<*
+  180 rem  ******************************
+  190 rem
+  200 rem  ******************************
+  210 rem  *       steuerzeichen        *
+  220 rem  *  ------------------------  *
+  230 rem  *  "{clr}"  =  shift + clr/home  *
+  240 rem  *  "{home}"  =  clr/home          *
+  250 rem  *  "{down}"  =  crsr down         *
+  260 rem  *  "{wht}"  =  ctrl  + 2         *
+  270 rem  *  "{red}"  =  ctrl  + 3         *
+  280 rem  *  "{cyn}"  =  ctrl  + 4         *
+  290 rem  *  "{pur}"  =  ctrl  + 5         *
+  300 rem  *  "{grn}"  =  ctrl  + 6         *
+  310 rem  *  "{blu}"  =  ctrl  + 7         *
+  320 rem  *  "{yel}"  =  ctrl  + 8         *
+  330 rem  *  "{rvon}"  =  ctrl  + 9         *
+  340 rem  *  "{orng}"  =  c=    + 1         *
+  350 rem  *  "{lblu}"  =  c=    + 7         *
+  360 rem  ******************************
+  370 rem
+  380 poke56,126:clr:poke251,0
+  390 r=1:ls=1:sh=3:mu=1:sp=100:ms= 5:fs=1:of=0:le=1
+  400 ri=0:co=0:ck=1:v=53248:si=54272
+  410 pokesi+12,71:pokesi+13,25:pokesi+11,0
+  420 fori=0to17:reada:poke52736+i,a:next
+  430 sys52736:pokesi+24,0:pokev+21,0
+  440 pokev+48,0:pokev+17,155:pokev+16,0
+  450 pokev+32,0:pokev+33,0
+  460 cx= 0:cy=10:gosub3120
+  470 printchr$(14)chr$(8)
+  480 print"{clr}{grn}{rvon}                                        ";
+  490 print" Bitte 22 Sek. Geduld !!  Lese Daten !! ";
+  500 print"                                        "
+  510 x=248:y=249
+  520 rem daten einlesen
+  530 fori=832to832+33:reada:pokei,a:next
+  540 sys832
+  550 fort=0to62:reada:poke61440+t,a:next
+  560 fort=0to62:reada:poke61504+t,a:next
+  570 fort=0to62:reada:poke61568+t,a:next
+  580 fort=0to62:poke61696+t,0:next
+  590 fort=0to62step3:poke61696+t,60:next
+  600 fort=0to62:reada:poke61760+t,a:next
+  610 fort=0to62:reada:poke61824+t,a:next
+  620 fort=0to62:reada:poke61888+t,a:next
+  630 fort=0to62:reada:poke61952+t,a:next
+  640 fori=0to25:reada:b$=b$+chr$(a):next
+  650 foran=0to18:fori=0to7
+  660 reada:poke59392+i+8*an,a
+  670 nexti:nextan
+  680 poke56334,peek(56334)and254:poke1,peek(1)and251
+  690 fora=0to7:poke59552+a,peek(54088+a):next
+  700 fora=0to7:poke59560+a,peek(55112+a):next
+  710 fora=0to7:poke59568+a,peek(54008+a):next
+  720 fora=0to7:poke59544+a,peek(55032+a):next
+  730 poke1,peek(1)or4:poke56334,peek(56334)or1
+  740 fori=32768to33229:reada:pokei,a:next
+  750 fori=36600to36863:pokei,0:next
+  760 fori=0to255:reada:poke50432+i,a:reada
+  770 poke50688+i,a:next
+  780 fori=0to117:reada:poke828+i,a:next:
+  790 fori=0to15:reada:poke704+i,a:next
+  800 iff=1thenend:rem wenn fehler in data,dann ende
+  810 poke770,704and255:poke771,704/256
+  820 pokev+24,11:poke56576,peek(56576)and252:poke648,192
+  830 gosub3190:print"{clr}{lblu}":pokesi+24,0
+  840 print"lpllpllopqllllolqopqolqolopllopqopollopl";
+  850 print"abfeabeabfefababfeabfeabeffeabffabfeabfe";
+  860 print"cd  cd      cd    cd  cd    cd      cd  ";
+  870 print:print
+  880 print"gh      gh  gh  gh    gh    gh    gh    ";
+  890 print"ij@ij k ijghijnjij    ij@ij@ijkij@ijkijk";
+  900 print"lpllpllopqllllolqb    aolopllopqopollopl";
+  910 ifco=1then990
+  920 c=0:pokev+21,3:pokev+1,80:pokev+3,80:pokev+5,80
+  930 print"{down}{yel}":fori=1to3:readaw,ew,sw,s1,s2:gosub1560
+  940 next:fori=104to245
+  950 pokev+0,i+6:pokev+2,i+6
+  960 ifi>=104andi=(int(i/8))*8andc<=13thengosub3370
+  970 next:print:gosub3390
+  980 fori=1to2:readaw,ew,sw,s1,s2:gosub1560:next
+  990 ifco=0then1030
+ 1000 pokev+0,172:pokev+1,80:pokev+2,172:pokev+3,80
+ 1010 print"{down}{down}"tab(14)"{yel}"a$
+ 1020 gosub3390
+ 1030 cx=0: cy=16:gosub3120
+ 1040 rem      f       gravitation       normal
+ 1050 print"{gry2}{down} F1    : GRAVITATION    :  NORMAL  "
+ 1060 rem    f       laser speed       normal
+ 1070 print" F3    : LASER{$a0}SPEED    :  NORMAL  "
+ 1080 rem    f       anzahl schiffe
+ 1090 print" F5    : ANZAHL{$a0}SCHIFFE :  3  "
+ 1100 rem    f       musik             ein
+ 1110 print" F7    : MUSIK          :  EIN"
+ 1120 rem    crsr _  fuelsaeule        schnell
+ 1130 print" CRSR _: FUELSEULE      :  SCHNELL"
+ 1140 rem    return  start
+ 1150 print" RETURN: START "
+ 1160 fort=0to30:next:a=peek(203)
+ 1170 onagosub1430,1240,1200,1270,1340,1400
+ 1180 ifa=1thenpokesi+24,15:goto1600
+ 1190 goto1160
+ 1200 cx=27:cy=20:gosub3120
+ 1210 ifmu=1thenprint"AUS":mu=0:return:rem aus
+ 1220 ifmu=0thenprint"EIN":mu=1:rem ein
+ 1230 return
+ 1240 cx=27:cy=21:gosub3120
+ 1250 iffs=1thenprint"LANGSAM":fs=0:return:rem langsam
+ 1260 iffs=0thenprint"SCHNELL":fs=1:return:rem schnell
+ 1270 gr=gr+1:ifgr>4thengr=1
+ 1280 cx=27:cy=17:gosub3120
+ 1290 ifgr=1thenprint"STARK     ":rem stark
+ 1300 ifgr=2thenprint"SCHWACH{$a0}{$a0} ":rem schwach
+ 1310 ifgr=3thenprint"NORMAL    ":rem normal
+ 1320 ifgr=4thenprint"SCHWAECHER":rem schwaecher
+ 1330 return
+ 1340 ls=ls+1:ifls>3thenls=1
+ 1350 cx=27:cy=18:gosub3120
+ 1360 ifls=1thenprint"SCHNELL ":rem schnell
+ 1370 ifls=2thenprint"LANGSAM ":rem langsam
+ 1380 ifls=3thenprint"NORMAL  ":rem normal
+ 1390 return
+ 1400 sh=sh+1:ifsh>15thensh=3
+ 1410 cx=26:cy=19:gosub3120
+ 1420 printshchr$(157)chr$(32):return
+ 1430 print"{home}{down}{down}{down}{down}{down}{down}{down}{down}"
+ 1440 fort=0to4
+ 1450 print"                                     "
+ 1460 next
+ 1470 rem              joystick in port 1
+ 1480 print"           JOYSTICK{$a0}IN{$a0}PORT{$a0}1       "
+ 1490 fort=0to7
+ 1500 print"                                     "
+ 1510 next
+ 1520 aw=173:ew=255:sw=1:s1=0:s2=2:gosub1560
+ 1530 pokev+16,3:aw=0:ew=100:gosub1560
+ 1540 pokev+0,0:pokev+2,0:pokev+16,0
+ 1550 return
+ 1560 rem schleife
+ 1570 fork=awtoewstepsw:pokev+s1,k:pokev+s2,k
+ 1580 fort=0to30:next:next
+ 1590 return
+ 1600 ifls=1thenpoke33004,40:poke33020,20
+ 1610 ifls=2thenpoke33004,200:poke33020,100
+ 1620 ifls=3thenpoke33004,100:poke33020,50
+ 1630 ifgr=1thengr=30
+ 1640 ifgr=2thengr=150
+ 1650 ifgr=3thengr=70
+ 1660 ifgr=4thengr=255
+ 1670 poke33032,230:poke33033,249
+ 1680 poke36611,  1:poke36607,8
+ 1690 poke33156,ms :poke36860,5
+ 1700 iffs=1thenpoke32978,10
+ 1710 iffs=0thenpoke32978,50
+ 1720 pokesi+2,2:pokesi+3,7
+ 1730 ifmu=0thenpoke33152, 96:pokesi+24,15
+ 1740 pokev+21,247
+ 1750 poke56549,sp:poke36862,51
+ 1760 sys32768:pokev+30,0:pokev+31,0
+ 1770 ifri=1thenl1=5:l2=1:l3=-1
+ 1780 ifri=0thenl1=1:l2=6:l3=1
+ 1790 forla=l1tol2stepl3:ti$="000000"
+ 1800 ax=peek(v+21):pokev+21,0
+ 1810 onlagosub3520,3750,4020,4280,4550,4890
+ 1820 pokev+21,ax
+ 1830 pokex,xk(ri):pokey,yk(ri)
+ 1840 poke36614,0:ifri=1thenpoke36614,mb
+ 1850 cx=0 :cy=22:gosub3120
+ 1860 print"{wht} {CBM-A}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{CBM-R}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{CBM-R}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{CBM-S}
+ 1870 rem     ships     time        score
+ 1880 print" {SHIFT--}SHIPS:   {SHIFT--}TIME:      {SHIFT--}SCORE:        {SHIFT--}
+ 1890 print" {CBM-Z}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{CBM-E}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{CBM-E}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{CBM-X}{home}"
+ 1900 cx=8 :cy=23:gosub3120:printsh;:gosub3150
+ 1910 gosub3170:cx=31:gosub3120:printsc;:poke33028,gr
+ 1920 poke251,0:pokev+30,0:pokev+31,0
+ 1930 sys8*4096
+ 1940 ifpeek(251)then2780
+ 1950 poke250,ri
+ 1960 a=peek(v+31):if(aand7)then2830
+ 1970 a=peek(v+30)
+ 1980 ifa=68thengosub2940
+ 1990 ifaand128then2060
+ 2000 if(aand7)then2830
+ 2010 ifpeek(36862)>=250then2050
+ 2020 if(peek(56321)and16)=0thengosub3080
+ 2030 cx=18:cy=23:gosub3120:printmid$(ti$,3,2);
+ 2040 print":"right$(ti$,2):goto1940
+ 2050 poke53274,0:poke53280,0:poke33028,1:of=1:goto1940
+ 2060 a=0:onlagoto2190,2070,2070,2070,2700,2080
+ 2070 goto2000
+ 2080 ri=1:pokev+14,0:pokev+15,0:poke36610,1:poke33038,40
+ 2090 a=0:ifu=1then2000
+ 2100 gosub3150
+ 2110 poke648,4:forh=0to5 :fori=7to18
+ 2120 cx=15:cy=i:gosub3120
+ 2130 print"{rvon}{blu}                       "
+ 2140 cx=15:cy=i:gosub3120
+ 2150 print"{rvon}{red}                       "
+ 2160 cx=15:cy=i:gosub3120
+ 2170 print"{rvon}{yel}                       "
+ 2180 next:next:u=1:poke648,192:gosub3170:goto2000
+ 2190 ifpeek(36610)<>1then2000
+ 2200 pokev+23,176:pokev+29,128:poke50174,200
+ 2210 pokev+12,176:pokev+13,90
+ 2220 poke33038,45:pokev+21,195:pokesi+24,0
+ 2230 sys52736:poke32809,162:poke32810,128
+ 2240 sys32768:pokev+40,2:pokev+32,0
+ 2250 pokev+26,0:fori=0to62:poke62144+i,0:next
+ 2260 fori=0to3000:next:gosub3150
+ 2270 fori=0to2:cx=0:cy=22+i:gosub3120
+ 2280 print"                                       ";
+ 2290 printchr$(20)" ";:next
+ 2300 sys828:pokev+45,1:pokev+46,8
+ 2310 poke50172,203:poke50173,203:pokev+43,6
+ 2320 pokev+44,6:pokev+8,152:pokev+9,194
+ 2330 pokev+11,194:pokev+10,216:pokev+21,243:poke646,6
+ 2340 fori=0to62step3:poke62144+i,255
+ 2350 forj=0to50:nextj,i
+ 2360 fori=0to4:cx=16:cy=18+i:gosub3120
+ 2370 print"q       q";:next
+ 2380 fori=194to220step2:pokev+9,i:pokev+11,i
+ 2390 forj=0to50:nextj,i
+ 2400 fori=0to1:cx=16:cy=23+i:gosub3120
+ 2410 print"q       q";:next
+ 2420 pokev+21,195:pokev+23,128:pokev+29,176
+ 2430 poke50173,195:poke50172,195
+ 2440 pokev+8,141:pokev+10,189:pokev+9,186
+ 2450 pokev+11,186:pokev+21,243
+ 2460 cx=17:cy=17:gosub3120:print"       ";
+ 2470 fori=0to29:pokev+8,141-i:pokev+10,189+i
+ 2480 forj=0to20:nextj,i
+ 2490 fori=0to3000:next
+ 2500 fori=peek(v)to176stepsgn(176-peek(v))
+ 2510 pokev,i:pokev+2,i
+ 2520 forj=0to20:nextj,i:fori=0to1000:next
+ 2530 fori=peek(v+1)to246:pokev+1,i:pokev+3,i
+ 2540 forj=0to20:nextj,i
+ 2550 sp=sp-10:le=le+1:ifsp<=35thensp=sp+10
+ 2560 fori=0to3000:next:pokev+21,0:printchr$(142)
+ 2570 print"{clr}{wht}{down}{down}{down}{down}       herzlichen glueckwunsch !!
+ 2580 print"{down}{down}{down}           sie haben ihre
+ 2590 print"{down}         mission erfolgreich
+ 2600 print"{down}{down}              beendet !!
+ 2610 print"{down}{down}{down}      ab jetzt wird's schneller !
+ 2620 print"{down}{down}               level :"le
+ 2630 fori=0to5000:next
+ 2640 gosub3190
+ 2650 printchr$(14)
+ 2660 pokev+21,243
+ 2670 poke33038,40:poke36610,0
+ 2680 ri=0:goto1750
+ 2690 goto2000
+ 2700 gosub3150:pokev+14,0:pokev+15,0:pokev+12,255
+ 2710 forz=9to13:cx=31:cy=z:gosub3120:print" "
+ 2720 pokesi+18,33:pokesi+18,32
+ 2730 fori=0to300:next:next
+ 2740 cx=36:cy=6:gosub3120:print" "
+ 2750 forz=7to16:cx=35:cy=z:gosub3120:print"  ":pokesi+18,33
+ 2760 pokesi+18,32:fori=0to300:next:next
+ 2770 cx=36:cy=z:gosub3120:print"  ":gosub3170:goto2010
+ 2780 ifri=1andla=1then1940
+ 2790 sc=sc+((240-val(ti$))*10)
+ 2800 cx=30:cy=23:gosub3120:print"SCORE{$a0}: "sc;:poke251,0
+ 2810 rem score
+ 2820 next:goto1770
+ 2830 rem ruettel routine
+ 2840 kr=peek(v+17):gosub3150:pokesi+11,129:pokesi+8,50
+ 2850 pokesi+12,16* 1+5
+ 2860 pokesi+13,16* 1+1
+ 2870 fori=1to10:pokev+17,23:pokesi+11,129:fort=0to50:next
+ 2880 pokev+17,16:pokesi+11,128:fort=0to50:next:next
+ 2890 pokev+17,kr:pokesi+11,0
+ 2900 poke36862,51
+ 2910 pokesi+12,71:pokesi+13,25:sh=sh-1:ti$="000000"
+ 2920 ifsh=0thensh=3:goto3010
+ 2930 goto1830
+ 2940 gosub3150:y1=peek(y):pokesi+5,255:fori=0to500:next
+ 2950 ifof=1thenof=0:poke53274,241:poke33028,gr:poke36862,250
+ 2960 fori=peek(36862)to51step-1:poke36862,i:pokesi+ 8,i-51
+ 2970 pokesi+11,17:pokesi+11,18:next
+ 2980 pokey,y1-1:gosub3180:forxy=0to100
+ 2990 next:ifpeek(v+30)theny1=y1-1:goto2980
+ 3000 gosub3170:pokesi+11,0:a=0:pokesi+5,77:return
+ 3010 sys52736:pokev+21,0:poke53280,0:pokesi+4,0
+ 3020 printchr$(147):cx=15:cy=12:gosub3130:print"GAME OVER"
+ 3030 ifsc>hsthenhs=sc
+ 3040 print"{down}{down}{down}         SCORE : "sc:rem score
+ 3050 print"{down}    HIGH SCORE : "hs:rem high -
+ 3060 fori=0to4000:next:ri=0:sc=0
+ 3070 pokev+21,3:co=1:sp=100:goto830
+ 3080 if((peek(v+21))and4)=4then3100
+ 3090 pokev+21,peek(v+21)or4:goto3110
+ 3100 pokev+21,peek(v+21)and251
+ 3110 return
+ 3120 rem cursor positionieren
+ 3130 poke211,cx:poke214,cy:sys58640:return
+ 3140 rem raumschiff festhalten
+ 3150 sys33217:pokev+21,peek(v+21)and207:return
+ 3160 rem raumschiff loslassen
+ 3170 sys33204:poke36608,50:return
+ 3180 pokev+1,y1:pokev+3,y1:pokev+5,y1:pokev+7,y1:return
+ 3190 rem sprites initialisieren
+ 3200 pokev+31, 0:poke33048,4
+ 3210 pokev+39, 7:pokev+40 ,2
+ 3220 pokev+41, 1:pokev+42 ,0
+ 3230 pokev+43, 5:pokev+44 ,5
+ 3240 pokev+32, 0:pokev+33 ,0
+ 3250 pokev+23,48:pokev+27 ,240
+ 3260 pokev+29,64:poke33052,84
+ 3270 fort=0to62:poke61632+t,0:next
+ 3280 fort=0to23:poke61632+t,255:next
+ 3290 poke50168,192:poke50169,193
+ 3300 poke50170,194:poke50171,195
+ 3310 poke50172,196:poke50173,196
+ 3320 poke50174,197:poke50175,198:poke36610,0
+ 3330 pokesi+ 2,  2:pokesi+ 3,  7:u=0
+ 3340 pokesi+ 5, 77:pokesi+19,0:pokesi+20,244
+ 3350 pokesi+15, 30:poke36614,0:pokev+16,0
+ 3360 pokesi+6,24:pokesi+24,15:return
+ 3370 readze:printtab(i/8)chr$(ze);:c=c+1:a$=a$+chr$(ze)
+ 3380 return
+ 3390 print"{orng}{down}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght} (C) 1984  BY "
+ 3400 print"{down}{rght}{rght}{rght}{rght}{rght}  "b$:return
+ 3520 rem ** labyrinthe **
+ 3530 print"{clr}{blu}{down}{down}                  uqqqs
+ 3540 print"                uqqt vqqs
+ 3550 print"               uqt     vqs
+ 3560 print"              uqt       vqs
+ 3570 print"              qt         vq
+ 3580 print"             uq           qs
+ 3590 print"             qt           vq
+ 3600 print"            uq             qs
+ 3610 print"qqqqqqqqqqqqqt             vqqqqqqqqqqqq";
+ 3620 print"ababfapldfab{wht}q{blu}               {wht}q{blu}flolplfeabf";
+ 3630 print"cdcd  ab  cd                  fplob  cd ";
+ 3640 print"      cd                       abf      ";
+ 3650 print"                                        ";
+ 3660 print"gh             gh       gh          gh  ";
+ 3670 print"ij@kij  kij@{wht}q{blu} @ij       ijkk{wht}q{blu}      @ij@ ";
+ 3680 print"qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq";
+ 3690 poke36614,0:xk(0)=174:yk(0)=130
+ 3700 pokev+8,248:pokev+9,139:pokev+12,0
+ 3710 poke v+13,0:pokev+10,120:pokev+11,139
+ 3720 pokev+23,176:pokev+29,192
+ 3730 poke 50175,198:pokev+14,164:pokev+15,73
+ 3740 xk(1)=54:yk(1)=151:mb=15:pokev+46,8:return
+ 3750 print"{clr}{red}ollqlpolqloqpllllllloqllpllolqllplloqlll";
+ 3760 print"lollplloqlloqollllqllolpllllolqplllqolll";
+ 3770 print"olopllqlollplllollqllpollqllqoplllllpoll";
+ 3780 print"loqllqlllopqlllplqllpqlollqlllollllpllol";
+ 3790 print"llollpollpolllpolqlpllqpoqllqlpollpolllo";
+ 3800 print"lllopllopllolpllolpollpllolqlplpolllollp";
+ 3810 print"lllqllqlloqllqlpllqllplqlpolllpllollloll";
+ 3820 print"efabe{wht}q{red}abpllpllpolqlabef{wht}q{red}abfabfeabfeabfea";
+ 3830 print"  cd  cdfabollolobfcd   cd     cd  cd  c";
+ 3840 print"         cdablplo        {$a0}
+ 3850 print"           cdfole                     ";
+ 3860 print"  ijk           ab     ij{wht}q{red}j@ij     ij@gh@ ";
+ 3870 print"lqoll{wht}q{red} @gh{$a0}   cd    kolpolll     oloplql";
+ 3880 print"lllolqllij@        ilplllopl     lllolll";
+ 3890 print"lllpolqplll@      illollllol{CBM-POUND}{CBM-POUND}{CBM-POUND}{CBM-POUND}{CBM-POUND}lllpoll";
+ 3900 print"llplqopqlllpl@ gh@pollolllpllllllllpllol";
+ 3910 print"lpollqolllplll@ijlqlolpoqpllllolplpolllo";
+ 3920 print"pllolllolqollqpllqlqpolplollllppllllolll";
+ 3930 print"olqlolllollolplqllqplqoollolllpollllpoll";
+ 3940 print"lollpolllolpoqolllpollpolllllpllollpllol";
+ 3950 print"llopllolqlolloqolllllplllllllllllollllll";
+ 3960 print"llpolllolllolllpolllpollllllllllllllllll"
+ 3970 poke36614,0:xk(0)=26:yk(0)=116:xk(1)=59
+ 3980 yk(1)=117:mb=15:pokev+46,0
+ 3990 pokev+8,64:pokev+9,106:pokev+10,208
+ 4000 pokev+11,106:pokev+14,0:pokev+15,0
+ 4010 pokev+12,245:pokev+13,150:return
+ 4020 print"{clr}{pur}abefabapolploqlplollpoplllplqlloplqlqopl";
+ 4030 print"cd  cd oqpolpoqollopllollpollqlloqlqlqol";
+ 4040 print"       folplpab {wht}q{pur}flabflolllolqlababababo";
+ 4050 print"       gppolb     fcd fabnlpollcdcd  c l";
+ 4060 print"gh     ioopom            npllom         ";
+ 4070 print"ij@    appob             fllom          ";
+ 4080 print"oqlj    flpj       gh    fllom          ";
+ 4090 print"lopb    iplb    {wht}q{pur}ijij     lllm          ";
+ 4100 print"lpoj    aolj    oqplpm    flm           ";
+ 4110 print"plqlj    pob    lplpol     lm           ";
+ 4120 print"abfef    old   nqlpllm     nm
+ 4130 print"cd       ab    nlpobfe    nm            ";
+ 4140 print"{$a0}        cd   nqllf       lm            ";
+ 4150 print"             golbf       nlmgh          ";
+ 4160 print"     gh      @plm     @ij@omij         l";
+ 4170 print"     ij@gh @ipom    iqlolllolqlqqm    nq";
+ 4180 print"qlpqolllij@oplpm    {wht}q{pur}bfef ab e ab     ab";
+ 4190 print"lpllplqplqplplpm               cd     cd";
+ 4200 print"polqlopqlpqqolqm                        ";
+ 4210 print"lllqlloqplqlpollgh      gh  gh     gh gh";
+ 4220 print"llllqllolllpllolij@ {wht}q{pur}  @ij@ ij @ij ij@ij";
+ 4230 print"ollllllpolpllllollllllllllllllllllllllll";
+ 4240 poke36614,0:xk(0)=30:yk(0)=65:pokev+12,18
+ 4250 pokev+13,160:pokev+14,0:pokev+8,152
+ 4260 pokev+10,184:pokev+11,175:pokev+15,0
+ 4270 xk(1)=57:yk(1)=102:mb=15:pokev+9,70:return
+ 4280 print"{clr}{lblu}abfbfeaolbabolqopqoqllqpllqqlplqobabf ef";
+ 4290 print"cd     ab cdaolplqlolqlolqllpbab  cd
+ 4300 print"              fqllabolqpllqpl
+ 4310 print"gh  gh         f {wht}q{lblu}cdaopolqplb         gh";
+ 4320 print"ij@ ij@   @          plqopff     @@ @ ij";
+ 4330 print"qolqpllqlpll         flqqo@     nqpqoqlp";
+ 4340 print"lplbabcd   a{wht}q{lblu}         abflo@gh   pqqlopq";
+ 4350 print"plb cd                   faoij   faoqlol";
+ 4360 print"olj  {$a0}                    nqlb{$a0}    qoqpo";
+ 4370 print"lolj    @        {wht}q{lblu} ij     nlf    @ilppql";
+ 4380 print"qpol   npjgh{$a0}   nollpj    lf    iloppolq";
+ 4390 print"pfab    flpj     noplb   @l@    alppoqol";
+ 4400 print"b cd     nlq{wht}q{lblu}    npab    pql@    faqloql";
+ 4410 print"m        @olj    pfcd   nolllm     alpqq";
+ 4420 print"j       @olob   nlj    nllolf    ghipoll";
+ 4430 print"lj     iolol    lllj    flpo     ijplqol";
+ 4440 print"qlqpolqlpbab    llll    @plf    @llqllql";
+ 4450 print"abfaqobff       oplf   @plf    nllqqlqqo";
+ 4460 print"cd  ab         npab    abf     iolqllqlp";
+ 4470 print"           gh@@pbcd          gilpqllqqlo";
+ 4480 print"gh        @ijopb             iopllqqqlqq";
+ 4490 print"ij@   {$a0} nllolloj  gh  @   @ijqlopolqqlll"
+ 4500 poke36614,0:xk(0)=34:yk(0)=196:pokev+12,35
+ 4510 pokev+13,160:pokev+14,0:pokev+8,120
+ 4520 pokev+9,106:pokev+10,160:pokev+11,80
+ 4530 pokev+15,0:pokev+46,0
+ 4540 pokev+46,0:xk(1)=59:yk(1)=56:mb=15:return
+ 4550 print"{clr}{orng}jcd  alpqpoqllplqlbabaoqj
+ 4560 print"bgh  iqoplqfefab   cd foqj             i";
+ 4570 print"jij@lqploqb   cd       e{wht}q{orng}pj           ib";
+ 4580 print"qlolqloab                alj         ib ";
+ 4590 print"llqolpfcd                 alj{CBM-R}{CBM-R}{CBM-R}{CBM-R}{CBM-R}{CBM-R}{CBM-R}ib  ";
+ 4600 print"plqplb      ij     ij@     al{CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-I}b   ";
+ 4610 print"oqpolj      alqbob{wht}q{orng}faoj     apj   ib{CBM-W}   ";
+ 4620 print"lplqoq@gh    aojcd   eoj     qlj ib{CBM-Q}{CBM-W}   ";
+ 4630 print"polqplpij     pb      eo{wht}q{orng}    abqpb {CBM-Q}{CBM-W}   ";
+ 4640 print"lloloplqlj    aj       poj     q   {CBM-Q}{CBM-W}   ";
+ 4650 print"qlpoqoioab    nb       flo     q   {CBM-Q}{CBM-W}   ";
+ 4660 print"qpoqoqobcd    lj  {wht}q{orng}    @bf     q   {CBM-Q}{CBM-W}   ";
+ 4670 print"pllqplb      aopqlb    lj      q   {CBM-Q}{CBM-W}   ";
+ 4680 print"oqllolj gh      f      al    ghq   {CBM-Q}{CBM-W}   ";
+ 4690 print"abfefaqjij           ijil    ijlo  {CBM-Q}{CBM-W}   ";
+ 4700 print"cd    lpll@@        @loof    olopj {CBM-Q}{CBM-W}   ";
+ 4710 print"      abpqlojij@   ipqbf    @qopolj{CBM-Q}{CBM-W}   ";
+ 4720 print"      cd e  allplqlbab     @olplqolj{CBM-W}   ";
+ 4730 print"gh                  cd     appoqlpqlj   ";
+ 4740 print"ij@                        iolqqlolqlj  ";
+ 4750 print"lpqj@ijgh                ghaloqpoqolqpj ";
+ 4760 print"pllqlolij@{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}qijiqlooqlpoplqj"
+ 4770 poke36614,0:xk(0)=43:yk(0)=180:pokev+12,0
+ 4780 pokev+13,0:pokev+14,145:pokev+8,216
+ 4790 pokev+9,74:pokev+10,168:pokev+11,102
+ 4800 poke50175,199:pokev+23,48:pokev+29,64
+ 4810 pokev+15,123:xk(1)=54:yk(1)=136:mb=15
+ 4820 onrigoto4840
+ 4830 pokev+46,1:return
+ 4840 forz=9to13:cx=31:cy=z:gosub3120:print" ":next
+ 4850 cx=36:cy=6 :gosub3120:print" "
+ 4860 cx=36:cy=17:gosub3120:print" "
+ 4870 forz=7to16:cx=35:cy=z:gosub3120:print"  "
+ 4880 next:pokev+46,0:return
+ 4890 print"{clr}{yel}opolqllpllloqplopllqlrrrrrrrrllqlpllqlop";
+ 4900 print"poqolqpolqlrrrrrrrrrrr{wht}q{yel}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{wht}q{yel}rrrrrrrrrrrr";
+ 4910 print"lqlbf faollb{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}      {CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}a";
+ 4920 print"olb     foq{CBM-J}                           {CBM-L}";
+ 4930 print"ab       ao{CBM-J}                           {CBM-L}";
+ 4940 print"cd        p{CBM-J}                           {CBM-L}";
+ 4950 print"          r{CBM-J}     rrrrr{wht}q    q{yel}rrrrr      {CBM-L}";
+ 4960 print"     r    r{CBM-J}   r    ij      ij    r    {CBM-L}";
+ 4970 print"gh   r    r{CBM-J}   r  rrrrrr  rrrrrr  r    {CBM-L}";
+ 4980 print"ij@ ir    r{CBM-J}   r  rpqqor  rpqqor  r    {CBM-L}";
+ 4990 print"polqlr    r{CBM-J}   rjiroqqprjiroqqprjir    {CBM-L}";
+ 5000 print"olollr    r{CBM-J}   roprqopqroprqopqropr    {CBM-L}";
+ 5010 print"pbcdar    r{CBM-J}   rporqpoqrporqpoqrpor    {CBM-L}";
+ 5020 print"b    r    r{CBM-J}   rbarpqqorbarpqqorbar    {CBM-L}";
+ 5030 print"{CBM-J}         r{CBM-J}   r {$a0}roqqpr  roqqpr  r    {CBM-L}";
+ 5040 print"{CBM-J}         r{CBM-J}   r{$a0} rrrrrr  rrrrrr  r    {CBM-L}";
+ 5050 print"{CBM-J}         r{CBM-J}   r    ab      ab    r    {CBM-L}";
+ 5060 print"{CBM-J}   rrrrrrr{CBM-J}     rrrrrrr  rrrrrrr      {CBM-L}";
+ 5070 print"{CBM-J}                                      {CBM-L}";
+ 5080 print"{CBM-J}                                      {CBM-L}";
+ 5090 print"j                   {$a0}{$a0}                 i";
+ 5100 print"lqopolqopqolqoqlplllollqopolllqoqplllqoq";
+ 5110 print"{up}{up}{up}{up}"
+ 5120 poke36614,0:xk(0)=25:yk(0)=96:xk(1)=25
+ 5130 yk(1)=96:pokev+12,0:pokev+13,0
+ 5140 pokev+8,240:pokev+9,60:pokev+10,201
+ 5150 pokev+11,60:poke50175,200:pokev+15,59
+ 5160 pokev+23,48+128:pokev+29,192:mb=0:poke33038,46
+ 5170 poke36610,1:pokev+14,200:pokev+21,243:return
+ 5180 rem datas    *******************************
+ 5190 data120,169, 49,141, 20,  3,169,234,141, 21
+ 5200 data  3,169,  0,141, 26,208, 88, 96,120,169
+ 5210 data 51,133,  1,169,  0,133, 95,133, 90,133
+ 5220 data 88,169,208,133, 96,169,240,133, 89,169
+ 5230 data224,133, 91, 32,191,163,169, 55,133,  1
+ 5240 data 88, 96
+ 5250 rem daten fuer sprites *********************
+ 5260 data0,0,0,0,0,0,0,0,0,0,0,0,0,0,0:rem 15 x 0
+ 5270 data 64,126,  2, 32,195,  4, 17,129,136, 11
+ 5280 data  0,208,  6,  0, 96, 62,  0,124,122,  0
+ 5290 data 94,119,129,238,120,255, 30, 30, 60,120
+ 5300 data  7,129,224,  0,255
+ 5310 data0,0,0,0,0,0,0,0,0,0,0,0,0,0,0:rem 15 x 0
+ 5320 data0,0,0,0,0,0,0,0,0,0,0,0,0,0,0:rem 15 x 0
+ 5330 data  0,  0, 60,  0,  0,126,  0,  0,255,  0
+ 5340 data  1,255,128,  1,255,128,  1,255,128,  0
+ 5350 data126,0,0,0,0,0,0,0,0,0,0,0,0,0:rem 13 x 0
+ 5360 data0,0,0,0,0,0,0,0,0,0,0,0,0,0,0:rem 15 x 0
+ 5370 data0,0,0,0,0,0,0,0,0,0,0,0,0,0,0:rem 15 x 0
+ 5380 data0,0,0,0,0,0,0,0,0,0,0,0,0,0,0:rem 15 x 0
+ 5390 data0,0,0,0,0,0,0,0,0,0,0,0,0,0,0:rem 15 x 0
+ 5400 data 12,  0, 48, 24,  0, 24, 48,  0, 12,120
+ 5410 data  0, 30,252,  0, 63,192,  0,  3,192,  0
+ 5420 data  3,192,  0,  3,192,  0,  3,192,  0,  3
+ 5430 data192,  0,  3,192,  0,  3,192,  0,  3,192
+ 5440 data  0,  3,192,  0,  3,255,255,255,225,108
+ 5450 data 55,225,109,247,239,108,247,227,108,247
+ 5460 data206,  9,225,206,  8, 33,255,255,255,240
+ 5470 data  0, 15,240,  0, 15,240,  0, 15,  2,  0
+ 5480 data 64,130,  0, 65,130,  0, 65,194,  0, 67
+ 5490 data 66,  0, 66, 98,  0, 70, 34,  0, 68, 50
+ 5500 data231, 76, 18,189, 72, 27,129,216,136,129
+ 5510 data 17,207,129,243, 96,129,  6, 63,129,252
+ 5520 data  0,129,  0,255,129,255,  0,129,  0,  3
+ 5530 data129,192, 14,129,112, 56,129, 28,224,255
+ 5540 data  7,  0,  0,248,  0,  1,252,  0,  3,  6
+ 5550 data  0,  6,  3,  0,  6,  3,  0,  6,  3,  0
+ 5560 data  6,  3,  0,  6,  3,  0,  3,  6,  0,  3
+ 5570 data252,  0,  7,248,  0, 15,  0,  3,158,  0
+ 5580 data  3,252,  0,  9,248,  0,125,240,  0, 63
+ 5590 data224,  0, 63,192,  0, 31,128,  0, 15,  0
+ 5600 data  0, 14,  0,  0,  0,  0,  0,  3,195,192
+ 5610 data 15,126,240, 15,255,240,  3,  0,192,  3
+ 5620 data126,192, 15, 66,240, 15,126,240,  3,  0
+ 5630 data192,  3,126,192, 15,  0,240, 15, 94,240
+ 5640 data  3, 82,192,  3,114,192, 15,  0,240, 15
+ 5650 data 78,240,  3, 74,192,  3,126,192, 15,  0
+ 5660 data240, 15,255,240,  3,255,192
+ 5670 data200,193,210,193,204,196, 32,194,197,201
+ 5680 data206,197, 32, 38, 32,193,210,206,197, 32
+ 5690 data202,193,206,211,197,206
+ 5700 rem daten fuer die zeichen *****************
+ 5710 data  8,  8, 28, 28, 62,126,127,255,127, 63
+ 5720 data 31, 15,  3,  7,  7,  3,255,254,252,240
+ 5730 data248,240,240,224,  0,  1,  1,  0,  0,  0
+ 5740 data  0,  0,224,128,192,128,128,  0,  0,  0
+ 5750 data252,110, 60, 24, 16,  0,  0,  0,252,126
+ 5760 data124, 56, 56, 16, 16, 16,  0,  0,  0,  1
+ 5770 data  1,  3,  3,  7,  0,  0,  0,  0,  0,128
+ 5780 data128,192,  4, 15, 15, 31, 31, 63, 63,255
+ 5790 data192,224,224,240,240,248,252,255,  8,  8
+ 5800 data  8, 28, 28, 62,126,255, 46,127,223,126
+ 5810 data239,251,191,237,192,224,112,248,252, 76
+ 5820 data 76,196,  3,  6, 14, 31, 63, 50, 51, 34
+ 5830 data 63, 31,143,207,199,225,240,252,252,248
+ 5840 data225,195,207,143,143, 63,255,255,255,255
+ 5850 data255,255,255,255,  0,126,126,102,102,126,126,0
+ 5860 rem ** maschinenroutine **
+ 5870 data120,169, 32,141, 20,  3,169,128,141
+ 5880 data 21,  3,169,129,141, 26,208,173,254
+ 5890 data143,141, 18,208,173, 17,208, 41,127
+ 5900 data141, 17,208, 88, 96,173, 25,208,141
+ 5910 data 25,208, 48, 10, 32, 95,128,173, 13
+ 5920 data220, 88, 76, 49,234,173,253,143,201
+ 5930 data  1,240,19,169,  0,141, 32,208,173
+ 5940 data254,143,141, 18,208,169,  1,141,253
+ 5950 data143, 76,188,254,173,252,143,141, 32
+ 5960 data208,169,255,141, 18,208,169,  2,141
+ 5970 data253,143, 76,188,254,173,  1,220, 41
+ 5980 data  1,208,101,173,  1,220, 41,  2,208                       
+ 5990 data 91,173,  1,220, 41,  4,208, 78,173
+ 6000 data  1,220, 41,  8,208, 74,165,248,141
+ 6010 data  0,208,141,  2,208,141,  4,208,141
+ 6020 data  6,208,165,249,141,  1,208,141,  3
+ 6030 data208,141,  5,208,141,  7,208,173,  6
+ 6040 data143,141, 16,208,206,  0,143,240, 55
+ 6050 data206,  1,143,240, 92,206,  5,143,240
+ 6060 data 34,173,  2,143,208, 92,173, 30,208
+ 6070 data234,234, 32, 21,129,234,234,234,234
+ 6080 data234, 32,125,129, 96, 76, 82,129, 76
+ 6090 data 89,129, 76, 77,129, 76, 72,129,238
+ 6100 data254,143,169,100,141,  5,143, 76,172
+ 6110 data128,173,  3,143, 73,  1,141,  3,143
+ 6120 data208, 16,173, 21,208, 41,207,141, 21
+ 6130 data208,169, 90,141,  0,143, 76,162,128
+ 6140 data173, 21,208,  9, 48,141,21,208,169
+ 6150 data 45,141,  0,143, 76,162,128,169,150
+ 6160 data141,  1,143,234,234, 76,167,128,238
+ 6170 data 40,208, 76,177,128, 41,  8,165,248
+ 6180 data201, 24,240, 20,201, 64,208, 34,173
+ 6190 data 16,208, 41,  3,240, 27,198,248,165
+ 6200 data250,208, 21, 76, 60,129,173, 16,208
+ 6210 data 41,  3,208, 11,230,248,165,250,240
+ 6220 data  5,169,  1,133,251,234, 96,169,  3
+ 6230 data141,255,127, 96,230,249, 76,102,128
+ 6240 data198,249, 76,109,128,230,248,240, 14
+ 6250 data 76,116,128,198,248,165,248,201,255
+ 6260 data240, 14, 76,123,128,173,  6,143,  9
+ 6270 data 15,141,  6,143, 76,116,128,173,  6
+ 6280 data143, 41,240,141,  6,143, 76,123,128
+ 6290 data234,234,234,206,255,142,240,  1, 96
+ 6300 data169,  7,141,255,142,238,254,142,174
+ 6310 data254,142,189,  0,197,141,  0,212,189
+ 6320 data  0,198, 41,127,141,  1,212,189,  0
+ 6330 data198, 41,128,208,  6,169, 64,141,  4
+ 6340 data212, 96,169, 64,141,  4,212,169, 65
+ 6350 data141,  4,212, 96,120,169,128,141, 42
+ 6360 data128,169, 95,141, 41,128, 88, 96,120
+ 6370 data169,129,141, 42,128,169,125,141, 41
+ 6380 data128, 88, 96
+ 6390 rem    t  a  k  t    1 ************
+ 6400 data 27,132, 27,  4, 55,136, 39,134
+ 6410 data 27,132, 27,  4, 55,136, 39,134
+ 6420 data 27,132, 27,  4, 55,136, 39,134
+ 6430 data 27,132,226,132, 39,134, 55,136
+ 6440 rem    t  a  k  t    2 ************
+ 6450 data 27,132, 27,  4, 55,136, 39,134
+ 6460 data 27,132, 27,  4, 55,136, 39,134
+ 6470 data 27,132, 27,  4, 55,136, 39,134
+ 6480 data 27,132,226,132, 39,134, 55,136
+ 6490 rem    t  a  k  t    3 ************
+ 6500 data 27,132, 27,  4, 55,136, 39,134
+ 6510 data 27,132,226,132, 39,134, 55,136
+ 6520 data169,131,169,  3, 81,135,123,133
+ 6530 data169,131,156,132,123,133, 81,135
+ 6540 rem    t  a  k  t    4 ************
+ 6550 data 66,131, 66,  3,133,134,226,132
+ 6560 data 66,131, 81,135,226,132,133,134
+ 6570 data 27,132, 27,  4, 55,136, 39,134
+ 6580 data 27,132,226,132, 39,134, 55,136
+ 6590 rem    t  a  k  t    5 ************
+ 6600 data 27,132, 27,  4, 55,136, 39,134
+ 6610 data 27,132, 27,  4, 55,136, 39,134
+ 6620 data 27,132, 27,  4, 55,136, 39,134
+ 6630 data 27,132,226,132, 39,134, 55,136
+ 6640 rem    t  a  k  t    6 ************
+ 6650 data 27,132, 27,  4, 55,136, 39,134
+ 6660 data 27,132, 27,  4, 55,136, 39,134
+ 6670 data 27,132, 27,  4, 55,136, 39,134
+ 6680 data 27,132,226,132, 39,134, 55,136
+ 6690 rem    t  a  k  t    7 ************
+ 6700 data 27,132, 27,  4, 55,136, 39,134
+ 6710 data 27,132,226,132, 39,134, 55,136
+ 6720 data169,131,169,  3, 81,135,123,133
+ 6730 data169,131,156,132,123,133, 81,135
+ 6740 rem    t  a  k  t    8 ************
+ 6750 data 66,131, 66,  3,133,134,226,132
+ 6760 data 66,131, 81,135,226,132,133,134
+ 6770 data 66,131, 66,  3,133,134,226,132
+ 6780 data 66,131, 81,135,226,132,133,134
+ 6790 rem    t  a  k  t    9 ************
+ 6800 data226,132,226,  4,196,137, 81,135
+ 6810 data226,132,226,  4,196,137, 81,135
+ 6820 data226,132,226,  4,196,137, 81,135
+ 6830 data226,132, 39,134, 81,135,196,137
+ 6840 rem    t  a  k  t   10 ************
+ 6850 data226,132,226,  4,196,137, 81,135
+ 6860 data226,132,226,  4,196,137, 81,135
+ 6870 data226,132,226,  4,196,137, 81,135
+ 6880 data226,132, 39,134, 81,135,196,137
+ 6890 rem    t  a  k  t   11 ************
+ 6900 data 39,134, 39,  6, 78,140, 56,137
+ 6910 data039,134,081,135,056,137,078,140
+ 6920 data123,133,123,  5,247,138, 55,136
+ 6930 data123,133,232,134,055,136,247,138
+ 6940 rem    t  a  k  t   12 ************
+ 6950 data226,132,226,  4,196,137, 81,135
+ 6960 data226,132, 39,134, 81,135,196,137
+ 6970 data226,132,226,  4,196,137, 81,135
+ 6980 data226,132, 39,134, 81,135,196,137
+ 6990 rem    t  a  k  t   13 ************
+ 7000 data226,132,226,  4,196,137, 81,135
+ 7010 data226,132,226,  4,196,137, 81,135
+ 7020 data226,132,226,  4,196,137, 81,135
+ 7030 data226,132, 39,134, 81,135,196,137
+ 7040 rem    t  a  k  t   14 ************
+ 7050 data226,132,226,  4,196,137, 81,135
+ 7060 data226,132,226,  4,196,137, 81,135
+ 7070 data226,132,226,  4,196,137, 81,135
+ 7080 data226,132, 39,134, 81,135,196,137
+ 7090 rem    t  a  k  t   15 ************
+ 7100 data 39,134, 39,  6, 78,140, 56,137
+ 7110 data 39,134, 81,135, 56,137, 78,140
+ 7120 data123,133,123,  5,247,138, 55,136
+ 7130 data123,133,232,134, 55,136,247,138
+ 7140 rem    t  a  k  t   16 ************
+ 7150 data226,132,226,  4,196,137, 81,135
+ 7160 data226,132, 39,134, 81,135,196,137
+ 7170 data 27,132, 27,  4, 55,136, 39,134
+ 7180 data 27,132,226,132, 39,134, 55,136
+ 7190 :
+ 7200 data120,169, 50,141,  8,212,141,  1,212,169
+ 7210 data  3,141,  3,212,169, 17,141, 12,212,141
+ 7220 data  5,212,169, 32,141, 11,212,169, 33,141
+ 7230 data 11,212,169,242,141,  6,212,169,114,141
+ 7240 data 13,212,169, 15,141, 24,212,169, 16,141
+ 7250 data  4,212,169,129,141,  4,212,173, 32,208
+ 7260 data 72,173, 33,208, 72,162,  2,134,  2,162
+ 7270 data128,160,255,238, 32,208,238, 33,208,173
+ 7280 data 24,212, 73, 15,141, 24,212,136,208,239
+ 7290 data202,208,234,198,  2,208,228, 88,169,  0
+ 7300 data141,  4,212,141, 11,212,141, 24,212,104
+ 7310 data141, 33,208,104,141, 32,208, 96
+ 7320 data169,  4,141,136,  2,169,131,141,  2,  3
+ 7330 data169,164,141,  3,  3,  0,  0,172,  1,  0
+ 7340 data  2, 80,130,  1,  1,  3,172,110, -1,  0
+ 7350 data  2, 42, 42,42, 32,28, 54, 53, 49, 48
+ 7360 data 32,158, 42, 42, 42,254,172, -1,  0,  2
+ 7370 data130, 80, -1,  1,  3,173,255,  1,  0,  2
+ 7380 data  0, 70
+

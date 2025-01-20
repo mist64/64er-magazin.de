@@ -1,0 +1,287 @@
+
+
+;vic.prg ==1001==
+    1 rem 'vic' ein ki-programm f. vc20 + 8kb
+    2 rem      robert treichler
+    3 rem fl-9497 triesenberg (f.tum liechtenstein)
+   10 rem
+   20 rem init.+titel
+   30 rem
+   50 print"{clr}       v i c{down}{down}{down}"
+   60 print"kopie auf drucker?    {down}<j/n>"
+   70 getz$:ifz$=""then70
+   80 ifz$="n"then100
+   90 d=1:open4,4:print#4,chr$(14)"vic - interview"chr$(15)+chr$(10)
+  100 print"{clr}{down}{down}{down}ich muss mich mal kurz{down}konzentrieren.":ea=50:fa=50:sv=3:gosub3200
+  110 dima%(25),e$(ea),f$(fa),s$(sa),s%(sa,sv),t$(tk+tn),t2$(tk),tv$(tv),tf$(tf)
+  120 gosub3000:f$="salue, ich heisse vic! wie heisst du ?":gosub2500:gosub1000
+  130 n$=e$(w):f$="also "+n$+", erzaehle mir etwas von dir und deiner familie.":goto500
+  197 rem
+  198 rem input+vergl.
+  199 rem
+  200 gosub1000:fori=0tow:a=asc(e$(i))-65:ifa<0ora>25then290
+  210 s=a%(a):ifs=0then290
+  220 fors=stosa:ifs%(s,0)>tkthenz$=left$(e$(i),len(s$(s))):goto250
+  230 z$=e$(i)
+  250 ifz$>s$(s)thennexts:goto290
+  260 ifz$<s$(s)then290
+  270 gosub2000
+  290 nexti
+  297 rem
+  298 rem output vorber.
+  299 rem
+  310 ifff=0then350
+  320 ff=0:iftf>0thentf=tf-1
+  330 f$=tf$(tf):goto500
+  350 ifw<2andf<1thenf$="mach gefaelligst einen anstaendigen satz!":goto500
+  360 iff<1then400
+  370 f$=f$(f):f$(f)="":f=f-1:goto500
+  397 rem
+  398 rem verlegenheitsfragen stellen
+  399 rem
+  400 ifta<3then430
+  410 f$="so, nun muss ich aber schluss machen. tschuess "+n$
+  420 gosub2500:close4:end
+  430 t=int(rnd(1)*tv):iftv$(t)=""then430
+  460 ta=ta+1:f$=tv$(t):tv$(t)=""
+  497 rem
+  498 rem frage ausgeben
+  499 rem
+  500 gosub2500
+  510 goto200
+  990 rem
+  991 rem***************
+  992 rem
+  993 rem routinen:
+  994 rem
+  995 rem
+  997 rem input
+  998 rem
+  999 rem get char
+ 1000 e=0:e$="":geta$:ifa$>""then1000
+ 1010 print"{rvon} {rvof}{left}";
+ 1020 geta$:ifa$=""then1020
+ 1030 a=asc(a$):ifa<>20then1100
+ 1040 ife<1then1020
+ 1050 e=e-1:e$=left$(e$,e):print" {left}{left}";:goto1010
+ 1100 ifa=13thena$="."
+ 1110 ifa$<" "ora$>"z"then1020
+ 1120 e$=e$+a$:e=e+1:printa$;
+ 1130 ifa$="!"ora$="."then1200
+ 1140 ifa$="?"thenff=1:goto1200
+ 1150 goto1010
+ 1199 rem in worte zerlegen
+ 1200 ife<1thenreturn
+ 1202 print:print"{down}{down}lass mich ueberlegen."
+ 1205 w=-1:wa=0:fori=1toe:a$=mid$(e$,i,1):a=asc(a$)
+ 1210 ifa>64anda<91ora>47anda<58then1300
+ 1220 ifwa=0orwt=1then1350
+ 1230 ifa=45thenwt=1:goto1350
+ 1250 wa=0:goto1350
+ 1300 ifwa=0thenwa=1:w=w+1:e$(w)="":ifw>ea-1thenreturn
+ 1310 wt=0:e$(w)=e$(w)+a$
+ 1350 next
+ 1399 rem 1.pers ersetzen durch 2.pers.
+ 1400 fori=0tow:iflen(e$(i))>6then1490
+ 1405 z$=left$(e$(i),4)
+ 1410 ifz$="ich"thene$(i)="du":goto1450
+ 1415 ifz$="du"thene$(i)="ich":goto1450
+ 1420 ifz$="mich"then1480
+ 1425 ifz$="dich"then1470
+ 1430 ifz$="mein"then1480
+ 1435 ifz$="dein"then1470
+ 1440 ifz$="mir"then1480
+ 1445 ifz$="dir"then1470
+ 1450 goto1490
+ 1470 e$(i)="m"+right$(e$(i),len(e$(i))-1):goto1490
+ 1480 e$(i)="d"+right$(e$(i),len(e$(i))-1)
+ 1490 next
+ 1500 rem drucken
+ 1520 ifdthenprint#4,"du: ";e$
+ 1530 return
+ 1997 rem
+ 1998 rem fragen vorber.
+ 1999 rem
+ 2000 iff>fa-1thenreturn
+ 2010 rem nicht benutzte texte suchen
+ 2020 z=0:forj=0tosv:t=s%(s,j):ift$(t)>""thenz(z)=t:z=z+1
+ 2030 nextj
+ 2050 ifz=0thenreturn
+ 2060 t=z(rnd(1)*z):ift=<tkandi=wthenreturn
+ 2100 rem text holen
+ 2120 f=f+1:f$(f)=t$(t):t$(t)="":ift>tkthenreturn
+ 2200 rem text-komposition
+ 2210 ife$(i+1)="ich"ore$(i+1)="du"then2230
+ 2220 forj=i+1tow:goto2250
+ 2230 forj=0tow:ifj=ithenj=j+2:rem inversion
+ 2250 ife$(j)="und"ore$(j)="oder"thenj=w:goto2270
+ 2260 f$(f)=f$(f)+" "+e$(j)
+ 2270 nextj
+ 2280 f$(f)=f$(f)+" "+t2$(t)
+ 2290 return
+ 2497 rem
+ 2498 rem bs editieren
+ 2499 rem
+ 2500 print"{clr}":x$=f$
+ 2510 z=22
+ 2520 z$=mid$(f$,z,1):ifz$=""then2550
+ 2530 ifasc(z$)<65then2550
+ 2540 z=z-1:goto2520
+ 2550 z$=left$(f$,z):printz$:ifz<22thenprint"{down}";
+ 2560 ifz=>len(f$)then2580
+ 2570 f$=right$(f$,len(f$)-z):iff$<>""then2510
+ 2580 print"{down}{down}":ifd=1thenprint#4,"vic:";x$
+ 2590 return
+ 2997 rem
+ 2998 rem data's lesen
+ 2999 rem
+ 3000 restore:fori=1tosa:reads$(i):j=0:a=asc(s$(i))-65:ifa%(a)=0thena%(a)=i
+ 3030 readz:ifz=0then3050
+ 3040 s%(i,j)=abs(z)-tk*(z>0):j=j+1:goto3030
+ 3050 next:readz$
+ 3060 fori=tk+1totk+tn:readt$(i):next:readz$
+ 3070 fori=1totk:readt$(i),t2$(i):next:readz$
+ 3080 fori=0totv-1:readtv$(i):next:readz$
+ 3090 fori=0totf-1:readtf$(i):next:readz$:ifz$<>"$"thenprint"{clr}data-fehler{down}":end
+ 3100 return
+ 3200 rem
+ 3201 rem data's zaehlen
+ 3202 rem
+ 3210 gosub3300:sa=z:gosub3300:tn=z:gosub3300:tk=z/2:gosub3300:tv=z:gosub3300:tf=z:return
+ 3300 z=0
+ 3320 readz$:ifz$="$"thenreturn
+ 3330 a=asc(z$):ifa>57ora<45ora=46thenz=z+1
+ 3340 goto3320
+ 9999 rem *************
+10000 rem
+10010 rem schluesselwoerter + verkettung
+10020 rem
+10650 dataaerger,14,25,0,arm,2,22,0
+10660 databin,-1,-12,-13,-19,0,bist,-17,-35,-37,-38,0,bleibe,-7,-30,0
+10662 databrauche,-14,0,bruder,9,0,brueder,9,0
+10670 datacomputer,11,0
+10680 datadarf,-3,-29,0
+10700 datafinde,-34,0,frau,3,4,0,freund,15,0
+10710 datagebe,-32,0,gehe,-15,0,geld,2,0,geschwister,9,0
+10712 datagesund,21,22,0,glaube,-5,27,29,0,glueck,23,0
+10720 datahabe,-2,-22,-39,0,haette,17,0,hast,-36,0,hat,-25,0,hoffe,-6,0
+10730 dataidiot,20,0
+10750 datakann,-4,-24,0,kannst,-18,-42,0,koennte,17,0
+10752 datakomme,-33,0,krank,22,0,kummer,25,0
+10760 datalieb,6,28,0,lust,24,0
+10770 datamache,-11,-21,-27,-28,0,maenner,5,0,mann,5,0
+10772 datamoechte,-16,-31,0,moeglich,13,0,muss,-20,-26,0,mutter,7,0
+10790 dataonkel,10,0
+10820 datareich,2,22,0
+10830 datasag,12,29,0,schwaegerin,10,0,schwager,10,0
+10832 dataschwester,9,0,sex,26,0,soehne,1,0,sorgen,25,0,spiel,16,0
+10834 dataspinner,20,0,streit,25,0,stress,25,0
+10840 datatante,10,0,toechter,1,0,traurig,14,25,0,trottel,20,0
+10850 dataunglueck,14,23,0,unzufrieden,14,0
+10860 datavater,8,0,verwandt,10,0,vielleicht,13,0
+10870 datawaere,17,0,weiss,-10,0,werde,-9,-23,-40,-41,0,wetter,18,0
+10872 datawill,-8,-9,-41,0,wuerde,17,0,wunsch,19,0
+19990 data$
+19997 rem
+19998 rem texte
+19999 rem
+20001 datadu bist sicher stolz auf deine kinder. was machen sie?
+20002 datageld allein macht nicht gluecklich!
+20003 dataich glaube frauen sind ein heikles thema.
+20004 data"uebrigens, wie sollte deine traumfrau sein?"
+20005 datamachst du dir viel aus maenner?
+20006 datamit der liebe ist es halt so eine sache.
+20007 dataerzaehle mir mehr ueber deine mutter.
+20008 datawar dein vater sehr streng mit dir?
+20009 dataerzaehl mir etwas mehr von deinen geschwistern.
+20010 datagibt es in deiner verwandtschaft auch leute die du magst?
+20011 data"was glaubst du, sind computer fuer die menschheit ein fluch oder ein segen?"
+20012 datadas halte ich fuer ein geruecht.
+20013 datadu scheinst etwas unsicher zu sein.
+20014 dataversuche solche negativen gedanken von dir fern zu halten.
+20015 datadu bist aber hoffentlich nicht verheiratet - oder?
+20016 datagambler!
+20017 dataso sicher scheint das aber nicht zu sein - oder?
+20018 datahast du kein besseres thema als das wetter?
+20019 datawuensche sind die triebfeder der menschheit. (gut - was?)
+20020 data"nebenbei bemerkt: schimpfwoerter moechte ich dann keine mehr hoeren!"
+20021 data"a votre sante! (hast du gesehen, ich kann sogar franzoesisch.)"
+20022 data"du sagst dir vermutlich auch: lieber gesund und reich, als krank und arm."
+20023 data"du kennst doch die geschichte vom hans im glueck, oder?"
+20024 data"apropos lust: ich haette jetzt gerade lust auf ein bier."
+20025 datadu solltest das leben etwas von der heiteren seite nehmen.
+20026 dataweisst du wie nonnen zaehlen?              1 2 3 4 5 pfui!
+20027 datadas kann ich allerdings nicht so recht glauben.
+20028 datageht die liebe bei dir auch durch den magen?
+20029 dataglaubst du das wirklich?
+29990 data$
+29997 rem
+29998 rem kompositions-texte
+29999 rem
+30001 data"bist du etwa stolz darauf, dass du",bist?
+30002 data"was fuer ein zufall, auch ich habe",.
+30003 data"wer bestimmt denn, dass du",darfst?
+30004 data"das habe ich mir gedacht,dass du",kannst.
+30005 datawarum glaubst du,?
+30006 data"hoffst du noch etwas anderes, ausser",?
+30007 data"deine standhaftigkeit in ehren. ist es aber wirklich klug,",zu bleiben?
+30008 data"an was denkst du, wenn du",willst?
+30009 data"glaubst du es waere gut, wenn du",wuerdest?
+30010 data"wie meinst du das genau, du wuesstest",?
+30011 dataalso mach,. ist mir auch gleich.
+30012 data"wen interessiert das schon, dass du",bist?
+30013 data"oh, ich waere auch gerne",.
+30014 datavielleicht brauchst du wirklich,.
+30015 dataich moechte eigentlich auch,gehen.
+30016 data"an was denkst du, wenn du",moechtest?
+30017 data"uebrigens:du bist selbst",!
+30018 data"wetten wir, dass du selbst",kannst?
+30019 data"so, so. du bist also",. ob das wohl jemanden juckt?
+30020 data"kann ich dir helfen, wenn du das naechste mal",musst?
+30021 data"erzaehle mir mehr darueber, wie du",machst.
+30022 data"was glaubst du woher das kommt, dass du",hast?
+30023 datawarum wirst du,?
+30024 data"kannst du mir erklaeren, wie man",kann?
+30025 datawer hat sonst noch,?
+30026 datadu bist nicht der einzige. auch ich sollte,.
+30027 data"was denkst du dir dabei, wenn du",machst?
+30028 data"was waere wohl, wenn jeder",machen wuerde?
+30029 data"das muesste mir mal einer sagen, dass ich",darf!
+30030 datawarum kannst du nur so stur sein und,bleiben?
+30031 data" "," - das moechte noch mancher!"
+30032 data"ich finde es grosszuegig von dir, dass du",gibst.
+30033 datakommt sonst noch jemand,?
+30034 dataich stimme dir voll bei. auch ich finde,.
+30035 data"ok, ich bin"," - was bist denn du?"
+30036 data"das weiss doch jeder, dass ich",habe.
+30037 data"hat lange gedauert, bis du gemerkt hast, dass ich",bin.
+30038 data"dummkopf! das weiss man doch, dass ich",bin.
+30039 data"bist du froh, dass du",hast?
+30040 datawer wird sonst noch,?
+30041 datawenn nur alle,wuerden!
+30042 datawarum soll ich,koennen?
+30043 data"glaubst du, das beeindruckt mich, dass du",kannst?
+39990 data$
+39997 rem
+39998 rem verlegenheits-texte
+39999 rem
+40001 dataredest du immer so einfaeltiges zeugs?
+40002 dataerzaehle mir was du von mir denkst.
+40003 data"glaubst du auch, dass ich dir etwas ueberlegen bin?"
+40004 datawarum sprichst du eigentlich mit einem computer?
+40005 datakannst du nicht etwas gescheiters erzaehlen?
+40006 databist du auch so intelligent wie ich?
+40007 data"uebrigens: was haelst du eigentlich von unserer konversation?"
+40008 data"wenn es dir zu bloed wird, zieh mir einfach den stecker raus."
+40009 dataein gespraech mit dir ist ziemlich einfaeltig.
+40010 data"unserer konversation nach zu schliessen, bist du nicht gerade der hellste!"
+40990 data$
+40998 rem
+40999 rem verlegenh.texte auf ?
+41000 rem
+41001 datadeine fragerei geht mir auf den wecker!
+41002 datadumme frage! weiss doch jeder!
+41003 datakeine ahnung! was erwartest du eigentlich von mir?
+41004 datadas weisst du sicher besser als ich. erzaehle weiter!
+49999 data$
+
