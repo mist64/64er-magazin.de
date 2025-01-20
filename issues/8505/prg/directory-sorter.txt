@@ -1,0 +1,125 @@
+
+
+;directory-sorter.prg ==0801==
+  100 rem ************************
+  110 rem *                      *
+  120 rem * directory-sort v1.0  *
+  130 rem * -------------------  *
+  140 rem * autor:               *
+  150 rem * edwin goebel         *
+  160 rem * schuetzstr. 1        *
+  170 rem * 8522 herzogenaurach  *
+  180 rem *                      *
+  190 rem ************************
+  200 goto430
+  210 rem *******************************
+  220 rem  unterroutinen
+  230 rem *******************************
+  240 input#1,f1,f$,f2,f3:iff1=0thenreturn
+  250 print"{cyn}{down}"f1;f$,f2;f3"{blk}":end:rem "{cyn}"=cyan; "{blk}"=schwarz
+  260 rem -------------------------------
+  270 ifno+en>=cthenreturn
+  280 sys53056,0,2,2,23,18:no=no+1
+  290 poke214,23:poke211,2:sys58732:printna$(zu(no+en-1));:return
+  300 rem -------------------------------
+  310 ifno=0thenreturn
+  320 sys53056,1,2,2,23,18:no=no-1
+  330 poke214,2:poke211,2:sys58732:printna$(zu(no+1)):return
+  340 rem -------------------------------
+  350 print"{clr}{blk}{rvon}"tab(13)"directory-sort"
+  360 printtab(12)"----------------"
+  370 print"{cyn}{down} diskette einlegen und taste druecken"
+  380 gett$:ift$=""then380
+  390 print"{home}{down}{down}{down}                                     ":return
+  400 rem *******************************
+  410 rem  beginn des hauptprogrammes
+  420 rem *******************************
+  430 poke53280,0:poke53281,11:gosub350
+  440 open1,8,15,"i":diman$(145),na$(145),re$(145),zu(146),sn(19)
+  450 fori=1to18:readsn(i):next
+  460 fori=52992to53242:reads:pokei,s:next
+  470 gosub240:open2,8,2,"#":gosub240
+  480 s=1:c=1:n$=chr$(0):nn$=n$+n$+n$+n$+n$+n$+n$+n$+n$+n$
+  490 nu$=nn$+nn$+nn$:re$(0)=nn$+n$
+  500 an$(0)=chr$(128)+chr$(18)+chr$(1):na$(0)="----------------":rem trennstrich
+  510 rem *******************************
+  520 rem  einlesen des directorys
+  530 rem *******************************
+  540 print#1,"u1 2 0 18"s:print"{home}{lred}"s"{left} ":rem "{lred}"=hellrot
+  550 get#2,t$:get#2,s$:s=asc(s$+n$)
+  560 forbp=0to7:print#1,"b-p 2";bp*32+2
+  570 sys52992,2,3,x$:an$(c)=x$:ifleft$(x$,1)=n$thennext:goto600
+  580 sys52992,2,16,x$:na$(c)=x$:sys52992,2,11,x$:re$(c)=x$
+  590 zu(c)=c:print"{home}{rght}{rght}{rght}{rght}"c"{left} ":c=c+1:next
+  600 ift$<>""then540
+  610 close2:poke650,128:print"{home}{down}{down}{blk}>{cyn}{up}";:cp=2:no=0:nu=0:en=c:ifen>23thenen=23
+  620 printchr$(13)tab(2)na$(nu+1);:nu=nu+1:ifnu<en-1then620
+  630 rem *******************************
+  640 rem  tastaturabfrage
+  690 rem *******************************
+  700 getta$:ifta$=""then700
+  710 ifta$="{f3}"thenifcp>2thencp=cp-1:sys53056,0,2,0,23,0
+  720 ifta$="{f3}"thenifcp=2thengosub310
+  730 ifta$="{f5}"thenifcp<enthenifno+cp<cthencp=cp+1:sys53056,1,2,0,23,0
+  740 ifta$="{f5}"thenifcp>=23thengosub270
+  750 ifta$="{f1}"then810
+  760 ifta$="{f2}"thenifc<145thenf=1:c=c+1:print"{lred}{home}{rght}{rght}{rght}{rght}"c-1"{left} {cyn}":en=en+1:ifen>23thenen=23
+  770 ifta$="{f2}"theniff=1thenf=0:te=0:te$=na$(0):goto840
+  780 ifta$="{f8}"then1000
+  790 ifta$="{f6}"then1090
+  800 goto700
+  810 te=zu(no+cp-1):te$=na$(te)
+  820 sys53056,0,cp,2,23,18:ifc>23thenen=en+1:gosub290:en=en-1
+  830 fori=no+cp-2toc-1:zu(i+1)=zu(i+2):next
+  840 poke214,cp:poke211,19:sys58732
+  850 print"{CBM-T}{CBM-T}"te$:rem "{CBM-T}"=commodore+"t"
+  860 getta$:ifta$=""then860
+  870 ifta$="{f3}"thenifcp>2thencp=cp-1:sys53056,0,2,19,24,37:sys53056,0,2,0,23,0
+  880 ifta$="{f3}"thenifcp=2thengosub310
+  890 ifta$="{f5}"thenifcp<enthencp=cp+1:sys53056,1,2,19,24,37:sys53056,1,2,0,23,0
+  900 ifta$="{f5}"thenifcp=23thengosub270
+  910 ifta$="{f1}"then950
+  920 ifta$="{f4}"thente$="{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}":c=c-1:en=c:ifen>23thenen=23
+  930 ifta$="{f4}"thenprint"{home}{lred}{rght}{rght}{rght}{rght}"c-1"{left} {cyn}":goto970
+  940 goto860
+  950 sys53056,1,cp,2,23,18
+  960 fori=c-1tono+cp-1step-1:zu(i+1)=zu(i):next:zu(no+cp-1)=te
+  970 poke214,cp:poke211,2:sys58732
+  980 printte$"                   "
+  990 goto700
+ 1000 rem ******************************
+ 1010 rem  schreiben des sortierten dir.
+ 1020 rem ******************************
+ 1030 open2,8,2,"#":t=18:fori=0toint((c-2)/8):if8*i+8>=c-1thent=0
+ 1040 print#1,"b-p 2 0":print#2,chr$(t)chr$(sn(i+2))
+ 1050 forbp=0to7:print#1,"b-p 2";bp*32+2
+ 1060 ifbp+8*i+1>=cthenprint#2,nu$;:next:goto1080
+ 1070 print#2,an$(zu(bp+8*i+1))na$(zu(bp+8*i+1))re$(zu(bp+8*i+1));:next
+ 1080 print#1,"u2 2 0 18"sn(i+1):print"{lred}{home}"tab(36)sn(i+1)"{left} {cyn}":gosub240:next
+ 1090 close2:gosub350:goto470
+ 1100 rem ******************************
+ 1110 rem  sektoren des directory tracks
+ 1120 rem ******************************
+ 1130 data1,4,7,10,13,16,2,5,8,11,14,17,3,6,9,12,15,18
+ 1140 rem ******************************
+ 1150 rem  input maschinen-routine
+ 1160 rem ******************************
+ 1170 data32,253,174,32,158,183,32,30,225,32,253,174,32,158,183,138,72,32,253
+ 1180 data174,32,139,176,133,73,132,74,32,163,182,104,32,117,180,160,2,185
+ 1190 data97,0,145,73,136,16,248,200,32,18,225,145,98,200,196,97,208,246,32
+ 1200 data204,255,96,0,0,0,0,0
+ 1210 rem ******************************
+ 1220 rem  scroll maschinen-routine
+ 1230 rem ******************************
+ 1240 data32,245,207,138,72,32,245,207,224,0,176,3,76
+ 1250 data72,178,224,24,176,249,134,251,32,245,207,224,0,144,240,224,39,176
+ 1260 data236,134,253,32,245,207,224,25,176,227,134,252,232,138,56,229,251
+ 1270 data144,218,240,216,133,250,32,245,207,224,40,176,207,228,253,144,203
+ 1280 data134,254,104,170,165,172,72,165,173,72,165,174,72,165,175,72,224,0
+ 1290 data208,22,166,251,198,250,240,44,32,240,233,232,189,240,236,133,172
+ 1300 data181,217,32,219,207,48,236,202,240,3,76,72,178,166,252,198,250,240
+ 1310 data16,32,240,233,202,189,240,236,133,172,181,217,32,219,207,48,236,164
+ 1320 data254,32,240,233,32,36,234,169,32,145,209,136,196,253,16,249,76,88
+ 1330 data233,41,3,13,136,2,133,173,32,224,233,164,254,177,172,145,209,177
+ 1340 data174,145,243,136,196,253,16,243,96,32,253,174,76,158,183
+
