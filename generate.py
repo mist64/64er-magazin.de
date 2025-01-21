@@ -399,6 +399,11 @@ def avif_picture_tag(soup, img_src, attrs=None):
     picture_tag.append(new_img_tag)
     return picture_tag
 
+def exec_command(command: list[str], cwd: str | None = None) -> [int, str, str]:
+    process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, cwd=cwd)
+    stdout, stderr = process.communicate()
+    exitcode = process.returncode
+    return exitcode, stdout, stderr
 
 def calculate_sha1(filepath):
     sha1 = hashlib.sha1()
@@ -610,7 +615,38 @@ class Issue:
           data_name = tag.get("data-name")
           data_range = tag.get("data-range")
           data_availability = tag.get("data-availability")
-          if data_filename:
+          data_type = tag.get("data-type")
+          data_variant = tag.get("data-variant")
+
+          chksumver = ""
+          if data_type is not None and data_type.startswith("basic-"):
+              chksumver = data_type[6:]
+
+          if data_filename and data_filename.endswith('.prg'):
+              file_path = os.path.join(os.path.dirname(html_file_path), 'prg')
+              if data_type == "mse" and data_variant in ["1", "2", "2.1"]:
+                  command = ['cbmprint', '-f', data_filename, '-l', f'mse{data_variant}']
+                  exitcode, stdout, stderr = exec_command(command, cwd=file_path)
+                  if exitcode != 0 or len(stderr) > 0:
+                             print(f"Failed to process: {data_filename}")
+                             print(stderr)
+                             exit()
+                  tag.string = stdout.decode('ascii')
+                  tag['class'] = 'listing-mse'
+              elif data_type.startswith("basic"):
+                  petcatlisting = generate_petcat_from_prg(os.path.join(file_path, data_filename), data_variant, chksumver)
+                  checksummerlisting = generate_checksummer_from_prg(os.path.join(file_path, data_filename), data_variant, chksumver)
+
+                  generate_listing_from_sources(tag, petcatlisting, checksummerlisting)
+
+                  if not any(item[0] == data_name for item in downloads): # duplicates
+                      if data_availability != "local":
+                          data_filename_escaped = urllib.parse.quote(data_filename)
+                          downloads.append((data_name, f"prg/{data_filename_escaped}"))
+              else:
+                  print(f"invalid configuration for {data_filename}")
+                  exit()
+          elif data_filename:
               # remove ';', empty lines and leading spaces
               listing = listings[data_filename]
               listing = [line.lstrip() for line in listing.splitlines() if line.strip() and not line.lstrip().startswith(';')]
@@ -631,7 +667,16 @@ class Issue:
                   listing = filtered_lines
 
               listing = "\n".join(listing)
-              tag.string = listing
+
+              if data_type and data_type[:5] == "basic":
+                  out_directory = os.path.join(OUT_DIRECTORY, BASE_DIR)
+                  issue_dest_path = os.path.join(out_directory, os.path.dirname(html_file_path)[len(IN_DIRECTORY)+1:])
+                  output_file_name = os.path.join(issue_dest_path, 'prg', f"{data_filename}.prg")
+                  checksummerlisting = generate_checksummer_from_prg(output_file_name, data_variant, chksumver)
+
+                  generate_listing_from_sources(tag, listing, checksummerlisting)
+              else:
+                  tag.string = listing
 
               if not any(item[0] == data_name for item in downloads): # duplicates
                   if data_availability != "local":
@@ -1769,6 +1814,50 @@ def html_to_text_preserve_paragraphs(soup):
     # Ensure the final text does not have redundant newlines
     final_text = '\n'.join(filter(None, text_parts))
     return final_text.strip()
+
+def generate_listing_from_sources(tag, petcatlisting, checksummerlisting):
+    newhtml   =f"""<div class="listing"><input type="checkbox" role="switch" class="toggle" />
+                <pre class="listing-petcat">{petcatlisting}</pre>{checksummerlisting}</div>
+                """
+    tag.replace_with(BeautifulSoup(newhtml, 'html.parser'))
+
+def generate_prg_from_petcat(filename, basic_version):
+    path = os.path.dirname(filename)
+    fname = os.path.basename(filename)
+
+    command = ['petcat', '-l', 'petcat', '-f', fname, '-b', basic_version]
+    exitcode, stdout, stderr = exec_command(command, cwd=path)
+    if exitcode != 0 or len(stderr) > 0:
+               print(f"Failed to process: {data_filename}")
+               print(stderr)
+               exit()
+    return stdout.decode('ascii')
+
+def generate_petcat_from_prg(filename, basic_version):
+    path = os.path.dirname(filename)
+    fname = os.path.basename(filename)
+
+    command = ['cbmprint', '-l', 'petcat', '-f', fname, '-b', basic_version]
+    exitcode, stdout, stderr = exec_command(command, cwd=path)
+    if exitcode != 0 or len(stderr) > 0:
+               print(f"Failed to process: {data_filename}")
+               print(stderr)
+               exit()
+    return stdout.decode('ascii')
+
+def generate_checksummer_from_prg(filename, basic_version, chksum_version):
+    path = os.path.dirname(filename)
+    fname = os.path.basename(filename)
+
+    command = ['cbmprint', '-l', '64er-checksummer-html', '-f', fname, '-b', basic_version, '-s', '64er']
+    if chksum_version != "":
+        command += '-c', chksum_version
+    exitcode, stdout, stderr = exec_command(command, cwd=path)
+    if exitcode != 0 or len(stderr) > 0:
+               print(f"Failed to process: {filename}")
+               print(stderr)
+               exit()
+    return stdout.decode('utf-8')
 
 def generate_search_json(db, out_directory):
     articles_info = []
