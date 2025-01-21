@@ -50,7 +50,7 @@
 
         <p>TODO</p>
 
-        <p>Im ersten Fall steht das Ergebnis im Akku, in den anderen Fällen in der jeweils adressierten Speicherstelle. Außer der N-Flagge, die in jedem Fall 0 wird, beeinflußt LSR auch die Carry-Flagge und unter Umständen die Z-Flagge. Je nach Adressierungsart liegt LSR als l-Byte-, 2-Byte- oder 3-Byte-Befehl vor.</p>
+        <p>Im ersten Fall steht das Ergebnis im Akku, in den anderen Fällen in der jeweils adressierten Speicherstelle. Außer der N-Flagge, die in jedem Fall 0 wird, beeinflußt LSR auch die Carry-Flagge und unter Umständen die Z-Flagge. Je nach Adressierungsart liegt LSR als 1-Byte-, 2-Byte- oder 3-Byte-Befehl vor.</p>
 
         <p>Sowohl bei ASL als auch bei LSR hatten wir festgestellt, daß man herausgeschobene Bits, falls sie noch von Bedeutung sind, irgendwie aus dem Carry-Bit (dort sind sie ja gelandet) an einen sinnvollen Ort schaffen muß. Das ist natürlich möglich über eine Befehlskette, in der zunächst das Carry-Bit abgefragt wird:<br>
             zum Beispiel:</p>
@@ -75,10 +75,10 @@
 
         <p>TODO</p>
 
-        <p>Je nach Adressierung kann es sich dann wieder um einen l-Byte- bis 3-Byte-Befehl handeln. Die N-, Z- und natürlich die Carry-Flagge sind beeinflußt und das Ergebnis des Befehls ist im Akku zu finden (erste Adressierungsart) oder in der angesprochenen Speicherstelle.</p>
+        <p>Je nach Adressierung kann es sich dann wieder um einen 1-Byte- bis 3-Byte-Befehl handeln. Die N-, Z- und natürlich die Carry-Flagge sind beeinflußt und das Ergebnis des Befehls ist im Akku zu finden (erste Adressierungsart) oder in der angesprochenen Speicherstelle.</p>
 
         <p>Wozu das Ganze? Abgesehen von der Möglichkeit, einzelne Bits auf diese Weise ohne Verlust aus einem Byte durch das Carry-Bit herausschieben zu können, um sie Prüfungen zu unterziehen, gibt es noch die Möglichkeit, einen Überlauf bei Rechenoperationen aufzufangen. Erinnern Sie sich an die letzte Folge, wo wir mittels ASL Multiplikationen durchgeführt hatten? Dort kann es unter gewissen Umständen ja leicht geschehen, daß ein Byte für das Ergebnis nicht mehr ausreicht. Wir haben in den Beispielen schon die Überlegung durchgeführt, daß man mittels BCC oder BCS prüfen sollte, ob man eine signifikante Stelle (also eine führende 1) aus dem Byte herausgeschoben hat. Ist das der Fall, dann gibt es zwei Wege:<br>
-            1) Man veranlaßt den Ausdruck eines OVERFLOW ERROR, wenn nur l-Byte-Zahlen zulässig sind, oder<br>
+            1) Man veranlaßt den Ausdruck eines OVERFLOW ERROR, wenn nur 1-Byte-Zahlen zulässig sind, oder<br>
             2) man schaltet um auf 2-Byte-Zahlen.</p>
 
         <p>Sehen wir uns das mal an dem Schritt 7 des Beispiels aus der letzten Folge an. Dort hatten wir die Zahl 192 (binär 1100 0000) vorliegen (zum Beispiel in Speicherstelle 7000). Im Computer werden 2-Byte-Integers in der Form LSB/MSB verarbeitet. Wir schaffen also die Speicherstelle für das MSB von 192 in 7001. Jetzt muß dort noch 0 drin stehen. Um bei nochmaliger Multiplikation mit 2 eine 16-Bit-Zahl als Ergebnis zu erhalten, verfährt man wie folgt:</p>
@@ -249,6 +249,443 @@
 
         <p>Die ROM-Bereiche enthalten nicht nur ausgeklügelte Maschinenprogramme, sondern auch eine Menge Daten. Sollten Sie mal in die Verlegenheit kommen, beispielsweise die Zahl Pi im MFLPT-Format verwenden zu müssen, dann erfordert das einen ganz schönen Aufwand an Rechen- und Programmarbeit, oder Sie möchten bestimmte Texte wie beispielsweise eine Fehlermeldung verfügbar halten &hellip;. und so weiter. Viele von diesen Daten sind schon in der Firmware enthalten und wir werden im folgenden festhalten, wo sie sich befinden und welches Format man vorfindet. Sehen wir uns zunächst Zahlen an (Tabelle 1). Es existieren noch weitere Zahlentabellen in den ROM-Bereichen, die aber selten von Interesse sind. Ebenso wie Zahlen, findet man auch Texte im ROM als ASCII-Werte abgelegt (Tabelle 2):</p>
 
+        <figure>
+            <table>
+                <tbody>
+                    <tr>
+                        <th>Startadresse</th>
+                        <th>Format</th>
+                        <th>Zahl</th>
+                    </tr>
+                    <tr>
+                        <td>$AEA8</td>
+                        <td>MFLPT</td>
+                        <td>Pi</td>
+                    </tr>
+                    <tr>
+                        <td>$BlA5</td>
+                        <td>MFLPT</td>
+                        <td>-32768</td>
+                    </tr>
+                    <tr>
+                        <td>$B9BC</td>
+                        <td>MFLPT</td>
+                        <td>1</td>
+                    </tr>
+                    <tr>
+                        <td>$B9C1</td>
+                        <td>1-Byte-Integer</td>
+                        <td>3</td>
+                    </tr>
+                    <tr>
+                        <td>$B9C2</td>
+                        <td>MFLPT</td>
+                        <td>0.434255942</td>
+                    </tr>
+                    <tr>
+                        <td>$B9C7</td>
+                        <td>MFLPT</td>
+                        <td>0.576584541</td>
+                    </tr>
+                    <tr>
+                        <td>$B9CC</td>
+                        <td>MFLPT</td>
+                        <td>0.961800759</td>
+                    </tr>
+                    <tr>
+                        <td>$B9D1</td>
+                        <td>MFLPT</td>
+                        <td>2.88539007</td>
+                    </tr>
+                    <tr>
+                        <td>$B9D6</td>
+                        <td>MFLPT</td>
+                        <td>0.707106781 = SQR(l/2)</td>
+                    </tr>
+                    <tr>
+                        <td>$B9DB</td>
+                        <td>MFLPT</td>
+                        <td>1.41421356 = SQR(2)</td>
+                    </tr>
+                    <tr>
+                        <td>$B9E0</td>
+                        <td>MFLPT</td>
+                        <td>-0.5</td>
+                    </tr>
+                    <tr>
+                        <td>$B9E5</td>
+                        <td>MFLPT</td>
+                        <td>0.693147181 = ln2</td>
+                    </tr>
+                    <tr>
+                        <td>$BAF9</td>
+                        <td>MFLPT</td>
+                        <td>10</td>
+                    </tr>
+                    <tr>
+                        <td>$BDB3</td>
+                        <td>MFLPT</td>
+                        <td>99 999 999.9</td>
+                    </tr>
+                    <tr>
+                        <td>$BDB8</td>
+                        <td>MFLPT</td>
+                        <td>999 999 999</td>
+                    </tr>
+                    <tr>
+                        <td>$BDBD</td>
+                        <td>MFLPT</td>
+                        <td>1000 000 000</td>
+                    </tr>
+                    <tr>
+                        <td>$BF11</td>
+                        <td>MFLPT</td>
+                        <td>0.5</td>
+                    </tr>
+                    <tr>
+                        <td>$BF16</td>
+                        <td>4-Byte-Integer</td>
+                        <td>-100 000 000</td>
+                    </tr>
+                    <tr>
+                        <td>$BFlA</td>
+                        <td>— " —</td>
+                        <td>10 000 000</td>
+                    </tr>
+                    <tr>
+                        <td>$BFlE</td>
+                        <td>— " —</td>
+                        <td>-1000 000</td>
+                    </tr>
+                    <tr>
+                        <td>$BF22</td>
+                        <td>— " —</td>
+                        <td>100000</td>
+                    </tr>
+                    <tr>
+                        <td>$BF26</td>
+                        <td>— " —</td>
+                        <td>-10000</td>
+                    </tr>
+                    <tr>
+                        <td>$BF2A</td>
+                        <td>— " —</td>
+                        <td>1000</td>
+                    </tr>
+                    <tr>
+                        <td>$BF2E</td>
+                        <td>— " —</td>
+                        <td>-100</td>
+                    </tr>
+                    <tr>
+                        <td>$BF32</td>
+                        <td>— " —</td>
+                        <td>10</td>
+                    </tr>
+                    <tr>
+                        <td>$BF36</td>
+                        <td>— " —</td>
+                        <td>-1</td>
+                    </tr>
+                    <tr>
+                        <td>$BF3A</td>
+                        <td>— " —</td>
+                        <td>-2160000</td>
+                    </tr>
+                    <tr>
+                        <td>$BF3E</td>
+                        <td>— " —</td>
+                        <td>216000</td>
+                    </tr>
+                    <tr>
+                        <td>$BF42</td>
+                        <td>— " —</td>
+                        <td>-36000</td>
+                    </tr>
+                    <tr>
+                        <td>$BF46</td>
+                        <td>— " —</td>
+                        <td>3600</td>
+                    </tr>
+                    <tr>
+                        <td>$BF4A</td>
+                        <td>— " —</td>
+                        <td>-600</td>
+                    </tr>
+                    <tr>
+                        <td>$BF4E</td>
+                        <td>— " —</td>
+                        <td>60</td>
+                    </tr>
+                    <tr>
+                        <td>$BFBF</td>
+                        <td>MFLPT</td>
+                        <td>1.44269504 = l/ln2</td>
+                    </tr>
+                    <tr>
+                        <td>$BFC4</td>
+                        <td>1-Byte-Integer</td>
+                        <td>7</td>
+                    </tr>
+                    <tr>
+                        <td>$BFC5</td>
+                        <td>MFLPT</td>
+                        <td>2.14987637E-05</td>
+                    </tr>
+                    <tr>
+                        <td>$BFCA</td>
+                        <td>MFLPT</td>
+                        <td>1.43523140E-04</td>
+                    </tr>
+                    <tr>
+                        <td>$BFCF</td>
+                        <td>MFLPT</td>
+                        <td>1.34226348E-03</td>
+                    </tr>
+                    <tr>
+                        <td>$BFD4</td>
+                        <td>MFLPT</td>
+                        <td>9.61401701E-03</td>
+                    </tr>
+                    <tr>
+                        <td>$BFD9</td>
+                        <td>MFLPT</td>
+                        <td>0.0555051269</td>
+                    </tr>
+                    <tr>
+                        <td>$BFDE</td>
+                        <td>MFLPT</td>
+                        <td>0.240226385</td>
+                    </tr>
+                    <tr>
+                        <td>$BFE3</td>
+                        <td>MFLPT</td>
+                        <td>0.693147186 = ln2</td>
+                    </tr>
+                    <tr>
+                        <td>$BFE8</td>
+                        <td>MFLPT</td>
+                        <td>1</td>
+                    </tr>
+                    <tr>
+                        <td>$E08D</td>
+                        <td>MFLPT</td>
+                        <td>11879 546</td>
+                    </tr>
+                    <tr>
+                        <td>$E092</td>
+                        <td>MFLPT</td>
+                        <td>3.92767774E-08</td>
+                    </tr>
+                    <tr>
+                        <td>$E2E0</td>
+                        <td>MFLPT</td>
+                        <td>1.57079633 = Pi/2</td>
+                    </tr>
+                    <tr>
+                        <td>$E2E5</td>
+                        <td>MFLPT</td>
+                        <td>6.28318531 = 2*Pi</td>
+                    </tr>
+                    <tr>
+                        <td>$E2EA</td>
+                        <td>MFLPT</td>
+                        <td>0.25</td>
+                    </tr>
+                    <tr>
+                        <td>$E2EF</td>
+                        <td>1-Byte-Integer</td>
+                        <td>5</td>
+                    </tr>
+                    <tr>
+                        <td>$E2F0</td>
+                        <td>MFLPT</td>
+                        <td>-14.3813907</td>
+                    </tr>
+                    <tr>
+                        <td>$E2F5</td>
+                        <td>MFLPT</td>
+                        <td>42.0077971</td>
+                    </tr>
+                    <tr>
+                        <td>$E2FA</td>
+                        <td>MFLPT</td>
+                        <td>-76.7041703</td>
+                    </tr>
+                    <tr>
+                        <td>$E2FF</td>
+                        <td>MFLPT</td>
+                        <td>81.6052237</td>
+                    </tr>
+                    <tr>
+                        <td>$E304</td>
+                        <td>MFLPT</td>
+                        <td>-41.3417021</td>
+                    </tr>
+                    <tr>
+                        <td>$E309</td>
+                        <td>MFLPT</td>
+                        <td>6.28318531 = 2*Pi</td>
+                    </tr>
+                    <tr>
+                        <td>$E33E</td>
+                        <td>1-Byte-Integer</td>
+                        <td>11</td>
+                    </tr>
+                    <tr>
+                        <td>$E33F</td>
+                        <td>MFLPT</td>
+                        <td>-6.8473912E-04</td>
+                    </tr>
+                    <tr>
+                        <td>$E344</td>
+                        <td>MFLPT</td>
+                        <td>4.85094216E-03</td>
+                    </tr>
+                    <tr>
+                        <td>$E349</td>
+                        <td>MFLPT</td>
+                        <td>-0.0161117018</td>
+                    </tr>
+                    <tr>
+                        <td>$E34E</td>
+                        <td>MFLPT</td>
+                        <td>0.034209638</td>
+                    </tr>
+                    <tr>
+                        <td>$E353</td>
+                        <td>MFLPT</td>
+                        <td>-0.0542791328</td>
+                    </tr>
+                    <tr>
+                        <td>$E358</td>
+                        <td>MFLPT</td>
+                        <td>0.0724571965</td>
+                    </tr>
+                    <tr>
+                        <td>$E35D</td>
+                        <td>MFLPT</td>
+                        <td>-0.0898023954</td>
+                    </tr>
+                    <tr>
+                        <td>$E362</td>
+                        <td>MFLPT</td>
+                        <td>0.110932413</td>
+                    </tr>
+                    <tr>
+                        <td>$E367</td>
+                        <td>MFLPT</td>
+                        <td>-0.142839808</td>
+                    </tr>
+                    <tr>
+                        <td>$E36C</td>
+                        <td>MFLPT</td>
+                        <td>0.19999912</td>
+                    </tr>
+                    <tr>
+                        <td>$E371</td>
+                        <td>MFLPT</td>
+                        <td>-0.333333316</td>
+                    </tr>
+                    <tr>
+                        <td>$E376</td>
+                        <td>MFLPT</td>
+                        <td>1</td>
+                    </tr>
+                    <tr>
+                        <td>$E3BA</td>
+                        <td>MFLPT</td>
+                        <td>0.811635157</td>
+                    </tr>
+                    <tr>
+                        <td>$E8DA - $E8E9</td>
+                        <td>1-Byte-Integers</td>
+                        <td>Tabelle der Farbcodes</td>
+                    </tr>
+                    <tr>
+                        <td>$EB81 - $EBC1</td>
+                        <td>— " —</td>
+                        <td>Tastaturdecodierung: Einzelne Tasten</td>
+                    </tr>
+                    <tr>
+                        <td>$EBC2-$EC02</td>
+                        <td>1-Byte-Integers</td>
+                        <td>Tasten mit Shift</td>
+                    </tr>
+                    <tr>
+                        <td>$EC03 - $EC43</td>
+                        <td>1-Byte-Integers</td>
+                        <td>Tasten mit Commodore-Taste</td>
+                    </tr>
+                    <tr>
+                        <td>$EC78 - $ECB8</td>
+                        <td>1-Byte-Integers</td>
+                        <td>Tasten mit Control-Taste</td>
+                    </tr>
+                    <tr>
+                        <td>$ECB9 - $ECE5</td>
+                        <td>1-Byte-Integers</td>
+                        <td>VIC-II-Chip-Registerwerte</td>
+                    </tr>
+                    <tr>
+                        <td>$ECF0 - $ED08</td>
+                        <td>1-Byte-Integers</td>
+                        <td>Tabelle der LSBs der Bildschirm-Anfangsadressen</td>
+                    </tr>
+                </tbody>
+            </table>
+            <figcaption>Tabelle 1. Im ROM stehen nicht nur Programme, sondern auch
+                Tabellen, hier einige wichtige Zahlen.</figcaption>
+        </figure>
+
+        <figure>
+            <table>
+                <tbody>
+                    <tr>
+                        <td>$A004</td>
+                        <td>CBMBASIC</td>
+                    </tr>
+                    <tr>
+                        <td>$A09E - $A19D</td>
+                        <td>Texte der Basic-Befehlsworte<br>(im letzten Byte ist jeweils Bit 7 gesetzt)</td>
+                    </tr>
+                    <tr>
+                        <td>$A19E - $A327</td>
+                        <td>Texte der Basic-Fehler- und System- Meldungen. (Im letzten Byte ist jeweils Bit 7 gesetzt)</td>
+                    </tr>
+                    <tr>
+                        <td>$A364 - $A38A</td>
+                        <td>Weitere System-Meldungen: OK, ERROR, IN, READY, BREAK. (Das letzte Bvte ist ieweils 0)</td>
+                    </tr>
+                    <tr>
+                        <td>$ACFC - $AD1D</td>
+                        <td>Fehlermeldungstexte für INPUT: ?EXTRA IGNORED, ?REDO FROM START. (Das letzte Byte ist jeweils 0)</td>
+                    </tr>
+                    <tr>
+                        <td>$E460</td>
+                        <td>BASIC BYTES FREE</td>
+                    </tr>
+                    <tr>
+                        <td>$E473</td>
+                        <td>**** COMMODORE 64 BASIC V2 **** 64K-RAM-System</td>
+                    </tr>
+                    <tr>
+                        <td>$ECE6</td>
+                        <td>LOAD (Return) RUN (Return)</td>
+                    </tr>
+                    <tr>
+                        <td>$F0BD - $F12B</td>
+                        <td>Texte für Ein- und Ausgabe-Onerationen</td>
+                    </tr>
+                    <tr>
+                        <td>$FD10</td>
+                        <td>CBM80</td>
+                    </tr>
+                </tbody>
+            </table>
+            <figcaption>Tabelle 2. Diese Texte sind im ROM als ASCII-Werte abgelegt</figcaption>
+        </figure>
+
         <p>Sollten Sie mal in die Verlegenheit kommen, solche Texte ausgeben zu wollen, dann legen Sie sie nicht nochmal in einer eigenen Texttabelle ab, sondern schöpfen Sie aus dem Fundus, den wir im ROM-Bereich fix und fertig haben.</p>
 
         <p>Diese Folge soll nicht abgeschlossen werden, ohne eine Korrektur. Auf einen Fehler, dem ich aufgesessen bin (in der Literatur befinde ich mich aber in guter Gesellschaft, andere sind auch davon betroffen), haben mich zwei aufmerksame Leser hingewiesen. Es dreht sich um die Flaggensetzung bei Compare-Befehlen. Die N-Flagge ist nämlich nicht nur vom Ergebnis des Vergleichs, sondern auch noch von den aktuellen Akku- beziehungsweise Registerinhalten bestimmt.</p>
@@ -266,6 +703,150 @@
 
         <p>[1] »Computerspiele und Wissenswertes Commodore 64«, Haar bei München: Markt &amp; Technik Verlag, 1984. Das ist die von P. Lücke besorgte Übersetzung des amerikanischen Buches »More on the sixtyfour« und ist jedem Assembler-Programmierer warm zu empfehlen.<br>
             [2] »MOS Microcomputers Programmier-Handbuch«, Frankfurt: Commodore MOS Technology</p>
+
+        <figure>
+            <table>
+                <tbody>
+                    <tr>
+                        <th rowspan="2">Befehlswort</th>
+                        <th rowspan="2">Adressierung</th>
+                        <th rowspan="2">Bytezahl</th>
+                        <th colspan="2">Code</b>
+                        <th rowspan="2">Taktzyklen</th>
+                        <th rowspan="2">Beinflussung von Flaggen</th>
+                    </tr>
+                    <tr>
+                        <th>Hex</th>
+                        <th>Dez</th>
+                    </tr>
+                    <tr>
+                        <td rowspan="5">LSR</td>
+                        <td>»Akkumulator«</td>
+                        <td></td>
+                        <td>1A</td>
+                        <td>26</td>
+                        <td>2</td>
+                        <td>N,Z,C</td>
+                    </tr>
+                    <tr>
+                        <td>absolut</td>
+                        <td>3</td>
+                        <td>4E</td>
+                        <td>78</td>
+                        <td>6</td>
+                        <td>N,Z,C</td>
+                    </tr>
+                    <tr>
+                        <td>0-page-absolut</td>
+                        <td>2</td>
+                        <td>46</td>
+                        <td>70</td>
+                        <td>5</td>
+                        <td>N,Z,C</td>
+                    </tr>
+                    <tr>
+                        <td>absolut-X-indiz.</td>
+                        <td>3</td>
+                        <td>5E</td>
+                        <td>94</td>
+                        <td>7</td>
+                        <td>N,Z,C</td>
+                    </tr>
+                    <tr>
+                        <td>0-page-X-indiz.</td>
+                        <td>2</td>
+                        <td>56</td>
+                        <td>86</td>
+                        <td>6</td>
+                        <td>N,Z,C</td>
+                    </tr>
+                    <tr>
+                        <td rowspan="5">ROL</td>
+                        <td>»Akkumulator«</td>
+                        <td>1</td>
+                        <td>2A</td>
+                        <td>42</td>
+                        <td>2</td>
+                        <td>N,Z,C</td>
+                    </tr>
+                    <tr>
+                        <td>absolut</td>
+                        <td>3</td>
+                        <td>2E</td>
+                        <td>46</td>
+                        <td>6</td>
+                        <td>N,Z,C</td>
+                    </tr>
+                    <tr>
+                        <td>0-page-absolut</td>
+                        <td>2</td>
+                        <td>26</td>
+                        <td>38</td>
+                        <td>5</td>
+                        <td>N,Z,C</td>
+                    </tr>
+                    <tr>
+                        <td>absolut-X-indiz.</td>
+                        <td>3</td>
+                        <td>3E</td>
+                        <td>62</td>
+                        <td>7</td>
+                        <td>N,Z,C</td>
+                    </tr>
+                    <tr>
+                        <td>0-page-X-indiz.</td>
+                        <td>2</td>
+                        <td>36</td>
+                        <td>54</td>
+                        <td>6</td>
+                        <td>N,Z,C</td>
+                    </tr>
+                    <tr>
+                        <td rowspan="5">ROR</td>
+                        <td>»Akkumulator«</td>
+                        <td>1</td>
+                        <td>6A</td>
+                        <td>106</td>
+                        <td>2</td>
+                        <td>N,Z,C</td>
+                    </tr>
+                    <tr>
+                        <td>absolut</td>
+                        <td>3</td>
+                        <td>6E</td>
+                        <td>110</td>
+                        <td>6</td>
+                        <td>N,Z,C</td>
+                    </tr>
+                    <tr>
+                        <td>0-page-absolut</td>
+                        <td>2</td>
+                        <td>66</td>
+                        <td>102</td>
+                        <td>5</td>
+                        <td>N,Z,C</td>
+                    </tr>
+                    <tr>
+                        <td>absolut-X-indiz.</td>
+                        <td>3</td>
+                        <td>7E</td>
+                        <td>126</td>
+                        <td>7</td>
+                        <td>N,Z,C</td>
+                    </tr>
+                    <tr>
+                        <td>0-page-X-indiz.</td>
+                        <td>2</td>
+                        <td>76</td>
+                        <td>118</td>
+                        <td>6</td>
+                        <td>N,Z,C</td>
+                    </tr>
+                </tbody>
+            </table>
+            <figcaption>Tabelle 3. Die in dieser Ausgabe
+                besprochenen Assembler-Befehle</figcaption>
+        </figure>
 
         <figure>
             <pre>TODO</pre>
