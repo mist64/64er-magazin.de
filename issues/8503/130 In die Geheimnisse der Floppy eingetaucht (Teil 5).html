@@ -39,7 +39,7 @@
 
         <figure>
             Wichtige Adressen des DOS:
-            <table>
+            <table class="plain">
                 <tbody>
                     <tr>
                         <td>$FD9E</td>
@@ -63,15 +63,32 @@
                     </tr>
                     <tr>
                         <td>$F510</td>
-                        <td>— Blockheader lesen:<br>+ Diskette muß initialisiert sein<br>+ $32/33 muß die Adresse der Track- und Sektornummer enthalten (L/H); zum Beispiel $00/03, wenn die Nummern in $0300/0301 abgespeichert sind.<br>+ Rückkehr nur bei fehlerfreier Durchführung des Lesens</td>
+                        <td>— Blockheader lesen:
+                            <ul class="plain">
+                                <li>+ Diskette muß initialisiert sein</li>
+                                <li>+ $32/33 muß die Adresse der Track- und Sektornummer enthalten (L/H); zum Beispiel $00/03, wenn die Nummern in $0300/0301 abgespeichert sind.</li>
+                                <li>+ Rückkehr nur bei fehlerfreier Durchführung des Lesens</li>
+                            </ul>
+                        </td>
                     </tr>
                     <tr>
                         <td>$F527</td>
-                        <td>— Blockheader lesen:<br>+ Diskette muß initialisiert sein<br>+ zuvor muß $12 nach $16 und $13 nach $17 gebracht Werden<br>+ Track- und Sektornummer in $18 und $19<br>+ Rückkehr nur bei fehlerfreier Durchführung des Lesens</td>
+                        <td>— Blockheader lesen:
+                            <ul class="plain">
+                                <li>+ Diskette muß initialisiert sein</li>
+                                <li>+ zuvor muß $12 nach $16 und $13 nach $17 gebracht Werden</li>
+                                <li>+ Track- und Sektornummer in $18 und $19</li>
+                                <li>+ Rückkehr nur bei fehlerfreier Durchführung des Lesens</li>
+                            </ul>
+                        </td>
                     </tr>
                     <tr>
                         <td>$F50A</td>
-                        <td>— Datenblockanfang suchen:<br>+ Parameter siehe $F510</td>
+                        <td>— Datenblockanfang suchen:
+                            <ul class="plain">
+                                <li>+ Parameter siehe $F510</li>
+                            </ul>
+                        </td>
                     </tr>
                 </tbody>
             </table>
@@ -86,7 +103,7 @@
 
         <figure>
             Jobcodes des DOS:
-            <table>
+            <table class="plain">
                 <tbody>
                     <tr>
                         <td>$80</td>
@@ -129,7 +146,7 @@
 
         <figure>
             Rückmeldungen der Jobschleife:
-            <table>
+            <table class="plain">
                 <tbody>
                     <tr>
                         <td>$01</td>
@@ -216,7 +233,7 @@
 
         <h3>1) Lesen eines Sektors in einen Puffer:</h3>
 
-        <p>Wenn wir einen Sektor in einen Puffer lesen wollen, so stellen wir fest, daß diese Aktion auf der Ebene der Jobschleife fast genauso einfach ist, wie von Basic aus mit dem »B-R«- beziehungsweise »Ul«-Befehl. Zum Lesen eines Sektors geben Sie dessen Track- und Sektornummer in den entsprechenden Speicherstellen für den gewünschten Puffer an. Anschließend senden Sie den Code $80 an den DC, und das Laufwerk startet sofort und liest den Sektor ein.</p>
+        <p>Wenn wir einen Sektor in einen Puffer lesen wollen, so stellen wir fest, daß diese Aktion auf der Ebene der Jobschleife fast genauso einfach ist, wie von Basic aus mit dem »B-R«- beziehungsweise »U1«-Befehl. Zum Lesen eines Sektors geben Sie dessen Track- und Sektornummer in den entsprechenden Speicherstellen für den gewünschten Puffer an. Anschließend senden Sie den Code $80 an den DC, und das Laufwerk startet sofort und liest den Sektor ein.</p>
 
         <p>Diese Befehlsübergabe können Sie sogar von Basic aus, mit den MEMORY- und BLOCK-Befehlen, realisieren und dann den Pufferinhalt auslesen, um sich zu überzeugen, daß der Block auch wirklich eingelesen wurde.</p>
 
@@ -227,17 +244,17 @@
         <p>Wir werden jetzt den Jobcode für Lesen des Blocks 18,1 in Puffer 0 übergeben und uns dann die Rückmeldung und den Inhalt des Blocks ansehen. Mit dem POKE-Befehl im Programm schreiben wir den Inhalt des Puffers direkt in den Bildschirmspeicher, was für unsere Kontrolle langen soll:</p>
 
         <figure>
-            <code>1 OPEN1,8,15,”I”<br>
-            2 PRINT#1,”M-W”CHR$(6)CHR$(0)CHR$(2)CHR$(18)CHR$(1)<br>
-            3 PRINT#1,”M-W”CHR$(0)CHR$(0)CHR$(1)CHR$(128)<br>
-            4 FORX=0TO2000:NEXTX<br>
-            5 PRINT#1,”M-R”CHR$(0)CHR$(0)CHR$(1)<br>
-            6 GET#1,A$: PRINT ASC(A$ + CHR$(0))<br>
-            7 FORX=0TO255<br>
-            8 PRINT#1,”M-R”CHR$(X)CHR$(3)CHR$(1)<br>
-            9 GET#1,A$: POKE1024+X,ASC(A$+CHR$(0))<br>
-            10 NEXTX<br>
-            11 CLOSE 1</code>
+            <p><code>1 OPEN1,8,15,”I”
+            2 PRINT#1,”M-W”CHR$(6)CHR$(0)CHR$(2)CHR$(18)CHR$(1)
+            3 PRINT#1,”M-W”CHR$(0)CHR$(0)CHR$(1)CHR$(128)
+            4 FORX=0TO2000:NEXTX
+            5 PRINT#1,”M-R”CHR$(0)CHR$(0)CHR$(1)
+            6 GET#1,A$: PRINT ASC(A$ + CHR$(0))
+            7 FORX=0TO255
+            8 PRINT#1,”M-R”CHR$(X)CHR$(3)CHR$(1)
+            9 GET#1,A$: POKE1024+X,ASC(A$+CHR$(0))
+            10 NEXTX
+            11 CLOSE 1</code></p>
         </figure>
 
         <p>Dieses kleine Programm initialisiert die Diskette im Laufwerk. Anschließend werden Track und Sektor (18,1) übergeben und schließlich der Jobcode in Adresse $0000 geschrieben, der dafür sorgt, daß unser Block in Puffer 0 geladen wird. Nach einer kleinen Warteschleife, in der die Floppy Zeit zur Befehlsausführung hat, wird der Jobspeicher wieder ausgelesen. Anhand von Tabelle 2 können Sie erkennen, daß der Job ordnungsgemäß ausgeführt wurde, wenn Sie als Rückmeldung eine »1« bekommen.</p>
@@ -262,7 +279,7 @@
 
         <p>Ihnen ist vielleicht auch schon ein weiterer Vorteil der Jobschleife aufgefallen: Es erfolgt keine Kontrolle auf »legale« Angaben mehr; das heißt, wenn Sie an den Disk-Controller das Kommando geben, daß er Block 2 auf Track 38 lesen soll, dann tut er dies auch.</p>
 
-        <p>Versuchen Sie das einmal mit dem Ul-Befehl; hier bekommen Sie als Antwort: »ILLEGAL TRACK OR SEKTOR«, da Track 38 gar nicht existiert.</p>
+        <p>Versuchen Sie das einmal mit dem U1-Befehl; hier bekommen Sie als Antwort: »ILLEGAL TRACK OR SEKTOR«, da Track 38 gar nicht existiert.</p>
 
         <p>So groß der Vorteil dieser Nichtkontrolle auch sein mag; sie sollten sich dessen immer bewußt sein, daß der DC auch versuchen würde, auf Track 100 zuzugreifen, wenn dies verlangt werden sollte.</p>
 
@@ -300,11 +317,11 @@
 
         <p>Wir haben jetzt die Möglichkeit, ein Maschinenprogramm im Pufferspeicher der Floppy abzulegen und dort zu starten. Unsere Jobcodes erlauben es uns außerdem, direkt in den Ablauf der Jobschleife einzugreifen und die Diskette sozusagen »von Hand« zu manipulieren.</p>
 
-        <p>Als letztes fehlen uns jetzt nur noch die Kenntnisse über den direkten Zugriff auf den Schreib-/ Lesekopf der Floppy, so daß wir einzelne Bits ohne Umwege und ohne irgendeine Einschränkung durch die Blockstruktur der Diskette direkt auf die Magnetschicht schreiben können. Mit diesem Problem, das eigentlich gar keines ist, wollen wir uns jetzt beschäftigen. Dazu ein paar Bemerkungen zur Organisation der Schreib-/Leseelektronik der 1541.</p>
+        <p>Als letztes fehlen uns jetzt nur noch die Kenntnisse über den direkten Zugriff auf den Schreib-/Lesekopf der Floppy, so daß wir einzelne Bits ohne Umwege und ohne irgendeine Einschränkung durch die Blockstruktur der Diskette direkt auf die Magnetschicht schreiben können. Mit diesem Problem, das eigentlich gar keines ist, wollen wir uns jetzt beschäftigen. Dazu ein paar Bemerkungen zur Organisation der Schreib-/Leseelektronik der 1541.</p>
 
         <p>Die Bytes werden zwar auf Diskette in serieller Bitfolge abgelegt; dieses Problem braucht uns jedoch gar nicht weiter zu beschäftigen. Der VIA 6522, der für uns die Elektronik steuert, kann nämlich von uns wie eine Speicherstelle behandelt werden. Senden wir also ein Byte an den VIA 6522, so geschieht das Schreiben auf Diskette vollautomatisch, so daß uns diese Sache nicht weiter beschäftigen soll.</p>
 
-        <p>Das einzige Problem, das sich bei der ganzen Angelegenheit stellt, ist die Frage des Timing. Immerhin benötigt der Schreiboder Lesevorgang eine gewisse Zeit, das heißt, wenn wir beispielsweise Daten vom Tonkopf lesen wollen, muß uns der DC erst mitteilen, wann das nächste Byte fertig eingelesen ist und zur Ausgabe bereitsteht.</p>
+        <p>Das einzige Problem, das sich bei der ganzen Angelegenheit stellt, ist die Frage des Timing. Immerhin benötigt der Schreib- oder Lesevorgang eine gewisse Zeit, das heißt, wenn wir beispielsweise Daten vom Tonkopf lesen wollen, muß uns der DC erst mitteilen, wann das nächste Byte fertig eingelesen ist und zur Ausgabe bereitsteht.</p>
 
         <p>Zur Steuerung dieses Timings wird in der 1541 das V-(Overflow-)Flag des Prozessorstatusregisters benutzt. Der Mikroprozessor 6502 hat nämlich den Vorteil, daß dieses Flag extern beeinflußt werden kann.</p>
 
@@ -390,7 +407,7 @@ AUF LESEN UMSCHALTEN:
         </figure>
         <figure>
             <pre>TODO</pre>
-            <figcaption>Listing 2b. Herstellen eines »22, READ ERROR« (Assemblerprogramm)</figcaption>
+            <figcaption>Listing 2b. <a href="#fehlerteufelchen" class="fehlerteufelchen_link">Herstellen eines »22, READ ERROR« (Assemblerprogramm)</a></figcaption>
         </figure>
         <figure>
             <!-- TODO <pre data-filename="read error 23" data-name="READ ERROR 23 erzeugen"></pre> -->
@@ -398,7 +415,7 @@ AUF LESEN UMSCHALTEN:
         </figure>
         <figure>
             <pre>TODO</pre>
-            <figcaption>Listing 3b. Herstellen eines »23, READ ERROR« (Assemblerprogramm)</figcaption>
+            <figcaption>Listing 3b. <a href="#fehlerteufelchen" class="fehlerteufelchen_link">Herstellen eines »23, READ ERROR« (Assemblerprogramm)</a></figcaption>
         </figure>
         <figure>
             <pre>0500      JSR $FDA3 ; TRACK LOESCHEN
@@ -412,6 +429,14 @@ AUF LESEN UMSCHALTEN:
 0512      RTS       ; PROGRAMMENDE</pre>
             <figcaption>Listing 4. Ein »Killertrack« wird erzeugt. Startadresse bei $0506.</figcaption>
         </figure>
+
+        <aside class="fehlerteufelchen" id="fehlerteufelchen">
+        <h2>Fehlerteufelchen</h2>
+        
+        <p>Auf der Seite 135 muß in den Listings 2b und 3b in der Speicherstelle 050C LDA #$ ... stehen.</p>
+        
+        <!-- 64'er 4/1985 -->
+        </aside>
     </article>
 </body>
 
