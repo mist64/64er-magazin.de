@@ -406,7 +406,45 @@ AUF LESEN UMSCHALTEN:
             <figcaption>Listing 2a. Ein READ ERROR 22 wird erzeugt (in einem beliebigen Sektor)</figcaption>
         </figure>
         <figure>
-            <pre>TODO</pre>
+            <pre>0500      LDA $12     ; ID 1 HOLEN
+0502      STA $16     ; UND UEBERNEHMEN
+0504      LDA $13     ; ID 2 HOLEN
+0506      STA $17     ; UND UEBERNEHMEN
+0508      LDA #$23    ; TRACKNUMMER
+050A      STA $18     ; UEBERNEHMEN
+050C      <a href="#fehlerteufelchen" class="fehlerteufelchen_link">LDA 00</a>      ; SEKTORNUMMER
+050E      STA $19     ; UEBERNEHMEN
+0510      JSR $F527   ; BLOCKHEADER HOLEN
+0513      JSR $F556   ; AUF 'SYNC' WARTEN
+0516      LDX #$00    ; WARTEN, UM IN
+0518 LOOP DEX         ; DEN DATENBLOCK
+0519      BNE LOOP    ; ZU KOMMEN
+051B      LDA $1C0C   ;
+051E      AND #$lF    ; PCR AUF SCHREIBEN
+0520      ORA #$C0    ; UMSCHALTEN
+0522      STA $1C0C   ;
+0525      LDA #$FF    ; PORT A AUF
+0527      STA $1C03   ; AUSGANG STELLEN
+052A      LDA #$55    ; FALSCHWERT
+052C      STA $1C01   ; IN PUFFER SCHREIBEN
+052F W1   BVC W1      ; WARTEN AUF READY
+0531      CLV         ; FLAG LOESCHEN
+0532 W2   BVC W2      ; WARTEN AUF READY
+0534      CLV         ; FLAG LOESCHEN
+0535 W3   BVC W3      ; WARTEN AUF READY
+0537      CLV         ; FLAG LOESCHEN
+0538      JSR $FE00   ; AUF LESEN SCHALTEN
+053B      JMP $FD9E   ; ZUR JOBSCHLEIFE
+053E      NOP         ;
+053F      NOP         ;
+0540      MOP         ;
+0541      LDA #$23    ; TRACKNUMMER
+0543      STA $0A     ; IN JOBSPEICHER
+0545      LDA #$E0    ; JOBCODE
+0547      STA $02     ; UEBERGEBEN
+0549 WAIT LDA $02     ; RUECKMELDUNG
+054B      BMI WAIT    ; WARTEN AUF ENDE
+054D      RTS         ; PROGRAMMENDE</pre>
             <figcaption>Listing 2b. <a href="#fehlerteufelchen" class="fehlerteufelchen_link">Herstellen eines »22, READ ERROR« (Assemblerprogramm)</a></figcaption>
         </figure>
         <figure>
@@ -414,7 +452,47 @@ AUF LESEN UMSCHALTEN:
             <figcaption>Listing 3a. Ein READ ERROR 23 wird erzeugt</figcaption>
         </figure>
         <figure>
-            <pre>TODO</pre>
+            <pre>0500      LDA $12     ; ID 1 HOLEN
+0502      STA $16     ; UND UEBERNEHMEN
+0504      LDA $13     ; ID 2 HOLEN
+0506      STA $17     ; UND UEBERNEHMEN
+050S      LDA #$23    ; TRACKNUMMER
+050A      STA $18     ; UEBERNEHMEN
+050C      <a href="#fehlerteufelchen" class="fehlerteufelchen_link">LDA 01</a>      ; SEKTORNUMMER
+050E      STA $19     ; UEBERNEHMEN
+0510      JSR $F527   ; BLOCKHEADER HOLEN
+0513      JSR $F556   ; AUF 'SYNC' WARTEN
+0516      LDA $1C0C   ; PCR
+0519      AND #$1F    ; AUF SCHREIBEN
+051B      ORA #$C0    ; UMSCHALTEN
+051D      STA $1C0C   ;
+0520      LDA #$FF    ; PORT A AUF AUSGANG
+0522      STA $1C03   ; UMSCHALTEN
+0525      LDA #$55    ; FALSCHWERT
+0527      STA $1C01   ;
+052A W1   BVC W1      ; SCHREIBEN
+052C      CLV         ;
+052D W2   BVC W2      ; SCHREIBEN
+052F      CLV         ;
+0530 W3   BVC W3      ; SCHREIBEN
+0532      CLV         ;
+0533      JSR $FE00   ; PCR AUF LESEN
+0536      JMP $FD9E   ; ZUR JOBSCHLEIFE
+0539      NOP         ;
+053A      NOP         ;
+053B      NOP         ;
+053C      NOP         ;
+053D      NOP         ;
+053E      NOP         ;
+053F      NOP         ;
+0540      NOP         ;
+0541      LDA #$23    ; TRACKNUMMER
+0543      STA $0A     ; IN JOBSPEICHER
+0545      LDA #$E0    ; JOBCODE
+0547      STA $02     ; UEBERGEBEN
+0549 WAIT LDA $02     ; RUECKMELDUNG
+054B      BMI WAIT    ; WARTEN AUF ENDE
+054D      RTS         ; PROGRAMMENDE</pre>
             <figcaption>Listing 3b. <a href="#fehlerteufelchen" class="fehlerteufelchen_link">Herstellen eines »23, READ ERROR« (Assemblerprogramm)</a></figcaption>
         </figure>
         <figure>
@@ -432,9 +510,10 @@ AUF LESEN UMSCHALTEN:
 
         <aside class="fehlerteufelchen" id="fehlerteufelchen">
         <h2>Fehlerteufelchen</h2>
-        
-        <p>Auf der Seite 135 muß in den Listings 2b und 3b in der Speicherstelle 050C LDA #$ ... stehen.</p>
-        
+
+        <p>Auf der Seite 135 wurden die beiden Bildunterschriften Listing 2b und 3b vertauscht.</p>
+        <p>In beiden Listings muß in der Speicherstelle 050C LDA #$ ... stehen.</p>
+
         <!-- 64'er 4/1985 -->
         </aside>
     </article>
