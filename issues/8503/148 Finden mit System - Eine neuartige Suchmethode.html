@@ -28,7 +28,7 @@
 
         <h3>Wie sucht man eigentlich?</h3>
 
-        <p>Nun, uns soll hier nicht interessieren, wie der eine oder andere mit seiner häuslichen (Un-) Ordnung fertig wird. Uns geht es hier um das Suchen und möglichst auch Finden von einer Zeichenkette in einer anderen. Einigen wir uns jetzt schon auf zwei Begriffe, damit wir später keine Schwierigkeiten bekommen. Der Suchstring ist der String, nach dem wir suchen. Dies kann eine beliebige Zeichenkette, also ein Wort, eine Zahl, Grafikzeichen oder ein Gemisch aus alledem sein. Der Durchsuchstring ist derjenige, in dem wir suchen.</p>
+        <p>Nun, uns soll hier nicht interessieren, wie der eine oder andere mit seiner häuslichen (Un-)Ordnung fertig wird. Uns geht es hier um das Suchen und möglichst auch Finden von einer Zeichenkette in einer anderen. Einigen wir uns jetzt schon auf zwei Begriffe, damit wir später keine Schwierigkeiten bekommen. Der Suchstring ist der String, nach dem wir suchen. Dies kann eine beliebige Zeichenkette, also ein Wort, eine Zahl, Grafikzeichen oder ein Gemisch aus alledem sein. Der Durchsuchstring ist derjenige, in dem wir suchen.</p>
 
         <p>Das landläufige Suchverfahren sieht folgendermaßen aus: Der Anfang des Suchstring wird an den Anfang des Durchsuchstrings angelegt. Dann werden die beiden ersten Buchstaben verglichen. Sind diese gleich, werden die beiden zweiten Buchstaben verglichen, und so weiter. Dieses Spielchen wiederholt sich so lange, bis sich die beiden Buchstaben nicht gleichen. Dann wird der Suchstring um eine Position am Durchsuchstring verschoben, und somit der erste Buchstabe des Suchstrings mit dem zweiten des Durchsuchstrings und so weiter, verglichen. Wird beim Suchen festgestellt, daß alle Buchstaben übereinstimmen, so hat man den Suchstring im Durchsuchstring gefunden. Stellt man aber fest, daß das Ende des Suchstrings über den Durchsuchstring hinausragt, so muß man die Suche abbrechen, da der Suchstring nicht im Durchsuchstring vorhanden sein kann.</p>
 
@@ -42,45 +42,52 @@
 
         <p>Hier das Ganze im Bild:</p>
 
-        <p>SCHÖNES WETTER HEUTE<br>
-            HALLO<br>
-            HALLO<br>
-            HALLO&hellip;<br>
-            TODO</p>
+<pre style="font-family: monospace">
+SCHÖNES WETTER HEUTE
+HALLO
+     HALLO
+          HALLO&hellip;
+</pre>
 
         <p>Doch es ist nicht immer ganz so einfach. Suchen wir mal im String »DU HALLODRI«. Beim Anlegen und Vergleichen trifft das »O« aus »HALLO» auf das »A« von »DU HALLODRI«. Würden wir jetzt, da die beiden ja ungleich sind, »HALLO« um fünf Positionen verschieben, würden wir leider das »HALLO« in »HALLODRI« übersehen, da wir schon zu weit verschoben haben:</p>
 
-        <p>DU HALLODRI<br>
-            HALLO<br>
-            HALLO<br>
-            TODO</p>
+<pre style="font-family: monospace">
+DU HALLODRI
+HALLO
+     HALLO
+</pre>
 
         <p>Wie weit darf man in diesem Fall verschieben? Nun, um maximal drei Positionen, dann liegt das »HALLO« nämlich genau an der richtigen Stelle:</p>
 
-        <p>DU HALLODRI<br>
-            HALLO<br>
-            HALLO<br>
-            TODO</p>
+<pre style="font-family: monospace">
+DU HALLODRI
+HALLO
+   HALLO
+</pre>
 
         <p>Das ist ja ganz schön und gut, daß wir wissen, daß jetzt maximal um drei Positionen verschoben werden darf, aber wie sag ich’s dem Computer? Auf die Lösung zu kommen ist genial und deshalb verblüffend einfach. Zählen wir einmal die Buchstaben von »HALLO« von hinten mit Null beginnend durch.</p>
 
-        <p>H A L L O<br>
-            4 3 2 1 0<br>
-            TODO</p>
+        <table class="plain center">
+            <tr><td>H</td><td>A</td><td>L</td><td>L</td><td>O</td></tr>
+            <tr><td>4</td><td>3</td><td>2</td><td>1</td><td>0</td></tr>
+        </table>
 
-        <p>Das A erhält dann die Stellungsnummer 3. Diese stimmt aber nun mit dem maximalen Verschiebefaktor überein. Zufall? Nun machen wir noch ein Beispiel. Suchen wir PUTER in COMPUTER.<br>
-            Erst einmal durchzählen:</p>
+        <p>Das A erhält dann die Stellungsnummer 3. Diese stimmt aber nun mit dem maximalen Verschiebefaktor überein. Zufall? Nun machen wir noch ein Beispiel. Suchen wir PUTER in COMPUTER.</p>
 
-        <p>P U T E R<br>
-            4 3 2 1 0<br>
-            TODO</p>
+        <p class="noindent">Erst einmal durchzählen:</p>
 
-        <p>Und dann:</p>
+        <table class="plain center">
+            <tr><td>P</td><td>U</td><td>T</td><td>E</td><td>R</td></tr>
+            <tr><td>4</td><td>3</td><td>2</td><td>1</td><td>0</td></tr>
+        </table>
 
-        <p>C O M P U T E R<br>
-            P U T E R<br>
-            P U T E R<br>
-            TODO</p>
+        <p class="noindent">Und dann:</p>
+
+        <table class="plain center">
+            <tr><td>C</td><td>O</td><td>M</td><td>P</td><td>U</td><td></td><td></td><td></td></tr>
+            <tr><td>P</td><td>U</td><td>T</td><td>E</td><td>R</td></tr>
+            <tr><td></td><td></td><td></td><td>P</td><td>U</td><td>T</td><td>E</td><td>R</td></tr>
+        </table>
 
         <p>Der letzte Buchstabe in PUTER, das R stößt auf ein U im Computer. Dessen Stellungsnummer ist aber wieder 3, es darf also wieder um drei Positionen verschoben werden. Daß das tatsächlich immer funktioniert, kann man auch mathematisch beweisen, würde jedoch hier den Rahmen sprengen.</p>
 
@@ -88,15 +95,20 @@
 
         <p>Sollten Buchstaben im Suchstring doppelt auftauchen, so wird für einen Buchstaben immer die kleinste Stellungsnummer gespeichert. Dies läßt sich sehr einfach dadurch erreichen, daß der Suchstring beim Anlegen der Tabelle von vorne nach hinten durchgegangen wird. Taucht dann ein Buchstabe ein zweites Mal auf, so wird automatisch die größere Stellungsnummer von der kleineren überschrieben. Ein Beispiel:</p>
 
-        <p>Suchen wir mal »COMMODORE« in » COMMODORE«. TODO</p>
+        <p class="noindent">Suchen wir mal »COMMODORE« in<br>»  COMMODORE«.</p>
 
-        <p>Zuerst einmal durchzählen:</p>
+        <p class="noindent">Zuerst einmal durchzählen:</p>
 
-        <p>C O M M O D O R E<br>
-            8 7 6 5 4 3 2 1 0<br>
-            COMMODORE COMMODORE<br>
-            TODO</p>
+        <table class="plain center">
+            <tr><td>C</td><td>O</td><td>M</td><td>M</td><td>O</td><td>D</td><td>O</td><td>R</td><td>E</td></tr>
+            <tr><td>8</td><td>7</td><td>6</td><td>5</td><td>4</td><td>3</td><td>2</td><td>1</td><td>0</td></tr>
+        </table>
 
+<pre style="font-family: monospace">
+  COMMODORE
+COMMODORE
+</pre>
+            
         <p>Das »E« stößt nun auf ein »O«. Nun gibt es aber drei »O«. Welche Stellungsnummer darf hier genommen werden? Die des letzten »O«, die »2«. Mit einer Verschiebung von zwei haben wir dann ja auch die Übereinstimmung gefunden. Durch den Tabellen-Algorithmus wird immer automatisch die Stellungsnummer des letzten »O« genommen.</p>
 
         <p>Die zweite Regel befaßt sich mit den Buchstaben. Die erhalten als Stellungsnummer die Länge des Suchstrings, da ja in diesem Fall um die gesamte Suchstringlänge verschoben werden kann. (Siehe auch unser allererstes Beispiel). Somit ist der Algorithmus zur Tabellenbildung schon formulierbar. Er ist in Bild 1 als Flußdiagramm dargestellt.</p>
@@ -110,21 +122,23 @@
 
         <p>Suchen wir mal »HOHO« in »HIHOHOHI«. Beim ersten Anlegen von »HOHO« stimmen die letzten beiden Buchstaben überein, der zweite aber nicht. Würde jetzt um den Tabellenwert — bei dem »I« ist er 4, verschoben, so würden wir um zwei Buchstaben zu weit verschoben haben!:</p>
 
-        <p>H I H O H O H I<br>
-            H O H O<br>
-            H O H O<br>
-            TODO</p>
+        <table class="plain center">
+            <tr><td>H</td><td>I</td><td>H</td><td>O</td><td>H</td><td>O</td><td>H</td><td>I</td></tr>
+            <tr><td>H</td><td>O</td><td>H</td><td>O</td></tr>
+            <tr><td></td><td></td><td></td><td></td><td>H</td><td>O</td><td>H</td><td>O</td></tr>
+        </table>
 
         <p>Um dies zu vermeiden, müssen wir einen weiteren Begriff einführen, die Suchtiefe. Die Suchtiefe bezeichnet nichts anderes, als die Anzahl der positiv ausgefallen Vergleiche. In unserem Beispiel wäre sie 2, da zwei Vergleiche, »O« mit »O« und »H« mit »H«, positiv ausgefallen sind. Der dritte Vergleich »I« mit »O« ist nun negativ, das heißt, daß der Suchbegriff dort nicht auftauchen kann, und nun verschoben werden muß. Um den tatsächlichen Verschiebefaktor zu ermitteln, muß nun noch von dem aus der Tabelle entnommenen Wert die Suchtiefe subtrahiert werden. In unserem Fall wäre das 4 minus 2 = 2. Und das stimmt wieder:</p>
 
-        <p>H I H O H O H I<br>
-            H O H O<br>
-            H O H O<br>
-            TODO</p>
+        <table class="plain center">
+            <tr><td>H</td><td>I</td><td>H</td><td>O</td><td>H</td><td>O</td><td>H</td><td>I</td></tr>
+            <tr><td>H</td><td>O</td><td>H</td><td>O</td></tr>
+            <tr><td></td><td></td><td>H</td><td>O</td><td>H</td><td>O</td></tr>
+        </table>
 
         <p>Verschieben wir um zwei Positionen, so liegt unser »HOHO« genau an der richtigen Stelle. Die Suchtiefe kann minimal Null werden, wenn schon der erste Vergleich negativ ausfällt, und maximal gleich der Länge des Suchstrings, wenn nämlich völlige Übereinstimmung herrscht, der Begriff also gefunden wurde.</p>
 
-        <p>Das wäre an sich schon alles. Theoretisch ließe sich auch schon jetzt der Suchalgorithmus formulieren. Aber eine Kleinigkeit würde unsjetzt noch Schwierigkeiten machen. Gemeint ist das Suchen mit ]oker. Den Floppybesitzern unter Ihnen wird es wahrscheinlich schon bekannt sein.</p>
+        <p>Das wäre an sich schon alles. Theoretisch ließe sich auch schon jetzt der Suchalgorithmus formulieren. Aber eine Kleinigkeit würde uns jetzt noch Schwierigkeiten machen. Gemeint ist das Suchen mit ]oker. Den Floppybesitzern unter Ihnen wird es wahrscheinlich schon bekannt sein.</p>
 
         <h3>Probleme mit dem Joker</h3>
 
@@ -132,21 +146,23 @@
 
         <p>Konstruieren wir uns mal wieder ein Beispiel. Wir suchen nach »H?HI« in »HIHXHI«. Beim ersten Anlege- und Vergleichsvorgang wird das »I« mit einem »X« verglichen. Da der Vergleich ungleich ausfällt, und »X«, da nicht im Suchstring enthalten, einen Maximalverschiebefaktor von 4 liefert, und die Suchtiefe hier auch noch 0 ist, würde um vier Zeichen verschoben, und das Auftauchen von »HXHI« an der Position 3 völlig übersehen.</p>
 
-        <p>H I H X H I<br>
-            H ? H I<br>
-            H ? H I<br>
-            TODO</p>
+        <table class="plain center">
+            <tr><td>H</td><td>I</td><td>H</td><td>X</td><td>H</td><td>I</td></tr>
+            <tr><td>H</td><td>?</td><td>H</td><td>I</td></tr>
+            <tr><td></td><td></td><td></td><td></td><td>H</td><td>?</td><td>H</td><td>I</td></tr>
+        </table>
 
         <p>Fragen wir uns also wieder einmal, um wieviel hier maximal verschoben werden kann. Die Antwort lautet 2, da ja »HXHI« an der Position 3 steht.</p>
 
-        <p>H I H X H I<br>
-            H ? H I<br>
-            H ? H I<br>
-            TODO</p>
+        <table class="plain center">
+            <tr><td>H</td><td>I</td><td>H</td><td>X</td><td>H</td><td>I</td></tr>
+            <tr><td>H</td><td>?</td><td>H</td><td>I</td></tr>
+            <tr><td></td><td></td><td>H</td><td>?</td><td>H</td><td>I</td></tr>
+        </table>
 
         <p>Nun ist die Stellungsnummer des Jokers gerade aber auch 2. Ohne näheren Beweis und Erklärung muß der Algorithmus noch folgende Regel zusätzlich enthalten:</p>
 
-        <p>Es darf maximal um die Stellungsnummer des Jokers im Suchstring verschoben werden. Damit läßt sich der Suchalgorithmus als Flußdiagramm formulieren. Dies ist in Bild 2 dargestellt. Das Flußdiagramm ist übrigens parallel zur Suchroutine im Suchprogramm zu sehen, da sich beide in der Struktur gleichen. Diese Suchroutine steht in den Speicherzellen $C12B-$0179. Deswegen ist das Flußdiagramm auch nicht ganz so elegant, wie es eigentlich sein könnte.</p>
+        <p>Es darf maximal um die Stellungsnummer des Jokers im Suchstring verschoben werden. Damit läßt sich der Suchalgorithmus als Flußdiagramm formulieren. Dies ist in Bild 2 dargestellt. Das Flußdiagramm ist übrigens parallel zur Suchroutine im Suchprogramm zu sehen, da sich beide in der Struktur gleichen. Diese Suchroutine steht in den Speicherzellen $C12B-$C179. Deswegen ist das Flußdiagramm auch nicht ganz so elegant, wie es eigentlich sein könnte.</p>
 
         <figure>
             <img src="148-2.png" alt="">
@@ -187,7 +203,7 @@
 
         <p><strong>A$</strong> bezeichnet den zu suchenden String. Hier ist wohl keine besondere Erklärung nötig, außer daß wie schon erwähnt »?« als Joker und »*« als Füllsel gilt.</p>
 
-        <p><strong>B$(0)</strong> bezeichnet das zu durchsuchende Array. Soll, waswenig sinnvoll ist, ein einzelner String durchsucht werden, darf hier auch einfach B$ stehen. Will man die Suche erst beim siebten Arrayelement starten, weil der String zum Beispiel schon im sechsten Element gefunden wurde ( = B$(5), Zählung beginnt bei 0), darf dort auch B$(6) stehen. Dies ist dann der erste durchsuchte String.</p>
+        <p><strong>B$(0)</strong> bezeichnet das zu durchsuchende Array. Soll, was wenig sinnvoll ist, ein einzelner String durchsucht werden, darf hier auch einfach B$ stehen. Will man die Suche erst beim siebten Arrayelement starten, weil der String zum Beispiel schon im sechsten Element gefunden wurde (= B$(5), Zählung beginnt bei 0), darf dort auch B$(6) stehen. Dies ist dann der erste durchsuchte String.</p>
 
         <p><strong>P</strong> gibt die Anzahl der zu durchsuchenden Strings an. Wird beispielsweise bei B$(0) begonnen, und hat P den Wert 100, so wird nach dem Durchsuchen von B$(99) abgebrochen. Bei einem Startwert B$(17) wäre dies dann analog bei B$(116) der Fall. Diese Angabe ist stets sorgfältig zu handhaben, da Intellisearch nicht die Größe des zu durchsuchenden Arrays feststellt, und somit aus Versehen über das Array hinaus gesucht werden kann. Dies kann im ärgsten Fall zum Absturz führen!</p>
 
@@ -207,11 +223,11 @@
         </figure>
 
         <figure>
-            <table>
+            <table class="plain">
                 <tbody>
                     <tr>
                         <td>$02</td>
-                        <td>Zwischenspeicher für Füllselposi- tion/Suchtiefe</td>
+                        <td>Zwischenspeicher für Füllselposition/Suchtiefe</td>
                     </tr>
                     <tr>
                         <td>$b0</td>
@@ -307,7 +323,13 @@
 
         <p>Als nächstes werden die zwei numerischen Parameter geholt, beide als Bytewert. Deswegen sind hier auch nur Werte kleiner 256 erlaubt. Mehr ist sowieso kaum sinnvoll.</p>
 
-        <p>Nun wird der aktuelle Durchsuchstringdescriptor in den Arbeitsspeicher kopiert, die Tabelle angelegt und die Suche nach Teilstring 1 gestartet. Wird Teilstring 1 gefunden, wird nach der zu durchsuchenden Strings erreicht wird. Dann wird die Rücksprungadresse vom Stack entfernt, und nach dem Einkopieren von —1 in die erste der beiden Integervariablen die Routine verlassen.</p>
+        <p>Nun wird der aktuelle Durchsuchstringdescriptor in den Arbeitsspeicher kopiert, die Tabelle angelegt und die Suche nach Teilstring 1 gestartet. Wird Teilstring 1 gefunden, wird nach Teilstring 2, falls vorhanden, gesucht.</p>
+
+        <p>Als Flag für erfolgreiche Suche steht das Carry-Flag. Ist es gesetzt, war die Suche erfolgreich, ansonsten ist das Carry-Flag gelöscht.</p>
+
+        <p>Der nächste Programmteil kopiert nach erfolgreicher Suche die Werte in die beiden Integervariablen.</p>
+            
+        <p>Ein wenig gemein programmmiert ist die »Zähler erhöhen«-Routine. Sie wird zwar mit JSR aufgerufen, aber es erfolgt kein Rücksprung, wenn die Anzahl der zu durchsuchenden Strings erreicht wird. Dann wird die Rücksprungadresse vom Stack entfernt, und nach dem Einkopieren von —1 in die erste der beiden Integervariablen die Routine verlassen.</p>
 
         <p>Die beiden letzten Teile des Programms sind das Tabellenanlegen und die eigentliche Suchroutine. Hier verweise ich auf die beiden Flußdiagramme und die obigen Erklärungen.</p>
 
