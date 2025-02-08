@@ -1067,6 +1067,668 @@ TODO END ASIDE
 
 # DFU — Was ist das?
 
+### Modem
+
+Datenübertragungseinrichtung, die direkt an das Telefonnetz angeschlossen wird, also nicht über den Telefonapparat.
+
+### Akustikkoppler
+
+Datenübertragungseinrichtung, die über das Telefon an das Postnetz angeschlossen wird. Erkennbar sind Akustikkoppler an den Gummimuffen für die Aufnahme des Telefonhörers.
+
+### Handshaking
+
+»Handshaking« bezeichnet den Vorgang des Aussendens von Daten und des Wartens auf die Empfangsbestätigung des Computers, mit dem man den Datenaustausch vornimmt.
+
+### Simplex
+
+Wenn auf einer Datenübertragungsleitung Daten nur in einer Richtung übertragen werden können, bezeichnet man dies als Simplexbetrieb. Dieses Verfahren wird wegen der fehlenden Rückmeldemöglichkeiten jedoch selten angewandt.
+
+### Halbduplex
+
+Im Halbduplexbetrieb bestätigt der empfangende Computer den Empfang der Daten.
+
+### Vollduplex
+
+Im Vollduplexbetrieb können beide Computer gleichzeitig senden. Weiterhin wiederholt der empfangende Computer die Daten und sendet sie an den ersten Computer zurück. Stimmen diese Daten überein, wird das nächste Byte gesendet. Sind sie nicht korrekt, werden sie wiederholt.
+
+### Baud-Rate
+
+Die Baud-Rate bezeichnet die Geschwindigkeit mit der Daten übermittelt und empfangen werden. 300 Baud bedeutet, daß 300 Bits pro Sekunde übertragen werden.
+
+### Paritätsbit
+
+Um die Übertragungssicherheit zu erhöhen, wird jedes Byte durch ein zusätzliches Bit ergänzt. Die Ergänzung erfolgt so, daß die Summe der gleichartigen Binärzustände (0 oder 1) eine ungerade oder gerade Zahl ergibt. Wird kein Bit ergänzt, so hat die Übertragung keine Parität.
+
+### Start/Stop-Bits
+
+Einige Computer verlangen die Übertragung einer bestimmten Anzahl von Null-Bits nach jedem Byte. Die Benutzung von je einem Stop-Bit und einem Start-Bit ist am häufigsten.
+
+### Treibersoftware, Terminalprogramm
+
+Mit Treibersoftware oder Terminalprogramm bezeichnet man die Programme, die die Datenübertragung steuern. Mit ihnen wird zum Beispiel die Übertragung von Stop-, Start- und Paritäts-Bits eingestellt und gesteuert.
+
+### Mailbox
+
+Eine Mailbox ist eine Art elektronischer Briefkasten. Es wird zwischen drei Kategorien unterschieden:
+
+1.	Öffentliche Mailboxen (Zutritt für jedermann)
+2.	Private Mailboxen (Zutritt nur für eingetragene Benutzer)
+3.	Gemischte Mailboxen (öffentlicher und privater Bereich).
+
+Alle drei Kategorien können gewerblichen Charakter haben. Im gewerblichen Bereich dienen Mailboxen oft zur Aufnahme von Bestellungen.
+
+### Sysop
+
+Der System-Operator ist der Betreiber einer Mailbox oder die Aufsicht am Mailbox-Computer.
+
+### Übertragungs-/Eingangsprotokoll
+
+Mit diesem Protokoll werden die Regeln festgelegt, die dem Übertragungsverfahren zugrunde liegen. Erst wenn beide Computer manuell oder automatisch auf das gleiche Übertragungsprotokoll eingestellt sind, kann eine sinnvolle Datenübertragung beginnen.
+
+### Timeout
+
+Der Timeout ist die Zeitspanne, die eine Mailbox auf die Eingabe des Benutzers wartet, bevor sie annimmt, daß der Benutzer die Verbindung beendet hat. Die Telefonverbindung wird dann auch von der Mailbox beendet, damit die Leitung für den nächsten Anrufer zur Verfügung steht.
+
+### Gesamtzeitlimit
+
+Das Gesamtzeitlimit ist das Zeitkonto des Benutzers innerhalb des Computersystems, mit dem er Kontakt aufgenommen hat. Erreicht der Anrufer sein Zeitlimit, wird die Verbindung automatisch beendet. Es soll verhindert werden, daß einzelne Benutzer einen Computer stundenlang blockieren. Das Zeitlimit von »eingetragenen Benutzern« ist meist größer bemessen, als das von »Besuchern«.
+
+### Answer/Originate
+
+Wenn Sie mit einem Computer Verbindung aufnehmen, muß Ihr Modem oder Akustikkoppler auf »Originate« gesetzt sein. Dadurch wird das »Einführungsprotokoll« begonnen. Kommunizieren Sie direkt mit einem Computer, muß der eine im »Originate-«, der andere im »Answer-Modus« sein. Ist die Verbindung aufgebaut, spielt der Modus keine Rolle mehr.
+
+### Datex-P
+
+Datex-P ist ein Verbindungsnetz der Bundespost. Über zentrale Vermittlungsstellen kann meist über große Entfernung zum Orts-Tarif kommuniziert werden. Siehe auch »Die Netze der Post«, Seite 46.
+
+### Btx
+
+Service-Netz der Bundespost. Ausführlicher siehe auch »Die Netze der Post«, Seite 46.
+
+### Telebox
+
+Die Telebox ist eine von der Bundespost betriebene Mailbox. Sie ist nur für eingetragene Benutzer konzipiert. Siehe auch »Die Netze der Post«, Seite 46.
+
+### ISDN
+
+Mit ISDN (Integrated Services Digital Network) wird der bis 1988 geplante Netzausbau der Bundespost bezeichnet. Siehe auch »Die Netze der Post«, Seite 46.
+
+### 7-Bit-, 8-Bit-Übertragung
+
+Um den ASCII-Code darzustellen, benötigt der Computer nur sieben Bits. Mit dem Ausdruck 7-Bit, 8-Bit-Ubertragungwird angegeben, ob in einem übertragenen Byte sieben Datenbits (also der ASCII-Wert) und ein »Füllbit« (7-Bit-Übertragung) oder sieben Datenbits und ein Paritätsbit (8-Bit-Übertragung) enthalten sind.
+
+### Wortlänge
+
+Die Wortlänge bezeichnet die Anzahl der Bits in einem »Übertragungsbyte« beziehungsweise einer Übertragungseinheit. Sie besteht aus den Datenbits, dem Paritätsbit, dem Startbit und den Stop-Bit(s). Bei acht Datenbits, einem Paritätsbit, einem Startbit und zwei Stop-Bits ist die Wortlänge = 12. Aus »Schlampigkeit« wird in der DFÜ in diesem Fall oft von einem »Byte« gesprochen, obwohl es 12 Bits beinhaltet.
+
+### Datenendeinrichtung
+
+Mit »Datenendeinrichtung« wird das Gerät »am Ende« einer Ubertragungsleitung bezeichnet. Wird die Datenübertragung mit einem C 64 vorgenommen, so ist dieser die Datenendeinrichtung. Ein Modem oder Akustikkoppler ist dagegen ein Datenübertragungsgerät.
+
+(rg)
+
+
+TODO ASIDE
+
+Sollten Ihnen Begriffe nicht klar geworden sein, oder sollten Sie Begriffe vermissen, die wir in dieser Übersicht nicht berücksichtigt haben, so schreiben Sie uns bitte.
+
+TODO END ASIDE
+
+# Die Netze der Post
+
+> Die Datenfernübertragung mit Computern steckt in Deutschland eigentlich noch in den Kinderschuhen. Deshalb informieren wir Sie umfassend, wasninter den Begriffen Datex-P, Btx und Telebox steckt, und wie Sie diese Einrichtungen nutzen können. Auch die Route für die Zukunft hat die Bundespost schon festgelegt.
+
+Am 31. Dezember 1975 wurde von der Bundespost die FTZ-Prüfnummer 1813138000 an einen Teakholzkasten vergeben. Klappte man diesen Kasten auf, wurden zwei Mulden sichtbar, die einen Telefonhörer aufnehmen konnten. Dieser Kasten war ein Akustikkoppler. Genauer gesagt, der erste Akustikkoppler, der eine FTZ-Prüfnum-mer bekam.
+
+Der Akustikkoppler im Holzkasten ist heute fast schon ein Museumsstück. In den letzten zehn Jahren haben ihn modernere und billigere Geräte abgelöst. Auch neue DFÜ-Netze sind mittlerweile von der Bundespost eingerichtet worden. So wurde 1980 das Datex-P-Netz eingeführt, 1983 Btx und 1984 die Telebox. Das Gesamtkonzept des weiterhin geplanten Netzausbaus bis 1988 wird mit ISDN bezeichnet. Was sich hinter den Begriffen Datex-P, Btx, Telebox und ISDN verbirgt, und wie man sich an diesen Netzen beteiligt, erfahren Sie im folgenden.
+
+## Datex-P
+
+Am 26. August 1980 begann im gesamten Bereich der Deutschen Bundespost ein zwölfmonatiger Probebetrieb für den Datex-P-Dienst. Direkt im Anschluß an den Probebetrieb wurde Datex-P dann in das feste Angebot der Bundespost übernommen. Doch was ist Datex-P eigentlich?
+
+Datex-P ist ein öffentliches Datenübertragungsnetz, das binäre Daten (zum Beispiel von Computern; andere binäre Daten siehe ISDN) »in Paketen vermittelt«. Bei der Paketvermittlung werden die zu sendenden Daten zu Abschnitten (Paketen) zusammengefügt. Ein Paket kann bis zu 512 Bits enthalten. Ein Datenpaket wird gesendet, sobald es vollständig ist oder es nur noch den »Rest« einer Übertragung enthält. Es wird also nicht jedes Zeichen für sich übertragen, sondern die Zeichen werden zu kleinen Paketen gebündelt. Ist ein Datenpaket gesendet worden, wird die Übertragungsleitung für andere Benutzer freigegeben, bis das nächste Paket des gleichen Benutzers vollständig vorliegt. So wird eine Übertragungsleitung von mehreren Benutzern gleichzeitig verwendet. Man spricht hierbei von einer virtuellen Verbindung. Der Datex-P-Benutzer spürt von der virtuellen Verbindung jedoch überhaupt nichts. Er hat das Gefühl, daß er die Übertragungsleitung ständig zur Verfügung hat.
+
+Berechnet wird jeweils nur die Datenmenge, die im Datex-P-Netz übertragen wird, und die Zeit, während der sich ein Benutzer in das Netz einschaltet. Die Entfernung spielt keine Rolle. So ist es zum Beispiel egal, ob Sie Daten von München nach Nürnberg oder von München nach Hamburg übertragen.
+
+### Bedienung
+
+
+Um Datex-P zu nutzen, brauchen Sie nur einen Computer, einen Akustikkoppler oder ein Modem und ein Terminalprogramm. Über das Telefon wird dann die nächste Datex-P-Vermittlungsstelle angewählt (Rufnummern siehe Tabelle 1.). Ist die Verbindung hergestellt (der Akustikkoppler oder das Modem schaltet auf READY), muß ein ».«(Punkt) und RETURN eingegeben werden (Dienstanforderungssignal). Die Vermittlungsstelle meldet sich zur Kontrolle dann mit: »Datex-P: 44 xxxx xxxxx«. Hierbei bezeichnet 44 xxxx xxxxx die Datex-P-Rufnum-mer des erreichten Anschlusses in der Vermittlungsstelle. In München könnte diese Meldung zum Beispiel »Datex-P: 44 8900 49130« lauten.
+
+Die Vermittlungsstelle erwartet jetzt die Eingabe einer NUI (**N**etwork **U**ser **I**dentification) oder NUA (**N**etwork **U**ser **A**dress). Die NUI ist ein Code, der dem System mitteilt, daß Sie die Gebühren der Datenübertragung übernehmen. Die NUI muß bei der Bundespost beantragt werden. Die Eingabe würde lauten: NUI Dxxxxx, wobei xxxxx die Teilnehmerkennung ist. Nach dieser Eingabe wird noch Ihr Passwort abge-fragt.
+
+Die NUA ist die Datex-P-Rufnum-mer des Teilnehmers, den Sie anwählen wollen. Besitzen Sie keine NUI, muß die Gegenstelle bereit sein, die Gebührenzuübernehmen. Hierzu müssen Sie der Rufnummer (NUA) ein »R« (Reverse Charging) voranstellen. Die Datex-P-Vermitt-lungsstelle prüft dann, ob die Gegenstelle mit der Gebührenübernahme einverstanden ist. Die NUA kann wie folgt aussehen (dies ist eine Fantasienummer):
+45 8900 12345 (Rufnummer)
+R 45 8900 12345 (Rufnummer mit der Bitte um Gebührenübernahme)
+C(xxx) 45 8900 12345 (Rufnummer mit Teilnehmerklasse, durch den Index xxx gekennzeichnet. Die Teilnehmerklasse kennzeichnet die Bereiche einer Datenbank, die benutzt werden können).
+
+### Gebühren
+
+Bei Datex-P gibt es, abweichend vom Telefontarif, drei Zeitabschnitte mit unterschiedlichen Verbindungsgebühren (Tabelle 2):
+Tag — von 8 bis 18 Uhr
+Nacht 1 — von 6 bis 8 Uhr und von 18 bis 22 Uhr
+Nacht 2 — von 22 bis 6 Uhr und Samstag 14 Uhr bis Montag 6 Uhr, sowie an bundeseinheitlichen Feiertagen von 0 bis 24 Uhr.
+
+Die Gebühren setzen sich aus verschiedenen Einzelpositionen zusammen, die Sie dem »Bundespost Informationsblatt Nummer 146« entnehmen können. An dieser Stelle seien nur zwei kleine Beispiele aus dem »Informationsblatt Nummer 145« der Bundespost angeführt:
+
+Für eine Verbindung mit einer Datenbank von 30 Minuten Dauer bei zirka 7500 übertragenen Zeichen ist eine Gebühr von rund 0,75 Mark an die Post zu zahlen.
+
+Bei einer Reisebuchung im Dialog einschließlich der Ausgabe der Reiseunterlagen von zwei Minuten Dauer mit zirka 2500 übertragenen Zeichen fällt eine Gebühr von etwa 0,20 Mark an.
+
+In beiden Fällen kann diese Gebühr unter Berücksichtigung der mengenabhängigen Gebührenstaffel und der Tageszeit noch geringer ausfallen (siehe Tabelle 2). Eine NUI kostet 15 Mark im Monat.
+
+Anträge für einen Datex-P-Haupt-anschluß und die Erteilung einer NUI sind bei Ihrem örtlichen Fernmeldeamt erhältlich.
+
+Wer sich noch weiter über Datex-P informieren will, kann bei der Bundespost die Informationsblätter Nummer 93,145, 146, 166und 189 bestellen.
+
+## Bildschirmtext
+
+Bildschirmtext, kurz Btx, wurde von der Deutschen Bundespost im September 1983 als allgemeiner Fernmeldedienst eingeführt. Allerdings lief Btx bis zur Inbetriebnahme einer neuen Systemtechnik Mitte 1984 nur mit Einschränkungen.
+
+Btx soll in Zusammenarbeit von Telefon und Fernseher einen Dialog mit Computern ermöglichen. Dazu benötigen Sie als Grundgeräte einen Fernseher, einen Decoder, eine Tastatur und ein Telefon. Der Fernseher muß mit einem Btx-Decoder ausgestattet sein. Der Decoder wandelt die über die Anschlußbox ankommenden Signale in Bildschirmseiten um. Verbunden werden Telefon und Fernseher über die Btx-Anschlußbox. Diese erfüllt die Funktion eines Modems. Zusätzlich brauchen Sie jetzt noch eine Tastatur, um Eingaben machen zu können. Die Tastatur wird über den Decoder an den Fernseher angeschlossen.
+
+Doch wo bleibt bei dieser Gerätekonfiguration der Computer?
+
+Eine Btx-Tastatur kostet zum Beispiel bei einem großen Versandhaus zirka 400 Mark. Eine Tastatur hat unser Computer jedoch auch! Man muß sie nur an das Btx-Netz anschließen können. Hierzu bietet Commodore für den C 64 ein Btx-Modul an, das diesen Anschluß ermöglicht. Zusätzlich erlaubt das Modul das Speichern und Laden von Bildschirmseiten, was bei Btx sonst nicht möglich wäre. Bei einem Preis von 298 Mark für das Modul spart man also 100 Mark.
+
+### Was leistet Btx?
+
+Neben den Datenverarbeitungsanlagen der Bundespost steht das Btx-Netz mit zur Zeit 89 externen Datenverarbeitungsanlagen in Verbindung (übrigens über Datex-P). Zu diesen gehören zum Beispiel Computer von Versandhäusern, Banken, Reiseveranstaltern etc. Der Benutzer kann unmittelbar mit Bestell-Buchungs- und Reservierungssystemen Kontakt aufnehmen. Man kann also, rund um die Uhr bequem vom Wohnzimmersessel aus, die Kontoführung mit der Bank bearbeiten, die nächste Urlaubsreise buchen oder einen neuen Kühlschrank bestellen.
+
+Über Btx können umfangreiche Datenbanken abgerufen und von Rechenzentren angebotene Datenverarbeitungsprogramme für Berechnungen genutzt werden.
+
+Es gibt unter den Anbietern von Bildschirmseiten auch Zeitungsverlage, die zum Beispiel die neuesten Nachrichten, Lokalberichte oder den Wetterbericht anbieten.
+
+Und noch eine weitere Nutzungsmöglichkeit wird zur Zeit in den Bildschirmtext integriert: Die Telesoftware. Unter diesem Namen wird in Zukunft Software für Home- und Personal Computer abrufbar sein. (Siehe auch unseren »Btx-Wettbewerb« in dieser Ausgabe.) Die Gebühren für diesen neuen Service stehen zur Zeit noch nicht fest.
+
+### Btx-Übertragungsstandard
+
+Seit September 1983 gilt für Bildschirmtext ein neuer, internationaler Darstellungsstandard, der von der CEPT (Konferenz der Europäischen Verwaltungen für Post und Fernmeldewesen) festgelegt wurde. Er umfaßt ein Basisrepertoire von 335 lateinischen Buchstaben, Ziffern und Zeichen. Zusätzlich erlaubt der CEPT-Standard bis zu 94 frei gestaltbare Zeichen in den Decoder zu laden. Dieser Punkt macht es zum Beispiel erst möglich, Programme mit den Grafikzeichen des C 64 zu übertragen, da diese nicht im bisherigen Basisrepertoire von Btx enthalten sind. Dieser frei definierbare Zeichensatz wird mit DRCS (Dynamically redifinable character set) bezeichnet.
+
+Grafiken werden aus »Mosaikfeldern« zusammengesetzt. Mosaikfelder bestehen aus einem zwei mal drei Felder großen Raster. Die Mosaikelemente werden in dieses Raster eingesetzt, wobei insgesamt 64 Kombinationsmöglichkeiten zur Verfügung stehen. Dieses Darstellungsverfahren wird allgemein als das »Alphamosaikverfahren« bezeichnet. Zusätzlich enthält der neue Standard 64 Schrägflächen- und 32 Linienzeichen (Tabelle 3).
+
+Den Unterschied zwischen dem alten und dem neuen Standard können Sie in Bild 1 und Bild 2 erkennen. Bild 1 verdeutlicht anschaulich die hochauflösende Grafik des neuen Standards. Bild 2 zeigt den der Blockgrafik des C 64 entsprechenden alten Standard.
+
+### Wie funktioniert Btx ?
+
+Wählt man das Btx-Netz über Telefon an, wird man mit einem »Teilnehmerrechner« verbunden. Dieser kann jeweils bis zu 100 Btx-Verbin-dungen gleichzeitig bearbeiten. Im Teilnehmerrechner sind über 50000 Bildschirmseiten gespeichert. Steht die von Ihnen gewünschte Bildschirmseite hier nicht zur Verfügung, wird die Anfrage an den dem Teilnehmerrechner übergeordneten Datenbankrechner weitergeleitet. In diesem sind 90000 Bildschirmseiten gespeichert. Erst wenn auch hier die gewünschte Bildschirmseite nicht vorliegt, wird eine Verbindung mit der Btx-Leitzentrale in Ulm hergestellt. Dies soll nach Aussage der Bundespost jedoch nur in zwei Prozent aller Fälle notwendig sein.
+
+Die Auswahl der im Teilnehmerund Datenbankrechner angebotenen Bildschirmseiten richtet sich nach der Häufigkeit der diese Seiten betreffenden Aufrufe. Wird zum Beispiel eine im Teilnehmerrechner gespeicherte Seite neunmal verlangt, eine im Datenbankrechner gespeicherte aber 40mal, so werden diese ausgetauscht. Das heißt die wenig verlangte Bildschirmseite wird im Datenbankrechner gespeichert, die häufig verlangte im Teilnehmerrechner. So ist immer ein schneller Zugriff auf die meist verlangten Bildschirmseiten gewährleistet.
+
+### Gebühren
+
+Die Gebühren für den Bildschirmtext setzen sich aus drei Einzelpositionen zusammen. Die Grundgebühr für den Btx-Hauptanschluß kostet 8 Mark pro Monat. In dieser Gebühr ist die Miete für die Anschlußbox enthalten. Hinzu kommen die Verbindungsgebühren im Fernsprechnetz. Ab Mitte 1985 soll für alle Fernsprechanschlüsse der Ortsbeziehungsweise Nahtarif zu Bildschirmtext gewährleistet sein. Das bedeutet, daß Sie von jeder Stelle der Bundesrepublik aus zum Ortstarif am Btx teilnehmen können.
+
+Als letzter, aber auch größter Posten, kommen die Gebühren für die im allgemeinen kostenpflichtigen Bildschirmseiten dazu. Die Gebühren schwanken zwischen 0,00 und 9,99 Mark pro Bildschirmseite. Die Gebührenhöhe bleibt in diesem Spielraum dem Anbieter der Bildschirmseite überlassen. Auf diese Gebühren muß vom Anbieter bei ei-nemAufrufhingewiesenwerden. So kann der Btx-Benutzer immer noch entscheiden, ob er diese Gebühren akzeptiert.
+
+Alle, die sich weiter über Bildschirmtext informieren wollen, können den Sonderdruck aus dem Dokumentarband Bundespost '84 »Die Technik des Bildschirmtextdienst« bei der Bundespost bestellen.
+
+### Ist Btx nicht sicher?
+
+Ende 1984 machte eine Nachricht in der Presse Schlagzeilen. Der Hamburger Chaos Computer Club (CCC) hatte nach eigenen Angaben das Btx-Sicherheitsnetz umgangen und einen »Bankraub« durchgeführt. Was genau war passiert? Der CCC hatte einen Softwarefehler der Btx-Steuerung entdeckt und sich das Passwort der Hamburger Sparkasse beschafft. Erst mittels dieser Kombination war es dem CCC möglich, durch ein Programm, das auf einem Personal Computer lief, eine gebührenpflichtige Bildschirmseite über 10000mal innerhalb einer Nacht abzurufen. Da das Passwort der Bank verwendet wurde, wurden dieser die Gebühren berechnet. In diesem Fall zirka 135 000 Mark.
+
+Dazu die Bundespost: »Wie der CCC bei dieser Aktion im einzelnen vorging, ist bis heute noch nicht geklärt. Der Softwarefehler lag tatsächlich vor, ist heute aber behoben. Dieser Fehler konnte aber nur im Zusammenhang mit einem Passwort ausgenutzt werden. Das Passwort der Hamburger Sparkasse, so nimmt man an, hat sich der CCC wohl bei einer öffentlichen Vorführung in der Bank besorgt. Die Hintergründe der Vorgehensweise bleiben aber im dunkeln«.
+
+Es bleibt noch zu erwähnen, daß diese Gebühren nicht erhoben worden sind. Wer Gebühren erhebt, muß aufVerlangennachweisen, daß diese berechtigt sind. Aber wer ruft über 10000mal dieselbe Bildschirmseite in einer Nacht auf, wenn sich die Information nicht ändert. Ein Nachweis der berechtigten Gebühren wäre in diesem Fall zumindest fraglich gewesen.
+
+## Telebox
+
+Die Telebox ist eine von der Bundespost eingerichtete Mailbox. Sie ist ausschließlich für eingetragene Benutzer konzipiert.
+
+Installiert ist der Telebox-Computer in Mannheim. Zur Zeit läuft die Telebox noch in einem zweistufigen Testbetrieb. Die erste Stufe begann Juni 1984 und endete am 31.09.84. Unterbrechungsfrei ging sie am 01.10.84 in die zweite Stufe über. Der Testbetrieb wird am 30.09.85 abgeschlossen sein.
+
+### Benutzung
+
+Der Telebox-Computer ist unter folgenden Rufnummern erreichbar:
+Telefonnetz: 0621/413091, 300 Baud
+0621/412071, 1200 Baud
+Datex-P (NUI erforderlich):
+45 6210 40000
+45 6210 90000.
+Wird die Telebox angewählt, erhalten Sie die Aufforderung »Bitte vorstellen«. Wer sich nur über das Telebox-System informieren will, beantwortet diese Aufforderung mit: ID INF100 TELEBOX
+
+Sie können dann auf umfangreiche Informationsdateien zugreifen, die Sie über das Leistungsangebot der Telebox unterrichten.
+
+Eingetragene Benutzer oder Anrufer, die einem Benutzer eine Nachricht hinterlassen wollen, melden sich mit einer Benutzerkennung. Diese ist mit einer Telefonnummer im Fernsprechnetz vergleichbar. Ein Verzeichnis der Benutzernummern finden Sie in den Informationsdateien. Die Benutzernummer wird wie folgt eingegeben: ID ABC123
+
+ABC ist das Kürzel des eingetragenen Benutzers. 123 gibt die Nummer des Speicherbereiches (Adresse) an, in dem eine Nachricht gelesen oder geschrieben werden soll. Ein eingetragener Benutzer kann mehrere solcher Adressen haben. Die Adressen eines Benutzers sind dann aufsteigend durchnummeriert. Hat ein Benutzer zwei Adressen, so lauten die Kennziffern 001 und 002. Nach der Eingabe der Benutzerkennung wird ein Passwort verlangt. Erst dieses Passwort ermöglicht Ihnen Nachrichten zu lesen. Mit der Benutzeradresse allein können Sie nur Nachrichten hinterlassen. Wird das Passwort akzeptiert, so erscheinen folgende Meldungen:
+Ausgeschaltet um/am:
+12.00/21.06.85
+
+Diese Meldung bezeichnet den Termin, an dem die letzte Nachricht in die Mailbox eingegeben wurde. Letzter Zugang um/am:
+17.01/20.06.85
+
+Hiermit wird angegeben, wann zum letzten Mal Nachrichten gelesen wurden.
+Vorliegende Meldungen:
+3 ungelesen
+
+Diese Meldung besagt, daß drei Nachrichten bisher vom Benutzer noch nicht gelesen wurden. Hierin liegt ein großer Vorteil des Telebox-Systems, denn Sie können gleich an der Eingangsmeldung erkennen, ob neue Nachrichten für Sie vorliegen. Sie müssen also nicht erst weiter in das System vordringen.
+
+Will man das System verlassen, so muß »ENDE« eingegeben werden.
+
+### Gebühren
+
+Ab 01.10.84 kostet jede Adresse 40 Mark Grundgebühr plus 40 Mark pauschale Nutzungsgebühr.
+
+Nach Ende der Testphase am 30.09.85 werden folgende Gebühren fällig:
+
+- Belegungsgebühr je Minute 0,30 Mark
+- Speichergebühr je Tag und Einheit (2 KByte) 0,03 Mark
+- Adressiergebühr je Adresse 0,10 Mark
+
+Mindestnutzungsgebühr sind 40 Mark pro Monat.
+
+Um die Gebühren der Telebox zu erläutern, und um sie dem Briefverkehr gegenüberzustellen, ein kleines Beispiel:
+
+Ein Verkäufer einer Hamburger Firma hat in Frankfurt einen Verkaufsabschluß getätigt. Er möchte den Text und die Daten an seine Firma übermitteln. Diese hat eine Telebox-Adresse. Daten und Text umfassen 10 KByte; der Verkäufer benutzt einen 300 Baud Akustikkoppler. Der Text und die Daten sind vorbereitet und werden gesammelt übertragen.
+
+<table class="plain">
+<tr>
+<td>Gebühr für Ortsgespräch</td><td align="right">0,23 Mark</td>
+</tr><tr>
+<td>Datex-P-Gebühr</td><td align="right">0,33 Mark</td>
+</tr><tr>
+<td>Belegungsgebühr Telebox</td><td align="right">0,30 Mark</td>
+</tr><tr>
+<td>Speichergebühr (1 Tag)</td><td align="right">0,15 Mark</td>
+</tr><tr>
+<td>Adressierungsgebühr</td><td align="right">0,10 Mark</td>
+</tr><tr>
+<td>Übermittlung Verkäufer zur Firma</td><td align="right">1,11 Mark</td>
+</tr><tr>
+<td>Gebühr für Ortsgespräch</td><td align="right">0,23 Mark</td>
+</tr><tr>
+<td>Datex-P-Gebühr</td><td align="right">0,33 Mark</td>
+</tr><tr>
+<td>Abruf der Daten</td><td align="right">0,56 Mark</td>
+</tr><tr>
+<td>Anfallende Kosten für die Firma gesamt:</td><td align="right">1,67 Mark</td>
+</tr>
+</table>
+
+Die Daten sind für die Firma sofort verfügbar.
+
+Stellen wir jetzt die Übermittlung per Brief gegenüber:
+
+<table class="plain">
+<tr>
+<td>Porto</td><td align="right">0,80 Mark</td>
+</tr><tr>
+<td>Einschreibgebühren</td><td align="right">2 Mark</td>
+</tr><tr>
+<td>Eilbrief</td><td align="right">3 Mark</td>
+</tr><tr>
+<td>Gesamt:</td><td align="right">5,80 Mark</td>
+</tr>
+</table>
+
+Die Firma muß je nach Uhrzeit und Verbindungsweg (Flugzeug oder Bundesbahn) drei Stunden oder bis zum nächsten Morgen warten.
+
+Wenn Sie eine eingehende Beratung über das Teleboxsystem wünschen, wenden Sie sich bitte an folgende Adresse:
+Fernmeldetechnisches Zentralamt
+Referat T 21
+Postfach 5000
+6100 Darmstadt
+Tel. 06151/83-4641
+
+Den Antrag für die Teilnahme am Telebox-Betrieb erhalten Sie beim:
+Fernmeldeamt
+Anmeldestelle für Fernmeldeeinrichtungen
+Postfach 7300
+6800 Mannheim 1
+Tel. 06 21/2 48 53
+
+## ISDN-Digitalisierte Zukunft
+
+»ISDN — die Antwort der Deutschen Bundespost auf die Anforderungen der Telekommunikation von Morgen«, so wird von der Bundespost das Konzept für die Zukunft bezeichnet.
+
+ISDN (Integrated Services Digital Network) heißt also unsere »fernmeldetechnische Zukunft«. Die kurze Umschreibung der Bundespost sagt nicht gerade viel aus. Äußerungen wie »Die Deutsche Bundespost wird künftig auch Fernmeldedienstleistungen über Satelliten anbieten, mit denen die terrestrischen Netze schnell und flächendeckend ergänzt werden« scheinen einem Science Fiction-Roman entnommen. Doch so steht es in einer Informationsbroschüre der Deutschen Bundespost.
+
+Was hat die Bundespost nun wirklich geplant? Uns allen dürfte klar sein, daß die Technik in vielen Teilen des Fernmeldedienstes überaltert ist. Noch heute ist das Rattern der Relais in den Vermittlungsstellen der Fernmeldeämter zu hören, wenn eine Telefonverbindung hergestellt wird.
+
+1976 wurde mit dem Aufbau des IDN (Integriertes Text- und Datennetz) begonnen. Zum IDN gehören auch Telex und Datex-P. Zur Zeit sind an das IDN über 300 000 Teilnehmer angeschlossen.
+
+Es handelt sich hierbei um ein Fernmeldenetz, in dem die digitale Übertragungs- und Vermittlungstechnik angewandt wird.
+
+### Das Digitale Fernsprechnetz
+
+Was bedeutet »Digitalisierung«? Nehmen wir als Beispiel ein Telefongespräch. Wie sieht das bisher aus? Man wählt eine Rufnummer. Die Verbindung wird dann durch einzelne Relais in der Vermittlungszentrale geschaltet. Dies dauert seine Zeit. Ist die Verbindung hergestellt, wird die Sprache, die das Mikrofon im Telefonhörer aufnimmt, in elektromagnetische Signale umgesetzt. Diese werden dann übertragen und müssen, da sie bei der Übertragung über die jetzigen Leitungen der Post schnell an Intensität abnehmen, oft verstärkt werden. Die ankommenden Schwingungen werden vom Lautsprecher des Telefonhörers wieder in Töne verwandelt.
+
+Im digitalisierten Fernsprechnetz funktioniert dies anders.
+
+Alle Signale werden im Binär-Code übertragen. Als erstes erreicht die codierte Rufnummer den Vermittlungscomputer, der die Funktion der Relais erfüllt. Wie beim Datex-P-Netz stellt der Computer jetzt die Verbindung her. Im Gegensatz zur Relais-Vermittlung ist die Computervermittlung erheblich schneller und zuverlässiger, da die mechanische Vermittlung wegfällt.
+
+## Gespräch im Binär-Code
+
+Als nächstes werden die akustischen Signale, also die Sprache, in digitale Signale (wir kennen dies von den Spracheingabemodulen des C 64) umgesetzt. Diese digitalen Signale werden dann über eine virtuelle Verbindung ähnlich Datex-P übertragen.
+
+Dieser Binärcode wird dann von der Vermittlungsstelle bei der Gegenstelle wieder in verständliche akustische Signale umgesetzt.
+
+Wer nun meint, bei dieser Art der Vermittlung würden Verzögerungen auftreten, der täuscht sich. Die Datenübertragung erfolgt, wie bei Datex-R mit bis zu 64000 Baud. Das reicht auch für den schnellsten Sprecher.
+
+In Zukunft werden also Telefongespräche digital vermittelt und übertragen. Dies hat den Vorteil, daß wie bei Datex-P durch die virtuelle Verbindung wesentlich weniger Leitungen benötigt werden. Und dieselben Leitungen können auch für den Datenaustausch zwischen Computern verwendet werden. Telefongespräche, Datex-R Bildschirmtext und die Telebox können in Zukunft direkt über dasselbe Kabel laufen.
+
+Das ISDN-Netz soll ab 1988 zur Realität werden.
+
+(rg)
+
+Info: Die Informationsbroschüren der Bundespost sind über jedes Fernmeldeamt erhältlich.
+
+# Die Scroll-Machine: Das Fenster zur Spielewelt
+
+> Dieses außergewöhnliche Programm verschiebt den Bildschirm flimmerfrei in jede Richtung, wie es sonst nur von professionellen Spielen her bekannt ist — und das mit Basic.
+
+Bildschirmscrolling in eine beliebige Richtung ist im Commodore Basic V2.0 nicht realisierbar. Wer es dennoch versucht, wird mit dem Ergebnis nicht zufrieden sein. Dieses Programm macht es auch dem Anfänger leicht, Soft-Scrolling, ein Synonym für ruckfreies Verschieben des Bildschirms in alle Richtungen, in seine eigene Programme einzubauen. Besonders gut eignet es sich dazu mit dem Pseudoschirm-Editor Spielfelder zu konstruieren, die die Größe des normalen Bildschirms überschreiten. Durch eine große Anzahl von Befehlen ist jeder in der Lage, mittels Soft-Scroll immer den Teil des Feldes darzustellen, in dem sich die Spielfigur befindet. Die Spielfiguren werden ähnlich wie in professionellen Programmen durch Basic-Befehle, die die Beschleunigung, Reibung oder Höchstgeschwindigkeit festlegen, beliebig auf dem sichtbaren Pseudoschirm bewegt, einem Schirm, der in x- und y-Richtung größer ist als der normale Textbildschirm (x>40, y>25). Jeder kann maximal zwei Textfenster realisieren, die beliebige Spielinformationen enthalten. Das Programm stellt zum Laden und Abspeichern von SEQ- und PRG-Files einige sehr leistungsfähige Befehle zur Verfügung.
+
+Aber nicht nur für die Gestaltung von Spielen ist dieses Programm geeignet. Der Anwender kann zum Beispiel von Basic aus Textverarbeitungsprogramme gestalten, die durch horizontales Scrollen mehr als 40 Zeichen pro Zeile darstellen können, wie es bei fast allen kommerziellen Programmen der Fall ist.
+
+Bei dem Pseudoschirm-Editor handelt es sich um ein in Basic geschriebenes Programm, das durch einfache Befehle und einen geeigneten Zeichensatz beliebige Landschaften auf dem Bildschirm entstehen läßt. Die Konstruktion von Gängen und Höhlen wird im Kontur- und Micromodus zum Kinderspiel. Das Programm arbeitet sowohl mit einfarbigen wie aber auch mehrfarbigen Zeichensätzen. Die beiden Bilder sind ein ausgezeichnetes Beispiel für die Leistungsfähigkeit dieses Programms.
+
+(Thilo Herrmann/ah)
+
+TODO ASIDE
+
+## Lebenslauf
+
+Ich wurde am 20.12.1968 in Göppingen geboren und ging nach erfolgreichem Besuch der Grundschule 1979 auf das Gymnasium, wo ich nun wenig begeistert die 10te Klasse besuche. Bis zum 14ten Lebensjahr stieg mein Interesse an Computern langsam an. Im Göppin-ger Computershop entdeckte ich einen TI99 4/A. Nach kurzer Zeit wurde mir das Herumexperimentieren mit diesem Computer zu wenig und ich entschloß mich, von meinen Ersparnissen einen VC 20 mit Dataset-te zu kaufen. Mit ihm war es mir möglich, das Commodore Basic zu erlernen. Ein halbes Jahr später stieß ich im Kaufhaus auf einen C 64 und war von seinen Fähigkeiten begeistert. So wurde der VC 20 kurzerhand zu Weihnachten gegen seinen größeren Bruder eingetauscht. Vom Rest meiner Ersparnisse schaffte ich mir ein 1541-Diskettenlaufwerk an. Nun konnte ich endlich richtig programmieren. Zuerst noch viel in Basic, doch dann immer mehr in Maschinensprache. Das Ergebnis meiner Bemühungen ist die Scroll-Machine, die mein bisher größtes Maschinenprogramm ist. Ohne Zweifel werden ihr noch größere Programme folgen. Es war nicht immer einfach, sämtliche Hürden zu überwinden, denn beim Programmieren des Videoprozessors sind viele Besonderheiten zu beachten, die nicht leicht zu verstehen und in keinem Buch zu finden sind.
+
+(Thilo Herrmann/ak)
+
+TODO END ASIDE
+
+> Bringen Sie Bewegung in Ihre Grafik. Nutzen Sie einen Bildschirm, der bis zu 30 mal größer ist als der normale Textbildschirm. Scrolling wie bei dem Spiel Zeppelin wird dadurch möglich.
+
+Das Programm besteht aus 3 KByte Maschinensprache, die im Bereich von $COOO (49152) bis fast $CBFF (52223) liegen. Die Variablen stehen von 828 bis 959 im Kassettenpuffer. Das Video-RAM, das vom Programm benutzt wird, liegt im Bereich von 52224 bis 53223. Da die Spritepointer immer dem Video-RAM folgen, stehen sie nun von 53240 bis 53247 (normal: 2040 bis 2047). Im Bereich von $D000 (53248) bis $D7FF (55295) steht der Zeichensatz, der leicht verändert werden kann. Dabei ist zu beachten, daß der Bereich von $D000 bis $DFFF dreimal belegt ist, einmal durch die Ein-/ Ausgabe (VIC, SID, CIA 1 und 2), den C 64-Zeichensatz und das RAM, in das der Zeichensatz kopiert oder ein neuer geladen wird.
+
+Außerdem benötigt die Scroll-Machine noch eine Multiplikationstabelle, die von $DE00 (56832) bis $DFFF (57343) steht. Der Rest von $D800 bis $DDFF (55296 bis 56831) kann von Sprites genutzt werden. Ebenfalls für Sprites frei ist das RAM unter dem Kernal von $E000 bis $FFFF (57344 bis 65535). Dort kann auch ein 8-KByte-Pseudoschirm stehen, der eine größere X/Y-Ausdehnung hat als der normale Textbildschirm. Wenn dieser Bereich jedoch frei ist, kann man insgesamt 152 verschiedene Sprites im Speicher halten. Es muß aufgrund einer Besonderheit des VICs darauf geachtet werden, daß die Speicherstelle 65535 den Wert Null enthält. Die Sprites müssen nach wie vor vom Basic-Programm bewegt werden.
+
+Es sei nicht unerwähnt, daß ich die Restore-Taste geändert habe. Sie funktioniert nun auch ohne daß man RUN-STOP drückt. Die NMI-Vektoren $0318/$0319 (792/793) und $FFFA/$FFFB (65530/65531) im RAM enthalten immer die Adresse der neuen Restore-Routine. Soll die Restore-Taste gesperrt werden, so hilft POKE 51692,64. Die RUN/STOP-Taste kann mit POKE 49710,52 außer Kraft gesetzt werden (Tl wird damit auch unbrauchbar).
+
+## Die Funktionsweise
+
+Das Programm arbeitet mit drei Rasterzeileninterrupts, zwei für den oberen Text/Soft-Scroll-Übergang und einer für den unteren. Alle Interrupts können mit dem RZ-Befehl verschoben werden, so daß die Bildschirmfenster beliebig groß werden können.
+
+Jede der drei Interruptroutinen setzt erst die Parameter des Videoprozessors: Hintergrundfarbe, Rahmenfarbe und so weiter. Die erste Interruptroutine hat damit ihre Aufgabe erfüllt. Sie setzt die Hintergrundfarbe auf die Zeichenfarbe, damit ein sauberer Übergang zwischen Soft-Scroll und normalem Text entsteht.
+
+Die zweite Routine berechnet die Werte für Bewegung und Steuerung. Dann springt sie zum normalen Systeminterrupt, der die Tastatur abfragt und die Zeit erhöht.
+
+Der dritte Interrupt ruft die Scroll-Routine auf, die den Pseudobildschirm abtastet und am meisten Zeit verschlingt.
+
+Dieser Teil des Programms muß sehr schnell sein, da er seine Aufgabe erledigt haben muß, bevor der nächste Interrupt ausgelöst wird.
+
+Die neuen Basic-Befehle werden mit Hilfe des Pointers $0308/$0309 eingebunden.
+
+TI$ wird unbrauchbar, da der Systeminterrupt nun nicht mehrjede 60stel Sekunde, sondernjede 50stel Sekunde ausgeführt wird. Die Sekunde errechnet sich während des Betriebs des Soft-Scrolls nun mit TI/50.
+
+## Joysticksteuerung
+
+Wie sich aus der Befehlsliste ersehen läßt, besitzt das Programm vier Befehle zur Steuerung des Joysticks.
+
+Es gibt mehrere Möglichkeiten, ein Objekt zu steuern. Zum einen gibt es die »lineare« Steuerung. Sie wird wohl am häufigsten verwendet, zum Beispiel bei Fort Apocalypse und den meisten selbstgeschriebenen Spielen. Das funktioniert so: Man drückt den Steuerknüppel in eine bestimmte Richtung und das Objekt setzt sich in Bewegung. Es bewegt sich so lange, bis man den Knüppel wieder losläßt. Diese Steuerung ist jedoch wenig wirklichkeitsnah, man denke nur an eine Raumkapsel, die durch Raketenschübe gesteuert wird. Sie setzt sich nicht sprunghaft in Bewegung, sondern langsam. Wenn der Antrieb dann abgeschaltet wird, stoppt unser Flugkörper nicht plötzlich, sondern fliegt mit der gleichen Geschwindigkeit weiter. Diese träge Steuerung und die lineare Steuerung lassen sich mit der Scroll-Machine verwirklichen.
+
+Da die lineare Steuerung besonders einfach ist, werden ihre Werte im JS-Befehl mit angegeben. Nämlich so:
+
+### ← JS m,x,y,p (m = Joystickmodus, p = Port)
+
+x und y stellen die Geschwindigkeiten der linearen Steuerung dar. Bei x = 8 und y = 0 hat man in etwa die Space-Invader-Einstellung.
+
+Die träge Steuerung benötigt drei Befehle, was schon andeutet, daß sie etwas kompliziert ist. Hier bestimmt man nicht die Geschwindigkeit, sondern die Beschleunigung. Da vor jedem Trägheitsbefehl ein T steht, lautet der Befehl:
+
+### ← TB x,y
+
+x und y geben die X-Y-Beschleunigung an. Sie können Werte zwischen Null und 255 annehmen.
+
+Wenn man nun den Steuerknüppel in eine Richtung drückt, wird die Geschwindigkeit immer größer. Die größtmögliche Geschwindigkeit kann man mit dem TG-Befehl festlegen.
+
+### ← TG x, y
+
+Dies kann man sehr genau regeln, weil x und y Werte zwischen Null und 32767 annehmen können.
+
+Wenn man einen Gegenstand auf einer waagrechten Fläche beschleunigt, so hält dieser Gegenstand irgendwann auch wieder an. Daran ist die Reibung schuld. Das kann man auch simulieren, der Befehl lautet:
+
+### ← TR x,y
+
+x und y müssen kleiner sein als die entsprechenden Werte beim TB-Befehl. Die Routine zieht x und y einfach von der Geschwindigkeit ab.
+
+Natürlich kann man die lineare und die träge Steuerung auch mischen. (Es muß vor jedem Befehl ein Pfeil stehen.)
+
+Zum Beispiel: Defender:←RS:←CP:←ZF 1:←US 1.
+Diese Befehle setzen die Standardeinstellung.
+
+TODO TABLE
+
+In diese Steuerung kann man auch noch Bewegung einmischen mit:
+
+TODO TABLE
+
+Ergebnis: Der Bildschirm bewegt sich kontinuierlich nach oben. Mit dem Joystick kann man die Y-Geschwindigkeit erhöhen oder vermindern.
+
+## Die Befehle
+
+Vor jedem Befehl steht der Pfeil nach links. Die folgenden zwei Buchstaben stellen das Befehlswort dar. Danach muß man teilweise einige Parameter angeben, wie zum Beispiel beim normalen POKE-Befehl. Nach einer IF...THEN-Entschei-dung muß nach dem THEN ein Doppelpunkt stehen, wenn ein Scroll-Machine-Befehl folgt, zum Beispiel IF A=1 THEN: ← RS. Wem der Pfeil nicht paßt, der kann mit POKE 50550,ASC(X$) ein anderes Zeichen auswählen. So wird nach POKE 50550,ASC(”!”) nur noch das Ausrufezeichen angenommen. Folgende Zeichen lassen sich verwenden: !"#$%&'(),.:; sowie Klammeraffe, die eckigen Klammern, Pfund, PI, Pfeil links sowie fast alle Buchstaben:
+
+Damit man das Programm auch von Maschinensprache aus verwenden kann, habe ich jeweils die entsprechenden Adressen und gegebenenfalls auch die Einsprungadressen mit angegeben.
+
+Die Befehle:
+
+### RS
+Reset. Dieser Befehl sollte am Anfang jedes Programms stehen. Er löscht alle Einstellungen und schaltet auf den Normalzustand, das heißt, er führt unter anderem folgende Befehle aus:
+MT 40960,40,0: VI 52224,21
+ML: JSR $C5C0
+
+### MT aa,xd,yd
+
+Erstellt die Multiplikationstabelle, das heißt, man legt mit diesem Befehl die Anfangsadresse und die X- und Y-Ausdehnung des Pseudoschirms fest.
+
+aa = Anfangsadresse, xd = Ausdehnung des Schirms in X-Richtung, yd = Ausdehnung in Y-Richtung.
+
+Der normale Videoschirm hätte zum Beispiel die X- und Y-Werte 40 und 25. Die des Pseudoschirms können theoretisch zwischen Null und 8191 liegen.
+
+Die Y-Ausdehnung ist völlig unwichtig. Sie gehörtjedoch der Vollständigkeit halber dazu, wird mitgespeichert und -geladen und kann über USR(12) abgefragt werden.
+
+Wenn der Schirm im Basic-RAM liegt (aa < 40960), sollte man das Basic-Ende so herabsetzen:
+
+AA = Startadresse aa: H = INT(AA/256): L=AA-H*256: POKE 55,L: POKE 56,H: CLR
+ML: aa:$CBFA/CBFB, xd:$CBFC/CBFD, yd:$CBFE/CBFF, JSR $C6AC
+
+### CP
+
+Kopiert den Zeichensatz vom ROM in das darunterliegende RAM. Erführt UT 53248, 55295, 53248,51,48 aus. Dieser Befehl sollte ebenfalls am Anfang eines Programms stehen, falls nicht ein neu definierter Zeichensatz mit dem LD-Befehl geladen wurde.
+ML: JSR $C8BC
+
+### US n
+
+Umschalten zwischen Soft-Scroll (n=1) und Text (n=0). Bei n=0 werden alle Einstellungen des Textfensters gesetzt.
+ML:LDX#n:JSR$C5F8
+
+### ZFf
+
+Dient zum Setzen der Zeichenfarbe f. Wenn man im Multico-lormodus arbeitet, kann man nur die Farben Null bis Sieben nutzen und muß jeweils Acht dazuzählen (Bit 3 setzen).
+ML : LDA #n: JSR $C8EB
+
+### HF f1,f2,f3
+
+Wählt die Hintergrundfarben der drei Bereiche.
+f1 = Hintergrundfarbe des Textfensters,
+f2 = Hintergrundfarbe des Streifens, f2 muß gleich der Zeichenfarbe sein, damit ein sauberer Übergang entsteht.
+f3 = Hintergrundfarbe des Soft-Scroll-Bereiches.
+ML: $C568/$C569/$C56A
+
+### RF f1,f2,f3
+
+Die Randfarben können beliebig gewählt werden.
+ML: $C56B/$C56C/$C56D
+
+### PO x,y
+
+Positioniert den Bildschirm innerhalb des Pseudoschirms, x und y können negativ und positiv sein.
+
+Sinnvoll sind jedoch nur 0 < x < xd*8 und 0 < y < yd*8.
+ML: x:$0358/$0359, y:$035A/$035B
+
+### BWx,y
+
+Bewegt den Bildschirm in der angegebenen X- und Y-Geschwindigkeit. x und y können zwischen -127 und 128 liegen.
+ML: x:$0385, y:$0386
+
+### JS m,x,y,p
+
+Bestimmt die Werte für den Joystick.
+m = Modus.
+Bei m=0 keine Steuerung.
+Bei m=1 lineare Steuerung.
+Bei m=2 lineare und träge Steuerung.
+x und y geben die Geschwindigkeit der linearen Steuerung an. Sie kann zwischen 0 und 255 liegen.
+p steht für den Joystickport.
+Die letzten drei Angaben können weggelassen werden.
+ML: n:$033E, x:$0374, y:$0375, p:$03A5
+
+Zur trägen Steuerung gibt es drei Befehle. Sie bewirken nur etwas, wenn der Joystickmodus zwei gewählt wurde. Der erste Buchstabe lautet immer »T«.
+
+### TB x,y
+
+Regelt die Beschleunigung, x und y kann zwischen 0 und 255 liegen.
+ML: x:$034A, y:$034B
+
+### TR x,y
+
+Bestimmt die Reibung, x und y sind auch hier 1-Byte-Werte.
+ML: x:$0392, y:$0393
+
+### TG x,y
+
+Legt die Höchstgeschwindigkeit fest, x und y sind hier 2-Byte-Werte, sie können also Werte zwischen 0 und 65535 annehmen.
+ML: x:$038E/$038F, y:$0390/$0391
+
+Die nachfolgenden Befehle sind allgemeingültig:
+
+### GR x,x2,y,y2
+
+Die hier festgelegten Grenzen können nicht überschritten werden. Die Werte können wie beim PO-Befehl zwischen 0 und 65535 liegen.
+ML x:$0396/$0397, x2:$0398/$0399, y:$039A/$039B, y2:$039C/$039D
+
+### GM m
+
+Der Grenzmodus wird gewählt: Bei m=O bestehen keine Grenzen. Bei m=1 wird bei den Grenzen abgestoppt. Bei m=2 wird der Bildschirm an die gegenüberliegende Grenze gesetzt.
+ML: m:$039E
+AS n
+Läßt den Interrupt n mal aussetzen, bevor er wieder ausgeführt wird. Das ist besonders nützlich, wenn man Rechenzeit sparen will.
+Nachteil: Je größer n ist, desto stärker ruckt das Bild.
+ML: LDX #n: JSR $C78D
+TM m
+Wählt den >Tastmodus<<. Bei m=0 wird der Pseudoschirm nur abgetastet, wenn es nötig ist.
+Bei m=1 wird er immer abgetastet (= jede 50stel Sekunde), was natürlich Rechenzeit kostet.
+Nützlich, wenn im Pseudoschirm laufend etwas verändert wird. Ein Beispiel: RS:CP:ZF 1:MT 1024,40,25:PO O,O:TM 1:US 1
+PRINT ”<HO>”
+Ergebnis: Der blinkende Cursor erscheint doppelt auf dem Schirm. Der zweite Cursor macht alle Bewegungen mit. Wenn man TM 0 eingibt, ändert sich das.
+ML: m:$03A2
+SY n
+Synchronisiert die Scroll-Machine mit dem laufenden Programm, das heißt, der Interrupt wird nicht mehr im 50stel-Sekunden-Takt ausgeführt, sondern im Programmtakt.
+n=1 schaltet Sync-Modus ein und führt den nächsten Interrupt aus.
+n=0 schaltet den Sync-Modus aus.
+Diese Funktion ist wichtig bei langsamen Basic-Programmen wie dem Editor. Achtung: Die X/Y-Position wird erst beim darauffolgenden SY 1-Befehl gesetzt.
+ML: LDX #n: JSR $C88C
+VI aa,z
+Verlegt das Video-RAM, in das geschrieben wird.
+aa = neue Anfangsadresse, z = Anzahl der Zeilen (z < = 21). Normal: aa= 52224, z=21. Je kleiner z ist, desto schneller wird das Programm.
+ML: aa:$C4D9/$C4DA, LDX #z: JSR $C7AE
+1R n1,n2,n3
+Inhalt des 1. Steuerregisters (VIC+17) in den drei Bereichen. Normal: 27,23,16
+ML: $C55C/$C55D/$C55E
+2R n1,n2,n3
+Der entsprechende Befehl für das 2. Steuerregister (VIC+22). Normal: 200,200,192
+ML: $C55F/$C560/$C561
+MC n1,n2,n3
+Dasselbe für das Memory-Control-Register (VIC+24). Normal: 21,52,52
+ML: $C562/$C563/$C564
+Cl n1,n2,n3
+Das Gleiche gilt für die Basisadresse der CIA 2 (56576). Normal: 151,148,148
+ML: $C565/$C566/$C567
+RZ z1,z2,z3
+Legt die Rasterzeilen für die drei Interrupts fest. Normal: 81,88,248 andere Möglichkeit: 106,115,232 + SU 4 ML: $C56E/$C56F/$C570
+SU n
+Behebt Fehler, die bei der Änderung der Rasterzeilen entstehen können. Das erkennt man am Rucken des Scrollings, n kann Werte von 0 bis 7 annehmen.
+Den richtigen Wert kann man nur durch Ausprobieren feststellen.
+Wenig Probleme wird man haben, wenn man die RZ-Werte in Achterschritten verändert. Normal: n=5
+ML: n:$C571
+Die folgenden zwei Befehle sind als allgemeine Hilfe gedacht:
+FU a,e,n,w
+Dieser Befehl füllt den Speicher von a bis e mit n, während in der Speicherstelle 1 w steht, w kann weggelassen werden. ML: a:$FB/$FC, e:$FD/$FE, n:$03B0, LDX #w: JSR $C842
+UT a,e,a2,r,w
+Es wird der Block von a bis e nach a2 übertragen. Dabei steht in 1 während des Lesens r und während des Schreibens w.
+ML: a:$FB/$FC, e:$03A6/$03A7, a2:$FD/$FE,
+LDA #r : LDX #w : JSR $C725
+Natürlich kann man die Erweiterung auch ausschalten:
+OF
+Schaltet die Erweiterung vollständig ab. Sie muß mit SYS49152 wieder gestartet werden. Die Wirkung ähnelt der der Run-Stop/Restore-Funktion.
+Dieser Befehl wird zum Beispiel dann benötigt, wenn man etwas von der Datasette laden will.
+ML: JSR $C65E
+Die Diskettenbefehle
+LD ”Name”
+Lädt den Pseudoschirm mit der Bezeichnung Name von der Diskette. Die Anfangsadresse, die X-Ausdehnung und die Y-Ausdehnung werden mitgeladen und gesetzt.
+ML: LDA #0 : STA $CBF8
+LDX # < Namenadr. : LDY # > Namenadr. : LDA
+# Namenlänge
+JSR $FFBD (Setnam-Routine)
+JSR $CAC8
+LD ”Name”,aa
+Lädt ein beliebiges Datenfile absolut an die Adresse aa von der Diskette. Achtung: Das File wird vollständig geladen, inklusive den beiden Adreßbytes am Anfang jedes Programms. Man sollte deshalb von aa zwei abziehen.
+Wenn man sequentielle Files oder Userfiles laden will, dann hängt man an den Namen einfach noch ,S oder ,U an.
+ML: aa:$FB/$FC, LDA #1 : STA $CBF8
+Ansonsten weiter wie oben.
+SV ”Name”,ea
+Speichert einen Pseudoschirm mit der Bezeichnung »Name« auf Diskette. Die Endadresse ea errechnet sich aus Anfangsadresse + X-Ausdehnung * Y-Ausdehnung.
+ML: ea:$FD/$FE
+LDX # < Namenadr. LDY # > Namenadr. LDA # Namenlänge
+JSR $FFBD (Setnam-Routine)
+JSR $CB3E
+Die USR(x)-Funktion
+Mit ihrer Hilfe kann sich der Benutzer einige wichtige Werte holen. Je nachdem, welchen Wert x annimmt, wird zu verschiedenen Routinen verzweigt.
+
+x=0 Jedesmal, wenn eine Grenze berührt wird, die mit dem GR-Befehl gesetzt wurde, setzt das Programm ein Flag auf eins. Mit dieser Funktion wird das Flag abgefragt und gelöscht.
+ML: $03AD
+x=1	Liefert die momentane X-Position.
+ML $0358/$0359
+x=2	Liefert die Y-Position.
+ML: $035A/$035B
+x=3 Gibt die Adresse im Pseudoschirm an, die der Bildmitte entspricht.
+ML: $C50C/$C50D
+x=4 Ergibt eins, wenn der Feuerknopf des Joysticks in Port 2 gedrückt ist.
+ML: Es empfiehlt sich der normale Joystickport $DCOO.
+x=5 Dasselbe für Port 1.
+ML: $DC01
+x=10 Übermittelt die Anfangsadresse des Pseudoschirms (die möglicherweise nicht bekannt ist, weil der Schirm eben geladen wurde).
+ML: $CBFA/$CBFB
+x=11 Liefert die X-Ausdehnung.
+ML: $CBFC/$CBFD
+x=12 Liefert die Y-Ausdehnung.
+ML: $CBFE/$CBFF
+x>255 Übermittelt den Inhalt der Speicherstelle x. Es wird immer der Inhalt des RAMs gelesen. Man hat damit also die Möglichkeit, das versteckte RAM zu lesen.
+ML: Die allgemeine Methode funktioniert so:
+SEI: LDX #48:STX 1:LDA x:LDX #55:STX 1:CLI
+Übrigens:	In $036A/$036B	(874/875) und
+$036C/$036D (876/877) stehen die X- und Y-Werte für die Trägheitsgeschwindigkeit.
+Der Pseudoschirmeditor
+Der Editor ist ein Basic-Programm, das mit den wichtigsten Funktionen zur komfortablen Erstellung eines Pseudoschirms ausgestattet ist.
+Er benötigt die Scroll-Machine, um arbeiten zu können. Man muß sie also von Datasette oder Diskette laden. Dann lädt man den Editor und startet ihn mit RUN.
+Zuerst wird man nach der X/Y-Ausdehnung und der Anfangsadresse gefragt. Die Werte XD=128, YD=64 und AA=40960 sind vorgegeben, so daß der Pseudoschirm das RAM unter dem Basic-ROM voll belegt ($AOOO — $BFFF). In diesem Fall ist RETURN zu drücken. Dann will das Programm wissen, ob der Zeichensatz vom ROM ins RAM kopiert werden soll. Wenn man das Programm eben erst geladen hat, sollte man mit »J« antworten. Steht jedoch schon ein neuer Zeichensatz, der erhalten werden soll, im Speicher, so gibt man »N« ein. Anschließend erscheint die Frage »MULTICOLOR (J/N)« auf dem Bildschirm. Wenn der normale Commodore-Zeichensatz benutzt wird, lautet die Antwort immer »N«, ansonsten hängt das vom Zeichensatz ab. Natürlich muß man auch noch die Farben eingeben, wenn man nur Return drückt, erhält man die Standardeinstellung. Schließlich kann man entscheiden, ob der Pseudoschirm gelöscht werden soll. Normalerweise antwortet man mit »J« und der Pseudoschirm wird nach einer Rückversicherung mit dem Zeichen 32 (Space) gefüllt.
+Nach diesen Eingaben hat man endlich das normale Bild des Editors vor sich, das folgendermaßen aufgebaut ist:
+Der Bildschirm ist in zwei Bereiche unterteilt. Oben wird immer der Teil des Pseudoschirms gezeigt, der gerade bearbeitet wird. In der Mitte dieses Bereiches befindet sich ein Sprite, der als Cursor fungiert. Der Bildschirm läßt sich mit Hilfe eines Joysticks in Port zwei bewegen. Unten kann man den kompletten C 64-Zeichensatz erkennen. Er ist in acht Zeilen ä 32 Zeichen unterteilt, wie bei vielen Zeichengeneratorprogrammen. Es wird der große Zeichensatz benützt, weil er mehr Grafikzeichen zur Verfügung stellt. Auch hier wird ein Sprite als Cursor benutzt, der sich mit den Cursortasten auf der Zeichenpalette bewegen läßt.
+Im Normalmodus wird durch einen Druck auf den Joystickknopf jeweils das Zeichen von der Palette auf den Pseudoschirm übertragen, auf das der Zeichencursor zeigt.
+Das ist die einfachste Funktion des Programms, mit ihr allein ist esjedoch fast unmöglich, einen Pseudoschirm zu erstellen. Deshalb bietet es noch einige andere Möglichkeiten wie Rechteck füllen, Rechteck übertragen und so weiter, die man von Programmen wie Paint Magic oder Koalapainter her kennt. Sie bedürfen keiner langen Erklärung, da die Bedienung einfach und logisch aufgebaut ist.
+Auch der Mikromodus ist schnell erklärt. Er benutzt die Zeichen 32, 97, 98, 108, 123, 124, 126,127 und ihre reversen Entsprechungen, um eine vierfache Auflösung zu erreichen. Mit dem Klammeraffen kann man zwischen Punkt löschen und Punkt setzen umschalten. Mit Shift-M kann man die Zeichenfolge neu definieren. Wenn man einen selbstdefinierten Zeichensatz benutzt, stimmen die Codes 97, 98, 108 etc. nicht mehr. Der Einfachheit halber müssen die neuen Zeichen aufeinanderfolgen, mit Leerraum (=Space) beginnen und mit einem vollständig gefüllten Zeichen enden. Eine nicht ganz einfache Funktion ist der Konturmodus, der im folgenden näher erläutert wird.
+Mit den Zeichen 100, 111, 121, 98 und so weiter, kann man eine sanft aufsteigende Linie bilden. Das wird im Konturmodus ausgenutzt. Wenn man F7 betätigt, wird dieser Modus gesetzt. Jetzt kann man Landschaften formen, die sanft auf- und absteigen. Jedoch kann man keine Höhlendecken oder ähnliches bilden, auch senkrechte Wände bleiben einem versagt. Das kann man mit einem Druck auf »K« ändern. Man wird nach X+, X—, Y+, Y— gefragt. Mit den Tasten 1-4 kann man die gewünschte Einstellung wählen. X bedeutet senkrechte Wände, Y steht für waagrechte Wände. Plus und Minus geben jeweils an, welche Seite Freiraum und welche Wand ist. Anschließend muß man noch die Geschwindigkeit angeben, die regelt, ob der Berg sanft oder steil ansteigt.
+Wenn man senkrechte Wände bearbeitet, wird man feststellen, daß die Kontur fehlerhaft ist. Das liegt am Zeichensatz des C 64. Die Zeichen 101 und 116 sind identisch, was von Commodore so geregelt wurde, damit das Zeichen auf einem Fernsehschirm besser sichtbar ist. Mit einem VC 20-Zeichensatz hätten wir diese Probleme nicht. Wenn man einen eigenen Zeichensatz benutzt, ist das Problem auch gelöst. Denn wie beim Mikromodus gibt es hier ebenfalls die Möglichkeit, das Programm an den eigenen Zeichensatz anzupassen.
+Mit SHIFT-K ruft man die entsprechende Routine auf. Man benötigtvierZeichenfolgen. Jeweils eine fürX+, X—, Y+, Y— Mit 1-4 kann man wählen, welche man neu definieren will. Jede Zeichenfolge muß aus acht Zeichen bestehen, von denen das erste Space (32) oder das letzte Revers-Space (160) ist. Man steuert mit den Cursortasten auf das erste Zeichen und drückt dann RETURN. Nun muß man sich für +1 oder—1 entscheiden. Hier hilft nur ausprobieren. Dann gibt man nur noch die Geschwindigkeit an und die neue Zeichenfolge ist im Speicher.
+Ein Pseudoschirm muß auch abgespeichert und geladen werden können, was man mit F1 und F3 erreichen kann. Die Scroll-Machine enthält bereits Routinen, um einen Pseudoschirm aus irgendeinem Speicherbereich auf Diskette Gerätenummer 8 abzuspeichern und in den gleichen Bereich wieder zu laden. Für die Datasette existiertjedoch kein Befehl, so daß man dafür die ROM-Routinen verwenden muß. Deshalb kann man mit der Datasette nur das Basic-RAM benutzen, da sich die Bereiche von 40960 bis 49151 und 57344 bis 65535 von den ROM-Routinen nicht auslesen lassen. Man kann jedoch einen Pseudoschirm in das Basic-RAM laden, um ihn dann mit dem UT-Befehl in das versteckte RAM zu schieben. Wenn man einen Pseudoschirm mit dem eigenen Programm von Kassette laden will, muß man das Unterprogramm des Editors verwenden (ab Zeile 17 500). Der Wechselmodus wird mit»W«aktiviertund mitSHIFT-W definiert. Man kann einen Bereich von Zeichen festlegen, die dann zyklisch wiederholt verwendet werden. Nützlich ist dies für flächige Felsstrukturen oder ähnliches. Denn wenn man den ganzen Bereich mit dem gleichen Zeichen gestaltet, wird die Struktur regelmäßig und sieht nicht echt aus.
+Aus allen Modi kommt man wieder heraus, indem man den Pfeil nach links drückt. Dadurch wird der Editor wieder in den Normalzustand zurückgesetzt.
+Zum Editor ist damit alles Wichtige gesagt. Abtippen muß man ihn wie jedes andere Programm, die REM- und Doppelpunkt-Zeilen werden jedoch nicht angesprungen, deshalb können sie weggelassen werden.
+Die Befehlsliste gibt Auskunft über die restlichen Funktionen und deren Handhabung.
+Ich hoffe, daß das Programm möglichst fehlerlos ist und wünsche Ihnen viel Spaß damit
+Um die Fähigkeiten von »Scroll-Machine« aufzuzeigen, soll auch gleich ein kleines Beispielprogramm angeführt werden. Da man es niemandem zumuten kann, einen Pseudoschirm von 8 KByte oder mehr abzutippen, muß sich das Spiel den Schirm selbst aufbauen. Daß darunter die Qualität der Grafik leidet ist klar. Außerdem habe ich keinen neudefinierten Zeichensatz verwendet, sondern nur die Commodore-Zeichen Space (32), lnvers-Space (160) und lnvers-Shift-0 (207). Der Pseudoschirm besitzt nur eine Auflösung von 128 x 64, was genau 8 KByte entspricht. Eigene Schirme sollte man größer machen — etwa 20 bis 30 KByte — und wenn möglich mit einem eigenen Zeichensatz versehen.
+Atomdepot, ein Demoprogramm zur Scroll-Machine
+Doch dieses Spiel ist trotzdem ein gutes Beispiel dafür, wie man die Scroll-Machine benutzt.
+Der Handlungsort ist ein Bergwerksstollen in nicht allzu ferner Zukunft, in dem noch drei Atommüllfässer lagern. Sinn des Spiels ist es, die drei Fässer von der hinteren Kammer in die vordere zu bringen, von wo sie abtransportiert werden können. Der Greifer des Transporters wird mit dem Feuerknopf des Joysticks (Port 2) bedient, doch erst dann, wenn Greifarme punktgenau am Faß anliegen. Ebenso vorsichtig muß man es auf den Boden stellen. In einem engen Stollen ist der Transport nicht einfach, doch mit genügend Geduld und etwas Übung ist auch das kein Problem. (Thilo Herrmann/ah)
 
 
 
@@ -1074,6 +1736,63 @@ TODO END ASIDE
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# MSE-Abtippen sicher und leicht gemacht
+
+> Ähnlich wie der »Checksummer« ist auch der MSE ein Hilfsmittel bei der Eingabe von Listings, diesmal jedoch bei reinen Maschinensprache-Programmen.
+
+Im Gegensatz zum »Checksummer« aber ist die Eingabe nicht ohne den MSE möglich. Der M8E verringert die Tipparbeit um ein Drittel und schließt Fehleingaben vollkommen aus. Außerdem können Sie die DATAs blind eingeben, ohne andauernd auf den Bildschirm schauen zu müssen. Dies wird durch akustische Meldungen realisiert.
+
+MSE ist ein Maschinenspracheditor, mit dem ein Vertippen ausgeschlossen ist. Eine abgetippte Zeile wird nur angenommen, wenn sie richtig ist. Eine Checksumme am Ende jeder Zeile prüft, ob die richtigen Werte in der richtigen Zeile an der richtigen Stelle stehen. Wenn nicht, ertönt ein Warnsignal, und man beseitigt den Fehler.
+
+War die Zeile korrekt, erklingt ein Gong, und die nächste Zeilennummer wird ausgegeben. Damit ist also auch »blindes« Eintippen möglich; Sie können sich voll auf den Text konzentrieren.
+
+### So arbeitet man mit MSE
+
+Laden und starten Sie MSE. Zuerst wird der Programmname und die Start- und Endadresse erfragt. **Diese Angaben entnehmen Sie dem Kopf des jeweiligen abgedruckten Listings.** MSE meldet sich dann mit der Zeilennummer der ersten Zeile. Wenn Sie die Zeile richtig eingegeben haben, erscheint die nächste Zeilennummer und so weiter bis zum Ende. Zum Schluß wird das fertige Programm mit »CTRL-S« auf Diskette oder Kassette abgespeichert. Dazu sind keine weiteren Angaben mehr erforderlich. Das Programm kann dann ganz normal wieder geladen und gestartet werden. Wenn Sie nicht alles auf einmal tippen wollen, können Sie jederzeit unterbrechen und den eingetippten Teil mit »CTRL-S« abspeichern. Wollen Sie weiterarbeiten, laden und starten Sie MSE wieder.
+
+Geben Sie auf die Frage nach der Startadresse aberjetzt »L« ein, um Ihr Teilprogramm zu laden. Jetzt können Sie mit »CTRL-N« die Adresse eingeben, an der Sie weitertippen müssen. Wenn Sie sich nicht gemerkt haben, wie weit Sie gekommen sind, geben Sie nach dem Laden »CTRL-M« ein.
+
+Auf die Frage nach der Startadresse antworten Sie mit der Anfangsadresse, die links in der Kopfzeile auf dem Bildschirm steht. Nun wird Ihr Programm aufgelistet. Mit »SPACE« wird das Listen fortgesetzt, mit »STOP« abgebrochen. Das Ende Ihres Programmteils erkennen Sie sehr einfach daran, daß nur noch der Wert »AA« in der Zeile steht. Die Adresse dieser Zeile müssen Sie anschließend mit »CTRL-N« eingeben. Das Programm ist nur mit »STOP/RESTORE« zu verlassen. Speichern Sie aber vorher unbedingt immer Ihren Text ab.
+
+### Hinweise zum Abtippen
+
+Vor dem Abtippen oder späteren Wiederladen des MSE-Laders müssen Sie unbedingt folgende Zeile eingeben:
+**POKE 43,1:POKE 44,32:POKE 8192,0 NEW**
+
+Starten Sie das Programm mit RUN. Fehlerhafte Zeilen werden angezeigt und müssen korrigiert werden, bis der Lader zum »READY« durchläuft. Jetzt müssen Sie das fertige MSE-Programm abspeichern. Dazu brauchen Sie nur »RETURN« zu drücken, weil die erforderlichen Angaben schon auf dem Bildschirm stehen. (Kassettenbesitzer müssen in Zeile 343 die letzte Zahl in »1« abändern). Abjetzt können Sie »MSE V1.0« direkt, also ohne den DATA-Lader, benutzen, MSE V1.0 wird ganz normal mit »,8« geladen (keine POKEs notwendig).
+
+(N. Mann /D. Weineck/gk)
+
+TODO ASIDE
+
+### MSE-Befehle:
+
+DEL löscht die letzt Eingabe.
+CTRL-S speichert das eingetippte Programm ab.
+CTRL-L lädt ein Programm. Start- und Endadresse werden automatisch ermittelt.
+CTRL-M listet den Speicherinhalt. Abbruch mit STOP-Taste, weiter mit Leertaste.
+CTRL-N erlaubt die Eingabe einer neuen Adresse zum Weitertippen.
+CTRL-P gibt ein MSE-Listing auf dem Drucker aus.
 
 
 
