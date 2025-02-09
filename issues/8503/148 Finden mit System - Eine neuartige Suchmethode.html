@@ -346,7 +346,216 @@ COMMODORE
             <figcaption>Listing 1. Das Suchprogramm »Intellisearch« muß mit dem MSE eingegeben werden</figcaption>
         </figure>
         <figure>
-            <pre>TODO</pre>
+            <pre>INTELLISEARCH
+geschr. von B. Schneider, 20.12.84.
+
+.; c000 20 fa ae jsr $aefa     Klammer auf?
+.; c003 20 9a ad jsr $ad9a     Auswertung Teil 1
+.; c006 20 a3 b6 jsr $b6a3     Auswertung Teil 2
+.; c009 86 b2    stx $b2       Hi-Byte Adresse
+.; c00b 84 b3    sty $b3       Lo-Byte
+.; c00d 85 b4    sta $b4       Länge des Suchstrings
+
+.; c00f a2 05    ldx #$05      Zwischenspeicher löschen
+.; c011 a9 00    lda #$00
+.; c013 85 b1    sta $b1
+.; c015 95 b5    sta $b5,x
+.; c017 ca       dex
+.; c018 10 fb    bpl $c015
+
+.; c01a a0 00    ldy #$00      Check auf Füllsel
+.; c01c b1 b2    lda ($b2),y
+.; c01e c9 2a    cmp #$2a
+.; c020 f0 07    beq $c029
+.; c022 c8       iny
+.; c023 c4 b4    cpy $b4
+.; c025 d0 f5    bne $c01c
+.; c027 f0 1e    beq $c047
+
+.; c029 18       clc           Zerlegung in zwei Teilstrings
+.; c02a 84 02    sty $02       wenn Füllsel vorhanden.
+.; c02c c8       iny
+.; c02d 98       tya
+.; c02e 65 b2    adc $b2
+.; c030 85 b5    sta $b5
+.; c032 a5 b3    lda $b3
+.; c034 85 b6    sta $b6
+.; c036 90 02    bcc $c03a
+.; c038 e6 b6    inc $b6
+.; c03a a5 b4    lda $b4
+.; c03c 38       sec
+.; c03d e5 02    sbc $02
+.; c03f 85 b7    sta $b7
+.; c041 c6 b7    dec $b7
+.; c043 a5 02    lda $02
+.; c045 85 b4    sta $b4
+
+.; c047 20 fd ae jsr $aefd     Komma?
+.; c04a 20 9a ad jsr $ad9a     Startstring holen
+.; c04d a5 64    lda $64       Pointer auf Descriptor
+.; c04f 85 b9    sta $b9       zwischenspeichern
+.; c051 a5 65    lda $65
+.; c053 85 ba    sta $ba
+
+.; c055 20 fd ae jsr $aefd     Komma?
+.; c058 20 9e b7 jsr $b79e     Anzahl der zu durchsuchenden
+.; c05b 86 b8    stx $b8       Strings speichern
+
+.; c05d 20 fd ae jsr $aefd     Komma?
+.; c060 20 9e b7 jsr $b79e     Startposition der Suche
+.; c063 ca       dex           speichern
+.; c064 86 b0    stx $b0
+
+.; c066 a5 b2    lda $b2       Descriptor von Teilstr.1
+.; c068 85 f7    sta $f7       in Arbeitsspeicher kopieren
+.; c06a a5 b3    lda $b3
+.; c06c 85 f8    sta $f8
+.; c06e a5 b4    lda $b4
+.; c070 85 f9    sta $f9
+
+.; c072 20 0f c1 jsr $c10f     Tabelle anlegen
+
+.; c075 a2 02    ldx #$02      Descriptor des Durchsuch-
+.; c077 a0 02    ldy #$02      strings in Arbeitsspeicher
+.; c079 b1 b9    lda ($b9),y   kopieren
+.; c07b 95 fa    sta $fa,x
+.; c07d ca       dex
+.; c07e 88       dey
+.; c07f 10 f8    bpl $c079
+
+.; c081 20 2b c1 jsr $c12b     Suchen
+
+.; c084 a5 fd    lda $fd       Position merken
+.; c086 85 bb    sta $bb
+.; c088 b0 06    bcs $c090     gefunden? (c=1 ja)
+.; c08a 20 d0 c0 jsr $c0d0     Pointer auf Descriptor erhöhen
+.; c08d 4c 75 c0 jmp $c075     nächster Versuch
+
+.; c090 a5 b7    lda $b7       Teilstring 2 vorhanden
+.; c092 d0 03    bne $c097     ja, weitersuchen
+.; c094 4c af c0 jmp $c0af     nein, fertig
+
+.; c097 85 f9    sta $f9       Descriptor von Teilstring 2
+.; c099 a5 b5    lda $b5       in Arbeitsspeicher kopieren
+.; c09b 85 f7    sta $f7
+.; c09d a5 b6    lda $b6
+.; c09f 85 f8    sta $f8
+
+.; c0a1 20 0f c1 jsr $c10f     Tabelle anlegen
+
+.; c0a4 20 2f c1 jsr $c12f     suchen
+
+.; c0a7 b0 06    bcs $c0af     gefunden, fertig
+.; c0a9 20 d0 c0 jsr $c0d0     nicht gef. Pointer erhöhen
+.; c0ac 4c 66 c0 jmp $c066     weitersuchen
+
+.; c0af 20 f9 c0 jsr $c0f9     Integervariable holen
+.; c0b2 a9 00    lda #$00      und Position im Array
+.; c0b4 a0 00    ldy #$00      hineinkopieren
+.; c0b6 91 64    sta ($64),y
+.; c0b8 c8       iny
+.; c0b9 a5 b1    lda $b1
+.; c0bb 91 64    sta ($64),y
+.; c0bd 20 f9 c0 jsr $c0f9     Integervariable holen
+.; c0c0 a9 00    lda #$00      und Position im String
+.; c0c2 a0 00    ldy #$00      hineinkopieren
+.; c0c4 91 64    sta ($64),y
+.; c0c6 e6 bb    inc $bb
+.; c0c8 a5 bb    lda $bb
+.; c0ca c8       iny
+.; c0cb 91 64    sta ($64),y
+.; c0cd 4c f7 ae jmp $aef7     Klammer zu? und raus.
+
+.; c0d0 c6 b1    inc $b1       Zähler erhöhen
+.; c0d2 c5 b8    cmp $b8       gleich Anzahl?
+.; c0d4 b0 0c    bcs $c0e2     ja, dann fertig aber nicht gef.
+.; c0d6 18       clc
+.; c0d7 a5 b9    lda $b9       Pointer auf Descriptor um 3
+.; c0d9 69 03    adc #$03      erhöhen = nächster Descriptor
+.; c0db 85 b9    sta $b9
+.; c0dd 90 02    bcc $c0e1
+.; c0df e6 ba    inc $ba
+.; c0e1 60       rts
+
+.; c0e2 68       pla           gewaltsamer Ausprung, daher
+.; c0e3 68       pla           Rücksprungadresse entfernen
+.; c0e4 28 f9 c0 jsr $c0f9     Integervariable holen und
+.; c0e7 a9 ff    lda #$ff      -1 einkopieren
+.; c0e9 a0 00    ldy #$00
+.; c0eb 91 64    sta ($64),y
+.; c0ed c8       iny
+.; c0ee 91 64    sta ($64),y
+.; c0f0 20 fd ae jsr $aefd     Komma?
+.; c0f3 20 8b b0 jsr $b08b     Variable holen, aber nicht verwenden
+.; c0f6 4c f7 ae jmp $aef7     Klammer zu? und raus.
+.; c0f9 4c fd ae jmp $aefd     Komma?
+.; c0fc 20 8b b0 jsr $b08b     Variable holen/anlegen
+.; c0ff 85 64    sta $64       Pointer zwischenspeichern
+.; c101 84 65    sty $65
+.; c103 a5 0d    lda $0d       Check auf Integer
+.; c105 d0 05    bne $c10c
+.; c107 a5 0e    lda $0e
+.; c109 f0 01    beq $c10c
+.; c10b 60       rts
+.; c10c 4c 99 ad jmp $ad99     Type Mismatch Error und raus
+
+.; c10f a5 f9    lda $f9       Tabelle anlegen
+.; c111 85 ff    sta $ff       Länge des Suchstr.
+.; c113 a2 00    ldx #$00
+.; c115 9d 00 c2 sta $c200,x   Tabelle vorbelegen
+.; c118 e8       inx
+.; c119 d0 fa    bne $c115
+.; c11b a0 ff    ldy #$ff
+.; c11d c8       iny
+.; c11e c6 ff    dec $ff
+.; c120 b1 f7    lda ($f7),y
+.; c122 aa       tax
+.; c123 a5 ff    lda $ff       Stellungsnummern
+.; c125 9d 00 c2 sta $c200,x   in Tabelle
+.; c128 d0 f3    bne $c11d
+.; c12a 60       rts
+
+.; c12b a5 b0    lda $b0       Startposition in
+.; c12d 85 fd    sta $fd       Positionsspeicher
+.; c12f a5 f9    lda $f9       Länge Suchstr.
+.; c131 85 fe    sta $fe       in Arbeitsspeicher
+.; c133 a9 ff    lda #$ff      Suchtiefe (wird gleich $00)
+.; c135 85 02    sta $02
+.; c137 c6 fe    dec $fe
+.; c139 e6 02    inc $02
+.; c13b a5 fd    lda $fd       Anlegeposition des letzten
+.; c13d 18       clc           Buchstaben berechnen
+.; c13e 65 fe    adc $fe
+.; c140 a8       tay
+.; c141 b1 fb    lda ($fb),y   aus Durchsuchstr. holen
+.; c143 85 ff    sta $ff       zwischenspeichern
+.; c145 a4 fe    ldy $fe       Position im Suchstr.
+.; c147 b1 f7    lda ($f7),y
+.; c149 c9 3f    cmp #$3f      = Joker ?
+.; c14b f0 04    beq $c151
+.; c14d c5 ff    cmp $ff       Buchstaben gleich?
+.; c14f d0 06    bne $c157
+.; c151 a5 fe    lda $fe       komplett durchsucht?
+.; c153 f0 23    beq $c1788
+.; c155 d0 e0    bne $c137
+.; c157 a6 ff    ldx $ff       neue Anlegeposition berechnen
+.; c159 bd 00 c2 lda $c200,x   max. Verschiebewert aus Tabelle
+.; c15c 38       sec
+.; c15d e5 02    sbc $02       Suchtiefe abziehen
+.; c15f cd 3f c2 cmp $c23f     größer als Jokerverschiebewert?
+.; c162 90 03    bcc $c167
+.; c164 ad 3f c2 lda $c23f
+.; c167 18       clc
+.; c168 65 fd    adc $fd       Verschiebewert zu Position addieren
+.; c16a 85 fd    sta $fd
+.; c16c 65 f9    adc $f9       Test auf Überlauf
+.; c16e b0 06    bcs $c176
+.; c170 c5 fa    cmp $fa       fertig mit durchsuchen?
+.; c172 90 bb    bcc $c12f     nein
+.; c174 f0 b9    beq $c12f     nein
+.; c176 18       clc           Flag für nicht gefunden
+.; c177 24 38    bit $38       Maskierung für sec, Flag für gef.
+.; c179 60       rts           und zurück</pre>
             <figcaption>Listing 2. Der Quellcode von unserem Suchprogramm »Intellisearch«</figcaption>
         </figure>
     </article>

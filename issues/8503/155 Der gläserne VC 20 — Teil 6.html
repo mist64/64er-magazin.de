@@ -8,11 +8,8 @@
     <meta name="author" content="Christoph Sauer, ev">
     <meta name="64er.issue" content="3/85">
     <meta name="64er.pages" content="155-160">
-    <meta name="64er.head1" content="VC 20-Kurs">
-    <meta name="64er.toc_title" content="Der gläserne VC 20 (Teil 6)">
     <meta name="64er.toc_category" content="Kurse">
-    <meta name="64er.index_title" content="Der gläserne VC 20 (Teil 6)">
-    <meta name="64er.index_category" content="Kurse|VC 20">
+    <!-- <meta name="64er.toc_title" content="XXX"> -->
     <meta name="64er.id" content="vc20">
 </head>
 
@@ -33,7 +30,7 @@
 
         <p>Die Einschaltroutine hat nun die verschiedensten Aufgaben zu bewältigen. Am wichtigsten ist zunächst die Initialisierung des Prozessorstacks, also des Stapelspeichers, der die Rücksprungadressen beim Befehl JSR verwaltet (damit der Computer aus den Unterprogrammen wieder ins Hauptprogramm zurückfindet).</p>
 
-        <p>Der nächste Schritt in der Reset-Routine ist die Modulabfrage, in der die Modulidentifikation abgefragt wird. Findet der VC 20 im Bereich $A004 bis $A009 die Zeichenfolge »a0CBM« (die den Bytes 41 30 C3 C2 und CD entspricht), so gibt das Betriebssystem die Kontrolle an das Modulprogramm ab. Auch hierbei spielen wieder Vektoren ein Rolle, denn die Startadresse des Moduls muß in den beiden Speicherstellen $A000 und $A001 abgelegt sein.</p>
+        <p>Der nächste Schritt in der Reset-Routine ist die Modulabfrage, in der die Modulidentifikation abgefragt wird. Findet der VC 20 im Bereich $A004 bis $A009 die Zeichenfolge »aOCBM« (die den Bytes 41 30 C3 C2 und CD entspricht), so gibt das Betriebssystem die Kontrolle an das Modulprogramm ab. Auch hierbei spielen wieder Vektoren ein Rolle, denn die Startadresse des Moduls muß in den beiden Speicherstellen $A000 und $A001 abgelegt sein.</p>
 
         <p>Mit Hilfe eines solchen Modulprogramms, das automatisch gestartet wird, kann man nun den Computer ganz nach seinen Wünschen gestalten. Dies kann zum Beispiel in Form einer Basic-Erweiterung geschehen, wie sie an dieser Stelle ja schon besprochen worden ist.</p>
 
@@ -43,19 +40,19 @@
 
         <p>Dies waren im wesentlichen die Schritte, die nach dem Einschalten des Computers ablaufen; damit ist nun das Betriebssystem einsatzbereit und gibt nun die Kontrolle an den Basic-Interpreter ($E378) ab. Der wiederum setzt als erstes die in Folge 3 angesprochenen Basic-Vektoren, damit die essentiellen Operationen (wie zum Beispiel die Umwandlung einer Zeile in Interpretertoken) über diese abgewickelt werden können.</p>
 
-        <p>Bevor die bekannte Einschaltmeldung (CBM BASIC&hellip;) auf dem Bildschirm ausgegeben wird, initialisiert der Interpreter den Basic-Teil der Zeropage und des Speichers nach seinen Bedürfnissen. Dabei werden zum Beispiel verschiedene Zeiger (Adresse 43, 44, 45, &hellip;) gesetzt und der erste Verbindungszeiger im Programmspeicher gelöscht (daher kann ein Basic-Programm nach einem Reset nicht mehr gelistet werden).</p>
+        <p>Bevor die bekannte Einschaltmeldung (CBM BASIC..) auf dem Bildschirm ausgegeben wird, initialisiert der Interpreter den Basic-Teil der Zeropage und des Speichers nach seinen Bedürfnissen. Dabei werden zum Beispiel verschiedene Zeiger (Adresse 43, 44, 45, &hellip;) gesetzt und der erste Verbindungszeiger im Programmspeicher gelöscht (daher kann ein Basic-Programm nach einem Reset nicht mehr gelistet werden).</p>
 
         <h2>Unterbrechung? Ja, bitte!</h2>
 
-        <p>Nachdem die Systemmeldung auf dem Bildschirm ausgegeben wurde, verzweigt die Interpreterroutine in die sogenannte Eingabewarteschleife ($C474), die wir ja bereits in Folge 3 näher beleuchtet haben. Damit ist der Computer bereit, Anweisungen des Benutzers zu empfangen.</p>
+        <p>Nachdem die Systemmeldung auf dem Bildschirm ausgegeben wurde, verzweigt die Interpreterroutine in die sogenannte Eingabewarteschleife ($C474), die wirja bereits in Folge 3 näher beleuchtet haben. Damit ist der Computer bereit, Anweisungen des Benutzers zu empfangen.</p>
 
         <p>Soweit die Beschreibung der Resetroutine, die durch ein Signal an einem Prozessoreingang gestartet wurde. Auch die Interrupts, auf die ich genauer eingehen möchte, werden über die Hardware ausgelöst. Der Plural bei Interrupts verrät bereits, daß es mehrere — genauer gesagt sogar 3 — Unterbrechungen von dieser Sorte gibt.</p>
 
-        <p>Da ist zunächst der Systeminterrupt, der vom VC 20 alle 60stel Sekunde durchlaufen wird (ein Timer in dem 6522-Ausgabebaustein ist für dessen Auslösung verantwortlich). Durch diese Interruptanfrage — sie wird auch IRQ (Interrupt Request) genannt — wird die Zentraleinheit veranlaßt, das gerade laufende Programm zu unterbrechen, um in eine Abarbeitungsroutine zu verzweigen. Auch hierbei besorgt sich die CPU über den Hardwarevektor ($FFFE und $FFFF) die entsprechende Startadresse ($FF72).</p>
+        <p>Da ist zunächst der Systeminterrupt, der vom VC 20 alle 60steF Sekunde durchlaufen wird (ein Timer in dem 6522-Ausgabebaustein ist für dessen Auslösung verantwortlich). Durch diese Interruptanfrage — sie wird auch IRQ (Interrupt Request) genannt — wird die Zentraleinheit veranlaßt, das gerade laufende Programm zu unterbrechen, um in eine Abarbeitungsroutine zu verzweigen. Auch hierbei besorgt sich die CPU über den Hardwarevektor ($FFFE und $FFFF) die entsprechende Startadresse ($FF72).</p>
 
         <p>Dort werden als erstes alle CPU-Register auf den Stack gerettet, denn die dort gespeicherten Werte werden ja später bei der Wiederaufnahme des regulären Programmablaufs benötigt. Danach verzweigt die Routine über einen eigenen Vektor (Interrupt-Vektor $0314,$0315) in das eigentliche Abarbeitungsunterprogramm (Adresse $EABF).</p>
 
-        <p>Hier wird zunächst die interne Uhr (TI) um eins hochgezählt und bei dieser Gelegenheit auch gleich der Zustand der STOP-Taste abgefragt. Ist diese gedrückt, dann setzt die Unterroutine ein Flag in der Zeropage, und der Interpreter unterbricht — nachdem der Interrupt zu Ende bearbeitet worden ist — das laufende Basic-Programm. Durch »verbiegen« des erwähnten Sprungvektors kann dieses Unterprogramm in der Abarbeitungsroutine so übersprungen werden, daß keine Abfrage der STOP-Taste mehr stattfindet, womit bewirkt wird, daß man ein Basic-Programm nicht mehr auf normalem Wege anhalten kann (dieses nur als eine Programmschutzvariante).</p>
+        <p>Hier wird zunächst die interne Uhr (TI) um eins hochgezählt und bei dieser Gelegenheit auch gleich der Zustand der STOP-Taste abgefragt. Ist diese gedrückt, dann setzt die Unterroutine ein Flag in der Zeropage, und der Interpreter unterbricht — nachdem der Interrupt zu Ende bearbeitet worden ist — das laufende Basic-Programm. Durch »verbiegen« des erwähnten Sprungvektors kann dieses Unterprogramm in der Abarbeitungsroutine so übersprungen werden, daß keine Abfrage der STOPTaste mehr stattfindet, womit bewirkt wird, daß man ein Basic-Programm nicht mehr auf normalem Wege anhalten kann (dieses nur als eine Programmschutzvariante).</p>
 
         <p>Nun aber wieder zurück zu unserer Abarbeitungsroutine. Hier wird als nächstes der sogenannte Cursorblinkzähler, der bei jedem Interrupt um eins dekrementiert wird, abgefragt. Ist dieser auf Null, so wird der momentane Zustand des Cursors geändert; das heißt aus revers wird normal oder umgekehrt (auf diese Weise wird ein Blinken des Zeigers erreicht).</p>
 
@@ -65,7 +62,7 @@
 
         <h2>Eingriff ins Eingemachte</h2>
 
-        <p>Wie wir bereits gesehen haben, springt der Computer über einen Vektor ($0314-$0315) in die Bearbeitungsroutine ein. Dadurch können wir jetzt in den Ablauf eingreifen, indem wir dort zusätzliche Unterprogramme einbetten. Als Beispiel für solch einen Eingriff möchte ich nun eine Routine besprechen, die den regelmäßigen Interruptzyklus benützt, um die aktuelle Uhrzeit auf dem Bildschirm anzuzeigen. Dazu bedienen wir uns einer speziellen Eigenschaft des VIC, die es erlaubt, mehr als 23 Zeilen auf dem Bildschirm anzuzeigen. Mit Hilfe des Registers # 4 (Adresse 36867 beziehungsweise $9003) kann man die anzeigbare Zeilenzahl vergrößern oder verkleinern. Für unseren Zweck genügt es, die verfügbaren Zeilen auf 25 zu erhöhen. In diesen Zeilen wird dann später die Uhrzeit angezeigt werden. Mittels POKE 36867,50 wird diese Umschaltung realisiert. Meine Routine kann mit dem Lader (Listing 1) irgendwo im Speicher plaziert werden (das Programm gibt die günstigste Adresse vor). Den wichtigsten Teil der Initialisierungsroutine — also dem Unterprogramm, das den Interrupt-Vektor »verbiegt« — möchte ich kurz anhand von Listing 2 beschreiben. Dort wird gleich als erstes eine Unterroutine aufgerufen, die ein eventuell vorhandenes Basic-Programm im Speicher verschieben soll. Das hat seinen guten Grund, denn die zwei zusätzlichen Bildschirmzeilen nehmen, um ihre Zeichen ablegen zu können, den Anfang des Basic-Speichers in Beschlag, so daß ein dort stehendes Programm teilweise überschrieben werden würde. Diese Verschiebe-Routine ist so universell, daß sie auch für andere Anwendungen nützlich sein kann (um beispielsweise ein Basic-Programm zu verschieben, damit Platz für einen Grafikspeicher ist). Die Anzahl der zu verschiebenden Bytes ist, bei einer anderweitigen Verwendung, in die Additionsroutine in $210E einzusetzen.</p>
+        <p>Wie wir bereits gesehen haben, springt der Computer über einen Vektor ($0314-$0315) in die Bearbeitungsroutine ein. Dadurch können wirjetzt in den Ablauf eingreifen, indem wir dort zusätzliche Unterprogramme einbetten. Als Beispiel für solch einen Eingriff möchte ich nun eine Routine besprechen, die den regelmäßigen Interruptzyklus benützt, um die aktuelle Uhrzeit auf dem Bildschirm anzuzeigen. Dazu bedienen wir uns einer speziellen Eigenschaft des VIC, die es erlaubt, mehr als 23 Zeilen auf dem Bildschirm anzuzeigen. Mit Hilfe des Registers # 4 (Adresse 36867 beziehungsweise $9003) kann man die anzeigbare Zeilenzahl vergrößern oder verkleinern. Für unseren Zweck genügt es, die verfügbaren Zeilen auf 25 zu erhöhen. In diesen Zeilen wird dann später die Uhrzeit angezeigt werden. Mittels POKE 36867,50 wird diese Umschaltung realisiert. Meine Routine kann mit dem Lader (Listing 1) irgendwo im Speicher plaziert werden (das Programm gibt die günstigste Adresse vor). Den wichtigsten Teil der Initialisierungsroutine — also dem Unterprogramm, das den Interrupt-Vektor »verbiegt« — möchte ich kurz anhand von Listing 2 beschreiben. Dort wird gleich als erstes eine Unterroutine aufgerufen, die ein eventuell vorhandenes Basic-Programm im Speicher verschieben soll. Das hat seinen guten Grund, denn die zwei zusätzlichen Bildschirmzeilen nehmen, um ihre Zeichen ablegen zu können, den Anfang des Basic-Speichers in Beschlag, so daß ein dort stehendes Programm teilweise überschrieben werden würde. Diese Verschiebe-Routine ist so universell, daß sie auch für andere Anwendungen nützlich sein kann (um beispielsweise ein Basic-Programm zu verschieben, damit Platz für einen Grafikspeicher ist). Die Anzahl der zu verschiebenden Bytes ist, bei einer anderweitigen Verwendung, in die Additionsroutine in $210E einzusetzen.</p>
 
         <p>Nachdem die 24. und 25. Zeile zugeschaltet worden ist, wird der Interruptvektor auf den Anfang unserer Uhrenroutine gestellt, damit sie beim nächsten Aufruf mit abgearbeitet wird. Bevor man diesen Zeiger jedoch verändert, muß man mittels des Befehls SEI dafür sorgen, daß zeitweise keine Interrupts mehr akzeptiert werden. Sonst könnte es passieren, daß die — zufällig gerade zu dieser Zeit ausgelöste — Interruptroutine ihren Vektor sucht, und wir sind gerade dabei, ihn zu verändern, wodurch der Computer eine falsche Adresse finden und damit abstürzen würde. Das ist auch der Grund, warum man niemals versuchen darf, Interrupt-Vektoren von Basic aus mit POKE-Befehlen zu verändern.</p>
 
@@ -77,7 +74,7 @@
 
         <p>Sollte ein solches Modulprogramm nicht vorhanden sein, so wird die NMI-Routine normal fortgesetzt. Als erstes wird dann die STOP-Taste des Computers abgefragt, denn ein Programmabbruch soll ja nur durch das Drücken der Tastenkombination RUN/STOP-RESTORE möglich sein. Wenn auch diese Klippe genommen ist, beginnt der eigentliche Warmstart des Computers, der die Vektoren neu setzt und die Zeropage ordnet (daher wird auch unser Uhrenprogramm nach dem Drücken dieser Tastenkombination abgeschaltet).</p>
 
-        <p>Natürlich kann auch der NMI für unsere Programme mißbraucht werden. Dazu muß nur wieder (wie soll es auch anders sein) der entsprechende Vektor geändert werden, so daß er auf ein eigenes Maschinenprogramm zeigt. In Folge 3 ist eine sehr kurze und effiziente Anwendung der RESTORE-Taste erläutert worden. Damals ging es darum, sich innerhalb von Hochkommas (") von den lästigen Cursor-Steuerzeichen zu befreien. Durch das Drücken der RESTORE-Taste, die dann quasi als zusätzliche Funktionstaste arbeitet, kann man also auch Aktionen auslösen.</p>
+        <p>Natürlich kann auch der NMI für unsere Programme mißbraucht werden. Dazu muß nur wieder (wie soll es auch anders sein) der entsprechende Vektor geändert werden, so daß er auf ein eigenes Maschinenprogramm zeigt. In Folge 3 ist eine sehr kurze und effiziente Anwendung der RESTORE-Taste erläutert worden. Damals ging es darum, sich innerhalb von Hochkommas (&ldquo;) von den lästigen Cursor-Steuerzeichen zu befreien. Durch das Drücken der RESTORE-Taste, die dann quasi als zusätzliche Funktionstaste arbeitet, kann man also auch Aktionen auslösen.</p>
 
         <h2>Aller guten Dinge sind drei</h2>
 
@@ -92,12 +89,12 @@
         <p><strong>Fehlermeldung ausgeben ($C437)</strong>: Oftmals ist es nötig, eine Basic-Fehlermeldung auszugeben (zum Beispiel in einer Befehlserweiterung, in der ein Komma abzufragen ist). Wenn dieses nicht vorhanden ist oder sonst ein Fehler vorliegt, dann soll eine Fehlermeldung ausgedruckt werden. Alles, was man bei dieser Routine zu tun hat, ist die Eingabe der Fehlernummer ins X-Register. Alle möglichen Meldungen und die dazugehörigen Nummern sind in Tabelle 1 zu finden. Dann wird die Abarbeitungsroutine mit JMP $C437 angesprungen. Zu beachten ist, daß ein Maschinenprogramm auf diese Weise beendet wird (der Interpreter springt nämlich in die Eingabewarteschleife zurück). Möchte man nur eine Meldung ausgeben (ohne das Programm anzuhalten), so ist die Nachricht mit einer anderen Routine, die noch besprochen wird, zu erzeugen. Zwei oft benötigte Fehlermeldungen (Syntax- und Illegal Quantity Error) sind noch einfacher zu bekommen. Um den Syntax Error zu erzeugen springt man mit JMP $CF08 in eine Unterroutine ein, die bereits die Fehlernummer enthält (auf diese Weise spart der Interpreter Speicherplatz). Auch für den Illegal Quantity Error gibt es solch ein Unterprogramm: JMP $D248. Für beide Abkürzungen gilt im übrigen — dies noch als Ergänzung — das oben zum Programmabbruch gesagte.</p>
 
         <figure>
-            <table class="plain">
+            <table>
                 <tbody>
-                    <tr class="strong">
-                        <td>Nummer</td>
-                        <td>Fehlermeldung</td>
-                        <td>Adresse</td>
+                    <tr>
+                        <th>Nummer</th>
+                        <th>Fehlermeldung</th>
+                        <th>Adresse</th>
                     </tr>
                     <tr>
                         <td>01</td>
@@ -107,37 +104,37 @@
                     <tr>
                         <td>02</td>
                         <td>FILE OPEN</td>
-                        <td>$C1AD</td>
+                        <td>$ClAD</td>
                     </tr>
                     <tr>
                         <td>03</td>
                         <td>FILE NOT OPEN</td>
-                        <td>$C1B5</td>
+                        <td>$ClB5</td>
                     </tr>
                     <tr>
                         <td>04</td>
                         <td>FILE NOT FOUND</td>
-                        <td>$C1C2</td>
+                        <td>$ClC2</td>
                     </tr>
                     <tr>
                         <td>05</td>
                         <td>DEVICE NOT PRESENT</td>
-                        <td>$C1D0</td>
+                        <td>$ClD0</td>
                     </tr>
                     <tr>
                         <td>06</td>
                         <td>NOT INPUT FILE</td>
-                        <td>$C1E2</td>
+                        <td>$ClE2</td>
                     </tr>
                     <tr>
                         <td>07</td>
                         <td>NOT OUTPUT FILE</td>
-                        <td>$C1F0</td>
+                        <td>$ClF0</td>
                     </tr>
                     <tr>
                         <td>08</td>
                         <td>MISSING FILE NAME</td>
-                        <td>$C1FF</td>
+                        <td>$ClFF</td>
                     </tr>
                     <tr>
                         <td>09</td>
@@ -225,22 +222,22 @@
                         <td>$C2ED</td>
                     </tr>
                     <tr>
-                        <td>1A</td>
+                        <td>lA</td>
                         <td>CAN’T CONTINUE</td>
                         <td>$C300</td>
                     </tr>
                     <tr>
-                        <td>1B</td>
+                        <td>lB</td>
                         <td>UNDEF’D FUNCTION</td>
                         <td>$C30E</td>
                     </tr>
                     <tr>
-                        <td>1C</td>
+                        <td>lC</td>
                         <td>VERIFY</td>
                         <td>$C31E</td>
                     </tr>
                     <tr>
-                        <td>1D</td>
+                        <td>lD</td>
                         <td>LOAD</td>
                         <td>$C324</td>
                     </tr>
@@ -249,17 +246,14 @@
             <figcaption>Tabelle 1. Sämtliche Fehlermeldungen und ihre Adressen</figcaption>
         </figure>
 
-        <p><strong>Programmzeilen neu ordnen ($C533)</strong>: Dies ist eine der praktischsten Routinen, die mir im gesamten Basic-Interpreter untergekommen ist. Das kleine unscheinbare Unterprogramm kann mehr, als zunächst zu vermuten ist. Es ist wahrscheinlich jedem schon einmal passiert, daß plötzlich aus irgendeinem Grund ein verstümmeltes Basic-Programm im Speicher steht. Das kann durch falsches Laden vom Band oder auch durch unvorsichtiges POKEn im Basic-Speicher geschehen. Der Grund für diesen »Zeilensalat« ist eine Veränderung der Verbindungszeiger (Koppeladressen), die am Beginn jeder (Basic-) Programmzeile stehen, und die im Normalfall auf die Adresse der jeweils folgenden Zeile zeigen (siehe auch Folge 1 dieses Kurses). Das Unterprogramm ab $C533 hat nun die nützliche Eigenschaft, fast alle auf diese Weise beschädigten Programme wieder zu restaurieren. Man ruft es einfach von Basic aus mit SYS 53483 auf, und schon ist das Programm zumindest wieder LISTbar (jedenfalls in den meisten Fällen). Damit aber noch nicht genug. Bei dieser Gelegenheit stellt die Routine auch noch die Länge des Programmes fest und übergibt die Endadresse den Speicherstellen $22 und $23. Damit ist es möglich, die durch einen Reset oder durch NEW scheinbar verlorenen Programme völlig wiederherzustellen. Dazu ist lediglich der erste Verbindungszeiger zu rekonstruieren (das macht unsere Unterroutine), und das Programmende muß in den Speicherstellen $2D und $2E vermerkt werden. Die nachfolgende Programmzeile ist das kürzeste Rekonstruktionsprogramm, das mir bekannt ist. Ich habe es bereits in Folge 1 besprochen und möchte es in diesem Zusammenhang noch einmal erwähnen.
-            <code>SYS 50483:POKE 46,PEEK(35): POKE 45,PEEK(781) + 2:CLR</code>
-        </p>
+        <p><strong>Programmzeilen neu ordnen ($C533)</strong>: Dies ist eine der praktischsten Routinen, die mir im gesamten Basic-Interpreter untergekommen ist. Das kleine unscheinbare Unterprogramm kann mehr, als zunächst zu vermuten ist. Es ist wahrscheinlich jedem schon einmal passiert, daß plötzlich aus irgendeinem Grund ein verstümmeltes Basic-Programm im Speicher steht. Das kann durch falsches Laden vom Band oder auch durch unvorsichtiges POKEn im Basic-Speicher geschehen. Der Grund für diesen »Zeilensalat« ist eine Veränderung der Verbindungszeiger (Koppeladressen), die am Beginn jeder (Basic-) Programmzeile stehen, und die im Normalfall auf die Adresse der jeweils folgenden Zeile zeigen (siehe auch Folge 1 dieses Kurses). Das Unterprogramm ab $C533 hat nun die nützliche Eigenschaft, fast alle auf diese Weise beschädigten Programme wieder zu restaurieren. Man ruft es einfach von Basic aus mit SYS 53483 auf, und schon ist das Programm zumindest wieder LISTbar (jedenfalls in den meisten Fällen). Damit aber noch nicht genug. Bei dieser Gelegenheit stellt die Routine auch noch die Länge des Programmes fest und übergibt die Endadresse den Speicherstellen $22 und $23. Damit ist es möglich, die durch einen Reset oder durch NEW scheinbar verlorenen Programme völlig wiederherzustellen. Dazu ist lediglich der erste Verbindungszeiger zu rekonstruieren (das macht unsere Unterroutine), und das Programmende muß in den Speicherstellen $2D und $2E vermerkt werden. Die nachfolgende Programmzeile ist das kürzeste Rekonstruktionsprogramm, das mir bekannt ist. Ich habe es bereits in Folge 1 besprochen und möchte es in diesem Zusammenhang noch einmal erwähnen.<br>
+            SYS 50483:POKE 46,PEEK(35): POKE 45,PEEK(781) + 2:CLR</p>
 
-        <p>Bevor diese Zeile eingegeben wird, muß man den Anfang des Basic-Programms im Speicher markieren, denn sonst wird es von der Routine nicht gefunden:
-            <code>POKE (Basic-Anfangsadresse) + 1,1.</code>
-        </p>
+        <p>Bevor diese Zeile eingegeben wird, muß man den Anfang des Basic-Programms im Speicher markieren, denn sonst wird es von der Routine nicht gefunden: POKE (Basic-Anfangsadresse) + 1,1.</p>
 
         <p>Natürlich ist diese Routine auch im C 64 zu finden. Dort ist die Startadresse $A533.</p>
 
-        <p><strong>String ausgeben ($CB1E)</strong>: Mit diesem Unterprogramm ist es in einfacher Weise möglich, Texte in einem Maschinenprogramm auszugeben. Dadurch entfallen die sonst nötigen langwierigen Druckschleifen, mit denen man sich sonst herumschlagen muß. Auch bei dieser Unterroutine ist die Handhabung wieder ganz einfach. Der auszugebende Text, der natürlich auch Sonder- und Steuerzeichen enthalten darf, muß im ASCII-Format irgendwo im Speicher stehen. Das Textende muß mit einer Null markiert sein. Ist diese Voraussetzung erfüllt, braucht man nur noch den Akku mit dem Low-Byte, das Y-Register mit dem High-Byte der Anfangsadresse zu laden und das Unterprogramm mit JSR $CB1E aufzurufen: Schon steht der Text auf dem Bildschirm. Auch Fehlermeldungen können auf diese einfache Weise ausgegeben werden (die Möglichkeit hatte ich ja oben schon angekündigt). Die Adressen der einzelnen Fehlernachrichten sind Tabelle 1 zu entnehmen.</p>
+        <p><strong>String ausgeben ($CB1E)</strong>: Mit diesem Unterprogramm ist es in einfacher Weise möglich, Texte in einem Maschinenprogramm auszugeben. Dadurch entfallen die sonst nötigen langwierigen Druckschleifen, mit denen man sich sonst herumschlagen muß. Auch bei dieser Unterroutine ist die Handhabung wieder ganz einfach. Der auszugebende Text, der natürlich auch Sonderund Steuerzeichen enthalten darf, muß im ASCII-Format irgendwo im Speicher stehen. Das Textende muß mit einer Null markiert sein. Ist diese Voraussetzung erfüllt, braucht man nur noch den Akku mit dem Low-Byte, das Y-Register mit dem High-Byte der Anfangsadresse zu laden und das Unterprogramm mit JSR $CBlE aufzurufen: Schon steht der Text auf dem Bildschirm. Auch Fehlermeldungen können auf diese einfache Weise ausgegeben werden (die Möglichkeit hatte ich ja oben schon angekündigt). Die Adressen der einzelnen Fehlernachrichten sind Tabelle 1 zu entnehmen.</p>
 
         <p>Es soll nicht verschwiegen werden, daß es in seltenen Fällen zu einem Problem kommen kann: Weil dieses Unterprogramm auf String-Basis arbeitet, wird der Text als Variable zwischengespeichert. Wurden die Zeiger $37 und $38 (dezimal 55, 56) verändert, so kommt es manchmal dazu, daß irgendwelche unsinnigen Zeichen, aber nicht der gewünschte Text ausgegeben werden. In solch einem Fall müssen die Zeichen konventionell, das heißt über die Kernalroutine $FFD2 ausgegeben werden.</p>
 
@@ -300,7 +294,7 @@
         <address class="author">(Christoph Sauer/ev)</address>
 
         <aside>
-            <p>PS. Uns interessiert Ihre Meinung zum Thema VC 20 im 64’er-Magazin im allgemeinen und zu diesem Kurs im besonderen. Wie wär's, schreiben Sie uns eine Mitmachkarte?</p>
+            <p>PS. Uns interessiert Ihre Meinung zum Thema VC 20 im 64’er-Magazin im allgemeinen und zu diesem Kurs im besonderen. Wie wär&rsquo;s, schreiben Sie uns eine Mitmachkarte?</p>
         </aside>
 
         <figure>
@@ -308,7 +302,144 @@
             <figcaption>Listing 1. »IRQ-Clock« (Basic-Lader)</figcaption>
         </figure>
         <figure>
-            <pre>TODO</pre>
+            <pre>****************** INITIALISIERUNG
+****************** DER UHRENROUTINE
+2000  JSR $20D0  ; BASICPGM. VERSCIEBEN
+2003  LDA $9003  ; BILDSCHIRMGROESSE
+2006  AND #$80   ; LADEN UND 24,25.
+2008  ORA #$32   ; ZEILE ZUSCHALTEN
+200A  STA $9003  ; ABSPEICHERN
+200D  LDX #$2C   ; ZEILEN LOESCHEN
+200F  LDA #$A0   ; MIT INVERSEN SPACES
+2011  STA $11F9,X; ABSPEICHERN
+2014  LDA $900F  ; AKTUELLE FARBE
+2017  AND #$07   ; WIRD ZUR
+2019  STA $9FF9,X; ZEICHENFARBE
+201C  DEX        ; SCHLEIFE
+201D  BNE $200F
+201F  LDX #$08   ; FARBE DER UHRZEIT
+2021  LDA $0286  ; IST AKTUELLE ZEICH-
+2024  STA $9616,X; CHENFARBE
+2027  DEX
+2028  BNE $2024
+202A  SEI        ; INTERRUPTS VERHIND.
+202B  LDA #$3C   ; VEKTOREN INITIAL.
+202D  STA $0314
+2030  LDA #$20
+2032  STA $3015
+2035  CLI        ; INTERRUPTS ZULASSEN
+2036  JSR $C659  ; BASIC-BEFEHL CLR
+2039  JMP $C474  ; INS BASIC ZURUECK
+****************** UHREN ANZEIGE
+203C  LDX #$05   ; DIVERSE ZEROPAGE-
+203E  LDA $61,X  ; DATEN IN DEN BAND-
+2040  STA $0349,X; PUFFER RETTEN
+2043  DEX
+2044  BNE $203E
+2046  LDX #$0B
+2048  LDA $00FE,X
+204B  STA $0354,X
+204E  DEX
+204F  BNE $2048
+2051  LDA $71
+2053  STA $0361
+2056  LDA $47
+2058  STA $0362
+205B  LDA $5D
+205D  STA $0363
+2060  LDA $5E
+2062  STA $0364
+2065  LDA $A2    ; UHRZEIT (A2,A1,A0)
+2067  LDX $A1    ; HOLEN
+2069  LDY $A0
+206B  JSR $CF87  ; IN STRING VERWANDELN
+206E  STY $5E    ; UNTERROUTINE VOR-
+2070  DEY        ; BEREITEN
+2071  STY $71
+2073  LDY #$06   ; 6 ZIFFERN DARSTELLEN
+2075  STY $5D
+2077  LDY #$24
+2079  JSR $DE68  ; ZIFFERN BERECHNEN
+207C  LDA #$17  ; BILDSCHIRMSPEICHER-
+207E  STA $A9    ; ADRESSE DER ZIFFERN
+2080  LDA #$12
+2082  STA $AA
+2084  LDY #$00   ; ZAEHLER FUER ZIFFERN
+2086  LDX #$02   ; ZAEHLER FUER ':'
+2088  LDA $00FF,X; ZIFFERN HOLEN
+208B  STA ($A9),X; IN BILDSCHIRMSPEICHER
+208D  INY        ; SCHLEIFE 1
+208E  CPY #$06   ; ALLE ZIFFERN ?
+2090  BEQ $20A4  ; JA, DANN ENDE
+2092  DEX
+2093  BNE $2088
+2095  LDA #$3A   ; DOPPELPUNKT LADEN
+2097  STA ($A9),Y; UND ABSPEICHERN
+2099  DEY        ; SCHLEIFE 2
+209A  INC $A9    ; ZAHLER KORREKTUR
+209C  BNE $20A0
+209E  INC $AA    ; ZAHLER KORREKTUR
+20A0  LDX #$03   ; NEUER ':' ZAHLER
+20A2  BNE $208D
+20A4  LDX #$05   ; ALLE GERETTETEN
+20A6  LDA $0349,X; ZEROPAGE VARIABLEN
+20A9  STA $61,X  ; WIEDER ZURUECK-
+20AB  DEX        ; SPEICHERN.
+20AC  BNE $20A6
+20AE  LDX #$0B
+20B0  LDA $0354,X
+20BE  STA $00FE,X
+20B6  DEX
+20B7  BNE $20B0
+20B9  LDA $0361
+20BC  STA $71
+20BE  LDA $0362
+20C1  STA $47
+20C3  LDA $0363
+20C6  STA $5D
+20C8  LDA $0364
+20CB  STA $5E
+20CD  JMP $EABF  ; ZUR INTERRUPTROUTINE
+****************** BASICPROGRAMM VER-
+****************** SCHIEBEN
+20D0  LDX $2D    ; ENEADRESSE DES PGMS
+20D2  STX $5A    ; HOLEN
+20D4  LDY $2E
+20D6  STY $5B
+20D8  JSR $210A  ; 49 ADDIEREN
+20DB  STX $58    ; UND ABSPEICHERN
+20DD  STX $2D
+20DF  STY $59
+20E1  STY $2E
+20E3  LDX $2B    ; PGM. ANFANGSADRESSE
+20E5  STX $5F    ; HOLEN UND ABSP.
+20E7  LDY $2C
+20E9  STY $60
+20EB  JSR $210A  ; 49 ADDIEREN
+20EE  STX $2B    ; UND ABSPEICHERN
+20F0  STX $A6
+20F2  STY $2C
+20F4  STY $A7
+20F6  JSR $C3B8  ; PROGRAMM VERSCHIEBEN
+20F9  JSR $C533  ; PGM.ZEILEN BINDEN
+20FC  LDA $A6
+20FE  BNE $2102
+2100  DEC $A7    ; 0 AN DEN NEUEN PGM.-
+2102  DEC $A6    ; ANFANG SPEICHERN
+2104  LDA #$00
+2106  TAY
+2107  STA ($A6),
+2109  RTS
+****************** ADDITIONSROUTINE
+210A  STY $A8
+210C  CLC        ; 16-BIT ADDITION
+210D  TXA        ; VORBEREITEN
+210E  ADC #$31   ; DEZ 49 ADDIEREN
+2110  TAX
+2111  LDA $A8    ; HIGH-BYTE LADEN
+2113  ADC #$00   ; UEBERTRAG ADDIEREN
+2115  TAY
+2116  RTS</pre>
             <figcaption>Listing 2. »IRQ Clock« (Assembler-Listing)</figcaption>
         </figure>
         <figure>
@@ -316,7 +447,17 @@
             <figcaption>Listing 3. »Autostart« für C 64 / VC 20</figcaption>
         </figure>
         <figure>
-            <pre>TODO</pre>
+            <pre>0351 LDX #$0E    ; INPUT-VEKTOR REKON-
+0353 STX $0324   ; STRUIEREN.
+0356 LDX #$F2
+0358 STX $0325
+035B LDX #$09    ; NEUN ZEICHEN
+035D STX $C6     ; IN TATATURCOUNTER
+035F LDA $EDF4,X ; ZEICHEN AUS ROM HOLEN
+0362 STA $0277,X ; UND IN TASTATURPUFFER
+0365 DEX
+0366 BPL $035F   ; ALLE NEUNE ?
+0368 RTS         ; JA, DANN ENDE</pre>
             <figcaption>Listing 4. Die Maschinenroutine zum Autostartprogramm als Assembler-Listing</figcaption>
         </figure>
 
