@@ -1242,7 +1242,7 @@ def write_full_html_file(db, path, title, preview_img, body_html, body_class, co
 </div>
 
 <footer class="page_footer">
-  <span class="left_text">© 1984 Markt & Technik Verlag Aktiengesellschaft</span>
+  <span class="left_text">© 1985 Markt & Technik Verlag Aktiengesellschaft</span>
   <nav class="right_nav">
     <a href="https://github.com/mist64/64er-magazin.de">{LABEL_CONTACT}</a>
     <a href="/{BASE_DIR}{impressum_path}">{LABEL_IMPRINT}</a>
