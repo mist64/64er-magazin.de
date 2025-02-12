@@ -19,7 +19,7 @@
 <body>
     <article>
         <h1>Assembler ist keine Alchimie (Teil 7)</h1>
-        <p class="intro">ln diesem Teil werden wir drei Themen besprechen: den Stapel und die indirekte Adressierung. Ferner zeigen wir an einem ausführlichen Beispiel, wie Text auf dem Bildschirm und auf dem Drucker ausgegeben werden kann.</p>
+        <p class="intro">In diesem Teil werden wir drei Themen besprechen: den Stapel und die indirekte Adressierung. Ferner zeigen wir an einem ausführlichen Beispiel, wie Text auf dem Bildschirm und auf dem Drucker ausgegeben werden kann.</p>
 
         <p>Die Assembler-Folge in der letzten Ausgabe hat einige Fragen offengelassen, die dieses Mal beantwortet werden sollen: Die Sache mit dem Stapel wird geklärt, und Sie werden Befehle zu gebrauchen lernen, die uns Stapeloperationen ermöglichen. In unserem ersten Programmprojekt-Teil gab es für Sie unverständliche Sequenzen, die mit der Speicherstelle 1 zu tun hatten. Auch das werden Sie diesmal verstehen.</p>
 
@@ -562,9 +562,9 @@
             <li>Fehlerabfrage und -behandlung</li>
         </ol>
 
-        <p>Fangen wir mit dem Punkt »Vorbereitungen« an. Einige Routinen brauchen Informationen, die ihnen erst durch andere Kernal-Routmen beschafft werden. Ruft man diese anderen Routinen vorher nicht auf, dann funktioniert auch der erwünschte Aufruf nicht richtig. Wenn die Routine einen bestimmten Wert im Y-Register erwartet, dann muß der dort auch stehen. Wenn nicht, dann geht das Programm in die Hose. Bei jeder Kernal-Routine, die hier beschrieben wird, gebe ich alle nötigen Vorbereitungen an.</p>
+        <p>Fangen wir mit dem Punkt »Vorbereitungen« an. Einige Routinen brauchen Informationen, die ihnen erst durch andere Kernal-Routinen beschafft werden. Ruft man diese anderen Routinen vorher nicht auf, dann funktioniert auch der erwünschte Aufruf nicht richtig. Wenn die Routine einen bestimmten Wert im Y-Register erwartet, dann muß der dort auch stehen. Wenn nicht, dann geht das Programm in die Hose. Bei jeder Kernal-Routine, die hier beschrieben wird, gebe ich alle nötigen Vorbereitungen an.</p>
 
-        <p>Der Routinenaufruf sollte immer mittels ]SR erfolgen. Alle auf diese Weise aus der Kernal-Sprungtabelle abzurufenden Programme enden nämlich mit einem RTS. Damit keine wichtigen Werte aus dem Aufrufprogramm überschrieben werden, man sie also vor dem Aufruf der Kernal-Routine irgendwohin retten kann, gebe ich auch noch an, welche Register durch die Routine verändert werden und wieviel Stapelspeicherplatz bereitgehalten werden muß.</p>
+        <p>Der Routinenaufruf sollte immer mittels JSR erfolgen. Alle auf diese Weise aus der Kernal-Sprungtabelle abzurufenden Programme enden nämlich mit einem RTS. Damit keine wichtigen Werte aus dem Aufrufprogramm überschrieben werden, man sie also vor dem Aufruf der Kernal-Routine irgendwohin retten kann, gebe ich auch noch an, welche Register durch die Routine verändert werden und wieviel Stapelspeicherplatz bereitgehalten werden muß.</p>
 
         <p>Die Routinen sind so konstruiert, daß beim Auftreten eines Fehlers nach der Rückkehr das Carry-Bit gesetzt ist. Durch Untersuchen des Carry können so Fehler rechtzeitig erkannt und behandelt werden. Im Akku findet man in dem Fall dann eine Fehlernummer. Die Ausgabe der Fehlermeldung erfolgt also nicht — wie im Basic — in Klarschrift. In Tabelle 3 sind die Fehlernummern und ihre Bedeutung aufgelistet.</p>
 
@@ -710,7 +710,7 @@
             <tr><td><strong>Register</strong></td><td>Akku, X-Register</td></tr>
         </table>
 
-        <p>Mit dieser Routine kann jedes File, der zuvor durch OPEN spezifiziert worden ist, zum Ausgabefile erklärt werden. Natürlich muß dann das derart angesprochene Gerät auch ein Ausgabegerät sein. Andernfalls ergibt sich ein Fehler. Bevor man Daten über einen Kanal senden will, muß CHKOUT durchgeführt werden. Wenn die mittels OPEN übergebene Geräteadresse größer als 3 ist, sendet diese Routine automatisch auch ein LISTEN-Kommando an das Ausgabegerät. LISTEN setzt dann zum Beispiel den Drucker in Empfangsbereitschaft. Die Durchführung von CHKOUT ist einfach (vorausgesetzt, man hat vorher OPEN aufgerufen): In das X-Register wird die logische Filenummer geschrieben und dann perJSR FFC3 CHKOUT angesteuert.</p>
+        <p>Mit dieser Routine kann jedes File, der zuvor durch OPEN spezifiziert worden ist, zum Ausgabefile erklärt werden. Natürlich muß dann das derart angesprochene Gerät auch ein Ausgabegerät sein. Andernfalls ergibt sich ein Fehler. Bevor man Daten über einen Kanal senden will, muß CHKOUT durchgeführt werden. Wenn die mittels OPEN übergebene Geräteadresse größer als 3 ist, sendet diese Routine automatisch auch ein LISTEN-Kommando an das Ausgabegerät. LISTEN setzt dann zum Beispiel den Drucker in Empfangsbereitschaft. Die Durchführung von CHKOUT ist einfach (vorausgesetzt, man hat vorher OPEN aufgerufen): In das X-Register wird die logische Filenummer geschrieben und dann per JSR FFC3 CHKOUT angesteuert.</p>
 
         <p>Nun zur anderen Vorbereitung von FFD2, zu OPEN:</p>
 
@@ -799,7 +799,7 @@
 
         <figure>
             <img src="124-3.png" alt="">
-            <figcaption>Bild 3. Die Ablolge der Routineaufrufe</figcaption>
+            <figcaption>Bild 3. Die Abfolge der Routineaufrufe</figcaption>
         </figure>
 
         <p>Und hier das Programm dazu. Wir verwenden die im anderen Beispiel schon aufgebaute Texttabelle weiter. Zunächst also SETNAM:</p>
