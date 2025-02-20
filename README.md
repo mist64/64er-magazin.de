@@ -66,7 +66,6 @@ Das Skript braucht (macOS):
 ```
 brew install imagemagick     # to convert PNG to JPG
 brew install vice            # to generate PRG from TXT (via petcat)
-brew install exiftool        # remove metadata from images
 
 python3 -m pip install -r requirements.txt
 # pip3 install beautifulsoup4    # to work with HTML
