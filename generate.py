@@ -17,7 +17,7 @@ import pytz
 import argparse
 import gzip
 import lunr
-from tools import petcat2checksummer
+from tools import mse, petcat2checksummer
 from dataclasses import dataclass, field
 from collections import defaultdict, OrderedDict
 from bs4 import BeautifulSoup, NavigableString
@@ -524,7 +524,10 @@ class Issue:
                       listings[basename] = file_obj.read()
                   listings_bin[basename] = petcat2prg(listings[basename])
               elif file.endswith('.seq') or file.endswith('.prg'):
+                  src_path = os.path.join(root, file)
                   file_path = os.path.join('prg', file)
+                  with open(src_path, 'rb') as file_obj:
+                      listings_bin[file] = file_obj.read()
                   binaries.append(file_path)
 
       for root, dirs, files in os.walk(issue_directory_path):
@@ -651,7 +654,16 @@ class Issue:
           data_range = tag.get("data-range")
           data_availability = tag.get("data-availability")
           data_checksummer = tag.get("data-checksummer")
-          if data_filename:
+          data_mse = tag.get("data-mse")
+          if data_mse and data_filename:
+              data = listings_bin[data_filename]
+              start = data[0] | (data[1] << 8)
+              end = start + (len(data) - 2)
+              lines = mse.MSEversions[data_mse](data_filename, start, end, mse.Memory(data[2:]))
+              listing = "\n".join(lines)
+              tag.string = listing
+
+          elif data_filename:
               listing_bin = listings_bin[data_filename]
               # remove ';', empty lines and leading spaces
               listing = listings[data_filename]
