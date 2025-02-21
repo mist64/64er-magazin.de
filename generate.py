@@ -17,6 +17,7 @@ import pytz
 import argparse
 import gzip
 import lunr
+from tools import petcat2checksummer
 from dataclasses import dataclass, field
 from collections import defaultdict, OrderedDict
 from bs4 import BeautifulSoup, NavigableString
@@ -511,14 +512,17 @@ class Issue:
       # todo: XXX get listings and binaries from the articles instead of the prg folder
       # read all listings in petcat format (and other binaries)
       listings = {}
+      listings_bin = {}
       binaries = []
       prg_path = os.path.join(issue_directory_path, 'prg')
       for root, _, files in os.walk(prg_path):
           for file in files:
               if file.endswith('.txt'):
                   file_path = os.path.join(root, file)
+                  basename = os.path.splitext(file)[0]
                   with open(file_path, 'r') as file_obj:
-                      listings[os.path.splitext(file)[0]] = file_obj.read()
+                      listings[basename] = file_obj.read()
+                  listings_bin[basename] = petcat2prg(listings[basename])
               elif file.endswith('.seq') or file.endswith('.prg'):
                   file_path = os.path.join('prg', file)
                   binaries.append(file_path)
@@ -527,7 +531,7 @@ class Issue:
           for file in files:
               if file.endswith('.html'):
                   article_path = os.path.join(root, file)
-                  article_metadata = Issue.__read_html(article_path, listings)
+                  article_metadata = Issue.__read_html(article_path, listings, listings_bin)
                   articles.append(Article(article_metadata))
 
               elif file == 'toc.txt':
@@ -592,11 +596,12 @@ class Issue:
       self.pdf_filename = pdf_filename
       self.issue_dir_name = issue_dir_name
       self.listings = listings
+      self.listings_bin = listings_bin
       self.binaries = binaries
 
 
   @staticmethod
-  def __read_html(html_file_path, listings):
+  def __read_html(html_file_path, listings, listings_bin):
       """Parses an HTML file for article metadata and includes the filename."""
       with open(html_file_path, 'r', encoding='utf-8') as file:
           contents = file.read()
@@ -645,11 +650,12 @@ class Issue:
           data_name = tag.get("data-name")
           data_range = tag.get("data-range")
           data_availability = tag.get("data-availability")
+          data_checksummer = tag.get("data-checksummer")
           if data_filename:
+              listing_bin = listings_bin[data_filename]
               # remove ';', empty lines and leading spaces
               listing = listings[data_filename]
               listing = [line.lstrip() for line in listing.splitlines() if line.strip() and not line.lstrip().startswith(';')]
-
               if data_range:
                   ranges = [(int(part.split('-')[0]), int(part.split('-')[-1])) for part in data_range.split(',')]
                   filtered_lines = []
@@ -665,8 +671,27 @@ class Issue:
                           blank_line_added = True
                   listing = filtered_lines
 
-              listing = "\n".join(listing)
-              tag.string = listing
+              if data_checksummer and listing_bin:
+                  checksums = petcat2checksummer.calculate_checksums(listing_bin, int(data_checksummer))
+                  listing_64er = []
+                  for line in listing:
+                      lineno, content = petcat2checksummer.process_line(line)
+                      if lineno is None:
+                          continue
+                      checksum = checksums[lineno]
+                      content = content.replace("&", "&amp;")
+                      content = content.replace("<", "&lt;")
+                      listing_64er += [f"<span data-chksum='<{checksum:03d}>'>{lineno: 3d} {content} </span>"]
+                  listing = "\n".join(listing)
+                  listing_64er = "\n".join(listing_64er)
+                  newhtml = f"""<div class="listing"><input type="checkbox" role="switch" class="toggle" />
+                    <pre class="listing-petcat">{listing}</pre>
+                    <pre class="listing-checksummer">{listing_64er}</pre></div>
+                  """
+                  tag.replace_with(BeautifulSoup(newhtml, 'html.parser'))
+              else:
+                  listing = "\n".join(listing)
+                  tag.string = listing
 
               if not any(item[0] == data_name for item in downloads): # duplicates
                   if data_availability != "local":
