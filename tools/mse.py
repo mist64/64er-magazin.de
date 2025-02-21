@@ -67,7 +67,7 @@ def dumpMSE1(data, start, end):
 def dumpMSE2(data, start, end):
     def dmp(d): return " ".join(splitString(mapToMSE2(d),4))
     def chk(d, s, e, c):
-        val = ((c & 0xff) ^ ((0x1c00 + c - s)>>8))
+        val = (c & 0xff) ^ (0x1c + (c>>8) - (s>>8))
         for b in reversed(d):
             val = rol8(val+b)
         return mapToMSEchksum(val)
