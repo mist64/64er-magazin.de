@@ -52,6 +52,41 @@ class BuildConfig():
     git_branch_name: str = "main" # set in setup
 
 
+# If outputfile == None, returns byte array
+# If outputfile given, returns None
+# exits on subprocess error
+def petcat2prg(listing, output_file_name = None):
+
+    regex = r"^;.*==([0-9A-Fa-f]{4})=="
+    load_address = re.findall(regex, listing, re.MULTILINE)
+    if load_address:
+        load_address = load_address[0]
+    else:
+        load_address = '0801'
+
+    pattern = r"^;version=(.*)$"
+    match = re.search(pattern, listing, re.MULTILINE)
+    version = match.group(1) if match else None
+    if not version:
+        version = '2'
+
+    # Prepare the command
+    command = ['petcat', f'-w{version}', '-l', load_address, f'-{version}']
+    if output_file_name:
+        command += ['-o', output_file_name]
+
+    # Execute the command, piping the listing into it
+    process = subprocess.Popen(command, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.DEVNULL)
+    prg, _ = process.communicate(input=listing.encode('utf-8'))
+
+    # Check if petcat executed successfully
+    if process.returncode != 0:
+        print(f"Failed to process: {key}")
+        exit()
+
+    if not output_file_name:
+        return prg
+
 def parse_cli_into_config():
 
     # supported command line arguments
@@ -1657,31 +1692,8 @@ def copy_articles_and_assets(db, in_directory, out_directory):
         for key, listing in issue.listings.items():
             # Prepare the output file name
             output_file_name = os.path.join(issue_dest_path, 'prg', f"{key}.prg")
+            petcat2prg(listing, output_file_name)
 
-            regex = r"^;.*==([0-9A-Fa-f]{4})=="
-            load_address = re.findall(regex, listing, re.MULTILINE)
-            if load_address:
-                load_address = load_address[0]
-            else:
-                load_address = '0801'
-
-            pattern = r"^;version=(.*)$"
-            match = re.search(pattern, listing, re.MULTILINE)
-            version = match.group(1) if match else None
-            if not version:
-                version = '2'
-
-            # Prepare the command
-            command = ['petcat', f'-w{version}', '-l', load_address, f'-{version}', '-o', output_file_name]
-
-            # Execute the command, piping the listing into it
-            process = subprocess.Popen(command, stdin=subprocess.PIPE, text=True)
-            process.communicate(input=listing)
-
-            # Check if petcat executed successfully
-            if process.returncode != 0:
-                print(f"Failed to process: {key}")
-                exit()
 
         for binary_path in issue.binaries:
             input_file_name = os.path.join(issue_source_path, binary_path)
