@@ -1672,7 +1672,7 @@ def copy_articles_and_assets(db, in_directory, out_directory):
                 version = '2'
 
             # Prepare the command
-            command = ['petcat', '-w2', '-l', load_address, f'-{version}', '-o', output_file_name]
+            command = ['petcat', f'-w{version}', '-l', load_address, f'-{version}', '-o', output_file_name]
 
             # Execute the command, piping the listing into it
             process = subprocess.Popen(command, stdin=subprocess.PIPE, text=True)
