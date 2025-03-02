@@ -55,7 +55,7 @@
 
         <p>Die folgenden Beispiele sollen Ihnen die Arbeit mit dem Disk-Monitor verdeutlichen.</p>
 
-        <p>Achtung! Benutzen Sie unbedingtzum Üben eine Diskette, die Sie nicht mehr brauchen!</p>
+        <p>Achtung! Benutzen Sie unbedingt zum Üben eine Diskette, die Sie nicht mehr brauchen!</p>
 
         <p>Weder wir noch der Verlag haften dafür, wenn Ihr Lieblingsprogramm oder die mühsam erstellte Adreßdatei unwiederbringlich dahin sind. Daß das sehr sehr schnell gehen kann, wissen wir aus eigener Erfahrung &hellip;</p>
 
@@ -65,9 +65,9 @@
 
         <p>Sicher ist Ihnen das auch schon passiert: Sie wollen Ihr Programm mit Namen »Schrott« löschen, geben als Abkürzung »S:S*« ein und merken in dem Moment, in dem Sie »RETURN« drücken, daß auf der Diskette auch alle Versionen von »SMON« waren, außerdem auch noch »Springvogel«, »Soccer« etc. Verzweifeln müssen Sie nur, wenn auch diese letzte SMON-Version mit dem Disk-Monitor dabei war. Ansonsten behalten Sie die Ruhe und verfahren Sie wie im folgenden beschrieben.</p>
 
-        <p>Laden Sie alsojetzt SMON, legen Sie Ihre »Übungsdiskette« (!) ins Laufwerk und löschen Sie eins der ersten Programme mit dem üblichen Scratch-Kommando. Nun starten Sie SMON und drücken »Z«. Der Bildschirm ändert seine Farbe wie beschrieben, und am Anfang der Zeile erscheint der »*«. Jetzt geben Sie ein:</p>
-
-        <h3>R 12 00</h3>
+        <p>Laden Sie also jetzt SMON, legen Sie Ihre »Übungsdiskette« (!) ins Laufwerk und löschen Sie eins der ersten Programme mit dem üblichen Scratch-Kommando. Nun starten Sie SMON und drücken »Z«. Der Bildschirm ändert seine Farbe wie beschrieben, und am Anfang der Zeile erscheint der »*«. Jetzt geben Sie ein:
+            <strong><code>R 12 00</code></strong>
+        </p>
 
         <p>Auf dem Bildschirm erscheint die erste Zeile der BAM, die bei jeder Diskette auf Track 18, Sektor 0 abgelegt ist. Die ersten beiden Bytes enthalten »12 01« und geben damit den logisch nächsten Block an. In diesem Falle wäre das der erste Block des Directory. Wenn Sie mit »SHIFT« die Bildschirmausgabe fortsetzen, erkennen Sie etwa in der Mitte den Diskettennamen. Lassen Sie die Ausgabe durchlaufen, bis wieder der »*« erscheint. Nun geben Sie »R« ohne weitere Angaben ein. Damit erhalten Sie den Koppel-Block, also Track 18, Sektor 1, den ersten Directory-Block. (Natürlich hätten Sie auch gleich »R 12 01« eintippen können, aber wir wollen ja zeigen, wie die Befehle funktionieren.)</p>
 
@@ -77,21 +77,26 @@
 
         <h2>Schützen eines Files</h2>
 
-        <p>Da wir gerade dabei sind, wollen wir unser repariertes gelöschtes File gleich ein für allemal gegen Löschen schützen. Diese Möglichkeit des Diskettenoperationssystems (DOS) ist zwar nicht im Handbuch beschrieben, funktioniert aber trotzdem ausgezeichnet. Laden Sie dazu nochmals die erste Seite des Directory mit R 12 01</p>
-
-        <p>und ändern Sie die »82« vor dem Fileeintrag in »C2«. Geben Sie »W« ein, um die Änderung auf Diskette zu schreiben. Verlassen Sie nun SMON mit »X« und lassen Sie sich ein Directory anzeigen. Das geschützte File ist mit einem » > « gekennzeichnet. Versuchen Sie nun, dieses Programm mit dem Scratch-Kommando zu löschen. Es geht nicht! Zum »Entriegeln« brauchen Sie nur das »C2« wieder in »82« zu ändern. Der »>« im Directory verschwindet und das File ist nicht mehr geschützt.</p>
+        <p>Da wir gerade dabei sind, wollen wir unser repariertes gelöschtes File gleich ein für allemal gegen Löschen schützen. Diese Möglichkeit des Diskettenoperationssystems (DOS) ist zwar nicht im Handbuch beschrieben, funktioniert aber trotzdem ausgezeichnet. Laden Sie dazu nochmals die erste Seite des Directory mit 
+            <strong><code>R 12 01</code></strong>
+        und ändern Sie die »82« vor dem Fileeintrag in »C2«. Geben Sie »W« ein, um die Änderung auf Diskette zu schreiben. Verlassen Sie nun SMON mit »X« und lassen Sie sich ein Directory anzeigen. Das geschützte File ist mit einem » > « gekennzeichnet. Versuchen Sie nun, dieses Programm mit dem Scratch-Kommando zu löschen. Es geht nicht! Zum »Entriegeln« brauchen Sie nur das »C2« wieder in »82« zu ändern. Der »>« im Directory verschwindet und das File ist nicht mehr geschützt.</p>
 
         <h2>Schützen einer Diskette</h2>
 
         <p>Wollen Sie eine ganze Diskette vor versehentlichem Löschen oder Formatieren schützen, gibt es die Möglichkeit, die Löschschutzkerbe abzukleben. Es geht jedoch auch anders. <strong>Achtung! Die im folgenden beschriebene Prozedur läßt sich nicht mehr rückgängig machen, auch nicht mit dem Disk-Monitor!</strong></p>
 
-        <p>Nehmen Sie also eine Diskette, die Sie anschließend »hart formatieren« können (also mit Eingabe einer ID). Starten Sie nun den Disk-Monitor und lesen Sie die BAM mit »R 12 00« ein. Das dritte Byte enthält »41«. Diese »41« ist ein Kennzeichen für das DOS der 1541- oder 4040-Floppy. Ändern Sie diese Bytes durch Überschreiben in »45« und speichern Sie die Änderung mit »W« auf die Diskette zurück. Verlassen Sie nun SMON und versuchen Sie, etwas zu löschen. Ergebnis siehe oben. Versuchen Sie auch, die Diskette »weich«, also zum Beispiel mit OPEN 1,8,15,"N:TEST" zu formatieren. Auch das ist jetzt nicht mehr möglich. Aber es kommt noch besser: Starten Sie noch einmal den Disk-Monitor und versuchen Sie, die Änderung durch Zurückschreiben der »41« an Stelle der »45« rückgängig zu machen.</p>
+        <p>Nehmen Sie also eine Diskette, die Sie anschließend »hart formatieren« können (also mit Eingabe einer ID). Starten Sie nun den Disk-Monitor und lesen Sie die BAM mit »R 12 00« ein. Das dritte Byte enthält »41«. Diese »41« ist ein Kennzeichen für das DOS der 1541- oder 4040-Floppy. Ändern Sie diese Bytes durch Überschreiben in »45« und speichern Sie die Änderung mit »W« auf die Diskette zurück. Verlassen Sie nun SMON und versuchen Sie, etwas zu löschen. Ergebnis siehe oben. Versuchen Sie auch, die Diskette »weich«, also zum Beispiel mit OPEN 1,8,15,"N:TEST"<br>zu formatieren.</p> 
+        
+        <p>Auch das ist jetzt nicht mehr möglich. Aber es kommt noch besser: Starten Sie noch einmal den Disk-Monitor und versuchen Sie, die Änderung durch Zurückschreiben der »41« an Stelle der »45« rückgängig zu machen.</p>
 
-        <p>Auch das ist nicht mehr möglich, wir hatten Sie bereits gewarnt! Es bleibt lediglich die Möglichkeit, die Diskette »hart«, zum Beispiel mit OPEN 1,8,15,"N:TESTTE"<br>
-            zu formatieren. Sollten Sie nun entgegen allen Warnungen doch Ihre Master-Diskette gegen Schreibzugriffe gesichert haben, verraten wir Ihnen ausnahmsweise, wie Sie den Eingriff trotzdem rückgängig machen können. Dazu überlisten wir das DOS des 1541-Laufwerkes, indem wir ihm vorgaukeln, es hätte eine Diskette im Normalformat vor sich. Wir verwenden den Memory-Write-Befehl, mit dem wir in die Speicherstelle 0101 (Zero-Page Adresse) des 1541-RAM einfach ein »A« schreiben. Der CHR$-Code des »A« ist 65, oder in hexadezimaler Schreibweise 41. Erinnern Sie sich? Dieser Wert stand ursprünglich im dritten Byte des Tracks 18, Sektor 0. Mit folgendem kleinen Programm umgehen wir einfach die DOS-Kennzeichnung und wir können die Diskette wieder normal beschreiben. Am sinnvollsten ist es, sofort den SMON zu starten, das vorher in 45 abgeänderte Byte wieder in 41 zu verwandeln und abzuspeichern. Die Diskette kann dann wieder zum Lesen und Schreiben verwendet werden. Hier nun das kleine Programm:<br>
-            10 OPEN 1,8,15<br>
-            20 PRINT#1, "M-W"CHR$(1)CHR$(1)CHR$(1)CHR$(65)<br>
-            30 CLOSE1</p>
+        <p>Auch das ist nicht mehr möglich, wir hatten Sie bereits gewarnt! Es bleibt lediglich die Möglichkeit, die Diskette »hart«, zum Beispiel mit 
+            <code>OPEN 1,8,15,"N:TEST,TE"</code>
+        zu formatieren. Sollten Sie nun entgegen allen Warnungen doch Ihre Master-Diskette gegen Schreibzugriffe gesichert haben, verraten wir Ihnen ausnahmsweise, wie Sie den Eingriff trotzdem rückgängig machen können. Dazu überlisten wir das DOS des 1541-Laufwerkes, indem wir ihm vorgaukeln, es hätte eine Diskette im Normalformat vor sich. Wir verwenden den Memory-Write-Befehl, mit dem wir in die Speicherstelle 0101 (Zero-Page Adresse) des 1541-RAM einfach ein »A« schreiben. Der CHR$-Code des »A« ist 65, oder in hexadezimaler Schreibweise 41. Erinnern Sie sich? Dieser Wert stand ursprünglich im dritten Byte des Tracks 18, Sektor 0. Mit folgendem kleinen Programm umgehen wir einfach die DOS-Kennzeichnung und wir können die Diskette wieder normal beschreiben. Am sinnvollsten ist es, sofort den SMON zu starten, das vorher in 45 abgeänderte Byte wieder in 41 zu verwandeln und abzuspeichern. Die Diskette kann dann wieder zum Lesen und Schreiben verwendet werden. Hier nun das kleine Programm:
+            <code>10 OPEN 1,8,15
+                20 PRINT#1, "M-W"CHR$(1)CHR$(1)CHR$(1)CHR$(65)
+                30 CLOSE1
+            </code>
+        </p>
 
         <h2>Ändern des Diskettennamens oder der ID</h2>
 
@@ -117,31 +122,31 @@
 
         <p>Beim Arbeiten mit dem Disk-Monitor werden sämtliche Fehler vom Laufwerk direkt, auch ohne Eingabe von »@«, ausgegeben, zum Beispiel »ILLEGAL TRACK OR SECTOR«, wenn Sie mit »R« einen Block lesen wollen, den es gar nicht gibt. Einen Fehler hat das Programm allerdings, den wir nicht verschweigen wollen. Der letzte Block eines Files enthält als Koppeladresse »00 FF«. Da es einen solchen Block nicht geben kann, »weiß« das DOS, daß es am Ende angelangt ist. Versuchen Sie aber, den nächsten Block (Spur 0, Sektor 255!!) mit »R« zu lesen, erscheint als Fehlermeldung nicht, wie es sein müßte, »ILLEGAL BLOCK OR SECTOR«, sondern »SYNTAX ERROR«. Das ist zwar eigentlich unerheblich, sollte aber erwähnt werden. Der Fehler liegt in der Routine, die unsere Zahleneingaben in das richtige Diskettenformat wandelt. Es fehlte einfach der Platz im Programm für eine »korrekte« Umwandlung, wir mußten uns mit einer »Sparroutine« behelfen.</p>
 
-        <p>Abschließend noch ein SMON-Trick, den wir einem aufmerksamen Leser verdanken. Für eine Directory-Ausgabe fehlte der Platz im SMON. Es geht aber hilfsweise so: Laden Sie das Directory zum Beispiel mit<br>
-            <strong>L "$" 8000</strong><br>
+        <p>Abschließend noch ein SMON-Trick, den wir einem aufmerksamen Leser verdanken. Für eine Directory-Ausgabe fehlte der Platz im SMON. Es geht aber hilfsweise so: Laden Sie das Directory zum Beispiel mit
+            <strong<code>>L "$" 8000</code></strong>
             an einen freien Speicherplatz. Mit »M« oder »K« können Sie jetzt das Directory »lesen«. Damit sind alle wichtigen Funktionen für den Umgang mit der Diskette im SMON enthalten.
         </p>
 
         <h2>Hinweise zum Abtippen</h2>
 
-        <p>Mit dem neuen »MSE« dürften nun wirklich keine Fehler beim Abtippen mehr auftreten — nur noch ein letztes Mal, nämlich beim Abtippen von »MSE«. Starten Sie dann MSE und geben Sie als Start- und Endadresse die beiden Zahlen im Kopf des SMON-Listings an, also $CE09 als Start und $CFFA als Ende. Nach Beendigung der Tipperei speichern Sie den fertigen Programmteil auf Diskette oder Kassette ab. Nun müssen wir noch den neuen Teil in SMON »einbinden«. Dazu laden Sie Ihren alten »SMON $C000« und starten ihn. Noch ein Tip an dieser Stelle: Wenn Sie SMON mit »X« verlassen, um ins Basic zurückzuspringen, wird in aller Regel bereits Ihre erste Eingabe von Basic aus mit einem<br>
-            <strong>»OUT OF MEMORY ERROR«</strong><br>
+        <p>Mit dem neuen »MSE« dürften nun wirklich keine Fehler beim Abtippen mehr auftreten — nur noch ein letztes Mal, nämlich beim Abtippen von »MSE«. Starten Sie dann MSE und geben Sie als Start- und Endadresse die beiden Zahlen im Kopf des SMON-Listings an, also $CE09 als Start und $CFFA als Ende. Nach Beendigung der Tipperei speichern Sie den fertigen Programmteil auf Diskette oder Kassette ab. Nun müssen wir noch den neuen Teil in SMON »einbinden«. Dazu laden Sie Ihren alten »SMON $C000« und starten ihn. Noch ein Tip an dieser Stelle: Wenn Sie SMON mit »X« verlassen, um ins Basic zurückzuspringen, wird in aller Regel bereits Ihre erste Eingabe von Basic aus mit einem
+            <strong><code>»OUT OF MEMORY ERROR«</code></strong>
             quittiert.
         </p>
 
         <p>Beim Laden von SMON setzt das Betriebssystem nämlich die Zeiger für das Basic-Programmende auf das SMON-Ende, also irgendwo in den $C&hellip;-Bereich.</p>
 
-        <p>Damit ist aber jede weitere Eingabe von Basic-Zeilen unmöglich und führt zu dem oben angegebenen Fehler. Das ist nebenbei auch der Grund, wenn der SMON-Befehl »B« zum Erzeugen von DATA-Zeilen einmal nicht funktionieren will. Abhilfe schafft ein simples »NEW« unmittelbar nach dem Laden von SMON. SMON selbst bleibt dabei unbeeinträchtigt, denn er liegt ja nicht im Basic-Bereich. SMON ist also jetzt ordnungsgemäß geladen und kann mit »SYS 49152« wie gewohnt gestartet werden. Laden Sie nun den neuen Teil mit<br>
-            <strong>L "SMON TEIL 5"</strong><br>
-            ohne Eingabe einer weiteren Adresse. Damit steht er automatisch an der richtigen Stelle. Jetzt müssen wir SMON noch klarmachen, daß er über den neuen Befehl »Z« zum Aufruf unseres Disk-Monitors verfügt. Geben Sie dazu<br>
-            <strong>M C020</strong><br>
-            ein, brechen Sie mit STOP ab und ändern Sie die »00« nach »58« (Speicherstelle $C026) in »5A«. Das ist der ASCII-Wert für »Z«. Zum Einbinden der Startadresse des Disk-Monitors geben Sie<br>
-            <strong>M C060</strong><br>
-            ein, unterbrechen mitSTOP und ändern die ersten beiden Nullen (Speicherstelle $C061/$C062) in »08 CE«. Die Startadresse ist $CE09, SMON braucht aber bekanntlich die um 1 erniedrigte Adresse in der Form Lowbyte-Highbyte.
+        <p>Damit ist aber jede weitere Eingabe von Basic-Zeilen unmöglich und führt zu dem oben angegebenen Fehler. Das ist nebenbei auch der Grund, wenn der SMON-Befehl »B« zum Erzeugen von DATA-Zeilen einmal nicht funktionieren will. Abhilfe schafft ein simples »NEW« unmittelbar nach dem Laden von SMON. SMON selbst bleibt dabei unbeeinträchtigt, denn er liegt ja nicht im Basic-Bereich. SMON ist also jetzt ordnungsgemäß geladen und kann mit »SYS 49152« wie gewohnt gestartet werden. Laden Sie nun den neuen Teil mit
+            <strong><code>L "SMON TEIL 5"</code></strong>
+            ohne Eingabe einer weiteren Adresse. Damit steht er automatisch an der richtigen Stelle. Jetzt müssen wir SMON noch klarmachen, daß er über den neuen Befehl »Z« zum Aufruf unseres Disk-Monitors verfügt. Geben Sie dazu
+            <strong><code>M C020</code></strong>
+            ein, brechen Sie mit STOP ab und ändern Sie die »00« nach »58« (Speicherstelle $C026) in »5A«. Das ist der ASCII-Wert für »Z«. Zum Einbinden der Startadresse des Disk-Monitors geben Sie
+            <strong><code>M C060</code></strong>
+            ein, unterbrechen mit STOP und ändern die ersten beiden Nullen (Speicherstelle $C061/$C062) in »08 CE«. Die Startadresse ist $CE09, SMON braucht aber bekanntlich die um 1 erniedrigte Adresse in der Form Lowbyte-Highbyte.
         </p>
 
-        <p>Der Disk-Monitor ist damit integriert und der nunmehr komplette SMON kann mit<br>
-            <strong>S "SMON $C000" C000 CFFA</strong><br>
+        <p>Der Disk-Monitor ist damit integriert und der nunmehr komplette SMON kann mit
+            <strong><code>S "SMON $C000" C000 CFFA</code></strong>
             abgespeichert werden.
         </p>
 
@@ -149,20 +154,22 @@
 
         <p>Sicher haben Sie nach der Beschreibung im letzten Heft SMON-Versionen für andere Speicherbereiche hergestellt und auch zum Laufen gebracht. Durch den neuen Teil ergeben sich für die Verschiebung einige Veränderungen. Daher beschreiben wir noch einmal, wie sich ein »SMON $9000« herstellen läßt.</p>
 
-        <ol>
-            <li>Wir beginnen mit<br>W C000 CFFA 9000<br>da SMON jetzt ja etwas länger geworden ist.</li>
-            <li>Nun folgt die Umrechnung der absoluten Adressen:<br>V C000 CFFA 9000 920B 9FD2</li>
-            <li>Die Änderung der Einsprungadressen bleibt so wie beschrieben, nur ist jetzt eine Adresse (für »Z«) hinzugekommen.</li>
-            <li>Bei den Befehlen mit unmittelbarer Adressierung (zum Beispiel LDA #CC) hat sich gar nichts geändert.</li>
-            <li>Neu hinzugekommen ist aber eine Sprungtabelle für den Disk-Monitor. Ähnlich wie in Punkt 3 beschrieben, müssen Sie sechs Adressen ändern. Geben Sie dazu<br>M CFD8 CFE4<br>ein und überschreiben Sie in jedem 2. Byte das »C« mit »9«.</li>
-        </ol>
+        <strong>
+            <ol>
+                <li>Wir beginnen mit<code>W C000 CFFA 9000</code>da SMON jetzt ja etwas länger geworden ist.</li>
+                <li>Nun folgt die Umrechnung der absoluten Adressen:<code>V C000 CFFA 9000 920B 9FD2</code></li>
+                <li>Die Änderung der Einsprungadressen bleibt so wie beschrieben, nur ist jetzt eine Adresse (für »Z«) hinzugekommen.</li>
+                <li>Bei den Befehlen mit unmittelbarer Adressierung (zum Beispiel LDA #CC) hat sich gar nichts geändert.</li>
+                <li>Neu hinzugekommen ist aber eine Sprungtabelle für den Disk-Monitor. Ähnlich wie in Punkt 3 beschrieben, müssen Sie sechs Adressen ändern. Geben Sie dazu<code>M CFD8 CFE4</code>ein und überschreiben Sie in jedem 2. Byte das »C« mit »9«.</li>
+            </ol>
+        </strong>
 
 
         <p>Das war’s. Wir glauben, wir haben am Anfang dieser Serie nicht zu viel versprochen: Wenn Sie alle fünf Folgen durchgearbeitet haben, liegt Ihnen mit SMON jetzt ein Maschinenmonitor mit wirklich außergewöhnlichen Leistungsmerkmalen vor, der wohl jedem Vergleich standhält</p>
 
         <p>Viele Leser haben SMON zum Einstieg in die Maschinensprache genutzt, und das war auch unser Ziel. Natürlich werden Sie, vor allem wenn Sie noch Anfänger sind, nicht sofort alle Möglichkeiten von SMON ausnutzen können; eine Weile werden Sie mit Disassembler und Memory-Dump vollauf beschäftigt sein. Aber je tiefer Sie mit SMON in die Maschinensprache eindringen, desto mehr werden Sie seine Fähigkeiten zu schätzen wissen.</p>
 
-        <p>Wir werden in einer der nächsten Ausgaben der 64’er noch einmal auf Fragen aus dem Leserkreis, die sich bei der Arbeit mit SMON ergeben haben, eingehen. Vielleicht haben Sie auch noch Verbesserungsvorschläge oder Tricks im Umgang mit SMON entdeckt. Haben Sie aber bitte Verständnis, wenn wir nicht auf jede Zuschrift antworten können. Wirhaben inzwischen schon mehrere hundert (!) schriftliche oder telefonische Anfragen bekommen, und auch für uns ist die Computerei nur ein Hobby, nicht mehr und nicht weniger.</p>
+        <p>Wir werden in einer der nächsten Ausgaben der 64’er noch einmal auf Fragen aus dem Leserkreis, die sich bei der Arbeit mit SMON ergeben haben, eingehen. Vielleicht haben Sie auch noch Verbesserungsvorschläge oder Tricks im Umgang mit SMON entdeckt. Haben Sie aber bitte Verständnis, wenn wir nicht auf jede Zuschrift antworten können. Wir haben inzwischen schon mehrere hundert (!) schriftliche oder telefonische Anfragen bekommen, und auch für uns ist die Computerei nur ein Hobby, nicht mehr und nicht weniger.</p>
 
         <address class="author">(N. Mann/D. Weineck/gk)</address>
 
