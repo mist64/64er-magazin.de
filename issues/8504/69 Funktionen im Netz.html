@@ -21,21 +21,26 @@
         <h1>Funktionen im Netz</h1>
         <p class="intro">3-D-Funktionsdiagramme sehen nicht nur gut aus, sie liefern auch viele Informationen über mathematische Funktionen.</p>
 
-        <p>Mit diesem Programm können Sie Kurven als 3-D-Netzgrafiken zeichnen lassen, in Abhängigkeitvon zwei Variablen X und Y. Die Geschwindigkeit, mit der das Maschinenprogramm die notwendigen Bildpunkte berechnet und auf den Bildschirm bringt, läßt die »Kurvendiskussion« zu einem Vergnügen werden. Vor dieses haben die Götter aber bekanntlich die Arbeit gesetzt: Zuerst ist nämlich der umfangreiche Lader mit dem MSE abzutippen. Das Maschinenprogramm selbst ist etwa 2 KByte lang und belegt den Bereich von $C000-$C77F. Es verträgt sich deshalb nicht mit Erweiterungen wie DOS 5.1 und Simons Basic. Für den Aufbau der Grafik wird der gesamte RAM-Bereich von $COOO-$FFFF gebraucht Der gesamte Basic-Speicher mit 38 KByte bleibt also erhalten. Braucht man zusätzlich eigene Grafikroutinen, wie Hardcopy und Beschriftung, müssen diese in den Basic-Speicher gelegt und das Ende des Basic-RAMs herabgesetzt werden. Das Basic-Ende wird durch den Inhalt der Speicherzellen 55 (Low-Byte) und 56 (High-Byte der Endadresse) festgelegt.</p>
+        <p>Mit diesem Programm können Sie Kurven als 3-D-Netzgrafiken zeichnen lassen, in Abhängigkeit von zwei Variablen X und Y. Die Geschwindigkeit, mit der das Maschinenprogramm die notwendigen Bildpunkte berechnet und auf den Bildschirm bringt, läßt die »Kurvendiskussion« zu einem Vergnügen werden. Vor dieses haben die Götter aber bekanntlich die Arbeit gesetzt: Zuerst ist nämlich der umfangreiche Lader mit dem MSE abzutippen. Das Maschinenprogramm selbst ist etwa 2 KByte lang und belegt den Bereich von $C000-$C77F. Es verträgt sich deshalb nicht mit Erweiterungen wie DOS 5.1 und Simons Basic. Für den Aufbau der Grafik wird der gesamte RAM-Bereich von $COOO-$FFFF gebraucht Der gesamte Basic-Speicher mit 38 KByte bleibt also erhalten. Braucht man zusätzlich eigene Grafikroutinen, wie Hardcopy und Beschriftung, müssen diese in den Basic-Speicher gelegt und das Ende des Basic-RAMs herabgesetzt werden. Das Basic-Ende wird durch den Inhalt der Speicherzellen 55 (Low-Byte) und 56 (High-Byte der Endadresse) festgelegt.</p>
 
         <p>Die Funktionen des Zeichenprogrammes werden durch SYS-Befehle in Bild 1 gestartet.</p>
 
         <figure>
-            NEU=49152 EIN=49241<br>
-            AUS=49252 GSV=49271<br>
-            GLD=49333 ROT=50316<br>
-            XY=50672<br>
-            Adressen der Befehle<br>
-            SYS NEU, Farbe — löscht Hires-Grafik, setzt Farbe, initialisiert Tabellen. Farbe = 16xPunktfarbe + Hintergrundfarbe<br>
-            SYS EIN — schaltet Grafikmodus ein<br>
-            SYS AUS — schaltet Grafikmodus aus<br>
-            SYS GSV, »Name«, 8 oder 1 — speichert Grafik ab. Da die Grafik unter dem Betriebssystem liegt (ab $E000), wird sie erst nach $A000 kopiert und von dort aus abgespeichert.<br>
-            SYS GLD, »Name«, 8 oder 1 — lädt Grafik mit beliebiger Startadresse<br>
+            <ul class="plain">
+                <li>NEU=49152 EIN=49241</li>
+                <li>AUS=49252 GSV=49271</li>
+                <li>GLD=49333 ROT=50316</li>
+                <li>XY=50672</li>
+            </ul>
+            
+            Adressen der Befehle
+            <ul class="plain">
+                <li>SYS NEU, Farbe — löscht Hires-Grafik, setzt Farbe, initialisiert Tabellen. Farbe = 16xPunktfarbe + Hintergrundfarbe</li>
+                <li>SYS EIN — schaltet Grafikmodus ein</li>
+                <li>SYS AUS — schaltet Grafikmodus aus</li>
+                <li>SYS GSV, »Name«, 8 oder 1 — speichert Grafik ab. Da die Grafik unter dem Betriebssystem liegt (ab $E000), wird sie erst nach $A000 kopiert und von dort aus abgespeichert.</li>
+                <li>SYS GLD, »Name«, 8 oder 1 — lädt Grafik mit beliebiger Startadresse</li>
+            </ul>
             <figcaption>Bild 1. Einsprung-Adressen und deren Funktionen</figcaption>
         </figure>
 
@@ -43,19 +48,24 @@
 
         <h2>Einfachste Parameterübergabe</h2>
 
-        <p>Stellen Sie sich einen großen, leeren Raum vor. Auf dem Fußboden sei ein Raster von sagen wir 10x10 Linien gezeichnet. Auf jeden Kreuzungspunkt wird ein Stab mit einer bestimmten Länge gestellt. Die Stablänge entspricht dabei der Höhe eines Funktionswertes an dieser Stelle. Sind alle Stäbe aufgestellt, verbindet man die oberen Enden der Stäbe ebenso wie die unteren und erhält wieder ein Netz. Dieses Netz kann im Gegensatz zum unteren geschwungen sein und stellt die erwünschte dreidimensionale Funktionsgrafik dar. Das Problem der 3-D-Grafik besteht eigentlich aus zwei:<br>
-            1. Das Berechnen der Funktionswerte (Stablängen)<br>
-            2. Das Zeichnen des oberen Netzes, wobei Linien die »hinter einem Berg« liegen, nicht gezeichnet werden sollen.</p>
+        <p>Stellen Sie sich einen großen, leeren Raum vor. Auf dem Fußboden sei ein Raster von sagen wir 10x10 Linien gezeichnet. Auf jeden Kreuzungspunkt wird ein Stab mit einer bestimmten Länge gestellt. Die Stablänge entspricht dabei der Höhe eines Funktionswertes an dieser Stelle. Sind alle Stäbe aufgestellt, verbindet man die oberen Enden der Stäbe ebenso wie die unteren und erhält wieder ein Netz. Dieses Netz kann im Gegensatz zum unteren geschwungen sein und stellt die erwünschte dreidimensionale Funktionsgrafik dar. Das Problem der 3-D-Grafik besteht eigentlich aus zwei:</p>
+
+        <ol>
+            <li>Das Berechnen der Funktionswerte (Stablängen)</li>
+            <li>Das Zeichnen des oberen Netzes, wobei Linien die »hinter einem Berg« liegen, nicht gezeichnet werden sollen.</li>
+        </ol>
 
         <h3>Berechnung der Funktionswerte</h3>
 
         <p>Nach dem Aufruf mit ROT oder XY berechnet das Programm die benötigten Funktionswerte. Sie müssen dem Programm nur sagen, welche Funktion es berechnen soll. Dazu definieren Sie in einem Basic-Programm einfach die gewünschte Funktion mit DEF FNR(EGAL) und geben einige Parameter an. Das 3-D-Programm holt sich dann selbsttätig die Informationen aus den angelegten Variablen. Das Zeichenprogramm kann, wie bereits erwähnt, auf zwei Arten aufgerufen werden. Mit SYS XY werden X und Y variiert und der dazugehörige Z-Wert (Stablänge) berechnet. Der Vektor vom Ursprung zu einem Kreuzungspunkt auf dem ein Stab steht wird mit dem Satz von Phythagoras berechnet: r2 = x2 + y2. SYS ROT variiert nur X und kann deshalb nur für Funktionen mit einer Variable verwendet werden. In der obigen Gleichung ist Y=X, was bedeutet, daß das Programm in Y-Richtung die gleichen Werte wie in X-Richtung durchläuft um einen 3-D-Effekt zu bekommen. Dies führt zu einer rotationssymmetrischen Figur. Es reicht deshalb aus, nur ein achtel der Figur zu berechnen und dieses dreimal zu spiegeln. Andere Variablen als X werden als Konstanten betrachtet. Die ROT-Routine benötigt neben der Funktion noch die Parameter in Bild 2 und einige Angaben zur Lage der Grafik am Bildschirm. Wenn Sie die beiden Demo-Programme (SYS ROT und SYS XY) abtippen und dort Ihre Funktionen einsetzen, brauchen Sie sich um die folgenden Parameter nicht zu kümmern: Sie werden in diesen Programmen entsprechend Ihren Angaben berechnet.</p>
 
         <figure>
-            NN% = Anzahl der Netzlinien in X- und Y-Richtung<br>
-            KK% = NN%/2+0,5; halbe Linienanzahl. Mit 0,5 wird gerundet.<br>
-            DD = Faktor für Funktionswert<br>
-            PP = Faktor für Argument
+            <ul class="plain">
+                <li>NN% = Anzahl der Netzlinien in X- und Y-Richtung</li>
+                <li>KK% = NN%/2+0,5; halbe Linienanzahl. Mit 0,5 wird gerundet.</li>
+                <li>DD = Faktor für Funktionswert</li>
+                <li>PP = Faktor für Argument</li>
+            </ul>
             <figcaption>Bild 2. Parameter für SYS ROT</figcaption>
         </figure>
 
@@ -68,10 +78,12 @@
         <p>Bei SYS XY werden X und Y variiert. In der Funktionsdefinition DEF FNR(EGAL)=SIN(X)*A*COS(Y) werden X und Y verändert; A bleibt während aller Berechnungen konstant und hat den zuletzt zugewiesenen Wert. Die formale Variable EGAL kann nach Lust und Laune benannt werden.</p>
 
         <figure>
-            FF — Abstand zwischen zwei X-Linien<br>
-            LL — Abstand zwischen zwei Y-Linien<br>
-            X — Startwert von X (X<sub>min</sub>)<br>
-            YY — Startwert von Y (Y<sub>min</sub>)
+            <ul class="plain">
+                <li>FF — Abstand zwischen zwei X-Linien</li>
+                <li>LL — Abstand zwischen zwei Y-Linien</li>
+                <li>X — Startwert von X (X<sub>min</sub>)</li>
+                <li>YY — Startwert von Y (Y<sub>min</sub>)</li>
+            </ul>
             <figcaption>Bild 3. Parameter für SYS XY</figcaption>
         </figure>
 
@@ -85,7 +97,7 @@
 
         <h3>Parameter für SYS ROT und SYS XY</h3>
 
-        <p>Damit die Lage der Netzgrafik auf dem Bildschirm verändert werden kann, sind noch weitere Parameter nötig, die an das Maschinenprogramm übergeben werden müssen. Mit diesen Angaben kann der Aufsicht- und der Drehwinkel der Grafik festgelegt werden. Mit Änderung des Drehwinkels können Sie die Grafik in XY-Richtung um den Startpunkt P (Bild 4) drehen. Und zwar bis zu 45° im Uhrzeigersinn bis zu 90° im Gegenuhrzeigersinn. Der Aufsichtswinkel liegt im Bereich von 0-90 °. Bei 90 ° sehen Sie genau von oben auf das Netz.</p>
+        <p>Damit die Lage der Netzgrafik auf dem Bildschirm verändert werden kann, sind noch weitere Parameter nötig, die an das Maschinenprogramm übergeben werden müssen. Mit diesen Angaben kann der Aufsicht- und der Drehwinkel der Grafik festgelegt werden. Mit Änderung des Drehwinkels können Sie die Grafik in XY-Richtung um den Startpunkt P (Bild 4) drehen. Und zwar bis zu 45° im Uhrzeigersinn bis zu 90° im Gegenuhrzeigersinn. Der Aufsichtswinkel liegt im Bereich von 0-90°. Bei 90° sehen Sie genau von oben auf das Netz.</p>
 
         <figure>
             <img src="69-4.png" alt="">
@@ -103,10 +115,12 @@
         <p>Eine Zusammenfassung der Parameter zeigt Bild 6.</p>
 
         <figure>
-            XX% — X-Koordinate des Ursprungs<br>
-            YY% — Y-Koordinate des Ursprungs<br>
-            AA%, EE% Verschiebungsfaktoren in Y-Richtung<br>
-            BB%, CC% Verschiebungsfaktoren in X-Richtung
+            <ul class="plain">
+                <li>XX% — X-Koordinate des Ursprungs</li>
+                <li>YY% — Y-Koordinate des Ursprungs</li>
+                <li>AA%, EE% Verschiebungsfaktoren in Y-Richtung</li>
+                <li>BB%, CC% Verschiebungsfaktoren in X-Richtung</li>
+            </ul>
             <figcaption>Bild 6. Parameter für die Lage der Grafik am Bildschirm. Die Demo-Programme berechnen alle Faktoren aus Ihren Angaben für Aufsichts-, Drehwinkel, Linienzahl und Variablengrenzen.</figcaption>
         </figure>
 
