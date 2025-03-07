@@ -25,36 +25,40 @@
 
         <p>Da eine reine Diskettenversion zwar die einfachste, aber leider nicht die kompatibelste Lösung ist, haben wir die Form des Kernal-ROMs gewählt. Das heißt, das Betriebssystem des Computers wird durch Austausch des Kernal-Speicherbausteins verändert. Als neuer Programmträger dient ein 2764-EPROM, dessen Inhalt mit dem nachfolgend abgedruckten Programm erzeugt wird. Wie das vonstatten geht, ist mit wenigen Worten erklärt. Das Betriebssystem (auch Kernal genannt) des Commodore 64 befindet sich im Speicherbereich von 57344 ($E000) bis 65535 ($FFFF). Es hat damit genau die Länge von 8 KByte. Das gesamte Kernal (Assemblerlisting) abzudrucken würde natürlich den Rahmen des Heftes sprengen. Ein kompletter Abdruck ist auch gar nicht notwendig, denn es werden ja nur bestimmte Teile des Betriebssystems verändert.</p>
 
-        <p>Das abgedruckte Programm kopiert dazu zunächst in den Speicherbereich 24576 ($6000) bis 49151 ($7FFF). Wer einen anderen Speicherbereich verwenden möchte, muß die Leseschleife in Zeile 30 und den Offset (OF) in Zeile 15 verändern. Soll das Kernal beispielsweise im Speicherbereich ab $5000 stehen, lautet die Zeile 30:<br>
-            30 FOR I = 5*4096 T07*4096-1 POKE I, PEEK(I+OF): NEXTI</p>
+        <p>Das abgedruckte Programm kopiert dazu zunächst in den Speicherbereich 24576 ($6000) bis 49151 ($7FFF). Wer einen anderen Speicherbereich verwenden möchte, muß die Leseschleife in Zeile 30 und den Offset (OF) in Zeile 15 verändern. Soll das Kernal beispielsweise im Speicherbereich ab $5000 stehen, lautet die Zeile 30:
+            <code>30 FOR I = 5*4096 TO7*4096-1 POKE I, PEEK(I+OF): NEXTI</code>
+        </p>
 
         <p>Der Offset beträgt in diesem Fall 36864. Nach dem Kopieren befindet sich im Speicher ein genaues Abbild des Kernal-ROMs. Der nächste Schritt, der automatisch vom Programm ausgeführt wird, ist das Verändern der einzelnen Speicherstellen. Der gesamte Vorgang läuft automatisch ab, bis unser neues Kernal im Speicher steht. Am besten ist es, den Speicherbereich von $6000 bis $8000 nun mit einem Monitor abzuspeichern. Wer im Besitz eines EPROM-Programmiergerätes ist, sollte nicht lange warten und das neue Kernal auf ein 2764-EPROM brennen.</p>
 
         <p>Bis hierhin war eigentlich alles relativ einfach, jetzt aber kommt die schwierigste Hürde auf dem Weg zum neuen Betriebssystem. Ein Adaptersockel muß eingebaut werden, denn leider sind die Pin-Belegungen des Original-ICs und die des 2764 nicht identisch. Solche Sockel kann man entweder kaufen (beispielsweise Roßmöller MR 2764) oder aber selbst bauen. Bild 1 zeigt, welche Pins des 24poligen Sockels mit denen des 28poligen verbunden werden. Das Ganze sieht nach der Fertigstellung wie ein kleiner Doppeldeckerbus mit überhängendem Dach aus. Im oberen Stockwerk dieses »Busses« nimmt nun der 2764 mit unserem neuen Betriebssystem Platz. Die 24 Pins des unteren Fahrwerks finden im (hoffentlich gesockelten) U4-Steckplatz des Computers ihre Heimat. Das überhängende Dach zeigt, zusammen mit der EPROM-Kerbe, in Richtung des User-Ports.</p>
 
         <figure>
-            <p>F1 = LOAD”$”,8 ohne Programmverlust</p>
-            <p>F2 = LOAD</p>
-            <p>F3 = LIST</p>
-            <p>F4 = SAVE</p>
-            <p>F5 = RUN</p>
-            <p>F6 = SYS64738</p>
-            <p>F7 = OPEN1,8,15,</p>
-            <p>F8 = CLOSE1</p>
-            <p>SHIFT &amp; RUN/STOP lädt und startet das erste Programm von der Diskette</p>
+            <ul class="plain">
+                <li>F1 = LOAD”$”,8 ohne Programmverlust</li>
+                <li>F2 = LOAD</li>
+                <li>F3 = LIST</li>
+                <li>F4 = SAVE</li>
+                <li>F5 = RUN</li>
+                <li>F6 = SYS64738</li>
+                <li>F7 = OPEN1,8,15,</li>
+                <li>F8 = CLOSE1</li>
+                <li>SHIFT &amp; RUN/STOP lädt und startet das erste Programm von der Diskette</li>
+            </ul>            
             <figcaption>Bild 1. Die Belegung der Funktionstasten</figcaption>
         </figure>
 
         <p>Sollte sich (was sehr erfreulich wäre) der Computer mit geändertem Farbbild, aber sonst gewohnter Anzeige melden, haben Sie es geschafft. Ihnen steht nun eine recht leistungsfähige Variante des Hypra-Load zur Verfügung. Drucker, Plotter und weitere Laufwerke können jetzt beim Laden eingeschaltet bleiben. Die Funktionstasten sind belegt (Bild 2) und eine etwa sechsfache Ladegeschwindigkeit wird erreicht. Der Directory zerstört ein im Speicher befindliches Programm nicht mehr. Um die Kompatibilität zu fertigen Softwareprodukten so hoch wie möglich zu machen, wurde eine Umschaltautomatik mitprogrammiert. Sie schaltet auf langsame Ladegeschwindigkeit um, wenn ein schnelles Laden nicht möglich ist. Sollte dennoch einmal ein Programm nicht funktionieren, ist noch lange nicht aller Tage Abend. Die Speicherzelle 2, die zum Steuerregister umprogrammiert worden ist, schaltet die einzelnen Funktionen des Hypra-ROMs aus und an. Je nachdem, welcher Wert hier hineingeschrieben wird, schaltet sich eine Funktion nach der anderen aus. Im einzelnen bewirken:</p>
 
-        <p>POKE 2,32 = Funktionstasten abschalten<br>
-            POKE 2,64 = Directory wird normal geladen (mit Programmverlust)<br>
-            POKE 2,128 = Abschalten des Fast-Load-Modus<br>
-            POKE 2,0 = Zurücksetzen in den Einschaltzustand<br>
-            TODO</p>
+        <table class="plain strong">
+            <tr><td>POKE 2,32</td><td>Funktionstasten abschalten</td></tr>
+            <tr><td>POKE 2,64</td><td>Directory wird normal geladen (mit Programmverlust)</td></tr>
+            <tr><td>POKE 2,128</td><td>Abschalten des Fast-Load-Modus</td></tr>
+            <tr><td>POKE 2,0</td><td>Zurücksetzen in den Einschaltzustand</td></tr>
+        </table>
 
         <p>Natürlich sind auch Kombinationen möglich, beispielsweise:<br>
-            <strong>POKE 2,32 + 64.</strong>
+            <strong><code>POKE 2,32 + 64.</code></strong>
         </p>
 
         <p>Alles in allem müßte das neue Hypra-ROM mit beinahe 99 Prozent aller erhältlichen Programme funktionieren. Was nicht geht, ist der Betrieb eines Datenrecorders; es sei denn, das neue Kernal wird auf einer Umschaltplatine in den Computer gesteckt. Solche Platinen werden von verschiedenen Herstellern angeboten und bieten Platz für zwei oder mehr Betriebssysteme, die über einen Drehschalter anwählbar sind. Prinzipiell genügt es aber, bei Bedarf auf das Original-Kernal zurückzugreifen. Übrigens: Wer sich sein Kernal in einer individuellen Farbkombination brennen möchte, braucht lediglich die Farbwerte in Zeile 50 bis 70 zu ändern. Und nun viel Freude mit »Hypra-Perfekt«.</p>
@@ -62,11 +66,11 @@
         <address class="author">(Arnd Wängler/Ernst Schöberl/gk)</address>
 
         <figure>
-            <table>
+            <table class="plain">
                 <tbody>
-                    <tr>
-                        <td><b>28poliger Sockel</b></td>
-                        <td><b>24poliger Sockel</b></td>
+                    <tr class="strong">
+                        <td>28poliger Sockel</td>
+                        <td>24poliger Sockel</td>
                     </tr>
                     <tr>
                         <td>1,28,27,26</td>
@@ -174,7 +178,7 @@
                     </tr>
                 </tbody>
             </table>
-            <p>Pin 1 eines jeden Sockels ist links von der Kerbe, Pin 24 beziehungsweise 28 ist rechts davon.</p>
+            Pin 1 eines jeden Sockels ist links von der Kerbe, Pin 24 beziehungsweise 28 ist rechts davon.
             <figcaption>Bild 2. Das Verbindungsschema für den Adaptersockel</figcaption>
         </figure>
 
