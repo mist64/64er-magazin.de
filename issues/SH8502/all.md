@@ -2017,351 +2017,448 @@ TODO Listing 22
 
 ### Action in Räumen
 
-TODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODOTODO
+Die raumspezifische Action bereite meisten den größten Programmieraufwand, und bringt somit auch das größte Chaos in die anfangs gut strukturierten Listings. Uns soll dies nicht passieren.
 
-
-Die raumspezifische Action bereite meisten den größten Programmieraufwand,und bringt somit auch das größte Chaos in die anfangs gut strukturierten Listings. Uns soll dies nicht passieren.
 Wo bringt man die raumspezifische Action denn am besten im Listing beziehungsweise im Programm unter?
+
 Die einfachste Lösung wäre es, die raumspezifische Action einfach an das Actionmodul anzuhängen. Man würde sich so für jeden Raum zirka 100 Zeilen reservieren (zum Beispiel 2500 bis 2599 für Raum 1) und vor jedem Raum eine IF – THEN - Abfrage stellen, die feststellt, ob der Raum übersprungen oder behandelt werden soll. Dieses Verfahren hat jedoch einen großen Verzögerungseffekt auf die Bearbeitungsgeschwindigkeit des Adventures zur Folge.
  
-Um diesem und allen anderen Problemen auszuweichen, schreiben wir unsere raumspezifische Action direkt auf die Spielkarte. Dies geht ganz einfach:	Betrachten wir zunächst einmal erneut den Aufbau der Spielkarte und nehmen als Beispiel Raum 1.
-Raum 1 liegt in den Zeilen 10100 bis maximal 10199. Am Kopf des Raumes steht eine DATA-Zeile, die die möglichen Richtungen und ihre Zielorte zu diesem Raum enthält.
-Die DATA-Zeile wird mittels RESTORE 10000 + ZN*100 und einer READ-Schleife gelesen.
+Um diesem und allen anderen Problemen auszuweichen, schreiben wir unsere raumspezifische Action direkt auf die Spielkarte. Dies geht ganz einfach:
+Betrachten wir zunächst einmal erneut den Aufbau der Spielkarte und nehmen als Beispiel Raum 1.
+
+Raum 1 liegt in den Zeilen 10100 bis maximal 10199.
+
+Am Kopf des Raumes steht eine DATA-Zeile, die die möglichen Richtungen und ihre Zielorte zu diesem Raum enthält.
+
+Die DATA-Zeile wird mittels
+
+RESTORE 10000 + ZN*100
+
+und einer READ-Schleife gelesen.
+
 Danach wird die Raumbeschreibung mittels GOSUB 10000 + ZN*100 ausgegeben.
+
 Die Raumbeschreibung steht dabei in PRINT-Zeilen von 10105 bis maximal 10119.
+
 Was liegt nun näher, als die raumspezifische Action einfach in die Zeile von 10120 bis maximal 10199 zu legen?
+
 Das allgemeine Ablaufschema für einen einzelnen Raum der Spielkarte samt Action sieht nun so aus:
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+TODO
 
 Aus diesem Schema geht hervor, daß die raumspezifische Action zum Raum ZN (ZN = Zimmernummer der Karte) mittels
 GOSUB 10000 + ZN*100 + 20
 aufgerufen wird.
-Um die Action des Raumes 1 aufzurufen, müßte man also 
+
+Um die Action des Raumes 1 aufzurufen, müßte man also
 GOSUB 10000 + 1*100 + 20,
-was identisch mit GOSUB 10120 ist, eingeben.
+was identisch mit
+GOSUB 10120 ist, eingeben.
+
 Die raumspezifische Action wird immer am Ende des Actionmoduls aufgerufen. Ergänzen Sie Ihr Programm nun bitte um Listing 23.
 
-
-
-
-
-
-
-
-
+TODO Listing 23
 
 Damit ist eine übersichtliche Methode gegeben, unser Adventure mit jeder nur denkbaren Art von Action zu versehen. Der Vorteil der vorgestellten Methode liegt hauptsächlich darin, daß Fehler leicht beseitigt werden können, sofern sie im Spielverlauf auftreten.
  
 Angenommen, wir sind in Raum 1 und irgendetwas funktioniert nicht, so muß man nur Zeile 10100 bis 10199 auflisten und kann sofort gezielt nach dem Fehler suchen.
+
 Auf den folgenden Seiten finden Sie nun noch einige Beispiele zum Einbau und zur Programmierung von raumspezifischer Action.
-Programmierung einer Tür
-Unser Ziel soll nun sein, eine Tür zwischen den Räumen 2 und 5 zu programmieren. Bisher kann man einfach von Raum 2 mittels der Eingabe »S« zu Raum 5 gelangen. Die Tür wird jedoch bereits in der Raumbeschreibung erwähnt, da sie in der Objekttabelle vertreten ist. Zu bemerken ist hier, daß jede Tür immer zweimal in der Objekttabelle vertreten sein muß — denn man kann eine Tür immer von zwei Räumen aus sehen—den Räumen, die durch die Tür getrennt werden. Vergleichen Sie bitte auch in Ihrem Listing die Zeilen 52416 und 52418. Der erste Schritt zur Programmierung der Tür besteht darin, den Verbindungsweg zwischen den beiden Räumen, zwischen die die Tür später soll, zunächst zu entfernen.
+
+#### Programmierung einer Tür
+
+Unser Ziel soll nun sein, eine Tür zwischen den Räumen 2 und 5 zu programmieren.
+
+Bisher kann man einfach von Raum 2 mittels der Eingabe »S« zu Raum 5 gelangen. Die Tür wird jedoch bereits in der Raumbeschreibung erwähnt, da sie in der Objekttabelle vertreten ist.
+
+Zu bemerken ist hier, daß jede Tür immer zweimal in der Objekttabelle vertreten sein muß – denn man kann eine Tür immer von zwei Räumen aus sehen – den Räumen, die durch die Tür getrennt werden.
+
+Vergleichen Sie bitte auch in Ihrem Listing die Zeilen 52416 und 52418. Der erste Schritt zur Programmierung der Tür besteht darin, den Verbindungsweg zwischen den beiden Räumen, zwischen die die Tür später soll, zunächst zu entfernen.
+
 Für die Tür in unserem Beispiel (Raum 2 und 5) müssen wir die Richtungs-DATA-Zeilen der beiden Räume folgendermaßen ändern:
+
 10202 DATA 0,0,1,0,0,0,0,6,0,0
 10502 DATA 0,0,0,0,0,0,0,0,0,0
-Damit ist die Verbindung zwischen Raum 2 und Raum 5 auch schon unterbrochen. Nun brauchen wir noch eine Variable, die den Zustand der Tür bestimmt. Wir unterscheiden zwischen drei Zuständen:
-1.	Die Tür ist offen. Der Variablenwert zur Tür sei dann 0.
-2.	Die Tür ist zu und kann mittels »OEFFNE TUER« geöffnet werden. Der Variablenwert sei hierbei 1.
-3.	Die Tür ist zu und kann nur mit einem Hilfsmittel (zum Beispiel Schlüssel) geöffnet werden. Hierbei sei die Variable 2.
-Unsere Türvariable soll TU(1) sein. Das Feld TU(1) bis TU(X) ist für die Zustände aller Dinge verantwortlich, die man öffnen und schließen kann. Unsere Tür soll zunächst ohne Schlüssel geöffnet werden können. Die Türvariable TU(1) hat folglich den Wert 1. Bitte ergänzen Sie das Listing nun um folgende Zeilen:
+
+Damit ist die Verbindung zwischen Raum 2 und Raum 5 auch schon unterbrochen. Nun brauchen wir noch eine Variable, die den Zustand der Tür bestimmt.
+
+Wir unterscheiden zwischen drei Zuständen:
+
+1. Die Tür ist offen. Der Variablenwert zur Tür sei dann 0.
+2. Die Tür ist zu und kann mittels »OEFFNE TUER« geöffnet werden. Der Variablenwert sei hierbei 1.
+3. Die Tür ist zu und kann nur mit einem Hilfsmittel (zum Beispiel Schlüssel) geöffnet werden. Hierbei sei die Variable 2.
+
+Unsere Türvariable soll TU(1) sein. Das Feld TU(1) bis TU(X) ist für die Zustände aller Dinge verantwortlich, die man öffnen und schließen kann.
+
+Unsere Tür soll zunächst ohne Schlüssel geöffnet werden können. Die Türvariable TU(1) hat folglich den Wert 1.
+
+Bitte ergänzen Sie das Listing nun um folgende Zeilen:
+
 52900 REM ALLGEMEINE VARIABLEN
 52910 TU(1) = 1 : REM TUER 2/5
+
 Jetzt müssen wir die raumspezifische Action in den Räumen 2 und 5 zum Öffnen und Schließen der Tür programmieren. Dies geht so:
+
 10220 IF TU(1)=0 THEN RI(2)=5
 10225 IF VE=11 AND OB=5 AND TU(1)=1 THEN PRINT "OK.":TU(1)=0:RI(2)=5
 10230 IF VE=12 AND OB=5 AND TU(1)=0 THEN PRINT "OK. "TU(1)=1:RI(2)=0
 10250 RETURN
+
 Damit unser Programm jedoch einwandfrei läuft, müssen wir im Actionmodul selbst erst noch eine kleine Änderung vornehmen: Bitte fügen Sie Zeile 1130 REM und 1155 GOSUB 10000+ZN*100 in das Programm ein. Eine Erklärung für diese Änderung folgt gleich. Nun die Erklärung zur Türprogrammierung in Raum 2:
-10220	In dieser Zeile wird der Zustand der Tür überprüft. Wird dabei festgestellt, daß die Tür offen ist, so gilt RI(2).= 5. Wie bereits festgelegt, ist RI(2) für die Richtung SUEDEN zuständig. Dadurch, daß die Tür offen ist, muß RI(2) also auf den Wert 5 gesetzt werden, was nichts anderes heißt, als daß man durch die Tür zu Raum 5 gelangt. Der ganze Trick der Türprogrammierung besteht darin, daß man zunächst den Verbindungsweg zwischen den Räumen entfernt, und im Falle einer offenen Tür einfach wieder herstellt, Diese Wiederherstellung erfolgt in dieser Zeile.
+
+TODO Tabelle
+
+10220
+
+In dieser Zeile wird der Zustand der Tür überprüft. Wird dabei festgestellt, daß die Tür offen ist, so gilt RI(2).= 5. Wie bereits festgelegt, ist RI(2) für die Richtung SUEDEN zuständig. Dadurch, daß die Tür offen ist, muß RI(2) also auf den Wert 5 gesetzt werden, was nichts anderes heißt, als daß man durch die Tür zu Raum 5 gelangt. Der ganze Trick der Türprogrammierung besteht darin, daß man zunächst den Verbindungsweg zwischen den Räumen entfernt, und im Falle einer offenen Tür einfach wieder herstellt, Diese Wiederherstellung erfolgt in dieser Zeile.
+
 Hierduch läßt sich auch begründen, warum wir das Actionmodul ein wenig verändern mußten: Wenn der Spieler einen neuen Raum betritt, geschieht folgendes:
+
 1.	Der DATA-Zeiger wird mittels RESTORE 10000+ZN*100 auf die DATA-Zeile des neuen Raumes gesetzt.
 2.	Nun werden die Richtungsmöglichkeiten RI(1) bis RI(10) mittels READ-Befehl eingelesen.
 3.	Sodann wird mittels GOSUB 10000 +100*ZN die Raumbeschreibung aufgerufen, bei der gegebenenfalb (Tür ist offen) auch der Verbindungsweg wieder hergestellt wird.
+
 Die Änderung des Actionmoduls bestand also lediglich in der Vertauschung der Arbeitsschritte 2 und 3 auf die jetzige Reihenfolge. Nur bei der jetzigen Ordnung funktioniert das Programm einwandfrei.
  
-10225	Hier wird geprüft, ob die Befehlseingabe des Spielers »OEFFNE TUER« lautet. Man schaut dazu einfach nach, ob VE=11 und OB=5 ist. Außerdem wird geprüft, ob die Tür zu ist, denn eine offene Tür kann man logischerweise nicht öffnen,
+10225
+
+Hier wird geprüft, ob die Befehlseingabe des Spielers »OEFFNE TUER« lautet. Man schaut dazu einfach nach, ob VE=11 und OB=5 ist. Außerdem wird geprüft, ob die Tür zu ist, denn eine offene Tür kann man logischerweise nicht öffnen.
+
 Stimmt alles, so wird TU(1) nun auf den Wert 1 (Tür ist offen) gesetzt, und der Verbindungsweg zu Raum 5 hergestellt: RI(2)=5.
-10230	Analog zu 10225, nur das die Tür hier geschlossen wird.
+
+10230
+
+Analog zu 10225, nur das die Tür hier geschlossen wird.
+
 Achtung: Sicher haben Sie sich bereits gewundert, wie die Abfrage, ob im Befehlssatz des Spielers die TUER vorkommt, erfolgt. Die Abfrage hierfür lautete einfach IF OB= 5 THEN... Warum muß OB gleich 5 und nicht gleich 4 sein?
+
 Lassen Sie uns einmal einen Blick auf die Objekttabelle werfen:
+
+TODO Tabelle
 
 OB$(1)="TRUHE"	OO(1)=5
 OB$(2)="SCHACHT"	OO(2)=6
 OB$(3)="EISENRING"	OO(3)=6
 OB$(4)="TUER"	OO(4)=2
 OB$(5)="TUER"	OO(5)=5
+
 Wie Sie bereits wissen, stammt der OB-Wert aus dem Befehlsanalysemodul. Sie erinnern sich sicher auch noch daran, wie das Modul den OB-Wert erhält:
+
 Es durchläuft mit einer Schleife einfach die Objekttabelle:
+
 FOR 1=1 TO OZ : IF BE$(WZ) = OB$(1) THEN OB=I
+
 Somit wird klar, warum der erhaltene OB-Wert 5 und nicht 4 ist. Wir müssen also darauf achten, daß für Objekte, die den gleichen Namen haben, immer der OB-Wert des Objekts ausgegeben wird, welches in der Tabelle zuletzt gefunden wird beziehungsweise, das in der Tabelle den höchsten Wert hat.
+
 Nun müssen wir natürlich noch den Raum 5 mit der spezifischen Action versehen, die auch in Raum 2 enthalten ist (was das Öffnen und Schließen der Tür anbelangt).
+
 Bitte ergänzen Sie mit Listing 24.
 
-
-
-
-
-
-
-
-
-
+TODO Listing 24
 
 Die Programmierung der Tür könnte nun eigentlich als abgeschlossen betrachtet werden. Allerdings ist es erstrebenswert, dem Spieler die Möglichkeit zu geben, mittels »GEH TUER« durch die Tür zu gelangen.
+
 Bisher muß man nach dem Öffnen der Tür noch den Befehl »SCHAU« eingeben, um zu erfahren, welche weitere Richtung sich durch das Öffnen der Tür ergeben hat. Dazu müssen wir die Verbtabelle wieder um das Verb »GEH« erweitern:
+
 52030 .DATA GEHE,BETRETE1
 und in Zeile 52100 den VZ-Wert auf 24 erhöhen. Nun kann die raumspezifische Action in den Räumen 2 und 5 erweitert werden:
+
 10240 IF VE=23 AND OB=5 THEN VE=2
 10540 IF VE=23 AND OB=5 THEN VE=1
+
 Nebenbei muß auch das Actionmodul noch so ergänzt werden, damit diese Routinen angenommen werden:
+
 1110 IF RI(VE)=0 THEN PRINT" KEIN WEG IN DIESE RICHTUNG ! ": VE=0:GOTO 1200
 1130 VE=0
 2520 IF VE>0 AND VE<11 THEN 1100
  
 Wenn Sie wissen möchten, warum diese Änderungen unbedingt notwendig sind, dann spielen Sie das Adventure einmal vor und einmal nach der Änderung des Actionmoduls durch (die Tür-Szene). Bisher kann die Tür noch problemlos geöffnet werden. Nun wollen wir das Öffnen und Schließen der Tür von einem Schlüssel abhängig machen — die Tür kann nur dann noch geöffnet werden, wenn der Spieler im Besitz des Schlüssels ist.
+
 Viele englische Adventures verlangen als Befehlssyntax zum Öffnen einer verschlossenen Tür mit einem Schlüssel etwa folgendes:
+
 ENTRIEGLE TUER
-QEFFNE TUER
+OEFFNE TUER
 GEH TUER
+
 Im Deutschen ist es allerdings nicht besonders üblich »entriegle Tür« zu sagen. Wir wollen deshalb den ersten Schritt weglassen,-und folgenden Ablauf vereinbaren:
-—	Wenn der Spieler die Tür mit »OEFFNE TUER« öffnen will, jedoch keinen passenden Schlüssel bei sich hat, so erhält er die Meldung »ICH HABE KEINEN PASSENDEN SCHLUESSEL«.
-—	Hat er einen Schlüssel bei sich und gibt als Befehl wieder »OEFFNE TUER« ein, so erhält er die Meldung »OK.«.
-Es ist pure Haarspalterei, vom Spieler Eingaben wie zum Beispiel »OEFFNE DIE TUER MIT DEM SCHLUESSEL« beziehungsweise »ENTRIEGLE DIE TUER MIT DEM SCHLUESSEL« und dann »OEFFNE TUER« zu verlangen.
-Wichtig ist nur die Tatsache, daß der Spieler einen Schlüssel gefunden haben muß, um durch die Tür zu gelangen. Die Routine für die Schlüsselabfrage ist ganz einfach zu programmieren: Wir müssen vor der Tür-öffnen-Routine einfach eine Abfrage einbauen, die feststellt, ob GE(3) den Wert -1 hat, also, ob der Schlüssel im Besitz des Spielers ist. Dazu sind nur zwei neue Ergänzungszeilen aus Listing 25 notwendig.
 
+* Wenn der Spieler die Tür mit »OEFFNE TUER« öffnen will, jedoch keinen passenden Schlüssel bei sich hat, so erhält er die Meldung »ICH HABE KEINEN PASSENDEN SCHLUESSEL«.
+* Hat er einen Schlüssel bei sich und gibt als Befehl wieder »OEFFNE TUER« ein, so erhält er die Meldung »OK.«.
 
+Es ist pure Haarspalterei, vom Spieler Eingaben wie zum Beispiel »OEFFNE DIE TUER MIT DEM SCHLUESSEL« beziehungsweise »ENTRIEGLE DIE TUER MIT DEM SCHLUESSEL« und dann »OEFFNE TUER« zu verlangen. Wichtig ist nur die Tatsache, daß der Spieler einen Schlüssel gefunden haben muß, um durch die Tür zu gelangen.
 
+Die Routine für die Schlüsselabfrage ist ganz einfach zu programmieren: Wir müssen vor der Tür-öffnen-Routine einfach eine Abfrage einbauen, die feststellt, ob GE(3) den Wert -1 hat, also, ob der Schlüssel im Besitz des Spielers ist.
 
+Dazu sind nur zwei neue Ergänzungszeilen aus Listing 25 notwendig.
 
+TODO Listing 25
 
+Wenn Sie Ihr Programm ergänzt haben, dann machen Sie gleich einmal ein Probespiel und probieren das Öffnen der Tür mit dem Schlüssel aus.
 
+Spielen Sie auch einmal die folgende Variante durch:
 
-
-
-Wenn Sie Ihr Programm ergänzt haben, dann machen Sie gleich einmal ein Probespiel und probieren das Öffnen der Tür mit dem Schlüssel aus. Spielen Sie auch einmal die folgende Variante durch:
 1.	Schlüssel holen
 2.	Tür in Raum 2 öffnen.
 3.	Schlüssel verlieren.
 4.	In Raum 5 gehen.
 5.	Tür schließen.
+
 Sie sind nun in Raum 5 und können diesen nicht mehr verlassen, da das Türschloß zugeschnappt ist, und der Schlüssel sich in Raum 2 befindet, Man kann den Spieler also in eine Falle laufen lassen.
+
 Interessant hierbei ist, daß kaum ein Spieler eine Tür wiederschließt, nachdem er sie erst einmal geöffnet hat. Die Programmierung dieses Effekts (die in der bisherigen Tür-Logik bereits enthalten ist) ist allein dadurch interessant, daß der Spieler überrascht wird.
-Die Truhe
+
+#### Die Truhe
+
 Wenn Sie sich in Raum 5 begeben, werden Sie feststellen, daß sich dort eine Truhe befindet.
-Transportieren kann man die Truhe nicht, da wir bereits festgelegt haben, daß Objekte vom Spieler nicht transportiert werden können (eventuell, weil sie dazu zu schwer sind). Lassen Sie uns zunächst noch eine Fehlermeldung in unser Adventure einbauen — wenn der Spieler versucht ein Objekt zu nehmen (Tür, etc.), so erhält er die Antwort »DAS GEHT UEBER MEINE KRAEFTE «.
+
+Transportieren kann man die Truhe nicht, da wir bereits festgelegt haben, daß Objekte vom Spieler nicht transportiert werden können (eventuell, weil sie dazu zu schwer sind).
+
+Lassen Sie uns zunächst noch eine Fehlermeldung in unser Adventure einbauen — wenn der Spieler versucht ein Objekt zu nehmen (Tür, etc.), so erhält er die Antwort »DAS GEHT UEBER MEINE KRAEFTE!«.
+
 Diese Fehlermeldung läßt sich ganz einfach in die NIMM-Routine einbauen:
+
 2115 IF OB<>O THEN PRINT " DAS GEHT UEBER MEINE KRAEFTE ! ":GOT0 2200
+
 Nun zur Truhe speziell:
-In der Truhe können selbstverständlich Gegenstände liegen. Für die Gegenstände haben wir bisher folgendes definiert: Wenn GE(X) größer als Null ist, so liegt der Gegenstand in diesem Raum. Wenn GE(X) den Wert -1 hat, so ist dieser Gegenstand im Besitz des Spielers. Nun ergänzen wir mit folgender Bedingung:
-Wenn GE(X) den Wert -2 hat, so liegt der Gegenstand in der Truhe. Wir wollen unsere Gegenstandstabelle nun so umändern, daß das Schwert nicht mehr wie bisher in Raum 1 liegt, sondern sich zukünftig in der Truhe befindet, also:
+
+In der Truhe können selbstverständlich Gegenstände liegen. Für die Gegenstände haben wir bisher folgendes definiert: Wenn GE(X) größer als Null ist, so liegt der Gegenstand in diesem Raum.
+
+Wenn GE(X) den Wert -1 hat, so ist dieser Gegenstand im Besitz des Spielers.
+
+Nun ergänzen wir mit folgender Bedingung:
+
+Wenn GE(X) den Wert -2 hat, so liegt der Gegenstand in der Truhe.
+
+Wir wollen unsere Gegenstandstabelle nun so umändern, daß das Schwert nicht mehr wie bisher in Raum 1 liegt, sondern sich zukünftig in der Truhe befindet, also:
  
 52210 DATA SCHWERT,-2
+
 Nun liegt das Schwert in der Truhe.
 Wie kommen wir im Verlauf des Spiels jedoch wieder zum Schwert?
-Nun ganz einfach, wir müssen die Truhe öffnen. Dazu ist es erforderlich, in die raurnspezifische Action von Raum 5 eine Routine einzubauen, die das OEFFNEN der TRUHE erlaubt. Im Prinzip können wir die Truhe wie eine Tür betrachten, denn auch bei der Truhe sind drei Zustandsformen möglich (offen, zu, verriegelt). Wir benötigen also wieder eine Variable, die Auskunft über den jeweiligen Zustand der Truhe gibt. Diese Variable sei TU(2) und der Ausgangszustand der Truhe sei 1 (also Truhe ist zu und kann mittels OEFFNEN ohne irgendeinem Hilfsmittel a la Schlüssel geöffnet werden).
+
+Nun ganz einfach, wir müssen die Truhe öffnen. Dazu ist es erforderlich, in die raurnspezifische Action von Raum 5 eine Routine einzubauen, die das OEFFNEN der TRUHE erlaubt. Im Prinzip können wir die Truhe wie eine Tür betrachten, denn auch bei der Truhe sind drei Zustandsformen möglich (offen, zu, verriegelt).
+
+Wir benötigen also wieder eine Variable, die Auskunft über den jeweiligen Zustand der Truhe gibt. Diese Variable sei TU(2) und der Ausgangszustand der Truhe sei 1 (also Truhe ist zu und kann mittels OEFFNEN ohne irgendeinem Hilfsmittel a la Schlüssel geöffnet werden).
+
 Wir ergänzen:
+
 52920 TU(2)=1:REM TRUHE
+
 Nun müssen wir die OEFFNE-Routine für Raum 5 programmieren. Dies geht ganz einfach:
+
 10545 IF VE=11 AND OB=1 AND TU(2)=1 THEN PRINT "OK. ":TU(2)=0
+
 Was man öffnen kann, kann man auch schließen, also:
+
 10546 IF VE=12 AND OB=1 AND TU(2)=0 THEN PRINT "OK. ":TU(2)=1
+
 Sie sehen schon, daß die meisten Routinen relativ einfach programmiert werden können, da wir zu Beginn viel Arbeit und Gedanken in die Programmierung des Befehlsanalysemoduls gesteckt haben. Diese Arbeit macht sich nun bezahlt, denn wir können nun jegliche Routine programmieren, und müssen dabei nur den Wortschatz entsprechend erweitern, in der Routine selbst nur VERBZAHL, OBJEKTZAHL etc. abfragen, und danach TUER-Variablen etc. entsprechend verändern.
+
 So schön, so gut!
+
 Wir können die Truhe nun öffnen und schließen, aber vom Schwert ist noch keine Spur zu sehen. Dazu müssen wir die Raumbeschreibungs-Routine erweitern. Die Gegenstände, die sich in der Truhe befinden, sollen künftig auch in der Raumbeschreibung erwähnt werden, unter der Bedingung einer geöffneten Truhe. Dazu genügt wieder eine einzige Abfrage:
-1189 IF GE(I)=-2 AND TU(2)=0 AND ZN=5 THEN PRINT GE$(I);",";:lC=1
-Diese Abfrage steht innerhalb der Schleife, in der auch geprüft wird, ob sich im betreffenden Raum ein Gegenstand befindet. In der Truhenabfrage muß also berücksichtigt werden, daß der Gegenstand nur dann in der Raumbeschreibung vorkommen darf, wenn der Spieler sich in Raum 5 (wo die Truhe steht) befindet, wenn die Truhe offen ist, und wenn in der Truhe Gegenstände liegen (also deren GE-Wert gleich -2 ist). Wenn Sie nun in Raum 5 gehen und mittels »OEFFNE TRUHE« die Truhe öffnen, und danach den Befehl »SCHAU« eingeben, so wird das Schwert sichtbar. Wenn Sie die Truhe jedoch wieder schließen, so verschwindet das Schwert auch wieder aus der Raumbeschreibung. Das Schwert ist nun sichtbar. Wenn Sie jedoch versuchen, sich das Schwert mit »NIMM SCHWERT« anzueignen, so werden Sie mit der Fehlermeldung »ICH SEHE DIESEN GEGENSTAND HIER NICHT!« enttäuscht. Unser Programm fragt nämlich nur, ob der Gegenstandswert des Gegenstands, den man nehmen will, der Zimmernummer ZN entspricht (also GE(G1) gleich ZN ist.).
+
+1189 IF GE(I)=-2 AND TU(2)=0 AND ZN=5 THEN PRINT GE$(I);",";:IC=1
+
+Diese Abfrage steht innerhalb der Schleife, in der auch geprüft wird, ob sich im betreffenden Raum ein Gegenstand befindet.
+
+In der Truhenabfrage muß also berücksichtigt werden, daß der Gegenstand nur dann in der Raumbeschreibung vorkommen darf, wenn der Spieler sich in Raum 5 (wo die Truhe steht) befindet, wenn die Truhe offen ist, und wenn in der Truhe Gegenstände liegen (also deren GE-Wert gleich -2 ist).
+
+Wenn Sie nun in Raum 5 gehen und mittels »OEFFNE TRUHE« die Truhe öffnen, und danach den Befehl »SCHAU« eingeben, so wird das Schwert sichtbar. Wenn Sie die Truhe jedoch wieder schließen, so verschwindet das Schwert auch wieder aus der Raumbeschreibung.
+
+Das Schwert ist nun sichtbar. Wenn Sie jedoch versuchen, sich das Schwert mit »NIMM SCHWERT« anzueignen, so werden Sie mit der Fehlermeldung »ICH SEHE DIESEN GEGENSTAND HIER NICHT!« enttäuscht. Unser Programm fragt nämlich nur, ob der Gegenstandswert des Gegenstands, den man nehmen will, der Zimmernummer ZN entspricht (also GE(G1) gleich ZN ist.).
+
 Wir müssen nun eine Abfrage einbauen, die es dem Spieler erlaubt auch Gegenstände zu nehmen, die in der Truhe liegen, wenn diese offen ist, und wenn wir uns in dem Raum befinden, in dem die Truhe steht.
+
 Diese Abfrage muß natürlich wieder in der raumspezifischen Action zu Raum 5 vorkommen. Wir benötigen wiederum nur eine Zeile:
+
 10548 IF VE=15 AND GE(G1)=-2 AND TU(2)=0 THEN PRINT"OK.":GE(G1)=-1
+
 Damit können auch Gegenstände aus der Truhe herausgenommen werden.
- 
 
 Allerdings erfolgt immer noch die Fehlermeldung »ICH SEHE...«.
+
 Um diesen Fehler zu beseitigen, stellen wir der Zeile, in der diese Fehlermeldung produziert wird, folgende Zeile voran:
+
 2119 IF GE(G1)=-2 AND ZN=5 AND TU(2)=0 THEN 2125
+
 Damit ist das Problem auch schon gelöst.
-Wir sind jedoch noch nicht am Ende der Truhen-Programmierung angelangt. Aus einer Truhe, aus der man etwas herausnehmen kann, muß man auch etwas hineinlegen können. Gerade solche Kleinigkeiten sind es letztendlich, die ein gutes Adventure ausmachen. Um das »LEGEN« von Gegenständen in die Truhe möglich zu machen, müssen wir eine VERLIER-Routine erstellen, die auf Objekte bezogen ist. Gemäß unserer Worttabelle besteht die VERLIER-Wortfamilie aus folgenden Mitgliedern: VERLIERE, LEGE, WIRF, WERFE. Wir nehmen nun einmal an, der Spieler steht in Raum 5 und hat die Truhe bereits geöffnet. Wenn er den Befehl »VERLIER« und Gegenstand eingibt, so nimmt dieser Gegenstand den Wert ZN an (GE(G1) =ZN) und liegt nun in Raum 5. Wir müssen nun eine Routine programmieren, die dem Gegenstand bei einer Eingabe wie »LEGE (GEGENSTAND) IN TRUHE« den Wert -2 verpaßt.
+
+Wir sind jedoch noch nicht am Ende der Truhen-Programmierung angelangt. Aus einer Truhe, aus der man etwas herausnehmen kann, muß man auch etwas hineinlegen können.
+
+Gerade solche Kleinigkeiten sind es letztendlich, die ein gutes Adventure ausmachen.
+
+Um das »LEGEN« von Gegenständen in die Truhe möglich zu machen, müssen wir eine VERLIER-Routine erstellen, die auf Objekte bezogen ist.
+
+Gemäß unserer Worttabelle besteht die VERLIER-Wortfamilie aus folgenden Mitgliedern: VERLIERE, LEGE, WIRF, WERFE.
+
+Wir nehmen nun einmal an, der Spieler steht in Raum 5 und hat die Truhe bereits geöffnet. Wenn er den Befehl »VERLIER« und Gegenstand eingibt, so nimmt dieser Gegenstand den Wert ZN an (GE(G1) =ZN) und liegt nun in Raum 5.
+
+Wir müssen nun eine Routine programmieren, die dem Gegenstand bei einer Eingabe wie »LEGE (GEGENSTAND) IN TRUHE« den Wert -2 verpaßt.
+
 Dies bringen wir wieder in der raumspezifischen Action zu Raum 5 unter:
+
 10550 IF VE=18 AND OB=1 AND TU(2)=0 AND GE(G1)=-1 THEN PRINT "OK.":GE(G1)=-2
+
 10590 RETURN
+
 Zusätzlich muß noch eine Abfrage in die Verlier-Routine eingebaut werden, die dafür sorgt, daß die normale Verlier-Routine übersprungen wird, wenn der VERLIER-Befehl sich auf ein Objekt wie die Truhe bezieht:
+
 2301 IF OB<>0 THEN 2400
+
 Wenn der Spieler die Kiste beziehungsweise die Truhe untersucht, so erfährt er, daß sie sehr groß ist.
-Der Spieler kommt nun vielleicht auf die Idee, in die Truhe zu gehen. Auch dies wollen wir ihm ermöglichen. Dazu müssen wir die Truhe zunächst als Raum programmieren. Wir nehmen dazu Raum 7 — also ab Zeile 10700:
+
+Der Spieler kommt nun vielleicht auf die Idee, in die Truhe zu gehen. Auch dies wollen wir ihm ermöglichen.
+
+Dazu müssen wir die Truhe zunächst als Raum programmieren. Wir nehmen dazu Raum 7 — also ab Zeile 10700:
+
 10700 REM IN DER TRUHE
 10702 DATA 0,0,0,0,0,0,0,0,0,0
 10705 PRINT" IN DER TRUHE. "
 10720 RETURN
-Um in die Truhe zu gelangen, muß der Spieler in Raum 5 den Befehl »GEH TRUHE« eingeben, aber erst, nachdem er die Truhe geöffnet hat. Dazu ergänzen wir die raumspezifische Action in Raum 5:
+
+Um in die Truhe zu gelangen, muß der Spieler in Raum 5 den Befehl »GEH TRUHE« eingeben, aber erst, nachdem er die Truhe geöffnet hat.
+
+Dazu ergänzen wir die raumspezifische Action in Raum 5:
+
 10560 IF VE=23 AND OB=1 AND TU(2)=0 THEN RI(1)= 7:VE=1
-Wie Sie aus dieser Zeile ersehen können, besteht der Trick des GEH-Befehls also einfach darin, in die Richtung RI(1) den Wert des Zielraums zu schreiben (für die Truhe also 7), und danach die Verbzahl VE auf den Wert 1 zu setzen, wodurch das GEHEN bewirkt wird. Einmal in der Truhe, werden Sie enttäuscht feststellen, daß Sie das Schwert überhaupt nicht sehen können. Wenn Sie in der Truhe einen Gegenstand verlieren, so läßt sich dieser nur dann wieder nehmen, wenn Sie dazu in die Truhe gehen. Dies liegt daran, daß wir zuvor bestimmt haben, daß jeder Gegenstand, der sich in der Truhe befindet, den Wert -2 bekommt. Da die Truhe nun aber selbst zu einem Raum geworden ist, müssen alle Gegenstände, die sich in ihr befinden den Wert 7 haben, da 7 der Raumwert der Truhe ist. Wenn Sie den Fehler also beheben wollen, so müssen Sie lediglich alle -2-Werte in den Wert 7 umwandeln. Damit die Truhe auch wieder verlassen werden kann, müßen wir die raumspezifische Action der Truhe programmieren: Der Wortschatz wird zunächst um das Verb VERLASSE erweitert:
+
+Wie Sie aus dieser Zeile ersehen können, besteht der Trick des GEH-Befehls also einfach darin, in die Richtung RI(1) den Wert des Zielraums zu schreiben (für die Truhe also 7), und danach die Verbzahl VE auf den Wert 1 zu setzen, wodurch das GEHEN bewirkt wird.
+
+Einmal in der Truhe, werden Sie enttäuscht feststellen, daß Sie das Schwert überhaupt nicht sehen können. Wenn Sie in der Truhe einen Gegenstand verlieren, so läßt sich dieser nur dann wieder nehmen, wenn Sie dazu in die Truhe gehen.
+
+Dies liegt daran, daß wir zuvor bestimmt haben, daß jeder Gegenstand, der sich in der Truhe befindet, den Wert -2 bekommt. Da die Truhe nun aber selbst zu einem Raum geworden ist, müssen alle Gegenstände, die sich in ihr befinden den Wert 7 haben, da 7 der Raumwert der Truhe ist.
+
+Wenn Sie den Fehler also beheben wollen, so müssen Sie lediglich alle -2-Werte in den Wert 7 umwandeln.
+
+Damit die Truhe auch wieder verlassen werden kann, müßen wir die raumspezifische Action der Truhe programmieren:
+
+Der Wortschatz wird zunächst um das Verb VERLASSE erweitert:
+
 52045 DATA VERLASSE
+
 52100 VZ=25……….	(VZ-Wert anpassen!)
+
 Nun die Action zum Verlassen der Truhe in Raum 7:
+
 10720 IF VE=25 AND OB=I AND TU(2)=0 THEN RI(1)=5:VE=1
-Diese Abfrage ist lediglich die Umkehrung zur Abfrage in der die Truhe betreten wird. Sonderbar ist jedoch, daß auch abgefragt wird, ob die Truhe offen ist, wenn man sie verlassen will. Schließlich läßt sich die Truhe doch nur dann betreten, wenn man sie geöffnet hat, und wenn man erst einmal in der Truhe ist, dann kann man sie von dort aus doch nicht schließen! Wozu also die Abfrage, ob die Truhe auch offen ist? Wer sollte sie denn schließen?
+
+Diese Abfrage ist lediglich die Umkehrung zur Abfrage in der die Truhe betreten wird. Sonderbar ist jedoch, daß auch abgefragt wird, ob die Truhe offen ist, wenn man sie verlassen will.
+
+Schließlich läßt sich die Truhe doch nur dann betreten, wenn man sie geöffnet hat, und wenn man erst einmal in der Truhe ist, dann kann man sie von dort aus doch nicht schließen! Wozu also die Abfrage, ob die Truhe auch offen ist? Wer sollte sie denn schließen?
+
 Damit kommen wir auch schon zum nächsten Abschnitt des Kurses:
  
+### Ein Gespenst geht um ...
 
-Ein Gespenst geht um …
+Wie ich bereits zu Beginn des Kurses erwähnt habe, sind Adventures mit Nichtspielercharakteren — Spielfiguren, die vom Programm selbst gesteuert werden — besonders reizvoll.
 
-Wie ich bereits zu Beginn des Kurses erwähnt habe, sind Adventures mit Nichtspielercharakteren — Spielfiguren, die vom Programm selbst gesteuert werden — besonders reizvoll. Da die Programmierung solcher Spielfiguren oft für sehr schwer gehalten wird, treten nur in sehr wenigen Spielen solche Figuren auf. Ein Meisterbeispiel für solche Adventures ist »Hobbit«. Tatsächlich ist es jedoch relativ einfach, Nichtspielercharaktere zu programmieren. Das erste Problem besteht darin, einen Weg zu finden, wie der Nichtspielercharakter (in unserem Falle das Gespenst) in der Spielkarte umherlaufen kann. Eine Möglichkeit wäre es, das Gespenst per Randout (zufallsgesteuert) von Raum zu Raum irren zu lassen. Diese Lösung erweist sich auf die Dauer jedoch als zu primitiv, da die Gefahr groß ist, daß das Gespenst sich in einer Sackgasse verfängt und dort sehr lange umherirrt. Dadurch trifft der Spieler nur äußerst selten auf das Gespenst, was nicht der Fall sein soll. Das Gespenst soll dem Spieler oft in die Quere geraten.
-Eine weitere, primitive Lösung wäre es, das Gespenst erst gar nicht herumlaufen zu lassen, sondern es einfach per Zufall gesteuert plötzlich im Raum des Spielers auftauchen zu lassen. Folgende Lösung hat sich in meinen Adventures bisher bestens bewährt: Zunächst wird das Gespenst einmal in die Personentabelle aufgenommen:
+Da die Programmierung solcher Spielfiguren oft für sehr schwer gehalten wird, treten nur in sehr wenigen Spielen solche Figuren auf.
+
+Ein Meisterbeispiel für solche Adventures ist »Hobbit«. Tatsächlich ist es jedoch relativ einfach, Nichtspielercharaktere zu programmieren.
+
+Das erste Problem besteht darin, einen Weg zu finden, wie der Nichtspielercharakter (in unserem Falle das Gespenst) in der Spielkarte umherlaufen kann. Eine Möglichkeit wäre es, das Gespenst per Randout (zufallsgesteuert) von Raum zu Raum irren zu lassen. Diese Lösung erweist sich auf die Dauer jedoch als zu primitiv, da die Gefahr groß ist, daß das Gespenst sich in einer Sackgasse verfängt und dort sehr lange umherirrt. Dadurch trifft der Spieler nur äußerst selten auf das Gespenst, was nicht der Fall sein soll. Das Gespenst soll dem Spieler oft in die Quere geraten.
+
+Eine weitere, primitive Lösung wäre es, das Gespenst erst gar nicht herumlaufen zu lassen, sondern es einfach per Zufall gesteuert plötzlich im Raum des Spielers auftauchen zu lassen.
+
+Folgende Lösung hat sich in meinen Adventures bisher bestens bewährt: Zunächst wird das Gespenst einmal in die Personentabelle aufgenommen:
+
 52600 REM PERSONENTABELLE
 52610 DATA GESPENST
 52700 PZ=1:DIM PE$(PZ):FOR I=1 TO PZ:READ PE$(I): NEXT
+
 Als nächster Schritt wird eine genaue Route festgelegt, die das Gespenst später ablaufen soll.
+
 Für unser Adventure eignet sich die folgende Route:
+
 1 – 3 – 4 – 3 – 1 – 2 – 5 – 2 – 6 – 2 – 1
-Diese Zahlen beziehen sich selbstverständlich auf die einzelnen Räume. Das Gespenst beginnt also in
-Raum 1, geht dann nach Raum 3 etc.
-Wichtig ist dabei nur, daß der letzte Raum der Kette wieder dem ersten Raum entspricht, denn wir wollen es auch unserem Gespenst nicht erlauben, durch Wände von Raum zu Raum zu gelangen. Das Gespenst läuft also immer wieder die gleiche Route ab. Dies hört sich zwar primitiv an, aber ich kann Ihnen versichern, daß dem Spieler kaum auffallen wird, daß das Gespenst sich immer nach dem gleichen Schema fortbewegt. Nun gut, bei unserem Mini-Adventure ist es vielleicht nicht sehr schwer, die Taktik des Gespenstes zu durchschauen, aber bei Spielen mit 100 und mehr Räumen, was natürlich mit längeren Routen verbunden ist, besteht kaum eine Chance, die Route eines Nichtspielercharakters herauszufinden — vorausgesetzt, man hat sie nicht selbst programmiert.
+
+Diese Zahlen beziehen sich selbstverständlich auf die einzelnen Räume. Das Gespenst beginnt also in Raum 1, geht dann nach Raum 3 etc.
+
+Wichtig ist dabei nur, daß der letzte Raum der Kette wieder dem ersten Raum entspricht, denn wir wollen es auch unserem Gespenst nicht erlauben, durch Wände von Raum zu Raum zu gelangen.
+
+Das Gespenst läuft also immer wieder die gleiche Route ab. Dies hört sich zwar primitiv an, aber ich kann Ihnen versichern, daß dem Spieler kaum auffallen wird, daß das Gespenst sich immer nach dem gleichen Schema fortbewegt. Nun gut, bei unserem Mini-Adventure ist es vielleicht nicht sehr schwer, die Taktik des Gespenstes zu durchschauen, aber bei Spielen mit 100 und mehr Räumen, was natürlich mit längeren Routen verbunden ist, besteht kaum eine Chance, die Route eines Nichtspielercharakters herauszufinden — vorausgesetzt, man hat sie nicht selbst programmiert.
+
 Ein weiterer Vorteil der Routenprogrammierung liegt darin, daß man die Gebiete der einzelnen Figuren gut begrenzen kann. Die Route wird nun durch das Feld PE(1) bis PE(11) festgelegt.
+
 52920 DATA1,3,4,3,1,2,5,2,6,2,1
+
 52935 DIM PE(11):FOR I=1 T0 11:READ PE(I): NEXT:MO=1
+
 Die Steuerung des Gespenstes soll innerhalb des Actionmoduls ab Zeile 3000 beginnen:
+
 3000 REM STEUERUNG DES GESPENSTES 
 3001 PRINT "GESPENST= ";PE(MO)
 3010 IF MO=0 THEN RETURN
 3020 MO=MO+1:IF MO=12 THEN MO=1 
 3025 IF PE(MO)<>ZN THEN 3100
 3100 RETURN
+
 Aufgerufen wird dieses Unterprogramm noch vor dem Aufruf der raumspezifischen Action in Zeile 2505:
+
 2505 GOSUB 3000: REM GESPENST
-Zeile 3001 dient lediglich zum Verfolgen des Gespenstes. Sie kann später nach Belieben wieder entfernt werden. Die Variable MO läuft von 1 bis 11 durch und beginnt dann wieder von vorne: PE(MO) ist somit der Raum, in dem sich das Gespenst gerade befindet. Ist MO=0, dann ist das Gespenst abgeschaltet (durch Zeile 3010). Nach jedem Spielzug des Spielers wird die Variable MO um 1 erhöht — das Gespenst bewegt sich. Damit der Spieler auch bemerkt, wenn das Gespenst den Raum betritt, müssen wir noch folgende Zeile einfügen:
+
+Zeile 3001 dient lediglich zum Verfolgen des Gespenstes. Sie kann später nach Belieben wieder entfernt werden.
+
+Die Variable MO läuft von 1 bis 11 durch und beginnt dann wieder von vorne: PE(MO) ist somit der Raum, in dem sich das Gespenst gerade befindet. Ist MO=0, dann ist das Gespenst abgeschaltet (durch Zeile 3010).
+
+Nach jedem Spielzug des Spielers wird die Variable MO um 1 erhöht — das Gespenst bewegt sich.
+
+Damit der Spieler auch bemerkt, wenn das Gespenst den Raum betritt, müssen wir noch folgende Zeile einfügen:
+
 3030 PRINT "EIN RIESIGES GESPENST ERSCHEINT !"
  
 Bisher ist unser Gespenst ja noch ziemlich harmlos. Wir wollen ihm deshalb folgende Aufgabe stellen:
+
 Wenn das Gespenst einen Raum betritt, in dem ein Gegenstand liegt, so soll es diesen mitnehmen. Es darf jedoch immer nur einen Gegenstand transportieren, kann allerdings den Gegenstand auch jederzeit gegen einen anderen austauschen. Geben Sie zunächst folgende Ergänzung ein — die Erklärung dazu folgt anschließend:
+
 3100 IC=0:FOR I=1 TO GZ:IF GE(I)=PE(MO) THEN IC= I
 3105 NEXT
 3110 IF IC=0 THEM 315O
 3120 GE(GF)= PE(MO):GF=IC:GE(IC)=0
 3150 RETURN
-Auch diese Routine läßt sich leicht erklären. Zunächst wird eine Schleife durchlaufen, in der geprüft wird, ob sich in dem Raum, in welchem sich das Gespenst gerade befindet, auch ein Gegenstand liegt. Trifft dies zu, so legt das Gespenst den Gegenstand, den es momentan bei sich trägt ab (GE(GF)=PE(MO)), und nimmt den neuen Gegenstand mit (GF=IC). Der Gegenstand, der im Besitz des Gespenstes ist, muß immer auf Null gesetzt werden (GE(lC)=0). Die Variable GF dient lediglich als Zwischenspeicher für die genommenen Gegenstände. Das Gespenst kann nun also Gegenstände transportieren. Nun wollen wir noch einen weiteren Effekt einbauen:
-3150 IF PE(MO)=5 AND ZN=7 AND TU(2)=0 THEN TU(2)=1:
-PRINT "JEMAND SCHLIESST DIE TRUHE" 
+
+Auch diese Routine läßt sich leicht erklären.
+
+Zunächst wird eine Schleife durchlaufen, in der geprüft wird, ob sich in dem Raum, in welchem sich das Gespenst gerade befindet, auch ein Gegenstand liegt. Trifft dies zu, so legt das Gespenst den Gegenstand, den es momentan bei sich trägt ab (GE(GF)=PE(MO)), und nimmt den neuen Gegenstand mit (GF=IC). Der Gegenstand, der im Besitz des Gespenstes ist, muß immer auf Null gesetzt werden (GE(lC)=0). Die Variable GF dient lediglich als Zwischenspeicher für die genommenen Gegenstände.
+
+Das Gespenst kann nun also Gegenstände transportieren. Nun wollen wir noch einen weiteren Effekt einbauen:
+
+3150 IF PE(MO)=5 AND ZN=7 AND TU(2)=0 THEN TU(2)=1:PRINT "JEMAND SCHLIESST DIE TRUHE" 
 3160 RETURN
-Wenn das Gespenst nun Raum 5 betritt und der Spieler sich gleichzeitig in der Truhe befindet, so schließt das Gespenst die Truhe, und der Spieler ist gefangen. Auf den letzten Seiten sollten Sie anhand der Beispiele gelernt haben, wie man ein Adventure mit Action versieht. Im Prinzip besteht jede Actionhandlung nur aus einfachen IF THEN - Abfragen und einem anschließenden Spiel und Verändern von verschiedenen Variablen.
+
+Wenn das Gespenst nun Raum 5 betritt und der Spieler sich gleichzeitig in der Truhe befindet, so schließt das Gespenst die Truhe, und der Spieler ist gefangen.
+
+Auf den letzten Seiten sollten Sie anhand der Beispiele gelernt haben, wie man ein Adventure mit Action versieht. Im Prinzip besteht jede Actionhandlung nur aus einfachen IF THEN - Abfragen und einem anschließenden Spiel und Verändern von verschiedenen Variablen.
+
 Sie sollten nun in der Lage sein, jede beliebige Actionszene zu programmieren. Es sollten hier nur die Prinzipien an einem einfachen Beispiel gezeigt werden. Welcher Art die Nichtspielcharakter sind, ihre Route und Fähigkeiten, liegt im Ermessen des jeweiligen Programmierers.
+
 Als abschließende Übung zur Überprüfung Ihres Lernerfolgs empfehle ich diese Variante:
+
 In Raum 6 befindet sich ein Schacht und ein Eisenring im Boden.
 Programmieren Sie nun folgendes:
-Durch den Schacht gelangt man zu Raum 8. Dazu muß man das Seil am Eisenring befestigen und anschließend hinabklettern.
 
+Durch den Schacht gelangt man zu Raum 8. Dazu muß man das Seil am Eisenring befestigen und anschließend hinabklettern. Wenn Sie dieses Problem gelöst haben, können Sie sich durchaus daran machen, eigene Probleme zu stellen, und diese dann in Programmroutinen umzusetzen Hier noch abschließend Listing 26, das Sie vorliegen haben sollten, wenn Sie bisher richtig mitgearbeitet haben.
 
+### Noch ein Tip zum Schluß
+
+Versuchen Sie die Wahl der Bildschirmfarben so zu treffen, daß sie auch angenehm gelesen werden können.
+
+Es empfiehlt sich in jedem Fall für Hintergrund und Rahmen die Farbe Schwarz zu wählen. Als Schriftfarbe wäre dann Hellgrau, Weiß oder Grün geeignet. Viele Adventures, wie man sie von Zeitschriften her kennt, sind in einer unangenehmen Farbkombination gehalten (zum Beispiel schwarze Schrift auf braunem Hintergrund etc).
+
+Wie störend eine grelle Farbgebung für den Spieler sein kann, erfahren Sie spätestens dann, wenn auch Ihnen die Augen tränen - entscheiden Sie sich deshalb gründlich, bevor Sie eine endgültige Auswahl der Farben treffen. Dies sind zwar nur Kleinigkeiten, aber gerade diese Kleinigkeiten werden oft vom Programmierer übersehen. Dies führt nicht zuletzt auch zu einer Qualitätsminderung des Spiels. Bisher haben wir außerdem kaum von Grafik in Adventures gesprochen. Für Datasettenanwender bietet sich lediglich die normale Zeichengrafik an, da hochauflösende Grafik zuviel Speicherplatz benötigt und auch nur schwer mittels Datasette zu bearbeiten ist.
+
+Die Grafik sollte immer das letzte sein, woran Sie arbeiten - sie soll also erst dann eingebaut werden, wenn das eigentliche Adventure schon komplett ist. Es empfiehlt sich, für die Grafiken eine Größe von zirka 10 mal 20 Zeichen zu wählen, da ganze Bildschirmseiten wiederum zuviel Speicherplatz kosten. Das folgende Programm stellt einen Maskengenerator dar, der es ihnen ermöglicht, Bilder einfach zu erstellen.
+
+Nachdem der Maskengenerator geladen ist, wird das Bild mittels Cursortasten auf den Bildschirm »gemalt«. Ist das Bild fertig, so wird es an jeder Ecke mit einem Klammeraffen­ Zeichen versehen. Die vier Klammeraffen müssen ein Rechteck bilden, beziehungsweise die Eckpunkte eines Rechtecks begrenzen, in dem das Bild steht.
+
+Sodann wird der Maskengenerator mittels RUN 60000 gestartet. Von der Größe des Bildes hängt die Bearbeitungszeit ab. Nach einer Weile, erscheint das Bild in Form von PRINT­ Zeilen auf dem Bildschirm. Sie müssen nun nur noch die RETURN-Taste mehrmals drücken, um die PRINT-Zeilen zu übernehmen. Das Programm errechnet alle Steuerzeichen und Farben automatisch und setzt sie in PRINT-Zeilen um.
+
+Das eigentlich mühselige Erstellen von Blockgrafiken wird so mit Listing 27 zum Kinderspiel.
  
+TODO Listing 27
 
- 
+Ich hoffe, daß es mir mit dem vorliegenden Kurs gelungen ist, Sie für Abenteuerspiele und deren Programmierung zu interessieren. Dazu wünsche ich Ihnen viele gute Ideen und viel Spaß.
 
- 
-
- 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-Wenn Sie dieses Problem gelöst haben, können Sie sich durchaus daran machen, eigene Probleme zu stellen, und diese dann in Programmroutinen umzusetzen Hier noch abschließend Listing 26, das Sie vorliegen haben sollten, wenn Sie bisher richtig mitgearbeitet haben.
-
-Noch ein Tip zum Schluß
-Versuchen Sie die Wahl der Bildschirmfarben so zu treffen, daß sie auch angenehm gelesen werden können. Es empfiehlt sich in jedem Fall für Hintergrund und Rahmen die Farbe Schwarz zu wählen. Als Schriftfarbe wäre dann Hellgrau, Weiß oder Grün geeignet. Viele Adventures, wie man sie von Zeitschriften her kennt, sind in einer unangenehmen Farbkombination gehalten (zum Beispiel schwarze Schrift auf braunem Hintergrund etc). Wie störend eine grelle Farbgebung für den Spieler sein kann, erfahren Sie spätestens dann, wenn auch Ihnen die Augen tränen - entscheiden Sie sich deshalb gründlich, bevor Sie eine endgültige Auswahl der Farben treffen. Dies sind zwar nur Kleinigkeiten, aber gerade diese Kleinigkeiten werden oft vom Programmierer übersehen. Dies führt nicht zuletzt auch zu einer Qualitätsminderung des Spiels. Bisher haben wir außerdem kaum von Grafik in Adventures gesprochen. Für Datasettenanwender bietet sich lediglich die normale Zeichengrafik an, da hochauflösende Grafik zuviel Speicherplatz benötigt und auch nur schwer mittels Datasette zu bearbeiten ist.
-Die Grafik sollte immer das letzte sein, woran Sie arbeiten - sie soll also erst dann eingebaut werden, wenn das eigentliche Adventure schon komplett ist. Es empfiehlt sich, für die Grafiken eine Größe von zirka 10 mal 20 Zeichen zu wählen, da ganze Bildschirmseiten wiederum zuviel Speicherplatz kosten. Das folgende Programm stellt einen Maskengenerator dar, der es ihnen ermöglicht, Bilder einfach zu erstellen. Nachdem der Maskengenerator geladen ist, wird das Bild mittels Cursortasten auf den Bildschirm »gemalt«. Ist das Bild fertig, so wird es an jeder Ecke mit einem Klammeraffen­ Zeichen versehen. Die vier Klammeraffen müssen ein Rechteck bilden, beziehungsweise die Eckpunkte eines Rechtecks begrenzen, in dem das Bild steht. Sodann wird der Maskengenerator mittels RUN 60000 gestartet. Von der Größe des Bildes hängt die Bearbeitungszeit ab. Nach einer Weile, erscheint das Bild in Form von PRINT­ Zeilen auf dem Bildschirm. Sie müssen nun nur noch die RETURN-Taste mehrmals drücken, um die PRINT-Zeilen zu übernehmen. Das Programm errechnet alle Steuerzeichen und Farben automatisch und setzt sie in PRINT-Zeilen um. Das eigentlich mühselige Erstellen von Blockgrafiken wird so mit Listing 27 zum Kinderspiel.
- 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-lch hoffe, daß es mir mit dem vorliegenden Kurs gelungen ist, Sie für Abenteuerspiele und deren Programmierung zu interessieren. Dazu wünsche ich Ihnen viele gute ldeen und viel Spaß.
+(Michael Nickles/rg)
 
