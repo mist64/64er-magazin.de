@@ -159,8 +159,8 @@
                 <li>Wir beginnen mit<code>W C000 CFFA 9000</code>da SMON jetzt ja etwas länger geworden ist.</li>
                 <li>Nun folgt die Umrechnung der absoluten Adressen:<code>V C000 CFFA 9000 920B 9FD2</code></li>
                 <li>Die Änderung der Einsprungadressen bleibt so wie beschrieben, nur ist jetzt eine Adresse (für »Z«) hinzugekommen.</li>
-                <li>Bei den Befehlen mit unmittelbarer Adressierung (zum Beispiel LDA #CC) hat sich gar nichts geändert.</li>
-                <li>Neu hinzugekommen ist aber eine Sprungtabelle für den Disk-Monitor. Ähnlich wie in Punkt 3 beschrieben, müssen Sie sechs Adressen ändern. Geben Sie dazu<code>M CFD8 CFE4</code>ein und überschreiben Sie in jedem 2. Byte das »C« mit »9«.</li>
+                <li><a href="#fehlerteufelchen" class="fehlerteufelchen_link">Bei den Befehlen mit unmittelbarer Adressierung (zum Beispiel LDA #CC) hat sich gar nichts geändert.</a></li>
+                <li>Neu hinzugekommen ist aber eine Sprungtabelle für den Disk-Monitor. Ähnlich wie in Punkt 3 beschrieben, müssen Sie sechs Adressen ändern. Geben Sie dazu<a href="#fehlerteufelchen" class="fehlerteufelchen_link"><code>M CFD8 CFE4</code></a>ein und überschreiben Sie in jedem 2. Byte das »C« mit »9«.</li>
             </ol>
         </strong>
 
@@ -177,6 +177,18 @@
             <!-- TODO MSE <pre data-filename="smon teil 5.prg" data-name="SMON Teil 5"></pre> -->
             <figcaption>Listing SMON. Zur Eingabe benötigen Sie den MSE, den Sie auch in dieser Ausgabe finden.</figcaption>
         </figure>
+
+        <aside class="fehlerteufelchen" id="fehlerteufelchen">
+        <h2>Fehlerteufelchen</h2>
+        
+        <p>Punkt 4, Seite 67, ist leider falsch. Es muß beim Verschieben der »LDY #CF« in Adresse $9f71 in »LDY #9F« geändert werden.</p>
+
+        <p>Unter Punkt 5 ist der Bereich falsch angegeben. Es muß natürlich »M 9FD8 9FE4« eingegeben werden, sonst wird der alte und nicht der neue SMON geändert. Unangenehmer ist ein Programmfehler: Beim Einlesen eines Blocks wird das letzte Byte nicht (!) in den Speicher übernommen, wohl aber beim Zurückschreiben ein zufälliger Wert als 256. Byte. Abhilfe:</p>
+
+        <p>Zwei Befehle müssen mit »NOP« überschrieben werden. Zuerst mit SMON »O CED8 CEDC EA« eingeben, dann das Programmmit»S ":SMON $C000 D000« wieder abspeichern.</p>
+        
+        <!-- 64'er 5/1985 -->
+        </aside>
     </article>
 </body>
 

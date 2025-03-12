@@ -30,12 +30,15 @@
 
         <p>Diese Speicherzellen enthalten die Zeilennummer in Low-/ High-Byte-Darstellung derjenigen Basic-Anweisung, welche gerade ausgeführt wird.</p>
 
-        <p>Ein kurzes Programm macht das deutlich:<br>
-            10 PRINT "ZEILE 10", PEEK(57) + 256*PEEK(58)<br>
-            20 A = 3:PRINT A,PEEK(57) + 256*PEEK(58)<br>
-            30 B = 5:PRINT B,PEEK(57) + 256*PEEK(58)<br>
-            40 PRINT A*B,PEEK(57) + 256*PEEK(58)<br>
-            In jeder Zeile wird zuerst etwas gePRINTet, nämlich Text, Variable und ein Rechenresultat. Durch das Komma getrennt wird in der 2. Bildschirmhälfte (VC 20) beziehungsweise Bildschirmviertel (C 64) der Inhalt der Speicherzellen 57/58 ausgedruckt. Das Resultat zeigt in der Tat die jeweilige Zeilennummer an.</p>
+        <p class="noindent">Ein kurzes Programm macht das deutlich:
+            <code>10 PRINT "ZEILE 10", PEEK(57) + 256*PEEK(58)
+                20 A = 3:PRINT A,PEEK(57) + 256*PEEK(58)
+                30 B = 5:PRINT B,PEEK(57) + 256*PEEK(58)
+                40 PRINT A*B,PEEK(57) + 256*PEEK(58)
+            </code>
+        </p>
+
+        <p>In jeder Zeile wird zuerst etwas gePRINTet, nämlich Text, Variable und ein Rechenresultat. Durch das Komma getrennt wird in der 2. Bildschirmhälfte (VC 20) beziehungsweise Bildschirmviertel (C 64) der Inhalt der Speicherzellen 57/58 ausgedruckt. Das Resultat zeigt in der Tat die jeweilige Zeilennummer an.</p>
 
         <p>Die Basic-Befehle GOTO, GOSUB-RETURN, FOR-NEXT, END, STOP, CONT und die Betätigung der STOP-Taste während eines Programmlaufes verwenden alle den Inhalt dieser Speicherzellen, um entweder zu der laufenden Zeile zurückzufinden oder um die Unterbrechung mit BREAK IN&hellip; anzuzeigen. Auch die meisten Fehlermeldungen verwenden diese Zellen.</p>
 
@@ -49,8 +52,9 @@
 
         <p>Immer dann, wenn ein Programmablauf durch die Befehle END oder STOP oder aber mit der STOP-Taste abgebrochen wird, wird die Nummer der gerade ausgeführten Programmzeile nach 59/60 gebracht und bleibt dort so lange, bis eine neue Unterbrechung erfolgt.</p>
 
-        <p>Das läßt sich am besten mit der STOP-Taste und nachfolgendem CONT zeigen. Nehmen Sie bitte dazu das kleine Demo-Programm der Zellen 57/58 und ändern Sie alle PEEK-Adressen in 59/60 um. Fügen Sie außerdem noch eine Zeile 50 hinzu:<br>
-            50 GOTO 10</p>
+        <p>Das läßt sich am besten mit der STOP-Taste und nachfolgendem CONT zeigen. Nehmen Sie bitte dazu das kleine Demo-Programm der Zellen 57/58 und ändern Sie alle PEEK-Adressen in 59/60 um. Fügen Sie außerdem noch eine Zeile 50 hinzu:
+            <code>50 GOTO 10</code>
+        </p>
 
         <p>Den dadurch erzeugten kontinuierlichen Lauf des Programms bremsen Sie dann mit der STOP-Taste und lassen ihn danach mit CONT weiterlaufen.</p>
 
@@ -68,11 +72,13 @@
 
         <p>Zur besseren Erklärung dieser in 61/62 als Zeiger stehenden Adresse einer Basic-Zeile möchte ich Sie an den dritten Teil dieses Kurses in Ausgabe 1/85 erinnern, in dem ich in einem separaten Texteinschub den Basic-Programmspeicher »sichtbar« gemacht habe, um die Wirkung der Verschiebung des Zeigers in den Zellen 43/44 zu demonstrieren.</p>
 
-        <p>Wir nehmen dazu bitte noch einmal das kleine Demo-Programm für die Adressen 57/58 oben her und ersetzen die PEEK-Werte durch 61 und 62. Das Ausdrucken des Inhalts von 61/62 legen wir aber an den Anfang jeder Zeile. Das Programm sieht dann so aus:<br>
-            10 PRINT PEEK(61) + 256*PEEK (62),"ZEILE 10"<br>
-            20 PRINT PEEK(61) + 256*PEEK (62),:A = 3:PRINTA<br>
-            30 PRINT PEEK(61) + 256*PEEK (62),:B = 5:PRINTB<br>
-            40 PRINT PEEK(61) + 256*PEEK (62),A*B</p>
+        <p>Wir nehmen dazu bitte noch einmal das kleine Demo-Programm für die Adressen 57/58 oben her und ersetzen die PEEK-Werte durch 61 und 62. Das Ausdrucken des Inhalts von 61/62 legen wir aber an den Anfang jeder Zeile. Das Programm sieht dann so aus:
+            <code>10 PRINT PEEK(61) + 256*PEEK (62),"ZEILE 10"
+                20 PRINT PEEK(61) + 256*PEEK (62),:A = 3:PRINTA
+                30 PRINT PEEK(61) + 256*PEEK (62),:B = 5:PRINTB
+                40 PRINT PEEK(61) + 256*PEEK (62),A*B
+            </code>
+        </p>
 
         <p>Nach RUN erhalten wir jetzt auf der linken Seite Zahlen, die den jeweiligen Basic-Speicher angeben, ab dem diese Zeile gespeichert ist. Wenn Sie ab diesen Adressen mit der gerade erwähnten Methode aus der Ausgabe 1/85 nachschauen, finden Sie genau die Zeilen des kleinen Demo-Programms wieder. Zur Anwendung dieses Zeigers kann ich wenig sagen. Ihn durch POKE zu verändern, geht in Basic nicht, weil das Betriebssystem die richtigen Werte immer neu eingibt. Man kann ihn allerdings abfragen.</p>
 
@@ -82,12 +88,14 @@
 
         <p>Diese Speicherzellen enthalten die Nummer der Basic-Zeile, in der gerade ein DATA-Befehl mit READ gelesen wird. Sobald in einer DATA-Zeile ein Fehler gefunden wird, kommt diese Zeilennummer aus 63/64 in die Speicherzellen 57/58, um in der Fehlermeldung die fehlerhafte DATA-Zeile und nicht die laufende READ-Zeile anzuzeigen. Auf diese Weise werden Syntax-Fehler in einer DATA-Zeile angezeigt. Um andere Fehler, wie zum Beispiel ein fehlendes Komma zwischen zwei DATA-Angaben anzuzeigen, können die Speicherzellen 63/64 eingesetzt werden.</p>
 
-        <p>In dem folgenden Programm wird in Zeile 20 geprüft, ob die DATA-Angaben größer als 255 sind. Da bei einem fehlenden Komma die beiden Zahlen als eine Zahl gelesen werden, wird dieser Fall erkannt und mit einem F versehen die Nummer der DATA-Zeile ausgedruckt, in der das Komma fehlt.<br>
-            10 FOR X = 1 TO 10:READ A:PRINT A<br>
-            20 IF A>255 THEN PRINT "F" PEEK(63) + 256*PEEK(64) 30 NEXT X<br>
-            40 DATA 10,20,30<br>
-            50 DATA 40,50,60<br>
-            60 DATA 70,80,90,100</p>
+        <p>In dem folgenden Programm wird in Zeile 20 geprüft, ob die DATA-Angaben größer als 255 sind. Da bei einem fehlenden Komma die beiden Zahlen als eine Zahl gelesen werden, wird dieser Fall erkannt und mit einem F versehen die Nummer der DATA-Zeile ausgedruckt, in der das Komma fehlt.
+            <code>10 FOR X = 1 TO 10:READ A:PRINT A
+                20 IF A>255 THEN PRINT "F" PEEK(63) + 256*PEEK(64) 30 NEXT X
+                40 DATA 10,20,30
+                50 DATA 40,50,60
+                60 DATA 70,80,90,100
+            </code>
+        </p>
 
         <p>Sie können jetzt in den DATA-Zeilen Kommafehler einbauen, die vom Programm angezeigt werden. Ein anderer häufiger Fehler, nämlich ein Komma am Ende einer DATA-Zeile, kann damit leider nicht erkannt werden. Aber vielleicht fällt Ihnen eine Prüfformel dazu ein.</p>
 
@@ -97,26 +105,30 @@
 
         <p>Diese Speicherzellen enthalten in der Low-/High-Byte-Darstellung die Adresse im Basic-Programmspeicher, ab welcher der READ-Befehl nach der nächsten DATA-Zeile sucht.</p>
 
-        <p>Zu Beginn eines Programms steht in 65/66 als Adresse der Beginn des Basic-Speichers, also derselbe Wert wie in den Speicherzellen 43/44. Der Befehl RESTORE setzt den Zeiger immer auf diesen Anfangswert zurück. Ein Demo-Programm zeigt uns das an (die Kommata sind wichtig für das Format der Darstellung auf dem Bildschirm!):<br>
-            10 PRINT, PEEK(65) + 256*PEEK (66)<br>
-            20 FORX = 1 TO 10:READA 30 PRINT A,PEEK(65) + 256* PEEK(66)<br>
-            40 NEXT X<br>
-            50 DATA 10,20,30,40,50,60,70,80, 90,100<br>
-            60 RESTORE<br>
-            70 PRINT,PEEK(65) + 256*PEEK (66)</p>
+        <p>Zu Beginn eines Programms steht in 65/66 als Adresse der Beginn des Basic-Speichers, also derselbe Wert wie in den Speicherzellen 43/44. Der Befehl RESTORE setzt den Zeiger immer auf diesen Anfangswert zurück. Ein Demo-Programm zeigt uns das an (die Kommata sind wichtig für das Format der Darstellung auf dem Bildschirm!):
+            <code>10 PRINT, PEEK(65) + 256*PEEK (66)
+                20 FORX = 1 TO 10:READA 30 PRINT A,PEEK(65) + 256* PEEK(66)
+                40 NEXT X
+                50 DATA 10,20,30,40,50,60,70,80,90,100
+                60 RESTORE
+                70 PRINT,PEEK(65) + 256*PEEK (66)
+            </code>
+        </p>
 
         <p>Durch Verändern dieses Zeigers in 65/66 kann die Reihenfolge, mit der DATA-Angaben gelesen werden, verändert werden, allerdings nur zeilenweise.</p>
 
-        <p>Wir brauchen dazu die oben beschriebenen Speicherzellen 61/62, deren jeweiligen Inhalt wir ja mit PEEK abfragen können. Wenn wir das vor jeder DATA-Zeile machen und diesen Wert einer Variablen zuweisen, haben wir die Adresse gespeichert, hinter welcher die DATA-Zeile kommt. Durch POKEn dieser Adressen in die Speicherzellen 65/66 vor einem READ-Befehl, wird diesem READ die nächste DATA-Zeile vorgegeben und wir können so die Reihenfolge der DATA-Zeilen ändern.<br>
-            10 A1 = PEEK(61):B1 = PEEK(62)<br>
-            20 DATA DAS IST DIE 1. ZEILE<br>
-            30 A2 = PEEK(61):B2 = PEEK(62)<br>
-            40 DATA DAS IST DIE 2.ZEILE<br>
-            50 A3 = PEEK(61):B3 = PEEK(62)<br>
-            60 DATA DAS IST DIE 3.ZEILE<br>
-            70 POKE 65,A3:POKE 66,B3: READ A$:PRINT A$<br>
-            80 POKE 65,A1:POKE 66,B1: READ A$:PRINT A$<br>
-            90 POKE 65,A2:POKE 66,B2: READ A$:PRINT A$</p>
+        <p>Wir brauchen dazu die oben beschriebenen Speicherzellen 61/62, deren jeweiligen Inhalt wir ja mit PEEK abfragen können. Wenn wir das vor jeder DATA-Zeile machen und diesen Wert einer Variablen zuweisen, haben wir die Adresse gespeichert, hinter welcher die DATA-Zeile kommt. Durch POKEn dieser Adressen in die Speicherzellen 65/66 vor einem READ-Befehl, wird diesem READ die nächste DATA-Zeile vorgegeben und wir können so die Reihenfolge der DATA-Zeilen ändern.
+            <code>10 A1 = PEEK(61):B1 = PEEK(62)
+                20 DATA DAS IST DIE 1. ZEILE
+                30 A2 = PEEK(61):B2 = PEEK(62)
+                40 DATA DAS IST DIE 2.ZEILE
+                50 A3 = PEEK(61):B3 = PEEK(62)
+                60 DATA DAS IST DIE 3.ZEILE
+                70 POKE 65,A3:POKE 66,B3: READ A$:PRINT A$
+                80 POKE 65,A1:POKE 66,B1: READ A$:PRINT A$
+                90 POKE 65,A2:POKE 66,B2: READ A$:PRINT A$
+            </code>
+        </p>
 
         <p>Mit den Zeilen 70 bis 90 werden für jede DATA-Zeile eigene READ-Anweisungen gegeben. Welche DATA-Zeile gelesen werden soll, wird durch die Variablen Ax und Bx (x = l,2,3) bestimmt, mit denen der Zeiger in 65/66 »verbogen« wird.</p>
 
@@ -160,25 +172,29 @@
 
         <h3>Hilfsspeicher für Vergleichs-Operationen</h3>
 
-        <p>Die bei 75/76 schon erwähnte Auswertungs-Routine FRMEVL erzeugt in der Speicherzelle 77 einen Wert, der angibt, ob es sich bei einer Vergleichsoperation um den Fall »Kleiner als« (&lt;), »gleich wie« (=) oder »größer als« (>) handelt. Diese Speicherzelle ist nur im Maschinencode erreichbar.</p>
+        <p>Die bei 75/76 schon erwähnte Auswertungs-Routine FRMEVL erzeugt in der Speicherzelle 77 einen Wert, der angibt, ob es sich bei einer Vergleichsoperation um den Fall »Kleiner als« (&lt;), »gleich wie« (=) oder »größer als« (&gt;) handelt. Diese Speicherzelle ist nur im Maschinencode erreichbar.</p>
 
         <h2>Adresse 78 und 79 ($4E und $4F)</h2>
 
         <h3>Zeiger auf Adresse, ab welcher der Wert der Variablen einer selbstdefinierten Funktion gespeichert ist.</h3>
 
-        <p>Basic erlaubt es bekanntlich, mit dem Befehl DEF selbst erfundene Funktionen zu definieren, welche die Form FN gefolgt von einem Variablennamen haben, zum Beispiel<br>
-            DEF FNAA(X).</p>
+        <p>Basic erlaubt es bekanntlich, mit dem Befehl DEF selbst erfundene Funktionen zu definieren, welche die Form FN gefolgt von einem Variablennamen haben, zum Beispiel
+            <code>DEF FNAA(X).</code>
+        </p>
 
         <p>Im nebenstehenden Textblock »Darstellung von Variablen selbstdefinierter Funktionen« wird gezeigt beziehungsweise sichtbar gemacht, wie derartige Funktionen und ihre Variablen abgespeichert werden. Während der Definition einer Funktion steht in 78/79 die Adresse, ab welcher die Funktion und der Wert ihrer Variablen abgespeichert ist. Der Inhalt dieser Adressen ist identisch mit den Zeichen hinter dem Namen der Funktion (1. Gruppe im nebenstehenden Beispiel).</p>
 
         <p>Nach der Ausführung der Funktion sieht in 78/79 allerdings die Adresse, ab welche der Zahlenwert der Funktion selbst abgespeichert ist. Er ist identisch mit den Zeichen der 2. Gruppe.</p>
 
-        <p>Diesen Zusammenhang können Sie überprüfen, indem Sie im Programm des Texteinschubes folgende Zeilen hinzufügen:<br>
-            25 PRINT PEEK(78) + 256*PEEK (79)<br>
-            35 PRINT PEEK(78) + 256*PEEK (79)</p>
+        <p>Diesen Zusammenhang können Sie überprüfen, indem Sie im Programm des Texteinschubes folgende Zeilen hinzufügen:
+            <code>25 PRINT PEEK(78) + 256*PEEK (79)
+                35 PRINT PEEK(78) + 256*PEEK (79)
+            </code>
+        </p>
 
-        <p>Nach RUN erhalten Sie zwei Adressen, die Sie mit direkter Eingabe abfragen:<br>
-            FOR I = 0TO 4:PRINT PEEK (1.Adresse + I);:NEXTI: FORJ=OTO 4:PRINT PEEK (2.Adresse + J);:NEXTJ</p>
+        <p>Nach RUN erhalten Sie zwei Adressen, die Sie mit direkter Eingabe abfragen:
+            <code>FOR I = 0TO 4:PRINT PEEK (1.Adresse + I);:NEXTI: FORJ=OTO 4:PRINT PEEK (2.Adresse + J);:NEXTJ</code>
+        </p>
 
         <p>Sie werden sehen, daß der Inhalt der beiden Adressen genau die Werte der Zeichen 3 bis 7 der beiden Gruppen entspricht, allerdings im Bildschirmcode.</p>
 
@@ -217,10 +233,12 @@
 
             <p>Aber ein Unterschied kommt noch dazu. Der Befehl DEF kann leider nicht direkt eingegeben werden, sondern muß immer als Teil einer Programmzeile mit einer Zeilennummer versehen sein.</p>
 
-            <p>Deshalb schreiben wir zuerst ein kleines Programm zur Definition der Funktion plus Variable, bevor wir den Variablenspeicher mit dem Bildschirmspeicher zusammenlegen:<br>
-                10 DEF FNAA(X) = 3*SIN(X) + COS(X)<br>
-                20 X = 5<br>
-                30 PRINT FNAA(X)</p>
+            <p>Deshalb schreiben wir zuerst ein kleines Programm zur Definition der Funktion plus Variable, bevor wir den Variablenspeicher mit dem Bildschirmspeicher zusammenlegen:
+                <code>10 DEF FNAA(X) = 3*SIN(X) + COS(X)
+                    20 X = 5
+                    30 PRINT FNAA(X)
+                </code>
+            </p>
 
             <p>Die Funktion hat also den Namen »AA«. Bevor wir weitermachen, überprüfen Sie bitte mit RUN, ob alles stimmt. Nun wird der Speicher verschoben.</p>
 
@@ -267,7 +285,7 @@
 
             <p>Der Aufbau einer Funktion läßt sich also so zusammenfassen:</p>
 
-            <table>
+            <table class="center">
                 <tbody>
                     <tr>
                         <td>1</td>
