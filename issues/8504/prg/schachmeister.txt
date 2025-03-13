@@ -1,8 +1,212 @@
-;68schach-1zu1.prg ==0801==
-;Eingetippt von pgeorgi
+;schachmeister.prg ==0801==
+;Quelle: 8411.D64
+;Änderungen in 8504 eingetippt von pgeorgi
+   10 rem ********************************
+   20 rem *      >> schachmeister <<     *
+   30 rem *                              *
+   40 rem * thomas behrend               *
+   50 rem * in der wanne 16    7900 ulm  *
+   60 rem *     (8.1984)                 *
+   70 rem ********************************
+   80 rem
+   90 rem  -- alle rem-zeilen koennen  --
+  100 rem -- weggelassen werden       --
+  110 rem
+  120 rem -- neue zeichen --
+  130 rem
+  140 poke53281,6:poke53280,1:print"{clr}"chr$(5)
+  150 data120,169,51,133,1,169,0,133,95,133,90,133,88,169,208,133,96,169,240,133
+  160 data89,169,224,133,91,32,191,163,169,55,133,1,88,96
+  170 rem -- mc-programm --
+  180 j=4097:fori=832to865:reada:j=j-a:pokei,a:next
+  190 ifj<>0thenprint"data-fehler in zeile 15-20":stop
+  200 sys832:poke850,160:sys832:poke56576,peek(56576)and252:poke53272,8
+  210 poke648,192:print"{down}"tab(5)"> schachmeister <"
+  220 print"{down}{down}"tab(5)"bitte einen moment warten..."
+  230 ad=57344:fori=64to91:b=ad+i*8:forj=0to7:readc:pokeb+j,c:next:next
+  240 fori=192to219:b=ad+i*8:forj=0to7:readc:pokeb+j,c:next:next
+  250 i=175:b=ad+i*8:forj=0to7:readc:pokeb+j,c:next
+  260 poke56,130
+  270 rem
+  280 rem -- data fuer schachfiguren --
+  290 rem
+  300 data0,0,60,60,255,255,60,60
+  310 data0,0,0,0,0,0,0,0
+  320 data0,0,0,0,60,255,255,255
+  330 data255,255,60,60,60,60,60,60
+  340 data0,0,3,3,15,10,0,0
+  350 data60,255,255,255,255,170,0,0
+  360 data0,0,192,192,240,160,0,0
+  370 data0,0,3,3,3,3,3,3
+  380 data0,0,60,60,60,255,255,255
+  390 data0,0,192,192,192,192,192,192
+  400 data3,0,0,0,0,0,0,0
+  410 data255,60,60,60,60,60,60,60
+  420 data255,255,255,255,255,255,255,255
+  430 data192,0,0,0,0,0,0,0
+  440 data0,0,60,60,240,195,255,255
+  450 data255,255,255,255,255,170,0,0
+  460 data0,0,0,0,192,192,0,0
+  470 data0,0,0,0,0,3,3,15
+  480 data0,48,48,63,255,207,207,255
+  490 data0,0,0,0,192,192,192,192
+  500 data63,63,63,60,0,0,0,3
+  510 data255,207,15,63,63,255,255,255
+  520 data192,192,0,0,0,0,0,192
+  530 data3,3,3,3,15,10,0,0
+  540 data192,240,240,240,240,160,0,0
+  550 data0,0,12,15,3,3,3,3
+  560 data0,0,48,240,192,192,192,192
+  570 data0,0,0,0,3,3,0,0
+  580 data85,85,125,125,255,255,125,125
+  590 data85,85,85,85,85,85,85,85
+  600 data85,85,85,85,125,255,255,255
+  610 data255,255,125,125,125,125,125,125
+  620 data85,85,87,87,95,90,85,85
+  630 data125,255,255,255,255,170,85,85
+  640 data85,85,213,213,245,165,85,85
+  650 data85,85,87,87,87,87,87,87
+  660 data85,85,125,125,125,255,255,255
+  670 data85,85,213,213,213,213,213,213
+  680 data87,85,85,85,85,85,85,85
+  690 data255,125,125,125,125,125,125,125
+  700 data255,255,255,255,255,255,255,255
+  710 data213,85,85,85,85,85,85,85
+  720 data85,85,125,125,245,215,255,255
+  730 data255,255,255,255,255,170,85,85
+  740 data85,85,85,85,213,213,85,85
+  750 data85,85,85,85,85,87,87,95
+  760 data85,117,117,127,255,223,223,255
+  770 data85,85,85,85,213,213,213,213
+  780 data127,127,127,125,85,85,85,87
+  790 data255,223,95,127,127,255,255,255
+  800 data213,213,85,85,85,85,85,213
+  810 data87,87,87,87,95,90,85,85
+  820 data213,245,245,245,245,165,85,85
+  830 data85,85,93,95,87,87,87,87
+  840 data85,85,117,245,213,213,213,213
+  850 data85,85,85,85,87,87,85,85
+  860 data126,189,215,231,231,215,189,126
+  870 rem
+  880 rem -- variablen und felder --
+  890 rem
   895 dim a$(12)
+  900 b$(1)="abaacadef":rem bauer
+  910 b$(2)="ghijlmdof":rem turm
+  920 b$(3)="anaakadef":rem laeufer
+  930 b$(4)="qrstuvwox":rem pferd
+  940 b$(5)="yhzacadef":rem dame
+  950 b$(6)="[@pjcmdef":rem koenig
+  960 fori=1to6:forj=0to2:fork=1to3
+  970 a$=mid$(b$(i),j*3+k,1):a$(i)=a$(i)+chr$(asc(a$)+128):next
+  980 a$(i)=a$(i)+"{down}{left}{left}{left}":next:next
+  990 dimb(8,8)
+ 1000 fori=7to1step-2:forj=1to7step2:b(i,j)=1:next:next
+ 1010 fori=8to2step-2:forj=2to8step2:b(i,j)=1:next:next
+ 1020 dima(8,8)
+ 1030 gosub2760
+ 1040 z1$="{rvon}{cyn} {red}             "
+ 1050 :
+ 1060 rem
+ 1070 rem -- multicolor-modus --
+ 1080 rem -- einschalten      --
+ 1090 rem
+ 1100 poke53281,6:poke53282,7:poke53283,5
+ 1110 poke53270,peek(53270)or16
+ 1120 rem
+ 1130 rem -- liste der partien --
+ 1140 rem -- aufstellen        --
+ 1150 rem
+ 1160 data-1
+ 1170 restore:da=0
+ 1180 da=da+1:reada:ifa=-1then1200
+ 1190 goto1180
+ 1200 dimp(20),p$(20),p1$(20),ja$(20):p=0:d=0
+ 1210 p=p+1:readp$(p),p1$(p),ja$(p):d=d+3
+ 1220 reada$:d=d+1:ifa$="e"ora$="x"then1240
+ 1230 goto1220
+ 1240 ifa$="x"then1290
+ 1250 p(p)=d:goto1210
+ 1260 rem
+ 1270 rem -- auswahlmenue --
+ 1280 rem
+ 1290 restore:fori=1toda:reada:next
+ 1300 printchr$(5)"{clr}{down}   - auswahl -"
+ 1310 print:print
+ 1320 fori=1top:printi;tab(5)p$(i)tab(16)p1$(i),ja$(i):next
+ 1330 poke198,0:input"{down}{down}";w:ifw<1orw>pthen1330
+ 1340 print"{clr}":ifw=1then1390
+ 1350 fori=1top(w-1):reada$:next
+ 1360 rem
+ 1370 rem -- spielbrett --
+ 1380 rem
+ 1390 fori=1to24:printchr$(159)tab(0)"{rvon} "tab(25)z1$:next
+ 1400 printchr$(5)"{home}";
+ 1410 fory=8to1step-1:x=1:gosub2840:print"{down}{left}{left}"y:x=8:gosub2840
+ 1420 print"{down}{rght}{rght}"y:next
+ 1430 fory=8to1step-1:forx=1to8
+ 1440 gosub2470
+ 1450 next:next
+ 1460 print"{home}"
+ 1470 rem
+ 1480 rem -- anfangsstellung --
+ 1490 rem
+ 1500 fory=7to8:forx=1to8
+ 1510 gosub2530:next:next
+ 1520 fory=1to2:forx=1to8:gosub2530:next:next
+ 1530 printchr$(159)"{home}":printtab(27)"{rvon} spieler 1 "
+ 1540 printtab(27)"{rvon}           {rvof}"
+ 1550 printtab(27)"{up}{rvon}           "
+ 1560 poke214,18:print:printtab(27)chr$(30)"{rvon} spieler 2 "
+ 1570 printtab(27)"{rvon}           {rvof}"
+ 1580 printtab(27)"{up}{rvon}           "
+ 1590 poke214,5:print:printtab(27)chr$(5)"{rvon}zug:{rvof}  1"
+ 1600 poke214,7:print:printtab(28)chr$(158)"{rvon}       {rvof}"
+ 1610 poke214,9:print:printtab(27)chr$(5)"{rvon}          "
+ 1620 printtab(27)"{rvon}          "
+ 1630 printtab(27)"{up}{rvon}          "
+ 1640 reada$:a$=left$(a$,9):poke214,20:print:printtab(28)"{rvon}"a$
+ 1650 reada$:a$=left$(a$,9):poke214,2:print:printtab(28)"{rvon}"a$
+ 1660 reada$:poke214,15:print:printtab(28)a$
+ 1670 zu=1:z1=-1:aw=0
+ 1680 rem
+ 1690 rem ************************
+ 1700 rem *  -- hauptprogramm -- *
+ 1710 rem ************************
+ 1720 rem
+ 1730 print"{home}":z1=z1+1:ifz1=2thenz1=0:zu=zu+1:poke214,5:print:printtab(32)chr$(5)zu
+ 1740 reada$:iflen(a$)<>4then1950
+ 1750 rem
+ 1760 rem -- normaler zug --
+ 1770 rem
+ 1780 b$=left$(a$,2):gosub2620:x=x2:y=y2
+ 1790 b2$=b$
+ 1800 b$=right$(a$,2):gosub2620
+ 1810 o$="-":ifa(x2,y2)<>0theno$="/"
+ 1820 a$=b2$+o$+b$
+ 1830 poke214,7:print:printtab(29)chr$(5)"{rvon}"a$
+ 1840 fori=1to4:gosub2530:gosub2470:next
+ 1850 a1=a(x,y):a(x,y)=0:a(x2,y2)=a1
+ 1860 x=x2:y=y2:fori=1to4:gosub2470:gosub2530:next
  1865 if aw=4 then gosub 2304:aw=1
+ 1870 ifaw=3thenaw=0:return
+ 1880 ifaw=2then2890:rem-matt oder remis-
+ 1890 gosub2660
  1900 if aw=1 then aw=0:poke 214,11:print:print tab(27)"{rvon}          "
+ 1910 goto1730
+ 1920 rem
+ 1930 rem -- besondere situationen --
+ 1940 rem
+ 1950 ifa$="e"then2890
+ 1960 ifa$="sa"then2100
+ 1970 ifa$="wa"then2120
+ 1980 ifa$="kr"then2190
+ 1990 ifa$="lr"then2250
+ 2000 printchr$(5)
+ 2010 b$=right$(a$,1):a$=left$(a$,4)
+ 2020 ifb$="s"thenaw=1:poke214,11:print:printtab(27)"{rvon}schach !":goto1780
+ 2030 ifb$="m"thenaw=2:poke214,11:print:printtab(27)"{rvon} matt !":goto1780
+ 2040 ifb$="r"thenaw=2:poke214,11:print:printtab(27)"{rvon} remis !":goto1780
  2041 if b$="p"then aw=2:poke 214,11:print:print tab(27)"{rvon} patt !":goto 1780
  2042 if b$="w"then aw=2:poke 214,9:print:print tab(27)"{rvon}dritte mal"
  2043 if b$="w"then print tab(27)"{rvon}gleiche",tab(67)"{rvon}stellung !":goto 1780
@@ -10,13 +214,41 @@
  2045 if b$="z"then print tab(27)"{rvon}   ohne",tab(67)"{rvon}  bauer !":goto 1780
  2046 if b$="v"then aw=4:poke 214,11:print:print tab(27)"{rvon}en-passant":goto 1780
  2050 if b$="d"or b$="t"or b$="h"or b$="l"then:f$=b$:goto 2340
+ 2060 print"{clr}datafehler !!!":stop
+ 2070 rem
+ 2080 rem -- aufgeben --
+ 2090 rem
+ 2100 a$="{rvon}schwarz"
+ 2110 goto2130
+ 2120 a$="{rvon}weiss"
+ 2130 poke214,9:print:printtab(29)a$
+ 2140 printtab(27)"{rvon}gibt auf !"
+ 2150 goto2890
+ 2160 rem
+ 2170 rem -- kurze rochade --
+ 2180 rem
+ 2190 y=1:t=0:ifz1=1theny=8:t=6
+ 2200 a(5,y)=0:a(8,y)=0:a(6,y)=8-t:a(7,y)=12-t:x=5:gosub2470:x=8:gosub2470
+ 2210 x=6:gosub2530:x=7:gosub2530:goto2280
+ 2220 rem
+ 2230 rem -- lange rochade --
+ 2240 rem
+ 2250 y=1:t=0:ifz1=1theny=8:t=6
+ 2260 a(1,y)=0:a(5,y)=0:a(3,y)=12-t:a(4,y)=8-t
+ 2270 x=1:gosub2470:x=5:gosub2470:x=3:gosub2530:x=4:gosub2530
+ 2280 poke214,11:print:printtab(29)chr$(5)"{rvon}rochade"
+ 2290 gosub2660
+ 2300 poke214,11:print:printtab(29)"{rvon}       ":goto1730
  2301 rem
  2302 rem -- en-passant --
  2303 rem
  2304 if a1=7 then y=y-1
  2305 if a1=1 then y=y+1
  2306 a(x,y)=0:gosub 2470:return
+ 2310 rem
  2320 rem -- tausch auf der grundlinie --
+ 2330 rem
+ 2340 aw=3:gosub1780
  2350 if(y2=8)and(f$="d")then a(x2,8)=11
  2351 if(y2=1)and(f$="d")then a(x2,1)=5
  2352 if(y2=8)and(f$="t")then a(x2,8)=8
@@ -25,7 +257,13 @@
  2355 if(y2=1)and(f$="h")then a(x2,1)=4
  2356 if(y2=8)and(f$="l")then a(x2,8)=9
  2357 if(y2=1)and(f$="l")then a(x2,1)=3
- 2360 diese zeile loeschen
+
+;Im Heft war es die folgende Zeile; es wurde ein REM eingefügt, sodass man das
+;Diff-Listing aus dem Heft einigermassen aus dieser Datei ausschneiden kann.
+;2360 diese zeile loeschen
+ 2360 rem diese zeile loeschen
+
+ 2370 x=x2:y=y2:gosub2530
  2380 poke 214,10:print:print tab(28)chr$(5);
  2381 if f$="d"then print"{rvon}dame-"
  2382 if f$="t"then print"{rvon}turm-"
@@ -34,5 +272,79 @@
  2390 prinnt tab(28)"{rvon}tausch"
  2400 gosub 2660:poke 214,10:print:print tab(28)"{rvon}         ":goto 1730
  2410 print tab(28)"{rvon}    ":goto 1730
+ 2420 rem ****** unterprogramme ******
+ 2430 rem
+ 2440 rem -- einzelne felder --
+ 2450 rem -- drucken         --
+ 2460 rem
+ 2470 ifb(x,y)=1then2490
+ 2480 gosub2840:poke646,15:print"{rvon}AAA{down}{left}{left}{left}AAA{down}{left}{left}{left}AAA":return
+ 2490 gosub2840:print"   {down}{left}{left}{left}   {down}{left}{left}{left}   ":return
+ 2500 rem
+ 2510 rem -- figur drucken --
+ 2520 rem
  2530 f=a(x,y)
+ 2540 gosub2840
+ 2550 poke646,9:iff>6andb(x,y)=0then:print"{rvon}"a$(f-6)"{up}":return
+ 2560 iff>6andb(x,y)=1then:print"{rvof}"a$(f-6)"{up}":return
+ 2570 poke646,8:ifb(x,y)=1thenprint"{rvof}"a$(f)"{up}":return
+ 2580 print"{rvon}"a$(f)"{up}":return
+ 2590 rem
+ 2600 rem -- umrechnen --
+ 2610 rem
+ 2620 b1$=left$(b$,1):x2=asc(b1$)-64:y2=val(right$(b$,1)):return
+ 2630 rem
+ 2640 rem -- zeitschlaufe --
+ 2650 rem
+ 2660 poke198,0:fort=1to250:ifpeek(197)<>64then2680
+ 2670 next:return
+ 2680 ifpeek(197)=3then2700
+ 2690 return
+ 2700 ifpeek(197)<>64then2700
+ 2710 ifpeek(197)=64then2710
+ 2720 return
+ 2730 rem
+ 2740 rem -- grundstellung --
+ 2750 rem
+ 2760 a(1,1)=8:a(2,1)=10:a(3,1)=9:a(4,1)=11:a(5,1)=12:a(6,1)=9
+ 2770 a(7,1)=10:a(8,1)=8
+ 2780 fori=1to8:a(i,8)=a(i,1)-6:next
+ 2790 forx=1to8:a(x,2)=7:a(x,7)=1:next
+ 2800 return
+ 2810 rem
+ 2820 rem -- bildschirmposition --
+ 2830 rem
+ 2840 ify=8thenprint"{home}"tab((x-1)*3+1);:return
+ 2850 x1=(x-1)*3+1:y1=(8-y)*3-1:poke214,y1:print:printtab(x1);:return
+ 2860 rem
+ 2870 rem -- spielende ---
+ 2880 rem
+ 2890 poke198,0:fori=1to10000:ifpeek(197)=64thennext
+ 2900 fori=1to8:forj=1to8:a(i,j)=0:next:next
+ 2910 gosub2760:goto1290
+10000 rem
+10010 rem -----  data fuer die   ------
+10020 rem -----  partien         ------
+10030 rem
+10040 rem ** demo-partie 1 **
+10050 datasiff,kashdan,1948
+10060 datad2d4,g8f6,c2c4,e7e6,b1c3,f8b4,d1c2,d7d5,a2a3,b4e7,c4d5,e6d5,c1f4,c7c6
+10070 datah2h3,kr,e2e3,f8e8,f1d3,b8d7,g1f3,d7f8,f3e5,e7d6,kr,f8e6,f4h2,g7g6
+10080 datae5f3,e6g7,h2d6,d8d6,f1c1,c8f5,f3d2,e8e7,b2b4,a8e8,a1b1,f5h3,g2h3,e7e3
+10090 datad3f1,g7f5,f2e3,d6g3s,f1g2,g3e3s,g1h1,f5g3s,h1h2,e3f4,d2f3,e8e2,c3e2
+10100 datag3e2s,h2h1,f6h5,c2d2,h5g3s,h1h2,g3f1s,h2h1,f4h2s,f3h2,f1g3m
+10110 datae
+10120 rem ** demo-partie 2 **
+10130 datageller,euwe,1953
+10140 datad2d4,g8f6,c2c4,e7e6,b1c3,f8b4,e2e3,c7c5,a2a3,b4c3,b2c3,b7b6,f1d3,c8b7
+10150 dataf2f3,b8c6,g1e2,kr,kr,c6a5,e3e4,f6e8,e2g3,c5d4,c3d4,a8c8,f3f4,a5c4
+10160 dataf4f5,f7f6,f1f4,b6b5,f4h4,d8b6,e4e5,c4e5,f5e6,e5d3,d1d3,b6e6,d3h7s
+10170 datag8f7,c1h6,f8h8,h7h8,c8c2,a1c1,c2g2s,g1f1,e6b3,f1e1,b3f3,wa
+10180 datae
+10190 rem ** demo-partie 3 **
+10200 datarossetto,stahlberg,1947
+10210 datae2e4,e7e6,d2d4,d7d5,b1c3,g8f6,c1g5,f8e7,e4e5,f6d7,h2h4,c7c5,c3b5,f7f6
+10220 dataf1d3,a7a6,d1h5s,e8f8,h1h3,a6b5,g5h6,d8a5s,h6d2,a5c7,h3g3,c5d4,g1f3
+10230 datad7e5,g3g7,h7h6,d3h7,f8g7,h5h6s,g7f7,h6h5s,f7g7r
+10240 datax
 
