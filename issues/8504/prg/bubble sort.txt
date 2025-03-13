@@ -1,0 +1,88 @@
+;148-4.prg ==0801==
+;Eingetippt von pgeorgi
+;*** gemeinsamer code
+   10 rem erstellen eines feldes zum
+   20 rem sortieren.
+   30 rem das erstellen kann zufaellig
+   40 rem oder geziehlt (durch eingabe)
+   50 rem erfolgen.
+   60 rem
+   70 rem sortieralgorithmen erhalten die
+   80 rem zeilennummern von 10000 bis 50000
+   90 rem sie benoetigen jeweils diesen
+   99 rem vorspann zur ausfuehrung.
+  100 rem herstellung eines arrays:
+  110 rem arrayvariable      - a$
+  120 rem schleifenvariablen - x, y, z
+  130 rem hilfsvariablen     - b$, c$, d$
+  140 rem dreiecktausch mit  - s$
+  150 print"{clr}":clr
+  160 print"soll von {rvon}h{rvof}and oder {rvon}z{rvof}ufaellig erstellt":print
+  170 input"werden ";x$
+  180 if x$<>"h"and x$<>"z"then 150
+  190 if x$="h"then gosub 220:gosub 1000:goto 210
+  200 gosub 220:gosub 2000
+  210 goto 4000: rem weitermachen
+  220 rem anzahl der elemente bestimmen
+  230 print:input"anzahl der elemente ";a
+  240 if a>10000 then print:print"zu viele elemente": goto 230
+  250 if a<10 then print:print"zu wenige elemente":goto 230
+  255 dim a$(a)
+  260 input"{down}{down}{rvon}d{rvof}rucker oder {rvon}b{rvof}ildschirm ";y$
+  270 if y$<>"d"and y$<>"b"then 260
+  280 if y$="d"then d=4:goto 300
+  290 d=3
+  300 return
+ 1000 rem eingabe von hand
+ 1010 print"{clr}"
+ 1020 print:print"sie muessen jetzt"a" elemente eingeben!":print:print
+ 1030 print"jedes element besteht aus 3 zeichen.":print:print
+ 1040 for x=1 to a
+ 1050 print x". ";:input"element";a$(x)
+ 1060 if len(a$(x))<>3 then 1050
+ 1070 next x
+ 1080 return
+ 2000 rem zufaellige eingabe
+ 2010 print"{clr}"
+ 2020 print:print"es werden jetzt"a" elemente zufaellig":print:print"ausgewaehlt"
+ 2030 print:print"jedes element besteht aus 3 zeichen.":print:print
+ 2040 for x=1 to a
+ 2050 a$(x)=""
+ 2060 for y=1 to 3:a$(x)=a$(x)+chr$(int(rnd(ti)*25)+65):next y
+ 2070 next x
+ 2080 return
+ 3000 rem zwischenausgabe der elemente
+ 3010 for i=1 to a-9 step 10
+ 3020 for j=i to i+9:print#1,a$(j)" ";:next j
+ 3030 print#1:next i
+ 3040 return
+ 4000 rem weitermachen
+ 4005 open 1,d
+ 4010 print"{clr}ausgabe des erstellten feldes"
+ 4020 print
+ 4030 gosub 3000
+ 4040 rem sortierung startet
+ 4050 rem
+;*** gemeinsamer code
+
+10000 rem sortieren durch austauschen
+10010 rem
+10020 rem
+10030 rem bubblesort
+10040 for x=a-1 to 1 step-1
+10050 for y=1 to x
+10060 if a$(y)<=a$(y+1)then 10080
+10065 rem austauschen beider elemente
+10070 s$=a$(y):a$(y)=a$(y+1):a$(y+1)=s$
+10080 next y
+10090 gosub 3000: rem ausgabe
+10100 next x
+
+;*** gemeinsamer code
+50000 rem endebehandlung
+50010 print#1
+50020 gosub 3000
+50030 print#1,a;" elemente"
+50040 print#1:print#1:close 1
+50050 end
+;*** gemeinsamer code
