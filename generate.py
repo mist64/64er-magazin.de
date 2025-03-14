@@ -1266,6 +1266,19 @@ def write_full_html_file(db, path, title, preview_img, body_html, body_class, co
     <script src="/{BASE_DIR}lunr.js"></script>
     <script src="/{BASE_DIR}search.js"></script>
     <script src="/{BASE_DIR}mathjax/es5/tex-mml-chtml.js"></script>
+    <script>
+      if (window.isSecureContext) document.addEventListener("DOMContentLoaded", (event) => {{
+        let copyBtn = document.createElement("span")
+        copyBtn.innerHTML = "📋"
+        copyBtn.addEventListener("click", () => {{
+          let el = copyBtn.parentNode.parentNode.querySelector("pre.listing-petcat")
+          navigator.clipboard.writeText(el.innerText)
+        }})
+        document.querySelectorAll("div.listing span.controls").forEach( (el) => {{
+            el.appendChild(copyBtn)
+        }})
+      }})
+    </script>
 
 
     {additional_head_tags}
