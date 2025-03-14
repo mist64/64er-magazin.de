@@ -696,7 +696,7 @@ class Issue:
                       listing_64er += [f"<span data-chksum='<{checksum:03d}>'>{lineno: 3d} {content} </span>"]
                   listing = "\n".join(listing)
                   listing_64er = "\n".join(listing_64er)
-                  newhtml = f"""<div class="listing"><input type="checkbox" role="switch" class="toggle" />
+                  newhtml = f"""<div class="listing"><span class="controls"><input type="checkbox" role="switch" class="toggle" /></span>
                     <pre class="listing-petcat">{listing}</pre>
                     <pre class="listing-checksummer">{listing_64er}</pre></div>
                   """
