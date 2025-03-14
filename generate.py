@@ -696,7 +696,7 @@ class Issue:
                       listing_64er += [f"<span data-chksum='<{checksum:03d}>'>{lineno: 3d} {content} </span>"]
                   listing = "\n".join(listing)
                   listing_64er = "\n".join(listing_64er)
-                  newhtml = f"""<div class="listing"><input type="checkbox" role="switch" class="toggle" />
+                  newhtml = f"""<div class="listing"><span class="controls"><input type="checkbox" role="switch" class="toggle" /></span>
                     <pre class="listing-petcat">{listing}</pre>
                     <pre class="listing-checksummer">{listing_64er}</pre></div>
                   """
@@ -1260,6 +1260,19 @@ def write_full_html_file(db, path, title, preview_img, body_html, body_class, co
     <script src="/{BASE_DIR}lunr.js"></script>
     <script src="/{BASE_DIR}search.js"></script>
     <script src="/{BASE_DIR}mathjax/es5/tex-mml-chtml.js"></script>
+    <script>
+      document.addEventListener("DOMContentLoaded", (event) => {{
+        let copyBtn = document.createElement("span")
+        copyBtn.innerHTML = "📋"
+        copyBtn.addEventListener("click", () => {{
+          let el = copyBtn.parentNode.parentNode.querySelector("pre.listing-petcat")
+          navigator.clipboard.writeText(el.innerText)
+        }}
+        document.querySelectorAll("div.listing span.controls").forEach( (el) => {{
+            el.appendChild(copyBtn)
+        }})
+      }})
+    </script>
 
 
     {additional_head_tags}
