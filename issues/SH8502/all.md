@@ -1,4 +1,5 @@
-# Abenteuer total
+
+# Abenteuer total \[3]
 
 > Warum haben Abenteuerspiele in der letzten Zeit einen immer größer werdenden Anhängerkreis gefunden? Weil sie logisches Denkvermögen, Fantasie, Ausdauer und Kreativität fördern und fordern. Abenteuerspiele sind wie geschaffen für den Heimcomputer, oder besser, wurden erst durch diesen möglich. Gründe genug, um ein ganzes Sonderheft dieser Kategorie der Freizeitbeschäftigung mit dem Computer zu widmen.
 
@@ -44,7 +45,7 @@ Bitte verwenden Sie für Ihre Bestellung die beigefügte Postscheck-Zahlkarte zu
 **Bestell-Nr.: L685 S2 / DM 34,90**
 
 
-# Abenteuer selbst programmiert
+# Abenteuer selbst programmiert \[7]
 
 > Abenteuerspiele auf dem Commodore 64 gehören mittlerweile zu den beliebtesten Freizeitbeschäftigungen mit einem Computer. Dieser Kurs wird Sie in die Lage versetzen, nahezu professionelle Abenteuerspiele selbst zu programmieren.' Alles was Sie brauchen ist ein bißchen Basic-Erfahrung, gute Ideen, viel Fantasie und Spaß am Programmieren.
 
@@ -2504,7 +2505,7 @@ Ich hoffe, daß es mir mit dem vorliegenden Kurs gelungen ist, Sie für Abenteue
 
 (Michael Nickles/rg)
 
-# Zauberschloß  – ein Abenteuerspiel mit Tücken
+# Zauberschloß  – ein Abenteuerspiel mit Tücken \[53]
 
 > Abenteuerspiele haben ihren ganz besonderen Reiz. Gefragt sind weniger die motorischen Reaktionsfähigkeiten, sondern vielmehr die logische Vorgehensweise und viel Fantasie. In einem streng bewachten Schloß mit seinen vielfältigen Gefahren gilt es, dem Zauberer die Krone und damit die Regentschaft über das Volk zu entreißen. Doch es ist ein steiniger Weg.
 
@@ -2524,7 +2525,7 @@ Und nun viel Spaß bei einem Abenteuer im Zauberschloß.
 
 (Dennis Merbach/aa)
 
-# Neuer Checksummer 64 — blitzschnell und kürzer
+# Neuer Checksummer 64 — blitzschnell und kürzer \[63]
 
 > Der Checksummer überprüft jede eingegebene Basic-Zeile und erspart Ihnen deshalb eine langwierige Fehlersuche. Und neu ist der Checksummer, weil die Initialisierung zirka einhundertmal schneller ist als die alta
 
@@ -2578,7 +2579,7 @@ TODO
 (F. Lonczewski/gk)
 
 
-# Adventure 2000 — Die Jagd nach der Rakete
+# Adventure 2000 — Die Jagd nach der Rakete \[65]
 
 > Vom Präsidenten der Vereinigten Staaten erhalten Sie den Auftrag, den dritten Weltkrieg zu verhindern.
 
@@ -2620,7 +2621,7 @@ Sollte man alle erlaubten 100 Zeichen der Eingabe mit Mühe gefüllt haben und d
 
 (Frank Schmelzer/rg)
 
-# Quasimodo, Herrscher der Kartanen
+# Quasimodo, Herrscher der Kartanen \[76]
 
 > Dieses Abenteuer führt Sie in die Welt der Fantasia 31 Räume stehen Ihnen auf der Suche nach Quasimodo zur Verfügung. Finden und vernichten Sie ihn.
 
@@ -2634,7 +2635,7 @@ Richtungsänderungen können durch Eingabe der Abkürzungen N, S, W, 0 für Nord
 
 (Roland Selzer/rg)
 
-# Mario, die unheimliche Mine
+# Mario, die unheimliche Mine \[80]
 
 > Im Land der Fantasie liegt die Mine »Mario«. Finden sie den richtigen Weg durch das ausgedehnte Gangsystem.
 
@@ -2683,7 +2684,7 @@ Obwohl die Mine mehrere Ebenen hat, gibt es zur Bestimmung der Position des Spie
 
 (Frank Leggewie/Harald Bornfleth/rg)
 
-# Zeittunnel — Flucht in die Gegenwart
+# Zeittunnel — Flucht in die Gegenwart \[93]
 
 > Durch einen Zeittunnel in die Zukunft. Finden Sie den Weg zurück.
 
@@ -2691,7 +2692,7 @@ Das Spiel beginnt im heimischen Wohnzimmer. Die Kommandos müssen ausgeschrieben
 
 (Jens Schürbs/Arndt Meiswinkel/rg)
 
-# Crantor — Bedrohung aus dem All
+# Crantor — Bedrohung aus dem All \[102]
 
 > Hier müssen Sie sich auf die Reise durch das Ali begeben. Crantor ist ein Beispiel, wie man ein Geschicklichkeitsspiel mit einem Adventure verbinden kann.
 
@@ -2713,7 +2714,7 @@ Die Aegriventre-Untertasse wird durch einen Joystick an Control-Port 1 gesteuert
 
 (Andreas Lüning/rg)
 
-# Odyssee — Kampf der Bruderschaft
+# Odyssee — Kampf der Bruderschaft \[111]
 
 > Eine abenteuerliche Reise durch das Land des bösen Zauberers Saruman.
 
@@ -2821,7 +2822,7 @@ Wie Sie vielleicht bemerkt haben, habe ich drei Einzeiler aus der Ausgabe 11/84 
 
 (Jan Geißelmann/rg)
 
-# Ring of Power
+# Ring of Power \[118]
 
 Vorbei an Drachen und Hausmäusen sollen Sie den Thronsaal finden, in dem der »Ring of Power« liegt. Ihr Weg führt Sie durch ein großes Schloß, einen Schloßgarten und über unterirdische Quellen.
 
@@ -2831,7 +2832,7 @@ takelamp, lampon, north, takekey, south, east, north, north, east, take can, nor
 
 (Rüdiger Ihlo/rg)
 
-# So löse ich Ultima III
+# So löse ich Ultima III \[119]
 
 > Viele Abenteurer werden beim Versuch Ultima III zu lösen sicherlich schon auf Schwierigkeiten gestoßen sein. Um diese Schwierigkeiten zu beseitigen, haben wir die wichtigsten Lösungstips für dieses Spiel niedergeschrieben.
 
@@ -2936,7 +2937,7 @@ Treten Sie an den ersten Slot von links. Dort muß die »Card of Love« eingeste
 
 (Holger Ocken/M. Kohlen/rg)
 
-# Mask of the Sun
+# Mask of the Sun \[122]
 
 Sie sollen die Sonnenmaske der Azteken finden. Behindert werden Sievon Ihrem Rivalen »Roboff«, einem Leoparden und anderen Schwierigkeiten.
 
@@ -2974,7 +2975,7 @@ Herzlichen Glückwunsch, YOU HAVE WON THE GAME!!!
 
 (Frank Schneider/rg)
 
-# Critical Mass
+# Critical Mass \[122]
 
 In fünf großen Städten hat ein Größenwahnsinniger, der die Weltherrschaft übernehmen möchte, Zeitbomben versteckt. In einem Wettlauf gegen die Zeit haben Sie als Agent die Aufgabe, alle Bomben zu finden und zu entschärfen.
 
@@ -2986,7 +2987,7 @@ Get envelope, open envelope, read sign, get flowers, W, push button, D, jump (er
 
 (Thomas R.A. Wolf/rg)
 
-# Voodoo Castle
+# Voodoo Castle \[122]
 
 Voodoo Castle von Scott Adams ist schon ein relativ betagtes Adventure, das den Spieler aber vor eine Vielzahl von Problemen stellt.
 
@@ -3008,7 +3009,7 @@ Jetzt haben Sie es tatsächlich geschafft. Wenn Sie sich die Beschreibung der Ka
 
 (Stephan Keller/rg)
 
-# Pirate Adventure
+# Pirate Adventure \[123]
 
 > Hier ist die Lösung des »Pirate Adventure« von Scott Adams.
 
@@ -3022,7 +3023,7 @@ Wer jetzt glaubt, von Scott Adams zu hören, daß man ein guter Abenteurer sei, 
 
 (Stephan Keller/rg)
 
-# Gruds in Space
+# Gruds in Space \[123]
 
 > Die Schritt-für-Schritt-Lösung, Lagepläne, eine Hilfsliste und die benötigten Koordinaten werden Sie der Lösung von »Gruds in Space« näherbringen.
 
@@ -3115,7 +3116,7 @@ TODO ASIDE
 
 w, s, pressgreen, pressgreen, pressgreen, n, d, d, w, set 64-18-52, w, set 77-34-40, go window, n, n, n, n, steal rope, s, w, take coin, e, s, e, s, s, e, knock, say yes, give coin, e, give rope, say yes, e, help, ta-ke all, w, w, w, n, w, s, go window, e, set 96-17-14, w, set 82-13-64, go window, e, tie rope to tree, e, d, take gun, u, w, loosen rope, take rope, n, e, n, shoot venusian, n, drop gun, w, give note, take money maker, e, takegun, s, shootvenusian, s, w, s, w, gowindow, e, set 64-18-52, w, set 77-34-40, gowindow, n, e, s, e, knock, e, e, givemoneymaker, take rock, w, w, w, n, w, s, w, n, w, w, s, s, w, tie rope to stalagmite, d, n, e, s, d, n, w, take key, e, s, u, n, w, s, u, e, u, e, n, shoot bat, u, open chest, d, drop key, u, look chest, take key, d, s, u, n, e, s, e, e, n, n, e, s, e, n, n, n, w, n, open gate, n, n, n, w, n, n, take green, s, s, e, s, s, s, s, e, s, s, s, w, n, w, s, w, n, w, w, s, s, u, n, w, drop green, take all, e, s, d, n, n, e, e, s, e, go window, e, set 96-17-14, w, set 66-12-15, go window, e, n, drop green, take green, w, drop key, take orange, drop green, take green, e, s, w, drop light, e, drop green, take green, e, e, drop orange, take orange, e, take purple, drop blue, take blue, w, w, drop purple, take purple, w, w, w, drop purple, take purple, w, drop gun, take white, drop orange, take gun, e, e, drop gun, drop rock, e, drop green, take green, e, e, s, drop white, take white, w, take yellow, drop purple, take purple, e, n, w, drop purple, take purple, w, w, w, drop purple, take purple, w, take orange, s, drop white, take white, e, e, drop yellow, take brown, e, e, drop purple, take purple, e, n, n, drop brown, e, take black, drop white, w, s, w, drop purple, w, w, drop all, take rock, take light, take gun, take black, go window, e, set 64-18-52, w, set 77-34-40, gowindow, n, e, s, e, n, n, n, w, n, n, n, n, e, s, e, shootarler, u, e, drop black, e, look screen, w, e, take note, w, d, w, n, w, s, s, s, s, e, s, s, s, knock, e, e, give note, take card, w, w, w, n, w, s, go window, e, set 96-17-14, w, set 82-13-64, go window, e, n, e, n, shoot tree, drop gun, n, w, insert card, press blue, e, s, s, w, s, w, go window, e, set 64-18-52, w, set 77-34-40, go window, n, n, e, e, drop light, look sign, buy mask, take mask, take coin, buy container, take container, w, w, s, s, go window, e, set 96-17-14, w, set 82-13-64, gowindow, e, n, e, n, n, w, insert card, revive green, press blue, e, s, s, w, s, w, go window, e, set 70-10-24, w, set 14-93-96, go window, n ,w, drop card, drop note, take bomb, e, s, e, take box, w, go window, e, look box, set 64-18-52, w, set 77-34-40, gowindow, n, w, breaktable, take leg, e, e, s, e, n, n, n, w, n, n, n, n, e, s, e, u, n, lift rock, look hole, take heliotropanite, s, d, w, n, w, s, s, s, s, e, s, s, s, w, n, w, s, go window, e, e, u, u, s, press green, n, d, d, w, set 18-98-32, w, set 34-76-21, set 36-24-35, go window, drop bomb, go window, press red, set 34-76-21, go window, e, u, pull lever, n, give container, s, d, w, go window, e, e, u, u, s, press green, n ,d, d, w, set 53-42-75, w, set 66-43-44, go window, help
 
-# Die Lösung von Hobbit
+# Die Lösung von Hobbit \[126]
 
 > Lange haben die Abenteuerspielfreunde auf die Lösung von Hobbit warten müssen. Einen der möglichen Lösungswege, der sogar ein Ergebnis von 101,5 % zuläßt, wollen wir Ihnen hier vorstellen.
 
@@ -3138,13 +3139,13 @@ Und nun viel Erfolg!
 
 (Roland Selzer/rg)
 
-# Enchanter ist jetzt gelöst!
+# Enchanter ist jetzt gelöst! \[126]
 
 TODO BILD 2
 
 SE, SE, NE, S, READ SCROLL, GNUSTO REZROV, LEARN REZROV, SW, NW, NW, NE, N ,OPEN OVEN, GET BREAD, GET JUG, S, NE ,SE, NE, FILL JUG, SW, SE, E, E, REZROV GATE, E, FROTZ BOOK, N, N, E, E, E, E, E, LEARN REZROV, REZROV GATE, N, (GET SCROLL, READ IT), GNUSTO KREBF, E, LOOK UNDER LILY PAD, READ SCROLL, GNUSTO CLEESH, W, S, W, W, W, W, W, S, S, S, S, E, D, OPEN DOOR, N, PULL BLOCK, E, (GET SCROLL, READ IT), GNUSTO EXEX, W, S, U, DROP BOOK, E, GET LIGHTED PORTRAIT, GET SCROLL, W, GET BOOK, READ SCROLL, GNUSTO OZMOO, EAT BREAD, N, GET BOX, S, W, U, GET IN BED, SLEEP, GET UP, EXAMINE BEDPOST, PUSH BUTTON, (GET SCROLL, READ IT), GNUSTO VAXUM, D, N, N, N, N, U, GET EGG, LEARN REZROV, LEARN KREBF, REZROV EGG, GET SCROLL, KREBF SCROLL, READ SCROLL, GNUSTO ZIFMIA, D, S, S, S, S, E, E, E, S, LEARN NITFOL, LEARN EXEX, EXEX TURTLE, NITFOL TURTLE, (TURTLE, FOLLOW ME), NW, N, E, U, (TURTLE, SE GET SCROLL, NW, DROPSCROLL, (TURTLE, THANKS), GETSCROLL, D, W, W, W, N, N, E, LEARN OZMOO, OZMOO ME, DROP ALL, E, WAIT, D, W, GET ALL, CUT ROPE, OPEN BOX, GET VELLUM SCROLL, READ VELLUM SCROLL, GNUSTO MELBOR, DROP BOX, LEARN MELBOR, MELBOR ME, E, E, E, N, EXAMINE TRACKS, READ FRAYED SCROLL, GNUSTO GONDAR, N, SLEEP, LEARN ZIFMIA, LEARN VAXUM, (JETZT IN DEN SPIEGELSÄLEN AUF UND AB GEHEN BIS DER ADVENTURER ERSCHEINT, DANN...), ZIFMIA ADVENTURER, VAXUM ADVENTURER, (JETZT NACH OSTEN BIS ZUR GUARDED DOOR), POINT AT DOOR, LEARN CLEESH, CLEESH ADVENTURER, N, DROP DAGGER, GET PENCIL, GET PURPLE SCROLL, S, W, W, W, W, W, W, S, S, S, S, E, D, D, READ MAP, D, S, E, NE, SE, LEARN MELBOR, MELBOR ME, DRAW FROM F TO P, SW, SW, RUB FROM V TO M, RUB FROM B TO R, DRAW FROM J TO B, DROP PENCIL, DROP MAP, GET SCROLL, NE, NW, NW, W, DRINK WATER, DROP JUG, U, U, E, E, E, W, N, N, LEARN MELBOR, MELBOR ME, N, E, LEARN GONDAR, LEARN CLEESH, DROP BREAD, DROP, PURPLE SCROLL, E, KUL-CAD STAIR, IZYUK ME, E, GONDAR DRAGON, CLEESH MONSTER, GUNCHO KRILL !!!!!!
 
-# So löse ich Abenteuerspiele
+# So löse ich Abenteuerspiele \[128]
 
 > Es gibt einige grundlegende Methoden, um an die Lösungen von Abenteuerspielen heranzugehen.
 
@@ -3224,7 +3225,7 @@ Sterben können Sie inAdventures relativ oft (Sorcerer hat beispielsweise 70 ver
 
 (M. Kohlen/rg)
 
-# Impressum
+# Impressum \[130]
 
 Herausgeber: Carl-Franz von Quadt, Otmar Weber
 
