@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>Mario, die unheimliche Mine</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="Frank Leggewie, Harald Bornfleth, rg">
+    <meta name="64er.issue" content="SH8502">
+    <meta name="64er.pages" content="80">
+    <!-- <meta name="64er.toc_category" content="XXX"> -->
+    <!-- <meta name="64er.toc_title" content="XXX"> -->
+    <meta name="64er.id" content="XXX">
+</head>
+
+<body>
+    <article>
+        <h1>Mario, die unheimliche Mine</h1>
+<blockquote><p>Im Land der Fantasie liegt die Mine »Mario«. Finden sie den richtigen Weg durch das ausgedehnte Gangsystem.</p></blockquote>
+
+<p>Mario ist ein Grafik-Adventure für den C 64. Das Spiel ist in normalem C 64-Basic geschrieberr und füllt fast den gesamten Basic-Speicherplatz des Computers. Es finden 24 Sprites Verwendung, deren Daten bei Bedarf eingeschaltet werden. Deshalb muß der Spieler zu Beginn eine knappe viertel Minute warten, während dessen er Gelegenheit hat, die Anleitung zu lesen. Lesern von J. R. Tolkien werden gewisse Parallelen zu dem Buch »Der Herr der Ringe« auffallen. Das ist nicht ganz zufällig, denn die verlassene Mine namens Mario ist in gewissem Sinne der Zwergenmine Moria aus diesem Buch nachempfunden. Wer überhaupt nicht mehr weiter weiß, sollte sich dieses Buch ausleihen. Dort kann er einige Hilfen für das Adventure finden.</p>
+
+<p>Das Spiel versteht 19 Befehle. Diese lauten:</p>
+
+<p>NIMM, VERLIERE, HEBE, ENTLEERE, WIRF, LIES (diese Befehle werden von einem Gegenstand gefolgt)</p>
+
+<p>OEFFNE (eine Tür oder ein Tor)</p>
+
+<p>BRINGE &hellip; UM (dazwischen steht ein Lebewesen)</p>
+
+<p>SPEICHERE, LADE (für das Speichern und Laden eines Spielstandes, um nicht immer wieder von vorn anfangen zu müssen). Diese Befehle können erst eingegeben werden, wenn man in die Mine eingedrungen ist. Besitzer einer Diskettenstation müssen die Zeilen 16520 (Öffnen der Datei für Speichern) und 16620 (Öffnen der Datei für Laden) entsprechend ändern.</p>
+
+<p>SAGE (wird von beliebigen Worten gefolgt, die aber nicht in normalen Anführungszeichen stehen sollten).</p>
+
+<p>HILF (hier gibt der Computer Hilfen oder Erklärungen, denen man aber nicht immer trauen sollte)</p>
+
+<p>LIST (zeigt die getragenen Gegenstände auf)</p>
+
+<p>N, S, O, W, H (hoch), R (runter).</p>
+
+<p>Man kann höchstens drei Gegenstände auf einmal tragen. Wenn das Anfangsbild erstellt ist, muß eine Taste gedrückt werden, da danach soviel Text erscheint, daß eine vernünftige Grafik zusammen mit dem Text nicht möglich wäre. Vorsicht mit der Rechtschreibung! Der Computer achtet genau auf die richtige Schreibweise der Befehle.</p>
+
+<p>Zu jedem Raum, in dem man sich befindet, wird ein Bild gezeigt, das die Spielsituation verdeutlicht. Insgesamt gibt es sechs voneinander völlig verschiedene Bilder. Es gibt jedoch wesentlich mehr Räume, da die Bilder manchmal nur leicht abgewandelt werden, wenn man in einen anderen Raum kommt.</p>
+
+<p>Bei dem Weg durch die Mine wird man unter anderem von Orks, einer Riesenspinne und einem schrecklichen Feuerwesen behindert. Mehr soll hier nicht verraten werden. Aufpassen muß man auch bei den Himmelsrichtungen. Der Spieler sieht die Räume so, daß Osten immer in Blickrichtung liegt.</p>
+
+<h3>Erläuterungen zum Ablaufschema des Programms</h3>
+
+<p>Zunächst springt das Programm in Zeile 9000, wo die Erläuterungen für den Spieler am Bildschirm ausgegeben werden, danach liest es die Daten der Sprites und wartet auf einen Tastendruck. Es zeichnet das Anfangsbild und geht zu Zeile 6000, wo mittels eines GET-Befehls das Kommando eingegeben wird. Sobald »Return« gedrückt wird, erfolgt die Auswertung. Hat man das Tor geöffnet und den Befehl »0« eingegeben, wird das nächste Bild gezeichnet und es folgt der Sprung in Zeile 15030, wo für alle Räume, außer dem Anfangsbild, das Kommando mittels INPUT-Befehl eingelesen wird. In den darauffolgenden Zeilen wird fürjeden möglichen Befehl geprüft, ob er identisch mit dem eingegebenen Kommando ist und die entsprechende Reaktion auslöst Wenn man einen neuen Raum betritt, geht das Programm zu Zeile 10200, von wo aus dann in die Unterprogramme zum Zeichnen der Räume verteilt wird. Von diesen werden die Unterprogramme ab Zeile 10000, 10100, 10300 und 11000 angesprochen:</p>
+
+<p>TODO TABLE</p>
+
+<p>10000 berechnet mittels C(X,Y) die Gegenstände, stellt sie mittels einer Verzweigung in die Unterprogramme ab 5000 dar<br/>
+10100 berechnet mittels D(X,Y) die Ausgänge aus den Räumen, besetzt eventuell die Merker B(1) bis B(6)<br/>
+10300 sucht nach Besonderheiten (E(X,Y)), verzweigtin die Unterprogramme zu ihrer Darstellung<br/>
+11000 stellt fest, ob wegen irgendwelcher Besonderheiten der Tod des Spielers eingetreten ist. Wenn ja, dann gibt es zu dem Unterprogramm ab Zeile 8000, das das Spiel beendet und auf Wunsch des Spielers neu startet. Wenn nein, erfolgt ein Rücksprung.</p>
+
+<p>Sonder-Unterprogramme (Inhalt der Schriftrolle, des Buches, Flucht der Spinne etc.) werden von den Auswertungszeilen zum INPUT-Befehl direkt aufgerufen.</p>
+
+<p>Das Feuer in einem Raum besteht aus 4 Sprites, die nacheinander erscheinen und deshalb eine Bewegung vortäuschen.</p>
+
+<p>Obwohl die Mine mehrere Ebenen hat, gibt es zur Bestimmung der Position des Spielers nur zwei Variablen, X und Y Dies geschah aus Speicherplatzgründen. Wenn man in die nächste Ebene kommt, dann wird einfach der Y-Wert auf einen Wert gebracht, der in der vorhergehenden Ebene gar nicht vorkommen kann. So wurde die Positionsbestimmung mit nur zwei Variablen möglich.</p>
+
+<address class="author">(Frank Leggewie/Harald Bornfleth/rg)</address>
+    </article>
+</body>
+</html>
