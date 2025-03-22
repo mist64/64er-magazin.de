@@ -1,0 +1,35 @@
+;listing 27 ==0801==
+;Quelle: 64'er CD
+60000 rem *****************************
+60001 rem g r a f i k - d e s i g n e r
+60002 rem *****************************
+60003 data"{wht}","{red}","{cyn}","{pur}","{grn}","{blu}","{yel}","{orng}","{brn}","{lred}","{gry1}","{gry2}","{lgrn}","{lblu}","{gry3}"
+60004 dimz$(25):i=1024:dimy$(15):fori4=1to15:ready$(i4):nexti4
+60005 ifpeek(i)=0thena=i+1:goto60008
+60006 ifi>2023then60011
+60007 i=i+1:goto60005
+60008 fori=atoa+38:ifpeek(i)=0thenb=i-1
+60009 next:fori=a-1+40to2023step40:ifpeek(i)=0thenc=i+1
+60010 next
+60011 ab=b-a:d=c+ab:ifa=0orb=0orc=0ord=0thenprint"?illegal size  error":end
+60012 fa=peek(53280)
+60013 iffa>15thenfa=fa-16:goto60013
+60014 fori1=atocstep40:z$="?"+chr$(34):fori=i1toi1+ab:x=peek(i):cl=peek(i+54272)
+60015 ifcl>15thencl=cl-16:goto60015
+60016 ifrv=2andx<128thenrv=3
+60017 ifx>127andrv=0thenrv=1
+60018 ifrv=1orrv=2thenx=x-128
+60019 ifx>63andx<96thenx=x+32:goto60023
+60020 ifx>96andx<128thenx=x+64:goto60023
+60021 ifx>0 andx<32thenx=x+64:goto60023
+60022 ifx>=32andx<64thenx=x
+60023 iffa=clthen60027
+60024 fa=cl:iffa=0thenz$=z$+"{blk}"
+60025 fori2=1to15:iffa=i2thenz$=z$+y$(i2)
+60026 nexti2
+60027 ifrv=1thenz$=z$+"{rvon}":rv=2
+60028 ifrv=3thenz$=z$+"{rvof}":rv=0
+60029 z$=z$+chr$(x):nexti:z$=z$+chr$(34):z$(an)=z$:z$="":an=an+1:rv=0:nexti1
+60030 input"{clr}ab welcher zeile ";zn:ifzn<0orzn>63000then60030
+60031 print"{clr}{down}{down}":fori=0to(c-a)/40:printzn+i;z$(i):next:print"{home}";:end
+

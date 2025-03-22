@@ -1,0 +1,201 @@
+;Quelle: 64'er CD
+;listing 26 ==0801==
+    0 rem *****************************
+    1 rem * adventure-programmierkurs *
+    2 rem *                           *
+    3 rem *     uebungs-programm      *
+    4 rem *****************************
+    9 rem basic-erweiterung
+   10 data76,24,1,177,251,145,251,200,208,249,230,252,202,208,244,96,120,160,0,169
+   12 data160,132,251,133,252,162,32,32,11,1,169,224,132,251,133,252,162,32,32,11
+   14 data1,169,53,133,1,88,96:fori=264to310:readx:pokei,x:next:sys264
+   16 fori=710to730:readx:pokei,x:next
+   18 data208,3,76,29,168,32,192,2,32,19,166,56,165,95,233,1,164,96,76,36,168
+   20 poke40996,197:poke40997,2:poke1,54
+   22 fori=43168to43170:readx:pokei,x:next
+   24 fori=704to709:readx:pokei,x:next
+   26 data32,192,2,32,138,173,76,247,183
+   30 gosub52000: rem tabellen deffinieren
+  100 zn=1:goto1130
+ 1000 rem a c t i o n m o d u l
+ 1010 gosub50000: rem befehlseingabe
+ 1100 rem gehen in ein neues zimmer
+ 1105 ifve<1orve>10then1200
+ 1110 ifri(ve)=0thenprint"kein weg in diese richtung !":ve=0:goto1200
+ 1120 zn=ri(ve):print"{clr}"
+ 1130 ve=0
+ 1140 restore 10000+zn*100
+ 1150 fori=1to10:readri(i):next
+ 1155 gosub 10000+zn*100
+ 1160 print"{down}moegliche richtungen : ";
+ 1165 ic=0:fori=1to10:ifri(i)<>0thenprintve$(i);",";:ic=1
+ 1170 nexti
+ 1175 ific=0thenprint"keine."
+ 1180 ific=1thenprintchr$(20)
+ 1185 print"ich sehe : ";
+ 1186 ic=0:fori=1tooz:ifoo(i)=znthenprintob$(i);",";:ic=1
+ 1187 next
+ 1188 fori=1togz:ifge(i)=znthenprintge$(i);",";:ic=1
+ 1189 ifge(i)=-2andtu(2)=0andzn=5thenprintge$(i);",";:ic=1
+ 1190 next
+ 1192 ific=0thenprint"nichts besonderes."
+ 1194 ific=1thenprintchr$(20)
+ 1200 rem
+ 2000 rem reaktion auf befehle (allgemeine action)
+ 2100 rem nimm routine
+ 2110 ifve<>15then2200
+ 2115 ifob<>0thenprint"das geht ueber meine kraefte !":goto2200
+ 2119 ifge(g1)=-2andzn=5andtu(2)=0then2125
+ 2120 ifge(g1)<>znthenprint"ich sehe diesen gegenstand hier nicht !"
+ 2125 ifge(g1)=-1thenprint"sie haben diesen gegenstand bereits !"
+ 2130 ifge(g1)=znthenge(g1)=-1:print"ok."
+ 2200 rem inventur routine
+ 2205 ifve<>22then2300
+ 2210 print"ich habe: ";
+ 2220 ic=0:fori=1togz:ifge(i)=-1thenprintge$(i)",";:ic=1
+ 2225 next
+ 2230 ific=0thenprint"nichts."
+ 2235 ific=1thenprint"{left} "
+ 2300 rem verlier routine
+ 2301 ifob<>0then2400
+ 2305 ifve<>18then2400
+ 2310 ifge(g1)<>-1thenprint"ich habe das nicht !"
+ 2320 ifge(g1)=-1thenge(g1)=zn:print"ok."
+ 2400 rem schau - routine
+ 2405 ifve<>13then2500
+ 2410 ifob=0andg1=0thenprint"{clr}":ve=0:goto1130
+ 2415 ifob=1andoo(1)=znthenprint"die truhe ist sehr gross."
+ 2500 rem aufruf der raumspezifischen action
+ 2505 gosub3000 : rem gespenst
+ 2510 gosub 10000+zn*100+20
+ 2520 ifve>0andve<11then1100
+ 2600 goto1000
+ 3000 rem steuerung des gespenstes
+ 3010 ifmo=0thenreturn
+ 3020 mo=mo+1:ifmo=12thenmo=1
+ 3025 ifpe(mo)<>znthen3100
+ 3030 print"ein riessiges gespenst erscheint !"
+ 3100 ic=0:fori=1togz:ifge(i)=pe(mo)thenic=i
+ 3105 next
+ 3110 ific=0then3150
+ 3120 ge(gf)=pe(mo):gf=ic:ge(ic)=0
+ 3150 ifpe(mo)=5andzn=7andtu(2)=0thentu(2)=1:print"jemand schliesst die truhe !"
+ 3160 return
+10000 rem ------- spielkarte -------
+10100 rem raum 1 ---------
+10102 data 0,3,0,2,0,0,0,0,0,0
+10105 print"raum nummer 1"
+10120 return
+10200 rem raum 2 ---------
+10202 data 0,0,1,0,0,0,0,6,0,0
+10205 print"raum nummer 2"
+10220 iftu(1)=0thenri(2)=5
+10224 ifve=11andob=5andge(3)<>-1thenprint"ich habe keinen schluessel.":goto10230
+10225 ifve=11andob=5andtu(1)=1thenprint"ok.":tu(1)=0:ri(2)=5
+10230 ifve=12andob=5andtu(1)=0thenprint"ok.":tu(1)=1:ri(2)=0
+10240 ifve=23andob=5thenve=2
+10250 return
+10300 rem raum 3 ---------
+10302 data 1,0,0,0,0,0,0,0,0,4
+10305 print"raum nummer 3"
+10320 return
+10400 rem raum 4 ---------
+10402 data 0,0,0,0,0,0,0,0,3,0
+10405 print"raum nummer 4"
+10420 return
+10500 rem raum 5 ---------
+10502 data 0,0,0,0,0,0,0,0,0,0
+10505 print"raum nummer 5"
+10520 iftu(1)=0thenri(1)=2
+10524 ifve=11andob=5andge(3)<>-1thenprint"ich habe keinen schluessel.":goto10230
+10525 ifve=11andob=5andtu(1)=1thenprint"ok.":tu(1)=0:ri(1)=2
+10530 ifve=12andob=5andtu(1)=0thenprint"ok.":tu(1)=1:ri(1)=0
+10540 ifve=23andob=5thenve=1
+10545 ifve=11andob=1andtu(2)=1thenprint"ok.":tu(2)=0
+10546 ifve=12andob=1andtu(2)=0thenprint"ok.":tu(2)=1
+10548 ifve=15andge(g1)=-2andtu(2)=0thenprint"ok.":ge(g1)=-1
+10550 ifve=18andob=1andtu(2)=0andge(g1)=-1thenprint"ok.":ge(g1)=-2
+10560 ifve=23andob=1andtu(2)=0thenri(1)=7:ve=1
+10590 return
+10600 rem raum 6 ---------
+10602 data 0,0,0,0,2,0,0,0,0,0
+10605 print"raum nummer 6"
+10620 return
+10700 rem in der truhe -------
+10702 data 0,0,0,0,0,0,0,0,0,0
+10705 print"in der truhe."
+10720 ifve=25andob=1andtu(2)=0thenri(1)=5:ve=1
+10730 return
+50000 rem ****************************
+50010 rem *     befehlseingabe       *
+50020 rem *     befehlszerlegung     *
+50030 rem *     befehlscodierung     *
+50040 rem ****************************
+50050 ifud=1then50220
+50060 poke198,0:be$="":print"was nun ? ";
+50070 poke204,0
+50080 getx$:ifx$=""then50080
+50090 ifpeek(203)=1orlen(be$)>68thenprint" ":poke204,1:goto50140
+50100 i=asc(x$):ifi<65ori>90thenifi<>32andi<>20andi<>34then50080
+50110 ifi=20andbe$=""then50080
+50120 ifi=20thenpoke204,1:print"{left}  {left}{left}";:be$=left$(be$,len(be$)-1):goto50070
+50130 printx$;:be$=be$+x$:goto50080
+50140 fori=1to10:be$(i)="":next:wz=1:fori=1tolen(be$)
+50150 :ifmid$(be$,i,1)=" "thengosub50190:goto50180
+50160 :ifwz>10thenprint"eingabe ist zu lang !":i=len(be$)+1:goto50180
+50170 :be$(wz)=be$(wz)+mid$(be$,i,1)
+50180 nexti:goto50220
+50190 ic=0:fori1=1toaz:ifbe$(wz)=au$(i1)thenic=1
+50200 nexti1:ific=0thenwz=wz+1:return
+50210 be$(wz)="":return
+50220 ifud=1thenud=0:goto50240
+50230 wz=1:ve=0:ob=0:pe=0
+50240 ic=0:g1=0:g2=0
+50250 fori=1tovz:ifbe$(wz)=ve$(i)thenve=i:ic=1
+50251 iflen(be$(wz))<3then50260
+50255 ifbe$(wz)=left$(ve$(i),len(be$(wz)))thenve=i-val(right$(ve$(i),1)):ic=1
+50260 nexti:ific=1then50350
+50270 fori=1togz:ifbe$(wz)<>ge$(i)then50300
+50280 ic=1:ifg1=0theng1=i
+50290 g2=i:ifg2=g1theng2=0
+50300 nexti:ific=1then50350
+50310 fori=1tooz:ifbe$(wz)=ob$(i)thenob=i:ic=1
+50320 nexti:ific=1then50350
+50330 fori=1topz:ifbe$(wz)=pe$(i)thenpe=i:ic=1
+50340 nexti
+50350 ifbe$(wz)="und"thenud=1:ic=1
+50360 ific=0thenprint"ich kenne ";be$(wz);" nicht !":return
+50370 wz=wz+1:ifwz>10orbe$(wz)=""orud=1thenreturn
+50380 ic=0:goto50250
+52000 rem t a b e l l e n
+52005 restore52000
+52010 rem verbtabelle ---------
+52020 datan,s,w,o,nw,no,sw,so,rauf,runter
+52030 dataoeffne,schliesse,schaue,untersuche1,nimm,nehme1,hole2
+52035 dataverliere,lege1,wirf2,werfe3,inventur
+52040 datagehe,betrete1
+52045 dataverlasse
+52100 vz=25:dimve$(vz):fori=1tovz:readve$(i):next
+52200 rem gegenstandstabelle ---------
+52210 dataschwert,-2
+52211 dataseil,2
+52212 dataschluessel,4
+52213 datadiamant,5
+52300 gz=4:dimge$(4):dimge(4):fori=1togz:readge$(i):readge(i):nexti
+52400 rem objekttabelle ---------
+52410 datatruhe,5
+52412 dataschacht,6
+52414 dataeisenring,6
+52416 datatuer,2
+52418 datatuer,5
+52500 oz=5:dimob$(oz):dimoo(oz):fori=1tooz:readob$(i):readoo(i):nexti
+52600 rem personentabelle -------
+52610 datagespenst
+52700 pz=1:dimpe$(pz):fori=1topz:readpe$(i):next
+52900 rem allgemeine tabellen
+52910 tu(1)=1:rem tuer 2/5
+52920 tu(2)=1:rem truhe
+52930 data1,3,4,3,1,2,5,2,6,2,1
+52935 dimpe(11):fori=1to11:readpe(i):next:mo=1
+53000 return
+

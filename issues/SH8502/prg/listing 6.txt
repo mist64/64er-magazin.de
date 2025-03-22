@@ -1,0 +1,83 @@
+;listing 6 ==0801==
+;Quelle: 64'er CD
+    5 gosub60000: rem tabellen bestimmen
+   10 rem ********* steuerung ***********
+   30 gosub50000
+   40 rem reagieren-aufrufen
+   60 rem ******* demonstration *********
+   62 print:print"be$ = ";be$:print
+   64 print"verbzahl (ve) =";ve
+   66 print"1.gegenstandszahl (g1) =";g1
+   68 print"2.gegenstandszahl (g2) =";g2
+   70 print"objektzahl (ob) =";ob
+   72 print"personenzahl (pe) =";pe
+   80 goto10
+   90 rem *******************************
+50000 rem befehl be$ vom spieler erfragen --------------------------------------
+50010 ifud=1then52000
+50020 input"was nun ";be$
+50030 goto51000
+51000 rem be$ in be$(1)-be$(10) zerlegen----------------------------------------
+51010 fori=1to10:be$(i)="":next
+51020 wz=1
+51030 fori=1tolen(be$)
+51040 :ifmid$(be$,i,1)=" "thengosub51100:goto51060
+51045 :ifwz>10thenprint"eingabe ist zu lang !":i=len(be$)+1:goto51060
+51050 :be$(wz)=be$(wz)+mid$(be$,i,1)
+51060 nexti
+51070 goto52000
+51100 rem au$ woerter aussortieren
+51110 ic=0:fori1=1toaz
+51120 :ifbe$(wz)=au$(i1)thenic=1
+51130 nexti1
+51140 ific=0thenwz=wz+1:return
+51150 be$(wz)="":return
+52000 rem die befehlswoerter untersuchen und daraus einen sinn deuten ----------
+52005 ifud=1thenud=0:goto52020
+52010 wz=1:ve=0:ob=0:pe=0
+52020 ic=0:g1=0:g2=0
+52025 rem *** verb ve suchen
+52030 fori=1tovz
+52040 :ifbe$(wz)=ve$(i)thenve=i:ic=1
+52050 nexti:ific=1then52150
+52060 rem *** gegenstand g1/g2 suchen
+52070 fori=1togz
+52080 :ifbe$(wz)<>ge$(i)then52090
+52082 : ic=1
+52084 : ifg1=0theng1=i
+52086 : g2=i:ifg2=g1theng2=0
+52090 nexti:ific=1then52150
+52100 rem *** objekt ob suchen
+52110 fori=1tooz
+52120 :ifbe$(wz)=ob$(i)thenob=i:ic=1
+52130 nexti:ific=1then52150
+52132 rem *** person pe suchen
+52133 fori=1topz
+52134 :ifbe$(wz)=pe$(i)thenpe=i:ic=1
+52135 nexti:ific=1then52150
+52137 ifbe$(wz)="und"thenud=1:ic=1
+52140 ific=0thenprint"ich kenne ";be$(wz);" nicht !":return
+52150 wz=wz+1
+52160 ifwz>10orbe$(wz)=""orud=1thenreturn
+52170 ic=0:goto52025
+60000 rem *****************************
+60001 rem * w o r t - t a b e l l e n *
+60002 rem *****************************
+60010 rem *** au$-wort-tabelle
+60020 data der,die,das,den, ,ueber,unter,auf,in,von,vom,im,nach,durch,mit,dem
+60022 data am
+60030 az=17:dimau$(az):fori=1toaz:readau$(i):next
+60050 rem *** verb-tabelle ve$
+60060 data nimm,verliere,oeffne,gib,sage,inventur,befestige
+60070 vz=7:dimve$(vz):fori=1tovz:readve$(i):next
+60090 rem *** gegenstands-tabelle ge$
+60100 data schwert,schluessel,seil,fackel,armbrust,helm,schild
+60110 gz=7:dimge$(7):fori=1togz:readge$(i):next
+60130 rem *** objekt-tabelle ob$
+60140 data fenster,tuer,truhe,kiste,falltuer
+60150 oz=5:dimob$(oz):fori=1tooz:readob$(i):next
+60160 rem *** personen-tabelle pe$
+60170 data geist,monster,thorin,gommel,ork
+60180 pz=5:dimpe$(pz):fori=1topz:readpe$(i):next
+60200 return
+

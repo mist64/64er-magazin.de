@@ -1,0 +1,265 @@
+;odyssee ==0801==
+;Quelle: 64'er CD
+    1 rem ***************
+    2 rem *  odyssee :  *
+    3 rem *             *
+    4 rem *  mainprg.   *
+    5 rem ***************
+    6 :
+    7 :
+    8 :
+    9 ifz=0then9000
+   10 dimt(4),v$(1,4),w$(1,4),w(2,4),s%(64):ti$="000000":w$="hand":v1=40
+   15 g=350:y=9:w=3:f=50:t=17061:h=300:forz=1to4:g(z)=5:next:poke12762,0
+   16 forz=1to27:readz$:next:forz=0to63
+   17 s%(z)=50:next:s%(64)=100:forz=1to16
+   18 readi:s%(i)=i*100:next:forz=1to100
+   21 i=int(rnd(0)*20):x=int(rnd(0)*440+20):ifpeek(17001+(20-i)+x*20)<>40then21
+   22 poke17001+(20-i)+x*20,35:next:fori=0to1:forz=1to4:readw$(i,z),w(i,z):next:next
+   23 v$(0,1)="foodshop":v$(0,2)="pub":v$(1,1)="weaponshop":v$(1,2)="armourshop"
+   24 v$(1,4)="exit the town":poke788,52
+   25 v$(0,3)="talk to people":v$(1,3)=v$(0,3):v$(0,4)="exit the village"
+   26 printchr$(147):poke53265,11
+   33 i=t:forz=1to40:poke16604,i-256*int(i/256):poke16605,int(i/256):i=i+20
+   34 sys16484:next:poke1043+y*40,33:ifb=5thenpoke1043+y*40,38:poke55296+y*40,14
+   35 poke 214,20 : sys58640 : print "{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}";
+   40 poke53265,155:poke53272,29:goto 90
+   50 print"illegal command":goto90
+   60 print"not there":goto90
+   70 print"no way":goto90
+   80 print"pass"
+   90 print"cmd: ";
+  100 sys16674:p=1043+y*40:i=i+1:ifi<15thenz=peek(197):ta=z*100:goto s%(z)
+  110 i=0:ifpeek(p-1)=35then160
+  120 ifpeek(p+1)=35then160
+  130 ifpeek(p-40)=35then160
+  140 ifpeek(p+40)=35then160
+  150 goto100
+  160 i=int(rnd(0)*18):ifk+a(2)<ithenprint"hit":h=h-int(rnd(0)*5)-1:ifh<1then180
+  165 ifk+a(2)>i-1thenprint"missed"
+  170 print"cmd: ";:goto100
+  180 printn$" is dead":forz=1to10:poke198,0:next:wait198,1:run
+  210 i=v1:v1=peek(z)
+  211 ifb=0thenifpeek(z)=40thengoto x
+  212 ifb=5thenifpeek(z)=37thengoto x
+  213 ifpeek(z)=41and(spand2)=2then220
+  214 ifpeek(z)=37and(spand16)=16thensw=sw+1:goto2180
+  215 ifpeek(z)=37and(spand16)=16thengoto x
+  216 ifpeek(z)=42thenh=h-100:ifh<0then180
+  217 ifpeek(z)=42thengoto x
+  218 ifpeek(z)=43and(spand8)=8thengoto x
+  219 v1=i:goto70
+  220 bo=bo+1:ifbo=2thensp=sp-2
+  230 goto x
+ 1000 print"attack --- ";:goto10000
+ 1010 ifpeek(s)<>35thenprint"miss":goto90
+ 1020 i=int(rnd(0)*20):ifw+a(1)>iorze=5thenprint"hit":ze=0:goto1040
+ 1030 ze=ze+1:print"miss":goto90
+ 1040 print"hit":g(z)=g(z)-1:ifg(z)<1theng(z)=int(rnd(0)*3)+3:goto1060
+ 1050 forz=1to5:poke197,64:next:goto90
+ 1060 i=int(rnd(0)*20):print" killed --- gold found :"i:g=g+i:pokes,40:u=40:p=35
+ 1070 c=c+1:ifc=20thenprint"you get a blue tassle":sp=sp+1
+ 1080 goto2110
+ 1200 ifb=5thenprint"only on foot":goto90
+ 1205 print"{clr}{rvon}"n$:print:print:print:print
+ 1210 forz=1to5:printk$(z);b(z):next
+ 1215 poke214,5:sys58640:printtab(29)"food :"int(f):printtab(29)"gold :"g
+ 1217 printtab(29)"power:"h:print:print
+ 1220 print:print:print"weapon : "w$
+ 1230 print:print"armour : "ar$
+ 1240 print:print"tools  : ";
+ 1250 i=1:x=0:forz=1to7:if(spandi)=ithenx=x+1:printsp$(z)";";
+ 1255 i=i*2:next
+ 1260 ifx=0thenprint"no tool":goto1290
+ 1270 print"{left} "
+ 1290 poke198,0:wait198,1:goto26
+ 1400 print"enter --- ";:goto10000
+ 1410 ifpeek(s)=36thena$="a town.":a=1:goto1460
+ 1420 ifpeek(s)=39thena$="a village.":a=0:goto1460
+ 1430 ifpeek(s)=44then16000
+ 1440 ifpeek(s)=31thent=26641:y=15:goto26
+ 1450 goto60
+ 1460 poke53272,21:print"{clr}you have entered "a$;:goto15000
+ 1700 print"restart game --- are you sure ? ";
+ 1710 poke198,0:wait198,1:getz$:ifz$="y"thenprintz$:run
+ 1720 print"n":print"i knew it":goto90
+ 2100 print"food: "int(f):goto90
+ 2110 s=s-1024:i=int(s/40):z=t+(40-(s-i*40))*20-y1:pokez,u:goto90
+ 2160 goto x
+ 2180 ifsw=12thensp=sp-16
+ 2190 goto x
+ 2200 print"transact --- ";:goto10000
+ 2210 print"ok":print"==> ";:ifpeek(s)=34then2215
+ 2211 ifpeek(s)=35thenprint"nice day;today":goto90
+ 2212 print"no response":goto90
+ 2215 ify1=3anda(3)<16then20000
+ 2220 ify1=12anda(5)<10then20010
+ 2225 ify1=10andg<100thenprint"he wants to have 100 golden coins.":goto90
+ 2227 ify1=10theng=g-100:print"he takes 100 coins":print"==> ";:goto2290
+ 2230 ify1=2anda(5)<30then20010
+ 2235 ify1=4anda(5)<20then20010
+ 2240 ify1=13thenprint"he tells you a secret password.":a(5)=10:goto2295
+ 2245 ify1=1thenprint"he gives you magical boots.":sp=spor2:goto2295
+ 2250 ify1=9thenprint"he gives you a golden key":sp=spor32:goto2295
+ 2255 ify1=19and(spand32)=32thenprint"he take the golden key.":sp=sp-32:goto2290
+ 2257 ify1=19thenprint"he wants to have the golden key":goto90
+ 2260 ify1=11thenprint"he gives you a key.":sp=spor6:goto2295
+ 2265 ify1=0anda(4)<17thenprint"wisdom no high enough.":goto20005
+ 2270 ify1=8anda(3)<22then20000
+ 2275 ify1=6thenprint"he gives you a swim-west":sp=spor16:goto2295
+ 2280 ify1=14thenprint"he stoles all your gold":g=0:goto2295
+ 2285 ify1=5thenprint"he gives you a magic missile.":sp=spor4:goto2295
+ 2290 print"you may pass"
+ 2295 forz=1to16:pokes+54272,z:fori=1to50:next:next:u=40:p=34
+ 2297 pokes+54272,13:pokes,40:goto2110
+ 2300 print"exit ";:ifb=0thenprint"what ?":goto90
+ 2305 print"ship --- ";:goto10000
+ 2310 ifpeek(s)<>40then60
+ 2320 y1=y:pokes,33:print"ok":ifs=p-40thens=p-40:y=y-1:goto2360
+ 2330 ifs=p+1thens=p-1:t=t-20:poke16604,(t)and255:poke16605,int(t/256):sys16384:goto2360
+ 2340 ifs=p+40theny=y+1:s=p-40:goto2360
+ 2350 s=p+1:t=t+20:i=t+780:poke16604,iand255:poke16605,int(i/256):sys16484
+ 2360 u=38:b=0:v1=40:goto2110
+ 2600 print"gold: "g:goto90
+ 2800 print"board ship --- ";:goto10000
+ 2810 ifpeek(s)<>38then60
+ 2820 if(spand1)<>1thenprint"no":print"==> the crew does not allow this":goto90
+ 2830 print"ok":b=5:pokep,v1:poke54272+s,14:p=p+1:ifs=p-41theny=y-1:goto2870
+ 2840 ifs=pthent=t-20:poke16604,(t)and255:poke16605,int(t/256):sys16384:goto2870
+ 2850 ifs=p+39theny=y+1:goto2870
+ 2860 t=t+20:i=t+780:poke16604,iand255:poke16605,int(i/256):sys16484:goto2870
+ 2870 u=37:s=p-1:p=38:v1=37:goto2110
+ 2900 print"power: "h:goto90
+ 3000 print"unlock door --- ";:if(spand64)<>64thenprint"no key":goto90
+ 3005 goto10000
+ 3010 ifpeek(s)<>194then60
+ 3020 print"ok":pokes,40:pokes-41,192:goto90
+ 3600 if(spand4)<>4thenprint"no magic missile":goto90
+ 3610 print"magic missile"
+ 3620 forz=1024to1823:i=peek(z+54272):pokez+54272,1
+ 3630 ifpeek(z)<>35andpeek(z)<>34then3640
+ 3635 x=z-1024:n=int(x/40):poket+(40-(x-n*40))*20-n,40:g=g+5:pokez,40
+ 3640 ifpeek(z)=30thengoto18000
+ 3650 pokez+54272,i:next:sp=sp-4:goto90
+ 4500 v2=v1
+ 4505 z=1042+y*40:x=4510:goto210
+ 4510 t=t+20:i=t+780:poke16604,iand255:poke16605,int(i/256):print"west"
+ 4520 sys16484:pokep+1,v2:pokez+1,33+b
+ 4530 f=f-.2:iff<0thenprint"no food --- ";:goto180
+ 4540 goto90                           
+ 4600 v2=v1:z=1043+y*40-40:x=4610:goto210
+ 4610 print"north":pokez+40,v2:y=y-1:pokez,33+b:goto4530
+ 5000 v2=v1
+ 5005 z=1044+y*40:x=5010:goto210
+ 5010 t=t-20:poke16604,(t)and255:poke16605,int(t/256):print"east":sys16384
+ 5020 pokep-1,v2:pokez-1,33+b:goto4530
+ 5500 v2=v1:z=1043+y*40+40:x=5510:goto210
+ 5510 print"south":pokez-40,v2:y=y+1:poke1043+y*40,33+b:goto4530
+ 9000 poke53280,0:poke53281,0:poke53272,21:printchr$(142),chr$(8):ar$="skin"
+ 9010 poke95,0:poke96,160:poke90,0:poke91,192:poke88,0:poke89,192:sys41919
+ 9020 gosub9500:k$(5)=k$(5)+"00"
+ 9100 print"{clr}{wht}{down}{down}"tab(10)"creating a player":printtab(7)"=-=-=-=-=-=-=-=-=-=-=-="
+ 9110 print:print:print:forz=1to5:printtab(10);k$(z):a$(z)="":next:i=7:s=0
+ 9115 forz=1to4:poke214,i:sys58640
+ 9120 printtab(25);:poke198,0:wait198,1:getz$
+ 9130 ifz$=chr$(20)andlen(a$(z))thena$(z)=left$(a$(z),len(a$(z))-1):goto9165
+ 9140 iflen(a$(z))=2thenprint:goto9170
+ 9150 ifasc(z$)<48orasc(z$)>57then9120
+ 9160 a$(z)=a$(z)+z$
+ 9165 printz$;:goto9120
+ 9170 a(z)=val(a$(z)):s=s+a(z):ifs>100then9100
+ 9175 i=peek(214):poke214,20:sys58640:print"points left :      {left}{left}{left}{left}{left}"100-s:next
+ 9180 input"{up}{up}{up}{up}{up}{up}your name ";n$
+ 9184 ifpeek(2)=0thenforz=57344to65535:pokez,peek(z):next:poke59639,20
+ 9185 gosub9500:a(1)=int(a(1)/5):a(2)=int(a(2)/5):poke2,1:poke1,53
+ 9190 i=43168:pokei,32:pokei+1,192:pokei+2,2:i=704:pokei,32:pokei+1,138
+ 9195 pokei+2,173:pokei+3,76:pokei+4,247:pokei+5,183:printchr$(147)
+ 9197 forz=1to4:b(z)=a(z):next
+ 9200 printtab(12)"{down}{down}{down}{wht}<<< odyssee >>>"
+ 9210 print"{down}"tab(9)"<<<  please wait  >>>"
+ 9220 printtab(6)"{down}<<< while loading part2 >>>"
+ 9230 printtab(3)"{down}<<<  (c) by jan geiszelmann   >>>"
+ 9240 print"{down}<<<-------------* 1984 *------------>>>"
+ 9250 printtab(4)"{down}{down}{down}*******************************"
+ 9260 printtab(4)"*                             *"
+ 9270 printtab(4)"*******************************":print"{up}{up}"tab(6);
+ 9280 forz=1to27:readz$
+ 9290 forx=1to100:next:ifz$="x"thenprint" ";:next
+ 9295 printz$;:next
+ 9297 load"world",8,1
+ 9299 rem fuer datasette : zeile 9297 loeschen und zeile 9300-9320 eingeben
+ 9300 print:print:print:print"{blk}load"chr$(34)"world"chr$(34)",1,1{wht}{up}{up}";:poke631,13
+ 9310 poke632,90:poke633,61:poke634,49:poke635,58:poke636,71:poke637,111
+ 9320 poke638,49:poke639,13:poke198,10:end
+ 9500 k$(1)="strenght.......":k$(2)="stamina........":k$(3)="intelligence..."
+ 9510 k$(4)="wisdom.........":k$(5)="passwords......":sp$(1)="blue tassle"
+ 9520 sp$(2)="boots":sp$(3)="magic missile":sp$(4)="mark of fire"
+ 9530 sp$(5)="swim-west":sp$(6)="golden key":sp$(7)="key":return
+10000 poke198,0:wait198,1:getz$
+10010 ifz$="@"thens=p-40:print"north -- ";:z=1:y1=y-1:gotota+10
+10020 ifz$=":"thens=p-1:print"west --- ";:z=2:y1=y:gotota+10
+10030 ifz$=";"thens=p+1:print"east --- ";:z=3:y1=y:gotota+10
+10040 ifz$="/"thens=p+40:print"south -- ";:z=4:y1=y+1:gotota+10
+10050 goto80
+15000 poke214,3:sys58640:print:v=1
+15010 ify1=9thenv$(a,3)="buy a boat":v$(a,2)="talk to people":v=2
+15020 ify1=1thenv=3
+15030 ify1=17thenv$(a,3)="buy the mark of fire":v=4
+15100 i=1:forz=1to4:printi"{left}.) "v$(a,z):i=i+1:next:print"{down}{down}what do you want ? ";
+15110 poke198,0:wait198,1:getz$:ifval(z$)<1orval(z$)>4then15110
+15120 printz$:print:print:onval(z$)goto15125,15127,15128,15370
+15125 x=0:ona+1goto15230,15130
+15127 x=1:ona+1goto15276,15130
+15128 onvgoto15200,15330,15276,15400
+15130 forz=1to4:printz"{left}.) "w$(x,z):next:print"{down}{down}your interest ? ";
+15150 poke198,0:wait198,1:getz$:printz$:ifval(z$)<1orval(z$)>4then1460
+15160 z=val(z$):print"{down}the "w$(x,z)" cost you"w(x,z)"{left}. ok ? ";:u=15170:goto15530
+15170 i=w(x,z):u=15180:goto15500
+15180 g=g-i:print"{down}ok!":ifx=0thenw$=w$(0,z):w=3+z*2:goto15520
+15190 ar$=w$(1,z):k=z*2+1:goto15520
+15200 print"the people here do not know anything.":goto15520
+15230 p=int(rnd(0)*20)+32:print"100 food units cost you"p"{left}. ok ? ";
+15235 u=15240:goto15530
+15240 i=p:u=15250:f=f+100:goto15500
+15250 print"{down}now you have"int(f)"food units":g=g-p:goto15520
+15276 ifv<>2andv<>3then15280
+15277 print"they tell you a secret password.":b(5)=v*10:goto15520
+15280 p=int(rnd(0)*75)-50:ifg=0thenprint"no money !":goto1460
+15282 print"gambling ...":forz=1to1000:next:i=0:u=15285:goto15500
+15285 ifp<0thenprint"i'm sorry but you have lost";:goto15310
+15290 ifp>0thenprint"ohh. you have won";:goto15312
+15300 goto15282
+15310 ifsgn(p)*p>gthenp=-1*g
+15312 printp*sgn(p)"!"::g=g+p:goto15520
+15315 goto15520
+15330 print"{down}the boat cost 100 coins ! ok ? ";:u=15340:goto15530
+15340 i=100:u=15350:goto15500
+15350 g=g-100:y=9:b=5:t=21101:ri=0:v1=37:forz=1to500:next
+15370 poke53272,29:goto23
+15400 print"the mark of fire cost 50 ! ok ? ";:u=15410:goto15530
+15410 u=15420:i=50:goto15500
+15420 sp=spor8:g=g-i:goto15520
+15500 ifg<ithenprint"{down}you have not enough money !":forz=1to500:next:goto1460
+15510 goto u
+15520 forz=1to700:next:goto1460
+15530 poke198,0:wait198,1:getz$:ifz$<>"y"thenprint"n":goto15520
+15540 printz$:goto u
+16000 print"{clr}you have entered the castle of a lord"
+16010 print"{down}{down}for 50 coins you get 1000 units of power"
+16020 print"do you want ? ";
+16030 poke198,0:wait198,1:getz$:ifz$<>"y"thenprint"n":forz=1to200:next:goto26
+16040 ifg<50thenprint"you have not enough money":goto26
+16050 printz$:forz=1to200:next:g=g-50:h=h+1000:goto26
+18000 forz=1to16:fori=1to16::poke53280,i:next:poke53281,z:next
+18010 print"{clr}congratulations "n$
+18020 a$="{down}{down}{down}you have managed it to destroy the dark tower and to kill the"
+18030 a$=a$+" wizard saruman.thepeople living in sosaria have made you  to "
+18035 a$=a$+"their new king for the next 20 years.{down}{down}{rvon} end of report {down}{down}"
+18040 forz=1to183:printmid$(a$,z,1);:fori=1to150:next:next:end
+20000 print"you are not intelligent enough"
+20005 printtab(4)"so that you may pass.":goto90
+20010 print"you do not know the secret password.":goto90
+60000 dataa,x,f,a,n,t,a,s,y,x,r,o,l,e,x,p,l,a,y,i,n,g,x,g,a,m,e
+60010 data10,12,14,17,22,23,28,30,36,45,46,50,55,26,21,29,dagger
+60020 data 50,axe,80,bow,100,gun,150,cloth,50,leather,80,chain,100,shield,150
+
