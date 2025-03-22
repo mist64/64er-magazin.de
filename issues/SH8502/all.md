@@ -3,7 +3,7 @@
 
 > Warum haben Abenteuerspiele in der letzten Zeit einen immer größer werdenden Anhängerkreis gefunden? Weil sie logisches Denkvermögen, Fantasie, Ausdauer und Kreativität fördern und fordern. Abenteuerspiele sind wie geschaffen für den Heimcomputer, oder besser, wurden erst durch diesen möglich. Gründe genug, um ein ganzes Sonderheft dieser Kategorie der Freizeitbeschäftigung mit dem Computer zu widmen.
 
-Im Gegensatz zu Schieß-, Action-, Arcade- oder Sportspielen, bei denen hauptsächlich die motorischen Fähigkeiten des Spielers gefragt sind und die schon nach relativ kurzer Zeit eine gewisse Monotonie hervorrufen, fesseln interessante Adventures oft über Monate hinweg. Sie schlüpfen dabei in die Rolle eines Schatzsuchers, Piraten, Archäologen, Forschers, Weltraumreisenden, Ritters oder Prinzen. Vielfältige Gefahren lauern auf Sie: feuerspeiende Drachen, hinter-hältigeZwerge, feindlicheGalaxienbewohner, heimtückische Fallen, verschrobene Professoren, undurchdringliche Urwälder, rätselhafte Schlösser, hungrige Ureinwohner oder einfach verbohrte Mitspieler.
+Im Gegensatz zu Schieß-, Action-, Arcade- oder Sportspielen, bei denen hauptsächlich die motorischen Fähigkeiten des Spielers gefragt sind und die schon nach relativ kurzer Zeit eine gewisse Monotonie hervorrufen, fesseln interessante Adventures oft über Monate hinweg. Sie schlüpfen dabei in die Rolle eines Schatzsuchers, Piraten, Archäologen, Forschers, Weltraumreisenden, Ritters oder Prinzen. Vielfältige Gefahren lauern auf Sie: feuerspeiende Drachen, hinterhältige Zwerge, feindliche Galaxienbewohner, heimtückische Fallen, verschrobene Professoren, undurchdringliche Urwälder, rätselhafte Schlösser, hungrige Ureinwohner oder einfach verbohrte Mitspieler.
 
 All denen gilt es Paroli zu bieten. Begeben Sie sich mit uns in die faszinierende Welt der computerisierten Abenteuer.
 
@@ -18,11 +18,11 @@ Der Kurs ist sowohl für Anfänger als auch Profis geeignet. Es wird Ihnen schri
 
 Es werden dabei einige sehr interessante Programmiertechniken vermittelt, die Sie unter anderem mit der Stringverarbeitung, der Analyse ganzer Sätze, dem modularen Aufbau eines Programms und der bool’schen Algebra vertraut machen sollen. Als Autor dieses Grundkurses konnten wir den Entwickler des deutschen Abenteuerspiels Gordon Saga gewinnen. Er plaudert aus seiner Trickkiste der Abenteuerspiel-Programmierung. Wenn Sie den Adventure-Kurs gründlich durchgearbeitet haben, sind Sie in der Lage, selbst gute Abenteuerspiele zu programmieren. Voraussetzungen sind nur Grundkenntnisse in Basic und die Bereitschaft, das Gelernte in die Tat umzusetzen.
 
-Gleichsam als Anschauungsmaterial werden im zweiten Teil sieben Abenteuerspiele zum Abtippen geliefert. Darunter befindet sich auch Zauberschloß, das erste in Deutschland veröffentlichte Abenteuerlisting. Die restlichen sechs Adventures sind bisher unveröffentlichte Listings der Spitzenklasse. »Odyssee — Kampf der Bruderschaft« fällt etwas aus der Reihe. Es handelt sich dabei um ein Rollenspiel, eine Untergruppe der Adventures. Doch lassen Sie sich überraschen. Diese Listings wurden unabhängig vom Kurs entwickelt, jedes hat seine spezifischen Stärken und Schwächen. Durch genauen Vergleich des im Kurs Gelernten, und dem in den Listings Realisierten, können Sie die Vorteile der unterschiedlichen Methoden für eigene Programmeverwen-den.
+Gleichsam als Anschauungsmaterial werden im zweiten Teil sieben Abenteuerspiele zum Abtippen geliefert. Darunter befindet sich auch Zauberschloß, das erste in Deutschland veröffentlichte Abenteuerlisting. Die restlichen sechs Adventures sind bisher unveröffentlichte Listings der Spitzenklasse. »Odyssee — Kampf der Bruderschaft« fällt etwas aus der Reihe. Es handelt sich dabei um ein Rollenspiel, eine Untergruppe der Adventures. Doch lassen Sie sich überraschen. Diese Listings wurden unabhängig vom Kurs entwickelt, jedes hat seine spezifischen Stärken und Schwächen. Durch genauen Vergleich des im Kurs Gelernten, und dem in den Listings Realisierten, können Sie die Vorteile der unterschiedlichen Methoden für eigene Programme verwenden.
 
 Alle Listings, sowohl die des Kurses, als auch die Abenteuerspiele sind mit einer speziellen Prüfsumme versehen, wie Sie sie bereits vom 64’er Stammheft kennen. Dadurch reduziert sich die Fehlerquote beim Eintippen erheblich. Lesen Sie sich also vor dem Eintippen irgendwelcher Listings den Artikel über den Checksummer 64 aufmerksam durch.
 
-Der dritte und vierte Teil des Sonderheftes »Abenteuerspiele« wendet sich an die oft verzweifelten Besitzer von käuflich erworbenen, professionellen Adventures. Nun hat man sich also »Gruds in Space« oder »Ultima III« besorgt, und kommt und kommt einfach an einer bestimmten Stelle nicht weiter. Auch Freunde oder Bekannte, die das selbe Spiel besitzen, können nicht helfen. Für all jene, die entnervt, mit zerwühltem Haar, der Verzweiflung und dem Aufgeben nahe, seit Monaten vor dem Adventure sitzen, haben wir im dritten AbschnittSchritt-für-Schritt-Lösungen von bekannten Abenteuerspielen gesammelt. Wie diese Lösungen eingesetzt werden, bleibtjedem selbst überlassen. Er kann sie in einem durchspielen, dann ist der Reiz ein für allemal weg, oder er nimmt sie her, um über eine für ihn besonders heikle Stelle hinwegzukommen, und dann denn Rest des Weges wieder allein zu gehen, oder es zumindest zu versuchen. Der vierte Abschnitt gibt dazu wertvolle, allgemeine Tips.
+Der dritte und vierte Teil des Sonderheftes »Abenteuerspiele« wendet sich an die oft verzweifelten Besitzer von käuflich erworbenen, professionellen Adventures. Nun hat man sich also »Gruds in Space« oder »Ultima III« besorgt, und kommt und kommt einfach an einer bestimmten Stelle nicht weiter. Auch Freunde oder Bekannte, die das selbe Spiel besitzen, können nicht helfen. Für all jene, die entnervt, mit zerwühltem Haar, der Verzweiflung und dem Aufgeben nahe, seit Monaten vor dem Adventure sitzen, haben wir im dritten Abschnitt Schritt-für-Schritt-Lösungen von bekannten Abenteuerspielen gesammelt. Wie diese Lösungen eingesetzt werden, bleibtjedem selbst überlassen. Er kann sie in einem durchspielen, dann ist der Reiz ein für allemal weg, oder er nimmt sie her, um über eine für ihn besonders heikle Stelle hinwegzukommen, und dann denn Rest des Weges wieder allein zu gehen, oder es zumindest zu versuchen. Der vierte Abschnitt gibt dazu wertvolle, allgemeine Tips.
 
 ### Für wen ist dieses Sonderheft gedacht?
 
@@ -30,7 +30,7 @@ Sicher für alle, die sich sowieso für Abenteuerspiele interessieren. Aber auch
 
 ### Welche weiteren Sonderhefte sind geplant?
 
-Die 64’er-Redaktion macht die Sonderhefte nicht auS »Spaß an der Freud’«, sondern weil derWunsch einer komprimierten Abhandlung über ein bestimmtes Thema von vielen Lesern geäußert wurde. Bei uns bestimmen Sie, was im 64’er Stammagazin erscheint, und welche Schwerpunkte als Sonderheft in allen Details behandelt werden sollen. Daher der Aufruf an alle Leser: Teilen Sie uns Ihre Vorstellungen über die nächsten Sonderhefte mit. Sie entscheiden, über welches Thema, sei es nun Drucker, DFÜ, Spiele, Massenspeicher (Diskettenlaufwerkund Datasette), Anwendungsprogramme, Grafik, Musik, Tips & Tricks, Hardware-Erweiterungen, etc., wir das nächste Sonderheft machen werden.
+Die 64’er-Redaktion macht die Sonderhefte nicht auS »Spaß an der Freud’«, sondern weil der Wunsch einer komprimierten Abhandlung über ein bestimmtes Thema von vielen Lesern geäußert wurde. Bei uns bestimmen Sie, was im 64’er Stammagazin erscheint, und welche Schwerpunkte als Sonderheft in allen Details behandelt werden sollen. Daher der Aufruf an alle Leser: Teilen Sie uns Ihre Vorstellungen über die nächsten Sonderhefte mit. Sie entscheiden, über welches Thema, sei es nun Drucker, DFÜ, Spiele, Massenspeicher (Diskettenlaufwerkund Datasette), Anwendungsprogramme, Grafik, Musik, Tips & Tricks, Hardware-Erweiterungen, etc., wir das nächste Sonderheft machen werden.
 
 (aa)
 
@@ -107,7 +107,7 @@ a) Spiele mit überwiegend Grafik (Grafik-Adventure)
 
 b) Spiele mit überwiegend Text (Text-Adventure)
 
-Bei Grafikabenteuerspielen findet man für jeden Raum ein Bild. Unter diesem Bild ist ein kleines Textfenster zur Befehlseingabe, ein Beispiel hierfür wäre das Adventure »Zauberschloß« von Happy Software. Bei Textabenteuerspielen findet man anstelle von Bildern lange Texte, die jeden Raum aus-führlich beschreiben — das Bild entsteht also in der Fantasie des Spielers, der den Text liest.
+Bei Grafikabenteuerspielen findet man für jeden Raum ein Bild. Unter diesem Bild ist ein kleines Textfenster zur Befehlseingabe, ein Beispiel hierfür wäre das Adventure »Zauberschloß« von Happy Software. Bei Textabenteuerspielen findet man anstelle von Bildern lange Texte, die jeden Raum ausführlich beschreiben — das Bild entsteht also in der Fantasie des Spielers, der den Text liest.
 
 Als ich mein erstes Adventure schrieb, war ich besonders darauf aus, viele Räume zu haben, weil ich dachte, daß dies für ein sehr gutes Adventure unbedingt notwendig sei. Ich bemerkte jedoch bald, daß ich hier völlig falsch lag — das Resultat war ein Spiel mit 200 (9 Räumen, aber kaum Action. Alles was man konnte, war herumlaufen und laufen und laufen. Auch die Befehlsanalyse, auf die ich in einem später folgenden Kapitel ausführlich zu sprechen kommen werde, war viel zu knapp geraten.
 
@@ -288,7 +288,7 @@ Unter Abenteuer sollte man vielmehr Erleben verstehen – Adventures sollten des
 Sehen Sie sich doch einmal die folgenden Themen an:
 
 1. Ein kleiner Wanderzirkus kommt in die Stadt. In der Nacht bricht ein gefährlicher Löwe aus und macht die Stadt unsicher.<br>Die Aufgabe des Spielers besteht nun darin, den Löwen zu finden und zu fangen.
-2. Auf einem riesigen Reiseschiff (ä la Traumschiff) befindet sich eine Gräfin. Aus ihrer Kabine werden plötzlich die gesamten Juwelenschmuckstücke entwendet. Der Täter kann das Schiff erst verlassen, wenn es im nächsten Hafen anlegt.<br>Aufgabe des Spielers ist den Dieb zu entlarven, bevor die Schiffsreise beendet ist.
+2. Auf einem riesigen Reiseschiff (à la Traumschiff) befindet sich eine Gräfin. Aus ihrer Kabine werden plötzlich die gesamten Juwelenschmuckstücke entwendet. Der Täter kann das Schiff erst verlassen, wenn es im nächsten Hafen anlegt.<br>Aufgabe des Spielers ist den Dieb zu entlarven, bevor die Schiffsreise beendet ist.
 3. Eine Flaschenpost wird gefunden, die eine Seekarte enthält, auf der eine bisher unbekannte Insel eingezeichnet ist.
 Aufgabe des Spielers: Zur Insel reisen und sie erforschen.
 4. Aufgabe des Spielers: Per Autostop von Frankfurt nach Rom zu trampen.
@@ -544,7 +544,7 @@ Eine utopische Lösung wäre, wenn man den Bären einfach mit Anbrüllen zur Flu
 
 Lassen Sie sich ruhig mehrere Tage Zeit, die Lösungen zu den einzelnen Aufgaben zu finden. Ein anderes Beispiel für eine solche Action-Szene stand bereits in der Einleitung zu diesem Kurs. Es stammt aus dem Adventure »Gorden Saga«.
 
-Oft bringt der Einbau von Action-Szenen auch eine Änderung der Spielkarte mit sich. Sie sehen, daß es beim Schreiben von Adventures nahezu unmöglich ist, einzelne Arbeitsschritte nacheinander durchzuführen — man muß vielmehr immer an mehreren gleichzeitig arbeiten, da sie alle eng mit-einander verbunden sind.
+Oft bringt der Einbau von Action-Szenen auch eine Änderung der Spielkarte mit sich. Sie sehen, daß es beim Schreiben von Adventures nahezu unmöglich ist, einzelne Arbeitsschritte nacheinander durchzuführen — man muß vielmehr immer an mehreren gleichzeitig arbeiten, da sie alle eng miteinander verbunden sind.
 
 Ich möchte jetzt nicht auf weitere Action-Szenen eingehen, die man in das Spiel einbauen kann. Es sollen statt dessen noch einige Erläuterungen zur Karte gemacht werden.
 
@@ -752,7 +752,7 @@ Dokumentation zum Listing:
 50070	Prüfung, ob DEL-Taste gedrückt worden ist. Wenn Ja, dann Cursor ausschalten. Letztes Zeichen löschen. Vom Befehlsstring BE$ das letzte Zeichen wieder löschen.
 50080	Das neue Zeichen X$ ausdrucken. Den Befehlsstring BE$ um das neue Zeichen X$ erweitern. Neues Zeichen von Tastatur abwarten.
 
-Nun möchte ich Ihnen noch eine Routine (Listing 3) vorstellen. Erfolgt 30 Sekunden lang keine Eingabe, so endet die Routine und fährt im Programm fort— die Bedenkzeit des Spielers wird also eingeschränkt. Bei dieser Routine werden Sie feststellen, daß der Bildschirm in zwei Abschnitte unter-teilt ist, wie es bei Adventures mit Grafik und Text vorkommt. Die oberen 3/4 des Bildschirms sind als Grafik-Fenster, das untere Viertel als Texteingabe-Fenster definiert.
+Nun möchte ich Ihnen noch eine Routine (Listing 3) vorstellen. Erfolgt 30 Sekunden lang keine Eingabe, so endet die Routine und fährt im Programm fort— die Bedenkzeit des Spielers wird also eingeschränkt. Bei dieser Routine werden Sie feststellen, daß der Bildschirm in zwei Abschnitte unterteilt ist, wie es bei Adventures mit Grafik und Text vorkommt. Die oberen 3/4 des Bildschirms sind als Grafik-Fenster, das untere Viertel als Texteingabe-Fenster definiert.
 
 TODO Listing 3
 
@@ -1249,7 +1249,7 @@ Wie liest das Codiermodul diesen Satz nun eigentlich?
 
 Eine erste Antwort auf diese Frage ist, wie bereits besprochen, »Wort für Wort«.
 
-Welches Wort bearbeitet wird, bestimmt die Variable WZ (Wortzähler). Damit das Lesen beim ersten Wort beginnt, setzten wir die Wortzähl-Variable WZ am Anfang des Lese-beziehungsweise Codiermoduls auf 1.
+Welches Wort bearbeitet wird, bestimmt die Variable WZ (Wortzähler). Damit das Lesen beim ersten Wort beginnt, setzten wir die Wortzähl-Variable WZ am Anfang des Lese- beziehungsweise Codiermoduls auf 1.
 
 Sodann wird das Wort BE$(WZ) gelesen, also codiert. Und das geht folgendermaßen:
 
@@ -1394,7 +1394,7 @@ Wenn das Wort in irgendeiner Tabelle gefunden wird, so wird die Checkvariable IC
 52140	Wenn IC nun immer noch 0 ist, so steht fest, daß das Wort BE$(WZ) in keiner Tabelle beziehungsweise dem gesamten Wortschatz vertreten ist. Es erfolgt somit eine Fehlermeldung, die ausdrückt, welches Wort nicht erkannt wurde.
 52150			Die Wortzählvariable wird auf das nächste Wort gesetzt.
 52160	Überprüfung, ob der Befehlssatz die zulässige Wortzahl von maximal 10 Worten überschreitet, ob das neue Wort BE$(WZ) = " " ist oder ob UD = 1 ist. Trifft eine dieser Bedingungen zu, so wird der Codiervorgang.
-a)	beendet, wenn der Befehlssatz zu-ende ist (BE$(WZ)= " ").
+a)	beendet, wenn der Befehlssatz zuende ist (BE$(WZ)= " ").
 b)	unterbrochen, wenn ein Teilbefehl des Befehlssatzes BE$ ausgeführt werden muß, also wenn UD=1 ist.
 52170	Die Check-Variable IC wird auf 0 gesetzt. Der Lesevorgang beginnt erneut.
 Ab 60000	Definieren der Worttabellen
@@ -1689,7 +1689,7 @@ sowie:
 10 rem demoprogramm
 20 INPUT"WERT'; X
 30 IF X <1 OR X > 3 THEN GOTO 20
-40 RESTORE 100*3 : READX$ : PRINT X$ : GOTO 20
+40 RESTORE 100\*3 : READX$ : PRINT X$ : GOTO 20
 100 DATA HALLO
 200 DATA WIE
 300 DATA GEHTS
@@ -1717,7 +1717,7 @@ Wir wollen zunächst eine primitive Steuerung simulieren. Geben Sie dazu bitte f
 1000 REMACTIONMODUL
 1010 INPUT" IN WELCHEN RAUM WOLLEN SIE GEHEN? ":ZN
 1015 IF ZN <1 OR ZN> 6 THEN PRINT" DAS GEHT NICHT":GOT01010
-1020 GOSUB 10000+ZN*100
+1020 GOSUB 10000+ZN\*100
 1030 GOTO 1000
  
 Nun ist das Programm lauffähig.
@@ -1730,7 +1730,7 @@ Das vorliegende Actionmodul ist selbstverständlich noch extrem einfach. Im Mome
 
 Löschen Sie bitte nun folgende Zeilen wieder: 1010, 1015, 1020 und 1030. Wichtig ist nur, daß Sie sich die Formel zur Errechnung des jeweiligen Raumes merken:
 
-Raum = 10000+ZN*100.
+Raum = 10000+ZN\*100.
 
 ZN ist die jeweilige Zimmernummer, identisch mit den Nummern auf dem gezeichneten Spielplan. Der Raum beziehungsweise die Formel bestimmt die Zeilennummer, ab der der Raum im Programm steht. Es wird nun höchste Zeit, daß wir unser Befehlseingabemodul in Bewegung setzen.
 
@@ -1791,7 +1791,7 @@ TODO
 
 Dies ist ein Spielplan mit sechs Räumen. Wie man solche Pläne anfertigt, haben Sie bereits im Theorie-Teil dieses Kurses gelernt. Die einzelnen Räume sind von 1 bis 6 durchnummeriert. Ich habe den Plan absichtlich so kurz gehalten, da er für unsere ersten Versuche völlig ausreicht, und ich Ihnen unnötige Abtipparbeit soweit wie möglich ersparen möchte.
 
-Bitte ergänzen Sie Ihr bisheriges Programm (Basic - Erweiterungsroutine und Befehlseingabe-modul) nun um die Zeilen von Listing 10.
+Bitte ergänzen Sie Ihr bisheriges Programm (Basic - Erweiterungsroutine und Befehlseingabemodul) nun um die Zeilen von Listing 10.
 
 TODO Listing 10
 
@@ -1830,7 +1830,7 @@ Das Actionmodul hätte erst einmal die neue Zimmernummer registriert:
 
 ZN = RI(VE)
 
-Danach: GOSUB 10000 + ZN*100
+Danach: GOSUB 10000 + ZN\*100
 
 Dann: neues Feld RI von Raum B einlesen.
 
@@ -1843,8 +1843,8 @@ Diese Theorie wird mittels den folgenden Ergänzungszeilen nun in die Praxis umg
 1105 IF VE< 1 OR VE> 10 THEN 1200
 1110 IF RI(VE)=0 THEN PR1NT " KEIN WEG IN DIESE RICHTUNG ! ":GOT0 1200
 1120 ZN = Rl(VE) : PRINT " {CLR} "
-1130 GOSUB 10000 + ZN*100
-1140 RESTORE 1 0000 + ZN *100
+1130 GOSUB 10000 + ZN\*100
+1140 RESTORE 1 0000 + ZN \*100
 1150 FOR I=1 TO 10 : READ RI(I) : NEXT
 1200 GOTO 1000
 
@@ -1864,7 +1864,7 @@ Die vorgestellte Spielkarte ist natürlich jedoch nur mit einem sehr spärlichen
 
 Wir haben nun ein Adventure mit Räumen der primitivsten Art vorliegen. Alles was man bisher machen kann, ist herumlaufen.
 
-Es ist nun sehr wünschenswert, daß man nach jeder Raum-beschreibung eine Angabe erhält, in welche Richtung man sich bewegen kann.
+Es ist nun sehr wünschenswert, daß man nach jeder Raumbeschreibung eine Angabe erhält, in welche Richtung man sich bewegen kann.
 
 Wir schreiben deshalb nun eine kleine Routine, die nach jeder Raumbeschreibung »MÖGLICHE RICHTUNGEN:...« ausgibt.
 
@@ -2075,11 +2075,11 @@ Am Kopf des Raumes steht eine DATA-Zeile, die die möglichen Richtungen und ihre
 
 Die DATA-Zeile wird mittels
 
-RESTORE 10000 + ZN*100
+RESTORE 10000 + ZN\*100
 
 und einer READ-Schleife gelesen.
 
-Danach wird die Raumbeschreibung mittels GOSUB 10000 + ZN*100 ausgegeben.
+Danach wird die Raumbeschreibung mittels GOSUB 10000 + ZN\*100 ausgegeben.
 
 Die Raumbeschreibung steht dabei in PRINT-Zeilen von 10105 bis maximal 10119.
 
@@ -2090,11 +2090,11 @@ Das allgemeine Ablaufschema für einen einzelnen Raum der Spielkarte samt Action
 TODO
 
 Aus diesem Schema geht hervor, daß die raumspezifische Action zum Raum ZN (ZN = Zimmernummer der Karte) mittels
-GOSUB 10000 + ZN*100 + 20
+GOSUB 10000 + ZN\*100 + 20
 aufgerufen wird.
 
 Um die Action des Raumes 1 aufzurufen, müßte man also
-GOSUB 10000 + 1*100 + 20,
+GOSUB 10000 + 1\*100 + 20,
 was identisch mit
 GOSUB 10120 ist, eingeben.
 
@@ -2147,7 +2147,7 @@ Jetzt müssen wir die raumspezifische Action in den Räumen 2 und 5 zum Öffnen 
 10230 IF VE=12 AND OB=5 AND TU(1)=0 THEN PRINT "OK. "TU(1)=1:RI(2)=0
 10250 RETURN
 
-Damit unser Programm jedoch einwandfrei läuft, müssen wir im Actionmodul selbst erst noch eine kleine Änderung vornehmen: Bitte fügen Sie Zeile 1130 REM und 1155 GOSUB 10000+ZN*100 in das Programm ein. Eine Erklärung für diese Änderung folgt gleich. Nun die Erklärung zur Türprogrammierung in Raum 2:
+Damit unser Programm jedoch einwandfrei läuft, müssen wir im Actionmodul selbst erst noch eine kleine Änderung vornehmen: Bitte fügen Sie Zeile 1130 REM und 1155 GOSUB 10000+ZN\*100 in das Programm ein. Eine Erklärung für diese Änderung folgt gleich. Nun die Erklärung zur Türprogrammierung in Raum 2:
 
 TODO Tabelle
 
@@ -2157,9 +2157,9 @@ In dieser Zeile wird der Zustand der Tür überprüft. Wird dabei festgestellt, 
 
 Hierduch läßt sich auch begründen, warum wir das Actionmodul ein wenig verändern mußten: Wenn der Spieler einen neuen Raum betritt, geschieht folgendes:
 
-1.	Der DATA-Zeiger wird mittels RESTORE 10000+ZN*100 auf die DATA-Zeile des neuen Raumes gesetzt.
+1.	Der DATA-Zeiger wird mittels RESTORE 10000+ZN\*100 auf die DATA-Zeile des neuen Raumes gesetzt.
 2.	Nun werden die Richtungsmöglichkeiten RI(1) bis RI(10) mittels READ-Befehl eingelesen.
-3.	Sodann wird mittels GOSUB 10000 +100*ZN die Raumbeschreibung aufgerufen, bei der gegebenenfalb (Tür ist offen) auch der Verbindungsweg wieder hergestellt wird.
+3.	Sodann wird mittels GOSUB 10000 +100\*ZN die Raumbeschreibung aufgerufen, bei der gegebenenfalb (Tür ist offen) auch der Verbindungsweg wieder hergestellt wird.
 
 Die Änderung des Actionmoduls bestand also lediglich in der Vertauschung der Arbeitsschritte 2 und 3 auf die jetzige Reihenfolge. Nur bei der jetzigen Ordnung funktioniert das Programm einwandfrei.
  
@@ -2223,7 +2223,7 @@ ENTRIEGLE TUER
 OEFFNE TUER
 GEH TUER
 
-Im Deutschen ist es allerdings nicht besonders üblich »entriegle Tür« zu sagen. Wir wollen deshalb den ersten Schritt weglassen,-und folgenden Ablauf vereinbaren:
+Im Deutschen ist es allerdings nicht besonders üblich »entriegle Tür« zu sagen. Wir wollen deshalb den ersten Schritt weglassen, und folgenden Ablauf vereinbaren:
 
 * Wenn der Spieler die Tür mit »OEFFNE TUER« öffnen will, jedoch keinen passenden Schlüssel bei sich hat, so erhält er die Meldung »ICH HABE KEINEN PASSENDEN SCHLUESSEL«.
 * Hat er einen Schlüssel bei sich und gibt als Befehl wieder »OEFFNE TUER« ein, so erhält er die Meldung »OK.«.
@@ -2539,7 +2539,7 @@ Der Checksummer 64 ist ein kleines Maschinenprogramm, das, wenn es aktiviert ist
 
 **Hinweis**: Wenn Sie bei aktivertem Checksummer 64 ein Programm mit »LOAD« in den Speicher holen, wird auch eine Checksumme ausgegeben. Dies liegtjedoch an rechnerinternen Routinen und hat keine weitere Bedeutung, stellt insbesondere keine Gefahr für das geladene Programm dar, da alle Pointer richtig gesetzt werden.
 
-Nach Eingabe von RUN wird zunächst einmal das ROM in das RAM des Commodore 64 verschoben, wonach der Basic-lnterpreter modifiziert wird. Dadurch hat man den Vorteil, trotz einer zusätzlichen Routine das gesamte RAM des Rechners zurVerfügung zu haben. Nach ordnungsgemäßem Ablaufdes Programms können Sie sofort mit Eingaben beginnen. Für Maschinensprache-Spezialisten: die Einschaltmeldungen des Rechners werden nur nach einem Reset generiert. Der Textbereich, in dem die Meldung steht, wird von dem erzeugten Maschinenprogramm überschrieben.
+Nach Eingabe von RUN wird zunächst einmal das ROM in das RAM des Commodore 64 verschoben, wonach der Basic-Interpreter modifiziert wird. Dadurch hat man den Vorteil, trotz einer zusätzlichen Routine das gesamte RAM des Rechners zurVerfügung zu haben. Nach ordnungsgemäßem Ablaufdes Programms können Sie sofort mit Eingaben beginnen. Für Maschinensprache-Spezialisten: die Einschaltmeldungen des Rechners werden nur nach einem Reset generiert. Der Textbereich, in dem die Meldung steht, wird von dem erzeugten Maschinenprogramm überschrieben.
 
 Alle veröffentlichten Listings sind mit einer Checksumme versehen, die am Ende jeder Programmzeile steht. Diese Checksumme steht zwischen < und >. Sie wird beim Eintippen des Programms nicht mit eingegeben. Die Zahl zwischen den beiden Zeichen stellt lediglich eine Information für Sie dar. Wenn Sie diese Checksumme dennoch mit eintippen, werden Sie schnell bemerken, daß Sie etwas falsch gemacht haben. Bei aktiviertem Checksummer 64 wird nämlich nach Eingabe einer Basic-Zeile, die mit Return beendet wird, in die linke obere Bildschirmecke die Checksumme eingeblendet, die mit der Summe aus dem veröffentlichten Listing übereinstimmen muß. Ist das nicht der Fall, haben Sie die Zeile anders eingegeben, als sie im Listing dargestellt ist. Vergessen Sie also bitte nicht, daß die am Ende einer Zeile zwischen < und > stehende Prüfsumme nicht mit eingegeben werden darf.
 
@@ -2587,7 +2587,7 @@ Die Idee eines Adventures ist, mit dem Computer zu kommunizieren. Viele Adventur
 
 Einige Adventures haben Mehr-Wort-Eingaben (The Hobbit), die ein komfortables »Gespräch« mit dem Computer ermöglichen.
 
-Auch Adventure 2000 versteht Mehr-Wort-Eingaben. Man kann Begleiter, bestimmteSignal- und Bindewörteraufeinmal eingeben, ohne den Satz groß verstümmeln zu müssen. Zum Beispiel: »Nimm den Schlüssel dann stecke den Schlüssel in das Schlüsselloch dann öffne die Türe und gehe durch die Türe« wird von den in Adventure 2000 verwendeten Routinen rasch bearbeitet.
+Auch Adventure 2000 versteht Mehr-Wort-Eingaben. Man kann Begleiter, bestimmte Signal- und Bindewörteraufeinmal eingeben, ohne den Satz groß verstümmeln zu müssen. Zum Beispiel: »Nimm den Schlüssel dann stecke den Schlüssel in das Schlüsselloch dann öffne die Türe und gehe durch die Türe« wird von den in Adventure 2000 verwendeten Routinen rasch bearbeitet.
 
 Durch Eingabe von »BEFEHLE« listet der Computer alle Verben auf, die er versteht.
 
@@ -2661,13 +2661,13 @@ N, S, O, W, H (hoch), R (runter).
 
 Man kann höchstens drei Gegenstände auf einmal tragen. Wenn das Anfangsbild erstellt ist, muß eine Taste gedrückt werden, da danach soviel Text erscheint, daß eine vernünftige Grafik zusammen mit dem Text nicht möglich wäre. Vorsicht mit der Rechtschreibung! Der Computer achtet genau auf die richtige Schreibweise der Befehle.
 
-Zu jedem Raum, in dem man sich befindet, wird ein Bild gezeigt, das die Spielsituation verdeutlicht. Insgesamt gibt es sechs voneinander völlig verschiedene Bilder. Es gibt jedoch wesentlich mehr Räume, da die Bilder manchmal nur leicht ab-gewandeltwerden, wenn man in einen anderen Raum kommt.
+Zu jedem Raum, in dem man sich befindet, wird ein Bild gezeigt, das die Spielsituation verdeutlicht. Insgesamt gibt es sechs voneinander völlig verschiedene Bilder. Es gibt jedoch wesentlich mehr Räume, da die Bilder manchmal nur leicht abgewandelt werden, wenn man in einen anderen Raum kommt.
 
 Bei dem Weg durch die Mine wird man unter anderem von Orks, einer Riesenspinne und einem schrecklichen Feuerwesen behindert. Mehr soll hier nicht verraten werden. Aufpassen muß man auch bei den Himmelsrichtungen. Der Spieler sieht die Räume so, daß Osten immer in Blickrichtung liegt. 
 
 ### Erläuterungen zum Ablaufschema des Programms
 
-Zunächst springt das Programm in Zeile 9000, wo die Erläuterungen für den Spieler am Bildschirm ausgegeben werden, danach liest es die Daten der Sprites und wartet auf einen Tastendruck. Es zeichnet das Anfangsbild und geht zu Zeile 6000, wo mittels eines GET-Befehls das Kommando eingegeben wird. Sobald »Return« gedrückt wird, erfolgt die Auswertung. Hat man das Tor geöffnet und den Befehl »0« eingegeben, wird das nächste Bild gezeichnet und es folgt der Sprung in Zeile 15030, wo für alle Räume, außer dem Anfangsbild, das Kommando mittels INPUT-Befehl eingelesen wird. In den darauffolgenden Zeilen wird fürjeden möglichen Befehl geprüft, ob er identisch mit dem eingegebenen Kommando ist und die entsprechende Reaktion auslöst Wenn man einen neuen Raum betritt, geht das Programm zu Zeile 10200, von wo aus dann in die Unterprogramme zum Zeichnen der Räume verteilt wird. Von diesen werden die UnterprogrammeabZeile10000,1O1OO, 10300und11000ange-sprochen:
+Zunächst springt das Programm in Zeile 9000, wo die Erläuterungen für den Spieler am Bildschirm ausgegeben werden, danach liest es die Daten der Sprites und wartet auf einen Tastendruck. Es zeichnet das Anfangsbild und geht zu Zeile 6000, wo mittels eines GET-Befehls das Kommando eingegeben wird. Sobald »Return« gedrückt wird, erfolgt die Auswertung. Hat man das Tor geöffnet und den Befehl »0« eingegeben, wird das nächste Bild gezeichnet und es folgt der Sprung in Zeile 15030, wo für alle Räume, außer dem Anfangsbild, das Kommando mittels INPUT-Befehl eingelesen wird. In den darauffolgenden Zeilen wird fürjeden möglichen Befehl geprüft, ob er identisch mit dem eingegebenen Kommando ist und die entsprechende Reaktion auslöst Wenn man einen neuen Raum betritt, geht das Programm zu Zeile 10200, von wo aus dann in die Unterprogramme zum Zeichnen der Räume verteilt wird. Von diesen werden die Unterprogramme ab Zeile 10000, 10100, 10300 und 11000 angesprochen:
 
 TODO TABLE
 
@@ -2750,7 +2750,7 @@ Nach Eingabe der Richtung, in die verhandelt werden soll, erscheint die Antwort 
 E = betreten (ENTER)
 Mit diesem Befehl kann man in Dörfer und Städte gelangen.
 B = Schiff betreten (BOARD SHIP)
-Um auf ein Schiff zu gelangen, muß man diesen Befehl benutzen. Man braucht aber einen Matrosenanzug (BLUE TASS-LE), damit man von der Besatzung an Bord gelassen wird. Ausnahme ist, wenn man das Schiff in einem Dorf kauft.
+Um auf ein Schiff zu gelangen, muß man diesen Befehl benutzen. Man braucht aber einen Matrosenanzug (BLUE TASSLE), damit man von der Besatzung an Bord gelassen wird. Ausnahme ist, wenn man das Schiff in einem Dorf kauft.
 X = Das vorher betretene Schiff wird verlassen.
 Z = Inventar
 Hier wird der Name des Spielers, seine Waffen, seine Kleidung, seine Eigenschaften, seine Kraft und die Sachen (TOOLS), die er bei sich trägt, auf dem Bildschirm angezeigt. Drückt man eine Taste, so dauert es noch einen Moment, bis das Spiel fortgesetzt werden kann.
@@ -2768,7 +2768,7 @@ Hiermit kann ein neues Spiel begonnen werden, falls man in einer aussichtslosen 
 
 In den Dörfern und Städten des Landes erhält man viele Gegenstände, die zur Lösung der Aufgabe beitragen. In jeder Stadt kann man Waffen und Kleider kaufen. Um seine Vorräte aufzufüllen oder seine Spielsucht zu befriedigen, muß man sich schon in die Dörfer bequemen.
 
-Kauf einer Waffe: Man betritt eine Stadt und geht in den WEAPONSHOP, indem man eine 1 drückt. Ausdenvierange-botenen Waffen wählt man sich eine aus, indem man die Ziffer der Waffe drückt. Der Ladeninhaber sagt den Preis, und man kann sich entscheiden, ob man die Waffe kaufen oder lieber seinen Geldbeutel schonen möchte.
+Kauf einer Waffe: Man betritt eine Stadt und geht in den WEAPONSHOP, indem man eine 1 drückt. Aus den vier angebotenen Waffen wählt man sich eine aus, indem man die Ziffer der Waffe drückt. Der Ladeninhaber sagt den Preis, und man kann sich entscheiden, ob man die Waffe kaufen oder lieber seinen Geldbeutel schonen möchte.
 
 Der Kauf eines Kleidungsstücks vollzieht sich genauso, wie der Erwerb einer Waffe.
 
@@ -2858,7 +2858,7 @@ Bei den Kämpfen gegen den Fußboden sollten Sie alle Spieler in der untersten R
 
 ### Waffen
 
-Es gibt Unmengen verschiedenerWaffentypen. Davon sind die Nahkampfwaffen am uneffektivsten. Schuß-, Wurf- und Schleuderwaffen sind also ganz klar zu bevorzugen.
+Es gibt Unmengen verschiedener Waffentypen. Davon sind die Nahkampfwaffen am uneffektivsten. Schuß-, Wurf- und Schleuderwaffen sind also ganz klar zu bevorzugen.
 
 Wenn Sie noch nicht genügend Geld haben, sich bessere Waffen zu kaufen, wählen Sie Slings; Slings sind die billigsten auf Entfernung wirkenden Waffen. Sollte Ihr Geld ausreichen, dann gehen Sie zur Stadt Dawn. Dort gibt es alle Waffen, die man haben möchte.
 
@@ -2901,7 +2901,7 @@ In dieses »längst vergessene Land« gelangen Sie, indem Sie mit dem Schiff in 
 
 Kartographieren Sie das Land mit der Hilfe eines Gems, da man sehr leicht die Übersicht verlieren kann. Ambrosia ist schließlich ein ziemlich dunkles Land, Sie sehen dort fast nichts.
 
-An den vier »Shrines« (Altäre) die dort zu finden sind, kann man die Persönlichkeitsattribute derCharaktere (Intelligence, Magic Points etc.) erheblich verbessern. Dafür müssen Sie allerdings tief in die Tasche greifen.
+An den vier »Shrines« (Altäre) die dort zu finden sind, kann man die Persönlichkeitsattribute der Charaktere (Intelligence, Magic Points etc.) erheblich verbessern. Dafür müssen Sie allerdings tief in die Tasche greifen.
 
 Wenn Sie die Insel verlassen wollen, finden Sie im Südwesten ein Schiff.
 
@@ -2915,7 +2915,7 @@ Wachen lassen sich nicht nur verlangsamen (Powders), sondern auch bestechen. Das
 
 ### Exotics
 
-Exotic-Rüstungen und Exotic-Waffen benötigt man unbe-dingtfür den Kampf im Schloß des bösen Exodus. Vergessen Sie nicht, die Exotic-Rüstungen vor dem Betreten des Schloßes anzulegen und sich mit den Exotic-Waffen auszurüsten.
+Exotic-Rüstungen und Exotic-Waffen benötigt man unbedingt für den Kampf im Schloß des bösen Exodus. Vergessen Sie nicht, die Exotic-Rüstungen vor dem Betreten des Schloßes anzulegen und sich mit den Exotic-Waffen auszurüsten.
 
 Exotics können Sie auf kleinen Inseln finden, auf den Sie »Other Cmd: Dig« eingeben müssen. Denken Sie daran, daß jeder der 4 Charaktere Exotics braucht.
 
@@ -2983,7 +2983,7 @@ Sollte Ihnen dies bisher nicht gelungen sein, wird Ihnen unsere Lösung bestimmt
 
 Vorbemerkung: Da dieses Programm mit einer laufenden Uhr arbeitet, darf die Eingabe der einzelnen Befehle nicht zu langsam erfolgen.
 
-Get envelope, open envelope, read sign, get flowers, W, push button, D, jump (erst mit RETURN abschließen, wenn Sie den 4. Stock erreichen), W, go zoo, N, W, buy peanuts, E, feed peanuts, E, get bomb, throw bomb, E, read sign, get paper, use broom, read paper, W, W, S, S, go un, E, go alley, get bottle, S, E, read sign, W, (falls nötig RETURN drücken, bis die Uhr 10:00 anzeigt), go deli, buy chicken soup, W, W, go airport, go london, E, S, buy newspaper, read newspaper, N, go telex, kicktelex, leave telex, getinstrument, E, give flower, W, W, W, go bridge, N, say lithium, S, W, go airport, go rome, S, go ruins, E, N, look door, read note, E, E, getflashlight, W, W, S, E, go airport, go paris, S, go laundry, go laundry, ring bell, give receipt, W, S, W, S, E, E, S, S, E, get key, W, N, N, W, W, N, N, eat soup, E, S, S, go airport, go new york, go miami, E, go beach, N, N, read sign, S, S, S, S, read sign, save game (1), call gid-get, (falls Sie kein TOWEL gewonnen haben, RESTORE (1), sonstweiter), N, N, W, goairport, gosanjuan, W, godocks, get gas, clean deck, W, push button, S, 8x E, go house, knock door, major, clue, stuportino, N, W, W, S, push button, 14x S, 6x E, N, W, E, E, N, N, E, N, N, look corner, saysneezer, N, U, U, S, duck (sofort!), S, insert key, N, D, N, N, save game (2), (Raketen mit IJKM & SPACE abschießen; falls es nicht klappt, RESTORE (2) eingeben.)
+Get envelope, open envelope, read sign, get flowers, W, push button, D, jump (erst mit RETURN abschließen, wenn Sie den 4. Stock erreichen), W, go zoo, N, W, buy peanuts, E, feed peanuts, E, get bomb, throw bomb, E, read sign, get paper, use broom, read paper, W, W, S, S, go un, E, go alley, get bottle, S, E, read sign, W, (falls nötig RETURN drücken, bis die Uhr 10:00 anzeigt), go deli, buy chicken soup, W, W, go airport, go london, E, S, buy newspaper, read newspaper, N, go telex, kicktelex, leave telex, getinstrument, E, give flower, W, W, W, go bridge, N, say lithium, S, W, go airport, go rome, S, go ruins, E, N, look door, read note, E, E, getflashlight, W, W, S, E, go airport, go paris, S, go laundry, go laundry, ring bell, give receipt, W, S, W, S, E, E, S, S, E, get key, W, N, N, W, W, N, N, eat soup, E, S, S, go airport, go new york, go miami, E, go beach, N, N, read sign, S, S, S, S, read sign, save game (1), call gidget, (falls Sie kein TOWEL gewonnen haben, RESTORE (1), sonstweiter), N, N, W, goairport, gosanjuan, W, godocks, get gas, clean deck, W, push button, S, 8x E, go house, knock door, major, clue, stuportino, N, W, W, S, push button, 14x S, 6x E, N, W, E, E, N, N, E, N, N, look corner, saysneezer, N, U, U, S, duck (sofort!), S, insert key, N, D, N, N, save game (2), (Raketen mit IJKM & SPACE abschießen; falls es nicht klappt, RESTORE (2) eingeben.)
 
 (Thomas R.A. Wolf/rg)
 
@@ -3003,7 +3003,7 @@ Für die, die das Adventure lieber selber lösen wollen, aber irgendwo steckenge
 
 Für die Ungeduldigen jetzt die genaue Anleitung:
 
-open coffin, get ring, east, wave ring, go chute, get plaque, go hole, examine ball, get knife, west, drop knife, south, get glass, west, south, east, get sword, get shield, west, north, east, north, west, gofireplace, getidol, clean idol, south, east, south, east, move kettle, go hole, read plaque, get foot, drop plaque, drop glass, up, north, pull heads, turn 38, turn 33, get hammer, drop heads, drop sword, east, east, get chems, west, mixchems, drinkchems, west, south, west, west, south, go door, get saw, exam graves, get clover, east, north, east, north, drop foot (daraufhin kommt die Frage des Computers: »ON WHAT?« Tippen Sie ein: on man), north, go window, get doll, south, south, drop doll, south, climb stairs, get statue, down, north, west, go fireplace, open flue, go flue, pull nails, drop nails, get boards, drop boards, saw grating, drop grating, press button, push sweep, read paper (diese Eingabe dient nur zum Verständnis des folgenden und kann, wie alle »Read...«-Eingaben, weggelassen werden), drop paper, down, down, south, east, south, east, north, east, east, drop statue, sayzap, getbag, west, dropshield, getbook, getstick, read book, west, south, west, north, drop ring, drop hammer, east, go chute, wave bag, go crack, get page, south, read pa-ge, go hole, examine ball, west, get knife, get doll, circle coffin, wave stick, yell chant —
+open coffin, get ring, east, wave ring, go chute, get plaque, go hole, examine ball, get knife, west, drop knife, south, get glass, west, south, east, get sword, get shield, west, north, east, north, west, gofireplace, getidol, clean idol, south, east, south, east, move kettle, go hole, read plaque, get foot, drop plaque, drop glass, up, north, pull heads, turn 38, turn 33, get hammer, drop heads, drop sword, east, east, get chems, west, mixchems, drinkchems, west, south, west, west, south, go door, get saw, exam graves, get clover, east, north, east, north, drop foot (daraufhin kommt die Frage des Computers: »ON WHAT?« Tippen Sie ein: on man), north, go window, get doll, south, south, drop doll, south, climb stairs, get statue, down, north, west, go fireplace, open flue, go flue, pull nails, drop nails, get boards, drop boards, saw grating, drop grating, press button, push sweep, read paper (diese Eingabe dient nur zum Verständnis des folgenden und kann, wie alle »Read...«-Eingaben, weggelassen werden), drop paper, down, down, south, east, south, east, north, east, east, drop statue, sayzap, getbag, west, dropshield, getbook, getstick, read book, west, south, west, north, drop ring, drop hammer, east, go chute, wave bag, go crack, get page, south, read page, go hole, examine ball, west, get knife, get doll, circle coffin, wave stick, yell chant —
 
 Jetzt haben Sie es tatsächlich geschafft. Wenn Sie sich die Beschreibung der Kapelle genau ansehen, werden Sie lesen, daß ein lächelnder Graf Christo im Raum steht. Das ist aber auch alles. Ansonsten steht da nur das wohlbekannte »ADVENTURE OVER! HIT -Y«.
 
@@ -3027,14 +3027,14 @@ Wer jetzt glaubt, von Scott Adams zu hören, daß man ein guter Abenteurer sei, 
 
 > Die Schritt-für-Schritt-Lösung, Lagepläne, eine Hilfsliste und die benötigten Koordinaten werden Sie der Lösung von »Gruds in Space« näherbringen.
 
-Das Ziel des Spiels »Gruds in Space« ist es, den Treibstoff »Heliotropanite« zu finden und zu einem gestrandeten Schiff auf dem Pluto zu bringen. Dazu muß man jedoch vorher umfangreiche Aufgaben und Probleme bewältigen, die einen oft zurVerzweiflung bringen können. Die Handlung spieltaufver-schiedenen Planeten und Raumschiffen, so daß man nicht darum herumkommt, Lagepläne anzufertigen, da das Spiel über 100 verschiedene Stationen besitzt (übrigensjede mit Grafik).
+Das Ziel des Spiels »Gruds in Space« ist es, den Treibstoff »Heliotropanite« zu finden und zu einem gestrandeten Schiff auf dem Pluto zu bringen. Dazu muß man jedoch vorher umfangreiche Aufgaben und Probleme bewältigen, die einen oft zur Verzweiflung bringen können. Die Handlung spielt auf verschiedenen Planeten und Raumschiffen, so daß man nicht darum herumkommt, Lagepläne anzufertigen, da das Spiel über 100 verschiedene Stationen besitzt (übrigensjede mit Grafik).
 
 Nun zur Lösung.
 
 Ich habe meine Lösung in vier Teile aufgegliedert:
 
 * für die Verzweifelten: Eine Schritt-für-Schritt-Lösung, die die Eingaben der Reihe nach auflistet.
-* eine Liste, die für den anspruchsvolleren Abenteurer ge-eignetist, dernichtweiterkommt, abertrotzdemnichtdie fertige Lösung präsentiert haben möchte. Sie gibt nur an, welche Schritte zu unternehmen sind.
+* eine Liste, die für den anspruchsvolleren Abenteurer geeignet ist, dernichtweiterkommt, abertrotzdemnichtdie fertige Lösung präsentiert haben möchte. Sie gibt nur an, welche Schritte zu unternehmen sind.
 * für die Könner, diefaulsind, Pläneanzulegen, aberauch für die Anfänger ist der dritte Teil sehr wichtig: die Lagepläne. Sie geben die örtlichen Verhältnisse auf den verschiedenen Planeten beziehungsweise in den Raumschiffen wieder.
 * dann schließlich eine Übersicht über die verschiedenen Koordinaten, die benutzt werden müssen, um bestimmte Orte anzufliegen und um zu teleportieren.
 
@@ -3114,7 +3114,7 @@ TODO ASIDE
 
 ## Schritt-für-Schritt-Lösung
 
-w, s, pressgreen, pressgreen, pressgreen, n, d, d, w, set 64-18-52, w, set 77-34-40, go window, n, n, n, n, steal rope, s, w, take coin, e, s, e, s, s, e, knock, say yes, give coin, e, give rope, say yes, e, help, ta-ke all, w, w, w, n, w, s, go window, e, set 96-17-14, w, set 82-13-64, go window, e, tie rope to tree, e, d, take gun, u, w, loosen rope, take rope, n, e, n, shoot venusian, n, drop gun, w, give note, take money maker, e, takegun, s, shootvenusian, s, w, s, w, gowindow, e, set 64-18-52, w, set 77-34-40, gowindow, n, e, s, e, knock, e, e, givemoneymaker, take rock, w, w, w, n, w, s, w, n, w, w, s, s, w, tie rope to stalagmite, d, n, e, s, d, n, w, take key, e, s, u, n, w, s, u, e, u, e, n, shoot bat, u, open chest, d, drop key, u, look chest, take key, d, s, u, n, e, s, e, e, n, n, e, s, e, n, n, n, w, n, open gate, n, n, n, w, n, n, take green, s, s, e, s, s, s, s, e, s, s, s, w, n, w, s, w, n, w, w, s, s, u, n, w, drop green, take all, e, s, d, n, n, e, e, s, e, go window, e, set 96-17-14, w, set 66-12-15, go window, e, n, drop green, take green, w, drop key, take orange, drop green, take green, e, s, w, drop light, e, drop green, take green, e, e, drop orange, take orange, e, take purple, drop blue, take blue, w, w, drop purple, take purple, w, w, w, drop purple, take purple, w, drop gun, take white, drop orange, take gun, e, e, drop gun, drop rock, e, drop green, take green, e, e, s, drop white, take white, w, take yellow, drop purple, take purple, e, n, w, drop purple, take purple, w, w, w, drop purple, take purple, w, take orange, s, drop white, take white, e, e, drop yellow, take brown, e, e, drop purple, take purple, e, n, n, drop brown, e, take black, drop white, w, s, w, drop purple, w, w, drop all, take rock, take light, take gun, take black, go window, e, set 64-18-52, w, set 77-34-40, gowindow, n, e, s, e, n, n, n, w, n, n, n, n, e, s, e, shootarler, u, e, drop black, e, look screen, w, e, take note, w, d, w, n, w, s, s, s, s, e, s, s, s, knock, e, e, give note, take card, w, w, w, n, w, s, go window, e, set 96-17-14, w, set 82-13-64, go window, e, n, e, n, shoot tree, drop gun, n, w, insert card, press blue, e, s, s, w, s, w, go window, e, set 64-18-52, w, set 77-34-40, go window, n, n, e, e, drop light, look sign, buy mask, take mask, take coin, buy container, take container, w, w, s, s, go window, e, set 96-17-14, w, set 82-13-64, gowindow, e, n, e, n, n, w, insert card, revive green, press blue, e, s, s, w, s, w, go window, e, set 70-10-24, w, set 14-93-96, go window, n ,w, drop card, drop note, take bomb, e, s, e, take box, w, go window, e, look box, set 64-18-52, w, set 77-34-40, gowindow, n, w, breaktable, take leg, e, e, s, e, n, n, n, w, n, n, n, n, e, s, e, u, n, lift rock, look hole, take heliotropanite, s, d, w, n, w, s, s, s, s, e, s, s, s, w, n, w, s, go window, e, e, u, u, s, press green, n, d, d, w, set 18-98-32, w, set 34-76-21, set 36-24-35, go window, drop bomb, go window, press red, set 34-76-21, go window, e, u, pull lever, n, give container, s, d, w, go window, e, e, u, u, s, press green, n ,d, d, w, set 53-42-75, w, set 66-43-44, go window, help
+w, s, pressgreen, pressgreen, pressgreen, n, d, d, w, set 64-18-52, w, set 77-34-40, go window, n, n, n, n, steal rope, s, w, take coin, e, s, e, s, s, e, knock, say yes, give coin, e, give rope, say yes, e, help, take all, w, w, w, n, w, s, go window, e, set 96-17-14, w, set 82-13-64, go window, e, tie rope to tree, e, d, take gun, u, w, loosen rope, take rope, n, e, n, shoot venusian, n, drop gun, w, give note, take money maker, e, takegun, s, shootvenusian, s, w, s, w, gowindow, e, set 64-18-52, w, set 77-34-40, gowindow, n, e, s, e, knock, e, e, givemoneymaker, take rock, w, w, w, n, w, s, w, n, w, w, s, s, w, tie rope to stalagmite, d, n, e, s, d, n, w, take key, e, s, u, n, w, s, u, e, u, e, n, shoot bat, u, open chest, d, drop key, u, look chest, take key, d, s, u, n, e, s, e, e, n, n, e, s, e, n, n, n, w, n, open gate, n, n, n, w, n, n, take green, s, s, e, s, s, s, s, e, s, s, s, w, n, w, s, w, n, w, w, s, s, u, n, w, drop green, take all, e, s, d, n, n, e, e, s, e, go window, e, set 96-17-14, w, set 66-12-15, go window, e, n, drop green, take green, w, drop key, take orange, drop green, take green, e, s, w, drop light, e, drop green, take green, e, e, drop orange, take orange, e, take purple, drop blue, take blue, w, w, drop purple, take purple, w, w, w, drop purple, take purple, w, drop gun, take white, drop orange, take gun, e, e, drop gun, drop rock, e, drop green, take green, e, e, s, drop white, take white, w, take yellow, drop purple, take purple, e, n, w, drop purple, take purple, w, w, w, drop purple, take purple, w, take orange, s, drop white, take white, e, e, drop yellow, take brown, e, e, drop purple, take purple, e, n, n, drop brown, e, take black, drop white, w, s, w, drop purple, w, w, drop all, take rock, take light, take gun, take black, go window, e, set 64-18-52, w, set 77-34-40, gowindow, n, e, s, e, n, n, n, w, n, n, n, n, e, s, e, shootarler, u, e, drop black, e, look screen, w, e, take note, w, d, w, n, w, s, s, s, s, e, s, s, s, knock, e, e, give note, take card, w, w, w, n, w, s, go window, e, set 96-17-14, w, set 82-13-64, go window, e, n, e, n, shoot tree, drop gun, n, w, insert card, press blue, e, s, s, w, s, w, go window, e, set 64-18-52, w, set 77-34-40, go window, n, n, e, e, drop light, look sign, buy mask, take mask, take coin, buy container, take container, w, w, s, s, go window, e, set 96-17-14, w, set 82-13-64, gowindow, e, n, e, n, n, w, insert card, revive green, press blue, e, s, s, w, s, w, go window, e, set 70-10-24, w, set 14-93-96, go window, n ,w, drop card, drop note, take bomb, e, s, e, take box, w, go window, e, look box, set 64-18-52, w, set 77-34-40, gowindow, n, w, breaktable, take leg, e, e, s, e, n, n, n, w, n, n, n, n, e, s, e, u, n, lift rock, look hole, take heliotropanite, s, d, w, n, w, s, s, s, s, e, s, s, s, w, n, w, s, go window, e, e, u, u, s, press green, n, d, d, w, set 18-98-32, w, set 34-76-21, set 36-24-35, go window, drop bomb, go window, press red, set 34-76-21, go window, e, u, pull lever, n, give container, s, d, w, go window, e, e, u, u, s, press green, n ,d, d, w, set 53-42-75, w, set 66-43-44, go window, help
 
 # Die Lösung von Hobbit \[126]
 
@@ -3143,7 +3143,7 @@ Und nun viel Erfolg!
 
 TODO BILD 2
 
-SE, SE, NE, S, READ SCROLL, GNUSTO REZROV, LEARN REZROV, SW, NW, NW, NE, N ,OPEN OVEN, GET BREAD, GET JUG, S, NE ,SE, NE, FILL JUG, SW, SE, E, E, REZROV GATE, E, FROTZ BOOK, N, N, E, E, E, E, E, LEARN REZROV, REZROV GATE, N, (GET SCROLL, READ IT), GNUSTO KREBF, E, LOOK UNDER LILY PAD, READ SCROLL, GNUSTO CLEESH, W, S, W, W, W, W, W, S, S, S, S, E, D, OPEN DOOR, N, PULL BLOCK, E, (GET SCROLL, READ IT), GNUSTO EXEX, W, S, U, DROP BOOK, E, GET LIGHTED PORTRAIT, GET SCROLL, W, GET BOOK, READ SCROLL, GNUSTO OZMOO, EAT BREAD, N, GET BOX, S, W, U, GET IN BED, SLEEP, GET UP, EXAMINE BEDPOST, PUSH BUTTON, (GET SCROLL, READ IT), GNUSTO VAXUM, D, N, N, N, N, U, GET EGG, LEARN REZROV, LEARN KREBF, REZROV EGG, GET SCROLL, KREBF SCROLL, READ SCROLL, GNUSTO ZIFMIA, D, S, S, S, S, E, E, E, S, LEARN NITFOL, LEARN EXEX, EXEX TURTLE, NITFOL TURTLE, (TURTLE, FOLLOW ME), NW, N, E, U, (TURTLE, SE GET SCROLL, NW, DROPSCROLL, (TURTLE, THANKS), GETSCROLL, D, W, W, W, N, N, E, LEARN OZMOO, OZMOO ME, DROP ALL, E, WAIT, D, W, GET ALL, CUT ROPE, OPEN BOX, GET VELLUM SCROLL, READ VELLUM SCROLL, GNUSTO MELBOR, DROP BOX, LEARN MELBOR, MELBOR ME, E, E, E, N, EXAMINE TRACKS, READ FRAYED SCROLL, GNUSTO GONDAR, N, SLEEP, LEARN ZIFMIA, LEARN VAXUM, (JETZT IN DEN SPIEGELSÄLEN AUF UND AB GEHEN BIS DER ADVENTURER ERSCHEINT, DANN...), ZIFMIA ADVENTURER, VAXUM ADVENTURER, (JETZT NACH OSTEN BIS ZUR GUARDED DOOR), POINT AT DOOR, LEARN CLEESH, CLEESH ADVENTURER, N, DROP DAGGER, GET PENCIL, GET PURPLE SCROLL, S, W, W, W, W, W, W, S, S, S, S, E, D, D, READ MAP, D, S, E, NE, SE, LEARN MELBOR, MELBOR ME, DRAW FROM F TO P, SW, SW, RUB FROM V TO M, RUB FROM B TO R, DRAW FROM J TO B, DROP PENCIL, DROP MAP, GET SCROLL, NE, NW, NW, W, DRINK WATER, DROP JUG, U, U, E, E, E, W, N, N, LEARN MELBOR, MELBOR ME, N, E, LEARN GONDAR, LEARN CLEESH, DROP BREAD, DROP, PURPLE SCROLL, E, KUL-CAD STAIR, IZYUK ME, E, GONDAR DRAGON, CLEESH MONSTER, GUNCHO KRILL !!!!!!
+SE, SE, NE, S, READ SCROLL, GNUSTO REZROV, LEARN REZROV, SW, NW, NW, NE, N ,OPEN OVEN, GET BREAD, GET JUG, S, NE ,SE, NE, FILL JUG, SW, SE, E, E, REZROV GATE, E, FROTZ BOOK, N, N, E, E, E, E, E, LEARN REZROV, REZROV GATE, N, (GET SCROLL, READ IT), GNUSTO KREBF, E, LOOK UNDER LILY PAD, READ SCROLL, GNUSTO CLEESH, W, S, W, W, W, W, W, S, S, S, S, E, D, OPEN DOOR, N, PULL BLOCK, E, (GET SCROLL, READ IT), GNUSTO EXEX, W, S, U, DROP BOOK, E, GET LIGHTED PORTRAIT, GET SCROLL, W, GET BOOK, READ SCROLL, GNUSTO OZMOO, EAT BREAD, N, GET BOX, S, W, U, GET IN BED, SLEEP, GET UP, EXAMINE BEDPOST, PUSH BUTTON, (GET SCROLL, READ IT), GNUSTO VAXUM, D, N, N, N, N, U, GET EGG, LEARN REZROV, LEARN KREBF, REZROV EGG, GET SCROLL, KREBF SCROLL, READ SCROLL, GNUSTO ZIFMIA, D, S, S, S, S, E, E, E, S, LEARN NITFOL, LEARN EXEX, EXEX TURTLE, NITFOL TURTLE, (TURTLE, FOLLOW ME), NW, N, E, U, (TURTLE, SE GET SCROLL, NW, DROPSCROLL, (TURTLE, THANKS), GETSCROLL, D, W, W, W, N, N, E, LEARN OZMOO, OZMOO ME, DROP ALL, E, WAIT, D, W, GET ALL, CUT ROPE, OPEN BOX, GET VELLUM SCROLL, READ VELLUM SCROLL, GNUSTO MELBOR, DROP BOX, LEARN MELBOR, MELBOR ME, E, E, E, N, EXAMINE TRACKS, READ FRAYED SCROLL, GNUSTO GONDAR, N, SLEEP, LEARN ZIFMIA, LEARN VAXUM, (JETZT IN DEN SPIEGELSÄLEN AUF UND AB GEHEN BIS DER ADVENTURER ERSCHEINT, DANN...), ZIFMIA ADVENTURER, VAXUM ADVENTURER, (JETZT NACH OSTEN BIS ZUR GUARDED DOOR), POINT AT DOOR, LEARN CLEESH, CLEESH ADVENTURER, N, DROP DAGGER, GET PENCIL, GET PURPLE SCROLL, S, W, W, W, W, W, W, S, S, S, S, E, D, D, READ MAP, D, S, E, NE, SE, LEARN MELBOR, MELBOR ME, DRAW FROM F TO P, SW, SW, RUB FROM V TO M, RUB FROM B TO R, DRAW FROM J TO B, DROP PENCIL, DROP MAP, GET SCROLL, NE, NW, NW, W, DRINK WATER, DROP JUG, U, U, E, E, E, W, N, N, LEARN MELBOR, MELBOR ME, N, E, LEARN GONDAR, LEARN CLEESH, DROP BREAD, DROP, PURPLE SCROLL, E, KULCAD STAIR, IZYUK ME, E, GONDAR DRAGON, CLEESH MONSTER, GUNCHO KRILL !!!!!!
 
 # So löse ich Abenteuerspiele \[128]
 
@@ -3169,7 +3169,7 @@ Bei den Infocom-Adventures ist fast alles möglich — tippen Sie einfach ein, w
 
 Bei Abenteuerspielen von Telarium-Software und Windham Classics liegt jeweils eine Wortschatzliste bei; der Chef von Telarium ist selbst leidenschaftlicher Adventure-Spieler und haßt (nach eigenen Worten) das »Guess what word the parser wants to have«-Spielchen.
 
-Bei anderen Adventures gilt: Grundsätzlich sollte man erst einmal alles ausprobieren und eventuell auch in einem Englisch-Wörterbuch nachsehen. Wenn das nicht mehr geht, dann kann man noch immer mit Hilfe eines guten Maschinen-sprachen-Monitors oder Disk-Doktors entsprechende Wissenslücken ausfüllen. Sehr gut geht das bei den Abenteuerspielen von Sirius-Software; andere Abenteuer sind als Schutz vor solch unfairem Verhalten manchmal sehr geschickt codiert. In diesem Fall kann Ihnen dann nur noch ein gutes Vokabel-Gedächtnis helfen.
+Bei anderen Adventures gilt: Grundsätzlich sollte man erst einmal alles ausprobieren und eventuell auch in einem Englisch-Wörterbuch nachsehen. Wenn das nicht mehr geht, dann kann man noch immer mit Hilfe eines guten Maschinensprachen-Monitors oder Disk-Doktors entsprechende Wissenslücken ausfüllen. Sehr gut geht das bei den Abenteuerspielen von Sirius-Software; andere Abenteuer sind als Schutz vor solch unfairem Verhalten manchmal sehr geschickt codiert. In diesem Fall kann Ihnen dann nur noch ein gutes Vokabel-Gedächtnis helfen.
 
 Außerdem sollte man in der Anleitung nachsehen, ob das Spiel ganze Sätze oder nur Zweiwort- beziehungsweise Einwort-Kommandos annimmt.
 
@@ -3193,7 +3193,7 @@ Auch wenn das Abenteuerspiel, das Sie vielleicht gerade spielen, ganze Sätze ve
 
 Beachten Sie, daß Gegenstände manipuliert werden können oder einen bestimmten Inhalt haben. Sie können außerdem spezielle Eigenschaften haben. Das Schwert aus Zork leuchtet zum Beispiel blau, wenn Gefahr droht, und rot, wenn der Träger des Schwertes wütend ist. Tatsachen wie diese sollte man immer ausnützen, sie helfen oft enorm bei der Lösung einiger hart zu knackender Nüsse.
 
-Es ist sehr selten, daß es mehrere Wege gibt, ein Problem zu lösen. Wenn Sie beispielsweise einen Gegenstand an einer Stelle benutzen, an der es auch anders geht und später einen Punkt erreichen, an dem dieser Gegenstand unbedingt benötigt wird, aber schon von der vorherigen Benutzung abgenutzt, verbraucht oder kaputt ist, dann können Sie sich (im Adventure) begraben. Denken Sie also immer logisch nach, was Sie wo brauchen und wie Sie es sinnvoll einsetzen. Bei den meisten Abenteuerspielen ist ein sinnvoller Einsatz eines Gegenstandes immer nur einmal möglich (abgesehen von ständig benutzbaren Dingen wie Schlüssel oder Kerzen). Wenn nur eine bestimmte Zahl von Gegenständen zu tragen erlaubt ist, sollten Sie die schon sinnvoll genutzten Dinge wieder ablegen. Speichern Sie allerdings davor den Spielstand ab, daesinseltenen Fällen möglich sein kann, daßderGegen-stand doch noch einmal zum Einsatz kommen kann.
+Es ist sehr selten, daß es mehrere Wege gibt, ein Problem zu lösen. Wenn Sie beispielsweise einen Gegenstand an einer Stelle benutzen, an der es auch anders geht und später einen Punkt erreichen, an dem dieser Gegenstand unbedingt benötigt wird, aber schon von der vorherigen Benutzung abgenutzt, verbraucht oder kaputt ist, dann können Sie sich (im Adventure) begraben. Denken Sie also immer logisch nach, was Sie wo brauchen und wie Sie es sinnvoll einsetzen. Bei den meisten Abenteuerspielen ist ein sinnvoller Einsatz eines Gegenstandes immer nur einmal möglich (abgesehen von ständig benutzbaren Dingen wie Schlüssel oder Kerzen). Wenn nur eine bestimmte Zahl von Gegenständen zu tragen erlaubt ist, sollten Sie die schon sinnvoll genutzten Dinge wieder ablegen. Speichern Sie allerdings davor den Spielstand ab, daesinseltenen Fällen möglich sein kann, daß der Gegenstand doch noch einmal zum Einsatz kommen kann.
 
 Die meisten Abenteuer haben übrigens ihre spezielle »Art des Hauses«. Das heißt: Je nach Herstellerfirma muß man mehr oder weniger logisch denken. Falls Sie beispielsweise mal ein Exemplar eines Adventures von Screenplay in die Hände bekommen, müssen Sie sich zu dessen Lösung in die chaotischen Gehirnwindungen eines Verrückten hineindenken und immer das Gegenteil von dem tun, was Sie eigentlich tun wollten.
 
@@ -3221,7 +3221,7 @@ Als idealste Methode für Profi-Abenteuerer erweisen sich Mischformen der oben g
 
 Wenn Sie auch schnell an Abenteuerspielen verzweifeln mögen, üben Sie sich in Geduld. Wer keine Adventures spielt, der hat seinen naturgegebenen Forscherdrang vermutlich schon verloren.
 
-Sterben können Sie inAdventures relativ oft (Sorcerer hat beispielsweise 70 verschiedene Todesarten), aber Leben haben Sie unendlich viele. Nutzen Sie alles hier Gesagte aus, auch wenn es noch so unwichtig oder selbstverständlich erscheint.
+Sterben können Sie in Adventures relativ oft (Sorcerer hat beispielsweise 70 verschiedene Todesarten), aber Leben haben Sie unendlich viele. Nutzen Sie alles hier Gesagte aus, auch wenn es noch so unwichtig oder selbstverständlich erscheint.
 
 (M. Kohlen/rg)
 
@@ -3284,7 +3284,7 @@ Auch Anschrift für Beihefter und Beilagen.
 
 ---
 
-**Urheberrecht**: Alle in diesem Heft erschienenen Beiträge sind urheberrechtlich geschützt. Alle Rechte, auch Übersetzungen, vorbehalten. Reproduktionen gleich welcher Art, ob Fotokopie, Mikrofilm oder Erfas-sung in Datenverarbeitungsanlagen, nur mit schriftlicher Genehmigung des Verlages. Anfragen sind an Hans Hörl zu richten. Für die in der Übersicht gemachten Angaben können wir weder Gewähr noch irgendwelche Haftung übernehmen.
+**Urheberrecht**: Alle in diesem Heft erschienenen Beiträge sind urheberrechtlich geschützt. Alle Rechte, auch Übersetzungen, vorbehalten. Reproduktionen gleich welcher Art, ob Fotokopie, Mikrofilm oder Erfassung in Datenverarbeitungsanlagen, nur mit schriftlicher Genehmigung des Verlages. Anfragen sind an Hans Hörl zu richten. Für die in der Übersicht gemachten Angaben können wir weder Gewähr noch irgendwelche Haftung übernehmen.
 
 ---
 
