@@ -21,26 +21,37 @@ Zum 40jährigen Jubiläum des *64'er Magazins* präsentieren wir das Kunstprojek
 * 08/85: 19. Juli 2025
 * 09/85: 16. August 2025
 * 10/85: 20. September 2025
-<!--
-* 11/85: 
-* 12/85: 
-* 01/86:
-* 02/86:
-* 03/86:
-* 04/86:
-* 05/86:
+* 11/85: 18. Oktober 2025
+* 12/85: 15. November 2025
+* 01/86: 13. Dezember 2025
+* 02/86: 17. Januar 2026
+* 03/86: 14. Februar 2026
+* 04/86: 14. März 2026
+* 05/86: 11. April 2026
 * 06/86: 16. Mai 2026
-* 07/86:
+* 07/86: 14. Juni 2026
 * 08/86: 18. Juli 2026
-* 09/86: 
-* 10/86: 
-* 11/86: 
-* 12/86: 
--->
+* 09/86: 15. August 2026
+* 10/86: 19. September 2026
+
 usw.
 
-* Sonderheft 1/85 (Tips & Tricks)
+* Sonderheft 1/85 (Tips & Tricks): 23. November 2024
 * Sonderheft 2/85 (Abenteuerspiele): 25. März 1985 <!-- 8504/S.30 -->
+* Sonderheft 3/85 (Spiele): ca. 14. Juni 2025 <!-- 8507/S.34 -->
+* Sonderheft 4/85 (Grafik): *vor* 16. August 2025 <!-- 8509 -->
+* Sonderheft 5/85 (Floppy, Datasette): ca. 20. September 2025 <!-- 8510 -->
+* Sonderheft 6/85 (Top-Themen): ca. 18. Oktober 2025 <!-- 8511/S.139 -->
+* Sonderheft 7/85 (Professionelle Anwendungen): Mitte November 2025 <!-- 8601/S.106 -->
+* Sonderheft 8/85 (Assembler): ca. 13. Dezember 2025 <!-- 8601/S.106 -->
+* Sonderheft 1/86 (PC 128): **weit vor** 14. Februar 2026 <!-- 8603/S.168 -->
+* Sonderheft 2/86 (Tips & Tricks): **vor** 14. Februar 2026 <!-- 8603/S.168 -->
+* Sonderheft 3/86 (C16, C116, Plus/4): **unbekannt**
+* Sonderheft 4/86 (Abenteuerspiele): *vor* 14. März 2026 <!-- 8604/S.9 -->
+* Sonderheft 5/86 (C64-Grundwissen): **weit vor** 16. Mai 2026 <!-- 8606/S.73 -->
+* Sonderheft 6/86 (Grafik): zwischen 16. Mai und 14. Juni 2026 <!-- wegen 7/86 -->
+* Sonderheft 7/86 (Peeks & Pokes): "Ende" Juni 2026 <!-- 8607/S.40 -->
+
 usw.
 
 Auf der modernen Homepage gibt es
@@ -180,6 +191,8 @@ Die Eingabe-Ausgaben werden aus `issues` gelesen, die Website wird nach `out` ge
         * [goloMAK](https://www.forum64.de/wcf/index.php?user/28439-golomak/)
         * [ClausS](https://www.forum64.de/wcf/index.php?user/28399-clauss/)
 * Sonderheft 2/1985:
+    * Zeitschrift zum Scannen geliehen
+        * [pgeorgi](https://www.forum64.de/wcf/index.php?user/28405-pgeorgi/)
     * OCR
         * [Drachen](https://www.forum64.de/wcf/index.php?user/9125-drachen/)
 
