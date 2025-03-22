@@ -1,7 +1,49 @@
 # Abenteuer total
 
-TODO
- 
+> Warum haben Abenteuerspiele in der letzten Zeit einen immer größer werdenden Anhängerkreis gefunden? Weil sie logisches Denkvermögen, Fantasie, Ausdauer und Kreativität fördern und fordern. Abenteuerspiele sind wie geschaffen für den Heimcomputer, oder besser, wurden erst durch diesen möglich. Gründe genug, um ein ganzes Sonderheft dieser Kategorie der Freizeitbeschäftigung mit dem Computer zu widmen.
+
+Im Gegensatz zu Schieß-, Action-, Arcade- oder Sportspielen, bei denen hauptsächlich die motorischen Fähigkeiten des Spielers gefragt sind und die schon nach relativ kurzer Zeit eine gewisse Monotonie hervorrufen, fesseln interessante Adventures oft über Monate hinweg. Sie schlüpfen dabei in die Rolle eines Schatzsuchers, Piraten, Archäologen, Forschers, Weltraumreisenden, Ritters oder Prinzen. Vielfältige Gefahren lauern auf Sie: feuerspeiende Drachen, hinter-hältigeZwerge, feindlicheGalaxienbewohner, heimtückische Fallen, verschrobene Professoren, undurchdringliche Urwälder, rätselhafte Schlösser, hungrige Ureinwohner oder einfach verbohrte Mitspieler.
+
+All denen gilt es Paroli zu bieten. Begeben Sie sich mit uns in die faszinierende Welt der computerisierten Abenteuer.
+
+Dazu haben wir dieses Sonderheft in vier Abschnitte unterteilt:
+
+* ein kompletter Kurs zur Programmierung eigener Abenteuerspiele,
+* sieben fertige Abenteuerlistings zum Abtippen,
+* viele Lösungen zu professionellen Abenteuerspielen
+* und allgemeine Hinweise, wie Abenteuerspiele zu lösen sind.
+
+Der Kurs ist sowohl für Anfänger als auch Profis geeignet. Es wird Ihnen schrittweise gezeigt, wie Sie eigene Ideen für ein Abenteuerspiel finden, diese ausfeilen, an die konkrete Ausarbeitung herangehen, die Ideen in kompakte Programmmodule umsetzen und schließlich ein vollständiges Adventure selbst programmieren.
+
+Es werden dabei einige sehr interessante Programmiertechniken vermittelt, die Sie unter anderem mit der Stringverarbeitung, der Analyse ganzer Sätze, dem modularen Aufbau eines Programms und der bool’schen Algebra vertraut machen sollen. Als Autor dieses Grundkurses konnten wir den Entwickler des deutschen Abenteuerspiels Gordon Saga gewinnen. Er plaudert aus seiner Trickkiste der Abenteuerspiel-Programmierung. Wenn Sie den Adventure-Kurs gründlich durchgearbeitet haben, sind Sie in der Lage, selbst gute Abenteuerspiele zu programmieren. Voraussetzungen sind nur Grundkenntnisse in Basic und die Bereitschaft, das Gelernte in die Tat umzusetzen.
+
+Gleichsam als Anschauungsmaterial werden im zweiten Teil sieben Abenteuerspiele zum Abtippen geliefert. Darunter befindet sich auch Zauberschloß, das erste in Deutschland veröffentlichte Abenteuerlisting. Die restlichen sechs Adventures sind bisher unveröffentlichte Listings der Spitzenklasse. »Odyssee — Kampf der Bruderschaft« fällt etwas aus der Reihe. Es handelt sich dabei um ein Rollenspiel, eine Untergruppe der Adventures. Doch lassen Sie sich überraschen. Diese Listings wurden unabhängig vom Kurs entwickelt, jedes hat seine spezifischen Stärken und Schwächen. Durch genauen Vergleich des im Kurs Gelernten, und dem in den Listings Realisierten, können Sie die Vorteile der unterschiedlichen Methoden für eigene Programmeverwen-den.
+
+Alle Listings, sowohl die des Kurses, als auch die Abenteuerspiele sind mit einer speziellen Prüfsumme versehen, wie Sie sie bereits vom 64’er Stammheft kennen. Dadurch reduziert sich die Fehlerquote beim Eintippen erheblich. Lesen Sie sich also vor dem Eintippen irgendwelcher Listings den Artikel über den Checksummer 64 aufmerksam durch.
+
+Der dritte und vierte Teil des Sonderheftes »Abenteuerspiele« wendet sich an die oft verzweifelten Besitzer von käuflich erworbenen, professionellen Adventures. Nun hat man sich also »Gruds in Space« oder »Ultima III« besorgt, und kommt und kommt einfach an einer bestimmten Stelle nicht weiter. Auch Freunde oder Bekannte, die das selbe Spiel besitzen, können nicht helfen. Für all jene, die entnervt, mit zerwühltem Haar, der Verzweiflung und dem Aufgeben nahe, seit Monaten vor dem Adventure sitzen, haben wir im dritten AbschnittSchritt-für-Schritt-Lösungen von bekannten Abenteuerspielen gesammelt. Wie diese Lösungen eingesetzt werden, bleibtjedem selbst überlassen. Er kann sie in einem durchspielen, dann ist der Reiz ein für allemal weg, oder er nimmt sie her, um über eine für ihn besonders heikle Stelle hinwegzukommen, und dann denn Rest des Weges wieder allein zu gehen, oder es zumindest zu versuchen. Der vierte Abschnitt gibt dazu wertvolle, allgemeine Tips.
+
+### Für wen ist dieses Sonderheft gedacht?
+
+Sicher für alle, die sich sowieso für Abenteuerspiele interessieren. Aber auch jenen, die bisher mit einer gewissen Skepsis dieser Sorte von Spielen gegenüberstanden sei wärmstens empfohlen, einmal »reinzuriechen«. Dann natürlich für alle, die zwar Adventures gerne spielen, aber noch nie daran gedacht haben, selbst welche zu programmieren. Vielleicht kommen Sie durch dieses Sonderheft auf den Geschmack.
+
+### Welche weiteren Sonderhefte sind geplant?
+
+Die 64’er-Redaktion macht die Sonderhefte nicht auS »Spaß an der Freud’«, sondern weil derWunsch einer komprimierten Abhandlung über ein bestimmtes Thema von vielen Lesern geäußert wurde. Bei uns bestimmen Sie, was im 64’er Stammagazin erscheint, und welche Schwerpunkte als Sonderheft in allen Details behandelt werden sollen. Daher der Aufruf an alle Leser: Teilen Sie uns Ihre Vorstellungen über die nächsten Sonderhefte mit. Sie entscheiden, über welches Thema, sei es nun Drucker, DFÜ, Spiele, Massenspeicher (Diskettenlaufwerkund Datasette), Anwendungsprogramme, Grafik, Musik, Tips & Tricks, Hardware-Erweiterungen, etc., wir das nächste Sonderheft machen werden.
+
+(aa)
+
+TODO ASIDE
+
+## Listing-Service
+
+Auch an die Leser, die zu wenig Zeit oder Geduld zum Abtippen der oft sehr umfangreichen Listings haben, wurde wieder gedacht. Alle Listings (Kurs und Abenteuerspiele) sind auch auf Diskette erhältlich.
+
+Bitte verwenden Sie für Ihre Bestellung die beigefügte Postscheck-Zahlkarte zur Überweisung des Rechnungsbetrags. Sie erleichtern uns die Auftragsabwicklung und Sie **sparen** sich die **3,— DM** Versandkosten!
+
+**Bestell-Nr.: L685 S2 / DM 34,90**
+
+
 # Abenteuer selbst programmiert
 
 > Abenteuerspiele auf dem Commodore 64 gehören mittlerweile zu den beliebtesten Freizeitbeschäftigungen mit einem Computer. Dieser Kurs wird Sie in die Lage versetzen, nahezu professionelle Abenteuerspiele selbst zu programmieren.' Alles was Sie brauchen ist ein bißchen Basic-Erfahrung, gute Ideen, viel Fantasie und Spaß am Programmieren.
@@ -2461,4 +2503,859 @@ TODO Listing 27
 Ich hoffe, daß es mir mit dem vorliegenden Kurs gelungen ist, Sie für Abenteuerspiele und deren Programmierung zu interessieren. Dazu wünsche ich Ihnen viele gute Ideen und viel Spaß.
 
 (Michael Nickles/rg)
+
+# Zauberschloß  – ein Abenteuerspiel mit Tücken
+
+> Abenteuerspiele haben ihren ganz besonderen Reiz. Gefragt sind weniger die motorischen Reaktionsfähigkeiten, sondern vielmehr die logische Vorgehensweise und viel Fantasie. In einem streng bewachten Schloß mit seinen vielfältigen Gefahren gilt es, dem Zauberer die Krone und damit die Regentschaft über das Volk zu entreißen. Doch es ist ein steiniger Weg.
+
+Es ist uns klar, daß wir mit der Veröffentlichung des Listings vom Zauberschloß die Möglichkeit bieten, durch Analyse des Programms dem Lösungsweg auf die Spur zu kommen. Viel wichtiger erschien unsjedoch, einmal an einem kommentierten Listing zu zeigen, wie ein Abenteuerspiel aufgebaut ist. Nicht zuletzt, um vielleicht einige Leser anzuregen, sich selbst mit der Erstellung dieser Denkspiele zu befassen.
+
+Worum geht es bei dem Abenteuerspiel Zauberschloß? Nach dem Starten des Programms sieht man zunächst den Wald vor lauter Bäumen nicht. Präzise gesagt, man befindet sich in einem Wald, der kein Ende zu nehmen scheint. In welche Richtung man auch läuft — nur Wald. Mit einem Trick gelangt man aber doch in das Zauberschloß.
+
+An dieser Stelle sei kurz auf die Art der Befehlseingabe hingewiesen. Um die gestellte Aufgabe (die sich erst während des Spiels klarer herauskristallisiert) zu lösen, geben Sie dem Computer Anweisungen, die er dann ausführt. Diese Befehle bestehen in der Regel aus zwei Worten, die durch eine Leerstelle getrennt sein müssen. Das erste Wort ist ein Befehlswort, das aus dem vorhandenen Wortschatz (NIMM VERLIERE LIES ÖFFNE VERJAGE DREH BENUTZE TRINK) zu entnehmen ist. Das zweite Wort bezieht sich auf einen Gegenstand, der in denjeweiligen Situationsbildern zu sehen ist. Die Auswirkungen der Kommandos werden vom C64 auf dem Bildschirm als Nachricht angezeigt. Für die Richtungsangabe werden nur die Anfangsbuchstaben eingegeben. Die möglichen Himmelsrichtungen sind jeweils vorgegeben.
+
+Das Schloß besteht aus mehreren Stockwerken einschließlich einem Kerker im Keller, der in keinem anständigen Schloß fehlen darf. In den verschiedenen Stockwerken lauern Kobolde, die Sie bei falscher Vorgehensweise in einen Zwerg verwandeln, öffnen sich bei Fehltritten Falltüren, liegen Tarnkappen, Gift- und Zaubergetränke, Messer, Speere und Zettel herum. All diese Gegenstände stehen in irgendeiner Beziehung zum weiteren Vorwärtskommen. Man muß sie in der entsprechenden Reihenfolge aufnehmen und wieder wegwerfen. Wegwerfen deshalb, weil man zu einem bestimmten Zeitpunkt nur vier Gegenstände gleichzeitig tragen kann. Ein wesentlicher Meilenstein ist das Buch. In diesem Buch stehen nämlich wichtige Informationen, wie man sich bei der letztlich eintretenden Konfrontation mit dem Zauberer zu verhalten hat. Aber Vorsicht, die Wache hat etwas gegen den verständlichen Wunsch, dieses Buch zu lesen. Als größtes Hindernis tritt Ihnen ein feuerspeiender Drache gegenüber, der den Eingang zum Thronsaal bewacht. Fürwahr, ein schwerer Brocken. Wenn Sie aber den richtigen Zauberspruch auf Lager haben, verwandelt der Zauberer sich in eine niedliche Maus, und Sie haben das Königreich von einem Tyrannen befreit. Es bleibt nur ein Problem: Wie kommt man mit der Krone wieder aus dem Schloß heraus?
+
+Aber bis Sie soweit vorgedrungen sind, werden sicherlich einige Stunden vergangen sein, in denen Sie ein Wechselbad von Enttäuschungen und Hochgefühlen durchleben. Da bis zum endgültigen Ziel eine Menge Schritte einzugeben sind, und Sie sicherlich nicht beim ersten Versuch gleich die Lösung finden werden, bietet Ihnen das Programm die Möglichkeit, das Spiel mit dem Kommando SAVE abzuspeichern. So können Sie zu einem späteren Zeitpunkt genau bei der Stelle weitersuchen, an der Sie kurz vor einem Zusammenbruch aufgehört haben.
+
+Noch eine kurze Bemerkung zum Listing: Um die oben angesprochene Analyse dennoch etwas zu erschweren, sind einige Daten verschlüsselt worden. Das Listing ist im Grafikmodus einzugeben.
+
+Und nun viel Spaß bei einem Abenteuer im Zauberschloß.
+
+(Dennis Merbach/aa)
+
+# Neuer Checksummer 64 — blitzschnell und kürzer
+
+> Der Checksummer überprüft jede eingegebene Basic-Zeile und erspart Ihnen deshalb eine langwierige Fehlersuche. Und neu ist der Checksummer, weil die Initialisierung zirka einhundertmal schneller ist als die alta
+
+Der Checksummer 64 ist ein kleines Maschinenprogramm, das, wenn es aktiviert ist, Sie sofort davon unterrichtet, ob Sie die jeweilige Programmzeile korrekt eingegeben haben.
+
+1.	Tippen Sie den Basic-Lader sorgfältig ein. Es gibt zwei Versionen: Eine für den Commodore 64 und eine für den VC 20.
+2.	Bevor Sie »RUN« eingeben, speichern Sie den Basic-Lader bitte erst ab, denn wenn Sie zum Beispiel einen Fehler bei den eingetippten POKE-Anweisungen gemacht haben, ist es möglich, daß der Rechner aussteigt. Heben Sie sich den abgespeicherten Checksummer 64 auf — Sie werden ihn immer wieder brauchen, wenn Sie ein Basic-Programm aus dem 64’er eintippen wollen.
+3.	Nach Initialisierung des Maschinenprogramms ist der Checksummer 64 aktiviert. Er steht innerhalb des Betriebssystems und verbraucht kein einziges Byte Speicherplatz. Es sei hier für Interessierte gesagt, daß selbst alle Sprungvektoren unverändert bleiben, das Programm also mit einer Vielzahl von Programmier-Spracherweiterungen problemlos zusammenarbeitet. Achten Sie aber darauf, daß bestimmte Spracherweiterungen das hinter dem ROM liegende RAM für Hires-Grafiken benutzen. Wird zum Beispiel eine Hires-Grafik von Simons Basic aus angesprochen, so wird der Checksummer 64 zerstört.
+4.	Wenn Sie den Checksummer 64 zwischenzeitlich nicht benutzen, können Sie ihn jederzeit mit »POKE 1, 55« desaktivieren. Auch durch Drücken der Run-Stop- und der Restore-Taste wird der Checksummer 64 desaktiviert. Wollen Sie, daß der Checksummer 64 auch noch nach Drücken dieser Tastenkombination erhalten bleibt, so geben Sie bei aktiviertem Checksummer 64 »POKE64982,53« ein. Der Checksummer 64 ist dann nur durch »POKE1, 55« abschaltbar.<br>Wollen Sie den Checksummer 64 wieder einschalten, so geben Sie bitte »POKE 1, 53« ein.<br>Das Maschinenprogramm bleibt solange erhalten, bis der Computer ausgeschaltet, oder wenn von anderen Programmen auf das hinter dem ROM liegende RAM zugegriffen wird.
+5.	Eine Checksumme wird nur dann ausgegeben, wenn der Commodore 64 (VC 20) eindeutig erkennt, daß Sie eine Zeile, bestehend aus der Zeilennummer und zumindestens einem alphanumerischen Zeichen, eingegeben haben. Ansonsten reagiert der Commodore 64 normal.
+
+**Hinweis**: Wenn Sie bei aktivertem Checksummer 64 ein Programm mit »LOAD« in den Speicher holen, wird auch eine Checksumme ausgegeben. Dies liegtjedoch an rechnerinternen Routinen und hat keine weitere Bedeutung, stellt insbesondere keine Gefahr für das geladene Programm dar, da alle Pointer richtig gesetzt werden.
+
+Nach Eingabe von RUN wird zunächst einmal das ROM in das RAM des Commodore 64 verschoben, wonach der Basic-lnterpreter modifiziert wird. Dadurch hat man den Vorteil, trotz einer zusätzlichen Routine das gesamte RAM des Rechners zurVerfügung zu haben. Nach ordnungsgemäßem Ablaufdes Programms können Sie sofort mit Eingaben beginnen. Für Maschinensprache-Spezialisten: die Einschaltmeldungen des Rechners werden nur nach einem Reset generiert. Der Textbereich, in dem die Meldung steht, wird von dem erzeugten Maschinenprogramm überschrieben.
+
+Alle veröffentlichten Listings sind mit einer Checksumme versehen, die am Ende jeder Programmzeile steht. Diese Checksumme steht zwischen < und >. Sie wird beim Eintippen des Programms nicht mit eingegeben. Die Zahl zwischen den beiden Zeichen stellt lediglich eine Information für Sie dar. Wenn Sie diese Checksumme dennoch mit eintippen, werden Sie schnell bemerken, daß Sie etwas falsch gemacht haben. Bei aktiviertem Checksummer 64 wird nämlich nach Eingabe einer Basic-Zeile, die mit Return beendet wird, in die linke obere Bildschirmecke die Checksumme eingeblendet, die mit der Summe aus dem veröffentlichten Listing übereinstimmen muß. Ist das nicht der Fall, haben Sie die Zeile anders eingegeben, als sie im Listing dargestellt ist. Vergessen Sie also bitte nicht, daß die am Ende einer Zeile zwischen < und > stehende Prüfsumme nicht mit eingegeben werden darf.
+
+Der Checksummer 64 ist so ausgelegt, daß er abhängig von der Zeilennummer und dem Text der Zeile eine Checksumme ausgibt. Beim Bilden dieser Checksumme werden Spaces (Leertaste) überlesen, was für Sie bedeutet, daß es egal ist, wieviel Leerzeichen Sie zwischen den Worten lassen, da sie für den Programmablauf ohnehin keine Bedeutung haben. Aber manchmal ist das richtige Setzen von Leerzeichen doch wichtig, besonders innerhalb von Strings (Zeichenketten), die gedruckt werden sollen. Seien Sie deshalb besonders genau bei Leerzeichen, die innerhalb von Anführungszeichen stehen, denn meistens ermöglichen nur die richtig gesetzten Spaces eine sinnvolle Textausgabe auf dem Bildschirm.
+
+Beachten Sie auch, daß es durchaus erlaubt ist, Abkürzungen für die Commodore-Befehlswörter zu verwenden. So führt die Eingabe von »?« als Kurzschreibweise für »PRINT« nicht etwa zu einem Checksummen-Fehler, sondern wird korrekt verarbeitet und dementsprechend die Checksumme generiert. Zahlendreher werden allerdings nicht erkannt. Eine 320 in der DATA-Zeile ergibt also dieselbe Prüfsumme wie 230! Nachdem Sie ein Listing eingegeben haben, sollten Sie es aus Sicherheitsgründen vor dem Starten abspeichern. Sie brauchen hierfür jedoch nicht den Checksummer 64 zu desaktivieren.
+
+## Wichtiger Hinweis für alle Listings in unseren Heften!
+
+Um Ihnen die Eingabe unserer Listings zu erleichtern, gibt es weder Steuerzeichen noch andere Grafikzeichen. Sie werden ersetzt durch Klartext. In der Tabelle finden Sie die Erklärung der übersetzten Steuerzeichen.
+Beispiel 1:
+
+In einem Listing sehen Sie folgende Zeile:
+
+TODO
+
+Dann dürfen Sie weder die geschweiften Klammern eintippen (es gibt sie eh nicht auf der Tastatur) und auch nicht die Wörter CLEAR, 13SPACE, RVSON oder RVOFF, sondern Sie müssen die diesen Wörtern zugeordneten Tasten drücken. In der Tabelle sehen Sie zum Beispiel für
+CLEAR = Shift-Taste und 2. Taste ganz rechts oben.
+
+Gemeint ist also, daß Sie anstelle des Wortes CLEAR die Taste CLR/HOME drücken müssen, gefolgtvon 13maligem Betätigen der Leertaste (13SPACE) und so weiter. Auf Ihrem Bildschirm erscheint dann als erstes ein revers dargestelltes Herz. Entsprechendes gilt für alle anderen Wörter innerhalb der geschweiften Klammern.
+Beispiel 2:
+
+In manchen Listings tauchen ganz seltsame unterstrichene und manchmal auch überstrichene Zeichen auf, zum Beispiel:
+
+TODO
+
+Das unterstrichene U bedeutet, daß Sie die Shift-Taste und die Taste U drücken müssen.
+
+Der überstrichene Stern bedeutet, daß Sie die Commodore-Taste und die Taste mit dem Stern drücken müssen. Das Zeichen davor ist nicht etwa ein unterstrichenes kleines f, sondern ein unterstrichenes Pfund-Zeichen (Sie drücken deshalb die Shift-Taste und die 3. Taste oben rechts).
+
+Also, **unterstrichen** bedeutet **Shift-Taste** und den entsprechenden Buchstaben (oder Zeichen), **überstrichen** bedeutet die **Commodore-Taste** und den entsprechenden Buchstaben (oder Zeichen). Auf dem Bildschirm sollten Sie dann natürlich die zugehörigen Grafik-Zeichen sehen.
+
+Die beiden Programm-Zeilen von oben sehen später (auf dem Drucker oder ähnlich auf dem Bildschirm) so aus:
+
+TODO
+
+(F. Lonczewski/gk)
+
+
+# Adventure 2000 — Die Jagd nach der Rakete
+
+> Vom Präsidenten der Vereinigten Staaten erhalten Sie den Auftrag, den dritten Weltkrieg zu verhindern.
+
+Die Idee eines Adventures ist, mit dem Computer zu kommunizieren. Viele Adventures tun das mit Hilfe von Zwei-Wort-Befehlen. So hat »GEHE TUER« den Effekt vom Verlassen eines Raumes durch eine Tür.
+
+Einige Adventures haben Mehr-Wort-Eingaben (The Hobbit), die ein komfortables »Gespräch« mit dem Computer ermöglichen.
+
+Auch Adventure 2000 versteht Mehr-Wort-Eingaben. Man kann Begleiter, bestimmteSignal- und Bindewörteraufeinmal eingeben, ohne den Satz groß verstümmeln zu müssen. Zum Beispiel: »Nimm den Schlüssel dann stecke den Schlüssel in das Schlüsselloch dann öffne die Türe und gehe durch die Türe« wird von den in Adventure 2000 verwendeten Routinen rasch bearbeitet.
+
+Durch Eingabe von »BEFEHLE« listet der Computer alle Verben auf, die er versteht.
+
+Durch Kombination der Verben mit den verwendeten Nomen und Verkettung durch »und« oder »dann« kann man versuchen, der Lösung näher zu kommen.
+
+Zugegeben — das scheint kompliziert. Man lernt jedoch den Umgang am besten, indem man einfach ausprobiert, was der Computer verarbeitet. Zudem braucht man von jedem Verb oder Nomen nur die ersten drei Buchstaben einzugeben, den Rest erledigt der Computer. Achtung! Signalwörter wie »dann« und »und« müssen immer ausgeschrieben werden.
+
+### Was ist die Aufgabe beim Adventure 2000?
+
+Die eigentliche Aufgabe wird erst im Verlauf des Spiels gestellt.
+
+### Was passiert?
+
+Nachdem das Programm mit »RUN« gestartet wurde, erscheint das Titelbild und der Computer liest Daten ein und setzt die Variablen fest. Dann wird der Bildschirm gelöscht und Sie finden sich im Raum wieder.
+
+Beim Betreten eines Raumes wird in der ersten Zeile immer angegeben wo man sich befindet. Links wird die Grafik des entsprechenden Raumes gezeigt und rechts was sich im Raum befindet und welche direkten Ausgänge es gibt.
+
+Sind keine direkten Ausgänge angegeben, so bleibt es dem Kombinationsvermögen des Spielers überlassen, andere zu finden. Unter der Grafik erscheint dann: Was gedenkst du zu tun? Darauf kann die Eingabe erfolgen, die — wie der Spieler denkt — zum Erfolg führt.
+
+### Wie »antwortet« der Computer auf die Eingabe?
+
+Der Computer überprüft die Eingabe und gibt — falls erforderlich — aus, daß er nicht weiß, wovon die Rede ist (wenn falsche Worte verwendet wurden).
+
+Wenn der Computer in der Lage ist, die Eingabe auszuführen, erscheint das Ergebnis auf dem Bildschirm.
+
+Zum Beispiel führt »NIMM MAPPE« zur Meldung »IN ORDNUNG, WIR TRAGEN NUN EINE MAPPE BEI UNS«.
+
+### Was tun, wenn der Computer »abstürzt«?
+
+Sollte man alle erlaubten 100 Zeichen der Eingabe mit Mühe gefüllt haben und dann mit Schrecken feststellen, daß der Computer nur noch ausgibt: »Wovon sprichst du?« oder »Ich verstehe dich nicht!«, dann kann man ihn mit der F1-Taste wieder zum »Was gedenkst du zu tun?« zurückholen.
+
+(Frank Schmelzer/rg)
+
+# Quasimodo, Herrscher der Kartanen
+
+> Dieses Abenteuer führt Sie in die Welt der Fantasia 31 Räume stehen Ihnen auf der Suche nach Quasimodo zur Verfügung. Finden und vernichten Sie ihn.
+
+Sie wurden vom Volk der Kartanen bestimmt, den Herrscher des Landes aufzuspüren und zu vernichten. Sie wissen von ihm nur, daß er Quasimodo heißt und Hexenmeister ist. Als Sie sich bereit erklärten, diese schwere Aufgabe zu übernehmen, brachten Sie ihre Landsleute durch einen Geheimgang in dessen Gewölbe. Nun müssen Sie allerlei Gefahren, wie Monster, Leichen und Fallgruben überstehen, um zu Quasimodo vorzudringen.
+
+Das Programm Quasimodo ist ein Abenteuerspiel, bei dem es darauf ankommt, durch Eingabe von Befehlen eine bestimmte Aufgabe zu lösen. Diese Kommandos bestehen meist aus einem Verb und einem Hauptwort. Hier nun eine Zusammenstellung aller möglichen Kommandos:
+
+NIMM, GIB, GEH, LISTE, HOCH, ZUENDE, SPRING, TRINK, DRUECKE, BEFEHLE und OEFFNE.
+
+Richtungsänderungen können durch Eingabe der Abkürzungen N, S, W, 0 für Nord, Süd, West und Ost vorgenommen werden. Diese werden neben den sichtbaren Gegenständen immer auf dem Bildschirm angezeigt. Zum Ablauf des Programms wäre noch zu sagen, daß der Computer wichtige Spielpassagen akustisch untermalt.
+
+(Roland Selzer/rg)
+
+# Mario, die unheimliche Mine
+
+> Im Land der Fantasie liegt die Mine »Mario«. Finden sie den richtigen Weg durch das ausgedehnte Gangsystem.
+
+Mario ist ein Grafik-Adventure für den C 64. Das Spiel ist in normalem C 64-Basic geschrieberr und füllt fast den gesamten Basic-Speicherplatz des Computers. Es finden 24 Sprites Verwendung, deren Daten bei Bedarf eingeschaltet werden. Deshalb muß der Spieler zu Beginn eine knappe viertel Minute warten, während dessen er Gelegenheit hat, die Anleitung zu lesen. Lesern von J. R. Tolkien werden gewisse Parallelen zu dem Buch »Der Herr der Ringe« auffallen. Das ist nicht ganz zufällig, denn die verlassene Mine namens Mario ist in gewissem Sinne der Zwergenmine Moria aus diesem Buch nachempfunden. Wer überhaupt nicht mehr weiter weiß, sollte sich dieses Buch ausleihen. Dort kann er einige Hilfen für das Adventure finden.
+
+Das Spiel versteht 19 Befehle. Diese lauten:
+
+NIMM, VERLIERE, HEBE, ENTLEERE, WIRF, LIES (diese Befehle werden von einem Gegenstand gefolgt)
+
+OEFFNE (eine Tür oder ein Tor)
+
+BRINGE ... UM (dazwischen steht ein Lebewesen)
+
+SPEICHERE, LADE (für das Speichern und Laden eines Spielstandes, um nicht immer wieder von vorn anfangen zu müssen). Diese Befehle können erst eingegeben werden, wenn man in die Mine eingedrungen ist. Besitzer einer Diskettenstation müssen die Zeilen 16520 (Öffnen der Datei für Speichern) und 16620 (Öffnen der Datei für Laden) entsprechend ändern.
+
+SAGE (wird von beliebigen Worten gefolgt, die aber nicht in normalen Anführungszeichen stehen sollten).
+
+HILF (hier gibt der Computer Hilfen oder Erklärungen, denen man aber nicht immer trauen sollte)
+
+LIST (zeigt die getragenen Gegenstände auf)
+
+N, S, O, W, H (hoch), R (runter).
+
+Man kann höchstens drei Gegenstände auf einmal tragen. Wenn das Anfangsbild erstellt ist, muß eine Taste gedrückt werden, da danach soviel Text erscheint, daß eine vernünftige Grafik zusammen mit dem Text nicht möglich wäre. Vorsicht mit der Rechtschreibung! Der Computer achtet genau auf die richtige Schreibweise der Befehle.
+
+Zu jedem Raum, in dem man sich befindet, wird ein Bild gezeigt, das die Spielsituation verdeutlicht. Insgesamt gibt es sechs voneinander völlig verschiedene Bilder. Es gibt jedoch wesentlich mehr Räume, da die Bilder manchmal nur leicht ab-gewandeltwerden, wenn man in einen anderen Raum kommt.
+
+Bei dem Weg durch die Mine wird man unter anderem von Orks, einer Riesenspinne und einem schrecklichen Feuerwesen behindert. Mehr soll hier nicht verraten werden. Aufpassen muß man auch bei den Himmelsrichtungen. Der Spieler sieht die Räume so, daß Osten immer in Blickrichtung liegt. 
+
+### Erläuterungen zum Ablaufschema des Programms
+
+Zunächst springt das Programm in Zeile 9000, wo die Erläuterungen für den Spieler am Bildschirm ausgegeben werden, danach liest es die Daten der Sprites und wartet auf einen Tastendruck. Es zeichnet das Anfangsbild und geht zu Zeile 6000, wo mittels eines GET-Befehls das Kommando eingegeben wird. Sobald »Return« gedrückt wird, erfolgt die Auswertung. Hat man das Tor geöffnet und den Befehl »0« eingegeben, wird das nächste Bild gezeichnet und es folgt der Sprung in Zeile 15030, wo für alle Räume, außer dem Anfangsbild, das Kommando mittels INPUT-Befehl eingelesen wird. In den darauffolgenden Zeilen wird fürjeden möglichen Befehl geprüft, ob er identisch mit dem eingegebenen Kommando ist und die entsprechende Reaktion auslöst Wenn man einen neuen Raum betritt, geht das Programm zu Zeile 10200, von wo aus dann in die Unterprogramme zum Zeichnen der Räume verteilt wird. Von diesen werden die UnterprogrammeabZeile10000,1O1OO, 10300und11000ange-sprochen:
+
+TODO TABLE
+
+10000 berechnet mittels C(X,Y) die Gegenstände, stellt sie mittels einer Verzweigung in die Unterprogramme ab 5000 dar
+10100 berechnet mittels D(X,Y) die Ausgänge aus den Räumen, besetzt eventuell die Merker B(1) bis B(6)
+10300 sucht nach Besonderheiten (E(X,Y)), verzweigtin die Unterprogramme zu ihrer Darstellung
+11000 stellt fest, ob wegen irgendwelcher Besonderheiten der Tod des Spielers eingetreten ist. Wenn ja, dann gibt es zu dem Unterprogramm ab Zeile 8000, das das Spiel beendet und auf Wunsch des Spielers neu startet. Wenn nein, erfolgt ein Rücksprung.
+
+Sonder-Unterprogramme (Inhalt der Schriftrolle, des Buches, Flucht der Spinne etc.) werden von den Auswertungszeilen zum INPUT-Befehl direkt aufgerufen.
+
+Das Feuer in einem Raum besteht aus 4 Sprites, die nacheinander erscheinen und deshalb eine Bewegung vortäuschen.
+
+Obwohl die Mine mehrere Ebenen hat, gibt es zur Bestimmung der Position des Spielers nur zwei Variablen, X und Y Dies geschah aus Speicherplatzgründen. Wenn man in die nächste Ebene kommt, dann wird einfach der Y-Wert auf einen Wert gebracht, der in der vorhergehenden Ebene gar nicht vorkommen kann. So wurde die Positionsbestimmung mit nur zwei Variablen möglich.
+
+(Frank Leggewie/Harald Bornfleth/rg)
+
+# Zeittunnel — Flucht in die Gegenwart
+
+> Durch einen Zeittunnel in die Zukunft. Finden Sie den Weg zurück.
+
+Das Spiel beginnt im heimischen Wohnzimmer. Die Kommandos müssen ausgeschrieben und durch eine Leerstelle getrennt werden. Zum Beispiel »NEHME BILD«. Die Syntax ist: Imperativ, Leerstelle, Objekt. Für die Richtungen werden Anfangsbuchstaben benutzt. Die Eingabe wird mit »Return« abgeschlossen. Mit der gleichen Taste gelangt man vom Grafik- in den Textmodus. Vom Text- in den Grafikmodus kommt man mit dem Befehl »BILD«.
+
+(Jens Schürbs/Arndt Meiswinkel/rg)
+
+# Crantor — Bedrohung aus dem All
+
+> Hier müssen Sie sich auf die Reise durch das Ali begeben. Crantor ist ein Beispiel, wie man ein Geschicklichkeitsspiel mit einem Adventure verbinden kann.
+
+Es geschah einst in ferner Zukunft, als ein garstiger Möchtegern-Imperator namens Eusebius Crantor die Andromeda-Galaxis erobern wollte, indem er sämtliche Imbißstuben zerstören ließ. Das hypergalaktische Imbißdepot beauftragte daraufhin den Jäger des verlorenen Hamburgers (den Spieler) den garstigen Imperator mitsamt seiner Wochenendbasis in handliche Einheiten zu zerlegen.
+
+Alsdann schwang sich unser Held in seine supramoderne Aegriventre-Untertasse, um Crantors Basis zu erreichen. Nach einer problematischen Landung gelangte der Jäger in das Innere der Basis.
+
+Dort mußte er sich gegen Eusebius Crantor und dessen Wachen, den Crames, zur Wehr setzen.
+
+Nachdem er, unter mannigfachen Problemen leidend, zur Energiezentrale der Basis vorgedrungen war, und dort eine Sprengladung mit Zeitzünder angebracht hatte, eilte er in Windeseile zu seinem U-Boot, um die Explosion der Basis aus der sicheren Entfernung einer Pommesbudeam Rande dervierten Astralaxe mitsamt einem Hamburger zwischen den Zähnen zu betrachten.
+
+Die Befehle mit denen unser Held geleitet wird, werden wie üblich in zwei Worten eingegeben:
+
+Zum Beispiel »NIMM SCHWERT«, »TOETE CRANTOR« oder »LIST« (gibt eine Liste aller Gegenstände aus, die der Jäger gerade besitzt).
+
+Mit »SAVE« und »LOAD« kann eine Spielsituation gespeichert, beziehungsweise wieder geladen werden.
+
+Die Aegriventre-Untertasse wird durch einen Joystick an Control-Port 1 gesteuert.
+
+(Andreas Lüning/rg)
+
+# Odyssee — Kampf der Bruderschaft
+
+> Eine abenteuerliche Reise durch das Land des bösen Zauberers Saruman.
+
+Bei Odyssee handelt es sich um eine Kombination aus Abenteuer- und Rollenspiel.
+
+Als Auserwählter einer Bruderschaft erhalten Sie den Auftrag, das Land vom Zauberer zu befreien. Sie begeben sich auf die Reise, den Zauberer zu suchen und zu vernichten; dabei werden Sie gefährliche Situationen zu meistern haben, Feinden, aber auch Freunden begegnen.
+
+Vor 20 Jahren hat der mächtige Zauberer Saruman die Herrschaft über das Land Sosaria an sich gerissen. Ihre Bruderschaft ist jedoch nicht länger gewillt, seine Tyrannei noch länger zu erdulden und hat Ihnen den Auftrag gegeben, den Zauberer zu suchen und zu vernichten. Auf Ihrer Reise begegnen Sie vielen Feinden und einigen Ordensbrüdern, aber auch unter diesen gibt es Verräter. Ausgerüstet sind Sie mit 400 Einheiten Kraft, 350 goldenen Münzen und 50 Vorratseinheiten. Sie werden schnell feststellen, daß Sie noch sehr schwach sind, aber es gibt in Dörfern und Städten Kleider, Waffen und Vorräte zu kaufen. Geld bekommen Sie in zahlreichen Kämpfen.
+
+### Eingabe und Speicherung
+
+Zuerst muß man den »Creater« eingeben und speichern. Nach dem Starten prüft das Programm, ob alle DATA-Zeilen richtig eingegeben worden sind. Ist dies nicht der Fall, so erscheint eine Fehlermeldung. Stimmen die DATAs, dauert es noch etwa 3,5 Minuten, bis das Programm »World« auf Diskette gespeichert ist. »World« beinhaltet einen neuen Zeichensatz, eine Maschinensprache-Routine zum waagerechten Scrollen des Bildschirms und zirka 16 KByte, die die Landschaft der Odyssee ausmachen.
+
+Die Odyssee ist das Hauptprogramm. Nach Eintippen und Speichern startet man es mit RUN. Zuerst gilt es, sich einen Spieler zu erstellen. Hier kann man 100 Punkte auf Stärke (Strength), Widerstandskraft (Stamina), Intelligenz (Intelligence) und Wissen (Wisdom) verteilen. Die Eingabe der Punkte muß immer zwei Ziffern lang sein. Falls man einmal zuviel Punkte (100) eingegeben hat, werden alle Kriterien wieder auf Null gesetzt, und man beginnt von vorne. Nun entschließt man sich noch zu einem fantasievollen Namen und muß jetzt erst einmal Geduld aufbringen, da man noch ungefähr eine Minute zu warten hat. Diese Wartezeit braucht jedoch nur beim 1. Spiel in Kauf genommen zu werden. Nun erscheint das Titelbild mit dem Hinweis darauf, daß der 2.Teil geladen wird. Ist der Ladevorgang abgeschlossen, kann das Spiel begonnen werden.
+
+### Änderungen für Kassette:
+
+1.	CREATER; Zeile 265 SYS(57812)»WORLD«,1
+2.	ODYSSEE:Die Änderungen stehen im Listing von Zeile 9299—9320
+
+## Bewegung der Spielfigur
+
+Die Spielfigur wird ausschließlich über die Tastatur gesteuert. Hier die Belegung der einzelnen Tasten:
+@ = Die Spielfigur bewegt sich nach Norden
+/ = Die Spielfigur geht nach Süden
+; = Die Spielfigur läuft nach Westen
+: = Die Spielfigur schreitet nach Osten
+
+A = angreifen (ATTACK)
+Im unteren Fenster erscheint ATTACK —. Nun muß man eine Richtungstaste drücken (siehe oben), um dem Computer zu zeigen, in welche Richtung der Befehl zielen soll. Das Programm gibt daraufhin an, ob getroffen worden ist. Dies hängt von der Stärke des Spielers und von seinen Waffen ab. Ist ein Feind besiegt, so erhält man eine Anzahl von Goldstücken und, wenn man Glück hat, einen Matrosenanzug (BLUE TASSLE).
+T = verhandeln (TRANSACT)
+Nach Eingabe der Richtung, in die verhandelt werden soll, erscheint die Antwort im Textfenster. Falls sich in der angegebenen Richtung niemand aufhält, erscheint die Meldung: »NO RESPONSE«
+E = betreten (ENTER)
+Mit diesem Befehl kann man in Dörfer und Städte gelangen.
+B = Schiff betreten (BOARD SHIP)
+Um auf ein Schiff zu gelangen, muß man diesen Befehl benutzen. Man braucht aber einen Matrosenanzug (BLUE TASS-LE), damit man von der Besatzung an Bord gelassen wird. Ausnahme ist, wenn man das Schiff in einem Dorf kauft.
+X = Das vorher betretene Schiff wird verlassen.
+Z = Inventar
+Hier wird der Name des Spielers, seine Waffen, seine Kleidung, seine Eigenschaften, seine Kraft und die Sachen (TOOLS), die er bei sich trägt, auf dem Bildschirm angezeigt. Drückt man eine Taste, so dauert es noch einen Moment, bis das Spiel fortgesetzt werden kann.
+U =Tür aufschließen (UNLOCK DOOR)
+Eine Tür kann geöffnet werden, wenn man den Schlüssel zu ihr besitzt.
+G = Zeigt an, wieviel Goldstücke man besitzt.
+H = Gibt an, wieviel Kraft (POWER) man noch hat.
+F = Zeigt die verbleibenden FOOD-Einheiten.
+M = MAGIC MISSILE auslösen
+Ein weißes Quadrat läuft über den Bildschirm und tötet alle Feinde und Freunde. Fürjedes Lebewesen erhält man 5 Goldstücke. Man kann es nur einmal benutzen.
+R = Neues Spiel (RESTART GAME)
+Hiermit kann ein neues Spiel begonnen werden, falls man in einer aussichtslosen Lage ist. Der Computer fragt, ob man sich sicher ist, daß man ein neues Spiel starten möchte. Antwortet man mit »Y«, so kann man sich eine neue Spielfigur erstellen.
+
+### Dörfer und Städte
+
+In den Dörfern und Städten des Landes erhält man viele Gegenstände, die zur Lösung der Aufgabe beitragen. In jeder Stadt kann man Waffen und Kleider kaufen. Um seine Vorräte aufzufüllen oder seine Spielsucht zu befriedigen, muß man sich schon in die Dörfer bequemen.
+
+Kauf einer Waffe: Man betritt eine Stadt und geht in den WEAPONSHOP, indem man eine 1 drückt. Ausdenvierange-botenen Waffen wählt man sich eine aus, indem man die Ziffer der Waffe drückt. Der Ladeninhaber sagt den Preis, und man kann sich entscheiden, ob man die Waffe kaufen oder lieber seinen Geldbeutel schonen möchte.
+
+Der Kauf eines Kleidungsstücks vollzieht sich genauso, wie der Erwerb einer Waffe.
+
+Kaufen von Nahrung: In einem Dorf betritt man mit 1 den FOODSHOP und erfährt den Preis für 100 FOOD-Einheiten. Der Preisschwanktzwischen 32 und 52 Goldstücken und ist bei jedem Versuch anders. Scheint der Preis annehmbar, so beantwortet man die Frage ob man kaufen möchte mit »Y«, und der Computer zeigt an, wieviel Einheiten FOOD man besitzt.
+
+Hat man einmal nichtgenug Geld, um den geforderten Preis zu bezahlen, erscheint die Fehlermeldung »YOU HAVE NOT ENOUGH MONEY«.
+
+### Freunde und Feinde
+
+Zu Ihrem Unglück gibt es viele Ihnen feindlich gesonnene Krieger, die im Dienste des Zauberers stehen, jedoch nur wenige Ordensbrüder, die Ihnen aber wertvolle Dinge geben können. Manche dieser Ordensbrüder stehen Ihnen aber auch mißtrauisch gegenüber, so daß Sie von Ihnen Geheimwörterwissen wollen oder Sie nach Ihrer Intelligenz (INTELLIGENCE) oder nach Ihrem Wissen (WISDOM) beurteilen.
+
+Werden Sie in einen Kampf mit den Feinden verstrickt, so erscheint im Textfenster immer HIT und MISS. HIT bedeutet, daß der Gegner Sie getroffen hat; MISS, daß er verfehlt hat. Wie oft Sie getroffen werden, hängt von der Dauer des Kampfes, IhrerWiderstandsfähigkeit (STAMINA) und Ihrer Kleidung ab.
+
+Sie haben das Spiel verloren, wenn Sie keine Nahrung (FOOD) oder keine Kraft (POWER) mehr haben. FOOD verlieren Sie, wenn Sie durch das Land gehen (pro Schritt 0,2 Einheiten). Kraft verlieren Sie in den Kämpfen, wenn Sie getroffen werden.
+
+### Hilfsmittel
+
+Die Hilfsmittel braucht man, um die gestellte Aufgabe zu lösen. Man erhält sie in Kämpfen, Dörfern und Städten und von den Ordensbrüdern. Wenn man »Z« drückt, werden sie unter TOOLS aufgelistet.
+
+BLUE TASSLE: Matrosenanzug
+
+Hat man keinen Matrosenanzug, läßt einen die Besatzung eines Schiffes nicht an Bord. Es erscheint die Meldung »THE CREW DOES NOT ALLOW THIS«.
+
+MAGIC MISSILE: magische Waffe
+
+Mit ihr vernichtet man alle Feinde, leider aber auch alle Freunde, die auf dem Bildschirm zu sehen sind. Für jeden Freund oder Feind erhält man durch diese Tötungsaktion 5 Goldstücke. Man kann sie also dazu benutzen, sich Geld zu verschaffen odereine ÜbermaChtvon Feindenzuvernichten.
+
+KEY: Schlüssel
+
+Braucht man um Türen zu öffnen.
+
+GOLDEN KEY: goldener Schlüssel
+
+Erklärt sich im Spielverlauf
+
+SWIM-WEST: Schwimmweste
+
+Hat man die Schwimmweste, kann man 12 Felder weit schwimmen. Danach löst sie sich in Luft auf.
+
+BOOTS: Schuhe
+
+Trägt man Schuhe, so kann man 2 Felder über felsigen Grund laufen. Danach sind sie verschlissen.
+
+MARK OF FIRE:
+
+Mit MARK OF FIRE kann man durch LAVA gehen.
+
+### Verschiedenes
+
+Wie Sie vielleicht bemerkt haben, habe ich drei Einzeiler aus der Ausgabe 11/84 des 64’er Magazins in mein Programm übernommen. Im »Creater« istes die SAVE-Routine für Maschinenspracheprogramme und in der »Odyssee« der Einzeiler zum Kopieren des Basic ins RAM. Der Einzeiler, der die »Odyssee« überhaupt erst ermöglicht hat, ist der zum Feststellen eines Bildschirmbereiches von Peter Eckart.
+
+(Jan Geißelmann/rg)
+
+# Ring of Power
+
+Vorbei an Drachen und Hausmäusen sollen Sie den Thronsaal finden, in dem der »Ring of Power« liegt. Ihr Weg führt Sie durch ein großes Schloß, einen Schloßgarten und über unterirdische Quellen.
+
+Für alle, die diesen Weg noch nicht gefunden haben, der Lösungsweg:
+
+takelamp, lampon, north, takekey, south, east, north, north, east, take can, north, west, west, south, west, west, north, take key, south, south, south, take bottle, east, east, east, north, east, open chest, take sword, take armour, east, north, north, takecreditcard, south, south, south, open door, south, south, take honey, south, west, west, west, take cork, west, west, north, drop key, take bottle, south, east, east, east, east, east, fill bottle, north, north, north, west, west, south, west, north, up, pay, east, drop cork, take boat, east, east, east, east, drop credit card, take ball, west, west, north, north, north, empty bottle, drop boat, up, kill dragon, west, west, open door, west, drop bottle, take coins, north, west, west, negotiate customs, drop coins, east, east, south, open door, south, east, open door, east, east, take rope, north, west, take guide, east, south, west, west, north, take note, inve (Zahl notieren), drop note, west, west, west, west, south, drop key, take coins, east, up, pay, west, north, drop rum, north, north, drop honey, east, south, south, east, down, pay, west, take key, take plank, east, up, pay, west, north, drop key, south, take key, north, north, east, open door, drop key, east, take key, west, south, south, south, drop plank, north, north, north, take key, south, south, south, south, east, north, open door, drop key, north, open chest, take jewel, south, drop armour, take key, west, open clam, north, north, east, up, pay, east, east, drop ball, drop can, drop rope, drop treasure key, west, down, pay, west, north, take key, west, north, north, east, east, take crown, west, west, south, south, south, south, south, dial ... (notierte Zahl), take orb, north, west, south, west, west, north, north, drop guide, north, east, east, take pulley, west, west, south, south, east, east, north, east, north, north, east, south, south, south, take pearl, north, north, east, up, pay, east, drop pulley, west, down, pay, take cage, up, pay, east, drop crown, drop orp, take pulley, take rope, south, south, drop pulley, drop rope, take jigsaw, north, north, take can, east, east, north, drop cage, north, open door, oil door, open door, drop can, south, west, drop key, west, take crown, take key, take orb, east, east, north, north, west, south (Postertext notieren), west, west, west, north, north, west, south, south, south, east, south, say ... (Postertext), south, south, west, north, take ring.
+
+(Rüdiger Ihlo/rg)
+
+# So löse ich Ultima III
+
+> Viele Abenteurer werden beim Versuch Ultima III zu lösen sicherlich schon auf Schwierigkeiten gestoßen sein. Um diese Schwierigkeiten zu beseitigen, haben wir die wichtigsten Lösungstips für dieses Spiel niedergeschrieben.
+
+Wichtig, wenn auch im Anleitungsbuch leicht übersehbar, ist die Tatsache, daß ein Spieler, der im Level gestiegen ist, mit Lord British reden muß. Erst dadurch kann er die gewonnene Erfahrung in Hit-Points (Lebenskraft-Punkte) umsetzen.
+
+Hit-Points kann man außerdem aufbessern, indem man zum Dungeon des Feuers geht. Dort befindet sich in der zweiten Etage eine Quelle, von der man trinken sollte.
+
+Sie tun gut daran, wenn Sie bei der Zusammenstellung der Gruppe nicht nur gleiche Charaktere nehmen. Als ideale Kombination erwies sich die Zusammenstellung der Gruppe aus einem »Cleric«, einem »Wizard«, einem »Fighter« und einem »Thief«. Statt des Klerikers und des Kämpfers können Sie allerdings auch einen Paladin nehmen, der Klerikersprüche benutzen kann und auch im Kampf stark ist.
+
+Der Dieb hat den Vorteil, daß er in den Dungeons (Höhlenlabyrinthen) Fallen aufspüren kann. Auch beim Umgang mit »Powders« stellt er sich geschickter an, als die anderen Charaktere. Die positive Eigenschaft des Zauberers und des Klerikers ist das Zaubern; die Sprüche des Klerikers haben mehr eine friedfertige Natur (Heilen, Schatzkisten öffnen etc.), wogegen der Zauberer seine Fähigkeiten besser im Kampf mit Gegnern einsetzen kann. Kämpfer sind besondersstark, wenn es darum geht, einem Feind zu widerstehen.
+
+Dies waren ein paar allgemeine Tips, doch nun zur Lösung. Alle in diesem Artikel angegebenen Koordinatenangaben beziehen sich übrigens auf das Schloß des Lord British. Sind beispielsweise die Koordinaten 8W und 35S angegeben, dann müssen Sie von Lord British’s Castle aus 8 Schritte nach links (Westen) und 35 Schritte nach unten (Süden) gehen.
+
+### Kämpfe
+
+Kämpfen ist in diesem Spiel unerläßlich, denn durch das Töten von Monstern erhalten Sie Erfahrungspunkte, durch die Sie später in Ihrem Level aufsteigen.
+
+Gegen sehr starke Gegner wie zum Beispiel Drachen, Balrons oder größere Ansammlungen von Wachen, empfiehlt es sich, Powders einzusetzen. Powders verlangsamen den Bewegungsablauf der Gegner.
+
+Gegen die sehr häufig auftretenden Skelette sollten Sie mit dem Klerikerspruch A (Pontori) kämpfen. Vor Benutzung dieses Spruches solltejedoch nicht angegriffen werden, da er sonst fast immer mißlingt. Das gleiche gilt auch für den Zauberspruch A (Repond), dergegen Orcs und Orc-ähnliche Monster verwendet werden kann.
+
+Bei den Kämpfen gegen den Fußboden sollten Sie alle Spieler in der untersten Reihe postieren. Attackieren Sie dann immer nur mit Hilfe von Schuß-, Schleuder- oder Wurfwaffen nach Norden (Oben).
+
+### Waffen
+
+Es gibt Unmengen verschiedenerWaffentypen. Davon sind die Nahkampfwaffen am uneffektivsten. Schuß-, Wurf- und Schleuderwaffen sind also ganz klar zu bevorzugen.
+
+Wenn Sie noch nicht genügend Geld haben, sich bessere Waffen zu kaufen, wählen Sie Slings; Slings sind die billigsten auf Entfernung wirkenden Waffen. Sollte Ihr Geld ausreichen, dann gehen Sie zur Stadt Dawn. Dort gibt es alle Waffen, die man haben möchte.
+
+Wenn Sie mit Hilfe dieser Waffen sehr stark und gewandt sind, lassen sich die Gegner vernichten, ohne überhaupt mit ihnen in Berührung zu kommen.
+
+### Gold
+
+Sobald Sie einen Gegner besiegt haben, können Sie all sein Gold und sonstige Besitztümer nehmen. Wenn Ihre Charaktere genügend Kraft besitzen, können Sie ganze Städte entvölkern. Das bringt Ihnen neben großem Geldreichtum noch eine Menge Erfahrungspunkte.
+
+Wenn Sie die Schatztruhen öffnen, sollten Sie das unbedingt mit dem dafür vorgesehenen Klerikerspruch B (Appar unem) tun. So vermeiden Sie hinterlistige Fallen, die an den Truhen befestigt sein können. In den Höhlen ist außerdem eine Unmenge Gold zu finden. Dessen habhaft zu werden erfordert allerdings viel Geduld.
+
+### Dawn
+
+Dawn ist eine Stadt, in der man so ziemlich alles bekommen kann, was man sich wünscht. Dort gibt es Powders, Gems, bessere Rüstungen und bessere Waffen als in allen anderen Städten. Dawn hat die Koordinaten 8 West, 35 Süd, und erscheint nur zu Mondstellung (0/0).
+
+### Schiffe
+
+Um ein Schiff zu bekommen, müssen Sie erst einmal die Mannschaft des Piratenschiffs vernichtet haben. Wenn Sie beim Kampf taktisch klug vorgehen und den richtigen Weg einschlagen, werden Sie kein einziges Mal von der Kanone getroffen. Falls mal kein Schiff kommen sollte, brauchen Sie nicht gleich die Geduld zu verlieren. Manchmal kann es sehr lange dauern, bis sich eines zeigt.
+
+Wenn Sie Ihr Boot abstellen, sollten Sie übrigens darauf achten, daß es an einer Stelle steht, an die der Strudel nicht so schnell herankommen kann. Abgestellte Schiffe können vom Strudel zerstört werden. Wenn Sie sich gerade dann auf einer Insel befinden, auf der es keine Mondtore gibt, haben Sie eben Pech gehabt.
+
+### Dungeons
+
+Unter Dungeon versteht man unterirdische Höhlensysteme. Die Etage, in der sie sich befinden, wird dabei als Dungeon-Level bezeichnet, was aber nichts mit dem Level zu tun hat, in dem sich Ihre Charaktere jeweils befinden.
+
+Bevor Sie die Höhlen erforschen, sollten Sie sich ein paar Gems (Juwelen) besorgen. Davon brauchen Sie mindestens acht Stück; bekommen kann man sie in den Städten Dawn, Devil Guard oder Grey. Mit Hilfe von Gems lassen sich die einzelnen Dungeon-Levels kartographieren. Außerdem benötigen Sie Fackeln, die es in den oben genannten Städten zu kaufen gibt, in denen es auch Gems gibt.
+
+### Marks
+
+Insgesamt gibt es vier Marks, die sich in Dungeons zumeist im 8. Level befinden. Jeder der Spieler muß jede der Marks besitzen. Das betrifft auch die Toten, also müssen Verstorbene vor dem Suchen nach Marks wieder zum Leben erweckt werden. Das kostet zwar viel Geld, ist aber unbedingt notwendig.
+
+* Mark of Force: Diese ist in der Höhle des Feuers im achten Level zu finden. Die Koordinaten sind 19 Süd, 3 Ost, 1 Nord, 1 Ost, 2 Nord. Mit Hilfe der Mark of Force kann man unbeschadet durch Kraftfelder gehen.
+* Mark of Fire: Sie befindet sich in der Höhle im Nordwesten, ebenfalls im 8. Level. Die Koordinaten sind 2 Süd, 12 Ost, 1 West, 2 Nord. Die Mark of Fire ermöglicht es, ungehindert Lava zu durchqueren.
+* Mark of Kings: Die Mark of Kings ist im selben Dungeon wie die Markof Fire, aberschon im 1. Level. Mitihrer Hilfe kann man ein bestimmtes Schloß betreten.
+* Mark of Snake: Sie ist auf einer Insel zu finden, die man sowohl per Schiff, als auch auf schnellerem Weg durch ein Mondtor erreichen kann. Die Koordinaten des Mondtores sind 6 West, 41 Süd, 3 West, 1 Nord. Das Tor erscheint zu Mondstellung (3/1). Verlassen kann man die Insel bei (1/3). Über diese Markjedoch später mehr.
+
+### Ambrosia
+
+In dieses »längst vergessene Land« gelangen Sie, indem Sie mit dem Schiff in den Strudel fahren. Sie werden dabei nur sterben, wenn nichtjeder der 4 Charaktere alle Marks besitzt. Ziehen Sie also nicht die Disk heraus, auch wenn es so aussieht, als ob Sie sterben würden.
+
+Kartographieren Sie das Land mit der Hilfe eines Gems, da man sehr leicht die Übersicht verlieren kann. Ambrosia ist schließlich ein ziemlich dunkles Land, Sie sehen dort fast nichts.
+
+An den vier »Shrines« (Altäre) die dort zu finden sind, kann man die Persönlichkeitsattribute derCharaktere (Intelligence, Magic Points etc.) erheblich verbessern. Dafür müssen Sie allerdings tief in die Tasche greifen.
+
+Wenn Sie die Insel verlassen wollen, finden Sie im Südwesten ein Schiff.
+
+### Cards
+
+Geben Sie auf jedem der Altäre in Ambrosia »Other Cmd: Search« ein. Sie erhalten dann insgesamt vier Karten, die Sie zur Lösung des Abenteuers unbedingt benötigen.
+
+### Wachen
+
+Wachen lassen sich nicht nur verlangsamen (Powders), sondern auch bestechen. Das geht mit »Other Cmd: Bribe« oder »Other Cmd: Suite«. Sie werden dabei lediglich 100 Goldstücke los.
+
+### Exotics
+
+Exotic-Rüstungen und Exotic-Waffen benötigt man unbe-dingtfür den Kampf im Schloß des bösen Exodus. Vergessen Sie nicht, die Exotic-Rüstungen vor dem Betreten des Schloßes anzulegen und sich mit den Exotic-Waffen auszurüsten.
+
+Exotics können Sie auf kleinen Inseln finden, auf den Sie »Other Cmd: Dig« eingeben müssen. Denken Sie daran, daß jeder der 4 Charaktere Exotics braucht.
+
+### Silversnake
+
+Am Eingang der Insel, auf der das Schloß von Exodus steht, befindet sich eine Schlange; sie bewacht den Eingang. Um an ihr vorbeizukommen, müssen Sie die Mark of Snake besitzen. Stellen Sie sich mit Ihrem Schiff direkt unter die Schlange und geben jetzt »Yell evocare« ein. Um aus der Bucht wieder herauszukommen, müssen Sie genau das gleiche tun.
+
+### Das SchloB des bösen Exodus
+
+Für den gefährlichen Weg durch das Schloß sollten Sie sich erst Pferde besorgen. Wenn Sie auf Exodus’ Insel sind und noch kein Pferd haben, verlassen Sie die Insel durch das Mondtor unten rechts. So auf das Festland gelangt, können Sie sich jetzt Pferde kaufen und durch Mondtore wieder die Insel betreten.
+
+Mit dem Pferd haben Sie den Vorteil, daß Sie sich doppelt so schnell bewegen können wie ein Fußgänger, und deswegen einigen Kämpfen entgehen.
+
+Wenn Sie das Schloß betreten haben, halten Sie sich links. Da Ihnen nun einiges entgegenkommt, finden die Powders jetzt gezielte Verwendung. Folgen Sie dem langen Gang bis ganz nach oben, dann biegen Sie rechts ein. In der Mitte des Schloßes gehen Sie wieder nach oben. Nach vier Kämpfen gegen den Fußboden (Sie haben richtig gelesen, der Fußboden greift Sie an) stehen Sie vor Exodus.
+
+### Die Vernichtung von Exodus
+
+Treten Sie an den ersten Slot von links. Dort muß die »Card of Love« eingesteckt werden. Tun Sie das mit dem Befehl »Other Cmd: Insert«, nach der Eingabe der Richtung und »L« für Card of Love. Vor dem zweiten Schlitz tun Sie das gleiche, diesmal allerdings mit einem »S« für Card of Sol. In den dritten Kartenschlitz stecken Sie die Card of Moon (»M«). Zum krönenden Abschluß des ganzen Abenteuers können Sie jetzt siegessicher Exodus’ Tod belächeln: Schieben Sie ihm mit einem hämischen Grinsen die Card of Death (»D«) in den vierten Schlitz.
+
+(Holger Ocken/M. Kohlen/rg)
+
+# Mask of the Sun
+
+Sie sollen die Sonnenmaske der Azteken finden. Behindert werden Sievon Ihrem Rivalen »Roboff«, einem Leoparden und anderen Schwierigkeiten.
+
+Für alle, die bis jetzt am Spiel verzweifelt sind, hier der Lösungsweg.
+
+### Diskette Seite A:
+
+Leave plane, get all, in jeep, NW, W, SE, put gun, put match, putamulet, putmap, putknife, outjeep, gethead, puthead on statue, in jeep, getfood, getamulet, get lamp, get match, S, E, out jeep, in hut, give food, out hut, in jeep, W, W, W, NW, F.
+
+### Diskette Seite B:
+
+W, out jeep, down vine, light match, light lamp, F, F.
+
+An dieser Stelle den Spielstand durch Eingabe von SAVE GAME unter einem beliebigen Namen abspeichern!
+
+SW, jetzt den Lavafluß überqueren, wenn dies beim erstenmal nicht gelingt, den abgespeicherten Spielstand mit RESTORE GAME und Angabe des Filenamens wieder einladen und nochmal versuchen.
+
+Wenn man drüber ist, weiter mit FORWARD, auf die Fragen der Gesichter mit dem Wort XOTZIL antworten.
+
+Weiter mit: F, F, F, put amulet in hole, get mask, search altar, get mask, return, wear mask, go door, F
+
+Auf die Frage der Sonne antwortet man: A coffin
+
+Jetztkommtderlrrgarten, gehen SieR, L, F, L, R, R, go door
+
+Von hier ab müssen Sie den Irrgarten solange durchsuchen, bis Sie in einem Raum auf einen Ganoven stoßen, der von Ihnen mit vorgehaltenem Revolver die Maske der Sonne verlangt.
+
+Leider kann ich dorthin keine genaue Wegbeschreibung mehr liefern, da es mir nur einmal gelungen ist, dorthin zu gelangen, aber eine bißchen Suchen machtja auch Spaß.
+
+Geben Sie dem Mann die Maske durch: GIVE MASK
+
+Wenn der Leopard sich Ihnen zuwendet weiter mit: PLAY FLUTE
+
+Herzlichen Glückwunsch, YOU HAVE WON THE GAME!!!
+
+(Frank Schneider/rg)
+
+# Critical Mass
+
+In fünf großen Städten hat ein Größenwahnsinniger, der die Weltherrschaft übernehmen möchte, Zeitbomben versteckt. In einem Wettlauf gegen die Zeit haben Sie als Agent die Aufgabe, alle Bomben zu finden und zu entschärfen.
+
+Sollte Ihnen dies bisher nicht gelungen sein, wird Ihnen unsere Lösung bestimmt weiterhelfen.
+
+Vorbemerkung: Da dieses Programm mit einer laufenden Uhr arbeitet, darf die Eingabe der einzelnen Befehle nicht zu langsam erfolgen.
+
+Get envelope, open envelope, read sign, get flowers, W, push button, D, jump (erst mit RETURN abschließen, wenn Sie den 4. Stock erreichen), W, go zoo, N, W, buy peanuts, E, feed peanuts, E, get bomb, throw bomb, E, read sign, get paper, use broom, read paper, W, W, S, S, go un, E, go alley, get bottle, S, E, read sign, W, (falls nötig RETURN drücken, bis die Uhr 10:00 anzeigt), go deli, buy chicken soup, W, W, go airport, go london, E, S, buy newspaper, read newspaper, N, go telex, kicktelex, leave telex, getinstrument, E, give flower, W, W, W, go bridge, N, say lithium, S, W, go airport, go rome, S, go ruins, E, N, look door, read note, E, E, getflashlight, W, W, S, E, go airport, go paris, S, go laundry, go laundry, ring bell, give receipt, W, S, W, S, E, E, S, S, E, get key, W, N, N, W, W, N, N, eat soup, E, S, S, go airport, go new york, go miami, E, go beach, N, N, read sign, S, S, S, S, read sign, save game (1), call gid-get, (falls Sie kein TOWEL gewonnen haben, RESTORE (1), sonstweiter), N, N, W, goairport, gosanjuan, W, godocks, get gas, clean deck, W, push button, S, 8x E, go house, knock door, major, clue, stuportino, N, W, W, S, push button, 14x S, 6x E, N, W, E, E, N, N, E, N, N, look corner, saysneezer, N, U, U, S, duck (sofort!), S, insert key, N, D, N, N, save game (2), (Raketen mit IJKM & SPACE abschießen; falls es nicht klappt, RESTORE (2) eingeben.)
+
+(Thomas R.A. Wolf/rg)
+
+# Voodoo Castle
+
+Voodoo Castle von Scott Adams ist schon ein relativ betagtes Adventure, das den Spieler aber vor eine Vielzahl von Problemen stellt.
+
+Ein Problem sind die vielen unnützen Dinge, die überall herumliegen. Man versucht soviel wie möglich mitzuschleppen und läßt dabei wichtige Sachen liegen.
+
+Die folgende Anleitung führt zur vollständigen Lösung des Adventures. Richtungen wie North, West, etc. sind in der Anleitung ausgeschrieben, können beim Eintippen aber mit dem Anfangsbuchstaben abgekürzt werden.
+
+Für die, die das Adventure lieber selber lösen wollen, aber irgendwo steckengeblieben sind, noch drei kleine Hinweise:
+
+* Die Plakette können Sie nur in dem Loch unter dem Kessel lesen. Zum Lesen benötigen Sie die Glasscherben.
+* Die Tierköpfe kann man mit »pull heads« von der Wand nehmen, wenn man das Schwert dabei hat.
+* In Medium Maegen’s Mad Room können Sie das Medium erscheinen lassen (say medium). Es gibt Ihnen einen kostbaren Hinweis, den Sie nur richtig deuten müssen. Beachten Sie vor allem das Wort zwischen den Gedankenstrichen.
+
+Für die Ungeduldigen jetzt die genaue Anleitung:
+
+open coffin, get ring, east, wave ring, go chute, get plaque, go hole, examine ball, get knife, west, drop knife, south, get glass, west, south, east, get sword, get shield, west, north, east, north, west, gofireplace, getidol, clean idol, south, east, south, east, move kettle, go hole, read plaque, get foot, drop plaque, drop glass, up, north, pull heads, turn 38, turn 33, get hammer, drop heads, drop sword, east, east, get chems, west, mixchems, drinkchems, west, south, west, west, south, go door, get saw, exam graves, get clover, east, north, east, north, drop foot (daraufhin kommt die Frage des Computers: »ON WHAT?« Tippen Sie ein: on man), north, go window, get doll, south, south, drop doll, south, climb stairs, get statue, down, north, west, go fireplace, open flue, go flue, pull nails, drop nails, get boards, drop boards, saw grating, drop grating, press button, push sweep, read paper (diese Eingabe dient nur zum Verständnis des folgenden und kann, wie alle »Read...«-Eingaben, weggelassen werden), drop paper, down, down, south, east, south, east, north, east, east, drop statue, sayzap, getbag, west, dropshield, getbook, getstick, read book, west, south, west, north, drop ring, drop hammer, east, go chute, wave bag, go crack, get page, south, read pa-ge, go hole, examine ball, west, get knife, get doll, circle coffin, wave stick, yell chant —
+
+Jetzt haben Sie es tatsächlich geschafft. Wenn Sie sich die Beschreibung der Kapelle genau ansehen, werden Sie lesen, daß ein lächelnder Graf Christo im Raum steht. Das ist aber auch alles. Ansonsten steht da nur das wohlbekannte »ADVENTURE OVER! HIT -Y«.
+
+(Stephan Keller/rg)
+
+# Pirate Adventure
+
+> Hier ist die Lösung des »Pirate Adventure« von Scott Adams.
+
+Das Pirate Adventure ist mit seinen zirka 20 Räumen ein relativ »kleines« Adventure. In der Lösungsanleitung sind die Richtungsbefehle (North, East, etc.) ausgeschrieben. Bei der Eingabe können sie jedoch abgekürzt werden. Das Programm sagt dem Spieler meist nicht, wo man sich gerade befindet. Wer sich also die Gegend anschauen will, muß erst »look« eingeben.
+
+Hinter »say yoho« ist der Zielort in Klammern angegeben. Die Anweisung muß so oft wiederholt werden, bis man sich am angegebenen Ort befindet. Nun die Schritt-für-Schritt-Lösung:
+
+get rum, get sack, climb stairs, get book, read book, go passage, east, get torch, get bag, say yoho (sandy beach), open bag, drop bag, get matches, east, go shack, give rum, get chest (wenn der Pirat sie nicht hergeben will, dann versuchen Sie es noch einmal), get parrot, west, west, drop chest, drop crackers, drop parrot, drop book, east, east, go path, go crack, light torch, go shed, get hammer, get wings, north, go crack, unlight torch, down, west, west, drop wings, get book, drop torch, drop matches, say yoho (outside building), climb window, down, pull nails, get nails, get rug, drop rug, get keys, climb stairs, go passage, east, get bottle, say yoho (sandy beach), drop keys, drop hammer, drop nails, get wings, go lagoon, north, get water, get fish, south, west, drop wings, drop book, get torch, get matches, get keys, east, east, go cave, light torch, down, give fish, unlock door, go hall, east, get sails, get lumber, drop bottle, go shed, get shovel, north, west, go pit, up, west, drop torch, drop matches, west, west, drop sails, drop lumber, get wings, go lagoon, dig anchor (solange bis die Meldung OK kommt, bei »I don’t find anything« die Eingabe wiederholen), get anchor, west, unlock chest, exam chest, get plans, build ship, drop plans, exam chest, get map, drop keys, drop wings, get book, say yoho (outside building), climb window, go passage, east, wake pirate, say yoho (sandy beach), drop book, get crackers, get parrot, go ship, set sails, (wenn der Pirat Einwände wegen der Gezeiten macht, dann wiederholen Sie den Befehl, bis er ablegt) go shore, dig, get bottle, south, east, go monastery, drop parrot, get dubleons, read map, west, go 30, dig, get box, west, north, giverum, south, wakepirate, north, goship, setsails, go shore, get hammer, open box, drop box, drop hammer, get stamp, get book, say yoho (outside building) climb window, down, drop stamps, drop dubleons, score
+
+Wer jetzt glaubt, von Scott Adams zu hören, daß man ein guter Abenteurer sei, wird enttäuscht. Man muß schon sehr genau hinsehen, um die zwei Worte »YOU WON!« zu entdecken. Alles was bleibt, ist die Befriedigung ein Adventure gelöst zu haben. Die hält mindestens bis zum nächsten frustrierten Enttäuschungsschrei vor dem Computer an.
+
+(Stephan Keller/rg)
+
+# Gruds in Space
+
+> Die Schritt-für-Schritt-Lösung, Lagepläne, eine Hilfsliste und die benötigten Koordinaten werden Sie der Lösung von »Gruds in Space« näherbringen.
+
+Das Ziel des Spiels »Gruds in Space« ist es, den Treibstoff »Heliotropanite« zu finden und zu einem gestrandeten Schiff auf dem Pluto zu bringen. Dazu muß man jedoch vorher umfangreiche Aufgaben und Probleme bewältigen, die einen oft zurVerzweiflung bringen können. Die Handlung spieltaufver-schiedenen Planeten und Raumschiffen, so daß man nicht darum herumkommt, Lagepläne anzufertigen, da das Spiel über 100 verschiedene Stationen besitzt (übrigensjede mit Grafik).
+
+Nun zur Lösung.
+
+Ich habe meine Lösung in vier Teile aufgegliedert:
+
+* für die Verzweifelten: Eine Schritt-für-Schritt-Lösung, die die Eingaben der Reihe nach auflistet.
+* eine Liste, die für den anspruchsvolleren Abenteurer ge-eignetist, dernichtweiterkommt, abertrotzdemnichtdie fertige Lösung präsentiert haben möchte. Sie gibt nur an, welche Schritte zu unternehmen sind.
+* für die Könner, diefaulsind, Pläneanzulegen, aberauch für die Anfänger ist der dritte Teil sehr wichtig: die Lagepläne. Sie geben die örtlichen Verhältnisse auf den verschiedenen Planeten beziehungsweise in den Raumschiffen wieder.
+* dann schließlich eine Übersicht über die verschiedenen Koordinaten, die benutzt werden müssen, um bestimmte Orte anzufliegen und um zu teleportieren.
+
+Zu den Plänen ist noch zu sagen, daß sie vielleicht an manchen Stellen etwas unübersichtlich erscheinen könnten, da das Spiel oft auch in der Vertikalen verläuft, was nur sehr schwer grafisch dargestellt werden kann. Ich habe mich für folgendes System entschieden:
+
+Die Stellen, an denen nach oben oder unten gegangen wird, sind auf den Plänen durch gestrichelte Pfeile dargestellt, bei denen die Richtungen (U/D) angegeben sind.
+
+Der Plan des außerirdischen Raumschiffes hat noch eine Besonderheit an sich: Die Übergänge zu anderen Räumen bestehen oft aus Türen, die nur durch das Einfügen einer bestimmten Kugel in einen Rahmen an der Tür geöffnet werden können. Solche Übergänge sind durch dickere, gestrichelte Trennwände gekennzeichnet. Ferner ist in jedem Raum aufgeführt, welche Rahmen (...sq.) beziehungsweise Kugeln (...orb) sich in diesem befinden.
+
+Einige allgemeine Tips:
+
+Vor allem nicht verzweifeln, wenn es mal nicht so recht klappt. Es ist ratsam, das Spiel zwischendurch öfter mal auf einer leeren Diskette abzuspeichern, da der Tod des Spielers möglich ist.
+
+Auch bei diesem Adventure heißt das Motto: Es darf gelaufen (geflogen) werden. Also keine Mühen scheuen.
+
+Ein Wort zum Schluß:
+
+Die Lösungswege von Hilfsliste und Schritt-für-Schritt-Lösung stimmen nicht völlig überein, sind aber beide möglich. Man hat also zwei verschiedene Lösungswege zur Auswahl.
+
+(Joachim Conrads/rg)
+
+TODO ASIDE
+
+## Die Hilfsliste
+
+Diese Hilfsliste gibt Hinweise auf die einzelnen Schritte, die zu unternehmen sind. Ausführung und Lösung einiger Probleme bleiben dadurch dem Spieler noch erhalten, so daß der Reiz des Adventures nicht vollständig zerstört wird.
+
+* Empfangen eines Funkspruchs
+* Flug zum Saturn
+* Seil und Münze suchen und nehmen
+* »Lord Deebo« aufsuchen (Tip: Butler < = > Trinkgeld)
+* Flug zur Venus
+* Pistole suchen
+* Mr. Green aufsuchen (Tip: eine Station vorher »HELP«)
+* »Note« übergeben
+* Flug zum Saturn
+* Von Mr. Green erhaltenen Gegenstand bei Deebo abgeben
+* In den Höhlen den versteckten Schlüssel suchen
+* Den zweiten versteckten Schlüssel suchen (Tip: BAT)
+* »Gate« öffnen und Tempel aufsuchen
+* Grüne Kugel nehmen
+* In den Höhlen blaue Kugel suchen (Tip: Square)
+* Flug zur Venus, ins außerirdische Raumschiff teleportieren
+* Durch geschicktes Vorgehen (Türen, Squares, Orbs) schwarze Kugel finden (Lageplan; dieser Teil ist sehr schwierig)
+* Flug zum Saturn
+* »Hill« aufsuchen und den Arier verjagen
+* Höhle des Ariers betreten (Tip: Black Orb)
+* Höhle verlassen und nochmals betreten
+* Lord Deebo
+* Flug zur Venus
+* Mr. Green aufsuchen (Tip: Trees, Gun)
+* Mit »Card« die Wohnung betreten
+* Flug zum Saturn
+* »Supply Building« aufsuchen, einen Gegenstand (Tip: der in den Höhlen zum Einsatz kommt) fallen lassen und dafür »02-Mask« kaufen (Container können nützlich sein)
+* Cafeteria aufsuchen
+* Tischbein nehmen
+* »Arier Cave« aufsuchen (Tip: erinnern Sie sich an den Felsen nördlich der Höhle)
+* Heliotropanite nehmen
+* Flug zur Venus
+* Mr. Green wiederbeleben
+* Flug zum Titan
+* Gegenstände nehmen
+* Funkspruch
+* Flug zum Pluto
+* Sprengen des feindlichen Schiffes
+* Teleportieren zum Pluto
+* Aufsuchen des Schiffes
+* Übergeben des Helitropanite
+* Funkspruch
+* Flug zur Erde
+* Teleportieren
+* »HELP« eingeben
+* SPIELENDE
+
+
+TODO ASIDE
+
+## Schritt-für-Schritt-Lösung
+
+w, s, pressgreen, pressgreen, pressgreen, n, d, d, w, set 64-18-52, w, set 77-34-40, go window, n, n, n, n, steal rope, s, w, take coin, e, s, e, s, s, e, knock, say yes, give coin, e, give rope, say yes, e, help, ta-ke all, w, w, w, n, w, s, go window, e, set 96-17-14, w, set 82-13-64, go window, e, tie rope to tree, e, d, take gun, u, w, loosen rope, take rope, n, e, n, shoot venusian, n, drop gun, w, give note, take money maker, e, takegun, s, shootvenusian, s, w, s, w, gowindow, e, set 64-18-52, w, set 77-34-40, gowindow, n, e, s, e, knock, e, e, givemoneymaker, take rock, w, w, w, n, w, s, w, n, w, w, s, s, w, tie rope to stalagmite, d, n, e, s, d, n, w, take key, e, s, u, n, w, s, u, e, u, e, n, shoot bat, u, open chest, d, drop key, u, look chest, take key, d, s, u, n, e, s, e, e, n, n, e, s, e, n, n, n, w, n, open gate, n, n, n, w, n, n, take green, s, s, e, s, s, s, s, e, s, s, s, w, n, w, s, w, n, w, w, s, s, u, n, w, drop green, take all, e, s, d, n, n, e, e, s, e, go window, e, set 96-17-14, w, set 66-12-15, go window, e, n, drop green, take green, w, drop key, take orange, drop green, take green, e, s, w, drop light, e, drop green, take green, e, e, drop orange, take orange, e, take purple, drop blue, take blue, w, w, drop purple, take purple, w, w, w, drop purple, take purple, w, drop gun, take white, drop orange, take gun, e, e, drop gun, drop rock, e, drop green, take green, e, e, s, drop white, take white, w, take yellow, drop purple, take purple, e, n, w, drop purple, take purple, w, w, w, drop purple, take purple, w, take orange, s, drop white, take white, e, e, drop yellow, take brown, e, e, drop purple, take purple, e, n, n, drop brown, e, take black, drop white, w, s, w, drop purple, w, w, drop all, take rock, take light, take gun, take black, go window, e, set 64-18-52, w, set 77-34-40, gowindow, n, e, s, e, n, n, n, w, n, n, n, n, e, s, e, shootarler, u, e, drop black, e, look screen, w, e, take note, w, d, w, n, w, s, s, s, s, e, s, s, s, knock, e, e, give note, take card, w, w, w, n, w, s, go window, e, set 96-17-14, w, set 82-13-64, go window, e, n, e, n, shoot tree, drop gun, n, w, insert card, press blue, e, s, s, w, s, w, go window, e, set 64-18-52, w, set 77-34-40, go window, n, n, e, e, drop light, look sign, buy mask, take mask, take coin, buy container, take container, w, w, s, s, go window, e, set 96-17-14, w, set 82-13-64, gowindow, e, n, e, n, n, w, insert card, revive green, press blue, e, s, s, w, s, w, go window, e, set 70-10-24, w, set 14-93-96, go window, n ,w, drop card, drop note, take bomb, e, s, e, take box, w, go window, e, look box, set 64-18-52, w, set 77-34-40, gowindow, n, w, breaktable, take leg, e, e, s, e, n, n, n, w, n, n, n, n, e, s, e, u, n, lift rock, look hole, take heliotropanite, s, d, w, n, w, s, s, s, s, e, s, s, s, w, n, w, s, go window, e, e, u, u, s, press green, n, d, d, w, set 18-98-32, w, set 34-76-21, set 36-24-35, go window, drop bomb, go window, press red, set 34-76-21, go window, e, u, pull lever, n, give container, s, d, w, go window, e, e, u, u, s, press green, n ,d, d, w, set 53-42-75, w, set 66-43-44, go window, help
+
+# Die Lösung von Hobbit
+
+> Lange haben die Abenteuerspielfreunde auf die Lösung von Hobbit warten müssen. Einen der möglichen Lösungswege, der sogar ein Ergebnis von 101,5 % zuläßt, wollen wir Ihnen hier vorstellen.
+
+The Hobbit ist ein Grafikadventure bei dem es darauf ankommt einen Schatz zu finden.
+
+Eine Standard-Lösung dazu ist nicht möglich, da sich durch umherirrende Gestatten ständig neue Spieteituationen ergeben.
+
+### Befehlsliste:
+
+Die in Klammem angegebenen Hinweise brauchen nicht mit eingegeben zu werden. Richtungsangaben, wie zum Beispiel »East«, können durch die Anfangsbuchstaben abgekürzt werden.
+START
+OPEN DOOR, EAST, NORTH, NORTH, WAIT (bis »DAY DAWNS«), SOUTH, GET KEY, NORTH, UNLOCK, OPEN, GO DOOR (Rocky door), GET ROPE, GET SWORD, SOUTH, SOUTH, SOUTHEAST, TALK, SAY ELROND »READ MAP« (bis ersie liest), EAST, NORTH, NORTHEAST, NORTH, SOUTHEAST, DOWN, DOWN, DOWN, DOWN, EAST, GET KEY, UP, NORTH, WEST, SOUTH, EAST,
+NORTH, (nun warten Sie, bis ein Goblin Sie gefangen nimmt, achten Sie aber darauf, daß Gandatt oder Thorin bei ihnen sind), DIG SAND (in »Goblins dungeon«), BREAK TRAP WITH SWORD, GET KEY, SAY THORIN »CARRY, ME« (oder zu Gandatt), SAY THORIN »OPEN WINDOW«, SAY THORIN »GO WINDOW«, SOUTHWEST, (als nächstes müssen Sie in dem Verlies der Goblins einen Ring suchen, der von Gollum bewacht wird. Haben Sie diesen, begeben sie sich zum Ausgang »GOBUNS BACKDOOR«), EAST, EAST, OPEN CURTAIN, OPEN CUPBOARD, GET, NORTHEAST EAST, EAST, WEST, WEST WATT (bis »Wooden Ett« kommt und Sie in einem roten Kerker einsperrt) (Sie befinden sich nun im Kerker), WAIT (bis »SOMEONE OPEN RED DOOR«), GO DOOR, NORTH, WAIT, SOUTH, (diese »NORTH-WAIT-
+SOUTH«-Kombination so lange bis »BUTLER DRINK SOME WINE«, dann weiter bis »BUTLER OPEN TRAP DOOR«, wenn »BUTLER THROWS BARREL THROUGH TRAP DOOR«, »JUMP BARREL« eingeben), EAST SAY BARD »CAREFULLY, GO NORTH«, NORTH, NORTH, WAIT (bis »RED DRAGON« erscheint), SAY BARD »SHOOT DRAGON«, UP, NORTH, NORTH, NORTH, GETTREASURE, SOUTH, SOUTH, SOUTH, DOWN, SOUTH, SOUTH, (am »WATERFALL« warten Sie bis Wooden-Ett kommt) so kommt man in das Ettenverlies), WAIT (auf »SOMEONE OPEN RED DOOR«), GO DOOR, NORTH, WAIT, WEAR RING, READ MAGIC DOOR, LOOK DOOR, WAIT (irgendwann öffnet sich das magische Tor), WEST, (ein Spinnennetz behindert nun den Weg, dieses Hindemis kann durch Eingabe von SMASH WEB beseitigt werden), (nun versuchen Sie an Hand der Lagekarte zum LONELAND zurückzukehren), GO DOOR, OPEN CHEST, PUT TREASURE.
+ENDE
+
+Mit Hitte dieser Lösung sollte es möglich sein mindestens 85% des Adventures zu lösen. VVenn man alle Räume durchtaufen hat, sind sogar 101,5% drin. Übrigens der Punktestand kann mit »SCORE« abgefragt werden.
+
+Und nun viel Erfolg!
+
+(Roland Selzer/rg)
+
+# Enchanter ist jetzt gelöst!
+
+TODO BILD 2
+
+SE, SE, NE, S, READ SCROLL, GNUSTO REZROV, LEARN REZROV, SW, NW, NW, NE, N ,OPEN OVEN, GET BREAD, GET JUG, S, NE ,SE, NE, FILL JUG, SW, SE, E, E, REZROV GATE, E, FROTZ BOOK, N, N, E, E, E, E, E, LEARN REZROV, REZROV GATE, N, (GET SCROLL, READ IT), GNUSTO KREBF, E, LOOK UNDER LILY PAD, READ SCROLL, GNUSTO CLEESH, W, S, W, W, W, W, W, S, S, S, S, E, D, OPEN DOOR, N, PULL BLOCK, E, (GET SCROLL, READ IT), GNUSTO EXEX, W, S, U, DROP BOOK, E, GET LIGHTED PORTRAIT, GET SCROLL, W, GET BOOK, READ SCROLL, GNUSTO OZMOO, EAT BREAD, N, GET BOX, S, W, U, GET IN BED, SLEEP, GET UP, EXAMINE BEDPOST, PUSH BUTTON, (GET SCROLL, READ IT), GNUSTO VAXUM, D, N, N, N, N, U, GET EGG, LEARN REZROV, LEARN KREBF, REZROV EGG, GET SCROLL, KREBF SCROLL, READ SCROLL, GNUSTO ZIFMIA, D, S, S, S, S, E, E, E, S, LEARN NITFOL, LEARN EXEX, EXEX TURTLE, NITFOL TURTLE, (TURTLE, FOLLOW ME), NW, N, E, U, (TURTLE, SE GET SCROLL, NW, DROPSCROLL, (TURTLE, THANKS), GETSCROLL, D, W, W, W, N, N, E, LEARN OZMOO, OZMOO ME, DROP ALL, E, WAIT, D, W, GET ALL, CUT ROPE, OPEN BOX, GET VELLUM SCROLL, READ VELLUM SCROLL, GNUSTO MELBOR, DROP BOX, LEARN MELBOR, MELBOR ME, E, E, E, N, EXAMINE TRACKS, READ FRAYED SCROLL, GNUSTO GONDAR, N, SLEEP, LEARN ZIFMIA, LEARN VAXUM, (JETZT IN DEN SPIEGELSÄLEN AUF UND AB GEHEN BIS DER ADVENTURER ERSCHEINT, DANN...), ZIFMIA ADVENTURER, VAXUM ADVENTURER, (JETZT NACH OSTEN BIS ZUR GUARDED DOOR), POINT AT DOOR, LEARN CLEESH, CLEESH ADVENTURER, N, DROP DAGGER, GET PENCIL, GET PURPLE SCROLL, S, W, W, W, W, W, W, S, S, S, S, E, D, D, READ MAP, D, S, E, NE, SE, LEARN MELBOR, MELBOR ME, DRAW FROM F TO P, SW, SW, RUB FROM V TO M, RUB FROM B TO R, DRAW FROM J TO B, DROP PENCIL, DROP MAP, GET SCROLL, NE, NW, NW, W, DRINK WATER, DROP JUG, U, U, E, E, E, W, N, N, LEARN MELBOR, MELBOR ME, N, E, LEARN GONDAR, LEARN CLEESH, DROP BREAD, DROP, PURPLE SCROLL, E, KUL-CAD STAIR, IZYUK ME, E, GONDAR DRAGON, CLEESH MONSTER, GUNCHO KRILL !!!!!!
+
+# So löse ich Abenteuerspiele
+
+> Es gibt einige grundlegende Methoden, um an die Lösungen von Abenteuerspielen heranzugehen.
+
+Abenteuerspiele zu lösen bereitete schon immer Schwierigkeiten, besondersjemandem, der vorher noch nie mit dieser Art von Spielen in Berührung kam. Wir helfen bei den ersten Schritten. Die Tips, die wir hier geben, gelten nur für die sogenannten Text-Adventures beziehungsweise Text/Grafik-Abenteuer. Joystick-Abenteuer beziehungsweise Rollenspiele sind in der Regel ganz anders zu spielen.
+
+## Ein kurzes Wort zu Lösungsbüchern
+
+Wer sich ein Abenteuerspiel gekauft hat und absolut nicht damit zurecht kommt, sollte erst einmal Freunde mitspielen lassen, bevor er zu Lösungsbüchern greift. So macht das Ganze mehr Spaß. Wer dann schließlich doch zur Hilfsliteratur greifen muß, sollte erst einmal zwischen Lösungsbüchern und sogenannten »Hint Books« unterscheiden. Hints sind nur Tips und keine festen Lösungen. Die Hersteller verschiedener Adventures bieten zu ihren Spielen des öfteren solche Lösungshinweise an, aber auch Buch- und Zeitschriftenverlage haben ihre Adventure-Hacker, die dann Lösungs- beziehungsweise Hint Books anbieten.
+
+Telarium (vorher Trillium) legt zum Beispiel zu ihren Spielen verschlüsselte Lösungshinweise als Beigabe dazu, die man — um nicht »aus Versehen« zu schummeln — erst mit Hilfe einer Tabelle decodieren muß.
+
+## Wie finde ich den Wortschatz heraus
+
+Bei Infocom-Abenteuerspielen, wiezum Beispiel, Suspect, Zork III oder Deadline kann man »Hint Books« bestellen, in denen Lösungshinweise mit einer Geheimtinte abgedruckt sind. Diese werden erst nach Überstreichen mit einem mitgeliefertem Spezialfilzstift sichtbar. So ist gewährleistet, daß man immer nur die Informationen erhält, die man tatsächlich haben möchte.
+
+Wer von der Herstellerfirma bestimmter Adventures keine Lösungshinweise erhalten kann, der sollte sich auch in deutschen und amerikanischen Zeitschriften und Büchern umsehen; dort sind öfters Lösungen und Tips zu finden.
+
+Adventurespiele haben eines gemeinsam: Alle verstehen ihren Wortschatz mit Hilfe eines »Parsers«. Der Parser ist die Sprachinterpretationsroutine, die überprüft, wie der Satz aufgebaut ist (Unterscheidung von Verben, Substantiven und Präpositionen, die in einer einprogrammierten Wortschatzliste enthalten sein müssen).
+
+Bei den Infocom-Adventures ist fast alles möglich — tippen Sie einfach ein, was Sie denken. Wenn Ihr benutztes Wort nicht im 800 Worte großen Wortschatz enthalten ist, probieren Sie eben ein Synonym, das geht fast immer.
+
+Bei Abenteuerspielen von Telarium-Software und Windham Classics liegt jeweils eine Wortschatzliste bei; der Chef von Telarium ist selbst leidenschaftlicher Adventure-Spieler und haßt (nach eigenen Worten) das »Guess what word the parser wants to have«-Spielchen.
+
+Bei anderen Adventures gilt: Grundsätzlich sollte man erst einmal alles ausprobieren und eventuell auch in einem Englisch-Wörterbuch nachsehen. Wenn das nicht mehr geht, dann kann man noch immer mit Hilfe eines guten Maschinen-sprachen-Monitors oder Disk-Doktors entsprechende Wissenslücken ausfüllen. Sehr gut geht das bei den Abenteuerspielen von Sirius-Software; andere Abenteuer sind als Schutz vor solch unfairem Verhalten manchmal sehr geschickt codiert. In diesem Fall kann Ihnen dann nur noch ein gutes Vokabel-Gedächtnis helfen.
+
+Außerdem sollte man in der Anleitung nachsehen, ob das Spiel ganze Sätze oder nur Zweiwort- beziehungsweise Einwort-Kommandos annimmt.
+
+## Was man beim Spielen von Adventures grundsätzlich beachten soll
+
+Wenn man in einem Raum steht, erfährt man in vielen Adventures immer nur das, was man auf den ersten Blick sieht. Geben Sie in diesem Fall unbedingt noch den Befehl LOOK ein. Erst dann erfahren Sie, was bei genauerem Hinsehen zu entdecken ist. Gegenstände, die herumliegen, oder irgendwelche Öffnungen, Türen oder Spalten sollten Sie immer genauer untersuchen. Das geht meistens mit Hilfe der Befehle EXAMINEOBJECTbeziehungsweise INSPECT OBJECT. Um etwas zu durchsuchen, sollte man SEARCH IN »Gegenstand« oder SEARCH AT »Gegenstand« oder auch nur (je nach Parser des Spiels) SEARCH »Gegenstand« eintippen.
+
+Bei einigen Abenteuern erlaubt die Zeit oft nicht, alle vorhandenen Dinge zu untersuchen. Tun Sie das trotzdem. Im Lauf der Zeit werden Sie erfahren, welche Gegenstände unnütz sind und welche Sie gebrauchen können. Sie können nach Ablauf der Zeit noch immer neu starten und dieses Mal das Untersuchen auslassen — Sie wissen ja schon vom vorherigen Durchlauf, wie die Gegenstände aussehen und was sich dahinter verbirgt.
+
+Nehmen Sie immer nur das mit, von dem Sie glauben, daß Sie es brauchen. Wenn Sie später einen Gegenstand brauchen, den Sie vorher nicht mitgenommen haben, und sich eventuell nicht mehr daran erinnern können, ist das natürlich nicht besonders vorteilhaft. Sie sollten sich deshalb alle Gegenstände, die Sie irgendwo sehen, aufschreiben. Auch in den Umgebungsbeschreibungen sind oft nützliche Hinweise versteckt. Wenn Sie meinen, daß das der Fall ist: Auch aufschreiben.
+
+Die Umgebung sollte außerdem ständig kartographiert werden; darüberjedoch später mehr.
+
+Vor schwierigen Stellen ist es ratsam, das Spiel abzuspeichern. Die meisten Adventures benutzen dazu den Befehl SAVE oder SAVE GAME, manchmal kommt man auch mit QUIT in ein Menü, von dem aus man sein Spiel abspeichern kann. Auch sonst sollte man regelmäßig seinen Spielstand abspeichern (je nach Umfang und Schwierigkeitsgrad immer nach einem Fünftel bis einem Zehntel des Abenteuers). Bei extrem schweren Spielen (zum Beispiel »Sorcerer«) sollte man ständig abspeichern.
+
+In verschiedenen Abenteuerspielen sind auch ziemlich heimtückische Fallen eingebaut. Probieren Sie also alles, was Ihnen als möglich erscheint, auch wenn es noch so unlogisch oder abnormal ist. Beispiel: lm Adventure »The Hitchhikers Guide to the Galaxy« heißt es an einer Stelle, man könne nicht zum Ausgang hinaus. Nach dem dritten Versuch zeigt sich aber, daß es doch geht: Das Spiel (beziehungsweise der Programmierer) gibt zu, daß gelogen wurde. Wenn Sie also meinen, daß Ihre Idee die einzig richtige ist, dann versuchen Sie es ruhig mehrmals.
+
+Bei zeitabhängigen Abenteuern sollten Sie außerdem nicht immer blind lostippen, um den Computer zu veranlassen dies und jenes und sonstnochwas zu tun. Sie können ja auch mal abwarten (WAIT-Befehl), das hilft Ihnen oft sehr weiter (zum Beispiel bei Hitchhikers Guide vor dem Bulldozer).
+
+Auch wenn das Abenteuerspiel, das Sie vielleicht gerade spielen, ganze Sätze versteht, können Sie sich durch Abkürzungen eine Menge Zeit ersparen. Tippen Sie als Abkürzungen für die Himmelsrichtungen also immer nur S, W, E, N, SW, SO, NW, NO und für aufwärts und abwärts U und D. Arbeiten Sie mit einem Ganz-Satz-Adventure genau so, als ob es einen Zweiwort-Parser hätte.
+
+Beachten Sie, daß Gegenstände manipuliert werden können oder einen bestimmten Inhalt haben. Sie können außerdem spezielle Eigenschaften haben. Das Schwert aus Zork leuchtet zum Beispiel blau, wenn Gefahr droht, und rot, wenn der Träger des Schwertes wütend ist. Tatsachen wie diese sollte man immer ausnützen, sie helfen oft enorm bei der Lösung einiger hart zu knackender Nüsse.
+
+Es ist sehr selten, daß es mehrere Wege gibt, ein Problem zu lösen. Wenn Sie beispielsweise einen Gegenstand an einer Stelle benutzen, an der es auch anders geht und später einen Punkt erreichen, an dem dieser Gegenstand unbedingt benötigt wird, aber schon von der vorherigen Benutzung abgenutzt, verbraucht oder kaputt ist, dann können Sie sich (im Adventure) begraben. Denken Sie also immer logisch nach, was Sie wo brauchen und wie Sie es sinnvoll einsetzen. Bei den meisten Abenteuerspielen ist ein sinnvoller Einsatz eines Gegenstandes immer nur einmal möglich (abgesehen von ständig benutzbaren Dingen wie Schlüssel oder Kerzen). Wenn nur eine bestimmte Zahl von Gegenständen zu tragen erlaubt ist, sollten Sie die schon sinnvoll genutzten Dinge wieder ablegen. Speichern Sie allerdings davor den Spielstand ab, daesinseltenen Fällen möglich sein kann, daßderGegen-stand doch noch einmal zum Einsatz kommen kann.
+
+Die meisten Abenteuer haben übrigens ihre spezielle »Art des Hauses«. Das heißt: Je nach Herstellerfirma muß man mehr oder weniger logisch denken. Falls Sie beispielsweise mal ein Exemplar eines Adventures von Screenplay in die Hände bekommen, müssen Sie sich zu dessen Lösung in die chaotischen Gehirnwindungen eines Verrückten hineindenken und immer das Gegenteil von dem tun, was Sie eigentlich tun wollten.
+
+Bei Adventures von tellarium kommen Sie nur weiter, wenn Sie ein Feingefühl für Eihzelsituationen besitzen.
+
+Abenteuer von Sirius-Software sind extrem logisch aufgebaut, Infocom-Adventures dagegen bestehen aus einer idealen Mischung von Intuition und Logik (etwa 80% logische Gesichtspunkte).
+
+Soweit einige allgemein wichtige Gesichtspunkte.
+
+## Das Kartographieren
+
+In jedem Abenteuer sollten Sie mitzeichnen, auch wenn Ihnen die beschriebene Umgebung noch so gut im Gedächtnis bleibt — irgendwann kommen Sieja doch durcheinander.
+
+Es gibt verschiedene Verfahren, sich Karten und Umgebungspläne zu machen (eine ist ausführlich im Kurs für Abenteuerspiele beschrieben). Wenn Sie ein Abenteuer haben, das keine schrägen Richtungen wie Südwest oder Nordost besitzt (beispielsweise in einem Haus mit viereckigen Räumen), ist es am einfachsten und am platzsparendsten, wenn Sie sich ein kariertes Blatt Papier nehmen. Nehmen Sie einfach immer ein vier Karo großes Quadrat als Raum und setzen Sie diese Räume direkt nebeneinander. Verbindungen zwischen Räumen kann man mit einfachen Strichen zwischen den Quadraten illustrieren. Beschreibungen des Raumes sind nicht unbedingt für die Karte notwendig, wichtige Einzelheiten und vorkommende Gegenstände sollten Sie aber in die Quadrate einschreiben. Wenn in den Quadraten nicht ausreichend Platz für solch elementare Dinge ist, brauchen Sie die Räume einfach nur durchzunumerieren und sich die Gegenstände auf ein extra Blatt zu notieren.
+
+Wenn Richtungen wie Nordost oder Südwest im Abenteuer möglich sind, sollte man zwischen den einzelnen Quadraten, die die Räume darstellen sollen, ein wenig Platz lassen, um eventuelle Schrägrichtungen oder Wegbiegungen besser eintragen zu können. Wie Sie Möbel, Fenster und Türen einzeichnen, bleibt Ihnen überlassen. Diese Art des Kartographierens ist beispielsweise in dem Markt & Technik-Buch »Im Land der Abenteuer« enthalten (Adventuretips für die gängigsten Grafikabenteuer).
+
+Eine dritte, wenn auch anspruchsvollere Art des Kartographierens istdie Frei-Hand-Zeichnung, wie sie beispielsweise in der Lösung zu Enchanter (März-Ausgabe von 64’er) enthalten ist. Hier ist sehr viel künstlerisches Geschick notwendig. Lange Säle können hier auch wirklich lang dargestellt werden und nicht nur als Vierecke mit langen Verbindungsstrichen. Landschaften lassen sich wenn Sie wollen, dort auch auf künstlerischem Wege eintragen.
+
+Diese Darstellungsart wird allerdings im Lauf der Zeit sehr unübersichtlich, wenn Sie keine genauen Daten über die Länge einzelner Gänge oder ähnlichem vom Adventure erhalten.
+
+Als idealste Methode für Profi-Abenteuerer erweisen sich Mischformen der oben genannten Kartographierungsarten, wie sie auch in den Hint Books von Infocom verwendet werden.
+
+## Happy Adventuring
+
+Wenn Sie auch schnell an Abenteuerspielen verzweifeln mögen, üben Sie sich in Geduld. Wer keine Adventures spielt, der hat seinen naturgegebenen Forscherdrang vermutlich schon verloren.
+
+Sterben können Sie inAdventures relativ oft (Sorcerer hat beispielsweise 70 verschiedene Todesarten), aber Leben haben Sie unendlich viele. Nutzen Sie alles hier Gesagte aus, auch wenn es noch so unwichtig oder selbstverständlich erscheint.
+
+(M. Kohlen/rg)
+
+# Impressum
+
+Herausgeber: Carl-Franz von Quadt, Otmar Weber
+
+---
+
+**Redaktion**: Albert Absmeier, Volker Everts, Georg Klinge, Harald Meyer, Christian Rogge.
+Fremdautoren:
+Nickles, Lonczewski, Schmelzer, Selzer, Leggewie, Bornfleth, Schürks, Meiswinkel, Lüning, Geißelmann, lhlo, Ocken, Kohlen, Schneider, Keller, Conrads, Pither, Merbach.
+
+---
+
+**Layout**: Leo Eder (Ltg.)
+
+---
+
+**Zeichnungen**: Rene Nestler
+
+---
+
+**Auslandsrepräsentation**:
+Schweiz: Markt & Technik Vertriebs AG, Alpenstr. 14, CH-6300 Zug, Tel. 042-22 31 55, Telex: 862329
+USA:	M&T Publishing lnc.; 2464 Embarcadero Way, Palo Alto, CA 94303
+
+---
+
+**Vertriebsieitung**: Hans Hörl
+
+---
+
+**Anzeigen-Verkaufsleitung**: Ralph Peter Rauchfuss
+
+---
+
+**Anzeigenleitung**: Christian Schlottau
+
+---
+
+**Anzeigenverwaltung und Disposition**: Michaela Hörl
+
+---
+
+**Verlagsleiter M&T-Buchverlag**: Günther Frank
+
+---
+
+**Druck**: St. Otto-Verlag GmbH, 8600 Bamberg, Laubanger 23
+Auch Anschrift für Beihefter und Beilagen.
+
+---
+
+**Preis**: Das Einzelheft kostet DM 14,—
+
+---
+
+**Vertrieb Handelsauflage**: Inland (Groß-, Einzel- und Bahnhofsbuchhandel) sowie Österreich und Schweiz: Pegasus Buch- und Zeitschriften-Vertriebs GmbH, Hauptstätter Straße 96, 7000 Stuttgart 1, Telefon (0711) 7 6 48 30
+
+---
+
+**Urheberrecht**: Alle in diesem Heft erschienenen Beiträge sind urheberrechtlich geschützt. Alle Rechte, auch Übersetzungen, vorbehalten. Reproduktionen gleich welcher Art, ob Fotokopie, Mikrofilm oder Erfas-sung in Datenverarbeitungsanlagen, nur mit schriftlicher Genehmigung des Verlages. Anfragen sind an Hans Hörl zu richten. Für die in der Übersicht gemachten Angaben können wir weder Gewähr noch irgendwelche Haftung übernehmen.
+
+---
+
+**© 1985 Markt & Technik Verlag Aktiengesellschaft**
+
+---
+
+**Verantwortlich**: Für redaktionellen Teil:
+Albert Absmeier
+Für Anzeigen: Christian Schlottau
+
+---
+
+**Vorstand**: Carl-Franz von Quadt, Otmar Weber
+
+---
+
+**Anschrift für Verlag, Redaktion, Vertrieb, Anzeigenverwaltung und alle Verantwortlichen:**
+Markt & Technik Verlag Aktiengesellschaft, Hans-Pinsel-Straße 2,
+8013 Haar bei München, Telefon (089) 4613-0, Telex 5-22052
+
+---
+
+Aktionäre, die mehrals 25% des Kapitals halten: Otmar Weber, Ingenieur, München; Carl-Franz von Quadt, Betriebswirt, München. Aufsichtsrat: Dr. Robert Dissmann (Vorsitzender), Karl-Heinz Fanselow, Eduard Heilmayr
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
