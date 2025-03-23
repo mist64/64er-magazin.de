@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>Leserforum</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="XXX">
+    <meta name="64er.issue" content="6/85">
+    <meta name="64er.pages" content="12-14">
+    <!-- <meta name="64er.toc_category" content="XXX"> -->
+    <!-- <meta name="64er.toc_title" content="XXX"> -->
+    <meta name="64er.id" content="XXX">
+</head>
+
+<body>
+    <article>
+        <h1>Leserforum</h1>
+        <h2>RUN = Syntax Error?</h2>
+
+        <p>Läßt sich beim C 64 der Basic-Start verändern? Das Vorhandensein der Routine $A68E läßt mich dieszwar vermuten, es gelingt mir aber nicht ganz. Nach dem Heraufsetzen des Basic-Starts wird »RUN« mit »Syntax Error« beantwortet, ebenso »NEW«. Germann Podest</p>
+
+        <p>Der Syntax Error bei RUN ist schon ziemlich symptomatisch. Sie haben wahrscheinlich nicht bedacht, daß das erste Byte im Basic-Bereich immer ein Nullbyte sein muß. Vor dem SYS-Befehl müssen Sie also unbedingt einen POKE <Anfangsadresse>, O-Befehl geben.</p>
+
+        <h2>Kreuzworträtsel auf MPS-8O1?</h2>
+
+        <p>Ich habe das fantastische Kreuzworträtsel-Programm von Gert Büttgenbach aus der Ausgabe 12/84 abgetippt. Allerdings ist es mirnicht gelungen, dieses für den Epson-Drucker geschriebene Programm für den MPS-801 umzuschreiben. Vielleicht findet sich ein versierter Leser, der dieses Problem gelöst hat?<br>
+            Karl Kipping</p>
+
+        <h2>Chemie per User-Port</h2>
+
+        <p>Wie kann man über den User-Port am C 64 chemische Messungen durchführen?</p>
+
+        <p>Ausgabe: 3/85</p>
+
+        <p>Joachim von Neuenkirchen</p>
+
+        <p>Die Zeitschrift »CLB — Chemie für Labor und Betrieb« hat seit einiger Zeit eine Rubrik mit Software für den Laborbereich. In einer der letzten Ausgaben erschien ein Artikel über die Soft- und Hardware bei der Erfassung von titrimetrischen Bestimmungen mit einem Commodore 64. Werner Geitner Info: CLB — Chemie für Labor und Betrieb, Stuttgarter Str. 18-24, Postfach 110262, 6000 Frankfurt 1</p>
+
+        <h2>Fragen Sie doch</h2>
+
+        <p>Selbst bei sorgfältiger Lektüre von Handbüchern und Programmbeschreibungen bleiben beim Anwender immer wieder Fragen offen. Viel mehr Fragen ergeben sich bei Computer-Interessenten, die noch keine festen Kontakte zu Händlern, Herstellern oder Computerclubs haben. Sie können der Redaktion Ihre Fragen schreiben oder Probleme schildern (am einfachsten auf der Karte »Lesermeinung«). Wirveranlassen, daß sie von einem Fachmann beantwortet werden. Allgemein interessierende Fragen und Antworten werden veröffentlicht, die übrigen brieflich beantwortet.</p>
+
+        <h2>Teilstrings in Comal?</h2>
+
+        <p>Wie kann man in Comal 0.14 Teilstrings analog zu den Basic-Funktionen MID$, LEFT$ und RIGHT$ gewinnen?</p>
+
+        <p>Detlef Grittner</p>
+
+        <p>Teilstrings werden in Comal 0.14 sehr einfach durch Angabe der linken und rechten Begrenzung erzeugt. Ein Beispiel:<br>
+            DIM TEXT$ OF 20<br>
+            TEXT$ := "BASIC, COMAL ODER PASCAL?"<br>
+            PRINT TEXT$ (7:11)</p>
+
+        <p>Es wird als Antwort der Teil von Textstring vom 7. bis zum 11. Zeichen gedruckt, also »COMAL«. Mit der Vereinbarung L : = LEN(X$) werden die Basic-Stringfunktionen in Comal also folgendermaßen erzeugt:<br>
+            LEFT$(X$,N) &hellip; X$(1:N)<br>
+            RIGHT$(X$,N) &hellip; X$(L-N + 1,L)<br>
+            MID$(X$,N,A) &hellip; X$(N:N + A-1)<br>
+            MID$(X$,N) &hellip; X$(N:L)</p>
+
+        <h2>Zufallszahlen mit Wiederholung?</h2>
+
+        <p>Beim Arbeiten mit der »Zufallsformel« X=INT(RND(1)*N) +1, durch die Zufallszahlen von 1 bis N erzeugt werden, habe ich festgestellt, daß die so erzeugten »Zufallszahlen« gar keine solchen sind. Zumindestens wiederholen sie sich nach einiger Zeit in gleicher Folge. Nun meine Fragen:</p>
+
+        <p>Kann man überhaupt von Zufallszahlen reden, wenn sie sich nach einer gewissen Zeit in gleicher Folge wiederholen?</p>
+
+        <p>Kann man diese Tatsache umgehen, vielleicht durch Änderung der Formel?</p>
+
+        <p>Wie funktioniert eigentlich die Auswahl der Zufallszahlen?</p>
+
+        <p>Marco Hesselbart</p>
+
+        <p>Entscheidenden Einfluß auf die erzeugten Zufallszahlen hat die Wahl des oft als unwichtig betrachteten Argumentes der RND-Funktion. Generell sind drei Fälle zu unterscheiden:</p>
+
+        <p>Fall 1. Die Funktion wird mit einem positiven Argument aufgerufen, also beispielsweise mit RND(1). Anstelle der 1 kann eine beliebige andere Zahl oder Variable größer als Null stehen. In diesem Falle werden die Zufallszahlen nach einem bestimmten mathematischen Algorithmus, also nach einer bestimmten Rechenvorschrift, ermittelt. In diesem Falle kommen die Zufallszahlen (oder besser die Pseudo-Zufallszahlen), die nach dem Einschalten des Computers erzeugt werden, jedesmal in genau der gleichen Reihenfolge wieder vor, was sicherlich als nachteilig zu bewerten ist. Der Vorteil dabei ist jedoch die sehr gute Gleichverteilung der erzeugten Zahlen. Es werden weder Zahlen bevorzugt noch benachteiligt.</p>
+
+        <ol>
+            <li>Die Funktion wird mit einem negativen Wert aufgerufen (Beispiel: RND(-1) oder RND(X), falls X &lt; 0). In diesem Fall ergibt jede einzelne negative Zahl einen speziellen Zufallswert, aber eben für jede Zahl stets wieder denselben. Probieren Sie ruhig zehnmal hintereinander RND(-1) aus, Sie erhalten stets die gleiche Zahl. Haben Sie aber einmal einen als zufällig geltenden Anfangswert X, dann können Sie mit der Folge »10 X = RND(-X): PRINTX:GOTO 10« eine beliebige Kette von zufälligen Zahlen erzeugen. Jeder verschiedene Anfangswert für X liefert bei dieser Methode eine eigene, ganz spezielle Zufallszahlenreihe.</li>
+        </ol>
+
+
+        <p>Als Startwert kommen alle möglichen Werte in Betracht, sinnvoll ist in vielen Fällen eine Initialisierung über die Zeitvariable TI. Der Startwert ist dann von der seit dem Einschalten vergangenen Zeit abhängig und kann in den meisten Fällen wohl als ausreichend zufällig angesehen werden.</p>
+
+        <p>Fall 3: Die Funktion wird mit dem Argument Null aufgerufen. In diesem Falle wendet der Basic-Interpreter eine weitere Methode an: Er nimmt die Zeiten verschiedener interner Zeitgeber, verknüpft sie durch eine mathematische Formel miteinander und bildet so ebenfalls eine Zufallszahl.</p>
+
+        <p>Diese Zahlen sind wirklich alle paar Mikrosekunden völlig anders und liefern keine vorhersehbare Folge von Zahlen. Allerdings ist bei dieser Methode die Gleichverteilung der Zahlen um einiges schlechter, jedenfalls wenn die Zufallszahlen in einer festen Programmschleife, also in einem festgelegten Zeittakt gebildet werden. In diesem Falle werden fast unweigerlich bestimmte Zahlenwerte häufiger vorkommen als andere.</p>
+
+        <p>Die effektivste Methode für möglichst zufällige, aber eben auch möglichst gleichverteilte Zahlen ist die zweite. Besonders bei Initialisierung mit TI, womöglich noch durch Multiplikation oder Division mit irgendwelchen Zeropage-Inhalten verknüpft, erreicht man die besten Ergebnisse.</p>
+
+        <h2>Adventure-Tips gesucht</h2>
+
+        <ol>
+            <li>Bei dem Adventure »Time Machine« komme ich nicht weiter als bis zum Haus. Alle anderen Wege führen früher oder später in den Treibsand. Wie komme ich ins Haus hinein?</li>
+            <li>Wie komme ich bei »Pitfall II« an die Schatulle (es kann auch ein Ring sein)? Ich habe zwar schon einmal alle Schätze, Wölfe, Mäuse, Ratten und Mädchen aufgesammelt, aber an diese Schatulle kam ich bisher einfach nicht heran.</li>
+            <li>Wie komme ich bei dem Adventure »The Fabulous Wanda&hellip;« an die richtigen Informationen; wo muß ich mein Geld investieren? Manfred Wilke</li>
+        </ol>
+
+
+        <h2>Hardcopy mit Hindernissen?</h2>
+
+        <p>Das Hardcopyprogramm für Text und Grafik»X-Graf« des CP 80 X-Druckers druckt bei Hardcopies immer eine Leerzeile zwischen den Datenzeilen. Dadurch kann man keine Grafiken ausdrucken. Ich bitte um einen Ratschlag.</p>
+
+        <p>Klemens Millonig</p>
+
+        <p>Stellen Sie an Ihrem Drucker den Auto-Line-Feed-Schalter auf die Aus-Stellung. Näheres darüber steht in Ihrem Drucker-Handbuch.</p>
+
+        <h2>Multiplan mit 80 Zeichen?</h2>
+
+        <p>Kann man Multiplan auf einem C 64 mit 80-Zeichen-Karte laufen lassen?</p>
+
+        <p>Klaus Grütling</p>
+
+        <p>Nein, das kann man nicht. Multiplan für den C 64 ist für den 40-Zeichen-Bildschirm ausgelegt. Eine 80-Zeichenkarte, die mit Multiplan zusammen läuft, konnten wir außerdem auch nicht entdecken.</p>
+
+        <h2>3.5-Basic für den C 64?</h2>
+
+        <p>Kann man das Commodore 3.5-Basic des C 16 auch in den C 64 »einpflanzen«?</p>
+
+        <p>Patrick Dohmen</p>
+
+        <p>Direkt aus dem Basic-Interpreter des C 16 kann man die Routinen für diese Befehle nicht übernehmen, da er mit völlig anderer Hardware arbeitet (Betriebssystem und Basic arbeiten mit Bank-Switching, das heißt, eskönnentheoretischweit mehr als nur 64 KByte Speicher verwaltet werden); eine Übernahme der Befehle ist jedoch schon möglich. Allerdings wird Basic 3.5 noch von keiner einzigen Firma für den C 64 angeboten (aus Copyrightgründen).</p>
+
+        <p>Sie müssen sich dafür also selbst eine Befehlserweiterung schreiben.<br>
+            C 16-Sprites?<br>
+            Ich besitze einen C 16 mit Datasette und wollte wissen, ob ich Spritesim Textmodus simulieren kann oder ob jemand ein Programm dafür geschrieben hat. Frank Karner<br>
+            Der C 16 besitzt die Shape- beziehungsweise Sprite-Fähigkeit nur im Hires-Modus, weil im TED (der Chip, der am C 16 auch für die Video-Ausgabe zuständig ist) Sprites nicht hardwaremäßig vorgesehen sind wie beim Videochip des C 64.<br>
+            Falls man aus Speicherplatzgründen auf Hires-Shapes verzichten will oder muß, kann man sich immer noch, ähnlich wie beim VC 20, mit einem selbstdefinierten Zeichensatz helfen, der nur 2 KByte vom RAM abknappst und dennoch schon beachtliche Grafikmöglichkeiten bietet. Ein entsprechendes Listing dazu mit Zeicheneditor und ausführlicher Beschreibung wie’s funktioniert, finden Sie demnächst in dieser Zeitschrift.<br>
+            »Magic Desk« gesucht<br>
+            In der Ausgabe 7/84 befindet sich ein Bericht über das Programm »Magic Desk«. Da ich großes Interesse an dem Steckmodulhabe, bitte ich Sie um Anschrift der Firma, die das Modul vertreibt.<br>
+            Dr. med. Karl Vigano<br>
+            Das Programm wurde von Commodore selbst entwickelt und sollte demzufolge eigentlich über jeden Commodore-Händler zu beziehen sein. Da der Programmierer allerdings mit dem ehemaligen Commodore-Chef Jack Tramiel zu Atan gegangen ist, ist nicht sicher, ob Commodore das Modul noch vertreibt. Erkundigen Sie sich am besten bei Ihrem Commodore-Händler, ob der Ihnen das Modul noch besorgen kann.</p>
+
+        <p>TODO ASIDE<br>
+            TODO H1!</p>
+
+        <h2>Leser fragen - Willi Brechtl antwortet</h2>
+
+        <p class="intro">Hallo liebe Leser, hier bin ich wieder, um Eure Fragen zu beantworten.</p>
+
+        <p>Ich werde mich hauptsächlich um Leserbriefe kümmern, die nicht in das sachliche Einerlei des Leserforums passen. Zum Beispiel Fragen, die sich aus dem einen oder anderen Grund n ur ganz subjektiv bean tworten lassen. Oft genug tauchen auch Probleme auf, die sich nicht mit einem kurzen Antwortsatz abhandeln lassen. Und wenn selbst eine längere Antwort im Rahmen des Leserforums nicht mehr ausreichen würde, dann ist das ganz klar ein Fall für Willi Brechtl.<br>
+            Also: Wenn Sie als Anfänger Probleme mit Computer, Software oder Handbuch haben, dann wenden Sie sich in Zukunft doch einfach vertrauensvoll direkt an mich.</p>
+
+        <h2>Unsichtbar Nachladen?</h2>
+
+        <p>Wie schaffe ich es, in Basic ein Nachlade-Programm zu konzipieren, dasbei entsprechender Menüwahl ein Teilprogramm nachlädt — und zwar ohne Ausgabe der Meldungen »Seraching for« und »Loading«?</p>
+
+        <p>Ipek Cüneyt</p>
+
+        <p>Beim Nachladen von Programmen müssen Sie folgendes speziell beachten: Der Befehl »LOAD« in einem Programm bewirkt nicht nur, wie im Direktmodus, das Laden eines Programms, sondern gleichzeitig einen Autostart. Falls das nachgeladene Programm größer ist als das ursprüngliche Programm, dann werden alle Variablen gelöscht. Sie sollten daher dafür sorgen, daß Ihr Hauptprogramm immer größer ist als das nachzuladende. Auch sollten Sie beachten, daß Strings in der Regel nicht mit übernommen werden. Wollen Sie Stringvariable dennoch ins nächste Programm übernehmen, dann müssen Sie beispielsweise im ersten Programm schreiben: A$ = "HALLO" + ""</p>
+
+        <p>Dies ist deshalb nötig, weil nur Stringvariable, die mit irgendeiner Stringoperation ( + , LEFT$, MID$, RIGHT$) verknüpft wurden, ihren Wert auch im nachgeladenen Programm behalten. Um die manchmal unerwünschtes Systemmeldung wie »Searching for« am Bildschirm nicht sichtbar werden zu lassen, gibt es eine sehr einfache Methode: Setzen Sie vor den LOAD-Befehl im Programm einfach die Schreibfarbe auf die Hintergrundfarbe. Sie verhindern damit zwar nicht die Ausgabe dieser Meldung, sie erscheinen aber nicht sichtbar auf dem Bildschirm.</p>
+
+        <h2>Atari-Module auf dem C 64?</h2>
+
+        <p>Wie bringt man Atari Telespiel-Module (Atari VCS 2600) auf dem C 64 zum Laufen?</p>
+
+        <p>Robert Wölfert</p>
+
+        <p>Atari-Module bringt man auf dem C 64 überhaupt nicht zum Laufen, da die VCS 2600-Module und der C 64 über eine völlig unterschiedliche Hardware verfügen. Außerdem ist die VCS 2600-Konsole inzwischen schon ab 60 Mark im Ausverkauf erhältlich, so daß sich irgendwelche eventuell möglichen aufwendigen Hardware-Basteleien auch beim besten Willen nicht lohnen.</p>
+
+        <h2>Diskette versehentlich formatiert?</h2>
+
+        <p>Ich habe versehentlich eine Diskette mit vielen Programmen darauf formatiert. Wie kann ich diese Programme wieder zurückholen?</p>
+
+        <p>Hinnerk Behn</p>
+
+        <p>Wenn Sie die Diskette ohne Angabe einer ID formatiert haben (die Formatierung kann dann nur einige Sekundenbruchteile gedauert haben), dann ist nur das Directory gelöscht. Mit einem Diskettenmonitor (und unserem Floppy-Kurs) könnten Sie bei etwas Erfahrung in der Lage sein, das Inhaltsverzeichnis wieder zu restaurieren. Da in der Regel aber mit ID formatiert wird, sind Ihre Programme wohl verloren. Das 1541-Laufwerk beschreibt nämlich beim normalen Formatieren alle Sektoren der Diskette mit Null Bytes. Die ursprünglich darin enthaltene Information geht dabei genauso verloren wie beim Überspielen einer normalen Musik-Kassette.</p>
+
+        <h2>Timing-Probleme?</h2>
+
+        <p>Wenn ich eine selbstprogrammierte Melodie ständig wiederholen möchte, indem ich hinter die DATA-Zeilen einen RESTORE-Befehl schreibe und mit GOTO wieder an den Anfang springe, dann hat der Computer einige Timing-Schwierigkeiten, besonders bei schnellen Melodien.</p>
+
+        <p>Frank Herbert</p>
+
+        <p>Abhilfe: Lesen Sie die Musikdaten zu Anfang in eine Feldvariable ein (Dimensionierung nicht vergessen). Der Zugriff auf Feldelemente ist schneller als auf DATAs. Außerdem sollten Sie anstelle des GOTO-Befehls den entsprechenden Programmabschnitt durch eien FOR&hellip;NEXT-Schleife wiederholen lassen, auch das bringt einen Geschwindigkeitsvorteil. Und natürlich sollten Sie alle Zahlenwerte schon in der Form »Low-Byte, High-Byte« im Programm stehen haben und diese Berechnungen nicht dem Computer während der Programmausführung aufbürden.</p>
+
+        <h2>Zeichensatz verschwunden?</h2>
+
+        <p>Aus welchem Speicherblock kann man die Daten eines geänderten Zeichensatzes PEEKen, wenn der Zeichensatz nach $E000 und das Video-RAMnach $CC00 verlegt worden ist? Ich habe den ganzen Speicher durchsucht, aber nichts gefunden.</p>
+
+        <p>Jens Schlingmann</p>
+
+        <p>Ab Adresse $E000 sind die 8 KByte ROM des Betriebssystems dem RAM-Bereich überlagert. Während man mit POKE auch in diesem Bereich ins »unter« dem ROM liegende RAM schreiben kann, ergibt jedes PEEKen hier nur den Inhalt des Betriebssystem-ROMs. Abhilfe ist hier nur über Maschinensprache möglich, da zum Auslesen dieses Speicherbereichs das Betriebssystem und der Basic-Interpreter abgeschaltet werden muß.</p>
+
+        <h2>MSE-Probleme?</h2>
+
+        <p>Es gelingt mir nicht, mit dem MSE eingegebene Programme nach dem Abspeichern und Wiederladen laufen zu lassen. Es ist überha upt kein Programm mehr vorhanden: Nach LIST erscheint sofort »Ready«, ebenso nach RUN.</p>
+
+        <p>Stafan Gass</p>
+
+        <p>Der MSE dient zur Eingabe von Programmen, die in Maschinensprache geschrieben sind. Maschinenprogramme lassen sich von Basic aus nicht listen und müssen mit dem SYS-Befehl statt mit RUN gestartet werden. Allerdings muß man dazu die Startadresse kennen. Diese Startadresse müssen Sie der Anleitung zum Programm entnehmen. Lesen Sie sich bitte zu jedem Maschinenprogramm die Anleitung sehr genau durch.</p>
+
+        <h2>Druckeranschluß ohne Software?</h2>
+
+        <p>Ich besitze seit kurzer Zeit einen VC 20 und den Drucker GP 80A von Seikosha. Wie kann ich diesen Drucker an den VC 20 anschließen, ohne daß ich ein Programm benötige?</p>
+
+        <p>Wilhelm Halla</p>
+
+        <p>Den GP80 gibt es in einer speziellen Version zum direkten Anschluß an den VC 20 als GP 80 VC von Seikosha oder als VC 1515 im Commodore-Vertrieb. Bei Ihrer Version (A) handelt es sich um das Standardmodell mit internationalem (ASCII-) Zeichensatz und Centronics-Schnittstelle. Sie benötigen zum Anschluß entweder ein VC-Interface (seriell auf Centronics) oder einfach ein Centronics-Kabel zum Anschluß an den User-Port. Ein VC-Interface ist allerdings nicht ganz preiswert (etwa von 100 Mark aufwärts), während ein Centronics-Kabel nur ein paar Mark kostet, dafür aber ohne zusätzliche Software nicht zu betreiben ist. Ihr Seikosha-Fachhändler kann Ihnen nähere Auskünfte geben.</p>
+
+        <h2>Steckmodul abschalten?</h2>
+
+        <p>Ich besitze einen C 64 und seit einiger Zeit ein Steckmodul für die Spracherweiterung Simons Basic. Leiderlaufen einige Programme nicht mit dieser Erweiterung. Durch ständigen Wechsel des Moduls sind bereits Leiterbahnen auf der C 64-Platine beschädigt worden.</p>
+
+        <p>Ist es möglich, durch Einbau eines Schalters in die Leiterbahn des Pin 2 am Expansion Port (+5V) das Modul abzuschalten ohne eine Beschädigung herbeizuführen?</p>
+
+        <p>Dieter Kothe</p>
+
+        <p>Eine entsprechende Bastelanleitung erscheint demnächst unter der Rubrik Tips &amp; Tricks.</p>
+
+        <h2>Wollen Sie antworten?</h2>
+
+        <p>Wii veröffentlichen auf dieser Seite auch Fragen, die sich nicht ohne weiteres anhand eines guten Archivs oder aufgrund der Sachkunde eines Herstellers beziehungsweise Programmierers beantworten lassen. Das ist vor allem der Fall, wenn es um bestimmte Erfahrungen geht oder um die Suche nach speziellen Programmen. Wenn Sie eine Antwort auf eine hier veröffentlichte Frage wissen — oder eine andere, bessere Antwort als die hier gelesene, dann schreiben Sie uns. Antworten publizieren wir in einer der nächsten Ausgaben. Bei Bedarf stellen wir auch den Kontakt zwischen Lesern her.</p>
+
+        <h2>Merge-Problem</h2>
+
+        <p>Wie kann ich zwei Programme im Speicher zu einem einzigen zusammenfügen?</p>
+
+        <p>Ausgabe 4/85</p>
+
+        <p>Martin Hossdorf</p>
+
+        <p>Auch ohne Basic-Erweiterung kann man beim C 64/VC 20 Programme relativ einfach »mergen«:</p>
+
+        <p>Erstes Programm laden und danach »POKE 43, PEEK(45)-2 : POKE 44, PEEK(46)« eingeben. Dies schützt den ersten Programmteil. Jetzt kann man ein zweites Programm laden, nochmals die gleichen POKE-Befehle geben, ein drittes Programm laden und so fort. Nach »POKE 43,1 : POKE 44,8« stehen alle Programme zu einem einzigen zusammengefaßt im Speicher. Man sollte allerdings darauf achten, daß die nachgeladenen Programme höhere Zeilennummern haben, da es sonst zu Problemen kommen kann. Michael Aßfahl</p>
+
+        <h2>Schreibmaschine am Computer lernen</h2>
+
+        <p>Wo gibt es ein Programm, das Schreibmaschinenkenn tnisse am Bildschirm vermittelt?</p>
+
+        <p>Ausgabe 4/85</p>
+
+        <p>Christian van der Linde</p>
+
+        <p>Ich habe einen Schreibmaschinenkurs für den Commodore 64 entwickelt. Das Programm wurde auf der Hannover-Messe 1984 von Bundesforschungsminister Dr. Riesenhuber als bestes Lernprogramm mit der »Goldenen Diskette« ausgezeichnet.</p>
+
+        <p>Der Schreibmaschinenkurs ist in deutscher Sprache geschrieben und führt in 27 Lektionen auf unterhaltsame Weise in das Zehn-Finger-System ein. Es verwendet den normalen C 64-Zeichensatz. Einige grafische Einlagen lockern den Lernprozeß auf und sorgen für notwendige (Entspannungs-)Pausen.</p>
+
+        <p>Das Programm ist in der Reihe Chip-Soft des Vogel-Verlags auf Diskette und Kassette erschienen. Nils Rode</p>
+
+        <p>Info: Chip-Soft, Vogel-Verlag, Postfach 6740, 8700 Würzburg 1</p>
+
+        <h2>Nochmals Simons Basic und Turbo Tape</h2>
+
+        <p>Wer kennt eine Möglichkeit, um gleichzeitig Simons Basic und Turbo Tape benutzen zu können?</p>
+
+        <p>Ausgabe 8/84, 12/84, 2/85</p>
+
+        <p>Rolf Lehr</p>
+
+        <p>Dieses Problem ist eigentlich schon seit Mitte 1984 gelöst. Das zu Turbo Tape kompatible Fast Tape von H. Reichert gestattet auch bei Simons Basic eine schnelle Kassette. Interessenten mögen sich bitte bei mir melden.</p>
+
+        <p>Jürgen Atrott</p>
+
+        <p>In der amerikanischen Computerzeitschrift »Compute!« wurde im Januar ein Turbo Tape zum Abtippen veröffentlicht, das man ans jeweilige Ende des Basic-RAM setzen kann. Dieses Turbo Tape ist kompatibel mit Simons Basic und anderen Erweiterungen. Ich bin gerne bereit, Interessenten gegen Einsendung einer Leerkassette und eines frankierten Rückumschlages eine Kopie zu senden.</p>
+
+        <p>Marcus Maier</p>
+
+        <h2>Fortran Compiler für C 64</h2>
+
+        <p>Gibt es für den C 64 einen Fortran-Compiler ?</p>
+
+        <p>Ausgabe 3/85</p>
+
+        <p>Bernhard Pöttinger</p>
+
+        <p>Commodore selbst bietet in Amerika einen Fortran Compiler für den C 64 mit CP/M-Modul an. Dieser Compiler (»Nevada Fortran«) ist jedoch leider in Europa nicht erhältlich. Es handelt sich dabei um eine bemerkenswert starke Fortran IV-Version mit ausgezeichneter Dokumentation. Tom V. Segalstad Info: Commodore Business Machines, Inc., 1200 Wilson Drive, West Chester, PA 19380</p>
+
+        <h2>Mikrofon am C 64</h2>
+
+        <p>Wie kann ich ein Mikrofon an den C 64 anschließen, und wie läßt sich das Tonsignal dann beeinflussen?</p>
+
+        <p>Ausgabe 3/85</p>
+
+        <p>Roland Feichtinger</p>
+
+        <p>Der Anschluß eines Mikrofons an den C 64 ist über den Audio-In-Pin an der Audio-Video-Buchse möglich. Das Signal muß allerdings vorverstärkt werden. Dies geht am besten über die heimische Stereo-Anlage. Man schließt also das Mikrofon an den entsprechenden Eingang der Stereo-Anlage an und verbindet den Kopfhörer-Ausgang mit Audio-In am C 64. Natürlich darf auch die Masseleitung nicht vergessen werden (GND). Die Pinbelegung von C 64 und Stereoanlage entnimmt man dem C 64-Handbuch beziehungsweise dem Schaltplan der Stereoanlage.</p>
+
+        <p>Achtung: Bei nicht sachgemäßer Ausführung der Verbindung können sowohl der C 64 als auch die Stereoanlage beschädigt werden. Elektronik-Laien sollten daher vom Nachbau absehen. Und noch eine Warnung: Hüten Sie sich davor, den Verstärker zu weit aufzudrehen. Durch zu hohen Eingangspegel kann der SID im C 64 zerstört werden.</p>
+
+        <p>Der Ton vom Mikrofon kann durch POKEn der Lautstärke hörbar gemacht werden. Weiterhin stehen alle Filtermöglichkeiten des SID zur Verfügung.</p>
+
+        <p>Holger Riedelbauch</p>
+
+        <h2>Schreibmaschine am C 64</h2>
+
+        <p>Wie kann ich eine Olivetti Praxis 30 an den C 64 anschließen? Ausgabe 8/84 und 3/85</p>
+
+        <p>Josef Hauk</p>
+
+        <p>Leider enthält die in Ausgabe 3/85 gegebene Übersicht über die für die Brother CE-Reihe (50, 51, 60, 70)erhältlichenInterfaces eine interessante Variante nicht, und zwar das Modul Robotext der Schweizer Firma Märki &amp; Lenz. Robotext ist ein komplettes Textsystem (Textverarbeitung, Adressenverwaltung, Interface) und wird in der BRD durch C.M. Hacker Consult vertrieben.</p>
+
+        <p>Dr.-Ing. Winfried Staib</p>
+
+        <p>Der Anschluß der Brother CE-50 bis CE-70 sowie der Olivetti P-30 bis P-40.ist mit dem Tri-Interface von Märki und Lenz direkt und ohne Probleme möglich. Außerdem ist ein EPROM erhältlich, mit dem das Interface voll zu Vizawrite kompatibel wird. Alfred Theiler</p>
+
+        <p>Info: Märki, Lenz &amp; Co., Bernstr. 15, CH-3114 Wichtrach<br>
+            C.M. Hacker Consult, Paulinenstraße 4, 7107 Neckarsulm</p>
+
+        <h2>Software für Lichtgriffel gesucht</h2>
+
+        <p>Wer hat ein Lichtgriffel-Programm für den VC 20, mit dem man auch in hochauflösender Grafik zeichnen kann?</p>
+
+        <p>Andreas Hattemer</p>
+
+        <h2>Elektrische Schreibmaschine am C 64</h2>
+
+        <p>Ich suche Bausätze, Anleitungen, Soft- und Hardware zum Anschluß einer alten elektrischen Triumph Schreibmaschine an den C 64.</p>
+
+        <p>Hellmut Korndörfer</p>
+
+        <h2>Q-Bert für Grundversion</h2>
+
+        <p>Das in der Ausgabe 2/85 veröffentlichte Spiel Q-Bert für den VC 20 gefällt mir ausgezeichnet. Leider wurde vergessen zu erwähnen, daß es nur mit der 3-KByte-Erweiterung läuft. Es ist mir nun gelungen, das Programm so weit zu komprimieren, daß es auch in die Grundversion paßt. Gegen Erstattung der Unkosten für Porto und Datenträger sende ich das Programm gerne jedem Interessierten zu.</p>
+
+        <p>Fred Behringer</p>
+
+        <h2>Hier gibt’s Comal-Software</h2>
+
+        <p>Der Comal-User-Club C. Canisius bietet seit Anfang Mai in Comal geschriebene »Public Domain« Software für den C 64 auf Diskette an. Jede Diskette ist doppelseitig bespielt, kostet 25 Mark und enthält in der Regel 20 bis 40 Programme.</p>
+
+        <p>Christiane Canisius Info: Comal-User-Club C Canisius, Freiheitsstr. 30, 4000 Düsseldorf 12</p>
+    </article>
+</body>
+
+</html>

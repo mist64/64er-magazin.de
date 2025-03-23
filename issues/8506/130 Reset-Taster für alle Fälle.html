@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>Reset-Taster für alle Fälle</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="hm">
+    <meta name="64er.issue" content="6/85">
+    <meta name="64er.pages" content="130-131">
+    <!-- <meta name="64er.toc_category" content="XXX"> -->
+    <!-- <meta name="64er.toc_title" content="XXX"> -->
+    <meta name="64er.id" content="XXX">
+</head>
+
+<body>
+    <article>
+        <h1>Reset-Taster für alle Fälle</h1>
+        <p class="intro">Ein Reset-Taster der herkömmlichen Bauart führt nicht immer zum gewünschten Ergebnis. Abhilfe schafft diese 3-Mark-Lösung, die fast jedes Programm abbricht. Sie müssen den C 64 also nicht immer aus- und wieder einschalten, um ein Programm zu beenden.</p>
+
+        <p>Ein normaler Reset-Taster für den C 64 kann viele Programme nicht stoppen. Das ist immer dann der Fall, wenn im Programm ein sogenannter Modulstart enthalten ist.</p>
+
+        <h2>So funktioniert der Modulstart</h2>
+
+        <p>Was ist ein überhaupt ein Modulstart? Um das zu erklären, muß man sich das Betriebssystem des C 64 näher betrachten. Nach einem Reset, der auch softwareseitig mit SYS64738 ausgelöst werden kann, sieht sich der Computer den Inhalt der Speicherstellen $8004 bis $8008 an. Steht dort »cbm80« in Form der Commodore-ASCII-Codes, springt der C 64 an die Adresse, die in $8000 und $8001 angegeben ist. Dabei steht in $8000 das Low- und in $8001 das High-Byte des Reset-Vektors. In $8002 und $8003 steht der Warmstart-Vektor, also die Adresse, die durch Drücken von RESTORE angesprungen wird. Steht nun in $8000 und $8001 der Anfang eines Programmes, startet das Programm nach einem Reset immer wieder von neuem. Der Name »Modulstart« kommt daher, daß in jedem Modul, das nach dem Einschalten auch starten soll »cbm80« steht.</p>
+
+        <p>Wie Sie sehen, entscheidet also der Inhalt der Speicherzellen $8000-8008 über die Wirksamkeit eines herkömmlichen Reset-Taster, der die Reset-Leitung des C 64 auf Masse legt.</p>
+
+        <h2>Wir brechen aus</h2>
+
+        <p>Da ein Modul die ROM-Konfiguration des C 64 ändert, ist klar, daß kein Reset-Taster ein Modul abschalten kann. Das Modul schließt nämlich eine oder mehrere Leitungen am Expansion-Port kurz und sagt dem C 64 dadurch, welche Speicheraufteilung zu aktivieren ist. Wird die EXROM-Leitung (externes ROM) auf Masse gelegt, schaltet der C 64 den RAM-Speicher von $8000 bis $A000 ab und greift in diesem Bereich auf das ROM des Moduls (EPROM) zu. Genau das hilft uns, um dem Software-Modulstart eines Programmes zu entkommen. Wird nämlich während eines Reset die EXROM-Leitung auf Masse gelegt, sucht der C 64 in einem (nicht vorhandenen) Modul nach der bekannten »cbm80«-Kennung. Da in einem nicht vorhandenen Modul kein »cbm80« steht, durchläuft der C 64 die normale Reset-Routine mit Basic-Kaltstart-Einsprung (Einschaltmeldung). Nach dem Reset wird dann die Verbindung EXROM — Masse aufgehoben und damit die normale Speicherkonfiguration wieder hergestellt. Der C 64 meldet sich mit dem Einschaltbild. Wenn Sie nun einen normalen Reset — etwa mit SYS64738 — auslösen, wird das Programm wieder gestartet. Ob es allerdings noch funktionsfähig ist, hängt vom Programm selbst ab.</p>
+
+        <h2>Reset-Schalter in der Praxis</h2>
+
+        <p>Wie bereits erwähnt, muß während des Reset die EXROM-Leitung auf Masse (GND) gelegt werden. Das macht man am einfachsten mit einem Taster, der zwei Leitungen gleichzeitig schaltet (2 x Ein). Da EXROM während des ganzen Reset Low-Potential haben muß, wird mit einem Kondensator die »Reset-Dauer« begrenzt. Dazu wird ein Elektrolyt-Kondensator mit 16V/47µF in die Leitung vom Reset-Kontakt (Pin C, Expansion-Port) zum Taster geschleift. Minuspol in Richtung Masse. Die Funktion ist einfach zu erklären: Nach Drücken des Tasters liegt auf beiden Kondensatorplatten Masse an, der Reset wird gestartet. Der Kondensator lädt sich nun innerhalb kürzester Zeit auf und die Reset-Leitung liegt wieder auf High-Pegel, während EXROM (Pin 9) noch solange Low-Potential hat bis der Taster losgelassen wird. Damit sich der Elko nach dem Reset wieder entladen kann, überbrückt man ihn mit einem 1OkOhm-Widerstand, 1/8 Watt.</p>
+
+        <p>Die Resetleitung liegt durch diese »Einschaltbegrenzung« so kurzzeitig auf Masse, daß das Commodore Diskettenlaufwerk 1541 davon vielleicht gar nichts merkt und keinen Reset macht.</p>
+
+        <h2>Ein- oder Anbau — das ist hier die Frage</h2>
+
+        <p>Für den Versierten in Sachen Löten empfiehlt sich der feste Einbau in den C 64 (Garantie beachten). Die Kontakte des Expansion-Ports werden bei dieser Lösung am besten auf der Lötseite der C 64-Platine abgegriffen. In Bild 1 ist Masse an Pin 1 angeschlossen (gelbes Kabel). EXROM an Pin 9 (blaues Kabel) und Reset an Pin C (rotes Kabel). Den Schaltplan finden Sie in Bild 2, die Stückliste in Tabelle 1.</p>
+
+        <p>Eine andere Lösung wäre der Anschluß über einen Platinenstecker. Der Stecker muß allerdings selbst gebaut werden. Uns ist keine Bezugsquelle bekannt. Zur Steckerfertigung brauchen Sie eine beidseitig kupferkaschierte Epoxidharzplatte mit einer Größe 58 x 50 mm. 58 mm ist die Breite des Expansion-Ports. Bei ausgeschaltetem (!) Computer stecken Sie nun die Platine einige Male in den Expansion-Port und wieder aus, bis die Schleifspuren der Kontakte deutlich zu sehen sind. Zwischen den Spuren wird das Kupfer auf der ganzen Länge der beiden Platinenseiten etwa 1 mm breit abgekratzt. Das kann mit einem Stichel, Körner oder einem spitzen Nagel und einem Lineal als Anschlag geschehen. An die Leiterbahnen können Sie nun die Zuleitungen zum Reset-Taster anschließen. Wer es professionell machen will, kann auch eine kleine Platine speziell dafür ätzen.</p>
+
+        <address class="author">(hm)</address>
+
+        <p>TODO TABELLE ("Tabelle 1")</p>
+
+        <h2>Stückliste</h2>
+
+        <p>Taster 2xEin<br>
+            Elko 16V/47µF<br>
+            Widerstand 1OkOhm, 1/8 Watt<br>
+            Schaltdraht (verseh. Farben)<br>
+            event. beidseitig kupferkaschierte Epoxidharzplatte 58 x 50 mm</p>
+    </article>
+</body>
+
+</html>

@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>Directory-Manipulationen</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="Boris Schneider, rg">
+    <meta name="64er.issue" content="6/85">
+    <meta name="64er.pages" content="140-142">
+    <!-- <meta name="64er.toc_category" content="XXX"> -->
+    <!-- <meta name="64er.toc_title" content="XXX"> -->
+    <meta name="64er.id" content="XXX">
+</head>
+
+<body>
+    <article>
+        <h1>Directory-Manipulationen</h1>
+        <p class="intro">Wer seine Programme vor den Augen anderer schützen möchte, der muß heutzutage schon zu recht harten Methoden greifen. Erstaunlich ist, was man allein schon mit dem Directory einer Diskette anfangen kann.</p>
+
+        <p>So mancher benutzt den C 64 doch tatsächlich noch, um Programme selber zu schreiben, und nicht nur zur Anwendung von »vorgefertigter« Software, nicht zuletzt Spielen. Und diese selbstgeschriebenen Meisterwerke sollen vor fremdem Zugriff, also dem Kopieren geschützt werden. Allerdings haben sich gerade manche dieser unermüdlichen Freaks darauf spezialisiert, Kopierprogramme zu schreiben, die einfach alles kopieren, was sich auf der Diskette befindet, seien das »Errors«, »Halb-« oder »verschmierte Spuren«, »Lücken« und »Synchronmarkierungen«. Ein wirksamer Kopierschutz ist also kaum noch realisierbar. Eines kann man aber nach wie vor: Die Programme wenigstens so sicher machen, daß keiner einen Blick hinter die Kulissen werfen, oder gar Teile in eigene Programme übernehmen kann. Meistens ist dann von »Autostart« und »Listschutz« die Rede. Ein Kapitel, mit dem man sich noch relativ wenig beschäftigt hat, sind die Directories der Disketten. Gerade diese lassen sich mit relativ wenig Aufwand so geschickt »vermurksen«, daß ein nicht Eingeweihter beim Versuch an das Programm heranzukommen, dasteht, wie der Ochs vorm Berg.</p>
+
+        <p>Alle hier vorgestellten Methoden haben allerdings einen Nachteil: Sie schützen nicht vor Kopierversuchen mit Programmen, die ganze Disketten blockweise kopieren (FCopy, Quickcopy und ähnliche). Sie verhindern aber den Einblick in die abgespeicherten Programme, unter denen sich dann natürlich ein Schutzprogramm befinden kann. Alles, was Sie im folgenden benötigen, ist ein Diskettenmonitor, beispielsweise den SMON, sowie Grundkenntnisse über die Blockorganisation auf Diskette.</p>
+
+        <h2>Der Trick mit dem Gänsefüßchen</h2>
+
+        <p>Ein absoluter Verblüffungseffekt läßt sich mit minimalem Aufwand erreichen, man benötigt noch nicht einmal einen Diskmonitor. Werfen Sie doch mal einen genauen Blick auf das Directory in Bild 1. Und nun überlegen Sie sich mal, wie Sie das zweite Programm laden können, das von der Blocklänge her das Hauptprogramm sein müßte. Das Problem scheint unlösbar, lädt doch LOAD "*",8 immer das erste Programm. Welchen Filenamen hat denn das zweite Programm überhaupt? Nun, des Rätsels Lösung lautet: Das Filename lautet» " «. Dies ist kein Druckfehler, sondern tatsächlich ein einzelnes Gänsefüßchen. Nun, selbst mit dieser Information scheinen wir aber immer noch nicht weiter zu kommen: LOAD ,8 erzeugt eine Fehlermeldung. Falls Sie selbst drauf kommen wollen: Denken Sie an den ASCII-Code. Und für alle anderen, die es nicht selber ausknobeln wollen: Der entsprechende LOAD-Befehl lautet: LOAD CHR$(34),8</p>
+
+        <p>Das Gänsefüßchen hat den ASCII-Code 34. Der einzige Weg, dies als Filenamen an die Floppy zu senden, ist die CHR$-Funktion. Das Ganze funktioniert analog dazu beim SAVE- und VERIFY-Befehl.</p>
+
+        <p>Und das ist noch nicht alles: Probieren Sie mal doch spaßeshalber folgenden SAVE-Befehl aus: SAVE "64"CHR$(34)"ER",8. Nachteil dieser Schreibweise: Das Programm läßt sich vom Unkundigen auch mit LOAD"64*",8 laden. Wichtig zu wissen ist nur folgendes: Tauchen im Filenamen ein oder mehrere Gänsefüßchen auf, so folgt kein abschließendes Gänsefüßchen. Der ganze Dreh beruht auf einigen Macken in der Directory-Sende-Routine des Floppy-DOS.</p>
+
+        <p>Noch eines ist interessant: Hinter dem Anführungszeichen im Filenamen werden die folgenden Steuercodes (Farbwechsel, Cursorbewegungen und ähnliches), sofern deren ASCII-Codes unter 128 liegen, nicht in Grafikzeichen übersetzt, sondern ausgeführt. Farbige Directories? Warum nicht!</p>
+
+        <h2>Schräge Typen</h2>
+
+        <p>Hiermit sind nicht die dunklen Gestalten aus Gangsterfilmen gemeint, sondern die vermurkste Anzeige des Filetyps im Directory. Schauen Sie noch einmal auf das Beispieldirectory in Bild 1. Glauben Sie mir, daß der dritte Eintrag kein sequentielles File, sondern ein Programm ist? Schön und gut, werden Sie sagen, aber wie lad ich&rsquo;s? Auch hier darf über die Einfachheit gestaunt werden: Es genügt ein einfaches LOAD"6510,S,R",8 und schon wird ganz brav das doch eigentlich sequentielle File in den Computerspeicher befördert. Natürlich muß hier vorher mit SAVE"6510,S,W" gearbeitet worden sein. Leider kann man auch echte sequentielle Files so laden, was dann und wann zu einem sauberen Systemabsturz führen kann. Damit die Vielfalt gewährt bleibt, funktioniert der Trick auch mit USR-Files, dann muß allerdings auch im LOAD-Befehl ein »U« anstelle eines »S« stehen.</p>
+
+        <p>Probleme gibt es allerdings bei relativen Files. Hier weigert sich die Floppy beharrlich, selbige als Programm an den Computer zu senden.</p>
+
+        <p>So, nun wird es etwas komplizierter. Als nächstes wollen wir einzelne Files kurzzeitig »wiederbeleben«. Dazu brauchen wir aber die Block-Lese- und Schreib-Befehle.</p>
+
+        <p>Im folgenden benötigen wir eine leere Diskette. Dann speichern wir das zu sichernde Programm ab und danach ein Ladeprogramm, über das gleich noch zu reden sein wird. Wichtig ist, daß diese Reihenfolge streng eingehalten wird. Und nun benutzen wir den Scratch-Befehl der Floppy, um das erste File, also das Hauptprogramm, wieder zu löschen. Warnung! Ab sofort dürfen keine Schreibzugriffe mehr auf diese Diskette ausgeführt werden. Im Directory ist jetzt also nur das zweite File, der Lader, verzeichnet? Weit gefehlt: Das erste File steht jetzt immer noch auf der Diskette und im Diskettendirectory, allerdings mit dem Filetyp *DEL. Der Stern vor dem DEL ist ebenfalls kein Druckfehler, sondern bedeutet in der Directory-Sprache, daß ein nicht ordnungsgemäß geschlossenes File vorliegt. Solche Sternchen findet man meist bei sequentiellen Dateien, wenn man einen Fehler gemacht hat, oder bei Programm-Files, wenn diese nicht mehr auf die Diskette paßten. Und da sich unsere Floppy intelligent schimpft, unterschlägt sie die *DEL-Einträge beim Laden von Directories in den Computerspeicher, um uns nicht mit nicht mehr vorhandenen Files nerven zu müssen. Natürlich ist das File auch noch auf der Diskette vorhanden. Um es wieder zu regenerieren, muß das Filetyp-Byte des Eintrages auf den Wert 130 ($82) gesetzt werden. Beim ersten Eintrag ist das Filetyp-Byte das Byte Nummer 2 (also das dritte! Zählungen beginnen bei Computern grundsätzlich bei Null) im Block Track 18, Sektor 1. Im Lader sollte nun in etwa folgende Befehlssequenz stehen:<br>
+            OPEN 3,4,3,"#"<br>
+            OPEN 15,8,15<br>
+            PRINT#15,"U1:3 0 18 1"<br>
+            PRINT#15,"B-P:3 2"<br>
+            PRINT#3,CHR$(130)<br>
+            PRINT#15,"U2:3 0 18 1"<br>
+            PRINT#15,"I"<br>
+            CLOSE 15,3<br>
+            LOAD":*",8</p>
+
+        <p>Der letzte LOAD-Befehl lädt nun nicht, wie man bei einem Blick auf das Directory vermuten würde, das Ladeprogramm, sondern das Hauptprogramm, das wir jetzt regeneriert haben. Wichtig ist, daß die Diskette vor dem Laden des Hauptprogramms initialisiert wird. Die Floppy merkt sich nämlich immer einige Teile des Directories, und liest diese gar nicht erst von der Diskette, wenn ein Directory vom Computer abgerufen wird. Die Folge wäre, daß wir immer noch nicht mit dem alten Directory arbeiten, obwohl schon das neue auf der Diskette steht. Beim Initialisieren werden dann allerdings die internen Zwischenspeicher der Laufwerks aktualisiert.</p>
+
+        <p>Die ersten Befehle im Hauptprogramm sollten das Hauptprogramm auf der Diskette wieder »löschen«, indem die obere Sequenz verwendet wird, aber anstelle des CHR$(130) ein CHR$(0). Dies ist die Kennzeichnung für ein *DEL-File. Das geht schneller und ist weniger auffällig als ein Scratch-Befehl.</p>
+
+        <p>Dieses Prinzip läßt sich fast beliebig ausweiten und stark verbessern, so zum Beispiel wenn man die Filenamen verändert oder die Angabe der Anzahl der Blöcke, die ein Programm belegt. Wer hier ansetzen will, der sollte sich ruhig noch einmal die Folgen Eins und Zwei unseres Floppykurses ansehen (64’er, Ausgabe 10und 11/84), dortsindalle wichtigen Informationen über den Directoryaufbau enthalten.</p>
+
+        <p>Ein Nachtragzu Bild 1: Falls Sie die komische FREE-Meldung irritiert haben sollte: Sie läßt sich durch Freigeben aller Blöcke in der BAM mittels Diskmonitor erreichen.</p>
+
+        <h2>Ein Directory verschwindet&hellip;</h2>
+
+        <p>Eine gute, alte Lebensweisheit lautet: »Wenn du nicht überzeugen kannst, verwirre!« Ähnliches haben wirjetzt vor, denn jeder, der sich von den bisherigen Tricks nicht überzeugen ließ, den versuchen wir jetzt durch ein nicht vorhandenes Directory in tiefste Zweifel an der eigenen Intelligenz (und der der Floppy) zu stürzen.</p>
+
+        <p>Es gibt zwei verschiedene Methoden, Directories gegen Einblick zu sichern. Die bekanntere folgt zuerst: Wer sich ein wenig mit der internen Struktur des C 64 auskennt, der weiß, daß der LIST-Befehl nur so lange arbeitet, bis er auf die Bytefolge 0,0,0 also dreimal Null, stößt. Dann wird das LISTen eines Programms sofort abgebrochen. Nun, was ist ein Directory, sofern es im Computerspeicher steht, aber anderes als ein nicht lauffähiges aber LISTbares Programm? Bringen wir irgendwo die drei Nuller unter, haben wir schon fast gewonnen. Wo man die drei Nuller versteckt, hängt ganz vom Benutzer ab: Ganz zu Anfang im Diskettennamen oder erst später in irgendeinem Filenamen, so daß man zumindest noch die ersten Filenamen lesen kann.</p>
+
+        <p>Dieser Trick in Verbindung mit anderen (Cursorbewegungen, Reversumschaltungen), sorgt schon für einigermaßen große Verblüffungseffekte.</p>
+
+        <p>Nachteil dieser Methode: Sie ist schon sehr bekannt, und außerdem steht das Directory im RAM des Computers und kann entweder mit einem Monitor oder aber mit einigen Tricks wieder LISTbar gemacht werden.</p>
+
+        <p>Noch gemeiner und sicherer, aber einfacher, kann man folgendermaßen vorgehen: Nehmen wir an, auf der Diskette befinden sich maximal acht Programme. Damit ist nur der Directoryblock 18,1 belegt. Die ersten beiden Bytes dieses Blocks enthalten die Werte 0 und 255, um 18,1 gleichzeitig als letzten Directoryblock zu kennzeichnen. Ändern Sie diese Werte mit einem Diskmonitor auf zwei völlig verrückte Werte, so zum Beispiel 64,85. Sollten Sie nun ein Directory laden wollen, beschwert sich die Floppy mit »ILLEGAL TRACK OR SECTOR«. Der Hammer bei der Geschichte ist aber: Es wird kein Filename an den Computer gesandt, beim Auflisten des Directories sieht man nur den Diskettennamen und die ID. Hier helfen dann auch keine Tricks und kein Monitor mehr: Das Directory, oder zumindest die vernünftigen ersten Einträge kommen nie beim Computer an.</p>
+
+        <p>Trotzdem funktionieren LOAD-Befehle immer noch einwandfrei, die floppyinternen Funktionen des Directory sind also nicht außer Kraft gesetzt. Einziger Nachteil der Methode ist, daß man sich auf acht Fileeinträge beschränken muß. Natürlich lassen sich alle bisher vorgestellten Methoden beliebig miteinander kombinieren, auch wenn das im Augenblick sinnlos erscheint. Wieso sollte man schon die Filetyp-Einträge manipulieren, wenn man doch niemals ein Directory sieht? Aber gerade die Kombination macht es dem Neugierigen besonders schwer, hinter die Geheimnisse des Directories zu kommen.</p>
+
+        <h2>Die beste Methode »Compiler Schutz«</h2>
+
+        <p>Zum Schluß noch einige allgemeine Tips: Schutzprogramme, die in Basic geschrieben wurden, sollten Sie unbedingt compilieren. Jeder Compiler erstellt einen derartigen »Wurschtel«-Code, der fast unlesbar ist, so daß da selbst die ausgebufftesten Knack-Profis resignieren müssen. Wichtig ist aber, daß Befehle, die an die Floppy gesandt werden, im Programmtext verschlüsselt stehen sollten. Zum Beispiel, in dem sie mit dem CHR$-Befehl arbeiten und die einzusetzenden Zahlenwerte über einen Entschlüsselungsalgorithmus errechnet werden. Dann kann man dem Compilat noch nicht einmal über einen Monitor entnehmen, welche Befehle zur Floppy gesandt werden. Soweit zu den Manipulationen an der Directory. Der Einblick in unsere Disketten ist nun verwehrt. Verwenden Sie dann auch noch einen Compiler, bleibt auch das Programm ein Buch mit sieben Siegeln. Nun sollten Sie auch noch Autostart-Programme verwenden. Wie man ein Autostart-File erzeugt, das mit verblüffenden Eigenschaften ausgestattet ist, werde ich in einer der nächsten Ausgaben zeigen.</p>
+
+        <address class="author">(Boris Schneider/rg)</address>
+    </article>
+</body>
+
+</html>

@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>Tips &amp; Tricks</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="Heinzpeter Oelkers, M. Kunze, Thomas Hahn, Thomas Lopatic, Wolfgang Meyer">
+    <meta name="64er.issue" content="6/85">
+    <meta name="64er.pages" content="80">
+    <!-- <meta name="64er.toc_category" content="XXX"> -->
+    <!-- <meta name="64er.toc_title" content="XXX"> -->
+    <meta name="64er.id" content="XXX">
+</head>
+
+<body>
+    <article>
+        <h1>Tips &amp; Tricks</h1>
+        <h2>Directory ohne Programmverlust</h2>
+
+        <p>Häufig möchte man sich das Directory einer Diskette ansehen ohne das gerade im Speicher befindliche Programm zu zerstören. Wenn man das DOS 5.1 nicht geladen hat, behilft man sich meist mit der zeitaufwendigen Zwischenspeicherung des Programms auf der Diskette. Es geht jedoch auch einfacher und schneller. Geben Sie einfach den folgenden Befehl ein:<br>
+            POKE 44, PEEK(46) + 1</p>
+
+        <p>Damit wird der Basic-Anfang auf einen freien Speicherbereich gestellt. Sie können jetzt wie gewohnt mit »LOAD "$" ,8« das Directory laden und anschließend auflisten.</p>
+
+        <p>Mit POKE 44,8 sind Sie dann wieder im eigentlichen Programm.</p>
+
+        <address class="author">(Heinzpeter Oelkers)</address>
+
+        <h2>Commodore-Joystick verbessert</h2>
+
+        <p>Der Commodore-Joystick VIC-1311 benötigt eine relativ große Hebelbewegung, um die Kontakte zu schließen. Bei Spielen, die eine hohe Reaktionsgeschwindigkeit erfordern, ist diese Eigenschaft sehr ungünstig. Man kann jedoch recht einfach Abhilfe schaffen:</p>
+
+        <p>Man entfernt die vier Schrauben an der Unterseite des Gehäuses und hebt den oberen Teil des Joysticks mit der Platine vorsichtig ab. Nun wird die Platine an den Durchtrittsöffnungen der Schrauben mit je einer etwa 1 Millimeter dicken Unterlegscheibe verstärkt. Die vier Unterlegscheiben können mit einem Tropfen Alleskleber (Vorsicht, nicht die Kontakte verkleben !) gegen Verrutschen gesichert werden. Danach wird der Joystick wieder zusammengeschraubt. Wenn Sie alles richtig gemacht haben und insbesondere keine Teile übriggeblieben sind, dann werden die Kontakte des Joysticks nun bei erheblich kleineren Hebelbewegungen geschlossen.</p>
+
+        <address class="author">(M. Kunze)</address>
+
+        <h2>Sequentielle Datei als Basic-Programm laden</h2>
+
+        <p>Es sind eine Reihe von Anwendungen denkbar, bei denen aus einer sequentiellen Datei auf Diskette oder Kassette ein lauffähiges Basic-Programm erstellt werden soll (Datenfernübertragung, Umwandlung von Textfiles in Basic-Programme). Der folgende Einzeiler macht&rsquo;s für den VC 20 möglich:<br>
+            OPEN 1, ⟨Gerät⟩, ⟨Sekundäradresse⟩, "⟨Name⟩" : POKE 812, 238 : POKE 781, 1 : SYS 65478</p>
+
+        <p>Dieses Miniprogramm öffnet das File Nummer 1 als Eingabefile (anstelle der Tastatur). Außerdem wird der CLALL-Vektor des Betriebssystems auf ein »RTS« gesetzt, so daß beim Einlesen von Programmzeilen keine Files geschlossen werden.</p>
+
+        <p>Deshalb werden nach Eingabe der obigen Befehlszeile von der ausgewählten Datei so lange Zeilen eingelesen und anschließend sofort im Direktmodus ausgeführt, bis die Betriebssystem-Routine CLRCHN aufgerufen wird (zum Beispiel durch einen Syntaxfehler in den gelesenen Zeilen oder durch GET #1, A$).</p>
+
+        <p>Um in den normalen Eingabemodus zurückzukehren, muß nur »POKE 812, 239 : CLR« eingegeben werden.</p>
+
+        <p>Zum Ausprobieren: Laden Sie ein beliebiges Basic-Programm und geben Sie danach im Direktmodus ein:<br>
+            OPEN 1,8,3,"LlSTING,S,W": CMD 1 : LIST : PRINT#1 : CLOSE 1</p>
+
+        <h2>Tips zum C 64</h2>
+
+        <p>Mit »POKE 808,225« wird die STOP-Taste ausgeschaltet und das Programm kann nicht mehr angehalten werden. »POKE 808,237« schaltet STOP wieder ein.</p>
+
+        <p>Eine Repeat-Funktion für alle Tasten wird mit »POKE 650,128« aktiviert. »POKE 650,0« schaltet wieder auf den Normalzustand zurück (Repeat-Funktion nur für die Leertaste und die Cursortasten sowie bei DEL und IN8T). Mit »POKE 650, 64« wird auch die Wiederholfunktion für diese Tasten abgeschaltet.</p>
+
+        <p>»POKE 657, 128« verhindert die Umschaltung zwischen Text- und Grafikmodus mit der Kombination von Shift- und Commodore-Taste. »POKE 657,0« hebt dies wieder auf.</p>
+
+        <p>Die Cursorfarbe kann mit »POKE 646,x« festgelegt werden, wobei für »x« der entsprechende Farbcode einzusetzen ist.</p>
+
+        <p>»PRINT PEEK(186) ergibt die Gerätenummer des zuletzt angesprochenen Peripheriegerätes.</p>
+
+        <address class="author">(Thomas Lopatic)</address>
+
+        <h2>Zwei Tips für den C 64</h2>
+
+        <p>Die Speicherstellen 57 und 58 enthalten die Zeilennummer der aktuellen Basic-Zeile. Die Abfrage geschieht mit »PRINT PEEK(57) + 256 * PEEK(58)«.</p>
+
+        <p>Mit »PRINT PEEK(1)« kann abgefragt werden, ob eine Taste an der Datasette gedrückt ist. Es gibt drei mögliche Werte:<br>
+            7: Taste gedrückt,<br>
+            55: keine Taste gedrückt,<br>
+            39: Taste gedrückt, aber Programmlauf unterbrochen.</p>
+
+        <p>Diese Abfragen sind für die benutzerfreundliche Programmierung von Kassettenoperationen recht nützlich.</p>
+
+        <address class="author">(Wolfgang Meyer)</address>
+
+        <h2>VC 20-Grundversion simuliert</h2>
+
+        <p>Mit der folgenden kurzen Routine lassen sich die meisten Grundversions- oder +3 KByte-Programme auch mit einer 8 KByte-Erweiterung laden und ausführen:<br>
+            POKE 648, 30 : SYS 64821<br>
+            POKE 4096, 0 : POKE 44, 16 : NEW</p>
+
+        <p>Danach wird das Programm ganz normal geladen und gestartet. Da der Bildschirmspeicher durch die kleine Routine an der gleichen Stelle wie in der Grundversion liegt, sind die meisten Grundversions-Programme ohne weitere Änderungen direkt lauffähig.</p>
+
+        <h2>VC 20-Tips</h2>
+
+        <p>POKE 792, 34 : POKE 793, 3 — Nach Drücken der RESTORE-Taste führt der Computer einen Kaltstart aus.</p>
+
+        <p>SYS 65511 — Dieser Befehl schließt alle Dateien</p>
+
+        <p>POKE 198,0:WAIT 198, 1 —DerComputerwartet, biseine Taste gedrückt wird.</p>
+
+        <p>SYS 64802 — Es wird ein vollständiger Kaltstart ausgeführt</p>
+
+        <p>SYS 64818 — Kaltstart des VC 20, ist schneller als SYS 64802</p>
+
+        <p>POKE 818,34 : POKE 819,253 : POKE 37150,2 — Damit wird das Abspeichern von Programmen verhindert (Kopierschutz). Nach der Eingabe von »SAVE« führt der Computer einen Kaltstart durch.</p>
+
+        <address class="author">(Thomas Hahn)</address>
+    </article>
+</body>
+
+</html>
