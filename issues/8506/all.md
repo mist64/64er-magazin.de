@@ -1,4 +1,5 @@
-# Der C 64 lebt weiter
+
+# Der C 64 lebt weiter [8]
 
 Als Einsteigermodell, so sagt man bei Commodore, habe er noch zwei bis drei Jahre seine Berechtigung. Dann könnte — wegen des branchenüblichen Preisverfalls — der 128 die Rolle des Billig-Modells übernehmen. Dafür spricht eine einfache Überlegung: Es ist wenig wahrscheinlich, daß der Absatz in diesem Jahr schlagartig zusammenbricht, nachdem 1984 allein in Deutschland knapp eine halbe Million 64er verkauft wurden und es im Frühjahr schon wieder Lieferprobleme gab. Nach einer Umfrage der Marktforschungsfirma Basisresearch lag Commodore im Bekanntheitsgrad von Computerherstellern hinter IBM und Nixdorf im Dezember 84 auf Platz drei. Zum gleichen Zeitpunkt galt Commodore als der Hersteller, der die preiswertesten und leistungsfähigsten Heim-/Kleincomputer baut und die besten Anwendungsprogramme im privaten Bereich hat. Ein solches Image geht auch nicht mir nichts, Dir nichts verloren — selbst wenn Konkurrenten wie Schneider oder Atari im Lauf dieses Jahres bei derartigen Umfragen aufholen sollten.
 
@@ -6,7 +7,7 @@ Es dürfte auch noch einiges an neuen Programmen, an Peripherie und Zubehör fü
 
 (Michael Pauly, Chefredakteur)
 
-# Hannover-Messe '85
+# Hannover-Messe '85 [8-9]
 
 > Neue Besucher- und Ausstellungsrekorde konnte die Hannover-Messe 1985 verbuchen. Viel Neues gab es bei den Computer- und Druckerherstellern zu sehen.
 
@@ -42,7 +43,7 @@ Ausführliche Informationen über das Geschehen auf der Hannover-Messe erhalten 
 
 (aa)
 
-# Schule braucht Computer
+# Schule braucht Computer [9-10]
 
 > Es erscheint angesichts der Verbreitung des Heimcomputers in Deutschland schon merkwürdig, daß in einigen Bundesländern der Informatikunterricht noch nicht einmal im Lehrplan aufgenommen ist. Computer in die Schulen zu bringen ist on immer noch Sache engagierter Schüler, Lehrer oder Eltern.
 
@@ -55,6 +56,8 @@ Der VAM stellte dafür eigens entwickelte Schulcomputer »Leibniz I« (C 64 mit 
 Dieses kleine Beispiel zeigt deutlich, wie erst durch private Initiative der Computer Eingang in den Schulunterricht findet. Der VAM hat sich dabei Gedanken gemacht, wie für Schulen, die bisher ohne Computer auskommen mußten, weil die Mittel fehlten, der Anreiz geschaffen werden kann, sich eine Anlage zu besorgen. Als Ergebnis kam das Modell der Mietpatenschaften heraus. Dabei werden der Schule durch den VAM die erforderlichen Computer kostenlos zu Verfügung gestellt. Es werden Firmen, Banken, Versicherungen in der Umgebung der Schule gesucht, die auf freiwilliger Basis die monatlichen Mieten für jeweils einen dieser Computer übernehmen. Nach ein paar Jahren sind die Geräte dann »abgezahlt« und gehen in den Besitz der Schule über. Der VAM übernimmt den Service bei anfallenden Reparaturen. So haben alle Seiten etwas davon, die Schüler kommen endlich zum Informatikunterricht, der Schule entstehen keinerlei Kosten und die Firmen der Umgebung können mit Schulabgängern rechnen, die mit hervorragenden Kenntnissen beim Umgang mit Computern ausgestattet sind. Fürwahr eine Idee die Schule machen könnte.
 
 (aa)
+
+# Aktuell [9-10]
 
 ## Computer ohne Kabelsalat
 
@@ -97,9 +100,7 @@ Beim zweiten Wettbewerb sind wieder Ihre Program-mierkünste gefragt. Schreiben 
 
 (aa)
 
-TODO ASIDE
-
-## Die Kuriositätenecke
+## Die Kuriositätenecke [10]
 
 Diesmal geht’s wieder querfeldein durchs Gemüsebeet mit interessanten, seltsamen und anderen Ereignissen der Computerszene. — In früheren Zeiten wurden Automatenspiele auf den Computer umgeschrieben, mittlerweile läuft dieser Prozeß schon fast in umgekehrter Richtung ab. Nachdem der Hyper-Olympics-Auto-mat gemäß dem IBM-PC-Vor-bild entstand, wurden jetzt auch die Heimcomuterspiele »Boulder Dash«, »Flip & Flop« und »Loderunner« für Auto-matenhersteller lizenziert. — Die amerikanische Firma Suncom hat den Vertrieb ihres »AeorbicJoystick« (richtig gelesen, nicht Aerobic sondern Aeorbic) aufgegeben. Das Gerät wurde auf ein Trainingsfahrrad aufgesteckt. Je schneller man in die Pedale trat, desto schneller bewegte sich das gewünschte Objekt auf dem Bildschirm. Das war gut für Pitstop II, bei Pacman-Fans stellte sich aber ein großer Haßeffekt ein. Auch schien es nicht genug sportliche Heimcomputerbesitzer zu geben.
 
@@ -111,7 +112,7 @@ Diesmal geht’s wieder querfeldein durchs Gemüsebeet mit interessanten, seltsa
 * Die Zeitschrift »Electronic games« brachte einen zwei Seiten langen Artikel über mögliche Freizeitbeschäfti-gungen während des Ladens eines Programms vom 1541-Diskettenlaufwerk. Vorschläge waren zum Beispiel, ein Musikinstrument zu erlernen, ein Buch zu lesen oder gar (während des Ladens von One on One, das immerhin drei volle Minuten benötigt) zum Surfen zu gehen.
 * Verschiedene Computerfirmen bekommen ihre Namen auf recht seltsame Art. »Penguin Software« z.B. basiert auf dem »Penguin on the telly«-Sketch der Monty-Python-Gruppe, die in England so etwas ist, wie den Deutschen ihr Otto Waalkes. — Die University of Montana führte ein wissenschaftliches Experiment durch, in dem Rhesus-Affen das Pac-Man-Spielen beigebracht bekamen. Je besser sie spielten, desto mehr Marshmallow-Früchte bekamen sie. Jetzt sind die Affen so perfekt, daß die Automaten schwerer eingestellt werden mußten.
 
-# Leserforum
+# Leserforum [12-14]
 
 ## RUN = Syntax Error?
 
@@ -221,7 +222,10 @@ In derAusgabe 7/84 befindet sich ein Bericht über das Programm »Magic Desk«. 
 Dr. med. Karl Vigano
 Das Programm wurde von Commodore selbst entwickelt und sollte demzufolge eigentlich über jeden Commodore-Händler zu beziehen sein. Da der Programmierer allerdings mit dem ehemaligen Commodore-Chef Jack Tramiel zu Atan gegangen ist, ist nicht sicher, ob Commodore das Modul noch vertreibt. Erkundigen Sie sich am besten bei Ihrem Commodore-Händler, ob der Ihnen das Modul noch besorgen kann.
 
-# Leser fragen - Willi Brechtl antwortet
+TODO ASIDE
+TODO H1!
+
+## Leser fragen - Willi Brechtl antwortet
 
 > Hallo liebe Leser, hier bin ich wieder, um Eure Fragen zu beantworten.
 
@@ -409,7 +413,7 @@ Der Comal-User-Club C. Canisius bietet seit Anfang Mai in Comal geschriebene »P
 
 Christiane Canisius Info: Comal-User-Club C Canisius, Freiheitsstr. 30, 4000 Düsseldorf 12
 
-# Erster ausführlidier Test PC 128 (Teil 1)
+# Erster ausführlidier Test PC 128 (Teil 1) [16-24,26-28]
 
 > Der PC 128 war bei Commodore noch im Vorbereitungsstadium für den deutschen Markt, da hat die 64'er-Redaktion sich eines der ersten Geräte über die Osterfeiertage besorgt, um den PC 128 für Sie auf Herz und Nieren zu testen. In diesem Teil beschreiben wir ausführlich die Hardware, das Basic 7.0 und die Kompatibilität zum C 64.
 
@@ -727,7 +731,7 @@ haben wir den Erlkönig für den deutschen Markt zu Gesicht bekommen. Der »deut
 
 TODO END ASIDE
 
-# So lernt Ihr Drucker lesen
+# So lernt Ihr Drucker lesen [30-31]
 
 > Die Zeit mühsamer Grafikpinselei ist vorbei: Eine Hardware-Erweiterung für Epson-Drucker macht aus Ihrer Computer-Anlage den billigsten Scanner den es je gab. Beliebige Vorlagen werden damit in wenigen Minuten digitalisiert, und zur Weiterverarbeitung dem Anwender zur Verfügung gestellt.
 
@@ -765,7 +769,7 @@ Zum Lieferumfang gehört die Optoelektronik, eine Programmdiskette sowie eine de
 
 (hm)
 
-# Hammerwerke mit sehr schöner Schrift
+# Hammerwerke mit sehr schöner Schrift [32-33]
 
 > Wo liegen die Stärken von Typenraddruckern? Was können sie und wie schnell sind sie wirklich? Lohnt sich der Kauf? Diese Fragen wollen wir beantworten und Ihnen eine Entscheidungshilfe geben.
 
@@ -807,7 +811,7 @@ Sie sehen also, ein Typenraddrucker hat ein sehr eingeengtes Anwendungsspektrum.
 
 (hm)
 
-# Big Brother druckt für Sie
+# Big Brother druckt für Sie [34-35]
 
 > Sehr gute Leistungen versprechen die Brother Schreibmaschinen CE 51 bis 61. Über ein Interface können sie an den C 64 angeschlossen werden und ersetzen dann einen »normalen« Typenraddrucker.
 
@@ -851,7 +855,7 @@ Die drei getesteten Geräte, aber auch die Interfaces von Witte und Brother, hab
 
 Info: Brother, Rosengarten 14, 6368 Bad Vilbel, Tel. 06101/ 8050
 
-# Rendezvous mit der Schreibmaschine
+# Rendezvous mit der Schreibmaschine [36]
 
 > Für knappe 1000 Mark ist die Triumph-Adler Gabriele 8008 L eine der billigsten Typenradschreibmaschinen mit eingebautem Commodore-Interface.
 
@@ -877,7 +881,7 @@ Zusammengefaßt läßt sich sagen, daß die Gabriele 8008 L mit Interface wegen 
 
 Info: Triumph-Adler AG, Fürther Straße 212, 8500 Nürnberg, Tel. 0911/333-0
 
-# Uchida DWX 305—Klappern gehört zum Handwerk
+# Uchida DWX 305—Klappern gehört zum Handwerk [37-38]
 
 > Der Typenraddrucker, der nicht mehr zu hören ist, muß erst noch erfunden werden. Dennoch überrascht der DWX 305 mit relativ niedrigem Geräuschpegel und einer Schriftqualität, die jenseits von Gut und Böse liegt.
 
@@ -905,7 +909,7 @@ Obwohl der DWX 305 sicherlich auch manchem kleineren Unternehmen bei seinen täg
 
 Info: Synelec Datensysteme GmbH, Postfach 1517 27, 8000 München 15, Tel. 0 89/7 25 30 81
 
-# Marktübersicht: Typenraddrucker und Schreibmaschinen
+# Marktübersicht: Typenraddrucker und Schreibmaschinen [38-39]
 
 > Die »Schönschreibdrucker« werden ständig billiger. Grund für uns, Ihnen mit einer Marktübersicht eine Einkaufshilfe zu geben.
 
@@ -919,7 +923,7 @@ In der folgenden Marktübersicht stellen wir Typenraddrucker und Schreibmaschine
 
 (hm)
 
-# Der erste Kontakt mit DFÜ
+# Der erste Kontakt mit DFÜ [40-42]
 
 > Daten durch das Telefon zu schicken, ist einfacher als man denkt. Ein Neuling in Sachen DFÜ schildert seine Erfahrungen.
 
@@ -980,7 +984,7 @@ Die Datenfernübertragung befindet sich heutzutage noch im Anfangsstadium. Siche
 
 (ah)
 
-# Terminalprogramme
+# Terminalprogramme [42-43]
 
 > Wie überall braucht man auch in der Datenfernübertragung gute Werkzeuge. Ein solches Werkzeug ist für die DFÜ das Terminalprogramm.
 
@@ -1065,7 +1069,7 @@ Landwehrstr. 5
 
 TODO END ASIDE
 
-# DFU — Was ist das?
+# DFU — Was ist das? [44]
 
 ### Modem
 
@@ -1174,7 +1178,7 @@ Sollten Ihnen Begriffe nicht klar geworden sein, oder sollten Sie Begriffe vermi
 
 TODO END ASIDE
 
-# Die Netze der Post
+# Die Netze der Post [46-51]
 
 > Die Datenfernübertragung mit Computern steckt in Deutschland eigentlich noch in den Kinderschuhen. Deshalb informieren wir Sie umfassend, wasninter den Begriffen Datex-P, Btx und Telebox steckt, und wie Sie diese Einrichtungen nutzen können. Auch die Route für die Zukunft hat die Bundespost schon festgelegt.
 
@@ -1414,7 +1418,7 @@ Das ISDN-Netz soll ab 1988 zur Realität werden.
 
 Info: Die Informationsbroschüren der Bundespost sind über jedes Fernmeldeamt erhältlich.
 
-# Die Scroll-Machine: Das Fenster zur Spielewelt
+# Die Scroll-Machine: Das Fenster zur Spielewelt [52,56-67]
 
 > Dieses außergewöhnliche Programm verschiebt den Bildschirm flimmerfrei in jede Richtung, wie es sonst nur von professionellen Spielen her bekannt ist — und das mit Basic.
 
@@ -1611,152 +1615,204 @@ ML x:$0396/$0397, x2:$0398/$0399, y:$039A/$039B, y2:$039C/$039D
 
 Der Grenzmodus wird gewählt: Bei m=O bestehen keine Grenzen. Bei m=1 wird bei den Grenzen abgestoppt. Bei m=2 wird der Bildschirm an die gegenüberliegende Grenze gesetzt.
 ML: m:$039E
-AS n
+
+### AS n
+
 Läßt den Interrupt n mal aussetzen, bevor er wieder ausgeführt wird. Das ist besonders nützlich, wenn man Rechenzeit sparen will.
+
 Nachteil: Je größer n ist, desto stärker ruckt das Bild.
 ML: LDX #n: JSR $C78D
-TM m
+
+### TM m
+
 Wählt den >Tastmodus<<. Bei m=0 wird der Pseudoschirm nur abgetastet, wenn es nötig ist.
 Bei m=1 wird er immer abgetastet (= jede 50stel Sekunde), was natürlich Rechenzeit kostet.
+
 Nützlich, wenn im Pseudoschirm laufend etwas verändert wird. Ein Beispiel: RS:CP:ZF 1:MT 1024,40,25:PO O,O:TM 1:US 1
 PRINT ”<HO>”
+
 Ergebnis: Der blinkende Cursor erscheint doppelt auf dem Schirm. Der zweite Cursor macht alle Bewegungen mit. Wenn man TM 0 eingibt, ändert sich das.
 ML: m:$03A2
-SY n
+
+### SY n
+
 Synchronisiert die Scroll-Machine mit dem laufenden Programm, das heißt, der Interrupt wird nicht mehr im 50stel-Sekunden-Takt ausgeführt, sondern im Programmtakt.
 n=1 schaltet Sync-Modus ein und führt den nächsten Interrupt aus.
 n=0 schaltet den Sync-Modus aus.
+
 Diese Funktion ist wichtig bei langsamen Basic-Programmen wie dem Editor. Achtung: Die X/Y-Position wird erst beim darauffolgenden SY 1-Befehl gesetzt.
+
 ML: LDX #n: JSR $C88C
-VI aa,z
+
+### VI aa,z
+
 Verlegt das Video-RAM, in das geschrieben wird.
 aa = neue Anfangsadresse, z = Anzahl der Zeilen (z < = 21). Normal: aa= 52224, z=21. Je kleiner z ist, desto schneller wird das Programm.
+
 ML: aa:$C4D9/$C4DA, LDX #z: JSR $C7AE
-1R n1,n2,n3
+
+### 1R n1,n2,n3
+
 Inhalt des 1. Steuerregisters (VIC+17) in den drei Bereichen. Normal: 27,23,16
 ML: $C55C/$C55D/$C55E
-2R n1,n2,n3
+
+### 2R n1,n2,n3
+
 Der entsprechende Befehl für das 2. Steuerregister (VIC+22). Normal: 200,200,192
 ML: $C55F/$C560/$C561
-MC n1,n2,n3
+
+### MC n1,n2,n3
+
 Dasselbe für das Memory-Control-Register (VIC+24). Normal: 21,52,52
 ML: $C562/$C563/$C564
-Cl n1,n2,n3
+
+### CI n1,n2,n3
+
 Das Gleiche gilt für die Basisadresse der CIA 2 (56576). Normal: 151,148,148
 ML: $C565/$C566/$C567
-RZ z1,z2,z3
-Legt die Rasterzeilen für die drei Interrupts fest. Normal: 81,88,248 andere Möglichkeit: 106,115,232 + SU 4 ML: $C56E/$C56F/$C570
-SU n
+
+### RZ z1,z2,z3
+Legt die Rasterzeilen für die drei Interrupts fest. Normal: 81,88,248 andere Möglichkeit: 106,115,232 + SU 4
+ML: $C56E/$C56F/$C570
+
+### SU n
+
 Behebt Fehler, die bei der Änderung der Rasterzeilen entstehen können. Das erkennt man am Rucken des Scrollings, n kann Werte von 0 bis 7 annehmen.
 Den richtigen Wert kann man nur durch Ausprobieren feststellen.
 Wenig Probleme wird man haben, wenn man die RZ-Werte in Achterschritten verändert. Normal: n=5
 ML: n:$C571
+
 Die folgenden zwei Befehle sind als allgemeine Hilfe gedacht:
-FU a,e,n,w
-Dieser Befehl füllt den Speicher von a bis e mit n, während in der Speicherstelle 1 w steht, w kann weggelassen werden. ML: a:$FB/$FC, e:$FD/$FE, n:$03B0, LDX #w: JSR $C842
-UT a,e,a2,r,w
+
+### FU a,e,n,w
+
+Dieser Befehl füllt den Speicher von a bis e mit n, während in der Speicherstelle 1 w steht, w kann weggelassen werden.
+ML: a:$FB/$FC, e:$FD/$FE, n:$03B0, LDX #w: JSR $C842
+
+### UT a,e,a2,r,w
+
 Es wird der Block von a bis e nach a2 übertragen. Dabei steht in 1 während des Lesens r und während des Schreibens w.
 ML: a:$FB/$FC, e:$03A6/$03A7, a2:$FD/$FE,
 LDA #r : LDX #w : JSR $C725
+
 Natürlich kann man die Erweiterung auch ausschalten:
-OF
+
+### OF
+
 Schaltet die Erweiterung vollständig ab. Sie muß mit SYS49152 wieder gestartet werden. Die Wirkung ähnelt der der Run-Stop/Restore-Funktion.
+
 Dieser Befehl wird zum Beispiel dann benötigt, wenn man etwas von der Datasette laden will.
 ML: JSR $C65E
-Die Diskettenbefehle
-LD ”Name”
+
+## Die Diskettenbefehle
+
+### LD ”Name”
+
 Lädt den Pseudoschirm mit der Bezeichnung Name von der Diskette. Die Anfangsadresse, die X-Ausdehnung und die Y-Ausdehnung werden mitgeladen und gesetzt.
+
+TODO TABLE
+
 ML: LDA #0 : STA $CBF8
-LDX # < Namenadr. : LDY # > Namenadr. : LDA
-# Namenlänge
+LDX # < Namenadr. : LDY # > Namenadr. : LDA # Namenlänge
 JSR $FFBD (Setnam-Routine)
 JSR $CAC8
-LD ”Name”,aa
+
+### LD ”Name”,aa
+
 Lädt ein beliebiges Datenfile absolut an die Adresse aa von der Diskette. Achtung: Das File wird vollständig geladen, inklusive den beiden Adreßbytes am Anfang jedes Programms. Man sollte deshalb von aa zwei abziehen.
+
 Wenn man sequentielle Files oder Userfiles laden will, dann hängt man an den Namen einfach noch ,S oder ,U an.
 ML: aa:$FB/$FC, LDA #1 : STA $CBF8
+
 Ansonsten weiter wie oben.
-SV ”Name”,ea
+
+### SV ”Name”,ea
+
 Speichert einen Pseudoschirm mit der Bezeichnung »Name« auf Diskette. Die Endadresse ea errechnet sich aus Anfangsadresse + X-Ausdehnung * Y-Ausdehnung.
 ML: ea:$FD/$FE
+
 LDX # < Namenadr. LDY # > Namenadr. LDA # Namenlänge
+
 JSR $FFBD (Setnam-Routine)
+
 JSR $CB3E
-Die USR(x)-Funktion
+
+## Die USR(x)-Funktion
+
 Mit ihrer Hilfe kann sich der Benutzer einige wichtige Werte holen. Je nachdem, welchen Wert x annimmt, wird zu verschiedenen Routinen verzweigt.
 
-x=0 Jedesmal, wenn eine Grenze berührt wird, die mit dem GR-Befehl gesetzt wurde, setzt das Programm ein Flag auf eins. Mit dieser Funktion wird das Flag abgefragt und gelöscht.
+TODO TABLE
+
+x=0	Jedesmal, wenn eine Grenze berührt wird, die mit dem GR-Befehl gesetzt wurde, setzt das Programm ein Flag auf eins. Mit dieser Funktion wird das Flag abgefragt und gelöscht.
 ML: $03AD
 x=1	Liefert die momentane X-Position.
 ML $0358/$0359
 x=2	Liefert die Y-Position.
 ML: $035A/$035B
-x=3 Gibt die Adresse im Pseudoschirm an, die der Bildmitte entspricht.
+x=3	Gibt die Adresse im Pseudoschirm an, die der Bildmitte entspricht.
 ML: $C50C/$C50D
-x=4 Ergibt eins, wenn der Feuerknopf des Joysticks in Port 2 gedrückt ist.
+x=4	Ergibt eins, wenn der Feuerknopf des Joysticks in Port 2 gedrückt ist.
 ML: Es empfiehlt sich der normale Joystickport $DCOO.
-x=5 Dasselbe für Port 1.
+x=5	Dasselbe für Port 1.
 ML: $DC01
-x=10 Übermittelt die Anfangsadresse des Pseudoschirms (die möglicherweise nicht bekannt ist, weil der Schirm eben geladen wurde).
+x=10	Übermittelt die Anfangsadresse des Pseudoschirms (die möglicherweise nicht bekannt ist, weil der Schirm eben geladen wurde).
 ML: $CBFA/$CBFB
-x=11 Liefert die X-Ausdehnung.
+x=11	Liefert die X-Ausdehnung.
 ML: $CBFC/$CBFD
-x=12 Liefert die Y-Ausdehnung.
+x=12	Liefert die Y-Ausdehnung.
 ML: $CBFE/$CBFF
-x>255 Übermittelt den Inhalt der Speicherstelle x. Es wird immer der Inhalt des RAMs gelesen. Man hat damit also die Möglichkeit, das versteckte RAM zu lesen.
+x>255	Übermittelt den Inhalt der Speicherstelle x. Es wird immer der Inhalt des RAMs gelesen. Man hat damit also die Möglichkeit, das versteckte RAM zu lesen.
 ML: Die allgemeine Methode funktioniert so:
 SEI: LDX #48:STX 1:LDA x:LDX #55:STX 1:CLI
-Übrigens:	In $036A/$036B	(874/875) und
-$036C/$036D (876/877) stehen die X- und Y-Werte für die Trägheitsgeschwindigkeit.
-Der Pseudoschirmeditor
+
+Übrigens: In $036A/$036B (874/875) und $036C/$036D (876/877) stehen die X- und Y-Werte für die Trägheitsgeschwindigkeit.
+
+## Der Pseudoschirmeditor
+
 Der Editor ist ein Basic-Programm, das mit den wichtigsten Funktionen zur komfortablen Erstellung eines Pseudoschirms ausgestattet ist.
+
 Er benötigt die Scroll-Machine, um arbeiten zu können. Man muß sie also von Datasette oder Diskette laden. Dann lädt man den Editor und startet ihn mit RUN.
+
 Zuerst wird man nach der X/Y-Ausdehnung und der Anfangsadresse gefragt. Die Werte XD=128, YD=64 und AA=40960 sind vorgegeben, so daß der Pseudoschirm das RAM unter dem Basic-ROM voll belegt ($AOOO — $BFFF). In diesem Fall ist RETURN zu drücken. Dann will das Programm wissen, ob der Zeichensatz vom ROM ins RAM kopiert werden soll. Wenn man das Programm eben erst geladen hat, sollte man mit »J« antworten. Steht jedoch schon ein neuer Zeichensatz, der erhalten werden soll, im Speicher, so gibt man »N« ein. Anschließend erscheint die Frage »MULTICOLOR (J/N)« auf dem Bildschirm. Wenn der normale Commodore-Zeichensatz benutzt wird, lautet die Antwort immer »N«, ansonsten hängt das vom Zeichensatz ab. Natürlich muß man auch noch die Farben eingeben, wenn man nur Return drückt, erhält man die Standardeinstellung. Schließlich kann man entscheiden, ob der Pseudoschirm gelöscht werden soll. Normalerweise antwortet man mit »J« und der Pseudoschirm wird nach einer Rückversicherung mit dem Zeichen 32 (Space) gefüllt.
+
 Nach diesen Eingaben hat man endlich das normale Bild des Editors vor sich, das folgendermaßen aufgebaut ist:
+
 Der Bildschirm ist in zwei Bereiche unterteilt. Oben wird immer der Teil des Pseudoschirms gezeigt, der gerade bearbeitet wird. In der Mitte dieses Bereiches befindet sich ein Sprite, der als Cursor fungiert. Der Bildschirm läßt sich mit Hilfe eines Joysticks in Port zwei bewegen. Unten kann man den kompletten C 64-Zeichensatz erkennen. Er ist in acht Zeilen ä 32 Zeichen unterteilt, wie bei vielen Zeichengeneratorprogrammen. Es wird der große Zeichensatz benützt, weil er mehr Grafikzeichen zur Verfügung stellt. Auch hier wird ein Sprite als Cursor benutzt, der sich mit den Cursortasten auf der Zeichenpalette bewegen läßt.
+
 Im Normalmodus wird durch einen Druck auf den Joystickknopf jeweils das Zeichen von der Palette auf den Pseudoschirm übertragen, auf das der Zeichencursor zeigt.
+
 Das ist die einfachste Funktion des Programms, mit ihr allein ist esjedoch fast unmöglich, einen Pseudoschirm zu erstellen. Deshalb bietet es noch einige andere Möglichkeiten wie Rechteck füllen, Rechteck übertragen und so weiter, die man von Programmen wie Paint Magic oder Koalapainter her kennt. Sie bedürfen keiner langen Erklärung, da die Bedienung einfach und logisch aufgebaut ist.
+
 Auch der Mikromodus ist schnell erklärt. Er benutzt die Zeichen 32, 97, 98, 108, 123, 124, 126,127 und ihre reversen Entsprechungen, um eine vierfache Auflösung zu erreichen. Mit dem Klammeraffen kann man zwischen Punkt löschen und Punkt setzen umschalten. Mit Shift-M kann man die Zeichenfolge neu definieren. Wenn man einen selbstdefinierten Zeichensatz benutzt, stimmen die Codes 97, 98, 108 etc. nicht mehr. Der Einfachheit halber müssen die neuen Zeichen aufeinanderfolgen, mit Leerraum (=Space) beginnen und mit einem vollständig gefüllten Zeichen enden. Eine nicht ganz einfache Funktion ist der Konturmodus, der im folgenden näher erläutert wird.
+
 Mit den Zeichen 100, 111, 121, 98 und so weiter, kann man eine sanft aufsteigende Linie bilden. Das wird im Konturmodus ausgenutzt. Wenn man F7 betätigt, wird dieser Modus gesetzt. Jetzt kann man Landschaften formen, die sanft auf- und absteigen. Jedoch kann man keine Höhlendecken oder ähnliches bilden, auch senkrechte Wände bleiben einem versagt. Das kann man mit einem Druck auf »K« ändern. Man wird nach X+, X—, Y+, Y— gefragt. Mit den Tasten 1-4 kann man die gewünschte Einstellung wählen. X bedeutet senkrechte Wände, Y steht für waagrechte Wände. Plus und Minus geben jeweils an, welche Seite Freiraum und welche Wand ist. Anschließend muß man noch die Geschwindigkeit angeben, die regelt, ob der Berg sanft oder steil ansteigt.
+
 Wenn man senkrechte Wände bearbeitet, wird man feststellen, daß die Kontur fehlerhaft ist. Das liegt am Zeichensatz des C 64. Die Zeichen 101 und 116 sind identisch, was von Commodore so geregelt wurde, damit das Zeichen auf einem Fernsehschirm besser sichtbar ist. Mit einem VC 20-Zeichensatz hätten wir diese Probleme nicht. Wenn man einen eigenen Zeichensatz benutzt, ist das Problem auch gelöst. Denn wie beim Mikromodus gibt es hier ebenfalls die Möglichkeit, das Programm an den eigenen Zeichensatz anzupassen.
+
 Mit SHIFT-K ruft man die entsprechende Routine auf. Man benötigtvierZeichenfolgen. Jeweils eine fürX+, X—, Y+, Y— Mit 1-4 kann man wählen, welche man neu definieren will. Jede Zeichenfolge muß aus acht Zeichen bestehen, von denen das erste Space (32) oder das letzte Revers-Space (160) ist. Man steuert mit den Cursortasten auf das erste Zeichen und drückt dann RETURN. Nun muß man sich für +1 oder—1 entscheiden. Hier hilft nur ausprobieren. Dann gibt man nur noch die Geschwindigkeit an und die neue Zeichenfolge ist im Speicher.
+
 Ein Pseudoschirm muß auch abgespeichert und geladen werden können, was man mit F1 und F3 erreichen kann. Die Scroll-Machine enthält bereits Routinen, um einen Pseudoschirm aus irgendeinem Speicherbereich auf Diskette Gerätenummer 8 abzuspeichern und in den gleichen Bereich wieder zu laden. Für die Datasette existiertjedoch kein Befehl, so daß man dafür die ROM-Routinen verwenden muß. Deshalb kann man mit der Datasette nur das Basic-RAM benutzen, da sich die Bereiche von 40960 bis 49151 und 57344 bis 65535 von den ROM-Routinen nicht auslesen lassen. Man kann jedoch einen Pseudoschirm in das Basic-RAM laden, um ihn dann mit dem UT-Befehl in das versteckte RAM zu schieben. Wenn man einen Pseudoschirm mit dem eigenen Programm von Kassette laden will, muß man das Unterprogramm des Editors verwenden (ab Zeile 17 500). Der Wechselmodus wird mit»W«aktiviertund mitSHIFT-W definiert. Man kann einen Bereich von Zeichen festlegen, die dann zyklisch wiederholt verwendet werden. Nützlich ist dies für flächige Felsstrukturen oder ähnliches. Denn wenn man den ganzen Bereich mit dem gleichen Zeichen gestaltet, wird die Struktur regelmäßig und sieht nicht echt aus.
+
 Aus allen Modi kommt man wieder heraus, indem man den Pfeil nach links drückt. Dadurch wird der Editor wieder in den Normalzustand zurückgesetzt.
+
 Zum Editor ist damit alles Wichtige gesagt. Abtippen muß man ihn wie jedes andere Programm, die REM- und Doppelpunkt-Zeilen werden jedoch nicht angesprungen, deshalb können sie weggelassen werden.
+
 Die Befehlsliste gibt Auskunft über die restlichen Funktionen und deren Handhabung.
+
 Ich hoffe, daß das Programm möglichst fehlerlos ist und wünsche Ihnen viel Spaß damit
+
 Um die Fähigkeiten von »Scroll-Machine« aufzuzeigen, soll auch gleich ein kleines Beispielprogramm angeführt werden. Da man es niemandem zumuten kann, einen Pseudoschirm von 8 KByte oder mehr abzutippen, muß sich das Spiel den Schirm selbst aufbauen. Daß darunter die Qualität der Grafik leidet ist klar. Außerdem habe ich keinen neudefinierten Zeichensatz verwendet, sondern nur die Commodore-Zeichen Space (32), lnvers-Space (160) und lnvers-Shift-0 (207). Der Pseudoschirm besitzt nur eine Auflösung von 128 x 64, was genau 8 KByte entspricht. Eigene Schirme sollte man größer machen — etwa 20 bis 30 KByte — und wenn möglich mit einem eigenen Zeichensatz versehen.
-Atomdepot, ein Demoprogramm zur Scroll-Machine
+
+## Atomdepot, ein Demoprogramm zur Scroll-Machine
+
 Doch dieses Spiel ist trotzdem ein gutes Beispiel dafür, wie man die Scroll-Machine benutzt.
-Der Handlungsort ist ein Bergwerksstollen in nicht allzu ferner Zukunft, in dem noch drei Atommüllfässer lagern. Sinn des Spiels ist es, die drei Fässer von der hinteren Kammer in die vordere zu bringen, von wo sie abtransportiert werden können. Der Greifer des Transporters wird mit dem Feuerknopf des Joysticks (Port 2) bedient, doch erst dann, wenn Greifarme punktgenau am Faß anliegen. Ebenso vorsichtig muß man es auf den Boden stellen. In einem engen Stollen ist der Transport nicht einfach, doch mit genügend Geduld und etwas Übung ist auch das kein Problem. (Thilo Herrmann/ah)
+
+Der Handlungsort ist ein Bergwerksstollen in nicht allzu ferner Zukunft, in dem noch drei Atommüllfässer lagern. Sinn des Spiels ist es, die drei Fässer von der hinteren Kammer in die vordere zu bringen, von wo sie abtransportiert werden können. Der Greifer des Transporters wird mit dem Feuerknopf des Joysticks (Port 2) bedient, doch erst dann, wenn Greifarme punktgenau am Faß anliegen. Ebenso vorsichtig muß man es auf den Boden stellen. In einem engen Stollen ist der Transport nicht einfach, doch mit genügend Geduld und etwas Übung ist auch das kein Problem.
+
+(Thilo Herrmann/ah)
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-# MSE-Abtippen sicher und leicht gemacht
+# MSE-Abtippen sicher und leicht gemacht [54-55]
 
 > Ähnlich wie der »Checksummer« ist auch der MSE ein Hilfsmittel bei der Eingabe von Listings, diesmal jedoch bei reinen Maschinensprache-Programmen.
 
@@ -1794,103 +1850,1450 @@ CTRL-M listet den Speicherinhalt. Abbruch mit STOP-Taste, weiter mit Leertaste.
 CTRL-N erlaubt die Eingabe einer neuen Adresse zum Weitertippen.
 CTRL-P gibt ein MSE-Listing auf dem Drucker aus.
 
+# Kurvenplotten mit Hardcopy [68]
 
+> Mit Hilfe dieses Programmes ist es auf demC 16 möglich, eine oder mehrere Funktionen in ein Koordinatensystem zu plotten und anschließend eine Hardcopy herzustellen.
 
+Da der C 16 bei hochauflösender Grafik leider nur noch 2 KByte für Basic übrig hat, mußte auf REM-Zeilen verzichtet werden, wodurch die Übersichtlichkeit des Programms etwas leidet.
 
+Das Programm gliedert sich in folgende Teile:
 
+TODO TABLE
 
+10-190 Initialisierung, Eingabe der Funktion, Wahl von Koordinatensystem und Maßstab
+200-320 Funktion wird geplottet
+330-390 Festlegung des Nullpunktes
+400-480 Festlegung der Vergrößerung
+510-610 Koordinatensystem und Beschriftung zeichnen 620-710 Bildschirm lesen und Ausgabe an Drucker
 
+Nach dem Starten des Programmes mit RUN muß zunächst die gewünschte Funktion eingegeben werden. Dies geschieht dadurch, daß in der aufgelisteten Zeile 200 die gewünschte Funktion anstelle von F(x) eingegeben wird (x muß als Variable benutzt werden).
 
+Durch Drücken von RETURN wird die Zeile programmiert. Wenn Sie wünschen, daß der hochauflösende Bildschirm gelöscht werden soll, so drücken Sie nun F1; soll die neue Funktion dagegen zu bestehenden Kurven hinzugeplottet werden, so drücken Sie F3.
 
+Nun müssen Sie den Maßstab eingeben (für eine Sinusfunktion ist beispielsweise 40 ein guter Wert) und eines von den drei möglichen Koordinatensystemen auswählen.
 
+Bei der Eingabe der Funktion braucht man nicht auf Definitionslücken zu achten, da die TRAP-Anweisung in Zeile 240 »DIVISION BY ZERO« Fehler und andere abfängt.
 
+Nach Beendigung des Plottens erscheint in der rechten oberen Ecke ein »E«. Drückt man jetzt auf »C«, wird der Bildschirm gelesen und als Hardcopy über den Drucker ausgegeben. Dies dauert leider fast 30 Minuten, da jeder der 64000 Bildpunkte einzeln ausgelesen und in ein dem Drucker genehmes Bitmuster umgewandelt werden muß. Dieser Programmteil (ab Zeile 620) wurde für den Seikosha GP100VC geschrieben und muß für andere Drucker eventuell geändert werden. Jeder andere Tastendruck führt zu einem kurzen Menü.
 
+Man kann durch Druck auf F1 Maßstab und Koordinatensystem neu wählen.
 
+Durch Druck auf F2 kommt man wieder zur Anfangsroutine und kann eine neue Funktion eingeben.
 
+(Christian Schoske/ev)
 
+# HI-EDDI — Druckerroutinen [69-70]
 
+> Schon lange warten HI-EDDI-Besitzer auf eine Anpassung für ihren Drucker. Die in Ausgabe 1/85 abgedruckte Version ließ eine Superhardcopy nur für den Epson zu. Doch jetzt kommen auch Besitzer von Commodore-Drucker in den Genuß, HI-EDDI-Bilder ausgeben zu können.
 
+Welcher 64’er Leser kennt ihn nicht—den HI-EDDI, das fantastische Zeichen- und Malprogramm aus Ausgabe 1/85. Jeder der einen Epson oder dazu kompatiblen Drucker besaß, kam sogar in den Genuß der ausgezeichneten Hardcopy-Funktion. Jetzt folgen Anpassungen für Drucker anderer Hersteller, diesmal für die Commodore-Drucker MPS 801/802/ 803 und kompatible. Für andere Drucker werden noch Lösungen gesucht.
 
+## Hi-EDDI für MPS 802 und kompatible
 
+Ich begann nach Überwindung meiner Abneigung gegen stundenlanges Tastenklopfen HI-EDDI abzutippen. Nach den ersten Tests dieses fantastischen Zeichen- und Malprogramms, bereute ich es aber nicht mehr mich dieser Tortur unterzogen zu haben. Doch mußte ich als Besitzer eines MPS-802-Druckers feststellen, was ist HI-EDDI ohne Superhardcopy?
 
+Die Antwort darauf veranlaßte mich dazu, die Anregung in der Funktionsbeschreibung aufzugreifen und eine Lösung für einen anderen Drucker zu suchen. Gesagt — getan, hier ist mein Lösungsvorschlag für den Commodore MPS-802 (Listing 1)
 
+Die Druckerroutine hat dieselben Eigenschaften wie die in 1/85 veröffentlichte und von Hans Haberl geschriebene Routine für Epson-Drucker. Daher kann auf eine Funktionsbeschreibung verzichtet werden. Ich hoffe, daß der Ausdruck von Hl-EDDI-Grafikbildern mit diesem Programm auf allen Versionen des Commodore 1526/MPS-802 Druckers funktioniert. Bei meinerAusführung (REV 07C) konnte ich bisjetztkeine Fehler feststellen.
 
+(Franz llletschko/gk)
 
+## HI-EDDI für MPS 801/803 und kompatible
 
+Eine Lösung für den Commodore MPS 801/803 schickte uns Florian Kulzer (Listing 2). Auch hier braucht am HI-EDDI selbst nichts verändert zu werden. Die Hardcopy wird, wie im 64’er 1/85 beschrieben, mit den Tasten »Commodore« und »P« gestartet.
 
+Allerdings ist mit diesem Programm das Nebeneinanderdrucken zweier Bilder nicht möglich. Ausgegeben wird immer eine Hardcopy des aktuellen Bildschirms. Daher können die Fragen nach Nummer und Format der Hardcopy beliebig beantwortet werden.
 
+(Florian Kulzer/gk)
 
+## HI-EDDI mit der Datasette
 
+Die Anpassung von HI-EDDI an die Datasette war doch nicht ganz so einfach wie zuerst gedacht. Hier sind die notwendigen Informationen. Die folgenden Listingsverweise beziehen sich auf 64’er, Ausgabe 1/85.
 
+a)	Am Listing 3 (HI-EDDI) folgende Änderungen vornehmen: In Zeile 50, 110 und 640 LOAD” .. ”,8,1 durch LOAD”.. ”,1 ersetzen.
 
+TODO PRE
 
+160 ON A+1 GOSUB 290,250,300,290,290,600,290,290,500, 510,300:GOTO150
+300	POKE8115,1:PRINT...
+330 PRINT C$:POKE 780,ASC(C$):H$=W$:W$=” ”
+340 INPUT”[Cursor Down]FILENAME”;W$:SYS 3331:W$=H$:H$=" ”
+350 RETURN
 
+Folgende Zeilen weglassen: 200-220, 400
 
+b)	Das so modifizierte Listing 3 als erstes auf die Programmkassette aufnehmen.
+c)	Folgende Befehle im Direktmodus eingeben:
 
+TODO PRE
 
+NEW
+POKE8192,0:POKE43,1:POKE44,32:NEW
 
+d)	Den DATA-Lader (Listing 2) laden und folgende Änderungen vornehmen:
 
+TODO PRE
+9 :
+10 :
+50	D=H(H)*16 + H(L):S=S+D:POKEI,D
+85 IFA<0THEN95
+90 S=O:A=O:PRINT:NEXT
+95	POKE43,0:POKE44,13:POKE45,76:POKE46,31
+96 SAVE”HI-EXE”,1,1:END
 
+e)	Programmkassette einlegen (nach Listing 3) und Listing 2 starten. Wenn keine Fehler mehrdrin sind, erzeugt der Lader auf der Kassette das Maschinenprogramm HI-EXE.
 
+f)	HI-EDDI istjetzt bereits lauffähig: Programmkassette zurückspulen, Computer kaltstarten, Listing 3 laden und starten. Das Maschinenprogramm wird nun geladen.
 
+g)	Die HI-EDDI-Befehle LOAD und SAVE funktionieren ebenfalls, somit kann auch schon das Menü erstellt werden. Die fertige Menütafel (mit Listing 4 verbunden) sollte an dritter Stelle auf die Programmkassette aufgenommen werden.
 
+h)	Hier die erforderlichen Änderungen am Listing 1: Zunächst wieder die POKEs wie unter c) eingeben und dann Listing 1 laden und folgende Änderungen vornehmen:
 
+TODO PRE
+720 FOR I = 3326 TO 3708
+730 READA:IF A<0THEN 730
+740 POKEI,A:NEXT
+750	POKE43,0:POKE44,13:POKE45,125:POKE46,14
+760 SAVE”HI-PRINT”,1,1
+770 END
 
+i)	Programmkassette einlegen (an 4. Stelle) und Listing 1 starten. Auf der Kassette wird nun das Maschinenprogramm Hl-PRINT erzeugt.
 
+Wenn nun im Programmlauf vor einem Druckvorgang diese Druckroutine geladen wurde, muß die Kassette zurückgespult werden, so daß das Maschinenprogramm HI-EXE nach Beendigung des Druckvorganges wieder geladen werden kann.
 
+(Hans Haberl/gk)
 
+# Tips & Tricks gesucht [70]
 
+Jeder Computer und jedes Programm hat seine speziellen Schwachstellen und Unzulänglichkeiten. Allerdings ist kaum ein Programmierer oder Anwender auf Dauer bereit, sich damit abzufinden. Wo auch sorgfältigste Lektüre von Handbüchern nicht weiterhilft, da wird so manche Stunde experimentiert, um eine Lösung zu finden (die oft in einer Basic-Zeile Platz hat).
 
+Wir suchen solche Tips und Tricks, um sie allen Lesern zugänglich zu machen. Schließlich ist es wenig sinnvoll, sich wochenlang mit Problemen herumzuschlagen, die andere bereits gelöst haben.
 
+Wenn Sie also interessante Tips für den Umgang mit Computer, Floppy, Drucker oder sonstiger Hardware haben, wenn Sie bei kommerzieller Software einige Kniffe kennen, die nicht in der Anleitung stehen, oder wenn Sie interessante Problemlösungen statt in vier Seiten Listing in ein oder zwei Basic-Zeilen untergebracht haben, dann sollten Sie uns auf jeden Fall einmal schreiben.
 
+Bitte geben Sie genau den Computertyp und die Gerätekonfiguration oder die Software an, und senden Sie Ihren Tip oder Trick an die
+Redaktion 64’er
+Markt & Technik Verlag Aktiengesellschaft
+Hans-Pinsel-Str. 2
+8013 Haar bei München
 
+# Samurai [72-74]
 
+Samurai ist ein Strategiespiel für zwei Personen. Gespielt wird auf einem acht mal acht Felder großem Spielplan. Jeder Spieler besitzt 16 Spielfiguren, darunter der König. Ziel des Spieles ist es, den gegnerischen König zu schlagen oder so viele Spielsteine zu entfernen, daß außer dem König nur eine Figur übrig bleibt. Geschlagen werden Spielsteine, ähnlich wie bei Schach, wenn ein eigener Spielstein auf das Feld des Gegners gesetzt wird. Die Zahl aufjedem Spielstein zeigt an, wie weit der Stein ziehen muß. Nach jedem Zug ändert sich diese Zahl des bewegten Spielsteines. Bei dem König erscheinen nur die Eins und die Zwei, bei den übrigen Steinen Eins bis Vier.
 
+Die Spielsteine dürfen nur waagerecht oder senkrecht bewegt werden. Dabei darf der Spieler einmal rechtwinklig abbiegen. Es dürfen keine Spielsteine übersprungen werden.
 
+Der Computer überwacht die Züge. Sind diese falsch, erscheint auf dem Bildschirm »N. möglich«. Wird ein Spielstein geschlagen, so erscheint »F. geschlagen«. Rechts oben steht immer der Name des Spielers, der am Zug ist.
 
+Man kann die Steine bewegen, indem man die Koordinaten der Anfangs- und Endposition der Steine eingibt. Eine weitere Möglichkeit ist, die Spielsteine durch den Joystick zu steuern.
 
+Mit dem Joystick kann man die Spielsteine folgendermaßen bewegen: am Anfang erscheint ein Pfeil. Der Spieler mit dem roten Stein hat einen weißen Pfeil und umgekehrt. Diesen Pfeil kann man nun beliebig, mit Hilfe des Joysticks, über das Spielfeld bewegen. Hat man den Pfeil auf dem Spielstein, den man aufnehmen will, so muß man auf den Feuerknopf drücken. Nun kann man entsprechend der Zahl auf dem Spielstein fahren. Der Spielstein bleibt aber auf seiner Position. Wenn man den Stein nun absetzen will, so muß man wiederum auf den Feuerknopf drücken. Der Rahmen um den Pfeil verschwindet nun und der Stein wird dort hingesetzt. Wenn man den Stein mit Hilfe der Koordinaten bewegen will, muß man am Anfang (nach der Anleitung) ein »K« drücken. Derjeweilige Spieler muß dann während des Spieles die Zeile und Spalte des Anfangs- und Endpunktes des Spielsteines über Tastatur eingeben. Falls man keinen oder nur einen Joystick besitzt, kann man den fehlenden durch die Tastatur ersetzen.
 
+Man muß folgende Zeilen ändern (Am Beispiel für Spieler 1, Joystickport 1):
 
+TODO TABLE
 
+(Thomas Strigl/rg)
 
+# Prost mit dem C 64 [76-78]
 
+> Dieses Programm macht Ihren C 64 zum elektronischen Steuermann. Mit dem User-Port können Sie bis zu acht Geräte ein- und ausschalten.
 
+Der Name Pro.St steht für programmierbare Steuerung; das Programm erlaubt die Steuerung von acht Geräten, die über entsprechende Treiberschaltungen am User-Port des C 64 angeschlossen sind. Für den Steuerungsablauf stehen Ihnen etwa 30 000 Einzelschritte zur Verfügung. Jeder Schritt wird als ein Byte im verbleibenden Basic-Speicher abgelegt. Zur Bearbeitung des Programmablaufs hat Pro.St einen eigenen Editor, mit dem Abläufe erstellt, geändert, angezeigt, ausgeführt, gespeichert und geladen werden.
 
+Nach dem Starten des Programms wird in Zeile 9 das User-Port-Display von Jan Legenhausen, 64’er Ausgabe 8/84, geladen. Sollten Sie dieses Programm (noch) nicht haben, sei gesagt, daß Pro.St auch ohne diese Anzeige läuft, dann aber an eine Autofahrt mit schwarzen Scheiben erinnert: Man weiß nie, woran man ist. Haben Sie das Programm von Jan Legenhausen nur als Basic-Lader, starten Sie den Lader und laden dieses Programm manuell. Vergessen Sie dann nicht, Zeile 9 von Pro.St zu löschen.
 
+Pro.St meldet sich nach dem Start mit seinem Hauptmenü, das sieben Wahlmöglichkeiten hat:
 
+**1**:	Eingabe eines Steuerprogramms über die Tastatur. Es werden für jeden Kanal des User-Ports die Schaltzustände (an/aus) binär eingegeben. Tippfehler können Sie mit DELete löschen. Korrekte Eingaben schließen mit RETURN ab. Das Programm wandelt die Eingabe in eine Dezimalzahl und POKEt siein den Programmspeicher, derabAdresse 10240im Basic-RAM beginnt. Beendet wird der Eingabemodus durch Eingabe von E und bei vollem Programmspeicher (RAM-Ende bei 40960).
 
+**2**:	Schaltet in den Edit-Modus. In einem Untermenü können Sie bestimmen, ob ein Schritt gelöscht (1), eingefügt (2) oder ersetzt (3) werden soll. Um den entsprechenden Schritt zu ändern, mußdessenNummereingetipptwerden. DieletzteWahl-möglichkeit (4) zeichnet eine grafische Darstellung des Programmablaufs. Die Schaltzustände am User-Port werden dazu in einem Diagramm gegen die Zeit aufgetragen, indem bis zu 35 Schritte aus dem Speicher geholt, ins Binärsystem umgerechnet und als High-Low-Diagramm auf den Bildschirm gedruckt werden. Mit den V- und Z-Tasten kann dabei im Programmablaufplan geblättert werden.
 
+**3**:	Führt ins Disketten-Unterprogramm. Hier können erstellte Programme gespeichert (1), geladen (2) und Directories gezeigt werden.
 
+**4**:	Löscht den Programmspeicher von Pro.St.
 
+**5**:	Startet das Programm im Speicher. Zuvor können Sie noch zwischen Freilauf (1) und Einzelschrittverarbeitung (2) wählen. Bei Freilauf müssen Sie die Zeit zwischen zwei Schritten angeben. Bei Einzelschritt können Sie mit der CTRL-Taste den nächsten Schritt starten. In beiden Fällen bestimmen Sie zusätzlich die Anzahl der Programmdurchläufe.
 
+**6**:	Dient zum direkten Testen der angeschlossenen Peripherie. Mit den Tasten 1 bis 8 kann ein Gerät, das am entsprechenden User-Port-Kanal angeschlossen ist, geschaltet werden.
 
+**7**:	Beendet das Programm. Nach einer Sicherheitsabfrage wird der User-Port wieder in den Anfangszustand versetzt.
 
+### Hinweis
 
+Da das Programm in Basic geschrieben ist, kann es nicht für zeitkritische Fälle verwendet werden. Wegen der Ungenauigkeit der internen Uhr des C 64 bedarf es einer Zeitkorrektur. Sie sollten den Korrekturfaktor in Zeile 2065 mit einer Stoppuhr nachprüfen. Der Korrekturfaktor wird mit Ihrer Sekundenangabe (ZD) für einen Schaltschritt multipliziert und dann ständig mit der internen Uhr (Tl) verglichen. Da TI im 1/60-Sekundentakt zählt, ist der Standard für den Korrekturfaktor 60.
 
+(Michael Anton/hm)
 
+# Durch POKEs zum Erfolg — Die Spiele-Trickkiste (2) [78-79]
 
+> Wieder einmal greifen wir tief in unsere Trickkiste und ermöglichen damit auch dem nicht so ganz versierten Spielefan einen Ausflug in höhere oder sogar höchste Spiel-Level.
 
+Stellen Sie sich vor, Sie hätten bei Ghostbusters 1 000 000 Dollar (!) Startkapital, könnten bei H.E.R.O. Ihre Feinde verschwinden lassen oder bei Pitfall endlich alle Bilderzu Gesicht bekommen. Zauberei? Nein, ein paar POKEs und andere Tricks reichen völlig aus.
 
+Allerdings erheben die folgenden POKEs keinen Anspruch auf Funktionsfähigkeit bei jeder Version der angegebenen Spiele. Insbesondere kommt es natürlich dann zu Problemen, wenn das Programm mit einem Autostart versehen ist und man keinen Reset-Schalter zur Verfügung hat.
 
+Auch die Freunde von Ghostbusters kommen diesmal zu ihrem Recht: Zwar haben wir für dieses Spiel noch keinen POKE zur Hand, aber einige Tips, wie man das reichlich magere Startkapital kräftig erhöhen kann.
 
+(ev)
 
+TODO TABLE
 
+Die Super-Nummer jedoch stammt von Mathias Höschen: $ 1 Million (!) erhält man bei Ghostbusters, wenn man statt eines Namens nur die RETURN-Taste drückt und als Kontonummer »458« eingibt. Als Anzeige erscheintjetzt nur »000000«, aber nach dem ersten Einkauf merkt man, daß man damit eine Million zur Verfügung hat.
 
+(Hermann Gorges/Mathias Höschen/Christoph Peter/Peter Siegert/Dirk Vreden)
 
+# Tips & Tricks [80]
 
+## Directory ohne Programmverlust
 
+Häufig möchte man sich das Directory einer Diskette ansehen ohne das gerade im Speicher befindliche Programm zu zerstören. Wenn man das DOS 5.1 nicht geladen hat, behilft man sich meist mit der zeitaufwendigen Zwischenspeicherung des Programms auf der Diskette. Es geht jedoch auch einfacher und schneller. Geben Sie einfach den folgenden Befehl ein:
+POKE 44, PEEK(46) + 1
 
+Damit wird der Basic-Anfang auf einen freien Speicherbereich gestellt. Sie können jetzt wie gewohnt mit »LOAD ”$” ,8« das Directory laden und anschließend auflisten.
 
+Mit POKE 44,8 sind Sie dann wieder im eigentlichen Programm.
 
+(Heinzpeter Oelkers)
 
+## Commodore-Joystick verbessert
 
+Der Commodore-Joystick VIC-1311 benötigt eine relativ große Hebelbewegung, um die Kontakte zu schließen. Bei Spielen, die eine hohe Reaktionsgeschwindigkeit erfordern, ist diese Eigenschaft sehr ungünstig. Man kann jedoch recht einfach Abhilfe schaffen:
 
+Man entfernt die vier Schrauben an der Unterseite des Gehäuses und hebt den oberen Teil des Joysticks mit der Platine vorsichtig ab. Nun wird die Platine an den Durchtrittsöffnungen der Schrauben mit je einer etwa 1 Millimeter dicken Unterlegscheibe verstärkt. Die vier Unterlegscheiben können mit einem Tropfen Alleskleber (Vorsicht, nicht die Kontakte verkleben !) gegen Verrutschen gesichert werden. Danach wird der Joystick wieder zusammengeschraubt. Wenn Sie alles richtig gemacht haben und insbesondere keine Teile übriggeblieben sind, dann werden die Kontakte des Joysticks nun bei erheblich kleineren Hebelbewegungen geschlossen.
 
+(M. Kunze)
 
+## Sequentielle Datei als Basic-Programm laden
 
+Es sind eine Reihe von Anwendungen denkbar, bei denen aus einer sequentiellen Datei auf Diskette oder Kassette ein lauffähiges Basic-Programm erstellt werden soll (Datenfernübertragung, Umwandlung von Textfiles in Basic-Programme). Der folgende Einzeiler macht's für den VC 20 möglich:
+OPEN 1, ⟨Gerät⟩, ⟨Sekundäradresse⟩, ”⟨Name⟩” : POKE 812, 238 : POKE 781, 1 : SYS 65478
 
+Dieses Miniprogramm öffnet das File Nummer 1 als Eingabefile (anstelle der Tastatur). Außerdem wird der CLALL-Vektor des Betriebssystems auf ein »RTS« gesetzt, so daß beim Einlesen von Programmzeilen keine Files geschlossen werden.
 
+Deshalb werden nach Eingabe der obigen Befehlszeile von der ausgewählten Datei so lange Zeilen eingelesen und anschließend sofort im Direktmodus ausgeführt, bis die Betriebssystem-Routine CLRCHN aufgerufen wird (zum Beispiel durch einen Syntaxfehler in den gelesenen Zeilen oder durch GET #1, A$).
 
+Um in den normalen Eingabemodus zurückzukehren, muß nur »POKE 812, 239 : CLR« eingegeben werden.
 
+Zum Ausprobieren: Laden Sie ein beliebiges Basic-Programm und geben Sie danach im Direktmodus ein:
+OPEN 1,8,3,”LlSTING,S,W”: CMD 1 : LIST : PRINT#1 : CLOSE 1
 
+## Tips zum C 64
+
+Mit »POKE 808,225« wird die STOP-Taste ausgeschaltet und das Programm kann nicht mehr angehalten werden. »POKE 808,237« schaltet STOP wieder ein.
+
+Eine Repeat-Funktion für alle Tasten wird mit »POKE 650,128« aktiviert. »POKE 650,0« schaltet wieder auf den Normalzustand zurück (Repeat-Funktion nur für die Leertaste und die Cursortasten sowie bei DEL und IN8T). Mit »POKE 650, 64« wird auch die Wiederholfunktion für diese Tasten abgeschaltet.
+
+»POKE 657, 128« verhindert die Umschaltung zwischen Text- und Grafikmodus mit der Kombination von Shift- und Commodore-Taste. »POKE 657,0« hebt dies wieder auf.
+
+Die Cursorfarbe kann mit »POKE 646,x« festgelegt werden, wobei für »x« der entsprechende Farbcode einzusetzen ist.
+
+»PRINT PEEK(186) ergibt die Gerätenummer des zuletzt angesprochenen Peripheriegerätes.
+
+(Thomas Lopatic)
+
+## Zwei Tips für den C 64
+
+Die Speicherstellen 57 und 58 enthalten die Zeilennummer der aktuellen Basic-Zeile. Die Abfrage geschieht mit »PRINT PEEK(57) + 256 * PEEK(58)«.
+
+Mit »PRINT PEEK(1)« kann abgefragt werden, ob eine Taste an der Datasette gedrückt ist. Es gibt drei mögliche Werte:
+7: Taste gedrückt,
+55: keine Taste gedrückt,
+39: Taste gedrückt, aber Programmlauf unterbrochen.
+
+Diese Abfragen sind für die benutzerfreundliche Programmierung von Kassettenoperationen recht nützlich.
+
+(Wolfgang Meyer)
+
+## VC 20-Grundversion simuliert
+
+Mit der folgenden kurzen Routine lassen sich die meisten Grundversions- oder +3 KByte-Programme auch mit einer 8 KByte-Erweiterung laden und ausführen:
+POKE 648, 30 : SYS 64821
+POKE 4096, 0 : POKE 44, 16 : NEW
+
+Danach wird das Programm ganz normal geladen und gestartet. Da der Bildschirmspeicher durch die kleine Routine an der gleichen Stelle wie in der Grundversion liegt, sind die meisten Grundversions-Programme ohne weitere Änderungen direkt lauffähig.
+
+## VC 20-Tips
+
+POKE 792, 34 : POKE 793, 3 — Nach Drücken der RESTORE-Taste führt der Computer einen Kaltstart aus.
+
+SYS 65511 — Dieser Befehl schließt alle Dateien
+
+POKE 198,0:WAIT 198, 1 —DerComputerwartet, biseine Taste gedrückt wird.
+
+SYS 64802 — Es wird ein vollständiger Kaltstart ausgeführt
+
+SYS 64818 — Kaltstart des VC 20, ist schneller als SYS 64802
+
+POKE 818,34 : POKE 819,253 : POKE 37150,2 — Damit wird das Abspeichern von Programmen verhindert (Kopierschutz). Nach der Eingabe von »SAVE« führt der Computer einen Kaltstart durch.
+
+(Thomas Hahn)
+
+# Fehlerteufelchen [84]
+
+### Änderungsvorschlag zur Turtle-Grafik, Ausgabe 3/85, Seite 90
+
+Der POKE-Befehl lautet korrekt: POKE 44,18: POKE 18 * 256,0: NEW. In Zeile 960 ist das Komma nach der 3 wegzulassen, so daß 32 entsteht. In Zeile 1040 ist nach dem 6. Datum nochmal eine 29 einzufügen.
+
+### Erst ein IEC-Bus öffnet Tür und Tor, Ausgabe 3/85, Seite 24
+
+Das IEEE 488-Interface von Luda erlaubt, im Gegensatz zu der Angabe in der Tabelle auf Seite 26, die Verwendung einer Datasette. Was in der Kernalversion wegfällt, sind die Routinen zur seriellen Datenübertragung. Sie werden erst durch Umschalten auf den Stan-dardkernal wieder möglich. Das Luda-Interface überträgt auch das EOI-Signal.
+
+### Mit 80 fängt das Leben an, Ausgabe 4/85, Seite 19
+
+Die 80-Zeichenkarte XL-80 wird nicht direkt von General Automation vertrieben, sondern nur über Händler. Der Preis ist also von Fall zu Fall zu erfragen, er liegt über 250 Mark.
+
+### Sternenhimmel, Ausgabe 5/85, Seite 58
+
+In den Zeilen 50140, 50340, 50360, 50400, 50440, 50470, und 50510 muß zwischen den Anführungszeichen jeweils ein Cursor up durchgeführt werden. In Zeile 50300 zwischen den Anführungsstrichen ein CLR (Bildschirm löschen) einfügen. In Zeile 50210 muß der Variablen pi der Wert π zugewiesen werden, also pi = π.
+
+### Trickfilm mit dem C 64, Ausgabe 5/85, Seite 64
+
+Im Listing »Trick.Obj« auf Seite 65 ist in Zeile C1D8 das dritte Datum etwas schlecht zu lesen, es lautet: A5 und nicht A3!
+
+## Sonderheft Abenteuerspiele
+
+### Quasimodo, Seite 76
+
+Wenn die Fehlermeldung »Next without for« in der Zeile 715 auftritt, so geben Sie vor dem Starten im Direktmodus POKE 44,64:POKE 16384,0 ein, und die Sache funktioniert. Die fehlende GOTO-Anweisung in Zeile 2100 ist ohne Bedeutung für den Ablauf des Programms.
+
+### Zeittunnel, Seite 93
+
+Bitte ergänzen Sie die Zeile 4870 auf Seite 99 wie folgt: 4870 PRINT”(DOWN,RIGHT,RED) ZERSCHMETTERT. DU BIST TOT.”:GOTO 4450.
+
+### Floppy 1541 jetzt für PC-1500, Ausgabe 5/85, Seite 9
+
+Bei der angegebenen Telefonnummer fehlte leider eine Null. Die korrekte Anschrift lautet: Ing. Rudolf W. Fankhauser, Postfach 1115, D-7893 Jestetten. Das ist die Postanschrift für Deutschland. Die Anschrift in der Schweiz: SRS, Micro Computer Products, Ing. Rudolf W. Fankhauser, Postfach 1207, CH-8213 Neunkirch/SH, Tel. (**0**0 4153) 6 25 93.
+
+0041 ist die internationale Vorwahl für die Schweiz!
+
+### Leserservice, Ausgabe 5/85, Seite 165
+
+Obwohl nicht durch das Diskettensymbol explizit gekennzeichnet, sind folgende Listings auf der Leserservice-Diskette für die Ausgabe 5 enthalten: VIC — das intelligente Programm, Seite 175; 6510, Seite 71; Mini-Grafik für den VC 20, Seite 69; Sternenhimmel, Seite 58.
+
+
+# Bücher, die zum C 64 gehören [115,128]
+
+> Wer seinen C 64 wirklich kennenlernen möchte, kommt um den Kauf zusätzlicher Literatur nicht herum. Wir haben für Sie eine Hitliste aus dem unüberschaubar groß gewordenen Angebot an begleitender Literatur zusammengestellt. Mit diesem Sortiment ist jeder Basic- oder Assemblerprogrammierer, aber auch der Hardware-Bastler bestens ausgestattet.
+
+## Das eigentliche Handbuch
+
+»Alles über den Commodore 64« aus der Commodore-Sachbuchreihe (Band 1) heißt das Standardwerk zum C 64. Wie schön wäre es, wenn dieses gute Buch mitjedem C 64 anstelle des mageren Handbuches ausgeliefert würde. Erstmals auf der Hannover-Messe 1984 angeboten, erfüllt dieses Programmierhandbuch einen lange gehegten Wunsch vieler Programmierer: Der englischsprachige »Programmers Reverence Guide« wurde ins Deutsche übersetzt.
+
+Das fast 500 Seiten starke Programmierhandbuch ist im wesentlichen in drei Abschnitte gegliedert: Die Programmierung in Basic, in Assembler und die Beschreibung der Hardware. In allen drei Abschnitten wird auf die besonderen Baugruppen (Grafik, Musik, Ein-/Ausgabe) des C 64 und deren Programmierung eingegangen. Dem Konzept folgend, kein Lehrbuch, sondern mehr ein Nachschlagewerk zu sein, sind die abgedruckten Beispiele relativ kurz gehalten. Gerade aus der Kürze der Darstellung leitet sich aber der wichtigste Vorteil dieses Buches ab: Es ist sehr leicht, Informationen zu den verschiedensten Problemen zu finden. Sogar bei Fragen zum generellen Konzept des C 64 hilftdas Programmierhandbuch, denn am Ende des Buches ist ein kompletter Schaltplan des C 64 eingeheftet.
+
+Es gibt kaum ein Buch zum C 64, das gleichermaßen umfassend informiert und trotzdem leicht verständlich geschrieben ist. Dabei bleibt der Wert des Buches auch mit steigenden Programmierfähigkeiten des Besitzers erhalten, denn viele Kapitel (Bausteinbeschreibung, Assemblerprogrammierung, Z80-Mo-dul) sind erst für den fortgeschrittenen Programmierer wichtig. Das Programmierhandbuch »Alles über den Commodore 64« sollte nebenjedem C 64 liegen, auch wenn derzeit noch 59 Mark zusätzlich investiert werden müssen.
+
+Info: »Alles über den Commodore 64«, Commodore Sachbuchreihe Band 1, Bezug über Fachhandel, ISBN3-89133-000-6, Preis 59 Mark
+
+## Das Handbuch für den Profi
+
+Mit dem »Systemhandbuch zum Commodore 64 und VC 20« haben die Profis von Interface Age das Handbuch für den fortgeschrittenen Programmierer geschaffen. Die Autoren Ralph Babel, M. Krause und A. Dripke haben in dieses mehr als 300 Seiten starke Buch ihre ganzen Erfahrungen aus der jahrelangen Arbeit mit Commodore-Computern einfließen lassen. Die eindeutige Aussage dieses Buches liegt in der Einsicht, daß ein so hervorragender Computer wie der C 64 erst in Assembler richtig programmiert werden kann. Dazu bedarf es aber der Kenntnis jedes einzelnen Bausteins im C 64. Herabsteigend bis auf die Chip-internen Grundvoraussetzungen werden die Bedingungen der Programmierung des C 64 umfassend und leicht verständlich beschrieben. In den vielen ausführlichen Kapiteln räumen die Autoren mit Unklarheiten und Halbwahrheiten über den C 64 auf. Folgende Themen werden dabei behandelt:
+
+* Der Basic-Interpreter (Interne Codierung, Token-Tabelle, Binärarithmetik, Darstellung und Ablage von Variablen/ USR-Funktion, Steuercode-Tabelle * Assembler (Assembler-Programm, Befehlsliste, Befehlserklärung, Adressierungsarten)
+* Grafik und Farbe (Bildschirm- und Farbspeicher, Zeichengenerator, HiRes-Grafik, Sprites, Interrupt- und Grafikkontrolle, Screen Blanking, Smooth Scrolling, Registerübersicht, Farben, Sprite-Generator, Hardware des VIC)
+* Funktionstasten
+* Tonerzeugung (Tongeneratoren, Frequenzberechnung, ADSR-Funktion, Wellenformen, Tonerzeugung, A/D-Wandler, Registerübersicht, Hardware des SID)
+* Ein-/Ausgabe (Serieller Bus, RS232, CIA-Chip, Portprogrammierung, Timer, Interrupt-Handling, Registerübersicht, Kontrollports, Joystick, Paddles, Lightpen, Datenspeicherungauf Kassette/Diskette)
+* Adaption von CBM-Program-men
+* Speicheraufteilung (Speicherübersicht, dokumentierte Me-mory-Map, CPU-Speicherverwaltung, Prozessorport, s Banking, Pinbelegung der CPU) — ROM-Listing (ausführlich kommentiert)
+
+Besonders das ausführlich kommentierte ROM-Listing ist von unschätzbarem Wert, denn kaum ein Assembler-Programm, das nicht auf die Systemroutinen angewiesen ist. Leider sind alle Adressen in dezimaler Schreibweise aufgeführt. Besser wäre es gewesen, die vom Assembler her gewohnte hexadezimale Form zu verwenden. Auch wer das Betriebssystem an seine eigenen Bedürfnisse anpassen möchte, findet hier alle notwendigen Informationen. Dieses Buch trägt zu Recht den Namen »Systemhandbuch«. Kompromißlos richtet sich das Buch an den fortgeschrittenen Programmierer, trotzdem ist es leicht verständlich.
+
+Info: Babel, M. Krause, A. Dripke »Das Interface Age Systemhandbuch zum Commodore 64 und VC 20«, Bezug durch Fachhandel, Preis: 74 Mark, ISBN 3-88986-001-X
+
+## Der Klassiker
+
+Obwohl das Haus Data Becker in den letzten Jahren den Computer-Literaturmarkt mit einer Vielzahl von Werken überschwemmt hat, gehört eines der ersten zu den besten. »64 Intern« war zu einer Zeit, als kaum jemand den Commodore kannte (beziehungsweise kaufte, weil er zu teuer war), das einzige Buch, das dem mit seinem Handbuch alleine gelassenen C 64-Besitzer von seinem Informationsdefizit befreien konnte.
+
+Ähnlich einem Systemhandbuch aufgebaut, soll »64 Intern« durch gute Beschreibung der Hardware und ihrer Programmierung ein ständiger Begleiter beim Programmieren sein. Diesen Anspruch unterstreicht das kommentierte ROM-Listing (in hexadezimaler Form) am Ende des Buches. Die wichtigsten Kapitel dieses Buches sind: — Hardware (CPU, Speicherbelegungspläne, User-Port, Expan-sion-Port)
+
+* Tonprogrammierung (Der SID, Register, A/D-Wandler, Synthy 64)
+* Grafik (Der VIC, Registerbeschreibung, Betriebsarten, Schnittstellen zum Prozessor)
+* Ein/Ausgabebausteine (Regi-ster-Plan, Ports, Timer, die CIAs, Joystickprogrammierung)
+* Der Basic-Interpreter (Erweiterung des Basic, Monitor-Programm, wichtige Kernal-Adres-sen, RS232, serieller Bus)
+* Vergleich: VC 20 — CBM — C 64
+* ROM-Listing
+
+Ebenso wie das Interface Age Systemhandbuch ist »64 Intern« für den fortgeschrittenen Programmierer nahezu unverzichtbar. Obwohl sich einige Informationen beider Bücher überschneiden, wird gerade durch die unterschiedliche Erklärung in beiden Büchern mancher Sachverhalt erst richtig verständlich.
+
+Info: Angershausen, Brückmann, Englisch, Gerits, 64 Intern, Data Becker, 4. Auflage 1984, 350 Seiten, Preis: 59 Mark
+
+## Von Basic zu Assembler
+
+»Das Commodore-Buch Band 4«, ein Leitfaden für Systemprogrammierer, ist die Fortsetzung der Buchreihe von Markt&Tech-nik. Dem Basic entwachsen, strebt so mancher Programmierer nach Höherem. Dieses Buch wendet sich deshalb vor allem an den Personenkreis, der gerade an der Schwelle der Assemblerprogrammierung steht. Somit widmen sich auch die ersten Kapitel der Beschreibung des Prozessors und seiner Befehle. Sehr übersichtlich werden Register, Adressierungsarten und Darstellungsformen der Assemblerschreibweise erklärt. Damit der Programmierer die neuen Kenntnisse auch gleich in die Tat umsetzen kann, haben die Autoren H. L. Schneider und W. Eberl in ihrem Buch gleich zwei Assembler und einen Disassembler mitgeliefert. Die erste Assemblerversion ist in Basic geschrieben. Die zweite Version wurde in durch Maschinensprache unterstütztem Basic entwickelt. Selbstverständlich stehen zu jedem Programm ausführliche Beschreibungen und Anleitungen zur Verfügung. Weitere Kapitel widmen sich der Zusammenarbeit von Maschinenprogrammen mit Basic. Sehr gut gelungen ist dabei die Tabelle der Basic-ROM-Routi-nen. Sie helfen besonders bei der Erstellung eigener Maschinenprogramme, denn durch geschicktes Verwenden dieser Routinen wird viel Platz gespart. Der Leser lernt nebenbei rationell zu programmieren. Trotzdem ist der Leitfaden für Systemprogrammierer kein Assembler-Lehrbuch, sondern ein für den Assembler-Anfänger lehrreiches und für den Profi hilfreiches Buch, das in keiner Sammlung fehlen sollte. Der pädagogische Wert dieses Buches wird durch die für 58 Mark erhältliche Diskette mit allen Programmen unterstützt.
+
+(Arnd Wängler)
+
+Info: H. L. Schneider, W. Eberl, Das Commodore 64-Buch, Band 4, ISBN-Nr.: 3-922120-70-9, Markt & Technik Verlag Haar b. München. Preis: 38 Mark
+
+## Einführung in CAD mit dem Commodore C 64
+
+Das rechnerunterstützte Konstruieren (Computer aided Design, kurz CAD) macht Gebrauch von den Fähigkeiten des Computers, zu rechnen, Daten zu verwalten und (auf dem Bildschirm oder dem Grafikdruk-ker) zu zeichnen, womit hier technisches Zeichnen, nicht Malen gemeint ist. Der Autor dieses neuen Data-Becker-Buches betont zu Beginn, daß im Vergleich zu professionellen Systemen die geringe Bildschirm-Auflösungsfähigkeit des C 64 der einzige echte Nachteil sei; die geringe Speicherkapazität und Rechengeschwindigkeit sei durch geschickte Organisation und Geduld wettzumachen. Und so stellt er Schritt für Schritt eine Reihe von kleinen Bausteinen zusammen (Zeichnen von Punkt, Linie, Rechteck, Kreis, Bogen; Strichlinien, Maßpfeile, Schraffuren), aus denenwiederum Makroelemente (Quader, Pyramide, Prisma, Zylinder, Kegel, Kegelstumpf, Kugel) gebildet werden können.
+
+Techniken wie Vergrößerung, Verkleinerung, Zoomen, Duplizieren, Drehen, Spiegeln und Setzen oder Löschen von Einzelpunkten mit einem »Hires-Cur-sor« werden ebenfalls behandelt und gehören sicherlich zu den interessantesten und nützlichsten Ausführungen des Buches. So hat man schließlich einen Satz von Bausteinen mit den entsprechenden Programmen in Simons Basic zur Verfügung, mit'denen man eigene Aufgaben angehen kann.
+
+In diesem Zusammenhang ist allerdings anzumerken, daß die Lösung der betrachteten Probleme hauptsächlich in den Programmen selbst stattfindet und im Text relativ wenig erklärt wird. Dazu gesellt sich die Bemerkung: »Wer wissen will, wie ein Programm strukturiert ist, kommt auch ohne Erklärungen dahinter, und wer es ohne Erklärungen nicht schafft, wird auch mit ihnen nicht glücklich.« Anstelle von 35 Seiten Programmlisting für eine spezielle Beispielzeichnung wäre es vielleicht angebrachter, einige grundsätzliche Dinge etwas ausführlicher zu erklären; seine Programme für eigene Anwendungen muß der Leser schließlich doch selber schreiben.
+
+Auf dem Wege dazu bietet dieses Buch letztlich aber doch eine Reihe von nützlichen Hilfsmitteln, Anregungen und Lösungsansätzen, so daß man das Buch jedem an technischer Grafik Interessierten durchaus empfehlen kann. (Dr. Wolfgang Bunse)
+
+Info: Werner Heift, Einführung in CAD mit dem Commodore 64, Data Becker, Düsseldorf 1985, 302 Seiten, ISBN 3-89011-067-3, 49 Mark.
+
+
+# In die Geheimnisse der Floppy eingetaucht (Teil 7) [116-119]
+
+> Dieser Teil zeigt wie das DOS codiert und physikalisch auf Diskette schreibt. Haben Sie gewußt, daß ein Block auf Diskette länger als 256 Byte ist?
+
+Dieser Artikel bildet den Abschluß der festen Kursreihe. Ab jetzt soll der Floppy-Kurs in lockerer Reihenfolge fortgesetzt werden. Wir werden nun versuchen, auf die von Ihnen bevorzugten Themen einzugehen, um darüber dann in unregelmäßigen Abständen weitere Folgen zu bringen. Wir wollen Sie deshalb dazu anregen, uns Ihre Probleme und Sorgen mit der 1541 mitzuteilen.
+
+An dieser Stelle soll aber noch ein wichtiger Sachverhalt besprochen werden, der bisher einfach unterschlagen wurde: die GCR-Codierung.
+
+## Was ist eine GCR-Codierung?
+
+Wenn Sie den Floppy-Kurs schon länger verfolgen sind Ihnen bestimmt schon einige Ungereimtheiten aufgefallen, was den Direktzugriff auf die Diskette betrifft. Auch in der letzten Folge über das Formatieren waren zum Beispiel im Listing von S-Format einige Sprungbefehle, die nicht erklärt wurden.
+
+Erinnern Sie sich noch an den Artikel, der sich das erste mal mit dem Schreiben von Daten auf die Diskette beschäftigte? Dort wurden, unter anderem, die SYNC-Markierungen auf der Diskette besprochen, die dem Disk-Controller als Positionsanzeiger dienen.
+
+Ich schrieb damals, daß sich diese SYNC-Markierungen bei der 1541 aus fünf $FF-Bytes zusammensetzen, die hintereinander auf Diskette geschrieben werden. Was ist aber, wenn ein Datenblock geschrieben werden soll, der nur aus $FF-Bytes besteht? Eigentlich müßten dann diese Bytes als SYNC-Markierung wirksam werden und den gesamten Schreib- und Lesebetrieb stören. Wie die Praxis zeigt, tritt dieser Fehler nicht auf. Auch bei mehreren Blöcken aus $FF-Bytes kommt es zu keinen Komplikationen. Bei der Konstruktion der Floppy hat man sich nämlich eine Codierung der Daten einfallen lassen, die eine Eindeutigkeit der Daten schafft. Die Codierung heißt GCR, was nichts anderes als eine Abkürzung der englischen Wörter »Group Code Recording« ist.
+
+Es stellt sich jetzt natürlich die Frage, was bei der GCR-Codierung passiert, damit eine Verwechselung zwischen SYNC-und Datenbytes unmöglich wird. Zur Beantwortung dieser Frage muß ein wenig intensiverauf das Lesen und Schreiben der Floppy eingegangen werden.
+
+## Was macht die GCR-Codierung
+
+Das Lesen von Bytes durch den Lesekopfes steuert ein Timer des Disk-Controllers. Auf der Diskette selbst wird jedes »l«-Bit physikalisch durch einen Wechsel der Magnetisierungsrichtung dargestellt und ein »0«-Bit durch gleichbleibende Richtung der Magnetisierung. Bild 1 zeigt, was gemeint ist. Soll ein Byte von Diskette gelesen werden, so wartet der Disk-Controller einfach die Zeitspanne ab, die zum Lesen von acht Bits erforderlich ist. Innerhalb dieser Zeit liest der Schreib-/Lesekopf eine gewisse Folge von Magnetisierungswechseln und Nicht-Magnetisierungswechseln.
+
+Dazu ein Beispiel: Auf der Diskette steht ein $55-Byte. $55 wird binär durch die Kombination %01010101 dargestellt. Der Tonkopf stellt also während der Lesezeit die folgenden Magnetisierungswechsel fest:
+
+Magnetisierung wechselt nicht, wechselt, wechselt nicht, wechselt, wechselt nicht, wechselt, wechselt nicht, wechselt.
+
+Das Erkennen eines Bits geschieht dabei völlig zeitgesteuert. Der Disk-Controller »weiß«, daß er zum Lesen eines Bits eine bestimmte Zeit warten muß. Danach gilt das Bit als gelesen, und es wird eine »1« oder eine »0« bereitgestellt, je nachdem, ob ein Magnetisierungswechsel stattgefunden hat oder nicht.
+
+Praktisch könnte man das folgendermaßen beschreiben: Sie machen mit einem Freund eine Zeit von 10 Sekunden aus. Er hat dann die Aufgabe innerhalb dieser 10 Sekunden entweder zu pfeifen oder nicht. Danach warten Sie diese 10 Sekunden ab. Hat er während dieser Zeit gepfiffen, dann entspricht das einem Magnetisierungswechsel. Hat er innerhalb der 10 Sekunden nicht gepfiffen, bedeutet das ein »O«-Bit, also keinen Magnetisierungswechsel. Da eine Diskette im Laufwerk nicht absolut gleichmäßig gedreht werden kann, also Drehzahlschwankungen unterliegt, muß noch für eine Kompensation der mechanischen Fehler gesorgt werden. Dazu wird der Timer, der die abzuwartende Zeit für jedes Bit bestimmt, bei jedem Magnetisierungswechsel neu getriggert (gestellt). Ein »l«-Bit hat also neben seinem Informationsgehalt noch die wichtige Aufgabe, Laufwerksschwankungen auszugleichen, um Lesefehler zu verhindern. Aus diesem Grund darf es zum Beipiel nicht passieren, daß mehrere $00-Bytes hintereinander auf der Diskette stehen, da sonst zu lange keine Laufwerkskontrolle mehr stattfinden könnte.
+
+Aber auch zuviele »l«-Bits sind nicht gestattet, da mehr als acht »l«-Bits ein SYNC-Signal auslösen.
+
+Aus den genannten Gründen werden alle Daten, die auf die Diskette geschrieben werden, vorher GCR-codiert. Mit dieser Codierung wird ausgeschlossen, daß mehr als acht »l«-Bits und mehr als zwei »O«-Bits direkt hintereinander auf die Diskette geschrieben werden und so die Schreib- und Lese-Elektronik durcheinanderbringen.
+
+Einzig und allein die SYNC-Markierungen (mehr als acht »1«-Bits) werden vom DOS (Disk Operating System, Controller) uncodiert auf die Diskette geschrieben.
+
+## Es gibt zwei Schreibarten
+
+Man kann also zwischen zwei Schreibarten auf Diskette unterscheiden:
+
+1)	Schreiben von Markierungen. Hier werden fünf $FF-Bytes direkt hintereinander auf die Diskette geschrieben, um eine SYNC-Markierung zu bilden, die der Orientierung dient.
+2)	Schreiben von Daten.
+
+In diesem Modus werden Byte-Inhalte codiert, um sich von den Markierungen zu unterscheiden.
+
+Sehen Sie sich jetzt einmal Tabelle 1 an, die Umwandlungstabelle für die Konvertierung Binär nach GCR und umgekehrt.
+
+Wie Sie unschwer erkennen können, handelt es sich beim GCR-Code um einen 5-Bit-Code. Jedes 4-Bit-Nibble, das Sie umwandeln, wird zu einem 5-Bit-GCR-Nibble. Ein Byte, das vorher aus 8 Bits bestand wird also durch die Codierung 10 Bits lang. Allgemein nimmt die Länge der codierten Daten, um den Faktor 5/4 zu. Deshalb ist die Handhabung der GCR-Bytes nicht ganz einfach. Wandeln Sie doch einmal zwei Bytes in den GCR-Code um. Als Ergebnis erhalten Sie »zweieinhalb« Bytes, die sicherlich schwer zu behandeln sind.
+
+Bei der GCR-Codierung geht man aus diesem Grund einen ganz einfachen Weg, um keine Format-Probleme zu bekommen: Es werden jeweils immer 4 Bytes gleichzeitig umgewandelt. Als Ergebnis erhält man 5 vollständige Bytes, die sich ohne Probleme weiterverarbeitet werden können.
+
+Lassen Sie mich das einmal an einem Beipiel erläutern:
+
+Nehmen wir einmal an, wir hätten vier Bytes mit dem Wert $FF. Eine Kombination also, die nicht direkt auf die Diskette geschrieben werden darf.
+
+Wir wandeln diese vier Hex-Bytes nun in die entsprechenden fünf GCR-Bytes um, indem wir in Tabelle 1 nachsehen,was die entsprechenden GCR-Äqui-valente dieser Bytes sind. Wir kommen zu folgendem Ergebnis:
+
+TODO TABLE
+
+HEX BINÄR GCR-Gode
+$FF 1111 1111 10101 10101
+$FF 1111 1111 10101 10101
+$FF 1111 1111 10101 10101
+$FF 1111 1111 10101 10101
+
+Die binär dargestellten GCR-Werte müssen wir jetzt nur noch zu fünf Bytes zusammenfassen, um auf folgendes Ergebnis zu kommen:
+1010 + 1101 = AD
+(**1010 1 + 101** 01)
+0110 + 1011 = 6B
+0101 + 1010 = 5A
+1101 + 0110 = D6
+1011 + 0101 = B5
+
+Vier $FF-Bytes werden also bei der GCR-Codierung in die fünf Bytes $AD, $6B, $5A, $D6 und $B5 umgewandelt, und Sie können sich jetzt leicht davon überzeugen, daß diese fünf Bytes für den Disk-Controller absolut ungefährlich und unkritisch sind, und daß sie die vorge-schriebenen Normen (nicht mehr als zwei »0«-Bytes und nicht mehr als acht »1«-Bytes) erfüllen.
+
+Um Ihnen die Umwandlung der Bytes zu erleichtern, habe ich diesem Kurs zwei Programmlistings beigefügt. Listing 1 enthält ein Programm, das Ihnen vier Hex-Bytes in fünf GCR-Bytes umwandelt. In Listing 2 sehen Sie ein Programm abgedruckt, das die GCR-Codierung wieder rückgängig macht. Hier werden fünf GCR-Bytes in vier Hex-Bytes zurückverwandelt, wobei Sie mit unerlaubten Bitkombinationen vorsichtig sein sollten. Kann ein Byte nicht zurückverwandelt werden, so haben Sie eine unerlaubte GCR-Bitkombination, die sich im Ergebnis dadurch äußert, daß entsprechende Nibbles fehlen. Sie erhalten dann unter Umständen nur »halbe« Bytes.
+
+Die Floppy hält übrigens für diesen Fall eine Fehlermeldung bereit, einen »24, READ ER-ROR«.
+
+Damit Sie auch in Maschinensprache in der Lage sind, Hex-GCR-Konvertierungen durchzuführen, ist noch ein weiteres Listing (Listing 3) beigefügt. Dieses enthält die Originalroutinen des DOS zur Umwandlung von Hex-Bytes in GCR-Bytes und umgekehrt.
+
+**$F6D0**: Dieses Programm holt vier Hex-Bytes aus den Speicherstellen $52 bis $55 und wandelt diese Bytes in die fünf entsprechenden GCR-Werte um. Diese fünf Bytes werden anschließend im Puffer der Adresse $30/31 (L,H) mit dem Pufferzeiger in $34 abgelegt.
+
+Pufferadresse und Pufferzeiger müssen dabei vor Aufruf dieser Routine übergeben werden.
+
+**$F78F**: Diese Routine wandelt einen gesamten Puffer, dessen Adresse in $30/31 (L,H) stehen muß, in GCR-Werte um und speichert diese in den Ausweichpuffer sowie den ursprünglichen Puffer zurück. Der Pufferinhalt vergrößert sich durch diese Umwandlung von 256 auf 324 Bytes.
+
+**$F7E6**: Diese Routine wandelt fünf GCR-Bytes aus einem Puffer (dessen Adresse in $30/31 (L,H) und dessen Pufferzeiger in $34 steht) wieder in vier Hex-Bytes zurück, wobei diese dann in der Zeropage von $52 bis $55 abgespeichert werden.
+
+**$F8E0**: Diese Routine decodiert einen gesamten GCR-Pufferin-halt in die ursprüngliche Form und legt diese 256 Bytes dann im Puffer mit der Adresse $30/31 (L,H) ab. Die vorherigen 324 GCR-Bytes müssen im gleichen Puffer und im Ausweichpuffer ($01BB bis $01FF) stehen.
+
+Die Anwendungen dieser Routinen sind äußerst vielfältig. So können Sie diese Programme zum Beispiel für einen Disk-Monitor verwenden, in dem man zwischen der Anzeige von GCR-Bytes und der Anzeige von normalen Hex-Bytes hin- und herschalten kann. Die einzigen Änderungen, die Sie dazu machen müssen, bestehen in der Umrechnung der Adressen für die Speicherbereiche im Computer und der Angabe neuer Parameter als Puffer- und Zeropagebe-reiche. Ihrer Phantasie, was die Möglichkeiten des Monitors angeht, sind außer dem Speicherplatz im Computer keine Grenzen gesetzt.
+
+## Bis zu 365 Byte in einem Block
+
+Durch die Verwendung der GCR-Codierung ergeben sich noch Konsequenzen. Wie sieht es beispielsweise in den Puffern der Floppy aus, wenn ein Puffer mit einem vollständigen Datenblock (also 256 Bytes) gefüllt wurde und dieser aufgezeichnet werden soll? Für dieses Problem hat der Controller einen speziellen Ausweichpuffer. Der Puffer hat eine Größe von 68 Bytes und befindet sich im Bereich von $01BB bis $01FF.
+
+Wird nun ein Datenblock in Puffer 1 ($0400-$04FF) codiert, so werden die ersten 68 GCR-Bytes in den Ausweichpuffer übernommen. Die restlichen Bytes stehen in Puffer 1.
+
+Aus den 256 Bytes an Information macht das DOS durch die Konvertierung also 324 Bytes, die einen gesamten Datenblock darstellen (inklusive Prüfsumme). Natürlich werden auch die Parameter im Datenblockheader (ID, Track, Sektor, Prüfsumme und Kennzeichen) vor dem Schreiben auf die Diskette in GCR-Bytesumgewandelt, wobei der Blockheader dann mit den zwei Lückenbytes auf eine Länge von zehn GCR-Bytes anwächst, da der Header aus ursprünglich acht Hex-Werten besteht.
+
+Zusammenfassend besteht ein Sektor auf der Diskette aus den fünf Bytes der ersten SYNC-Markierung; danach folgen die zehn Bytes des Blockheaders. Vor der SYNC-Markierung des Datenblocks folgen jedoch noch neun $55-Bytes, die der GCR-Norm entsprechen und direkt auf die Diskette geschrieben werden. Sie dienen als Pufferlücke, in der dem Disk-Controller Zeit bleibt, zwischen Schreiben und Lesen umzuschalten.
+
+Nach den fünf Bytes der SYNC-Markierung folgen die 324 Bytes des Datenblocks inklusive dessen Prüfsumme und anschließend noch die Lücke zwischen zwei Sektoren, die erfahrungsgemäß zwischen acht und zwölf Bytes lang ist. Wie Sie sehen hat also so ein Sektor auf der Diskette die stattliche Länge von 361 bis 365 Bytes.
+
+Jetzt werden Ihnen bestimmt auch ein paar zweifelhafte JSR-Befehle in der letzten Folge des Floppy-Kurses klar: bei dem Formatiersystem in Ausgabe 5/ 1985, wird einmal ein Befehl JSR $FE30 und an anderer Stelle ein Befehl JSR $F78F ausgeführt. Diese Adressen sind die Einsprünge der Codier-Routinen.
+
+Vielleicht kommt Ihnen auch noch einmal die Herstellung eines Killertracks in Erinnerung. Hier wird ein gesamter Track direkt mit $FF-Bytes vollgeschrieben und stellt so eine »Riesen-SYNC-Markierung« dar. Da eine solche Bitfolge jedoch unzulässig ist, kommt die Lese-und Schreibelektronik der Floppy völlig aus dem Konzept; der Controller »stürzt ab«.
+
+Wenn Sie noch mehr über Ihre 1541, über schnelle Kopierprogramme und Kopierschutz-Methoden erfahren oder ein gut dokumentiertes DOS-Listing haben wollen, dann sollten Sie einmal in das M&T Floppy-Buch schauen.
+
+(Karsten Schramm/hm)
+
+# Hier gibt's Clubs [119]
+
+### Luxemburg
+
+**Commodore Club Luxemburg (C.C.L.)**, 1 Rue des Muguets,
+L 5970 Itzig/Luxemburg,
+Clubmagazin, Extrainfos, Musikteil, Kummertelefon;
+
+### Holland
+
+**Copy Tronics**, Postbus 700, 7400 AS Deventer Nederland,
+Clubzeitschrift, Clubtreffen;
+
+### Österreich
+
+**CHIPSI-Computer-Club**, Jasomir-gottstr. 3, Mezzanin, 1010 Wien, Programm- und Literaturtausch, Programmierkurse, begünstigter Bezug von Computern, praktische Programmiertips, Clubzeitung, Clubtreffen;
+**Wiener Hard- u. Software Computerclub**, Rene Fürst, Herbortgasse 22, 1110 Wien, Softwareerstellung und Tausch, Hardwareunterstützung, Beitrag 150 Schilling pro Quartal, Beitrittsgebühr 1x150 Schilling, Tel. (02 22) 7 43 9154, (02 22) 6126 83
+**Bund Technischer Amateure**, Stromstr. 36-38/29/1, 1200 Wien,
+Clubtreffen, Grundlagen, Tips und Tricks, PRG-Bibliothek, Softwaretausch;
+**COMUSCLUS**, Computer User Club Salzburg, A-5033 Salzburg, Postfach 133,
+Clubtreffen, Clubstammtisch, monatliche Zeitschrift, Buch-und Softwarebibliothek, Arbeitskreise, Programmierkurse, auch für Nichtmitglieder, Sammelbestellungen;
+**Ruf-Commodore-User-Club**/Salzburg, A-5020 Salzburg, Haun-spergstraße 21, Tel. (0662) 75770, Herr Wiedermann Ruf-Commodore-User-Club/ Graz, Grazbachgasse 60, Tel. (0316) 70 02 66, Herr Hiess Ruf-Commodore-U ser-Club/ Klagenfurth, A-9020 Klagenfurt, Sponheimer Straße 9-11, Tel. 0 42 22) 5 5105, Herr Krassnitzer Clubtreffen (wöchentlich), Softwarebibliothek, Hardwareangebot, Programmierkurse etc.
+**IKC, Internationaler Kommunikationsclub**, Postfach 18, CH-6312 Steinhausen
+Info gegen 3 DM, Clubzeitschrift, Beratertelefon, DFÜ, Sektionen, Kurse, Listingkorrekturservice, Meisterschaften, etc. Aktiv-, Passiv- und Ehremitglieder sowie Gönner.
+
+### Schweiz
+
+**COBEC Computer-Benutzer-Club Wohlen**, Postfach 10, CH-5613 Hilfikon AG, Schweiz,
+Clubtreffen, Softwarebibliothek, diverse Hardware, Kurse;
+**C 64-Anwenderclub Zürich (ACZ)**, Postfach 194, 8029 Zürich,
+Clubtreffen, Softwarebibliothek, Hardware, Modem, Assembler- und Basic-Kurse, Jahresbeitrag 50 Franken;
+**C 64 Club, J. Reich**, Am Glattbogen 170, 8050 Zürich
+für Anfänger, Clubtreffen, Zeitschrift (geplant), Kurse, Seminare, Softwaretausch, vergünstigter Bezug von Soft- und Hardware, Beitrag 30 Franken
+**Syntax Error C 64**, Postfach 253, CH-9004 St. Gallen,
+Clubtreffen, Mailbox, DFÜ, Softwarebibliothek, Hard- und Softwareentwicklung.
+
+# Memory Map mit Wandervorschlägen [120,122-123]
+
+> Diesmal kommen die Adressen 144 bis 152 an die Reihe, die beim C 64 und VC 20 für Kassetten- und Ein-/Ausga-be-Operation verantwortlich sind.
+
+Zu Beginn möchte ich heute einen Nachtrag zu den in Ausgabe 4/85 behandelten Speicherzellen 65/66 bringen. Das kleine Demonstrationspro-gramm zur Änderung der Reihenfolge von DATA-Befehlen ist zwar richtig, kann aber unter ganz bestimmten Umständen zu Fehlern führen. Darauf hat mich ein aufmerksamer Leser hingewiesen — ich gebe daher seinen Leserbrief im folgenden direkt wieder. Die Adressen gelten nur für den C 64. Beim VC 20 ist der Sachverhalt aber derselbe.
+
+## Korrektur zu Adressen 65 bis 66
+
+Leserbrief von Martin Kröger aus Kiel:
+
+Bei der Behandlung der Adresse 65/66 hat Dr. H. Hauck auf einen Trick hingewiesen, mit dem der Befehl »RESTORE Zeilennummer« simuliert werden kann. Die Idee ist gut — doch die Ausführung hat einen kleinen, aber entscheidenden Fehler: Die Adresse 61/62 darf nicht mit zwei Befehlen, sondern muß mit einem Befehl ausgelesen werden, da bei einem möglichen Page-Wechsel zwischen den zwei Befehlen der Zeiger nicht verbogen, sondern abgeknickt wird.
+
+Was passiert in der ersten Zeile des Demo-Programms?
+
+10 A1 = PEEK(61):Bl = PEEK(62)
+
+Mit »A1 = PEEK(61)« wird der Variablen Al der Wert des LOW-Bytes des Zeigers 61/62 zugewiesen. Dieser zeigt am Anfang einer Zeile auf das 0-Byte vor der Linkadresse (hier 2048), so daß Al den Wert (2048 AND 255) = 0 erhält. Mit »Bl = PEEK (62)« wird der Variablen Bl der Wert des High-Bytes des Zeigers 61/62 zugewiesen. Dieser zeigt aber inzwischen auf das Trennzeichen (»:«) zwischen den beiden Befehlen (hier 2061), so daß Bl den Wert (INT(2061/ 256)) = 8 erhält. Als Zeiger auf das aktuelle DATA-Element erhalten wir die erwartete Adresse (Al + Bl*256) = 2048.
+
+Was aber, wenn Zeilenanfang und Trennzeichen nicht in derselben Page liegen? Dazu setzen Sie bitte den Basic-Anfang um eine Stelle zurück:
+
+POKE 43,0:POKE 2047,0:NEW
+
+Die Zeiger auf den Zeilenanfang und das Trennzeichen werden dadurch ja ebenfalls verändert, so daß Al jetzt den Wert (2047 AND 255) = 255 und Bl den Wert (INT(2060/256)) = 8 erhält. Als Zeiger auf das aktuelle DATA-Element erhalten wir nun die völlig unbrauchbare Adresse (Al + Bl*256) = 2303.
+
+Das korrigierte Demo-Programm könnte wie folgt aussehen:
+
+TODO PRE
+
+10 A1 = PEEK(61)+PEEK(62)*256
+20 DATA DAS IST DIE 1. ZEILE
+30 A2 = (61) + PEEK(62)*256
+40 DATA DAS IST DIE 2. ZEILE
+50 A3 = PEEK(61)+PEEK(62)*256
+60 DATA DAS IST DIE 3. ZEILE
+70 POKE 65,A3 AND 255: POKE 66,A3/256: READ A$:PRINT A$
+80 POKE 65,A1 AND 255: POKE 66,Al/256: READ A$:PRINT A$
+90 POKE 65,A2 AND 255: POKE 66,A2/256: READ A$:PRINT A$
+
+Ich freue mich über Leserbriefe, wie diesen von Herrn Kröger, zeigen sie mir doch, daß meine Erklärungen gelesen und verdaut werden. Und was kann mir besseres passieren, als auf meine eigenen Schlampereien hingewiesen zu werden! Ich habe nämlich den Trick der DATA-Zeilen nicht selbst erfunden, sondern von Sheldon Leemon (eine meiner üblichen Quellen) kritiklos übernommen — und das war falsch.
+
+So, nach diesem Rückblick geht es weiter mit unserer Wanderung. Heute habe ich wieder ein paar Besonderheiten zu bieten.
+
+## Adresse 144 ($90)<br>Statusvariable ST
+
+Diese Adresse enthält ein Byte, welches mit der Statusvariablen ST von Basic identisch ist. Diese reservierte Variable ist im nebenstehenden Texteinschub 1 »ST-atus« näher beschrieben.
+
+Alle Routinen des Betriebssystems, die mit Ein- und Ausgabe zu tun haben, benutzen diese Speicherzelle zum Abspeichern und Abfragen des Status der Ein-/Ausgabeoperationen.
+
+Genauer gesagt, alle Ein-/Aus-gabeoperationen, die mit der Datasette und mit dem Floppy-Gerät beziehungsweise dem Drucker zu tun haben, benutzen die Adresse 144. Im Fachjargon sprechen wir vom Kassettenport und vom seriellen Port.
+
+Der dritte Anschluß des Computers nämlich der RS232 oder User-Port benutzt für den Status die Speicherzelle 663. Jedes Bit der Zelle 144 hat eine eigene Bedeutung.
+
+TODO TABLE
+
+Alle nicht aufgeführten Bits sind nicht benutzt.
+
+Diese Speicherzelle beziehungsweise die Statusvariable ST kann recht nützlich sein. Einige Kochrezepte dafür werden im Texteinschub 1 behandelt.
+
+## Adresse 145 ($91)<br>Zwischenspeicher für Abfrage der STOP-Taste
+
+In den Bildern 1 und 2 ist dargestellt, wie die Tasten des VC 20 und des C 64 miteinander über eine Matrix verbunden sind.
+
+Sechzig mal in der Sekunde unterbricht der Computer seine Arbeit, merkt sich, wo er gerade ist und fragt dann, unter anderem, ob die STOP-Taste gedrückt worden ist. Dadurch wird erreicht, daß die STOP-Taste jederzeit Priorität hat.
+
+Die Abfrage geht so vonstat-ten, daß das Betriebssystem über das im Bild 1 und 2 gezeigte Spaltenregister 56320 (beim VC 20: 37152) diejenige Tastenspalte anwählt, in welcher sich die STOP-Taste befindet. Aus Bild 1 und 2 sehen wir, daß dies die Spalte mit der Codenummer 127 beziehungsweise 247 ist. Ist in dieser Spalte eine Taste gedrückt, wird an ihrer Stelle eine Null in das Auslese-Register 56321 (VC 20: 37153) geschrieben. Die dadurch entstandene Dualzahl wird in die Speicherzelle 145 gebracht.
+
+Es ist sicher verständlich, daß auf diese Weise nicht nur die STOPTaste, sondern alle Tasten der Spalte 127 (247) abgefragt werden können. Ein kleines Demonstrationsprogramm kann das beweisen:
+10 PRINT PEEK (656321); PEEK (145)
+20 GOTO 10
+
+Beim VC 20 ist statt 56321 natürlich 37153 einzusetzen.
+
+Das Zahlenband kann durch die Tasten der genannten Spalte — und nur durch diese — beeinflußt werden.
+
+## Adresse 146 ($92)<br>Zeitkonstante beim Lesen vom Band
+
+Die Speicherzelle enthält eine vom Betriebssystem einstellbare Zahl, welche die kleinen Unterschiede in der Aufnahmegeschwindigkeit ausgleicht, die bei verschiedenen Datasetten vorkommen können.
+
+Diese Zeitkonstante steht im Zusamenhang mit der Zahl, die in den Speicherzellen 176/177 steht.
+
+Eine Veränderung der Konstante in Basic ist nicht möglich.
+
+## Adresse 147 ($93)<br>Flagge für LOAD oder VERIFY
+
+Diese Flagge dient dem. Betriebssystem, um zu unterscheiden, ob eine LOAD-Operation nur LOADen oder aber VERIFY-en soll.
+
+Sie ist identisch mit der Flagge des Basic-Übersetzers in Speicherzelle 10. Genauere Hinweise bitte ich der Beschreibung von Zelle 10 in Ausgabe 12/84, Seite 132 zu entnehmen.
+
+## Adresse 148 ($94)<br>Flagge für Floppy/Drucker Ausgang
+
+Das Betriebssystem benutzt diese Speicherzelle, um anzuzeigen, daß ein Zeichen im Ausgabepuffer steht, welches zum Floppy-Gerät oder zum Drucker geleitet werden soll. Diese Flagge setzt alle am seriellen Port angeschlossenen Geräte in den Zustand »Listen«, das heißt bereit zu sein, Daten aufzunehmen.
+
+## Adresse 149 ($95)<br>Zeichen im Ausgabepuffer
+
+In dieser Speicherzelle wird das Zeichen abgelegt, welches als nächstes über den Serial Port zum Floppy-Gerät oder zum Drucker transportiert wird, sobald die Flagge in 148 die Bereitschaft anzeigt.
+
+## Adresse 150 ($96)<br>Arbeitsspeicher für die Band-Leseroutine
+
+Diese Speicherzelle wird zur Zwischenspeicherung von Daten beim Lesen einer Kassette benutzt.
+
+## Adresse 151 ($97)<br>Zwischenspeicher des X-Registers
+
+Maschinen-Programmierer kennen das X-Register des Mikroprozessors. Beim Lesen eines Zeichens von der Datasette wird der Inhalt des X-Registers in dieser Adresse zwischengespeichert.
+
+## Adresse 152 ($98)<br>Anzahl der offenen Files
+
+Ein File, oder auf Deutsch gesagt, eine Datei, wird mit dem Befehl OPEN eröffnet. Nach OPEN folgt die Nummer der Datei; sie ist beliebig wählbar bis maximal 255. Als zweites folgt die Nummer des Gerätes, mit dem die Verbindung hergestellt werden soll.
+
+Es ist erlaubt, mehrere Dateien gleichzeitig geöffnet zu halten, vorausgesetzt die Nummern der Dateien sind verschieden.
+
+In Speicherzelle 152 wird festgehalten, wieviel Dateien gleichzeitig geöffnet sind. Dieses kleine Programm zeigt es uns deutlich:
+
+TODO PRE
+
+10 FOR K = 1O TO 22
+20 PRINT PEEK (152),K
+30 OPEN K,0
+40 NEXT K
+
+Mit der FOR...NEXT-Schleife der Zeilen 10 und 40 eröffnen wir 13 Dateien hintereinander, und zwar — wie Zeile 30 uns deutlich macht — mit der Tastatur. Die Tastatur hat die Nummer 0, der Drucker die Nummer 4, das Floppy-Gerät die Nummer 8 und die Datasette die Nummer 1. Ich habe die Tastatur gewählt, obwohl es keinen Sinn ergibt, weil sie die vielen Eröffnungen ohne zu unterbrechen akzeptiert.
+
+Nach RUN sehen wir links untereinander den Inhalt von 152, also die Anzahl der eröffneten Dateien. Rechts steht jeweils die Nummer der eröffneten Datei.
+
+Nach der 10. Datei bricht das Programm ab und druckt uns die Fehlermeldung TOO MANY FILES aus.
+
+Das heißt es sind gleichzeitig nur 10 Dateien betreibbar. Wenn wir oben in Zeile 10 die Zahl 22 durch 19 ersetzen, läuft das Programm fehlerfrei.
+
+Eine Datei, die unter einer bestimmten Nummer eröffnet ist, kann nicht noch einmal eröffnet werden. Fügen Sie bitte dem Programm noch die folgende Rücksprungzeile hinzu: 50 GOTO 10
+
+In der 10. Zeile sehen wir jetzt die 10 als Inhalt von 152 und als neue Dateinummer (K) wieder die 10. Das Programm bleibt aber stehen und meldet FILE OPEN. Es hat recht, denn die Datei 10 ist bereits als erste eröffnet, aber nicht wieder geschlossen worden.
+
+Das Betriebssystem macht das so, daß jede der Dateinummern in eine Tabelle geschrieben wird, die in den Speicherzellen 601 bis 610 stehen. Bei jedem OPEN-Befehl wird dort nachgeschaut, ob die Filenummer existiert. Wenn ja wird die Fehlermeldung FILE OPEN ERROR ausgegeben. Beijedem CLOSE-Befehl wird die entsprechende Nummer aus der Tabelle gelöscht.
+
+Wir können aber auch eine 0 in die Speicherzelle 152 POKEn, wodurch dem Betriebssystem vorgegaukelt wird, daß keine Datei eröffnet ist. Schieben Sie im Programm einfach die Zeile ein:
+45 POKE 152,0
+und das Programm läuft ewig weiter.
+
+Die Speicherzelle 152 ist also der Wächter über die Anzahl der eröffneten Dateien. Steht sie auf 0, dann wird eine Neueröffnung am Anfang der Tabelle ab 601 eingetragen. Die Tabelle ihrerseits ist der Wächter über Exklusivität der Dateinummern. Ich zeige Ihnen das noch genauer, wenn wir zu 601 kommen.
+
+Sie werden vielleicht fragen, warum ich das so ausführlich beschreibe. Nun, in einem Programm kann es sicher sehr nützlich sein, die Zelle 152 mit PEEK nach der Datei-Lage abzufragen und entsprechend Maßnahmen zu treffen, ehe die Fehlermeldung das Programm abbricht.
+
+Mit POKE 152,0 aber müssen Sie aufpassen. Es ersetzt nämlich nicht (!!) den CLOSE-Befehl. Probieren Sie es aus: Um das kleine Programm oben per Drucker auszudrucken, brauchen wir:
+OPEN 1,4: CMD 1: LIST
+
+Wenn Sie jetzt die Zeile 152 auf 0 POKEn und dann LIST eintippen, wird trotzdem wieder auf dem Drucker gelistet und nicht auf dem Bildschirm. Die vorgeschriebene Schließmethode mit PRINT #l:CLOSE 1 geht jetzt aber auch nicht mehr, denn das Betriebssystem ist ja im Glauben, daß keine Datei eröffnet ist — schöner Schlamassel!
+
+Erst eine Neueröffnung bringt alles wieder in die Reihe. Also Vorsicht mit der Anwendung der Speicherzelle 152. Eine Möglichkeit, alle Dateien auf einen Schlag zu schließen, gibt es aber doch:
+
+SYS 65511 besorgt das, sowohl beim C 64 als auch beim VC 20.
+
+(Dr. Helmut Hauck/ah)
+
+TODO ASIDE
+
+## Texteinschub 1
+
+### ST-atus
+
+Neben den Befehlen (wie PRINT) und den Funktionen (wie COS) hat Basic auch noch drei fest definierte Variable, nämlich TI, TI$ und ST.
+
+Von den dreien ist ST wohl am seltensten anzutreffen, Grund genug, hier ein wenig darüber zu berichten.
+
+Der Anlaß ist natürlich, daß der Wert von ST immer in der Speicherzelle 144 steht, die ja heute in der Memory Map vorkommt.
+
+Bei der Beschreibung wurde schon erwähnt, daß ST den Status nach der letzten Ein- beziehungsweise Ausgabeopration angibt, beschränkt allerdings nur auf Operationen mit der Datasette und der an einem gemeinsamen Ausgang angeschlossenen Floppy und Drucker.
+
+Dementsprechend zeigt die Tabelle bei der Speicherzelle 144 diese beiden Fälle.
+
+Wichtig ist noch zu erwähnen, daß nicht nur die in der Tabelle gezeigten Zahlen für ST auftreten, sondern auch Kombinationen davon. So ergibt zum Beispiel ein zu kurzer Block (4) und ein gleichzeitig aufgetretener Prüfsummenfehler (32) ein Wert von 36.
+
+### Kassettenoperationen
+
+Zuerst testen wir mit einem Datei-Programm auf »File-Ende«. Geben Sie bitte folgendes Programm ein:
+
+TODO PRE
+
+10 OPEN 1,1,1,”DATEI”
+20 PRINT#1, "QWERTY”
+30 CLOSE 1
+40 END
+
+Zur Erinnerung: nach dem OPEN-Befehl folgt zuerst die Nummer der Da-tei(ich nehme hier 1), dann die Gerätenummer (1 = Datasette) und schließlich die Sekundäradresse (1 = Schreiben).
+
+Jetzt kommt der Lesevorgang:
+
+TODO PRE
+
+50 OPEN 2,1,0”DATEI”
+60 FOR K = 1 TO 10
+70 GET#2,A$
+80 PRINT A$;ST
+90 NEXT K
+100 CLOSE 2
+
+In Zeile 50 eröffnen wir wieder eine Datei (diesmal Nummer 2) für die Datasette, jetzt aberzum Lesen(Sekundäradresse = 0). Die Schleife der Zeilen 60 und 90 schreiben uns 10 mal ein Zeichen (A$) und den Wert von ST auf den Bildschirm.
+
+Jetzt geht es los. Mit RUN starten wir den ersten Teil des Programms. Nach dem Schreibvorgang und der READY-Meldung (nach Zeile 40) müssen Sie das Band zurückspulen und mit GOTO 50 ab Zeile 50 weiterfahren. Jetzt wird die Datei gelesen.
+
+Wir erhalten untereinander die sechs Buchstaben von Zeile 20, daneben für ST lauter Nullen. Am Ende allerdings erscheint eine 64. Das ist der in der Tabelle angegebene Wert von ST für »File-Ende«.
+
+Da die FOR-NEXT-Schleife zu lang ist, schießen wir mit dem Lesen über das File-Ende hinaus. Normalerweise kennen wir natürlich die Länge einer Datei nicht. Deshalb ist es besser mit GOTO zurückzuspringen und das File-Ende abzufragen.
+
+Löschen Sie bitte Zeile 60 und 90 und fügen Sie als Rücksprung und Prüfung ein:
+
+TODO PRE
+
+85 IF ST = 64 THEN 100
+90 GOTO 70
+
+Statt nach ST können wir natürlich genau so gut nach PEEK(144) fragen.
+
+Ein erneutes GOTO 50 bringt das erwünschte Resultat.
+
+Um den vorhin schon erwähnten »kurzen Block« zu sehen, müssen wir einen entsprechenden Fehler künstlich erzeugen.
+
+Löschen Sie bitte den ersten Teil des Programms bis einschließlich Zeile 40. Wir behalten also nur den Leseteil ab Zeile 50. Dann laden wir dieses Programm (Band vorher am besten wieder zurückspulen) mit SAVE "DATEI” nicht als Datei, sondern als ganz gewöhnliches Programm. Wenn es geladen ist, bitte das Band wieder zurückspulen.
+
+Mit RUN starten wir jetzt das Lese-Programm, welches eine Datei sucht, aber nur ein Programm findet, allerdings mit dem richtigen Namen. Natürlich findet es einen Fehler und wir erhalten als Ausdruck:
+
+TODO TABLE
+
+36 oder manchmal auch 4
+64	64
+
+Die Zahl 36 entsteht aus 32 + 4, das bedeutet Prüfsummenfehler + Block zu kurz. Danach folgt wie vorher das File-Ende.
+
+Die normale Blocklänge entspricht der Länge des Bandpuffers, in den die Datasette einspeichert. Er ist 191 Bytes lang. In unserem Fall war offenbar der Block nicht ganz voll.
+
+Der Prüfsummenfehler tritt dann auf, wenn eine der Überprüfungen von Kassettenoperationen einen Fehler gefunden hat. Der Blockfehler, auch der des zu langen Blocks, interessiert wohl weniger. Aber ein durch die Prüfungen gefundener Fehler könnte, frühzeitig noch vor dem Ausstieg des Programms entdeckt, abgefangen und ausgenutzt werden.
+
+Die Formel dafür, ins obige Program eingebaut ist:
+85 IF ST<64 OR ST>8 THEN..(zum Beispiel LIST)
+
+Statt LIST kann man natürlich auch etwas anderes nehmen.
+
+### Floppyoperationen
+
+Bei der Floppy bedeutet ST = 64, »Daten-Ende«, das ist etwa dasselbe wie bei der Datasette. Um es zu überprüfen nehmen wir dasselbe Programm wie vorher, nur müssen wir die Datei-Zeilen der Floppy anpassen. Das sieht dann so aus:
+
+TODO PRE
+
+10 OPEN 1,8,1,”DATEI,S,W”
+20 PRINT#1,”QWERTY”
+30 CLOSE 1
+40 END
+
+50 OPEN 2,8,0,”DATEI,S,R”
+60 FORK = 1 TO 10
+70 GET#2,A$
+80 PRINT A$;ST
+90 NEXT K
+100 CLOSE 2
+
+Das Ergebnis sieht hier so aus:
+64
+66
+66
+
+Die 64 ist natürlich wie erwartet der »Wert« für Daten-Ende. Die 66 ist 64 + 2, entstanden dadurch, daß wir über das Datenende hinausgelesen haben. Die 2 bedeutet »Fehler beim Lesen« (in den englischen Beschreibungen heißt es »Read Time Out«). Ähnliches gilt für ST = 1, das bededutet »Fehler beim Schreiben« (englisch: Write Time Out), nur weiß ich leider nicht, wie es vorzuführen ist. Wie bei der Datasette kann das Überlesen natürlich mit der Abfrage IF ST=64 THEN...und GOTO... gestoppt werden.
+
+Interessant ist noch der Status beim Fehler »DEVICE NOT PRESENT«, den wir dadurch erzeugen, daß wir ein Programm, oder die Directory, aus der Floppy laden wollen, ohne daß dieses Gerät angeschlossen oder eingeschaltet ist. Nach der Fehlermeldung geben wir direkt ein: PRINT ST oder PRINT PEEK(144) und wir erhalten die Zahl 128.
+
+Wie man allerdings in einem Basic-Programm durch Abfrage von ST= 128 die Fehlermeldung »Device Not Present« und den dann folgenden Programmabbruch vermeiden kann, weiß ich leider auch nicht. Die einzige Möglichkeit, die ich kenne, verwendet die sogenannte Interrupt-Methode. Diese ist von Christoph Sauer im letzten Teil seines Kurses »Der gläserne VC 20« in Heft 3/85, Seite 155, beschrieben worden.
+
+# Effektives Programmieren (6): Sortieren mit dem Computer — (Teil 3) [124,126,128]
+
+> Nachdem wir in den letzten beiden Folgen mehrere einfache Sortieralgorithmen besprochen haben, wollen wir uns diesmal nur mit einem einzigen Algorithmus auseinandersetzen, dem Heapsort. Heapsort ist mit Sicherheit die komplizierteste der bekannten Sortiermethoden und verdient deshalb unsere ganze Aufmerksamkeit, zumal sie dazu noch eine der schnellsten ist.
+
+Zuerst einmal zum Ausdruck »heap«. Ein Heap (engl.: Haufen, Menge) bezeichnet ein Variablenfeld, das auf eine ganz bestimmte Art sortiert wurde und damit einige wichtige Eigenschaften erfüllt, auf die wir später noch zu sprechen kommen werden.
+
+## Grundlagen
+
+Beschäftigen wir uns zunächst einmal mit dem Grundgedanken des Heapsort. Unsere bisherigen Sortierprogramme waren alle relativ langsam. In den beschriebenen Formeln konnte man das durch den Faktor A2 erkennen, der besagt, daß die Sortierzeit mit dem Quadrat der Feldgröße steigt. Die Ursache für diese ungünstigen Zeiten war die oft unnötige Anzahl von Durchläufen, obwohl gewisse Voraussetzungen schon gegebenwaren. Anders ausgedrückt haben unsere bisherigen Programme bei ihren Durchläufen nie alle Informationen genutzt, die ihnen zur Verfügung standen. Heapsort hat an dieser Stelle etwas geändert. Der Sortieralgorithmus verarbeitet bei jedem Durchlauf mehrere Informationseinheiten, die dann ein systematischeres Vorgehen erlauben.
+
+## Was ist ein »Baum«?
+
+Um Heapsort zu verstehen, müssen wir uns jetzt ersteinmal mit dem mathematischen Begriff des »Baums« beschäftigen. Ein mathematischer Baum ist eine Anordnung von Elementen einer Menge. Ein Beispiel für einen Baum sehen Sie in Bild 1. Jetzt stellt sich natürlich die Frage, wie wir einen solchen Baum in unsere Feldstruktur überführen können, denn immerhin ist ein Baum zweidimensional, wir arbeiten jedoch nur mit eindimensionalen Feldern. Sehen Sie sich dazu einmal Bild 2 an. Es zeigt den Baum aus Bild 3 in eindimensionaler Darstellung als Feld. Wie Sie sehen können, ist die Aufstellung streng hierarchisch und berechnet sich wie folgt: Wir nehmen ein Element an einer Position I. Handelt es sich bei unserer Menge aus Elementen um einen Heap (Variablenfeld), so muß der Wert an der Stelle INT (1/2) größer oder gleich des Wertes an der Stelle I sein. Mathematisch beschrieben sieht die Sache folgendermaßen aus (wobei A$(I) ein Feldelement ist):
+A$(INT(I/2)) >= A$(I), für 2 <= I <= A (A ist die Gesamtanzahl der Elemente des Feldes).
+
+Anschaulich können wir sagen, daß das Element A$ (INT(I/2)) immer der nächsthöhere »Knoten« des Baumes über den Elementen A$(I) und A$(I + 1) ist.
+
+## Welchen Sinn hat die Baumstruktur?
+
+Sie werden sich jetzt sicherlich fragen, was denn der Vorteil dieser recht komplizierten Baumstruktur ist. Nun, wir sind jetzt in der Lage, in einem Feld, welches einer Baumstruktur entspricht, ganz einfach nach einem Element die Position der nächstgrößeren, beziehungsweise die Position der nächstkleineren Elemente festzustellen und haben damit schon einmal eine Vorsortierung erreicht. Wie Sie vielleicht schon gemerkt haben, lassen sich die Positionen durch die oben genannte Formel ganz leicht aus der Position des Ausgangselements berechnen. Wenn Sie sich noch einmal die Bedingung für einen Baum betrachten, so werden Sie erkennen, daß auch Sonderfälle auftreten können. So kann ein Feld beispielsweise keinen vollständigen Baum darstellen, sondern nur ab einer gewissen Stelle eine Sortierung aufweisen, die der obigen Formel entspricht (Bild 3 zeigt ein Beispiel für eine solche Sortierung). Diese Form der Sortierung bezeichnet man als Heap. Ein Heap ist also nicht vollständig durchsortiert; er zeigt jedoch eine Eigenschaft, die für unser Sortieren von entscheidender Bedeutung ist: das Maximum des Feldes steht jeweils an der Spitze, also auf Position 1.
+
+Nehmen wir jetzt einmal an, Sie entfernen das Element an der Spitze des Heap und setzen den Rest des Feldes wieder zusammen. Der Arrayrest besteht jetzt aus A-1 Elementen, unter denen sich nun das zweitgrößte befindet. Jetzt stellen Sie diese A-1 Elemente wieder so zusammen, daß ein Heap entsteht...
+
+Wie die Reihe weitergeht, können Sie sich jetzt bestimmt denken. Wir nehmen wiederum das erste Element weg und haben somit das insgesamt zweitgrößte Element aussortiert. Diese Schritte wiederholen sich so lange, bis nur noch ein Element, das kleinste, im Heap übrigbleibt. Durch die relativ geordnete Struktur des Variablenfeldes während der Arbeit sind keine langen Suchzeiten erforderlich. Das verkürzt die Sortierdauer erheblich.
+
+Die Formel zeigt die Berechnung der mittleren Anzahl der Bewegungen bei einem Sortiervorgang, wobei A die Anzahl der Elemente des Feldes angibt: mittbew = ungefähr l/2*A*ld(A)
+
+Heapsort ist schneller, als die bisherigen Sortiermethoden
+
+An dieser Stelle zeigt sich bereits der deutliche Unterschied von Heapsort zu den vorher besprochenen Sortiermethoden. Während diese immer den Faktor A2 in ihren Formeln hatten, steigt die Zahl der Bewegungen bei Heapsort im Mittel nur um den Faktor ld (A), wobei ld den Logarithmus zur Basis 2 darstellt. Der Logarithmus ld kann durch den natürlichen Logarithmus (ln) auf die folgende Art dargestellt werden:
+ld(A) = ln(A)/ln(2).
+
+An dieser Stelle gleich einmal eine Bemerkung zum Logarithmus: Auf dem C 64 und auf dem VC 20 existiert jeweils nur der natürliche Logarithmus (ln). Im Basic-Dialekt dieser Computer wird jedoch eine unübliche Abkürzung für diesen Logarithmus verwendet. Eine Berechnung erfolgt hier mit dem Befehl LOG, der eigentlich für den Logarithmus der Basis 10 (Zehnerlogarithmus) steht.
+
+Jetzt aber wieder zurück zu Heapsort. In Bild 4 können Sie erkennen, was vorher besprochen wurde. Unser Beispiel-Heap aus Bild 3 wird sortiert, wobei jeweils das erste Element aussortiert und dann der Rest des Arrays wieder zusammengesetzt wird.
+
+Das Programm zu Heapsort ist in Listing 1 dargestellt und benötigt zu seiner Ausführung die beiden anderen Programmteile, die als Listing 1 und 2 in der 64'er, Ausgabe 4/1985 auf Seite 149 abgedruckt wurden. Um die Abfragepunkte bei Heapsort deutlich darzustellen, wurde in Listing 1 auf FOR-NEXT-Schlei-fen verzichtet, was allerdings zu Lasten der Geschwindigkeit geht. Wenn wir in der nächsten Ausgabe Quicksort besprechen, werden wir unter anderem auch auf Geschwindigkeitsfaktoren (Garbage-Collection, Vergleiche, Indizierung) eingehen. Außerdem werden wir einen Zeitvergleich über alle bisher besprochenen Routinen durchführen, zu dessen Zweck die Programme natürlich optimiert werden. Bild 5 zeigt einen Ausdruck von Heapsort während der Arbeit. In Bild 6 sehen Sie, wie schon in den vorherigen Folgen, einen Programmablaufplan, anhand dessen es keine großen Probleme bereiten sollte, Heapsort für eigene Anwendungen oder auf andere Programmiersprachen umzuschreiben.
+
+Hiermit wollen wir es für heute aber auch schon bewenden lassen. Heapsort dürfte Sie sicherlich noch einige Zeit beschäftigen, da diese Methode nicht ganz leicht zu durchschauen ist. In der nächsten Folge werden wir uns ausführlich mit dem Quicksort beschäftigen, dem wohl schnellsten Sortieralgorithmus.
+
+(Karsten Schramm/gk)
+
+# Floppy oder Datasette? [129,131]
+
+> Die Zeiten, in denen das Floppy-Laufwerk 1541 noch weit über 1000 Mark gekostet hat, sind längst vorbei. So nach und nach scheint die Data-sette verdrängt zu werden.
+
+Ein Computer ohne Massenspeicher ist wie ein Auto ohne Räder. Man kann ihn zwar in Betrieb nehmen, doch kommt man nicht allzu weit damit. Erst Massenspeicher machen den Computer so ungeheuer flexibel. Durch sie hat man die Möglichkeit, Programme und Daten dauerhaft zu konservieren, aber auch die Weitergabe und der Kauf von Software wird erst mit einem solchen Medium möglich.
+
+Zu einem Computer gehört also in jedem Fall ein externer Speicher. Für Homecomputer und speziell für den Commodore ist das die Dataset-te oder das Floppy-Laufwerk 1541. Doch für welchen Massenspeicher soll man sich entscheiden? Ein gewichtiges Argument fällt sofort, auch für den Laien, ins Auge: der Preis. Die Datasette ist mittlerweile für rund 99 Mark zu haben, während das Floppy-Laufwerk immerhin noch mehr als das sechsfache kostet. Doch der Siegeszug der Flop-py-Laufwerke ist nicht aufzuhalten. Für Datasette-Besitzer ein Grund zum Nachdenken.
+
+## Floppy oder Datasette?
+
+Was zeichnet denn nun die Floppy gegenüber der Datasette aus? Das gewichtigste Argument dürfte der Komfort sein. Mit der Floppy zu arbeiten ist wesentlich übersichtlicher und auch schneller als mit dem Kassettenrecorder. Das beginnt mit dem Anlegen eines Inhaltsverzeichnisses, dem Directory. Die Titel aller Programme und Dateien, die auf einer Diskette gespeichert sind, werden in dem Directory mit einem Befehl erkennbar. Es informiert Sie über den Namen, die Programmlänge und ob es sich um ein Programm (PRG) oder um Daten (Dateien) handelt. Dateien werden mit SEQ oder USR (sequentielle) oder REL (relative) gekennzeichnet. Gelöschte Programme oder Dateien erhalten die Kennzeichnung DEL, werden aber nicht mehr angezeigt.
+
+Auch der restliche auf der Diskette verfügbare Platz wird angegeben. Soll ein Programm geladen werden, kann das aus diesem Inhaltsverzeichnis heraus aber auch direkt geschehen. Wird ein Programm gelöscht, so wird der freigewordene Platz ohne Verlust und Lücken wieder zur Verfügung gestellt. Bei der Datasette bestehen diese Möglichkeiten nicht.
+
+Sollte ein Datasette-Besitzer in den Genuß einer nicht von seinem Gerät bespielten Kassette kommen, so kann es vorkommen, daß dessen Programme nicht geladen werden können. Der Tonkopf der anderen Datasette braucht nur etwas anders eingestellt sein und schon wird es problematisch. Manche Kassetten haben ab und zu nicht einwandfrei beschichtete Stellen auf dem Band. Sollte beim Speichern eines Programms solch eine Stelle beschrieben werden, wird es später unmöglich, das Programm wieder zu laden. Datasetten-Besitzer gewöhnen sich deshalb sehr schnell an eine Kontrollfunktion, VERIFY genannt. Hier wird das soeben auf Band gespeicherte Programm noch einmal mit dem Inhalt des Computers verglichen. Das bedeutet schon mehr als doppelten Zeitaufwand (vor dem VERIFY muß ja die Kassette zurückgespult werden). Diskettenbesitzer vergessen diesen Befehl bald. Disketten sind viel sicherer als Kassetten.
+
+Sollten Sie sich zu einem leidenschaftlichen Programmierer entwickeln, und das ist beim C 64 nicht ganz ausgeschlossen, werden Sie nicht an die Programmierung einer Dateiverwaltung herumkommen (wollen). Und jetzt bekommt die Datasette gleich zweimal eins aufs Dach. Turbotape-Besitzer (Turbotape beschleunigt Laden und Speichern von Programmen auf Kassette) können dieses Programm jetzt vergessen, denn Daten von sequentiellen Dateien werden nur mit der normalen Geschwindigkeit geladen. Das gibt Ihnen Zeit für Kaffee-und Zigarettenpausen. Den zweiten Schlag erhalten Sie, wenn Sie mit Ihrem Programmierwissen noch weiter vorangeschritten sind und in Zeitschriften oder Büchern über die Begriffe »Relative Datei« und »Direktzugriffsdatei« stolpern. Überlesen Sie einfach diese Kapitel, denn solche interessanten Dateiformen sind mit der Datasette nicht möglich. Aber selbst wenn Sie keine große Ambitionen als Programmierer haben: Dateiverwaltungsprogramme, die diese Formen der Verwaltung besitzen (und das sind die wirklich guten), erhalten Sie nur auf und für Diskette.
+
+Damit wären wir bei einem weiteren Thema: Softwareangebot. Mit stetig sinkendem Preis des Diskettenlaufwerks und damit dessen wachsender Beliebtheit wird immer mehr Software auf den Markt kommen, die es nur auf Diskette gibt, beziehungsweise nur zusammen mit einem Diskettenlaufwerk funktioniert. Selbst die Literatur, dazu zählen auch Computerzeitschriften, befaßt sich immer mehr mit der Floppy. Auch bei uns in der Redaktion bekommen wir die wachsende Präsenz der 1541-Besitzer zu spüren. Das Verhältnis der Programmeinsendungen mit Diskette zu denen mit Kassette liegt zur Zeit bei ungefähr 7:3, mit sinkender Tendenz für Kassette.
+
+## Floppy im Detail
+
+Obwohl der Preisunterschied zwischen Datasette und Floppy-Disklaufwerk nicht gerade gering ist, darf man nicht vergessen, daß die 1541 zu den preisgünstigsten Diskettenlaufwerken überhaupt zählt. Viele Hersteller von Homecomputern bieten erst gar keins an. Und erst recht findet man keine »intelligenten« Laufwerke. Intelligent deshalb, weil die 1541 einen eigenen Mikroprozessor, den 6502, und ein Disket-ten-Operations-System (DOS) besitzt.
+
+Die Speicherkapazität der 1541 ist zwar nicht berauschend, aber mit ungefähr 170 KByte pro formatierter 5¼-Zoll-Diskette für die meisten Anwendungen voll ausreichend. Dabei können bis zu 144 Einträge ins Directory gemacht werden, eine Zahl, die Sie wohl selten erreichen werden. Auch die Übertragungsgeschwindigkeit von Daten vom Computer zur Floppy ist mit runden 3200 Baud nicht gerade als Hexerei zu bezeichnen. Schuld daran ist nicht so sehr die serielle Datenübertragung, sondern vielmehr das DOS selber. Aber immerhin geht das immer noch rund 10 mal schneller als mit der Datasette.
+
+## Eine oder zwei Floppies?
+
+Wirklich keine Frage für Leute, die viel mit Dateiverwaltungen oder auch dem Kopieren von Programmen zu tun haben. Denn gerade diese Arbeiten erfordern oft einen Wechsel der Disketten. Mit zwei Floppy-Laufwerken ist dieses zeitraubende und auf die Dauer nervtötende Problem beseitigt. Genaugenommen lassen sich sogar bis zu fünf verschiedene 1541 hintereinander anschließen. Und das Schöne daran ist, daß, ausgenommen natürlich für das Laufwerk selber, keine zusätzlichen Kosten für Interfaces oder sonstige Hardwarezusätze hinzukommen. Einfach mit dem mitgelieferten Kabel an den Computer stecken und fertig. Vielleicht haben Sie jetzt auch den Eindruck, daß die Floppy gegenüber der Datasette doch entscheidende Vorteile hat, auch wenn die Existenzberechtigung der Datasette nicht ganz verschwunden ist. Denn für viele ist letzten Endes die Geldbörse das überzeugendste Argument — jedenfalls bis auf weiteres.
+
+(gk)
+
+# Reset-Taster für alle Fälle [130-131]
+
+> Ein Reset-Taster der herkömmlichen Bauart führt nicht immer zum gewünschten Ergebnis. Abhilfe schafft diese 3-Mark-Lösung, die fast jedes Programm abbricht. Sie müssen den C 64 also nicht immer aus- und wieder einschalten, um ein Programm zu beenden.
+
+Ein normaler Reset-Taster für den C 64 kann viele Programme nicht stoppen. Das ist immer dann der Fall, wenn im Programm ein sogenannter Modulstart enthalten ist.
+
+## So funktioniert der Modulstart
+
+Was ist ein überhaupt ein Modulstart? Um das zu erklären, muß man sich das Betriebssystem des C 64 näher betrachten. Nach einem Reset, der auch softwareseitig mit SYS64738 ausgelöst werden kann, sieht sich der Computer den Inhalt der Speicherstellen $8004 bis $8008 an. Steht dort »cbm80« in Form der Commodore-ASCII-Codes, springt der C 64 an die Adresse, die in $8000 und $8001 angegeben ist. Dabei steht in $8000 das Low- und in $8001 das High-Byte des Reset-Vektors. In $8002 und $8003 steht der Warmstart-Vektor, also die Adresse, die durch Drücken von RESTORE angesprungen wird. Steht nun in $8000 und $8001 der Anfang eines Programmes, startet das Programm nach einem Reset immer wieder von neuem. Der Name »Modulstart« kommt daher, daß in jedem Modul, das nach dem Einschalten auch starten soll »cbm80« steht.
+
+Wie Sie sehen, entscheidet also der Inhalt der Speicherzellen $8000-8008 über die Wirksamkeit eines herkömmlichen Reset-Taster, der die Reset-Leitung des C 64 auf Masse legt.
+
+## Wir brechen aus
+
+Da ein Modul die ROM-Konfigura-tion des C 64 ändert, ist klar, daß kein Reset-Taster ein Modul abschalten kann. Das Modul schließt nämlich eine oder mehrere Leitungen am Expansion-Port kurz und sagt dem C 64 dadurch, welche Speicheraufteilung zu aktivieren ist. Wird die EXROM-Leitung (externes ROM) aufMasse gelegt, schaltet der C 64 den RAM-Speicher von $8000 bis $A000 ab und greift in diesem Bereich auf das ROM des Moduls (EPROM) zu. Genau das hilft uns, um dem Software-Modulstart eines Programmes zu entkommen. Wird nämlich während eines Reset die EXROM-Leitung auf Masse gelegt, sucht der C 64 in einem (nicht vorhandenen) Modul nach der bekannten »cbm80«-Kennung. Da in einem nicht vorhandenen Modul kein »cbm80« steht, durchläuft der C 64 die normale Reset-Routine mit Basic-Kaltstart-Einsprung (Einschaltmeldung). Nach dem Reset wird dann die Verbindung EXROM — Masse aufgehoben und damit die normale Speicherkonfiguration wieder hergestellt. Der C 64 meldet sich mit dem Einschaltbild. Wenn Sie nun einen normalen Reset — etwa mit SYS64738 — auslösen, wird das Programm wieder gestartet. Ob es allerdings noch funktionsfähig ist, hängt vom Programm selbst ab.
+
+## Reset-Schalter in der Praxis
+
+Wie bereits erwähnt, muß während des Reset die EXROM-Leitung auf Masse (GND) gelegt werden. Das macht man am einfachsten mit einem Taster, der zwei Leitungen gleichzeitig schaltet (2 x Ein). Da EXROM während des ganzen Reset Low-Potential haben muß, wird mit einem Kondensator die »Reset-Dauer« begrenzt. Dazu wird ein Elektrolyt-Kondensator mit 16V/47µF in die Leitung vom Reset-Kontakt (Pin C, Expansion-Port) zum Taster geschleift. Minuspol in Richtung Masse. Die Funktion ist einfach zu erklären: Nach Drücken des Tasters liegt auf beiden Kondensatorplatten Masse an, der Reset wird gestartet. Der Kondensator lädt sich nun innerhalb kürzester Zeit auf und die Reset-Leitung liegt wieder auf High-Pegel, während EXROM (Pin 9) noch solange Low-Potential hat bis der Taster losgelassen wird. Damit sich der Elko nach dem Reset wieder entladen kann, überbrückt man ihn mit einem 1OkOhm-Widerstand, 1/8 Watt.
+
+Die Resetleitung liegt durch diese »Einschaltbegrenzung« so kurzzeitig auf Masse, daß das Commodore Diskettenlaufwerk 1541 davon vielleicht gar nichts merkt und keinen Reset macht.
+
+## Ein- oder Anbau — das ist hier die Frage
+
+Für den Versierten in Sachen Löten empfiehlt sich der feste Einbau in den C 64 (Garantie beachten). Die Kontakte des Expansion-Ports werden bei dieser Lösung am besten auf der Lötseite der C 64-Platine abgegriffen. In Bild 1 ist Masse an Pin 1 angeschlossen (gelbes Kabel). EXROM an Pin 9 (blaues Kabel) und Reset an Pin C (rotes Kabel). Den Schaltplan finden Sie in Bild 2, die Stückliste in Tabelle 1.
+
+Eine andere Lösung wäre der Anschluß über einen Platinenstecker. Der Stecker muß allerdings selbst gebaut werden. Uns ist keine Bezugsquelle bekannt. Zur Steckerfertigung brauchen Sie eine beidseitig kupferkaschierte Epoxidharzplatte mit einer Größe 58 x 50 mm. 58 mm ist die Breite des Expansion-Ports. Bei ausgeschaltetem (!) Computer stecken Sie nun die Platine einige Male in den Expansion-Port und wieder aus, bis die Schleifspuren der Kontakte deutlich zu sehen sind. Zwischen den Spuren wird das Kupfer auf der ganzen Länge der beiden Platinenseiten etwa 1 mm breit abgekratzt. Das kann mit einem Stichel, Körner oder einem spitzen Nagel und einem Lineal als Anschlag geschehen. An die Leiterbahnen können Sie nun die Zuleitungen zum Reset-Taster anschließen. Wer es professionell machen will, kann auch eine kleine Platine speziell dafür ätzen.
+
+(hm)
+
+TODO TABELLE ("Tabelle 1")
+
+## Stückliste
+Taster 2xEin
+Elko 16V/47µF
+Widerstand 1OkOhm, 1/8 Watt
+Schaltdraht (verseh. Farben)
+event. beidseitig kupferkaschierte Epoxidharzplatte 58 x 50 mm
+
+# Textomat Plus kontra Vizawrite 64 [132-135]
+
+> Der seit langem bekannte Textomat hat einen großen Bruder bekommen — Textomat Hus. Wird der »Neue« den bisherigen Spitzenreiter Vizawrite 64 verdrängen können?
+
+Für diejenigen, die unsere Zeitschrift seit einiger Zeit lesen, sind sowohl Textomat als auch Vizawrite 64 bereits alte Bekannte. In Ausgabe 9/84 haben wir den alten Textomat und in Ausgabe 10/84 Vizawrite 64 getestet. Seit damals galt Vizawrite 64 wegen seines ausgereiften und fehlerfreien Konzeptes als bestes Textverarbeitungsprogramm in der Klasse über zweihundert Mark. Für die knappere Kasse konnte man damals den Textomat für 99 Mark ruhigen Herzens empfehlen. Mittlerweile war man in Düsseldorf bei Data Becker nicht müßig und bemühte sich, ein Textverarbeitungsprogramm für den gehobenen Anspruch, in der gleichen Preisgruppe wie Vizawrite 64, zu entwickeln. Seit kurzem ist nun der von W. Schellenberger programmierte Textomat Plus für 248 Mark erhältlich.
+
+Die Einleitung zum Textomat Plus ist vielversprechend — viele Ideen und Anregungen aus dem Kundenkreis sollen beim Textomat Plus berücksichtigt worden sein. Alles in allem soll Textomat Plus in eine neue Dimension der Textverarbeitung führen. Ein hoher Anspruch, den es natürlich zu prüfen galt. Wir haben im Test besonders auf folgende Punkte geachtet:
+
+* Bedienungsfreundlichkeit (sind alle Funktionen einfach erreichbar und sinnvoll plaziert?)
+* Arbeitsgeschwindigkeit (wie lange dauert das Erstellen eines Testschriftstückes?)
+* Übersichtlichkeit (der Texteingabe, der Textkorrektur, der Sonderfunktionen)
+
+Textomat Plus wird nur auf Diskette geliefert. In alt bekannter Art beginnt kurz nach dem Laden der Weg durch eine Reihe verschiedener Vormenüs. Als erstes möchte Textomat Plus wissen, welcher Bildschirmzeichensatz geladen werden soll. Auf der Masterdiskette sind ein amerikanischer (C 64 Normaltastatur) oder ein deutscher Zeichensatz (simuliert eine deutsche Schreibmaschinentastatur) vorhanden. Im Regelfall wird man den schon voreingestellten deutschen Zeichensatz wählen (Taste Fl drücken), denn Textomat Plus erzeugt auf fast allen Druckern deutsche Sonderzeichen. Im nächsten Menü wird man dazu aufgefordert, den Druckertyp anzugeben. Hat man einen MPS 801, genügt ein Druck auf die Funktionstaste Fl. Besitzer eines anderen Druckers müssen hier ihren Druckertyp eintragen und den Rest der Zeile löschen. Im dritten und glücklicherweise letzten Menü kann das Datum in beliebiger Form eingegeben werden. Kurz nach dem Bestätigen mit Fl befindet man sich im Schreibmodus.
+
+## Unterschiedliche Menütechnik
+
+Es ist schon ärgerlich, was man beim Textomat Plus alles anstellen muß, um endlich einen Text eingeben zu dürfen. Flexibilität in allen Ehren, aber wer wechselt seinen Drucker schon täglich? Alle dauerhaften Konfigurationsparameter wie Bildschirmzeichensatz, Druckertyp, Anzahl der Laufwerke und die Bildschirmfarben gehören einmal festgelegt und abgespeichert. Hierzu ist die auch sonst sinnvolle Funktion des Formulars bestens geeignet. Beim Laden des Programms sollte ein vom Anwender erstelltes und unter bestimmten Namen (beispielsweise »Standardformular«) abgespeichertes Formular automatisch mitgeladen werden. Wer dann noch etwas ändern möchte, kann das im Textmodus immer noch tun. Auch die Eingabe des Datums sollte dem Wunsch des Anwenders vorbehalten bleiben. Das wurde auch erkannt, denn im Formular kann jederzeit das Datum eingegeben werden, fragt sich, warum dann noch ein extra Menü kurz nach dem Laden dafür vorgesehen ist?
+
+Das Konzept, das in dieser Hinsicht von Vizawrite 64 verwirklicht wird, gefällt da schon wesentlich besser. Nach dem Start erscheint ein Hauptmenü, von dem aus alle wesentlichen Grundfunktionen angewählt werden können. Man kann den Inhalt einer Diskette ansehen, ein altes oder neues Dokument laden oder einen DOS-Befehl geben.
+
+Farbeinstellungen, Laufwerkparameter und Druckerparameter werden erst viel später eingestellt, nämlich dann wenn man sie braucht. Wer nichts ändern möchte, wird aber auch nicht dazu gezwungen. Eine sinnvolle Eigenschaft von Vizawrite 64 ist es, alle wesentlichen Parameter wie Farbgebung, Zeilenformat, Druckertyp und Druckerparameter mit dem Dokument abzuspeichern. Der Anwender merkt davon nichts: Er erhält ein einmal abgespeichertes Dokument wieder so auf den Bildschirm, wie er es abgespeichert hat, ohne sich Gedanken über Formulare machen zu müssen. Damit ist allerdings der Nachteil verbunden, daß es bei Vizawrite 64 gegenüber Textomat Plus etwas länger dauert, das gesamte Format eines Textes zu ändern.
+
+Textomat Plus arbeitet gegenüber Vizawrite 64 nur teilweise bildschirmorientiert. Das heißt, der Text erscheint im Schreibmodus nur annähernd in seiner späteren Form. Zwar besitzt auch Textomat Plus nun einen sogenannten »Word wrap«, der ein Wort, das nicht mehr ganz in eine Zeile passen würde, mit in die nächste Zeile übernimmt. Prinzipiell faßt Textomat Plus den Text aber als eine fortlaufende Folge von Zeichen auf, die erst durch entsprechende Formatbefehle im Text ihr späteres Aussehen erhalten. Damit sind einige Nachteile verbunden, denn der beschriebene Text kann, besonders wenn öfters korrigiert oder ergänzt wurde, recht unübersichtlich werden. Das gilt wohlgemerkt nur im Schreibmodus, in der Funktion »Ansehen«, die den Text mit 40- und sogar 80 Zeichen auf den Bildschirm darstellt, werden überzählige Leerstellen ignoriert und der Text, besonders im 80-Zeichenmodus, so gezeigt, wie er später tatsächlich aussieht. Leider sind in dieser Funktion keine Korrekturen am Text möglich. Man muß sich entweder alle Fehler, die behoben werden sollen, aufschreiben, oder öfters zwischen Schreib- und Ansehmodus wechseln. Bei längeren Texten ist das aber ein vollkommen unpraktisches und sehr zeitraubendes Unterfangen, denn um von einem Modus in den anderen zu gelangen, muß Textomat Plus immer wieder auf die Masterdiskette zugreifen (Ladedauer im 80-Zeichenmodus insgesamt 48 Sekunden). Eine leichte Abhilfe ist es, wenn man das File »80« auf die Textdiskette kopiert, denn dann spart man sich wenigstens den Diskettenwechsel. Etwas unverständlich ist bei diesem Konzept die Funktion der variablen Zeilenbreite. Sie ist im Normalfall auf 40 Zeichen eingestellt, das heißt nachdem der rechte Bildschirmrand erreicht wird springt der Cursor in eine neue Zeile. Wer möchte, kann aber auch bis zu 240 Zeichen in eine Zeile eingeben, der Text wird dann horizontal verschoben. Eine solche Funktion ist aber eigentlich nur bei einem rein bildschirmorientierten Textsystem sinnvoll, in der Regel wird man deshalb auch bei 40 Zeichen pro Zeile bleiben.
+
+## Vizawrite 64 kann's besser
+
+Vizawrite 64 ist dagegen voll-kommmen bildschirmorientiert. Der Text wird im Schreibmodus so eingegeben und formatiert, wie er später aussehen soll. Der Text wird dabei, entsprechend der in der jeweiligen Formatzeile angegebenen Zeilenbreite, horizontal verschoben. Alle Absätze, Einrückungen und Zentrierungen haben direkte Wirkung auf das Aussehen des Textes. Vizawrite 64 besitzt keinen »Anseh-Modus«, mit dem der Text in seinem späteren Aussehen, möglicherweise sogar in 80-Zeichendarstellung, betrachtet werden kann. Wer den Text als ganzes sehen möchte, ohne dabei mit dem Cursor durch die Zeilen fahren zu müssen, kann den gesamten Text mit der »Width-«Funk-tion blitzschnell auf 40 Zeichen umformatieren. Da in diesem Modus weiterhin geschrieben werden kann, ist die Korrektur eines Textes schnell durchführbar. Aber auch beim Editieren eines Textes ist Vizawrite 64 seinem Konkurrenten überlegen. Bei Vizawrite 64 können beliebige Textteile (auch mitten aus einer Zeile heraus) kopiert, dupliziert oder aber gelöscht werden. Die betreffenden Textteile werden durch überfahren mit dem Cursor (auch Zeilen- und Seitenweise möglich) hell unterlegt. Durch Bestätigung mit der RETURN-Taste wird die gewünschte Funktion mit sehr hoher Geschwindigkeit ausgeführt. Die Bedienung ist dabei denkbar einfach. Soll beispielsweise mitten in einer Zeile ein ganzer Satz eingefügt werden, genügt ein Druck auf die F7-Taste, um beliebig viele Zeichen einzufügen. Drückt man nochmals auf die F7-Taste, wird der restliche Text perfekt an den neu geschriebenen Text angefügt.
+
+Mit Textomat Plus ist das schon etwas komplizierter. Zunächst gestattet dieser nur das zeilenweise Kopieren oder Verschieben, wobei zunächst ein Block markiert werden muß. Zum anderen ist ein Löschen nur zeilenweise, oder ab Cursor/bis Cursor möglich. Ein Einfügen von Text ist ähnlich wie bei Vizawrite 64, leider werden dabei immer wieder Leerzeichen hinzugemogelt, die zwar nicht den Ausdruck verändern, wohl aber die Übersichtlichkeit erschweren. Diese Leerzeichen werden deshalb eingefügt, weil Textomat Plus bei allen Editierbefehlen immer nur zwei Zeilen hinter dem Cursor erkennt. Beim Löschen entsteht deshalb in der zweiten Zeile eine Lücke. Übrigens ist es bei Textomat Plus nur im Einfüge-Modus möglich, einen nachträglichen Absatz einzufügen, denn sonst wird beim Drücken von SHIFT-RETURN der Rest der Zeile einfach gelöscht. In Praxi sind somit im ungünstigen Fall bis zu vier Tasten notwendig, um einen Absatz nachträglich zu setzen. Auch sollte die Funktion von RETURN (Zeilenwechsel ohne Absatz) und SHIFT-RETURN (Zeilenwechsel mit Absatz) vertauscht werden.
+
+Textomat Plus arbeitet mit einer Vielzahl von Menüs (Bild 1). Diese Menüs zum Ansteuern der Befehle sind alle hierarchisch geordnet. Um zu einer bestimmten Funktion zu kommen, bietet Textomat Plus zwei Wege an. Entweder wird von oben nach unten durch alle Menüs gewandert, oder aber der direkte Weg durch Drücken einer bestimmten Taste im Menü-Modus gewählt. Leider ist letzterer Weg zurück zum Schreibmodus nicht möglich. Es bleibt oft nichts anderes übrig, als immer wieder auf die Funktionstaste F2 zu drücken, bis man wieder im Schreibmodus ist. Eine »Escape«-Taste, die sofort wieder in den Schreibmodus führt, wäre sicherlich eine sinnvolle Ergänzung.
+
+Vizawrite 64 kennt dagegen nur zwei Menüs: Das Haupt- und das Druckermenü. Alle wesentlichen Funktionen werden direkt durch bestimmte Tasten in Verbindung mit der Commodore-Taste aufgerufen. Ein effizientes Verfahren, an das man sich schnell gewöhnt.
+
+Bislang haben wir hauptsächlich die Standardfunktionen unserer beiden Testkandidaten betrachtet. Dabei ist es natürlich unmöglich, alle Funktionen direkt miteinander zu vergleichen. Eine Übersicht aller Funktionen von Textomat Plus und Vizawrite 64 ist deshalb in Tabelle 1 zusammengestellt.
+
+## Das große Plus
+
+Beim Textomat Plus wurden erstmalig eine Reihe von Sonderfunktionen programmiert, die sonst in keinem anderen Textverarbeitungsprogramm für den Standard C 64 zu finden sind. In diesem Abschnitt soll darauf etwas genauer eingegangen werden.
+
+Textomat Plus verarbeitet Grafiken! Einerseits ist es möglich Grafiken einzuladen, zu betrachten und ganz oder abschnittweise abzuspeichern. Andererseits werden durch ein spezielles Steuerzeichen Grafiken, die im Standardformat ab dezimal 8192 = hex 2000 abgespeichert sind, im Text eingefügt (Bild 2). Leider kann bei dieser Funktion der Grafikabschnitt immer nur vertikal und nicht horizontal bestimmt werden, deshalb ist es auch nicht möglich, links oder rechts neben eine Grafik etwas zu schreiben. Das geht nur, wenn man das Papier entweder von Hand zurückdreht oder bei Druckern mit Rückwärtstransport die entsprechenden Steuerzeichen sendet.
+
+Jedes Terminalprogramm ist eigentlich auch ein kleines Textverarbeitungsprogramm. Warum sollte deshalb nicht in einem Textverarbeitungsprogramm auch ein Terminalmodus vorhanden sein? Textomat Plus besitzt eine spezielle Funktion zum Senden und Empfangen von Texten via Akustikkoppler. Am günstigsten ist es, wenn empfangene Texte von einem Computer gesendet wurden, der ebenfalls mit Textomat Plus arbeitet. In diesem Fall kommt es zu keinerlei Problemen beim Datenempfang. Soll aber beispielsweise mit einer Mailbox kommuniziert werden, wird es notwendig, zuerst eine RS232-Parameterta-belle und dann eine Liste der ASCII-Zeichen einzugeben. Hier wäre es wünschenswert, wenn die gängigsten Normen auf der Masterdiskette mitgeliefert würden oder wenigstens im Handbuch aufgeführt wären. Mit einem speziellen Terminalprogramm ist Textomat Plus allerdings nicht zu vergleichen.
+
+### Allerlei Druckmodi
+
+Das wohl interessanteste am Textomat Plus sind seine verschiedenen Druckmodi. Er besitzt drei davon, mit jeweils ganz unterschiedlichen Fähigkeiten. Der wohl gebräuchlichste ist der Standarddruck, bei ihm werden die Zeichen in Form eines Codes an den Drucker geschickt. Das hat den Vorteil, daß der Ausdruck relativ schnell vonstatten geht und alle Steuerzeichen (Fettschrift, Unterstreichen) verarbeitet werden.
+
+Im Grafikdruck werden alle Zeichen über Grafik erzeugt (auch auf den Commodore-Druckern!). Das bedeutet, daß eine selbst entworfene Schrift und diese sogar in proportionalem Zeichenabstand auf das Papier gebracht werden kann. Diese Methode verlangsamt den gesamten Druckvorgang natürlich wesentlich, außerdem werden keine Steuerzeichen mehr akzeptiert. Einzige Ausnahme sind Drucker mit einem ladbaren Zeichensatz. Wer sich auf eine 11*8 Punktmatrix beschränkt, kann auch weiterhin Steuerzeichen verwenden.
+
+Als Mischdruck wird beim Texto-mat Plus ein Druckverfahren bezeichnet, das sich aus dem Standarddruck und dem Grafikdruck zusammensetzt. Dieser Mischdruck erlaubt die Definition eigener Sonderzeichen, die dann im Grafikdruck eingefügt werden.
+
+### Hilfsprogramme eingebaut
+
+Natürlich ist es ohne geeignete Hilfsprogramme nicht gerade einfach, einen neuen Drucker- oder Bildschirmzeichensatz zu entwerfen. Deshalb hat man den Textomat Plus auch mit einer ganzen Reihe von Programmierhilfen ausgestattet. Ein komfortables Programm (von T. Müller) das direkt aus dem Textmodus geladen werden kann, erfüllt alle Ansprüche an einen komfortablen Bildschirm- und Zeicheneditor (Bild 3). Die Definition neuer Zeichen wird so kinderleicht. Besondere Befehle erlauben es, ein Zeichen vielgestaltig zu bearbeiten. Wer mit neuen Schriften, aber auch mit wissenschaftlichen Sonderzeichen arbeiten muß, wird von dieser Funktion des Textomat begeistert sein.
+
+### Flexibilität großgeschrieben
+
+Textomat Plus ist so programmiert, daß es mit möglichst vielen Druk-kern zusammenarbeitet. Neben der bereits vom Vorgänger her bekannten Tabelle zur ASCII-Code-Zuwei-sung, sind bereits aufder Masterdiskette einige Steuer-Codes wichtiger Druckertypen abgespeichert (siehe Tabelle). Textomat Plus arbeitet außerdem mit einigen Datenbanken (Superbase, Datamat) zusammen, um Serienbriefe erstellen zu können. Für kleinere Anwendungen ist es sogar vorgesehen, eigene Adreßdateien anzulegen, die später im Text eingefügt werden. Endlich ist es auch möglich, den Druck vorzeitig abzubrechen.
+
+Textomat Plus ist ohne Zweifel eines der besten Textverarbeitungsprogramme für den C 64. In einigen Bereichen ist er sogar unerreicht. Leider weist der Schreib-Modus einige Mängel auf, die Textomat Plus von der professionellen Ebene (in der er sich preislich bewegt) trennen. Die exzessive Menütechnik ist Geschmacksache. Bei längerem Arbeiten wird es allerdings lästig, die Menüs rauf und runter zu wandern, man tut gut daran die Befehlstasten schnell zu lernen. Der größte Mangel des Textomat Plus ist aber die extrem unkomfortable Art der Textkorrektur. Es kann niemanden zuge-mutet werden, sich alle Änderungen, die ihm im »Anseh-Modus« auffallen, zu merken, um sie später im Schreibmodus zu korrigieren. Vorbildlich ist dagegen die Hilfsprogrammsammlung. Es gibt kein anderes Textverarbeitungsprogramm, das auch nur ähnliche Manipulationen des Bildschirm- und Druckerzeichensatzes zuläßt.
+
+Wenn es darum geht, schnell und sehr komfortabel Texte zu erstellen, ohne dabei auf spezielle Grafikschriften zurückzugreifen, gibt es nach wie vor kaum ein besseres Programm als Vizawrite 64. Die reichhaltige Ausstattung und die Möglichkeit, beliebig viele Druckbefehle zu definieren, heben Vizawrite 64 eindeutig in die professionelle Klasse. Es ist natürlich Ansichtssache, aber es scheint, daß ein konsequent bildschirmorientiertes Textsystem am vorteilhaftesten ist. Unerreicht ist bislang die Korrektur- und Editierfunktion von Vizawrite 64. Schon oft haben wir das beliebige Umkopieren oder Löschen einzelner Textteile schätzen gelernt. Mit 34 000 freien Zeichen ist der Textspeicher von Vizawrite 64 übrigens um 10000 Zeichen größer als beim Textomat Plus.
+
+Wer gerne mit Schriften experimentiert, oder aber Grafik und Text mischen möchte, aber auch diejenigen, die oft spezielle Sonderzeichen benötigen, sind mit Textomat Plus (248 Mark) bestens bedient. Für alle, die schnell, komfortabel und vor allem übersichtlich Texte erstellen möchten, bleibt Vizawrite 64 (298 Mark) die beste Empfehlung.
+
+(Arnd Wängler/gk)
+
+Bezugsquellen: Textomat Plus: Data Becker, Postfach 1440, 4000 Düsseldorf 1, Vizawrite 64: Interface Age, Josephsburgstr. 6, 8000 München 80
+
+# Macro-Basic: Die Unterprogramm-Bibliothek [137-139]
+
+> Herkömmliche Basic-Erweiterungen sind in der Regel aus einem Guß, mit vielen nützlichen, aber auch unnötigen Befehlen. Und oft fehlen gerade die Funktionen, die man am dringendsten braucht. Damit will Macro-Basic ein für anemal Schluß machen.
+
+An anderen Befehlserweiterungen fehlt immer etwas: Exbasic Level II hat keine Grafikmöglichkeiten, Simons Basic kein richtiges RENUMBER, um nur einige Beispiele zu nennen. Der Gedanke, ein flexibles Software-Instrument zu bauen, welches aus einer Vielzahl von Modulen besteht, die man — je nach aktuellem Bedarf — in den Computer lädt, drängt sich da geradezu auf. Verwirklicht wurde dieses einleuchtende Konzept mit Macro-Basic.
+
+Packt man Macro-Basic aus, dann fällt dem in dieser Hinsicht von Commodore nicht gerade verwöhntem C 64-Besitzer zunächst einmal ein mehrere hundert DIN-A4-Seiten starkes Handbuch auf. Da merken Sie dann, was es heißt, seinen verfügbaren Basic-Befehlssatz in etwa zu vervierfachen. Das ist aber noch nicht alles, denn im Mai soll noch eine Grafikerweiterung auf den Markt kommen mit nochmal 18 neuen Befehlen. Daneben übersieht man fast die doppelseitig beschriebene Diskette und den Dongle, einen Kopierschutzstecker, der in den Kassettenport geschoben werden muß.
+
+Wie ist Macro-Basic aufgebaut? Zwei Softwarepakete bilden derzeit das komplette System, von denen das erste aus einem Ladeprogramm und 260 Befehlen besteht, das zweite aber eine Dateiverwaltungs-Bibliothek mit weiteren 30 Befehlen bereithält. Das Ganze verteilt sich auf 160, größtenteils voneinander unabhängige, Module, die mittels eines Linkprogramms nach Belieben zusammengestellt werden können. Theoretisch verfügt man mit Macro-Basic nicht nur über eine, sondern über 160 x 160 = 25 600 mögliche Befehlserweiterungen, je nachdem, wie man sich die Module zusammenbastelt. Jedes Modul enthält einen oder meist mehrere Befehle in Form von optimierten Maschinenprogrammen. Das kleinste Modul beansprucht 7 Byte, das größte — wenn ich mich nicht vertan habe — 3670 Byte an Speicherplatz. Im Schnitt opfert man für jedes Modul etwa 100 bis 200 Byte. Wohin man im Speicher seine Befehlsbibliothek packen will, bleibt im eigenen Ermessen. Eine fertig erstellte Basic-Erweiterung kann unter einem Kennwort abgespeichert werden. Sollten Sie Zugang zu anderen Commodore-Computern haben, dann können Sie die Befehlserweiterung auch auf diese anwenden, denn Macro-Basic ist mit besonderem Augenmerk auf Kompatibilität gebaut worden.
+
+Das Erstellen der individuellen Basic-Erweiterung geschieht relativ einfach im Dialog. Dazu lädt man das erste Programm auf der Macro-Basic-Diskette, gibtein, aufwelchem Commodore-System man arbeitet, steckt auf Anforderung den Datenstecker in den Kassettenport und gibt an, wo im Speicher die Maschinenprogramme abgelegt werden sollen. Man hat dann die Möglichkeit, sich auf dem Drucker ein Protokoll der weiteren Prozedur mitschreiben zu lassen. Das empfiehlt sich besonders bei größeren Erweiterungen, weil man nach einiger Zeit sicher nicht mehr weiß, welche Kombinationen man gewählt hat, und wohin man im Speicher das ganze Werk lädt. Die Startadresse braucht man nämlich, um die Erweiterungzu initialisieren. Von nun an ist alles ein Kinderspiel. Das Programm erfragt Stück für Stück die Kennzahlen der einzelnen Module bis man schließlich END eingibt. Dann erteilt man dem Ganzen einen Namen, legt eine formatierte Diskette ins Laufwerk, der Drucker schließt das Protokoll ab und das Ladeprogramm speichert alles ab, bevor es sich diskret aus dem Geschehen zurückzieht. Zum Testen habe ich mir mal eine Erweiterung aus 154 Modulen zusammengestellt, die etwa 23,6 KByte beansprucht. Das Ganze dauert ungefähr eine halbe Stunde. Wenn man mehr Übung darin hat, reduziert sich der Zeitaufwand sicher noch erheblich. In diesen 23,6 KByte liegen immerhin 260 neue Befehle! Für den Normalgebrauch kommt man sicher leicht mit den 4 KByte im oberen RAM des Commodore 64 ($C000 bis $D000) aus.
+
+Benötigt man nun irgendwann eines der auf diese Weise zusammengestellten Instrumente, dann lädt man es unter dem zugeteilten Namen, gibt danach NEW ein und startet mittels SYS Startadresse,*. Die Startadresse holt man sich aus dem Protokoll als Startadresse Original. Automatisch wird nun auch der Basic-Speicher begrenzt und alle Befehle der Erweiterung stehen zur Verfügung.
+
+Um welche Befehle es sich dabei handelt, sehen Sie aus der beigefügten Tabelle. Es ist allerdings unmöglich, in diesem Rahmen alle 290 Befehle vorzustellen. Deswegen habe ich nur eine — sicherlich etwas willkürliche — Auswahl der wichtigsten dort aufgeführt. Allen Macro-Basic-Befehlen ist ein »&« voranzustellen.
+
+Sind Sie ein Verfechter der strukturierten Programmierung? Dann verfügen Sie über Befehle wie IF... THEN... ELSE... ENDIF, aber auch SELECT. CASE.. OTHER.. ENDSEL, DO...DO WHILE...DO UNTIL... mit END DO und EXIT Label können gesetzt und mit GOSUB oder GOTO angesprungen werden. Echte Unterprogramme mit eigenen Variablen, die per CALL anzusteuern sind, sind möglich. Variable und Arrays können aber auch vom Hauptprogramm an das Unterprogramm übergeben werden. Mittels ’ (Hochkomma) können Kommentare ins Programm geschrieben werden. Durch SUBMIT ist es möglich, auf einfache Weise mit Overlay-Technik zu arbeiten, was auch durch den OVERLAY-Befehl für einzelne Programme möglich ist. ON ERROR und RESUME erlauben das Auffangen von Fehlermeldungen, die in Variablen EC%, EL% und ET$ als Fehlercode, fehlerhafte Basic-Zeile und Fehlertext abfragbar sind. Fast schon selbstverständlich sind Befehle wie AUTO (AUTONUMBER-Funktion, die auch noch Texte wie zum Beispiel DATA schreiben kann), BLOAD oder BSAVE (ladender oder speichernder Zugriff auf beliebige Speicherbereiche), DELETE (Löschen beliebiger Zeilen), DLINK (Anhängen von Programmen) und DMERGE (Mischen von Programmen nach Zeilennummern!), DUMP-Funktionen, die auch die Auflistung von Arrays erlauben, LIM (zum Begrenzen des Basic-Speichers), LPA-GE (zum seitenweisen Vorwärtsoder Rückwärts-Auflisten von Programmen), RENUM (das ist ein echtes RENUMBER), RLOAD (zum Laden und Starten eines Programmes), FIND und SEARCH (durchsucht Programme nach Variablen, Befehlen oder Konstanten und listet nach Speicherposition oder Basic-Zeilen-nummer auf) und TRACE-Möglichkeiten zur schrittweisen Bearbeitung von Basic-Programmen.
+
+Der Verkehr mit Peripherie wird gefördert durch SPOOLING-Befeh-le, Anweisungen zur Druckeranpassung, DISK zum Ermitteln von Diskettenparametern, HCOPY zum Ausdrucken des Bildschirminhaltes. SCR LOAD oder SAVE erlaubt das Einladen oder Abspeichern von Bildschirmen. Mittels RLIST und SLIST lassen sich relative oder sequentielle Dateien auf dem Bildschirmzeigen. TURBO beschleunigt Diskettenoperationen.
+
+Grafiken können — ab Mai angekündigt, auch mit Hochauflösung — durch Pixel oder Balken erstellt werden. FLASH-Funktionen lassen Bildschirmteile blinken, SOUND und BEEP sorgen für Lautuntermalungen. Eine Reihe von Befehlen greifen direkt auf den Bildschirm zu und erlauben beispielsweise das Füllen von Fenstern mit Zeichen.
+
+Mathematisch Interessierte haben eine Vielzahl von neuen Möglichkeiten zur Verfügung, angefangen vom ACOS über Rechnungen mit mehrfach genauer Zahlendar-stellung(biszu 100Ziffern!), Umrechnungen innerhalb der Zahlensysteme dezimal/sedezimal/binär, Winkelmaß-Umrechnungen etc. bis zur Berechnung des Gregorianischen Datums aus dem Julianischen und umgekehrt. Strings können wie mathematische Ausdrücke behandelt oder sogar als Basic-Anweisungen interpretiert werden.
+
+Und beim Stichwort Strings sind wir bei der eigentlichen Stärke von Macro-Basic angelangt. Ich habe nie gewußt, was man alles mit Strings anstellen kann, bis ich Macro-Basic kennenlernte! Sie werden kaum eine String-Operation vermissen. Mir ist jedenfalls keine mehr eingefallen. Ob es sich um Suchen von ganzen Strings oder Teilen davon, Tauschen oder Verändern, Ein- oder Ausgabe, Positionieren, Prüfen, Umwandeln, Formatieren, Löschen... dreht, alles ist vorhanden.
+
+Stringverarbeitung spielt beim Verwalten von Daten eine Rolle. Neben einer ganzen Reihe von neuen Befehlen, die den Datenzugriff auf Diskette oder im Speicher betreffen, gibt es sechs Module mit 30 Befehlen, die einen Dateityp schaffen, der ISAM/VSAM genannt wird. ISAM kennt vielleicht manch einer als IBM-Begriff: Indexed Sequential Access Method (also Index-sequen-tieller Dateizugriff). VSAM steht für Virtual Storage Access Method, also virtuelle Dateizugriffsmethode. Mittels ISAM/VSAM kann auf dreierlei Wegen Dateiverarbeitung geschehen: Sequentielle Verarbeitung in der Eingabereihenfolge, sequentielle Verarbeitung in Schlüsselfolgen und die gezielte Verarbeitung über Schlüssel. Datensätze dürfen variable Länge haben, die Datenspeicherung erfolgt blocküberspannend, mehrere Schlüssel dürfen pro Datensatz verwendet werden, aber auch mehrere Datensätze pro Schlüssel sind möglich, wobei übrigens der Schlüssel nicht Bestandteil des Datensatzes sein muß. Bis zu fünf Diskettenstationen der unterschiedlichen CBM-Formate können parallel verwaltet werden. Außer den Befehlen zum Einrichten, Löschen und Sichern solcher Dateien stehen Befehle zum Verarbeiten von Diskettenfehlern, zum Update, zum Suchen von Datensätzen, zum Überschreiben, zum Kopieren, zum Reorganisieren der Datei beziehungsweise der Einträge zur Verfügung.
+
+Sicherlich werden Sie in dieser Beschreibung Befehle vermissen. Das liegt aber nicht daran, daß Macro-Basic sie nicht zur Verfügung stellen würde, sondern daran, daß es unmöglich ist, hier alle aufzuführen. Kritik muß das Handbuch finden. Nicht, daß es vor Rechtschreibfehlern nur so strotzt stört, sondern, daß es offensichtlich für die großen Brüder des Commodore 64 geschrieben wurde, denn alle den Bildschirm betreffenden Operationen beziehen sich auf einen Bildschirmstart bei 32768. Einige Demoprogramme enthalten schlichtweg Fehler. Der Gebrauch der Bezeichnung BCD (binary coded decimal) als Abkürzung für Bildschirmcode verwirrt auch einigermaßen. Der Autor versichert aber, das Handbuch sei inzwischen überarbeitet worden und die neue Version enthalte diese Fehler nicht mehr. Der Preis hält sich im üblichen Rahmen: 298 Mark zahlt man für die Normalausführung (inklusive Dongle), dazu noch 34 Mark für das Handbuch. Als Zusatzpackung erhält man für 148 Mark die ISAM/VSAM Dateipackung. Nach Auskunft des Autors sind der Grafikzusatz und weitere geplante Ergänzungen darin schon enthalten.
+
+Fazit: Durch Macro-Basic wird der Commodore 64 zu einem derart vielseitigen Computer, daß dieses Software-Paket für ernsthafte Anwender guten Gewissens zu empfehlen ist.
+
+(Heimo Ponnath/gk)
+
+Info: S&A Software, Bernd, Lambertusstr. 32, 5210 Troisdorf-Muellekoven
+
+# Directory-Manipulationen [140-142]
+
+> Wer seine Programme vor den Augen anderer schützen möchte, der muß heutzutage schon zu recht harten Methoden greifen. Erstaunlich ist, was man allein schon mit dem Directory einer Diskette anfangen kann.
+
+So mancher benutzt den C 64 doch tatsächlich noch, um Programme selber zu schreiben, und nicht nur zur Anwendung von »vorgefertigter« Software, nicht zuletzt Spielen. Und diese selbstgeschriebenen Meisterwerke sollen vor fremdem Zugriff, also dem Kopieren geschützt werden. Allerdings haben sich gerade manche dieser unermüdlichen Freaks darauf spezialisiert, Kopierprogramme zu schreiben, die einfach alles kopieren, was sich auf der Diskette befindet, seien das »Errors«, »Halb-« oder »verschmierte Spuren«, »Lük-ken« und »Synchronmarkierungen«. Ein wirksamer Kopierschutz ist also kaum noch realisierbar. Eines kann man aber nach wie vor: Die Programme wenigstens so sicher machen, daß keiner einen Blick hinter die Kulissen werfen, oder gar Teile in eigene Programme übernehmen kann. Meistens ist dann von »Autostart« und »Listschutz« die Rede. Ein Kapitel, mit dem man sich noch relativ wenig beschäftigt hat, sind die Directories der Disketten. Gerade diese lassen sich mit relativ wenig Aufwand so geschickt »vermurksen«, daß ein nicht Eingeweihter beim Versuch an das Programm heranzukommen, dasteht, wie der Ochs vorm Berg.
+
+Alle hier vorgestellten Methoden haben allerdings einen Nachteil: Sie schützen nicht vor Kopierversuchen mit Programmen, die ganze Disketten blockweise kopieren (FCopy, Quickcopy und ähnliche). Sie verhindern aber den Einblick in die abgespeicherten Programme, unter denen sich dann natürlich ein Schutzprogramm befinden kann. Alles, was Sie im folgenden benötigen, ist ein Diskettenmonitor, beispielsweise den SMON, sowie Grundkenntnisse über die Blockorganisation auf Diskette.
+
+## Der Trick mit dem Gänsefüßchen
+
+Ein absoluter Verblüffungseffekt läßt sich mit minimalem Aufwand erreichen, man benötigt noch nicht einmal einen Diskmonitor. Werfen Sie doch mal einen genauen Blick auf das Directory in Bild 1. Und nun überlegen Sie sich mal, wie Sie das zweite Programm laden können, das von der Blocklänge her das Hauptprogramm sein müßte. Das Problem scheint unlösbar, lädt doch LOAD ”*”,8 immer das erste Programm. Welchen Filenamen hat denn das zweite Programm überhaupt? Nun, des Rätsels Lösung lautet: Das Filename lautet» ” «. Dies ist kein Druckfehler, sondern tatsächlich ein einzelnes Gänsefüßchen. Nun, selbst mit dieser Information scheinen wir aber immer noch nicht weiter zu kommen: LOAD	,8 erzeugt eine Fehlermeldung. Falls Sie selbst drauf kommen wollen: Denken Sie an den ASCII-Code. Und für alle anderen, die es nicht selber ausknobeln wollen: Der entsprechende LOAD-Befehl lautet: LOAD CHR$(34),8
+
+Das Gänsefüßchen hat den ASCII-Code 34. Der einzige Weg, dies als Filenamen an die Floppy zu senden, ist die CHR$-Funktion. Das Ganze funktioniert analog dazu beim SAVE-und VERIFY-Befehl.
+
+Und das ist noch nicht alles: Probieren Sie mal doch spaßeshalber folgenden SAVE-Befehl aus: SAVE "64"CHR$(34)"ER",8. Nachteil dieser Schreibweise: Das Programm läßt sich vom Unkundigen auch mit LOAD"64*",8 laden. Wichtig zu wissen ist nur folgendes: Tauchen im Filenamen ein oder mehrere Gänsefüßchen auf, so folgt kein abschließendes Gänsefüßchen. Der ganze Dreh beruht auf einigen Macken in der Directory-Sende-Routine des Floppy-DOS.
+
+Noch eines ist interessant: Hinter dem Anführungszeichen im Filenamen werden die folgenden Steuercodes (Farbwechsel, Cursorbewegungen und ähnliches), sofern deren ASCII-Codes unter 128 liegen, nicht in Grafikzeichen übersetzt, sondern ausgeführt. Farbige Directories? Warum nicht!
+
+## Schräge Typen
+
+Hiermit sind nicht die dunklen Gestalten aus Gangsterfilmen gemeint, sondern die vermurkste Anzeige des Filetyps im Directory. Schauen Sie noch einmal auf das Beispieldirectory in Bild 1. Glauben Sie mir, daß der dritte Eintrag kein sequentielles File, sondern ein Programm ist? Schön und gut, werden Sie sagen, aber wie lad ich's? Auch hier darf über die Einfachheit gestaunt werden: Es genügt ein einfaches LOAD"6510,S,R",8 und schon wird ganz brav das doch eigentlich sequentielle File in den Computerspeicher befördert. Natürlich muß hier vorher mit SAVE"6510,S,W" gearbeitet worden sein. Leider kann man auch echte sequentielle Files so laden, was dann und wann zu einem sauberen Systemabsturz führen kann. Damit die Vielfalt gewährt bleibt, funktioniert der Trick auch mit USR-Files, dann muß allerdings auch im LOAD-Befehl ein »U« anstelle eines »S« stehen.
+
+Probleme gibt es allerdings bei relativen Files. Hier weigert sich die Floppy beharrlich, selbige als Programm an den Computer zu senden.
+
+So, nun wird es etwas komplizierter. Als nächstes wollen wir einzelne Files kurzzeitig »wiederbeleben«. Dazu brauchen wir aber die Block-Lese- und Schreib-Befehle.
+
+Im folgenden benötigen wir eine leere Diskette. Dann speichern wir das zu sichernde Programm ab und danach ein Ladeprogramm, über das gleich noch zu reden sein wird. Wichtig ist, daß diese Reihenfolge streng eingehalten wird. Und nun benutzen wir den Scratch-Befehl der Floppy, um das erste File, also das Hauptprogramm, wieder zu löschen. Warnung! Ab sofort dürfen keine Schreibzugriffe mehr auf diese Diskette ausgeführt werden. Im Directory ist jetzt also nur das zweite File, der Lader, verzeichnet? Weit gefehlt: Das erste File steht jetzt immer noch auf der Diskette und im Diskettendirectory, allerdings mit dem Filetyp *DEL. Der Stern vor dem DEL ist ebenfalls kein Druckfehler, sondern bedeutet in der Directory-Sprache, daß ein nicht ordnungsgemäß geschlossenes File vorliegt. Solche Sternchen findet man meist bei sequentiellen Dateien, wenn man einen Fehler gemacht hat, oder bei Programm-Files, wenn diese nicht mehr auf die Diskette paßten. Und da sich unsere Floppy intelligent schimpft, unterschlägt sie die *DEL-Einträge beim Laden von Directories in den Computerspeicher, um uns nicht mit nicht mehr vorhandenen Files nerven zu müssen. Natürlich ist das File auch noch auf der Diskette vorhanden. Um es wieder zu regenerieren, muß das Filetyp-Byte des Eintrages auf den Wert 130 ($82) gesetzt werden. Beim ersten Eintrag ist das Filetyp-Byte das Byte Nummer 2 (also das dritte! Zählungen beginnen bei Computern grundsätzlich bei Null) im Block Track 18, Sektor 1. Im Lader sollte nun in etwa folgende Befehlssequenz stehen:
+OPEN 3,4,3,"#”
+OPEN 15,8,15
+PRINT#15,"U1:3 0 18 1”
+PRINT#15,"B-P:3 2”
+PRINT#3,CHR$(130)
+PRINT#15,"U2:3 0 18 1”
+PRINT#15,"I"
+CLOSE 15,3
+LOAD":*",8
+
+Der letzte LOAD-Befehl lädt nun nicht, wie man bei einem Blick auf das Directory vermuten würde, das Ladeprogramm, sondern das Hauptprogramm, das wir jetzt regeneriert haben. Wichtig ist, daß die Diskette vor dem Laden des Hauptprogramms initialisiert wird. Die Floppy merkt sich nämlich immer einige Teile des Directories, und liest diese gar nicht erst von der Diskette, wenn ein Directory vom Computer abgerufen wird. Die Folge wäre, daß wir immer noch nicht mit dem alten Directory arbeiten, obwohl schon das neue auf der Diskette steht. Beim Initialisieren werden dann allerdings die internen Zwischenspeicher der Laufwerks aktualisiert.
+
+Die ersten Befehle im Hauptprogramm sollten das Hauptprogramm auf der Diskette wieder »löschen«, indem die obere Sequenz verwendet wird, aber anstelle des CHR$(130) ein CHR$(0). Dies ist die Kennzeichnung für ein *DEL-File. Das geht schneller und ist weniger auffällig als ein Scratch-Befehl.
+
+Dieses Prinzip läßt sich fast beliebig ausweiten und stark verbessern, so zum Beispiel wenn man die Filenamen verändert oder die Angabe der Anzahl der Blöcke, die ein Programm belegt. Wer hier ansetzen will, der sollte sich ruhig noch einmal die Folgen Eins und Zwei unseres Floppykurses ansehen (64’er, Ausgabe 10und 11/84), dortsindalle wichtigen Informationen über den Directoryaufbau enthalten.
+
+Ein Nachtragzu Bild 1: Falls Sie die komische FREE-Meldung irritiert haben sollte: Sie läßt sich durch Freigeben aller Blöcke in der BAM mittels Diskmonitor erreichen.
+
+## Ein Directory verschwindet...
+
+Eine gute, alte Lebensweisheit lautet: »Wenn du nicht überzeugen kannst, verwirre!« Ähnliches haben wirjetzt vor, denn jeder, der sich von den bisherigen Tricks nicht überzeugen ließ, den versuchen wir jetzt durch ein nicht vorhandenes Directory in tiefste Zweifel an der eigenen Intelligenz (und der der Floppy) zu stürzen.
+
+Es gibt zwei verschiedene Methoden, Directories gegen Einblick zu sichern. Die bekanntere folgt zuerst: Wer sich ein wenig mit der internen Struktur des C 64 auskennt, der weiß, daß der LIST-Befehl nur so lange arbeitet, bis er auf die Bytefolge 0,0,0 also dreimal Null, stößt. Dann wird das LISTen eines Programms sofort abgebrochen. Nun, was ist ein Directory, sofern es im Computerspeicher steht, aber anderes als ein nicht lauffähiges aber LISTbares Programm? Bringen wir irgendwo die drei Nuller unter, haben wir schon fast gewonnen. Wo man die drei Nuller versteckt, hängt ganz vom Benutzer ab: Ganz zu Anfang im Diskettennamen oder erst später in irgendeinem Filenamen, so daß man zumindest noch die ersten Filenamen lesen kann.
+
+Dieser Trick in Verbindung mit anderen (Cursorbewegungen, Reversumschaltungen), sorgt schon für einigermaßen große Verblüffungseffekte.
+
+Nachteil dieser Methode: Sie ist schon sehr bekannt, und außerdem steht das Directory im RAM des Computers und kann entweder mit einem Monitor oder aber mit einigen Tricks wieder LISTbar gemacht werden.
+
+Noch gemeiner und sicherer, aber einfacher, kann man folgendermaßen vorgehen: Nehmen wir an, auf der Diskette befinden sich maximal acht Programme. Damit ist nur der Directoryblock 18,1 belegt. Die ersten beiden Bytes dieses Blocks enthalten die Werte 0 und 255, um 18,1 gleichzeitig als letzten Directoryblock zu kennzeichnen. Ändern Sie diese Werte mit einem Diskmonitor auf zwei völlig verrückte Werte, so zum Beispiel 64,85. Sollten Sie nun ein Directory laden wollen, beschwert sich die Floppy mit »ILLEGAL TRACK OR SECTOR«. Der Hammer bei der Geschichte ist aber: Es wird kein Filename an den Computer gesandt, beim Auflisten des Directories sieht man nur den Diskettennamen und die ID. Hier helfen dann auch keine Tricks und kein Monitor mehr: Das Directory, oder zumindest die vernünftigen ersten Einträge kommen nie beim Computer an.
+
+Trotzdem funktionieren LOAD-Befehle immer noch einwandfrei, die floppyinternen Funktionen des Directory sind also nicht außer Kraft gesetzt. Einziger Nachteil der Methode ist, daß man sich auf acht Fi-leeinträgebeschränkenmuß. Natürlich lassen sich alle bisher vorgestellten Methoden beliebig miteinander kombinieren, auch wenn das im Augenblick sinnlos erscheint. Wieso sollte man schon die Filetyp-Einträge manipulieren, wenn man doch niemals ein Directory sieht? Aber gerade die Kombination macht es dem Neugierigen besonders schwer, hinter die Geheimnisse des Directories zu kommen.
+
+## Die beste Methode »Compiler Schutz«
+
+Zum Schluß noch einige allgemeine Tips: Schutzprogramme, die in Basic geschrieben wurden, sollten Sie unbedingt compilieren. Jeder Compiler erstellt einen derartigen »Wurschtel«-Code, der fast unlesbar ist, so daß da selbst die ausgebuffte-sten Knack-Profis resignieren müssen. Wichtig ist aber, daß Befehle, die an die Floppy gesandt werden, im Programmtext verschlüsselt stehen sollten. Zum Beispiel, in dem sie mit dem CHR$-Befehl arbeiten und die einzusetzenden Zahlenwerte über einen Entschlüsselungsalgorithmus errechnet werden. Dann kann man dem Compilat noch nicht einmal über einen Monitor entnehmen, welche Befehle zur Floppy gesandt werden. Soweit zu den Manipulationen an der Directory. Der Einblick in unsere Disketten ist nun verwehrt. Verwenden Sie dann auch noch einen Compiler, bleibt auch das Programm ein Buch mit sieben Siegeln. Nun sollten Sie auch noch Autostart-Programme verwenden. Wie man ein Autostart-File erzeugt, das mit verblüffenden Eigenschaften ausgestattet ist, werde ich in einer der nächsten Ausgaben zeigen.
+
+(Boris Schneider/rg)
+
+# New York City — The Big Apple & Air Support [145]
+
+Lange hat es ja gedauert, aber jetzt ist es da, oder besser gesagt, sind sie da, zwei neue Spiele der amerikanischen Softwarefirma Synapse. Beide Spiele bekommt man auf einer Diskette. Wie man es von Synapse gewohnt ist, zeichnen sich beide Spiele durch interessante Grafik und außergewöhnliche Spielideen aus. In »New York City — The Big Apple« wird der Spieler in die Lage eines Touristen versetzt, der es sich zur Aufgabe gemacht hat, möglichst alle Sehenswürdigkeiten der Großstadt zu besichtigen. Allerdings ist das für den armen Mann schwerer, als er sich das vorgestellt hat. Als Autofahrer muß er darauf achten, nicht in einen der vielen Verkehrsunfälle (fast jede Sekunde ein Unfall; die New Yorker sind rücksichtslose Autofahrer) verwickelt zu werden, als Fußgänger droht ihm der Tod durch Überfahren oder ein längerer, kostspieliger Krankenhaus-Aufenthalt. Nachdem er sein Auto sicher geparkt hat, beginnt ein Wettlauf mit der Zeit, da das Auto nach Ablauf der Parkuhr offiziell abgeschleppt wird. In diesem Fall steht ihm ein längerer Fußmarsch zur Sammelgarage bevor, wo er sein Auto gegen Entgelt wiederbekommt. Der Computer zeigt während des Spiels den Stadtplan von New York, und scrollt je nach Bewegung des Spielers in eine der vier Richtungen. Wird ein Gebäude besucht, wie zum Beispiel das Empire State Building, das World Trade Center oder der Zoo, so wird auf eine andere Spielszene umgeschaltet, in der der Tourist mit verschiedenen Gefahren zu kämpfen hat. So muß er kurzerhand im Post Office Briefe abstempeln und sortieren, im Zoo ausgebrochene Tiere einfangen, hat beim Geldabheben auf der Bank mit Bankräubern kämpfen oder läuft Gefahr, in der U-Bahn-Station erschossen zu werden. Insgesamt müssen zwölf Sehenswürdigkeiten besichtigt werden, bevor die aufregende Reise beendet ist.
+
+## Air Support — Taktik und Strateaie mit faszinieren-aer Animation
+
+Air Support, ein Taktik- und Strategiespiel, das auf der Rückseite der Diskette aufgezeichnet ist, weist eine faszinierende Animation auf. Es ist wirklich zu bewundern, wie Hunderte von Objekten fast stufenlos über den Bildschirm bewegt werden. Ziel des Spiels ist, mit einer Armee von Robotern gegnerische Roboter zu vernichten. Der Spieler steuert einen Helikopter über eine Landschaft aus Bäumen, Felsen und Wiesen, die je nach Bewegung nach oben oder unten gescrollt wird. Je nach Schwierigkeitsgrad wird er von feindlichen Geschützen beschossen und kann selber Bomben abwerfen. Es besteht die Möglichkeit, eigene Roboter aufzunehmen und mit dem Helikopter im Feindgebiet abzusetzen. Mit Hilfe von Sammelkommandos können ganze Armeen von über 100 Robotern über das Spielfeld gelenkt und zu Sperrlinien und Schlachtordnungen aufge-stellt werden. Besonders, wenn man hohe Feindroboterzahlen wählt, wird der kleinste taktische Fehler zum Verhängnis. Air Support ist eine der interessantesten und abwechslungsreichsten Strategiespiele und erreicht auf alle Fälle die Qualität anderer Taktikspiele, wie zum Beispiel Combat Leader oder Operation Whirlwind.
+
+Alles in allem hat Synapse es mal wieder geschafft, zwei hervorragende Spiele zu veröffentlichen. Der Preis von zirka 80 Mark für beide Programme ist daher durchaus akzeptabel.
+
+(H. J. Deeg/rg)
+
+Info: Ariolasoft, Steinhauser Str. 3, 8000 München 80, Preis: etwa 80 Mark
+
+# Des Rätsels Lösung [145-146]
+
+> Das Abenteuerspiel Amazon, erst in unserer vorletzten Ausgabe vorgestellt, ist schon gelöst.
+
+Trotz der Lösung dieses Adventures wird Ihnen der Spaß nicht verdorben werden. Denn Amazon besitzt drei Schwierigkeitsgrade, von denen die letzten zwei noch zu meistern sind. Die Lösung zur Anfängerstufe stellen wir Ihnen hier vor.
+
+Sie sollten aber nicht einfach abtippen. Das würde Ihnen den Spaß verderben. Benutzen Sie unsere Schritt-für-Schritt-Lösung am besten als Spickzettel, den Sie nur zwischendurch mal ansehen — aber auch nur dann, wenn Sie mal eine harte Nuß überhaupt nicht knacken können.
+
+Und bevor Sie das tun, sollten Sie die Lösung lieber mit Papier abdecken und die folgenden kurzen Tips beachten:
+
+Obwohl Paco ein sehr guter Helfer ist, sagt er nicht immer die Wahrheit.
+
+Die »Goggles«, also die Brille, ist übrigens eine Infrarot-Brille. Sie ist gut bei Dunkelheit, besonders wenn man ganz bestimmte Leute nicht wecken will...
+
+An der Brücke genügt es, Paco durch den Anblick des Gewehres zu überzeugen.
+
+Vör dem Abflug nach Südamerika unbedingt den Spielstand abspeichern; Sie könnten die später so dringend benötigten Zigaretten womöglich schon am Flughafen loswerden.
+
+Bei der Statue sollten Sie die Nordwand untersuchen. Und, was noch sehr wichtig ist: Die Bilder sind so aufgebaut, daß man immer nach Norden sieht.
+
+(M. Kohlen/rg)
+
+WAIT, dann mit Joystick Sender einstellen, GO TO THE OFFICE, dann Name eingeben, gestellte Frage beantworten. Dann NOVICE eingeben. GO TO THE AIRPORT, OPEN LETTER, GO TO GATE 9, bei Taxifahrer: GO TO THE INSTITUTE, auf Frage (Hotel) mit NO antworten, ENTER INSTITUTE, ’ SHOW LETTER, ENTER INSTITUTE. Geben Sie Ihren Namen ein und beantworten Sie die Frage mit YES, GO TO THE OFFICE, ENTER OFFICE, REMOVE DRAPE, Name eingeben, OPEN CAGE, OPEN REFRIGERATOR, GET MEDICINE, GET FRUIT, OFFER FRUIT, vier Fragen mit Yes oder Okay beantworten, PACO, OPEN CUPBOARD, INSPECT CUPBOARD, GET FOOD, INSPECT GLIMMER, GET GUN, INSPECT GUN, EXIT OFFICE, BRIBE DIRECTOR, dreimal NO sagen, bis er 5000 Dollar annimmt, GO TO THE AIRPORT, BUY TWO TICKETS, GO TO THE BOOTH, (Frage) YES, GET PACK, INVENTORY, Untersuchen Sie jetzt alles, um die Funktionen zu erfahren. Jetzt SAVE.
+
+ENTER PLANE. Wenn jetzt jemand kommt, der Zigaretten haben will, dann LOAD. Weiter mit: SIT UR WEST, WEST, ACTIVATE COMPUTER (Code = 969), WEST, NORTH, NORTH, NORTH, WEST, SMILE, OFFER CIGARETTES, auf Frage (Food essen) mit YES antworten. NORTH, NORTH, N, N, WAIT, WAIT, auf die Frage irgend etwas antworten, nächste Frage mit YES beantworten, LOOK IN PACK, PACO, GET PACK, WEST, WEAR GOGGLES, N, REMOVE GOGGLES, ACTIVATE COMPUTER (diesmal den emergency code benutzen = 072), dem Computer die Richtung angeben, bis man die genannte Position erreicht (mit Hilfe der mitgelieferten Landkarte), NORTH, N, WEAR PARKA, N, N, ACTIVATE COMPUTER (wieder so wie oben verfahren), N, N, ENTERTUBE, OFFERFOOD, ACTIVATE COMPUTER (mit 969), SLEEP, N, N, N, N, E, E, E, E, GET PARACHUTE, OPEN CARTON, GET OAR, N, WEAR GOGGLES, FREEZE, W W REPAIR BOAT, USE PARACHUTE, SHOOT PACO, ENTER BOAT, CROSS RIVER, HIT ALLIGATORS WITH OAR, WAIT, ACTIVATE COMPUTER(mit 969), INVENTORY, ACTIVATE COMPUTER (969 etc., dann wieder Richtung eingeben, bis angegebene Stelle erreicht ist, dort im Actionspiel den Affen einfangen), E, E, S, S, S, W ACTIVATE COMPUTER (969), SOUTH, ACTIVATE LASER AND WEAR GOGGLES Qetzt im Actionspiel die Huni-Warriors abschießen), SLEEP, N, GO IN, N, N, E, N, N, PUSH WALL, PULL LEVER, DOWN, W, UR W, N, GET KEY, S, E, N, OPEN LOCK WITH KEY, GET PAPER, READ PAPER, ACTIVATE COMPUTER (969), W, OPEN 132. Jetzt dürfen Sie sich erstmal am Schatz und der Musik erfreuen, dann... alles bebt und: SOUTH, SOUTH, S, S, UP, WEST, ENTER THE HELICOPTER.
+THE END
+
+(M. Kohlen/rg)
+
+# Interview [146]
+
+> Was sagt ein »Game Designer« über die Zukunft des Softwaremarktes?
+
+David Crane, einer der Gründer von Activision und Autor von Softwarehits wie Pitfall, Decathlon und Ghostbusters stand uns Rede und Antwort. »Activision wird auch in der nahen Zukunft keine Anwendersoftware herausbringen; nur Unterhaltungssoftware. Wobei der Begriff Unterhaltungssoftware aber weiter ausgelegt werden muß, denn Unterhaltung besteht nicht nur aus Spielen. Activision wird in Zukunft auch neue Formen der Enter-tainment-Software bringen. Die ersten Schritte dazu machten wir schon mit Designer's Pencil und Music Studio.«
+
+Die Zukunft der Computer innerhalb unserer Gesellschaft sieht Crane positiv: »Eine Welt ohne einen Computer in jedem Haushalt kann ich mir nicht vorstellen. Es wird zwar lange Dauern, aber die Entwicklung kann man mit dem Einzug des Fernsehers in das Wohnzimmer vergleichen. Der Hauptzweck des Computers ist eben die Unterhaltung; wäre dies nicht der Fall, würde ich die Entwicklung nicht so optimistisch beurteilen.« Wir befragten David Crane auch gleich über die Zukunftspläne von Activision im Zusammenhang mit den neuen Computern von Commodore und Atari. Cranes Antwort: »Wir werden für jeden Computer Software herstellen, der sich gut verkauft.« Unsere nächste Frage betraf speziell den PC 128. »Activision wird keine Spiele machen, die nur auf einzelnen Computertypen laufen. Spiele, die viel RAM benötigen, werden wir eher in mehrere Teile trennen (von Diskette nachladbar), damit jeder unsere Software genießen kann — auch Besitzer von kleineren Computern.« Und wie programmiert David Crane seine Spiele?
+
+»Spiele entwickeln ist dem Drehen eines Filmes sehr ähnlich. Als erstes wird das Drehbuch geschrieben. Bei uns geschieht dies, indem der Game-Designer erst selbst Spiele spielt und mit ihnen herumprobiert. So lange, bis das Konzept (Drehbuch) fertig ist. Der Entwickler eines Spieles ist Drehbuchautor und Regisseur. Ein bißchen Kamera-Arbeit macht er auch. Die »Special Effects« wie Grafik oder Sound werden von Spezialisten gemacht.
+
+Für ein Spiel benötigen wir in der Regel acht Monate bis einJahr. Dazu setzen sich Gruppen von etwa vier bis zwölf Programmierern zusammen, die gemeinsam ein Spiel erarbeiten, das von einem einzelnen Designer erdacht wurde.
+
+Der Erfolg meiner Spiele liegt darin, daß ich immer voraussehen muß, was die Leute in einem Jahr wollen. Mittlerweile programmiere ich meine Spiele immer auf dem C 64, der zur Zeit mein Lieblingscomputer ist. Die Umsetzung auf andere Systeme wird dann von anderen Programmierern gemacht. Ghostbusters war übrigens mein C 64-Erstlingswerk.«
+
+Wie bewertet David Crane den Einfluß des Deutschen Software-Marktes auf die USA? Viele Softwarehäuser in den USA scheinen den europäischen Markt gar nicht zu beachten. Oft müssen europäische Händler monatelang auf die Software aus den Vereinigten Staaten warten. Existiert der europäische Software-Markt für Amerika überhaupt? Wir bekamen auf diese Frage zwei Antworten von Crane. »Zum einen ist Europa ein sehr guter Stabilisierungsfaktor für uns. Läuft das Geschäft in den USA nicht, so läuft es in Europa. Die Konjunkturzyklen sind genau entgegengesetzt. Das andere ist etwas, was die Europäer noch gar nicht bemerkt haben. Amerikanische Marketing- und Vertriebsexperten behaupten, Europa sei dem US-Software-Markt um zwei Jahre voraus. In den USA wurde durch den Boom der Telespielbranche der Beginn des Heimcompu-ter-Zeitalters zurückgedrängt; in Europa wuchsen beide Sektoren zugleich. Sie waren gleichzeitig existierende Marktsegmente. Im Endeffekt hatte der europäische Software-Markt mehr Zeit zur Entwicklung als der amerikanische. Deshalb gibt es in den USA viele Fachleute, die sich das europäische Konsumentenverhalten ansehen, um die Entwicklung im eigenen Land besser voraussagen zu können.«
+
+Europa, ein Testmarkt für das amerikanische Käuferverhalten der Zukunft? Nicht leicht vorstellbar, aber Insider wie David Crane scheinen davon überzeugt zu sein.
+
+(M. Kohlen/rg)
+
+# Semmelservice mit dem C 64 [147,152
+
+> Wie zu Omas Zeiten wird Ihnen in München das Frühstück vor die Haustür gebracht. Bei Sonnenschein und Reqen. Der Unterschied zu früher: Anstelle eines Fahrrads ein Lieferwagen und ein C 64 für die Buchführung und Streckenplanung.
+
+So ein Pech! Da hat man gerade eine Wette mit seiner Freundin verloren: Eine ganze Woche Frühstück ans Bett. Und das bei der Saukälte am Novembermorgen! Da fällt einem brühwarm der Handzettel ein, der vorgestern im Briefkasten lag. Jemand bot doch da einen Semmel- und Frühstücksdienst an? Der Blick in den Müll findet das gelbe Blättchen: Wie zu Omas Zeiten kann man sich Semmeln, Brezen, Milch, Butter und Eier morgens bis halb acht vor die Haustür bringen lassen. Die Laune steigt um hundert Prozent. Der Service rettet Ihre Morgenstunden.
+
+Eines Tages hatte es der Medizinstudent Helmut Radspieler satt, »immer mit dem letzten Zwanziger in der Tasche« herumzulaufen. Da fiel ihm seine Jugend ein. Damals hatte er mit seinem Freund in einem amerikanischen Film (wo denn sonst?) gesehen, wie ein Botenjunge außer der Zeitung noch eine Tüte mit Brot und Butter an die Tür einer Vorstadtvilla schleuderte. Die damaligen Schüler versuchten die Idee in ihrer Wohngegend zu kopieren. Es funktionierte. Nur das Durchhaltevermögen der Jungs ließ nach, und nach dem Abi gaben sie endgültig auf. Bis vor zwei Jahren Helmut Radspieler das Geschäft wieder ankurbelte. Diesmal aber besser organisiert. »Professioneller« und mit Computerunterstützung. Als Computer benutzt er einen C 64 mit Diskettenstation und Drucker.
+
+## Freunde leisteten Hilfestellung
+
+Ein Freund, Informatik-Student, hat Helmut dazu ein menügesteuertes Programm geschrieben, das drei Dateien verwaltet: eine Kundendatei, eine Bäckerliste und eine Tourenliste. Bäcker- und Tourenliste ergeben sich dabei jeweils auf Befehl aus der Kundendatei. Die Tourenliste wird nach den verschiedenen Gebieten aufgebaut, die vom Frühstückservice beliefert werden. Dort stehen in optimierter Reihenfolge die anzusteuernden Adressen. Dazu kommt bei jedem Kunden die Uhrzeit, zu der er spätestens seine Brötchen haben will. Ist der Fahrer mal in Verzug, muß er auch mal einen kleinen Umweg fahren, um einem Früh-aus-dem-Haus-Geher zu versorgen. Die Kundendatei enthält außer Namen und Adresse auch die Standard-Mengen, die ein Kunde pro Tag haben möchte. Will jemand nur am nächsten Dienstag drei Brötchen mehr, kann das genauso vermerkt werden, wie die Änderung »jeden Dienstag drei Brezen«. Per Telefon und Anrufbeantworter werden die vom Normalfall abweichenden Werte vom Kunden an Helmuts Frühstücksdienst und von diesem an den Bäcker und die Molkerei gemeldet.
+
+## Ein typischer Arbeitstag:
+
+»Um halb fünf morgens rasselt der Wecker, denn ich will mit Helmut auf Tour. In einer halben Stunde müssen wir in der Molkerei Schwabing die Milch abholen. Der weißbekittelte Helfer übergibt uns einen Korb mit 28 ganzen und 19 halben Litern Milch. Dazu elf Joghurt und 20 Halbpfünder Butter. Danach geht’s zum Bäcker. Da liegen 687 Semmeln und Brezen, 15 Croissants und zwei Vollkornbrote für uns bereit. Wir laden das Zeug in einen japanischen Mini-Transporter ein. Damit grast »Helmuts Frühstücksservice« die Münchner Gegend zwischen Olympiazentrum und Schwabing ab. Ein angestellter zweiter Fahrer kutschiert die Ware durch Reihenhausgebiete im Münchner Westen. Den 150, meist festen Kunden kommt der Service nicht allzu teuer: Drei Mark die Woche, wenn jeden Tag geliefert wird und zwei, wenn’s weniger als drei Tage sind. Auch die Preise für Semmeln, Croissants, Milch und Brezen sind kaum teurer als beim Bäcker oder dem Supermarkt an der Ecke. Die Masse macht's. Nachdem der zweite Fahrer bezahlt ist, bleibt ein hervorragender »Nebenverdienst«. Fast 3 000 Mark im Monat bei dreieinhalb Stunden Arbeit am Tag, inklusive Buchführung.
+
+Die Buchführung wird genauso wie das Schreiben von Rechnungen auch vom C 64 übernommen. Säumige Zahler werden gemahnt und Kunden-individuelle Fakturen geschrieben. Das Programm holt sich selbständig aus der Kundendatei die wöchentliche Bestellmenge und die Sonderlieferungen und Abbestellungen einzelner Tage. Die Preise pro Einheit werden getrennt gehalten, wie in jedem flexiblen System. Selbstverständ-lichwerden Feiertage, an denen keine Semmeln ausgefahren werden, automatisch berücksichtigt. Das Kontrollieren der Rechnungen, die Helmut selber zahlen muß, also Molkerei und Bäcker, übernimmt ebenfalls der Computer. Man kann einen beliebigen Zeitraum eingeben, für den eine Rechnung erstellt oder überprüft werden soll. Mit dem Bäcker ergeben sich ab und zu Differenzen von vier oder fünf Brötchen, aber die regelt man problemlos. Der Bäcker kalkuliert und fakturiert ja auch per Computer.
+
+Bei der morgendlichen Tour sehen wir keinen unserer Kunden. Die meisten von ihnen kennt auch Helmut nur per Telefon und Brief. Die Türen der Häuser, an denen er das Frühstück abliefert, sind um sechs Uhr früh geschlossen. Illustre Namen sind dabei: Freiherr von X, GrafY und sogar Prinz Z. Dazu beliefern wir Münchens Villengegend. Da erstaunt es nicht, daß auch ein gewisser Herr Flick sich beliefern ließ. Junge Polizisten nehmen dankbar die Abwechslung in ihrer Dienstroutine zur Kenntnis.
+
+Wir stellen die Papiertüten unter den Sims. Falls es regnen sollte, stopfen wir sie in bereitliegende Plastiktüten und schon hat uns die Straße wieder. Um halb acht sind wir fertig, das letzte Kipferl wartet auf den, der es verschlingen wird.
+
+Der Frühsport — fahren, aussteigen, Äutotür auf, Sachen raustragen, Tür zu, einsteigen, weiterfahren — steckt einem noch eine Zeit-lang in den Knochen.
+
+Leider kam an diesem Morgen keine Begegnung der Art zustande, wie sie mir Helmut schilderte: An einer Ampel bat ihn einmal eine junge Studentin um ein Brötchen. Er gab es ihr. Anschließend fuhr sie mit und half ihm bei der Arbeit. Als er schließlich das Angebot machte, ihr seinen C 64 zu zeigen, folgte sie ihm gerne zum Kaffeetrinken in seine Wohnung.
+
+(Tomas F. Lansky/hm)
+
+# Formatierte Eingabe [148]
+
+> Für professionelle Programme wird oft eine INPUT-Routine benötigt, die nur bestimmte Zeichen zuläßt. Mit diesem Maschinenprogramm können Sie sehr einfach Eingabemasken realisieren.
+
+Haben Sie schon mal wirklich professionelle Programme geschrieben? Dann hat Ihnen mit Sicherheit die INPUT-Routine des C 64-Betriebssystems zu schaffen gemacht, die sämtliche Zeichen zuläßt. Auch solche, die zu völligem Unsinn oder Fehlermeldungen führen. Dieser Mißstand wird in Basic-Pro-grammen meist mit einer GET-Schleife umgangen. Bei dieser Methode wird ständig ein Zeichen von der Tastatur geholt, auf Zulässigkeit überprüft und auf den Bildschirm gedruckt. Die einzelnen Zeichen werden in einem String addiert. Wenn sie mit INS oder DEL im Eingabefeld Korrekturen ausführen wollen, können Sie sich vorstellen, wie kompliziert und zeitraubend eine solche Routine werden kann.
+
+Eine schnelle Lösung dieses Problems schafft dieses Maschinenprogramm, das einen neuen Input-Befehl generiert. Die Syntax des Befehls lautet:
+
+INPUT>Eingabelänge, Spalte, Zeile, Variable
+
+Wie Sie schon an der Syntax sehen, ein recht komfortabler INPUT-Befehl. Mit der Eingabelänge geben Sie an, wie lang das Eingabefeld höchstens sein darf. Durch Angabe von Zeile und Spalte können Sie das Eingabefeld direkt an jeder beliebigen Bildschirmstelle positionieren. Als Variable müssen Sie eine Stringvariable einsetzen, zum Beispiel A$. Sollen ausschließlich Zahlen eingegeben werden, braucht der String nur noch auf Buchstaben hin überprüft werden. Beispielsweise mit folgender Routine:
+10 INPUT>4,1,1,A$
+20 IF STR$(VAL(A$))=” ”+A$ THEN PRINT ”ES IST EINE ZAHL":END
+30 PRINT "KEINE ZAHL":GOTO 10
+
+### Tips zur Eingabe
+
+Das Programm müssen Sie mit dem MSE eingeben und abspeichern. Laden Sie dann die Input-Routine mit LOAD »na-me«,8,1 oder LOAD ”name”,1,1 und geben Sie NEW und SYS 49152 zur Initialisierung ein. Danach können Sie Ihre Basic-Programme eintippen und mit dem neuen INPUT>-Befehl verwenden. Die Routine können Sie natürlich auch mit dem Basic-Programm nachladen und mit dem neuen INPUT>-Befehl verwenden.
+
+## Zusammenfassung
+
+* Die Routine wird mit SYS49152 initialisiert
+* Das Programm benötigt den Speicherbereich von Adresse 49152 bis 49617
+* Die Syntax lautet: INPUT>Eingabelänge, Zeile, Spalte, Stringvariable
+* Die CLR-, HOME-, RUN-, STOP- und SHIFT-Taste ist bei der Eingabe gesperrt.
+* Das Eingabefeld kann mit den Cursortasten nicht verlassen werden.
+* INST/DEL wirkt nur innerhalb des Eingabefeldes
+* Leerzeichen am Ende der Eingabe werden nicht mit übernommen.
+* Benötigen Sie die Leerzeichen am Schluß geben Sie einfach POKE 49298,131 ein. POKE 49298,94 schaltet wieder in den Normalzustand.
+
+Ein Nachteil soll nicht verschwiegen werden:
+
+Fragetext kann nicht, wie beim serienmäßigen INPUT-Befehl, ausgegeben werden. Der Text muß mit PRINT gedruckt werden.
+
+(Thomas Graf/hm)
+
+# Wir suchen die Anwendung des Monats [151]
+
+Anwendung des Monats, was ist das? Nun, Sie haben einen Commodore 64 oder einen VC 20 und versuchen diesen irgendwie sinnvoll einzusetzen. Unter einer sinnvollen Anwendung versteht die 64’er Redaktion alles, was beispielsweise Programme im häuslichen Bereich bewirken. Es kann sich dabei um die Berechnung der Benzinkosten für Ihren Wagen handeln, um ein eigenes Textverarbeitungsprogramm gehen, sich um die Verwaltung Ihrer Tiefkühltruhe drehen oder ein ausgeklügeltes Telefon- und Adreßregister sein.
+
+Setzen Sie Ihren VC 20/C 64 mehr oder weniger beruflich ein? Auch, oder vor allem, das ist eine sinnvolle Anwendung. Sie führen die Lohn- und Gehaltsabrechnung, Ihre Lagerverwaltung, die Bestellungen auf einem Commodore-Heimcom-
+
+puter durch? So spezielle Anwendungen wie die Berechnung der Statik von selbstgezimmerten Regalen, von Klimadiagrammen oder Vokabellernprogrammen für den Schulunterricht oder die Zinsberechnung bei Krediten sind ebenfalls Themen, die mehr als konkurrenzfähig sind.
+
+Uns ist die Anwendung des Monats
+**500 Mark**
+wert.
+
+Schreiben Sie uns, was Sie mit Ihrem Computer machen:
+
+Redaktion 64’er, Aktion: Anwendung des Monats, Hans-Pinsel-Str. 2, 8013 Haar bei München.
+
+# Einmal im Monat gibt es die SUPERCHANCE das Listing des Monats [151]
+
+Diese nicht einmalige Gelegenheit sollten Sie nutzen. Wie? Schicken Sie uns Ihr bestes, selbst erstelltes Programm. Bei der Art des Programms sind wir nicht wählerisch.
+
+Sie haben ein sehr gutes (Schieß-, Knobel-, Denk-, Action-, Abenteuer-)Spiel geschrieben: einschicken!
+
+Sie verfügen über ein komfortables Disketten-Kopier-(Sortier) Programm mit einigen außergewöhnlichen Leistungsmerkmalen: einschicken!
+
+Sie haben das Basic um einige sinnvolle Befehle erweitert: einschicken!
+
+Sie arbeiten mit einem selbsterstellten Textverarbeitungsprogramm, einer eigenen Tabellenkalkulation, einem semiprofessionellen Datenverwaltungsprogramm: einschicken!
+
+Sie zeichnen und konstruieren mit einem selbsterstellten Programm in hochauflösender Grafik: einschicken!
+
+Wir freuen uns über jeden Beitrag und honorieren mit bis zu
+**2000 Mark**
+
+Aus den besten Listings, die veröffentlicht werden, sucht die 64’er-Redaktion einmal im Monat das »Listing des Monats« aus. Alle Listings, die im 64’er abgedruckt sind, werden mit 100 bis 300 Mark honoriert. Die genaue Vorgehensweise beim Einsenden von Listings ist in dem Beitrag »Wie schicke ich meine Programme ein?« in verschiedenen Ausgaben beschrieben.
+
+Schicken Sie Ihr Listing an: Redaktion 64’er, Superchance: Listing des Monats, Hans-Pinsel-Str. 2, 8013 Haar bei München.
+
+# Mitmachen — mitgewinnen [152-154]
+
+> Die 64'er will noch besser werden. Dafür müssen wir aber mehr über Sie, den Leser, wissen. Deshalb starten wir einen großen Umfragewettbewerb mit toHen Preisen.
+
+Was ist Ihre Aufgabe, um bei diesem Wettbewerb mitmachen zu können? Zunächst einmal, sollten Sie sich den Artikel über das Floppy-Laufwerk durchlesen, um die ersten sieben Fragen beantworten zu können. Nur wenn diese sieben Fragen richtig beantwortet sind, nehmen Sie an der Verlosung der Preise teil. Sodann bitten wir Sie den »Fragebogen« vollständig auszufüllen. Mit dieser Befragung haben Sie die Möglichkeit an der künftigen Gestaltung der 64’er mitzuwirken.
+
+Der 64’er-Redaktion ist es bisher im Großen und Ganzen gelungen, ein in fast allen Belangen zufriedenstellendes Magazin für den C 64-und VC 20-Anwender zu machen. Doch der Markt ändert sich schnell, besonders auf dem Gebiet der Computerei. Nur wer genau weiß, was die Leser wollen, kann auch eine Zeitschrift machen, die für alle etwas beinhaltet. So haben wir beispielsweise erkennen müssen, daß nach mehr als einem Jahr seit dem die 64’er erscheint, wir uns von der Auswahl der Themen her immer mehr am Profi orientieren. Das hatte bittere Klagen der Anfänger und Fortgeschrittenen zur Folge. Eine andere Gruppe, die sich benachteiligt fühlte, waren die Datasette-Besitzer; ihr Argument: wir brächten zuviel für die Floppy. Auch die Basic-Programmierer fühlen sich benachteiligt, zuviel in Maschinensprache.
+
+Sind das nun die Beschwerden von ein paar Unentwegten, oder steht eine schweigende Mehrheit dahinter? Ist Datenfernübertragung für alle interessant oder nur für Hacker? Begeistern Grafikprogramme oder Tabellenkalkulation mehr? Sollen wir mehr Listings für den technisch/na-turwissenschaftlichen Bereich oder für die kaufmännische Anwendung bringen? Wie umfangreich sollen die Aktuellmeldungen sein oder bringen die Kurse mehr. Welche Kurse werden gewünscht? Ist die neue optische Aufmachung (Layout) bei Ihnen angekommen, oder sollen wir wieder mehr auf den »Bravo«-Stil umschwenken? Bevorzugen Sie Hardware- oder Software-Test? Was halten Sie von Bastelanleitungen? Soll der Computer-Markt ausgedehnt werden oder ist er gar zu groß? Welche Themen begeistern so viele, daß ein Sonderheft daraus gemacht werden kann?
+
+Fragen über Fragen. Nur Sie als Leser können diese Fragen beantworten. Aber nur, wenn Sie sich so zahlreich wie nur irgend möglich beteiligen. Sie haben hier die Möglichkeit das Gesicht »Ihrer« 64’er zu gestalten. Es ist klar, daß die Beantwortung der Fragen einige Zeit in Anspruch nimmt, und die 80 Pfennig sind auch kein Pappenstiel, doch wir glauben, es lohnt sich, vor allem für Sie. Je mehr mitmachen, umso sicherer wird die statistische Auswertung, desto besser wird die 64’er in der Zukunft. Und daß die 64’er eine Zukunft hat, daran glauben alle Redakteure und Mitarbeiter von Markt & Technik. Arbeiten Sie mit an Ihrer Zeitschrift.
+
+Zum Thema Datenschutz: Ihre Adresse wird nicht zusammen mit den statistischen Daten, die lediglich für die zukünftige Gestaltung der 64’er von Interesse sind, abgespeichert. Sie dient lediglich dazu, Sie im Falle eines Gewinnes zu benachrichtigen. Schicken Sie den Fragebogen an Markt&Tech-nik Verlag AG, Redaktion 64’er, **Stichwort: Umfrage**, Hans-Pinsel-Str. 2, 8013 Haar bei München.
+
+TODO ASIDE
+
+Folgende Preise sind zu gewinnen:
+1. Preis:
+Ein PC 10
+(IBM-kompatibel, 256 KByte RAM, zwei Diskettenlaufwerke mit je 360 KByte Speicherkapazität, MS/DOS-Betriebssystem, Centronics- und V.24-Schnittstelle und Monitor: Wert 5500 Mark)
+2. bis 11. Preis:
+je ein Diskettenlaufwerk 1541 für den Commodore 64 oder VC 20
+12. bis 50. Preis:
+je ein Buchgutschein im Wert von 50 Mark. Einzulösen nur beim Verlag Markt & Technik AG.
+
+TODO UMFRAGE
+
+# »Dokumentationshilfe«: Cross-Referenz-Liste C 64 [155-159]
+
+> Die Dokumentation von Basic-Programmen ist manchmal eine mühevolle Aufgabe. Trotzdem ist sie sinnvoll oder sogar notwendig. Aus diesem Grund schlugen wir einen Programmierwettbewerb zur Dokumentationshilfe vor, dessen Ergebnis hier vor Ihnen liegt.
+
+TODO ASIDE
+
+## Lebenslauf
+
+Angefangen hat meine Computerbegeisterung mit etwa zehn Jahren. Damals schenkte meine Großmutter mir einige Spiele von Atari. Diese Spiele waren aber nur kurzzeitig von Interesse.
+
+Ich kaufte mir fast alle Computer-Zeitschriften und konnte in den Kaufhäusern nicht an den Computern vorbeigehen, die dort ausgestellt waren.
+
+Als mein Vater sich für seine Handelsvertretung einen Commodore-Com-puter zulegte, hatte ich Gelegenheit, durch meine Vorkenntnisse, die Gespräche zwischen einer Leasingfirma und meinem Vater zu beeinflussen.
+
+Meine Großmutter unterstützte mein Computerhobby auch finanziell und ich war mit 15 Jahren in der Lage, mir meinen eigenen C 64 mit Floppy zu kaufen. Nach den großen Ferien komme ich in die gymnasiale Oberstufe. Als Abiturfächer werde ich Physik, Mathematik und Englisch wählen, da ich Informatik studieren möchte. Diesen Beruf würde ich gern in der Forschung ausüben.
+
+Zur Zeit überarbeite ich das EDV-Programm der Firma meines Vaters, um es bedienungsfreundlicher zu gestalten und dieses auch für einen Tennisclub von etwa 500 Mitgliedern (Verwaltung, Mitteilungen, Beitragseinzug) zu verwenden.
+
+(Stefan Becker)
+
+---
+
+Jeder Basic-Programmie-rer kennt das Problem: Man schreibt lange und auch komplizierte Programme und merkt, daß langsam aber sicher der Überblick verloren geht. Oder auch, wenn versucht wird, ein fremdes, nicht selbst erstelltes Programm zu verstehen: Was bedeutet diese Variable, und wo taucht sie im Programm noch auf? Von wo und wie oft wird diese Programmzeile angesprungen?
+
+Bei gut strukturierten Programmen findet man relativ schnell durch, aber die sind selten zu finden. Doch selbst dann ist eine gute Beschreibung eine hilfreiche Sache und erleichtert den späteren Wiedereinstieg.
+
+Eine Crossreferenzliste unterstützt bei der Erstellung einer Dokumentation. Gerade bei kommerziellen Software-Projekten wird nicht auf sie verzichtet. Sie enthält dabei nicht nur eine Aufzählung aller Sprünge (sofern bei höheren Programmiersprachen überhaupt vorhanden), sondern vor allem eine komplette Variablenliste. Und diese Funktionen hat auch unser Programm. Im einzelnen enthält sie:
+
+1.	Liste aller Zeilen, in denen Sprungbefehle enthalten sind. Angegeben wird die Zeilennummer und die angesprungene Zeile.
+2.	Liste aller Zeilen, die angesprungen werden. Angegeben sind die Zeilennummer und alle Zeilen, von denen aus diese Zeile angesprungen wird. Eine sehr nützliche Information.
+3.	Eine Liste aller im Programm vorkommenden Variablen. Angegeben wird, alphabetisch sortiert, der Variablenname und die Zeilen, in denen sie vorkommt. Zusätzlich hat man die Möglichkeit, zu jeder Variablen einen kurzen Kommentar mit einzugeben.
+4.	Liste aller Variablen mit dem vorhin genannten Kommentar, aber ohne Hinweise auf die Zeilen, in denen sie vorkommen.
+
+Mit diesen Informationen kann man schon etwas anfangen. Dochjetzt etwas für Programmierer selbst:
+
+## Wie funktioniert das?
+
+Wie sucht man nach Variablen? Wie nach Sprungbefehlen? Wie so oft, ist die Lösung ganz einfach.
+
+Wie ein Basic-Programm im Speicher steht, wurde ausführlich im 64’er, Ausgabe 2/85, Seite 87, beschrieben. Fast in der gleichen Form wird ein Programm auch auf Diskette gespeichert. Lediglich zwei Byte für die Ladeadresse des Programms kommen dazu. Beim absoluten Laden eines Programms (LOAD”NAME”,8,1) holt sich der Basic-Interpre-ter diese zwei Byte, um festzustellen, an welcher Stelle im Speicher das Programm beginnt. Beim normalen LOAD-Befehl, also ohne die ”,1” am Ende, wirdjedesPro-gramm ab Basic-Anfang gesetzt, also ab $801 ( = dezimal 2049).
+
+An einem kleinen Beispiel soll gezeigt werden, wie man sich alle Zeilen anzeigen lassen kann, die den Befehl GOTO enthalten. Sehen Sie sich dazu das Flußdiagramm (Bild 1) an.
+
+Als erstes muß eine »Programmdatei« geöffnet werden. Das geht zum Beispiel mit OPEN2,8,2,”NAME,P,R”. »P« steht dabei für Programm und »R« für READ, also lesen.
+
+Dann folgt das Lesen der Byte. Dazu nimmt man den GET#-Befehl. Der INPUT #-Befehl ist zwar wesentlich schneller, »schafft« aber nur maximal 88 Zeichen, benötigt ein Carriage Return (CHR$(13)) als Endekennzei-chen (bei Programmen sind es Null-Byte) und verträgt keine Kommata (in Basic-Programmen oft vorhanden). Außerdem erlaubtuns der GET#-Befehl die Überprüfung einzelner Zeichen direkt nach dem Laden.
+
+Lesen wir jetzt also die ersten Byte eines Basic-Programms. Am Anfang, das sind die ersten zwei Bytes, steht die Startadresse. Bei Basic-Programmen ist sie 2049, hexadezimal ausgedrückt $0801. Darauf folgen zwei Byte für die Anfangsadresse der nächsten Basic-Zeile (gemeint ist hier die Adresse im RAM, die natürlich auch gespeichert wird). Erst jetzt beginnt die wirkliche Basic-Zeile: Zwei Byte für die Zeilennummer, aufgetrennt in Low- und High-Byte, gefolgt vom Basic-Text. Das Ende einer Basic-Zeile erkennen Sie (und der Basic-Interpreter) an einem Null-Byte. Danach folgt wieder die Anfangsadresse der nächsten Basic-Zeile (Low-und High-Byte) und der nächsten Zeilennummer (auch Low- und High-Byte), danach der Basic-Text, etc., etc.. Das Ende eines Basic-Programms ist gekennzeichnet durch drei aufeinanderfolgende Null-Byte, und auch die Statusvariable ST wird auf 64 gesetzt.
+
+Das war’s schon. Mit diesem Wissen sind Sie in der Lage, ein Basic-Programm komplett zu analysieren. Eine vollständige Liste aller Token, das sind die Abkürzungen, die Codes der Basic-Befehle, finden Sie in Bild 2.
+
+Doch nun zum Programm »Cross-Ref 64«.
+
+## Cross-Ref 64
+
+Das hier vorgestellte Programm Cross-Ref 64 (Listing 2) arbeitet auf allen Commodore-Computern, mit einem Floppy- oder Kassetten-Lauf-werk und einem Drucker.
+
+Nach dem Start mit RUN kann die Ausgabe der fertigen Listen auf Drucker oder Bildschirm gewählt werden (siehe auch Zeile 200 bis 260). Die Variable DV enthält die jeweils gültige Gerätenummer. Danach müssen Sie den Dateinamen des zu durchsuchenden Files eingeben.
+
+Ihr Computer liest sich nun das Programm wie ein sequentielles File Byte für Byte durch. Das Programm steht auf der Diskette im gleichen Format wie im RAM, lediglich die ersten beiden Bytes geben den Start des Programms an. Liegt Ihr Programm nicht ab 2049, zum Beispiel bei Maschinenprogrammen üblich, so bricht das Programm die Bearbeitung ab. Sollten Sie das Programm auf einem anderen Commodore-Computer betreiben, so geben Sie einfach Listing 3 ein und tauschen die auf dem Bildschrim erscheinende Zahl gegen die in Zeile 290 stehende 2049 aüs.
+
+Beim Durchsuchen »hangelt« sich der Computer durch die Zeilen, indem er, immer wenn er auf einen Charakter 0 trifft, eine neue Zeile beginnt. Im ersten Paß durchsucht er das Programm auf die Token für die Sprungbefehle GOTO, RUN, GOSUB und THEN (Zeile 330). Sie haben, in der gleichen Reihenfolge, die ASCII-Werte 137, 138, 141 und 167. Gefundene Sprünge werden auf zwei Arten gespeichert. Als erstes im Format ZEILENNUMMER : SPRUNGZIEL (Bild 3) in den Zeilen 400 bis 420, darauf im Format SPRUNGZIEL : ZEILENNUMMERN (Bild 3). Wobei SPRUNGZIEL immer die Zahl ist, die hinter GOTO oder THEN steht. ZEILENNUMMER ist jeweils die Zeile, in der der Sprungbefehl auftaucht.
+
+Die Zeilennummern werden in den Feldern ps$( und sp$( gespeichert. Wird in einem der Felder die Maximallänge von 70 Zeichen überschritten, so wird ein neues Feld angelegt (Zeile 410 und 450).
+
+Haben Sie den ersten Pass glücklich überstanden, so wird die Liste auf das von Ihnen gewählte Gerät übertragen (Zeile 580 bis 680). Die aufsteigend sortierten Zeilennummern werden so ausgegeben, daß nie zwei gleiche Zeilennummern untereinanderstehen. Statt dessen werden sechs Leerzeichen gedruckt (Zeile 660).
+
+Der zweite Pass läuft im Prinzip wie der erste ab. Die Variablen mit zugehörigen Zeilennummern werden lediglich im Feld VA$( gespeichert und sortiert. Selbstverständlich wird der Text hinter REM und DATA sowie Anführungszeichen überlesen (Zeile 750-790).
+
+In diesem Stadium kommt Arbeit auf Sie zu. Jetzt haben Sie die Möglichkeit, die Variablen mit einem Text zu versehen. Dabei müssen Sie sich allerdings auf 25 Zeichen beschränken.
+
+Antworten Sie auf die Frage »WOLLEN SIE ZU DEN VARIABLEN BEMERKUNGEN EINGEBEN« mit »J«, so können sie mit Cursor UP und DOWN durch die Liste wandern. Die momentane Variable wird jeweils angezeigt. Haben Sie die richtige Stelle gefunden, so drücken Sie »RETURN« und können Ihren Text eingeben. Durch nochmaliges Drücken der »RETURN«-Taste wird der Text gespeichert.
+
+Haben Sie Ihre Texte verteilt, so beginnt das Programm nach Drücken der »N«-Taste zu drucken (Zeilen 1180 bis 1280). Auch hier können Sie den Druckvorgang wiederholen (Bild 4 und 5).
+
+### Umstellungshinweise
+
+Dieses Programm ist auf allen Computern lauffähig, die ihren Basic-Text nach Commodoreart speichern. Potentielle »Umschreiber«’können sich daher auf die Zeile 330 beschränken. Auch die Druckausgabe ist leicht modifizierbar. Die Sekundäradresse der OPEN-Befehle in den Zeilen 580 und 1180 stellen den Epson MX-80 über das Print-64-Interface auf Klein/Großschrift um. Dies kann auch durch normale »OPENs« mit nachfolgenden Steuercodes erfolgen.
+
+Sogar bei einem Kassettenlaufwerk ist das Programm verwendbar. Auch hier ändern Sie in den Zeilen 290 und 730 die OPEN-Befehle (Listing 4).
+
+(Stefan Becker/gk)
+
+# Gewinnen Sie zwei Btx-Femsehgerüte Loewe MCP 114 und eine Reise zur Internationalen Funkausstellung '85 in Berlin! [160-161]
+
+> Gesucht: Vier originelle Spiel- und Lernprogramme für den C 64. Schreiben Sie die erste C 64-Telesoftwure für das deutsche Bildschirmtext-System! Jeder der mitmacht hat eine Chance.
+
+Die Deutsche Bundespost wird bei der Internationalen Funkausstellung 1985 in Berlin erstmals das Fernladen von Computerprogrammen für den C 64 mittels Bild-schirmtext demonstrieren. Die vier Programme, die auf diesem Weg von der Btx-Zentraldatenbank in Ulm in fünf Demonstrationsmodelle C 64 in Halle 13 des Internationalen Ausstellungsgelän-des am Funkturm geschickt werden, sollen von den 64’er-Lesern geschrieben werden. Gesucht wird nach je zwei originellen Spiel- und zwei Lernprogrammen.
+
+* Der erste Preis ist ein Btx-Fernsehgerät Loewe MCP 114 und eine Reise zur Preisverleihung während der Funkausstellung im September für eine Person.
+* Der zweite Preis ist ein Btx-Fernsehgerät Loewe MCP 114.
+* Der dritte und vierte Preis ist je ein Drucker MPS 802.
+
+## Das ist Bildschirmtext
+
+Bildschirmtext ist ein neuer Informationsdienst der Post. Dabei können Informationen aus Btx-Zentralen (Computern) der Post über die Telefonleitung auf dem Bildschirm im Wohnzimmer abgerufen und wegen der Dialogfähigkeit des Systems auch gesendet werden.
+
+Für die Nutzung von Bildschirmtext braucht man ein Farbfernsehgerät mit einer Zusatzeinrichtung (Decoder). Dazu eine Btx-An-schlußbox, die von der Post zwischen Telefon und Fernsehgerät installiert wird. Dort werden die digitalen Signale moduliert und so umgewandelt, daß sie über die Fernsprechleitung der Post-Zentrale zugeführt werden können.
+
+Die Möglichkeiten bei der Nutzung von Bildschirmtext beschränken sich allerdings nicht nur auf den Abruf visueller Informationen (Text, Zeichengrafik, Kleingrafik), sondern man kann auch Daten übermitteln, die einen Bildplattenspieler steuern, die ein Programm für einen Mikrocomputer darstellen oder die Eingangsdaten für ein Computerprogramm. Die Faszination dieserart Programme in den eigenen Heimcomputer zu laden und dort ablaufen zu lassen liegt nicht zuletzt in der Nutzung eines modernen Telekommunikationsnetzes. Zum anderen kommt man so problemlos an ein umfassendes Programmangebot. Um in der Btx-Zentrale gespeicherte Programme und Daten in den Computer laden zu können (downloading), bedarf es auf der Benutzerseite neben dem Rechner, wie beim normalen Empfang von Btx-Informationsseiten eines Btx-Fernsehgerätes (mit Btx-Anschluß), einer Verbindung zwischen Rechner und Fernsehgerät und der Betriebssoftware für den Rechner zur Steuerung der Kommunikation und des Ladevorganges.
+
+### Folgende Bedingungen müssen die Programme erfüllen:
+
+* Das Programm kann in Basic oder Maschinensprache geschrieben sein
+* Die maximale Länge beträgt 7 KByte, oder 30 Blocks auf der Diskette
+* Das Programm muß vollständig im Speicher stehen, das heißt es dürfen keine weiteren Programmteile nachgeladen werden
+* Der Speicherbereich zwischen $C000 und $CFFF und die Puffer in der Zeropage dürfen nicht benutzt werden
+* Das Programm darf nicht über einen Autostart verfügen, das heißt, es darf sich nach dem Laden nicht selbst starten
+* Es sollte eine Bedienungsanleitung im Programm wahlweise angesprungen werden können
+* Spielprogramme müssen überJoysticks gesteuert werden
+* Während des Programmlaufs dürfen keine Zugriffe auf Diskette oder Kassette erfolgen, das heißt es dürfen weder Daten nachgeladen noch abgespeichert werden
+* Die schriftliche Bedienungsanleitung zum Programm sollte die üblichen »Zutaten« enthalten: Programmbeschreibung, Varia-blendefinition, Programmaufschlüsselung nach Zeilennummern, Flußdiagramm, bei Maschinensprache dokumentierter Quellcode, etc.
+* Strukturierte Programmierung ist nicht erforderlich.
+
+Zu den Spielprogrammen: Bei der Art des Programms sind wir nicht wählerisch, das heißt sie können aus dem gesamten Bereich des
+
+Spielespektrums von Schieß-, Kletter- und Hüpfspielen bis zu Denk- und Strategiespielen kommen. Wichtigste Voraussetzung: Alles muß mit dem oder den Joysticks zu steuern sein.
+
+Zu den Lernprogrammen: Auch hier kann jede Art von Programmen, die irgend etwas mit Lernen zu tun haben, eingesandt werden. Die Rechte an den Programmen gehen an den Verlag Markt & Technik AG über. Schik-ken Sie Ihre Programme an:
+Verlag Markt & Technik AG
+**Stichwort: Btx-Wettbewerb**
+Hans-Pinsel-Str. 2
+8013 Haar bei München
+
+**Einsendeschluß ist der 15. Juni 1985**
+
+Es gilt das Datum des Poststempels. Der Rechtsweg ist ausgeschlossen.
+
+# Vorschau [164]
+
+## Modems und Akustikkoppler
+
+Das Angebot der Modems und Akustikkoppler ist seit unserer letzten Marktübersicht um einiges größer geworden. Es reicht von einfachen Platinen bis zu preiswerten und leistungsstarken Geräten. Auf welche Leistungsmerkmale man achten sollte, zeigt unser Bericht.
+
+## Was ist ein EPROM?
+
+Möchten Sie das Betriebssystem des C 64 ändern, ist die Anschaf-fungeines EPROM-Programmierers unumgänglich. In einem Test stellen wir Ihnen neben einer ausführlichen Funktionsbeschreibung in einer Marktübersicht die zur Zeit erhältlichen Geräte für den C 64 vor.
+
+## Die anderen Drucker
+
+Was gibt Tintenstrahldruckern und Plottern den Ruf des Besonderen? In der nächsten Ausgabe sagen wir Ihnen, was an diesem Ruf »dran« ist. Das Prinzip der Billigsten, der Thermodrucker, wird ebenfalls erklärt. Eine Marktübersicht dieser Druckertypen soll Ihnen beim Kauf helfen.
+
+## Test: PC 128 (2. Teil)
+
+Im zweiten Teil unseres großen PC 128-Tests finden Sie alles über den neuen RGB/Composite-Farb-monitor 1902 und über das schnelle 1571-Floppy-Laufwerk, das dem PC 128 auch zu CP/M verhilft. Das ist das Stichwort zum zweiten großen Thema unseres Testberichts. Sie erfahren, was CP/M ist, wie es auf dem PC 128 funktioniert und natürlich auch, welche Software damit läuft.
+
+## Terminalprogramm zum Abtippen
+
+Viele gute Programme erreichten die Redaktion zum Wettbewerb Terminalprogramme. Ein Programm jedoch ließ die anderen weit hinter sich. Auch den Vergleich mit professionellen Terminalprogrammen braucht es nicht zu scheuen. Überzeugen Sie sich in der nächsten Ausgabe selbst.
+
+## IEEE-Interface zum Selberbauen
+
+Um beispielsweise Peripheriegeräte von den großen CBM-Rechnern (Floppy-Laufwerke, Drucker oder Meßgeräte) an den C 64 anschließen zu können, benötigen Sie ein IEEE-Interface. Die zur Zeit erhältlichen Geräte kosten meist über 200 Mark. Das hier beschriebene Interface ist zu einem Bauteilepreis von unter 50 Mark zu haben.
+
+## Der Top-Assembler
+
+Zusammen mit dem SMON wird mit diesem Assembler dem Maschinenprogrammierer ein Programmpaket zur Verfügung gestellt, das leistungsfähiger ist als viele kommerziell angebotene Programme. Die hervorste-chenste Eigenschaft dieses Assemblers ist die Möglichkeit, Macros anzulegen, in denen lokale Variablen benutzt werden können. Neben vielen Pseudo-Opcodes kann auch bedingt as-sembliert werden. Ein eingebautes Hilfstool enthält Befehle wie zum Beispiel Auto, Renumber und formatiertes Listen. Ein Listing des Monats par excellence.
+
+## Software-Test Promal, Forth und Pilot
+
+Drei ganz unterschiedliche Programmiersprachen für den C 64: Pil'ot wurde in erster Linie für Ausbildungszwecke entwickelt, Forth stammt aus der Steuerungstechnik, und bei Promal handelt es sich um eine völlig neue Sprache, die in der Struktur an Pascal angelehnt ist. Alle drei Programmiersprachen haben eines gemeinsam: Sie ermöglichen sehr effektives Programmieren — das bedeutet kurze, schnelle Programme, die wenig Speicherplatz benötigen, aber viel leisten. Wir haben diese drei Sprachen daher für Sie ausführlich getestet.
+
+## Außerdem ...
+
+* ein File-Compactor
+* eine Centronics-Schnittstelle ohne Speicherplatzverbrauch
+* ein Bericht, wie der 64er für die Auswertung von internationalen Sportveranstaltungen eingesetzt wird
+* sowie wieder viele Tips & Tricks für C 16, VC 20 und C 64
 
