@@ -2,7 +2,7 @@
 <html lang="de">
 
 <head>
-    <title>Erster ausführlidier Test PC 128 (Teil 1)</title>
+    <title>Erster ausführlicher Test PC 128 (Teil 1)</title>
     <meta charset="UTF-8">
     <link rel="stylesheet" href="../style.css">
     <meta name="author" content="ev, hm">
@@ -15,8 +15,13 @@
 
 <body>
     <article>
-        <h1>Erster ausführlidier Test PC 128 (Teil 1)</h1>
+        <h1>Erster ausführlicher Test PC 128 (Teil 1)</h1>
         <p class="intro">Der PC 128 war bei Commodore noch im Vorbereitungsstadium für den deutschen Markt, da hat die 64'er-Redaktion sich eines der ersten Geräte über die Osterfeiertage besorgt, um den PC 128 für Sie auf Herz und Nieren zu testen. In diesem Teil beschreiben wir ausführlich die Hardware, das Basic 7.0 und die Kompatibilität zum C 64.</p>
+
+        <figure>
+            <img src="16-0.png" alt="">
+        </figure>
+
 
         <p>Nicht nur die 6510-Programmmierer kommen mit dem PC 128 auf ihre Kosten. Der PC 128 hat nämlich zusätzlich einen Z80-Prozessor eingebaut, der einen wesentlich komfortableren Befehlssatz als die 65xx-Familie besitzt, zu der auch der 8502-Prozessor im PC 128 gerechnet werden muß. Der Z80 wird im PC 128 mit 4 MHz getaktet. Dadurch, und mit dem neuen 1571-Laufwerk, das auch CP/M-Disketten lesen kann, werden endlich CP/M-Programme wie Wordstar auf einem preiswerten Computer verwendbar.</p>
 
@@ -70,11 +75,14 @@
 
         <p>Diese Frage ist nur mit »Jein« zu beantworten. Einerseits schaltet, wie erwähnt, der VIC im Fast-Modus einfach ab. Der Bildschirm sieht dann genauso aus, wie beim Laden von Datasette. Andererseits werden alle Grafikbefehle im Speicher ausgeführt, so daß nach Zurückschalten aufSLOW die fertige Grafik sichtbar wird. Das gleiche gilt generell, wenn Sie nur einen Fernseher oder 1701/1702-Composite-Monitor besitzen und trotzdem mit 2 MHz Taktfrequenz arbeiten möchten. Sie müssen vor jeder Bildschirmausgabe mit dem SLOW-Befehl den l-MHz-Modus einschalten, denn der VIC ist ja bei 2 MHz abgeschaltet. Erst nach der Umschaltung kann der VIC dann wieder Ihren Fernseher oder 1701/1702 ansteuern. Nach der Ausgabe können Sie dann mit FAST wieder den 2-MHz-Takt aktivieren. Das Programm läuft dann wieder mit doppelter Geschwindigkeit — allerdings mit abgeschalteten Composite-Bildschirm, da bei 2 MHz wieder der »simple« RGB-Video-Controller das Bild erzeugt.</p>
 
-        <p>Bild 1 zeigt die Speicherorganisationen der möglichen Betriebsarten. Die Speicheraufteilung im C 64-Modus ist mit der Memory Map des C 64 vollkommen identisch: im Bereich von$A000 bis $BFFF liegt das Basic-ROM und von $E000 bis $FFFF das Kernal-ROM mit dem</p>
-
         <h2>Die Speicherlandschaft</h2>
 
-        <p>40-Zeichen-Editor. $D000 bis $DFFF belegen die I/O-Bausteine (CIA und VIA) und das Character-ROM. Beide ROM-Bereiche, Basic und Betriebssystem für den C 64-Modus, sind beim PC 128 in einem 16-KByte-ROM-Baustein abgelegt, im Gegensatz zum C 64, wo Basic und Betriebssystem in je einem 8-KByte-ROM untergebracht sind.</p>
+        <p>Bild 1 zeigt die Speicherorganisationen der möglichen Betriebsarten. Die Speicheraufteilung im C 64-Modus ist mit der Memory Map des C 64 vollkommen identisch: im Bereich von$A000 bis $BFFF liegt das Basic-ROM und von $E000 bis $FFFF das Kernal-ROM mit dem 40-Zeichen-Editor. $D000 bis $DFFF belegen die I/O-Bausteine (CIA und VIA) und das Character-ROM. Beide ROM-Bereiche, Basic und Betriebssystem für den C 64-Modus, sind beim PC 128 in einem 16-KByte-ROM-Baustein abgelegt, im Gegensatz zum C 64, wo Basic und Betriebssystem in je einem 8-KByte-ROM untergebracht sind.</p>
+
+        <figure>
+            <img src="16-1.png" alt="">
+            <figcaption>Bild 1. Die Memory Map des PC 128. Halblinks die bekannte Speicheraufteilung des C 64</figcaption>
+        </figure>
 
         <p>Im PC 128-Modus wird die Aufteilung komplizierter; ist doch ein wesentlich umfangreichers Basic (Version 7.0) und ein zusätzlicher 80-Zeichen-Editor unterzubringen.</p>
 
@@ -102,9 +110,19 @@
 
         <p>Zusätzlich kann man sich selbst Bereiche von 1 bis 16 KByte in beiden Bänken reservieren, die am Speicheranfang oder Speicherende liegen können (Bild 2).</p>
 
+        <figure>
+            <img src="16-2.png" alt="">
+            <figcaption>Bild 2. Der untere Teil des Speichers unter die Lupe genommen</figcaption>
+        </figure>
+
         <p>Man kann diesen Bereich beispielsweise in eigenen Maschinenroutinen als Stack oder Speicher verwenden, wenn zwischen den Bänken umgeschaltet werden muß und die gleichen Daten zur Verfügung stehen sollen.</p>
 
         <p>Zur Bereichswahl hat die MMU das RAM-Configuration-Register (RCR, Bild 3). Bit 0 und 1 des RCR bestimmen die Größe des gemeinsamen Speicherbereichs von Bank 0 und Bank 1: 1, 4, 8, oder 16 KByte. Sind beide Bits »0«, beträgt der gemeinsame Speicher 1 KByte, oder wenn beide »1« sind, 16 KByte.</p>
+
+        <figure>
+            <img src="16-3.png" alt="">
+            <figcaption>Bild 3. Das RAM Configuration-Register der MMU</figcaption>
+        </figure>
 
         <p>Bit 2 und 3 des RCR bestimmen die Bereichslage. Ist Bit 2 gesetzt, liegt der gemeinsame Bereich an der Speicheruntergrenze, ist Bit 3 gesetzt liegt er an der Speicherobergrenze. Wenn beide Bits »1«, gesetzt sind, wird sowohl am Anfang und am Ende des Speichers der angegebene Bereich reserviert. Der Bereich kann also entsprechend zum jeweiligen Programm angelegt werden. Wie schon erwähnt, liegt der gemeinsame Speicher immer in Bank 0. Aber die MMU weiß durch das RCR, bei welcher Adresse die Bank gewechselt werden soll, ohne daß der Wechsel explizit im Programm angegeben werden muß.</p>
 
@@ -124,9 +142,19 @@
 
         <p>Bit 6 und 7 schließlich selektieren die RAM-Bank. Für die 128-KByte-Version des PC 128 ist nur Bit 6 wichtig. Ist es »0«, ist Bank 0 ausgewählt, ist es »1«, Bank 1.</p>
 
+        <figure>
+            <img src="16-11.png" alt="">
+            <figcaption>Bild 11. In unermüdlicher Kleinarbeit wühlt sich Georg Klinge durch Handbuch und Speicherorganisation.</figcaption>
+        </figure>
+
         <h2>Verbindung nach draußen</h2>
 
         <p>Wie der C 64 hat der PC 128 einen Expansion-Port, der von beiden Betriebsmodi angesteuert wird (Bild 4).</p>
+
+        <figure>
+            <img src="16-4.png" alt="">
+            <figcaption>Bild 4. Der PC 128 von hinten gesehen. Von rechts nach links: User-Port, RGB-Ausgang, Fernseher, Composite Video, Serieller Port, Datasetten-Anschluß, Expansion-Port für Steckmodule</figcaption>
+        </figure>
 
         <p>Im C 64-Modus entspricht die Pin-Belegung genau der des C 64.</p>
 
@@ -139,6 +167,11 @@
         <h3>Der serielle Bus</h3>
 
         <p>Der serielle Bus und der Kassetten-Port des PC 128 sind von den Anschlüssen her identisch mit denen des C 64. Die Bedienung des seriellen Bus wurde überarbeitet, so daß der PC 128 zusammen mit dem neuen Commodore Laufwerk 1571 wesentlich schneller speichern und laden kann als der C 64 (Bild 5).</p>
+
+        <figure>
+            <img src="16-5.png" alt="">
+            <figcaption>Bild 5. Die neue Floppy-Station 1571 und der ebenfalls neue 1902-RGB/Composite-Monitor</figcaption>
+        </figure>
 
         <p>TODO ASIDE</p>
 
@@ -154,7 +187,21 @@
 
         <p>Ein Blick ins Innere des PC 128 (Bild 6 und 10) zeigte auch, daß immer noch dieselben Bus-Bausteine verwendet werden. Gleichzeitig entspricht die Taktfrequenz des PC 128 im C 64-Modus der des C 64, so daß hier eigentlich auch keine Probleme erwartet wurden. Nächstes Testobjekt war ein Kopierprogramm, das intensiven Gebrauch von illegalen Opcodes macht. Mit Opcodes bezeichnet man den Befehlssatz des Prozessors. Illegale Opcodes sind Befehle, die der Hersteller des Prozessors eigentlich gar nicht vorgesehen hat. In Wirklichkeit bewirken aber manche von ihnen auch beim C 64 schon etwas. Und einige Programme nutzen sie. Es hätte also sein können, daß der 8502-Prozessor einige dieser beim 6502 an sich undefinierten Opcodes benutzt. Doch traten hier keine Probleme auf. Auch alle anderen kopiergeschützten (und nicht kopiergeschützten) Diskettenprogramme konnten wir ohne Schwierigkeiten laden und benutzen.</p>
 
+        <figure>
+            <img src="16-6.png" alt="">
+            <figcaption>Bild 6. Ein Blick auf die Platine des 128. Für das Seriengerät sind allerdings noch einige Änderungen vorgesehen.</figcaption>
+        </figure>
+        <figure>
+            <img src="16-10.png" alt="">
+            <figcaption>Bild 10. Hardware-Spezialist und Redakteur Harald Meyer bei der Analyse der PC 128-Platine.</figcaption>
+        </figure>
+
         <p>Wir verwendeten bei unserem Test das bekannte 1541-Floppy-Laufwerk (Bild 13). Wie es sich mit dem Nachfolgemodell, der 1571, verhält, berichten wir im zweiten Teil unseres PC 128-Tests.</p>
+
+        <figure>
+            <img src="16-13.png" alt="">
+            <figcaption>Bild 13. Christian Rogge testete die Kompatibilität des PC 128 zum C 64. Selbst undefinierte Opcodes bereiteten dem PC 128  64er-Modus keinerlei Probleme.</figcaption>
+        </figure>
 
         <p>Getestet wurden von uns diverse Spiele wie Ghostbusters und Pit Stop II. Auch hier ein eindeutiges Ergebnis: Grafik und Musik stimmen mit dem C 64 überein. Da auch die Datasette an den PC 128 angeschlossen werden kann, standen als nächstes Kassettenprogramme auf dem Plan: Diverse Spiele, zum Teil mit Turboladern und Autostart versehen, liefen genauso problemlos wie die Diskettenprogramme.</p>
 
@@ -162,9 +209,19 @@
 
         <p>Klares Fazit unseres Kompatibilitätstests: Wer schon einen C 64 mit Floppy 1541 hat, der kann zumindest seinen Computer beruhigt weiterverkaufen, steigt er auf den PC 128 um. Es gibt keinen Programmtyp, den wir nicht getestet haben; wir versuchten es mit Programmen, die auf übelste Art im Betriebssystem herumspringen: keine Chance. Der PC 128 ist voll kompatibel zum C 64, selbst wieder bei den Joystickanschlüssen (Bild 7).</p>
 
+        <figure>
+            <img src="16-7.png" alt="">
+            <figcaption>Bild 7. Anschlüsse und Schalter an der rechten Seite: Netzteilanschluß, Einschaltknopf, Reset-Taster, Joystick-Ports 2 und 1</figcaption>
+        </figure>
+
         <h2>Super-Basic 7.0</h2>
 
         <p>Beim Basic-Interpreter zeigt sich der PC 128 und der PC 128D (Bild 8) ohne Zweifel von einer seiner stärksten Seite: Das Basic 7.0 enthält alle Befehle und Funktionen der Basic-Versionen 2.0 (C 64), 3.5 (C 16 und Plus/4) und 4.0 (CBM 80xx). Damit stehen bereits leistungsfähige Grafikbefehle wie DRAW, BOX oder CIRCLE sowie viele Diskettenkommandos zur Verfügung. Doch damit nicht genug. Zusätzlich enthält das 7.0-Basic eine Reihe spezieller Befehle zur Steuerung von Sprites und zur einfachen Programmierung des Synthesizer-Bausteins (SID). Die zusätzlich zum 2.0-Basic vorhandenen Befehle und Funktionen sind in Tabelle 1 beschrieben.</p>
+
+        <figure>
+            <img src="16-8.png" alt="">
+            <figcaption>Bild 8. In der Version PC 128 sind Computer und 1571-Floppy im selben Gehäuse untergebracht</figcaption>
+        </figure>
 
         <p>Schon eine erste, oberflächliche Betrachtung dieser Tabelle läßt eine neue Dimension der Basic-Programmierung erahnen. Endlose DATA-Orgien und wüster GOTO-Dschungel gehören mit diesem Basic endgültig der Vergangenheit an.</p>
 
@@ -257,6 +314,15 @@
         <p>Ein weiterer Wermutstropfen: Die ganze schöne Grafik, Sprites und 40-Zeichen-Text sind ausschließlich über einen Composite-Monitor verfügbar, auf einem RGB-Monitor tut sich überhaupt nichts. Andersherum ist die 80-Zeichen-Textdarstellung nur über RGB (oder natürlich einen monochromen Monitor) möglich.</p>
 
         <p>Der verblüffte Anwender stellt spätestens jetzt fest, daß er einfach einen Monitor zu wenig hat. Damit dürfte Commodore sich die Urheberrechte am ersten Zwei-Monitor-Heimcomputer der Welt gesichert haben. Wohlgemerkt, man hat nicht die Wahl zwischen Composite und RGB, sondern braucht unbedingt einen Composite-Monitor für 40-Zeichen, Grafik und Sprites und ebenso unbedingt entweder einen RGB- oder einen SW-Monitor für 80 Zeichen (Bild 9 und 12). Abhilfe schafft hier der neue 1902-Monitor von Commodore, der speziell zum PC 128 entwickelt wurde und sowohl über einen Composite- als auch über einen RGB-Eingang verfügt. Zwischen beiden Betriebsarten des Monitors wird mit einem kleinen Schalter an der Frontseite hin- und hergeschaltet — eine softwaremäßige Umschaltung ist nicht vorgesehen. Man kann daher nur wünschen, daß der Umschalter stabil genug gebaut ist — er wird oft betätigt werden müssen.</p>
+
+        <figure>
+            <img src="16-9.png" alt="">
+            <figcaption>Bild 9. Der PC 128 mit RGB- und Composite-Monitor. Links das Programm und rechts die dadurch erzeugte Grafik.</figcaption>
+        </figure>
+        <figure>
+            <img src="16-12.png" alt="">
+            <figcaption>Bild 12. Das gesamte 7.0-Basic wurde  Volker Everts,  Sprachenspezialisten, konsequent durchprobiert und ausgetestet.</figcaption>
+        </figure>
 
         <p>Als Fazit zur PC 128-Grafik bleibt festzuhalten, daß sie von der Auflösung her dem durch den C 64 gesetzten Standard (320 x 200 Punkte) entspricht und wie beim C 16 vorbildlich durch das Basic unterstützt wird.</p>
 

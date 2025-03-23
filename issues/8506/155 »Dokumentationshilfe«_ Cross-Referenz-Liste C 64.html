@@ -18,23 +18,25 @@
         <h1>»Dokumentationshilfe«: Cross-Referenz-Liste C 64</h1>
         <p class="intro">Die Dokumentation von Basic-Programmen ist manchmal eine mühevolle Aufgabe. Trotzdem ist sie sinnvoll oder sogar notwendig. Aus diesem Grund schlugen wir einen Programmierwettbewerb zur Dokumentationshilfe vor, dessen Ergebnis hier vor Ihnen liegt.</p>
 
-        <p>TODO ASIDE</p>
+        <aside>
+            <h2>Lebenslauf</h2>
 
-        <h2>Lebenslauf</h2>
+            <figure>
+                <img src="155-0.png" alt="">
+            </figure>
 
-        <p>Angefangen hat meine Computerbegeisterung mit etwa zehn Jahren. Damals schenkte meine Großmutter mir einige Spiele von Atari. Diese Spiele waren aber nur kurzzeitig von Interesse.</p>
+            <p>Angefangen hat meine Computerbegeisterung mit etwa zehn Jahren. Damals schenkte meine Großmutter mir einige Spiele von Atari. Diese Spiele waren aber nur kurzzeitig von Interesse.</p>
 
-        <p>Ich kaufte mir fast alle Computer-Zeitschriften und konnte in den Kaufhäusern nicht an den Computern vorbeigehen, die dort ausgestellt waren.</p>
+            <p>Ich kaufte mir fast alle Computer-Zeitschriften und konnte in den Kaufhäusern nicht an den Computern vorbeigehen, die dort ausgestellt waren.</p>
 
-        <p>Als mein Vater sich für seine Handelsvertretung einen Commodore-Computer zulegte, hatte ich Gelegenheit, durch meine Vorkenntnisse, die Gespräche zwischen einer Leasingfirma und meinem Vater zu beeinflussen.</p>
+            <p>Als mein Vater sich für seine Handelsvertretung einen Commodore-Computer zulegte, hatte ich Gelegenheit, durch meine Vorkenntnisse, die Gespräche zwischen einer Leasingfirma und meinem Vater zu beeinflussen.</p>
 
-        <p>Meine Großmutter unterstützte mein Computerhobby auch finanziell und ich war mit 15 Jahren in der Lage, mir meinen eigenen C 64 mit Floppy zu kaufen. Nach den großen Ferien komme ich in die gymnasiale Oberstufe. Als Abiturfächer werde ich Physik, Mathematik und Englisch wählen, da ich Informatik studieren möchte. Diesen Beruf würde ich gern in der Forschung ausüben.</p>
+            <p>Meine Großmutter unterstützte mein Computerhobby auch finanziell und ich war mit 15 Jahren in der Lage, mir meinen eigenen C 64 mit Floppy zu kaufen. Nach den großen Ferien komme ich in die gymnasiale Oberstufe. Als Abiturfächer werde ich Physik, Mathematik und Englisch wählen, da ich Informatik studieren möchte. Diesen Beruf würde ich gern in der Forschung ausüben.</p>
 
-        <p>Zur Zeit überarbeite ich das EDV-Programm der Firma meines Vaters, um es bedienungsfreundlicher zu gestalten und dieses auch für einen Tennisclub von etwa 500 Mitgliedern (Verwaltung, Mitteilungen, Beitragseinzug) zu verwenden.</p>
+            <p>Zur Zeit überarbeite ich das EDV-Programm der Firma meines Vaters, um es bedienungsfreundlicher zu gestalten und dieses auch für einen Tennisclub von etwa 500 Mitgliedern (Verwaltung, Mitteilungen, Beitragseinzug) zu verwenden.</p>
 
-        <address class="author">(Stefan Becker)</address>
-
-        <hr />
+            <address class="author">(Stefan Becker)</address>
+        </aside>
 
         <p>Jeder Basic-Programmierer kennt das Problem: Man schreibt lange und auch komplizierte Programme und merkt, daß langsam aber sicher der Überblick verloren geht. Oder auch, wenn versucht wird, ein fremdes, nicht selbst erstelltes Programm zu verstehen: Was bedeutet diese Variable, und wo taucht sie im Programm noch auf? Von wo und wie oft wird diese Programmzeile angesprungen?</p>
 
@@ -60,6 +62,11 @@
 
         <p>An einem kleinen Beispiel soll gezeigt werden, wie man sich alle Zeilen anzeigen lassen kann, die den Befehl GOTO enthalten. Sehen Sie sich dazu das Flußdiagramm (Bild 1) an.</p>
 
+        <figure>
+            <img src="155-1.png" alt="">
+            <figcaption>Bild 1. So funktioniert im Prinzip dos Suchen von Basic-Befehlen aus Programmen, die auf Diskette stehen.</figcaption>
+        </figure>
+
         <p>Als erstes muß eine »Programmdatei« geöffnet werden. Das geht zum Beispiel mit OPEN2,8,2,"NAME,P,R". »P« steht dabei für Programm und »R« für READ, also lesen.</p>
 
         <p>Dann folgt das Lesen der Byte. Dazu nimmt man den GET#-Befehl. Der INPUT #-Befehl ist zwar wesentlich schneller, »schafft« aber nur maximal 88 Zeichen, benötigt ein Carriage Return (CHR$(13)) als Endekennzeichen (bei Programmen sind es Null-Byte) und verträgt keine Kommata (in Basic-Programmen oft vorhanden). Außerdem erlaubtuns der GET#-Befehl die Überprüfung einzelner Zeichen direkt nach dem Laden.</p>
@@ -80,6 +87,11 @@
 
         <p>Beim Durchsuchen »hangelt« sich der Computer durch die Zeilen, indem er, immer wenn er auf einen Charakter 0 trifft, eine neue Zeile beginnt. Im ersten Paß durchsucht er das Programm auf die Token für die Sprungbefehle GOTO, RUN, GOSUB und THEN (Zeile 330). Sie haben, in der gleichen Reihenfolge, die ASCII-Werte 137, 138, 141 und 167. Gefundene Sprünge werden auf zwei Arten gespeichert. Als erstes im Format ZEILENNUMMER : SPRUNGZIEL (Bild 3) in den Zeilen 400 bis 420, darauf im Format SPRUNGZIEL : ZEILENNUMMERN (Bild 3). Wobei SPRUNGZIEL immer die Zahl ist, die hinter GOTO oder THEN steht. ZEILENNUMMER ist jeweils die Zeile, in der der Sprungbefehl auftaucht.</p>
 
+        <figure>
+            <img src="155-3.png" alt="">
+            <figcaption>Bild 3. Diese Sprungtabelle wird ausgegeben, wenn das Programm »Listing 1« untersucht wird.</figcaption>
+        </figure>
+
         <p>Die Zeilennummern werden in den Feldern ps$( und sp$( gespeichert. Wird in einem der Felder die Maximallänge von 70 Zeichen überschritten, so wird ein neues Feld angelegt (Zeile 410 und 450).</p>
 
         <p>Haben Sie den ersten Pass glücklich überstanden, so wird die Liste auf das von Ihnen gewählte Gerät übertragen (Zeile 580 bis 680). Die aufsteigend sortierten Zeilennummern werden so ausgegeben, daß nie zwei gleiche Zeilennummern untereinanderstehen. Statt dessen werden sechs Leerzeichen gedruckt (Zeile 660).</p>
@@ -91,6 +103,15 @@
         <p>Antworten Sie auf die Frage »WOLLEN SIE ZU DEN VARIABLEN BEMERKUNGEN EINGEBEN« mit »J«, so können sie mit Cursor UP und DOWN durch die Liste wandern. Die momentane Variable wird jeweils angezeigt. Haben Sie die richtige Stelle gefunden, so drücken Sie »RETURN« und können Ihren Text eingeben. Durch nochmaliges Drücken der »RETURN«-Taste wird der Text gespeichert.</p>
 
         <p>Haben Sie Ihre Texte verteilt, so beginnt das Programm nach Drücken der »N«-Taste zu drucken (Zeilen 1180 bis 1280). Auch hier können Sie den Druckvorgang wiederholen (Bild 4 und 5).</p>
+
+        <figure>
+            <img src="155-4.png" alt="">
+            <figcaption>Bild 4. Diese Variablenliste erstellt »Cross-Ref 64« nach Untersuchung von »Listing 1«. Die Kommentare müssen natürlich zusätzlich eingegeben werden.</figcaption>
+        </figure>
+        <figure>
+            <img src="155-5.png" alt="">
+            <figcaption>Bild 5. Auch eine Variablenliste ohne Zeilennummern ist möglich. </figcaption>
+        </figure>
 
         <h3>Umstellungshinweise</h3>
 
