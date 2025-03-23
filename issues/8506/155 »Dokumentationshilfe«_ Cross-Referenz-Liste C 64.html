@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>»Dokumentationshilfe«: Cross-Referenz-Liste C 64</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="Stefan Becker, Stefan Becker, gk">
+    <meta name="64er.issue" content="6/85">
+    <meta name="64er.pages" content="155-159">
+    <!-- <meta name="64er.toc_category" content="XXX"> -->
+    <!-- <meta name="64er.toc_title" content="XXX"> -->
+    <meta name="64er.id" content="XXX">
+</head>
+
+<body>
+    <article>
+        <h1>»Dokumentationshilfe«: Cross-Referenz-Liste C 64</h1>
+        <p class="intro">Die Dokumentation von Basic-Programmen ist manchmal eine mühevolle Aufgabe. Trotzdem ist sie sinnvoll oder sogar notwendig. Aus diesem Grund schlugen wir einen Programmierwettbewerb zur Dokumentationshilfe vor, dessen Ergebnis hier vor Ihnen liegt.</p>
+
+        <p>TODO ASIDE</p>
+
+        <h2>Lebenslauf</h2>
+
+        <p>Angefangen hat meine Computerbegeisterung mit etwa zehn Jahren. Damals schenkte meine Großmutter mir einige Spiele von Atari. Diese Spiele waren aber nur kurzzeitig von Interesse.</p>
+
+        <p>Ich kaufte mir fast alle Computer-Zeitschriften und konnte in den Kaufhäusern nicht an den Computern vorbeigehen, die dort ausgestellt waren.</p>
+
+        <p>Als mein Vater sich für seine Handelsvertretung einen Commodore-Computer zulegte, hatte ich Gelegenheit, durch meine Vorkenntnisse, die Gespräche zwischen einer Leasingfirma und meinem Vater zu beeinflussen.</p>
+
+        <p>Meine Großmutter unterstützte mein Computerhobby auch finanziell und ich war mit 15 Jahren in der Lage, mir meinen eigenen C 64 mit Floppy zu kaufen. Nach den großen Ferien komme ich in die gymnasiale Oberstufe. Als Abiturfächer werde ich Physik, Mathematik und Englisch wählen, da ich Informatik studieren möchte. Diesen Beruf würde ich gern in der Forschung ausüben.</p>
+
+        <p>Zur Zeit überarbeite ich das EDV-Programm der Firma meines Vaters, um es bedienungsfreundlicher zu gestalten und dieses auch für einen Tennisclub von etwa 500 Mitgliedern (Verwaltung, Mitteilungen, Beitragseinzug) zu verwenden.</p>
+
+        <address class="author">(Stefan Becker)</address>
+
+        <hr />
+
+        <p>Jeder Basic-Programmierer kennt das Problem: Man schreibt lange und auch komplizierte Programme und merkt, daß langsam aber sicher der Überblick verloren geht. Oder auch, wenn versucht wird, ein fremdes, nicht selbst erstelltes Programm zu verstehen: Was bedeutet diese Variable, und wo taucht sie im Programm noch auf? Von wo und wie oft wird diese Programmzeile angesprungen?</p>
+
+        <p>Bei gut strukturierten Programmen findet man relativ schnell durch, aber die sind selten zu finden. Doch selbst dann ist eine gute Beschreibung eine hilfreiche Sache und erleichtert den späteren Wiedereinstieg.</p>
+
+        <p>Eine Crossreferenzliste unterstützt bei der Erstellung einer Dokumentation. Gerade bei kommerziellen Software-Projekten wird nicht auf sie verzichtet. Sie enthält dabei nicht nur eine Aufzählung aller Sprünge (sofern bei höheren Programmiersprachen überhaupt vorhanden), sondern vor allem eine komplette Variablenliste. Und diese Funktionen hat auch unser Programm. Im einzelnen enthält sie:</p>
+
+        <ol>
+            <li>Liste aller Zeilen, in denen Sprungbefehle enthalten sind. Angegeben wird die Zeilennummer und die angesprungene Zeile.</li>
+            <li>Liste aller Zeilen, die angesprungen werden. Angegeben sind die Zeilennummer und alle Zeilen, von denen aus diese Zeile angesprungen wird. Eine sehr nützliche Information.</li>
+            <li>Eine Liste aller im Programm vorkommenden Variablen. Angegeben wird, alphabetisch sortiert, der Variablenname und die Zeilen, in denen sie vorkommt. Zusätzlich hat man die Möglichkeit, zu jeder Variablen einen kurzen Kommentar mit einzugeben.</li>
+            <li>Liste aller Variablen mit dem vorhin genannten Kommentar, aber ohne Hinweise auf die Zeilen, in denen sie vorkommen.</li>
+        </ol>
+
+
+        <p>Mit diesen Informationen kann man schon etwas anfangen. Dochjetzt etwas für Programmierer selbst:</p>
+
+        <h2>Wie funktioniert das?</h2>
+
+        <p>Wie sucht man nach Variablen? Wie nach Sprungbefehlen? Wie so oft, ist die Lösung ganz einfach.</p>
+
+        <p>Wie ein Basic-Programm im Speicher steht, wurde ausführlich im 64’er, Ausgabe 2/85, Seite 87, beschrieben. Fast in der gleichen Form wird ein Programm auch auf Diskette gespeichert. Lediglich zwei Byte für die Ladeadresse des Programms kommen dazu. Beim absoluten Laden eines Programms (LOAD"NAME",8,1) holt sich der Basic-Interpreter diese zwei Byte, um festzustellen, an welcher Stelle im Speicher das Programm beginnt. Beim normalen LOAD-Befehl, also ohne die ",1" am Ende, wird jedes Programm ab Basic-Anfang gesetzt, also ab $801 ( = dezimal 2049).</p>
+
+        <p>An einem kleinen Beispiel soll gezeigt werden, wie man sich alle Zeilen anzeigen lassen kann, die den Befehl GOTO enthalten. Sehen Sie sich dazu das Flußdiagramm (Bild 1) an.</p>
+
+        <p>Als erstes muß eine »Programmdatei« geöffnet werden. Das geht zum Beispiel mit OPEN2,8,2,"NAME,P,R". »P« steht dabei für Programm und »R« für READ, also lesen.</p>
+
+        <p>Dann folgt das Lesen der Byte. Dazu nimmt man den GET#-Befehl. Der INPUT #-Befehl ist zwar wesentlich schneller, »schafft« aber nur maximal 88 Zeichen, benötigt ein Carriage Return (CHR$(13)) als Endekennzeichen (bei Programmen sind es Null-Byte) und verträgt keine Kommata (in Basic-Programmen oft vorhanden). Außerdem erlaubtuns der GET#-Befehl die Überprüfung einzelner Zeichen direkt nach dem Laden.</p>
+
+        <p>Lesen wir jetzt also die ersten Byte eines Basic-Programms. Am Anfang, das sind die ersten zwei Bytes, steht die Startadresse. Bei Basic-Programmen ist sie 2049, hexadezimal ausgedrückt $0801. Darauf folgen zwei Byte für die Anfangsadresse der nächsten Basic-Zeile (gemeint ist hier die Adresse im RAM, die natürlich auch gespeichert wird). Erst jetzt beginnt die wirkliche Basic-Zeile: Zwei Byte für die Zeilennummer, aufgetrennt in Low- und High-Byte, gefolgt vom Basic-Text. Das Ende einer Basic-Zeile erkennen Sie (und der Basic-Interpreter) an einem Null-Byte. Danach folgt wieder die Anfangsadresse der nächsten Basic-Zeile (Low- und High-Byte) und der nächsten Zeilennummer (auch Low- und High-Byte), danach der Basic-Text, etc., etc.. Das Ende eines Basic-Programms ist gekennzeichnet durch drei aufeinanderfolgende Null-Byte, und auch die Statusvariable ST wird auf 64 gesetzt.</p>
+
+        <p>Das war’s schon. Mit diesem Wissen sind Sie in der Lage, ein Basic-Programm komplett zu analysieren. Eine vollständige Liste aller Token, das sind die Abkürzungen, die Codes der Basic-Befehle, finden Sie in Bild 2.</p>
+
+        <p>Doch nun zum Programm »Cross-Ref 64«.</p>
+
+        <h2>Cross-Ref 64</h2>
+
+        <p>Das hier vorgestellte Programm Cross-Ref 64 (Listing 2) arbeitet auf allen Commodore-Computern, mit einem Floppy- oder Kassetten-Laufwerk und einem Drucker.</p>
+
+        <p>Nach dem Start mit RUN kann die Ausgabe der fertigen Listen auf Drucker oder Bildschirm gewählt werden (siehe auch Zeile 200 bis 260). Die Variable DV enthält die jeweils gültige Gerätenummer. Danach müssen Sie den Dateinamen des zu durchsuchenden Files eingeben.</p>
+
+        <p>Ihr Computer liest sich nun das Programm wie ein sequentielles File Byte für Byte durch. Das Programm steht auf der Diskette im gleichen Format wie im RAM, lediglich die ersten beiden Bytes geben den Start des Programms an. Liegt Ihr Programm nicht ab 2049, zum Beispiel bei Maschinenprogrammen üblich, so bricht das Programm die Bearbeitung ab. Sollten Sie das Programm auf einem anderen Commodore-Computer betreiben, so geben Sie einfach Listing 3 ein und tauschen die auf dem Bildschrim erscheinende Zahl gegen die in Zeile 290 stehende 2049 aüs.</p>
+
+        <p>Beim Durchsuchen »hangelt« sich der Computer durch die Zeilen, indem er, immer wenn er auf einen Charakter 0 trifft, eine neue Zeile beginnt. Im ersten Paß durchsucht er das Programm auf die Token für die Sprungbefehle GOTO, RUN, GOSUB und THEN (Zeile 330). Sie haben, in der gleichen Reihenfolge, die ASCII-Werte 137, 138, 141 und 167. Gefundene Sprünge werden auf zwei Arten gespeichert. Als erstes im Format ZEILENNUMMER : SPRUNGZIEL (Bild 3) in den Zeilen 400 bis 420, darauf im Format SPRUNGZIEL : ZEILENNUMMERN (Bild 3). Wobei SPRUNGZIEL immer die Zahl ist, die hinter GOTO oder THEN steht. ZEILENNUMMER ist jeweils die Zeile, in der der Sprungbefehl auftaucht.</p>
+
+        <p>Die Zeilennummern werden in den Feldern ps$( und sp$( gespeichert. Wird in einem der Felder die Maximallänge von 70 Zeichen überschritten, so wird ein neues Feld angelegt (Zeile 410 und 450).</p>
+
+        <p>Haben Sie den ersten Pass glücklich überstanden, so wird die Liste auf das von Ihnen gewählte Gerät übertragen (Zeile 580 bis 680). Die aufsteigend sortierten Zeilennummern werden so ausgegeben, daß nie zwei gleiche Zeilennummern untereinanderstehen. Statt dessen werden sechs Leerzeichen gedruckt (Zeile 660).</p>
+
+        <p>Der zweite Pass läuft im Prinzip wie der erste ab. Die Variablen mit zugehörigen Zeilennummern werden lediglich im Feld VA$( gespeichert und sortiert. Selbstverständlich wird der Text hinter REM und DATA sowie Anführungszeichen überlesen (Zeile 750-790).</p>
+
+        <p>In diesem Stadium kommt Arbeit auf Sie zu. Jetzt haben Sie die Möglichkeit, die Variablen mit einem Text zu versehen. Dabei müssen Sie sich allerdings auf 25 Zeichen beschränken.</p>
+
+        <p>Antworten Sie auf die Frage »WOLLEN SIE ZU DEN VARIABLEN BEMERKUNGEN EINGEBEN« mit »J«, so können sie mit Cursor UP und DOWN durch die Liste wandern. Die momentane Variable wird jeweils angezeigt. Haben Sie die richtige Stelle gefunden, so drücken Sie »RETURN« und können Ihren Text eingeben. Durch nochmaliges Drücken der »RETURN«-Taste wird der Text gespeichert.</p>
+
+        <p>Haben Sie Ihre Texte verteilt, so beginnt das Programm nach Drücken der »N«-Taste zu drucken (Zeilen 1180 bis 1280). Auch hier können Sie den Druckvorgang wiederholen (Bild 4 und 5).</p>
+
+        <h3>Umstellungshinweise</h3>
+
+        <p>Dieses Programm ist auf allen Computern lauffähig, die ihren Basic-Text nach Commodoreart speichern. Potentielle »Umschreiber«’können sich daher auf die Zeile 330 beschränken. Auch die Druckausgabe ist leicht modifizierbar. Die Sekundäradresse der OPEN-Befehle in den Zeilen 580 und 1180 stellen den Epson MX-80 über das Print-64-Interface auf Klein/Großschrift um. Dies kann auch durch normale »OPENs« mit nachfolgenden Steuercodes erfolgen.</p>
+
+        <p>Sogar bei einem Kassettenlaufwerk ist das Programm verwendbar. Auch hier ändern Sie in den Zeilen 290 und 730 die OPEN-Befehle (Listing 4).</p>
+
+        <address class="author">(Stefan Becker/gk)</address>
+    </article>
+</body>
+
+</html>
