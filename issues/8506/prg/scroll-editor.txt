@@ -1,0 +1,595 @@
+
+
+;scroll-editor ==0801==
+    0 rem************ editor **************
+    1 rem*--------------------------------*
+    2 rem*                                *
+    3 rem*   (c) 1985 by thilo herrmann   *
+    4 rem*         poststr. 6             *
+    5 rem*         7321 b\rtlingen        *
+    6 rem*                                *
+    7 rem*         tel. 07161/52592       *
+    8 rem*--------------------------------*
+    9 rem**********************************
+   10 :
+  100 ifpeek(50000)=56andpeek(50001)=253then160
+  110 print"scroll-machine laden !"
+  120 end
+  130 :
+  140 :
+  150 rem erweiterung ein
+  160 sys49152
+  170 rem basic-speicher ueber 20000
+  180 rem       freihalten
+  190 poke56,78:poke55,32:clr
+  200 ze=160:v=53248:as=1024:sp=53240:m=1
+  210 sx=40:sy=180:tt=197:nt=64
+  220 xk=64:yk=8
+  230 h1=8:h2=16:h3=255:h4=256
+  240 uf=55296: rem zwischenspeicher
+  250 a(0)=1:a(1)=0:a(2)=128
+  260 pokev+21,0
+  270 a=3:gosub2240
+  280 gosub2280
+  290 :
+  300 rem *** eingabe ***
+  310 gosub2500:_us0
+  320 print"{clr}{wht}"
+  330 sa=40960:xd=128:yd=64
+  340 gosub4860
+  350 :
+  360 :
+  370 rem zeichensatz kopieren
+  380 print"{clr}":gosub5010
+  390 :
+  400 rem *** parameter setzen ***
+  410 _rs:_zf14
+  420 s2=sa-19-7*xd:gosub2130
+  430 _mts2,xd,yd
+  440 _js1,64,64
+  450 _gm1:_grxd*8,xd*16-8,0,yd*8-8
+  460 df=3*xd
+  470 :
+  480 rem textfenster verlegen
+  490 _rz40,50,164
+  500 _su0:_1r31,23,16
+  510 _rf6,6,6:_vi52224,15
+  520 :
+  530 ifwhthen760
+  540 _fu52224,53223,32
+  550 _us1:gosub2500:gosub3080
+  560 f(1)=14:f(4)=6
+  570 ifc=1thenf(1)=0:f(2)=7:f(3)=8:f(4)=10
+  580 gosub2500:gosub2930
+  590 :
+  600 rem palette erstellen
+  610 a=52867:b=40:c=32
+  620 fori=0to7
+  630 fort=0to31
+  640 pokea+i*b+t,i*c+t
+  650 nextt,i
+  660 :
+  670 rem *** loeschen ***
+  680 gosub2500:print"loeschen (j/n)?"
+  690 gosub2060:onagoto700,760
+  700 print"{up}wirklich (j/n)?"
+  710 gosub2060:onagoto720,760
+  720 _fusa,ea,32
+  730 :
+  740 :
+  750 rem *** sprites ***
+  760 _fuas,as+62,.
+  770 fort=as+6tot+21step3:poket,3:next
+  780 fort=as+8tot+21step3:poket,192:next
+  790 pokeas+31,255:pokeas+4,255
+  800 _ut as,as+64,55296,48,48
+  810 pokesp,96:pokesp+1,96
+  820 pokev,175:pokev+1,100
+  830 pokev+2,0:pokev+3,180
+  840 pokev+40,7
+  850 pokev+21,3
+  860 :
+  870 _fu960,1023,0
+  880 _fu1024,2023,32
+  890 _fu2040,2047,15
+  900 gosub2570
+  910 :
+  920 ifwhthen970
+  930 wh=1:rem flag setzen
+  940 :
+  950 rem auf 0,0 -position setzen
+  960 _poxd*8,0
+  970 _tm1:_us1:print
+  980 e$="~":gosub4760:goto1070
+  990 :
+ 1000 :
+ 1010 rem ***** hauptroutine *****
+ 1020 :
+ 1030 rem *** tastaturabfrage ***
+ 1040 rem cursortasten abfragen
+ 1050 gete$:ife$=""then1490
+ 1060 ife$="{up}"ore$="{down}"ore$="{left}"ore$="{rght}"thengosub2730:goto1410
+ 1070 e=val(e$)
+ 1080 rem zeichen unter cursor loeschen
+ 1090 ifpeek(tt)=.ore$=chr$(20)thenpokepo,32:goto1490
+ 1100 ife$=" "thengosub4300
+ 1105 ife$="@"then5430
+ 1110 ife$="r"thengosub4370
+ 1120 ife>0then:_ase-1
+ 1130 ife$="{home}"thenze=32
+ 1140 gosub2500
+ 1150 _fu1024,2023,32
+ 1160 ife$="l"then680
+ 1170 :
+ 1180 :
+ 1190 gosub2690
+ 1200 ife$="{f7}"thengosub2250
+ 1210 ife$="k"thengosub2200
+ 1220 ife$="m"thengosub4820
+ 1230 ife$="M"thengosub5230
+ 1240 ife$="{f1}"then1790
+ 1250 ife$="{f3}"then1890
+ 1260 ife$="{CTRL-X}"thenpoke648,4:_us0:print"{clr}";:end
+ 1270 ife$="f"thengosub2910
+ 1280 ife$="z"then3140
+ 1290 ife$="W"thengosub3420
+ 1300 ife$="s"thengosub3230
+ 1310 ife$="c"thengosub5010
+ 1320 ife$="w"thengosub4700
+ 1330 ife$="a"then5080
+ 1340 ife$="u"thengosub3570
+ 1350 ife$="t"then5540
+ 1360 ife$="K"thengosub3700
+ 1370 ife$="^"thengosub5360
+ 1390 ife$="_"thengosub4760
+ 1400 rem bildschirm zuruecksetzen
+ 1410 gosub2570:print
+ 1420 _fu55896,56295,fs
+ 1430 _fu55296,55855,f(4)
+ 1440 pokev+39,1:poke198,0
+ 1450 xc=zeand31:yc=int(ze/32)
+ 1460 ut=1:gosub2780:ut=0
+ 1470 printtab(26)"{up}{rght}{wht}nr. :"ze"{left}  "
+ 1480 :
+ 1490 gosub1580
+ 1500 ifm2thengosub1630
+ 1510 ifusr(4)then:gosub1540:pokepo,ze
+ 1520 _sy1
+ 1530 gosub1690:goto1050
+ 1540 ifm1thenze=k(paand7,km):pa=usr(kd)
+ 1550 ifwethenze=ze+1:ifze>w2thenze=w1
+ 1560 return
+ 1565 :
+ 1570 rem adresse berechnen
+ 1580 po=usr(3)-df
+ 1590 ifpo<.thenpo=65536+po
+ 1600 return
+ 1610 :
+ 1620 rem micro-punkt berechnen
+ 1630 pu=p2((p1and1)+(p2and1)*2)
+ 1640 ze=s(r(usr(po))orpu)
+ 1650 p1=usr(1)/4:p2=usr(2)/4
+ 1660 return
+ 1670 :
+ 1680 rem x- und y-koordinaten printen
+ 1690 gosub1750
+ 1700 print"{up}x:"xp;
+ 1710 print"{left} y:"yp;
+ 1720 print"{left} addr:"po"{left}   "
+ 1730 return
+ 1740 :
+ 1750 xp=int(usr(1)/8-xd)
+ 1760 yp=int(usr(2)/8):return
+ 1770 :
+ 1780 rem *** abspeichern ***
+ 1790 print"{rght}abspeichern (j/n)?"
+ 1800 gosub2060:onagoto1810,1410
+ 1810 gosub5780:ifa$="k"then3960
+ 1820 _mtsa,xd,yd
+ 1830 _us0
+ 1840 open1,8,15,"s:"+n$:gosub1990
+ 1850 _sv n$,ea
+ 1860 gosub1980:goto420
+ 1870 :
+ 1880 rem *** laden ***
+ 1890 print"{rght}laden (j/n)?"
+ 1900 gosub2060:onagoto1910,1410
+ 1910 gosub5780:ifa$="k"then4190
+ 1920 _ld n$
+ 1930 gosub1980:ifenthen1950
+ 1940 sa=usr(10):xd=usr(11):yd=usr(12)
+ 1950 goto420
+ 1960 :
+ 1970 rem floppymeldung
+ 1980 _us0:open1,8,15
+ 1990 input#1,en,er$,et,es
+ 2000 close1:_us1
+ 2010 if er$="ok"then return
+ 2020 print"{down}{rght}"en;er$;et;es
+ 2030 wait197,63:poke198,0:return
+ 2040 :
+ 2050 rem j/n eingabe
+ 2060 poke198,0
+ 2070 geta$
+ 2080 ifa$="j"thena=1:return
+ 2090 ifa$<>"n"then2070
+ 2100 a=2:return
+ 2110 :
+ 2120 rem endadresse berechnen
+ 2130 ea=sa+xd*yd-1:return
+ 2140 :
+ 2150 :
+ 2160 rem hi/lo-byte umrechnung
+ 2170 h=int(a/256):l=a-h*256:return
+ 2180 :
+ 2190 rem kontur einstellen
+ 2200 gosub3880
+ 2210 input"geschwindigkeit:{rght}{rght}8{left}{left}{left}";ge
+ 2220 ifa<3then:xk=ge:yk=64:goto2240
+ 2230 yk=ge:xk=64
+ 2240 km=a:kd=(a-1)/2+1
+ 2250 we=0:m1=1:m2=0:_js1,xk,yk:return
+ 2260 :
+ 2270 rem micro-datas
+ 2280 data 32,108,123,98,124,225,255,254,126,127,97,252,226,251,236,160
+ 2290 dimr(255),s(15)
+ 2300 restore
+ 2310 fori=0to15
+ 2320 reada:s(i)=a:r(a)=i:next
+ 2330 :
+ 2340 fori=0to3:p2(i)=2^(3-i):next
+ 2350 :
+ 2360 rem y - datas
+ 2370 data100,111,121,98,248,247,227,160
+ 2380 fori=7to0step-1:reada:k(i,3)=a
+ 2390 k(i,4)=a+128and255:next
+ 2400 :
+ 2410 rem x - datas
+ 2420 data101,116,117,97,246,234,231,160
+ 2430 fori=0to7:reada:k(i,1)=a
+ 2440 k(i,2)=a+128and255:next
+ 2450 :
+ 2460 return
+ 2470 :
+ 2480 :
+ 2490 rem normal schalten
+ 2500 poke648,4
+ 2510 _mc21,52,52
+ 2520 _ci151,148,148
+ 2530 gosub2650
+ 2540 return
+ 2550 :
+ 2560 rem palette einschalten
+ 2570 _mc52,52,52
+ 2580 _ci148,148,148
+ 2590 poke648,204
+ 2600 poke214,14:print
+ 2610 _fu55856,55895,6:rem hin.far.
+ 2620 return
+ 2630 :
+ 2640 rem cursor setzen + zeile loeschen
+ 2650 poke214,14:print:print"                                       {up}"
+ 2660 return
+ 2670 :
+ 2680 rem auf vielfaches von 8 setzen
+ 2690 gosub1750:_poxd*8+xp*8,yp*8:return
+ 2700 :
+ 2710 :
+ 2720 rem wahl des characters
+ 2730 ife$="{up}"thenyc=yc-1:ifyc<0thenyc=7
+ 2740 ife$="{down}"thenyc=yc+1:ifyc>7thenyc=0
+ 2750 ife$="{left}"thenxc=xc-1:ifxc<0thenxc=31
+ 2760 ife$="{rght}"thenxc=xc+1:ifxc>31thenxc=0
+ 2770 rem spritesteuerung
+ 2780 cx=xc*h1+sx
+ 2790 pokev+2,cxandh3
+ 2800 pokev+h2,sgn(cxandh4)*2
+ 2810 pokev+3,sy+yc*h1
+ 2820 :
+ 2830 ifutthen2860
+ 2840 ifpeek(tt)<>ntthengete$:goto2730
+ 2850 gosub2570:print
+ 2860 ze=yc*32+xc:rem zeichen berechnen
+ 2870 return
+ 2880 :
+ 2890 :
+ 2900 rem farbeneingabe
+ 2910 gosub3080
+ 2920 :
+ 2930 print
+ 2940 a=1:gosub3050:
+ 2950 oncgoto2960,2980
+ 2960 a=2:gosub3050:pokev+34,f(2)
+ 2970 a=3:gosub3050:pokev+35,f(3)
+ 2980 _2r200+b,200,192+b
+ 2990 a=4:gosub3050:_hf6,6,f(1)
+ 3000 :
+ 3010 fs=f(4)
+ 3020 ifb=0thenfs=f(1)
+ 3030 gosub2570:return
+ 3040 :
+ 3050 print"{up}farbe"a":  "f(a)"{left} "
+ 3060 print"{up}"tab(10);:inputf(a):return
+ 3070 :
+ 3080 print"multicolor (j/n)?"
+ 3090 gosub2060:gosub2500:b=(1-(a-1))*16:c=a
+ 3100 return
+ 3110 :
+ 3120 :
+ 3130 rem zeichensatz laden
+ 3140 print"{rght}{rght}zeichensatz laden (j/n)?"
+ 3150 gosub2060:onagoto3160,3190
+ 3160 input"{down}{rght}name: ";n$
+ 3170 rem laden an 53248 - 2
+ 3180 _ld n$,53246:gosub1980
+ 3190 goto420
+ 3200 :
+ 3210 :
+ 3220 rem schreiben
+ 3230 _sy0:_tm0:_js0:rt=usr(1)
+ 3240 x=usr(1):y=usr(2)
+ 3250 geta$:ifa$="{f7}"then:_tm1:_js1:return
+ 3260 ifa$=""then3250
+ 3270 a=asc(a$)
+ 3280 rem cursorsteuercodes beachten
+ 3290 ifa=32then3360
+ 3300 ifa=20ora=157thenx=x-8:goto3380
+ 3310 ifa=29thenx=x+8:goto3380
+ 3320 ifa=17theny=y+8:goto3380
+ 3330 ifa=145theny=y-8:goto3380
+ 3340 ifa=13theny=y+8:x=rt:goto3380
+ 3350 ifa=18ora=146thenprinta$;:goto3250
+ 3360 print"{home}"a$;:a=peek(1024)
+ 3370 pokeusr(3)-df,a:x=x+8
+ 3380 _pox,y:goto3240
+ 3390 :
+ 3400 :
+ 3410 rem wechsel
+ 3420 gosub2570:gosub2650
+ 3430 print"wechsel von":gosub3500
+ 3440 w1=ze
+ 3450 print"{up}wechsel bis":gosub3500
+ 3460 w2=ze:ifw2<w1then3450
+ 3470 we=1:return
+ 3480 :
+ 3490 rem waehlen des zeichens
+ 3500 gosub2730
+ 3510 gete$:ife$=chr$(13)thenreturn
+ 3520 ife$=""then3510
+ 3530 goto3500
+ 3540 :
+ 3550 :
+ 3560 rem uebertragen
+ 3570 gosub2570:gosub2650
+ 3580 y2=yc:x2=xc:ut=1
+ 3590 print"uebertragen !"
+ 3600 gete$:ife$=chr$(13)thenut=.:return
+ 3610 ife$=""then3600
+ 3620 gosub2730
+ 3630 a=usr(3)-df+xc-x2+yc*xd-y2*xd
+ 3640 ifa>=saanda<=eathenpokea,ze
+ 3650 _sy1
+ 3660 goto3600
+ 3670 :
+ 3680 :
+ 3690 rem konturen definieren
+ 3700 gosub3880:a2=a
+ 3710 gosub2570:gosub2650
+ 3720 print"erstes element ?"
+ 3730 gosub3500
+ 3740 gosub2650
+ 3750 :
+ 3760 rem austeigend oder fallend
+ 3770 print"1...[-1] / 2...[+1]"
+ 3780 geta$:a=val(a$)*2-3
+ 3790 ifa<-1ora>1then3780
+ 3800 a3=0
+ 3810 rem in variablen schreiben
+ 3820 fori=-3.5*ato3.5*astepa
+ 3830 k(i+4,a2)=ze+a3:a3=a3+1:next
+ 3840 a=a2:gosub2650:goto2210
+ 3850 :
+ 3860 :
+ 3870 rem wahl des konturmodes
+ 3880 print"1...x+ B 2...x- B 3...y+ B 4...y-
+ 3890 geta$:a=val(a$)
+ 3900 ifa<1ora>4then3890
+ 3910 return
+ 3920 :
+ 3930 :
+ 3940 rem abspeichern auf kassette
+ 3950 rem schreiben von sa,xd,yd
+ 3960 _of:open1,1,1,n$:print#1,sa","xd","yd:close1
+ 3970 rem schreiben des schirms
+ 3980 gosub4050:a=sa:gosub2170
+ 3990 poke251,l:poke252,h
+ 4000 a=ea+1:gosub2170
+ 4010 poke780,251:poke781,l:poke782,h
+ 4020 sys65496:close1:sys49152:goto410
+ 4030 :
+ 4040 rem oeffnen des kassettenkanals
+ 4050 l=len(n$):poke183,l
+ 4060 s=256*204
+ 4070 ifl=0then4100
+ 4080 forx=1tol
+ 4090 pokes+x-1,asc(mid$(n$,x,1)):next
+ 4100 poke780,1:poke781,1:poke782,0
+ 4110 sys65466
+ 4120 poke780,l:poke781,0
+ 4130 poke782,204:sys65469
+ 4140 return
+ 4150 :
+ 4160 :
+ 4170 rem laden von kassette
+ 4180 rem lesen von sa,xd,yd
+ 4190 _of:open1,1,0,n$:input#1,s2,x2,y2:close1
+ 4200 rem lesen des schirms
+ 4210 gosub4050:a=s2:gosub2170
+ 4220 poke780,0:poke781,l:poke782,h
+ 4230 sys65493
+ 4240 if(st and 48)thenprint"{down}band fehler !":close1:wait197,63:goto410
+ 4250 sa=s2:xd=x2:yd=y2:sys49152:goto410
+ 4260 :
+ 4270 :
+ 4280 rem schnellgang
+ 4290 rem syncronisation aus + hf=gruen
+ 4300 _sy0:_rf6,6,5:pokev+39,1
+ 4310 gosub1580:gosub1690
+ 4320 gete$:ife$=""then4310
+ 4330 e$="":_rf6,6,6:return
+ 4340 :
+ 4350 :
+ 4360 rem rechteck ausfuellen
+ 4370 gosub4480:rem bereich waehlen
+ 4380 ife$="_"thenreturn
+ 4390 :
+ 4400 rem rechteck fuellen
+ 4410 fori=ystoyp
+ 4420 br=ps+(yp-i)*xd
+ 4430 _fu br,br+(xp-xs),ze
+ 4440 next
+ 4450 e$="":return
+ 4460 :
+ 4470 rem bereich waehlen
+ 4480 xs=xp:ys=yp:ps=po:g=usr(ps)
+ 4490 pokeps,(usr(ps)+128)andh3
+ 4500 pokev+39,peek(v+39)+1andh3
+ 4510 _sy1
+ 4520 gosub1580:gosub1690
+ 4530 ifusr(4)then4590
+ 4540 gete$
+ 4550 ife$=""then4490
+ 4560 ife$=" "thengosub4300
+ 4570 ife$="_"thenpokeps,g:goto4760
+ 4580 goto4490
+ 4590 pokeps,g
+ 4600 :
+ 4610 rem normalisieren
+ 4620 ifxp-xs<0thena=xp:xp=xs:xs=a
+ 4630 ifyp-ys<0thena=yp:yp=ys:ys=a
+ 4640 ps=sa+ys*xd+xs
+ 4650 return
+ 4660 :
+ 4670 :
+ 4680 :
+ 4690 rem umschalten auf wechselmodus
+ 4700 we=we+1and1
+ 4710 ifwethenze=w1:return
+ 4720 goto2860
+ 4730 :
+ 4740 :
+ 4750 rem reset
+ 4760 m1=0:m2=0:gosub2690:_js1,64,64
+ 4770 we=0:ze=160
+ 4780 return
+ 4790 :
+ 4800 :
+ 4810 rem micro - mode setzen
+ 4820 m2=1:m1=0:we=0:_js1,32,32:return
+ 4830 :
+ 4840 :
+ 4850 rem eingabe von aa,xd,yd
+ 4860 gosub2650
+ 4870 print"{rght}{rght}x- und y-ausdehnung   "xd","yd
+ 4880 print"{up}"spc(23);:inputxd,yd
+ 4890 print"{down}{rght}{rght}startadresse   "sa
+ 4900 print"{up}"spc(16);:inputsa
+ 4910 ifxd<1oryd<1then4860
+ 4920 gosub2130
+ 4930 print"{down}{rght}{rght}start:"sa"  ende:"ea
+ 4940 ifsa<20000or(sa>49152andsa<57344)orsa>65530then4860
+ 4950 if(ea>49152andea<57344)orea>65535then4860
+ 4960 print"{down}{rght}{rght}{rght}richtig (j/n)?"
+ 4970 gosub2060:onagoto4980,4860
+ 4980 return
+ 4990 :
+ 5000 rem zeichensatz vom rom ins ram
+ 5010 gosub2500:print"{rght}{rght}zeichensatz kopieren (j/n)?"
+ 5020 gosub2060:onagoto5030,5040
+ 5030 _cp
+ 5040 return
+ 5050 :
+ 5060 :
+ 5070 rem umformatieren eines schirms
+ 5080 sf=sa:ef=ea:xf=xd:yf=yd
+ 5090 gosub4860:_us0:l=48
+ 5100 l1=0:l2=yf-1:l3=1
+ 5110 ifxd>xfthenl1=yf-1:l2=0:l3=-1
+ 5120 :
+ 5122 print"{clr} schirm an neue adresse kopieren (j/n)?"
+ 5123 gosub 2060:on a goto 5140,5190
+ 5130 :
+ 5140 fori= l1 to l2 step l3
+ 5150 a=sf+xf*i:b=sf+xf*(i+1)-1:c=b-a
+ 5160 _ut a,b,uf,l,l
+ 5170 _ut uf,uf+c,sa+xd*i,l,l
+ 5180 next
+ 5190 goto420
+ 5200 :
+ 5210 :
+ 5220 rem micro-zeichen definieren
+ 5230 gosub2570:gosub2650
+ 5240 print"erstes element ?"
+ 5250 gosub3500:rem zeichen waehlen
+ 5260 ifze>240then5250
+ 5270 gosub5320
+ 5280 fori=0to15:s(i)=i+ze:r(i+ze)=i
+ 5290 next
+ 5300 goto4820
+ 5310 :
+ 5320 fori=0to255:r(i)=.:next:return
+ 5330 :
+ 5340 :
+ 5350 rem kontur und micro reset
+ 5360 print"kontur und micro zuruecksetzen (j/n)?"
+ 5370 gosub2060:onagoto5380,5390
+ 5380 gosub5320:gosub2300
+ 5390 return
+ 5400 :
+ 5410 :
+ 5420 rem micro-mode umschalten
+ 5430 r(32)=15-r(32)
+ 5440 fori=0to15
+ 5450 r(s(i))=15-i
+ 5460 next
+ 5470 fori=0to7
+ 5480 a=s(i):s(i)=s(15-i):s(15-i)=a
+ 5490 next
+ 5500 goto1490
+ 5510 :
+ 5520 :
+ 5530 rem transfer eines bereiches
+ 5540 gosub4480:rem bereich waehlen
+ 5550 ife$="_"then420
+ 5560 gosub2650:print"wohin (linker oberer punkt) ?{up}"
+ 5570 ifusr(4)then5570
+ 5580 pt=ps:xt=xs:yt=ys
+ 5590 xr=xp:yr=yp:gosub4480
+ 5600 ife$="_"then420
+ 5610 :
+ 5620 rem rechteck uebertragen
+ 5630 _us0
+ 5640 ifpo>ptthenl1=yt:l2=yr:l3=1:goto5660
+ 5650 l1=yr:l2=yt:l3=-1
+ 5660 l=48
+ 5670 fori=l1tol2stepl3
+ 5680 br=(yr-i)*xd
+ 5690 a=(xr-xt)
+ 5700 _ut pt+br,pt+br+a,uf,l,l
+ 5710 ifpo+br+a>eathen5730
+ 5720 _ut uf,uf+a,po+br,l,l
+ 5730 next
+ 5740 goto420
+ 5750 :
+ 5760 :
+ 5770 rem eingabe fuer disk & kassette
+ 5780 n$="":input"{down}{rght}{rght}name: ";n$
+ 5790 print"{down}{rght}{rvon}d{rvof}isk oder {rvon}k{rvof}assette ?
+ 5800 geta$:ifa$<>"k"anda$<>"d"then5800
+ 5810 return
+ 5820 gosub2280:restore
+ 5830 fori=0to15
+ 5840 r(s(i))=15-i:reada:s(15-i)=a+128and255
+ 5850 next
+ 5860 fori=0to15:prints(i);:next
+
