@@ -235,117 +235,117 @@
 
         <address class="author">(Dr. Helmut Hauck/ah)</address>
 
-        <p>TODO ASIDE</p>
+        <aside>
+            <h2>Texteinschub 1</h2>
 
-        <h2>Texteinschub 1</h2>
+            <h3>ST-atus</h3>
 
-        <h3>ST-atus</h3>
+            <p>Neben den Befehlen (wie PRINT) und den Funktionen (wie COS) hat Basic auch noch drei fest definierte Variable, nämlich TI, TI$ und ST.</p>
 
-        <p>Neben den Befehlen (wie PRINT) und den Funktionen (wie COS) hat Basic auch noch drei fest definierte Variable, nämlich TI, TI$ und ST.</p>
+            <p>Von den dreien ist ST wohl am seltensten anzutreffen, Grund genug, hier ein wenig darüber zu berichten.</p>
 
-        <p>Von den dreien ist ST wohl am seltensten anzutreffen, Grund genug, hier ein wenig darüber zu berichten.</p>
+            <p>Der Anlaß ist natürlich, daß der Wert von ST immer in der Speicherzelle 144 steht, die ja heute in der Memory Map vorkommt.</p>
 
-        <p>Der Anlaß ist natürlich, daß der Wert von ST immer in der Speicherzelle 144 steht, die ja heute in der Memory Map vorkommt.</p>
+            <p>Bei der Beschreibung wurde schon erwähnt, daß ST den Status nach der letzten Ein- beziehungsweise Ausgabeopration angibt, beschränkt allerdings nur auf Operationen mit der Datasette und der an einem gemeinsamen Ausgang angeschlossenen Floppy und Drucker.</p>
 
-        <p>Bei der Beschreibung wurde schon erwähnt, daß ST den Status nach der letzten Ein- beziehungsweise Ausgabeopration angibt, beschränkt allerdings nur auf Operationen mit der Datasette und der an einem gemeinsamen Ausgang angeschlossenen Floppy und Drucker.</p>
+            <p>Dementsprechend zeigt die Tabelle bei der Speicherzelle 144 diese beiden Fälle.</p>
 
-        <p>Dementsprechend zeigt die Tabelle bei der Speicherzelle 144 diese beiden Fälle.</p>
+            <p>Wichtig ist noch zu erwähnen, daß nicht nur die in der Tabelle gezeigten Zahlen für ST auftreten, sondern auch Kombinationen davon. So ergibt zum Beispiel ein zu kurzer Block (4) und ein gleichzeitig aufgetretener Prüfsummenfehler (32) ein Wert von 36.</p>
 
-        <p>Wichtig ist noch zu erwähnen, daß nicht nur die in der Tabelle gezeigten Zahlen für ST auftreten, sondern auch Kombinationen davon. So ergibt zum Beispiel ein zu kurzer Block (4) und ein gleichzeitig aufgetretener Prüfsummenfehler (32) ein Wert von 36.</p>
+            <h3>Kassettenoperationen</h3>
 
-        <h3>Kassettenoperationen</h3>
+            <p>Zuerst testen wir mit einem Datei-Programm auf »File-Ende«. Geben Sie bitte folgendes Programm ein:</p>
 
-        <p>Zuerst testen wir mit einem Datei-Programm auf »File-Ende«. Geben Sie bitte folgendes Programm ein:</p>
+            <p>TODO PRE</p>
 
-        <p>TODO PRE</p>
+            <p>10 OPEN 1,1,1,"DATEI"<br>
+                20 PRINT#1, "QWERTY"<br>
+                30 CLOSE 1<br>
+                40 END</p>
 
-        <p>10 OPEN 1,1,1,"DATEI"<br>
-            20 PRINT#1, "QWERTY"<br>
-            30 CLOSE 1<br>
-            40 END</p>
+            <p>Zur Erinnerung: nach dem OPEN-Befehl folgt zuerst die Nummer der Datei (ich nehme hier 1), dann die Gerätenummer (1 = Datasette) und schließlich die Sekundäradresse (1 = Schreiben).</p>
 
-        <p>Zur Erinnerung: nach dem OPEN-Befehl folgt zuerst die Nummer der Datei (ich nehme hier 1), dann die Gerätenummer (1 = Datasette) und schließlich die Sekundäradresse (1 = Schreiben).</p>
+            <p>Jetzt kommt der Lesevorgang:</p>
 
-        <p>Jetzt kommt der Lesevorgang:</p>
+            <p>TODO PRE</p>
 
-        <p>TODO PRE</p>
+            <p>50 OPEN 2,1,0"DATEI"<br>
+                60 FOR K = 1 TO 10<br>
+                70 GET#2,A$<br>
+                80 PRINT A$;ST<br>
+                90 NEXT K<br>
+                100 CLOSE 2</p>
 
-        <p>50 OPEN 2,1,0"DATEI"<br>
-            60 FOR K = 1 TO 10<br>
-            70 GET#2,A$<br>
-            80 PRINT A$;ST<br>
-            90 NEXT K<br>
-            100 CLOSE 2</p>
+            <p>In Zeile 50 eröffnen wir wieder eine Datei (diesmal Nummer 2) für die Datasette, jetzt aberzum Lesen(Sekundäradresse = 0). Die Schleife der Zeilen 60 und 90 schreiben uns 10 mal ein Zeichen (A$) und den Wert von ST auf den Bildschirm.</p>
 
-        <p>In Zeile 50 eröffnen wir wieder eine Datei (diesmal Nummer 2) für die Datasette, jetzt aberzum Lesen(Sekundäradresse = 0). Die Schleife der Zeilen 60 und 90 schreiben uns 10 mal ein Zeichen (A$) und den Wert von ST auf den Bildschirm.</p>
+            <p>Jetzt geht es los. Mit RUN starten wir den ersten Teil des Programms. Nach dem Schreibvorgang und der READY-Meldung (nach Zeile 40) müssen Sie das Band zurückspulen und mit GOTO 50 ab Zeile 50 weiterfahren. Jetzt wird die Datei gelesen.</p>
 
-        <p>Jetzt geht es los. Mit RUN starten wir den ersten Teil des Programms. Nach dem Schreibvorgang und der READY-Meldung (nach Zeile 40) müssen Sie das Band zurückspulen und mit GOTO 50 ab Zeile 50 weiterfahren. Jetzt wird die Datei gelesen.</p>
+            <p>Wir erhalten untereinander die sechs Buchstaben von Zeile 20, daneben für ST lauter Nullen. Am Ende allerdings erscheint eine 64. Das ist der in der Tabelle angegebene Wert von ST für »File-Ende«.</p>
 
-        <p>Wir erhalten untereinander die sechs Buchstaben von Zeile 20, daneben für ST lauter Nullen. Am Ende allerdings erscheint eine 64. Das ist der in der Tabelle angegebene Wert von ST für »File-Ende«.</p>
+            <p>Da die FOR-NEXT-Schleife zu lang ist, schießen wir mit dem Lesen über das File-Ende hinaus. Normalerweise kennen wir natürlich die Länge einer Datei nicht. Deshalb ist es besser mit GOTO zurückzuspringen und das File-Ende abzufragen.</p>
 
-        <p>Da die FOR-NEXT-Schleife zu lang ist, schießen wir mit dem Lesen über das File-Ende hinaus. Normalerweise kennen wir natürlich die Länge einer Datei nicht. Deshalb ist es besser mit GOTO zurückzuspringen und das File-Ende abzufragen.</p>
+            <p>Löschen Sie bitte Zeile 60 und 90 und fügen Sie als Rücksprung und Prüfung ein:</p>
 
-        <p>Löschen Sie bitte Zeile 60 und 90 und fügen Sie als Rücksprung und Prüfung ein:</p>
+            <p>TODO PRE</p>
 
-        <p>TODO PRE</p>
+            <p>85 IF ST = 64 THEN 100<br>
+                90 GOTO 70</p>
 
-        <p>85 IF ST = 64 THEN 100<br>
-            90 GOTO 70</p>
+            <p>Statt nach ST können wir natürlich genau so gut nach PEEK(144) fragen.</p>
 
-        <p>Statt nach ST können wir natürlich genau so gut nach PEEK(144) fragen.</p>
+            <p>Ein erneutes GOTO 50 bringt das erwünschte Resultat.</p>
 
-        <p>Ein erneutes GOTO 50 bringt das erwünschte Resultat.</p>
+            <p>Um den vorhin schon erwähnten »kurzen Block« zu sehen, müssen wir einen entsprechenden Fehler künstlich erzeugen.</p>
 
-        <p>Um den vorhin schon erwähnten »kurzen Block« zu sehen, müssen wir einen entsprechenden Fehler künstlich erzeugen.</p>
+            <p>Löschen Sie bitte den ersten Teil des Programms bis einschließlich Zeile 40. Wir behalten also nur den Leseteil ab Zeile 50. Dann laden wir dieses Programm (Band vorher am besten wieder zurückspulen) mit SAVE "DATEI" nicht als Datei, sondern als ganz gewöhnliches Programm. Wenn es geladen ist, bitte das Band wieder zurückspulen.</p>
 
-        <p>Löschen Sie bitte den ersten Teil des Programms bis einschließlich Zeile 40. Wir behalten also nur den Leseteil ab Zeile 50. Dann laden wir dieses Programm (Band vorher am besten wieder zurückspulen) mit SAVE "DATEI" nicht als Datei, sondern als ganz gewöhnliches Programm. Wenn es geladen ist, bitte das Band wieder zurückspulen.</p>
+            <p>Mit RUN starten wir jetzt das Lese-Programm, welches eine Datei sucht, aber nur ein Programm findet, allerdings mit dem richtigen Namen. Natürlich findet es einen Fehler und wir erhalten als Ausdruck:</p>
 
-        <p>Mit RUN starten wir jetzt das Lese-Programm, welches eine Datei sucht, aber nur ein Programm findet, allerdings mit dem richtigen Namen. Natürlich findet es einen Fehler und wir erhalten als Ausdruck:</p>
+            <p>TODO TABLE</p>
 
-        <p>TODO TABLE</p>
+            <p>36 oder manchmal auch 4<br>
+                64 64</p>
 
-        <p>36 oder manchmal auch 4<br>
-            64 64</p>
+            <p>Die Zahl 36 entsteht aus 32 + 4, das bedeutet Prüfsummenfehler + Block zu kurz. Danach folgt wie vorher das File-Ende.</p>
 
-        <p>Die Zahl 36 entsteht aus 32 + 4, das bedeutet Prüfsummenfehler + Block zu kurz. Danach folgt wie vorher das File-Ende.</p>
+            <p>Die normale Blocklänge entspricht der Länge des Bandpuffers, in den die Datasette einspeichert. Er ist 191 Bytes lang. In unserem Fall war offenbar der Block nicht ganz voll.</p>
 
-        <p>Die normale Blocklänge entspricht der Länge des Bandpuffers, in den die Datasette einspeichert. Er ist 191 Bytes lang. In unserem Fall war offenbar der Block nicht ganz voll.</p>
+            <p>Der Prüfsummenfehler tritt dann auf, wenn eine der Überprüfungen von Kassettenoperationen einen Fehler gefunden hat. Der Blockfehler, auch der des zu langen Blocks, interessiert wohl weniger. Aber ein durch die Prüfungen gefundener Fehler könnte, frühzeitig noch vor dem Ausstieg des Programms entdeckt, abgefangen und ausgenutzt werden.</p>
 
-        <p>Der Prüfsummenfehler tritt dann auf, wenn eine der Überprüfungen von Kassettenoperationen einen Fehler gefunden hat. Der Blockfehler, auch der des zu langen Blocks, interessiert wohl weniger. Aber ein durch die Prüfungen gefundener Fehler könnte, frühzeitig noch vor dem Ausstieg des Programms entdeckt, abgefangen und ausgenutzt werden.</p>
+            <p>Die Formel dafür, ins obige Program eingebaut ist:<br>
+                85 IF ST<64 OR ST>8 THEN..(zum Beispiel LIST)</p>
 
-        <p>Die Formel dafür, ins obige Program eingebaut ist:<br>
-            85 IF ST<64 OR ST>8 THEN..(zum Beispiel LIST)</p>
+            <p>Statt LIST kann man natürlich auch etwas anderes nehmen.</p>
 
-        <p>Statt LIST kann man natürlich auch etwas anderes nehmen.</p>
+            <h3>Floppyoperationen</h3>
 
-        <h3>Floppyoperationen</h3>
+            <p>Bei der Floppy bedeutet ST = 64, »Daten-Ende«, das ist etwa dasselbe wie bei der Datasette. Um es zu überprüfen nehmen wir dasselbe Programm wie vorher, nur müssen wir die Datei-Zeilen der Floppy anpassen. Das sieht dann so aus:</p>
 
-        <p>Bei der Floppy bedeutet ST = 64, »Daten-Ende«, das ist etwa dasselbe wie bei der Datasette. Um es zu überprüfen nehmen wir dasselbe Programm wie vorher, nur müssen wir die Datei-Zeilen der Floppy anpassen. Das sieht dann so aus:</p>
+            <p>TODO PRE</p>
 
-        <p>TODO PRE</p>
+            <p>10 OPEN 1,8,1,"DATEI,S,W"<br>
+                20 PRINT#1,"QWERTY"<br>
+                30 CLOSE 1<br>
+                40 END</p>
 
-        <p>10 OPEN 1,8,1,"DATEI,S,W"<br>
-            20 PRINT#1,"QWERTY"<br>
-            30 CLOSE 1<br>
-            40 END</p>
+            <p>50 OPEN 2,8,0,"DATEI,S,R"<br>
+                60 FORK = 1 TO 10<br>
+                70 GET#2,A$<br>
+                80 PRINT A$;ST<br>
+                90 NEXT K<br>
+                100 CLOSE 2</p>
 
-        <p>50 OPEN 2,8,0,"DATEI,S,R"<br>
-            60 FORK = 1 TO 10<br>
-            70 GET#2,A$<br>
-            80 PRINT A$;ST<br>
-            90 NEXT K<br>
-            100 CLOSE 2</p>
+            <p>Das Ergebnis sieht hier so aus:<br>
+                64<br>
+                66<br>
+                66</p>
 
-        <p>Das Ergebnis sieht hier so aus:<br>
-            64<br>
-            66<br>
-            66</p>
+            <p>Die 64 ist natürlich wie erwartet der »Wert« für Daten-Ende. Die 66 ist 64 + 2, entstanden dadurch, daß wir über das Datenende hinausgelesen haben. Die 2 bedeutet »Fehler beim Lesen« (in den englischen Beschreibungen heißt es »Read Time Out«). Ähnliches gilt für ST = 1, das bededutet »Fehler beim Schreiben« (englisch: Write Time Out), nur weiß ich leider nicht, wie es vorzuführen ist. Wie bei der Datasette kann das Überlesen natürlich mit der Abfrage IF ST=64 THEN&hellip;und GOTO&hellip; gestoppt werden.</p>
 
-        <p>Die 64 ist natürlich wie erwartet der »Wert« für Daten-Ende. Die 66 ist 64 + 2, entstanden dadurch, daß wir über das Datenende hinausgelesen haben. Die 2 bedeutet »Fehler beim Lesen« (in den englischen Beschreibungen heißt es »Read Time Out«). Ähnliches gilt für ST = 1, das bededutet »Fehler beim Schreiben« (englisch: Write Time Out), nur weiß ich leider nicht, wie es vorzuführen ist. Wie bei der Datasette kann das Überlesen natürlich mit der Abfrage IF ST=64 THEN&hellip;und GOTO&hellip; gestoppt werden.</p>
+            <p>Interessant ist noch der Status beim Fehler »DEVICE NOT PRESENT«, den wir dadurch erzeugen, daß wir ein Programm, oder die Directory, aus der Floppy laden wollen, ohne daß dieses Gerät angeschlossen oder eingeschaltet ist. Nach der Fehlermeldung geben wir direkt ein: PRINT ST oder PRINT PEEK(144) und wir erhalten die Zahl 128.</p>
 
-        <p>Interessant ist noch der Status beim Fehler »DEVICE NOT PRESENT«, den wir dadurch erzeugen, daß wir ein Programm, oder die Directory, aus der Floppy laden wollen, ohne daß dieses Gerät angeschlossen oder eingeschaltet ist. Nach der Fehlermeldung geben wir direkt ein: PRINT ST oder PRINT PEEK(144) und wir erhalten die Zahl 128.</p>
-
-        <p>Wie man allerdings in einem Basic-Programm durch Abfrage von ST= 128 die Fehlermeldung »Device Not Present« und den dann folgenden Programmabbruch vermeiden kann, weiß ich leider auch nicht. Die einzige Möglichkeit, die ich kenne, verwendet die sogenannte Interrupt-Methode. Diese ist von Christoph Sauer im letzten Teil seines Kurses »Der gläserne VC 20« in Heft 3/85, Seite 155, beschrieben worden.</p>
+            <p>Wie man allerdings in einem Basic-Programm durch Abfrage von ST= 128 die Fehlermeldung »Device Not Present« und den dann folgenden Programmabbruch vermeiden kann, weiß ich leider auch nicht. Die einzige Möglichkeit, die ich kenne, verwendet die sogenannte Interrupt-Methode. Diese ist von Christoph Sauer im letzten Teil seines Kurses »Der gläserne VC 20« in Heft 3/85, Seite 155, beschrieben worden.</p>
+        </aside>
     </article>
 </body>
 
