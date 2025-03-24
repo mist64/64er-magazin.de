@@ -1,0 +1,115 @@
+
+
+;demo i ==0801==
+  100 ifhthenpoke45,l:poke46,h:goto160
+  110 ifpeek(50000)=56andpeek(50001)=253then160
+  120 l=peek(45):h=peek(46)
+  140 load"scroll-machine",8,1
+  150 :
+  160 print"{clr}{wht}":sys49152
+  170 ifusr(20000)<>229then:_ld"pseudo i"
+  180 ifusr(53248)<>4then:_ld"zeichensatz",53246
+  185 ifusr(57369)<>170then:_ld"sprites",57342
+  200 :
+  210 :
+  220 :
+  230 _rs:rem einstellungen loeschen
+  240 gosub1080:rem joysticksteuerung
+  245 _rz81,88,248:_su5
+  250 :
+  260 rem neue adresse der sprite pointers
+  270 sp=53240
+  280 :
+  290 js=56320:rem port 2
+  300 :
+  310 rem sprites vorbereiten
+  320 v=53248:pokev,172:pokev+1,150
+  330 pokev+2,173:pokev+3,161
+  340 pokev+28,3:pokev+39,14:pokev+38,6:pokev+37,1
+  350 pokev+40,8
+  360 pokev+23,0:pokev+29,0
+  370 co=v+31:rem sprite collission
+  380 s=128:rem sprites ab 128 = 57344
+  390 sh=3:rem anzahl der schiffe
+  400 e=200:rem anfangsenergie
+  410 :
+  420 rem soft-scroll-einstellungen
+  430 :
+  440 rem anfangsadresse,xausd.,yausd.
+  450 _mt20000,160,70
+  460 rem grenzen festlegen
+  470 _gm1:_gr0,8*160,0,8*50
+  480 rem register2:norm,norm,multicol.
+  490 _2r200,200,208
+  500 _hf0,10,0:rem hintergrundfarbe
+  510 poke53282,7:poke53283,8:_zf10
+  520 _us1:rem soft-scroll ein
+  530 _po50,0:rem position auf 50,0
+  540 _rf6,6,6:rem randfarbe
+  560 rem collission register loeschen
+  570 pokeco,0
+  580 pokesp,s:rem sprite aendern
+  590 s=s+1:ifs>132thens=128
+  600 rem randberuehrung
+  610 ifusr(0)then:_js2
+  620 e=e-1:gosub680
+  630 ife=0then720
+  640 f=f+1and1:pokev+21,1
+  650 if(peek(co)and1)then930
+  660 if(peek(js)and1)=0thenpokesp+1,144+f:pokev+21,3
+  670 goto580
+  680 print"{home} schiffe:"sh"{left}  energie: "e"{left}  "
+  690 return
+  700 :
+  710 rem verlust eines schiffes
+  720 i=0:e=200:x=-8:pokev+21,1
+  730 sh=sh-1
+  740 gosub680
+  750 rem zerfall
+  760 fori=1to10:poke53280,1:next
+  770 fori=132toi+11
+  780 pokesp,i
+  790 fort=1to20:next
+  800 next
+  810 _po50,0
+  820 _js2:rem traegheit loeschen
+  830 ifsh=0then860
+  840 goto500
+  850 :
+  860 pokev+21,0:poke214,12:print
+  870 _us0:rem soft scroll aus
+  880 printtab(13)"{wht}game over !!!"
+  890 wait197,63:poke198,0
+  900 _us0:run
+  910 :
+  920 rem landen
+  930 ifusr(2)>330andusr(2)<334andusr(1)>441andusr(1)<469then950
+  940 goto720:rem keine landung
+  950 print"{home}{down}{down}{rght}{wht} gelandet !"
+  960 e=200:gosub680
+  970 rem stoppen und joystick aus
+  980 _bw0,0:_js0
+  990 rem setzen auf y = 179
+ 1000 _pousr(1),330
+ 1010 rem joystick oben gedrueckt
+ 1020 if(peek(js)and1)then1000
+ 1030 :
+ 1040 _bwbx,by
+ 1050 _js2:gosub 1070:goto570
+ 1060 rem 3 zeilen loeschen
+ 1070 _fu 1024,1063+3*40,32:return
+ 1080 print
+ 1090 input"{clr}{down}{down}{down}{rght}bewegung (-127 bis 128) x,y{rght}{rght}0,1{left}{left}{left}{left}{left}";bx,by
+ 1100 _bw bx,by
+ 1110 print"{down}{down}{rght}{rght}joysticksteuerung :
+ 1120 input"{down}{down}{rght}normale steuerung:{rght}{rght}0,0{left}{left}{left}{left}{left}";x,y
+ 1130 _js 2,x,y:rem 2 = traegheitsmode
+ 1140 print"{down}{down}{rght}{rght}traegheitssteuerung:
+ 1150 input"{down}{rght}beschleunigung: (0-255) x,y{rght}{rght}16,16{left}{left}{left}{left}{left}{left}{left}";x,y
+ 1160 _tb x,y
+ 1170 input"{down}{rght}grenzgeschw.: (0-32767) x,y{rght}{rght}5000,5000{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}";x,y
+ 1180 _tg x,y
+ 1190 input"{down}{rght}reibung (0-255) x,y{rght}{rght}4,4{left}{left}{left}{left}{left}";x,y
+ 1200 _tr x,y
+ 1210 print"{clr}":return
+

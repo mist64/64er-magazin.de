@@ -1,0 +1,168 @@
+
+
+;spiel ==0801==
+   90 print"{clr}{gry1}"
+  100 sys 49152
+  105 print
+  110 aa=40960:xd=128:yd=64
+  120 sp=32:ze=207:fa=0
+  130 sr=57344:rem spriteadresse
+  140 v=53248:rem vic
+  145 co=v+31:rem collision
+  150 sz=53240:rem sprite-zeiger
+  160 g1=aa+2470:g2=aa+2477
+  165 g3=aa+6250:g4=aa+6271
+  170 fz=3:rem fasszaehler
+  180 a$(0)="auf":a$(1)=" {wht}{rvon}zu{gry1}"
+  190 def fna(x)=sin(x*.7)*cos(x*2.2)
+  195 :
+  200 _rs   :rem reset aller register
+  201 _cp   :rem zeichensatz kopieren
+  205 _mt aa,xd,yd :rem
+  206 :
+  300 rem farben+rasterzeilen
+  305 _hf 0,0,11
+  310 _rf 0,0,0
+  315 _rz 81,89,248
+  320 :
+  321 _js 2 :rem joysticksteuerung
+  322 _tg 2000,2000
+  330 :
+  332 ifegthen950
+  333 :
+  335 _us0
+  340 input"{down}{down}{rght}{rght}beschleunigung (1-255):{rght}{rght}16{left}{left}{left}{left}";g
+  343 input"{down}{down}{rght}{rght}reibung (1-255):{rght}{rght}8{left}{left}{left}";r
+  347 input"{down}{down}{rght}{rght}energie:{rght}{rght}5000{left}{left}{left}{left}{left}{left}";eg
+  350 print"{down}{down}{rght}{rght}neuer stollen (j/n)?"
+  355 geta$:ifa$="n"then950
+  360 ifa$<>"j"then355
+  365 input"{down}{down}{rght}{rght}breite (3-20):{rght}{rght}7{left}{left}{left}";b
+  480 :
+  485 printtab(10)"{down}{down}*** stollenaufbau ***
+  490 _fu aa,aa+8191,160
+  500 h=xd/12
+  510 fori=30toxd-1-b
+  515 p=int(fna(i/h)*16+32)*xd+aa+i
+  520 _fup,p+b,32
+  525 _fup-xd,p+b-xd,sp
+  526 _fup+xd,p+b+xd,sp
+  530 nexti
+  590 :
+  600 fori=13to47
+  610 p=aa+30+i*xd
+  615 ifi<20then:_fu p,p+25,sp
+  620 _fu p,p+6,sp
+  630 nexti
+  690 :
+  700 fori=19to48
+  710 p=aa+115+i*xd
+  715 ifi>40then:_fu p-10,p+13,sp
+  720 _fu p,p+13,sp
+  730 nexti
+  790 :
+  950 _zf0
+  955 _us1
+  956 ee=eg
+  957 _tbg,g:_trr,r
+  960 :
+  990 rem sprites
+ 1000 poke sz,128
+ 1010 poke sz+1,129
+ 1020 poke v+39,15
+ 1030 poke v+40,0
+ 1040 poke v,172:poke v+1,150
+ 1050 poke v+2,171:poke v+3,161
+ 1090 :
+ 1100 pokev+21,3
+ 1102 _fu sr,sr+128,0
+ 1105 :
+ 1107 rem sprite einlesen
+ 1108 restore
+ 1110 fori=25toi+18
+ 1120 reada:pokesr+i,a:next
+ 1125 :
+ 1127 rem zeichen 81 in sprite kopieren
+ 1130 fori=0to7
+ 1140 pokesr+65+i*3,usr(v+ze*8+i)
+ 1150 next
+ 1190 :
+ 1195 rem faesser setzen
+ 1200 fori=g1+3toi+11step4
+ 1210 pokei,ze:next
+ 1250 fori=g3tog4
+ 1260 pokei,sp:next
+ 1270 :
+ 1300 _po 822,247
+ 1500 pokev+21,1
+ 1900 print"{home}faesser:"fz" energie:"ee"{left} greifer: "a$(fa)
+ 1902 ifusr(4)then1902
+ 1905 _js2
+ 1910 _tm0
+ 1915 gosub6000
+ 1920 pokeco,0
+ 1930 iffz=0then6500
+ 1990 :
+ 1995 rem **** hauptroutine ****
+ 1996 :
+ 2000 ee=ee-1:print"{home}"tab(20)ee"{left} "
+ 2010 ifpeek(co)then3000
+ 2020 ifusr(4)then4000
+ 2500 ifee>0then2000
+ 2590 :
+ 2595 :
+ 2600 print"{clr}{down}{down}{rght}{rght}batterie leer => absturz
+ 2610 goto3010
+ 2990 :
+ 3000 _js0:gosub6000
+ 3002 ifpeek(co)=2then3100
+ 3005 print"{clr}{down}{down}{rght}sie haben ihren transporter zerstoert.
+ 3010 onfa+1goto7050,7020
+ 3100 print"{clr}{down}{down}{rght}{rght}{rght}{rght}{rght}sie haben das fass zerstoert.
+ 3110 goto7020
+ 3900 :
+ 4000 ee=ee-10
+ 4010 onfagoto4200
+ 4112 :
+ 4115 p=usr(3):rem fass aufnehmen
+ 4120 ifusr(p)<>zethen1910
+ 4122 _js0:rem traegheit loeschen
+ 4124 rem y-position berichtigen
+ 4125 _pousr(1),usr(2)and8184
+ 4127 _tm1:rem bildschirm abtasten
+ 4130 fa=1:pokev+21,3:rem sprite an
+ 4140 pokep,sp:rem character loeschen
+ 4145 ifp>g3andp<g4thenfz=fz+1
+ 4150 goto1900
+ 4190 :
+ 4200 p=usr(3):rem fass absetzen
+ 4210 ifusr(p+xd)<>160then4300
+ 4215 _js0
+ 4220 _po(usr(1)and8184)+4,usr(2)and8184
+ 4230 _tm1:fa=0:pokep,ze
+ 4240 pokev+21,1
+ 4245 ifp>g3andp<g4thenfz=fz-1
+ 4250 goto1900
+ 4290 :
+ 4300 print"{clr}{down}{down}{rght}{rght}sie haben das fass fallenlassen"
+ 4350 goto7020
+ 4900 :
+ 4980 :
+ 4990 rem spritedaten
+ 5000 data 255,0,3,255,192,60,231,60,239,255,247,3,0,192,1,0,128,0,129
+ 6000 fori=1to20:next:return
+ 6500 print"{clr}{down}{down}{rght}{rght}{rght}sie haben ihre mission erfuellt.
+ 6510 print"{down}{down}{rght}{rght}restenergie:"ee
+ 6520 print"{down}{down}{rght}{rght}dafuer bekommen sie ein paar orden !
+ 6590 goto7090
+ 7020 print"{down}{down}{down}{rght}{rght}{rght}{rght}der stollen ist nun vollstaendig
+ 7030 print"{down}{rght}{rght}strahlenverseucht.
+ 7040 print"{down}{rght}{rght}ein fortfuehren der arbeit wird in
+ 7045 print"{down}{rght}{rght}ca. 1500 jahren wieder moeglich sein.
+ 7050 print"{down}{down}{rght}{rght}{rght}{rght}s i e   s i n d   t o t   ! ! !
+ 7090 printtab(15)"{down}{down}{down}{down}e  n  d  e
+ 7100 _us0
+ 7101 pokev+21,0
+ 7105 geta$:ifa$=""then7105
+ 7110 goto110
+

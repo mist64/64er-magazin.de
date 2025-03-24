@@ -1,0 +1,54 @@
+
+
+;hex-gcr ==0801==
+   10 rem programm zur konvertierung
+   20 rem von vier hexbytes in die
+   30 rem fuenf entsprechenden
+   40 rem gcr-aequivalente
+   50 rem
+   60 rem
+   70 rem
+   80 rem (w) 1985 by karsten schramm
+   90 rem
+  100 a$="0123456789abcdef":dimg$(15):e$=""
+  110 g$(0)="01010"
+  120 g$(1)="01011"
+  130 g$(2)="10010"
+  140 g$(3)="10011"
+  150 g$(4)="01110"
+  160 g$(5)="01111"
+  170 g$(6)="10110"
+  180 g$(7)="10111"
+  190 g$(8)="01001"
+  200 g$(9)="11001"
+  210 g$(10)="11010"
+  220 g$(11)="11011"
+  230 g$(12)="01101"
+  240 g$(13)="11101"
+  250 g$(14)="11110"
+  260 g$(15)="10101"
+  270 print"{clr}hex - gcr - konvertierung":print
+  280 print:print"geben sie jetzt 4 hexbytes ein":print
+  290 print"z.b. ed 34 27 58":input"{down}{down}";h$:gc$=""
+  300 gosub470:forx=1to4
+  310 h1$=mid$(h$,x*2-1,1):h2$=mid$(h$,x*2,1)
+  320 h1=val(h1$):h2=val(h2$)
+  330 ifh1=0andh1$<>"0"thenh1=asc(h1$)-55
+  340 ifh2=0andh2$<>"0"thenh2=asc(h2$)-55
+  350 gc$=gc$+g$(h1)+g$(h2)
+  360 nextx
+  370 forx=1to10
+  380 b=0:b$=mid$(gc$,x*4-3,4)
+  390 fory=0to3
+  400 ifmid$(b$,y+1,1)="1"thenb=b+2^(3-y)
+  410 nexty
+  420 e$=e$+mid$(a$,b+1,1)
+  430 ifx/2=int(x/2)thene$=e$+" "
+  440 nextx
+  450 print:print:print"gcr: ";e$
+  460 end
+  470 x$="":forx=1tolen(h$)
+  480 ifmid$(h$,x,1)<>" "thenx$=x$+mid$(h$,x,1)
+  490 next
+  500 h$=x$:return
+

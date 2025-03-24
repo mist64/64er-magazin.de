@@ -1,0 +1,270 @@
+
+
+;prost ==0801==
+    0 rem **********************************      *                                *
+    1 rem *     p r o.s t  6 4  (3)        *      *                                *
+    2 rem *         1984  by               *      *       michael anton            *
+    3 rem *      herm.essig str 106        *      *      7141 schwieberdingen      *
+    4 rem *       (07150)/31576            *      *                                *
+    5 rem **********************************
+    7 rem "zeile 9 u.10 weglassen, wenn sie das userport-display aus der 64'er"
+    8 rem "nicht als maschinenprogramm nachladen koennen"
+    9 ifsv=0thensv=1:load"upd.49309",8,1
+   10 sys49309
+   11 :
+   12 poke56,40:clr
+   13 :
+   14 :
+   15 rem *init*
+   16 :
+   20 an=10240:sv=0:uf=0:bs$(0)="R":bs$(1)="E":po=56577:poke56579,255:pokepo,0
+   30 poke53280,15:poke53281,8:print"{clr}{cyn}"
+   40 forl=1to8:readhi(l):nextl
+   41 data8,7,6,5,4,3,2,1
+   50 goto10000
+   70 :
+   75 :
+   80 rem *loesch1*
+   81 input"{clr}{down}{down}{down}{down}{down}{down}{down}{rght}{rght}{rght}sicher (j/n)";a$:ifa$<>"j"thenreturn
+   85 ma=0:sv=0:return
+   87 :
+   90 rem *loesch2*
+   92 forll=an+sstoan+ma+1:pokell,peek(ll+1):nextll:ma=ma-1:return
+   93 :
+   95 rem *einf*
+   97 forll=an+ma+1toan+lxstep-1:pokell+1,peek(ll):nextll:ma=ma+1:return
+   98 :
+   99 :
+  100 rem *eingabe*
+  101 :
+  102 ifsv=0then105
+  103 input"{clr}{down}{down}{down}{down}{down}{rght}altes programm ueberschreiben (j/n)";a$
+  104 ifa$<>"j"thenreturn
+  105 uf=0
+  110 print"{clr}{down}{down}{rght}{rght}{rght}eingabe{down}{down}{down}":print"{rvon}0{rvof}  {rvon}1{rvof}  {rvon}del{rvof}   {rvon}return{rvof}   {rvon}e{rvof}nde"
+  120 gosub6000
+  130 :
+  160 rem *einsch*
+  170 lx=1
+  180 print"{down}schritt "lx;tab(15);"87654321":printtab(15);
+  190 :
+  200 rem *bin-in*
+  210 forlb=1to9
+  220 gett$:if(t$="0"ort$="1")andlb<9then260
+  225 ift$=chr$(13)andlb=9then290
+  230 ift$=chr$(20)thenlb=lb-1:print"{left}";:goto220
+  240 ift$="e"then340
+  250 goto220
+  260 bi(lb)=val(t$):printt$;:nextlb
+  270 :
+  290 rem *bin-dez*
+  295 d=0:h=128
+  300 forlb=1to8:d=d+bi(lb)*h:h=h/2:nextlb
+  305 ifuf=1thenreturn
+  310 print"{rght}{rght}";d:pokean+lx,d
+  315 ifuf=2thenreturn
+  320 lx=lx+1:iflx+an<40960then180
+  330 print"{down}{down}{rght}{rght}speicherplatz zuende!!"
+  340 print:print"eingabeende bei schritt ";lx-1:ma=lx-1:sv=1:gosub6000
+  350 return
+  400 :
+  450 :
+  500 rem *editieren*
+  502 :
+  505 ifsv=0thenprint"{clr}{down}{down}{down}{down}{down}{rght}{rght}{rght}{rght}{rght}speicher leer":goto6000
+  510 print"{clr}{down}{down}{down}{down}{down}1 _ schritt loeschen":print"{down}2 _ schritt einfuegen"
+  520 print"{down}3 _ schritt ersetzen":print"{down}4 _ verlaufsdiagramm":print"{down}5 _ menu"
+  530 gett$:ift$=""then530
+  535 wa=val(t$):ifwa<1orwa>5then530
+  540 onwagoto560,580,587,600,550
+  545 goto500
+  550 return
+  555 :
+  560 rem *loeschen*
+  565 input"{clr}{down}{down}{down}{down}{down}zu loeschender schritt: ";ss:gosub90
+  570 print"{down}{down}{down}{rght}{rght}{rght}{rght}{rght}ok":gosub6000:goto500
+  575 :
+  580 rem *einfuegen*
+  585 input"{clr}{down}{down}{down}{down}{down}{rght}{rght}{rght}{rght}{rght}einfuegen bei schritt: ";lx:gosub95:goto590
+  587 input"{clr}{down}{down}{down}{down}{down}{rght}{rght}{rght}{rght}{rght}zu eretzender schritt ";lx
+  590 print"{down}neuen schritt eingeben:{down}{down}":uf=2:gosub180
+  595 gosub6000:goto500
+  597 :
+  600 rem *diagramm*
+  602 :
+  605 ms$="{CBM-Q}{CBM-E}{CBM-E}{CBM-E}{CBM-E}{CBM-E}{CBM-E}{CBM-E}{CBM-E}{CBM-E}{CBM-E}{CBM-E}{CBM-E}{CBM-E}{CBM-E}{CBM-E}{CBM-E}{CBM-E}{CBM-E}{CBM-E}{CBM-E}{CBM-E}{CBM-E}{CBM-E}{CBM-E}{CBM-E}{CBM-E}{CBM-E}{CBM-E}{CBM-E}{CBM-E}{CBM-E}{CBM-E}{CBM-E}{CBM-W}":ss=1
+  610 ko$="   {rvon}v{rvof}or    {rvon}z{rvof}urueck     {rvon}a{rvof}nfang     {rvon}e{rvof}nde"
+  615 forl=1to8:bz$(l)="":nextl:hz=1
+  617 poke211,15:poke214,24:sys58640:print"bitte warten!"
+  620 d=peek(an+ss):h=128
+  630 forl=1to8:bi=int(d/h)
+  650 bz$(hi(l))=bz$(hi(l))+bs$(bi)
+  670 d=d-h*bi:h=h/2:nextl
+  680 hz=hz+1:ss=ss+1:ifss>mathen700
+  690 ifhz<=35then620
+  700 print"{clr}{down}":forl=1to8:printl;bz$(l):print:nextl:print
+  710 printtab(3);"{up}";ms$:print:printtab(2);ss-hz+1:print:printko$
+  720 gett$:ift$=""then720
+  725 ift$="v"andss<mathen615
+  730 zf=0:ift$="z"andss>35thenss=ss-70:zf=1:ifss<1thenss=1
+  735 ift$="z"andzf=1then615
+  740 ift$="a"thenss=1:goto615
+  745 ift$="e"then500
+  750 goto720
+ 1000 :
+ 1500 :
+ 2000 rem *start*
+ 2002 :
+ 2003 ifsv=0thenprint"{clr}{down}{down}{down}{down}{down}{rght}{rght}{rght}{rght}{rght}speicher leer":goto6000
+ 2005 print"{clr}{down}{down}{down}{rght}{rght}{rght}{rght}{rght}{rght}lauf":print"{down}{down}{down}1 _ freilauf"
+ 2010 print"{down}2 _ einzelschritt":print"{down}{down}{down}{rght}{rght}{rght}{rght}{rght}wahl?"
+ 2015 wait203,63:gett$
+ 2020 ift$="1"then2040
+ 2025 ift$="2"then2200
+ 2030 goto2015
+ 2040 print"{clr}{down}{down}{down}{down}{down}{down}{rght}{rght}{rght}freilauf":print"{down}{down}{down}1 _ dauerlauf"
+ 2045 print"{down}2 _ x*durchlaufen":print"{down}{down}{down}{rght}{rght}{rght}{rght}{rght}wahl?"
+ 2046 wl=0
+ 2050 wait203,63:gett$
+ 2055 ift$="1"thenwl=1
+ 2060 ift$="2"thenwl=2
+ 2062 ifwl=0then2050
+ 2064 :
+ 2065 input "{clr}{down}{down}{down}{down}{rght}{rght}{rght}zyklusdauer in sekunden ";zd:zd=zd*55
+ 2070 ifwl=2theninput"{down}{down}{rght}{rght}{rght}durchlaeufe ";dl
+ 2075 input"{down}{down}{rght}{rght}{rght}start bei schritt ";ss:ll=0:print"{down}{down}{down}{rght}{rght}{rght}{rght}{rght}start = < taste >"
+ 2078 gett$:ift$=""then2078
+ 2080 l=an+ss
+ 2090 pokepo,peek(l):ti$="000000"
+ 2110 ifti<zdthen2110
+ 2120 ifpeek(653)=1thenk$="break":ll=ll+1:ss=ss+1:goto2160
+ 2130 ss=ss+1:ifss<=mathen2080
+ 2135 ll=ll+1:ifll<dlthenss=1:goto2080
+ 2140 ifwl=1thenss=1:goto2080
+ 2150 k$="ende"
+ 2160 print"{down}{down}{down}";k$;" bei durchlauf";ll;" schritt";ss-1:goto6000
+ 2180 :
+ 2200 rem *einzel*
+ 2210 input"{clr}{down}{down}{down}{rght}{rght}{rght}durchlaeufe ";dl
+ 2220 input"{down}{down}{rght}{rght}{rght}start bei ";ss:print"{down}{down}{down}{down}{rght}{rght}{rght}{rght}{rght}start = < taste >":ll=0
+ 2230 gett$:ift$=""then2230
+ 2240 l=an+ss:pokepo,peek(l)
+ 2250 ifpeek(653)=1thenk$="break":ll=ll+1:goto2160
+ 2260 ifpeek(653)<>4then2250
+ 2265 ford=1to50:nextd
+ 2270 ss=ss+1:ifss<=mathen2240
+ 2280 ll=ll+1:ifll<dlthenss=1:goto2240
+ 2290 k$="ende":goto2160
+ 2400 :
+ 2500 :
+ 3000 rem *saven*
+ 3010 print"{clr}{down}{down}{down}{down}{down}{down}{down}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}absaven"
+ 3020 input"{down}{down}{rght}{rght}{rght}{rght}{rght}filename:";na$
+ 3030 open1,8,2,na$+",s,w":gosub5000
+ 3035 print"{down}{rght}{rght}{rght}{rght}{rght}";ds$:ifd1>19then3085
+ 3040 ll=ma+1:print#1,ll
+ 3050 forl=1toll:print#1,peek(an+l):nextl
+ 3085 close1:close15:ifd1>19then3020
+ 3090 print"{down}{rght}{rght}{rght}{rght}{rght}file gespeichert":gosub6000
+ 3100 return
+ 3200 :
+ 3300 :
+ 4000 rem *einlesen*
+ 4010 print"{clr}{down}{down}{down}{down}{down}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}einlesen"
+ 4012 ifsv=0then4020
+ 4014 input"{down}{rght}{rght}altes programm loeschen??  (j/n)";a$:ifa$<>"j"thenreturn
+ 4020 input"{down}{down}{down}{rght}{rght}{rght}{rght}{rght}filename:";na$
+ 4030 open1,8,2,na$+",s,r":gosub5000
+ 4035 print"{down}{rght}{rght}{rght}{rght}{rght}";ds$:ifd1>19then4100
+ 4040 input#1,ll:ma=ll-1
+ 4050 forl=1toll:input#1,d:pokean+l,d:nextl
+ 4100 close1:close15:ifd1>19then4020
+ 4110 print"{down}{rght}{rght}{rght}{rght}{rght}file eingelesen":sv=1:gosub6000
+ 4120 return
+ 4200 :
+ 4300 :
+ 5000 rem *status*
+ 5010 open15,8,15:input#15,d1,ds$,d2,d3:return
+ 5050 :
+ 5100 print"{clr}":open1,8,0,"$":a=0
+ 5110 get#1,x$,x$
+ 5120 get#1,x$,x$
+ 5130 get#1,x$,x$
+ 5140 get#1,x$:ifst<>0then5220
+ 5150 ifx$<>chr$(34)then5140
+ 5160 get#1,x$:ifx$<>chr$(34)thenprintx$;:goto5160
+ 5170 ifa=0thena=1:print:goto5180
+ 5175 a=0:printtab(20);
+ 5180 get#1,x$:ifx$=chr$(32)then5180
+ 5190 get#1,x$:ifx$<>""then5190
+ 5200 gett$:ift$<>""thengosub5240
+ 5210 ifst=0then5120
+ 5220 print
+ 5230 close1:goto6000
+ 5240 gett$:ift$=""then5240
+ 5250 return
+ 5400 :
+ 5500 rem *disk*
+ 5510 print"{clr}{down}{down}{down}{down}{down}1 _ saven":print"{down}2 _ einlesen":print"{down}3 _ inhalt"
+ 5520 gett$:ift$=""then5520
+ 5525 wa=val(t$):ifwa<1orwa>3then5520
+ 5530 onwagoto3000,4000,5100
+ 5600 :
+ 5700 :
+ 6000 rem *warten*
+ 6005 :
+ 6010 print "{down}{down}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}<< taste >>"
+ 6020 gett$:ift$=""then6020
+ 6030 return
+ 7000 :
+ 8000 :
+ 9000 rem *test*
+ 9005 :
+ 9010 print"{clr}{down}{down}{down}{rght}{rght}{rght}{rght}peripherietest":print"{down}{down}{down}{rght}{rght}{rvon}m{rvof}enu{down}{down}"
+ 9015 forl=1to8:bi(l)=0:nextl:d=0
+ 9020 print" 1  2  3  4  5  6  7  8":print
+ 9025 goto9055
+ 9030 gett$:ift$=""then9030
+ 9035 ift$="m"thenreturn
+ 9040 lb=val(t$):iflb<1orlb>8then9030
+ 9045 lb=hi(lb)
+ 9050 ifbi(lb)=1thenbi(lb)=0:goto9054
+ 9051 ifbi(lb)=0thenbi(lb)=1
+ 9054 uf=1:gosub290
+ 9055 print"{up}";:forl=8to1step-1:printbi(l);:nextl:print
+ 9060 pokepo,d:goto9030
+ 9100 :
+ 9200 :
+10000 rem *menu*
+10005 :
+10010 print"{clr}{down}{down}{down}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}p r o.s t  64.1{down}{down}"
+10030 print"{down}1 _ eingabe":print"{down}2 _ editieren"
+10040 print"{down}3 _ diskette":print"{down}4 _ loeschen":print"{down}5 _ starten"
+10050 print"{down}6 _ peripherietest":print"{down}7 _ ende"
+10120 gett$:ift$=""then10120
+10130 wa=val(t$):ifwa<1orwa>7then10120
+10140 onwagosub100,500,5500,80,2000,9000,11000
+10150 goto10000
+10200 :
+10300 :
+11000 rem *ende*
+11005 :
+11010 input"{clr}{down}{down}{down}{down}{down}{rght}{rght}{rght}{rght}{rght}alles gesichert??? (j/n)";a$:ifa$<>"j"thenreturn
+11020 pokepo,0:poke56579,0
+11030 :
+11040 end
+11050 :
+11055 :
+11060 :
+12025 rem directory (5100-5400) frei
+12030 rem nach commodore vic 1541 sdfd
+12035 rem user's manual s.47
+12040 rem userportdisplay von jan
+12045 rem legenhausen, 64'er 8/84
+12050 rem            vielen dank!!!
+12055 :
+12060 rem zeilen 0-5 und 12025 ff.
+12065 rem weglassen!! gilt auch fuer
+12070 :
+12075 rem ^ solche ^
+

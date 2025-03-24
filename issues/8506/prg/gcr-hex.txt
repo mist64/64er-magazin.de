@@ -1,0 +1,54 @@
+
+
+;gcr-hex ==0801==
+   10 rem programm zur konvertierung
+   20 rem von fuenf gcr-bytes in die
+   30 rem vier entsprechenden
+   40 rem hex-aequivalente
+   50 rem
+   60 rem
+   70 rem
+   80 rem (w) 1985 by karsten schramm
+   90 rem
+  100 a$="0123456789abcdef":dimg$(15):e$=""
+  110 g$(0)="01010"
+  120 g$(1)="01011"
+  130 g$(2)="10010"
+  140 g$(3)="10011"
+  150 g$(4)="01110"
+  160 g$(5)="01111"
+  170 g$(6)="10110"
+  180 g$(7)="10111"
+  190 g$(8)="01001"
+  200 g$(9)="11001"
+  210 g$(10)="11010"
+  220 g$(11)="11011"
+  230 g$(12)="01101"
+  240 g$(13)="11101"
+  250 g$(14)="11110"
+  260 g$(15)="10101"
+  270 print"{clr}gcr - hex - konvertierung":print
+  280 print:print"geben sie jetzt 5 gcr-bytes ein":print
+  290 input"{down}{down}";h$:gc$=""
+  300 x$="":forx=1tolen(h$)
+  310 ifmid$(h$,x,1)<>" "thenx$=x$+mid$(h$,x,1)
+  320 next
+  330 h$=x$
+  340 forx=1to10
+  350 x$=mid$(h$,x,1)
+  360 xx=val(x$):ifxx=0andx$<>"0"thenxx=asc(x$)-55
+  370 fory=0to3
+  380 yy=int(xx/2^(3-y)):xx=xx-yy*2^(3-y)
+  390 ifyythengc$=gc$+"1":goto410
+  400 gc$=gc$+"0"
+  410 nexty,x
+  420 hc$="":forx=1to8
+  430 x$=mid$(gc$,x*5-4,5)
+  440 fory=0to15
+  450 ifx$<>g$(y)thennexty
+  460 :
+  470 hc$=hc$+mid$(a$,y+1,1)
+  480 ifint(x/2)=x/2thenhc$=hc$+" "
+  490 nextx
+  500 print:print:print"hex: ";hc$
+

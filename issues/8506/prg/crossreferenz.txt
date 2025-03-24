@@ -1,0 +1,180 @@
+
+
+;crossreferenz ==0801==
+   10 rem*********************************
+   20 rem* programmname : xref           *
+   30 rem*     c-64                      *
+   40 rem*     floppy 1541 o. aehnliche  *
+   50 rem*     drucker (z.b. mps 801)    *
+   60 rem* von stefan becker             *
+   70 rem*********************************
+   80 clr:goto150
+   90 get#1,a$:x=asc(a$+n$):if(64andst)=0thenreturn
+  100 close1:ifpathenpa=0:goto520
+  110 goto960
+  120 gosub90:x1=x:gosub90:x=x1+256*x:return
+  130 ifsp<obandva<obandps<obthenreturn:rem*** grenzen erreicht ? ***
+  140 print:print"Bitte die Variable ob in Zeile 150 vergroessern.":goto1310
+  150 ob=500:dimsp$(ob),ps$(ob),va$(ob)
+  160 rem*** ob ist obergrenze der anzahl der spruenge und variablen ***
+  170 poke53280,6:poke53281,6
+  180 n$=chr$(0)
+  190 le$="                                                  "
+  200 printchr$(147)chr$(9)chr$(14)chr$(8)chr$(144);
+  210 print"{rvon}          Cross-Referenz-Lister         "
+  220 print"{down}{down}Ausgabe auf ":print"{down}{rvon}B{rvof}ildschirm oder {rvon}D{rvof}rucker{up}{up}{up}"
+  230 printspc(12);:poke204,0
+  240 geta$:ifa$<>"b"anda$<>"d"goto240
+  250 ifa$="b"thenprint"Bildschirm.":dv=3:goto270
+  260 print"Drucker.":dv=4
+  270 print"{down}                       {up}"
+  280 open1,0:print"Programmname: ";:input#1,na$:close1:print
+  290 open2,8,15:open1,8,2,na$+",p,r":gosub1290:gosub120:ifx=2049then310
+  300 print:print"Das Programm muss ab 2049 liegen.":goto1310
+  302 :
+  304 :
+  305 rem********************************
+  306 rem     pass 1 sprungtabelle
+  308 rem********************************
+  309 :
+  310 print"{clr}Pass 1 (Suchen der Spruenge){down}":pa=1
+  320 gosub120:gosub120:ze$=right$("     "+str$(x),5):print"{home}{down}{down}"ze$
+  330 gosub90:ifx=137orx=138orx=141orx=167thens1$="":goto360
+  340 ifx=0goto320
+  350 goto330
+  360 gosub90:ifx=32goto360
+  370 ifx>=48andx<=57thens1$=s1$+a$:goto360
+  380 ifs1$=""goto470
+  390 s1$=right$("      "+s1$,6)
+  400 ifleft$(sp$(sp),5)<>ze$thensp=sp+1:gosub130:sp$(sp)=ze$+":"
+  410 iflen(sp$(sp))>70thensp=sp+1:gosub130:sp$(sp)=ze$+":"
+  420 ifright$(sp$(sp),6)<>s1$thensp$(sp)=sp$(sp)+s1$
+  430 fori=1tops
+  440 ifleft$(ps$(i),6)<>s1$thennext:ps=i:gosub130:ps$(i)=s1$+":"
+  450 iflen(ps$(i))>70thennext:ps=ps+1:i=ps:gosub130:ps$(i)=s1$+":"
+  460 ifright$(ps$(i),5)<>ze$thenps$(i)=ps$(i)+" "+ze$
+  470 ifx=0goto320
+  480 ifx=44thens1$="":goto360
+  490 ifx=58orx>=127or(x>=65andx<=90)goto330
+  500 print:print"{down}Fehler im Quellprogramm. Zeile:"ze$:goto1310
+  502 :
+  504 :
+  506 rem -------------------------------
+  510 rem*** sortieren der sprungziele (feld ps$( ***
+  515 rem -------------------------------
+  516 :
+  520 fori=1tops
+  530 forj=itops
+  540 ifleft$(ps$(i),5)<left$(ps$(j),5)goto560
+  550 ps$(0)=ps$(i):ps$(i)=ps$(j):ps$(j)=ps$(0)
+  560 nextj
+  570 nexti
+  574 :
+  575 rem--------------------------------
+  576 rem   ausgabe spruenge + sprungziele
+  577 rem--------------------------------
+  578 :
+  580 open1,dv,7:print#1,"Programmname: "na$:print#1
+  590 print#1,"sprungtabelle           "
+  600 print#1,"--------------------------"
+  605 print#1,"zeile :   sprung auf zeile      ":print#1
+  610 fori=1tosp
+  620 ifleft$(sp$(i-1),5)=left$(sp$(i),5)thenprint#1,spc(7)mid$(sp$(i),7):goto640
+  630 print#1," "sp$(i)
+  640 nexti:print#1
+  645 print#1,"zeile :   wird angesprungen von":print#1
+  650 ps$(0)="":fori=2tops
+  660 ifleft$(ps$(i-1),6)<>left$(ps$(i),6)thenprint#1,ps$(i):goto680
+  670 print#1,spc(6);mid$(ps$(i),7)
+  680 nexti:close1
+  690 print"{down}{rvon}N{rvof}ochmals/{rvon}W{rvof}eiter"
+  700 geta$:ifa$<>"n"anda$<>"w"goto700
+  710 ifa$="n"goto580
+  712 :
+  714 :
+  715 rem********************************
+  716 rem     pass 2 variable suchen
+  718 rem********************************
+  719 :
+  720 print"{clr}Pass 2 (Suchen der Variablen){down}"
+  730 open1,8,2,na$+",p,r":gosub1290:gosub120
+  740 gosub120:gosub120:ze$=right$("     "+str$(x),5):print"{home}{down}{down}"ze$:y=0
+  750 gosub90
+  760 ifx=0goto740
+  770 ifx=34orx=131orx=143goto800
+  780 ifx>64andx<91goto850
+  790 goto750
+  800 ifx=131theny=1
+  810 gosub90:ifx=0goto740
+  820 ifx=34goto750
+  830 ifx=58andy=1goto750
+  840 goto810
+  850 v1$=a$
+  860 gosub90
+  870 ifx=36orx=37or(x>47andx<58)or(x>64andx<91)thenv1$=v1$+a$:goto860
+  880 ifx=40thenv1$=v1$+a$
+  890 v1$=left$(v1$+"    ",4)
+  900 fori=1tova
+  910 ifleft$(va$(i),4)<>v1$thennext:va=i:gosub130:va$(i)=v1$+"  :"
+  920 iflen(va$(i))>50thennext:va=va+1:i=va:gosub130:va$(i)=va$+"  :"
+  930 ifright$(va$(i),5)<>ze$thenva$(i)=va$(i)+" "+ze$
+  940 ifx=0goto740
+  950 goto750
+  952 :
+  954 :
+  956 rem -------------------------------
+  960 rem *** sortieren der variablen (feld va$( ***
+  965 rem -------------------------------
+  968 :
+  970 fori=1tova
+  980 forj=itova
+  990 ifleft$(va$(i),4)>left$(va$(j),4)goto1010
+ 1000 va$(0)=va$(i):va$(i)=va$(j):va$(j)=va$(0)
+ 1010 nextj
+ 1020 nexti:va=va-1:i=va
+ 1025 :
+ 1030 print"{clr}Wollen Sie zu den Variablen":print"Bemerkungen eingeben?  ";
+ 1040 geta$:ifa$="n"goto1180
+ 1050 ifa$<>"j"goto1040
+ 1060 print"Ja{down}{down}{down}"
+ 1070 print"{home}{down}{down}{down}{down}{down}{down}Variablenname: ";left$(va$(i),4)
+ 1073 printle$
+ 1075 iflen(va$(i))>70thenprint"{up}{up}"right$(va$(i),25)
+ 1080 geta$:ifa$<>"{up}"anda$<>"{down}"anda$<>chr$(13)goto1080
+ 1090 ifa$="{up}"theni=i+1:ifi>vatheni=va
+ 1100 ifa$="{down}"theni=i-1:ifi<1theni=1
+ 1110 ifa$<>chr$(13)goto1070
+ 1120 vr$=left$(va$(i),4):open1,0
+ 1130 print"Text:";:input#1,te$:print:close1:te$=left$(te$,25)
+ 1140 fori=vato1step-1
+ 1150 ifleft$(va$(i),4)<>vr$thennext:print"Nicht vorhanden.":goto1070
+ 1160 va$(i)=left$(va$(i)+le$,55)+right$(le$+te$,25):goto1030
+ 1170 vr$=left$(vr$,4)
+ 1174 ;
+ 1175 rem-------------------------------
+ 1176 rem     ausgabe variable
+ 1177 rem-------------------------------
+ 1180 print:open1,dv,7
+ 1190 print#1,"{down}{down}liste der variablen     :"
+ 1200 print#1,"-------------------------"
+ 1210 fori=vato1step-1
+ 1220 ifleft$(va$(i+1),4)<>left$(va$(i),4)thenprint#1,va$(i):goto1240
+ 1230 print#1,spc(6);mid$(va$(i),7)
+ 1240 nexti
+ 1250 print"{down}{rvon}n{rvof}ochmals/{rvon}w{rvof}eiter"
+ 1260 geta$:ifa$<>"n"anda$<>"w"goto1260
+ 1263 ifa$="n"goto1190
+ 1266 print"Variablenliste ohne Zeilennummer (j/n)"
+ 1267 getr$:ifr$=""then1267
+ 1268 ifr$<>"j"thenprint:print"ende":goto1310
+ 1269 print#1:print#1:print#1,"Variablenliste ohne Zeilennummer"
+ 1270 print#1,"-------------------------------"
+ 1271 fori=vato1step-1
+ 1272 iflen(va$(i))>70thenprint#1,left$(va$(i),8);right$(va$(i),25):goto1274
+ 1273 print#1,left$(va$(i),8)
+ 1274 nexti
+ 1280 goto1310
+ 1290 input#2,a$,b$:ifa$="00"thenreturn
+ 1300 print:print"Disk-Error: ";b$
+ 1310 close1:close2:end
+
