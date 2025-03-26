@@ -39,7 +39,7 @@ usw.
 * Sonderheft 1/85 (Tips & Tricks): 23. November 2024
 * Sonderheft 2/85 (Abenteuerspiele): 25. März 1985 <!-- 8504/S.30 -->
 * Sonderheft 3/85 (Spiele): ca. 14. Juni 2025 <!-- 8507/S.34 -->
-* Sonderheft 4/85 (Grafik): *vor* 16. August 2025 <!-- 8509 -->
+* Sonderheft 4/85 (Grafik): *vor* 16. August 2025 <!-- 8509 --> <!-- bis 25.10.85, SH8506 -->
 * Sonderheft 5/85 (Floppy, Datasette): ca. 20. September 2025 <!-- 8510 -->
 * Sonderheft 6/85 (Top-Themen): ca. 18. Oktober 2025 <!-- 8511/S.139 -->
 * Sonderheft 7/85 (Professionelle Anwendungen): Mitte November 2025 <!-- 8601/S.106 -->
