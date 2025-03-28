@@ -193,6 +193,8 @@ def process_line(line: str) -> tuple[int, str] | tuple[None, None]:
                     tmp += map_petcat_64er[seg[: lenspecial + 1]]
                     tmp += map_shift(seg[lenspecial + 1 :])
                 part = tmp
+            collapse = "  "
+            part = part.replace(collapse,collapse.replace(" ","{SPACE}"))
 
         newparts += [part]
         quotes = not quotes
