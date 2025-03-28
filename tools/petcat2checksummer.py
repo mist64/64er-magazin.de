@@ -1,3 +1,4 @@
+import string
 import sys
 import re
 import itertools
@@ -37,14 +38,14 @@ encoding_64er = [
     "{F7}", "{F2}", "{F4}", "{F6}", "{F8}", "{$8d}", "{$8e}", "{$8f}",
     "{BLACK}", "{UP}", "{RVOFF}", "{CLR}", "{INST}", "{BROWN}", "{LIG.RED}", "{GREY1}",
     "{GREY2}", "{LIG.GREEN}", "{LIG.BLUE}", "{GREY3}", "{PURPLE}", "{LEFT}", "{YELLOW}", "{CYAN}",
-    "{SHIFT-SPACE}", to_cbm("K"), to_cbm("I"), to_cbm("T"), to_cbm("@"), to_cbm("G"), to_cbm("+"), to_cbm("M"),
-    to_cbm("£"), to_shift("£"), to_cbm("N"), to_cbm("Q"), to_cbm("D"), to_cbm("Z"), to_cbm("S"), to_cbm("P"),
-    to_cbm("A"), to_cbm("E"), to_cbm("R"), to_cbm("W"), to_cbm("H"), to_cbm("J"), to_cbm("L"), to_cbm("Y"),
-    to_cbm("U"), to_cbm("O"), to_shift("@"), to_cbm("F"), to_cbm("C"), to_cbm("X"), to_cbm("V"), to_cbm("B"),
-    to_shift("*"), "A", "B", "C", "D", "E", "F", "G",
-    "H", "I", "J", "K", "L", "M", "N", "O",
-    "P", "Q", "R", "S", "T", "U", "V", "W",
-    "X", "Y", "Z", to_shift("+"), to_cbm("-"), to_shift("-"), "{$de}", "{CBM-*}",
+    "{SHIFT-SPACE}", to_cbm("k"), to_cbm("i"), to_cbm("t"), to_cbm("@"), to_cbm("g"), to_cbm("+"), to_cbm("m"),
+    to_cbm("£"), to_shift("£"), to_cbm("n"), to_cbm("q"), to_cbm("d"), to_cbm("z"), to_cbm("s"), to_cbm("p"),
+    to_cbm("a"), to_cbm("e"), to_cbm("r"), to_cbm("w"), to_cbm("h"), to_cbm("j"), to_cbm("l"), to_cbm("y"),
+    to_cbm("u"), to_cbm("o"), to_shift("@"), to_cbm("f"), to_cbm("c"), to_cbm("x"), to_cbm("v"), to_cbm("b"),
+    to_shift("*"), to_shift("a"), to_shift("b"), to_shift("c"), to_shift("d"), to_shift("e"), to_shift("f"), to_shift("g"),
+    to_shift("h"), to_shift("i"), to_shift("j"), to_shift("k"), to_shift("l"), to_shift("m"), to_shift("n"), to_shift("o"),
+    to_shift("p"), to_shift("q"), to_shift("r"), to_shift("s"), to_shift("t"), to_shift("u"), to_shift("v"), to_shift("w"),
+    to_shift("x"), to_shift("y"), to_shift("z"), to_shift("+"), to_cbm("-"), to_shift("-"), "{$de}", to_cbm("*"),
     "{$e0}", "{$e1}", "{$e2}", "{$e3}", "{$e4}", "{$e5}", "{$e6}", "{$e7}",
     "{$e8}", "{$e9}", "{$ea}", "{$eb}", "{$ec}", "{$ed}", "{$ee}", "{$ef}",
     "{$f0}", "{$f1}", "{$f2}", "{$f3}", "{$f4}", "{$f5}", "{$f6}", "{$f7}",
@@ -97,9 +98,14 @@ map_petcat_64er = dict(zip(encoding_petcat, encoding_64er))
 map_petcat_64er_singles = dict(
     map(
         lambda k: (k, map_petcat_64er[k]),
-        filter(lambda x: len(x) == 1 and map_petcat_64er[x] != x, encoding_petcat),
+        filter(lambda x: len(x) == 1 and (x < "A" or x > "Z") and map_petcat_64er[x] != x, encoding_petcat),
     )
 )
+
+def map_shift(s: str) -> str:
+    for c in string.ascii_uppercase:
+        s = s.replace(c, to_shift(c))
+    return s
 
 
 def calculate_checksums(prg: bytes, version: int) -> dict[int, int]:
@@ -171,7 +177,7 @@ def process_line(line: str) -> tuple[int, str] | tuple[None, None]:
 
     # no strings? no pain.
     if not '"' in line:
-        return lineno, line
+        return lineno, line.upper()
 
     parts = line.split('"')
     newparts = []
@@ -180,17 +186,18 @@ def process_line(line: str) -> tuple[int, str] | tuple[None, None]:
         if quotes:
             special = part.split("{")
             if len(special) > 1:
-                tmp = special[0]
+                tmp = map_shift(special[0])
                 for seg in special[1:]:
                     seg = "{" + seg
                     lenspecial = seg.find("}")
                     tmp += map_petcat_64er[seg[: lenspecial + 1]]
-                    tmp += seg[lenspecial + 1 :]
+                    tmp += map_shift(seg[lenspecial + 1 :])
                 part = tmp
 
         newparts += [part]
         quotes = not quotes
     nline = '"'.join(newparts)
+    nline = nline.upper()
 
     # Handle spaces adjacent to control codes
     nline = nline.replace("} ", "}{SPACE}")
