@@ -693,6 +693,9 @@ class Issue:
                       checksum = checksums[lineno]
                       content = content.replace("&", "&amp;")
                       content = content.replace("<", "&lt;")
+                      content = content.replace("\u0346", "<span class='cbm'>")
+                      content = content.replace("\u033a", "<span class='shift'>")
+                      content = content.replace("\ue000", "</span>")
                       listing_64er += [f"<span data-chksum='<{checksum:03d}>'>{lineno: 3d} {content} </span>"]
                   listing = "\n".join(listing)
                   listing_64er = "\n".join(listing_64er)

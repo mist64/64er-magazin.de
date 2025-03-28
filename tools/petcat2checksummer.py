@@ -6,12 +6,14 @@ from typing import Optional, Tuple
 
 
 # approximating the overline / underline notation in the magazine
+# uses overline/underline style decorators plus a PUA character
+# for later translation into HTML entities.
 def to_cbm(c: str) -> str:
-    return "\u0346" + c
+    return "\u0346" + c + "\ue000"
 
 
 def to_shift(c: str) -> str:
-    return "\u033a" + c
+    return "\u033a" + c + "\ue000"
 
 
 # With help from https://style64.org/petscii/
