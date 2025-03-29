@@ -420,9 +420,15 @@ def parse(
                 line += encoding_64er[b]
             else:
                 token, skip = detokenize(basicver, b, read8(p + 1))
-                line += token
                 if skip:
                     p += 1
+                if token in ["TO", "THEN"]:
+                    if line[-1] != " ":
+                        line += " "
+                elif len(token) > 1 and token[:5] not in ["INPUT", "PRINT"]:
+                    if read8(p + 1) != " ":
+                        token += " "
+                line += token
 
             p += 1
 
