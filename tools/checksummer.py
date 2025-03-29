@@ -337,11 +337,13 @@ def process_line(line: str) -> str:
     nline = nline.replace("}{", ",")
 
     # Handle duplicate control codes
-    sequences = set(re.findall("{(.*?,.*?)}", nline))
+    sequences = re.findall("{(.*?,.*?)}", nline)
     for s in sequences:
         uniq = [list(map(str, v)) for k, v in itertools.groupby(s.split(","))]
         short = ",".join(map(lambda i: f"{len(i)}{i[0]}" if len(i) > 1 else i[0], uniq))
-        nline = nline.replace(s, short)
+        if short == s:
+            continue
+        nline = nline.replace(s, short, 1)
 
     return nline
 
