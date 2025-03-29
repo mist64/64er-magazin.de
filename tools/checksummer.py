@@ -325,21 +325,8 @@ def detokenize(basicver: str, token: int, extratoken: int) -> (str, bool):
 def process_line(line: str) -> str:
     line = line.strip()
 
-    parts = line.split('"')
-    newparts = []
-    quotes = False
-    for part in parts:
-        if quotes:
-            collapse = "  "
-            part = part.replace(collapse, collapse.replace(" ", "{SPACE}"))
-
-        newparts += [part]
-        quotes = not quotes
-    nline = '"'.join(newparts)
-
-    # Handle spaces adjacent to control codes
-    nline = nline.replace("} ", "}{SPACE}")
-    b = nline
+    # Handle spaces before control codes
+    b = line
     c = ""
     while c != b:
         c = b
@@ -413,11 +400,19 @@ def parse(
             b = read8(p)
 
             val, shift = checksummer(val, shift, b)
-            if b == 0x22:
+            if b == ord('"'):
                 quoted = not quoted
                 line += '"'
             elif quoted:
-                line += encoding_64er[b]
+                if b == ord(' '):
+                    if line[-1] == ' ':
+                        line = line[:-1]+'{SPACE}{SPACE}'
+                    elif line[-1] == '}':
+                        line += '{SPACE}'
+                    else:
+                        line += " "
+                else:
+                    line += encoding_64er[b]
             else:
                 token, skip = detokenize(basicver, b, read8(p + 1))
                 if skip:
