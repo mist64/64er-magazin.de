@@ -17,7 +17,7 @@ import pytz
 import argparse
 import gzip
 import lunr
-from tools import mse, petcat2checksummer
+from tools import mse, checksummer
 from dataclasses import dataclass, field
 from collections import defaultdict, OrderedDict
 from bs4 import BeautifulSoup, NavigableString
@@ -53,10 +53,10 @@ class BuildConfig():
     git_branch_name: str = "main" # set in setup
 
 
-# If outputfile == None, returns byte array
-# If outputfile given, returns None
+# If outputfile == None, returns (byte array, basicversion)
+# If outputfile given, returns (None, basicversion)
 # exits on subprocess error
-def petcat2prg(listing, output_file_name = None):
+def petcat2prg(listing, output_file_name = None) -> tuple[None | bytes, str]:
 
     regex = r"^;.*==([0-9A-Fa-f]{4})=="
     load_address = re.findall(regex, listing, re.MULTILINE)
@@ -85,8 +85,10 @@ def petcat2prg(listing, output_file_name = None):
         print(f"Failed to process: {key}")
         exit()
 
-    if not output_file_name:
-        return prg
+    if output_file_name:
+        prg = None
+
+    return prg, version
 
 def parse_cli_into_config():
 
@@ -527,7 +529,7 @@ class Issue:
                   src_path = os.path.join(root, file)
                   file_path = os.path.join('prg', file)
                   with open(src_path, 'rb') as file_obj:
-                      listings_bin[file] = file_obj.read()
+                      listings_bin[file] = (file_obj.read(), None)
                   binaries.append(file_path)
 
       for root, dirs, files in os.walk(issue_directory_path):
@@ -656,7 +658,7 @@ class Issue:
           data_checksummer = tag.get("data-checksummer")
           data_mse = tag.get("data-mse")
           if data_mse and data_filename:
-              data = listings_bin[data_filename]
+              data = listings_bin[data_filename][0]
               start = data[0] | (data[1] << 8)
               end = start + (len(data) - 2)
               lines = mse.MSEversions[data_mse](data_filename, start, end, mse.Memory(data[2:]))
@@ -664,7 +666,7 @@ class Issue:
               tag.string = listing
 
           elif data_filename:
-              listing_bin = listings_bin[data_filename]
+              listing_bin, basicver = listings_bin[data_filename]
               # remove ';', empty lines and leading spaces
               listing = listings[data_filename]
               listing = [line.lstrip() for line in listing.splitlines() if line.strip() and not line.lstrip().startswith(';')]
@@ -684,24 +686,19 @@ class Issue:
                   listing = filtered_lines
 
               if data_checksummer and listing_bin:
-                  checksums = petcat2checksummer.calculate_checksums(listing_bin, int(data_checksummer))
-                  listing_64er = []
-                  for line in listing:
-                      lineno, content = petcat2checksummer.process_line(line)
-                      if lineno is None:
-                          continue
-                      checksum = checksums[lineno]
+                  listing_64er = checksummer.parse(listing_bin, int(data_checksummer), basicver)
+                  listing_html = ""
+                  for (lineno, content, checksum) in listing_64er:
                       content = content.replace("&", "&amp;")
                       content = content.replace("<", "&lt;")
                       content = content.replace("\u0346", "<span class='cbm'>")
                       content = content.replace("\u033a", "<span class='shift'>")
                       content = content.replace("\ue000", "</span>")
-                      listing_64er += [f"<span data-chksum='<{checksum:03d}>'>{lineno: 3d} {content} </span>"]
+                      listing_html += f"<span data-chksum='<{checksum:03d}>'>{lineno: 3d} {content} </span>\n"
                   listing = "\n".join(listing)
-                  listing_64er = "\n".join(listing_64er)
                   newhtml = f"""<div class="listing"><span class="controls"><input type="checkbox" role="switch" class="toggle" /></span>
                     <pre class="listing-petcat">{listing}</pre>
-                    <pre class="listing-checksummer">{listing_64er}</pre></div>
+                    <pre class="listing-checksummer">{listing_html}</pre></div>
                   """
                   tag.replace_with(BeautifulSoup(newhtml, 'html.parser'))
               else:
