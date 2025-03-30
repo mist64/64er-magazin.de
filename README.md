@@ -193,6 +193,8 @@ Die Eingabe-Ausgaben werden aus `issues` gelesen, die Website wird nach `out` ge
 * Sonderheft 2/1985:
     * Zeitschrift zum Scannen geliehen
         * [pgeorgi](https://www.forum64.de/wcf/index.php?user/28405-pgeorgi/)
+    * Umschlag (inkl. Titelbild) zum Scannen geliehen
+        * [docbobo](https://www.forum64.de/wcf/index.php?user/26944-docbobo/)
     * OCR
         * [Drachen](https://www.forum64.de/wcf/index.php?user/9125-drachen/)
 
