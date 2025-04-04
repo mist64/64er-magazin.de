@@ -976,18 +976,24 @@ def html_generate_toc(db, issue_key, heading_level=1, prepend_issue_dir=False):
     toc_entries = db.toc_with_articles(issue_key)
 
     last_category = None
+    last_subcategory = None
 
     html_parts.append('<div class="toc">')
 
     for entry in toc_entries:
         if len(entry['articles']):
-          category, subcategory = (entry['category'].split('|', 1) + [None])[:2] if '|' in entry['category'] else (entry['category'], None)
+          category, subcategory, subsubcategory = (entry['category'].split('|', 2) + [None])[:3] if '|' in entry['category'] else (entry['category'], None, None)
           if category != last_category:
               if category != "":
                   html_parts.append(f"<h3>{category}</h3>\n")
               last_category = category
-          if subcategory:
-              html_parts.append(f"<h4>{subcategory}</h4>\n")
+              last_subcategory = None
+          if subcategory != last_subcategory:
+              if subcategory:
+                  html_parts.append(f"<h4>{subcategory}</h4>\n")
+              last_subcategory = subcategory
+          if subsubcategory:
+              html_parts.append(f"<h4>{subsubcategory}</h4>\n")
           html_parts.append('<ul>\n')
           for article in entry['articles']:
 
