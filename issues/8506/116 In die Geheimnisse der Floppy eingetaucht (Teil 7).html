@@ -171,13 +171,34 @@
 
         <p>Wir wandeln diese vier Hex-Bytes nun in die entsprechenden fünf GCR-Bytes um, indem wir in Tabelle 1 nachsehen,was die entsprechenden GCR-Äquivalente dieser Bytes sind. Wir kommen zu folgendem Ergebnis:</p>
 
-        <p>TODO TABLE</p>
+        <table class="plain">
+            <tr>
+                <td>HEX</td>
+                <td>BINÄR</td>
+                <td>GCR-Gode</td>
+            </tr>
+            <tr>
+                <td>$FF</td>
+                <td>1111 1111</td>
+                <td>10101 10101</td>
+            </tr>
+            <tr>
+                <td>$FF</td>
+                <td>1111 1111</td>
+                <td>10101 10101</td>
+            </tr>
+            <tr>
+                <td>$FF</td>
+                <td>1111 1111</td>
+                <td>10101 10101</td>
+            </tr>
+            <tr>
+                <td>$FF</td>
+                <td>1111 1111</td>
+                <td>10101 10101</td>
+            </tr>
+        </table>
 
-        <p>HEX BINÄR GCR-Gode<br>
-            $FF 1111 1111 10101 10101<br>
-            $FF 1111 1111 10101 10101<br>
-            $FF 1111 1111 10101 10101<br>
-            $FF 1111 1111 10101 10101</p>
 
         <p>Die binär dargestellten GCR-Werte müssen wir jetzt nur noch zu fünf Bytes zusammenfassen, um auf folgendes Ergebnis zu kommen:<br>
             1010 + 1101 = AD<br>
@@ -236,7 +257,431 @@
             <figcaption>Listing 2. Umwandlung von GCR- in Daten-Bytes</figcaption>
         </figure>
         <figure>
-            TODO
+            <pre>Umwandlung von 4 Daten-Bytes
+in 5 GCR-Bytes
+f6d0  a9 00       lda #$00
+f6d2  85 57       sta $57
+f6d4  85 5a       sta $5a
+; Pufferzeiger holen
+f6d6  a4 34       ldy $34
+; erstes Byte holen
+f6d8  a5 52       lda $52
+f6da  29 f0       and #$f0
+f6dc  4a          lsr a
+f6dd  4a          lsr a
+f6de  4a          lsr a
+f6df  4a          lsr a
+f6e0  aa          tax
+; und anhand der Tabelle
+; umwandeln
+f6e1  bd 7f f7    lda $f77f,x
+f6e4  0a          asl a
+f6e5  0a          asl a
+f6e6  0a          asl a
+f6e7  85 56       sta $56
+f6e9  a5 52       lda $52
+f6eb  29 0f       and #$0f
+f6ed  aa          tax
+f6ee  bd 7f f7    lda $f77f,x
+f6f1  6a          ror a
+f6f2  66 57       ror $57
+f6f4  6a          ror a
+f6f5  66 57       ror $57
+f6f7  29 07       and #$07
+f6f9  05 56       ora $56
+; Byte in Puffer schreiben
+f6fb  91 30       sta ($30),y
+f6fd  c8          iny
+; zweites Byte holen
+f6fe  a5 53       lda $53
+f700  29 f0       and #$f0
+f702  4a          lsr a
+f703  4a          lsr a
+f704  4a          lsr a
+f705  4a          lsr a
+f706  aa          tax
+f707  bd 7f f7    lda $f77f,x
+; und codieren
+f70a  0a          asl a
+f70b  05 57       ora $57
+f70d  85 57       sta $57
+f70f  a5 53       lda $53
+f711  29 0f       and #$0f
+f713  aa          tax
+f714  bd 7f f7    lda $f77f,x
+f717  2a          rol a
+f718  2a          rol a
+f719  2a          rol a
+f71a  2a          rol a
+f71b  85 58       sta $58
+f71d  2a          rol a
+f71e  29 01       and #$01
+f720  05 57       ora $57
+; in Puffer schreiben
+f722  91 30       sta ($30),y
+f724  c8          iny
+; drittes Byte holen
+f725  a5 54       lda $54
+f727  29 f0       and #$f0
+f729  4a          lsr a
+f72a  4a          lsr a
+f72b  4a          lsr a
+f72c  4a          lsr a
+f72d  aa          tax
+; codieren und in
+f72e  bd 7f f7    lda $f77f,x
+f731  18          clc
+f732  6a          ror a
+f733  05 58       ora $58
+; Puffer schreiben
+f735  91 30       sta ($30),y
+f737  c8          iny
+f738  6a          ror a
+f739  29 80       and #$80
+f73b  85 59       sta $59
+f73d  a5 54       lda $54
+f73f  29 0f       and #$0f
+f741  aa          tax
+f742  bd 7f f7    lda $f77f,x
+f745  0a          asl a
+f746  0a          asl a
+f747  29 7c       and #$7c
+f749  05 59       ora $59
+f74b  85 59       sta $59
+; viertes Byte holen
+f74d  a5 55       lda $55
+f74f  29 f0       and #$f0
+f751  4a          lsr a
+f752  4a          lsr a
+f753  4a          lsr a
+f754  4a          lsr a
+f755  aa          tax
+; codieren und in
+f756  bd 7f f7    lda $f77f,x
+f759  6a          ror a
+f75a  66 5a       ror $5a
+f75c  6a          ror a
+f75d  66 5a       ror $5a
+f75f  6a          ror a
+f760  66 5a       ror $5a
+f762  29 03       and #$03
+f764  05 59       ora $59
+; Puffer schreiben
+f766  91 30       sta ($30),y
+f768  c8          iny
+f769  d0 04       bne $f76f
+f76b  a5 2f       lda $2f
+f76d  85 31       sta $31
+f76f  a5 55       lda $55
+f771  29 0f       and #$0f
+f773  aa          tax
+f774  bd 7f f7    lda $f77f,x
+f777  05 5a       ora $5a
+; Überlaufbyte ebenfalls
+; in Puffer schreiben
+f779  91 30       sta ($30),y
+f77b  c8          iny
+; Pufferzeiger merken
+f77c  84 34       sty $34
+f77e  60          rts
+; Tabelle für die
+; Umwandlung
+; von HEX nach GCR-
+; Werten
+f77f  0a 0b 12 13 0e 0f 16 17
+ff87  09 19 1a 1b 0d 1d 1e 15
+-----------------------------
+; Pufferdaten codieren
+; Pufferadresse Lo
+f78f  a9 00       lda #$00
+f791  85 30       sta $30
+f793  85 2e       sta $2e
+; Pufferzeiger 2 setzen
+f795  85 36       sta $36
+; Pufferzeiger für
+f797  a9 bb       lda #$bb
+; Ausweichpuffer setzen
+f799  85 34       sta $34
+f79b  85 50       sta $50
+; Pufferadresse Hi
+f79d  a5 31       lda $31
+; merken
+f79f  85 2f       sta $2f
+; Pufferadresse auf
+f7a1  a9 01       lda #$01
+; Ausweichpuffer
+f7a3  85 31       sta $31
+; Datenblockkennz. $07
+; für Kodierung
+; vorbereiten
+f7a5  a5 47       lda $47
+f7a7  85 52       sta $52
+f7a9  a4 36       ldy $36
+; Bytes aus normalem
+; Puffer
+f7ab  b1 2e       lda ($2e),y
+; in Speicher für
+; Codierung
+f7ad  85 53       sta $53
+f7af  c8          iny
+f7b0  b1 2e       lda ($2e),y
+f7b2  85 54       sta $54
+f7b4  c8          iny
+f7b5  b1 2e       lda ($2e),y
+f7b7  85 55       sta $55
+f7b9  c8          iny
+; Pufferzeiger retten
+f7ba  84 36       sty $36
+; Bytes kodieren und in
+; Ausweichpuffer
+; schreiben
+f7bc  20 d0 f6    jsr $f6d0
+f7bf  a4 36       ldy $36
+; weitere Bytes aus
+; Puffer in
+f7c1  b1 2e       lda ($2e),y
+; Speicher für Codierung
+-----------------------------
+f7c3  85 52       sta $52
+f7c5  c8          iny
+f7c6  f0 11       beq $f7d9
+f7c8  b1 2e       lda ($2e),y
+f7ca  85 53       sta $53
+f7cc  c8          iny
+f7cd  b1 2e       lda ($2e),y
+f7cf  85 54       sta $54
+f7d1  c8          iny
+f7d2  b1 2e       lda ($2e),y
+f7d4  85 55       sta $55
+f7d6  c8          iny
+; und ggf. codieren
+f7d7  d0 e1       bne $f7ba
+f7d9  a5 3a       lda $3a
+; ebenfalls codieren und
+; in Puffer schreiben
+f7db  85 53       sta $53
+f7dd  a9 00       lda #$00
+f7df  85 54       sta $54
+; Leerbytes zum Auffüllen
+f7e1  85 55       sta $55
+; ebenfalls codieren
+f7e3  4c d0 f6    jmp $f6d0
+-----------------------------
+Umwandlung von S GCR-Bytes
+in 4 Daten-Bytes
+; Pufferzeiger holen
+f7e6  a4 34       ldy $34
+; Byte aus Puffer holen
+f7e8  b1 30       lda ($30),y
+f7ea  29 f8       and #$f8
+f7ec  4a          lsr a
+f7ed  4a          lsr a
+f7ee  4a          lsr a
+f7ef  85 56       sta $56
+; und decodieren;
+; Zwischenspeichern
+; für späteres
+f7f1  b1 30       lda ($30),y
+f7f3  29 07       and #$07
+f7f5  0a          asl a
+f7f6  0a          asl a
+; zusammenschieben
+f7f7  85 57       sta $57
+f7f9  c8          iny
+f7fa  d0 06       bne $f802
+f7fc  a5 4e       lda $4e
+f7fe  85 31       sta $31
+f800  a4 4f       ldy $4f
+; nächstes Byte holen
+f802  b1 30       lda ($30),y
+f804  29 c0       and #$c0
+f806  2a          rol a
+f807  2a          rol a
+f808  2a          rol a
+f809  05 57       ora $57
+f80b  85 57       sta $57
+; codieren und
+f80d  b1 30       lda ($30),y
+f80f  29 3e       and #$3e
+f811  4a          lsr a
+; zwischenspeichern
+f812  85 58       sta $58
+f814  b1 30       lda ($30),y
+f816  29 01       and #$01
+f818  0a          asl a
+f819  0a          asl a
+f81a  0a          asl a
+f81b  0a          asl a
+f81c  85 59       sta $59
+f81e  c8          iny
+f81f  b1 30       lda ($30),y
+f821  29 f0       and #$f0
+f823  4a          lsr a
+f824  4a          lsr a
+f825  4a          lsr a
+f826  4a          lsr a
+f827  05 59       ora $59
+f829  85 59       sta $59
+f82b  b1 30       lda ($30),y
+f82d  29 0f       and #$0f
+f82f  0a          asl a
+f830  85 5a       sta $5a
+f832  c8          iny
+f833  b1 30       lda ($30),y
+f835  29 80       and #$80
+f837  18          clc
+f838  2a          rol a
+f839  2a          rol a
+f83a  29 01       and #$01
+f83c  05 5a       ora $5a
+f83e  85 5a       sta $5a
+f840  b1 30       lda ($30),y
+f842  29 7c       and #$7c
+f844  4a          lsr a
+f845  4a          lsr a
+f846  85 5b       sta $5b
+f848  b1 30       lda ($30),y
+f84a  29 03       and #$03
+f84c  0a          asl a
+f84d  0a          asl a
+f84e  0a          asl a
+f84f  85 5c       sta $5c
+f851  c8          iny
+f852  d0 06       bne $f85a
+f854  a5 4e       lda $4e
+f856  85 31       sta $31
+f858  a4 4f       ldy $4f
+f85a  b1 30       lda ($30),y
+f85c  29 e0       and #$e0
+f85e  2a          rol a
+f85f  2a          rol a
+f860  2a          rol a
+f861  2a          rol a
+f862  05 5c       ora $5c
+f864  85 5c       sta $5c
+f866  b1 30       lda ($30),y
+f868  29 1f       and #$1f
+f86a  85 5d       sta $5d
+f86c  c8          iny
+f86d  84 34       sty $34
+; Bytes aus
+; Zwischenspeicher
+f86f  a6 56       ldx $56
+; holen, gemäß Tabelle
+; übersetzen und ab $52
+; bis $55
+f871  bd a0 f8    lda $f8a0,x
+f874  a6 57       ldx $57
+f876  1d c0 f8    ora $f8c0,x
+; speichern für Übergabe
+; 1. Byte
+f879  85 52       sta $52
+f87b  a6 58       ldx $58
+f87d  bd a0 f8    lda $f8a0,x
+f880  a6 59       ldx $59
+f882  1d c0 f8    ora $f8c0,x
+; 2. Byte
+f885  85 53       sta $53
+f887  a6 5a       ldx $5a
+f889  bd a0 f8    lda $f8a0,x
+f88c  a6 5b       ldx $5b
+f88e  1d c0 f8    ora $f8c0,x
+; 3. Byte
+f891  85 54       sta $54
+f893  a6 5c       ldx $5c
+f895  bd a0 f8    lda $f8a0,x
+f898  a6 5d       ldx $5d
+f89a  1d c0 f8    ora $f8c0,x
+; 4. Byte
+f89d  85 55       sta $55
+f89f  60          rts
+; Tabelle dient der
+; Decodierung der GCR-
+; Bytes in die entspr.
+; Hex-Werte.
+; Die $FF-Bytes geben
+; die Positionen der
+; illegalen Bitkombina-
+; tionen an. Sie veran-
+; lassen ggf. einen
+; »24, READ ERROR«.
+f8a0  ff ff ff ff ff ff ff ff
+f8a8  ff 80 00 10 ff c0 40 50
+f8b0  ff ff 20 30 ff f0 60 70
+f8b8  ff 90 a0 b0 ff d0 e0 ff
+f8c0  ff ff ff ff ff ff ff ff
+f8c8  ff 08 00 01 ff 0c 04 05
+f8d0  ff ff 02 03 ff 0f 06 07
+f8d8  ff 09 0a 0b ff 0d 0e ff
+-----------------------------
+Pufferinhalt decodieren
+; Pufferzeiger auf Null
+f8e0  a9 00       lda #$00
+; setzen
+f8e2  85 34       sta $34
+f8e4  85 2e       sta $2e
+; 2. Pufferzeiger
+f8e6  85 36       sta $36
+; Adresse für
+; Ausweichpuffer
+f8e8  a9 01       lda #$01
+f8ea  85 4e       sta $4e
+; nach $4e/4f
+f8ec  a9 ba       lda #$ba
+f8ee  85 4f       sta $4f
+; Pufferadresse Hi retten
+f8f0  a5 31       lda $31
+f8f2  85 2f       sta $2f
+; Bytes decodieren
+f8f4  20 e6 f7    jsr $f7e6
+; 1. Byte als Kennzeichen
+f8f7  a5 52       lda $52
+; für Datenblock
+f8f9  85 38       sta $38
+f8fb  a4 36       ldy $36
+; restliche Bytes in
+; Puffer
+f8fd  a5 53       lda $53
+f8ff  91 2e       sta ($2e),y
+f901  c8          iny
+f902  a5 54       lda $54
+f904  91 2e       sta ($2e),y
+f906  c8          iny
+f907  a5 55       lda $55
+f909  91 2e       sta ($2e),y
+f90b  c8          iny
+f90c  84 36       sty $36
+; nächste Kolonne
+; codieren
+f90e  20 e6 f7    jsr $f7e6
+f911  a4 36       ldy $36
+f913  a5 52       lda $52
+; Bytes in Puffer
+; schreiben
+f915  91 2e       sta ($2e),y
+f917  c8          iny
+f918  f0 11       beq $f92b
+f91a  a5 53       lda $53
+f91c  91 2e       sta ($2e),y
+f91e  c8          iny
+f91f  a5 54       lda $54
+f921  91 2e       sta ($2e),y
+f923  c8          iny
+f924  a5 55       lda $55
+f926  91 2e       sta ($2e),y
+f928  c8          iny
+; restliche Bytes ggf.
+; codieren
+f929  d0 e1       bne $f90c
+; Prüfsumme Datenblock
+; übernehmen
+f92b  a5 53       lda $53
+f92d  85 3a       sta $3a
+; Pufferadresse Hi
+; zurückholen
+f92f  a5 2f       lda $2f
+f931  85 31       sta $31
+f933  60          rts</pre>
             <figcaption>Listing 3. Die DOS-Routinen zur GCR-Codierung</figcaption>
         </figure>
     </article>
