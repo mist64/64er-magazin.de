@@ -178,11 +178,456 @@
         <address class="author">(Karsten Schramm/gk)</address>
 
         <figure>
-            <pre>TODO</pre>
+            <pre>Floppyprogramm zum Disk-Format-System
+    1985 by KOSS
+0500  ea        nop
+0501  a5 0a     lda $0a      Tracknummer aus Jobspeicher
+0503  c9 24     cmp #$24     größer als 35?
+0505  90 07     bcc $050e    nein
+0507  a9 12     lda #$12     ja: 18 als Anzahl der Sektoren
+0509  85 43     sta $43      festlegen
+050b  4c 13 05  jmp $0513
+050e  20 4b f2  jsr $f24b    Anzahl der Sektoren holen
+0511  85 43     sta $43      und merken
+0513  a9 00     lda #$00
+0515  85 1b     sta $1b      Sektorzähler setzen
+0517  a0 00     ldy #$00
+0519  a2 00     ldx #$00
+051b  a5 39     lda $39      Kennzeichen $08 für Blockheader
+051d  99 00 03  sta $0300,y
+0520  c8        iny
+0521  c8        iny
+0522  a5 1b     lda $1b      Sektornummer
+0524  99 00 03  sta $0300,y
+0527  c8        iny
+0528  a5 0a     lda $0a      Tracknummer
+052a  99 00 03  sta $0300,y
+052d  c8        iny
+052e  a5 13     lda $13      ID 2
+0530  99 00 03  sta $0300,y
+0533  c8        iny
+0534  a5 12     lda $12      ID 1
+0536  99 00 03  sta $0300,y
+0539  c8        iny
+053a  a9 0f     lda #$0f
+053c  99 00 03  sta $0300,y  Lücke lassen
+053f  c8        iny
+0540  99 00 03  sta $0300,y
+0543  c8        iny
+0544  a9 00     lda #$00
+0546  59 fa 02  eor $02fa,y  Prüfsumme bilden
+0549  59 fb 02  eor $02fb,y
+054c  59 fc 02  eor $02fc,y
+054f  59 fd 02  eor $02fd,y
+0552  99 f9 02  sta $02f9,y  und abspeichern
+0555  e6 1b     inc $1b
+0557  a5 1b     lda $1b      Sektorzähler erhöhen
+0559  c5 43     cmp $43      schon Maximalzahl?
+055b  90 be     bcc $051b    nein, weitermachen
+055d  a9 03     lda #$03
+055f  85 31     sta $31
+0561  98        tya
+0562  48        pha
+0563  8a        txa
+0564  9d 00 07  sta $0700,x  Datenblock mit $00 füllen
+0567  e8        inx
+0568  d0 fa     bne $0564
+056a  20 30 fe  jsr $fe30
+056d  68        pla
+056e  a8        tay
+056f  88        dey
+0570  20 e5 fd  jsr $fde5
+0573  20 f5 fd  jsr $fdf5
+0576  a9 07     lda #$07
+0578  85 31     sta $31
+057a  20 e9 f5  jsr $f5e9    Prüfsumme für Datenblock
+057d  85 3a     sta $3a      abspeichern
+057f  20 8f f7  jsr $f78f
+0582  a9 00     lda #$00     Sektorzähler setzen
+0584  85 32     sta $32
+0586  20 0e fe  jsr $fe0e    Track löschen
+0589  a9 ff     lda #$ff
+058b  8d 01 1c  sta $1c01    SYNC schreiben
+058e  a2 05     ldx #$05
+0590  50 fe     bvc $0590
+0592  b8        clv
+0593  ca        dex
+0594  d0 fa     bne $0590
+0596  a2 0a     ldx #$0a
+0598  a4 32     ldy $32
+059a  50 fe     bvc $059a    Blockheader schreiben
+059c  b8        clv
+059d  b9 00 03  lda $0300,y
+05a0  8d 01 1c  sta $1c01
+05a3  c8        iny
+05a4  ca        dex
+05a5  d0 f3     bne $059a
+05a7  a2 09     ldx #$09
+05a9  50 fe     bvc $05a9    Lücke von 9 Bytes lassen
+05ab  b8        clv
+05ac  a9 55     lda #$55
+05ae  8d 01 1c  sta $1c01
+05b1  ca        dex
+05b2  d0 f5     bne $05a9
+05b4  a9 ff     lda #$ff
+05b6  a2 05     ldx #$05
+05b8  50 fe     bvc $05b8    SYNC-Markierung für Datenblock
+05ba  b8        clv
+05bb  8d 01 1c  sta $1c01
+05be  ca        dex
+05bf  d0 f7     bne $05b8
+05c1  a2 bb     ldx #$bb
+05c3  50 fe     bvc $05c3
+05c5  b8        clv
+05c6  bd 00 01  lda $0100,x
+05c9  8d 01 1c  sta $1c01
+05cc  e8        inx
+05cd  d0 f4     bne $05c3
+05cf  a0 00     ldy #$00
+05d1  50 fe     bvc $05d1    Datenblock schreiben
+05d3  b8        clv
+05d4  b1 30     lda ($30),y
+05d6  8d 01 1c  sta $1c01
+05d9  c8        iny
+05da  d0 f5     bne $05d1
+05dc  a9 55     lda #$55
+05de  a2 08     ldx #$08     Lücke nach Sektor mit fester
+05e0  50 fe     bvc $05e0    Länge von 8 Bytes schreiben
+05e2  b8        clv
+05e3  8d 01 1c  sta $1c01
+05e6  ca        dex
+05e7  d0 f7     bne $05e0
+05e9  a5 32     lda $32
+05eb  18        clc
+05ec  69 0a     adc #$0a
+05ee  85 32     sta $32
+05f0  c6 1b     dec $1b      schon alle Sektoren?
+05f2  d0 95     bne $0589    nein, weitermachen
+05f4  50 fe     bvc $05f4
+05f6  b8        clv
+05f7  50 fe     bvc $05f7
+05f9  b8        clv
+05fa  20 00 fe  jsr $fe00    auf Lesen umschalten
+05fd  a9 c8     lda #$c8     200 Leseversuche
+05ff  85 1f     sta $1f
+0601  a9 00     lda #$00
+0603  85 30     sta $30
+0605  a9 03     lda #$03
+0607  85 31     sta $31
+0609  a5 43     lda $43
+060b  85 1b     sta $1b      Sektorzähler
+060d  20 56 f5  jsr $f556    auf SYNC-Signal warten
+0610  a2 0a     ldx #$0a
+0612  a0 00     ldy #$00
+0614  50 fe     bvc $0614
+0616  b8        clv
+0617  ad 01 1c  lda $1c01
+061a  d1 30     cmp ($30),y  Daten vergleichen
+061c  d0 0e     bne $062c
+061e  c8        iny
+061f  ca        dex
+0620  d0 f2     bne $0614
+0622  18        clc
+0623  a5 30     lda $30
+0625  69 0a     adc #$0a
+0627  85 30     sta $30
+0629  4c 35 06  jmp $0635
+062c  c6 1f     dec $1f      Zähler vermindern
+062e  d0 d1     bne $0601
+0630  a9 06     lda #$06
+0632  4c d3 fd  jmp $fdd3    24, READ ERROR
+0635  20 56 f5  jsr $f556    SYNC-Signal abwarten
+0638  a0 bb     ldy #$bb
+063a  50 fe     bvc $063a
+063c  b8        clv
+063d  ad 01 1c  lda $1c01
+0640  d9 00 01  cmp $0100,y
+0643  d0 e7     bne $062c
+0645  c8        iny
+0646  d0 f2     bne $063a
+0648  a2 fc     ldx #$fc
+064a  50 fe     bvc $064a
+064c  b8        clv
+064d  ad 01 1c  lda $1c01
+0650  d9 00 07  cmp $0700,y  Datenblock testen
+0653  d0 d7     bne $062c
+0655  c8        iny
+0656  ca        dex
+0657  d0 f1     bne $064a
+0659  c6 1b     dec $1b
+065b  d0 b0     bne $060d
+065d  4c 9e fd  jmp $fd9e    Ende; zur Jobschleife
+0660  a0 00     ldy #$00     Start des Floppyprogramms
+0662  b9 e0 06  lda $06e0,y
+0665  99 00 02  sta $0200,y  Disknamen übernehmen
+0668  c8        iny
+0669  cc df 06  cpy $06df
+066c  90 f4     bcc $0662
+066e  ad df 06  lda $06df
+0671  8d 74 02  sta $0274    Länge der Zeile setzen
+0674  ad de 06  lda $06de
+0677  8d 7b 02  sta $027b    Kommaposition setzen
+067a  a9 00     lda #$00
+067c  85 7f     sta $7f      Drive 0 setzen
+067e  20 00 c1  jsr $c100    LED am Laufwerk an
+0681  ac 7b 02  ldy $027b
+0684  b9 00 02  lda $0200,y  ID 1 holen
+0687  85 12     sta $12
+0689  b9 01 02  lda $0201,y  id 2 holen
+068c  85 13     sta $13
+068e  20 07 d3  jsr $d307    alle Kanäle schließen
+0691  a9 1a     lda #$1a
+0693  8d 05 1c  sta $1c05    Timer setzen
+0696  a9 c0     lda #$c0     BUMP anfordern
+0698  85 00     sta $00
+069a  a5 00     lda $00
+069c  30 fc     bmi $069a    auf Ausführung warten
+069e  ae dc 06  ldx $06dc    erste Tracknummer
+06a1  86 0a     stx $0a
+06a3  a9 e0     lda #$e0     Track formatieren
+06a5  85 02     sta $02
+06a7  a5 02     lda $02
+06a9  30 fc     bmi $06a7    auf Ende warten
+06ab  c9 02     cmp #$02     Fehler aufgetreten?
+06ad  b0 0c     bcs $06bb    verzweige, wenn ja
+06af  e8        inx
+06b0  ec dd 06  cpx $06dd    schon Zieltrack formatiert?
+06b3  90 ec     bcc $06a1    weiter, wenn nein
+06b5  20 40 ee  jsr $ee40    Directory herstellen
+06b8  60        rts          Ende
+06b9  ea        nop
+06ba  ea        nop
+06bb  a2 02     ldx #$02
+06bd  4c 0a e6  jmp $e60a    Diskstatus ausgeben; Ende
+</pre>
             <figcaption>Listing 1a. Das Floppy-Programm zum Format-System</figcaption>
         </figure>
         <figure>
-            <pre>TODO</pre>
+            <pre>   Computerprogramm zum Disk-Format-System
+   (c) 1985 by KOSS
+., c200 a2 00      ldx #$00
+., c202 20 87 c2   jsr $c287         Titel und erste Frage ausgeben
+., c205 a0 00      ldy #$00
+., c207 20 cf ff   jsr $ffcf         Eingabe holen
+., c20a c9 0d      cmp #$0d
+., c20c f0 08      beq $c216
+., c20e 99 e0 c1   sta $c1e0,y       Namen abspeichern
+., c211 c8         iny
+., c212 c0 10      cpy #$10          schon 16 Zeichen?
+., c214 90 f1      bcc $c207         weiter, wenn nein
+., c216 a9 2c      lda #$2c          Komma hinter den Namen setzen
+., c218 99 e0 c1   sta $c1e0,y
+., c21b c8         iny
+., c21c 8c de c1   sty $c1de
+., c21f a2 47      ldx #$47
+., c221 20 87 c2   jsr $c287         Frage nach Disk-ID
+., c224 a2 00      ldx #$00
+., c226 20 cf ff   jsr $ffcf         Eingabe abwarten
+., c229 c9 0d      cmp #$0d
+., c22b f0 09      beq $c236
+., c22d 99 e0 c1   sta $c1e0,y       ID ebenfalls abspeichern
+., c230 c8         iny
+., c231 e8         inx
+., c232 e0 02      cpx #$02
+., c234 90 f0      bcc $c226
+., c236 8c df c1   sty $c1df
+., c239 a2 53      ldx #$53
+., c23b 20 87 c2   jsr $c287         'FROM TRACK:$' ausgeben
+., c23e 20 cf ff   jsr $ffcf
+., c241 85 fa      sta $fa
+., c243 20 cf ff   jsr $ffcf
+., c246 85 fb      sta $fb
+., c248 a9 00      lda #$00
+., c24a 85 d0      sta $d0
+., c24c a2 62      ldx #$62
+., c24e 20 87 c2   jsr $c287         'TO TRACK:$' ausgeben
+., c251 20 cf ff   jsr $ffcf
+., c254 85 fc      sta $fc
+., c256 20 cf ff   jsr $ffcf
+., c259 85 fd      sta $fd
+., c25b a9 00      lda #$00
+., c25d 85 d0      sta $d0
+., c25f a5 fa      lda $fa
+., c261 a6 fb      ldx $fb
+., c263 20 04 c4   jsr $c404         Umrechnung in HEX-Byte
+., c266 8d dc c1   sta $c1dc         Anfangstrack setzen
+., c269 a5 fc      lda $fc
+., c26b a6 fd      ldx $fd
+., c26d 20 04 c4   jsr $c404         Umrechnung in HEX-Byte
+., c270 8d dd c1   sta $c1dd         Endetrack setzen
+., c273 ee dd c1   inc $c1dd         plus 1 als Vergleichswert
+., c276 ea         nop
+., c277 ea         nop
+., c278 ea         nop
+., c279 ea         nop
+., c27a ea         nop
+., c27b ea         nop
+., c27c ea         nop
+., c27d ea         nop
+., c27e ea         nop
+., c27f ea         nop
+., c280 ea         nop
+., c281 ea         nop
+., c282 ea         nop
+., c283 ea         nop
+., c284 4c 93 c2   jmp $c293         weiter
+
+., c287 bd 4d c3   lda $c34d,x       Ausgabe der Texte
+., c28a f0 06      beq $c292
+., c28c 20 d2 ff   jsr $ffd2
+., c28f e8         inx
+., c290 d0 f5      bne $c287
+., c292 60         rts
+
+., c293 a9 0d      lda #$0d
+., c295 20 d2 ff   jsr $ffd2
+., c298 a9 0d      lda #$0d
+., c29a 20 d2 ff   jsr $ffd2
+., c29d a9 00      lda #$00
+., c29f a2 c0      ldx #$c0
+., c2a1 85 a7      sta $a7
+., c2a3 86 a8      stx $a8
+., c2a5 a9 00      lda #$00
+., c2a7 a2 05      ldx #$05
+., c2a9 85 a9      sta $a9
+., c2ab 86 aa      stx $aa
+., c2ad a9 08      lda #$08          LISTEN für Gerät Nummer 8
+., c2af 20 b1 ff   jsr $ffb1
+., c2b2 a9 6f      lda #$6f          15; Kommandokanal
+., c2b4 20 93 ff   jsr $ff93
+., c2b7 a9 4d      lda #$4d
+., c2b9 20 a8 ff   jsr $ffa8         Programm zur Floppy senden
+., c2bc a9 2d      lda #$2d
+., c2be 20 a8 ff   jsr $ffa8
+., c2c1 a9 57      lda #$57
+., c2c3 20 a8 ff   jsr $ffa8
+., c2c6 a0 00      ldy #$00
+., c2c8 a5 a9      lda $a9
+., c2ca 20 a8 ff   jsr $ffa8
+., c2cd a5 aa      lda $aa
+., c2cf 20 a8 ff   jsr $ffa8
+., c2d2 a9 1e      lda #$1e
+., c2d4 20 a8 ff   jsr $ffa8
+., c2d7 b1 a7      lda ($a7),y
+., c2d9 20 a8 ff   jsr $ffa8
+., c2dc c8         iny
+., c2dd c0 1e      cpy #$1e
+., c2df 90 f6      bcc $c2d7
+., c2e1 20 ae ff   jsr $ffae
+., c2e4 18         clc
+., c2e5 a5 a7      lda $a7
+., c2e7 69 1e      adc #$1e
+., c2e9 85 a7      sta $a7
+., c2eb 90 03      bcc $c2f0
+., c2ed e6 a8      inc $a8
+., c2ef 18         clc
+., c2f0 a5 a9      lda $a9
+., c2f2 a6 aa      ldx $aa
+., c2f4 69 1e      adc #$1e
+., c2f6 85 a9      sta $a9
+., c2f8 90 02      bcc $c2fc
+., c2fa e6 aa      inc $aa
+., c2fc e0 07      cpx #$07
+., c2fe 90 ad      bcc $c2ad
+., c300 c9 00      cmp #$00
+., c302 90 a9      bcc $c2ad
+., c304 a9 08      lda #$08          LISTEN für Gerät 8
+., c306 20 b1 ff   jsr $ffb1
+., c309 a9 6f      lda #$6f          15; Kommandokanal
+., c30b 20 93 ff   jsr $ff93
+., c30e a9 4d      lda #$4d
+., c310 20 a8 ff   jsr $ffa8         Programm in der Floppy
+., c313 a9 2d      lda #$2d          bei Adresse $0600 starten
+., c315 20 a8 ff   jsr $ffa8
+., c318 a9 45      lda #$45
+., c31a 20 a8 ff   jsr $ffa8
+., c31d a9 60      lda #$60
+., c31f 20 a8 ff   jsr $ffa8
+., c322 a9 06      lda #$06
+., c324 20 a8 ff   jsr $ffa8
+., c327 20 ae ff   jsr $ffae
+., c32a a9 00      lda #$00
+., c32c 85 90      sta $90
+., c32e a9 08      lda #$08          Fehlermeldung holen
+., c330 20 b4 ff   jsr $ffb4
+., c333 a9 6f      lda #$6f
+., c335 20 96 ff   jsr $ff96
+., c338 20 a5 ff   jsr $ffa5
+., c33b 20 d2 ff   jsr $ffd2         und anzeigen
+., c33e 24 90      bit $90
+., c340 50 f6      bvc $c338
+., c342 20 ab ff   jsr $ffab
+., c345 4c dc c3   jmp $c3dc         Endebehandlung
+
+.: c348 00 00 00 00 00 93 20 20 ......
+.: c350 20 20 20 20 20 2a 2a 2a      ***
+.: c358 20 44 49 53 4b 2d 46 4f  disk-fo
+.: c360 52 4d 41 54 2d 53 59 53 rmat-sys
+.: c368 54 45 4d 20 2a 2a 2a 0d tem ***.
+.: c370 0d 0d 20 28 43 29 20 31 .. (c) 1
+.: c378 39 38 35 20 42 59 20 4b 985 by k
+.: c380 4f 53 53 20 20 20 0d 0d oss   ..
+.: c388 0d 44 49 53 4b 4e 41 4d .disknam
+.: c390 45 3a 20 00 0d 0d 44 49 e: ...di
+.: c398 53 4b 2d 49 44 3a 20 00 sk-id: .
+.: c3a0 0d 0d 46 52 4f 4d 20 54 ..from t
+.: c3a8 52 41 43 4b 3a 24 00 0d rack:$..
+.: c3b0 0d 54 4f 20 54 52 41 43 .to trac
+.: c3b8 4b 3a 24 00 0d 0d 41 4e k:$...an
+.: c3c0 4f 54 48 45 52 20 46 4f other fo
+.: c3c8 52 4d 41 54 20 28 59 2f rmat (y/
+.: c3d0 4e 29 20 3f 20 0d 0d 00 n) ? ...
+.: c3d8 00 00 00 00 20 29 c4 a2 .... )..
+
+., c3dc 20 29 c4 jsr $c429           SAVE-Vektor stellen
+., c3df a2 6f    ldx #$6f
+., c3e1 20 87 c2 jsr $c287           'ANOTHER FORMAT (Y/N) ?' ausgeben
+., c3e4 20 e4 ff jsr $ffe4
+., c3e7 f0 fb    beq $c3e4
+., c3e9 c9 59    cmp #$59            Ende ?
+., c3eb d0 03    bne $c3f0           ja: RTS
+., c3ed 4c 00 c2 jmp $c200           noch einmal formatieren
+., c3f0 60       rts
+., c3f1 00       brk
+., c3f2 a5 b7    lda $b7             Länge des Filenamens =0?
+., c3f4 f0 03    beq $c3f9           ja; dann formatieren
+., c3f6 4c ed f5 jmp $f5ed           zur SAVE-Routine
+., c3f9 20 00 c2 jsr $c200           formatieren
+., c3fc a9 01    lda #$01
+., c3fe a2 00    ldx #$00
+., c400 a0 00    ldy #$00
+., c402 18       clc
+., c403 60       rts                 Ende
+
+., c404 85 02    sta $02             Umrechnung der Eingabe in ein
+., c406 86 03    stx $03             HEX-Byte
+., c408 a5 02    lda $02
+., c40a c9 41    cmp #$41
+., c40c 90 03    bcc $c411
+., c40e 18       clc
+., c40f 69 09    adc #$09
+., c411 29 0f    and #$0f
+., c413 0a       asl
+., c414 0a       asl
+., c415 0a       asl
+., c416 0a       asl
+., c417 85 02    sta $02
+., c419 a5 03    lda $03
+., c41b c9 41    cmp #$41
+., c41d 90 03    bcc $c422
+., c41f 18       clc
+., c420 69 09    adc #$09
+., c422 29 0f    and #$0f
+., c424 05 02    ora $02
+., c426 85 02    sta $02
+., c428 60       rts
+
+., c429 a9 f2    lda #$f2            SAVE-Vektor herstellen
+., c42b 8d 32 03 sta $0332
+., c42e a9 c3    lda #$c3            auf Adresse $c3f2 setzen
+., c430 8d 33 03 sta $0333
+., c433 60       rts
+</pre>
             <figcaption>Listing 1. Eine neue Formatierroutine. Eine Diskette wird nicht nur schneller sondern Sie können auch angeben, welche formatiert werden sollen. Was das für Vorteile hat, erfahren Sie im Bericht. Zwischen den Adressen C348 und C3DA liegt eine ASCII-Tabelle</figcaption>
         </figure>
         <figure>
