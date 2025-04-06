@@ -853,7 +853,31 @@
         </figure>
 
         <figure>
-            <pre>TODO</pre>
+            <pre>.
+,5000 a2 00     ldx #00
+,5002 86 5c     stx   5c
+,5004 86 5d     stx   5d
+,5006 a0 10     ldy #10
+,5008 06 57     asl   57
+,500a 26 58     rol   58
+,500c 26 5c     rol   5c
+,500e 26 5d     rol   5d
+,5010 38        sec
+,5011 a5 5c     lda   5c
+,5013 e5 59     sbc   59
+,5015 aa        tax
+,5016 a5 5d     lda   5d
+,5018 e5 5a     sbc   5a
+,501a 90 06     bcc 5022
+,501c 86 5c     stx   5c
+,501e 85 5d     sta   5d
+,5020 e6 57     inc   57
+,5022 88        dey
+,5023 d0 e3     bne 5008
+,5025 60        rts
+-----------------------
+.?
+</pre>
             <figcaption>Programm 1. Die 16-Bit-Division</figcaption>
         </figure>
         <div class="binary_download" data-filename="ass.-9_prog.1.prg" data-name="16-Bit-Division"></div>
@@ -862,12 +886,119 @@
             <figcaption>Programm 2. Das Demo-Programm zur neuen Verschieberoutine. Vorher müssen Programm 3 und Programm 4 geladen werden.</figcaption>
         </figure>
         <figure>
-            <pre>TODO</pre>
+            <pre>.
+,6000 a9 00     lda #00
+,6002 85 5f     sta   5f
+,6004 a9 04     lda #04
+,6006 85 60     sta   60
+,6008 a9 e8     lda #e8
+,600a 85 5a     sta   5a
+,600c 85 58     sta   58
+,600e a9 07     lda #07
+,6010 85 5b     sta   5b
+,6012 a9 e3     lda #e3
+,6014 85 59     sta   59
+,6016 20 bf a3  jsr a3bf
+,6019 a9 00     lda #00
+,601b 85 5f     sta   5f
+,601d a9 d8     lda #d8
+,601f 85 60     sta   60
+,6021 a9 e8     lda #e8
+,6023 85 5a     sta   5a
+,6025 a9 db     lda #db
+,6027 85 5b     sta   5b
+,6029 a9 d1     lda #d1
+,602b 85 58     sta   58
+,602d a9 e7     lda #e7
+,602f 85 59     sta   59
+,6031 20 bf a3  jsr a3bf
+,6034 a9 40     lda #40
+,6036 8d 11 03  sta 0311
+,6039 a9 60     lda #60
+,603b 8d 12 03  sta 0312
+,603e 60        rts
+----------------------
+.?</pre>
             <figcaption>Programm 3. Zweiter Teil der Verschieberoutine</figcaption>
         </figure>
         <div class="binary_download" data-filename="ass.-9_prog.3.prg" data-name="Zweiter Teil der Verschieberoutine"></div>
         <figure>
-            <pre>TODO</pre>
+            <pre>.
+,603f ea        nop
+,6040 a9 00     lda   #00
+,6042 85 5f     sta   5f
+,6044 a9 e0     lda   #e0
+,6046 85 60     sta   60
+,6048 a9 e8     lda   #e8
+,604a 85 5a     sta   5a
+,604c 85 58     sta   58
+,604e a9 e3     lda   #e3
+,6050 85 5b     sta   5b
+,6052 a9 07     lda   #07
+,6054 85 59     sta   59
+,6056 20 77 60  jsr 6077
+,6059 a9 e9     lda   #e9
+,605b 85 5f     sta   5f
+,605d a9 e3     lda   #e3
+,605f 85 60     sta   60
+,6061 a9 d1     lda   #d1
+,6063 85 5a     sta   5a
+,6065 a9 e7     lda   #e7
+,6067 85 5b     sta   5b
+,6069 a9 e8     lda   #e8
+,606b 85 58     sta   58
+,606d a9 db     lda   #db
+,606f 85 59     sta   59
+,6071 20 77 60  jsr 6077
+,6074 60        rts
+----------------------------
+,6075 ea        nop
+,6076 ea        nop
+,6077 78        sei
+,6078 a5 01     lda   01
+,607a 48        pha
+,607b a9 35     lda   #35
+,607d 85 01     sta   01
+,607f 38        sec
+,6080 a5 5a     lda   5a
+,6082 e5 5f     sbc   5f
+,6084 85 22     sta   22
+,6086 a8        tay
+,6087 a5 5b     lda   5b
+,6089 e5 60     sbc   60
+,608b aa        tax
+,608c e8        inx
+,608d 98        tya
+,608e f0 23     beq 60b3
+,6090 a5 5a     lda   5a
+,6092 38        sec
+,6093 e5 22     sbc   22
+,6095 85 5a     sta   5a
+,6097 b0 03     bcs 609c
+,6099 c6 5b     dec   5b
+,609b 38        sec
+,609c a5 58     lda   58
+,609e e5 22     sbc   22
+,60a0 85 58     sta   58
+,60a2 b0 08     bcs 60ac
+,60a4 c6 59     dec   59
+,60a6 90 04     bcc 60ac
+,60a8 b1 5a     lda  (5a),y
+,60aa 91 58     sta  (58),y
+,60ac 88        dey
+,60ad d0 f9     bne 60a8
+,60af b1 5a     lda  (5a),y
+,60b1 91 58     sta  (58),y
+,60b3 c6 5b     dec   5b
+,60b5 c6 59     dec   59
+,60b7 ca        dex
+,60b8 d0 f2     bne 60ac
+,60ba 68        pla
+,60bb 85 01     sta   01
+,60bd 58        cli
+,60be 60        rts
+----------------------------
+.?</pre>
             <figcaption>Programm 4. Zweiter Teil der Verschieberoutine</figcaption>
         </figure>
         <div class="binary_download" data-filename="ass.-9_prog.4.prg" data-name="Zweiter Teil der Verschieberoutine"></div>
