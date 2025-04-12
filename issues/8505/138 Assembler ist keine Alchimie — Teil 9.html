@@ -40,33 +40,53 @@
 
         <p>Erinnern Sie sich noch an das dezimale Linksschieben mit ASL aus der letzten Folge? Wir hatten festgestellt, daß jedes Linksschieben einer Dezimalzahl einer Multiplikation mit 10 entspricht. Hier im umgekehrten Fall, also beim Rechtsschieben, muß jedes LSR einer Division durch 10 entsprechen:</p>
 
-        <p>TODO</p>
+        <table class="plain right0 center1 right2">
+            <tr><td>25000</td><td>wird durch LSR zu</td><td>2500</td></tr>
+            <tr><td>2500</td><td></td><td>250</td></tr>
+            <tr><td>250</td><td></td><td>25</td></tr>
+            <tr><td colspan="3" style="text-align:left">und so weiter</td></tr>
+        </table>
 
         <p>Geht man von der Ausgangszahl (25000) aus, dann ergibt sich der erste rechts verschobene Wert durch Division mit</p>
 
-        <p>TODO</p>
+        <table class="plain">
+            <tr><td></td><td>10<sup>1</sup>=10</td></tr>
+            <tr><td>der 2. durch</td><td>10<sup>2</sup>=100</td></tr>
+            <tr><td>der 3. durch</td><td>10<sup>3</sup>=1000</td></tr>
+        </table>
 
         <p>Es wird also durch Potenzen der Zahlenbasis 10 geteilt. Haben wir es — wie im Computer — mit Binärzahlen zu tun, deren Basis die 2 ist, dann teilen wir mit jedem LSR durch 2. Je nachdem, wie oft hintereinander das LSR auf eine Zahl ausgeübt wird, teilt man dann durch 2<sup>1</sup>=2, 2<sup>2</sup>=4, 2<sup>3</sup> = 8, etc. Das konnte man sich alles ja schon vorstellen, nachdem ASL zur Multiplikation verwendet wurde. Auch hier muß man immer das Carry-Bit abfragen, denn die Division kann ja unter Umständen nicht aufgehen, wie das folgende Beispiel der Division von 3 durch 2 zeigt:</p>
 
-        <p>(3) 0000 0011 ergibt durch LSR: 0000 0001 und 1 im Carry-Bit. Das Ergebnis ist schon richtig, nämlich 1. Im Carry steht der Rest dieser Division, die 1. Weil der Rest für manche Berechnungen von Bedeutung ist, muß das Carry-Bit irgendwie erfaßt werden. Wie man das erreicht, lernen wir später noch. Leider ist diese Art der Division mittels LSR nicht so einfach verwendbar wie die Multiplikation mittels ASL. Während man dort durch geschicktes Aufteilen des Faktors ASL auch bei anderen Multiplikatoren als reine Zweierpotenzen anwenden konnte, ist das hier nicht so ohne weiteres möglich. Bei Divisionen geht man deshalb lieber andere Wege. Die zeige ich Ihnen ebenfalls etwas später.</p>
+        <p>(3) 0000&thinsp;0011 ergibt durch LSR: 0000&thinsp;0001 und 1 im Carry-Bit. Das Ergebnis ist schon richtig, nämlich 1. Im Carry steht der Rest dieser Division, die 1. Weil der Rest für manche Berechnungen von Bedeutung ist, muß das Carry-Bit irgendwie erfaßt werden. Wie man das erreicht, lernen wir später noch. Leider ist diese Art der Division mittels LSR nicht so einfach verwendbar wie die Multiplikation mittels ASL. Während man dort durch geschicktes Aufteilen des Faktors ASL auch bei anderen Multiplikatoren als reine Zweierpotenzen anwenden konnte, ist das hier nicht so ohne weiteres möglich. Bei Divisionen geht man deshalb lieber andere Wege. Die zeige ich Ihnen ebenfalls etwas später.</p>
 
         <p>LSR kann auf die gleiche Weise adressiert werden wie ASL:</p>
 
-        <p>TODO</p>
+        <table class="plain nobreak0">
+            <tr><td>LSR</td><td>auf den Akku bezogen</td></tr>
+            <tr><td>LSR 6000</td><td>absolut</td></tr>
+            <tr><td>LSR FE</td><td>Zeropage-absolut</td></tr>
+            <tr><td>LSR 6000,X</td><td>absolut-X-indiziert</td></tr>
+            <tr><td>LSR FA,X</td><td>Zeropage-absolut-X-indiziert</td></tr>
+        </table>
 
         <p>Im ersten Fall steht das Ergebnis im Akku, in den anderen Fällen in der jeweils adressierten Speicherstelle. Außer der N-Flagge, die in jedem Fall 0 wird, beeinflußt LSR auch die Carry-Flagge und unter Umständen die Z-Flagge. Je nach Adressierungsart liegt LSR als 1-Byte-, 2-Byte- oder 3-Byte-Befehl vor.</p>
 
         <p>Sowohl bei ASL als auch bei LSR hatten wir festgestellt, daß man herausgeschobene Bits, falls sie noch von Bedeutung sind, irgendwie aus dem Carry-Bit (dort sind sie ja gelandet) an einen sinnvollen Ort schaffen muß. Das ist natürlich möglich über eine Befehlskette, in der zunächst das Carry-Bit abgefragt wird:<br>
             zum Beispiel:</p>
 
-        <p>6000 BCC 6007<br>
-            6002 LDA #01<br>
-            6004 STA 8000<br>
-            6007 etc.<br>
-            TODO</p>
+        <table class="plain nobreak1">
+            <tr><td>6000</td><td>BCC 6007</td></tr>
+            <tr><td>6002</td><td>LDA #01</td></tr>
+            <tr><td>6004</td><td>STA 8000</td></tr>
+            <tr><td>6007</td><td>etc.</td></tr>
+        </table>
 
-        <p>Wenn das Carry-Bit frei ist, wird alles weitere übersprungen. Wenn da drin etwas aufgetaucht ist, lädt man eine 1 (die ist ja im Carry-Bit) an die benötigte Speicherstelle (hier zum Beispiel 8000). Das kostet aber einige Bytes Speicherplatz und einige Taktzeiten Rechendauer. Außerdem erschwert sich die Programmierung, wenn man eine Zahl öfter verschiebt und dann nach 8000 alle Carry-Inhalte packen will. So kompliziert brauchen wir auch gar nicht zu arbeiten, denn unsere CPU kennt zwei Befehle, die das Bit-Verschieben und das Carry-Verschieben für uns machen. Das sind:<br>
-            ROL rotate left Linksrotieren ROR rotate right Rechtsrotieren</p>
+        <p>Wenn das Carry-Bit frei ist, wird alles weitere übersprungen. Wenn da drin etwas aufgetaucht ist, lädt man eine 1 (die ist ja im Carry-Bit) an die benötigte Speicherstelle (hier zum Beispiel 8000). Das kostet aber einige Bytes Speicherplatz und einige Taktzeiten Rechendauer. Außerdem erschwert sich die Programmierung, wenn man eine Zahl öfter verschiebt und dann nach 8000 alle Carry-Inhalte packen will. So kompliziert brauchen wir auch gar nicht zu arbeiten, denn unsere CPU kennt zwei Befehle, die das Bit-Verschieben und das Carry-Verschieben für uns machen. Das sind:</p>
+
+        <table class="plain nobreak0 right1">
+            <tr><td>ROL rotate left</td><td>Linksrotieren</td></tr>
+            <tr><td>ROR rotate right</td><td>Rechtsrotieren</td></tr>
+        </table>
 
         <p>Sehen wir uns zunächst mal ROL (Bild 2) an:</p>
 
@@ -77,17 +97,33 @@
 
         <p>Wie bei ASL wandert jedes Bit um eine Position nach links. Das Bit 7 wird dabei in das Carry-Bit verschoben. In Bit 0 gelangt aber hier nicht eine 0 (wie bei ASL), sondern der Inhalt des Carry-Bit (wohlgemerkt der Inhalt, der dort war, bevor dort hinein Bit 7 geschoben wurde). Bevor wir auf den praktischen Nährwert dieses Befehls eingehen, sollen erstmal die Adressierungsmöglichkeiten aufgeführt werden:</p>
 
-        <p>TODO</p>
+        <table class="plain nobreak0">
+            <tr><td>ROL</td><td>auf den Akku bezogen</td></tr>
+            <tr><td>ROL 6000</td><td>absolut</td></tr>
+            <tr><td>ROL FE</td><td>Zeropage-absolut</td></tr>
+            <tr><td>ROL 6000,X</td><td>absolut-X-indiziert</td></tr>
+            <tr><td>ROL FE,X</td><td>Zeropage-absolut-X-indiziert</td></tr>
+        </table>
 
         <p>Je nach Adressierung kann es sich dann wieder um einen 1-Byte- bis 3-Byte-Befehl handeln. Die N-, Z- und natürlich die Carry-Flagge sind beeinflußt und das Ergebnis des Befehls ist im Akku zu finden (erste Adressierungsart) oder in der angesprochenen Speicherstelle.</p>
 
-        <p>Wozu das Ganze? Abgesehen von der Möglichkeit, einzelne Bits auf diese Weise ohne Verlust aus einem Byte durch das Carry-Bit herausschieben zu können, um sie Prüfungen zu unterziehen, gibt es noch die Möglichkeit, einen Überlauf bei Rechenoperationen aufzufangen. Erinnern Sie sich an die letzte Folge, wo wir mittels ASL Multiplikationen durchgeführt hatten? Dort kann es unter gewissen Umständen ja leicht geschehen, daß ein Byte für das Ergebnis nicht mehr ausreicht. Wir haben in den Beispielen schon die Überlegung durchgeführt, daß man mittels BCC oder BCS prüfen sollte, ob man eine signifikante Stelle (also eine führende 1) aus dem Byte herausgeschoben hat. Ist das der Fall, dann gibt es zwei Wege:<br>
-            1) Man veranlaßt den Ausdruck eines OVERFLOW ERROR, wenn nur 1-Byte-Zahlen zulässig sind, oder<br>
-            2) man schaltet um auf 2-Byte-Zahlen.</p>
+        <p>Wozu das Ganze? Abgesehen von der Möglichkeit, einzelne Bits auf diese Weise ohne Verlust aus einem Byte durch das Carry-Bit herausschieben zu können, um sie Prüfungen zu unterziehen, gibt es noch die Möglichkeit, einen Überlauf bei Rechenoperationen aufzufangen. Erinnern Sie sich an die letzte Folge, wo wir mittels ASL Multiplikationen durchgeführt hatten? Dort kann es unter gewissen Umständen ja leicht geschehen, daß ein Byte für das Ergebnis nicht mehr ausreicht. Wir haben in den Beispielen schon die Überlegung durchgeführt, daß man mittels BCC oder BCS prüfen sollte, ob man eine signifikante Stelle (also eine führende 1) aus dem Byte herausgeschoben hat. Ist das der Fall, dann gibt es zwei Wege:</p>
 
-        <p>Sehen wir uns das mal an dem Schritt 7 des Beispiels aus der letzten Folge an. Dort hatten wir die Zahl 192 (binär 1100 0000) vorliegen (zum Beispiel in Speicherstelle 7000). Im Computer werden 2-Byte-Integers in der Form LSB/MSB verarbeitet. Wir schaffen also die Speicherstelle für das MSB von 192 in 7001. Jetzt muß dort noch 0 drin stehen. Um bei nochmaliger Multiplikation mit 2 eine 16-Bit-Zahl als Ergebnis zu erhalten, verfährt man wie folgt:</p>
+        <ol>
+            <li>Man veranlaßt den Ausdruck eines OVERFLOW ERROR, wenn nur 1-Byte-Zahlen zulässig sind, oder</li>
+            <li>man schaltet um auf 2-Byte-Zahlen.</li>
+        </ol>
 
-        <p>TODO</p>
+        <p>Sehen wir uns das mal an dem Schritt 7 des Beispiels aus der letzten Folge an. Dort hatten wir die Zahl 192 (binär 1100&thinsp;0000) vorliegen (zum Beispiel in Speicherstelle 7000). Im Computer werden 2-Byte-Integers in der Form LSB/MSB verarbeitet. Wir schaffen also die Speicherstelle für das MSB von 192 in 7001. Jetzt muß dort noch 0 drin stehen. Um bei nochmaliger Multiplikation mit 2 eine 16-Bit-Zahl als Ergebnis zu erhalten, verfährt man wie folgt:</p>
+
+        <figure>
+            <table class="plain nobreak1">
+                <tr><td>6000</td><td>ASL 7000</td><td>Damit ist die führende 1 ins Carry-Bit gewandert</td></tr>
+                <tr><td>6003</td><td>BCC 6008</td><td>Das setzt man natürlich nur dann ein, wenn man nicht genau weiß, welches Ergebnis zu erwarten ist.<br>Wenn keine 1 ins Carry-Bit gelangte, kann man die nächste Zeile überspringen.</td></tr>
+                <tr><td>6005</td><td>ROL 7001</td><td>Damit wurde der Inhalt des Carry-Bit als Bit 0 ins MSB unseres Ergebnisses geschoben.</td></tr>
+                <tr><td>6008</td><td>etc.</td><td></td></tr>
+            </table>
+        </figure>
 
         <p>Die Funktion dieser Befehlssequenz können Sie aus Bild 3 entnehmen.</p>
 
@@ -107,7 +143,13 @@
 
         <p>Jedes Bit wandert, wie bei LSR, um eine Stelle nach rechts. Als Bit 7 kommt (im Gegensatz zu LSR) der Inhalt des Carry-Bit herein. Bit 0 wird ins Carry-Bit geschoben. Adressiert werden kann ROR ebenso wie ROL:</p>
 
-        <p>TODO</p>
+        <table class="plain nobreak0">
+            <tr><td>ROR</td><td>auf den Akku bezogen</td></tr>
+            <tr><td>ROR 6000</td><td>absolut</td></tr>
+            <tr><td>ROR FE</td><td>Zeropage-absolut</td></tr>
+            <tr><td>ROR 6000,X</td><td>absolut-X-indiziert</td></tr>
+            <tr><td>ROR FE,X</td><td>Zeropage-absolut-X-indiziert</td></tr>
+        </table>
 
         <p>Auch für die Byteanzahl, den Ort des Ergebnisses und die Flaggenbeanspruchung gilt dasselbe wie für ROL.</p>
 
@@ -121,18 +163,34 @@
 
         <p>Signale vom Joystick landen in den DATA-Ports A oder B des CIA 1. CIA heißt »Complex Interface Adapter« und ist die Institution unseres Computers, die den Verkehr mit der Außenwelt erlaubt. Wir haben zwei Stück davon (CIA 1 und CIA 2). Je nachdem, in welchen Port der Joystick gesteckt wurde, laufen die Signale in den Registern DC00 oder DC01 (dezimal 56320 oder 56321) ein. Wir nehmen im weiteren mal DC00 an. Die Bits 0 bis 4 beziehen sich auf den Joystick:</p>
 
-        <p>Bit 0 oben<br>
-            Bit 1 unten<br>
-            Bit 2 links<br>
-            Bit 3 rechts<br>
-            Bit 4 Feuerknopf<br>
-            TODO</p>
+        <table class="plain">
+            <tr><td>Bit 0</td><td>oben</td></tr>
+            <tr><td>Bit 1</td><td>unten</td></tr>
+            <tr><td>Bit 2</td><td>links</td></tr>
+            <tr><td>Bit 3</td><td>rechts</td></tr>
+            <tr><td>Bit 4</td><td>Feuerknopf</td></tr>
+        </table>
 
         <p>Wenn keine dieser Möglichkeiten angesprochen ist, enthalten diese Bits den Wert 1. Drückt man beispielsweise den Feuerknopf, dann wechselt der Inhalt von Bit 4 zum Wert 0. Man muß also ständig diese Bits überprüfen und reagieren, sobald eines davon 0 wird. Die Lösung von P. Siepen, diese Abfrage in das Interruptprogramm einzubauen, ist sehr brauchbar. Dadurch hat der Computer die Möglichkeit, trotzdem an anderen Aufgaben weiterzuarbeiten. Wir werden in den nächsten Folgen auf diese Programmiertechnik eingehen. Die Verbesserung von M. Hartig besteht darin, daß er nicht durch CMP-Befehle den Inhalt von DC00 prüft (was Zeit und auch Speicherplatz kostet), sondern mittels ROR Bit für Bit nach rechts in das Carry-Bit schiebt und dieses dann mit BCC abfragt. Sobald die Carry-Flagge nämlich frei ist, ist die zu dem Bit gehörige Joystickfunktion gefragt.</p>
 
         <p>Nun die Abfrageroutine:</p>
 
-        <p>TODO</p>
+        <figure>
+            <table class="plain nobreak0">
+                <tr><td><strong>LDA DC00</strong></td><td>Inhalt des DATA-Port A in den Akku</td></tr>
+                <tr><td><strong>ROR</strong></td><td>Durch Rechtsrotieren wird Bit 0 in die Carry-Flagge geschoben.</td></tr>
+                <tr><td><strong>BCC Oben</strong></td><td>Wenn die Carry-Flagge nicht gesetzt ist, war Bit 0 eine Null, also die Joystickfunktion »Oben« gefordert, zu deren Bearbeitung hier verzweigt werden kann.</td></tr>
+                <tr><td><strong>ROR</strong></td><td>Das nächste Rechtsrotieren schiebt Bit 1 in die Carry-Flagge.</td></tr>
+                <tr><td><strong>BCC Unten</strong></td><td>Auch hier wieder Abzweigen zur Bearbeitung von »Unten«, wenn Bit 1 nicht gesetzt war.</td></tr>
+                <tr><td><strong>ROR</strong></td><td>Bit 2 ins Carry-Bit</td></tr>
+                <tr><td><strong>BCC Links</strong></td><td>und bearbeiten, wenn nicht gesetzt</td></tr>
+                <tr><td><strong>ROR</strong></td><td>Bit 3 in Carry-Flagge</td></tr>
+                <tr><td><strong>BCC Rechts</strong></td><td>und verzweigen wenn Bit 3 Null war</td></tr>
+                <tr><td><strong>ROR</strong></td><td>zu guter Letzt kommt noch Bit 4 ins Carry-Bit</td></tr>
+                <tr><td><strong>BCC Fire</strong></td><td>und kann bearbeitet werden, wenn es Null war.</td></tr>
+                <tr><td colspan="2">.... weitere Bearbeitung, wenn keine Joystickfunktion</td></tr>
+            </table>
+        </figure>
 
         <p>Der Vorteil dieser nur 18 Byte langen Unterroutine liegt in ihrer Schnelligkeit: Sie braucht nur 24 Taktzyklen, wenn nicht verzweigt wird, beziehungsweise 25, wenn verzweigt wird. Natürlich wäre anstelle von ROR auch die Verwendung von LSR möglich gewesen, denn die herausgeschobenen Bits werden nicht mehr benötigt. Im Falle, daß man nach einer solchen Abfrage wieder den Ausgangszustand des Akku oder der Speicherstelle herstellen will, muß man eine entsprechende Anzahl ROR-Anweisungen anschließen, bis Bit 0 wieder in seine Ausgangslage rotiert ist.</p>
 
@@ -140,21 +198,44 @@
 
         <p>Wir haben in der letzten und in dieser Folge gelernt, wie man 8-Bit-Zahlen miteinander malnehmen kann um 8- oder 16-Bit-Zahlen zu erhalten. Dabei ist unbefriedigend, daß man sich über jede Zahl Gedanken machen muß, wie man sie am besten multipliziert. Was fehlt, ist ein allgemein gültiges Programm, das in der Lage ist, jede Zahlenkombination (solange es sich um 2-Byte-Integers handelt und das Ergebnis als 16-Bit-Zahl darstellbar ist) zu verarbeiten. Und da haben wir mal wieder Glück: Gut versteckt befindet sich so etwas bereits fertig in unserem Computer. Ab dez. 45900 ($B34C) liegt im Interpreter solch eine Routine und ihr Einsprungspunkt ist für uns bei dez. 45911 ($B357). Bevor wir aber detailliert darauf eingehen, soll noch das Prinzip erklärt werden, das dabei genutzt wird.</p>
 
-        <p>Jeden Tag rechnen Sie wahrscheinlich völlig automatisch Multiplikationsaufgaben, ohne noch Gedanken daran zu verschwenden, wieviel Schweiß das Erlernen dieser Technik früher mal gekostet hat. Könnten Sie heute nochjemandem genau erklären, warum man da was wie macht? Genau das müssen wir aber tun, damit der Binärautomat (unser C 64) multiplizieren lernt. Nehmen wir mal eine Multiplikation von 16x15:</p>
+        <p>Jeden Tag rechnen Sie wahrscheinlich völlig automatisch Multiplikationsaufgaben, ohne noch Gedanken daran zu verschwenden, wieviel Schweiß das Erlernen dieser Technik früher mal gekostet hat. Könnten Sie heute noch jemandem genau erklären, warum man da was wie macht? Genau das müssen wir aber tun, damit der Binärautomat (unser C 64) multiplizieren lernt. Nehmen wir mal eine Multiplikation von 16x15:</p>
 
-        <p>TODO</p>
+        <table class="plain center0">
+            <tr><td class="separator">16 x 15</td></tr>
+            <tr><td>16</td></tr>
+        </table>
+
+        <table class="plain center0">
+            <tr><td class="separator">80</td></tr>
+            <tr><td>240</td></tr>
+        </table>
 
         <p>Daß wir nicht so genau wissen, was wir da tun, liegt am ziemlich komplizierten Zehnersystem. Damit das alles einfacher und überschaubarer wird, wechseln wir mal ins Binärsystem: 16 = 10000, 15 = 1111. Die Aufgabe sieht dann so aus:</p>
 
-        <p>TODO</p>
+        <table class="plain pre">
+            <tr><td class="separator">10000 * 1111</td></tr>
+            <tr><td> 10000</td></tr>
+            <tr><td>  10000</td></tr>
+            <tr><td>   10000</td></tr>
+            <tr><td class="separator">    10000</td></tr>
+            <tr><td> 11110000</td></tr>
+        </table>
 
         <p>Jetzt wird schon deutlicher, was wir getan haben. Der Faktor auf der rechten Seite wurde vom MSB an Bit für Bit durchgesehen. Jedesmal, wenn wir auf eine 1 gestoßen sind (hier waren nur Einsen), haben wir den links stehenden Faktor notiert. Dabei sind wir von mal zu mal um eine Stelle nach rechts gerückt, was zu tun hat mit dem Stellenwert des im rechten Faktor gerade betrachteten Bits. Das geschah so lange, bis alle Bits des rechten Faktors durchgearbeitet waren. Die sich auf diese Weise ergebene Kolonne wird dann addiert und führt zum Ergebnis. Vergleichen Sie, 240 ist wirklich binär 1111 0000.</p>
 
         <p>Genauso wie hier beschrieben, arbeitet das Multiplikationsprogramm. Ein Unterschied tritt auf, nämlich daß nicht bis zum Schluß mit der Addition gewartet, sondern jede neue Zwischenzahl sofort addiert wird. Bild 5a zeigt die Beschreibung der Interpreterroutine:</p>
 
         <figure>
-            TODO
-            <figcaption>Bild 5a. Interpreterroutine UMULT</figcaption>
+            <table class="plain">
+                <tr><td><strong>Name</strong></td><td><strong>UMULT</strong></td></tr>
+                <tr><td>Zweck</td><td>Multiplikation zweier 16-Bit-Zahlen</td></tr>
+                <tr><td>Adresse</td><td>$B357 dez. 45911</td></tr>
+                <tr><td>Vorbereitungen</td><td>Faktor 1 in $28/29<br>Faktor 2 in $71/72</td></tr>
+                <tr><td>Speicherstellen</td><td>$28/29,$71/72, $5D</td></tr>
+                <tr><td>Register</td><td>Akku, X- und Y-Register</td></tr>
+                <tr><td>Stapelbedarf</td><td>keiner</td></tr>
+            </table>
+            <figcaption>Bild 5a. Die Interpreterroutine UMULT</figcaption>
         </figure>
 
         <p>Diese Routine hier abzudrucken, wäre reine Platzverschwendung. Schalten Sie einfach den SMON ein und verlangen Sie von ihm ein Disassemblerlisting ab B357. Dort haben Sie dann für die weitere Besprechung alles parat. In Bild 5 finden Sie noch ein Flußdiagramm der UMULT-Routine.</p>
@@ -164,23 +245,26 @@
             <figcaption>Bild 5. Flußdiagramm zur Betriebssystemroutine UMULT<br>Faktor 1: 40/41<br>Faktor 2: 113/114<br>Ergebnis: X/Y</figcaption>
         </figure>
 
-        <p>Das Ergebnis der Multiplikation befindet sich in LSB/MSB-Form in den X/Y-Registern. Programm und Flußdiagramm wollen wir an einem Beispiel nachspielen. Dazu sollen die beiden Zahlen 321 und 65 (binär 0000 0001 0100 0001 und 0100 0001) miteinander multipliziert werden, was bekanntlich 20865 (binär 0101 0001 1000 0001) ergibt. Was Ihnen im Bild 6 als undurchdringlicher Bit-Dschungel entgegenstrahlt, ist das schrittweise Verfolgen des Programms in Computerformat, also binär.</p>
+        <p>Das Ergebnis der Multiplikation befindet sich in LSB/MSB-Form in den X/Y-Registern. Programm und Flußdiagramm wollen wir an einem Beispiel nachspielen. Dazu sollen die beiden Zahlen 321 und 65 (binär 0000&thinsp;0001&thinsp;0100&thinsp;0001 und 0100&thinsp;0001) miteinander multipliziert werden, was bekanntlich 20865 (binär 0101&thinsp;0001&thinsp;1000&thinsp;0001) ergibt. Was Ihnen im Bild 6 als undurchdringlicher Bit-Dschungel entgegenstrahlt, ist das schrittweise Verfolgen des Programms in Computerformat, also binär.</p>
 
         <figure>
             <img src="138-6.png" alt="">
             <figcaption>Bild 6. UMULT am Beispiel der Multiplikation 321 x 65 = 20865</figcaption>
         </figure>
 
-        <p>In Bild 6 sind die Speicheradressen alle dezimal angegeben. Dort finden Sie zunächst die Ausgangslage. In Speicherstelle 40/41 steht die ganze Operation über unverändert die Zahl 321. In 113/114 finden Sie (wegen des LSB/MSB-Formates umgedreht als 114/113) unseren Faktor 65. Akku und Speicherstelle 93 stehen auf 16, dem Bitzähler. In das X- und Y-Register wurde eine Null eingelesen. Im Flußdiagramm ist diese Situation mit einer 1 gekennzeichnet. Ganz unten im Diagramm sehen Sie, daß der Bitzähler 93 erniedrigt und danach geprüft wird, ob er schon gleich Null sei. Daraus folgt, daß die große Schleife 16mal durchlaufen wird. Den ersten Durchlauf (gekennzeichnet durch kleine Buchstaben) verfolgen wir im einzelnen.<br>
-            a) X-Register wird zur Bearbeitung in den Akku geschoben.<br>
-            b) Mittels ASL wird das Bit 7 in die Carry-Flagge geschoben, was einen Carry-Inhalt von 0 bewirkt.<br>
-            c) Der solchermaßen bearbeitete Akku-Inhalt (der sich hier nicht weiter verändert hat) geht wieder zurück ins X-Register.<br>
-            d) Nun ist das Y-Register zur Bearbeitung dran. Es gelangt in den Akku.<br>
-            e) Mittels ROL wandert nun das MSB des X-Registers aus dem Carry-Bit in die O-Bit-Position des Akku<br>
-            f) und alles zusammen wieder ins Y-Register. Insgesamt wird dadurch die 16-Bit-Zahl im X/Y-Register um eine Stellenzahl erhöht, was der Vorbereitung zur Addition dient. (Erinnern Sie sich bitte: Die Kolonne der Einzelergebnisse wird ja addiert). Im Diagramm (ohne Buchstabenkennzeichnung) schließt sich hier noch einePrüfung auf einen eventuellen Überlauf an, der dann mit einer Fehlermeldung beantwortet wird.<br>
-            g) Nun wird das MSB der Speicherstelle 113 nach links ins Carry geschoben. Das ist auch hier noch eine Null.<br>
-            h) Anschließend wandert dieser Carry-Inhalt als Bit 0 in Speicherstelle 114. Bit 7 von 114 landet dafür im Carry. Auch hier wird auf diese Weise die ganze 16-Bit-Zahl 113/114 um ein Bit nach links geschoben und im nächsten Schritt — im Flußdiagramm wieder ohne Buchstabe — geprüft, ob da eine 1 oder eine 0 ins Carry-Bit geshiftet wurde. Wenn lediglich eine Null auftrat — wie hier —, dann springt das Programm sofort zum Herabzählen des Bitzählers 93. Tritt aber eine 1 auf, dann addiert sich der Inhalt von 40/41 zu X/Y.<br>
-            i) Hier wird der Zustand der betroffenen Speicherstellen und Register nach dem ersten Schleifendurchlauf gezeigt.</p>
+        <p>In Bild 6 sind die Speicheradressen alle dezimal angegeben. Dort finden Sie zunächst die Ausgangslage. In Speicherstelle 40/41 steht die ganze Operation über unverändert die Zahl 321. In 113/114 finden Sie (wegen des LSB/MSB-Formates umgedreht als 114/113) unseren Faktor 65. Akku und Speicherstelle 93 stehen auf 16, dem Bitzähler. In das X- und Y-Register wurde eine Null eingelesen. Im Flußdiagramm ist diese Situation mit einer 1 gekennzeichnet. Ganz unten im Diagramm sehen Sie, daß der Bitzähler 93 erniedrigt und danach geprüft wird, ob er schon gleich Null sei. Daraus folgt, daß die große Schleife 16mal durchlaufen wird. Den ersten Durchlauf (gekennzeichnet durch kleine Buchstaben) verfolgen wir im einzelnen.</p>
+
+        <ol type="a">            
+            <li>X-Register wird zur Bearbeitung in den Akku geschoben.</li>
+            <li>Mittels ASL wird das Bit 7 in die Carry-Flagge geschoben, was einen Carry-Inhalt von 0 bewirkt.</li>
+            <li>Der solchermaßen bearbeitete Akku-Inhalt (der sich hier nicht weiter verändert hat) geht wieder zurück ins X-Register.</li>
+            <li>Nun ist das Y-Register zur Bearbeitung dran. Es gelangt in den Akku.</li>
+            <li>Mittels ROL wandert nun das MSB des X-Registers aus dem Carry-Bit in die 0-Bit-Position des Akku</li>
+            <li>und alles zusammen wieder ins Y-Register. Insgesamt wird dadurch die 16-Bit-Zahl im X/Y-Register um eine Stellenzahl erhöht, was der Vorbereitung zur Addition dient. (Erinnern Sie sich bitte: Die Kolonne der Einzelergebnisse wird ja addiert). Im Diagramm (ohne Buchstabenkennzeichnung) schließt sich hier noch eine Prüfung auf einen eventuellen Überlauf an, der dann mit einer Fehlermeldung beantwortet wird.</li>
+            <li>Nun wird das MSB der Speicherstelle 113 nach links ins Carry geschoben. Das ist auch hier noch eine Null.</li>
+            <li>Anschließend wandert dieser Carry-Inhalt als Bit 0 in Speicherstelle 114. Bit 7 von 114 landet dafür im Carry. Auch hier wird auf diese Weise die ganze 16-Bit-Zahl 113/114 um ein Bit nach links geschoben und im nächsten Schritt — im Flußdiagramm wieder ohne Buchstabe — geprüft, ob da eine 1 oder eine 0 ins Carry-Bit geshiftet wurde. Wenn lediglich eine Null auftrat — wie hier —, dann springt das Programm sofort zum Herabzählen des Bitzählers 93. Tritt aber eine 1 auf, dann addiert sich der Inhalt von 40/41 zu X/Y.</li>
+            <li>Hier wird der Zustand der betroffenen Speicherstellen und Register nach dem ersten Schleifendurchlauf gezeigt.</li>
+        </ol>
 
         <p>Römisch II bis XVI zeigen nun jeweils den Zustand nach dem 2. bis 16. Durcharbeiten der großen Schleife. Wenn Sie verstehen möchten, was da passiert, sollten Sie versuchen, Bild 6 nur als Kontrolle zu verwenden und ansonsten mal selbst alle Schritte nachzuvollziehen.</p>
 
@@ -201,18 +285,36 @@
 
         <p>Damit Sie wissen, wo was hinein- oder herauskommt:</p>
 
-        <p>TODO</p>
+        <table class="plain center strong">
+            <tr><td>A</td><td>: B</td><td>= C</td><td>+ Rest</td></tr>
+            <tr><td>&uarr;</td><td>&uarr;</td><td>&uarr;</td><td>&uarr;</td></tr>
+            <tr><td>$57/$58</td><td>$59/$5A</td><td>$57/58</td><td>$5C/5D</td></tr>
+        </table>
 
         <p>An dem folgenden Beispiel soll der Programmverlauf getestet werden: Wir teilen 20867 durch 321. Dabei kommt nach Adam Riese heraus: 65, Rest 2.</p>
 
         <p>In folgender Weise wird in die Speicherzellen die Aufgabe eingespeist:</p>
 
-        <p>TODO</p>
+        <table class="plain strong">
+            <tr><td>20867</td><td>$57</td><td>1000</td><td>0011</td><td>LSB</td></tr>
+            <tr><td></td><td>$58</td><td>0101</td><td>0001</td><td>MSB</td></tr>
+            <tr><td>321</td><td>$59</td><td>0100</td><td>0001</td><td>LSB</td></tr>
+            <tr><td></td><td>$5A</td><td>0000</td><td>0001</td><td>MSB</td></tr>
+            <tr><td colspan="5">Als Ergebnis findet man dann:</td></tr>
+            <tr><td>65</td><td>$57</td><td>0100</td><td>0001</td><td>LSB</td></tr>
+            <tr><td></td><td>$58</td><td>0000</td><td>0000</td><td>MSB</td></tr>
+            <tr><td>Rest 2</td><td>$5C</td><td>0000</td><td>0010</td><td>LSB</td></tr>
+            <tr><td></td><td>$5D</td><td>0000</td><td>0000</td><td>MSB</td></tr>
+        </table>
 
-        <p>Als Bit-Zähler dient hier das Y-Register.<br>
-            b) Erstes Linksschieben des LSB mittels ASL. Dabei gelangt die 1 in das Carry-Bit.<br>
-            c) Hineinrotieren der 1 aus dem Carry in das MSB mittels ROL. d), e) Linksrotieren der 16-Bit-Zahl in $5C/5D, die jetzt noch 0 ist.<br>
-            f) Situation am Ende der ersten Schleife. Der Bitzähler ist um 1 reduziert.</p>
+        <p>Als Bit-Zähler dient hier das Y-Register.</p>
+
+        <ul class="plain">
+            <li>b) Erstes Linksschieben des LSB mittels ASL. Dabei gelangt die 1 in das Carry-Bit.</li>
+            <li>c) Hineinrotieren der 1 aus dem Carry in das MSB mittels ROL.</li>
+            <li>d), e) Linksrotieren der 16-Bit-Zahl in $5C/5D, die jetzt noch 0 ist.</li>
+            <li>f) Situation am Ende der ersten Schleife. Der Bitzähler ist um 1 reduziert.</li>
+        </ul>
 
         <p>Im folgenden wird dann jeweils die Situation am Ende der Schleife gezeigt. Beim Berechnen der Differenz muß jeweils darauf geachtet werden, daß die Subtraktion einer Zahl als Addition des Zweierkomplements ausgeführt wird. Das haben wir in den Folgen 3 und 4 der Serie kennengelernt. Allerdings muß an dieser Stelle nochmal gesagt werden, daß die 1, die zum Einerkomplement hinzuaddiert wird, um das Zweierkomplement zu erhalten, das gesetzte Carry-Bit ist. Nun dürfte es für Sie eigentlich keine Probleme mehr geben, was das Nachvollziehen der Divisionsroutine betrifft.</p>
 
@@ -226,10 +328,24 @@
 
         <p>Von nun an können Sie immer — auch im Direktmodus — durch ein USR-Kommando diesen Bildschirm abbilden. Zum Programm in der Folge 6 sind noch zwei Dinge zu bemerken, die hier geändert werden sollen. Erstens eine Frage: Ist Ihnen der Computer mal abgestürzt beim Aufruf des Programms? Die Wahrscheinlichkeit dafür ist ungefähr 1 : 60, wenn nämlich ein Interrupt stattfindet, während die Speicherstelle 1 geändert wird. Obwohl wir erst in den nächsten Folgen auf Interrupts eingehen werden, wollen wir die Wahrscheinlichkeit für so einen Absturz auf Null reduzieren. Eine andere Sache ist der Ort, an dem sich das Programm befand. Es hat sich nämlich herausgestellt, daß anscheinend die Nutzung dieses dort gewählten Speicherbereichs nicht ganz so problemlos ist. Bei einigen Anrufen wurde mir erzählt, daß zumindest der Anfang ab $02A7 bei bestimmten Konstellationen überschrieben wird. Deswegen packen wir unser Programm ganz unkonventionell nach $6000, von wo Sie es — das beherrschen Sie ja mit dem SMON inzwischen sicher — dorthin schieben können, wo es Ihnen gefällt. Allerdings müssen dann auch die USR-Adressen geändert werden. Aber auch das dürfte für Sie inzwischen kein Problem mehr sein.</p>
 
-        <p>Um diese immerhin schon 2 000 Byte (1000 für den Bildschirm und nochmal 1000 für das Farb-RAM) zu verschieben, bedienen wir uns einer Interpreter-Routine, die seit Ausgabe 3/85 des 64’er auch beim Checksummer verwendet wird — der Blockverschiebe-Routine (Bild 9a).</p>
+        <p>Um diese immerhin schon 2000 Byte (1000 für den Bildschirm und nochmal 1000 für das Farb-RAM) zu verschieben, bedienen wir uns einer Interpreter-Routine, die seit Ausgabe 3/85 des 64’er auch beim Checksummer verwendet wird — der Blockverschiebe-Routine (Bild 9a).</p>
 
         <figure>
-            TODO
+            <table class="plain">
+                <tr><td><strong>Name</strong></td><td><strong>BLTUC</strong></td></tr>
+                <tr><td>Zweck</td><td>Verschieben von Speicherinhalten im Speicher</td></tr>
+                <tr><td>Adresse</td><td>$A3BF dez. 41919</td></tr>
+                <tr><td>Vorbereitungen</td><td>
+                    <table class="plain">
+                        <tr><td>Quelle</td><td>Startadresse nach $5F/60</td></tr>
+                        <tr><td></td><td>Endadresse +1 nach $5A/5B</td></tr>
+                        <tr><td>Ziel</td><td>Endadresse +1 nach $58/59</td></tr>
+                    </table>
+                </td></tr>
+                <tr><td>Speicherstellen</td><td>$58-5B, $5F, $60, $22</td></tr>
+                <tr><td>Register</td><td>Akku, X- und Y-Register</td></tr>
+                <tr><td>Stapelbedarf</td><td>keiner</td></tr>
+            </table>
             <figcaption>Bild 9a. BLTUC</figcaption>
         </figure>
 
@@ -254,12 +370,12 @@
         <p>Die ROM-Bereiche enthalten nicht nur ausgeklügelte Maschinenprogramme, sondern auch eine Menge Daten. Sollten Sie mal in die Verlegenheit kommen, beispielsweise die Zahl Pi im MFLPT-Format verwenden zu müssen, dann erfordert das einen ganz schönen Aufwand an Rechen- und Programmarbeit, oder Sie möchten bestimmte Texte wie beispielsweise eine Fehlermeldung verfügbar halten &hellip;. und so weiter. Viele von diesen Daten sind schon in der Firmware enthalten und wir werden im folgenden festhalten, wo sie sich befinden und welches Format man vorfindet. Sehen wir uns zunächst Zahlen an (Tabelle 1). Es existieren noch weitere Zahlentabellen in den ROM-Bereichen, die aber selten von Interesse sind. Ebenso wie Zahlen, findet man auch Texte im ROM als ASCII-Werte abgelegt (Tabelle 2):</p>
 
         <figure>
-            <table>
+            <table class="plain">
                 <tbody>
-                    <tr>
-                        <th>Startadresse</th>
-                        <th>Format</th>
-                        <th>Zahl</th>
+                    <tr class="separator strong">
+                        <td>Startadresse</td>
+                        <td>Format</td>
+                        <td>Zahl</td>
                     </tr>
                     <tr>
                         <td>$AEA8</td>
@@ -267,7 +383,7 @@
                         <td>Pi</td>
                     </tr>
                     <tr>
-                        <td>$BlA5</td>
+                        <td>$B1A5</td>
                         <td>MFLPT</td>
                         <td>-32768</td>
                     </tr>
@@ -304,7 +420,7 @@
                     <tr>
                         <td>$B9D6</td>
                         <td>MFLPT</td>
-                        <td>0.707106781 = SQR(l/2)</td>
+                        <td>0.707106781 = SQR(1/2)</td>
                     </tr>
                     <tr>
                         <td>$B9DB</td>
@@ -329,17 +445,17 @@
                     <tr>
                         <td>$BDB3</td>
                         <td>MFLPT</td>
-                        <td>99 999 999.9</td>
+                        <td>99&thinsp;999&thinsp;999.9</td>
                     </tr>
                     <tr>
                         <td>$BDB8</td>
                         <td>MFLPT</td>
-                        <td>999 999 999</td>
+                        <td>999&thinsp;999&thinsp;999</td>
                     </tr>
                     <tr>
                         <td>$BDBD</td>
                         <td>MFLPT</td>
-                        <td>1000 000 000</td>
+                        <td>1&thinsp;000&thinsp;000&thinsp;000</td>
                     </tr>
                     <tr>
                         <td>$BF11</td>
@@ -349,32 +465,32 @@
                     <tr>
                         <td>$BF16</td>
                         <td>4-Byte-Integer</td>
-                        <td>-100 000 000</td>
+                        <td>-100&thinsp;000&thinsp;000</td>
                     </tr>
                     <tr>
-                        <td>$BFlA</td>
+                        <td>$BF1A</td>
                         <td>— " —</td>
-                        <td>10 000 000</td>
+                        <td>10&thinsp;000&thinsp;000</td>
                     </tr>
                     <tr>
-                        <td>$BFlE</td>
+                        <td>$BF1E</td>
                         <td>— " —</td>
-                        <td>-1000 000</td>
+                        <td>-1&thinsp;000&thinsp;000</td>
                     </tr>
                     <tr>
                         <td>$BF22</td>
                         <td>— " —</td>
-                        <td>100000</td>
+                        <td>100&thinsp;000</td>
                     </tr>
                     <tr>
                         <td>$BF26</td>
                         <td>— " —</td>
-                        <td>-10000</td>
+                        <td>-10&thinsp;000</td>
                     </tr>
                     <tr>
                         <td>$BF2A</td>
                         <td>— " —</td>
-                        <td>1000</td>
+                        <td>1&thinsp;000</td>
                     </tr>
                     <tr>
                         <td>$BF2E</td>
@@ -394,22 +510,22 @@
                     <tr>
                         <td>$BF3A</td>
                         <td>— " —</td>
-                        <td>-2160000</td>
+                        <td>-2&thinsp;160&thinsp;000</td>
                     </tr>
                     <tr>
                         <td>$BF3E</td>
                         <td>— " —</td>
-                        <td>216000</td>
+                        <td>216&thinsp;000</td>
                     </tr>
                     <tr>
                         <td>$BF42</td>
                         <td>— " —</td>
-                        <td>-36000</td>
+                        <td>-36&thinsp;000</td>
                     </tr>
                     <tr>
                         <td>$BF46</td>
                         <td>— " —</td>
-                        <td>3600</td>
+                        <td>3&thinsp;600</td>
                     </tr>
                     <tr>
                         <td>$BF4A</td>
@@ -424,7 +540,7 @@
                     <tr>
                         <td>$BFBF</td>
                         <td>MFLPT</td>
-                        <td>1.44269504 = l/ln2</td>
+                        <td>1.44269504 = 1/ln2</td>
                     </tr>
                     <tr>
                         <td>$BFC4</td>
@@ -474,7 +590,7 @@
                     <tr>
                         <td>$E08D</td>
                         <td>MFLPT</td>
-                        <td>11879 546</td>
+                        <td>11&thinsp;879&thinsp;546</td>
                     </tr>
                     <tr>
                         <td>$E092</td>
@@ -612,7 +728,7 @@
                         <td>Tastaturdecodierung: Einzelne Tasten</td>
                     </tr>
                     <tr>
-                        <td>$EBC2-$EC02</td>
+                        <td>$EBC2 - $EC02</td>
                         <td>1-Byte-Integers</td>
                         <td>Tasten mit Shift</td>
                     </tr>
@@ -643,7 +759,7 @@
         </figure>
 
         <figure>
-            <table>
+            <table class="plain">
                 <tbody>
                     <tr>
                         <td>$A004</td>
@@ -655,11 +771,11 @@
                     </tr>
                     <tr>
                         <td>$A19E - $A327</td>
-                        <td>Texte der Basic-Fehler- und System- Meldungen. (Im letzten Byte ist jeweils Bit 7 gesetzt)</td>
+                        <td>Texte der Basic-Fehler- und System-Meldungen. (Im letzten Byte ist jeweils Bit 7 gesetzt)</td>
                     </tr>
                     <tr>
                         <td>$A364 - $A38A</td>
-                        <td>Weitere System-Meldungen: OK, ERROR, IN, READY, BREAK. (Das letzte Bvte ist ieweils 0)</td>
+                        <td>Weitere System-Meldungen: OK, ERROR, IN, READY, BREAK. (Das letzte Bvte ist jeweils 0)</td>
                     </tr>
                     <tr>
                         <td>$ACFC - $AD1D</td>
@@ -694,10 +810,13 @@
 
         <p>Diese Folge soll nicht abgeschlossen werden, ohne eine Korrektur. Auf einen Fehler, dem ich aufgesessen bin (in der Literatur befinde ich mich aber in guter Gesellschaft, andere sind auch davon betroffen), haben mich zwei aufmerksame Leser hingewiesen. Es dreht sich um die Flaggensetzung bei Compare-Befehlen. Die N-Flagge ist nämlich nicht nur vom Ergebnis des Vergleichs, sondern auch noch von den aktuellen Akku- beziehungsweise Registerinhalten bestimmt.</p>
 
-        <p>Bild 1 in der 5. Folge muß deshalb korrigiert werden:<br>
-            (A,X,Y) größer als die Daten: N kann 0 oder 1 sein<br>
-            (A,X,Y) = Daten N = 0<br>
-            (A,X,Y) kleiner als die Daten: N kann 0 oder 1 sein.</p>
+        <p>Bild 1 in der 5. Folge muß deshalb korrigiert werden:</p>
+
+        <ul class="plain">
+            <li>(A,X,Y) größer als die Daten: N kann 0 oder 1 sein</li>
+            <li>(A,X,Y) = Daten N = 0</li>
+            <li>(A,X,Y) kleiner als die Daten: N kann 0 oder 1 sein.</li>
+        </ul>
 
         <p>Das stammt aus dem offziellen MOS-Technology-Handbuch und entspricht somit hoffentlich der Wahrheit [2]. Das bedeutet, daß man bei den Abfragen durch Branch-Befehle nach den Vergleichsbefehlen etwas vorsichtig sein sollte, was die N-Flagge angeht.</p>
 
@@ -705,34 +824,37 @@
 
         <address class="author">(Heimo Ponnath/gk)</address>
 
-        <p>[1] »Computerspiele und Wissenswertes Commodore 64«, Haar bei München: Markt &amp; Technik Verlag, 1984. Das ist die von P. Lücke besorgte Übersetzung des amerikanischen Buches »More on the sixtyfour« und ist jedem Assembler-Programmierer warm zu empfehlen.<br>
-            [2] »MOS Microcomputers Programmier-Handbuch«, Frankfurt: Commodore MOS Technology</p>
+        <ul class="plain source">
+            <li>[1] »Computerspiele und Wissenswertes Commodore 64«, Haar bei München: Markt &amp; Technik Verlag, 1984. Das ist die von P. Lücke besorgte Übersetzung des amerikanischen Buches »More on the sixtyfour« und ist jedem Assembler-Programmierer warm zu empfehlen.</li>
+            <li>[2] »MOS Microcomputers Programmier-Handbuch«, Frankfurt: Commodore MOS Technology</li>
+        </ul>
 
         <figure>
-            <table>
+            <table class="plain">
                 <tbody>
-                    <tr>
-                        <th rowspan="2">Befehlswort</th>
-                        <th rowspan="2">Adressierung</th>
-                        <th rowspan="2">Bytezahl</th>
-                        <th colspan="2">Code</b>
-                        <th rowspan="2">Taktzyklen</th>
-                        <th rowspan="2">Beinflussung von Flaggen</th>
+                    <tr class="strong">
+                        <td class="separator" rowspan="2">Befehlswort</td>
+                        <td class="separator" rowspan="2">Adressierung</td>
+                        <td class="separator" rowspan="2">Bytezahl</td>
+                        <td colspan="2">Code</td>
+                        <td class="separator" rowspan="2">Taktzyklen</td>
+                        <td class="separator" rowspan="2">Beinflussung von Flaggen</td>
+                    </tr>
+                    <tr class="strong">
+                        <td class="separator">Hex</td>
+                        <td class="separator">Dez</td>
                     </tr>
                     <tr>
-                        <th>Hex</th>
-                        <th>Dez</th>
-                    </tr>
-                    <tr>
-                        <td rowspan="5">LSR</td>
+                        <td>LSR</td>
                         <td>»Akkumulator«</td>
-                        <td></td>
+                        <td>1</td>
                         <td>1A</td>
                         <td>26</td>
                         <td>2</td>
                         <td>N,Z,C</td>
                     </tr>
                     <tr>
+                        <td></td>
                         <td>absolut</td>
                         <td>3</td>
                         <td>4E</td>
@@ -741,6 +863,7 @@
                         <td>N,Z,C</td>
                     </tr>
                     <tr>
+                        <td></td>
                         <td>0-page-absolut</td>
                         <td>2</td>
                         <td>46</td>
@@ -749,6 +872,7 @@
                         <td>N,Z,C</td>
                     </tr>
                     <tr>
+                        <td></td>
                         <td>absolut-X-indiz.</td>
                         <td>3</td>
                         <td>5E</td>
@@ -757,6 +881,7 @@
                         <td>N,Z,C</td>
                     </tr>
                     <tr>
+                        <td></td>
                         <td>0-page-X-indiz.</td>
                         <td>2</td>
                         <td>56</td>
@@ -765,7 +890,7 @@
                         <td>N,Z,C</td>
                     </tr>
                     <tr>
-                        <td rowspan="5">ROL</td>
+                        <td>ROL</td>
                         <td>»Akkumulator«</td>
                         <td>1</td>
                         <td>2A</td>
@@ -774,6 +899,7 @@
                         <td>N,Z,C</td>
                     </tr>
                     <tr>
+                        <td></td>
                         <td>absolut</td>
                         <td>3</td>
                         <td>2E</td>
@@ -782,6 +908,7 @@
                         <td>N,Z,C</td>
                     </tr>
                     <tr>
+                        <td></td>
                         <td>0-page-absolut</td>
                         <td>2</td>
                         <td>26</td>
@@ -790,6 +917,7 @@
                         <td>N,Z,C</td>
                     </tr>
                     <tr>
+                        <td></td>
                         <td>absolut-X-indiz.</td>
                         <td>3</td>
                         <td>3E</td>
@@ -798,6 +926,7 @@
                         <td>N,Z,C</td>
                     </tr>
                     <tr>
+                        <td></td>
                         <td>0-page-X-indiz.</td>
                         <td>2</td>
                         <td>36</td>
@@ -806,7 +935,7 @@
                         <td>N,Z,C</td>
                     </tr>
                     <tr>
-                        <td rowspan="5">ROR</td>
+                        <td>ROR</td>
                         <td>»Akkumulator«</td>
                         <td>1</td>
                         <td>6A</td>
@@ -815,6 +944,7 @@
                         <td>N,Z,C</td>
                     </tr>
                     <tr>
+                        <td></td>
                         <td>absolut</td>
                         <td>3</td>
                         <td>6E</td>
@@ -823,6 +953,7 @@
                         <td>N,Z,C</td>
                     </tr>
                     <tr>
+                        <td></td>
                         <td>0-page-absolut</td>
                         <td>2</td>
                         <td>66</td>
@@ -831,6 +962,7 @@
                         <td>N,Z,C</td>
                     </tr>
                     <tr>
+                        <td></td>
                         <td>absolut-X-indiz.</td>
                         <td>3</td>
                         <td>7E</td>
@@ -839,6 +971,7 @@
                         <td>N,Z,C</td>
                     </tr>
                     <tr>
+                        <td></td>
                         <td>0-page-X-indiz.</td>
                         <td>2</td>
                         <td>76</td>

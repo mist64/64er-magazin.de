@@ -24,7 +24,7 @@
 
         <p>Dabei wird anhand des Source-Listings des Programms Modulator gezeigt, wie man diese Algorithmen unter zeitkritischen Nebenbedingungen programmieren kann.</p>
 
-        <p>Im zweiten Teil dieser Reihe wurde schon erwähnt, daß man jeden Signalverlauf durch eine Folge von Stützwerten beschreiben kann. Da man diese Stützwerte digital codieren kann, wird so die Signalerzeugung und -verarbeitung mit dem Computer möglich. Man muß dabei allerdings mit einer Abtastfrequenz arbeiten, die mindestens doppelt so hoch ist wie die höchste Frequenz, die im verarbeiteten Signal vorkommt. Für Audio-Signale in HiFi-Qulität ist somit eine Abtastfrequenz von mindestens 40 kHz erforderlich. Stellen wir dieser Frequenz einmal die Taktfrequenz von 1 MHz in unserem C 64 gegenüber: Eine Abtastperiode dauert bei 40 kHz 25 gs. Diese Zeit entspricht genau 25 Taktzyklen im C 64. Ein 6510-Maschinenbefehl dauert zwischen zwei und sieben Taktzyklen, das heißt, daß die CPU während einer Abtastperiode gerade vier bis maximal zwölf Befehle abarbeiten kann; zuwenig, um damit schon sinnvoll einen Signalabtastwert weiterzuverarbeiten. Die digitale Verarbeitung von Audiosignalen bleibt also zunächst einmal Hochleistungsrechnern und Spezialprozessoren vorenthalten.</p>
+        <p>Im zweiten Teil dieser Reihe wurde schon erwähnt, daß man jeden Signalverlauf durch eine Folge von Stützwerten beschreiben kann. Da man diese Stützwerte digital codieren kann, wird so die Signalerzeugung und -verarbeitung mit dem Computer möglich. Man muß dabei allerdings mit einer Abtastfrequenz arbeiten, die mindestens doppelt so hoch ist wie die höchste Frequenz, die im verarbeiteten Signal vorkommt. Für Audio-Signale in HiFi-Qulität ist somit eine Abtastfrequenz von mindestens 40 kHz erforderlich. Stellen wir dieser Frequenz einmal die Taktfrequenz von 1 MHz in unserem C 64 gegenüber: Eine Abtastperiode dauert bei 40 kHz 25 &micro;s. Diese Zeit entspricht genau 25 Taktzyklen im C 64. Ein 6510-Maschinenbefehl dauert zwischen zwei und sieben Taktzyklen, das heißt, daß die CPU während einer Abtastperiode gerade vier bis maximal zwölf Befehle abarbeiten kann; zuwenig, um damit schon sinnvoll einen Signalabtastwert weiterzuverarbeiten. Die digitale Verarbeitung von Audiosignalen bleibt also zunächst einmal Hochleistungsrechnern und Spezialprozessoren vorenthalten.</p>
 
         <h3>Dreh- und Angelpunkt: Integer-Arithmetik</h3>
 
@@ -34,45 +34,79 @@
 
         <p>Was ist 43 x 13? Die wenigsten Menschen dürften die Antwort auf einen Schlag parat haben, so wie zum Beispiel auf die Frage, was 3 x 7 ist. Wir brauchen 3 x 7 nicht auszurechnen, weil wir es auswendig wissen. Den Wert des Produkts 43 x 13 werden die wenigsten auswendig kennen und daher zu rechnen anfangen. Eine solche Rechnung könnte (ausführlich) so aussehen:</p>
 
-        <p>TODO</p>
+        <table class="plain pre strong right1">
+            <tr><td>(1)</td><td class="separator">43 x 13</td></tr>
+            <tr><td>(2)</td><td>43 </td></tr>
+            <tr><td>(3)</td><td class="separator">129</td></tr>
+            <tr><td>(4)</td><td>559</td></tr>
+        </table>
 
         <p>In Zeile (1) stehen dabei noch einmal die Faktoren. Zeile (2) stellt das Teilprodukt 43 x 10 = 430 dar, Zeile (3) das Teilprodukt 43 x 3 = 129. Durch geeignetes Einrücken braucht man die Null bei 430 in Zeile (2) nicht mitschreiben. In Zeile (4) werden schließlich die Teilprodukte addiert. Dieser vertrauten Rechenweise liegt das <strong>Distributivgesetz</strong> zugrunde, welches die Bildungvon Teilprodukten erlaubt:</p>
 
-        <p>(5) 43x(10 + 3)=(43x10)+(43x3)<br>
-            TODO</p>
+        <table class="plain pre strong">
+            <tr><td>(5)</td><td>43x(10+3)=(43x10)+(43x3)</td></tr>
+        </table>
 
-        <p>Die »komplizierte« Multiplikation 43 x 13 wird also auf »einfachere« Multiplikationen 43 x 10 und 43 x 3 zurückgeführt. Bezeichnen wir in unserem Beispiel die Zahl 43 als Multiplikant (MD) und 13 als Multiplikator (MR), so können wir das Multiplikationsschema so formulieren: »Multipliziere MD mit den einzelnen Dezimalstellen von MR und addiere die Teilproduktion, die mit den entsprechenden Zehnerpotenzen 1,10,1000 etc. zu skalieren sind. Die Skalierung erreicht man aber einfach durch Linksverschieben um 0,1,2 etc. Dezimalstellen.«</p>
+        <p>Die »komplizierte« Multiplikation 43 x 13 wird also auf »einfachere« Multiplikationen 43 x 10 und 43 x 3 zurückgeführt. Bezeichnen wir in unserem Beispiel die Zahl 43 als <strong>Multiplikant (MD)</strong> und 13 als <strong>Multiplikator (MR)</strong>, so können wir das Multiplikationsschema so formulieren: »Multipliziere MD mit den einzelnen Dezimalstellen von MR und addiere die Teilproduktion, die mit den entsprechenden Zehnerpotenzen 1,10,1000 etc. zu skalieren sind. Die Skalierung erreicht man aber einfach durch Linksverschieben um 0,1,2 etc. Dezimalstellen.«</p>
 
-        <p>Man kann den Multiplikator aber auch anders zerlegen, zum Beispiel in Zweierpotenzen:<br>
-            13 = 8 + 4 + 1<br>
-            und so multiplizieren:</p>
+        <p>Man kann den Multiplikator aber auch anders zerlegen, zum Beispiel in Zweierpotenzen:</p>
 
-        <p>(6) 43x13 = 8x43 + 4x43 + 1x43<br>
-            = 344 + 172 + 43<br>
-            = 599<br>
-            TODO</p>
+        <table class="plain pre strong">
+            <tr><td>13 = 8 + 4 + 1</td></tr>
+        </table>
+
+        <p class="noindent">und so multiplizieren:</p>
+
+        <table class="plain pre strong right1 right2 right4 right5 right6">
+            <tr><td>(6)</td><td>43x13 =</td><td>8x43</td><td>+</td><td>4x43</td><td>+</td><td>1x43</td></tr>
+            <tr><td></td><td>=</td><td>344</td><td>+</td><td>172</td><td>+</td><td>43</td></tr>
+            <tr><td></td><td>=</td><td>599</td><td></td><td></td><td></td><td></td></tr>
+        </table>
 
         <p>Man benötigt hier als Summanden Produkte von MD mit Zweierpotenzen, die man leicht durch wiederholtes Verdoppeln von MD erhalten kann. Auf diese Weise sollen übrigens schon die alten Ägypter multipliziert haben. Wenn man nun MD und MR im Binärsystem darstellt, kann man besonders einfach multiplizieren: Die Produkte von MD mit Zweierpotenzen erhält man ganz einfach durch wiederholtes Linksverschieben. In unserem Beispiel gilt in binärer Schreibweise: MD = 101011, MR = 1101. Es ergibt sich das Schema:</p>
 
-        <p>TODO</p>
+        <table class="plain pre strong right1 right2">
+            <tr><td></td><td>MD</td><td>MR</td></tr>
+            <tr><td>(7)</td><td colspan="2">101011 x 1101</td></tr>
+            <tr><td>(8)</td><td colspan="2">101011   </td></tr>
+            <tr><td>(9)</td><td colspan="2">101011  </td></tr>
+            <tr><td>(10)</td><td colspan="2">+   101011</td></tr>
+            <tr><td>(11)</td><td colspan="2">1000101111</td></tr>
+        </table>
 
         <p>In Zeile (7) stehen MD und MR. Die Zeilen (8), (9) und (10) entsprechen den Teilpodukten 43 x 8, 43 x 4 und 43 x 1, die durch Linksverschiebung aus MD hervorgehen. Die Summe in Zeile (11) ist genau die Binärdarstellung von 559 (nachrechnen!).</p>
 
         <p>Nach diesem Schema kann man nun einen Algorithmus formulieren: Es sei dazu N die Zahl der Binärstellen von MR:</p>
 
-        <p>1 SUM: = 0;<br>
-            2 FOR I: = N-1 DOWNTO 0 DO<br>
-            3 BEGIN<br>
-            4 SUM := LINKS(SUM);<br>
-            5 IF MR(I)=1 THEN SUM: = SUM + MD<br>
-            6 END</p>
+        <table class="plain pre strong">
+            <tr><td>1</td><td>SUM:=0;</td></tr>
+            <tr><td>2</td><td>FOR I:=N-1 DOWNTO 0 DO</td></tr>
+            <tr><td>3</td><td>BEGIN</td></tr>
+            <tr><td>4</td><td>SUM := LINKS(SUM);</td></tr>
+            <tr><td>5</td><td>IF MR(I)=1 THEN SUM:=SUM+MD</td></tr>
+            <tr><td>6</td><td>END</td></tr>
+        </table>
 
         <p>Der Algorithmus ist hier formal in einem Pascal-ähnlichen Stil dargestellt. SUM wird zunächst mit 0 vorbesetzt und dann N-mal nach links geschoben. Immer wenn dabei, von links nach rechts gezählt, in MR eine Eins auftritt, wird MD zu SUM addiert.</p>
 
-        <p>Sehen wir uns für unser Beispiel einen Trace des Programms an:<br>
-            MD = 101011 MR = 1101 N = 4</p>
+        <p>Sehen wir uns für unser Beispiel einen Trace des Programms an:</p>
 
-        <p>TODO</p>
+        <table class="plain">
+            <tr><td>MD = 101011</td><td>MR = 1101</td><td>N = 4</td></tr>
+        </table>
+
+        <table class="plain pre strong right3 center4">
+            <tr class="separator"><td>Zeile</td><td>I</td><td>MR(I)=1</td><td>SUM</td><td>AKTION</td></tr>
+            <tr><td>1</td><td>undef</td><td>undef</td><td>0</td><td></td></tr>
+            <tr><td>4</td><td>3</td><td>true</td><td>0</td><td>LINKS</td></tr>
+            <tr><td>5</td><td>3</td><td>true</td><td>101011</td><td>+</td></tr>
+            <tr><td>4</td><td>1</td><td>true</td><td>1010110</td><td>LINKS</td></tr>
+            <tr><td>5</td><td>2</td><td>true</td><td>10000001</td><td>+</td></tr>
+            <tr><td>4</td><td>1</td><td>false</td><td>100000010</td><td>LINKS</td></tr>
+            <tr><td>5</td><td>1</td><td>false</td><td>100000010</td><td>nichts</td></tr>
+            <tr><td>4</td><td>0</td><td>true</td><td>1000000100</td><td>LINKS</td></tr>
+            <tr><td>5</td><td>0</td><td>true</td><td>1000101111</td><td>+</td></tr>
+        </table>
 
         <p>Wir wollen diesen Algorithmus nun konkret in Maschinensprache realisieren. Wenn MD und MR zunächst auf 8 Bit begrenzt werden, kann man auf sie mit einem einzigen Maschinenbefehl zugreifen. Die Variable SUM hält man am besten im Akkumulator, weil man sie zum Addieren sowieso dorthin laden müßte. Auch die Linksverschiebung des Akkumulators ist wesentlich schneller als die einer Speicherzelle. Beim Addieren in den Akkumulator und beim Linksverschieben treten allerdings Überträge auf, die nicht verloren gehen dürfen, da diese je gerade die höherwertigen Bits von SUM darstellen. Das Endprodukt, das sich in SUM bildet, kann bis zu 16 Bit lang werden. (In unserem Beispiel sind es immerhin schon 9 Bit.) Bild 1 zeigt eine elegante Realisierung des Algorithmus, die mit nur zwei Speicherplätzen auskommt.</p>
 
@@ -81,11 +115,23 @@
             <figcaption>Bild 1. Schema einer 8 x 8-Bit-Multiplikation</figcaption>
         </figure>
 
-        <p>Die langen Rechtecke stellen die Speicherstellen MD, MR und den Akkumulator dar, fette Linien stehen für Bytepfade, dünne für Bitpfade.»+« versinnbildlicht die Addition A : = A + MD. In diesem Schema werden MR und A zusammen (wie ein 16-Bit-Register) nach links geschoben. Dadurch erscheinen die Bits von MR nacheinander in der Carry-Flagge und können so leicht abgefragt werden. MD wird nur dann zum Akku addiert, wenn das durch Linksverschiebungen aus MR gewonnene Bit Eins ist. Ein Übertrag bei der Addition in den Akku muß natürlich nach MR weitergegeben werden, da MR gleichzeitig auch die höherwertigen Bits von SUM enthält. Durch die doppelte Nutzung der Speicherstelle MR wird der Multiplikator zwar durch das höherwertige Byte von SUM überschrieben, man spart sich dadurch aber einen Schiebebefehl und einen Speicherplatz. Da wir wegen schnelleren Zugriffs MD und MR in der Zero-Page plazieren werden, und da der freie Platz dort knapp ist, ist die Einsparung von Speicherplatz durchaus gerechtfertigt. Hier das Programm, das ausführlich besprochen werden soll:</p>
+        <p>Die langen Rechtecke stellen die Speicherstellen MD, MR und den Akkumulator dar, fette Linien stehen für Bytepfade, dünne für Bitpfade. »+« versinnbildlicht die Addition A : = A + MD. In diesem Schema werden MR und A zusammen (wie ein 16-Bit-Register) nach links geschoben. Dadurch erscheinen die Bits von MR nacheinander in der Carry-Flagge und können so leicht abgefragt werden. MD wird nur dann zum Akku addiert, wenn das durch Linksverschiebungen aus MR gewonnene Bit Eins ist. Ein Übertrag bei der Addition in den Akku muß natürlich nach MR weitergegeben werden, da MR gleichzeitig auch die höherwertigen Bits von SUM enthält. Durch die doppelte Nutzung der Speicherstelle MR wird der Multiplikator zwar durch das höherwertige Byte von SUM überschrieben, man spart sich dadurch aber einen Schiebebefehl und einen Speicherplatz. Da wir wegen schnelleren Zugriffs MD und MR in der Zero-Page plazieren werden, und da der freie Platz dort knapp ist, ist die Einsparung von Speicherplatz durchaus gerechtfertigt. Hier das Programm, das ausführlich besprochen werden soll:</p>
 
-        <p>TODO</p>
+        <table class="plain strong">
+            <tr><td>MUL</td><td>LDA #0</td><td>(2)</td><td>SUM:=0</td></tr>
+            <tr><td></td><td>LDX #8</td><td>(2)</td><td>Schleifenzähler</td></tr>
+            <tr><td>LOOP</td><td>ASL A</td><td>(2)</td><td>Registerpaar</td></tr>
+            <tr><td></td><td>ROL MR</td><td>(5)</td><td>(MR.A) n. links</td></tr>
+            <tr><td></td><td>BCC NEXT</td><td>(2/3)</td><td></td></tr>
+            <tr><td></td><td>CLC</td><td>(2)</td><td></td></tr>
+            <tr><td></td><td>ADC MD</td><td>(3)</td><td>SUM:= SUM+MD</td></tr>
+            <tr><td></td><td>BCC NEXT</td><td>(2/3)</td><td></td></tr>
+            <tr><td></td><td>INC MR</td><td>(5)</td><td>Übertrag nach MR</td></tr>
+            <tr><td>NEXT</td><td>DEX</td><td>(2)</td><td></td></tr>
+            <tr><td></td><td>BNE LOOP</td><td>(2/3)</td><td>nächster Lauf</td></tr>
+        </table>
 
-        <p>Die Zahlen in Klammern geben die Ausführungszeiten der Befehle in Taktzyklen an. Sie sind aus Tabelle 1 entnommen. Bei den Verzweigungen nehmen wir der Einfachheit halber an, daß keine Page-Grenzen übersprungen werden, sonst müßte man im Falle eines Sprunges vier statt drei Takte in Rechnung stellen. Zur Arbeitsweise des Programms: Zuerst wird SUM mit 0 vorbesetzt. Dazu genügt es, den Akku mit 0 zu besetzen, da die höherwertigen Bits von SUM erst durch den Schiebeprozeß entstehen. Das X-Register zählt die Schleifendurchläufe. Innerhalb der Schleife wird zunächst das Registerpaar (MR.A) durch das Befehlspaar ASL,ROL nach links verschoben. Beide Befehle schieben nach links, wobei Bit 7 in die Carry-Flagge geschoben wird. Der Unterschied der beiden Befehle besteht aber darin, daß ASL das Bit 0 immer mit Null besetzt, während ROL Bit 0 mit dem Wert besetzt, den die Carry-Flagge vor dem ROL-Befehl hatte. In unserem Fall ist das gerade das aus dem vorhergehenden ASL stammende Bit 7 vom Akku. Nach der Verschiebung zeigt das aus MR stammende Carry-Bit an, ob MD zu SUM addiert werden soll oder nicht. Falls nicht, wird mit BCC NEXT die Addition übersprungen. Die Addition selbst berücksichtigt durch ein weiteres BCC NEXT/ INC MR einen eventuell auftretenden Übertrag nach MR. Die Speicherstelle MR enthält zwar gleichzeitig Teile vom Multiplikator und von SUM, man kann sich aber überlegen, daß ein Übertrag nach MR nur den SUM-Teil, aber nicht den Multiplikator-Teil beeinflußt. Nach dem Verlassen der Schleife steht schließlich das 16-Bit-Produkt (die Variable SUM) im Registerpaar (MR.A). Der Multiplikator wurde überschrieben, der Multiplikant in MD dagegen ist unverändert erhalten geblieben.</p>
+        <p>Die Zahlen in Klammern geben die Ausführungszeiten der Befehle in Taktzyklen an. Sie sind aus Tabelle 1 entnommen. Bei den Verzweigungen nehmen wir der Einfachheit halber an, daß keine Page-Grenzen übersprungen werden, sonst müßte man im Falle eines Sprunges vier statt drei Takte in Rechnung stellen. Zur Arbeitsweise des Programms: Zuerst wird SUM mit 0 vorbesetzt. Dazu genügt es, den Akku mit 0 zu besetzen, da die höherwertigen Bits von SUM erst durch den Schiebeprozeß entstehen. Das X-Register zählt die Schleifendurchläufe. Innerhalb der Schleife wird zunächst das Registerpaar (MR.A) durch das Befehlspaar ASL,ROL nach links verschoben. Beide Befehle schieben nach links, wobei Bit 7 in die Carry-Flagge geschoben wird. Der Unterschied der beiden Befehle besteht aber darin, daß ASL das Bit 0 immer mit Null besetzt, während ROL Bit 0 mit dem Wert besetzt, den die Carry-Flagge vor dem ROL-Befehl hatte. In unserem Fall ist das gerade das aus dem vorhergehenden ASL stammende Bit 7 vom Akku. Nach der Verschiebung zeigt das aus MR stammende Carry-Bit an, ob MD zu SUM addiert werden soll oder nicht. Falls nicht, wird mit BCC NEXT die Addition übersprungen. Die Addition selbst berücksichtigt durch ein weiteres BCC NEXT/INC MR einen eventuell auftretenden Übertrag nach MR. Die Speicherstelle MR enthält zwar gleichzeitig Teile vom Multiplikator und von SUM, man kann sich aber überlegen, daß ein Übertrag nach MR nur den SUM-Teil, aber nicht den Multiplikator-Teil beeinflußt. Nach dem Verlassen der Schleife steht schließlich das 16-Bit-Produkt (die Variable SUM) im Registerpaar (MR.A). Der Multiplikator wurde überschrieben, der Multiplikant in MD dagegen ist unverändert erhalten geblieben.</p>
 
         <figure>
             <img src="152-t1.png" alt="">
@@ -94,18 +140,23 @@
 
         <h3>Zeitbedarf</h3>
 
-        <p>Es soll hier exemplarisch gezeigt werden, wie man den genauen Zeitbedarf eines Maschinenprogramms ermittelt. Die Ausführungszeit des Multiplikationsprogramms ist nicht einheitlich. Sie hängt von den Anfangswerten von MR und MD ab, welche das Verhalten des Programms an den beiden Verzweigungsstellen (BCC NEXT) beeinflussen. Wir werden hier also den günstigsten (in bezug auf die Rechenzeit) und den ungünstigsten Fall untersuchen. Im ungünstigsten Fall muß bei jedem Schleifendurchlauf addiert werden, und zusätzlich tritt bei jeder Additon ein Übertrag auf. Der Zeitbedarf eines Schleifendurchlaufes beträgt dann:<br>
-            2(ASL) + 5(ROL) + 2(BCC) + 2(CLC) + 3(ADC) + 2(BCC) + 5 (INC) + 2(DEX) + 3(BNE) = 26 Takte</p>
+        <p>Es soll hier exemplarisch gezeigt werden, wie man den genauen Zeitbedarf eines Maschinenprogramms ermittelt. Die Ausführungszeit des Multiplikationsprogramms ist nicht einheitlich. Sie hängt von den Anfangswerten von MR und MD ab, welche das Verhalten des Programms an den beiden Verzweigungsstellen (BCC NEXT) beeinflussen. Wir werden hier also den günstigsten (in bezug auf die Rechenzeit) und den ungünstigsten Fall untersuchen. Im ungünstigsten Fall muß bei jedem Schleifendurchlauf addiert werden, und zusätzlich tritt bei jeder Additon ein Übertrag auf. Der Zeitbedarf eines Schleifendurchlaufes beträgt dann:</p>
 
-        <p>Die Gesamtdauer der Multiplikation ergibt sich dann so:<br>
-            2(LDA) + 2(LDX) + 8*26(Schleife) -1 = <strong>211</strong></p>
+        <p>2(ASL) + 5(ROL) + 2(BCC) + 2(CLC) + 3(ADC) + 2(BCC) + 5(INC) + 2(DEX) + 3(BNE) = 26 Takte</p>
+
+        <p>Die Gesamtdauer der Multiplikation ergibt sich dann so:</p>
+        
+        <p class="noindent">2(LDA) + 2(LDX) + 8*26(Schleife) -1 = <strong>211</strong></p>
 
         <p>Die -1 kommt dadurch zustande, daß beim letzten Schleifendurchlauf bei BNE nicht gesprungen wird und dadurch nur 2 statt 3 Takte benötigt werden.</p>
 
-        <p>Im günstigsten Fall (MR = 0, die Addition wird immer übersprungen) braucht die Schleife:<br>
-            2(ASL) + 5(ROL) + 3(BCC) + 2(DEX) + 3(BNE) = 16 Takte<br>
-            Gesamtdauer:<br>
-            2(LDA) + 2(LDX) + 8*16 (Schleife)-1 = 131</p>
+        <p>Im günstigsten Fall (MR = 0, die Addition wird immer übersprungen) braucht die Schleife:</p>
+
+        <p>2(ASL) + 5(ROL) + 3(BCC) + 2(DEX) + 3(BNE) = 16 Takte</p>
+
+        <p class="noindent">Gesamtdauer:</p>
+
+        <p>2(LDA) + 2(LDX) + 8*16 (Schleife)-1 = 131</p>
 
         <p>Die Ausführungszeit der Multiplikation liegt also immer zwischen 131 und 211 Takten, wobei die Grenzwerte wohl selten erreicht werden dürften. Man kann im Mittel wohl mit zirka 170 Takten rechnen. Es ist für unsere Zwecke sehr wichtig, diese Größe zu kennen. Wenn wir in unserem Programm Modulator für einen Schritt eine Zeit von maximal 16,6 ms zur Verfügung haben, so können wir daraus eine theoretische Obergrenze für die Anzahl der in einem Schritt ausführbaren Multiplikationen ableiten. Sie liegt bei unserer 8-mal-8-Bit-Multiplikation etwa bei 75, wenn man den ungünstigsten Fall zugrundelegt.</p>
 
@@ -117,11 +168,12 @@
 
         <p>Die Wortlängen der Modulationsziele sind:</p>
 
-        <p>Tonfrequenzen 16 Bit<br>
-            Pulsweiten 12 Bit<br>
-            Filterfrequenz 8 Bit<br>
-            Lautstärke 4 Bit<br>
-            TODO</p>
+        <table class="plain right1">
+            <tr><td>Tonfrequenzen</td><td>16 Bit</td></tr>
+            <tr><td>Pulsweiten</td><td>12 Bit</td></tr>
+            <tr><td>Filterfrequenz</td><td>8 Bit</td></tr>
+            <tr><td>Lautstärke</td><td>4 Bit</td></tr>
+        </table>
 
         <p>Die Filterfrequenz ist beim SID zwar eine ll-Bit-Größe, da aber feine Frequenzunterschiede in der Filterfrequenz nicht hörbar sind, werden nur die oberen 8 Bit moduliert.</p>
 
@@ -161,7 +213,7 @@
 
         <h3>Aliasing-Parasitäre Frequenzen</h3>
 
-        <p>Bei der eben beschriebenen Erzeugung der LFO-Kurvenformen tritt bei etwas höheren Frequenzen, etwa ab 10 Hz, noch ein interessantes Phänomen auf. Man kann die Erzeugung eines Sägezahnverlaufs durch zyklisches Hochzählen eines Wortes auch als Abtastung einer hypothetischen, kontinuierlichen Sägezahnkurfe auffassen. Die Abtastfrequenz ist in unserem Fall mit 60 Hz fest. Die Frequenz der hypothetischen Sägezahnkurve kann man aber durch den Parameter LFOF sehr feinstufig zwischen 0 und 60 Hz variieren. Wie soll aber zum Beispiel eine LFO-Kurve mit 50 Hz aussehen, wenn man nur 60 Äbtastwerte pro Sekunde hat? Die Antwort gibt Bild 4. Man erhält den gestrichelten Verlauf mit einer Frequenz von nur 10 Hz. Noch seltsamer sieht das Resultat bei einer LFO-Frequenz von 25 Hz aus. Die Folge der Abtastwerte schwingt zwar ungefähr im Rhythmus von 25 Hz, dieser Bewegung ist aber zusätzlich ein Auf und Ab im 10-Hz-Rhythmus überlagert.</p>
+        <p>Bei der eben beschriebenen Erzeugung der LFO-Kurvenformen tritt bei etwas höheren Frequenzen, etwa ab 10 Hz, noch ein interessantes Phänomen auf. Man kann die Erzeugung eines Sägezahnverlaufs durch zyklisches Hochzählen eines Wortes auch als Abtastung einer hypothetischen, kontinuierlichen Sägezahnkurfe auffassen. Die Abtastfrequenz ist in unserem Fall mit 60 Hz fest. Die Frequenz der hypothetischen Sägezahnkurve kann man aber durch den Parameter LFOF sehr feinstufig zwischen 0 und 60 Hz variieren. Wie soll aber zum Beispiel eine LFO-Kurve mit 50 Hz aussehen, wenn man nur 60 Abtastwerte pro Sekunde hat? Die Antwort gibt Bild 4. Man erhält den gestrichelten Verlauf mit einer Frequenz von nur 10 Hz. Noch seltsamer sieht das Resultat bei einer LFO-Frequenz von 25 Hz aus. Die Folge der Abtastwerte schwingt zwar ungefähr im Rhythmus von 25 Hz, dieser Bewegung ist aber zusätzlich ein Auf und Ab im 10-Hz-Rhythmus überlagert.</p>
 
         <figure>
             <img src="152-4.png" alt="">
@@ -174,7 +226,7 @@
 
         <h3>Wie es weitergeht</h3>
 
-        <p>Nach diesem etwas anstrengenden theoretischen Teil werden wir uns in der nächsten Folge wieder der Tonerzeugung selbst zuwenden. Zunächst werden noch der Hüllkurvengenerator und der Portamento-Mechanismus von Modulator beschrieben, anschließend wird ein komfortables Editorprogramm vorgestellt, das ein schnelles, interaktives Manipuleren aller Modulator- und SID-Parameter ermöglicht. Mit dem Programm kann direkt über die Tastatur gespielt werden, und es können Sound-Parametersätze auf Diskette verwaltet werden. Dieses Programm soll dann in einer weiteren Folge zu einem kompletten dreistimmigen Sequenzer erweitert werden. Als Besonderheit wird dieses Programm unabhängige Melodier/ Sound-Files erzeugen können, die für sich allein lauffähig sind. Die so erstellten Klangschöpfungen können dann in andere Programme eingebaut werden.</p>
+        <p>Nach diesem etwas anstrengenden theoretischen Teil werden wir uns in der nächsten Folge wieder der Tonerzeugung selbst zuwenden. Zunächst werden noch der Hüllkurvengenerator und der Portamento-Mechanismus von Modulator beschrieben, anschließend wird ein komfortables Editorprogramm vorgestellt, das ein schnelles, interaktives Manipuleren aller Modulator- und SID-Parameter ermöglicht. Mit dem Programm kann direkt über die Tastatur gespielt werden, und es können Sound-Parametersätze auf Diskette verwaltet werden. Dieses Programm soll dann in einer weiteren Folge zu einem kompletten dreistimmigen Sequenzer erweitert werden. Als Besonderheit wird dieses Programm unabhängige Melodier/Sound-Files erzeugen können, die für sich allein lauffähig sind. Die so erstellten Klangschöpfungen können dann in andere Programme eingebaut werden.</p>
 
         <address class="author">(Thomas Krätzig/aa)</address>
 
