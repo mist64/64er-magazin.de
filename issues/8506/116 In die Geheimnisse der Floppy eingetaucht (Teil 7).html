@@ -34,7 +34,7 @@
 
         <h2>Was macht die GCR-Codierung</h2>
 
-        <p>Das Lesen von Bytes durch den Lesekopfes steuert ein Timer des Disk-Controllers. Auf der Diskette selbst wird jedes »l«-Bit physikalisch durch einen Wechsel der Magnetisierungsrichtung dargestellt und ein »0«-Bit durch gleichbleibende Richtung der Magnetisierung. Bild 1 zeigt, was gemeint ist. Soll ein Byte von Diskette gelesen werden, so wartet der Disk-Controller einfach die Zeitspanne ab, die zum Lesen von acht Bits erforderlich ist. Innerhalb dieser Zeit liest der Schreib-/Lesekopf eine gewisse Folge von Magnetisierungswechseln und Nicht-Magnetisierungswechseln.</p>
+        <p>Das Lesen von Bytes durch den Lesekopfes steuert ein Timer des Disk-Controllers. Auf der Diskette selbst wird jedes »1«-Bit physikalisch durch einen Wechsel der Magnetisierungsrichtung dargestellt und ein »0«-Bit durch gleichbleibende Richtung der Magnetisierung. Bild 1 zeigt, was gemeint ist. Soll ein Byte von Diskette gelesen werden, so wartet der Disk-Controller einfach die Zeitspanne ab, die zum Lesen von acht Bits erforderlich ist. Innerhalb dieser Zeit liest der Schreib-/Lesekopf eine gewisse Folge von Magnetisierungswechseln und Nicht-Magnetisierungswechseln.</p>
 
         <figure>
             <img src="116-1.png" alt="">
@@ -47,11 +47,11 @@
 
         <p>Das Erkennen eines Bits geschieht dabei völlig zeitgesteuert. Der Disk-Controller »weiß«, daß er zum Lesen eines Bits eine bestimmte Zeit warten muß. Danach gilt das Bit als gelesen, und es wird eine »1« oder eine »0« bereitgestellt, je nachdem, ob ein Magnetisierungswechsel stattgefunden hat oder nicht.</p>
 
-        <p>Praktisch könnte man das folgendermaßen beschreiben: Sie machen mit einem Freund eine Zeit von 10 Sekunden aus. Er hat dann die Aufgabe innerhalb dieser 10 Sekunden entweder zu pfeifen oder nicht. Danach warten Sie diese 10 Sekunden ab. Hat er während dieser Zeit gepfiffen, dann entspricht das einem Magnetisierungswechsel. Hat er innerhalb der 10 Sekunden nicht gepfiffen, bedeutet das ein »O«-Bit, also keinen Magnetisierungswechsel. Da eine Diskette im Laufwerk nicht absolut gleichmäßig gedreht werden kann, also Drehzahlschwankungen unterliegt, muß noch für eine Kompensation der mechanischen Fehler gesorgt werden. Dazu wird der Timer, der die abzuwartende Zeit für jedes Bit bestimmt, bei jedem Magnetisierungswechsel neu getriggert (gestellt). Ein »l«-Bit hat also neben seinem Informationsgehalt noch die wichtige Aufgabe, Laufwerksschwankungen auszugleichen, um Lesefehler zu verhindern. Aus diesem Grund darf es zum Beipiel nicht passieren, daß mehrere $00-Bytes hintereinander auf der Diskette stehen, da sonst zu lange keine Laufwerkskontrolle mehr stattfinden könnte.</p>
+        <p>Praktisch könnte man das folgendermaßen beschreiben: Sie machen mit einem Freund eine Zeit von 10 Sekunden aus. Er hat dann die Aufgabe innerhalb dieser 10 Sekunden entweder zu pfeifen oder nicht. Danach warten Sie diese 10 Sekunden ab. Hat er während dieser Zeit gepfiffen, dann entspricht das einem Magnetisierungswechsel. Hat er innerhalb der 10 Sekunden nicht gepfiffen, bedeutet das ein »0«-Bit, also keinen Magnetisierungswechsel. Da eine Diskette im Laufwerk nicht absolut gleichmäßig gedreht werden kann, also Drehzahlschwankungen unterliegt, muß noch für eine Kompensation der mechanischen Fehler gesorgt werden. Dazu wird der Timer, der die abzuwartende Zeit für jedes Bit bestimmt, bei jedem Magnetisierungswechsel neu getriggert (gestellt). Ein »1«-Bit hat also neben seinem Informationsgehalt noch die wichtige Aufgabe, Laufwerksschwankungen auszugleichen, um Lesefehler zu verhindern. Aus diesem Grund darf es zum Beipiel nicht passieren, daß mehrere $00-Bytes hintereinander auf der Diskette stehen, da sonst zu lange keine Laufwerkskontrolle mehr stattfinden könnte.</p>
 
-        <p>Aber auch zuviele »l«-Bits sind nicht gestattet, da mehr als acht »l«-Bits ein SYNC-Signal auslösen.</p>
+        <p>Aber auch zuviele »1«-Bits sind nicht gestattet, da mehr als acht »1«-Bits ein SYNC-Signal auslösen.</p>
 
-        <p>Aus den genannten Gründen werden alle Daten, die auf die Diskette geschrieben werden, vorher GCR-codiert. Mit dieser Codierung wird ausgeschlossen, daß mehr als acht »l«-Bits und mehr als zwei »O«-Bits direkt hintereinander auf die Diskette geschrieben werden und so die Schreib- und Lese-Elektronik durcheinanderbringen.</p>
+        <p>Aus den genannten Gründen werden alle Daten, die auf die Diskette geschrieben werden, vorher GCR-codiert. Mit dieser Codierung wird ausgeschlossen, daß mehr als acht »1«-Bits und mehr als zwei »0«-Bits direkt hintereinander auf die Diskette geschrieben werden und so die Schreib- und Lese-Elektronik durcheinanderbringen.</p>
 
         <p>Einzig und allein die SYNC-Markierungen (mehr als acht »1«-Bits) werden vom DOS (Disk Operating System, Controller) uncodiert auf die Diskette geschrieben.</p>
 
@@ -59,8 +59,10 @@
 
         <p>Man kann also zwischen zwei Schreibarten auf Diskette unterscheiden:</p>
 
-        <p>1) Schreiben von Markierungen. Hier werden fünf $FF-Bytes direkt hintereinander auf die Diskette geschrieben, um eine SYNC-Markierung zu bilden, die der Orientierung dient.<br>
-            2) Schreiben von Daten.</p>
+        <ol>
+            <li>Schreiben von Markierungen. Hier werden fünf $FF-Bytes direkt hintereinander auf die Diskette geschrieben, um eine SYNC-Markierung zu bilden, die der Orientierung dient.</li>
+            <li>Schreiben von Daten.</li>
+        </ol>
 
         <p>In diesem Modus werden Byte-Inhalte codiert, um sich von den Markierungen zu unterscheiden.</p>
 
@@ -76,7 +78,7 @@
 
 
         <figure>
-            <table>
+            <table class="plain">
                 <tbody>
                     <tr>
                         <th><b>Hexadezimal</b></th>
@@ -169,7 +171,7 @@
                 für Binär-GCR-Umwandlung</figcaption>
         </figure>
 
-        <p>Wir wandeln diese vier Hex-Bytes nun in die entsprechenden fünf GCR-Bytes um, indem wir in Tabelle 1 nachsehen,was die entsprechenden GCR-Äquivalente dieser Bytes sind. Wir kommen zu folgendem Ergebnis:</p>
+        <p>Wir wandeln diese vier Hex-Bytes nun in die entsprechenden fünf GCR-Bytes um, indem wir in Tabelle 1 nachsehen, was die entsprechenden GCR-Äquivalente dieser Bytes sind. Wir kommen zu folgendem Ergebnis:</p>
 
         <table class="plain">
             <tr>
@@ -200,13 +202,16 @@
         </table>
 
 
-        <p>Die binär dargestellten GCR-Werte müssen wir jetzt nur noch zu fünf Bytes zusammenfassen, um auf folgendes Ergebnis zu kommen:<br>
-            1010 + 1101 = AD<br>
-            (<strong>1010 1 + 101</strong> 01)<br>
-            0110 + 1011 = 6B<br>
-            0101 + 1010 = 5A<br>
-            1101 + 0110 = D6<br>
-            1011 + 0101 = B5</p>
+        <p>Die binär dargestellten GCR-Werte müssen wir jetzt nur noch zu fünf Bytes zusammenfassen, um auf folgendes Ergebnis zu kommen:</p>
+
+        <ul class="plain">
+            <li>1010 + 1101 = AD</li>
+            <li>(<strong>1010 1 + 101</strong> 01)</li>
+            <li>0110 + 1011 = 6B</li>
+            <li>0101 + 1010 = 5A</li>
+            <li>1101 + 0110 = D6</li>
+            <li>1011 + 0101 = B5</li>
+        </ul>
 
         <p>Vier $FF-Bytes werden also bei der GCR-Codierung in die fünf Bytes $AD, $6B, $5A, $D6 und $B5 umgewandelt, und Sie können sich jetzt leicht davon überzeugen, daß diese fünf Bytes für den Disk-Controller absolut ungefährlich und unkritisch sind, und daß sie die vorgeschriebenen Normen (nicht mehr als zwei »0«-Bytes und nicht mehr als acht »1«-Bytes) erfüllen.</p>
 
@@ -234,13 +239,13 @@
 
         <p>Wird nun ein Datenblock in Puffer 1 ($0400-$04FF) codiert, so werden die ersten 68 GCR-Bytes in den Ausweichpuffer übernommen. Die restlichen Bytes stehen in Puffer 1.</p>
 
-        <p>Aus den 256 Bytes an Information macht das DOS durch die Konvertierung also 324 Bytes, die einen gesamten Datenblock darstellen (inklusive Prüfsumme). Natürlich werden auch die Parameter im Datenblockheader (ID, Track, Sektor, Prüfsumme und Kennzeichen) vor dem Schreiben auf die Diskette in GCR-Bytesumgewandelt, wobei der Blockheader dann mit den zwei Lückenbytes auf eine Länge von zehn GCR-Bytes anwächst, da der Header aus ursprünglich acht Hex-Werten besteht.</p>
+        <p>Aus den 256 Bytes an Information macht das DOS durch die Konvertierung also 324 Bytes, die einen gesamten Datenblock darstellen (inklusive Prüfsumme). Natürlich werden auch die Parameter im Datenblockheader (ID, Track, Sektor, Prüfsumme und Kennzeichen) vor dem Schreiben auf die Diskette in GCR-Bytes umgewandelt, wobei der Blockheader dann mit den zwei Lückenbytes auf eine Länge von zehn GCR-Bytes anwächst, da der Header aus ursprünglich acht Hex-Werten besteht.</p>
 
         <p>Zusammenfassend besteht ein Sektor auf der Diskette aus den fünf Bytes der ersten SYNC-Markierung; danach folgen die zehn Bytes des Blockheaders. Vor der SYNC-Markierung des Datenblocks folgen jedoch noch neun $55-Bytes, die der GCR-Norm entsprechen und direkt auf die Diskette geschrieben werden. Sie dienen als Pufferlücke, in der dem Disk-Controller Zeit bleibt, zwischen Schreiben und Lesen umzuschalten.</p>
 
         <p>Nach den fünf Bytes der SYNC-Markierung folgen die 324 Bytes des Datenblocks inklusive dessen Prüfsumme und anschließend noch die Lücke zwischen zwei Sektoren, die erfahrungsgemäß zwischen acht und zwölf Bytes lang ist. Wie Sie sehen hat also so ein Sektor auf der Diskette die stattliche Länge von 361 bis 365 Bytes.</p>
 
-        <p>Jetzt werden Ihnen bestimmt auch ein paar zweifelhafte JSR-Befehle in der letzten Folge des Floppy-Kurses klar: bei dem Formatiersystem in Ausgabe 5/ 1985, wird einmal ein Befehl JSR $FE30 und an anderer Stelle ein Befehl JSR $F78F ausgeführt. Diese Adressen sind die Einsprünge der Codier-Routinen.</p>
+        <p>Jetzt werden Ihnen bestimmt auch ein paar zweifelhafte JSR-Befehle in der letzten Folge des Floppy-Kurses klar: bei dem Formatiersystem in Ausgabe 5/1985, wird einmal ein Befehl JSR $FE30 und an anderer Stelle ein Befehl JSR $F78F ausgeführt. Diese Adressen sind die Einsprünge der Codier-Routinen.</p>
 
         <p>Vielleicht kommt Ihnen auch noch einmal die Herstellung eines Killertracks in Erinnerung. Hier wird ein gesamter Track direkt mit $FF-Bytes vollgeschrieben und stellt so eine »Riesen-SYNC-Markierung« dar. Da eine solche Bitfolge jedoch unzulässig ist, kommt die Lese- und Schreibelektronik der Floppy völlig aus dem Konzept; der Controller »stürzt ab«.</p>
 

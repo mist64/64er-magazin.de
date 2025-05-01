@@ -30,13 +30,13 @@
 
         <p>10 A1 = PEEK(61):B1 = PEEK(62)</p>
 
-        <p>Mit »A1 = PEEK(61)« wird der Variablen Al der Wert des LOW-Bytes des Zeigers 61/62 zugewiesen. Dieser zeigt am Anfang einer Zeile auf das 0-Byte vor der Linkadresse (hier 2048), so daß A1 den Wert (2048 AND 255) = 0 erhält. Mit »B1 = PEEK (62)« wird der Variablen B1 der Wert des High-Bytes des Zeigers 61/62 zugewiesen. Dieser zeigt aber inzwischen auf das Trennzeichen (»:«) zwischen den beiden Befehlen (hier 2061), so daß B1 den Wert (INT(2061/ 256)) = 8 erhält. Als Zeiger auf das aktuelle DATA-Element erhalten wir die erwartete Adresse (A1 + B1*256) = 2048.</p>
+        <p>Mit »A1 = PEEK(61)« wird der Variablen A1 der Wert des LOW-Bytes des Zeigers 61/62 zugewiesen. Dieser zeigt am Anfang einer Zeile auf das 0-Byte vor der Linkadresse (hier 2048), so daß A1 den Wert (2048 AND 255) = 0 erhält. Mit »B1 = PEEK (62)« wird der Variablen B1 der Wert des High-Bytes des Zeigers 61/62 zugewiesen. Dieser zeigt aber inzwischen auf das Trennzeichen (»:«) zwischen den beiden Befehlen (hier 2061), so daß B1 den Wert (INT(2061/ 256)) = 8 erhält. Als Zeiger auf das aktuelle DATA-Element erhalten wir die erwartete Adresse (A1 + B1*256) = 2048.</p>
 
         <p>Was aber, wenn Zeilenanfang und Trennzeichen nicht in derselben Page liegen? Dazu setzen Sie bitte den Basic-Anfang um eine Stelle zurück:</p>
 
         <p>POKE 43,0:POKE 2047,0:NEW</p>
 
-        <p>Die Zeiger auf den Zeilenanfang und das Trennzeichen werden dadurch ja ebenfalls verändert, so daß Al jetzt den Wert (2047 AND 255) = 255 und B1 den Wert (INT(2060/256)) = 8 erhält. Als Zeiger auf das aktuelle DATA-Element erhalten wir nun die völlig unbrauchbare Adresse (Al + B1*256) = 2303.</p>
+        <p>Die Zeiger auf den Zeilenanfang und das Trennzeichen werden dadurch ja ebenfalls verändert, so daß A1 jetzt den Wert (2047 AND 255) = 255 und B1 den Wert (INT(2060/256)) = 8 erhält. Als Zeiger auf das aktuelle DATA-Element erhalten wir nun die völlig unbrauchbare Adresse (A1 + B1*256) = 2303.</p>
 
         <p>Das korrigierte Demo-Programm könnte wie folgt aussehen:</p>
 
@@ -71,7 +71,7 @@
             </tr>
             <tr>
                 <td>80</td>
-                <td>POKE 65,A1 AND 255: POKE 66,Al/256: READ A$:PRINT A$</td>
+                <td>POKE 65,A1 AND 255: POKE 66,A1/256: READ A$:PRINT A$</td>
             </tr>
             <tr>
                 <td>90</td>
@@ -93,67 +93,68 @@
 
         <p>Der dritte Anschluß des Computers nämlich der RS232 oder User-Port benutzt für den Status die Speicherzelle 663. Jedes Bit der Zelle 144 hat eine eigene Bedeutung.</p>
 
-        <table>
-            <tbody>
-                <tr>
-                    <th colspan="3">Kassette:</th>
-                </tr>
-                <tr>
-                    <td>Bit 2</td>
-                    <td>(Wert 4)</td>
-                    <td>Kurzer Block</td>
-                </tr>
-                <tr>
-                    <td>Bit 3</td>
-                    <td>(Wert 8)</td>
-                    <td>Langer Block</td>
-                </tr>
-                <tr>
-                    <td>Bit 4</td>
-                    <td>(Wert 16)</td>
-                    <td>Lesefehler (nicht korrigierbar)</td>
-                </tr>
-                <tr>
-                    <td>Bit 5</td>
-                    <td>(Wert 32)</td>
-                    <td>Prüfsummenfehler</td>
-                </tr>
-                <tr>
-                    <td>Bit 6</td>
-                    <td>(Wert 64)</td>
-                    <td>File-Ende</td>
-                </tr>
-                <tr>
-                    <td>Bit 7</td>
-                    <td>(Wert 128)</td>
-                    <td>Band-Ende</td>
-                </tr>
-                <tr>
-                    <th colspan="3">Floppy/Drucker:</th>
-                </tr>
-                <tr>
-                    <td>Bit 0</td>
-                    <td>(Wert 1)</td>
-                    <td>Fehler beim Schreiben</td>
-                </tr>
-                <tr>
-                    <td>Bit 1</td>
-                    <td>(Wert 2)</td>
-                    <td>Fehler beim Lesen</td>
-                </tr>
-                <tr>
-                    <td>Bit 6</td>
-                    <td>(Wert 64)</td>
-                    <td>Daten-Ende</td>
-                </tr>
-                <tr>
-                    <td>Bit 7</td>
-                    <td>(Wert 128)</td>
-                    <td>»Device Not Present«-Fehler</td>
-                </tr>
-            </tbody>
-        </table>
-
+        <figure>
+            <table class="plain">
+                <tbody>
+                    <tr>
+                        <td colspan="3">Kassette:</td>
+                    </tr>
+                    <tr class="strong">
+                        <td style="padding-left: 1em">Bit 2</td>
+                        <td>(Wert 4)</td>
+                        <td>Kurzer Block</td>
+                    </tr>
+                    <tr class="strong">
+                        <td style="padding-left: 1em">Bit 3</td>
+                        <td>(Wert 8)</td>
+                        <td>Langer Block</td>
+                    </tr>
+                    <tr class="strong">
+                        <td style="padding-left: 1em">Bit 4</td>
+                        <td>(Wert 16)</td>
+                        <td>Lesefehler (nicht korrigierbar)</td>
+                    </tr>
+                    <tr class="strong">
+                        <td style="padding-left: 1em">Bit 5</td>
+                        <td>(Wert 32)</td>
+                        <td>Prüfsummenfehler</td>
+                    </tr>
+                    <tr class="strong">
+                        <td style="padding-left: 1em">Bit 6</td>
+                        <td>(Wert 64)</td>
+                        <td>File-Ende</td>
+                    </tr>
+                    <tr class="strong">
+                        <td style="padding-left: 1em">Bit 7</td>
+                        <td>(Wert 128)</td>
+                        <td>Band-Ende</td>
+                    </tr>
+                    <tr>
+                        <td colspan="3">Floppy/Drucker:</td>
+                    </tr>
+                    <tr class="strong">
+                        <td style="padding-left: 1em">Bit 0</td>
+                        <td>(Wert 1)</td>
+                        <td>Fehler beim Schreiben</td>
+                    </tr>
+                    <tr class="strong">
+                        <td style="padding-left: 1em">Bit 1</td>
+                        <td>(Wert 2)</td>
+                        <td>Fehler beim Lesen</td>
+                    </tr>
+                    <tr class="strong">
+                        <td style="padding-left: 1em">Bit 6</td>
+                        <td>(Wert 64)</td>
+                        <td>Daten-Ende</td>
+                    </tr>
+                    <tr class="strong">
+                        <td style="padding-left: 1em">Bit 7</td>
+                        <td>(Wert 128)</td>
+                        <td>»Device Not Present«-Fehler</td>
+                    </tr>
+                </tbody>
+            </table>
+        </figure>
 
         <p>Alle nicht aufgeführten Bits sind nicht benutzt.</p>
 
@@ -176,9 +177,11 @@
             <figcaption>Bild 2. Tastenanordnung des C 64</figcaption>
         </figure>
 
-        <p>Es ist sicher verständlich, daß auf diese Weise nicht nur die STOPTaste, sondern alle Tasten der Spalte 127 (247) abgefragt werden können. Ein kleines Demonstrationsprogramm kann das beweisen:<br>
-            10 PRINT PEEK (656321); PEEK (145)<br>
-            20 GOTO 10</p>
+        <p>Es ist sicher verständlich, daß auf diese Weise nicht nur die STOP-Taste, sondern alle Tasten der Spalte 127 (247) abgefragt werden können. Ein kleines Demonstrationsprogramm kann das beweisen:
+            <code>10 PRINT PEEK (656321); PEEK (145)
+                20 GOTO 10
+            </code>
+        </p>
 
         <p>Beim VC 20 ist statt 56321 natürlich 37153 einzusetzen.</p>
 
@@ -194,7 +197,7 @@
 
         <h2>Adresse 147 ($93)<br>Flagge für LOAD oder VERIFY</h2>
 
-        <p>Diese Flagge dient dem. Betriebssystem, um zu unterscheiden, ob eine LOAD-Operation nur LOADen oder aber VERIFYen soll.</p>
+        <p>Diese Flagge dient dem Betriebssystem, um zu unterscheiden, ob eine LOAD-Operation nur LOADen oder aber VERIFYen soll.</p>
 
         <p>Sie ist identisch mit der Flagge des Basic-Übersetzers in Speicherzelle 10. Genauere Hinweise bitte ich der Beschreibung von Zelle 10 in Ausgabe 12/84, Seite 132 zu entnehmen.</p>
 
@@ -225,7 +228,7 @@
         <table class="plain">
             <tr>
                 <td>10</td>
-                <td>FOR K = 1O TO 22</td>
+                <td>FOR K = 10 TO 22</td>
             </tr>
             <tr>
                 <td>20</td>
@@ -253,10 +256,10 @@
 
         <p>In der 10. Zeile sehen wir jetzt die 10 als Inhalt von 152 und als neue Dateinummer (K) wieder die 10. Das Programm bleibt aber stehen und meldet FILE OPEN. Es hat recht, denn die Datei 10 ist bereits als erste eröffnet, aber nicht wieder geschlossen worden.</p>
 
-        <p>Das Betriebssystem macht das so, daß jede der Dateinummern in eine Tabelle geschrieben wird, die in den Speicherzellen 601 bis 610 stehen. Bei jedem OPEN-Befehl wird dort nachgeschaut, ob die Filenummer existiert. Wenn ja wird die Fehlermeldung FILE OPEN ERROR ausgegeben. Beijedem CLOSE-Befehl wird die entsprechende Nummer aus der Tabelle gelöscht.</p>
+        <p>Das Betriebssystem macht das so, daß jede der Dateinummern in eine Tabelle geschrieben wird, die in den Speicherzellen 601 bis 610 stehen. Bei jedem OPEN-Befehl wird dort nachgeschaut, ob die Filenummer existiert. Wenn ja wird die Fehlermeldung FILE OPEN ERROR ausgegeben. Bei jedem CLOSE-Befehl wird die entsprechende Nummer aus der Tabelle gelöscht.</p>
 
-        <p>Wir können aber auch eine 0 in die Speicherzelle 152 POKEn, wodurch dem Betriebssystem vorgegaukelt wird, daß keine Datei eröffnet ist. Schieben Sie im Programm einfach die Zeile ein:<br>
-            45 POKE 152,0<br>
+        <p>Wir können aber auch eine 0 in die Speicherzelle 152 POKEn, wodurch dem Betriebssystem vorgegaukelt wird, daß keine Datei eröffnet ist. Schieben Sie im Programm einfach die Zeile ein:
+            <code>45 POKE 152,0</code>
             und das Programm läuft ewig weiter.</p>
 
         <p>Die Speicherzelle 152 ist also der Wächter über die Anzahl der eröffneten Dateien. Steht sie auf 0, dann wird eine Neueröffnung am Anfang der Tabelle ab 601 eingetragen. Die Tabelle ihrerseits ist der Wächter über Exklusivität der Dateinummern. Ich zeige Ihnen das noch genauer, wenn wir zu 601 kommen.</p>
@@ -318,7 +321,7 @@
 
             <p>Jetzt kommt der Lesevorgang:</p>
 
-            <table class="plain">
+            <table class="plain right0">
                 <tr>
                     <td>50</td>
                     <td>OPEN 2,1,0"DATEI"</td>
@@ -345,7 +348,7 @@
                 </tr>
             </table>
 
-            <p>In Zeile 50 eröffnen wir wieder eine Datei (diesmal Nummer 2) für die Datasette, jetzt aberzum Lesen(Sekundäradresse = 0). Die Schleife der Zeilen 60 und 90 schreiben uns 10 mal ein Zeichen (A$) und den Wert von ST auf den Bildschirm.</p>
+            <p>In Zeile 50 eröffnen wir wieder eine Datei (diesmal Nummer 2) für die Datasette, jetzt aber zum Lesen (Sekundäradresse = 0). Die Schleife der Zeilen 60 und 90 schreiben uns 10 mal ein Zeichen (A$) und den Wert von ST auf den Bildschirm.</p>
 
             <p>Jetzt geht es los. Mit RUN starten wir den ersten Teil des Programms. Nach dem Schreibvorgang und der READY-Meldung (nach Zeile 40) müssen Sie das Band zurückspulen und mit GOTO 50 ab Zeile 50 weiterfahren. Jetzt wird die Datei gelesen.</p>
 
@@ -395,8 +398,9 @@
 
             <p>Der Prüfsummenfehler tritt dann auf, wenn eine der Überprüfungen von Kassettenoperationen einen Fehler gefunden hat. Der Blockfehler, auch der des zu langen Blocks, interessiert wohl weniger. Aber ein durch die Prüfungen gefundener Fehler könnte, frühzeitig noch vor dem Ausstieg des Programms entdeckt, abgefangen und ausgenutzt werden.</p>
 
-            <p>Die Formel dafür, ins obige Program eingebaut ist:<br>
-                85 IF ST<64 OR ST>8 THEN..(zum Beispiel LIST)</p>
+            <p>Die Formel dafür, ins obige Program eingebaut ist:
+                <code>85 IF ST&lt;64 OR ST&gt;8 THEN..(zum Beispiel LIST)</code>
+            </p>
 
             <p>Statt LIST kann man natürlich auch etwas anderes nehmen.</p>
 
@@ -404,7 +408,7 @@
 
             <p>Bei der Floppy bedeutet ST = 64, »Daten-Ende«, das ist etwa dasselbe wie bei der Datasette. Um es zu überprüfen nehmen wir dasselbe Programm wie vorher, nur müssen wir die Datei-Zeilen der Floppy anpassen. Das sieht dann so aus:</p>
 
-            <table class="plain">
+            <table class="plain right0">
                 <tr>
                     <td>10</td>
                     <td>OPEN 1,8,1,"DATEI,S,W"</td>
@@ -447,10 +451,13 @@
                 </tr>
             </table>
 
-            <p>Das Ergebnis sieht hier so aus:<br>
-                64<br>
-                66<br>
-                66</p>
+            <p>Das Ergebnis sieht hier so aus:</p>
+
+            <ul class="plain">
+                <li>64</li>
+                <li>66</li>
+                <li>66</li>
+            </ul>
 
             <p>Die 64 ist natürlich wie erwartet der »Wert« für Daten-Ende. Die 66 ist 64 + 2, entstanden dadurch, daß wir über das Datenende hinausgelesen haben. Die 2 bedeutet »Fehler beim Lesen« (in den englischen Beschreibungen heißt es »Read Time Out«). Ähnliches gilt für ST = 1, das bededutet »Fehler beim Schreiben« (englisch: Write Time Out), nur weiß ich leider nicht, wie es vorzuführen ist. Wie bei der Datasette kann das Überlesen natürlich mit der Abfrage IF ST=64 THEN&hellip;und GOTO&hellip; gestoppt werden.</p>
 
