@@ -47,16 +47,18 @@
 
         <p>So, nun wird es etwas komplizierter. Als nächstes wollen wir einzelne Files kurzzeitig »wiederbeleben«. Dazu brauchen wir aber die Block-Lese- und Schreib-Befehle.</p>
 
-        <p>Im folgenden benötigen wir eine leere Diskette. Dann speichern wir das zu sichernde Programm ab und danach ein Ladeprogramm, über das gleich noch zu reden sein wird. Wichtig ist, daß diese Reihenfolge streng eingehalten wird. Und nun benutzen wir den Scratch-Befehl der Floppy, um das erste File, also das Hauptprogramm, wieder zu löschen. Warnung! Ab sofort dürfen keine Schreibzugriffe mehr auf diese Diskette ausgeführt werden. Im Directory ist jetzt also nur das zweite File, der Lader, verzeichnet? Weit gefehlt: Das erste File steht jetzt immer noch auf der Diskette und im Diskettendirectory, allerdings mit dem Filetyp *DEL. Der Stern vor dem DEL ist ebenfalls kein Druckfehler, sondern bedeutet in der Directory-Sprache, daß ein nicht ordnungsgemäß geschlossenes File vorliegt. Solche Sternchen findet man meist bei sequentiellen Dateien, wenn man einen Fehler gemacht hat, oder bei Programm-Files, wenn diese nicht mehr auf die Diskette paßten. Und da sich unsere Floppy intelligent schimpft, unterschlägt sie die *DEL-Einträge beim Laden von Directories in den Computerspeicher, um uns nicht mit nicht mehr vorhandenen Files nerven zu müssen. Natürlich ist das File auch noch auf der Diskette vorhanden. Um es wieder zu regenerieren, muß das Filetyp-Byte des Eintrages auf den Wert 130 ($82) gesetzt werden. Beim ersten Eintrag ist das Filetyp-Byte das Byte Nummer 2 (also das dritte! Zählungen beginnen bei Computern grundsätzlich bei Null) im Block Track 18, Sektor 1. Im Lader sollte nun in etwa folgende Befehlssequenz stehen:<br>
-            OPEN 3,4,3,"#"<br>
-            OPEN 15,8,15<br>
-            PRINT#15,"U1:3 0 18 1"<br>
-            PRINT#15,"B-P:3 2"<br>
-            PRINT#3,CHR$(130)<br>
-            PRINT#15,"U2:3 0 18 1"<br>
-            PRINT#15,"I"<br>
-            CLOSE 15,3<br>
-            LOAD":*",8</p>
+        <p>Im folgenden benötigen wir eine leere Diskette. Dann speichern wir das zu sichernde Programm ab und danach ein Ladeprogramm, über das gleich noch zu reden sein wird. Wichtig ist, daß diese Reihenfolge streng eingehalten wird. Und nun benutzen wir den Scratch-Befehl der Floppy, um das erste File, also das Hauptprogramm, wieder zu löschen. Warnung! Ab sofort dürfen keine Schreibzugriffe mehr auf diese Diskette ausgeführt werden. Im Directory ist jetzt also nur das zweite File, der Lader, verzeichnet? Weit gefehlt: Das erste File steht jetzt immer noch auf der Diskette und im Diskettendirectory, allerdings mit dem Filetyp *DEL. Der Stern vor dem DEL ist ebenfalls kein Druckfehler, sondern bedeutet in der Directory-Sprache, daß ein nicht ordnungsgemäß geschlossenes File vorliegt. Solche Sternchen findet man meist bei sequentiellen Dateien, wenn man einen Fehler gemacht hat, oder bei Programm-Files, wenn diese nicht mehr auf die Diskette paßten. Und da sich unsere Floppy intelligent schimpft, unterschlägt sie die *DEL-Einträge beim Laden von Directories in den Computerspeicher, um uns nicht mit nicht mehr vorhandenen Files nerven zu müssen. Natürlich ist das File auch noch auf der Diskette vorhanden. Um es wieder zu regenerieren, muß das Filetyp-Byte des Eintrages auf den Wert 130 ($82) gesetzt werden. Beim ersten Eintrag ist das Filetyp-Byte das Byte Nummer 2 (also das dritte! Zählungen beginnen bei Computern grundsätzlich bei Null) im Block Track 18, Sektor 1. Im Lader sollte nun in etwa folgende Befehlssequenz stehen:
+            <code>OPEN 3,4,3,"#"
+                OPEN 15,8,15
+                PRINT#15,"U1:3 0 18 1"
+                PRINT#15,"B-P:3 2"
+                PRINT#3,CHR$(130)
+                PRINT#15,"U2:3 0 18 1"
+                PRINT#15,"I"
+                CLOSE 15,3
+                LOAD":*",8
+            </code>
+        </p>
 
         <p>Der letzte LOAD-Befehl lädt nun nicht, wie man bei einem Blick auf das Directory vermuten würde, das Ladeprogramm, sondern das Hauptprogramm, das wir jetzt regeneriert haben. Wichtig ist, daß die Diskette vor dem Laden des Hauptprogramms initialisiert wird. Die Floppy merkt sich nämlich immer einige Teile des Directories, und liest diese gar nicht erst von der Diskette, wenn ein Directory vom Computer abgerufen wird. Die Folge wäre, daß wir immer noch nicht mit dem alten Directory arbeiten, obwohl schon das neue auf der Diskette steht. Beim Initialisieren werden dann allerdings die internen Zwischenspeicher der Laufwerks aktualisiert.</p>
 

@@ -21,7 +21,7 @@
         <h1>HI-EDDI — Druckerroutinen</h1>
         <p class="intro">Schon lange warten HI-EDDI-Besitzer auf eine Anpassung für ihren Drucker. Die in Ausgabe 1/85 abgedruckte Version ließ eine Superhardcopy nur für den Epson zu. Doch jetzt kommen auch Besitzer von Commodore-Drucker in den Genuß, HI-EDDI-Bilder ausgeben zu können.</p>
 
-        <p>Welcher 64’er Leser kennt ihn nicht—den HI-EDDI, das fantastische Zeichen- und Malprogramm aus Ausgabe 1/85. Jeder der einen Epson oder dazu kompatiblen Drucker besaß, kam sogar in den Genuß der ausgezeichneten Hardcopy-Funktion. Jetzt folgen Anpassungen für Drucker anderer Hersteller, diesmal für die Commodore-Drucker MPS 801/802/ 803 und kompatible. Für andere Drucker werden noch Lösungen gesucht.</p>
+        <p>Welcher 64’er Leser kennt ihn nicht—den HI-EDDI, das fantastische Zeichen- und Malprogramm aus Ausgabe 1/85. Jeder der einen Epson oder dazu kompatiblen Drucker besaß, kam sogar in den Genuß der ausgezeichneten Hardcopy-Funktion. Jetzt folgen Anpassungen für Drucker anderer Hersteller, diesmal für die Commodore-Drucker MPS 801/802/803 und kompatible. Für andere Drucker werden noch Lösungen gesucht.</p>
 
         <h2>Hi-EDDI für MPS 802 und kompatible</h2>
 
@@ -29,7 +29,7 @@
 
         <p>Die Antwort darauf veranlaßte mich dazu, die Anregung in der Funktionsbeschreibung aufzugreifen und eine Lösung für einen anderen Drucker zu suchen. Gesagt — getan, hier ist mein Lösungsvorschlag für den Commodore MPS-802 (Listing 1)</p>
 
-        <p>Die Druckerroutine hat dieselben Eigenschaften wie die in 1/85 veröffentlichte und von Hans Haberl geschriebene Routine für Epson-Drucker. Daher kann auf eine Funktionsbeschreibung verzichtet werden. Ich hoffe, daß der Ausdruck von Hl-EDDI-Grafikbildern mit diesem Programm auf allen Versionen des Commodore 1526/MPS-802 Druckers funktioniert. Bei meinerAusführung (REV 07C) konnte ich bis jetzt keine Fehler feststellen.</p>
+        <p>Die Druckerroutine hat dieselben Eigenschaften wie die in 1/85 veröffentlichte und von Hans Haberl geschriebene Routine für Epson-Drucker. Daher kann auf eine Funktionsbeschreibung verzichtet werden. Ich hoffe, daß der Ausdruck von HI-EDDI-Grafikbildern mit diesem Programm auf allen Versionen des Commodore 1526/MPS-802 Druckers funktioniert. Bei meiner Ausführung (REV 07C) konnte ich bis jetzt keine Fehler feststellen.</p>
 
         <address class="author">(Franz Illetschko/gk)</address>
 
@@ -49,113 +49,110 @@
         <h2>HI-EDDI mit der Datasette</h2>
 
         <p>Die Anpassung von HI-EDDI an die Datasette war doch nicht ganz so einfach wie zuerst gedacht. Hier sind die notwendigen Informationen. Die folgenden Listingsverweise beziehen sich auf 64’er, Ausgabe 1/85.</p>
-
-        <p>a) Am Listing 3 (HI-EDDI) folgende Änderungen vornehmen: In Zeile 50, 110 und 640 LOAD" .. ",8,1 durch LOAD".. ",1 ersetzen.</p>
-
-        <table class="plain">
-            <tr>
-                <td>160</td>
-                <td>ON A+1 GOSUB 290,250,300,290,290,600,290,290,500, 510,300:GOTO150</td>
-            </tr>
-            <tr>
-                <td>300</td>
-                <td>POKE8115,1:PRINT&hellip;</td>
-            </tr>
-            <tr>
-                <td>330</td>
-                <td>PRINT C$:POKE 780,ASC(C$):H$=W$:W$=" "</td>
-            </tr>
-            <tr>
-                <td>340</td>
-                <td>INPUT"{Cursor Down}FILENAME";W$:SYS 3331:W$=H$:H$=""</td>
-            </tr>
-            <tr>
-                <td>350</td>
-                <td>RETURN</td>
-            </tr>
-        </table>
-        <!-- TODO: new style for code tables with smaller font? -->
-
-        <p>Folgende Zeilen weglassen: 200-220, 400</p>
-
-        <p>b) Das so modifizierte Listing 3 als erstes auf die Programmkassette aufnehmen.<br>
-            c) Folgende Befehle im Direktmodus eingeben:</p>
-
-        <table class="plain">
-            <tr>
-                <td>NEW</td>
-            </tr>
-            <tr>
-                <td>POKE8192,0:POKE43,1:POKE44,32:NEW</td>
-            </tr>
-        </table>
-
-        <p>d) Den DATA-Lader (Listing 2) laden und folgende Änderungen vornehmen:</p>
-
-        <table class="plain">
-            <tr>
-                <td>9</td>
-                <td>:</td>
-            </tr>
-            <tr>
-                <td>10</td>
-                <td>:</td>
-            </tr>
-            <tr>
-                <td>50</td>
-                <td>D=H(H)*16 + H(L):S=S+D:POKEI,D</td>
-            </tr>
-            <tr>
-                <td>85</td>
-                <td>IF A&lt;0 THEN95</td>
-            </tr>
-            <tr>
-                <td>90</td>
-                <td>S=0:A=0:PRINT:NEXT</td>
-            </tr>
-            <tr>
-                <td>95</td>
-                <td>POKE43,0:POKE44,13:POKE45,76:POKE46,31</td>
-            </tr>
-            <tr>
-                <td>96</td>
-                <td>SAVE"HI-EXE",1,1:END</td>
-            </tr>
-        </table>
-
-        <p>e) Programmkassette einlegen (nach Listing 3) und Listing 2 starten. Wenn keine Fehler mehr drin sind, erzeugt der Lader auf der Kassette das Maschinenprogramm HI-EXE.<br>
-            f) HI-EDDI ist jetzt bereits lauffähig: Programmkassette zurückspulen, Computer kaltstarten, Listing 3 laden und starten. Das Maschinenprogramm wird nun geladen.<br>
-            g) Die HI-EDDI-Befehle LOAD und SAVE funktionieren ebenfalls, somit kann auch schon das Menü erstellt werden. Die fertige Menütafel (mit Listing 4 verbunden) sollte an dritter Stelle auf die Programmkassette aufgenommen werden.<br>
-            h) Hier die erforderlichen Änderungen am Listing 1: Zunächst wieder die POKEs wie unter c) eingeben und dann Listing 1 laden und folgende Änderungen vornehmen:</p>
-
-        <table class="plain">
-            <tr>
-                <td>720</td>
-                <td>FOR I = 3326 TO 3708</td>
-            </tr>
-            <tr>
-                <td>730</td>
-                <td>READA:IF A&lt;0THEN 730</td>
-            </tr>
-            <tr>
-                <td>740</td>
-                <td>POKEI,A:NEXT</td>
-            </tr>
-            <tr>
-                <td>750</td>
-                <td>POKE43,0:POKE44,13:POKE45,125:POKE46,14</td>
-            </tr>
-            <tr>
-                <td>760</td>
-                <td>SAVE"HI-PRINT",1,1</td>
-            </tr>
-            <tr>
-                <td>770</td>
-                <td>END</td>
-            </tr>
-        </table>
-
-        <p>i) Programmkassette einlegen (an 4. Stelle) und Listing 1 starten. Auf der Kassette wird nun das Maschinenprogramm Hl-PRINT erzeugt.</p>
+        
+        <ol type="a">
+            <li>Am Listing 3 (HI-EDDI) folgende Änderungen vornehmen: In Zeile 50, 110 und 640 LOAD" .. ",8,1 durch LOAD".. ",1 ersetzen.
+                <table class="plain">
+                    <tr>
+                        <td>160</td>
+                        <td>ON A+1 GOSUB 290,250,300,290,290,600,290,290,500, 510,300:GOTO150</td>
+                    </tr>
+                    <tr>
+                        <td>300</td>
+                        <td>POKE8115,1:PRINT&hellip;</td>
+                    </tr>
+                    <tr>
+                        <td>330</td>
+                        <td>PRINT C$:POKE 780,ASC(C$):H$=W$:W$=" "</td>
+                    </tr>
+                    <tr>
+                        <td>340</td>
+                        <td>INPUT"{Cursor Down}FILENAME";W$:SYS 3331:W$=H$:H$=""</td>
+                    </tr>
+                    <tr>
+                        <td>350</td>
+                        <td>RETURN</td>
+                    </tr>
+                </table>
+                <!-- TODO: new style for code tables with smaller font? -->
+                <p>Folgende Zeilen weglassen: 200-220, 400</p>
+            </li>
+            <li>Das so modifizierte Listing 3 als erstes auf die Programmkassette aufnehmen.</li>
+            <li>Folgende Befehle im Direktmodus eingeben:
+                <table class="plain">
+                    <tr>
+                        <td>NEW</td>
+                    </tr>
+                    <tr>
+                        <td>POKE8192,0:POKE43,1:POKE44,32:NEW</td>
+                    </tr>
+                </table>
+            </li>
+            <li>Den DATA-Lader (Listing 2) laden und folgende Änderungen vornehmen:
+                <table class="plain right0">
+                    <tr>
+                        <td>9</td>
+                        <td>:</td>
+                    </tr>
+                    <tr>
+                        <td>10</td>
+                        <td>:</td>
+                    </tr>
+                    <tr>
+                        <td>50</td>
+                        <td>D=H(H)*16 + H(L):S=S+D:POKEI,D</td>
+                    </tr>
+                    <tr>
+                        <td>85</td>
+                        <td>IF A&lt;0 THEN95</td>
+                    </tr>
+                    <tr>
+                        <td>90</td>
+                        <td>S=0:A=0:PRINT:NEXT</td>
+                    </tr>
+                    <tr>
+                        <td>95</td>
+                        <td>POKE43,0:POKE44,13:POKE45,76:POKE46,31</td>
+                    </tr>
+                    <tr>
+                        <td>96</td>
+                        <td>SAVE"HI-EXE",1,1:END</td>
+                    </tr>
+                </table>
+            </li>
+            <li>Programmkassette einlegen (nach Listing 3) und Listing 2 starten. Wenn keine Fehler mehr drin sind, erzeugt der Lader auf der Kassette das Maschinenprogramm HI-EXE.</li>
+            <li>HI-EDDI ist jetzt bereits lauffähig: Programmkassette zurückspulen, Computer kaltstarten, Listing 3 laden und starten. Das Maschinenprogramm wird nun geladen.</li>
+            <li>Die HI-EDDI-Befehle LOAD und SAVE funktionieren ebenfalls, somit kann auch schon das Menü erstellt werden. Die fertige Menütafel (mit Listing 4 verbunden) sollte an dritter Stelle auf die Programmkassette aufgenommen werden.</li>
+            <li>Hier die erforderlichen Änderungen am Listing 1: Zunächst wieder die POKEs wie unter c) eingeben und dann Listing 1 laden und folgende Änderungen vornehmen:
+                <table class="plain">
+                    <tr>
+                        <td>720</td>
+                        <td>FOR I = 3326 TO 3708</td>
+                    </tr>
+                    <tr>
+                        <td>730</td>
+                        <td>READA:IF A&lt;0THEN 730</td>
+                    </tr>
+                    <tr>
+                        <td>740</td>
+                        <td>POKEI,A:NEXT</td>
+                    </tr>
+                    <tr>
+                        <td>750</td>
+                        <td>POKE43,0:POKE44,13:POKE45,125:POKE46,14</td>
+                    </tr>
+                    <tr>
+                        <td>760</td>
+                        <td>SAVE"HI-PRINT",1,1</td>
+                    </tr>
+                    <tr>
+                        <td>770</td>
+                        <td>END</td>
+                    </tr>
+                </table>
+            </li>
+            <li>Programmkassette einlegen (an 4. Stelle) und Listing 1 starten. Auf der Kassette wird nun das Maschinenprogramm Hl-PRINT erzeugt.</li>
+        </ol>
 
         <p>Wenn nun im Programmlauf vor einem Druckvorgang diese Druckroutine geladen wurde, muß die Kassette zurückgespult werden, so daß das Maschinenprogramm HI-EXE nach Beendigung des Druckvorganges wieder geladen werden kann.</p>
 
