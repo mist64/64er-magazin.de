@@ -22,6 +22,339 @@
             <img src="51-1.png" alt="">
             <figcaption>XXXXXXXXX</figcaption>
         </figure>
+        <figure>
+            <table>
+                <tbody>
+                    <tr>
+                        <td><b>Label:</b></td>
+                        <td>Sprungmarke</td>
+                    </tr>
+                    <tr>
+                        <td><b>Bedingte Assemblierung:</b></td>
+                        <td>Abhängig von einer Variablen können zum Beispiel Quelltextzeilen beim Assemblieren übersprungen werden. Bei unterschiedlichen Variablen erhält man folglich unterschiedlichen Objektcode.</td>
+                    </tr>
+                    <tr>
+                        <td><b>Makro:</b></td>
+                        <td>Befehlsfolgen, die im Quelltext häufiger benutzt werden. Das Makro wird in einer Definitionszeile mit einem Namen versehen, unter dem es im Quelltext beliebig oft aufgerufen werden kann. Trifft der Assembler auf einen so definierten Namen, so wird an diese Stelle die vorher definierte Folge von Befehlen assembliert.</td>
+                    </tr>
+                    <tr>
+                        <td><b>n-Paß:</b></td>
+                        <td>Für n steht eine Zahl, die die Anzahl der Assemblerläufe anzeigt.<br>Bei Assemblern, die Labels verarbeiten können, handelt es sich in der Regel um 2-Pass-Assembler. Im ersten Pass wird eine Syntaxprüfung durchgeführt und den Labels und Variablen ein numerischer Wert (Adresse) zugewiesen. (Symboltabelle wird angelegt). Im zweiten Pass wird dann der Objektcode erzeugt.</td>
+                    </tr>
+                    <tr>
+                        <td><b>Objektcode:</b></td>
+                        <td>Das vom Assembler erzeugte, lauffähige Programm</td>
+                    </tr>
+                    <tr>
+                        <td><b>Quelltext:</b></td>
+                        <td>Das mit dem Assembler erstellte Basic- oder Text-File</td>
+                    </tr>
+                    <tr>
+                        <td><b>Symboltabelle:</b></td>
+                        <td>Beim Assemblieren wird jedem Label und jeder Variable ein numerischer Wert zugewiesen. Die Symboltabelle enthält eine Liste aller im Programm vorkommenden Label und Variablen mit deren Wertzuweisungen.</td>
+                    </tr>
+                </tbody>
+            </table>
+            <figcaption>Bild 2. Definition der im Text auftretenden Fachbegriffe</figcaption>
+        </figure>
+        <figure>
+            <table>
+                <tbody>
+                    <tr>
+                        <td>/a 100,10</td>
+                        <td>Automatische Zeilennumerierung. Hier mit der Startnummer 100 und der Schrittweite 10. ~<br>Die automatische Zeilennumerierung wird ausgeschaltet, indem man direkt hinter dem ausgegebenen Minuszeichen RETURN eingibt.</td>
+                    </tr>
+                    <tr>
+                        <td>/o</td>
+                        <td>Re-New eines Quelltextes, der mit NEW gelöscht wurde, falls der Text nicht anderweitig zerstört wurde.</td>
+                    </tr>
+                    <tr>
+                        <td>/d ; /d 100 ; /d -100 ; /d 100- ; /d 100 bis 200</td>
+                        <td>Löschen von Zeilen und Zeilenbereichen. Auch für das Löschen einzelner Zeilen sollte man den /d- Befehl verwenden, da man das Minuszeichen hinter der Zeilennummer doch immer wieder vergißt.</td>
+                    </tr>
+                    <tr>
+                        <td>/e ; /e 100 ; /e -100 ; /e 100- ; /e 100 bis 200</td>
+                        <td>Formatiertes Listen von Zeilen und Zeilenbereichen.<br>Label, Assembler-Befehle werden gemäß den Tabulatoren übersichtlich untereinander geschrieben.</td>
+                    </tr>
+                    <tr>
+                        <td>/tO,13 ; /t 1,24 ; /t2,0 ; /t3,10</td>
+                        <td>setzt die Tabulatoren T0, T1, T2, T3<br>T0 = Tabulator für Assemblerbefehle<br>T1 = Tabulator für den Kommentar bei der formatierten Ausgabe<br>T2 = Tabulator für die Anzahl der Blanks, die amAn- fang einer Ausgabezeile ausgegeben werden<br>T3 = Tabulator für die Symboltabelle</td>
+                    </tr>
+                    <tr>
+                        <td>/x<br></td>
+                        <td>Verlassen des Assemblers. Beim Verlassen des Programms wird ein Reset durchgeführt.</td>
+                    </tr>
+                    <tr>
+                        <td>/p 1,100,200</td>
+                        <td>Setzen eines Arbeitsbereichs (Page). Hier Bereich 1 von Zeile 100 bis 200, beide einschließlich. Bis zu 30 solcher Arbeitsbereiche sind erlaubt. Die Parameter der Arbeitsbereiche werden im Kassettenpuffer abgelegt.</td>
+                    </tr>
+                    <tr>
+                        <td>/ziffer(n)</td>
+                        <td>Formatiertes Listen der Page.</td>
+                    </tr>
+                    <tr>
+                        <td>/n 1,100,10</td>
+                        <td>Neu Durchnumerieren einer Page mit Startnummer und Schrittweite.</td>
+                    </tr>
+                    <tr>
+                        <td>/f 1,”string”</td>
+                        <td>Suchen einer Zeichenkette in einer Page. Dabei sind im String Fragezeichen als Joker erlaubt. Das Fragezeichen ersetzt ein beliebiges Zeichen. Zu beachten ist jedoch, daß im Quelltext unnötige Blanks entfernt wurden, wie ein Vergleich mit den Befehlen /e und LIST zeigt.</td>
+                    </tr>
+                    <tr>
+                        <td>/r 1,”string1”, ”string2”</td>
+                        <td>Ersetzen von Zeichenketten.String 2 darf nicht leer sein. Überall in der Page wird die Zeichenkette aus String 2 durch die aus String1 ersetzt. Auch beim Ersetzen ist in String 2 das Fragezeichen als Joker erlaubt. Da String 1 leer sein darf, können mit diesem Befehl auch Zeichenketten gelöscht werden.</td>
+                    </tr>
+                    <tr>
+                        <td>/u 9000</td>
+                        <td>Setzen des Quelltextstartes (Programmstartes). Normalerweise ist als Startwert die Adresse 7000 eingestellt Durch Hochlegen des Startes kann man zum Beispiel einen Monitor in dem nun freien Bereich unterbringen.</td>
+                    </tr>
+                    <tr>
+                        <td>/b</td>
+                        <td>Anzeige der aktuellen Speicherkonfiguration. Es wird angezeigt:<br>a) der normale Quelltextstart 7000 als Merkhilfe<br>b) der aktuelle Quelltextstart<br>c) das Quelltextende<br>d) die Anzahl der noch verbleibenden Bytes für den Quelltext</td>
+                    </tr>
+                    <tr>
+                        <td>/l”name” ; /s”name” ; /v”name” ; /m”name”</td>
+                        <td>Kurzform der Befehle LOAD, SAVE, VERIFY und<br>MERGE</td>
+                    </tr>
+                    <tr>
+                        <td>/g8</td>
+                        <td>Die zugehörige Gerätenummer kann mit diesem Befehl eingestellt werden. Voreingestellt ist das Gerät 8.</td>
+                    </tr>
+                    <tr>
+                        <td colspan="2">Zur Unterstützung des Umgangs mit dem Floppy-Laufwerk 1541 sind drei Befehle implementiert:</td>
+                    </tr>
+                    <tr>
+                        <td>/i</td>
+                        <td>— Lesen des Inhaltsverzeichnisses von Floppy ohne Verlust des geschriebenen Quelltextes</td>
+                    </tr>
+                    <tr>
+                        <td>/k</td>
+                        <td>— Lesen des Fehlerkanals</td>
+                    </tr>
+                    <tr>
+                        <td>/e</td>
+                        <td>— Übermittlung von Befehlen an die Floopy</td>
+                    </tr>
+                    <tr>
+                        <td colspan="2">Diese drei Befehle entsprechen denen des DOS 5.1.<br>Auch zur Farbgebung des Bildschirms sind zwei Befehle vorhanden, die die Hintergrund- und die Rahmenfarbe setzen.</td>
+                    </tr>
+                    <tr>
+                        <td>/ch O</td>
+                        <td>— Setzen der Hintergrundfarbe</td>
+                    </tr>
+                    <tr>
+                        <td>/cr O</td>
+                        <td>— Setzen der Rahmenfarbe</td>
+                    </tr>
+                    <tr>
+                        <td colspan="2">Nach erfolgter Assemblierung kann nun die erzeugte Symboltabelle mit zwei Befehlen ausgegeben werden:</td>
+                    </tr>
+                    <tr>
+                        <td>/!</td>
+                        <td>— Ausgabe in unsortierter Form</td>
+                    </tr>
+                    <tr>
+                        <td>/!!</td>
+                        <td>— Ausgabe sortiert</td>
+                    </tr>
+                </tbody>
+            </table>
+            <p>Es werden nur Label ausgegeben, die entweder global oder von der Ordnung Null sind.</p>
+            <p>Beide Dumps können mit der CTRL-Taste verlangsamt und mit der STOP-Taste angehalten werden.</p>
+            <p>Mit OPEN..., CMD... können die Dumps an andere Geräte gesendet werden.</p>
+            <p>Als Ergänzung zum Basic-Befehl PRINT, der aufgrund der Torkenbildung nicht alle Labelnamen verarbeiten kann, kann der Befehl — verwendet werden.</p>
+            <p>Basic-Funktionen wie PEEK sind nur über den PRINT-Befehl erreichbar. Die Funktionen <(...) und>(...) sind außerhalb des Quelltextes nur durch ← zu verwenden. Mit dem ←—Befehl kann genau wie im Quelltext gerechnet werden.</p>
+            <figcaption>Bild 1. Die Editorbefehle</figcaption>
+        </figure>
+
+        <figure>
+            <p>Zusätzlich zu den Fehlermedlungen, die von Interpreterroutinen wie »illegal quantity« oder »syntax« stammen, gibt HYPRA-ASS folgende Meldungen aus:</p>
+            <ol>
+                <li><b>can’t number term — </b>ein Ausdruck kann von HYPRA- ASS nicht berechnet werden. Möglicher Grund kann die falsche Abkürzung eines Operators sein.</li>
+                <li><b>end of line expected — </b>bei der Abarbeitung einer Zeile wurde statt des Zeilenendes etwas anderes gefunden.</li>
+                <li><b>no mnemonic — </b>ein Mnemonic kann nicht identifiziert werden.</li>
+                <li><b>unknown pseudo — </b>ein Pseudo-Op wurde falsch abgekürzt.</li>
+                <li><b>illegal register — </b>ein Assemblerbefehl existiert in der gewählten Adressierungsart nicht mit dem gewählten Register.</li>
+                <li><b>wrong adress — </b>ein Assemblerbefehl existiert nicht in der gewählten Adressierungsart.</li>
+                <li><b>illegal label — </b>das erste Zeichen eines Labels war kein Buchstabe.</li>
+                <li><b>unknown label — </b>in Pass 2 wurde ein unbekannter Labelname entdeckt</li>
+                <li><b>branch too far — </b>eine Verzweigung führt über eine zu große Distanz.</li>
+                <li><b>label declared twice — </b>ein Labelname wurde zweimal benutzt.</li>
+                <li><b>too many labels — </b>Label und Quelltext passen zusammen nicht mehr in den Speicher.</li>
+                <li><b>no macro to close — </b>die Anzahl der .ma-Anweisungen stimmt nicht mit der Anzahl der .rt-Anweisungen überein.</li>
+                <li><b>parameter — </b>im Makroaufruf stimmt die Parameterliste nicht mit der Parameterliste der Definition überein.</li>
+                <li><b>return — </b>es liegt keine Rückkehradresse auf dem Stack, als eine .rt-Anweisung ausgeführt werden sollte.</li>
+            </ol>
+            <p>Hinzuweisen ist noch auf eine einfache Möglichkeit, den »label twice-error« zu vermeiden:</p>
+            <p>Legt man eine Makrodefinition um einen beliebigen Block des Quelltextes, so sind alle Label in dem Block automatisch lokal. Auf diese Weise kann schon vorhandener Quelltext in neuen eingefügt werden, ohne daß man sich um doppelt verwendete Labelnamen kümmern muß.</p>
+
+            <figcaption>Bild 2. Fehlermeldungen von HYPRA-ASS</figcaption>
+        </figure>
+
+        <figure>
+            <table>
+                <tbody>
+                    <tr>
+                        <td>1)</td>
+                        <td>.ba $C000</td>
+                        <td>gibt die Startadresse der Assemblierung an. Bei anderen Assemblern heißt dieser Befehl auch org oder * = .</td>
+                    </tr>
+                    <tr>
+                        <td>2)</td>
+                        <td>.eq label=wert</td>
+                        <td>weist einem Label einen Wert zu</td>
+                    </tr>
+                    <tr>
+                        <td>3)</td>
+                        <td>.gl label=wert</td>
+                        <td>weist einem globalen Label einen Wert zu</td>
+                    </tr>
+                    <tr>
+                        <td>4)</td>
+                        <td>.by 1,2,”a”</td>
+                        <td>Einfügen von Byte-Werten in den Quelltext</td>
+                    </tr>
+                    <tr>
+                        <td>5)</td>
+                        <td>.wo 1234,label</td>
+                        <td>Einfügen von Adressen in der Folge low/high</td>
+                    </tr>
+                    <tr>
+                        <td>6)</td>
+                        <td>.tx”text”</td>
+                        <td>Einfügen von Text als ASCII-Werte</td>
+                    </tr>
+                    <tr>
+                        <td>7)</td>
+                        <td>.ap ”file”</td>
+                        <td>Verketten von Quelltexten</td>
+                    </tr>
+                    <tr>
+                        <td>8)</td>
+                        <td>.ob "file,p,w”</td>
+                        <td>Senden des Objektcodes zur Floppy</td>
+                    </tr>
+                    <tr>
+                        <td>9)</td>
+                        <td>.en</td>
+                        <td>Schließen des Objektfiles</td>
+                    </tr>
+                    <tr>
+                        <td>10)</td>
+                        <td>.on aus- druck,sprung</td>
+                        <td>bedingter Sprung, wenn Ausdruck wahr</td>
+                    </tr>
+                    <tr>
+                        <td>11)</td>
+                        <td>.go sprung</td>
+                        <td>unbedingter Sprung</td>
+                    </tr>
+                    <tr>
+                        <td>12)</td>
+                        <td>.if ausdruck</td>
+                        <td>Fortführung der Assemblierung bei ELSE, falls Ausdruck falsch. Ansonsten hinter .if bis zu ELSE oder ENDIF</td>
+                    </tr>
+                    <tr>
+                        <td>13)</td>
+                        <td>.el</td>
+                        <td>Alternative zu den Zeilen, die hinter .if stehen</td>
+                    </tr>
+                    <tr>
+                        <td>14)</td>
+                        <td>.ei</td>
+                        <td>Ende der IF-Konstruktion</td>
+                    </tr>
+                    <tr>
+                        <td>15)</td>
+                        <td>.co var1,var2</td>
+                        <td>Übergabe von Labeln und Quelltext an nachgeladene Teile</td>
+                    </tr>
+                    <tr>
+                        <td>16)</td>
+                        <td>.ma makro (par1,par2)</td>
+                        <td>Makrodefinitionszeile</td>
+                    </tr>
+                    <tr>
+                        <td>17)</td>
+                        <td>.rt</td>
+                        <td>Ende der Makrodefinition</td>
+                    </tr>
+                    <tr>
+                        <td>18)</td>
+                        <td>...makro<br>(par1,par2)</td>
+                        <td>Makroaufruf</td>
+                    </tr>
+                    <tr>
+                        <td>19)</td>
+                        <td>.li lfn, dn, ba</td>
+                        <td>sendet formatiertes Listing unter der File- Nummer lfn zum Gerät dn mit der Sekundäradresse ba</td>
+                    </tr>
+                    <tr>
+                        <td>20)</td>
+                        <td>.sy lfn, dn, ba</td>
+                        <td>sendet formatierte Symboltabelle unter der File- Nummer lfn zum Gerät dn mit der Sekundäradresse ba</td>
+                    </tr>
+                    <tr>
+                        <td>21)</td>
+                        <td>.st</td>
+                        <td>beendet die Assemblierung</td>
+                    </tr>
+                    <tr>
+                        <td>22)</td>
+                        <td>.dp t0, t1, t2, t3</td>
+                        <td>setzt die Tabulatoren T0, T1, T2, T3 aus dem Quelltext heraus</td>
+                    </tr>
+                    <tr>
+                        <td colspan="3">Vor den Anweisungen 12, 13, 14, 16 und 17 dürfen in derselben Zeile keine Label stehen.</td>
+                    </tr>
+                </tbody>
+            </table>
+            <figcaption>Bild 3. Zusammenfassung aller Pseudobefehle</figcaption>
+        </figure>
+
+        <figure>
+            <table>
+                <tbody>
+                    <tr>
+                        <td>$0000</td>
+                        <td>Zeropage</td>
+                    </tr>
+                    <tr>
+                        <td>$033e</td>
+                        <td>Bandpuffer als Zwischenspeicher</td>
+                    </tr>
+                    <tr>
+                        <td>$0400</td>
+                        <td>Video-RAM</td>
+                    </tr>
+                    <tr>
+                        <td>$0800</td>
+                        <td>Hypra-ASS</td>
+                    </tr>
+                    <tr>
+                        <td>$1fd7</td>
+                        <td>Raum für Quelltext und Label. Quelltext bis maximal $a000</td>
+                    </tr>
+                    <tr>
+                        <td>$a000</td>
+                        <td>Basic-Interpreter — darunter von c000 abwärts die Symboltabelle</td>
+                    </tr>
+                    <tr>
+                        <td>$c000</td>
+                        <td>frei!</td>
+                    </tr>
+                    <tr>
+                        <td>$d000</td>
+                        <td>I/O und so weiter</td>
+                    </tr>
+                    <tr>
+                        <td>$c000</td>
+                        <td>Kernal</td>
+                    </tr>
+                </tbody>
+            </table>
+            <figcaption>Bild 4. Speicherbelegung von HYPRA-ASS</figcaption>
+        </figure>
 
         <p>HYPRA-ASS ist ein rein in Maschinensprache geschriebener 3-Pass-Makroassembler mit integriertem Editor für den C 64 mit Diskettenlaufwerk 1541. Er belegt etwa 6 KByte RAM-Speicher von $0801 bis $lFD7. HYPRA-ASS gehört, was Leistung und Schnelligkeit betrifft, zu einem der besten Assembler. Seine hervorstechendste Eigenschaft ist die Fähigkeit, um Befehlsfolgen, die in einem Programm immer wieder auftreten, einen Block beziehungsweise ein Makro zu legen. So definierte Befehlsfolgen können durch einen einfachen Befehl an jeder beliebigen Stelle des Programms aufgerufen werden. Diese Eigenschaft haben viele Assembler, aber nur wenige können lokale Labels beziehungsweise Sprungziele innerhalb eines Makros verarbeiten. Innerhalb eines Makros sind, wenn nicht besonders gekennzeichnet, alle Labels und Variablen lokal. Neben vielen Pseudo-Opcodes, mit denen sich zum Beispiel der Objektcode auf Diskette assemblieren läßt oder Quelltexte verketten lassen, kann auch bedingt assembliert werden. Formatierte Listings können an beliebige Geräte gesendet werden. Symboltabellen lassen sich sortiert und unsortiert ausgeben.</p>
 
