@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>Aus eins mach vier</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="Andreas Gerzen, hm">
+    <meta name="64er.issue" content="7/85">
+    <meta name="64er.pages" content="41-43">
+    <!-- <meta name="64er.toc_category" content="XXX"> -->
+    <!-- <meta name="64er.toc_title" content="XXX"> -->
+    <meta name="64er.id" content="XXX">
+</head>
+
+<body>
+    <article>
+        <h1>Aus eins mach vier</h1>
+        <p class="intro">Wir stellten schon mehrere geänderte Betriebssysteme für den C 64 vor. Das beste Beispiel ist das Hypra-Perfekt. Diese Bauanleitung setzt der ganzen Sache die Krone auf: Absturzfreies Umschalten zwischen vier Betriebssystemen.</p>
+
+        <p>Die Idee zu dieser Schaltung lieferte eigentlich das Hypra-Load-Programm in der Betriebssystemversion, welches ein neues EPROM im Kernalsteckplatz U 4 erfordert. Mit etwa 98 Prozent der Programme funktioniert dies hervorragend. Für die restlichen 2 Prozent, mit denen es Schwierigkeiten gibt, hilft allerdings nur, das Originalkernal wieder einzusetzen. Meistens ist das der Fall, wenn Kassetten-Routinen benötigt werden. Eine Umgehung des ständigen Ein- und Ausbaus bietet sich mit einer Betriebssystemumschaltung an. So könnte ein Programm mit Hypra-Load geladen und anschließend auf das Originalsystem zurückgeschaltet werden. Dadurch wäre eine 100prozentige Programmverträglichkeit gewährleistet. Allerdings nur, wenn beim Umschalten, der Computer nicht »abstürzt«.</p>
+
+        <p>Aus diesen Gedanken heraus wurde diese Schaltung entwickelt. Sie hat die oben beschriebenen Vorteile und bietet noch die Möglichkeit der Umschaltung zwischen dem Original-Kernal und drei zusätzlichen Betriebssystemen.</p>
+
+        <h2>Etwas Theorie</h2>
+
+        <p>Wie wird dem Computer ein Umschalten des Betriebssystems mitgeteilt? Für den Computer stellt das Betriebssystem eine Ansammlung von Befehlen, Sprungadressen und Routinen in einem bestimmten Adreßbereich dar. Beim C 64 ist es der Bereich 57344 bis 65535 ($E000 bis $FFFF). Will der Computer aus irgendeinem Grund auf das Betriebssystem zugreifen, aktiviert er den Speicherbaustein für diesen Adreßbereich und legt ihn auf den Adreß- und Datenbus. Was für eine Art Speicherbaustein (ROM, RAM oder EPROM) das ist, ist ihm völlig egal. Hauptsache er findet in dem Adreßbereich einen Speicher vor.</p>
+
+        <p>Für uns ist es aber nun sehr wichtig zu wissen, nach welchem System der Computer seine Speicherbausteine verwaltet, damit ohne Absturz ein neues Betriebssystem aktiviert werden kann. Das Zusammenspiel der einzelnen RAM/ROM-Bausteine wird von einem einzigen IC gesteuert. Dieses IC befindet sich im Steckplatz U 17 und ist ein sogenannter PLA-Chip (Programable-Logic-Array). Dieses IC wird bei der Fertigung nach Herstellerangaben programmiert und erhält so besondere Logikeigenschaften, die eine Vielzahl von herkömmlichen Gatterfunktionen nachbilden. Dieser PLA-Baustein ist im C 64 dem Prozessor untergeordnet und nimmt diesem weitgehend die Verwaltung der Speicherbausteine im gesamten Adressierungsbereich ab. Die PLA, auch Adreßraummanager genannt, sorgt dafür, daß auf entsprechende Befehle der CPU immer der richtige Baustein angesprochen wird und daß immer nur ein RAM/ROM-Baustein aktiv auf dem Adreß- oder Datenbus zugreift, damit keine »Kurzschlüsse« entstehen. Jeder RAM/ ROM-Baustein ist über eine Leitung mit dem Manager verbunden. Sie heißt Chipselect- oder Enableleitung. Sie aktiviert die einzelnen Speicher über ein Low-Signal und blendet dadurch den entsprechenden Adreßbereich ein. Um beispielsweise das Betriebssystem zu aktivieren, legt der Manager die</p>
+
+        <p>Kernalleitung auf Low-Pegel (Pin 20 am Kernal-ROM) und hält alle anderen Leitungen auf High-Pegel. Damit ein anderes Betriebssystem aktiviert wird, muß man nur die Kernalleitung zum anderen Betriebssystem durchschalten und es natürlich auch mit den Adreß- und Datenleitungen verbinden. Will man drei neue und das alte System benutzen, benötigt man eigentlich nur einen 4fach Umschalter, der die Chipselect-Leitung verteilt. Allerdings hat die ganze Sache einen Haken.</p>
+
+        <p>Der Computer läuft mit einer Taktfrequenz von 1 MHz. Entsprechend schnell werden die einzelnen Speicher-ICs auch geschaltet. Würde man mit einem einfachen Umschalter ein anderes Betriebssystem auswählen, wäre während der Umschaltphase, die ja immerhin selbst bei »Fingerakrobaten« einige Millisekunden dauert, gar kein Betriebssystem verfügbar und der Computer würde ins »Leere« springen. Um das zu verhindern, darf eigentlich nur umgeschaltet werden, wenn auf das Betriebssystem gerade nicht zugegriffen wird. Hier setzt diese Schaltung an. Sie speichert den Umschaltimpuls so lange, bis das Kernal-ROM nicht mehr aktiv ist und gibt dann das andere angewählte Betriebssystem frei.</p>
+
+        <h3>Wie funktioniert die absturzfreie Umschaltung?</h3>
+
+        <p>Zuerst etwas Grundsätzliches zur Arbeitsweise der beiden ICs. Sollten Sie sich für die Technik nicht interessieren, können Sie dieses Kapitel auch überschlagen.</p>
+
+        <p>IC 1 beinhaltet vier D-Register (bistabile Gatter, Flip-Flops) mit zwei Eingängen E und D (Bild 1) und zwei Ausgängen Q und Q. Der Eingang E ist ein Enable, das heißt ein Freigabe-Eingang. Liegt dieser Eingang auf High-Pegel, wird das an D anliegende Signal sofort zum Ausgang Q übertragen. Q führt dagegen immer das entgegengesetzte Signal zu Q. Deshalb auch der Strich über dem Buchstaben. Wird an E ein Low-Signal gelegt, wird das in diesem Augenblick an D anliegende Signal gespeichert. Das heißt, daß Signaländerungen an D nicht wirksam sind, solange E auf Low-Pegel liegt. Das D-Register ist also nichts anderes als ein 1-Bit-Speicher, den man freigeben oder sperren kann. DR 1-3 sind völlig identisch.</p>
+
+        <p>Die technische Bezeichnung für IC 2 lautet: 3-Bit-Binärdecoder/Demultiplexer (3-8) mit Adressen-Zwischenspeicher. Das hört sich komplizierter an als es ist. Die drei Eingänge A0 bis A2 (Bild 1) wirken so, wie die D-Register DRl-3. Der Eingang LE (Latch Enable) bestimmt die Funktion der Adreßeingänge A0 bis A2. Liegt LE auf High-Pegel, werden die zuletzt an den Eingängen A0 bis A2 anliegenden Pegel gespeichert. Liegt dagegen ein Low-Pegel an LE, werden die Signale an A0 bis A2 an die Ausgänge weitergegeben. Nun sind bei diesem IC die Ausgänge der Speicher nicht herausgeführt, wie bei IC 1, sondern führen auf einen internen 1 aus 8-Decoder. Die Ausgänge Q0 bis Q 7 sind die Ausgänge dieses Decoders, der wie folgt arbeitet: Von seinen acht Ausgängen kann immer nur einer Low-Pegel führen. Welcher, das bestimmt die als 3-Bit-Binärzahl an den Eingängen A0 bis A2. Mit 3 Bit lassen sich ja bekanntlich die Dezimalzahlen von 0 bis 7 darstellen. Als Beispiel: an A0 bis A2 liegt die Bitkombination 101 an. Dezimal ist das 5, somit liegt Q5 auf Low-Pegel, und zwar so lange, wie diese Bitkombination anliegt. Alle anderen Ausgänge führen High-Pegel.</p>
+
+        <p>Weiterhin hat IC2 zwei Freigabe-Eingänge E1 und E2, die vollkommen unabhängig von den anderen Eingängen arbeiten. Mit El oder E2 können alle Ausgänge Q0-Q7 gleichzeitig auf High-Pegel gelegt werden. Dazu muß an E1 ein High- oder an E2 ein Low-Signal anliegen.</p>
+
+        <p>Anschaulicher wird es an einem Beispiel: Wir wollen mit Hilfe eines 3-Bit-Wortes irgendein Signal, sagen wir ein Rechtecksignal, nacheinander an vier verschiedene Stellen leiten. Dazu legen wir das 3-Bit-Wort an die Adreßeingänge A0 bis A2 an. El wird auf Masse gelegt, da nur ein Freigabeeingang benötigt wird. Wie bringen wir aber nun zum Beispiel Ausgang Q5 dazu, unser Rechtecksignal zu übertragen? Zuerst wird an A0 bis A2 die Bitkombination 101 angelegt, mit der wir Ausgang Q5 bestimmen. Dann wird das Rechtecksignal gleichzeitig an LE und an E2 gelegt. Liegt das Rechtecksignal gerade auf High-Pegel, sind alle Ausgänge, somit auch Q5, auf High-Pegel. Geht das Rechtecksignal auf Low-Pegel, gibt E2 die Ausgänge frei, und das Low-Signal an LE überträgt sich auf den adressierten Ausgang; hier Q5. Geht das Rechtecksignal wieder auf High-Pegel, beginnt alles von vorn. Das ist genau das, was wir wollen. Wird an A0 bis A2 jetzt ein anderer Ausgang adressiert, wird das Eingangssignal auf den anderen übertragen.</p>
+
+        <p>Nachdem nun die Funktion der einzelnen ICs etwas verdeutlicht wurde, zur eigentlichen Umschaltung. Die Auswahl des Betriebssystems erfolgt über die Schalter S1 (a und b). Die Auswahlsignale gelangen nicht direkt auf die Adreßeingänge, sondern erst über die D-Register DR1 und DR2. Die beiden Register haben die Aufgabe, den Pegelwechsel vom Schalter »schön rechteckig« zu machen.</p>
+
+        <h3>Hinweise zum Aufbau</h3>
+
+        <p>Das Layout für die Umschaltplatine zeigt Bild 2, die Stückliste Tabelle 1. Beachten Sie beim Ätzen, daß einige Leiterzüge sehr schmal sind und nicht verschwinden.</p>
+
+        <p>Nach erfolgreicher Herstellung der Leiterplatte wird diese gebohrt. Die angedeuteten Löcher zum Anschluß der Steckverbinder dürfen nicht durchbrochen werden, da die Steckverbinder als Adaptersockel später direkt von hinten auf die Platine gelötet werden. Zuerst sollten die Drahtbrücken eingesetzt werden und dann die Widerstände und IC-Sockel. Zur Befestigung der Adaptersockel lötet man diese erst an den zwei Endpunkten an und richtet sie rechtwinklig aus. Danach sollte man ausprobieren, ob die ganze Sache auch paßt. Erst dann sollten die Steckverbinder endgültig mit der Platine verlötet werden. Den 4fach-Umschalter schließt man am günstigsten mit Flachbandleitung an. Um Leiterzüge auf der Platine zu sparen, wird die eigentliche Verdrahtung des Schalters erst an den Anschlußpins des Schalters selbst durchgeführt. Der Schalter wird laut Schaltplan »binär« verdrahtet: die Schalterausgänge müssen beim Weiterschalten die Binärzahlen 00-01-10-11 liefern. Das ist einfach möglich, indem man die entsprechenden Schaltereingänge mit R4 (5 Volt) verbindet oder offen läßt. Durch das Offenlassen entsteht über R2 oder R3 Low-Pegel.</p>
+
+        <p>Die Leuchtdioden sollen eigentlich nur dem Spieltrieb von Computerfreaks entgegenkommen. Die LEDs werden über die noch freien vier Kontakte des Umschalters geschaltet. Die Versorgungsleitung für die Leuchtdioden kommt über R1 von der Platine. Wollen Sie die LEDs nicht einbauen, kann der 470-Ohm-Widerstand selbstverständlich ersatzlos entfallen. Es ist dann auch nur noch ein 2x4-Umschalter notwendig.</p>
+
+        <p>Ist die Platine nun so weit bestückt, können die Betriebssysteme eingesetzt werden. Dazu kommt das Kernal-ROM aus Steckplatz U4 in die 24polige Fassung. Wenn Sie eine C 64-Version mit fest eingelötetem ROM haben, sollten Sie sich von einem Lötkolben-Profi eine Fassung einbauen lassen. In die Fassungen 1 bis 3 auf der Platine werden die Betriebssystems-EPROMs gesteckt. Achten Sie unbedingt darauf, die EPROMs und das ROM richtig herum in die Fassungen zu stecken (Bestückungsplan, Bild 3). Möglich sind nur 2764- oder 27C64-Typen, die ohne Schwierigkeiten zu beschaffen sind. Die C-Typen sind CMOS-Ausführungen und bieten den Vorteil der geringen Stromaufnahme. Hat man nur ein neues Betriebssystem, muß dieses unbedingt in Fassung 1 eingesteckt werden, das nächste in Fassung 2 und das dritte in Fassung 3. Sollte eine Fassung frei bleiben, darf diese natürlich nicht über den Schalter angewählt werden. Ein Absturz des Computers bliebe mit Sicherheit nicht aus.</p>
+
+        <p>Ist alles soweit fertig (vorher nochmal auf Lötbrücken untersuchen!), kann die Platine in den Steckplatz U4 eingesetzt werden. Die EPROMs müssen nach dem Einsetzen links von U4 stehen und alle Markierungskerben der ICs auf die C 64-Rückseite zeigen. Der Wahlschalter kommt zunächst in Stellung 1. Nach dem Einschalten des Computers sollte dieser sich normal melden. Dann kann umgeschaltet werden. Schaltet man auf Hypra-Perfekt, dürfte auf dem Bildschirm keine Veränderung feststellbar sein. Aber an der geänderten Funktionstastenbelegungwird es schnell klar, daß man ein anderes Betriebssystem aktiviert hat. Noch ein Wort zur Umschaltung: Der Computer wird natürlich nur dann nicht »abstürzen«, wenn innerhalb der Betriebssysteme zur Umschaltzeit die gleichen Routinen benutzt werden. Konkret: Benutzt man ein System mit Hypra-Load, darf natürlich während des Ladens nicht auf das normale Kernal umgeschaltet werden, weil die Laderoutine mit der originalen nicht identisch ist. Bei anderen Betriebssystemen muß man das von Fall zu Fall ausprobieren. Am sichersten ist ein Umschalten immer im Direktmodus. Kaputtgehen kann während des Umschaltens nichts. Spätestens nach einem Reset ist der Rechner wieder einsatzbereit.</p>
+
+        <address class="author">(Andreas Gerzen/hm)</address>
+    </article>
+</body>
+
+</html>

@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>Centronics-Interface für jeden Bedarf</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="W. Forstenrath, M. Braun, A. Wängler, hm">
+    <meta name="64er.issue" content="7/85">
+    <meta name="64er.pages" content="78-81">
+    <!-- <meta name="64er.toc_category" content="XXX"> -->
+    <!-- <meta name="64er.toc_title" content="XXX"> -->
+    <meta name="64er.id" content="XXX">
+</head>
+
+<body>
+    <article>
+        <h1>Centronics-Interface für jeden Bedarf</h1>
+        <p class="intro">Will man einen Drucker mit Centronics-Eingang an den C 64 anschließen, kommt man um ein Interface nicht herum. Wir zeigen Ihnen mit dieser Software-Schnittstelle die billigste Lösung für ein Interface.</p>
+
+        <p>Zweifelsohne sind Software-Lösungen von Centronics-Schnittstellen für den C 64 (mit einfachem Kabel am User-Port) nichts unbekanntes. Bedauerlicherweise ist jedoch die Verträglichkeit mit käuflichen Programmen nicht immer gewährleistet. Viele Textverarbeitungsprogramme funktionieren damit nicht. Die Software für die Schnittstelle wird durch diese Programme leider meistens überschrieben. Dieses Problem läßt sich eigentlich nur durch das feste Einbinden der »Centronics-Software« in das Betriebssystem des C 64 lösen. Der User-Port des C 64 stellt dann eine vollwertige Centronics-Schnittstelle dar. Auf alle Besonderheiten des C 64-Zeichensatzes konnte aber aus Platzgründen keine Rücksicht genommen werden. Reverse Zeichen, Cursor-Steuerzeichen und Sekundäradressen werden, bis auf die Sekundäradresse zur Umschaltung zwischen Groß- und Kleinschrift, nicht erkannt. Dafür wird aber bei Verwendung der Sekundäradresse 7 nicht nur eine Groß-/Kleinschrift, sondern auch eine C 64/ASCII-Codewandlung durchgeführt.</p>
+
+        <h2>Centronics hoch drei</h2>
+
+        <p>In dieser Bauanleitung werden drei Schnittstellen vorgestellt. Zum einen ist das »C 64 Centron« eine Schnittstelle, bei der außer einer Verkürzung der Systemmeldungen nichts im Betriebssystem verloren geht (auch nicht die Kassettenroutinen). Die zweite Schnittstelle ist dem in Ausgabe 4/85 veröffentlichten Hypra-Perfektangepaßt. Bei derdritten Schnittstelle wurde auf größte Flexibilität geachtet. Es handelt sich dabei um ein frei verschiebbares Programm, das komfortabel zu bedienen ist. Außer der dritten Version sind alle Schnittstellen nur als ROM-Version benutzbar. Das Kernal-ROM wird dazu durch ein neues ersetzt. Die dritte Version ist eine reine Software-Lösung. Das Anschlußkabel, welches das in Tabelle 1 dargestellte Verdrahtungsschema haben muß, ist aber in allen drei Fällen gleich.</p>
+
+        <h2>Software-Schnittstelle im Betriebssystem integriert</h2>
+
+        <p>Das größte Hindernis für die Verträglichkeit mit fertigen Programmen ergibt sich aus der Tatsache, daß der C 64 bereits eine Druckerschnittstelle eingebaut hat: den seriellen lEC-Bus. Da käufliche Programme in der Regel diesen Weg benutzen, um einen Drucker anzusprechen, muß eine nachträgliche Lösung Abhilfe schaffen.</p>
+
+        <p>C 64 Centron (Listing 1) arbeitet mit allen Centronics-Druckern zusammen, ohne irgendeine Funktion des C 64 zu beeinflussen. Da die Schnittstellen-Software aus den oben erwähnten Gründen im Kernal-ROM selbst liegen muß, war zunächst das Platzproblem zu überwinden. Einerseits hat Commodore fast den gesamten Raum für das Kernal benutzt, andererseits ist der C 64 aber mit ausgesprochen platzaufwendigen Einschalt- und Systemmeldungen ausgestattet. Doch welcher C 64-Besitzer weiß nicht schon nach recht kurzer Zeit, welchen Namen sein Computer hat. Dementsprechend wurde die Einschaltmeldung drastisch verkürzt. Der C 64 meldet von nun an mit
+            \* C64 CENTRON \* 38911 BYTES RAM</p>
+
+        <p>Weiterhin wurden die Meldungen bei Betrieb von Datasette und Floppy vereinfacht. Die neuen Meldungen sind in Tabelle 2 zusammengefaßt. Als nächste Möglichkeit bieten sich die Initialisierungsroutinen des Betriebssystems an. Hier wird vom C 64 nach dem Einschalten untersucht, ob der C 64 in Europa oder in Amerika zum Einsatz kommt. Da die amerikanische Initialisierung in Europa nicht gebraucht wird, konnten die entsprechenden Routinen einschließlich der NTSC-Zeitkonstanten für die RS232-Schnittstelle aus dem Betriebssystem entfernt werden. Damit war genug freier Platz im ROM für die Schnittstellen-Software geschaffen.</p>
+
+        <p>Hohe Verträglichkeit einer Schnittstelle wird durch die richtige Einbindung der Änderungen in das Original-Betriebssystem erreicht. Ziel muß es dabei sein, die neuen Routinen so spät wie möglich in den normalen Ablauf der seriellen IEC-Busverbindungen einzubinden. Hier wurde folgender Weg eingeschlagen:</p>
+
+        <p>Nach einem Sprung aus der LISTEN-Routine ($EDOC) wird in der neuen Routine beim Ansprechen der Geräteadresse 4 (OPEN 4,4 oder OPEN 4,4,X) ein Flag für Centronics-Ausgabe (Centflag) gesetzt. Der Drucker wird durch Senden einer »0« initialisiert. Bei anderen Geräteadressen wird ein Rücksprung in die normale LISTEN-Routine durchgeführt.</p>
+
+        <p>In der SECLISTEN-Routine ($EDB9) wird bei gesetztem Centflag überprüft, ob bei der File-Eröffnung die Sekundäradresse 7 eingegeben wurde. Dementsprechend wird ein weiteres Flag (Secflag) gesetzt. Diese beiden Flags werden in der eigentlichen Ausgaberoutine, die in die lECOUT-Routine ($ED40) eingebunden ist, nacheinander abgefragt. Bei nichtgesetztem Centflag erfolgt ein Rücksprung in die normale lECOUT-Routine. Ist Centflag gesetzt, wird das Secflag abgefragt und bei gesetztem Flag eine Codewandlung von C 64-Code in Standard-ASCII vorgenommen. Nach Ausgabe des ASCII-Zeichens wird wie in der seriellen Ausgabe abgefragt, ob das ausgegebene Zeichen das letzte einer Zeichenkette war. Wenn ja, erfolgt ein Rücksprung in das Normalbetriebssystem. Nach Ausgabe des letzten Zeichens werden Centflag und Secflag gelöscht. Beim Schließen des Druckffiles (CLOSE4) wird »CARRIAGE RETURN« ausgegeben, um eventuell noch im Druckpuffer befindliche Zeichen auszudrucken. Dies geschieht in der SECLISTEN-Routine.</p>
+
+        <p>Eine besondere Einrichtung dieser Lösung ist eine Benutzerschnittstelle. Es ist nämlich möglich, vor der eigentlichen Ausgabe eines Zeichens in eigene Routinen zu verzweigen. Und das sogar bei käuflicher Software. Wichtige Voraussetzung dafür ist lediglich, daß ein RAM-Bereich frei bleibt und nie vom Programm beschrieben wird. Dies kann häufig der Kassettenpuffer ($033C-$03FB), weniger häufig der Bereich von $C000 bis$CFFF sein. Im freien RAM-Bereich muß eine Routine stehen, die indirekt angesprochen wird und nach Ausführung in die Centronics-Software zurückspringt. So können zum Beispiel Steuerzeichen auch von Druckern exotischer Herkunft aus Steuersignalen für Standarddrucker (etwa von Commodore oder Epson) erzeugt werden. In Listing 2 ist eine Beispielroutine abgedruckt, die bei Übergabe eines Wertes von 255 an den Drucker einen Text aus der Benutzerschnittstelle ausdruckt.</p>
+
+        <p>Die Bedienung der Benutzerschnittstelle läuft nach folgendem Schema ab: Bei gesetztem Secflag (also bei Sekundäradresse 7) wird ein Schlüsselbyte in Speicherstelle $DCOC mit dem Wert $DB verglichen. Ist dieser Wert dort nicht vorhanden, wird die Centronics-Ausgaberoutine mit Codewandlung fortgesetzt. Wird der Wert $DB jedoch gefunden (weil er vorher hineingeschrieben worden ist), springt der C 64 über einen Zeiger in $0336/$0337 (LByte/HByte der Startadresse der eigenen Routine) ins selbstdefinierte Programm, führt die programmierten Funktionen aus und kehrt in die Ausgaberoutine zurück.</p>
+
+        <p>Weitere Möglichkeiten, etwa umfangreiche Codewandlung über Tabellen etc., können dadurch selbst entwickelt werden.</p>
+
+        <p>Die hier vorgestellte Schnittstelle arbeitet mit allen bisher getesteten Programmen zusammen, einschließlich Textomat, Textomat plus und MAE-Assembler. Leider ist es nicht mehr möglich, gleichzeitig bei Anschluß eines Druckers an den User-Port die RS232-Schnittstelle zu betreiben. Sämtliche RS232-Routinen sind jedoch unverändert vorhanden und funktionstüchtig.</p>
+
+        <p>Der Basic-Lader kopiert das Kernal in den RAM-Bereich von $6000 bis $7FFF und verändert dort das Betriebssystem. Das C 64 CENTRON-Betriebssystem kann nun durch Menüwahl entweder auf Diskette abgespeichert oder mit einem EPROM-Kopiergerät in ein 8-KByte-EPROM gebrannt werden. Das EPROM wird auf einer entsprechenden Adapterplatine oder auch auf einer Betriebssystem-Umschaltplatine in den Sockel U4, anstelle des normalen Kernal-ROM, eingesetzt.</p>
+
+        <h2>Hypra-Centronics</h2>
+
+        <p>Da bei der Programmierung des Hypra-Perfekt bereits auf die Kassettenroutinen verzichtet wurde, war die Platzsuche im Betriebssystem weniger aufwendig. Trotzdem mußte auch hier etwas getrickst werden. Die Schnittstelle fand keinen Platz mehr. Wer bereits im Besitz eines Hypra-Perfekt-Kernals ist, sollte Listing 3 eingeben und starten. Das neue Betriebssystem mit Centronics-Schnittstelle befindet sich dann wie gewohnt ab $6000 bis $8000 im Speicher. In den REM-Zeilen am Anfang des Listings ist angegeben, welche Änderungen vorgenommen werden müssen, um an Stelle des $6000-Bereichs den $8000-Bereich als Startadresse zu erhalten. Diese Änderungen können notwendig werden, wenn das EPROM-Programmiergerät nicht mit Programmen im $6000-Bereich arbeiten kann.</p>
+
+        <h2>Softwarelösung für jedermann</h2>
+
+        <p>lm Gegensatz zu den beiden bisher beschriebenen Versionen arbeitet die Schnittstelle aus Listing 4 im RAM-8peicher des C 64. Dafür bietet sie aber den Vorteil, völlig frei verschiebbar zu sein. Einige Bereiche, in denen die Schnittstelle keinen Platz findet, wurden von vorneherein ausgeschlossen. Eine Fehlbedienung ist somit fast unmöglich. Nach dem Starten des Programms meldet sich ein Menü, mittels dessen Sie den Speicherbereich, in dem die Schnittstelle arbeiten soll, eingeben können. Es ist dabei belanglos, ob Sie den Speicherbereich in dezimaler oder hexadezimaler Form (zum Beispiel $C000) bestimmen. Das Programm rechnet die Adressen um und informiert Sie anschließend darüber, mit welchem SYS-Befehl (der ja vom Speicherbereich abhängt) die Schnittstelle immer wieder neu initialisiert werden kann.</p>
+
+        <p>Wir hoffen, Ihnen mit diesen drei Lösungen das Mittel an die Hand zu geben, mit dem Sie jeden Drucker mit Centronics-Schnittstelle an den C 64 anschließen können. Es sei nochmals darauf hingewiesen, daß Listing 1 und Listing 3, ausschließlich für die Verwendung im Kernal-ROM vorgesehen sind. Dazu ist es notwendig, den Computer zu öffnen (Achtung! Garantieverlust) und das Kernal-ROM durch ein 2764-EPROM zu ersetzen. Bitte beachten Sie, daß dieser EPROM-Typ nur mit einer Adapterplatine (Bild 1 zeigt, welche Pins von Sockel und EPROM miteinander zu verbinden sind) in den U4-Steckplatz eingesetzt werden darf. Ohne diesen Adapter wird der C 64 wahrscheinlich beschädigt.</p>
+
+        <p>Wer möchte, kann sein neues Betriebssystem natürlich auch im RAM unter dem ROM ($E0000 bis $FFFF) ausprobieren. In Listing 1 ist dafür eine eigene Funktion im Menü vorgesehen. Bei Listing 4 brauchen Sie sich keine Gedanken um EPROMs und Steckplätze zu machen. Sie funktioniert ohne jede Änderung mit jedem C 64. Leider muß sie jedesmal vor dem Arbeiten neu geladen werden.</p>
+
+        <address class="author">(W. Forstenrath, M. Braun, A. Wängler/hm)</address>
+    </article>
+</body>
+
+</html>

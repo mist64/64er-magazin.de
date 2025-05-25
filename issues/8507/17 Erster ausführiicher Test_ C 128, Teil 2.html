@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>Erster ausführiicher Test: C 128, Teil 2</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="ev, hm">
+    <meta name="64er.issue" content="7/85">
+    <meta name="64er.pages" content="17-22">
+    <!-- <meta name="64er.toc_category" content="XXX"> -->
+    <!-- <meta name="64er.toc_title" content="XXX"> -->
+    <meta name="64er.id" content="XXX">
+</head>
+
+<body>
+    <article>
+        <h1>Erster ausführiicher Test: C 128, Teil 2</h1>
+        <p class="intro">In der letzten Ausgabe haben wir Ihnen die Eigenschaften und Möglichkeiten des C 128 vorgestellt. Diesmal sollen Sie erfahren, was alles im C 128 und dem neuen Diskettenlaufwerk 1571 zu finden ist, und wie es um das Betriebssystem CP/M im 128er bestellt ist.</p>
+
+        <p>Bild 1 zeigt die Platine des C 128. Rechts unten finden Sie die wichtigsten Bausteine der ganzen Platine: den 8502-Prozessor und den Z80. Der 8502 wurde von Commodore/MOS für den C 128 gebaut. In seinen Funktionen entspricht er dem 6510 aus dem C 64. Allerdings kann er mit 2 MHz getaktet werden, doppelt so schnell wie der 6510. Durch den Z80 »versteht« der C 128 auch CP/M-Programme. Sie können dadurch auch Programme wie Wordstar und Sprachcompiler (Pascal, Cobol und Ada) verwenden.</p>
+
+        <p>Rechts unten befindet sich das Gedächtnis des C 128: der 128-KByte-RAM-Speicher. 128 KByte RAM erhält man durch Parallelschaltung von sechzehn 8 KByte/ 8 Bit RAMs.</p>
+
+        <h2>C 128-Hardware — Bewährtes und Neues</h2>
+
+        <p>Gleich oberhalb der RAMs finden Sie die vier Betriebssystem-ROMs mit je 16 KByte. Im freien Steckplatz für ein 32-KByte-ROM wird in der deutschen C 128-Version ein deutscher Zeichensatz untergebracht sein. Sie können dort aber auch eigene Betriebssysteme einstecken.</p>
+
+        <p>Neben den ROMs, die Bildgeneratoren: Der RGB-Controller und der aus dem C 64 bekannte VIC, der für den C 128 leicht überarbeitet wurde. Normalerweise befindet sich über den beiden Video-Chips ein Abschirmblech. Ebenso über dem Modulator, der ein Hochfrequenzsignal zum Anschluß eines Fernsehers erzeugt. Im 2-MHz-Modus löst der RGB-Controller den VIC, der nur mit 1 MHz arbeiten kann, ab.</p>
+
+        <p>Rechts neben der »Bildstelle« befindet sich der Sound-Chip, der SID. Er ist identisch mit dem 6581 aus dem C 64. Etwas weiter rechts liegt die MMU, die Memory Management Unit. Erst mit der MMU kann ein 8502-Prozessor 128 KByte Speicher mittels Bank-Switching verwalten.</p>
+
+        <p>Die PLA (Programmable Logic Array, vom Hersteller programmierbare Logikschaltung) und die CIAs (Complex Interface Adapter, hier zur Steuerung von Aus- und Eingängen ) haben im C 128 fast die gleichen Aufgaben wie im C 64. So verwaltet die PLA den ROM-Speicheraufbau. Sie selektiert die vom Prozessor benötigten ROMs im Computer und EPROMs auf einer eventuellen Erweiterungskarte. Die 6526-CIAs, Commodore/MOS-Entwicklungen, regeln alles, was an Daten in den C 128 hinein- und hinausgeht. CIA 1 übernimmt die Auswertung, welche Taste der Tastatur gedrückt wurde und teilt dem Prozessor mit, in welche Richtung ein Joystick weist. CIA 2 steuert die Ein- und Ausgänge des User-Ports und des seriellen IEC-Bus.</p>
+
+        <p>Bild 2 zeigt das Blockschaltbild des C 128. Im folgenden soll kurz der Aufbau des Systembusses erläutert werden.</p>
+
+        <h3>1. Der Prozessor-Bus</h3>
+
+        <p>Als Prozessorbus bezeichnet man den Adreß- und Datenbus. Der Adreßbus umfaßt 16 Leitungen A0 bis A15, der Datenbus 8, D0 bis D7. Wie Sie ja sicherlich wissen, muß beim C 64 ein Datum (POKE-Wert) innerhalb des Wertebereichs von 0 — 255 liegen. Aber nicht nur beim C 64, sondern bei allen 8-Bit-Computern, da 255 die größte mit 8 Bit darstellbare Zahl ist. Es sind deshalb 16 Adreßleitungen nötig, damit ein 8-Bit-Computer 65536 Speicherstellen (64 KByte) ansprechen kann. Beide Bussysteme stellen die Verbindung des Prozessors mit den ROMs, RAMs und I/O (Input/Output)-Bausteinen her. Der Prozessorbus dient sowohl dem 8502, als auch dem Z80. Damit der Z80, der mit 4 MHz getaktet wird, mit dem 2 MHz-Bussystem arbeiten kann, wurde ihm eine entsprechende Interface-Schaltung »verpaßt«. Diese Schaltung sorgt dafür, daß der Z80 nur mit 2 MHz getaktet wird, wenn er auf den Bus zugreift.</p>
+
+        <h3>2. Der Translated Adress Bus</h3>
+
+        <p>Dieses Bussystem wird von der MMU generiert. Das System besteht nur aus den höherwertigen Adreßleitungen TA8 bis TA15. Diese Adreßleitungen benötigt der VIC-Chip zum Zugriff auf das Zeichensatz-ROM. Dazu legt die MMU TA8 bis TA11, während der VIC arbeitet, auf einen Tri-State-Pegel, damit der VIC-Chip diese Leitungen für sich nutzen kann, als VA8 bis VA15. Das ermöglicht erst den VIC das gesamte Zeichen-ROM zu adressieren. Ein Zeichen besteht aus 8 Byte, der Zeichensatz umfaßt 256 Zeichen, insgesamt also 2048 Byte. Mit acht Leitungen könnte der VIC aber nur 256 Byte adressieren. Um aber 2048 Speicherplätze adressieren zu können, stellte eben die MMU dem VIC noch drei Tri-State-Leitungen zur Verfügung. Schaltet ein Baustein eine Leitung auf Tri-State-Pegel, entspricht das einer Leitung die in »der Luft hängt«. Technisch wird dazu einfach ein sehr hochohmiger Abschlußwiderstand in die Leitung geschaltet.</p>
+
+        <p>Eine andere Funktion des Translated Adress Bus ermöglicht das Arbeiten des Z80 auf dem 8502-Bussystem. Im Z80-Modus wird zu jeder Adresse von Bank 0 aus dem Bereich von $0000 bis $OFFF $D000 addiert, damit der Z80 auf das CP/M-BIOS zugreifen kann. Normalerweise liegt ja bei CP/M das BIOS im Bereich von $D000 bis $DFFF im RAM-Speicher. Da aber die ganze C 128-Organisation 8502-spezifisch ist und deshalb das BIOS in Bank 0 von $0000 bis $OFFF untergebracht ist, ist eine Konvertierung der Adressen von $D000 bis $DFFF auf $0000 bis $OFFF nötig. Und zwar immer dann, wenn vom Z80 auf das BIOS zugegriffen wird. Die Adreßkonvertierung findet nur in Bank 0 statt, nicht in Bank 1. Hier befindet sich die normale 8502-System-Zeropage.</p>
+
+        <h3>Der Multiplexed Adress Bus</h3>
+
+        <p>Dieses Bussystem sichert die Zusammenarbeit des VICs mit dem Prozessor. Welche Daten über welche Leitungen fließen, bestimmt das MUX-Signal. Es wird von der MMU über die PLA erzeugt. Da die Erklärung der Funktion des Multiplexed Adress Bus hier zu weit führen würde, nur einen Umriß: Er wird vom Prozessor zur Adressierung der beiden RAM-Bänke gebraucht, zur Adressierung der VIC-Register und für Zugriffe des VIC auf das Farb-RAM und das Zeichensatz-ROM.</p>
+
+        <p>Zum neuen Computer gibt es auch ein neues Floppy-Laufwerk, die 1571, die wir auch unter die Lupe nahmen. Zum Test standen leider keine Unterlagen zur Verfügung.</p>
+
+        <h2>Das 1571-Laufwerk</h2>
+
+        <p>Genaue Aussagen können wir über die Ladegeschwindigkeiten im C 128- und C 64-Modus geben. Im C 64-Modus hat sich nichts gegenüber der 1541 geändert, im 128er-Modus ist das Laufwerk allerdings 7- bis 8mal so schnell. So benötigt beispielsweise ein Hires-Bild (33 Blökke auf Diskette) ganze 3,2 Sekunden Ladezeit. Der Bildschirm wird während des Ladens nicht abgeschaltet.</p>
+
+        <p>Auch das Formatieren geht sehr viel schneller als vorher: Ganze 40 Sekunden werden zum doppelseitigen Formatieren einer Diskette benötigt. Danach stehen 1328 Blöcke zur freien Verfügung, also die doppelte Speicherkapazität einer 1541-formatierten Diskette. Noch eins fällt beim Formatieren auf: das Rattern entfällt. Den Grund dafür entdeckten wir nach dem Aufschrauben der 1571: Der mechanische Anschlag zur Kopfpositionierung wurde durch eine Lichtschranke ersetzt. Die Mechanik macht allgemein einen sehr guten und stabilen Eindruck. Interessant ist auch, daß eine weitere Lichtschranke zur Abfrage des Indexloches vorhanden ist. Alle Schreib-/Lesevorgänge funktionierten nämlich auch mit Disketten, die kein Indexloch hatten. Eine Ausnahme könnte der CP/M-Modus sein, wenn Disketten anderer Formate verwendet werden. Dies konnten wir aber mit dieser Version nicht testen, da der Floppy-Controller noch nicht auf andere Diskettenformate programmiert werden konnte.</p>
+
+        <p>Auch die Elektronik zeigt sich von einer guten Seite. Auf der sehr sauber aufgebauten Platine sind gegenüber der 1541 einige Chips hinzugekommen, über deren Funktion teilweise nur spekuliert werden konnte. So ist zum Beispiel eine 6526-CIA und ein WD1770-Controller vorhanden (Bild 3).</p>
+
+        <p>Das alte 1541-Problem der Wärmeabfuhr wurde bei der 1571 gelöst. Das ohnehin schon recht »kalte« Netzteil ist völlig von der Floppymechanik getrennt. Es können also kaum mehr Schreib-/Leseprobleme auftreten, die auf eine Wärmeleitung vom Netzteil auf die Floppymechanik zurückzuführen sind.</p>
+
+        <p>Wie der C 128 hat auch das Floppy-Laufwerk einen Modus, der ein früheres Commodore-Gerät, die 1541, simulieren soll. Hier gab&rsquo;s, zumindest bei unserer Vorabversion, noch einige Probleme. Es ist deshalb die Serienversion abzuwarten, will man ein endgültiges Urteil abgeben. Eine Kleinigkeit ist uns noch sehr positiv aufgefallen: An der Rückseite befinden sich zwei kleine DIP-Schalter, mit denen die Geräteadresse der Floppy auf Werte zwischen 8 und 11 geändert werden kann. Es wird also auch für absolute Anfänger ein problemloser Betrieb mit mehreren Laufwerken möglich sein.</p>
+
+        <h2>Der CP/M-Modus</h2>
+
+        <p>Der C 128 ist der erste Commodore-Computer, der von Haus aus bereits CP/M-fähig ist. Mit diesem Betriebssystem steht dem Anwender die ganze Welt der CP/M-Software zur Verfügung, was insbesondere beim mehr professionell orientierten Anwender ein starkes Argument für den C 128 darstellen dürfte. Allerdings wurde dieser Vorteil, wie beschrieben, mit einem immensen technischen Aufwand erkauft. Während ein reiner Z80-Computer mit CP/M in der Regel überhaupt keine Probleme hat (System in den Speicher laden — fertig), sind beim C 128 eine Vielzahl soft- und hardwaremäßiger Probleme zu lösen.</p>
+
+        <p>Bei dem uns zur Verfügung stehenden Testgerät war denn auch das CP/M-System noch nicht in der endgültigen Version implementiert. Insbesondere die Ladegeschwindigkeit unter CP/M ließ noch sehr zu wünschen übrig. Die Ladezeit für das CP/M-System selbst betrug in der (vorläufigen) Version ziemlich genau 45 Sekunden. In der endgültigen Version wird die Geschwindigkeit allerdings deutlich höher liegen, so daß ein sinnvolles Arbeiten möglich wird.</p>
+
+        <p>Wer bisher nur mit dem C 64 gearbeitet hat, dem stehen bei der Umstellung auf eine CP/M-fähige Maschine natürlich einige Umstellungen bevor.</p>
+
+        <h2>Was ist CP/M?</h2>
+
+        <p>Die Bezeichnung CP/M steht für »Control Program for Microcomputers«, also einfach für ein — inzwischen weitverbreitetes — Betriebssystem für Mikrocomputer. CP/M wurde bereits 1974 von Gary Kildall bei Intel entwickelt und diente ursprünglich als Dateiverwaltungs-System für einen von Intel vertriebenen Compiler für die Programmiersprache PL/M. Seit 1975 wird CP/M als allgemeines Betriebssystem kommerziell angeboten und ständig weiterentwickelt. Das Erfolgsrezept von CP/M heißt »Standard«.</p>
+
+        <p>Da jeder Hersteller eines Mikrocomputers in der Regel sein eigenes Betriebssystem einbaut, ergeben sich sehr große Probleme bei der Übertragung von Programmen und Daten zwischen verschiedenen Computern. Wer schon einmal versucht hat, ein VC 20-Programm an den C 64 anzupassen (oder umgekehrt), der weiß, wovon hier die Rede ist.</p>
+
+        <p>Das CP/M-Betriebssystem tritt nun als Vermittler zwischen Anwenderprogramm und Hardware auf. Beispielsweise fragt ein CP/M-Programm niemals die Tastatur direkt ab, denn die kann ja infolge unterschiedlicher Hardware von Computer zu Computer anders konzipiert und angesteuert sein. Statt dessen ruft das Anwenderprogramm eine Routine im CP/M-System auf, die die gewünschte Funktion ausführt. Natürlich muß das CP/M-System für jeden Computer an die spezielle Hardware angepaßt werden, aber, und das ist das Entscheidende, die Anwenderprogramme laufen unverändert, da sie ja nicht direkt auf die Hardware zugreifen.</p>
+
+        <p>Da alle CP/M-Programme generell im gleichen Speicherbereich liegen, treten kaum Probleme bei der Übertragung von einer CP/M-Maschine zur anderen auf.</p>
+
+        <p>Grundvoraussetzung für die Übertragbarkeit von Software ist allerdings die Verwendung des gleichen Mikroprozessors in allen CP/ M-Computern. Die Wahl fiel bei Intel nicht schwer: Der 8080 aus dem eigenen Hause wurde zum CP/M-Prozessor gekürt. Der Fairneß halber muß man allerdings zugeben, daß der 8080 damals (Mitte der siebziger Jahre) tatsächlich einer der leistungsfähigsten Mikroprozessoren überhaupt war.</p>
+
+        <p>Heutzutage wird allerdings fast ausschließlich der Z80 verwendet, der voll aufwärtskompatibel zum 8080 ist, aber über einen stark erweiterten Befehlsvorrat und mehr interne Register verfügt. Wer sich ernsthaft für CP/M interessiert, der sollte sich daher mit diesem Prozessor vertraut machen.</p>
+
+        <h2>Der Z80-Prozessor</h2>
+
+        <p>Im Gegensatz zur 6502-Prozessorfamilie (zu der auch der 6510 im C 64 und der 8502 im C 128 gehört) handelt es sich beim Z80 ebenso wie beim Vorgänger 8080 um eine sogenannte »registerorientierte CPU«. Das bedeutet, daß der Z80 über eine größere Anzahl interner Register verfügt, die sowohl als Daten- wie auch als Adreßregister benutzt werden können (Bild 5).</p>
+
+        <p>Insgesamt stehen dem Benutzer sechs allgemeine 16-Bit-Register (BC, DE, HL, BC’, DE’, HB) zur Verfügung, die wahlweise auch als zwölf 8-Bit-Register angesprochen werden können. Daneben gibt es zwei Akkus und ebenfalls zwei Flag-Register, zwei 16-Bit-Indexregister (IX und IY), einen 16-Bit-Stackpointer (SP) und natürlich einen Programmzähler (PC). Zwei weitere Register, das Interrupt-Vektor-Register I und das Refresh-Kontroll-Register R haben spezielle Funktionen.</p>
+
+        <p>Die Register AF, BC, DE und HL bilden die sogenannten Primärregister, die vom 8080 übernommen wurden und die in erster Linie direkt angesprochen werden können. Mit speziellen Befehlen kann zwischen diesen Primärregistern und den »Sekundärregistern« AF’, BC’, DE’ und HB umgeschaltet werden. Die Indexregister IX und IY haben ähnliche Aufgaben wie die 6502-Register X und Y, sind jedoch 16 Bit breit.</p>
+
+        <p>Der Z80-Befehlssatz ist sehr umfangreich und umfaßt unter anderem auch 16-Bit-Arithmetik, Blockverschiebebefehle, automatische Such- und Ein-/Ausgabebefehle, bedingte Unterprogrammaufrufe sowie Einzelbitbefehle. Insgesamt kennt die Z80-CPU über 700 Opcodes. Um diese vielen Maschinenbefehle verschlüsseln zu können (mit einem Befehlsbyte können nur 256 Befehle codiert werden), gibt es einige spezielle »Umschaltopcodes«, die einfach bewirken, daß der Z80 intern auf eine andere Befehlstabelle umschaltet und das nächste Befehlsbyte in einer anderen Form interpretiert.</p>
+
+        <p>Nach diesem kurzen Ausflug zum Z80 jetzt jedoch wieder zum CP/M-Betriebssystem. Beim Studium von Handbüchern und CP/M-Literatur stößt man immer wieder auf vier Abkürzungen: BIOS, BDOS, CCP und TPA. Hinter diesen Bezeichnungen verbergen sich die wichtigsten Bestandteile eines CP/M-Systems.</p>
+
+        <p>BIOS steht für »Basic Input Output System«, hat aber absolut nichts mit der Programmiersprache Basic zu tun. Die Bezeichnung deutet lediglich an, daß es sich hierbei um eine Sammlung grundlegender Routinen zur Ein-/Ausgabe von Daten handelt.</p>
+
+        <p>Das CP/M-BIOS entspricht von der Funktion her ziemlich genau den Kernal-Routinen bei Commodore-Computern. Der gesamte Kontakt eines Anwenderprogramms mit der Hardware-Umgebung läuft über diese Routinen. Alle BIOS-Routinen werden indirekt über das BDOS, das Basic Disk Operating System, durchgeführt. Der Aufruf aller Systemroutinen geschieht durch einen Unterprogrammsprung zur Adresse 5, dem sogenannten BDOS-CALL. Die verschiedenen geforderten Funktionen werden dadurch selektiert, daß im C-Register des Z80 ein Funktionscode übergeben wird. Die Routine ab Adresse 5 verzweigt dann abhängig vom Inhalt des C-Registers zu den verschiedenen BIOS-Funktionen (Tabelle 1).</p>
+
+        <p>Diese beiden Teile des CP/M-Systems, BIOS und BDOS, werden beim »Booten«, also beim Laden des Systems von der Diskette, einmal in den Speicher geholt und bleiben dann ständig resident vorhanden.</p>
+
+        <p>Für den Kontakt zwischen CP/M und Anwender sorgt der »Console Command Processor« (CCP). Es handelt sich dabei um einen einfachen Kommando-Interpreter, der über die Tastatur eingegebene CP/M-Kommandos erkennt und ausführt. Mit CP/M-Kommandos hat es dabei eine besondere, grundlegende Bewandtnis. Hierzu ist es wichtig zu wissen, daß Dateinamen unter CP/M aus zwei Teilen bestehen, der eigentlichen Dateibezeichnung (acht Zeichen Länge) und der Namenserweiterung (»Extension«, drei Zeichen Länge). Diese Erweiterung, die durch einen Punkt vom eigentlichen Namen abgetrennt wird, gibt den Typ der Datei an.</p>
+
+        <h2>Kommandostruktur</h2>
+
+        <p>Besonders wichtig ist der Dateityp »COM«. Wenn ein Dateiname die Erweiterung COM hat, dann stellt sie ein CP/M-Kommando dar. Das funktioniert folgendermaßen: Wenn der Benutzer ein Kommando eingibt, dann sucht der CCP auf der Diskette nach einer COM-Datei, die den Namen des Kommandos trägt. Diese Datei wird dann geladen und gestartet, mit anderen Worten, die Datei <strong>ist</strong> das Kommando.</p>
+
+        <p>Will man beispielsweise das Directory der Diskette sehen, dann gibt man den Befehl DIR ein. Der CCP sucht, lädt und startet daraufhin das Programm »DIR.COM«, das wiederum das Inhaltsverzeichnis der Diskette ausgibt. Derartige Kommandos heißen »transiente Kommandos«, weil sie eben nicht fest eingebaut sind, sondern nur bei Bedarf geladen werden. Der für transiente Kommandos reservierte Speicherbereich heißt »Transient Program Area« (TPA), womit auch die vierte der oben angesprochenen Abkürzungen geklärt wäre. Jedes CP/M-System verfügt auf der Systemdiskette über eine Standard-Bibliothek von wichtigen transienten Kommandos. Dazu gehören in der Regel Kommandos zum Ändern von CP/M-Parametern, zum Kopieren, Löschen, Listen und Umbenennen von Dateien und ähnliches, was man zum sinnvollen Arbeiten mit einer Diskettenstation benötigt.</p>
+
+        <p>Natürlich ist es möglich, diesen Befehlsvorrat zu erweitern, indem man entsprechende Assemblerroutinen schreibt oder auch einen Compiler einsetzt. Einzige Bedingung für transiente Kommandos ist die Lauffähigkeit des Maschinenprogramms in der TPA. Generell sind alle CP/M-Anwenderprogramme transiente Kommandos. Das Textverarbeitungsprogramm Wordstar heißt unter CP/M zum Beispiel »WS.COM« und wird einfach mit dem Kommando »WS« aufgerufen.</p>
+
+        <p>Mit dem CP/M-Betriebssystem hat der C 128-Benutzer Zugriff auf das größte Softwareangebot der Welt. Immerhin werden bereits seit zehn Jahren CP/M-Programme entwickelt und immer weiter verbessert. Textverarbeitung, Datenbanken, Tabellenkalkulation stehen in großer Auswahl ebenso zur Verfügung wie spezielle Branchenlösungen für den kommerziellen Einsatz. Statistik-Pakete, mathematische und naturwissenschaftliche Software ist in Mengen erhältlich. Wer selber programmieren will, der findet unter CP/M ein Angebot an Programmiersprachen, das von Fortran und Cobol über Pascal bis zu Ada und Lisp reicht. Unter CP/M gibt es so ziemlich alles, was auch auf Großrechnern läuft.</p>
+
+        <p>Allerdings soll nicht verschwiegen werden, daß trotz Standard und Kompatibilität gewisse Probleme auftreten können. So muß CP/M-Software generell erst einmal an einen speziellen Computer angepaßt werden. Das erledigt ein zu jeder Software gehöriges sogenanntes Installations-Programm, das zum Beispiel die Tastaturbelegung, Bildschirmansteuerung etc. abfragt, um beispielsweise ein Textprogramm optimal auf den jeweiligen Computer einstellen zu können. Dieser kleine Arbeitsaufwand ist aber natürlich gar nichts im Vergleich beispielsweise zur Aufgabe, etwa den Textomat oder Vizawrite an den VC 20 anzupassen.</p>
+
+        <p>Als Fazit darf festgehalten werden, daß dem C 128-Besitzer durch das CP/M-Betriebssystem ein riesiges Software-Potential zur Verfügung steht. Es ist zu hoffen, daß es zukünftig auch »schlüsselfertige«, also bereits an den C 128 angepaßte CP/M-Software geben wird, um dem Anwender die Mühen der Installation zu ersparen. Vor allem aber dürfte es von entscheidender Bedeutung sein, ob die Hersteller von CP/M-Software willens sind, die Preise für ihre Produkte, die sich teilweise noch im vierstelligen Bereich befinden, drastisch zu senken.</p>
+
+        <p>Die Chancen dafür stehen nicht schlecht, denn nachdem CP/M im professionellen Bereich inzwischen durch MS-DOS, ein 16-Bit-Betriebssystem, abgelöst worden ist, sollten die CP/M-Hersteller eigentlich schon an neuen Märkten interessiert sein, und diese neuen Märkte könnten durchaus im oberen Home-Bereich liegen. Wenn die Software jedoch teurer als der Computer ist, dürfte wohl kein Geschäft zu machen sein, aber beispielsweise Wordstar für 298 oder gar für 198 Mark — das wäre doch wohl ein Renner.</p>
+
+        <h3>Schlußfolgerung</h3>
+
+        <p>Der C 128 ist ein Zwitter. Bedingt durch die sicherlich löbliche Entscheidung von Commodore den C 128 64er-kompatibel zu machen, ergaben sich bei der technischen Realisierung natürlich einige umständliche Lösungen. Die 8-Bit-Technologie ist bei Heimcomputern zwar noch weit verbreitet, dennoch zeigen einige Konkurrenten mit 16-Bit-Prozessoren wo der Weg auch bei »Kleincomputern« hingehen wird.</p>
+
+        <p>Auf der anderen Seite verfügt der C 128 bereits bei seiner Einführung über ein enormes Softwarepotential (C 64- und CP/M-Software). Der Anwender kann also aus dem Vollen schöpfen. Das wesentlichste Kaufkriterium wird aber der Preis sein. Wünschenswert wäre jeweils ein Kaufpreis von deutlich unter 1000 Mark für Computer, Floppy-Laufwerk und Monitor. Bei den bisherigen Preisen kommt man sehr schnell über 3000 Mark, und in dieser Kategorie gibt es Alternativen!</p>
+
+        <address class="author">(ev/hm)</address>
+    </article>
+</body>
+
+</html>

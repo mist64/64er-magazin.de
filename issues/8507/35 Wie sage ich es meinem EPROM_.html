@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>Wie sage ich es meinem EPROM?</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="Klaus Zietlow, Arnd Wängler, ah">
+    <meta name="64er.issue" content="7/85">
+    <meta name="64er.pages" content="35-36,38">
+    <!-- <meta name="64er.toc_category" content="XXX"> -->
+    <!-- <meta name="64er.toc_title" content="XXX"> -->
+    <meta name="64er.id" content="XXX">
+</head>
+
+<body>
+    <article>
+        <h1>Wie sage ich es meinem EPROM?</h1>
+        <p class="intro">Die Programmierung von EPROMS hat ihren besonderen Reiz. Doch was ist das eigentlich, ein EPROM? Wir stellen die wichtigsten EPROM-Typen der 25er und 27er Reihe vor und zeigen Ihnen, wie man sie programmiert.</p>
+
+        <p>Bei Halbleiterspeichern muß man zwischen Festwert- und Schreib-/Lesespeichern unterscheiden. Die Festwertspeicher gliedern sich in ROMs (<strong>R</strong>ead <strong>O</strong>nly <strong>M</strong>emory), PROMs (<strong>P</strong>rogramable ROM), und EPROMs. Die EPROMs haben gegenüber den anderen Festwertspeichern den Vorteil, daß sie sich nach einer Programmierung wieder löschen lassen. Sie sind also für Anwendungen, in denen keine größeren Stückzahlen anfallen oder öfters Änderungen gemacht werden müssen, prädestiniert. Auch die Preise bei den Speicher-ICs haben in den letzten Jahren einen so erfreulichen Verlauf genommen, daß es sich in vielen Fällen lohnt, häufiger benötigte Programme als Modul in EPROMs zu speichern. Der Wermutstropfen bei ihrer Anwendung ist die relativ komplizierte Programmierung, für die ein eigenes Gerät benötigt wird.</p>
+
+        <h2>EPROM-Typen</h2>
+
+        <p>Die ersten EPROMs benötigten noch drei Versorgungsspannungen und waren nur mit großem Aufwand zu programmieren. Da ihr Preis inzwischen auch mehr als »Liebhaberpreis« zu sehen ist, soll auf diese »antiken« Stücke nicht näher eingegangen werden. Später gingen die Hersteller dazu über, Speicherbausteine mit einer 5 Volt Spannungsversorgung zu produzieren. Dadurch wurde der Aufwand, EPROMs zu programmieren, erheblich reduziert. Der erste Typ, der 2508, hatte eine Kapazität von 1 KByte. Alle EPROMs werden nach dem sogenannten Bytewide-Prinzip gefertigt, das heißt sie haben acht Datenleitungen. Dies hat den Vorteil, daß zum Anschluß an einen 8-Bit-Mikroprozessor nur ein IC benötigt wird. Hinzu kommt, daß die Pinbelegung der EPROMs so konzipiert ist, daß sie untereinander und zu vielen statischen RAM-ICs weitgehend kompatibel sind.</p>
+
+        <p>EPROMs mit 2 KByte heißen 2716 oder 2516, wobei jedoch beim Kauf von 2716ern Vorsicht geboten ist, da vereinzelt auch noch ältere 3-Spannungstypen unter diesem Namen gehandelt werden. 4 KByte EPROMs gibt es im Handel unter den Bezeichnungen 2732 und 2532. Diese beiden Typen unterscheiden sich in den Pins 18 und 21. Der Grund für diese Abweichung ist darin zu suchen, daß Texas Instruments, der Hauptlieferant für 2532er, bei ihren EPROMs eine direkte Pin-Kompatibilität zu den bestehenden MaskenROMs suchte, während die meisten anderen Hersteller die 4 KByte-EPROMs aufwärtskompatibel zu den größeren 28poligen Typen machen wollte. Das Bemühen von TI wird noch deutlicher, wenn man den 2564, den 8 KByte-Typ dieses Herstellers, betrachtet. So ist es möglich, dieses 28polige IC direkt mit dem unteren Teil in einen 24poligen Sockel für ein 8 KByte-ROM zu setzen, wie zum Beispiel das Kernal-ROM des C 64, falls es gesockelt ist. Die Pins 1, 2, 27 und 28 sind einfach wie in Bild 1 gezeigt zu beschalten. Diesen Vorteil des 2564 muß man jedoch mit einem etwas höheren Preis bezahlen.</p>
+
+        <p>Der bei weitem verbreitetere 8 KByte-Typ ist der 2764. Er ist zur Zeit das EPROM mit dem günstigsten Preis/Bit-Verhältnis. Die Typenbezeichnung ist bei diesen EPROMs äußerst logisch aufgebaut. Die Zahl hinter der 25 beziehungsweise 27 gibt die Kapazität des Speichers in KBit an. Also: 2764 bedeutet 64 KBit oder 8 KByte. Folglich heißen die größeren Typen 27128 (16 KByte), 27256 (32 KByte) und 27512 (64 KByte). Ein EPROM mit 1 Megabit Speicherkapazität ist von NEC angekündigt, wird jedoch in einem 40poligen Gehäuse angeboten werden.</p>
+
+        <p>Diese immensen Speichergrößen sind aber im Moment den professionellen Anwendern vorbehalten und können von Homecomputern mit 8-Bit-CPUs nicht sinnvoll verwaltet werden. Einen sehr geeigneten Schritt hin zur leichteren Verwaltung großer EPROM-Bänke hat Intel mit ihrem 27513 (Bild 2) gemacht. Dieses EPROM ist seitenorientiert aufgebaut, das heißt es besteht aus vier EPROM-Bänken mit jeweils 16 KByte. Die Auswahl der aktiven Bank erfolgt über einen Schreibbefehl m ein internes Register des 27513. Beim Schreibbefehl werden die an den Datenleitungen D0 und D1 anliegenden Informationen übernommen und zur Seitenadresse decodiert. Beim Einschalten der Versorgungsspannung wird automatisch die Seite Null aktiviert, so daß man einen definierten Systemzustand erhält. Mit einem 27513 lassen sich also mit einem Befehl vier 16 KByte-Blöcke umschalten. Es ließen sich also auch umfangreichere Programme auf kleinere Computer umschreiben und in einem Chip unterbringen. Für den Expansion-Port des C 64 wäre dieses IC geradezu ideal. Es wird jedoch noch zirka zwei Jahre dauern, bis dieser Baustein preislich mit anderen Lösungen konkurrieren kann.</p>
+
+        <p>Nach soviel Zukunftsmusik nun wieder zur Realität: Der Bedeutung der einzelnen Pins eines EPROMs und der Programmierung.</p>
+
+        <h2>Der 2764 unter der Lupe</h2>
+
+        <p>Das 28polige Gehäuse des 2764 (Bild2) hat 13 Adreßleitungen, A0 bis A12. Sie dienen zur Auswahl der angesprochenen Speicherstelle und sind binär codiert. Der Chip hat acht Datenleitungen OO bis 07, die bei einem Lesezugriff das Datenwort führen. Während der Programmierung müssen hier die zu programmierenden Bytes angelegt werden. Ferner gibt es noch eine Chip-Enable-(CE), eine Output-Enable-(OE) und eine Program-Leitung (PGM). Ihre Funktionen zeigt Bild 3. Die 5 Volt-Versorgungsspannung wird an Pin 28 (VC0) angeschlossen, Pin 1 (Vpp) führt während der Programmierung 21 Volt sonst 5 Volt. Alle Spannungen beziehen sich auf das mit Pin 14 (GND) verbundene Massepotential.</p>
+
+        <h3>Konventionelle Programmierung</h3>
+
+        <p>Beim Programmbeginn muß PGM auf Low-Pegel liegen. Dann erst darf die Programmierspannung von 21 Volt angelegt werden. Diese Spannung kann bis zum Ende der Programmierung angelegt bleiben, muß also nicht zum Verifizieren der Daten abgeschaltet werden. Nur vor der Entnahme des ICs aus der Fassung sollte man die Spannung abschalten, um ungewollte Programmierungen oder sogar die Zerstörung des Chips zu vermeiden. Während der gesamten Programmierung muß der 2764 selektiert sein, das heißt, der Chip-Enable-Eingang auf Low-Pegel liegen. MitOE = high werden die Ausgänge des EPROMs abgeschaltet. Jetzt werden die Adresse und das entsprechende Datenwort angelegt und, wenn diese stabil anliegen, die Programmierung durch einen 50 ms langen negativen Impuls an PGM vollzogen. Jetzt werden die Daten von den Ausgängen OO bis 07 des EPROMs entfernt und der Inhalt der gerade programmierten Speicherzelle mit OE = Low-Pegel ausgelesen. Stimmt er nicht mit dem Sollwert überein, so ist entweder das IC oder das Programmiergerät nicht in Ordnung. Ist die Zelle korrekt »gebrannt«, kann man, nachdem OE wieder auf High-Pegel gebracht wurde, mit dem nächsten Byte fortfahren. Da die vollständige Programmierung eines 2764 mit diesem Verfahren zirka 7 Minuten dauert, haben sich die meisten Hersteller einen schnelleren Programmieralgorithmus ausgedacht (Bild 4), der die Programmierzeit für einen 2764 auf zirka 75 Sekunden verkürzt. Diese immense Zeiteinsparung ist vor allem für den kommerziellen Anwender wichtig, da sie oftmals die Anschaffung eines teuren Produktions-EPROMmers, der mehrere ICs gleichzeitig brennen kann, überflüssig macht. Aber auch für den Amateur ist eine solche Zeiteinsparung angenehm, zumal der schnelle Algorithmus keine umfangreichen Änderungen an der Hardware des Programmiergeräts benötigt.</p>
+
+        <h2>Der schnelle Programmieralgorithmus</h2>
+
+        <p>Um die Methode der schnellen Programmierung zu verstehen, ist es hilfreich, sich eine Vorstellung von dem zu machen, was sich bei der Programmierung in einer Speicherzelle abspielt. Eine EPROM-Zelle besteht im wesentlichen aus einem Feldeffekttransistor mit isoliertem Gate. Die Spannung des Gates beeinflußt maßgeblich den Strom zwischen Source und Drain, den beiden anderen Anschlüssen des Transistors. Wird nun die Zelle bei einem Lesezugriff angesprochen, so erzeugt dieser Strom einen Spannungsabfall, der mit einem festen Wert, der Schwellspannung, verglichen wird. Ist die Spannung kleiner als die Schwellspannung, also das Potential am Gate des Zelltransistors noch zu niedrig, dann ist der korrespondierende Ausgang des Speichers auf High-Pegel. Nach dem Löschen mit UV-Licht oder beim Kauf eines neuen Chips sind die Gates der Zelltransistoren ungeladen. Deshalb haben neue EPROMs immer den Inhalt »$FF«. Durch die Programmierung wird die Ladung auf dem Gate erhöht und es kann nun, wenn man während des Programmierens öfters den Speicherinhalt überprüft, der Zeitpunkt bestimmt werden, zu dem die Daten das erste Mal richtig in den Zellen stehen. Das bedeutet jedoch nicht, daß der Inhalt nun stabil für immer in den Zellen erhalten bleibt, sondern daß die Schwellspannung zum ersten Mal überschritten wurde. Die schnellen Programmieralgorithmen messen die Zeit bis dies geschieht und programmieren dann noch einmal ein Vielfaches dieser Zeiten. Je nach Hersteller zwischen dem ein- und vierfachen).</p>
+
+        <p>Damit die Daten über den gesamten Temperatur- und Versorgungsspannungsbereich stabil sind, wird von allen schnellen Algorithmen eine weitere Aktion vor der eigentlichen Programmierung unternommen.</p>
+
+        <p>Die Versorgungsspannung wird von 5 auf 6 Volt erhöht. Die Schwellspannung, die zum Vergleich, ob eine Zelle geladen ist oder nicht, herangezogen wird, wird nämlich aus der Versorgungsspannung abgeleitet. Ist diese Schwellspannung nun etwas höher, so läßt der Algorithmus die Speicherzellen alle etwas länger brennen, als es für den normalen Betrieb eigentlich nötig wäre. Dies bringt zusätzliche Sicherheit, besonders an den Grenzen des erlaubten Betriebsbereiches und eine gute Langzeitstabilität.</p>
+
+        <h2>Programmiergeräte</h2>
+
+        <p>Das Komplizierteste am Selbstbau eines EPROM-Programmiergerätes ist das programmgesteuerte Umschalten von stabilen Spannungen an den verschiedenen Pins der Wechselfassung. Um ein universell verwendbares Gerät zu erhalten, sind drei Programmierspannungen (12,5 V 21 V 25 V) und die Möglichkeit, für den schnellen Algorithmus die Versorgungsspannung auf 6 Volt zu erhöhen, vorzusehen. Die Auswahl zwischen den EPROM-Typen kann man entweder über Schalter oder rein softwareseitig machen. Die Adressen-, Daten- und Steuerleitungen werden am einfachsten über Parallel-Ports geführt, da diese sehr leicht zu programmieren sind. Ein großes Problem bleibt die Stromversorgung. Es ist wünschenswert, ohne einen zusätzlichen Netztrafo auszukommen, nicht nur weil meistens die letzte Steckdose schon besetzt ist, sondern weil es für einen unerfahrenen Bastler die unliebsame Bekanntschaft mit 220 Volt zu vermeiden hilft. Für den C 64 bietet sich die Benutzung des User-Ports an, da er die 9 Volt Wechselspannung des Computers an den Pins 10 und 11 führt. Nachteilig für den Selbstbau ist die äußerst schwierige Programmierung der I/O-Leitungen. Als Alternative zum User-Port bliebe nur noch der Expansion-Port, der einen sehr einfachen Anschluß von Portbausteinen gestattet.</p>
+
+        <p>Der Nachteil dieser Alternative ist die Notwendigkeit, die Programmierspannung durch einen Gleichspannungswandler aus den 5 Volt zu gewinnen. Erstens sind solche Wandler nicht gerade billig, und zweitens wird dadurch sehr schnell die Belastungsgrenze der Computerstromversorgung erreicht. Aus den 5 Volt sollten nicht mehr als 300 mA entnommen werden, während die 9 Volt-Spannung etwas unempfindlicher auf Überlastung reagiert. Wem nach diesem kleinen Einblick in die Problematik eines solchen Projektes noch nicht der Mut zum Selbstbau eines Programmiergerätes verlassen hat, dem sei angeraten, sich die Datenblätter der Hersteller zu Gemüte zu führen. Jedoch sollte ein solcher Selbstbau wirklich dem Freak vorbehalten bleiben, da mit Spannungen gearbeitet wird, die den C 64 leicht zerstören können.</p>
+
+        <h2>XROM und GAME</h2>
+
+        <p>Der C 64 hat die Möglichkeit, im Expansion-Port EPROM-Module aufzunehmen, die in den Adreßbereichen $8000 bis $9FFF und $A000 bis $BFFF liegen. Um dem Computer mitzuteilen, ob in dem Expansion-Port ein EPROM steckt, hat er die Leitungen XROM und GAME. Wird XROM auf Low-Pegel gelegt, schaltet der Computer sein internes RAM von $8000 bis $9FFF ab und erzeugt für diesen Bereich einen Chip-Select (ROML), das direkt an den Chip-Select-Eingang des EPROMs gelegt werden kann. Wenn GAME auf low gelegt wird, so schaltet der C 64 seinen Basic-Interpreter ab und erzeugt für den Bereich von $A000 bis $BFFF das Chip-Select-Signal (ROMH), das ebenfalls an den Chip-Select-Eingang des EPROMs gelegt werden kann. Es ist verständlich, daß dieser Bereich nur für Maschinensprache oder andere nicht auf das Basic zugreifende Programme geeignet ist.</p>
+
+        <h2>Autostart</h2>
+
+        <p>Der C 64 kann Programme im $8000-Bereich als Autostart-Programme identifizieren. Als Indiz dient ihm der CBM80-Code in den Adressen von $8004 bis $8008. Zu beachten sind die nicht dem ASCII-Code entsprechenden Buchstabencodes des C 64. Sind also die Speicherzellen von $8004 an mit den HEX-Werten $C3, $C2, $CD, $38 und $30 gefüllt, so springt der Computer indirekt über die Adresse $8000 in das Programm. ($8000 = Low-Adresse und $8001 = High-Adresse). In den Adressen $8002 und $8003 steht der neue NMI-Vektor im Low-/High-Format.</p>
+
+        <h2>Basic-Programme</h2>
+
+        <p>Um Basic-Programme mit Autostart in EPROMs zu brennen, empfehlen wir einen Blick in die Ausgabe 9/84, Seite 163. In dem Artikel ist ein Verschiebeprogramm in Maschinensprache abgedruckt, womit ein nach $8100 verschobenes Basic-Programm wieder korrekt zurückgelegt und gestartet wird.</p>
+
+        <p>Mit dieser Hilfe müßte es möglich sein, ein einfaches Programm zu schreiben, das ein Basic-Programm einfach hinter den Lader schreibt und für den Prommer als HEX-Datei zum Beispiel nach $2000 schiebt.</p>
+
+        <h2>EEPROMs</h2>
+
+        <p>Eine neue Entwicklung der Halbleiterindustrie ist das EEPROM, ein Speicher, der sich elektrisch löschen läßt (statt wie bisher mit UV-Licht) und seinen Inhalt beim Abschalten der Versorgungsspannung nicht verliert. Diese Bausteine müssen zum Programmieren nicht aus der Schaltung entfernt werden. Die Schreibdauer liegt bei zirka 10 ms. Das ist verglichen mit RAM-ICs sehr hoch. Deshalb gibt es, vor allem von kleineren amerikanischen Firmen, Speicher, die ein statisches RAM mit einem EEPROM auf einem Chip kombinieren. Solche NOVRAMs (<strong>N</strong>onvolatile <strong>R</strong>andom <strong>A</strong>ccess <strong>M</strong>emory) haben die kurzen Zugriffszeiten eines RAMs und die Möglichkeit, mit einem Befehl den gesamten RAM-Inhalt auf einmal in die EEPROM-Zellen zu schreiben. Es müssen aber noch einige technische Probleme beseitigt werden, wie etwa die zur Zeit auf zirka 10000 Schreibzyklen pro Speicherzelle beschränkte Lebensdauer.</p>
+
+        <address class="author">(Klaus Zietlow, Arnd Wängler/ah)</address>
+    </article>
+</body>
+
+</html>
