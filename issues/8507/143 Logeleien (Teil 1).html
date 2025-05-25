@@ -220,47 +220,6 @@
 
         <p>Leider ist das nicht möglich. Versucht man es trotzdem, erhält man einen ILLEGAL QUANTITY ERROR. Woran liegt das? Die Ursache dafür liegt wieder in der Eigenart, wie der C 64 Integer-Zahlen interpretiert. Zwar erzeugt die NOT-Operation das Einerkomplement der Ausgangszahl, verstanden wird dieses Ergebnis aber als Zweierkomplementzahl. Daraus folgt, daß man mit der obigen Anweisung versucht, eine negative Zahl in die Speicherstelle zu POKEn, und da streikt unser Computer. Die Binärzahl 1010 1010 wird als —86 verstanden. Was kann man tun, daß der wahre Wert, also 170, in den Speicher gePOKEt wird? Bei 1-Byte-Zahlen ist das relativ einfach: Man wandelt sie durch Abziehen von 256 in eine 2-Byte-Zahl um, also NOT(A-256). In Bild 2 ist zu sehen, was dabei geschieht.</p>
 
-        <figure>
-            <table class="plain">
-                <tbody>
-                    <tr>
-                        <td>256 </td>
-                        <td>= 0000</td>
-                        <td>0001</td>
-                        <td>0000</td>
-                        <td>0000</td>
-                    </tr>
-                    <tr>
-                        <td>Einerkomplement<br>+ 1</td>
-                        <td>= 1111</td>
-                        <td>1110</td>
-                        <td>1111</td>
-                        <td>1111<br>1</td>
-                    </tr>
-                    <tr>
-                        <td>Zweierkomplement = 1111<br>= -256 unsere Binärzahl</td>
-                        <td><br></td>
-                        <td>0000<br>0101</td>
-                        <td>0000<br>0101</td>
-                    </tr>
-                    <tr>
-                        <td>NOT-Operation:</td>
-                        <td>1111<br>0000</td>
-                        <td>1111<br>0000 </td>
-                        <td>0101<br>1010</td>
-                        <td>0101<br>1010</td>
-                    </tr>
-                    <tr>
-                        <td><br></td>
-                        <td>↑<br>Vorzeichenbit = 0 (positiv)</td>
-                        <td><br></td>
-                        <td><br></td>
-                    </tr>
-                </tbody>
-            </table>
-            <figcaption>Bild 2. Ablauf der Operation NOT (A-256) bei A=0101 0101</figcaption>
-        </figure>
-
         <p>Ein anderer Weg für 1-Byte-Zahlen (also Zahlen, die kleiner als 255 sind) ist NOT A AND 255, was wir aber erst später verstehen werden, wenn wir die AND-Operation kennengelernt haben. Vorsicht muß man walten lassen, wenn auch negative A-Werte auftreten. Negative A können ohne Probleme der NOT-Operation unterzogen werden, weil das Ergebnis in jedem Fall positiv ist. Verwendet man NOT(A-256), kommt es zu Fehlern. Der Weg über NOT A AND 255 ist auch mit negativen 1-Byte-Zahlen möglich. Am sichersten wäre also diese Basic-Zeile:<br>
             POKE53269,NOTPEEK(53269)AND255</p>
 
@@ -278,158 +237,200 @@
 
         <address class="author">(Heimo Ponnath/gk)</address>
 
-        <p>TODO ASIDE</p>
+        <aside>
 
-        <h2>Einige Erläuterungen zum Rechnen mit Binärzahlen</h2>
+            <h2>Einige Erläuterungen zum Rechnen mit Binärzahlen</h2>
 
-        <h3>a) Dezimales und binäres Zahlensystem</h3>
+            <h3>a) Dezimales und binäres Zahlensystem</h3>
 
-        <p>Wir sind es gewohnt, im dezimalen Zahlensystem zu rechnen unter Verwendung der Ziffern 0 bis 9. Die Grundlage unseres Zahlensystems ist die Zahl 10. Reichen die Ziffern 0 bis 9 nicht aus, um eine Zahl (zum Beispiel 9 +1) darzustellen, dann führen wir den Stellenwert einer Zahl ein. Hierbei hat jede Stelle in einer Zahl einen Faktor, der sich berechnet aus 10<sup>Stelle</sup>. Zum Beispiel in der Zahl 132 befindet sich die Ziffer 2 an der nullten Stelle, und sie wird mit dem Faktor 10<sup>0</sup> multipliziert (10<sup>0</sup> = 1). Für unsere Beispielszahl können wir so schreiben:<br>
-            132 = 1<em>10↑2 + 3</em>10↑1 + 2<em>10↑0 = 1</em>100 + 3<em>10 + 2</em>1</p>
+            <p>Wir sind es gewohnt, im dezimalen Zahlensystem zu rechnen unter Verwendung der Ziffern 0 bis 9. Die Grundlage unseres Zahlensystems ist die Zahl 10. Reichen die Ziffern 0 bis 9 nicht aus, um eine Zahl (zum Beispiel 9 +1) darzustellen, dann führen wir den Stellenwert einer Zahl ein. Hierbei hat jede Stelle in einer Zahl einen Faktor, der sich berechnet aus 10<sup>Stelle</sup>. Zum Beispiel in der Zahl 132 befindet sich die Ziffer 2 an der nullten Stelle, und sie wird mit dem Faktor 10<sup>0</sup> multipliziert (10<sup>0</sup> = 1). Für unsere Beispielszahl können wir so schreiben:<br>
+                132 = 1<em>10↑2 + 3</em>10↑1 + 2<em>10↑0 = 1</em>100 + 3<em>10 + 2</em>1</p>
 
-        <p>Nach demselben Prinzip wird im Binärsystem verfahren. Hier gibt es allerdings nur die Ziffern 0 und 1. Die Grundlage dieses Systems ist die Zahl 2. Auch hier spielt der Stellenwert die entscheidende Rolle. Der Faktor ist nun aber die entsprechende Zweierpotenz (2tStelle). Die Binärzahl 110 beispielsweise setzt sich dann so zusammen: 110 = 1<em>2↑2 + 1</em>2↑1 + 0<em>2↑0<br>
-                = 1</em>4 + 1<em>2 + 0</em>1 = 6</p>
+            <p>Nach demselben Prinzip wird im Binärsystem verfahren. Hier gibt es allerdings nur die Ziffern 0 und 1. Die Grundlage dieses Systems ist die Zahl 2. Auch hier spielt der Stellenwert die entscheidende Rolle. Der Faktor ist nun aber die entsprechende Zweierpotenz (2tStelle). Die Binärzahl 110 beispielsweise setzt sich dann so zusammen: 110 = 1<em>2↑2 + 1</em>2↑1 + 0<em>2↑0<br>
+                    = 1</em>4 + 1<em>2 + 0</em>1 = 6</p>
 
-        <h3>b) Umrechnung Binär- in Dezimalzahl</h3>
+            <h3>b) Umrechnung Binär- in Dezimalzahl</h3>
 
-        <p>Damit haben Sie praktisch schon gesehen, wie man Binärzahlen in Dezimalzahlen umrechnen kann: Jeder Stelle entspricht eine Zweierpotenz. Alle Zweierpotenzen, an deren Stelle eine 1 steht, werden zusammengezählt. Dabei gilt: 2<sup>0</sup> = 1 (siehe Bild 1).</p>
+            <p>Damit haben Sie praktisch schon gesehen, wie man Binärzahlen in Dezimalzahlen umrechnen kann: Jeder Stelle entspricht eine Zweierpotenz. Alle Zweierpotenzen, an deren Stelle eine 1 steht, werden zusammengezählt. Dabei gilt: 2<sup>0</sup> = 1 (siehe Bild 1).</p>
 
-        <figure>
-            <table class="plain">
-                <tbody>
-                    <tr>
-                        <td>4. Stelle</td>
-                        <td>3. Stelle</td>
-                        <td>2. Stelle</td>
-                        <td>1. Stelle</td>
-                        <td>0. Stelle</td>
-                    </tr>
-                    <tr>
-                        <td>= 1*2<sup>4</sup></td>
-                        <td>+ 1*2<sup>3</sup></td>
-                        <td>+ 1*2<sup>2</sup></td>
-                        <td>+ 0*2<sup>1</sup></td>
-                        <td>+ 1*2<sup>0</sup> =</td>
-                    </tr>
-                    <tr>
-                        <td>= 1*16</td>
-                        <td>+ 1*8</td>
-                        <td>+ 1*4</td>
-                        <td>+ 0*2</td>
-                        <td>+ 1*1 =</td>
-                    </tr>
-                    <tr>
-                        <td>- 16</td>
-                        <td>+ 8</td>
-                        <td>+ 4</td>
-                        <td>+</td>
-                        <td>1 =</td>
-                    </tr>
-                    <tr>
-                        <td>= 29</td>
-                        <td><br></td>
-                        <td><br></td>
-                        <td><br></td>
-                        <td><br></td>
-                    </tr>
-                </tbody>
-            </table>
-            <figcaption>Bild 1. Umrechnung einer Binärzahl (11101) in eine Dezimalzahl (29)</figcaption>
-        </figure>
-        <figure>
-            <table class="plain">
-                <tbody>
-                    <tr>
-                        <td colspan="4"></td>
-                        <td>Binärzahl</td>
-                    </tr>
-                    <tr>
-                        <td>29:</td>
-                        <td>2 =</td>
-                        <td>14</td>
-                        <td>Rest 1</td>
-                        <td>0. Stelle</td>
-                    </tr>
-                    <tr>
-                        <td>14:</td>
-                        <td>2 =</td>
-                        <td>7</td>
-                        <td>Rest 0</td>
-                        <td>1. Stelle</td>
-                    </tr>
-                    <tr>
-                        <td>7:</td>
-                        <td>2 =</td>
-                        <td>3</td>
-                        <td>Rest 1</td>
-                        <td>2. Stelle</td>
-                    </tr>
-                    <tr>
-                        <td>3:</td>
-                        <td>2 =</td>
-                        <td>1</td>
-                        <td>Rest 1</td>
-                        <td>3. Stelle</td>
-                    </tr>
-                    <tr>
-                        <td>1:</td>
-                        <td>2 =</td>
-                        <td>0</td>
-                        <td>Rest 1</td>
-                        <td>4. Stelle</td>
-                    </tr>
-                </tbody>
-            </table>
-            <figcaption>Bild 1a. Umrechnung einer Dezimalzahl in eine Binärzahl</figcaption>
-        </figure>
+            <figure>
+                <table class="plain">
+                    <tbody>
+                        <tr>
+                            <td>4. Stelle</td>
+                            <td>3. Stelle</td>
+                            <td>2. Stelle</td>
+                            <td>1. Stelle</td>
+                            <td>0. Stelle</td>
+                        </tr>
+                        <tr>
+                            <td>= 1*2<sup>4</sup></td>
+                            <td>+ 1*2<sup>3</sup></td>
+                            <td>+ 1*2<sup>2</sup></td>
+                            <td>+ 0*2<sup>1</sup></td>
+                            <td>+ 1*2<sup>0</sup> =</td>
+                        </tr>
+                        <tr>
+                            <td>= 1*16</td>
+                            <td>+ 1*8</td>
+                            <td>+ 1*4</td>
+                            <td>+ 0*2</td>
+                            <td>+ 1*1 =</td>
+                        </tr>
+                        <tr>
+                            <td>- 16</td>
+                            <td>+ 8</td>
+                            <td>+ 4</td>
+                            <td>+</td>
+                            <td>1 =</td>
+                        </tr>
+                        <tr>
+                            <td>= 29</td>
+                            <td><br></td>
+                            <td><br></td>
+                            <td><br></td>
+                            <td><br></td>
+                        </tr>
+                    </tbody>
+                </table>
+                <figcaption>Bild 1. Umrechnung einer Binärzahl (11101) in eine Dezimalzahl (29)</figcaption>
+            </figure>
+            <figure>
+                <table class="plain">
+                    <tbody>
+                        <tr>
+                            <td colspan="4"></td>
+                            <td>Binärzahl</td>
+                        </tr>
+                        <tr>
+                            <td>29:</td>
+                            <td>2 =</td>
+                            <td>14</td>
+                            <td>Rest 1</td>
+                            <td>0. Stelle</td>
+                        </tr>
+                        <tr>
+                            <td>14:</td>
+                            <td>2 =</td>
+                            <td>7</td>
+                            <td>Rest 0</td>
+                            <td>1. Stelle</td>
+                        </tr>
+                        <tr>
+                            <td>7:</td>
+                            <td>2 =</td>
+                            <td>3</td>
+                            <td>Rest 1</td>
+                            <td>2. Stelle</td>
+                        </tr>
+                        <tr>
+                            <td>3:</td>
+                            <td>2 =</td>
+                            <td>1</td>
+                            <td>Rest 1</td>
+                            <td>3. Stelle</td>
+                        </tr>
+                        <tr>
+                            <td>1:</td>
+                            <td>2 =</td>
+                            <td>0</td>
+                            <td>Rest 1</td>
+                            <td>4. Stelle</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <figcaption>Bild 1a. Umrechnung einer Dezimalzahl in eine Binärzahl</figcaption>
+            </figure>
 
-        <h3>c) Umrechnung Dezimal- in Binärzahl</h3>
+            <h3>c) Umrechnung Dezimal- in Binärzahl</h3>
 
-        <p>Der umgekehrte Weg läßt sich durch eine Kettendivision der Dezimalzahl durch 2 realisieren. Jeweils die Divisionsreste ergeben eine Stelle der Binärzahl. Beispiel (die Zahl 29):</p>
+            <p>Der umgekehrte Weg läßt sich durch eine Kettendivision der Dezimalzahl durch 2 realisieren. Jeweils die Divisionsreste ergeben eine Stelle der Binärzahl. Beispiel (die Zahl 29):</p>
 
-        <p>Die Kettendivision ist beendet, wenn sich als Ergebnis 0 zeigt. Die Zahl 29 lautet also im Binärformat 11101.</p>
+            <p>Die Kettendivision ist beendet, wenn sich als Ergebnis 0 zeigt. Die Zahl 29 lautet also im Binärformat 11101.</p>
 
-        <h3>d) Bits und Bytes</h3>
+            <h3>d) Bits und Bytes</h3>
 
-        <p>Eine Stelle einer solchen Binärzahl nennt man ein »Bit«. Unser Computer ist so gebaut, daß er 8 Bit zu einer Einheit zusammenfaßt. Solch eine Einheit ist em Byte. Jede Speicherstelle des C 64 faßt genau ein solches Byte. Weil aber die größte in einem Byte darstellbare Zahl binär 11111111 ist — was dezimal 255 entspricht (rechnen Sie mal nach) —, meldet unser Computer einen ILLEGAL QUANTITY ERROR, wenn wir versuchen, eine größere Zahl in eine Speicherstelle zu POKEn.</p>
+            <p>Eine Stelle einer solchen Binärzahl nennt man ein »Bit«. Unser Computer ist so gebaut, daß er 8 Bit zu einer Einheit zusammenfaßt. Solch eine Einheit ist em Byte. Jede Speicherstelle des C 64 faßt genau ein solches Byte. Weil aber die größte in einem Byte darstellbare Zahl binär 11111111 ist — was dezimal 255 entspricht (rechnen Sie mal nach) —, meldet unser Computer einen ILLEGAL QUANTITY ERROR, wenn wir versuchen, eine größere Zahl in eine Speicherstelle zu POKEn.</p>
 
-        <p>Der C 64 ist darauf eingerichtet, ganze Zahlen als 2-Byte-Werte (also mit 16 Bit) zu verarbeiten. Die auf diese Weise größte darstellbare Zahl ist 11111111 11111111, was 65535 entspricht. Das ist übrigens genau die Anzahl der Speicherstellen unseres Computers. Allerdings erlaubt der C 64 bei Integerzahlen lediglich Eingaben zwischen 32767 und —32768. Die Ursache dafür ist die Art, wie negative Binärzahlen erzeugt und gespeichert werden.</p>
+            <p>Der C 64 ist darauf eingerichtet, ganze Zahlen als 2-Byte-Werte (also mit 16 Bit) zu verarbeiten. Die auf diese Weise größte darstellbare Zahl ist 11111111 11111111, was 65535 entspricht. Das ist übrigens genau die Anzahl der Speicherstellen unseres Computers. Allerdings erlaubt der C 64 bei Integerzahlen lediglich Eingaben zwischen 32767 und —32768. Die Ursache dafür ist die Art, wie negative Binärzahlen erzeugt und gespeichert werden.</p>
 
-        <h3>e) Negative Binärzahlen</h3>
+            <h3>e) Negative Binärzahlen</h3>
 
-        <p>Bit 7 (also das ganz links stehende Bit eines Bytes: Die Zählung fängt rechts mit 0 an) einer 8-Bit-Zahl oder Bit 15 einer 16-Bit-Zahl wird als Vorzeichenkennung verwendet. Ist dieses Bit eine 0, dann liegt eine positive, ansonsten eine negative Zahl vor. Die Binärzahl 0111 1111 1111 1111(32767) ist daher die größte vorzeichenbehaftete 16-Bit-Binärzahl. Wenn also Bit 7 (oder bei der 16-Bit-Zahl Bit 15) eine 1 enthält, handelt es sich um eine negative Zahl. Unser Computer hat aber eine besondere Art, solche negativen Zahlen zu verstehen: Er interpretiert sie als »Zweierkomplementzahlen«. Ein Beispiel, in dem wir die Zahl —29 in dieses Format bringen, soll erläutern, worum es sich dabei handelt:<br>
-            Schritt 1:</p>
+            <p>Bit 7 (also das ganz links stehende Bit eines Bytes: Die Zählung fängt rechts mit 0 an) einer 8-Bit-Zahl oder Bit 15 einer 16-Bit-Zahl wird als Vorzeichenkennung verwendet. Ist dieses Bit eine 0, dann liegt eine positive, ansonsten eine negative Zahl vor. Die Binärzahl 0111 1111 1111 1111(32767) ist daher die größte vorzeichenbehaftete 16-Bit-Binärzahl. Wenn also Bit 7 (oder bei der 16-Bit-Zahl Bit 15) eine 1 enthält, handelt es sich um eine negative Zahl. Unser Computer hat aber eine besondere Art, solche negativen Zahlen zu verstehen: Er interpretiert sie als »Zweierkomplementzahlen«. Ein Beispiel, in dem wir die Zahl —29 in dieses Format bringen, soll erläutern, worum es sich dabei handelt:<br>
+                Schritt 1:</p>
 
-        <p>Man berechnet zuerst die Binärzahl der positiven Zahl, also von 29:<br>
-            0000 0000 0001 1101<br>
-            Schritt 2:</p>
+            <p>Man berechnet zuerst die Binärzahl der positiven Zahl, also von 29:<br>
+                0000 0000 0001 1101<br>
+                Schritt 2:</p>
 
-        <p>Davon wird nun das sogenannte Einerkomplement gebildet, wobei jedes Bit in sein Gegenteil verkehrt wird:<br>
-            1111 1111 1110 0010<br>
-            Schritt 3:</p>
+            <p>Davon wird nun das sogenannte Einerkomplement gebildet, wobei jedes Bit in sein Gegenteil verkehrt wird:<br>
+                1111 1111 1110 0010<br>
+                Schritt 3:</p>
 
-        <p>Aus dem so erhaltenen Einerkomplement bildet man das »Zweierkomplement« durch Addieren einer 1:</p>
+            <p>Aus dem so erhaltenen Einerkomplement bildet man das »Zweierkomplement« durch Addieren einer 1:</p>
 
-        <p>TODO</p>
+            <p>TODO</p>
 
-        <p>Das Ergebnis ist —29 im Zweierkomplement-Format.<br>
-            Hat man eine Zahl im Zweierkomplementformat vorliegen, dann kann man auf genau demselben Weg ihren Wert feststellen. Das wollen wir uns noch an einer 8-Bit-Zahl ansehen:<br>
-            Schritt 1:</p>
+            <p>Das Ergebnis ist —29 im Zweierkomplement-Format.<br>
+                Hat man eine Zahl im Zweierkomplementformat vorliegen, dann kann man auf genau demselben Weg ihren Wert feststellen. Das wollen wir uns noch an einer 8-Bit-Zahl ansehen:<br>
+                Schritt 1:</p>
 
-        <p>Es liegt eine Binärzahl vor, die so aussieht:<br>
-            1111 1110<br>
-            Schritt 2:<br>
-            Das Einerkomplement wird gebildet:<br>
-            0000 0001<br>
-            Schritt 3:</p>
+            <p>Es liegt eine Binärzahl vor, die so aussieht:<br>
+                1111 1110<br>
+                Schritt 2:<br>
+                Das Einerkomplement wird gebildet:<br>
+                0000 0001<br>
+                Schritt 3:</p>
 
-        <p>Das Zweierkomplement wird durch Addieren von 1 erzeugt:</p>
+            <p>Das Zweierkomplement wird durch Addieren von 1 erzeugt:</p>
 
-        <p>TODO</p>
+            <p>TODO</p>
 
-        <p>Schritt 4:</p>
+            <p>Schritt 4:</p>
 
-        <p>Umrechnen der Binärzahl in die Dezimalzahl ergibt hier den Wert 2. Das Vorzeichen war negativ (Bit 7 ist ja 1 in der ursprünglichen Zahl). Es handelte sich also um die Zahl -2.</p>
+            <p>Umrechnen der Binärzahl in die Dezimalzahl ergibt hier den Wert 2. Das Vorzeichen war negativ (Bit 7 ist ja 1 in der ursprünglichen Zahl). Es handelte sich also um die Zahl -2.</p>
+
+            <figure>
+                <table class="plain">
+                    <tbody>
+                        <tr>
+                            <td>256 </td>
+                            <td>= 0000</td>
+                            <td>0001</td>
+                            <td>0000</td>
+                            <td>0000</td>
+                        </tr>
+                        <tr>
+                            <td>Einerkomplement<br>+ 1</td>
+                            <td>= 1111</td>
+                            <td>1110</td>
+                            <td>1111</td>
+                            <td>1111<br>1</td>
+                        </tr>
+                        <tr>
+                            <td>Zweierkomplement = 1111<br>= -256 unsere Binärzahl</td>
+                            <td><br></td>
+                            <td>0000<br>0101</td>
+                            <td>0000<br>0101</td>
+                        </tr>
+                        <tr>
+                            <td>NOT-Operation:</td>
+                            <td>1111<br>0000</td>
+                            <td>1111<br>0000 </td>
+                            <td>0101<br>1010</td>
+                            <td>0101<br>1010</td>
+                        </tr>
+                        <tr>
+                            <td><br></td>
+                            <td>↑<br>Vorzeichenbit = 0 (positiv)</td>
+                            <td><br></td>
+                            <td><br></td>
+                        </tr>
+                    </tbody>
+                </table>
+                <figcaption>Bild 2. Ablauf der Operation NOT (A-256) bei A=0101 0101</figcaption>
+            </figure>
+        </aside>
         <figure>
             <pre data-filename="logik-1" data-name="Logik-1"></pre>
             <figcaption>Programm Logik-1. Mit NOT eine Geheimschrift erzeugen</figcaption>
