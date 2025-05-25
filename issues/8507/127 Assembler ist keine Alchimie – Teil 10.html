@@ -38,6 +38,165 @@
             <img src="127-5.png" alt="">
             <figcaption>XXXXXXXXX</figcaption>
         </figure>
+        <figure>
+            <table class="plain">
+                <tbody>
+                    <tr>
+                        <td>6000</td>
+                        <td>PHA</td>
+                        <td>mit diesen Befehlen retten wir Akku und Register</td>
+                    </tr>
+                    <tr>
+                        <td>6001</td>
+                        <td>TXA</td>
+                        <td>auf den Stapel.</td>
+                    </tr>
+                    <tr>
+                        <td>6002</td>
+                        <td>PHA</td>
+                        <td><br></td>
+                    </tr>
+                    <tr>
+                        <td>6003</td>
+                        <td>TYA</td>
+                        <td><br></td>
+                    </tr>
+                    <tr>
+                        <td>6004</td>
+                        <td>PHA</td>
+                        <td><br></td>
+                    </tr>
+                    <tr>
+                        <td>6005</td>
+                        <td>LDA #$7F</td>
+                        <td>0111 1111 ist das in binär.</td>
+                    </tr>
+                    <tr>
+                        <td>6007</td>
+                        <td>STA $DD0D</td>
+                        <td>Dadurch werden alle NMIs, die vom CIA 2 kommen könnten, gesperrt. Erinnern Sie sich: Bit 7 ist Null beim Schreiben, also Sperrfunktion.</td>
+                    </tr>
+                    <tr>
+                        <td>600A</td>
+                        <td>LDY $DD0D</td>
+                        <td>Lesen des Registers 13 löscht dieses und zeigt uns, ob die NMI-Anforderung von dort kam.</td>
+                    </tr>
+                    <tr>
+                        <td>600D</td>
+                        <td>BMI $601A</td>
+                        <td>falls NMI-Anforderung vom CIA 2 kam, wird verzweigt</td>
+                    </tr>
+                    <tr>
+                        <td>600F</td>
+                        <td>LDA $D020</td>
+                        <td>ansonsten kommt der NMI von der RESTORE- Taste, und in den Akku wird die Rahmenfarbe eingeladen</td>
+                    </tr>
+                    <tr>
+                        <td>6012</td>
+                        <td>EOR #$0E</td>
+                        <td>Ausgehend davon, daß als Rahmenfarbe 14 vorliegt, wird diese exklusiv oder verknüpft zu Null. Ist die Rahmenfarbe 0, dann wird sie wieder 14.</td>
+                    </tr>
+                    <tr>
+                        <td>6014</td>
+                        <td>STA $D020</td>
+                        <td>Einschreiben des neuen Farbwertes</td>
+                    </tr>
+                    <tr>
+                        <td>6017</td>
+                        <td>JMP $FEBC</td>
+                        <td>Sprung in den Rest der normalen NMI-Routine</td>
+                    </tr>
+                    <tr>
+                        <td>601A</td>
+                        <td>JMP $FE72</td>
+                        <td>Sprung in die normale NMI-Routine im Fall, daß die Anforderung durch den NMI-CIA kam.</td>
+                    </tr>
+                </tbody>
+            </table>
+            <figcaption>Programm 1. Ein kleines Testprogramm demonstriert die Wirkung einer Unterbrechung: Durch Drücken der RESTORE-Taste wird die Rahmenfarbe geändert.</figcaption>
+        </figure>
+        <figure>
+            <table>
+                <tbody>
+                    <tr>
+                        <td><b>Unterbrechungsart</b></td>
+                        <td><b>Vektor</b></td>
+                        <td><b>Zieladresse</b></td>
+                    </tr>
+                    <tr>
+                        <td>Maskierbare Unterbrechung (IRQ, BRK)</td>
+                        <td>$FFFE/FFFF</td>
+                        <td>65352 $FF48</td>
+                    </tr>
+                    <tr>
+                        <td>Reset</td>
+                        <td>$FFFC/FFFD</td>
+                        <td>64738 $FCE2</td>
+                    </tr>
+                    <tr>
+                        <td>Nichtmaskierbare Unterbrechung (NMI)</td>
+                        <td>$FFFA/FFFB</td>
+                        <td>65091 $FE43</td>
+                    </tr>
+                </tbody>
+            </table>
+            <figcaption>Tabelle 1. Unterbrechungsvektoren und ihre Inhalte</figcaption>
+        </figure>
+        <figure>
+            <table>
+                <tbody>
+                    <tr>
+                        <td rowspan="2"><b>Befehlswort</b></td>
+                        <td rowspan="2"><b>Adressierung</b></td>
+                        <td rowspan="2"><b>Bytezahl</b></td>
+                        <td colspan="2"><b>Code</b></td>
+                        <td rowspan="2"><b>Taktcyclen</b></td>
+                        <td rowspan="2"><b>Beeinflussung von Flaggen</b></td>
+                    </tr>
+                    <tr>
+                        <td><b>Hex</b></td>
+                        <td><b>Dez</b></td>
+                    </tr>
+                    <tr>
+                        <td>CLI</td>
+                        <td>implizit</td>
+                        <td>1</td>
+                        <td>58</td>
+                        <td>88</td>
+                        <td>2</td>
+                        <td>I-Flagge</td>
+                    </tr>
+                    <tr>
+                        <td>SEI</td>
+                        <td>implizit</td>
+                        <td>1</td>
+                        <td>78</td>
+                        <td>120</td>
+                        <td>2</td>
+                        <td>I-Flagge</td>
+                    </tr>
+                    <tr>
+                        <td>RTI</td>
+                        <td>implizit</td>
+                        <td>1</td>
+                        <td>40</td>
+                        <td>64</td>
+                        <td>6</td>
+                        <td>alle Flaggen</td>
+                    </tr>
+                    <tr>
+                        <td>BRK</td>
+                        <td>implizit</td>
+                        <td>1</td>
+                        <td>00</td>
+                        <td>0</td>
+                        <td>7</td>
+                        <td>B-Flagge vor dem Schieben auf den Stapel, I-Flagge danach</td>
+                    </tr>
+                </tbody>
+            </table>
+            <figcaption>Tabelle 2. Die Daten zu den letzten Assembler-Befehlen</figcaption>
+        </figure>
 
         <p>Die Assembler-Befehle haben wir bis auf vier noch offenstehende alle behandelt. Diese vier, die alle mit dem Interrupt-Handling zusammenhängen, sollen diesmal unser Thema sein. Um nach längerer Zeit mal wieder auf den Titel dieser Serie zurückzukommen (nämlich die Alchimie!): Wenn wir diese 4 Befehle beherrschen, haben wir den ersten Schritt zum Meister der Assembler-Alchimie getan. Diese vier kleinen 1-Byte-Befehle öffnen uns eine geheime Pforte zu einem Universum an Programmier-Möglichkeiten, von dem wir bisher kaum zu träumen vermochten. Genug der Schwärmerei, erst kommt noch eine Menge Arbeit, die uns wohl mehrere Folgen dieser Serie in Atem halten wird.</p>
 
