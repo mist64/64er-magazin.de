@@ -1,0 +1,286 @@
+;bas.editor.prg ==0801==
+   10 clr
+   20 dim ze$(100)
+   30 sg=peek(832)+peek(833)*256
+   40 print:print"{blk}{clr}{down}"
+   50 print"        {CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}"
+   60 print"        {rvon}  ** EDITOR-MENUE **  "
+   70 print"        {CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{down}{down}{down}"
+   80 print"       (1) - Text schreiben/editieren{down}"
+   90 print"       (2) - Text speichern{down}"
+  100 print"       (3) - Text laden{down}"
+  110 print"       (4) - Text ausgeben{down}"
+  120 print"       (5) - Diskbefehle{down}"
+  130 print"       (6) - Puffer loeschen{down}{down}"
+  140 print"       (7) - Terminal-Programm"
+  150 get q$:if q$="" then 150
+  160 on val(q$) goto 210,1930,2140,1650,2540,2430,190
+  170 if q$="0" then gosub 2370:end
+  180 goto 150
+  190 gosub 2370:load"terminal",8
+  200 :
+  210 rem ** text schreiben **
+  220 print"{clr}":gosub 2300
+  230 print"{down}{down}{down}        Puffer loeschen (j/n)?"
+  240 get q$:if q$<>"j" and q$<>"n" then 240
+  250 print"{clr}"
+  260 if q$="j" then max=0:goto 320
+  270 gosub 1370:print"{clr}"
+  280 for nr=0 to 22
+  290 print ze$(nr)
+  300 next nr
+  310 print"{home}"
+  320 nr=0
+  330 gosub 1030
+  340 get q$:if q$="" or q$="{home}" or q$="{clr}" then 340
+  350 if q$="_" then max=max-1:gosub 1490:goto 40
+  360 gosub 1080
+  370 if asc(q$)>31 and asc(q$)<128 then 460
+  380 if (q$="{left}" or q$=chr$(20)) and pos(0)=0 then 330
+  390 if q$="{rght}" and pos(0)=38 then 330
+  400 if q$="{up}" then gosub 1220:goto 330
+  410 if q$="{down}" then gosub 1300:goto 330
+  420 if q$=chr$(13) or q$=chr$(141) then 490
+  430 if q$="{inst}" and peek(1024+38+peek(214)*40)<>32 then 330
+  440 if q$="{ensh}" and pos(0)=0 then gosub 680:goto 330
+  450 if q$="{CTRL-D}" and pos(0)=0 then gosub 860:goto 330
+  460 print q$;:poke 212,0
+  470 if pos(0)<39 then 330
+  480 :
+  490 rem * einlesen *
+  500 if nr=100 then print"{up}":goto 330
+  510 print chr$(13);"{up}";:poke 211,0
+  520 ze$(nr)=""
+  530 open 1,3
+  540 for x=1 to 39
+  550 get#1,e$
+  560 ze$(nr)=ze$(nr)+e$
+  570 next x
+  580 close 1
+  590 n=39
+  600 if mid$(ze$(nr),n,1)<>" " then 620
+  610 n=n-1:if n>0 then 600
+  620 ze$(nr)=left$(ze$(nr),n)
+  630 nr=nr+1:if nr>max then max=nr
+  640 print
+  650 if nr=100 then poke 53280,2
+  660 goto 330
+  670 :
+  680 rem * insert *
+  690 if max=100 then return
+  700 z=peek(214):n=nr
+  710 for x=peek(214) to 23
+  720 print"                                       ";chr$(20);" ":next x
+  730 poke 214,z+1:print"{up}"
+  740 e=nr+22-z:if e>max then e=max
+  750 for n=nr to e
+  760 print ze$(n)
+  770 next n
+  780 poke 214,z:print"{up}"
+  790 for z=max to nr step-1
+  800 ze$(z+1)=ze$(z)
+  810 next z
+  820 max=max+1
+  830 ze$(nr)=""
+  840 return
+  850 :
+  860 rem * delete *
+  870 if max=0 then return
+  880 z=peek(214)
+  890 for x=peek(214) to 23
+  900 print"                                       ";chr$(20);" ":next x
+  910 poke 214,z:print"{up}"
+  920 e=nr+24-z:if e>max then e=max
+  930 for n=nr+1 to e
+  940 print ze$(n)
+  950 next n
+  960 poke 214,z:print"{up}"
+  970 max=max-1
+  980 for z=nr to max
+  990 ze$(z)=ze$(z+1)
+ 1000 next z
+ 1010 return
+ 1020 :
+ 1030 rem * cursor ein *
+ 1040 p=peek(209)+peek(210)*256+peek(211)
+ 1050 if peek(p)<128 then poke p,peek(p)+128:poke 54272+p,0
+ 1060 return
+ 1070 :
+ 1080 rem * cursor aus *
+ 1090 p=peek(209)+peek(210)*256+peek(211)
+ 1100 if peek(p)>127 then poke p,peek(p)-128
+ 1110 return
+ 1120 :
+ 1130 rem * zurueckblaettern *
+ 1140 print"{clr}"
+ 1150 nr=nr-22:if nr<0 then nr=0
+ 1160 for z=nr to nr+22
+ 1170 print ze$(z)
+ 1180 next z
+ 1190 print"{home}"
+ 1200 return
+ 1210 :
+ 1220 rem * cursor up *
+ 1230 if nr=100 then poke 53280,peek(838)
+ 1240 if peek(214)=1 and nr>0 then gosub 1130:return
+ 1250 if peek(214)=1 then return
+ 1260 print"{up}";
+ 1270 nr=nr-1
+ 1280 return
+ 1290 :
+ 1300 rem * cursor down *
+ 1310 if nr=max then return
+ 1320 if peek(214)>23 then print ze$(nr):nr=nr+1:return
+ 1330 print"{down}";
+ 1340 nr=nr+1
+ 1350 return
+ 1360 :
+ 1370 rem * speicher-->variable *
+ 1380 print"{clr}{down}{down}{down}{down}{down}         Einen Moment bitte..."
+ 1390 nr=0:ze$(0)=""
+ 1400 for sz=15440 to sg
+ 1410 e=usr(sz)
+ 1420 if e=13 then nr=nr+1:ze$(nr)="":goto 1450
+ 1430 if len(ze$(nr))=39 then nr=nr+1:ze$(nr)=""
+ 1440 ze$(nr)=ze$(nr)+chr$(e)
+ 1450 if nr<100 then next sz
+ 1460 if nr=100 then print"{down}{down}{down}{down}        Achtung, Text zu lang !!!":wait 198,255
+ 1470 max=nr:poke 198,0:return
+ 1480 :
+ 1490 rem * variable-->speicher *
+ 1500 poke 53280,peek(838)
+ 1510 print"{clr}{down}{down}{down}{down}{down}         Einen Moment bitte...{down}{down}"
+ 1520 sg=15440
+ 1530 for nr=0 to max
+ 1540 if ze$(nr)="" then 1590
+ 1550 for z=1 to len(ze$(nr))
+ 1560 q$=mid$(ze$(nr),z,1)
+ 1570 poke sg,asc(q$):sg=sg+1
+ 1580 next z:ze$(nr)=""
+ 1590 poke sg,13:sg=sg+1
+ 1600 next nr
+ 1610 sg=sg-1
+ 1620 gosub 2300:wait 198,255
+ 1630 return
+ 1640 :
+ 1650 rem ** daten ausgeben **
+ 1660 print"{clr}"
+ 1670 gosub 2300
+ 1680 if sg=15440 then 40
+ 1690 print"{down}'F1' = Bildschirm"
+ 1700 print"'F3' = Drucker"
+ 1710 print"'F5' = Hardcopy{down}"
+ 1720 wait 198,255
+ 1730 d=0
+ 1740 for sz=15440 to sg
+ 1750 if peek(198)=0 then 1830
+ 1760 get b$
+ 1770 if b$=" " then wait 198,255:get b$
+ 1780 if b$="_" then poke 53280,6:close 1:goto 40
+ 1790 if b$="{f3}" and d=0 then z=peek(840):poke 53280,2
+ 1800 if b$="{f3}"andd=0thenopen1,4,z:forz=841to845:print#1,chr$(peek(z));:next:d=1
+ 1810 if b$="{f1}" then d=0:close 1:poke 53280,peek(838)
+ 1820 if b$="{f5}" then gosub 2720
+ 1830 c$=chr$(usr(sz))
+ 1840 print c$;
+ 1850 if d then print#1,c$;
+ 1860 if sz=53247 then sz=57343
+ 1870 next sz
+ 1880 close 1:poke 53280,peek(838)
+ 1890 get b$:if b$="" then 1890
+ 1900 if b$="{f5}" then gosub 2720
+ 1910 goto 40
+ 1920 :
+ 1930 rem ** daten speichern **
+ 1940 print"{clr}"
+ 1950 gosub 2300
+ 1960 if sg=15440 then 40
+ 1970 dn$=""
+ 1980 input"{down}{down}Dateiname ";dn$
+ 1990 if dn$="" then 40
+ 2000 open 1,8,2,dn$+",s,w"
+ 2010 gosub 2660
+ 2020 print#1,chr$(usr(15440));
+ 2030 if st<>0 then 2100
+ 2040 cmd 1
+ 2050 for sz=15441 to sg
+ 2060 print chr$(usr(sz));
+ 2070 if sz=53247 then sz=57343
+ 2080 next sz
+ 2090 print#1,"";
+ 2100 close 1:close 15
+ 2110 if val(b$)<>0 then wait 198,255
+ 2120 goto 40
+ 2130 :
+ 2140 rem *** daten laden ***
+ 2150 dn$=""
+ 2160 input"{clr}{down}{down}{down}Dateiname ";dn$
+ 2170 if dn$="" then 40
+ 2180 sg=15440
+ 2190 open 1,8,2,dn$+",s,r"
+ 2200 gosub 2660
+ 2210 if val(b$)<>0 then 2250
+ 2220 poke 144,0:poke 832,80:poke 833,60
+ 2230 sys 848:rem load-routine
+ 2240 sg=peek(832)+peek(833)*256-1
+ 2250 close 1:close 15
+ 2260 if sg=-1 then print"{down}{down}Achtung, Puffer voll !!!{down}{down}":sg=65535
+ 2270 gosub 2300:wait 198,255
+ 2280 goto 40
+ 2290 :
+ 2300 rem ** speichergrenze **
+ 2310 if sg<53248 then by=sg-15440
+ 2320 if sg>57343 then by=sg-15440-4095
+ 2330 print:print"Bytes belegt:";by
+ 2340 print"Bytes frei  :";46000-by
+ 2350 return
+ 2360 :
+ 2370 rem ** lo/hi-berechnung **
+ 2380 lo=sg-int(sg/256)*256
+ 2390 hi=int(sg/256)
+ 2400 poke 832,lo:poke 833,hi
+ 2410 return
+ 2420 :
+ 2430 rem ** puffer loeschen **
+ 2440 print"{clr}{down}{down}"
+ 2450 input"Puffer loeschen (j/n)";q$
+ 2460 if q$<>"j" and q$<>"n" then 2450
+ 2470 print"{down}"
+ 2480 if q$="n" then gosub 2300:wait 198,255:goto 40
+ 2490 sg=15440
+ 2500 gosub 2300
+ 2510 wait 198,255
+ 2520 goto 40
+ 2530 :
+ 2540 rem ** diskbefehle **
+ 2550 print"{clr}{down}{down}'$' = Directory{down}{down}"
+ 2560 print spc(13) chr$(34);:poke 212,0:print"{up}"
+ 2570 poke 198,1:poke 631,29
+ 2580 input"Diskbefehl ";b$
+ 2590 if b$="$" then print:sys 918:wait 198,255:goto 40
+ 2600 open 15,8,15
+ 2610 print#15,b$
+ 2620 gosub 2680
+ 2630 close 15
+ 2640 wait 198,255:goto 40
+ 2650 :
+ 2660 rem ** diskstatus **
+ 2670 open 15,8,15
+ 2680 input#15,b$,c$
+ 2690 print"{down}{down}Diskstatus: "b$;" ";c$;"{down}"
+ 2700 return
+ 2710 :
+ 2720 rem * hardcopy *
+ 2730 d=0:close 1:z=peek(840):open 1,4,z
+ 2740 for z=841 to 845:print#1,chr$(peek(z));:next
+ 2750 open 2,3
+ 2760 print"{home}";
+ 2770 print#1
+ 2780 for z=1 to 25
+ 2790 for sp=1 to 40
+ 2800 get#2,e$:print#1,e$;
+ 2810 next sp
+ 2820 next z
+ 2830 print#1:close 1:close 2
+ 2840 return
+
