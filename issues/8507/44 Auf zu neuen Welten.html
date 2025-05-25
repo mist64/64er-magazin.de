@@ -18,18 +18,25 @@
         <h1>Auf zu neuen Welten</h1>
         <p class="intro">Der parallele IEEE-Bus ist eine der wichtigsten Verbindungen der »großen« Commodore-Computer zur Außenwelt. Mit unserem Selbstbau-Interface eröffnen Sie Ihrem C 64 die gesamte Palette der Commodore-Peripherie.</p>
 
-        <figure>
-            <img src="44-4.png" alt="">
-            <figcaption>Bild 4. Layout Platinenoberseite des IEEE-Interface</figcaption>
-        </figure>
-        <figure>
-            <img src="44-5.png" alt="">
-            <figcaption>Bild 5. Layout Platinenunterseite des IEEE-Interface</figcaption>
-        </figure>
-        <figure>
-            <img src="44-6.png" alt="">
-            <figcaption>Bild 6. Fertig aufgebautes IEEE-488-Interface</figcaption>
-        </figure>
+        <p>Ohne Zweifel, es lohnt sich! Speicherkapazitäten von mehreren MByte, beschleunigte Lade- und Speichervorgänge sowie eine rasante Dateiverarbeitung machen die »großen« Peripheriegeräte, wie das Diskettenlaufwerk CBM 4040, interessant. Das einzige Problem ist die im C 64 eingebaute Schnittstelle. Der serielle IEEE-488-Bus (auch als IEC-Bus bezeichnet) ist nicht zum Anschluß dieser Geräte geeignet. Aber der C 64 wäre nicht der C 64, der seinen weltweiten Siegeszug angetreten hat, wenn man dieses Hindernis nicht überwinden könnte. Unser Selbstbau-Interface verwandelt den Expansion-Port in eine IEEE-488-Schnittstelle, wie sie von den CBM-Computern her bekannt ist.</p>
+
+        <p>Dabei sind im wesentlichen zwei Hindernisse zu überwinden. Einerseits müssen die Daten des C 64 zwischengespeichert und aufbereitet werden. Andererseits muß dem C 64 mitgeteilt werden, daß er seine Daten nicht mehr wie gewohnt seriell, sondern parallel ausgibt. Die Hauptaufgabe der Bedienung des IEEE-Busses übernimmt dabei ein 6821-Schnittstellenbaustein. Mehrere Gründe sprechen für diesen Ein-/Ausgabebaustein. Da ist zum einen der ausgesprochen günstige Preis. Er ist in nahezu jedem Elektronikversand unter 10 Mark zu haben. Ein 6526, wie er im C 64 sogar gleich zweimal vorhanden ist, kostet dagegen zirka 45 Mark. Zum anderen ist der 6821, im Gegensatz zum ebenfalls möglichen 6522, ohne Probleme an den C 64 anschließbar. Der 6522 verträgt das Timing des C 64 nicht und benötigt deshalb noch eine Zusatzschaltung, die das Taktsignal des C 64 etwas verzögert. Der 6821 läßt sich übrigens durch die stromsparende CMOS-Variante 6321 problemlos ersetzen.</p>
+
+        <p>Die Daten werden vom C 64 allerdings nicht direkt auf den IEEE-Bus, sondern über einen Bustreiber 74LS245 geführt. Dies ist nötig, um den 6821 (6321) vor Beschädigungzu schützen und zugleich den sicheren Betrieb von mehreren Geräten am Bus zu gewährleisten. Die Steuersignale werden dabei über den Inverter-Baustein 4069 geführt.</p>
+
+        <h2>Die Realisierung</h2>
+
+        <p>Der verwendete PIA-(<strong>P</strong>arallel <strong>I</strong>nterface <strong>A</strong>dapter)-Baustein 6821 enthält zwei Ports. Jeder Port verfügt über drei Register: das Dateneingabe- und Datenausgaberegister, das Datenrichtungsregister und das Control-/Statusregister. Diese Register wurden auf einige bisher unbenutzte Register des C 64 gelegt. Im einzelnen befinden sich diese in folgenden Speicherzellen:</p>
+
+        <p>TODO TABLE</p>
+
+        <p>$DE00 Datenregister A/Datenrichtungsregister A
+            $DE01 Controllregister A
+            $DE02 Datenregister B/Datenrichtungsregister B
+            $DE03 Controllregister B</p>
+
+        <p>Die Unterscheidung zwischen dem Datenrichtungs- und Ein-/Ausgaberegister erfolgt über das Bit 2 des Controllregisters. Ist es gelöscht (0), dann ist das Datenrichtungsregister selektiert. Im Datenrichtungsregister ist jeder Ein-/Ausgabeleitung ein Bit zugeordnet. Der Zustand dieses Bits legt fest, ob die betreffende Leitung Eingang oder Ausgang ist. Ist das Bit gesetzt, so ist die zugeordnete Leitung Ausgang, ist das Bit gelöscht, so wird die Leitung als Einganggeschaltet. Beim IEEE-488-Modul sind diese Leitungen wie in Bild 1 abgebildet, geschaltet.</p>
+
         <figure>
             <table>
                 <tbody>
@@ -81,6 +88,9 @@
             </table>
             <figcaption>Bild 1. Beschaltungsplan des IEEE-488-Interfaces</figcaption>
         </figure>
+
+        <p>Natürlich kann man das IEEE-Modul auch als eine Art Userport-Erweiterung benutzen. In der Regel wird man aber Geräte wie Diskettenlaufwerke (4040, 8050, 8250, 2031, SFD1001) oder aber Drucker und Meßgeräte anschließen. Dazu benötigt man noch ein spezielles Anschlußkabel, das auf der Computerseite mit einem TRW 251-12-50-170 und auf der Peripherieseite mit einem 24poligen Amphenol-Stecker verbunden ist. Die Anschlußbelegung ist im Verdrahtungsschema (Bild 2) abgebildet.</p>
+
         <figure>
             <table>
                 <tbody>
@@ -178,6 +188,11 @@
             </table>
             <figcaption>Bild 2. Verdrahtungsschema für ein Peripheriekabel</figcaption>
         </figure>
+
+        <h2>Die Software</h2>
+
+        <p>Wie bei fast allen Erweiterungen des Betriebssystems trat auch beim IEEE-488-Interface das Problem des Speicherbereichs auf. Die Lösung sollte sich mit fertiger Software bestens vertragen und trotzdem sofort nach dem Einschalten zur Verfügung stehen. Anstelle der Kassettenroutinen wurde die Treibersoftware für das Interface einprogrammiert. Da dort aber noch Platz war, haben wir das von der Test/Demo-Diskette bekannte DOS 5.1 implementiert. Die zusätzlichen Befehle dieser DOS-Erweiterung sind in Bild 3 zusammengefaßt. Um aber Probleme mit fertiger Software auszuschließen, muß das DOS 5.1 mit den Tasten CTRL und + eingeschaltet werden.</p>
+
         <figure>
             Achtung! Erst mit CTRL und + einschalten
             <table>
@@ -210,6 +225,29 @@
             </table>
             Auch Joker und Fragezeichen im Namen sind erlaubt.
             <figcaption>Bild 3. Auch die DOS-5.1-Befehle kennt das IEEE-Interface</figcaption>
+        </figure>
+
+        <p>Der wesentlichste Grund, warum sich Diskettenlaufwerke wie die sehr gute SFD 1001 bisher nicht durchsetzen konnten, ist einerseits der Preis und andererseits das vom 1541-Floppy-Laufwerk unterschiedliche Aufzeichnungsformat. Kaum ein Anbieter professioneller Software konnte sich bisher dazu entschließen, seine Programme auch in diesem Format anzubieten. Durch einen kleinen Trick ist es möglich, mit unserem Interface Programme vom 1541 auf das 8250-Format (das SFD-1001-Laufwerk ist praktisch ein halbiertes 8250-Laufwerk) zu überspielen. Die Speicherzelle 2 des C 64 wurde zum Steuerregister umfunktioniert. Im Normalfall steht dort eine 4. Das bedeutet, daß der Drucker auch mit dem IEEE-488-Interface weiterhin seriell betrieben werden kann. Und nun der Trick: Schreibt man in Speicherzelle 2 eine 8, so wird nicht das parallele Diskettenlaufwerk, sondern die 1541 angesprochen. Stellt man die Geräteadresse des parallelen Laufwerks auf 9, so kann man mit jedem Kopierprogramm für zwei Laufwerke vom Laufwerk 8 (1541) auf Laufwerk 9 (zum Beispiel SFD 1001) Programme übertragen. Die normale Geräteadresse (ohne Umstellung) des parallelen Laufwerks ist aber weiterhin die 8. Natürlich können Sie auf diese Weise auch jede andere erlaubte Geräteadresse seriell ansprechen, Sie brauchen dazu nur die Geräteadresse in Speicherzelle 2 zu schreiben (Beispiel: POKE 2,8 um das 1541-Laufwerk anzusprechen).</p>
+
+        <h2>Das Listing</h2>
+
+        <p>Die Software (Listing 1) wird irrt Overlay-Verfahren auf das Original-Kernal kopiert. Dazu wird vom Programm zunächst das Betriebssystem in den Bereich ab $6000 verschoben. In einer POKE-Schleife werden die notwendigen Veränderungen vorgenommen. Nach Beendigung des Programmablaufs befindet sich im Speicherbereich des C 64 ab $6000 bis $8000 das komplett neue Kernal. Sie können es nun entweder direkt mit einem Monitor abspeichern (was zu empfehlen ist) oder aber gleich in ein 2764-EPROM brennen. Dieses EPROM wird dann mit einem Adapter anstelle des Kernal-ROMs in den U4-Steckplatz des C 64 eingebaut. Die Herstellung eines solchen Adapters haben wir in Ausgabe 4/85 ausführlich beschrieben. Es werden aber auch von verschiedenen Herstellern ähnliche Adapter angeboten.</p>
+
+        <h3>Wie erhalte ich meine Platine?</h3>
+
+        <p>Das Platinen-Layout und das fertige IEEE-Interface (Arbeitsversion) im Maßstab 1 : 1 finden Sie in Bild 4, 5 und 6. Das 44polige Ende der Platine ist zum Einstecken in den Expansion-Port vorgesehen. An der 24poligen Seite werden die Peripheriegeräte angeschlossen. Die Bestückungsseite der Platine erkennen Sie an den zwei Lötpunkten für einen Kondensator. Er muß sich in diesem Fall rechts oben auf der Expansion-Port-Seite befinden. Zur Bestückung legen Sie die Platine so vor sich hin, daß diese beiden Lötpunkte rechts oben sind, und die Expansion-Port-Seite von Ihnen weg zeigt. Setzen Sie nun in die linken vorderen Lötpunkte einen 20poligen Sockel und in die rechten Lötpunkte einen 14poligen Sockel. Die Sockelkerben zeigen dabei immer nach links. Den 6821 (6321) sockeln Sie analog dazu. Löten Sie nun den Kondensator (10 µ F) so ein, daß + 5 V des Kondensators mit Pin 2 und 3 auf der C 64-Steckleiste verbunden sind. Der äußere Pin liegt an Masse. Nach dem Einlöten der Sockel brauchen Sie nur noch die Bausteine (Kerbe auf Kerbe) einsetzen. Das Interface ist nun fertig. In Bild 7 finden Sie nochmals eine komplette Stückliste. Falls es Ihnen nicht möglich sein sollte, die Platine selber zu ätzen, können Sie sich an die unten angegebene Adresse wenden, dort hilft man Ihnen weiter. Unter dieser Adresse ist die Leerplatine (35 Mark), der Bausatz inklusive EPROM (75 Mark) und das Fertiggerät inklusive EPROM (98 Mark) zu haben.</p>
+
+        <figure>
+            <img src="44-4.png" alt="">
+            <figcaption>Bild 4. Layout Platinenoberseite des IEEE-Interface</figcaption>
+        </figure>
+        <figure>
+            <img src="44-5.png" alt="">
+            <figcaption>Bild 5. Layout Platinenunterseite des IEEE-Interface</figcaption>
+        </figure>
+        <figure>
+            <img src="44-6.png" alt="">
+            <figcaption>Bild 6. Fertig aufgebautes IEEE-488-Interface</figcaption>
         </figure>
         <figure>
             <table>
@@ -254,41 +292,6 @@
             </table>
             <figcaption>Bild 7. Diese Bauteile benötigt man für das IEEE-Interface</figcaption>
         </figure>
-
-        <p>Ohne Zweifel, es lohnt sich! Speicherkapazitäten von mehreren MByte, beschleunigte Lade- und Speichervorgänge sowie eine rasante Dateiverarbeitung machen die »großen« Peripheriegeräte, wie das Diskettenlaufwerk CBM 4040, interessant. Das einzige Problem ist die im C 64 eingebaute Schnittstelle. Der serielle IEEE-488-Bus (auch als IEC-Bus bezeichnet) ist nicht zum Anschluß dieser Geräte geeignet. Aber der C 64 wäre nicht der C 64, der seinen weltweiten Siegeszug angetreten hat, wenn man dieses Hindernis nicht überwinden könnte. Unser Selbstbau-Interface verwandelt den Expansion-Port in eine IEEE-488-Schnittstelle, wie sie von den CBM-Computern her bekannt ist.</p>
-
-        <p>Dabei sind im wesentlichen zwei Hindernisse zu überwinden. Einerseits müssen die Daten des C 64 zwischengespeichert und aufbereitet werden. Andererseits muß dem C 64 mitgeteilt werden, daß er seine Daten nicht mehr wie gewohnt seriell, sondern parallel ausgibt. Die Hauptaufgabe der Bedienung des IEEE-Busses übernimmt dabei ein 6821-Schnittstellenbaustein. Mehrere Gründe sprechen für diesen Ein-/Ausgabebaustein. Da ist zum einen der ausgesprochen günstige Preis. Er ist in nahezu jedem Elektronikversand unter 10 Mark zu haben. Ein 6526, wie er im C 64 sogar gleich zweimal vorhanden ist, kostet dagegen zirka 45 Mark. Zum anderen ist der 6821, im Gegensatz zum ebenfalls möglichen 6522, ohne Probleme an den C 64 anschließbar. Der 6522 verträgt das Timing des C 64 nicht und benötigt deshalb noch eine Zusatzschaltung, die das Taktsignal des C 64 etwas verzögert. Der 6821 läßt sich übrigens durch die stromsparende CMOS-Variante 6321 problemlos ersetzen.</p>
-
-        <p>Die Daten werden vom C 64 allerdings nicht direkt auf den IEEE-Bus, sondern über einen Bustreiber 74LS245 geführt. Dies ist nötig, um den 6821 (6321) vor Beschädigungzu schützen und zugleich den sicheren Betrieb von mehreren Geräten am Bus zu gewährleisten. Die Steuersignale werden dabei über den Inverter-Baustein 4069 geführt.</p>
-
-        <h2>Die Realisierung</h2>
-
-        <p>Der verwendete PIA-(<strong>P</strong>arallel <strong>I</strong>nterface <strong>A</strong>dapter)-Baustein 6821 enthält zwei Ports. Jeder Port verfügt über drei Register: das Dateneingabe- und Datenausgaberegister, das Datenrichtungsregister und das Control-/Statusregister. Diese Register wurden auf einige bisher unbenutzte Register des C 64 gelegt. Im einzelnen befinden sich diese in folgenden Speicherzellen:</p>
-
-        <p>TODO TABLE</p>
-
-        <p>$DE00 Datenregister A/Datenrichtungsregister A
-            $DE01 Controllregister A
-            $DE02 Datenregister B/Datenrichtungsregister B
-            $DE03 Controllregister B</p>
-
-        <p>Die Unterscheidung zwischen dem Datenrichtungs- und Ein-/Ausgaberegister erfolgt über das Bit 2 des Controllregisters. Ist es gelöscht (0), dann ist das Datenrichtungsregister selektiert. Im Datenrichtungsregister ist jeder Ein-/Ausgabeleitung ein Bit zugeordnet. Der Zustand dieses Bits legt fest, ob die betreffende Leitung Eingang oder Ausgang ist. Ist das Bit gesetzt, so ist die zugeordnete Leitung Ausgang, ist das Bit gelöscht, so wird die Leitung als Einganggeschaltet. Beim IEEE-488-Modul sind diese Leitungen wie in Bild 1 abgebildet, geschaltet.</p>
-
-        <p>Natürlich kann man das IEEE-Modul auch als eine Art Userport-Erweiterung benutzen. In der Regel wird man aber Geräte wie Diskettenlaufwerke (4040, 8050, 8250, 2031, SFD1001) oder aber Drucker und Meßgeräte anschließen. Dazu benötigt man noch ein spezielles Anschlußkabel, das auf der Computerseite mit einem TRW 251-12-50-170 und auf der Peripherieseite mit einem 24poligen Amphenol-Stecker verbunden ist. Die Anschlußbelegung ist im Verdrahtungsschema (Bild 2) abgebildet.</p>
-
-        <h2>Die Software</h2>
-
-        <p>Wie bei fast allen Erweiterungen des Betriebssystems trat auch beim IEEE-488-Interface das Problem des Speicherbereichs auf. Die Lösung sollte sich mit fertiger Software bestens vertragen und trotzdem sofort nach dem Einschalten zur Verfügung stehen. Anstelle der Kassettenroutinen wurde die Treibersoftware für das Interface einprogrammiert. Da dort aber noch Platz war, haben wir das von der Test/Demo-Diskette bekannte DOS 5.1 implementiert. Die zusätzlichen Befehle dieser DOS-Erweiterung sind in Bild 3 zusammengefaßt. Um aber Probleme mit fertiger Software auszuschließen, muß das DOS 5.1 mit den Tasten CTRL und + eingeschaltet werden.</p>
-
-        <p>Der wesentlichste Grund, warum sich Diskettenlaufwerke wie die sehr gute SFD 1001 bisher nicht durchsetzen konnten, ist einerseits der Preis und andererseits das vom 1541-Floppy-Laufwerk unterschiedliche Aufzeichnungsformat. Kaum ein Anbieter professioneller Software konnte sich bisher dazu entschließen, seine Programme auch in diesem Format anzubieten. Durch einen kleinen Trick ist es möglich, mit unserem Interface Programme vom 1541 auf das 8250-Format (das SFD-1001-Laufwerk ist praktisch ein halbiertes 8250-Laufwerk) zu überspielen. Die Speicherzelle 2 des C 64 wurde zum Steuerregister umfunktioniert. Im Normalfall steht dort eine 4. Das bedeutet, daß der Drucker auch mit dem IEEE-488-Interface weiterhin seriell betrieben werden kann. Und nun der Trick: Schreibt man in Speicherzelle 2 eine 8, so wird nicht das parallele Diskettenlaufwerk, sondern die 1541 angesprochen. Stellt man die Geräteadresse des parallelen Laufwerks auf 9, so kann man mit jedem Kopierprogramm für zwei Laufwerke vom Laufwerk 8 (1541) auf Laufwerk 9 (zum Beispiel SFD 1001) Programme übertragen. Die normale Geräteadresse (ohne Umstellung) des parallelen Laufwerks ist aber weiterhin die 8. Natürlich können Sie auf diese Weise auch jede andere erlaubte Geräteadresse seriell ansprechen, Sie brauchen dazu nur die Geräteadresse in Speicherzelle 2 zu schreiben (Beispiel: POKE 2,8 um das 1541-Laufwerk anzusprechen).</p>
-
-        <h2>Das Listing</h2>
-
-        <p>Die Software (Listing 1) wird irrt Overlay-Verfahren auf das Original-Kernal kopiert. Dazu wird vom Programm zunächst das Betriebssystem in den Bereich ab $6000 verschoben. In einer POKE-Schleife werden die notwendigen Veränderungen vorgenommen. Nach Beendigung des Programmablaufs befindet sich im Speicherbereich des C 64 ab $6000 bis $8000 das komplett neue Kernal. Sie können es nun entweder direkt mit einem Monitor abspeichern (was zu empfehlen ist) oder aber gleich in ein 2764-EPROM brennen. Dieses EPROM wird dann mit einem Adapter anstelle des Kernal-ROMs in den U4-Steckplatz des C 64 eingebaut. Die Herstellung eines solchen Adapters haben wir in Ausgabe 4/85 ausführlich beschrieben. Es werden aber auch von verschiedenen Herstellern ähnliche Adapter angeboten.</p>
-
-        <h3>Wie erhalte ich meine Platine?</h3>
-
-        <p>Das Platinen-Layout und das fertige IEEE-Interface (Arbeitsversion) im Maßstab 1 : 1 finden Sie in Bild 4, 5 und 6. Das 44polige Ende der Platine ist zum Einstecken in den Expansion-Port vorgesehen. An der 24poligen Seite werden die Peripheriegeräte angeschlossen. Die Bestückungsseite der Platine erkennen Sie an den zwei Lötpunkten für einen Kondensator. Er muß sich in diesem Fall rechts oben auf der Expansion-Port-Seite befinden. Zur Bestückung legen Sie die Platine so vor sich hin, daß diese beiden Lötpunkte rechts oben sind, und die Expansion-Port-Seite von Ihnen weg zeigt. Setzen Sie nun in die linken vorderen Lötpunkte einen 20poligen Sockel und in die rechten Lötpunkte einen 14poligen Sockel. Die Sockelkerben zeigen dabei immer nach links. Den 6821 (6321) sockeln Sie analog dazu. Löten Sie nun den Kondensator (10 µ F) so ein, daß + 5 V des Kondensators mit Pin 2 und 3 auf der C 64-Steckleiste verbunden sind. Der äußere Pin liegt an Masse. Nach dem Einlöten der Sockel brauchen Sie nur noch die Bausteine (Kerbe auf Kerbe) einsetzen. Das Interface ist nun fertig. In Bild 7 finden Sie nochmals eine komplette Stückliste. Falls es Ihnen nicht möglich sein sollte, die Platine selber zu ätzen, können Sie sich an die unten angegebene Adresse wenden, dort hilft man Ihnen weiter. Unter dieser Adresse ist die Leerplatine (35 Mark), der Bausatz inklusive EPROM (75 Mark) und das Fertiggerät inklusive EPROM (98 Mark) zu haben.</p>
 
         <p>Noch ein paar Tips zum Abschluß: Überprüfen Sie alle Kontakte auf Durchgang. Stecken Sie das Modul nur in den ausgeschalteten Computer und vergessen Sie den Adapter für das Kernal-EPROM nicht.</p>
 

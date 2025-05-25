@@ -18,6 +18,83 @@
         <h1>Logeleien (Teil 1)</h1>
         <p class="intro">In vielen Basic-Programmen tauchen sie auf, die logischen Operatoren wie NOT, AND und 0R. Bei sinnvollem Einsatz kann man eine Menge Basic-Speicherplatz sparen. Aber auch Ausdrücke wie IF A THEN &hellip; bringen nicht nur den Anfänger manchmal ins Schleudern. Was steckt eigentlich im Endefekt dahinter?</p>
 
+        <p>Das hätte sich der »Vater der Logik«, Aristoteles, vor 2200 Jahren nicht träumen lassen können, was aus seinen Gedankengängen einmal werden würde. Man kann aber mit einiger Berechtigung behaupten, daß es ohne seine Werke und die von Leibniz (vor etwa 300 Jahren hat dieser die Logik modernisiert) keine Computer gäbe. Die Arbeiten der Begründer der mathematischen Logik, Boole (1815-64) und Frege (1848-1925), basieren auf dem jahrtausende alten Fundament. Wie für den Computer geschaffen — aber eigentlich ist es umgekehrt: Die logische Maschine ist ein Produkt der mathematischen Logik — ist die sogenannte zweiwertige Logik. Hier geht es um »Wahr« und »Falsch«, ein drittes gibt es nicht (tertium non datur, wie die alten Philosophen zu sagen pflegten). Die Verwandtschaft liegt auf der Hand: Die elektronische Maschine kennt die Zustände Strom an/Strom aus oder Ladung vorhanden/nicht vorhanden oder eben einfach 1 und 0, die Ziffern der Binärarithmetik.</p>
+
+        <p>Dazu noch eine technische Bemerkung: Sollten Sie mit dem System der binären Zahlen noch nicht vertraut sein, dann lesen Sie den beigefügten Kasten, in dem die wichtigsten Begriffe erklärt sind.</p>
+
+        <h3>1. Wahrheitswerte und Aussagen</h3>
+
+        <p>Was sind Aussagen? Am besten sehen wir uns einfach einige Beispiele an:</p>
+
+        <ul>
+            <li>Rosen sind rot</li>
+            <li>Die Zahl ist größer als 100.</li>
+        </ul>
+
+        <p>Das sind einfache Aussagen. Eine zusammengesetzte Aussage ist beispielsweise:</p>
+
+        <p>Rosen sind rot <strong>UND</strong> Veilchen sind blau. Hier wurden zwei Aussagen UND-verknüpft. Keine Aussage ist:</p>
+
+        <ul>
+            <li>Wohin gehst Du?</li>
+        </ul>
+
+
+        <p>Ich hoffe, daß auf diese Weise ohne tiefschürfende philosophische Erörterungen (denn die gibt es natürlich) das Wesen von Aussagen klar geworden ist.</p>
+
+        <p>Aussagen können wahr sein. Sie enthalten dann den Wahrheitswert »Wahr«. Sie können aber auch statt dessen falsch sein, was ihnen den Wahrheitswert »Falsch« verleiht. Der Wahrheitswert von zusammengesetzten Aussagen hängt zum einen von den Wahrheitswerten der Einzelaussagen ab und zum anderen von der Art ihrer Verknüpfung. Wir werden im folgenden für die Wahrheitswerte die Buchstaben W (für Wahr) und F (für Falsch) verwenden.</p>
+
+        <p>In der binären Arithmetik entspricht die 1 dem W und die 0 dem F. Keine Angst, falls Ihnen das noch unverständlich erscheint, wir werden noch allerlei Logeleien mit Binärzahlen treiben. Dann wird Ihnen das ganz geläufig sein. Was uns momentan interessiert, ist, wie der Computer Wahrheitswerte angibt. Dazu machen wir einen kleinen Test mit dem folgenden Programm:<br>
+            10 INPUTA,B<br>
+            20 C=(A=B)<br>
+            30 PRINTA,B,C</p>
+
+        <p>In Zeile 20 ist eine Aussage enthalten: A = B. Wenn Sie A und B so eingegeben haben, daß beide gleich sind, dann ist diese Aussage wahr (W), und in C finden Sie den Wahrheitswert, den der Computer für W verwendet. Probieren Sie dies mal aus: Sie finden —1! Wenn aber A und B verschiedene Zahlen waren, ist die Aussage A = B falsch, und in C steht 0, was die Computerform von F ist. Weshalb —1 als Wahrheitswert des Commodore 64 für W? Das liegt daran, daß unser Computer für den Wahrheitswert ein ganzes Byte reserviert. Das schreibt er im Falle W voller Einsen:<br>
+            1111 1111</p>
+
+        <p>Nach den Regeln von vorzeichenbehafteten Binärzahlen ist das aber die Erscheinungsform von —1.</p>
+
+        <h3>2. Das merkwürdige IF A THEN &hellip;</h3>
+
+        <p>Bei IF..THENVerzweigungen wird vom Computer der gesamte Ausdruck zwischen IF und THEN auf seinen Wahrheitswert untersucht (das kann dann eine Aussage sein, aber auch etwas anderes, zum Beispiel eine Variable). Dabei nimmt der C 64 alles für wahr an, was bei dieser Untersuchung ungleich Null ist.</p>
+
+        <p>Wenn also in einer Verzweigung der Form:<br>
+            IF A THEN &hellip;<br>
+            A schon irgendeinen Wert angenommen hat, der ungleich Null ist, wird die Bedingung als erfüllt angesehen. Probieren Sie mal mit verschiedenen Eingaben für A:<br>
+            10 INPUT A<br>
+            20 IF A THEN PRINT ”TEST”<br>
+            30 PRINT A</p>
+
+        <p>In der uns geläufigeren Form dieser Verzweigung tauchen zwischen IF und THEN Aussagen in mathematischer Form auf, in denen die Vergleichssymbole verwendet werden, zum Beispiel:<br>
+            IF A > = 100 THEN GOTO &hellip;</p>
+
+        <h3>3. Rechnen mit Wahrheitswerten</h3>
+
+        <p>Außerhalb solch einer Verzweigung ist es manchmal gar nicht so einfach festzustellen, ob es sich bei einem Ausdruck um eine Aussage dreht oder vielleicht nur um eine Zuweisung. Es kommt hier sehr auf den Zusammenhang mit dem übrigen Programmtext an. Beispielsweise kann A = B sowohl eine Zuweisung sein (LET A = B) als auch eine Aussage (C = (A = B)). In Programmen, in denen viel mit logischen Operatoren gearbeitet wird, empfiehlt sich deshalb — um mehr Klarheit zu schaffen —, die vom C 64 verstandene, aber so gut wie nie verwendete Basic-Vokabel LET bei Zuweisungen zu verwenden.</p>
+
+        <p>Ein noch eklatanteres Beispiel ist enthalten in A = 5 + 2. Das ist offensichtlich keine Aussage, könnte deutlicher aber noch als LET A = 5 + 2 geschrieben werden. In einem anderen Zusammenhang ist es eine Aussage: C = 4 + (A = 5 + 2)</p>
+
+        <p>Ist hier A = 5 + 2 wahr (wenn A = 7), ergibt sich ein C von 3, weil ja der Wahrheitswert der Aussage —1 beträgt. Im anderen Fall ist C = 4. Man kann mit Aussagen — besser gesagt, mit ihren Wahrheitswerten — also auch rechnen.</p>
+
+        <p>Im folgenden Programmbeispiel sind gleich fünf Wahrheitswerte miteinander rechnerisch verknüpft. Es handelt sich um eine kurze Routine zur Umrechnung von ASCII-Code in Bildschirmcode:<br>
+            10 INPUT”ASCII-WERT”;A<br>
+            20 C = A-161-33<em>(A&lt;255)-64</em>(A &lt; 192)-32<em>(A &lt; 160) + 32</em>(A &lt; 96)-64*(A&lt;64)<br>
+            30 PRINT”ASCII = ”A,”POKE-CODE=&ldquo;C</p>
+
+        <p>Beispiel: ASCII = 65, Bildschirmcode = 1</p>
+
+        <p>Aussagen können auch mit Strings gebildet werden. Auch dabei ergeben sich die Wahrheitswerte —1 oder 0. Allerdings lassen sich hier sinnvoll nur die Vergleichsrelationen »=« und »ungleich« einsetzen. Alle anderen »größer als«, »kleiner als« etc. sind mit Vorsicht zu genießen. Zur Ermittlung des Wahrheitswertes werden nämlich von links nach rechts alle Buchstaben beider Strings in Form ihrer ASCII-Werte miteinander verglichen. Die erste auf diese Weise gefundene Abweichung führt dann zum Ergebnis. Ein Beispiel soll das Problem verdeutlichen:</p>
+
+        <p>Die Aussage (A$&lt;B$) soll uns einen Wahrheitswert liefern. Wenn nun A$ = &ldquo;DZZZ&rdquo; und B$ = ”EAAA” definiert wurden, ergibt sich —1 als Wahrheitswert, weil der ASCII-Wert von D kleiner ist als der von E. Der Rest der Strings spielt keine Rolle mehr.</p>
+
+        <h3>4. Die logischen Operatoren in Basic</h3>
+
+        <p>Drei Operatoren haben wir im Normalfall zur Verfügung für die sogenannte Boolesche Algebra, wie man manchmal auch das Rechnen mit logischen Operatoren nennt:<br>
+            <strong>NOT, AND, OR</strong>
+        </p>
+
+        <p>Die Tabelle 1 zeigt, wo in der Prioritätenreihenfolge aller Operatoren diese drei einzuordnen sind. Ebenso wie bei den arithmetischen Operatoren ( + ,*,t etc.) kann auch hier die Reihenfolge durch sinnvolle Anwendung von Klammern verändert werden.</p>
+
         <figure>
             <table>
                 <tbody>
@@ -61,6 +138,25 @@
             <figcaption>Tabelle 1. Reihenfolge der
                 Priorität von Operatoren</figcaption>
         </figure>
+
+        <h3>5. Wahrheitstabellen</h3>
+
+        <p>Jede Verkoppelung von Aussagen (beziehungsweise ihren Wahrheitswerten) mittels logischer Operatoren ergibt ebenfalls wieder Wahrheitswerte. Wir hatten vorhin schon erwähnt, daß das Ergebnis abhängt:<br>
+            a) von den Wahrheitswerten der zu verknüpfenden Aussagen und<br>
+            b) von der Art der Verknüpfung.</p>
+
+        <p>Das kann manchmal schon reichlich schwer zu durchschauen sein, was welche Kombination ergibt. Deshalb schreibt man sich eine Übersicht, die alle möglichen Ausgangs-Wahrheitswerte enthält und die nach der Verknüpfung entstandenen Wahrheitswerte. Solche Tabellen nennt man Wahrheitstabellen. Wir werden diese Tabellen im folgenden bei der Erklärung der logischen Operatoren verwenden. Wie man sie erstellt und liest, wird Ihnen schnell geläufig sein.</p>
+
+        <p>Noch eine Bemerkung: Die Anwendung der logischen Operatoren auf Aussagen und auf Zahlen wird bei uns — aus Gründen der besseren Verständlichkeit — getrennt behandelt werden. Das ist eigentlich nicht nötig, denn im Grunde genommen sind ja die Wahrheitswerte von Aussagen auch nur Zahlen.</p>
+
+        <h3>6. Die Anwendung von NOT auf Aussagen</h3>
+
+        <p>Der NOT-Operator erzeugt immer das Gegenteil des Wahrheitswertes der Ausgangsaussage. Wenden wir also NOT auf eine Aussage mit dem Wahrheitswert W an, dann ergibt das den Wert F. Dasselbe geschieht im umgekehrten Fall.</p>
+
+        <p>Dazu wollen wir uns eine Wahrheitstabelle schreiben (Tabelle 2). In der linken Spalte sind die beiden möglichen Wahrheitswerte einer Aussage A aufgeführt. Die rechte Spalte ergibt sich durch Anwendung von NOT auf die Werte der linken Spalte:<br>
+            NOT W = F<br>
+            NOT F = W</p>
+
         <figure>
             <table>
                 <tbody>
@@ -80,6 +176,19 @@
             </table>
             <figcaption>Tabelle 2. Wahrheitstabelle: NOT bei Aussagen</figcaption>
         </figure>
+
+        <p>Das ist gar nicht so schwer, nicht wahr? An einem Beispiel wollen wir uns das auch noch mal ansehen. Die Zeile:<br>
+            10 A = (3 = 5):PRINT NOT A<br>
+            ergibt den Wert —1. Die Aussage 3 = 5 ist ja falsch (F oder für den Computer 0) und A deshalb 0. NOT A ergibt dann das Gegenteil, also W oder —1.</p>
+
+        <p>Eine Basic-Zeile wie die folgende:<br>
+            10 A = NOT A<br>
+            kann man wie einen Flip-Flop-Schalter einsetzen, falls man den Wahrheitswert von A zuvor als 0 oder —1 definiert hat. Jedesmal, wenn das Programm über diesen Ausdruck läuft, kippt der Wert von A.</p>
+
+        <h3>7. NOT auf Zahlen angewendet</h3>
+
+        <p>Zahlen oder Variable, auf die der NOT-Operator angewandt wird, verkehren sich in ihr Einerkomplement. Falls Sie mit den Begriffen »Einerkomplement« und »Zweierkomplement« Schwierigkeiten haben, weise ich Sie nochmal auf den hier abgedruckten Kasten mit Erläuterungen hin. Jedes Bit wird also »gekippt«. Aus einer 0 wird 1 und umgekehrt. Die Wahrheitstabelle kann hier ähnlich aufgestellt werden wie für Aussagen, nur tauchen hier anstelle von W und F nun 1 und 0 (also die Bitwerte) auf (siehe Tabelle 3).</p>
+
         <figure>
             <table>
                 <tbody>
@@ -100,6 +209,91 @@
             <figcaption>Tabelle 3. Wahrheitstabelle:
                 NOT bei Zahlen</figcaption>
         </figure>
+
+        <p>Eine Anwendung von NOT wäre beispielsweise das gezielte Kippen von Bytes oder 2-Byte-Werten. Besonders bei Sprite-Programmen ist sowas denkbar. Nehmen wir mal an, wir hätten acht Sprites definiert, von denen vier bis zu einem bestimmten Ereignis sichtbar sein sollen. Die anderen vier sind solange abgeschaltet. Wenn das Ereignis (Tastendruck oder Zusammenstoß &hellip;) eintritt, werden die obersten vier ab- und gleichzeitig die anderen vier angeschaltet. Register 21 (53269) des VIC-II-Chip stellt für jedes Sprite ein Schalt-Bit zur Verfügung (0 steht dort für ein ausgeschaltetes und 1 für ein aktiviertes Sprite). Sollen also zuerst die Sprites 0,2,4,6 an- und 1, 3, 5, 7 abgeschaltet sein, dann enthält Register 21 das Bit-Muster:<br>
+            0101 0101</p>
+
+        <p>Darauf nun eine NOT-Operation angewendet ergäbe genau das erwünschte Kippen: 1010 1010 nach NOT.</p>
+
+        <p>Es läge daher nahe, etwa so zu programmieren:<br>
+            POKE 53269,NOT PEEK(53269)</p>
+
+        <p>Leider ist das nicht möglich. Versucht man es trotzdem, erhält man einen ILLEGAL QUANTITY ERROR. Woran liegt das? Die Ursache dafür liegt wieder in der Eigenart, wie der C 64 Integer-Zahlen interpretiert. Zwar erzeugt die NOT-Operation das Einerkomplement der Ausgangszahl, verstanden wird dieses Ergebnis aber als Zweierkomplementzahl. Daraus folgt, daß man mit der obigen Anweisung versucht, eine negative Zahl in die Speicherstelle zu POKEn, und da streikt unser Computer. Die Binärzahl 1010 1010 wird als —86 verstanden. Was kann man tun, daß der wahre Wert, also 170, in den Speicher gePOKEt wird? Bei 1-Byte-Zahlen ist das relativ einfach: Man wandelt sie durch Abziehen von 256 in eine 2-Byte-Zahl um, also NOT(A-256). In Bild 2 ist zu sehen, was dabei geschieht.</p>
+
+        <figure>
+            <table class="plain">
+                <tbody>
+                    <tr>
+                        <td>256 </td>
+                        <td>= 0000</td>
+                        <td>0001</td>
+                        <td>0000</td>
+                        <td>0000</td>
+                    </tr>
+                    <tr>
+                        <td>Einerkomplement<br>+ 1</td>
+                        <td>= 1111</td>
+                        <td>1110</td>
+                        <td>1111</td>
+                        <td>1111<br>1</td>
+                    </tr>
+                    <tr>
+                        <td>Zweierkomplement = 1111<br>= -256 unsere Binärzahl</td>
+                        <td><br></td>
+                        <td>0000<br>0101</td>
+                        <td>0000<br>0101</td>
+                    </tr>
+                    <tr>
+                        <td>NOT-Operation:</td>
+                        <td>1111<br>0000</td>
+                        <td>1111<br>0000 </td>
+                        <td>0101<br>1010</td>
+                        <td>0101<br>1010</td>
+                    </tr>
+                    <tr>
+                        <td><br></td>
+                        <td>↑<br>Vorzeichenbit = 0 (positiv)</td>
+                        <td><br></td>
+                        <td><br></td>
+                    </tr>
+                </tbody>
+            </table>
+            <figcaption>Bild 2. Ablauf der Operation NOT (A-256) bei A=0101 0101</figcaption>
+        </figure>
+
+        <p>Ein anderer Weg für 1-Byte-Zahlen (also Zahlen, die kleiner als 255 sind) ist NOT A AND 255, was wir aber erst später verstehen werden, wenn wir die AND-Operation kennengelernt haben. Vorsicht muß man walten lassen, wenn auch negative A-Werte auftreten. Negative A können ohne Probleme der NOT-Operation unterzogen werden, weil das Ergebnis in jedem Fall positiv ist. Verwendet man NOT(A-256), kommt es zu Fehlern. Der Weg über NOT A AND 255 ist auch mit negativen 1-Byte-Zahlen möglich. Am sichersten wäre also diese Basic-Zeile:<br>
+            POKE53269,NOTPEEK(53269)AND255</p>
+
+        <p>2-Byte-Zahlen spielen bei POKEs keine Rolle, weshalb wir auf die Umwandlung der negativen Zahl in den vorzeichenfreien Ausdruck hier nicht eingehen werden. Eine andere Sache muß bei der Anwendung von NOT noch bedacht werden: Diese Operation arbeitet mit Integer-Zahlen. Treten nun als Argumente »Komma-Zahlen« auf, dann führt der C 64 zuerst eine INT-Operation aus, die unter Umständen zu Fehlern führen kann: 3999 ergibt dann ein deutlich anderes Ergebnis als 4001.</p>
+
+        <p>Die NOT-Operation kann nur auf Zahlen, nicht aber auf Strings angewendet werden. Allerdings erfolgt die computerinterne Speicherung von Buchstaben ja als ASCII-Werte, also auch als Zahlen. Wenn wir daher die ASCII-Codes eines Textes der NOT-Verknüpfung unterziehen, haben wir auch Strings dieser Operation zugänglich gemacht. Genau das tut ein kleines Demo-Programm (Programm Logik-1): Es ver- und entschlüsselt Texte mittels NOT.</p>
+
+        <p>In diesem Demo-Programm wird Text Buchstabe für Buchstabe in die ASCII-Werte übertragen und diese dann durch NOT komplementiert und in C$ gespeichert. Der Ausdruck ist dann ein unverständliches Kauderwelsch, das aber durch eine zweite NOT-Operation wieder lesbar wird.</p>
+
+        <h3>8. Eine kleine Hilfe</h3>
+
+        <p>Als Programm Logik-2 finden Sie eine kleine Denk- und Rechenhilfe hier abgedruckt. Dieses Programm kann Zahlen zwischen —32767 und +32767 den logischen Verknüpfungen unterziehen und zeigt Ihnen dabei, was sich im Binärformat abspielt und wie die Argumente — falls negative Zahlen auftreten — im vorzeichenfreien Format aussehen. Nach dem RUN bietet Ihnen ein Menü fünf Möglichkeiten an: NOT, AND, OR, EOR und Programmende. NOT kennen Sie ja schon, die anderen logischen Operatoren werden Ihnen in der nächsten Folge geläufig werden. Dort wird Ihnen dieses Programm dann einige Hilfestellungen geben für etwas kompliziertere Sachverhalte. Wenn Sie eine Option angewählt haben, werden zwei Zahleneingaben verlangt (bei NOT nur eine) und dann die entsprechenden Binärzahlen, die vorzeichenfreien Formen und das Ergebnis der Verknüpfung ausgedruckt. Innerhalb der gesteckten Grenzen sind alle Zahleneingabe-Formate möglich. Ein Tastendruck bringt Sie wieder ins Menü zurück.</p>
+
+        <p>In der nächsten Folge werden wir uns die Operatoren AND und OR ansehen. Ein in dem WAIT-Befehl versteckter weiterer Operator EOR soll aufgespürt werden, und wir werden wieder einige Anwendungen der Boole’schen Algebra in unserem Computer kennenlernen.</p>
+
+        <address class="author">(Heimo Ponnath/gk)</address>
+
+        <p>TODO ASIDE</p>
+
+        <h2>Einige Erläuterungen zum Rechnen mit Binärzahlen</h2>
+
+        <h3>a) Dezimales und binäres Zahlensystem</h3>
+
+        <p>Wir sind es gewohnt, im dezimalen Zahlensystem zu rechnen unter Verwendung der Ziffern 0 bis 9. Die Grundlage unseres Zahlensystems ist die Zahl 10. Reichen die Ziffern 0 bis 9 nicht aus, um eine Zahl (zum Beispiel 9 +1) darzustellen, dann führen wir den Stellenwert einer Zahl ein. Hierbei hat jede Stelle in einer Zahl einen Faktor, der sich berechnet aus 10<sup>Stelle</sup>. Zum Beispiel in der Zahl 132 befindet sich die Ziffer 2 an der nullten Stelle, und sie wird mit dem Faktor 10<sup>0</sup> multipliziert (10<sup>0</sup> = 1). Für unsere Beispielszahl können wir so schreiben:<br>
+            132 = 1<em>10↑2 + 3</em>10↑1 + 2<em>10↑0 = 1</em>100 + 3<em>10 + 2</em>1</p>
+
+        <p>Nach demselben Prinzip wird im Binärsystem verfahren. Hier gibt es allerdings nur die Ziffern 0 und 1. Die Grundlage dieses Systems ist die Zahl 2. Auch hier spielt der Stellenwert die entscheidende Rolle. Der Faktor ist nun aber die entsprechende Zweierpotenz (2tStelle). Die Binärzahl 110 beispielsweise setzt sich dann so zusammen: 110 = 1<em>2↑2 + 1</em>2↑1 + 0<em>2↑0<br>
+                = 1</em>4 + 1<em>2 + 0</em>1 = 6</p>
+
+        <h3>b) Umrechnung Binär- in Dezimalzahl</h3>
+
+        <p>Damit haben Sie praktisch schon gesehen, wie man Binärzahlen in Dezimalzahlen umrechnen kann: Jeder Stelle entspricht eine Zweierpotenz. Alle Zweierpotenzen, an deren Stelle eine 1 steht, werden zusammengezählt. Dabei gilt: 2<sup>0</sup> = 1 (siehe Bild 1).</p>
+
         <figure>
             <table class="plain">
                 <tbody>
@@ -188,193 +382,6 @@
             </table>
             <figcaption>Bild 1a. Umrechnung einer Dezimalzahl in eine Binärzahl</figcaption>
         </figure>
-        <figure>
-            <table class="plain">
-                <tbody>
-                    <tr>
-                        <td>256 </td>
-                        <td>= 0000</td>
-                        <td>0001</td>
-                        <td>0000</td>
-                        <td>0000</td>
-                    </tr>
-                    <tr>
-                        <td>Einerkomplement<br>+ 1</td>
-                        <td>= 1111</td>
-                        <td>1110</td>
-                        <td>1111</td>
-                        <td>1111<br>1</td>
-                    </tr>
-                    <tr>
-                        <td>Zweierkomplement = 1111<br>= -256 unsere Binärzahl</td>
-                        <td><br></td>
-                        <td>0000<br>0101</td>
-                        <td>0000<br>0101</td>
-                    </tr>
-                    <tr>
-                        <td>NOT-Operation:</td>
-                        <td>1111<br>0000</td>
-                        <td>1111<br>0000 </td>
-                        <td>0101<br>1010</td>
-                        <td>0101<br>1010</td>
-                    </tr>
-                    <tr>
-                        <td><br></td>
-                        <td>↑<br>Vorzeichenbit = 0 (positiv)</td>
-                        <td><br></td>
-                        <td><br></td>
-                    </tr>
-                </tbody>
-            </table>
-            <figcaption>Bild 2. Ablauf der Operation NOT (A-256) bei A=0101 0101</figcaption>
-        </figure>
-
-        <p>Das hätte sich der »Vater der Logik«, Aristoteles, vor 2200 Jahren nicht träumen lassen können, was aus seinen Gedankengängen einmal werden würde. Man kann aber mit einiger Berechtigung behaupten, daß es ohne seine Werke und die von Leibniz (vor etwa 300 Jahren hat dieser die Logik modernisiert) keine Computer gäbe. Die Arbeiten der Begründer der mathematischen Logik, Boole (1815-64) und Frege (1848-1925), basieren auf dem jahrtausende alten Fundament. Wie für den Computer geschaffen — aber eigentlich ist es umgekehrt: Die logische Maschine ist ein Produkt der mathematischen Logik — ist die sogenannte zweiwertige Logik. Hier geht es um »Wahr« und »Falsch«, ein drittes gibt es nicht (tertium non datur, wie die alten Philosophen zu sagen pflegten). Die Verwandtschaft liegt auf der Hand: Die elektronische Maschine kennt die Zustände Strom an/Strom aus oder Ladung vorhanden/nicht vorhanden oder eben einfach 1 und 0, die Ziffern der Binärarithmetik.</p>
-
-        <p>Dazu noch eine technische Bemerkung: Sollten Sie mit dem System der binären Zahlen noch nicht vertraut sein, dann lesen Sie den beigefügten Kasten, in dem die wichtigsten Begriffe erklärt sind.</p>
-
-        <h3>1. Wahrheitswerte und Aussagen</h3>
-
-        <p>Was sind Aussagen? Am besten sehen wir uns einfach einige Beispiele an:
-            * Rosen sind rot
-            * Die Zahl ist größer als 100.</p>
-
-        <p>Das sind einfache Aussagen. Eine zusammengesetzte Aussage ist beispielsweise:</p>
-
-        <p>Rosen sind rot <strong>UND</strong> Veilchen sind blau. Hier wurden zwei Aussagen UND-verknüpft. Keine Aussage ist:</p>
-
-        <ul>
-            <li>Wohin gehst Du?</li>
-        </ul>
-
-
-        <p>Ich hoffe, daß auf diese Weise ohne tiefschürfende philosophische Erörterungen (denn die gibt es natürlich) das Wesen von Aussagen klar geworden ist.</p>
-
-        <p>Aussagen können wahr sein. Sie enthalten dann den Wahrheitswert »Wahr«. Sie können aber auch statt dessen falsch sein, was ihnen den Wahrheitswert »Falsch« verleiht. Der Wahrheitswert von zusammengesetzten Aussagen hängt zum einen von den Wahrheitswerten der Einzelaussagen ab und zum anderen von der Art ihrer Verknüpfung. Wir werden im folgenden für die Wahrheitswerte die Buchstaben W (für Wahr) und F (für Falsch) verwenden.</p>
-
-        <p>In der binären Arithmetik entspricht die 1 dem W und die 0 dem F. Keine Angst, falls Ihnen das noch unverständlich erscheint, wir werden noch allerlei Logeleien mit Binärzahlen treiben. Dann wird Ihnen das ganz geläufig sein. Was uns momentan interessiert, ist, wie der Computer Wahrheitswerte angibt. Dazu machen wir einen kleinen Test mit dem folgenden Programm:
-            10 INPUTA,B
-            20 C=(A=B)
-            30 PRINTA,B,C</p>
-
-        <p>In Zeile 20 ist eine Aussage enthalten: A = B. Wenn Sie A und B so eingegeben haben, daß beide gleich sind, dann ist diese Aussage wahr (W), und in C finden Sie den Wahrheitswert, den der Computer für W verwendet. Probieren Sie dies mal aus: Sie finden —1! Wenn aber A und B verschiedene Zahlen waren, ist die Aussage A = B falsch, und in C steht 0, was die Computerform von F ist. Weshalb —1 als Wahrheitswert des Commodore 64 für W? Das liegt daran, daß unser Computer für den Wahrheitswert ein ganzes Byte reserviert. Das schreibt er im Falle W voller Einsen:
-            1111 1111</p>
-
-        <p>Nach den Regeln von vorzeichenbehafteten Binärzahlen ist das aber die Erscheinungsform von —1.</p>
-
-        <h3>2. Das merkwürdige IF A THEN &hellip;</h3>
-
-        <p>Bei IF..THENVerzweigungen wird vom Computer der gesamte Ausdruck zwischen IF und THEN auf seinen Wahrheitswert untersucht (das kann dann eine Aussage sein, aber auch etwas anderes, zum Beispiel eine Variable). Dabei nimmt der C 64 alles für wahr an, was bei dieser Untersuchung ungleich Null ist.</p>
-
-        <p>Wenn also in einer Verzweigung der Form:
-            IF A THEN &hellip;
-            A schon irgendeinen Wert angenommen hat, der ungleich Null ist, wird die Bedingung als erfüllt angesehen. Probieren Sie mal mit verschiedenen Eingaben für A:
-            10 INPUT A
-            20 IF A THEN PRINT ”TEST”
-            30 PRINT A</p>
-
-        <p>In der uns geläufigeren Form dieser Verzweigung tauchen zwischen IF und THEN Aussagen in mathematischer Form auf, in denen die Vergleichssymbole verwendet werden, zum Beispiel:
-            IF A > = 100 THEN GOTO &hellip;</p>
-
-        <h3>3. Rechnen mit Wahrheitswerten</h3>
-
-        <p>Außerhalb solch einer Verzweigung ist es manchmal gar nicht so einfach festzustellen, ob es sich bei einem Ausdruck um eine Aussage dreht oder vielleicht nur um eine Zuweisung. Es kommt hier sehr auf den Zusammenhang mit dem übrigen Programmtext an. Beispielsweise kann A = B sowohl eine Zuweisung sein (LET A = B) als auch eine Aussage (C = (A = B)). In Programmen, in denen viel mit logischen Operatoren gearbeitet wird, empfiehlt sich deshalb — um mehr Klarheit zu schaffen —, die vom C 64 verstandene, aber so gut wie nie verwendete Basic-Vokabel LET bei Zuweisungen zu verwenden.</p>
-
-        <p>Ein noch eklatanteres Beispiel ist enthalten in A = 5 + 2. Das ist offensichtlich keine Aussage, könnte deutlicher aber noch als LET A = 5 + 2 geschrieben werden. In einem anderen Zusammenhang ist es eine Aussage: C = 4 + (A = 5 + 2)</p>
-
-        <p>Ist hier A = 5 + 2 wahr (wenn A = 7), ergibt sich ein C von 3, weil ja der Wahrheitswert der Aussage —1 beträgt. Im anderen Fall ist C = 4. Man kann mit Aussagen — besser gesagt, mit ihren Wahrheitswerten — also auch rechnen.</p>
-
-        <p>Im folgenden Programmbeispiel sind gleich fünf Wahrheitswerte miteinander rechnerisch verknüpft. Es handelt sich um eine kurze Routine zur Umrechnung von ASCII-Code in Bildschirmcode:
-            10 INPUT”ASCII-WERT”;A
-            20 C = A-161-33<em>(A&lt;255)-64</em>(A &lt; 192)-32<em>(A &lt; 160) + 32</em>(A &lt; 96)-64*(A&lt;64)
-            30 PRINT”ASCII = ”A,”POKE-CODE=&ldquo;C</p>
-
-        <p>Beispiel: ASCII = 65, Bildschirmcode = 1</p>
-
-        <p>Aussagen können auch mit Strings gebildet werden. Auch dabei ergeben sich die Wahrheitswerte —1 oder 0. Allerdings lassen sich hier sinnvoll nur die Vergleichsrelationen »=« und »ungleich« einsetzen. Alle anderen »größer als«, »kleiner als« etc. sind mit Vorsicht zu genießen. Zur Ermittlung des Wahrheitswertes werden nämlich von links nach rechts alle Buchstaben beider Strings in Form ihrer ASCII-Werte miteinander verglichen. Die erste auf diese Weise gefundene Abweichung führt dann zum Ergebnis. Ein Beispiel soll das Problem verdeutlichen:</p>
-
-        <p>Die Aussage (A$&lt;B$) soll uns einen Wahrheitswert liefern. Wenn nun A$ = &ldquo;DZZZ&rdquo; und B$ = ”EAAA” definiert wurden, ergibt sich —1 als Wahrheitswert, weil der ASCII-Wert von D kleiner ist als der von E. Der Rest der Strings spielt keine Rolle mehr.</p>
-
-        <h3>4. Die logischen Operatoren in Basic</h3>
-
-        <p>Drei Operatoren haben wir im Normalfall zur Verfügung für die sogenannte Boolesche Algebra, wie man manchmal auch das Rechnen mit logischen Operatoren nennt:
-            <strong>NOT, AND, OR</strong>
-        </p>
-
-        <p>Die Tabelle 1 zeigt, wo in der Prioritätenreihenfolge aller Operatoren diese drei einzuordnen sind. Ebenso wie bei den arithmetischen Operatoren ( + ,*,t etc.) kann auch hier die Reihenfolge durch sinnvolle Anwendung von Klammern verändert werden.</p>
-
-        <h3>5. Wahrheitstabellen</h3>
-
-        <p>Jede Verkoppelung von Aussagen (beziehungsweise ihren Wahrheitswerten) mittels logischer Operatoren ergibt ebenfalls wieder Wahrheitswerte. Wir hatten vorhin schon erwähnt, daß das Ergebnis abhängt:
-            a) von den Wahrheitswerten der zu verknüpfenden Aussagen und
-            b) von der Art der Verknüpfung.</p>
-
-        <p>Das kann manchmal schon reichlich schwer zu durchschauen sein, was welche Kombination ergibt. Deshalb schreibt man sich eine Übersicht, die alle möglichen Ausgangs-Wahrheitswerte enthält und die nach der Verknüpfung entstandenen Wahrheitswerte. Solche Tabellen nennt man Wahrheitstabellen. Wir werden diese Tabellen im folgenden bei der Erklärung der logischen Operatoren verwenden. Wie man sie erstellt und liest, wird Ihnen schnell geläufig sein.</p>
-
-        <p>Noch eine Bemerkung: Die Anwendung der logischen Operatoren auf Aussagen und auf Zahlen wird bei uns — aus Gründen der besseren Verständlichkeit — getrennt behandelt werden. Das ist eigentlich nicht nötig, denn im Grunde genommen sind ja die Wahrheitswerte von Aussagen auch nur Zahlen.</p>
-
-        <h3>6. Die Anwendung von NOT auf Aussagen</h3>
-
-        <p>Der NOT-Operator erzeugt immer das Gegenteil des Wahrheitswertes der Ausgangsaussage. Wenden wir also NOT auf eine Aussage mit dem Wahrheitswert W an, dann ergibt das den Wert F. Dasselbe geschieht im umgekehrten Fall.</p>
-
-        <p>Dazu wollen wir uns eine Wahrheitstabelle schreiben (Tabelle 2). In der linken Spalte sind die beiden möglichen Wahrheitswerte einer Aussage A aufgeführt. Die rechte Spalte ergibt sich durch Anwendung von NOT auf die Werte der linken Spalte:
-            NOT W = F
-            NOT F = W</p>
-
-        <p>Das ist gar nicht so schwer, nicht wahr? An einem Beispiel wollen wir uns das auch noch mal ansehen. Die Zeile:
-            10 A = (3 = 5):PRINT NOT A
-            ergibt den Wert —1. Die Aussage 3 = 5 ist ja falsch (F oder für den Computer 0) und A deshalb 0. NOT A ergibt dann das Gegenteil, also W oder —1.</p>
-
-        <p>Eine Basic-Zeile wie die folgende:
-            10 A = NOT A
-            kann man wie einen Flip-Flop-Schalter einsetzen, falls man den Wahrheitswert von A zuvor als 0 oder —1 definiert hat. Jedesmal, wenn das Programm über diesen Ausdruck läuft, kippt der Wert von A.</p>
-
-        <h3>7. NOT auf Zahlen angewendet</h3>
-
-        <p>Zahlen oder Variable, auf die der NOT-Operator angewandt wird, verkehren sich in ihr Einerkomplement. Falls Sie mit den Begriffen »Einerkomplement« und »Zweierkomplement« Schwierigkeiten haben, weise ich Sie nochmal auf den hier abgedruckten Kasten mit Erläuterungen hin. Jedes Bit wird also »gekippt«. Aus einer 0 wird 1 und umgekehrt. Die Wahrheitstabelle kann hier ähnlich aufgestellt werden wie für Aussagen, nur tauchen hier anstelle von W und F nun 1 und 0 (also die Bitwerte) auf (siehe Tabelle 3).</p>
-
-        <p>Eine Anwendung von NOT wäre beispielsweise das gezielte Kippen von Bytes oder 2-Byte-Werten. Besonders bei Sprite-Programmen ist sowas denkbar. Nehmen wir mal an, wir hätten acht Sprites definiert, von denen vier bis zu einem bestimmten Ereignis sichtbar sein sollen. Die anderen vier sind solange abgeschaltet. Wenn das Ereignis (Tastendruck oder Zusammenstoß &hellip;) eintritt, werden die obersten vier ab- und gleichzeitig die anderen vier angeschaltet. Register 21 (53269) des VIC-II-Chip stellt für jedes Sprite ein Schalt-Bit zur Verfügung (0 steht dort für ein ausgeschaltetes und 1 für ein aktiviertes Sprite). Sollen also zuerst die Sprites 0,2,4,6 an- und 1, 3, 5, 7 abgeschaltet sein, dann enthält Register 21 das Bit-Muster:
-            0101 0101</p>
-
-        <p>Darauf nun eine NOT-Operation angewendet ergäbe genau das erwünschte Kippen: 1010 1010 nach NOT.</p>
-
-        <p>Es läge daher nahe, etwa so zu programmieren:
-            POKE 53269,NOT PEEK(53269)</p>
-
-        <p>Leider ist das nicht möglich. Versucht man es trotzdem, erhält man einen ILLEGAL QUANTITY ERROR. Woran liegt das? Die Ursache dafür liegt wieder in der Eigenart, wie der C 64 Integer-Zahlen interpretiert. Zwar erzeugt die NOT-Operation das Einerkomplement der Ausgangszahl, verstanden wird dieses Ergebnis aber als Zweierkomplementzahl. Daraus folgt, daß man mit der obigen Anweisung versucht, eine negative Zahl in die Speicherstelle zu POKEn, und da streikt unser Computer. Die Binärzahl 1010 1010 wird als —86 verstanden. Was kann man tun, daß der wahre Wert, also 170, in den Speicher gePOKEt wird? Bei 1-Byte-Zahlen ist das relativ einfach: Man wandelt sie durch Abziehen von 256 in eine 2-Byte-Zahl um, also NOT(A-256). In Bild 2 ist zu sehen, was dabei geschieht.</p>
-
-        <p>Ein anderer Weg für 1-Byte-Zahlen (also Zahlen, die kleiner als 255 sind) ist NOT A AND 255, was wir aber erst später verstehen werden, wenn wir die AND-Operation kennengelernt haben. Vorsicht muß man walten lassen, wenn auch negative A-Werte auftreten. Negative A können ohne Probleme der NOT-Operation unterzogen werden, weil das Ergebnis in jedem Fall positiv ist. Verwendet man NOT(A-256), kommt es zu Fehlern. Der Weg über NOT A AND 255 ist auch mit negativen 1-Byte-Zahlen möglich. Am sichersten wäre also diese Basic-Zeile:
-            POKE53269,NOTPEEK(53269)AND255</p>
-
-        <p>2-Byte-Zahlen spielen bei POKEs keine Rolle, weshalb wir auf die Umwandlung der negativen Zahl in den vorzeichenfreien Ausdruck hier nicht eingehen werden. Eine andere Sache muß bei der Anwendung von NOT noch bedacht werden: Diese Operation arbeitet mit Integer-Zahlen. Treten nun als Argumente »Komma-Zahlen« auf, dann führt der C 64 zuerst eine INT-Operation aus, die unter Umständen zu Fehlern führen kann: 3999 ergibt dann ein deutlich anderes Ergebnis als 4001.</p>
-
-        <p>Die NOT-Operation kann nur auf Zahlen, nicht aber auf Strings angewendet werden. Allerdings erfolgt die computerinterne Speicherung von Buchstaben ja als ASCII-Werte, also auch als Zahlen. Wenn wir daher die ASCII-Codes eines Textes der NOT-Verknüpfung unterziehen, haben wir auch Strings dieser Operation zugänglich gemacht. Genau das tut ein kleines Demo-Programm (Programm Logik-1): Es ver- und entschlüsselt Texte mittels NOT.</p>
-
-        <p>In diesem Demo-Programm wird Text Buchstabe für Buchstabe in die ASCII-Werte übertragen und diese dann durch NOT komplementiert und in C$ gespeichert. Der Ausdruck ist dann ein unverständliches Kauderwelsch, das aber durch eine zweite NOT-Operation wieder lesbar wird.</p>
-
-        <h3>8. Eine kleine Hilfe</h3>
-
-        <p>Als Programm Logik-2 finden Sie eine kleine Denk- und Rechenhilfe hier abgedruckt. Dieses Programm kann Zahlen zwischen —32767 und +32767 den logischen Verknüpfungen unterziehen und zeigt Ihnen dabei, was sich im Binärformat abspielt und wie die Argumente — falls negative Zahlen auftreten — im vorzeichenfreien Format aussehen. Nach dem RUN bietet Ihnen ein Menü fünf Möglichkeiten an: NOT, AND, OR, EOR und Programmende. NOT kennen Sie ja schon, die anderen logischen Operatoren werden Ihnen in der nächsten Folge geläufig werden. Dort wird Ihnen dieses Programm dann einige Hilfestellungen geben für etwas kompliziertere Sachverhalte. Wenn Sie eine Option angewählt haben, werden zwei Zahleneingaben verlangt (bei NOT nur eine) und dann die entsprechenden Binärzahlen, die vorzeichenfreien Formen und das Ergebnis der Verknüpfung ausgedruckt. Innerhalb der gesteckten Grenzen sind alle Zahleneingabe-Formate möglich. Ein Tastendruck bringt Sie wieder ins Menü zurück.</p>
-
-        <p>In der nächsten Folge werden wir uns die Operatoren AND und OR ansehen. Ein in dem WAIT-Befehl versteckter weiterer Operator EOR soll aufgespürt werden, und wir werden wieder einige Anwendungen der Boole’schen Algebra in unserem Computer kennenlernen.</p>
-
-        <address class="author">(Heimo Ponnath/gk)</address>
-
-        <p>TODO ASIDE</p>
-
-        <h2>Einige Erläuterungen zum Rechnen mit Binärzahlen</h2>
-
-        <h3>a) Dezimales und binäres Zahlensystem</h3>
-
-        <p>Wir sind es gewohnt, im dezimalen Zahlensystem zu rechnen unter Verwendung der Ziffern 0 bis 9. Die Grundlage unseres Zahlensystems ist die Zahl 10. Reichen die Ziffern 0 bis 9 nicht aus, um eine Zahl (zum Beispiel 9 +1) darzustellen, dann führen wir den Stellenwert einer Zahl ein. Hierbei hat jede Stelle in einer Zahl einen Faktor, der sich berechnet aus 10<sup>Stelle</sup>. Zum Beispiel in der Zahl 132 befindet sich die Ziffer 2 an der nullten Stelle, und sie wird mit dem Faktor 10<sup>0</sup> multipliziert (10<sup>0</sup> = 1). Für unsere Beispielszahl können wir so schreiben:
-            132 = 1<em>10↑2 + 3</em>10↑1 + 2<em>10↑0 = 1</em>100 + 3<em>10 + 2</em>1</p>
-
-        <p>Nach demselben Prinzip wird im Binärsystem verfahren. Hier gibt es allerdings nur die Ziffern 0 und 1. Die Grundlage dieses Systems ist die Zahl 2. Auch hier spielt der Stellenwert die entscheidende Rolle. Der Faktor ist nun aber die entsprechende Zweierpotenz (2tStelle). Die Binärzahl 110 beispielsweise setzt sich dann so zusammen: 110 = 1<em>2↑2 + 1</em>2↑1 + 0<em>2↑0
-                = 1</em>4 + 1<em>2 + 0</em>1 = 6</p>
-
-        <h3>b) Umrechnung Binär- in Dezimalzahl</h3>
-
-        <p>Damit haben Sie praktisch schon gesehen, wie man Binärzahlen in Dezimalzahlen umrechnen kann: Jeder Stelle entspricht eine Zweierpotenz. Alle Zweierpotenzen, an deren Stelle eine 1 steht, werden zusammengezählt. Dabei gilt: 2<sup>0</sup> = 1 (siehe Bild 1).</p>
 
         <h3>c) Umrechnung Dezimal- in Binärzahl</h3>
 
@@ -390,30 +397,30 @@
 
         <h3>e) Negative Binärzahlen</h3>
 
-        <p>Bit 7 (also das ganz links stehende Bit eines Bytes: Die Zählung fängt rechts mit 0 an) einer 8-Bit-Zahl oder Bit 15 einer 16-Bit-Zahl wird als Vorzeichenkennung verwendet. Ist dieses Bit eine 0, dann liegt eine positive, ansonsten eine negative Zahl vor. Die Binärzahl 0111 1111 1111 1111(32767) ist daher die größte vorzeichenbehaftete 16-Bit-Binärzahl. Wenn also Bit 7 (oder bei der 16-Bit-Zahl Bit 15) eine 1 enthält, handelt es sich um eine negative Zahl. Unser Computer hat aber eine besondere Art, solche negativen Zahlen zu verstehen: Er interpretiert sie als »Zweierkomplementzahlen«. Ein Beispiel, in dem wir die Zahl —29 in dieses Format bringen, soll erläutern, worum es sich dabei handelt:
+        <p>Bit 7 (also das ganz links stehende Bit eines Bytes: Die Zählung fängt rechts mit 0 an) einer 8-Bit-Zahl oder Bit 15 einer 16-Bit-Zahl wird als Vorzeichenkennung verwendet. Ist dieses Bit eine 0, dann liegt eine positive, ansonsten eine negative Zahl vor. Die Binärzahl 0111 1111 1111 1111(32767) ist daher die größte vorzeichenbehaftete 16-Bit-Binärzahl. Wenn also Bit 7 (oder bei der 16-Bit-Zahl Bit 15) eine 1 enthält, handelt es sich um eine negative Zahl. Unser Computer hat aber eine besondere Art, solche negativen Zahlen zu verstehen: Er interpretiert sie als »Zweierkomplementzahlen«. Ein Beispiel, in dem wir die Zahl —29 in dieses Format bringen, soll erläutern, worum es sich dabei handelt:<br>
             Schritt 1:</p>
 
-        <p>Man berechnet zuerst die Binärzahl der positiven Zahl, also von 29:
-            0000 0000 0001 1101
+        <p>Man berechnet zuerst die Binärzahl der positiven Zahl, also von 29:<br>
+            0000 0000 0001 1101<br>
             Schritt 2:</p>
 
-        <p>Davon wird nun das sogenannte Einerkomplement gebildet, wobei jedes Bit in sein Gegenteil verkehrt wird:
-            1111 1111 1110 0010
+        <p>Davon wird nun das sogenannte Einerkomplement gebildet, wobei jedes Bit in sein Gegenteil verkehrt wird:<br>
+            1111 1111 1110 0010<br>
             Schritt 3:</p>
 
         <p>Aus dem so erhaltenen Einerkomplement bildet man das »Zweierkomplement« durch Addieren einer 1:</p>
 
         <p>TODO</p>
 
-        <p>Das Ergebnis ist —29 im Zweierkomplement-Format.
-            Hat man eine Zahl im Zweierkomplementformat vorliegen, dann kann man auf genau demselben Weg ihren Wert feststellen. Das wollen wir uns noch an einer 8-Bit-Zahl ansehen:
+        <p>Das Ergebnis ist —29 im Zweierkomplement-Format.<br>
+            Hat man eine Zahl im Zweierkomplementformat vorliegen, dann kann man auf genau demselben Weg ihren Wert feststellen. Das wollen wir uns noch an einer 8-Bit-Zahl ansehen:<br>
             Schritt 1:</p>
 
-        <p>Es liegt eine Binärzahl vor, die so aussieht:
-            1111 1110
-            Schritt 2:
-            Das Einerkomplement wird gebildet:
-            0000 0001
+        <p>Es liegt eine Binärzahl vor, die so aussieht:<br>
+            1111 1110<br>
+            Schritt 2:<br>
+            Das Einerkomplement wird gebildet:<br>
+            0000 0001<br>
             Schritt 3:</p>
 
         <p>Das Zweierkomplement wird durch Addieren von 1 erzeugt:</p>

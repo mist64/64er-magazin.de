@@ -18,102 +18,53 @@
         <h1>Assembler ist keine Alchimie – Teil 10</h1>
         <p class="intro">Auf zum Endspurt: Die letzten 4 Assembler-Befehle werden in Angriff genommen (jedoch nicht die letzte Folge des Kurses). Wir steigen ein in ein unerhört interessantes, wenn auch nicht einfaches Thema: Die Interrupt-Technik.</p>
 
+        <p>Die Assembler-Befehle haben wir bis auf vier noch offenstehende alle behandelt. Diese vier, die alle mit dem Interrupt-Handling zusammenhängen, sollen diesmal unser Thema sein. Um nach längerer Zeit mal wieder auf den Titel dieser Serie zurückzukommen (nämlich die Alchimie!): Wenn wir diese 4 Befehle beherrschen, haben wir den ersten Schritt zum Meister der Assembler-Alchimie getan. Diese vier kleinen 1-Byte-Befehle öffnen uns eine geheime Pforte zu einem Universum an Programmier-Möglichkeiten, von dem wir bisher kaum zu träumen vermochten. Genug der Schwärmerei, erst kommt noch eine Menge Arbeit, die uns wohl mehrere Folgen dieser Serie in Atem halten wird.</p>
+
+        <p>Zuvor noch eine Bemerkung: es gibt kaum ein Thema im Rahmen der Programmierung in Assembler, welches so penetrant häufig Abstürze provoziert, wie das nunmehr angesteuerte! Falls Sie noch keine RESET-Taste an ihrem Computer haben, wird es nun höchste Zeit. Diese nützlichen Dinger werden inzwischen schon so preiswert angeboten (sehen Sie mal in den Kleinanzeigenteil!), daß Sie zur Grundausstattung eines Assembler Alchimisten zählen.</p>
+
+        <h2>Was sind Interrupts?</h2>
+
+        <p>Unser Computer ist — solange er eingeschaltet ist — ständig mit irgendwelchen Tätigkeiten beschäftigt. Im Direktmodus hängt er beispielsweise meistens in einer Warteschleife und harrt der Eingaben, im Programm-Modus arbeitet er sich mit Hilfe der Interpreterschleife durch einen Basic-Befehlstext hindurch und so weiter. Nun werden Sie ja sicher schon festgestellt haben, daß er im Direktmodus auch den Cursor blinken läßt, in beiden Modi die TI$-Uhr weiterzählt und weitere Dinge macht, die anscheinend so nebenher passieren. Schon in der ersten Folge dieser Serie aber haben wir einen Unterschied zwischen Mensch und Computer festgehalten: Der Mensch kann mehrere Dinge gleichzeitig tun, der Mikroprozessor ist nur fähig zu einer Arbeit pro Zeiteinheit. Weil aber diese Zeiteinheiten so unfaßbar kurz sind (etwa eine Millionstel Sekunde), haben wir Benutzer den Eindruck der Gleichzeitigkeit.</p>
+
+        <p>Wenn dem aber so ist, wie macht es der Computer, daß er beispielsweise ein Programm abarbeitet und trotzdem die TI$-Uhr weiterzählt? Durch Unterbrechungen (interrupt = unterbrechen) der gerade ausgeübten Tätigkeit. Ein Beispiel aus dem täglichen Leben soll uns das illustrieren: Sie lesen gerade diesen Artikel, als das Telefon klingelt und ein Freund von Ihnen wissen möchte, was eigentlich Unterbrechungen sind. Während Sie es ihm erklären, fängt in der Küche der Teekessel schrill zu pfeifen an. Sie sagen Ihrem Freund, er möge sich einen Moment gedulden, gehen in die Küche und nehmen den Kessel vom Feuer. Dann kehren Sie ans Telefon zurück und beenden nach einer Weile das Gespräch. Nach dem Auflegen des Telefonhörers setzen Sie die Lektüre des Artikels fort, fest entschlossen, sich nun nicht mehr unterbrechen zu lassen. Kurze Zeit später klingelt jemand an der Tür. Sie lassen sich dadurch nicht stören.</p>
+
+        <p>Dieses Gleichnis gibt ziemlich genau wieder, was sich im Computer — nur bei millionenfacher Geschwindigkeit — bei Unterbrechungen abspielt. In Bild 1 ist das Schema des Ablaufes grafisch dargestellt. In gewisser Weise ähnelt das ganze dem Abarbeiten von Unterprogrammsequenzen. Weshalb programmiert man dann nicht einfach mittels einiger JSR-Aufrufe? Dafür hat L.A.Leventhal einen einleuchtenden Vergleich: »Ein Unterbrechungs-System entspricht etwa einer Telefonklingel. Sie läutet, wenn ein Anruf empfangen wird, so daß man den Hörer nicht laufend abnehmen muß, um festzustellen, ob sich jemand in der Leitung befindet.« (L.A.Leventhal, »6502 Programmieren in Assembler«, München tewi Verlag, S.121). Unterbrechungen können dann angefordert und abgearbeitet werden, wenn sie nötig sind, im Gegensatz zu Unterprogrammen, die erst dann berücksichtigt werden, wenn der Programmzähler einen JSR-Befehl erfaßt. Um also schnell reagieren zu können, müßte man sehr oft in einem Programm eine Unterroutine anspringen, die auf gewisse Registerinhalte prüft und dann zur Bearbeitung verzweigt oder — bei Nichtvorliegen einer Bedingung — im normalen Programm weiterfährt. Das kostet unnötig Zeit und Speicherraum. Mancher Verkehr des Computers mit Peripherie erfordert so schnelle Reaktionen, daß diese nur geleistet werden können durch Unterbrechen des laufenden Programmes.</p>
+
         <figure>
             <img src="127-1.png" alt="">
-            <figcaption>Bild i. Unterbrechungsbeispiele im täglichen Leben</figcaption>
+            <figcaption>Bild 1. Unterbrechungsbeispiele im täglichen Leben</figcaption>
         </figure>
+
+        <p>Ich denke, daß Sie nun die Notwendigkeit von Unterbrechungen erkennen. Fast jede CPU kennt solche Unterbrechungssysteme. Man kann sie charakterisieren durch die Beantwortung folgender Fragen:
+            <strong>1)</strong> Welche Unterbrechungs-Eingänge weist die CPU auf?
+            <strong>2)</strong> Wie reagiert die CPU auf eine Unterbrechung?
+            <strong>3)</strong> Wie bestimmt die CPU die Unterbrechungsquelle, wenn die Anzahl der Quellen größer ist als die Anzahl der Eingänge?
+            <strong>4)</strong> Kann die CPU zwischen wichtigen und weniger wichtigen Unterbrechungen unterscheiden?
+            <strong>5)</strong> Wie und wann wird das Unterbrechungssystem freigegeben oder gesperrt?
+            All diese Fragen werden wir im Laufe dieser Serie für unseren Computer ergründen.
+        </p>
+
+        <h2>Das Unterbrechungssystem der CPU 6510/6502</h2>
+
+        <p>Einige dieser Charakteristika sind schnell zu zeigen:
+            <strong>Zu 1</strong>: Unsere CPU hat ganau 2 Eingänge für Unterbrechungen (wenn man RESET außer acht läßt, was wir im folgenden meist tun werden).
+            <strong>Zu 3</strong>: Natürlich gibt es weitaus mehr denkbare Unterbrechungsquellen als diese 2 Eingänge, weshalb softwaremäßig eine Registerabfrage (das sogenannte Polling) durchgeführt wird, um die Quelle festzustellen.
+            <strong>Zu 4</strong>: Zwischen wichtiger und nicht so wichtiger Unterbrechung kann unsere CPU unterscheiden durch die Priorität der beiden Eingänge. Wir haben eine sogenannte maskierbare Unterbrechung, genannt IRQ, welche per Befehl ignoriert (maskiert) werden kann und eine andere, nicht maskierbare, die daher auch NMI (not maskable interrupt = nicht maskierbare Unterbrechung) genannt wird. NMI hat eine höhere Priorität als IRQ und kann deshalb für die wichtigeren Aufgabenstellungen eingesetzt werden.
+            <strong>Zu 5</strong>: Freigegeben oder gesperrt werden kann die IRQ-Unterbrechung durch ein Sperrbit (auch Maskenbit genannt), welches sich als Bit 2 im Flaggen-Register des Prozessors befindet. Das ist die I-Flagge. Für den Empfang der NMI-Unterbrechung kann die CPU nicht gesperrt werden.
+        </p>
+
+        <p>Um mal die Parallele zu unserem Beispiel zu zeigen: Das Lesen des Artikels ist die gerade stattfindende Tätigkeit des Computers. Die Telefonklingel signalisiert einen IRQ, der im folgenden bearbeitet wird. Das Pfeifen des Teekessels soll einem NMI entsprechen. Wenn dieser dann bearbeitet ist, geht es mit der Abarbeitung des IRQ weiter. Nach Beendigung des Telefonates wird das Unterbrechungs-Sperrbit gesetzt (sie nehmen sich vor, sich nicht mehr stören zu lassen) und mit der normalen Tätigkeit fortgefahren. Weil der nun folgende IRQ damit maskiert ist, wird das Türklingeln ignoriert.</p>
+
+        <p>Die <strong>Frage 2</strong>, nämlich wie unsere CPU auf eine Unterbrechung reagiert, blieb noch unbeantwortet. Nun soll sie behandelt werden:
+            <strong>a)</strong> Am Ende jedes Befehls überprüft die CPU automatisch den Zustand des Unterbrechungs-Systems. Wenn an einer der beiden Unterbrechungsleitungen eine Anforderung vorliegt und diese auch freigegeben ist, beginnt die Unterbrechung zu wirken.
+            <strong>b)</strong> Zunächst wird der Programmzählerinhalt in der Reihenfolge MSB, LSB auf den Stapel geschrieben. Danach wandert noch der Prozessorstatus auf den Stapel (siehe Bild 2).
+            <strong>c)</strong> Durch Setzen des Unterbrechungs-Sperrbits I werden weitere maskierbare Unterbrechungen (IRQ) unterbunden.
+            <strong>d)</strong> Nun holt sich die CPU aus einem Vektor ganz am Ende des Speichers eine Adresse, lädt diese in den Programmzähler und startet auf diese Weise ein Serviceprogramm, das dem auslösenden Anlaß Rechnung trägt. In der Tabelle 1 sind die zu den Unterbrechungsformen und zum RESET gehörigen Vektoren aufgeführt.
+        </p>
+
         <figure>
             <img src="127-2.png" alt="">
             <figcaption>Bild 2. Die CPU rettet den Programmzähler und das Statusregister beim Eintreten einer Unterbrechung auf den Stapel</figcaption>
-        </figure>
-        <figure>
-            <img src="127-3.png" alt="">
-            <figcaption>Bild 3. Das Interrupt-Enable-Register (53274 = $dO1a) des VIC-II-Chip</figcaption>
-        </figure>
-        <figure>
-            <img src="127-4.png" alt="">
-            <figcaption>Bild 4. Das Interrupt-Latch-Register (53273 = $dO19) des VIC-II-Chip</figcaption>
-        </figure>
-        <figure>
-            <img src="127-5.png" alt="">
-            <figcaption>Bild 5. Genereller Aufbau der Unterbrechungs-Kontroll-Register (13) der beiden CIA-Bausteine</figcaption>
-        </figure>
-        <figure>
-            <table class="plain">
-                <tbody>
-                    <tr>
-                        <td>6000</td>
-                        <td>PHA</td>
-                        <td>mit diesen Befehlen retten wir Akku und Register</td>
-                    </tr>
-                    <tr>
-                        <td>6001</td>
-                        <td>TXA</td>
-                        <td>auf den Stapel.</td>
-                    </tr>
-                    <tr>
-                        <td>6002</td>
-                        <td>PHA</td>
-                        <td><br></td>
-                    </tr>
-                    <tr>
-                        <td>6003</td>
-                        <td>TYA</td>
-                        <td><br></td>
-                    </tr>
-                    <tr>
-                        <td>6004</td>
-                        <td>PHA</td>
-                        <td><br></td>
-                    </tr>
-                    <tr>
-                        <td>6005</td>
-                        <td>LDA #$7F</td>
-                        <td>0111 1111 ist das in binär.</td>
-                    </tr>
-                    <tr>
-                        <td>6007</td>
-                        <td>STA $DD0D</td>
-                        <td>Dadurch werden alle NMIs, die vom CIA 2 kommen könnten, gesperrt. Erinnern Sie sich: Bit 7 ist Null beim Schreiben, also Sperrfunktion.</td>
-                    </tr>
-                    <tr>
-                        <td>600A</td>
-                        <td>LDY $DD0D</td>
-                        <td>Lesen des Registers 13 löscht dieses und zeigt uns, ob die NMI-Anforderung von dort kam.</td>
-                    </tr>
-                    <tr>
-                        <td>600D</td>
-                        <td>BMI $601A</td>
-                        <td>falls NMI-Anforderung vom CIA 2 kam, wird verzweigt</td>
-                    </tr>
-                    <tr>
-                        <td>600F</td>
-                        <td>LDA $D020</td>
-                        <td>ansonsten kommt der NMI von der RESTORE- Taste, und in den Akku wird die Rahmenfarbe eingeladen</td>
-                    </tr>
-                    <tr>
-                        <td>6012</td>
-                        <td>EOR #$0E</td>
-                        <td>Ausgehend davon, daß als Rahmenfarbe 14 vorliegt, wird diese exklusiv oder verknüpft zu Null. Ist die Rahmenfarbe 0, dann wird sie wieder 14.</td>
-                    </tr>
-                    <tr>
-                        <td>6014</td>
-                        <td>STA $D020</td>
-                        <td>Einschreiben des neuen Farbwertes</td>
-                    </tr>
-                    <tr>
-                        <td>6017</td>
-                        <td>JMP $FEBC</td>
-                        <td>Sprung in den Rest der normalen NMI-Routine</td>
-                    </tr>
-                    <tr>
-                        <td>601A</td>
-                        <td>JMP $FE72</td>
-                        <td>Sprung in die normale NMI-Routine im Fall, daß die Anforderung durch den NMI-CIA kam.</td>
-                    </tr>
-                </tbody>
-            </table>
-            <figcaption>Programm 1. Ein kleines Testprogramm demonstriert die Wirkung einer Unterbrechung: Durch Drücken der RESTORE-Taste wird die Rahmenfarbe geändert.</figcaption>
         </figure>
         <figure>
             <table>
@@ -142,100 +93,6 @@
             </table>
             <figcaption>Tabelle 1. Unterbrechungsvektoren und ihre Inhalte</figcaption>
         </figure>
-        <figure>
-            <table>
-                <tbody>
-                    <tr>
-                        <td rowspan="2"><b>Befehlswort</b></td>
-                        <td rowspan="2"><b>Adressierung</b></td>
-                        <td rowspan="2"><b>Bytezahl</b></td>
-                        <td colspan="2"><b>Code</b></td>
-                        <td rowspan="2"><b>Taktcyclen</b></td>
-                        <td rowspan="2"><b>Beeinflussung von Flaggen</b></td>
-                    </tr>
-                    <tr>
-                        <td><b>Hex</b></td>
-                        <td><b>Dez</b></td>
-                    </tr>
-                    <tr>
-                        <td>CLI</td>
-                        <td>implizit</td>
-                        <td>1</td>
-                        <td>58</td>
-                        <td>88</td>
-                        <td>2</td>
-                        <td>I-Flagge</td>
-                    </tr>
-                    <tr>
-                        <td>SEI</td>
-                        <td>implizit</td>
-                        <td>1</td>
-                        <td>78</td>
-                        <td>120</td>
-                        <td>2</td>
-                        <td>I-Flagge</td>
-                    </tr>
-                    <tr>
-                        <td>RTI</td>
-                        <td>implizit</td>
-                        <td>1</td>
-                        <td>40</td>
-                        <td>64</td>
-                        <td>6</td>
-                        <td>alle Flaggen</td>
-                    </tr>
-                    <tr>
-                        <td>BRK</td>
-                        <td>implizit</td>
-                        <td>1</td>
-                        <td>00</td>
-                        <td>0</td>
-                        <td>7</td>
-                        <td>B-Flagge vor dem Schieben auf den Stapel, I-Flagge danach</td>
-                    </tr>
-                </tbody>
-            </table>
-            <figcaption>Tabelle 2. Die Daten zu den letzten Assembler-Befehlen</figcaption>
-        </figure>
-
-        <p>Die Assembler-Befehle haben wir bis auf vier noch offenstehende alle behandelt. Diese vier, die alle mit dem Interrupt-Handling zusammenhängen, sollen diesmal unser Thema sein. Um nach längerer Zeit mal wieder auf den Titel dieser Serie zurückzukommen (nämlich die Alchimie!): Wenn wir diese 4 Befehle beherrschen, haben wir den ersten Schritt zum Meister der Assembler-Alchimie getan. Diese vier kleinen 1-Byte-Befehle öffnen uns eine geheime Pforte zu einem Universum an Programmier-Möglichkeiten, von dem wir bisher kaum zu träumen vermochten. Genug der Schwärmerei, erst kommt noch eine Menge Arbeit, die uns wohl mehrere Folgen dieser Serie in Atem halten wird.</p>
-
-        <p>Zuvor noch eine Bemerkung: es gibt kaum ein Thema im Rahmen der Programmierung in Assembler, welches so penetrant häufig Abstürze provoziert, wie das nunmehr angesteuerte! Falls Sie noch keine RESET-Taste an ihrem Computer haben, wird es nun höchste Zeit. Diese nützlichen Dinger werden inzwischen schon so preiswert angeboten (sehen Sie mal in den Kleinanzeigenteil!), daß Sie zur Grundausstattung eines Assembler Alchimisten zählen.</p>
-
-        <h2>Was sind Interrupts?</h2>
-
-        <p>Unser Computer ist — solange er eingeschaltet ist — ständig mit irgendwelchen Tätigkeiten beschäftigt. Im Direktmodus hängt er beispielsweise meistens in einer Warteschleife und harrt der Eingaben, im Programm-Modus arbeitet er sich mit Hilfe der Interpreterschleife durch einen Basic-Befehlstext hindurch und so weiter. Nun werden Sie ja sicher schon festgestellt haben, daß er im Direktmodus auch den Cursor blinken läßt, in beiden Modi die TI$-Uhr weiterzählt und weitere Dinge macht, die anscheinend so nebenher passieren. Schon in der ersten Folge dieser Serie aber haben wir einen Unterschied zwischen Mensch und Computer festgehalten: Der Mensch kann mehrere Dinge gleichzeitig tun, der Mikroprozessor ist nur fähig zu einer Arbeit pro Zeiteinheit. Weil aber diese Zeiteinheiten so unfaßbar kurz sind (etwa eine Millionstel Sekunde), haben wir Benutzer den Eindruck der Gleichzeitigkeit.</p>
-
-        <p>Wenn dem aber so ist, wie macht es der Computer, daß er beispielsweise ein Programm abarbeitet und trotzdem die TI$-Uhr weiterzählt? Durch Unterbrechungen (interrupt = unterbrechen) der gerade ausgeübten Tätigkeit. Ein Beispiel aus dem täglichen Leben soll uns das illustrieren: Sie lesen gerade diesen Artikel, als das Telefon klingelt und ein Freund von Ihnen wissen möchte, was eigentlich Unterbrechungen sind. Während Sie es ihm erklären, fängt in der Küche der Teekessel schrill zu pfeifen an. Sie sagen Ihrem Freund, er möge sich einen Moment gedulden, gehen in die Küche und nehmen den Kessel vom Feuer. Dann kehren Sie ans Telefon zurück und beenden nach einer Weile das Gespräch. Nach dem Auflegen des Telefonhörers setzen Sie die Lektüre des Artikels fort, fest entschlossen, sich nun nicht mehr unterbrechen zu lassen. Kurze Zeit später klingelt jemand an der Tür. Sie lassen sich dadurch nicht stören.</p>
-
-        <p>Dieses Gleichnis gibt ziemlich genau wieder, was sich im Computer — nur bei millionenfacher Geschwindigkeit — bei Unterbrechungen abspielt. In Bild 1 ist das Schema des Ablaufes grafisch dargestellt. In gewisser Weise ähnelt das ganze dem Abarbeiten von Unterprogrammsequenzen. Weshalb programmiert man dann nicht einfach mittels einiger JSR-Aufrufe? Dafür hat L.A.Leventhal einen einleuchtenden Vergleich: »Ein Unterbrechungs-System entspricht etwa einer Telefonklingel. Sie läutet, wenn ein Anruf empfangen wird, so daß man den Hörer nicht laufend abnehmen muß, um festzustellen, ob sich jemand in der Leitung befindet.« (L.A.Leventhal, »6502 Programmieren in Assembler«, München tewi Verlag, S.121). Unterbrechungen können dann angefordert und abgearbeitet werden, wenn sie nötig sind, im Gegensatz zu Unterprogrammen, die erst dann berücksichtigt werden, wenn der Programmzähler einen JSR-Befehl erfaßt. Um also schnell reagieren zu können, müßte man sehr oft in einem Programm eine Unterroutine anspringen, die auf gewisse Registerinhalte prüft und dann zur Bearbeitung verzweigt oder — bei Nichtvorliegen einer Bedingung — im normalen Programm weiterfährt. Das kostet unnötig Zeit und Speicherraum. Mancher Verkehr des Computers mit Peripherie erfordert so schnelle Reaktionen, daß diese nur geleistet werden können durch Unterbrechen des laufenden Programmes.</p>
-
-        <p>Ich denke, daß Sie nun die Notwendigkeit von Unterbrechungen erkennen. Fast jede CPU kennt solche Unterbrechungssysteme. Man kann sie charakterisieren durch die Beantwortung folgender Fragen:
-            <strong>1)</strong> Welche Unterbrechungs-Eingänge weist die CPU auf?
-            <strong>2)</strong> Wie reagiert die CPU auf eine Unterbrechung?
-            <strong>3)</strong> Wie bestimmt die CPU die Unterbrechungsquelle, wenn die Anzahl der Quellen größer ist als die Anzahl der Eingänge?
-            <strong>4)</strong> Kann die CPU zwischen wichtigen und weniger wichtigen Unterbrechungen unterscheiden?
-            <strong>5)</strong> Wie und wann wird das Unterbrechungssystem freigegeben oder gesperrt?
-            All diese Fragen werden wir im Laufe dieser Serie für unseren Computer ergründen.
-        </p>
-
-        <h2>Das Unterbrechungssystem der CPU 6510/6502</h2>
-
-        <p>Einige dieser Charakteristika sind schnell zu zeigen:
-            <strong>Zu 1</strong>: Unsere CPU hat ganau 2 Eingänge für Unterbrechungen (wenn man RESET außer acht läßt, was wir im folgenden meist tun werden).
-            <strong>Zu 3</strong>: Natürlich gibt es weitaus mehr denkbare Unterbrechungsquellen als diese 2 Eingänge, weshalb softwaremäßig eine Registerabfrage (das sogenannte Polling) durchgeführt wird, um die Quelle festzustellen.
-            <strong>Zu 4</strong>: Zwischen wichtiger und nicht so wichtiger Unterbrechung kann unsere CPU unterscheiden durch die Priorität der beiden Eingänge. Wir haben eine sogenannte maskierbare Unterbrechung, genannt IRQ, welche per Befehl ignoriert (maskiert) werden kann und eine andere, nicht maskierbare, die daher auch NMI (not maskable interrupt = nicht maskierbare Unterbrechung) genannt wird. NMI hat eine höhere Priorität als IRQ und kann deshalb für die wichtigeren Aufgabenstellungen eingesetzt werden.
-            <strong>Zu 5</strong>: Freigegeben oder gesperrt werden kann die IRQ-Unterbrechung durch ein Sperrbit (auch Maskenbit genannt), welches sich als Bit 2 im Flaggen-Register des Prozessors befindet. Das ist die I-Flagge. Für den Empfang der NMI-Unterbrechung kann die CPU nicht gesperrt werden.
-        </p>
-
-        <p>Um mal die Parallele zu unserem Beispiel zu zeigen: Das Lesen des Artikels ist die gerade stattfindende Tätigkeit des Computers. Die Telefonklingel signalisiert einen IRQ, der im folgenden bearbeitet wird. Das Pfeifen des Teekessels soll einem NMI entsprechen. Wenn dieser dann bearbeitet ist, geht es mit der Abarbeitung des IRQ weiter. Nach Beendigung des Telefonates wird das Unterbrechungs-Sperrbit gesetzt (sie nehmen sich vor, sich nicht mehr stören zu lassen) und mit der normalen Tätigkeit fortgefahren. Weil der nun folgende IRQ damit maskiert ist, wird das Türklingeln ignoriert.</p>
-
-        <p>Die <strong>Frage 2</strong>, nämlich wie unsere CPU auf eine Unterbrechung reagiert, blieb noch unbeantwortet. Nun soll sie behandelt werden:
-            <strong>a)</strong> Am Ende jedes Befehls überprüft die CPU automatisch den Zustand des Unterbrechungs-Systems. Wenn an einer der beiden Unterbrechungsleitungen eine Anforderung vorliegt und diese auch freigegeben ist, beginnt die Unterbrechung zu wirken.
-            <strong>b)</strong> Zunächst wird der Programmzählerinhalt in der Reihenfolge MSB, LSB auf den Stapel geschrieben. Danach wandert noch der Prozessorstatus auf den Stapel (siehe Bild 2).
-            <strong>c)</strong> Durch Setzen des Unterbrechungs-Sperrbits I werden weitere maskierbare Unterbrechungen (IRQ) unterbunden.
-            <strong>d)</strong> Nun holt sich die CPU aus einem Vektor ganz am Ende des Speichers eine Adresse, lädt diese in den Programmzähler und startet auf diese Weise ein Serviceprogramm, das dem auslösenden Anlaß Rechnung trägt. In der Tabelle 1 sind die zu den Unterbrechungsformen und zum RESET gehörigen Vektoren aufgeführt.
-        </p>
 
         <p>Bevor wir uns weiter mit den so angesteuerten Routinen befassen, wollen wir die 4 Befehle kennenlernen, die uns noch fehlen.</p>
 
@@ -320,6 +177,11 @@
 
         <p>Das sogenannte Interrupt Enable Register (Unterbrechungs-Zulassungs-Register) des VIC-II-Chips ist Register 26. Es befindet sich in der Speicherstelle 53274 ($D01A) (siehe Bild 3).</p>
 
+        <figure>
+            <img src="127-3.png" alt="">
+            <figcaption>Bild 3. Das Interrupt-Enable-Register (53274 = $dO1a) des VIC-II-Chip</figcaption>
+        </figure>
+
         <p>In diesem Register wird festgelegt, ob eines — oder mehrere — der 4 möglichen auslösenden Ereignisse eine Unterbrechungsanforderung an den Mikroprozessor senden soll. Jedem Ereignis ist ein Bit zugeordnet. Ist dieses Bit gleich 1, dann ist die Unterbrechung freigegeben, ist es gleich 0, dann liegt eine Sperrung vor. Die Zuordnung der Bits ist wie folgt:
             <strong>Bit 0</strong> Rasterzeilen-IRQ
             <strong>Bit 1</strong> Sprite/Hintergrund-Kollision
@@ -329,6 +191,11 @@
         </p>
 
         <p>Das Register 25 wird Interrupt Latch Register genannt, was etwa zu übersetzen wäre mit »Unterbrechungs-Einrast-Register« (siehe Bild 4). Der englische Ausdruck »latch«, der nur umschreibend oder sehr technisch übersetzt werden kann, beschreibt eigentlich recht genau, was in diesem Register geschieht. Ein »latch« ist nämlich so etwas wie ein Schnappriegel, also ein Riegel, der bei der Betätigung einrastet. Wenn eines der 4 möglichen Ereignisse eintritt, schnappt im dazugehörigen Bit dieses Registers der Inhalt auf 1. Die Bit-Zuordnung ist die gleiche wie in Register 26. Aber das Bit 7 hat hier noch eine Bedeutung: Ist eines der Bits 0 bis 3 auf 1 gesetzt und das dazugehörige Ereignis in Register 26 auch zur Unterbrechung zugelassen (also auch dort gleich 1), dann taucht in Register 25, Bit 7 eine 1 auf. So kann durch einfaches Lesen dieses Bits festgestellt werden, ob ein IRQ durch den VIC-II-Chip ausgelöst wurde.</p>
+
+        <figure>
+            <img src="127-4.png" alt="">
+            <figcaption>Bild 4. Das Interrupt-Latch-Register (53273 = $dO19) des VIC-II-Chip</figcaption>
+        </figure>
 
         <p>Will man in diesem Register ein gesetztes Bit löschen, muß man — außergewöhnlich! — eine 1 in die Bitposition schreiben.</p>
 
@@ -349,6 +216,11 @@
         <p>Die Ereignisse 4 und 5 werden wir ebenfalls im weiteren weitgehend ausklammern.</p>
 
         <p>Nun zum Register 13, dem Unterbrechungs-Kontroll-Register (siehe Bild 5).</p>
+
+        <figure>
+            <img src="127-5.png" alt="">
+            <figcaption>Bild 5. Genereller Aufbau der Unterbrechungs-Kontroll-Register (13) der beiden CIA-Bausteine</figcaption>
+        </figure>
 
         <p>Auch hier gehört zu jedem Ereignis ein Bit. Dabei — um Wiederholungen zu vermeiden — ist die Zuordnung schon durch die eben angegebene Ereignisaufzählung gegeben. Ziehen Sie von der vorangestellten Nummer immer eine 1 ab und Sie haben die Bitnummer. Die Bits 5 und 6 sind unbenutzt. Bit 7 hat eine dreifache Funktion, die eng mit den anderen Bitinhalten verknüpft ist. Sehen wir uns das mal der Reihe nach an:</p>
 
@@ -394,9 +266,143 @@
 
         <p>Ein kleines Testprogramm soll Ihnen hier noch vorgestellt werden, das Sie vielleicht aber noch nicht ganz verstehen werden, weil wir erst in der nächsten Folge die eingebauten Serviceprogramme kennenlernen werden. Schalten Sie also den SMON ein und geben Sie das Programm 1 ein (ab $6000):</p>
 
+        <figure>
+            <table class="plain">
+                <tbody>
+                    <tr>
+                        <td>6000</td>
+                        <td>PHA</td>
+                        <td>mit diesen Befehlen retten wir Akku und Register</td>
+                    </tr>
+                    <tr>
+                        <td>6001</td>
+                        <td>TXA</td>
+                        <td>auf den Stapel.</td>
+                    </tr>
+                    <tr>
+                        <td>6002</td>
+                        <td>PHA</td>
+                        <td><br></td>
+                    </tr>
+                    <tr>
+                        <td>6003</td>
+                        <td>TYA</td>
+                        <td><br></td>
+                    </tr>
+                    <tr>
+                        <td>6004</td>
+                        <td>PHA</td>
+                        <td><br></td>
+                    </tr>
+                    <tr>
+                        <td>6005</td>
+                        <td>LDA #$7F</td>
+                        <td>0111 1111 ist das in binär.</td>
+                    </tr>
+                    <tr>
+                        <td>6007</td>
+                        <td>STA $DD0D</td>
+                        <td>Dadurch werden alle NMIs, die vom CIA 2 kommen könnten, gesperrt. Erinnern Sie sich: Bit 7 ist Null beim Schreiben, also Sperrfunktion.</td>
+                    </tr>
+                    <tr>
+                        <td>600A</td>
+                        <td>LDY $DD0D</td>
+                        <td>Lesen des Registers 13 löscht dieses und zeigt uns, ob die NMI-Anforderung von dort kam.</td>
+                    </tr>
+                    <tr>
+                        <td>600D</td>
+                        <td>BMI $601A</td>
+                        <td>falls NMI-Anforderung vom CIA 2 kam, wird verzweigt</td>
+                    </tr>
+                    <tr>
+                        <td>600F</td>
+                        <td>LDA $D020</td>
+                        <td>ansonsten kommt der NMI von der RESTORE- Taste, und in den Akku wird die Rahmenfarbe eingeladen</td>
+                    </tr>
+                    <tr>
+                        <td>6012</td>
+                        <td>EOR #$0E</td>
+                        <td>Ausgehend davon, daß als Rahmenfarbe 14 vorliegt, wird diese exklusiv oder verknüpft zu Null. Ist die Rahmenfarbe 0, dann wird sie wieder 14.</td>
+                    </tr>
+                    <tr>
+                        <td>6014</td>
+                        <td>STA $D020</td>
+                        <td>Einschreiben des neuen Farbwertes</td>
+                    </tr>
+                    <tr>
+                        <td>6017</td>
+                        <td>JMP $FEBC</td>
+                        <td>Sprung in den Rest der normalen NMI-Routine</td>
+                    </tr>
+                    <tr>
+                        <td>601A</td>
+                        <td>JMP $FE72</td>
+                        <td>Sprung in die normale NMI-Routine im Fall, daß die Anforderung durch den NMI-CIA kam.</td>
+                    </tr>
+                </tbody>
+            </table>
+            <figcaption>Programm 1. Ein kleines Testprogramm demonstriert die Wirkung einer Unterbrechung: Durch Drücken der RESTORE-Taste wird die Rahmenfarbe geändert.</figcaption>
+        </figure>
+
         <p>Am besten speichern Sie nun das Programm ab und schalten dann mittels dem SMON-Kommando M 0318 die Anzeige der Bytes ab $0318 ein. Dort steht in den beiden ersten Speicherzellen 47 und FE. Mit dem Cursor fahren Sie in diese Zeile und ändern den Inhalt in 00 und 60, also unsere Programmstartadresse in der LSB/MSB-Form. Nach einem RETURN läuft nun jede NMI-Anforderung über unser Programm. Nun können Sie es ausprobieren, indem Sie mal die RESTORE-Taste drücken. Es genügt völlig, alleine diese Taste zu betätigen. Das wirkt — sichtbar durch die Änderung der Rahmenfarbe — in jedem Modus und jederzeit. Eine kleine Merkwürdigkeit ist, daß man manchmal etwas Geduld aufbringen muß, bis man die Wirkung sieht. Ich vermute, daß der NMI so schnell erledigt wird, daß sich mehrer NMIs pro Tastendruck ereignen. Man müßte sich noch eine kleine Routine überlegen, die die Wirkung etwas verzögert, denn 2 solche EOR-Kommandos nacheinander heben sich gegenseitig auf.</p>
 
         <p>Damit sei’s für diesmal genug. In der nächsten Ausgabe werden wir uns die Unterbrechungs-Firmware ansehen und einige Programmbeispiele vorstellen. Zum Schluß noch wie üblich eine Aufstellung (Tabelle 2) mit den besprochenen Befehlen.</p>
+
+        <figure>
+            <table>
+                <tbody>
+                    <tr>
+                        <td rowspan="2"><b>Befehlswort</b></td>
+                        <td rowspan="2"><b>Adressierung</b></td>
+                        <td rowspan="2"><b>Bytezahl</b></td>
+                        <td colspan="2"><b>Code</b></td>
+                        <td rowspan="2"><b>Taktcyclen</b></td>
+                        <td rowspan="2"><b>Beeinflussung von Flaggen</b></td>
+                    </tr>
+                    <tr>
+                        <td><b>Hex</b></td>
+                        <td><b>Dez</b></td>
+                    </tr>
+                    <tr>
+                        <td>CLI</td>
+                        <td>implizit</td>
+                        <td>1</td>
+                        <td>58</td>
+                        <td>88</td>
+                        <td>2</td>
+                        <td>I-Flagge</td>
+                    </tr>
+                    <tr>
+                        <td>SEI</td>
+                        <td>implizit</td>
+                        <td>1</td>
+                        <td>78</td>
+                        <td>120</td>
+                        <td>2</td>
+                        <td>I-Flagge</td>
+                    </tr>
+                    <tr>
+                        <td>RTI</td>
+                        <td>implizit</td>
+                        <td>1</td>
+                        <td>40</td>
+                        <td>64</td>
+                        <td>6</td>
+                        <td>alle Flaggen</td>
+                    </tr>
+                    <tr>
+                        <td>BRK</td>
+                        <td>implizit</td>
+                        <td>1</td>
+                        <td>00</td>
+                        <td>0</td>
+                        <td>7</td>
+                        <td>B-Flagge vor dem Schieben auf den Stapel, I-Flagge danach</td>
+                    </tr>
+                </tbody>
+            </table>
+            <figcaption>Tabelle 2. Die Daten zu den letzten Assembler-Befehlen</figcaption>
+        </figure>
 
         <address class="author">(Heimo Ponnath/gk)</address>
     </article>
