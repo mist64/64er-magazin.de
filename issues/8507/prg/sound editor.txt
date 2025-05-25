@@ -1,0 +1,999 @@
+;sound editor.prg ==0801==
+    0 if a>1 then return :rem dummy-routine
+ 1000 rem ******************************
+ 1005 rem ***                        ***
+ 1010 rem ***    sound - editor      ***
+ 1015 rem ***                        ***
+ 1020 rem ***  fuer die parameter    ***
+ 1025 rem *** von sid und modulator  ***
+ 1030 rem ***                        ***
+ 1035 rem *** t. kraetzig      1985  ***
+ 1040 rem ***                        ***
+ 1045 rem ******************************
+ 1050 rem
+ 1055 rem falls von menue 7 gekommen,
+ 1060 rem dorthin zurueck
+ 1065 if m=7 then 7665
+ 1070 rem
+ 1120 rem modulator laden
+ 1130 if a=0then a=1:load"modulator",8,1
+ 1140 rem
+ 1150 rem dimensionierungen
+ 1155 poke 56,144:clr:rem b.-grenze $9000
+ 1160 dim v%(7,255),tn%(255),th(24)
+ 1165 dim bf(2),t(2),o(2),of(2),s(2)
+ 1170 dim c1(2),c(2),ad(2),sr(2)
+ 1175 dim bl$(6),kv$(3),kf$(6),md$(3)
+ 1180 dim tn$(11)
+ 1185 rem
+ 1190 gosub 8000  :rem initialisierungen
+ 1200 gosub 4000  :rem hauptmenue
+ 1210 rem
+ 1500 rem===============================
+ 1510 rem hauptschleife, sprungverteiler
+ 1520 rem===============================
+ 1530 get a$:if a$="" then 1530
+ 1540 a=asc(a$)
+ 1550 sys gs,v%(m,a) :rem berechn. gosub
+ 1560 goto 1530
+ 2000 rem===============================
+ 2010 rem noten spielen
+ 2020 rem===============================
+ 2025 poke 650,0
+ 2030 f=th(tn%(a)):ad=mo+72:x=peek(ad)
+ 2035 if s(0) then sysdo,mo   ,f*bf(0):poke si+4 ,c1(0)
+ 2040 if s(1) then sysdo,mo+7 ,f*bf(1):poke si+11,c1(1)
+ 2050 if s(2) then sysdo,mo+14,f*bf(2):poke si+18,c1(2)
+ 2090 if eg then poke ad,x or 1
+ 2110 if su then poke 650,128:return
+ 2120 if peek(203)<>64 and peek(198)=0 then 2120
+ 2130 poke ad,x and 254
+ 2140 poke si+4 ,c(0)
+ 2150 poke si+11,c(1):poke si+18,c(2)
+ 2160 poke 650,128:return
+ 2500 rem===============================
+ 2510 rem numerische parameter aendern,
+ 2520 rem verteiler einzelroutinen
+ 2530 rem===============================
+ 2550 pw=pw+p2:if pw>=pm then pw=pw-pm
+ 2555 sysgt,pv
+ 2560 pw=pw+p1:if pw>=pm then pw=pw-pm
+ 2565 sysgt,pv
+ 2570 pw=pw-p1:if pw< 0  then pw=pw+pm
+ 2575 sysgt,pv
+ 2580 pw=pw-p2:if pw< 0  then pw=pw+pm
+ 2585 sysgt,pv
+ 2600 rem-------------------------------
+ 2605 rem lfof
+ 2610 sysdo,pa,pw:l=len(str$(pw))
+ 2620 syspr,3+ln,4,bl$(6-l);f2$;pw
+ 2625 return
+ 2630 rem-------------------------------
+ 2635 rem lfop
+ 2640 poke pa,pw:l=len(str$(pw))
+ 2650 syspr,3+ln,11,bl$(4-l);f2$;pw
+ 2655 return
+ 2660 rem-------------------------------
+ 2665 rem lfoa
+ 2670 poke pa,pw:l=len(str$(pw))
+ 2680 syspr,3+ln,16,bl$(4-l);f2$;pw
+ 2685 return
+ 2690 rem-------------------------------
+ 2695 rem lfo kurve
+ 2700 if a>136 or a<133 then return
+ 2705 b=a-133  :rem b=0,1,2,3
+ 2710 poke pa,(peek(pa)and231)or(b*8)
+ 2715 syspr,3+ln,21,f2$;kv$(b)
+ 2717 syspr,6   ,34,f2$;kf$(b):return
+ 2720 rem-------------------------------
+ 2725 rem lfo modus
+ 2730 if a>135 or a<133 then return
+ 2735 b=a-132  :rem b=1,2,3
+ 2740 poke pa,(peek(pa)and249)or(b*2)
+ 2745 syspr,3+ln,28,f2$;md$(b):return
+ 2750 rem-------------------------------
+ 2755 rem eg a d s r ega (an=0-4)
+ 2760 poke pa,pw:l=len(str$(pw))
+ 2765 syspr,7,s,bl$(4-l);f2$;pw:return
+ 2770 rem-------------------------------
+ 2775 rem eg form
+ 2780 b=-(a>134):rem f1,f3 b=0 f5,f7 b=1
+ 2785 poke pa,(peek(pa)and247)or(b*8)
+ 2790 syspr,7,29,f2$;chr$(43+2*b)
+ 2795 return
+ 2810 rem-------------------------------
+ 2815 rem eg modus
+ 2820 if a>135 or a<133 then return
+ 2825 b=a-132  :rem b=1,2,3
+ 2830 poke pa,(peek(pa)and249)or(b*2)
+ 2835 syspr,7,33,f2$;md$(b):return
+ 2840 rem-------------------------------
+ 2845 rem filter frequenz
+ 2850 poke pa,pwand7:poke pa+1,int(pw/8)
+ 2855 l=len(str$(pw))
+ 2860 syspr,5,2,bl$(5-l);f2$;pw:return
+ 2865 rem-------------------------------
+ 2870 rem filter resonanz
+ 2875 rf=(rf and 15)+16*pw:poke pa,rf
+ 2880 l=len(str$(pw))
+ 2885 syspr,5,9,bl$(3-l);f2$;pw:return
+ 2890 rem-------------------------------
+ 2895 rem filter schalter
+ 2900 if a>136 or a<133 then return
+ 2905 b=a-133  :rem b=0,1,2,3
+ 2910 x=2^b:x1=255-x:rem masken
+ 2915 y=rf and x
+ 2920 rf=(rf and x1)or(x-y):poke pa,rf
+ 2925 y=-128*(y=0):ad=1024+(5+b)*40+15
+ 2930 for i=ad to ad+5
+ 2935 : poke i,(peek(i)and127)or y
+ 2940 next:return
+ 2945 rem-------------------------------
+ 2950 rem filter modus
+ 2955 if a>136 or a<133 then return
+ 2960 b=a-129  :rem b=4,5,6,7
+ 2965 x=2^b:x1=255-x:rem masken
+ 2970 pw=peek(pa):y=pw and x
+ 2975 poke pa,(pw and x1)or(x-y)
+ 2980 y=-128*(y=0):ad=1024+(1+b)*40+25
+ 2985 for i=ad to ad+3
+ 2990 : poke i,(peek(i)and127)or y
+ 2995 next:return
+ 3000 rem-------------------------------
+ 3005 rem lautstaerke
+ 3010 poke pa,(peek(pa) and 240) or pw
+ 3015 l=len(str$(pw))
+ 3020 syspr,5,31,bl$(3-l);f2$;pw:return
+ 3050 rem-------------------------------
+ 3052 rem basisfrequenz
+ 3054 if a<>134 then 3064
+ 3056 rem f3 offset erhoehen
+ 3058 of=of+1:if of<=50 then 3110
+ 3062 of=-49:goto 3076
+ 3064 if a<>135 then 3074
+ 3066 rem f5 offset erniedrigen
+ 3068 of=of-1:if of>=-49 then 3110
+ 3072 of=50:goto 3084
+ 3074 if a<>133 then 3082
+ 3076 rem tonnummer erhoehen
+ 3078 t=t+1:if t<=11 then 3110
+ 3080 t=0:goto 3090
+ 3082 if a<>136 then return
+ 3084 rem tonnummer erniedrigen
+ 3086 t=t-1:if t>=0 then 3110
+ 3088 t=11:goto 3096
+ 3090 rem oktave erhoehen
+ 3092 o=o+1:if o<=5 then 3110
+ 3094 o=0:goto 3110
+ 3096 rem oktave erniedrigen
+ 3098 o=o-1:if o>=0 then 3110
+ 3100 o=5:t=10
+ 3110 rem basisfrequenz berechnen
+ 3112 if t=11 and o=5 then t=0:o=0
+ 3114 bf=440*2^(o-4+(t-9)/12+of/1200)
+ 3116 o(sn)=o:t(sn)=t:of(sn)=of
+ 3118 bf(sn)=bf*17.0327
+ 3120 sysdo,mo+7*sn,f*bf(sn)
+ 3122 rem anzeigen
+ 3124 syspr,3+sn,3,f2$;o
+ 3126 syspr,3+sn,2,tn$(t)
+ 3128 syspr,3+sn,5,right$(" "+str$(of),3)
+ 3130 return
+ 3150 rem-------------------------------
+ 3155 rem pulsweite stimme
+ 3160 sysdo,pa,pw
+ 3165 syspr,3+sn,9,f2$;right$("  "+str$(pw),4)
+ 3170 return
+ 3175 rem-------------------------------
+ 3180 rem a
+ 3185 ad(sn)=(ad(sn)and15) or pw*16
+ 3190 poke pa,ad(sn)
+ 3195 syspr,3+sn,14,f2$;right$(str$(pw),2)
+ 3200 return
+ 3205 rem-------------------------------
+ 3210 rem d
+ 3215 ad(sn)=(ad(sn)and240) or pw
+ 3220 poke pa,ad(sn)
+ 3225 syspr,3+sn,17,f2$;right$(str$(pw),2)
+ 3230 return
+ 3235 rem-------------------------------
+ 3240 rem s
+ 3245 sr(sn)=(sr(sn)and15) or pw*16
+ 3250 poke pa,sr(sn)
+ 3255 syspr,3+sn,20,f2$;right$(str$(pw),2)
+ 3260 return
+ 3265 rem-------------------------------
+ 3270 rem r
+ 3275 sr(sn)=(sr(sn)and240) or pw
+ 3280 poke pa,sr(sn)
+ 3285 syspr,3+sn,23,f2$;right$(str$(pw),2)
+ 3290 return
+ 3300 rem-------------------------------
+ 3305 rem control (bit 7-s)
+ 3310 if a<>133 and a<>134 then 3335
+ 3315 rem bit setzen
+ 3320 c(sn)=c(sn) or 2^(7-s)
+ 3325 c1(sn)=c(sn) or 1
+ 3330 syspr,3+sn,26+s,f2$;"1":goto 3355
+ 3335 rem bit ruecksetzen
+ 3340 c(sn)=c(sn) and 255-2^(7-s)
+ 3345 c1(sn)=c(sn) or 1
+ 3350 syspr,3+sn,26+s,f2$;"0"
+ 3355 rem control-byte zum sid
+ 3360 x=c(sn):if su then x=c1(sn)
+ 3365 poke si+7*sn+4,x:return
+ 3370 rem-------------------------------
+ 3375 rem porta
+ 3380 poke pa,pw:l=len(str$(pw))
+ 3385 syspr,3+sn,34,bl$(4-l);f2$;pw
+ 3390 return
+ 3500 rem===============================
+ 3510 rem stimme (des-)aktivieren
+ 3520 rem===============================
+ 3525 syspr,15,10,f2$;"stimme 1,2,3"
+ 3530 get a$:if a$=""then 3530
+ 3540 ifa$="1"ora$="2"ora$="3"then 3560
+ 3550 goto 3590
+ 3560 i=val(a$)-1 :s(i)=not s(i)
+ 3570 if s(i) then print chr$(18);
+ 3580 syspr,21,31+2*i,f1$;a$;chr$(146);
+ 3590 syspr,15,10,f1$;"stimme 1,2,3"
+ 3595 return
+ 3600 rem===============================
+ 3610 rem software-eg ausloesen
+ 3620 rem===============================
+ 3630 poke 650,64
+ 3640 ad=mo+72:x=peek(ad):poke ad,x or 1
+ 3650 if peek(203)<>64 and peek(198)=0 then 3650
+ 3660 poke ad,xand254:poke650,128:return
+ 3700 rem===============================
+ 3710 rem software-eg an-/abkoppeln
+ 3720 rem===============================
+ 3730 eg=not eg
+ 3740 if eg then print chr$(18);
+ 3750 syspr,23,31,f1$;"soft-eg{rvof}":return
+ 3800 rem===============================
+ 3810 rem sustain-modus ein/aus
+ 3820 rem===============================
+ 3830 su=not su
+ 3840 if su then print chr$(18);
+ 3850 syspr,22,31,f1$;"sustain{rvof}"
+ 3860 if not su then 2140
+ 3870 return
+ 4000 rem===============================
+ 4010 rem hauptmenue
+ 4020 rem===============================
+ 4030 m=0:pv=0:syscl:print "{home}";f1$
+ 4040 print" {CBM-A}CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC{CBM-S}"
+ 4045 print" B{rvon}         m o d u l a t o r          {rvof}B"
+ 4050 print" B{rvon}     thomas kraetzig       1985     {rvof}B"
+ 4055 print" {CBM-Z}CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC{CBM-X}"
+ 4100 syspr,6,1,f2$;"sh v";f1$;" stimmen"
+ 4105 syspr,7,1,f2$;"   f";f1$;" filter/lautstaerke"
+ 4110 syspr,8,1,f2$;"   l";f1$;" lfo"
+ 4115 syspr,9,1,f2$;"   h";f1$;" huellkurve (soft-eg)"
+ 4120 syspr,10,1,f2$;"   k";f1$;" ksv"
+ 4125 syspr,11,1,f2$;"sh s";f1$;" sounds"
+ 4130 syspr,12,1,f2$;"   d";f1$;" disk"
+ 4135 return
+ 4200 rem-------------------------------
+ 4210 rem bild zeilen 15-23
+ 4220 rem-------------------------------
+ 4240 syspr,15,1, f2$;"v  1,2,3"
+ 4245 syspr,15,10,f1$;"stimme 1,2,3
+ 4250 syspr,15,26,f2$;"s"
+ 4255 syspr,15,32,f1$;"sustain"
+ 4260 syspr,16,1, f2$;"sh space"
+ 4270 syspr,16,10,f1$;"eg (ab-)koppeln"
+ 4280 syspr,16,26,f2$;"space"
+ 4290 syspr,16,32,f1$;"eg gate"
+ 4292 syspr,17,1, f2$;"x"
+ 4294 syspr,17,10,f1$;"hauptmenue"
+ 4300 syspr,19,0,f2$;
+ 4310 for i=1 to 4
+ 4320 : print" {rvon} B B B B B B B B B B B B B B {rvof}":next
+ 4330 print" {rvon}qBwBeBrBtByBuBiBoBpB@B*B^B;B="
+ 4340 syspr,19,0,;
+ 4350 for i=1 to 2
+ 4360 : print" {rght} {rght} {rght}{rght}{rght} {rght} {rght} {rght}{rght}{rght} {rght} {rght}{rght}{rght} {rght} {rght} ":next
+ 4370 print" {rght}2{rght}3{rght}{rght}{rght}5{rght}6{rght}7{rght}{rght}{rght}9{rght}0{rght}{rght}{rght}-{rght}\{rght}c"
+ 4380 syspr,19,31,f1$;"aktiv:"
+ 4390 for i=0 to 2
+ 4400 : a$=right$(str$(i+1),1)
+ 4410 : gosub 3570:next i
+ 4420 gosub 3840:gosub 3740
+ 4430 return
+ 4500 rem===============================
+ 4505 rem untermenue stimme
+ 4510 rem===============================
+ 4515 m=1:pv=3050:syscl:print"{home}{rvof}";f1$
+ 4520 print"     f    pw   a  d  s  r control porta"
+ 4525 print" {CBM-A}CCCCCC{CBM-R}CCCC{CBM-R}CC{CBM-R}CC{CBM-R}CC{CBM-R}CC{CBM-R}CCCCCCC{CBM-R}CCCC{CBM-S}"
+ 4530 for i=1 to 3
+ 4535 print" B      B    B  B  B  B  B       B    B"
+ 4540 next i
+ 4545 print" {CBM-Z}CCCCCC{CBM-E}CCCC{CBM-E}CC{CBM-E}CC{CBM-E}CC{CBM-E}CC{CBM-E}{CBM-R}{CBM-R}{CBM-R}{CBM-R}{CBM-R}{CBM-R}{CBM-R}{CBM-E}CCCC{CBM-X}"
+ 4550 syspr,7,26,"BBBBBB{CBM-Z}CCsync"
+ 4555 syspr,8,26,"BBBBB{CBM-Z}CCring"
+ 4560 syspr,9,1,f2$;"f1  ++";f1$
+ 4565 syspr,9,26,"BBBB{CBM-Z}CCtest"
+ 4570 syspr,10,1,f2$;"f3  +";f1$
+ 4575 syspr,10,26,"BBB{CBM-Z}CCtrian"
+ 4580 syspr,11,1,f2$;"f5  -";f1$
+ 4585 syspr,11,26,"BB{CBM-Z}CCsawtooth"
+ 4590 syspr,12,1,f2$;"f7  --";f1$
+ 4595 syspr,12,26,"B{CBM-Z}CCsquare"
+ 4600 syspr,13,26,"{CBM-Z}CCnoise"
+ 4602 rem parameter anzeigen
+ 4604 a$=f2$:f2$=f1$
+ 4606 for sn=0 to 2
+ 4608 : t=t(sn):o=o(sn):of=of(sn)
+ 4610 : gosub 3122:rem f
+ 4612 : pw=(usr(mo+7*sn+2)):gosub 3165
+ 4614 : pw=int(ad(sn)/16)  :gosub 3195
+ 4616 : pw=ad(sn)and15     :gosub 3225
+ 4618 : pw=int(sr(sn)/16)  :gosub 3255
+ 4620 : pw=sr(sn)and15     :gosub 3285
+ 4622 : rem control-byte (7 bit)
+ 4624 : b=c(sn):a=128
+ 4626 : syspr,3+sn,26,f1$;"0000000"
+ 4628 : for s=7 to 1 step -1
+ 4630 : if(banda)thensyspr,3+sn,33-s,"1"
+ 4632 : a=a/2:next s
+ 4634 : pa=mo+7*sn+4:pw=peek(pa)
+ 4636 : gosub 3370:rem porta
+ 4638 next sn
+ 4640 f2$=a$
+ 4642 sn=0:av=4700:sysgs,av:return
+ 4650 rem-------------------------------
+ 4652 rem parameterwahl durch cursor
+ 4654 rem hoch
+ 4656 sn=sn-1:if sn<0 then sn=2
+ 4658 gosub 5815:sysgt,av
+ 4660 rem runter
+ 4662 sn=sn+1:if sn>2 then sn=0
+ 4664 gosub 5815:sysgt,av
+ 4666 rem rechts
+ 4668 if av<>4880 then 4674
+ 4670 s=s+1:if s>6 then av=4910
+ 4672 goto 4678
+ 4674 av=av+30:if av>4910 then av=4700
+ 4676 if av=4880 then s=0
+ 4678 gosub 5815:sysgt,av
+ 4680 rem links
+ 4682 if av<>4880 then 4688
+ 4684 s=s-1:if s<0 then av=4850
+ 4686 goto 4692
+ 4688 av=av-30:if av<4700 then av=4910
+ 4690 if av=4880 then s=6
+ 4692 gosub 5815:sysgt,av
+ 4700 rem-------------------------------
+ 4702 rem basisfrequenz waehlen
+ 4704 pb=fa+40*(sn+3)+2
+ 4706 for i=pb to pb+5:poke i,f2:next
+ 4708 t=t(sn):o=o(sn):of=of(sn)
+ 4710 pa=mo+7*sn:pv=3050:return
+ 4730 rem-------------------------------
+ 4732 rem pulsweite waehlen
+ 4734 pb=fa+40*(sn+3)+9
+ 4736 for i=pb to pb+3:poke i,f2:next
+ 4738 pa=mo+7*sn+2:pw=usr(pa):pm=4096
+ 4740 p1=1:p2=50:pv=3150:return
+ 4760 rem-------------------------------
+ 4762 rem attack waehlen
+ 4764 pb=fa+40*(sn+3)+14
+ 4766 poke pb,f2:poke pb+1,f2
+ 4768 pa=si+7*sn+5:pw=int(ad(sn)/16)
+ 4770 pm=16:p1=1:p2=1:pv=3175:return
+ 4790 rem-------------------------------
+ 4792 rem decay waehlen
+ 4794 pb=fa+40*(sn+3)+17
+ 4796 poke pb,f2:poke pb+1,f2
+ 4798 pa=si+7*sn+5:pw=ad(sn)and15
+ 4800 pm=16:p1=1:p2=1:pv=3205:return
+ 4820 rem-------------------------------
+ 4822 rem sustain waehlen
+ 4824 pb=fa+40*(sn+3)+20
+ 4826 poke pb,f2:poke pb+1,f2
+ 4828 pa=si+7*sn+6:pw=int(sr(sn)/16)
+ 4830 pm=16:p1=1:p2=1:pv=3235:return
+ 4850 rem-------------------------------
+ 4852 rem release waehlen
+ 4854 pb=fa+40*(sn+3)+23
+ 4856 poke pb,f2:poke pb+1,f2
+ 4858 pa=si+7*sn+6:pw=sr(sn)and15
+ 4860 pm=16:p1=1:p2=1:pv=3265:return
+ 4880 rem-------------------------------
+ 4882 rem control-byte waehlen
+ 4884 pb=fa+40*(sn+3)+26+s
+ 4886 poke pb,f2
+ 4888 pa=si+7*sn+4:pv=3300:return
+ 4910 rem-------------------------------
+ 4912 rem porta waehlen
+ 4914 pb=fa+40*(sn+3)+35
+ 4916 for i=0 to 2:poke pb+i,f2:next
+ 4918 pa=mo+7*sn+4:pw=peek(pa):pm=256
+ 4920 p1=1:p2=10:pv=3370:return
+ 5000 rem===============================
+ 5005 rem untermenue filter/laut
+ 5010 rem===============================
+ 5015 m=2:pv=0:syscl:print"{home}{rvof}";f1$
+ 5020 print" filter/lautstaerke"
+ 5025 print" {CBM-A}CCCCC{CBM-R}CCCCC{CBM-R}CCCCCCCC{CBM-R}CCCCCCC{CBM-R}CCCC{CBM-S}"
+ 5030 print" BfiltfB res BschalterB modus BlautB"
+ 5035 print" {CBM-Q}CCCCC{SHIFT-+}CCCCC{SHIFT-+}CCCCCCCC{SHIFT-+}CCCCCCC{SHIFT-+}CCCC{CBM-W}"
+ 5040 print" B     B     B filt1  B   lp  B    B"
+ 5045 print" {CBM-Q}CCCCC{CBM-E}CCCCC{CBM-W} filt2  B   bp  {CBM-Q}CCCC{CBM-X}"
+ 5050 print" B           B filt3  B   hp  B"
+ 5055 print" B           B filtex B  3off B"
+ 5060 print" {CBM-Z}CCCCCCCCCCC{CBM-E}CCCCCCCC{CBM-E}CCCCCCC{CBM-X}"
+ 5065 print f2$;" f1";f1$;"    ++      filt1      lp    ++"
+ 5070 print f2$;" f3";f1$;"    +       filt2      bp    +"
+ 5075 print f2$;" f5";f1$;"    -       filt3      hp    -"
+ 5080 print f2$;" f7";f1$;"    -       filtex    3off   --"
+ 5085 pw=(peek(mo+21)and7)+8*peek(mo+22)
+ 5090 syspr,5, 7-len(str$(pw)),pw
+ 5095 pw=int(rf/16)
+ 5100 syspr,5,12-len(str$(pw)),pw
+ 5102 ifrfand1then syspr,5,15,"{rvon}filt1 {rvof}"
+ 5104 ifrfand2then syspr,6,15,"{rvon}filt2 {rvof}"
+ 5106 ifrfand4then syspr,7,15,"{rvon}filt3 {rvof}"
+ 5108 ifrfand8then syspr,8,15,"{rvon}tiltex{rvof}"
+ 5110 pw=peek(mo+23)
+ 5112 ifpwand 16then syspr,5,25,"{rvon} lp {rvof}"
+ 5114 ifpwand 32then syspr,6,25,"{rvon} bp {rvof}"
+ 5116 ifpwand 64then syspr,7,25,"{rvon} hp {rvof}"
+ 5118 ifpwand128then syspr,8,25,"{rvon}3off{rvof}"
+ 5120 pw=peek(mo+23)and15
+ 5122 syspr,5,34-len(str$(pw)),pw
+ 5125 av=5200:sysgs,av:return
+ 5130 rem-------------------------------
+ 5135 rem parameterwahl durch cursor
+ 5140 rem rechts
+ 5145 av=av+50:if av>5400 then av=5200
+ 5150 goto 5165
+ 5155 rem links
+ 5160 av=av-50:if av<5200 then av=5400
+ 5165 gosub 5815:a=pb-fa-200
+ 5170 if a<>15 and a<>25 then sysgt,av
+ 5175 for j=1to3:pb=pb+40:gosub5815:next
+ 5180 pb=pb-120:sysgt,av
+ 5200 rem-------------------------------
+ 5205 rem filterfrequenz anwaehlen
+ 5210 pb=fa+203
+ 5215 for i=pb to pb+3:poke i,f2:next
+ 5220 pa=mo+21:pw=peek(pa)+8*peek(pa+1)
+ 5225 pm=2048:p1=1:p2=50:pv=2850:return
+ 5250 rem-------------------------------
+ 5255 rem resonanz anwaehlen
+ 5260 pb=fa+210
+ 5265 poke pb,f2:poke pb+1,f2
+ 5270 pa=si+23:pw=int(rf/16)
+ 5275 pm=16:p1=1:p2=1:pv=2875:return
+ 5300 rem-------------------------------
+ 5305 rem schalter anwaehlen
+ 5310 pb=fa+215
+ 5315 for i=0 to 120 step40:for j=0 to 5
+ 5320 : poke pb+i+j,f2:next:next
+ 5325 pa=si+23:pw=rf and 15
+ 5330 pv=2900:return
+ 5350 rem-------------------------------
+ 5355 rem modus anwaehlen
+ 5360 pb=fa+225
+ 5365 for i=0 to 120 step40:for j=0 to 3
+ 5370 : poke pb+i+j,f2:next:next
+ 5375 pa=mo+23
+ 5380 pv=2955:return
+ 5400 rem-------------------------------
+ 5405 rem lautstaerke anwaehlen
+ 5410 pb=fa+232
+ 5415 poke pb,f2:poke pb+1,f2
+ 5420 pa=mo+23:pw=peek(pa) and 15
+ 5425 pm=16:p1=1:p2=1:pv=3010:return
+ 5500 rem===============================
+ 5505 rem untermenue lfo
+ 5510 rem===============================
+ 5515 m=3:syscl:print"{home}{rvof}";f1$;
+ 5520 print"   {CBM-A}CCCCCC{CBM-R}CCCC{CBM-R}CCCC{CBM-R}CCCCCC{CBM-R}CCCCC{CBM-S}"
+ 5525 print"   B lfof BlfopBlfoaBkurve BmodusB"
+ 5530 print" {CBM-A}C{SHIFT-+}CCCCCC{SHIFT-+}CCCC{SHIFT-+}CCCC{SHIFT-+}CCCCCC{SHIFT-+}CCCCC{SHIFT-+}CCCC{CBM-S}"
+ 5535 for z=3 to 9
+ 5540 : syspr,z,1,"B B      B    B    B      B     B    B"
+ 5545 next z
+ 5550 syspr,10,1,"{CBM-Z}C{CBM-E}CCCCCC{CBM-E}CCCC{CBM-E}CCCC{CBM-E}CCCCCC{CBM-E}CCCCC{CBM-E}CCCC{CBM-X}
+ 5555 print f2$;" f1";f1$;"  ++     ++   ++  trian  reset"
+ 5560 print f2$;" f3";f1$;"  +      +    +   sawup  hold"
+ 5565 print f2$;" f5";f1$;"  -      -    -   sawdwn run"
+ 5570 print f2$;" f7";f1$;"  --     --   --  square"
+ 5575 for ln=0 to 6
+ 5580 : z=3+ln
+ 5585 : syspr,z,2,chr$(48+ln)
+ 5590 : pw=usr(mo+32+5*ln)     :rem lfof
+ 5595 : syspr,z,10-len(str$(pw)),pw
+ 5600 : pw=peek(mo+34+5*ln)    :rem lfop
+ 5605 : syspr,z,15-len(str$(pw)),pw
+ 5610 : pw=peek(mo+35+5*ln)    :rem lfoa
+ 5615 : syspr,z,20-len(str$(pw)),pw
+ 5620 : pw=peek(mo+36+5*ln)    :rem lfoc
+ 5625 : syspr,z,21,kv$((pw and 24)/8)
+ 5630 : syspr,z,28,md$((pw and  6)/2)
+ 5640 next ln
+ 5645 ln=0:av=5830:sysgs,av:return
+ 5650 rem-------------------------------
+ 5655 rem parameterwahl durch cursor
+ 5670 rem hoch
+ 5675 ln=ln-1:if ln<0 then ln=6
+ 5680 gosub 5815:sysgt,av
+ 5685 rem runter
+ 5690 ln=ln+1:if ln>6 then ln=0
+ 5695 gosub 5815:sysgt,av
+ 5700 rem rechts
+ 5705 av=av+30:if av>5950 then av=5830
+ 5710 gosub 5810:sysgt,av
+ 5715 rem links
+ 5720 av=av-30:if av<5830 then av=5950
+ 5725 gosub 5810:sysgt,av
+ 5800 rem-------------------------------
+ 5805 rem aktueles parameterfeld farbe 1
+ 5810 syspr,6,34,"    "
+ 5815 fori=pbtopb+6:pokei,f1:next:return
+ 5820 rem-------------------------------
+ 5825 rem lfof anwaehlen
+ 5830 pb=fa+40*(ln+3)+4
+ 5835 for i=pb to pb+5:poke i,f2:next
+ 5840 pa=mo+32+5*ln:pw=usr(pa):pm=65536
+ 5845 p1=1:p2=200:pv=2610:return
+ 5850 rem-------------------------------
+ 5855 rem lfop anwaehlen
+ 5860 pb=fa+40*(ln+3)+11
+ 5865 for i=pb to pb+3:poke i,f2:next
+ 5870 pa=mo+34+5*ln:pw=peek(pa):pm=256
+ 5875 p1=1:p2=10 :pv=2640:return
+ 5880 rem-------------------------------
+ 5885 rem lfoa waehlen
+ 5890 pb=fa+40*(ln+3)+16
+ 5895 for i=pb to pb+3:poke i,f2:next
+ 5900 pa=mo+35+5*ln:pw=peek(pa):pm=256
+ 5905 p1=1:p2=10 :pv=2670:return
+ 5910 rem-------------------------------
+ 5915 rem lfo kurve waehlen
+ 5920 pb=fa+40*(ln+3)+21
+ 5925 for i=pb to pb+5:poke i,f2:next
+ 5930 pa=mo+36+5*ln:pv=2700
+ 5935 b=(peek(pa) and 24)/8:goto 2717
+ 5940 rem-------------------------------
+ 5945 rem lfo modus waehlen
+ 5950 pb=fa+40*(ln+3)+28
+ 5955 for j=pb to pb+4:poke j,f2:next
+ 5960 pa=mo+36+5*ln
+ 5965 pv=2730:return
+ 6000 rem===============================
+ 6010 rem untermenue eg
+ 6020 rem===============================
+ 6030 m=4:syscl:print"{home}{rvof}";f1$
+ 6040 print" software-eg":print:print
+ 6050 print" {CBM-A}CCCC{CBM-R}CCCC{CBM-R}CCCC{CBM-R}CCCC{CBM-R}CCCC{CBM-R}CCCCC{CBM-R}CCCCC{CBM-S}"
+ 6060 print" B  a B  d B  s B  r B egaB formBmodusB"
+ 6070 print" {CBM-Q}CCCC{SHIFT-+}CCCC{SHIFT-+}CCCC{SHIFT-+}CCCC{SHIFT-+}CCCC{SHIFT-+}CCCCC{SHIFT-+}CCCCC{CBM-W}"
+ 6080 print" B    B    B    B    B    B     B     B"
+ 6090 print" {CBM-Z}CCCC{CBM-E}CCCC{CBM-E}CCCC{CBM-E}CCCC{CBM-E}CCCC{CBM-E}CCCCC{CBM-E}CCCCC{CBM-X}"
+ 6100 syspr,10,1,f2$;"f1":print" f3"
+ 6110 print" f5":print" f7";f1$
+ 6120 syspr,10,13,"++                  reset"
+ 6130 syspr,11,13,"+               +   hold"
+ 6140 syspr,12,13,"-               -   run"
+ 6150 syspr,13,13,"--"
+ 6160 for i=0 to 4
+ 6170 : pw=peek(mo+67+i)
+ 6180 : syspr,7,6+5*i-len(str$(pw)),pw
+ 6190 next i
+ 6210 pw=peek(mo+72)
+ 6220 syspr,7,29,chr$(43+(pw and 8)/4)
+ 6230 syspr,7,33,md$((pw and 6)/2)
+ 6240 av=6310:an=0:sysgt,av
+ 6300 rem-------------------------------
+ 6305 rem a d s r ega (an=0-4) waehlen
+ 6310 pb=fa+282+5*an:s=2+5*an
+ 6315 for i=pb to pb+3:poke i,f2:next
+ 6320 pa=mo+67+an  :pw=peek(pa)
+ 6325 pm=256:if an=0 then pm=129
+ 6330 p1=1:p2=10:pv=2760:return
+ 6335 rem-------------------------------
+ 6340 rem eg form waehlen
+ 6345 pb=fa+280+27:poke pb+2,f2
+ 6350 pa=mo+72:pv=2780:return
+ 6370 rem-------------------------------
+ 6375 rem eg modus waehlen
+ 6380 pb=fa+280+33
+ 6385 for i=pb to pb+4:poke i,f2:next
+ 6390 pa=mo+72:pv=2820:return
+ 6395 rem-------------------------------
+ 6400 rem parameterwahl durch cursor
+ 6405 rem links
+ 6410 if av<>6310 then 6420
+ 6415 an=an-1:if an>=0 then 6430
+ 6420 av=av-35:an=4
+ 6425 if av<6310 then av=6380
+ 6430 gosub 5815:sysgt,av
+ 6435 rem rechts
+ 6440 if av<>6310 then 6450
+ 6445 an=an+1:if an<=4 then 6460
+ 6450 av=av+35
+ 6455 if av>6380 then av=6310:an=0
+ 6460 gosub 5815:sysgt,av
+ 6500 rem===============================
+ 6510 rem untermenue ksv
+ 6520 rem===============================
+ 6530 m=5:pv=0:print"{rvof}";:syscl
+ 6540 syspr,1,1,f1$;"kreuzschienen-verteiler"
+ 6550 syspr,3,1,"e    lfo"
+ 6560 syspr,4,1,"g6543210"
+ 6570 syspr,5,1,f2$;"{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}"
+ 6580 a$=f2$+"{CBM-M}"+f1$+"        "+f2$+"T "+f1$
+ 6590 print a$;"f1";f2$;"     cursortasten"
+ 6600 print a$;"f2"
+ 6610 print a$;"f3"
+ 6620 print a$;"p1";f2$;"     f1 ";f1$;"verbindung"
+ 6630 print a$;"p2"
+ 6640 print a$;"p3";f2$;"     f7 ";f1$;"keine verbindung"
+ 6650 print a$;"filt"
+ 6660 print a$;"laut"
+ 6670 print f2$;" {CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}"
+ 6680 for z=0 to 7:gosub 6730:next
+ 6685 z=0:s=7:poke 55296+40*(6+z)+8-s,f2
+ 6690 return
+ 6700 rem-------------------------------
+ 6710 rem ksv-byte z anzeigen
+ 6720 rem-------------------------------
+ 6730 b=peek(mo+24+z):a=128
+ 6740 syspr,6+z,1,f1$;"{rvon}00000000"
+ 6750 if b=0 then return
+ 6760 for s=7 to 0 step -1
+ 6770 if(b and a)thensyspr,6+z,8-s,"{rvon}1";
+ 6780 a=a/2:next s
+ 6790 print f1$;:return
+ 6800 rem-------------------------------
+ 6810 rem cursorbewegungen
+ 6820 rem-------------------------------
+ 6830 poke 55296+40*(6+z)+8-s,f1:rem aus
+ 6840 z=(z-1) and 7:goto 6910:rem hoch
+ 6850 poke 55296+40*(6+z)+8-s,f1
+ 6860 z=(z+1) and 7:goto 6910:rem runter
+ 6870 poke 55296+40*(6+z)+8-s,f1
+ 6880 s=(s+1) and 7:goto 6910:rem links
+ 6890 poke 55296+40*(6+z)+8-s,f1
+ 6900 s=(s-1) and 7:goto 6910:rem rechts
+ 6910 poke 55296+40*(6+z)+8-s,f2:rem an
+ 6915 return
+ 6920 rem-------------------------------
+ 6925 rem ksv bit z,s setzen
+ 6930 rem-------------------------------
+ 6935 ad=mo+24+z
+ 6940 poke ad,peek(ad) or 2^s
+ 6950 poke 1024+40*(6+z)+8-s,177:return
+ 6960 rem-------------------------------
+ 6965 rem ksv bit z,s setzen
+ 6970 rem-------------------------------
+ 6975 ad=mo+24+z
+ 6980 poke ad,peek(ad) and (255-2^s)
+ 6990 poke 1024+40*(6+z)+8-s,176:return
+ 7000 rem===============================
+ 7005 rem untermenue sounds
+ 7010 rem===============================
+ 7015 m=6:pv=0:syscl:print"{home}{rvof}";f2$
+ 7020 syspr,1,8,"a           b           c"
+ 7025 print f1$;"   {CBM-A}CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC{CBM-S}"
+ 7030 for i=1 to 8
+ 7035 syspr,2+i,1,f2$;chr$(48+i);f1$" B"
+ 7040 syspr,2+i,38,"B":next
+ 7045 syspr,11,3,"{CBM-Z}CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC{CBM-X}"
+ 7050 syspr,12,4,f2$;"a-c 1-8"
+ 7055 syspr,12,13,f1$;"sound waehlen"
+ 7060 syspr,13,1,f2$;"_  a-c 1-8"
+ 7065 syspr,13,13,f1$"sound abspeichern"
+ 7070 syspr,14,1,f2$;"n"
+ 7075 syspr,14,13,f1$;"namen eingeben (return)"
+ 7080 for s=0 to 2:for z=0 to 7
+ 7085 : syspr,3+z,4+s*12,;
+ 7090 : sysna,so+107*(8*s+z)+97
+ 7095 next:next:ifns<0thenz=0:s=0:return
+ 7100 z=ns and 7:s=int(ns/8):goto 7180
+ 7110 rem-------------------------------
+ 7115 rem sound waehlen (a,b,c)
+ 7120 x=a-65 :rem spalte 0,1,2
+ 7122 syspr,12,13,f2$;"{rvof}sound waehlen"
+ 7125 get a$:if a$="" then 7125
+ 7130 y=asc(a$)-49:rem zeile
+ 7135 if y<0 or y>7 then 7142
+ 7140 gosub 7150:gosub 7400
+ 7142 syspr,12,13,f1$;"{rvof}sound waehlen"
+ 7144 return
+ 7146 rem-------------------------------
+ 7150 rem altes namenfeld normal
+ 7155 ns=8*s+z
+ 7160 : syspr,3+z,4+s*12,f1$;"{rvof}";
+ 7165 : sysna,so+107*ns+97
+ 7170 rem neues namenfeld hervorheben
+ 7175 s=x:z=y:ns=8*s+z
+ 7180 : syspr,3+z,4+s*12,f2$;"{rvof}";
+ 7185 : sysna,so+107*ns+97
+ 7190 return
+ 7200 rem-------------------------------
+ 7205 rem sound abspeichern
+ 7210 syspr,13,13,f2$;"{rvof}sound abspeichern"
+ 7215 get a$:if a$="" then 7215
+ 7220 x=asc(a$)-65:rem spalte
+ 7225 if x<0 or x>2 then 7250
+ 7230 get a$:if a$="" then 7230
+ 7235 y=asc(a$)-49:rem zeile
+ 7240 if y<0 or y>7 then 7250
+ 7245 gosub 7150:gosub 7450:goto 7260
+ 7250 syspr,13,13,f1$;"{rvof}sound abspeichern"
+ 7255 return
+ 7260 syspr,13,13,f1$;"{rvof}sound abspeichern"
+ 7300 rem-------------------------------
+ 7305 rem namen eingeben (z,s,ns)
+ 7310 syspr,14,13,f2$;"namen eingeben (return)"
+ 7315 x=12*s+4:y=z+3:ad=1024+40*y+x
+ 7320 sa=so+107*ns+97:i=0
+ 7325 poke ad+i,peek(ad+i) or 128
+ 7330 get a$:if a$="" then 7330
+ 7335 a=asc(a$):if a<32or a>95 then 7370
+ 7340 rem zeichen ausgeben
+ 7345 syspr,y,x+i,f2$;a$;:poke sa+i,a
+ 7350 i=i+1
+ 7355 if i>9 then i=9:goto 7325
+ 7360 if i<0 then i=0
+ 7365 goto 7325
+ 7370 if a=29 then poke ad+i,peek(ad+i) and 127:goto 7350
+ 7375 if a=157then poke ad+i,peek(ad+i) and 127:i=i-1:goto 7355
+ 7380 if a<>13 then 7330
+ 7385 poke ad+i,peek(ad+i) and 127
+ 7390 syspr,14,13,f1$;"namen eingeben (return)"
+ 7395 return
+ 7400 rem-------------------------------
+ 7402 rem parametersatz ns holen
+ 7404 sa=so+ns*107:sysge,sa
+ 7406 for i=0 to 2
+ 7408 : ad=sa+7*i
+ 7410 : bf(i)=usr(ad+73)
+ 7412 : x=bf(i)/17.0327/440
+ 7414 : y=log(x)/log(2) :rem x=2^y
+ 7416 : y=y+4+9/12+49/1200
+ 7418 : o(i)=int(y):y=(y-o(i))*12
+ 7420 : t(i)=int(y)
+ 7422 : of(i)=int((y-t(i))*100-48.5)
+ 7424 : s(i)=(peek(ad+75)=1)
+ 7426 : a$=chr$(49+i):gosub 3570
+ 7428 : c(i)=peek(ad+77) and 254
+ 7430 : c1(i)=c(i) or 1
+ 7432 : ad(i)=peek(ad+78)
+ 7434 : sr(i)=peek(ad+79)
+ 7436 next i
+ 7438 rf=peek(sa+94)
+ 7440 eg=(peek(sa+95)=1):gosub 3740
+ 7442 su=(peek(sa+96)=1):gosub 3840
+ 7444 return
+ 7450 rem-------------------------------
+ 7452 rem parametersatz ns abspeichern
+ 7454 sa=so+ns*107:syspu,sa
+ 7456 for sn=0 to 2
+ 7458 : ad=sa+7*sn
+ 7460 : sysdo,ad+73,bf(sn)
+ 7462 : poke ad+75,-s(sn)
+ 7464 : poke ad+77,c(sn)
+ 7466 : poke ad+78,ad(sn)
+ 7468 : poke ad+79,sr(sn)
+ 7470 next sn
+ 7472 poke sa+94,rf
+ 7474 poke sa+95,-eg
+ 7476 poke sa+96,-su
+ 7478 return
+ 7500 rem===============================
+ 7505 rem untermenue diskette
+ 7510 rem===============================
+ 7515 m=7:pv=0:syscl:print"{home}";f1$
+ 7520 print" disk"
+ 7525 syspr,5,4,f2$;"f1"
+ 7530 syspr,5,7,f1$;"sounds laden"
+ 7535 syspr,7,4,f2$;"f3"
+ 7540 syspr,7,7,f1$;"sounds abspeichern"
+ 7545 return
+ 7600 rem-------------------------------
+ 7605 rem sounds laden
+ 7610 syspr,5,7,f2$;"sounds laden"
+ 7615 syspr,10,4,f1$;"dateiname ";
+ 7620 dn$="sounds              "
+ 7625 syspr,10,16,dn$
+ 7630 syspr,10,14,;:input dn$
+ 7635 open 8,8,8,dn$+",p,r":close 8
+ 7640 open1,8,15:input#1,a,a$,x,y:close1
+ 7645 syspr,12,4,"                             "
+ 7650 if a=0 then 7660
+ 7655 syspr,12,3,a;a$;x;y:goto 7625
+ 7660 a=0:load dn$,8,1
+ 7665 syspr,5,7,f1$;"sounds laden"
+ 7670 ns=-1:a=211:goto 1550
+ 7700 rem-------------------------------
+ 7705 rem sounds abspeichern
+ 7710 syspr,7,7,f2$;"sounds abspeichern"
+ 7715 syspr,10,4,f1$;"dateiname ";
+ 7720 dn$="sounds              "
+ 7725 syspr,10,16,dn$
+ 7730 syspr,10,14,;:input dn$
+ 7735 sys 50198:rem modulator aus
+ 7740 rem bereich $8000-$8a08 auf disk
+ 7745 open 1,8,1,"@:"+dn$
+ 7750 poke 252,0:poke 253,144:rem $9000
+ 7755 poke 780,252:rem akku
+ 7760 poke 781,8  :rem x-reg = $08
+ 7765 poke 782,154:rem y-reg = $9a
+ 7770 sys 65496   :rem kernal save
+ 7775 close 1
+ 7780 open1,8,15:input#1,a,a$,x,y:close1
+ 7785 if a=0 then 7795
+ 7790 syspr,12,4,a;a$;x;y:goto 7725
+ 7795 syspr,12,4,"                              "
+ 7800 syspr,7,7,f1$;"sounds abspeichern"
+ 7805 sys 50185:return:rem modulator an
+ 8000 rem===============================
+ 8010 rem vorbesetzung, initialisierung
+ 8020 rem===============================
+ 8030 print"{clr}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}       ";
+ 8035 print"bitte 30 sekunden warten"
+ 8040 rem-------------------------------
+ 8045 rem ms-programme in kassettenpuf.
+ 8050 for i=0 to 22   :rem kernal-gosub
+ 8055 poke 828+i,peek(43139+i):next
+ 8060 fori=0to129:readx:poke851+i,x:next
+ 8065 poke785,169:poke 786,3:rem usr
+ 8070 rem-------------------------------
+ 8072 rem ms-programme ab $c423
+ 8074 for i=50211 to 50291
+ 8076 read x:poke i,x:next
+ 8078 rem-------------------------------
+ 8080 rem namen der toene
+ 8082 for i=0 to 11:read tn$(i):next
+ 8100 rem-------------------------------
+ 8110 rem sprungvektoren
+ 8120 read a$:l=len(a$)
+ 8130 on l goto 8150,8220,8280,8310
+ 8150 rem l=1  ascii-zeichen
+ 8160 a=asc(a$)
+ 8170 if m>=0 then v%(m,a)=zn:goto 8120
+ 8180 for i=0 to 7:v%(i,a)=zn:next
+ 8190 goto 8120
+ 8200 if left$(a$,1)<>"m" then 8120
+ 8220 rem l=2  menue-indikator
+ 8230 if left$(a$,1)<>"m" then 8120
+ 8240 a$=right$(a$,1)
+ 8250 if a$="a" then m=-1 :goto 8120
+ 8260 m=val(a$)           :goto 8120
+ 8280 rem l=3  ascii-wert
+ 8290 a=val(a$) :goto 8170
+ 8310 rem l=4  zeilennummer oder ende
+ 8320 if a$="ende" then 8340
+ 8330 zn=val(a$) :goto 8120
+ 8340 rem-------------------------------
+ 8350 rem tonnummern
+ 8360 a$="q2w3er5t6y7ui9o0p@-*\^{home};="
+ 8370 for i=0 to 24
+ 8380 : a=asc(mid$(a$,i+1,1))
+ 8390 : tn%(a)=i
+ 8400 : for j=0 to 7:v%(j,a)=2000:next
+ 8410 next i
+ 8450 rem-------------------------------
+ 8455 rem frequenzen der tonleiter
+ 8460 for i=0 to 24:th(i)=2^(i/12):next
+ 8465 rem-------------------------------
+ 8470 rem konstanten
+ 8472 gs=828:gt=857:pr=869:do=897:cl=959
+ 8474 na=50229:ge=50245:pu=50276
+ 8480 si=54272:mo=49152:fa=55296
+ 8482 so=36864
+ 8484 f1$=chr$(154):f1=14
+ 8490 f2$=chr$(5)  :f2=1
+ 8495 kv$(0)="trian ":kf$(0)="NMNM"
+ 8500 kv$(1)="sawup ":kf$(1)="NLNL"
+ 8505 kv$(2)="sawdwn":kf$(2)="{SHIFT-@}M{SHIFT-@}M"
+ 8510 kv$(3)="square":kf$(3)="OLOL"
+ 8515 md$(0)="reset" :md$(1)="reset"
+ 8520 md$(2)="hold " :md$(3)="run  "
+ 8525 bl$(0)="":bl$(1)=" ":bl$(2)="  "
+ 8530 bl$(3)="   ":bl$(4)="    "
+ 8535 bl$(5)="     ":bl$(6)="      "
+ 8540 rem-------------------------------
+ 8545 rem soundparameter vorbesetzungen
+ 8550 for sn=0 to 2
+ 8555 : poke si+7*sn+5,10 :ad(sn)=10
+ 8560 : poke si+7*sn+6,138:sr(sn)=138
+ 8565 : o(sn)=3+sn:of(sn)=0:t(sn)=0
+ 8570 : bf=440*2^(o(sn)-4+(t(sn)-9)/12+of(sn)/1200)
+ 8572 : bf(sn)=bf*17.0327
+ 8575 :  c(sn)=64         :c1(sn)=65
+ 8580 :  s(sn)=(sn=0)
+ 8585 : sysdo,mo+7*sn+2,2048 :rem pw
+ 8590 : poke  mo+7*sn+4,0    :rem porta
+ 8595 next sn
+ 8600 poke  si+23,0:rf=0  :rem res/filt
+ 8605 sysdo,mo+21,0       :rem filterfr.
+ 8610 poke  mo+23,15      :rem mod/laut
+ 8615 for i=24 to 72 :rem ksv,lfo,eg aus
+ 8620 : poke mo+i,0:next
+ 8625 eg=0         :rem eg abkoppeln
+ 8630 su=0         :rem sustain aus
+ 8635 rem-------------------------------
+ 8640 rem sounds vorbesetzen
+ 8645 for ns=0 to 23
+ 8650 : gosub 7450
+ 8655 : ad=so+107*ns+97
+ 8660 : for i=ad to ad+9:poke i,46:next
+ 8665 next ns:ns=0
+ 8700 rem-------------------------------
+ 8870 rem farben, bild, modulator
+ 8880 poke 53280,14:poke 53281,6
+ 8890 print f1$;"{rvof}";:poke 650,128
+ 8900 gosub 4200 :rem bild zeilen 15-23
+ 8910 sys mo+1033:rem modulator aktiv.
+ 8920 a=2:return
+ 9000 rem===============================
+ 9010 rem datas
+ 9020 rem===============================
+ 9030 rem maschinenprogramme
+ 9060 data 032,089,003,076,174,167,032
+ 9070 data 253,174,032,138,173,032,247
+ 9080 data 183,076,163,168,032,253,174
+ 9090 data 032,158,183,138,072,032,253
+ 9100 data 174,032,158,183,138,168,104
+ 9110 data 170,024,032,240,255,032,253
+ 9120 data 174,076,160,170,032,253,174
+ 9130 data 032,138,173,032,247,183,165
+ 9140 data 020,133,158,165,021,133,159
+ 9150 data 032,253,174,032,138,173,032
+ 9160 data 247,183,160,000,120,165,020
+ 9170 data 145,158,200,165,021,145,158
+ 9180 data 088,096,032,247,183,160,000
+ 9190 data 120,177,020,133,099,200,177
+ 9200 data 020,088,133,098,162,144,056
+ 9210 data 076,073,188,169,032,162,000
+ 9220 data 157,000,004,157,000,005,202
+ 9230 data 208,247,162,087,157,000,006
+ 9240 data 202,016,250,096
+ 9250 rem-------------------------------
+ 9260 rem maschinenprogramme ab $c423
+ 9270 data 032,253,174,032,138,173,032
+ 9280 data 247,183,165,020,133,158,165
+ 9290 data 021,133,159,096,032,035,196
+ 9300 data 160,000,177,158,032,210,255
+ 9310 data 200,192,010,208,246,096,032
+ 9320 data 035,196,160,000,177,158,153
+ 9330 data 000,192,200,192,073,208,246
+ 9340 data 177,158,153,183,211,200,192
+ 9350 data 094,208,246,177,158,141,023
+ 9360 data 212,096,032,035,196,160,000
+ 9370 data 185,000,192,145,158,200,192
+ 9380 data 073,208,246,096
+ 9400 rem-------------------------------
+ 9410 rem  namen der toene
+ 9420 data c,c#,d,d#,e,f,f#,g,g#,a,a#,h
+ 9500 rem-------------------------------
+ 9510 rem datas fuer sprungverteiler
+ 9520 data ma,4000,x,3500,v,3600,032
+ 9530 data ma,3700,160,3800,s
+ 9540 data ma,2550,133,2560,134
+ 9550 data ma,2570,135,2580,136,4500,214
+ 9555 data ma,5500,l,6000,h,6500,k
+ 9560 data ma,5000,f,7000,211,7500,d
+ 9565 data m1,4654,145,4660,017
+ 9570 data m1,4666,029,4680,157
+ 9580 data m2,5160,157,5145,029
+ 9600 data m3,5675,145,5690,017
+ 9610 data m3,5720,157,5705,029
+ 9620 data m4,6410,157,6440,029
+ 9630 data m5,6830,145,6850,017
+ 9640 data m5,6870,157,6890,029
+ 9650 data m5,6935,133,134,6975,135,136
+ 9700 data m6,7110,a,b,c,7200,_,7300,n
+ 9750 data m7,7600,133,7700,134
+ 9900 data ende
+

@@ -1,0 +1,75 @@
+;lader.terminal.prg ==0801==
+   10 rem written by peter falk
+   20 :
+   30 poke840,0:rem sekundaer-adresse
+   40 poke841,27:poke842,32:poke843,84:poke844,0:poke845,0:rem drucker-parameter
+   50 :
+   60 poke 55,79:poke 56,60:rem speicher-
+   70 poke643,79:poke644,60:rem grenze
+   80 clr                  :rem auf 15439
+   90 poke838,6:poke839,15:rem farben
+  100 poke53280,peek(838):poke53281,peek(839)
+  110 g%=100*0.23:poke828,g%:rem gebuehren-einheit
+  120 print"{blk}{clr}{down}";chr$(14);chr$(8)
+  130 gosub350:gosub600:poke650,128
+  140 poke832,80:rem pufferanfang
+  150 poke833,60:rem bei 15440
+  160 print"{clr}{down}{down}     *******************************"
+  170 print"     *                             *"
+  180 print"     *   S U P E R - T E R M  64   *"
+  190 print"     *   {CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}   *"
+  200 print"     *                             *"
+  210 print"     *    Written by Peter Falk    *"
+  220 print"     *                             *"
+  230 print"     *    (c) 64'er  1985          *"
+  240 print"     *                             *"
+  250 print"     *******************************"
+  260 print"{down}{down}        (1) - Terminalprogramm{down}"
+  270 print"        (2) - Editor{down}{down}"
+  280 print"        (0) - Programm beenden"
+  290 getq$:ifq$<>"0"andq$<>"1"andq$<>"2"then290
+  300 ifq$="0"thenend
+  310 print"{down}{down}              Loading..."
+  320 ifq$="1"thenload"terminal",8
+  330 ifq$="2"thenload"editor",8
+  340 :
+  350 rem * peek+poke fuer ueberl. ram *
+  360 data165,20,72,165,21,72,32,247,183,120,165,1,41,252,133,1,160,0,177,20
+  370 data168,165,1,9,3,133,1,88,104,133,21,104,133,20,76,162,179,32,253,174
+  380 data32,138,173,32,247,183,32,253,174,32,158,183,120,169,52,133,1,138,160
+  390 data0,145,20,169,55,133,1,88,96
+  400 fori=698to765:reada:pokei,a:next
+  410 poke785,186:poke786,2
+  420 :
+  430 rem * load *
+  440 data160,0,169,8,32,180,255,169,98,32,150,255,173,64,3,133,174,173,65
+  450 data3,133,175,32,19,238,145,174,230,174,208,2,230,175,169,208,197,175
+  460 data208,8,169,0,133,174,169,224,133,175,165,175,240,4,36,144,80,223
+  470 data165,174,141,64,3,165,175,141,65,3,32,171,255,96,0
+  480 fori=848to917:reada:pokei,a:next
+  490 :
+  500 rem * directory *
+  510 data169,36,133,251,169,251,133,187,169,0,133,188,169,1,133,183,169,8
+  520 data133,186,169,96,133,185,32,213,243,165,186,32,180,255,165,185,32,150
+  530 data255,169,0,133,144,160,3,132,251,32,165,255,133,252,164,144,208,47
+  540 data32,165,255,164,144,208,40,164,251,136,208,233,166,252,32,205,189
+  550 data169,32,32,210,255,32,165,255,166,144,208,18,170,240,6,32,210,255
+  560 data76,226,3,169,13,32,210,255,160,2,208,198,32,66,246,96
+  570 fori=918to1022:reada:pokei,a:next
+  580 return
+  590 :
+  600 rem * f-tasten laden *
+  610 open1,8,2,"f-tasten,s,r"
+  620 open2,8,15
+  630 input#2,f
+  640 iff=0thenprint"{down}{down}{down}  Die Funktionstasten werden geladen."
+  650 print"{down}{down}{down}            Bitte warten..."
+  660 iff=0then700
+  670 fors=54000to54559
+  680 sys735,s,13:next
+  690 goto720
+  700 fors=54000to54559
+  710 get#1,a$:sys735,s,asc(a$):next
+  720 close1:close2
+  730 return
+

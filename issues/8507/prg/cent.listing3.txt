@@ -1,0 +1,62 @@
+;cent.listing3.prg ==0801==
+    1 rem um in den bereich ab $8000
+    2 rem zu verschieben :
+    3 rem
+    4 rem 10 poke56,128..
+    5 rem
+    6 rem 20 of=24576...
+    7 rem 60 if pr<>3153...
+    8 rem 95 data 0,160,160...
+    9 rem *******************************
+   10 poke56,96:poke55,0:clr
+   20 of=32768 : restore
+   30 print"{clr}reading mc-program...":print:pr=0
+   40 for n=828 to 853
+   50 read d:poken,d:pr=pr+d
+   55 next
+   60 if pr<>3121 thenprint"Fehler in MC-Datas":stop
+   70 print"verschiebe $e000-$ffff nach $6000":print
+   80 sys 828
+   90 data169,0,160,224,133,95,132,96,169,0,168,133,90,132,91,169
+   95 data0,160,128,133,88,132,89,76,191,163
+  100 bl=1
+  110 pr=0
+  120 reada,e,p :print"block :"bl;
+  130 for n=a to a+e-1
+  140 read d :poken-of,d :pr=pr+d
+  150 next
+  160 if pr=p thenprint" o.k.":goto200
+  170 print"pruefsumme falsch! "pr" statt "p
+  180 print:print"taste druecken":print
+  190 poke198,0:wait198,1:poke198,0
+  200 bl=bl+1:if bl<=4goto110
+  210 print:print"Zeiger auf Ausgabe berichtigen"
+  220 poke64822-of,65:poke64823-of,252 :rem open-vektor
+  230 poke64828-of,167:poke64829-of,252:rem chkout-vektor
+  240 poke64834-of,105:poke64835-of,252:rem chrout-vektor
+  900 print:print"Aenderungen durchgefuehrt.":print:print:end
+ 1000 rem block 1 $e4b8-$e4c8
+ 1010 data 58552,16,2331
+ 1020 data 32,189,255,165,185,234,234,201,7,240,4,169,2,133,185,96
+ 1030 rem block 2 $fc41-$fccf
+ 1040 data 64577,143,16117
+ 1050 data165,186,201,4,240,3,76,74,243,169,1,162,104,160,252
+ 1060 data32,184,228,32,74,243,176,8,165,2,41,253,133,2,24
+ 1070 data96,165,2,9,2,133,2,24,96,13,72,165,154,201,4
+ 1080 data240,3,76,205,241,165,2,41,2,208,4,165,154,208,243
+ 1090 data173,13,221,41,16,234,234,165,2,41,1,240,23,173,24
+ 1100 data208,41,2,234,234,104,201,64,144,10,201,192,144,4,41
+ 1110 data127,208,2,9,32,72,104,76,172,243,24,96,32,15,243
+ 1120 data240,3,76,1,247,32,31,243,165,186,201,4,240,3,76
+ 1130 data91,242,165,2,41,2,240,247,165,2,41,254,133,2,165
+ 1140 data185,41,7,201,7,76,194,254
+ 1150 rem block3  $fec4-$fed3
+ 1160 data65218,18,1960
+ 1170 data208,6,169,1,5,2,133,2,169,255,141,3,221,169,4,76,153,243
+ 1180 rem block4 $f399-$f3c0
+ 1190 data 62361,47,5538
+ 1200 data 13,0,221,141,0,221,173,2,221,9,4,141,2,221,169
+ 1210 data 4,76,117,242,141,1,221,173,0,221,41,251,141,0,221
+ 1220 data 234,234,234,9,4,141,0,221,173,13,221,41,16,240,249,24,96
+ 1230 rem ende
+

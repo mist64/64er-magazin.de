@@ -1,0 +1,527 @@
+;bas.terminal.prg ==0801==
+   10 rem written by peter falk
+   20 rem 828=preis einer einheit
+   30 poke 829,32:rem 7 datenbits
+   40 poke 830,6:rem 300 baud
+   50 poke 831,0:rem 1 stopbit
+   60 rem 832,80:rem (lo) pufferanfang
+   70 rem 833,60:rem (hi) bei 15440
+   80 rem 834=gegenstelle duplex
+   90 rem 835=gebuehren ja/nein
+  100 rem 836=gebuehren-zone
+  110 rem 837=gebuehren-tarif
+  120 rem 838=rahmen-farbe
+  130 rem 839=hintergrund-farbe
+  140 rem 840-845=drucker-parameter
+  150 :
+  160 rem ** menue **
+  170 print:print"{clr}{blk}{down}{down}       {CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}"
+  180 print"       {rvon}  ** TERMINAL-MENUE **  "
+  190 print"       {CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{down}{down}"
+  200 print"       (1) - Kommunizieren";a$;"{down}"
+  210 print"       (2) - Daten speichern{down}"
+  220 print"       (3) - Daten laden{down}"
+  230 print"       (4) - Daten ausgeben{down}"
+  240 print"       (5) - Funktionstasten{down}"
+  250 print"       (6) - Parameter{down}"
+  260 print"       (7) - Gebuehren{down}"
+  270 print"       (8) - Diskbefehle{down}"
+  280 print"       (9) - Editor laden"
+  290 get q$:if q$="" then 290
+  300 if q$="1" and a$="(Fortsetzung)" then a$="":goto 480
+  310 on val(q$) goto 360,2390,2610,2770,4110,3070,3850,4810,340
+  320 if q$="0" then end
+  330 goto 290
+  340 load"editor",8
+  350 :
+  360 rem *** kommunizieren ***
+  370 input"{clr}{down}{down}  Gegenstelle {rvon}H{rvof}alb- / {rvon}V{rvof}ollduplex   v{left}{left}{left}";q$
+  380 if q$="v" then poke 834,1
+  390 if q$="h" then poke 834,0
+  400 print"{down}{down}  Gebuehren-Berechnung (j/n)?{down}"
+  410 get q$:if q$<>"j" and q$<>"n" then 410
+  420 poke 835,0
+  430 if q$="j" then poke 835,1:gosub 3390
+  440 print"{down}{down}           Zum Starten Taste !"
+  450 get q$:if q$="" then 450
+  460 if q$="_" then 160
+  470 ti$="000000"
+  480 baud=peek(830):db=peek(829):sb=peek(831)
+  490 open 2,2,0,chr$(baud+db+sb)+chr$(0):get#2,q$
+  500 print"{clr}";
+  510 gosub 4990
+  520 gosub 4030
+  530 dp=-peek(834)
+  540 gb=-peek(835)
+  550 get#2,q$:print
+  560 :
+  570 gosub 4700
+  580 get b$:if b$="" then 650
+  590 gosub 4760
+  600 if asc(b$)>132 and asc(b$)<141 then gosub 4480:goto 570
+  610 if peek(653)=2 then 2250
+  620 gosub 2100
+  630 :
+  640 gosub 4700
+  650 if peek(667)=peek(668) then 580
+  660 gosub 4760
+  670 get#2,c$:if c$="" then c$=chr$(0)
+  680 gosub 2170
+  690 if not sp then 570
+  700 poke sg,d:sg=sg+1:if sg=53248 then sg=57344
+  710 if sg=65536 then poke 53280,peek(838):sp=0:sg=65535
+  720 goto 570
+  730 :
+  740 rem * programm-uebertragung *
+  750 gosub 3970:close 2:clr
+  760 baud=peek(830)
+  770 open 2,2,0,chr$(baud)+chr$(0):get#2,q$
+  780 input"{clr}{down}{down}{down}Programm-Name:";dn$:if dn$="" then print:close 2:goto 480
+  790 dim b$(258)
+  800 open 1,8,15,"m-w"+chr$(7)+chr$(28)+chr$(1)+chr$(15):close 1
+  810 print"{down}{down}{rvon}S{rvof}enden / {rvon}E{rvof}mpfangen ?"
+  820 get q$:if q$<>"s" and q$<>"e" then 820
+  830 if q$="e" then 1440
+  840 :
+  850 rem * senden *
+  860 print"{down}{down}Laenge einer Uebertragungs-Einheit"
+  870 input"in Bytes (max.256)   80{left}{left}{left}{left}";e
+  880 if e<1 or e>256 then 860
+  890 open 1,8,2,dn$+",p,r"
+  900 gosub 4930
+  910 if val(b$)<>0 then 1360
+  920 poke 668,peek(667):poke 198,0
+  930 print#2,chr$(2);
+  940 get#2,e$:get q$
+  950 for w=1 to 100:next
+  960 if e$="" and q$<>"_" then 930
+  970 if q$="_" then 1360
+  980 print"{down}Beginn der Uebertragung.{down}"
+  990 for w=1 to 250:next
+ 1000 poke 688,peek(667):by=0
+ 1010 :
+ 1020 for z=1 to e
+ 1030 get#1,b$(z):if b$(z)="" then b$(z)=chr$(0)
+ 1040 if st=0 then next z
+ 1050 f=st:if z>e then z=e
+ 1060 for w=1 to 1000:next
+ 1070 su=0:get#2,e$
+ 1080 for x=1 to z
+ 1090 print#2,b$(x);
+ 1100 su=su+asc(b$(x))
+ 1110 next x
+ 1120 if peek(669)<>peek(670) then 1120
+ 1130 poke 668,peek(667)
+ 1140 get q$:if peek(667)=peek(668) and q$<>"_" then 1140
+ 1150 if q$="_" then 1360
+ 1160 get#2,lo$:if lo$="" then lo$=chr$(0)
+ 1170 get q$:if peek(667)=peek(668) and q$<>"_" then 1170
+ 1180 if q$="_" then 1360
+ 1190 get#2,hi$:if hi$="" then hi$=chr$(0)
+ 1200 se=asc(lo$)+256*asc(hi$)
+ 1210 if se<>su then 1300
+ 1220 by=by+z
+ 1230 print" OK.       ";int(by/254)+1;"{left}. BLOCK"
+ 1240 if f<>0 then 1360
+ 1250 print#2,chr$(2);
+ 1260 get q$:if peek(667)=peek(668) and q$<>"_" then 1260
+ 1270 if q$="_" then 1360
+ 1280 goto 1020
+ 1290 :
+ 1300 rem error
+ 1310 print#2,chr$(1);:print" ERROR !"
+ 1320 get q$:if peek(667)=peek(668) and q$<>"_" then 1320
+ 1330 for w=1 to 1000:next
+ 1340 if q$<>"_" then 1070
+ 1350 :
+ 1360 if q$="_" then print"{down}ABBRUCH !{down}"
+ 1370 print#2,chr$(3);
+ 1380 print"{down}Ende der Uebertragung."
+ 1390 close 1:close 15:close 2
+ 1400 print"{down}{down}           Taste druecken !"
+ 1410 wait 198,255:poke 198,0
+ 1420 goto 480
+ 1430 :
+ 1440 rem * empfangen *
+ 1450 open 1,8,2,dn$+",p,w"
+ 1460 gosub 4930
+ 1470 if val(b$)<>0 then 1800
+ 1480 poke 668,peek(667):poke 198,0
+ 1490 print#2,chr$(2);
+ 1500 get#2,e$:get q$
+ 1510 for w=1 to 100:next
+ 1520 if e$="" and q$<>"_" then 1490
+ 1530 if q$="_" then 1800
+ 1540 print"{down}Beginn der Uebertragung.{down}"
+ 1550 for w=1 to 100:next
+ 1560 get#2,e$:poke 668,peek(667):by=0
+ 1570 su=0:z=1
+ 1580 get q$:if peek(667)=peek(668) and q$<>"_" then 1580
+ 1590 if q$="_" then 1800
+ 1600 at=ti
+ 1610 if ti-at>30 then 1660
+ 1620 if peek(667)=peek(668) then 1610
+ 1630 get#2,b$(z):if b$(z)="" then b$(z)=chr$(0)
+ 1640 su=su+asc(b$(z)):z=z+1
+ 1650 if z<258 then 1600
+ 1660 hi=int(su/256):lo=su-256*hi
+ 1670 print#2,chr$(lo);chr$(hi);
+ 1680 get q$:if peek(667)=peek(668) and q$<>"_" then 1680
+ 1690 if q$="_" then 1800
+ 1700 get#2,e$
+ 1710 if e$<>chr$(2)and e$<>chr$(3)then 1870
+ 1720 print#2,chr$(4);
+ 1730 for x=1 to z
+ 1740 print#1,b$(x);
+ 1750 next x
+ 1760 get#2,q$
+ 1770 by=by+z
+ 1780 print" OK.       ";int(by/254)+1;"{left}. BLOCK"
+ 1790 if e$=chr$(2) then 1570
+ 1800 if q$="_" then print"{down}ABBRUCH !{down}"
+ 1810 print"{down}Ende der Uebertragung."
+ 1820 close 1:close 15:close 2
+ 1830 print"{down}{down}           Taste druecken !"
+ 1840 wait 198,255:poke 198,0
+ 1850 goto 480
+ 1860 :
+ 1870 rem error
+ 1880 print" ERROR !"
+ 1890 print#2,chr$(3);
+ 1900 poke 668,peek(667)
+ 1910 goto 1570
+ 1920 :
+ 1930 rem * daten senden *
+ 1940 for sz=15440 to sg
+ 1950 get q$:if q$="_" then print:return
+ 1960 if q$=" " then get e$:if e$<>" " then 1960
+ 1970 for w=1 to 24:next
+ 1980 get#2,c$:if c$=chr$(24) then print:return
+ 1990 if c$<>chr$(19) then 2010
+ 2000 get#2,q$:if q$<>chr$(17) and peek(203)=64 then 2000
+ 2010 sys 62595:rem cia's setzen
+ 2020 b$=chr$(usr(sz)):get#2,c$
+ 2030 if dp then poke 646,0:print b$;
+ 2040 if sz=53247 then sz=57343
+ 2050 gosub 2100
+ 2060 if d=13 then for w=1 to 100:next
+ 2070 next sz
+ 2080 return
+ 2090 :
+ 2100 rem * umformen/senden *
+ 2110 e=0:d=asc(b$):if d>64 and d<91 then e=32
+ 2120 if d=20 then d=8
+ 2130 d=d+e
+ 2140 print#2,chr$(d);:if not dp then poke 646,0:print b$;
+ 2150 return
+ 2160 :
+ 2170 rem * umformen/ausgeben *
+ 2180 e=0:d=asc(c$):if d>64 and d<91 then e=32
+ 2190 if d>96 and d<123then e=-32
+ 2200 if d=8 then d=20
+ 2210 d=d+e
+ 2220 poke646,0:poke199,0:print chr$(d);
+ 2230 return
+ 2240 :
+ 2250 rem * tastatur-auswertung *
+ 2260 e=asc(b$)
+ 2270 if e=174 and sg<65536 then sp=-1:poke 53280,2:goto 570
+ 2280 if e=182 then sg=15440:gosub 3970:goto 570
+ 2290 if e=177 then sp=0:poke 53280,peek(838):goto 570
+ 2300 if e=176 and sg>15440 then gosub 1930:goto 570
+ 2310 if e=165 then gosub 3520:goto 570
+ 2320 if e=191 then gosub 4050:goto 570
+ 2330 if e=175 then 740
+ 2340 ife=95thenpoke53280,peek(838):gosub3970:gosub3520:close2:wait198,1:goto160
+ 2350 ife=222thenpoke53280,peek(838):gosub3970:close2:a$="(Fortsetzung)":goto160
+ 2360 if e=180 then gosub 4990:goto 570
+ 2370 goto 570
+ 2380 :
+ 2390 rem *** daten speichern ***
+ 2400 print"{clr}"
+ 2410 gosub 4030
+ 2420 if sg=15440 then 160
+ 2430 dn$=""
+ 2440 input"{down}{down}Dateiname ";dn$
+ 2450 if dn$="" then 160
+ 2460 open 1,8,2,dn$+",s,w"
+ 2470 gosub 4930
+ 2480 print#1,chr$(usr(15440));
+ 2490 if st<>0 then 2570
+ 2500 cmd 1:a=15441
+ 2510 e=sg:if e>53247 then e=53247
+ 2520 for sz=a to e
+ 2530 print chr$(usr(sz));
+ 2540 next
+ 2550 if e<sg then a=57344:e=sg:goto2520
+ 2560 print#1,"";
+ 2570 close 1:close 15
+ 2580 if val(b$)<>0 then wait 198,255
+ 2590 goto 160
+ 2600 :
+ 2610 rem *** daten laden ***
+ 2620 dn$=""
+ 2630 input"{clr}{down}{down}{down}Dateiname ";dn$
+ 2640 if dn$="" then 160
+ 2650 sg=15440
+ 2660 open 1,8,2,dn$+",s,r"
+ 2670 gosub 4930
+ 2680 if val(b$)<>0 then 2720
+ 2690 poke 144,0:poke 832,80:poke 833,60
+ 2700 sys 848:rem load-routine
+ 2710 sg=peek(832)+peek(833)*256-1
+ 2720 close 1:close 15
+ 2730 if sg=-1 then print"{down}{down}Achtung, Puffer voll !!!{down}{down}":sg=65535
+ 2740 gosub 3970:poke 198,0:wait 198,255
+ 2750 goto 160
+ 2760 :
+ 2770 rem *** daten ausgeben ***
+ 2780 print"{clr}"
+ 2790 gosub 4030
+ 2800 if sg=15440 then 160
+ 2810 print"{down}'F1' = Bildschirm"
+ 2820 print"'F3' = Drucker"
+ 2830 print"'F5' = Hardcopy{down}"
+ 2840 wait 198,255
+ 2850 d=0
+ 2860 for sz=15440 to sg
+ 2870 if peek(198)<>0 then 2980
+ 2880 c$=chr$(usr(sz))
+ 2890 print c$;
+ 2900 if d then print#1,c$;
+ 2910 if sz=53247 then sz=57343
+ 2920 next sz
+ 2930 close 1:poke 53280,peek(838)
+ 2940 get b$:if b$="" then 2940
+ 2950 if b$="{f5}" then gosub 5130
+ 2960 goto 160
+ 2970 :
+ 2980 get b$
+ 2990 if b$=" " then wait 198,255:get b$
+ 3000 if b$="_" then close 1:poke 53280,peek(838):goto 160
+ 3010 if b$="{f3}" and d=0 then e=peek(840):poke 53280,2
+ 3020 if b$="{f3}"andd=0thenopen1,4,e:fore=841to845:print#1,chr$(peek(e));:next:d=1
+ 3030 if b$="{f1}" then d=0:close 1:poke 53280,peek(838)
+ 3040 if b$="{f5}" then gosub 5130
+ 3050 goto 2880
+ 3060 :
+ 3070 rem ** parameter **
+ 3080 print"{clr}{down}{down}"
+ 3090 :
+ 3100 rem baudrate
+ 3110 if peek(830)=3 then baud=110
+ 3120 if peek(830)=5 then baud=150
+ 3130 if peek(830)=6 then baud=300
+ 3140 if peek(830)=7 then baud=600
+ 3150 print spc(22) baud;"{up}"
+ 3160 input"110,150,300,600 Baud ";baud
+ 3170 if baud=110 then poke 830,3
+ 3180 if baud=150 then poke 830,5
+ 3190 if baud=300 then poke 830,6
+ 3200 if baud=600 then poke 830,7
+ 3210 :
+ 3220 rem datenbits
+ 3230 if peek(829)=32 then db=7
+ 3240 if peek(829)=0 then db=8
+ 3250 print"{down}{down}{down}";spc(20) db;"{up}"
+ 3260 input"7 oder 8 Datenbits ";db
+ 3270 if db=7 then poke 829,32
+ 3280 if db=8 then poke 829,0
+ 3290 :
+ 3300 rem stopbits
+ 3310 if peek(831)=0 then sb=1
+ 3320 if peek(831)=128 then sb=2
+ 3330 print"{down}{down}{down}";spc(19) sb;"{up}"
+ 3340 input"1 oder 2 Stopbits ";sb
+ 3350 if sb=1 then poke 831,0
+ 3360 if sb=2 then poke 831,128
+ 3370 goto 160
+ 3380 :
+ 3390 rem ** gebuehren berechnen **
+ 3400 print"{down}  0. Zone: Nahgespraech"
+ 3410 print"{down}  1. Zone: unter 50 KM"
+ 3420 print"{down}  2. Zone: 50 - 100 KM"
+ 3430 print"{down}  3. Zone: ueber 100 KM"
+ 3440 zo=4:input"{down}  Zone 0, 1, 2 oder 3 ";zo
+ 3450 if zo<>0 and zo<>1 and zo<>2 and zo<>3 then 3440
+ 3460 input"{down}  {rvon}N{rvof}ormal- / {rvon}B{rvof}illig-Tarif ";q$
+ 3470 if q$<>"n" and q$<>"b" then 3460
+ 3480 poke 836,zo
+ 3490 poke 837,asc(q$)
+ 3500 return
+ 3510 :
+ 3520 if not gb then return
+ 3530 zo=peek(836)
+ 3540 q$=chr$(peek(837))
+ 3550 zeit=val(left$(ti$,2))*3600+val(mid$(ti$,3,2))*60+val(right$(ti$,2))
+ 3560 if q$="b" then 3620
+ 3570 if zo=0 then betrag=int(zeit/480+1)*peek(828)/100
+ 3580 if zo=1 then betrag=int(zeit/45+1)*peek(828)/100
+ 3590 if zo=2 then betrag=int(zeit/20+1)*peek(828)/100
+ 3600 if zo=3 then betrag=int(zeit/12+1)*peek(828)/100
+ 3610 goto 3650
+ 3620 if zo=0 then betrag=int(zeit/720+1)*peek(828)/100
+ 3630 if zo=1 then betrag=int(zeit/67.5+1)*peek(828)/100
+ 3640 if zo=2 or zo=3 then betrag=int(zeit/38.6+1)*peek(828)/100
+ 3650 print
+ 3660 print"Zeit  =";ti$
+ 3670 print"Betrag=";betrag;"DM"
+ 3680 print
+ 3690 if b$<>"_" then 3830
+ 3700 print"Gebuehren speichern (j/n)?"
+ 3710 get q$
+ 3720 if q$<>"j" and q$<>"n" then 3710
+ 3730 if q$="n" then 3830
+ 3740 open 1,8,2,"gebuehren,s,r"
+ 3750 input#1,gesb
+ 3760 close 1
+ 3770 gesb=gesb+betrag
+ 3780 open 1,8,2,"@:gebuehren,s,w"
+ 3790 print#1,gesb
+ 3800 close 1
+ 3810 print"{down}Gesamtbetrag=";gesb;"DM"
+ 3820 wait 198,255
+ 3830 poke 198,1:return
+ 3840 :
+ 3850 rem ** gebuehren ansehen **
+ 3860 print"{clr}{down}{down}"
+ 3870 input"Gebuehren loeschen   n{left}{left}{left}";q$
+ 3880 if q$<>"j" and q$<>"n" then 3870
+ 3890 if q$="j" then open 1,8,2,"@:gebuehren,s,w":print#1,0:close 1
+ 3900 open 1,8,2,"gebuehren,s,r"
+ 3910 input#1,gesb
+ 3920 close 1
+ 3930 print"{down}{down}Gesamtbetrag=";gesb;"DM"
+ 3940 wait 198,255
+ 3950 goto 160
+ 3960 :
+ 3970 rem ** lo/hi-berechnung **
+ 3980 poke 832,sg-int(sg/256)*256
+ 3990 poke 833,int(sg/256)
+ 4000 gosub 4030
+ 4010 return
+ 4020 :
+ 4030 rem ** speichergrenze **
+ 4040 sg=peek(832)+peek(833)*256
+ 4050 if sg<53248 then by=sg-15440
+ 4060 if sg>57343 then by=sg-15440-4095
+ 4070 print:print"Bytes belegt:";by
+ 4080 print"Bytes frei  :";46000-by
+ 4090 return
+ 4100 :
+ 4110 rem ** funktionstasten **
+ 4120 print"{clr}{down}{down}            FUNKTIONSTASTEN"
+ 4130 print"            {CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{down}"
+ 4140 for ft=0 to 7
+ 4150 print" F";ft+1;":  ";chr$(34);
+ 4160 sz=54000+70*ft
+ 4170 e=usr(sz):if e=13 then 4210
+ 4180 print chr$(e);
+ 4190 sz=sz+1
+ 4200 goto 4170
+ 4210 print
+ 4220 next ft
+ 4230 print"{down}            Aendern (j/n)?"
+ 4240 get q$:if q$<>"j" and q$<>"n" then4240
+ 4250 if q$="n" then 160
+ 4260 print"{home}{down}{down}{down}{down}"
+ 4270 for ft=0 to 7
+ 4280 poke 631,29:poke 198,1
+ 4290 input"{rght}{rght}{rght}{rght}{rght}{rght}";q$
+ 4300 if q$="" then 4370
+ 4310 q$=left$(q$,69)+chr$(13)
+ 4320 sz=54000+70*ft
+ 4330 for sp=1 to len(q$)
+ 4340 sys 735,sz,asc(mid$(q$,sp,1))
+ 4350 sz=sz+1
+ 4360 next sp
+ 4370 next ft
+ 4380 print"{down}            Speichern (j/n)?"
+ 4390 get q$:if q$<>"j" and q$<>"n" then4390
+ 4400 if q$="n" then 160
+ 4410 open 1,8,2,"@:f-tasten,s,w"
+ 4420 for sz=54000 to 54559
+ 4430 print#1,chr$(usr(sz));
+ 4440 next sz
+ 4450 close 1
+ 4460 goto 160
+ 4470 :
+ 4480 rem ** funktionstasten senden **
+ 4490 d=asc(b$)
+ 4500 if d=133 then ft=0
+ 4510 if d=134 then ft=2
+ 4520 if d=135 then ft=4
+ 4530 if d=136 then ft=6
+ 4540 if d=137 then ft=1
+ 4550 if d=138 then ft=3
+ 4560 if d=139 then ft=5
+ 4570 if d=140 then ft=7
+ 4580 sz=54000+70*ft
+ 4590 for w=1 to 30:next
+ 4600 sys 62595
+ 4610 b$=chr$(usr(sz))
+ 4620 get#2,q$
+ 4630 if dp then print b$;
+ 4640 gosub 2100
+ 4650 sz=sz+1
+ 4660 if b$<>chr$(13) then 4590
+ 4670 poke 668,peek(667):get#2,q$
+ 4680 return
+ 4690 :
+ 4700 rem * cursor ein *
+ 4710 e=peek(209)+peek(210)*256+peek(211)
+ 4720 if peek(e)<128 then poke e,peek(e)+128
+ 4730 poke 54272+e,0
+ 4740 return
+ 4750 :
+ 4760 rem * cursor aus *
+ 4770 e=peek(209)+peek(210)*256+peek(211)
+ 4780 if peek(e)>127 then poke e,peek(e)-128
+ 4790 return
+ 4800 :
+ 4810 rem ** diskbefehle **
+ 4820 print"{clr}{down}{down}'$' = Directory{down}{down}"
+ 4830 print spc(13) chr$(34);:poke 212,0:print"{up}"
+ 4840 poke 198,1:poke 631,29
+ 4850 input"Diskbefehl ";b$
+ 4860 if b$="$" then print:sys 918:wait 198,255:goto 160
+ 4870 open 15,8,15
+ 4880 print#15,b$
+ 4890 gosub 4950
+ 4900 close 15
+ 4910 wait 198,255:goto 160
+ 4920 :
+ 4930 rem ** diskstatus **
+ 4940 open 15,8,15
+ 4950 input#15,b$,c$
+ 4960 print"{down}{down}Diskstatus: "b$;" ";c$;"{down}"
+ 4970 return
+ 4980 :
+ 4990 rem * help *
+ 5000 print
+ 5010 print"'C= S':Daten speichern"
+ 5020 print"'C= E':Speichern Ende"
+ 5030 print"'C= A':Daten aussenden"
+ 5040 print"'C= L':Puffer loeschen"
+ 5050 print"'C= G':Gebuehren"
+ 5060 print"'C= B':Bytes frei"
+ 5070 print"'C= P':Prg-Uebertragung"
+ 5080 print"'C= _':Off-line"
+ 5090 print"'C= ^':Unterbrechung"
+ 5100 print"'C= H':Help"
+ 5110 return
+ 5120 :
+ 5130 rem * hardcopy *
+ 5140 d=0:close 1:e=peek(840):open 1,4,e
+ 5150 for e=841 to 845:print#1,chr$(peek(e));:next
+ 5160 open 2,3
+ 5170 print"{home}";
+ 5180 print#1
+ 5190 for z=1 to 25
+ 5200 for sp=1 to 40
+ 5210 get#2,e$:print#1,e$;
+ 5220 next sp
+ 5230 next z
+ 5240 print#1:close 1:close 2
+ 5250 return
+

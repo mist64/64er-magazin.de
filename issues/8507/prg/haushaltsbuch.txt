@@ -1,0 +1,786 @@
+;haushaltsbuch.prg ==0801==
+    1 rem *********************************
+    2 rem * > h a u s h a l t s b u c h < *
+    3 rem *                               *
+    4 rem *     martin schumann           *
+    5 rem *********************************
+   40 printchr$(147):poke211,12:poke214,10:sys58732:print"ich lese daten !"
+   50 gosub7830:gosub7970:dimsb$(2),f$(7),fs$(5)
+   60 dimms(20),m$(12),d$(200,2),s(12),zs(12),n$(20),s$(20),kn$(20):t1$="0"
+   70 m$(1)="januar   ":m$(2)="februar  "
+   80 m$(3)="maerz    ":m$(4)="april    "
+   90 m$(5)="mai      ":m$(6)="juni     "
+  100 m$(7)="juli     ":m$(8)="august   "
+  110 m$(9)="september":m$(10)="oktober  "
+  120 m$(11)="november ":m$(12)="dezember "
+  130 f$(1)=" konten anlegen      "
+  140 f$(2)=" buchen              "
+  150 f$(3)=" kontenuebersicht    "
+  160 f$(4)=" kontennamen ausgeben"
+  170 f$(5)=" monatsuebersicht    "
+  180 f$(6)=" jahresuebersicht    "
+  190 f$(7)=" buchungsposten abfr."
+  200 f$(0)=" programm beenden    "
+  210 f%=peek(768):goto880
+  220 rem
+  230 rem =*=  d r u c k e r  vorhanden?
+  240 rem
+  250 poke768,185:open1,4:print#1,"":close1:poke768,f%
+  260 ifst<>-128goto290
+  270 poke214,24:poke211,2:sys58732:print"      drucker nicht bereit !         ";
+  280 :fori=0to2500:next
+  290 return
+  300 rem
+  310 rem =*=   f l o p p y   vorhanden?
+  320 rem
+  330 poke768,185:open1,8,15,"i":close1:poke768,f%
+  340 ifst<>-128goto365
+  350 c=23:s=9:gosub830:print"{red} floppy nicht bereit !"
+  360 :fori=0to2500:next:return
+  365 open1,8,15,"m-w"+chr$(7)+chr$(28)+chr$(1)+chr$(15):rem floppyzugriff beschl.
+  370 input#1,r:close1
+  375 ifr=21thens=9:c=23:gosub830:print"{red}diskette einlegen !":fori=0to3500:next
+  380 return
+  390 rem ==============================
+  400 rem **  shell - sort /(num.)    **
+  410 rem ==============================
+  420 d=4
+  430 ifd<nthend=d+d:goto430
+  440 d=d-1
+  450 d=int(d/2)
+  460 ifd<1thenreturn
+  470 forj=1ton-d
+  480 :fori=jto1step-d
+  490 : ifval(d$(i+d,x))>=val(d$(i,x))goto540
+  500 :  fort=0to2
+  510 :   sys715(d$(i,t),d$(i+d,t))
+  520 :  nextt
+  530 :nexti
+  540 nextj
+  550 goto450
+  570 rem ===========================
+  580 rem **   shell - sort/alpha     **
+  590 rem ===========================
+  600 d=4
+  610 ifd<nthend=d+d:goto610
+  620 d=d-1
+  630 d=int(d/2)
+  640 ifd<1thenreturn
+  650 forj=1ton-d
+  660 :fori=jto1step-d
+  670 : ifd$(i+d,x)>=d$(i,x)then720
+  680 :  fort=0to2
+  690 :   sys715(d$(i,t),d$(i+d,t))
+  700 : nextt
+  710 :nexti
+  720 nextj
+  730 goto630
+  740 rem
+  750 rem *=* u e b e r s c h r i f t e n
+  760 printtab(8)"{orng}UCCCCCCCCCCCCCCCCCCCCCCI":rem 22 chr$(99)=shift c
+  770 printtab(8)"B";f$(x);" B":rem menuefunktionen
+  780 printtab(8)"JCCCCCCCCCCCCCCCCCCCCCCK{brn}":rem com-taste+2
+  790 return
+  810 rem =*= cursor positionieren =*=
+  830 poke211,s:poke214,c:sys58732:return
+  850 rem **  erster bildschirm      ****
+  860 rem ===============================
+  870 :
+  880 poke53281,7:poke53280,8:print"{brn}":bl$="                    ":rem 20 blank
+  890 gosub4010:poke788,52:rem stop aus
+  900 input"aktuelles jahr (1984-1999): ";j$:ja$=right$(j$,2)
+  910 :ifj$<"1983"orj$>"1999"thenprint"unzulaessiges jahr!":print"{up}{up}";:goto900
+  920 rem       shift/crsr^ <chr$(145)>
+  930 rem ===============================
+  940 rem  menue / aufruf unterprogramme
+  950 rem ===============================
+  960 gosub4010
+  970 printtab(10)"{red}funktionsauswahl:"
+  980 printtab(10)"-----------------":print
+  990 printtab(5)"{blu}-1-{brn}  konten anlegen"
+ 1000 printtab(5)"{blu}-2-{brn}  buchen":print
+ 1010 printtab(5)"{blu}-3-{brn}  kontenuebersicht":print
+ 1020 printtab(5)"  {orng}  <kontennamen ausgeben>":printtab(11)"-----> {blu}2-3,5-7"
+ 1030 printtab(45)"{blu}-5-{brn}  monatsuebersicht"
+ 1040 printtab(5)"{blu}-6-{brn}  jahresuebersicht":print
+ 1050 printtab(5)"{blu}-7-{brn}  buchungsposten abfragen":print
+ 1060 printtab(5)"{grn}-0-{brn}  programm beenden":print
+ 1070 printtab(10)"{rvon}{red} auswahl (0-7) {rvof}{brn}"
+ 1080 get x$: if x$<"0"orx$>"7"then1080
+ 1090 : x=val(x$):if x=0 goto1200
+ 1100 : ifx<>4goto1130
+ 1110 :  s=6:c=22:gosub830:print"{red}werden bei den uebrigen funktio-"
+ 1120 :  printtab(6)"nen automatisch ausgegeben";:fori=0to2000:next:goto960
+ 1130 : on x gosub 1310,1750,2510,2890,3240,3580,4500
+ 1140 goto960
+ 1160 rem ==========================
+ 1170 rem ** programm beenden     **
+ 1180 rem ==========================
+ 1200 gosub4010:gosub760:print:print:print
+ 1210 close1:close2:close3
+ 1220 print"sollten sie versehentlich das programm  beendet haben, so koennen ";
+ 1230 print"sie es mit",tab(15)chr$(17)"{rvon}{red} goto 960 {rvof}{brn}"chr$(17),,"wieder ";
+ 1240 print"starten !":poke788,49:rem stop ein
+ 1250 s=0:c=13:gosub830:sys42115:rem end ohne ready
+ 1270 rem ***======================***
+ 1280 rem ===  konten anlegen      ===
+ 1290 rem ***======================***
+ 1310 gosub4010:gosub760:rem gew.funkt.
+ 1320 print"{blu}achtung ! eine evtl. bereits angelegte  datei dieses jahres wird";
+ 1330 print" geloescht.":printchr$(28)
+ 1340 print"{red}wollen sie das (j/n)"
+ 1350 get x$:if x$<>"j"and x$<>"n"then1350
+ 1360 :ifx$="n"thenreturn
+ 1370 gosub330:ifst=-128orr=21thenreturn
+ 1380 open3,8,15,"s:"+j$+"*":close3:ak=0
+ 1390 open2,8,15,"s:konten"+j$
+ 1400 printchr$(147);:gosub760
+ 1410 print:print" wieviele konten wollen sie anlegen"
+ 1420 print"  {red}{rvon} 0 {rvof}{brn}  = keine konten neu anlegen   ":input"(1-20) ";kz
+ 1430 : ifkz=0thenclose1:close2:return
+ 1440 : ifkz<1orkz>20thenprintchr$(145)chr$(145)chr$(145);:goto1420
+ 1450 open1,8,2,"konten"+j$+",l,"+chr$(141)
+ 1460 printchr$(145);:zz=0:d$(0,0)="noch keine buchungen"
+ 1470 s=1:c=4:gosub830:print"<{red}{rvon}return{rvof}{brn}> = konten anlegen abbrechen  "
+ 1480 print"                                     "
+ 1490 print"                                     ":rem 36 x space
+ 1500 fori=1tokz
+ 1510 :print"name konto nr.";spc(3-len(str$(i)))i":";
+ 1520 : input kn$
+ 1530 :  ifkn$=""theni=kz:goto1610
+ 1540 :  if len(kn$)>20 then kn$=left$(kn$,20)
+ 1550 : rc$=kn$+left$(bl$,20-len(kn$))
+ 1560 : n$(i)=left$(rc$,12)
+ 1570 : for t=1 to 12
+ 1580 :  rc$=rc$+str$(0)+left$(bl$,10-len(str$(0)))
+ 1590 : nextt:zz=zz+1
+ 1600 : print#1,rc$:kn$=""
+ 1610 nexti
+ 1620 close1:close2:close3
+ 1630 ifzz<kzthenkz=zz:rem abbruch ?
+ 1640 for i=1 to kz
+ 1650 : open3,8,3,j$+n$(i)+",s,w"
+ 1660 :  print#3,d$(0,0)
+ 1670 : close3
+ 1680 next i
+ 1690 close1:close2:close3:return
+ 1710 rem ============================
+ 1720 rem ***    b u c h e n       ***
+ 1730 rem ============================
+ 1750 gosub2900:ifkn$="e"orak=0thenreturn
+ 1760 ifst=-128orr=21thenreturn
+ 1770 x=2:gosub4110:lv=1
+ 1780 printchr$(147)"{lblu}";:gosub760:su=0
+ 1790 print"-------------------------------"
+ 1800 print"{lblu}nr.";kn;" - {red}";kn$(kn)
+ 1810 print"{brn}-------------------------------"
+ 1820 print"einnahme oder ausgabe (e/a) ?"
+ 1830 print"-------------------------------"
+ 1840 print
+ 1850 print"{blu} funktion verlassen mit {red}f7{brn}!";
+ 1860 getx$:ifx$<>"e"andx$<>"a"thenifx$<>chr$(136)goto1860
+ 1870 : ifx$=chr$(136)andlv>1thenlv=lv-1:goto2210
+ 1880 : ifx$=chr$(136)thenclose1:close2:return
+ 1890 ba$=x$:rem buchungsart merken
+ 1900 s=30:c=6:gosub830:printba$:s=1:c=9:gosub830
+ 1910 input"monat (1-12)       :     {blu}";mo$:m=val(mo$)
+ 1920 : if m<1 or m>12 then printchr$(145);:goto 1910
+ 1930 print"{brn}-------------------------------"
+ 1940 print"alter stand      : {lblu}";s(m):zs(m)=s(m)
+ 1950 print"{brn}-------------------------------"
+ 1960 print"kostenart, betrag, tag  :{blu}"
+ 1970 inputd$(lv,0),su,bd$
+ 1980 print"{brn}-------------------------------"
+ 1990 ifx$="e"thens(m)=s(m)+su:goto2010
+ 2000 s(m)=s(m)-su
+ 2010 print"neuer stand      : {blu}";s(m)
+ 2020 print"{brn}-------------------------------":print
+ 2030 print"{lblu}alles richtig (j/n) ?{brn}"
+ 2040 get x$:if x$<>"j"and x$<>"n"then 2040
+ 2050 ifx$="n"thens(m)=zs(m):goto1780
+ 2090 iflen(bd$)=1 then bd$=t1$+bd$
+ 2110 :::rem *=*= tag zu datum aufbereiten       *=*= monat/tag/jahr
+ 2120 : d$(lv,2)=mo$+bd$+ja$
+ 2130 : ifba$="a"thensu=su-2*su
+ 2140 : gosub4370:rem nachkommastelle pruefen
+ 2150 : iflen(d$(lv,0))>20thend$(lv,0)=left$(d$(lv,0),20)
+ 2160 : d$(lv,1)=su$
+ 2180 print:print"{blu}weitere buchungen auf diesem konto      (j/n) ?{brn}"
+ 2190 get x$:if x$<>"j"and x$<>"n"then 2190
+ 2200 :ifx$="j"thenlv=lv+1:su=0:printchr$(147);:gosub760:goto1790
+ 2210 printchr$(147):poke211,10:poke214,11:sys58732
+ 2220 print"{lblu}ok. ich speichere !"
+ 2230 rc$=""
+ 2240 rc$=rc$+kn$+left$(bl$,20-len(kn$))
+ 2250 fori=1to12
+ 2260 : s$=str$(s(i))
+ 2270 : rc$=rc$+s$+left$(bl$,10-len(s$))
+ 2280 next i
+ 2290 print#2,"p"+chr$(2)+chr$(kn)+chr$(0)+chr$(1)
+ 2300 print#1,rc$
+ 2310 close1:close2:close3
+ 2320 :
+ 2330 rem == abspeichern der seq.datei
+ 2340 rem == daten anhaengen _ "append"
+ 2350 n$=left$(kn$(kn),12)
+ 2360 open3,8,3,j$+n$+",s,a"
+ 2370 for y=1 to lv
+ 2380 : for i=0 to 2
+ 2390 :  print#3,d$(y,i)
+ 2400 : next i
+ 2410 next y
+ 2420 close3
+ 2430 printchr$(145);:print"{red}weitere buchungen auf anderen konten    (j/n) ?{brn}"
+ 2440 get x$:if x$<>"j"and x$<>"n"then 2440
+ 2450 if x$="j" then 1750
+ 2460 return
+ 2470 rem ============================
+ 2480 rem ***  konten-uebersicht  ****
+ 2490 rem ============================
+ 2500 :
+ 2510 gosub2900:ifkn$="e"orak=0thenreturn
+ 2520 x=3:gosub4110:ifst=-128orr=21thenreturn
+ 2530 printchr$(147);:gosub760
+ 2540 print"{lblu}--------------------------------------{blu}"
+ 2550 print" nr.";kn;"- ";"{red}"kn$"{lblu}"
+ 2560 print"--------------------------------------"
+ 2570 printspc(2)"monat"spc(22)"saldo"
+ 2580 print"--------------------------------------{brn}"
+ 2590 gs=0
+ 2600 fori=1to12
+ 2610 : printspc(2)m$(i);spc(22-len(str$(int(s(i)))))"{lblu}"s(i)"{brn}"
+ 2620 : gs=gs+s(i)
+ 2630 next i
+ 2640 print"--------------------------------------"
+ 2650 printspc(2)"{red}"j$;spc(3)"{brn}gesamt"spc(18-len(str$(int(gs))))"{blu}"gs
+ 2660 printspc(27)"=========="
+ 2670 close1:close2:ifx$=chr$(133)thenprint#4:close4:goto2780
+ 2680 print"weitere uebersichten = {red}f3{blu}"
+ 2690 goto2760
+ 2700 return
+ 2720 rem ============================
+ 2730 rem =*= up ausdrucken ?     ===
+ 2740 rem ============================
+ 2760 poke214,24:poke211,0:sys58732
+ 2770 print"  ausdrucken = {red}f1{blu}   zum menue  = {red}f5{blu}";:printchr$(145);
+ 2780 : getx$:ifx$=chr$(133)goto2820
+ 2790 :  ifx$=chr$(134)andx=3goto2510
+ 2800 :ifx$=chr$(135)goto960
+ 2810 : goto2780
+ 2820 gosub250:ifst=-128thenx$="":goto2760
+ 2830 close4:open4,4:print#4,chr$(27)+chr$(108)+chr$(10):cmd4:ifx=3goto2540
+ 2840 :  ifx=5goto3420
+ 2850 :  ifx=6goto3850
+ 2860 :
+ 2870 rem ============================
+ 2880 rem ** kontennamen ausgeben  ***
+ 2890 rem ============================
+ 2900 x=4:printchr$(147);:gosub760:print
+ 2910 ifak<>0thengosub3120:return
+ 2920 gosub330:ifst=-128orr=21thenreturn
+ 2930 open1,8,2,"konten"+j$+",l,"+chr$(141)
+ 2940 open2,8,15
+ 2950 : ak=1
+ 2960 : print#2,"p"+chr$(2)+chr$(ak)+chr$(0)+chr$(1)
+ 2970 : rc$=""
+ 2980 : input*1,141,rc$:ifleft$(rc$,1)="~"thenrc$="":goto3040
+ 2990 :  input#2,r
+ 3000 :  ifr=50thenrc$="":goto3040
+ 3010 : kn$(ak)=left$(rc$,20):l%=len(str$(ak))
+ 3020 : printspc(3-l%)ak;" - ";kn$(ak)
+ 3030 : ak=ak+1:goto 2960
+ 3040 ak=ak-1:close1:close2:ifak<>0goto3060
+ 3050 printtab(6)"{red}datei "j$" nicht gefunden !{brn}":fori=0to2000:next:return
+ 3060 gosub3130:return
+ 3070 :
+ 3080 rem ** k o n t o  auswaehlen  **
+ 3090 rem ============================
+ 3110 gosub4990
+ 3120 fori=1toak:l%=len(str$(i)):printspc(3-l%)i;kn$(i):nexti
+ 3130 print:print"abbrechen mit {rvon}{red} e {rvof}{brn}"
+ 3140 input"kontonummer (1-20) : ";kn$
+ 3150 : ifkn$="e"orak=0thenreturn
+ 3160 : kn=val(kn$)
+ 3170 : ifkn<1 or kn>akthenprintchr$(145);:goto3140
+ 3180 return
+ 3200 rem ============================
+ 3210 rem ** monatsuebersicht      ***
+ 3220 rem ============================
+ 3240 printchr$(147);:gosub760:print
+ 3250 input"monat  : ";m
+ 3260 : ifm<1orm>12thenprintchr$(145);:goto3250
+ 3270 :
+ 3280 gosub330:ifst=-128orr=21thenreturn
+ 3290 open1,8,2,"konten"+j$+",l,"+chr$(141)
+ 3300 open2,8,15
+ 3310 gs=0:kn=1
+ 3320 print#2,"p"+chr$(2)+chr$(kn)+chr$(0)+chr$(1)
+ 3330 :rc$=""
+ 3340 : input*1,141,rc$:ifleft$(rc$,1)="~"thenrc$="":goto3410
+ 3350 : input#2,r
+ 3360 :  ifr=50thenrc$="":goto3410
+ 3370 : kn$(kn)=left$(rc$,20)
+ 3380 : s$(kn)=mid$(rc$,(20+(m-1)*10),10)
+ 3390 : gs=gs+val(s$(kn))
+ 3400 : kn=kn+1:goto3320
+ 3410 su=gs:gosub4370
+ 3420 printchr$(145)"---------- {red}";m$(m);" "j$" {brn}--------"
+ 3430 print"{blu}nr.   name                saldo"
+ 3440 print"{brn}----------------------------------"
+ 3450 fork=1tokn-1:l%=len(str$(k))
+ 3460 : printspc(3-l%)k;kn$(k);spc(6-len(str$(int(val(s$(k))))))"{lblu}"s$(k)"{brn}"
+ 3470 next
+ 3480 print"{brn}----------------------------------"
+ 3490 printm$(m)" "j$;spc(3)"gesamt "spc(7-(l-1))"{blu}"su$"{brn}"
+ 3500 printspc(24)"=========="
+ 3510 close1:close2:ifx$=chr$(133)thenprint#4:close4
+ 3520 goto2760
+ 3540 rem *** ====================== **
+ 3550 rem ***   jahresuebersicht     **
+ 3560 rem *** ====================== **
+ 3580 printchr$(147);:gosub760:print
+ 3590 print"  saldo  12  monate  ( j/ n ) ?":print:print
+ 3600 getx$:ifx$<>"j"andx$<>"n"goto3600
+ 3610 : ifx$="j"thenu=1:o=12:goto3660
+ 3620 print"geben sie bitte unter- und obergrenze an":input"(u,o) --> ";u,o
+ 3630 if u<1 or u>12 or o<1or o>12thenprintchr$(145)chr$(145)chr$(145);:goto3620
+ 3640 ifu>othent=u:u=o:o=t
+ 3660 gosub330:ifst=-128orr=21thenreturn
+ 3670 printchr$(147);:gosub760:print
+ 3680 open1,8,2,"konten"+j$+",l,"+chr$(141)
+ 3690 open2,8,15
+ 3700 js=0:fork=1toak:ms(k)=0:next:kn=1
+ 3710 : print#2,"p"+chr$(2)+chr$(kn)+chr$(0)+chr$(1)
+ 3720 ::input*1,141,rc$:ifleft$(rc$,1)="~"thenrc$="":goto3840
+ 3730 :  input#2,r
+ 3740 :  if r=50 then rc$="":goto 3840
+ 3750 : kn$(kn)=left$(rc$,20)
+ 3760 : form=utoo
+ 3770 :  s$(kn)=" ":s=0
+ 3780 :  s$(kn)=mid$(rc$,(20+(m-1)*10),10)
+ 3790 :  s=val(s$(kn))
+ 3800 :  ms(kn)=ms(kn)+s
+ 3810 : nextm
+ 3820 : js=js+ms(kn)
+ 3830 kn=kn+1:goto 3710
+ 3840 su=js:gosub4370
+ 3850 print"{brn}-------------- {red}"j$"{brn} --------------"
+ 3860 print"{blu}nr.  name                 saldo"
+ 3870 print"{brn}----------------------------------"
+ 3880 fork=1tokn-1:l%=len(str$(k))
+ 3890 :printspc(3-l%)k;kn$(k);spc(6-len(str$(int(ms(k)))))"{lblu}"ms(k)"{brn}"
+ 3900 next
+ 3910 print"{brn}----------------------------------"
+ 3920 print" {red}";j$;" saldo ";
+ 3930 printleft$(m$(u),3)" - "left$(m$(o),3)spc(9-(l-1))"{blu}"su$"{brn}"
+ 3940 printspc(23)"==========="
+ 3950 close1:close2:ifx$=chr$(133)thenprint#4:close4
+ 3960 goto2760
+ 3980 rem ========================== **
+ 3990 rem *** programmkopf erstellen **
+ 4000 rem ========================== **
+ 4010 printchr$(147);
+ 4020 printtab(4)"================================"
+ 4030 printtab(4)"h a u s h a l t s b u c h   "+j$
+ 4040 printtab(4)"================================"
+ 4050 print:return
+ 4070 rem *** ====================== **
+ 4080 rem **    konto einlesen       **
+ 4090 rem *** ====================== **
+ 4110 gosub330:ifst=-128orr=21thenreturn
+ 4120 printchr$(147);:gosub760:print:print
+ 4130 print:print"{lblu}konto {red}";kn$(kn);"{lblu} wird eingele-sen !{brn}"
+ 4140 open1,8,2,"konten"+j$+",l,"+chr$(141)
+ 4150 open2,8,15
+ 4160 print#2,"p"+chr$(2)+chr$(kn)+chr$(0)+chr$(1)
+ 4170 rc$=""
+ 4180 :input*1,141,rc$:ifleft$(rc$,1)="~"thenrc$="":goto4310
+ 4190 : input#2,r
+ 4200 :  if r<>50 then 4250
+ 4210 print:print"jahresdatei bzw. konto nicht gefunden !":print
+ 4220 print"weiter mit {rvof}{lgrn} taste {rvof}{brn} !";:wait 198,1:poke 198,0
+ 4230 close1:close2:return
+ 4240 :
+ 4250 kn$=left$(rc$,20)
+ 4260 gs=0
+ 4270 for i=1 to 12
+ 4280 : s(i)=val(mid$(rc$,20+(i-1)*10,10))
+ 4290 : gs=gs+s(i)
+ 4300 next i
+ 4310 return
+ 4320 :
+ 4330 rem ==============================
+ 4340 rem = up summenausgabe aufbereiten
+ 4350 rem =    <print using>-simulation
+ 4360 rem ==============================
+ 4370 su$=str$(su):a=len(su$):l=0:fort=1toa:ifmid$(su$,t,1)="."thenl=t:t=a
+ 4380 nextt
+ 4390 : ifl=0thensu$=su$+".00":l=a+1:return
+ 4400 : ifa>=l+2andsu<0thensu=su-.00001:su$=left$(str$(su),l+2):return
+ 4410 : ifa>=l+2andsu>0thensu=su+.00001:su$=left$(str$(su),l+2):return
+ 4420 : ifa=l+1thensu$=su$+"0"
+ 4430 return
+ 4440 :
+ 4450 rem ============================
+ 4460 rem ==   sonderfunktionen     ==
+ 4470 rem ==  seq.buchungsdateien   ==
+ 4480 rem ============================
+ 4490 :
+ 4500 fs$(1)="datei laden       {$a0}"
+ 4510 fs$(2)="datei sichern     {$a0}"
+ 4520 fs$(3)="buchungen ausgeben{$a0}"
+ 4530 fs$(4)="buchungen aendern {$a0}"
+ 4540 fs$(5)="buchungen sortieren"
+ 4550 fs$(0)="s-funktion beenden "
+ 4560 :
+ 4570 fb$(0)="kostenart    "
+ 4580 fb$(1)="betrag       "
+ 4590 fb$(2)="buchungsmonat"
+ 4600 :s%=0
+ 4610 gosub 3990:print
+ 4620 printtab(8)"{red}sonderfunktion":printtab(8)"-----------------"
+ 4630 printtab(8)"{blu}buchungsposten bearbeiten":print
+ 4640 printtab(5)"  {orng} <datei laden> ----> {rvon}{blu}3{rvof} - {rvon}5{rvof}"
+ 4650 printtab(5)"{blu}{rvon}2{rvof}{brn}  datei sichern":print
+ 4660 printtab(5)"{blu}{rvon}3{rvof}{brn}  buchungen ausgeben"
+ 4670 printtab(5)"{blu}{rvon}4{rvof}{brn}  buchungen aendern"
+ 4680 printtab(5)"{blu}{rvon}5{rvof}{brn}  buchungen sortieren":print:print
+ 4690 printtab(5)"{grn}0{brn}  sonderfunktion verlassen":print:print
+ 4700 :
+ 4710 printtab(8)"{red}{rvon} auswahl  0-5 {rvof}{brn} "
+ 4720 :
+ 4730 getf$:iff$="0"thenclose3:gosub4820:return:rem zum hauptmenue
+ 4740 iff$<"2"orf$>"5"then4730
+ 4750 fu=val(f$)
+ 4760 :onfugosub6300,6560,5070,6880,6030
+ 4770 goto4610
+ 4780 :
+ 4790 rem =*=*=  sonderfunktionen verlassen *=*
+ 4800 rem pruefen, ob aenderungen gesichert =*=
+ 4810 :
+ 4820 ifav=0ands%=0thenreturn
+ 4830 printchr$(147):gosub4990:print
+ 4840 ifav=0ands%=1goto4890
+ 4850 print"die datei {red}"kn$(zw)"{brn} wurde","veraendert, aber nicht gesichert !"
+ 4860 print:print"wollen sie sichern ? --->  {red}{rvon} s {rvof}{blu}"
+ 4870 print:print"zurueck zum menue  ? ---> {red}return{blu}":gosub4920:av=0:return
+ 4880 :
+ 4890 print"datei {red}"kn$(zw)"{brn} wurde","sortiert, aber noch nicht gesichert !"
+ 4900 print:print"wollen sie sichern ? --->  {red}{rvon} s {rvof}{blu}":print
+ 4910 print"zurueck zum menue  ? ---> {red}return{blu}"
+ 4920 getx$:ifx$=chr$(13)thenreturn
+ 4930 ifx$="s"thens%=0:gosub6590:return
+ 4940 goto4920
+ 4950 :
+ 4960 rem =*= ueberschrift / funktion
+ 4970 rem ============================
+ 4980 :
+ 4990 printtab(8)"{orng}UCCCCCCCCCCCCCCCCCCCCCCI"
+ 5000 printtab(8)"B ";fs$(fu);"  B"
+ 5010 printtab(8)"JCCCCCCCCCCCCCCCCCCCCCCK{brn}"
+ 5020 print:return
+ 5030 :
+ 5040 rem ============================
+ 5050 rem == buchungen ausgeben     ==
+ 5060 rem ============================
+ 5070 printchr$(147);
+ 5080 gosub4990:print:print"{blu}drucker ({rvon}{red}d{rvof}{blu}) oder bildschirm ({rvon}{red}b{rvof}{blu}) ?"
+ 5090 geta$:aa$=a$:ifa$<>"d"anda$<>"b"goto5090
+ 5100 gosub6300:ifkn$="e"orak=0thenreturn
+ 5110 ifst=-128orr=21thenreturn
+ 5120 ifa$<>"d"goto5180
+ 5130 gosub250:ifst=-128thenzw=0:return
+ 5140 close4:open4,4:print#4,chr$(27)+chr$(108)+chr$(10);
+ 5145 print#4,chr$(10);chr$(14);kn$(kn);"{$a0}";j$;chr$(10)
+ 5150 print#4,"kostenart                  betrag       datum   "
+ 5160 print#4,"------------------------------------------------":print#4
+ 5170 ifz=0thenprint#4:print#4,spc(9)d$(z,0):print#4:close4:return
+ 5180 fu=3:su=0:zz=0
+ 5190 printchr$(147);:gosub4990:print:print kn$(kn):print
+ 5200 ifz=0thenprinttab(90)"{red}"d$(z,0):fori=0to2000:next:return
+ 5210 : sb$(0)="":sb$(2)=""
+ 5220 poke211,3:poke214,13:sys58732:print"{blu}druecken sie bei nicht relevanten"
+ 5230 printtab(3)"feldern  ---->  {red}return{brn}"
+ 5240 poke214,7:print
+ 5250 : printfb$(0);:inputsb$(0)
+ 5260 : printfb$(2);:inputsb$(2)
+ 5270 ifsb$(2)<>""andval(sb$(2))<1orval(sb$(2))>12thenprintchr$(145);:goto5260
+ 5280 printchr$(147);:gosub4990:print"{red}"kn$(kn)" "j$:print"{brn}":iffu=4goto5300
+ 5290 ifsb$(0)=""andsb$(2)=""anda$<>"d"thenfory=1toz:gosub5680:nexty:goto5470
+ 5300 for y=1 to z
+ 5310 : sb=0
+ 5320 : if sb$(0)="" then sb=1:goto 5340
+ 5330 : if left$(d$(y,0),len(sb$(0)))=sb$(0) then sb=sb+1
+ 5340 : ifsb$(2)=""thensb=sb+1:goto5380
+ 5350 :::rem =*= datum 1- od. 2-stellig?
+ 5360 : iflen(d$(y,2))=5andleft$(d$(y,2),1)=sb$(2)thensb=sb+1:goto5380
+ 5370 : iflen(d$(y,2))=6andleft$(d$(y,2),2)=sb$(2)thensb=sb+1
+ 5380 :iffu=4goto5420
+ 5390 :ifa$<>"d"goto5410
+ 5400 : ifsb=2andfu=3thengosub5860:goto5440
+ 5410 : ifsb=2andfu=3thengosub5680:goto5440
+ 5420 : ifsb=2andzz>0thengosub7150:goto5440
+ 5430 : ifsb=2andzz<1thengosub7140
+ 5440 next y
+ 5450 iffu=4ore$="e"thenreturn:rem zu "aenderungen"
+ 5460 ifa$="d"thengosub5960:goto5500
+ 5470 printtab(20)"----------":printtab(10)"{lblu}summe{blu} ";:gosub4370
+ 5480 printtab(26-(l-1))su$;"{brn}"
+ 5490 zz=0
+ 5500 print:print"{red}dateiende erreicht."
+ 5510 print"suchbegriff nicht (nochmals) gefunden !":print
+ 5520 print"{blu}weitere buchungen suchen (j/n) ?"
+ 5530 : get x$: if x$<>"j" and x$<>"n" goto5530
+ 5540 ::ifx$="j"ands%<>0goto5180
+ 5550 :ifx$="n"thenclose3:return
+ 5560 printchr$(145)"{blu}gleiches konto {brn}"kn$(kn),"{blu} (j/n) ?";
+ 5570 :getx$:ifx$<>"j"andx$<>"n"goto5570
+ 5580 :ifx$="j"goto5180
+ 5590 kn=0
+ 5600 printchr$(147):gosub3110:ifkn$="e"orak=0thenreturn
+ 5610 if kn=zw then 5180: rem pruefen,
+ 5620 zw=kn:rem               ob gleiche kn wie vorher
+ 5630 close3:gosub6330:ifaa$="d"thena$=aa$:goto5140
+ 5640 goto5180
+ 5650 ::rem =*=* buchung auf bildschirm
+ 5660 ::rem ============================
+ 5670 :
+ 5680 printd$(y,0);"{blu}";
+ 5690 d=val(d$(y,1)):su=su+d
+ 5700 printtab(29-len(d$(y,1)));d$(y,1);"{brn}";
+ 5710 iflen(d$(y,2))=5 goto 5730
+ 5720 printtab(31);mid$(d$(y,2),3,2)"."left$(d$(y,2),2)"."right$(d$(y,2),2):goto5740
+ 5730 printtab(31);mid$(d$(y,2),2,2)". "left$(d$(y,2),1)"."right$(d$(y,2),2)
+ 5740 zz=zz+1
+ 5750 ify=z-1andzz>=11thenzz=0:gosub5780:goto5770
+ 5760 ifzz>14andy<z-1thenzz=0:gosub5780:rem =*= ausgeben bis 15 stueck
+ 5770 return
+ 5780 printtab(20)"----------":printtab(10);"{lblu}summe{blu} ";:gosub4370
+ 5790 printtab(26-(l-1))su$;"{brn}"
+ 5800 print:print"{lblu}weiter mit {red}{rvon} taste {rvof}";
+ 5810 : wait 198,1:poke 198,0
+ 5820 ::printchr$(147);:gosub4990:print"{red}"kn$(kn)" "j$"{brn}":print
+ 5830 return
+ 5840 : rem **  ausgabe auf drucker   **
+ 5850 : rem ============================
+ 5860 d=val(d$(y,1)):su=su+d
+ 5870 print#4,chr$(27)"d";
+ 5880 print#4,chr$(1)+chr$(34-len(d$(y,1)))+chr$(39)+chr$(0);
+ 5890 print#4,chr$(9);d$(y,0);chr$(9);d$(y,1);
+ 5900 iflen(d$(y,2))=5goto5930
+ 5910 print#4,chr$(9)mid$(d$(y,2),3,2)"."left$(d$(y,2),2)"."right$(d$(y,2),2)
+ 5920 goto5940
+ 5930 print#4,chr$(9)mid$(d$(y,2),2,2)". "left$(d$(y,2),1)"."right$(d$(y,2),2)
+ 5940 return
+ 5950 :
+ 5960 print#4,spc(25)"----------":print#4,spc(10);"{lblu}summe{blu} ";:gosub4370
+ 5970 print#4,spc(15-(l-1));su$;"{brn}":close4:a$="":return
+ 5980 :
+ 5990 rem ============================
+ 6000 rem ==   datei   sortieren    ==
+ 6010 rem ============================
+ 6020 :
+ 6030 gosub6300:ifkn$="e"orak=0thenreturn
+ 6040 ifst=-128orr=21thenreturn
+ 6050 n=z:fu=5:printchr$(147):gosub4990
+ 6060 ifz=0thenprint:printtab(10)"{red}"d$(z,0):fori=0to2000:next:return
+ 6070 for i=0 to 2
+ 6080 ::printtab(8)"{rvon}{red}"i+1"{rvof}{brn}  "fb$(i)
+ 6090 nexti:print:s%=0
+ 6100 printtab(4)"{blu}wonach soll sortiert werden ?"
+ 6110 printtab(4)"geben sie bitte die nummer an !":print
+ 6120 printtab(4)"zurueck zum menue --> {red}return{blu} !"
+ 6130 getx$:ifx$=chr$(13)thenreturn
+ 6140 ifx$<"1"orx$>"3"goto6130
+ 6150 x=val(x$)-1:print
+ 6160 printtab(4)"ich sortiere, bitte warten sie !":s%=1:rem kennz. datei sort.
+ 6170 ifx=0thengosub600:goto6190
+ 6180 gosub420
+ 6190 printtab(4)"{blu}datei {red}"kn$(kn)"{blu} wurde",tab(4)"nach {red}",fb$(x)"{blu} sortiert !"
+ 6200 print:printtab(4)"buchungsposten ausgeben (j/n) ?"
+ 6210 :getx$:ifx$<>"j"andx$<>"n"goto6210
+ 6220 :ifx$="j"thengosub5180
+ 6230 :fu=5:gosub4820
+ 6240 return
+ 6250 :
+ 6260 rem ============================
+ 6270 rem ==   datei   laden        ==
+ 6280 rem ============================
+ 6290 :
+ 6300 gosub2900:ifkn$="e"orak=0thenreturn
+ 6310 ifkn=zwthenreturn:rem      pruefen,
+ 6320 ifs%<>0orav<>0thengosub4820:s%=0:rem ob gleiche kn wie vorher
+ 6330 zw=kn:n$=left$(kn$(kn),12)
+ 6340 printchr$(147):fu=1:gosub 4990
+ 6350 print:print:print"{blu}datei {red}"kn$(kn) "{blu}wird geladen !"
+ 6360 gosub330:ifst=-128orr=21thenreturn
+ 6370 open2,8,15
+ 6380 open3,8,3,j$+n$+",s,r"
+ 6390 input#2,r:ifr<>62goto6410
+ 6400 ::print"datei nicht gefunden !":close2:close3:fort=0to3000:next:return
+ 6410 z=0:input#3,d$(z,0),d$(z,1):ifst=64thenclose3:close2:return
+ 6420 close3
+ 6430 open3,8,3,j$+n$+",s,r"
+ 6440 input#3,d$(0,0)
+ 6450 z=1
+ 6460 :
+ 6470 ::input#3,d$(z,0),d$(z,1),d$(z,2)
+ 6480 :
+ 6490 if st<>64 then z=z+1:goto 6460
+ 6500 close3:close2:return
+ 6510 :
+ 6520 rem ============================
+ 6530 rem ==   datei sichern        ==
+ 6540 rem ============================
+ 6550 :
+ 6560 ifz>0goto6590
+ 6570 poke214,23:poke211,8:sys58732:print"keine daten im rechner"
+ 6580 :forx=0to2000:next:return
+ 6590 printchr$(147);:fu=2:gosub4990
+ 6600 print:print"{blu}diskette eingelegt ?":print
+ 6610 print"{brn}druecken sie anschliessend {red}{rvon} s {rvof}{blu}":print:fori=0to800:next
+ 6620 print:print"wollen sie die geaenderte datei ",kn$(zw)" nicht sichern  ?"
+ 6630 print"dann menue   --->   {red}return{blu}"
+ 6640 getx$:ifx$<>"s"andx$<>chr$(13)goto6640
+ 6650 : ifx$=chr$(13)thenreturn
+ 6660 gosub330:ifst=-128orr=21thenreturn
+ 6670 print:print"buchungsdatei {red}"kn$(zw)"{blu} wird","gesichert !"
+ 6680 n$=left$(kn$(zw),12)
+ 6690 close3:open3,8,15,"s:"+j$+n$
+ 6700 close3:open3,8,3,j$+n$+",s,w"
+ 6710 : print#3,d$(0,0)
+ 6720 : for y=1 to z
+ 6730 :   for i=0 to 2
+ 6740 :     print#3,d$(y,i)
+ 6750 :   next i
+ 6760 : next y
+ 6770 close3
+ 6780 print:av=0:s%=0
+ 6790 print"buchungsdatei {red}"kn$(zw)"{blu} ist  gesichert !":print
+ 6800 print:print"weiter mit {red}taste{blu} !"
+ 6810 wait 198,1:poke 198,0
+ 6820 return
+ 6830 :
+ 6840 rem ============================
+ 6850 rem == buchungen aendern      ==
+ 6860 rem ============================
+ 6870 :
+ 6880 gosub6300:ifkn$="e"orak=0thenreturn
+ 6890 ifst=-128orr=21thenreturn
+ 6900 printchr$(147):fu=4:gosub 4990
+ 6910 ifz=0thenprint:printtab(9)"{red}"d$(z,0):fori=0to2000:next:return
+ 6920 zz=0:zs=10:av=0:print
+ 6930 print"{blu}wenn sie gezielt buchungpositionen oder monate aendern wollen,";
+ 6940 print" geben sie bitte"," {red}{rvon}e{blu}{rvof}  ein."
+ 6950 print:print"{red}return{lblu} listet die datei vollstaendig           auf !"
+ 6960 gete$:ife$<>"e"ande$<>chr$(13)goto6960
+ 6970 ife$="e"thengosub5190:goto7060
+ 6980 :
+ 6990 rem =*= alle pos. auflisten =*=
+ 7000 rem ===========================
+ 7010 printchr$(147);:gosub 4990
+ 7020 gosub 7780
+ 7030 for y=1 to z
+ 7040 :   gosub 7150
+ 7050 next y
+ 7060 print:print"{blu}dateiende erreicht !"
+ 7070 ife$=chr$(13)then7280
+ 7080 ifzz<>0ande$="e"thene$="":goto7280
+ 7090 :::fori=1to2000:next
+ 7100 return
+ 7110 :
+ 7120 rem =*= ausgabe auf bildschirm ==
+ 7130 rem ===-----------------------===
+ 7140 gosub7780:rem bei einzel-selekt.
+ 7150 ify<11ande$<>"e"thenprintspc(3-len(str$(y)))"{red}"y"{brn}"d$(y,0)"{blu}";:goto7170
+ 7160 printspc(4-len(str$(y)))"{red}"y"{brn}"d$(y,0)"{blu}";
+ 7170 printtab(30-len(d$(y,1)));d$(y,1)"{orng}";
+ 7180 iflen(d$(y,2))=5goto7210
+ 7190 printtab(31);mid$(d$(y,2),3,2)"."left$(d$(y,2),2)"."right$(d$(y,2),2)
+ 7200 goto7220
+ 7210 printtab(31);mid$(d$(y,2),2,2)". "left$(d$(y,2),1)"."right$(d$(y,2),2)
+ 7220 zz=zz+1
+ 7230 :ifzz=zsandzz<zthenzs=zs+10:gosub7280
+ 7240 return
+ 7250 :
+ 7260 rem =*= aenderungsabfrage =*=
+ 7270 :
+ 7280 print:print"{red}aenderungen (j/n) ?"
+ 7290 : get x$:if x$<>"j"and x$<>"n" then 7290
+ 7300 : if x$="n"and y<z then printchr$(147):gosub 4990:gosub 7780:return
+ 7310 : ifx$="n"andy>=zandav=1thengosub6590:return:rem aend.sichern
+ 7320 : ifx$="n"andy>=zandav=0thenreturn:rem keine aenderung-->menue
+ 7330 :printchr$(145)"                                       ":rem 39 x leert.
+ 7340 :
+ 7350 rem =*= aenderung         =*=
+ 7360 rem =========================
+ 7370 c=17:s=0:gosub830
+ 7380 print"{lblu}geben sie bitte die zu aendernde posi-  tion ein (zeile, spalte) !"
+ 7390 :inputa,b:b=b-1:ifb<>0andb<>2goto7370
+ 7400 : ifa<1ora>ygoto7370
+ 7410 : ify-1=zanda>y-1orb>2orb<0thenc=17:s=0:gosub830:goto7380
+ 7420 : ifb<>2goto7470
+ 7430 : iflen(d$(a,2))=5goto7460
+ 7440 : printtab(2);mid$(d$(a,2),3,2)"."left$(d$(a,2),2)"."right$(d$(a,2),2)
+ 7450 : goto7480
+ 7460 : printtab(2);mid$(d$(a,2),2,2)". "left$(d$(a,2),1)"."right$(d$(a,2),2)
+ 7470 ifb<>2thenprint"{brn}  ";d$(a,b)
+ 7480 print:print"bitte aendern sie !                    ":av=1
+ 7490 c=20:s=0:gosub830
+ 7500 :
+ 7510 inputd$(a,b):print"  {red}"d$(a,b):iflen(d$(a,b))>20thend$(a,b)=left$(d$(a,b),20)
+ 7520 ifb<>2goto7590:rem datum pruefen
+ 7530 ifmid$(d$(a,2),3,1)="."andmid$(d$(a,2),6,1)="."goto7570
+ 7540 ifmid$(d$(a,2),2,1)="."andmid$(d$(a,2),4,1)="."thengosub7710:goto7590
+ 7550 ifmid$(d$(a,2),2,1)="."andmid$(d$(a,2),5,1)="."thengosub7720:goto7590
+ 7560 ifmid$(d$(a,2),3,1)="."andmid$(d$(a,2),5,1)="."thengosub7730:goto7590
+ 7570 d$(a,2)=mid$(d$(a,2),4,2)+left$(d$(a,2),2)+right$(d$(a,2),2)
+ 7580 :
+ 7590 print" weitere aenderungen (j/n) ?"
+ 7600 : getx$:if x$<>"j"and x$<>"n"then 7600
+ 7610 ::ifx$="n"andy<zthenprintchr$(147):gosub4990:gosub7780:return
+ 7620 :ifx$="n"andy>=zandav=1thengosub6590:return:rem aend.sichern
+ 7630 c=19:s=1:gosub830
+ 7640 print"{blu}        "
+ 7650 print"                                       ":rem 39 x leertaste
+ 7660 print"                                       "
+ 7670 c=17:s=0:gosub830
+ 7680 goto7380
+ 7690 :
+ 7700 rem =*= datum aufbereiten mmttjj *
+ 7710 d$(a,2)=mid$(d$(a,2),3,1)+"0"+left$(d$(a,2),1)+right$(d$(a,2),2):return
+ 7720 d$(a,2)=mid$(d$(a,2),3,2)+"0"+left$(d$(a,2),1)+right$(d$(a,2),2):return
+ 7730 d$(a,2)=mid$(d$(a,2),4,1)+left$(d$(a,2),2)+right$(d$(a,2),2):return
+ 7740 :
+ 7750 rem =*= spalten-beschriftung =*=
+ 7760 rem ===========================
+ 7770 :
+ 7780 printtab(5)"{red}1";tab(26)"2";tab(33)"3":print:return
+ 7790 :
+ 7800 rem ==============================
+ 7810 rem ** datas fuer input-modifikat.
+ 7820 rem ==============================
+ 7830 fori=828to922
+ 7840 readx:pokei,x:s=s+x:nexti
+ 7850 data169,71,160,3,141,8,3,140,9,3,96,32
+ 7860 data115,0,201,133,240,6,32,121,0,76,231,167
+ 7870 data32,115,0,201,172,240,6,32,191,171,76,174
+ 7880 data167,32,155,183,32,30,225,32,253,174,32,158
+ 7890 data183,138,72,32,253,174,32,139,176,133,73,132
+ 7900 data74,32,163,182,104,32,117,180,160,2,185,97
+ 7910 data0,145,73,136,16,248,200,32,18,225,145,98
+ 7920 data200,196,97,208,246,32,204,255,76,174,167
+ 7930 ifs<>11096thenprint"fehler in datas!!":end
+ 7940 sys828:return
+ 7945 rem ==============================
+ 7950 rem * swap - funktion simulieren *
+ 7960 rem ==============================
+ 7970 rem syntax:sys715(string1,string2)
+ 7980 rem ==============================
+ 7990 data 32,250,174,32,158,173,32,143,173,165,100,133,247,165,101,133
+ 8000 data248,32,253,174,32,158,173,32,143,173,160,0,177,247,133,249
+ 8010 data177,100,145,247,165,249,145,100,200,192,3,208,239,32,247,174,96
+ 8030 sa=715:se=sa+48:fori=satose:readx:pokei,x:cs=cs+x:next
+ 8040 ifcs<>7314thenprint"fehler in data's":end
+ 8050 return
+

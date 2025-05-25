@@ -1,0 +1,108 @@
+;logik-2.prg ==0801==
+    1 rem *********************************
+    2 rem *                               *
+    3 rem *     logische  operationen     *
+    4 rem *                               *
+    5 rem * zum verfolgen im binaerformat *
+    6 rem *        not,and,or,eor         *
+    7 rem *                               *
+    8 rem *  heimo ponnath  hamburg 1985  *
+    9 rem *                               *
+   10 rem*********************************
+   15 printchr$(147):goto200
+   20 rem ***** up-cursor setzen *****
+   25 poke211,s:poke214,z:sys58640:return
+   30 rem ***** up-eingabetest *******
+   35 e=abs(e):a=(e>=0):b=(e<255)
+   40 ifaandbthenm=8:return
+   45 a=(e>=255):b=(e<32768)
+   50 ifaandbthenm=16:return
+   55 m=0:return
+   60 rem ***** up-eingabe 1 *********
+   65 s=1:z=5:gosub25:printchr$(28)"welche zahl solls denn sein?"
+   70 z=7:gosub25:print"sie muss zwischen -32767und +32767 sein"
+   75 z=9:gosub25:inputw:e=w:gosub35:ifm=0thenpoke781,9:sys59903:goto75
+   80 printchr$(30):return
+   85 rem ***** up-eingabe 2 *********
+   90 s=1:z=5:gosub25:printchr$(28)"geben sie nun die beiden zahlen ein."
+   95 s=1:z=7:gosub25:print"sie muessen zw. -32767 u. +32767 sein!"
+  100 z=9:gosub25:input"erste zahl =";w1:e=w1:gosub35:m1=m
+  105 ifm=0thenpoke781,9:sys59903:goto100
+  110 z=11:gosub25:input"zweite zahl=";w2:e=w2:gosub35
+  115 ifm=0thenpoke781,11:sys59903:goto110
+  120 m=16+8*((m1=8)and(m=8)):printchr$(30):return
+  125 rem **** up-umrechnung dez/bin ****
+  130 bi$="":di=de
+  135 di=di/2:d$="0":ifdi<>int(di)thend$="1"
+  140 di=int(di):bi$=d$+bi$:ifdi>0then135
+  145 iflen(bi$)<mthenbi$="0"+bi$:goto145
+  150 return
+  155 rem **** up-umrechnung bin/dez ****
+  160 de=0:fori=1tom:ifmid$(a$,i,1)="1"thende=de+2^(m-i)
+  165 nexti:return
+  170 rem **** up-bildschirmausgabe *****
+  175 printchr$(158)tab(5)de;tab(32-m)bi$;chr$(30):return
+  198 rem
+  199 rem **** hauptprogramm-variable ***
+  200 s=0:z=0:e=0:a=0:b=0:m=0:w=0:w1=0:w2=0:m1=0:i=0:k=0:x=0
+  205 di=0:de=0:c=0:v=0
+  210 bi$="":d$="":a$="":b$="":c$="":z$="-----------------":be$=""
+  220 dimde(3),bi$(3)
+  299 rem **** hauptprogramm-menue ******
+  300 poke53280,0:poke53281,0:printchr$(147)chr$(30)
+  305 z=3:s=2:gosub25:printchr$(18)" die logischen befehle in binaerform "
+  310 z=7:gosub25:printtab(10)"not"tab(25)"1"
+  315 z=9:gosub25:printtab(10)"and"tab(25)"2"
+  320 z=11:gosub25:printtab(10)"or"tab(25)"3"
+  325 z=13:gosub25:printtab(10)"eor"tab(25)"4"
+  330 z=15:gosub25:printtab(10)"programmende"tab(25)"5"
+  335 poke646,10:z=20:gosub25:print"bitte waehlen sie einen menuepunkt..."chr$(30)
+  340 getb$:ifb$<"1"orb$>"5"then340
+  345 onval(b$)gosub400,500,600,700,800
+  350 z=23:s=1:gosub25:printchr$(3)"weiter durch tastendruck..."
+  355 poke198,0:wait198,1:goto300
+  399 rem **** option - not ***********
+  400 printchr$(147):z=2:s=1:gosub25:printchr$(18)" option  not      "chr$(146)
+  405 bi$="":be$="":d$="":w=0:de=0:k=0:gosub65:ifw<0then450
+  410 de=w:gosub130
+  412 z=15:s=0:gosub25:gosub175:printtab(15)z$+" not":be$=""
+  415 fori=1tom:d$=mid$(bi$,i,1):ifd$="1"thend$="0":goto420
+  417 d$="1"
+  420 be$=be$+d$:nexti:ifk=1thenreturn
+  425 bi$=be$:a$=be$:gosub160:z=17:s=0:gosub25:gosub175:be$="":return
+  440 rem **** up-negative binaerzahl ***
+  450 w=notw:de=w:gosub130:k=1:gosub415:a$=be$:gosub160:k=0:ifx=1thenreturn
+  455 bi$=be$:be$="":goto412
+  499 rem **** option - and ***********
+  500 printchr$(147):z=2:s=1:gosub25:printchr$(18)" option  and      "chr$(146)
+  502 rem **** up-eingabenverarbeitung **
+  505 gosub90:ifw1<0thenw=w1:x=1:gosub450:x=0:bi$(1)=be$:de(1)=de:be$="":de=0
+  510 ifw2<0thenw=w2:x=1:gosub450:x=0:bi$(2)=be$:de(2)=de:be$="":de=0
+  515 ifw1>=0thende=w1:gosub130:de(1)=de:bi$(1)=bi$:de=0:bi$=""
+  520 ifw2>=0thende=w2:gosub130:de(2)=de:bi$(2)=bi$:de=0:bi$=""
+  525 z=15:s=0:gosub25:de=de(1):bi$=bi$(1):gosub175
+  530 z=16:gosub25:de=de(2):bi$=bi$(2):gosub175:ifv=1thenreturn
+  532 printtab(15)z$+" and":bi$(3)=""
+  535 fori=1tom:a=val(mid$(bi$(1),i,1)):b=val(mid$(bi$(2),i,1)):c=aandb
+  540 bi$(3)=bi$(3)+right$(str$(c),1):nexti:a$=bi$(3):gosub160:bi$=bi$(3)
+  545 z=18:gosub25:gosub175:return
+  599 rem **** option - or ************
+  600 printchr$(147):z=2:s=1:gosub25:printchr$(18)" option   or      "chr$(146)
+  605 v=1:gosub505:v=0
+  610 printtab(15)z$+" or":bi$(3)=""
+  615 fori=1tom:a=val(mid$(bi$(1),i,1)):b=val(mid$(bi$(2),i,1)):c=aorb
+  620 bi$(3)=bi$(3)+right$(str$(c),1):nexti:a$=bi$(3):gosub160:bi$=bi$(3)
+  625 z=18:gosub25:gosub175:return
+  699 rem **** option - eor ***********
+  700 printchr$(147):z=2:s=1:gosub25:printchr$(18)" option  eor      "chr$(146)
+  705 v=1:gosub505:v=0
+  710 printtab(15)z$+" eor":bi$(3)=""
+  715 fori=1tom:a=val(mid$(bi$(1),i,1)):b=val(mid$(bi$(2),i,1))
+  720 ifa+b=1thenc=1:goto730
+  725 c=0
+  730 bi$(3)=bi$(3)+right$(str$(c),1):nexti:a$=bi$(3):gosub160:bi$=bi$(3)
+  735 z=18:gosub25:gosub175:return
+  799 rem **** option-programmende ****
+  800 printchr$(147):s=8:z=12:gosub25:print"das war's...tschuess !"
+  805 z=22:s=0:gosub25:end
+

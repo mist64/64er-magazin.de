@@ -1,0 +1,51 @@
+;cent.listing4.prg ==0801==
+   10 goto 90
+   20 rem hex -> dez
+   30 sa$=right$("    "+sa$,4)
+   40 sa=0:fori=1tolen(sa$):s0=asc(mid$(sa$,i,1)):sa=16*sa+s0-48+(s0>64)*7:next
+   50 return
+   60 rem adresse -> low,high
+   70 sh=int(s4/256):sl=s4-256*sh
+   80 return
+   90 printchr$(14);"{clr}{down}{down}       c-64 Parallel Programm"
+  100 print"       ----------------------"
+  110 print:
+  120 input "Startadresse: ";sa$:sa=val(sa$)
+  130 if left$(sa$,1)="$"thengosub30
+  140 read en
+  150 for i=1 to en
+  160 read a,b:if sa+187>=a and sa<=b thenrun
+  170 next
+  180 print:print"Einlesen des MC-Programmes":print
+  190 s1=sa+58:s2=sa+122:s3=sa+37
+  200 for i = sa to sa+187
+  210 read da
+  220 pokei,da
+  230 next i
+  240 s4=s2 : gosub 70
+  250 poke sa+2,sh:pokesa+4,sl
+  260 s4=s1 :gosub 70
+  270 poke sa+12,sh:pokesa+14,sl
+  272 s4=s3 :gosub70
+  274 poke sa+28,sl:poke sa+29,sh
+  280 print:print"Wiedereinschalten nach 'STOP/RESTORE'"
+  290 print:print"mit      'sys ";sa;"'"
+  300 sys sa
+  310 end
+  320 rem" gesperrte Bereiche
+  330 data 4
+  340 data 0,827,1023,2039,40960,49151,53248,65535
+  350 rem maschinenprogramm
+  360 data120,169,192,160,122,141, 33,  3,140, 32,  3,169,192,160, 58,141
+  370 data 39,  3,140, 38,  3, 88, 32,204,255,160, 20,185, 37,192, 32,210
+  380 data255,136, 16,247, 96, 13, 86, 73, 84, 75, 65, 32, 84, 82, 79, 80
+  390 data 45, 76, 69, 76, 76, 65, 82, 65, 80, 13, 72,165,154,201,  4,240
+  400 data  3, 76,205,241,173, 13,221,165,  2, 41,  1,240, 16,104,201, 64
+  410 data144, 10,201,192,144,  4, 41,127,208,  2,  9, 32, 72,104,141,  1
+  420 data221,173,  0,221, 41,251,141,  0,221,234,234,234,  9,  4,141,  0
+  430 data221,173, 13,221, 41, 16,240,249, 24, 96, 32, 15,243,240,  3, 76
+  440 data  1,247, 32, 31,243,165,186,201,  4,240,  3, 76, 91,242,165,  2
+  450 data 41,254,133,  2,165,185, 41,  7,201,  7,208,  6,169,  1,  5,  2
+  460 data133,  2,169,255,141,  3,221,169,  4, 13,  0,221,141,  0,221,169
+  470 data  4, 13,  2,221,141,  2,221,169,  4, 76,117,242
+
