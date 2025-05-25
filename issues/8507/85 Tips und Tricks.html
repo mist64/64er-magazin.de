@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>Tips und Tricks</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="Andreas Scharrer, Günter Büntemeyer, Henning Zipf, Klaus Holthausen, Thomas Hahn, Werner Weigelt">
+    <meta name="64er.issue" content="7/85">
+    <meta name="64er.pages" content="85-86">
+    <!-- <meta name="64er.toc_category" content="XXX"> -->
+    <!-- <meta name="64er.toc_title" content="XXX"> -->
+    <meta name="64er.id" content="XXX">
+</head>
+
+<body>
+    <article>
+        <h1>Tips und Tricks</h1>
+        <h2>VC 20-Steckmodule auf Diskette</h2>
+
+        <p>Wer ein Programmierhilfe-Modul wie zum Beispiel den »Super-Expander« und gleichzeitig eine 64-KByte-8peichererweiterung besitzt, der steht vor dem Problem, daß immer nur eines von beiden Modulen eingesetzt werden kann. Man hat also die Wahl zwischen erweitertem Speicher und komfortabler Programmierung.</p>
+
+        <p>Doch das muß nicht so sein. Wenn Sie ein Diskettenlaufwerk zur Verfügung haben, dann können Sie das Modul einfach auf Diskette abspeichern und bei Bedarf in den Steckmodulbereich ($A000 bis $BFFF) der 64-KByte-Erweiterung laden. Gehen Sie dabei wie folgt vor:</p>
+
+        <p>Bei eingesteckter Supererweiterung wird zunächst der Basic-Anfang durch
+            POKE 43,0:POKE 44,160
+            auf $A000, also auf den Steckmodulanfang, gesetzt. Nun wird noch der Zeiger auf das Basic-Ende verbogen:
+            POKE 45,0:POKE 46,192</p>
+
+        <p>Das Modul kann jetzt mit »SAVE ”»Name”,8« auf Diskette gespeichert werden. Bei Bedarf kann es jederzeit wieder mit »LOAD ”Name”,8,1« geladen werden, vorausgesetzt natürlich, man hat RAM im Bereich $A000 bis $BFFF zur Verfügung. Die Supererweiterung wird mit »SYS 64802« eingeschaltet und meldet sich dann mit 28023 freien Speicherbytes. Ausgeschaltet werden kann sie mit »SYS 64818«.</p>
+
+        <p>Natürlich ist das Laden von Diskette umständlicher, als gleich mit dem Steckmodul zu arbeiten. Der große Vorteil liegt aber darin, daß man jetzt über die Befehle der Supererweiterung und gleichzeitig den vollen Speicherausbau verfügt.</p>
+
+        <p>Es muß noch darauf hingewiesen werden, daß sich Spielemodule mit dieser Methode in der Regel nicht kopieren lassen, da sie erstens mit einem Autostart versehen sind und zweitens zusätzliche Schutzmaßnahmen eingebaut haben. Die hier beschriebene Methode funktioniert nur zusammen mit einer Diskettenstation, da das Betriebssystem des VC 20 sich weigert, den Steckmodulbereich auf Kassette abzuspeichern.</p>
+
+        <address class="author">(Günter Büntemeyer)</address>
+
+        <h2>Es muß nicht immer »READY.« sein &hellip;</h2>
+
+        <p>Wenn Sie sich darüber ärgern, daß der C 64 nach jedem ausgeführten Befehl sein stupides »READY.« auf den Bildschirm schreibt, dann geben Sie doch die beiden folgenden Zeilen im Direktmodus ein:
+            FOR I = 40960 TO 49151 : POKE I,PEEK(I) : NEXT : POKE 1,54 : REM Basic-Interpreter ins RAM laden
+            FOR I=41848 TO 41853 : POKE I,32 : NEXT : REM READY-Meldung überschreiben</p>
+
+        <p>Wenn Sie jetzt irgendeinen Befehl eingeben, erscheint kein »READY.« mehr. Natürlich können Sie aber auch einfach den Text ändern:
+            A$=&ldquo;HALLO.&rdquo; : FOR I = 1 TO 6 : POKE 41847 + I,ASC(MID$ (A$,I,1)) : NEXT</p>
+
+        <p>Nach Eingabe dieser Zeile meldet sich der Interpreter nach jeder Eingabe mit »HALLO.«. Sie können jeden beliebigen Text wählen, vorausgesetzt, er ist maximal sechs Zeichen lang.</p>
+
+        <address class="author">(Andreas Scharrer)</address>
+
+        <h2>Simons Basic und TurboTape</h2>
+
+        <p>Das langsame Laden von der Datasette ist ein gravierender Nachteil von Simons Basic, der sich aber mit »Turbo Tape« beheben läßt. Nun überschneiden sich zwar Simons Basic und Turbo-Tape in bestimmten Speicherbereichen und bei der Zeropage-Belegung, aber das läßt sich mit wenig Aufwand beheben. Wer sich an die folgenden Anweisungen hält, wird künftig auch bei Simons Basic im Turbo-Tape-Modus laden und abspeichern können. Die Anweisungen gelten für alle Turbo-Tape-Versionen, die einen Basic-Kopf haben und über »SYS 50000« reaktiviert werden können. Die Anfangsadresse des ungekürzten Turbo-Tape ist A=3032. Bei anderen Anfangsadressen sollte der entsprechende Wert im Umschreibeprogramm verwendet werden.
+            (1) Umschreiben von Turbo-Tape
+            Durch folgende Manipulationen wird Turbo-Tape in einen anderen Speicherbereich verlegt:
+            — Simons Basic laden und starten.
+            — Turbo-Tape laden ohne zu starten.
+            — Eingabe der folgenden Zeilen im Direktmodus:
+            A=3032 : B=PEEK(45) + 256 \* PEEK(46) : D=0 : DIM A(100)
+            FORX=ATOB:C = PEEK(X): IFC>19ANDC&lt;198THEN D=D+1 : A(D)=X : NEXT : ELSE : NEXT
+            H = 141 : G = 169
+            FOR X=1 TO D : C=A(X): F=PEEK(C-2): IF F=32 OR F=H OR PEEK(C-1)=GTHEN POKE C,PEEK&copy;-96: NEXT:ELSE : NEXT
+            — Turbo-Tape ist jetzt fertig umgeschrieben und sollte zunächst abgespeichert werden.
+            (2) Der Umgang mit Simons Turbo-Tape
+            — Erst Simons Basic, dann das umgeschriebene Turbo-Tape laden und starten.
+            — Um mit Simons Basic normal arbeiten zu können, muß es mit »SYS 32778« reaktiviert werden. Ein eventuell vorhandenes Programm erhält man mit dem Befehl »OLD« zurück.
+            — Zum Laden oder Abspeichern von Programmen wird TurboTape mit »SYS 25424« aktiviert.
+            — Simons Basic und Turbo-Tape werden also je nach Bedarf wechselseitig eingeschaltet.
+            — Der Basic-Speicher sollte auf $6000 eingegrenzt werden, damit Turbo-Tape nicht überschrieben wird.</p>
+
+        <p>Wenn man sich genau an diese Hinweise hält, dann steht einem Arbeiten mit Turbo-Tape auch bei Simons Basic nichts mehr im Wege. Es gibt mittlerweile auch neue Versionen von Turbo-Tape und Simons Basic, die problemlos von Anfang an zusammenarbeiten.</p>
+
+        <address class="author">(Klaus Holthausen)</address>
+
+        <h2>Tips für VC 20 und Datasette</h2>
+
+        <p>POKE 37148,252 Datasetten-Motor einschalten
+            POKE 37148,254 Datasetten-Motor ausschalten
+            WAIT 37148,2,2 Wartet auf Drücken einer Datasetten-Taste
+            WAIT 37151,64 Wartet, bis »Play«-Taste ausrastet</p>
+
+        <address class="author">(Thomas Hahn)</address>
+
+        <h2>Textomat mit Centronics-Drucker</h2>
+
+        <p>Mit wenig Aufwand und zudem sehr preiswert ist es möglich, das Textverarbeitungsprogramm »Textomat« von Data-Becker ohne teures Hardware-Interface an einen Centronics-Drucker (zum Beispiel Epson RX) anzuschließen.</p>
+
+        <p>Als Software-Schnittstelle wird dabei das Treiberprogramm von Arnd Wängler und Thomas Krätzig aus der Ausgabe 6/84 des 64’er-Magazins verwendet und das dazugehörige, im gleichen Artikel beschriebene User-Port-Kabel, das ein paar Mark in Anspruch nimmt.</p>
+
+        <p>Die Aufgabe besteht nun darin, Textomat irgendwie an diese Schnittstelle anzupassen. Zur Datenübertragung mit dem Wängler/Krätzig-Interface muß ein Druckerfile zur Geräteadresse 4 geöffnet werden, das keine Sekundäradresse oder allenfalls die Sekundäradresse 128 enthalten darf. Da Textomat aber nur Sekundäradressen zwischen 1 und 14 zuläßt, muß die Anpassung extern erfolgen. Dabei behilft man sich mit einem kleinen Trick:</p>
+
+        <p>Mit dem Druckermenü des Textomat wird ein Druckerprogramm zu einer anderen Sekundäradresse erstellt und auf Diskette abgelegt.</p>
+
+        <p>Dieses »Programm« wird nach Aus- und Wiedereinschalten des C 64 wie ein normales Basic-Programm mit »LOAD ”Drucker”,8« geladen. Der LIST-Befehl darf aber auf keinen Fall verwendet werden, da es sich um kein eigentliches Programm handelt. Statt dessen gibt man nach dem Laden »POKE 2048+255,128« ein, wodurch die Sekundäradresse auf 128 geändert wird. Anschließend wird das so geänderte Drucker-File mit »SAVE ”:Drucker”,8« wieder auf die Diskette zurückgeschrieben. Die für den Epson-Drucker erforderliche Anpassung der Commodore-Zeichen an den Standard-ASCII-Zeichensatz kann über die Druckeranpassung des Textomat erfolgen.</p>
+
+        <p>Um nun mit Textomat und dem Centronics-Treiber zu arbeiten, muß stets als erstes das Treiberprogramm aus der Ausgabe 6/84 geladen und mit »SYS 724« initialisiert werden. Dann lädt man das Textomat-Hauptprogramm mit »LOAD ’T.OBJ”,8,1« und startet es mit »SYS 4108«. An diesen SYS-Befehl sollte man sich beizeiten gewöhnen, da der normale Start mit SYS 4096 den Kopierschutz aktiviert, der das Directory jeder »unbefugten« Diskette löscht.</p>
+
+        <p>Der Centronics-Drucker kann jetzt wie ein Commodore-Drucker angesprochen werden, nachdem die ASCII-Anpassung und die Anpassung der Steuerzeichen vorgenommen wurde.</p>
+
+        <p>Zu bemerken wäre noch, daß diese Vorgehensweise mit der 83’er Textomat-Version erprobt wurde und das Funktionieren mit neueren Versionen nicht garantiert ist.</p>
+
+        <address class="author">(Werner Weigelt)</address>
+
+        <h2>POKEs für den VC 20</h2>
+
+        <p>POKE 199,1 Wirkung wie RVS ON
+            POKE 199,0 Wirkung wie RVS OFF
+            POKE 214,X Setzt Cursor um X Stellen nach unten
+            POKE 774,0 Listschutz (Listet nur Zeilennummern)
+            POKE 774,27 Listschutz (Listet nur Unsinn)
+            POKE 774,26 Listschutz aus
+            POKE 775,1 Listschutz (VC 20 stürzt ab)
+            POKE 775,200 Listschutz (»Error« nach erster Zeile)
+            POKE 775,199 LIST wieder normal
+            POKE 776,221 Verweigert Befehlsausführung
+            POKE 777,1 Cursor »HOME« nach jedem Befehl
+            POKE 777,199 Hebt vorherigen POKE wieder auf
+            POKE 788,194 RUN/STOP-Taste abschalten
+            POKE 788,191 RUN/STOP-Taste wieder in Betrieb
+            POKE 792,2 RESTORE-Taste abschalten
+            POKE 792,173 RESTORE-Taste wieder in Betrieb
+            POKE 808,128 RUN/STOP und RESTORE abschalten
+            POKE 808,112 RUN/STOP und RESTORE wieder in Betrieb
+            POKE 36864,X Horizontale Bildschirmzentrierung (X=0-59)
+            POKE 36865,X Vertikale Bildschirmzentrierung (X=0-156)
+            POKE 36866,X Anzahl Bildschirmspalten (X=128 + Spalten)
+            POKE 36867,X Anzahl Bildschirmzeilen (X=2-46)
+            POKE 36869,242 Umschalten auf Kleinschriftmodus
+            POKE 36869,240 Umschalten auf Großschrift/Grafik
+            POKE 37148,251 Datasettenmotoraus
+            POKE 37148,252 Datasettenmotor ein
+            POKE 37150,2 Setzt RESTORE-Taste außer Betrieb
+            POKE 37150,130 Setzt RESTORE-Taste wieder in Betrieb (Herbert Lickes)</p>
+
+        <h2>Reset-Helfer für C 64</h2>
+
+        <p>Das Betriebssystem des C 64 enthält ab der Adresse $FD02 ein Unterprogramm, das im Steckmodulbereich ab $8000 nach der Zeichenfolge »CBM80« sucht. Nach dem Einschalten des Computers oder nach einem Reset wird dieses Unterprogramm jedesmal aufgerufen. Werden ab der Adresse $8003 die Zeichen »CBM80« gefunden, dann wird nicht zum Basic-Start gesprungen, sondern das Betriebssystem nimmt an, daß ein Modul eingesteckt ist, holt sich aus der Speicherzelle $8000/$8001 die Startadresse des Modulprogramms und verzweigt dorthin.</p>
+
+        <p>Das kleine »Reset-Helfer«-Programm (Listing) nutzt dies aus, indem es die genannten Speicherstellen in geeigneter Weise abändert. Es schreibt die »CBM80«-Zeichenfolge ab $8003 ins RAM und läßt die Speicherstellen $8000/$8001 auf den Basic-Warmstart zeigen.</p>
+
+        <p>Wenn man jetzt einen Reset auslöst, kommt man wie gewohnt aus allen »abgestürzten« Programmen heraus, ein vorhandenes Basic-Programm bleibt aber erhalten.</p>
+
+        <address class="author">(Henning Zipf)</address>
+
+        <h2>Einfacher Reset-Schalter selbstgebaut</h2>
+
+        <p>Sehr preiswert und einfach kommt man im Selbstbau zu einem Reset-Schalter, wenn man sich im Elektronikfachgeschäft einen sechspoligen Diodenstecker und einen Miniatur-Tastschalter besorgt. Der Tastschalter wird zwischen die Pins 2 und 6 des Diodensteckers gelötet (siehe Bild). Zur Pinbelegung vergleiche auch Seite 142 im C 64-Handbuch. Der so präparierte Diodenstecker wird nun in den seriellen Port des C 64 beziehungsweise VC 20 gesteckt. Falls der Port bereits von Floppy oder Drucker belegt ist, kann der Stecker natürlich auch in die freie Buchse des entsprechenden Zusatzgerätes eingesteckt werden. Auf Knopfdruck wird nun in jedem Fall wieder der Einschaltzustand des Computers hergestellt.</p>
+
+        <p>Die Kosten für Stecker und Taste betragen zusammen etwa 4 Mark.</p>
+
+        <address class="author">(Henning Zipf)</address>
+    </article>
+</body>
+
+</html>

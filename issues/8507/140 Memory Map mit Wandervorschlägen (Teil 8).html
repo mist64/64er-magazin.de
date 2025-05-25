@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>Memory Map mit Wandervorschlägen (Teil 8)</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="Dr. Helmuth Hauck, ah">
+    <meta name="64er.issue" content="7/85">
+    <meta name="64er.pages" content="140-142">
+    <!-- <meta name="64er.toc_category" content="XXX"> -->
+    <!-- <meta name="64er.toc_title" content="XXX"> -->
+    <meta name="64er.id" content="XXX">
+</head>
+
+<body>
+    <article>
+        <h1>Memory Map mit Wandervorschlägen (Teil 8)</h1>
+        <p class="intro">Neben der dynamischen Tastaturabfrage werden die Adressen 153 bis 158 behandelt. Deren Aufgabe ist die Ausgabe von Fehlermeldungen.</p>
+
+        <p>Die dynamische Tastaturabfrage ist das Kernthema mit dem wir uns heute beschäftigen wollen. Zuvor aber noch einige Speicherstellen, die wie beim letzten Mal das Betriebssystem als Zeiger für Ein/Ausgabeoperationen benutzt.</p>
+
+        <h2>Adresse 153 ($99)<br>Nummer des Eingabe-Gerätes</h2>
+
+        <p>Das Betriebssystem verwendet diese Speicherzelle, um festzuhalten, welches Gerät zur Eingabe verwendet werden soll.</p>
+
+        <p>Die Nummern sind wie folgt festgelegt:</p>
+
+        <p>TODO</p>
+
+        <p>0 = Tastatur
+            1 = Datasette
+            2 = RS232 (User-)Port
+            3 = Bildschirm
+            4 , 5 = Drucker
+            8-11 = Floppy-Laufwerke</p>
+
+        <p>Nach dem Einschalten oder nach RESET des Computers steht in 153 eine 0 (Tastatur). Nach jedem Einsatz eines anderen Gerätes wird diese Speicherzelle wieder auf 0 gesetzt, so daß wir immer die Tastatur zur Verfügung haben.</p>
+
+        <p>Für Maschinenprogrammierer ist diese Adresse sicherlich wertvoll. Die Routine, welche die Eingabegeräte festlegt, sobald der Befehl INPUT# beziehungsweise GET# ausgeführt wird, heißt CHKIN und beginnt beim C 64 ab Adresse 61966 ($F20E), beim VC 20 ab 62151 ($F2C7).</p>
+
+        <p>Für Basic-Programmierer habe ich in der Literatur nur eine Anwendung gefunden, und die wurde bereits bei der Besprechung der Speicherzelle 19 (Teil 3 des Kurses in Ausgabe 1/85, Seite 127) angekündigt.</p>
+
+        <p>Es ist dies eine MERGE-Routine. Leider funktioniert dieses Verfahren nicht bei dem 1541 Floppy-Laufwerk. Erfunden wurde die Routine von Brad Templeton und ist von Jim Butterfield unter dem Namen »Magic Merge« für den VC 20/C 64 adaptiert worden. Ich gebe zu, in der Zwischenzeit sind noch andere, vielleicht auch kürzere MERGE-Routinen veröffentlicht worden. Aber diese hier verwendet gleich drei interessante Ingredienzen, nämlich die Speicherzellen 19 und 153, außerdem die sogenannte »Dynamische Tastenabfrage«. Wer die letztere nicht kennt, sollte sich zum Verständnis den Texteinschub 1 gleichen Namens ansehen.</p>
+
+        <p>Ein MERGE (deutsch: zusammenführen, verschmelzen) besteht darin, ein auf Band gespeichertes Programm zu einem im Computer stehenden anderen Programm so dazuzuladen, daß dieses nicht überschrieben, sondern ergänzt wird. Wichtig ist dabei, daß das Programm vom Band höhere Zeilennummern hat als das Programm im Computer. Außerdem muß das Programm auf dem Band als Datei gespeichert sein. Das wird so erreicht:</p>
+
+        <p>TODO</p>
+
+        <ol>
+            <li>Programm eintippen</li>
+            <li>Direkt eingeben:<br>OPEN 1,1,1,”Name”:CMD1:LIST</li>
+            <li>Erst wenn READY kommt, direkt eingeben PRINT#1:CLOSE1</li>
+        </ol>
+
+
+        <p>Damit ist das Programm auf dem Band gespeichert. Nun kommt der eigentliche MERGE-Vorgang.</p>
+
+        <p>TODO</p>
+
+        <ol>
+            <li>Es steht ein Programm im Computer</li>
+            <li>Band mit dem Programm »Name« einlegen</li>
+            <li>Direkt eingeben: POKE 19,l:OPEN 1</li>
+            <li>Sobald READY erscheint, Bildschirm löschen (SHIFT-CLR).</li>
+            <li>Dreimal Cursor-Down</li>
+            <li>Direkt eingeben:<br>PRINT CHR$(19):POKE 198,1: POKE 631,13:POKE 153,1</li>
+            <li>Das Band beendet den Ladevorgang mit einer Fehlermeldung, die wir ignorieren.</li>
+            <li>Nach CLOSE 1 sind beide Programme zusammengefügt.</li>
+        </ol>
+
+
+        <p>Wie gesagt, Schritt 6 verwendet Zelle 19 (bitte dort nachlesen), Schritte 8 und 9 sind die »Dynamische Tastenabfrage«, und Schritt 9 verwendet zusätzlich die hier zur Diskussion stehende Speicherzelle 153, um die Datasette als Eingabegerät zu definieren.</p>
+
+        <h2>Adresse 154 ($9A)<br>Nummer des Ausgabe-Gerätes</h2>
+
+        <p>Diese Speicherzelle entspricht der Zelle 153, nur steht hier die Nummer des Gerätes, über das die Ausgabe läuft.</p>
+
+        <p>Nach dem Einschalten und nach Ausgabeoperationen wird der Wert immer auf 3 gesetzt. Das ist entsprechend der oben genannten Zuordnung der Bildschirm.</p>
+
+        <p>Für Maschinenprogrammierer sei erwähnt, daß Basic bei den Befehlen PRINT # oder CMD die Routine CHKOUT einsetzt, welche die Adresse 154 belegt. Sie steht im C 64 ab Adresse 62032 ($F250), im VC 20 ab 62217 ($F309).</p>
+
+        <h2>Adresse 155 ($9B)<br>Fehlerkontrolle bei Bandoperationen</h2>
+
+        <p>Die Commodore-Datasette ist deswegen so zuverlässig, weil sie mehrere Methoden zur Fehlererkennung beziehungsweise Korrektur von Lese- und Schreibfehlern verwendet.</p>
+
+        <p>Eine der Methoden ist die sogenannte Parity-Prüfung. Sie ist nichts anderes als eine Quersummenbildung der einzelnen Stellen jedes Bytes, deren Resultat überprüft wird.</p>
+
+        <p>Die Speicherzelle 155 wird bei dieser Parity-Prüfung eingesetzt.</p>
+
+        <h2>Adresse 156 ($9C)<br>Flagge für korrektes Byte vom Band</h2>
+
+        <p>In dieser Speicherzelle wird zwischengespeichert, ob das vom Band gelesene Byte die Prüfungen bestanden hat, also richtig ist oder nicht.</p>
+
+        <h2>Adresse 157 ($9D)<br>Flagge für Meldungen</h2>
+
+        <p>Man muß zwischen zwei Arten von Meldungen unterscheiden:</p>
+
+        <ul>
+            <li>Meldungen des Betriebssystems</li>
+            <li>Meldungen des Basic-Übersetzers</li>
+        </ul>
+
+
+        <p>Die Meldungen des Betriebssystems kennen wir als Angaben zum Ablauf, wie SEARCHING FOR, FOUND, PRESS PLAY ON TAPE und so weiter. Normalerweise nicht bekannt ist die Meldung I/O ERROR #, wobei nach dem Zeichen # Zahlen von 0 bis 29 stehen können. Diese Zahlen beziehen sich auf Meldungen des Übersetzers (Interpreter), die ausschließlich Fehlermeldungen sind. Das mag verwirrend klingen, klärt sich aber sofort. Die Flagge in 157 kann vier Werte annehmen, 0, 64, 128 und 192.</p>
+
+        <ol>
+            <li>Der Wert 0 unterdrückt alle Meldungen des Betriebssystems. Dieser Modus tritt nach RUN beim Ablauf eines Programms ein.</li>
+            <li>Der Wert 64 läßt nur Fehlermeldungen des Betriebssystems zu. Dieser Modus ist normalerweise nicht vorgesehen, kann aber künstlich erzeugt werden.</li>
+            <li>Der Wert 128 unterdrückt die Fehlermeldung des Betriebssystems. Dieser Modus entspricht dem Normalfall.</li>
+            <li>Der Wert 192 läßt alle Meldungen zu. Auch dieser Modus ist nur künstlich herzustellen.
+                Das folgende Beispiel macht das deutlich. Geben Sie direkt ein:
+                POKE 157,0:LOAD ”$”,9</li>
+        </ol>
+
+
+        <p>Wir versuchen, vom Gerät mit der Nummer 9, das ist eine zweite Floppy, die Directory zu laden. Wir erhalten entsprechend Punkt 1 nur die Meldung des Übersetzers »? DEVICE NOT PRESENT«. Verändern wir den POKE-Befehl für Punkt 2: POKE 157,64:LOAD”$”,9</p>
+
+        <p>Wir erhalten jetzt »I/O ERROR #5 ? DEVICE NOT PRESENT«. POKE 157,128:LOAD"$&lsquo;,9 ergibt die Meldung »SEARCHING FOR $
+            ? DEVICE NOT PRESENT«.</p>
+
+        <p>Schließlich nehmen wir noch den letzten Fall:
+            POKE 157,192:LOAD”$&ldquo;,9</p>
+
+        <p>Jetzt erhalten wir alles: »SEARCHING FOR $
+            I/O ERROR #5
+            ? DEVICE NOT PRESENT«</p>
+
+        <p>Da die Fehlermeldung des Betriebssystems und die zugehörigen Nummern in keinem Handbuch erwähnt sind, habe ich sie interessehalber in der folgenden Tabelle zusammengefaßt.</p>
+
+        <p>TODO TABLE</p>
+
+        <p> # MELDUNG (ERROR)
+            1 TOO MANY FILES
+            2 FILE OPEN
+            3 FILE NOT OPEN
+            4 FILE NOT FOUND
+            5 DEVICE NOT PRESENT
+            6 NOT INPUT FILE
+            7 NOT OUTPUT FILE
+            8 MISSING FILE NAME
+            9 ILLEGAL DEVICE NUMBER
+            10 NEXT WITHOUT FOR
+            11 SYNTAX
+            12 RETURN WITHOUT GOSUB
+            13 OUT OF DATA
+            14 ILLEGAL QUANTITY
+            15 OVERFLOW
+            16 OUT OF MEMORY
+            17 UNDEF’D STATEMENT
+            18 BAD SUBSCRIPT
+            19 REDIM’D ARRAY
+            20 DIVISION BY ZERO
+            21 ILLEGALDIRECT
+            22 TYPE MISMATCH
+            23 STRING TOO LONG
+            24 FILE DATA
+            25 FORMULA TOO COMPLEX
+            26 CAN’T CONTINUE
+            27 UNDEF’D FUNCTION
+            28 VERIFY
+            29 LOAD</p>
+
+        <p>Das nächste Mal fahren wir ab Speicherzelle 158 fort.</p>
+
+        <address class="author">(Dr. Helmuth Hauck/ah)</address>
+
+        <p>TODO ASIDE</p>
+
+        <h2>Texteinschub 1. Dynamische Tastenabfrage</h2>
+
+        <p>Jedesmal wenn Sie eine Taste drücken, wird der ASCII-Codewert des Zeichens oder der Funktion dieser Taste ermittelt und im »Tastaturpuffer« gespeichert. Dieser Pufferspeicher liegt in den Speicherzellen 631 bis 640.</p>
+
+        <p>Die eigentliche Abfrage und Umcodierung eines Tastendrucks habe ich im Kurs »Alle Tasten-, Zeichen- und Steuercodes« in den Ausgaben 4/84 bis 7/84 beschrieben. Die ASCII-Codetabelle finden Sie da auch. Sie ist natürlich in allen Handbüchern enthalten, leider aber nicht immer ganz vollständig. Zuerst will ich Ihnen die Arbeitsweise des Tastaturpuffers zeigen.</p>
+
+        <p>Der Computer holt sich den ASCII-Codewert aus dem Tastaturpuffer und wenn gerade kein Programm läuft, druckt er das Zeichen auf den Bildschirm oder führt die Funktion der Taste aus. Das ist der oft zitierte »Direkt-Modus«.</p>
+
+        <p>Wenn aber ein Programm läuft, dann bleiben die Codezahlen im Puffer so lange stehen, bis der Computer fertig ist. Dann erst werden sie herausgeholt und verarbeitet. Das will ich Ihnen beweisen.</p>
+
+        <p>Tippen Sie im Direkt-Modus ein:
+            FOR K = 1 TO 15000:NEXT K (RETURN)</p>
+
+        <p>Während diese an sich sinnlose Zeitschleife 15000mal im Kreise rumrennt, haben Sie genügend Zeit, mehrere Tasten zu drücken, zum Beispiel die erste Buchstabenreihe (QWERTYUIOP@\*↑). Natürlich sehen Sie am Bildschirm gar nichts, denn das Programm der Schleife läuft ja noch. Sobald aber die Schleife zu Ende ist, erscheinen 10 der getippten Buchstaben. Quod erat demonstrandum!</p>
+
+        <p>Warum nur 10 Buchstaben? Nun, der Tastaturpuffer hat nur 10 Plätze, logisch?</p>
+
+        <p>Jetzt müssen wir noch eine weitere Speicherzelle ins Spiel bringen. In die Zelle 198 kann man nämlich eine Zahl hineinPOKEn, welche die Anzahl der Zeichen im Tastaturpuffer begrenzt.</p>
+
+        <p>Wiederholen Sie bitte das Experiment von oben, nur soll die direkt eingegebene Zeile erweitert werden:
+            FOR K = 1 TO 15000:NEXT K: POKE 198,6 (RETURN)</p>
+
+        <p>Und siehe da, jetzt werden nur die 6 Buchstaben Q bis Y ausgedruckt. Diese Anwendung des Tastaturpuffers nutzen wir für das Kochrezept »Dynamische Tastenabfrage« aus. Allerdings müssen wir dazu prinzipiell die ASCII-Codewerte verwenden, so wie im nächsten Beispiel.</p>
+
+        <p>Löschen Sie bitte den Bildschirm und geben Sie ein (identisch für VC 20 und C 64):
+            10 PRINT CHR$(65)
+            20 PRINT CHR$(156)
+            30 PRINT CHR$(66)CHR$(13)CHR$(67)</p>
+
+        <p>65 ist der Code für A, 156 für die Farbe »purple«, 66 für B, 13 für »RETURN« und 67 für C. Das heißt also, daß wir zuerst ein A drucken, dann auf »purple« umschalten, darunter dann das B schreiben, einmal RETURN geben und dann noch das C folgen lassen.</p>
+
+        <p>Bild 1 zeigt den Ausdruck auf dem Bildschirm, wenn Sie diese Zeilen LISTen und starten.</p>
+
+        <p>Zur Erklärung: Die Leerzeile zwischen A und B ist bedingt durch die PRINT-Anweisung in Zeile 20, welche nur die Farbe umschaltet. Obwohl die Codes für B und C zusammen in einer Zeile stehen, werden sie doch durch das »RETURN« (13) untereinandergesetzt.</p>
+
+        <p>Anstelle der 13 können Sie alle mögliche anderen Steuerfunktionen setzen. Bild 2 zeigt das Resultat von 17, nämlich »Cursor down«. Wenn Sie die 8 nehmen, können Sie den Zeichensatz nicht mehr ändern. Der Einsatz der gleichzeitig gedrückten SHIFT- und Commodore-Taste funktioniert erst nach CHR$(9) wieder.</p>
+
+        <p>Als nächstes wollen wir die ASCII-Codewerte und den Tastaturpuffer im »Programm-Modus« einsetzen.</p>
+
+        <p>Das Resultat von Bild 2 wollen wir jetzt durch POKEn der ASCII-Werte in den Tastaturpuffer wiederholen.</p>
+
+        <p>TODO</p>
+
+        <p>5 POKE 198,5
+            10 POKE 631,65
+            20 POKE 632,156
+            30 POKE 633,66: POKE 634,17: POKE 635,67
+            99 END</p>
+
+        <p>Prinzipiell macht dieses Programm das gleiche wie das Programm in Bild 2. Trotzdem erhalten wir nach LIST und RUN ein anders Ergebnis, nämlich das von Bild 3.</p>
+
+        <p>Ist das ein Fehler? Natürlich nicht. Nach RUN laufen zuerst mal alle POKE-Befehle ab. Zeile 5 gibt an, wieviele Zeichen im Puffer stehen sollen. In Zeile 99 findet das Programm das ENDe und meldet sich mit READY. Jetzt erst wird im Tastaturpuffer nachgeschaut. Dort findet der Computer zuerst das A, dann »purpur«, dann das B welches sofort neben das A gesetzt wird. Das ist auch logisch, denn es fehlt ja jede Angabe, eine Zeile tiefer zu gehen. Um das zu erreichen, müssen wir in der Zeile 10 den Codewert für RETURN einschieben:
+            10 POKE 631,65: POKE 632,13</p>
+
+        <p>Vorsicht! Sie müssen in Zeile 20 und 30 alle POKE-Adressen um 1 erhöhen und auch die Zahl in Zeile 5. Nehmen sie 10, dann haben Sie Platz für Erweiterungen. So, jetzt LIST und RUN eingeben und es erscheint Bild 4 — und wir haben schon wieder ein Problem! Aber alles im Computer ist logisch! Nach dem A findet er den Wert für »RETURN« also führt er den Befehl aus, auf dem der Cursor gerade steht. Der steht auf dem A. Da das kein gültiger Basic-Befehl ist, druckt der Computer die Fehler-Meldung und zeigt READY an. Danach allerdings macht er weiter wie oben.</p>
+
+        <p>Und jetzt kommt die ASCII-Zahl 141 (SHIFT-RETURN) voll zur Geltung. Diese Kombination nämlich setzt den Cursor an den Anfang der nächsten Zeile, ohne den Befehl »RETURN« auszuführen.</p>
+
+        <p>Ersetzen Sie also die 13 in Zeile 10 durch 141, dann läuft’s (Bild 5).</p>
+
+        <p>Es gibt übrigens noch eine interessante ASCII-Codezahl, die in keiner Tabelle steht, nämlich 131. Sie bedeutet dasselbe wie die geSHIFTete STOP-Taste, also die Funktion »LOAD + RUN«.</p>
+
+        <p>Wenn Sie diesen Code mit PRINT CHR$(131) ausprobieren, funktioniert er allerdings nicht. Deshalb steht er wohl auch nicht in den Tabellen.</p>
+
+        <p>In den Tastaturpuffer gePOKEt bringt er aber seine Wirkung.</p>
+
+        <p>Setzen Sie bitte in Zeile 30 an die Stelle von 67 die Zahl 131 und anstelle des C erscheint</p>
+
+        <p>LOAD und PRESS PLAY ON TAPE. Gut, nicht wahr?</p>
+
+        <p>So, jetzt haben wir alle Zutaten für unser Kochrezept zusammen.</p>
+
+        <p>Löschen Sie bitte alles bisherige und tippen Sie ein:</p>
+
+        <p>TODO</p>
+
+        <p>10 PRINT CHR$(147)
+            20 FORI=lTO5:PRINTI
+            30 FOR T=1 TO 500: NEXT T
+            40 NEXT I</p>
+
+        <p>Nach Löschen des Bildschirms (Zeile 10) drucken wir zum Ausschmücken die Zahlen 1 bis 5 untereinander (Zeile 20 und 40) und damit es nicht zu schnell geht, bremsen wir mit der Zeile 30.</p>
+
+        <p>TODO</p>
+
+        <p>50 PRINT ”LIST” (Das ist natürlich sehr einfach, aber jetzt kommt’s!)
+            60 POKE 198,5
+            70 POKE 631,145: POKE 632, 145: POKE 633,145
+            80 POKE 634,13
+            90 END</p>
+
+        <p>Nach RUN erscheinen erst die fünf Zahlen, dann wird in einer neuen Zeile das Wort LIST geschrieben. Nach END wird erst (wie immer) eine Zeile ausgelassen, dann READY gedruckt und schließlich springt der Cursor an den Anfang der Zeile darunter. Während der Cursor anfangen will, drei Zeilen unter dem Wort LIST zu blinken, findet der Computer im Tastaturpuffer 3 den ASCII-Code für »Cursor up«. Also geht dieser auch drei Zeilen hoch und will jetzt auf dem Wort LIST blinken.</p>
+
+        <p>Damit wird es aber wieder nichts, denn im Puffer steht ja noch der Code für RETURN (13). Das wird ausgeführt und zwar für das LIST. Es hat dieselbe Wirkung, als ob Sie direkt LIST tippen und danach auf die RETURN-Taste drücken, nämlich das Programm wird ausgeLISTet.</p>
+
+        <p>Alle sinnvollen Basic-Befehle, die Sie in der Zeile 50 PRINTen, werden durch diese dynamische Manipulation des Cursors ausgeführt.</p>
+
+        <p>Versuchen Sie es mit</p>
+
+        <p>TODO</p>
+
+        <p>50 PRINT &ldquo;PRINT 16 \* 35”
+            50 PRINT ”LOAD”
+            50 PRINT ”GOTO 10”
+            50 PRINT ”RUN”
+            50 PRINT ”RUN 50”</p>
+
+        <p>und falls Sie dieses kleine Programm geSAVEt haben</p>
+
+        <p>TODO</p>
+
+        <p>50 PRINT ”SYS 64824”
+            50 PRINT ”SYS 64763”</p>
+
+        <p>Die Kunst ist also, mit entsprechenden Codezahlen den Cursor an diejenige Stelle des Bildschirms zu bringen, wo innerhalb eines Programms eine geeignete Anweisung gedruckt worden ist. Man kann damit getrennte Programmteile nachladen, mit SYS-Befehlen Maschinenprogramme aufrufen, oder gar Programme durch sich selbst ändern lassen.</p>
+    </article>
+</body>
+
+</html>

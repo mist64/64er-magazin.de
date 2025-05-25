@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>Basic-Start-Generator</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="Hermann-Josef Rottkemper, hm">
+    <meta name="64er.issue" content="7/85">
+    <meta name="64er.pages" content="74">
+    <!-- <meta name="64er.toc_category" content="XXX"> -->
+    <!-- <meta name="64er.toc_title" content="XXX"> -->
+    <meta name="64er.id" content="XXX">
+</head>
+
+<body>
+    <article>
+        <h1>Basic-Start-Generator</h1>
+        <p class="intro">Maschinenroutinen laden wie Basic-Programme und mit RUN starten, bleibt nicht länger ein Wunschtraum. Dieses Programm macht es möglich.</p>
+
+        <p>Wie war noch die Startadresse für den Monitor? Sie haben bestimmt auch schon öfter die Einsprungadresse eines Maschinenprogramms vergessen, wenn Sie viel mit Assembler-Programmen arbeiten. Abhilfe schafft diese kleine Routine, die Sie mit dem MSE eingeben müssen.</p>
+
+        <p>Das Programm macht aus einem im Speicher befindlichen Maschinenprogramm ein Programm, das einen normalen Basic-Start besitzt. Es braucht lediglich noch auf den Datenträger gespeichert zu werden — fertig! Das speichern geschieht mit SAVE”name”,8(1). Damit entfällt die leidige Frage nach dem SYS-Befehl, was bei einer großen Programmsammlung schon lästig sein kann. Das so präparierte Programm kann normal (mit »,8« oder »,1«) geladen und mit RUN gestartet werden.</p>
+
+        <p>Ausgenommen sind Programme, die im Bereich von $0800 bis $09af und unter dem Basic- und Kernal-ROM liegen, da hier entweder der Basic-Start-Generator oder von ihm verwendete Routinen liegen.</p>
+
+        <h3>Tips zur Bedienung</h3>
+
+        <ol>
+            <li>Laden des zu bearbeitenden Maschinenprogramms</li>
+            <li>NEW eingeben</li>
+            <li>Laden des Basic-Start-Generators mit LOAD”name”,8</li>
+            <li>Starten mit RUN</li>
+            <li>Eingabe von SYS 2089,[anfang],[ende+1],[einsprung] [anfang]: Beginn des Maschinenprogramms im Speicher [ende]: Ende des Maschinenprogramms im Speicher [einsprung]: Einsprungadresse, also der SYS-Wert, mit dem normalerweise das Programm gestartet wurde.<br>Alle Parameter müssen in dezimaler Schreibweise eingegeben werden, wobei der korrekte Bereich (0 bis 65535) selbst überprüft werden muß. Es wird ein »ILLEGAL QUANTITY ERROR« ausgegeben, falls [anfang] > = [ende] ist.</li>
+            <li>Speichern des erzeugten Programms mit SAVE ”name”,8</li>
+        </ol>
+
+
+        <h3>Funktion</h3>
+
+        <p>Nach der Eingabe und Umrechnung der Parameter in das 16-Bit-Format wird das Quellprogramm direkt hinter den Start-Generator kopiert (ab $08af). Dem Quellprogramm ist nun sein späterer Programmkopf vorgelagert. Des weiteren wird nun ein Teil des Start-Generators nach $C000 kopiert, der die weitere Arbeit übernimmt.</p>
+
+        <p>Jetzt werden der Programmkopf und das dahinter liegende Quellprogramm nach $0800, also dem Basic-Start, kopiert. Anschließend werden die Basic-Pointer (Anfang/Ende des Basic-Programms) und im Programmkopf die Adressen gesetzt. Nach der Meldung »READY TO SAVE« kann das bearbeitete Programm abgespeichert werden.</p>
+
+        <p>Nun eine nähere Erläuterung zum Programmkopf: lm Basic-ROM gibt es eine Unterroutine, die Speicherinhalte verschieben kann und deren Einsprungpunkt bei $A3BF liegt.</p>
+
+        <p>Diese Verschieberoutine macht sich der Basic-Start-Generator im Programmkopf zunutze, so daß das Quellprogramm wieder in seinen Ursprungsbereich kopiert werden kann. Die Übergabe der Kopierparameter erfolgt in den Adressen:
+            $5F/$60 — alter Blockanfang
+            $5A/$5B — altes Blockende + 1
+            $58/$59 — neues Blockende + 1</p>
+
+        <p>Nach dem Start des mit einem Basic-Start versehenen Programms wird die Blockverschieberoutine aktiviert und das Programm in seinen Bereich kopiert und gestartet.</p>
+
+        <p>Soll das Programm nach RUN nur an seinen ursprünglichen Start verschoben werden, müssen Sie als Einsprungadresse eine Adresse wählen, bei der ein RTS (return to subroutine) steht. Beispielsweise 64922, eine Adresse im Betriebssystem des C 64. RTS entspricht einem RETURN in Basic. Es bewirkt, daß das Programm zwar verschoben, aber nicht gestartet wird. Haben Sie zum Beispiel den SMON mit dem Start-Generator behandelt, meldet sich der SMON nach RUN mit der Registeranzeige, wenn Sie als Einsprungadresse 49152 angegeben haben. Haben Sie 64922 angegeben, kommt die READY-Meldung. Mit SYS49152 können Sie dann den SMON starten.</p>
+
+        <address class="author">(Hermann-Josef Rottkemper/hm)</address>
+    </article>
+</body>
+
+</html>

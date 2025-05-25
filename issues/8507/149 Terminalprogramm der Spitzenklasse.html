@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>Terminalprogramm der Spitzenklasse</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="Peter Falk, Peter Falk, rg, rg">
+    <meta name="64er.issue" content="7/85">
+    <meta name="64er.pages" content="149,151-154">
+    <!-- <meta name="64er.toc_category" content="XXX"> -->
+    <!-- <meta name="64er.toc_title" content="XXX"> -->
+    <meta name="64er.id" content="XXX">
+</head>
+
+<body>
+    <article>
+        <h1>Terminalprogramm der Spitzenklasse</h1>
+        <p class="intro">Eine harte Nuß haben wir unseren Lesern mit diesem Wettbewerb zu knacken gegeben. Trotzdem erreichten uns viele Einsendungen als Anwärter auf den ersten Preis.</p>
+
+        <p>TODO ASIDE</p>
+
+        <h2>Lebenslauf</h2>
+
+        <p>Ich wurde am 15.9.1966 geboren. Heute gehe ich in die 12. Klasse des Ratsgymnasiums in Stadthagen. Bevor ich mich mit dem Computer beschäftigte, hatte ich die Hobbys Modelleisenbahn und Elektronik. Weiterhin bin ich noch Modellflieger.</p>
+
+        <p>Den C 64 habe ich seit einem Jahr. In dieser Zeit lernte ich zunächst Basic und Pascal, was auch bei uns in der Schule im Informatikunterricht verwendet wird. Seit einiger Zeit beschäftige ich mich mit Assembler.</p>
+
+        <p>Vor zirka einem halben Jahr kaufte ich mir einen Akustikkoppler. Da ich kein passendes Terminalprogramm fand, begann ich mir ein eigenes Programm zu schreiben. Dieses wurde dann immer mehr erweitert, bis es die heutige Form hatte.</p>
+
+        <address class="author">(Peter Falk)</address>
+
+        <p>TODO ASIDE</p>
+
+        <p>Peter Falk konnte mit seinem Programm »Super Term 64« diesen Wettbewerb für sich entscheiden. Besonders erwähnenswert ist neben der Leistung dieses Programmes der übersichtliche und gut durchschaubare Programmierstil.</p>
+
+        <p>Der Autor: »Ich habe bei dem Terminal-Programm einerseits darauf Wert gelegt, daß es möglichst komfortabel und benutzerfreundlich ist, andererseits war mir aber auch ein großer Terminal-Speicher sehr wichtig. Deswegen habe ich auf unnötige »Verzierungen« verzichtet. So kann man bei den Übertragungs-Parametern zum Beispiel nur Baudrate, Datenbits und Stop-Bits in begrenztem Umfang ändern. Ich habe jedoch die Erfahrung gemacht, daß man bei allen Mailboxen eine einwandfreie Verbindung hat, wenn man die Normalparameter (300 Baud, 7 Bit, 1 Stop-Bit) benutzt. Der C 64 empfängt nämlich auch dann richtig, wenn er zum Beispiel auf 7 Datenbit eingestellt ist und die Gegenstelle mit 8 Bit sendet. Nur wenn man auch Steuerzeichen übertragen will, muß man auf 8 Datenbit umstellen.</p>
+
+        <p>Der große Terminal-Speicher wurde unter anderem dadurch erreicht, daß der gesamte vom ROM überlagerte RAM genutzt wird, indem das Betriebssystem beim Zugriff auf den RAM mit einer Assembler-Routine abgeschaltet wird. Weitere Maschinen-Routinen werden für das Laden von Daten in den Terminal-Speicher und für das Listen des Directorys benutzt. Sie werden alle über DATA-Zeilen im Lader eingelesen, so daß sie nachher keinen Speicherplatz mehr verbrauchen.</p>
+
+        <p>Bei der Programm-Übertragung nach der »Teleterm-Norm« können natürlich die selben Fehler auftreten wie bei Teleterm, nämlich dann, wenn sich zwei Übertragungsfehler in einem Block gegenseitig aufheben. Trotzdem ist die Übertragungs-Routine etwas sicherer als bei Teleterm. Am Anfang der Übertragung kann man die Länge einer Übertragungseinheit einstellen (bei Teleterm: »Programmsatzlänge«). Bei einer guten Verbindung kann sie ruhig auf 256 Byte gestellt werden; die Übertragung ist dann etwas schneller.«</p>
+
+        <h2>Ladeprogramm</h2>
+
+        <p>Nachdem man den Lader geladen und mit RUN gestartet hat, werden die Funktionstasten-Belegungen von der Diskette geladen, soweit sie schon vorhanden sind. Ansonsten wird der F-Tasten-Speicher gelöscht. Danach erscheint ein Menü, in dem man zwischen dem Terminal-Programm und dem Editor wählen kann. Wenn man 1 oder 2 gedrückt hat, wird das jeweilige Programm geladen und automatisch gestartet.</p>
+
+        <p>In die ersten Programmzeilen des Laders kann man individuelle Parameter schreiben. So kann man in Zeile 90 Hintergrund- und Rahmenfarbe eingeben (Schriftfarbe muß schwarz bleiben), in Zeile 110 den Preis für eine Telefon-Gebühreneinheit ändern und in den Zeilen 30 und 40 kann man Parameter zur Druckeranpassung eingeben (Sekundäradresse und maximal fünf sonstige Parameter).</p>
+
+        <p>In den Zeilen 350 bis 580 werden die Assembler-Routinen für Speicherzugriff, LOAD und Directory eingelesen.</p>
+
+        <p>Die vorhandenen Druckerparameter sind für einen Epson-Drucker mit Görlitz-Interface zugeschnitten (Sekundäradresse: 0, Parameter: »chr$(27)”t”«, also 27, 32, 84).</p>
+
+        <h2>Terminalprogramm</h2>
+
+        <p>Das Terminal-Programm muß mit dem Lader geladen werden, damit es funktionstüchtig ist. Im folgenden werden die einzelnen Menüpunkte erklärt:
+            1. Kommunizieren</p>
+
+        <p>Nachdem man 1 gedrückt hat, muß man eingeben, ob die Gegenstelle mit oder ohne Echo arbeitet. Danach wird man gefragt, ob man eine Berechnung der Telefongebühren wünscht. Wenn ja, dann müssen die Gebührenzone und der Gebührentarif (vor oder nach 18 Uhr plus Wochenende) eingegeben werden. Nachdem man die Verbindung hergestellt hat (was ja durchaus etwas länger dauern kann!), startet man den Terminal-Modus mit einem Tastendruck (die —-Taste führt ins Menü zurück). Im Terminal-Modus wird nun eine Help-Liste ausgegeben, in der alle Funktionen aufgeführt sind, die man über »Commodore«-Taste ansprechen kann. <strong>»Commodore S«</strong> bewirkt, daß alle empfangenen Zeichen in den Terminal-Speicher geschrieben werden, der eine Größe von 46000 Byte hat. Auf ein automatisches Abspeichern habe ich wegen der Time-Out-Regelung der meisten Mailboxen verzichtet. Außerdem muß man schon ganz schön lange telefonieren, um den Speicher voll zu bekommen. <strong>»Commodore E«</strong> beendet den Speichervorgang wieder.
+            <strong>»Commodore A«</strong> bewirkt, daß der Inhalt des Terminal-Speichers ausgesendet wird. So kann man zum Beispiel vorher abgefaßte Briefe übertragen. Abbruch mit ’ *- ’. Auch Basic-Programme, die in einer Sequenz vorliegen, können so übertragen werden. Diese Prozedur reagiert auf die Steuerzeichen
+            CTRL - S = Stop
+            CTRL - Q = Weiter
+            CTRL - X = Abbruch
+            <strong>»Commodore L«</strong> löscht den Terminal-Speicher.
+            <strong>»Commodore B«</strong> gibt an, wieviele Bytes im Speicher schon belegt und wieviele noch frei sind.
+            <strong>»Commodore G«</strong> zeigt die Zeit und die Gebühren an, die schon »vertelefoniert« sind.
+            <strong>»Commodore H«</strong> gibt die angezeigte Help-Liste nochmals aus.
+            <strong>»Commodore P«</strong> bietet eine Besonderheit: In diesem Modus ist es möglich Basic- und Maschinen-Programme zu übertragen und zwar nach der »TELETERM-Norm«. Man kann sich jetzt also Programme aus Mailboxen holen, die eine Teleterm-Box besitzen (zum Beispiel K.I.S., R.T.C., MHB etc.) oder man kann Programme unter Freunden und Bekannten austauschen, ohne Teleterm benutzen zu müssen. Es ist so eine weitgehend fehlerlose Übertragung von Programmen möglich.
+        </p>
+
+        <p>Statt »Commodore £« und »1« bei Teleterm muß man hier »Commodore P« und »E« für empfangen drücken.
+            <strong>»Commodore ↑«</strong> unterbricht den Terminal-Modus, das heißt man kann jetzt alle Menüpunkte anwählen, ohne daß die eingestellten Parameter und die Gebühren verloren gehen. Man kann so also auch während man mit einer Mailbox kommuniziert, die anderen Menüpunkte ausführen.
+            <strong>»Commodore ←«</strong> beendet den Terminal-Modus. Hier werden jetzt die Zeit und die Gebühren angezeigt und abgespeichert, und dann der Gesamtbetrag angezeigt.
+            2. Daten speichern
+        </p>
+
+        <p>Hier wird der Inhalt des Terminal-Speichers auf Diskette gespeichert. Man muß dafür den Namen angeben, unter dem abgespeichert werden soll.</p>
+
+        <p>RETURN bewirkt den Rücksprung ins Menüs.
+            3. Entspricht Punkt 2, nur daß hier geladen wird.
+            4. Daten ausgeben</p>
+
+        <p>Unter diesem Menüpunkt wird der Inhalt des Terminal-Speichers auf dem Bildschirm oder dem Drucker ausgegeben.
+            F1 = Ausgabe auf dem Bildschirm
+            F3 = Ausgabe auf dem Drucker
+            F5 = Bildschirm-Hardcopy
+            ← = Menü</p>
+
+        <p>SPACE hält die Ausgabe an. Sie kann dann mit einer beliebigen Taste fortgesetzt werden.
+            5. Funktionstasten</p>
+
+        <p>Hier kann man sich eine Übersicht der F-Tasten-Belegungen ausgeben lassen und sie gegebenenfalls ändern und abspeichern.
+            6. Parameter ändern</p>
+
+        <p>Die Baudrate und die Anzahl der Daten- und Stop-Bits können hier verändert werden.
+            7. Gebühren ansehen</p>
+
+        <p>Wenn man mit der Gebühren-Berechnung arbeitet, kann man hier den abgespeicherten Gesamtbetrag abrufen und die Gebühren am Ablesetag löschen.
+            8. Diskbefehle</p>
+
+        <p>Unter diesem Punkt kann man Befehle wie zum Beispiel Validate, Scratch, Rename etc. der Floppy übermitteln. Mit dem Dollarzeichen kann man das Inhaltsverzeichnis auflisten.</p>
+
+        <h2>Editor-Programm</h2>
+
+        <p>Mit dem Editor kann man Anzeigen oder Briefe, die man in Mailboxen schreiben will, erstellen. Der Text wird nach dem Erstellen sofort in den Terminal-Speicher geschrieben, so daß er nicht erst auf Diskette gespeichert zu werden braucht, bevor man das Terminal-Programm lädt. Der Speicherplatz für Variablen ist deswegen nur so groß, daß der Editor maximal 100 Zeilen aufnehmen kann.</p>
+
+        <p>Wenn man den Menüpunkt 1 anwählt, wird man zuerst gefragt, ob der Terminal-Speicher gelöscht werden soll. Antwortet man mit »ja«, so kann man einen neuen Text schreiben. Ansonsten wird der Inhalt des Terminal-Speichers in den Editor übertragen. Hier kann man nun seinen Text eingeben und mit den Cursor-Tasten frei editieren. Man muß allerdings in jeder Zeile, die übernommen werden soll, RETURN drücken. Wenn der Cursor am Anfang einer Zeile steht, kann man vor dieser Zeile mit CTRL-I (Insert) eine Zeile einfügen und mit CTRL-D (Delete) kann man die Zeile löschen. Wenn die maximale Anzahl von 100 Zeilen erreicht ist, wechselt die Rahmenfarbe in Rot und es wird keine weitere Zeile mehr übernommen.</p>
+
+        <p>Die ←-Taste führt ins Menü zurück, nachdem der Text in den Terminal-Speicher geschrieben wurde.</p>
+
+        <p>Die anderen Menüpunkte entsprechen denen des Terminal-Programms.</p>
+
+        <address class="author">(Peter Falk/rg)</address>
+
+        <p>TODO ASIDE</p>
+
+        <h2>Achtung! Achtung!</h2>
+
+        <p>Die Qualitäten dieses Programmes zwangen uns zu einer etwas ungewöhnlichen Maßnahme.</p>
+
+        <p>Das hier abgedruckte Basic-Programm ist in dieser Form nicht lauffähig. Es muß erst mit dem Austro-Speed-Compiler compiliert werden. Was soll dann der Abdruck, beziehungsweise wer hat schon diesen Compiler, werden Sie wohl fragen. Nun, wir sind von diesem Terminalprogramm und seinen Leistungen überzeugt. Ein Abdruck der mit MSE einzugebenden compilierten Version würde mindestens zehn Seiten beanspruchen. Dies halten wir für nicht zumutbar. Um nun allen Lesern dieses Programm zugänglich zu machen, bieten wir in diesem Fall einen Extraservice. Alle, die an dem MSE-Listing interessiert sind, können dies gegen Einsendung eines Freiumschlages (DIN A6, frankiert mit 1,10 Mark) bei folgender Adresse anfordern:
+            Markt &amp; Technik Verlag
+            Redaktion 64’er
+            Stichwort: Terminal
+            Hans-Pinsel-Straße 2
+            8013 Haar bei München</p>
+
+        <p>Eine weitere Möglichkeit, das Listing zu nutzen, bietet Ihnen natürlich auch der Leserservice. Auf der heftbegleitenden Diskette befindet sich natürlich auch die compilierte Version.</p>
+
+        <address class="author">(rg)</address>
+    </article>
+</body>
+
+</html>
