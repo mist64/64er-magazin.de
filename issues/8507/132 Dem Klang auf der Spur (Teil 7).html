@@ -18,13 +18,44 @@
         <h1>Dem Klang auf der Spur (Teil 7)</h1>
         <p class="intro">Die praktische Anwendung der bisher erarbeiteten Kenntnisse steht im Mittelpunkt dieser Folge: Ein universelles Synthesizer-Programm bringt den SID auf Trab.</p>
 
+        <p>Die meisten modernen digitalen Synthesizer haben eine Gemeinsamkeit: eine fast unüberschaubare Vielzahl von Einstellmöglichkeiten. Das in den letzten Folgen beschriebene Programm Modulator ist da keine Ausnahme. Um die reichhaltigen Möglichkeiten auszuloten, die dieses Programm bietet, benötigt man ein komfortables Editorprogramm, sonst läßt die Motivation beim Jonglieren mit Bits, Bytes, PEEK und POKE bald nach. Ein solches Programm wird hier vorgestellt. Es zeigt die über 70 Parameter des SID und von Modulator, übersichtlich nach Funktionsgruppen geordnet, auf dem Bildschirm an und erlaubt einen schnellen Zugriff auf alle Einstellwerte. Diese Einstellwerte können geändert werden, während ein Ton klingt, so daß die Wirkung der Einstellung unmittelbar überprüft werden kann. Zudem kann man Töne im Bereich von zwei Oktaven direkt über die Tastatur anspielen. Dabei können zwar nicht mehrere Tasten gleichzeitig gespielt werden, man kann aber zwei oder drei SID-Stimmen mit einem Tastendruck gleichzeitig erklingen lassen. Darüber hinaus verwaltet das Programm 24 Parametersätze, im folgenden Sounds genannt, im Arbeitsspeicher. Diese 24 Sounds können als eine Datei von Diskette geladen, bearbeitet und wieder abgespeichert werden.</p>
+
+        <h2>Wie man den Sound-Editor zum Laufen bringt</h2>
+
+        <p>Das abgedruckte Programm kann man beim Listing-Service bestellen oder auch selbst abtippen, was bei 107 Blöcken leider etwas mühsam ist. Dabei kann man die Kommentare natürlich weglassen, denn man hat sie im Heft ja bereits vor sich. Man sollte dann aber trotzdem alle Zeilennummern eintippen, da viele Zeilen angesprungen werden, auch wenn sie nur Kommentare enthalten. Reine Kommentarzeilen kann man mit: »(Zeilennummer) REM« oder »(Zeilennummer) : « abkürzen. Man hüte sich aber davor, eine RENUMBER-Utility auf das Programm anzuwenden. Die meisten Sprünge werden nämlich nicht über die Basic-Befehle GOTO und GOSUB abgewickelt, sondern über zwei Maschinenprogramme GT und GS (darüber später mehr). Diesen Umstand kann eine RENUMBER-Utility natürlich nicht berücksichtigen.</p>
+
+        <p>Der Sound-Editor ist nur zusammen mit dem in Ausgabe 4/85 (MSE-Listing) und in Ausgabe 5/84 (Assembler-Listing) veröffentlichten Programm Modulator lauffähig. Dieses Programm muß auf Diskette als absolut zu ladende Datei (Bereich $0075 bis $C422) unter dem Namen »MODULATOR« vorliegen.</p>
+
+        <p>Im Programm Modulator steckt leider noch ein kleiner Bug: Es wird der Zeropage-Speicherplatz $FF verwendet, was hin und wieder den Basic-Interpreter stören kann. Wenn man statt $FF den vom Betriebssystem nicht verwendeten Speicherplatz $02 verwendet, treten keine Probleme mehr auf. Im Modulator-Code sind zehn Zeropage-Adressen von dieser Änderung betroffen. Die folgenden vier Basic-Zeilen enthalten die zehn Adressen und nehmen auch gleich die Änderung vor:</p>
+
+        <p>TODO
+            10 FORI=1 TO 10
+            20 READ AD:POKE AD,2:NEXT I
+            30 DATA 49339,49344,49734,49744,50115
+            40 DATA 50129,50162,50168,50173,50178</p>
+
+        <p>Der geänderte Modulator-Code sollte dann unter dem Namen »MODULATOR« auf Diskette zurückgespeichert werden. Jetzt müßte der Sound-Editor, sofern er fehlerfrei eingetippt wurde, laufen. Da es sich hier um ein Programm handelt, das überwiegend in Basic geschrieben ist, ist ein umfangreicher Setup-Teil, der etwa 30 Sekunden beansprucht, leider unvermeidbar. Das Warten wird dann allerdings durch Komfort und durchaus akzeptable Geschwindigkeit belohnt.</p>
+
+        <h2>Mit 8 Menüs über 70 Parameter im Griff</h2>
+
+        <p>Zum Verständnis der Parameter sei auf Ausgabe 4/85 verwiesen, wo die Funktionen der Modulatorkomponenten beschrieben sind. Der Sound-Editor meldet sich mit dem Hauptmenü (Bild 1) mit dem Namen MODULATOR. Damit soll betont werden, daß Modulator der eigentliche Kern des Programms ist. Der Sound-Editor wird ausschließlich über die Tastatur bedient, wobei sich die meisten Funktionen mit einem einzigen Tastendruck auslösen lassen. Es ist durchgehend &lsquo; das WYSIWYG-Konzept (What You See Is What You Get) verwirklicht, das heißt, alle in einer Situation verfügbaren Kommandos werden am Bildschirm angezeigt. Eine Ausnahme bilden die sieben Kommandos zur Auswahl der Untermenüs, die zwar nur im Hauptmenü angezeigt werden, aber auch in jedem Untermenü funktionieren. Man kann also direkt von einem Untermenü ins andere springen. Den Umweg über das Hauptmenü benötigt man eigentlich nur, wenn man die Kommandos nicht mehr weiß.</p>
+
         <figure>
             <img src="132-1.png" alt="">
             <figcaption>Bild 1. Hauptmenü</figcaption>
         </figure>
+
+        <p>Das untere Drittel des Bildschirms ist in allen Menüs identisch. Es zeigt eine stilisierte Klaviatur über zwei Oktaven, der auf dem Computer die oberen beiden Tastenreihen entsprechen. Mit diesen Tasten kann man bis zu drei SID-Stimmen mit einem Tastendruck anspielen. Mit dem Kommando V und einer Ziffer 1, 2 oder 3 können die zu spielenden Stimmen aktiviert oder desaktiviert werden. Angezeigt wird das rechts neben der Klaviatur. Die Funktion SUSTAIN bewirkt, daß der Ton nach dem Loslassen einer Ton-Taste weiterklingt, sofern ein SUSTAIN-Pegel größer als Null eingestellt ist. Die GATE-Bits des SID werden bei aktivierter SUSTAIN-Funktion nicht zurückgesetzt. Mit dem Drücken der Space-Taste wird das GATE-Bit des Software-Hüllkurvengenerators (Soft-EG) gesetzt, durch Loslassen zurückgesetzt. Der Soft-EG wird also durch SPACE ausgelöst, vorausgesetzt, seine Parameter haben sinnvolle Werte. Das Auslösen des Soft-EG kann man mit Shift Space an die Tontasten koppeln, was bei den meisten Soft-EG-Anwendungen sinnvoll sein dürfte. Auch die SUSTAIN-Funktion und die Koppelung des Soft-EG werden rechts neben der Klaviatur angezeigt.</p>
+
+        <p>Die Beeinflussung der Parameter in den Untermenüs erfolgt nach einheitlichem Schema: Der zu ändernde Parameter wird mit den Cursor-Tasten angewählt und mit den f-Tasten verstellt. Je nach Anzahl der Parameter sind dabei alle vier Cursortasten oder nur die Tasten Cursor-Links und Cursor-Rechts wirksam. Auch die Funktionsweise der f-Tasten ist einheitlich: Numerische Parameter werden durch fl und f7 in großer und durch f3 und f5 in kleiner Schrittweite verstellt. Bei nichtnumerischen Parametern wird die Funktion der f-Tasten am Bildschirm angezeigt.</p>
+
+        <p>Bei numerischen Parametern werden bis auf eine Ausnahme direkt die Werte der SID- oder Modulator-Register angezeigt. Bei der Ausnahme handelt es sich um die Basisfrequenzen der drei Stimmen (Bild 2, Parameter F). Bei dieser Basisfrequenz handelt es sich um die Frequenz des tiefsten spielbaren Tones (Taste Q). Sie wird nicht in Hertz, sondern in einer musikalisch sinnvollen Notation angegeben. Sie besteht aus Notennamen, einer Oktavnummer und einer Verstimmung in Cent. Die Oktavnummern bewegen sich im Bereich 0 bis 5. Dabei entspricht A 4 dem 440-Hz-Ton, der in der Musik korrekt »eingestrichenes a« heißt. Ein Cent ist ein hundertstel Halbton. Der Parameter bewegt sich von —49 bis + 50. Die etwas komplizierte Berechnung der Basisfrequenz in Hz und in SID-Registerwerten findet man in den Programmzeilen ab 3110.</p>
+
+        <p>Alle anderen Sound-Parameter sind anhand der Menübilder, in denen sie auftreten (Bild 2 bis 6), leicht identifizierbar und bedürfen keiner weiteren Erläuterung.</p>
+
         <figure>
             <img src="132-2.png" alt="">
-            <figcaption>Bild 2. Untermenü Stimmen-Pnrameter </figcaption>
+            <figcaption>Bild 2. Untermenü Stimmen-Parameter </figcaption>
         </figure>
         <figure>
             <img src="132-3.png" alt="">
@@ -42,6 +73,9 @@
             <img src="132-6.png" alt="">
             <figcaption>Bild 6. Untermenü KSV </figcaption>
         </figure>
+
+        <p>Im Menü SOUNDS (Bild 7) können ganze Parametersätze (jeweils 107 Byte, siehe auch Tabelle 4) mit Namen versehen und im Speicher abgelegt werden. Angewählt werden die Sounds hier nicht über die Cursor-Tasten, sondern über die Tastenkombinationen Al bis C8. Die 24 Sounds sind alle mit der Parametereinstellung, die beim Programmstart vorliegt, vorbesetzt. Eine Gruppe von 24 Sounds kann im Menü DISK (Bild 8) auf Diskette abgespeichert und wieder geladen werden.</p>
+
         <figure>
             <img src="132-7.png" alt="">
             <figcaption>Bild 7. Untermenü Sounds</figcaption>
@@ -50,6 +84,30 @@
             <img src="132-8.png" alt="">
             <figcaption>Bild 8. Untermenü Disk</figcaption>
         </figure>
+
+        <h2>Bemerkungen zum Programm</h2>
+
+        <p>Es soll hier nicht die Arbeitsweise des Sound-Editors im Detail beschrieben, sondern nur einige Bemerkungen zum Stil des Programms gemacht werden. In dem Programm werden sehr viele Tastenkommandos akzeptiert, die in verschiedenen Menüs und bei den verschiedenen Parametern auch noch unterschiedliche Bedeutung haben. Um in dieser Situation die Übersicht zu behalten (Anliegen des Programmierers) und um das Programm trotz Realisierung in Basic akzeptabel schnell zu halten (Anliegen des Anwenders), werden die vielen Einzelroutinen von zentraler Stelle aus über variable Vektoren angesprungen. Zwar unterstützt Basic mit den Befehlen ON GOTO und ON GOSUB Mehrfachverzweigungen, diese sind aber bei der hier in Frage kommenden sehr großen Zahl von Sprungzielen schlecht einzusetzen. Die beiden Maschinenprogramme GS und GT (siehe auch Tabelle 2) erlauben dagegen (Unterprogramm-) Sprünge zu Zeilen, deren Nummer ein beliebiger arithmetischer Ausdruck oder eine Variable, der Sprungvektor, sein kann.</p>
+
+        <p>Die Tastenkommandos werden nun sehr schnell und auf einfache Weise interpretiert. Der ASCII-Code A der zuletzt gedrückten Taste und die Nummer M des gerade aktiven Menüs (0 bis 7) werden als Indizes in eine Sprungvektor-Tabelle V% verwendet. Der gefundene Eintrag ist die Zeilennummer der Routine, die den Tastendruck bearbeitet. Diese Routine wird als Unterprogramm aufgerufen. Für diesen Vorgang benötigt man nur einen einzigen Befehl:
+            SYSGS,V%(M,A) (Zeile 1550).</p>
+
+        <p>Allen nicht definierten Tasten wird über die Tabelle der Sprungvektor 0 zugeordnet. Er führt in das leere Unterprogramm ganz am Anfang des Listings. Die Sprung-Tabelle wird über die Inhalte der DATA-Zeilen ab 9500 im Programm-Setup besetzt. Vierstellige DATAs stehen für Zeilennummern, dreistellige für ASCII-Codes, zweistellige wählen ein Menü (dabei bedeutet zum Beispiel Ml »Menü Nr. 1« und MA »alle Menüs«) und einstellige sind ASCII-Zeichen. »ENDE« schließt die Tabellen-DATAs ab. Der Programmteil ab Zeile 8110 interpretiert diese DATAs und besetzt die Tabelle.</p>
+
+        <p>Eine Ergänzung des Programms um weitere Funktionen gestattet sich mit diesem Konzept sehr einfach. Man schreibt ein Unterprogramm und trägt die Zeilennummer des Unterprogramm-Starts zusammen mit der Taste, durch die das Unterprogramm aufgerufen werden soll, in die Tabelle ein. Die Hardcopys entstanden auf diese Weise: Ab Zeile 7900 stand eine Hardcopy-Routine (im Listing hier nicht enthalten). Durch:
+            9760 DATA MA,7900,Z
+            wurde bewirkt, daß in allen Menüs durch den Tastendruck Z ein Hardcopy-Ausdruck ausgelöst werden konnte.</p>
+
+        <p>Im Sound-Editor werden noch weitere Sprungvektoren angewendet: Eine f-Taste führt grundsätzlich in die Dummy-Routine (leeres Unterprogramm) oder in eine der vier Zeilen 2550, 2560, 2570, 2580. Dort wird ein aktueller numerischer Parameterwert erhöht oder erniedrigt. Anschließend wird in eine der 21 Routinen ab Zeile 2600 weiterverzweigt. Die zugehörige Vektorvariable ist PV. Die 21 Einzelroutinen bringen den geänderten Parameter an seinen Platz in ein SID- oder ein Modulator-Register und geben ihn zudem an der richtigen Stelle am Bildschirm aus.</p>
+
+        <p>Der Parameter-Vektor PV wird von Parameter-Anwahl-Routinen gesetzt, von denen es in jedem Menü für jede Parameterart eine gibt, zum Beispiel »Filterfrequenz« wählen, Zeile 5200. Der Aufruf einer Parameter-Anwahl-Routine wird durch die Cursor-Tasten ausgelöst und geschieht durch einen weiteren Vektor AV. Beispiel: »Parameterwahl durch Cursor«, Zeile 5130. Von diesen Cursor-Routinen gibt es fünf Ausführungen, für jedes Menü, in denen die Cursor-Tasten wirksam sind, eine.</p>
+
+        <p>Einige Maschinenprogramme machen den Sound-Editor schneller und übersichtlicher. Erwähnt seien dabei Unterprogramme zum Zugriff auf Doppelbytes von Basic aus (»DEEK« und »DOKE«). Das lästige Berechnen von Low- und High-Byte entfällt so. Der »PRINT AT«-Befehl gestattet es, den Cursor an jede Stelle des Bildschirms zu positionieren, um dort etwas auszugeben. Die Tabellen 1 bis 4 sollen eine kleine Dokumentation des Sound-Editors darstellen. Der Leser, der das Programm selbst modifizieren oder erweitern will (zum Beispiel andere oder mehr Farben), findet dort die gesuchte Information.</p>
+
+        <p>Das Tabellen- und Vektor-Konzept wird einen weiteren Ausbau des Programms sehr erleichtern. Das schon einmal angekündigte Sequenzer-Programm wird bis zum Ende dieses Kurses den Sound-Editor zu einem kompletten Synthesizer-Programm erweitern, mit dem man dann auch virtuose Melodien mit Modulator-Sounds spielen lassen kann.</p>
+
+        <address class="author">(Thomas Krätzig/ev)</address>
+
         <figure>
             <table>
                 <tbody>
@@ -444,61 +502,6 @@
             TODO
             <figcaption>Tabelle 4. Speicherung der Sound-Parameter</figcaption>
         </figure>
-
-        <p>Die meisten modernen digitalen Synthesizer haben eine Gemeinsamkeit: eine fast unüberschaubare Vielzahl von Einstellmöglichkeiten. Das in den letzten Folgen beschriebene Programm Modulator ist da keine Ausnahme. Um die reichhaltigen Möglichkeiten auszuloten, die dieses Programm bietet, benötigt man ein komfortables Editorprogramm, sonst läßt die Motivation beim Jonglieren mit Bits, Bytes, PEEK und POKE bald nach. Ein solches Programm wird hier vorgestellt. Es zeigt die über 70 Parameter des SID und von Modulator, übersichtlich nach Funktionsgruppen geordnet, auf dem Bildschirm an und erlaubt einen schnellen Zugriff auf alle Einstellwerte. Diese Einstellwerte können geändert werden, während ein Ton klingt, so daß die Wirkung der Einstellung unmittelbar überprüft werden kann. Zudem kann man Töne im Bereich von zwei Oktaven direkt über die Tastatur anspielen. Dabei können zwar nicht mehrere Tasten gleichzeitig gespielt werden, man kann aber zwei oder drei SID-Stimmen mit einem Tastendruck gleichzeitig erklingen lassen. Darüber hinaus verwaltet das Programm 24 Parametersätze, im folgenden Sounds genannt, im Arbeitsspeicher. Diese 24 Sounds können als eine Datei von Diskette geladen, bearbeitet und wieder abgespeichert werden.</p>
-
-        <h2>Wie man den Sound-Editor zum Laufen bringt</h2>
-
-        <p>Das abgedruckte Programm kann man beim Listing-Service bestellen oder auch selbst abtippen, was bei 107 Blöcken leider etwas mühsam ist. Dabei kann man die Kommentare natürlich weglassen, denn man hat sie im Heft ja bereits vor sich. Man sollte dann aber trotzdem alle Zeilennummern eintippen, da viele Zeilen angesprungen werden, auch wenn sie nur Kommentare enthalten. Reine Kommentarzeilen kann man mit: »(Zeilennummer) REM« oder »(Zeilennummer) : « abkürzen. Man hüte sich aber davor, eine RENUMBER-Utility auf das Programm anzuwenden. Die meisten Sprünge werden nämlich nicht über die Basic-Befehle GOTO und GOSUB abgewickelt, sondern über zwei Maschinenprogramme GT und GS (darüber später mehr). Diesen Umstand kann eine RENUMBER-Utility natürlich nicht berücksichtigen.</p>
-
-        <p>Der Sound-Editor ist nur zusammen mit dem in Ausgabe 4/85 (MSE-Listing) und in Ausgabe 5/84 (Assembler-Listing) veröffentlichten Programm Modulator lauffähig. Dieses Programm muß auf Diskette als absolut zu ladende Datei (Bereich $0075 bis $C422) unter dem Namen »MODULATOR« vorliegen.</p>
-
-        <p>Im Programm Modulator steckt leider noch ein kleiner Bug: Es wird der Zeropage-Speicherplatz $FF verwendet, was hin und wieder den Basic-Interpreter stören kann. Wenn man statt $FF den vom Betriebssystem nicht verwendeten Speicherplatz $02 verwendet, treten keine Probleme mehr auf. Im Modulator-Code sind zehn Zeropage-Adressen von dieser Änderung betroffen. Die folgenden vier Basic-Zeilen enthalten die zehn Adressen und nehmen auch gleich die Änderung vor:</p>
-
-        <p>TODO
-            10 FORI=1 TO 10
-            20 READ AD:POKE AD,2:NEXT I
-            30 DATA 49339,49344,49734,49744,50115
-            40 DATA 50129,50162,50168,50173,50178</p>
-
-        <p>Der geänderte Modulator-Code sollte dann unter dem Namen »MODULATOR« auf Diskette zurückgespeichert werden. Jetzt müßte der Sound-Editor, sofern er fehlerfrei eingetippt wurde, laufen. Da es sich hier um ein Programm handelt, das überwiegend in Basic geschrieben ist, ist ein umfangreicher Setup-Teil, der etwa 30 Sekunden beansprucht, leider unvermeidbar. Das Warten wird dann allerdings durch Komfort und durchaus akzeptable Geschwindigkeit belohnt.</p>
-
-        <h2>Mit 8 Menüs über 70 Parameter im Griff</h2>
-
-        <p>Zum Verständnis der Parameter sei auf Ausgabe 4/85 verwiesen, wo die Funktionen der Modulatorkomponenten beschrieben sind. Der Sound-Editor meldet sich mit dem Hauptmenü (Bild 1) mit dem Namen MODULATOR. Damit soll betont werden, daß Modulator der eigentliche Kern des Programms ist. Der Sound-Editor wird ausschließlich über die Tastatur bedient, wobei sich die meisten Funktionen mit einem einzigen Tastendruck auslösen lassen. Es ist durchgehend &lsquo; das WYSIWYG-Konzept (What You See Is What You Get) verwirklicht, das heißt, alle in einer Situation verfügbaren Kommandos werden am Bildschirm angezeigt. Eine Ausnahme bilden die sieben Kommandos zur Auswahl der Untermenüs, die zwar nur im Hauptmenü angezeigt werden, aber auch in jedem Untermenü funktionieren. Man kann also direkt von einem Untermenü ins andere springen. Den Umweg über das Hauptmenü benötigt man eigentlich nur, wenn man die Kommandos nicht mehr weiß.</p>
-
-        <p>Das untere Drittel des Bildschirms ist in allen Menüs identisch. Es zeigt eine stilisierte Klaviatur über zwei Oktaven, der auf dem Computer die oberen beiden Tastenreihen entsprechen. Mit diesen Tasten kann man bis zu drei SID-Stimmen mit einem Tastendruck anspielen. Mit dem Kommando V und einer Ziffer 1, 2 oder 3 können die zu spielenden Stimmen aktiviert oder desaktiviert werden. Angezeigt wird das rechts neben der Klaviatur. Die Funktion SUSTAIN bewirkt, daß der Ton nach dem Loslassen einer Ton-Taste weiterklingt, sofern ein SUSTAIN-Pegel größer als Null eingestellt ist. Die GATE-Bits des SID werden bei aktivierter SUSTAIN-Funktion nicht zurückgesetzt. Mit dem Drücken der Space-Taste wird das GATE-Bit des Software-Hüllkurvengenerators (Soft-EG) gesetzt, durch Loslassen zurückgesetzt. Der Soft-EG wird also durch SPACE ausgelöst, vorausgesetzt, seine Parameter haben sinnvolle Werte. Das Auslösen des Soft-EG kann man mit Shift Space an die Tontasten koppeln, was bei den meisten Soft-EG-Anwendungen sinnvoll sein dürfte. Auch die SUSTAIN-Funktion und die Koppelung des Soft-EG werden rechts neben der Klaviatur angezeigt.</p>
-
-        <p>Die Beeinflussung der Parameter in den Untermenüs erfolgt nach einheitlichem Schema: Der zu ändernde Parameter wird mit den Cursor-Tasten angewählt und mit den f-Tasten verstellt. Je nach Anzahl der Parameter sind dabei alle vier Cursortasten oder nur die Tasten Cursor-Links und Cursor-Rechts wirksam. Auch die Funktionsweise der f-Tasten ist einheitlich: Numerische Parameter werden durch fl und f7 in großer und durch f3 und f5 in kleiner Schrittweite verstellt. Bei nichtnumerischen Parametern wird die Funktion der f-Tasten am Bildschirm angezeigt.</p>
-
-        <p>Bei numerischen Parametern werden bis auf eine Ausnahme direkt die Werte der SID- oder Modulator-Register angezeigt. Bei der Ausnahme handelt es sich um die Basisfrequenzen der drei Stimmen (Bild 2, Parameter F). Bei dieser Basisfrequenz handelt es sich um die Frequenz des tiefsten spielbaren Tones (Taste Q). Sie wird nicht in Hertz, sondern in einer musikalisch sinnvollen Notation angegeben. Sie besteht aus Notennamen, einer Oktavnummer und einer Verstimmung in Cent. Die Oktavnummern bewegen sich im Bereich 0 bis 5. Dabei entspricht A 4 dem 440-Hz-Ton, der in der Musik korrekt »eingestrichenes a« heißt. Ein Cent ist ein hundertstel Halbton. Der Parameter bewegt sich von —49 bis + 50. Die etwas komplizierte Berechnung der Basisfrequenz in Hz und in SID-Registerwerten findet man in den Programmzeilen ab 3110.</p>
-
-        <p>Alle anderen Sound-Parameter sind anhand der Menübilder, in denen sie auftreten (Bild 2 bis 6), leicht identifizierbar und bedürfen keiner weiteren Erläuterung.</p>
-
-        <p>Im Menü SOUNDS (Bild 7) können ganze Parametersätze (jeweils 107 Byte, siehe auch Tabelle 4) mit Namen versehen und im Speicher abgelegt werden. Angewählt werden die Sounds hier nicht über die Cursor-Tasten, sondern über die Tastenkombinationen Al bis C8. Die 24 Sounds sind alle mit der Parametereinstellung, die beim Programmstart vorliegt, vorbesetzt. Eine Gruppe von 24 Sounds kann im Menü DISK (Bild 8) auf Diskette abgespeichert und wieder geladen werden.</p>
-
-        <h2>Bemerkungen zum Programm</h2>
-
-        <p>Es soll hier nicht die Arbeitsweise des Sound-Editors im Detail beschrieben, sondern nur einige Bemerkungen zum Stil des Programms gemacht werden. In dem Programm werden sehr viele Tastenkommandos akzeptiert, die in verschiedenen Menüs und bei den verschiedenen Parametern auch noch unterschiedliche Bedeutung haben. Um in dieser Situation die Übersicht zu behalten (Anliegen des Programmierers) und um das Programm trotz Realisierung in Basic akzeptabel schnell zu halten (Anliegen des Anwenders), werden die vielen Einzelroutinen von zentraler Stelle aus über variable Vektoren angesprungen. Zwar unterstützt Basic mit den Befehlen ON GOTO und ON GOSUB Mehrfachverzweigungen, diese sind aber bei der hier in Frage kommenden sehr großen Zahl von Sprungzielen schlecht einzusetzen. Die beiden Maschinenprogramme GS und GT (siehe auch Tabelle 2) erlauben dagegen (Unterprogramm-) Sprünge zu Zeilen, deren Nummer ein beliebiger arithmetischer Ausdruck oder eine Variable, der Sprungvektor, sein kann.</p>
-
-        <p>Die Tastenkommandos werden nun sehr schnell und auf einfache Weise interpretiert. Der ASCII-Code A der zuletzt gedrückten Taste und die Nummer M des gerade aktiven Menüs (0 bis 7) werden als Indizes in eine Sprungvektor-Tabelle V% verwendet. Der gefundene Eintrag ist die Zeilennummer der Routine, die den Tastendruck bearbeitet. Diese Routine wird als Unterprogramm aufgerufen. Für diesen Vorgang benötigt man nur einen einzigen Befehl:
-            SYSGS,V%(M,A) (Zeile 1550).</p>
-
-        <p>Allen nicht definierten Tasten wird über die Tabelle der Sprungvektor 0 zugeordnet. Er führt in das leere Unterprogramm ganz am Anfang des Listings. Die Sprung-Tabelle wird über die Inhalte der DATA-Zeilen ab 9500 im Programm-Setup besetzt. Vierstellige DATAs stehen für Zeilennummern, dreistellige für ASCII-Codes, zweistellige wählen ein Menü (dabei bedeutet zum Beispiel Ml »Menü Nr. 1« und MA »alle Menüs«) und einstellige sind ASCII-Zeichen. »ENDE« schließt die Tabellen-DATAs ab. Der Programmteil ab Zeile 8110 interpretiert diese DATAs und besetzt die Tabelle.</p>
-
-        <p>Eine Ergänzung des Programms um weitere Funktionen gestattet sich mit diesem Konzept sehr einfach. Man schreibt ein Unterprogramm und trägt die Zeilennummer des Unterprogramm-Starts zusammen mit der Taste, durch die das Unterprogramm aufgerufen werden soll, in die Tabelle ein. Die Hardcopys entstanden auf diese Weise: Ab Zeile 7900 stand eine Hardcopy-Routine (im Listing hier nicht enthalten). Durch:
-            9760 DATA MA,7900,Z
-            wurde bewirkt, daß in allen Menüs durch den Tastendruck Z ein Hardcopy-Ausdruck ausgelöst werden konnte.</p>
-
-        <p>Im Sound-Editor werden noch weitere Sprungvektoren angewendet: Eine f-Taste führt grundsätzlich in die Dummy-Routine (leeres Unterprogramm) oder in eine der vier Zeilen 2550, 2560, 2570, 2580. Dort wird ein aktueller numerischer Parameterwert erhöht oder erniedrigt. Anschließend wird in eine der 21 Routinen ab Zeile 2600 weiterverzweigt. Die zugehörige Vektorvariable ist PV. Die 21 Einzelroutinen bringen den geänderten Parameter an seinen Platz in ein SID- oder ein Modulator-Register und geben ihn zudem an der richtigen Stelle am Bildschirm aus.</p>
-
-        <p>Der Parameter-Vektor PV wird von Parameter-Anwahl-Routinen gesetzt, von denen es in jedem Menü für jede Parameterart eine gibt, zum Beispiel »Filterfrequenz« wählen, Zeile 5200. Der Aufruf einer Parameter-Anwahl-Routine wird durch die Cursor-Tasten ausgelöst und geschieht durch einen weiteren Vektor AV. Beispiel: »Parameterwahl durch Cursor«, Zeile 5130. Von diesen Cursor-Routinen gibt es fünf Ausführungen, für jedes Menü, in denen die Cursor-Tasten wirksam sind, eine.</p>
-
-        <p>Einige Maschinenprogramme machen den Sound-Editor schneller und übersichtlicher. Erwähnt seien dabei Unterprogramme zum Zugriff auf Doppelbytes von Basic aus (»DEEK« und »DOKE«). Das lästige Berechnen von Low- und High-Byte entfällt so. Der »PRINT AT«-Befehl gestattet es, den Cursor an jede Stelle des Bildschirms zu positionieren, um dort etwas auszugeben. Die Tabellen 1 bis 4 sollen eine kleine Dokumentation des Sound-Editors darstellen. Der Leser, der das Programm selbst modifizieren oder erweitern will (zum Beispiel andere oder mehr Farben), findet dort die gesuchte Information.</p>
-
-        <p>Das Tabellen- und Vektor-Konzept wird einen weiteren Ausbau des Programms sehr erleichtern. Das schon einmal angekündigte Sequenzer-Programm wird bis zum Ende dieses Kurses den Sound-Editor zu einem kompletten Synthesizer-Programm erweitern, mit dem man dann auch virtuose Melodien mit Modulator-Sounds spielen lassen kann.</p>
-
-        <address class="author">(Thomas Krätzig/ev)</address>
     </article>
 </body>
 
