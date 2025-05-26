@@ -1,0 +1,223 @@
+
+
+;wator.prg ==0801==
+   10 rem ********************************
+   11 rem *                              *
+   12 rem *  wator version 1.0           *
+   13 rem *   8.4.1985                   *
+   14 rem *                              *
+   15 rem *  copyright by                *
+   16 rem *                              *
+   17 rem *      siegmar kutschker       *
+   18 rem *      sachsenheimer weg 5     *
+   19 rem *      7122 besigheim          *
+   20 rem *                              *
+   21 rem *  nach einer idee aus         *
+   22 rem *                              *
+   23 rem *  spektrum der wissenschaft   *
+   24 rem *                              *
+   25 rem *     2/85                     *
+   26 rem *                              *
+   30 rem ********************************
+   40 poke 56,112:poke 55,0:rem basic bereich einschraenken
+   45 :
+   50 if peek(2) = 0 then poke 2,1: load "wator msp",8,1
+   60 rem definitionen der adressen
+   70 hp = 34816 :rem programm-start
+   75 zp = 36608 :rem ersatzzeropage
+   80 fa = zp + 116:rem fische anzahl
+   85 ha = zp + 118:rem haie anzahl
+   90 vf = zp + 120:rem vermehrungsalter fisch
+   95 vh = zp + 121:rem vermehrungsalter haie
+  100 hu = zp + 122:rem alter in dem haie verhungern
+  105 zu = zp + 6:rem zufallsgenerator
+  115 hu%=1:vh%=1:vf%=1:rem anfangswerte setzen
+  120 poke 53280,0:poke 53281,0 :poke 646,1:rem farbe setzen
+  130 print chr$(147):rem bildschirm loeschen
+  140 print:print:print:print:print:print:print
+  150 print"           O{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}P "
+  160 print"           {CBM-H}                  {CBM-N} "
+  170 print"           {CBM-H}    w a t o r     {CBM-N} "
+  180 print"           {CBM-H}                  {CBM-N} "
+  190 print"           L{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{SHIFT-@} "
+  200 print:print:print:print:print tab(3) "wollen sie eine anleitung lesen?"
+  210 print:print tab(3) "(j/n)"
+  220 get t$:if t$ = "" then 220
+  230 if t$ =  "j" then gosub 16000:goto250
+  240 if t$ <> "n" then 220
+  250 gosub 10200
+  300 rem menue
+  301 poke 53280,0:poke 53281,0 :poke 646,8:rem farbe setzen
+  305 printchr$(147);:print tab(11)"zyklenanzahl:  " az:poke 646,1:print
+  310 print"fische vermehren sich nach      jahr(en)"
+  315 print:poke 646,7
+  320 print" haie  vermehren sich nach      jahr(en)
+  325 print:print:poke 646,1
+  330 print"      wir haben derzeit         fisch(e)
+  335 poke 646,7
+  340 print"                    und         hai(e)
+  345 print:poke 646,7
+  350 print"  die haie verhungern nach      jahr(en)
+  355 print:poke 646,5
+  360 print"          bitte waehlen sie:
+  365 print:print: poke 646,14
+  370 print"    <1> anleitung
+  375 print:poke 646,3
+  380 print"    <2> aendern der parameter
+  385 print:poke 646,4
+  390 print"    <3> fortfahren im programm
+  400 printchr$(19):print:poke 646,10
+  410 print tab(26) vf%
+  420 print:printtab(26) vh%
+  430 print:print:printtab(26) fa%
+  440 printtab(26) ha%
+  450 print:printtab(26) hu%
+  460 poke 646,1
+  500 get t$:if t$ = "" then 500
+  510 if t$ = "1" then gosub 16000:goto300
+  520 if t$ = "2" then gosub 10000:goto300
+  530 if t$ = "h" then gosub 18650:goto300
+  540 if t$<> "3"then 500
+ 1000 poke zu,256*rnd(1)
+ 1010 poke zu+1,256*rnd(1)
+ 1020 if az=0 then sys hp
+ 1030 sys hp+3
+ 1040 if peek(zp+128)=0 then az=az+65536:goto 1030
+ 1050 az = az + peek(zp+129) + peek(zp+130)*256+1
+ 1060 fa% = peek(fa)+peek(fa+1)*256
+ 1070 ha% = peek(ha)+peek(ha+1)*256
+ 1100 goto 300
+ 9000 stop
+10000 printchr$(147):poke 646,1:ug =0:og=512:i=fa%:
+10005 print"ohne eingabe bleiben die alten werte    erhalten":print:print:print
+10010 print"bisher hatten wir "i "fische":print
+10020 print"wieviele in zukunft":gosub15000
+10030 print:fa% = i
+10040 ug = 0:og = 512 -fa%:i = ha%
+10050 print"bisher hatten wir "i "haie":print
+10060 print"wieviele in zukunft":gosub15000
+10070 print:ha% = i
+10080 ug = 1:og = 255
+10090 print:print:print"bisher vermehrten sich fische nach"
+10100 print"dem "vf%" ten jahr"
+10110 print"nach wievielen jahren in zukunft"
+10120 i = vf%:gosub 15000:vf%=i
+10130 print:print:print"bisher vermehrten sich haie nach"
+10140 print"dem "vh%" ten jahr"
+10150 print"nach wievielen jahren in zukunft"
+10160 i = vh%:gosub 15000:vh%=i
+10170 print:print:print"bisher verhungerten  haie nach"
+10180 print"dem "hu%" ten jahr"
+10190 print"nach wievielen jahren in zukunft":i=hu%:gosub15000:hu%=i
+10200 poke vh,vh%-1:w = vh%-1:gosub 11000:poke vh+3,w1
+10210 poke vf,vf%-1:w = vf%-1:gosub 11000:poke vf+3,w1
+10220 poke hu,hu%-1:w = hu%-1:gosub 11000:poke hu+3,w1
+10240 poke ha+1,int(ha%/256)
+10250 poke ha,ha%-int(ha%/256)*256
+10260 poke fa+1,int(fa%/256)
+10270 poke fa,fa%-int(fa%/256)*256
+10280 az = 0
+10300 return
+11000 w1=0
+11010 if w1<w then w1 = w1+w1+1:goto11010
+11020 return
+14500 stop
+15000 input i
+15100 i=int(i)
+15200 if ug <= i and og >=i then return
+15300 print:print"wert zwischen " ug" und "og "eingeben!":goto 15000
+16000 rem  anleitung
+16050 print chr$ (147):print:print:print
+16100 print tab(12) "*********"
+16150 print tab(12) "* wator *"
+16200 print tab(12) "*********"
+16250 print:print
+16300 print tab(5) "ist ein sehr interessantes":print
+16350 print tab(5) "simulationsprogramm.":print
+16400 printtab(5)"simuliert wird ein oekosystem, in":print
+16450 printtab(5)"dem sich zwei verschiedene arten":print
+16500 printtab(10)"von tieren tummeln:":print
+16550 printtab(11)"haie und fische.":print:print:print
+16600 gosub 21000:print
+16650 printtab(5)"jedes tier kann sich bewegen und":print
+16700 printtab(5)"sich vermehren, wobei die":print
+16750 printtab(5)"haie versuchen, die fische zu":print
+16800 printtab(5)"fressen. nahrung fuer die fische":print
+16850 printtab(5)"gibt es im ueberfluss.":print
+16900 printtab(5)"findet ein hai eine zeit lang":print
+16950 printtab(5)"keinen fisch, so verhungert er.":print
+17000 printtab(5)"lebensraum ist ein see, der in":print
+17050 printtab(5)"der form eines torusses gekruemmt":print
+17100 printtab(5)"ist. daher der name 'wator'.":print
+17110 print:print:gosub 21000
+17120 fori=0to10:print:next
+17200 printtab(5)"mehr zu diesem thema finden sie":print
+17230 printtab(5)"im spektrum der wissenschaft":print
+17260 printtab(15)"2/85.":fori=0to10:print:next:gosub 21000:
+17265 for i=1to 20:print:next
+17270 printtab(5)"von ihnen koennen 5 verschiedene":print
+17300 printtab(5)"parameter eingestellt werden.":print
+17310 printtab(10)"und zwar:":fori=0to10:print:next:gosub 21000
+17320 for i=0to 30:print:next
+17330 printtab(5)"die variable":print
+17350 printtab(5)"'anzahl der fische'.":print
+17370 printtab(5)"diese variable wird am anfang":print
+17400 printtab(5)"eines durchlaufs gesetzt und":print
+17420 printtab(5)"waehrend des durchlaufs staendig":print
+17450 printtab(5)"aktualisiert.":print
+17470 printtab(5)"man findet ihren wert am bild-":print
+17500 printtab(5)"schirm unten links."
+17530 print:print:print:print:gosub 21000
+17550 fori=1to30:print:next
+17570 printtab(5)"'anzahl der haie' ist die":print
+17600 printtab(5)"entsprechende variable fuer die":print
+17630 printtab(5)"haie.":print
+17650 printtab(5)"man findet sie unten rechts.":print
+17670 printtab(5)"ist die anzahl der haie = 0, so":print
+17680 printtab(5)"kehrt das programm in das grund-":print
+17690 printtab(5)"menue zurueck, ebenso, wenn":print
+17693 printtab(5)"waehrend des programmlaufs die":print
+17695 printtab(5)"restore-taste gedrueckt wird."
+17700 print:print:print:print:print:gosub 21000:fori=0to30:print:next
+17720 printtab(5)"die variable":print
+17730 printtab(5)"'vermehrung fische' gibt an,nach":print
+17750 printtab(5)"wievielen jahren sich die fische":print
+17770 printtab(5)"vermehren;":print
+17800 printtab(5)"ob nach dem ersten, zweiten":print
+17830 printtab(5)"dritten.....":print:print:print:print:print:print
+17850 gosub 21000:fori=0to30:print:next
+17870 printtab(5)"'vermehrung haie' erfuellt densel-":print
+17900 printtab(5)"ben zweck bei den haien.":print
+17920 for i=0to 10:print:next:gosub 21000
+17950 print:print:print:print:print:print
+17970 printtab(5)"die variable 'hunger' gibt an,":print
+18000 printtab(5)"nach wievielen jahren ein hai":print
+18030 printtab(5)"stirbt, wenn er in dieser zeit":print
+18050 printtab(5)"keinen fisch zum fressen findet.":print
+18070 printtab(5)"ob nach ein, zwei, drei.....":print
+18100 printtab(5)"jahren."
+18130 print:print:print:print:print:print:print
+18150 gosub21000
+18170 fori=1to20:print:next
+18200 printtab(5)"zusaetzlich finden sie in der ":print
+18230 printtab(5)"mitte oben die anzahl der zyklen,":print
+18250 printtab(5)"die seit dem start dieser":print
+18270 printtab(5)"kombination vergangen sind."
+18300 print:print:print:print:print:print:print:print
+18330 gosub 21000:fori=1to15:print:next
+18350 printtab(5)"dies klingt jetzt alles":print
+18370 printtab(5)"furchtbar kompliziert, und sie ":print
+18400 printtab(5)"werden am anfang schwierigkeiten":print
+18430 printtab(5)"haben, ein oekosystem zu entwer-":print
+18450 printtab(5)"fen, das nicht schon nach wenigen":print
+18470 printtab(5)"hundert jahren zusammenbricht.   ":print:print
+18500 printtab(5)"druecken sie 'h' und der computer":print
+18530 printtab(5)"stellt ihnen eine kombination ein,":print
+18550 printtab(5)"die sicher laueft!":print
+18600 gett$:ift$=""then 18600
+18630 ift$<>"h"then return
+18650 vh%=15:vf%=3:hu%=2:fa%=400:ha%=20:goto 10200
+21000 printtab(7)"weiter mit {rvon}return{rvof}"
+21020 gett$:if t$ <> chr$(13) then 21020
+21030 gett$:return
+
