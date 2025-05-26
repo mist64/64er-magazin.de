@@ -1,0 +1,503 @@
+
+
+;dich nicht.prg ==5a01==
+   10 rem *********************************
+   20 rem *                               *
+   30 rem * --mensch aergere dich nicht-- *
+   40 rem *              von              *
+   50 rem *           ralf hahn           *
+   60 rem *     luisenthalerstrasse 32    *
+   70 rem *        6623 altenkessel       *
+   80 rem *                               *
+   90 rem *********************************
+  100 rem dimensionieren ******************
+  110 rem poke657,128:poke774,226:poke775,252 shift-sperre
+  120 v=53248:pokev+21,0
+  130 dim s(4),na$(4),st(16),d(4),f$(4),f(4),dr(4),z(16),b(16),zf(16)
+  140 dim po(75),ge(75),fa(75)
+  150 print"{clr}"
+  160 for i=1 to 16:z(i)=3:next
+  170 d(1)=4:d(2)=4:d(3)=4:d(4)=4
+  180 rem zeichenverschiebung *************
+  190 fori=51200to51252
+  200 read x:pokei,x:s=s+x:next
+  210 data 120,165,1,72,41,251,133,1,169,208,133,3
+  220 data 169,48,133,5,160,0,132,2,132,4,162,32
+  230 data 177,2,145,4,200,208,249,230,3,230,5,202
+  240 data 208,242,104,133,1,173,24,208,41,241,9,12
+  250 data 141,24,208,88,96
+  260 sys51200
+  270 rem eingabemodus *******************
+  280 poke53280,0:poke53281,0:t=20
+  290 rem buchstabenaenderungen **********
+  300 fori=0to2
+  310 read as
+  320 for x=0to7
+  330 read da
+  340 poke12288+8*as+x,da
+  350 nextx:nexti
+  360 data 27,219,60,102,126,102,102,102,0
+  370 data 85,102,0,102,102,102,102,60,0
+  380 data 29,102,60,102,102,102,102,60,0
+  390 n=0:c=0
+  400 for i=1 to4:read f$(i),f(i):next
+  410 data "gelb",7,"blau",6,"grUn",5,"rot",2
+  420 print"{clr}{grn}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}         ralf hahn {orng}pr[sentiert"
+  430 fora=0to20:gosub630:next:t=700
+  440 print"{home}{down}{down}{down}{down}{down}{gry3}       mensch [rgere dich nicht"
+  450 for a=0to20:forz=1to15:poke1231+54272+int(25*rnd(1)),z:next:next
+  460 print"{down}{down}{yel}              anmerkung:  "
+  470 print"             CCCCCCCCCC{SHIFT-*}{SHIFT-*}    "
+  480 print"{down}{down} dieses spiel entspricht den regeln,"
+  490 print"{down}            nach denen {wht}ich "
+  500 print"{down}       {red}mensch [rgere dich nicht{yel}"
+  510 print"{down}                spiele"
+  520 print"{down}{down} -es k]nnten also differenzen bestehen"
+  530 print"{down}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rvon}taste{rvof}"
+  540 poke198,0:wait198,1
+  550 print"{clr}{gry3}{down}{down}{down}              anleitung"
+  560 print"             {red}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{gry3}
+  570 print"{down}{down}*gewUrfelt wird mit {rvon}space{rvof}."
+  580 print"{down}*der computerspieler wUerfelt und zieht {down} selbstst[ndig."
+  590 print"{down}*die figur wird mit {rvon}space{rvof} ausgewaehlt    {down}und mit {rvon}return{rvof} gezogen.
+  600 print"{down}{down}{down}{red}das war's {SHIFT-*} den rest macht der computer"
+  610 print"{down}{down}{down}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{wht}{rvon}taste{rvof}"
+  620 t=2000:poke198,0:wait198,1:goto640
+  630 forb=0tot:next:print"{down}";:return
+  640 print"{clr}"
+  650 n=0:c=0:a$=""
+  660 for i=1 to 4
+  670 poke53280,f(i):print"{clr}{down}{down}{down}{wht}   m]chte ein spieler ";f$(i);" haben? {rvon}j{rvof}/{rvon}n{rvof}"
+  680 get a$:ifa$=""then680
+  690 ifa$="j"thenn=n+1:s(i)=2:goto810
+  700 ifa$="n"then 720
+  710 goto680
+  720 print"{down}{down}    soll der computer den spieler":printspc(9);"{down}Ubernehmen? {rvon}j{rvof}/{rvon}n{rvof}
+  730 get a$:ifa$=""then730
+  740 ifa$="j"then c=c+1:s(i)=1:on c goto 770,780,790,800
+  750 ifa$="n"then:s(i)=0:goto850
+  760 goto730
+  770 na$(i)="computer 1":goto850
+  780 na$(i)="computer 2":goto850
+  790 na$(i)="computer 3":goto850
+  800 na$(i)="computer 4":goto850
+  810 print"{down}{down} bitte geben sie den namen des spielers":print"{down}{rght} ein! ";
+  820 print"-aber h]chstens 10 buchstaben!{down}"
+  830 poke19,64:input na$:poke19,0
+  840 na$(i)=left$(na$,10)
+  850 print"{down}CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC":next:poke53280,0
+  860 ifn+c<2thenprint"{clr}{rght}{rght}{rght}{rght}{rght}{rght}{down}{down}{down}{down}2 spieler braucht man schon!!":du=1:goto880
+  870 print"{clr}":goto890
+  880 for z=1to1000:next:goto640
+  890 print"{clr}{down}{down}{down}":for q=1 to4
+  900 if s(q)=0 then na$(q)="nicht belegt"
+  910 print"{down}{down}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}spieler";q;": ";na$(q)
+  920 next
+  930 print"{down}{down}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}eingaben korrekt? j/n";
+  940 get a$:ifa$=""then940
+  950 ifa$="j"thenprint"{left}{left}{left}{left}{left}!    ":goto980
+  960 if a$="n" then run
+  970 goto940
+  980 rem zeichenaenderungen *************
+  990 fori=0to27
+ 1000 read as
+ 1010 for x=0to7
+ 1020 read da
+ 1030 poke12288+8*as+x,da
+ 1040 nextx:nexti
+ 1050 data 35,0,0,0,7,31,63,127,127
+ 1060 data 36,0,0,0,224,248,252,254,254
+ 1070 data 37,127,127,63,31,7,0,0,0
+ 1080 data 38,254,254,252,248,224,0,0,0
+ 1090 data 81,0,0,0,7,24,32,64,64
+ 1100 data 82,0,0,0,224,24,4,2,2
+ 1110 data 83,64,64,32,24,7,0,0,0
+ 1120 data 84,2,2,4,24,224,0,0,0
+ 1130 data 86,1,7,15,15,15,7,3,3
+ 1140 data 87,128,224,240,240,240,224,192,192
+ 1150 data 88,7,7,15,15,31,31,15,0
+ 1160 data 89,224,224,240,240,248,248,240,0
+ 1170 data 39,0,0,0,7,31,62,124,122
+ 1180 data 40,0,0,0,224,248,124,62,94
+ 1190 data 41,126,126,62,31,7,0,0,0
+ 1200 data 42,126,126,124,248,224,0,0,0
+ 1210 data 68,0,0,0,7,31,63,127,124
+ 1220 data 69,0,0,0,224,248,124,190,30
+ 1230 data 70,124,127,63,31,7,0,0,0
+ 1240 data 71,30,190,124,248,224,0,0,0
+ 1250 data 72,0,0,0,7,31,62,126,126
+ 1260 data 73,0,0,0,224,248,124,126,126
+ 1270 data 74,122,124,62,31,7,0,0,0
+ 1280 data 75,94,62,124,248,224,0,0,0
+ 1290 data 76,0,0,0,7,31,62,125,120
+ 1300 data 77,0,0,0,224,248,252,254,30
+ 1310 data 78,120,125,62,31,7,0,0,0
+ 1320 data 79,30,254,252,248,224,0,0,0
+ 1330 rem bildaufbau ********************
+ 1340 print"{clr}{down}{down}{down}{down}{down}{down}{down}{rght}{rght}{rght}{wht}mensch";spc(8);"[rgere":print"{down}{down}{down}{down}{down}{down}{down}{down}{rght}{rght}{rght}dich";spc(11);"nicht"
+ 1350 print"{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}":po(0)=1532
+ 1360 fori=1to16:read po:read fa:po(i)=po:fa(i)=fa
+ 1370 if s(int((i-1)/4)+1)=0 then ge(i)=35:goto1390
+ 1380 ge(i)=86
+ 1390 next
+ 1400 ge=81:fa=12
+ 1410 fori=17to56:read po:po(i)=po:ge(i)=ge:fa(i)=fa
+ 1420 next
+ 1430 ge=35
+ 1440 fori=57to72:read po:read fa:po(i)=po:ge(i)=ge:fa(i)=fa
+ 1450 next
+ 1460 ge(17)=72:fa(17)=7
+ 1470 ge(27)=76:fa(27)=6
+ 1480 ge(37)=39:fa(37)=5
+ 1490 ge(47)=68:fa(47)=2
+ 1500 fori=1to72
+ 1510 pokepo(i),ge(i):pokepo(i)+54272,fa(i)
+ 1520 pokepo(i)+1,ge(i)+1:pokepo(i)+54273,fa(i)
+ 1530 pokepo(i)+40,ge(i)+2:pokepo(i)+54312,fa(i)
+ 1540 pokepo(i)+41,ge(i)+3:pokepo(i)+54313,fa(i)
+ 1550 next
+ 1560 fori=1to16:ge(i)=35:next
+ 1570 fori=1090to1930step40:pokei,93:pokei+54272,5:next
+ 1580 poke1650,107:fori=1651to1663:pokei,67:pokei+54272,5:next
+ 1590 data1162,7,1165,7,1242,7,1245,7,1722,6,1725,6,1802,6,1805,6
+ 1600 data 1707,5,1710,5,1787,5,1790,5,1147,2,1150,2,1227,2,1230,2,1078
+ 1610 data 1158,1238,1318,1398,1400,1402,1404,1406,1486,1566,1564,1562,1560,1558
+ 1620 data 1638,1718,1798,1878,1876,1874,1794,1714,1634,1554,1552,1550,1548,1546
+ 1630 data 1466,1386,1388,1390,1392,1394,1314,1234,1154,1074,1076
+ 1640 data 1156,7,1236,7,1316,7,1396,7,1484,6,1482,6,1480,6,1478,6
+ 1650 data 1796,5,1716,5,1636,5,1556,5,1468,2,1470,2,1472,2,1474,2
+ 1660 rem grundstellungen ***************
+ 1670 for i=1to16:st(i)=i:next
+ 1680 v=53248:pokev+16,126
+ 1690 poke2040,184:pokev+39,1
+ 1700 pokev+23,126:pokev+29,126
+ 1710 for z=2 to12 step2:pokev+z,15:pokev+z+1,195:pokev+39+z/2,15
+ 1720 poke2040+z/2,184+z/2:next
+ 1730 poke211,30:poke214,2:sys58640:print"{wht}mensch":print"{down}{down}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{gry2}[rgere"
+ 1740 print"{down}{down}{left}{left}{left}{left}{left}{left}{left}{left}{left}{gry2}dich":print"{down}{down}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{gry1}nicht!";"{down}{down}{left}{left}{left}{left}{left}{gry3}von";
+ 1750 print"{down}{down}{left}{left}{left}{left}{left}{left}{wht}ralf hahn{wht}"
+ 1760 for z=0 to 6
+ 1770 for n=0 to62 :read q:poke11776+z*64+n,q:next:next
+ 1780 data63,255,252,32,0,4,32
+ 1790 data0,4,32,0,4,32,0
+ 1800 data4,32,0,4,32,0,4
+ 1810 data32,0,4,32,0,4,32
+ 1820 data0,4,32,0,4,32,0
+ 1830 data4,32,0,4,32,0,4
+ 1840 data32,0,4,32,0,4,32
+ 1850 data0,4,32,0,4,32,0
+ 1860 data4,32,0,4,63,255,252
+ 1870 data7,255,254,15,255,253,31
+ 1880 data255,251,63,255,247,127,255
+ 1890 data239,0,0,31,127,255,223
+ 1900 data127,255,223,127,255,223,127
+ 1910 data255,223,127,255,223,127,255
+ 1920 data223,127,31,223,127,31,223
+ 1930 data127,31,223,127,255,223,127
+ 1940 data255,222,127,255,220,127,255
+ 1950 data216,127,255,208,127,255,192
+ 1960 data7,255,254,15,255,253,31
+ 1970 data255,251,63,255,247,127,255
+ 1980 data239,0,0,31,127,255,223
+ 1990 data127,248,223,127,248,223,127
+ 2000 data248,223,127,255,223,127,255
+ 2010 data223,127,255,223,127,255,223
+ 2020 data127,255,223,127,255,223,127
+ 2030 data255,222,99,255,220,99,255
+ 2040 data216,99,255,208,127,255,192
+ 2050 data7,255,254,15,255,253,31
+ 2060 data255,251,63,255,247,127,255
+ 2070 data239,0,0,31,127,255,223
+ 2080 data127,248,223,127,248,223,127
+ 2090 data248,223,127,255,223,127,255
+ 2100 data223,127,31,223,127,31,223
+ 2110 data127,31,223,127,255,223,127
+ 2120 data255,222,99,255,220,99,255
+ 2130 data216,99,255,208,127,255,192
+ 2140 data7,255,254,15,255,253,31
+ 2150 data255,251,63,255,247,127,255
+ 2160 data239,0,0,31,127,255,223
+ 2170 data99,248,223,99,248,223,99
+ 2180 data248,223,127,255,223,127,255
+ 2190 data223,127,255,223,127,255,223
+ 2200 data127,255,223,127,255,223,127
+ 2210 data255,222,99,248,220,99,248
+ 2220 data216,99,248,208,127,255,192
+ 2230 data7,255,254,15,255,253,31
+ 2240 data255,251,63,255,247,127,255
+ 2250 data239,0,0,31,127,255,223
+ 2260 data99,248,223,99,248,223,99
+ 2270 data248,223,127,255,223,127,255
+ 2280 data223,127,31,223,127,31,223
+ 2290 data127,31,223,127,255,223,127
+ 2300 data255,222,99,248,220,99,248
+ 2310 data216,99,248,208,127,255,192
+ 2320 data7,255,254,15,255,253,31
+ 2330 data255,251,63,255,247,127,255
+ 2340 data239,0,0,31,127,255,223
+ 2350 data99,248,223,99,248,223,99
+ 2360 data248,223,127,255,223,127,255
+ 2370 data223,99,248,223,99,248,223
+ 2380 data99,248,223,127,255,223,127
+ 2390 data255,222,99,248,220,99,248
+ 2400 data216,99,248,208,127,255,192
+ 2410 rem stechen ***********************
+ 2420 if peek(po(k))<>18 then sys64738:rem"{del}{del}{del}{del}{del}{del}{del}{del}{del}{del}{del}{del}{del}{del} k=0
+ 2430 poke211,0:poke214,24:sys58640
+ 2440 print"wUrfeln wir ums anfangen!{up}":for i=1 to 1000 :next
+ 2450 a=int(rnd(1)*4+3):g=int(4*rnd(1))+1
+ 2460 if s(g)=0 then 2450
+ 2470 forq=1to4:j=q
+ 2480 if s(q)=0 then 2550
+ 2490 poke646,f(q):print"    ";na$(q);" ist dran!          {up}":poke v+21,0
+ 2500 if s(q)=1 then for i=1 to 1000:next:goto2520
+ 2510 poke198,0:wait198,1
+ 2520 if q=g then w=a:gosub2870:goto 2550
+ 2530 w=rnd(1)*a:w=int(w):ifw=0thenw=1
+ 2540 gosub 2870
+ 2550 next
+ 2560 pokev+21,0
+ 2570 poke646,f(g):print"    ";na$(g);" hat gewonnen!         {up}"
+ 2580 for i=1 to800:next
+ 2590 j=g:goto 2640
+ 2600 rem spielschleife *****************
+ 2610 j=0
+ 2620 j=j+1:if j=5then j=1
+ 2630 if s(j)=0 then 2620
+ 2640 if d(j)=4then gosub 3360:goto2720
+ 2650 if d(j)<4 and dr(j)>0 and d(j)+dr(j)=4 then 2670
+ 2660 goto2710
+ 2670 sp=0:for i=56+4*jto 56+4*j+1-dr(j) step-1
+ 2680 if peek(po(i))=86 then sp=sp+1
+ 2690 next
+ 2700 if sp=dr(j)thengosub3360:goto2720
+ 2710 gosub 2800:as=0
+ 2720 if wu=6 then gosub 3470
+ 2730 if wu=6 then gosub 3470
+ 2740 if wu=6 then gosub 3470
+ 2750 if as=1then as=0:goto2620
+ 2760 gosub 2950
+ 2770 if s(j)=1 then gosub 3700
+ 2780 if s(j)=2 then gosub 3130
+ 2790 goto 2620
+ 2800 rem wuerfeln **********************
+ 2810 poke646,f(j):pokev+21,0
+ 2820 print"{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}                  {up}"
+ 2830 printna$(j);" ist dran!                {up}":w=int(6*rnd(1))+1
+ 2840 wu=w
+ 2850 if s(j)=1 then for i=1 to1200:next:goto2870
+ 2860 ifj<>3then poke198,0:wait198,1
+ 2870 si=54272:poke54277,5:poke54278,0:poke54296,15
+ 2880 for z=1 to8:for t=1 to50:next
+ 2890 poke54279,100:pokesi+8,8:pokesi+12,0:pokesi+11,129:pokesi+13,16:pokesi+4,0
+ 2900 pokesi+1,6:pokesi+4,129:pokesi+24,15:pokesi+24,15:pokesi+11,0:next
+ 2910 pokev+21,2^w
+ 2920 poke54276,0:poke54277,0:poke54278,0
+ 2930 for i=1 to 1000:next
+ 2940 return
+ 2950 rem figuren sperren ***************
+ 2960 for i=(j-1)*4+1to j*4:z(i)=3
+ 2970 if st(i)<17 then z(i)=0:goto3110
+ 2980 if j=1 then 3010
+ 2990 if st(i)+wu>56 and st(i)<=56 then w=wu-40:goto3010
+ 3000 if st(i)+wu>j*10+6 and st(i)<=j*10+6then w=wu+46-6*j
+ 3010 if st(i)+w>56+j*4thenz(i)=0:goto3110
+ 3020 if rs=1 then return
+ 3030 if st(i)<=56 and st(i)+w>56 and st(i)+w<=56+j*4 then z(i)=2
+ 3040 fo=0:for fi=1 to16
+ 3050 if st(i)+w=st(fi)then fo=fi
+ 3060 nextfi:if fo=0 then 3110
+ 3070 f1=int((i-1)/4)+1
+ 3080 f2=int((fo-1)/4)+1
+ 3090 if f(f1)=f(f2)then z(i)=0:goto 3110
+ 3100 if st(i)+w<=56+j*4 and z(i)<>2then z(i)=1:zf(i)=fo
+ 3110 if rs=1 then return
+ 3120 w=wu:nexti:return
+ 3130 rem eingabe ***********************
+ 3140 f=(j-1)*4
+ 3150 if z(f+1)+z(f+2)+z(f+3)+z(f+4)=0 then 4660
+ 3160 s=0:for q=1 to4
+ 3170 if z(f+q)<>0 then s=s+5
+ 3180 next
+ 3190 if s>5 then 3220
+ 3200 for q=1to4:if z(f+q)<>0thena$=chr$(13):f=(j-1)*4+q:goto3300
+ 3210 next
+ 3220 poke646,f(j):print"figurwahl: {rvon}space{rvof}   eingabe: {rvon}return{rvof}{up}"
+ 3230 t=t+1:if t>=5 then t=1
+ 3240 f=(j-1)*4+t
+ 3250 if z(f)=0 then 3230
+ 3260 y=(int((po(st(f))-1024)/40)+1)*8
+ 3270 x=(po(st(f))-983-5*y)*8
+ 3280 pokev,x+12:pokev+1,y+40:pokev+21,1+2^wu
+ 3290 get a$:ifa$=""then3290
+ 3300 if a$=chr$(13) then pokev+21,0:goto 3330
+ 3310 if a$=" "then w=wu:pokev+21,2^wu:goto 3230
+ 3320 goto3290
+ 3330 print"{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}           {up}":rs=1:i=f:gosub 2980:rs=0
+ 3340 gosub 4190
+ 3350 return
+ 3360 rem 3-mal wuerfeln ****************
+ 3370 if s(j)=1 then for i=1 to 1000:next:goto3380
+ 3380 poke v+21,0
+ 3390 poke646,f(j):printna$(j);" darf 3-mal wUrfeln!    {up}"
+ 3400 for i=1 to 1300:next
+ 3410 for q=1to3
+ 3420 gosub 2800
+ 3430 if s(j)=1 or q=3 then for i=1 to 1000:next:goto3440
+ 3440 if w=6 then gosub3470:return
+ 3450 next
+ 3460 as=1:return
+ 3470 rem ansetzen **********************
+ 3480 as=1
+ 3490 for f=(j-1)*4+1to4*j
+ 3500 if st(f)<17then 3520
+ 3510 next
+ 3520 if d(j)=0 then 4460
+ 3530 w=1
+ 3540 gosub2950:if s(j)=2 andd(j)=0then gosub 3130
+ 3550 if s(j)=1 and d(j)=0 then gosub 3700
+ 3560 d(j)=d(j)-1:w=1
+ 3570 poke646,f(j):printna$(j);" muss ansetzen!        {up}"
+ 3580 for fi=1to 16
+ 3590 if st(fi)=j*10+7 then z(f)=1:zf(f)=fi:goto3610
+ 3600 next
+ 3610 gosub 4190
+ 3620 if d(j)=0 then gosub 2800:goto 4460
+ 3630 print"loch freimachen!                 {up}":goto3640
+ 3640 for i=1 to1000 :next:gosub2800
+ 3650 gosub2950:if z(f)=0 ands(j)=2 thengosub3130:goto3680
+ 3660 if z(f)=0 ands(j)=1 thengosub3700:goto 3680
+ 3670 gosub 4190
+ 3680 if wu=6 then gosub2800:as=0
+ 3690 return
+ 3700 rem denkphase *********************
+ 3710 w=wu:wu=w:f=(j-1)*4+1:gf=0
+ 3720 if z(f)+z(f+1)+z(f+2)+z(f+3)=0 then 4660
+ 3730 for i=f to f+3
+ 3740 if z(i)=0 then b(i)=0:goto3870
+ 3750 rs=1:gosub2980:rs=0:b(i)=0
+ 3760 sv=0:sn=0
+ 3770 if st(i)+w=17 and d(1)<>0 then b(i)=1:goto3870
+ 3780 if st(i)+w=27 and d(2)<>0 then b(i)=1:goto3870
+ 3790 if st(i)+w=37 and d(3)<>0 then b(i)=1:goto3870
+ 3800 if st(i)+w=47 and d(4)<>0 then b(i)=1:goto3870
+ 3810 if st(i)=17 and d(1)<>0 then b(i)=30:goto3870
+ 3820 if st(i)=27 and d(2)<>0 then b(i)=30:goto3870
+ 3830 if st(i)=37 and d(3)<>0 then b(i)=30:goto3870
+ 3840 if st(i)=47 and d(4)<>0 then b(i)=30:goto3870
+ 3850 if z(i)=1 then 3890
+ 3860 goto 3970
+ 3870 next
+ 3880 goto4130
+ 3890 rem schlagen **********************
+ 3900 for fi=1 to 16
+ 3910 if i=fi then 3930
+ 3920 if st(fi)=st(i)+w then 3940
+ 3930 next
+ 3940 b(i)=st(i)-j*10
+ 3950 if b(i)<0 then b(i)=b(i)+40
+ 3960 goto3870
+ 3970 rem lage vorher *******************
+ 3980 for fi=1 to 16
+ 3990 if i=fi then 4010
+ 4000 if st(fi)+6>=st(i) and st(fi)<st(i)thensv=sv+1
+ 4010 next
+ 4020 b(i)=sv*5
+ 4030 if z(i)=2 then b(i)=b(i)+50:goto3870
+ 4040 rem lage nachher ******************
+ 4050 for fi=1 to 16
+ 4060 if i=fi then 4080
+ 4070 if st(fi)+6>=st(i)+w and st(fi)<st(i)+w then sn=sn+1
+ 4080 next
+ 4090 if sn>sv then b(i)=2:goto3870
+ 4100 if sn=sv then b(i)=3:goto3870
+ 4110 b(i)=4+(sv-sn)*3
+ 4120 goto3870
+ 4130 rem auswahl ***********************
+ 4140 w=wu:f=(j-1)*4+1:c=f
+ 4150 for i=f+1 to f+3:if b(c)<b(i)then c=i
+ 4160 next
+ 4170 f=c:i=f:rs=1:gosub2980:rs=0:gosub4190
+ 4180 return
+ 4190 rem zugphase **********************
+ 4200 if z(f)=1 then gosub4530
+ 4210 if st(f)<=56 and st(f)+w>56 then dr(j)=dr(j)+1:wp=w:gosub2950:w=wp
+ 4220 y=(int((po(st(f))-1024)/40)+1)*8
+ 4230 x=(po(st(f))-983-5*y)*8
+ 4240 pokev,x+12:pokev+1,y+40:pokev+21,1
+ 4250 for z=1to300:next
+ 4260 poke po(st(f)),ge(st(f))
+ 4270 poke po(st(f))+54272,fa(st(f))
+ 4280 poke po(st(f))+1,ge(st(f))+1
+ 4290 poke po(st(f))+54273,fa(st(f))
+ 4300 poke po(st(f))+40,ge(st(f))+2
+ 4310 poke po(st(f))+54312,fa(st(f))
+ 4320 poke po(st(f))+41,ge(st(f))+3
+ 4330 poke po(st(f))+54313,fa(st(f))
+ 4340 if st(f)<17then st(f)=j*10+6
+ 4350 pokev+21,0
+ 4360 y=(int((po(st(f)+w)-1024)/40)+1)*8
+ 4370 x=(po(st(f)+w)-983-5*y)*8
+ 4380 pokev,x+12:pokev+1,y+40:pokev+21,1
+ 4390 pokepo(st(f)+w),86:pokepo(st(f)+w)+54272,f(j)
+ 4400 pokepo(st(f)+w)+1,87:pokepo(st(f)+w)+54273,f(j)
+ 4410 pokepo(st(f)+w)+40,88:pokepo(st(f)+w)+54312,f(j)
+ 4420 pokepo(st(f)+w)+41,89:pokepo(st(f)+w)+54313,f(j)
+ 4430 st(f)=(st(f)+w)
+ 4440 if dr(j)=4 then gosub 4770
+ 4450 for z=1to300:next:pokev+21,0:return
+ 4460 rem nochmal wuerfeln **************
+ 4470 gosub 2950
+ 4480 if s(j)=2 then gosub 3130
+ 4490 if s(j)=1 then gosub 3700
+ 4500 if wu=6 and d(j)<>0 then gosub3470:goto 2620
+ 4510 if wu=6 then gosub2800:wu=w:goto4460
+ 4520 return
+ 4530 rem schlagen **********************
+ 4540 ws=w:ff=f:f=zf(f)
+ 4550 j=int((f-1)/4)+1:d(j)=d(j)+1
+ 4560 w=f-st(f)
+ 4570 poke54276,0:poke54277,0:poke54278,0
+ 4580 for x=15 to 0 step-2
+ 4590 poke54296,x:poke54277,15:poke54278,0:poke54273,16:poke54272,80:poke54276,129
+ 4600 next
+ 4610 poke54276,0:poke54277,0:poke54278,0
+ 4620 gosub 4220
+ 4630 w=ws:f=ff
+ 4640 j=int((f-1)/4)+1
+ 4650 return
+ 4660 rem naechster spieler *************
+ 4670 poke646,f(j):print na$(j);" kann nicht ziehen!          {up}"
+ 4680 poke54296,15
+ 4690 poke54277,25
+ 4700 poke54278,150
+ 4710 poke54273,3:poke54272,100
+ 4720 poke54276,33
+ 4730 for t=1 to 200:next
+ 4740 poke54276,0:poke54277,0:poke54278,0
+ 4750 for i=1 to1000 :next
+ 4760 return
+ 4770 rem spielende *********************
+ 4780 poke646,f(j):print na$(j);" hat gewonnen!!!!!!    {up}"
+ 4790 poke54296,15:for z=1 to3
+ 4800 poke54277,25
+ 4810 poke54278,150
+ 4820 poke54273,7:poke54272,193
+ 4830 poke54276,33
+ 4840 for t=1 to 200:next
+ 4850 poke54276,0:poke54277,0:poke54278,0:next
+ 4860 poke54277,25:poke54278,150:poke54273,6:poke54272,39:poke54276,33
+ 4870 for t=1 to 500:next:poke54276,0:poke54277,0:poke54278,0
+ 4880 poke198,0:wait198,1
+ 4890 dr(j)=0:s(j)=0
+ 4900 if s(1)+s(2)+s(3)+s(4)=0 then 4960
+ 4910 print" {wht} soll ich weiterspielen? j/n {up}"
+ 4920 get a$:ifa$=""then4920
+ 4930 if a$="j"then 4970
+ 4940 if a$="n"then 4960
+ 4950 goto4920
+ 4960 print"     {wht}-------spielende--------{up}":poke198,0:wait198,1:run
+ 4970 print"                                   {up}":return
+
+;*** Machine language part skipped. ***
+

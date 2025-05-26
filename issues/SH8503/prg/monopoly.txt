@@ -1,0 +1,1126 @@
+
+
+;monopoly.prg ==0801==
+   10 rem  ******************************
+   11 rem  *                            *
+   12 rem  * commercial town   fuer c64 *
+   13 rem  *                            *
+   14 rem  * von : peter fink           *
+   15 rem  *       8500 nuernberg 30    *
+   16 rem  *       stephanstrasse 20    *
+   17 rem  *       tel.: 0911/467930    *
+   18 rem  *                            *
+   19 rem  ******************************
+   99 print"{clr}";
+  100 dimsn$(41)
+  150 poke53281,0:poke53280,0
+  200 sn$(0)=""
+  205 sn$(1)="     c o m m e r c i a l   t o w n"
+  210 sn$(2)="     DDDDDDDDDDDDDDDDDDDDDDDDDDDDD"
+  215 sn$(3)=""
+  220 sn$(4)="        peter fink, februar 1985"
+  225 sn$(5)=""
+  230 sn$(6)="dieses spiel laeuft nach den originalen"
+  235 sn$(7)="monopoly-regeln. es koennen 1 - 4 spie-"
+  240 sn$(8)="ler teilnehmen. die auf 4 spieler feh-"
+  245 sn$(9)="lenedn werden vom computer simuliert."
+  250 sn$(10)="bei der eingabe von strassennamen brau-"
+  255 sn$(11)="chen nur die ersten drei buchstaben"
+  260 sn$(12)="eingegeben zu werden."
+  265 sn$(13)="               ausnahmen:"
+  270 sn$(14)="schillerstrasse und schlossallee: 4"
+  275 sn$(15)="hauptbahnhof und hauptstrasse:    6"
+  280 sn$(16)=""
+  285 sn$(17)="1 hotel entspricht 5 haeusern, das"
+  290 sn$(18)="heisst auch beim kauf und verkauf von"
+  295 sn$(19)="haeusern muessen hotels als 5 haeuser"
+  300 sn$(20)="eingegeben werden."
+  305 sn$(21)=""
+  310 sn$(22)=""
+  315 sn$(23)="            weiter -> [space]"
+  320 sn$(24)=""
+  325 sn$(25)="bei der abfrage nach den aktivitaeten"
+  330 sn$(26)="des spielers vor dem wuerfeln kann fol-"
+  335 sn$(27)="gende auswahl getroffen werden:"
+  340 sn$(28)="> h < wenn er haeuser kaufen will"
+  345 sn$(29)="> z < wenn er eine hypothek zurueck-"
+  350 sn$(30)="                           zahlen will."
+  355 sn$(31)="> k < wenn er einem mitspieler ein ver-"
+  360 sn$(32)="      kaufs- oder tauschangebot machen"
+  362 sn$(34)="> w < wenn er wuerfeln will."
+  365 sn$(33)="                                  will."
+  370 sn$(35)=""
+  375 sn$(36)="steht im feld 'standort': {red}{rvon}gefaengnis #{rvof}{grn}"
+  380 sn$(37)="so heisst das, dass der spieler nicht"
+  385 sn$(38)="nur zu besuch sondern echt im gefaeng-"
+  390 sn$(39)="nis ist."
+  395 sn$(40)=""
+  400 sn$(41)="            start -> [space]"
+  420 fora=0to22:print"{orng}"sn$(a):next
+  422 gosub25000:printsn$(23)
+  425 geta$:ifa$<>" "then425
+  430 print"{clr}";:fora=24to40:print"{grn}"sn$(a):next
+  440 gosub25090:printsn$(41)
+  510 sn$(0)="{lred}UCCC{CBM-R}CCCCCCCCCC{CBM-R}CCCI{brn}UCCCCCCCCCCCCCCCCCCI"
+  520 sn$(1)="{lred}B***B  {yel}besitz{lred}  B***B{brn}B{wht}    standort:     {brn}B"
+  530 sn$(2)="{lred}{CBM-Q}CCCK  {blu}EEEEEE{lred}  JCCC{CBM-W}{brn}B                  B"
+  540 sn$(3)="{lred}B                  B{brn}B                  B"
+  550 sn$(4)="{lred}B                  B{brn}B                  B"
+  560 sn$(5)="{lred}B                  B{brn}{CBM-Q}CCCCCCCCCCCCCCCCCC{CBM-W}"
+  570 sn$(6)="{lred}B                  B{brn}B{cyn}{rvon}                  {rvof}{brn}B"
+  580 sn$(7)="{lred}B                  B{brn}B{cyn}{rvon}                  {rvof}{brn}B"
+  590 sn$(8)="{lred}B                  B{brn}B{cyn}{rvon}                  {rvof}{brn}B"
+  600 sn$(9)="{lred}B                  B{brn}B{cyn}{rvon}                  {rvof}{brn}B"
+  610 sn$(10)="{lred}B                  B{brn}B{cyn}{rvon}                  {rvof}{brn}B"
+  620 sn$(11)="{lred}B                  B{brn}B{cyn}{rvon}                  {rvof}{brn}B"
+  630 sn$(12)="{lred}B                  B{brn}B{cyn}{rvon}                  {rvof}{brn}B"
+  640 sn$(13)="{lred}B                  B{brn}JCCCCCCCCCCCCCCCCCCK"
+  650 sn$(14)="{lred}B                  B {red}spieler            "
+  660 sn$(15)="{lred}B                  B{grn}{rvon}{CBM-K}       {rvof}{CBM-K} {orng}UCCCCCCCI "
+  670 sn$(16)="{lred}B                  B{grn}{rvon}{CBM-K}       {rvof}{CBM-K} {orng}B{brn} zeit: {orng}B "
+  680 sn$(17)="{lred}B                  B{grn}{CBM-C}{rvon}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{rvof}{CBM-V} {orng}B       B "
+  690 sn$(18)="{lred}B                  B {yel}kapital  {orng}JCCCCCCCK "
+  700 sn$(19)="{lred}B                  B{pur}{rvon}{CBM-K}       {rvof}{CBM-K}           "
+  710 sn$(20)="{lred}B                  B{pur}{rvon}{CBM-K}       {rvof}{CBM-K} {blu}UCCCCCCCI "
+  720 sn$(21)="{lred}B                  B{pur}{CBM-C}{rvon}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{CBM-I}{rvof}{CBM-V} {blu}B{gry2}frei p.{blu}B "
+  730 sn$(22)="{lred}B                  B {lgrn}{rvon}Q Q{rvof} {rvon}  Q{rvof}  {blu}B       B "
+  740 sn$(23)="{lred}B                  B {lgrn}{rvon}   {rvof} {rvon} Q {rvof}  {blu}JCCCCCCCK "
+  750 sn$(24)="{lred}JCCCCCCCCCCCCCCCCCCK {lgrn}{rvon}Q Q{rvof} {rvon}Q  {rvof}           "
+  775 geta$:ifa$<>" "then775
+  776 print"{clr}";
+  780 fora=0to24:printsn$(a);:next
+  795 poke56295,14:poke2023,102
+ 1000 gosub25220
+ 1100 gosub10900:gosub10800:print"{down}dauer des spieles":gosub10800
+ 1105 print"{down}{down}    (in min.)":gosub10800
+ 1110 print"{down}{down}{down}{down}{rght}{rght}{rght}{rght}{rght}{rght}";:b$=""
+ 1111 geta$:ifa$<>chr$(20)then1114
+ 1112 iflen(b$)>0thenprint"{left}{rvon} {left}";:b$=left$(b$,len(b$)-1)
+ 1113 goto1111
+ 1114 ifa$<>""anda$<>chr$(13)thenifasc(a$)<48orasc(a$)>57then1111
+ 1115 printa$;:ifa$=chr$(13)andlen(b$)>0then1118
+ 1116 b$=b$+a$:goto1111
+ 1118 ru=val(b$)
+ 1120 gosub10900:gosub10800
+ 1125 print"{down}anzahl der spieler":gosub10800
+ 1130 print"{down}{down}{down}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rvon}";:b$=""
+ 1131 geta$:ifa$<>chr$(20)anda$<>chr$(13)anda$<>""thenprinta$"{left}";:b$=a$
+ 1132 ifa$=chr$(13)andlen(b$)=1then1134
+ 1133 goto1131
+ 1134 ifasc(b$)<48orasc(b$)>52then1120
+ 1135 an=val(b$)
+ 1140 gosub10900:ifan=0then1180
+ 1145 fora=1toan
+ 1150 print"{home}"sr$su$"{cyn}{rvon}  name spieler "a
+ 1155 printsr$"{up}{rvon}(bis zu 7 buchst.)
+ 1156 print"{home}"su$sr$"{down}{down}{rvon}anm.: verschiedene{down}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}";
+ 1157 print"{rvon}anfangsbuchstaben{down}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}";
+ 1158 print"{rvon}waeren von vorteil"
+ 1160 printsr$"{rght}{rght}{rght}{rght}{rght}{rvon}";:b$=""
+ 1161 geta$:ifa$<>chr$(20)then1164
+ 1162 iflen(b$)>0thenprint"{left}{rvon} {left}";:b$=left$(b$,len(b$)-1)
+ 1163 goto1161
+ 1164 iflen(b$)>=7then1168
+ 1165 ifa$=chr$(13)then1167
+ 1166 printa$;:b$=b$+a$:goto1161
+ 1167 iflen(b$)=0then1161
+ 1168 sp$(a)=b$:gosub10900
+ 1170 nexta
+ 1175 ifan=4then1200
+ 1180 b=1:fora=an+1to4
+ 1185 sp$(a)=na$(b):b=b+1
+ 1190 nexta
+ 1195 sp$(5)="bank"
+ 1200 fora=1to40:sb(a)=0:next
+ 1205 fora=1to4:po(a)=1:next
+ 1210 bb$(0)=" ":bb$(1)="1":bb$(2)="2":bb$(3)="3":bb$(4)="4":bb$(5)="A"
+ 1215 fora=1to4:s$(a)=left$(sp$(a),1):next
+ 1220 fp=0:ez=1:gz=1
+ 2995 ti$="000000":gosub20000
+ 3000 forz=1to4:ll=0:p=0:wp$="":ifpo(z)=0then3995
+ 3010 gosub7000
+ 3015 gosub6000
+ 3020 gosub10000
+ 3025 gosub5000
+ 3030 gosub8000
+ 3035 ifpg(z)=1then21000
+ 3040 ifz>anthengosub13000:goto3100
+ 3042 gosub10900
+ 3045 print"{home}"sr$su$"{cyn}{rvon} * aktivitaeten *"
+ 3050 print"{home}"sr$su$"{rvon}{down}{down}haus kaufen   -> h"
+ 3051 print"{home}"sr$su$"{rvon}{down}{down}{down}hyp. z'zahlen -> z"
+ 3052 print"{home}"sr$su$"{rvon}{down}{down}{down}{down}angeb. mitsp. -> k"
+ 3053 print"{home}"sr$su$"{rvon}{down}{down}{down}{down}{down}wuerfeln      -> w"
+ 3054 tm$=ti$
+ 3055 geta$:ifa$=""then3055
+ 3057 ti$=tm$
+ 3060 ifa$="h"thengosub10900:gosub12000:goto3042
+ 3065 ifa$="z"thengosub10900:gosub11000:goto3042
+ 3070 ifa$="k"thengosub10900:gosub16000:goto3042
+ 3075 ifa$<>"w"then3045
+ 3100 gosub22000
+ 3105 gosub9000
+ 3110 gosub5000
+ 3200 iflo=1andpo(z)<>1theni=4000:goto3210
+ 3205 iflo=1andpo(z)=1theni=8000:goto3210
+ 3206 goto3220
+ 3210 gosub10900:gosub10800:print"{down}{rght}"sp$(z)" bekommt"
+ 3215 gosub10800:print"{down}{down}"i"dm."
+ 3216 ge(z)=ge(z)+i
+ 3218 lo=0:fora=1to1500:next
+ 3220 ifpo(z)=5orpo(z)=39thengosub20500
+ 3225 ifpo(z)=8orpo(z)=23orpo(z)=37then23000
+ 3230 ifpo(z)=3orpo(z)=18orpo(z)=34then23100
+ 3235 ifz2=1thenz2=0:goto3995
+ 3240 ifpo(z)=11thengosub10900:goto3285
+ 3245 ifpo(z)=21thengosub10900:gosub10800:print"{rght}{down}"sp$(z)" bekommt"
+ 3250 ifpo(z)=21thengosub10800:print"{down}{down}"fp"dm."
+ 3255 ifpo(z)=21thenge(z)=ge(z)+fp:fp=0
+ 3260 ifpo(z)=31thenpg(z)=1:wu=20:goto3105
+ 3265 iffa(po(z))=10thengosub24000
+ 3270 iffa(po(z))=9thengosub24200
+ 3275 iffa(po(z))>0andfa(po(z))<9thengosub24400
+ 3280 ifz2=1thenz2=0:goto3995
+ 3285 gosub7000:gosub20000
+ 3287 fora=1to1000:next
+ 3290 ifwp$="pasch"andpg(z)=0then3400
+ 3295 goto3990
+ 3400 ifz<=anthen3100
+ 3410 gosub10900:gosub10800:print"{down}{rght}pasch: nochmal!":fora=1to1500:next:goto3100
+ 3990 fora=1to1000:next
+ 3992 gosub10900
+ 3995 nextz:iftt>ruthen27100
+ 3996 goto3000
+ 5000 print"{home}{rvof}"left$(re$,22);"{down}{down}{down}{lgrn}                 {down}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}";
+ 5005 print"                 "
+ 5010 print"{home}"left$(re$,22);"{down}{down}{down}{lgrn}{rvon}";sn$(po(z))" "bb$(sb(po(z)))"{rvof}";
+ 5015 ifpg(z)=1thenprint"{left}#"
+ 5020 iffa(po(z))>0thenprint"{home}"left$(re$,22)"{down}{down}{down}{down}{lred}besitzer: "sp$(be(po(z)))
+ 5025 fora=1to100:next
+ 5030 print"{home}{rvof}"left$(re$,22);"{down}{down}{down}{lgrn}                 {left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}";
+ 5035 print"{home}"left$(re$,22);"{down}{down}{down}{lgrn}";sn$(po(z))" "bb$(sb(po(z)));
+ 5040 ifpg(z)=1thenprint"{left}{rvon}#{rvof}"
+ 5050 return
+ 6000 print"{home}{grn}"left$(re$,21);left$(un$,16);"{rvon}       {rvof}"
+ 6010 print"{home}{grn}"left$(re$,21);left$(un$,16);"{rvon}"sp$(z)"{rvof}"
+ 6015 return
+ 7000 ge(z)=int(ge(z)/10)*10:g$=right$(str$(ge(z)),len(str$(ge(z)))-1)
+ 7005 print"{home}{pur}"left$(re$,21);left$(un$,20);"{rvon}       {rvof}"
+ 7010 print"{home}{pur}"left$(re$,21);left$(un$,20);"{rvon}"g$"{rvof}"
+ 7015 return
+ 8000 zl=4:j=1
+ 8002 forb=0toko(j)-1:i=st(j,b)
+ 8005 ifbe(i)<>zthen8020
+ 8007 ifzl=22thengosub8200
+ 8010 print"{home}"left$(un$,zl)"{rght}"fa$(fa(i))"{rvon}              {rvof} - "bb$(sb(i));
+ 8011 ifhy(i)=1thenprint"{left}h";
+ 8012 print"{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{rvon}"sn$(i):zl=zl+1
+ 8020 nextb
+ 8025 j=j+1:ifj=11thenreturn
+ 8030 goto8002
+ 8200 ifz>anthen8300
+ 8202 print"{home}"left$(un$,zl+1)"{rght}{gry3}weiter mit <space>"
+ 8204 tm$=ti$
+ 8205 geta$:ifa$=""then8205
+ 8206 ti$=tm$
+ 8210 gosub10000:zl=4:return
+ 8300 fora=1to2000:next:goto8210
+ 9000 fora=1toabs(wu):q=0
+ 9005 fori=1to4:ifi=zthen9015
+ 9010 ifpo(z)=po(i)thenq=1:j=i
+ 9015 nexti
+ 9020 ifq=0then9030
+ 9025 ifasc(s$(j))<65thenpokekn(po(z))+54272,1:pokekn(po(z)),asc(s$(j)):goto9050
+ 9027 pokekn(po(z))+54272,1:pokekn(po(z)),asc(s$(j))-64:goto9050
+ 9030 pokekn(po(z))+54272,fb(po(z)):pokekn(po(z)),ze(po(z))
+ 9050 po(z)=po(z)+sgn(wu)
+ 9055 ifpo(z)>40thenpo(z)=po(z)-40:ifll=0andpg(z)=0thenlo=1
+ 9060 ifasc(s$(z))<65thenpokekn(po(z))+54272,1:pokekn(po(z)),asc(s$(z)):goto9070
+ 9065 pokekn(po(z))+54272,1:pokekn(po(z)),asc(s$(z))-64
+ 9070 nexta:return
+10000 print"{home}{rvof}{down}{down}{down}{rght}";
+10005 fora=1to20
+10010 print"                  {down}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}";
+10015 next
+10020 return
+10800 print"{home}"su$sr$"{cyn}{rvon}";:return
+10900 print"{home}"su$sr$lo$lp$lq$:return
+11000 gosub10900:gosub10800:print"{down}{rght}auf welcher":gosub10800
+11002 print"{down}{down}{rght}strasse willst du":gosub10800:print"{down}{down}{down}{rght}eine hypothek"
+11004 gosub10800:print"{down}{down}{down}{down}{rght}zurueckzahlen ?"
+11010 gosub19000:gosub10800:print"{down}{down}{down}{down}{down}{rght}auf "at$(i):iffe=1then11025
+11020 ifhy(i)=1andge(z)>=.6*pr(i)then11030
+11025 gosub10800:print"{down}{down}{down}{down}{down}{down}{rght}falsche eingabe!":goto11050
+11030 hy(i)=0:ge(z)=ge(z)-.6*pr(i)
+11035 kp(z,fa(i))=kp(z,fa(i))+1
+11040 gosub10000:gosub8000:gosub7000
+11050 fora=1to1500:next:return
+12000 gosub10900:gosub10800
+12005 print"{down}{rght}auf welche":gosub10800:print"{down}{down}{rght}strassen willst":gosub10800
+12010 print"{down}{down}{down}{rght}du haeuser bauen?":gosub10800:print"{down}{down}{down}{down}{rght}(die 1. angeben)"
+12015 gosub19000:iffe=1then12500
+12020 ifbe(i)<>zthen12500
+12025 ifi>38then12500
+12027 iffa(i)<1orfa(i)>8then12500
+12030 r=i
+12035 w(0)=0:w(1)=0:w(2)=0
+12040 forj=0toko(fa(r))-1:b(j)=st(fa(r),j):b$(j)=sn$(st(fa(r),j))
+12045 ifbe(b(j))<>zthenq=1
+12050 nextj
+12055 ifq=1thenq=0:goto12500
+12065 gosub10900:gosub10800:print"{down}{rght}{rght}{rght}wieviele auf .."
+12070 fori=0toko(fa(r))-1
+12075 gosub10800:printleft$(un$,i+2)"{rght}"b$(i);
+12080 getw$(i):ifw$(i)=""then12080
+12085 ifasc(w$(i))<48orasc(w$(i))>53then12080
+12090 gosub10800:printleft$(un$,i+2)"{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}"w$(i):w(i)=val(w$(i))
+12095 nexti
+12097 ifabs(sb(b(0))+w(0)-sb(b(1))-w(1))>1then12500
+12100 ifko(fa(r))=3andabs(sb(b(1))+w(1)-sb(b(2))-w(2))>1then12500
+12105 ifko(fa(r))=3andabs(sb(b(0))+w(0)-sb(b(2))-w(2))>1then12500
+12110 fori=0toko(fa(r))-1
+12115 ifsb(b(i))+w(i)>5thenq=1
+12120 nexti
+12125 ifq=1thenq=0:goto12500
+12130 py=int((fa(r)+1)/2)*1000*(w(0)+w(1)+w(2))
+12135 gosub10800:print"{down}{down}{down}{down}{down}{down}{rght}preis:"py:gosub19500
+12140 ifpj=1thenreturn
+12145 fori=0toko(fa(r))-1
+12150 sb(b(i))=sb(b(i))+w(i)
+12155 gt=gt+w(i)
+12160 nexti
+12165 ge(z)=ge(z)-py:gosub7000:gosub10000:gosub8000:fora=1to2000:next:return
+12500 gosub10800:print"{down}{down}{down}{down}{down}{down}{rght}falsche eingabe!":fora=1to2000:next:return
+13000 gosub13900:gosub14000:ifs2=1then13900
+13005 gosub15000:ifs2=1thengosub13900
+13010 gosub13100:return
+13100 j=0:k=0:m2=9:kj=0
+13105 l(0)=0:l(1)=0
+13110 fori=1to8
+13115 ifkp(z,i)=ko(i)thenk(j)=i:j=j+1:k=1
+13120 nexti:ifk=0then13400
+13125 fork=1toj
+13130 ifge(z)<gt*200+rnd(1)*5000orge(z)<3*(int((k(j-1)+1)/2)*1000)then13400
+13135 h=int((rnd(1)/4+.5)*ge(z))
+13140 m=int(rnd(1)*j):ifm=m2thenm=m+1:ifm=jthenm=0
+13145 n=int(h/((int((k(m)+1)/2)*1000)))
+13150 ifn=0then13345
+13155 m2=m
+13160 fori=0toko(k(m))-1
+13165 b$(i)=sn$(st(k(m),i)):b(i)=st(k(m),i):nexti
+13190 y=sb(b(0))+sb(b(1))-(sb(b(2))*(ko(k(m))=3))
+13195 ify+n>5*ko(k(m))thenn=5*ko(k(m))-y
+13200 ifn=0then13345
+13210 ifko(k(m))=2then13250
+13215 ifsb(b(0))=sb(b(1))andsb(b(0))=sb(b(2))then13230
+13220 ifsb(b(1))<sb(b(2))andsb(b(1))<sb(b(0))thenl(1)=1:n=n-1:goto13230
+13225 ifsb(b(0))=sb(b(1))andsb(b(1))<sb(b(2))thenl(0)=1:l(1)=1:n=n-2
+13230 ifint(n/3)=n/3thenc(0)=n/3:c(1)=c(0):c(2)=c(0)
+13235 ifint((n+2)/3)=(n+2)/3thenc(0)=int(n/3):c(1)=c(0):c(2)=c(0)+1
+13240 ifint((n+1)/3)=(n+1)/3thenc(0)=int(n/3)+1:c(1)=c(0)-1:c(2)=c(0)
+13245 c(0)=c(0)+l(0):c(1)=c(1)+l(1):n=n+l(0)+l(1):goto13272
+13250 ifsb(b(0))=sb(b(1))then13260
+13255 l(0)=1:n=n-1
+13260 ifint(n/2)=n/2thenc(0)=n/2:c(1)=c(0)
+13265 ifint((n+1)/2)=(n+1)/2thenc(0)=int(n/2):c(1)=c(0)+1
+13270 c(0)=c(0)+l(0):n=n+l(0)
+13272 forg=0toko(k(m))-1
+13273 ifc(g)+sb(b(g))>5thenn=n-(c(g)+sb(b(g))-5):c(g)=5-sb(b(g))
+13274 nextg:ifn=0then13345
+13275 gosub10900:gosub10800:print"{down}{rght}"sp$(z)" kauft":gosub10800
+13280 print"{down}{down}{rght}haeuser:   auf.."
+13285 l(0)=0:l(1)=0
+13290 forg=0toko(k(m))-1
+13295 gosub10800:printleft$(un$,g+4)"{rght}"b$(g)
+13300 gosub10800:printleft$(un$,g+4)"{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}"c(g)
+13305 nextg
+13310 fori=0toko(k(m))-1
+13315 sb(b(i))=sb(b(i))+c(i)
+13320 gt=gt+c(i)
+13325 nexti
+13330 ge(z)=ge(z)-n*int((k(m)+1)/2)*1000
+13335 xj=j:gosub7000:gosub10000:gosub8000:j=xj
+13340 fora=1to2000:nexta
+13345 nextk
+13400 return
+13900 gosub10900
+13910 gosub10800:print"{down}{rght}* aktivitaeten *":return
+14000 i=0:s2=0
+14010 i=i+1:if(be(i)<>zorhy(i)=0)andi<40then14010
+14020 ifi<40then14060
+14030 ifbe(40)=zandhy(40)=1then14060
+14040 ifs2=1thengosub7000:gosub10000:gosub8000
+14050 return
+14060 ifge(z)<.8*pr(i)then14040
+14070 gosub10900:gosub10800:print"{down}{rght}"sp$(z)" zahlt":gosub10800
+14075 print"{down}{down}{rght}hypothek auf "at$(i):gosub10800:print"{down}{down}{down}{rght}"sn$(i)
+14078 gosub10800:print"{down}{down}{down}{down}{rght}zurueck.
+14080 ge(z)=ge(z)-.6*pr(i):hy(i)=0:s2=1
+14085 kp(z,fa(i))=kp(z,fa(i))+1
+14090 fora=1to1500:next
+14095 ifi=40then14040
+14100 goto14010
+15000 s2=0:n=0
+15005 fori=1to8:a$="":z4=0:z5=0:z6=0:z7=0:ifn>=2then15090
+15010 ifkp(z,i)=ko(i)orkp(z,i)=0then15090
+15015 forj=1to4:ifj=zorz4<>0then15025
+15020 ifkp(j,i)>0thenz4=j
+15025 nextj
+15030 ifz4=0then15090
+15035 fork=1to8:ifk=iorz5<>0then15045
+15040 if(kp(z4,k)=1orkp(z4,k)=2andko(k)=3)andkp(z,k)=1thenz5=k
+15045 nextk
+15050 ifz5=0then15069
+15055 m=-1
+15057 m=m+1:ifbe(st(i,m))<>z4then15057
+15060 z7=st(i,m):m=-1
+15062 m=m+1:ifbe(st(z5,m))<>zthen15062
+15065 z6=st(z5,m):gosub17500:n=n+1:s2=1:goto15090
+15069 m=-1
+15070 m=m+1:ifbe(st(i,m))<>z4then15070
+15075 z7=st(i,m):pt=int((pr(z7)*(1.9+rnd(1)*1.4))/100)*100
+15080 ifge(z)<ptthen15090
+15085 gosub17000:s2=1:n=n+1
+15090 ifa$="j"thengosub10000:gosub8000:gosub7000
+15092 nexti
+15095 ifs2=1thenfora=1to3000:next
+15097 return
+16000 n=0
+16002 n=n+1:ifn=3then16500
+16005 gosub10900:gosub10800:print"{down}{rght}welche strasse":gosub10800
+16006 print"{down}{down}{rght}willst du ?"
+16010 gosub19000:iffe=1then16500
+16012 fora=1to800:next
+16015 z7=i
+16020 ifsb(i)>0then16500
+16030 forj=0toko(fa(j))-1:b(j)=st(fa(i),j)
+16035 nextj
+16040 ifsb(b(1))>0then16500
+16045 ifm=3andsb(b(2))>0then16500
+16050 gosub10900:gosub10800:print"{down}{rght}von wem willst":gosub10800
+16051 print"{down}{down}{rght}du "ar$(z7):gosub10800:print"{down}{down}{down}{rght}"sn$(z7)" ?"
+16055 z4=0
+16060 tm$=ti$
+16065 geta$:ifa$=""then16065
+16066 ti$=tm$
+16070 fork=1to4:ifk=zthen16075
+16072 ifa$=left$(sp$(k),1)thenz4=k
+16075 nextk
+16080 ifz4=0orz4<>be(i)then16500
+16085 gosub10800:print"{down}{down}{down}{down}{down}{down}{rght}{rght}{rght}{rght}{rght}"sp$(z4)
+16088 fora=1to1000:next
+16090 gosub10900:gosub10800:print"{down}{rght}willst du":gosub10800
+16095 print"{down}{down}{rght}kaufen (v) oder":gosub10800:print"{down}{down}{down}{rght}tauschen (t) ?"
+16099 tm$=ti$
+16100 geta$:ifa$<>"v"anda$<>"t"then16100
+16101 ti$=tm$
+16105 ifa$="t"then16140
+16110 gosub10800:print"{down}{down}{down}{down}{rght}zu welchem preis?"
+16113 b$=""
+16115 gosub10800:print"{down}{down}{down}{down}{down}{down}{rght}{rght}{rght}{rght}dm ";
+16116 geta$:ifa$<>chr$(20)then16119
+16117 iflen(b$)>0thenprint"{left}{rvon} {left}";:b$=left$(b$,len(b$)-1)
+16118 goto16116
+16119 ifa$<>""anda$<>chr$(13)thenifasc(a$)<48orasc(a$)>57then16116
+16120 printa$;:ifa$=chr$(13)andlen(b$)>0then16122
+16121 b$=b$+a$:goto16116
+16122 pt=val(b$)
+16125 gosub17000
+16130 ifa$="j"thengosub10000:gosub8000:gosub7000
+16135 fora=1to3000:next:return
+16140 gosub10800:print"{down}{down}{down}{down}{rght}gegen welche ?":gosub19000:iffe=1then16500
+16145 z6=i:j=i
+16150 ifbe(j)<>zthen16500
+16155 fork=0toko(fa(j))-1:b(k)=st(fa(j),k)
+16160 nextk
+16165 ifsb(j)>0orsb(b(1))>0then16500
+16170 ifm=2andsb(b(2))>0then16500
+16180 gosub17500:goto16130
+16500 gosub10800:print"{down}{down}{down}{down}{down}{down}{rght}falsche eingabe!":fora=1to1500:next:gosub10900
+16510 return
+17000 gosub10900:gosub10800:print"{down}{rght}"sp$(z)" will":gosub10800
+17002 print"{down}{down}{rght}von "sp$(z4)" "ar$(z7)
+17005 a$=""
+17010 gosub10800:print"{down}{down}{down}{rght}"sn$(z7):gosub10800:print"{down}{down}{down}{down}{rght}fuer dm"pt
+17015 gosub10800:print"{down}{down}{down}{down}{down}{down}{rght}{rght}{rght}(j/n)?"
+17020 ifz4>anthen17100
+17024 tm$=ti$
+17025 geta$:ifa$=""then17025
+17026 ti$=tm$
+17030 ifa$="j"then17050
+17035 ifa$="n"then17045
+17040 goto17024
+17045 gosub10800:print"{down}{down}{down}{down}{down}{down}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}nein!":return
+17050 ifge(z)<ptthengosub10800:print"{down}{down}{down}{down}{down}{down}{rght}zu wenig geld! "
+17051 ifge(z)<ptthenreturn
+17055 gosub10800:print"{down}{down}{down}{down}{down}{down}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}ja!"
+17060 be(z7)=z
+17061 ifhy(z7)=0thenkp(z,fa(z7))=kp(z,fa(z7))+1
+17063 ifhy(z7)=0thenkp(z4,fa(z7))=kp(z4,fa(z7))-1
+17065 ge(z)=ge(z)-pt:ge(z4)=ge(z4)+pt:return
+17100 ifkp(z,fa(z7))=ko(fa(z7))-1thena$="n"
+17105 ifkp(z4,fa(z7))>1thena$="n"
+17110 m=0
+17115 forj=1to8:ifkp(z4,j)=ko(j)thenm=m+1
+17120 nextj:ifm<2andpt<3*pr(z7)thena$="n"
+17125 ifpt<2*pr(z7)thena$="n"
+17130 ifpt>3*pr(z7)andrnd(1)<.5thena$="n"
+17132 ifge(z4)>3000thena$="n"
+17135 ifa$<>"n"thena$="j"
+17140 goto17030
+17500 r=pr(z7)-pr(z6):a$=""
+17505 ifr>0andge(z)<rthenreturn
+17510 gosub10900:gosub10800:print"{down}{rght}"sp$(z)" will":gosub10800
+17512 print"{down}{down}{rght}von "sp$(z4)" "ar$(z7):gosub10800
+17513 ifr>=0then17520
+17515 print"{down}{down}{down}{rght}"sn$(z7)" +":gosub10800:print"{down}{down}{down}{down}"abs(r)"dm gegen "ar$(z6)
+17517 gosub10800:print"{down}{down}{down}{down}{down}{rght}"sn$(z6)
+17518 goto17525
+17520 gosub10800:print"{down}{down}{down}{rght}"sn$(z7):gosub10800:print"{down}{down}{down}{down}{rght}gegen dm"abs(r)
+17522 gosub10800:print"{down}{down}{down}{down}{down}{rght}+ "sn$(z6)
+17525 gosub10800:print"{down}{down}{down}{down}{down}{down}{rght}{rght}{rght}(j/n)?"
+17530 ifz4>anthen17600
+17534 tm$=ti$
+17535 geta$:ifa$=""then17535
+17536 ti$=tm$
+17540 ifa$="j"then17555
+17545 ifa$="n"then17552
+17550 goto17534
+17552 gosub10800:print"{down}{down}{down}{down}{down}{down}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}nein!":return
+17555 gosub10800:print"{down}{down}{down}{down}{down}{down}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}ja!"
+17556 ifr>0andge(z)<rthengosub10800:print"{down}{down}{down}{down}{down}{down}{rght}zu wenig geld":goto17575
+17557 ifr<0andge(z4)<(-r)thengosub10800:print"{down}{down}{down}{down}{down}{down}{rght}zu wenig geld":goto17575
+17560 be(z7)=z:be(z6)=z4
+17561 ifhy(z7)=0thenkp(z,fa(z7))=kp(z,fa(z7))+1
+17563 ifhy(z7)=0thenkp(z4,fa(z7))=kp(z4,fa(z7))-1
+17565 ifhy(z6)=0thenkp(z4,fa(z6))=kp(z4,fa(z6))+1
+17567 ifhy(z6)=0thenkp(z,fa(z6))=kp(z,fa(z6))-1
+17570 ge(z)=ge(z)-r:ge(z4)=ge(z4)+r
+17575 return
+17600 ifkp(z,fa(z7))-ko(fa(z7))<=kp(z4,fa(z6))-ko(fa(z6))thena$="j"
+17602 ifa$<>"j"thena$="n"
+17605 ifr<0andge(z4)<abs(r)thena$="n"
+17610 goto17540
+18000 ifge(z)<z9then18015
+18005 ifz>anthengosub10000:gosub8000
+18010 v=0:fora=1to1000:next:return
+18015 q=0
+18020 fori=1to40
+18025 ifbe(i)=zthenq=1
+18030 nexti
+18035 ifq=0then27000
+18040 gosub18100:gosub7000:goto18000
+18100 ifz>anthen18500
+18105 gosub10900:gosub10800:print"{down}haeuser verk. -> v"
+18110 gosub10800:print"{down}{down}hypothek aufn.-> h"
+18115 gosub10800:print"{down}{down}{down}strasse verk. -> s"
+18120 gosub10800:print"{down}{down}{down}{down}{down}{rght}{rght}schuld:"z9
+18124 tm$=ti$
+18125 geta$:ifa$=""then18125
+18126 ti$=tm$
+18127 ifa$="v"then18300
+18128 ifa$="h"then18200
+18129 ifa$<>"s"then18124
+18130 gosub10900:gosub10800:print"{down}{rght}welche strasse":gosub10800:print"{down}{down}{rght}willst du"
+18135 gosub10800:print"{down}{down}{down}{rght}verkaufen?"
+18140 gosub19000:iffe=1then18105
+18142 ifbe(i)<>zthen18400
+18144 forj=0to2
+18146 b(j)=st(fa(i),j)
+18148 nextj
+18150 q=0
+18152 forj=0toko(fa(i))
+18154 ifsb(b(j))>0thenq=1
+18156 nextj
+18160 ifq=1then18400
+18165 be(i)=5
+18170 ge(z)=ge(z)+pr(i)*(1+(.5*(hy(i)=1)))
+18172 ifhy(i)=0thenkp(z,fa(i))=kp(z,fa(i))-1
+18175 hy(i)=0:gosub10000:gosub8000:return
+18200 gosub10900:gosub10800:print"{down}{rght}auf welche":gosub10800:print"{down}{down}{rght}strasse willst"
+18205 gosub10800:print"{down}{down}{down}{rght}du eine hypothek":gosub10800:print"{down}{down}{down}{down}{rght}aufnehmen?"
+18210 gosub19000:iffe=1then18105
+18215 ifbe(i)<>zthen18400
+18220 forj=0toko(fa(i))-1
+18225 b(j)=st(fa(i),j)
+18230 nextj
+18235 q=0
+18240 forj=0toko(fa(i))-1
+18245 ifsb(b(j))>0thenq=1
+18250 nextj
+18255 ifq=1then18400
+18260 ifhy(i)=1then18400
+18265 ge(z)=ge(z)+.5*pr(i)
+18267 kp(z,fa(i))=kp(z,fa(i))-1
+18270 hy(i)=1:gosub10000:gosub8000:return
+18300 gosub10900:gosub10800:print"{down}{rght}auf welchem":gosub10800:print"{down}{down}{rght}strassenzug
+18305 gosub10800:print"{down}{down}{down}{rght}willst du haeuser":gosub10800:print"{down}{down}{down}{down}{rght}verkaufen?"
+18310 gosub10800:print"{down}{down}{down}{down}{down}{rght}(die 1. angeben)"
+18315 gosub19000:iffe=1then18105
+18325 forj=0toko(fa(i))-1
+18330 b(j)=st(fa(i),j)
+18332 nextj
+18335 gosub10900
+18337 forj=0toko(fa(i))-1
+18340 gosub10800:printleft$(un$,j+1)sn$(b(j))":"
+18345 geta$:ifa$=""then18345
+18347 ifasc(a$)<48orasc(a$)>53then18345
+18350 w(j)=val(a$):gosub10800:printleft$(un$,j+1)"{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}"w(j)
+18355 c(j)=sb(b(j))-w(j)
+18360 nextj
+18370 ifabs(c(0)-c(1))>1then18400
+18372 ifko(fa(i))=3andabs(c(0)-c(2))>1then18400
+18374 ifko(fa(i))=3andabs(c(1)-c(2))>1then18400
+18376 w=w(0)+w(1)+w(2)
+18378 forj=0toko(fa(i))-1
+18380 sb(b(j))=sb(b(j))-w(j)
+18385 nextj
+18390 ge(z)=ge(z)+w*500*int((fa(i)+1)/2)
+18395 gt=gt-w:z4=i:gosub10000:gosub8000:goto18965
+18400 gosub10900:gosub10800:print"{down}{down}{rght}das geht nicht!"
+18405 fora=1to1500:next:goto18105
+18500 z4=0:o=1
+18505 forb=1to10:forc=0toko(b)-1:i=st(b,c):ifz4<>0then18514
+18510 ifv>0thengosub18615:goto18514
+18512 onogosub18525,18540,18555,18570,18585,18600,18615,18630,18645
+18514 nextc,b
+18516 ifz4<>0thenonz5goto18900,18920,18940
+18518 o=o+1:ifo<10then18505
+18520 return
+18525 if(fa(i)=9orfa(i)=10)andbe(i)=zandhy(i)=0thenz4=i:z5=1
+18526 return
+18540 ifkp(z,fa(i))=1andbe(i)=zandhy(i)=0thenz4=i:z5=1
+18541 return
+18555 ifkp(z,fa(i))=2andko(fa(i))=3andbe(i)=zandhy(i)=0thenz4=i:z5=1
+18556 return
+18570 if(fa(i)=9orfa(i)=10)andbe(i)=zthenz4=i:z5=2
+18571 return
+18585 ifkp(z,fa(i))=0andbe(i)=zandhy(i)=1thenz4=i:z5=2
+18586 return
+18600 ifkp(z,fa(i))=0andko(fa(i))=3andbe(i)=zandhy(i)=1thenz4=i:z5=2
+18601 return
+18615 ifkp(z,fa(i))<ko(fa(i))thenreturn
+18616 v=0:forj=0toko(fa(i))-1
+18617 b(j)=st(fa(i),j)
+18618 v=v+sb(b(j))
+18619 nextj
+18620 ifv=0thenreturn
+18621 m=0
+18622 forj=0toko(fa(i))-1
+18623 ifsb(b(j))>mthenm=sb(b(j)):z4=b(j)
+18624 nextj:z5=3:return
+18630 ifbe(i)=zandhy(i)=0thenz4=i:z5=1
+18631 return
+18645 ifbe(i)=zthenz4=i:z5=2
+18646 return
+18900 gosub10900:gosub10800:print"{down}{rght}"sp$(z)" nimmt":gosub10800
+18902 print"{down}{down}{rght}hypothek auf "ar$(z4):gosub10800:print"{down}{down}{down}{rght}"sn$(z4)"
+18905 gosub10800:print"{down}{down}{down}{down}{rght}auf.":gosub10800:print"{down}{down}{down}{down}{down}{down}{rght}schuld:"z9
+18910 ge(z)=ge(z)+.5*pr(z4)
+18913 kp(z,fa(z4))=kp(z,fa(z4))-1
+18915 hy(z4)=1:return
+18920 gosub10900:gosub10800:print"{down}{rght}"sp$(z):gosub10800
+18922 print"{down}{down}{rght}verkauft "ar$(z4):gosub10800
+18925 print"{down}{down}{down}{rght}"sn$(z4)
+18930 gosub10800:print"{down}{down}{down}{down}{down}{down}{rght}schuld:"z9
+18932 ge(z)=ge(z)+.5*pr(z4)
+18933 ifhy(z4)=0thenkp(z,fa(z4))=kp(z,fa(z4))-1
+18935 be(z4)=5:hy(z4)=0:return
+18940 gosub10900:gosub10800:print"{down}{rght}"sp$(z)" verkauft":gosub10800
+18942 print"{down}{down}{rght}ein haus auf "at$(z4):gosub10800:print"{down}{down}{down}{rght}"sn$(z4)
+18945 gosub10800:print"{down}{down}{down}{down}{down}{down}{rght}schuld:"z9
+18950 sb(z4)=sb(z4)-1:v=v-1
+18955 ge(z)=ge(z)+int((fa(z4)+1)/2)*500
+18960 gt=gt-1
+18965 return
+19000 fe=0
+19002 getb$:ifb$=""then19000
+19005 getc$:ifc$=""then19005
+19010 getd$:ifd$=""then19010
+19015 a$=b$+c$+d$
+19020 ifa$="sch"then19100
+19025 ifa$="hau"then19130
+19030 i=0
+19035 i=i+1:ifi=41then19045
+19040 ifleft$(sn$(i),3)<>a$then19035
+19045 ifi=41then19300
+19050 goto19180
+19100 getb$:ifb$=""then19100
+19105 ifb$="l"theni=40:goto19180
+19110 ifb$<>"i"then19300
+19115 i=27:goto19180
+19130 getb$:ifb$=""then19130
+19135 getb$:ifb$=""then19135
+19140 getb$:ifb$=""then19140
+19145 ifb$="s"theni=33:goto19180
+19150 ifb$<>"b"then19300
+19155 i=36:goto19180
+19180 a$=sn$(i)
+19190 gosub10800:print"{down}{down}{down}{down}{down}{down}{rght}"a$
+19195 return
+19300 fe=1:return
+19500 ifge(z)>pythenpj=0:return
+19510 pj=1:gosub10800:print"{down}{down}{down}{down}{down}{rght}"sp$(z)" hat nicht":gosub10800
+19515 print"{down}{down}{down}{down}{down}{down}{rght}genug geld."
+19520 return
+20000 tt=val(left$(ti$,2))*60+val(mid$(ti$,3,2))
+20002 print"{home}{gry1}"tr$tu$;"     {left}{left}{left}{left}{left}"str$(ru-tt)
+20005 print"{home}{gry1}"fr$fu$;"      {left}{left}{left}{left}{left}{left}"str$(fp)
+20010 return
+20500 ifpo(z)=39thengoto20520
+20505 gosub10900:gosub10800:print"{down}{rght}"sp$(z)" muss"
+20510 gosub10800:print"{down}{down}{rght}4000 dm zahlen."
+20515 bz=4000:goto20550
+20520 gosub10900:gosub10800:print"{down}{rght}"sp$(z)" muss"
+20525 gosub10800:print"{down}{down}{rght}2000 dm zahlen."
+20530 bz=2000:goto20550
+20550 ifbz>ge(z)thenz9=bz:gosub18000
+20555 ge(z)=ge(z)-bz:fp=fp+bz:return
+21000 gosub22000:gw(z)=gw(z)+1
+21010 ifwp$="pasch"thenpg(z)=0:gw(z)=0:gosub21100:goto3105
+21015 ifgw(z)=3thengw(z)=0:pg(z)=0:z9=1000:gosub21150:goto21040
+21020 ifff(z)=1thenpg(z)=0:gw(z)=0:ff(z)=0:goto21065
+21021 gosub10900:gosub10800:print"{down}{rght}willst du dich":gosub10800
+21022 print"{down}{down}{rght}fuer dm 1000":gosub10800:print"{down}{down}{down}{rght}freikaufen ?":gosub10800
+21023 print"{down}{down}{down}{down}{down}{rght}{rght}{rght}(j/n)";:ifz>anthen21030
+21024 tm$=ti$
+21025 geta$:ifa$<>"j"anda$<>"n"then21025
+21026 ti$=tm$
+21027 ifa$="j"andge(z)>=1000thengw(z)=3:print" ja!":fora=1to1000:next:goto21015
+21028 print" nein!":fora=1to1000:next:goto3235
+21030 ifgt>10orge(z)<1000thena$="n"
+21031 ifge(z)>1000and(wu=10orwu=7)thena$="j"
+21032 ifa$="n"thenprint" nein!":fora=1to1000:next:goto3235
+21033 print" ja!"
+21035 fora=1to1000:next:gw(z)=3:goto21015
+21040 ifge(z)<z9thengosub18000
+21045 ifz2=1then3235
+21050 ge(z)=ge(z)-1000:goto3105
+21065 gosub10900:gosub10800:print"{down}{rght}{rght}{rght}e/g-karte:"
+21066 gosub10800:print"{down}{down}{rght}du kommst aus":gosub10800:print"{down}{down}{down}{rght}dem gefaengnis"
+21067 gosub10800:print"{down}{down}{down}{down}{rght}frei."
+21070 goto3105
+21100 gosub10900:gosub10800:print"{down}{rght}{rght}{rght}{rght}* pasch *"
+21105 gosub10800:print"{down}{down}{rght}du kommst aus":gosub10800:print"{down}{down}{down}{rght}dem gefaengnis"
+21110 gosub10800:print"{down}{down}{down}{down}{rght}frei."
+21115 return
+21150 gosub10900:gosub10800:print"{down}{rght}du kommst fuer"
+21155 gosub10800:print"{down}{down}{rght}1000 dm aus dem":gosub10800:print"{down}{down}{down}{rght}gefaengnis frei"
+21160 return
+21999 goto3100
+22000 gosub10900
+22005 gosub10800:print"{down}{rght}{rght}{rght}* wuerfeln *"
+22010 ifz>anor(pg(z)=0andwp$="")then22025
+22015 gosub10800:print"{rvof}{down}{down}{down}{rght}{rght}{rght}{rght}{rght}{rght}return"
+22019 tm$=ti$
+22020 geta$:ifa$<>chr$(13)then22020
+22021 ti$=tm$:gosub10800:print"{down}{down}{down}{rght}{rght}{rght}{rght}{rght}{rght}      "
+22025 w(1)=6:w(2)=6
+22030 b(1)=int(rnd(1)*12)+13
+22040 b(2)=int(rnd(1)*12)+13
+22045 ifb(1)>=b(2)thenx=b(1):goto22050
+22046 x=b(2)
+22050 fory=1tox:fori=1to2
+22052 ify>b(i)then22056
+22055 w(i)=w(i)-1:ifw(i)=0thenw(i)=6
+22056 nexti
+22057 print"{home}"left$(re$,21)left$(un$,22);
+22058 onw(1)gosub22200,22210,22220,22230,22240,22250
+22059 print"{home}"left$(re$,25)left$(un$,22);
+22060 onw(2)gosub22200,22210,22220,22230,22240,22250
+22065 nexty
+22070 ifw(1)=w(2)thenwp$="pasch"
+22072 ifw(1)<>w(2)thenwp$=""
+22075 ifwp$="pasch"thenp=p+1:ifp=3thenpg(z)=1:wu=11-po(z):ifwu<0thenwu=wu+40
+22080 ifp=3then22100
+22085 wu=w(1)+w(2)
+22090 return
+22100 gosub10900:gosub10800
+22105 print"{down}dreimal pasch:"
+22110 gosub10800:print"{down}{down}{down}"sp$(z)" muss ins"
+22115 gosub10800:print"{down}{down}{down}{down}gefaengnis."
+22120 fora=1to2000:next:return
+22200 print"{lgrn}{rvon}   {down}{left}{left}{left} Q {down}{left}{left}{left}   ";:return
+22210 print"{lgrn}{rvon}  Q{down}{left}{left}{left}   {down}{left}{left}{left}Q  ";:return
+22220 print"{lgrn}{rvon}Q  {down}{left}{left}{left} Q {down}{left}{left}{left}  Q";:return
+22230 print"{lgrn}{rvon}Q Q{down}{left}{left}{left}   {down}{left}{left}{left}Q Q";:return
+22240 print"{lgrn}{rvon}Q Q{down}{left}{left}{left} Q {down}{left}{left}{left}Q Q";:return
+22250 print"{lgrn}{rvon}Q Q{down}{left}{left}{left}Q Q{down}{left}{left}{left}Q Q";:return
+23000 a=0
+23002 iflen(er$(a,ez))>18then23010
+23005 a=a+1:goto23002
+23010 lt$=right$(er$(a,ez),6):l1$=left$(lt$,1):e$(a)=left$(er$(a,ez),18)
+23012 ifa>0thenforb=0toa-1:e$(b)=er$(b,ez):nextb
+23015 gosub10900
+23020 fori=0toa
+23025 gosub10800:printleft$(un$,i+1)e$(i)
+23030 nexti
+23035 ez=ez+1:ifez=16thenez=0
+23040 goto23140
+23100 a=0
+23102 iflen(ge$(a,gz))>18then23110
+23105 a=a+1:goto23102
+23110 lt$=right$(ge$(a,gz),6):l1$=left$(lt$,1):g$(a)=left$(ge$(a,gz),18)
+23112 ifa>0thenforb=0toa-1:g$(b)=ge$(b,gz):nextb
+23115 gosub10900
+23120 fori=0toa
+23125 gosub10800:printleft$(un$,i+1)g$(i)
+23130 nexti
+23135 gz=gz+1:ifgz=16thengz=0
+23140 ifmid$(lt$,1,3)<>"0"thenl3=val(right$(lt$,4)):goto23160
+23145 ifmid$(lt$,1,4)<>"0"thenl3=val(right$(lt$,3)):goto23160
+23150 ifmid$(lt$,1,5)<>"0"thenl3=val(right$(lt$,2)):goto23160
+23155 l3=val(right$(lt$,1)):goto23160
+23160 ifl1$="x"thenwu=l3-po(z):ifwu<0thenwu=wu+40
+23162 ifl1$="x"then3105
+23165 ifl1$="y"thenwu=l3-po(z):ll=1
+23166 ifl1$="y"then3105
+23170 ifl1$<>"z"then23175
+23171 ifl3>ge(z)thenz9=l3:gosub18000
+23172 ifz2=1then3235
+23173 ge(z)=ge(z)-l3:fp=fp+l3:goto3235
+23175 ifl1$="e"thenge(z)=ge(z)+l3:goto3235
+23180 ifl1$="g"thenwu=-3:ll=1:goto3105
+23185 ifl1$="f"thenff(z)=1:goto3235
+23190 ifl1$="k"thenpg(z)=1:wu=11-po(z):ifwu<0thenwu=wu+40
+23195 ifl1$="k"thengosub9000:goto3235
+23200 ifl1$<>"a"then23220
+23201 gosub10800:print"{down}{down}{down}{down}{down}{down}{rvof}e{rvon}'karte - {rvof}z{rvon}ahlen ?"
+23202 ifz<=anthen23205
+23203 ifrnd(1)<.5orge(z)<200then23210
+23204 goto23215
+23205 tm$=ti$
+23206 geta$:ifa$=""then23205
+23207 ti$=tm$:ifa$="e"then23210
+23208 ifa$<>"z"then23205
+23209 goto23215
+23210 q$="{down}{down}{down}{down}{down}{down}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}          "
+23211 gosub10800:printq$:fora=1to1500:next
+23212 goto23000
+23215 q$="{down}{down}{down}{down}{down}{down}         "
+23216 gosub10800:printq$:ifge(z)<200then23201
+23217 ge(z)=ge(z)-200:fp=fp+200:goto3235
+23220 ifl1$<>"b"then23230
+23221 fori=1to4:ifi=zthen23223
+23222 ifge(i)>200thenge(i)=ge(i)-200
+23223 nexti
+23224 ge(z)=ge(z)+600
+23225 goto3235
+23230 ifl1$<>"s"then23250
+23231 u=0
+23232 fori=1to40
+23233 ifsb(i)=5andbe(i)=zthenu=u+2300:goto23235
+23234 ifsb(i)>0andbe(i)=zthenu=u+800*sb(i)
+23235 next:gosub10800:print"{down}{down}{down}{down}{down}{down}{rght}gesamt:"u"dm"
+23236 ifge(z)<uthenz9=u:gosub18000
+23237 ifz2=1then3235
+23238 ge(z)=ge(z)-u
+23239 fp=fp+u
+23240 goto3235
+23250 ifl1$<>"r"then3235
+23251 u=0
+23252 fori=1to40
+23253 ifsb(i)=5andbe(i)=zthenu=u+2000:goto23255
+23254 ifsb(i)>0andbe(i)=zthenu=u+500*sb(i)
+23255 nexti:gosub10800:print"{down}{down}{down}{down}{down}{down}{rght}gesamt:"u"dm"
+23256 ifge(z)<uthenz9=u:gosub18000
+23257 ifz2=1then3235
+23258 ge(z)=ge(z)-u
+23259 fp=fp+u
+23260 goto3235
+24000 ifbe(po(z))=5then24045
+24005 ifbe(po(z))=zthengosub10900:gosub10800:print"{down}{rght}"sp$(z)" ist"
+24006 ifbe(po(z))=zthengosub10800:print"{down}{down}{rght}selbst besitzer":return
+24010 ifbe(14)=be(29)andhy(14)=0andhy(29)=0thenmx=200*wu:goto24020
+24012 mx=80*wu
+24015 ifhy(po(z))=1then24500
+24020 gosub10900:gosub10800:print"{down}{rght}"sp$(z)" zahlt an":gosub10800
+24025 print"{down}{down}{rght}"sp$(be(po(z)));mx"dm":gosub10800:print"{down}{down}{down}{rght}miete."
+24030 ge(be(po(z)))=ge(be(po(z)))+mx
+24035 ifge(z)<mxthenz9=mx:gosub18000:ifz2=1thenreturn
+24040 ge(z)=ge(z)-mx:return
+24045 gosub10900:gosub10800:print"{down}{rght}"sn$(po(z)):gosub10800
+24047 print"{down}{down}{rght}ist fuer"pr(po(z))"dm"
+24050 gosub10800:print"{down}{down}{down}{rght}zu verkaufen.":gosub10800:print"{down}{down}{down}{down}{down}{rght}{rght}{rght}(j/n)?"
+24055 ifz>anthen24135
+24059 tm$=ti$
+24060 geta$:ifa$<>"j"anda$<>"n"then24060
+24061 ti$=tm$
+24065 ifa$="n"thengosub10800:print"{down}{down}{down}{down}{down}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}nein !":return
+24070 gosub10800:print"{down}{down}{down}{down}{down}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}ja !"
+24075 py=pr(po(z))
+24080 gosub19500:ifpj=1thenreturn
+24085 ge(z)=ge(z)-py
+24090 be(po(z))=z
+24095 kp(z,fa(po(z)))=kp(z,fa(po(z)))+1
+24100 print"{home}"left$(un$,zl)"{rght}"fa$(fa(po(z)))"{rvon}              {rvof} - "bb$(sb(po(z)));
+24102 print"{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{rvon}"sn$(po(z))
+24105 zl=zl+1:ifzl=22thengosub10000:zl=4
+24110 return
+24135 ifkp(z,fa(po(z)))=0andrnd(1)<.1andge(z)<2*pr(po(z))thena$="n":goto24065
+24140 ifge(z)>=pr(po(z))thena$="j":goto24070
+24145 a$="n":goto24065
+24200 ifbe(po(z))=5then24045
+24205 ifbe(po(z))=zthengosub10900:gosub10800:print"{down}{rght}"sp$(z)" ist"
+24206 ifbe(po(z))=zthengosub10800:print"{down}{down}{rght}selbst besitzer":return
+24208 mx=(2^(kp(be(po(z)),fa(po(z)))-1))*500
+24210 goto24015
+24400 ifbe(po(z))=5then24045
+24405 ifbe(po(z))=zthengosub10900:gosub10800:print"{down}{rght}"sp$(z)" ist"
+24406 ifbe(po(z))=zthengosub10800:print"{down}{down}{rght}selbst besitzer":return
+24410 mx=mi(po(z),sb(po(z)))
+24415 ifkp(be(po(z)),fa(po(z)))=ko(fa(po(z)))andsb(po(z))=0thenmx=mx*2
+24420 goto24015
+24500 gosub10900:gosub10800:print"{down}{rght}hypothek auf "at$(po(z)):gosub10800
+24505 print"{down}{down}{rght}"sn$(po(z))":":gosub10800:print"{down}{down}{down}{down}{rght}keine miete!"
+24510 return
+25000 dimpr(40),mi(40,5),be(40),ar$(40),gw(4)
+25005 dimsb(40),fa(40),kp(4,10),hy(40),ge(4),g1(4),gg(4),sp$(5),po(4),pg(4)
+25010 dimer$(4,15),ge$(4,15),v(15),kn(40),fb(40),ze(40),at$(40),st(10,3)
+25015 fora=1to4:ge(a)=30000:next
+25020 fora=1to40:readpr(a):next
+25025 fora=1to40:forb=0to5:readmi(a,b):nextb,a
+25030 fora=1to40:be(a)=5:next
+25035 fora=1to40:readar$(a):next
+25036 fora=1to40:readat$(a):next
+25040 fora=1to40:readfa(a):next
+25045 fora=1to10:readko(a):next
+25050 fora=0to15:v(a)=a:next
+25055 fora=15to0step-1
+25060 c=int(rnd(1)*(a+1)):e=0
+25065 readge$(e,v(c))
+25070 iflen(ge$(e,v(c)))<=18thene=e+1:goto25065
+25075 ifc=athen25085
+25080 ford=ctoa-1:v(d)=v(d+1):nextd
+25085 nexta:return
+25090 fora=0to15:v(a)=a:next
+25095 fora=15to0step-1
+25100 c=int(rnd(1)*(a+1)):e=0
+25105 reader$(e,v(c))
+25110 iflen(er$(e,v(c)))<=18thene=e+1:goto25105
+25115 ifc=athen25125
+25120 ford=ctoa-1:v(d)=v(d+1):nextd
+25125 nexta
+25130 fora=1to4:readna$(a):next
+25135 fora=1to11:b=32-a
+25136 kn(a)=2024-a:kn(b)=kn(a)-400
+25137 nexta
+25140 fora=12to20:b=52-a
+25141 kn(a)=2013-40*(a-11):kn(b)=kn(a)+10
+25142 nexta
+25150 re$="{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}"
+25155 un$="{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}"
+25160 tr$=left$(re$,31):tu$=left$(un$,17)
+25165 fr$=left$(re$,31):fu$=left$(un$,22)
+25170 sr$=left$(re$,21):su$=left$(un$,6)
+25175 l$="{cyn}{rvon}                  {down}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}"
+25180 fora=1to3:lo$=lo$+l$:next
+25185 fora=1to2:lp$=lp$+l$:next
+25190 fora=1to2:lq$=lq$+l$:next
+25200 fa$(1)="{blu}":fa$(2)="{cyn}":fa$(3)="{pur}":fa$(4)="{orng}":fa$(5)="{red}":fa$(6)="{yel}"
+25205 fa$(7)="{grn}":fa$(8)="{lblu}":fa$(9)="{wht}":fa$(10)="{gry2}"
+25210 fora=1to40:readfb(a),ze(a):nexta
+25215 return
+25220 fora=1to40:pokekn(a)+54272,fb(a):pokekn(a),ze(a):next
+25300 b=0:c=0:d=0
+25305 fora=1to40:readsn$(a)
+25310 iffa(a)<9andfa(a)>0thenst(fa(a),b)=a:b=b+1:ifb=ko(fa(a))thenb=0
+25315 iffa(a)=9thenst(9,c)=a:c=c+1
+25320 iffa(a)=10thenst(10,d)=a:d=d+1
+25325 nexta
+25999 return
+26000 data0,1200,0,1600,0,4000,2000,0,2000,2400,0,2800,2800,3000,3200,4000
+26005 data3600,0,3600,4000,0,4400,0,4400,4800,4000,5200,5200,3000,5600,0,6000
+26010 data6000,0,6400,4000,0,7000,0,8000
+26020 data0,0,0,0,0,0
+26025 data40,200,600,1800,3200,5000
+26030 data0,0,0,0,0,0
+26035 data80,400,1200,3600,6400,9000
+26040 data0,0,0,0,0,0
+26045 data500,1000,2000,4000,0,0
+26050 data120,600,1800,5400,8000,11000
+26055 data0,0,0,0,0,0
+26060 data120,600,1800,5400,8000,11000
+26065 data160,800,2000,6000,9000,12000
+26070 data0,0,0,0,0,0
+26075 data200,1000,3000,9000,12000,15000
+26080 data200,1000,3000,9000,12000,15000
+26085 data1,1,1,1,1,1
+26090 data240,1200,3600,10000,13000,16000
+26095 data500,1000,2000,4000,0,0
+26100 data280,1400,4000,11000,15000,19000
+26105 data0,0,0,0,0,0
+26110 data280,1400,4000,11000,15000,19000
+26115 data320,1600,4400,12000,16000,20000
+26120 data0,0,0,0,0,0
+26125 data360,1800,5000,14000,17500,23000
+26130 data0,0,0,0,0,0
+26135 data360,1800,5000,14000,17500,23000
+26140 data400,2000,6000,15000,18500,24000
+26145 data500,1000,2000,4000,0,0
+26150 data440,2200,6600,17000,21000,25000
+26155 data440,2200,6600,17000,21000,25000
+26160 data1,1,1,1,1,1
+26165 data480,2400,7200,18000,22500,27000
+26170 data0,0,0,0,0,0
+26175 data520,2600,7800,19000,24000,28000
+26180 data520,2600,7800,19000,24000,28000
+26185 data0,0,0,0,0,0
+26190 data560,2800,8400,20000,25500,30000
+26195 data500,1000,2000,4000,0,0
+26200 data0,0,0,0,0,0
+26205 data700,3000,11000,25000,30000,35000
+26210 data0,0,0,0,0,0
+26211 data1000,4000,12000,28000,34000,40000
+26212 data,die,das,die,die,den,die,das,die,die,das,die,die,das,die,den,die,das
+26213 datadie,die,,die,das,die,den,den,die,die,das,die,,den,die,das,die,den
+26214 datadas,die,die,die
+26215 data,der,dem,der,der,dem,der,dem,der,der,dem,der,der,dem,der,dem,der,dem
+26216 datader,der,,der,dem,der,dem,dem,der,der,dem,der,,dem,der,dem,der,dem,dem
+26217 datader,der,der
+26275 data0,1,0,1,0,9,2,0,2,2,0,3,3,10,3,9,4,0,4,4,0,5,0,5,5,9,6,6,10,6,0
+26280 data7,7,0,7,9,0,8,0,8
+26285 data2,3,3,3,3,3,3,2,4,2
+26330 data"zahle an das kran-
+26331 data"kenhaus. dm 2000  z 2000
+26335 data" aus lagerverkaeu-
+26336 data" fen erhaeltst du
+26337 data" dm 100.          e 0100
+26340 data" einkommenssteuer-
+26341 data" rueckzahlung. du
+26342 data" erhaeltst dm 400.e 0400
+26345 data"   arztkosten.
+26346 data"   zahle dm 100.  z 0100
+26350 data"du kommst aus dem
+26351 data"gefaengnis frei.  f 0000
+26355 data" zahle deine ver-
+26356 data" sicherungssumme.
+26357 data" dm 1000.         z 1000
+26360 data"bankirrtum zu
+26361 data"deinen gunsten. du
+26362 data"erhaeltst dm 4000 e 4000
+26365 data"du hast im kreuz-
+26366 data"wortraetsel gewon-
+26367 data"nen. du erhaeltst
+26368 data"dm 2000.          e 2000
+26370 data" gehe zurueck zur
+26371 data" badsstrasse.     y 0002
+26375 data"   gehe in das
+26376 data"   gefaengnis     k 0011
+26380 data"deine jahresrente
+26381 data"wird faellig.
+26382 data"ziehe dm 2000 ein.e 2000
+26385 data"du hast in einer
+26386 data"schoenheitskonkur-
+26387 data"renz den 2. preis
+26388 data"gewonnen. du
+26389 data"erhaeltst dm 200  e 0200
+26390 data" aus vorzugsaktien
+26391 data" erhaeltst du 7%
+26392 data" dividende. dm 500e 0500
+26395 data" du erbst dm 2000.e 2000
+26400 data" zahle eine stra-
+26401 data" fe von dm 200
+26402 data" oder nimm eine
+26403 data" ereigniskarte.   a 0000
+26405 data" ruecke vor bis
+26406 data" auf los          x 0001
+26410 data"   mache einen
+26411 data"   ausflug zum
+26412 data"   westbahnhof    x 0016
+26415 data" zahle schulgeld.
+26416 data" dm 3000.         z 3000
+26420 data"betrunken im
+26421 data"dienst. zahle eine
+26422 data"strafe von dm 200.z 0200
+26425 data" ruecke vor bis
+26426 data" zur schlossallee.x 0040
+26430 data" die bank zahlt
+26431 data" dir eine dividen-
+26432 data" de von dm 1000.  e 1000
+26435 data"  gehe 3 felder
+26436 data"  zurueck.        g 0003
+26440 data" ruecke vor bis
+26441 data" zur seestrasse.  x 0012
+26445 data" strafe fuer zu
+26446 data" schnelles fahren.
+26447 data" dm 300.          z 0300
+26450 data" miete und anlei-
+26451 data" hezinsen werden
+26452 data" faellig. du er-
+26453 data" haeltst dm 3000. e 3000
+26455 data"  ruecke vor bis
+26456 data"  auf los.        x 0001
+26460 data" ruecke vor bis
+26461 data" zum opernplatz.  x 0025
+26465 data" strassenausbes-
+26466 data"   serungsarbeiten
+26467 data"pro haus-  dm 800
+26468 data"pro hotel- dm 2300s 0000
+26470 data" lasse deine haeu-
+26471 data" ser renovieren.
+26472 data"pro haus-  dm 500
+26473 data"pro hotel- dm 2000r 0000
+26475 data"   gehe in das
+26476 data"   gefaengnis     k 0011
+26480 data" es ist dein ge-
+26481 data" burtstag. ziehe
+26482 data" von jedem spie-
+26483 data" ler dm 200 ein.  b 0200
+26485 data" du kommst aus dem
+26486 data" gefaengnis frei. f 0000
+26490 data1 comm,2 comm,3 comm,4 comm
+26500 data1,159,6,130,12,160,6,148,11,160,1,147,3,131,12,160,3,133,3,144,10,163
+26510 data4,147,4,136,15,133,4,142,1,151,8,141,12,160,8,151,8,130,13,164
+26515 data2,141,12,160,2,148,2,143,1,142,7,147,7,140,15,151,7,135,10,161
+26520 data5,146,5,136,12,160,5,130,1,136,12,160,14,144,11,160,14,147
+26620 datalos,badstrasse,gemeins.-feld,turmstrasse,einkom.-steuer,suedbahnhof
+26625 datachausseestr.,ereignisfeld,elisenstrasse,poststrasse,gefaengnis
+26630 dataseestrasse,hafenstrasse,elektr.-werk,neue strasse,westbahnhof
+26632 datamuenchner str.,gemeins.-feld,wiener strasse,berliner str.,frei parken
+26635 datamuseumsstrasse,ereignisfeld,theaterstrasse,opernplatz,nordbahnhof
+26640 dataschillerstr.,lessingstrasse,wasserwerk,goethestrasse,gehe ins gef.
+26645 datarathausplatz,hauptstrasse,gemeins.-feld,bahnhofstrasse,hauptbahnhof
+26650 dataereignisfeld,parkstrasse,zusatzsteuer,schlossallee
+27000 gosub10900:gosub10800:print"{down}{rght}"sp$(z)" ist":gosub10800
+27001 print"{down}{down}{rght}ausgeschieden !"
+27002 ge(z)=0
+27005 fori=1to40:ifbe(i)=zthenbe(i)=5
+27006 nexti
+27010 fori=1to4:ifi=zthen27015
+27012 ifpo(i)=po(z)thenq=1:j=i
+27015 nexti
+27020 ifq=0then27030
+27022 ifasc(s$(j))<65thenpokekn(po(z))+54272,1:pokekn(po(z)),asc(s$(j))
+27025 ifasc(s$(j))>=65thenpokekn(po(z))+54272,1:pokekn(po(z)),asc(s$(j))-64
+27027 goto27035
+27030 pokekn(po(z))+54272,fb(po(z)):pokekn(po(z)),ze(po(z))
+27035 po(z)=0
+27040 j=0
+27045 fori=1to4:ifpo(i)=0thenj=j+1
+27050 nexti
+27055 ifj=3then27100
+27075 z2=1:return
+27100 fora=1to4:fori=1to40
+27110 ifbe(i)=atheng1(a)=g1(a)+pr(i)*(1+.5*(hy(i)=1))
+27115 ifbe(i)=aandsb(i)>0theng1(a)=g1(a)+(int((fa(i)+1)/2)*500)*sb(i)
+27120 nexti
+27125 gg(a)=ge(a)+g1(a)
+27130 nexta
+27135 print"{clr}"
+27137 print:print
+27140 print"{red}         e n d r e s u l t a t"
+27145 print"{blu}         DDDDDDDDDDDDDDDDDDDDD"
+27150 print:print
+27155 print"{yel} spieler:  {pur}kapital:  {cyn}besitz:   {orng}gesamt:"
+27160 print"{wht}----------------------------------------";
+27163 print
+27165 fora=1to4
+27170 printtab(1)"{yel}"sp$(a);tab(11)"{pur}"ge(a);tab(21)"{cyn}"g1(a);tab(31)"{orng}"gg(a)
+27172 print
+27175 nexta
+27180 print:print:print
+27185 print"{grn}    noch ein spiel ? -> [space]"
+27190 geta$:ifa$<>" "then27190
+27200 run
+

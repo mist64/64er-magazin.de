@@ -1,0 +1,886 @@
+
+
+;buch weisheit_ba.prg ==0801==
+    1 rem  ********************************
+    2 rem  *                              *
+    3 rem  *     das buch der weisheit    *
+    4 rem  *                              *
+    5 rem  *          juli 1984           *
+    6 rem  *                              *
+    7 rem  * edgar thorand                *
+    8 rem  * an der roethe 1              *
+    9 rem  * 3501 koerle                  *
+   10 rem * 05665/1670                   *
+   11 rem *                              *
+   12 rem *       und   falk messing     *
+   13 rem *             c/o e.thorand    *
+   14 rem *                              *
+   15 rem *                              *
+   16 rem ********************************
+   23 form=1to3:y(m)=int(rnd(1)*144)+108:nextm
+   24 deffntr(cp)=(cp=ob(no)orob(no)=-2)
+   25 poke53280,2:poke53281,2
+   26 printchr$(14)
+   27 print"{clr}"
+   28 print"{down}{down}{down}{down}{down}{rght}{rght}{rght}{rght}{blk}*** Das BUCH der WEISHEIT ***"
+   29 print"{down}{down}{rght}{rght}{rght}{rght}{rght}{rght}E.Thorand  und  F.Messing"
+   30 gosub50000
+   35 print"{clr}{down}{down}{down}{down}{down}{down}{rght}{rght}Neues oder Altes Spiel ?"
+   36 getsp$:ifsp$=""then36
+   37 ifsp$="n"orsp$="N"then40
+   38 ifsp$="a"orsp$="A"then25000
+   39 goto35
+   40 poke53280,0:poke53281,0
+  100 rem
+  101 s=o
+  110 gosub1261
+  112 gosub1130
+  115 ifvb=3andn1$=""then100
+  120 ifno<9andno<>0and(vb=0orvb=1)thenvb=1:goto150
+  130 iflen(n1$)>0andno=0thens=1
+  131 ifs=1thens=0:print"{gry2}Ich kenne ";chr$(34);n1$;chr$(34);" nicht!":goto112
+  135 ifvb=27orvb=13orvb=38orvb=29orvb=24then150
+  140 ifn1$=""andvb>0thenprint"{gry2}Ich benoetige ein VERB und ein OBJEKT!":goto112
+  150 goto1490
+ 1130 print:print"{lblu}Was willst Du jetzt machen ?"
+ 1135 inputcm$
+ 1140 iflen(cm$)=0then1130
+ 1150 vb$="":no$="":vb=0:no=0
+ 1160 lc=len(cm$):fori=1tolc:a$=mid$(cm$,i,1):ifa$<>" "thenvb$=vb$+a$:next
+ 1170 iflen(vb$)+1>=len(cm$)thenno=0:goto1190
+ 1180 no$=right$(cm$,lc-i)
+ 1190 n1$=no$:v1$=vb$:vb$=left$(vb$,4):no$=left$(no$,4):fori=1tonv
+ 1200 ifvb$=vb$(i)thenvb=i:goto1240
+ 1210 next:vb=0
+ 1220 ifn1$=""thenno$=vb$
+ 1230 vb=0:goto1250
+ 1240 ifvb$=cm$thenno=0:no$="":return
+ 1250 fori=1tonn:ifno$=no$(i)thenno=i:return
+ 1260 next:no=0:no$="":return
+ 1261 ifkl=1andcp=43andvb=3thenprints$(112):return
+ 1262 ifkl=1andcp=57andvb=3thenprints$(112):return
+ 1263 ifkl=1andcp=62andvb=3thenprints$(113):return
+ 1264 ifkl=1andcp=131andvb=3thenprints$(114):return
+ 1265 ifkl=1andcp=133andvb=3thenprints$(114):return
+ 1266 ifkl=1andcp=137andvb=3thenprints$(114):return
+ 1270 ifcp<>csorvb=3andn1$=""thenprint"{clr}":cs=cp:goto1290
+ 1280 return
+ 1290 p$="{lblu}Du bist "+p$(cp)
+ 1291 printp$:iflg=0then1298
+ 1292 ifob(47)=-2andli>0thens=1
+ 1293 ifob(47)=cpandli>0thens=1
+ 1294 ifs=1thens=0:goto1298
+ 1297 prints$(62):goto1340
+ 1298 k=0:fori=1tolo:ifob(i)<>cpthen1330
+ 1300 ifk=0thenprint"{pur}Du siehst "
+ 1310 if(4+pos(0)+len(ob$(i)))>39thenprint
+ 1320 print"{wht}";ob$(i);".";:k=k+1
+ 1330 nexti
+ 1331 ifcp=134orcp=120thenprint"{wht}Eisenringe."
+ 1332 ifcp=133orcp=136orcp=139orcp=141orcp=146orcp=137thens=1
+ 1333 ifs=1thens=0:print:print"{lgrn}Da sind Schienen."
+ 1334 ifk>0thenprint
+ 1340 k=0:print:print"{pur}Moegliche Richtungen: "
+ 1350 fori=0to3:ifp(cp,i)=0then1380
+ 1360 ifk>0thenprint". ";:k=k+1
+ 1370 print"{gry3}";d$(i);:k=k+1
+ 1380 next
+ 1390 print
+ 1399 return
+ 1490 ifbi>0thenz=z+1
+ 1491 ifz=4orz=7orz>9thenprints$(26):fori=1to1500:nexti
+ 1492 ifz>12then30000
+ 1494 ifri>2thenprints$(40):fori=1to2000:nexti
+ 1495 ifri=5thenprints$(41):ob(40)=0:zz=zz-1:fori=1to2000:nexti:ri=0
+ 1500 ifob(91)=-1thenf=f+1
+ 1501 iff>4 thenprints$(67):fori=1to2500:nexti:ifob(16)=-2thenzz=zz-1
+ 1502 iff> 4thenob(16)=0:fe=0:f=0:ob(91)=-3
+ 1504 ifob(95)=-1thenb=b+1:ifb>15thenprints$(68):ifob(20)=-2thenzz=zz-1
+ 1505 ifb>15thenob(20)=0:b=0:ob(95)=-3
+ 1510 ifpf=0thenob(38)=0:pf=0
+ 1515 ifbp>0thenbp=bp+1:ifbp>5thenprints$(155):ob$(38)=ob$(98):ob(96)=0:s=1
+ 1516 ifs=1thens=0:bp=0:fori=1to2500:nexti
+ 1522 ifcp=58then30010
+ 1523 ifcp=41andob(11)<>-2thensp=sp+1:ifsp>4then30030
+ 1529 ifcp=30orcp=31orcp=39orcp=44orcp=48orcp=51orcp=52orcp=60orcp=61thens=1
+ 1530 ifs=1thensm=sm+1:ifsm>5thens=0:goto30020
+ 1540 ifcp=161thenprints$(163):fori=1to2000:nexti:goto30010
+ 1545 ifcp=149thenprints$(164):fori=1to2000:nexti:goto30010
+ 1600 ifru>0thenru=ru+1:goto100
+ 1601 ifru=2orru=4orru=6thenprints$(167):goto100
+ 1603 ifru>6thengoto30010
+ 1700 form=1to3:ifcp=y(m)then1705
+ 1701 nextm
+ 1702 goto1991
+ 1705 ifob(13)=-2thenprints$(167):ob(13)=0:zz=zz-1:y(1)=0:y(2)=0:y(3)=0:s=1
+ 1706 ifs=1thens=0:fori=1to2000:nexti:goto1991
+ 1707 fori=1tolo:ifob(i)=-2thenob(i)=0:zz=zz-1:prints$(168):y(m)=0:s=1
+ 1708 ifs=1thens=0:forx=1to2000:nextx:goto1991
+ 1709 nexti
+ 1991 ifkl=1andvb<>13thenifkl=1andvb<>12thenprints$(2):goto112
+ 2000 ifvb=0then2100
+ 2010 onvbgoto3000,3500,4000,4500,5000,5500,14000,6500,7000,7500,8000,8500,9000
+ 2011 onvb-13goto9500,10000,10000,3500,3500,10500,10500,11000,3000,3000
+ 2012 onvb-23goto11500,12000,12500,20000,13500,14000,14000,14500,14500,15000
+ 2013 onvb-33goto15500,16000,16500,17000,17500
+ 2100 print"{gry2}Ich habe nie gelernt,wie man "
+ 2101 printchr$(34);v1$;chr$(34);" anwendet":goto100
+ 3000 ifno<9then3025
+ 3005 ifnotfntr(cp)thenprints$(3):goto100
+ 3008 ifno=10andcp=7thencp=177:goto100
+ 3010 ifno=30thenprints$(136):goto100
+ 3020 ifno=79andob(79)=cpthenprints$(157):goto100
+ 3022 ifno=61thenprints$(157):goto100
+ 3023 ifno=64thenprints$(157):goto100
+ 3024 prints$(158):goto100
+ 3025 ifno>4thenno=no-4
+ 3026 no=no-1
+ 3030 ifp(cp,no) =0thenprint"Kein Weg in diese Richtung":goto100
+ 3035 ifcp=148orcp=153orcp=156orcp=160orcp=164thens=1
+ 3040 ifs=1thenifob(30)<>-2thenprints$(159):s=0:fori=1to1500:nexti:goto30010
+ 3045 ifs=1thenifob(30)=-2andob(31)<>-2thenprints$(160):s=0:ru=1:goto100
+ 3046 s=0
+ 3050 ifcp=25andno=1andob(21)=cpthenprint"{lgrn}Der Tiger ";s$(28):goto100
+ 3055 ifcp=28andno=1andob(90)<>-1thenprint"{lgrn}Der Puma ";s$(28):goto100
+ 3060 ifcp=33andno=2andob(17)=cpthenprint"{lgrn}Die Phyton ";s$(28):goto100
+ 3065 ifcp=34andno=2andob(71)=cpthenprint"{lgrn}Die Affen ";s$(161):goto100
+ 3070 ifcp=35andno=2andob(18)=cpthenprint"{lgrn}Die Elephanten ";s$(161):goto100
+ 3075 ifcp=49andno=2andob(25)=cpthenprint"{lgrn}Die Boa ";s$(28):goto100
+ 3080 ifcp=41andob(22)=cpandob(87)<>-1thenprint"{lgrn}Die Spinne ";s$(28):goto100
+ 3083 ifcp=73andno=3andob(76)=cpthencp=61:goto100
+ 3085 ifcp=73andob(76)=cpthenprint"{lgrn}Die Krebse ";s$(161):goto100
+ 3090 ifcp=63andno=1andob(73)=cpthenprint"{lgrn}Die Ratten ";s$(161):goto100
+ 3100 ifcp=84andno=0andob(37)=cpthenprint"{lgrn}Die Pflanze ";s$(28):goto100
+ 3110 ifcp=87andno=0andob(89)<>-1thenprint"{lgrn}Der Scorpion ";s$(28):goto100
+ 3115 ifcp=106andob(47)<>-2andno=2thenprint"{lgrn}Die Zwerge ";s$(161):goto100
+ 3120 ifcp=106andno=3andob(12)<>-2thenprint"{lgrn}Die Zwerge ";s$(161):goto100
+ 3131 ifcp=130andno=1andob(57)=cpthenprint"{lgrn}Der Flugdrache ";s$(28):goto100
+ 3135 ifcp=135andno=2andob(62)=cpthenprint"{lgrn}Der Waechter ";s$(28):goto100
+ 3136 ifcp=156andob(43)=cpandno=2thenprint"{lgrn}Die Krokodile ";s$(161):goto100
+ 3137 ifcp=124andno=2andob(56)=cpthenprint"{lgrn}Der Steinfresser ";s$(28):goto100
+ 3140 ifcp=120andba<>cpandno=1thens=1
+ 3141 ifcp=112andba<>cpandno=0thens=1
+ 3142 ifcp=128andba<>cpandno=2thens=1
+ 3143 ifcp=134andba<>cpandno=2thens=1
+ 3144 ifcp=145thens=1
+ 3148 ifs=1thenprints$(56):cp=147:ob(47)=106:ob(12)=165:fori=1to2500:nexti
+ 3149 ifs=1thenzz=zz-1:lg=0:s=0:goto100
+ 3150 cp=p(cp,no):goto100
+ 3500 :
+ 3504 ifnotfntr(cp)thenprints$(3):goto100
+ 3505 ifse>0andno=42thenprints$(2):goto100
+ 3506 ifob(no)=-2thenprints$(25):goto100
+ 3508 ifno=10orno=18orno=19orno=21orno=23orno=24orno=26orno=27orno=28thens=1
+ 3509 ifno=29orno=37orno=41orno=46orno=49orno=61orno=60orno=62orno=63thens=1
+ 3510 ifno=67orno=68orno=69orno=72orno=75orno=79orno=71orno=36orno>81thens=1
+ 3511 ifs=1thenprints$(7):s=0:goto100
+ 3514 ifno=54orno=64thenprints$(9):goto100
+ 3516 ifno=17orno=25orno=33orno=56orno=57orno=73thens=1
+ 3519 ifno=22andob(87)<>-1thens=1
+ 3521 ifno=70andob(88)<>-1thens=1
+ 3522 ifno=74andob(89)<>-1thens=1
+ 3527 ifs=1thenprints$(8):s=0:bi=1:goto100
+ 3529 ifno=13andob(88)<>-1thenprint"{lgrn}Die Tarantel";s$(28):goto100
+ 3530 ifno=47andob(46)=cpandlg=0thenprint"{lgrn}Der Zwergenkoenig";s$(28):goto100
+ 3532 ifno=47andli=0thenli=cp
+ 3539 ifzz>8thenprints$(27):goto100
+ 3540 prints$(1):ob(no)=-2:zz=zz+1:goto100
+ 4000 :
+ 4005 ifnotfntr(cp)thenprints$(3):goto100
+ 4010 ifno=48orno=54orno=58orno=60orno=65orno=66orno=50then4020
+ 4012 prints$(143):goto100
+ 4020 ifno=48andob(82)=-1thenprints$(144):goto100
+ 4025 ifno=48thenprints$(145):goto100
+ 4030 ifno=66andob(83)=-1andob(80)=cpthenprints$(146):goto100
+ 4035 ifno=66andob(83)=-1thenprints$(144):goto100
+ 4040 ifno=66thenprints$(145):goto100
+ 4045 ifno=60thenprints$(147):goto100
+ 4050 ifno=54thenprints$(148):goto100
+ 4055 ifno=65thenprints$(149):goto100
+ 4060 ifno=50thenprints$(165):goto100
+ 4065 prints$(143):goto100
+ 4500 :
+ 4503 ifnotfntr(cp)thenprints$(3):goto100
+ 4504 ifno=12andob(12)<>-2thenprints$(29):goto100
+ 4505 ifno=47andob(47)<>-2thenprints$(29):goto100
+ 4506 ifno=12andob(46)=cpthenprints$(57):ob(12)=0:ob(47)=-2:lg=1:goto 100
+ 4507 ifno=47andob(46)=cpthenprints$(72):ob(12)=cp:ob(47)=cp:lg=0:ob(12)=-2:s=1
+ 4508 ifs=1thens=0:goto100
+ 4510 ifcp=106thenprints$(13):goto100
+ 4513 ifcp<>106thenprints$(73):goto100
+ 4515 prints$(58):goto100
+ 5000 :
+ 5004 ifob(42)<>-2thenprints$(29):goto100
+ 5006 ifcp=43thenprints$(42):se=1:ob(42)=cp:zz=zz-1:goto100
+ 5008 ifcp=57thenprints$(43):se=1:ob(42)=cp:zz=zz-1:goto100
+ 5012 ifcp=120orcp=134thens=1
+ 5014 ifs=1thens=0:prints$(48):zz=zz-1:ob(42)=cp:se=1:goto100
+ 5018 prints$(46):goto100
+ 5500 :
+ 5504 ifnotfntr(cp)thenprints$(3):goto100
+ 5506 ifno=40orno=58then5508
+ 5507 prints$(36):goto100
+ 5508 ifno=58anddr=1thenprints$(6):goto100
+ 5509 ifno=58thenprints$(37):p(131,2)=135:dr=1:goto100
+ 5510 ifno=40andob(12)=-2thenprint"{clr}{down}{down}{down}{down}{down}{down}";s$(39):ri=ri+1:goto5514
+ 5512 prints$(38):goto100
+ 5514 x=int(rnd(1)*6)+1
+ 5515 onxgosub5520,5525,5530,5535,5540,5541
+ 5517 ifcd=cpthen5514
+ 5518 fori=1to2500:nexti:goto100
+ 5520 cp=17:return
+ 5525 cp=22:return
+ 5530 cp=92:return
+ 5535 cp=95:return
+ 5540 cp=176:return
+ 5541 cp=5:return
+ 6500 :
+ 6505 ifnotfntr(cp)thenprints$(3):goto100
+ 6510 ifno=48andob(82)=-1thenprint"{lgrn}Die Truhe ";s$(122):goto100
+ 6515 ifno=48andob(51)=-2andob(93)=-1thenprints$(1):s=1
+ 6516 ifs=1thens=0:ob(82)=-1:ob$(48)=ob$(82):goto100
+ 6517 ifno=48andob(93)<>-1thenprints$(2):goto100
+ 6518 ifno=48andob(51)<>-2thenprints$(2):goto100
+ 6525 ifno=54thenprints$(123):goto100
+ 6530 ifno=66andob(83)=-1thenprint"{lgrn}Die Kiste ";s$(122):goto100
+ 6539 ifs=1thens=0:prints$(124):ob(80)=cp:pg=1:goto100
+ 6540 ifno=66andob(92)<>-1thenprints$(2):goto100
+ 6541 ifno=66andob(55)<>-2thenprints$(2):goto100
+ 6543 ifno=66andob(92)=-1andob(55)=-2thenprints$(1):ob(83)=-1:s=1
+ 6544 ifs=1thens=0:ob$(66)=ob$(83):prints$(4):ob(80)=cp:goto100
+ 6545 ifno=65andbu=1thenprints$(122):goto100
+ 6550 ifno=65thenprints$(1):bu=1:goto100
+ 6555 prints$(125):goto100
+ 7000 :
+ 7004 ifnotfntr(cp)thenprints$(3):goto100
+ 7005 ifno<>12thenprints$(128):goto100
+ 7006 ifno=12andcp>10thenprints$(2):goto100
+ 7010 ifno=12andcp<11thenprint"{clr}{down}{down}{down}{down}";s$(39)
+ 7011 form=1to2500:nextm
+ 7012 print"{clr}":ifob(12)<>-2thenob(12)=-2:zz=zz+1
+ 7015 x=int(rnd(1)*3)+1
+ 7016 ifx=1thencp=11:goto100
+ 7017 ifx=2thencp=12:goto100
+ 7018 ifx=3thencp=13:goto100
+ 7020 ifno=12thenprints$(2):goto100
+ 7025 goto100
+ 7500 :
+ 7501 ifnotfntr(cp)thenprints$(3):goto100
+ 7502 ifno=15orno=16orno=20orno=38orno=47then7504
+ 7503 prints$(66):goto100
+ 7504 ifno=16andob(91)=-1thenprints$(21):goto100
+ 7506 ifno=16andfe=0thenprints$(70):goto100
+ 7508 ifno=15andob(94)=-1thenprints$(63):goto100
+ 7512 ifno=15andfe=1andob(16)=cpthens=1
+ 7514 ifno=15andfe=1andob(16)=-2thens=1
+ 7516 ifs=1thenprints$(1):s=0:ob$(15)=ob$(94):fa=1:ob(94)=-1:goto100
+ 7520 ifno=20andob(95)=-1thenprints$(64):goto100
+ 7525 ifno=20andfa=1andob(15)=cpthens=1
+ 7530 ifno=20andfa=1andob(15)=-2thens=1
+ 7535 ifs=1thens=0:prints$(1):ob$(20)=ob$(95):b=1:ob(95)=-1:goto100
+ 7540 ifno=38andob(96)=-1thenprints$(65):goto100
+ 7545 ifno=38andfa=1andob(15)=-2thens=1
+ 7550 ifno=38andfa=1andob(15)=cpthens=1
+ 7555 ifs=1thens=0:ob$(38)=ob$(96):ob(96)=-1:bp=1:prints$(1):goto100
+ 7560 ifno=47andob(97)=-1thenprints$(71):goto100
+ 7565 ifno=47andfa=1andob(15)=-2thens=1
+ 7570 ifno=47andfa=1andob(15)=cpthens=1
+ 7580 ifs=1thens=0:prints$(1):ob$(47)=ob$(97):ob(97)=-1:li=cp:goto100
+ 7585 prints$(2):goto100
+ 8000 :
+ 8004 ifnotfntr(cp)thenprints$(3):goto100
+ 8006 ifob(no)<>-2thenprints$(29):goto100
+ 8007 ifno=47andlg=1thenli=0
+ 8008 ob(no)=cp:zz=zz-1:prints$(1)
+ 8010 ifno=52andob(12)=cpthenprints$(93):ob(52)=0:goto100
+ 8020 ifno=44andcp=33andob(17)=cpthenprints$(95):ob(17)=0:ob(44)=0:goto100
+ 8025 ifno=44andcp=49andob(25)=cpthenprints$(93):ob(44)=0:goto100
+ 8030 ifno=52andcp=35andob(18)=cpthenprints$(93):ob(52)=0:goto100
+ 8035 ifno=35andcp=35andob(18)=cpthenprints$(96):ob(18)=0:ob(35)=0:goto100
+ 8040 ifno=45andcp=84andob(37)=cpthenprints$(97):ob(37)=0:ob(45)=0:goto100
+ 8045 ifno=78andcp=34andob(71)=cpthenprints$(98):ob(78)=0:ob(71)=0:goto100
+ 8050 ifno=77andcp=63andob(73)=cpthenprints$(99):ob(77)=0:ob(73)=0:goto100
+ 8055 ifno=34andcp=73andob(76)=cpthenprints$(100):ob(34)=0:ob(76)=0:goto100
+ 8060 ifno=34andcp=63andob(73)=cpthenprints$( 99):ob(34)=0:ob(73)=0:goto100
+ 8070 ifno=20andcp=112thenba=cp:prints$(126):goto100
+ 8072 ifno=20andcp=134thenba=cp:prints$(126):goto100
+ 8073 ifno=20andcp=128thenba=cp:prints$(126):goto100
+ 8074 ifno=20andcp=120thenba=cp:prints$(126):goto100
+ 8076 ifno=51andcp=121andob(93)=0thenprints$(127):ob(51)=0:goto100
+ 8080 ifno=55andcp=121andob(92)=0thenprints$(127):ob(55)=0:goto100
+ 8085 ifcp=106andno=65then32000
+ 8090 goto100
+ 8500 :
+ 8502 ifnotfntr(cp)thenprints$(3):goto100
+ 8503 ifkl=1thenprints$(110):goto112
+ 8505 ifno=24andob(86)<>-1andcp=43thenprints$(1):kl=1:goto112
+ 8510 ifno=26andcp=57andob(85)<>-1thenprints$(1):kl=1:goto112
+ 8515 ifno=29andcp=62thenprints$(103):kl=1:goto112
+ 8520 ifno=42andse=1thenprints$(52):fori=1to2500:nexti:prints$(104):goto100
+ 8525 ifno=49andcp=109thenprints$(105):goto100
+ 8530 ifno=58andcp=131thenprints$(106);s$(107):kl=1:goto112
+ 8535 ifno=61andob(61)=cpthenprints$(108):kl=1:goto112
+ 8540 ifno=64andob(63)=0thenprints$(132):ob(64)=0:goto100
+ 8542 ifno=64andcp=138thenprints$(109):goto112
+ 8545 ifno=79andcp=137andob(79)=cpthenprints$(54):kl=1:goto112
+ 8593 prints$(111):goto100
+ 9000 :
+ 9003 ifkl=1thenprints$(115):kl=0:goto100
+ 9005 prints$(116):goto100
+ 9500 :
+ 9502 ifno=11orno=30orno=38orno=39orno=32orno=59orno=14then9505
+ 9503 prints$(121):goto100
+ 9505 ifnotfntr(cp)thenprints$(3):goto100
+ 9506 ifno=14thenprint"{lgrn}Wie?":goto100
+ 9510 ifno=30thenprints$(136):goto100
+ 9515 ifno=32then14500
+ 9520 ifno=38then14500
+ 9525 ifno=11andcp=124andob(56)=cpthenprints$(137):ob(56)=0:goto100
+ 9530 ifno=11andcp=41andob(23)=0thenprints$(139):ob$(22)=ob$(87):s=1
+ 9531 ifs=1thens=0:ob(87)=-1:goto100
+ 9535 ifno=11andcp=41andob(23)<>0thenprints$(138):ob(23)=0:goto100
+ 9540 ifno=39andob(38)=-2andcp=130andob(57)=cpthenprints$(140):ob(57)=0:s=1
+ 9541 ifs=1thens=0:pf=pf-1:goto100
+ 9545 ifno=39andob(38)=-2andob(96)=-1andcp=98andob(41)<>0thenprints$(141):s=1
+ 9546 ifs=1thens=0:pf=pf-1:ob(41)=0:p(98,2)=105:goto100
+ 9550 ifno=39andob(38)=-2andcp=98thenprints$(142):pf=pf-1:goto100
+ 9560 ifno=39andob(38)=-2thenprints$(83):pf=pf-1:goto100
+ 9570 ifno=11andob(11)=-2andcp=25andob(21)=cpthenprints$(156):ob(21)=0:goto100
+ 9575 ifno=59andcp=137andob(79)>0thenprints$(1):ra=1:goto100
+ 9580 prints$(6):goto100
+10000 :
+10003 ifnotfntr(cp)thenprints$(3):goto100
+10004 ifno=65andbu=1thenprints$(150);s$(151):goto100
+10005 ifno=65thenprints$(152):goto100
+10006 ifno=80andob(80)<>0thenprints$(59):goto100
+10007 ifno=66thenprints$(152):goto100
+10008 ifno=67thenprints$(60):goto100
+10009 ifno=36then10100
+10010 prints$(61):goto100
+10100 print"{clr}{lred}{down}{down}{rght}{rght}{rght}{rght}{rght}Hallo Abenteurer !"
+10101 print"{down}{down}Du hast die Aufgabe, das"
+10102 print"{down}{rght}{rght}{rght}*** BUCH DER{$a0}WEISHEIT ***"
+10103 print"{down}zu finden und zu den ZWERGEN{$a0}zu bringen."
+10104 print"Auf dem Wege dahin wirst Du viele {$a0}{$a0}{$a0}{$a0}{$a0}{$a0}ABENTEUER und GEFAHREN"
+10105 print"bestehen muessen. Sei auf der Hut und   fuerchte Dich nicht."
+10106 print"{down}Noch ein paar Tips:"
+10107 print"{down}Ich werde Dein Begleiter sein, und dich fuehren, indem Du mir "
+10108 print"Anweisungen in Form ' nimm axt' "
+10109 print"'lege buch' gibst.":print"*** Bitte eine Taste ***":wait 203,63
+10110 print"{down}Einige VERBEN sind z.B.:"
+10111 print"{down}tausche-frage-trage-benutze-(ein)laden- raeumen"
+10112 print"Mit 'inventur' bekommst Du gezeigt, was Du bei Dir traegst."
+10115 print"Mit 'save' kannst Du ein Spiel fuer     spaeteres Weiterspielen"
+10116 print"abspeichern."
+10117 print"{down}{down}{down}Und nun  VIEL GLUECK !!!"
+10118 print"{down}{down}{down}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}(E.Thorand u.{$a0}F.Messing)"
+10119 print"{down}{down}{down}*** Bitte eine Taste *** ":wait 203,63:print"{clr}{home}":cs=1
+10120 print"{down}{down}Noch etwas:"
+10122 print"{down}{down}Einige Verben koennen allein benutzt    werden, z.B."
+10124 print"schau - hilf - save"
+10126 print"{down}Wenn Du etwas untersuchen moechtest,    gib' bitte z.B. "
+10128 print"{down}schau Huette oder schau Statue' ein."
+10130 print"Die hier aufgefuehrten Verben sind nur  eine Auswahl!"
+10136 print"{down}{down}*** bitte eine Taste ***":wait203,63:print"{clr}"
+10138 print"Ein vorletzter Tip: Die Raeume sind     normalerweise quadratisch,"
+10140 print"nur am Fluss nicht, dort ist Vorsicht   beim Aufzeichnen geboten!"
+10144 print"{down}{down}......und sollte es garnicht klappen:"
+10146 print"{down}{down}Karte oder Anruf an:"
+10147 print"{down}Edgar Thorand"
+10148 print"An der Roethe 1"
+10149 print"3501 Koerle"
+10150 print"Tel. 05665/1670"
+10155 print"{down}Auch ueber Kritik und Anregungen bin    ich sehr dankbar!!"
+10156 print"So .. und nun los!"
+10160 print"{down}{down}*** bitte eine Taste ***":wait203,63:goto100
+10500 :
+10504 ifob(no)<>-2thenprints$(29):goto100
+10508 ifno=45orno=53thenprints$(33):ob(no)=0:zz=zz-1:goto100
+10510 ifno=20orno=34orno=35orno=52orno=77orno=78thenprints$(34):ob(no)=0:s=1
+10511 ifs=1thenzz=zz-1:s=0:goto100
+10512 prints$(35):goto100
+11000 :
+11005 ifno<>81thenprints$(30):goto100
+11008 ifcp=94orcp=147orcp=165orcp=71orcp=153orcp=154orcp=155orcp=156thens=1
+11011 ifcp=157orcp=159orcp=158orcp=64orcp=160orcp=172thens=1
+11012 :
+11013 ifs=1thenprints$(31):s=0:goto100
+11015 ifcp=81orcp=166orcp=68orcp=167orcp=55orcp=56orcp=168orcp=57orcp=72thens=1
+11017 ifcp=169orcp=170orcp=73orcp=171orcp=74orcp=75orcp=173orcp=63orcp=76thens=1
+11018 ifcp=77orcp=174orcp=90orcp=175orcp=103orcp=104orcp=176thens=1
+11019 ifs=1thenprints$(45):s=0:goto100
+11035 prints$(32):goto100
+11500 :
+11506 print"{clr}{down}{down}Du traegst:"
+11507 print:ifzz=0thenprint"{lred}Nichts":goto100
+11510 fori=9tolo:ifob(i)<>-2then11520
+11512 ifi=38thenprint"{left}";pf;
+11514 print"{lred}";ob$(i)
+11520 nexti
+11522 goto100
+12000 :
+12004 ifnotfntr(cp)thenprints$(3):goto100
+12010 ifno=76orno=71orno=63orno=62orno=28orno=46orno=12then12020
+12015 prints$(5):goto100
+12020 ifno=76andcp=73thenprints$(84):ob(76)=0:goto100
+12025 ifno=71andcp=34thenprints$(85);s$(86):ob(71)=0:goto100
+12030 ifno=63andcp=138thenprints$(87);s$(88):ob(63)=0:goto100
+12035 ifno=62andcp=135andob(11)=-2thenprints$(89):ob(62)=0:goto100
+12036 ifno=62thenprints$(14):goto100
+12040 ifno=28andcp=59thenprints$(90):ob(28)=0:goto100
+12045 ifno=46thenprints$(91):goto100
+12050 ifno=12thenprints$(92):goto100
+12500 :
+12502 ifnotfntr(cp)thenprints$(3):goto100
+12504 ifno=12orno=22orno=72orno=70orno=74orno=57orno=56orno=41then12520
+12506 ifno=17orno=25orno=62orno=43orno=73orno=21then12520
+12508 prints$(5):goto100
+12520 print"{lgrn}Wie ?":goto100
+13500 :
+13505 ifnotfntr(cp)thenprints$(3):goto100
+13510 ifno=61then13520
+13515 prints$(5):goto100
+13520 ifcp=133thenprints$(133):ob(61)=137:p(137,3)=0:goto100
+13525 ifcp=137thenprints$(133):p(137,3)=134:ob(61)=133:goto100
+14000 :
+14005 ifnotfntr(cp)thenprints$(3):goto100
+14006 ifno=61orno=79orno=50then14010
+14007 prints$(5):goto100
+14010 ifno=61andra=1thenprints$(117):prints$(118):p(137,2)=140:s=1
+14011 ifs=1thens=0:ob$(79)=ob$(84):goto100
+14015 ifno=61andcp=137thenprints$(119):goto100
+14020 ifno=79andra=0thenprints$(119):goto100
+14025 ifno=79andra=1andob(61)=cpthenprints$(120):goto100
+14030 ifno=50andcp=121andob(51)=0thenprints$(134):ob(93)=-1:s=1
+14035 ifs=1thens=0:ob$(51)=ob$(93):ob(51)=cp:goto100
+14040 ifno=50andcp=121andob(55)=0thenprints$(135):ob$(55)=ob$(92):s=1
+14041 ifs=1thens=0:ob(92)=-1:ob(55)=cp:goto100
+14050 prints$(121):goto100
+14500 :
+14504 ifnotfntr(cp)thenprints$(3):goto100
+14510 ifno=14orno=32orno=38then14520
+14511 ifno=10orno=12orno=17orno=18orno19orno=24orno=26orno=25orno=27thens=1
+14512 ifno=28orno=29orno=33orno=36orno=37orno=41orno=43orno=46orno=49thens=1
+14513 ifno=54orno=56orno=57orno=58orno=60orno=61orno=62orno=63orno=64thens=1
+14514 ifno=67orno=68orno=69orno=70orno=71orno=72orno=73orno=74orno=75thens=1
+14515 ifno=76orno=79orno>80thens=1
+14516 ifs=1thens=0:prints$(5):goto100
+14519 prints$(1):ob(no)=0:zz=zz-1:goto100
+14520 :
+14525 ifno=32andcp=18andob(88)<>-1thenprints$(76):ob(88)=-1:ob$(70)=ob$(88):s=1
+14526 ifs=1thens=0:zz=zz-1:ob(32)=cp:goto100
+14530 ifno=32andcp=28andob(90)<>-1thenprints$(77):ob(90)=-1:ob$(72)=ob$(90):s=1
+14531 ifs=1thens=0:zz=zz-1:ob(32)=cp:goto100
+14535 ifno=32andcp=49andob(25)=cpthenprints$(78);s$(79):ob(25)=0:ob(32)=0:s=1
+14536 ifs=1thens=0:zz=zz-1:goto100
+14540 ifno=32andcp=156andob(43)=cpthenprints$(80):zz=zz-1:ob(32)=0:s=1
+14541 ifs=1thens=0:ob(43)=0:goto100
+14545 ifno=32thenprints$(1):zz=zz-1:ob(32)=0:goto100
+14550 ifno=38thenprints$(83):s=1:pf=pf-1:ifpf=0thenzz=zz-1:ob(38)=0
+14551 ifs=1thens=0:goto100
+14555 ifno=14andcp=87andob(89)=0thenprints$(81):zz=zz-1:ob(14)=cp:s=1
+14556 ifs=1thens=0:ob(89)=-1:ob$(74)=ob$(89):goto100
+14560 ifno=14andcp=63andob(73)=cpthenprints$(82):zz=zz-1:ob(73)=0:s=1
+14561 ifs=1thens=0:ob(14)=cp:goto100
+14565 ifno=14thenprints$(1):zz=zz-1:ob(14)=0:goto100
+15000 :
+15004 ifnotfntr(cp)thenprints$(3):goto100
+15006 ifno=28thenprints$(10):prints$(11):prints$(12):goto100
+15008 ifno=46thenprints$(13):goto100
+15010 ifno=62thenprints$(14):goto100
+15012 ifno=63thenprint"{clr}";s$(15):prints$(16):prints$(17):prints$(18):s=1
+15013 ifs=1thens=0:goto15030
+15014 prints$(5):goto100
+15030 input"{lgrn}Wie ist mein NAME";na$:na=na+1
+15033 ifna$="usebis"orna$="USEBIS"then15038
+15034 ifna>5thenprints$(88):ob(63)=0:goto100
+15035 prints$(129):goto100
+15038 prints$(130);s$(131):prints$(88):ob(63)=0:ob(65)=cp:goto100
+15500 :
+15504 ifnotfntr(cp)thenprints$(3):goto100
+15510 ifno=12orno=17orno=18orno=21orno=25orno=37orno=71orno=72then15520
+15511 ifno=73orno=76then15520
+15515 prints$(5):goto100
+15520 print"{lgrn}Lege das Futter hin !":goto100
+16000 :
+16004 ifnotfntr(cp)thenprints$(3):goto100
+16006 ifno=9thenprints$(19):ob(12)=cp:ob(9)=0:goto100
+16008 ifno=17orno=18orno=21orno=22orno=25orno=33orno=37thenprints$(20):goto100
+16010 ifno=43orno=41orno=45orno=46orno=56orno=57orno=70thenprints$(20):goto100
+16011 ifno=71orno=72orno=73orno=74orno=75orno=76thenprints$(20):goto100
+16012 ifno=16andob(91)=-1thenprints$(21):goto100
+16014 ifno=16thenprints$(1):ob$(16)=ob$(91):ob(91)=-1:fe=1:goto100
+16049 prints$(6):goto100
+16500 :
+16502 ifnotfntr(cp)thenprints$(3):goto100
+16503 ifob(14)<>-2thenprint"{lgrn}Womit ?":goto100
+16504 ifno=26andob(85)=-1thenprints$(22):goto100
+16506 ifno=26thenprints$(1):ob$(26)=ob$(85):ob(85)=-1:p(57,2)=152:s=1
+16507 ifs=1thens=0:p(169,3)=152:p$(179)="unter der Tanne":goto100
+16510 ifno=24andob(86)=-1thenprints$(23):goto100
+16512 ifno=24thenprints$(1):ob$(24)=ob$(86):ob(86)=-1:goto100
+16514 ifno=29thenprints$(24):goto100
+16516 prints$(5):goto100
+17000 :
+17004 ifnotfntr(cp)thenprints$(3):goto100
+17006 ifno<>42thenprints$(5):goto100
+17007 ifse=0thenprints$(49):goto100
+17008 prints$(1):se=0:goto100
+17500 :
+17505 print"{clr}{down}{down}{down}"
+17506 prints$(153);s$(154):goto100
+20000 input"{clr}{down}{down}{down}Filename";n$
+20009 print"{down}{down}{down}Kassette oder Diskette?"
+20010 getk$:ifk$="d"ork$="D"then21000
+20020 ifk$="k"ork$="K"then22000
+20025 goto20010
+21000 open2,8,2,n$+",s,w":open15,8,15:input#15,a,a$:ifa$<>"ok"then29000
+21100 fori=9tolo:print#2,ob(i):print#2,ob$(i):nexti:print#2,cp:print#2,zz
+21101 print#2,lg:print#2,li:print#2,se:print#2,ri:print#2,bp:print#2,fa
+21102 print#2,fe:print#2,kl:print#2,z:print#2,pf:print#2,bu:print#2,ra
+21103 print#2,na
+21104 print#2,sp:form=1to3:print#2,y(m):nextm
+21108 fori=1tocp:forj=0to3:print#2,p(i,j):nextj,i:print#2,dr:print#2,pg
+21200 close2:close15:goto100
+22000 open2,1,1,n$:goto21100
+25000 input"{down}{down}{down}Filename";n$
+25005 print"{down}{down}Kassette oder Diskette?"
+25010 geta$:ifa$="d"ora$="D"then26000
+25012 ifa$="k"ora$="K"then27000
+25014 goto25010
+26000 open2,8,2,n$+",s,r":goto28000
+26100 fori=9tolo:input#2,ob(i):input#2,ob$(i):nexti
+26101 input#2,cp:input#2,zz:input#2,lg:input#2,li:input#2,se:input#2,ri
+26102 input#2,bp:input#2,fa:input#2,fe:input#2,kl:input#2,z:input#2,pf
+26103 input#2,bu:input#2,ra:input#2,na:input#2,sp:form=1to3:input#2,y(m):nextm
+26104 fori=1tocp:forj=0to3:input#2,p(i,j):nextj,i:input#2,dr:input#2,pg
+26120 close2:close15:goto40
+27000 open2,1,0,n$:goto26100
+28000 open15,8,15:input#15,a,a$:ifa$="ok"then26100
+28010 ifa$="file not found"then28100
+28020 ifa$="drive not ready"then28110
+28030 ifa$="file type mismatch"then28120
+28050 printa$:end
+28100 print"{down}Ein File dieses Namens existiert nicht!"
+28110 input"{down}Filename";n$:goto28200
+28111 print"{down}Diskette einlegen!":print,"{down}{down}Fertig?"
+28112 getx$:ifx$=""then28112
+28113 goto28110
+28120 print"{down}{down}Kein Daten-File!":goto28110
+28150 printa$:stop
+28200 close2:close15:goto26000
+29000 close2:close15:ifa$="write protect on"then29100
+29010 ifa$="drive not ready"then29200
+29030 ifa$="file exists"then29300
+29040 ifa$="file type mismatch"then29400
+29050 print"a$:sT
+29060 goto20000
+29100 print"Diese Diskette ist Schreib-geschuetzt"
+29110 print"Bitte eine andere Diskette einlegen":print,"Fertig?"
+29120 getx$:ifx$=""then29120
+29130 goto21000
+29200 print"Diskette einlegen!":print,"Fertig?":goto29120
+29300 print"Ein File dieses Namens existiert bereits"
+29310 print"soll es ueberschrieben werden (j/n)?"
+29320 getx$:ifx$="j"thenn$="@0:"+n$:goto21000
+29330 ifx$="n"then20000
+29340 goto29320
+29400 print"Dieser Name ist von einem anderen"," File-Typ gelegt"
+29410 fora=1to2000:next:goto20000
+30000 :
+30004 print"{clr}{down}{down}{down}{down}{yel}Dein Koerper ist so geschwaecht, dass   Du Dich nicht mehr";
+30005 print" bewegen kannst.":print"{down}{down}Du stirbst qualvoll !"
+30006 fori=1to3000:nexti:goto31000
+30010 print"{clr}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{rght}{rght}{yel}Du bist leider ertrunken!"
+30011 fori=1to2000:nexti:goto31000
+30020 print"{clr}{down}{down}{down}{down}{down}{down}{down}{down}{down}{yel}....und der SUMPF fordert ein neues     OPFER !!!"
+30021 fori=1to3000:nexti:print"{clr}":goto31000
+30030 print"{clr}{down}{down}{down}{down}{down}{down}{yel}Die SPINNE{$a0}hat Dich gefressen.":fori=1to3000:nexti:goto31000
+31000 :
+31002 print"{clr}{down}{down}{down}{down}{rght}{rght}{wht}Neues Spiel ? (j/n)"
+31003 getsp$:ifsp$=""then31003
+31004 ifsp$="j"thenclr:restore:goto1
+31005 ifsp$="n"then31007
+31006 goto31003
+31007 print"{down}{down}Wie schade.":sys64738
+32000 print"{clr}{down}{down}{down}{down}{down}{down}{down}{down}{rght}{rght}*** HERZLICHEN{$a0}GLUECKWUNSCH{$a0}***"
+32001 fori=1to15:poke53280,i:fors=1to200:nexts:nexti:poke53280,2:poke53281,2
+32002 print"{down}{down}{wht}Du hast das Abenteuer hervorragend      geloest!"
+32003 print"{down}{down}Es gratulieren Dir die Autoren:"
+32004 print"{down}{rght}{rght}{rght}{rght}{rght}F.Messing und E.Thorand"
+32005 fori=1to4000:nexti:print"{down}{down}* Bitte eine Taste *":wait203,63
+32006 sys64738
+50000 :
+50005 np=180:lo=98:nv=38:cp=177:cs= 0:nn=84:ss=168:zz=0:pf=5
+50010 dimp(np,4),p$(np),vb$(nv),ob$(lo),ob(lo),no$(nn),s$(ss)
+50020 fori=1tonp:forj=0to3:readp(i,j):nextj,i
+50030 fori=1tonp:readp$(i):nexti
+50040 fori=9tolo:readob$(i):nexti
+50050 fori=9tolo:readob(i):nexti
+50060 fori=1tonn:readno$(i):nexti
+50070 fori=0to3:readd$(i):nexti
+50080 fori=1tonv:readvb$(i):nexti
+50090 fori=1toss:reads$(i):nexti
+51000 :
+51002 data 0,2,4,0,1,0,5,0,0,4,7,0,3,5,8,1,4,6,9,2,5,0,10,0,177,8,0,3,7,9,0,4
+51003 data 8,10,0,5,9,0,0,6
+51005 data 0,0,16,0,0,0,20,0,0,0,24,0,0,15,27,0,14,16,28,0,15,17,0,0
+51006 data 16,18,30,0,17,19,31,0,18,20,32,0,19,21,33,0
+51008 data 20,22,34,0,21,23,35,0,22,24,36,0,23,25,37,0,24,26,38,0,25,0,39,0
+51009 data 0,28,40,14,27,29,41,15,28,30,0,0,0,0,0,0
+51011 data 0,0,0,0,31,0,45,19,0,0,46,20,0,35,47,21,34,36,48,22
+51012 data 35,37,49,23,36,38,50,24,37,39,51,25,0,0,0,0,0,41,53,27
+51014 data40,42,54,28,41,43,55,0,42,44,56,30,0,0,0,0,44, 0,0,32,0,0,59,33
+51015 data 0,48,60,34,0,0,0,0,48,0,62,36,0,51,63,37
+51017 data 0,0,0,0,0,0,0,0,0,54,66,40,53,55,67,41,54,56,68,42,55,57,0,43
+51018 data 56,0,0,44,0,0,0,0,0,60,72,46,0,0,0,0
+51020 data 0,0,0,0,61,63,75,0,62,64,0,50,63,65,160,51,64,0,78,52,0,67,79,53
+51021 data 66,68,80,54,67,149,81,55,167,70,82,168,69,71,0,169
+51023 data 70,170,84,153,0,73,0,59,72,74,0,60,73,75,0,61,74,0,0,62,173,77,89,0
+51024 data 76,161,90,0,174,0,91,65,0,80,92,66,79,81,93,67
+51026 data 80,148,94,68,166,0,95,69,0,84,0,0,83,0,97,71,0,86,0,0
+51027 data 85,87,0,0,86,0,0,172,87,89,101,173,88,90,102,76
+51028 data 89,0,103,77
+51030 data 175,0,104,78,0,93,0,79,92,94,0,80,93,0,0,81,165,96,0,82,95,97,0,0
+51031 data 96,98,0,84,97,99,0,0,98,100,0,0,99,101,0,0
+51033 data 100,102,0,88,101,103,0,89,102,176,0,90,0,0,0,91,0,0,106,98
+51034 data 0,0,108,105,0,108,115,0,107,109,116,106,108,0,117,0,0,111,0,0
+51036 data 110,112,0,0,111,113,0,0,112,114,0,0,113,115,123,0,114,116,0,107
+51037 data 115,117,124,108,116,118,0,109,117,119,125,0,118,120,0,0,119,121,0,0
+51039 data 120,122,0,0,121,0,0,0,0,0,126,114,0,0,127,116,0,0,128,118
+51040 data 0,0,129,123,0,0,0,124,0,0,133,125,0,130,134,126,129,131,0,0
+51042 data 130,0,0,0,0,133,0,0,132,0,136,128,0,0,137,129,0,0,138,131
+51043 data 0,0,139,133,146,0,0,134,0,0,0,135,0,0,141,136,0,0,142,137
+51045 data 0,0,146,139,0,143,0,140,142,144,0,0,143,145,0,0,0,0,0,0,0,0,137,141
+51046 data  0,165,0,148,81,0,147,178,68,167,0,0,0,151,178,0,150,179
+51048 data 0,0,0,0,169,57,0,154,71,0,153,155,0,0,154,156,0,0,155,157,172,0
+51056 data 156,158,0,0,157,0,0,159,0,160,158,0,159,0,180,64,77
+51058 data 174,0,0,0,0,163,180,0,164,0,162,163,0,0,104,0,95,0,166,0,82,165,167
+51059 data 149,69,166,0,0,169,69,0,168,0,70,152,71,171,0,0
+51061 data 170,172,0,0,171,173,87,156,172,76,88,0,161,78,175,0
+51062 data 0,91,0,174,103,0,0,0,0,7,0,0,0,0,148,150,151,58,0,0,0,0,162,160
+51066 data "auf einer Lichtung","im Wald","im Wald","im Wald","im Wald"
+51067 data "im Wald","auf einer Lichtung","im Wald","auf einer Lichtung"
+51068 data "im Wald","auf einem Feld","im Wald","auf einer Wiese"
+51069 data "im Farnwald","im Farnwald","im oeden Grasland","in einer Steppe"
+51070 data "in einer Steppe","im Farnwald","in einer Steppe","in einer Steppe"
+51071 data "in einer Steppe","im Grasland","im Grasland","in der Steppe"
+51072 data "im Farnwald","im Farnwald","im Farnwald","im lichten Wald"
+51073 data "im Sumpf","im Sumpf","im Farnwald","im Farnwald","im Farnwald"
+51074 data "im lichten Wald","im Farnwald","auf einer Lichtung"
+51075 data "im lichten Wald","im Sumpf","im Farnwald","im Spinnennest"
+51076 data"im Farnwald","auf einer Lichtung","im Sumpf","im lichten Wald"
+51077 data"im lichten Wald","im lichten Wald","im Sumpf","im Farnwald"
+51078 data"im Farnwald","im Sumpf","im Sumpf","im Farnwald","im Farnwald"
+51079 data"am Fluss","am Fluss","am Fluss","im Wasserfall","auf einer Lichtung"
+51080 data"im Sumpf","im Sumpf","im Farnwald","am Fluss","am Fluss"
+51081 data"im Farnwald","auf einer Lichtung","auf einer Lichtung"
+51082 data"am Fluss","im lichten Wald","im lichten Wald","am Fluss","am Fluss"
+51083 data"am Fluss","am Fluss","am Fluss","am Fluss","am Fluss"
+51084 data"im lichten Wald","im Farnwald","im Farnwald","am Fluss"
+51085 data"im huegeligen Gelaende","im huegeligen Gelaende","im Farnwald"
+51086 data"im Farnwald","im Farnwald","im huegeligen Gelaende","im Farnwald"
+51087 data"im huegeligem Gelaende","am Fluss","im Farnwald","am Gebirge"
+51088 data"im Farnwald","an der Quelle","am Gebirge","im Farnwald","am Gebirge"
+51089 data"vor der Hoehle","am Gebirge","am Gebirge","im Farnwald"
+51090 data"am Gebirge","am Fluss","am Fluss","im dunklen Gang","vor dem Tor"
+51091 data"vor einer Nische","im breitem Gang","vor einer Nische"
+51092 data"am Stollenende","im breitem Stollen","am Wasserschacht"
+51093 data"im breiten Stollen","an einer Gabelung","im Gewoelbe"
+51094 data"im Gewoelbegang","im Gewoelbe","an einer Gabelung"
+51095 data"im breiten Stollen","am Wasserschacht","im breiten Gang"
+51096 data"am Stollenende","in der Kaverne","in einer Hoehle","im Felsendom"
+51097 data"im Verbindungsgang","im Verbindungsgang","am Wasserschacht"
+51098 data"im Quergang","im Quergang","im Quergang","im Quergang","im Quergang"
+51099 data"am Wasserschacht","im Vorraum","im Stollen"
+51100 data"im Stollen","in fuerstlichen Gemaechern","im Stollen"
+51101 data"in einer grossen Hoehle","im Stollen","im Vorraum"
+51102 data"in finsteren Raeumen","in finsteren Raeumen","auf einer Falltuer"
+51103 data"im Tunnel","bei der Quelle","auf dem Fluss","auf der Haengebruecke"
+51104 data"auf dem Fluss","auf dem Fluss","auf der Tanne"
+51105 data"auf dem Fluss","auf dem Fluss"
+51106 data"auf dem Fluss","auf dem Fluss","auf dem Fluss","auf dem Fluss"
+51107 data"auf dem Fluss","auf dem Fluss","auf der Bruecke","auf dem Fluss"
+51108 data"auf dem Fluss","auf dem Fluss","an der Quelle","am Fluss","am Fluss"
+51109 data"am Fluss","am Fluss","am Fluss","am Fluss","am Fluss","am Fluss"
+51110 data"am Fluss","am Fluss","am Fluss","in der Huette"
+51111 data"unter der Haengebruecke","auf dem Fluss","unter der Bruecke"
+51112 data"alte Oel-Lampe","Huette","Schwert","Pegasus","Muenzen","Axt","Fackel"
+51113 data"Hoelzer","Phyton","Elefanten","Kochstelle","Balken","Tiger"
+51114 data"Spinne","Netz","Baum","Boa","Tanne","Kate","alter Mann"
+51115 data"Eiche","Boot","Ruder","Speer","Ameisen","Erdbeeren"
+51116 data"Kartoffeln","Notiz","fleischfressende Pflanze", "Pfeile","Bogen"
+51117 data"magischer Ring","ZYKLOP","Seil","Krokodile","Eier"
+51118 data"Wuermer","Zwerge","Grubenlicht","Truhe","Luftschacht","Form"
+51119 data"Silberstuecke","Aepfel","Orchideen","Schmelzofen","Goldstuecke"
+51120 data"Steinfresser","Flugdrachen","Statue","Kreuzhacke","Skelett"
+51121 data"Lore","Waechter","Herrscher","Thron","BUCH{$a0}DER WEISHEIT"
+51122 data"Kiste","INSCHRIFT","Falltuer","Tunnel","Tarantel","Affen"
+51123 data"Puma","Ratten","Scorpion","Termiten","Krebse","Kaese","Bananen"
+51124 data"Geroellhalde","Pergament","Schluessel","offene Truhe"
+51125 data"geoffnete Kiste","Durchbruch","gefaellte Tanne","gefaellter Baum"
+51126 data"tote Spinne","tote Tarantel","toter Scorpion","toter Puma"
+51127 data "brennende Hoelzer","Goldschluessel","Silberschluessel"
+51130 data"brennende Fackel","brennender Balken","brennende Pfeile"
+51132 data"leuchtendes Grubenlicht","Pfeile"
+51156 data 5,7,176,0,18,80,23,29,33,35,37,37,25,41,41,43,49,57,59,59,62,64,104
+51157 data 85,82, 42,96,177,84,46,83,92,98,78,156,3, 68,106,106,107,109,110
+51158 data 111,10,26,121,122,124,130,131,125,144,133,135,138,138,0
+51159 data 140,132,145,146,18,34,28,63,87,129,73,89,53,137,0,0,0,0,0,0,0,0,0,0
+51160 data 0,0,0,0,0,0,0,0,0
+51171 data n,s,o,w,nord,sued,ost,west,lamp,huet,schw,pega,muen,axt,fack,hoel
+51172 data phyt,elef,koch,balk,tige,spin,netz,baum,boa,tann,kate,mann,eich,boot
+51173 data rude,spee,amei,erdb,kart,noti,pfla,pfei,boge,ring,zykl,seil,krok
+51174 data eier,wuer,zwer,lich,truh,luft,form,silb,aepf,orch,ofen,gold,stei
+51175 data flug,stat,kreu,skel,lore,waec,herr,thro,buch,kist,insc,fall,tunn
+51176 data tara,affe,puma,ratt,scor,term,kreb,kaes,bana,gero,perg,wass,rues
+51177 data furt,flus
+51191 data "Norden","Sueden","Osten","Westen"
+51201 data gehe,nimm,scha,taus,befe,dreh,fuel,oeff,reit,zuen,lege,klet,spri
+51202 data benu,lies,lese,hebe,trag,esse,iss,trin,lauf,renn,inve,verj,toet
+51203 data save,schi,lade,raeu,werf,wirf,frag,fuet,reib,fael,loes,hilf
+51214 data"{lgrn}O.K.","{lgrn}Das kannst du JETZT nicht machen"
+51215 data"{lgrn}Das siehst Du hier nicht.","{lgrn}Du siehst etwas"
+51217 data"{lgrn}Mach' Dich nicht laecherlich!"
+51218 data "{lgrn}O.K. Nichts passiert."
+51219 data "{lgrn}Das kannst Du nicht tragen.","{lgrn}Du bist gebissen worden."
+51220 data "{lgrn}Das ist viel zu schwer."
+51221 data "{lgrn}Halte Dich am Fluss und finde die       bewachte Hoehle.",
+51222 data"{lgrn}Achte auf Dein Feuer!                   Viel Glueck!"
+51223 data"{lgrn}Gib' uns Dein PEGASUS! und lege Deine   FACKEL hin."
+51224 data"{lgrn}Ich lasse Dich nicht durch."
+51225 data"{lgrn}Hallo FREMDER! Dein MUT soll belohnt    werden."
+51226 data"{lgrn}Du musst aber zuvor noch ein RAETSEL    loesen."
+51227 data"{lgrn}Wenn Du mir MEINEN{$a0}Namen nennen kannst, gebe ich Dir "
+51228 data "{lgrn}*** DAS  BUCH{$a0}DER{$a0}WEISHEIT ***"
+51229 data"{lgrn}Die Lampe verschwindet und es erscheint *PEGASUS*"
+51230 data "{lgrn}Bei Tieren solltest Du vorsichtig sein."
+51231 data "{lgrn}Die Hoelzer brennen schon."
+51232 data "{lgrn}Die Tanne ist schon gefaellt."
+51233 data "{lgrn}Der Baum ist schon gefaellt."
+51234 data "{lgrn}Du bist nicht BONIFAZIUS!"
+51235 data"{lgrn}Das traegst Du schon."
+51236 data"{lgrn}Die Wunde hat sich entzuendet!"
+51237 data"{lgrn}Du kannst nicht mehr tragen !"
+51238 data"{lgrn} laesst Dich nicht."
+51239 data"{lgrn}Du traegst das nicht."
+51240 data"{lgrn}Das kannst Du nicht trinken."
+51241 data"{lgrn}Aah! Das tut gut !","{lgrn}Hier ist kein Wasser."
+51242 data"{lgrn}Igitt! Das schmeckt nicht!","{lgrn}Mmmhh! Das ist lecker!"
+51243 data"{lgrn}Das kannst Du nicht essen."
+51244 data"{lgrn}Das kannst Du nicht drehen."
+51245 data"{lgrn}Eine Oeffnung nach OSTEN wird sichtbar."
+51246 data"{lgrn}Es passiert JETZT nichts."
+51247 data"{lgrn}Das PEGASUS erhebt sich in die Luefte   und fliegt mit Dir davon."
+51248 data"{lgrn}Der magische Ring beginnt zu gluehen."
+51249 data"{lgrn}Der magische Ring hat sich aufgeloest."
+51250 data"{lgrn}Das Seil ist an dem Baum festgemacht."
+51251 data"{lgrn}Das Seil ist an der Tanne befestigt."
+51252 data"{lgrn}Das Seil haengt an einem Ast der Eiche."
+51253 data"{lgrn}Du kannst das Wasser nicht erreichen."
+51254 data"{lgrn}Da ist nichts, wo man ein Seil anbinden kann."
+51255 data"{lgrn}Das Seil haengt an der Lore."
+51256 data"{lgrn}Das Seil haengt an einem Eisenring ueberder Grube."
+51257 data"{lgrn}Das Seil ist schon los."
+51258 data"{lgrn}Du siehst ein Gebirge im OSTEN."
+51259 data"{lgrn}Du siehst entfernt im OSTEN einen ZYCLOPaus einer HOEHLE kommen."
+51260 data"{lgrn}Du haengst am Seil."
+51261 data"{lgrn}Der Schacht wird immer enger."
+51262 data"{lgrn}Du siehst einen LICHTSCHIMMER zwischen  den Steinen."
+51263 data"{lgrn}Du kannst HIER nicht klettern."
+51264 data"{lgrn}PLATSCH!!! Ein Wasserstrudel reisst dichmit fort."
+51265 data"{lgrn}Der Zwergenkoenig bedankt sich,und gibt dir das Grubenlicht."
+51266 data"{lgrn}Das kannst Du nicht tauschen."
+51267 data"{lgrn}*** Nur wer seinen Geist gebraucht,     ist weise ***   USEBIS"
+51268 data"{lgrn}Durch ARBEIT kommst Du auch ans ZIEL."
+51269 data"{lgrn}Das kannst Du nicht lesen."
+51270 data"{lgrn}Es ist dunkel !"
+51271 data"{lgrn}Die Fackel brennt schon.","{lgrn}Der Balken brennt schon."
+51272 data"{lgrn}Der Pfeil brennt schon.","{lgrn}Du bist kein Brandstifter."
+51273 data"{lgrn}Die Hoelzer sind restlos verbrannt."
+51274 data"{lgrn}Der Balken ist verbrannt."
+51275 data"{lgrn}Das Feuer reicht nicht aus, um den Pfeilzu entzuenden."
+51276 data"{lgrn}DENKE nach!  Du hast doch kein Feuer!"
+51277 data"{lgrn}Das Grubenlicht brennt schon."
+51278 data"{lgrn}Der Zwergenkoenig gibt Dir PEGASUS      zurueck."
+51279 data"{lgrn}Das kannst Du HIER nicht tauschen."
+51280 data"{lgrn}Das Glas zerspringt und das Licht geht  aus."
+51281 data"{lgrn}hat sein Ziel verfehlt.","{lgrn}Du hast die Tarantel getroffen."
+51282 data"{lgrn}Du hast den Puma getroffen."
+51283 data"{lgrn}Du hast die Boa verletzt.Sie verkriecht sich mit dem Speer "
+51284 data"im Farnwald."
+51285 data"{lgrn}Die Krokodile schwimmen davon und der   Speer versinkt."
+51286 data"{lgrn}Die Axt zerquetscht dem Scorpion."
+51287 data"{lgrn}Die Ratten verschwinden im Fluss."
+51288 data"{lgrn}Der Pfeil zischt durch die Luft."
+51289 data"{lgrn}Die Krebse fluechten in den Fluss."
+51290 data"{lgrn}Die Affen schwingen sich unter lautem   Geschrei auf naheliegende"
+51291 data"{lgrn}Baeume.","{lgrn}Wer SO denkt, ist des BUCHES nicht wuerdig."
+51292 data"{lgrn}Der HERRSCHER dreht sich um und geht."
+51293 data"{lgrn}Der Waechter zieht sich zurueck."
+51294 data"{lgrn}Der alte Mann geht in seine Kate zurueck."
+51295 data"{lgrn}Wenn Du nicht aufpasst, verjagen sie    DICH !!"
+51296 data"{lgrn}PEGASUS laesst sich nicht verjagen."
+51297 data"{lgrn}Schnurps! Schnurps!","{lgrn}Das kannst Du nicht verfuettern."
+51298 data"{lgrn}Die Phyton gibt Dir den Weg frei."
+51299 data"{lgrn}Der Elefant laeuft kauend weiter."
+51300 data"{lgrn}Die fleischfressende Pflanze gibt Dir   den Weg frei."
+51301 data"{lgrn}Die Affen freuen sich, und laufen weg."
+51302 data"{lgrn}Die Ratten verschwinden."
+51303 data"{lgrn}Die Krebse geben den Weg frei."
+51304 data"{lgrn}Du bist in einer Baumkrone."
+51305 data "{lgrn}Du bist im Wipfel einer Tanne."
+51306 data"{lgrn}Du bist ganz oben in der{$a0}Eiche.Ueber Dirist blauer Himmel."
+51307 data"{lgrn}Du kannst Dich nicht mehr halten......"
+51308 data"{lgrn}Du kommst nicht dran, der Schacht ist   zu hoch."
+51309 data"{lgrn}Du stehst auf der Statue."
+51310 data"{lgrn}Sie WACKELT leicht !"
+51311 data "{lgrn}Dieses Gefaehrt ist nur mit STEINEN zu  beladen!"
+51312 data"{lgrn}Der HERRSCHER verwehrt Dir den Zutritt!"
+51313 data"{lgrn}Du kannst HIER{$a0}nicht weiterklettern."
+51314 data"{lgrn}Du kannst JETZT nicht klettern!"
+51315 data "{lgrn}Du siehst im OSTEN ein Gebirge."
+51316 data"{lgrn}Du siehst einen ZYKLOP aus einer Hoehle kommen."
+51317 data"{lgrn}Du siehst nichts Besonderes.","{lgrn}Hups{$a0}!"
+51318 data"{lgrn}Du bist ja richtig sportlich!"
+51319 data"{lgrn}Die Lore ist voll Geroell!","{lgrn}Ein Durchbruch wird sichtbar."
+51320 data"{lgrn}Die Geroellhalde hat ZU GROSSE Steine."
+51331 data"{lgrn}Wohin?","{lgrn}Das kannst Du nicht.","{lgrn}ist doch schon auf!"
+51332 data"{lgrn}Der Ofen ist HEISS !","{lgrn}Es liegt ewas darin."
+51333 data"{lgrn}Das kannst Du doch nicht oeffnen!"
+51334 data"{lgrn}Der Balken liegt ueber dem Wasserloch."
+51335 data"{lgrn}Die Muenzen sind im OFEN! Sie schmelzen und werden fluessig!"
+51336 data"{lgrn}Wie willst Du denn das REITEN?","{lgrn}Das ist nicht mein Name!"
+51337 data"{lgrn}BRAVO{$a0}ABENTEURER{$a0}!!!{$a0}Du sollst DAS{$a0}BUCH bekommen."
+51338 data"{lgrn}ER legt DAS{$a0}BUCH{$a0}hin.","{lgrn}Der Thron versinkt im Erdreich."
+51339 data"{lgrn}Die Lore rollt davon."
+51340 data"{lgrn}In der Form beginnt ein SILBERSCHLUESSELzu erkalten."
+51341 data"{lgrn}In der Form beginnt ein GOLDSCHLUESSEL  zu erkalten."
+51342 data"{lgrn}Versuche: Nimm Boot.","{lgrn}Der Steinfresser flieht."
+51343 data"{lgrn}Das Netz zerreisst,aber die RIESENSPINNEkommt auf Dich zu."
+51344 data"{lgrn}Die Spinne ist tot.","{lgrn}Der Flugdrachen fliegt davon."
+51345 data"{lgrn}Der ZYKLOP{$a0} ist schwer verwundet und    verschwindet in der Hoehle."
+51346 data"{lgrn}Der Pfeil verwundet den ZYKLOP          nur LEICHT."
+51347 data"{lgrn}Du siehst nichts BESONDERES.","{lgrn}Sie ist leer."
+51348 data"{lgrn}Sie ist verschlossen.","{lgrn}Es liegt ein PERGAMENT darin."
+51349 data"{lgrn}Die Knochen sind mit Spinnweben         ueberzogen."
+51350 data"{lgrn}Es kommt eine grosse HITZE{$a0}und RAUCH{$a0}   heraus."
+51351 data"{lgrn}Da steht etwas GESCHRIEBENES."
+51352 data"{lgrn}MACHT und GELD ist nicht ALLES!"
+51353 data"{lgrn}WEISHEIT{$a0}ist, KEINEM{$a0}TRAUM nachzurennen."
+51354 data"{yel}*** Das BUCH{$a0}der WEISHEIT ***"
+51355 data"{lgrn}Lasse Deine FANTASIE spielen!"
+51356 data"{lgrn}Bedenke: Du bist in einem MAERCHEN- und{$a0}SAGENLAND!"
+51357 data"{lgrn}Die Pfeile sind erloschen."
+51358 data"{lgrn}Der Tiger knurrt und laeuft davon."
+51359 data"{lgrn}Versuche: KLETTERN","{lgrn}Da kannst Du nicht hingehen."
+51360 data"{lgrn}Leider kannst Du NICHT schwimmen."
+51361 data"{lgrn}Ohne RUDER{$a0}kommst Du nicht voran.","{lgrn}lassen Dich nicht!"
+51362 data"{lgrn}Die Zwerge","{lgrn}Die Bruecke ist morsch....Sie BRICHT!"
+51363 data"{lgrn}Die Haengebruecke haelt Dein Gewicht    nicht aus........"
+51364 data"{lgrn}Es ist eine Schluessel-form. (Reste     von METALL sind darin)"
+51365 data"{lgrn}Das Boot leckt !"
+51366 data"{lgrn}Die KOBOLDE haben die Muenzen genommen  und verschwinden!"
+51367 data"{lgrn}Die KOBOLDE haben Dich bestohlen !"
+52000 return
+

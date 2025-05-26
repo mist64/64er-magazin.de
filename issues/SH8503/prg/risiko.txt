@@ -1,0 +1,681 @@
+
+
+;risiko.prg ==0801==
+    1 rem  ********************************
+    2 rem  *                              *
+    3 rem  *            risiko            *
+    4 rem  *                              *
+    5 rem  * geschrieben von bernd hornig *
+    6 rem  *                              *
+    7 rem  *   absender:                  *
+    8 rem  *             bernd hornig     *
+    9 rem  *             bismarckstr.77   *
+   10 rem *        4100 duisburg 1       *
+   11 rem *                              *
+   12 rem ********************************
+   15 gosub 55000
+   20 s=0:diml$(45):dimm$(45)
+   30 dimq(45):dimla(45,6):dimw$(6):dims$(6):dimn$(45)
+   40 dimwv(13):dimwu(13):dimwe$(6,5):dimko(6):dimkl(6):dimdd(6)
+  100 we$(6,1)="UCCCI"
+  110 we$(6,2)="{SHIFT--}Q Q{SHIFT--}"
+  120 we$(6,3)="{SHIFT--}Q Q{SHIFT--}"
+  130 we$(6,4)="{SHIFT--}Q Q{SHIFT--}"
+  140 we$(6,5)="JCCCK"
+  150 we$(1,1)=we$(6,1):we$(1,2)="{SHIFT--}   {SHIFT--}":we$(1,3)="{SHIFT--} Q {SHIFT--}":we$(1,4)=we$(1,2)
+  160 we$(1,5)=we$(6,5)
+  170 we$(2,1)=we$(6,1):we$(2,2)="{SHIFT--}Q  {SHIFT--}":we$(2,3)=we$(1,2):we$(2,4)="{SHIFT--}  Q{SHIFT--}"
+  180 we$(2,5)=we$(6,5)
+  190 we$(3,1)=we$(6,1):we$(3,2)=we$(2,2):we$(3,3)=we$(1,3):we$(3,4)=we$(2,4)
+  200 we$(3,5)=we$(6,5)
+  210 we$(4,1)=we$(6,1):we$(4,2)=we$(6,2):we$(4,3)=we$(2,3):we$(4,4)=we$(6,4)
+  220 we$(4,5)=we$(6,5)
+  230 we$(5,1)=we$(6,1):we$(5,2)=we$(6,2):we$(5,3)=we$(1,3):we$(5,4)=we$(6,4)
+  240 we$(5,5)=we$(6,5)
+  250 dima(7):dimb(7)
+  260 a(1)=4:a(2)=8:a(3)=6:a(4)=9:a(5)=6:a(6)=7:a(7)=5
+  270 b(1)=0:b(2)=4:b(3)=12:b(4)=18:b(5)=27:b(6)=33:b(7)=40
+  280 er=45:ar=4:dimxs(6):fori=1to6:xs(i)=0:dd(i)=0:next:c=1:wt=1:gf=0
+  900 gosub20000:print"{clr}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{lblu} spielanleitung ?  [j/n]"
+  910 geta$:ifa$=""then910
+  920 ifa$="j"thengosub60000
+ 1000 poke53281,0:poke53280,0
+ 1010 print"{clr}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{rght}{rght}{grn}{rght}{rght}{rght}{rght}{rght}{rght}wieviele spieler ? (2-6)"
+ 1020 gets$:ifs$=""then1020
+ 1030 ifs$="2"thenl=22:s=2
+ 1040 ifs$="3"thenl=15:s=3
+ 1050 ifs$="4"thenl=11:s=4
+ 1055 ifs$="5"thenl=9:s=5
+ 1060 ifs$="6"thenl=7:s=6
+ 1070 ifs=0then1020
+ 1080 print"{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{up}{up}{up}{up}{up}{up}{up}{up}{up}{up}{up}{up}{up}{up}{up}{up}"
+ 1090 forw=1tos
+ 1100 print"{down}name des ";:printw;:print". spielers ";:inputw$(w)
+ 1101 s$(w)=left$(w$(w),2)
+ 1102 ifw>=2theny=0:goto1104
+ 1103 goto1108
+ 1104 fori=1tow:ifs$(w)=s$(i)theny=y+1
+ 1105 nexti
+ 1107 ify<>1then1100
+ 1108 nextw
+ 1109 print"{clr}{down}{down}{down}{down}{down}{down}{down}{down}{down}{grn}{rght}bitte geduld ich lose die laender aus"
+ 1110 forx=1to45:readl$(x),za,zb,zc,zd,ze,zf
+ 1111 la(x,1)=za:la(x,2)=zb:la(x,3)=zc:la(x,4)=zd:la(x,5)=ze:la(x,6)=zf
+ 1118 n$(x)="oo":m$(x)="o":q(x)=1:nextx
+ 1120 forv=1tol
+ 1130 forp=1tos
+ 1140 x=int(er*rnd(1))+1
+ 1145 ifn$(x)<>"oo"then1140
+ 1150 n$(x)=s$(p):m$(x)=w$(p)
+ 1160 ifx=erthener=er-1
+ 1170 nextp:nextv
+ 1180 forkl=1to45
+ 1190 ifn$(kl)="oo"thenn$(kl)="co":m$(kl)="computer"
+ 1200 nextkl
+ 1500 gosub20000
+ 1505 print"{grn}{clr}{down}{down}{down}{down}{down}{down}{down}{down}{down}{rght}{rght}{rght}{rght}{rght}feldheer ";:printw$(c)
+ 1510 print"{down}{down}{rght}{rght}{rght}{rght}{rght}sie bekommen ";:print"{red}";:printar;:print"{grn} armeen dazu"
+ 1515 fori=1to1500:nexti
+ 1520 print"{down}{down}{down}{rght}{rght}{rght}{rght}{rght}wo sollen die armeen hin ?":fori=1to750:nexti
+ 1530 gosub52400
+ 1540 gosub20000
+ 1550 a$="":print"{clr}{red}";
+ 1551 si=54272:fl=si:fh=si+1:tl=si+2:th=si+3:w=si+4:a=si+5:h=si+6:l=si+24
+ 1552 forx=15to0step-.1:print" angriff ";
+ 1553 pokel,x:pokea,15:pokeh,74:pokefh,140:pokew,129
+ 1554 next
+ 1555 pokew,0:pokea,0
+ 1560 ifa$="n"then1580
+ 1565 gosub15000
+ 1567 ifa$="n"then1580
+ 1570 goto1565
+ 1580 gosub20000
+ 1590 print"{clr}{pur}"
+ 1591 si=54272:fl=si:fh=si+1:tl=si+2:th=si+3:w=si+4:a=si+5:h=si+6:l=si+24
+ 1592 forx=1to10:fori=15to0step-1:print" verschieben ";:fory=1to2:nexty
+ 1593 pokel,15:pokea,102:pokeh,1:pokefh,i*10:pokefl,i*15:pokew,33
+ 1594 nexti
+ 1595 pokew,0:pokea,0
+ 1600 nextx:pokew,0:pokea,0
+ 1610 qy=0:qz=0
+ 1620 gosub20010
+ 1621 print"{clr}{rght}{rght}{rght}{rght}{rght}{blu}feldherr ";:printw$(c);:print" ihre laender{down}"
+ 1630 y=0
+ 1640 fori=1to45
+ 1650 ifn$(i)=s$(c)thenprinttab(y)"{yel}";i;".";tab(5+y)"{grn}";l$(i);:goto1655
+ 1654 goto1660
+ 1655 printtab(15+y)"{red}";q(i);:y=y+20:ify=40theny=0:print
+ 1660 nexti
+ 1670 print:print"{down}{yel}{rght}{rght}{rght}{rght}{rght}von nummer: ";:inputts$
+ 1675 ifts$="x"thengoto1810
+ 1676 ifts$="@"thengosub53000:goto1620
+ 1690 qy=val(ts$)
+ 1700 ifn$(qy)<>s$(c)then1620
+ 1720 print"{clr}":gosub20020
+ 1721 print"{home}{down}{down}{down}{rght}{rght}{red}verschieben von {rvon}";l$(qy);"{rvof}  {pur}";q(qy)
+ 1722 le=qy:gosub30120:print:gosub20020
+ 1725 print"{down}{rght}{rght}{rght}{lgrn}nach land nr";:inputy$
+ 1726 ify$="x"then1810
+ 1727 ify$="@"thengosub53000:goto1720
+ 1728 y=val(y$):qz=0
+ 1729 fori=1to6:ify=la(qy,i)thenqz=y
+ 1730 nexti
+ 1732 ifqz=0then1720
+ 1735 ifn$(qz)<>s$(c)then1720
+ 1760 print"{down}{rght}{rght}{lred}wieviele armeen";:inputer
+ 1770 ifer>q(qy)-1then1760
+ 1780 q(qz)=q(qz)+er
+ 1790 q(qy)=q(qy)-er
+ 1800 goto1620
+ 1810 gosub 13000
+ 1811 c=c+1:ifc>sthenc=1
+ 1815 forx=1togf:ifdd(x)=cthenc=c+1
+ 1816 nextx
+ 1817 ifc>sthenc=1:goto1815
+ 1820 ifxs(c)<5then1840
+ 1830 x=xs(c)/5:x=int(x):xs(c)=xs(c)-5*x:wt=wt+1:ar=x*wt
+ 1840 ar=ar+4
+ 1850 fory=1to7:forx=1toa(y)
+ 1860 ifn$(b(y)+x)=s$(c)thenc(y)=c(y)+1
+ 1870 nextx
+ 1880 ifc(y)=a(y)thenar=ar+c(y)
+ 1885 c(y)=0
+ 1890 nexty
+ 1900 goto1500
+13000 forx=1tos:kl(x)=0:ko(x)=0:nextx
+13010 fory=1tos
+13020 forx=1to45
+13030 ifn$(x)=s$(y)thenkl(y)=1
+13040 nextx
+13050 ifkl(y)<>1thenko(1)=y
+13060 nexty
+13070 ifko(1)=0thenreturn
+13080 gosub20000:print"{clr}":gosub20020
+13090 print"{down}{red}{rght}{rght}{rght}{rght}{rght}{rght}eine traurige nachricht !!!"
+13100 print"{down}{blu}{rght}{rght}feldherr {cyn}";w$(ko(1));" {blu}mit seiner "
+13110 print"{down}{rght}{rght}letzen armee in den kampf gezogen,"
+13120 print"{down}{rght}{rght}und wurde toedlich getoffen"
+13130 forx=1to5000:nextx
+13140 gf=gf+1:dd(gf)=ko(1)
+13150 goto13000
+15000 gosub20000:z=0
+15002 gosub40000
+15003 print"{down}{down}{rght}{rght}{wht}angriff von welchem kontinent aus ?"
+15010 print"{cyn}{down}{down}{rght}{rght}{rght}{rght}{rght}{rght}{rght}1.{grn} miniland"
+15020 print"{down}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{cyn}2.{grn} jumboland"
+15030 print"{down}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{cyn}3.{grn} bongoland"
+15040 print"{down}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{cyn}4.{grn} wangoland"
+15050 print"{down}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{cyn}5.{grn} zululand"
+15060 print"{down}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{cyn}6.{grn} yungoland"
+15070 print"{down}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{cyn}7.{grn} xyloland"
+15080 print"{down}{down}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{yel}{rvon}nummer ?{rvof}"
+15090 geta$:ifa$=""then15090
+15100 ifa$="1"thenz=1
+15110 ifa$="2"thenz=2
+15120 ifa$="3"thenz=3
+15130 ifa$="4"thenz=4
+15140 ifa$="5"thenz=5
+15150 ifa$="6"thenz=6
+15160 ifa$="7"thenz=7
+15165 ifa$="x"then:a$="n":return
+15167 ifa$="@"thengosub53000
+15180 ifz=0then15000
+15200 gosub20010:print"{clr}"
+15210 print"{clr}{down}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{pur}angriff von land nr: "
+15220 fori=1toa(z)
+15230 print"{down}{rght}{rght}{rght}{rght}{lblu}";b(z)+i;". {yel}";l$(b(z)+i);
+15240 printtab(27)"{grn}";n$(b(z)+i);
+15250 printtab(35)"{red}";q(b(z)+i)
+15260 next
+15270 print"{lblu}{down}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}nummer :";:inputle$
+15280 ifle$="@"thengosub53000:goto15200
+15290 ifle$="x"thena$="j":return
+15300 le=val(le$)
+15310 ifle<1orle>45then15200
+15320 ifn$(le)<>s$(c)then15200
+15330 gosub30000:return
+16000 poke53281,2:poke53280,8:x=0
+16002 gosub41000
+16003 print"{down}{down}{rght}{rght}{rght}{rght}{wht}informationen ueber kontinent ?"
+16010 print"{cyn}{down}{down}{rght}{rght}{rght}{rght}{rght}{rght}{rght}1.{yel} miniland"
+16020 print"{down}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{cyn}2.{yel} jumboland"
+16030 print"{down}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{cyn}3.{yel} bongoland"
+16040 print"{down}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{cyn}4.{yel} wangoland"
+16050 print"{down}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{cyn}5.{yel} zululand"
+16060 print"{down}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{cyn}6.{yel} yungaland"
+16070 print"{down}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{cyn}7.{yel} xyloland"
+16080 print"{down}{down}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{blk}{rvon}nummer ?{rvof}"
+16090 geta$:ifa$=""then16090
+16100 ifa$="1"thenx=1
+16110 ifa$="2"thenx=2
+16120 ifa$="3"thenx=3
+16130 ifa$="4"thenx=4
+16140 ifa$="5"thenx=5
+16150 ifa$="6"thenx=6
+16160 ifa$="7"thenx=7
+16165 ifa$="x"then:a$="":return
+16167 ifa$="@"thengosub53000
+16180 ifx=0then16000
+16190 poke53281,8:poke53280,9
+16200 print"{clr}";:gosub20020:print"{home}"
+16210 fori=1toa(x)
+16230 print"{down}{rght}{rght}{rght}{red}";b(x)+i;"{rght}{rght}{blk}";l$(b(x)+i);tab(29)"{brn}";n$(b(x)+i);"{rght}{rght}{rght}{rght}{rght}{gry1}";:
+16240 printq(b(x)+i)
+16250 nexti
+16260 print:gosub20020
+16270 print"{down}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rvon} taste {rvof}"
+16280 geta$:ifa$=""then16280
+16300 return
+20000 poke53281,0:poke53280,0:return
+20010 poke53281,0:poke53280,11:return
+20020 print"{rght}{wht}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}":return
+20030 print"{rght}{blu}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}{CBM-+}":return
+30000 gosub20010:print"{clr}"
+30100 print"{red}{rght}{rght}{rght}{rvon} ";:printl$(le);:print" {rvof}{rght}{rght}{rght}armeen:";:printq(le)
+30105 print:gosub20030:print
+30110 print"{down}{cyn}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}angriff auf :":gosub30120:goto30305
+30120 print"{down}{down}{rght}{rght}{grn}";:printla(le,1);". {lblu}";l$(la(le,1));tab(23)"{pur}";
+30130 printn$(la(le,1));"{rght}{rght}{lred}";q(la(le,1))
+30140 print"{down}{rght}{rght}{grn}";la(le,2);". {lblu}";l$(la(le,2));tab(23)"{pur}";
+30150 printn$(la(le,2));"{rght}{rght}{lred}";q(la(le,2))
+30160 ifla(le,3)=0thengoto30300
+30170 print"{down}{rght}{rght}{grn}";la(le,3);". {lblu}";l$(la(le,3));tab(23)"{pur}";
+30180 printn$(la(le,3));"{rght}{rght}{lred}";q(la(le,3))
+30190 ifla(le,4)=0thengoto30300
+30200 print"{down}{rght}{rght}{grn}";la(le,4);". {lblu}";l$(la(le,4));tab(23)"{pur}";
+30210 printn$(la(le,4));"{rght}{rght}{lred}";q(la(le,4))
+30220 ifla(le,5)=0thengoto30300
+30230 print"{down}{rght}{rght}{grn}";la(le,5);". {lblu}";l$(la(le,5));tab(23)"{pur}";
+30240 printn$(la(le,5));"{rght}{rght}{lred}";q(la(le,5))
+30250 ifla(le,6)=0thengoto30300
+30260 print"{down}{rght}{rght}{grn}";la(le,6);". {lblu}";l$(la(le,6));tab(23)"{pur}";
+30270 printn$(la(le,6));"{rght}{rght}{lred}";q(la(le,6))
+30300 return
+30305 print"{down}{down}{lgrn}{rght}{rght}{rght}{rght}{rght}{rght}{rght}angriff auf nummer :";:
+30310 inputls$
+30311 ifls$="@"thengosub53000:goto30000
+30312 ifls$="x"thena$="j":return
+30313 ls=val(ls$)
+30315 y=0:fori=1to6:ifla(le,i)=lstheny=1
+30316 next:ify<>1then30000
+30317 ifn$(ls)=s$(c)then30000
+30320 print"{down}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{lred}mit wie vielen armeen :";:inputaq
+30330 ifaq>q(le)-1then30000
+30335 q(le)=q(le)-aq
+30400 ifaq>3thenwu=4:goto30410
+30405 wu=aq
+30410 ifq(ls)>3thenwv=4:goto30420
+30415 wv=q(ls)
+30420 fori=1towu:wu(4+i)=int(6*rnd(1))+1:next
+30430 fori=1towv:wv(4+i)=int(6*rnd(1))+1:next
+30450 ifwu<=3thenwu(8)=0
+30460 ifwu<=2thenwu(7)=0
+30470 ifwu<=1thenwu(6)=0
+30480 ifwv<=3thenwv(8)=0
+30490 ifwv<=2thenwv(7)=0
+30500 ifwv<=1thenwv(6)=0
+30510 wx=0
+30550 ifwu(8)>=wu(7)andwu(8)>=wu(6)andwu(8)>=wu(5)thenwx=wx+1:wu(wx)=wu(8):wu(8)=-1
+30560 ifwu(7)>=wu(8)andwu(7)>=wu(6)andwu(7)>=wu(5)thenwx=wx+1:wu(wx)=wu(7):wu(7)=-1
+30570 ifwu(6)>=wu(8)andwu(6)>=wu(7)andwu(6)>=wu(5)thenwx=wx+1:wu(wx)=wu(6):wu(6)=-1
+30580 ifwu(5)>=wu(8)andwu(5)>=wu(7)andwu(5)>=wu(6)thenwx=wx+1:wu(wx)=wu(5):wu(5)=-1
+30590 ifwu(9)<>-1then30550
+30600 wx=0
+30610 ifwv(8)>=wv(7)andwv(8)>=wv(6)andwv(8)>=wv(5)thenwx=wx+1:wv(wx)=wv(8):wv(8)=-1
+30620 ifwv(7)>=wv(8)andwv(7)>=wv(6)andwv(7)>=wv(5)thenwx=wx+1:wv(wx)=wv(7):wv(7)=-1
+30630 ifwv(6)>=wv(8)andwv(6)>=wv(7)andwv(6)>=wv(5)thenwx=wx+1:wv(wx)=wv(6):wv(6)=-1
+30640 ifwv(5)>=wv(8)andwv(5)>=wv(7)andwv(5)>=wv(6)thenwx=wx+1:wv(wx)=wv(5):wv(5)=-1
+30650 ifwv(9)<>-1then30610
+30660 wv(9)=0:wu(9)=0
+30670 poke53280,11:poke53281,15:print"{clr}"
+30680 print"{rght}{rght}{rght}{red}angreifer{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{blk}verteidiger{down}"
+30690 fori=1towu:fory=1to5
+30700 print"{red}{rght}{rght}{rght}{rght}";we$(wu(i),y)
+30710 nexty:print;:nexti
+30715 print"{home}{down}{down}"
+30720 fori=1towv:fory=1to5
+30730 printtab(32)"{blk}";we$(wv(i),y)
+30740 nexty:print;:nexti
+30745 fory=1to1500:nexty
+30750 y=0:fori=1to4
+30760 ifwu(i)=0orwv(i)=0thengoto30810
+30770 ifwv(i)>=wu(i)thenaq=aq-1:goto30810
+30780 q(ls)=q(ls)-1
+30810 nexti
+30820 ifaq<>0andq(ls)<>0then30400
+30830 gosub40000
+30840 ifq(ls)=0thenprint"{down}{down}{down}{down}{down}{down}{rght}{rght}{grn}";w$(c);" sie haben ";l$(ls)" erobert":goto30860
+30850 goto30900
+30860 print"{down}{rght}{rght}es sind nun{red}";aq;"{grn}armeen in diesem land"
+30870 print"{down}{down}{down}{rght}{rght}{lblu}";m$(ls);" sie haben {red}";l$(ls);"{lblu} verloren"
+30880 q(ls)=aq:n$(ls)=s$(c):xs(c)=xs(c)+1:m$(ls)=m$(le):goto31000
+30900 print"{down}{down}{down}{down}{down}{down}{down}{rght}{rght}{rght}{rght}{rght}{rght}{lblu}";m$(ls);" sie haben {red}";l$(ls)
+30910 print"{down}{rght}{rght}{rght}{rght}{rght}{rght}{lblu}erfolgreich verteidigt"
+30920 print"{down}{down}{down}{grn}{rght}{rght}{rght}{rght}{rght}{rght}";m$(le);" hat seine angreifenden"
+30930 print"{down}{rght}{rght}{rght}{rght}{rght}{rght}truppen verloren"
+31000 fori=1to5000:next
+31010 print"{clr}":poke53280,0:poke53281,0
+31020 print"{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{rght}{rght}{rght}{pur}noch ein angriff ";w$(c);" ?"
+31030 geta$:ifa$=""then31030
+31050 return
+40000 poke53280,11:poke53281,0:print"{clr}"
+40010 forwj=1024to1063:pokewj,102:next
+40020 forwj=1984to2023:pokewj,102:next
+40030 forwj=1064to1944step40:pokewj,102:next
+40040 forwj=1103to1983step40:pokewj,102:next
+40050 forwj=55296to55335:pokewj,6:next
+40060 forwj=56256to56295:pokewj,6:next
+40070 forwj=55336to56216step40:pokewj,6:next
+40080 forwj=55375to56255step40:pokewj,6:next
+40090 print"{home}";:return
+41000 print"{clr}"
+41010 forwj=1024to1063:pokewj,42:next
+41020 forwj=1984to2023:pokewj,42:next
+41030 forwj=1064to1944step40:pokewj,42:next
+41040 forwj=1103to1983step40:pokewj,42:next
+41050 forwj=55296to55335:pokewj,1:next
+41060 forwj=56256to56295:pokewj,1:next
+41070 forwj=55336to56216step40:pokewj,1:next
+41080 forwj=55375to56255step40:pokewj,1:next
+41090 print"{home}";:return
+43996 ifa$="\"thenend
+45000 poke53280,0:poke53281,6
+45010 print"{clr}{wht}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rvon} planet gurungo {rvof}{down}"
+45020 print"{blk}{rvon}{rght}{rght}{rght}{rght}{rght}  {rght}   {rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}     {rght}{rght}{rght}{rght}{rght}{rght}{rvof}"
+45030 print"{rvon}{rght}{rght}{rght}{rght}{rght}       {rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}        {rght}{rght}{rght}{rght}{rvof}"
+45040 print"{rvon}{rght}{rght}{rght}{rght}  jumbo  {rght}{rght}{rght}{rght}    {rght}{rght}{rght}{rght}{rght}          {rght}{rght}{rght}{rvof}"
+45050 print"{rvon}{rght}{rght}{rght}{rght}          {rght}{rght}      {rght}{rght}{rght}{rght}  wango   {rght}{rght}{rght}{rvof}"
+45060 print"{rvon}{rght}{rght}{rght}{rght}  {rght}       {rvof}{SHIFT-*}{rvon}  mini  {rght}{rght}{rght}{rght}{rvof}N{rvon}       {rght}{rght}{rght}{rght}{rvof}"
+45070 print"{rvon}{rght}{rght}{rght}{rght}  {rght}{rght}     {rght}{rght}        {rght}{rght}{rght} {rght}      {rght}{rght}{rght}{rght}{rght}{rvof}"
+45080 print"{rvon}{rght}{rght}{rght}{rght}{rght}{rght}{rght}     {rght}{rght}{rght}{rght}        {rght}{rvof}{CBM-P}{rvon} {rvof}{SHIFT-*}{rvon}      {rght}{rght}{rght}{rght}{rght}{rvof}"
+45090 print"{rvon}{rght}{rght}{rght}{rght}{rght}{rght}     {rght}{rvof}M{rvon}{rght}{rght}{rght}{rght}{rght}{rght}{rght}     {rght}{rght}{rght}{rght}    {rght}{rght}{rght}{rght}{rght}{rght}{rvof}"
+45100 print"{rvon}{rght}{rght}{rght}{rght}{rght}{rght}{rvof}N{rvon}{rght}{rght}{rght}{rght}{rght}{rght}{rvof}M{rvon}{rght}    {rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rvof}{CBM-N}{rvon}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rvof}"
+45110 print"{rvon}{rght}{rght}{rght}    {rght}{rght}{rght}{rght}{rght}{rght}{rght}      {rght}{rght}{rght}{rght}{rght}{rght}{rght}  {rght}  {rght}{rght}{rght}{rght}{rght}{rght}{rvof}"
+45120 print"{rvon}{rght}{rght}      {rght}{rght}{rght}{rght}         {rght}{rght}{rght}{rght}{rght}      {rght}{rght}{rght}{rght}{rght}{rvof}"
+45130 print"{rvon}{rght}       {rvof}{SHIFT-*}{SHIFT-*}{SHIFT-*}{rvon}   zulu    {rght}{rght}{rght}       {rght}{rght}{rght}{rght}{rght}{rvof}"
+45140 print"{rvon}{rght} xylo {rght}{rght}{rght}{rght}         {rght} {rght}{rght}{rght} bonga {rvof}M{rvon} {rght}{rght}{rght}{rvof}"
+45150 print"C{rvon}       {rght}{rght}{rght}{rght}{rght}       {rght} {rght}{rght}{rght}{rght}     {rght}{rght} {rvof}CCCCCC"
+45160 print"{up}{rvon}{rght}{rght}     {rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}    {rght}{rght}{rght}{rvof}M{rvon}{rght}{rght}{rght}{rght}   {rght}{rvof}{CBM-Y}{CBM-Y}{rvon}{rght}{rght}{rght}{rght}{rvof}"
+45170 print"{rvon}{rght}{rght}{rght}    {rght}{rght}{rght}{rght}{rght}{rght}{rght}    {rght}{rght}{rght}    {rght}{rvof}{CBM-P}{CBM-P}{rvon} {rght}{rght}{rght}{rght}{rght}{rght}{rght}{rvof}"
+45180 print"{rvon}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}      {rght}{rght}{rght}{rght}{rght}{rght}{rght}{rvof}"
+45190 print"{rvon}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}  yunga {rght}{rght}{rght}{rght}{rght}{rght}{rght}{rvof}"
+45200 print"{rvon}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}        {rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rvof}"
+45210 print"{rvon}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rvof}N{rvon}     {rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rvof}"
+45215 print"{rvon}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght} {rght}{rght}    {rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rvof}"
+45216 print"{rvon}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght} {rvof}{SHIFT-*}{SHIFT-*}{SHIFT-*}{rvon}  {rght}{rght}{rght}{rght}{yel}taste{rght}{rght}{rvof}"
+45230 geta$:ifa$=""then45230
+45250 a$="":return
+46000 poke53280,0:poke53281,6
+46010 print"{clr}{down}{wht}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rvon} miniland {rvof}{down}"
+46020 print"{blk}{down}{down}"
+46030 print"{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rvon}       {rvof}"
+46040 print"{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rvon}            {rvof}"
+46050 print"{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rvon}{CBM-P}{CBM-P}  moira   O  {rvof}"
+46060 print"{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rvon}   M        N     {rvof}"
+46070 print"{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rvon} ";n$(2);" M  ";n$(1);"  N       {rvof}"
+46080 print"{rght}{pur}j{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{blk}{rvon}      M{CBM-P}{CBM-P}{CBM-P}{CBM-P}N  ";n$(3);"    {rvof}"
+46090 print"{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rvon}  mur M            {$a0}{rvof}"
+46100 print"{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rvon}      M  marisuan {CBM-P}{CBM-P}{rvof}"
+46110 print"{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rvon}     {SHIFT-@}     {CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}N  {rvof}"
+46120 print"{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rvon}     {rvof}  {rvon}     N       {rvof}"
+46130 print"{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rvon}   {rvof}   {rvon}    N        {rvof}"
+46140 print"{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rvon}  N mesigo {rvof}"
+46150 print"{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rvon}         {rvof}"
+46160 print"{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rvon}   ";n$(4);" {rvof}"
+46170 print"{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rvon}    {rvof}{pur}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}w{blk}"
+46220 print"{down}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{yel}{rght}{rght}{rght}{rght}{rght}{rght}{rvon}taste{rvof}"
+46230 geta$:ifa$=""then46230
+46250 a$="":return
+47000 poke53280,0:poke53281,6
+47010 print"{clr}{down}{wht}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rvon} jumboland {rvof}{down}"
+47020 print"{blk}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rvon}     {rvof}"
+47030 print"{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rvon}       {rvof}              {rvon}   {rvof}"
+47040 print"{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rvon} juisu   {rvof}           {rvon}      {rvof}"
+47050 print"{rght}{rght}{rght}{rght}{rght}{rght}{rvon}           {rvof}         {rvon} josuah  {rvof}"
+47060 print"{rght}{rght}{rght}{rght}{rght}{rvon} {CBM-Y}M       N{CBM-Y}   {rvof}    {rvon}            {rvof}
+47070 print"{rght}{rght}{rght}{rvon}     M  ";n$(5);" {CBM-N}   ";n$(7);"   {CBM-N}             {rvof}"
+47080 print"{rght}{rght}{rvon}   ";n$(6);"  M    {CBM-N}        {CBM-N}{CBM-P}{CBM-P}{CBM-P}{CBM-P}     ";n$(8);"  {rvof}"
+47090 print"{rght}{rght}{rvon}        M   {rvof}  {rvon} jedip {CBM-N}    M       {rvof}
+47100 print"{rght}{rght}{rght}{rvon}        {CBM-Y}{CBM-Y}{rvof}   {rvon}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}N ";n$(9);"  M{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{rvof}"
+47110 print"{rght}{rght}{rght}{rght}{rvon}  juklia {rvof}    {rvon}      M           {rvof}"
+47120 print"{rght}{rght}{rght}{rght}{rght}{rvon}         {rvof}    {rvon}      M{CBM-P}{CBM-P}  jidu {rvof}{pur}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}m{blk}"
+47130 print"{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rvon}      {rvof}    {rvon}         M     {rvof}"
+47140 print"{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rvon}  {rvof}    {rvon}  juxario N{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{rvof}"
+47150 print"{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}M{rght}{rght}{rght}{rght}{rght}{rvon}        Njanian {rvof}"
+47160 print"{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}M{rght}{rght}{rght}{rvon} M  ";n$(10);"  N        {rvof}"
+47170 print"{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rvon}     M    N   ";n$(11);"   {rvof}"
+47180 print"{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rvon}    ";n$(12);"   M  {CBM-N}        {rvof}{pur}M{blk}"
+47190 print"{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rvon}           {CBM-Y}{CBM-Y}{CBM-Y}M   {rvof}     {pur}M{blk}"
+47200 print"{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rvon}  jodelia     {rvof}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{pur}z{blk}"
+47205 print"{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{pur}N{blk}{rvon}         {rvof}"
+47210 print"{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{pur}xN{blk}{rght}{rght}{rght}{rvon}     {rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{yel}taste{rvof}"
+47230 geta$:ifa$=""then47230
+47250 a$="":return
+48000 poke53280,0:poke53281,6
+48010 print"{clr}{down}{wht}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rvon} bongaland {rvof}{down}"
+48020 print"{blk}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{pur}Bw{blk}"
+48030 print"{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rvon}  {rvof}              {pur}B{blk}"
+48040 print"{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rvon}    {rvof}            {rvon}  {rvof}"
+48050 print"{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rvon}      M   {rvof}     {rvon}     {rvof}"
+48060 print"{rght}{rght}{rght}{rght}{rght}{rght}{rvon}        {CBM-H}     {rvof} {rvon}       {rvof}"
+48070 print"{rght}{rght}{rght}{rght}{rght}{rvon}  bouya  {CBM-H}             {rvof}"
+48080 print"{rght}{rght}{rght}{rght}{rvon}          {CBM-H}bunga  {CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{rvof}"
+48090 print"{rght}{rght}{rght}{rght}{rvon}   ";n$(13);"    N       N     {rvof}"
+48100 print"{rght}{rght}{rght}{rght}{rvon}        NM   ";n$(14);" N      {rvof}"
+48110 print"{rght}{rght}{rght}{rght}{rght}{rvon}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}N  {CBM-Y}{CBM-Y}M{CBM-P}{CBM-P}N  ";n$(16);"  {rvof}{rght}{rght}N{rvon}   {rvof}"
+48120 print"{rght}{rght}{rght}{rght}{rght}{rght}{rvon}          {CBM-N}         {rvof}{rght}N{rght}{rvon}     {rvof}"
+48130 print"{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rvon}   bifian{CBM-N} balingo {rvof}N{rght}{rght}{rght}{rvon}     {rvof}"
+48140 print"{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rvon}       {CBM-N}         {rvof}{rght}{rght}{rght}{rght}{rvon}  ";n$(18);" {rvof}"
+48150 print"{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rvon}  ";n$(15);"  M{CBM-P}{CBM-P}     {rvof}{rght}{rght}{rght}{rght}{rght}{rght}{rvon}     {rvof}"
+48160 print"{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rvon}     {CBM-N}  M    {rvof}{rght}{rght}{rght}{rght}{rght}{rght}{rvon}      {rvof}"
+48170 print"{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rvon}{CBM-P}{CBM-P}{CBM-P}{CBM-P}N ";n$(17);"M{CBM-P}{CBM-P}{rvof}{rght}{rght}{rght}{rght}{rght}{rght}{rvon}  beyu {rvof}"
+48180 print"{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rvon}         {rvof}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{rvon}       {rvof}"
+48190 print"{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rvon}  boan {rvof}{rght}{rght}{rght}{rght}{rght}{rght}{rvon}      {rvof}{pur}CCx{blk}"
+48200 print"{rght}{rght}{rght}{rght}{rght}{rght}{pur}y{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{blk}{rvon}      {rvof}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rvon}    {rvof}"
+48210 print"{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rvon}  {rvof}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rvon}  {rvof}"
+48220 print"{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{yel}{rvon}taste{rvof}"
+48230 geta$:ifa$=""then48230
+48250 a$="":return
+49000 poke53280,0:poke53281,6
+49010 print"{clr}{down}{wht}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rvon} wangoland {rvof}{down}{down}"
+49020 print"{blk}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rvon}  M       M  {rvof}"
+49030 print"{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rvon}     M       M    {rvof}"
+49040 print"{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rvon}   ";n$(20);"  {CBM-N} wiumbo{CBM-N}     {rvof}"
+49050 print"{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rvon}        {CBM-N}       Nwokio {rvof}"
+49060 print"{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rvon}  waguriu{CBM-N}  ";n$(19);"  N     N{CBM-Y} {rvof}"
+49070 print"{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rvon}         {CBM-N}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}N  ";n$(22);" N    {rvof}"
+49080 print"{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rvon}        N     M    N  ";n$(23);" {rvof}"
+49090 print"{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rvon}     N       M{CBM-P}{CBM-P}N      {rvof}"
+49100 print"{rght}{rght}{rght}{rght}{rvon}   {rvof}{rght}{rght}{rght}N{rght}{rght}{rvon}  N  wefia {CBM-N}        {rvof}"
+49110 print"{rght}{rght}{rght}{rvon}  ";n$(26);"  {rvof}N{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rvon}       {CBM-N} wigua {rvof}"
+49120 print"{rght}{rght}{rght}{rvon}       {rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}  ";n$(21);" NM{CBM-P}{CBM-P}   {rvof}"
+49130 print"{rght}{rght}{rvon}  wanzan{CBM-P}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{CBM-P}{CBM-P}{CBM-P}N ";n$(24);" M{CBM-P}{CBM-P}{rvof}"
+49140 print"{rght}{rght}{rght}{rvon}      N   {rght}{rght}{rght}{rght}{rght}{rght}{rght}   M       {rvof}"
+49150 print"{rght}{rght}{rght}{rght}{rvon}    N     {rght}{rght}{rght}{rght}{rght}{rght}    Mwuga {rvof}"
+49160 print"{rght}{rght}{rght}{rght}{rght}{rvon}  N wegos {rght}{rght}{rght}{rght}{rght}{rght} ";n$(25);" M{CBM-P}{CBM-P}{CBM-P}{CBM-P}{rvof}"
+49170 print"{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rvon}         {rvof}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{rvon}        {rvof}"
+49175 print"{rght}{rght}{rght}{pur}m{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{blk}{rvon} ";n$(27);"   {rght}{rght}{rght}{rght}{rght}{rght}{rght} waspo {rvof}"
+49180 print"{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rvon}    {rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}      {rvof}"
+49190 print"{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rvon}    {rvof}"
+49220 print"{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{pur}Bb{rght}{rght}{rght}{rght}{yel}{rvon}taste{rvof}"
+49230 geta$:ifa$=""then49230
+49250 a$="":return
+50000 poke53280,0:poke53281,6
+50005 print"{clr}{down}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{wht}{rvon} zululand {rvof}{down}"
+50007 print"{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{pur}j{blk}"
+50010 print"{blk}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{pur}M{blk}{rght}{rght}{rvon}        N        {rvof}"
+50020 print"{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{pur}M{blk}{rvon}  zuga   {CBM-H} zilubo   {rvof}"
+50030 print"{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rvon}         NM           {rvof}"
+50040 print"{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rvon}{CBM-P}   ";n$(28);"   N  M    ";n$(29);"     {rvof}"
+50050 print"{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rvon}  M{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}N    M{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}N{CBM-Y}{rvof}"
+50060 print"{rght}{rght}{rght}{rght}{rght}{rght}{rvon}   ";n$(30);"     {CBM-N}           N      {rvof}"
+50070 print"{rght}{rght}{rght}{rght}{rvon}             M zanguan N       {rvof}"
+50080 print"{pur}x{SHIFT-*}{SHIFT-*}{SHIFT-*}{blk}{rvon}  zulamboga   M        {CBM-H} zagi {rvof}"
+50090 print"{rght}{rght}{rght}{rght}{rght}{rvon}             {CBM-N}        {CBM-H}      {rvof}"
+50100 print"{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rvon}     {CBM-P}{CBM-P}{CBM-P}N  ";n$(31);"   N      {rvof}"
+50110 print"{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rvon}{CBM-P}{CBM-P}N   M       {rght}  ";n$(32);" {rvof}"
+50120 print"{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rvon}      M{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{rght}{rght}     {rvof}"
+50130 print"{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rvon}            {rght}{rght}{rght}   {rvof}{pur}M{blk}"
+50140 print"{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rvon} zelambie {rvof}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{pur}M{blk}"
+50150 print"{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rvon}         {rvof}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{pur}M{blk}"
+50160 print"{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rvon}       {rvof}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{pur}M{blk}"
+50170 print"{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rvon}  ";n$(33);"  {rvof}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{pur}y{blk}"
+50180 print"{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rvon}      {rvof}"
+50190 print"{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rvon}      {rvof}"
+50200 print"{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rvon}    {rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{yel}taste{rvof}"
+50230 geta$:ifa$=""then50230
+50250 a$="":return
+51000 poke53281,0:poke53281,6:print"{clr}{down}{wht}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rvon} yungaland {rvof}{down}"
+51003 print"{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{pur}{rght}zM{blk}"
+51005 print"{blk}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rvon}        {CBM-N}    {rvof}"
+51010 print"{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rvon}         {CBM-P}{CBM-P}N       {rvof}"
+51020 print"{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rvon}   yunkan N  M yeduin  {rvof}{pur}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}b{blk}"
+51030 print"{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rvon}  ";n$(34);"       N    M{CBM-P}{CBM-P}{CBM-P}      {rvof}"
+51040 print"{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rvon}  M{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}N         M ";n$(35);"   {rvof}"
+51050 print"{rght}{rght}{rght}{rght}{rght}{rght}{rvon}           {CBM-H}  yupondei  M{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{rvof}"
+51060 print"{rght}{rght}{rght}{rght}{rght}{rght}{rvon}           M                N   {rvof}"
+51070 print"{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rvon}   yiunak M{CBM-P}{CBM-P}{CBM-P}{CBM-P}   ";n$(36);"     N ";n$(38);" {rvof}"
+51080 print"{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}N{rvon}             M      N{CBM-Y}{CBM-Y}    {rvof}"
+51090 print"{rght}{rght}{rght}{rvon}   {rvof}{rght}{rght}N{rght}{rght}{rght}{rvon}     ";n$(37);"     M{CBM-P}{CBM-P}{CBM-P}{CBM-P}N     {rvof}"
+51100 print"{rght}{rght}{rvon}     {rvof}N{rght}{rght}{rght}{rght}{rght}{rght}{rvon}       N{CBM-Y}MN        {rvof}"
+51110 print"{rght}{rght}{rvon}  ";n$(40);"  {rght}{rght}{rght}{rght}{rght}{rght}{rght}     N  N  yeti {rvof}"
+51120 print"{rght}{rght}{rght}{rvon}      {rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}  {CBM-H}  L{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{rvof}"
+51130 print"{rght}{rght}{rght}{rght}{rght}{rvon}      {rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}            {rvof}"
+51140 print"{rght}{rght}{rght}{rght}{rght}{rght}{rvon}       {rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}            {rvof}"
+51150 print"{rght}{rght}{rght}{rght}{rght}{rght}{rvon}  yungo {rvof}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{rvon} yasafkiju {rvof}"
+51160 print"{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rvon}     {rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}          {rvof}"
+51170 print"{rvon}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}   {rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}   ";n$(39);"   {rvof}"
+51180 print"{rvon}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}     {rvof}
+51220 print"{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{yel}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rvon}taste{rvof}"
+51230 geta$:ifa$=""then51230
+51250 a$="":return
+52000 poke53280,0:poke53281,6
+52010 print"{clr}{down}{wht}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rvon} xyloland {rvof}{down}"
+52015 print"{blk}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{pur}Nj{blk}"
+52020 print"{blk}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rvon}    {CBM-H}      {rvof}"
+52030 print"{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rvon}       {CBM-H}   ";n$(42);"    {rvof}"
+52040 print"{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rvon}        N            {rvof}"
+52050 print"{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rvon}   xektra {CBM-H}xipaloingu  {rvof}"
+52060 print"{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rvon}           M           {rvof}"
+52070 print"{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rvon}  ";n$(41);" N{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}M        {rvof}{pur}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}z{blk}"
+52080 print"{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rvon}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}N        M{CBM-P}{CBM-P}{CBM-P}{CBM-P}  {rvof}"
+52090 print"{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rvon}     {CBM-N}  xentria M   M{rvof}"
+52100 print"{rght}{rght}{pur}bCCCC{blk}{rvon}       M         {CBM-N}  {rvof}"
+52110 print"{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rvon}       {CBM-H}  ";n$(43);"    N {rvof}"
+52120 print"{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rvon}  ";n$(44);" M{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}N  {rvof}"
+52130 print"{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rvon}         M        {rvof}"
+52140 print"{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rvon}           M   ";n$(45);"    {rvof}"
+52150 print"{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rvon}  xambesian {CBM-N}          {rvof}"
+52160 print"{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rvon}           Nxylamboan  {rvof}"
+52170 print"{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rvon}       N          {rvof}"
+52180 print"{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rvon}{CBM-P}{CBM-P}{CBM-P}N         {rvof}"
+52190 print"{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rvon}        {rvof}"
+52220 print"{down}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{yel}{rvon}taste{rvof}"
+52230 geta$:ifa$=""then52230
+52250 a$="":return
+52400 poke53281,0:poke53280,14:y=0
+52410 print"{clr}{down}{rght}{rght}{rght}{rght}{rght}{lblu}feldherr ";:printw$(c);:print" ihre laender"
+52420 print"{down}{down}"
+52430 fori=1to45
+52440 ifn$(i)=s$(c)thenprinttab(y)"{yel}";i;".";tab(5+y)"{grn}";l$(i);:goto52445
+52443 goto52450
+52445 printtab(15+y)"{red}";q(i);:y=y+20:ify=40theny=0:print
+52450 nexti:print
+52560 print"{down}{yel}{rght}nummer des landes ";:inputt$
+52565 ift$="@"thengosub53000:goto52400
+52566 ift$=chr$(13)then52400
+52567 t=0
+52570 t=val(t$)
+52580 ifn$(t)<>s$(c)then52400
+52590 print:print"{down}{rght}{rght}{pur}wieviele armeen  [max";ar;"]";:inputer
+52600 ifer>arthen52590
+52610 ar=ar-er:q(t)=q(t)+er:ifar=0thent=0:return
+52620 goto52410
+53000 poke53280,0:poke53281,0
+53010 print"{clr}{down}{rght}{rght}{rght}{lblu}{rvon}f1{rvof} :{blu} ";b$
+53020 print"{down}{lblu}{rght}{rght}{rght}{rvon}f3{rvof} :{blu} ";c$
+53030 print"{down}{lblu}{rght}{rght}{rght}{rvon}f5{rvof} :{blu} ";d$
+53040 print"{down}{lblu}{rght}{rght}{rght}{rvon}f7{rvof} :{blu} ";e$
+53050 print"{down}{lblu}{rght}{rght}{rght}{rvon}f2{rvof} :{blu} ";f$
+53060 print"{down}{lblu}{rght}{rght}{rght}{rvon}f4{rvof} :{blu} ";g$
+53070 print"{down}{lblu}{rght}{rght}{rght}{rvon}f6{rvof} :{blu} ";h$
+53080 print"{down}{lblu}{rght}{rght}{rght}{rvon}f8{rvof} :{blu} ";i$
+53090 print"{down}{lblu}{rght}{rght}{rght}{rvon}i{rvof}  :{blu} information ueber kontinente"
+53100 print"{down}{lblu}{rght}{rght}{rght}{rvon}^{rvof}  :{blu} spiestand/spielende"
+53105 print"{down}{lblu}{rght}{rght}{rght}{rvon}x{rvof}  :{blu} zurueck zum spielschritt"
+53110 print"{down}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{red}{rvon}taste{rvof}"
+53130 geta$:ifa$=""then53130
+53140 ifa$="{f1}"thengosub45000
+53150 ifa$="{f3}"thengosub46000
+53160 ifa$="{f5}"thengosub47000
+53170 ifa$="{f7}"thengosub48000
+53180 ifa$="{f2}"thengosub49000
+53190 ifa$="{f4}"thengosub50000
+53200 ifa$="{f6}"thengosub51000
+53210 ifa$="{f8}"thengosub52000
+53220 ifa$="x"thenreturn
+53230 ifa$="^"thengosub54000
+53240 ifa$="i"thengosub16000
+53250 goto53000
+54000 poke53281,8:poke53280,9
+54010 print"{clr}";:gosub20020:print"{home}{down}"
+54015 forx=1tos:kl(x)=0:ko(x)=0:nextx
+54020 fori=1tos
+54030 forx=1to45
+54040 ifn$(x)=s$(i)thenkl(i)=kl(i)+1
+54050 nextx
+54060 forx=1to7
+54070 fory=1toa(x)
+54080 ifn$(b(x)+y)=s$(i)thendf=df+1
+54090 nexty:ifdf=a(x)thenko(i)=ko(i)+df
+54100 df=0:nextx
+54110 print"{down}{rght}{rght}{red}";w$(i);tab(25)"{gry1}";ko(i)+kl(i);tab(30)"{blk}punkte"
+54120 nexti
+54130 print"{down}":gosub20020:print"{down}{down}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{blk}{rvon}taste{rvof}"
+54140 geta$:ifa$=""then54140
+54150 print"{clr}{down}{down}{down}{down}{down}{down}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{blk}spielende [j/n]"
+54160 geta$:ifa$=""then54160
+54170 ifa$="j"thensys64738
+54180 return
+55000 poke53280,0:poke53281,0:print"{clr}{lblu}"
+55010 print"{down}{down}{down}{rght}{rght}{rght}{rght}{rvon}{SHIFT-POUND}  {CBM-*}{rght}{rght}  {rght}{rght}{SHIFT-POUND}    {rght}{rght}  {rght}{rght} {rght}{rght} {rght}{rght}{SHIFT-POUND}  {CBM-*}"
+55020 print"{rght}{rght}{rght}{rght}{rvon} {rght}{rght} {rght}{rght}  {rght}{rght} {rvof}{SHIFT-POUND}{rvon}{rght}{rght}{rght}{rght}{rght}  {rght}{rght} {rght}{SHIFT-POUND}{rvof}{SHIFT-POUND}{rvon}{rght}{rght} {rght}{rght} "
+55030 print"{rght}{rght}{rght}{rght}{rvon} {rght}{SHIFT-POUND}{rvof}{SHIFT-POUND}{rvon}{rght}{rght}  {rght}{rght} {CBM-*}{rght}{rght}{rght}{rght}{rght}  {rght}{rght} {SHIFT-POUND}{rvof}{SHIFT-POUND}{rvon}{rght}{rght}{rght} {rght}{rght} "
+55040 print"{rght}{rght}{rght}{rght}{rvon} {SHIFT-POUND}{rvof}{SHIFT-POUND}{rvon}{rght}{rght}{rght}  {rght}{rght}{rvof}{CBM-*}{rvon}   {CBM-*}{rght}{rght}  {rght}{rght}  {rght}{rght}{rght}{rght} {rght}{rght} "
+55050 print"{rght}{rght}{rght}{rght}{rvon} {rvof}{CBM-*}{rvon}{CBM-*}{rght}{rght}{rght}  {rght}{rght}{rght}{rght}{rght}{rvof}{CBM-*}{rvon} {rght}{rght}  {rght}{rght} {rvof}{CBM-*}{rvon}{CBM-*}{rght}{rght}{rght} {rght}{rght} "
+55060 print"{rght}{rght}{rght}{rght}{rvon} {rght}{rvof}{CBM-*}{rvon}{CBM-*}{rght}{rght}  {rght}{rght}{rght}{rght}{rght}{SHIFT-POUND} {rght}{rght}  {rght}{rght} {rght}{rvof}{CBM-*}{rvon}{CBM-*}{rght}{rght} {rght}{rght} "
+55070 print"{rght}{rght}{rght}{rght}{rvon} {rght}{rght} {rght}{rght}  {rght}{rght}    {rvof}{SHIFT-POUND}{rvon}{rght}{rght}  {rght}{rght} {rght}{rght} {rght}{rght}{rvof}{CBM-*}{rvon}  {rvof}{SHIFT-POUND}{rvon}"
+55080 print"{down}{down}{down}{down}{rght}{rght}{rght}{pur}created/written/idea/sound/grafik"
+55090 print"{down}{down}{down}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rvon}{red} all by bernd hornig {rvof}"
+55100 fori=1to3500:next:return
+60000 poke53280,1:poke53281,12:print"{clr}"
+60010 print"{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{red}{rvon} spielanleitung {rvof}"
+60020 print"{down}{rght}{blk}sie befinden sich in einer fernen ga-"
+60030 print"{down}{rght}laxie auf dem planeten gurungo, mit "
+60040 print"{down}{rght}seinen 7 kontinenten. sie sind fedlherr"
+60050 print"{rght}auf diesem planeten und besitzen eine"
+60060 print"{down}{rght}anzahl von laendern, die sie vergroes-"
+60070 print"{down}{rght}sern und verteidigen sollen. jeden mo-":rem15
+60080 print"{down}{rght}nat bekommen sie armeen dazu. die an-"
+60090 print"{down}{rght}zahl richtet sich nach vollstaendig be-"
+60100 print"{rght}setzten kontinenten und neu eroberten"
+60110 print"{down}{rght}laendern.                 {down}{down}{rvon}{red} taste {rvof}"
+60120 geta$:ifa$=""then60120
+60130 print"{clr}{down}{blk}{rght}bei angriffen, oder bei verschieben von"
+60140 print"{rght}armeen, muss mindestens eine armee im"
+60150 print"{down}{rght}heimatland stehen bleiben."
+60160 print"{down}{rght}mit der {red}{rvon}@{rvof}{blk}-taste kommen sie zum unter-"
+60170 print"{down}{rght}menu, von dem sie die karten usw. er-"
+60180 print"{down}{rght}reichen koennen."
+60190 print"{down}{rght}mit der {red}{rvon}x{rvof}{blk}-taste koennen sie die rou-"
+60200 print"{down}{rght}tinen beenden.     {down}{down}viel spass !!!!!!!"
+60210 print"{down}{down}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{red}{rvon} taste {rvof}"
+60220 geta$:ifa$=""then60220
+60230 return
+62000 return
+63001 datamoira,2,3,0,0,0,0
+63002 datamur,1,3,9,0,0,0
+63003 datamarisuan,1,2,4,0,0,0
+63004 datamesigo,3,27,0,0,0,0
+63005 datajuisu,6,7,0,0,0,0
+63006 datajuklia,5,12,0,0,0,0
+63007 datajedip,5,8,9,10,0,0
+63008 datajosuah,7,9,0,0,0,0
+63009 datajidu,7,8,10,11,2,0
+63010 datajuxario,7,9,11,12,0,0
+63011 datajanian,9,10,12,2,0,0
+63012 datajodelia,6,10,11,42,0,0
+63013 databouya,14,15,0,0,0,0
+63014 databunga,13,15,16,25,0,0
+63015 databifian,13,15,16,17,0,0
+63016 databalingo,14,15,17,18,0,0
+63017 databoan,15,16,18,35,0,0
+63018 databeyu,16,17,44,0,0,0
+63019 datawiumbo,20,21,22,0,0,0
+63020 datawagurio,19,21,26,0,0,0
+63021 datawefia,19,20,22,23,24,25
+63022 datawokio,19,21,23,0,0,0
+63023 datawigua,21,22,24,0,0,0
+63024 datawuga,21,23,25,0,0,0
+63025 datawaspo,21,24,27,0,0,0
+63026 datawanzan,20,27,0,0,0,0
+63027 datawegos,25,26,4,0,0,0
+63028 datazuga,29,30,31,11,0,0
+63029 datazilubo,28,31,32,0,0,0
+63030 datazulamboga,28,31,33,42,0,0
+63031 datazanguan,28,29,30,32,33,0
+63032 datazagi,29,31,34,0,0,0
+63033 datazelambie,30,31,0,0,0,0
+63034 datayunkan,35,36,37,32,0,0
+63035 datayeduin,34,36,38,17,0,0
+63036 datayupondei,34,35,37,38,0,0
+63037 datayiunak,34,36,38,39,40,0
+63038 datayeti,35,36,37,39,0,0
+63039 datayasafkiju,37,38,40,0,0,0
+63040 datayungo,37,39,0,0,0,0
+63041 dataxektra,42,43,44,0,0,0
+63042 dataxipaloingo,41,43,45,30,12,0
+63043 dataxentria,41,42,44,45,0,0
+63044 dataxambesian,41,43,45,18,0,0
+63045 dataxylamboan,42,43,44,0,0,0
+
