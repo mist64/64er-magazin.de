@@ -1,0 +1,215 @@
+
+
+;golf.prg ==0801==
+    0 rem     ** golf ('85) ***
+    1 rem     *  ----------   *
+    2 rem     * b.tertelmann  *
+    3 rem     * ostendorf 36  *
+    4 rem     * 4435 horstmar *                       *****************
+    5 print"{clr}{gry3}* golf *":v=53248:pokev+21,0:pokev+32,11:pokev+33,11:goto15
+    6 rem v+16 fuer baeume und ballbewegung
+    7 ifz>wthenz=zandw:pokev6,c
+    8 return
+    9 ifd-c>wthenpokev6,peek(v6)or16:c=w+1:return
+   10 ifd<cthenpokev6,peek(v6)andnot16:c=0
+   11 return
+   15 v6=v+16:v0=v+30:v1=v0+1:o=21.9:w=255:m=40:sx=.8:sy=.8:s=54272:j=56320:b=2040
+   16 dimp%(38),p(50):fori=0to38:readp%(i):next
+   17 fori=0to7:readr(i),g(i),b(i),h(i):next:n=20
+   18 fori=0to10:readp(i):p(n+i)=-p(i):p(n-i)=p(i):p(m-i)=-p(i):p(m+i)=p(i):next
+   20 fori=832to864:readq:pokei,q:next:fori=ito989:pokei,0:next
+   25 fori=itoi+33:readq:pokei,q:next:fori=12800toi+46:readq:pokei,q:next
+   30 fori=itoi+38:pokei,0:next:fori=itoi+297:readq:pokei,q:next
+   35 poke924,24:poke927,60:poke930,60:poke933,24:pokev+42,5:pokev+43,1:rem ball
+   40 deffnb(x)=o+(sin(x/2)+cos(x/4))/2:rem bodenkurve fuer 1.bild
+   42 deffnh(x)=k+sin(x/5)/2+(x-a)*l:rem    horizont fuer 2.bild
+   45 pokev+37,10:pokev+38,0:pokeb,200:pokeb+3,203:pokeb+4,14
+   50 pokes,0:pokes+6,0:pokes+7,0:pokes+9,0:pokes+10,8
+   55 pokes+13,0:pokes+14,0:pokes+19,9:pokes+20,0:pokes+24,15
+   60 print"{clr}{blu}{down}{down}{down}{down}":pokev+33,6:pokev+32,11
+   62 printtab(14)"U{SHIFT-*}IU{SHIFT-*}II  U{SHIFT-*}I"
+   65 printtab(14)"{SHIFT--}  {SHIFT--} {SHIFT--}{SHIFT--}  {SHIFT--}"
+   68 printtab(14)"{SHIFT--}{SHIFT-*}I{SHIFT--} {SHIFT--}{SHIFT--}  {CBM-Q}{SHIFT-*}"
+   70 printtab(14)"{SHIFT--} {SHIFT--}{SHIFT--} {SHIFT--}{SHIFT--}  {SHIFT--}"
+   72 printtab(14)"J{SHIFT-*}KJ{SHIFT-*}KJ{SHIFT-*}KK{down}"
+   75 printtab(14)"************{down}{down}{down}{down}{down}{down}{blk}"
+   80 printtab(8)"1 spieler.......taste 1{down}"
+   82 printtab(8)"2 spieler.......taste 2":i=10
+   85 geta$:ifa$="1"ora$="2"then90
+   86 a=55600:fork=0to38:pokea+p%(k),i^1:next
+   87 fork=0to11:poke55750+k,i^1:next:i=7-(i=7)*3:goto85
+   90 ss=val(a$):bs(1)=999:bs(2)=999:sm(1)=0:sm(2)=0:sp=0
+   95 s(1)=0:s(2)=0:sp=sp+1:forn=1toss:pokes+8,15:pokes+12,5:pokes+15,150
+   99 rem vorbereitung bild 1
+  100 pokev+33,9:print"{clr}":pokev+33,6:pokev+32,11:pokev+23,42:pokev+29,232
+  105 pokev+28,7:pokev+40,5:pokev+41,5:pokev+44,0:pokev+45,15:pokev+46,15
+  110 pokeb+1,201:pokeb+2,202:pokeb+5,204:pokeb+6,13:pokeb+7,15
+  115 q=rnd(ti):a=q*9999:a%=q*20:x=a+a%:h=fnb(x)
+  120 y=fnb(x+10):ify+1<hthen115
+  125 ify>hthenh=y
+  130 z=a%+55297+int(h)*m:fori=0to8:pokez+i,14:next
+  135 z=z+41:fori=0to6:pokez+i,14:next:l=a%+1024:r=l+10
+  140 k=0:forx=a+37toa+39:iffnb(x)>=22thenk=1
+  145 next:y=56173:fori=0to2:forx=0tok:pokey+i+x*m,8:next:next
+  150 pokev6,1:pokev,64:pokev+1,fnb(a+38)*8+35
+  155 k=1:ifa%>14thenk=3:goto165
+  160 ifa%>7thenk=2
+  165 x%(k-1)=a%+8:fori=kto3:x%(i)=rnd(1)*(11+i*6-x%(i-1))+x%(i-1)+6:next
+  170 onkgoto185,180
+  175 x%(1)=rnd(1)*(a%-12)+4:x%(2)=rnd(1)*(a%-8-x%(1))+x%(1)+6:goto185
+  180 x%(1)=rnd(1)*(a%-6)+4
+  185 x%=rnd(1)*3+1
+  190 y%=rnd(1)*3+1:ify%=x%then190
+  195 k=6-x%-y%:x=x%(x%):z=x*8+18:c=3:gosub7:pokev+2,z:pokev+3,fnb(x+a)*8+8
+  200 x=x%(y%):z=x*8+18:c=5:gosub7:pokev+4,z:pokev+5,fnb(x+a)*8+29
+  205 x=x%(k):z=x*8+8:c=41:gosub7:pokev+6,z:pokev+10,z
+  210 z=fnb(x+a)*8+8:pokev+7,z:pokev+11,z:pokev+8,0
+  215 pokev+12,132:pokev+13,73:pokev+14,180:pokev+15,63
+  220 x=a:fori=1024to1063:ifi>landi<rtheny=h:goto230
+  225 y=fnb(x)
+  230 y%=y:pokei+m*y%,b(8*(y-y%)):fory=y%+1to24:pokei+m*y,160:next:x=x+1:next
+  235 print"{blk}":onssgosub670,680:l=a%+2:r=l+10
+  240 printtab(5)"{red}{down}{down}{down}{down}{CBM-D}{rvon}{CBM-V}  {CBM-C}{rvof}{CBM-F}":printtab(5)"{rvon}{CBM-V}    {CBM-C}"
+  245 printtab(5)"{rvon}  {gry2}              ":printtab(3)"{rvon}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{rght}{CBM-@}{CBM-@}"
+  250 printtab(5)"{rvon}{red}{CBM-F}    {CBM-D}{blk}":pokev+21,w:z=931:p=0:u=5
+  254 rem spiel bild 1
+  255 c=0:x=a:x%=0:d=14
+  260 pokes+6,0:y=fnb(x):e=y*8+37:x=0
+  265 pokev+8,d-c:pokev+9,e:pokev+27,0:gosub650:ifx%>38then310
+  270 gosub550:f=2*sgn(t):k=f:g=g*t:g=g*g:t=p(p)/t:pokev+27,16
+  275 pokez,0:pokes+4,129:y=peek(v0)+peek(v1)
+  280 d=d+k:ifd<14ord>328thenpokes+5,9:pokes+4,0:pokes+4,17:k=-k:d=d+k+k
+  285 ifpeek(v0)and14thenpokes+18,0:pokes+18,129:k=-k:d=d+k+k
+  290 x=x+f:y=e+x*(x/g-t):ify>240then300
+  295 gosub9:pokev+8,d-c:pokev+9,y:ifnotpeek(v1)and16then280
+  300 x%=d/8+.5:ifx%>landx%<rthenpokev+9,h*8+40:goto500
+  305 pokes+11,0:pokes+11,17:x=x%-2+a:d=x%*8-2:gosub9:goto260
+  309 rem ende bild 1
+  310 print"{down}{down}{down}":fori=0to28:fork=0to4:print"{rght}";chr$(20):next:print"{up}{up}{up}{up}{up}{up}"
+  315 pokes+18,16:pokes+18,17:fort=0to50:next:next
+  319 rem vorbereitung bild 2
+  320 pokev+21,0:print"{clr}":pokev+33,9:pokev,207:pokev+1,120:pokev+28,1
+  325 pokeb+1,13:pokeb+2,15:pokeb+5,205:pokeb+6,205:pokeb+7,205
+  330 pokev+40,15:pokev+41,15:pokev+44,7:pokev+45,13:pokev+46,7
+  335 fori=v+10tov+13:pokei,rnd(1)*140+25:i=i+1:pokei,rnd(1)*85+120:next
+  340 pokev+14,rnd(1)*62:pokev+15,rnd(1)*85+120:pokev6,128
+  345 e=(y-19)*50+35:d=int((rnd(1)+x%-39)*104+15):c=0:gosub9
+  350 pokev+8,d-c:pokev+9,e:pokes+8,5:pokes+12,96
+  355 pokev+2,132:pokev+3,73:pokev+4,180:pokev+5,63
+  360 x%=(fnb(a+39)-fnb(a+37))*7:q=sgn(x%):l=q/9:k=6-q-q:q=q*sx:poke55720,0
+  365 x=a:fori=1024to1063:y=fnh(x):y%=y:fort=0toy%-1:pokei+t*m,160:next
+  370 pokei+m*y%,h(8*(y-y%)):x=x+1:next
+  375 pokes+15,15:onssgosub670,680:pokev+23,192:pokev+29,102:pokev+21,247
+  380 gosub650:gosub550:g=g/4+1:f=p(p):pokez,0:pokes+4,129
+  384 rem spiel bild 2
+  385 i=peek(v0)+peek(v1):fori=gto1step-.07:x0=d:y0=e:ifi<3thend=d+q:e=e+sy
+  390 d=d+t*i:ifd<14ord>330thenpokes+18,0:pokes+18,17:t=-p(p+10):d=x0
+  395 ifpeek(v1)and16thenife<109thene=fnh((d-14)/8+a)*8+m:i=i-.1:goto415
+  400 h=peek(v0):e=e-f*i:ife>237thenpokes+18,0:pokes+18,17:f=-p(p):e=y0
+  405 ifhand16thenifnothand1theni=i-.4:pokes+11,0:pokes+11,129
+  410 ife<126ande>120thenifd<211andd>205then435
+  415 d=int(d+.5):y%=e+.5:gosub9:pokev+8,d-c:pokev+9,y%:next
+  420 ifpeek(v1)and16thenife<109thenpokev+9,y%+3:e=e+3
+  425 ife<160thenifd<250andd>170thenpoke1448,87:pokev+21,246:goto380
+  430 poke1448,32:pokev+21,247:goto380
+  434 rem spielende und auswertung
+  435 pokev+8,208:pokev+9,123:gosub650:pokes+12,0:pokes+13,89:pokev+32,2
+  440 pokes+11,0:pokes+11,65:gosub490:pokev+33,8:gosub490:pokev+32,11
+  445 gosub490:pokev+33,9:gosub490:pokev+21,0:pokes+11,0:pokes+13,0:nextn
+  450 fori=1toss:sm(i)=sm(i)+s(i):ifs(i)<bs(i)thenbs(i)=s(i)
+  455 next:print"{clr}{down}{down}{down}{down}":pokev+33,8:onssgosub700,705
+  460 printtab(5)"{down}{down}{down}{down}{down}{down}von vorn..........taste v":printtab(5)"(punkte auf 0)"
+  465 printtab(5)"{down}weiter.........taste w oder fire"
+  470 geta$:ifpeek(j)and16thenifa$<>"v"anda$<>"w"then470
+  475 ifa$="v"then60
+  480 goto95
+  489 rem tonerzeugung bei spielende
+  490 fori=0to3:forf=20to50:pokes+8,f:next:next:return
+  499 rem ton und ramenfarbe, wenn see ge-troffen
+  500 pokes+5,9:pokes+6,58:pokev+32,8:pokes+4,0:pokes+4,129
+  505 fori=10tomstep.3:pokes+1,i:next:pokev+32,11
+  510 fori=25to70step.3:pokes+1,i:next:pokev+32,8:pokes+4,128
+  515 fori=0to300:next:pokes+5,5:pokev+32,11:goto255
+  549 rem eingabe winkel und schlagstaerke
+  550 pokes+1,w:pokes+5,2:pokes+4,32:pokez,r(u):pokes+4,33:pokes+1,30
+  555 f=notpeek(j):iffand16then595
+  560 iffand4thenp=p+(p=m)*p+1:goto635
+  565 iffand8then630
+  570 geta$:ifa$=""then555
+  575 ifa$="{left}"thenp=p+(p=m)*p+1:goto635
+  580 ifa$="{rght}"then630
+  585 ifa$<>" "then555
+  590 fori=0to180:next
+  595 i=853:t=0:g=2:s(n)=s(n)+1
+  600 ifg>13theng=g^1:goto620
+  605 g=g+.23:ift>7thent=0:i=i+1:ifi=856theni=1011
+  610 ifi=1013thenf=g(t)or1:pokei,f:pokei+3,f:pokei+6,f:goto620
+  615 pokei,g(t):pokei+3,g(t):pokei+6,g(t)
+  620 t=t+1:geta$:ifnotpeek(j)and16ora$=" "then600
+  625 t=p(p+10):onssgosub670,685:pokes+4,0:pokes+5,5:return
+  630 p=p-(p=0)*m-1
+  635 y%=11-9*p(p):x%=11.5+10*p(p+10):a%=x%/8:u=x%and7
+  640 pokez,0:z=896+a%+3*y%:pokez,r(u):goto555
+  649 rem geschwindigkeits-skala loeschen
+  650 poke1019,1:poke1016,1:poke1013,1:poke1018,0:poke1015,0:poke1012,0
+  655 poke1017,0:poke1014,0:poke1011,0:poke861,0:poke858,0:poke855,0
+  660 poke860,0:poke857,0:poke854,0:poke859,128:poke856,128:poke853,128:return
+  669 rem bildschirmkopf fuer 1 spieler
+  670 print"{home}"
+  675 printtab(9)"{rvon}spiel"sptab(24)"{rvof}schlaege:"s(1):return
+  679 rem bildschirmkopf fuer 2 spieler
+  680 poke1041+n*24,81:poke55313+n*24,15
+  685 print"{home}"
+  690 print"{rght}{rght}1.spieler"s(1)tab(18)"{rvon}"sp"{left} "tab(26)"{rvof}2.spieler"s(2):return
+  699 rem auswertung fuer 1 spieler
+  700 gosub675:printtab(13)"{down}{down}bestes spiel"bs(1):printtab(13)"{down}summe"sm(1):return
+  704 rem auswertung fuer 2 spieler
+  705 gosub690:print"{down}{down} bestes sp."bs(1)tab(25)"bestes sp."bs(2)
+  710 print"{down} summe"sm(1)tab(25)"summe"sm(2):return
+  755 data-88,-89,-90,-50,-10,30,70,71,72,32,-8,-9,-85,-86,-87,-47,-7,33,73,74
+  760 data75,35,-5,-45,-84,-44,-4,36,76,77,78,79,39,-1,,-41,-81,-80,-79
+  765 data192,128,160,99,96,192,227,119,48,224,247,120,24,240,248,226
+  770 data12,248,98,249,6,252,121,239,3,254,111,228,3,255,100,160
+  774 rem sin-tabelle
+  775 data.001,.156,.309,.454,.588,.707,.809,.891,.951,.986,.999
+  779 rem sprite 'skala links'
+  780 data226,57,200,166,8,74,162,57,206,162,32,66,226,57,194
+  785 data8,66,16,255,255,255,128,,,128,,,128,,,255,255,255
+  789 rem sprite 'skala rechts'
+  790 data115,156,231,66,4,165,115,136,231,18,136,161,115,136,231
+  795 data132,33,8,255,255,255,,,1,,,1,,,1,255,255,255,
+  799 rem sprite 'fahne'
+  800 data,12,,,13,,,13,64,,13,64,,13,16,,13,84,,13,80,,13,,
+  805 data12,,,12,,,12,,,12,,,12,,,12,,,12,,,63
+  809 rem sprite 'tanne'
+  810 data8,,,8,,,42,,,34,,,168,128,,170,128,2,170,128,2,170
+  815 data160,10,46,160,10,190,168,10,62,40,,60,,,60,,,60,,
+  819 rem sprite 'kleiner baum'
+  820 data,170,,2,170,128,10,170,168,10,42,168,42,168,168,34,130,170,42,42
+  825 data170,40,170,42,168,138,170,162,40,162,40,170,170,170,170,168,138,186
+  830 data160,170,186,,40,60,,,60,,,60,,,60,,,60,,,60,,,60,,
+  834 rem sprite 'grosser baum - laub'
+  835 data31,240,,59,254,,59,255,,125,207,128,124,191,224,126,127,224,223,127
+  840 data112,227,63,176,125,63,176,62,30,112,1,153,176,,3,224,,1,224,
+  845 data,,24,,,118,,,205,,,240,,,,,,,,,,,,
+  849 rem sprite 'grosser baum - stamm'
+  850 data,,,4,,,4,,,2,48,,3,64,,1,128,,32,128
+  855 data128,28,192,64,2,192,64,1,225,128,0,102,64,,124,,,120,,
+  860 data112,,6,112,,9,240,,48,240,,,112,0,,112,,,112,,,112,,
+  864 rem sprite 'sandfelder'
+  865 data,2,170,,,,,85,85,,,,10,170,170,,,,5,85
+  870 data85,,,,42,170,170,,,,85,85,85,,,,42,170,168,
+  875 data,,85,85,80,,,,170,170,128,,,,85,85,64,,,,170,170,,
+  885 rem mit den variablen sx und sy kann in zeile 15 fuer bild 2 das gefaelle
+  886 rem  in x- und y-richtung getrennt   eingestellt werden.
+  890 rem fuer s/w-geraet oder -monitor    bitte folgende zeilen aendern
+  891 rem 100 pokev+33,8...
+  892 rem 145 ...pokey+i+x*m,12...
+  893 rem 320 ...pokev+33,8...
+  894 rem 435 ...pokev+32,0
+  895 rem 440 ...pokev+33,12...
+  896 rem 445 ...pokev+33,8...
+  897 rem 500 ...pokev+32,12...
+  898 rem 510 ...pokev+32,12...
+  900 rem-zeilen brauchen nicht mit einge- geben zu werden!
+
