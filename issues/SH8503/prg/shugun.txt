@@ -1,0 +1,528 @@
+
+
+;shugun.prg ==0801==
+   10 rem  **************************
+   20 rem  *                        *
+   30 rem  *    s  h  u  g  u  n    *
+   40 rem  *                        *
+   50 rem  *           by           *
+   60 rem  *      andreas gast      *
+   70 rem  *    & rainer wilhelm    *
+   80 rem  *                        *
+   90 rem  *    1984/85 ettenheim   *
+   91 rem  *                        *
+   92 rem  **************************
+   93 :
+   94 rem  **************************
+   95 rem  * 'rem-zeilen' auch ab-  *
+   96 rem  * tippen...              *
+   97 rem  **************************
+  121 :
+  125 rem ******************************
+  130 rem * titelbild                  *
+  132 rem ******************************
+  133 :
+  140 poke53281,0:poke53280,0:printchr$(142)chr$(8)
+  150 print"{clr}{wht}";
+  160 print" UCCCCC{SHIFT-*}CCCI UCIU{SHIFT-*}IU{SHIFT-*}IU{SHIFT-*}IU{SHIFT-*}IU{SHIFT-*}IU{CBM-R}KU{SHIFT-*}K"
+  170 print" BUCC{SHIFT-*}CCCCIB {CBM-Q}CK{CBM-Q}{CBM-R}K{CBM-Q}{SHIFT-*} J{SHIFT-*}I{CBM-Q}{SHIFT-*} {SHIFT--} {SHIFT--} {SHIFT--} J{SHIFT-*}I {CBM-V}"
+  180 print" BB{grn} a & r {wht}BB K  KJ J{SHIFT-*}KJ{SHIFT-*}KJ{SHIFT-*}KJ J K J{SHIFT-*}K {CBM-V}"
+  190 print" BB{grn} {CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U} {wht}BB   "
+  200 print" BB{grn} soft*{wht} BB   "
+  210 print" BJCC{SHIFT-*}CCCCKB       {red}s {cyn}h {pur}u {grn}g {blu}u {yel}n"
+  220 print"{wht} JCCCI U{SHIFT-*}CCK     "
+  230 print" {CBM-A}CCCK JC{SHIFT-*}C{CBM-S}     {yel}a strategic game"
+  240 print"{wht} BE{rvon}{CBM-I}{rvof}E   E{rvon}{CBM-I}{rvof}E{CBM-Q}I"
+  250 print" {CBM-Z}CCCCCC{SHIFT-*}CC{CBM-X}B       {yel} for the"
+  260 print"{wht}            {SHIFT--}             {lred} {CBM-@}{CBM-@}{CBM-@}{CBM-@}{wht}"
+  270 print" {CBM-A}CCCCCCCC{SHIFT-*}{CBM-S}{SHIFT--}   {lred} commodore lxiv{wht}"
+  280 print" B{CBM-B}{CBM-B}{CBM-B}{CBM-B}{CBM-B}{CBM-B}{CBM-B}{CBM-B}{CBM-B}{CBM-Q}K             {lred} {CBM-T}{CBM-T}{CBM-T}{CBM-T}{wht}"
+  290 print" JCCCCCCCCCK     "
+  300 print"                 "
+  310 print"{red} {CBM-Q}III  {wht} UCI UCIUCIUCKU{CBM-R}CK  {lred} {CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}"
+  320 print"{red} JKJ{CBM-W}  {wht} {CBM-Q}C{CBM-W} BCI{CBM-Q}C{CBM-W}JCI B    {lred} mdcccclxxxv"
+  330 print"{red} UCCK  {wht} K K{CBM-V}JCKK KUCK K    {lred} {CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}"
+  340 print"{red}      {SHIFT--}{wht} UCI I IU{CBM-R}KI I IU{CBM-R}KI U{CBM-R}I "
+  350 print"{red} U{CBM-W}UIU{CBM-W}{wht} {CBM-Q}{CBM-R}K BBB B B {CBM-Q}C{CBM-W} {CBM-Q} B BBB "
+  360 print"{red} JKKKJK{wht} KJ {CBM-V}J{CBM-E}KU{CBM-E}KJCJ J {CBM-E}KJCJ J "
+  370 print"{cyn}              {CBM-A}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{CBM-S}"
+  380 print"{cyn}        press {SHIFT--}{lred} f1 {cyn}{SHIFT--} to start"
+  390 print"{cyn}              {CBM-Z}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{CBM-X}"
+  400 fort=1to5000:nextt
+  410 geta$:ifa$<>"{f1}"then410
+  420 gosub20000
+  421 :
+  422 rem  ******************************
+  423 rem  * einleitungstext            *
+  424 rem  ******************************
+  425 :
+  438 print"{clr}"chr$(142)chr$(8)
+  439 print"          {red}s {cyn}h {pur}u {grn}g {blu}u {yel}n"
+  440 print
+  450 print" sie befinden sich im alten china"
+  460 print" vor rund 2000 jahren."
+  470 print" bei einem feldzug gegen die rebellen"
+  480 print" hat sie der grosse khan"
+  490 print" comm-o-dor lxiv. gefangengenommen."
+  500 print" es besteht nur noch eine geringe"
+  510 print" chance, ihr leben zu retten."
+  520 print" sie muessen ihn im shugun besiegen..."
+  530 print" der, der die shugun-schlacht"
+  540 print" verliert, wird mit einem  "
+  550 print" felsbrocken am fuss im jangtsekiang "
+  560 print" versenkt. "
+  570 print"{down} die spielregeln dieses spieles ent-"
+  580 print" sprechen denen des strategiespiels"
+  590 print" 'shogun' (tm)."
+  600 print"{down}{wht} kennen sie diese regeln (j/n) ?"
+  610 geta$:z=int(rnd(1)):ifa$=""then610
+  620 ifa$="n"thengoto2840
+  630 ifa$="j"then650
+  640 goto610
+  650 print"{down} viel glueck, fremder !"
+  660 fori=1to1000:next
+  661 :
+  662 rem  ******************************
+  663 rem  * spielfeld zeichnen         *
+  664 rem  ******************************
+  670 :
+  680 poke53275,0:poke53281,2:poke53280,2
+  690 print"{clr}":printchr$(142)chr$(8)"{home}"
+  700 fori=1to3:print"{yel}{rvon}                                       {rvof}":next
+  710 fori=1to16:print"{yel}{rvon}   {rvof}";tab(19);"{rvon}                    {rvof}" :next
+  720 fori=1to3:print"{yel}{rvon}                                       {rvof}":next
+  730 fori=1103to1943step40:pokei,160:next:fori=55335to56215step40:pokei,7:next
+  740 print"{home}{blk}"
+  750 print"{down}{down}{rght}{rght} {CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P}{CBM-P} "
+  760 fori=1to8
+  770 print"{rght}{rght}{CBM-N}OPOPOPOPOPOPOPOP{CBM-H}"
+  780 print"{rght}{wht}";chr$(i+64);"{blk}{CBM-N}L{SHIFT-@}L{SHIFT-@}L{SHIFT-@}L{SHIFT-@}L{SHIFT-@}L{SHIFT-@}L{SHIFT-@}L{SHIFT-@}{CBM-H}"
+  790 next
+  800 print"{blk}{rght}{rght} {CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y} "
+  810 print"{wht}{rght}{rght}{rght}{rght}1{rght}2{rght}3{rght}4{rght}5{rght}6{rght}7{rght}8"
+  820 print"{home}{blk}"
+  830 fori=1to22
+  840 printtab(22)"{yel}{CBM-J}"
+  850 next
+  860 :
+  861 rem  ******************************
+  862 rem  * sprites aktivieren         *
+  980 rem  ******************************
+  981 :
+  990 v=53248
+ 1000 pokev+39,1:pokev+40,5:pokev+41,6:pokev+42,5:pokev+43,5:pokev+44,5
+ 1010 pokev+45,5:pokev+46,5
+ 1020 fori=0to62:reads1:pokei+832,s1:next
+ 1030 fori=0to62:reads2:pokei+896,s2:next
+ 1040 fori=0to62:reads3:pokei+960,s3:next
+ 1050 poke2040,13:poke2041,14:poke2042,15
+ 1060 poke2043,14:poke2044,14:poke2045,14
+ 1070 poke2046,14:poke2047,14
+ 1080 pokev+21,255:pokev+23,255:pokev+29,255
+ 1090 pokev,255:pokev+1,62
+ 1100 pokev+2,185:pokev+3,185
+ 1110 pokev+4,205:pokev+5,180
+ 1120 pokev+6,235:pokev+7,170
+ 1130 pokev+8,215:pokev+9,150
+ 1140 pokev+10,235:pokev+11,200
+ 1150 pokev+12,170:pokev+13,70
+ 1160 pokev+14,180:pokev+15,130
+ 1161 :
+ 1162 rem  *****************************
+ 1163 rem  * zuganzeige                *
+ 1164 rem  *****************************
+ 1165 :
+ 1170 print"{home}{down}{down}{down}{down}{down}{down}";
+ 1180 printtab(24)"{rvon}{lred}U{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}I"
+ 1190 printtab(24)"{rvon}{lred}{SHIFT--}UIIUIUUIIUUI{SHIFT--}"
+ 1200 printtab(24)"{rvon}{lred}{SHIFT--}JI{CBM-Q}{CBM-W}{SHIFT--}{SHIFT--}{SHIFT--}{CBM-R}{SHIFT--}{SHIFT--}{SHIFT--}{SHIFT--}{SHIFT--}"
+ 1210 printtab(24)"{rvon}{lred}{SHIFT--}JKKJJKJKJKKJ{SHIFT--}"
+ 1220 printtab(24)"{rvon}{lred}J{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}K"
+ 1230 printtab(23)"{yel}{rvon}{down} ihr zug:   -{rvof}"
+ 1240 printtab(23)"{yel}{rvon} {CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}"
+ 1250 printtab(26)"{rvon}   r. wilhelm"
+ 1260 print:printtab(34)"{rvon}&"
+ 1270 print:printtab(32)"{rvon}a. gast"
+ 1280 print:printtab(31)"{rvon}a&r soft"
+ 1290 print"{home}{down}{down}{down}"tab(24)"{rvon}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}    {CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}"
+ 1300 print"{home}{down}{down}{down}{down}"tab(24)"{rvon}mdcccc   +lxxxv"
+ 1310 print"{home}{down}{down}{down}{down}{down}"tab(24)"{rvon}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}    {CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}"
+ 1320 :
+ 1321 rem  *****************************
+ 1322 rem  * spielsteine zeichnen      *
+ 1323 rem  *****************************
+ 1330 :
+ 1340 print"{home}{lblu}"
+ 1350 print"{down}{down}{down}";
+ 1360 print"{rght}{rght}{rght}{rvon}{CBM-A} {CBM-A} {CBM-A} {CBM-A} Z {CBM-A} {CBM-A} {CBM-A} "
+ 1370 print"{rght}{rght}{rght}{rvon}{CBM-Z}{CBM-X}{CBM-Z}{CBM-X}{CBM-Z}{CBM-X}{CBM-Z}{CBM-X}ZZ{CBM-Z}{CBM-X}{CBM-Z}{CBM-X}{CBM-Z}{CBM-X}"
+ 1380 print"{wht}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}";
+ 1390 print"{rght}{rght}{rght}{rvon}U U U U Q U U U "
+ 1400 print"{rght}{rght}{rght}{rvon}JKJKJKJKQQJKJKJK"
+ 1401 :
+ 1402 rem  *****************************
+ 1403 rem  * variablendefinition       *
+ 1404 rem  *****************************
+ 1410 :
+ 1420 fori=1to8:pa(i)=1185+2*i:next
+ 1430 fori=1to8:pb(i)=1745+2*i:next
+ 1440 fori=1to8:z=int(rnd(1)*4+1):fa(i)=z:next
+ 1450 fori=1to8:z=int(rnd(1)*4+1):fb(i)=z:next
+ 1460 :
+ 1470 fori=1to8:pokepa(i)+1,fa(i)+48+128::poke54273+pa(i),14:next
+ 1480 fori=1to8:pokepb(i)+1,fb(i)+48+128::poke54273+pb(i), 1:next
+ 1490 goto3360
+ 1500 :
+ 1501 rem  *****************************
+ 1502 rem  * eingabe pruefen           *
+ 1503 rem  *****************************
+ 1510 :
+ 1520 zu$=zu$(1)+zu$(2)
+ 1530 fori=1to4
+ 1540 z$(i)=mid$(zu$,i,1)
+ 1550 next
+ 1560 fori=0to7
+ 1570 ifz$(1)=chr$(i+65)thenz$(1)=str$(i)
+ 1580 next
+ 1590 fori=0to7
+ 1600 ifz$(3)=chr$(i+65)thenz$(3)=str$(i)
+ 1610 next
+ 1620 :
+ 1630 fx=val(z$(3))-val(z$(1))
+ 1640 fy=val(z$(4))-val(z$(2))
+ 1650 :
+ 1660 px=1185+(val(z$(1))*80)
+ 1670 py=px+(val(z$(2))*2)
+ 1680 p=py
+ 1690 fori=1to8
+ 1700 ifpb(i)=pthen1730
+ 1710 next
+ 1720 goto3360
+ 1730 f=fb(i)
+ 1740 if f<>(abs(fx)+abs(fy))then3360
+ 1750 :
+ 1760 s=i
+ 1770 fx=fx*80
+ 1780 fy=fy*2
+ 1790 zp=p+fx+fy
+ 1800 fori=1to8
+ 1810 ifzp=pb(i)then3360
+ 1820 nexti
+ 1830 :
+ 1840 fori=1to8
+ 1850 ifzp=pa(i)thengosub3550:goto1870
+ 1860 nexti
+ 1870 ifs= 5thens(1)=209:s(2)=160:s(3)=209:s(4)=209:goto1890
+ 1880 ifs<>5thens(1)=213:s(2)=160:s(3)=202:s(4)=203
+ 1890 pokepb(s),79:poke54272+pb(s),0
+ 1900 pokepb(s)+1,80:poke54272+pb(s)+1,0
+ 1910 pokepb(s)+40,76:poke54272+pb(s)+40,0
+ 1920 pokepb(s)+41,122:poke54272+pb(s)+41,0
+ 1930 pokezp,s(1):pokezp+1,s(2):pokezp+40,s(3):pokezp+41,s(4)
+ 1940 poke54272+zp,1:poke54272+zp+1,1:poke54272+zp+40,1:poke54272+zp+41,1
+ 1950 z=int(rnd(1)*4+1)
+ 1960 fb(s)=z
+ 1970 pb(s)=zp:pokezp+1,128+z+48
+ 1971 :
+ 1972 rem  *****************************
+ 1973 rem  * computer-strategie        *
+ 1974 rem  *****************************
+ 1980 :
+ 1990 fori=1to8:ifpa(i)=200then2030
+ 2000 xa(i)=pa(i)-1187:ya(i)=int(xa(i)/80)
+ 2010 xa(i)=xa(i)-80*ya(i):ya(i)=16*ya(i)
+ 2020 za(i)=xa(i)/2:xa(i)=ya(i)+za(i)
+ 2030 next:fori=1to8:ifpb(i)=200then2060
+ 2040 xb(i)=pb(i)-1187:yb(i)=int(xb(i)/80):xb(i)=xb(i)-80*yb(i):yb(i)=16*yb(i)
+ 2050 zb(i)=xb(i)/2:xb(i)=yb(i)+zb(i)
+ 2060 next:fori=1to8:ifnotpb(i)=200thenpoke53212+i,xb(i)
+ 2070 ifpb(i)=200thenpoke53212+i,pb(i)
+ 2080 next:fori=1to8:ifnotpa(i)=200thenpoke53112+i,xa(i)
+ 2090 ifpa(i)=200thenpoke53112+i,pa(i)
+ 2100 next:fori=1to8:poke53202+i,fb(i):next
+ 2110 fori=1to8:poke53102+i,fa(i):next
+ 2120 sys49152:c1=peek(52970):es=peek(53244):c2=peek(52969)
+ 2130 ifes=200andc2=200then2200
+ 2140 if(es>0andes<9)andc2=200thengosub2790:goto2230
+ 2150 ifes=200and(c2>0andc2<9)then2390
+ 2160 if(es>0andes<9)andc1=5then2390
+ 2170 ifes=5thengosub2790:goto2230
+ 2180 if(es>0andes<9)and(c2>0andc2<9)then2390
+ 2190 :
+ 2191 rem  *****************************
+ 2192 rem  * computer zieht            *
+ 2193 rem  *****************************
+ 2194 :
+ 2200 p=0:fori=53100to52972step-2:ifpeek(i)<>200thenp=p+1:nexti
+ 2210 z=int((rnd(1))*p)*2:z=53101-z
+ 2220 zp=peek(z):s=peek(z-1)
+ 2230 x=int(zp/16):zp=zp-16*x:x=x*80:y=zp*2:zp=1187+x+y
+ 2240 p=pa(s)
+ 2250 pokep,79:pokep+1,80:pokep+40,76:pokep+41,122
+ 2260 poke54272+p,0:poke54272+p+1,0:poke54272+p+40,0:poke54272+p+41,0
+ 2270 ifs=5thens(1)=218:s(2)=160:s(3)=218:s(4)=218:goto2290
+ 2280 ifs<>5thens(1)=240:s(2)=160:s(3)=237:s(4)=253
+ 2290 pokezp,s(1)
+ 2300 pokezp+1,s(2)
+ 2310 pokezp+40,s(3)
+ 2320 pokezp+41,s(4)
+ 2330 poke54272+zp,14
+ 2340 poke54272+zp+1,14
+ 2350 poke54272+zp+40,14
+ 2360 poke54272+zp+41,14
+ 2370 pa(s)=zp:z=int(rnd(1)*4+1):pokezp+1,z+48+128:fa(s)=z
+ 2380 goto1490
+ 2381 :
+ 2382 rem  *****************************
+ 2383 rem  * computer kann schlagen    *
+ 2384 rem  *****************************
+ 2390 :
+ 2391 z=int(rnd(1)*(lev+1)+1):ifz=1andnotlev=9then2190
+ 2400 print"{home}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}";
+ 2410 print"{yel}und noch ein setzer von dir draussen..."
+ 2420 poke1983,46:poke56255,7
+ 2430 c1=peek(52970):c2=peek(52969):if(c1<1orc1>8)or(c2<1orc2>8)then2130
+ 2440 p=pb(c1):fora=0to10step2:poke54272+p,a:poke54272+p+1,a:poke54272+p+40,a
+ 2450 poke54272+p+41,a
+ 2460 forfa=1to150:nextfa,a
+ 2470 ifc2= 5thens(1)=218:s(2)=160:s(3)=218:s(4)=218
+ 2480 ifc2<>5thens(1)=240:s(2)=160:s(3)=237:s(4)=253
+ 2490 pokepa(c2)  ,79:poke54272+pa(c2),0
+ 2500 pokepa(c2)+1,80:poke54272+pa(c2)+1,0
+ 2510 pokepa(c2)+40,76:poke54272+pa(c2)+40,0
+ 2520 pokepa(c2)+41,122:poke54272+pa(c2)+41,0
+ 2530 pokepb(c1),s(1):pokepb(c1)+1,s(2):pokepb(c1)+40,s(3):pokepb(c1)+41,s(4)
+ 2540 poke54272+pb(c1),14:poke54272+pb(c1)+1,14:poke54272+pb(c1)+40,14
+ 2550 poke54272+pb(c1)+41,14:z=int(rnd(1)*4+1)
+ 2560 fa(c2)=z
+ 2570 pa(c2)=pb(c1)
+ 2580 pokepa(c2)+1,128+z+48
+ 2590 pb(c1)=200:fb(c1)=0:xb(c1)=200
+ 2600 ifpb(5)=200then3650
+ 2605 print"{home}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}";
+ 2607 print"                                       "
+ 2610 goto1490
+ 2611 :
+ 2740 rem  *****************************
+ 2750 rem  * unterprogramme            *
+ 2760 rem  *****************************
+ 2761 :
+ 2790 rem  *****************************
+ 2791 rem  * computer wird bedroht     *
+ 2792 rem  *****************************
+ 2793 :
+ 2800 fori=53100to52972step-2
+ 2810 ifpeek(i)<>esthennexti
+ 2820 zp=peek(i+1):s=es:ifzp<>200thenreturn:rem"zug moeglich"
+ 2821 fori=1to8:poke53112+i,xa(es):next
+ 2822 fori=1to8:poke53102+i,fa(es):next
+ 2823 poke53101,200:sys49152
+ 2824 t=53101:zp=peek(t):ifzp<>200then2829
+ 2825 fori=1to8:poke53112+i,xa(i):next
+ 2826 fori=1to8:poke53102+i,fa(i):next
+ 2827 sys49152
+ 2828 goto 2190
+ 2829 fori=52961to52969step2:ifpeek(i)=esthenc1=peek(i+1):c2=peek(i):goto2440
+ 2830 next:fori=1to8:ifnotzp=xa(i)thennext:s=es:return
+ 2831 t=t-2:zp(1)=peek(t):ifzp(1)=zporzp(1)=200then2825
+ 2832 fori=1to8:ifnotzp(1)=xa(i)thennext:zp=zp(1):s=es:return
+ 2833 ift>=52973then2831
+ 2839 goto2825
+ 2840 rem  *****************************
+ 2841 rem  * spielregeln               *
+ 2842 rem  *****************************
+ 2859 :
+ 2860 print"{clr}{rvon}{wht} spielregeln des spiels 'shugun' :      {rvof}"
+ 2870 print" 'shugun' wird auf einem 8 mal 8 felder"
+ 2880 print" grossen spielbrett gespielt."
+ 2890 print" die gegner (sie und der c-64) "
+ 2900 print" ziehen mit einem 8 mann starken "
+ 2910 print" samurai-heer in den kampf."
+ 2920 print" dabei uebernehmen sie das untere heer,"
+ 2930 print" der c-64 das obere heer."
+ 2940 print" auf jedem spielstein erscheint durch"
+ 2950 print" zufall eine zahl zwischen 1 und 4."
+ 2960 print" diese zahl sagt ihnen, wie viele"
+ 2970 print" felder sie mit dieser figur fahren"
+ 2980 print" koennen."
+ 2990 print"                     [return]"
+ 3000 geta$:ifa$<>chr$(13)then3000
+ 3010 print"{clr}"
+ 3020 print" steht auf einem stein nun zum beispiel"
+ 3030 print" eine '4', so koennen sie mit diesem"
+ 3040 print" stein 4 felder fahren. "
+ 3050 print" ( z.b. 4 geradeaus , 2 geradeaus "
+ 3060 print" und 2 nach links oder rechts )"
+ 3070 print" es kann jedoch nur eine x- und eine"
+ 3080 print" y-bewegung pro zug gemacht werden!"
+ 3090 print" sie koennen auch nicht diagonal"
+ 3100 print" fahren ."
+ 3110 print" haben sie einen stein bewegt, so"
+ 3120 print" aendert sich seine zahl wieder"
+ 3130 print" durch zufall."
+ 3140 print" fahren sie nun mit einem stein auf"
+ 3150 print" ein vom gegner besetztes feld, so"
+ 3160 print" wird der gegnerische stein von ihnen"
+ 3170 print" geschlagen."
+ 3180 print"                     [return]"
+ 3190 geta$:ifa$<>chr$(13)then3190
+ 3200 print"{clr}"
+ 3210 print" ein krieger jeder mannschaft ist"
+ 3220 print" besonders gekennzeichnet."
+ 3230 print" es ist der 'shugun'."
+ 3240 print" wird der 'shugun' so bedroht, dass"
+ 3250 print" er nicht mehr ausweichen kann, so ist"
+ 3260 print" das spiel zu ende."
+ 3270 print" auch wenn alle krieger eines heeres"
+ 3280 print" geschlagen sind, ist der kampf vorbei."
+ 3290 print"{down} doch nun genug der worte,"
+ 3300 print" die schlacht beginnt !"
+ 3310 print"{down} viel spass wuenschen die autoren"
+ 3320 print" des spieles !"
+ 3330 geta$:ifa$=""then3330
+ 3340 goto650
+ 3351 :
+ 3352 rem  *****************************
+ 3353 rem  * eingabe des zuges         *
+ 3354 rem  *****************************
+ 3355 :
+ 3360 gosub3500
+ 3370 getz$(1):ifz$(1)=""then3370
+ 3380 ifasc(z$(1))<65orasc(z$(1))>72then3370
+ 3390 print"{home}{rvon}{yel}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}"tab(33)z$(1)"{rvon}?"
+ 3400 getz$(2):ifz$(2)=""then3400
+ 3410 ifasc(z$(2))<49orasc(z$(2))>56then3400
+ 3420 print"{home}{rvon}{yel}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}"tab(34)z$(2)"-{rvon}?":zu$(1)=z$(1)+z$(2)
+ 3430 getz$(3):ifz$(3)=""then3430
+ 3440 ifasc(z$(3))<65orasc(z$(3))>72then3430
+ 3450 print"{home}{rvon}{yel}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}"tab(36)z$(3)"{rvon}?"
+ 3460 getz$(4):ifz$(4)=""then3460
+ 3470 ifasc(z$(4))<49orasc(z$(4))>56then3460
+ 3480 print"{home}{rvon}{yel}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}"tab(37)z$(4):zu$(2)=z$(3)+z$(4)
+ 3490 goto1500
+ 3500 print"{home}{yel}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}"tab(33)"{rvon}{yel}?*-**"
+ 3510 print"{home}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}";
+ 3520 print"                                       ":poke1983,32
+ 3530 return
+ 3540 :
+ 3550 rem  *****************************
+ 3551 rem  * spieler schlaegt          *
+ 3552 rem  *****************************
+ 3553 :
+ 3560 print"{home}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}";
+ 3570 print"{yel}ausnahmsweise mal ein guter zug von dir":poke1983,33:poke56255,7
+ 3580 fora=0to10step2:poke54272+zp,a:poke54272+zp+1,a:poke54272+zp+40,a
+ 3590 poke54272+zp+41,a
+ 3600 forfa=1to150:nextfa
+ 3610 nexta
+ 3620 pa(i)=200:fa(i)=0:xa(i)=200
+ 3630 ifpa(5)=200then3650
+ 3640 return
+ 3641 :
+ 3642 rem  *****************************
+ 3643 rem  * spielende (graphik & text)*
+ 3644 rem  *****************************
+ 3650 :
+ 3651 fora=0to10step2:poke53281,a:poke53280,a:forfq=0to150:nextfq,a
+ 3653 ifpa(5)=200thengew$="b"
+ 3654 ifpb(5)=200thengew$="a"
+ 3660 v=53248:pokev+21,0:fori=0to62:readq:poke832+i,q:next
+ 3740 poke2042,13:pokev+41,1
+ 3750 print"{clr}";:poke53281,0:poke53280,0
+ 3760 print"{down}{wht}";
+ 3770 print"    {CBM-@}{CBM-P}{CBM-O}{CBM-O}{CBM-O}{CBM-I}{CBM-I}{CBM-I}{CBM-O}{CBM-P}      {CBM-@}{CBM-P}{CBM-O}{CBM-I}{CBM-I}{CBM-I}{CBM-O}"
+ 3780 print"    {CBM-T}{CBM-Y}{CBM-U}{rvon}{CBM-I}{CBM-O}{CBM-O}{CBM-P}{CBM-I}{rvof}{CBM-Y}       {CBM-T}{CBM-Y}{CBM-U}{rvon}{CBM-I}{CBM-O}{rvof}{CBM-U}{CBM-Y}{CBM-T}"
+ 3790 print"{down}        {CBM-@}{CBM-P}{CBM-P}{CBM-P}{CBM-O}{CBM-O}{CBM-I}{CBM-I}{CBM-I}{rvon}{CBM-Y}{CBM-Y}{CBM-T}{CBM-T}{CBM-Y}{CBM-Y}{rvof}{CBM-I}{CBM-I}{CBM-I}{CBM-O}{CBM-P}{CBM-@}{CBM-@}"
+ 3800 print"        {CBM-T}{CBM-Y}{CBM-U}{rvon}{CBM-I}{CBM-O}{CBM-P}         {CBM-O}{CBM-I}{rvof}{CBM-U}{CBM-U}{CBM-Y}{CBM-T}{CBM-T}{CBM-T}{CBM-T}"
+ 3810 print"             {CBM-T}{CBM-Y}{CBM-Y}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U} "
+ 3820 print"{brn}{down}{down}";
+ 3830 print"{CBM-I}{CBM-O}{CBM-O}{CBM-P}{CBM-@}{CBM-P}{CBM-O}{CBM-P}{CBM-@}{CBM-@}{CBM-O}{CBM-I}{CBM-O}"
+ 3840 print"{rvon}            {rvof}{SHIFT-POUND}"
+ 3850 print"{rvon}           {rvof}{SHIFT-POUND}"
+ 3860 print"{rvon}          {rvof}{CBM-K}"
+ 3870 print"{rvon}          {rvof}{CBM-H}"
+ 3880 print"{rvon}          {rvof}"
+ 3890 print"{rvon}         {rvof}{SHIFT-POUND}"
+ 3900 print"{rvon}         {rvof}"
+ 3910 print"{rvon}        {rvof}{SHIFT-POUND}"
+ 3920 print"{rvon}        {rvof}"
+ 3930 print"{rvon}        {rvof}"
+ 3940 print"{brn}{rvon}        {rvof}{orng}{CBM-B} "
+ 3950 print"{brn}{rvon}       {rvof}{SHIFT-POUND}{orng}{CBM-B}{CBM-B}{CBM-D}"
+ 3960 print"{brn}{rvon}       {rvof}{CBM-H}{orng}{CBM-B}{CBM-P}{CBM-P}{CBM-@}{CBM-P}{CBM-O}{CBM-I}{CBM-O}{CBM-O}{CBM-P}{CBM-P}{CBM-@}{CBM-@}{CBM-@}{CBM-O}{CBM-I}{CBM-I}{CBM-P}{CBM-@}{CBM-@}{CBM-P}{CBM-O}{CBM-I}{CBM-P}{CBM-@}{CBM-@}{CBM-P}{CBM-O}{CBM-O}{CBM-P}{CBM-@}{CBM-@}{brn}";
+ 3970 print"{brn}{rvon}       {rvof}{orng}{rvon}                                 ";
+ 3980 print"{brn}{rvon}       {rvof}{orng}{rvon}                                {home}{rvof}";
+ 3990 poke2023,160:poke56295,8
+ 3991 print"{home}{down}{down}{down}{down}{down}{down}{down}{down}"tab(17)"{red}g {cyn}a {pur}m {grn}e  {blu}o {yel}v {orng}e {brn}r"
+ 3992 ifgew$="b"then4004
+ 3993 print:print"{red}{home}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}"tab(17)"der khan hat dich be-"
+ 3994 printtab(17)"siegt.qualvoll stirbst"
+ 3995 printtab(17)"du im jangtsekiang...":goto 4008
+ 4004 print:print"{red}{home}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}"tab(17)"du hast den khan be-"
+ 4005 printtab(17)"siegt.qualvoll stirbt"
+ 4006 printtab(17)"er im jangtsekiang..."
+ 4008 fori=1to4000:next
+ 4009 pokev+4,130:pokev+5,100:pokev+21,4
+ 4010 poke53275,255:pokev+23,0:pokev+29,0
+ 4020 fori=100to255
+ 4030 pokev+5,i:fort=1to15:nextt
+ 4040 next
+ 4050 print"{rvof}{home}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}";
+ 4060 printtab(11)"{yel}u{down}{rght}a{down}{rght}r{down}{rght}g{down}{rght}h"
+ 4070 fory=1to2000:nexty
+ 4160 printtab(17)"{up}{up}{up}{up}{up}{up} noch ein spiel(j/n)?"
+ 4170 geta$:ifa$<>"j"anda$<>"n"then4170
+ 4180 ifa$="j"thenrun
+ 4190 ifa$="n"thensys64738
+ 9000 :
+ 9001 rem  *****************************
+ 9002 rem  * daten fuer sprites        *
+ 9003 rem  *****************************
+ 9004 :
+10000 rem  ---sprite 1-saebel----------
+10010 data192,0,3,224,0,7,112,0,14,56,0,28,28,0,56,14,0,112,7,0
+10020 data224,3,129,192,1,195,128,0,231,0,0,110,0,0,28,0,0,56,0,0,118
+10030 data0,24,231,24,13,195,176,7,129,224,7,0,224,13,129,176,24,195,24,48,0,12
+10040 rem  ---sprite 2-baum  ----------
+10050 data0,0,0,0,0,0,0,0,0,0,8,0,0,24,0,0,24,0,0,60,0,0,60,0,0,126,0,0,126,0
+10060 data0,255,0,0,255,0,1,255,128,3,255,192,3,255,192,7,255,224,15,255
+10070 data240,28,60,56,0,60,0,0,126,0,0,255,0
+10080 rem  ---sprite 3-zelt  ----------
+10090 data0,0,0,0,65,8,0,33,16,0,125,32,0,125,64,0,61,128,0,59,0,0,125,0,0,253,0
+10100 data1,251,0,3,247,128,7,247,192,15,227,224,15,193,240,31,128,240,63,128,248
+10110 data63,128,248,127,128,252,127,128,252,127,128,252,255,255,254
+10120 rem  ---sprite 4-mann  ----------
+10130 data 0,192,0,17,226,0,9,228,0,4
+10140 data 200,0,3,240,0,1,224,0,1,224
+10150 data 0,1,224,0,1,224,0,1,224,0
+10160 data 1,32,0,1,32,0,1,32,0,3
+10170 data 48,0,2,0,0,4,0,0,8,0
+10180 data 0,112,0,0,248,0,0,248,0,0
+10190 data 240,0,0
+10200 :
+10201 rem  ****************************
+10202 rem  * leveleingabe (1-9)       *
+10203 rem  ****************************
+20000 :
+20010 print"{clr}{down}{down}"
+20020 print" waehlen sie den schwierigkeitsgrad:"
+20030 print:print
+20040 printtab(10)"{red}(1) - {yel}vollidiot"
+20050 printtab(10)"{red}(2) - {yel}leicht beschraenkt"
+20060 printtab(10)"{red}(3) - {yel}hobbyspastiker"
+20070 printtab(10)"{red}(4) - {yel}anfaenger"
+20080 printtab(10)"{red}(5) - {yel}amateur"
+20090 printtab(10)"{red}(6) - {yel}fortgeschrittener"
+20100 printtab(10)"{red}(7) - {yel}profi"
+20110 printtab(10)"{red}(8) - {yel}selbstmoerder"
+20120 printtab(10)"{red}(9) - {yel}angeber"
+20130 print:printtab(8)"  {wht}nummer >   <"
+20140 geta$:ifval(a$)<1orval(a$)>9then20140
+20150 print"{up}"tab(19)a$:lev=val(a$)
+20160 fori=1to1000:next
+20170 return
+30000 :
+30010 rem  ****************************
+30020 rem  * ende des programms       *
+30030 rem  ****************************
+

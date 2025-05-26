@@ -1,0 +1,172 @@
+
+
+;stone rescue 1.prg ==0801==
+   10 rem*********************************
+   20 rem***          written          ***
+   30 rem***            by             ***
+   40 rem***       dirk schlote        ***
+   50 rem***            and            ***
+   60 rem***     matthias strecker     ***
+   62 rem***        zum anger 8        ***
+   64 rem***    3430 witzenhausen 6    ***
+   66 rem***      tel. 05542/1632      ***
+   70 rem*********************************
+   80 bn=1:l1=1:wg=8:gosub950:gosub1000
+   90 ifi<>0then670
+  100 rem********************************
+  110 rem***        titelbild         ***
+  120 rem********************************
+  130 poke53280,1:poke53281,1
+  140 printchr$(142):printchr$(8)
+  141 printchr$(147):print:print:print
+  150 print"          {lblu}{rvon}  {blk} {rvof}"
+  160 print"{lblu} {rvon}               {rvof}{blk}{rvon} {rvof}"
+  170 print"{lblu} {rvon}  {blk} {rvof}      {lblu}{rvon}  {blk} {rvof}              {lblu}{rvon}{SHIFT-POUND}{blk} {rvof}"
+  180 print"{lblu} {rvon}  {blk} {rvof}      {lblu}{rvon}  {blk} {rvof}  {lblu}{rvon}      {blk} {rvof} {lblu}{rvon}     {blk} {rvof} {lblu}{rvon}     {blk} {rvof}"
+  190 print"{lblu} {rvon}      {blk} {rvof}  {lblu}{rvon}  {blk} {rvof}  {lblu}{rvon}  {blk} {rvof}{lblu} {rvon}  {blk} {rvof} {lblu}{rvon} {blk} {rvof}  {lblu}{rvon} {blk} {rvof} {lblu}{rvon} {blk} {rvof}  {lblu}{rvon} {blk} {rvof}"
+  200 print"{lblu}     {rvon}  {blk} {rvof}  {lblu}{rvon}  {blk} {rvof}  {lblu}{rvon}  {blk} {rvof}{lblu} {rvon}  {blk} {rvof} {lblu}{rvon} {blk} {rvof}  {lblu}{rvon} {blk} {rvof} {lblu}{rvon}     {blk} {rvof}"
+  210 print"{lblu}     {rvon}  {blk} {rvof}  {lblu}{rvon}  {blk} {rvof}  {lblu}{rvon}  {blk} {rvof}{lblu} {rvon}  {blk} {rvof} {lblu}{rvon} {blk} {rvof}  {lblu}{rvon} {blk} {rvof} {lblu}{rvon} {blk} {rvof}"
+  220 print"{lblu} {rvon}      {blk} {rvof}  {lblu}{rvon}  {blk} {rvof}  {lblu}{rvon}      {blk} {rvof} {lblu}{rvon} {blk} {rvof}  {lblu}{rvon} {blk} {rvof} {lblu}{rvon}     {blk} {rvof}"
+  230 print"{down}{down}{blu}{rvon}                                       ";
+  240 print"{blu}{rvon}                 rescue 1                ";
+  250 print"{blu}{rvon}                                        ";
+  260 print"{home}{blk} 1985 {rvof}"
+  270 print"{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}"
+  280 print" by matthias strecker and dirk schlote"
+  290 fort=0to4:print"{up}{up}":next
+  300 print"            {rvon}  please wait  "
+  310 i=1:goto90
+  320 print"{up}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rvon} press a button "
+  330 fort=0to350:next
+  340 print"{up}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rvon}                {rvof}
+  350 geta$:ifa$=""then370
+  360 print"{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}":goto380
+  370 fort=0to350:next:goto320
+  380 print"{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}generate or play game ?"
+  390 print"{down}{down}{down}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}(  g  /  p  ){down}{down}{down}{down}{down}{down}{down}{down}{down}{down}"
+  400 geta$:ifa$="g"thensys51590
+  410 ifa$<>"p"then400
+  420 gosub1030
+  430 rem*******************************
+  440 rem***        bild-laden       ***
+  450 rem*******************************
+  460 poke53281,1:poke53280,1:poke646,0
+  470 print"{clr}{down}{down}{down}{down}{down}{down}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}es wird geladen
+  480 print"{down}{down}{down}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}bild :";bn
+  530 bn$=str$(bn)
+  540 a$="stone-bild"+bn$+"*"
+  550 fort=1tolen(a$):poke12984+t,asc(mid$(a$,t,1)):next
+  560 sys51565
+  570 ifbn=10thenpoke37794,65:poke37787,65
+  590 return
+  600 rem*******************************
+  610 rem***        game over        ***
+  620 rem*******************************
+  630 f1=48:gosub950:print"{home}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{yel}game over"
+  640 print"{down}{down}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}press space"
+  643 poke1179,48
+  645 forz=0to50:fort=0to8:pokev+22,t:next:next
+  650 l1=1:l2=0:l3=0:l4=0
+  660 poke198,0:wait 198,1:goto360
+  670 rem*******************************
+  680 rem***     initialisierung     ***
+  690 rem*******************************
+  700 ifi=1theni=2:load"stone 1",8,1
+  710 ifi=2theni=3:sys49152:load"stone 2",8,1
+  720 v=53248:pokev+37,8
+  730 pokev+38,14
+  740 fort=39to43:pokev+t,7:next
+  750 poke12949,31:poke12969,8
+  760 goto 320
+  770 rem*******************************
+  780 rem***      anzeigen-tafel     ***
+  790 rem*******************************
+  800 b1$=left$(bn$,2)
+  805 ifbn<10thenb1$=chr$(48)
+  806 b1=val(b1$)
+  810 b2$=right$(bn$,1):b2=val(b2$)
+  820 poke12972,f1:poke12973,f2
+  830 ifpeek(12934)=51thenf2=f2+1
+  840 iff2>57thenf1=f1+1
+  860 poke12974,48+b1:poke12975,48+b2
+  870 ifl1>57thenl2=l2+1
+  880 ifl2>57thenl3=l3+1
+  890 ifl3>57thenl4=l4+1
+  900 poke12976,48+l4
+  910 poke12977,48+l3
+  920 poke12978,48+l2
+  930 poke12979,48+l1
+  940 return
+  950 rem*******************************
+  960 rem***       score loeschen    ***
+  970 rem*******************************
+  980 fort=12931to12936:poket,48:next
+  990 return
+ 1000 fort=12937to12942:poket,48:next
+ 1010 return
+ 1030 rem******************************
+ 1040 rem***     steuerprogramm     ***
+ 1050 rem******************************
+ 1060 f1=48:f2=51
+ 1070 gosub1190:gosub1180:gosub430
+ 1080 gosub1190:gosub1180:gosub770
+ 1090 pokev+21,255
+ 1100 pokev+4,144:pokev+5,80
+ 1110 pokev+28,255:poke2042,245
+ 1120 poke53280,0:poke53281,0:poke646,5
+ 1123 pokev+2,0:pokev+6,0:pokev+8,0:pokev+10,0
+ 1124 pokev+22,200:pokev+30,0:poke12953,0
+ 1125 poke12960,0:poke12952,0
+ 1130 poke12963,1:sys49480:poke12963,0
+ 1140 s2=peek(12960)
+ 1150 ifs2=1thenbn=bn+1:l1=l1+1:goto1070
+ 1160 iff2=49thenbn=1:goto600
+ 1170 ifpeek(12952)=1thenf2=f2-1:goto1080
+ 1180 poke12958,s1
+ 1181 poke12808,0:poke12963,wa
+ 1182 poke12964,w1:poke12965,w2
+ 1183 poke12966,w3:poke12967,w4:return:return
+ 1190 rem******************************
+ 1200 rem***   bilder vorbereiten   ***
+ 1210 rem******************************
+ 1215 w1=0:w2=0:w3=0:w4=0:gosub1182
+ 1220 ifbn>=2then1240
+ 1230 s1=12:wa=1:w1=87:w3=183:return
+ 1240 ifbn>=3then1260
+ 1250 s1=11:wa=1:w1=87:w2=230:return
+ 1260 ifbn>=4then1280
+ 1270 s1=11:wa=1:w1=230:return
+ 1280 ifbn>=5then1300
+ 1290 s1=17:wa=1:w1=230:return
+ 1300 ifbn>=6then1320
+ 1310 s1=15:wa=1:w1=78:w2=230:return
+ 1320 ifbn>=7then1340
+ 1330 s1=12:wa=1:w1=230:return
+ 1340 ifbn>=8then1360
+ 1350 s1=12:wa=1:w1=230:return
+ 1360 ifbn>=9then1380
+ 1370 s1=10:wa=1:w1=230:return
+ 1380 ifbn>=10then1400
+ 1390 s1=16:wa=1:w1=96:w2=230:return
+ 1400 ifbn>=11then1420
+ 1410 s1=9:wa=1:w1=230:return
+ 1420 rem ******************************
+ 1430 rem *** folgendermassen werden ***
+ 1440 rem *** eigene bilder eingebaut***
+ 1450 rem *** 1. bild erzeugen       ***
+ 1460 rem *** 2. steine zaehlen      ***
+ 1470 rem *** 3. nach dem selben     ***
+ 1480 rem ***    schema eingeben wie ***
+ 1490 rem ***    oben.               ***
+ 1500 rem *** - s1 = steinanzahl     ***
+ 1510 rem *** - wa = 0 (wurm aus)    ***
+ 1520 rem *** - wa = 1 (wurm an)     ***
+ 1530 rem *** - w1-w4 hoehen der     ***
+ 1540 rem ***         wuermer        ***
+ 1550 rem ***         + :return      ***
+ 1560 rem *** - goto in der letzten  ***
+ 1570 rem ***   zeile entsprechend   ***
+ 1580 rem ***   aendern.(fertig)     ***
+ 1590 rem ******************************
+63999 ifbn>=11thenpoke12949,peek(12949)-2:bn=1:return
+
