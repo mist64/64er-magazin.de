@@ -689,6 +689,8 @@ class Issue:
                   listing_64er = checksummer.parse(listing_bin, int(data_checksummer), basicver)
                   listing_html = ""
                   for (lineno, content, checksum) in listing_64er:
+                      if data_range and not any(start <= lineno <= end for start, end in ranges):
+                          continue
                       content = content.replace("&", "&amp;")
                       content = content.replace("<", "&lt;")
                       content = content.replace("\u0346", "<span class='cbm'>")
