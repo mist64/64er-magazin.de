@@ -451,6 +451,7 @@ class Article:
         self.title = metadata['title']
 #        self.issue = metadata['issue'] # XXX should we reference the issue directly?
         self.pages = metadata['pages']
+        self.filename = metadata['filename']
         self.id = metadata['id']
         self.issue_key = metadata['issue_key']
         self.head1 = metadata['head1']
@@ -474,6 +475,9 @@ class Article:
             return int(self.pages.split(',')[0].split('-')[0])
         except ValueError:
             raise SystemExit(f'\n---\nMetaDataError: pages tag is "{self.pages}"\n   File: "{self.path}"')
+
+    def article_sort_key(self):
+        return (self.first_page_number(), self.filename)
 
     def out_filename(self):
         return self.id + '.html'
@@ -559,12 +563,12 @@ class Issue:
                 raise Exception(f"- [{issue_directory_path}] ERROR: category not in toc.txt: '{article.toc_category}' ({article.title})")
         else: # no toc_category
             category_index = len(toc_order)
-        return (article.first_page_number(), category_index, article.title)
+        return (article.article_sort_key(), category_index, article.title)
 
       sorted_articles = sorted(articles, key=lambda x: sort_by_page_number_and_toc_category(x))
 
       for index, article in enumerate(sorted_articles):
-          #print((index, article.first_page_number(), article.toc_category, article.title))
+          #print((index, article.article_sort_key(), article.toc_category, article.title))
           article.sort_index = index
       articles = sorted_articles
 
@@ -630,7 +634,7 @@ class Issue:
               raise SystemExit(f'\n---\nMetaDataError: title tag is missing\n   File: "{html_file_path}"')
 
       metadata = {
-          'filename': os.path.basename(html_file_path), # XXX old
+          'filename': os.path.basename(html_file_path),
           'title': find_title(),
           'issue_key': find_meta('64er.issue', False),
           'pages': find_meta('64er.pages', False),
@@ -826,11 +830,11 @@ class ArticleDatabase:
             index_categories = tuple(index_categories)
             filtered_articles = [ article for article in self.articles if article.index_category and article.index_category.startswith(index_categories) and (issue_key is None or article.issue_key == issue_key)]
 
-        return sorted(filtered_articles, key=lambda x: x.first_page_number())
+        return sorted(filtered_articles, key=lambda x: x.article_sort_key())
 
     def articles_by_toc_categories(self, toc_categories, issue_key=None):
         filtered_articles = [article for article in self.articles if article.toc_category in toc_categories and (issue_key is None or article.issue_key == issue_key)]
-        return sorted(filtered_articles, key=lambda x: x.first_page_number())
+        return sorted(filtered_articles, key=lambda x: x.article_sort_key())
 
     def toc_with_articles(self, issue_key):
         issue = self.issues[issue_key]
@@ -839,7 +843,7 @@ class ArticleDatabase:
         toc_order = [""] + issue.toc_order # prepend empty category
         for toc in toc_order:
             articles = self.articles_by_toc_categories([toc], issue_key)
-            articles_sorted = sorted(articles, key=lambda x: x.first_page_number())
+            articles_sorted = sorted(articles, key=lambda x: x.article_sort_key())
             toc_entries.append({
                 'category': toc,
                 'articles': articles_sorted
@@ -863,7 +867,7 @@ class ArticleDatabase:
 
         # Sort articles in each category by issue and then by first page number
         for category, articles_list in articles_by_category.items():
-            articles_by_category[category] = sorted(articles_list, key=lambda x: (x.issue_key, x.first_page_number()))
+            articles_by_category[category] = sorted(articles_list, key=lambda x: (x.issue_key, x.article_sort_key()))
 
         sorted_categories = sorted(articles_by_category.items(), key=lambda x: x[0])
         return OrderedDict(sorted_categories)
