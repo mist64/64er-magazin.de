@@ -16,205 +16,206 @@
 <body>
     <article>
         <h1>Billard</h1>
-<blockquote><p>Dieses Programm simuliert die Bewegungen von bis zu sieben Billardkugeln in Realzeit physikalisch richtig und im Rahmen der möglichen Bildschirmauflösung sehr genau.</p></blockquote>
+        <p class="intro">Dieses Programm simuliert die Bewegungen von bis zu sieben Billardkugeln in Realzeit physikalisch richtig und im Rahmen der möglichen Bildschirmauflösung sehr genau.</p>
 
-<p>Der C 64 verfügt mit den Sprites über hervorragende Möglichkeiten, grafische Figuren besonders durch Maschinenbefehle sehr schnell auf dem Bildschirm zu bewegen. Es stellte sich aber heraus, daß die CPU auch nach Ausschöpfung aller programmtechnischen Möglichkeiten mit Bewegung und Stoßauswertung so ausgelastet ist, daß eine realistische Effet-Behandlung in Realzeit nicht mehr möglich ist (für Interessierte, die auf einem anderen Rechner ähnliches realisieren möchten, sei darauf hingewiesen, daß aber noch genügend Zeitreserven für eine Programmlösung auch ohne Sprites vorhanden sind!).</p>
+        <p>Der C 64 verfügt mit den Sprites über hervorragende Möglichkeiten, grafische Figuren besonders durch Maschinenbefehle sehr schnell auf dem Bildschirm zu bewegen. Es stellte sich aber heraus, daß die CPU auch nach Ausschöpfung aller programmtechnischen Möglichkeiten mit Bewegung und Stoßauswertung so ausgelastet ist, daß eine realistische Effet-Behandlung in Realzeit nicht mehr möglich ist (für Interessierte, die auf einem anderen Rechner ähnliches realisieren möchten, sei darauf hingewiesen, daß aber noch genügend Zeitreserven für eine Programmlösung auch ohne Sprites vorhanden sind!).</p>
 
-<p>Trotz dieser Einschränkung läßt sich aber ein Billardspiel gut simulieren.</p>
+        <p>Trotz dieser Einschränkung läßt sich aber ein Billardspiel gut simulieren.</p>
 
-<p>Vor dem eigentlichen Programm jedoch noch einige prinzipielle Bemerkungen zum wichtigsten Teilproblem, der Stoßberechnung.</p>
+        <p>Vor dem eigentlichen Programm jedoch noch einige prinzipielle Bemerkungen zum wichtigsten Teilproblem, der Stoßberechnung.</p>
 
-<p>Da sich alle Kugeln zu jeder Zeit, also insbesondere auch, wenn ein Stoß auszuwerten ist, gleichmäßig bewegen sollen, wird durch diese Rechnung entscheidend die Schnelligkeit der Kugelbewegungen bestimmt. Wie so oft liegt hier die Schwierigkeit weniger in der programmtechnischen Ausführung als in der rechnergerechten Formulierung des Problems.</p>
+        <p>Da sich alle Kugeln zu jeder Zeit, also insbesondere auch, wenn ein Stoß auszuwerten ist, gleichmäßig bewegen sollen, wird durch diese Rechnung entscheidend die Schnelligkeit der Kugelbewegungen bestimmt. Wie so oft liegt hier die Schwierigkeit weniger in der programmtechnischen Ausführung als in der rechnergerechten Formulierung des Problems.</p>
 
-<h2>Ein kleiner Ausflug in die Physik</h2>
+        <h2>Ein kleiner Ausflug in die Physik</h2>
 
-<p>Eine Geschwindigkeit ist bekanntlich ein Vektor, das heißt, sie wird bestimmt durch einen Betrag und durch eine Richtung. Ein Vektor läßt sich grafisch gut als Pfeil darstellen, dessen Länge hier für die Größe der Geschwindigkeit steht, während die Spitze beziehungsweise der Winkel mit der Horizontalen die Richtung angibt (siehe Bild 1).</p>
+        <p>Eine Geschwindigkeit ist bekanntlich ein Vektor, das heißt, sie wird bestimmt durch einen Betrag und durch eine Richtung. Ein Vektor läßt sich grafisch gut als Pfeil darstellen, dessen Länge hier für die Größe der Geschwindigkeit steht, während die Spitze beziehungsweise der Winkel mit der Horizontalen die Richtung angibt (siehe Bild 1).</p>
 
-<p>Für grafische Betrachtungen dürfen wir in diesem Zusammenhang Vektoren beliebig verschieben, nicht aber drehen.</p>
+        <p>Für grafische Betrachtungen dürfen wir in diesem Zusammenhang Vektoren beliebig verschieben, nicht aber drehen.</p>
 
-<p>Wie in Bild 1 b) gezeigt, kann eineGeschwindigkeitVin ihre Komponenten in x-Richtung (VX) und in y-Richtung (VY) zerlegt werden und ist durch diese auch eindeutig bestimmt.</p>
+        <p>Wie in Bild 1 b) gezeigt, kann eineGeschwindigkeitVin ihre Komponenten in x-Richtung (VX) und in y-Richtung (VY) zerlegt werden und ist durch diese auch eindeutig bestimmt.</p>
 
-<p>Bild 1 c) verdeutlicht, wie sich aus den Komponenten VX und VY wieder die Geschwindigkeit V konstruieren läßt. Dazu braucht lediglich VY bis zur Spitze von VX verschoben zu werden, und die Verbindung des Fußpunktes von VX mit der Spitze des verschobenen VY (VY’) stellt V dar. Ein solches Aufspalten und Zusammenfügen von Vektorkomponenten bezüglich zweier Richtungen ist immer möglich, wenn die Richtungen aufeinander senkrecht stehen. Bei der Stoßbetrachtung werden uns später zwei andere Richtungen interessieren, wo die Zerlegung dann nach dem gleichen, hier in Bild 1 beschriebenen Prinzip, durchgeführt wird.</p>
+        <p>Bild 1 c) verdeutlicht, wie sich aus den Komponenten VX und VY wieder die Geschwindigkeit V konstruieren läßt. Dazu braucht lediglich VY bis zur Spitze von VX verschoben zu werden, und die Verbindung des Fußpunktes von VX mit der Spitze des verschobenen VY (VY’) stellt V dar. Ein solches Aufspalten und Zusammenfügen von Vektorkomponenten bezüglich zweier Richtungen ist immer möglich, wenn die Richtungen aufeinander senkrecht stehen. Bei der Stoßbetrachtung werden uns später zwei andere Richtungen interessieren, wo die Zerlegung dann nach dem gleichen, hier in Bild 1 beschriebenen Prinzip, durchgeführt wird.</p>
 
-<p>Die Aufspaltung in x- und y-Komponenten paßt sehr gut zur Art der Spritebewegung, so daß es naheliegt, alle vorkommenden Geschwindigkeiten so zu zerlegen und VX und VY getrennt zu behandeln. Damit wird bei der Bewegung das Rechnen mit Winkeln vermieden.</p>
+        <p>Die Aufspaltung in x- und y-Komponenten paßt sehr gut zur Art der Spritebewegung, so daß es naheliegt, alle vorkommenden Geschwindigkeiten so zu zerlegen und VX und VY getrennt zu behandeln. Damit wird bei der Bewegung das Rechnen mit Winkeln vermieden.</p>
 
-<p>Zur Stoßberechnung selbst bieten sich zunächst die Energie- und Impuls-Erhaltungssätze an (Mancher wird sich jetzt wohl an den Physikunterricht erinnern). Diese allein liefern aber noch keine eindeutige Lösung, es ist noch eine zusätzliche Annahme erforderlich.</p>
+        <p>Zur Stoßberechnung selbst bieten sich zunächst die Energie- und Impuls-Erhaltungssätze an (Mancher wird sich jetzt wohl an den Physikunterricht erinnern). Diese allein liefern aber noch keine eindeutige Lösung, es ist noch eine zusätzliche Annahme erforderlich.</p>
 
-<p>In Bild 2 sind zwei sich berührende Kugeln dargestellt, die gleiche Größe und gleiches Gewicht haben sollen. Außerdem sind zwei ausgezeichnete Richtungen angedeutet, die senkrecht aufeinander stehen: die sogenannte Tangential- und die Normalrichtung. Denken wir uns nun die Kugelgeschwindigkeiten ähnlich wie oben in einen Anteil von Tangential- (VT) und einen Anteil in Normal- (VN) Richtung zerlegt, dann gilt folgende Regel:</p>
+        <p>In Bild 2 sind zwei sich berührende Kugeln dargestellt, die gleiche Größe und gleiches Gewicht haben sollen. Außerdem sind zwei ausgezeichnete Richtungen angedeutet, die senkrecht aufeinander stehen: die sogenannte Tangential- und die Normalrichtung. Denken wir uns nun die Kugelgeschwindigkeiten ähnlich wie oben in einen Anteil von Tangential- (VT) und einen Anteil in Normal- (VN) Richtung zerlegt, dann gilt folgende Regel:</p>
 
-<p>Bei einem Stoß bleibt für jede Kugel deren Geschwindigkeitsanteil in Tangentialrichtung nach Betrag und Richtung erhalten, während jede Kugel die Normalkomponente der anderen Kugel übernimmt.</p>
+        <p>Bei einem Stoß bleibt für jede Kugel deren Geschwindigkeitsanteil in Tangentialrichtung nach Betrag und Richtung erhalten, während jede Kugel die Normalkomponente der anderen Kugel übernimmt.</p>
 
-<p>Mit dieser Annahme lassen sich nun die Kugelgeschwindigkeiten nach einem Stoß durch Zerlegen der vorherigen Geschwindigkeiten in VT und VN und entsprechendes Zusammenfügen dieser Komponenten zeichnerisch einwandfrei bestimmen.</p>
+        <p>Mit dieser Annahme lassen sich nun die Kugelgeschwindigkeiten nach einem Stoß durch Zerlegen der vorherigen Geschwindigkeiten in VT und VN und entsprechendes Zusammenfügen dieser Komponenten zeichnerisch einwandfrei bestimmen.</p>
 
-<p>Für das Programm sind aber mathematische Gleichungen erforderlich. Dazu müssen die Tangential- und Normal-Geschwindigkeiten jede für sich noch einmal in einen x-Anteil (VXT, VXN) und einen y-Anteil (VYT, VYN) zerlegt werden:</p>
+        <p>Für das Programm sind aber mathematische Gleichungen erforderlich. Dazu müssen die Tangential- und Normal-Geschwindigkeiten jede für sich noch einmal in einen x-Anteil (VXT, VXN) und einen y-Anteil (VYT, VYN) zerlegt werden:</p>
 
-<pre><code>VXT = (VX \* SIN(W) - VY \* COS(W)) \* SIN(W)  
-VXN = (VY \* SIN(W) + VX \* COS(W)) \* COS(W)  
-VYT = -(VX \* SIN(W) - VY \* COS(W)) \* COS(W)  
+        <pre><code>VXT = (VX \* SIN(W) - VY \* COS(W)) \* SIN(W)
+VXN = (VY \* SIN(W) + VX \* COS(W)) \* COS(W)
+VYT = -(VX \* SIN(W) - VY \* COS(W)) \* COS(W)
 VYN = (VY \* SIN(W) + VX + COS(W)) \* SIN(W)
 </code></pre>
 
-<p>Der Winkel W ist der Winkel zwischen Normalenrichtung und der Horizontalen (siehe Bild 2); er läßt sich aus den Koordinatendifferenzen der Kugelpositionen bestimmen.</p>
+        <p>Der Winkel W ist der Winkel zwischen Normalenrichtung und der Horizontalen (siehe Bild 2); er läßt sich aus den Koordinatendifferenzen der Kugelpositionen bestimmen.</p>
 
-<p>Dann ergeben sich die resultierenden Kugelgeschwindigkeiten nach dem Stoß beziehungsweise deren x- und y-Komponenten:</p>
+        <p>Dann ergeben sich die resultierenden Kugelgeschwindigkeiten nach dem Stoß beziehungsweise deren x- und y-Komponenten:</p>
 
-<pre><code>VX1 = vxn2 + vxtl }  
-                  } für Kugel 1  
+        <pre><code>VX1 = vxn2 + vxtl }
+                  } für Kugel 1
 VY1 = vyn2 + vyt1 }
 
-VX2 = vxn1 + vxt2 }  
-                  } für Kugel 2  
+VX2 = vxn1 + vxt2 }
+                  } für Kugel 2
 VY2 = vyn1 + vyt2 }
 </code></pre>
 
-<p>Für die sich stoßenden Kugeln 1 und 2 sind die Geschwindigkeiten vor dem Stoß klein, nach dem Stoß groß geschrieben.</p>
+        <p>Für die sich stoßenden Kugeln 1 und 2 sind die Geschwindigkeiten vor dem Stoß klein, nach dem Stoß groß geschrieben.</p>
 
-<p>Mit einiger Knobelei habe ich die Gleichungen auf diese Form gebracht, die den Vorteil hat, daß alle vorkommenden Summanden, Klammerausdrücke und Zwischenergebnisse nicht größer werden können als die Ausgangsgröße V.</p>
+        <p>Mit einiger Knobelei habe ich die Gleichungen auf diese Form gebracht, die den Vorteil hat, daß alle vorkommenden Summanden, Klammerausdrücke und Zwischenergebnisse nicht größer werden können als die Ausgangsgröße V.</p>
 
-<p>Werden für V dann nur Werte zwischen 0 und 12 7 zugelassen, so können die Rechnungen mit positiven und negativen Ein-Byte-Zahlen durchgeführt werden, was, wie Sie aus dem laufenden Assemblerkurs wissen, besonders einfach und schnell geht.</p>
+        <p>Werden für V dann nur Werte zwischen 0 und 12 7 zugelassen, so können die Rechnungen mit positiven und negativen Ein-Byte-Zahlen durchgeführt werden, was, wie Sie aus dem laufenden Assemblerkurs wissen, besonders einfach und schnell geht.</p>
 
-<h2>Geschwindigkeit durch Tabellen</h2>
+        <h2>Geschwindigkeit durch Tabellen</h2>
 
-<p>Bei diesen schönen Ein-Byte-Rechnungen stören aber noch die vielen » * SIN« und » * COS«, die viel zuviel Rechenzeit beanspruchen. Es bleibt nur die Möglichkeit, mit Tabellen zu arbeiten, wobei aber nicht alle benötigten Werte gespeichert werden müssen. Zunächst ergeben sich in jedem Viertelkreis immer die gleichen SIN- und COS-Werte, nur mit unterschiedlichem Vorzeichen. Außerdem ist der COS symmetrisch zum SIN:</p>
+        <p>Bei diesen schönen Ein-Byte-Rechnungen stören aber noch die vielen » * SIN« und » * COS«, die viel zuviel Rechenzeit beanspruchen. Es bleibt nur die Möglichkeit, mit Tabellen zu arbeiten, wobei aber nicht alle benötigten Werte gespeichert werden müssen. Zunächst ergeben sich in jedem Viertelkreis immer die gleichen SIN- und COS-Werte, nur mit unterschiedlichem Vorzeichen. Außerdem ist der COS symmetrisch zum SIN:</p>
 
-<p>COS(W) = SIN(W+90 Grad). Ich unterteile also den Viertelkreis in 23 Winkelteile und lege die zugehörigen SIN-Werte im Fließkommaformat in einer Tabelle ab.</p>
+        <p>COS(W) = SIN(W+90 Grad). Ich unterteile also den Viertelkreis in 23 Winkelteile und lege die zugehörigen SIN-Werte im Fließkommaformat in einer Tabelle ab.</p>
 
-<p>Nun stört nur noch die Multiplikation. Da wie oben beschrieben nur Faktoren von 0 bis 127 vorkommen, ist auch hier eine Tabelle noch vertretbar. So werden nach Start des Programmes zujedem SIN-Wert 128 Ein-Byte-Zahlen in eine Multiplikationstabelle geschrieben: (Byte 0 bis 127) * SIN.</p>
+        <p>Nun stört nur noch die Multiplikation. Da wie oben beschrieben nur Faktoren von 0 bis 127 vorkommen, ist auch hier eine Tabelle noch vertretbar. So werden nach Start des Programmes zujedem SIN-Wert 128 Ein-Byte-Zahlen in eine Multiplikationstabelle geschrieben: (Byte 0 bis 127) * SIN.</p>
 
-<p>Das sind jetzt zwar schon eine ganze Menge Bytes, dafür wird das Programm aber auch kürzer und sehr schnell.</p>
+        <p>Das sind jetzt zwar schon eine ganze Menge Bytes, dafür wird das Programm aber auch kürzer und sehr schnell.</p>
 
-<p>Durch geeignetes Setzen von Zeigern können alle Werte »Byte * SIN« und »Byte * COS« nun ohne weitere Rechnung direkt abgerufen werden. Es bleibt nur noch die schnelle Ein-Byte-Addition und -Subtraktion. Die gewählte Winkel- und Geschwindigkeitsauflösung ist im Rahmen der Bildschirmauflösung voll ausreichend.</p>
+        <p>Durch geeignetes Setzen von Zeigern können alle Werte »Byte * SIN« und »Byte * COS« nun ohne weitere Rechnung direkt abgerufen werden. Es bleibt nur noch die schnelle Ein-Byte-Addition und -Subtraktion. Die gewählte Winkel- und Geschwindigkeitsauflösung ist im Rahmen der Bildschirmauflösung voll ausreichend.</p>
 
-<p>Da hier Winkel durch das Verhältnis der Geschwindigkeiten VX und VY dargestellt werden, ist klar, daß die Genauigkeit bei sehr kleinen Geschwindigkeiten geringer wird. Bei einer Gesamtgeschwindigkeit von beispielsweise 2 kann der Winkel eben nicht mehr so genau dargestellt werden wie mit höheren Werten, die viel mehr Kombinationen VY/VX zulassen.</p>
+        <p>Da hier Winkel durch das Verhältnis der Geschwindigkeiten VX und VY dargestellt werden, ist klar, daß die Genauigkeit bei sehr kleinen Geschwindigkeiten geringer wird. Bei einer Gesamtgeschwindigkeit von beispielsweise 2 kann der Winkel eben nicht mehr so genau dargestellt werden wie mit höheren Werten, die viel mehr Kombinationen VY/VX zulassen.</p>
 
-<p>Aus diesem Grund dürfen die Kugeln auch nicht rollen bis ihre Geschwindigkeit Null geworden ist, sondern die Bewegung wird schon etwas früher abgebrochen.</p>
+        <p>Aus diesem Grund dürfen die Kugeln auch nicht rollen bis ihre Geschwindigkeit Null geworden ist, sondern die Bewegung wird schon etwas früher abgebrochen.</p>
 
-<p>Am Schluß dieser Betrachtungen noch zwei Beispiele, an denen Sie bei Billardprogrammen einmal die Richtigkeit der Stoßberechnung überprüfen können:</p>
+        <p>Am Schluß dieser Betrachtungen noch zwei Beispiele, an denen Sie bei Billardprogrammen einmal die Richtigkeit der Stoßberechnung überprüfen können:</p>
 
-<p>Die Verhältnisse sind besonders einfach, wenn eine bewegte Kugel eine ruhende stößt. Erfolgt der Stoß zentral, so muß die stoßende Kugel anschließend stillstehen, während die andere Kugel die Geschwindigkeit voll aufgenommen hat. Bei nichtzentralen Stößen müssen die Richtungen, in die sich die zwei Kugeln nach dem Stoß bewegen, einen rechten Winkel einschließen.</p>
+        <p>Die Verhältnisse sind besonders einfach, wenn eine bewegte Kugel eine ruhende stößt. Erfolgt der Stoß zentral, so muß die stoßende Kugel anschließend stillstehen, während die andere Kugel die Geschwindigkeit voll aufgenommen hat. Bei nichtzentralen Stößen müssen die Richtungen, in die sich die zwei Kugeln nach dem Stoß bewegen, einen rechten Winkel einschließen.</p>
 
-<h2>Tips zum Eintippen</h2>
+        <h2>Tips zum Eintippen</h2>
 
-<p>Es besteht aus zwei Teilen, dem eigentlichen Billardprogramm, das in Maschinencode geschrieben ist und am Basic-Anfang bei Adresse 2048 beginnt, und einem Basic-Teil im Speicher ab 4973, in dem die Spielregeln definiert werden.</p>
+        <p>Es besteht aus zwei Teilen, dem eigentlichen Billardprogramm, das in Maschinencode geschrieben ist und am Basic-Anfang bei Adresse 2048 beginnt, und einem Basic-Teil im Speicher ab 4973, in dem die Spielregeln definiert werden.</p>
 
-<p>Die ersten Bytes des Maschinenprogrammes entsprechen einer Basic-Zeile: »1 SYS2061«. BeimStartdesProgrammes findet der Basic-Interpreter diesen SYS-Befehl und startet das Maschinen-Programm bei 2061. Dort wird der Basic-Anfang auf 4973 hochgesetzt, die oben beschriebene Multiplikationstabelle erstellt und zum Basic-Teil gesprungen, von dem aus dann die weiteren Maschinen-Routinen aufgerufen werden.</p>
+        <p>Die ersten Bytes des Maschinenprogrammes entsprechen einer Basic-Zeile: »1 SYS2061«. BeimStartdesProgrammes findet der Basic-Interpreter diesen SYS-Befehl und startet das Maschinen-Programm bei 2061. Dort wird der Basic-Anfang auf 4973 hochgesetzt, die oben beschriebene Multiplikationstabelle erstellt und zum Basic-Teil gesprungen, von dem aus dann die weiteren Maschinen-Routinen aufgerufen werden.</p>
 
-<p>Auf diese Weise ist das Maschinen-Programm so eingebunden, daß Sie das gesamte Programm später wie ein gewöhnliches Basic-Programm ohne Zeigerumstellungen handhaben können.</p>
+        <p>Auf diese Weise ist das Maschinen-Programm so eingebunden, daß Sie das gesamte Programm später wie ein gewöhnliches Basic-Programm ohne Zeigerumstellungen handhaben können.</p>
 
-<p>Da der MSE die gleiche Methode benutzt, also auch ab 2048 im Speicher liegt, wird die Eingabe des Programmes etwas umständlich.</p>
+        <p>Da der MSE die gleiche Methode benutzt, also auch ab 2048 im Speicher liegt, wird die Eingabe des Programmes etwas umständlich.</p>
 
-<p>Verfahren Sie daher am besten folgendermaßen:</p>
+        <p>Verfahren Sie daher am besten folgendermaßen:</p>
 
-<ol>
-<li>Mit dem MSE (siehe Seite 8) den Maschinenteil ab $C000 eingeben und unter »BILL(MP)« abspeichern.</li>
-<li>Mit dem Checksummer (Seite 6) das Basic-Programm eingeben und unter »BILL(BASIC)« abspeichern.</li>
-<li>Beide Programmteile binden:<br/>
-a)  »BILL(MP)« absolut laden (»LOAD"BILL(MP)&ldquo;,8,1« oder »&hellip;,1,1«)<br/>
-b)  Basic-Anfang auf 4973 setzen mit Eingabe im Direktmodus »POKE 43,109: POKE 44,19: POKE 4972,0: NEW«<br/>
-c)  Maschinen-Programm im Direktmodus übertragen »FOR 1=49152 TO 52076: POKE 1-47104, PEEK(I): NEXT«<br/>
-d)  Basic-Programm laden mit»LOAD "BILL(BASIC)&rdquo;,8« (beziehungsweise »&hellip;,1« für Datasette)<br/>
-e)  Basic-Anfang zurückstellen und Gesamtprogramm speichern mit »POKE 43,1: POKE 44,8: SAVE &ldquo;BILLARD&rdquo;,8« (beziehungsweise »&hellip;,1«)</li>
-</ol>
+        <ol>
+            <li>Mit dem MSE (siehe Seite 8) den Maschinenteil ab $C000 eingeben und unter »BILL(MP)« abspeichern.</li>
+            <li>Mit dem Checksummer (Seite 6) das Basic-Programm eingeben und unter »BILL(BASIC)« abspeichern.</li>
+            <li>Beide Programmteile binden:<br />
+                a) »BILL(MP)« absolut laden (»LOAD"BILL(MP)&ldquo;,8,1« oder »&hellip;,1,1«)<br />
+                b) Basic-Anfang auf 4973 setzen mit Eingabe im Direktmodus »POKE 43,109: POKE 44,19: POKE 4972,0: NEW«<br />
+                c) Maschinen-Programm im Direktmodus übertragen »FOR 1=49152 TO 52076: POKE 1-47104, PEEK(I): NEXT«<br />
+                d) Basic-Programm laden mit»LOAD "BILL(BASIC)&rdquo;,8« (beziehungsweise »&hellip;,1« für Datasette)<br />
+                e) Basic-Anfang zurückstellen und Gesamtprogramm speichern mit »POKE 43,1: POKE 44,8: SAVE &ldquo;BILLARD&rdquo;,8« (beziehungsweise »&hellip;,1«)</li>
+        </ol>
 
 
-<p>Im Programm »BILLARD« sind nun beide Teile enthalten. Es läßt sich wie ein übliches Basic-Programm nach Einschalten des C 64 laden und starten.</p>
+        <p>Im Programm »BILLARD« sind nun beide Teile enthalten. Es läßt sich wie ein übliches Basic-Programm nach Einschalten des C 64 laden und starten.</p>
 
-<p>Die Bedienung des Programms erfolgt bei der Spielwahl über die Tastatur; Schlagwinkel und Schlagstärke werden über Joystick an Port 2 eingegeben. Die Spielregeln sollen hier nicht näher erklärt werden; Sie werden sie während des Spiels schnell herausfinden.</p>
+        <p>Die Bedienung des Programms erfolgt bei der Spielwahl über die Tastatur; Schlagwinkel und Schlagstärke werden über Joystick an Port 2 eingegeben. Die Spielregeln sollen hier nicht näher erklärt werden; Sie werden sie während des Spiels schnell herausfinden.</p>
 
-<h2>Änderungen erwünscht!</h2>
+        <h2>Änderungen erwünscht!</h2>
 
-<p>Betrachten Sie den Basic-Teil von »BILLARD« lediglich als Vorschlag und Anregung zu einem eigenen Programm.</p>
+        <p>Betrachten Sie den Basic-Teil von »BILLARD« lediglich als Vorschlag und Anregung zu einem eigenen Programm.</p>
 
-<p>Das Maschinenprogramm ist so modular und variabel aufgebaut, daß Sie leicht ein Billardspiel nach eigenem Geschmack und mit eigenen Regeln realisieren können (zum Beispiel ein Lochbillard mit fünf Kugeln unter Berücksichtigung von Stößen).</p>
+        <p>Das Maschinenprogramm ist so modular und variabel aufgebaut, daß Sie leicht ein Billardspiel nach eigenem Geschmack und mit eigenen Regeln realisieren können (zum Beispiel ein Lochbillard mit fünf Kugeln unter Berücksichtigung von Stößen).</p>
 
-<p>Zur Erkennung eines Stoßes oder einer Bandenberührung werden die entsprechenden Sprite-Register nicht benutzt, wodurch Sie auch in der grafischen Gestaltung völlig frei sind.</p>
+        <p>Zur Erkennung eines Stoßes oder einer Bandenberührung werden die entsprechenden Sprite-Register nicht benutzt, wodurch Sie auch in der grafischen Gestaltung völlig frei sind.</p>
 
-<p>Die drei Tongeneratoren werden vom Programm vor jedem Stoß auf die benötigten Werte eingestellt. Sie müssen nur von Basic aus das Register 54296 für die Lautstärke einstellen (=15).</p>
+        <p>Die drei Tongeneratoren werden vom Programm vor jedem Stoß auf die benötigten Werte eingestellt. Sie müssen nur von Basic aus das Register 54296 für die Lautstärke einstellen (=15).</p>
 
-<p>Generator 1: Bandenberührung</p>
+        <p>Generator 1: Bandenberührung</p>
 
-<p>Generator 2: Stoßgeräusch</p>
+        <p>Generator 2: Stoßgeräusch</p>
 
-<p>Generator 3: Ton, wenn eine Kugel in ein Loch fällt</p>
+        <p>Generator 3: Ton, wenn eine Kugel in ein Loch fällt</p>
 
-<p>Alle drei Generatoren werden mit der Dreieck-Wellenform »16/17« geschaltet.</p>
+        <p>Alle drei Generatoren werden mit der Dreieck-Wellenform »16/17« geschaltet.</p>
 
-<h3>1.  Veränderbare Programmparameter</h3>
+        <h3>1. Veränderbare Programmparameter</h3>
 
-<p>Der Bewegungsablauf kann durch drei Parameter beeinflußt werden.<br/>
-a)  Byte 3687: Dämpfung (hier = 10)<br>Ein größerer Wert bedeutet hier schwächere Dämpfung; die Kugeln rollen dann bei gleicher Schlagstärke weiter. Ein kleinerer Wert bewirkt stärkere Dämpfung.<br/>
-b)  Byte 4200: Ende der Kugelbewegung (hier = 2) Wie schon oben bei der Stoßauswertung beschrieben, istessinnvoll, die Kugelbewegung abzubrechen, bevor die Geschwindigkeit auf 0 abgesunken ist. Ein zu kleiner Wert an dieser Stelle hat vor allem bei schwacher Dämpfung ein Abknicken der Bewegungsrichtung kurz vor Stillstand zur Folge.<br/>
-c)  Byte 4248: Verzögerung des Bewegungsablaufes (hier = 10)<br>Eine automatische Geschwindigkeitsanpassung abhängig von der Anzahl der rollenden Kugeln ist an anderer Stelle eingebaut; sie sorgt für gleichmäßige Bewegung, gleichgültig, ob sich gerade nur eine oder sieben Kugeln bewegen.<br>An dieser Stelle bewirkt ein größerer Wert zusätzliche Verzögerung. Sie können sich beispielsweise mit »255« einen Stoß in Zeitlupe ansehen. Während mit der Dämpfung die zurückzulegende Strecke bestimmt wird, läßt sich hier die Geschwindigkeit der Bewegung festlegen.<br>Experimentieren Sie ruhig etwas mit diesen Parametern. Nach einem entsprechenden POKE sehen Sie die Wirkung gleich beim nächsten Stoß.<br>Wenn Sie nach Änderungen hier das Programm wieder neu abspeichern, werden die neuen Werte mitgespeichert. Sie können selbstverständlich aber auch während des Programmlaufes die Parameter mehrfach ändern.</p>
+        <p>Der Bewegungsablauf kann durch drei Parameter beeinflußt werden.<br />
+            a) Byte 3687: Dämpfung (hier = 10)<br>Ein größerer Wert bedeutet hier schwächere Dämpfung; die Kugeln rollen dann bei gleicher Schlagstärke weiter. Ein kleinerer Wert bewirkt stärkere Dämpfung.<br />
+            b) Byte 4200: Ende der Kugelbewegung (hier = 2) Wie schon oben bei der Stoßauswertung beschrieben, istessinnvoll, die Kugelbewegung abzubrechen, bevor die Geschwindigkeit auf 0 abgesunken ist. Ein zu kleiner Wert an dieser Stelle hat vor allem bei schwacher Dämpfung ein Abknicken der Bewegungsrichtung kurz vor Stillstand zur Folge.<br />
+            c) Byte 4248: Verzögerung des Bewegungsablaufes (hier = 10)<br>Eine automatische Geschwindigkeitsanpassung abhängig von der Anzahl der rollenden Kugeln ist an anderer Stelle eingebaut; sie sorgt für gleichmäßige Bewegung, gleichgültig, ob sich gerade nur eine oder sieben Kugeln bewegen.<br>An dieser Stelle bewirkt ein größerer Wert zusätzliche Verzögerung. Sie können sich beispielsweise mit »255« einen Stoß in Zeitlupe ansehen. Während mit der Dämpfung die zurückzulegende Strecke bestimmt wird, läßt sich hier die Geschwindigkeit der Bewegung festlegen.<br>Experimentieren Sie ruhig etwas mit diesen Parametern. Nach einem entsprechenden POKE sehen Sie die Wirkung gleich beim nächsten Stoß.<br>Wenn Sie nach Änderungen hier das Programm wieder neu abspeichern, werden die neuen Werte mitgespeichert. Sie können selbstverständlich aber auch während des Programmlaufes die Parameter mehrfach ändern.</p>
 
-<h3>2.  Parameter für Feld- und Lochgrößen</h3>
+        <h3>2. Parameter für Feld- und Lochgrößen</h3>
 
-<p>Sie sind in Bild 3 mit den hier verwendeten Bezeichnungen dargestellt.<br/>
-a)  Byte 3204: Linker Feldrand (hier = 20)<br/>
-b)  Byte 3205: Rechter Feldrand (hier = 56)<br/>
-c)  Byte 3206: Oberer Feldrand (hier = 73)<br/>
-d)  Byte 3207: Unterer Feldrand (hier = 73)<br/>
-e)  Byte 3208: (hier = 3) Dieser Wert legt fest, um wieviel Grafikpunkte sich der Cursor (zur Einstellung der Stoßrichtung) über den Feldrand hinaus bewegen lassen soll.<br>Dieser Cursor — hier ein Zielkreuz (Sprite 0) — ist übrigens in Sprite-Block 39 definiert und kann durch Eingabe entsprechender Daten in 2496 bis 2559 geändert werden.<br/>
-f)  Byte 3209: Größe der Ecklöcher (hier = 6)<br/>
-g)  Byte 3210: Größe der mittleren Löcher (hier = 10)<br>Es gilt hier die Einschränkung, daß der rechte Feldrand sowie die rechten Ecklöcher im Bildschirmbereich des V+16-Registers (53264) liegen müssen, während die anderen Werte nicht in diesem Bereich liegen dürfen (für den rechten Feldrand ist unter b natürlich das Low-Byte einzugeben).<br>Als kleine Hilfe: Die Kugeln bleiben voll sichtbar im Bereich X zwischen 12 und 64, Y zwischen 41 und 229.<br>Auch diese Parameter stehen im Programm und werden bei erneutem Abspeichern mit übernommen. Allerdings sehen Sie Änderungen hier nicht gleich beim Programmlauf, da diese Werte erst beim Programmstart abgerufen werden. Ein Unterprogramm errechnet daraus die im Programm benötigten Daten und schreibt sie an die richtige Stelle. Wollen Sie diese Parameter während des Programmes ändern, rufen Sie nach den entsprechenden POKEs das Maschinen-Programm »SE« (siehe später) auf.</p>
+        <p>Sie sind in Bild 3 mit den hier verwendeten Bezeichnungen dargestellt.<br />
+            a) Byte 3204: Linker Feldrand (hier = 20)<br />
+            b) Byte 3205: Rechter Feldrand (hier = 56)<br />
+            c) Byte 3206: Oberer Feldrand (hier = 73)<br />
+            d) Byte 3207: Unterer Feldrand (hier = 73)<br />
+            e) Byte 3208: (hier = 3) Dieser Wert legt fest, um wieviel Grafikpunkte sich der Cursor (zur Einstellung der Stoßrichtung) über den Feldrand hinaus bewegen lassen soll.<br>Dieser Cursor — hier ein Zielkreuz (Sprite 0) — ist übrigens in Sprite-Block 39 definiert und kann durch Eingabe entsprechender Daten in 2496 bis 2559 geändert werden.<br />
+            f) Byte 3209: Größe der Ecklöcher (hier = 6)<br />
+            g) Byte 3210: Größe der mittleren Löcher (hier = 10)<br>Es gilt hier die Einschränkung, daß der rechte Feldrand sowie die rechten Ecklöcher im Bildschirmbereich des V+16-Registers (53264) liegen müssen, während die anderen Werte nicht in diesem Bereich liegen dürfen (für den rechten Feldrand ist unter b natürlich das Low-Byte einzugeben).<br>Als kleine Hilfe: Die Kugeln bleiben voll sichtbar im Bereich X zwischen 12 und 64, Y zwischen 41 und 229.<br>Auch diese Parameter stehen im Programm und werden bei erneutem Abspeichern mit übernommen. Allerdings sehen Sie Änderungen hier nicht gleich beim Programmlauf, da diese Werte erst beim Programmstart abgerufen werden. Ein Unterprogramm errechnet daraus die im Programm benötigten Daten und schreibt sie an die richtige Stelle. Wollen Sie diese Parameter während des Programmes ändern, rufen Sie nach den entsprechenden POKEs das Maschinen-Programm »SE« (siehe später) auf.</p>
 
-<p>Wenn Sie das geänderte Programm abspeichern, vergessen Sie nicht, vorher den Basic-Anfang zurückzustellen mit:<br/>
-»POKE 43,1: POKE 44,8«! Andernfallswird möglicherweise nur das Basic-Programm gespeichert.<br/>
-Wie das Zielkreuz (Sprite 0, Block 39) stehen auch die Sprite-Daten der Kugeln im Maschinenprogramm in den Sprite-Blöcken 40 bis 47, zwischen denen zur Simulation einer Rollbewegung hin und her geschaltet wird.<br/>
-Jeder Kugel ist entsprechend ihrer Sprite-Nummer eine Zahl zwischen 1 und 7 zugeordnet. Ebensosind die Löcher, wie in Bild 3 gezeigt, durchnummeriert von 2 bis 7.<br/>
-Nach jedem Stoß stehen Ihnen folgende Informationen zur Auswertung zur Verfügung:</p>
+        <p>Wenn Sie das geänderte Programm abspeichern, vergessen Sie nicht, vorher den Basic-Anfang zurückzustellen mit:<br />
+            »POKE 43,1: POKE 44,8«! Andernfallswird möglicherweise nur das Basic-Programm gespeichert.<br />
+            Wie das Zielkreuz (Sprite 0, Block 39) stehen auch die Sprite-Daten der Kugeln im Maschinenprogramm in den Sprite-Blöcken 40 bis 47, zwischen denen zur Simulation einer Rollbewegung hin und her geschaltet wird.<br />
+            Jeder Kugel ist entsprechend ihrer Sprite-Nummer eine Zahl zwischen 1 und 7 zugeordnet. Ebensosind die Löcher, wie in Bild 3 gezeigt, durchnummeriert von 2 bis 7.<br />
+            Nach jedem Stoß stehen Ihnen folgende Informationen zur Auswertung zur Verfügung:</p>
 
-<p>a)  Stoßregister $FD (= Basicvariable SR = 253):<br>Hier sind die Kugeln angegeben, die mindestens einmal mit der Stoßkugel kollidiert sind, und zwar im Format »2 hoch Kugelnummer 1 bis 7«. Dieses Format entspricht dem, das Ihnen beispielsweise vom Sprite-Sprite Berührungsregister her bekannt ist.<br/>
-b)  Lochregister $FE (= Basicvariable LR = 254):<br>Hier finden Sie im gleichen Format wie beim Stoßregister die Kugeln, die in ein Loch gefallen sind.<br/>
-c)  Zur weiteren Auswertung ist fürjede Kugel ein zusätzliches Lochregister vorhanden: 52123 + Kugelnummer 1 bis 7.<br>Dieses enthält »2 hoch Lochnummer« des Loches, in das die entsprechende Kugel gefallen ist. Liegt sie noch auf dem Feld, steht hier 0.<br>Alle Register a) bis c) werden vor jedem Stoß automatisch auf 0 zurückgesetzt.<br>Zum besseren Verständnis folgen einige Beispiele:</p>
+        <p>a) Stoßregister $FD (= Basicvariable SR = 253):<br>Hier sind die Kugeln angegeben, die mindestens einmal mit der Stoßkugel kollidiert sind, und zwar im Format »2 hoch Kugelnummer 1 bis 7«. Dieses Format entspricht dem, das Ihnen beispielsweise vom Sprite-Sprite Berührungsregister her bekannt ist.<br />
+            b) Lochregister $FE (= Basicvariable LR = 254):<br>Hier finden Sie im gleichen Format wie beim Stoßregister die Kugeln, die in ein Loch gefallen sind.<br />
+            c) Zur weiteren Auswertung ist fürjede Kugel ein zusätzliches Lochregister vorhanden: 52123 + Kugelnummer 1 bis 7.<br>Dieses enthält »2 hoch Lochnummer« des Loches, in das die entsprechende Kugel gefallen ist. Liegt sie noch auf dem Feld, steht hier 0.<br>Alle Register a) bis c) werden vor jedem Stoß automatisch auf 0 zurückgesetzt.<br>Zum besseren Verständnis folgen einige Beispiele:</p>
 
-<p>Zu a): IF PEEK(SR) = 12 THEN »Stoßkugel kollidierte mit den Kugeln 2 und 3« (22 + 23 = 12)<br/>
-Zu b): IF PEEK(LR) AND 8 THEN »Kugel 3 gefallen«<br>IF PEEK(LR) AND 84 THEN »Kugel mit gerader Nummer, also Kugel 2, 4 oder 6 gefallen«<br/>
-Zu c): IF PEEK(52123+K) = 64 THEN »Kugel K in Loch 6«<br>IF PEEK(52123+K) AND 28 THEN »Kugel K in einem der oberen Löcher, also Loch 2, 3 oder 4«</p>
+        <p>Zu a): IF PEEK(SR) = 12 THEN »Stoßkugel kollidierte mit den Kugeln 2 und 3« (22 + 23 = 12)<br />
+            Zu b): IF PEEK(LR) AND 8 THEN »Kugel 3 gefallen«<br>IF PEEK(LR) AND 84 THEN »Kugel mit gerader Nummer, also Kugel 2, 4 oder 6 gefallen«<br />
+            Zu c): IF PEEK(52123+K) = 64 THEN »Kugel K in Loch 6«<br>IF PEEK(52123+K) AND 28 THEN »Kugel K in einem der oberen Löcher, also Loch 2, 3 oder 4«</p>
 
-<h2>Die Maschinensprache-Routinen</h2>
+        <h2>Die Maschinensprache-Routinen</h2>
 
-<p>Es folgt nun eine Kurzbeschreibung der Maschinenroutinen: Hinter SYS steht die im Basic-Programm benutzte Variable, die zugehörigen Adressen sind später aufgeführt.</p>
+        <p>Es folgt nun eine Kurzbeschreibung der Maschinenroutinen: Hinter SYS steht die im Basic-Programm benutzte Variable, die zugehörigen Adressen sind später aufgeführt.</p>
 
-<p><strong>SYS SE</strong>: Setzt die Feld- und Lochparameter direkt in das Programm. Die Routine braucht nur aufgerufen zu werden, wenn diese Parameter während des Programmlaufes verändert worden sind.</p>
+        <p><strong>SYS SE</strong>: Setzt die Feld- und Lochparameter direkt in das Programm. Die Routine braucht nur aufgerufen zu werden, wenn diese Parameter während des Programmlaufes verändert worden sind.</p>
 
-<p><strong>SYS IN, Anzahl der Kugeln 1 bis 7 + 0 oder + 128</strong>: Diese Routine muß einmal vor Beginn eines neuen Spieles aufgerufen werden. Sie definiert für ein Spiel die Anzahl der Kugeln, wobei dann beispielsweise mit einer Kugelzahl von 3 die Kugeln 1, 2 und 3 im Programm berücksichtigt werden. Zusätzlich wird durch Bit 7 festgelegt, ob Lochbillard (Bit 7 = 1, also + 128) oder Bandenbillard (Bit 7 = 0) gespielt werden soll.</p>
+        <p><strong>SYS IN, Anzahl der Kugeln 1 bis 7 + 0 oder + 128</strong>: Diese Routine muß einmal vor Beginn eines neuen Spieles aufgerufen werden. Sie definiert für ein Spiel die Anzahl der Kugeln, wobei dann beispielsweise mit einer Kugelzahl von 3 die Kugeln 1, 2 und 3 im Programm berücksichtigt werden. Zusätzlich wird durch Bit 7 festgelegt, ob Lochbillard (Bit 7 = 1, also + 128) oder Bandenbillard (Bit 7 = 0) gespielt werden soll.</p>
 
-<p><strong>SYS AL, Kugelnummer, X-Koordinate (2 Byte 0 bis 511), Y-Koordinate</strong>: Hierdurch wird eine Kugel auf das Feld gelegt, wobei die Register V+21 und V+16 automatisch entsprechend eingestellt werden. Wird eine Kugel so gesetzt, daß sie eine andere berühren würde, wird sie so weit wie nötig zur Feldmitte hin verschoben. Für regelgerechte Bewegungen muß die Kugel selbstverständlich in das Spielfeld gesetzt werden.</p>
+        <p><strong>SYS AL, Kugelnummer, X-Koordinate (2 Byte 0 bis 511), Y-Koordinate</strong>: Hierdurch wird eine Kugel auf das Feld gelegt, wobei die Register V+21 und V+16 automatisch entsprechend eingestellt werden. Wird eine Kugel so gesetzt, daß sie eine andere berühren würde, wird sie so weit wie nötig zur Feldmitte hin verschoben. Für regelgerechte Bewegungen muß die Kugel selbstverständlich in das Spielfeld gesetzt werden.</p>
 
-<p><strong>SYS VL, Kugelnummer</strong>: Legt eine Kugel vor dem Loch wieder auf, wenn sie gefallen ist, andernfalls hat der Aufruf keine Wirkung. Im Fall einer Berührung mit anderen Kugeln wird wie bei »AL« verschoben. Sie können diese Routine beispielsweise benutzen, wenn eine Kugel in ein verbotenes Loch gefallen ist.</p>
+        <p><strong>SYS VL, Kugelnummer</strong>: Legt eine Kugel vor dem Loch wieder auf, wenn sie gefallen ist, andernfalls hat der Aufruf keine Wirkung. Im Fall einer Berührung mit anderen Kugeln wird wie bei »AL« verschoben. Sie können diese Routine beispielsweise benutzen, wenn eine Kugel in ein verbotenes Loch gefallen ist.</p>
 
-<p><strong>SYS KS, Nummer der Stoßkugel</strong>: Dieser Aufruf muß vor jedem Stoß erfolgen. Es wird hier die Stoßkugel festgelegt und außerdem das Kreuz auf diese Stoßkugel gesetzt.</p>
+        <p><strong>SYS KS, Nummer der Stoßkugel</strong>: Dieser Aufruf muß vor jedem Stoß erfolgen. Es wird hier die Stoßkugel festgelegt und außerdem das Kreuz auf diese Stoßkugel gesetzt.</p>
 
-<p><strong>SYS JS</strong>: Nach diesem Aufruf kann mit Hilfe des Joysticks an Port 2 das Zielkreuz bewegt werden. Nach »FIRE« erfolgt Rücksprung in Basic, wo nun die Geschwindigkeits-Eingabe folgen sollte.</p>
+        <p><strong>SYS JS</strong>: Nach diesem Aufruf kann mit Hilfe des Joysticks an Port 2 das Zielkreuz bewegt werden. Nach »FIRE« erfolgt Rücksprung in Basic, wo nun die Geschwindigkeits-Eingabe folgen sollte.</p>
 
-<p><strong>SYS GS, Anfangsgeschwindigkeit 0 biS 127</strong>: Für die Anfangsgeschwindigkeit der Stoßkugel sind hier Werte zwischen 0 und 127 erlaubt. Nach Auswertung der Geschwindigkeits-Eingabe beginnt die Bewegung der Kugeln. Rücksprung in Basic erfolgt erst, wenn alle Kugeln wieder in Ruhe sind, vorher ist ein Aussprung nur mit »STOP / RESTORE« möglich.</p>
+        <p><strong>SYS GS, Anfangsgeschwindigkeit 0 biS 127</strong>: Für die Anfangsgeschwindigkeit der Stoßkugel sind hier Werte zwischen 0 und 127 erlaubt. Nach Auswertung der Geschwindigkeits-Eingabe beginnt die Bewegung der Kugeln. Rücksprung in Basic erfolgt erst, wenn alle Kugeln wieder in Ruhe sind, vorher ist ein Aussprung nur mit »STOP / RESTORE« möglich.</p>
 
-<p><strong>SYS N1, Anfangsgeschwindigkeit</strong>: Wählen Sie statt »GS« diesen Einsprungspunkt, so werden vor der Bewegung alle Sprite-Positionen und die Nummer der Stoßkugel in einem Speicherbereich 1 abgelegt. Da damit alle wichtigen Parameter vor einem Stoß erhalten bleiben, wird eine Stoßwiederholung ermöglicht.</p>
+        <p><strong>SYS N1, Anfangsgeschwindigkeit</strong>: Wählen Sie statt »GS« diesen Einsprungspunkt, so werden vor der Bewegung alle Sprite-Positionen und die Nummer der Stoßkugel in einem Speicherbereich 1 abgelegt. Da damit alle wichtigen Parameter vor einem Stoß erhalten bleiben, wird eine Stoßwiederholung ermöglicht.</p>
 
-<p><strong>SYS SW</strong>: Wählen Sie diesen Einsprungspunkt an Stelle von »JS«, und haben Sie den vorherigen Stoß mit »N1« durchgeführt, werden alle Sprites auf die dort gespeicherten Werte zurückgesetzt, die ja den Zustand vor dem letzten Stoß wiedergeben.</p>
+        <p><strong>SYS SW</strong>: Wählen Sie diesen Einsprungspunkt an Stelle von »JS«, und haben Sie den vorherigen Stoß mit »N1« durchgeführt, werden alle Sprites auf die dort gespeicherten Werte zurückgesetzt, die ja den Zustand vor dem letzten Stoß wiedergeben.</p>
 
-<p>Außerdem werden die jetzigen Positionen in einem anderen Speicherbereich 2 abgelegt. Das Programm fährt fort bei »JS« mit der Joystickabfrage.</p>
+        <p>Außerdem werden die jetzigen Positionen in einem anderen Speicherbereich 2 abgelegt. Das Programm fährt fort bei »JS« mit der Joystickabfrage.</p>
 
-<p>Wählen Sie dann für die Geschwindigkeitseingabe bei der Schlagwiederholung den Einsprungspunkt »GS«, haben Sie nach diesem wiederholten Stoß die Wahl zwischen drei Möglichkeiten:</p>
+        <p>Wählen Sie dann für die Geschwindigkeitseingabe bei der Schlagwiederholung den Einsprungspunkt »GS«, haben Sie nach diesem wiederholten Stoß die Wahl zwischen drei Möglichkeiten:</p>
 
-<p>Einmal können Sie den vorherigen Stoß mit »SW« und »GS« noch einmal wiederholen. Sie können aber auch mit »JS« und »N1« vom jetzigen Zustand aus weiterspielen. Für die dritte Möglichkeit, die ich in meinem Programm gewählt habe, fehlt noch eine Routine:</p>
+        <p>Einmal können Sie den vorherigen Stoß mit »SW« und »GS« noch einmal wiederholen. Sie können aber auch mit »JS« und »N1« vom jetzigen Zustand aus weiterspielen. Für die dritte Möglichkeit, die ich in meinem Programm gewählt habe, fehlt noch eine Routine:</p>
 
-<p><strong>SYS V2</strong>: Hierdurch werden die Kugeln auf die in Speicherbereich 2 abgelegten Werte gesetzt, die ja den Zustand nach dem ursprünglichen Stoß wiedergeben. Fährt man danach mit »JS« und »N1«fort, ist die Schlagwiederholung sozusagen »außer Konkurrenz« durchgeführt worden, da ja vom Zustand nach dem ursprünglichen Stoß aus weitergespielt wird.</p>
+        <p><strong>SYS V2</strong>: Hierdurch werden die Kugeln auf die in Speicherbereich 2 abgelegten Werte gesetzt, die ja den Zustand nach dem ursprünglichen Stoß wiedergeben. Fährt man danach mit »JS« und »N1«fort, ist die Schlagwiederholung sozusagen »außer Konkurrenz« durchgeführt worden, da ja vom Zustand nach dem ursprünglichen Stoß aus weitergespielt wird.</p>
 
-<p><strong>SYS ZS, 2 hoch Kugelnummer (= 2 bis 254); Geschwindigkeit, Winkel</strong>: Diese letzte Routine benutze ich, um einen zufälligen Anfangszustand vor Beginn eines Spieles zu erzeugen. Es lassen sich eine bis sieben Kugeln gleichzeitig mit der gleichen Anfangsgeschwindigkeit zwischen 0 und 127 anstoßen. Die Bewegungsrichtung wird durch einen Winkel in Altgrad (ein rechter Winkel entsprechend 90 Grad) eingestellt. Auf diese Weise läßt sich auch ein berechneter Stoß mit der Stoßkugel durchführen.</p>
+        <p><strong>SYS ZS, 2 hoch Kugelnummer (= 2 bis 254); Geschwindigkeit, Winkel</strong>: Diese letzte Routine benutze ich, um einen zufälligen Anfangszustand vor Beginn eines Spieles zu erzeugen. Es lassen sich eine bis sieben Kugeln gleichzeitig mit der gleichen Anfangsgeschwindigkeit zwischen 0 und 127 anstoßen. Die Bewegungsrichtung wird durch einen Winkel in Altgrad (ein rechter Winkel entsprechend 90 Grad) eingestellt. Auf diese Weise läßt sich auch ein berechneter Stoß mit der Stoßkugel durchführen.</p>
 
-<p>Der Umgang mit diesen Routinen erscheint nach dem ersten Durchlesen vielleicht etwas kompliziert. Sie werden aber sicher nach Lektüre des Demonstrationsprogrammes (Listing 1) und schlimmstenfalls nach einigem Probieren feststellen, wie einfach sich das beschriebene Maschinenprogramm anwenden läßt.</p>
+        <p>Der Umgang mit diesen Routinen erscheint nach dem ersten Durchlesen vielleicht etwas kompliziert. Sie werden aber sicher nach Lektüre des Demonstrationsprogrammes (Listing 1) und schlimmstenfalls nach einigem Probieren feststellen, wie einfach sich das beschriebene Maschinenprogramm anwenden läßt.</p>
 
-<address class="author">(Bernhard Tertelmann/ev)</address>
+        <address class="author">(Bernhard Tertelmann/ev)</address>
 
-<p>TODO ASIDE</p>
+        <p>TODO ASIDE</p>
 
-<p><strong>Die wichtigsten Programmdaten:</strong><br/>
-Adresse des Maschinen-Programms: 2048 bis 4972<br/>
-Multiplikationstabelle und verschiedene Arbeitsspeicher: 49152 bis 52245<br/>
-Adressen der Routinen: SE = 2158, IN = 3211, AL = 2372, VL = 2327, KS = 2444, SW = 3255, JS = 3294, N1 = 3566, GS = 3588, V2 = 3232, ZS = 4828<br/>
-Benutzte Zeropage-Adresse: $FB bis $FE und $57 bis $64 Außerdem werden einige Betriebssystem-Routinen aufgerufen wie beispielsweise »FAC = KONST * FAC«<br/>
-Adresse des Basic-Programms: ab 4973</p>
+        <p><strong>Die wichtigsten Programmdaten:</strong><br />
+            Adresse des Maschinen-Programms: 2048 bis 4972<br />
+            Multiplikationstabelle und verschiedene Arbeitsspeicher: 49152 bis 52245<br />
+            Adressen der Routinen: SE = 2158, IN = 3211, AL = 2372, VL = 2327, KS = 2444, SW = 3255, JS = 3294, N1 = 3566, GS = 3588, V2 = 3232, ZS = 4828<br />
+            Benutzte Zeropage-Adresse: $FB bis $FE und $57 bis $64 Außerdem werden einige Betriebssystem-Routinen aufgerufen wie beispielsweise »FAC = KONST * FAC«<br />
+            Adresse des Basic-Programms: ab 4973</p>
     </article>
 </body>
+
 </html>
