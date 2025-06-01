@@ -316,7 +316,7 @@ def detokenize(basicver: str, token: int, extratoken: int) -> (str, bool):
             tbl = tblit.__next__()
         except StopIteration:
             if "parent" not in langver:
-                return chr(token), False
+                return encoding_64er[token], False
             langver = tokens[langver["parent"]]
             tblit = iter(langver["segments"])
             tbl = tblit.__next__()
