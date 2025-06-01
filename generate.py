@@ -95,6 +95,7 @@ def parse_cli_into_config():
     # supported command line arguments
     parser = argparse.ArgumentParser(description=f"Generate the magazine")
     parser.add_argument("deploy_mode", choices=["upload", "local"], nargs='?', default="local", help="the deploy mode (default: %(default)s)")
+    parser.add_argument("--issues", action='extend', nargs='+', type=str, help="only build specified issues (yymm)" )
     parser.add_argument("--future", action='store_true', help="also build issues with release dates in the future")
     parser.add_argument("--lang", choices=['de', 'en'], nargs='?', const='de', default='de', help="[WIP] build a different language version (default: %(default)s)")
     parser.add_argument("--join", action='store_true', help="open page locally without starting a server ")
@@ -104,6 +105,7 @@ def parse_cli_into_config():
 
     config = BuildConfig()
     config.deploy = args.deploy_mode == "upload"
+    config.build_issues = args.issues
     config.build_future = args.future
     config.lang = args.lang
     config.start_local_server = not args.join
@@ -126,7 +128,7 @@ def parse_cli_into_config():
 
     # adjust base dir for the current build destination and branches
     if is_on_main:
-        if not config.build_future:
+        if not (config.build_future or config.build_issues):
             config.base_dir = ''
         else:
             config.base_dir = 'test/'
@@ -150,7 +152,7 @@ def parse_cli_into_config():
       #   print("There are uncommited changes in the working copy.")
       #   exit()
 
-      if is_on_main and not config.build_future:
+      if is_on_main and not (config.build_future or config.build_issues):
           response = input("Deploy to production? [Y/N]: ").strip()
           if response.lower() != 'y':
               print("Exiting.")
@@ -166,6 +168,7 @@ git_status =  '\n  <!!!> Has uncommited changes!' if CONFIG.git_has_changes else
 print(f"""
     > base_dir: {CONFIG.base_dir}
     > deploy: {CONFIG.deploy}
+    > build_issues: {CONFIG.build_issues}
     > build_future: {CONFIG.build_future}
     > start_local_server: {CONFIG.start_local_server}
 {git_status}
@@ -580,7 +583,7 @@ class Issue:
       if not pubdate:
           # no system exit as this also triggers for empty folders (eg. after branch change)
           raise AssertionError(f"- [{issue_directory_path}] Skipping: no pubdate")
-      elif not CONFIG.build_future:
+      elif not (CONFIG.build_future or CONFIG.build_issues):
         # Define the current datetime with UTC timezone for comparison
           current_datetime = datetime.now(pytz.utc)
 
@@ -787,6 +790,9 @@ class ArticleDatabase:
         self.authors = set(())
         self.articles = []
         for issue_dir_name in sorted(os.listdir(in_directory)):
+            if CONFIG.build_issues and issue_dir_name not in CONFIG.build_issues:
+                continue
+
             issue_dir_path = os.path.join(in_directory, issue_dir_name)
             if os.path.isdir(issue_dir_path) and (re.match(r'^\d{4}$', issue_dir_name) or re.match(r'^SH\d{4}$', issue_dir_name)):
 
