@@ -1686,7 +1686,7 @@ def copy_and_modify_html(article, html_dest_path, pdf_path, prev_page_link, next
         return ls_json
 
     past_pubtime = article.article_pubdate() - relativedelta(years=40)
-    iso_date_published = past_pubtime.strftime("%a, %d %b %Y %H:%M:%S %z")[:-5] + "GMT"
+    iso_date_published = past_pubtime.isoformat()
     ls_json = create_ls_json(article.title, preview_img, iso_date_published, iso_date_published, "")
     head_html = f'<script type="application/ld+json">{ls_json}</script>'
 
