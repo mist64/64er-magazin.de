@@ -316,7 +316,7 @@ def detokenize(basicver: str, token: int, extratoken: int) -> (str, bool):
             tbl = tblit.__next__()
         except StopIteration:
             if "parent" not in langver:
-                return chr(token), False
+                return encoding_64er[token], False
             langver = tokens[langver["parent"]]
             tblit = iter(langver["segments"])
             tbl = tblit.__next__()
@@ -420,10 +420,10 @@ def parse(
                 if skip:
                     p += 1
                 if token in ["TO", "THEN"]:
-                    if line[-1] != " ":
+                    if line[-1] != 0x20:
                         line += " "
                 elif len(token) > 1 and token[:5] not in ["INPUT", "PRINT"]:
-                    if read8(p + 1) != " ":
+                    if read8(p + 1) != 0x20:
                         token += " "
                 line += token
 

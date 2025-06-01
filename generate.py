@@ -701,6 +701,8 @@ class Issue:
                       content = content.replace("\ue000", "</span>")
                       listing_html += f"<span data-chksum='<{checksum:03d}>'>{lineno: 3d} {content} </span>\n"
                   listing = "\n".join(listing)
+                  listing = listing.replace("&", "&amp;")
+                  listing = listing.replace("<", "&lt;")
                   newhtml = f"""<div class="listing"><span class="controls"><input type="checkbox" role="switch" class="toggle" checked="checked" /></span>
                     <pre class="listing-petcat">{listing}</pre>
                     <pre class="listing-checksummer">{listing_html}</pre></div>
