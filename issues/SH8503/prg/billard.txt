@@ -1,0 +1,158 @@
+;billard.prg ==0801==
+    1 rem    *****************
+    2 rem    * billard ('85) *
+    3 rem    * ------------- *
+    4 rem    * b.tertelmann  *
+    5 rem    * ostendorf 36  *
+    6 rem    * 4435 horstmar *
+    7 rem    *****************
+    8 rem
+   10 print"{clr}":v=53248:pokev+32,2:pokev+33,9:t=54272:jj=56320
+   15 sr=253:lr=254:l=52123:eb=21
+   20 se=2158:in=3211:al=2372:vl=2327:ks=2444
+   25 sw=3255:v2=3232:js=3294:n1=3566:gs=3588:zs=4828
+   30 g(0)=229:g(1)=225:g(2)=106:g(3)=32
+   35 pokev+39,0:pokev+40,15:pokev+43,10:pokev+45,10:poket+24,15
+   40 x1$="{CBM-N}{lred}0123456789{red}{CBM-H}":x2$="{rvon}{red}{CBM-N}{lred}          {red}{CBM-H}"
+   45 y$="{rvon}{CBM-C}{rvof}{CBM-I}{rvon}{CBM-V}               {CBM-C}{rvof}{CBM-I}{CBM-I}{rvon}{CBM-V}               {CBM-C}{rvof}{CBM-I}{rvon}"
+   50 z$="                                      "
+   55 pokev+21,0:print"{clr}{red}{rvon}  "z$"  "z$"  "z$"{blk}  "z$;
+   60 fori=0to19:print" "spc(38)" ";:next
+   65 print" "z$"{home}{down}{down}{down}{down}":poke56295,0:poke2023,160
+   70 printspc(14)"{CBM-R}{CBM-S}.{CBM-S}{CBM-S}    {CBM-S}";
+   75 printspc(30)"{CBM-Q}{CBM-W}{CBM-S}{SHIFT--}{SHIFT--}{CBM-A}{CBM-S}{CBM-R}{CBM-A}{CBM-W}";
+   80 printspc(30)"{CBM-E}{CBM-X}{CBM-Z}{CBM-Z}{CBM-Z}{CBM-Z}{CBM-E}{CBM-Z}{CBM-Z}{CBM-E}";
+   85 printspc(30)"{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}"
+   90 printtab(3)"{down}taste'1' : bandenbill. (1 spieler)"
+   95 printtab(3)"{down}taste'2' : bandenbill. (2 spieler)"
+  100 printtab(3)"{down}taste'3' : lochbill.{lred}QQ{blk} (1 spieler)"
+  105 printtab(3)"{down}taste'4' : lochbill.{lred}Q{grn}Q{blk} (2 spieler)"
+  110 printtab(3)"{down}taste'5' : lochbill.{lred}W{grn}W{blk} (1 spieler)"
+  115 printtab(3)"{down}taste'6' : lochbill.{lred}W{grn}W{blk} (2 spieler)"
+  120 print"{down}{down}{rght}{rght}{rvon}schlagwiederh.'w'   spielwahl 'home'{home}";
+  125 geta$:ifa$<"1"ora$>"6"then125
+  130 print"{down}{down}{down}{down}{down}":fori=0to15:print"{rght}"z$"{rght}";:next
+  135 onval(a$)goto365,310,285,235,200
+  139 rem * spiel 6 *
+  140 gosub425:gosub445
+  145 print"{rvon}{red}    "spc(11)"{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}"spc(11)"    {up}";:e(0)=255:e(1)=255:gosub470
+  150 gosub485
+  155 gosub560:gosub620:r=peek(lr):ifr<3then150
+  160 f=1:forj=2to6:ifpeek(l+j)and168thensysvl,j:f=0
+  165 j=j+1:ifpeek(l+j)and84thensysvl,j:f=0
+  170 next:e=peek(v+21):ife(i)=255thenife<252thenj=-((eand84)=84):gosub500
+  175 if(eande(i))=0then195
+  180 if(eande(1-i))=0theni=1-i:goto195
+  185 ifnoteand2orf=0or(rande(1-i))then150
+  190 goto155
+  195 gosub525:onfgoto145,55
+  199 rem * spiel 5 *
+  200 gosub425:z=0:b=999:print"{lred}spiel{red}"spc(9)x1$spc(28)x2$
+  205 gosub460
+  210 gosub560:s=s+1:printspc(5)"{red}{rvon}   {rvof}{blk}{left}{left}{left}"s"{up}":gosub620:ifpeek(lr)<3then210
+  215 forj=2to6:ifpeek(l+j)and168thensysvl,j
+  220 j=j+1:ifpeek(l+j)and84thensysvl,j
+  225 next:ifpeek(v+21)>3then210
+  230 gosub510:onfgoto205,55
+  234 rem * spiel 4 *
+  235 gosub415:pokev+42,5:pokev+44,5:pokev+46,5:gosub445
+  240 print"{rvon}{red}    "spc(11)"{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}"spc(11)"    {up}";:e(0)=0:e(1)=0:gosub470
+  245 gosub485
+  250 gosub560:gosub620:r=peek(lr):ifr<3then245
+  255 ife(i)=0thengosub495
+  260 e=peek(v+21):if(eande(i))=0then280
+  265 if(eande(1-i))=0theni=1-i:goto280
+  270 ifnoteand2or(rande(1-i))then245
+  275 goto250
+  280 gosub525:onfgoto240,55
+  284 rem * spiel 3 *
+  285 gosub415:pokev+42,10:pokev+44,10:pokev+46,10
+  290 z=0:b=999:print"{lred}spiel{red}"spc(9)x1$spc(28)x2$
+  295 gosub460
+  300 gosub560:s=s+1:printspc(5)"{red}{rvon}   {rvof}{blk}{left}{left}{left}"s"{up}":gosub620
+  302 ifpeek(lr)=0orpeek(v+21)>3then300
+  305 gosub510:onfgoto295,55
+  309 rem * spiel 2 *
+  310 pokev+41,12:pokev+42,10:print"{rght}{down}{down}{rvon}"z$"{home}";:gosub450
+  315 print"{lred}{rvon}sp.   {red}         {CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}         {lred}sp.   {up}";:l$="{rvon}"+z$
+  320 printtab(11)"{red}{rvon}  "tab(27)"  {up}"
+  325 sysin,3:g=0:s(0)=0:s(1)=0:pokev+21,0:pokev+16,0
+  330 sysal,1,23,219:sysal,2,36,215:sysal,3,26,206
+  335 syszs,14,80+rnd(ti)*15,23+rnd(1)*9
+  340 gosub485
+  345 sk=i+1:gosub565:gosub620:ifpeek(sr)<9then340
+  350 s(i)=s(i)+1:print"{rvof}{blk}"tab(11)mid$(str$(s(0)),2)tab(27)mid$(str$(s(1)),2)"{up}"
+  355 poket+18,16:poket+18,17:ifs(i)<ebthen345
+  360 z(i)=z(i)+1:print"{lred}{rvon}"tab(3)z(0)tab(37)z(1):gosub530:onfgoto320,55
+  364 rem * spiel 1 *
+  365 pokev+41,12:pokev+42,10:print"{rght}{down}{down}{rvon}"z$"{home}";
+  370 z=0:b=999:print"{lred}spiel{red}"spc(9)x1$spc(28)x2$:l$="{rvon}"+z$
+  375 print"{blk}pkt.{red}{rvon}   "spc(8)"{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}      {blk}{rvof}best.{home}";
+  380 p=0:s=0:z=z+1:print"{rvon}{lred}"spc(5)z"{down}"
+  385 sysin,3:sk=1:g=0:pokev+21,0:pokev+16,0
+  390 sysal,1,171,190:sysal,2,260,147:sysal,3,88,147
+  395 gosub565:s=s+1:printtab(27)"{blk}"mid$(str$(s),2)"{home}{down}":gosub620
+  400 ifpeek(sr)<12then395
+  405 p=p+1:poket+18,16:printspc(4)p;:poket+18,17:ifp<ebthen395
+  410 gosub510:onfgoto375,55
+  414 rem feld fuer sp. 3 und 4
+  415 print"{rvon}{CBM-D}"spc(38)"{CBM-F}{rvof}{CBM-K}"spc(38)"{rvon}{CBM-K}"y$"{home}";:poke2023,254
+  420 print"{down}{down}{down}{CBM-D}{CBM-I}{CBM-F}"spc(15)"{CBM-D}{CBM-I}{CBM-I}{CBM-F}"spc(15)"{CBM-D}{CBM-I}{CBM-F}{rvof}{CBM-K}"spc(38);:goto440
+  424 rem feld fuer sp. 5 und 6
+  425 pokev+42,5:pokev+44,5:pokev+46,5
+  430 print"{rvon}{CBM-D}"spc(38)"{CBM-F}{rvof}{CBM-K}{grn}W"spc(17)"{lred}UI"spc(17)"{grn}W{blk}{rvon}{CBM-K}"y$"{home}";:poke2023,254
+  435 print"{down}{down}{down}{CBM-D}{CBM-I}{CBM-F}"spc(15)"{CBM-D}{CBM-I}{CBM-I}{CBM-F}"spc(15)"{CBM-D}{CBM-I}{CBM-F}{rvof}{CBM-K}{lred}W"spc(17)"{grn}JK"spc(17)"{lred}W{blk}";
+  440 pokev+41,10:print"{rvon}{CBM-K}{CBM-C}"spc(38)"{CBM-V}{home}";:l$=y$:return
+  444 rem vorbereitung fuer sp. 2,4 und 6
+  445 k$(0)="rot":k$(1)="grn":k(0)=84:k(1)=168
+  450 p(0)=1033:p(1)=1054:z(0)=0:z(1)=0:i=1
+  455 print"{rvon}{gry3}spieler 1 {red}    "x1$"    {gry3} spieler 2"spc(14)x2$:return
+  459 rem vorbereitung fuer sp. 3 und 5
+  460 print"{blk}stoss{rvon}{red}   "spc(7)"{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}"spc(5)"{blk}{rvof}best.:{home}";
+  465 s=0:z=z+1:print"{lred}{rvon}"spc(5)z"{down}"
+  469 rem kugel-grundpos. fuer lochbill.
+  470 sysin,135:sk=1:g=0:pokev+21,0:pokev+16,0
+  475 sysal,1,260,147:sysal,2,111,147:sysal,3,100,140:sysal,4,89,133
+  480 sysal,5,100,154:sysal,6,89,161:sysal,7,89,147:return
+  484 rem spielerwechsel
+  485 poket+15,222:poket+19,3:poket+18,32:pokep(i),160
+  490 i=1-i:pokep(i),209:poket+18,33:return
+  494 rem zuordnung kugelfarbe zu spieler
+  495 j=1:ifrand84thenj=0
+  500 f$(i)=k$(j):f$(1-i)=k$(1-j):e(i)=k(j):e(1-i)=k(1-j)
+  505 print"{blk}{rvof}"f$(0)spc(34)f$(1)"{up}";:return
+  509 rem spielende fuer sp. 1, 3 und 5
+  510 poket+19,5:forj=9to30:poket+15,j^1^1:poket+18,32:poket+18,33:next
+  515 ifs<bthenb=s
+  520 printtab(36)"{red}{rvon}   {rvof}{blk}{left}{left}{left}"b:goto540
+  524 rem spielende fuer sp. 2, 4 und 6
+  525 z(i)=z(i)+1:printspc(12)"{blk}{rvof}"mid$(str$(z(0)),2)tab(27)mid$(str$(z(1)),2)
+  530 pokep(1-i),160:poket+19,5:forj=9to30:f=81-(f=81)*128:pokep(i),f
+  535 poket+15,j^1^1:poket+18,32:poket+18,33:next
+  540 poke214,25:print"{up}{rght}{rght}{rght}{rvon}{blk}spielwahl:'home'     weiter:'fire'{up}"
+  545 ifnotpeek(jj)and16thenprintl$"{home}{down}":f=1:return
+  550 geta$:ifa$<>"{home}"then545
+  555 f=2:return
+  559 rem stosskugel auf grundposition
+  560 if(peek(v+21)and2)=0thensysal,1,260,147
+  565 sysks,sk
+  570 if(peek(jj)and31)<31then595
+  575 geta$:ifa$="{home}"then10
+  580 ifa$<>"w"org=0then570
+  584 rem schlagwiederholung
+  585 pokev+32,8:syssw:gosub600:sysgs,g
+  590 forj=0to2000:next:gosub625:sysv2:pokev+32,2:goto570
+  594 rem joystick und geschw.-eingabe
+  595 sysjs
+  600 g=1:forf=1079to1088:forj=0to3:ifpeek(jj)and16thenreturn
+  605 pokef,g(j):g=g+2^1:next:next:forj=0to100:ifpeek(jj)and16thenreturn
+  610 next:gosub625:goto600
+  620 sysn1,g:rem stoss und kugelbewegung
+  624 rem geschw.-skala loeschen
+  625 forj=1088to1079step-1:pokej,160:next:return
+  630 rem
+  631 rem * die variable 'eb' in zeile 15         * legt das spiel-ende
+  632 rem * fuer bandenbillard fest.
+  635 rem
+  636 rem-zeilen brauchen nicht mit in's      programm uebernommen zu werden !
+
