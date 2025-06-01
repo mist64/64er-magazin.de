@@ -420,10 +420,10 @@ def parse(
                 if skip:
                     p += 1
                 if token in ["TO", "THEN"]:
-                    if line[-1] != " ":
+                    if line[-1] != 0x20:
                         line += " "
                 elif len(token) > 1 and token[:5] not in ["INPUT", "PRINT"]:
-                    if read8(p + 1) != " ":
+                    if read8(p + 1) != 0x20:
                         token += " "
                 line += token
 
