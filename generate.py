@@ -25,6 +25,7 @@ from urllib.parse import quote
 from datetime import datetime, timedelta, timezone
 from dateutil.relativedelta import relativedelta
 from PyPDF2 import PdfReader, PdfWriter
+from os import utime
 
 #
 # Parse arguments
@@ -1359,7 +1360,6 @@ def write_full_html_file(db, path, title, preview_img, body_html, body_class, co
     with open(path, 'w', encoding='utf-8') as f:
         f.write(full_html)
 
-
 def generate_all_issues_with_tocs_html(db, out_directory):
     body_html = html_generate_tocs_all_issues(db)
     write_full_html_file(db, os.path.join(out_directory, f'{FILENAME_ISSUES}.html'), f'{LABEL_ALL_ISSUES} | {MAGAZINE_NAME}', None, body_html, 'all_issues')
@@ -1822,6 +1822,15 @@ def copy_articles_and_assets(db, in_directory, out_directory):
             html_dest_path = os.path.join(issue_dest_path, article.target_filename)
             copy_and_modify_html(article, html_dest_path, pdf_path, prev_page_link, next_page_link)
             article_index += 1
+
+        # Set timestamps for all files in the issue directory
+        past_pubdate = issue.pubdate - relativedelta(years=40)
+        issue_timestamp = past_pubdate.timestamp()
+        for root, dirs, files in os.walk(issue_dest_path):
+            for file in files:
+                file_path = os.path.join(root, file)
+                utime(file_path, (issue_timestamp, issue_timestamp))
+
 
 def html_to_text_preserve_paragraphs(soup):
     block_tags = ['p', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'div', 'li', 'tr', 'td']
