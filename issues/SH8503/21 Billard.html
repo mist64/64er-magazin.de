@@ -117,12 +117,12 @@ VY2 = vyn1 + vyt2 }
         <ol>
             <li>Mit dem MSE (siehe Seite 8) den Maschinenteil ab $C000 eingeben und unter »BILL(MP)« abspeichern.</li>
             <li>Mit dem Checksummer (Seite 6) das Basic-Programm eingeben und unter »BILL(BASIC)« abspeichern.</li>
-            <li>Beide Programmteile binden:<br />
-                a) »BILL(MP)« absolut laden (»LOAD"BILL(MP)&ldquo;,8,1« oder »&hellip;,1,1«)<br />
-                b) Basic-Anfang auf 4973 setzen mit Eingabe im Direktmodus »POKE 43,109: POKE 44,19: POKE 4972,0: NEW«<br />
-                c) Maschinen-Programm im Direktmodus übertragen »FOR 1=49152 TO 52076: POKE 1-47104, PEEK(I): NEXT«<br />
-                d) Basic-Programm laden mit»LOAD "BILL(BASIC)&rdquo;,8« (beziehungsweise »&hellip;,1« für Datasette)<br />
-                e) Basic-Anfang zurückstellen und Gesamtprogramm speichern mit »POKE 43,1: POKE 44,8: SAVE &ldquo;BILLARD&rdquo;,8« (beziehungsweise »&hellip;,1«)</li>
+            <li>Beide Programmteile binden:<br>
+                a) »BILL(MP)« absolut laden (»LOAD"BILL(MP)",8,1« oder »&hellip;,1,1«)<br>
+                b) Basic-Anfang auf 4973 setzen mit Eingabe im Direktmodus »POKE 43,109: POKE 44,19: POKE 4972,0: NEW«<br>
+                c) Maschinen-Programm im Direktmodus übertragen »FOR 1=49152 TO 52076: POKE 1-47104, PEEK(I): NEXT«<br>
+                d) Basic-Programm laden mit»LOAD "BILL(BASIC)",8« (beziehungsweise »&hellip;,1« für Datasette)<br>
+                e) Basic-Anfang zurückstellen und Gesamtprogramm speichern mit »POKE 43,1: POKE 44,8: SAVE "BILLARD",8« (beziehungsweise »&hellip;,1«)</li>
         </ol>
 
 
@@ -150,20 +150,20 @@ VY2 = vyn1 + vyt2 }
 
         <h3>1. Veränderbare Programmparameter</h3>
 
-        <p>Der Bewegungsablauf kann durch drei Parameter beeinflußt werden.<br />
-            a) Byte 3687: Dämpfung (hier = 10)<br>Ein größerer Wert bedeutet hier schwächere Dämpfung; die Kugeln rollen dann bei gleicher Schlagstärke weiter. Ein kleinerer Wert bewirkt stärkere Dämpfung.<br />
-            b) Byte 4200: Ende der Kugelbewegung (hier = 2) Wie schon oben bei der Stoßauswertung beschrieben, istessinnvoll, die Kugelbewegung abzubrechen, bevor die Geschwindigkeit auf 0 abgesunken ist. Ein zu kleiner Wert an dieser Stelle hat vor allem bei schwacher Dämpfung ein Abknicken der Bewegungsrichtung kurz vor Stillstand zur Folge.<br />
+        <p>Der Bewegungsablauf kann durch drei Parameter beeinflußt werden.<br>
+            a) Byte 3687: Dämpfung (hier = 10)<br>Ein größerer Wert bedeutet hier schwächere Dämpfung; die Kugeln rollen dann bei gleicher Schlagstärke weiter. Ein kleinerer Wert bewirkt stärkere Dämpfung.<br>
+            b) Byte 4200: Ende der Kugelbewegung (hier = 2) Wie schon oben bei der Stoßauswertung beschrieben, istessinnvoll, die Kugelbewegung abzubrechen, bevor die Geschwindigkeit auf 0 abgesunken ist. Ein zu kleiner Wert an dieser Stelle hat vor allem bei schwacher Dämpfung ein Abknicken der Bewegungsrichtung kurz vor Stillstand zur Folge.<br>
             c) Byte 4248: Verzögerung des Bewegungsablaufes (hier = 10)<br>Eine automatische Geschwindigkeitsanpassung abhängig von der Anzahl der rollenden Kugeln ist an anderer Stelle eingebaut; sie sorgt für gleichmäßige Bewegung, gleichgültig, ob sich gerade nur eine oder sieben Kugeln bewegen.<br>An dieser Stelle bewirkt ein größerer Wert zusätzliche Verzögerung. Sie können sich beispielsweise mit »255« einen Stoß in Zeitlupe ansehen. Während mit der Dämpfung die zurückzulegende Strecke bestimmt wird, läßt sich hier die Geschwindigkeit der Bewegung festlegen.<br>Experimentieren Sie ruhig etwas mit diesen Parametern. Nach einem entsprechenden POKE sehen Sie die Wirkung gleich beim nächsten Stoß.<br>Wenn Sie nach Änderungen hier das Programm wieder neu abspeichern, werden die neuen Werte mitgespeichert. Sie können selbstverständlich aber auch während des Programmlaufes die Parameter mehrfach ändern.</p>
 
         <h3>2. Parameter für Feld- und Lochgrößen</h3>
 
-        <p>Sie sind in Bild 3 mit den hier verwendeten Bezeichnungen dargestellt.<br />
-            a) Byte 3204: Linker Feldrand (hier = 20)<br />
-            b) Byte 3205: Rechter Feldrand (hier = 56)<br />
-            c) Byte 3206: Oberer Feldrand (hier = 73)<br />
-            d) Byte 3207: Unterer Feldrand (hier = 73)<br />
-            e) Byte 3208: (hier = 3) Dieser Wert legt fest, um wieviel Grafikpunkte sich der Cursor (zur Einstellung der Stoßrichtung) über den Feldrand hinaus bewegen lassen soll.<br>Dieser Cursor — hier ein Zielkreuz (Sprite 0) — ist übrigens in Sprite-Block 39 definiert und kann durch Eingabe entsprechender Daten in 2496 bis 2559 geändert werden.<br />
-            f) Byte 3209: Größe der Ecklöcher (hier = 6)<br />
+        <p>Sie sind in Bild 3 mit den hier verwendeten Bezeichnungen dargestellt.<br>
+            a) Byte 3204: Linker Feldrand (hier = 20)<br>
+            b) Byte 3205: Rechter Feldrand (hier = 56)<br>
+            c) Byte 3206: Oberer Feldrand (hier = 73)<br>
+            d) Byte 3207: Unterer Feldrand (hier = 73)<br>
+            e) Byte 3208: (hier = 3) Dieser Wert legt fest, um wieviel Grafikpunkte sich der Cursor (zur Einstellung der Stoßrichtung) über den Feldrand hinaus bewegen lassen soll.<br>Dieser Cursor — hier ein Zielkreuz (Sprite 0) — ist übrigens in Sprite-Block 39 definiert und kann durch Eingabe entsprechender Daten in 2496 bis 2559 geändert werden.<br>
+            f) Byte 3209: Größe der Ecklöcher (hier = 6)<br>
             g) Byte 3210: Größe der mittleren Löcher (hier = 10)<br>Es gilt hier die Einschränkung, daß der rechte Feldrand sowie die rechten Ecklöcher im Bildschirmbereich des V+16-Registers (53264) liegen müssen, während die anderen Werte nicht in diesem Bereich liegen dürfen (für den rechten Feldrand ist unter b natürlich das Low-Byte einzugeben).<br>Als kleine Hilfe: Die Kugeln bleiben voll sichtbar im Bereich X zwischen 12 und 64, Y zwischen 41 und 229.<br>Auch diese Parameter stehen im Programm und werden bei erneutem Abspeichern mit übernommen. Allerdings sehen Sie Änderungen hier nicht gleich beim Programmlauf, da diese Werte erst beim Programmstart abgerufen werden. Ein Unterprogramm errechnet daraus die im Programm benötigten Daten und schreibt sie an die richtige Stelle. Wollen Sie diese Parameter während des Programmes ändern, rufen Sie nach den entsprechenden POKEs das Maschinen-Programm »SE« (siehe später) auf.</p>
 
         <figure>
@@ -171,18 +171,18 @@ VY2 = vyn1 + vyt2 }
             <figcaption>Bild 3. Parameter für Feldgröße und Lochgrößen</figcaption>
         </figure>
 
-        <p>Wenn Sie das geänderte Programm abspeichern, vergessen Sie nicht, vorher den Basic-Anfang zurückzustellen mit:<br />
-            »POKE 43,1: POKE 44,8«! Andernfallswird möglicherweise nur das Basic-Programm gespeichert.<br />
-            Wie das Zielkreuz (Sprite 0, Block 39) stehen auch die Sprite-Daten der Kugeln im Maschinenprogramm in den Sprite-Blöcken 40 bis 47, zwischen denen zur Simulation einer Rollbewegung hin und her geschaltet wird.<br />
-            Jeder Kugel ist entsprechend ihrer Sprite-Nummer eine Zahl zwischen 1 und 7 zugeordnet. Ebensosind die Löcher, wie in Bild 3 gezeigt, durchnummeriert von 2 bis 7.<br />
+        <p>Wenn Sie das geänderte Programm abspeichern, vergessen Sie nicht, vorher den Basic-Anfang zurückzustellen mit:<br>
+            »POKE 43,1: POKE 44,8«! Andernfallswird möglicherweise nur das Basic-Programm gespeichert.<br>
+            Wie das Zielkreuz (Sprite 0, Block 39) stehen auch die Sprite-Daten der Kugeln im Maschinenprogramm in den Sprite-Blöcken 40 bis 47, zwischen denen zur Simulation einer Rollbewegung hin und her geschaltet wird.<br>
+            Jeder Kugel ist entsprechend ihrer Sprite-Nummer eine Zahl zwischen 1 und 7 zugeordnet. Ebensosind die Löcher, wie in Bild 3 gezeigt, durchnummeriert von 2 bis 7.<br>
             Nach jedem Stoß stehen Ihnen folgende Informationen zur Auswertung zur Verfügung:</p>
 
-        <p>a) Stoßregister $FD (= Basicvariable SR = 253):<br>Hier sind die Kugeln angegeben, die mindestens einmal mit der Stoßkugel kollidiert sind, und zwar im Format »2 hoch Kugelnummer 1 bis 7«. Dieses Format entspricht dem, das Ihnen beispielsweise vom Sprite-Sprite Berührungsregister her bekannt ist.<br />
-            b) Lochregister $FE (= Basicvariable LR = 254):<br>Hier finden Sie im gleichen Format wie beim Stoßregister die Kugeln, die in ein Loch gefallen sind.<br />
+        <p>a) Stoßregister $FD (= Basicvariable SR = 253):<br>Hier sind die Kugeln angegeben, die mindestens einmal mit der Stoßkugel kollidiert sind, und zwar im Format »2 hoch Kugelnummer 1 bis 7«. Dieses Format entspricht dem, das Ihnen beispielsweise vom Sprite-Sprite Berührungsregister her bekannt ist.<br>
+            b) Lochregister $FE (= Basicvariable LR = 254):<br>Hier finden Sie im gleichen Format wie beim Stoßregister die Kugeln, die in ein Loch gefallen sind.<br>
             c) Zur weiteren Auswertung ist fürjede Kugel ein zusätzliches Lochregister vorhanden: 52123 + Kugelnummer 1 bis 7.<br>Dieses enthält »2 hoch Lochnummer« des Loches, in das die entsprechende Kugel gefallen ist. Liegt sie noch auf dem Feld, steht hier 0.<br>Alle Register a) bis c) werden vor jedem Stoß automatisch auf 0 zurückgesetzt.<br>Zum besseren Verständnis folgen einige Beispiele:</p>
 
-        <p>Zu a): IF PEEK(SR) = 12 THEN »Stoßkugel kollidierte mit den Kugeln 2 und 3« (22 + 23 = 12)<br />
-            Zu b): IF PEEK(LR) AND 8 THEN »Kugel 3 gefallen«<br>IF PEEK(LR) AND 84 THEN »Kugel mit gerader Nummer, also Kugel 2, 4 oder 6 gefallen«<br />
+        <p>Zu a): IF PEEK(SR) = 12 THEN »Stoßkugel kollidierte mit den Kugeln 2 und 3« (22 + 23 = 12)<br>
+            Zu b): IF PEEK(LR) AND 8 THEN »Kugel 3 gefallen«<br>IF PEEK(LR) AND 84 THEN »Kugel mit gerader Nummer, also Kugel 2, 4 oder 6 gefallen«<br>
             Zu c): IF PEEK(52123+K) = 64 THEN »Kugel K in Loch 6«<br>IF PEEK(52123+K) AND 28 THEN »Kugel K in einem der oberen Löcher, also Loch 2, 3 oder 4«</p>
 
         <h2>Die Maschinensprache-Routinen</h2>
@@ -221,18 +221,18 @@ VY2 = vyn1 + vyt2 }
 
         <address class="author">(Bernhard Tertelmann/ev)</address>
 
-        <p>TODO ASIDE</p>
-
-        <p><strong>Die wichtigsten Programmdaten:</strong><br />
-            Adresse des Maschinen-Programms: 2048 bis 4972<br />
-            Multiplikationstabelle und verschiedene Arbeitsspeicher: 49152 bis 52245<br />
-            Adressen der Routinen: SE = 2158, IN = 3211, AL = 2372, VL = 2327, KS = 2444, SW = 3255, JS = 3294, N1 = 3566, GS = 3588, V2 = 3232, ZS = 4828<br />
-            Benutzte Zeropage-Adresse: $FB bis $FE und $57 bis $64 Außerdem werden einige Betriebssystem-Routinen aufgerufen wie beispielsweise »FAC = KONST * FAC«<br />
-            Adresse des Basic-Programms: ab 4973</p>
+        <aside>
+            <strong>Die wichtigsten Programmdaten:</strong><br>
+            Adresse des Maschinen-Programms: 2048 bis 4972<br>
+            Multiplikationstabelle und verschiedene Arbeitsspeicher: 49152 bis 52245<br>
+            Adressen der Routinen: SE = 2158, IN = 3211, AL = 2372, VL = 2327, KS = 2444, SW = 3255, JS = 3294, N1 = 3566, GS = 3588, V2 = 3232, ZS = 4828<br>
+            Benutzte Zeropage-Adresse: $FB bis $FE und $57 bis $64 Außerdem werden einige Betriebssystem-Routinen aufgerufen wie beispielsweise »FAC = KONST * FAC«<br>
+            Adresse des Basic-Programms: ab 4973
+        </aside>
     </article>
 
     <figure>
-        <pre data-filename="billard" data-name="Billard"></pre>
+        <pre data-filename="billard" data-name="Billard" data-checksummer="3"></pre>
         <figcaption>Listing 1. Das Basic-Listing zu »Billard«</figcaption>
     </figure>
     <figure>
