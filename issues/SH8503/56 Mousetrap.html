@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>Mousetrap</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="Jirco Kos ,  ev">
+    <meta name="64er.issue" content="Sonderheft 3/85">
+    <meta name="64er.pages" content="56-61">
+    <!-- <meta name="64er.toc_category" content="XXX"> -->
+    <!-- <meta name="64er.toc_title" content="XXX"> -->
+    <meta name="64er.id" content="XXX">
+</head>
+
+<body>
+    <article>
+        <h1>Mousetrap</h1>
+<blockquote><p>Eine Mausefalle für Spielernaturen: Labyrinthspiel mit Generator.</p></blockquote>
+
+<p>Grki führte ein ganz normales Feldmausleben, bis sie eines düsteren Tages von einem Institut für Verhaltensforschung im Rahmen eines Beobachtungsprogramms gefangen und in ein Labyrinth eingesperrt wurde zwecks Verhaltensstudiums. Da Grki natürlich auch hier des öfteren einem nagenden Hungergefühl verfällt, muß sie irgendwie für ihre Nahrung sorgen. Glücklicherweise sind im ganzen Labyrinth Käsestückchen verteilt, welche Grki fressen kann, um zu überleben. Die Sache wäre zu wundervoll, wenn sie nicht ein paar Haken hätte!</p>
+
+<p>Haken Nummer 1: Grki kann nicht ewig im Labyrinth auf der Suche nach Käse umherirren, sondern muß ihren Hunger in einer bestimmten Zeit gestillt haben.</p>
+
+<p>Haken Nummer 2 besteht aus Katzen, die — zwar festgebunden — nur darauf warten, daß Grki in sie hineinrennt.</p>
+
+<p>Und schließlich gibt es da noch weitere gefräßige Tierchen, die speziell für Mäuse einen Heißhunger entwickeln können.</p>
+
+<p>Zum Glück kommt Grki ihr ausgezeichneter Geruchssinn zu Hilfe. Mit diesem nämlich kann sie Käse und Verfolger im ganzen Labyrinth lokalisieren, auch außerhalb ihres Blickfeldes, das nur einen kleinen Teil des Labyrinths umfaßt. Zusätzlich hat Grki im Laufe ihrer Gefangenschaft einen speziellen »Mäuseschrei« entwickelt, der selbst die Verfolger so erschreckt, daß sie langsamer werden und manchmal für ein paar Sekunden erstarren.</p>
+
+<p>Gesteuert wird das Ganze mit einem Joystick (oder auf der Tastatur mit I, J, M, L). Ein Druck auf den Feuerknopf (shift) läßt den lautsprecherruinierenden Mäuseschrei erklingen. Der Geruchssinn wird in Form eines kleinen Radarfeldes dargestellt (man kann darauf die Käsestückchen und die blinkenden Verfolger erkennen).</p>
+
+<p>Anläßlich des 300. Geburtstages des berühmten Komponisten wird das Spiel von der Badinerie der h-moll Suite von J.S. Bach begleitet.</p>
+
+<p>Das Spiel wird von einem kleinen Menü aus angesprochen, in welchem man das Tempo von Grki und jenes der Verfolger wählen kann. Es ist somit möglich, ein beliebiges Geschwindigkeitsverhältnis einzugeben. Außerdem kommt man durch Druck auf F5 in das Untermenü »Maze Construction«.</p>
+
+<p>Da es sich bei dem Spiel um ein reines Maschinencodeprogramm handelt, muß es mit der Hex-Eingaberoutine (Listing 1) eingegeben werden. Diese ist so konzipiert, daß man bisher eingegebene Bytes zwischenspeichern kann, um zum Beispiel erst am nächsten Tag fortzufahren.</p>
+
+<p>Achtung! Vor Eingabe oder Laden der Eingaberoutine müssen sie unbedingt stets zuerst »POKE44,53:POKE53 * 256,0:NEW« eingeben, da in den darunterliegenden Bereich der Maschinencode gepoked wird. Nach Starten mit» RUN « fragt das Programm zunächst, ob ein bereits abgespeicherter Teil des Maschinenprogramms (Listing 2) geladen werden soll. Falls Sie bereits einen Teil abgespeichert haben, sollten Sie diesen jetzt laden lassen. Während des Ladevorgangs erhalten Sie eine Meldung über Anfang und Ende des gespeicherten Programmteils.</p>
+
+<p>Anschließend erscheint die Frage, ab welcher Adresse Sie neue Daten eingeben wollen. Falls Sie vorher einen Programmteil geladen hatten, sollten Sie jetzt die von der Laderoutine ausgegebene »bis«-Adresse angeben. Haben Sie ichts geladen (also beim ersten Start der Eingaberoutine), dann sollten Sie jetzt »1200« eingeben, also die Anfangsadresse des Maschinenprogramms (siehe Listing 2).</p>
+
+<p>Sie können jetzt die Daten aus Listing 2 eingeben. Der Aufbau einer Zeile in Listing 2 ist folgender: Zunächst kommt die Adresse (wie alle Eingaben hexadezimal!), gefolgt von einem Doppelpunkt Die Adresse wird während der Eingabe vorgegeben, braucht also nicht eingetippt zu werden (den Doppelpunkt bitte auch nicht eingeben).</p>
+
+<p>Anschließend folgen acht Datenbytes, im Listing durch einen Zwischenraum getrennt, der aber von der Eingaberoutine ebenfalls vorgegeben wird. Das letzte Datenbyte in jeder Zeile (das neunte) stellt eine Prüfsumme dar. Geben Sie dieses Byte ebenfalls ein. Die Eingaberoutine stellt fest, ob die Prüfsumme stimmt. Falls die Zeile einen Fehler enthält, erfolgt eine entsprechende Meldung, und die fragliche Zeile muß neu eingegeben werden. Wollen Sie die Eingabe unterbrechen, dann drücken Sie einfach die RETURN-Taste. Dies bewirkt einen Sprung in die SAVE-Routine. Sie müssen einen Filenamen angeben und den Speicherbereich (hexadezimal!), der auf Kassette oder Diskette gespeichert werden soll. Die Anfangsadresse (»von«) sollte dabei immer 1200 sein, die Endadresse (»bis«) ist die Adresse des zuletzt eingegebenen Datenbytes. Nach dem Abspeichern ist ein VERIFY möglich, was bei Verwendung einer Datasette unbedingt zu empfehlen ist.</p>
+
+<p>Haben Sie auf diese Art und Weise schließlich in mehreren Etappen das gesamte Programm im Speicher, dann sollten Sie es sicherheitshalber zunächst nochmals, wie oben beschrieben, abspeichern. Dann unterbrechen Sie das Eingabe-Programm und geben im Direktmodus folgende Zeile ein:</p>
+
+<p>POKE 43,1: POKE 44,18: POKE 45,0: POKE 46,53:CLR<br/>
+Nach »LIST« sollte jetzt die Basic-Zeile</p>
+
+<p>0 SYS 13457<br/>
+erscheinen. Ist dies nicht der Fall, haben Sie irgend etwas falsch gemacht. Lesen Sie sich die Anleitung bitte nochmals aufmerksam durch.</p>
+
+<p>Erscheint aber die SYS-Zeileaufdem Bildschirm, dann können Sie aufatmen. Bevor Sie aber irgend etwas anderes unternehmen, sollten Sie das jetzt erst einmal wie ein normales Basic-Programm mit SAVE abspeichern. Danach dürfen Sie mit »RUN« auf Käsesuche gehen&hellip;</p>
+
+<address class="author">(Jirco Kos / ev)</address>
+    </article>
+</body>
+</html>
