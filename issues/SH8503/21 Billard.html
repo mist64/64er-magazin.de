@@ -36,7 +36,7 @@
 
         <p>Für grafische Betrachtungen dürfen wir in diesem Zusammenhang Vektoren beliebig verschieben, nicht aber drehen.</p>
 
-        <p>Wie in Bild 1 b) gezeigt, kann eineGeschwindigkeitVin ihre Komponenten in x-Richtung (VX) und in y-Richtung (VY) zerlegt werden und ist durch diese auch eindeutig bestimmt.</p>
+        <p>Wie in Bild 1 b) gezeigt, kann eine Geschwindigkeit V in ihre Komponenten in x-Richtung (VX) und in y-Richtung (VY) zerlegt werden und ist durch diese auch eindeutig bestimmt.</p>
 
         <p>Bild 1 c) verdeutlicht, wie sich aus den Komponenten VX und VY wieder die Geschwindigkeit V konstruieren läßt. Dazu braucht lediglich VY bis zur Spitze von VX verschoben zu werden, und die Verbindung des Fußpunktes von VX mit der Spitze des verschobenen VY (VY’) stellt V dar. Ein solches Aufspalten und Zusammenfügen von Vektorkomponenten bezüglich zweier Richtungen ist immer möglich, wenn die Richtungen aufeinander senkrecht stehen. Bei der Stoßbetrachtung werden uns später zwei andere Richtungen interessieren, wo die Zerlegung dann nach dem gleichen, hier in Bild 1 beschriebenen Prinzip, durchgeführt wird.</p>
 
@@ -57,10 +57,11 @@
 
         <p>Für das Programm sind aber mathematische Gleichungen erforderlich. Dazu müssen die Tangential- und Normal-Geschwindigkeiten jede für sich noch einmal in einen x-Anteil (VXT, VXN) und einen y-Anteil (VYT, VYN) zerlegt werden:</p>
 
-        <pre><code>VXT = (VX \* SIN(W) - VY \* COS(W)) \* SIN(W)
-VXN = (VY \* SIN(W) + VX \* COS(W)) \* COS(W)
-VYT = -(VX \* SIN(W) - VY \* COS(W)) \* COS(W)
-VYN = (VY \* SIN(W) + VX + COS(W)) \* SIN(W)
+        <pre><code>
+VXT = (VX * SIN(W) - VY * COS(W)) * SIN(W)
+VXN = (VY * SIN(W) + VX * COS(W)) * COS(W)
+VYT =-(VX * SIN(W) - VY * COS(W)) * COS(W)
+VYN = (VY * SIN(W) + VX + COS(W)) * SIN(W)
 </code></pre>
 
         <p>Der Winkel W ist der Winkel zwischen Normalenrichtung und der Horizontalen (siehe Bild 2); er läßt sich aus den Koordinatendifferenzen der Kugelpositionen bestimmen.</p>
@@ -88,7 +89,7 @@ VY2 = vyn1 + vyt2 }
 
         <p>COS(W) = SIN(W+90 Grad). Ich unterteile also den Viertelkreis in 23 Winkelteile und lege die zugehörigen SIN-Werte im Fließkommaformat in einer Tabelle ab.</p>
 
-        <p>Nun stört nur noch die Multiplikation. Da wie oben beschrieben nur Faktoren von 0 bis 127 vorkommen, ist auch hier eine Tabelle noch vertretbar. So werden nach Start des Programmes zujedem SIN-Wert 128 Ein-Byte-Zahlen in eine Multiplikationstabelle geschrieben: (Byte 0 bis 127) * SIN.</p>
+        <p>Nun stört nur noch die Multiplikation. Da wie oben beschrieben nur Faktoren von 0 bis 127 vorkommen, ist auch hier eine Tabelle noch vertretbar. So werden nach Start des Programmes zu jedem SIN-Wert 128 Ein-Byte-Zahlen in eine Multiplikationstabelle geschrieben: (Byte 0 bis 127) * SIN.</p>
 
         <p>Das sind jetzt zwar schon eine ganze Menge Bytes, dafür wird das Programm aber auch kürzer und sehr schnell.</p>
 
@@ -106,7 +107,7 @@ VY2 = vyn1 + vyt2 }
 
         <p>Es besteht aus zwei Teilen, dem eigentlichen Billardprogramm, das in Maschinencode geschrieben ist und am Basic-Anfang bei Adresse 2048 beginnt, und einem Basic-Teil im Speicher ab 4973, in dem die Spielregeln definiert werden.</p>
 
-        <p>Die ersten Bytes des Maschinenprogrammes entsprechen einer Basic-Zeile: »1 SYS2061«. BeimStartdesProgrammes findet der Basic-Interpreter diesen SYS-Befehl und startet das Maschinen-Programm bei 2061. Dort wird der Basic-Anfang auf 4973 hochgesetzt, die oben beschriebene Multiplikationstabelle erstellt und zum Basic-Teil gesprungen, von dem aus dann die weiteren Maschinen-Routinen aufgerufen werden.</p>
+        <p>Die ersten Bytes des Maschinenprogrammes entsprechen einer Basic-Zeile: »1 SYS2061«. Beim Start des Programmes findet der Basic-Interpreter diesen SYS-Befehl und startet das Maschinen-Programm bei 2061. Dort wird der Basic-Anfang auf 4973 hochgesetzt, die oben beschriebene Multiplikationstabelle erstellt und zum Basic-Teil gesprungen, von dem aus dann die weiteren Maschinen-Routinen aufgerufen werden.</p>
 
         <p>Auf diese Weise ist das Maschinen-Programm so eingebunden, daß Sie das gesamte Programm später wie ein gewöhnliches Basic-Programm ohne Zeigerumstellungen handhaben können.</p>
 
@@ -121,7 +122,7 @@ VY2 = vyn1 + vyt2 }
                 a) »BILL(MP)« absolut laden (»LOAD"BILL(MP)",8,1« oder »&hellip;,1,1«)<br>
                 b) Basic-Anfang auf 4973 setzen mit Eingabe im Direktmodus »POKE 43,109: POKE 44,19: POKE 4972,0: NEW«<br>
                 c) Maschinen-Programm im Direktmodus übertragen »FOR 1=49152 TO 52076: POKE 1-47104, PEEK(I): NEXT«<br>
-                d) Basic-Programm laden mit»LOAD "BILL(BASIC)",8« (beziehungsweise »&hellip;,1« für Datasette)<br>
+                d) Basic-Programm laden mit »LOAD "BILL(BASIC)",8« (beziehungsweise »&hellip;,1« für Datasette)<br>
                 e) Basic-Anfang zurückstellen und Gesamtprogramm speichern mit »POKE 43,1: POKE 44,8: SAVE "BILLARD",8« (beziehungsweise »&hellip;,1«)</li>
         </ol>
 
@@ -152,7 +153,7 @@ VY2 = vyn1 + vyt2 }
 
         <p>Der Bewegungsablauf kann durch drei Parameter beeinflußt werden.<br>
             a) Byte 3687: Dämpfung (hier = 10)<br>Ein größerer Wert bedeutet hier schwächere Dämpfung; die Kugeln rollen dann bei gleicher Schlagstärke weiter. Ein kleinerer Wert bewirkt stärkere Dämpfung.<br>
-            b) Byte 4200: Ende der Kugelbewegung (hier = 2) Wie schon oben bei der Stoßauswertung beschrieben, istessinnvoll, die Kugelbewegung abzubrechen, bevor die Geschwindigkeit auf 0 abgesunken ist. Ein zu kleiner Wert an dieser Stelle hat vor allem bei schwacher Dämpfung ein Abknicken der Bewegungsrichtung kurz vor Stillstand zur Folge.<br>
+            b) Byte 4200: Ende der Kugelbewegung (hier = 2) Wie schon oben bei der Stoßauswertung beschrieben, ist es sinnvoll, die Kugelbewegung abzubrechen, bevor die Geschwindigkeit auf 0 abgesunken ist. Ein zu kleiner Wert an dieser Stelle hat vor allem bei schwacher Dämpfung ein Abknicken der Bewegungsrichtung kurz vor Stillstand zur Folge.<br>
             c) Byte 4248: Verzögerung des Bewegungsablaufes (hier = 10)<br>Eine automatische Geschwindigkeitsanpassung abhängig von der Anzahl der rollenden Kugeln ist an anderer Stelle eingebaut; sie sorgt für gleichmäßige Bewegung, gleichgültig, ob sich gerade nur eine oder sieben Kugeln bewegen.<br>An dieser Stelle bewirkt ein größerer Wert zusätzliche Verzögerung. Sie können sich beispielsweise mit »255« einen Stoß in Zeitlupe ansehen. Während mit der Dämpfung die zurückzulegende Strecke bestimmt wird, läßt sich hier die Geschwindigkeit der Bewegung festlegen.<br>Experimentieren Sie ruhig etwas mit diesen Parametern. Nach einem entsprechenden POKE sehen Sie die Wirkung gleich beim nächsten Stoß.<br>Wenn Sie nach Änderungen hier das Programm wieder neu abspeichern, werden die neuen Werte mitgespeichert. Sie können selbstverständlich aber auch während des Programmlaufes die Parameter mehrfach ändern.</p>
 
         <h3>2. Parameter für Feld- und Lochgrößen</h3>
@@ -172,9 +173,9 @@ VY2 = vyn1 + vyt2 }
         </figure>
 
         <p>Wenn Sie das geänderte Programm abspeichern, vergessen Sie nicht, vorher den Basic-Anfang zurückzustellen mit:<br>
-            »POKE 43,1: POKE 44,8«! Andernfallswird möglicherweise nur das Basic-Programm gespeichert.<br>
+            »POKE 43,1: POKE 44,8«! Andernfalls wird möglicherweise nur das Basic-Programm gespeichert.<br>
             Wie das Zielkreuz (Sprite 0, Block 39) stehen auch die Sprite-Daten der Kugeln im Maschinenprogramm in den Sprite-Blöcken 40 bis 47, zwischen denen zur Simulation einer Rollbewegung hin und her geschaltet wird.<br>
-            Jeder Kugel ist entsprechend ihrer Sprite-Nummer eine Zahl zwischen 1 und 7 zugeordnet. Ebensosind die Löcher, wie in Bild 3 gezeigt, durchnummeriert von 2 bis 7.<br>
+            Jeder Kugel ist entsprechend ihrer Sprite-Nummer eine Zahl zwischen 1 und 7 zugeordnet. Ebenso sind die Löcher, wie in Bild 3 gezeigt, durchnummeriert von 2 bis 7.<br>
             Nach jedem Stoß stehen Ihnen folgende Informationen zur Auswertung zur Verfügung:</p>
 
         <p>a) Stoßregister $FD (= Basicvariable SR = 253):<br>Hier sind die Kugeln angegeben, die mindestens einmal mit der Stoßkugel kollidiert sind, und zwar im Format »2 hoch Kugelnummer 1 bis 7«. Dieses Format entspricht dem, das Ihnen beispielsweise vom Sprite-Sprite Berührungsregister her bekannt ist.<br>
@@ -201,7 +202,7 @@ VY2 = vyn1 + vyt2 }
 
         <p><strong>SYS JS</strong>: Nach diesem Aufruf kann mit Hilfe des Joysticks an Port 2 das Zielkreuz bewegt werden. Nach »FIRE« erfolgt Rücksprung in Basic, wo nun die Geschwindigkeits-Eingabe folgen sollte.</p>
 
-        <p><strong>SYS GS, Anfangsgeschwindigkeit 0 biS 127</strong>: Für die Anfangsgeschwindigkeit der Stoßkugel sind hier Werte zwischen 0 und 127 erlaubt. Nach Auswertung der Geschwindigkeits-Eingabe beginnt die Bewegung der Kugeln. Rücksprung in Basic erfolgt erst, wenn alle Kugeln wieder in Ruhe sind, vorher ist ein Aussprung nur mit »STOP / RESTORE« möglich.</p>
+        <p><strong>SYS GS, Anfangsgeschwindigkeit 0 bis 127</strong>: Für die Anfangsgeschwindigkeit der Stoßkugel sind hier Werte zwischen 0 und 127 erlaubt. Nach Auswertung der Geschwindigkeits-Eingabe beginnt die Bewegung der Kugeln. Rücksprung in Basic erfolgt erst, wenn alle Kugeln wieder in Ruhe sind, vorher ist ein Aussprung nur mit »STOP / RESTORE« möglich.</p>
 
         <p><strong>SYS N1, Anfangsgeschwindigkeit</strong>: Wählen Sie statt »GS« diesen Einsprungspunkt, so werden vor der Bewegung alle Sprite-Positionen und die Nummer der Stoßkugel in einem Speicherbereich 1 abgelegt. Da damit alle wichtigen Parameter vor einem Stoß erhalten bleiben, wird eine Stoßwiederholung ermöglicht.</p>
 
