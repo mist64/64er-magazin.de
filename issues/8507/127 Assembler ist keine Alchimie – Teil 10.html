@@ -39,31 +39,31 @@
             <figcaption>Bild 1. Unterbrechungsbeispiele im täglichen Leben</figcaption>
         </figure>
 
-        <p>Ich denke, daß Sie nun die Notwendigkeit von Unterbrechungen erkennen. Fast jede CPU kennt solche Unterbrechungssysteme. Man kann sie charakterisieren durch die Beantwortung folgender Fragen:
-            <strong>1)</strong> Welche Unterbrechungs-Eingänge weist die CPU auf?
-            <strong>2)</strong> Wie reagiert die CPU auf eine Unterbrechung?
-            <strong>3)</strong> Wie bestimmt die CPU die Unterbrechungsquelle, wenn die Anzahl der Quellen größer ist als die Anzahl der Eingänge?
-            <strong>4)</strong> Kann die CPU zwischen wichtigen und weniger wichtigen Unterbrechungen unterscheiden?
-            <strong>5)</strong> Wie und wann wird das Unterbrechungssystem freigegeben oder gesperrt?
+        <p>Ich denke, daß Sie nun die Notwendigkeit von Unterbrechungen erkennen. Fast jede CPU kennt solche Unterbrechungssysteme. Man kann sie charakterisieren durch die Beantwortung folgender Fragen:<br>
+            <strong>1)</strong> Welche Unterbrechungs-Eingänge weist die CPU auf?<br>
+            <strong>2)</strong> Wie reagiert die CPU auf eine Unterbrechung?<br>
+            <strong>3)</strong> Wie bestimmt die CPU die Unterbrechungsquelle, wenn die Anzahl der Quellen größer ist als die Anzahl der Eingänge?<br>
+            <strong>4)</strong> Kann die CPU zwischen wichtigen und weniger wichtigen Unterbrechungen unterscheiden?<br>
+            <strong>5)</strong> Wie und wann wird das Unterbrechungssystem freigegeben oder gesperrt?<br>
             All diese Fragen werden wir im Laufe dieser Serie für unseren Computer ergründen.
         </p>
 
         <h2>Das Unterbrechungssystem der CPU 6510/6502</h2>
 
-        <p>Einige dieser Charakteristika sind schnell zu zeigen:
-            <strong>Zu 1</strong>: Unsere CPU hat ganau 2 Eingänge für Unterbrechungen (wenn man RESET außer acht läßt, was wir im folgenden meist tun werden).
-            <strong>Zu 3</strong>: Natürlich gibt es weitaus mehr denkbare Unterbrechungsquellen als diese 2 Eingänge, weshalb softwaremäßig eine Registerabfrage (das sogenannte Polling) durchgeführt wird, um die Quelle festzustellen.
-            <strong>Zu 4</strong>: Zwischen wichtiger und nicht so wichtiger Unterbrechung kann unsere CPU unterscheiden durch die Priorität der beiden Eingänge. Wir haben eine sogenannte maskierbare Unterbrechung, genannt IRQ, welche per Befehl ignoriert (maskiert) werden kann und eine andere, nicht maskierbare, die daher auch NMI (not maskable interrupt = nicht maskierbare Unterbrechung) genannt wird. NMI hat eine höhere Priorität als IRQ und kann deshalb für die wichtigeren Aufgabenstellungen eingesetzt werden.
-            <strong>Zu 5</strong>: Freigegeben oder gesperrt werden kann die IRQ-Unterbrechung durch ein Sperrbit (auch Maskenbit genannt), welches sich als Bit 2 im Flaggen-Register des Prozessors befindet. Das ist die I-Flagge. Für den Empfang der NMI-Unterbrechung kann die CPU nicht gesperrt werden.
+        <p>Einige dieser Charakteristika sind schnell zu zeigen:<br>
+            <strong>Zu 1</strong>: Unsere CPU hat genau 2 Eingänge für Unterbrechungen (wenn man RESET außer acht läßt, was wir im folgenden meist tun werden).<br>
+            <strong>Zu 3</strong>: Natürlich gibt es weitaus mehr denkbare Unterbrechungsquellen als diese 2 Eingänge, weshalb softwaremäßig eine Registerabfrage (das sogenannte Polling) durchgeführt wird, um die Quelle festzustellen.<br>
+            <strong>Zu 4</strong>: Zwischen wichtiger und nicht so wichtiger Unterbrechung kann unsere CPU unterscheiden durch die Priorität der beiden Eingänge. Wir haben eine sogenannte maskierbare Unterbrechung, genannt IRQ, welche per Befehl ignoriert (maskiert) werden kann und eine andere, nicht maskierbare, die daher auch NMI (not maskable interrupt = nicht maskierbare Unterbrechung) genannt wird. NMI hat eine höhere Priorität als IRQ und kann deshalb für die wichtigeren Aufgabenstellungen eingesetzt werden.<br>
+            <strong>Zu 5</strong>: Freigegeben oder gesperrt werden kann die IRQ-Unterbrechung durch ein Sperrbit (auch Maskenbit genannt), welches sich als Bit 2 im Flaggen-Register des Prozessors befindet. Das ist die I-Flagge. Für den Empfang der NMI-Unterbrechung kann die CPU nicht gesperrt werden.<br>
         </p>
 
         <p>Um mal die Parallele zu unserem Beispiel zu zeigen: Das Lesen des Artikels ist die gerade stattfindende Tätigkeit des Computers. Die Telefonklingel signalisiert einen IRQ, der im folgenden bearbeitet wird. Das Pfeifen des Teekessels soll einem NMI entsprechen. Wenn dieser dann bearbeitet ist, geht es mit der Abarbeitung des IRQ weiter. Nach Beendigung des Telefonates wird das Unterbrechungs-Sperrbit gesetzt (sie nehmen sich vor, sich nicht mehr stören zu lassen) und mit der normalen Tätigkeit fortgefahren. Weil der nun folgende IRQ damit maskiert ist, wird das Türklingeln ignoriert.</p>
 
-        <p>Die <strong>Frage 2</strong>, nämlich wie unsere CPU auf eine Unterbrechung reagiert, blieb noch unbeantwortet. Nun soll sie behandelt werden:
-            <strong>a)</strong> Am Ende jedes Befehls überprüft die CPU automatisch den Zustand des Unterbrechungs-Systems. Wenn an einer der beiden Unterbrechungsleitungen eine Anforderung vorliegt und diese auch freigegeben ist, beginnt die Unterbrechung zu wirken.
-            <strong>b)</strong> Zunächst wird der Programmzählerinhalt in der Reihenfolge MSB, LSB auf den Stapel geschrieben. Danach wandert noch der Prozessorstatus auf den Stapel (siehe Bild 2).
-            <strong>c)</strong> Durch Setzen des Unterbrechungs-Sperrbits I werden weitere maskierbare Unterbrechungen (IRQ) unterbunden.
-            <strong>d)</strong> Nun holt sich die CPU aus einem Vektor ganz am Ende des Speichers eine Adresse, lädt diese in den Programmzähler und startet auf diese Weise ein Serviceprogramm, das dem auslösenden Anlaß Rechnung trägt. In der Tabelle 1 sind die zu den Unterbrechungsformen und zum RESET gehörigen Vektoren aufgeführt.
+        <p>Die <strong>Frage 2</strong>, nämlich wie unsere CPU auf eine Unterbrechung reagiert, blieb noch unbeantwortet. Nun soll sie behandelt werden:<br>
+            <strong>a)</strong> Am Ende jedes Befehls überprüft die CPU automatisch den Zustand des Unterbrechungs-Systems. Wenn an einer der beiden Unterbrechungsleitungen eine Anforderung vorliegt und diese auch freigegeben ist, beginnt die Unterbrechung zu wirken.<br>
+            <strong>b)</strong> Zunächst wird der Programmzählerinhalt in der Reihenfolge MSB, LSB auf den Stapel geschrieben. Danach wandert noch der Prozessorstatus auf den Stapel (siehe Bild 2).<br>
+            <strong>c)</strong> Durch Setzen des Unterbrechungs-Sperrbits I werden weitere maskierbare Unterbrechungen (IRQ) unterbunden.<br>
+            <strong>d)</strong> Nun holt sich die CPU aus einem Vektor ganz am Ende des Speichers eine Adresse, lädt diese in den Programmzähler und startet auf diese Weise ein Serviceprogramm, das dem auslösenden Anlaß Rechnung trägt. In der Tabelle 1 sind die zu den Unterbrechungsformen und zum RESET gehörigen Vektoren aufgeführt.<br>
         </p>
 
         <figure>
@@ -110,12 +110,13 @@
 
         <p>Noch eine Bemerkung zum Verhindern der IRQs. Wir werden später sehen, was alles während der 60mal pro Sekunde aufgerufenen Unterbrechung erledigt wird. Jede Routine, die SEI verwendet, verbraucht Rechenzeit. Wenn sie so lange dauert, daß eine oder mehrere dieser regelmäßigen IRQs unterbunden werden, kann das unter Umständen zu Störungen von Programmabläufen führen. In solchen Fällen ist es sinnvoll, in die eigene Routine den Teil der regulären IRQ-Routine einzubauen, der im Programmablauf durch sein Fehlen Störungen verursacht. Meistens kann man aber durch gute Planung eines Programmes dieses Problem umgehen.</p>
 
-        <p>RTI heißt »ReTurn from Interrupt«, zu deutsch also: »kehre aus dem Unterbrechungsprogramm zurück.« Es entspricht in seinem Einsatz etwa dem RTS bei Unterprogrammrücksprüngen. Während RTS aber lediglich den alten Programmzählerinhalt vom Stapel holt (und noch eine 1 dazuaddiert), schafft RTI auch noch den alten Inhalt des Status-Registers vom Stapel zurück. Der genaue Ablauf ist wie folgt: <strong>1)</strong> Alten Prozessorstatus vom Stapel wieder ins Status-Register schieben.
-            <strong>2)</strong> Stapelzeiger um 1 erhöhen
-            <strong>3)</strong> LSB des alten Programmzählers vom Stapel nehmen und zurückschreiben.
-            <strong>4)</strong> Stapelzeiger um 1 erhöhen
-            <strong>5)</strong> MSB des alten Programmzählers vom Stapel nehmen und zurückschreiben.
-            <strong>6)</strong> Stapelzeiger um 1 erhöhen.
+        <p>RTI heißt »ReTurn from Interrupt«, zu deutsch also: »kehre aus dem Unterbrechungsprogramm zurück.« Es entspricht in seinem Einsatz etwa dem RTS bei Unterprogrammrücksprüngen. Während RTS aber lediglich den alten Programmzählerinhalt vom Stapel holt (und noch eine 1 dazuaddiert), schafft RTI auch noch den alten Inhalt des Status-Registers vom Stapel zurück. Der genaue Ablauf ist wie folgt:<br>
+            <strong>1)</strong> Alten Prozessorstatus vom Stapel wieder ins Status-Register schieben.<br>
+            <strong>2)</strong> Stapelzeiger um 1 erhöhen<br>
+            <strong>3)</strong> LSB des alten Programmzählers vom Stapel nehmen und zurückschreiben.<br>
+            <strong>4)</strong> Stapelzeiger um 1 erhöhen<br>
+            <strong>5)</strong> MSB des alten Programmzählers vom Stapel nehmen und zurückschreiben.<br>
+            <strong>6)</strong> Stapelzeiger um 1 erhöhen.<br>
         </p>
 
         <p>Damit ist der Zustand vor der Unterbrechung wieder hergestellt. Auch die I-Flagge ist so automatisch wieder gelöscht, denn vor der Unterbrechung war sie sicher nicht gesetzt gewesen und der alte Status-Zustand ist ja jetzt wieder vorhanden.</p>
@@ -124,25 +125,25 @@
 
         <p>Bei eigenen Unterbrechungs-Routinen verwendet man häufig nicht RTI, sondern springt durch JMP an eine sinnvolle Stelle des normalen Unterbrechungsprogrammes. Auf diese Weise kann man dann die normalen Arbeitsgänge der vorprogrammierten Unterbrechung oder Teile davon noch ausführen lassen.</p>
 
-        <p>Den Befehl BRK (break = Software-Unterbrechung) haben wir schon verwendet. Er entspricht in seinem Einsatz etwa dem STOP-Befehl in Basic und dient wie jeder Befehl dort hauptsächlich dem Testen von Programmen. Tatsächlich unterscheidet sich die Reaktion unserer CPU bei Auftreten eines BRK kaum von der bei einem IRQ. Folgendes passiert:
-            <strong>a)</strong> Der Programmzähler wird um 2 erhöht.
-            <strong>b)</strong> Bit 4 des Prozessorstatusregisters, die Break-Flagge B, wird auf 1 gesetzt.
-            <strong>c)</strong> Das MSB des Programmzählers wird auf den Stapel gebracht und der Stapelzähler um 1 heruntergezählt.
-            <strong>d)</strong> Dasselbe geschieht nun mit dem LSB des Programmzählers e) und mit dem Statusregister.
-            <strong>f)</strong> Das Unterbrechungsmaskenbit, die I-Flagge, wird auf 1 gesetzt um IRQs zu sperren.
-            <strong>g)</strong> In den Programmzähler wird nun aus dem Vektor FFFE/FFFF dieselbe Adresse geladen, die auch bei IRQs benutzt wird. Damit startet nun das Programm, das diese Unterbrechung bearbeitet.
+        <p>Den Befehl BRK (break = Software-Unterbrechung) haben wir schon verwendet. Er entspricht in seinem Einsatz etwa dem STOP-Befehl in Basic und dient wie jeder Befehl dort hauptsächlich dem Testen von Programmen. Tatsächlich unterscheidet sich die Reaktion unserer CPU bei Auftreten eines BRK kaum von der bei einem IRQ. Folgendes passiert:<br>
+            <strong>a)</strong> Der Programmzähler wird um 2 erhöht.<br>
+            <strong>b)</strong> Bit 4 des Prozessorstatusregisters, die Break-Flagge B, wird auf 1 gesetzt.<br>
+            <strong>c)</strong> Das MSB des Programmzählers wird auf den Stapel gebracht und der Stapelzähler um 1 heruntergezählt.<br>
+            <strong>d)</strong> Dasselbe geschieht nun mit dem LSB des Programmzählers e) und mit dem Statusregister.<br>
+            <strong>f)</strong> Das Unterbrechungsmaskenbit, die I-Flagge, wird auf 1 gesetzt um IRQs zu sperren.<br>
+            <strong>g)</strong> In den Programmzähler wird nun aus dem Vektor FFFE/FFFF dieselbe Adresse geladen, die auch bei IRQs benutzt wird. Damit startet nun das Programm, das diese Unterbrechung bearbeitet.<br>
         </p>
 
         <p>Sie sehen, daß der BRK-Befehl ein ziemlich komplizierter Geselle ist. Zwar handelt es sich wieder um einen 1-Byte-Befehl mit impliziter Adressierung, aber er benötigt immerhin 7 Taktzyklen, um all diese Arbeit zu bewältigen.</p>
 
-        <p>Wir haben BRK bisher immer zur Programmunterbrechung mit nachfolgender Registeranzeige durch den SMON eingesetzt. Der SMON ist — wie fast jeder Monitor — so programmiert, daß ein BRK zur Registeranzeige führt. Das ist natürlich sinnvoll beim Einsatz von BRK zur Fehlersuche. In dem Moment, wo ein BRK vom Prozessor bearbeitet wurde, kann nur durch die gesetzte B-Flagge von einem IRQ unterschieden werden. Es ist manchmal nötig, schon zu diesem Zeitpunkt diesen Unterschied festzustellen. Deshalb verwendet man den nachfolgend beschriebenen Test zu diesem Zweck:
-            <strong>PLA</strong>
-            in den Akku wird das zuletzt auf den Stapel geschobene Prozessorstatus-Register geholt.
-            <strong>PHA</strong>
-            und sogleich wieder zurückgeschoben
-            <strong>AND #$10</strong>
-            durch die AND-Verknüpfung mit der Binärzahl 0001 0000 kann eine eventuell vorhandene B-Flagge isoliert werden.
-            <strong>BNE BREAK</strong>
+        <p>Wir haben BRK bisher immer zur Programmunterbrechung mit nachfolgender Registeranzeige durch den SMON eingesetzt. Der SMON ist — wie fast jeder Monitor — so programmiert, daß ein BRK zur Registeranzeige führt. Das ist natürlich sinnvoll beim Einsatz von BRK zur Fehlersuche. In dem Moment, wo ein BRK vom Prozessor bearbeitet wurde, kann nur durch die gesetzte B-Flagge von einem IRQ unterschieden werden. Es ist manchmal nötig, schon zu diesem Zeitpunkt diesen Unterschied festzustellen. Deshalb verwendet man den nachfolgend beschriebenen Test zu diesem Zweck:<br>
+            <strong>PLA</strong><br>
+            in den Akku wird das zuletzt auf den Stapel geschobene Prozessorstatus-Register geholt.<br>
+            <strong>PHA</strong><br>
+            und sogleich wieder zurückgeschoben<br>
+            <strong>AND #$10</strong><br>
+            durch die AND-Verknüpfung mit der Binärzahl 0001 0000 kann eine eventuell vorhandene B-Flagge isoliert werden.<br>
+            <strong>BNE BREAK</strong><br>
             Falls eine B-Flagge gesetzt war, ist der Akku ungleich 0 und die Bearbeitung verzweigt zum von uns konstruierten BREAK-Programm. War der Akku nach dieser AND-Verknüpfung gleich 0, dann erfolgt keine Verzweigung und es handelt sich um einen IRQ, zu dessen Bearbeitung nun zu springen ist.
         </p>
 
@@ -158,23 +159,23 @@
 
         <p>Quellen für Unterbrechungen können viele genannt werden: Diskettenstation, Datasette, Drucker, Modem, Schaltelemente und so weiter. Um aber eine gewisse Übersicht zu bekommen, sollte man unterscheiden zwischen primären und sekundären Unterbrechungsquellen. Das soll kurz erläutert werden: Die Diskettenstation beispielsweise ist über den seriellen Port mit dem Computer verbunden. Dieser wiederum steht in direktem Kontakt zu 2 Bausteinen, den CIAs. Erst diese CIAs stehen in direktem Kontakt zur CPU. Alle Unterbrechungs-Quellen, die direkt Signale an die beiden Unterbrechungseingänge unserer CPU senden, sollen künftig »primäre« Quellen genannt werden, die anderen, die nur über solch eine primäre Quelle Unterbrechungs-Anforderungen stellen, werden von uns als »sekundäre« Quellen bezeichnet. Weil wir irgendwo einen Schnitt machen müssen — einmal, um nicht völlig auszuufern in der Erklärung von peripheren Geräten (das soll anderen, kompetenteren überlassen bleiben) und zum anderen, weil ich mich da auch nicht so gut auskenne — werden wir uns im folgenden auf die primären Unterbrechungsquellen beschränken. Da bleibt aber noch mehr als genug zu tun übrig und deshalb soll auch nur eine Auswahl dieser Primärquellen detailliert behandelt werden.</p>
 
-        <p>Welches sind nun die primären Unterbrechungsquellen? Hier sind sie aufgeführt:
-            <strong>1)</strong> Der VIC-II-Chip (MOS 6566/6S67 Video Interface Controller)
-            <strong>2)</strong> Die beiden CIAs (MOS 6526 Complex Interface Adapter)
-            <strong>3)</strong> Die RESTORE-Taste
-            <strong>4)</strong> Der Expansion-Port
-            <strong>5)</strong> RESET (paßt hier nicht ganz her, woanders aber auch nicht besser)
+        <p>Welches sind nun die primären Unterbrechungsquellen? Hier sind sie aufgeführt:<br>
+            <strong>1)</strong> Der VIC-II-Chip (MOS 6566/6S67 Video Interface Controller)<br>
+            <strong>2)</strong> Die beiden CIAs (MOS 6526 Complex Interface Adapter)<br>
+            <strong>3)</strong> Die RESTORE-Taste<br>
+            <strong>4)</strong> Der Expansion-Port<br>
+            <strong>5)</strong> RESET (paßt hier nicht ganz her, woanders aber auch nicht besser)<br>
         </p>
 
         <p>Den Expansion-Port werden wir nicht behandeln und einen RESET nur ziemlich kurz betrachten, weil es sich dabei eigentlich nicht um eine Unterbrechung im bisher definierten Sinn handelt.</p>
 
         <h2>Der VIC-II-Chip als Unterbrechungsquelle</h2>
 
-        <p>Soweit ich feststellen konnte, kommt der VIC-II-Chip in Bezug auf unsere CPU nur als Anforderer von maskierten Unterbrechungen (IRQ) in Frage. Die Handhabung seiner Unterbrechungs-Anforderungen geschieht im VIC-II-Chip durch zwei Register. Vier Ereignisse sind eingeplant, deren Eintreten zur Unterbrechung führen kann:
-            <strong>1)</strong> Rasterzeilen-Unterbrechung
-            <strong>2)</strong> Kollision eines Sprite mit Hintergrund
-            <strong>3)</strong> Kollision von Sprites untereinander
-            <strong>4)</strong> Lichtgriffel-Unterbrechung.
+        <p>Soweit ich feststellen konnte, kommt der VIC-II-Chip in Bezug auf unsere CPU nur als Anforderer von maskierten Unterbrechungen (IRQ) in Frage. Die Handhabung seiner Unterbrechungs-Anforderungen geschieht im VIC-II-Chip durch zwei Register. Vier Ereignisse sind eingeplant, deren Eintreten zur Unterbrechung führen kann:<br>
+            <strong>1)</strong> Rasterzeilen-Unterbrechung<br>
+            <strong>2)</strong> Kollision eines Sprite mit Hintergrund<br>
+            <strong>3)</strong> Kollision von Sprites untereinander<br>
+            <strong>4)</strong> Lichtgriffel-Unterbrechung.<br>
         </p>
 
         <p>Die ersten 3 Auslöser werden wir uns in kommenden Folgen genau ansehen und dabei vielerlei interessante Möglichkeiten feststellen. Die Option, die der Lichtgriffel bietet, wird nicht behandelt werden: Meine Kenntnisse auf diesem Sektor sind nur gering (nobody is perfect).</p>
@@ -186,12 +187,12 @@
             <figcaption>Bild 3. Das Interrupt-Enable-Register (53274 = $dO1a) des VIC-II-Chip</figcaption>
         </figure>
 
-        <p>In diesem Register wird festgelegt, ob eines — oder mehrere — der 4 möglichen auslösenden Ereignisse eine Unterbrechungsanforderung an den Mikroprozessor senden soll. Jedem Ereignis ist ein Bit zugeordnet. Ist dieses Bit gleich 1, dann ist die Unterbrechung freigegeben, ist es gleich 0, dann liegt eine Sperrung vor. Die Zuordnung der Bits ist wie folgt:
-            <strong>Bit 0</strong> Rasterzeilen-IRQ
-            <strong>Bit 1</strong> Sprite/Hintergrund-Kollision
-            <strong>Bit 2</strong> Sprite/Sprite-Kollision
-            <strong>Bit 3</strong> Lichtgriffel-IRQ
-            <strong>Bits 4 bis 7</strong> sind ungenutzt und haben immer den Wert 1.
+        <p>In diesem Register wird festgelegt, ob eines — oder mehrere — der 4 möglichen auslösenden Ereignisse eine Unterbrechungsanforderung an den Mikroprozessor senden soll. Jedem Ereignis ist ein Bit zugeordnet. Ist dieses Bit gleich 1, dann ist die Unterbrechung freigegeben, ist es gleich 0, dann liegt eine Sperrung vor. Die Zuordnung der Bits ist wie folgt:<br>
+            <strong>Bit 0</strong> Rasterzeilen-IRQ<br>
+            <strong>Bit 1</strong> Sprite/Hintergrund-Kollision<br>
+            <strong>Bit 2</strong> Sprite/Sprite-Kollision<br>
+            <strong>Bit 3</strong> Lichtgriffel-IRQ<br>
+            <strong>Bits 4 bis 7</strong> sind ungenutzt und haben immer den Wert 1.<br>
         </p>
 
         <p>Das Register 25 wird Interrupt Latch Register genannt, was etwa zu übersetzen wäre mit »Unterbrechungs-Einrast-Register« (siehe Bild 4). Der englische Ausdruck »latch«, der nur umschreibend oder sehr technisch übersetzt werden kann, beschreibt eigentlich recht genau, was in diesem Register geschieht. Ein »latch« ist nämlich so etwas wie ein Schnappriegel, also ein Riegel, der bei der Betätigung einrastet. Wenn eines der 4 möglichen Ereignisse eintritt, schnappt im dazugehörigen Bit dieses Registers der Inhalt auf 1. Die Bit-Zuordnung ist die gleiche wie in Register 26. Aber das Bit 7 hat hier noch eine Bedeutung: Ist eines der Bits 0 bis 3 auf 1 gesetzt und das dazugehörige Ereignis in Register 26 auch zur Unterbrechung zugelassen (also auch dort gleich 1), dann taucht in Register 25, Bit 7 eine 1 auf. So kann durch einfaches Lesen dieses Bits festgestellt werden, ob ein IRQ durch den VIC-II-Chip ausgelöst wurde.</p>
@@ -209,12 +210,12 @@
 
         <h2>Die beiden CIA-Bausteine als Unterbrechungsquellen</h2>
 
-        <p>Sehen wir uns aber zuerst einmal an, welche Ereignisse vom Standpunkt eines CIA-Bausteines als Unterbrechungskriterium dienen können:
-            <strong>1)</strong> Unterlauf der Uhr A
-            <strong>2)</strong> Unterlauf der Uhr B
-            <strong>3)</strong> Die interne Uhr hat eine Alarmzeit erreicht
-            <strong>4)</strong> Am SP-Eingang (hängt mit dem seriellen Port zusammen) ist ein bestimmter Zustand erreicht
-            <strong>5)</strong> An einem Eingang namens FLAG ist ein bestimmter Zustand erreicht.
+        <p>Sehen wir uns aber zuerst einmal an, welche Ereignisse vom Standpunkt eines CIA-Bausteines als Unterbrechungskriterium dienen können:<br>
+            <strong>1)</strong> Unterlauf der Uhr A<br>
+            <strong>2)</strong> Unterlauf der Uhr B<br>
+            <strong>3)</strong> Die interne Uhr hat eine Alarmzeit erreicht<br>
+            <strong>4)</strong> Am SP-Eingang (hängt mit dem seriellen Port zusammen) ist ein bestimmter Zustand erreicht<br>
+            <strong>5)</strong> An einem Eingang namens FLAG ist ein bestimmter Zustand erreicht.<br>
         </p>
 
         <p>Die Ereignisse 4 und 5 werden wir ebenfalls im weiteren weitgehend ausklammern.</p>
@@ -234,12 +235,12 @@
 
         <h3>Schreiben in das Register</h3>
 
-        <p><strong>Bit 7 = 0</strong> erzeugt Sperren.
+        <p><strong>Bit 7 = 0</strong> erzeugt Sperren.<br>
             Das erkennt man am besten an einem Beispiel. Nehmen wir an, wir möchten die Unterbrechung sperren, die durch einen Unterlauf von Uhr A erzeugt werden kann. Das betrifft das Bit 0. Wir schreiben in das Register 13 folgende Zahl: 0000 0001</p>
 
         <p>Wie Sie sehen, ist das Bit 7 gleich 0. Die 1 in Bit 1 bewirkt die Sperrung. Durch die Nullen in den anderen Bits wird bewirkt, daß die anderen Unterbrechungs-Ereignisse nicht beeinflußt werden. Wollten wir alle sperren, dann müßten wir einschreiben: 0001 1111</p>
 
-        <p>Auf diese Weise können selektiv einzelne Unterbrechungen durch Einschreiben der 1 bei gelöschtem Bit 7 gesperrt werden.
+        <p>Auf diese Weise können selektiv einzelne Unterbrechungen durch Einschreiben der 1 bei gelöschtem Bit 7 gesperrt werden.<br>
             <strong>Bit 7 = 1</strong> erzeugt Freigabe.
         </p>
 
@@ -250,14 +251,14 @@
 
         <h3>Der IRQ-CIA</h3>
 
-        <p>Das Register 13 des IRQ-CIA (der die Speicherstellen 56320 bis 56335 belegt), liegt in Zelle 56333 ($DC0D). Die einzelnen Bits sind wie folgt zugeordnet:
-            <strong>Bit 0</strong> Unterlauf Uhr A
-            Von hier kommt der IRQ, der 60mal pro Sekunde stattfindet zur Tastaturabfrage, zum Weiterstellen der TI$-Uhr etc.
-            <strong>Bit 1</strong> Unterlauf Uhr B
-            Spielt bei Kassettenoperationen und dem seriellen Port eine Rolle.
-            <strong>Bit 2</strong> ALARM bei interner Uhr. Spielt beim Zufallszahlengenerator (RND(0)) eine Rolle.
-            <strong>Bit 3</strong> Hier kommen durch den User-Port Unterbrechungs-Anforderungen.
-            <strong>Bit 4</strong> ist verbunden mit dem seriellen Port und der Kassetten-Lese-Leitung.
+        <p>Das Register 13 des IRQ-CIA (der die Speicherstellen 56320 bis 56335 belegt), liegt in Zelle 56333 ($DC0D). Die einzelnen Bits sind wie folgt zugeordnet:<br>
+            <strong>Bit 0</strong> Unterlauf Uhr A<br>
+            Von hier kommt der IRQ, der 60mal pro Sekunde stattfindet zur Tastaturabfrage, zum Weiterstellen der TI$-Uhr etc.<br>
+            <strong>Bit 1</strong> Unterlauf Uhr B<br>
+            Spielt bei Kassettenoperationen und dem seriellen Port eine Rolle.<br>
+            <strong>Bit 2</strong> ALARM bei interner Uhr. Spielt beim Zufallszahlengenerator (RND(0)) eine Rolle.<br>
+            <strong>Bit 3</strong> Hier kommen durch den User-Port Unterbrechungs-Anforderungen.<br>
+            <strong>Bit 4</strong> ist verbunden mit dem seriellen Port und der Kassetten-Lese-Leitung.<br>
         </p>
 
         <h3>Der NMI-CIA</h3>
@@ -266,7 +267,7 @@
 
         <h3>Die RESTORE-Taste und ein kleines Testprogramm</h3>
 
-        <p>Die RESTORE-Taste ist direkt mit dem NMI-Eingang unseres Mikroprozessors verbunden. Das ermöglicht es uns, durch einfaches Drücken dieser Taste jederzeit ins Geschehen einzugreifen, ohne uns um Details kümmern zu müssen, ob sich der Computer gerade im Direktoder im Programm-Modus befindet und so weiter. Denn NMI hat die höchste Priorität der Unterbrechungen.</p>
+        <p>Die RESTORE-Taste ist direkt mit dem NMI-Eingang unseres Mikroprozessors verbunden. Das ermöglicht es uns, durch einfaches Drücken dieser Taste jederzeit ins Geschehen einzugreifen, ohne uns um Details kümmern zu müssen, ob sich der Computer gerade im Direkt- oder im Programm-Modus befindet und so weiter. Denn NMI hat die höchste Priorität der Unterbrechungen.</p>
 
         <p>Ein kleines Testprogramm soll Ihnen hier noch vorgestellt werden, das Sie vielleicht aber noch nicht ganz verstehen werden, weil wir erst in der nächsten Folge die eingebauten Serviceprogramme kennenlernen werden. Schalten Sie also den SMON ein und geben Sie das Programm 1 ein (ab $6000):</p>
 
