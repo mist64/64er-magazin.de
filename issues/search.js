@@ -4,7 +4,8 @@
 
 let pagesIndex, searchIndex;
 const MAX_SUMMARY_LENGTH = 100;
-const SENTENCE_BOUNDARY_REGEX = /[.!?]+\s+/gm;
+// Improved sentence boundary detection for German text
+const SENTENCE_BOUNDARY_REGEX = /(?<![A-Z][a-z]\.)\s*[.!?]+\s+/gm;
 const WORD_REGEX = /\b(\w*)[\W|\s|\b]?/gm;
 
 async function fetchJsonData(url) {
