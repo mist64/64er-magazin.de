@@ -36,20 +36,26 @@
 
         <p>Befindet sich der REM-Korrektor einmal im Computer, kann er selbstverständlich immer wieder mit SYS 52000 aufgerufen werden. Danach werden alle REMs aus dem Basic-Programm entfernt. Steht die REM-Anweisung am Zeilenanfang, wird die ganze Zeile gelöscht. Steht sie am Zeilenende, wird nur alles nach dem REM gelöscht. Sprünge auf gelöschte REM-Zeilen werden korrigiert, auch wenn die neuen Sprungadressen aus mehr ASCII-Codes bestehen wie die ursprünglichen. GOTO 99 erfordert 3 Bytes in Basic. Wird die Zeile gelöscht, und die nächste gültige Zeile ist 12300, werden für den geänderten Befehl GOTO 12300 6 Bytes erforderlich. Ferner setzt das Programm alle Basic-Zeiger in der Zeropage auf den aktuellen Wert.</p>
 
-        <p>Bearbeitet werden alle Sprünge wie
-            GOTO
-            GOSUB
-            IF&hellip;THEN (Zeilennummer)
-            IF&hellip;THEN GOTO (Zeilennummmer)
-            IF&hellip;THEN GOSUB (Zeilennummer)
-            IF&hellip;GOTO (Zeilennummer)
-            IF&hellip;GOSUB (Zeilennummer)
-            ON X GOTO (Zeilennummer), (Zeilennummer),&hellip;
-            ON X GOSUB (Zeilennummer), (Zeilennummer),&hellip;</p>
+        <p class="noindent">Bearbeitet werden alle Sprünge wie</p>
 
-        <p>Einer Zeilennummer vorangehende Leerzeichen sind ebenfalls erlaubt. Bei ON X GOTO oder ON X GOSUB muß jede Zeilennummer, bis auf die letzte durch ein Komma abgetrennt sein.
-            ON X GOTO 200, 300, 400, 500, 600 ist erlaubt. Nicht jedoch
-            ON X GOTO 200, 300, 400 , 500, 600.</p>
+        <ul class="plain">
+            <li>GOTO</li>
+            <li>GOSUB</li>
+            <li>IF&hellip;THEN (Zeilennummer)</li>
+            <li>IF&hellip;THEN GOTO (Zeilennummmer)</li>
+            <li>IF&hellip;THEN GOSUB (Zeilennummer)</li>
+            <li>IF&hellip;GOTO (Zeilennummer)</li>
+            <li>IF&hellip;GOSUB (Zeilennummer)</li>
+            <li>ON X GOTO (Zeilennummer), (Zeilennummer),&hellip;</li>
+            <li>ON X GOSUB (Zeilennummer), (Zeilennummer),&hellip;</li>
+        </ul>
+
+        <p>Einer Zeilennummer vorangehende Leerzeichen sind ebenfalls erlaubt. Bei ON X GOTO oder ON X GOSUB muß jede Zeilennummer, bis auf die letzte durch ein Komma abgetrennt sein.</p>
+
+        <p class="noindent">
+            ON X GOTO 200, 300, 400, 500, 600 ist erlaubt. Nicht jedoch<br>
+            ON X GOTO 200, 300, 400 , 500, 600.
+        </p>
 
         <p>Während des Programmablaufs erscheinen zur Kontrolle der Korrekturen die Nummern der in die Sprungbefehle neu eingesetzten Zeilen auf dem Bildschirm.</p>
 
@@ -59,30 +65,24 @@
 
         <ol>
             <li>Der REM-Korrektor ist in der Lage, durch NEW versehentlich gelöschte Basic-Programme zu regenerieren (RENEW-Funktion), wenn man vor dem Starten durch SYS 52000 den Befehl POKE 2050,1 eingibt (allerdings sind dann sämtliche REMs »raus«).</li>
-            <li>Zeile 0 darf keine REM-Zeile sein (0REM&hellip;). Enthält Zeile 0 einen REM-Befehl, werden keine Sprungkorrekturen ausgeführt.<br>Der REM-Korrektor benötigt für ein 20 KByte langes Basic-Programm etwa 1,5 Sekunden, wenn keine Sprungkorrekturen notwendig sind. Aber auch wenn zahlreiche Korrekturen durchgeführt werden müssen, bleibt die Ablaufzeit im Bereich von einigen Sekunden.</li>
+            <li>Zeile 0 darf keine REM-Zeile sein (0REM&hellip;). Enthält Zeile 0 einen REM-Befehl, werden keine Sprungkorrekturen ausgeführt.<br>Der REM-Korrektor benötigt für ein 20 KByte langes Basic-Programm etwa 1,5 Sekunden, wenn keine Sprungkorrekturen notwendig sind. Aber auch wenn zahlreiche Korrekturen durchgeführt werden müssen, bleibt die Ablaufzeit im Bereich von einigen Sekunden.
+                <p>Ist kein Basic-Programm im Speicher, stoppt der REM-Korrektorsofortwieder. Sind nur REM-Zeilen vorhanden, führt er einen RESET durch. Der REM-Korrektor bleibt jedoch funktionsfähig.</p>
+                <p>Das Programm arbeitet aus Geschwindigkeitsgründen mit Hilfsspeicherbereichen in denen Hilfszeiger abgelegt sind. Da diese den RAM-Speicher unter dem ROM benutzen, wird kein Basic-Speicherplatz verbraucht.</p>
+            </li>
+            <li>Die Arbeitsweise des REM-Korrektors
+                <p>Das Maschinenprogramm ist in drei Hauptteile gegliedert. Im ersten Teil wird das Basic-Programm durchsucht und für jede gültige Zeile, oder den gültigen Teil einer Zeile, die Anfangsadresse (2 Bytes) und die Zahl der Bytes (1 Byte) unter dem ROM ab Adresse $A000 abgelegt.</p>
+
+                <p>Die Nummern der gelöschten Zeilen (2 Bytes) sowie die Nummer der jeweils nächsten gültigen Zeile (die nicht mit einem REM beginnt), werden ab Adresse $FFFF, ebenfalls unter dem ROM, in absteigender Folge abgelegt.</p>
+
+                <p>Anhand der Zeiger ab $A000 werden die Zeilenteile der Basic-Bereiche neu zusammengesetzt und nach untern komprimiert. Das heißt, daß mit den gültigen Zeilen oder Zeilenteilen das ursprüngliche Basic-Programm überschrieben wird. Da das neue Basic-Programm kürzer oder höchstens gleich lang ist wie das alte, kann diese Operation Zeile für Zeile im selben Speicherbereich (Basic-Bereich ab 2048) stattfinden. Damit sind die REMs entfernt!</p>
+
+                <p>Die Teile 1 und 2 sind sehr schnell, da der Basic-Speicherbereich jeweils nur einmal durchlaufen werden muß.</p>
+
+                <p>Im dritten Teil wird das Basic-Programm nach Sprungcodes durchsucht. Dabei werden Bytes, die zufällig eine Sprungadresse darstellen, sich aber innerhalb von Anführungszeichen befinden (Strings), natürlich ignoriert.</p>
+
+                <p>Die gefundene Adresse, also die Folge von ASCII-Codes, wird in eine 2-Byte-Hexadezimalzahl umgewandelt und der Bereich von $FFFF abwärts durchsucht, ob diese Zeilennummer mit der Nummer einer gelöschten Zeile übereinstimmt. Trifft dies zu, wird die ebenfalls abgespeicherte Hexadezimalzahl (Zeilennummer) der nächsten gültigen Zeile geholt und in ASCII-Codes umgerechnet. Ist die neue Zeilennummer, in einer Folge von ASCII-Codes ausgedrückt, länger als die alte, wird das Basic-Programm um diesen Unterschied nach hinten verschoben und die Basic-Zeiger restauriert. Dann wird die Zeilennummer eingefügt und festgestellt, ob noch eine Zeilennummer folgt (ON&hellip;GOTO). Wenn nicht, wird nach weiteren Sprungcodes gesucht.</p>
+            </li>
         </ol>
-
-
-        <p>Ist kein Basic-Programm im Speicher, stoppt der REM-Korrektorsofortwieder. Sind nur REM-Zeilen vorhanden, führt er einen RESET durch. Der REM-Korrektor bleibtjedoch funktionsfähig.</p>
-
-        <p>Das Programm arbeitet aus Geschwindigkeitsgründen mit Hilfsspeicherbereichen in denen Hilfszeiger abgelegt sind. Da diese den RAM-Speicher unter dem ROM benutzen, wird kein Basic-Speicherplatz verbraucht.</p>
-
-        <ol>
-            <li>Die Arbeitsweise des REM-Korrektors</li>
-        </ol>
-
-
-        <p>Das Maschinenprogramm ist in drei Hauptteile gegliedert. Im ersten Teil wird das Basic-Programm durchsucht und für jede gültige Zeile, oder den gültigen Teil einer Zeile, die Anfangsadresse (2 Bytes) und die Zahl der Bytes (1 Byte) unter dem ROM ab Adresse $A000 abgelegt.</p>
-
-        <p>Die Nummern der gelöschten Zeilen (2 Bytes) sowie die Nummer der jeweils nächsten gültigen Zeile (die nicht mit einem REM beginnt), werden ab Adresse $FFFF, ebenfalls unter dem ROM, in absteigender Folge abgelegt.</p>
-
-        <p>Anhand der Zeiger ab $A000 werden die Zeilenteile der Basic-Bereiche neu zusammengesetzt und nach untern komprimiert. Das heißt, daß mit den gültigen Zeilen oder Zeilenteilen das ursprüngliche Basic-Programm überschrieben wird. Da das neue Basic-Programm kürzer oder höchstens gleich lang ist wie das alte, kann diese Operation Zeile für Zeile im selben Speicherbereich (Basic-Bereich ab 2048) stattfinden. Damit sind die REMs entfernt!</p>
-
-        <p>Die Teile 1 und 2 sind sehr schnell, da der Basic-Speicherbereich jeweils nur einmal durchlaufen werden muß.</p>
-
-        <p>Im dritten Teil wird das Basic-Programm nach Sprungcodes durchsucht. Dabei werden Bytes, die zufällig eine Sprungadresse darstellen, sich aber innerhalb von Anführungszeichen befinden (Strings), natürlich ignoriert.</p>
-
-        <p>Die gefundene Adresse, also die Folge von ASCII-Codes, wird in eine 2-Byte-Hexadezimalzahl umgewandelt und der Bereich von $FFFF abwärts durchsucht, ob diese Zeilennummer mit der Nummer einer gelöschten Zeile übereinstimmt. Trifft dies zu, wird die ebenfalls abgespeicherte Hexadezimalzahl (Zeilennummer) der nächsten gültigen Zeile geholt und in ASCII-Codes umgerechnet. Ist die neue Zeilennummer, in einer Folge von ASCII-Codes ausgedrückt, länger als die alte, wird das Basic-Programm um diesen Unterschied nach hinten verschoben und die Basic-Zeiger restauriert. Dann wird die Zeilennummer eingefügt und festgestellt, ob noch eine Zeilennummer folgt (ON&hellip;GOTO). Wenn nicht, wird nach weiteren Sprungcodes gesucht.</p>
 
         <address class="author">(Dipl. Ing. Wilhelm Meierhofer/hm)</address>
         <figure>
@@ -90,6 +90,16 @@
             <figcaption>Listing des REM-Korrektors</figcaption>
         </figure>
         <div class="binary_download" data-filename="remkorrektor.prg" data-name="REM-Korrektor"></div>
+
+        <aside class="fehlerteufelchen" id="fehlerteufelchen">
+            <h2>Fehlerteufelchen</h2>
+        
+            <p>In den REM-Killer hat sich ein logischer Fehler eingeschlichen. Sollen GOTO-und GOSUB-Befehle direkt hinter einem THEN-Befehl angeglichen werden, sind folgende Änderungen nach dem Laden des REM-Killers nötig:
+                <code>»POKE 52621,154:POKE526 25,150«</code>
+            </p>
+        
+            <!-- 64'er 9/1985 -->
+        </aside>
     </article>
 </body>
 
