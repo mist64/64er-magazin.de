@@ -121,12 +121,16 @@ function createSearchResultBlurb(query, pageContent) {
         }
       }
     }
+    // Check if we have enough words for the summary
     const searchResultWords = tokenize(searchResultText);
-    const pageBreakers = searchResultWords.filter((word) => word.length > 50);
-    if (pageBreakers.length > 0) {
-      searchResultText = fixPageBreakers(searchResultText, pageBreakers);
-    }
     if (searchResultWords.length >= MAX_SUMMARY_LENGTH) break;
+  }
+  
+  // Fix any long words that might break layout (do this once at the end)
+  const searchResultWords = tokenize(searchResultText);
+  const pageBreakers = searchResultWords.filter((word) => word.length > 50);
+  if (pageBreakers.length > 0) {
+    searchResultText = fixPageBreakers(searchResultText, pageBreakers);
   }
   result = ellipsize(searchResultText, MAX_SUMMARY_LENGTH).replace(
     searchQueryRegex,
