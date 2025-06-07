@@ -836,23 +836,6 @@ class ArticleDatabase:
             default=None
         )
 
-    def articles_by_index_categories(self, index_categories, issue_key=None):
-        # toc_category hacks for Rubriken and Aktuell
-        if index_categories == ["Aktuell|"]:
-          filtered_articles = [ article for article in self.articles if ((not article.index_category and article.toc_category and article.toc_category == "Aktuell") or (article.index_category and article.index_category.startswith("Aktuell"))) and (issue_key is None or article.issue_key == issue_key)]
-
-        elif index_categories == ["Rubriken|"]:
-            filtered_articles = [ article for article in self.articles if article.toc_category and article.toc_category == "Rubriken" and (issue_key is None or article.issue_key == issue_key)]
-
-        else:
-            index_categories = tuple(index_categories)
-            filtered_articles = [ article for article in self.articles if article.index_category and article.index_category.startswith(index_categories) and (issue_key is None or article.issue_key == issue_key)]
-
-        return sorted(filtered_articles, key=lambda x: x.article_sort_key())
-
-    def articles_by_toc_categories(self, toc_categories, issue_key=None):
-        filtered_articles = [article for article in self.articles if article.toc_category in toc_categories and (issue_key is None or article.issue_key == issue_key)]
-        return sorted(filtered_articles, key=lambda x: x.article_sort_key())
 
     def toc_with_articles(self, issue_key):
         issue = self.issues[issue_key]
@@ -860,7 +843,7 @@ class ArticleDatabase:
 
         toc_order = [""] + issue.toc_order # prepend empty category
         for toc in toc_order:
-            articles = self.articles_by_toc_categories([toc], issue_key)
+            articles = self.get_articles(issue_key=issue_key, toc_categories=[toc], sort_by='page')
             articles_sorted = sorted(articles, key=lambda x: x.article_sort_key())
             toc_entries.append({
                 'category': toc,
@@ -869,8 +852,6 @@ class ArticleDatabase:
 
         return toc_entries
 
-    def articles_with_downloads(self):
-        return [article for article in self.articles if article.is_category_listings()]
 
     def all_type_in_articles_grouped_by_index_category(self):
         # Initialize a dictionary to hold articles by category
@@ -889,6 +870,58 @@ class ArticleDatabase:
 
         sorted_categories = sorted(articles_by_category.items(), key=lambda x: x[0])
         return OrderedDict(sorted_categories)
+
+    def get_articles(self, 
+                    title_exclude=None,
+                    issue_key=None,
+                    index_categories=None,
+                    toc_categories=None,
+                    has_downloads=None,
+                    sort_by='page',
+                    reverse=False,
+                    limit=None):
+        """
+        Unified method to filter and sort articles.
+        """
+        articles = self.articles[:]
+        
+        if title_exclude:
+            articles = [a for a in articles if a.title not in title_exclude]
+            
+        if issue_key:
+            articles = [a for a in articles if a.issue_key == issue_key]
+            
+        if index_categories:
+            if index_categories == ["Aktuell|"]:
+                articles = [a for a in articles if 
+                           ((not a.index_category and a.toc_category and a.toc_category == "Aktuell") or 
+                            (a.index_category and a.index_category.startswith("Aktuell")))]
+            elif index_categories == ["Rubriken|"]:
+                articles = [a for a in articles if 
+                           a.toc_category and a.toc_category == "Rubriken"]
+            else:
+                index_categories_tuple = tuple(index_categories)
+                articles = [a for a in articles if 
+                           a.index_category and a.index_category.startswith(index_categories_tuple)]
+                           
+        if toc_categories:
+            articles = [a for a in articles if a.toc_category in toc_categories]
+            
+        if has_downloads is not None:
+            if has_downloads:
+                articles = [a for a in articles if a.is_category_listings()]
+        
+        if sort_by == 'page':
+            articles = sorted(articles, key=lambda x: x.article_sort_key(), reverse=reverse)
+        elif sort_by == 'pubdate':
+            articles = sorted(articles, key=lambda x: x.article_pubdate(), reverse=reverse)
+        elif sort_by == 'sort_index':
+            articles = sorted(articles, key=lambda x: x.sort_index, reverse=reverse)
+        
+        if limit:
+            articles = articles[:limit]
+            
+        return articles
 
 ### Helpers
 
@@ -953,11 +986,10 @@ def html_generate_latest_issue(db, special):
     return latest_html
 
 def html_generate_latest_downloads(db):
-    articles_with_downloads = db.articles_with_downloads()
-    sorted_articles = sorted(articles_with_downloads, key=lambda x: x.article_pubdate(), reverse=True)[:NEW_DOWNLOADS]
+    articles = db.get_articles(has_downloads=True, sort_by='pubdate', reverse=True, limit=NEW_DOWNLOADS)
     html_parts = [f"<h2>{LABEL_LATEST_LISTINGS}</h2><hr><ul>"]
 
-    for article in sorted_articles:
+    for article in articles:
         link = article_link(db, article, index_title(article), True)
         html_parts.append(f"<li>{link}</li>")
 
@@ -1084,7 +1116,7 @@ def html_generate_tocs_all_issues(db):
     return ''.join(html_parts)
 
 def html_generate_articles_for_categories(db, index_categories, alphabetical, issue_key=None, append_issue_number=False):
-    articles = db.articles_by_index_categories(index_categories, issue_key)
+    articles = db.get_articles(issue_key=issue_key, index_categories=index_categories, sort_by='page')
     if not articles:
         return None
     if alphabetical:
@@ -1213,11 +1245,7 @@ def html_generate_article_preview(db, article):
 
 
 def html_generate_all_article_previews(db):
-    # Filter out specific articles
-    articles = [article for article in db.articles if article.title not in ["Impressum", "Vorschau"]]
-
-    # Sort by 'pubdate'
-    articles = sorted(articles, key=lambda x: x.article_pubdate(), reverse=True)
+    articles = db.get_articles(title_exclude=["Impressum", "Vorschau"], sort_by='pubdate', reverse=True)
 
     html_articles = []
 
@@ -1465,9 +1493,9 @@ def generate_404_page(db, out_directory):
 def generate_rss_feed(db, out_directory):
     rss_items = []
 
-    sorted_articles = sorted(db.articles, key=lambda x: x.article_pubdate(), reverse=True)
+    articles = db.get_articles(sort_by='pubdate', reverse=True)
 
-    for article in sorted_articles:
+    for article in articles:
         title = html.escape(index_title(article))
         issue = db.issues[article.issue_key]
         link = full_url(article_path(issue, article, True))
@@ -1788,9 +1816,9 @@ def copy_articles_and_assets(db, in_directory, out_directory):
 
 
         # Copy all images of all articles of the issue and downloads
-        articles = [article for article in db.articles if article.issue_key == issue_key]
+        articles = db.get_articles(issue_key=issue_key, sort_by='sort_index')
         article_index = 0
-        for article in sorted(articles, key=lambda x: x.sort_index):
+        for article in articles:
             # Copy images found in article metadata
             img_srcs = article.src_img_urls if article.src_img_urls else []
             for img_src in img_srcs:
