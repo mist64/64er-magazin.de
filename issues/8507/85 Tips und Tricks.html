@@ -5,7 +5,7 @@
     <title>Tips und Tricks</title>
     <meta charset="UTF-8">
     <link rel="stylesheet" href="../style.css">
-    <meta name="author" content="Andreas Scharrer, Günter Büntemeyer, Henning Zipf, Klaus Holthausen, Thomas Hahn, Werner Weigelt">
+    <meta name="author" content="Andreas Scharrer, Günter Büntemeyer, Henning Zipf, Herbert Lickes, Klaus Holthausen, Thomas Hahn, Werner Weigelt">
     <meta name="64er.issue" content="7/85">
     <meta name="64er.pages" content="85-86">
     <meta name="64er.head1" content="Tips und Tricks">
@@ -17,7 +17,6 @@
 
 <body>
     <article>
-        <h1>Tips und Tricks</h1>
         <h2>VC 20-Steckmodule auf Diskette</h2>
 
         <p>Wer ein Programmierhilfe-Modul wie zum Beispiel den »Super-Expander« und gleichzeitig eine 64-KByte-Speichererweiterung besitzt, der steht vor dem Problem, daß immer nur eines von beiden Modulen eingesetzt werden kann. Man hat also die Wahl zwischen erweitertem Speicher und komfortabler Programmierung.</p>
@@ -25,9 +24,10 @@
         <p>Doch das muß nicht so sein. Wenn Sie ein Diskettenlaufwerk zur Verfügung haben, dann können Sie das Modul einfach auf Diskette abspeichern und bei Bedarf in den Steckmodulbereich ($A000 bis $BFFF) der 64-KByte-Erweiterung laden. Gehen Sie dabei wie folgt vor:</p>
 
         <p>Bei eingesteckter Supererweiterung wird zunächst der Basic-Anfang durch
-            POKE 43,0:POKE 44,160
+            <code>POKE 43,0:POKE 44,160</code>
             auf $A000, also auf den Steckmodulanfang, gesetzt. Nun wird noch der Zeiger auf das Basic-Ende verbogen:
-            POKE 45,0:POKE 46,192</p>
+            <code>POKE 45,0:POKE 46,192</code>
+        </p>
 
         <p>Das Modul kann jetzt mit »SAVE "»Name",8« auf Diskette gespeichert werden. Bei Bedarf kann es jederzeit wieder mit »LOAD "Name",8,1« geladen werden, vorausgesetzt natürlich, man hat RAM im Bereich $A000 bis $BFFF zur Verfügung. Die Supererweiterung wird mit »SYS 64802« eingeschaltet und meldet sich dann mit 28023 freien Speicherbytes. Ausgeschaltet werden kann sie mit »SYS 64818«.</p>
 
@@ -40,11 +40,14 @@
         <h2>Es muß nicht immer »READY.« sein &hellip;</h2>
 
         <p>Wenn Sie sich darüber ärgern, daß der C 64 nach jedem ausgeführten Befehl sein stupides »READY.« auf den Bildschirm schreibt, dann geben Sie doch die beiden folgenden Zeilen im Direktmodus ein:
-            FOR I = 40960 TO 49151 : POKE I,PEEK(I) : NEXT : POKE 1,54 : REM Basic-Interpreter ins RAM laden
-            FOR I=41848 TO 41853 : POKE I,32 : NEXT : REM READY-Meldung überschreiben</p>
+            <code>FOR I = 40960 TO 49151 : POKE I,PEEK(I) : NEXT : POKE 1,54 : REM Basic-Interpreter ins RAM laden
+                FOR I=41848 TO 41853 : POKE I,32 : NEXT : REM READY-Meldung überschreiben
+            </code>
+        </p>
 
         <p>Wenn Sie jetzt irgendeinen Befehl eingeben, erscheint kein »READY.« mehr. Natürlich können Sie aber auch einfach den Text ändern:
-            A$="HALLO." : FOR I = 1 TO 6 : POKE 41847 + I,ASC(MID$ (A$,I,1)) : NEXT</p>
+            <code>A$="HALLO." : FOR I=1 TO 6 : POKE 41847+I,ASC(MID$(A$,I,1)) : NEXT</code>
+        </p>
 
         <p>Nach Eingabe dieser Zeile meldet sich der Interpreter nach jeder Eingabe mit »HALLO.«. Sie können jeden beliebigen Text wählen, vorausgesetzt, er ist maximal sechs Zeichen lang.</p>
 
@@ -52,23 +55,34 @@
 
         <h2>Simons Basic und TurboTape</h2>
 
-        <p>Das langsame Laden von der Datasette ist ein gravierender Nachteil von Simons Basic, der sich aber mit »Turbo Tape« beheben läßt. Nun überschneiden sich zwar Simons Basic und Turbo-Tape in bestimmten Speicherbereichen und bei der Zeropage-Belegung, aber das läßt sich mit wenig Aufwand beheben. Wer sich an die folgenden Anweisungen hält, wird künftig auch bei Simons Basic im Turbo-Tape-Modus laden und abspeichern können. Die Anweisungen gelten für alle Turbo-Tape-Versionen, die einen Basic-Kopf haben und über »SYS 50000« reaktiviert werden können. Die Anfangsadresse des ungekürzten Turbo-Tape ist A=3032. Bei anderen Anfangsadressen sollte der entsprechende Wert im Umschreibeprogramm verwendet werden.
-            (1) Umschreiben von Turbo-Tape
-            Durch folgende Manipulationen wird Turbo-Tape in einen anderen Speicherbereich verlegt:
-            — Simons Basic laden und starten.
-            — Turbo-Tape laden ohne zu starten.
-            — Eingabe der folgenden Zeilen im Direktmodus:
-            A=3032 : B=PEEK(45) + 256 \* PEEK(46) : D=0 : DIM A(100)
-            FORX=ATOB:C = PEEK(X): IFC>19ANDC&lt;198THEN D=D+1 : A(D)=X : NEXT : ELSE : NEXT
-            H = 141 : G = 169
-            FOR X=1 TO D : C=A(X): F=PEEK(C-2): IF F=32 OR F=H OR PEEK(C-1)=GTHEN POKE C,PEEK&copy;-96: NEXT:ELSE : NEXT
-            — Turbo-Tape ist jetzt fertig umgeschrieben und sollte zunächst abgespeichert werden.
-            (2) Der Umgang mit Simons Turbo-Tape
-            — Erst Simons Basic, dann das umgeschriebene Turbo-Tape laden und starten.
-            — Um mit Simons Basic normal arbeiten zu können, muß es mit »SYS 32778« reaktiviert werden. Ein eventuell vorhandenes Programm erhält man mit dem Befehl »OLD« zurück.
-            — Zum Laden oder Abspeichern von Programmen wird TurboTape mit »SYS 25424« aktiviert.
-            — Simons Basic und Turbo-Tape werden also je nach Bedarf wechselseitig eingeschaltet.
-            — Der Basic-Speicher sollte auf $6000 eingegrenzt werden, damit Turbo-Tape nicht überschrieben wird.</p>
+        <p>Das langsame Laden von der Datasette ist ein gravierender Nachteil von Simons Basic, der sich aber mit »Turbo Tape« beheben läßt. Nun überschneiden sich zwar Simons Basic und Turbo-Tape in bestimmten Speicherbereichen und bei der Zeropage-Belegung, aber das läßt sich mit wenig Aufwand beheben. Wer sich an die folgenden Anweisungen hält, wird künftig auch bei Simons Basic im Turbo-Tape-Modus laden und abspeichern können. Die Anweisungen gelten für alle Turbo-Tape-Versionen, die einen Basic-Kopf haben und über »SYS 50000« reaktiviert werden können. Die Anfangsadresse des ungekürzten Turbo-Tape ist A=3032. Bei anderen Anfangsadressen sollte der entsprechende Wert im Umschreibeprogramm verwendet werden.</p>
+
+        <ol>
+            <li>Umschreiben von Turbo-Tape
+                <p>Durch folgende Manipulationen wird Turbo-Tape in einen anderen Speicherbereich verlegt:</p>
+                <ul>
+                    <li>Simons Basic laden und starten.</li>
+                    <li>Turbo-Tape laden ohne zu starten.</li>
+                    <li>Eingabe der folgenden Zeilen im Direktmodus:
+                        <code>A=3032 : B=PEEK(45) + 256 * PEEK(46) : D=0 : DIM A(100)
+                            FORX=ATOB:C = PEEK(X): <a href="#fehlerteufelchen" class="fehlerteufelchen_link">IFC&gt;19</a> AND C&lt;198THEN D=D+1 : A(D)=X : NEXT : ELSE : NEXT
+                            H = 141 : G = 169
+                            FOR X=1 TO D : C=A(X): F=PEEK(C-2): IF F=32 OR F=H OR PEEK(C-1)=G THEN POKE C,PEEK(C)-96: NEXT : ELSE : NEXT
+                        </code>
+                    </li>
+                    <li>Turbo-Tape ist jetzt fertig umgeschrieben und sollte zunächst abgespeichert werden.</li>
+                </ul>
+            </li>
+            <li>Der Umgang mit Simons Turbo-Tape
+                <ul>
+                    <li>Erst Simons Basic, dann das umgeschriebene Turbo-Tape laden und starten.</li>
+                    <li>Um mit Simons Basic normal arbeiten zu können, muß es mit »SYS 32778« reaktiviert werden. Ein eventuell vorhandenes Programm erhält man mit dem Befehl »OLD« zurück.</li>
+                    <li>Zum Laden oder Abspeichern von Programmen wird TurboTape mit »SYS 25424« aktiviert.</li>
+                    <li>Simons Basic und Turbo-Tape werden also je nach Bedarf wechselseitig eingeschaltet.</li>
+                    <li>Der Basic-Speicher sollte auf $6000 eingegrenzt werden, damit Turbo-Tape nicht überschrieben wird.</li>
+                </ul>
+            </li>
+        </ol>
 
         <p>Wenn man sich genau an diese Hinweise hält, dann steht einem Arbeiten mit Turbo-Tape auch bei Simons Basic nichts mehr im Wege. Es gibt mittlerweile auch neue Versionen von Turbo-Tape und Simons Basic, die problemlos von Anfang an zusammenarbeiten.</p>
 
@@ -76,10 +90,12 @@
 
         <h2>Tips für VC 20 und Datasette</h2>
 
-        <p>POKE 37148,252 Datasetten-Motor einschalten
-            POKE 37148,254 Datasetten-Motor ausschalten
-            WAIT 37148,2,2 Wartet auf Drücken einer Datasetten-Taste
-            WAIT 37151,64 Wartet, bis »Play«-Taste ausrastet</p>
+        <ul class="plain">
+            <li>POKE 37148,252 Datasetten-Motor einschalten</li>
+            <li>POKE 37148,254 Datasetten-Motor ausschalten</li>
+            <li>WAIT37148,2,2 Wartet auf Drücken einer Datasetten-Taste</li>
+            <li>WAIT 37151,64 Wartet, bis »Play«-Taste ausrastet</li>
+        </ul>
 
         <address class="author">(Thomas Hahn)</address>
 
@@ -105,34 +121,39 @@
 
         <h2>POKEs für den VC 20</h2>
 
-        <p>POKE 199,1 Wirkung wie RVS ON
-            POKE 199,0 Wirkung wie RVS OFF
-            POKE 214,X Setzt Cursor um X Stellen nach unten
-            POKE 774,0 Listschutz (Listet nur Zeilennummern)
-            POKE 774,27 Listschutz (Listet nur Unsinn)
-            POKE 774,26 Listschutz aus
-            POKE 775,1 Listschutz (VC 20 stürzt ab)
-            POKE 775,200 Listschutz (»Error« nach erster Zeile)
-            POKE 775,199 LIST wieder normal
-            POKE 776,221 Verweigert Befehlsausführung
-            POKE 777,1 Cursor »HOME« nach jedem Befehl
-            POKE 777,199 Hebt vorherigen POKE wieder auf
-            POKE 788,194 RUN/STOP-Taste abschalten
-            POKE 788,191 RUN/STOP-Taste wieder in Betrieb
-            POKE 792,2 RESTORE-Taste abschalten
-            POKE 792,173 RESTORE-Taste wieder in Betrieb
-            POKE 808,128 RUN/STOP und RESTORE abschalten
-            POKE 808,112 RUN/STOP und RESTORE wieder in Betrieb
-            POKE 36864,X Horizontale Bildschirmzentrierung (X=0-59)
-            POKE 36865,X Vertikale Bildschirmzentrierung (X=0-156)
-            POKE 36866,X Anzahl Bildschirmspalten (X=128 + Spalten)
-            POKE 36867,X Anzahl Bildschirmzeilen (X=2-46)
-            POKE 36869,242 Umschalten auf Kleinschriftmodus
-            POKE 36869,240 Umschalten auf Großschrift/Grafik
-            POKE 37148,251 Datasettenmotoraus
-            POKE 37148,252 Datasettenmotor ein
-            POKE 37150,2 Setzt RESTORE-Taste außer Betrieb
-            POKE 37150,130 Setzt RESTORE-Taste wieder in Betrieb (Herbert Lickes)</p>
+        <ul class="plain">
+            <li>POKE 199,1 Wirkung wie RVS ON</li>
+            <li>POKE 199,0 Wirkung wie RVS OFF</li>
+            <li>POKE 214,X Setzt Cursor um X Stellen nach unten</li>
+            <li>POKE 774,0 Listschutz (Listet nur Zeilennummern)</li>
+            <li>POKE 774,27 Listschutz (Listet nur Unsinn)</li>
+            <li>POKE 774,26 Listschutz aus</li>
+            <li>POKE 775,1 Listschutz (VC 20 stürzt ab)</li>
+            <li>POKE 775,200 Listschutz (»Error« nach erster Zeile)</li>
+            <li>POKE 775,199 LIST wieder normal</li>
+            <li>POKE 776,221 Verweigert Befehlsausführung</li>
+            <li>POKE 777,1 Cursor »HOME« nach jedem Befehl</li>
+            <li>POKE 777,199 Hebt vorherigen POKE wieder auf</li>
+            <li>POKE 788,194 RUN/STOP-Taste abschalten</li>
+            <li>POKE 788,191 RUN/STOP-Taste wieder in Betrieb</li>
+            <li>POKE 792,2 RESTORE-Taste abschalten</li>
+            <li>POKE 792,173 RESTORE-Taste wieder in Betrieb</li>
+            <li>POKE 808,128 RUN/STOP und RESTORE abschalten</li>
+            <li>POKE 808,112 RUN/STOP und RESTORE wieder in Betrieb</li>
+            <li>POKE 36864,X Horizontale Bildschirmzentrierung (X=0-59)</li>
+            <li>POKE 36865,X Vertikale Bildschirmzentrierung (X=0-156)</li>
+            <li>POKE 36866,X Anzahl Bildschirmspalten (X=128 + Spalten)</li>
+            <li>POKE 36867,X Anzahl Bildschirmzeilen (X=2-46)</li>
+            <li>POKE 36869,242 Umschalten auf Kleinschriftmodus</li>
+            <li>POKE 36869,240 Umschalten auf Großschrift/Grafik</li>
+            <li>POKE 37148,251 Datasettenmotoraus</li>
+            <li>POKE 37148,252 Datasettenmotor ein</li>
+            <li>POKE 37150,2 Setzt RESTORE-Taste außer Betrieb</li>
+            <li>POKE 37150,130 Setzt RESTORE-Taste wieder in Betrieb</li>
+        </ul>
+
+
+        <address class="author">(Herbert Lickes)</address>
 
         <h2>Reset-Helfer für C 64</h2>
 
@@ -161,6 +182,16 @@
         </figure>
 
         <address class="author">(Henning Zipf)</address>
+
+        <aside class="fehlerteufelchen" id="fehlerteufelchen">
+            <h2>Fehlerteufelchen</h2>
+
+            <h3>Simons Basic und Turbo Tape</h3>
+
+            <p>In der zweiten Zeile des Umschreibeprogramms befindet sich ein Fehler. Statt »IF C>19« sollte es heißen »IF C>191«.</p>
+        
+            <!-- 64'er 4/1986 -->
+        </aside>
     </article>
 </body>
 
