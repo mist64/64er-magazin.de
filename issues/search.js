@@ -4,7 +4,7 @@
 
 let pagesIndex, searchIndex;
 const MAX_SUMMARY_LENGTH = 100;
-const SENTENCE_BOUNDARY_REGEX = /\b\.\s/gm;
+const SENTENCE_BOUNDARY_REGEX = /[.!?]+\s+/gm;
 const WORD_REGEX = /\b(\w*)[\W|\s|\b]?/gm;
 
 async function fetchJsonData(url) {
@@ -133,7 +133,9 @@ function createSearchResultBlurb(query, pageContent) {
     "<strong>$&</strong>"
   );
   if (!result) {
-    result = "[...]";
+    // Fallback: provide excerpt from beginning of content
+    const fallbackText = ellipsize(pageContent, MAX_SUMMARY_LENGTH);
+    result = fallbackText.replace(searchQueryRegex, "<strong>$&</strong>");
   }
   return result;
 }
