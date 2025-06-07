@@ -34,7 +34,14 @@
             <li>NEW eingeben</li>
             <li>Laden des Basic-Start-Generators mit LOAD"name",8</li>
             <li>Starten mit RUN</li>
-            <li>Eingabe von SYS 2089,[anfang],[ende+1],[einsprung] [anfang]: Beginn des Maschinenprogramms im Speicher [ende]: Ende des Maschinenprogramms im Speicher [einsprung]: Einsprungadresse, also der SYS-Wert, mit dem normalerweise das Programm gestartet wurde.<br>Alle Parameter müssen in dezimaler Schreibweise eingegeben werden, wobei der korrekte Bereich (0 bis 65535) selbst überprüft werden muß. Es wird ein »ILLEGAL QUANTITY ERROR« ausgegeben, falls [anfang] > = [ende] ist.</li>
+            <li>Eingabe von SYS 2089,[anfang],[ende+1],[einsprung]
+                <ul class="plain">
+                    <li>[anfang]: Beginn des Maschinenprogramms im Speicher</li>
+                    <li>[ende]: Ende des Maschinenprogramms im Speicher</li>
+                    <li>[einsprung]: Einsprungadresse, also der SYS-Wert, mit dem normalerweise das Programm gestartet wurde.</li>
+                </ul>
+                <p>Alle Parameter müssen in dezimaler Schreibweise eingegeben werden, wobei der korrekte Bereich (0 bis 65535) selbst überprüft werden muß. Es wird ein »ILLEGAL QUANTITY ERROR« ausgegeben, falls [anfang] > = [ende] ist.</p>
+            </li>
             <li>Speichern des erzeugten Programms mit SAVE "name",8</li>
         </ol>
 
@@ -45,12 +52,15 @@
 
         <p>Jetzt werden der Programmkopf und das dahinter liegende Quellprogramm nach $0800, also dem Basic-Start, kopiert. Anschließend werden die Basic-Pointer (Anfang/Ende des Basic-Programms) und im Programmkopf die Adressen gesetzt. Nach der Meldung »READY TO SAVE« kann das bearbeitete Programm abgespeichert werden.</p>
 
-        <p>Nun eine nähere Erläuterung zum Programmkopf: lm Basic-ROM gibt es eine Unterroutine, die Speicherinhalte verschieben kann und deren Einsprungpunkt bei $A3BF liegt.</p>
+        <p>Nun eine nähere Erläuterung zum Programmkopf: Im Basic-ROM gibt es eine Unterroutine, die Speicherinhalte verschieben kann und deren Einsprungpunkt bei $A3BF liegt.</p>
 
-        <p>Diese Verschieberoutine macht sich der Basic-Start-Generator im Programmkopf zunutze, so daß das Quellprogramm wieder in seinen Ursprungsbereich kopiert werden kann. Die Übergabe der Kopierparameter erfolgt in den Adressen:
-            $5F/$60 — alter Blockanfang
-            $5A/$5B — altes Blockende + 1
-            $58/$59 — neues Blockende + 1</p>
+        <p>Diese Verschieberoutine macht sich der Basic-Start-Generator im Programmkopf zunutze, so daß das Quellprogramm wieder in seinen Ursprungsbereich kopiert werden kann. Die Übergabe der Kopierparameter erfolgt in den Adressen:</p>
+
+        <ul class="plain">
+            <li>$5F/$60 — alter Blockanfang</li>
+            <li>$5A/$5B — altes Blockende + 1</li>
+            <li>$58/$59 — neues Blockende + 1</li>
+        </ul>
 
         <p>Nach dem Start des mit einem Basic-Start versehenen Programms wird die Blockverschieberoutine aktiviert und das Programm in seinen Bereich kopiert und gestartet.</p>
 
