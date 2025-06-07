@@ -727,6 +727,13 @@ class Issue:
       for tag in div_downloads:
           data_filename = tag.get("data-filename")
           data_name = tag.get("data-name")
+          
+          # Check if the binary file actually exists to avoid 404s
+          issue_directory = os.path.dirname(html_file_path)
+          binary_file_path = os.path.join(issue_directory, 'prg', data_filename)
+          if not os.path.exists(binary_file_path):
+              raise SystemExit(f'\n---\nBinaryDownloadError: Binary file not found: "{binary_file_path}"\n   File: "{html_file_path}"')
+          
           data_filename_escaped = urllib.parse.quote(data_filename)
           downloads.append((data_name, f"prg/{data_filename_escaped}"))
           tag.decompose()
