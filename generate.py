@@ -708,7 +708,7 @@ class Issue:
                   listing = "\n".join(listing)
                   listing = listing.replace("&", "&amp;")
                   listing = listing.replace("<", "&lt;")
-                  newhtml = f"""<div class="listing"><span class="controls"><input type="checkbox" role="switch" class="toggle" checked="checked" /></span>
+                  newhtml = f"""<div class="listing"><span role="controls"><input name="{data_filename}/{data_range}" id="petcat" type="radio" checked><label for="petcat">petcat <span class="copy-btn"></label> | <input name="{data_filename}/{data_range}" id="checksummer" type="radio"><label for="checksummer">Checksummer</label></span>
                     <pre class="listing-petcat">{listing}</pre>
                     <pre class="listing-checksummer">{listing_html}</pre></div>
                   """
@@ -1283,14 +1283,13 @@ def write_full_html_file(db, path, title, preview_img, body_html, body_class, co
     <script src="/{BASE_DIR}mathjax/es5/tex-mml-chtml.js"></script>
     <script>
       if (window.isSecureContext) document.addEventListener("DOMContentLoaded", (event) => {{
-        let copyBtn = document.createElement("span")
-        copyBtn.innerHTML = "📋"
-        copyBtn.addEventListener("click", () => {{
-          let el = copyBtn.parentNode.parentNode.querySelector("pre.listing-petcat")
+        let copyFunc = function (e) {{
+          let el = this.parentNode.parentNode.parentNode.querySelector("pre.listing-petcat")
           navigator.clipboard.writeText(el.innerText)
-        }})
-        document.querySelectorAll("div.listing span.controls").forEach( (el) => {{
-            el.appendChild(copyBtn)
+        }}
+        document.querySelectorAll(".copy-btn").forEach( (copyBtn) => {{
+	    copyBtn.style.visibility = 'inherit';
+	    copyBtn.addEventListener("click", copyFunc)
         }})
       }})
     </script>
