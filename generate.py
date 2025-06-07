@@ -1880,21 +1880,11 @@ def html_to_text_preserve_paragraphs(soup):
     block_tags = ['p', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'div', 'li', 'tr', 'td']
     text_parts = []
 
-    def process_string(elem):
-        clean_text = html.unescape(elem.strip())
-        if clean_text:  # Avoid adding empty strings
-            text_parts.append(clean_text)
-
     def process_block_element(elem):
         # Directly handle block elements without nested block tags
         clean_text = html.unescape(elem.get_text(separator=' ', strip=True))
         if clean_text:  # Add newline for block elements
             text_parts.append(clean_text + '\n')
-
-    # Handle strings
-    for string in soup.find_all(string=True):
-        if isinstance(string, NavigableString):
-            process_string(string)
 
     # Handle block elements
     for tag_name in block_tags:
