@@ -1640,6 +1640,7 @@ def copy_and_modify_html(article, html_dest_path, pdf_path, prev_page_link, next
     body_html = body_html[6:-7] # remove '<body>' and '</body>'
     title = f"{article.title} | {MAGAZINE_NAME}"
     preview_img = next((url for url in (article.img_urls if article.img_urls else [])), None)
+    
 
 
     # add ls-json schema.com information
@@ -1647,49 +1648,58 @@ def copy_and_modify_html(article, html_dest_path, pdf_path, prev_page_link, next
     # metas = soup.find_all('meta', {"name": True})
 
     def create_ls_json(title, image_url, date_published, date_modified, authors):
+        import json
+        
+        # Ensure absolute URL for image
         if not image_url:
-            image_url = "logo.png"
-
-        def author_tag(author_name, author_url):
-            if not author_url:
-              author_url = ""
-              #! TODO: add author url:
-              # ,
-              # "url": "{author_url}"
-
-            author_json = f'''
-            {{
-              "@type": "Person",
-              "name": "{author_name}"
-            }}
-            '''
-            return author_json
+            image_url = f"{RSS_BASE_URL}{BASE_DIR}logo.png"
+        elif not image_url.startswith('http'):
+            # Make relative URLs absolute
+            if image_url.startswith('/'):
+                image_url = f"{RSS_BASE_URL}{image_url[1:]}"
+            else:
+                image_url = f"{RSS_BASE_URL}{BASE_DIR}{image_url}"
 
         # author information
         authors_meta_list = soup.find_all('meta', {"name": "author"})
-        authors = []
+        authors_list = []
         for authors_meta in authors_meta_list:
-            authors.extend([ author.strip() for author in authors_meta["content"].split(',')])
+            authors_list.extend([author.strip() for author in authors_meta["content"].split(',')])
 
-        if authors:
-            db.authors.update(authors)
-            authors_json_list = [author_tag(author, "") for author in authors]
-            authors_json = f''', "author": [{", ".join(authors_json_list)}]'''
-        else:
-            authors_json = ""
+        if authors_list:
+            db.authors.update(authors_list)
 
-        ls_json = f'''
-    {{
-      "@context": "https://schema.org",
-      "@type": "Article",
-      "headline": "{title}",
-      "image": [ "{image_url}" ],
-      "datePublished": "{date_published}",
-      "dateModified": "{date_published}"
-      {authors_json}
-    }}
-    '''
-        return ls_json
+        # Build structured data as proper dict, then serialize to JSON
+        structured_data = {
+            "@context": "https://schema.org",
+            "@type": "Article",
+            "headline": title,
+            "image": [image_url],
+            "datePublished": date_published,
+            "dateModified": date_published,
+            "publisher": {
+                "@type": "Organization",
+                "name": MAGAZINE_NAME,
+                "logo": {
+                    "@type": "ImageObject",
+                    "url": f"{RSS_BASE_URL}{BASE_DIR}logo.png"
+                }
+            }
+        }
+        
+        # Add author information if available
+        if authors_list:
+            if len(authors_list) == 1:
+                structured_data["author"] = {
+                    "@type": "Person",
+                    "name": authors_list[0]
+                }
+            else:
+                structured_data["author"] = [
+                    {"@type": "Person", "name": author} for author in authors_list
+                ]
+        
+        return json.dumps(structured_data, ensure_ascii=False)
 
     past_pubtime = article.article_pubdate() - relativedelta(years=40)
     iso_date_published = past_pubtime.isoformat()
