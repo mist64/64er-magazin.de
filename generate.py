@@ -1584,6 +1584,40 @@ def convert_and_copy_image(img_path, dest_img_path):
         shutil.copy(dest_img_path, cache_path)
 
 
+def make_authors_clickable(soup):
+    """Make author names clickable by converting them to links within <address class="author"> tags."""
+    # Find all <address class="author"> tags
+    author_addresses = soup.find_all('address', class_='author')
+    
+    for address in author_addresses:
+        # Get the text content
+        author_text = address.get_text()
+        
+        # Remove parentheses and their content
+        import re
+        author_text_clean = re.sub(r'\([^)]*\)', '', author_text).strip()
+        
+        # Split by '/' to get individual authors and separators
+        parts = re.split(r'(/)', author_text_clean)
+        
+        # Clear the address tag
+        address.clear()
+        
+        # Process each part
+        for part in parts:
+            if part == '/':
+                # Add separator as-is
+                address.append(part)
+            elif part.strip():  # Non-empty author name
+                author = part.strip()
+                # URL encode the author name for the link
+                author_url = f"/{BASE_DIR}authors/{author.replace(' ', '%20')}.html"
+                
+                # Create and append the link
+                link = soup.new_tag('a', href=author_url)
+                link.string = author
+                address.append(link)
+
 def copy_and_modify_html(article, html_dest_path, pdf_path, prev_page_link, next_page_link):
     """Modifies, and writes an HTML file directly to the destination."""
     soup = article.html
@@ -1623,6 +1657,9 @@ def copy_and_modify_html(article, html_dest_path, pdf_path, prev_page_link, next
       for aside in asides:
         ft_tag = BeautifulSoup(HTML_IMG_FUTURETEUFELCHEN, 'html.parser')
         aside.insert(0, ft_tag)
+    
+    # Make authors clickable
+    make_authors_clickable(soup)
 
     # Insert actions for downloading the pdf and tooting to mastooton
     download_pdf_html = f'''
@@ -1927,6 +1964,95 @@ def generate_search_json(db, out_directory):
     with gzip.open(os.path.join(out_directory, 'search_idx.json.gz'), 'wt') as f:
         json.dump(serialized_idx, f, ensure_ascii=False)
 
+def generate_single_author_page(db, author, authors_dir):
+    """Generate a page for a single author with all their articles."""
+    # Find all articles by this author
+    author_articles = []
+    
+    for article in db.articles:
+        soup = article.html
+        author_addresses = soup.find_all('address', class_='author')
+        for address in author_addresses:
+            author_text = address.get_text()
+            # Remove parentheses and their content
+            import re
+            author_text_clean = re.sub(r'\([^)]*\)', '', author_text).strip()
+            # Split by '/' to get individual authors
+            authors_list = [a.strip() for a in author_text_clean.split('/') if a.strip()]
+            
+            if author in authors_list:
+                author_articles.append(article)
+                break
+    
+    # Sort articles by issue (chronologically) and then by page
+    author_articles.sort(key=lambda a: (db.issues[a.issue_key].pubdate, a.first_page_number()))
+    
+    # Generate HTML for the author page
+    html_parts = []
+    html_parts.append(f"<main>\n")
+    html_parts.append(f"<h1>{author}</h1>\n")
+    html_parts.append(f"<p>{len(author_articles)} Artikel</p>\n")
+    html_parts.append("<hr>\n")
+    
+    # Group articles by issue
+    html_parts.append("<ul>\n")
+    current_issue = None
+    
+    for article in author_articles:
+        if article.issue_key != current_issue:
+            if current_issue is not None:
+                html_parts.append("</ul></li>\n")
+            current_issue = article.issue_key
+            html_parts.append(f"<li><strong>{LABEL_ISSUE} {current_issue}</strong>\n<ul>\n")
+        
+        link = article_link(db, article, index_title(article), True)
+        pages = article.pages
+        html_parts.append(f"<li>{link} ({LABEL_PAGE} {pages})</li>\n")
+    
+    if current_issue is not None:
+        html_parts.append("</ul></li>\n")
+    html_parts.append("</ul>\n")
+    html_parts.append("</main>\n")
+    
+    # Write the author page
+    body_html = ''.join(html_parts)
+    author_filename = f"{author.replace(' ', '%20')}.html"
+    author_path = os.path.join(authors_dir, author_filename)
+    write_full_html_file(db, author_path, f"{author} | {MAGAZINE_NAME}", None, body_html, 'one_author')
+
+def generate_all_authors_page(db, all_authors, out_directory):
+    """Generate the main authors.html page listing all authors."""
+    html_parts = []
+    html_parts.append(f"<main>\n")
+    html_parts.append(f"<h1>Alle Autoren</h1>\n")
+    html_parts.append(f"<p>{len(all_authors)} Autoren</p>\n")
+    html_parts.append("<hr>\n")
+    
+    # Create alphabetical listing of authors
+    html_parts.append("<ul>\n")
+    
+    current_letter = None
+    for author in all_authors:
+        first_letter = author[0].upper()
+        if first_letter != current_letter:
+            if current_letter is not None:
+                html_parts.append("</ul></li>\n")
+            current_letter = first_letter
+            html_parts.append(f"<li><strong>{current_letter}</strong>\n<ul>\n")
+        
+        author_url = f"/{BASE_DIR}authors/{author.replace(' ', '%20')}.html"
+        html_parts.append(f'<li><a href="{author_url}">{author}</a></li>\n')
+    
+    if current_letter is not None:
+        html_parts.append("</ul></li>\n")
+    html_parts.append("</ul>\n")
+    html_parts.append("</main>\n")
+    
+    # Write the authors index page
+    body_html = ''.join(html_parts)
+    authors_path = os.path.join(out_directory, 'authors.html')
+    write_full_html_file(db, authors_path, f"Alle Autoren | {MAGAZINE_NAME}", None, body_html, 'all_authors')
+
 def generate_author_pages(db, out_directory):
     known_authors = {}
     known_authors["aa"] = "Albert Absmeier"
@@ -1941,8 +2067,35 @@ def generate_author_pages(db, out_directory):
     # XXX is the marker for author tags that are not set
     unknown_authors = ["ai", "wg", "XXX"]
 
-    found_authors = [author for author in sorted(db.authors) if author not in unknown_authors]
-    #print(found_authors)
+    # Get all unique authors from articles (from address tags)
+    all_authors = set()
+    for article in db.articles:
+        soup = article.html
+        author_addresses = soup.find_all('address', class_='author')
+        for address in author_addresses:
+            author_text = address.get_text()
+            # Remove parentheses and their content
+            import re
+            author_text_clean = re.sub(r'\([^)]*\)', '', author_text).strip()
+            # Split by '/' to get individual authors
+            authors_list = [author.strip() for author in author_text_clean.split('/') if author.strip()]
+            all_authors.update(authors_list)
+    
+    # Also include known authors
+    all_authors.update(known_authors.values())
+    
+    # Create authors directory
+    authors_dir = os.path.join(out_directory, 'authors')
+    if not os.path.exists(authors_dir):
+        os.makedirs(authors_dir)
+    
+    # Generate individual author pages
+    for author in sorted(all_authors):
+        if author not in unknown_authors:
+            generate_single_author_page(db, author, authors_dir)
+    
+    # Generate the main authors.html page
+    generate_all_authors_page(db, sorted(all_authors), out_directory)
 
 
 if __name__ == '__main__':
