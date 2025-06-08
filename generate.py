@@ -1714,7 +1714,7 @@ def generate_course_navigation(article, course_series_map):
     nav_parts.append(f'<div class="course_title">Kurs: {base_title}</div>')
     nav_parts.append('<div class="course_nav_links">')
     
-    # Previous part link
+    # Previous part link (or invisible placeholder)
     if current_index > 0:
         prev_article, prev_part = series[current_index - 1]
         prev_issue = db.issues[prev_article.issue_key]
@@ -1726,12 +1726,13 @@ def generate_course_navigation(article, course_series_map):
             prev_path = f"../{article_path(prev_issue, prev_article, prepend_issue_dir=True)}"
         nav_parts.append(f'<a href="{prev_path}" class="course_nav_prev">◀ Teil {prev_part}</a>')
     else:
-        nav_parts.append('<span class="course_nav_prev disabled">◀ Teil 1</span>')
+        # Invisible placeholder to maintain symmetry
+        nav_parts.append('<span class="course_nav_placeholder"></span>')
     
     # Current part indicator
-    nav_parts.append(f'<span class="course_nav_current">Teil {current_part} von {total_parts}</span>')
+    nav_parts.append(f'<span class="course_nav_current">Teil {current_part}</span>')
     
-    # Next part link
+    # Next part link (or invisible placeholder)
     if current_index < len(series) - 1:
         next_article, next_part = series[current_index + 1]
         next_issue = db.issues[next_article.issue_key]
@@ -1743,7 +1744,8 @@ def generate_course_navigation(article, course_series_map):
             next_path = f"../{article_path(next_issue, next_article, prepend_issue_dir=True)}"
         nav_parts.append(f'<a href="{next_path}" class="course_nav_next">Teil {next_part} ▶</a>')
     else:
-        nav_parts.append(f'<span class="course_nav_next disabled">Teil {total_parts} ▶</span>')
+        # Invisible placeholder to maintain symmetry
+        nav_parts.append('<span class="course_nav_placeholder"></span>')
     
     nav_parts.append('</div>')
     nav_parts.append('</div>')
@@ -1823,6 +1825,11 @@ def copy_and_modify_html(article, html_dest_path, pdf_path, prev_page_link, next
 {mastodon_html}
 </div>'''
 
+    # Insert course navigation again at the end (before PDF downloads)
+    if course_nav_html:
+        course_nav_soup_end = BeautifulSoup(course_nav_html, 'html.parser')
+        body.append(course_nav_soup_end)
+    
     article_actions_soup = BeautifulSoup(article_actions_html, 'html.parser')
     body.append(article_actions_soup) # pdf download and mastodon
 
