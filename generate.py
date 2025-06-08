@@ -2126,6 +2126,7 @@ def generate_single_author_page(db, author, authors_dir, name_to_code):
     html_parts.append(f"<main>\n")
     html_parts.append(f"<h1>{page_title}</h1>\n")
     html_parts.append(f"<p>{len(author_articles)} Artikel</p>\n")
+    html_parts.append(f"<p><a href=\"/{BASE_DIR}autoren.html\">Alle Autoren</a></p>\n")
     html_parts.append("<hr>\n")
 
     # Group articles by issue
