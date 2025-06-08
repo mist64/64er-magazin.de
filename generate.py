@@ -2275,9 +2275,9 @@ def generate_all_authors_page(db, all_authors, out_directory, name_to_code):
     authors_path = os.path.join(out_directory, 'authors.html')
     write_full_html_file(db, authors_path, f"Alle Autoren | {MAGAZINE_NAME}", None, body_html, 'all_authors')
 
-def generate_authors_by_count_page(db, all_authors, out_directory, name_to_code):
+def generate_combined_authors_page(db, all_authors, out_directory, name_to_code):
     """
-    Generate the authors_by_count.html page listing all authors, sorted by article count (descending).
+    Generate the autoren.html page with both alphabetical and count-based listings.
     Authors with more than one article are displayed in bold.
     """
     # Pre-calculate article counts for all authors
@@ -2285,17 +2285,32 @@ def generate_authors_by_count_page(db, all_authors, out_directory, name_to_code)
     
     html_parts = []
     html_parts.append(f"<main>\n")
-    html_parts.append(f"<h1>Autoren nach Anzahl Artikel</h1>\n")
+    html_parts.append(f"<h1>Autoren</h1>\n")
     html_parts.append(f"<p>{len(all_authors)} Autoren</p>\n")
     html_parts.append("<hr>\n")
 
-    # Sort authors by article count (descending), then by last name for ties
-    sorted_authors = sorted(all_authors, key=lambda name: (-author_article_counts.get(name, 0), name.split()[-1]))
+    # ALPHABETICAL SECTION
+    html_parts.append("<h2>Alphabetisch</h2>\n")
+    
+    # 1. Sort the list of authors by their last name.
+    sorted_authors = sorted(all_authors, key=lambda name: name.split()[-1])
 
-    # Create listing of authors sorted by count
+    # Create alphabetical listing of authors
     html_parts.append("<ul>\n")
 
+    current_letter = None
+    # 2. Iterate over the newly sorted list.
     for author in sorted_authors:
+        # 3. Get the first letter of the last name for the alphabetical heading.
+        last_name = author.split()[-1]
+        first_letter = last_name[0].upper()
+
+        if first_letter != current_letter:
+            if current_letter is not None:
+                html_parts.append("</ul>\n")
+            current_letter = first_letter
+            html_parts.append(f"<h3>{current_letter}</h3>\n<ul>\n")
+
         # Format name as "Last name, First name(s)" for display
         formatted_name = format_author_name_lastname_first(author)
 
@@ -2317,13 +2332,49 @@ def generate_authors_by_count_page(db, all_authors, out_directory, name_to_code)
         author_url = f"/{BASE_DIR}authors/{author.replace(' ', '_')}.html"
         html_parts.append(f'<li><a href="{author_url}">{display_name}</a></li>\n')
 
+    if current_letter is not None:
+        html_parts.append("</ul>\n")
+    html_parts.append("</ul>\n")  # Close the main alphabetical section
+
+    # BY COUNT SECTION - only authors with > 1 article
+    html_parts.append("<h2>Nach Anzahl Artikel</h2>\n")
+    
+    # Sort authors by article count (descending), then by last name for ties
+    # Filter to only include authors with more than 1 article
+    authors_with_multiple = [author for author in all_authors if author_article_counts.get(author, 0) > 1]
+    sorted_authors_by_count = sorted(authors_with_multiple, key=lambda name: (-author_article_counts.get(name, 0), name.split()[-1]))
+
+    # Create listing of authors sorted by count
+    html_parts.append("<ul>\n")
+
+    for author in sorted_authors_by_count:
+        # Format name as "Last name, First name(s)" for display
+        formatted_name = format_author_name_lastname_first(author)
+
+        # Create display name with code if available
+        author_code = name_to_code.get(author)
+        if author_code:
+            display_name = f"{formatted_name} ({author_code})"
+        else:
+            display_name = formatted_name
+
+        # Get article count from pre-calculated mapping
+        article_count = author_article_counts.get(author, 0)
+
+        # Wrap the display name in bold tags and add count (all have > 1 article)
+        display_name = f"<b>{display_name}</b> ({article_count})"
+
+        # Create the final list item with the potentially bolded name
+        author_url = f"/{BASE_DIR}authors/{author.replace(' ', '_')}.html"
+        html_parts.append(f'<li><a href="{author_url}">{display_name}</a></li>\n')
+
     html_parts.append("</ul>\n")
     html_parts.append("</main>\n")
 
-    # Write the authors by count page
+    # Write the combined authors page
     body_html = ''.join(html_parts)
-    authors_path = os.path.join(out_directory, 'authors_by_count.html')
-    write_full_html_file(db, authors_path, f"Autoren nach Anzahl Artikel | {MAGAZINE_NAME}", None, body_html, 'all_authors')
+    authors_path = os.path.join(out_directory, 'autoren.html')
+    write_full_html_file(db, authors_path, f"Autoren | {MAGAZINE_NAME}", None, body_html, 'all_authors')
 
 def generate_author_pages(db, out_directory):
     # Load author abbreviations mapping from CSV
@@ -2351,8 +2402,8 @@ def generate_author_pages(db, out_directory):
     # Generate the main authors.html page
     generate_all_authors_page(db, all_authors, out_directory, name_to_code)
     
-    # Generate the authors_by_count.html page
-    generate_authors_by_count_page(db, all_authors, out_directory, name_to_code)
+    # Generate the combined autoren.html page with both alphabetical and count-based sections
+    generate_combined_authors_page(db, all_authors, out_directory, name_to_code)
 
 
 if __name__ == '__main__':
