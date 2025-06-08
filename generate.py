@@ -708,7 +708,7 @@ class Issue:
                   listing = "\n".join(listing)
                   listing = listing.replace("&", "&amp;")
                   listing = listing.replace("<", "&lt;")
-                  newhtml = f"""<div class="listing"><span role="controls"><input name="{data_filename}/{data_range}" id="petcat" type="radio" checked><label for="petcat">petcat <span class="copy-btn"></label> | <input name="{data_filename}/{data_range}" id="checksummer" type="radio"><label for="checksummer">Checksummer</label></span>
+                  newhtml = f"""<div class="listing"><span role="controls"><label>petcat <span class="copy-btn"></span><input class="petcat" type="radio" name="{data_filename}/{data_range}" checked></label> | <label>Checksummer<input class="checksummer" type="radio" name="{data_filename}/{data_range}"></label></span>
                     <pre class="listing-petcat">{listing}</pre>
                     <pre class="listing-checksummer">{listing_html}</pre></div>
                   """
