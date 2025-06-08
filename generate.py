@@ -2252,9 +2252,9 @@ def generate_all_authors_page(db, all_authors, out_directory, name_to_code):
         # Get article count from pre-calculated mapping
         article_count = author_article_counts.get(author, 0)
 
-        # 5. NEW: If the author has more than one article, wrap the display name in bold tags.
+        # If the author has more than one article, wrap the display name in bold tags and add count
         if article_count > 1:
-            display_name = f"<b>{display_name}</b>"
+            display_name = f"<b>{display_name}</b> ({article_count})"
 
         # Create the final list item with the potentially bolded name
         author_url = f"/{BASE_DIR}authors/{author.replace(' ', '_')}.html"
