@@ -1603,13 +1603,15 @@ def make_authors_clickable(soup):
     # Load author abbreviations mapping from CSV
     known_authors = load_author_codes()
     
-    # Get canonical authors from meta tags and resolve abbreviations
+    # Get canonical authors from meta tags and resolve abbreviations for linking
     authors_meta_list = soup.find_all('meta', {"name": "author"})
     canonical_authors = []
+    original_codes = []  # Keep track of original codes for display
     for authors_meta in authors_meta_list:
         for author in authors_meta["content"].split(','):
             author = author.strip()
-            # Resolve abbreviation to full name if known
+            original_codes.append(author)  # Store original code/name
+            # Resolve abbreviation to full name for linking
             resolved_author = known_authors.get(author, author)
             canonical_authors.append(resolved_author)
     
@@ -1649,58 +1651,75 @@ def make_authors_clickable(soup):
         # Get the original text content
         original_text = address.get_text().strip()
         
-        # Determine what text to use
+        # Determine what text to use for display (preserve original format)
         if original_text:
             # Use existing text in address tag
-            text_to_process = original_text
-        elif canonical_authors:
-            # If address is empty but we have canonical authors, use them
-            text_to_process = ', '.join(canonical_authors)
+            display_text = original_text
+        elif original_codes:
+            # If address is empty but we have original codes, use them
+            display_text = ', '.join(original_codes)
         else:
-            # No text and no canonical authors, skip this address tag
+            # No text and no original codes, skip this address tag
             continue
         
+        # For linking, we need to determine the canonical author
         # Handle parentheses: if entire string is parenthetical, extract content; otherwise remove parentheses
-        if text_to_process.startswith('(') and text_to_process.endswith(')') and text_to_process.count('(') == 1:
+        if display_text.startswith('(') and display_text.endswith(')') and display_text.count('(') == 1:
             # Entire string is parenthetical, extract the content
-            clean_text = text_to_process[1:-1].strip()
+            clean_text = display_text[1:-1].strip()
         else:
-            # Remove parentheses and their content
-            clean_text = re.sub(r'\([^)]*\)', '', text_to_process).strip()
+            # Remove parentheses and their content for matching
+            clean_text = re.sub(r'\([^)]*\)', '', display_text).strip()
         
-        # Check if we have an abbreviation to resolve
+        # Check if we have an abbreviation to resolve for linking
         if clean_text in known_authors:
-            clean_text = known_authors[clean_text]
+            canonical_author = known_authors[clean_text]
+        else:
+            canonical_author = clean_text
         
-        # Split by '/' and ',' to handle different separators
-        parts = re.split(r'([/,])', clean_text)
+        # Split by '/' and ',' to handle different separators in display text
+        parts = re.split(r'([/,])', display_text)
         
         # Clear the address tag only after we have content to replace it
         address.clear()
         
-        # Process each part
-        for part in parts:
-            if part in ['/', ',']:
-                # Add separator as-is
-                address.append(part)
-            elif part.strip():  # Non-empty author name
-                author_text = part.strip()
-                
-                # Try to find canonical match
-                canonical_match = find_best_match(author_text, canonical_authors)
-                
-                if canonical_match:
-                    # Create link using canonical author name for URL
-                    author_url = f"/{BASE_DIR}authors/{canonical_match.replace(' ', '_')}.html"
-                    link = soup.new_tag('a', href=author_url)
-                    link.string = author_text  # Keep original display text
-                    address.append(link)
+        # For simple case: if we have a single author code, link it directly
+        if len(parts) == 1 and clean_text in known_authors:
+            # Single author code - link to resolved author but display original
+            author_url = f"/{BASE_DIR}authors/{canonical_author.replace(' ', '_')}.html"
+            link = soup.new_tag('a', href=author_url)
+            link.string = display_text  # Keep original display text (including parentheses)
+            address.append(link)
+        else:
+            # Process each part for complex cases
+            for part in parts:
+                if part in ['/', ',']:
+                    # Add separator as-is
+                    address.append(part)
+                elif part.strip():  # Non-empty author name
+                    author_text = part.strip()
+                    
+                    # For individual parts, check if it's a code or try fuzzy matching
+                    part_clean = re.sub(r'\([^)]*\)', '', author_text).strip()
+                    if part_clean in known_authors:
+                        # It's a known code, link to resolved author
+                        canonical_match = known_authors[part_clean]
+                    else:
+                        # Try to find canonical match using fuzzy logic
+                        canonical_match = find_best_match(author_text, canonical_authors)
+                    
+                    if canonical_match:
+                        # Create link using canonical author name for URL
+                        author_url = f"/{BASE_DIR}authors/{canonical_match.replace(' ', '_')}.html"
+                        link = soup.new_tag('a', href=author_url)
+                        link.string = author_text  # Keep original display text
+                        address.append(link)
+                    else:
+                        # No match found, keep as plain text
+                        address.append(author_text)
                 else:
-                    # No match found, keep as plain text
-                    address.append(author_text)
-            else:
-                # Preserve whitespace
-                address.append(part)
+                    # Preserve whitespace
+                    address.append(part)
 
 def copy_and_modify_html(article, html_dest_path, pdf_path, prev_page_link, next_page_link):
     """Modifies, and writes an HTML file directly to the destination."""
