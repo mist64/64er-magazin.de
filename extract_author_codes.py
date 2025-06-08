@@ -76,37 +76,14 @@ def main():
             for code, name in codes.items():
                 all_codes[code].add(name)
     
-    # Compile final mapping, handling variations
+    # Compile final mapping from extracted data only
     final_mapping = {}
     
-    # Add existing known mappings from generate.py
-    known_authors = {
-        "aa": "Albert Absmeier",
-        "ev": "Volker Everts", 
-        "gk": "Georg Klinge",
-        "kg": "Karin Gößlinghoff",
-        "py": "Michael M. Pauly",
-        "rg": "Christian Rogge",
-        "sc": "Michael Scharfenberger"
-    }
-    
-    for code, name in known_authors.items():
-        final_mapping[code] = name
-    
-    # Add new codes found in Impressum files
+    # Use only codes found in Impressum files
     for code, names in all_codes.items():
-        if code not in final_mapping:
-            # If multiple name variations, pick the longest/most complete one
-            best_name = max(names, key=len) if names else ""
-            final_mapping[code] = best_name
-        else:
-            # Check if we found a better/longer name
-            names_list = list(names)
-            if names_list:
-                longest_name = max(names_list, key=len)
-                if len(longest_name) > len(final_mapping[code]):
-                    print(f"Better name for {code}: '{longest_name}' vs '{final_mapping[code]}'")
-                    final_mapping[code] = longest_name
+        # If multiple name variations, pick the longest/most complete one
+        best_name = max(names, key=len) if names else ""
+        final_mapping[code] = best_name
     
     # Write CSV file
     csv_file = 'known_authors.csv'

@@ -17,6 +17,7 @@ import pytz
 import argparse
 import gzip
 import lunr
+import csv
 from tools import mse, checksummer
 from dataclasses import dataclass, field
 from collections import defaultdict, OrderedDict
@@ -30,6 +31,17 @@ from os import utime
 #
 # Parse arguments
 #
+
+def load_author_codes():
+    """Load author codes from known_authors.csv file."""
+    author_codes = {}
+    with open('known_authors.csv', 'r', encoding='utf-8') as f:
+        reader = csv.DictReader(f)
+        for row in reader:
+            code = row['code'].strip()
+            name = row['name'].strip()
+            author_codes[code] = name
+    return author_codes
 
 ### CONFIG Class
 
@@ -1588,16 +1600,8 @@ def convert_and_copy_image(img_path, dest_img_path):
 
 def make_authors_clickable(soup):
     """Make author names clickable by using meta tags as canonical source and fuzzy matching address tags."""
-    # Known author abbreviations mapping
-    known_authors = {
-        "aa": "Albert Absmeier",
-        "ev": "Volker Everts", 
-        "gk": "Georg Klinge",
-        "kg": "Karin Gößlinghoff",
-        "py": "Michael M. Pauly",
-        "rg": "Christian Rogge",
-        "sc": "Michael Scharfenberger"
-    }
+    # Load author abbreviations mapping from CSV
+    known_authors = load_author_codes()
     
     # Get canonical authors from meta tags and resolve abbreviations
     authors_meta_list = soup.find_all('meta', {"name": "author"})
@@ -1808,8 +1812,13 @@ def copy_and_modify_html(article, html_dest_path, pdf_path, prev_page_link, next
         # author information
         authors_meta_list = soup.find_all('meta', {"name": "author"})
         authors_list = []
+        known_authors = load_author_codes()
         for authors_meta in authors_meta_list:
-            authors_list.extend([author.strip() for author in authors_meta["content"].split(',')])
+            for author in authors_meta["content"].split(','):
+                author = author.strip()
+                # Resolve abbreviation to full name if known
+                resolved_author = known_authors.get(author, author)
+                authors_list.append(resolved_author)
 
         if authors_list:
             db.authors.update(authors_list)
@@ -2044,7 +2053,7 @@ def generate_search_json(db, out_directory):
     with gzip.open(os.path.join(out_directory, 'search_idx.json.gz'), 'wt') as f:
         json.dump(serialized_idx, f, ensure_ascii=False)
 
-def generate_single_author_page(db, author, authors_dir):
+def generate_single_author_page(db, author, authors_dir, name_to_code):
     """Generate a page for a single author with all their articles."""
     # Find all articles by this author using meta tag data
     author_articles = []
@@ -2054,20 +2063,32 @@ def generate_single_author_page(db, author, authors_dir):
         # Get canonical authors from meta tags
         authors_meta_list = soup.find_all('meta', {"name": "author"})
         article_authors = []
+        known_authors = load_author_codes()
         for authors_meta in authors_meta_list:
-            article_authors.extend([a.strip() for a in authors_meta["content"].split(',')])
+            for meta_author in authors_meta["content"].split(','):
+                meta_author = meta_author.strip()
+                # Resolve abbreviation to full name if known
+                resolved_author = known_authors.get(meta_author, meta_author)
+                article_authors.append(resolved_author)
         
-        # Check if this author is in the article's meta authors
+        # Check if this author is in the article's resolved meta authors
         if author in article_authors:
             author_articles.append(article)
     
     # Sort articles by issue (chronologically) and then by page
     author_articles.sort(key=lambda a: (db.issues[a.issue_key].pubdate, a.first_page_number()))
     
+    # Create title with code if available
+    author_code = name_to_code.get(author)
+    if author_code:
+        page_title = f"{author} ({author_code})"
+    else:
+        page_title = author
+    
     # Generate HTML for the author page
     html_parts = []
     html_parts.append(f"<main>\n")
-    html_parts.append(f"<h1>{author}</h1>\n")
+    html_parts.append(f"<h1>{page_title}</h1>\n")
     html_parts.append(f"<p>{len(author_articles)} Artikel</p>\n")
     html_parts.append("<hr>\n")
     
@@ -2095,9 +2116,9 @@ def generate_single_author_page(db, author, authors_dir):
     body_html = ''.join(html_parts)
     author_filename = f"{author.replace(' ', '_')}.html"
     author_path = os.path.join(authors_dir, author_filename)
-    write_full_html_file(db, author_path, f"{author} | {MAGAZINE_NAME}", None, body_html, 'one_author')
+    write_full_html_file(db, author_path, f"{page_title} | {MAGAZINE_NAME}", None, body_html, 'one_author')
 
-def generate_all_authors_page(db, all_authors, out_directory):
+def generate_all_authors_page(db, all_authors, out_directory, name_to_code):
     """Generate the main authors.html page listing all authors."""
     html_parts = []
     html_parts.append(f"<main>\n")
@@ -2117,8 +2138,15 @@ def generate_all_authors_page(db, all_authors, out_directory):
             current_letter = first_letter
             html_parts.append(f"<li><strong>{current_letter}</strong>\n<ul>\n")
         
+        # Create display name with code if available
+        author_code = name_to_code.get(author)
+        if author_code:
+            display_name = f"{author} ({author_code})"
+        else:
+            display_name = author
+        
         author_url = f"/{BASE_DIR}authors/{author.replace(' ', '_')}.html"
-        html_parts.append(f'<li><a href="{author_url}">{author}</a></li>\n')
+        html_parts.append(f'<li><a href="{author_url}">{display_name}</a></li>\n')
     
     if current_letter is not None:
         html_parts.append("</ul></li>\n")
@@ -2131,14 +2159,11 @@ def generate_all_authors_page(db, all_authors, out_directory):
     write_full_html_file(db, authors_path, f"Alle Autoren | {MAGAZINE_NAME}", None, body_html, 'all_authors')
 
 def generate_author_pages(db, out_directory):
-    known_authors = {}
-    known_authors["aa"] = "Albert Absmeier"
-    known_authors["ev"] = "Volker Everts"
-    known_authors["gk"] = "Georg Klinge"
-    known_authors["kg"] = "Karin Gößlinghoff"
-    known_authors["py"] = "Michael M. Pauly"
-    known_authors["rg"] = "Christian Rogge"
-    known_authors["sc"] = "Michael Scharfenberger"
+    # Load author abbreviations mapping from CSV
+    known_authors = load_author_codes()
+    
+    # Create reverse mapping: full name -> code
+    name_to_code = {name: code for code, name in known_authors.items()}
 
     # the shorthands that are in the magazine but not in the imprint and
     # XXX is the marker for author tags that are not set
@@ -2154,10 +2179,10 @@ def generate_author_pages(db, out_directory):
     
     # Generate individual author pages
     for author in all_authors:
-        generate_single_author_page(db, author, authors_dir)
+        generate_single_author_page(db, author, authors_dir, name_to_code)
     
     # Generate the main authors.html page
-    generate_all_authors_page(db, all_authors, out_directory)
+    generate_all_authors_page(db, all_authors, out_directory, name_to_code)
 
 
 if __name__ == '__main__':
