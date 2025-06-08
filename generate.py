@@ -932,9 +932,11 @@ def article_path(issue, article, prepend_issue_dir=False):
     article_path = optional_issue_prefix(article.out_filename(), issue, prepend_issue_dir)
     return article_path
 
-def article_link(db, article, title, prepend_issue_dir=False):
+def article_link(db, article, title, prepend_issue_dir=False, from_subdirectory=False):
     issue = db.issues[article.issue_key]
     path = article_path(issue, article, prepend_issue_dir)
+    if from_subdirectory:
+        path = "../" + path
     return f"<a href='{path}'>{title}</a>"
 
 def prg_link(issue, download):
@@ -2080,7 +2082,7 @@ def generate_single_author_page(db, author, authors_dir):
             current_issue = article.issue_key
             html_parts.append(f"<li><strong>{LABEL_ISSUE} {current_issue}</strong>\n<ul>\n")
         
-        link = article_link(db, article, index_title(article), True)
+        link = article_link(db, article, index_title(article), True, from_subdirectory=True)
         pages = article.pages
         html_parts.append(f"<li>{link} ({LABEL_PAGE} {pages})</li>\n")
     
