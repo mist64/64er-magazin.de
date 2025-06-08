@@ -1680,60 +1680,11 @@ def make_authors_clickable(soup):
         # Clear the address tag only after we have content to replace it
         address.clear()
 
-        # Handle parenthetical content specially
-        if display_text.startswith('(') and display_text.endswith(')') and display_text.count('(') == 1:
-            # Entire content is parenthetical - preserve the parentheses around the whole thing
-            inner_content = display_text[1:-1].strip()  # Content without outer parentheses
-
-            # Add opening parenthesis
-            address.append('(')
-
-            # Split the inner content by '/' and ','
-            parts = re.split(r'([/,])', inner_content)
-
-            # Process each part within the parentheses
-            for part in parts:
-                if part in ['/', ',']:
-                    # Add separator as-is
-                    address.append(part)
-                elif part.strip():  # Non-empty author name
-                    author_text = part.strip()
-
-                    # Check if this part matches a known author
-                    if author_text in known_authors:
-                        # It's a known code, link to resolved author
-                        canonical_match = known_authors[author_text]
-                    else:
-                        # Try to find canonical match using fuzzy logic
-                        canonical_match = find_best_match(author_text, canonical_authors)
-
-                    if canonical_match:
-                        # Create link using canonical author name for URL
-                        author_url = f"/{BASE_DIR}authors/{canonical_match.replace(' ', '_')}.html"
-                        link = soup.new_tag('a', href=author_url)
-                        link.string = author_text  # Keep original display text without parentheses
-                        address.append(link)
-                    else:
-                        # No match found, keep as plain text
-                        address.append(author_text)
-                else:
-                    # Preserve whitespace
-                    address.append(part)
-
-            # Add closing parenthesis
-            address.append(')')
-
-        elif len(re.split(r'([/,])', clean_text)) == 1 and clean_text in known_authors:
-            # Single author code without parentheses - link it directly
-            author_url = f"/{BASE_DIR}authors/{canonical_author.replace(' ', '_')}.html"
-            link = soup.new_tag('a', href=author_url)
-            link.string = display_text  # Keep original display text
-            address.append(link)
-        else:
-            # Non-parenthetical content with multiple parts
-            parts = re.split(r'([/,])', display_text)
-
-            # Process each part for complex cases
+        # Helper function to process author parts and create links
+        def process_author_parts(text_to_process):
+            """Process author text by splitting on separators and creating links where appropriate."""
+            parts = re.split(r'([/,])', text_to_process)
+            
             for part in parts:
                 if part in ['/', ',']:
                     # Add separator as-is
@@ -1762,6 +1713,30 @@ def make_authors_clickable(soup):
                 else:
                     # Preserve whitespace
                     address.append(part)
+
+        # Handle parenthetical content specially
+        if display_text.startswith('(') and display_text.endswith(')') and display_text.count('(') == 1:
+            # Entire content is parenthetical - preserve the parentheses around the whole thing
+            inner_content = display_text[1:-1].strip()  # Content without outer parentheses
+
+            # Add opening parenthesis
+            address.append('(')
+            
+            # Process the content inside parentheses
+            process_author_parts(inner_content)
+
+            # Add closing parenthesis
+            address.append(')')
+
+        elif len(re.split(r'([/,])', clean_text)) == 1 and clean_text in known_authors:
+            # Single author code without parentheses - link it directly
+            author_url = f"/{BASE_DIR}authors/{canonical_author.replace(' ', '_')}.html"
+            link = soup.new_tag('a', href=author_url)
+            link.string = display_text  # Keep original display text
+            address.append(link)
+        else:
+            # Non-parenthetical content with multiple parts
+            process_author_parts(display_text)
 
 def copy_and_modify_html(article, html_dest_path, pdf_path, prev_page_link, next_page_link):
     """Modifies, and writes an HTML file directly to the destination."""
