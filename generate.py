@@ -739,13 +739,13 @@ class Issue:
       for tag in div_downloads:
           data_filename = tag.get("data-filename")
           data_name = tag.get("data-name")
-          
+
           # Check if the binary file actually exists to avoid 404s
           issue_directory = os.path.dirname(html_file_path)
           binary_file_path = os.path.join(issue_directory, 'prg', data_filename)
           if not os.path.exists(binary_file_path):
               raise SystemExit(f'\n---\nBinaryDownloadError: Binary file not found: "{binary_file_path}"\n   File: "{html_file_path}"')
-          
+
           data_filename_escaped = urllib.parse.quote(data_filename)
           downloads.append((data_name, f"prg/{data_filename_escaped}"))
           tag.decompose()
@@ -883,7 +883,7 @@ class ArticleDatabase:
         sorted_categories = sorted(articles_by_category.items(), key=lambda x: x[0])
         return OrderedDict(sorted_categories)
 
-    def get_articles(self, 
+    def get_articles(self,
                     title_exclude=None,
                     issue_key=None,
                     index_categories=None,
@@ -896,43 +896,43 @@ class ArticleDatabase:
         Unified method to filter and sort articles.
         """
         articles = self.articles[:]
-        
+
         if title_exclude:
             articles = [a for a in articles if a.title not in title_exclude]
-            
+
         if issue_key:
             articles = [a for a in articles if a.issue_key == issue_key]
-            
+
         if index_categories:
             if index_categories == ["Aktuell|"]:
-                articles = [a for a in articles if 
-                           ((not a.index_category and a.toc_category and a.toc_category == "Aktuell") or 
+                articles = [a for a in articles if
+                           ((not a.index_category and a.toc_category and a.toc_category == "Aktuell") or
                             (a.index_category and a.index_category.startswith("Aktuell")))]
             elif index_categories == ["Rubriken|"]:
-                articles = [a for a in articles if 
+                articles = [a for a in articles if
                            a.toc_category and a.toc_category == "Rubriken"]
             else:
                 index_categories_tuple = tuple(index_categories)
-                articles = [a for a in articles if 
+                articles = [a for a in articles if
                            a.index_category and a.index_category.startswith(index_categories_tuple)]
-                           
+
         if toc_categories:
             articles = [a for a in articles if a.toc_category in toc_categories]
-            
+
         if has_downloads is not None:
             if has_downloads:
                 articles = [a for a in articles if a.is_category_listings()]
-        
+
         if sort_by == 'page':
             articles = sorted(articles, key=lambda x: x.article_sort_key(), reverse=reverse)
         elif sort_by == 'pubdate':
             articles = sorted(articles, key=lambda x: x.article_pubdate(), reverse=reverse)
         elif sort_by == 'sort_index':
             articles = sorted(articles, key=lambda x: x.sort_index, reverse=reverse)
-        
+
         if limit:
             articles = articles[:limit]
-            
+
         return articles
 
 ### Helpers
@@ -1602,7 +1602,7 @@ def make_authors_clickable(soup):
     """Make author names clickable by using meta tags as canonical source and fuzzy matching address tags."""
     # Load author abbreviations mapping from CSV
     known_authors = load_author_codes()
-    
+
     # Get canonical authors from meta tags and resolve abbreviations for linking
     authors_meta_list = soup.find_all('meta', {"name": "author"})
     canonical_authors = []
@@ -1614,24 +1614,24 @@ def make_authors_clickable(soup):
             # Resolve abbreviation to full name for linking
             resolved_author = known_authors.get(author, author)
             canonical_authors.append(resolved_author)
-    
+
     # Helper function for fuzzy matching
     def find_best_match(address_author, canonical_list):
         """Find best matching canonical author using simple fuzzy logic."""
         address_lower = address_author.lower().strip()
-        
+
         # First try exact match
         for canonical in canonical_list:
             if canonical.lower() == address_lower:
                 return canonical
-        
+
         # Try partial matches (address author contains canonical or vice versa)
         for canonical in canonical_list:
             canonical_lower = canonical.lower()
             # Check if one contains the other (handles abbreviations)
             if (canonical_lower in address_lower or address_lower in canonical_lower):
                 return canonical
-        
+
         # Try matching last names (split by space and compare last parts)
         address_parts = address_lower.split()
         if address_parts:
@@ -1640,17 +1640,17 @@ def make_authors_clickable(soup):
                 canonical_parts = canonical.lower().split()
                 if canonical_parts and canonical_parts[-1] == address_lastname:
                     return canonical
-        
+
         # No match found
         return None
-    
+
     # Find all <address class="author"> tags
     author_addresses = soup.find_all('address', class_='author')
-    
+
     for address in author_addresses:
         # Get the original text content
         original_text = address.get_text().strip()
-        
+
         # Determine what text to use for display (preserve original format)
         if original_text:
             # Use existing text in address tag
@@ -1661,7 +1661,7 @@ def make_authors_clickable(soup):
         else:
             # No text and no original codes, skip this address tag
             continue
-        
+
         # For linking, we need to determine the canonical author
         # Handle parentheses: if entire string is parenthetical, extract content; otherwise remove parentheses
         if display_text.startswith('(') and display_text.endswith(')') and display_text.count('(') == 1:
@@ -1670,27 +1670,27 @@ def make_authors_clickable(soup):
         else:
             # Remove parentheses and their content for matching
             clean_text = re.sub(r'\([^)]*\)', '', display_text).strip()
-        
+
         # Check if we have an abbreviation to resolve for linking
         if clean_text in known_authors:
             canonical_author = known_authors[clean_text]
         else:
             canonical_author = clean_text
-        
+
         # Clear the address tag only after we have content to replace it
         address.clear()
-        
+
         # Handle parenthetical content specially
         if display_text.startswith('(') and display_text.endswith(')') and display_text.count('(') == 1:
             # Entire content is parenthetical - preserve the parentheses around the whole thing
             inner_content = display_text[1:-1].strip()  # Content without outer parentheses
-            
+
             # Add opening parenthesis
             address.append('(')
-            
-            # Split the inner content by '/' and ',' 
+
+            # Split the inner content by '/' and ','
             parts = re.split(r'([/,])', inner_content)
-            
+
             # Process each part within the parentheses
             for part in parts:
                 if part in ['/', ',']:
@@ -1698,7 +1698,7 @@ def make_authors_clickable(soup):
                     address.append(part)
                 elif part.strip():  # Non-empty author name
                     author_text = part.strip()
-                    
+
                     # Check if this part matches a known author
                     if author_text in known_authors:
                         # It's a known code, link to resolved author
@@ -1706,7 +1706,7 @@ def make_authors_clickable(soup):
                     else:
                         # Try to find canonical match using fuzzy logic
                         canonical_match = find_best_match(author_text, canonical_authors)
-                    
+
                     if canonical_match:
                         # Create link using canonical author name for URL
                         author_url = f"/{BASE_DIR}authors/{canonical_match.replace(' ', '_')}.html"
@@ -1719,10 +1719,10 @@ def make_authors_clickable(soup):
                 else:
                     # Preserve whitespace
                     address.append(part)
-            
+
             # Add closing parenthesis
             address.append(')')
-            
+
         elif len(re.split(r'([/,])', clean_text)) == 1 and clean_text in known_authors:
             # Single author code without parentheses - link it directly
             author_url = f"/{BASE_DIR}authors/{canonical_author.replace(' ', '_')}.html"
@@ -1732,7 +1732,7 @@ def make_authors_clickable(soup):
         else:
             # Non-parenthetical content with multiple parts
             parts = re.split(r'([/,])', display_text)
-            
+
             # Process each part for complex cases
             for part in parts:
                 if part in ['/', ',']:
@@ -1740,7 +1740,7 @@ def make_authors_clickable(soup):
                     address.append(part)
                 elif part.strip():  # Non-empty author name
                     author_text = part.strip()
-                    
+
                     # For individual parts, check if it's a code or try fuzzy matching
                     part_clean = re.sub(r'\([^)]*\)', '', author_text).strip()
                     if part_clean in known_authors:
@@ -1749,7 +1749,7 @@ def make_authors_clickable(soup):
                     else:
                         # Try to find canonical match using fuzzy logic
                         canonical_match = find_best_match(author_text, canonical_authors)
-                    
+
                     if canonical_match:
                         # Create link using canonical author name for URL
                         author_url = f"/{BASE_DIR}authors/{canonical_match.replace(' ', '_')}.html"
@@ -1802,7 +1802,7 @@ def copy_and_modify_html(article, html_dest_path, pdf_path, prev_page_link, next
       for aside in asides:
         ft_tag = BeautifulSoup(HTML_IMG_FUTURETEUFELCHEN, 'html.parser')
         aside.insert(0, ft_tag)
-    
+
     # Make authors clickable
     make_authors_clickable(soup)
 
@@ -1850,7 +1850,7 @@ def copy_and_modify_html(article, html_dest_path, pdf_path, prev_page_link, next
     body_html = body_html[6:-7] # remove '<body>' and '</body>'
     title = f"{article.title} | {MAGAZINE_NAME}"
     preview_img = next((url for url in (article.img_urls if article.img_urls else [])), None)
-    
+
 
 
     # add ls-json schema.com information
@@ -1859,7 +1859,7 @@ def copy_and_modify_html(article, html_dest_path, pdf_path, prev_page_link, next
 
     def create_ls_json(title, image_url, date_published, date_modified, authors):
         import json
-        
+
         # Ensure absolute URL for image
         if not image_url:
             image_url = f"{RSS_BASE_URL}{BASE_DIR}logo.png"
@@ -1901,7 +1901,7 @@ def copy_and_modify_html(article, html_dest_path, pdf_path, prev_page_link, next
                 }
             }
         }
-        
+
         # Add author information if available
         if authors_list:
             if len(authors_list) == 1:
@@ -1913,7 +1913,7 @@ def copy_and_modify_html(article, html_dest_path, pdf_path, prev_page_link, next
                 structured_data["author"] = [
                     {"@type": "Person", "name": author} for author in authors_list
                 ]
-        
+
         return json.dumps(structured_data, ensure_ascii=False)
 
     past_pubtime = article.article_pubdate() - relativedelta(years=40)
@@ -2118,7 +2118,7 @@ def generate_single_author_page(db, author, authors_dir, name_to_code):
     """Generate a page for a single author with all their articles."""
     # Find all articles by this author using meta tag data
     author_articles = []
-    
+
     for article in db.articles:
         soup = article.html
         # Get canonical authors from meta tags
@@ -2131,88 +2131,112 @@ def generate_single_author_page(db, author, authors_dir, name_to_code):
                 # Resolve abbreviation to full name if known
                 resolved_author = known_authors.get(meta_author, meta_author)
                 article_authors.append(resolved_author)
-        
+
         # Check if this author is in the article's resolved meta authors
         if author in article_authors:
             author_articles.append(article)
-    
+
     # Sort articles by issue (chronologically) and then by page
     author_articles.sort(key=lambda a: (db.issues[a.issue_key].pubdate, a.first_page_number()))
-    
+
     # Create title with code if available
     author_code = name_to_code.get(author)
     if author_code:
         page_title = f"{author} ({author_code})"
     else:
         page_title = author
-    
+
     # Generate HTML for the author page
     html_parts = []
     html_parts.append(f"<main>\n")
     html_parts.append(f"<h1>{page_title}</h1>\n")
     html_parts.append(f"<p>{len(author_articles)} Artikel</p>\n")
     html_parts.append("<hr>\n")
-    
+
     # Group articles by issue
-    html_parts.append("<ul>\n")
     current_issue = None
-    
+
     for article in author_articles:
         if article.issue_key != current_issue:
             if current_issue is not None:
-                html_parts.append("</ul></li>\n")
+                html_parts.append("</ul>\n")
             current_issue = article.issue_key
-            html_parts.append(f"<li><strong>{LABEL_ISSUE} {current_issue}</strong>\n<ul>\n")
-        
+            html_parts.append(f"<h3>{LABEL_ISSUE} {current_issue}</h3>\n<ul>\n")
+
         link = article_link(db, article, index_title(article), True, from_subdirectory=True)
         pages = article.pages
         html_parts.append(f"<li>{link} ({LABEL_PAGE} {pages})</li>\n")
-    
+
     if current_issue is not None:
-        html_parts.append("</ul></li>\n")
-    html_parts.append("</ul>\n")
+        html_parts.append("</ul>\n")
     html_parts.append("</main>\n")
-    
+
     # Write the author page
     body_html = ''.join(html_parts)
     author_filename = f"{author.replace(' ', '_')}.html"
     author_path = os.path.join(authors_dir, author_filename)
     write_full_html_file(db, author_path, f"{page_title} | {MAGAZINE_NAME}", None, body_html, 'one_author')
 
+def format_author_name_lastname_first(author_name):
+    """Format author name as 'Last name, First name(s)' for display."""
+    # Split the name into parts
+    parts = author_name.split()
+    if len(parts) < 2:
+        return author_name
+
+    # Get last name (last part) and first names (all other parts)
+    last_name = parts[-1]
+    first_names = ' '.join(parts[:-1])
+
+    return f"{last_name}, {first_names}"
+
 def generate_all_authors_page(db, all_authors, out_directory, name_to_code):
-    """Generate the main authors.html page listing all authors."""
+    """Generate the main authors.html page listing all authors, sorted by last name."""
     html_parts = []
     html_parts.append(f"<main>\n")
     html_parts.append(f"<h1>Alle Autoren</h1>\n")
     html_parts.append(f"<p>{len(all_authors)} Autoren</p>\n")
     html_parts.append("<hr>\n")
-    
+
+    # 1. Sort the list of authors by their last name.
+    #    The `key` function splits the name by spaces and takes the last part.
+    sorted_authors = sorted(all_authors, key=lambda name: name.split()[-1])
+
     # Create alphabetical listing of authors
     html_parts.append("<ul>\n")
-    
+
     current_letter = None
-    for author in all_authors:
-        first_letter = author[0].upper()
+    # 2. Iterate over the newly sorted list.
+    for author in sorted_authors:
+        # 3. Get the first letter of the last name for the alphabetical heading.
+        last_name = author.split()[-1]
+        first_letter = last_name[0].upper()
+
         if first_letter != current_letter:
             if current_letter is not None:
                 html_parts.append("</ul>\n")
             current_letter = first_letter
             html_parts.append(f"<h2>{current_letter}</h2>\n<ul>\n")
-        
+
+        # Format name as "Last name, First name(s)" for display
+        # This part of the logic can remain the same.
+        formatted_name = format_author_name_lastname_first(author)
+
         # Create display name with code if available
         author_code = name_to_code.get(author)
         if author_code:
-            display_name = f"{author} ({author_code})"
+            display_name = f"{formatted_name} ({author_code})"
         else:
-            display_name = author
-        
+            display_name = formatted_name
+
+        # Assuming BASE_DIR is defined
         author_url = f"/{BASE_DIR}authors/{author.replace(' ', '_')}.html"
         html_parts.append(f'<li><a href="{author_url}">{display_name}</a></li>\n')
-    
+
     if current_letter is not None:
         html_parts.append("</ul>\n")
     html_parts.append("</main>\n")
-    
+
     # Write the authors index page
     body_html = ''.join(html_parts)
     authors_path = os.path.join(out_directory, 'authors.html')
@@ -2221,7 +2245,7 @@ def generate_all_authors_page(db, all_authors, out_directory, name_to_code):
 def generate_author_pages(db, out_directory):
     # Load author abbreviations mapping from CSV
     known_authors = load_author_codes()
-    
+
     # Create reverse mapping: full name -> code
     name_to_code = {name: code for code, name in known_authors.items()}
 
@@ -2231,16 +2255,16 @@ def generate_author_pages(db, out_directory):
 
     # Use the canonical authors from db.authors (extracted from meta tags during parsing)
     all_authors = [author for author in sorted(db.authors) if author not in unknown_authors and author.strip()]
-    
+
     # Create authors directory
     authors_dir = os.path.join(out_directory, 'authors')
     if not os.path.exists(authors_dir):
         os.makedirs(authors_dir)
-    
+
     # Generate individual author pages
     for author in all_authors:
         generate_single_author_page(db, author, authors_dir, name_to_code)
-    
+
     # Generate the main authors.html page
     generate_all_authors_page(db, all_authors, out_directory, name_to_code)
 
