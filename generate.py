@@ -2195,9 +2195,9 @@ def generate_all_authors_page(db, all_authors, out_directory, name_to_code):
         first_letter = author[0].upper()
         if first_letter != current_letter:
             if current_letter is not None:
-                html_parts.append("</ul></li>\n")
+                html_parts.append("</ul>\n")
             current_letter = first_letter
-            html_parts.append(f"<li><strong>{current_letter}</strong>\n<ul>\n")
+            html_parts.append(f"<h2>{current_letter}</h2>\n<ul>\n")
         
         # Create display name with code if available
         author_code = name_to_code.get(author)
@@ -2210,8 +2210,7 @@ def generate_all_authors_page(db, all_authors, out_directory, name_to_code):
         html_parts.append(f'<li><a href="{author_url}">{display_name}</a></li>\n')
     
     if current_letter is not None:
-        html_parts.append("</ul></li>\n")
-    html_parts.append("</ul>\n")
+        html_parts.append("</ul>\n")
     html_parts.append("</main>\n")
     
     # Write the authors index page
