@@ -1585,38 +1585,116 @@ def convert_and_copy_image(img_path, dest_img_path):
 
 
 def make_authors_clickable(soup):
-    """Make author names clickable by converting them to links within <address class="author"> tags."""
+    """Make author names clickable by using meta tags as canonical source and fuzzy matching address tags."""
+    # Known author abbreviations mapping
+    known_authors = {
+        "aa": "Albert Absmeier",
+        "ev": "Volker Everts", 
+        "gk": "Georg Klinge",
+        "kg": "Karin Gößlinghoff",
+        "py": "Michael M. Pauly",
+        "rg": "Christian Rogge",
+        "sc": "Michael Scharfenberger"
+    }
+    
+    # Get canonical authors from meta tags and resolve abbreviations
+    authors_meta_list = soup.find_all('meta', {"name": "author"})
+    canonical_authors = []
+    for authors_meta in authors_meta_list:
+        for author in authors_meta["content"].split(','):
+            author = author.strip()
+            # Resolve abbreviation to full name if known
+            resolved_author = known_authors.get(author, author)
+            canonical_authors.append(resolved_author)
+    
+    # Helper function for fuzzy matching
+    def find_best_match(address_author, canonical_list):
+        """Find best matching canonical author using simple fuzzy logic."""
+        address_lower = address_author.lower().strip()
+        
+        # First try exact match
+        for canonical in canonical_list:
+            if canonical.lower() == address_lower:
+                return canonical
+        
+        # Try partial matches (address author contains canonical or vice versa)
+        for canonical in canonical_list:
+            canonical_lower = canonical.lower()
+            # Check if one contains the other (handles abbreviations)
+            if (canonical_lower in address_lower or address_lower in canonical_lower):
+                return canonical
+        
+        # Try matching last names (split by space and compare last parts)
+        address_parts = address_lower.split()
+        if address_parts:
+            address_lastname = address_parts[-1]
+            for canonical in canonical_list:
+                canonical_parts = canonical.lower().split()
+                if canonical_parts and canonical_parts[-1] == address_lastname:
+                    return canonical
+        
+        # No match found
+        return None
+    
     # Find all <address class="author"> tags
     author_addresses = soup.find_all('address', class_='author')
     
     for address in author_addresses:
-        # Get the text content
-        author_text = address.get_text()
+        # Get the original text content
+        original_text = address.get_text().strip()
         
-        # Remove parentheses and their content
-        import re
-        author_text_clean = re.sub(r'\([^)]*\)', '', author_text).strip()
+        # Determine what text to use
+        if original_text:
+            # Use existing text in address tag
+            text_to_process = original_text
+        elif canonical_authors:
+            # If address is empty but we have canonical authors, use them
+            text_to_process = ', '.join(canonical_authors)
+        else:
+            # No text and no canonical authors, skip this address tag
+            continue
         
-        # Split by '/' to get individual authors and separators
-        parts = re.split(r'(/)', author_text_clean)
+        # Handle parentheses: if entire string is parenthetical, extract content; otherwise remove parentheses
+        if text_to_process.startswith('(') and text_to_process.endswith(')') and text_to_process.count('(') == 1:
+            # Entire string is parenthetical, extract the content
+            clean_text = text_to_process[1:-1].strip()
+        else:
+            # Remove parentheses and their content
+            clean_text = re.sub(r'\([^)]*\)', '', text_to_process).strip()
         
-        # Clear the address tag
+        # Check if we have an abbreviation to resolve
+        if clean_text in known_authors:
+            clean_text = known_authors[clean_text]
+        
+        # Split by '/' and ',' to handle different separators
+        parts = re.split(r'([/,])', clean_text)
+        
+        # Clear the address tag only after we have content to replace it
         address.clear()
         
         # Process each part
         for part in parts:
-            if part == '/':
+            if part in ['/', ',']:
                 # Add separator as-is
                 address.append(part)
             elif part.strip():  # Non-empty author name
-                author = part.strip()
-                # URL encode the author name for the link
-                author_url = f"/{BASE_DIR}authors/{author.replace(' ', '%20')}.html"
+                author_text = part.strip()
                 
-                # Create and append the link
-                link = soup.new_tag('a', href=author_url)
-                link.string = author
-                address.append(link)
+                # Try to find canonical match
+                canonical_match = find_best_match(author_text, canonical_authors)
+                
+                if canonical_match:
+                    # Create link using canonical author name for URL
+                    author_url = f"/{BASE_DIR}authors/{canonical_match.replace(' ', '_')}.html"
+                    link = soup.new_tag('a', href=author_url)
+                    link.string = author_text  # Keep original display text
+                    address.append(link)
+                else:
+                    # No match found, keep as plain text
+                    address.append(author_text)
+            else:
+                # Preserve whitespace
+                address.append(part)
 
 def copy_and_modify_html(article, html_dest_path, pdf_path, prev_page_link, next_page_link):
     """Modifies, and writes an HTML file directly to the destination."""
@@ -1966,23 +2044,20 @@ def generate_search_json(db, out_directory):
 
 def generate_single_author_page(db, author, authors_dir):
     """Generate a page for a single author with all their articles."""
-    # Find all articles by this author
+    # Find all articles by this author using meta tag data
     author_articles = []
     
     for article in db.articles:
         soup = article.html
-        author_addresses = soup.find_all('address', class_='author')
-        for address in author_addresses:
-            author_text = address.get_text()
-            # Remove parentheses and their content
-            import re
-            author_text_clean = re.sub(r'\([^)]*\)', '', author_text).strip()
-            # Split by '/' to get individual authors
-            authors_list = [a.strip() for a in author_text_clean.split('/') if a.strip()]
-            
-            if author in authors_list:
-                author_articles.append(article)
-                break
+        # Get canonical authors from meta tags
+        authors_meta_list = soup.find_all('meta', {"name": "author"})
+        article_authors = []
+        for authors_meta in authors_meta_list:
+            article_authors.extend([a.strip() for a in authors_meta["content"].split(',')])
+        
+        # Check if this author is in the article's meta authors
+        if author in article_authors:
+            author_articles.append(article)
     
     # Sort articles by issue (chronologically) and then by page
     author_articles.sort(key=lambda a: (db.issues[a.issue_key].pubdate, a.first_page_number()))
@@ -2016,7 +2091,7 @@ def generate_single_author_page(db, author, authors_dir):
     
     # Write the author page
     body_html = ''.join(html_parts)
-    author_filename = f"{author.replace(' ', '%20')}.html"
+    author_filename = f"{author.replace(' ', '_')}.html"
     author_path = os.path.join(authors_dir, author_filename)
     write_full_html_file(db, author_path, f"{author} | {MAGAZINE_NAME}", None, body_html, 'one_author')
 
@@ -2040,7 +2115,7 @@ def generate_all_authors_page(db, all_authors, out_directory):
             current_letter = first_letter
             html_parts.append(f"<li><strong>{current_letter}</strong>\n<ul>\n")
         
-        author_url = f"/{BASE_DIR}authors/{author.replace(' ', '%20')}.html"
+        author_url = f"/{BASE_DIR}authors/{author.replace(' ', '_')}.html"
         html_parts.append(f'<li><a href="{author_url}">{author}</a></li>\n')
     
     if current_letter is not None:
@@ -2067,22 +2142,8 @@ def generate_author_pages(db, out_directory):
     # XXX is the marker for author tags that are not set
     unknown_authors = ["ai", "wg", "XXX"]
 
-    # Get all unique authors from articles (from address tags)
-    all_authors = set()
-    for article in db.articles:
-        soup = article.html
-        author_addresses = soup.find_all('address', class_='author')
-        for address in author_addresses:
-            author_text = address.get_text()
-            # Remove parentheses and their content
-            import re
-            author_text_clean = re.sub(r'\([^)]*\)', '', author_text).strip()
-            # Split by '/' to get individual authors
-            authors_list = [author.strip() for author in author_text_clean.split('/') if author.strip()]
-            all_authors.update(authors_list)
-    
-    # Also include known authors
-    all_authors.update(known_authors.values())
+    # Use the canonical authors from db.authors (extracted from meta tags during parsing)
+    all_authors = [author for author in sorted(db.authors) if author not in unknown_authors and author.strip()]
     
     # Create authors directory
     authors_dir = os.path.join(out_directory, 'authors')
@@ -2090,12 +2151,11 @@ def generate_author_pages(db, out_directory):
         os.makedirs(authors_dir)
     
     # Generate individual author pages
-    for author in sorted(all_authors):
-        if author not in unknown_authors:
-            generate_single_author_page(db, author, authors_dir)
+    for author in all_authors:
+        generate_single_author_page(db, author, authors_dir)
     
     # Generate the main authors.html page
-    generate_all_authors_page(db, sorted(all_authors), out_directory)
+    generate_all_authors_page(db, all_authors, out_directory)
 
 
 if __name__ == '__main__':
