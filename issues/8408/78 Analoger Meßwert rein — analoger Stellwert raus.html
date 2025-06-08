@@ -30,7 +30,7 @@
             <figcaption>Ein- und Ausgangsschaltung</figcaption>
         </figure>
 
-        <p>Diese Anordnung dürfte auch für viele Bastelzwecke sehr interessant sein. Für den Analogeingang wurde mit dem IC LM311 ein Spannungs-Frequenzwandler gebaut. Die Frequenz des erzeugten Rechtecksignals wurde über eine einadrige Schirmleitung mit Ader auf PIN6 = CNT-2 des Userports und Schirm auf PIN1 = GND zur Frequenzmessung eingegeben. Diese Anwendung ist prinzipiell in [1] beschrieben, allerdings mit dem kleinen Schönheitsfehler, daß die Sache so nicht funktioniert. Trotzdem ist das erwähnte Buch sehr empfehlenswert wegen seiner Vielfalt und Verständlichkeit. Im folgenden wird zunächst ein funktionsfähiges Programm gezeigt und anschließend werden wesentliche Verbesserungen unter Verwendung einer Assembler-Routine geschildert. Ein Studium der Literatur [1 bis 4] zeigt, daß für eine einfache Frequenzmessung bis hinauf zu etwas mehr als 20 kHz der im CIA 6526 (Complex Interface-Adapter-IC) eingebaute Zähler und die Systemuhr Tl als Zeitbasis in Frage kommen. Wer einen Rechteckgenerator zur Hand hat, kann dies auch gleich (TTL-Pegel 5 V einstellen) mal ausprobieren! Geben sie das folgende Basic-Programm ein und schließen Sie den Generator — wie beschrieben — an CNT-2 an.</p>
+        <p>Diese Anordnung dürfte auch für viele Bastelzwecke sehr interessant sein. Für den Analogeingang wurde mit dem IC LM311 ein Spannungs-Frequenzwandler gebaut. Die Frequenz des erzeugten Rechtecksignals wurde über eine einadrige Schirmleitung mit Ader auf PIN6 = CNT-2 des Userports und Schirm auf PIN1 = GND zur Frequenzmessung eingegeben. Diese Anwendung ist prinzipiell in [1] beschrieben, allerdings mit dem kleinen Schönheitsfehler, daß die Sache so nicht funktioniert. Trotzdem ist das erwähnte Buch sehr empfehlenswert wegen seiner Vielfalt und Verständlichkeit. Im folgenden wird zunächst ein funktionsfähiges Programm gezeigt und anschließend werden wesentliche Verbesserungen unter Verwendung einer Assembler-Routine geschildert. Ein Studium der Literatur [1 bis 4] zeigt, daß für eine einfache Frequenzmessung bis hinauf zu etwas mehr als 20 kHz der im CIA 6526 (Complex Interface-Adapter-IC) eingebaute Zähler und die Systemuhr TI als Zeitbasis in Frage kommen. Wer einen Rechteckgenerator zur Hand hat, kann dies auch gleich (TTL-Pegel 5 V einstellen) mal ausprobieren! Geben sie das folgende Basic-Programm ein und schließen Sie den Generator — wie beschrieben — an CNT-2 an.</p>
 
         <figure>
             <pre>90 rem****basic-programm frequenzmessung************
@@ -52,7 +52,7 @@
             Dez. 56580 Hex DD04 Zähler 1 Low-Byte T1L<br>
             Dez. 56581 Hex DD05 Zähler 1 High-Byte T1H</p>
 
-        <p>In Zeile 100 wird das Kontrollregister für den Zähler 1 so programmiert, daß dieser in der gewünschten Art arbeitet und zunächst im STOP-Zustand ist. In Zeile 110 wird der Zähler mit HB = 255 und LB = 255 geladen; er hat die Eigenschaft, diese zwei Byte nach dem Start herunterzuzählen (Dez. 65535 bis 0). Der Zähler kann nun aber nicht, wie in [1] erwähnt, mit dem Setzen des High-Byte von T1 (T1H) gestartet werden, sondern durch den Befehl Poke 56590, 241, bei dem Bit 0 im Kontrollregister auf 1 = START gesetzt wird. Die Tl-Uhr wird bei diesem Programm »im Vorübergehen« gelesen, die beiden IF Abfragen geben den Start- und den Auslesebefehl für den Zähler.</p>
+        <p>In Zeile 100 wird das Kontrollregister für den Zähler 1 so programmiert, daß dieser in der gewünschten Art arbeitet und zunächst im STOP-Zustand ist. In Zeile 110 wird der Zähler mit HB = 255 und LB = 255 geladen; er hat die Eigenschaft, diese zwei Byte nach dem Start herunterzuzählen (Dez. 65535 bis 0). Der Zähler kann nun aber nicht, wie in [1] erwähnt, mit dem Setzen des High-Byte von T1 (T1H) gestartet werden, sondern durch den Befehl Poke 56590, 241, bei dem Bit 0 im Kontrollregister auf 1 = START gesetzt wird. Die TI-Uhr wird bei diesem Programm »im Vorübergehen« gelesen, die beiden IF Abfragen geben den Start- und den Auslesebefehl für den Zähler.</p>
 
         <p>Im Kontrollregister haben nur Bit 0 und 5 wichtige Funktionen:<br>
             11110001 = Dez. 241 → Zähler Start<br>
@@ -60,7 +60,7 @@
 
         <p>Die anderen Bits sind als »Dauermaske« aufzufassen.</p>
 
-        <p>Das Basicprogramm zeigt jedoch leider bei der praktischen Anwendung Anzeigeschwankungen von etwa 2 Prozent und manchmal weit darüber. Schuld daran ist sicher die Programmsprache Basic, welche zum Beispiel aufgrund von zu langsamen Bearbeitungszeiten des Basic-Interpreters in den IF Abfragen ziemliche Fehler in der Zeitbasis zu verursachen scheint. Gelegentlich kommt die ganze Messung aber auch noch stärker »aus dem Tritt«. Geht man dazu über, die Uhr Tl nicht »im Vorübergehen« abzulesen, dann kann man schon eine etwas bessere Genauigkeit erreichen.</p>
+        <p>Das Basicprogramm zeigt jedoch leider bei der praktischen Anwendung Anzeigeschwankungen von etwa 2 Prozent und manchmal weit darüber. Schuld daran ist sicher die Programmsprache Basic, welche zum Beispiel aufgrund von zu langsamen Bearbeitungszeiten des Basic-Interpreters in den IF Abfragen ziemliche Fehler in der Zeitbasis zu verursachen scheint. Gelegentlich kommt die ganze Messung aber auch noch stärker »aus dem Tritt«. Geht man dazu über, die Uhr TI nicht »im Vorübergehen« abzulesen, dann kann man schon eine etwas bessere Genauigkeit erreichen.</p>
 
         <figure>
             <pre>90 rem****basic-programm frequenzmessung************
@@ -77,9 +77,9 @@
             <figcaption>Listing »Frequenzmessung« 2</figcaption>
         </figure>
 
-        <p>In diesem Programm wird in Zeile 120/130 durch EinPOKEn von 0 in die drei TI-Register 160, 161, 162 die Uhr Tl jedesmal neu gestartet, wobei Register 162 des »schnellsten Rädchens« zuletzt genullt wird. Hierdurch entfällt die erste IF Schleife des Starts. Benützt wird im Prinzip nur Regsiter 162, in welchem die Uhr von 0 bis 255 in Schritten von 1/60 s (Jiffies) läuft. Die beiden anderen Register werden nur zur Sicherheit genullt.</p>
+        <p>In diesem Programm wird in Zeile 120/130 durch EinPOKEn von 0 in die drei TI-Register 160, 161, 162 die Uhr TI jedesmal neu gestartet, wobei Register 162 des »schnellsten Rädchens« zuletzt genullt wird. Hierdurch entfällt die erste IF Schleife des Starts. Benützt wird im Prinzip nur Regsiter 162, in welchem die Uhr von 0 bis 255 in Schritten von 1/60 s (Jiffies) läuft. Die beiden anderen Register werden nur zur Sicherheit genullt.</p>
 
-        <p>Ausgehend von diesem Programm wurde das folgende Assembler-Programm geschrieben, das im Prinzip den gleichen Ablauf hat, bei dem aber die Startbefehle für Zähler und Uhr Tl sowie der Stop-Befehl für den Zähler und vor allem die Zeitabfrage und das Ablesen »blitzschnell« ablaufen:</p>
+        <p>Ausgehend von diesem Programm wurde das folgende Assembler-Programm geschrieben, das im Prinzip den gleichen Ablauf hat, bei dem aber die Startbefehle für Zähler und Uhr TI sowie der Stop-Befehl für den Zähler und vor allem die Zeitabfrage und das Ablesen »blitzschnell« ablaufen:</p>
 
         <figure>
             <pre>DD0E              100 CRA   =    $DD0E
