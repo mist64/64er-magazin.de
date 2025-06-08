@@ -2191,7 +2191,29 @@ def format_author_name_lastname_first(author_name):
     return f"{last_name}, {first_names}"
 
 def generate_all_authors_page(db, all_authors, out_directory, name_to_code):
-    """Generate the main authors.html page listing all authors, sorted by last name."""
+    """
+    Generate the main authors.html page listing all authors, sorted by last name.
+    Authors with more than one article are displayed in bold.
+    """
+    # Pre-calculate article counts for all authors to avoid redundant processing
+    author_article_counts = {}
+    known_authors = load_author_codes()
+    
+    for article in db.articles:
+        if article.html:
+            authors_meta_list = article.html.find_all('meta', {"name": "author"})
+            article_authors = []
+            for authors_meta in authors_meta_list:
+                for meta_author in authors_meta["content"].split(','):
+                    meta_author = meta_author.strip()
+                    # Resolve abbreviation to full name if known
+                    resolved_author = known_authors.get(meta_author, meta_author)
+                    article_authors.append(resolved_author)
+            
+            # Increment count for each author in this article
+            for author in article_authors:
+                author_article_counts[author] = author_article_counts.get(author, 0) + 1
+    
     html_parts = []
     html_parts.append(f"<main>\n")
     html_parts.append(f"<h1>Alle Autoren</h1>\n")
@@ -2199,7 +2221,6 @@ def generate_all_authors_page(db, all_authors, out_directory, name_to_code):
     html_parts.append("<hr>\n")
 
     # 1. Sort the list of authors by their last name.
-    #    The `key` function splits the name by spaces and takes the last part.
     sorted_authors = sorted(all_authors, key=lambda name: name.split()[-1])
 
     # Create alphabetical listing of authors
@@ -2219,7 +2240,6 @@ def generate_all_authors_page(db, all_authors, out_directory, name_to_code):
             html_parts.append(f"<h2>{current_letter}</h2>\n<ul>\n")
 
         # Format name as "Last name, First name(s)" for display
-        # This part of the logic can remain the same.
         formatted_name = format_author_name_lastname_first(author)
 
         # Create display name with code if available
@@ -2229,7 +2249,14 @@ def generate_all_authors_page(db, all_authors, out_directory, name_to_code):
         else:
             display_name = formatted_name
 
-        # Assuming BASE_DIR is defined
+        # Get article count from pre-calculated mapping
+        article_count = author_article_counts.get(author, 0)
+
+        # 5. NEW: If the author has more than one article, wrap the display name in bold tags.
+        if article_count > 1:
+            display_name = f"<b>{display_name}</b>"
+
+        # Create the final list item with the potentially bolded name
         author_url = f"/{BASE_DIR}authors/{author.replace(' ', '_')}.html"
         html_parts.append(f'<li><a href="{author_url}">{display_name}</a></li>\n')
 
