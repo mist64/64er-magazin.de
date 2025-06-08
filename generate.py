@@ -2190,12 +2190,8 @@ def format_author_name_lastname_first(author_name):
 
     return f"{last_name}, {first_names}"
 
-def generate_all_authors_page(db, all_authors, out_directory, name_to_code):
-    """
-    Generate the main authors.html page listing all authors, sorted by last name.
-    Authors with more than one article are displayed in bold.
-    """
-    # Pre-calculate article counts for all authors to avoid redundant processing
+def calculate_author_article_counts(db):
+    """Calculate article counts for all authors to avoid redundant processing."""
     author_article_counts = {}
     known_authors = load_author_codes()
     
@@ -2213,6 +2209,16 @@ def generate_all_authors_page(db, all_authors, out_directory, name_to_code):
             # Increment count for each author in this article
             for author in article_authors:
                 author_article_counts[author] = author_article_counts.get(author, 0) + 1
+    
+    return author_article_counts
+
+def generate_all_authors_page(db, all_authors, out_directory, name_to_code):
+    """
+    Generate the main authors.html page listing all authors, sorted by last name.
+    Authors with more than one article are displayed in bold.
+    """
+    # Pre-calculate article counts for all authors
+    author_article_counts = calculate_author_article_counts(db)
     
     html_parts = []
     html_parts.append(f"<main>\n")
@@ -2269,6 +2275,56 @@ def generate_all_authors_page(db, all_authors, out_directory, name_to_code):
     authors_path = os.path.join(out_directory, 'authors.html')
     write_full_html_file(db, authors_path, f"Alle Autoren | {MAGAZINE_NAME}", None, body_html, 'all_authors')
 
+def generate_authors_by_count_page(db, all_authors, out_directory, name_to_code):
+    """
+    Generate the authors_by_count.html page listing all authors, sorted by article count (descending).
+    Authors with more than one article are displayed in bold.
+    """
+    # Pre-calculate article counts for all authors
+    author_article_counts = calculate_author_article_counts(db)
+    
+    html_parts = []
+    html_parts.append(f"<main>\n")
+    html_parts.append(f"<h1>Autoren nach Anzahl Artikel</h1>\n")
+    html_parts.append(f"<p>{len(all_authors)} Autoren</p>\n")
+    html_parts.append("<hr>\n")
+
+    # Sort authors by article count (descending), then by last name for ties
+    sorted_authors = sorted(all_authors, key=lambda name: (-author_article_counts.get(name, 0), name.split()[-1]))
+
+    # Create listing of authors sorted by count
+    html_parts.append("<ul>\n")
+
+    for author in sorted_authors:
+        # Format name as "Last name, First name(s)" for display
+        formatted_name = format_author_name_lastname_first(author)
+
+        # Create display name with code if available
+        author_code = name_to_code.get(author)
+        if author_code:
+            display_name = f"{formatted_name} ({author_code})"
+        else:
+            display_name = formatted_name
+
+        # Get article count from pre-calculated mapping
+        article_count = author_article_counts.get(author, 0)
+
+        # If the author has more than one article, wrap the display name in bold tags and add count
+        if article_count > 1:
+            display_name = f"<b>{display_name}</b> ({article_count})"
+
+        # Create the final list item with the potentially bolded name
+        author_url = f"/{BASE_DIR}authors/{author.replace(' ', '_')}.html"
+        html_parts.append(f'<li><a href="{author_url}">{display_name}</a></li>\n')
+
+    html_parts.append("</ul>\n")
+    html_parts.append("</main>\n")
+
+    # Write the authors by count page
+    body_html = ''.join(html_parts)
+    authors_path = os.path.join(out_directory, 'authors_by_count.html')
+    write_full_html_file(db, authors_path, f"Autoren nach Anzahl Artikel | {MAGAZINE_NAME}", None, body_html, 'all_authors')
+
 def generate_author_pages(db, out_directory):
     # Load author abbreviations mapping from CSV
     known_authors = load_author_codes()
@@ -2294,6 +2350,9 @@ def generate_author_pages(db, out_directory):
 
     # Generate the main authors.html page
     generate_all_authors_page(db, all_authors, out_directory, name_to_code)
+    
+    # Generate the authors_by_count.html page
+    generate_authors_by_count_page(db, all_authors, out_directory, name_to_code)
 
 
 if __name__ == '__main__':
