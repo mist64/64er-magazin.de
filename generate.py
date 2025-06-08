@@ -1684,7 +1684,7 @@ def make_authors_clickable(soup):
         def process_author_parts(text_to_process):
             """Process author text by splitting on separators and creating links where appropriate."""
             parts = re.split(r'([/,])', text_to_process)
-            
+
             for part in parts:
                 if part in ['/', ',']:
                     # Add separator as-is
@@ -1721,7 +1721,7 @@ def make_authors_clickable(soup):
 
             # Add opening parenthesis
             address.append('(')
-            
+
             # Process the content inside parentheses
             process_author_parts(inner_content)
 
@@ -2094,12 +2094,12 @@ def generate_single_author_page(db, author, authors_dir, name_to_code):
     # Find all articles by this author using meta tag data
     author_articles = []
 
+    known_authors = load_author_codes()
     for article in db.articles:
         soup = article.html
         # Get canonical authors from meta tags
         authors_meta_list = soup.find_all('meta', {"name": "author"})
         article_authors = []
-        known_authors = load_author_codes()
         for authors_meta in authors_meta_list:
             for meta_author in authors_meta["content"].split(','):
                 meta_author = meta_author.strip()
@@ -2169,7 +2169,7 @@ def calculate_author_article_counts(db):
     """Calculate article counts for all authors to avoid redundant processing."""
     author_article_counts = {}
     known_authors = load_author_codes()
-    
+
     for article in db.articles:
         if article.html:
             authors_meta_list = article.html.find_all('meta', {"name": "author"})
@@ -2180,11 +2180,11 @@ def calculate_author_article_counts(db):
                     # Resolve abbreviation to full name if known
                     resolved_author = known_authors.get(meta_author, meta_author)
                     article_authors.append(resolved_author)
-            
+
             # Increment count for each author in this article
             for author in article_authors:
                 author_article_counts[author] = author_article_counts.get(author, 0) + 1
-    
+
     return author_article_counts
 
 def generate_all_authors_page(db, all_authors, out_directory, name_to_code):
@@ -2194,7 +2194,7 @@ def generate_all_authors_page(db, all_authors, out_directory, name_to_code):
     """
     # Pre-calculate article counts for all authors
     author_article_counts = calculate_author_article_counts(db)
-    
+
     html_parts = []
     html_parts.append(f"<main>\n")
     html_parts.append(f"<h1>Alle Autoren</h1>\n")
@@ -2257,7 +2257,7 @@ def generate_combined_authors_page(db, all_authors, out_directory, name_to_code)
     """
     # Pre-calculate article counts for all authors
     author_article_counts = calculate_author_article_counts(db)
-    
+
     html_parts = []
     html_parts.append(f"<main>\n")
     html_parts.append(f"<h1>Autoren</h1>\n")
@@ -2266,7 +2266,7 @@ def generate_combined_authors_page(db, all_authors, out_directory, name_to_code)
 
     # ALPHABETICAL SECTION
     html_parts.append("<h2>Alphabetisch</h2>\n")
-    
+
     # 1. Sort the list of authors by their last name.
     sorted_authors = sorted(all_authors, key=lambda name: name.split()[-1])
 
@@ -2313,7 +2313,7 @@ def generate_combined_authors_page(db, all_authors, out_directory, name_to_code)
 
     # BY COUNT SECTION - only authors with > 1 article
     html_parts.append("<h2>Nach Anzahl Artikel</h2>\n")
-    
+
     # Sort authors by article count (descending), then by last name for ties
     # Filter to only include authors with more than 1 article
     authors_with_multiple = [author for author in all_authors if author_article_counts.get(author, 0) > 1]
@@ -2376,7 +2376,7 @@ def generate_author_pages(db, out_directory):
 
     # Generate the main authors.html page
     generate_all_authors_page(db, all_authors, out_directory, name_to_code)
-    
+
     # Generate the combined autoren.html page with both alphabetical and count-based sections
     generate_combined_authors_page(db, all_authors, out_directory, name_to_code)
 
