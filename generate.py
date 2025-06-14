@@ -1603,36 +1603,11 @@ def parse_course_part_number(article):
         base_title = match.group(1).strip()
         part_number = int(match.group(2))
         
-        # Normalize known variations in course titles
-        # This handles inconsistencies in the original magazine
-        base_title = normalize_course_title(base_title)
-        
         return (base_title, part_number)
     
     return None
 
 
-def normalize_course_title(title):
-    """Normalize course titles to handle known variations.
-    
-    This handles inconsistencies like:
-    - "Basic-Programme" vs "Basicprogramme"  
-    - Different Unicode dashes
-    - Case variations
-    """
-    # Normalize Unicode dashes to regular dash
-    title = title.replace('–', '-').replace('—', '-').replace('−', '-')
-    
-    # Normalize whitespace
-    title = ' '.join(title.split())
-    
-    # Specific normalizations for known course series
-    # Always normalize "Ein" to "ein" for Strubs series
-    if title.startswith('Strubs - '):
-        title = title.replace('Strubs - Ein Precompiler', 'Strubs - ein Precompiler')
-        title = title.replace('Basicprogramme', 'Basic-Programme')
-    
-    return title
 
 
 def build_course_series_map(db):
@@ -1670,10 +1645,12 @@ def build_course_series_map(db):
             expected_part += 1
         
         if missing_parts:
-            print(f"\n---\nWARNING: Course Series Missing Parts in '{base_title}':")
+            print(f"\nERROR: Course Series Missing Parts in '{base_title}':")
             print(f"   Missing parts: {', '.join(map(str, missing_parts))}")
             print(f"   Found parts: {', '.join(str(p[1]) for p in parts_list)}")
-            print(f"   Continuing anyway...\n---")
+            for article, part_num in parts_list:
+                print(f"     {article.issue_key}: {index_title(article)} (Teil {part_num})")
+            raise SystemExit(f"Database inconsistency: Course series '{base_title}' has missing parts. Fix the database.")
         
         # Only include series with multiple parts
         if len(parts_list) > 1:
