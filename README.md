@@ -197,6 +197,11 @@ Die Eingabe-Ausgaben werden aus `issues` gelesen, die Website wird nach `out` ge
         * [thierer](https://www.forum64.de/wcf/index.php?user/26370-thierer/)
     * OCR-Fixes
         * [vicjack](https://www.forum64.de/wcf/index.php?user/15999-vicjack/)
+* Ausgabe 7/85:
+    * Formatierung, Metadaten, OCR-Fixes
+        * [thierer](https://www.forum64.de/wcf/index.php?user/26370-thierer/)
+    * OCR-Fixes
+        * [vicjack](https://www.forum64.de/wcf/index.php?user/15999-vicjack/)
 * Sonderheft 1/1985:
     * Abtippen der Listings
         * [Kalle861](https://www.forum64.de/wcf/index.php?user/18972-kalle861/)
@@ -210,6 +215,11 @@ Die Eingabe-Ausgaben werden aus `issues` gelesen, die Website wird nach `out` ge
         * [docbobo](https://www.forum64.de/wcf/index.php?user/26944-docbobo/)
     * OCR
         * [Drachen](https://www.forum64.de/wcf/index.php?user/9125-drachen/)
+* Sonderheft 3/1985:
+    * OCR-Fixes
+        * [vicjack](https://www.forum64.de/wcf/index.php?user/15999-vicjack/)
+    * Abtippen der Listings
+        * [Endurion](https://www.forum64.de/wcf/index.php?user/1964-endurion/)
 
 ![](screenshot1.png)
 
