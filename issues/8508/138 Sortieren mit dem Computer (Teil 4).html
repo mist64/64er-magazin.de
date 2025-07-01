@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>Sortieren mit dem Computer (Teil 4)</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="Karsten Schramm, gk">
+    <meta name="64er.issue" content="8/85">
+    <meta name="64er.pages" content="138,141-143">
+    <!-- <meta name="64er.toc_category" content="XXX"> -->
+    <!-- <meta name="64er.toc_title" content="XXX"> -->
+    <meta name="64er.id" content="XXX">
+</head>
+
+<body>
+    <article>
+        <h1>Sortieren mit dem Computer (Teil 4)</h1>
+        <p class="intro">Quicksort verdient seinen Namen zu Recht. Aber er kann auch zu einem ausgesprochenen Langweiler werden. Sogar Bubblesort kann schneller sein als alle anderen Sortierroutinen. Woran das liegt, erfahren Sie im folgenden Artikel.</p>
+
+        <p>Der Quicksort-Algorithmus wurde bereits 1962 von R. Hoare entwickelt und ist trotzdem bis heute die schnellste Methode zum Sortieren großer, zufallsbesetzter Felder geblieben. Der Deutlichkeit halber betone ich noch einmal zufallsbesetzt, denn nur bei dieser Art der Verteilung der Feldelemente kann Quicksort wirklich effektiv arbeiten. Haben wir ein Array, das zum Beispiel absteigend sortiert ist (9, 8, 7,&hellip;, 1) und sollen hier nur wenige Elemente neu einsortiert werden, so wird Quicksort im wahrsten Sinne des Wortes zum »Slowsort« und benötigt eine ewige Zeit zur Bearbeitung des Feldes.</p>
+
+        <p>Andererseits lohnt sich der Einsatz von Quicksort auch dann nicht, wenn es darum geht, beispielsweise eine Kartei zu führen, bei der laufend neue Elemente in ein schon vorsortiertes Feld eingefügt werden sollen (zum Beispiel der Buchstabe D in dasFeldA, B, C, F, H, M, N, O,&hellip;).</p>
+
+        <p>Hier eignet sich unser (normalerweise langsamster) Bubblesort-2-Algorithmus sehr gut; in diesem Fall findet nämlich nur ein einziger Durchlauf statt, bevor der Algorithmus beendet wird (wie Sie wissen, verwendet Bubblesort 2 eine zusätzliche Variable, die anzeigt, ob noch weitere Sortierdurchläufe notwendig sind).</p>
+
+        <p>Bei der Effektivität unserer Sortierprogramme sollen uns diese Spezialanwendungen jedoch nicht weiter interessieren. Hier geht es nur um das Problem, ein völlig »durcheinandergeratenes« Feld wieder in Ordnung zu bringen, und das bitte möglichst schnell.</p>
+
+        <h2>Wie funktioniert Quicksort?</h2>
+
+        <p>So wollen wir uns nun einmal den Quicksort-Algorithmus etwas genauer betrachten. Er ist nicht im mindesten mit den bisherigen Methoden zu vergleichen, und wunderbarerweise zählt er trotz seiner Leistungsfähigkeit zu den etwas leichter verständlichen Algorithmen.</p>
+
+        <p>Das Prinzip von Quicksort ist folgendes:</p>
+
+        <p>Zuallererst wird aus dem gesamten Variablenfeld ein (beliebiges) Element herausgegriffen und »beiseite gelegt«. Dieses Element dient nun als Vergleichswert für das gesamte übrige Array. Jetzt werden alle Elemente, die kleiner als das Vergleichselement sind, links (also auf niedrigere Positionen) und alle Elemente, die größer sind, rechts (also auf höhere Positionen) vom Vergleichselement abgespeichert. Wir erhalten so ein Variablenfeld, bei dem alle kleineren Elemente oberhalb und alle größeren Elemente unterhalb des Vergleichselements stehen. Bild 1 zeigt noch einmal genau, was gemeint ist.</p>
+
+        <p>Nachdem diese »Gesamtsortierung« vollzogen wurde, haben wir ein schon sehr grob sortiertes Feld vorliegen. Nun teilen wir die beiden neuen Teilfelder (oberhalb und unterhalb des Vergleichselements) wiederum durch jeweils ein neues Vergleichselement auf, wobei diese beiden Teilfelder auf die oben beschriebene Art erneut sortiert werden. Als Ergebnis haben wir dann vier teilsortierte Feldabschnitte vorliegen, die wiederum, jedes für sich, geteilt und sortiert werden.</p>
+
+        <p>Setzen wir diese Teilungen immer weiter fort, so werden wir irgendwann einmal die Teilfeldlänge 1 erreichen, womit unser Gesamtfeld fertig sortiert wäre.</p>
+
+        <p>Wie Sie sicherlich bemerken, ist die Effektivität dieses Algorithmus natürlich stark von der Wahl des jeweiligen Vergleichselements abhängig. Optimal wäre jedesmal ein Vergleichselement, das etwa das Mittel der zugehörigen Teilliste ausmacht und diese so in zwei gleich große Abschnitte trennt.</p>
+
+        <p>Die Suche nach einem solchen optimalen Vergleichselement würde sich jedoch so aufwendig gestalten, daß die Geschwindigkeit von Quicksort stark darunter leiden müßte. Aus diesem Grund geht man bei der Wahl des betreffenden Elements einen anderen Weg. Es wird einfach jedesmal das Element gewählt, das genau in der Mitte der Teilliste steht. Auf diese Weise erhält man bei zufallsbesetzten Feldern zwar auch sehr ungünstige Werte; dieser Mangel wird jedoch durch eine ebensogroße Zahl von extrem günstigen Werten ausgeglichen.</p>
+
+        <p>Im Geschwindigkeitstest zeigt dieser Quicksort-Algorithmus dann auch seine verblüffenden Eigenschaften.</p>
+
+        <p>Bevor wir jedoch auf einen Vergleich sämtlicher bisher besprochener Sortiermethoden eingehen, noch etwas zur Programmierung von Quicksort.</p>
+
+        <h2>Was ist rekursives Programmieren?</h2>
+
+        <p>Während des Programmablaufs kommt ein Unterprogramm immer wieder in der gleichen Form vor und zwar das Sortieren eines Teilfeldes anhand des Vergleichselements. Dieses Unterprogramm stellt nun auch die neuen Teillisten fest und müßte bei einem sofortigen Rücksprung mit »RETURN« sämtliche neuen Parameter zwischenspeichern, um dann erneut aufgerufen zu werden &hellip;</p>
+
+        <p>Diese umständliche Programmiertechnik, die für einen linearen Programmablauf sorgt, wurde bei Quicksort nicht verwendet. Hier werden vielmehr die neu festgestellten Teillisten sofort wieder bearbeitet, um danach ebenfalls wieder die nächsten Teillisten herzustellen.</p>
+
+        <p>Wie funktioniert nun eine solche Programmiertechnik?</p>
+
+        <p>Man geht davon aus, daß der eigentliche Sortier- und Teilalgorithmus in einer Unterroutine untergebracht ist, wobei diese mit GOSUB aufgerufen wird. Wurde nun die erste Teilung des Variablenfeldes durchgeführt, so werden sofort die Werte für die nächste Halbierung dieser beiden Teilfelder bereitgestellt. Danach ruft sich die Unterroutine sofort wieder <strong>selbst</strong> auf, um auch die neue Sortierung und Teilung ablaufen zu lassen. Dabei entstehen wieder zwei neue Teilfelder, die wiederum sofort bearbeitet werden, etc. &hellip;</p>
+
+        <p>Bild 2 zeigt anschaulich, was gemeint ist.</p>
+
+        <p>Eine solche Programmiertechnik, bei der sich Programmteile selbst aufrufen, nennt man rekursiv!</p>
+
+        <p>Nun, könnten Sie jetzt einwenden, dieses Programm verschachtelt sich doch immer weiter, ohne daß ein Ende abzusehen ist. Wie findet der Computer denn aus diesem »Irrgarten« wieder heraus?</p>
+
+        <p>Die Sache ist relativ einfach. Irgendwann wird der Computer bei der Teillistenlänge 1 angekommen sein. Hat er das festgestellt, so erfolgt kein weiterer Selbstaufruf mehr, sondern es wird ein »RETURN« durchgeführt. Jetzt ist aber unser Unterprogramm so ausgelegt, daß es jeweils <strong>alle</strong> Teillisten der gleichen Länge nacheinander bearbeitet. Erfolgt also das erste RETURN, so bearbeitet der Computer die zweite Teilliste der Länge 2, bis er auch hier wieder teilt und bei 1 ankommt&hellip;</p>
+
+        <p>Dieses Bearbeiten der zwei letzten Teillisten setzt sich so lange fort, bis der Computer bei der letzten Teilliste dieser Ebene angekommen ist. Hier erfolgt wiederum ein RETURN, so daß nun auf die drittletzte Ebene mit der Größe 4 zurückgesprungen wird. Auch dort werden sämtliche Elemente bearbeitet, bis wir irgendwann wieder bei einer Teilliste der Länge A (gesamtes Feld) angekommen sind, worauf der Quicksortalgorithmus verlassen wird.</p>
+
+        <p>Dieses Prinzip ist nicht so ohne weiteres verständlich. Am besten sehen Sie sich noch einmal Bild 2 an; dort ist der ganze rekursive Algorithmus grafisch dargestellt.</p>
+
+        <p>An der Geschwindigkeit von Quicksort wird deutlich, wie effektiv rekursive Programmiertechnik sein kann.</p>
+
+        <h3>Probleme der Rekursion in Basic</h3>
+
+        <p>Bei unserem Quicksort in Basic stellt sich jedoch noch ein zusätzliches Problem: Basic ist keine strukturierte Sprache!</p>
+
+        <p>Was das bedeutet, sei am Beispiel von Pascal kurz erläutert.</p>
+
+        <p>Bei einer strukturierten Sprache werden Unterprogramme als eigene Einheiten mit eigenen Variablen betrachtet. Es kann also vorkommen, daß eine Unterroutine die gleichen Variablen wie das übergeordnete Programm enthält, wobei diesen jedoch andere Werte zugeordnet sind.</p>
+
+        <p>Hat also beispielsweise das Hauptprogramm in Pascal eine Variable X mit dem Wert 3 belegt und springt nun ein Unterprogramm an, in dem diese Variable ebenfalls verwendet wird, so wird der Inhalt von X auf einen Software-Stack gerettet und erst anschließend das Unterprogramm aufgerufen. Bei der Rückkehr aus dieser Unterroutine holt der Computer den Wert von X wieder vom Stack und übergibt ihn dem Hauptprogramm.</p>
+
+        <p>Bei einer rekursiven Programmiertechnik bleiben also alle Parameter, die von einer Routine erarbeitet wurden, erhalten und können später, gemäß der Reihenfolge, weiter verwendet werden.</p>
+
+        <p>Nicht so in Basic!</p>
+
+        <p>Hier gibt es nur jeweils <strong>eine</strong> Variable gleichen Namens, deren Wert sowohl vom Hauptprogramm als auch von Unterroutinen gleichermaßen beeinflußt werden kann. Haben Sie also die Variable X mit dem Wert 3, so erfolgt bei einem Unterprogramm, in dem es heißt: X = 5, ein Verlust der 3, der auch bei der Rückkehr ins Hauptprogramm nicht aufgehoben wird.</p>
+
+        <p>Aus diesem Grund können Sie im Basic-Quicksort noch ein weiteres Variablenfeld erkennen, in dem die wichtigen Parameter der Teilfelder abgespeichert werden, damit sie bei der Rückkehr von einer Ebene auf eine höhere wieder zur Verfügung stehen.</p>
+
+        <p>Wenn Sie das Prinzip der rekursiven Programmiertechnik noch nicht ganz verstanden haben, sollten Sie nicht die Mühe scheuen, noch einmal von vorne mit dem Lesen dieses Artikels zu beginnen. Diese Programmiermethode eignet sich nämlich zu allen algorithmischen Lösungen von Problemen mit ähnlicher Struktur, und Sie werden anhand von Quicksort erkennen können, wie effektiv und leistungsstark ein solches Programm wird.</p>
+
+        <p>Wie leistungsstark unsere sämtlichen Sortierprogramme sind, das soll im folgenden dargestellt werden, wobei Sie auch für Quicksort wieder einen Programmablaufplan vorfinden, der das Umschreiben auf andere Programmiersprachen erleichtern soll (Bild 3).</p>
+
+        <p>Nun aber zu unserem Vergleichstest.</p>
+
+        <p>Für diesen Test habe ich sämtliche Sortierprogramme soweit optimiert, indem ich alle REMs und alle zusätzlichen Leerzeichen entfernt habe. Außerdem wurde die dauernde Zwischenausgabe der Daten auf Bildschirm oder Drucker weggelassen, so daß sich die Zeitmessung jetzt nur auf den reinen Algorithmus bezieht.</p>
+
+        <h2>Sortieralgorithmen im Vergleich</h2>
+
+        <p>Getestet wurde bei allen Kandidaten ein zufallsbesetztes Feld von jeweils 100, 250 und 500 Elementen. Die Ergebnisse dieses Tests sind in Bild 4 dargestellt. Wie Sie sehen, schneidet Quicksort mit Abstand am besten ab; dicht gefolgt von Heapsort und etwas weiter von Shellsort. Diese drei Sortiermethoden eignen sich also für den praktischen Einsatz bei zufallsbesetzten Feldern, wobei im Vergleich zu den »niederen« Algorithmen sehr große Zeitvorteile zu verzeichnen sind. Bei 500 Elementen ist beispielsweise Quicksort über 16mal so schnell, wie unser (verbesserter) Bubblesort-2-Algorithmus.</p>
+
+        <p>Wie Sie sicherlich ahnen, hat diese schlechte Zeit, die sogar unser »normales« Bubblesort unterbietet, etwas mit der zusätzlichen Abfrage auf Vertauschungen zu tun.</p>
+
+        <p>Bei zufallsbesetzten Feldern ist Bubblesort 2 nicht akzeptabel!</p>
+
+        <p>Haben wir jedoch ein schon aufsteigend sortiertes Feld vorliegen, bei dem nur einige neue Elemente eingefügt werden sollen, so wird Bubblesort 2 fast unschlagbar, da hier die zusätzliche Abfrage für ein schnelles Ende, ohne zusätzliche, unnötige Arbeit, sorgt.</p>
+
+        <p>Bei unseren kleinen Variablenfeldern können also mit den höheren Sortierprogrammen ohne weiteres gute Zeiten erreicht werden.</p>
+
+        <p>Kritisch wird die ganze Angelegenheit jedoch, wenn Sie mit großen Feldern arbeiten, wobei unter Umständen noch ein riesiges Programm im Speicher steht.</p>
+
+        <p>Hier bekommt man es dann sehr schnell und auf höchst unangenehme Weise mit der »Müllabfuhr im Computer«, der Garbage Collection, zu tun (64'er, Ausgabe 1/1985, Seite 122).</p>
+
+        <p>Diese Tatsache ist jedoch nicht weiter verwunderlich, wenn man bedenkt, daß wir bei zufallsbesetzten Feldern beinahe das gesamte Array neu definieren und dabei entsprechend viel »Müll« erzeugen.</p>
+
+        <h2>Sortieren ohne Müll</h2>
+
+        <p>Haben Sie vielleicht schon einmal an eine andere Methode der Sortierung von Arrays gedacht? Es gibt nämlich noch eine weitere Möglichkeit, bei der man ohne viele Stringverschiebungen auskommt. Diese Möglichkeit der Sortierung und das Problem der Garbage Collection soll uns das nächstemal interessieren, wo wir uns dann einmal mit dem Sortieren der Indizes der Feldvariablen befassen. Außerdem können Sie sich schon einmal Gedanken zum Thema »Sortieren mehrdimensionaler Felder« machen. Das ist nämlich nicht annähernd so leicht, wie es vielleicht aussehen mag und erfordert eine ganze Menge Schweiß.</p>
+
+        <p>Für heute wollen wir es aber nun genug sein lassen. Experimentieren Sie doch ein wenig mit Quicksort, und lernen Sie diesen Algorithmus genauer kennen. Ich bin davon überzeugt, daß sich Ihnen früher oder später ein Problem stellt, bei dem Sie auf einen guten und schnellen Sortieralgorithmus angewiesen sein werden und den Sie nun Dank R. Hoare auch besitzen.</p>
+
+        <address class="author">(Karsten Schramm/gk)</address>
+    </article>
+</body>
+
+</html>

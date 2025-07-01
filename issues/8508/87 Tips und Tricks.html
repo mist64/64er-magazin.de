@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>Tips und Tricks</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="A. Kaminski, ev, Elmar Walter, Karl Heinz Hödl, Kurt Pfahl">
+    <meta name="64er.issue" content="8/85">
+    <meta name="64er.pages" content="87-88">
+    <!-- <meta name="64er.toc_category" content="XXX"> -->
+    <!-- <meta name="64er.toc_title" content="XXX"> -->
+    <meta name="64er.id" content="XXX">
+</head>
+
+<body>
+    <article>
+        <h1>Tips und Tricks</h1>
+        <h2>Maschinensprache »getürkt«</h2>
+
+        <p>Es gibt eine einfache Methode, um beim VC 20 mit mindestens 8 KByte Erweiterung aus einem ganz normalen Basic-Programm scheinbar ein Maschinensprache-Programm zu machen.</p>
+
+        <p>Zunächst gibt man die folgende Zeile ein:<br />
+            10 SYS 4621</p>
+
+        <p>Danach folgt im Direktmodus:<br />
+            POKE 43, 1 : POKE 44, 19 : POKE 4864, 0 : NEW</p>
+
+        <p>Keine Angst, die Programmzeile 10 ist nicht verloren. Jetzt muß das folgende kleine Programm eingegeben werden.<br />
+            10 FOR A = 4621 T0 4643<br />
+            20 READ D : S = S + D : POKE A, D<br />
+            30 NEXT<br />
+            40 IF S&lt;>2039 THEN PRINT "FEHLER IN DATAS"<br />
+            50 DATA 169, 36, 133, 43, 169, 18, 133, 44<br />
+            60 DATA 169, 0, 141, 34, 3, 141, 35, 3, 32<br />
+            70 DATA 89, 198, 76, 174, 199, 0</p>
+
+        <p>Dieses Programm wird jetzt mit »RUN« gestartet. Anschließend wird im Direktmodus der Basic-Start verschoben:<br />
+            POKE 43, 36 : POKE 44, 18 : POKE 4643, 0 : NEW</p>
+
+        <p>Damit sind wir schon fast am Ziel. Jetzt kann ein beliebiges Basic-Programm geladen oder geschrieben werden. Die letzte ausführbare Zeile dieses Programms muß immer lauten:<br />
+            »(Zeilennummer)« POKE 43, 1 : POKE 44, 18 : END</p>
+
+        <p>Um das Programm abspeichern zu können, muß man jetzt noch »POKE 43, 1 : POKE 44, 18« eingeben. Gibt man nun »LIST« ein, so sieht man nur »10 SYS 4621«. Das auf solch wundersame Art zum »Maschinenprogramm« gewordene Basic-Programm kann jetzt ganz normal gespeichert, geladen und gestartet werden. Allerdings ist jetzt ein hervorragender Listschutz realisiert, zumal im Maschinenspracheteil des Programms noch die RUN/STOP-Taste gesperrt wird. Ein Versuch, das Programm damit abzubrechen, führt stets zu einem völligen »Absturz« des Computers.</p>
+
+        <address class="author">(A. Kaminski/ev)</address>
+
+        <h2>Checksummer 64 mit akustischer Anzeige</h2>
+
+        <p>Beim Abtippen eines Programms mittels Checksummer hat es mich gestört, daß man die Prüfziffer optisch kontrollieren muß und dabei den Blickkontakt zur Vorlage verliert, das heißt die nächste Zeile wieder suchen muß.</p>
+
+        <p>Ich habe deshalb das Programm derart erweitert, daß die richtige oder falsche Eingabe zusätzlich durch einen hohen oder einen tiefen Ton angezeigt wird. Dazu ist es erforderlich, nach dem letzten Zeichen der Zeile einen Doppelpunkt und unmittelbar danach die Prüfziffer einzutippen. Erst dann wird mit RETURN abgeschlossen und die Zeile wird, selbstverständlich ohne Doppelpunktund Prüfziffer, abgespeichert. Ein tiefer Ton signalisierteinen Fehler, ein hoher Ton bedeutet richtige Eingabe. Die Anzeige der Prüfziffer links oben erfolgt nach wie vor. Es ist auch möglich, auf das Eintippen der Prüfziffer zu verzichten, dann erfolgt keine akustische Anzeige.</p>
+
+        <p>Der erste Teil des Maschinenprogramms ist im Speicher von dezimal 679 bis 767 abgelegt und istfür die Überprüfung, ob die letzte Eingabe eine Prüfziffer nach dem Doppelpunkt war oder nicht, verantwortlich. Der zweite Teil ist im Kassettenpuffer von dezimal 828 bis 906 untergebracht und bewirkt die entsprechende Tonausgabe.</p>
+
+        <p>Folgende Zeilen wären in das Checksummerprogramm einzufügen beziehungsweise zu ändern (Zeilen 210 und 410):</p>
+
+        <p>TODO</p>
+
+        <p>152 poke 42359,167:poke 42360,2<br />
+            155 poke 251,252:poke 252,0<br />
+            170 for i = 828 to 906:read a:poke i,a:next i<br />
+            180 for i = 679 to 767:read a:poke i,a:next i<br />
+            210 print"(down)anschalten(2 space): poke1,53"<br />
+            220 print"(2 down)am ende der zeile doppelpunkt und die prüfziffer eingeben!":new<br />
+            410 data 255,76,60,3,92,72,32,201<br />
+            600 data 169,0,205,238,3,240,69,169,15,141,24,212,169,48,<br />
+            141,6,212,169,16<br />
+            601 data 141,5,212,164,253,196,2,240,18,169,9,141,1,212,169, 247,141,0,212<br />
+            602 data 169,33,141,4,212,76,121,3,169,64,141,1,212,169,191, 141,0,212,169<br />
+            603 data 17,141,4,212,162,255,160,255,136,208,253,202,208, 248,162,0,142,24<br />
+            604 data 212,76,128,164<br />
+            700 data 134,250,202,160,0,132,254,140,238,3,132,255,189,0,<br />
+            2,201,48,144,65<br />
+            701 data 201,59,176,61,201,58,240,14,56,233,48,200,192,4, 240,49,145,251,202<br />
+            702 data 76,179,2,134,250,160,0,132,41,132,114,164,255,132, 40,160,100,140<br />
+            703 data 238,3,132,113,32,87,179,134,255,166,254,134,40, 162,10,134,113,32<br />
+            704 data87,179,138,24,101,255,101,253,133,253,166,250,76,<br />
+            202,170</p>
+
+        <p>Mit diesen Änderungen ist der Checksummer 64 noch um einiges bedienerfreundlicher geworden.</p>
+
+        <address class="author">(Karl Heinz Hödl)</address>
+
+        <h2>ROM-Modul-Schalter für C 64</h2>
+
+        <p>Vor einiger Zeit habe ich mir Simons Basic als ROM-Modul zugelegt, um das lästige Laden von Diskette zu vermeiden. Es stellte sich jedoch bald ein gravierender Nachteil heraus: Viele Hilfsprogramme laufen nicht bei eingestecktem Modul, da der Speicherbereich $8000 - $9FFF durch Simons Basic blockiert wird.</p>
+
+        <p>Dadurch wird es notwendig, beim Arbeiten mit derartigen Programmen jedesmal das Steckmodul zu entfernen. Dieses dauernde Heineinstecken und Herausziehen ist nicht nur lästig, sondern auf lange Sicht auch den Kontakten nicht besonders zuträglich. Besser wäre der Einbau eines Umschalters, der dem Computer das Entfernen des Moduls vorspiegelt.</p>
+
+        <p>Die Anwesenheit eines ROM-Moduls am Expansion-Port wird dem C 64 durch zwei Signalleitungen (EXROM und GAME) angezeigt. Liegen beide Leitungen auf »High«, also auf logisch Eins, dann wird der normale RAM-Bereich benutzt. Befinden sich diese Leitungen jedoch auf »Low«, also auf logisch Null, dann wird der externe ROM-Bereich des Moduls adressiert. Normalerweise ist es nun so, daß die beiden Leitungen durch das eingesteckte Modul selbst auf »Low« gezogen werden und somit eine softwaremäßige Änderung des Zustandes nicht mehr möglich ist.</p>
+
+        <p>Ich habe deshalb die beiden Leitungen (Kontakte 8 und 9, siehe Bild) hinter dem Expansion-Port, also innerhalb des C 64, aufgetrennt und zu einem zweipoligen Umschalter an der Außenseite des Computers geführt. Das Anbringen des Schalters am Oberteil des Gehäuses stellt kein Problem dar. Lediglich die Unterbrechung der Leitungen 8 und 9 direkt hinter dem Expansion-Port ist etwas problematisch, da die Anschlußleitungen zur Hauptplatine sehr dicht beieinander liegen. Aus dem gleichen Grunde ist auch das Anlöten der Verbindungsdrähte zum Umschalter eine etwas knifflige Arbeit.</p>
+
+        <p>Mit dieser Schaltung ist es nun möglich, bei ständig eingesetztem Modul zwischen internem RAM und externem ROM umzuschalten. Das Umschalten muß jedoch vor dem Einschalten des Computers geschehen, oder der C 64 muß nach dem Umschalten kurz aus- und wieder eingeschaltet werden.</p>
+
+        <p>Es versteht sich wohl von selbst, daß dieser Eingriff nur nach Ablauf der Garantiefrist für den C 64 vorgenommen werden darf.</p>
+
+        <address class="author">(Kurt Pfahl)</address>
+
+        <h2>1520-Hardcopy verbessert</h2>
+
+        <p>Über das Maschinenprogramm »Farbige 1520-Hardcopy« aus der Ausgabe 10/84, habe ich mich als neuer Besitzer eines 1520-Printer-Plotters zunächst sehr gefreut. Nach dem mühsamen Eintippen der DATA-Zeilen war aber die Enttäuschung über das Mini-Bild groß. Nachdem das 1520-Format sowieso schon recht schmal ist, sollte man es doch wenigstens ausnutzen!</p>
+
+        <p>Gleiches gilt für die einfarbige 1520-Hardcopy-Routine in Basic, die in der Ausgabe 7/84 veröffentlicht wurde. Nachdem ich kein Maschinensprache-Profi bin, mußte allerdings eben diese Routine herhalten. Durch Ändern von vier Zeilen liefert sie brauchbare Hardcopies im 1:2 Querformat:</p>
+
+        <p>TODO</p>
+
+        <p>460 X=SW-C-SQ+Z+70 : Y=-L : PRINT#1, "M", -2*Y, 2*X<br />
+            510 IF B(Z+1) = 0 THEN PRINT#1, "D", -2*Y, 2*X+1 : PRINT#1, "D", -2*Y+1, 2*X+1<br />
+            511 PRINT#1, "D", -2*Y+1, 2*X : GOTO 454<br />
+            520 Z=Z+1 : X=X+1 : GOTO 510</p>
+
+        <p>Ein Problem ist natürlich die sehr niedrige Geschwindigkeit des Basic-Programms. Aber vielleicht kommtja noch mal eine vierfarbige 1520-Hardcopy-RoutinefürQuerformatin Maschinensprache. Bis dahin aber dürfte das Basic-Programm aus Ausgabe 7/84 mit den eben beschriebenen Änderungen langsame, aber gute Dienste leisten.</p>
+
+        <address class="author">(Elmar Walter)</address>
+    </article>
+</body>
+
+</html>

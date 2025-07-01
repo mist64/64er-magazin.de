@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>C 64 extern — Der Weg na&lt;h draußen (Teil 1)</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="Tobias Nicol, ev">
+    <meta name="64er.issue" content="8/85">
+    <meta name="64er.pages" content="144,147-150">
+    <!-- <meta name="64er.toc_category" content="XXX"> -->
+    <!-- <meta name="64er.toc_title" content="XXX"> -->
+    <meta name="64er.id" content="XXX">
+</head>
+
+<body>
+    <article>
+        <h1>C 64 extern — Der Weg na&lt;h draußen (Teil 1)</h1>
+        <p class="intro">Die meisten Computer-Anwender schließen nur käufliche Peripherie an ihren Homecomputer an. Oft fehlt das Wissen, wie man sich mit einfachen Mitteln neue Peripherie- und Steuergeräte selbst bauen kann. Dieser Kurs soll sowohl dem C 64- als auch dem VC 20-Besitzer einen Einstieg in diese Materie bieten.</p>
+
+        <p>Der C64 und der VC 20 haben an ihren User- und Control-Ports (Joystickports) viele Anschlüsse, an denen man sehr leicht verschiedene Steuergeräte betreiben kann. Der Schwerpunkt dieses Kurses wird hauptsächlich auf dem C 64 liegen, jedoch sollen auch die VC 20-Besitzer nicht zu kurz kommen. Alle Programmbeispiele sind nämlich auf beiden Rechnern lauffähig. In dieser Folge wollen wir uns den Control-Ports zuwenden und lernen, wie man hier dem Computer Signale zuführen kann. Der Kurs wird vor allem für diejenigen interessant sein, die sich mit solchen »externen« Möglichkeiten noch nie beschäftigt haben.</p>
+
+        <p>Wenn Sie die Versuche experimentell nachvollziehen wollen, sollten Sie sich unbedingt je einen Stecker für den Control-Port und für den User-Port besorgen. Diese Stecker sind zwar leider recht teuer, doch für ein sicheres Zugreifen auf die einzelnen Pins des Ports unabdingbar. Sie sind, wie alle für diesen Kurs benötigten Teile, in Elektronik- oder Computerfachgeschäften erhältlich.</p>
+
+        <p>Wer Angst um seine Computeranlage hat, sollte vor dem Einschalten alle nicht benötigten Peripheriegeräte (Drucker, Floppy, Datasette etc.) abtrennen. Wenn Sie jedoch vorsichtig sind und genau nach den gegebenen Anweisungen vorgehen, kann nichts schiefgehen.</p>
+
+        <p>Als erstes wollen wir uns den beiden Anschlüssen »POT X« und »POT Y« an den Control-Ports zuwenden. Diese beiden Anschlüsse (Pin 5 und 9, siehe Bild 1) sind dazu da, dem Computer analoge Daten (analog = stufenlos, stetig; in diesem Fall Spannungswerte) mitzuteilen. Die analogen Daten werden in einem sogenannten Analog/Digital-Wandler in digitale Daten, also in eine Zahl zwischen 0 und 255 umgewandelt. Das geschieht ohne unser Zutun automatisch im Computer. Die umgewandelten Daten kann man dann aus Speicherzellen auslesen. Die Zahl in diesen Speicherzellen ist um so kleiner, je größer die Spannung an POT X/Y ist. Deshalb stehen diese Register, wenn nichts angeschlossen ist, auch immer auf 255 (= 0 Volt an POT X/Y).</p>
+
+        <h2>Paddles im Selbstbau</h2>
+
+        <p>Der C 64 hat an jedem seiner beiden Control-Ports je ein Anschlußpaar POT X/ POT Y. Beim VC 20 gibt es nur ein solches Paar.</p>
+
+        <p>Wie sprechen wir diese Funktion des Computers an? Dazu müssen wir dem Computer also analoge Daten zuführen. Eine Möglichkeit besteht darin, über ein Potentiometer (= einstellbarer ohmscher Widerstand) verschiedene Spannungswerte an POT X oder POT Y einzustellen. Wenn Sie kein Poti (Potentiometer) zur Hand haben, können Sie in Elektronikläden eins kaufen. Falls Sie ein paar Paddles Ihr Eigen nennen, können Sie natürlich ebensogut dieses anschließen. Ich werde aber im folgenden von Potis sprechen, weil Paddles nur wenig verbreitet sind.</p>
+
+        <p>Über den idealen Widerstandswert des Potis gibt es in der Fachliteratur unterschiedliche Angaben. Ich empfehle ein 470-Kilo-Ohm-Poti. Die relativ guten Werte, die man damit erzielt, können durch Parallelschalten eines Festwiderstandes von etwa 1 Mega-Ohm noch verbessert werden. Sie brauchen jedoch vor dem Ausprobieren verschiedener Widerstände keine Angst zu haben, denn ein falscher Widerstand ist völlig ungefährlich: Bei zu kleinem Widerstandswert ist die Zahl 255 im POT X/Y-Register unmöglich, andernfalls wird sie zu früh erreicht, das heißt man muß das Poti nicht ganz aufdrehen, um die Zahl 255 zu erreichen (darunter leidet nur die Fähigkeit, Werte exakt einzustellen).</p>
+
+        <p>Jetzt wollen wir unser Poti aber erst einmal an den C 64 beziehungsweise VC 20 anschließen: Von den drei Anschlüssen des Potis verbinden Sie den mittleren mit POT X (Pin 9) und einen der verbleibenden (egal, welchen) mit +5 V (Pin 7) des Control-Ports 1 des C 64 (die VC 20-Leute natürlich mit den Anschlüssen des einzigen vorhandenen Control-Ports). Der dritte Anschluß bleibt frei. Wenn Sie Ihre Arbeit auf eventuelle Kurzschlüsse überprüft haben, schalten Sie Ihren Computer ein. Arbeiten an den Ports sollten grundsätzlich nur bei ausgeschaltetem Gerät durchgeführt werden. Tippen Sie nun das Programm »Männchendemo« (Listing 1) ab. Um das Programm an den VC 20 anzupassen, entfernen Sie eventuell vorhandene RAM-Erweiterungen und geben die Änderungen mit ein, die am Ende des Listings angegeben sind. Das gilt für alle Programme dieses Kurses.</p>
+
+        <p>Starten Sie nun das Programm mit »RUN«. Ein Männchen läuft über den Bildschirm. Wenn Sie am Potentiometer drehen, ändert sich die Laufgeschwindigkeit des Männchens kontinuierlich.</p>
+
+        <p>Wie funktioniert das? Sehen Sie sich das Listing zum Programm an. Das Programm besteht aus zwei gleich aufgebauten Teilen und einem Unterprogrammteil. Der erste Teil ist für die Bewegung nach rechts, der zweite für die Bewegung nach links zuständig. Aus beiden Teilen wird das Unterprogramm aufgerufen. Das Neue an diesem Programm steckt in der Zeile 590. Hier ist eine Warteschleife programmiert, die J von 1 bis PEEK &copy; durchlaufen läßt. C steht für die Adresse, in welcher der Computer die digitale Information über den Spannungswert an POT X ablegt. Ich habe hier und auch in den folgenden Programmen bewußt viele Variablen verwendet, weil dadurch die Adaption an den VC 20 vereinfacht wird. Daher müssen zur Anpassung dieses Programms nur drei Zeilen ausgetauscht werden, weil zum Beispiel die Anfangsadresse des Bildschirm-RAMs oder die Zeilenzahl (in noch folgenden Programmen) als Variable vordefiniert wurden.</p>
+
+        <p>Dem POT X-Anschluß ist also beim C 64 die Adresse 54297 und beim VC 20 die Adresse 36872 zugeordnet. Für POT Y ist bei beiden Computern jeweils die nächste Speicherzelle auszulesen, also 54298 beziehungsweise 36873. Durch die »extern« variierte Warteschleife wird die Wanderung des Männchens über den Bildschirm unterschiedlich stark verlangsamt, wodurch eine Geschwindigkeitskontrolle realisiert ist.</p>
+
+        <h2>Probleme mit Port 2</h2>
+
+        <p>In dem Programm »Tondemo« (Listing 2) werden dann POT X und POT Y gleichzeitig benutzt. Für den richtigen Betrieb des Programm benötigen Sie eigentlich zwei Potentiometer, Sie können jedoch auch eines abwechselnd an POT X und POT Y betreiben. Wenn Sie gerade vor einem C 64 sitzen, dann schließen Sie für dieses Programm beide Potis an den Control-Port 2 an. Ich verwende jetzt bewußt den zweiten Port, weil man hier noch ein paar Dinge beachten muß, die bei Port 1 nicht notwendig sind.</p>
+
+        <p>Zurück zum Programm: Mit dem X-Poti wird die Lautstärke des Tones, mit dem Y-Poti die Frequenz des Tones eingestellt. Die Werte werden in den Zeilen 320 und 330 ausgelesen und für die Tonregister aufbereitet. Bevor wir den Port 2 des 0 64 auslesen können, müssen wir diesen allerdings noch dafür vorbereiten. Zunächst schalten wir die Interruptroutine des C 64 (IRQ) ab. Das geschieht durch POKE 56333,1 und ist notwendig, weil wir sonst schwankende Werte erhalten. Vielleicht ist Ihnen schon aufgefallen, daß die Register, aus denen ausgelesen wird (Zeilen 320/330), dieselben sind wie beim ersten Programm, obwohl wir doch jetzt den Port 2 beschältet haben. Wenn Sie das bemerkt haben, können Sie sich schon denken, was jetzt noch nötig ist: Wir müssen dem C 64 mitteilen, welchen Port wir auslesen wollen. Diese Information erhält er über Bit 6 und 7 der Adresse 56320. Das verhält sich so:</p>
+
+        <p>TODO</p>
+
+        <p>Bit 6 Bit 7<br />
+            Port 1 1<br />
+            Port2 0 1</p>
+
+        <p>In dieser Adresse müssen wir also eine 127 ablegen (das ergibt sich durch die Kombination der anderen Bits in 56320), wenn wir Port 1 abfragen wollen. Dieser Wert steht hier aber sowieso immer, weshalb wir uns das Einstellen dieses Registers bei Programm 1 sparen konnten (auch das Abschalten des Interrupts ist unnötig, da sich keine Probleme ergeben). Wollen wir Port 2 auslesen, müssen wir vorher 191 nach Adresse 56320 POKEn. Erwähnenswert ist außerdem, daß dieser Wert vor jeder Abfrage neu in dieses Register eingeschrieben werden muß, da er vom Betriebssystem immer wieder mit der 127 von Port 1 überschrieben wird. Um diesen Sachverhalt nachzuprüfen, geben Sie einmal folgendes Miniprogramm ein:<br />
+            10 POKE 56333,1 : POKE 56320,191<br />
+            20 PRINT PEEK (56320) : GOTO 20</p>
+
+        <p>Nach RUN wird ein paarmal der Wert 191 und danach nur noch der Wert 127 ausgegeben.</p>
+
+        <p>Nach dem Auslesen wird dann in den Zeilen 340/350 der alte Wert wieder in das Register 56320 eingeschrieben und der Interrupt wieder eingeschaltet (POKE 56333,129).</p>
+
+        <p>Wenn Sie das Programm für den VC 20 anpassen, fällt Ihnen wahrscheinlich auf, daß sehr viel mehr gelöscht als neu eingefügt werden muß. Das rührt daher, daß beim C 64 sowohl die Tonerzeugung als auch das Auslesen der Port-2-Register komplizierter ist. Bei der Tonerzeugung wird das allerdings durch die weitaus bessere Qualität der Töne wettgemacht.</p>
+
+        <p>Das dritte Programm, »X/ Y-Steuerung« (Listing 3), zeigt eine weitere Anwendung der POT X/Y-Register. Ein Objekt (in diesem Fall ein Rechteck) kann durch die zwei Potis, die jetzt wieder an Port 1 betrieben werden müssen, an jede beliebige Position des Bildschirms gebracht werden. Die Schwierigkeit bei dieser Anwendung besteht wieder darin, die Werte, die ausgelesen werden (Zeile 270,280), geeignet aufzubereiten, also in Bildschirmkoordinaten umzurechnen. Das wird in den Zeilen 310 und 320 für die X- und Y-Richtung getan. Für den VC 20 müssen wieder nur die Variablenbelegung und die Datenaufbereitung (wegen des kleineren Bildschirms, aber der gleich großen Werte 0 bis 255) ausgetauscht werden.</p>
+
+        <p>Diese drei vorgestellten Programme sind für sich allein betrachtet natürlich wenig sinnvoll, um nicht zu sagen langweilig. Sie sollen jedoch auch nur eine Demonstration dafür sein, was man mit den POT X/Y-Registern machen kann und wie man sie ausliest.</p>
+
+        <h3>Was man mit den Control-Ports alles machen kann &hellip;</h3>
+
+        <p>Eine weitere Möglichkeit in der Verwendung von POT X/Y liegt im Anschließen von »Umweltsensoren« wie zum Beispiel Licht- oder Temperaturmessern. So kann man statt des Potis einfach einen LDR (Light Dependent Resistor = lichtempfindlicher Widerstand) anschließen. Die Werte, die man aus den Registern ausliest, hängen dann von der Lichtintensität ab, die auf den LDR fällt. Man kann also durch ein Programm die Helligkeit des Raums überprüfen lassen. Bei einem Programm, das den Benutzer besonders lang vor dem Bildschirm fesselt, kann man damit einen besonderen Gag einbauen: Wenn die Sonne untergeht, und es im Zimmer dunkel wird, meldet sich der Computer mit der Information, daß man langsam das Licht einschalten sollte, um sich nicht die Augen zu verderben (das wäre doch mal etwas ganz Neues!).</p>
+
+        <p>Für den Lichtmesser muß man die auf den POT-Registern ausgelesenen Werte geeignet aufbereiten, wie es schon in der »Tondemo« für die Tonregister geschehen ist. Man eicht den Lichtmesser, wozu man allerdings einen bereits abgeglichenen Lichtmesser benötigt.</p>
+
+        <p>Um Temperaturen zu messen, nimmt man statt des lichtempfindlichen einen wärmeempfindlichen Widerstand. Diese Anwendung fällt aber genau wie der Lichtmesser schon in den Bereich der Meßtechnik. Der Phantasie sind in der Verwendung dieser Register keine Grenzen gesetzt.</p>
+
+        <p>Wenn Sie ein Paar Paddles besitzen, werden Sie sich vielleicht schon gefragt haben, wie man denn jetzt die beiden Feuerknöpfe an den Paddles abfragt. Diesbezüglich müssen Sie sich aber leider noch bis zur nächsten Folge dieses Kurses gedulden. Zur Zeit fehlen nämlich noch ein paar Grundkenntnisse, die zum Verstehen der Abfrage der Feuerknöpfe wichtig sind.</p>
+
+        <p>Zur Verwendung in Programmen eignen sich Paddles besonders dann, wenn eben zum Beispiel Geschwindigkeit oder Tonhöhe eingestellt (Männchen- und Tondemo) oder ein Objekt schnell und präzise zu einer bestimmten Stelle bewegt werden muß (X/Y-Steuerung), weil durch das Potentiometer theoretisch ein direkter Sprung zu jeder Bildschirmkoordiante möglich ist (durch schnelles Drehen), während man sich beim Joystick meistens mit einer konstanten Geschwindigkeit fortbewegt (Ausnahmen bestätigen die Regel).</p>
+
+        <p>Apropos Joystick: Haben Sie sich nicht schon einmal gefragt, wie Sie den Joystick in eigenen Programmen benutzen können? Ich möchte Ihnen jetzt zeigen, wie das funktioniert.</p>
+
+        <h2>So wird der Joystick abgefragt</h2>
+
+        <p>Während man an die POT X/Y-Anschlüsse analoge Spannungswerte anlegt, verlangen die Register, die den Joystick überwachen, klare Bedingungen: Hier gibt es nur zwei Zustände, nämlich Strom und keinen Strom beziehungsweise Eins und Null beziehungsweise +5 V (Pin 7) und GND (= Ground: negativer Pol der Computerversorgungsspannung, Pin 8). Deshalb ist der Commodore-Joystick ein sogenannter Schalter-Joystick.</p>
+
+        <p>Etwas anderes als der Schalter-Joystick ist der Potentiometer-Joystick, bei dem mit dem Steuerhebel Widerstandswerte auf Potentiometerbahnen eingestellt werden. Diese Potentiometer-Joysticks werden an die POT X/Y-Anschlüsse angeschlossen (es handelt sich also praktisch um zwei Paddles, die mit einem gemeinsamen »Steuerhebel« bewegt werden). Doch bleiben wir beim gewohnten Schalter-Joystick.</p>
+
+        <p>Durch Bewegen des Joystick-Steuerhebels können vier mögliche Kontakte geschlossen werden, davon maximal zwei gleichzeitig. Das ist bei den Zwischenrichtungen NO, SO, SW und NW der Fall. Der Feuerknopfhat einen eigenen Kontakt.</p>
+
+        <p>Mit diesen Kontakten stellt man die Verbindung zwischen GND (Ground, Masse) und den Control-Port-Anschlüssen 1, 2,3,4 oder 6 her. Welchen Richtungen diese Anschlüsse entsprechen, können Sie der Tabelle 1 entnehmen. Daß der Feuerknopf an Port 1 auf einen Anschluß namens Light Pen wirkt, lassen wir vorerst außer acht.</p>
+
+        <p>Im Gegensatz zu den Paddles gibt es für den Joystick im C 64 zwei Register, in denen die Joystickinformation abgelegt wird, für jeden Port also ein eigenes Register.</p>
+
+        <p>Der VC 20 hat zwar auch zwei Joystickregister, jedoch wird hier die Joystickinformation auf eben diese beiden Register aufgeteilt.</p>
+
+        <p>Bevor wir den Joystick auslesen können, müssen wir den Computer dafür vorbereiten. In der Vorgehensweise hierfür gibt es wieder erhebliche Unterschiede zwischen den C 64-Ports 1 und 2 und VC 20. Beginnen wir mit dem Port 2 des C 64: Zum Einschalten der Joystickfunktionen müssen wir die Bits 0 bis 4 der Adresse 56322 löschen. Das tun wir eleganterweise ohne die restlichen Bits zu beeinflussen mit POKE 56322, PEEK (56322) AND 224.</p>
+
+        <p>Zur Erinnerung: Die 224 ist die Summe der Wertigkeiten der Bits 5 bis 7 (224 = 128 + 64 + 32 = 2<sup>7</sup> + 2<sup>6</sup> + 2<sup>5</sup>). Das sind genau die, die wir mit unserem POKE nicht verändern wollten. Da die restlichen Bits in 224 gleich Null sind, werden diese im Ergebnis durch ÄND gelöscht, was ja unsere Absicht war!</p>
+
+        <p>Nachdem wir diesen POKE eingegeben haben, ist unser Computer für die Eingabe auf Joystick umgeschaltet. Sie sollten den genannten POKE übrigens niemals im Direktmodus eingeben, da danach die Tastatur Ihres Computers nicht mehr funktioniert (einschließlich RUN-STOP/RESTORE). Sie können den C 64 also nur noch ausschalten, und alles ist weg.</p>
+
+        <p>Beim Port 1 ist im Prinzip dieselbe Operation mit Register 56323, wie bei Port 2 mit Register 56322 nötig. Da in disem Register jedoch sowieso immer eine Null steht (also alle Bits gelöscht sind), kann man sich die Arbeit sparen.</p>
+
+        <p>Beim VC 20 müssen Sie POKE 37139,0 : POKE 37154,127 eingeben, um auf Joystick umzustellen. Auch hier wird die Tastatur teilweise außer Funktion gesetzt. RUN-STOP/RESTORE bleibt Ihnen jedoch erhalten.</p>
+
+        <p>Was dieses ganze gePOKE im einzelnen bedeutet und warum es nötig ist, erfahren Sie in der nächsten Folge. Sie sollten jedoch noch wissen, wie Sie die Eingabe wieder auf die Tastatur legen: C 64, Port 1: keine Eingabe nötig<br />
+            C 64, Port 2: POKE 56322, PEEK (56322) OR 31<br />
+            VC 20: POKE 37154,255 : POKE 37139,128</p>
+
+        <p>Nachdem die AND-Funktion oben schon erklärt wurde, nun noch kurz das OR: Wir wollen die Bits 0 bis 4 in 56322 setzen und die restlichen nicht verändern. Die 31 ist die Summe der Wertigkeiten der Bits 0 bis 4 (31 = 00011111 binär). Die restlichen Bits sind Null und werden daher im Ergebnis durch OR nicht verändert. Die Bits 0 bis 4 werden aber auf jeden Fall gesetzt.</p>
+
+        <p>Jetzt sollten wir den Joystick aber einmal abfragen, was durch die Störung der Tastatur jedoch leider im Direktmodus unmöglich ist. Die Information über den Zustand des Joystickhebels steht in folgenden Speicherstellen:<br />
+            C 64, Port 1 : 56321<br />
+            C 64, Port 2 : 56320</p>
+
+        <p>Beim VC 20 steht die Information für Osten in 37152, die für die anderen drei Richtungen und Feuer in 37137. Jedem Kontakt im Joystick ist genau ein Bit in einer dieser Speicherstellen zugeordnet. Welches Bit zu welcher Richtung gehört, zeigt Tabelle 1. Beim C 64 weisen die angegebenen Speicherstellen der beiden Ports die gleiche Bitstruktur auf. Der einzige Unterschied besteht darin, daß in Adresse 56320 das Bit 7 immer gelöscht ist.</p>
+
+        <h2>Ein Beispiel zur Joystickprogrammierung</h2>
+
+        <p>Nach soviel Theorie wieder etwas Praxis: Geben Sie zur Übung der Joystickprogrammierung das Programm »Joystickdemo 1« (Listing 4) ein. Mit diesem Programm können Sie per Joystick einen weißen Punkt auf einem schwarzen Bildschirm in alle acht Richtungen bewegen. Ist der Feuerknopf gedrückt, wird der Punkt nicht mehr gelöscht, das heißt er zeichnet.</p>
+
+        <p>In Zeile 300 wird die Eingabe auf den Joystick gelegt. Zeile 330 kopiert (bei VC 20 auch Zeile 335) den Inhalt des Joystickregisters in die Variable J1 (und beim VC 20 das zweite Register in J2). Ist der Joystick in Ruhestellung, so ist das zugehörige Bit auf Eins. Bei der Bewegung in eine Richtung wird das entsprechende Bit im Joystickregister gelöscht. Bei den Zwischenrichtungen NO, SO, SW und NW werden jeweils die zwei zugehörigen Bits gelöscht. Der Feuerknopf setzt das »Fire«-Bit auf Null. Ab Zeile 350 wird J1 (undJ2) ausgewertet. Wenn die bitweise Überprüfung mit AND Null ergibt, war der Joystick in dieser Richtung bewegt. Mit der Wertekontrolle ab Zeile 420 wird verhindert, daß der Punkt den Bildschirm verläßt und unkontrolliert im RAM herumschreibt. In Zeile 490 wird der alte Punkt eventuell (Abhängigkeit vom Feuerknopf) gelöscht und in 500/510 der neue gesetzt.</p>
+
+        <p>In diesem Programm wird der Joystick ausschließlich in Basic abgefragt. Für die hier dargestellte Anwendung ist dieses System auch völlig ausreichend. Wenn es aber auf hohe Geschwindigkeit ankommt oderjede der acht Richtungen eine andere Funktion auslösen soll, der Joystick also auf jede Richtung einzeln überprüft werden muß, reicht eine reine Basic-Abfrage oft nicht mehr aus. Ich habe dieses Problem in dem Programm »Joystickdemo 2« (Listing 5) behoben. Nach dem Programmstart wird die in den DATA-Zeilen enthaltene Maschinenroutine bei beiden Computern im Kassettenpuffer abgelegt. Für den VC 20 aktivieren Sie bitte die REM-Zeilen. Da beim C 64 der Port 1 verwendet wird, sind für ihn keine Einstellungen notwendig. Die oben genannten Einstellungen für den VC 20 nimmt dessen Maschinenroutine selbsttätigvor. Daher ist sie auch etwas länger. Außerdem sind natürlich die Abfrageregister und Bitwerte angepaßt. Die Routine, die übrigens nur relative Sprünge enthält, also auch in anderen Speicherbereichen abgelegt werden kann, liest bei ihrem Aufruf die oben beschriebenen Joystickregister der Computer aus und legt den ermittelten Wert im letzten Byte des Kassettenpuffers (Adresse 1023 dezimal oder $03Ff hexadezimal) ab. Den Aufbau dieses Wertes zeigt Bild 2. Ist der Feuerknopf gedrückt, wird zu dem errechneten Wert die Zahl 100 addiert. Diese Methode hat den Vorteil, daß nach der Berücksichtigung des Feuerknopf-Wertes, also der addierten 100, (Zeilen 410/420) die Joystick-Information direkt mit ON&hellip;GO-TO/GOSUB verarbeitet werden kann (Programmzeilen 430 bis 520). Da die Joystick-Werte »2«, »9« und »10« nicht vorkommen, müssen sie bei der ON&hellip;GOTO/GOSUB-Anweisung ausgeklammert werden (Sprünge nach Zeile 360 in Zeilen 430/440). Das ON.. GOTO ist, nebenbei bemerkt, nur deshalb auf die Zeilen 430/440 aufgeteilt, weil eine Zeile zu voll würde. Bis auf die besprochene Maschinenroutine funktioniert das eben beschriebene Programm genauso wie die »Joystickdemo 1«.</p>
+
+        <p>Die Geschwindigkeitsfanatiker unter Ihnen sollten jetzt noch einmal besonders gut aufpassen:</p>
+
+        <ol>
+            <li>Obwohl die zweite Joystickdemo eine Maschinenroutine enthält, ist sie in der Ausführung etwas langsamer als die erste. Das hat einen sehr einfachen Grund: Für die hier gezeigte Anwendung ist die reine Basic-Abfrage zeitlich besser, weil bei den Zwischenrichtungen zwei Bedingungen erfüllt sind und nicht jede Richtung einzeln abgefragt werden muß.</li>
+            <li>Der Cursorpunkt ist schneller, wenn er die Punkte nicht löschen muß, weil dann eine Anweisung entfällt.</li>
+        </ol>
+
+
+        <p>Das war's für heute. In der nächsten Folge werden wir die Besprechung des Control-Ports zu Ende bringen und uns anschließend dem User-Port zuwenden. Bis dahin haben Sie Gelegenheit, ausgiebig mit dem Gelernten zu experimentieren.</p>
+
+        <address class="author">(Tobias Nicol/ev)</address>
+    </article>
+</body>
+
+</html>

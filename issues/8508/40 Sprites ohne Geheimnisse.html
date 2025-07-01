@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>Sprites ohne Geheimnisse</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="Heimo Ponnath, ah">
+    <meta name="64er.issue" content="8/85">
+    <meta name="64er.pages" content="40-44">
+    <!-- <meta name="64er.toc_category" content="XXX"> -->
+    <!-- <meta name="64er.toc_title" content="XXX"> -->
+    <meta name="64er.id" content="XXX">
+</head>
+
+<body>
+    <article>
+        <h1>Sprites ohne Geheimnisse</h1>
+        <p class="intro">Sprites sind für manchen Einsteiger reizvolle, aber schwer zu programmierende Gebilde. Man muß viele Register kennen und mit Binärzahlen arbeiten. Dieser Artikel soll Ihnen helfen, beide Hürden zu meistern.</p>
+
+        <p>In Bild 1 finden Sie einen Fahrplan, der in 13 Stationen den Weg zum funktionierenden Sprite enthält. Diesem Schema werden wir nun folgen und anhand von zwei Sprites Abschnitt für Abschnitt ein Sprite-Programm aufbauen.</p>
+
+        <h3>Schritt 1</h3>
+
+        <p>Der erste Schritt spielt sich im Kopf ab: Wir fällen eine Entscheidung darüber, ob unser Sprite einfarbig (dafür aber feiner strukturiert) oder mehrfarbig werden soll. Von dieser Entscheidung hängt nämlich Schritt 2 ab. Wir werden zweispurig weiterfahren, indem wir sowohl ein einfarbiges als auch ein »Multicolor«-Sprite wählen.</p>
+
+        <h3>Schritt 2</h3>
+
+        <p>Hier nehmen wir uns nun ein Blatt kariertes Papier zur Hand und zeichnen darauf ein Rechteck mit 24 Karos horizontaler und 21 Karos vertikaler Ausdehnung. Das wird unser Sprite-Raster. Dann warten wir auf den Kuß der Musen, der uns eine geeignete Sprite-Gestalt eingibt. Sind wir soweit, dann trennen sich die Wege:</p>
+
+        <p>a) Das einfarbige Sprite tragen wir in unser Schema ein wie ein Stickmuster: Überall, wo ein Bildpunkt erscheinen soll, machen wir ein Kreuzchen (eine 1). Dann ergibt sich unser erstes Sprite wie Bild 2 zeigt.<br />
+            b) Etwas komplexer ist das mit dem Multicolorsprite. Hier treten vier Farben auf, die sich durch die Zahlenkombinationen 00, 01, 10 und 11 unterscheiden lassen. 00 besitzt die Hintergrundfarbe (ist also durchsichtig). Am besten benutzt man drei verschiedene Farbstifte (je einen für 01, 10 und 11) und träg tin das Schema mit dem jeweiligen Stift die Zweierkombination ein. Das Ergebnis sieht dann so aus wie in Bild 3.</p>
+
+        <h3>Schritt 3</h3>
+
+        <p>Nach diesen — mehr schöpferischen — Tätigkeiten kommt nun die Mathematik zu Wort. Wir müssen nämlich nun das, was wir auf dem Papier vor uns haben, in eine dem Computer verständliche Form bringen, also in Zahlen. Sehen Sie sich dazu nochmals Bild 2 und 3 an. Dort wurden zwei senkrechte Linien gezogen, die jede Zeile in drei Achtergruppen aufteilt. Eine solche Gruppe ist der künftige Inhalt eines Bytes. Jedes einzelne Kästchen entspricht einem Bit, und schon sind wir auf diese Weise bei den Binärzahlen gelandet. Wir werden aber hier keine Erklärung über alle Höhen und Tiefen dieser Zahlenart starten, sondern nur feststellen, auf welche Weise wir das Gebilde, das wir vor uns haben, in eine normale Zahl umrechnen können. Das ist ganz einfach. Sehen Sie sich dazu Bild 4 an.</p>
+
+        <p>Sie finden darin ein Byte und die Numerierung der Bits. Überall dort, wo an einer Bit-Position eine 1 steht, merkt man sich die im Bild darunter stehende Zahl. Alle auf diese Weise gemerkten Zahlen addiert man schließlich. Das Ergebnis ist die Dezimalzahl, die uns interessiert. Ein Beispiel soll das noch verdeutlichen. In Bild 3 (dem Multicolorsprite) finden Sie in Zeile 2 als erstes Byte: 10100000. Wenden wir nun unser Bild 4 darauf an:</p>
+
+        <p>TODO TABLE</p>
+
+        <p>Sie sehen, wir müssen addieren:<br />
+            128 + 32 = 160</p>
+
+        <p>Nun wissen Sie, wie es gemacht wird. Üben können Sie das nun bei allen 126 Byte unserer beiden Sprites. Was dabei herauskommt, sehen Sie ebenfalls in Bild 2 und 3 rechts neben dem Raster.</p>
+
+        <h3>Schritt 4</h3>
+
+        <p>Nachdem wir nun unsere Sprites dem Computer mundgerecht gemacht haben, überlegen wir uns, in welchen Speicherbereich wir sie plazieren. Zwei Bedingungen sind dabei zu beachten:</p>
+
+        <p>1) Die Sprites müssen im gleichen 16 K-Bereich liegen wie der Bildschirm. (Im Normalfall also von Speicherstelle 0 bis Speicherstelle 16383.)<br />
+            2) Die Startadresse der Sprite-Daten muß glatt durch 64 teilbar sein.</p>
+
+        <p>Außerdem sollte man natürlich sinnvolle Speicherbereiche auswählen, das heißt solche, die weder der Computer selber braucht (wie die ersten 1023 Byte), noch solche, die für das Basic-Programm benötigt werden. Allerdings gibt es erfreulicherweise Lücken in den ersten 1023 Speicherplätzen, die nicht oder nur recht selten vom Computer benötigt werden. Man kann dort tatsächlich die Daten von vier Sprites ablegen:</p>
+
+        <p>TODO TABLE</p>
+
+        <p>704 bis 767 1. Sprite<br />
+            832 bis 895 2. Sprite<br />
+            896 bis 959 3. Sprite<br />
+            960 bis 1023 4. Sprite</p>
+
+        <p>Die letzten Bereiche gehören zum Kassettenpuffer. Falls Sie also während eines Sprite-Programmes planen, eine Datasetten-Operation vorzunehmen, müssen Sie dafür sorgen, daß Ihre Sprite-Daten später wieder in den Kassettenpuffer geschrieben werden.</p>
+
+        <p>Sollten Sie mehr als vier Sprites benötigen, dann bleibt Ihnen nichts anderes übrig, als dazu den Basic-Speicherraum zu verwenden. Ich lege die Daten in diesem Fall häufig an die obere Grenze, also knapp unter 16383. Dann muß ich diesen Speicherteil vor dem Überschreiben durch das Basic-Programm (und Variable) schützen.</p>
+
+        <p>Eine andere Möglichkeit ist es, den Start des Basic-Speichers höher zu legen. All dies soll uns an dieser Stelle aber nicht belasten. Wir gehen hier davon aus, daß wir mit vier Sprite-Mustern auskommen.</p>
+
+        <p>Wie in der obigen Aufstellung schon angedeutet, legen wir unsere Sprite-Daten für Sprite 1 (das einfarbige Sprite) nach Speicherstelle 704 und für Sprite 2 nach 832.</p>
+
+        <h2>Nun geht's ans Programmieren:</h2>
+
+        <h3>Schritt 5</h3>
+
+        <p>Wir lesen die gewonnenen Sprite-Daten in den Computerspeicher ein mittels zweier simpler Schleifen:<br />
+            100 FOR I = 704 TO 766:READD :POKE I, D:NEXT I<br />
+            110 FOR I = 832 TO 894:READD :POKE I, D:NEXT I<br />
+            115 REM ****** DATAS VON SPRITE 1 ******<br />
+            120 DATA 0,0,0,0,0,0,3,255,192,1,3,128<br />
+            130 DATA 1,51,128,1,115,128,1,59,192<br />
+            140 DATA 129,186,254,255,255,255, 129,2,1<br />
+            150 DATA 129,2,1,253,254,127,222,0, 157<br />
+            160 DATA 255,255,190,62,0,62,28,0,28<br />
+            170 DATA 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0<br />
+            175 REM ****** DATAS VON SPRITE 2 ******<br />
+            180 DATA 128,8,0,160,40,0,168,168,0<br />
+            190 DATA 40,168,0,42,170,0,10,234,160<br />
+            200 DATA 43,250,128,43,250,0,170,232,0<br />
+            210 DATA 170,168,0,165,168,0,129,90,0<br />
+            220 DATA 129,86,0,0,80,128,0,80,0<br />
+            230 DATA 0,16,20,0,16,85,0,17,84,0,21,0<br />
+            240 DATA 0,16,0,0,16,0</p>
+
+        <p>Damit hätten wir den schlimmsten Teil der ganzen Arbeit hinter uns!</p>
+
+        <h3>Schritt 6</h3>
+
+        <p>Nun müssen wir unserem Computer mitteilen, an welchen Stellen im Speicher wir die Daten verstaut haben. Dazu gibt es ab Speicherstelle 2040 die sogenannten Sprite-Zeiger. Hier kommt die Startadresse der Daten hinein und zwar eine Kennzahl, die sich so ergibt:<br />
+            Datenstartadresse/64 = Kennzahl</p>
+
+        <p>Für das erste Sprite folgt 704/64 = 11 und für das zweite Sprite 832/64 = 13. Gleichzeitig legt man auf diese Weise eine Sprite-Nummer fest, die von 0 (Speicherstelle 2040) bis 7 (Speicherstelle 2047) gehen kann. Unser Sprite 1 machen wir nun zum Sprite 0 und schreiben die Kennzahl 11 in Speicherstelle 2040. Analog dazu wird Sprite 2 zum Sprite 1 und wir schreiben 13 in Byte 2041:<br />
+            245 REM **** SPRITE-ZEIGER ****<br />
+            250 POKE2040,11:PGKE2041,13</p>
+
+        <p>Immer dann, wenn im folgenden von einer Spritenummer N die Rede ist, meinen wir damit die durch die Spritezeiger festgelegte (also 0 für das einfarbige, 1 für das Multicolorsprite).</p>
+
+        <h3>Schritt 7</h3>
+
+        <p>Ob wir diesen Schritt jetzt gehen oder später, ist eigentlich gleichgültig. Es dreht sich um das Einschalten der Sprites. Dazu bedienen wir uns des Registers in Speicherstelle 53269. Dies ist das erste einer Reihe von Registern, die bei Sprites eine Rolle spielen und nach einem Schema funktionieren: Von den 8 Bits des Registers gehört zu jedem Bit ein Sprite. Also zu Sprite 0 das Bit 0, zu Sprite 1 das Bit 1 und so weiter, allgemein zu Sprite N das Bit N. Jedes Bit mit dem Inhalt 1 bewirkt, daß das dazugehörige Sprite angeschaltet ist, ein Bit-Inhalt 0 sorgt für das Ausschalten des Sprite</p>
+
+        <p>Ohne nun auf mathematische Einzelheiten einzugehen, genügt es zu wissen, daß man einzelne Sprites einschaltet mittels:<br />
+            POKE 53269,PEEK(53269)OR(2↑N) und abschaltet mit:<br />
+            POKE 53269,PEEK(53269)AND(255-2↑N)</p>
+
+        <p>Wir schalten nun unsere beiden Sprites an:<br />
+            255 REM **** EINSCHALTEN ****<br />
+            260 POKE53269,PEEK(53269)OR(2↑O): POKE53269,PEEK(53269) OR(2tl)</p>
+
+        <h3>Schritt 8</h3>
+
+        <p>Sie werden festgestellt haben, daß kein Sprite auf dem Bildschirm erschienen ist. Wir müssen nämlich noch festlegen, wo das Sprite auftauchen soll, müssen also für jedes Sprite eine X- und eine Y-Position eingeben. Oje, jetzt wird es wieder komplizierter. Sehen Sie sich am besten mal das Bild 5 an. Sie sehen dort ein Koordinatensystem, das X-Werte von 0 bis 511 und Y-Werte von 0 bis 255 zuläßt. Genau das sind die möglichen Sprite-Orte. Dabei zählt die linke obere Ecke des Sprite-Rasters als Anhaltspunkt. Umrahmt ist der Teil der Fläche, der den sichtbaren Bildschirm darstellt. Man kann also Sprites so plazieren, daß sie unsichtbar bleiben, weil sie außerhalb des Bildschirms liegen. Auf dem Bild sind zwei Sprites gezeigt, von denen eins voll sichtbar (mit den Koordinaten 128, 120) und das andere unsichtbar ist (Koordinaten 360, 190). Auch teilweise sichtbare Sprites sind möglich.</p>
+
+        <p>Die X-Position eines Sprites wird ebenso wie die Y-Position in jeweils eine Speicherstelle gePOKEt. Diese findet man ab 53248, wobei 53248 die X-Position von Sprite 0, 53249 dessen Y-Position enthält, 53250 nimmt dann die X-Koordinate von Sprite 1, 53251 die Y-Koordinate auf und so weiter. Allgemein POKEt man die X-Koordinate für Sprite N in 53248 + 2*N und die Y-Koordinate in 53249 + 2*N.</p>
+
+        <p>Für die Y-Positionen ist das ohne Probleme. Bei der X-Koordinate tauchen Schwierigkeiten auf: Sobald eine X-Position größer als 255 benötigt wird, kann man sie nicht mehr ein-POKEn. In diesem Fall verfährt man so. Man bildet die Differenz X-256 = XI und POKEt XI ein. Außerdem muß man nun in einem weiteren Register in 53264 (das wieder für jedes Sprite ein Bit bereithält) das dazugehörige Bit auf 1 setzen.</p>
+
+        <p>Für diese Eigenheiten gibt es natürlich eine Menge sehr eleganter Programmier-Möglichkeiten, die alle das Manko haben, reichlich unverständlich zu sein. Begnügen wir uns also mit einfachen IF..THEN-Abfragen. Unser Programm lautet also weiter:<br />
+            265 REM **** SPRITEPOSITIONEN ****<br />
+            270 FOR N = 0TO1: PRINT"SPRITE"N;:INPUT"X,Y=";X(N),Y(N)<br />
+            280 POKE 53249+2*N,Y(N)<br />
+            290 IFX(N)>255THENPOKE53248+2*N,X(N)-256:POKE53264,PEEK(53264)OR(2↑N):GOTO305<br />
+            300 POKE53248+2*N,X(N):POKE53264,PEEK(53264)AND(255-2↑N)<br />
+            305 IF K=1 THEN RETURN<br />
+            310 NEXT N</p>
+
+        <p>Dabei verlassen wir uns darauf, daß für X und Y nur sinnvolle Werte eingegeben werden. Wenn das aus irgendeinem Grund fraglich ist, müssen noch weitere IF&hellip;THEN-Abfragen dazukommen, die X und Y überprüfen vor Zeile 280. Die Zeile 305 ist vorsorglich für eine spätere Option eingebaut.</p>
+
+        <h3>Schritt 9</h3>
+
+        <p>Hier geht's um die Farbe unserer Sprites. Wie Sie sich denken können, müssen Multicolor-Sprites anders behandelt werden als einfarbige. Doch beiden gemeinsam ist zunächst folgendes:</p>
+
+        <p>Für jedes Sprite existiert ein Farbregister, das bei 53287 anfängt. Unser Sprite 0 hat in dieser Speicherstelle seinen Farbcode stehen, das Sprite 1 (das Multicolor-Sprite) in 53288 und so weiter. Allgemein steht die Farbe von Sprite N in Farbregister 53287+N.</p>
+
+        <p>Multicolorsprites bewahren in dieser Speicherstelle die Farbe auf, die zur Ziffernkombination 10 gehört. Die Kombination 01 und 11 werden für alle Multicolor-Sprites gemeinsam festgelegt. Dabei gehört der in 53285 stehende Farbcode zur Kombination 01, der in 53286 zur Kombination 11.</p>
+
+        <p>Außerdem muß für die Multicolor-Sprites noch der Mehrfarben-Modus eingeschaltet werden. Dazu existiert wieder ein Register (53276), in dem fürjede Spritenummer N ein Bit reserviert ist. Ist dieses Bit gleich 1, dann liegt das dazugehörige Sprite im Mehrfarben-Modus vor. Allgemein schaltet man für Sprite N also den Multicolor-Modus an durch:<br />
+            POKE 53276,PEEK(53276)OR(2↑N)</p>
+
+        <p>Das Rücksetzen geschieht durch Löschen des Bit N:<br />
+            POKE 53276,PEEK(53276)AND(255-2↑N)</p>
+
+        <p>Wir wählen für Sprite 0 die Farbe CYAN, für das Multicolor-Sprite die Zuordnungen:</p>
+
+        <p>TODO TABLE</p>
+
+        <p>Kombination 01 = Grün<br />
+            11 = Gelb<br />
+            10 = Rot</p>
+
+        <p>315 REM **** SPRITE-FARBEN ****<br />
+            320 POKE53287,3:REM SPRITE 0 = CYAN<br />
+            330 POKE53285,5:REM SPRITE 1 KENNUNG 01 = GRUEN<br />
+            340 POKE53286,7:REM KENNUNG 11 = GELB<br />
+            350 POKE53288,2:REM KENNUNG 10 = ROT<br />
+            360 POKE53276,PEEK(53276)OR(2↑1):<br />
+            REM MULTICOLORMODUS EINGESCHALTET</p>
+
+        <h3>Schritt 10</h3>
+
+        <p>Wenn Sie bis hierher unser schrittweise entwickeltes Programm eingegeben und gestartet haben, sehen Sie nun auf Ihrem Bildschirm zwei nette Sprites. Im folgenden werden wir nun noch einige Besonderheiten der Sprite-Programmierung kennenlernen, die wir aber im Text nur noch mit den allgemeinen Befehlen bearbeiten. Ein beigefügtes Beispielprogramm, das bis hierher (außer den Zeilen bis 100) mit unserem bisher entwickelten identisch ist, enthält die konkreten Befehle. Um das weitere Vorgehen deutlich zu machen, sind dort zunächst in den Zeilen 370 bis 400 drei weitere Sprites (mit denselben Daten) eingerichtet worden.</p>
+
+        <p>Schritt 10 stellt uns vor die Frage, ob wir unser Sprite in X-Richtung doppelt so groß darstellen wollen. Zu diesem Zweck gibt es dann wieder ein Register (jedes Bit ein Sprite), das Register 53277. Die X-Vergrößerung ist eingeschaltet, wenn für Sprite N das Bit N auf 1 gesetzt wurde mittels:<br />
+            POKE53277,PEEK(53277)OR(21 N)</p>
+
+        <p>Das Zurückschalten findet dann wieder statt mit &hellip;AND(255-2tN). Im Programm wurde Sprite 2 derart vergrößert.</p>
+
+        <h3>Schritt 11</h3>
+
+        <p>Dasselbe wie eben kann auch in der Y-Richtung geschehen. Dazu dient uns das Register 53271. Anschalten dieser Y-Verdoppelung also durch:<br />
+            POKE53271,PEEK(53271)OR(21 N)<br />
+            und Abschalten wie oben schon gezeigt mittels &hellip;AND(255-2tN).</p>
+
+        <p>Im Programm ist Sprite 3 so vergrößert worden. Sprite 4 ist — auch das funktioniert — sowohl in X- als auch in Y-Richtung gedehnt worden.</p>
+
+        <h3>Schritt 12</h3>
+
+        <p>Hier geht's um die Vorfahrt. Wenn sich zwei Sprites überdecken, bleibt immer dasjenige »vorne«, das die niedrigere Nummer besitzt. Also verdeckt Sprite 0 alle anderen. Man hat darauf — außer durch geeignete Auswahl der Spritenummer ganz zu Beginn — keine Einflußmöglichkeit.</p>
+
+        <p>Anders verhält sich das bei der Vorfahrt von Sprites und Bildschirmzeichen. Die kann mittels Register 53275 geregelt werden. Wieder gehört zu jedem Sprite ein Bit. Ist dieses gleich 0, erscheint das Sprite vor den Bildschirmzeichen, ist es gleich 1, versteckt es sich dahinter. Im Beispielprogramm wurde in den Zeilen 450 und 460 geregelt, daß sich alle Autos (Sprites 0,2 und 4) hinter den Bildschirmzeichen aufhalten.</p>
+
+        <h3>Schritt 13</h3>
+
+        <p>Unser Computer paßt auch auf Zusammenstöße auf. Zwei Register (wieder Bit N für Sprite N) sind zuständig:</p>
+
+        <p>Kollisionen Sprite mit Sprite (53278), Kollisionen Sprite mit Bildschirmzeichen (53279). Für jedes Sprite, das in eine Kollision verwickelt wurde, wird das entsprechende Bit auf 1 gesetzt. Wenn also Sprite 0 mit Bildschirmzeichen zusammenstößt, findet man in Register 53279 den Wert 1. Die Berechnung des zu erwartenden Wertes kann mit dem Bild 4 geschehen, wobei für mehrere Sprites die Zahlen zu addieren sind. Im Beispielprogramm wird in den Zeilen 530 und 540 das Sprite/Sprite-Kollisionsregister 53278 auf Zusammenstöße von Sprite 0 mit Blumen (Sprite 1 und Sprite 3) abgefragt. Bei einer Kollision werden im Register 53278 die Werte 3 oder 9 erzeugt.</p>
+
+        <p>Das Auslesen dieser beiden Register ist ziemlich radikal: Nach dem PEEK-Kommando sind sie gelöscht. Deshalb sollte man die ausgelesenen Werte in einer Variablen speichern (Zeile 530:A). Außerdem kann man die Register durch PEEKen vor der ersten Kollisionsabfrage leeren, was wir in Zeile 460 machen.</p>
+
+        <p>Unser Beispielprogramm (Listing 1) ist so aufgebaut, daß wir mit den Cursortasten das Sprite 0 steuern können. Jedesmal, wenn dabei eine Blume überfahren wird, ändert sich die Autofarbe. Um das Programm kurz und übersichtlich zu gestalten, finden Sie keine Sicherung gegen das Heraussteuern aus dem zulässigen Sprite-Koordinaten-Bereich. Durch Eingabe von — kann das Programm beendet werden.</p>
+
+        <p>Damit wissen Sie alles, was Sie zur Programmierung von Sprites brauchen. Probieren Sie mal ein wenig durch Veränderungen am Beispielprogramm herum. Falls Sie nun Blut geleckt haben, können Sie Ihr Wissen noch vertiefen durch die nachfolgend genannte Literatur:</p>
+
+        <p>— »Reise durch das Wunderland der Grafik«, 64'er, Ausgabe 8 (1984) Seite 142 ff. (Erscheint in diesen Tagen auch als Buch im Verlag Markt &amp; Technik).<br />
+            — H. Kunz hat etwas über das schnelle Bewegen von Sprites geschrieben im 64'er, Ausgabe 4 (1984) Seite 70 ff.<br />
+            — Eine nette Anwendung stammt von H. Grigat in Happy-Computer, Ausgabe 11 (1983), Seite 99 ff.<br />
+            — Einen Überblick geben Schneider und Ebert in den Bänden 1 und 3 des Commodore 64-Buches, erschienen im Verlag Markt &amp; Technik (1984).<br />
+            — Ebenfalls zu empfehlen ist S. Krutes »Grafik und Musik auf dem Commodore 64«, welches ebenfalls bei Markt &amp; Technik erschien.<br />
+            — Für alle, die es ganz genau wissen wollen (bis in die weiten Ebenen der Elektronik), empfehle ich schließlich noch den Aufsatz von P. Dornier »Sprites ohne Esoterik«, 64'er-Ausgabe 11 (1984), Seite 74 ff.</p>
+
+        <address class="author">(Heimo Ponnath/ah)</address>
+    </article>
+</body>
+
+</html>
