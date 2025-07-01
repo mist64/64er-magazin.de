@@ -26,6 +26,11 @@
 
         <p>Als erstes wollen wir uns den beiden Anschlüssen »POT X« und »POT Y« an den Control-Ports zuwenden. Diese beiden Anschlüsse (Pin 5 und 9, siehe Bild 1) sind dazu da, dem Computer analoge Daten (analog = stufenlos, stetig; in diesem Fall Spannungswerte) mitzuteilen. Die analogen Daten werden in einem sogenannten Analog/Digital-Wandler in digitale Daten, also in eine Zahl zwischen 0 und 255 umgewandelt. Das geschieht ohne unser Zutun automatisch im Computer. Die umgewandelten Daten kann man dann aus Speicherzellen auslesen. Die Zahl in diesen Speicherzellen ist um so kleiner, je größer die Spannung an POT X/Y ist. Deshalb stehen diese Register, wenn nichts angeschlossen ist, auch immer auf 255 (= 0 Volt an POT X/Y).</p>
 
+        <figure>
+            <img src="144-1.png" alt="">
+            <figcaption>Bild 1. Die Anschlußbelegung der Control-Ports</figcaption>
+        </figure>
+
         <h2>Paddles im Selbstbau</h2>
 
         <p>Der C 64 hat an jedem seiner beiden Control-Ports je ein Anschlußpaar POT X/ POT Y. Beim VC 20 gibt es nur ein solches Paar.</p>
@@ -125,6 +130,11 @@
         <p>In Zeile 300 wird die Eingabe auf den Joystick gelegt. Zeile 330 kopiert (bei VC 20 auch Zeile 335) den Inhalt des Joystickregisters in die Variable J1 (und beim VC 20 das zweite Register in J2). Ist der Joystick in Ruhestellung, so ist das zugehörige Bit auf Eins. Bei der Bewegung in eine Richtung wird das entsprechende Bit im Joystickregister gelöscht. Bei den Zwischenrichtungen NO, SO, SW und NW werden jeweils die zwei zugehörigen Bits gelöscht. Der Feuerknopf setzt das »Fire«-Bit auf Null. Ab Zeile 350 wird J1 (undJ2) ausgewertet. Wenn die bitweise Überprüfung mit AND Null ergibt, war der Joystick in dieser Richtung bewegt. Mit der Wertekontrolle ab Zeile 420 wird verhindert, daß der Punkt den Bildschirm verläßt und unkontrolliert im RAM herumschreibt. In Zeile 490 wird der alte Punkt eventuell (Abhängigkeit vom Feuerknopf) gelöscht und in 500/510 der neue gesetzt.</p>
 
         <p>In diesem Programm wird der Joystick ausschließlich in Basic abgefragt. Für die hier dargestellte Anwendung ist dieses System auch völlig ausreichend. Wenn es aber auf hohe Geschwindigkeit ankommt oderjede der acht Richtungen eine andere Funktion auslösen soll, der Joystick also auf jede Richtung einzeln überprüft werden muß, reicht eine reine Basic-Abfrage oft nicht mehr aus. Ich habe dieses Problem in dem Programm »Joystickdemo 2« (Listing 5) behoben. Nach dem Programmstart wird die in den DATA-Zeilen enthaltene Maschinenroutine bei beiden Computern im Kassettenpuffer abgelegt. Für den VC 20 aktivieren Sie bitte die REM-Zeilen. Da beim C 64 der Port 1 verwendet wird, sind für ihn keine Einstellungen notwendig. Die oben genannten Einstellungen für den VC 20 nimmt dessen Maschinenroutine selbsttätigvor. Daher ist sie auch etwas länger. Außerdem sind natürlich die Abfrageregister und Bitwerte angepaßt. Die Routine, die übrigens nur relative Sprünge enthält, also auch in anderen Speicherbereichen abgelegt werden kann, liest bei ihrem Aufruf die oben beschriebenen Joystickregister der Computer aus und legt den ermittelten Wert im letzten Byte des Kassettenpuffers (Adresse 1023 dezimal oder $03Ff hexadezimal) ab. Den Aufbau dieses Wertes zeigt Bild 2. Ist der Feuerknopf gedrückt, wird zu dem errechneten Wert die Zahl 100 addiert. Diese Methode hat den Vorteil, daß nach der Berücksichtigung des Feuerknopf-Wertes, also der addierten 100, (Zeilen 410/420) die Joystick-Information direkt mit ON&hellip;GO-TO/GOSUB verarbeitet werden kann (Programmzeilen 430 bis 520). Da die Joystick-Werte »2«, »9« und »10« nicht vorkommen, müssen sie bei der ON&hellip;GOTO/GOSUB-Anweisung ausgeklammert werden (Sprünge nach Zeile 360 in Zeilen 430/440). Das ON.. GOTO ist, nebenbei bemerkt, nur deshalb auf die Zeilen 430/440 aufgeteilt, weil eine Zeile zu voll würde. Bis auf die besprochene Maschinenroutine funktioniert das eben beschriebene Programm genauso wie die »Joystickdemo 1«.</p>
+
+        <figure>
+            <img src="144-2.png" alt="">
+            <figcaption>Bild 2. Diese Werte liefern die Maschinenroutinen zur Joystickabfrage (Listing 5)</figcaption>
+        </figure>
 
         <p>Die Geschwindigkeitsfanatiker unter Ihnen sollten jetzt noch einmal besonders gut aufpassen:</p>
 

@@ -39,9 +39,24 @@
 
         <p>Da der Computer nicht auf das Schachbrett sehen kann, muß man es intern in einer Computerform darstellen, mit der der Computer arbeiten kann. Es bietet sich an, jedem Feld des Schachbretts eine Speicherstelle im Computer zuzuordnen. Den Inhalt der entsprechenden Speicherstellen stellen die Figuren dar, die sich auf dem Schachbrett befinden. Nun taucht aber ein zweites Problem auf: Wie kann der Computer auf einfache Weise überprüfen, wann sich eine Figur am Spielfeldrand befindet und nicht weiterziehen kann. Hier bietet es sich an, daß man um das eigentliche Spielfeld noch einen Rand installiert, der einen speziellen Zahlenwert enthält (Bild 1). In diesem Fall signalisiert der Zahlenwert 128 dem Rechner, daß dieses Feld nicht zum eigentlichen Spielfeld gehört und er es somit mit seinen Figuren nicht betreten darf. Damit hätten wir das Schachbrett in einer computergerechten Fbrm intern dargestellt. Als letztes Problem müssen noch die verschiedenen Spielfiguren auf dem internen Brett codiert werden. Dazu ordnet man jeder Figur eine Zahl zu. Die weißen Figuren bekommen die Werte 1 bis 6 und die schwarzen Figuren die Werte 1 bis 6 plus 128. Somit ist eine einfache Unterscheidung zwischen weißen und schwarzen Figuren möglich: Weiße Figuren haben einen Wert kleiner 128 und schwarze Figuren einen Wert größer 128. Leere Felder werden mit Null initialisiert. Sehen wir unsjetzt im Listing an, wie die Probleme innerhalb des Programms gelöst werden (Zeilen 1030 bis 1080). Das Spielfeld liegt im Rechner ab Speicherstelle 49152. In den Zeilen 1030 bis 1050 werden zunächst der Spielfeldrand (128) und die leeren Felder (0) initialisiert (vergleiche auch Bild 1). In Zeile 1060 werden dann die weißen (1) und schwarzen Bauern (1 + 128 = 129) auf die zweite beziehungsweise siebte Reihe des Spielfeldes positioniert. Die beiden Zeilen 1070 und 1080 dienen dazu, die restlichen Figuren auf den Grundreihen zu positionieren.</p>
 
+        <figure>
+            <img src="72-1.png" alt="">
+            <figcaption>Bild 1. Die interne Spielfelddarstellung</figcaption>
+        </figure>
+
         <h2>Der Zuggenerator</h2>
 
         <p>Doch mit dem Spielbeginn taucht ein neues Problem auf: Wie bringe ich den Computer dazu, daß er die Figuren entsprechend den Regeln bewegt? Als Beispiel wollen wir dies mit den Turmzügen durchsprechen (Zeilen 6440 bis 6560). Als Grundlage dient hier das Spielfeld in Bild 1. Der Turm darf den Regeln nach nur senkrecht und waagerecht ziehen, und zwar so lange, bis er auf den Spielfeldrand oder eine andere Figur trifft. Das Ziehen des Turmes bedeutet somit auf dem Computerspielfeld, daß zum Ausgangsfeld des Turmes die Vielfachen von 1 oder 10 addiert beziehungsweise substrahiert werden. Dieses Verfahren wird so lange wiederholt, bis der Turm auf ein Hindernis (Spielfeldrand oder andere Figur) trifft. Diese Zuggenerierung wird vom Programm wie folgt realisiert: Als Beispiel betrachten wir die Zuggenerierung senkrecht nach »oben«, also die Addition der Vielfachen von 10 zum Ausgangsfeld. Die anderen Zugrichtungen ergeben sich analog zu der betrachteten. In Zeile 6440 wird zunächst ein Flag auf Null gesetzt (FF=0). Dieses Flag wird immer dann auf 1 gesetzt, wenn der Turm bei seinem Zug auf ein Hindernis trifft. Als nächstes wird eine FOR-NEXT-Schleife gestartet, die es ermöglicht, alle Felder in »+1O-Richtung« zu überprüfen. Die Variable X symbolisiert dabei das momentane Standfeld des Turmes, und Z durchläuft alle möglichen Zielfelder. Zum Schluß wird in Zeile 6440 geprüft, ob auf dem vorgesehenen Zielfeld bereits eine eigene Figur steht oder ob das Feld nicht mehr zum eigentlichen Spielfeld gehört. In beiden Fällen wird das Flag FF auf 1 gesetzt. In Zeile 6450 wird zunächst geprüft, ob das Flag FF gesetzt ist. Ist dies der Fall, so ist das Zielfeld Z regelwidrig, und das folgende wird übersprungen. Da FF jedoch in der gesamten Schleife nicht zurückgesetzt wird, wird sie bis zu ihrem Ende durchlaufen, ohne daß weitere Stellungen ausgewertet werden. Nehmen wirjetztaberan, daß FF noch Null ist und die Stellung somit legal. Dann wird in Zeile 6450 das erwogene Zielfeld ZF gleich Z gesetzt und die Stellungsbewertung ab Zeile 100 aufgerufen. Anschließend wird noch geprüft, ob auf Feld Z eine weiße Figur steht. Diese Figur darf zwar geschlagen werden, verhindert aber den weiteren Vormarsch des Turmes in diese Richtung. Somit wird das Flag FF in diesem Falle auf 1 gesetzt. Ich nehme an, daß das Prinzip der Zuggenerierung jetzt deutlich geworden ist. Es läßt sich relativ einfach auf die anderen Figuren übertragen, wenn man ihre speziellen Gangarten berücksichtigt.</p>
+
+        <figure>
+            schwarzer Bauer: -10 beziehungsweise -9 oder -11 beim Schlagen<br>
+            schwarzer Springer: -21, -19, -12, -8, 8, 12, 19, 21<br>
+            schwarzer Turm: nx-10, nx10, nx-1, nx1<br>
+            schwarzer Läufer: nx-11, nx11, nx-9, nx9<br>
+            schwarze Dame: kombiniert Läufer- und Turmzüge<br>
+            schwarzer König: -11, -10, -9, -1, 1, 9, 10, 11
+            <figcaption>Bild 2. Die verschiedenen Zugmöglichkeiten</figcaption>
+        </figure>
 
         <h2>Die Stellungsbewertung</h2>
 
@@ -51,9 +66,7 @@
 
         <address class="author">(Bernd Bettermann/ev)</address>
 
-        <p>Literaturhinweis: Computerschach von Ludek und Vas I. Kühnmund, Heyne-Buch Nr. 4704, Wilhelm Heyne Verlag, München, Taschenbuch, Preis: zirka 5,80 Mark.</p>
-
-        <p>Dieses Buch bietet eine ausführliche und leicht verständliche Einführung in das Thema Computerschach. Außerdem beinhaltet es einige interessante Partien zwischen Mensch und Computer.</p>
+        <p class="source">Literaturhinweis: Computerschach von Ludek und Vas I. Kühnmund, Heyne-Buch Nr. 4704, Wilhelm Heyne Verlag, München, Taschenbuch, Preis: zirka 5,80 Mark.<br>Dieses Buch bietet eine ausführliche und leicht verständliche Einführung in das Thema Computerschach. Außerdem beinhaltet es einige interessante Partien zwischen Mensch und Computer.</p>
     </article>
 </body>
 
