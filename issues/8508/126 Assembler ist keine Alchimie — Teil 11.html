@@ -24,6 +24,11 @@
 
         <p>Neulich hatten wir bereits festgestellt, daß eine IRQ-Anforderung (nach dem Retten des Programmzählers und des Prozessorstatus-Registers, sowie dem Setzen der I-Flagge) den Inhalt des Vektors $FFFE/FFFF in den Programmzähler holt. Dort steht die Adresse $FF48 (dez. 65352) und deshalb startet nun das dort im ROM verankerte Programm, welches wir uns nun im einzelnen ansehen werden (alle Adressen als Dezimalzahlen, in Bild 1 finden Sie das Flußdiagramm dazu).</p>
 
+        <figure>
+            <img src="126-1.png" alt="">
+            <figcaption>Bild 1. So bearbeitet der C 64 normale IRQs. Das Programm wird im Text erklärt.</figcaption>
+        </figure>
+
         <p>TODO</p>
 
         <p>65352 PHA Zunächst werden der Akku und die<br />
@@ -93,6 +98,11 @@
 
         <p>Dann zeigt er auf die Adresse 65126 ($FE66), wo ein Teil der NMI-Routine zu finden ist (Siehe auch das Flußdiagramm in Bild 2):</p>
 
+        <figure>
+            <img src="126-2.png" alt="">
+            <figcaption>Bild 2. Auf diese Weise verläuft ein unvorhergesehener BRK im Sande</figcaption>
+        </figure>
+
         <p>TODO</p>
 
         <p>65126 JSR 64789 Sprung ins Programm RESTOR, in dem alle Vektoren (788-819) gemäß einer ROM-Liste auf ihre Ausgangswerte gesetzt werden.<br />
@@ -112,6 +122,11 @@
         <h2>Was macht ein NMI?</h2>
 
         <p>Wenden wir uns nun der Firmware zu, die zur Bearbeitung eines NMI vorgesehen ist (Dazu sehen Sie sich bitte in Bild 3 das Flußdiagramm an).</p>
+
+        <figure>
+            <img src="126-3.png" alt="">
+            <figcaption>Bild 3. Flußdiagramm zum Ablauf einer NMI-Unterbrechung</figcaption>
+        </figure>
 
         <p>In der letzten Folge erfuhren wir, daß auch für diese Unterbrechung am Ende des Speichers ein Vektor vorhanden ist, nämlich $FFFA/FFFB (65530/65531). Dort steht die Adresse 65091 ($FE43), die nun in den Programmzähler gelangt und damit startet das folgende Programm:</p>
 
@@ -175,6 +190,11 @@
         <h2>Eigentlich keine Unterbrechung: RESET</h2>
 
         <p>Weil wir alle Unterbrechungen hier bearbeiten wollen, soll auch der RESET angesprochen werden. Es handelt sich dabei aber nicht um eine Unterbrechung im bisher definierten Sinn. Mir fällt allerdings kein Platz ein in dieser Serie, wo der RESET besser hinpassen würde. Ähnlich wie bei NMI und IRQ wird auch hier ein Vektorinhalt in den Programmzähler geladen, der in den höchsten Speicheradressen zu finden ist (Auch hierzu wieder ein Flußdiagramm in Bild 4).</p>
+
+        <figure>
+            <img src="126-4.png" alt="">
+            <figcaption>Bild 4. Diesem Weg folgt ein RESET</figcaption>
+        </figure>
 
         <p>Dieser Vektor liegt in $FFFC/FFFD. Der Inhalt ist die Adresse 64738 ($FCE2) und genau dort geht das Programm dann weiter:</p>
 

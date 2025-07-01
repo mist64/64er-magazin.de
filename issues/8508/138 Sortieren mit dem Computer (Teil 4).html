@@ -34,6 +34,11 @@
 
         <p>Zuallererst wird aus dem gesamten Variablenfeld ein (beliebiges) Element herausgegriffen und »beiseite gelegt«. Dieses Element dient nun als Vergleichswert für das gesamte übrige Array. Jetzt werden alle Elemente, die kleiner als das Vergleichselement sind, links (also auf niedrigere Positionen) und alle Elemente, die größer sind, rechts (also auf höhere Positionen) vom Vergleichselement abgespeichert. Wir erhalten so ein Variablenfeld, bei dem alle kleineren Elemente oberhalb und alle größeren Elemente unterhalb des Vergleichselements stehen. Bild 1 zeigt noch einmal genau, was gemeint ist.</p>
 
+        <figure>
+            <img src="138-1.png" alt="">
+            <figcaption>Bild 1. Sortierbeispiel von Qui<ksort< /figcaption>
+        </figure>
+
         <p>Nachdem diese »Gesamtsortierung« vollzogen wurde, haben wir ein schon sehr grob sortiertes Feld vorliegen. Nun teilen wir die beiden neuen Teilfelder (oberhalb und unterhalb des Vergleichselements) wiederum durch jeweils ein neues Vergleichselement auf, wobei diese beiden Teilfelder auf die oben beschriebene Art erneut sortiert werden. Als Ergebnis haben wir dann vier teilsortierte Feldabschnitte vorliegen, die wiederum, jedes für sich, geteilt und sortiert werden.</p>
 
         <p>Setzen wir diese Teilungen immer weiter fort, so werden wir irgendwann einmal die Teilfeldlänge 1 erreichen, womit unser Gesamtfeld fertig sortiert wäre.</p>
@@ -57,6 +62,19 @@
         <p>Man geht davon aus, daß der eigentliche Sortier- und Teilalgorithmus in einer Unterroutine untergebracht ist, wobei diese mit GOSUB aufgerufen wird. Wurde nun die erste Teilung des Variablenfeldes durchgeführt, so werden sofort die Werte für die nächste Halbierung dieser beiden Teilfelder bereitgestellt. Danach ruft sich die Unterroutine sofort wieder <strong>selbst</strong> auf, um auch die neue Sortierung und Teilung ablaufen zu lassen. Dabei entstehen wieder zwei neue Teilfelder, die wiederum sofort bearbeitet werden, etc. &hellip;</p>
 
         <p>Bild 2 zeigt anschaulich, was gemeint ist.</p>
+
+        <figure>
+            <img src="138-2.png" alt="">
+            <h3>Erklärung zu Bild 2:</h3>
+            <p>Das rekursive Unterprogramm arbeitet immer innerhalb <strong>eines</strong> Aufrufes <strong>zwei</strong> Teilfelder ab, indem es zwischen beiden die Elemente vertauscht (Sortierung anhand des Vergleichselements).</p>
+            <p>Die rekursive Technik funktioniert nun wie ein Baum, bei dem nacheinander alle Äste abgefahren werden. Zuerst wird das Gesamtfeld in zwei Teilfelder (entsprechend des Vergleichselements) aufsortiert (1. Ebene). Von diesen zwei Teilfeldern wird nun zuerst das erste Teilfeld wiederum aufgeteilt (grüner Pfeil X → 1). Da noch nicht Länge 1 erreicht wurde, wird das neue Teilfeld wiederum aufgeteilt (grüner Pfeil 1' → 1''). Jetzt haben die Teilfelder die Länge 1 und sind vollständig sortiert, weshalb nun auf eine höhere Ebene (RETURN bei 1'' und 2'') zurückgekehrt wird (roter Pfeil 2'' → 1' → 1).</p>
+            <p>Jetzt wird (wiederum mit GOSUB) das zweite Teilfeld der 2. Ebene (2') ebenfalls vollständig sortiert....</p>
+            <p>Diese Vorgänge wiederholen sich, bis beim Punkt Y mit drei RETURNs wieder ganz zurückgesprungen wird, da das Unterprogramm auf 1. Ebene vollständig abgearbeitet wurde.</p>
+            <figcaption>Bild 2. Grafische Darstellung der rekursiven Programmierung
+                bei Quicksort. Der besseren Übersicht
+                halber sind nur drei Verschachtelungsebenen
+                dargestellt.</figcaption>
+        </figure>
 
         <p>Eine solche Programmiertechnik, bei der sich Programmteile selbst aufrufen, nennt man rekursiv!</p>
 
@@ -92,6 +110,11 @@
 
         <p>Wie leistungsstark unsere sämtlichen Sortierprogramme sind, das soll im folgenden dargestellt werden, wobei Sie auch für Quicksort wieder einen Programmablaufplan vorfinden, der das Umschreiben auf andere Programmiersprachen erleichtern soll (Bild 3).</p>
 
+        <figure>
+            <img src="138-3.png" alt="">
+            <figcaption>Bild 3. Schematisierter Ablauf von Quicksort</figcaption>
+        </figure>
+
         <p>Nun aber zu unserem Vergleichstest.</p>
 
         <p>Für diesen Test habe ich sämtliche Sortierprogramme soweit optimiert, indem ich alle REMs und alle zusätzlichen Leerzeichen entfernt habe. Außerdem wurde die dauernde Zwischenausgabe der Daten auf Bildschirm oder Drucker weggelassen, so daß sich die Zeitmessung jetzt nur auf den reinen Algorithmus bezieht.</p>
@@ -99,6 +122,23 @@
         <h2>Sortieralgorithmen im Vergleich</h2>
 
         <p>Getestet wurde bei allen Kandidaten ein zufallsbesetztes Feld von jeweils 100, 250 und 500 Elementen. Die Ergebnisse dieses Tests sind in Bild 4 dargestellt. Wie Sie sehen, schneidet Quicksort mit Abstand am besten ab; dicht gefolgt von Heapsort und etwas weiter von Shellsort. Diese drei Sortiermethoden eignen sich also für den praktischen Einsatz bei zufallsbesetzten Feldern, wobei im Vergleich zu den »niederen« Algorithmen sehr große Zeitvorteile zu verzeichnen sind. Bei 500 Elementen ist beispielsweise Quicksort über 16mal so schnell, wie unser (verbesserter) Bubblesort-2-Algorithmus.</p>
+
+        <figure>
+            TODO
+            <figcaption>Bild 4. Direktvergleich aller Sortierprogramme (s = Sekunden)</figcaption>
+        </figure>
+        <figure>
+            <img src="138-4a.png" alt="">
+            <figcaption>Bild 4a. Zeitvergleich bei 100 Elementen</figcaption>
+        </figure>
+        <figure>
+            <img src="138-4b.png" alt="">
+            <figcaption>Bild 4b. Zeitvergleich bei 250 Elementen</figcaption>
+        </figure>
+        <figure>
+            <img src="138-4c.png" alt="">
+            <figcaption>Bild 4b. Zeitvergleich bei 250 Elementen</figcaption>
+        </figure>
 
         <p>Wie Sie sicherlich ahnen, hat diese schlechte Zeit, die sogar unser »normales« Bubblesort unterbietet, etwas mit der zusätzlichen Abfrage auf Vertauschungen zu tun.</p>
 

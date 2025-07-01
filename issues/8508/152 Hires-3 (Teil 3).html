@@ -38,6 +38,11 @@
 
         <p>Wie muß diese Routine aussehen? Unser Ziel soll es sein, daß eine Text-Kopfzeile auf dem Bildschirm sichtbar ist und daß die unteren vier Zeilen ebenfalls im Textmodus erscheinen. Dazwischen soll der Hochauflösungsmodus dargestellt werden (siehe Bild 1).</p>
 
+        <figure>
+            <img src="152-1.png" alt="">
+            <figcaption>Bild 1. Geplante Aufspaltung des Bildschirmes per Rasterzeilen-Interrupt</figcaption>
+        </figure>
+
         <p>Das sind Aufgaben, die der VIC-II-Chip zu erledigen hat. Dafür ist er ebenfalls mit einer IRQ-Steuermöglichkeit ausgestattet. Zwei Register spielen hier die entscheidende Rolle:</p>
 
         <p>TODO TABLE</p>
@@ -46,6 +51,11 @@
             53274 ($D01A) Interrupt Enable Register</p>
 
         <p>Der Aufbau beider Speicherstellen ist identisch. Bit 0 ist die zum Rasterinterrupt gehörige Flagge, Bit 1 hat mit Sprite/Hintergrund-Kollisionen zu tun, Bit 2 mit Kollisionen von Sprites untereinander, Bit 3 wird bei der Lichtgriffel-Benutzung angesprochen. Die Bits 4, 5 und 6 sind unbenutzt. Bit 7 ist immer dann gesetzt (oder muß in 53274 gesetzt werden), wenn eines der anderen Bits angesprochen wird (siehe Bild 2).</p>
+
+        <figure>
+            <img src="152-2.png" alt="">
+            <figcaption>Bild 2. Aufbau der Register 53273 und 53274</figcaption>
+        </figure>
 
         <p>Der Unterschied beider Register ist der, daß 53273 lediglich <strong>anzeigt</strong>, daß eine der vier möglichen Interrupt-Quellen einen IRQ ausgelöst hat. In dem Fall ist Bit 7 gesetzt, und das Bit des auslösenden Ereignisses ist gleich 1. Wir kennen sowas noch von der Folge 5, wo es um Kollisionen von Sprites ging. Bei einem Rasterzeileninterrupt findet man dann Bit 7 und Bit 0 gesetzt. Welcher Interrupt von den vier möglichen überhaupt zugelassen wird, kann man im Register 54274 bestimmen. Bit 7 regelt, ob überhaupt einer erlaubt wird (von den vier erwähnten). Ist Bit 7 gesetzt, sind solche IRQs gestattet. Durch Setzen der Bits 0 bis 3 wird die auslösende Quelle festgelegt. Dabei sind auch mehrere möglich. Man nennt das dabei gebildete Bit-Muster die Interrupt-Maske. Wenn wir nur den Rasterinterrupt zulassen wollen, müssen wir also Bit 0 und Bit 7 auf 1 setzen.</p>
 
@@ -184,11 +194,21 @@
 
         <p>Das war's! Mit SYS 35256 schalten Sie die Bildschirm-Aufspaltung ein, mit SYS 35377 wieder aus. Ein Flußdiagramm dieser Routine finden Sie in Bild 3.</p>
 
+        <figure>
+            <img src="152-3.png" alt="">
+            <figcaption>Bild 3. Flußdiagramm der drei Teile der Rasterzeilen-Interrupt-Routine</figcaption>
+        </figure>
+
         <p>Als Programm 1 ist diese Routine zur Eingabe mittels MSE angefügt. Programm 3 ist ein Basic-Aufrufprogramm, das aber außer dieser neuen Implementierung noch die zweite Version beansprucht. Bevor Sie Programm 3 also starten, bauen Sie zunächst noch Programm 2, nämlich das direkte Einschreiben von Text in die Bit-Map in Hires-3 ein. Wie man alles zusammensetzt, wird Ihnen am Ende dieser Folge noch erklärt werden.</p>
 
         <h2>Zeichen in die Bit-Map schreiben</h2>
 
         <p>Zunächst legen wir fest, auf welche Weise wir die Eingaben machen wollen. Der darzustellende Text soll sowohl als Stringvariable (zum Beispiel B$), als auch als direkter String (zum Beispiel »TEST«) als auch als Stringfeldvariable (zum Beispiel B$(1)) und schließlich auch noch als Stringfunktion (zum Beispiel MID$(B$,3,2) + STR$(A)) anzugeben sein. Alle in Basic erlaubten String-Erscheinungsformen dürfen also auftreten. Weiterhin sollen Zeile und Spalte das Stringanfangs anzugeben sein. Das ganze wird schließlich noch mit einem neuen Befehlswort »TEX« in Hires-3 eingebaut (Bild 4). Doch dazu später. Die Syntax soll dann lauten: <strong>TEX, String, Zeile, Spalte</strong></p>
+
+        <figure>
+            <img src="152-4.png" alt="">
+            <figcaption>Bild 4. Ergebnis der Befehle: A$+ "TEXT IN HIRES": TEX,A$,A,B,</figcaption>
+        </figure>
 
         <p>Die Angaben Zeile, Spalte dürfen ebenfalls in jeder erdenklichen, in Basic erlaubten Form, erscheinen. Im Programm muß dann ein Filter enthalten sein, der eine Fehlermeldung bei Falscheingaben (zum Beispiel Zeile = 234 oder ähnliches) ausgibt. Wir sind eigentlich schon mitten in der Besprechnung des ersten Teils unseres Maschinenprogrammes, nämlich der Parameterübergabe. Der zweite Teil muß nun aus den Angaben Zeile und Spalte den Ort in der Bit-Map ausrechnen, an den der String geschrieben wird. Das Startbyte in der Bit-Map ergibt sich (siehe Grafik-Folge 3) nach:<br />
             Startbyte = 320*Zeile + 8*Spalte + Anfangsadresse der Bit-Map</p>
@@ -385,6 +405,11 @@
             8B3A RTS Ende des Unterprogrammes. Rücksprung ins aufrufende Programm.</p>
 
         <p>Damit hätten wir's. Als Programm 2 finden Sie — falls Sie ohne Assembler (zum Beispiel SMON) arbeiten — ein mittels MSE eintippbares Listing dieser Routine und für den Überblick ist als Bild 5 noch ein komplettes Flußdiagramm gezeigt.</p>
+
+        <figure>
+            <img src="152-5.png" alt="">
+            <figcaption>Bild 5. Flußdiagramm der kompletten Routine: Zeichen in die Bit-Map schreiben</figcaption>
+        </figure>
 
         <h2>Wir sehen das Puzzle zusammen</h2>
 
