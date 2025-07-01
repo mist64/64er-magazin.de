@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>Hi-Text</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="W. Gachot, gk">
+    <meta name="64er.issue" content="8/85">
+    <meta name="64er.pages" content="70-71">
+    <!-- <meta name="64er.toc_category" content="XXX"> -->
+    <!-- <meta name="64er.toc_title" content="XXX"> -->
+    <meta name="64er.id" content="XXX">
+</head>
+
+<body>
+    <article>
+        <h1>Hi-Text</h1>
+        <p class="intro">Hi-Text ist als Programmbaustein zur Ergänzung von Grafikerweiterungen gedacht. Mit ihm lassen sich die im Zeichensatzspeicher vorhandenen 512 Zeichen im Quasi-Direktmodus vor, während oder nach der Erstellung einer Hires-Grafik darstellen.</p>
+
+        <p>Das Programm entstand aus folgender Überlegung: Zum Beschriften von Grafikbildern wäre ein Auswählen der Zeichen, der Farbe, des Darstellungsmodus und natürlich auch der Position beim »Schreiben« sehr viel geeigneter als beim Erstellen des Programms. Allein schon wegen der dadurch möglichen sofortigen Kontrolle und eventuellen Korrektur.</p>
+
+        <p>Ich glaube, daß alle, die mit Hires-Grafik umgehen, von dem Einsatz des Programms profitieren können.</p>
+
+        <p><strong>Kurzbeschreibung</strong>: Hi-Text ist ein Programmodul zur Darstellung der im Char-ROM des C 64 vorhandenen 512 Zeichen auf dem Hires-Bildschirm. Eine Besonderheit gebenüber den aus diversen Befehlserweiterungen bekannten »TEXT«-Befehlen ist die Tatsache, daß die Zeichen nach Aufruf des Programms über die Tastatur quasi im Direktmodus eingegeben werden, nachdem Farbe, Darstellungsmodus und Position direkt gewählt wurden. Das Programm hat eine Länge von 542 Byte. Da Hi-Text die Startadressen von Bit-Map und VideoRAM selbsttätig errechnet, kann es auch mit Grafikerweiterungen zusammenarbeiten, die mehrere Grafikseiten verwenden.</p>
+
+        <h3>Einsatzmöglichkeiten</h3>
+
+        <p>Das Programm ist bewußt als Programmodul konzipiert, das heißt, es soll zu allen Grafikerweiterungen passen. Dazu ist es notwendig, daß es ohne allzu großen Aufwand verschiebbar ist, denn nicht beijeder Grafikerweiterung kann das Programm ab Adresse $C000 bleiben (zum Beispiel Turtle-Grafik im 64'er, Ausgabe 11/84). Assemblerprogrammierer können das Programm durch Ändern der Startadresse im Quellprogramm in einen ihnen passenden Bereich verschieben. Um jedoch auch allen anderen eine freie Verwendung zu ermöglichen, habe ich das Hilfsprogramm (Listing 3) geschrieben. Es liest das Programm von Diskette ein, legt es am oberen Ende des freien Basic-Speichers ab und schützt es vor dem Überschreiben durch Basic. Das Programm wurde mit verschiedenen Basic-Erweiterungen getestet. Es arbeitete stets einwandfrei.</p>
+
+        <p>Während der Entstehung des Programms wurde Hires 3.1 (aus der 64'er, Ausgaben 2 und 3/85) veröffentlicht. Bei dieser Grafikerweiterung gibt es einen ungenutzten Bereich ab Adresse $89B8, der jedesmal mitabgespeichert wird. Hier bietet sich ein Einbau von »Hi-Text« geradezu an. Der erste Teil (Berechnung der Basisadressen) kann natürlich entfallen; es genügt die High-Bytes der Startadressen von Bitmap ($A0) und VideoRAM ($8C) direkt zu übergeben. Der Einfachheit halber ist das Programm »Hi-Text 2.0« (Listing 1) schon auf diesen Bereich abgestimmt. Eingebaut wird das Programm wie folgt:<br />
+            Hi-Text 2.0 mit dem MSE eingeben und abspeichern,<br />
+            SMON Laden.<br />
+            Hires 3.1 Laden.HI-TEXT 2.0 laden.<br />
+            Mit SMON die erweiterte Version Hires3.2 speichern. Aufgerufen wird das neue Unterprogramm mit SYS 35256. Der Vollständigkeit halber sei hinzugefügt, daß diese Version von Hi-Text den Bereich von $89B8-$8BD5 belegt und die Adressen bis $8BDD als interne Speicher benutzt. Ein kleines Programm (Listing 2) demonstriert die Wirkung von Hi-Text in Verbindung mit Hires-3.</p>
+
+        <h3>Umgang mit dem Programm</h3>
+
+        <p>Aufruf durch SYS Adresse .»Schreiben« wie im Direktmodus. Zum Beenden »RETURN« drücken (wichtig vor Hardcopies, damit der Cursor verschwindet!)</p>
+
+        <p>Und nun viel Spaß beim Schreiben und Zeichnen in der hochauflösenden Grafik!</p>
+
+        <address class="author">(W. Gachot/gk)</address>
+
+        <h3>Leserservice-Diskette</h3>
+
+        <p>Auf der zu jeder 64'er-Ausgabe lieferbaren Diskette befinden sich auch die hier veröffentlichten Programme (Listing 1 bis 3) und Hires-3 mit integriertem Hi-Text. Laden Sie dann also nur Hires3.2 (mit &hellip;,8,1) und anschließend DEMO (..,8). Mit RUN starten. Nachdem sich der Cursor meldet, können Sie über die Tastatur beliebigen Text eingeben.</p>
+    </article>
+</body>
+
+</html>

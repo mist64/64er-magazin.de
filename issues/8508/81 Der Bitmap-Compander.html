@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>Der Bitmap-Compander</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="Hans Haberl, ah">
+    <meta name="64er.issue" content="8/85">
+    <meta name="64er.pages" content="81">
+    <!-- <meta name="64er.toc_category" content="XXX"> -->
+    <!-- <meta name="64er.toc_title" content="XXX"> -->
+    <meta name="64er.id" content="XXX">
+</head>
+
+<body>
+    <article>
+        <h1>Der Bitmap-Compander</h1>
+        <p class="intro">Mit diesem kurzen Programm können Grafikbildschirme, die auf Diskette abgespeichert werden, auf die Hälfte komprimiert werden.</p>
+
+        <p>Jeder, der schon einmal eine hochauflösende Grafikauf Diskette abgespeichert hat, weiß, daß sie 33 Blocks benötigt. Das entspricht den 8 KByte des hochauflösenden Grafikbildschirms. Es besteht aber die Möglichkeit, diese Grafikbildschirme je nach Inhalt auf 10 bis 20 Blocks zu komprimieren. Das Verfahren beruht darauf, häufig wiederkehrende Sequenzen durch kürzere zu ersetzen. Dazu kann man sich die Bitmap als eine lange Kette von Nullen und Einsen vorstellen. Diese Kette wird jetzt in 4-Bit-Blöcke aufgeteilt. Solche Blöcke bezeichnet man als Halb-Byte oder Nibbles. Es gibt 16 verschiedene solcher Nibbles, wovon einige häufiger und andere seltener vorkommen. Jedem Nibble wird nun ein neuer Code zugeordnet, wobei das häufigste Nibble »0000«, den kürzesten Code »0« bekommt. Alle anderen 15 Codes müssen mit einer »1« beginnen. Einen Code »00« darf es nicht mehr geben, denn er könnte bei der Decodierung nicht mehr von dem Code »0« unterschieden werden. Es läßt sich nicht umgehen, viele Codes längerals 4 Bitzu machen. Die komplette Code-Tabelle ist in Tabelle 1 zu sehen. Doch die langen Codes kommen viel seltener vor als die kurzen, so daß bei einem »normalen« Bild viele Bits gespart werden können. Theoretisch wäre es möglich, daß eine komprimierte Bitmap länger wird als das Original. Aber selbst die Fotos aus der »Diashow« lassen sich komprimieren. Sir Winston Churchill magert zum Beispiel auf 24 Blocks ab. Bilder, wie sie üblicherweise in Gafik-Adventures vorkommen, lassen sich meist auf unter 15 Blocks zusammendrücken.</p>
+
+        <p>Tippen Sie das Programm (Listing 1) mit dem MSE ab und speichern Sie es, damit esjederzeit mit LOAD "BMC.EXE",8,1 geladen werden kann (auf der Leserservice-Diskette unter "BITMAPCOMPANDER" gespeichert). DerAufrufdes Companders funktioniert vom Basic aus mit einem SYS-Befehl. Die Parameter werden wie beim OPEN-Befehl angehängt.</p>
+
+        <p>Laden einer komprimierten Bitmap:<br />
+            SYS 52798,Filenummer,Geräteadresse,Kanalnummer,"Name"</p>
+
+        <p>Speichern einer komprimierten Bitmap:<br />
+            SYS 52736.Filenummer.Geräteadresse.Kanalnummer."Name.P.W"</p>
+
+        <p>Mit der Filenummer wird die Anfangsadresse der Bitmap ausgewählt.</p>
+
+        <p>TODO TABLE</p>
+
+        <p>Filenummer Bitmap-Adresse<br />
+            1 $2000 = 8192 (sichtbares Bild bei Hi-Eddi)<br />
+            2 $4000 = 16384<br />
+            3 $6000 = 24576<br />
+            5 $A000 = 40960 (Bitmap bei Hires-3)<br />
+            7 $E000 = 57344 (Bitmap bei Simons Basic)</p>
+
+        <p>Die Bitmaps 0, 4 und 6 sind theoretisch möglich, aber nicht sinnvoll, da der Videocontroller sie nicht adressieren kann. Die Gerätenummer ist 8 für das Floppy-Laufwerk und die Kanalnummer eine beliebige Zahl von 2 bis 14.</p>
+
+        <p>Beispiele für Aufrufe:</p>
+
+        <p>Speichern einer Simons Basic-Bitmap:<br />
+            SYS 52736,7,8,2,"Name,P,W"</p>
+
+        <p>Laden dieser Bitmap in Hires-3:<br />
+            SYS 52798,5,8,2,"Name"</p>
+
+        <p>Das Programm belegt den Bereich von $CE00 bis $CF19 (52736 bis 53017). Es belegt somit keinen Basic-Speicherplatz und verträgt sich auch mit Hires-3 und Simons Basic, solange der Befehl MEM nicht verwendet wird.</p>
+
+        <address class="author">(Hans Haberl/ah)</address>
+    </article>
+</body>
+
+</html>

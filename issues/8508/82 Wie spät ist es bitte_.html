@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>Wie spät ist es bitte?</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="Jörg Dorchain, hm">
+    <meta name="64er.issue" content="8/85">
+    <meta name="64er.pages" content="82">
+    <!-- <meta name="64er.toc_category" content="XXX"> -->
+    <!-- <meta name="64er.toc_title" content="XXX"> -->
+    <meta name="64er.id" content="XXX">
+</head>
+
+<body>
+    <article>
+        <h1>Wie spät ist es bitte?</h1>
+        <p class="intro">Haben Sie auch schon beim Programmieren jedes Zeitgefühl verloren und vielleicht einen Termin verpaßt? Mit diesem Uhr-Programm dürfte das nicht mehr passieren. Zusätzlich zur ständigen Zeitanzeige kann noch eine Alarmfunktion aufgerufen werden.</p>
+
+        <p>Mit »Piep Piep Piep« erinnert Sie dieses Programm daran, daß es schon wieder nach Mitternacht ist. Es ist vielleicht besser, die neueste Version zu speichern und ins Bett zu gehen. Aber genug der Vorrede, gehen wir »in medias res«.</p>
+
+        <p>Das Programm CIA-Uhr wird bei jedem Interrupt des C 64 einmal abgearbeitet, also 60mal pro Sekunde. Dabei wird die Echtzeituhr des C 64 abgefragt, die Alarmzeit überprüft und die Uhrzeit auf den Bildschirm gedruckt. Im Gegensatz zu Tl oder Tl$ hat die Echtzeituhr eine große Ganggenauigkeit. Die Variable Tl wird nämlich nur bei jedem Interrupt hochgezählt. Ein Interrupt muß aber nicht jede 60stel Sekunde stattfinden. Beispielsweise werden beim Speichern oder Laden von Programmen wesentlich weniger Interrupts pro Sekunde vom Computer ausgelöst als im READY-Modus.</p>
+
+        <h2>Was bedeutet Interrupt?</h2>
+
+        <p>Der C 64 unterbricht etwajede 60stel Sekunde das laufende Programm und überprüft, ob eine Taste (vielleicht RUN/STOP-RESTORE) gedrückt wurde oder ob ein angeschlossenes Gerät Daten empfangen oder senden kann.</p>
+
+        <p>Wird ein Interrupt ausgelöst, sieht der C 64 in zwei Adressen ($314, $315) der Zeropage nach, bei welcher Adresse das Interrupt-Programm beginnt. Im Normalfall bei $EA31. Da die Zeropage zum RAM-Speicher gehört, kann der C 64 auf eigene Interrupt-Routinen umgelenkt werden. Im Normalfall endet ein eigenes Interrupt-Programm mit dem Assemblerbefehl JMP$EA31, was heißt, daß der Computer mit der »serienmäßigen« Routine weitermachen soll.</p>
+
+        <p>Die CIAs 6526 (Complex Interface Adapter, vielseitiger Ein-/ Ausgabe-Baustein) regeln beim C 64 alles was mit Ein- und Ausgaben zusammenhängt. Dieser Baustein hat zwei Timer eingebaut. Einer davon steuert in der CIA auch eine 24-Stunden-Uhr (AM/PM) mit einer Auflösung von Y™ Sekunde. Die Uhr wird mit TOD (Time Of Day) bezeichnet. Die Zeit steht im BCD-Fbrmat in den Registern 8, 9, 10 und 11 der CIA 1. Die Ganggenauigkeit des Timer ergibt sich aus der Tatsache, daß er mit Netzfrequenz geregelt wird.</p>
+
+        <h2>Der Trick mit dem Interrupt</h2>
+
+        <p>»CIA-Uhr« steht im Speicher von $C000 (49152) bis $C230 (49712). Das Programm wird mit SYS 49152, "Uhrzeit im HHMMSS-Format", "Alarmzeit" initialisiert. Dabei wird der Interrupt-Vektor (Inhalt der Adressen $314, $315) des C 64 so verändert, daß er auf $C036 zeigt. Danach wird die angegebene Uhrzeit und Alarmzeit gesetzt. Pro Interrupt wird nun die Uhrzeit rechts oben am Bildschirm gedruckt und mit der Alarmzeit verglichen. Stimmen die Zeiten überein, fängt der Computer an zu piepen. Und zwar so lange, bis der Alarm mit SYS 49704 abgeschaltet wird.</p>
+
+        <p>Das Programm unterscheidet zwischen Vor- und Nachmittag, obwohl die Uhrzeit nur im 12-Stunden-Format ausgegeben wird. Setzt man beispielsweise die Uhrzeit auf 1 Uhr und die Alarmzeitauf 13 Uhr, erscheintinderAnzeige01:00:00;0. Der Alarm wird aber erst 12 Stunden später ausgelöst. Die »0« hinter dem Strichpunkt gibt die 1Otel Sekunden an.</p>
+
+        <p>Das Programm »CIA-Uhr« kann mit allen Basic-Erweiterungen benutzt werden, die den Interruptvektor nicht verändern und nicht den Speicherbereich von Adresse $C000 bis $C023 belegen.</p>
+
+        <p>Die Anzeige der Uhr erfolgt rechts oben am Bildschirm. Mit POKE 49311,0 kann sie auf die linke Seite verlagert werden.</p>
+
+        <h2>Tips zur Eingabe und Benutzung</h2>
+
+        <p>Das Programm muß mit dem MSE eingegeben werden. Nach dem Laden mit LOAD"UHR",8,1 (1,1) muß NEW eingegeben werden, damit kein OUT OF MEMORY ERROR auftritt. Bei RUN/STOP-RESTORE verschwindet die Anzeige vom Bildschirm, während die Uhr intern aber weiterläuft. Mit SYS 49152 wird die Anzeige wieder aktiviert. Das Maschinenprogramm kann auch in andere Speicherbereiche verschoben werden. Man sollte dazu wissen, daß in den Bereichen $C0A3 bis $C0A6 und $C137 bis $C14D Tabellen stehen.</p>
+
+        <address class="author">(Jörg Dorchain/hm)</address>
+    </article>
+</body>
+
+</html>

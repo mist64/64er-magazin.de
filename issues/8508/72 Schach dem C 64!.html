@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>Schach dem C 64!</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="Bernd Bettermann, ev">
+    <meta name="64er.issue" content="8/85">
+    <meta name="64er.pages" content="72-74">
+    <!-- <meta name="64er.toc_category" content="XXX"> -->
+    <!-- <meta name="64er.toc_title" content="XXX"> -->
+    <meta name="64er.id" content="XXX">
+</head>
+
+<body>
+    <article>
+        <h1>Schach dem C 64!</h1>
+        <p class="intro">Eines der interessantesten Gebiete der Computertechnik ist sicherlich die Beschäftigung mit »künstlicher Intelligenz«. Um erste Erfahrungen auf diesem Gebiet zu sammeln, bietet sich ein Schachprogramm gut an. Hier ist eines zum Abtippen!</p>
+
+        <p>Man erkennt auch sofort, daß es an diesem Programm keine »künstliche Intelligenz« im eigentlichen Sinne gibt. Die »Intelligenz« beruht nur auf festen, mathematischen Formeln. Trotzdem ist es interessant, auf diesem Gebiet zu experimentieren. Das vorliegende Programm ist ein voll funktionsfähiges Schachprogramm, das über eine grafische Spielfeldanzeige verfügt und eine sehr kurze Rechenzeit von unter 10 Sekunden hat. Natürlich ist das Programm sehr spielstark. Der Sinn dieses Programms ist denn auch ein anderer. Dieses Programm soll dem Benutzer ein Grundstein für selbstgeschriebene Erweiterungen sein. Der interessierte Anwender ist aufgefordert, kreativ zu werden und eigene Ergänzungen zu installieren. So bietet sich zum Beispiel das Stellungsbewertungsprogramm besonders dazu an, erweitert und verfeinert zu werden. Auch die Grafik kann sicher verbessert werden.</p>
+
+        <h2>So arbeitet das Programm</h2>
+
+        <p>Der Programmablauf sieht wie folgt aus: Nachdem das Spielfeld initialisiert und ausgegeben ist, wird eine Eingabe eines weißen Zugs erwartet, zum Beispiel E2E4. Der Zug wird auf seine Richtigkeit überprüft und, falls er korrekt ist, ausgeführt. Dann wird eine Schleife gestartet, die sämtliche Spielfelder auf schwarze Figuren hin untersucht. Wird eine schwarze Figur gefunden, so wird der Zuggenerator angesprungen. Hier werden die der Figur möglichen Züge ausgeführt und mittels der Stellungsbewertung beurteilt. Nachdem alle Figuren überprüft wurden, wird der schwarze Zug mit seiner Wertigkeit ausgegeben. Nach einer kurzen Warteschleife wird die aktuelle Stellung ausgegeben, und es kann der nächste weiße Zug ausgeführt werden.</p>
+
+        <p>Die verwendete Maschinenunterroutine liegt im Speicherbereich von 49408 ($0100) bis 49864 ($C2D0). Das Unterprogramm überprüft, ob der schwarze König von irgendeiner weißen Figur angegriffen ist. Falls dies der Fall ist, so wird der Wert 128 an Basic übergeben, andernfalls der Wert 0. Es ist nun möglich, mit dem MC-Programm zu überprüfen, ob eine beliebige schwarze Figur angegriffen ist. Dazu wird in Speicherstelle 49409 die Position der aktuellen Figur (im Bewertungsprogramm ZF) geschrieben und in die Speicherstelle 49414 der Wert der Figur (zum Beispiel 130 = Springer). Nach Aufruf des Unterprogramms müssen unbedingt (!!) wieder die Standardwerte gePOKEt werden (49409:100 / 49414:134). Wird dies nicht beachtet, so kann der Computer keine regelwidrigen Stellungen mehr erkennen und antwortet mit unlogischen Zügen. Das Maschinenprogramm ist somit ideal dazu geeignet, um in einem selbst ergänzten Stellungsbewertungs-Programm eingesetzt zu werden. Man sollte jedoch beachten, daß ein umfangreiches Bewertungsprogramm die Rechenzeit pro Zug nicht unerheblich steigert.</p>
+
+        <p>Um dem Computer das Schachspiel beizubringen, sind im wesentlichen drei Probleme zu lösen:</p>
+
+        <ol>
+            <li>Die interne Darstellung von Spielfeld und Figuren.</li>
+            <li>DerZuggenerator: Er muß die Figuren den Regeln entsprechend bewegen und eine Liste möglicher Züge generieren.</li>
+            <li>Die Stellungsbewertung. Von ihrer Genauigkeit hängt die Spielstärke des Programms ab.</li>
+        </ol>
+
+
+        <p>Nachfolgend nun eine Anleitung zur Lösung der drei Teilprobleme.</p>
+
+        <p>Da der Computer nicht auf das Schachbrett sehen kann, muß man es intern in einer Computerform darstellen, mit der der Computer arbeiten kann. Es bietet sich an, jedem Feld des Schachbretts eine Speicherstelle im Computer zuzuordnen. Den Inhalt der entsprechenden Speicherstellen stellen die Figuren dar, die sich auf dem Schachbrett befinden. Nun taucht aber ein zweites Problem auf: Wie kann der Computer auf einfache Weise überprüfen, wann sich eine Figur am Spielfeldrand befindet und nicht weiterziehen kann. Hier bietet es sich an, daß man um das eigentliche Spielfeld noch einen Rand installiert, der einen speziellen Zahlenwert enthält (Bild 1). In diesem Fall signalisiert der Zahlenwert 128 dem Rechner, daß dieses Feld nicht zum eigentlichen Spielfeld gehört und er es somit mit seinen Figuren nicht betreten darf. Damit hätten wir das Schachbrett in einer computergerechten Fbrm intern dargestellt. Als letztes Problem müssen noch die verschiedenen Spielfiguren auf dem internen Brett codiert werden. Dazu ordnet man jeder Figur eine Zahl zu. Die weißen Figuren bekommen die Werte 1 bis 6 und die schwarzen Figuren die Werte 1 bis 6 plus 128. Somit ist eine einfache Unterscheidung zwischen weißen und schwarzen Figuren möglich: Weiße Figuren haben einen Wert kleiner 128 und schwarze Figuren einen Wert größer 128. Leere Felder werden mit Null initialisiert. Sehen wir unsjetzt im Listing an, wie die Probleme innerhalb des Programms gelöst werden (Zeilen 1030 bis 1080). Das Spielfeld liegt im Rechner ab Speicherstelle 49152. In den Zeilen 1030 bis 1050 werden zunächst der Spielfeldrand (128) und die leeren Felder (0) initialisiert (vergleiche auch Bild 1). In Zeile 1060 werden dann die weißen (1) und schwarzen Bauern (1 + 128 = 129) auf die zweite beziehungsweise siebte Reihe des Spielfeldes positioniert. Die beiden Zeilen 1070 und 1080 dienen dazu, die restlichen Figuren auf den Grundreihen zu positionieren.</p>
+
+        <h2>Der Zuggenerator</h2>
+
+        <p>Doch mit dem Spielbeginn taucht ein neues Problem auf: Wie bringe ich den Computer dazu, daß er die Figuren entsprechend den Regeln bewegt? Als Beispiel wollen wir dies mit den Turmzügen durchsprechen (Zeilen 6440 bis 6560). Als Grundlage dient hier das Spielfeld in Bild 1. Der Turm darf den Regeln nach nur senkrecht und waagerecht ziehen, und zwar so lange, bis er auf den Spielfeldrand oder eine andere Figur trifft. Das Ziehen des Turmes bedeutet somit auf dem Computerspielfeld, daß zum Ausgangsfeld des Turmes die Vielfachen von 1 oder 10 addiert beziehungsweise substrahiert werden. Dieses Verfahren wird so lange wiederholt, bis der Turm auf ein Hindernis (Spielfeldrand oder andere Figur) trifft. Diese Zuggenerierung wird vom Programm wie folgt realisiert: Als Beispiel betrachten wir die Zuggenerierung senkrecht nach »oben«, also die Addition der Vielfachen von 10 zum Ausgangsfeld. Die anderen Zugrichtungen ergeben sich analog zu der betrachteten. In Zeile 6440 wird zunächst ein Flag auf Null gesetzt (FF=0). Dieses Flag wird immer dann auf 1 gesetzt, wenn der Turm bei seinem Zug auf ein Hindernis trifft. Als nächstes wird eine FOR-NEXT-Schleife gestartet, die es ermöglicht, alle Felder in »+1O-Richtung« zu überprüfen. Die Variable X symbolisiert dabei das momentane Standfeld des Turmes, und Z durchläuft alle möglichen Zielfelder. Zum Schluß wird in Zeile 6440 geprüft, ob auf dem vorgesehenen Zielfeld bereits eine eigene Figur steht oder ob das Feld nicht mehr zum eigentlichen Spielfeld gehört. In beiden Fällen wird das Flag FF auf 1 gesetzt. In Zeile 6450 wird zunächst geprüft, ob das Flag FF gesetzt ist. Ist dies der Fall, so ist das Zielfeld Z regelwidrig, und das folgende wird übersprungen. Da FF jedoch in der gesamten Schleife nicht zurückgesetzt wird, wird sie bis zu ihrem Ende durchlaufen, ohne daß weitere Stellungen ausgewertet werden. Nehmen wirjetztaberan, daß FF noch Null ist und die Stellung somit legal. Dann wird in Zeile 6450 das erwogene Zielfeld ZF gleich Z gesetzt und die Stellungsbewertung ab Zeile 100 aufgerufen. Anschließend wird noch geprüft, ob auf Feld Z eine weiße Figur steht. Diese Figur darf zwar geschlagen werden, verhindert aber den weiteren Vormarsch des Turmes in diese Richtung. Somit wird das Flag FF in diesem Falle auf 1 gesetzt. Ich nehme an, daß das Prinzip der Zuggenerierung jetzt deutlich geworden ist. Es läßt sich relativ einfach auf die anderen Figuren übertragen, wenn man ihre speziellen Gangarten berücksichtigt.</p>
+
+        <h2>Die Stellungsbewertung</h2>
+
+        <p>Somit bleibt als letztes Problem nur noch die Bewertung der entstehenden Stellungen (Zeilen 100 bis 520). Wozu überhaupt eine Stellungsbewertung? Jeder, der schon einmal Schach gespielt hat, weiß, daß es nicht genügt, nur die Regeln zu beherrschen. Man muß zwischen guten und schlechten Zügen unterscheiden können, wenn man das Spiel gewinnen will. Diese Aufgabe hat die Stellungsbewertung.</p>
+
+        <p>Versuchen wir, uns die Funktionsweise mit Hilfe des Listings zu verdeutlichen. Zeile 100 führt zunächst einmal den erwogenen Zug auf dem Spielfeld aus. Dazu muß der Inhalt des Zielfeldes in der Variablen WZ gesichert werden, da er sonst verloren gehen würde. Anschließend wird der Zug ausgeführt. Zeile 110 gehört noch nicht zum eigentlichen Stellungsbewertungs-Programm. Hier wird überprüft, ob in der entstandenen Stellung der schwarze König im Schach steht und die Stellung somit illegal ist. Dies wird dadurch angezeigt, daß das Maschinensprache-Programm der Variablen AA den Wert 128 übergibt. Ist dies der Fall, so wird die Stellungsbewertung übersprungen und nach Zeile 520 verzweigt, wo der ausgeführte Zug zurückgenommen und in den Zuggenerator gesprungen wird. In Zeile 200 wird der Wert der Stellung (AA) zunächst um den ursprünglichen Wert des Zielfeldes erhöht. Hat auf dem Zielfeld eine weiße Figur gestanden, so ist diese geschlagen, und der Zug ist somit höherwertig, als wenn Schwarz auf ein leeres Feld (WZ=O) gezogen hätte. In Zeile 210 wird geprüft, ob die Figur auf ihrem Ausgangsfeld angegriffen war. Dies ist der Fall, wenn der Wert der Felder X-9 oder X-11 gleich 1 ist, was bedeutet, daß die Figur auf ihrem Ausgangsfeld bedroht ist. Ein Wegziehen ist somit zu empfehlen, und der Wert AA wird um den Figurenwert erhöht. Das gleiche wird für das Zielfeld überprüft. Ist die Figur dort angegriffen, so wird ihr Wert von AA abgezogen, um zu zeigen, daß das Zielfeld ungünstig gewählt ist. Falls der berechnete Zug eine höhere Wertigkeit hat als der bisher beste Zug (BW), wird der soeben berechnete Zug als bester Zug eingeordnet, und die Ausgangs- und Zielkoordinaten (BA und BZ) werden ebenso wie die bisher beste Wertigkeit (BW) aktualisiert. Danach wird aus Zeile 500 nach 520 gesprungen, wo das Spielfeld zurückgesetzt und das Bewertungsprogramm verlassen wird. Falls der aktuelle Zug exakt die gleiche Wertigkeit hat wie der bisher beste Zug, so entscheidet der Zufallsgenerator darüber, ob der neue Zug als bester eingelistet werden soll. Diese Einrichtung sorgt dafür, daß der Computer in einer bestimmten Stellung nicht immer die gleichen Züge macht, sondern ein Spiel variiert. Das Stellungsbewertungs-Programm ist für eigene erste Experimente besonders geeignet. Man kann zum Beispiel noch eigene Kriterien zur Stellungsbewertung einführen. Jedoch sollte man bedenken, daß das Bewertungsprogramm besonders zeitkritisch ist, da es pro Zugberechnung etwa 30- bis 50mal durchlaufen wird. Jede weitere Zeile macht sich also in der Rechenzeit des Computers bemerkbar.</p>
+
+        <address class="author">(Bernd Bettermann/ev)</address>
+
+        <p>Literaturhinweis: Computerschach von Ludek und Vas I. Kühnmund, Heyne-Buch Nr. 4704, Wilhelm Heyne Verlag, München, Taschenbuch, Preis: zirka 5,80 Mark.</p>
+
+        <p>Dieses Buch bietet eine ausführliche und leicht verständliche Einführung in das Thema Computerschach. Außerdem beinhaltet es einige interessante Partien zwischen Mensch und Computer.</p>
+    </article>
+</body>
+
+</html>

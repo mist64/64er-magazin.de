@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>»Procedure« — oder der C 64 kann lernen</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="Frank Pflüger, hm">
+    <meta name="64er.issue" content="8/85">
+    <meta name="64er.pages" content="78-79">
+    <!-- <meta name="64er.toc_category" content="XXX"> -->
+    <!-- <meta name="64er.toc_title" content="XXX"> -->
+    <meta name="64er.id" content="XXX">
+</head>
+
+<body>
+    <article>
+        <h1>»Procedure« — oder der C 64 kann lernen</h1>
+        <p class="intro">Strukturiertes Programmieren bleibt nicht länger ein Schlagwort. Definierbare Basic-Befehle kürzen manchen »Spaghetti-Code«.</p>
+
+        <p>Mit diesem Programm (Listing 1) können Sie eigene Basic-Befehle definieren, wie das auch in vielen anderen Programmiersprachen möglich ist. Die Befehlsangaben können dabei bis zu einer Zeile lang sein (80 Zeichen) und auch bereits definierte Befehle enthalten. Ein Beispiel dazu finden Sie in Listing 2. Dort wird in Zeile 20 und 30 eine Prozedur definiert, die aus Anfangskapital, Laufzeit und Zinssatz das Endkapital berechnet. In Zeile 70 wird die Prozedur mit »UMRECHNUNG« aufgerufen.</p>
+
+        <p>»Procedure« liegt im Speicherbereich von $C000 bis $C367 (Tabelle 1) und wird mitSYS 49514 initialisiert. Dabei wird der Vektor auf die Tabelle der Basic-Befehle von $A7E1 auf $C000 geändert. Die Adresse des Vektors steht in $134 und $135. Im ersten Teil von »Procedure« wird ständig geprüft, ob der Interpreter einen neu definierten Befehl gelesen hat. Wenn ja, sucht die Routine in einer eigenen Tabelle nach der Startadresse der gespeicherten Befehlsfolge. Handelt es sich um keinen zusätzlichen Befehl, macht der Computer weiter wie normal. Der Interpreter sucht in der Basic-Befehls-Tabelle des C 64 im ROM. »Procedure« versteht die Anweisungen in Tabelle 2.</p>
+
+        <p>Beachten Sie bitte, daß bei mehrfachen Definitionen eines Wortes immer die erste abgearbeitet wird, wenn Sie kein !NEW eingegeben haben. Es können deshalb keine Befehlsfolgen umdefiniert werden.</p>
+
+        <h2>Basic-Erweiterungen in der Praxis</h2>
+
+        <p>Was geschieht mit den selbstdefinierten Befehlen? Das oben schon angerissene Thema ist relativ einfach zu beschreiben, vergleicht man das Programm mit einer Kartei. Es gibt eine Liste, in der alle Kunden (Wörter) eingetragen sind. In der Liste ist vermerkt, in welcher Schublade — stellen Sie sich einen großen Schrank vor — genaueres über den Kunden zu finden ist, oder in diesem Fall über die Befehlsfolge. Übrigens arbeiten fast alle Basic-Erweiterungen nach diesem Prinzip. Wenn nun »Procedure« auf !DEF stößt, wird das neue Befehlswort eingetragen, mit dem Vermerk in welcher Schublade die Befehlsfolge zu finden ist. Wird nun ein neu definiertes Befehlswort aufgerufen, wird die Nummer der Schublade in den Programmzeiger (Adressen $7A und $7B) geschrieben und die Programmausführung bei dieser Adresse fortgesetzt. Der Programmzeiger sagt nämlich dem C 64, was als nächstes bei welcher Adresse ausgeführt werden muß. Ist das Befehlswort der Pfeil (←), heißt das, daß die neue Befehlsfolge abgearbeitet ist und wieder ins Programm zurückgesprungen werden kann. Dazu wird in Adresse $7A und $7B einfach der aktuelle Wert geschrieben. Wie Sie sehen, ist es also sehr wichtig, daß am Ende der Befehlsdefinition der Pfeil (←) steht.</p>
+
+        <p>Nach einem Reset kann die Erweiterung mit SYS 49541 wieder aktiviert werden, wobei die neuen Befehle erhalten bleiben.</p>
+
+        <h3>Tips zur Eingabe.</h3>
+
+        <p>Das Maschinenprogramm (Listing 1) müssen Sie mit dem MSE eingeben und speichern. Nach dem Laden mit LOAD "PROCEDURE",8,1 (1,1) sollten Sie vor dem Initialisieren als erstes NEW eingeben, um bei weiteren Anweisungen keinen »OUT OF MEMORY ERROR« auszulösen.</p>
+
+        <address class="author">(Frank Pflüger/hm)</address>
+    </article>
+</body>
+
+</html>
