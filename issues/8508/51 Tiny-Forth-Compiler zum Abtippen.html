@@ -28,9 +28,7 @@
 
         <p>Die wohl auffälligste Eigenart von Forth ist die Art und Weise, in der Forth rechnet. Es ist die sogenannte »UPN« (Umgekehrte Polnische Notation), auch Postfix-Notation genannt. Sie ist es unter anderem, die Forth die Geschwindigkeit verleiht (10 bis 20mal so schnell wie Basic). Doch was bedeutet UPN?</p>
 
-        <p>Ein Beispiel: Sie wollen das Ergebnis von 8 + 5 auf dem Bildschirm ausgeben. In Basic sähe das dann so aus: »PRINT 8 + 5«. In Forth schreibt</p>
-
-        <p>sich das etwas anders: »5 8 + .«. Scheinbar verwirrend, aber nur auf den ersten Blick. Denn das Prinzip ist einfach. Im Mittelpunkt von Forth steht der Stack (Stapel). Man stelle sich einen Stapel Papier vor, auf den man Blätter obenauflegen kann und auch nur von oben wieder nehmen kann. Das bedeutet, das Blatt, welches Sie zuletzt draufgelegt haben, wird als erstes wieder heruntergenommen. Man nennt dieses System auch »LIFO« (Last In — First Out). Doch wie kann man damit rechnen? Kommen wir wieder zu unserem Beispiel zurück. Der Computer legt als erstes die Zahl 5 auf den Stack. Bild 1 verdeutlicht das Prinzip. Der TOS (Top of Stack) hat jetzt den Wert 5. Dann folgt die »8« nach dem gleichen Verfahren. Darauf addiert der Computer die zwei obersten Zahlen und legt das Ergebnis auf den Stack, dafür ist»+«verantwortlich. Jetzt haben wir zwar das Ergebnis auf dem Stack, können es aber nicht sehen. Für die Ausgabe von 16 Bitzahlen ist der Befehl».«zuständig. Damit wird immer der jeweilige Wert des TOS ausgegeben.</p>
+        <p>Ein Beispiel: Sie wollen das Ergebnis von 8 + 5 auf dem Bildschirm ausgeben. In Basic sähe das dann so aus: »PRINT 8 + 5«. In Forth schreibt sich das etwas anders: »5 8 + .«. Scheinbar verwirrend, aber nur auf den ersten Blick. Denn das Prinzip ist einfach. Im Mittelpunkt von Forth steht der Stack (Stapel). Man stelle sich einen Stapel Papier vor, auf den man Blätter obenauflegen kann und auch nur von oben wieder nehmen kann. Das bedeutet, das Blatt, welches Sie zuletzt draufgelegt haben, wird als erstes wieder heruntergenommen. Man nennt dieses System auch »LIFO« (Last In — First Out). Doch wie kann man damit rechnen? Kommen wir wieder zu unserem Beispiel zurück. Der Computer legt als erstes die Zahl 5 auf den Stack. Bild 1 verdeutlicht das Prinzip. Der TOS (Top of Stack) hat jetzt den Wert 5. Dann folgt die »8« nach dem gleichen Verfahren. Darauf addiert der Computer die zwei obersten Zahlen und legt das Ergebnis auf den Stack, dafür ist »+« verantwortlich. Jetzt haben wir zwar das Ergebnis auf dem Stack, können es aber nicht sehen. Für die Ausgabe von 16 Bitzahlen ist der Befehl ».« zuständig. Damit wird immer der jeweilige Wert des TOS ausgegeben.</p>
 
         <figure>
             <img src="51-1.png" alt="">
@@ -42,7 +40,8 @@
         <ul>
             <li>In Forth können Sie Ihre eigenen Befehle definieren. Es gibt dann in der Benutzung keinen Unterschied mehr zwischen den vordefinierten und Ihren eigenen Befehlen.</li>
             <li>Forth besteht nicht nur aus einem Compiler, sondern auch aus einem Interpreter. Dies gibt Ihnen die Möglichkeit, selbstentwickelte Befehle sofort zu testen.</li>
-            <li>Eine sehr hohe Geschwindigkeit beim Compilieren (1 Pass-Compiler) — Strukturierte Programmierung ohne GOTO</li>
+            <li>Eine sehr hohe Geschwindigkeit beim Compilieren (1 Pass-Compiler)</li>
+            <li>Strukturierte Programmierung ohne GOTO</li>
         </ul>
 
         <p>Sie sehen also, Forth ist eine Sprache, mit der zu beschäftigen es sich lohnt.</p>
@@ -68,221 +67,233 @@
 
         <p class="intro">Forth ist sicher eine der interessantesten Programmiersprachen überhaupt. Unser neues Listing des Monats stellt diese Sprache jedem C 64-Besitzer zur Verfügung.</p>
 
-        <p>Die folgende Anleitung zur Handhabung des Forth-Compilers kann natürlich kein Lehrbuch ersetzen. Falls Sie mit Fbrth noch keinerlei Erfahrungen haben, finden Sie im Anhang eine Übersicht über Forth-Literatur. Doch nun zur Beschreibung unseres Tiny-Forth-Compilers.</p>
+        <p>Die folgende Anleitung zur Handhabung des Forth-Compilers kann natürlich kein Lehrbuch ersetzen. Falls Sie mit Foth noch keinerlei Erfahrungen haben, finden Sie im Anhang eine Übersicht über Forth-Literatur. Doch nun zur Beschreibung unseres Tiny-Forth-Compilers.</p>
 
         <p>Die folgenden Befehle haben so gut wie alle einen Einfluß auf den Stack. Deshalb wird eine verkürzte Schreibweise verwendet, um das Verhalten der einzelnen Befehle darzustellen: »(Stack vorher - - - Stack nachher) «.</p>
 
-        <p>Die verwendeten Symbole haben folgende Bedeutung:<br />
-            n = 16-Bit-Zahl, b = 8-Bit-Zahl, c = ASCII, addr = Adresse, f = Flag (0/1).</p>
+        <p>Die verwendeten Symbole haben folgende Bedeutung: n = 16-Bit-Zahl, b = 8-Bit-Zahl, c = ASCII, addr = Adresse, f = Flag (0/1).</p>
 
         <p>Die einzelnen Befehle des Tiny-Forth-Compilers sind in Tabelle 1 noch einmal übersichtlich dargestellt. Im folgenden werden die Befehle genauer beschrieben:</p>
 
         <h3>Arithmetikbefehle</h3>
 
-        <p>Addition »+« (n2 n1 — n3)</p>
+        <p class="noindent">Addition »+« (n2 n1 - - - n3)</p>
 
         <p>Der Additionsbefehl holt die ersten beiden Argumente (n1,n2) vom Stack, addiert sie miteinander und legt das Ergebnis (n3) in den TOS (Top of Stack).</p>
 
-        <p>Subtraktion »-«(n2 n1 ,- - - n3)</p>
+        <p class="noindent">Subtraktion »-« (n2 n1 - - - n3)</p>
 
         <p>Der Subtraktionsbefehl holt, wie bei der Addition, die ersten zwei Argumente (n1,n2) vom Stack, das Ergebnis (n3) wird wieder im TOS abgelegt.</p>
 
-        <p>Multiplikation »*« (n2 n1 - - - n3)</p>
+        <p class="noindent">Multiplikation »*« (n2 n1 - - - n3)</p>
 
         <p>Die Multiplikation verhält sich analog zur Addition und Subtraktion.</p>
 
-        <p>Division »/«(n2 n1 — n3) Analog zu Multiplikation.</p>
+        <p class="noindent">Division »/« (n2 n1 - - - n3)</p>
 
-        <p>Modulo »MOD« (n2 n1 — n3)</p>
+        <p>Analog zu Multiplikation.</p>
+
+        <p class="noindent">Modulo »MOD« (n2 n1 - - - n3)</p>
 
         <p>Ähnlich einer Division, es wird aber nicht das Ergebnis der Division, sondern der Divisionsrest auf den Stack gelegt.</p>
 
         <h3>Vergleichsbefehle</h3>
 
-        <p>Gleich »=« (n2 n1 — f1)</p>
-
+        <p class="noindent">Gleich »=« (n2 n1 - - - f1)</p>
+        
         <p>Es werden die zwei obersten Werte auf Gleichheit geprüft.</p>
 
-        <p>Größer »&lt;« (n2 n1 — f1)</p>
+        <p class="noindent">Größer »&lt;« (n2 n1 - - - f1)</p>
 
         <p>Es wird geprüft, ob n2 größer als n1 ist.</p>
 
-        <p>Kleiner »>« (n2 n1 — f1)</p>
+        <p class="noindent">Kleiner »&gt;« (n2 n1 - - - f1)</p>
 
         <p>Es wird geprüft, ob n2 kleiner als n1 ist.</p>
 
         <h3>Logische Verknüpfungen</h3>
 
-        <p>AND (n2 n1 - - - n3)</p>
-
+        <p class="noindent">AND (n2 n1 - - - n3)</p>
+        
         <p>Zwischen den Werten n1 und n2 wird eine logische UND-Operation ausgeführt.</p>
 
-        <p>OR = (n2 n1 - - - n3)</p>
+        <p class="noindent">OR = (n2 n1 - - - n3)</p>
 
         <p>Es wird ein logisches ODER ausgeführt.</p>
 
-        <p>XOR (n2 n1 - - - n3)</p>
+        <p class="noindent">XOR (n2 n1 - - - n3)</p>
 
         <p>Es wird ein logisches exklusives ODER ausgeführt.</p>
 
-        <p>NOT (f1 - - - f2)</p>
+        <p class="noindent">NOT (f1 - - - f2)</p>
 
         <p>Das oben liegende Flag wird invertiert.</p>
 
         <h3>Stackoperatoren</h3>
 
-        <p>DROP (n2 n1 - - - n2)</p>
+        <p class="noindent">DROP (n2 n1 - - - n2)</p>
 
         <p>Der oberste Wert wird vom Stack entfernt.</p>
 
-        <p>DUP (n1 - - - n1 n1)</p>
+        <p class="noindent">DUP (n1 - - - n1 n1)</p>
 
         <p>Der oberste Wert auf dem Stack wird dupliziert.</p>
 
-        <p>SWAP (n2 n1 - - - n1 n2)</p>
+        <p class="noindent">SWAP (n2 n1 - - - n1 n2)</p>
 
         <p>Die obersten beiden Werte werden vertauscht.</p>
 
-        <p>OVER (n2 n1 - - - n2 n1 n2)</p>
+        <p class="noindent">OVER (n2 n1 - - - n2 n1 n2)</p>
 
         <p>Kopiert den zweiten Wert zum neuen TOS.</p>
 
-        <p>PICK (n1 n - - - n1 n2)</p>
+        <p class="noindent">PICK (n1 n - - - n1 n2)</p>
 
         <p>Pick holt den n-ten Wert in den TOS.</p>
 
-        <p>ROT (n3 n2 n1 - - - n2 n1 n3)</p>
+        <p class="noindent">ROT (n3 n2 n1 - - - n2 n1 n3)</p>
 
         <p>Rot läßt die ersten drei Elemente des Stack gegen den Uhrzeigersinn rotieren.</p>
 
-        <p>@ (addr — n1)</p>
+        <p class="noindent">@ (addr - - - n1)</p>
 
         <p>Holt eine 16-Bit-Zahl aus der Adresse addr.</p>
 
-        <p>! (n1 addr - - -)</p>
+        <p class="noindent">! (n1 addr - - -)</p>
 
         <p>Speichert eine 16-Bit-Zahl in der Adresse addr.</p>
 
-        <p>c@ (addr — b1)</p>
+        <p class="noindent">c@ (addr - - - b1)</p>
 
         <p>Holt eine 8-Bit-Zahl aus der Adresse addr.</p>
 
-        <p>c! (b1 addr —)</p>
+        <p class="noindent">c! (b1 addr - - -)</p>
 
         <p>Speichert eine 8-Bit-Zahl in der Adresse addr.</p>
 
         <h3>Kontrollstrukturen</h3>
 
-        <p>BEGIN — UNTIL (f - - -)</p>
+        <p class="noindent">BEGIN — UNTIL (f - - -)</p>
 
         <p>Der Programmteil zwischen BEGIN und UNTII wird solange ausgeführt, bis der TOS bei UNTIL ungleich Null ist.</p>
 
-        <p>BEGIN - WHILE - REPEAT (f - - -)</p>
+        <p class="noindent">BEGIN — WHILE — REPEAT (f - - -)</p>
 
         <p>Der Programmteil zwischen BEGIN und REPEAT wird solange ausgeführt, wie der TOS bei WHILE ungleich Null ist.</p>
 
-        <p>IF — ENDIF (f - - -)</p>
+        <p class="noindent">IF — ENDIF (f - - -)</p>
 
         <p>Der Programmteil zwischen IF und ENDIF wird nur dann ausgeführt, wenn der TOS bei IF ungleich Null ist.</p>
 
-        <p>IF — ELSE —ENDIF (f - - -)</p>
+        <p class="noindent">IF — ELSE — ENDIF (f - - -)</p>
 
         <p>Bei erfüllter Bedingung wird der Programmteil zwischen IF und ELSE ausgeführt, bei nichterfüllter Bedingung der zwischen ELSE und ENDIF.</p>
 
         <h3>Schleifen</h3>
 
-        <p>DO (n2 n1 - - -)</p>
+        <p class="noindent">DO (n2 n1 - - -)</p>
 
         <p>DO legt die Argumente n1 (Endwert), n2 (Startwert) auf den Returnstack und leitet eine Schleife ein.</p>
 
-        <p>LOOP (- - -)</p>
+        <p class="noindent">LOOP (- - -)</p>
 
         <p>LOOP erhöht den Schleifen-Zähler um 1, ist der Endwert nicht erreicht, wird wieder zu dem auf DO folgenden Befehl gesprungen.</p>
 
-        <p>I (- - - n)</p>
+        <p class="noindent">I (- - - n)</p>
 
-        <p>Der Befehl I legt den Wert des Schleifenzählers auf den TOS. +LOOP (n - - -)</p>
+        <p>Der Befehl I legt den Wert des Schleifenzählers auf den TOS. </p>
+
+        <p class="noindent">+LOOP (n - - -)</p>
 
         <p>+LOOP erhöht den Schleifenzähler um n, weiter wie LOOP.</p>
 
         <h3>Ein-/Ausgabeoperatoren</h3>
 
-        <p>KEY (- - - c)</p>
+        <p class="noindent">KEY (- - - c)</p>
 
         <p>Holt den ASCII-Wert, der gerade gedrückten Taste in den TOS, ist keine Taste gedrückt, so wird eine 0 in den TOS gelegt.</p>
 
-        <p>GET (- - - c)</p>
+        <p class="noindent">GET (- - - c)</p>
 
         <p>Wartet, bis eine Taste gedrückt wird und legt dann ihren ASCII-Wert in den TOS.</p>
 
-        <p>EXPECT (addr n - - -)</p>
+        <p class="noindent">EXPECT (addr n - - -)</p>
 
         <p>Erwartet eine Eingabe, die mit Return abgeschlossen wird, und legt sie bei addr mit einer maximalen Länge n im Speicher ab. Als Abschlußzeichen wird eine 13 in den Speicher gesetzt.</p>
 
-        <p>EMIT (c - - -)</p>
+        <p class="noindent">EMIT (c - - -)</p>
 
         <p>EMIT gibt den auf dem TOS liegenden ASCII-Wert auf dem Bildschirm aus.</p>
 
-        <p>TYPE (addr n - - -)</p>
+        <p class="noindent">TYPE (addr n - - -)</p>
 
         <p>TYPE gibt n Zeichen, welche ab addr im Speicher stehen, auf dem Bildschirm aus.</p>
 
-        <p>CR (- - -)</p>
+        <p class="noindent">CR (- - -)</p>
 
         <p>CR bewirkt einen Zeilenvorschub.</p>
 
-        <p>CLS (- - -)</p>
+        <p class="noindent">CLS (- - -)</p>
 
         <p>Löscht den Bildschirm.</p>
 
-        <p>."TEXT" (- - -)</p>
+        <p class="noindent">."TEXT" (- - -)</p>
 
         <p>Gibt den Text zwischen »."« und »"« aus (funktioniert nur in compilierter Form).</p>
 
         <h3>Definitionsbefehle</h3>
 
-        <p>n CONSTANT (Name) (n - - -)</p>
+        <p class="noindent">n CONSTANT &lang;Name&rang; (n - - -)</p>
 
-        <p>CONSTANT definiert eine Konstante mit dem Wert n und dem Namen (Name). Wird (Name) im Programm aufgerufen, so wird n auf den TOS gelegt.</p>
+        <p>CONSTANT definiert eine Konstante mit dem Wert n und dem Namen &lang;Name&rang;. Wird &lang;Name&rang; im Programm aufgerufen, so wird n auf den TOS gelegt.</p>
 
-        <p>n VARIABLE (Name) (n - - -)</p>
+        <p class="noindent">n VARIABLE &lang;Name&rang; (n - - -)</p>
 
-        <p>VARIABLE definiert eine Variable mit dem Wert n und dem Namen (Name). Wird (Name) im Programm aufgerufen, so wird die Adresse der Varible auf den Stack gelegt. Ein Wert wird mit @ (lies: Fetch) auf den TOS geholt und mit! (lies: Store) an eine Variable übergeben.</p>
+        <p>VARIABLE definiert eine Variable mit dem Wert n und dem Namen &lang;Name&rang;. Wird &lang;Name&rang; im Programm aufgerufen, so wird die Adresse der Varible auf den Stack gelegt. Ein Wert wird mit @ (lies: Fetch) auf den TOS geholt und mit! (lies: Store) an eine Variable übergeben.</p>
 
-        <p>n MEMORY (Name) (n - - -)</p>
+        <p class="noindent">n MEMORY &lang;Name&rang; (n - - -)</p>
 
-        <p>MEMORY definiert einen Speicherbereich mit dem Namen (Name) und der Länge n. Wird (Name) im Programm aufgerufen, so wird die Adresse des Speicherbereichs übergeben. In Adresse-2 ist die Länge zu finden und kann mit @ ausgelesen werden. MEMORY ist kein Standardwort!</p>
+        <p>MEMORY definiert einen Speicherbereich mit dem Namen &lang;Name&rang; und der Länge n. Wird &lang;Name&rang; im Programm aufgerufen, so wird die Adresse des Speicherbereichs übergeben. In Adresse-2 ist die Länge zu finden und kann mit @ ausgelesen werden. MEMORY ist kein Standardwort!</p>
 
-        <p>: (Name)&hellip;; (—)</p>
+        <p class="noindent">: &lang;Name&rang;&hellip;; (- - -)</p>
 
-        <p>Der Doppelpunkt definiert ein neues Forth-Wort mit dem Namen (Name). Die Definition muß mit »;« abgeschlossen werden.</p>
+        <p>Der Doppelpunkt definiert ein neues Forth-Wort mit dem Namen &lang;Name&rang;. Die Definition muß mit »;« abgeschlossen werden.</p>
 
         <h3>Systembefehle</h3>
 
-        <p>BASIC: Kehrt zum Basic zurück.<br />
-            RESET: Kehrt zum Ausgangszustand zurück.<br />
-            LIST n: Listet Screen n auf dem Drucker oder dem Bildschirm. CLEAR n: Löscht SCREEN n auf der Diskette.<br />
-            LOAD n: Compiliert Screen n in das Vocabulary.<br />
-            FORGET (Name): Löscht das Wort (Name) aus dem Vocabulary.<br />
-            VLIST: Listet das Vocabulary.<br />
-            SAVE-SYSTEM (Name): Speichert den Objektcode und Vocabulary-Einträge aller selbstdefinierten Befehle auf Diskette.<br />
-            LOAD-SYSTEM (Name): Lädt den Objektcode und die Vocabulary-Einträge wieder. Das System muß vorher mit RESET wieder in den Ausgangszustand gebracht werden und in Zeile 380 muß die Variable VOC denselben Wert wie beim Speichern haben, da sonst die Sprungadressen im Objektcode nicht stimmen.<br />
-            EDIT n: Ruft den Bildschirmeditor auf, n ist die Nummer des Screens.</p>
+        <p class="noindent">BASIC: Kehrt zum Basic zurück.</p>
+
+        <p class="noindent">RESET: Kehrt zum Ausgangszustand zurück.</p>
+
+        <p class="noindent">LIST n: Listet Screen n auf dem Drucker oder dem Bildschirm. CLEAR n: Löscht SCREEN n auf der Diskette.</p>
+
+        <p class="noindent">LOAD n: Compiliert Screen n in das Vocabulary.</p>
+
+        <p class="noindent">FORGET &lang;Name&rang;: Löscht das Wort &lang;Name&rang; aus dem Vocabulary.</p>
+
+        <p class="noindent">VLIST: Listet das Vocabulary.</p>
+
+        <p class="noindent">SAVE-SYSTEM &lang;Name&rang;: Speichert den Objektcode und Vocabulary-Einträge aller selbstdefinierten Befehle auf Diskette.</p>
+
+        <p class="noindent">LOAD-SYSTEM &lang;Name&rang;: Lädt den Objektcode und die Vocabulary-Einträge wieder. Das System muß vorher mit RESET wieder in den Ausgangszustand gebracht werden und in Zeile 380 muß die Variable VOC denselben Wert wie beim Speichern haben, da sonst die Sprungadressen im Objektcode nicht stimmen.</p>
+
+        <p class="noindent">EDIT n: Ruft den Bildschirmeditor auf, n ist die Nummer des Screens.</p>
 
         <h3>Spezialbefehle</h3>
 
-        <p>CALL (addr - - -)</p>
+        <p class="noindent">CALL (addr - - -)</p>
 
-        <p>Ruft ein Maschinenprogramm mit der Adresse addr auf. Es können, wie bei SYS in Basic, in den Speicherzellen 780 das A-, 781 das X-, 782 das Y-Register mit übergeben werden.<br />
-            R> (- - - n)</p>
+        <p>Ruft ein Maschinenprogramm mit der Adresse addr auf. Es können, wie bei SYS in Basic, in den Speicherzellen 780 das A-, 781 das X-, 782 das Y-Register mit übergeben werden.</p>
+
+        <p class="noindent">R&rang; (- - - n)</p>
 
         <p>Bringt das oberste Element des Return-Stacks auf den Stack.</p>
 
-        <p class="intro">R (n - - -)</p>
+        <p class="noindent">&rang; R (n - - -)</p>
 
         <p>Bringt das oberste Element des Stacks auf den Return-Stack.</p>
 
-        <p>;S (- - -)</p>
+        <p class="noindent">;S (- - -)</p>
 
         <p>Dieser Befehl sorgt für den vorzeitigen Abbruch des aktuellen Befehls.</p>
 
@@ -292,9 +303,9 @@
 
         <h2>Das Programmieren in Forth</h2>
 
-        <p>Nach dem Starten des Programms wird zuerst das Maschinenprogramm »VOCABULARY« in den Bereich 49152 bis 50160 geladen. Nach etwa einer Sekunde erscheint ein blinkender Cursor; jetzt können Sie Ihre Eingaben machen. Sie befinden sich im Interpretermodus, das heißt alle eingegebenen Befehle werden sofort ausgeführt. Daß dies im Interpretermodus so langsam geht, liegt nur daran, daß der Interpreter in Basic geschrieben ist; compilierte Befehle laufen dagegen etwa 10- bis 20mal so schnell wie Basic (sie werden vollkommen in Maschinensprache übersetzt). Vielleicht geben Sie mal das folgende Beispiel ein: »8 5 + .« (RETURN). Sie müßten jetzt 13auf dem Bildschirm erhalten; wenn nicht, dann müssen Sie irgendwo im Programm einen Fehler gemacht haben. Sie können auch Kommentare einfügen, sie werden mit einer »(« begonnen und mit»)« abgeschlossen. Jeder Befehl wird durch ein Leerzeichen (oder Return) vom anderen getrennt</p>
+        <p>Nach dem Starten des Programms wird zuerst das Maschinenprogramm »VOCABULARY« in den Bereich 49152 bis 50160 geladen. Nach etwa einer Sekunde erscheint ein blinkender Cursor; jetzt können Sie Ihre Eingaben machen. Sie befinden sich im Interpretermodus, das heißt alle eingegebenen Befehle werden sofort ausgeführt. Daß dies im Interpretermodus so langsam geht, liegt nur daran, daß der Interpreter in Basic geschrieben ist; compilierte Befehle laufen dagegen etwa 10- bis 20mal so schnell wie Basic (sie werden vollkommen in Maschinensprache übersetzt). Vielleicht geben Sie mal das folgende Beispiel ein: »8 5 + .« (RETURN). Sie müßten jetzt 13 auf dem Bildschirm erhalten; wenn nicht, dann müssen Sie irgendwo im Programm einen Fehler gemacht haben. Sie können auch Kommentare einfügen, sie werden mit einer »(« begonnen und mit »)« abgeschlossen. Jeder Befehl wird durch ein Leerzeichen (oder Return) vom anderen getrennt</p>
 
-        <p>Doch wie definiert man einen neuen Befehl? Diese Frage wird Ihnen sicher schon lange auf den Lippen brennen. Doch auch hier macht es Ihnen Forth sehr einfach. Um die Definition eines neuen Befehls einzuleiten wird »:« benutzt, gefolgt von dem Namen des neuen Befehls (bitte vergessen Sie nicht das Leerzeichen hinterjedem Befehl.) Dann folgen die Befehle, die in das Wort compiliert werden sollen. Ein »;« beendet die Definition. Danach ist der Befehl wie jeder andere Befehl benutzbar. Auf Fehler reagiert der Compiler, indem er die Compilation abbricht. Danach sollte man den Befehl mit FORGET löschen, da sonst das Programm abstürzt, wenn Sie den Befehl aufrufen.</p>
+        <p>Doch wie definiert man einen neuen Befehl? Diese Frage wird Ihnen sicher schon lange auf den Lippen brennen. Doch auch hier macht es Ihnen Forth sehr einfach. Um die Definition eines neuen Befehls einzuleiten wird »:« benutzt, gefolgt von dem Namen des neuen Befehls (bitte vergessen Sie nicht das Leerzeichen hinter jedem Befehl.) Dann folgen die Befehle, die in das Wort compiliert werden sollen. Ein »;« beendet die Definition. Danach ist der Befehl wie jeder andere Befehl benutzbar. Auf Fehler reagiert der Compiler, indem er die Compilation abbricht. Danach sollte man den Befehl mit FORGET löschen, da sonst das Programm abstürzt, wenn Sie den Befehl aufrufen.</p>
 
         <h2>Der Editor</h2>
 
@@ -302,245 +313,256 @@
 
         <p>Geben Sie einmal »EDIT 1« ein. Das System versucht nun, Screen 1 von der Diskette zu laden. Ist der Screen nicht auf Diskette vorhanden, so wird trotzdem in den Editor gesprungen, nur daß der Screen leer ist. Nachdem sich das System im Editor befindet, sehen Sie links die Zeilennummern von 0 bis 23 mit folgendem Doppelpunkt (dieser Doppelpunkt hat keine Bedeutung). Sie können nun mit dem Cursor hinter den Doppelpunkt fahren und eine Zeile eingeben. Jede Zeile muß mit RETURN abgeschlossen werden. Eine Zeile darf nicht länger als 35 Zeichen sein. Geben Sie doch einmal das vorherige Beispiel ein. Die Nummer am Anfang jeder Zeile entspricht in etwa einer Zeilennummer in Basic.</p>
 
-        <p>Um nun den Editor zu verlassen, gibt es zwei Möglichkeiten, einmal mit »e«, damit der Screen n abgespeichert wird und mit »s«, so wird der Editor ohne Änderung des Screens verlassen. Die Buchstaben müssen in der ersten Spalte einer Zeile stehen, also dort, wo die Zeilennummer steht. Es gibt noch mehr dieser Editorbefehle (siehe Tabelle 4). Zum Einfügen von Zeilen benützen Sie »I Zeile Anzahl«, mit »D Zeile Anzahl« löschen Sie Zeilen. Mit »L« listen Sie den Screen noch einmal, das ist dann von Nutzen, wenn Sie versehentlich die CLR-Taste betätigt haben. Mit »N Nummer« ändern Sie die Nummer eines Screens. Das Compilieren eines Screens geschieht mit LOAD n. Soll der nächste Screen (n + 1) auch noch compiliert werden, so muß in der letzten Zeile des Screens n der Befehl »->« vorhanden sein. Experimentieren Sie doch mal ein bißchen mit dem Editor.</p>
+        <p>Um nun den Editor zu verlassen, gibt es zwei Möglichkeiten, einmal mit »e«, damit der Screen n abgespeichert wird und mit »s«, so wird der Editor ohne Änderung des Screens verlassen. Die Buchstaben müssen in der ersten Spalte einer Zeile stehen, also dort, wo die Zeilennummer steht. Es gibt noch mehr dieser Editorbefehle (siehe Tabelle 4). Zum Einfügen von Zeilen benützen Sie »I Zeile Anzahl«, mit »D Zeile Anzahl« löschen Sie Zeilen. Mit »L« listen Sie den Screen noch einmal, das ist dann von Nutzen, wenn Sie versehentlich die CLR-Taste betätigt haben. Mit »N Nummer« ändern Sie die Nummer eines Screens. Das Compilieren eines Screens geschieht mit LOAD n. Soll der nächste Screen (n + 1) auch noch compiliert werden, so muß in der letzten Zeile des Screens n der Befehl »-->« vorhanden sein. Experimentieren Sie doch mal ein bißchen mit dem Editor.</p>
 
-        <p>In den Bildern 2 bis 6 finden Sie einige selbstdefinierte Befehle. Die Befehle J und LEAVE in Bild 3 möchte ich näher erklären. J gibt den Schleifenwert der zweitinnersten Schleife aus. Die Befehle R > und > R manipulieren den Returnstack (der Returnstack funktioniert genauso wie der normale Stack). Hier werden Werte für Schleifen zwischengespeichert und zwar im Format Endwert, Zähler. R > holt den obersten Wert des Returnstacks auf den Stack, > R tut das Gegenteil. Die 704 ist nur Zwischenspeicher. LEAVE schließt eine Schleife vorzeitig ab, indem Endwert und Zähler gleichgesetzt werden.</p>
+        <p>In den Bildern 2 bis 6 finden Sie einige selbstdefinierte Befehle. Die Befehle J und LEAVE in Bild 3 möchte ich näher erklären. J gibt den Schleifenwert der zweitinnersten Schleife aus. Die Befehle R> und >R manipulieren den Returnstack (der Returnstack funktioniert genauso wie der normale Stack). Hier werden Werte für Schleifen zwischengespeichert und zwar im Format Endwert, Zähler. R> holt den obersten Wert des Returnstacks auf den Stack, >R tut das Gegenteil. Die 704 ist nur Zwischenspeicher. LEAVE schließt eine Schleife vorzeitig ab, indem Endwert und Zähler gleichgesetzt werden.</p>
 
         <p>Viel Spaß beim Programmieren in Forth.</p>
 
         <address class="author">(Alexander Schindowski/ev)</address>
 
-        <p class="source">Info: Literatur zu Forth:<br>
-            — Paul M. Chirlien, Der Einstieg in Forth, Markt &amp; Technik 1985, 338 Seiten, 58 Mark.<br />
-            — E. Floegel, Forth-Handbuch, Ing. W. Hofacker Verlag 1983, 192 Seiten, 39 Mark.,<br />
-            — Monadjemi, Das Trainingsbuch zu Forth, Data Becker 1985, 300 Seiten, 39 Mark.<br />
-            — Ronald Zech, Die Programmiersprache Forth, Franzis-Verlag 1984, 312 Seiten, 69 Mark.<br />
-            — Weitere Literatur mit Informationen über Forth sind zu beziehen über die deutsche Sektion der Forth Interest Group (FIG). Kontaktadresse: Forth Gesellschaft Deutschland (F16), Postfach 20 22 64, 2000 Hamburg 20. Da die FIG nicht kommerziell arbeitet, bitte bei Anfragen Freiumschlag beifügen.</p>
+        <p class="source">Info: Literatur zu Forth:</p>
+
+        <ul class="source">
+            <li>Paul M. Chirlien, Der Einstieg in Forth, Markt &amp; Technik 1985, 338 Seiten, 58 Mark.</li>
+            <li>E. Floegel, Forth-Handbuch, Ing. W. Hofacker Verlag 1983, 192 Seiten, 39 Mark.,</li>
+            <li>Monadjemi, Das Trainingsbuch zu Forth, Data Becker 1985, 300 Seiten, 39 Mark.</li>
+            <li>Ronald Zech, Die Programmiersprache Forth, Franzis-Verlag 1984, 312 Seiten, 69 Mark.</li>
+            <li>Weitere Literatur mit Informationen über Forth sind zu beziehen über die deutsche Sektion der Forth Interest Group (FIG). Kontaktadresse: Forth Gesellschaft Deutschland (FIG), Postfach 20 22 64, 2000 Hamburg 20. Da die FIG nicht kommerziell arbeitet, bitte bei Anfragen Freiumschlag beifügen.</li>
+        </ul>
 
         <figure>
-            <table>
-                <tbody>
-                    <tr>
+            <table class="plain">
+                <tbody>                    
+                    <tr>                        
                         <td>1) Rechenoperationen:</td>
                         <td><br></td>
                     </tr>
                     <tr>
-                        <td>1.1) +</td>
+                        <td><p>1.1) +</p></td>
                         <td>(n2 n1 - - - n3)</td>
                     </tr>
                     <tr>
-                        <td>1.2) -</td>
+                        <td><p>1.2) -</p></td>
                         <td>{n2 n1 - - - n3)</td>
                     </tr>
                     <tr>
-                        <td>1.3) *</td>
+                        <td><p>1.3) *</p></td>
                         <td>(n2 n1 - - - n3)</td>
                     </tr>
                     <tr>
-                        <td>1.4) /</td>
+                        <td><p>1.4) /</p></td>
                         <td>(n2 n1 - - - n3)</td>
                     </tr>
                     <tr>
-                        <td>1.5) MOD</td>
+                        <td><p>1.5) MOD</p></td>
                         <td>(n2 n1 - - - n3)</td>
                     </tr>
+                    <tr><td colspan="2"><br></td></tr>
                     <tr>
                         <td>2) Vergleichsoperatoren:</td>
                         <td><br></td>
                     </tr>
                     <tr>
-                        <td>2.1) =</td>
+                        <td><p>2.1) =</p></td>
                         <td>(n2 n1 - - - f)</td>
                     </tr>
                     <tr>
-                        <td>2.2) &gt;</td>
+                        <td><p>2.2) &gt;</p></td>
                         <td>(n2 n1 - - - f)</td>
                     </tr>
                     <tr>
-                        <td>2.3) &lt;</td>
+                        <td><p>2.3) &lt;</p></td>
                         <td>(n2 n1 - - - f)</td>
                     </tr>
+                    <tr><td colspan="2"><br></td></tr>
                     <tr>
                         <td>3) Logische Verknüpfungen:</td>
                     </tr>
                     <tr>
-                        <td>3.1) AND</td>
+                        <td><p>3.1) AND</p></td>
                         <td>(n2 n1 - - - n3)</td>
                     </tr>
                     <tr>
-                        <td>3.2) OR</td>
+                        <td><p>3.2) OR</p></td>
                         <td>(n2 n1 - - - n3)</td>
                     </tr>
                     <tr>
-                        <td>3.3) NOT</td>
+                        <td><p>3.3) NOT</p></td>
                         <td>(f1 - - - f2)</td>
                     </tr>
                     <tr>
-                        <td>3.4) XOR</td>
+                        <td><p>3.4) XOR</p></td>
                         <td>(n2 n1 - - - n3)</td>
                     </tr>
+                    <tr><td colspan="2"><br></td></tr>
                     <tr>
                         <td>4) Stackoperatoren:</td>
                         <td><br></td>
                     </tr>
                     <tr>
-                        <td>4.0) DROP</td>
+                        <td><p>4.0) DROP</p></td>
                         <td>(n1 - - -)</td>
                     </tr>
                     <tr>
-                        <td>4.1) DUP</td>
+                        <td><p>4.1) DUP</p></td>
                         <td>(n1 - - - n1 n1)</td>
                     </tr>
                     <tr>
-                        <td>4.2) SWAP</td>
+                        <td><p>4.2) SWAP</p></td>
                         <td>(n2 n1 - - - n1 n2)</td>
                     </tr>
                     <tr>
-                        <td>4.3) OVER</td>
+                        <td><p>4.3) OVER</p></td>
                         <td>(n2 n1 - - - n2 n1 n2)</td>
                     </tr>
                     <tr>
-                        <td>4.4) PICK</td>
+                        <td><p>4.4) PICK</p></td>
                         <td>(n1 n - - - n1 n2)</td>
                     </tr>
                     <tr>
-                        <td>4.5) ROT</td>
+                        <td><p>4.5) ROT</p></td>
                         <td>(n3 n2 n1 - - - n2 n1 n3)</td>
                     </tr>
                     <tr>
-                        <td>4.6) @</td>
+                        <td><p>4.6) @</p></td>
                         <td>(addr - - - n1)</td>
                     </tr>
                     <tr>
-                        <td>4.7) !</td>
+                        <td><p>4.7) !</p></td>
                         <td>(n1 addr - - -)</td>
                     </tr>
                     <tr>
-                        <td>4.8) c@</td>
+                        <td><p>4.8) c@</p></td>
                         <td>(addr - - - b1)</td>
                     </tr>
                     <tr>
-                        <td>4.9) c'</td>
-                        <td>{b1 addr - - -)</td>
+                        <td><p>4.9) c!</p></td>
+                        <td>(b1 addr - - -)</td>
                     </tr>
+                    <tr><td colspan="2"><br></td></tr>
                     <tr>
                         <td>5) Kontrollstrukturen:</td>
                         <td><br></td>
                     </tr>
                     <tr>
-                        <td>5.1) BEGIN — UNTIL</td>
+                        <td><p>5.1) BEGIN — UNTIL</p></td>
                         <td>(f - - -)</td>
                     </tr>
                     <tr>
-                        <td>5.2) BEGIN — WHILE -</td>
-                        <td>- REPRAT (f - - -)</td>
-                    </tr>
-                    <tr>
-                        <td>5.3) IF - ENDIF</td>
+                        <td><p>5.2) BEGIN — WHILE — REPRAT</p></td>
                         <td>(f - - -)</td>
                     </tr>
                     <tr>
-                        <td>5.4) IF - ELSE — END</td>
-                        <td>HF (f - - -)</td>
+                        <td><p>5.3) IF — ENDIF</p></td>
+                        <td>(f - - -)</td>
                     </tr>
+                    <tr>
+                        <td><p>5.4) IF — ELSE — ENDIF</p></td>
+                        <td>(f - - -)</td>
+                    </tr>
+                    <tr><td colspan="2"><br></td></tr>
                     <tr>
                         <td>6) Definitionsworte:</td>
                         <td><br></td>
                     </tr>
                     <tr>
-                        <td>6.1) VARIABLE</td>
+                        <td><p>6.1) VARIABLE</p></td>
                         <td>(n - - -)</td>
                     </tr>
                     <tr>
-                        <td>6.2) CONSTANT</td>
+                        <td><p>6.2) CONSTANT</p></td>
                         <td>(n - - -)</td>
                     </tr>
                     <tr>
-                        <td>6.3) MEMORY</td>
+                        <td><p>6.3) MEMORY</p></td>
                         <td>(n - - -)</td>
                     </tr>
                     <tr>
-                        <td>6.4) : ... ;</td>
+                        <td><p>6.4) : ... ;</p></td>
                         <td><br></td>
                     </tr>
+                    <tr><td colspan="2"><br></td></tr>
                     <tr>
                         <td>7) Ein-/Ausgabe:</td>
                         <td><br></td>
                     </tr>
                     <tr>
-                        <td>7.1) EXPECT</td>
+                        <td><p>7.1) EXPECT</p></td>
                         <td>(addr n - - -)</td>
                     </tr>
                     <tr>
-                        <td>7.2) TYPE</td>
+                        <td><p>7.2) TYPE</p></td>
                         <td>(addr n - - -)</td>
                     </tr>
                     <tr>
-                        <td>7.3) KEY</td>
+                        <td><p>7.3) KEY</p></td>
                         <td>(- - - c)</td>
                     </tr>
                     <tr>
-                        <td>7.4) GET</td>
+                        <td><p>7.4) GET</p></td>
                         <td>(- - - c)</td>
                     </tr>
                     <tr>
-                        <td>7.5) EMIT</td>
+                        <td><p>7.5) EMIT</p></td>
                         <td>(c - - -)</td>
                     </tr>
                     <tr>
-                        <td>7.6) ."</td>
+                        <td><p>7.6) ."</p></td>
                         <td>(- - -)</td>
                     </tr>
                     <tr>
-                        <td>7-7) •</td>
+                        <td><p>7-7) •</p></td>
                         <td>(n - - -)</td>
                     </tr>
                     <tr>
-                        <td>7.8) CR</td>
+                        <td><p>7.8) CR</p></td>
                         <td>(---)</td>
                     </tr>
                     <tr>
-                        <td>7.9) CLS</td>
+                        <td><p>7.9) CLS</p></td>
                         <td>(- - -)</td>
                     </tr>
+                    <tr><td colspan="2"><br></td></tr>
                     <tr>
                         <td>8) Schleifen:</td>
                         <td><br></td>
                     </tr>
                     <tr>
-                        <td>8.1) DO</td>
+                        <td><p>8.1) DO</p></td>
                         <td>(n2 n1 - - -)</td>
                     </tr>
                     <tr>
-                        <td>8.2) LOOP</td>
+                        <td><p>8.2) LOOP</p></td>
                         <td>(- - -)</td>
                     </tr>
                     <tr>
-                        <td>8.3) +LOOP</td>
+                        <td><p>8.3) +LOOP</p></td>
                         <td>(n - - -)</td>
                     </tr>
                     <tr>
-                        <td>8.4) I</td>
+                        <td><p>8.4) I</p></td>
                         <td>(- - - n)</td>
                     </tr>
+                    <tr><td colspan="2"><br></td></tr>
                     <tr>
                         <td>9) Sonstige Befehle:</td>
                         <td><br></td>
                     </tr>
                     <tr>
-                        <td>9.1) call</td>
+                        <td><p>9.1) call</p></td>
                         <td>(addr - - -)</td>
                     </tr>
                     <tr>
-                        <td>9.2) &gt;R</td>
+                        <td><p>9.2) &gt;R</p></td>
                         <td>(n - - -)</td>
                     </tr>
                     <tr>
-                        <td>9.3) R&gt;</td>
+                        <td><p>9.3) R&gt;</p></td>
                         <td>(- - - n)</td>
                     </tr>
                     <tr>
-                        <td>9.4) DEPTH</td>
+                        <td><p>9.4) DEPTH</p></td>
                         <td>(- - - n)</td>
                     </tr>
                 </tbody>
@@ -549,10 +571,11 @@
         </figure>
 
         <figure>
-            <table>
+            <table class="plain">
                 <tbody>
                     <tr>
-                        <td><b>A,X,I,Z Lauf- und Hilfsvariablen</b></td>
+                        <td>A,X,I,Z</td>
+                        <td>Lauf- und Hilfsvariablen</td>
                     </tr>
                     <tr>
                         <td>VOC</td>
@@ -624,7 +647,7 @@
         </figure>
 
         <figure>
-            <table>
+            <table class="plain">
                 <tbody>
                     <tr>
                         <td>BASIC</td>
@@ -676,7 +699,7 @@
         </figure>
 
         <figure>
-            <table>
+            <table class="plain">
                 <tbody>
                     <tr>
                         <td>E</td>
