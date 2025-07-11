@@ -11,7 +11,7 @@
     <meta name="64er.head1" content="Tips und Tricks">
     <meta name="64er.head2" content="C 64">
     <meta name="64er.toc_category" content="Listing zum Abtippen|Tips & Tricks">
-    <meta name="64er.id" content="wiespaet">
+    <meta name="64er.id" content="wiespät">
 </head>
 
 <body>
@@ -25,17 +25,17 @@
 
         <h2>Was bedeutet Interrupt?</h2>
 
-        <p>Der C 64 unterbricht etwajede 60stel Sekunde das laufende Programm und überprüft, ob eine Taste (vielleicht RUN/STOP-RESTORE) gedrückt wurde oder ob ein angeschlossenes Gerät Daten empfangen oder senden kann.</p>
+        <p>Der C 64 unterbricht etwa jede 60stel Sekunde das laufende Programm und überprüft, ob eine Taste (vielleicht RUN/STOP-RESTORE) gedrückt wurde oder ob ein angeschlossenes Gerät Daten empfangen oder senden kann.</p>
 
-        <p>Wird ein Interrupt ausgelöst, sieht der C 64 in zwei Adressen ($314, $315) der Zeropage nach, bei welcher Adresse das Interrupt-Programm beginnt. Im Normalfall bei $EA31. Da die Zeropage zum RAM-Speicher gehört, kann der C 64 auf eigene Interrupt-Routinen umgelenkt werden. Im Normalfall endet ein eigenes Interrupt-Programm mit dem Assemblerbefehl JMP$EA31, was heißt, daß der Computer mit der »serienmäßigen« Routine weitermachen soll.</p>
+        <p>Wird ein Interrupt ausgelöst, sieht der C 64 in zwei Adressen ($314, $315) der Zeropage nach, bei welcher Adresse das Interrupt-Programm beginnt. Im Normalfall bei $EA31. Da die Zeropage zum RAM-Speicher gehört, kann der C 64 auf eigene Interrupt-Routinen umgelenkt werden. Im Normalfall endet ein eigenes Interrupt-Programm mit dem Assemblerbefehl JMP $EA31, was heißt, daß der Computer mit der »serienmäßigen« Routine weitermachen soll.</p>
 
-        <p>Die CIAs 6526 (Complex Interface Adapter, vielseitiger Ein-/ Ausgabe-Baustein) regeln beim C 64 alles was mit Ein- und Ausgaben zusammenhängt. Dieser Baustein hat zwei Timer eingebaut. Einer davon steuert in der CIA auch eine 24-Stunden-Uhr (AM/PM) mit einer Auflösung von Y™ Sekunde. Die Uhr wird mit TOD (Time Of Day) bezeichnet. Die Zeit steht im BCD-Fbrmat in den Registern 8, 9, 10 und 11 der CIA 1. Die Ganggenauigkeit des Timer ergibt sich aus der Tatsache, daß er mit Netzfrequenz geregelt wird.</p>
+        <p>Die CIAs 6526 (Complex Interface Adapter, vielseitiger Ein-/Ausgabe-Baustein) regeln beim C 64 alles was mit Ein- und Ausgaben zusammenhängt. Dieser Baustein hat zwei Timer eingebaut. Einer davon steuert in der CIA auch eine 24-Stunden-Uhr (AM/PM) mit einer Auflösung von ⅒ Sekunde. Die Uhr wird mit TOD (Time Of Day) bezeichnet. Die Zeit steht im BCD-Fbrmat in den Registern 8, 9, 10 und 11 der CIA 1. Die Ganggenauigkeit des Timer ergibt sich aus der Tatsache, daß er mit Netzfrequenz geregelt wird.</p>
 
         <h2>Der Trick mit dem Interrupt</h2>
 
         <p>»CIA-Uhr« steht im Speicher von $C000 (49152) bis $C230 (49712). Das Programm wird mit SYS 49152, "Uhrzeit im HHMMSS-Format", "Alarmzeit" initialisiert. Dabei wird der Interrupt-Vektor (Inhalt der Adressen $314, $315) des C 64 so verändert, daß er auf $C036 zeigt. Danach wird die angegebene Uhrzeit und Alarmzeit gesetzt. Pro Interrupt wird nun die Uhrzeit rechts oben am Bildschirm gedruckt und mit der Alarmzeit verglichen. Stimmen die Zeiten überein, fängt der Computer an zu piepen. Und zwar so lange, bis der Alarm mit SYS 49704 abgeschaltet wird.</p>
 
-        <p>Das Programm unterscheidet zwischen Vor- und Nachmittag, obwohl die Uhrzeit nur im 12-Stunden-Format ausgegeben wird. Setzt man beispielsweise die Uhrzeit auf 1 Uhr und die Alarmzeitauf 13 Uhr, erscheintinderAnzeige01:00:00;0. Der Alarm wird aber erst 12 Stunden später ausgelöst. Die »0« hinter dem Strichpunkt gibt die 1Otel Sekunden an.</p>
+        <p>Das Programm unterscheidet zwischen Vor- und Nachmittag, obwohl die Uhrzeit nur im 12-Stunden-Format ausgegeben wird. Setzt man beispielsweise die Uhrzeit auf 1 Uhr und die Alarmzeitauf 13 Uhr, erscheint in der Anzeige 01:00:00;0. Der Alarm wird aber erst 12 Stunden später ausgelöst. Die »0« hinter dem Strichpunkt gibt die 10tel Sekunden an.</p>
 
         <p>Das Programm »CIA-Uhr« kann mit allen Basic-Erweiterungen benutzt werden, die den Interruptvektor nicht verändern und nicht den Speicherbereich von Adresse $C000 bis $C023 belegen.</p>
 
