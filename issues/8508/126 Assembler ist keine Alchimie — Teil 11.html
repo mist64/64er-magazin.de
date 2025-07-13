@@ -33,64 +33,37 @@
             <figcaption>Bild 1. So bearbeitet der C 64 normale IRQs. Das Programm wird im Text erklärt.</figcaption>
         </figure>
 
-        <p>TODO</p>
-
-        <p>65352 PHA Zunächst werden der Akku und die<br />
-            TXA Register X und Y auf den Stapel ge-<br />
-            PHA schoben<br />
-            TYA<br />
-            PHA</p>
-
-        <p>Trickreich sind die beiden folgenden Befehle, mit denen das zu Beginn durch die CPU gerettete Statusregister gelesen wird:</p>
-
-        <p>TODO</p>
-
-        <p>TSX Stapelzeiger ins X- Register<br />
-            LDA 260,X Einladen des Status-Registers</p>
-
-        <p>Nun wird geprüft, ob die BRK-Flagge gesetzt ist. Wenn das der Fall ist, dann ist der Auslöser ein BRK gewesen, ansonsten ein IRQ:</p>
-
-        <p>TODO</p>
-
-        <p>AND#16 Isolieren der BRK-Flagge<br />
-            BEQ 65368 Wenn keine BRK-Flagge, dann überspringen des nächsten Befehls.<br />
-            65365 JMP (790) Falls BRK<br />
-            65368 JMP (788) Falls IRQ</p>
-
-        <p>Den vorletzten Sprungbefehl werden wir bei der BRK-Behandlung verfolgen. Interessant für uns ist jetzt der indirekte Sprung bei 65368. Der Vektor 788/789 ($314/315) liegt im RAM! Damit können wir ihn auf eigene Routinen verstellen. Genau hier ist der Ansatzpunkt für nahezu alle Eingriffe in die Unterbrechungsbehandlung. Der voreingestellte Wert in diesem Vektor ist die Adresse 59953 ($EA31). Das dort angesiedelte Programm wird im Normalfall 60mal in der Sekunde ausgeführt:</p>
-
-        <p>TODO</p>
-
-        <p>59953 JSR 65514 Das ist ein Kernal-Sprungbefehl zur Routine UDTIM bei 63131.</p>
-
-        <p>In diesem Unterprogramm wird zuerst die Uhr TI$ weitergestellt und dann die Tastaturabfrage vorbereitet.</p>
-
-        <p>TODO TABLE</p>
-
-        <p>59956 bis 60000 In diesem Programmteil erfolgt die Cursorbehandlung.<br />
-            60001 bis 60026 Anschließend wird abgefragt, ob eine Recordertaste gedrückt ist und entsprechende Flaggen bearbeitet.<br />
-            60027 JSR 60039 Dieses Unterprogramm dient zur Tastaturabfrage.</p>
-
-        <p>Auch in dieser Routine tritt übrigens ein indirekter Sprung nach einem RAM-Vektor auf (655/656 = $28F/290), der normalerweise auf 60232 zeigt, aber auch auf eine eigene Routine verbogen werden könnte.</p>
-
-        <p>Enthalten in der Tastaturabfrage ist auch die Überprüfung der RUN/STOP-Taste, die aber nur zusammen mit den in dem UDTIM-Aufruf voreingestellten Flaggen funktioniert. Deshalb wird das Abschalten der RUN/STOP-Taste im allgemeinen dadurch durchgeführt, daß man den IRQ-Vektor auf 59956 stellt und damit den ersten JSR-Befehl überspringt. Allerdings wird auf diese Weise auch die TI$-Uhr nicht weitergestellt.</p>
-
-        <p>TODO</p>
-
-        <p>60030 LDA 56333 Das ist das Unterbrechungs-Kontrollregister des IRQ-CIA, das hier durch Auslesen gelöscht wird.</p>
-
-        <p>Den Abschluß der IRQ-Routine bildet nun noch das Zurückschreiben der Register:</p>
-
-        <p>TODO</p>
-
-        <p>60033 PLA Zurückholen des<br />
-            TAY Y- und<br />
-            PLA
-            TAX des X-Registers<br />
-            PLA sowie des Akku.<br />
-            60038 RTI Damit kehrt der Computer zu dem<br />
-            durch den IRQ unterbrochenen<br />
-            Programm zurück.</p>
+        <table class="plain nobreak1">
+            <tr><td><b>65352</b></td><td><b>PHA</b></td><td rowspan="5">Zunächst werden der Akku und die Register X und Y auf den Stapel geschoben</td></tr>
+            <tr><td></td><td><b>TXA</b></td></tr>
+            <tr><td></td><td><b>PHA</b></td></tr>
+            <tr><td></td><td><b>TYA</b></td></tr>
+            <tr><td></td><td><b>PHA</b></td></tr>
+            <tr><td colspan="3"><p>Trickreich sind die beiden folgenden Befehle, mit denen das zu Beginn durch die CPU gerettete Statusregister gelesen wird:</p></td></tr>
+            <tr><td></td><td><b>TSX</b></td><td>Stapelzeiger ins X- Register</td></tr>
+            <tr><td></td><td><b>LDA 260,X</b></td><td>Einladen des Status-Registers</td></tr>
+            <tr><td colspan="3"><p>Nun wird geprüft, ob die BRK-Flagge gesetzt ist. Wenn das der Fall ist, dann ist der Auslöser ein BRK gewesen, ansonsten ein IRQ:</p></td></tr>
+            <tr><td></td><td><b>AND #16</b></td><td>Isolieren der BRK-Flagge</td></tr>
+            <tr><td></td><td><b>BEQ 65368</b></td><td>Wenn keine BRK-Flagge, dann überspringen des nächsten Befehls.</td></tr>
+            <tr><td><b>65365</b></td><td><b>JMP (790)</b></td><td>Falls BRK</td></tr>
+            <tr><td><b>65368</b></td><td><b>JMP (788)</b></td><td>Falls IRQ</td></tr>
+            <tr><td colspan="3"><p>Den vorletzten Sprungbefehl werden wir bei der BRK-Behandlung verfolgen. Interessant für uns ist jetzt der indirekte Sprung bei 65368. Der Vektor 788/789 ($314/315) liegt im RAM! Damit können wir ihn auf eigene Routinen verstellen. Genau hier ist der Ansatzpunkt für nahezu alle Eingriffe in die Unterbrechungsbehandlung. Der voreingestellte Wert in diesem Vektor ist die Adresse 59953 ($EA31). Das dort angesiedelte Programm wird im Normalfall 60mal in der Sekunde ausgeführt:</p></td></tr>
+            <tr><td><b>59953</b></td><td><b>JSR 65514</b></td><td>Das ist ein Kernal-Sprungbefehl zur Routine UDTIM bei 63131.</td></tr>
+            <tr><td colspan="3"><p>In diesem Unterprogramm wird zuerst die Uhr TI$ weitergestellt und dann die Tastaturabfrage vorbereitet.</p></td></tr>
+            <tr><td><b>59956 bis 60000</b></td><td></td><td>In diesem Programmteil erfolgt die Cursorbehandlung.</td></tr>
+            <tr><td><b>60001 bis 60026</b></td><td></td><td>Anschließend wird abgefragt, ob eine Recordertaste gedrückt ist und entsprechende Flaggen bearbeitet.</td></tr>
+            <tr><td><b>60027</b></td><td><b>JSR 60039</b></td><td>Dieses Unterprogramm dient zur Tastaturabfrage.</td></tr>
+            <tr><td colspan="3"><p>Auch in dieser Routine tritt übrigens ein indirekter Sprung nach einem RAM-Vektor auf (655/656 = $28F/290), der normalerweise auf 60232 zeigt, aber auch auf eine eigene Routine verbogen werden könnte.</p></td></tr>
+            <tr><td colspan="3"><p>Enthalten in der Tastaturabfrage ist auch die Überprüfung der RUN/STOP-Taste, die aber nur zusammen mit den in dem UDTIM-Aufruf voreingestellten Flaggen funktioniert. Deshalb wird das Abschalten der RUN/STOP-Taste im allgemeinen dadurch durchgeführt, daß man den IRQ-Vektor auf 59956 stellt und damit den ersten JSR-Befehl überspringt. Allerdings wird auf diese Weise auch die TI$-Uhr nicht weitergestellt.</p></td></tr>
+            <tr><td><b>60030</b></td><td><b>LDA 56333</b></td><td>Das ist das Unterbrechungs-Kontrollregister des IRQ-CIA, das hier durch Auslesen gelöscht wird.</td></tr>
+            <tr><td colspan="3"><p>Den Abschluß der IRQ-Routine bildet nun noch das Zurückschreiben der Register:</p></td></tr>
+            <tr><td><b>60033</b></td><td><b>PLA</b></td><td>Zurückholen des</td></tr>
+            <tr><td></td><td><b>TAY</b></td><td>Y- und</td></tr>
+            <tr><td></td><td><b>PLA</b></td><td></td></tr>
+            <tr><td></td><td><b>TAX</b></td><td>des X-Registers</td></tr>
+            <tr><td></td><td><b>PLA</b></td><td>sowie des Akku.</td></tr>
+            <tr><td><b>60038</b></td><td><b>RTI</b></td><td>Damit kehrt der Computer zu dem durch den IRQ unterbrochenen Programm zurück.</td></tr>
+        </table>
 
         <p>Somit hätten wir's. Nun können wir je nach Bedarf entscheiden, welche von diesen Servicetätigkeiten wir bei einem eigenen IRQ-Programm brauchen: Die Uhr TI$, die Cursorbehandlung, die Abfrage der Recordertasten und die Tastaturabfrage.</p>
 
@@ -107,17 +80,13 @@
             <figcaption>Bild 2. Auf diese Weise verläuft ein unvorhergesehener BRK im Sande</figcaption>
         </figure>
 
-        <p>TODO</p>
-
-        <p>65126 JSR 64789 Sprung ins Programm RESTOR, in dem alle Vektoren (788-819) gemäß einer ROM-Liste auf ihre Ausgangswerte gesetzt werden.<br />
-            JSR 64931 Sprung in das Programm I/O-RESET.</p>
-
-        <p>In diesem Programm werden die beiden CIAs auf die Anfangswerte gestellt.</p>
-
-        <p>TODO</p>
-
-        <p>JSR 58648 Sprung in ein Programm, welches zuerst den VIC-II-Chip initialisiert, dann einen Bildschirmeditor-RESET durchführt. Nach Beenden dieser Routine ist der Bildschirm gelöscht.<br />
-            JMP (40962)</p>
+        <table class="plain nobreak1">
+            <tr><td><b>65126</b></td><td><b>JSR 64789</b></td><td>Sprung ins Programm RESTOR, in dem alle Vektoren (788-819) gemäß einer ROM-Liste auf ihre Ausgangswerte gesetzt werden.</td></tr>
+            <tr><td></td><td><b>JSR 64931</b></td><td>Sprung in das Programm I/O-RESET.</td></tr>
+            <tr><td colspan="3"><p>In diesem Programm werden die beiden CIAs auf die Anfangswerte gestellt.</p></td></tr>
+            <tr><td></td><td><b>JSR 58648</b></td><td>Sprung in ein Programm, welches zuerst den VIC-II-Chip initialisiert, dann einen Bildschirmeditor-RESET durchführt. Nach Beenden dieser Routine ist der Bildschirm gelöscht.</td></tr>
+            <tr><td></td><td><b>JMP (40962)</b></td><td></td></tr>
+        </table>
 
         <p>Mit diesem indirekten Sprung ist die BRK-Unterbrechung beendet. Man sieht aber jetzt schon deutlich, daß es sich hier nicht um eine Unterbrechung im eigentlichen Sinn handelt, vielmehr um einen Abbruch. In 40962/40963 steht die Adresse des Basic-Warmstarts (58235). Danach befindet sich der Computer im READY-Zustand in der Eingabe-Warteschleife.</p>
 
@@ -134,60 +103,41 @@
 
         <p>In der letzten Folge erfuhren wir, daß auch für diese Unterbrechung am Ende des Speichers ein Vektor vorhanden ist, nämlich $FFFA/FFFB (65530/65531). Dort steht die Adresse 65091 ($FE43), die nun in den Programmzähler gelangt und damit startet das folgende Programm:</p>
 
-        <p>TODO</p>
-
-        <p>65091 SEI Unterbrechungen niedrigerer Priorität werden gesperrt.<br />
-            JMP (792)</p>
-
-        <p>Das ist nun wieder ein für uns sehr interessanter Vektor 792/793 ($318/319), der — weil er im RAM-Bereich liegt — verstellbar ist. Genau das haben wir am Ende der letzten Folge getan mittels des M-Kommandos von SMON um den NMI zu testen, den wir mit der RESTORE-Taste ausgelöst haben. Der voreingestellte Wert in diesem Vektor ist die Adresse 65095 ($FE47), also direkt der nächste Befehl nach dem indirekten Sprungbefehl.</p>
-
-        <p>TODO</p>
-
-        <p>65095 PHA Ebenso wie vorhin beim IRQ werden<br />
-            TXA hier die Inhalte des Akku und der<br />
-            PHA Register auf den Stapel geschoben.<br />
-            TYA<br />
-            PHA<br />
-            LDA #127 das ist binär 01111111.<br />
-            STA 56589 Sperrt alle weiteren NMI-Anforderungen<br />
-            LDY 56589 NMI-CIA Kontrollregister laden.<br />
-            BMI 65138 Wenn der NMI von der RESTORE-Taste kam, ist Bit 7 des Registers = 0, sonst = 1 (bei NMI-Anforderung durch NMI-CIA). Wenn also nicht durch die RESTORE-Taste, erfolgt Sprung.</p>
-
-        <p>An dieser Stelle läuft nun das Programm weiter, wenn die RESTORE-Taste der NMI-Auslöser war:</p>
-
-        <p>TODO</p>
-
-        <p>65110 JSR 64770 Das ist ein Unterprogramm, welches prüft, ob ein Modul ab $8000 vorhanden ist.</p>
-
-        <p>Dies wird dadurch angezeigt, daß von $8004 bis $8008 die Werte stehen: 195, 194, 205, 56, 48 (das ist "CBM80).</p>
-
-        <p>BNE 65118 Wenn kein Modulprogramm ab $8000 vorliegt, erfolgt ein Sprung.<br />
-            JMP (32770) Falls Modul.</p>
-
-        <p>Wenn ein Modul angezeigt wurde, erfolgt der indirekte Sprung nach den Vektor $8002/8003, der vom Modul vorgegeben wird. Das kann man auch nutzen, um eigene Maschinenprogramme zu starten durch einen Druck auf die RESTORE-Taste. Man muß dann nur in die Speicherstellen $8002 bis 8008 die geforderte Zieladresse beziehungsweise »CBM80« schreiben.</p>
-
-        <p>Der nun folgende Abschnitt wird nur angesprungen, wenn die RESTORE-Taste der NMI-Auslöser war:</p>
-
-        <p>65118 JSR 63164 Das ist ein Programmteil, der auch schon von der IRQ-Routine (nach dem Weiterstellen von TI$) durchlaufen wird. Hier werden einige Voreinstellungen für die Tastaturabfrage erledigt, die insbesonders die RUN/STOP-Taste betreffen.<br />
-            JSR 65505 Kernalroutine STOP</p>
-
-        <p>Dort befindet sich ein indirekter Sprung über den Vektor 808/809 ($328/329), also auch ein verstellbarer RAM-Vektor. Im Normalfall zeigt dieser Vektor auf 63213 ($F6ED). Dort wird geprüft, ob die RUN/STOP-Taste gedrückt ist. Eine andere Methode zum Ausschalten des RUN/STOP bietet sich hier an, die die Uhr TI$ ungeschoren läßt.</p>
-
-        <p>BNE 65138 Falls nur die RESTORE-Taste (also ohne RUN/STOP) gedrückt ist, erfolgt nun ein Sprung.</p>
-
-        <p>Waren aber sowohl die RUN/STOP- als auch die RESTORE-Taste gedrückt, dann folgt nun ein Programmabbruch, der uns schon von BRK her bekannt ist. Hier wie dort endet das Ganze dann mit dem Reset der I/O-Bausteine, des VIC-II-Chips, der Vektoren, des Bildschirmeditors und das Ergebnis ist ein Basic-Warmstart.</p>
-
-        <p>Ab 65138 befindet sich der Rest der NMI-Routine, auf die das Programm läuft, wenn<br />
-            1) die NMI-Anforderung nicht von der RESTORE-Taste kommt oder<br />
-            2) zwar von dieser Taste kommt, aber die RUN/STOP-Taste nicht gedrückt ist.</p>
-
-        <p>65138 bis 65211 Dieser ganze Abschnitt ist zur Behandlung der RS232C-Schnittstelle eingerichtet.<br />
-            65212 PLA Abschluß des NMI durch Rückschreiben des Akku und der Register vom Stapel<br />
-            TAY<br />
-            PLA<br />
-            TAX<br />
-            PLA<br />
-            65217 RTI Rückkehr zum unterbrochenen Programm.</p>
+        <table class="plain nobreak1">
+            <tr><td><b>65091</b></td><td><b>SEI</b></td><td>Unterbrechungen niedrigerer Priorität werden gesperrt.</td></tr>
+            <tr><td></td><td><b>JMP (792)</b></td><td></td></tr>
+            <tr><td colspan="3"><p>Das ist nun wieder ein für uns sehr interessanter Vektor 792/793 ($318/319), der — weil er im RAM-Bereich liegt — verstellbar ist. Genau das haben wir am Ende der letzten Folge getan mittels des M-Kommandos von SMON um den NMI zu testen, den wir mit der RESTORE-Taste ausgelöst haben. Der voreingestellte Wert in diesem Vektor ist die Adresse 65095 ($FE47), also direkt der nächste Befehl nach dem indirekten Sprungbefehl.</p></td></tr>
+            <tr><td><b>65095</b></td><td><b>PHA</b></td><td rowspan="5">Ebenso wie vorhin beim IRQ werden hier die Inhalte des Akku und der Register auf den Stapel geschoben.</td></tr>
+            <tr><td></td><td><b>TXA</b></td></tr>
+            <tr><td></td><td><b>PHA</b></td></tr>
+            <tr><td></td><td><b>TYA</b></td></tr>
+            <tr><td></td><td><b>PHA</b></td></tr>
+            <tr><td></td><td><b>LDA #127</b></td><td>das ist binär 01111111.</td></tr>
+            <tr><td></td><td><b>STA 56589</b></td><td>Sperrt alle weiteren NMI-Anforderungen</td></tr>
+            <tr><td></td><td><b>LDY 56589</b></td><td>NMI-CIA Kontrollregister laden.</td></tr>
+            <tr><td></td><td><b>BMI 65138</b></td><td>Wenn der NMI von der RESTORE-Taste kam, ist Bit 7 des Registers = 0, sonst = 1 (bei NMI-Anforderung durch NMI-CIA). Wenn also nicht durch die RESTORE-Taste, erfolgt Sprung.</td></tr>
+            <tr><td colspan="3"><p>An dieser Stelle läuft nun das Programm weiter, wenn die RESTORE-Taste der NMI-Auslöser war:</p></td></tr>
+            <tr><td><b>65110</b></td><td><b>JSR 64770</b></td><td>Das ist ein Unterprogramm, welches prüft, ob ein Modul ab $8000 vorhanden ist.</td></tr>
+            <tr><td colspan="3"><p>Dies wird dadurch angezeigt, daß von $8004 bis $8008 die Werte stehen: 195, 194, 205, 56, 48 (das ist "CBM80).</p></td></tr>
+            <tr><td></td><td><b>BNE 65118</b></td><td>Wenn kein Modulprogramm ab $8000 vorliegt, erfolgt ein Sprung.</td></tr>
+            <tr><td></td><td><b>JMP (32770)</b></td><td>Falls Modul.</td></tr>
+            <tr><td colspan="3"><p>Wenn ein Modul angezeigt wurde, erfolgt der indirekte Sprung nach den Vektor $8002/8003, der vom Modul vorgegeben wird. Das kann man auch nutzen, um eigene Maschinenprogramme zu starten durch einen Druck auf die RESTORE-Taste. Man muß dann nur in die Speicherstellen $8002 bis 8008 die geforderte Zieladresse beziehungsweise »CBM80« schreiben.</p></td></tr>
+            <tr><td colspan="3"><p>Der nun folgende Abschnitt wird nur angesprungen, wenn die RESTORE-Taste der NMI-Auslöser war:</p></td></tr>
+            <tr><td><b>65118</b></td><td><b>JSR 63164</b></td><td>Das ist ein Programmteil, der auch schon von der IRQ-Routine (nach dem Weiterstellen von TI$) durchlaufen wird. Hier werden einige Voreinstellungen für die Tastaturabfrage erledigt, die insbesonders die RUN/STOP-Taste betreffen.</td></tr>
+            <tr><td></td><td><b>JSR 65505</b></td><td>Kernalroutine STOP</td></tr>
+            <tr><td colspan="3"><p>Dort befindet sich ein indirekter Sprung über den Vektor 808/809 ($328/329), also auch ein verstellbarer RAM-Vektor. Im Normalfall zeigt dieser Vektor auf 63213 ($F6ED). Dort wird geprüft, ob die RUN/STOP-Taste gedrückt ist. Eine andere Methode zum Ausschalten des RUN/STOP bietet sich hier an, die die Uhr TI$ ungeschoren läßt.</p></td></tr>
+            <tr><td></td><td><b>BNE 65138</b></td><td>Falls nur die RESTORE-Taste (also ohne RUN/STOP) gedrückt ist, erfolgt nun ein Sprung.</td></tr>
+            <tr><td colspan="3"><p>Waren aber sowohl die RUN/STOP- als auch die RESTORE-Taste gedrückt, dann folgt nun ein Programmabbruch, der uns schon von BRK her bekannt ist. Hier wie dort endet das Ganze dann mit dem Reset der I/O-Bausteine, des VIC-II-Chips, der Vektoren, des Bildschirmeditors und das Ergebnis ist ein Basic-Warmstart.</p></td></tr>
+            <tr><td colspan="3"><p>Ab 65138 befindet sich der Rest der NMI-Routine, auf die das Programm läuft, wenn<ol><li>die NMI-Anforderung nicht von der RESTORE-Taste kommt oder</li><li>zwar von dieser Taste kommt, aber die RUN/STOP-Taste nicht gedrückt ist.</li></ol></p></td></tr>
+            <tr><td colspan="2"><b>65138 bis 65211</b></td><td>Dieser ganze Abschnitt ist zur Behandlung der RS232C-Schnittstelle eingerichtet.</td></tr>
+            <tr><td><b>65212</b></td><td><b>PLA</b></td><td rowspan="5">Abschluß des NMI durch Rückschreiben des Akku und der Register vom Stapel</td></tr>
+            <tr><td></td><td><b>TAY</b></td></tr>
+            <tr><td></td><td><b>PLA</b></td></tr>
+            <tr><td></td><td><b>TAX</b></td></tr>
+            <tr><td></td><td><b>PLA</b></td></tr>
+            <tr><td><b>65217</b></td><td><b>RTI</b></td><td></td></tr>
+            <tr><td colspan="3"></td></tr>
+        </table>
 
         <p>Wenn Sie sich nun mal unser kleines Demo-Programm aus der letzten Folge ansehen, dann werden Sie feststellen, daß der Programmteil bis $600E lediglich den ersten Teil der normalen NMI-Routine kopiert. Die Prüfung auf das Modul und die RUN/STOP-Taste werden übersprungen. Statt dessen erfolgt nach der Abarbeitung des für die RESTORE-Taste gebauten Programmes das Ende der NMI-Routine ($FEBC = 65212). Im anderen Fall, wenn also die RESTORE-Taste nicht der Auslöser des NMI war, wird in die normale Routine ab 65138 eingemündet.</p>
 
@@ -202,20 +152,18 @@
 
         <p>Dieser Vektor liegt in $FFFC/FFFD. Der Inhalt ist die Adresse 64738 ($FCE2) und genau dort geht das Programm dann weiter:</p>
 
-        <p>64738 LDX # 255 Im ersten Teil wird der Stapelspeicher initialisiert.<br />
-            SEI Verhindern von IRQ<br />
-            TXS Stapelzeiger auf $FF<br />
-            CLD Dezimal-Modus ausschalten (falls er eingeschaltet war).<br />
-            JSR 64770 Das ist wieder das Unterprogramm, das auf ein Modul prüft.</p>
-
-        <p>Hier ergibt sich die Möglichkeit, auch beim RESET einzugreifen, indem man die Kennung CBM80 an die abgefragten Orte packt.</p>
-
-        <p>BNE 64751 Falls kein Modul, erfolgt Sprung.<br />
-            64748 JMP(32768)</p>
-
-        <p>Dieser indirekte Sprung erfolgt nach dem Vektorinhalt von $8000/8001 = 32768/32769. Das ist ein anderer Vektor als wir ihn vorhin beim NMI hatten (dort war es $8002/8003 = 32770/32771). So kann ein anderer Programmteil angesteuert werden als durch den NMI, was übrigens auch dringend erforderlich ist, weil der Stapelzeiger zerstört wurde.</p>
-
-        <p>64751 Hier läuft das Programm weiter, falls keine Modulkennung erkannt wurde.</p>
+        <table class="plain nobreak1">
+            <tr><td><b>64738</b></td><td><b>LDX #255</b></td><td>Im ersten Teil wird der Stapelspeicher initialisiert.</td></tr>
+            <tr><td></td><td><b>SEI</b></td><td>Verhindern von IRQ</td></tr>
+            <tr><td></td><td><b>TXS</b></td><td>Stapelzeiger auf $FF</td></tr>
+            <tr><td></td><td><b>CLD</b></td><td>Dezimal-Modus ausschalten (falls er eingeschaltet war).</td></tr>
+            <tr><td></td><td><b>JSR 64770</b></td><td>Das ist wieder das Unterprogramm, das auf ein Modul prüft.</td></tr>
+            <tr><td colspan="3"><p>Hier ergibt sich die Möglichkeit, auch beim RESET einzugreifen, indem man die Kennung CBM80 an die abgefragten Orte packt.</p></td></tr>
+            <tr><td></td><td><b>BNE 64751</b></td><td>Falls kein Modul, erfolgt Sprung.</td></tr>
+            <tr><td><b>64748</b></td><td><b>JMP(32768)</b></td><td></td></tr>
+            <tr><td colspan="3"><p>Dieser indirekte Sprung erfolgt nach dem Vektorinhalt von $8000/8001 = 32768/32769. Das ist ein anderer Vektor als wir ihn vorhin beim NMI hatten (dort war es $8002/8003 = 32770/32771). So kann ein anderer Programmteil angesteuert werden als durch den NMI, was übrigens auch dringend erforderlich ist, weil der Stapelzeiger zerstört wurde.</p></td></tr>
+            <tr><td><b>64751</b></td><td></td><td>Hier läuft das Programm weiter, falls keine Modulkennung erkannt wurde.</td></tr>
+        </table>
 
         <p>Der ganze Rest dient dem Versetzen des Computers in den Einschaltzustand. Allerdings bin ich davon überzeugt, daß noch irgendein Unterschied bestehen muß zwischen dem einfachen Aus- und wieder Anschalten des Computers und einem RESET. Es hat sich nämlich bei einigen Programmen gezeigt, daß sie nach einem RESET fehlerhafte Verläufe nehmen können, was nach einem totalen Aus- und wieder Anschalten nicht zu beobachten war. Der Grund für diesen Unterschied liegt (für mich) noch im Dunkel. Vielleicht weiß das ja jemand von Ihnen. Dann schreiben Sie doch mal!</p>
 
