@@ -1303,6 +1303,7 @@ def write_full_html_file(db, path, title, preview_img, body_html, body_class, co
 <html lang="{LANG}">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta property="og:title" content="{title}">
     <meta property="og:image" content="{preview_img}">
     <title>{title}</title>
