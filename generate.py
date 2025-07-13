@@ -1598,7 +1598,8 @@ def parse_course_part_number(article):
         return None
     
     # Match pattern: "Title (Teil X)" where X is a number
-    match = re.match(r'^(.+?)\s*\(Teil\s+(\d+)\)$', title.strip())
+    # Look for the FIRST occurrence of (Teil X) pattern, not the last
+    match = re.match(r'^(.+?)\s*\(Teil\s+(\d+)\)', title.strip())
     if match:
         base_title = match.group(1).strip()
         part_number = int(match.group(2))
