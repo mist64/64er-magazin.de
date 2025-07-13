@@ -1647,12 +1647,20 @@ def build_course_series_map(db):
             expected_part += 1
         
         if missing_parts:
-            print(f"\nERROR: Course Series Missing Parts in '{base_title}':")
-            print(f"   Missing parts: {', '.join(map(str, missing_parts))}")
-            print(f"   Found parts: {', '.join(str(p[1]) for p in parts_list)}")
-            for article, part_num in parts_list:
-                print(f"     {article.issue_key}: {index_title(article)} (Teil {part_num})")
-            raise SystemExit(f"Database inconsistency: Course series '{base_title}' has missing parts. Fix the database.")
+            if CONFIG.build_issues:
+                print(f"\nWARNING: Course Series Missing Parts in '{base_title}':")
+                print(f"   Missing parts: {', '.join(map(str, missing_parts))}")
+                print(f"   Found parts: {', '.join(str(p[1]) for p in parts_list)}")
+                for article, part_num in parts_list:
+                    print(f"     {article.issue_key}: {index_title(article)} (Teil {part_num})")
+                print(f"   Note: This is only a warning when using --issues flag")
+            else:
+                print(f"\nERROR: Course Series Missing Parts in '{base_title}':")
+                print(f"   Missing parts: {', '.join(map(str, missing_parts))}")
+                print(f"   Found parts: {', '.join(str(p[1]) for p in parts_list)}")
+                for article, part_num in parts_list:
+                    print(f"     {article.issue_key}: {index_title(article)} (Teil {part_num})")
+                raise SystemExit(f"Database inconsistency: Course series '{base_title}' has missing parts. Fix the database.")
         
         # Only include series with multiple parts
         if len(parts_list) > 1:
