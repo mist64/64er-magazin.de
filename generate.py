@@ -1584,7 +1584,155 @@ def convert_and_copy_image(img_path, dest_img_path):
         shutil.copy(dest_img_path, cache_path)
 
 
-def copy_and_modify_html(article, html_dest_path, pdf_path, prev_page_link, next_page_link):
+def parse_course_part_number(article):
+    """Extract part number from course article using title fallback logic.
+    
+    Uses index_title with fallback to toc_title, then title.
+    Expects format like 'Title (Teil X)' and returns (base_title, part_number)
+    or None if not a course article.
+    """
+    # Use the existing fallback logic
+    title = index_title(article)
+    
+    if not title:
+        return None
+    
+    # Match pattern: "Title (Teil X)" where X is a number
+    # Look for the FIRST occurrence of (Teil X) pattern, not the last
+    # Handle cases like "(Teil 3; Schluß)" by allowing additional text after the number
+    match = re.match(r'^(.+?)\s*\(Teil\s+(\d+)(?:[;\s].*?)?\)', title.strip())
+    if match:
+        base_title = match.group(1).strip()
+        part_number = int(match.group(2))
+        
+        return (base_title, part_number)
+    
+    return None
+
+
+
+
+def build_course_series_map(db):
+    """Build a mapping of course series from the database.
+    
+    Returns a dict mapping course base titles to lists of (article, part_number) tuples,
+    sorted by part number. Validates that series are complete with no missing parts.
+    """
+    course_series = defaultdict(list)
+    
+    # Group articles by course series
+    for article in db.articles:
+        # Only consider articles in "Kurse" category
+        if not (article.index_category and article.index_category.startswith(f"{LABEL_TUTORIALS}|")):
+            continue
+            
+        course_info = parse_course_part_number(article)
+        if course_info:
+            base_title, part_number = course_info
+            course_series[base_title].append((article, part_number))
+    
+    # Sort each series by part number and validate completeness
+    validated_series = {}
+    for base_title, parts_list in course_series.items():
+        # Sort by part number
+        parts_list.sort(key=lambda x: x[1])  # Sort by part_number
+        
+        # Validate that parts are consecutive starting from 1
+        expected_part = 1
+        missing_parts = []
+        for article, part_number in parts_list:
+            while part_number > expected_part:
+                missing_parts.append(expected_part)
+                expected_part += 1
+            expected_part += 1
+        
+        if missing_parts:
+            print(f"\nERROR: Course Series Missing Parts in '{base_title}':")
+            print(f"   Missing parts: {', '.join(map(str, missing_parts))}")
+            print(f"   Found parts: {', '.join(str(p[1]) for p in parts_list)}")
+            for article, part_num in parts_list:
+                print(f"     {article.issue_key}: {index_title(article)} (Teil {part_num})")
+            raise SystemExit(f"Database inconsistency: Course series '{base_title}' has missing parts. Fix the database.")
+        
+        # Only include series with multiple parts
+        if len(parts_list) > 1:
+            validated_series[base_title] = parts_list
+    
+    return validated_series
+
+
+def generate_course_navigation(article, course_series_map, db):
+    """Generate course navigation HTML for a given article.
+    
+    Returns HTML string for navigation or None if article is not part of a course series.
+    """
+    course_info = parse_course_part_number(article)
+    if not course_info:
+        return None
+    
+    base_title, current_part = course_info
+    
+    if base_title not in course_series_map:
+        return None
+    
+    series = course_series_map[base_title]
+    total_parts = len(series)
+    
+    # Find current article's position in series by part number
+    current_index = None
+    for i, (series_article, part_number) in enumerate(series):
+        if part_number == current_part:
+            current_index = i
+            break
+    
+    if current_index is None:
+        return None
+    
+    nav_parts = []
+    nav_parts.append('<div class="course_navigation">')
+    nav_parts.append(f'<div class="course_title">Kurs: {base_title}</div>')
+    nav_parts.append('<div class="course_nav_links">')
+    
+    # Previous part link (or invisible placeholder)
+    if current_index > 0:
+        prev_article, prev_part = series[current_index - 1]
+        prev_issue = db.issues[prev_article.issue_key]
+        if prev_article.issue_key == article.issue_key:
+            # Same issue - just use filename
+            prev_path = article_path(prev_issue, prev_article, prepend_issue_dir=False)
+        else:
+            # Different issue - use relative path
+            prev_path = f"../{article_path(prev_issue, prev_article, prepend_issue_dir=True)}"
+        nav_parts.append(f'<a href="{prev_path}" class="course_nav_prev">◀ Teil {prev_part}</a>')
+    else:
+        # Invisible placeholder to maintain symmetry
+        nav_parts.append('<span class="course_nav_placeholder"></span>')
+    
+    # Current part indicator
+    nav_parts.append(f'<span class="course_nav_current">Teil {current_part}</span>')
+    
+    # Next part link (or invisible placeholder)
+    if current_index < len(series) - 1:
+        next_article, next_part = series[current_index + 1]
+        next_issue = db.issues[next_article.issue_key]
+        if next_article.issue_key == article.issue_key:
+            # Same issue - just use filename
+            next_path = article_path(next_issue, next_article, prepend_issue_dir=False)
+        else:
+            # Different issue - use relative path
+            next_path = f"../{article_path(next_issue, next_article, prepend_issue_dir=True)}"
+        nav_parts.append(f'<a href="{next_path}" class="course_nav_next">Teil {next_part} ▶</a>')
+    else:
+        # Invisible placeholder to maintain symmetry
+        nav_parts.append('<span class="course_nav_placeholder"></span>')
+    
+    nav_parts.append('</div>')
+    nav_parts.append('</div>')
+    
+    return ''.join(nav_parts)
+
+
+def copy_and_modify_html(article, html_dest_path, pdf_path, prev_page_link, next_page_link, course_series_map, db):
     """Modifies, and writes an HTML file directly to the destination."""
     soup = article.html
     issue_number = article.issue_key
@@ -1610,6 +1758,12 @@ def copy_and_modify_html(article, html_dest_path, pdf_path, prev_page_link, next
 '''
     custom_div_soup = BeautifulSoup(custom_div_html, 'html.parser')
     body.insert(0, custom_div_soup)
+
+    # Insert course navigation if this article is part of a course series
+    course_nav_html = generate_course_navigation(article, course_series_map, db)
+    if course_nav_html:
+        course_nav_soup = BeautifulSoup(course_nav_html, 'html.parser')
+        body.insert(1, course_nav_soup)  # Insert after the head_line div
 
     # Augment the Fehlerteufelchen <asides> with a full size Fehlerteufelchen
     asides = soup.find_all("aside", { "class" : "fehlerteufelchen" } )
@@ -1650,6 +1804,11 @@ def copy_and_modify_html(article, html_dest_path, pdf_path, prev_page_link, next
 {mastodon_html}
 </div>'''
 
+    # Insert course navigation again at the end (before PDF downloads)
+    if course_nav_html:
+        course_nav_soup_end = BeautifulSoup(course_nav_html, 'html.parser')
+        body.append(course_nav_soup_end)
+    
     article_actions_soup = BeautifulSoup(article_actions_html, 'html.parser')
     body.append(article_actions_soup) # pdf download and mastodon
 
@@ -1739,6 +1898,9 @@ def copy_and_modify_html(article, html_dest_path, pdf_path, prev_page_link, next
 def copy_articles_and_assets(db, in_directory, out_directory):
     if not os.path.exists(out_directory):
         os.makedirs(out_directory)
+    
+    # Build course series map for navigation
+    course_series_map = build_course_series_map(db)
 
     # copy globals: images, stylesheet, javascript and fonts
     shutil.copy(os.path.join(in_directory, 'logo.svg'), out_directory)
@@ -1864,7 +2026,7 @@ def copy_articles_and_assets(db, in_directory, out_directory):
 
             # Process and copy HTML files with navigation header etc.
             html_dest_path = os.path.join(issue_dest_path, article.target_filename)
-            copy_and_modify_html(article, html_dest_path, pdf_path, prev_page_link, next_page_link)
+            copy_and_modify_html(article, html_dest_path, pdf_path, prev_page_link, next_page_link, course_series_map, db)
             article_index += 1
 
         # Set timestamps for all files in the issue directory
