@@ -1621,7 +1621,7 @@ def build_course_series_map(db):
     # Group articles by course series
     for article in db.articles:
         # Only consider articles in "Kurse" category
-        if not (article.index_category and article.index_category.startswith("Kurse|")):
+        if not (article.index_category and article.index_category.startswith(f"{LABEL_TUTORIALS}|")):
             continue
             
         course_info = parse_course_part_number(article)
