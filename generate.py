@@ -1659,7 +1659,7 @@ def build_course_series_map(db):
     return validated_series
 
 
-def generate_course_navigation(article, course_series_map):
+def generate_course_navigation(article, course_series_map, db):
     """Generate course navigation HTML for a given article.
     
     Returns HTML string for navigation or None if article is not part of a course series.
@@ -1758,7 +1758,7 @@ def copy_and_modify_html(article, html_dest_path, pdf_path, prev_page_link, next
     body.insert(0, custom_div_soup)
 
     # Insert course navigation if this article is part of a course series
-    course_nav_html = generate_course_navigation(article, course_series_map)
+    course_nav_html = generate_course_navigation(article, course_series_map, db)
     if course_nav_html:
         course_nav_soup = BeautifulSoup(course_nav_html, 'html.parser')
         body.insert(1, course_nav_soup)  # Insert after the head_line div
