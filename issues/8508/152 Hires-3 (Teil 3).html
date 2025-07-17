@@ -53,8 +53,14 @@
         <p>Das sind Aufgaben, die der VIC-II-Chip zu erledigen hat. Dafür ist er ebenfalls mit einer IRQ-Steuermöglichkeit ausgestattet. Zwei Register spielen hier die entscheidende Rolle:</p>
 
         <table class="plain">
-            <tr><td>53273 ($D019)</td><td>Interrupt Latch Register, auch Interrupt Request- oder Interrupt Status-Register genannt.</td></tr>
-            <tr><td>53274 ($D01A)</td><td>Interrupt Enable Register</td></tr>
+            <tr>
+                <td>53273 ($D019)</td>
+                <td>Interrupt Latch Register, auch Interrupt Request- oder Interrupt Status-Register genannt.</td>
+            </tr>
+            <tr>
+                <td>53274 ($D01A)</td>
+                <td>Interrupt Enable Register</td>
+            </tr>
         </table>
 
         <p>Der Aufbau beider Speicherstellen ist identisch. Bit 0 ist die zum Rasterinterrupt gehörige Flagge, Bit 1 hat mit Sprite/Hintergrund-Kollisionen zu tun, Bit 2 mit Kollisionen von Sprites untereinander, Bit 3 wird bei der Lichtgriffel-Benutzung angesprochen. Die Bits 4, 5 und 6 sind unbenutzt. Bit 7 ist immer dann gesetzt (oder muß in 53274 gesetzt werden), wenn eines der anderen Bits angesprochen wird (siehe Bild 2).</p>
@@ -69,8 +75,14 @@
         <p>Rasterzeileninterrupt bedeutet, daß ab einer bestimmten Rasterzeile unser Computer in das Interruptprogramm springen soll, welches wir durch Einschreiben in den Vektor 788/789 definiert haben. Dazu muß dem VIC-II-Chip natürlich noch gesagt werden, welche Rasterzeile wir wählen wollen. Falls Sie über den Begriff »Rasterzeile« stolpern, dann sehen Sie in der 8. und 7. Folge der Grafik-Serie nochmal nach, wie der Computer das Bild auf Ihrem Monitor (oder Fernsehgerät) zusammenbaut. Diese Mitteilung an den VIC-II-Chip geschieht wieder über zwei Register:</p>
 
         <table class="plain">
-            <tr><td>53265 ($D011)</td><td>Hiervon aber nur Bit 7</td></tr>
-            <tr><td>53266 ($D012)</td><td>Das ganze Register</td></tr>
+            <tr>
+                <td>53265 ($D011)</td>
+                <td>Hiervon aber nur Bit 7</td>
+            </tr>
+            <tr>
+                <td>53266 ($D012)</td>
+                <td>Das ganze Register</td>
+            </tr>
         </table>
 
         <p>Die Sache verhält sich wie bei der X-Position von Sprites: Es können Zahlen auftreten, die größer als 255 sind. Wir haben den ganzen Bildschirm in 280 Rasterzeilen vorliegen (wobei das sichtbare Fenster etwa von Zeile 40 bis Zeile 240 reicht). Um beispielsweise die größtmögliche Rasterzeilen-Zahl 280 binär darzustellen, braucht man 9 Bits:
@@ -86,90 +98,423 @@
         <p>Das gesamte Programm besteht aus drei Teilen: Anschalten (Initialisieren) des Rasterzeileninterrupt, eigentliche Interrupt-Routine und Abschalten. Bei der Initialisierung muß zunächst der Inhalt der Textfenster gelöscht werden, denn dort steht ja für den Hochauflösungsmodus der Farbcode drin. Das geschieht in zwei Schleifen:</p>
 
         <table class="plain">
-            <tr><td><b>89B8</b></td><td><b>LDA #20</b></td><td>Code für »Space« in Akku</td></tr>
-            <tr><td><b>89BA</b></td><td><b>LDX #27</b></td><td>X-Register als Index mit dezimal 39 geladen</td></tr>
-            <tr><td><b>89BC</b></td><td><b>STA 8C00,X</b></td><td>Leerzeichen in Zeile 0 des Bildschirmspeichers beginnt in HIRES-3 ja bei 8C00)</td></tr>
-            <tr><td><b>89BF</b></td><td><b>STA 8F48,X</b></td><td>und in die 21. Zeile</td></tr>
-            <tr><td><b>89C2</b></td><td><b>DEX</b></td><td></td></tr>
-            <tr><td><b>89C3</b></td><td><b>BPL 89BC</b></td><td>das geschieht so lange, bis 40 Leerzeichen eingeschrieben sind, also die Zeilen 0 und 21 gelöscht wurden.</td></tr>
-            <tr><td colspan="3"></td><p>Jetzt kümmern wir uns noch um die letzten drei Zeilen:</p></tr>
-            <tr><td><b>89C5</b></td><td><b>LDX #77</b></td><td>X-Indez auf 119</td></tr>
-            <tr><td><b>89C7</b></td><td><b>STA 8F70,X</b></td><td>das Leerzeichen wird nun in die letzten drei Zeilen geschrieben</td></tr>
-            <tr><td><b>89CA</b></td><td><b>DEX</b></td><td>bis alle 120 Bildschirmpositionen gelöscht</td></tr>
-            <tr><td><b>89CB</b></td><td><b>BPL 89C7</b></td><td>sind.</td></tr>
-            <tr><td colspan="3"><p>Nun kommen wir zum Verbiegen des IRQ Zeigers:</p></td></tr>
-            <tr><td><b>89CD</b></td><td><b>SEI</b></td><td>Während dieser Prozedur können wir keine Interrupts gestatten</td></tr>
-            <tr><td><b>89CE</b></td><td><b>LDA #EC</b></td><td>LSB der Startadresse unserer IRQ-Routine</td></tr>
-            <tr><td><b>89D0</b></td><td><b>STA 0314</b></td><td>in LSB des IRQ-Zeigers.</td></tr>
-            <tr><td><b>89D3</b></td><td><b>LDA #89</b></td><td>MSB der Startadresse</td></tr>
-            <tr><td><b>89D5</b></td><td><b>STA 0315</b></td><td>in MSB des IRQ-Zeigers.</td></tr>
-            <tr><td colspan="3"><p>Wir schreiben nun unsere erste Rasterzeile (58= $3A) in das Rasterzeilenregister 53265/53266:</p></td></tr>
-            <tr><td><b>89D8</b></td><td><b>LDA #3A</b></td><td>Nummer der Rasterzeile, von der an vom Text- in den Grafik-Modus umgeschaltet wird. Im weiteren obere Position genannt.</td></tr>
-            <tr><td><b>89DA</b></td><td><b>STA D012</b></td><td>das ist Register 53266</td></tr>
-            <tr><td><b>89DD</b></td><td><b>LAD D011</b></td><td>Register 53265 wird in den Akku geladen</td></tr>
-            <tr><td><b>89E0</b></td><td><b>AND #7F</b></td><td>mit der AND-Maske $7F = binär 0111 1111 wird ein eventuell vorhandenes Bit 7 gelöscht</td></tr>
-            <tr><td><b>89E2</b></td><td><b>STA D011</b></td><td>der so veränderte Inhalt wird ins Register zurückgeschrieben.</td></tr>
-            <tr><td colspan="3"><p>Als letztes in der Initialisierungsphase müssen wir noch eine Maske ins Interrupt Enable Register 53274 schreiben um anzuzeigen, daß und vor allem welchen IRQ wir zulassen: </p></td></tr>
-            <tr><td><b>89E5</b></td><td><b>LAD #81</b></td><td>das ist binär 1000&nbsp;0001</td></tr>
-            <tr><td><b>89E7</b></td><td><b>STA D01A</b></td><td>das ist das IRQ Enable Register</td></tr>
-            <tr><td><b>89EA</b></td><td><b>CLI</b></td><td>jetzt dürfen wieder Interrupts geschehen</td></tr>
-            <tr><td><b>89EB</b></td><td><b>RTS</b></td><td>Rücksprung zum aufrufenden Programm.</td></tr>
-            <tr><td colspan="3"><p>Von nun an durchläuft jeder IRQ-Aufruf unsere ab $89EC vorhandene Routine. Das betrifft sowohl die IRQs, die von den Timern des CIA stammen, als auch die Rasterzeileninterrupts. Dann wollen wir mal schleunigst dafür sorgen, daß dort auch wirklich eine Routine steht! Zuerst überprüfen wir, ob eine Interruptanforderung auch wirklich von VIC-II-Chip her kommt:</p></td></tr>
-            <tr><td><b>89EC</b></td><td><b>LDA D019</b></td><td>Wir laden das Interrupt Request Register 53273 in den Akku</td></tr>
-            <tr><td><b>89EF</b></td><td><b>STA D019</b></td><td>und löschen es sofort wieder durch zurückschreiben</td></tr>
-            <tr><td><b>89F2</b></td><td><b>BMI 89FB</b></td><td>war Bit 7 gesetzt, dann lag ein IRQ vom VIC-II-Chip vor, also unser Rasterzeileninterrupt. In diesem Fall überspringen wir die nächsten Zeilen.</td></tr>
-            <tr><td colspan="3"><p>War Bit 7 in diesem Register nicht gesetzt, dann kam die IRQ-Anforderung vom CIA und wir benutzen die normale IRQ-Routine:</p></td></tr>
-            <tr><td><b>89F4</b></td><td><b>LDA DC0D</b></td><td>das ist das IRQ-Register des CIA und wir müssen den Anfang der normalen IRQ-Routine simulieren. Das geschieht hier durch Auslesen des CIA-Register (hier wird es auf diese Weise gelöscht)</td></tr>
-            <tr><td><b>89F7</b></td><td><b>CLI</b></td><td>wir löschen die IRQ-Flagge, um während des Timer-Interrupt einen Rasterzeileninterrupt zuzulassen</td></tr>
-            <tr><td><b>89F8</b></td><td><b>JMP EA31</b></td><td>wir springen zur normalen IRQ-Routine.</td></tr>
-            <tr><td colspan="3"><p>Nun kommt der Teil, den wir per Rasterzeileninterrupt ansteuern. Erst mal müssen wir feststellen, ob die IRQ-Anforderung durch die obere oder die untere Position erfolgt ist:</p></td></tr>
-            <tr><td><b>89FB</b></td><td><b>LDA D012</b></td><td>das ist das Rasterzeilenregister 53266</td></tr>
-            <tr><td><b>89FE</b></td><td><b>CMP #DA</b></td><td>$DA = dezimal 218, also die untere Position</td></tr>
-            <tr><td><b>8A00</b></td><td><b>BCS 8A1F</b></td><td>kam die IRQ-Anforderung durch die untere Position zustande, dann wird zur dazugehörigen Routine verzweigt.</td></tr>
-            <tr><td colspan="3"><p>Nach all diesen Vorkehrungen kommt der Programmablauf hier an, wenn die obere Position für einen Rasterzeileninterrupt verantwortlich ist. Hier soll der Wechsel vom Text- zum Hochauflösungsmodus stattfinden. Für das Anschalten dieses Modus waren ja (siehe Folge 3 der Grafik-Serie) die Register 53265 ($D011) und 53272 ($D018) zuständig:</p></td></tr>
-            <tr><td><b>8A02</b></td><td><b>LDA #38</b></td><td>Maske binär 0011 1000 in Akku</td></tr>
-            <tr><td><b>8A04</b></td><td><b>LDY #3B</b></td><td>Make binär 0011 1011 in Y-Register</td></tr>
-            <tr><td><b>8A06</b></td><td><b>STA D018</b></td><td>Akku-Maske in Register 53272</td></tr>
-            <tr><td><b>8A09</b></td><td><b>STY D011</b></td><td>Y-Register-Maske in Register 53265.</td></tr>
-            <tr><td colspan="3"><p>Damit wurde der Hochauflösungsmodus eingeschaltet und im folgenden Bildschirmteil wird der Bit-Map-Inhalt dargestellt. Es gibt nun ein Problem, das ich in den nächsten Programmzeilen einigermaßen lösen möchte. Unter dem Grafikbild werden wieder 4 Textzeilen eingerichtet. Sobald der Text dort über Zeile 24 hinausreicht, erzwingt das Betriebssystem ein Hochscrollen des Bildschirm-RAM-Inhaltes. Das drückt sich an zwei Stellen aus: Textzeilen schieben sich in den unteren Teil des Grafik-Bildes hinein, wo sie als farbige Quadrate stören. Zum zweiten scrollt der Inhalt der Kopfzeile aus dem Bildschirm und dafür treten die Farbcodes aus dem oberen Teil des Grafik-Bildes dort hinein und zeigen ein Sammelsurium von Zeichen. Für das zweite Problem, also die Zerstörung der Kopfzeile, werde ich hier keine Lösung angeben. Die finden Leser des Assembler-Kurses in der Ausgabe 2/1985 des 64'er-Magazins. Mit ein wenig Geschick können Sie das Programm zum Rückschreiben der Kopfzeile um- und hier einbauen. Aber auch das andere Problem ist zwar gelöst, aber noch nicht ganz zufriedenstellend. Wir schreiben einfach beijedem Rasterzeilen-IRQ in den unteren Rand des Grafik-Schirmes die Farbcodes hinein:</p></td></tr>
-            <tr><td><b>8A0C</b></td><td><b>LDX #27</b></td><td>das ist wieder der Zähler, den wir schon von der Initialisierung her kennen</td></tr>
-            <tr><td><b>8A0E</b></td><td><b>LDA 8E26</b></td><td>aus irgendeinem Bildschirmspeicherplatz des Hochauflösungsbildes wird der Farbcode entnommen und in den Akku gelegt</td></tr>
-            <tr><td><b>8A11</b></td><td><b>STA 8F20,X</b></td><td>dieser Farbcode wird in die letzte Grafikzeile geschrieben</td></tr>
-            <tr><td><b>8A14</b></td><td><b>DEX</b></td><td></td></tr>
-            <tr><td><b>8A15</b></td><td><b>BPL 8A11</b></td><td>das geschieht, bis die ganze Zeile neu beschrieben wurde.</td></tr>
-            <tr><td colspan="3"><p>Es zeigt sich, daß auf diese Weise das Problem zwar gelöst wurde, daß sich aber bei häufigem Scrollen, zum Beispiel beim LISTen eines Programmes, manchmal ein kleines Flackern ergibt. Eine andere Möglichkeit, diese Scroll-Frage in den Griff zu bekommen, wäre natürlich die Veränderung der Scroll-Routine des Betriebssystems gewesen. Dazu hätte man allerdings die RAM-Bereiche unter den ROMs verwenden müssen, was — abgesehen von einer Unmenge verplemperten Speicherplatzes — auch Schwierigkeiten mit unserer Bit-Map unter dem Basic-ROM ergeben hätte. Falls Sie eine bessere Lösung wissen, dann schreiben Sie mir. So können wir vielleicht gemeinsam Hires-3 vervollkommnen.</p></td></tr>
-            <tr><td colspan="3"><p>Aber unser Programm ist noch nicht fertig. Wir müssen an den zweiten Moduswechsel denken. Dazu schreiben wir in das Rasterzeilenregister jetzt die untere Position ein:</p></td></tr>
-            <tr><td><b>8A17</b></td><td><b>LDA #DA</b></td><td>das ist die Rasterzeilen-Nummer der unteren Position</td></tr>
-            <tr><td><b>8A19</b></td><td><b>STA D012</b></td><td>da haben wir wieder unser Rasterzeilen-Register. Von nun an wird der IRQ von dieser unteren Position ausgelöst.</td></tr>
-            <tr><td><b>8A1C</b></td><td><b>JMP EA81</b></td><td>schließlich springen wir zum Ende der normalen IRQ-Routine.</td></tr>
-            <tr><td colspan="3"><p>Wenn jetzt der nächste Rasterzeilen-Interrupt ausgelöst wird, dann muß er auf ein Programm laufen, das den Textmodus einrichtet:</p></td></tr>
-            <tr><td><b>8A1F</b></td><td><b>LDA #34</b></td><td>Maske binär 0011&nbsp;0100 in Akku</td></tr>
-            <tr><td><b>8A21</b></td><td><b>LDY #1B</b></td><td>Maske binär 0001&nbsp;1011 in Y-Register</td></tr>
-            <tr><td><b>8A23</b></td><td><b>STA D018</b></td><td>Akku-Maske in Register 53272</td></tr>
-            <tr><td><b>8A26</b></td><td><b>STA D011</b></td><td>Y-Register-Maske in Register 53265</td></tr>
-            <tr><td colspan="3"><p>Damit ist der Textmodus wieder eingeschaltet. Wir müssen nun noch dafür sorgen, daß der Wert der oberen Position ins Rasterzeilenregister eingetragen wird:</p></td></tr>
-            <tr><td><b>8A29</b></td><td><b>LDA #3A</b></td><td>dies ist unsere obere Position</td></tr>
-            <tr><td><b>8A2B</b></td><td><b>STA D012</b></td><td>Wir stellen das Rasterzeilenregister wieder auf diese obere Position</td></tr>
-            <tr><td><b>8A2E</b></td><td><b>JMP EA81</b></td><td>Abschließend erfolgt wieder der Sprung zum Ende der normalen IRQ-Routine.</td></tr>
-            <tr><td colspan="3"><p>Damit ist die eigentliche IRQ-Routine abgeschlossen. Wenn wir aberjemals wieder zu normalen Verhältnissen zurückkehren wollen, dann sollten wir auch noch einen Programmteil zum Abschalten des Rasterzeileninterrupt konstruieren. Das geschieht zunächst einmal durch Löschen des Interrupt Request Registers im VIC-II-Chip:</p></td></tr>
-            <tr><td><b>8A31</b></td><td><b>SEI</b></td><td>Wir wollen beim Abschalten nicht durch umhervagabundierende IRQs gestört werden.</td></tr>
-            <tr><td><b>8A32</b></td><td><b>LDA #00</b></td><td></td></tr>
-            <tr><td><b>8A34</b></td><td><b>STA D01A</b></td><td>Durch Einschreiben einer Null wird Register 53274 gelöscht</td></tr>
-            <tr><td colspan="3"><p>Dann stellen wir den IRQ-Zeiger wieder auf die normale Routine $EA31:</p></td></tr>
-            <tr><td><b>8A37</b></td><td><b>LDA #31</b></td><td>LSB der IRQ-Adresse</td></tr>
-            <tr><td><b>8A39</b></td><td><b>STA 0314</b></td><td>in LSB des IRQ-Zeigers</td></tr>
-            <tr><td><b>8A3C</b></td><td><b>LDA #EA</b></td><td>MSB der IRQ-Adresse</td></tr>
-            <tr><td><b>8A3E</b></td><td><b>STA 0315</b></td><td>in MSB des IRQ-Zeigers</td></tr>
-            <tr><td><b>8A41</b></td><td><b>CLI</b></td><td>Jetzt darf wieder unterbrochen werden</td></tr>
-            <tr><td colspan="3"><p>Zu guter Letzt soll nach Beendigung des Rasterzeilen-Interrupt der Hochauflösungszustand wiederhergestellt werden für den ganzen Bildschirm, und die Eintragungen in den Textzeilen müssen gegen den Farbcode ausgetauscht werden:</p></td></tr>
-            <tr><td><b>8A42</b></td><td><b>LDA #38</b></td><td></td></tr>
-            <tr><td><b>8A44</b></td><td><b>LDY #3B</b></td><td></td></tr>
-            <tr><td><b>8A46</b></td><td><b>STA D018</b></td><td></td></tr>
-            <tr><td><b>8A49</b></td><td><b>STY D011</b></td><td>Das alles kennen Sie schon von weiter oben im Programm (ab 8A02)</td></tr>
-            <tr><td><b>8A4C</b></td><td><b>LDA 8E26</b></td><td>wieder laden wir den Farbcode einer beliebigen Bildschirmspeicherzelle in den Akku</td></tr>
-            <tr><td><b>8A4F</b></td><td><b>JSR 9532</b></td><td>Diese Routine füllt den gesamten Bildschirmspeicher mit dem Akku-Inhalt.</td></tr>
-            <tr><td><b>8A52</b></td><td><b>RTS</b></td><td>Rücksprung zum aufrufenden Programm</td></tr>
-            <tr><td colspan="3"></td></tr>
+            <tr>
+                <td><b>89B8</b></td>
+                <td><b>LDA #20</b></td>
+                <td>Code für »Space« in Akku</td>
+            </tr>
+            <tr>
+                <td><b>89BA</b></td>
+                <td><b>LDX #27</b></td>
+                <td>X-Register als Index mit dezimal 39 geladen</td>
+            </tr>
+            <tr>
+                <td><b>89BC</b></td>
+                <td><b>STA 8C00,X</b></td>
+                <td>Leerzeichen in Zeile 0 des Bildschirmspeichers beginnt in HIRES-3 ja bei 8C00)</td>
+            </tr>
+            <tr>
+                <td><b>89BF</b></td>
+                <td><b>STA 8F48,X</b></td>
+                <td>und in die 21. Zeile</td>
+            </tr>
+            <tr>
+                <td><b>89C2</b></td>
+                <td><b>DEX</b></td>
+                <td></td>
+            </tr>
+            <tr>
+                <td><b>89C3</b></td>
+                <td><b>BPL 89BC</b></td>
+                <td>das geschieht so lange, bis 40 Leerzeichen eingeschrieben sind, also die Zeilen 0 und 21 gelöscht wurden.</td>
+            </tr>
+            <tr>
+                <td colspan="3"></td>
+                <p>Jetzt kümmern wir uns noch um die letzten drei Zeilen:</p>
+            </tr>
+            <tr>
+                <td><b>89C5</b></td>
+                <td><b>LDX #77</b></td>
+                <td>X-Indez auf 119</td>
+            </tr>
+            <tr>
+                <td><b>89C7</b></td>
+                <td><b>STA 8F70,X</b></td>
+                <td>das Leerzeichen wird nun in die letzten drei Zeilen geschrieben</td>
+            </tr>
+            <tr>
+                <td><b>89CA</b></td>
+                <td><b>DEX</b></td>
+                <td>bis alle 120 Bildschirmpositionen gelöscht</td>
+            </tr>
+            <tr>
+                <td><b>89CB</b></td>
+                <td><b>BPL 89C7</b></td>
+                <td>sind.</td>
+            </tr>
+            <tr>
+                <td colspan="3">
+                    <p>Nun kommen wir zum Verbiegen des IRQ Zeigers:</p>
+                </td>
+            </tr>
+            <tr>
+                <td><b>89CD</b></td>
+                <td><b>SEI</b></td>
+                <td>Während dieser Prozedur können wir keine Interrupts gestatten</td>
+            </tr>
+            <tr>
+                <td><b>89CE</b></td>
+                <td><b>LDA #EC</b></td>
+                <td>LSB der Startadresse unserer IRQ-Routine</td>
+            </tr>
+            <tr>
+                <td><b>89D0</b></td>
+                <td><b>STA 0314</b></td>
+                <td>in LSB des IRQ-Zeigers.</td>
+            </tr>
+            <tr>
+                <td><b>89D3</b></td>
+                <td><b>LDA #89</b></td>
+                <td>MSB der Startadresse</td>
+            </tr>
+            <tr>
+                <td><b>89D5</b></td>
+                <td><b>STA 0315</b></td>
+                <td>in MSB des IRQ-Zeigers.</td>
+            </tr>
+            <tr>
+                <td colspan="3">
+                    <p>Wir schreiben nun unsere erste Rasterzeile (58= $3A) in das Rasterzeilenregister 53265/53266:</p>
+                </td>
+            </tr>
+            <tr>
+                <td><b>89D8</b></td>
+                <td><b>LDA #3A</b></td>
+                <td>Nummer der Rasterzeile, von der an vom Text- in den Grafik-Modus umgeschaltet wird. Im weiteren obere Position genannt.</td>
+            </tr>
+            <tr>
+                <td><b>89DA</b></td>
+                <td><b>STA D012</b></td>
+                <td>das ist Register 53266</td>
+            </tr>
+            <tr>
+                <td><b>89DD</b></td>
+                <td><b>LAD D011</b></td>
+                <td>Register 53265 wird in den Akku geladen</td>
+            </tr>
+            <tr>
+                <td><b>89E0</b></td>
+                <td><b>AND #7F</b></td>
+                <td>mit der AND-Maske $7F = binär 0111 1111 wird ein eventuell vorhandenes Bit 7 gelöscht</td>
+            </tr>
+            <tr>
+                <td><b>89E2</b></td>
+                <td><b>STA D011</b></td>
+                <td>der so veränderte Inhalt wird ins Register zurückgeschrieben.</td>
+            </tr>
+            <tr>
+                <td colspan="3">
+                    <p>Als letztes in der Initialisierungsphase müssen wir noch eine Maske ins Interrupt Enable Register 53274 schreiben um anzuzeigen, daß und vor allem welchen IRQ wir zulassen: </p>
+                </td>
+            </tr>
+            <tr>
+                <td><b>89E5</b></td>
+                <td><b>LAD #81</b></td>
+                <td>das ist binär 1000&nbsp;0001</td>
+            </tr>
+            <tr>
+                <td><b>89E7</b></td>
+                <td><b>STA D01A</b></td>
+                <td>das ist das IRQ Enable Register</td>
+            </tr>
+            <tr>
+                <td><b>89EA</b></td>
+                <td><b>CLI</b></td>
+                <td>jetzt dürfen wieder Interrupts geschehen</td>
+            </tr>
+            <tr>
+                <td><b>89EB</b></td>
+                <td><b>RTS</b></td>
+                <td>Rücksprung zum aufrufenden Programm.</td>
+            </tr>
+            <tr>
+                <td colspan="3">
+                    <p>Von nun an durchläuft jeder IRQ-Aufruf unsere ab $89EC vorhandene Routine. Das betrifft sowohl die IRQs, die von den Timern des CIA stammen, als auch die Rasterzeileninterrupts. Dann wollen wir mal schleunigst dafür sorgen, daß dort auch wirklich eine Routine steht! Zuerst überprüfen wir, ob eine Interruptanforderung auch wirklich von VIC-II-Chip her kommt:</p>
+                </td>
+            </tr>
+            <tr>
+                <td><b>89EC</b></td>
+                <td><b>LDA D019</b></td>
+                <td>Wir laden das Interrupt Request Register 53273 in den Akku</td>
+            </tr>
+            <tr>
+                <td><b>89EF</b></td>
+                <td><b>STA D019</b></td>
+                <td>und löschen es sofort wieder durch zurückschreiben</td>
+            </tr>
+            <tr>
+                <td><b>89F2</b></td>
+                <td><b>BMI 89FB</b></td>
+                <td>war Bit 7 gesetzt, dann lag ein IRQ vom VIC-II-Chip vor, also unser Rasterzeileninterrupt. In diesem Fall überspringen wir die nächsten Zeilen.</td>
+            </tr>
+            <tr>
+                <td colspan="3">
+                    <p>War Bit 7 in diesem Register nicht gesetzt, dann kam die IRQ-Anforderung vom CIA und wir benutzen die normale IRQ-Routine:</p>
+                </td>
+            </tr>
+            <tr>
+                <td><b>89F4</b></td>
+                <td><b>LDA DC0D</b></td>
+                <td>das ist das IRQ-Register des CIA und wir müssen den Anfang der normalen IRQ-Routine simulieren. Das geschieht hier durch Auslesen des CIA-Register (hier wird es auf diese Weise gelöscht)</td>
+            </tr>
+            <tr>
+                <td><b>89F7</b></td>
+                <td><b>CLI</b></td>
+                <td>wir löschen die IRQ-Flagge, um während des Timer-Interrupt einen Rasterzeileninterrupt zuzulassen</td>
+            </tr>
+            <tr>
+                <td><b>89F8</b></td>
+                <td><b>JMP EA31</b></td>
+                <td>wir springen zur normalen IRQ-Routine.</td>
+            </tr>
+            <tr>
+                <td colspan="3">
+                    <p>Nun kommt der Teil, den wir per Rasterzeileninterrupt ansteuern. Erst mal müssen wir feststellen, ob die IRQ-Anforderung durch die obere oder die untere Position erfolgt ist:</p>
+                </td>
+            </tr>
+            <tr>
+                <td><b>89FB</b></td>
+                <td><b>LDA D012</b></td>
+                <td>das ist das Rasterzeilenregister 53266</td>
+            </tr>
+            <tr>
+                <td><b>89FE</b></td>
+                <td><b>CMP #DA</b></td>
+                <td>$DA = dezimal 218, also die untere Position</td>
+            </tr>
+            <tr>
+                <td><b>8A00</b></td>
+                <td><b>BCS 8A1F</b></td>
+                <td>kam die IRQ-Anforderung durch die untere Position zustande, dann wird zur dazugehörigen Routine verzweigt.</td>
+            </tr>
+            <tr>
+                <td colspan="3">
+                    <p>Nach all diesen Vorkehrungen kommt der Programmablauf hier an, wenn die obere Position für einen Rasterzeileninterrupt verantwortlich ist. Hier soll der Wechsel vom Text- zum Hochauflösungsmodus stattfinden. Für das Anschalten dieses Modus waren ja (siehe Folge 3 der Grafik-Serie) die Register 53265 ($D011) und 53272 ($D018) zuständig:</p>
+                </td>
+            </tr>
+            <tr>
+                <td><b>8A02</b></td>
+                <td><b>LDA #38</b></td>
+                <td>Maske binär 0011 1000 in Akku</td>
+            </tr>
+            <tr>
+                <td><b>8A04</b></td>
+                <td><b>LDY #3B</b></td>
+                <td>Make binär 0011 1011 in Y-Register</td>
+            </tr>
+            <tr>
+                <td><b>8A06</b></td>
+                <td><b>STA D018</b></td>
+                <td>Akku-Maske in Register 53272</td>
+            </tr>
+            <tr>
+                <td><b>8A09</b></td>
+                <td><b>STY D011</b></td>
+                <td>Y-Register-Maske in Register 53265.</td>
+            </tr>
+            <tr>
+                <td colspan="3">
+                    <p>Damit wurde der Hochauflösungsmodus eingeschaltet und im folgenden Bildschirmteil wird der Bit-Map-Inhalt dargestellt. Es gibt nun ein Problem, das ich in den nächsten Programmzeilen einigermaßen lösen möchte. Unter dem Grafikbild werden wieder 4 Textzeilen eingerichtet. Sobald der Text dort über Zeile 24 hinausreicht, erzwingt das Betriebssystem ein Hochscrollen des Bildschirm-RAM-Inhaltes. Das drückt sich an zwei Stellen aus: Textzeilen schieben sich in den unteren Teil des Grafik-Bildes hinein, wo sie als farbige Quadrate stören. Zum zweiten scrollt der Inhalt der Kopfzeile aus dem Bildschirm und dafür treten die Farbcodes aus dem oberen Teil des Grafik-Bildes dort hinein und zeigen ein Sammelsurium von Zeichen. Für das zweite Problem, also die Zerstörung der Kopfzeile, werde ich hier keine Lösung angeben. Die finden Leser des Assembler-Kurses in der Ausgabe 2/1985 des 64'er-Magazins. Mit ein wenig Geschick können Sie das Programm zum Rückschreiben der Kopfzeile um- und hier einbauen. Aber auch das andere Problem ist zwar gelöst, aber noch nicht ganz zufriedenstellend. Wir schreiben einfach beijedem Rasterzeilen-IRQ in den unteren Rand des Grafik-Schirmes die Farbcodes hinein:</p>
+                </td>
+            </tr>
+            <tr>
+                <td><b>8A0C</b></td>
+                <td><b>LDX #27</b></td>
+                <td>das ist wieder der Zähler, den wir schon von der Initialisierung her kennen</td>
+            </tr>
+            <tr>
+                <td><b>8A0E</b></td>
+                <td><b>LDA 8E26</b></td>
+                <td>aus irgendeinem Bildschirmspeicherplatz des Hochauflösungsbildes wird der Farbcode entnommen und in den Akku gelegt</td>
+            </tr>
+            <tr>
+                <td><b>8A11</b></td>
+                <td><b>STA 8F20,X</b></td>
+                <td>dieser Farbcode wird in die letzte Grafikzeile geschrieben</td>
+            </tr>
+            <tr>
+                <td><b>8A14</b></td>
+                <td><b>DEX</b></td>
+                <td></td>
+            </tr>
+            <tr>
+                <td><b>8A15</b></td>
+                <td><b>BPL 8A11</b></td>
+                <td>das geschieht, bis die ganze Zeile neu beschrieben wurde.</td>
+            </tr>
+            <tr>
+                <td colspan="3">
+                    <p>Es zeigt sich, daß auf diese Weise das Problem zwar gelöst wurde, daß sich aber bei häufigem Scrollen, zum Beispiel beim LISTen eines Programmes, manchmal ein kleines Flackern ergibt. Eine andere Möglichkeit, diese Scroll-Frage in den Griff zu bekommen, wäre natürlich die Veränderung der Scroll-Routine des Betriebssystems gewesen. Dazu hätte man allerdings die RAM-Bereiche unter den ROMs verwenden müssen, was — abgesehen von einer Unmenge verplemperten Speicherplatzes — auch Schwierigkeiten mit unserer Bit-Map unter dem Basic-ROM ergeben hätte. Falls Sie eine bessere Lösung wissen, dann schreiben Sie mir. So können wir vielleicht gemeinsam Hires-3 vervollkommnen.</p>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="3">
+                    <p>Aber unser Programm ist noch nicht fertig. Wir müssen an den zweiten Moduswechsel denken. Dazu schreiben wir in das Rasterzeilenregister jetzt die untere Position ein:</p>
+                </td>
+            </tr>
+            <tr>
+                <td><b>8A17</b></td>
+                <td><b>LDA #DA</b></td>
+                <td>das ist die Rasterzeilen-Nummer der unteren Position</td>
+            </tr>
+            <tr>
+                <td><b>8A19</b></td>
+                <td><b>STA D012</b></td>
+                <td>da haben wir wieder unser Rasterzeilen-Register. Von nun an wird der IRQ von dieser unteren Position ausgelöst.</td>
+            </tr>
+            <tr>
+                <td><b>8A1C</b></td>
+                <td><b>JMP EA81</b></td>
+                <td>schließlich springen wir zum Ende der normalen IRQ-Routine.</td>
+            </tr>
+            <tr>
+                <td colspan="3">
+                    <p>Wenn jetzt der nächste Rasterzeilen-Interrupt ausgelöst wird, dann muß er auf ein Programm laufen, das den Textmodus einrichtet:</p>
+                </td>
+            </tr>
+            <tr>
+                <td><b>8A1F</b></td>
+                <td><b>LDA #34</b></td>
+                <td>Maske binär 0011&nbsp;0100 in Akku</td>
+            </tr>
+            <tr>
+                <td><b>8A21</b></td>
+                <td><b>LDY #1B</b></td>
+                <td>Maske binär 0001&nbsp;1011 in Y-Register</td>
+            </tr>
+            <tr>
+                <td><b>8A23</b></td>
+                <td><b>STA D018</b></td>
+                <td>Akku-Maske in Register 53272</td>
+            </tr>
+            <tr>
+                <td><b>8A26</b></td>
+                <td><b>STA D011</b></td>
+                <td>Y-Register-Maske in Register 53265</td>
+            </tr>
+            <tr>
+                <td colspan="3">
+                    <p>Damit ist der Textmodus wieder eingeschaltet. Wir müssen nun noch dafür sorgen, daß der Wert der oberen Position ins Rasterzeilenregister eingetragen wird:</p>
+                </td>
+            </tr>
+            <tr>
+                <td><b>8A29</b></td>
+                <td><b>LDA #3A</b></td>
+                <td>dies ist unsere obere Position</td>
+            </tr>
+            <tr>
+                <td><b>8A2B</b></td>
+                <td><b>STA D012</b></td>
+                <td>Wir stellen das Rasterzeilenregister wieder auf diese obere Position</td>
+            </tr>
+            <tr>
+                <td><b>8A2E</b></td>
+                <td><b>JMP EA81</b></td>
+                <td>Abschließend erfolgt wieder der Sprung zum Ende der normalen IRQ-Routine.</td>
+            </tr>
+            <tr>
+                <td colspan="3">
+                    <p>Damit ist die eigentliche IRQ-Routine abgeschlossen. Wenn wir aberjemals wieder zu normalen Verhältnissen zurückkehren wollen, dann sollten wir auch noch einen Programmteil zum Abschalten des Rasterzeileninterrupt konstruieren. Das geschieht zunächst einmal durch Löschen des Interrupt Request Registers im VIC-II-Chip:</p>
+                </td>
+            </tr>
+            <tr>
+                <td><b>8A31</b></td>
+                <td><b>SEI</b></td>
+                <td>Wir wollen beim Abschalten nicht durch umhervagabundierende IRQs gestört werden.</td>
+            </tr>
+            <tr>
+                <td><b>8A32</b></td>
+                <td><b>LDA #00</b></td>
+                <td></td>
+            </tr>
+            <tr>
+                <td><b>8A34</b></td>
+                <td><b>STA D01A</b></td>
+                <td>Durch Einschreiben einer Null wird Register 53274 gelöscht</td>
+            </tr>
+            <tr>
+                <td colspan="3">
+                    <p>Dann stellen wir den IRQ-Zeiger wieder auf die normale Routine $EA31:</p>
+                </td>
+            </tr>
+            <tr>
+                <td><b>8A37</b></td>
+                <td><b>LDA #31</b></td>
+                <td>LSB der IRQ-Adresse</td>
+            </tr>
+            <tr>
+                <td><b>8A39</b></td>
+                <td><b>STA 0314</b></td>
+                <td>in LSB des IRQ-Zeigers</td>
+            </tr>
+            <tr>
+                <td><b>8A3C</b></td>
+                <td><b>LDA #EA</b></td>
+                <td>MSB der IRQ-Adresse</td>
+            </tr>
+            <tr>
+                <td><b>8A3E</b></td>
+                <td><b>STA 0315</b></td>
+                <td>in MSB des IRQ-Zeigers</td>
+            </tr>
+            <tr>
+                <td><b>8A41</b></td>
+                <td><b>CLI</b></td>
+                <td>Jetzt darf wieder unterbrochen werden</td>
+            </tr>
+            <tr>
+                <td colspan="3">
+                    <p>Zu guter Letzt soll nach Beendigung des Rasterzeilen-Interrupt der Hochauflösungszustand wiederhergestellt werden für den ganzen Bildschirm, und die Eintragungen in den Textzeilen müssen gegen den Farbcode ausgetauscht werden:</p>
+                </td>
+            </tr>
+            <tr>
+                <td><b>8A42</b></td>
+                <td><b>LDA #38</b></td>
+                <td></td>
+            </tr>
+            <tr>
+                <td><b>8A44</b></td>
+                <td><b>LDY #3B</b></td>
+                <td></td>
+            </tr>
+            <tr>
+                <td><b>8A46</b></td>
+                <td><b>STA D018</b></td>
+                <td></td>
+            </tr>
+            <tr>
+                <td><b>8A49</b></td>
+                <td><b>STY D011</b></td>
+                <td>Das alles kennen Sie schon von weiter oben im Programm (ab 8A02)</td>
+            </tr>
+            <tr>
+                <td><b>8A4C</b></td>
+                <td><b>LDA 8E26</b></td>
+                <td>wieder laden wir den Farbcode einer beliebigen Bildschirmspeicherzelle in den Akku</td>
+            </tr>
+            <tr>
+                <td><b>8A4F</b></td>
+                <td><b>JSR 9532</b></td>
+                <td>Diese Routine füllt den gesamten Bildschirmspeicher mit dem Akku-Inhalt.</td>
+            </tr>
+            <tr>
+                <td><b>8A52</b></td>
+                <td><b>RTS</b></td>
+                <td>Rücksprung zum aufrufenden Programm</td>
+            </tr>
+            <tr>
+                <td colspan="3"></td>
+            </tr>
         </table>
 
         <p>Das war's! Mit SYS 35256 schalten Sie die Bildschirm-Aufspaltung ein, mit SYS 35377 wieder aus. Ein Flußdiagramm dieser Routine finden Sie in Bild 3.</p>
@@ -202,150 +547,727 @@
         <p>Aus programmtechnischen Gründen taucht hier zuerst die Fehlerbehandlung auf:</p>
 
         <table class="plain">
-            <tr><td><b>8A54</b></td><td><b>LDX #0E</b></td><td>Fehlercode für ILLEGAL QUANTITY</td></tr>
-            <tr><td><b>8A56</b></td><td><b>JMP A437</b></td><td>Interpreter-Routine für die Ausgabe einer Fehlermeldung, deren Code im X-Register enthalten ist.</td></tr>
-            <tr><td colspan="3"><p>Hier fängt nun unser eigentliches Programm an mit der Übernahme der Parameter. Zunächst erfassen wir den String:</p></td></tr>
-            <tr><td><b>8A59</b></td><td><b>JSR AEFD</b></td><td>Interpreter-Routine, die auf Komma prüft.</td></tr>
-            <tr><td><b>8A5C</b></td><td><b>JSR AD9E</b></td><td>Interpreter-Routine, die einen Ausdruck auswertet. Wenn der Ausdruck ein String ist, wird in $64/65 ein Zeiger auf den Stringdeskriptor eingerichtet.</td></tr>
-            <tr><td colspan="3"><p>64/65 ist eine häufig benutzte Speicheradresse. Wir lesen daher den Stringdeskriptor und lagern die Stringlänge in $24, die Stringstartadresse nach $04/05:</p></td></tr>
-            <tr><td><b>8A5F</b></td><td><b>LDY #00</b></td><td>Zähler auf Null</td></tr>
-            <tr><td><b>8A61</b></td><td><b>LDA (64),Y</b></td><td>Stringlänge in Akku</td></tr>
-            <tr><td><b>8A63</b></td><td><b>STA 24</b></td><td>und nach $24</td></tr>
-            <tr><td><b>8A65</b></td><td><b>INY</b></td><td>Zähler erhöhen</td></tr>
-            <tr><td><b>8A66</b></td><td><b>LDA (64),Y</b></td><td>LSB des Stringzeigers in Akku</td></tr>
-            <tr><td><b>8A68</b></td><td><b>STA 04</b></td><td>und nach $04</td></tr>
-            <tr><td><b>8A6A</b></td><td><b>INY</b></td><td>Zähler erhöhen</td></tr>
-            <tr><td><b>8A6B</b></td><td><b>LDA (64),Y</b></td><td>MSB des Stringzeigers in Akku</td></tr>
-            <tr><td><b>8A6D</b></td><td><b>STA 05</b></td><td>und nach $05</td></tr>
-            <tr><td colspan="3"><p>Damit ist der String gesichert, nun lesen wir die Zeilennummer:</p></td></tr>
-            <tr><td><b>8A6F</b></td><td><b>JSR AEFD</b></td><td>kennen wir schon: Auf Komma prüfen.</td></tr>
-            <tr><td><b>8A72</b></td><td><b>JSR AD9E</b></td><td>kennen wir ebenfalls, kann aber noch mehr als nur Strings auszuwerten. Hier erkennt diese Routine, daß eine Zahl vorliegt und packt diese in den FAC (Fließkomma-Akkumulator 1)</td></tr>
-            <tr><td><b>8A75</b></td><td><b>JSR B1AA</b></td><td>Interpreter-Routine: Wandelt den FAC-Inhalt in eine 2-Byte-Integer-Zahl um. MSB landet im Akku, LSB im Y-Register. Das MSB brauchen wir nicht.</td></tr>
-            <tr><td><b>8A78</b></td><td><b>CPY #19</b></td><td>Ist Zeile größer oder gleich dezimal 25?</td></tr>
-            <tr><td><b>8A7A</b></td><td><b>BCS 8A54</b></td><td>Wenn ja, Sprung zur Fehlermeldungsausgabe</td></tr>
-            <tr><td colspan="3"><p>Zugegeben, wenn das Programm hier gelandet ist, können sich immer noch einige Falscheingaben durchgeschmuggelt haben. Aber wer wird bei der Zeilennummer-Eingabe zum Beispiel eine negative Zahl wählen! Wenn Sie Lust haben, dann können Sie ja auch noch andere Fehlereingabe-Filter einbauen. Uns soll's so erst mal genügen. Weil wir die Zahl jetzt gerade in so schön greifbarer Form haben, berechnen wir auch gleich noch den Teil »320*Zeile« für die Position in der Bit-Map. Für diese Multiplikation verwenden wir eine Hires-3-Routine:</p></td></tr>
-            <tr><td><b>8A7C</b></td><td><b>STY 5B</b></td><td>Zeile nach $5B</td></tr>
-            <tr><td><b>8A7E</b></td><td><b>LDA #40</b></td><td>LSB der Zahl 320</td></tr>
-            <tr><td><b>8A80</b></td><td><b>STA 59</b></td><td>nach $59</td></tr>
-            <tr><td><b>8A82</b></td><td><b>LDA #01</b></td><td>MSB der Zahl 320</td></tr>
-            <tr><td><b>8A84</b></td><td><b>STA 5A</b></td><td>nach $5A</td></tr>
-            <tr><td><b>8A86</b></td><td><b>JSR 9410</b></td><td>Hires-3-Routine, die eine in $59/5A liegende Zahl mit einer in $5B liegenden multipliziert. Das Ergebnis findet man in $57/58.</td></tr>
-            <tr><td colspan="3"><p>320*Zeile ist nun in $57/58 gespeichert und wir übernehmen die Spaltenangabe ins Programm:</p></td></tr>
-            <tr><td><b>8A89</b></td><td><b>JSR AEFD</b></td><td>Wie gehabt: Komma prüfen</td></tr>
-            <tr><td><b>8A8C</b></td><td><b>JSR AD9E</b></td><td>Kennen wir auch schon</td></tr>
-            <tr><td><b>8A8F</b></td><td><b>JSR B1AA</b></td><td>Bekannt: Bringt Spalte ins Y-Register</td></tr>
-            <tr><td><b>8A92</b></td><td><b>CPY #28</b></td><td>Ist die Zahl größer oder gleich dezimal 40?</td></tr>
-            <tr><td><b>8A94</b></td><td><b>BCS 8A54</b></td><td>Wenn ja, dann Sprung zur Fehlermeldungsausgabe.</td></tr>
-            <tr><td colspan="3"><p>Hier gilt dasselbe, was für Zeile oben gesagt wurde. Und auch hier rechnen wir gleich den Ausdruck »8*Spalte« aus:</p></td></tr>
-            <tr><td><b>8A96</b></td><td><b>TYA</b></td><td>Spalte in Akku</td></tr>
-            <tr><td><b>8A97</b></td><td><b>CLC</b></td><td>Von hier an erfolgt die</td></tr>
-            <tr><td><b>8A98</b></td><td><b>ROL</b></td><td>Multiplikation mit 8</td></tr>
-            <tr><td><b>8A99</b></td><td><b>ROL</b></td><td>und das Ergebnis landet</td></tr>
-            <tr><td><b>8A9A</b></td><td><b>ROL</b></td><td>in den Speicherstellen</td></tr>
-            <tr><td><b>8A9B</b></td><td><b>STA 25</b></td><td>$25 (LSB)</td></tr>
-            <tr><td><b>8A9D</b></td><td><b>LDA #00</b></td><td>und</td></tr>
-            <tr><td><b>8A9F</b></td><td><b>ROL</b></td><td>$26 (MSB)</td></tr>
-            <tr><td><b>8AA0</b></td><td><b>STA 26</b></td><td></td></tr>
-            <tr><td colspan="3"><p>Nun addieren wir die beiden Ausdrücke (320*Zeile + 8*Spalte):</p></td></tr>
-            <tr><td><b>8AA2</b></td><td><b>CLC</b></td><td></td></tr>
-            <tr><td><b>8AA3</b></td><td><b>LDA 57</b></td><td>LSB von 320*Zeile</td></tr>
-            <tr><td><b>8AA5</b></td><td><b>ADC 25</b></td><td>+ LSB von 8*Spalte</td></tr>
-            <tr><td><b>8AA7</b></td><td><b>STA 25</b></td><td>nach $25</td></tr>
-            <tr><td><b>8AA9</b></td><td><b>LDA 58</b></td><td>MSB von 320*Zeile</td></tr>
-            <tr><td><b>8AAB</b></td><td><b>ADC 26</b></td><td>+ MSB von 8*Spalte + Carry</td></tr>
-            <tr><td><b>8AAD</b></td><td><b>STA 26</b></td><td>nach $26</td></tr>
-            <tr><td colspan="3"><p>Schließlich zählen wir noch die Bit-Map-Startadresse dazu:</p></td></tr>
-            <tr><td><b>8AAF</b></td><td><b>CLC</b></td><td></td></tr>
-            <tr><td><b>8AB0</b></td><td><b>LDA 25</b></td><td>LSB von 320*Zeile + 8*Spalte</td></tr>
-            <tr><td><b>8AB2</b></td><td><b>ADC #00</b></td><td>+ LSB Bit-Map-Start</td></tr>
-            <tr><td><b>8AB4</b></td><td><b>STA 25</b></td><td>Ergebins = LSB Stringstart in der Bit-Map nach $25</td></tr>
-            <tr><td><b>8AB6</b></td><td><b>LDA 26</b></td><td>MSB von 320*Zeile + 8*Spalte</td></tr>
-            <tr><td><b>8AB8</b></td><td><b>ADC #A0</b></td><td>+ MSB Bit-Map-Start</td></tr>
-            <tr><td><b>8ABA</b></td><td><b>STA 26</b></td><td>MSB des Stringstarts in der Bit-Map nach $26</td></tr>
-            <tr><td colspan="3"><p>Damit haben wir sowohl die Parameterübergabe als auch die Positionierung in der Bit-Map programmiert:</p></td></tr>
-            <tr><td colspan="3">Wir finden nun in <ul class="plain"><li>$24 die Stringlänge,</li><li>$04/05 die Startadresse des Strings im Speicher</li><li>$25/26 die Startadresse des Strings in der Bit-Map</li></ul></td></tr>
-            <tr><td colspan="3"><p>Wir kommen nun zu dem Programmteil, in dem der String Zeichen für Zeichen gelesen, umgerechnet und schließlich gedruckt wird:</p></td></tr>
-            <tr><td><b>8ABC</b></td><td><b>LDY #00</b></td><td>Zähler auf Null</td></tr>
-            <tr><td><b>8ABE</b></td><td><b>LDA (04),Y</b></td><td>String-Zeichen in den Akku lesen,</td></tr>
-            <tr><td><b>8AC0</b></td><td><b>TAX</b></td><td>und ins X-Register schieben</td></tr>
-            <tr><td><b>8AC1</b></td><td><b>TYA</b></td><td>Zähler in den Akku</td></tr>
-            <tr><td><b>8AC2</b></td><td><b>PHA</b></td><td>und auf den Stapel retten</td></tr>
-            <tr><td><b>8AC3</b></td><td><b>TXA</b></td><td>Akku-Inhalt wiederherstellen</td></tr>
-            <tr><td><b>8AC4</b></td><td><b>JSR 8AD2</b></td><td>Unterprogramm, das die Umrechnung des ASCII-Codes im Akku zum Bildschirmcode vornimmt</td></tr>
-            <tr><td><b>8AC7</b></td><td><b>JSR 8AF6</b></td><td>Unterprogramm, welches das Übertragen der Zeichen aus dem Zeichen-ROM in die Bit-Map durchführt</td></tr>
-            <tr><td><b>8ACA</b></td><td><b>PLA</b></td><td>Zähler vom Stapel holen</td></tr>
-            <tr><td><b>8ACB</b></td><td><b>TAY</b></td><td>und wieder ins Y-Register schreiben</td></tr>
-            <tr><td><b>8ACC</b></td><td><b>INY</b></td><td>Zähler erhöhen</td></tr>
-            <tr><td><b>8ACD</b></td><td><b>CPY 24</b></td><td>Vergleich des Zählers mit der Stringlänge</td></tr>
-            <tr><td><b>8ACF</b></td><td><b>BMI 8ABE</b></td><td>Stringlänge erreicht? Wenn ja, dann&hellip;</td></tr>
-            <tr><td><b>8AD1</b></td><td><b>RTS</b></td><td>Programmende und zurück ins aufrufende Programm.</td></tr>
-            <tr><td colspan="3"><p>Nun kommen wir noch zu den beiden Unterprogrammen. Zunächst die Umrechnung vom ADCII- in den Bildschirmcode. Der Code des eingelesenen Zeichens befindet sich im Akku:</p></td></tr>
-            <tr><td><b>8AD2</b></td><td><b>BPL 8AD7</b></td><td>Liegt ein geSHIFTetes Zeichen vor? Dann ist nämlich Bit 7 gesetzt. Wenn Bit 7 nicht gesetzt ist, erfolgt der Sprung</td></tr>
-            <tr><td><b>8AD4</b></td><td><b>JMP 8AE6</b></td><td>ansonsten wird hier zur Routine für SHIFT-Zeichen gesprungen</td></tr>
-            <tr><td colspan="3"><p>Jetzt haben wir's also mit nicht geSHIFTeten Zeichen zu tun:</p></td></tr>
-            <tr><td><b>8AD7</b></td><td><b>CMP #20</b></td><td>haben wir es etwa mit Steuerzeichen zu tun?</td></tr>
-            <tr><td><b>8AD9</b></td><td><b>BCC 8AF3</b></td><td>Wenn ja, dann verzweigen wir</td></tr>
-            <tr><td><b>8ADB</b></td><td><b>CMP #60</b></td><td>liegen Grafikzeichen vor?</td></tr>
-            <tr><td><b>8ADD</b></td><td><b>BCC 8AE3</b></td><td>wenn nein, dann Sprung</td></tr>
-            <tr><td><b>8ADF</b></td><td><b>AND #DF</b></td><td>mit der Makse 1101&nbsp;1111 wird Bit 5 gelöscht</td></tr>
-            <tr><td><b>8AE1</b></td><td><b>BNE 8AE5</b></td><td>unbedingter Sprung</td></tr>
-            <tr><td><b>8AE3</b></td><td><b>AND #3F</b></td><td>mit der Maske 0011&nbsp;1111 werden die Bits 6 und 7 gelöscht</td></tr>
-            <tr><td><b>8AE5</b></td><td><b>RTS</b></td><td>Fertig mit den ungeSHIFTeten Zeichen. Rücksprung ins aufrufende Programm.</td></tr>
-            <tr><td colspan="3"><p>Im folgenden bearbeiten wir die SHIFT-Zeichen:</p></td></tr>
-            <tr><td><b>8AE6</b></td><td><b>AND #7F</b></td><td>Mit der Maske 0111&nbsp;1111 wird Bit 7 gelöscht</td></tr>
-            <tr><td><b>8AE8</b></td><td><b>CMP #7F</b></td><td>liegt das Pi-Zeichen vor?</td></tr>
-            <tr><td><b>8AEA</b></td><td><b>BNE 8AEE</b></td><td>Wenn nicht, Sprung</td></tr>
-            <tr><td><b>8AEC</b></td><td><b>LDA #5E</b></td><td>wenn ja, dann Code für das Pi-Zeichen in den Akku</td></tr>
-            <tr><td><b>8AEE</b></td><td><b>CMP #20</b></td><td>liegt ein Steuerzeichen vor?</td></tr>
-            <tr><td><b>8AF0</b></td><td><b>BCC 8AF3</b></td><td>Wenn ja, Sprung</td></tr>
-            <tr><td><b>8AF2</b></td><td><b>RTS</b></td><td>wenn nein, dann ist jetzt der Bildschirmcode im Akku und wir springen zurück zum aufrufenden Programm.</td></tr>
-            <tr><td colspan="3"><p>Nun haben wir es nur noch mit den Steuerzeichen zu tun. Die ignorieren wir und setzen dafür einfach ein Leerzeichen ein:</p></td></tr>
-            <tr><td><b>8AF3</b></td><td><b>LDA #20</b></td><td>Code für »Space« in Akku</td></tr>
-            <tr><td><b>8AF5</b></td><td><b>RTS</b></td><td>und Rücksprung zum aufrufenden Programm.</td></tr>
-            <tr><td colspan="3"><p>Kommen wir nun zum zweiten Unterprogramm, das die Zeichen, welche im Akku enthalten sind als Bildschirmcodes, aus dem Zeichen-ROM heraus und in die richtige Stelle der Bit-Map hineinliest:</p></td></tr>
-            <tr><td><b>8AF6</b></td><td><b>LDX #00</b></td><td></td></tr>
-            <tr><td><b>8AF8</b></td><td><b>STX 27</b></td><td>LSB der Zeichen-ROM-Startadresse = 0</td></tr>
-            <tr><td><b>8AFA</b></td><td><b>STX 29</b></td><td>Zwischenspeicher auf Null</td></tr>
-            <tr><td><b>8AFC</b></td><td><b>LDX #D0</b></td><td>MSB-Zeichen-ROM-Startadresse</td></tr>
-            <tr><td><b>8AFE</b></td><td><b>STX 28</b></td><td>nach $28</td></tr>
-            <tr><td><b>8B00</b></td><td><b>CLC</b></td><td>Von hier an wird der</td></tr>
-            <tr><td><b>8B01</b></td><td><b>ROL</b></td><td>Zeichencode im Akku</td></tr>
-            <tr><td><b>8B02</b></td><td><b>ROL 29</b></td><td>mal 8 gerechnet</td></tr>
-            <tr><td><b>8B04</b></td><td><b>ROL</b></td><td>Zu guter Letzt findet</td></tr>
-            <tr><td><b>8B05</b></td><td><b>ROL 29</b></td><td>man das LSB des</td></tr>
-            <tr><td><b>8B07</b></td><td><b>ROL</b></td><td>Ergebnisses im Akku</td></tr>
-            <tr><td><b>8B08</b></td><td><b>ROL 29</b></td><td>und das MSB in $29</td></tr>
-            <tr><td><b>8B0A</b></td><td><b>CLC</b></td><td>Von hier an wird die</td></tr>
-            <tr><td><b>8B0B</b></td><td><b>ADC 27</b></td><td>Startadresse des</td></tr>
-            <tr><td><b>8B0D</b></td><td><b>STA 27</b></td><td>Zeichenmusters im ROM</td></tr>
-            <tr><td><b>8B0F</b></td><td><b>LDA 28</b></td><td>berechnet und in</td></tr>
-            <tr><td><b>8B11</b></td><td><b>ADC 29</b></td><td>$27/28 abgelegt</td></tr>
-            <tr><td><b>8B13</b></td><td><b>STA 28</b></td><td></td></tr>
-            <tr><td colspan="3"><p>Damit wissen wir nun, daß 8 Bytes von der Adresse $27/28 im Zeichen-ROM zur Adresse $25/26 in der Bit-Map übertragen werden müssen. Das geschieht nun:</p></td></tr>
-            <tr><td><b>8B15</b></td><td><b>LDY #00</b></td><td>Y-Index auf Null</td></tr>
-            <tr><td><b>8B17</b></td><td><b>LDX #08</b></td><td>X-Register-Zähler auf 8</td></tr>
-            <tr><td><b>8B19</b></td><td><b>LDA 01</b></td><td>Prozessorport-Inhalt in Akku</td></tr>
-            <tr><td><b>8B1B</b></td><td><b>PHA</b></td><td>und auf den Stapel beiseitelegen</td></tr>
-            <tr><td><b>8B1C</b></td><td><b>AND #FB</b></td><td>mit Maske binär 1111&nbsp;1011 Bit 2 löschen = Zeichen-ROM zugreifbar machen</td></tr>
-            <tr><td><b>8B1E</b></td><td><b>SEI</b></td><td>wir können jetzt keine Interrupts gebrauchen</td></tr>
-            <tr><td><b>8B1F</b></td><td><b>STA 01</b></td><td>den neuen Prozessorport-Inhalt einlesen</td></tr>
-            <tr><td><b>8B21</b></td><td><b>LDA (27),Y</b></td><td>das Zeichen-Muster Byte für Byte aus dem Zeichen-ROM herauslesen in Akku</td></tr>
-            <tr><td><b>8B23</b></td><td><b>STA (25),Y</b></td><td>und in Bit-Map einschreiben</td></tr>
-            <tr><td><b>8B25</b></td><td><b>INY</b></td><td>Y-Index erhöhen</td></tr>
-            <tr><td><b>8B26</b></td><td><b>DEX</b></td><td>X-Zähler vermindern</td></tr>
-            <tr><td><b>8B27</b></td><td><b>BNE 8B21</b></td><td>wiederholen, bis X-Zähler gleich Null</td></tr>
-            <tr><td><b>8B29</b></td><td><b>PLA</b></td><td>alten Prozessorport Inhalt vom Stapel zurückholen</td></tr>
-            <tr><td><b>8B2A</b></td><td><b>STA 01</b></td><td>und rekonstruieren</td></tr>
-            <tr><td><b>8B2C</b></td><td><b>CLI</b></td><td>jetzt darf wieder unterbrochen werden</td></tr>
-            <tr><td><b>8B2D</b></td><td><b>CLC</b></td><td>Ab hier wird die</td></tr>
-            <tr><td><b>8B2E</b></td><td><b>LDA 25</b></td><td>Zieladresse in der</td></tr>
-            <tr><td><b>8B30</b></td><td><b>ADC #08</b></td><td>Bit-Map um 8 erhöht</td></tr>
-            <tr><td><b>8B32</b></td><td><b>STA 25</b></td><td>$25/26 enthält dann</td></tr>
-            <tr><td><b>8B34</b></td><td><b>LDA 26</b></td><td>schon für das nächste</td></tr>
-            <tr><td><b>8B36</b></td><td><b>ADC #00</b></td><td>einzuschreibende</td></tr>
-            <tr><td><b>8B38</b></td><td><b>STA 26</b></td><td>Zeichen die aktuelle Adresse.</td></tr>
-            <tr><td><b>8B3A</b></td><td><b>RTS</b></td><td>Ende des Unterprogrammes. Rücksprung ins aufrufende Programm.</td></tr>
-            <tr><td colspan="3"></td></tr>
+            <tr>
+                <td><b>8A54</b></td>
+                <td><b>LDX #0E</b></td>
+                <td>Fehlercode für ILLEGAL QUANTITY</td>
+            </tr>
+            <tr>
+                <td><b>8A56</b></td>
+                <td><b>JMP A437</b></td>
+                <td>Interpreter-Routine für die Ausgabe einer Fehlermeldung, deren Code im X-Register enthalten ist.</td>
+            </tr>
+            <tr>
+                <td colspan="3">
+                    <p>Hier fängt nun unser eigentliches Programm an mit der Übernahme der Parameter. Zunächst erfassen wir den String:</p>
+                </td>
+            </tr>
+            <tr>
+                <td><b>8A59</b></td>
+                <td><b>JSR AEFD</b></td>
+                <td>Interpreter-Routine, die auf Komma prüft.</td>
+            </tr>
+            <tr>
+                <td><b>8A5C</b></td>
+                <td><b>JSR AD9E</b></td>
+                <td>Interpreter-Routine, die einen Ausdruck auswertet. Wenn der Ausdruck ein String ist, wird in $64/65 ein Zeiger auf den Stringdeskriptor eingerichtet.</td>
+            </tr>
+            <tr>
+                <td colspan="3">
+                    <p>64/65 ist eine häufig benutzte Speicheradresse. Wir lesen daher den Stringdeskriptor und lagern die Stringlänge in $24, die Stringstartadresse nach $04/05:</p>
+                </td>
+            </tr>
+            <tr>
+                <td><b>8A5F</b></td>
+                <td><b>LDY #00</b></td>
+                <td>Zähler auf Null</td>
+            </tr>
+            <tr>
+                <td><b>8A61</b></td>
+                <td><b>LDA (64),Y</b></td>
+                <td>Stringlänge in Akku</td>
+            </tr>
+            <tr>
+                <td><b>8A63</b></td>
+                <td><b>STA 24</b></td>
+                <td>und nach $24</td>
+            </tr>
+            <tr>
+                <td><b>8A65</b></td>
+                <td><b>INY</b></td>
+                <td>Zähler erhöhen</td>
+            </tr>
+            <tr>
+                <td><b>8A66</b></td>
+                <td><b>LDA (64),Y</b></td>
+                <td>LSB des Stringzeigers in Akku</td>
+            </tr>
+            <tr>
+                <td><b>8A68</b></td>
+                <td><b>STA 04</b></td>
+                <td>und nach $04</td>
+            </tr>
+            <tr>
+                <td><b>8A6A</b></td>
+                <td><b>INY</b></td>
+                <td>Zähler erhöhen</td>
+            </tr>
+            <tr>
+                <td><b>8A6B</b></td>
+                <td><b>LDA (64),Y</b></td>
+                <td>MSB des Stringzeigers in Akku</td>
+            </tr>
+            <tr>
+                <td><b>8A6D</b></td>
+                <td><b>STA 05</b></td>
+                <td>und nach $05</td>
+            </tr>
+            <tr>
+                <td colspan="3">
+                    <p>Damit ist der String gesichert, nun lesen wir die Zeilennummer:</p>
+                </td>
+            </tr>
+            <tr>
+                <td><b>8A6F</b></td>
+                <td><b>JSR AEFD</b></td>
+                <td>kennen wir schon: Auf Komma prüfen.</td>
+            </tr>
+            <tr>
+                <td><b>8A72</b></td>
+                <td><b>JSR AD9E</b></td>
+                <td>kennen wir ebenfalls, kann aber noch mehr als nur Strings auszuwerten. Hier erkennt diese Routine, daß eine Zahl vorliegt und packt diese in den FAC (Fließkomma-Akkumulator 1)</td>
+            </tr>
+            <tr>
+                <td><b>8A75</b></td>
+                <td><b>JSR B1AA</b></td>
+                <td>Interpreter-Routine: Wandelt den FAC-Inhalt in eine 2-Byte-Integer-Zahl um. MSB landet im Akku, LSB im Y-Register. Das MSB brauchen wir nicht.</td>
+            </tr>
+            <tr>
+                <td><b>8A78</b></td>
+                <td><b>CPY #19</b></td>
+                <td>Ist Zeile größer oder gleich dezimal 25?</td>
+            </tr>
+            <tr>
+                <td><b>8A7A</b></td>
+                <td><b>BCS 8A54</b></td>
+                <td>Wenn ja, Sprung zur Fehlermeldungsausgabe</td>
+            </tr>
+            <tr>
+                <td colspan="3">
+                    <p>Zugegeben, wenn das Programm hier gelandet ist, können sich immer noch einige Falscheingaben durchgeschmuggelt haben. Aber wer wird bei der Zeilennummer-Eingabe zum Beispiel eine negative Zahl wählen! Wenn Sie Lust haben, dann können Sie ja auch noch andere Fehlereingabe-Filter einbauen. Uns soll's so erst mal genügen. Weil wir die Zahl jetzt gerade in so schön greifbarer Form haben, berechnen wir auch gleich noch den Teil »320*Zeile« für die Position in der Bit-Map. Für diese Multiplikation verwenden wir eine Hires-3-Routine:</p>
+                </td>
+            </tr>
+            <tr>
+                <td><b>8A7C</b></td>
+                <td><b>STY 5B</b></td>
+                <td>Zeile nach $5B</td>
+            </tr>
+            <tr>
+                <td><b>8A7E</b></td>
+                <td><b>LDA #40</b></td>
+                <td>LSB der Zahl 320</td>
+            </tr>
+            <tr>
+                <td><b>8A80</b></td>
+                <td><b>STA 59</b></td>
+                <td>nach $59</td>
+            </tr>
+            <tr>
+                <td><b>8A82</b></td>
+                <td><b>LDA #01</b></td>
+                <td>MSB der Zahl 320</td>
+            </tr>
+            <tr>
+                <td><b>8A84</b></td>
+                <td><b>STA 5A</b></td>
+                <td>nach $5A</td>
+            </tr>
+            <tr>
+                <td><b>8A86</b></td>
+                <td><b>JSR 9410</b></td>
+                <td>Hires-3-Routine, die eine in $59/5A liegende Zahl mit einer in $5B liegenden multipliziert. Das Ergebnis findet man in $57/58.</td>
+            </tr>
+            <tr>
+                <td colspan="3">
+                    <p>320*Zeile ist nun in $57/58 gespeichert und wir übernehmen die Spaltenangabe ins Programm:</p>
+                </td>
+            </tr>
+            <tr>
+                <td><b>8A89</b></td>
+                <td><b>JSR AEFD</b></td>
+                <td>Wie gehabt: Komma prüfen</td>
+            </tr>
+            <tr>
+                <td><b>8A8C</b></td>
+                <td><b>JSR AD9E</b></td>
+                <td>Kennen wir auch schon</td>
+            </tr>
+            <tr>
+                <td><b>8A8F</b></td>
+                <td><b>JSR B1AA</b></td>
+                <td>Bekannt: Bringt Spalte ins Y-Register</td>
+            </tr>
+            <tr>
+                <td><b>8A92</b></td>
+                <td><b>CPY #28</b></td>
+                <td>Ist die Zahl größer oder gleich dezimal 40?</td>
+            </tr>
+            <tr>
+                <td><b>8A94</b></td>
+                <td><b>BCS 8A54</b></td>
+                <td>Wenn ja, dann Sprung zur Fehlermeldungsausgabe.</td>
+            </tr>
+            <tr>
+                <td colspan="3">
+                    <p>Hier gilt dasselbe, was für Zeile oben gesagt wurde. Und auch hier rechnen wir gleich den Ausdruck »8*Spalte« aus:</p>
+                </td>
+            </tr>
+            <tr>
+                <td><b>8A96</b></td>
+                <td><b>TYA</b></td>
+                <td>Spalte in Akku</td>
+            </tr>
+            <tr>
+                <td><b>8A97</b></td>
+                <td><b>CLC</b></td>
+                <td>Von hier an erfolgt die</td>
+            </tr>
+            <tr>
+                <td><b>8A98</b></td>
+                <td><b>ROL</b></td>
+                <td>Multiplikation mit 8</td>
+            </tr>
+            <tr>
+                <td><b>8A99</b></td>
+                <td><b>ROL</b></td>
+                <td>und das Ergebnis landet</td>
+            </tr>
+            <tr>
+                <td><b>8A9A</b></td>
+                <td><b>ROL</b></td>
+                <td>in den Speicherstellen</td>
+            </tr>
+            <tr>
+                <td><b>8A9B</b></td>
+                <td><b>STA 25</b></td>
+                <td>$25 (LSB)</td>
+            </tr>
+            <tr>
+                <td><b>8A9D</b></td>
+                <td><b>LDA #00</b></td>
+                <td>und</td>
+            </tr>
+            <tr>
+                <td><b>8A9F</b></td>
+                <td><b>ROL</b></td>
+                <td>$26 (MSB)</td>
+            </tr>
+            <tr>
+                <td><b>8AA0</b></td>
+                <td><b>STA 26</b></td>
+                <td></td>
+            </tr>
+            <tr>
+                <td colspan="3">
+                    <p>Nun addieren wir die beiden Ausdrücke (320*Zeile + 8*Spalte):</p>
+                </td>
+            </tr>
+            <tr>
+                <td><b>8AA2</b></td>
+                <td><b>CLC</b></td>
+                <td></td>
+            </tr>
+            <tr>
+                <td><b>8AA3</b></td>
+                <td><b>LDA 57</b></td>
+                <td>LSB von 320*Zeile</td>
+            </tr>
+            <tr>
+                <td><b>8AA5</b></td>
+                <td><b>ADC 25</b></td>
+                <td>+ LSB von 8*Spalte</td>
+            </tr>
+            <tr>
+                <td><b>8AA7</b></td>
+                <td><b>STA 25</b></td>
+                <td>nach $25</td>
+            </tr>
+            <tr>
+                <td><b>8AA9</b></td>
+                <td><b>LDA 58</b></td>
+                <td>MSB von 320*Zeile</td>
+            </tr>
+            <tr>
+                <td><b>8AAB</b></td>
+                <td><b>ADC 26</b></td>
+                <td>+ MSB von 8*Spalte + Carry</td>
+            </tr>
+            <tr>
+                <td><b>8AAD</b></td>
+                <td><b>STA 26</b></td>
+                <td>nach $26</td>
+            </tr>
+            <tr>
+                <td colspan="3">
+                    <p>Schließlich zählen wir noch die Bit-Map-Startadresse dazu:</p>
+                </td>
+            </tr>
+            <tr>
+                <td><b>8AAF</b></td>
+                <td><b>CLC</b></td>
+                <td></td>
+            </tr>
+            <tr>
+                <td><b>8AB0</b></td>
+                <td><b>LDA 25</b></td>
+                <td>LSB von 320*Zeile + 8*Spalte</td>
+            </tr>
+            <tr>
+                <td><b>8AB2</b></td>
+                <td><b>ADC #00</b></td>
+                <td>+ LSB Bit-Map-Start</td>
+            </tr>
+            <tr>
+                <td><b>8AB4</b></td>
+                <td><b>STA 25</b></td>
+                <td>Ergebins = LSB Stringstart in der Bit-Map nach $25</td>
+            </tr>
+            <tr>
+                <td><b>8AB6</b></td>
+                <td><b>LDA 26</b></td>
+                <td>MSB von 320*Zeile + 8*Spalte</td>
+            </tr>
+            <tr>
+                <td><b>8AB8</b></td>
+                <td><b>ADC #A0</b></td>
+                <td>+ MSB Bit-Map-Start</td>
+            </tr>
+            <tr>
+                <td><b>8ABA</b></td>
+                <td><b>STA 26</b></td>
+                <td>MSB des Stringstarts in der Bit-Map nach $26</td>
+            </tr>
+            <tr>
+                <td colspan="3">
+                    <p>Damit haben wir sowohl die Parameterübergabe als auch die Positionierung in der Bit-Map programmiert:</p>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="3">Wir finden nun in <ul class="plain">
+                        <li>$24 die Stringlänge,</li>
+                        <li>$04/05 die Startadresse des Strings im Speicher</li>
+                        <li>$25/26 die Startadresse des Strings in der Bit-Map</li>
+                    </ul>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="3">
+                    <p>Wir kommen nun zu dem Programmteil, in dem der String Zeichen für Zeichen gelesen, umgerechnet und schließlich gedruckt wird:</p>
+                </td>
+            </tr>
+            <tr>
+                <td><b>8ABC</b></td>
+                <td><b>LDY #00</b></td>
+                <td>Zähler auf Null</td>
+            </tr>
+            <tr>
+                <td><b>8ABE</b></td>
+                <td><b>LDA (04),Y</b></td>
+                <td>String-Zeichen in den Akku lesen,</td>
+            </tr>
+            <tr>
+                <td><b>8AC0</b></td>
+                <td><b>TAX</b></td>
+                <td>und ins X-Register schieben</td>
+            </tr>
+            <tr>
+                <td><b>8AC1</b></td>
+                <td><b>TYA</b></td>
+                <td>Zähler in den Akku</td>
+            </tr>
+            <tr>
+                <td><b>8AC2</b></td>
+                <td><b>PHA</b></td>
+                <td>und auf den Stapel retten</td>
+            </tr>
+            <tr>
+                <td><b>8AC3</b></td>
+                <td><b>TXA</b></td>
+                <td>Akku-Inhalt wiederherstellen</td>
+            </tr>
+            <tr>
+                <td><b>8AC4</b></td>
+                <td><b>JSR 8AD2</b></td>
+                <td>Unterprogramm, das die Umrechnung des ASCII-Codes im Akku zum Bildschirmcode vornimmt</td>
+            </tr>
+            <tr>
+                <td><b>8AC7</b></td>
+                <td><b>JSR 8AF6</b></td>
+                <td>Unterprogramm, welches das Übertragen der Zeichen aus dem Zeichen-ROM in die Bit-Map durchführt</td>
+            </tr>
+            <tr>
+                <td><b>8ACA</b></td>
+                <td><b>PLA</b></td>
+                <td>Zähler vom Stapel holen</td>
+            </tr>
+            <tr>
+                <td><b>8ACB</b></td>
+                <td><b>TAY</b></td>
+                <td>und wieder ins Y-Register schreiben</td>
+            </tr>
+            <tr>
+                <td><b>8ACC</b></td>
+                <td><b>INY</b></td>
+                <td>Zähler erhöhen</td>
+            </tr>
+            <tr>
+                <td><b>8ACD</b></td>
+                <td><b>CPY 24</b></td>
+                <td>Vergleich des Zählers mit der Stringlänge</td>
+            </tr>
+            <tr>
+                <td><b>8ACF</b></td>
+                <td><b>BMI 8ABE</b></td>
+                <td>Stringlänge erreicht? Wenn ja, dann&hellip;</td>
+            </tr>
+            <tr>
+                <td><b>8AD1</b></td>
+                <td><b>RTS</b></td>
+                <td>Programmende und zurück ins aufrufende Programm.</td>
+            </tr>
+            <tr>
+                <td colspan="3">
+                    <p>Nun kommen wir noch zu den beiden Unterprogrammen. Zunächst die Umrechnung vom ADCII- in den Bildschirmcode. Der Code des eingelesenen Zeichens befindet sich im Akku:</p>
+                </td>
+            </tr>
+            <tr>
+                <td><b>8AD2</b></td>
+                <td><b>BPL 8AD7</b></td>
+                <td>Liegt ein geSHIFTetes Zeichen vor? Dann ist nämlich Bit 7 gesetzt. Wenn Bit 7 nicht gesetzt ist, erfolgt der Sprung</td>
+            </tr>
+            <tr>
+                <td><b>8AD4</b></td>
+                <td><b>JMP 8AE6</b></td>
+                <td>ansonsten wird hier zur Routine für SHIFT-Zeichen gesprungen</td>
+            </tr>
+            <tr>
+                <td colspan="3">
+                    <p>Jetzt haben wir's also mit nicht geSHIFTeten Zeichen zu tun:</p>
+                </td>
+            </tr>
+            <tr>
+                <td><b>8AD7</b></td>
+                <td><b>CMP #20</b></td>
+                <td>haben wir es etwa mit Steuerzeichen zu tun?</td>
+            </tr>
+            <tr>
+                <td><b>8AD9</b></td>
+                <td><b>BCC 8AF3</b></td>
+                <td>Wenn ja, dann verzweigen wir</td>
+            </tr>
+            <tr>
+                <td><b>8ADB</b></td>
+                <td><b>CMP #60</b></td>
+                <td>liegen Grafikzeichen vor?</td>
+            </tr>
+            <tr>
+                <td><b>8ADD</b></td>
+                <td><b>BCC 8AE3</b></td>
+                <td>wenn nein, dann Sprung</td>
+            </tr>
+            <tr>
+                <td><b>8ADF</b></td>
+                <td><b>AND #DF</b></td>
+                <td>mit der Makse 1101&nbsp;1111 wird Bit 5 gelöscht</td>
+            </tr>
+            <tr>
+                <td><b>8AE1</b></td>
+                <td><b>BNE 8AE5</b></td>
+                <td>unbedingter Sprung</td>
+            </tr>
+            <tr>
+                <td><b>8AE3</b></td>
+                <td><b>AND #3F</b></td>
+                <td>mit der Maske 0011&nbsp;1111 werden die Bits 6 und 7 gelöscht</td>
+            </tr>
+            <tr>
+                <td><b>8AE5</b></td>
+                <td><b>RTS</b></td>
+                <td>Fertig mit den ungeSHIFTeten Zeichen. Rücksprung ins aufrufende Programm.</td>
+            </tr>
+            <tr>
+                <td colspan="3">
+                    <p>Im folgenden bearbeiten wir die SHIFT-Zeichen:</p>
+                </td>
+            </tr>
+            <tr>
+                <td><b>8AE6</b></td>
+                <td><b>AND #7F</b></td>
+                <td>Mit der Maske 0111&nbsp;1111 wird Bit 7 gelöscht</td>
+            </tr>
+            <tr>
+                <td><b>8AE8</b></td>
+                <td><b>CMP #7F</b></td>
+                <td>liegt das Pi-Zeichen vor?</td>
+            </tr>
+            <tr>
+                <td><b>8AEA</b></td>
+                <td><b>BNE 8AEE</b></td>
+                <td>Wenn nicht, Sprung</td>
+            </tr>
+            <tr>
+                <td><b>8AEC</b></td>
+                <td><b>LDA #5E</b></td>
+                <td>wenn ja, dann Code für das Pi-Zeichen in den Akku</td>
+            </tr>
+            <tr>
+                <td><b>8AEE</b></td>
+                <td><b>CMP #20</b></td>
+                <td>liegt ein Steuerzeichen vor?</td>
+            </tr>
+            <tr>
+                <td><b>8AF0</b></td>
+                <td><b>BCC 8AF3</b></td>
+                <td>Wenn ja, Sprung</td>
+            </tr>
+            <tr>
+                <td><b>8AF2</b></td>
+                <td><b>RTS</b></td>
+                <td>wenn nein, dann ist jetzt der Bildschirmcode im Akku und wir springen zurück zum aufrufenden Programm.</td>
+            </tr>
+            <tr>
+                <td colspan="3">
+                    <p>Nun haben wir es nur noch mit den Steuerzeichen zu tun. Die ignorieren wir und setzen dafür einfach ein Leerzeichen ein:</p>
+                </td>
+            </tr>
+            <tr>
+                <td><b>8AF3</b></td>
+                <td><b>LDA #20</b></td>
+                <td>Code für »Space« in Akku</td>
+            </tr>
+            <tr>
+                <td><b>8AF5</b></td>
+                <td><b>RTS</b></td>
+                <td>und Rücksprung zum aufrufenden Programm.</td>
+            </tr>
+            <tr>
+                <td colspan="3">
+                    <p>Kommen wir nun zum zweiten Unterprogramm, das die Zeichen, welche im Akku enthalten sind als Bildschirmcodes, aus dem Zeichen-ROM heraus und in die richtige Stelle der Bit-Map hineinliest:</p>
+                </td>
+            </tr>
+            <tr>
+                <td><b>8AF6</b></td>
+                <td><b>LDX #00</b></td>
+                <td></td>
+            </tr>
+            <tr>
+                <td><b>8AF8</b></td>
+                <td><b>STX 27</b></td>
+                <td>LSB der Zeichen-ROM-Startadresse = 0</td>
+            </tr>
+            <tr>
+                <td><b>8AFA</b></td>
+                <td><b>STX 29</b></td>
+                <td>Zwischenspeicher auf Null</td>
+            </tr>
+            <tr>
+                <td><b>8AFC</b></td>
+                <td><b>LDX #D0</b></td>
+                <td>MSB-Zeichen-ROM-Startadresse</td>
+            </tr>
+            <tr>
+                <td><b>8AFE</b></td>
+                <td><b>STX 28</b></td>
+                <td>nach $28</td>
+            </tr>
+            <tr>
+                <td><b>8B00</b></td>
+                <td><b>CLC</b></td>
+                <td>Von hier an wird der</td>
+            </tr>
+            <tr>
+                <td><b>8B01</b></td>
+                <td><b>ROL</b></td>
+                <td>Zeichencode im Akku</td>
+            </tr>
+            <tr>
+                <td><b>8B02</b></td>
+                <td><b>ROL 29</b></td>
+                <td>mal 8 gerechnet</td>
+            </tr>
+            <tr>
+                <td><b>8B04</b></td>
+                <td><b>ROL</b></td>
+                <td>Zu guter Letzt findet</td>
+            </tr>
+            <tr>
+                <td><b>8B05</b></td>
+                <td><b>ROL 29</b></td>
+                <td>man das LSB des</td>
+            </tr>
+            <tr>
+                <td><b>8B07</b></td>
+                <td><b>ROL</b></td>
+                <td>Ergebnisses im Akku</td>
+            </tr>
+            <tr>
+                <td><b>8B08</b></td>
+                <td><b>ROL 29</b></td>
+                <td>und das MSB in $29</td>
+            </tr>
+            <tr>
+                <td><b>8B0A</b></td>
+                <td><b>CLC</b></td>
+                <td>Von hier an wird die</td>
+            </tr>
+            <tr>
+                <td><b>8B0B</b></td>
+                <td><b>ADC 27</b></td>
+                <td>Startadresse des</td>
+            </tr>
+            <tr>
+                <td><b>8B0D</b></td>
+                <td><b>STA 27</b></td>
+                <td>Zeichenmusters im ROM</td>
+            </tr>
+            <tr>
+                <td><b>8B0F</b></td>
+                <td><b>LDA 28</b></td>
+                <td>berechnet und in</td>
+            </tr>
+            <tr>
+                <td><b>8B11</b></td>
+                <td><b>ADC 29</b></td>
+                <td>$27/28 abgelegt</td>
+            </tr>
+            <tr>
+                <td><b>8B13</b></td>
+                <td><b>STA 28</b></td>
+                <td></td>
+            </tr>
+            <tr>
+                <td colspan="3">
+                    <p>Damit wissen wir nun, daß 8 Bytes von der Adresse $27/28 im Zeichen-ROM zur Adresse $25/26 in der Bit-Map übertragen werden müssen. Das geschieht nun:</p>
+                </td>
+            </tr>
+            <tr>
+                <td><b>8B15</b></td>
+                <td><b>LDY #00</b></td>
+                <td>Y-Index auf Null</td>
+            </tr>
+            <tr>
+                <td><b>8B17</b></td>
+                <td><b>LDX #08</b></td>
+                <td>X-Register-Zähler auf 8</td>
+            </tr>
+            <tr>
+                <td><b>8B19</b></td>
+                <td><b>LDA 01</b></td>
+                <td>Prozessorport-Inhalt in Akku</td>
+            </tr>
+            <tr>
+                <td><b>8B1B</b></td>
+                <td><b>PHA</b></td>
+                <td>und auf den Stapel beiseitelegen</td>
+            </tr>
+            <tr>
+                <td><b>8B1C</b></td>
+                <td><b>AND #FB</b></td>
+                <td>mit Maske binär 1111&nbsp;1011 Bit 2 löschen = Zeichen-ROM zugreifbar machen</td>
+            </tr>
+            <tr>
+                <td><b>8B1E</b></td>
+                <td><b>SEI</b></td>
+                <td>wir können jetzt keine Interrupts gebrauchen</td>
+            </tr>
+            <tr>
+                <td><b>8B1F</b></td>
+                <td><b>STA 01</b></td>
+                <td>den neuen Prozessorport-Inhalt einlesen</td>
+            </tr>
+            <tr>
+                <td><b>8B21</b></td>
+                <td><b>LDA (27),Y</b></td>
+                <td>das Zeichen-Muster Byte für Byte aus dem Zeichen-ROM herauslesen in Akku</td>
+            </tr>
+            <tr>
+                <td><b>8B23</b></td>
+                <td><b>STA (25),Y</b></td>
+                <td>und in Bit-Map einschreiben</td>
+            </tr>
+            <tr>
+                <td><b>8B25</b></td>
+                <td><b>INY</b></td>
+                <td>Y-Index erhöhen</td>
+            </tr>
+            <tr>
+                <td><b>8B26</b></td>
+                <td><b>DEX</b></td>
+                <td>X-Zähler vermindern</td>
+            </tr>
+            <tr>
+                <td><b>8B27</b></td>
+                <td><b>BNE 8B21</b></td>
+                <td>wiederholen, bis X-Zähler gleich Null</td>
+            </tr>
+            <tr>
+                <td><b>8B29</b></td>
+                <td><b>PLA</b></td>
+                <td>alten Prozessorport Inhalt vom Stapel zurückholen</td>
+            </tr>
+            <tr>
+                <td><b>8B2A</b></td>
+                <td><b>STA 01</b></td>
+                <td>und rekonstruieren</td>
+            </tr>
+            <tr>
+                <td><b>8B2C</b></td>
+                <td><b>CLI</b></td>
+                <td>jetzt darf wieder unterbrochen werden</td>
+            </tr>
+            <tr>
+                <td><b>8B2D</b></td>
+                <td><b>CLC</b></td>
+                <td>Ab hier wird die</td>
+            </tr>
+            <tr>
+                <td><b>8B2E</b></td>
+                <td><b>LDA 25</b></td>
+                <td>Zieladresse in der</td>
+            </tr>
+            <tr>
+                <td><b>8B30</b></td>
+                <td><b>ADC #08</b></td>
+                <td>Bit-Map um 8 erhöht</td>
+            </tr>
+            <tr>
+                <td><b>8B32</b></td>
+                <td><b>STA 25</b></td>
+                <td>$25/26 enthält dann</td>
+            </tr>
+            <tr>
+                <td><b>8B34</b></td>
+                <td><b>LDA 26</b></td>
+                <td>schon für das nächste</td>
+            </tr>
+            <tr>
+                <td><b>8B36</b></td>
+                <td><b>ADC #00</b></td>
+                <td>einzuschreibende</td>
+            </tr>
+            <tr>
+                <td><b>8B38</b></td>
+                <td><b>STA 26</b></td>
+                <td>Zeichen die aktuelle Adresse.</td>
+            </tr>
+            <tr>
+                <td><b>8B3A</b></td>
+                <td><b>RTS</b></td>
+                <td>Ende des Unterprogrammes. Rücksprung ins aufrufende Programm.</td>
+            </tr>
+            <tr>
+                <td colspan="3"></td>
+            </tr>
         </table>
 
         <p>Damit hätten wir's. Als Programm 2 finden Sie — falls Sie ohne Assembler (zum Beispiel SMON) arbeiten — ein mittels MSE eintippbares Listing dieser Routine und für den Überblick ist als Bild 5 noch ein komplettes Flußdiagramm gezeigt.</p>
@@ -358,7 +1280,7 @@
         <h2>Wir sehen das Puzzle zusammen</h2>
 
         <p>Um nun diese beiden Programmteile in Hires-3 einzubinden, sollten zunächst Programm 1 und Programm 2 abgetippt und gespeichert werden. Anschließend laden Sie Hires-3 (mit Load"HIRES-3", 8,1 beziehungsweise ,1,1 bei Kassettenbetrieb), geben die Schutz-POKEs ein:
-            <code>POKE52,128:POKE56,128</code> 
+            <code>POKE52,128:POKE56,128</code>
             und anschließend NEW. Das wurde in der Folge 8 der Grafikserie versehentlich ausgelassen. Nun laden Sie ebenfalls absolut (also mit LOAD"PROGRAMM 1",8,1 oder ,1,1) das Programm 1 ein, geben wieder NEW ein, laden dann absolut (!) das Programm 2 ein und schließen das alles mit einem letzten NEW ab. Hires-3 und die beiden Ergänzungen stehen nun nahtlos aneinandergefügt im Speicher. Um den TEX-Befehl zu ermöglichen, muß nun noch mittels einiger POKEs Hires-3 etwas verändert werden. Geben Sie also bitte noch ein:
             <code>POKE37694,89:POKE37695,138
                 POKE37858,84:POKE37859,69:POKE37860,88:POKE37861,0:POKE3 7862,0
@@ -378,6 +1300,26 @@
         <p>Die Bildschirmaufspaltung sollte nicht zusammen mit dem UHR-Befehl und der Hardcopy-Routine betrieben werden. Hires-3 ist nämlich noch nicht darauf eingerichtet, mehrere Interrupt-Routinen parallel zu verarbeiten. Als Programm 3 finden Sie noch ein Basic-Demonstrationsprogramm, das einige Anwendungen der neuen Befehle erläutert.</p>
 
         <address class="author">(Heimo Ponnath/gk)</address>
+
+        <figure>
+            <pre data-filename="programm1.prg" data-name="Programm 1" data-mse=mse1></pre>
+            <figcaption>Listing 1. Die Interrupt-Routine.</figcaption>
+        </figure>
+        <div class="binary_download" data-filename="programm1.prg" data-name="Programm 1"></div>
+        <figure>
+            <pre data-filename="programm2.prg" data-name="Programm 2" data-mse=mse1></pre>
+            <figcaption>Listing 2. Direktes Einschreiben von Text in die Bit-Map</figcaption>
+        </figure>
+        <div class="binary_download" data-filename="programm2.prg" data-name="Programm 2"></div>
+        <figure>
+            <pre data-filename="programm 3  bas" data-name="Programm 3"></pre>
+            <figcaption>Listing 3. Dieses Demo-Programm setzt Text in eine Hires-Grafik ein</figcaption>
+        </figure>
+
+
+        <div class="binary_download" data-filename="hires3 komplett.prg" data-name="Hires-3 komplett"></div>
+        <div class="binary_download" data-filename="hires3.2.prg" data-name="Hires 3.2"></div>
+
     </article>
 </body>
 
