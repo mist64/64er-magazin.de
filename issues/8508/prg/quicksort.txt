@@ -1,0 +1,103 @@
+
+
+;quicksort.prg ==0801==
+   10 rem erstellen eines feldes zum
+   20 rem sortieren.
+   30 rem das erstellen kann zufaellig
+   40 rem oder gezielt (durch eingabe)
+   50 rem erfolgen.
+   60 rem
+   70 rem sortieralgorithmen erhalten die
+   80 rem zeilennummern von 10000 bis 50000
+   90 rem sie benoetigen jeweils diesen
+   99 rem vorspann zur ausfuehrung.
+  100 rem herstellung eines arrays:
+  110 rem arrayvariable      - a$
+  120 rem schleifenvariablen - x, y, z
+  130 rem hilfsvariablen     - b$, c$, d$
+  140 rem dreiecktausch mit  - s$
+  150 print"{clr}":clr
+  160 print"soll von {rvon}h{rvof}and oder {rvon}z{rvof}ufaellig erstellt":print
+  170 input"werden ";x$
+  180 ifx$<>"h"andx$<>"z"then150
+  190 ifx$="h"thengosub220:gosub1000:goto210
+  200 gosub220:gosub2000
+  210 goto4000: rem weitermachen
+  220 rem anzahl der elemente bestimmen
+  230 print:input"anzahl der elemente ";a
+  240 if a>10000thenprint:print"zu viele elemente":goto230
+  250 ifa<10thenprint:print"zu wenige elemente":goto230
+  255 dim a$(a)
+  260 input"{down}{down}{rvon}d{rvof}rucker oder {rvon}b{rvof}ildschirm ";y$
+  270 ify$<>"d"andy$<>"b"then260
+  280 ify$="d"thend=4:goto300
+  290 d=3
+  300 return
+ 1000 rem eingabe von hand
+ 1010 print"{clr}"
+ 1020 print:print"sie muessen jetzt"a" elemente eingeben!":print:print
+ 1030 print"jedes element besteht aus 3 zeichen.":print:print
+ 1040 forx=1toa
+ 1050 printx". ";:input"element";a$(x)
+ 1060 iflen(a$(x))<>3then1050
+ 1070 nextx
+ 1080 return
+ 2000 rem zufaellige eingabe
+ 2010 print"{clr}"
+ 2020 print:print"es werden jetzt"a" elemente zufaellig":print:print"ausgewaehlt"
+ 2030 print:print"jedes element besteht aus 3 zeichen.":print:print
+ 2040 forx=1toa
+ 2050 a$(x)=""
+ 2060 fory=1to3:a$(x)=a$(x)+chr$(int(rnd(ti)*25)+65):nexty
+ 2070 nextx
+ 2080 return
+ 3000 rem zwischenausgabe der elemente
+ 3010 for i=1toa-9step10
+ 3020 for j=itoi+9:print#1,a$(j)" ";:nextj
+ 3030 print#1:nexti
+ 3040 return
+ 4000 rem weitermachen
+ 4005 open1,d
+ 4010 print"{clr}ausgabe des erstellten feldes"
+ 4020 print
+ 4030 gosub3000
+ 4040 rem sortierung startet
+ 4050 rem
+10000 rem sortieren durch zerlegen
+10010 rem
+10020 rem        quicksort
+10030 rem
+10040 rem lg = linke grenze
+10050 rem rg = rechte grenze
+10060 rem vg$ = vergleichselement
+10070 rem
+10080 rem eingang des hauptmoduls
+10090 rem
+10100 dimlg(100),rg(100):z=0:lg(1)=1:rg(1)=a
+10110 gosub10200: rem quicksort
+10120 goto50000:rem ende
+10200 rem eingang der rekursivschleife
+10210 z=z+1:iflg(z)>=rg(z)then10350
+10220 x=lg(z):y=rg(z)
+10225 rem vergleichselement holen
+10230 vg$=a$(int((x+y)/2))
+10240 ifx>ythen10320
+10250 ifa$(x)<vg$thenx=x+1:goto10250
+10260 ifa$(y)>vg$theny=y-1:goto10260
+10270 ifx>ythen10320
+10280 s$=a$(x):a$(x)=a$(y):a$(y)=s$
+10290 x=x+1:y=y-1
+10300 goto10240
+10310 rem
+10320 gosub3000
+10330 rg(z+1)=y:lg(z+1)=lg(z):gosub 10200
+10340 lg(z+1)=x:rg(z+1)=rg(z):gosub 10200
+10350 z=z-1:return
+10360 rem
+50000 rem endebehandlung
+50010 print#1
+50020 gosub 3000
+50030 print#1,a;" elemente"
+50040 print#1:print#1:close1
+50050 end
+

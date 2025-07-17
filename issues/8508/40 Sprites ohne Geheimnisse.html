@@ -91,10 +91,32 @@
         <p>Sie finden darin ein Byte und die Numerierung der Bits. Überall dort, wo an einer Bit-Position eine 1 steht, merkt man sich die im Bild darunter stehende Zahl. Alle auf diese Weise gemerkten Zahlen addiert man schließlich. Das Ergebnis ist die Dezimalzahl, die uns interessiert. Ein Beispiel soll das noch verdeutlichen. In Bild 3 (dem Multicolorsprite) finden Sie in Zeile 2 als erstes Byte: 10100000. Wenden wir nun unser Bild 4 darauf an:</p>
 
         <table class="plain">
-            <tr class="right"><td>1</td><td>0</td><td>1</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td></tr>
-            <tr class="right"><td>128</td><td>64</td><td>32</td><td>16</td><td>8</td><td>4</td><td>2</td><td>1</td></tr>
-            <tr><td colspan="8">Sie sehen, wir müssen addieren:</td></tr>
-            <tr><td colspan="8" class="center">128 + 32 = 160</td></tr>
+            <tr class="right">
+                <td>1</td>
+                <td>0</td>
+                <td>1</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
+            </tr>
+            <tr class="right">
+                <td>128</td>
+                <td>64</td>
+                <td>32</td>
+                <td>16</td>
+                <td>8</td>
+                <td>4</td>
+                <td>2</td>
+                <td>1</td>
+            </tr>
+            <tr>
+                <td colspan="8">Sie sehen, wir müssen addieren:</td>
+            </tr>
+            <tr>
+                <td colspan="8" class="center">128 + 32 = 160</td>
+            </tr>
         </table>
 
         <p>Nun wissen Sie, wie es gemacht wird. Üben können Sie das nun bei allen 126 Byte unserer beiden Sprites. Was dabei herauskommt, sehen Sie ebenfalls in Bild 2 und 3 rechts neben dem Raster.</p>
@@ -111,10 +133,26 @@
         <p>Außerdem sollte man natürlich sinnvolle Speicherbereiche auswählen, das heißt solche, die weder der Computer selber braucht (wie die ersten 1023 Byte), noch solche, die für das Basic-Programm benötigt werden. Allerdings gibt es erfreulicherweise Lücken in den ersten 1023 Speicherplätzen, die nicht oder nur recht selten vom Computer benötigt werden. Man kann dort tatsächlich die Daten von vier Sprites ablegen:</p>
 
         <table class="plain right1">
-            <tr><td>704 bis</td><td> 767</td><td>1. Sprite</td></tr>
-            <tr><td>832 bis</td><td> 895</td><td>2. Sprite</td></tr>
-            <tr><td>896 bis</td><td> 959</td><td>3. Sprite</td></tr>
-            <tr><td>960 bis</td><td>1023</td><td>4. Sprite</td></tr>
+            <tr>
+                <td>704 bis</td>
+                <td> 767</td>
+                <td>1. Sprite</td>
+            </tr>
+            <tr>
+                <td>832 bis</td>
+                <td> 895</td>
+                <td>2. Sprite</td>
+            </tr>
+            <tr>
+                <td>896 bis</td>
+                <td> 959</td>
+                <td>3. Sprite</td>
+            </tr>
+            <tr>
+                <td>960 bis</td>
+                <td>1023</td>
+                <td>4. Sprite</td>
+            </tr>
         </table>
 
         <p>Die letzten Bereiche gehören zum Kassettenpuffer. Falls Sie also während eines Sprite-Programmes planen, eine Datasetten-Operation vorzunehmen, müssen Sie dafür sorgen, daß Ihre Sprite-Daten später wieder in den Kassettenpuffer geschrieben werden.</p>
@@ -132,23 +170,74 @@
         <p>Wir lesen die gewonnenen Sprite-Daten in den Computerspeicher ein mittels zweier simpler Schleifen:</p>
 
         <table class="plain">
-            <tr><td>100</td><td>FOR I = 704 TO 766:READD :POKE I, D:NEXT I</td></tr>
-            <tr><td>110</td><td>FOR I = 832 TO 894:READD :POKE I, D:NEXT I</td></tr>
-            <tr><td>115</td><td>REM ****** DATAS VON SPRITE 1 ******</td></tr>
-            <tr><td>120</td><td>DATA 0,0,0,0,0,0,3,255,192,1,3,128</td></tr>
-            <tr><td>130</td><td>DATA 1,51,128,1,115,128,1,59,192</td></tr>
-            <tr><td>140</td><td>DATA 129,186,254,255,255,255, 129,2,1</td></tr>
-            <tr><td>150</td><td>DATA 129,2,1,253,254,127,222,0, 157</td></tr>
-            <tr><td>160</td><td>DATA 255,255,190,62,0,62,28,0,28</td></tr>
-            <tr><td>170</td><td>DATA 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0</td></tr>
-            <tr><td>175</td><td>REM ****** DATAS VON SPRITE 2 ******</td></tr>
-            <tr><td>180</td><td>DATA 128,8,0,160,40,0,168,168,0</td></tr>
-            <tr><td>190</td><td>DATA 40,168,0,42,170,0,10,234,160</td></tr>
-            <tr><td>200</td><td>DATA 43,250,128,43,250,0,170,232,0</td></tr>
-            <tr><td>210</td><td>DATA 170,168,0,165,168,0,129,90,0</td></tr>
-            <tr><td>220</td><td>DATA 129,86,0,0,80,128,0,80,0</td></tr>
-            <tr><td>230</td><td>DATA 0,16,20,0,16,85,0,17,84,0,21,0</td></tr>
-            <tr><td>240</td><td>DATA 0,16,0,0,16,0</td></tr>
+            <tr>
+                <td>100</td>
+                <td>FOR I = 704 TO 766:READD :POKE I, D:NEXT I</td>
+            </tr>
+            <tr>
+                <td>110</td>
+                <td>FOR I = 832 TO 894:READD :POKE I, D:NEXT I</td>
+            </tr>
+            <tr>
+                <td>115</td>
+                <td>REM ****** DATAS VON SPRITE 1 ******</td>
+            </tr>
+            <tr>
+                <td>120</td>
+                <td>DATA 0,0,0,0,0,0,3,255,192,1,3,128</td>
+            </tr>
+            <tr>
+                <td>130</td>
+                <td>DATA 1,51,128,1,115,128,1,59,192</td>
+            </tr>
+            <tr>
+                <td>140</td>
+                <td>DATA 129,186,254,255,255,255, 129,2,1</td>
+            </tr>
+            <tr>
+                <td>150</td>
+                <td>DATA 129,2,1,253,254,127,222,0, 157</td>
+            </tr>
+            <tr>
+                <td>160</td>
+                <td>DATA 255,255,190,62,0,62,28,0,28</td>
+            </tr>
+            <tr>
+                <td>170</td>
+                <td>DATA 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0</td>
+            </tr>
+            <tr>
+                <td>175</td>
+                <td>REM ****** DATAS VON SPRITE 2 ******</td>
+            </tr>
+            <tr>
+                <td>180</td>
+                <td>DATA 128,8,0,160,40,0,168,168,0</td>
+            </tr>
+            <tr>
+                <td>190</td>
+                <td>DATA 40,168,0,42,170,0,10,234,160</td>
+            </tr>
+            <tr>
+                <td>200</td>
+                <td>DATA 43,250,128,43,250,0,170,232,0</td>
+            </tr>
+            <tr>
+                <td>210</td>
+                <td>DATA 170,168,0,165,168,0,129,90,0</td>
+            </tr>
+            <tr>
+                <td>220</td>
+                <td>DATA 129,86,0,0,80,128,0,80,0</td>
+            </tr>
+            <tr>
+                <td>230</td>
+                <td>DATA 0,16,20,0,16,85,0,17,84,0,21,0</td>
+            </tr>
+            <tr>
+                <td>240</td>
+                <td>DATA 0,16,0,0,16,0</td>
+            </tr>
         </table>
 
         <p>Damit hätten wir den schlimmsten Teil der ganzen Arbeit hinter uns!</p>
@@ -160,8 +249,14 @@
         <p>Für das erste Sprite folgt 704/64 = 11 und für das zweite Sprite 832/64 = 13. Gleichzeitig legt man auf diese Weise eine Sprite-Nummer fest, die von 0 (Speicherstelle 2040) bis 7 (Speicherstelle 2047) gehen kann. Unser Sprite 1 machen wir nun zum Sprite 0 und schreiben die Kennzahl 11 in Speicherstelle 2040. Analog dazu wird Sprite 2 zum Sprite 1 und wir schreiben 13 in Byte 2041:</p>
 
         <table class="plain">
-            <tr><td>245</td><td>REM **** SPRITE-ZEIGER ****</td></tr>
-            <tr><td>250</td><td>POKE2040,11:POKE2041,13</td></tr>
+            <tr>
+                <td>245</td>
+                <td>REM **** SPRITE-ZEIGER ****</td>
+            </tr>
+            <tr>
+                <td>250</td>
+                <td>POKE2040,11:POKE2041,13</td>
+            </tr>
         </table>
 
         <p>Immer dann, wenn im folgenden von einer Spritenummer N die Rede ist, meinen wir damit die durch die Spritezeiger festgelegte (also 0 für das einfarbige, 1 für das Multicolorsprite).</p>
@@ -172,15 +267,21 @@
 
         <p>Ohne nun auf mathematische Einzelheiten einzugehen, genügt es zu wissen, daß man einzelne Sprites einschaltet mittels:
             <code>POKE 53269,PEEK(53269)OR(2↑N)</code>
-             und abschaltet mit:
+            und abschaltet mit:
             <code>POKE 53269,PEEK(53269)AND(255-2↑N)</code>
         </p>
 
         <p>Wir schalten nun unsere beiden Sprites an:</p>
 
         <table class="plain">
-            <tr><td>255</td><td>REM **** EINSCHALTEN ****</td></tr>
-            <tr><td>260</td><td>POKE53269,PEEK(53269)OR(2↑0): POKE53269,PEEK(53269)OR(2↑1)</td></tr>
+            <tr>
+                <td>255</td>
+                <td>REM **** EINSCHALTEN ****</td>
+            </tr>
+            <tr>
+                <td>260</td>
+                <td>POKE53269,PEEK(53269)OR(2↑0): POKE53269,PEEK(53269)OR(2↑1)</td>
+            </tr>
         </table>
 
         <h3>Schritt 8</h3>
@@ -199,13 +300,34 @@
         <p>Für diese Eigenheiten gibt es natürlich eine Menge sehr eleganter Programmier-Möglichkeiten, die alle das Manko haben, reichlich unverständlich zu sein. Begnügen wir uns also mit einfachen IF..THEN-Abfragen. Unser Programm lautet also weiter:</p>
 
         <table class="plain">
-            <tr><td>265</td><td>REM **** SPRITEPOSITIONEN ****</td></tr>
-            <tr><td>270</td><td>FOR N = 0TO1: PRINT"SPRITE"N;:INPUT"X,Y=";X(N),Y(N)</td></tr>
-            <tr><td>280</td><td>POKE 53249+2*N,Y(N)</td></tr>
-            <tr><td>290</td><td>IFX(N)>255THENPOKE53248+2*N,X(N)-256:POKE53264,PEEK(53264)OR(2↑N):GOTO305</td></tr>
-            <tr><td>300</td><td>POKE53248+2*N,X(N):POKE53264,PEEK(53264)AND(255-2↑N)</td></tr>
-            <tr><td>305</td><td>IF K=1 THEN RETURN</td></tr>
-            <tr><td>310</td><td>NEXT N</td></tr>
+            <tr>
+                <td>265</td>
+                <td>REM **** SPRITEPOSITIONEN ****</td>
+            </tr>
+            <tr>
+                <td>270</td>
+                <td>FOR N = 0TO1: PRINT"SPRITE"N;:INPUT"X,Y=";X(N),Y(N)</td>
+            </tr>
+            <tr>
+                <td>280</td>
+                <td>POKE 53249+2*N,Y(N)</td>
+            </tr>
+            <tr>
+                <td>290</td>
+                <td>IFX(N)>255THENPOKE53248+2*N,X(N)-256:POKE53264,PEEK(53264)OR(2↑N):GOTO305</td>
+            </tr>
+            <tr>
+                <td>300</td>
+                <td>POKE53248+2*N,X(N):POKE53264,PEEK(53264)AND(255-2↑N)</td>
+            </tr>
+            <tr>
+                <td>305</td>
+                <td>IF K=1 THEN RETURN</td>
+            </tr>
+            <tr>
+                <td>310</td>
+                <td>NEXT N</td>
+            </tr>
         </table>
 
         <p>Dabei verlassen wir uns darauf, daß für X und Y nur sinnvolle Werte eingegeben werden. Wenn das aus irgendeinem Grund fraglich ist, müssen noch weitere IF&hellip;THEN-Abfragen dazukommen, die X und Y überprüfen vor Zeile 280. Die Zeile 305 ist vorsorglich für eine spätere Option eingebaut.</p>
@@ -229,18 +351,45 @@
         <p>Wir wählen für Sprite 0 die Farbe CYAN, für das Multicolor-Sprite die Zuordnungen:</p>
 
         <table class="plain">
-            <tr><td>Kombination</td><td>01 = Grün</td></tr>
-            <tr><td></td><td>11 = Gelb</td></tr>
-            <tr><td></td><td>10 = Rot</td></tr>
+            <tr>
+                <td>Kombination</td>
+                <td>01 = Grün</td>
+            </tr>
+            <tr>
+                <td></td>
+                <td>11 = Gelb</td>
+            </tr>
+            <tr>
+                <td></td>
+                <td>10 = Rot</td>
+            </tr>
         </table>
 
         <table class="plain">
-            <tr><td>315</td><td>REM **** SPRITE-FARBEN ****</td></tr>
-            <tr><td>320</td><td>POKE53287,3:REM SPRITE 0 = CYAN</td></tr>
-            <tr><td>330</td><td>POKE53285,5:REM SPRITE 1 KENNUNG 01 = GRUEN</td></tr>
-            <tr><td>340</td><td>POKE53286,7:REM KENNUNG 11 = GELB</td></tr>
-            <tr><td>350</td><td>POKE53288,2:REM KENNUNG 10 = ROT</td></tr>
-            <tr><td>360</td><td>POKE53276,PEEK(53276)OR(2↑1):REM MULTICOLORMODUS EINGESCHALTET</td></tr>
+            <tr>
+                <td>315</td>
+                <td>REM **** SPRITE-FARBEN ****</td>
+            </tr>
+            <tr>
+                <td>320</td>
+                <td>POKE53287,3:REM SPRITE 0 = CYAN</td>
+            </tr>
+            <tr>
+                <td>330</td>
+                <td>POKE53285,5:REM SPRITE 1 KENNUNG 01 = GRUEN</td>
+            </tr>
+            <tr>
+                <td>340</td>
+                <td>POKE53286,7:REM KENNUNG 11 = GELB</td>
+            </tr>
+            <tr>
+                <td>350</td>
+                <td>POKE53288,2:REM KENNUNG 10 = ROT</td>
+            </tr>
+            <tr>
+                <td>360</td>
+                <td>POKE53276,PEEK(53276)OR(2↑1):REM MULTICOLORMODUS EINGESCHALTET</td>
+            </tr>
         </table>
 
         <h3>Schritt 10</h3>
@@ -290,6 +439,12 @@
         </ul>
 
         <address class="author">(Heimo Ponnath/ah)</address>
+
+        <figure>
+            <pre data-filename="sprites" data-name="Sprites"></pre>
+            <figcaption>Listing 1. So können Sprites komplett programmiert werden.</figcaption>
+        </figure>
+
     </article>
 </body>
 

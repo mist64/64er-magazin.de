@@ -1,0 +1,43 @@
+
+
+;hilfsprogramm.prg ==0801==
+   10 rem hilfsprogramm zum verschieben von hi-text
+   20 rem erst das grafikprogramm laden und evtl. vor dem ueberschreiben
+   30 rem durch basic schuetzen!
+   40 printchr$(147):print
+   50 print"diskette mit 'hi-text' einlegen
+   60 print
+   70 print"dann return druecken!"
+   80 gett$:ift$<>chr$(13) then 80
+   90 sa=peek(55)+256*peek(56)-560
+  100 hs=int(sa/256):ls=sa-hs *256
+  110 poke55,ls :poke56,hs
+  120 poke51,ls :poke52,hs
+  130 open 1,8,2,"hi-text"
+  140 get#1,a$:ifa$="" then a$=chr$(0)
+  150 get#1,b$:ifb$="" then b$=chr$(0)
+  160 fori=0 to542
+  170 get#1,a$:ifa$="" then a$=chr$(0)
+  180 a=asc(a$)
+  190 poke sa+i,a
+  200 next
+  210 close1
+  300 rem aenderung der sprungadressen
+  310 i =sa+515:ih=int(i/256):il=i-ih*256
+  320 e =sa+ 85:eh=int(e/256):el=e-eh*256
+  330 s =sa+ 76:sh=int(s/256):sl=s-sh*256
+  340 r =sa+275:rh=int(r/256):rl=r-rh*256
+  360 pokesa+ 77,il:pokesa+ 78,ih
+  370 pokesa+120,il:pokesa+121,ih
+  380 pokesa+132,il:pokesa+133,ih
+  390 pokesa+144,il:pokesa+145,ih
+  400 pokesa+135,el:pokesa+136,eh
+  410 pokesa+322,sl:pokesa+323,sh
+  420 pokesa+434,sl:pokesa+435,sh
+  430 pokesa+513,rl:pokesa+514,rh
+  450 printchr$(147)
+  460 print"hi-text ist jetzt im speicher!"
+  470 print
+  480 print"aufruf mit sys";sa
+  490 new
+

@@ -1,0 +1,118 @@
+
+
+;joystickdemo2.prg ==0801==
+  100 rem *******************************
+  110 rem *                             *
+  120 rem * j o y s t i c k d e m o   2 *
+  130 rem * --------------------------- *
+  140 rem *                             *
+  150 rem *  by   tobias        nicol   *
+  160 rem *                             *
+  170 rem *       neuwiesenstrasse 20   *
+  180 rem *                             *
+  190 rem *       6000  frankfurt  71   *
+  200 rem *                             *
+  210 rem *******************************
+  220  
+  230 rem ** maschinenroutine einlesen **
+  240 s = 0 : for i=842 to 925
+  250 read a : poke i,a : s = s+a
+  260 next i
+  270 if s=8788 then 300
+  280 print "{clr}{down}{down}{down}{down}data error!" : end
+  290  
+  300 rem ******* initialisierung *******
+  310 x1 = 0 : x2 = 0 : y1 = 0 : y2 = 0
+  320 poke 53281,0 : poke 53280,1
+  330 a = 1024 : b = 55296 : c = 40
+  340 d = 24 : print "{clr}"
+  350  
+  360 rem **** joystick-wert nach j  ****
+  370 sys842 : j = peek (1023)
+  380 if j = 0 or j = 100 then 360
+  390  
+  400 rem *** joystick-wert auswerten ***
+  410 if j < 100 then j1 = j
+  420 if j > 100 then j1 = j-100
+  430 on j1 goto 450,360,460,490,470,480
+  440 on j1-6 goto 520,500,360,360,510
+  450 y2=y2-1 : goto 540 : rem nord
+  460 x2=x2+1 : goto 540 : rem ost
+  470 y2=y2+1 : goto 540 : rem sued
+  480 x2=x2-1 : goto 540 : rem west
+  490 x2=x2+1:y2=y2-1: goto 540 : rem n/o
+  500 x2=x2+1:y2=y2+1: goto 540 : rem s/o
+  510 x2=x2-1:y2=y2+1: goto 540 : rem s/w
+  520 x2=x2-1:y2=y2-1: goto 540 : rem n/w
+  530  
+  540 rem ***** werte kontrollieren *****
+  550 if x2 < 0   then x2 = 0
+  560 if y2 < 0   then y2 = 0
+  570 if x2 > c-1 then x2 = c-1
+  580 if y2 > d   then y2 = d
+  590  
+  600 rem ******** punkt bewegen ********
+  610 if j < 100 then poke a+x1+y1*c,32
+  620 poke a+x2+y2*c,160
+  630 poke b+x2+y2*c,1
+  640  
+  650 rem ** neue werte & ruecksprung  **
+  660 x1 = x2 : y1 = y2
+  670 goto 360
+  680  
+  690  
+  700 rem ************ datas ************
+  710 data   008, 169, 000, 141, 255, 003
+  720 data   169, 001, 045, 001, 220, 208
+  730 data   008, 169, 001, 109, 255, 003
+  740 data   141, 255, 003, 169, 002, 045
+  750 data   001, 220, 208, 008, 169, 005
+  760 data   109, 255, 003, 141, 255, 003
+  770 data   169, 008, 045, 001, 220, 208
+  780 data   008, 169, 003, 109, 255, 003
+  790 data   141, 255, 003, 169, 004, 045
+  800 data   001, 220, 208, 008, 169, 006
+  810 data   109, 255, 003, 141, 255, 003
+  820 data   169, 016, 045, 001, 220, 208
+  830 data   008, 169, 100, 109, 255, 003
+  840 data   141, 255, 003, 040, 096, 000
+  850  
+  860  
+  870  
+  880 rem *******************************
+  890 rem *** aenderungen fuer vc-20  ***
+  900 rem *******************************
+  910 rem
+  920 rem geben sie diese zeilen ein:
+  930 rem
+  940 rem 240 s=0 : for i=842 to 943
+  950 rem 270 if s=10932 then 300
+  960 rem 320 poke 36879,9
+  970 rem 330 a=7680 : b=38400 : c=22
+  980 rem 340 d=22 : print "{clr}"
+  990  
+ 1000 rem bitte geben sie statt den zei-
+ 1010 rem len 700-840 diese datas ein:
+ 1020 rem
+ 1030 rem 700 data 008,169,127,141,034
+ 1040 rem 710 data 145,169,000,141,019
+ 1050 rem 720 data 145,141,255,003,169
+ 1060 rem 730 data 004,045,017,145,208
+ 1070 rem 740 data 008,169,001,109,255
+ 1080 rem 750 data 003,141,255,003,169
+ 1090 rem 760 data 008,045,017,145,208
+ 1100 rem 770 data 008,169,005,109,255
+ 1110 rem 780 data 003,141,255,003,169
+ 1120 rem 790 data 128,045,032,145,208
+ 1130 rem 800 data 008,169,003,109,255
+ 1140 rem 810 data 003,141,255,003,169
+ 1150 rem 820 data 016,045,017,145,208
+ 1160 rem 830 data 008,169,006,109,255
+ 1170 rem 840 data 003,141,255,003,169
+ 1180 rem 850 data 032,045,017,145,208
+ 1190 rem 860 data 008,169,100,109,255
+ 1200 rem 870 data 003,141,255,003,169
+ 1210 rem 880 data 255,141,034,145,169
+ 1220 rem 890 data 128,141,019,145,040
+ 1230 rem 900 data 096,000,000,000,000
+

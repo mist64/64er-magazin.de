@@ -1,0 +1,152 @@
+
+
+;schach.prg ==0801==
+    1 rem ****** schach fur den c-64 ******
+    2 rem ** (c) by bernd bettermann     **
+    3 rem **        amelither str.21     **
+    4 rem **        3417 bodenfelde      **
+    5 rem **  tel:05572/330 ab 18'00     **
+    6 rem *********************************
+    7 :
+   10 ifpeek(49408)<>162thensys5517
+   20 goto1000
+   70 :
+   80 rem ------ stellungsbewertung ------
+   90 :
+  100 wz=peek(zf):pokezf,peek(x):pokex,0
+  110 aa=usr(128):ifaa=128then520
+  120 :
+  200 aa=aa+wz
+  210 ifpeek(x-9)=1orpeek(x-11)=1thenaa=aa+peek(zf)-128
+  220 ifpeek(zf-9)=1orpeek(zf-11)=1thenaa=aa-peek(zf)-128
+  400 :
+  500 ifaa>bwthenbw=aa:ba=x:bz=zf:goto520
+  510 ifaa=bwandrnd(1)>.7thenba=x:bz=zf
+  520 pokex,peek(zf):pokezf,wz:return
+ 1000 :
+ 1010 rem ----- variablendefinition ----
+ 1020 :
+ 1030 forx=49152to49171:pokex,128:pokex+100,128:nextx
+ 1040 forx=49172to49251:pokex,0:nextx
+ 1050 forx=49172to49242step10:pokex,128:pokex+9,128:nextx
+ 1060 forx=49183to49190:pokex,1:pokex+50,129:nextx
+ 1070 restore:forx=49173to49180:reada:pokex,a:pokex+70,a+128:nextx
+ 1080 data 4,2,3,5,6,3,2,4
+ 1090 poke785,0:poke786,193
+ 2000 :
+ 2010 rem ----- spielfeld ausgeben -----
+ 2020 :
+ 2030 poke53280,0:poke53281,0:print"{clr}{grn}{down}{down}  {CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}"
+ 2040 fory=8to1step-1:printchr$(48+y);"{CBM-M}";:forx=1to8
+ 2050 w=peek(49162+y*10+x)
+ 2060 ifw=0thenprint"{SHIFT-@}";:goto2090
+ 2070 ifw>128thenprint"{rvon}";mid$("bsltdk",w-128,1);"{rvof}";
+ 2080 ifw<128thenprintmid$("bsltdk",w,1);
+ 2090 nextx:print
+ 2100 nexty:print"  {CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}":print"  abcdefgh{down}{down}":bw=-50
+ 3000 :
+ 3010 rem ------ zugeingabe weiss ------
+ 3020 :
+ 3030 input"ihr zug ";z$
+ 3040 iflen(z$)<>4thenprint"{up}":goto3030
+ 3050 ifmid$(z$,1,1)<"a"ormid$(z$,1,1)>"h"then3030
+ 3060 ifmid$(z$,3,1)<"a"ormid$(z$,3,1)>"h"then3030
+ 3070 ifmid$(z$,2,1)<"1"ormid$(z$,2,1)>"8"then3030
+ 3080 ifmid$(z$,4,1)<"1"ormid$(z$,4,1)>"8"then3030
+ 3090 af=asc(left$(z$,1))-64+10*val(mid$(z$,2,1))+49162
+ 3100 zf=asc(mid$(z$,3,1))-64+10*val(right$(z$,1))+49162
+ 3110 ifpeek(af)=0orpeek(af)>6then3030
+ 3120 ifpeek(zf)>0andpeek(zf)<129then3030
+ 3130 pokezf,peek(af):pokeaf,0
+ 4000 :
+ 4010 rem --- schw. figurenpos. holen --
+ 4020 :
+ 4030 forx=49173to49250:ifpeek(x)>128thengosub6000
+ 4040 nextx
+ 5000 :
+ 5010 rem ---- schw. zug ausfuehren ----
+ 5020 :
+ 5030 pokebz,peek(ba):pokeba,0:print"{down}wert:";bw
+ 5040 print"{down}zug: ";
+ 5050 bb=ba-49172
+ 5055 ifbb>10thenbb=bb-10:goto5055
+ 5057 printchr$(bb+64);
+ 5060 printchr$(int((ba-49172)/10)+49);"-";
+ 5070 bb=bz-49172
+ 5075 ifbb>10thenbb=bb-10:goto5075
+ 5077 printchr$(bb+64);
+ 5080 printchr$(int((bz-49172)/10)+49)
+ 5085 ifbw=-50thenprint"{down}ich gebe auf":end
+ 5090 forx=1to1000:nextx:goto2000
+ 5100 :
+ 5110 end
+ 5120 :
+ 6000 ifpeek(x)<>129then6100
+ 6010 :
+ 6020 rem -------- bauernzuege ---------
+ 6030 :
+ 6040 ifx>49233andpeek(x-10)=0andpeek(x-20)=0thenzf=x-20:gosub100
+ 6050 ifpeek(x-10)=0thenzf=x-10:gosub100
+ 6060 ifpeek(x-9)>0andpeek(x-9)<7thenzf=x-9:gosub100
+ 6070 ifpeek(x-11)>0andpeek(x-11)<7thenzf=x-11:gosub100
+ 6080 return
+ 6100 ifpeek(x)<>130then6200
+ 6110 :
+ 6120 rem ------- springerzuege --------
+ 6130 :
+ 6140 z$="08121921":forz=1to7step2
+ 6150 zz=val(mid$(z$,z,2))
+ 6160 ifpeek(x+zz)<128thenzf=x+zz:gosub100
+ 6170 ifpeek(x-zz)<128thenzf=x-zz:gosub100
+ 6180 nextz:return
+ 6200 ifpeek(x)<>131then6400
+ 6210 :
+ 6220 rem -------- laeuferzuege --------
+ 6230 :
+ 6240 ff=0:forz=x+11tox+77step11:ifpeek(z)>6thenff=1
+ 6250 ifff=0thenzf=z:gosub100:ifpeek(z)<>0thenff=1
+ 6260 nextz
+ 6270 ff=0:forz=x-11tox-77step-11:ifpeek(z)>6thenff=1
+ 6280 ifff=0thenzf=z:gosub100:ifpeek(z)<>0thenff=1
+ 6290 nextz
+ 6300 ff=0:forz=x+9tox+63step+9:ifpeek(z)>6thenff=1
+ 6310 ifff=0thenzf=z:gosub100:ifpeek(z)<>0thenff=1
+ 6320 nextz
+ 6330 ff=0:forz=x-9tox-63step-9:ifpeek(z)>6thenff=1
+ 6340 ifff=0thenzf=z:gosub100:ifpeek(z)<>0thenff=1
+ 6350 nextz
+ 6360 return
+ 6400 ifpeek(x)<>132then6600
+ 6410 :
+ 6420 rem --------- turmzuege ----------
+ 6430 :
+ 6440 ff=0:forz=x+10tox+70step10:ifpeek(z)>6thenff=1
+ 6450 ifff=0thenzf=z:gosub100:ifpeek(z)<>0thenff=1
+ 6460 nextz
+ 6470 ff=0:forz=x-10tox-70step-10:ifpeek(z)>6thenff=1
+ 6480 ifff=0thenzf=z:gosub100:ifpeek(z)<>0thenff=1
+ 6490 nextz
+ 6500 ff=0:forz=x+1tox+7step1:ifpeek(z)>6thenff=1
+ 6510 ifff=0thenzf=z:gosub100:ifpeek(z)<>0thenff=1
+ 6520 nextz
+ 6530 ff=0:forz=x-1tox-7step-1:ifpeek(z)>6thenff=1
+ 6540 ifff=0thenzf=z:gosub100:ifpeek(z)<>0thenff=1
+ 6550 nextz
+ 6560 return
+ 6600 ifpeek(x)<>5then6700
+ 6610 :
+ 6620 rem ---------- damenzuege --------
+ 6630 :
+ 6640 gosub6210:gosub6410:return
+ 6700 :
+ 6710 rem -------- koenigszuege --------
+ 6720 :
+ 6730 z$="01091011":forz=1to7step2
+ 6740 zz=val(mid$(z$,z,2))
+ 6750 ifpeek(x+zz)<7thenzf=x+zz:gosub100
+ 6760 ifpeek(x-zz)<7thenzf=x-zz:gosub100
+ 6770 nextz:return
+ 6780 :
+ 6790 rem ----------- ende -------------
+ 6800 :
+
