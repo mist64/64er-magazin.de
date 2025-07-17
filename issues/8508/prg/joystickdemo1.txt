@@ -1,0 +1,71 @@
+
+
+;joystickdemo1.prg ==0801==
+  100 rem *******************************
+  110 rem *                             *
+  120 rem * j o y s t i c k d e m o   1 *
+  130 rem * --------------------------- *
+  140 rem *                             *
+  150 rem *  by   tobias        nicol   *
+  160 rem *                             *
+  170 rem *       neuwiesenstrasse 20   *
+  180 rem *                             *
+  190 rem *       6000  frankfurt  71   *
+  200 rem *                             *
+  210 rem *******************************
+  220  
+  230 rem ******* initialisierung *******
+  240 x1=0 : y1=0 : x2=0 : y2=0 : f=0
+  250 poke 53280,2 : poke 53281,0 : d=25
+  260 print "{clr}" : a=1024 : b=55296 : c=40
+  270  
+  280 rem **** eingabe auf joystick  ****
+  290 rem **** an port 1  umstellen  ****
+  300 poke 56323,peek (56323) and 224
+  310  
+  320 rem **** joystickport auslesen ****
+  330 j1 = peek (56321)
+  340  
+  350 rem ******* daten auswerten *******
+  360 if (j1 and  1) = 0 then y2 = y2-1
+  370 if (j1 and  2) = 0 then y2 = y2+1
+  380 if (j1 and  4) = 0 then x2 = x2-1
+  390 if (j1 and  8) = 0 then x2 = x2+1
+  400 if (j1 and 16) = 0 then f  = 1
+  410  
+  420 rem ** koordinaten kontrollieren **
+  430 if x2 < 0   then x2 = 0
+  440 if y2 < 0   then y2 = 0
+  450 if x2 > c-1 then x2 = c-1
+  460 if y2 > d-1 then y2 = d-1
+  470  
+  480 rem ******** punkt bewegen ********
+  490 if f = 0 then poke a+x1+y1*c,32
+  500 poke a+x2+y2*c,81
+  510 poke b+x2+y2*c,1
+  520  
+  530 rem ** neue werte & ruecksprung  **
+  540 x1 = x2 : y1 = y2 : f = 0
+  550 goto 320
+  560  
+  570  
+  580  
+  590 rem *******************************
+  600 rem *** aenderungen fuer vc-20  ***
+  610 rem *******************************
+  620 rem
+  630 rem aendern sie diese zeilen:
+  640 rem
+  650 rem 250 poke 36879,10 : d=23
+  660 rem 260 print "{clr}" : a=7680 : b=3840
+  670 rem     0 : c=22
+  680 rem 300 poke37139,0 : poke37154,127
+  690 rem 330 j1 = peek (37137)
+  700 rem 335 j2 = peek (37152)
+  710 rem 390 if(j2and128)=0 then x2=x2+1
+  720 rem
+  730 rem in den zeilen 360-380 und 400
+  740 rem die werte mit denen j1 "and"-
+  750 rem verglichen wird der reihenfolge
+  760 rem nach durch 4,8,16,32 ersetzen.
+

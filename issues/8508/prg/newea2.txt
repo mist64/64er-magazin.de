@@ -1,0 +1,290 @@
+
+
+;newea2.prg ==0801==
+   10 rem*********************************
+   20 rem*                               *
+   30 rem*             newea2            *
+   40 rem*                               *
+   50 rem*        von  hans haberl       *
+   60 rem*                               *
+   70 rem*********************************
+  100 rem  steuerzeichen:
+  101 rem   "{clr}" = shift + clr/home
+  102 rem   "{down}" = crsr down
+  103 rem   "{up}" = crsr up
+  104 rem   "{left}" = crsr back
+  105 rem   "{rvon}" = ctrl + 9
+  106 rem   "{rvof}" = ctrl + 0
+  107 rem   "{cyn}" = ctrl + 4
+  108 rem   "{yel}" = ctrl + 8
+  109 rem   "{lred}" = com($64)rore + 3
+  110 rem   "{gry3}" = com($64)rore + 8
+  130 ($64){CTRL-Z}6,6:print"{clr}{gry3}":($64){CTRL-G}1,0,40,23,81,7:($64){CTRL-G}0,1,38,25,81,7:($64){wht}3,3,34,19,32
+  150 print($64)(11,9)"ac-netzwerkanalyse":print($64)(12,15)"von  hans haberl"
+  160 ($64){$74}1,"goto300"+chr$(13)
+  170 dimi,j,r,s,f,u,v,x,y,p,q,k,n,m,o,c,l,j1,j2,kf
+  180 dimx1,x2,y1,y2,xf,xs,yf,ys,tl,tp,t0,z,d,e,w,c$,x$,n$,l%,q%,i%
+  190 dimr(20,21),s(20,21),m%(20,21),k(20),y(2,20,20),f(9,20),u(9,20),w(9,20)
+  200 dimi(90),j(90),b(90),a(90),x(2,3,5),n(10),p(11)
+  210 dimc$(9),d$(9),e$(9),k$(9),b$(9)
+  220 tl=10/log(10):tp=180/~:t0=2*~:fori=0to9:readc$(i),d$(i),e$(i):nexti
+  230 dataf,knoten ,anzahl der ,a,widerstaende,r,d,kapazitaeten,c
+  240 datao,induktivitaeten,l,n,transistoren,c b e,e,y-vierpole,1 1' 2 2'
+  250 datal,op's,+ - a,s,frequenz,frequenzfile,0,0,r,0,0,w
+  280 i=0:($64) :getc$:i=i+1:($64))c$<>""ori=300:print"{clr}":gosub500
+  300 close2:close4:close15
+  400 ($64)::print"{down}{down}>";:gosub5010
+  410 forc=0to7:ifc$<>c$(c)thennextc:gosub500:($64)6
+  420 print:onc+1gosub1000,1000,1500,2000,3000,3300,4050,4000:($64)6
+  500 print"{down}menue:":print"n=netzwerk eingeben":print"e=elemente eingeben"
+  510 print"f="d$(7)"gang":print"a=ausgabe":print"d=diagramm"
+  520 print"l=daten laden":print"s=daten speichern":return
+ 1000 c$="":gosub5650:gosub5700:ifq=0thenp=0:return
+ 1010 i=q:ifc<1andu<9thenprintd$(7)"en von ";:gosub5700
+ 1020 ($64)f:ifq>0andf(q,0)>0thenforj=0tof(q,0)+1:f(i,j)=f(q,j):nextj
+ 1030 ($64)f:ifc=0thenprint"ohne aenderung ?";:gosub5010
+ 1040 q=i:l=0:input"notiz";k$(q):ifc<1thenw(q,0)=c:ifc$<>"j"thenl=1
+ 1080 gosub1400:ifp<3orc<0thenreturn
+ 1100 c=1:($64)::print"file{rvon}#{rvof} , {rvon}n{rvof}ormierung oder {rvon}d{rvof}rucker?";
+ 1110 gosub5010:j=asc(c$)-48:l=0
+ 1120 ifc$="n"thengosub1300:($64)6
+ 1130 ifc$="d"thengosub7200:($64)6
+ 1140 ($64)5 ifj<1orj>9:($64)5 iff(j,0)=0
+ 1150 gosub1200:($64)6:return
+ 1200 gosub5900:p=1:l=1:($64) :f=f(q,p):iff(j,l)<fthenf=f(j,l)
+ 1220 c$=str$(f):printright$(c$,len(c$)-1):print"{up}";
+ 1230 iff=f(q,p)thenprinttab(7)"{cyn}";:x=u(q,p)
+ 1240 ($64)f:gosub5950:printtab(23):x=w(q,p):gosub5950:print:print"{up}{gry3}";:p=p+1
+ 1250 iff=f(j,l)thenprinttab(15):x=u(j,l)
+ 1260 ($64)f:gosub5950:printtab(31):x=w(j,l):gosub5950:l=l+1
+ 1270 print:($64))p>f(q,0)orl>f(j,0)
+ 1280 printtab(10)"{cyn}file"q"{gry3}file"j:return
+ 1300 input"bezugsfrequenz";f:input"db-wert";s:fori=1tof(q,0)
+ 1310 iff=f(q,i)thenr=s-u(q,i):fori=1tof(q,0):u(q,i)=u(q,i)+r:nexti
+ 1320 ($64)f:gosub1400:return
+ 1330 nexti:return
+ 1400 gosub5900:forp=1to20
+ 1410 iff(q,p)=0andc=0thenl=1
+ 1420 ifl=1thenprintf(q,p);:inputf(q,p):print"{up}{up}"
+ 1430 iff(q,p)>0thenonc+2gosub6000,4400,4700:nextp
+ 1440 f(q,0)=p-1:return
+ 1500 gosub5750:q=p:ifq=0thenreturn
+ 1600 gosub1700:fori=1toq:forj=1tof(p(i),0):x1=x2:y1=y2
+ 1610 x2=log(f(p(i),j))*xf+xs:y2=u(p(i),j)*yf+ys
+ 1620 ifj>1then($64){stop}x1,y1,x2,y2,1:($64){stop}x1+1,y1,x2+1,y2,1
+ 1630 nextj:ifq>1then($64){CTRL-K}x2-18,y2-6,p(i)+48,1,1
+ 1640 nexti:gosub5050:($64){$67}:print"{down}ausgabe auf drucker ?";:gosub5010
+ 1650 ifc$="j"thengosub7300
+ 1660 return
+ 1700 x1=f(p(1),1):x2=x1+1:y2=u(p(1),1):y1=y2-1
+ 1710 fori=1toq:p=p(i):r=f(p,f(p,0)):s=f(p,1):ifr>x2thenx2=r
+ 1720 ifs<x1thenx1=s
+ 1730 forj=1tof(p,0):r=u(p,j):ifr>y2theny2=r:($64)g:ifr<y1theny1=r
+ 1740 nextj,i:yf=185/(y1-y2):ys=192-y1*yf:xf=288/log(x2/x1):xs=32-log(x1)*xf
+ 1750 ($64){CTRL-A}6,4:s=(y2-y1)/10:r=10^int(log(s)/log(10)+.2):s=r*int(s/r+1)
+ 1760 i=0:($64) :i=i+1:y=s*int(y1/s+i)
+ 1770 ify<y2thenv=y*yf+ys:($64){$6f}0,v-3,str$(y),1,1,8:($64){stop}32,v,319,v,1
+ 1780 ($64))y>y2
+ 1800 ifx2/x1>1.1thengosub1820:($64)g:gosub1860
+ 1810 return
+ 1820 s=log(x2/x1)/10:v=x2-x1:x=x1
+ 1830 ($64) :r=10^int(log(x*v/(x+v))/log(10)):x=r*int(x/r+1):gosub1900
+ 1840 x=x*exp(s):($64))x>x2:return
+ 1860 s=(x2-x1)/6:r=10^int(log(s)/log(10)+.2):s=r*int(s/r+1)
+ 1870 i=0:($64) :i=i+1:x=s*int(x1/s+i):gosub1900:($64))x>x2:return
+ 1900 u=x:($64)::($64)5 ifu<1000:u=u/1000:($64)6:c$=right$(str$(u),5)
+ 1910 u=log(x)*xf+xs:($64){$6f}u-4-4*len(c$),193,c$,1,1,8:($64){stop}u,0,u,191,1:return
+ 2000 c=-1:gosub1000:gosub5000:ifc$="j"orp<2thenreturn
+ 2010 l%=p-1:c=6:gosub5660:ifu>0thenp(10)=p(1):($64)g:p(10)=9-int(q/9)
+ 2020 ($64) :print"optimierung von max. 4 elementen"
+ 2030 p=1:($64) :printp".element "b$(p);:inputb$(p):gosub6050:($64))p>4
+ 2040 gosub5000:($64))c$<>"j":p(0)=9-p:ifp=9thenreturn
+ 2050 p(9)=q:p=p(10):f(p,0)=l%:w(p,0)=1:k$(p)="ist":z=1:q%=10:print"x=abbruch"
+ 2100 ($64)::l=2:q=p(q%):forp=1tol%:f(q,p)=f(p(9),p):gosub4400:($64)5 ifr=0
+ 2110 w(q,p)=u(q,p)-u(p(q%-1),p):nextp
+ 2130 forj=10toq%:u=-r:r=0:forp=1tol%:r=r+w(p(q%),p)*w(p(j),p)/w(p(9),p)^2
+ 2140 nextp,j:ifq%=11thens=(1+atn(u/r/6)/3)^2:gosub3500:q%=10:($64)6:z=0:return
+ 2150 print:print"zyklus"z"fehler:"r:forp=1top(0):printb$(p),b(p(p));
+ 2160 iflen(b$(p))>4thenprintb(p(p+4)):($64)g:print
+ 2170 nextp:getc$
+ 2180 ifc$="x"orr<1thenprint"abbruch?";:gosub5010:($64)5 ifc$="j"orc$="x"
+ 2200 q%=11:i%=($64)r(z,p(0))+1:z=z+1:s=1.1:d=b(p(i%)):e=b(p(i%+4)):gosub3500
+ 2210 ($64)6:z=0:return
+ 3000 j=j1:fori=1to5:p(i)=n(i):nexti:($64) :print"{down}"e$(0);d$(0)"(ohne 0)",n;
+ 3010 inputn:fori=1to6:printe$(0);d$(i)tab(30)n(i);:inputn(i):n(i)=abs(n(i))
+ 3020 nexti:gosub5000:gosub5600
+ 3030 ($64))j1<91andn>0andn<21andn(6)<6andc$<>"j"
+ 3040 m=1:j=j+j1:fori=1to5:p=m+p(i)*(1+int(i/4)):m=m+n(i)*(1+int(i/4))
+ 3050 ifp>mthenfork=mtoj:gosub5620:nextk
+ 3060 ifp<mthenfork=jtomstep-1:gosub5620:nextk
+ 3070 nexti:($64) :k=1:fori=1to6:ifn(i)>0thenprint"{down}"d$(i)" an "d$(0)
+ 3080 ($64)f:forj=1ton(i):onigosub5100,5100,5100,5150,5200,5150:gosub5250:nextj
+ 3090 nexti:($64) :print"{down}ausgangs"d$(0),n(9);:inputn(9)
+ 3100 ($64))n(9)>0andn(9)<=n
+ 3110 gosub5000:($64))c$<>"j":print
+ 3300 ($64) :k=0:j(0)=1:fori=1to6:ifn(i)>0ori=1thenprint:printd$(i)" "e$(i)
+ 3310 ($64)f:forj=sgn(i-1)ton(i):onigosub5300,5300,5300,5350,5450,5400
+ 3320 ($64)f:k=k+1+int(i/4):nextj
+ 3330 nexti:gosub5000:($64))c$<>"j"
+ 3500 ifz>0thenb(p(i%))=d*s:b(p(i%+4))=e*s^sgn(49-p(i%+4))
+ 3600 gosub6200:u=-1:m=n+1:fori=1ton:forj=1tom:m%(i,j)=0:nextj,i
+ 3610 k=1:j2=1:forl=0to2:fori=1ton:forj=1ton:y(l,i,j)=0:nextj,i
+ 3620 j2=j2+n(l+1):($64)::($64)5 ifk=j2:i=i(k):j=j(k):gosub5800:k=k+1
+ 3630 ($64)6:nextl:y(0,1,1)=y(0,1,1)+1/b(0):m%(1,m)=u
+ 3650 j2=j2+2*n(4):($64)::($64)5 ifk=j2:l=0:s=abs(b(k))/.026:r=s*5e-4:p=i(k+1):o=i(k)
+ 3660 i=p:j=o:gosub5820:j=j(k):r=s:gosub5820:o=j:r=s/a(k):gosub5820
+ 3670 l=1:r=s/t0/b(k+1):gosub5820:i=i(k):p=i:r=r*5e-4:gosub5820:k=k+2:($64)6
+ 3700 s=1:j2=j2+2*n(5):($64)::($64)5 ifk=j2:i=i(k):j=j(k):p=i:o=j:kf=0:gosub5850
+ 3710 i=i(k+1):j=j(k+1):kf=1:gosub5850:p=i:o=j:kf=3:gosub5850
+ 3720 i=i(k):j=j(k):kf=2:gosub5850:s=s+1:k=k+2:($64)6
+ 3750 j2=j2+2*n(6):($64)::($64)5 ifk=j2:l=i(k+1):fori=0to2:forj=1ton:y(i,l,j)=0
+ 3760 nextj,i:y(0,l,l)=1:m%(l,l)=u:m%(l,i(k))=u:m%(l,j(k))=u
+ 3770 a(k)=t0*b(k+1)/b(k):k=k+2:($64)6:j2=j2-2*n(6)
+ 3780 fori=1ton:m%(i,0)=i:nexti
+ 3790 p=n(9):ifp<nthenq=n:gosub6300
+ 3800 fori=1ton-1:forj=i+1ton:m%(i,j)=m%(i,j)orm%(j,i):m%(j,i)=m%(i,j):nextj,i
+ 3810 ifn<3then3920
+ 3820 forp=1ton-2:f=n*n:fork=pton-1:v=0:fori=pton-1
+ 3830 ifm%(i,k)thenforj=i+1ton:w=m%(k,j)andnotm%(i,j):v=v-w:nextj
+ 3840 nexti:v=2*v-m%(k,m):ifv=fthengosub6350:ifr>sthens=r:q=k
+ 3850 ifv<fthenf=v:q=k:gosub6350:s=r
+ 3860 nextk:ifq>pthengosub6300
+ 3870 iff=0then3910
+ 3880 fori=p+1ton-1
+ 3890 ifm%(i,p)thenforj=i+1ton:m%(i,j)=m%(i,j)orm%(p,j):m%(j,i)=m%(i,j):nextj
+ 3900 nexti
+ 3910 nextp
+ 3920 fori=1ton:m%(i,m)=m%(i,m)orm%(i-1,m):k(m%(i,0))=i:nexti:gosub6250
+ 3930 ifz>0thenreturn
+ 3950 print"ausgabe auf drucker?";:gosub5010:ifc$="j"thengosub7000
+ 3960 return
+ 4000 f=0:open15,8,15:print"schaltung speichern ?";:gosub5010
+ 4010 ifc$="j"andn*j1>0thengosub4100
+ 4020 print:iff=0thenprinte$(7)"s speichern ?";:gosub5010:ifc$="j"thengosub4300
+ 4030 close2:close15:return
+ 4050 open15,8,15:gosub5500
+ 4060 iff=0theninput#2,c$:ifright$(c$,5)="newea"thenonval(c$)gosub4110,4300
+ 4070 close15:close2:return
+ 4100 gosub5500:iff>0thenreturn:($64)g:print#2,"1newea":input"notiz";n$
+ 4110 print:ifc=7thenprint#2,chr$(34)+n$+chr$(34):($64)g:input#2,n$:printn$
+ 4120 n(0)=n:fori=0to9:ifc=7thenprint#2,n(i):($64)g:input#2,n(i)
+ 4130 nexti:n=n(0):gosub5600:fori=0toj1
+ 4140 ifc=7thenprint#2,i(i):print#2,j(i):print#2,b(i):print#2,a(i):($64)g:input#2,i(i),j(i),b(i),a(i)
+ 4150 nexti:ifn(5)=0then4190
+ 4160 fork=1ton(5):fori=0to2:forj=0to3
+ 4170 ifc=7thenprint#2,x(i,j,k):($64)g:input#2,x(i,j,k)
+ 4180 nextj:nexti:nextk
+ 4190 gosub5550:close2:iff=0andc=6thengosub3300
+ 4200 return
+ 4300 onc-5gosub5660,5750:ifp=0orc+u=16thenreturn
+ 4310 ifc=7thengosub5500:iff=0thenprint#2,"2newea":print#2,p:($64)g:iff>0thenreturn
+ 4330 ifc=6theninput#2,p:ifp>uthenprint"nur"u"von"p:p=u
+ 4340 fori=1top:q=p(i)
+ 4345 ifc=6theninput#2,k$(q):printq;k$(q):($64)g:print#2,chr$(34)+k$(q)+chr$(34)
+ 4350 j=0:($64) :ifc=6theninput#2,f(q,j),u(q,j),w(q,j)
+ 4360 ifc=7thenprint#2,f(q,j):print#2,u(q,j):print#2,w(q,j)
+ 4370 j=j+1:($64))j>f(q,0):f(q,j)=0:nexti:gosub5550:return
+ 4400 gosub6200:s=t0*f(q,p):ifs=0orn=0thengosub6400:return
+ 4410 fori=1ton:u=k(i):forj=1ton:v=k(j):s(u,v)=y(1,i,j)*s-y(2,i,j)/s
+ 4420 r(u,v)=y(0,i,j):nextj:s(i,m)=0:r(i,m)=0:nexti:r(k(1),m)=1/b(0)
+ 4450 k=j2:($64)::($64)5 ifk=j2+2*n(6):i=k(i(k+1)):ifi=0then4490
+ 4460 r=1+s*s/a(k)^2:u=b(k)/r:v=u*s/a(k)
+ 4470 j=k(i(k)):r(i,j)=r(i,j)-u:s(i,j)=s(i,j)+v
+ 4480 j=k(j(k)):r(i,j)=r(i,j)+u:s(i,j)=s(i,j)-v
+ 4490 k=k+2:($64)6
+ 4500 fork=1ton-1:u=r(k,k):v=s(k,k):f=u*u+v*v
+ 4510 iff=0thengosub6400:return
+ 4550 fori=k+1ton:ifnotm%(i,k)then4600
+ 4560 x=r(i,k):y=s(i,k):r=(x*u+y*v)/f:s=(y*u-x*v)/f:forj=k+1tom
+ 4580 ifm%(i,j)then:x=r(k,j):y=s(k,j):r(i,j)=r(i,j)-r*x+s*y:s(i,j)=s(i,j)-s*x-r*y
+ 4590 nextj
+ 4600 nexti,k:u=r(n,n):v=s(n,n):f=u*u+v*v:iff=0thengosub6400:return
+ 4610 x=r(n,m):y=s(n,m):r=(x*x+y*y)/f
+ 4620 gosub6250:ifr=0thenprint"ua=0":p=p-1:l=1:return
+ 4630 u(q,p)=tl*log(r):ifl=2thenreturn
+ 4640 r=x*u+y*v:s=y*u-x*v
+ 4650 ifs=0thenw(q,p)=(1-sgn(r))*90:($64)g:w(q,p)=90*sgn(s)-tp*atn(r/s)
+ 4700 x=f(q,p):printx;:printspc(12-len(str$(x)));:x=u(q,p):gosub5950
+ 4710 x=w(q,p):printspc(7):gosub5950
+ 4720 print:ifl=0orp<2thenreturn
+ 4750 f=f(q,p):u=u(q,p):v=w(q,p):forj=pto2step-1
+ 4760 iff(q,j-1)>fthenf(q,j)=f(q,j-1):u(q,j)=u(q,j-1):w(q,j)=w(q,j-1):nextj
+ 4770 f(q,j)=f:u(q,j)=u:w(q,j)=v:return
+ 5000 print"{down}korrektur? ";
+ 5010 ($64){blu}7,20:print"{yel} {gry3}";:gosub5050:print"{left} {left}"c$:($64){$69}:return
+ 5050 poke198,0:wait198,1:getc$:return
+ 5100 print" "e$(i);j,i(k);j(k);:inputi(k),j(k):return
+ 5150 print" "left$(d$(i),i-3);j,e$(i);i(k);j(k);i(k+1);
+ 5160 inputi(k),j(k),i(k+1):j(k+1)=0:return
+ 5200 ($64) :print" vp"j,e$(i):printi(k);j(k);i(k+1);j(k+1);
+ 5210 inputi(k),j(k),i(k+1),j(k+1):($64))j(k+1)<=n:return
+ 5250 forq=ktok+i/4
+ 5260 ifi(q)<0orj(q)<0orn<i(q)orn<j(q)thenj=j-1:return
+ 5270 nextq:k=q:return
+ 5300 ($64) :gosub6500:inputb(k):($64))b(k)<>0:return
+ 5350 ($64) :gosub6550:inputa(k),b(k),b(k+1):($64))b(k+1)>0anda(k)>0:return
+ 5400 ($64) :gosub6600:inputb(k),b(k+1):($64))b(k+1)>0:return
+ 5450 gosub6650:forl=0to3:gosub6660
+ 5460 inputx(0,l,j),x(1,l,j),x(2,l,j):nextl:return
+ 5500 ($64) :print:input"filename ($=directory)";n$:ifn$="$"thenprint:($64)j"$:*=s"
+ 5510 print:gosub5550:iff>0thenreturn
+ 5520 ($64))n$<>"$":open2,8,2,n$+",s,"+e$(c+2)
+ 5550 ($64){$66}1:input#15,f,c$,r,s:iff>0thenprintf;c$;r;s
+ 5560 return
+ 5600 j1=n(1)+n(2)+n(3)+2*(n(4)+n(5)+n(6)):return
+ 5620 q=k+p-m:i(k)=i(q):j(k)=j(q):b(k)=b(q):a(k)=a(q):return
+ 5650 print"{down}{down}":printe$(7)"belegung:"
+ 5660 u=0:fori=1to9:k=f(i,0):ifk=0thenu=u+1:p(u)=i
+ 5670 ifk>0andc<>6thenprinti":"k$(i):print" "k"freq :"f(i,1)"-"f(i,k)
+ 5680 nexti:print:p=u:return
+ 5700 ($64) :($64) :printe$(7)" (1-9)"q;:inputq
+ 5710 ($64))q>=0andq<=9:($64))f(q,0)>0orc<1orq=0:return
+ 5750 gosub5650:($64) :fori=1to9-u:printi".";:q=p(i):gosub5700:p(i)=q
+ 5760 ifq>0thennexti
+ 5770 p=i-1:gosub5000:($64))c$<>"j":return
+ 5800 p=i:o=j:ifl=1thenr=b(k):($64)g:r=1/b(k)
+ 5820 ifi=jorp=othenreturn
+ 5830 y(l,p,i)=y(l,p,i)+r:y(l,o,j)=y(l,o,j)+r:m%(p,i)=u:m%(o,j)=u
+ 5840 y(l,p,j)=y(l,p,j)-r:y(l,o,i)=y(l,o,i)-r:m%(p,j)=u:m%(o,i)=u:return
+ 5850 forl=0to2:r=x(l,kf,s):ifr<>0thengosub5820
+ 5860 nextl:return
+ 5900 print:printd$(7);spc(5)"betrag (db)   ";
+ 5910 ifw(q,0)=0thenprint"phase (grad)":($64)g:print"toleranz(db)"
+ 5920 return
+ 5950 x$=str$(sgn(x)*int(abs(x)*1e3+.5))
+ 5960 ($64)::($64)5 iflen(x$)>4:x$=($64)[("0",x$,1):($64)6
+ 5970 x$=($64)[(".",x$,len(x$)-3):($64),"####.###",x$:return
+ 6000 print($64)u(" ",10)"{up}":printf(q,p)tab(8):x=u(q,p):gosub5950:inputu(q,p)
+ 6010 ($64) :print"{up}"tab(23):x=w(q,p):gosub5950
+ 6020 inputw(q,p):($64))w(q,p)>0:gosub4750:return
+ 6050 r=1:c$=b$(p):l=len(c$):ifc$="0"thenp=10-p:return
+ 6060 fori=1to3:forj=rtor+2:ifmid$(c$,j,1)<>e$(i)thennextj,i:return
+ 6070 k=val(right$(c$,l-j)):ifk<int(i/2)ork>n(i)thenreturn
+ 6080 forj=1toi:k=k+n(j):nextj:k=k-n(i):p(p+4)=k:ifr=1then6120
+ 6100 fori=3to4:n$=mid$(c$,i,1)
+ 6110 ifn$="*"thenp(p+4)=k+50:($64)g:ifn$<>"/"thennexti:return
+ 6120 ifr=1thenp(p)=k:r=4:ifl>4then6060:($64)g:p=p+1:return
+ 6200 print"{lred}{rvon}***  busy  ***{gry3}":return
+ 6250 print"{up}"($64)u(" ",14)"{up}":return
+ 6300 fori=1ton:r=m%(i,p):m%(i,p)=m%(i,q):m%(i,q)=r:nexti
+ 6310 forj=0tom:r=m%(p,j):m%(p,j)=m%(q,j):m%(q,j)=r:nextj:return
+ 6350 r=u:forj=1ton:r=r-m%(k,j):nextj:return
+ 6400 gosub6250:r=0:print"nicht loesbar":p=p-1:l=1:return
+ 6500 print" "e$(i);j"("i(k);j(k)")",b(k);:return
+ 6550 print" t"j"("i(k);j(k);i(k+1)") b0,ic,ft":printa(k);b(k);b(k+1);:return
+ 6600 print" op"j"("i(k);j(k);i(k+1)") v0,ft":printb(k);b(k+1);:return
+ 6650 print" vp"j"("i(k);j(k);i(k+1);j(k+1)") 1/r  c  1/l":return
+ 6660 print"  y"11+8*int(l/2)+l;x(0,l,j);x(1,l,j);x(2,l,j);:return
+ 6700 gosub6650:forl=0to3:gosub6660:print:nextl:return
+ 7000 input"notiz";n$:gosub7400:print"   "n$
+ 7020 k=0:fori=1to6:ifn(i)>0ori=1thenprint:printd$(i)" "e$(i)
+ 7030 ($64)f:forj=sgn(i-1)ton(i):onigosub6500,6500,6500,6550,6700,6600
+ 7040 ($64)f:print:k=k+1+int(i/4):nextj
+ 7050 nexti:print:print"ausgangsknoten:",n(9):print#4:close4:return
+ 7100 gosub7400:print"optimierungsverlauf":print#4:close4:return
+ 7200 gosub7400:print"   "k$(q):gosub1400:print#4:close4:return
+ 7300 gosub7400:fori=1toq:ifq>1thenprint"   "p(i);
+ 7310 print"   "k$(p(i)):nexti:print:print#4:close4:($64){$77}:return
+ 7400 open4,4:cmd4:print:printchr$(14)"ac-netzwerkanalyse"chr$(15)
+ 7410 print:return
+

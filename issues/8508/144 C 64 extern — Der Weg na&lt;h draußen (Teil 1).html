@@ -58,9 +58,21 @@
         <p>Zurück zum Programm: Mit dem X-Poti wird die Lautstärke des Tones, mit dem Y-Poti die Frequenz des Tones eingestellt. Die Werte werden in den Zeilen 320 und 330 ausgelesen und für die Tonregister aufbereitet. Bevor wir den Port 2 des C 64 auslesen können, müssen wir diesen allerdings noch dafür vorbereiten. Zunächst schalten wir die Interruptroutine des C 64 (IRQ) ab. Das geschieht durch POKE 56333,1 und ist notwendig, weil wir sonst schwankende Werte erhalten. Vielleicht ist Ihnen schon aufgefallen, daß die Register, aus denen ausgelesen wird (Zeilen 320/330), dieselben sind wie beim ersten Programm, obwohl wir doch jetzt den Port 2 beschältet haben. Wenn Sie das bemerkt haben, können Sie sich schon denken, was jetzt noch nötig ist: Wir müssen dem C 64 mitteilen, welchen Port wir auslesen wollen. Diese Information erhält er über Bit 6 und 7 der Adresse 56320. Das verhält sich so:</p>
 
         <table class="plain center1 center2">
-            <tr class="separator"><td></td><td>Bit 6</td><td>Bit 7</td></tr>
-            <tr class="separator"><td>Port 1</td><td>1</td><td>0</td></tr>
-            <tr><td>Port 2</td><td>0</td><td>1</td></tr>
+            <tr class="separator">
+                <td></td>
+                <td>Bit 6</td>
+                <td>Bit 7</td>
+            </tr>
+            <tr class="separator">
+                <td>Port 1</td>
+                <td>1</td>
+                <td>0</td>
+            </tr>
+            <tr>
+                <td>Port 2</td>
+                <td>0</td>
+                <td>1</td>
+            </tr>
         </table>
 
         <p>In dieser Adresse müssen wir also eine 127 ablegen (das ergibt sich durch die Kombination der anderen Bits in 56320), wenn wir Port 1 abfragen wollen. Dieser Wert steht hier aber sowieso immer, weshalb wir uns das Einstellen dieses Registers bei Programm 1 sparen konnten (auch das Abschalten des Interrupts ist unnötig, da sich keine Probleme ergeben). Wollen wir Port 2 auslesen, müssen wir vorher 191 nach Adresse 56320 POKEn. Erwähnenswert ist außerdem, daß dieser Wert vor jeder Abfrage neu in dieses Register eingeschrieben werden muß, da er vom Betriebssystem immer wieder mit der 127 von Port 1 überschrieben wird. Um diesen Sachverhalt nachzuprüfen, geben Sie einmal folgendes Miniprogramm ein:
@@ -212,12 +224,12 @@
         <p>Beim Port 1 ist im Prinzip dieselbe Operation mit Register 56323, wie bei Port 2 mit Register 56322 nötig. Da in disem Register jedoch sowieso immer eine Null steht (also alle Bits gelöscht sind), kann man sich die Arbeit sparen.</p>
 
         <p>Beim VC 20 müssen Sie
-            <code>POKE 37139,0 : POKE 37154,127</code> 
+            <code>POKE 37139,0 : POKE 37154,127</code>
             eingeben, um auf Joystick umzustellen. Auch hier wird die Tastatur teilweise außer Funktion gesetzt. RUN-STOP/RESTORE bleibt Ihnen jedoch erhalten.
         </p>
 
         <p>Was dieses ganze gePOKE im einzelnen bedeutet und warum es nötig ist, erfahren Sie in der nächsten Folge. Sie sollten jedoch noch wissen, wie Sie die Eingabe wieder auf die Tastatur legen:</p>
-        
+
         <ul class="plain">
             <li>C 64, Port 1: keine Eingabe nötig</li>
             <li>C 64, Port 2: POKE 56322, PEEK (56322) OR 31</li>
@@ -259,6 +271,28 @@
         <p>Das war's für heute. In der nächsten Folge werden wir die Besprechung des Control-Ports zu Ende bringen und uns anschließend dem User-Port zuwenden. Bis dahin haben Sie Gelegenheit, ausgiebig mit dem Gelernten zu experimentieren.</p>
 
         <address class="author">(Tobias Nicol/ev)</address>
+
+        <figure>
+            <pre data-filename="maennchendemo" data-name="Männchendemo"></pre>
+            <figcaption>Listing 1. Das Männchendemo (Paddles).</figcaption>
+        </figure>
+
+        <figure>
+            <pre data-filename="tondemo" data-name="Tondemo (Paddles)"></pre>
+            <figcaption>Listing 2. Tondemo (Paddles)</figcaption>
+        </figure>
+        <figure>
+            <pre data-filename="x_y-steuerung" data-name="X/Y-Steuerung (Paddles)"></pre>
+            <figcaption>Listing 3. Ein Beispiel zur X/Y-Steuerung (Paddles)</figcaption>
+        </figure>
+        <figure>
+            <pre data-filename="joystickdemo1" data-name="Joystickabfrage"></pre>
+            <figcaption>Listing 4. Demo-Programm zur Joystickabfrage</figcaption>
+        </figure>
+        <figure>
+            <pre data-filename="joystickdemo2" data-name="Joystickabfrage (Maschinenroutine)"></pre>
+            <figcaption>Listing 5. Joystickabfrage als Maschinenroutine</figcaption>
+        </figure>
     </article>
 </body>
 

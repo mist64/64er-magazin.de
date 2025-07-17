@@ -1,0 +1,95 @@
+
+
+;q_shellsort.prg ==0801==
+   10 rem erstellen eines feldes zum
+   20 rem sortieren.
+   30 rem das erstellen kann zufaellig
+   40 rem oder geziehlt (durch eingabe)
+   50 rem erfolgen.
+   60 rem
+   70 rem sortieralgorithmen erhalten die
+   80 rem zeilennummern von 1000 bis 10000
+   90 rem sie benoetigen jeweils diesen
+   99 rem vorspann zur ausfuehrung.
+  100 rem herstellung eines arrays:
+  110 rem arrayvariable      - a$
+  120 rem schleifenvariablen - x, y, z
+  130 rem hilfsvariablen     - b$, c$, d$
+  140 rem dreiecktausch mit  - s$
+  150 print"{clr}":clr
+  160 print"soll von {rvon}h{rvof}and oder {rvon}z{rvof}ufaellig erstellt":print
+  170 input"werden ";x$
+  180 ifx$<>"h"andx$<>"z"then150
+  190 ifx$="h"thengosub220:gosub1000:goto210
+  200 gosub220:gosub2000
+  210 goto4000: rem weitermachen
+  220 rem anzahl der elemente bestimmen
+  230 print:input"anzahl der elemente ";a
+  240 if a>10000thenprint:print"zu viele elemente":goto230
+  250 ifa<10thenprint:print"zu wenige elemente":goto230
+  255 dim a$(a)
+  260 input"{down}{down}{rvon}d{rvof}rucker oder {rvon}b{rvof}ildschirm ";y$
+  270 ify$<>"d"andy$<>"b"then260
+  280 ify$="d"thend=4:goto300
+  290 d=3
+  300 return
+ 1000 rem eingabe von hand
+ 1010 print"{clr}"
+ 1020 print:print"sie muessen jetzt"a" elemente eingeben!":print:print
+ 1030 print"jedes element besteht aus 3 zeichen.":print:print
+ 1040 forx=1toa
+ 1050 printx". ";:input"element";a$(x)
+ 1060 iflen(a$(x))<>3then1050
+ 1070 nextx
+ 1080 return
+ 2000 rem zufaellige eingabe
+ 2010 print"{clr}"
+ 2020 print:print"es werden jetzt"a" elemente zufaellig":print:print"ausgewaehlt"
+ 2030 print:print"jedes element besteht aus 3 zeichen.":print:print
+ 2040 forx=1toa
+ 2050 a$(x)=""
+ 2060 fory=1to3:a$(x)=a$(x)+chr$(int(rnd(ti)*25)+65):nexty
+ 2070 nextx
+ 2080 return
+ 3000 rem zwischenausgabe der elemente
+ 3010 for i=1toa-9step10
+ 3020 for j=itoi+9:print#1,a$(j)" ";:nextj
+ 3030 print#1:nexti
+ 3040 return
+ 4000 rem weitermachen
+ 4005 open1,d
+ 4010 print"{clr}ausgabe des erstellten feldes"
+ 4020 print
+ 4030 gosub3000
+ 4040 rem sortierung startet
+ 4050 rem
+10035 dim aa$(a)
+10040 s=int(a/2)
+10050 forx=1tos
+10060 fory=1toint(a/s)
+10070 aa$(y)=a$((y-1)*s+x)
+10080 nexty
+10090 aa=y-1:gosub20000
+10100 fory=1toint(a/s)
+10110 a$((y-1)*s+x)=aa$(y)
+10120 nexty
+10130 nextx
+10140 s=int(s/2)
+10160 ifsgoto10050
+10180 goto50000
+20000 forxx=2toaa
+20010 ifaa$(xx)>=aa$(xx-1) then 20080
+20030 xx$=aa$(xx):foryy=xx-1to1step-1
+20040 aa$(yy+1)=aa$(yy)
+20050 ifxx$<=aa$(yy-1)then 20070
+20060 aa$(yy)=xx$:goto20080
+20070 nextyy
+20080 nextxx
+20090 return
+50000 rem endebehandlung
+50010 print#1
+50020 gosub 3000
+50030 print#1,a;" elemente"
+50040 print#1:print#1:close1
+50050 end
+

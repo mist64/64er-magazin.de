@@ -1,0 +1,492 @@
+
+
+;vocabulary.sorce.prg ==0801==
+   40 open1,8,15,"s:forth.voc":close1
+   50 open1,8,1,"forth.voc"
+   60 :
+   70 :
+  100 :           sys  9*4096
+  105 :           .opt oo
+  110 stack         =  $cf00
+  115 retstack      =  $ce00
+  120 pos           =  $0002
+  122 retpos        =  $00fc
+  125 l             =  $00fd
+  130 h             =  $00fe
+  135 hl            =  $00fd
+  140 print         =  $ffd2
+  145 :            *=  $c000
+  146 reg1         *=  *+2
+  147 reg2         *=  *+2
+  148 reg3         *=  *+2
+  150 ;----------------------
+  155 cls         lda  #"{clr}"
+  160 :           jmp  print
+  165 ;----------------------
+  170 show        jsr  pop
+  175 :           sta  $62
+  180 :           stx  $63
+  185 :           ldx  #$90
+  190 :           lda  $62
+  195 :           bmi  minus
+  200 plus        lda  #" "
+  205 :           jsr  print
+  210 :           sec
+  215 :           jmp  $bdd4
+  220 minus       lda  #"-"
+  225 :           jsr  print
+  230 :           clc
+  235 :           jmp  $bdd4
+  240 ;----------------------
+  245 push        sta  h
+  250 :           stx  l
+  255 push1       ldx  pos
+  260 :           lda  h
+  265 :           sta  stack,x
+  270 :           inx
+  275 :           lda  l
+  280 :           sta  stack,x
+  285 :           inx
+  290 :           stx  pos
+  295 :           rts
+  300 ;----------------------
+  305 pop         ldx  pos
+  310 :           dex
+  315 :           lda  stack,x
+  320 :           sta  l
+  325 :           dex
+  330 :           lda  stack,x
+  335 :           sta  h
+  340 :           stx  pos
+  345 :           lda  h
+  350 :           ldx  l
+  355 :           rts
+  360 ;----------------------
+  365 drop        jmp  pop
+  370 ;----------------------
+  375 dup         jsr  pop
+  380 :           jsr  push
+  385 :           jmp  push1
+  390 ;----------------------
+  395 swap        jsr  pop
+  400 :           sta  reg1
+  405 :           stx  reg1+1
+  410 :           jsr  pop
+  415 :           sta  reg2
+  420 :           stx  reg2+1
+  425 :           lda  reg1
+  430 :           ldx  reg1+1
+  435 :           jsr  push
+  440 :           lda  reg2
+  445 :           ldx  reg2+1
+  450 :           jmp  push
+  455 ;----------------------
+  460 over        dec  pos
+  465 :           dec  pos
+  470 :           jsr  pop
+  475 :           inc  pos
+  480 :           inc  pos
+  485 :           inc  pos
+  490 :           inc  pos
+  495 :           jmp  push
+  500 ;----------------------
+  505 retpop      ldx  retpos
+  510 :           dex
+  515 :           lda  retstack,x
+  520 :           sta  l
+  525 :           dex
+  530 :           lda  retstack,x
+  535 :           sta  h
+  540 :           stx  retpos
+  545 :           lda  h
+  550 :           ldx  l
+  555 :           rts
+  560 ;----------------------
+  565 retpush     sta  h
+  570 :           stx  l
+  575 retpush1    ldx  retpos
+  580 :           lda  h
+  585 :           sta  retstack,x
+  590 :           inx
+  595 :           lda  l
+  600 :           sta  retstack,x
+  605 :           inx
+  610 :           stx  retpos
+  615 :           rts
+  620 ;-----------------------
+  625 subtraktion sec
+  630 :           lda  reg1
+  635 :           sbc  reg2
+  640 :           sta  reg3
+  645 :           lda  reg1+1
+  650 :           sbc  reg2+1
+  655 :           sta  reg3+1
+  660 :           rts
+  665 ;-----------------------
+  670 addition    clc
+  675 :           lda  reg1
+  680 :           adc  reg2
+  685 :           sta  reg3
+  690 :           lda  reg1+1
+  695 :           adc  reg2+1
+  700 :           sta  reg3+1
+  705 :           rts
+  710 ;-----------------------
+  715 cr          lda  #13
+  720 :           jmp  print
+  725 ;-----------------------
+  730 vergleich   jsr  pop
+  735 :           stx  reg1
+  740 :           sta  reg1+1
+  745 :           jsr  pop
+  750 :           stx  reg2
+  755 :           sta  reg2+1
+  760 :           jmp  subtraktion
+  765 ;-----------------------
+  770 gleich      jsr  vergleich
+  771 :           lda  reg3
+  772 :           ora  reg3+1
+  775 :           beq  wahr1
+  780 falsch1     lda  #0
+  785 :           tax
+  790 :           jmp  push
+  795 wahr1       lda  #0
+  800 :           ldx  #1
+  805 :           jmp  push
+  810 ;-----------------------
+  815 groesser    jsr  vergleich
+  820 :           bcc  wahr2
+  825 falsch2     lda  #0
+  830 :           tax
+  835 :           jmp  push
+  840 wahr2       lda  #0
+  845 :           ldx  #1
+  850 :           jmp  push
+  855 ;-----------------------
+  860 kleiner     jsr  swap
+  865 :           jmp  groesser
+  870 ;-----------------------
+  875 nicht       jsr  pop
+  880 :           ora  l
+  885 :           beq  wahr3
+  890 falsch3     lda  #0
+  895 :           tax
+  900 :           jmp  push
+  905 wahr3       lda  #0
+  910 :           ldx  #1
+  915 :           jmp  push
+  920 ;-----------------------
+  925 hole        jsr  pop
+  930 :           stx  reg1
+  935 :           sta  reg1+1
+  940 :           jsr  pop
+  945 :           stx  reg2
+  950 :           sta  reg2+1
+  955 :           rts
+  960 ;-----------------------
+  965 und         jsr  hole
+  970 :           lda  reg1
+  975 :           and  reg2
+  980 :           sta  l
+  985 :           lda  reg1+1
+  990 :           and  reg2+1
+  995 :           sta  h
+ 1000 :           jmp  push1
+ 1005 ;-----------------------
+ 1010 oder        jsr  hole
+ 1015 :           lda  reg1
+ 1020 :           ora  reg2
+ 1025 :           sta  l
+ 1030 :           lda  reg1+1
+ 1035 :           ora  reg2+1
+ 1040 :           sta  h
+ 1045 :           jmp  push1
+ 1050 ;-----------------------
+ 1055 exoder      jsr  hole
+ 1060 :           lda  reg1
+ 1065 :           eor  reg2
+ 1070 :           sta  l
+ 1075 :           lda  reg1+1
+ 1080 :           eor  reg2+1
+ 1085 :           sta  h
+ 1090 :           jmp  push1
+ 1095 ;-----------------------
+ 1100 add         jsr  hole
+ 1105 :           jsr  addition
+ 1110 :           ldx  reg3
+ 1115 :           lda  reg3+1
+ 1120 :           jmp  push
+ 1125 ;-----------------------
+ 1130 sub         jsr  swap
+ 1135 :           jsr  hole
+ 1140 :           jsr  subtraktion
+ 1145 :           ldx  reg3
+ 1150 :           lda  reg3+1
+ 1155 :           jmp  push
+ 1160 ;-----------------------
+ 1165 mul         jsr  hole
+ 1170 :           ldy  #0
+ 1175 :           sty  reg3
+ 1180 :           sty  reg3+1
+ 1185 :           ldy  #16
+ 1190 loop16      asl  reg3
+ 1195 :           rol  reg3+1
+ 1200 :           rol  reg2
+ 1205 :           rol  reg2+1
+ 1210 :           bcc  lab2
+ 1215 :           clc
+ 1220 :           lda  reg3
+ 1225 :           adc  reg1
+ 1230 :           sta  reg3
+ 1235 :           lda  reg3+1
+ 1240 :           adc  reg1+1
+ 1245 :           sta  reg3+1
+ 1250 :           bcc  lab2
+ 1255 :           inc  reg2
+ 1260 :           bne  lab2
+ 1265 :           inc  reg2+1
+ 1270 lab2        dey
+ 1275 :           bne  loop16
+ 1280 :           ldx  reg3
+ 1285 :           lda  reg3+1
+ 1290 :           jmp  push
+ 1295 ;-----------------------
+ 1300 division    jsr  hole
+ 1305 :           ldy  #16
+ 1310 :           lda  #0
+ 1315 :           sta  reg3
+ 1320 :           sta  reg3+1
+ 1325 loop17      rol  reg2
+ 1330 :           rol  reg2+1
+ 1335 :           rol  reg3
+ 1340 :           rol  reg3+1
+ 1345 :           sec
+ 1350 :           lda  reg3
+ 1355 :           sbc  reg1
+ 1360 :           tax
+ 1365 :           lda  reg3+1
+ 1370 :           sbc  reg1+1
+ 1375 :           bcc  lab4
+ 1380 :           sta  reg3+1
+ 1385 :           stx  reg3
+ 1390 lab4        dey
+ 1395 :           bne  loop17
+ 1400 :           rol  reg2
+ 1405 :           rol  reg2+1
+ 1410 :           rts
+ 1415 ;-----------------------
+ 1420 div         jsr  division
+ 1425 :           ldx  reg2
+ 1430 :           lda  reg2+1
+ 1435 :           jmp  push
+ 1440 ;-----------------------
+ 1445 mod         jsr  division
+ 1450 :           ldx  reg3
+ 1455 :           lda  reg3+1
+ 1460 :           jmp  push
+ 1465 ;-----------------------
+ 1470 trs         jsr  retpop
+ 1475 :           jmp  push
+ 1480 ;-----------------------
+ 1485 tsr         jsr  pop
+ 1490 :           jmp  retpush
+ 1495 ;-----------------------
+ 1500 do          jsr  swap
+ 1505 :           jsr  tsr
+ 1510 :           jmp  tsr
+ 1515 ;-----------------------
+ 1520 ind         jsr  trs
+ 1525 :           inc  retpos
+ 1530 :           inc  retpos
+ 1535 :           rts
+ 1540 ;-----------------------
+ 1545 loop1       jsr  trs
+ 1550 :           jsr  dup
+ 1555 :           jsr  trs
+ 1560 :           jsr  swap
+ 1565 vergl       jsr  vergleich
+ 1570 :           bcc  wahr4
+ 1571 falsch4     jsr  drop
+ 1575 :           jsr  drop
+ 1579 :           sec
+ 1580 :           rts
+ 1585 wahr4       inc  retpos
+ 1590 :           inc  retpos
+ 1595 :           jsr  add
+ 1600 :           jsr  tsr
+ 1605 :           clc
+ 1610 :           rts
+ 1615 ;-----------------------
+ 1620 loop        lda  #0
+ 1625 :           ldx  #1
+ 1630 :           jsr  push
+ 1635 :           jmp  loop1
+ 1640 ;-----------------------
+ 1645 loopplus    jsr  pop
+ 1650 :           inc  pos
+ 1655 :           inc  pos
+ 1660 :           lda  h
+ 1665 :           bpl  loop1
+ 1670 :           jsr  trs
+ 1675 :           jsr  dup
+ 1680 :           jsr  trs
+ 1685 :           jmp  vergl
+ 1690 ;-----------------------
+ 1695 if          jsr  pop
+ 1700 :           ora  l
+ 1705 :           beq  nein
+ 1710 ja          sec
+ 1715 :           rts
+ 1720 nein        clc
+ 1725 :           rts
+ 1730 ;-----------------------
+ 1735 emit        jsr  pop
+ 1740 :           txa
+ 1745 :           jmp  print
+ 1750 ;-----------------------
+ 1755 get         jsr  $ea87
+ 1760 :           cpx  #255
+ 1765 :           beq  null
+ 1766 :           cpx  #13
+ 1767 :           bcs  nonull
+ 1770 null        ldx  #$00
+ 1775 nonull      lda  #$00
+ 1780 :           jmp  push
+ 1785 ;-----------------------
+ 1790 key         jsr  get
+ 1795 :           jsr  dup
+ 1800 :           jsr  if
+ 1805 :           bcs  next5
+ 1810 :           jsr  drop
+ 1815 :           jmp  key
+ 1820 next5       rts
+ 1825 ;-----------------------
+ 1830 putzeile    stx  l
+ 1835 :           sta  h
+ 1840 :           ldy  #0
+ 1845 loopput     lda  (hl),y
+ 1850 :           beq  endput
+ 1855 :           jsr  print
+ 1860 :           iny
+ 1865 :           bne  loopput
+ 1870 endput      rts
+ 1875 ;-----------------------
+ 1880 type        jsr  pop
+ 1885 :           stx  $f7
+ 1890 :           jsr  pop
+ 1895 :           ldy  #0
+ 1900 looptype    lda  (hl),y
+ 1905 :           jsr  print
+ 1910 :           iny
+ 1915 :           cpy  $f7
+ 1920 :           bne  looptype
+ 1925 :           rts
+ 1930 ;-----------------------
+ 1935 expect      jsr  pop
+ 1940 :           stx  $f9
+ 1945 :           jsr  pop
+ 1950 :           stx  $f7
+ 1955 :           sta  $f8
+ 1960 :           ldx  #0
+ 1965 :           ldy  #0
+ 1970 loopex      jsr  $ffcf
+ 1975 :           sta  ($f7),y
+ 1980 :           cmp  #13
+ 1985 :           beq  endex
+ 1990 :           inx
+ 1995 :           iny
+ 2000 :           cpy  $f9
+ 2005 :           bne  loopex
+ 2010 endex       rts
+ 2015 ;-----------------------
+ 2020 depth       lda  pos
+ 2025 :           lsr  a
+ 2030 :           tax
+ 2035 :           lda  #0
+ 2040 :           jmp  push
+ 2045 ;-----------------------
+ 2050 dpoke       jsr  pop
+ 2055 :           stx  $f7
+ 2060 :           sta  $f8
+ 2065 :           jsr  pop
+ 2070 :           ldy  #1
+ 2075 :           sta  ($f7),y
+ 2080 :           txa
+ 2085 :           dey
+ 2090 :           sta  ($f7),y
+ 2095 :           rts
+ 2100 ;----------------------
+ 2105 poke        jsr  pop
+ 2110 :           stx  $f7
+ 2115 :           sta  $f8
+ 2120 :           jsr  pop
+ 2125 :           ldy  #0
+ 2130 :           txa
+ 2135 :           sta  ($f7),y
+ 2140 :           rts
+ 2145 ;----------------------
+ 2150 dpeek       jsr  pop
+ 2155 :           stx  $f7
+ 2160 :           sta  $f8
+ 2165 :           ldy  #0
+ 2170 :           lda  ($f7),y
+ 2175 :           tax
+ 2180 :           iny
+ 2185 :           lda  ($f7),y
+ 2190 :           jmp  push
+ 2195 ;----------------------
+ 2200 peek        jsr  pop
+ 2205 :           stx  $f7
+ 2210 :           sta  $f8
+ 2215 :           ldy  #0
+ 2220 :           lda  ($f7),y
+ 2225 :           tax
+ 2230 :           lda  #0
+ 2235 :           jmp  push
+ 2240 ;----------------------
+ 2245 call        jsr  pop
+ 2246 :           lda  780
+ 2247 :           ldx  781
+ 2248 :           ldy  782
+ 2250 :           jmp  (hl)
+ 2255 ;----------------------
+ 2260 pick        jsr  pop
+ 2265 :           ldy  pos
+ 2270 :           sty  reg1
+ 2275 :           txa
+ 2280 :           asl  a
+ 2285 :           sta  pos
+ 2290 :           jsr  pop
+ 2300 :           ldy  reg1
+ 2305 :           sty  pos
+ 2312 :           jmp  push
+ 2313 ;----------------------
+ 2315 rot         jsr  pop
+ 2320 :           stx  reg1
+ 2325 :           sta  reg1+1
+ 2330 :           jsr  pop
+ 2335 :           stx  reg2
+ 2340 :           sta  reg2+1
+ 2345 :           jsr  pop
+ 2350 :           stx  reg3
+ 2355 :           sta  reg3+1
+ 2360 :           ldx  reg2
+ 2365 :           lda  reg2+1
+ 2370 :           jsr  push
+ 2375 :           ldx  reg1
+ 2380 :           lda  reg1+1
+ 2385 :           jsr  push
+ 2390 :           ldx  reg3
+ 2395 :           lda  reg3+1
+ 2400 :           jmp  push
+ 2405 ;----------------------
+ 2410 load        jsr  $aefd
+ 2415 :           jsr  $e1d4
+ 2420 :           lda  #1
+ 2425 :           sta  $b9
+ 2430 :           lda  #0
+ 2435 :           jmp  $ffd5
+ 2440 ;----------------------
+ 9600 :           .sst 8,2,"@:label,s,w"
+ 9610 :           .end
+

@@ -1,0 +1,39 @@
+
+
+;programm 3  bas.prg ==0801==
+    1 rem *********************************
+    2 rem *                               *
+    3 rem *    demo-programm zum thema    *
+    4 rem *                               *
+    5 rem *        text und grafik        *
+    6 rem *      auf einem bildschirm     *
+    7 rem *                               *
+    8 rem *  heimo ponnath  hamburg 1984  *
+    9 rem *                               *
+   10 rem*********************************
+   15 clr:printchr$(147):z=10:s=10:gosub1000:print"zuvor noch eine frage:":print
+   20 input"ist hires-3 komplett geladen (j/n)";a$
+   25 ifa$="n"thenprint:printchr$(18)"brauchen sie aber!"chr$(146):end
+   30 poke52,128:poke56,128:sys37498:printchr$(147)
+   40 rem ++++++ sinuskurve zeichnen +++++
+   45 deffna(x)=sin(x):xu=-2*~:xo=2*~:yu=-2.5:yo=2:trs,xu,xo,yu,yo:hfl,6,14
+   50 funkt,a,xu,xo:tln,xu,0,xo,0:tln,0,yu,0,yo:rec,0,0,319,199
+   55 rem ++++++ der tex-befehl ++++++++++
+   60 tex,"dies ist eine sinuskurve",3,8
+   65 rem +++++ bildschirmaufspaltung ++++
+   70 sys35256:sys34647:z=21:s=0:gosub1000:print"wuenschen sie eine skalierung";
+   75 input"(j/n)";a$:ifa$="n"then115
+   80 rem +++++++ skalierung  ++++++++++++
+   85 deffnx(x)=int(39*(x+2*~)/(4*~)):deffny(y)=int(24*(2-y)/4.5)
+   90 forx=-6to6:tln,x,0,x,-.1:x$=str$(x):a=fny(-.3):b=fnx(x)
+   95 tex,x$,a,b:nextx
+  100 tln,0,1,-.2,1:tln,0,-1,-.2,-1:a=fny(1):b=fnx(.5):tex,"1",a,b:a=fny(-1)
+  105 b=fnx(.3):tex,"-1",a,b:clr:input"hardcopy (j/n)";a$:ifa$="j"thengosub2000
+  110 rem +++++ programmende ++++++++++++
+  115 z=21:s=0:gosub1000:print"geben sie nach ready ein:sys35377:hof "
+  120 end
+  999 rem ++++++ up cursor setzen +++++++
+ 1000 poke214,z:poke211,s:sys58640:return
+ 1999 rem +++++++ up hardcopy ++++++++++
+ 2000 sys35377:open1,4,10:print#1:close1:sys34865:sys35256:return
+

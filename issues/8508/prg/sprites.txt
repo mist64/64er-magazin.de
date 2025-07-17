@@ -1,0 +1,82 @@
+
+
+;sprites.prg ==0801==
+    1 rem *********************************
+    2 rem *                               *
+    3 rem *  beispielprogramm zu sprites  *
+    4 rem *                               *
+    5 rem * heimo ponnath   hamburg  1985 *
+    6 rem *                               *
+    7 rem *********************************
+    8 rem
+   45 rem **** bildschirmfarben ****
+   50 poke53280,0:poke53281,0:poke646,14
+   95 rem **** einlesen sprite-daten ****
+  100 fori=704to766:readd:pokei,d:nexti
+  110 fori=832to894:readd:pokei,d:nexti
+  115 rem ****** datas von sprite 1 ******
+  120 data0,0,0,0,0,0,3,255,192,1,3,128
+  130 data1,51,128,1,115,128,1,59,192
+  140 data129,186,254,255,255,255,129,2,1
+  150 data129,2,1,253,254,127,222,0,157
+  160 data255,255,190,62,0,62,28,0,28
+  170 data0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+  175 rem ****** datas von sprite 2 ******
+  180 data128,8,0,160,40,0,168,168,0
+  190 data40,168,0,42,170,0,10,234,160
+  200 data43,250,128,43,250,0,170,232,0
+  210 data170,168,0,165,168,0,129,90,0
+  220 data129,86,0,0,80,128,0,80,0
+  230 data0,16,20,0,16,85,0,17,84,0,21,0
+  240 data0,16,0,0,16,0
+  245 rem **** sprite-zeiger ****
+  250 poke2040,11:poke2041,13
+  255 rem **** einschalten ****
+  260 poke53269,peek(53269)or(2^0):poke53269,peek(53269)or(2^1)
+  265 rem **** sprite-positionen ****
+  270 forn=0to1:print"sprite"n;:input"x,y=";x(n),y(n)
+  280 poke53249+2*n,y(n)
+  290 ifx(n)>255thenpoke53248+2*n,x(n)-256:poke53264,peek(53264)or(2^n):goto305
+  300 poke53248+2*n,x(n):poke53264,peek(53264)and(255-2^n)
+  305 ifk=1thenreturn
+  310 nextn
+  315 rem **** sprite-farben ****
+  320 poke53287,3:rem sprite 0 =cyan
+  330 poke53285,5:rem sprite 1 kennung 01=gruen
+  340 poke53286,7:rem kennung 11=gelb
+  350 poke53288,2:rem kennung 10=rot
+  360 poke53276,peek(53276)or(2^1):rem multicolormodus eingeschaltet
+  365 rem *** sprite-groessen ***
+  367 rem +++++ 3 weitere sprites +++++
+  370 poke2042,11:poke2043,13:poke2044,11:rem spritezeiger auf vorhandene daten
+  380 poke53269,peek(53269)or(2^2):poke53269,peek(53269)or(2^3)
+  385 poke53269,peek(53269)or(2^4):rem anschalten
+  390 poke53248+2*2,100:poke53249+2*2,100:poke53248+2*3,80:poke53249+2*3,200
+  395 poke53248+2*4,150:poke53249+2*4,150:poke53291,4
+  400 poke53289,1:poke53290,6:poke53276,peek(53276)or(2^3):rem positionen+farben
+  405 rem +++++ diese vergroessern +++++
+  410 poke53277,peek(53277)or(2^2):rem sprite 2 in x-richtung verdoppeln
+  420 poke53271,peek(53271)or(2^3):rem sprite 3 in y-richtung verdoppeln
+  430 poke53271,peek(53271)or(2^4):poke53277,peek(53277)or(2^4):rem sprite 4 x+y
+  435 rem **** vorfahrt-regelung *****
+  440 poke53275,peek(53275)or(2^0):poke53275,peek(53275)or(2^2)
+  450 poke53275,peek(53275)or(2^4):rem alle autos hinter bildschirmzeichen
+  455 rem *** kollisionen vorbereiten ***
+  460 a=peek(53278):a=peek(53279)
+  465 rem *** steuern von sprite 0 ***
+  470 printchr$(147):n=0
+  480 geta$:ifa$=""then480
+  490 ifa$=chr$(17)thenpoke53249,peek(53249)+3:rem abwaerts
+  500 ifa$=chr$(145)thenpoke53249,peek(53249)-3:rem aufwaerts
+  510 ifa$=chr$(157)thenx(n)=x(n)-3:k=1:gosub290:k=0:rem links
+  520 ifa$=chr$(29)thenx(n)=x(n)+3:k=1:gosub290:k=0:rem rechts
+  525 rem *** sprite/sprite-kollision ***
+  530 a=peek(53278)
+  540 ifa=3ora=9thengosub600:rem kollision mit blumen ?
+  545 rem *** ende abfrageschleife ***
+  550 ifa$="_"thenend:rem programmende
+  560 goto480:rem erneute abfrage
+  565 rem *** kollisionsfolge ***
+  600 f=peek(53287)+1:iff>255thenf=0:rem farbcode sprite 0 erhoehen
+  610 poke53287,f:return:rem in farbregister von sprite 0
+
