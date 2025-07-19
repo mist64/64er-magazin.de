@@ -303,7 +303,7 @@
 
         <h2>Das Programmieren in Forth</h2>
 
-        <p>Nach dem Starten des Programms wird zuerst das Maschinenprogramm »VOCABULARY« in den Bereich 49152 bis 50160 geladen. Nach etwa einer Sekunde erscheint ein blinkender Cursor; jetzt können Sie Ihre Eingaben machen. Sie befinden sich im Interpretermodus, das heißt alle eingegebenen Befehle werden sofort ausgeführt. Daß dies im Interpretermodus so langsam geht, liegt nur daran, daß der Interpreter in Basic geschrieben ist; compilierte Befehle laufen dagegen etwa 10- bis 20mal so schnell wie Basic (sie werden vollkommen in Maschinensprache übersetzt). Vielleicht geben Sie mal das folgende Beispiel ein: »8 5 + .« (RETURN). Sie müßten jetzt 13 auf dem Bildschirm erhalten; wenn nicht, dann müssen Sie irgendwo im Programm einen Fehler gemacht haben. Sie können auch Kommentare einfügen, sie werden mit einer »(« begonnen und mit »)« abgeschlossen. Jeder Befehl wird durch ein Leerzeichen (oder Return) vom anderen getrennt</p>
+        <p>Nach dem Starten des Programms wird zuerst das Maschinenprogramm »VOCABULARY« in den Bereich 49152 bis 50160 geladen. Nach etwa einer Sekunde erscheint ein blinkender Cursor; jetzt können Sie Ihre Eingaben machen. Sie befinden sich im Interpretermodus, das heißt alle eingegebenen Befehle werden sofort ausgeführt. Daß dies im Interpretermodus so langsam geht, liegt nur daran, daß der Interpreter in Basic geschrieben ist; compilierte Befehle laufen dagegen etwa 10- bis 20mal so schnell wie Basic (sie werden vollkommen in Maschinensprache übersetzt). Vielleicht geben Sie mal das folgende Beispiel ein: »8 5 + .« (RETURN). Sie müßten jetzt 13 auf dem Bildschirm erhalten; wenn nicht, dann müssen Sie irgendwo im Programm einen Fehler gemacht haben. Sie können auch Kommentare einfügen, sie werden mit einer »(« begonnen und mit »)« abgeschlossen. Jeder Befehl wird durch ein Leerzeichen (oder Return) vom anderen getrennt.</p>
 
         <p>Doch wie definiert man einen neuen Befehl? Diese Frage wird Ihnen sicher schon lange auf den Lippen brennen. Doch auch hier macht es Ihnen Forth sehr einfach. Um die Definition eines neuen Befehls einzuleiten wird »:« benutzt, gefolgt von dem Namen des neuen Befehls (bitte vergessen Sie nicht das Leerzeichen hinter jedem Befehl.) Dann folgen die Befehle, die in das Wort compiliert werden sollen. Ein »;« beendet die Definition. Danach ist der Befehl wie jeder andere Befehl benutzbar. Auf Fehler reagiert der Compiler, indem er die Compilation abbricht. Danach sollte man den Befehl mit FORGET löschen, da sonst das Programm abstürzt, wenn Sie den Befehl aufrufen.</p>
 
@@ -878,30 +878,30 @@
             <figcaption>Listing 3. Zusatz-Befehle, Screen 0</figcaption>
         </figure>
         <figure>
-            <pre> ( *** Zusatz-Befehle 0 *** )
+            <pre>( *** zusatz-befehle 1 ***)
 
 
- ( Processor-Register )
+ (  2. Schleifenindex )
 
- 780 constant a-reg
- 781 constant x-reg
- 782 constant y-reg
- ( ---------------------- )
+ : j
+    r> r> r>
+    dup 704 !
+    >r >r >r
+    704 @
+ ;
 
- ( Die folgenden Befehle  )
 
- ( sollen zeigen,dass es  )
 
- ( mit dem recht beschei- )
+ (  Verlasse Schleife )
 
- ( denen Grundvokabular   )
+ : leave
+    r> r>
+    drop dup
+    >r >r
+ ;
 
- ( moeglich ist,doch ein  )
 
- ( sinnvolles,zweckmaess- )
-
- ( iges zu erstellen.     )
--->
+ -->
 </pre>
             <figcaption>Listing 4. Zusatz-Befehle, Screen 1</figcaption>
         </figure>
