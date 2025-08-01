@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>Zeicheneditor für C 64</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="Marc Ritter, ev">
+    <meta name="64er.issue" content="Sonderheft 4/85">
+    <meta name="64er.pages" content="129">
+    <!-- <meta name="64er.toc_category" content="XXX"> -->
+    <!-- <meta name="64er.toc_title" content="XXX"> -->
+    <meta name="64er.id" content="XXX">
+</head>
+
+<body>
+    <article>
+        <h1>Zeicheneditor für C 64</h1>
+<p class="intro">In der Kürze liegt hier die Würze. Statt seitenlanger Listings brauchen Sie nur eine einzige Bildschirmseite abzutippen, um den Zeichensatz Ihres C 64 ganz nach Belieben ändern zu können.</p>
+
+<p>Das Programm »Character Change« (Listing 1) ist ein Hilfsprogramm, um den Zeichensatz des C 64 beliebig zu verändern und anschließend auf Diskette abzuspeichern. Das ganze Listing wirkt zwar auf den ersten Blick etwas unübersichtlich, aber dafür sind es halt auch bloß 24 Zeilen.</p>
+
+<p>Der Vollständigkeit halber ist auch noch ein Demo-Programm dabei, das es ermöglicht, mit diesem veränderten Zeichensatz in eigenen Programmen zu arbeiten. Einsatzmöglichkeiten gibt es genug, etwa Spiele.</p>
+
+<p>Ein paar Erläuterungen zum Programm:</p>
+
+<p>Nach dem Starten mit »RUN«, fragt der Computer »KEY ?«. Hier kann ein beliebiges Zeichen über die Tastatur eingegeben werden. Allerdings muß es an der Stelle stehen, an der der Cursor blinkt, da aus dieser Speicherzelle des Video-RAMs der Bildschirmcode geholt wird.</p>
+
+<p>Nachdem die Eingabe mit RETURN abgeschlossen wurde, erscheint die Matrix des Zeichens vergrößert auf dem Bildschirm. Dabei steht ein Sternchen für gesetztes, ein Punkt für ein nicht gesetztes Pixel.</p>
+
+<p>Jetzt kann die Zeichenmatrix verändert werden, und zwar zeilenweise. Wieder durch Punkte und Sternchen kennzeichnen, wo ein Punkt gesetzt beziehungsweise nicht gesetzt werden soll. Danach RETURN drücken und die nächste Zeile ändern.</p>
+
+<p>Sind alle acht Zeilen neu eingegeben, so kann man sich für »W« wie »weiter« und »S« wie »save« entscheiden. Drückt man »W«, so geht das Spielchen von vorne los, mit »S« wird der «Zeichensatz auf Diskette abgespeichert. Drückt man eine andere Taste, so erfolgt ein Programmabbruch.</p>
+
+<p>Das File des Zeichensatzes nennt sich »character ram«. Das Demo-Programm (Listing 2) lädt einen bereits veränderten Zeichensatz von Diskette und stellt dann alle 256 Zeichen auf dem Bildschirm dar.</p>
+
+<h2>So arbeitet das Programm</h2>
+
+<p>Noch ein paar Worte zur Arbeitsweise des Programms.</p>
+
+<p>Zuerst wird von einem in DATAs abgelegten Maschinenprogramm mit Hilfe der Blockverschieberoutine des Betriebssystems der Zeichensatz zweimal in verschiedene RAM-Bereiche kopiert. Einmal nach $E000, einmal nach $9000. Dies ist erforderlich, um die Zeichenmatrix mit PEEK auslesen zu können, was im unter dem Betriebssystem liegenden RAM bekanntlich nicht geht Die zweite Kopie ist die, aus der der Computer jetzt die Zeichen ausliest. Danach werden von Basic aus die Zeiger für den Beginn des Video-RAMs, den Zeichengenerator und die damit zusammenhängenden 16 KByte für den Video-Controller neu gesetzt. Das Video-RAM wird also zwangsweise mit verschoben, und zwar nach dezimal 49152.</p>
+
+<p>Aus dem Bildschirmcode des eingegebenen Zeichens wird die Startadresse in der ersten Kopie des Zeichensatzes ermittelt und 8 Bytes ausgelesen. Aus diesen 8 Bytes werden dann die Strings für die Bildschirmdarstellung gebildet. Umgekehrt werden aus den eingegebenen Strings die Bytes für den Zeichensatz gebildet und anschließend in beide Kopien ge-POKEt.</p>
+
+<p>Ein zweites Maschinenprogramm ruft dann die SAVE-Routine auf und speichert die 4 KByte der ersten Kopie auf Diskette. Eine erste Kopie deshalb, um sie nach dem Laden in andere Programme nochmals lesen oder verändern zu können.</p>
+
+<p>Das Demo-Programm enthält im wesentlichen eine weitere Maschinenspracheroutine, die den Zeichensatz nach $9000 lädt und dann nach $E000 verschiebt. Die Umschaltung der Zeiger geschieht auch hier von Basic aus, um dem Anwender zu überlassen, wann er den neuen Zeichensatz verwenden will.</p>
+
+<address class="author">(Marc Ritter/ev)</address>
+    </article>
+</body>
+</html>

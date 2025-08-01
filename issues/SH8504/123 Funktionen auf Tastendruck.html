@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>Funktionen auf Tastendruck</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="Christian Quirin Spitzner, hm">
+    <meta name="64er.issue" content="Sonderheft 4/85">
+    <meta name="64er.pages" content="123-125">
+    <!-- <meta name="64er.toc_category" content="XXX"> -->
+    <!-- <meta name="64er.toc_title" content="XXX"> -->
+    <meta name="64er.id" content="XXX">
+</head>
+
+<body>
+    <article>
+        <h1>Funktionen auf Tastendruck</h1>
+<p class="intro">Mit diesem Beitrag zeigen wir Ihnen, wie auf Tastendruck beliebige Funktionen oder Programme auch während eines Programmlaufs gestartet werden können. Egal ob es sich nun um ein Basic- oder Maschinenprogramm handelt.</p>
+
+<p>Dieser Artikel soll Ihnen das Thema »Funktionen« anhand eines Beispiels näherbringen. Das Beispielprogramm können Sie mit etwas Assemblerkenntnis auch für Ihre Programme verwenden. Vorschlag: Der F1-Taste wird eine Funktion zugeordnet. Durch Drücken der F1-Taste soll jederzeit das Directory einer Diskette am Bildschirm gezeigt werden, ohne daß ein im Speicher vorhandenes Programm gelöscht wird. Während das Directory geladen wird, soll der Bildschirmrahmen die Farbe des Hintergrundes annehmen.</p>
+
+<p>Es wurden schon viele solcher Utilities veröffentlicht. Diese Programme werden aber im Regelfall durch Drücken der STOP/RESTORE-Tasten wieder abgeschaltet. Sollen diese Routinen dagegen gewappnet sein, so versagen sie spätestens nach einem Reset. Im Gegensatz zu diesen »Billigmethoden« soll aber unsere Directory-Funktion der F1-Taste auch nach einem Reset erhalten bleiben.</p>
+
+<p>Um derartige Anforderungen zu realisieren, müssen einige Betriebssystemroutinen zumindest angeschnitten werden. Die Wichtigste ist die Interruptroutine des C 64. Die Interruptroutine ist ein computerinternes Programm, das sehr oft angesprochen wird. Befindet sich der Computer im »Ready«-Modus, wird die Interruptroutine beispielsweise alle 1/60 Sekunde durchlaufen. Wird der C 64 in Anspruch genommen, etwa durch Diskettenoperationen, wird dieses Programm jedoch seltener bearbeitet. Der Interrupt erfüllt viele Aufgaben. Er stellt beispielsweise die Uhrzeit (TI,TI$) nach, läßt den Cursor blinken und übernimmt die Tastaturabfrage. Das Interruptprogramm befindet sich ab Adresse $EA31 im Betriebssystem. Der Computer sucht sich diese Adresse über einen Wegweiser. Dieser Wegweiser steht bei Adresse $0314 und $0315 in der Zero-Page. Ein solcher Wegweiser wird im Fachjargon als Vektor bezeichnet. Da sich der Vektor im RAM befindet, kann dieser verändert werden. Das heißt, daß der Interrupt »umgeleitet« werden kann. Doch davon später.</p>
+
+<h2>Wie funktioniert eine Modulerkennung?</h2>
+
+<p>Eine zweite gewichtige Betriebsroutine ist die Modulerkennung. Diese benötigt man, damit die geplante Funktion der F1-Taste »resetfest« wird und zugleich immun gegen die Tastenkombination STOP/RESTORE. Die Kennungs-Routine überprüft, ob sich ein Steckmodul im Expansion-Port befindet. Und zwar an der Codefolge »cbm80« ab Adresse $8004. Diese ASCII-Codefolge entspricht den Hex-Zahlen $C3,$C2,$CD,$38 und $30. Findet der Computer diese fünf Zahlen ab Adresse $8004, werden sowohl bei einem Reset als auch beim Drücken der Restore-Taste nicht mehr die Standardroutinen angesprochen. Der C 64 springt die Adressen an, deren Vektoren in $8000/8001 und $8002/8003 stehen. Der erste Vektor ist der Resetvektor. Der Resetvektor zeigt auf die Adresse, die nach einem Reset angesprungen wird. Nach STOP/RESTORE holt sich der C 64 die Sprungadresse des NMI-Vektors aus den Speicherzellen $8002 und 8003. Ist kein Modul eingesteckt, ist der Adreßbereich ab $8000 als RAM freigegeben. Wenn man nun ab Adresse $8004 die oben genannte Codefolge ablegt, nimmt der C 64 an, daß sich ein Modul im Expansion-Port befindet. Durch diesen Trick kann der Reset- und NMI-(RESTORE-) Vektor verändert werden.</p>
+
+<p>Da unser Programm wegen dieses Tricks mitten im Basic-Speicher steht, muß es vor dem Überschreiben durch lange Basic-Programme oder Stringvariablen gesichert werden. Dies erreicht man, wenn man den Zeiger für den Stringspeicher $33-$34 und den Zeiger für die Speichergrenze auf $8000 setzt.</p>
+
+<p>Doch nun zum Programm selbst. Nach dem Eingeben des Programmes mit Hilfe des MSE kann es mit SYS 32819 oder mit einem Reset (SYS 64738) initialisiert werden. Dabei wird der Interrupt auf die Adresse $8046 umgeleitet und das Programm vor dem Überschreiben geschützt. Solange der Interruptvektor verändert wird, muß der Interrupt gesperrt werden. Das heißt, daß während dieser Zeit die Interruptroutine nicht angesprungen werden darf. Ein Interrupt muß auch verhindert werden, wenn gerade ein Interruptprogramm stattfindet. Die Katze soll sich schließlich nicht in den eigenen Schwanz beißen. Um einen Interrupt zu sperren, gibt es einen speziellen Assemblerbefehl, den SEI (Set Interrupt Flag). Ist das IRQ-Flag (IRQ, Interrupt Request) gesetzt, läßt sich der 6502-Prozessor nicht mehr durch einen Interrupt unterbrechen, um ein anderes Programm auszuführen. Um den Interruptvektor auf unser Beispielprogramm zu richten, muß in Speicherzelle $0314 das Lowbyte ($46) und in $0315 das Highbyte ($80) unserer Programmadresse ($8046) geschrieben werden. Danach kann das Interruptflag wieder gelöscht werden. Der Assemblerbefehl dazu lautet CLI (Clear Interrupt Flag). Wird nun ein Interrupt ausgelöst (von den CIAs), springt der Prozessor zur Adresse $8046. In unserem Beispiel setzt dort die Abfrage der F1-Taste ein. Ist sie gedrückt oder nicht? Eine Antwort darauf liefert die Adresse $CB in der Zero-Page. Denn der Inhalt von $CB gibt Auskunft darüber, welche Taste zuletzt gedrückt wurde. War es die F1-Taste, steht dort eine »4«.</p>
+
+<p>Den Code einer jeden Taste können Sie mit der folgenden Basic-Anweisung leicht ermitteln:<br/>
+FOR 1=1 TO 10000 : PRINT PEEK(203) : NEXT I</p>
+
+<p>Drücken Sie danach die gewünschte Taste, erscheint die zugehörige Zahl am Bildschirm.</p>
+
+<p>Das Beispielprogramm reagiert nun folgendermaßen: Ist dieF1-TaSte nicht gedrückt, also der Inhalt der Speicherzelle ungleich 4, wird in Speicherzelle $8009 der Wert $FF geschrieben und die Adresse $EA31 angesprungen. Wie schon erwähnt, steht ab $EA31 die normale IRQ-Routine des C 64. Warum in Speicherzelle $FF geschrieben wird, soll später erklärt werden.</p>
+
+<p>Wurde die F1-Taste gedrückt, wird das Beispielprogramm bearbeitet. Dabei verändert der Bildschirm seine Rahmenfarbe und das Unterprogramm »Directory« ab Adresse $8074 wird abgearbeitet. Ab Adresse $8074 kann jedes beliebige Unterprogramm stehen. Voraussetzung ist nur, daß dieses mit RTS abgeschlossen wird. In diesem Beispiel ist es eben das Zeigen eines Diskettendirectories.</p>
+
+<p>Stellen Sie sich jetzt vor, es würde kein Directory gelesen, sondern irgendeine Funktion aufgerufen, die einen sehr kleinen Zeitbedarf hat. Eventuell eine Einstellung von Bildschirmfarben, wo verfügbare Farben durch Drücken der F1-Taste gezeigt werden. Alle 1/60 Sekunde würde dann die Farbe wechseln. Unmöglich! Deshalb ist in die Tastenabfrage noch ein Trick eingebaut, der das verhindert. Dazu wird nach dem Drücken von F1 ein Flag gesetzt (Speicherzelle $8009 auf $00) und erst dann die Funktion aufgerufen. Ist beim nächsten Interrupt $8009 immer noch »0«, so heißt das, daß die F1-Taste in der Zwischenzeit noch nicht losgelassen wurde. Die Funktion soll dann nicht nochmal ausgeführt, sondern mit der originalen IRQ-Routine fortgefahren werden.</p>
+
+<p>Wäre die F1-Taste in der Zwischenzeit losgelassen worden, hätte in der Speicherzelle $CB eine Änderung stattgefunden. Unsere IRQ-Routine hätte das erkannt und in $8009 den Hex-Wert $FF geschrieben.</p>
+
+<p>Damit die Funktions-Belegung derF1-Taste nicht durch einen Reset zerstört werden kann, wurde das Prinzip der Modulerkennung genutzt. Der Resetvektor zeigt auf die Adresse $800A. Ab dieser Adresse wurde einfach der Anfang des Originalresets nachgebildet. Nachdem der Arbeitsspeicher neu initialisiert und alle Vektoren (auch Interruptvektor) mit ihren Standardwerten belegt wurden, springt »unser« Reset nach $8033 und initialisiert wieder die F1-Taste. Anschließend wird der Prozessor wieder auf seinen gewohnten Weg geschickt ($FCFB).</p>
+
+<h2>Unempfindlich gegen Reset</h2>
+
+<p>Der NMI-Vektor wurde auf die Adresse $801F »verbogen«. Ab dieser Adresse ist der Original-NMI nachgebaut Bis auf den Sprung an die Adresse $FD15, der weggelassen wurde. Dort wird nämlich die Interruptadresse korrigiert und die F1-Taste abgeschaltet, was die ganzen Anstrengungen zunichte machen würde.</p>
+
+<p>Das Beispielprogramm kann natürlich beliebig erweitert oder geändert werden. Es wäre zum Beispiel möglich, die Buchstabentasten über die CTRL-Taste mit einer vierten Funktion zu belegen. Ähnlich SHIFT/CBM. Ein anderer Einsatz wäre der Aufruf einer Hardcopy. Versuchen Sie einfach mal, eine Hardcopyroutine über ????? aufzurufen, statt die Directory-Funktion. Sie müssen dazu nur den JSR $8074-Befehl ab Adresse $806A so ändern, daß die von Ihnen gewählte Routine abgearbeitet wird. Der Befehl lautet dann vielleicht JSR $C000. Haben Sie keine Angst vor Maschinensprache! Experimentieren Sie doch einfach mit diesem Programm. Eine einfache Übung: Stellen Sie mit der F1-Taste die Farben ein.</p>
+
+<address class="author">(Christian Quirin Spitzner/hm)</address>
+    </article>
+</body>
+</html>

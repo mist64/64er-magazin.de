@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>Hardcopy für Ihren Drucker</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="Frank Lonczewski, ev">
+    <meta name="64er.issue" content="Sonderheft 4/85">
+    <meta name="64er.pages" content="115-122">
+    <!-- <meta name="64er.toc_category" content="XXX"> -->
+    <!-- <meta name="64er.toc_title" content="XXX"> -->
+    <meta name="64er.id" content="XXX">
+</head>
+
+<body>
+    <article>
+        <h1>Hardcopy für Ihren Drucker</h1>
+<p class="intro">&hellip; oder: von den Problemen, den Bildschirminhalt auf Papier zu bringen — und natürlich von den Lösungen dieser Probleme!</p>
+
+<p>Das Problem dürfte sich jedem Benutzer des C 64 stellen, der einen Drucker hat: Auf dem Monitor oder Fernseher wird ein Bild dargestellt, doch leider ist es ganz unmöglich, dieses Bild auf dem Drucker auszugeben, denn es wird nicht der normale Bildschirm mit einer Auflösung von 25 Zeilen ä 40 Zeichen dargestellt, sondern ein Bild in hochauflösender Grafik. Wie Sie trotzdem auch mit diesem Problem fertig werden, soll im folgenden beschrieben werden.</p>
+
+<h2>Aller Laster Anfang: Ihr Drucker</h2>
+
+<p>Schon beim Drucker stoßen wir auf schwerwiegende Probleme, denn manche Drucker sind wirklich nur sehr schwer oder gar nichtzum Drucken von Grafik zu bewegen. Folgende Kriterien sollten bei Ihrem Drucker erfüllt sein:</p>
+
+<ul>
+<li>der Drucker ist grafikfähig (natürlich die wichtigste Voraussetzung);</li>
+<li>der Drucker druckt mit mindestens acht Nadeln oder ähnlichem. Damit ist gemeint, daß der Druckkopf so konstruiert ist, daß er vertikal acht Punkte untereinander drucken kann;</li>
+<li>der Drucker beherrscht den sogenannten BI-Mode (Bit-Image-Mode). Das ist der Modus, in dem die hochauflösende Grafik ausgedruckt wird.</li>
+</ul>
+
+
+<p>Wenn Ihr Drucker diese Voraussetzungen erfüllt, dann ist es Ihnen in jedem Fall möglich, Ihre Bildschirmgrafiken auf Papier zu bringen.</p>
+
+<p>Aberauch Drucker, die keinen BI-Modus haben, sind mitunter grafikfähig. Da die Druckerpalette jedoch sehr groß ist, werden wir auf keinen speziellen Drucker eingehen, und es bleibt Ihnen letztlich überlassen, die Tauglichkeit Ihres Druckers zu überprüfen.</p>
+
+<p>Auch bei Druckern der unteren Preisklasse findet man heute schon die sogenannten ESC-Sequenzen. Das sind Steuerbefehle für den Drucker, die ihn zum Beispiel dazu veranlassen, die Schriftart oder etwa den Zeilenvorschub zu verändern. Eine solche Steuersequenz erkennt der Drucker an einem speziellen Zeichencode, bei dem er nicht wie sonst üblich das empfangene Zeichen als solches ausgibt, sondern vielmehr auf weitere Zeichen wartet, die in ihrer Gesamtheit einen Steuerbefehl ergeben. Üblicherweise wird dabei als ESC-Code das Zeichen CHR$(27) an den Drucker gesendet.</p>
+
+<h2>ESC — (von escape, engl. für entkommen, flüchten)</h2>
+
+<p>Die ESC-Sequenzen sind leider in keiner Norm vereinheitlicht. Deswegen darf normalerweise die Kompatibilität zwischen Druckern gleicher Leistungsklasse nicht ohne Einschränkungen angenommen werden.</p>
+
+<p>Nach Senden von ESC an den Drucker werden immer Daten nachgeschoben, die die Grundeinstellung des Druckers ändern, so etwa den Drucker dazu veranlassen, Grafik anstatt Klartext zu drucken. Wenn Sie einmal Ihr Druckerhandbuch aufschlagen und eine der Sequenzen ESC-K, ESC-L oder ESC-Z finden, dann werden Sie (hoffentlich) feststellen, daß Sie in dem Teil des Handbuchs lesen, der Sie interessiert — der Ausgabe von Grafik.</p>
+
+<p>Jetzt sind noch ein paar Berechnungen anzustellen und schon kann das Bild auf dem Drucker ausgegeben werden. Doch diese Berechnungen haben es in sich!</p>
+
+<h2>Wie die Grafik im Computer steht</h2>
+
+<p>Der C 64 ist bekanntlich ein vielseitiger Computer. So hat er unter anderem in seinem Inneren einen kleinen Chip (6567 Video Interface Chip, kurz VIC II) eingebaut, der dafür verantwortlich ist, daß sich etwas auf Ihrem Bildschirm tut. Der VIC II ist sehr flexibel und hat vielseitige Verwendungsmöglichkeiten innerhalb des C 64; wir beschränken uns jedoch hier auf die Funktionen, die ausschließlich für die Erzeugung der Grafik verantwortlich sind.</p>
+
+<p>Es können acht Grafikbildschirme vom VIC II verwaltet werden; ihre Basisadressen sind ein Vielfaches von 8192. So beginnt etwa der dritte Grafikbildschirm bei der Basisadresse 16384 (bei 0*8192 liegt der erste Grafikschirm, dieser wird aber im Regelfall nicht benutzt, da der Bereich anderweitig belegt ist, zum Beispiel durch Zero-Page und Stack.</p>
+
+<p>Wenn Sie ein Bild drucken wollen, müssen Sie sich immer erst Klarheit darüber verschaffen, in welchem Bereich der Grafikbildschirm steht, den Sie ausgeben wollen. Zwar können Sie für die Berechnungen auch so lange zwischen den acht Basisadressen wechseln, bis Sie den richtigen Bildschirm erwischt haben, effektiver dürfte da aber das kleine Basic-Programm sein, das in Listing 1 dargestellt ist. Mit Hilfe dieses kurzen Programms werden die Grafikbildschirme 3 (Startadresse 16384) bis 8 (Startadresse 57344) durch ein kurzes Maschinenprogramm auf die Startadresse des zweiten Grafikschirms verschoben und dort dargestellt. Dadurch wird es Ihnen möglich, auch die Grafikbildschirme 5 und 7 yon Basic aus problemlos auszugeben, da diese Schirme normalerweise nicht erreichbar sind (sie liegen »unter« dem ROM). Weil sich dieser Artikel nur mit der Ausgabe von Grafik beschäftigt, verzichte ich an dieser Stelle auf Erläuterungen zu dem Programm, denn dabei würde zu stark auf die Besonderheiten des VIC II eingegangen werden müssen.</p>
+
+<p>Nicht genug der acht Grafikschirme, verfügt der VIC II auch noch über zwei verschiedene Darstellungsarten: den sogenannten »High Resolution Mode« (HiRes, hochauflösende Grafik mit 64000 einzelnen Bildpunkten) und den »Multicolor-Mode«, in dem jeder Einzelpunkt in vier verschiedenen Farben dargestellt werden kann, bei dem aber dafür die Auflösung nur noch 32000 Bildpunkte beträgt. So mancher Anwender hat sich schon darüber gewundert, daß seine Hardcopy-Routine nur ein seltsames Strichmuster aufs Papier gebracht hat, aus dem man mit etwas Fantasie andeutungsweise das Originalbild entziffern konnte. Der Grund: im Multicolor-Modus werden in den Daten nicht nur die Bildinformation, sondern auch die Farbinformation verschlüsselt.</p>
+
+<p>An dieser Stelle ein Tip: wenn Sie eine Grafik ausgeben wollen, jedoch keine Möglichkeiten haben, den Programmablauf zu unterbrechen, so können Sie durchaus einen Reset auslösen. Dabei wird das Bild normalerweise nicht gelöscht und Sie können dann fast immer von Basic aus weitere Schritte zur Ausgabe des Bildes einleiten.</p>
+
+<h2>High Resolution Mode</h2>
+
+<p>ln Bild 1 ist zunächst einmal ein HiRes-Bild als solches dargestellt. In Bild 2 wurde über das Bild zusätzlich eine Schraffur gelegt, um die Struktur der Ablage des Bildes zu verdeutlichen. Durch das Rastermuster wird angedeutet, daß die Informationen nicht etwa Reihe für Reihe abgelegt werden, sondern in kleinen Blöcken, von denen in eine Zeile 40 passen, vertikal dagegen nur 25. Der Fachmann wird sich sofort an die Normaldarstellung von Zeichen erinnern. Tatsächlich ist diese Darstellung eng mit der normalen Zeichendarstellung verwandt.</p>
+
+<p>Bild 3 zeigt eine Vergrößerung eines Blocks. Man erkennt, daß ein Block seinerseits aus einer Matrix von 8 x 8 Punkten besteht. Ergo besteht ein Block aus 64 Punkten, und wir wissen, daß 25 x 40 = 1000 dieser Blöcke auf dem Bildschirm Platz haben, wodurch also insgesamt eine Auflösung von 64000 Punkten erreicht wird. So weit, so gut. Aus Bild 3 geht aber noch weiter hervor, daß die Informationen innerhalb eines einzelnen Blocks zeilenweise abgelegt werden; ein Block setzt sich also aus 8 Bytes zusammen, die ihrerseits wieder in kleinste Informationseinheiten, die Bits, zerlegt werden können. Diese Blöcke werden bei der HiRes-Darstellung so lange aneinandergereiht, bis eine Zeile mit Blöcken (weiterhin auch als »Blockzeile« bezeichnet) gefüllt ist. Der nächste Block liegt dann naheliegenderweise unter dem ersten der vorangegangenen Zeile.</p>
+
+<p>Damit es etwas anschaulicher wird, wollen wir uns an dieser Stelle mit einem kleinen Beispiel befassen.</p>
+
+<p>Aus Bild 2 ist Block 27 in Zeile 13 vergrößert im Bild 4 wiedergegeben (Blockbereich 0-39, Zeilenbereich 0-24). Weiterhin wird für die Beispielrechnung angenommen, daß das Bild im Computer im Grafikschirm 2 (Basisadresse 8192) abgespeichert ist. Wenn Sie nun die Blöcke zeilenweise auszählen, werden Sie feststellen, daß der besagte Block die Nummer 547 (erster Block entspricht der Nummer 0) trägt.</p>
+
+<p>Zunächst wollen wir klären, wie der Inhalt gerade dieses Blocks zu ermitteln ist. Dazö berechnen wir beispielsweise die Adresse von Byte 0 innerhalb dieses Blocks nach der Formel</p>
+
+<p>TODO PRE</p>
+
+<p>Byte 0 = Basisadresse+Blockzeilen*320+Blocknummer*8</p>
+
+<p>Wie läßt sich die Formel erklären?</p>
+
+<p>Zunächst einmal ist es verständlich, daß die Basisadresse des Grafikschirms der Positionsberechnung zugrunde liegen muß. Weiterhin faßt eine Blockzeile 40 Blöcke zu je 8 Byte; eine Blockzeile besteht also aus 320 Byte. Nun muß man sich noch innerhalb der aktuellen Zeile zu dem Block bewegen, dessen Inhalt untersucht werden soll. Hierzu multipliziert man einfach die Anzahl der Blöcke mit 8, da sich ein Blockaus 8 Byte zusammensetzt. Beachten Sie bitte bei der Berechnung, daß die Blockzeilen im Bereich 0 bis 24 liegen, die Blocknummern dagegen im Bereich 0 bis 39. So ergibt sich zum Beispiel als Startadresse für den 27. Block in der 13. Zeile:</p>
+
+<p>TODO PRE</p>
+
+<p>Byte 0 = 8192 + 13 * 320 + 27 * 8 = 12568</p>
+
+<p>Bei dem Block in unserem Beispiel ergibt also der Basic-Befehl</p>
+
+<p>TODO PRE</p>
+
+<p>PRINT PEEK(12568)</p>
+
+<p>den Inhalt von Byte 0 des Blocks 547. Wie groß wird nun dieser Wert sein?</p>
+
+<p>Wie bereits erwähnt, besteht ein Byte aus kleinen Informationseinheiten (Bits). Das Bit kann entweder den Zustand »1« oder den Zustand »0« annehmen. Wenn Sie nun noch einmal Bild 3 betrachten, werden Sie erkennen, daß 8 solcher Bits ein Byte ergeben. Diese Bits werden mit Bit 0 bis Bit 7 von rechts nach links durchnumeriert. Da das Bit nur zwei Schaltzustände annehmen kann, wird zur Berechnung eines Bytes das Binärsystem zugrunde gelegt. Es ist<br/>
+2<sup>7</sup>=128<br/>
+2<sup>6</sup>= 64<br/>
+2<sup>5</sup>= 32<br/>
+2<sup>4</sup>= 16<br/>
+2<sup>3</sup>=  8<br/>
+2<sup>2</sup>=  4<br/>
+2<sup>1</sup>=  2<br/>
+und schließlich<br/>
+2<sup>0</sup>=  1</p>
+
+<p>Bereits mit diesen Vorüberlegungen läßt sich der Inhalt von Byte 0 berechnen. Wie Sie in Bild 4 sehen, ist nur Bit 5 gesetzt, also ergibt sich als Inhalt von Byte 0 der Wert 2s = 32. Diesen Wert würde auch die Abfrage »PRINT PEEK(12568)« ergeben.</p>
+
+<p>Entsprechend ergeben sich zum Beispiel für Byte 2 als Inhalt</p>
+
+<p>2<sup>3</sup> + 2<sup>1</sup> + 2<sup>0</sup> = 8 + 2 + 1 = 11.</p>
+
+<p>Damit lassen sich auch alle anderen Bytes eines Blocks berechnen. Das Verfahren verläuft analog zum gezeigten Beispiel. Die Inhalte aller Bytes des Beispiels sind vollständig in Bild 4 wiedergegeben.</p>
+
+<h2>Der Drucker kommt ins Spiel</h2>
+
+<p>Zunächst muß der Drucker für die Datenausgabe vorbereitet werden. Hierfür müssen Sie sicherstellen, daß ein eventuell vorhandenes Interface keine falsche Interpretation von gesendeten Daten vornimmt. Dies geschieht im Normalfall durch Setzen einer bestimmten Sekundäradresse, bei einigen Herstellern auch als »Linearkanal« bezeichnet, weil gesendete Zeichen im Original an den Drucker weitergeleitet werden.</p>
+
+<p>Ebenso muß der Zeilenvorschub korrigiert werden. Wenn man davon ausgeht, daß acht Punktreihen untereinander in einem Arbeitsgang gedruckt werden können, so ist der Zeilenvorschub so einzustellen, daß die nächste gedruckte Zeile sich nahtlos an die vorhergehende Zeile anschließt. Dazu ist der Zeilenvorschub im Regelfalle auf 24/216 Zoll zu stellen.</p>
+
+<p>Damit sind die besonderen Voreinstellungen, die sowohl für den HiRes- als auch den Multicolor-Modus Gültigkeit besitzen, vorgenommen. Weitere Operationen beziehen sich nun auf den jeweiligen Modus, von dem ausgegangen wird.</p>
+
+<p>Kommen wir schließlich zu dem schon anfangs erwähnten ESC-K und ESC-L. Mit diesen Sequenzen wird der BI-Mode eingeschaltet. Doch das reine Einschalten genügt nicht; man muß auch noch spezifizieren, wieviele Daten zum Drucker gesendet werden.</p>
+
+<p>Schauen wir uns zunächst an, wie Grafik auf dem Drucker ausgegeben wird. Als Beispiel nehmen wir wieder Bezug auf Bild 4. Im ersteh Teil haben wir überlegt, wie ein Block innerhalb des Computers abgelegt wird: ein Block besteht aus 8 Bytes, die horizontal untereinander stehen.</p>
+
+<p>Beim Drucker ist das nicht üblich. Da der Druckkopf im allgemeinen nur aus einer Reihe von vertikal untereinander liegenden Dots (Nadeln) besteht, werden die Daten vertikal aufbereitet erwartet. Wird deshalb im Grafikmodus des Druckers ein Byte gesendet, so werden maximal 8 Punkte vertikal untereinander gedruckt. Wir können vom Computer her jedoch immer nur horizontale Punktreihen per PEEK abfragen. Was benötigt wird, ist eine Routine, die jeweils einen Block aus 8 x 8 Punkten entsprechend umrechnet. Bei unserem Beispiel muß der Block aus Bild 4 entsprechend Bild 5 umgerechnet werden. Bei der Berechnung gehen wir in diesem Fall von der Tatsache aus, daß das höchstwertige Bit der Druckerkopfdots innerhalb der Druckkopfmatrix oben liegt. In Ihrem Handbuch kann aber auch nachzulesen sein, daß das höchstwertige Bit in der Druckmatrix nach unten weist. In diesem Fall würden sich die berechneten Werte gemäß Bild 6 ändern. Wie Sie sehen, ist es durchaus wichtig zu wissen, wie die Dotmatrix Ihres Druckers aufgebaut ist.</p>
+
+<p>Wir gehen davon aus, daß der zuerst beschriebene Fall zutrifft. Wie man relativ einfach die Matrix yon Basic aus umrechnen kann, wird durch das Basic-Progfamm in Listing 2 illustriert. Mit diesem kleinen Programm können Sie jede beliebige Matrix umrechnen lassen. Dazu geben Sie nur die Startadresse Ihres Grafikschirms, die Zeile, in der sich der Block befindet und schließlich die Nummer des Blocks ähnlich wie oben in der Formel erwähnt an. Der Inhalt des betreffenden Blockswird in dem Basic-Programm in Listing 2 in den Zeilen 190 bis 210 in das Feld BYTEeingelesen. Nun müssen die Daten gewandelt werden. Dazu folgende Überlegungen:</p>
+
+<p>Um das erste Bit links oben des ersten vertikalen Bytes zu erhalten, muß von Byte 0 Bit 7 betrachtet werden (siehe Bild 4). Wenn es gesetzt ist, so wird es mit 27 = 128 multipliziert; man erhält so einen ersten Wert. Dann wird von Byte 1 Bit 7 betrachtet und untersucht, ob das Bit gesetzt ist. Falls dies der Fall ist, wird es mit 2e = 64 multipliziert und zum ersten von Byte 2 bis 7 das 7. Bit untersucht und schließlich mit einer absteigenden Potenz von 2 multipliziert und zum jeweils schon erhaltenen Wert (im Listing 2 die Variable OUTPUT) hinzuaddiert. Hat man auf diese Art und Weise das erste vertikale Byte erhalten, kann selbiges an einen Drucker gesendet werden, denn jetzt ist die gewünschte Umwandlung vorgenommen worden, wovon Sie sich durch Nachrechnen überzeugen können.</p>
+
+<p>Da der Block aber aus 8 Bytes besteht, wird dann mit der Aufbereitung des 2. vertikalen Bytes fortgefahren, also Bit 6 von Byte 0 untersucht. Ist es gesetzt, so muß es wieder mit 27 multipliziert werden, damit es an die korrekte Stelle innerhalb der Dotmatrix rutscht. Wieder erhält man einen ersten Zwischenwert. Dann wird Byte 1 auf Bit 6 hin untersucht. Ist es gesetzt, dann wird es mit 26 multipliziert, um dieses Bit an die korrekte Stelle der Dotmatrix des Druckers zu bringen. Nach diesem Verfahren wird fortgefahren, bis auch das letzte vertikale Byte berechnet worden ist.</p>
+
+<p>Wenn Sie das Programm also starten und die Adresse eines Blocks eingeben, so erhalten Sie acht Werte, die jeweils (vergleiche hierzu nochmals den Zusammenhang zwischen den Bildern 4 und 5) die umgerechneten Werte wiedergeben.</p>
+
+<p>Um die Effektivität und Berechnungszeit zu kürzen, wurde die Umrechnung in einen sehr kompakten Ausdruck eingebunden, über den Sie nicht gleich verzweifeln sollten (Zeile 240). Der Ausdruck kann nur verstanden werden, wenn Sie sich schon mal mit der »And/Or-Boolean-Wüste« des Computers beschäftigt haben, und ich möchte deswegen auch hier auf tiefergehende Erklärungen des Ausdrucks verzichten. Wenn Sie sich trotzdem für die Thematik interessieren, so empfehle ich Ihnen die im 64’er, Ausgabe 7/85 gestartete Serie »Logeleien«. Wichtig ist hier aber nur, daß Sie nachvollziehen können, wie die Umrechnung im Prinzip funktioniert.</p>
+
+<h2>Block an Block — Reihe an Reihe — fertig ist das HiRes-Bild</h2>
+
+<p>Da nun ein Programm erstellt ist, das einzelne Blöcke gemäß unseren Anforderungen aufbereitet, sind wir fast an unserem Ziel angelangt. Die Drucker, bei denen es nicht möglich ist, mehr als einen Block auf einmal zu senden, haben praktisch damit das endgültige Programm, mit dem der Druck von Grafik möglich gemacht wird. Besser dran sind da schon die Besitzer von Druckern, die es erlauben, Grafik zeilenweise auszugeben. Was jetzt nur noch fehlt, sind Schleifen, die die Blöcke hintereinander berechnen und eine korrekte Aufbereitung vornehmen.</p>
+
+<p>Doch bevor die eigentliche Ausgabe beginnt: der Drucker muß bereit sein! Haben Sie also den Zeilenvorschub korrigiert?</p>
+
+<p>Nun, dann dürfte Ihr Programm dem Struktogramm in Bild 7 entsprechen.</p>
+
+<p>Das Struktogramm enthält einen Punkt, über den man sich noch Klarheit verschaffen sollte:</p>
+
+<p>»Sende Code zur Einschaltung von HiRes«.</p>
+
+<p>Hier stellt sich die Frage, was man dem Drucker mitteilen soll. Da die Daten einer Blockzeile hintereinandergereiht auch einer Blockreihe auf dem Drucker entsprechen sollen, wird deutlich, was dem Drucker mitgeteilt werden muß:</p>
+
+<ul>
+<li>BI-Mode einschalten, dabei geeignete Punktdichte wählen</li>
+<li>Anzahl der Daten definieren</li>
+</ul>
+
+
+<p>Da 40 Blöcke zu je 8 Byte gesendet werden sollen, muß dem Drucker mitgeteilt werden, daß 320 Zeichendaten folgen. Üblicherweise wird dazu zur Einschaltung des BI-Mode ESC-L beziehungsweise ESC-K verwendet. Da die Vorgehensweise bei beiden Steuerbefehlen gleich ist und sie sich nur bezüglich Ihrer Punktdichten unterscheiden, betrachten wir nur ESC-L. Sie werden in Ihrem Druckerhandbuch finden, daß nach dem Einschalten von ESC-L noch definiert werden muß, wieviele Zeichendaten gesendet werden, bevor der Drucker wieder in seinen normalen Modus zurückschaltet. Würde nämlich keine solche Definition vorhanden sein, so würde der Druckerjedes gesendete Byte nach Einschaltung des BI-Mode als Grafikzeichen interpretieren und dann wäre zum Beispiel ein kontrollierter Zeilenvorschub unmöglich zu realisieren. Da Sie inzwischen wissen, daß sich eine Blockzeile im Computer und deshalb entsprechend auch später aufdem Druckeraus 320 Byteszusammensetzt, müssen Sie vor der eigentlichen Ausgabe der Blockzeile dem Drucker die nachfolgende Anzahl von Zeichendaten mitteilen. Dazu werden üblicherweise zwei Zahlen n1 und n2 nach den Formeln</p>
+
+<p>TODO PRE</p>
+
+<p>n1 = Zahl der Daten - INT(Zahl der Daten/256) * 256</p>
+
+<p>und</p>
+
+<p>TODO PRE</p>
+
+<p>n2 = INT(Zahl der Daten/256)</p>
+
+<p>berechnet. In unserem Beispiel wären also n1 = 64 und n2 = 1. An den Drucker würde man also eine Steuersequenz senden, die folgendermaßen aussieht:</p>
+
+<p>TODO PRE</p>
+
+<p>CHR$(27);"K";CHR$(64);CHR$(1);</p>
+
+<p>Danach ist dann der Drucker im BI-Mode und erwartet 320 Zeichendaten, um dann wieder auf Normalbetrieb zurückzuschalten.</p>
+
+<p>Das entsprechende Basic-Programm für die Ausgabe eines ganzen Grafikschirms im HiRes-Modus ist in Listing 3 dargestellt. Beachten Sie aber Ihre druckerspezifischen Einschränkungen, bevor Sie das Programm ausprobieren. Überprüfen Sie bitte, wie bei Ihrem Drucker die einzelnen Funktionen angesprochen werden. Hilfestellung sollten Ihnen dabei das Struktogramm aus Bild 7 und das eigentliche Basic-Programm mit den reichlich eingefügten REM-Statements in Listing 3 bieten. Wenn Sie das Listing 2 mit Listing 3 vergleichen, werden Sie weiterhin feststellen, daß der Algorithmus zur Umrechnung eines Blocks übernommen wurde. Mit diesen Abschlußbemerkungen wenden wir uns jetzt dem zweiten Problem zu: dem Druck von Grafik im zweiten Grafikmodus.</p>
+
+<h2>Der zweite Akt: Multicolor-Modus</h2>
+
+<p>Der Multicolor-Modus unterscheidet sich erheblich vom HiRes-Modus. Das liegt daran, daß mehrere Farben verwendet werden dürfen. Dabei werden immer zwei hintereinanderliegende Punkte zu einer Informationseinheit zusammengefaßt, aus der sich ableiten läßt, ob ein Punkt gesetzt ist, und wenn, in welcher Farbe. Dargestellt werden können in dieser Betriebsart des VIC II nur noch 32000 Bildpunkte.</p>
+
+<p>Ein Punktpaar kann folgende Schaltzustände annehmen (1 = Bit gesetzt, 0 = Bit gelöscht):</p>
+
+<p>00 Punkt nicht gesetzt, wird in Hintergrundfarbe dargestellt</p>
+
+<p>01 Punkt gesetzt, Darstellung in Farbe 1</p>
+
+<p>10 Punkt gesetzt, Darstellung in Farbe 2</p>
+
+<p>11 Punkt gesetzt, Darstellung in Farbe 3</p>
+
+<p>Wie man sich leicht selbst überlegt, muß eine Hardcopy einer Grafik dieses Modus also nicht nur zwischen gesetzten und nicht gesetzten Punkten differenzieren, sondern auch noch zusätzlich die Farbinformation weitergeben.</p>
+
+<h2>Drei Farben auf dem Papier — ist das möglich?</h2>
+
+<p>Mit einem normalen Drucker wird es selbstverständlich nicht möglich sein, Farben darzustellen. Der Drucker ist nur in der Lage, schwarze Farbe auf das Papier zu bringen. Es drängt sich hier der Vergleich mit einem Schwarzweiß-Fernsehgerät auf. Dort werden die unterschiedlichen Farben durch entsprechende Grauschattierungen wiedergegeben, die aus Mischprodukten von Weiß und Schwarz entstehen.</p>
+
+<p>Das gleiche Prinzip läßt sich auch auf dem Drucker verwirklichen. Dabei wählt man unterschiedliche Punktdichten, um so den Eindruck zu vermitteln, daß das Bild aus unterschiedlichen Farben besteht. Für uns reicht es wegen der maximal vier darstellbaren Farben aus, anzunehmen, daß die Farben Weiß (Hintergrundfarbe), Schwarz, und zwei Graustufen bereits das ganze Bild darstellen können. Bild 8 zeigt verschiedene Rastermuster.</p>
+
+<h2>So steht ein Multicolor-Bild im Speicher</h2>
+
+<p>Wieder wird über die Grafik ein Raster gelegt, welches das ganze Bild in einzelne Blöcke aufteilt. Eine Blockreihe besteht ebenfalls wieder aus 40 Blöcken. Ein Block ist in Bild 9 vergrößert. Zu erkennen ist die Struktur der Bitpaare, so daß im Prinzip eine Matrix vorliegt, mit der 4 Punkte in X-Richtung und 8 Punkte in Y-Richtung dargestellt werden können. Sie erhalten also eine 4 x 8-Matrix, die dann allerdings auch Informationen zur Farbe der einzelnen Punkte enthält. Zu finden ist nun ein Weg, der wieder Blöcke auswertet und zusätzlich noch Farbinformationen in Form eines Rastermusters mitliefert.</p>
+
+<p>Wie kann man nun die Informationen, die der Block beinhaltet, verarbeiten?</p>
+
+<p>Betrachten Sie zum Beispiel das fünfte Byte des Blocks in Bild 4. In Multicolor-Darstellung setzt sich das Byte aus 4 Bitpaaren zusammen, von denen das erste (Bitpaar 00) mit der Farbe des Hintergrundes, das zweite (Bitpaar 11) in Farbe 3, das dritte wieder in der Hintergrundfarbe und das vierte (Bitpaar 10) in Farbe 2 dargestellt werden würde. Ein Programm muß nun dem Inhalt eines Bitpaares verschiedene Punktdichten zuordnen, die dann als Graustufen auf dem Papier wiedergegeben werden.</p>
+
+<h2>Graustufen mit dem Drucker</h2>
+
+<p>Wenn davon ausgegangen wird, daß jedes Byte eines Blocks getrennt für sich ausgewertet wird, stellt sich einerseits der Sachverhalt relativ einfach dar, andererseits muß aber mit entsprechender Berechnungszeit kalkuliert werden.</p>
+
+<p>Um ein gutes, kontrastreiches Bild entstehen zu lassen, muß die Punktdichte möglichst groß gewählt werden. Grafikfähige Drucker bieten hierzu meist einen BI-Mode »vierfache Dichte« an, mit dem eine genügend hohe Auflösung erzielt werden kann. Um das Bild nun möglichst im Maßstab 1:1 auf j dem Drucker auszugeben, muß ein gesetzter Punkt auf dem Drucker durch ein kleines Quadrat wiedergegeben werden. Indem innerhalb eines solchen einzelnen Quadrates unterschiedliche Punkte gesetzt werden, erhält man unterschiedliche Grauwerte. Betrachten Sie hierzu einmal das Programm in Listing 4. Ähnlich wie im Fall einer HiRes-Grafik beschäftigen wir uns mit der Umwandlung eines einzelnen Blocks. Die Bestimmungsformeln zur Positionsbestimmung eines Blocks sind identisch mit denen zur Positionsbestimmung eines HiRes-Blocks, die Auswertung dagegen erfolgt anders. Die Rastermuster in den Zeilen 160 bis 190 erzeugen bei der gewählten vierfachen Punktdichte bei Ausgabe auf dem Drucker jeweils ein kleines Quadrat, das einen gesetzten Punkt in entsprechendem Grauwert wiedergibt (weiß wird hier auch mit einem Grauwert identifiziert). Diese Rastermuster werden zu Beginn des Programms in ein Feld DRUCKMATRIX eingelesen. Danach wird wie üblich definiert, welcher Block des Grafikbildschirms ausgegeben werden soll.</p>
+
+<p>Während bei einer HiRes-Grafik die vertikalen Werte eines Blocks auf dem Bildschirm ausgegeben wurden, wird hier dagegen direkt der Drucker angesprochen, um das Prinzip der Umwandlung der Bitpaare in Rastermuster zu verdeutlichen. Da die Informationen innerhalb eines Blocks byteweise verarbeitet werden und da natürlich nach dem ersten berechneten Rastermuster für Byte 0 das zweite Rastermuster direkt unter dem ersten liegt, muß zusätzlich der Zeilenvorschub entsprechend korrigiert werden. Dazu wird der Zeilenvorschub auf zirka 6/216 Zoll gesetzt (siehe Zeile 270). Da weiterhin ein Byte des betrachteten Blocks aus vier Bitpaaren besteht, müssen selbstverständlich auch vier Rastermuster nebeneinander auf dem Drucker erzeugt werden.</p>
+
+<h2>Das Bit-Rastermuster</h2>
+
+<p>Weil das Rastermuster eines Bits aber schon aus acht Daten (siehe DATA-Zeilen) zusammengesetzt wird, werden also 32 Daten pro Byte an den Drucker gesendet. Daher erklärt sich die Sequenz CHR$(32);CHR$(0) in Zeile 300, durch die der BI-Mode eingeschaltet wird und 32 Daten als reine Grafikdaten vom Drucker erwartet werden. Dann wird in den Zeilen 330 der Inhalt eines Bytes eines Blocks ermittelt und daraufhin in den Zeilen 340 bis 380 in seine Bitpaare zerlegt.</p>
+
+<p>Entsprechend dieser Zerlegung erhält die Variable RASTER einen Wert zwischen null und drei (wegen logischer Verknüpfungsoperationen). Durch die so zustande kommenden 1nhalte der Variable RASTER kann an den Drucker die passende Druckmatrix gesendet werden. Mit Byte 1 bis 7 des gleichen Blocks wird genauso verfahren. Sie erhalten dadurch auf dem Drucker ein Rastermuster, dessen Aussehen von den Eingangsdaten abhängt.</p>
+
+<h2>Der nächste Schritt: Ausgabe eines Multicolor-Bildes</h2>
+
+<p>Ein Block besteht aus 8 untereinanderliegenden Bytes. Von diesen Blöcken stehen in einer Zeile 40 und ergeben so eine Blockreihe. Wenn wir nach dem oben beschriebenen Prinzip weiter vorgehen wollen, dann muß zunächst Byte 0 von Block 1 berechnet werden. Daraufhin darf man jedoch nicht das zweite Byte des Blocks auswerten, sondern muß Byte 0 des Blocks 2 berechnen, da die nächste Information neben dem Byte 0 des Blocks 1 liegt. Man fährt nach diesem Auswertungsprinzip fort, bis Byte 0 des Blocks 40 einer Blockreihe berechnet ist und führt erst dann einen Zeilenvorschub aus, der aber so bemessen sein muß, daß die folgenden Punkte direkt an die vorhergehenden anschließen.</p>
+
+<p>Genauso wird jeweils Byte 1 bis 7 für alle Blöcke einer Reihe ausgewertet und daraufhin mit der nächsten Blockzeile fortgefahren. Es ergibt sich ein Algorithmus, der vollständig durch das Struktogramm in Bild 10 beschrieben wird. Dieses Struktogramm wurde in Listing 5 in ein Basic-Programm umgesetzt. Wieder werden Sie in wesentlichen Teilen die Übereinstimmungen zum Programm zur Berechnung eines Blocks im Multicolor-Modus erkennen.</p>
+
+<p>Als Ergebnis Ihrer Bemühungen dürften Sie eine Hardcopy Ihres im Computer befindlichen Bildes erhalten, das etwa so wie das Beispiel in Bild 1 aussieht.</p>
+
+<h2>Auf ein Wort: Basic</h2>
+
+<p>Nun kennen Sie zwar die Geheimnisse, die es Ihnen ermöglichen, selbst hochauflösende Grafiken auf dem Drucker auszugeben, aber spätestens wenn Sie eines der beiden Programme aus Listing 3 oder 4 eintippen und anschließend starten, wird Ihre Freude gedämpft sein, denn der Computer macht seinem Namen alle Ehre: er rechnet. Die Berechnungen nehmen aber so viel Zeit in Anspruch, daß man mitunter die Geduld verliert. Was hier also wünschenswert erscheint, ist eine Programmiersprache, die die ganze Sache etwas beschleunigt. Das naheliegendste: Benutzung von Maschinensprache. Dadurch verkürzt sich zum Beispiel die Ausgabe einer HiRes-Grafik auf 30 Sekunden (etwa durch das in der 64’er-Ausgabe 8/84 auf Seite 83 veröffentlichte Listing). Das werden Sie zu schätzen wissen, wenn Sie einmal das entsprechende Basic-Programm haben laufen lassen und dann die Maschinenroutine dagegenhalten.</p>
+
+<p>Wenn Sie also Maschinensprache beherrschen und nun das Prinzip der Grafikausgabe auf dem Drucker verstehen, empfehle ich Ihnen, eine Ihren Erfordernissen angepaßte Maschinenroutine zu schreiben, um Grafik auf dem Drucker auszugeben.</p>
+
+<p>Deshalb gebe ich hier dem interessierten Maschinenspracheprogrammierer Informationen über eine möglichst einfache Ansteuerung des Druckers. Dazu zunächst eine Liste aller verwendbaren Systemroutinen und Zero-Page-Adressen:</p>
+
+<p>TODO TABLE</p>
+
+<p>BSOUT   $FFD2   Ausgabe eines Bytes auf aktivem Kanal<br/>
+OPEN    $FFCO   Eröffnen eines Files auf dem Drucker<br/>
+CKOUT   $FFC9   Ausgabe auf definiertem Kanal einleiten<br/>
+CLRCH   $FFCC   Ausgabe wieder auf Standard zurücksetzen<br/>
+CLOSE   $FFC3   Schließen eines Files auf dem Drucker<br/>
+SETPAR  $FFBA   Setzen der Parameter für OPEN<br/>
+LAENGE  $B7 für die Länge eines Strings bei OPEN</p>
+
+<p>Bevor Sie ein File auf dem Drucker eröffnen, ist dem Computer erst mitzuteilen, welche Filenummer, welche Primäradresse und welche Sekundäradresse für das zu öffnende File zu verwenden sind. Da insbesondere beim Öffnen keine Zeichenkette an den Drucker zu senden ist, muß zunächst einmal das Flag LAENGE auf Null gesetzt werden:</p>
+
+<p>TODO PRE</p>
+
+<p>LDA #0<br/>
+STA LAENGE</p>
+
+<p>Daraufhin wird in den Akku die Filenummer, in das X&ndash;Register die Primäradresse des Druckers (normalerweise 4) und in das Y-Register die Sekundäradresse eines Files geladen, das dann später durch OPEN eröffnet wird. Zuerst müssen aber mit der Systemroutine SETPAR die Werte für einen OPEN-Befehl gesetzt werden, bevor die OPEN-Routine angesprungen werden darf.</p>
+
+<p>TODO PRE</p>
+
+<p>LDA #Filenummer<br/>
+LDX #Primäradresse<br/>
+LDY #Sekundäradresse<br/>
+JSR SETPAR<br/>
+JSR OPEN</p>
+
+<p>Damit ist ein Kanal für die Ausgabe auf dem Drucker definiert. Die eigentliche Ausgabe auf dem Drucker wird durch das nochmalige Laden der Filenummer in das X-Register und das Anspringen der Systemroutine CHKOUT eingeleitet.</p>
+
+<p>TODO PRE</p>
+
+<p>LDX #Filenummer<br/>
+JSR CHKOUT</p>
+
+<p>Danach kann man Zeichen, die im Akku stehen, mittels der Routine BSOUT auf dem Drucker ausgeben.</p>
+
+<p>TODO PRE</p>
+
+<p>LDA #auszugebendes Zeichen<br/>
+JSR BSOUT</p>
+
+<p>Durch diese Routine wird die Ausgabe, die mittels der Routine BSOUT normalerweise auf dem Bildschirm erfolgen würde, auf den Drucker umgeleitet. Das heißt unter anderem, daß dann während dieser Umleitung keine Zeichenausgabe auf dem Bildschirm vorgenommen werden kann. Wollen Sie die Umleitung wieder aufheben, so können Sie dies mit Hilfe von CLRCH erreichen:</p>
+
+<p>TODO PRE</p>
+
+<p>JSR CLRCH</p>
+
+<p>Diese Systemroutine setzt die Ausgabe auf den Bildschirm (und die Eingabe auf die Tastatur) zurück. Beachten Sie bitte, daß das Druckerfile noch nicht geschlossen ist und Sie jederzeit wieder mit der beschriebenen Syntax bei der Systemroutine CHKOUT die Ausgabe erneut umleiten können.</p>
+
+<p>Das Druckerfile schließen können Sie mit der Routine CLOSE. Dazu laden Sie die Filenummer in den Akku:</p>
+
+<p>TODO PRE</p>
+
+<p>LDA #Filenummer<br/>
+JSR CLOSE</p>
+
+<p>Danach ist das Drucker-File ordnungsgemäß geschlossen. So, damit hätten wir unsere umfangreiche Expedition in das Gebiet der Grafikumsetzung für Druckausgaben abgeschlossen. Ich hoffe, daß Sie Ihnen ein wenig Spaß gemacht und Ihr Interesse an der Problematik geweckt hat. Ich wünsche Ihnen jedenfalls viel Erfolg bei der Programmierung einer eigenen Grafikroutine, sei es nun in Basic oder einer anderen Programmiersprache.</p>
+
+<address class="author">(Frank Lonczewski/ev)</address>
+    </article>
+</body>
+</html>

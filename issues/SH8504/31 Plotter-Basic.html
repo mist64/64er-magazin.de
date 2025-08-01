@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>Plotter-Basic</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="Näheres siehe Plotter-Anleitung., Stephan Schäfer, gk">
+    <meta name="64er.issue" content="Sonderheft 4/85">
+    <meta name="64er.pages" content="31-36">
+    <!-- <meta name="64er.toc_category" content="XXX"> -->
+    <!-- <meta name="64er.toc_title" content="XXX"> -->
+    <meta name="64er.id" content="XXX">
+</head>
+
+<body>
+    <article>
+        <h1>Plotter-Basic</h1>
+<p class="intro">Plotter-Basic ist eine Basic-Befehlserweiterung für den Printer/Plotter 1520 von Commodore. Es ermöglicht eine starke Vereinfachung der normalen Plotterbedienungen und erlaubt zusätzlich zum Beispiel räumliche Zeichnungen zu erstellen und beliebig zu drehen.</p>
+
+<p>Außerdem verfügt es über die Möglichkeit Kreise beziehungsweise Ellipsen zu zeichnen, Blockdiagramme zu erstellen oder komfortable Funktionen-Plot-Programme zu schreiben.</p>
+
+<p>Die Befehlserweiterung funktioniert nach dem Prinzip, daß jedes Befehlswort auf einen vorangestellten Punkt untersucht wird, der einen Plotter-Basic-Befehl kennzeichnet, zum Beispiel .RESET.</p>
+
+<p>Nach dem Start mit SYS 12*4096 initialisiert sich das Programm (Listing 1) und gibt eine Einschaltmeldung aus. Die Initialisierung besteht darin, daß auf eventuelle andere Spracherweiterungen Rücksicht genommen wird und die Zeiger so verändert werden, daß die andere Erweiterung funktionstüchtig bleibt. Voraussetzung dafür ist natürlich, daß der Speicherbereich, den Plotter-Basic benötigt, nicht von fremden Programmen gebraucht wird. Es handelt sich hierbei um den Bereich $C000 bis $C8F5 beziehungsweise 49187 bis 51445.</p>
+
+<p>Die Zeiger, die verändert werden mußten, sind die Vektoren $308/$309 und $300/$301 (Warmstart-Vektor). Normalerweise zeigt der Vektor $308/$309 auf die Routine $A7E4 (Basic-Befehlsadresse holen). Nach der Initialisierung zeigt er nun auf eine Routine, die auf einen vorangestellten Punkt testet und den gegebenenfalls erkannten Befehl ausführt.</p>
+
+<p>Die Veränderung des Warmstartvektors ermöglichte es bei dem Befehl .PROG, der das Programmlisting zum Drucker schickt, die READY-Meldung wieder auf dem Bildschirm auszugeben und den Druckkanal ordnungsgemäß zu schließen. Außerdem besteht durch Veränderung dieses Zeigers die Möglichkeit, Fehlermeldungen zu unterdrücken beziehungsweise zu kontrollieren, ohne den Programmablauf abbrechen zu lassen.</p>
+
+<h3>Befehlsbeschreibung:</h3>
+
+<p>Die allgemeine Syntax der Befehle sieht folgendermaßen aus:<br/>
+a)  .BEFEHLSWORT keine Parameter erforderlich</p>
+
+<p>oder<br/>
+b)  .BEFEHLSWORT,Parameter1,Parameter2,&hellip;,Parameter n</p>
+
+<p>Sieht der Befehl also eine Parameterübergabe vor, so müssen diese vom Befehlswort durch Kommata getrennt werden. Die Parameter können sowohl Variablen als auch Zahlen sein. Ausnahmen sind bei den entsprechenden Beschreibungen erklärt.</p>
+
+<p>Grundsätzlich muß jedem Plotter-Basic-Befehlswort ein Punkt vorangestellt werden. Mehrere Befehle in einer Zeile müssen durch einen Doppelpunkt voneinander getrennt sein.</p>
+
+<p>Beispiel: .BLAU:.SUPER</p>
+
+<p>Eine Besonderheit sei hier noch erwähnt. die ihre Ursache darin hat, daß die neuen Befehlsworte nicht als Tokens codiert wurden. Die neuen Befehle werden im Speicher nämlich Buchstabe für Buchstabe abgelegt. Basic-Befehle dagegen besitzen jeweils einen Ein-Byte-Code (Token), in den sie nach der Eingabe umgewandelt werden. Bevor aber nun der Basic-Interpreter die einzelnen Tokens erkennt, wird eine Untersuchung auf Plotter-Basic-Befehle durchgeführt. Diese Methode hat ihre Schwachstelle bei einer IF&hellip;THEN-Abfrage. Sobald nämlich der Befehl hinter THEN abgearbeitet werden soll, wird nicht mehr zur umgelenkten Interpreterschleife zurückgesprungen, sondern sofort der nächste Befehl als Token interpretiert. Falls dieser Befehl aber aus Plotter-Basic stammt, kommt es zu einem Syntax-Error. Dieses Problem läßt sich jedoch lösen, indem man dem THEN einen Doppelpunkt folgen läßt.</p>
+
+<p>Beispiel: IF A=99 THEN:.TEXT, "neunundneunzig"</p>
+
+<p>Möchte man Plotter-Basic mit einer anderen Spracherweiterung gleichzeitig betreiben, so muß Plotter-Basic als letztes geladen werden. Da unter Umständen manche Befehlsworte mit der anderen Sprache identisch sind, kann es zu Fehlermeldungen kommen, die man dadurch unterdrückt, daß man nur die ersten Buchstaben des Plotter-Basic-Befehls eingibt. Es wird dann der Befehl ausgeführt, der die entsprechenden Anfangsbuchstaben besitzt und als erstes im Speicher steht. Bei den meisten Befehlen reicht es, nur die beiden ersten Buchstaben zur Identifizierung anzugeben.</p>
+
+<p>TODO</p>
+
+<p>Beispiel: .RO = .ROT<br/>
+.PR,10 = .PROG,10</p>
+
+<p>Die Parameter können also auch schon nach zwei Buchstaben folgen. Die Reihenfolge, in der die Befehlsworte im Speicher abgelegt sind, und ihre Startadressen sind am Ende der Beschreibung aufgeführt. Dadurch ist es möglich, die Befehle über SYS-Aufrufe ausführen zu lassen.</p>
+
+<p>Nun aber zur Erklärung der Befehle im Einzelnen:</p>
+
+<h3>1.  Farbwahl</h3>
+
+<p>TODO</p>
+
+<p>.BLAU<br/>
+.ROT<br/>
+.GRÜN<br/>
+.SCHWARZ<br/>
+stellt die entsprechende Farbe ein<br/>
+.FARBE,f wählt die Zeichenfarbe gemäß f.</p>
+
+<p>Der Parameter f entspricht der Farbnummer, wie es in der Plotter-Anleitung erklärt ist.</p>
+
+<h3>2.  Wahl der Zeichengröße</h3>
+
+<p>.KLEIN entspricht 80 Zeichen/Zeile<br/>
+.MITTEL entspricht 40 Zeichen/Zeile<br/>
+GROSS entspricht 20 Zeichen/Zeile<br/>
+.SUPER entspricht 10 Zeichen/Zeile<br/>
+.SIZE,g wählt die Zeichengröße gemäß g.</p>
+
+<address class="author">(Näheres siehe Plotter-Anleitung.)</address>
+
+<h3>3.  Ausdruck von ASCII-Daten</h3>
+
+<p>.TEXT,a$ druckt den String a$<br/>
+TEXT erzeugt eine Leerzeile (Carriage Return)<br/>
+.PROG<br/>
+.PROG,10<br/>
+.PROG,40-<br/>
+.PROG,100-556</p>
+
+<p>Dieser Befehl entspricht dem LIST-Befehl in Basic. Ohne Parameter wird das gesamte Programm gelistet, mit Parametern wird entsprechend eine Zeile oder mehrere Zeilen ausgedruckt.</p>
+
+<h3>4.  Wahl der Schriftarten</h3>
+
+<p>.GG stellt den Groß/Grafik-Modus ein.<br/>
+.GK stellt den Groß/Klein-Modus ein.</p>
+
+<h3>5.  Zeichendrehung</h3>
+
+<p>.DREH,r stellt für r=0 den Horizontalbetrieb ein und verursacht bei r=1 eine Zeichendrehung um 90 Grad nach rechts.</p>
+
+<h3>6.  Druckerrückstellung und Speicherlöschung</h3>
+
+<p>.RESET setzt den Printer/Plotter zurück und löscht seinen Speicher.</p>
+
+<h3>7. Wahl der Linienart</h3>
+
+<p>.STRICH,I bestimmt die Linienart. Für I gelten die Angaben der Plotteranleitung.</p>
+
+<h3>8. Zeichnen von X/Y-Daten</h3>
+
+<p>TODO</p>
+
+<p>.HOME bewegt zum Startpunkt (0/0).<br/>
+.INIT legt den relativen Nullpunkt auf die derzeitige X/Y-Position.<br/>
+.MOVE,x,y bewegt zur Position (x/y) relativ zum absoluten Nullpunkt (0/0).<br/>
+.DRAW,x,y zeichnet zur Position (x/y) relativ zum absoluten Nullpunkt (0/0).<br/>
+.RMOVE,x,y bewegt zur Position (x/y) relativ zum relativen Nullpunkt (x0/y0).<br/>
+.RDRAW,x,y zeichnet zur Position (x/y) relativ zum relativen Nullpunkt (x0/y0).<br/>
+.LINIE,x1,y1,x2,y2 zeichnet eine Linie von Position (x1/y1) zu Position (x2/y2).<br/>
+.RAHMEN,x,y,b,h zeichnet einen Rahmen ab dem Eckpunkt (x/y) mit der Breite b und der Höhe h.<br/>
+.KREIS,x,y,xr,yr zeichnet eine Ellipse um den Mittelpunkt (x/y) mit einem Radius in x-Richtung von xr und einem Radius in y-Richtung von yr. Gilt xr=yr so entsteht ein Kreis.<br/>
+.RADIUS,x,y,xr,yr,w zeichnet in die entsprechende Ellipse einen Radius, der mit der positiven X-Achse den Winkel w (in Grad!) bildet.</p>
+
+<p>Erklärung zum KREIS- und RADIUS-Befehl:</p>
+
+<p>TODO</p>
+
+<h3>9. Zeichnen von X/Y/Z-Daten</h3>
+
+<p>Die folgenden Befehle dienen dazu, dreidimensionale Grafiken zu erzeugen. Im wesentlichen transformieren sie drei Raumkoordinaten auf zwei Ebenenkoordinaten. Allen Berechnungen liegen diese Formeln zugrunde:<br/>
+x=f*[xr+yr*cos(w)]+xv<br/>
+y=f*[zr+yr*sin(w)]+yv</p>
+
+<p>yr und zr sind Raumkoordinaten, w ist der Betrachtungswinkel des Punktes in Grad, und f stellt einen Vergrößerungs- (für f größer als 1) beziehungsweise Verkleinerungsfaktor (für f zwischen 0 und 1) dar.</p>
+
+<p>xv und yv dienen dazu, den Punkt im zweidimensionalen Koordinatensystem zu verschieben.</p>
+
+<p>Die Achsen des räumlichen Koordinatensystems sind entsprechend der Abbildung bezeichnet:</p>
+
+<p>TODO</p>
+
+<p>.TRANSM,xr,yr,zr,xv,yv,f,w bewegt zur Position (x/y) relativ zum absoluten Nullpunkt, die sich durch Einsetzen aller Parameter in die obige Formel ergibt.</p>
+
+<p>.TRANSD,xr,yr,zr,xv,yv,f,w zeichnet zur entsprechenden Position (x/y) relativ zum absoluten Nullpunkt.</p>
+
+<p>.TRANSL,xr1,yr1,zr1,xv,yv,f,w,xr2,yr2,zr2 zieht eine Linie von (x1/y1) nach (x2/y2) entsprechend den Parametern.</p>
+
+<p>Möchte man also beispielsweise das räumliche Koordinatensystem zeichnen, so wählt man als Ursprung der drei Achsen den Nullpunkt, also xr1 =yr1 =zr1=0. Je nachdem, welche Achse gezeichnet werden soll, setzt man für die xr-Achse xr2=1, yr2=0, zr2=0, für die yr-Achse dann xr2=0, yr2 = 1, zr2=0 und für die zr-Achse xr2=0, yr2=0 und zr2 = 1. Um das Bild in die Mitte des Papiers zu bringen, setzt man die x-Verschiebung xv=240 und die y-Verschiebung yv=0. Da als Länge für die Achsen »eins« zu klein ist, könnte man den Faktor f=50 wählen. Der Betrachtungswinkel sei w=45 (Grad). Somit ergibt sich für die Zeichnung des Koordinatensystems:</p>
+
+<p>10 .TRANSL,0,0,0,240,0,50,45,1,0,0:REM xr-Achse</p>
+
+<p>20 .TRANSL,0,0,0,240,0,50,45,0,1,0:REM yr-Achse</p>
+
+<p>30 .TRANSL,0,0,0,240,0,50,45,0,0,1:REM zr-Achse</p>
+
+<h3>10. Drehung von x/y/z-Koordinaten</h3>
+
+<p>Um einen Körper von allen Seiten darstellen zu können, müssen die Raumkoordinaten gedreht werden. Dabei ist es natürlich möglich, um jede beliebige Raumachse und um jeden beliebigen Winkel zu drehen. Macht man sich eine solche Drehung am Koordinatensystem deutlich, so bemerkt man, daß sich jeweils die Komponente nicht verändert, um deren Achse gedreht werden soll. Bei einer Drehung um die xr-Achse verändern sich nur die yr- und die zr-Komponente, bei einer Drehung um die yr-Achse verändern sich nur xr und zr etc.</p>
+
+<p>Der Befehl .TURN,k1,k2,w benötigt daher außer der Angabe des Drehwinkels w in Grad nur die zwei Komponenten k1 und k2. Hierbei muß es sich um Variablen handeln! Vor dem Befehlsaufruf befinden sich in den Variablen die räumlichen Koordinaten eines Punktes und nach der Befehlsausführung stehen in den Variablen die Koordinaten des neuen (gedrehten) Punktes.</p>
+
+<p>Angenommen, in den Variablen xr, yr und zr befinden sich die Koordinaten eines Punktes, so könnte man ihn folgendermaßen um den Winkel w drehen:</p>
+
+<p>TODO</p>
+
+<p>Drehung um die xr-Achse: .TURN,yr,zr,w<br/>
+Drehung um die yr-Achse: .TURN,xr,zr,w<br/>
+Drehung um die zr-Achse: .TURN,xr,yr,w</p>
+
+<p>Anhand der Formeln zur Drehung läßt sich erkennen, warum der Befehl für alle drei Drehrichtungen richtige Ergebnisse liefert:</p>
+
+<p>TODO</p>
+
+<p>Drehung um die xr-Achse:<br/>
+xr'=xr yr'=yr*cos(w)+zr*sin(w) zr'=-yr*sin(w)+zr*cos(w)<br/>
+Drehung um die yr-Achse:<br/>
+yr'=yr xr'=xr*cos(w)+zr*sin(w) zr'=-xr*sin(w)+zr*cos(w)<br/>
+Drehung um die zr-Achse:<br/>
+zr'=zr xr'=xr*cos(w)+yr*sin(w) yr'=-xr*sin(w)+yr*cos(w)</p>
+
+<p>Ein kleines Beispielprogramm (Listing 2) demonstriert die Möglichkeiten dieses und des TRANSL-Befehls anhand der Drehung eines Körpers.</p>
+
+<h3>11. Fehlerbehandlung</h3>
+
+<p>Um zum Beispiel ein Programm zu schreiben, das jede beliebige Funktion plottet, ist es erforderlich, mathematische Fehlermeldungen zu unterdrücken. Sobald nämlich eine Funktion Definitionslücken besitzt, steigen die meisten Programme mit einem »division by zero« oder ähnlichem aus.</p>
+
+<p>Der Befehl .ERRJUMP,ze setzt die Programmausführung in der Zeile ze fort, sobald ein arithmetischer Fehler aufgetreten ist. Es handelt sich hierbei um die Fehler division by zero, illegal quantity und overflow. Sollte innerhalb einer FOR-NEXT-Schleife oder in einem Unterprogramm ein Fehler auftreten, so kann nicht wieder zu NEXT beziehungsweise RETURN gesprungen werden, da nun die notwendige Rücksprungadresse nicht mehr gefunden wird. FOR-NEXT-Schleifen und Unterprogrammsprünge lassen sich in solchen Fällen jedoch auch mit GOTO programmieren.</p>
+
+<p>Der Befehl ist nur während des Programmablaufs wirksam, um zu verhindern, daß bei Fehlern im Direkt-Modus das Programm neu gestartet wird.</p>
+
+<p>Sollen grundsätzlich alle Fehler unterdrückt werden, so muß hinter der Zeilennummer noch eine Sekundärvariable folgen:</p>
+
+<p>.ERRJUMP,ze,s setzt die Programmausführung in der Zeile ze fort, sobald irgendein Fehler auftritt. Die Variable s ist nur eine Scheinvariable, das heißt sie wird weder verändert noch spielt ihr Typ eine Rolle. Am einfachsten ist es hier, eine Zahl anzugeben.</p>
+
+<p>.ERRNUM,x schreibt in die Variable x die Fehlernummer des zuletzt aufgetretenen Fehlers. Bei x muß es sich um eine Variable handeln! Die Fehlernummer ist nur einmal lesbar und wird danach wieder auf Null gesetzt, bis der nächste Fehler auftritt. Innerhalb der Variablen bleibt die Fehlernummer natürlich erhalten. Die Fehlermeldungen besitzen folgende Nummern:</p>
+
+<p>TODO</p>
+
+<p>1   too many files<br/>
+3   file not open<br/>
+5   device not present<br/>
+7   missing filename<br/>
+9   illegal dev. number<br/>
+11 syntax<br/>
+13 out of data<br/>
+15 overflow<br/>
+17 undef’d statement<br/>
+19 redim’d array<br/>
+21 illegal direct error<br/>
+23 string too long<br/>
+25 form, too complex<br/>
+27 undef’d function<br/>
+29 load<br/>
+2   file open<br/>
+4   file not found<br/>
+6   not input file<br/>
+8 missing filename<br/>
+10 nextwithoutfor<br/>
+12 return without gosub<br/>
+14 illegal quantity<br/>
+16 outofmemory<br/>
+18 bad subscript<br/>
+20 division by zero<br/>
+22 type mismatch<br/>
+24 file data<br/>
+26 can’t continue<br/>
+28 verify</p>
+
+<p>.ERROUT schaltet innerhalb des Programms die Fehlerunterdrückung wieder aus. Dieser Befehl wird zum Beispiel dann nötig, wenn am Ende des Programms ein Listing ausgedruckt werden soll, da beide Befehle den Warmstartvektor ändern. Grundsätzlich wird die Fehlerunterdrückung mit Ende des Programms abgeschaltet.</p>
+
+<h3>12. Ausschalten von Plotter-Basic</h3>
+
+<p>.AUS setzt alle Zeiger wieder so, wie sie vor dem Start von Plotter-Basic standen und schaltet somit die Spracherweiterung ab. Erneutes Einschalten geschieht mit SYS 12*4096.</p>
+
+<h3>Die Befehlsadressen im Speicher</h3>
+
+<p>Um sämtliche Zeiger unverändert zu lassen, kann man Plotter-Basic auch ohne Startaufruf benutzen. Nach dem Laden lassen sich alle Befehle über SYS-Aufrufe ausführen. Zum Beispiel: .KREIS,240,0,80,50 entspricht SYS 50184, 240,0,80,50</p>
+
+<p>Parameter werden wie gewöhnlich durch das Komma getrennt.</p>
+
+<p>Die Reihenfolge entspricht der Reihenfolge, in der die Befehlsworte erkannt werden. .KREIS wird also schneller erkannt als .FARBE.</p>
+
+<p>TODO</p>
+
+<p>INIT    = 49916 RADIUS  = 50644<br/>
+SIZE    = 49783 ERROUT  = 51290<br/>
+MOVE    = 49926 TRANSM  = 50729<br/>
+DREH    = 49833 ERRNUM  = 51379<br/>
+DRAW    = 49974 TRANSD  = 50751<br/>
+STRICH  = 49888 AUS = 49157<br/>
+RMOVE   =49987  TRANSL  =   50764<br/>
+GG  =   49807   TURN    =   51091<br/>
+RDRAW   =   50000   BLAU    =   49695<br/>
+GK  =   49815   ROT =   49703<br/>
+HOME    =   49906   GRUEN   =   49711<br/>
+PROG    — 50413   SCHWARZ =   49719<br/>
+RAHMEN  =   50471   FARBE   =   49727<br/>
+TEXT    =   49851   KLEIN   =   49751<br/>
+LINIE   =   50013   MITTEL  =   49759<br/>
+RESET   — 49823   GROSS   =   49767<br/>
+KREIS   =   50184   SUPER   =   49775<br/>
+ERRJUMP =   51233</p>
+
+<address class="author">(Stephan Schäfer/gk)</address>
+    </article>
+</body>
+</html>

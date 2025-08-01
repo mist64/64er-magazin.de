@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>Centronics-Schnittstelle für Seikosha GP-550A</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="Pius Nippgen, hm">
+    <meta name="64er.issue" content="Sonderheft 4/85">
+    <meta name="64er.pages" content="10-12">
+    <!-- <meta name="64er.toc_category" content="XXX"> -->
+    <!-- <meta name="64er.toc_title" content="XXX"> -->
+    <meta name="64er.id" content="XXX">
+</head>
+
+<body>
+    <article>
+        <h1>Centronics-Schnittstelle für Seikosha GP-550A</h1>
+<p class="intro">Mit diesem Software-Interface können Sie auf einem Seikosha GP-550A die Steuer- und Grafikzeichen des C 64 listen und drucken. Der Wert der Schnittstelle wird dabei durch eine Hardcopy-Funktion noch um ein Vielfaches erhöht.</p>
+
+<p>Der Seikosha-Drucker GP-550A besitzt in der Grundversion eine Centronics-Schnittstelle. Zum Anschluß an den C 64 ist deshalb ein Interface notwendig. Unser Leser Pius Nippgen wollte sich aber die hohen Kosten für ein Hardware-Interface sparen. Er dachte sich, was mit einem Epson funktioniert, muß auch mit dem GP-550A gehen. Er nahm sich dazu kurzerhand die Eyssele-Schnittstelle aus Ausgabe 7/84 (auch in diesem Sonderheft) vor und schrieb sie auf den GP-550A um. Diese Schnittstelle besteht aus einem Programmteil und einem Kabel vom User-Port des C 64 an den Centronics-Eingang des Druckers.</p>
+
+<p>Die gesamte Ansteuerung (Sekundär- und Geräteadressen) wurde beibehalten. Die Adressen und die Verbindungsvorschrift des Kabels können Sie bei der Eyssele-Schnittstelle nachschlagen.</p>
+
+<p>Der GP-550A wird mit anderen Befehlssequenzen angesteuert als ein Epson-Drucker. Diese Sequenzen sind nötig, um beispielsweise den Grafikmodus des Druckers einzuschalten. Deshalb war die erste Aufgabe, alle Steuer-Codes der Eyssele-Schnittstelle dem GP-550A entsprechend zu ändern. Aber nicht nur das. Ein Epson-Drucker ordnet, beginnend mit der untersten der acht Nadeln, steigende binäre</p>
+
+<p>Wertigkeiten zu, der GP-550A aber fallende:</p>
+
+<p>TODO TABLE</p>
+
+<p>Epson   Nadel   Gp-550A<br/>
+128 8   1<br/>
+64  7   2<br/>
+32  6   4<br/>
+16  5   8<br/>
+8   4   16<br/>
+4   3   32<br/>
+2   2   64<br/>
+1   1   128</p>
+
+<p>Zusätzlich zu diesen Änderungen wurde eine Hardcopy-Funktion (Ausdruck des Grafikspeichers) in die Eyssele-Schnittstelle aufgenommen. Die Hardcopy-Routine wird nach dem Öffnen des Druckerkanals, beispielsweise mit OPEN 19,19 mit SYS 52223 aufgerufen. Der Aufruf kann sowohl innerhalb eines Programms, als auch im Direktmodus erfolgen. Es können alle Grafikseiten gedruckt werden, auch solche im RAM unterhalb des ROMs.</p>
+
+<p>Mit ein paar POKE-Befehlen läßt sich die Hardcopy variieren. Durch POKE 52236,224 wird der Speicherbereich von $E000 bis $FFFF selektiert. 224 ist das Highbyte von $E000 (57344). Erfolgt kein POKE-Befehl, wird vom Programm der normale Grafikbereich von $2000 (8192) bis $3FFF (16383) angenommen. Verschiedene Hardcopies können stufenlos aneinander gedruckt werden, indem man einfach mehrmals nacheinander mit SYS 52223 die Routine aufruft. Vorher muß man nur mit POKE 52236,X den gewünschten Grafikbereich einstellen.</p>
+
+<h2>Flexible Hardcopy</h2>
+
+<p>Über die Speicherzelle 52242 läßt sich die Zeilenzahl der Hardcopy einstellen. POKE 52242,25 bedeutet, daß die gesamte Grafikseite (25 Zeilen) ausgedruckt wird.</p>
+
+<p>Einen invertierten Ausdruck erreichen Sie durch POKE 52296,165. Durch POKE 52310,0:POKE 52239,50:POKE 52340,51 wird die Hardcopy-Breite auf die Hälfte reduziert, das Bild also gestaucht.</p>
+
+<p>Initialisiert wird die Schnittstelle mit SYS 51456. Sowohl nach dem Laden als auch nach RUN/STOP-RESTORE.</p>
+
+<p>Geben Sie das Listing mit dem MSE ein. Danach können Sie mit LOAD "name",8,1 oder 1,1 laden. Nach dem Laden sollten Sie noch NEW eingeben, damit die Basic-Vektoren wieder vernünftig gesetzt werden. Ohne NEW erhalten Sie bei der nächsten Anweisung einen »Out of Memory Error«. Wie Sie das Druckerkabel bauen müssen, entnehmen Sie bitte dem Artikel über die Eyssele-Schnittstelle.</p>
+
+<address class="author">(Pius Nippgen/hm)</address>
+    </article>
+</body>
+</html>

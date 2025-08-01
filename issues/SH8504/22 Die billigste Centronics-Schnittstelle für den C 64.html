@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>Die billigste Centronics-Schnittstelle für den C 64</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="H. Eyssele, hm">
+    <meta name="64er.issue" content="Sonderheft 4/85">
+    <meta name="64er.pages" content="22-14">
+    <!-- <meta name="64er.toc_category" content="XXX"> -->
+    <!-- <meta name="64er.toc_title" content="XXX"> -->
+    <meta name="64er.id" content="XXX">
+</head>
+
+<body>
+    <article>
+        <h1>Die billigste Centronics-Schnittstelle für den C 64</h1>
+<p class="intro">Diese Schnittstelle übertrifft mit ihren Leistungsmerkmalen viele käufliche Hardware-Schnittstellen um ein Vielfaches. Nicht aber im Preis: Nur etwa 15 Mark kostet diese »Selbstbau«-Centronics-Schnittstelle.</p>
+
+<p>Leser des 64’er Magazins, die schon »seit Anfang dabei sind«, erkennen diese Schnittstelle bestimmt wieder. In Ausgabe 7/85 wurde sie unter dem Namen Eyssele-Schnittstelle vorgestellt.</p>
+
+<p>Wie im Fernsehen! Jetzt fangen die auch schon mit Wiederholungen an! Diese Vermutung trifft nur in diesem speziellen Fall zu. Wir haben guten Grund, das Programm zu der Eyssele-Schnittstelle nochmals abzudrucken. Denn viele unserer Lesereinsendungen—auch einige Listings in diesem Sonderheft — beziehen sich auf diese Software-Schnittstelle. Die alten Hasen unter Ihnen mögen uns verzeihen. Aber seit einem Jahr wuchs unsere Leserzahl so gewaltig, daß ein großer Teil die Eyssele-Schnittstelle einfach noch nicht kennt.</p>
+
+<p>Es handelt sich hierbei um ein Maschinenspracheprogramm mit 726 Byte Länge, das den Adreßbereich C900-CBD1 (dezimal: 51456 bis 52182) belegt (Listing 1). Damit kann zum Beispiel das DOS 5.1 auf der Demodiskette ohne Probleme zusätzlich geladen werden.</p>
+
+<p>Das Programm ist ohne Einschränkung für alle Epson-kompatiblen Drucker anwendbar, die über einen Bitmustermodus verfügen. Dieser Modus wird für die Ausgabe der Commodore-eigenen Grafikzeichen benötigt. Das Programm besteht aus mehreren Programmteilen, von denen die meisten Erweiterungen bestehender Ein-/Ausgaberoutinen des Betriebssystems sind und bei der Initialisierung in diese eingebunden werden. Dadurch können schon bestehende Basic-Befehle wie OPEN und PRINT # zum Drucken benutzt, und Programme müssen nicht umgeschrieben werden. Zur Ansteuerung verschiedener Druckmodi wurden jedoch zusätzliche Gerätenummern definiert, deren Bedeutungen in Tabelle 1 erklärt sind. Gerätenummer 16 realisiert einen sogenannten Direktmodus, mit dem die internen Commodore-Zeichencodes ohne Wandlung an den Drucker gelangen. Der Direktmodus ist zur Ausgabe von Steuerzeichen oder bei der Verwendung des Druckers als Plotter zur Einzelnadelsteuerung beziehungsweise zur Ausgabe von Bitmustern geeignet. Der Textmodus (Groß- und Kleinschreibung) ist unter Gerätenummer 18 und, weil er wohl am häufigsten bei bereits bestehenden Programmen benutzt wird, unter Gerätenummer 4 ansprechbar. Die Gerätenummer 19 realisiert den Großschrift/Grafik-Modus, wie er beim C64 gleich nach dem Einschalten voreingestellt ist Der wichtige Modus zum Listen von Programmen wurde mit Gerätenummer 17 realisiert. Es läßt sich über die Sekundäradresse, wie in den Musterlistings (Bild 1 bis 3) gezeigt, noch zwischen vier Fällen unterscheiden. Einmal kann ausgewählt werden, ob das Listing, wie vom Bildschirm her gewohnt, mit Großbuchstaben und Grafikzeichen oder im Textmodus mit großen und kleinen Buchstaben gedruckt wird. Zum anderen kann man auswählen, ob die Steuerzeichen wie bei der Bildschirmausgabe als inverse Zeichen oder durch Abkürzungen wie &lt;CRD> (Cursor down) im Klartext gedruckt werden. Durch all diese Möglichkeiten kann der Anwender zum einen auf seinem Drucker Ausgaben erzeugen, wie man sie von Commodore-Druckern her gewohnt ist, zum anderen auch alle Möglichkeiten seines Druckers voll nutzen.</p>
+
+<h2>Commodoreeigene Grafikzeichen</h2>
+
+<p>Die Ausgabe von Grafikzeichen erfolgt in der Routine OUTGEN ab Adresse $CAC4. Zu diesem Zweck wird der Zeichengenerator des C 64 ausgelesen. Die Zeichen, die aus einer 8x8- Punktmatrix bestehen, sind dort in je 8 Byte abgelegt. Jedes Byte repräsentiert das Punktmuster einer Zeile der Matrix. Ein Matrixdrucker druckt die Zeichen, indem er sie ebenso als Muster von matrixartig angeordneten Punkten zu Papier bringt. Jedoch gibt er die Punktmatrix nicht wie der Bildschirm zeilenweise, sondern spaltenweise aus. Deshalb wird in OUTGEN die im Zeichengenerator in 8 Zeilenbyte gespeicherte Zeichenmatrix zunächst in 8 Spaltenbyte umorganisiert. Nach Umschalten des Druckers in den sogenannten Bitmustermodus, in dem er jedes ankommende Datenbyte nicht mehr als ASCII-Zeichen, sondern als Musterbyte für eine Matrixspalte interpretiert, gibt OUTGEN die acht geänderten Zeichenbyte an den Drucker aus. Dieser fügt sie wieder zu einem 8x8- Punktmatrixzeichen zusammen. So ist es möglich, auf einem Matrixdrucker exakte Kopien der C 64-Bildschirmzeichen herzustellen, obwohl dieser nicht über den entsprechenden Zeichensatz verfügt.</p>
+
+<h3>So benutzen Sie das Programm</h3>
+
+<p>Das Listing sollten Sie mit dem MSE eingeben und auf Diskette oder Kassette speichern, bevor Sie es starten. Bevor Sie es allerdings laden, sollten Sie sich das Verbindungskabel User-Port-Centronics-Buchse zusammenlöten. Dazu ist in Tabelle 2 ein Verbindungsplan angegeben. Das Kabel sollte für eine störungsfreie Funktion nicht länger als ein Meter lang sein und aus einem abgeschirmten, mehradrigen Steuerkabel bestehen, das man in (fast) jedem Elektronik-Bastelgeschäft findet Dort sind auch meist der Centronics-Stecker und der Stecker für den User-Port erhältlich.</p>
+
+<p>Initialisiert wird die geladene Treiberroutine mit SYS 12*4096+9*256 beziehungsweise SYS 51456.</p>
+
+<p>Hierbei wird die Routine in das Betriebssystem eingebunden. Jedoch Vorsicht: Nach einem Break, zum Beispiel durch die Betätigung der Tasten RUN/STOP und RESTORE ausgelöst, muß die Routine erneut initialisiert werden, da die l/O-Vektoren vom Betriebssystem zurückgesetzt wurden.</p>
+
+<p>Die einzelnen Druckmodi spricht man mit den üblichen Basicbefehlen an. Geöffnet wird der Ausgabekanal mit:</p>
+
+<p>OPEN log. Dateinummer, Geräteadr. [.Sekundäradr.]</p>
+
+<p>Die eckigen Klammern kennzeichnen optionale Angaben. So kann dann auf den geöffneten Kanal mit PRINT # log. Dateinummer ausgegeben werden. Ein Programmlisting (Bild 2) wird zum Beispiel erzeugt mit den Befehlen</p>
+
+<p>OPEN17,17 [,Sekundäradr.]:CMD17:</p>
+
+<p>LIST</p>
+
+<p>PRINT#17:CLOSE17</p>
+
+<p>Der PRINT-Befehl vor dem CLOSE ist notwendig, damit der CMD-Modus aufgehoben wird.</p>
+
+<h2>Umstellen auf beliebige Drucker mit Centronics-Schnittstelle</h2>
+
+<p>Das Programm wurde für einen Epson-Drucker geschrieben. Unverändert ist es für jeden anderen Drucker verwendbar, sofern auf die Ausgabe von Commodore-eigenen Grafikzeichen verzichtet wird. Für diese Funktion muß der Drucker vorübergehend in den Bitmustermodus zurückgeschaltet werden, was während einer normalen Textausgabe möglich sein muß. Diese Umschaltung erfolgt im Programm in der Schleife ab Adresse $CB10. Die Anzahl der auszugebenden Steuerzeichen ist unter Adresse $CB18 gespeichert und die Steuerzeichen selbst stehen ab Adresse $CBD2 am Ende des Programms. Für einen Epson-Drucker wird die Folge</p>
+
+<p>ESC*480</p>
+
+<p>ausgegeben, wobei mit4 der Bitmustermodus »CRT-Grafik« ausgewählt wird, 8 das niederwertige Byte und 0 das höherwertige Byte der Anzahl auszugebender Punktmatrixspalten darstellt. Der Epson-Drucker kehrt nach der Ausgabe der spezifizierten Anzahl Musterbytes wieder in den Textmodus zurück.</p>
+
+<address class="author">(H. Eyssele/hm)</address>
+    </article>
+</body>
+</html>

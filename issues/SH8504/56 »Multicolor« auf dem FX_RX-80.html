@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>»Multicolor« auf dem FX/RX-80</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="Karsten Klenz, rg">
+    <meta name="64er.issue" content="Sonderheft 4/85">
+    <meta name="64er.pages" content="56-57">
+    <!-- <meta name="64er.toc_category" content="XXX"> -->
+    <!-- <meta name="64er.toc_title" content="XXX"> -->
+    <meta name="64er.id" content="XXX">
+</head>
+
+<body>
+    <article>
+        <h1>»Multicolor« auf dem FX/RX-80</h1>
+<p class="intro">Hardcopy-Programme für den Epson FX gibt es viele. Doch dieses Programm ermöglicht eine Umsetzung der Farben in verschiedene Graustufen.</p>
+
+<p>Die meisten Drucker-Besitzer werden sich schon geärgert haben, daß »normale« Hardcopies von Multicolor-Grafiken kaum als solche zu erkennen waren. Besitzer eines Epson-RX/FX-80 sind jetzt fein raus.</p>
+
+<p>Ich habe mich geärgert, als ich das erste Mal die Hardcopy einer Strip-Poker-Grafik auf meinem FX-80 ausdrucken wollte. Als ich dann noch den Test des PRINT-64-Interfaces in der 64’er, Ausgabe 12/84, gelesen habe, das den Ausdruck von Multicolor-Grafiken mittels Grauschattierungen erlaubt, habe ich mir gedacht: Das muß doch auch softwaremäßig machbar sein.</p>
+
+<p>Gesagt, getan. Eines Abends nahm ich mir eine Flasche Cola und etwas Knabberkram und fing an zu programmieren. Nach mehreren erfolglosen Anläufen und stapelweise bedrucktem Papier war ich am Ziel: »M-C-HRDCPY«lief. Doch nun zum eigentlichen Programm.</p>
+
+<h2>Das Prinzip</h2>
+
+<p>Eine Multicolor-Grafik ist ja im wesentlichen genauso wie eine normale Grafik aufgebaut, nur repräsentieren jetzt zwei statt einem Bit einen Punkt auf dem Bildschirm. In dieser Kombination aus den beiden Bits steckt jetzt noch eine Farbinformation: Sind beide Bits 0, so wird der Punkt in der Farbe des Hintergrundregisters gesetzt, sind sie jedoch 01, 10 oder 11, wird der Punkt in der Farbe aus den Registern 33 bis 36 des VIC gesetzt. .</p>
+
+<p>Ich verfahre nun so, daß ich jeden Bildschirmpunkt in einer Matrix von 2x12 Punkten auf dem Drucker darstelle. Durch die Anordnung der Punkte in dieser Matrix kann ich nun verschiedene Graustufen darstellen — die Grundlage ist damit gegeben.</p>
+
+<h2>Die Bedienung</h2>
+
+<p>Die Bedienung mag auf den ersten Blick etwas kompliziert erscheinen, erlaubt dafür aber auch optimale Variationsmöglichkeiten.</p>
+
+<p>Vorjeder Anwendung kommt aber leider noch das Abtippen von 438 DATAs. Wenn Sie das gemacht haben, sollten Sie das Programm vorsichtshalber vor dem Starten speichern (so mancher mußte wegen eines Tippfehlers noch einmal anfangen &hellip;). Nach dem Starten sollte sich das Programm nach zirka vier Sekunden mit der Frage »Startadresse?« melden. Geben Sie nun ein, wo Sie das Programm im Speicher haben wollen. Eine kleine Hilfe hierzu gibt die Tabelle, die günstige Startadressen für verschiedene Programme nennt.</p>
+
+<p>Dann wird die Floppy anlaufen (falls Sie nur eine Datasette besitzen — bei Vorhandensein eines Epson-Druckers recht unwahrscheinlich — müssen Sie die Zeilen 1250 bis 1280 herausnehmen und zum Arbeiten immer wieder den Basic-Lader benutzen) und ein File namens »M-C-HRDCPY (Startadresse)« wird auf Diskette erzeugt. Gleichzeitig wird das Programm adressenangepaßt in den Speicher ab (Adresse) geschrieben. Wenn Sie »M-C-HRDCPY« nun noch eventuell durch POKE 55,(adresse) INT(adresse/256)*256:POKE 56,INT(adresse/256): CLR schützen, kann der erfolgreichen Hardcopy eigentlich nur noch das Dreckfuhlerteufelchen im Wege stehen.</p>
+
+<p>Nun zum Aufruf der Hardcopy-Routine. Generell hat er die Form:</p>
+
+<p>SYS (adresse),(filenummer),(page),a,b,c,d</p>
+
+<p><strong>(adresse)</strong> ist die Startadresse des Programms — die, die Sie auf die Frage »Startadresse?« eingegeben haben —, für</p>
+
+<p><strong>(filenummer)</strong> setzen Sie eine 0 ein, falls Sie Ihren Drucker am User-Port angeschlossen haben oder die Filenummer eines Files, das Sie vorher auf den Drucker zur Übergabe von Grafikdaten geöffnet haben.</p>
+
+<p><strong>(page)</strong> ist die Speicherseite, auf der die Grafik beginnt — also INT(Adresse der Grafik/256) und</p>
+
+<p><strong>a,b,c,d</strong> sind die Masken für die Graustufen der Hardcopy.</p>
+
+<p>Wie bereits erwähnt, kennt der VIC vier Möglichkeiten für die Darstellung eines Punktes, nämlich die Kombinationen 00, 01, 10 oder 11. Andererseits kennt die Hardcopy-Routine vier Graustufen. Die Parameter a, b, c und d geben nun an, wie die Bitkombinationen den Graustufen zugeordnet werden. a gibt an, welche Bitkombination auf dem Drucker ganz hell, b, welche hellgrau, c, welche dunkelgrau und d, welche schwarz dargestellt werden, a, b, c und d müssen dabei den dezimalen Wert der Bitkombinationen annehmen, das heißt, 0 für 00, 1 für 01, 2 für 10 und 3 für 11. Ein Beispiel hierzu gibt der Hardcopy-Ausdruck.</p>
+
+<p>Hier noch einmal zur Übung:</p>
+
+<p>Angenommen, Sie haben eine Simons Basic-Multicolor-Grafik und wollen diese so ausdrucken, daß die 00-Punkte Schwarz, die 01-Punkte hellgrau, die 10-Punkte weiß und die 11-Punkte dunkelgrau dargestellt werden.</p>
+
+<p>Also laden Sie den Basic-Lader, sehen in der Tabelle nach, welche Startadresse günstig ist, geben diese ein und tippen dann, nachdem sich der Computer wieder mit READY gemeldet hat, ein:</p>
+
+<p>POKE 55,44:POKE 56,126:CLR</p>
+
+<p>um M-C-HRDCPY vor dem Überschreiben zu schützen und dann weiter:</p>
+
+<p>SYS 32300,0,224,2,1,3,0</p>
+
+<p>falls Sie den Drucker am User-Port betreiben beziehungsweise</p>
+
+<p>OPEN xx,(Druckeradresse),(Grafiksekundäradresse)</p>
+
+<p>SYS 32300,xx,224,2,1,3,0</p>
+
+<p>falls Sie ein Hardware-Interface besitzen.</p>
+
+<p>Das Programm wurde auf einem FX-80 sowohl mit Software- als auch mit Data-Becker- und Görlitz-Hardwareinterface und auf einem RX-80 mit Software- und Görlitz-Hardwareinterface getestet und lief in allen Fällen problemlos. Vermutlich ist das Programm auch auch dem MX-80 und anderen Epson- und Epson-kompatiblen Druckern lauffähig. Im Zweifelsfall müssen Sie daher ausprobieren, ob auch Ihr Drucker für dieses Programm geeignet ist, kaputt kann eigentlich nichts gehen. Benutzt werden folgende Steuersequenzen: ESC 1, um den Drucker auf 7/72 Inch Zeilenvorschub zu schalten, ESC (Klammeraffe), um ihn zu initialisieren und ESC Z, um ihn in 1920 Punkte/Zeile-Grafikmodus zu bringen.</p>
+
+<h2>Die Kompatibilität</h2>
+
+<p>Da das Programm also recht viele Drucker unterstützt, frei verschiebbar ist, den Ausdruck von Grafiken aus den versteckten RAMs erlaubt und sowohl Hard- als auch Software-Interfaces unterstützt, sollte meiner Meinung nach ein Höchstmaß an Kompatibilität gewährleistet sein.</p>
+
+<p>Ansonsten viel Spaß und gut Druck!</p>
+
+<address class="author">(Karsten Klenz/rg)</address>
+    </article>
+</body>
+</html>
