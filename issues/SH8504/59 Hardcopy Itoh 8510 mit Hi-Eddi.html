@@ -15,58 +15,59 @@
 <body>
     <article>
         <h1>Hardcopy Itoh 8510 mit Hi-Eddi</h1>
-<p class="intro">Besitzern des Itoh 8510 bietet dieses Programm die Möglichkeit, von Hi-Eddi Hardcopies zu erzeugen.</p>
+        <p class="intro">Besitzern des Itoh 8510 bietet dieses Programm die Möglichkeit, von Hi-Eddi Hardcopies zu erzeugen.</p>
 
-<p>Mit dem Hi-Eddi aus der Ausgabe 1/85 vom 64’er lassen sich mit minimaler Hardware-Ausrüstung (C 64, Diskettenlaufwerk 1541, Joystick) sehr komfortable Grafiken erzeugen. Doch was nützt die schönste Grafik auf Bildschirm oder Diskette, wenn man sie nicht ausdrucken kann?</p>
+        <p>Mit dem Hi-Eddi aus der Ausgabe 1/85 vom 64’er lassen sich mit minimaler Hardware-Ausrüstung (C 64, Diskettenlaufwerk 1541, Joystick) sehr komfortable Grafiken erzeugen. Doch was nützt die schönste Grafik auf Bildschirm oder Diskette, wenn man sie nicht ausdrucken kann?</p>
 
-<p>Die in Ausgabe 1/85 veröffentlichte Druckroutine Hi-Print arbeitet leider nur mit Epson-Druckern zusammen. Da der Itoh 8510 ein verbreiteter und guter Drucker ist, wurden für ihn die im folgenden beschriebenen Programme erstellt. Er wird über eine Centronics-Schnittstelle via User-Port am C 64 angeschlossen.</p>
+        <p>Die in Ausgabe 1/85 veröffentlichte Druckroutine Hi-Print arbeitet leider nur mit Epson-Druckern zusammen. Da der Itoh 8510 ein verbreiteter und guter Drucker ist, wurden für ihn die im folgenden beschriebenen Programme erstellt. Er wird über eine Centronics-Schnittstelle via User-Port am C 64 angeschlossen.</p>
 
-<p>Zusätzlich wurden einige Features eingebaut, die die Epson-Hardcopy-Routine nicht besitzt. So wäre die Vorgabe von Leerspalten vom linken Rand aus (falls noch Platz ist) eine nützliche Sache. Um zwei Grafiken in der Horizontalen aneinander zu setzen, wurde dazu die volle Bildschirmbreite in 40 Spalten zu je 8 (40 x 8 = 320) Punkten (wie im Textmodus) organisiert. Um jetzt zwei Grafiken nebeneinander zu plazieren, kann dazu die Startspalte (wird mitgedruckt) der links stehenden Grafik (Grafik Nr. 1) und die Endspalte (wird nicht mitgedruckt) der rechts stehenden Grafik (Grafik Nr. 2) vorgewählt werden.</p>
+        <p>Zusätzlich wurden einige Features eingebaut, die die Epson-Hardcopy-Routine nicht besitzt. So wäre die Vorgabe von Leerspalten vom linken Rand aus (falls noch Platz ist) eine nützliche Sache. Um zwei Grafiken in der Horizontalen aneinander zu setzen, wurde dazu die volle Bildschirmbreite in 40 Spalten zu je 8 (40 x 8 = 320) Punkten (wie im Textmodus) organisiert. Um jetzt zwei Grafiken nebeneinander zu plazieren, kann dazu die Startspalte (wird mitgedruckt) der links stehenden Grafik (Grafik Nr. 1) und die Endspalte (wird nicht mitgedruckt) der rechts stehenden Grafik (Grafik Nr. 2) vorgewählt werden.</p>
 
-<p>Die Ausdruckbreite wird dazu in drei Sektoren von links nach rechts aufgeteilt.<br/>
-0. Sektor: Abstand (SPC) in Punkten vom linken Papierrand.<br/>
-1. Sektor: Grafik Nr. 1 (Bild-Nr.; Startspalte)<br/>
-Bild-Nr. = 0 = > kein Bild, Startspalte = 48<br/>
-Bild wird rechtsbündig gedruckt<br/>
-0 &lt; = Startspalte &lt; = 39<br/>
-Startspalte = 0 = > volle Hardcopy von Grafik Nr. 1<br/>
-2. Sektor: Grafik Nr. 2 (Bild-Nr.; Endspalte)<br/>
-Bild-Nr. = 0 = > kein Bild, Endspalte = 8<br/>
-Bild wird linksbündig gedruckt<br/>
-1 &lt; = Endspalte &lt; = 40<br/>
-Endspalte = 40 = > volle Hardcopy von Grafik Nr. 2</p>
+        <p>Die Ausdruckbreite wird dazu in drei Sektoren von links nach rechts aufgeteilt.<br />
+            0. Sektor: Abstand (SPC) in Punkten vom linken Papierrand.<br />
+            1. Sektor: Grafik Nr. 1 (Bild-Nr.; Startspalte)<br />
+            Bild-Nr. = 0 = > kein Bild, Startspalte = 48<br />
+            Bild wird rechtsbündig gedruckt<br />
+            0 &lt; = Startspalte &lt; = 39<br />
+            Startspalte = 0 = > volle Hardcopy von Grafik Nr. 1<br />
+            2. Sektor: Grafik Nr. 2 (Bild-Nr.; Endspalte)<br />
+            Bild-Nr. = 0 = > kein Bild, Endspalte = 8<br />
+            Bild wird linksbündig gedruckt<br />
+            1 &lt; = Endspalte &lt; = 40<br />
+            Endspalte = 40 = > volle Hardcopy von Grafik Nr. 2</p>
 
-<p>Insgesamt kann folgende Formel für die Aufteilung der drei Sektoren angegeben werden:</p>
+        <p>Insgesamt kann folgende Formel für die Aufteilung der drei Sektoren angegeben werden:</p>
 
-<p>SPC + (40-Startspalte)*8 + Endspalte*8 = 640</p>
+        <p>SPC + (40-Startspalte)*8 + Endspalte*8 = 640</p>
 
-<p>Im Steuerprogramm werden nacheinander die Bild-Nr. von Sektor 1, dann (falls Bild-Nr. &lt; > 0)die Startspalte von Grafik-Nr. 1, dann die Bild-Nr. von Sektor 2 und (falls Bild-Nr. &lt; > 0) die Endspalte von Grafik-Nr. 2, und schließlich die Anzahl der Leerspalten vor Grafik-Nr. 1 abgefragt.</p>
+        <p>Im Steuerprogramm werden nacheinander die Bild-Nr. von Sektor 1, dann (falls Bild-Nr. &lt; > 0)die Startspalte von Grafik-Nr. 1, dann die Bild-Nr. von Sektor 2 und (falls Bild-Nr. &lt; > 0) die Endspalte von Grafik-Nr. 2, und schließlich die Anzahl der Leerspalten vor Grafik-Nr. 1 abgefragt.</p>
 
-<p>Die Maximalwerte werden stets durch das Steuerprogramm vorgegeben, so daß in vielen Fällen ein einfaches RETURN genügt.</p>
+        <p>Die Maximalwerte werden stets durch das Steuerprogramm vorgegeben, so daß in vielen Fällen ein einfaches RETURN genügt.</p>
 
-<p>Um die Druckroutine namens »HI-P(ITOH8510)« für den ITOH 8510 in das Steuerprogramm Hi-Eddi einzubilden, mußte dieses auf die Bedürfnisse der Druckroutine angepaßt werden und heißt nun »HI-E(ITOH8510)«.</p>
+        <p>Um die Druckroutine namens »HI-P(ITOH8510)« für den ITOH 8510 in das Steuerprogramm Hi-Eddi einzubilden, mußte dieses auf die Bedürfnisse der Druckroutine angepaßt werden und heißt nun »HI-E(ITOH8510)«.</p>
 
-<p>Dazu wurden (aus Speicherplatzgründen) alle Zeilen neu numeriert und die Textausgabepassagen verkürzt. In den Programmzeilen 24 und folgende befindet sich das Drucksteuerprogramm.</p>
+        <p>Dazu wurden (aus Speicherplatzgründen) alle Zeilen neu numeriert und die Textausgabepassagen verkürzt. In den Programmzeilen 24 und folgende befindet sich das Drucksteuerprogramm.</p>
 
-<p>Es wird hierbei dringend davor gewarnt, das neue Steuerprogramm HI-E(ITOH8510) zu erweitern oder zu ändern, da sonst das Steuerprogramm (inklusive Variablen) nicht mehr in den verfügbaren Basic-Speicherplatz paßt. Dies gilt auch für den eingebauten Parametercheck, da in der Druckroutine selber keine Plausibilitätsprüfung mehr vorgenommen wird.</p>
+        <p>Es wird hierbei dringend davor gewarnt, das neue Steuerprogramm HI-E(ITOH8510) zu erweitern oder zu ändern, da sonst das Steuerprogramm (inklusive Variablen) nicht mehr in den verfügbaren Basic-Speicherplatz paßt. Dies gilt auch für den eingebauten Parametercheck, da in der Druckroutine selber keine Plausibilitätsprüfung mehr vorgenommen wird.</p>
 
-<p>Für die Initialisierung des Druckers und die Ausgabe der Hardcopy sollte sich der Drucker im SELECT-Modus befinden, da sonst das Programm hängenbleibt (Acknowledge-Signal wird erwartet).</p>
+        <p>Für die Initialisierung des Druckers und die Ausgabe der Hardcopy sollte sich der Drucker im SELECT-Modus befinden, da sonst das Programm hängenbleibt (Acknowledge-Signal wird erwartet).</p>
 
-<p>Falls aus irgendeinem Grunde (Drucker beziehungsweise Kabel defekt, falsch oder gar nicht angeschlossen) dieser Fall eintritt, kann mit RUN/STOP-RESTORE die Druckroutine beendet werden. Hi-Eddi kann dann wieder mit RUN gestartet werden. (Das RUN ist notwendig, um HI-EXE nachzuladen, da aus Speicherplatzgründen nach der Anwahl des Drucksteuerprogramms immer die Druckroutine über HI-EXE nachgeladen wird.)</p>
+        <p>Falls aus irgendeinem Grunde (Drucker beziehungsweise Kabel defekt, falsch oder gar nicht angeschlossen) dieser Fall eintritt, kann mit RUN/STOP-RESTORE die Druckroutine beendet werden. Hi-Eddi kann dann wieder mit RUN gestartet werden. (Das RUN ist notwendig, um HI-EXE nachzuladen, da aus Speicherplatzgründen nach der Anwahl des Drucksteuerprogramms immer die Druckroutine über HI-EXE nachgeladen wird.)</p>
 
-<p>Der Drucker sollte mittels der DIP-Schalter auf CR = CR und 8-Bit-Data eingestellt sein. Da am Anfang kein Carriage Return ausgegeben wird, sollte man dafür sorgen, daß der Druckkopf sich auf einer freien Zeile befindet. Außerdem sollte das Papier zentriert werden, da sich der Ausdruck über die volle Papierbreite erstrecken kann.</p>
+        <p>Der Drucker sollte mittels der DIP-Schalter auf CR = CR und 8-Bit-Data eingestellt sein. Da am Anfang kein Carriage Return ausgegeben wird, sollte man dafür sorgen, daß der Druckkopf sich auf einer freien Zeile befindet. Außerdem sollte das Papier zentriert werden, da sich der Ausdruck über die volle Papierbreite erstrecken kann.</p>
 
-<p>Die Anpassung des ITOH 8510A an Hi-Eddi besteht im wesentlichen aus zwei Schriften:</p>
+        <p>Die Anpassung des ITOH 8510A an Hi-Eddi besteht im wesentlichen aus zwei Schriften:</p>
 
-<ol>
-<li>HI-P(ITOH8510).L abtippen und starten. Dieses ist ein Ladeprogramm, das die Druckroutine HI-P(ITOH8510) auf Diskette ablegt. Es wird (nach erfolgreichem Test) zum Arbeiten mit Hi-Eddi nicht mehr benötigt.</li>
-<li>Hi-E(ITOH8510) abtippen und speichern. Es ist das angepaßte Steuerprogramm und ersetzt das alte Hi-Eddi,</li>
-</ol>
+        <ol>
+            <li>HI-P(ITOH8510).L abtippen und starten. Dieses ist ein Ladeprogramm, das die Druckroutine HI-P(ITOH8510) auf Diskette ablegt. Es wird (nach erfolgreichem Test) zum Arbeiten mit Hi-Eddi nicht mehr benötigt.</li>
+            <li>Hi-E(ITOH8510) abtippen und speichern. Es ist das angepaßte Steuerprogramm und ersetzt das alte Hi-Eddi,</li>
+        </ol>
 
 
-<p>So, das wär's eigentlich. Hi-Eddi mit Itoh 8510A ist nun lauffähig. Mir bleibt nur noch, viel Erfolg mit Hi-Eddi zu wünschen.</p>
+        <p>So, das wär's eigentlich. Hi-Eddi mit Itoh 8510A ist nun lauffähig. Mir bleibt nur noch, viel Erfolg mit Hi-Eddi zu wünschen.</p>
 
-<address class="author">(Frank Ziesche/rg)</address>
+        <address class="author">(Frank Ziesche/rg)</address>
     </article>
 </body>
+
 </html>
