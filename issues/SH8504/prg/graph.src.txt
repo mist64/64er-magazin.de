@@ -1,0 +1,253 @@
+
+
+;graph.src.prg ; graphics utilities
+;
+; richard l. rylander   11/4/84
+;
+; load arithmetic utilities first
+;
+ram=$033e
+origin=$c0e2
+;
+mlpcnd=$ac     ; multiplicand (s)
+mlpler=$ad     ; multiplier (s)
+prod=$ae      ; product (d)
+mult=$c011    ; call for multiply
+;
+rndm=$c000    ; random number
+random=$c0c8  ; call for random
+; note - a call to 'random' leaves a random byte
+; in the accumulator
+;
+       *=ram
+pltflg *=*+1  ; plot/unplot flag
+xplt   *=*+2  ; absolute plot coord
+yplt   *=*+1  ; absolute plot coord
+vic1   *=*+1  ; register storage
+vic2   *=*+1  ; register storage
+value  *=*+2  ; final normalized shade value
+htorrn *=*+1  ; shade flag, 1=halftone
+noscal *=*+1  ; scale flag, 1=no scale
+temp   *=*+2  ; temporary storage
+;
+       *=origin
+;
+;*****************************************
+;
+; turn on bit map graphics mode,
+; saving register values for
+; return to text mode later.
+;
+grfon  lda $d011
+       ora #$20
+       sta $d011
+       lda $dd00
+       sta vic1
+       and #$fc
+       ora #$01
+       sta $dd00
+       lda $d018
+       sta vic2
+       lda #$19
+       sta $d018
+       rts
+;
+;*****************************************
+;
+; return to text screen
+;
+grfoff lda $d011
+       and #$df
+       sta $d011
+       lda vic1
+       sta $dd00
+       lda vic2
+       sta $d018
+       rts
+;
+;*****************************************
+;
+; fill color map for black dots on white
+;
+color  lda #$01    ; poke new colors here
+       ldx #0
+col1   sta $8400,x
+       sta $8500,x
+       sta $8600,x
+       sta $8700,x
+       dex
+       bne col1
+       rts
+;
+;*****************************************
+;
+; clear hi-res graphics screen
+;
+clear  lda #$a0
+       sta $fc
+       ldy #0
+       sty $fb
+       lda #0      ; clear byte
+       ldx #$20
+clrlp  sta ($fb),y
+       iny
+       bne clrlp
+       inc $fc
+       dex
+       bne clrlp
+       rts
+;
+;*****************************************
+;
+; plot and unplot points on hi-res graphics
+; screen. absolute x and y screen coordinates
+; are poked into xplt, xplt+1, and yplt
+;
+plot   lda #0
+       .byte $2c
+unplot lda #$80
+       sta pltflg
+       lda $01    ; basic rom out
+       and #$fe
+       sta $01
+       sec        ; invert y coordinate to
+       lda #$c7   ; put origin in lower left
+       sbc yplt   ; corner of screen
+       tax        ; (199.-yplt)
+       lsr a
+       lsr a
+       lsr a
+       tay
+       lda table1,y
+       sta $fb
+       lda table2,y
+       sta $fc
+       txa
+       and #$07
+       clc
+       adc $fb
+       sta $fb
+       lda xplt
+       and #$f8
+       adc $fb
+       sta $fb
+       lda xplt+1
+       adc $fc
+       sta $fc
+       lda #$a0
+       adc $fc
+       sta $fc
+       lda xplt
+       and #$07
+       eor #$07
+       tax
+       lda #$01
+plotlp dex
+       bmi plot2
+       asl a
+       bne plotlp
+plot2  ldy #0
+       bit pltflg
+       bpl noplot
+       eor #$ff
+       and ($fb),y
+       .byte $2c
+noplot ora ($fb),y
+       sta ($fb),y
+       lda $01     ; basic rom restored
+       ora #$01
+       sta $01
+       rts
+;
+table1 .byte $00,$40,$80,$c0
+       .byte $00,$40,$80,$c0
+       .byte $00,$40,$80,$c0
+       .byte $00,$40,$80,$c0
+       .byte $00,$40,$80,$c0
+       .byte $00,$40,$80,$c0,$00
+;
+table2 .byte $00,$01,$02,$03
+       .byte $05,$06,$07,$08
+       .byte $0a,$0b,$0c,$0d
+       .byte $0f,$10,$11,$12
+       .byte $14,$15,$16,$17
+       .byte $19,$1a,$1b,$1c,$1e
+;
+;*****************************************
+;
+; shading by hybrid dither/dot-growth
+;
+shade  lda xplt     ; use bits -----***
+       and #$07     ; of 'x' screen coord
+       sta temp
+       lda yplt     ; and bits -----***
+       and #$07     ; of 'y' screen coord
+       asl a        ; shifted into --***---
+       asl a        ; position to determine
+       asl a        ; 6-bit offset in
+       ora temp     ; threshold table
+       tax
+       lda thresh,x ; screen-position-weighted
+       cmp value    ; threshold value
+       bpl greatr
+       jmp unplot
+greatr jmp plot
+;
+;*****************************************
+;
+; shading by random halftone
+;
+rshade jsr random
+       lsr a         ; reduce random byte
+       lsr a         ; to 6 bits for shade
+       cmp value     ; value comparison
+       bpl more
+       jmp unplot
+more   jmp plot
+;
+;*****************************************
+;
+; plot a point weighted by shading scheme
+; and shade value
+; check 'noscal' flag for scaling of y coord
+; check 'htorrn' flag for type of shading
+;
+pltshd lda noscal
+       beq norm
+;
+; scale y from 0-239 pseudo-coordinates
+; to 0-199 true screen coordinates by
+;     y = (y+1)*213/256
+;
+scale  ldy yplt
+       iny
+       sty mlpler
+       lda #$d5      ; 213.
+       sta mlpcnd
+       jsr mult      ; return with high byte
+       sta yplt      ; in accumulator
+norm   lda htorrn
+       beq rplt
+       jmp shade
+rplt   jmp rshade
+;
+;
+;
+thresh .byte $00,$08,$35,$3d
+       .byte $02,$0a,$37,$3f
+       .byte $10,$18,$25,$2d
+       .byte $12,$1a,$27,$2f
+       .byte $31,$39,$04,$0c
+       .byte $33,$3b,$06,$0e
+       .byte $21,$29,$14,$1c
+       .byte $23,$2b,$16,$1e
+       .byte $03,$0b,$36,$3e
+       .byte $01,$09,$34,$3c
+       .byte $13,$1b,$26,$2e
+       .byte $11,$19,$24,$2c
+       .byte $32,$3a,$07,$0f
+       .byte $30,$38,$05,$0d
+       .byte $22,$2a,$17,$1f
+       .byte $20,$28,$15,$1d
+.end
+

@@ -1,0 +1,85 @@
+
+
+;eyssele-erw..prg ==0801==
+   10 rem erweiterung zum treiberprogramm fuer centronics-drucker von h eyssele aus
+   12 rem 64-er nr. 7/84
+   14 rem
+   16 rem von w. meierhofer
+   18 rem
+   20 rem zusaetzliche faehigkeiten:
+   22 rem   - harcopy mit zeilenabstand
+   24 rem   - harcopy bildschirm absolut
+   26 rem   - erkennung und ausdruck von reversen sonderzeichen
+   30 rem naeheres entnehmen sie bitte der beigefuegten anleitung
+   32 rem
+   34 rem
+   40 print"{clr}das maschinenprogramm von h. eyssele"
+   42 print"muss sich bereits im speicher befinden !"
+   44 print"haben sie die druckersteuercodes in"
+   46 print"zeile 60 -65 an ihren drucker angepasst?"
+   50 print"weiter mit irgendeiner taste !"
+   52 ifpeek(203)=64then52
+   54 print:print"bitte warten":print:print
+   55 rem
+   56 rem
+   58 rem ***folgende parameter sind auf den drucker cp80 abgestimmt***
+   59 rem bitte aendern sie sie fuer ihren drucker
+   60 dz=4:rem anzahl notwendiger codes (max 9), um 8 bytes grafik auszugeben
+   61 d(1)=27:d(2)=75:d(3)=8:d(4)=0:rem bitte aendern oder ergaenzen
+   62 nz=3:rem anzahl notwendiger codes (max 8), fuer null-zeilenabstand
+   63 n(1)=27:n(2)=65:n(3)=7:rem bitte aendern oder ergaenzen
+   64 gz=2:rem anzahl notwendiger codes (max 5), fuer grundzeilenabstand
+   65 g(1)=27:g(2)=50:rem bitte aendern oder ergaenzen
+   66 rem
+   67 rem
+   68 rem ***einpoken von datas***
+   70 for i=52200to52267:readx:pokei,x:fe=fe+x:next
+   71 iffe<>8381thenprint"fehler im ersten datenblock":end
+   72 for i=52270to52426:readx:pokei,x:fa=fa+x:next
+   73 iffa<>22642thenprint"fehler im zweiten datenblock":end
+   75 rem
+   76 rem
+   77 rem ***druckerspezifische parametern***
+   80 poke51992,dz:fori=1todz:poke52177+i,d(i):next
+   82 poke52421,nz:fori=1tonz:poke52191+i,n(i):next
+   84 poke52404,gz:fori=1togz:poke52186+i,g(i):next
+   86 rem
+   87 rem
+   88 rem ***anschliessen der erweiterung***
+   90 poke51758,21:poke51760,91:poke51770,9:poke51772,219:poke51774,5
+   91 poke51780,76:poke51781,235:poke51782,203:poke51783,234:poke51785,91
+   92 poke51922,76:poke51923,25:poke51924,204
+   96 rem
+   97 rem
+   98 rem--------------------------------------------------------------------------
+   99 rem 1.datenblock
+  100 data76,0,201,164,199,208,19,201,18,240,10,201,255,240,3,76,72,202,76
+  101 data96,202,160,1,132,199,96,201,146,240,7,201,13,240,8,76,79,202,160
+  102 data0,132,199,96,160,0,132,199,76,72,202,74,74,74,72,165,199,208,4,104
+  103 data76,213,202,104,24,105,4,76,213,202
+  199 rem 2.datenblock
+  200 data32,0,201,32,253,174,32,158,183,169,255,133,249,202,138,133,250,232
+  201 data232,232,232,138,133,248,162,0,134,247,160,0,230,249,208,2,230,250
+  202 data230,247,177,249,201,128,144,21,172,24,208,192,21,208,4,160,208,208
+  203 data2,160,216,132,6,32,196,202,76,143,204,201,32,176,5,9,64,76,127,204
+  204 data201,64,144,3,24,105,128,172,24,208,192,21,208,6,32,68,202,76,143
+  205 data204,32,43,202,166,247,224,40,208,181,162,0,134,247,169,13,32,64,201
+  206 data165,250,197,248,208,166,165,249,201,231,208,160,162,0,189,219,203
+  207 data32,64,201,232,224,2,208,245,96,32,0,201,162,0,189,224,203,32,64,201
+  208 data232,224,3,208,245,76,49,204
+  210 rem
+  220 rem
+  230 rem
+  300 print"programm als maschinen-programm auf     diskette/cassette legen d/c/n?"
+  310 geta$:ifa$=""then310
+  320 ifa$="d"thensys(57812)"drucktreiber",8:goto360
+  330 ifa$="c"thensys(57812)"drucktreiber",1:goto360
+  340 ifa$="n"then400
+  350 goto310
+  360 poke193,0:poke194,201:poke174,203:poke175,204:sys62957
+  370 print:print"programm kann jetzt mit"
+  380 print"load'drucktreiber',8,1 (bzw.  ,1,1)"
+  390 print"direkt geladen werden !  (aber dabei"
+  392 print"'new' + initialisierung nicht vergessen)"
+  400 sys52200:end
+

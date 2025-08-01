@@ -1,0 +1,222 @@
+
+
+;shapes demo2.prg ==0801==
+   10 rem        shapes demo
+   20 :
+   30 rem     richard l. rylander    11/23/84 (revised 1/20/85 to add labeling)
+   40 :
+   50 gr=49378    :rem graphik modus
+   60 tx=49411    :rem text modus
+   70 :
+   80 lb=893      :rem linke grenze
+   90 rb=894      :rem rechte grenze
+  100 ub=895     :rem obere grenze
+  110 db=896     :rem untere grenze
+  120 :
+  130 rem   flags fuer verschiedene grafikmodi
+  140 :
+  150 sh=838     :rem schattierung: 0=random, 1=halbton
+  160 sc=839     :rem skalierung:0=normal (1:1), 1=skal. (4:3) fuer darstellung
+  170 lt=898     :rem lichteinfall: 0=normal, 1=von hinten beleuchtet
+  180 :
+  190 bo=53280   :rem  rahmenfarbe
+  200 :
+  210 rem   funktionsadressen
+  220 :
+  230 cl=51979   :rem bitmap bereich loeschen
+  240 co=52001   :rem colorbereich fuellen
+  250 :
+  260 sp=52119   :rem  sphere
+  270 tr=52141   :rem  ring von oben
+  280 vc=52150   :rem  zylinder (vertikale achse)
+  290 hc=52153   :rem  zylinder (horizontale achse)
+  300 vt=52186   :rem  ringschnitt (vertikale achse)
+  310 ht=52189   :rem  ringschnitt (axis horizontale achse)
+  320 vs=52203   :rem  spule (vertikale achse)
+  330 hs=52206   :rem  spule (horizontale achse)
+  340 :
+  350 rem  einzelne shapes zeichnen
+  360 :
+  370 poke sh,1 :rem halbtonschattierung
+  380 poke sc,1 :rem skalierung
+  390 poke lt,0 :rem normalbeleuchtung
+  400 sys(cl)   :rem bildschirm loeschen
+  410 sys(co),17*11+1  :rem farbkombination - dunkelgrau (11) weisse punkte (1)
+  414 rem  auf den meisten farbmonitoren
+  420 poke bo,1 :rem weisser rahmen
+  430 sys(gr)   :rem grafik einschalten
+  432 rw=12:cm=14:md=1:a$="shapes demo":gosub 1900:rem  titel
+  434 x1=110:y1=120:x2=210:y2=120:bc=1:dc=7:gosub 1700:rem  color titel
+  440 poke lb,38:poke rb,38:poke ub,38:poke db,38       :rem shape fenster
+  450 sys(sp),40,199,38
+  455 rw=9:cm=2:md=1:a$="kugel":gosub1900
+  460 sys(hc),120,199,38,38
+  465 cm=11:a$="h-zylnd.":gosub1900
+  470 sys(vc),200,199 :rem voreingestellte parameter werden benutzt
+  475 cm=21:a$="v-zylind.":gosub1900
+  480 sys(tr),280,199,15,38
+  485 cm=32:a$="  ring":gosub1900
+  490 sys(vt),40,64
+  495 rw=23:cm=1:a$="h-ring":gosub1900
+  500 sys(ht),120,64
+  505 cm=11:a$="v-ring":gosub1900
+  510 sys(hs),200,64,5,100
+  515 cm=22:a$="h-spule":gosub1900
+  520 sys(vs),280,64
+  525 cm=32:a$="v-spule":gosub1900
+  530 poke 198,0:wait 198,1:poke 198,0
+  540 rem  auf taste warten
+  550 :
+  560 rem  zwei "pokale", einer mit halbton-, der andere mit "random"-schattierung
+  570 :
+  580 sys(cl):sys(co),16*11+1
+  582 rw=14:cm=14:a$="vergleich":gosub 1900:rw=15:cm=16:a$="zweier":gosub 1900
+  584 rw=16:cm=12:a$="schattierungen":gosub 1900:rw=18:cm=14:a$="<-- halbton"
+  586 gosub 1900:rw=20:cm=15:a$="random -->":gosub 1900
+  590 poke lb,255:poke rb,255:poke ub,49:poke db,255: rem an den oberen rand
+  600 sys(sp),80,190,80
+  610 poke ub,51:poke db,51: rem weitern sprite-teil anhaengen
+  620 sys(vs),80,69,10,130
+  630 poke db,9:poke ub,8
+  640 sys(vt),80,9,25,45
+  650 poke sh,0  :rem auf random schattierung umschalten
+  660 poke lb,255:poke rb,255:poke ub,49:poke db,255
+  670 sys(sp),240,190,80
+  680 poke ub,51:poke db,51
+  690 sys(vs),240,69,10,130
+  700 poke db,9:poke ub,8
+  710 sys(vt),240,9,25,45
+  720 poke 198,0:wait 198,1:poke 198,0
+  740 :
+  750 rem  zeichne "wein" szene
+  760 poke lt,1 :rem hintergrungbeleuchtung
+  770 poke sh,1 :rem halbtonschattierung fuer flaschenetikett
+  780 sys(co):sys(cl),255: rem bitmap fuellen
+  790 poke bo,0 : rem schwarzer hintergrund
+  792 rw=0:cm=0:md=2:a$="zeichenen mit":gosub 1900:rw=1:cm=0:a$="rueckbeleuchtung"
+  794 gosub 1900:rw=2:cm=0:a$="gegen gesetzten":gosub 1900
+  796 rw=3:cm=0:a$="hintergrund":gosub 1900
+  798 rw=1:cm=26:a$="farben werden":gosub 1900
+  800 rw=2:cm=26:a$="nachgezeichnet":gosub1900
+  810 rem  zeichne flasche
+  820 poke ub,0:poke db,255:poke lb,255:pokerb,255
+  830 sys(vt),150,10,30,50
+  840 poke ub,255:sys(vc),150,70,50,60
+  850 poke db,0:sys(vt),150,130,6,50
+  860 poke db,55:poke ub,0:sys(vs),150,204,15,181
+  870 poke ub,255:sys(vc),150,221,16,17
+  880 :
+  890 rem  zeichene weinglas
+  900 poke ub,20:sys(sp),80,120,60
+  910 poke ub,35:poke db,34:sys(vs),80,34,10,110
+  920 :
+  930 rem  zeichent ein paar trauben
+  940 sys(sp),8,8,8:
+  950 sys(sp),20,8:sys(sp),40,8:sys(sp),12,20:sys(sp),30,20:sys(sp),25,16
+  960 :
+  970 rem zeichnet apfel bestehend aus 2 ringen und einem kugelfragment
+  980 poke ub,255:poke db,255:poke lb,255:poke rb,59
+  990 sys(vt),260,29,0,50:sys(vt),260,79
+ 1000 poke ub,43:poke db,43:sys(sp),260,54,60
+ 1010 rem   apfelstiel zeichnen
+ 1020 poke rb,0:poke db,0:sys(tr),272,104,10,15
+ 1030 rem   blatt zeichnen
+ 1040 poke db,255:poke rb,0:sys(sp),256,119,15
+ 1050 rem  "random"-schattiertes ettikett hinzufuegen !
+ 1060 poke ub,255:poke rb,255:poke lb,6
+ 1070 poke sh,0:sys(vc),150,72,50,48
+ 1080 :
+ 1090 rem  bild nachcolorieren
+ 1100 sys(co),12
+ 1110 x1=200:y1=1:x2=315:y2=100:dc=0:bc=2:gosub 1700
+ 1120 x1=240:y1=110:x2=255:y2=150:bc=5:gosub 1700
+ 1130 x1=260:y1=110:x2=270:y2=135:bc=9:gosub 1700
+ 1140 x1=1:y1=1:x2=48:y2=30:bc=4:gosub 1700
+ 1150 x1=140:y1=205:x2=180:y2=235:bc=7:gosub 1700
+ 1160 x1=145:y1=25:x2=195:y2=115:bc=6:gosub 1700
+ 1170 poke 198,0:wait 198,1:poke 198,0
+ 1190 :
+ 1200 rem   "kaffee und plaetzchen"
+ 1210 poke sh,0 :rem random-schattierung fuer plaetzchen
+ 1220 sys(co),16*11+1:sys(cl):poke bo,1
+ 1230 poke lb,255:poke rb,255:poke ub,255:poke db,255 :rem kein shape-fenster
+ 1240 sys(vt),60,20,20,60
+ 1250 poke rb,29:sys(vt),99,60:poke rb,255
+ 1260 sys(tr),188,180
+ 1270 rem halbtonschattierte kaffeetasse hinzufuegen.
+ 1280 poke sh,1:poke ub,0:sys(vt),188,20:poke ub,255
+ 1290 poke db,0:sys(tr),278,110,20,40
+ 1300 poke db,255:poke ub,0:poke lb,0
+ 1310 sys(tr),248,90,50,70:poke lb,255:sys(sp),248,110,10:poke ub,255
+ 1320 sys(vc),308,100,10,10
+ 1330 sys(vc),188,77,60,57
+ 1340 poke db,0:sys(vt),188,134,40,60
+ 1360 sys(co),1+16*9 :rem 1=weisser hintergrund, 9=braune punkte
+ 1370 x1=130:y1=1:x2=319:y2=136:bc=1:dc=5:gosub 1700
+ 1380 x1=250:y1=144:x2=319:y2=144:gosub 1700
+ 1390 poke 198,0:wait 198,1:poke 198,0
+ 1410 :
+ 1420 rem  zeichne "verbundene" ringe durch ueberlappung der fenster
+ 1430 poke lt,0 :rem blaue punkte auf weiss, keine hintergrundbeleutung
+ 1440 sys(cl):sys(co),1+16*6: rem 1=weisser intergrund, 6=blaue punkte
+ 1450 poke ub,255:poke db,255:poke lb,255:poke rb,255: rem keine fenster
+ 1460 poke sh,0  :rem zufaellige schattierung
+ 1470 sys(tr),244,84,48,70
+ 1480 sys(tr),160,84:sys(tr),76,84
+ 1490 sys(tr),118,156:sys(tr),202,156
+ 1500 rem  ueberlappende zonen hinzufuegen
+ 1510 poke rb,0:poke db,0:sys(tr),160,84:poke rb,255:poke lb,0
+ 1520 sys(tr),76,84:poke db,255:poke ub,0:sys(tr),118,156
+ 1530 poke lb,255:poke rb,0:sys(tr),202,156:poke lb,27
+ 1540 poke db,0:poke ub,255:sys(tr),160,84
+ 1550 poke db,0:poke ub,255:sys(tr),160,84
+ 1560 poke lb,255:poke ub,27:sys(tr),244,84
+ 1570 poke lb,0:poke rb,27:poke ub,255:sys(tr),244,84
+ 1580 poke 198,0
+ 1590 get a$:if a$= "" then 1590
+ 1600 sys(tx):poke bo,14:rem rueckkehr zum textmodus
+ 1610 end
+ 1620 :
+ 1630 rem unterprogramm zu nachcolorieren verschiedener zonen
+ 1640 rem achtung: es kann jeweils nur eine rechteckige flaeche
+ 1650 rem von 8x8 punkten eingefaerbt werden !!
+ 1660 rem (x1,y1)=unterer linker punkt, (x2,y2)=oberer rechter punkt
+ 1690 rem die y-koordinaten muessen "unskalliert" sein. falls scale-flag gesetzt:
+ 1700 if peek(sc)then y1=(y1+1)*213/256:y2=(y2+1)*213/256
+ 1710 rem uebergabevariable ist cc.
+ 1720 rem cc=16*dc + bc [dc=punkt farbe, bc= hintergrundfarbe]
+ 1730 cc=16*dc+bc
+ 1740 for ix=int(x1/8) to int(x2/8)
+ 1750 for iy=int(y1/8) to int(y2/8)
+ 1760 poke 34752+ix-40*iy,cc
+ 1770 next:next:return
+ 1780 :
+ 1790 rem "text"-unterroutine ermoeglicht einfuegen von text in die bilder.
+ 1800 rem "rw" und "cm" sind die zeilen(0-24) und spalten(0-39) koordinaten des
+ 1810 rem ersten buchstaben des zu druckenden textstrings.
+ 1820 rem uebergabevariable fuer text ist a$
+ 1830 rem "md" zeigt den druckmodus an:
+ 1840 rem  1 - normal ("schwarze" buchstaben auf "weissem" hintergrund)
+ 1850 rem  2 - inverse ("weisse" buchstaben auf "schwarzem" hintergrund)
+ 1860 rem  3 - buchstaben werden mit logischem oder mit hintergrund verknuepft.
+ 1870 rem  4 - buchstaben werden mit logischem und mit hintergrund verknuepft.
+ 1880 rem  5 - buchstaben werden mit logischem exor mit hintergrund verknuepft.
+ 1890 :
+ 1900 sb=40952:tb=54272:if(md and 1)then tb=53248:rem basisadressen
+ 1910 os=320*rw+8*cm:rem  adresse des zeichengenerators
+ 1920 poke 56334,peek(56334)and 254:rem disable irq timer
+ 1930 poke 1,peek(1)and 251:rem character rom einschalten
+ 1940 l=len(a$):for n=1 to l:n8=n*8+os+sb
+ 1950 x=asc(mid$(a$,n,1)):if x>63 then x=x-64
+ 1960 tc=tb+8*x
+ 1970 on md goto 1980,1980,1990,2000,2010
+ 1980 poke 53231,36:goto 2020
+ 1990 poke 53231,17:goto 2020
+ 2000 poke 53231,49:goto 2020
+ 2010 poke 53231,81
+ 2020 poke252,n8/256:poke251,n8-256*int(n8/256)
+ 2030 poke254,tc/256:poke253,tc-256*int(tc/256)
+ 2040 sys(53221):next
+ 2050 poke 1,peek(1)or 4:poke 56334,peek(56334)or 1:rem normal schalten
+ 2060 return
+

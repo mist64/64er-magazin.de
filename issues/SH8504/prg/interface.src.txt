@@ -1,0 +1,274 @@
+
+
+;interface.src.prg ; interface - easy parameter setting for shape
+; drawing routines from basic.
+;
+; richard l. rylander  11/23/84
+;
+;****************************************
+origin=$cac8
+ram   =$0393
+;
+; parameter locations for various shapes
+;
+xcent =$036a
+ycent =$036f
+xplot =$033f
+yplot =$0341
+xmin  =$034a
+ymin  =$034c
+xmid  =$034d
+ymid  =$034f
+xmax  =$0350
+ymax  =$0352
+radius =$0377
+hlen  =$0389
+ri    =$038f
+ro    =$038e
+;
+hvflag =$0383
+value =$0344
+pltflg =$033e
+;
+deflag =$fb
+;
+;****************************************
+;
+; function locations
+;
+grfon =$c0e2      ; switch to graphics mode
+grfoff =$c103      ; return to text display
+;
+clearr=$c12c       ; clear bitmap
+clrbyt=$c135       ; clear (fill) byte
+colorr=$c118       ; load color map
+colbyt=$c119       ; color byte
+;
+plotr =$c14b      ; point plot routine
+liner =$c2db       ; draw a line
+facetr =$c4e1       ; draw a shaded facet
+;
+;****************************************
+;
+; shaded shape drawing routines
+;
+spherr=$c7c7       ; sphere
+cylndr=$c864       ; cylinder
+torusr=$c90f       ; top-view toroid
+edgtor=$c88f       ; edge-view toroid
+spoolr=$ca3b       ; inside-view toroid
+;
+;****************************************
+;
+; basic rom routines
+;
+chkcom=$aefd       ; check for comma
+evaexp=$ad9e       ; evaluate expression
+fltfix=$b1aa       ; convert to fixed
+;
+*=ram
+linfac *=*+1       ; line or facet flag
+;
+*=origin
+;
+;****************************************
+;
+; get parameters from basic calling statement
+; of the form:
+; sys(fnctn),param1,param2,param3[opt]
+; where the third parameter (for example)
+; may be optional (a default value is used
+; if the parameter is not specified)
+;
+getnum jsr chkcom   ; look for comma
+       jsr evaexp   ; evaluate expression
+       jsr fltfix   ; change to integer with
+; high byte in "a" and low byte in "y"
+       rts
+;
+; check for additional (optional) parameters
+;
+pcheck lda #$2c     ; "," comma
+       ldy #0
+       sty deflag
+       cmp ($7a),y
+       bne nomore   ; no comma - use default
+       jmp $0073
+nomore ldy #$80
+       sty deflag
+       rts
+;
+; get two additional parameters for toroids
+;
+gettwo jsr pcheck
+       bit deflag
+       bmi dfault
+       jsr evaexp
+       jsr fltfix
+       sty ri
+       jsr getnum
+       sty ro
+dfault rts
+;
+;****************************************
+;
+; set center coordinates
+;
+center jsr getnum
+       sty xcent
+       sta xcent+1
+       jsr getnum
+       sty ycent
+       rts
+;
+;****************************************
+;
+; clear the bitmap, filling with (optional)
+; fill value specified or with (default) "0"
+;
+clear2 jsr pcheck
+       bit deflag
+       bmi defclr
+       jsr evaexp
+       jsr fltfix
+       .byte $2c
+defclr ldy #0
+       sty clrbyt
+       jmp clearr
+;
+;****************************************
+;
+; fill color map with (optional) color byte
+; specified or with (default) "$01"
+; (black dots on white background)
+;
+color2 jsr pcheck
+       bit deflag
+       bmi defcol
+       jsr evaexp
+       jsr fltfix
+       .byte $2c
+defcol ldy #$01
+       sty colbyt
+       jmp colorr
+;
+;****************************************
+;
+; plot or unplot points
+;
+plot2  lda #0
+       .byte $2c
+unplt2 lda #$80
+       sta pltflg
+       jsr getnum
+       sty xplot
+       sta xplot+1
+       jsr getnum
+       sty yplot
+       jmp plotr
+;
+;****************************************
+;
+; draw lines between (x1,y1) and (x2,y2)
+; or shaded facets between three points
+; (x1,y1), (x2,y2) and (x3,y3)
+;
+line2  lda #0
+       .byte $2c
+facet2 lda #$80
+       sta linfac
+       jsr getnum
+       sty xmin
+       sta xmin+1
+       jsr getnum
+       sty ymin
+       jsr getnum
+       sty xmid
+       sta xmid+1
+       jsr getnum
+       sty ymid
+       bit linfac
+       bpl ldraw
+       jsr getnum
+       sty xmax
+       sta xmax+1
+       jsr getnum
+       sty ymax
+       jsr getnum
+       sty value
+       jmp facetr
+ldraw  jmp liner
+;
+;****************************************
+;
+; draw a sphere centered at (xcent,ycent)
+; default radius is last value used
+;
+spher2 jsr center
+       jsr pcheck
+       bit deflag
+       bmi skip1
+       jsr evaexp
+       jsr fltfix
+       sty radius
+skip1  jmp spherr
+;
+;****************************************
+;
+; draw a top-view toroid at (xcent,ycent)
+; default inner and outer radii are last used
+;
+torus2 jsr center
+       jsr gettwo
+       jmp torusr
+;
+;****************************************
+;
+; draw cylinders with axes horizontal or
+; vertical.  default radius and "half-length"
+; are last values used.
+;
+vcyl2  lda #$80
+       .byte $2c
+hcyl2  lda #0
+       sta hvflag
+       jsr center
+       jsr pcheck
+       bit deflag
+       bmi skip2
+       jsr evaexp
+       jsr fltfix
+       sty radius
+       jsr getnum
+       sty hlen
+skip2  jmp cylndr
+;
+;****************************************
+;
+; draw edge-view toroids with axes horizontal
+; or vertical
+; innner and outer radii are optional
+;
+vtor2  lda #$80
+       .byte $2c
+htor2  lda #0
+       sta hvflag
+       jsr center
+       jsr gettwo
+       jmp edgtor
+;
+;****************************************
+;
+; draw inside-view toroids, "spools",
+; with axes horizontal or vertical
+; inner and outer radii are optional
+;
+vspl2  lda #$80
+       .byte $2c
+hspl2  lda #0
+       sta hvflag
+       jsr center
+       jsr gettwo
+       jmp spoolr
+.end
+

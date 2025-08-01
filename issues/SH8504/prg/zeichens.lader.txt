@@ -1,0 +1,29 @@
+
+
+;zeichens.lader.prg ==0801==
+    0 goto10
+    1 *********************************
+    2 *    charakter-designer c=64    *
+    3 *   *** zeichensatz lader ***   *
+    4 * von  matthias meyer           *
+    5 *                               *
+    6 * winkelweg 24                  *
+    7 * 5505 wasserliesch  bei trier  *
+    8 * tel.06501/14891               *
+    9 *********************************
+   10 ifa=0then100: rem schon geladen ?
+   20 poke53248+24, 29: rem  charaktersatz einschalten
+   30 print"multicolor (j/n) ";:poke198,0: wait198,1:getmu$: poke198,0
+   40 ifmu$="j"then poke vic+22, 216: goto 60: rem  cha. auf multicolor schalten
+   50 ifmu$<>"n"then print: goto30: rem  bei falscher taste zurueck
+   60 printmu$: end: rem  ende
+   70 rem  fuer multicolor gelten nur die farben 8-16 !!
+   80 rem  die anderen farben werden in reg 34 und 35 festgelegt
+   90 --- laden des zeichensatzes ---
+  100 poke56, 3*16: poke 55, 0: clr: rem  ende des basik ram auf $3000 setzen
+  110 vic = 53248:rem  vic grundadresse
+  120 pokevic+32,9: pokevic+33,7: print"{clr}{yel}":pokevic+33,9: rem  farben setzen
+  130 input"charaktersatz name";na$: rem  name des charaktersatzes
+  140 na$="{home}"+na$: rem  das erkennungszeichen fuer ein cha.satz vor den namen
+  150 a = 1:load na$ ,8,1: rem  cha.satz von floppy laden
+

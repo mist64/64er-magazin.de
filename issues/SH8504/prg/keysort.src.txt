@@ -1,0 +1,121 @@
+; KEYSORT - RELOCATABLE BUBBLE SORT USING KEY ARRAY
+; POINTING TO INTEGER ARRAY
+;
+;  RICHARD L. RYLANDER    1/12/85
+;
+ORIGIN=$CF59  ; 53081. (FOLLOWING DOS 5.1)
+;
+KB     = $FB  ; 251. POINTER TO KEY ARRAY
+ZB     = $FD  ; 253. POINTER TO DATA ARRAY
+MAX    = $8C  ; 140. POKE WITH MAX ARRAY INDEX
+TOP    = $AC
+TOPDIS = $AD
+FLAG   = $AE
+NXTFLG = $61
+CRRNT  = $62
+REPEAT = $64
+;
+      *=ORIGIN
+;
+INIT   LDY #$FF     ; INITIALIZE KEY ARRAY
+INLOOP INY
+       TYA
+       STA (KB),Y
+       CMP MAX
+       BNE INLOOP
+;
+SORT   STA TOPDIS   ; 'A' HOLDS 'MAX'
+LOOP1  LDA TOPDIS
+       STA TOP
+       LDX #0
+       STX NXTFLG
+       STX FLAG
+LOOP2  STX REPEAT
+;
+; GET BOTH BYTES OF INTEGER POINTED TO BY
+; 'KEY' ELEMENT.  RETURN WITH MSB ON STACK
+; AND LSB IN THE ACCUMULATOR
+;
+GETINT TXA
+       TAY
+       LDA (KB),Y
+       ASL A
+       BCC LOAD
+       DEC NXTFLG
+       INC ZB+1
+LOAD   TAY
+       LDA (ZB),Y
+       PHA
+       INY
+       LDA (ZB),Y
+       BIT NXTFLG
+       BPL NODEC
+       INC NXTFLG
+       DEC ZB+1
+NODEC  CPX REPEAT
+       BNE ORDER
+       STA CRRNT
+       PLA
+       STA CRRNT+1
+       INX
+       BNE GETINT
+;
+; COMPARE INTEGERS OBTAINED THROUGH KEY ARRAY
+; IF 'CURRENT' &lt;= 'NEXT' THEN SWAP KEY
+; ELEMENTS, ELSE CONTINUE
+;
+ORDER  CMP CRRNT
+       PLA
+       SBC CRRNT+1
+       BVC TEST
+       EOR #$80
+TEST   BPL NOSWAP
+SWAP   TXA
+       TAY
+       STX TOPDIS
+       LDA (KB),Y
+       PHA
+       DEY
+       LDA (KB),Y
+       INY
+       STA (KB),Y
+       PLA
+       DEY
+       STA (KB),Y
+       INC FLAG
+NOSWAP CPX TOP
+       BNE LOOP2
+       LDA FLAG
+       BNE LOOP1
+;
+; UNPACK THE BYTE ELEMENTS OF THE 'KEY' ARRAY
+; INTO BASIC'S NORMAL 2-BYTE INTEGER FORMAT
+;
+UNPACK LDX MAX
+       INX
+PKLOOP DEX
+       TXA
+       TAY
+       LDA (KB),Y
+       PHA
+       TXA
+       ASL A     ; MOVE TO 2*I+1
+       ORA #1
+       BCC STORE
+       INC NXTFLG
+       INC KB+1
+STORE  TAY
+       PLA
+       STA (KB),Y
+       LDA #0
+       DEY
+       STA (KB),Y
+       LDA NXTFLG
+       BEQ OK
+       DEC NXTFLG
+       DEC KB+1
+OK     TXA
+       BNE PKLOOP
+DONE   RTS
+.END
+
