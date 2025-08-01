@@ -80,6 +80,686 @@
         <p>Dieser Befehl invertiert den Text, welcher in Anführungszeichen steht, in die Bitmap an der Position (X,Y). Diese Position gibt die Koordinaten der linken unteren Ecke des ersten Buchstabens an.</p>
 
         <address class="author">(Alexander Del Pino/gk)</address>
+
+        <figure>
+            <pre data-filename="epson-sup.demo1" data-name="Demo-Programm »Schnecke«"></pre>
+            <figcaption>Listing 1. Demo-Programm »Schnecke«</figcaption>
+        </figure>
+
+        <figure>
+            <pre data-filename="epson-sup.demo2" data-name="Demo-Programm »Interferrenz«"></pre>
+            <figcaption>Listing 2. Demo-Programm »Interferrenz«</figcaption>
+        </figure>
+
+        <figure>
+            <pre data-filename="epson support.prg" data-name="Epson-Support" data-mse=mse1></pre>
+            <figcaption>Listing 3. Epson-Support muß mit dem MSE eingegeben werden.</figcaption>
+        </figure>
+        <div class="binary_download" data-filename="epson support.prg" data-name="Epson-Support"></div>
+
+        <figure>
+            <pre>          .ba $c000 ;pc setzen
+          ;***********************************
+          ; e p s o n - s u p p o r t
+          ;
+          ;version 1.7 (c)1984 by a.del pino
+          ;
+          ;***********************************
+          ;
+          ;variablen & systemadressen
+          ;
+help      = $033c
+yvalue    = $14
+xvalue    = $033c
+x1        = $0350
+y1        = x1+2
+x2        = x1+4
+y2        = x1+6
+xstep     = x1+8
+ystep     = x1+10
+xdiff     = x1+12
+ydiff     = x1+14
+sum       = x1+16
+xmax      = 800
+ymax      = 552
+disable   = $34 ;rom ausblenden
+enable    = 55 ;rom einblenden
+flag      = x1+18
+bitpos    = x1+19
+flag1     = x1+23
+flag2     = x1+24
+flag3     = x1+25
+lengh     = x1+26
+linetyp   = x1+27
+          ;
+          ;programmstart, zeiger verbiegen
+          ;
+          lda #&lt;esup
+          ldy #>esup
+          sta $0308
+          sty $0309
+          lda #&lt;8190
+          ldy #>8190
+          sta $33
+          sty $34
+          sta $37
+          sty $38
+          ;
+          ;prompt ausgeben
+          ;
+          lda #&lt;prompt
+          ldy #>prompt
+          jmp $ab1e
+          ;
+          ;basic-token erkennen
+          ;
+esup      jsr $73
+          cmp #'&'
+          beq support
+          jsr $79
+          jmp $a7e7
+support   ldx #$ff
+          ldy #0
+          sty flag
+sloop     inx
+          iny
+          lda @stmtab,x
+          beq newstmt
+          cmp ($7a),y
+          beq sloop
+nxt       inx
+          lda @stmtab,x
+          bne nxt
+          inc flag
+          ldy #0
+          lda @stmtab+1,x
+          bne sloop
+          jmp $af08
+newstmt   dey
+          clc
+          tya
+          adc $7a
+          sta $7a
+          bcc l1
+          inc $7b
+          ;
+          ;return-adresse auf den stack
+          ;
+l1        lda #$a7
+          pha
+          lda #$e9
+          pha
+          lda flag
+          asl
+          tax
+          lda @entry+1,x
+          ;
+          ;adresse des neuen befehls auf den stack
+          pha
+          lda @entry,x
+          pha
+          jmp $73
+          ;
+          ;hier sind die neuen befehle...
+          ;
+          ;**************************
+          ;
+          ; &clear
+          ;
+          ;**************************
+clear     lda #&lt;8192
+          ldy #>8192
+          sta $fb
+          sty $fc
+          sei
+          lda #disable
+          sta 1
+          ldy #0
+          tya
+cl1       sta ($fb),y
+          iny
+          bne cl1
+          inc $fc
+          ldx $fc
+          cpx #$c0
+          bne cl1
+          ldx #$c8
+          stx $fc
+cl2       sta ($fb),y
+          iny
+          bne cl2
+          inc $fc
+          bne cl2
+          lda #enable
+          sta 1
+          cli
+          rts
+          ;**************************
+          ;
+          ; dot - befehle
+          ;
+          ;**************************
+dot       lda #0
+          sta flag
+          jsr value+3
+          sta xvalue
+          sty xvalue+1
+          jsr value
+workdot   cpy #>ymax
+          bcc se1
+          cmp #&lt;ymax
+          bcc se1
+          rts
+          ;
+          ;adresse des punktes berechnen
+          ;
+se1       sta @help+2
+          sty @help+3
+          ldy #3
+se2       clc
+          lsr @help+3
+          ror @help+2
+          dey
+          bne se2
+          clc
+          lda @help+2
+          adc #>8192
+          sta $fc
+          lda @help+2
+          sta $fb
+          asl
+          adc $fc
+          sta $fc
+          lda #0
+          asl $fb
+          rol
+          asl $fb
+          rol
+          asl $fb
+          rol
+          asl $fb
+          rol
+          asl $fb
+          rol
+          adc $fc
+          sta $fc
+se4       lda $14
+          and #7
+          tax
+          lda @bit,x
+          sta bitpos
+          lda xvalue
+          ldy xvalue+1
+          cpy #>xmax
+          bcc se5
+          cmp #&lt;xmax
+          bcc se5
+          rts
+se5       adc $fb
+          sta $fb
+          tya
+          adc $fc
+          cmp #$c0
+          bcc se6
+          adc #7
+se6       sta $fc
+          sei
+          ;
+          ;rom ausblenden
+          ;
+          lda #disable
+          sta 1
+          ldy #0
+          bit flag
+          bpl dot0x
+          bvc invert
+          ;
+          ;punkt testen 'bittest'
+          ;
+          lda bitpos
+          ldx #0
+          and ($fb),y
+          beq ts1
+          dex
+ts1       stx flag
+          jmp enddot
+          ;
+          ;punkt invertieren
+          ;
+invert    lda bitpos
+          eor ($fb),y
+          sta ($fb),y
+          jmp enddot
+dot0x     bvc set
+          ;
+          ;punkt zuruecksetzen
+          ;
+          lda bitpos
+          eor #$ff
+          and ($fb),y
+          sta ($fb),y
+          jmp enddot
+          ;
+          ;punkt setzen
+          ;
+set       lda bitpos
+          ora ($fb),y
+          sta ($fb),y
+enddot    lda #enable
+          sta 1
+          cli
+          rts
+          ;**************************
+          ;
+          ; &print
+          ;
+          ;**************************
+          ;userport-interface durch geeigntes
+          ;setzen der portbaustein-register
+          ;initialisieren. bei druckern am seriellen bus muss
+          ;hier ein file auf den drucker eroeffnet werden.
+hardcopy  sei
+          lda #$ff
+          sta $dd03
+          lda $dd02
+          ora #4
+          sta $dd02
+          lda $dd00
+          ora #4
+          sta $dd00
+          lda #$10
+          sta $dd0d
+          lda $dd0d
+          cli
+          ;steuercodes fuer epson rx-80 ausgeben
+          ldx #5
+hc0       lda @table1,x
+          jsr cwrout
+          dex
+          bpl hc0
+          lda #&lt;8192
+          ldy #>8192
+          sta $fb
+          sty $fc
+          lda #0
+          sta $fd
+          ;steuercodes fuer neue grafikzeile ausgeben
+hc1       ldx #0
+          lda @table2,x
+          jsr cwrout
+          inx
+          cpx #14
+          bne hc1+2
+          ;eine grafikzeile (8*800 dots) ausgeben
+          ldx #0
+hc2       jsr wrout
+          inx
+          bne hc2
+hc3       jsr wrout
+          inx
+          bne hc3
+hc4       jsr wrout
+          inx
+          bne hc4
+hc5       jsr wrout
+          inx
+          cpx #&lt;xmax
+          bne hc5
+          inc $fd
+          lda $fd
+          cmp #69
+          bne hc1
+          rts
+          ;rom ausblenden
+wrout     sei
+          lda #disable
+          sta 1
+          ;adresse des auszugebenden punktes berechnen
+          clc
+          lda $fb
+          adc #&lt;$800
+          sta $fe
+          lda $fc
+          adc #>$800
+          sta $ff
+          ldy #0
+          lda $fc
+          cmp #$c0
+          bcs wr1
+          lda ($fb),y
+          .by $2c
+wr1       lda ($fe),y
+          inc $fb
+          bne wr2
+          inc $fc
+          ;rom wieder einblenden
+wr2       ldy #enable
+          sty 1
+          cli
+          ;gebe ascii-zeichen im accu aus
+          ;bei druckern mit serieller schnittstelle
+          ;muss hier 'jmp $ffd2' stehen
+          ;und danach auch ein 'rts'
+cwrout    sta $dd01
+          lda $dd00
+          and #$fb
+          sta $dd00
+          ora #4
+          sta $dd00
+wait      lda $dd0d
+          and #$10
+          beq wait
+          clc
+          rts
+          ;**************************
+          ;
+          ; line-befehle
+          ;
+          ;**************************
+line      lda #0
+          sta flag
+          lda #0
+          sta linetyp
+          jsr value+3
+          sta x1
+          sty x1+1
+          jsr value
+          sta y1
+          sty y1+1
+          jsr value
+          sta x2
+          sty x2+1
+          jsr value
+          sta y2
+          sty y2+1
+          ldx #1
+          ldy #0
+          sec
+          lda x2
+          sbc x1
+          sta xdiff
+          lda x2+1
+          sbc x1+1
+          sta xdiff+1
+          bpl li1
+          dex
+          dex
+          dey
+          eor #$ff
+          sta xdiff+1
+          lda xdiff
+          eor #$ff
+          sta xdiff
+          inc xdiff
+          bne li1
+          inc xdiff+1
+li1       stx xstep
+          sty xstep+1
+          ldx #1
+          ldy #0
+          sec
+          lda y2
+          sbc y1
+          sta ydiff
+          lda y2+1
+          sbc y1+1
+          sta ydiff+1
+          bpl li2
+          dex
+          dex
+          dey
+          eor #$ff
+          sta ydiff+1
+          lda ydiff
+          eor #$ff
+          sta ydiff
+          inc ydiff
+          bne li2
+          inc ydiff+1
+li2       stx ystep
+          sty ystep+1
+          ldy #0
+          lda xdiff
+          ora xdiff+1
+          bne li3
+          dey
+li3       sty sum
+          sty sum+1
+li4       lda x1
+          ldy x1+1
+          sta xvalue
+          sty xvalue+1
+          lda y1
+          ldy y1+1
+          sta yvalue
+          sty yvalue+1
+          jsr scann
+          jsr workdot
+          lda x1
+          cmp x2
+          bne li5
+          lda x1+1
+          cmp x2+1
+          bne li5
+          lda y1
+          cmp y2
+          bne li5
+          lda y1+1
+          cmp y2+1
+          bne li5
+          rts
+li5       bit sum+1
+          bpl li6
+          clc
+          lda y1
+          adc ystep
+          sta y1
+          lda y1+1
+          adc ystep+1
+          sta y1+1
+          clc
+          lda sum
+          adc xdiff
+          sta sum
+          lda sum+1
+          adc xdiff+1
+          sta sum+1
+          jmp li4
+li6       clc
+          lda x1
+          adc xstep
+          sta x1
+          lda x1+1
+          adc xstep+1
+          sta x1+1
+          sec
+          lda sum
+          sbc ydiff
+          sta sum
+          lda sum+1
+          sbc ydiff+1
+          sta sum+1
+          jmp li4
+value     jsr $aefd
+          jsr $ad8a
+          jsr $b7f7
+          lda $14
+          ldy $15
+          rts
+          ;flag setzen fuer modifizierten punkt- und linien-funktionen
+resetdot  lda #$40
+          jmp dot+2
+invertdot lda #$80
+          jmp dot+2
+resetline lda #$40
+          jmp line+2
+invertlinelda #$80
+          jmp line+2
+          ;**************************
+          ;
+          ; &exit
+          ;
+          ;**************************
+          ;zeiger wieder 'geradebiegen'
+exit      ldy #$a7
+          lda #$e4
+          sta $0308
+          sty $0309
+          sec
+          jsr $ff99
+          stx $37
+          sty $38
+          jmp $e39a ;system aufrufen
+          ; text-befehle, flag setzen
+invtext   lda #$80
+          .by $2c
+restext   lda #$40
+          .by $2c
+text      lda #0
+          sta flag
+          jsr value+3
+          sta x1
+          sty x1+1
+          jsr value
+          sta y1
+          sty y1+1
+          jsr string
+          bne txt1
+          rts
+txt1      sta lengh
+          sty flag3
+txt2      ldy flag3
+          lda ($64),y
+          cmp #$20
+          bcc txt3
+          cmp #$40
+          bcc txt3+2
+          cmp #$60
+          bcs txt3
+          and #$1f
+          .by $2c
+txt3      lda #$20
+          sta 2
+          lda #$1a
+          asl 2
+          rol
+          asl 2
+          rol
+          asl 2
+          rol
+          sta 3
+          sei
+          lda #$31
+          sta 1
+          ldy #7
+txt4      lda (2),y
+          sta $200,y
+          dey
+          bpl txt4
+          lda #enable
+          sta 1
+          cli
+          lda #0
+          sta flag1
+txt5      lda #7
+          sta flag2
+txt6      ldx flag2
+          lda $200,x
+          ldx flag1
+          and @bit,x
+          beq txt8
+          lda x1
+          ldy x1+1
+          sta xvalue
+          sty xvalue+1
+          ldy y1+1
+          lda flag2
+          clc
+          adc y1
+          sta $14
+          bcc txt7
+          iny
+txt7      jsr workdot
+txt8      dec flag2
+          bpl txt6
+          inc x1
+          bne txt9
+          inc x1+1
+txt9      inc flag1
+          ldx flag1
+          cpx #8
+          bne txt5
+          inc flag3
+          lda flag3
+          cmp lengh
+          bne txt10
+          rts
+txt10     jmp txt2
+string    jsr $aefd
+          jsr $ad9e
+          jsr $b6a3
+          ldy #0
+          lda ($64),y
+          sta $63
+          iny
+          lda ($64),y
+          tax
+          iny
+          lda ($64),y
+          sta $65
+          stx $64
+          ldy #0
+          lda $63
+          rts
+scann     bit linetyp
+          bmi sca1
+          rts
+sca1      ldx #$f0
+          stx flag
+          jsr workdot
+          lda y1
+          ldy y1+1
+          sta $14
+          bit flag
+          bpl sca2
+          pla
+          pla
+          rts
+sca2      ldx #0
+          stx flag
+          rts
+scannln   lda #$ff
+          jmp line+7
+          ;**************************
+          ;
+          ; d a t e n b e r e i c h
+          ;
+          ;**************************
+bit       .by 128 64 32 16 8 4 2 1
+table1    .by 13 8 'a' 27 '8' 27
+table2    .by 10 13 '       ' 27 '*' 1 xmax
+prompt    .by 'epson-support  v1.7  ***' 13
+          .by '(c)1984 by alex del pino' 13 0
+stmtab    .by 'clear' 0
+          .by 'dot' 0
+          .by 'resetdot' 0
+          .by 'invdot' 0
+          .by 'line' 0
+          .by 'resetline' 0
+          .by 'invline' 0
+          .by 153 0
+          .by 'exit' 0
+          .by 'text' 0
+          .by 'invtext' 0
+          .by 'resettext' 0
+          .by 'scanline' 0 0
+entry     .by clear-1 dot-1 resetdot-1 invertdot-1
+          .by line-1 resetline-1 invertline-1 hardcopy-1 exit-1
+          .by text-1 invtext-1 restext-1 scannln-1
+          .en ;end of source-file</pre>
+          <figcaption>Listing 4. Der Source-Code zum Epson-Support</figcaption>
+        </figure>
+
     </article>
 </body>
 
