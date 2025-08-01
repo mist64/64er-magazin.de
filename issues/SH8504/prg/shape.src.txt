@@ -1,0 +1,762 @@
+
+
+;shape.src.prg ; primitive solid shape drawing
+;
+; richard l. rylander   11/7/84
+;
+; load arithmetic and graphic utilities first
+;
+;*****************************************
+ram=$036a
+origin=$c5ea
+;
+mlpcnd=$ac     ; multiplicand (s)
+mlpler=$ad     ; multiplier (s)
+prod=$ae      ; product (d)
+mult=$c011    ; call for multiply
+;
+dvdnd=$fd     ; dividend (d)
+dvsor=$fb     ; divisor (d)
+quot=$fd      ; quotient (d)
+divide=$c025  ; call for divide
+;
+arg=$ac       ; argument (s)
+sqr=$ae       ; square of arg (d)
+square=$c004  ; call for square
+;
+radcnd=$ac    ; radicand (d)
+root=$033c    ; square root (s)
+sqrt=$c064    ; call for sqrt
+;
+rndm=$c000    ; random number
+random=$c0c8  ; call for random
+; note - a call to 'random' leaves a random byte
+; in the accumulator
+;
+xplt=$033f
+yplt=$0341
+norm=$c224
+pltshd=$c20f
+value=$0344   ; final normalized shade value
+htorrn=$0346  ; shade flag, 1=halftone
+noscal=$0347  ; scale flag, 1=no scale
+;
+       *=ram
+xcent  *=*+2  ; center coord
+xrel   *=*+1  ; relative (to center)
+xshd   *=*+2  ; used in shade calc
+ycent  *=*+1  ; center coord
+yrel   *=*+1  ; relative (to center)
+yshd   *=*+2  ; used in shade calc
+zrel   *=*+2  ; relative (to center)
+zwx    *=*+2  ; z with x (+ or -)
+;
+radius *=*+2  ; local radius of surface
+tone   *=*+2  ; used in shade calc
+tntmp  *=*+2  ; used in shade calc
+;
+clipl  *=*+1  ; left clipping bound
+clipr  *=*+1  ; right clipping bound
+clipu  *=*+1  ; up clipping bound
+clipd  *=*+1  ; down clipping bound
+;
+hemi   *=*+1  ; plotting hemisphere
+;
+baklit *=*+1  ; backlit flag
+hvflag *=*+1  ; horizontal/vertical flag
+temp   *=*+2  ; temporary storage
+cntx   *=*+1   ; loop counter
+cnty   *=*+1   ; loop counter
+max    *=*+1   ; loop limit
+;
+hlen   *=*+1   ; half-length of cylinders
+rs     *=*+2   ; square of toroid radius
+rt     *=*+1   ; toroid (ring) radius
+rc     *=*+1   ; center radius of toroid
+ro     *=*+1   ; outer radius of toroid
+ri     *=*+1   ; inner radius of toroid
+xsqr   *=*+2
+xmax   *=*+1
+;
+r0=hlen
+;
+       *=origin
+;*****************************************
+;
+; divide with single precision divisor
+; (used often in shape routines)
+;
+sdiv   lda #0
+       sta dvsor+1
+       jmp divide
+;
+;*****************************************
+;
+; calculate shade value (0-63) by
+; multiplying 'tone' by 26 then
+; divide result by radius of surface
+;
+getval bit tone+1
+       bpl cntnu   ; if 'tone'<0, then
+       lda baklit  ; make value 0 or abs(tone)
+       bne negate  ; depending on baklit flag
+       sta value
+       rts
+negate sec
+       lda #$00
+       sbc tone
+       sta tone
+cntnu  lda tone
+       sta mlpcnd
+       lda #$1a
+       sta mlpler
+       jsr mult
+       sta dvdnd+1
+       lda prod
+       sta dvdnd
+       lda radius
+       sta dvsor
+       jsr sdiv
+       lda quot
+       sta value
+       rts
+;
+;*****************************************
+;
+; point plotting by quadrants using
+; the four-fold symmetry of simple objects
+;
+; depending on status of 'hvflag', exchange
+; x and y coordinates to rotate objects 90 deg
+; single shape routine can then be used to
+; draw 'horizontal' or 'vertical' versions
+; of an object
+;
+; the folowing is a 'basic subroutine'
+; equivalent to explain its operation
+;
+; note that labels are used in place of
+; line numbers
+;
+; 'ptplot' if hvflag<0 then goto 'norot'
+;          (stack)=xrel:xrel=yrel:yrel=(stack)
+;          (stack)=xshd:xshd=yshd:yshd=(stack)
+; 'norot'  gosub 'getz'
+;          rem calculate 2*z from x,y and radius
+;          hemi = 1
+;          if xrel>clipl then goto 'rhemi'
+;          zwx=2*z-xshd
+;          xplt=xcent-xrel:rem left hemisphere
+; 'chclup' if yrel>clipu then goto 'dhemi'
+;          tone=zwx+yshd
+;          gosub 'getval':rem normalize shade val
+;          yplt=ycent+yrel
+;          gosub 'pltshd':rem plot or unplot
+;          rem   points weighted by shade value
+; 'dhemi'  if yrel>clipd then goto 'rhemi'
+;          tone=zwx-yshd
+;          gosub 'getval'
+;          yplt=ycent-yrel
+;          gosub 'pltshd'
+; 'rhemi'  if hemi=0 then return
+;          hemi=0
+;          if xrel>clipr then return
+;          zwx=2*z+xshd
+;          xplt=xcent+xrel
+;          gosub 'chclup'
+;          return
+;
+ptplot bit hvflag
+       bpl norot
+       lda xrel
+       pha
+       pha
+       lda yrel
+       sta xrel
+       pla
+       sta yrel
+       lda xshd
+       pha
+       pha
+       lda yshd
+       sta xshd
+       pla
+       sta yshd
+       lda xshd+1
+       pha
+       pha
+       lda yshd+1
+       sta xshd+1
+       pla
+       sta yshd+1
+norot  jsr getz
+ptplt2 lda #$01
+       sta hemi
+       sec
+       lda clipl  ; check left hemisphere
+       cmp xrel
+       bcc rhemi
+       sec
+       lda root
+       sbc xshd
+       sta zwx
+       lda root+1
+       sbc xshd+1
+       sta zwx+1
+       sec
+       lda xcent
+       sbc xrel
+       sta xplt
+       lda xcent+1
+       sbc #$00
+       sta xplt+1
+;
+chclup sec
+       lda clipu  ; check for up clipping
+       cmp yrel
+       bcc dhemi
+       clc
+       lda zwx
+       adc yshd
+       sta tone
+       lda zwx+1
+       adc yshd+1
+       sta tone+1
+       jsr getval
+       clc
+       lda ycent
+       adc yrel
+       sta yplt
+       jsr pltshd
+;
+dhemi  sec
+       lda clipd  ; check for down clipping
+       cmp yrel
+       bcc rhemi
+       sec
+       lda zwx
+       sbc yshd
+       sta tone
+       lda zwx+1
+       sbc yshd+1
+       sta tone+1
+       jsr getval
+       sec
+       lda ycent
+       sbc yrel
+       sta yplt
+       jsr pltshd
+;
+rhemi  lda hemi
+       beq pldone
+       dec hemi
+       sec
+       lda clipr  ; check for right clipping
+       cmp xrel
+       bcc pldone
+       clc
+       lda root
+       adc xshd
+       sta zwx
+       lda root+1
+       adc xshd+1
+       sta zwx+1
+       clc
+       lda xcent
+       adc xrel
+       sta xplt
+       lda xcent+1
+       adc #$00
+       sta xplt+1
+       jmp chclup
+pldone bit hvflag
+       bpl norstr
+       lda xshd+1    ; restore coords
+       sta yshd+1
+       pla
+       sta xshd+1
+       lda xshd
+       sta yshd
+       pla
+       sta xshd
+       lda xrel
+       sta yrel
+       pla
+       sta xrel
+norstr rts
+;
+;*****************************************
+;
+; calculate z from local x,y by
+; pythagorean sum
+;
+getz   lda radius
+       sta arg
+       jsr square
+       sta tntmp+1
+       lda sqr
+       sta tntmp
+       lda xshd
+       sta arg
+       jsr square
+       sec
+       lda tntmp
+       sbc sqr
+       sta tntmp
+       lda tntmp+1
+       sbc sqr+1
+       sta tntmp+1
+       lda yshd
+       sta arg
+       jsr square
+       sec
+       lda tntmp
+       sbc sqr
+       sta radcnd
+       lda tntmp+1
+       sbc sqr+1
+       sta radcnd+1
+       bmi zeroot
+       jsr sqrt
+       asl root
+       rol root+1
+       rts
+zeroot lda #$00
+       sta root
+       sta root+1
+       rts
+;
+;*****************************************
+;
+; set up parameters for toroids
+;
+; rt=(ro-ri)/2   rs=rt*rt   rc=rt+ri
+;
+tparm  lda ro
+       sec
+       sbc ri
+       lsr a
+       sta rt
+       sta radius
+       clc
+       adc ri
+       sta rc
+       lda rt
+       sta arg
+       jsr square
+       lda sqr
+       sta rs
+       lda sqr+1
+       sta rs+1
+       lda #0
+       sta cntx
+       rts
+;
+;*****************************************
+;
+; draw a shaded sphere
+;
+; 'basic subroutine' equivalent
+;
+; 'sphere' for cntx=0 to radius/sqr(2)
+;          xrel=cntx:xshd=cntx
+;          for cnty=cntx to sqr(rad*rad-cntx*cntx)
+;          yrel=cnty:yshd=cnty
+;          hvflag=0
+;          gosub 'ptplot'
+;          rem exchange x & y to use 8-fold sym
+;          hvflag=-128
+;
+;          gosub 'ptplot'
+;          next cnty
+;          next cntx
+;          return
+;
+;
+sphere lda radius
+       sta arg
+       jsr square
+       asl sqr
+       rol sqr+1
+       lda sqr
+       sta radcnd
+       lda sqr+1
+       sta radcnd+1
+       jsr sqrt
+       lsr root+1
+       ror root
+       lda root
+       sta xmax
+       lda #$00
+       sta cntx
+       sta xshd+1
+       sta yshd+1
+       lda radius
+       sta arg
+       jsr square
+       sta temp+1
+       lda sqr
+       sta temp
+loopx  lda cntx
+       sta cnty
+       sta arg
+       sta xrel
+       sta xshd
+       jsr square
+       sec
+       lda temp
+       sbc sqr
+       sta radcnd
+       lda temp+1
+       sbc sqr+1
+       sta radcnd+1
+       jsr sqrt
+       lda root
+       sta max
+loopy  lda cnty
+       sta yrel
+       sta yshd
+       lda #0
+       sta hvflag
+       jsr ptplot
+       lda #$80
+       sta hvflag
+       jsr ptplot
+       lda cnty
+       cmp max
+       beq doney
+       inc cnty
+       jmp loopy
+doney  lda cntx
+       cmp xmax
+       beq done
+       inc cntx
+       jmp loopx
+done   rts
+;
+;*****************************************
+;
+; draw shaded cylinders
+;
+; 'basic subroutine' equivalent
+;
+; 'cylndr' xshd=0
+;          for yrel=radius to 0
+;          yshd=yrel
+;          for xrel=hlen to 0
+;          gosub 'ptplot'
+;          next xrel
+;          next yrel
+;          return
+;
+cylndr lda #0
+       sta xshd
+       sta xshd+1
+       sta yshd+1
+       lda radius
+       sta yrel
+cyloop lda hlen
+       sta xrel
+       lda yrel
+       sta yshd
+cxloop jsr ptplot
+       dec xrel
+       bpl cxloop
+       dec yrel
+       bpl cyloop
+       rts
+;
+;*****************************************
+;
+; draw edge-view toroids
+;
+; 'basic subroutine' equivalent
+;
+; 'edgtor' gosub 'tparm':rem set up radii
+;          for cntx=0 to rt
+;          xrel=cntx:xshd=cntx
+;          r0=sqr(rt*rt-cntx*cntx)
+;          for cnty=0 to r0+rc
+;          yrel=cnty
+;          yshd=(r0*cnty)/(r0+rc)
+;          gosub 'ptplot'
+;          next cnty
+;          next cntx
+;          return
+;
+edgtor jsr tparm
+       lda #$00
+       sta xshd+1
+       sta yshd+1
+loopx4 lda cntx
+       sta xrel
+       sta xshd
+       sta arg
+       jsr square
+       sec
+       lda rs
+       sbc sqr
+       sta radcnd
+       lda rs+1
+       sbc sqr+1
+       sta radcnd+1
+       jsr sqrt
+       lda root
+       sta r0
+       clc
+       adc rc
+       sta max
+       lda #$00
+       sta cnty
+loopy4 lda cnty
+       sta yrel
+       sta mlpler
+       lda r0
+       sta mlpcnd
+       jsr mult
+       sta dvdnd+1
+       lda prod
+       sta dvdnd
+       lda max
+       sta dvsor
+       jsr sdiv
+       lda quot
+       sta yshd
+       jsr ptplot
+       lda cnty
+       cmp max
+       beq done4
+       inc cnty
+       jmp loopy4
+done4  lda cntx
+       cmp rt
+       beq doneht
+       inc cntx
+       jmp loopx4
+doneht rts
+;
+;*****************************************
+;
+; draw a shaded, top-view toroid
+;
+; 'basic subroutine' equivalent
+;
+; 'toroid' gosub 'tparm'
+;          for cntx=0 to ro/sqr(2)
+;          rem 8-fold symmetry used
+;          xrel=cntx
+;          max=sqr(ro*ro-cntx*cntx)
+;          if cntx>ri then goto 'grtr'
+;          cnty=sqr(ri*ri-cnty*cnty)
+;          goto 'llpy1'
+; 'grtr'   cnty=cntx
+; 'llpy1'  yrel=cnty
+;          r0=sqr(cnty*cnty+cntx*cntx)
+;          xshd=cntx-(cntx*rc)/r0
+;          yshd=cnty-(cnty*rc)/r0
+;          hvflag=0:gosub 'ptplot'
+;          hvflag=-128:gosub 'ptplot'
+;          if cnty=max then goto 'ddny1'
+;          cnty=cnty+1
+;          goto 'llpy1'
+; 'ddny1'  next cntx
+;          return
+;
+toroid jsr tparm
+       lda ro
+       sta arg
+       jsr square
+       asl sqr
+       rol sqr+1
+       lda sqr
+       sta radcnd
+       lda sqr+1
+       sta radcnd+1
+       jsr sqrt
+       lsr root+1
+       ror root
+       lda root
+       sta xmax
+llpx1  lda cntx
+       sta xrel
+       sta arg
+       jsr square
+       sta xsqr+1
+       lda sqr
+       sta xsqr
+       lda ro
+       sta arg
+       jsr square
+       sec
+       lda sqr
+       sbc xsqr
+       sta radcnd
+       lda sqr+1
+       sbc xsqr+1
+       sta radcnd+1
+       jsr sqrt
+       lda root
+       sta max
+       sec
+       lda ri
+       sbc cntx
+       bcc grtr
+       lda ri
+       sta arg
+       jsr square
+       sec
+       lda sqr
+       sbc xsqr
+       sta radcnd
+       lda sqr+1
+       sbc xsqr+1
+       sta radcnd+1
+       jsr sqrt
+       lda root
+       sta cnty
+       jmp llpy1
+grtr   lda cntx
+       sta cnty
+llpy1  lda cnty
+       sta yrel
+       sta arg
+       jsr square
+       clc
+       lda sqr
+       adc xsqr
+       sta radcnd
+       lda sqr+1
+       adc xsqr+1
+       sta radcnd+1
+       jsr sqrt
+       lda root
+       sta r0
+       sta dvsor
+       lda cntx
+       sta mlpler
+       lda rc
+       sta mlpcnd
+       jsr mult
+       sta dvdnd+1
+       lda prod
+       sta dvdnd
+       jsr sdiv
+       sec
+       lda cntx
+       sbc quot
+       sta xshd
+       lda #$00
+       sbc quot+1
+       sta xshd+1
+       lda cnty
+       sta mlpler
+       lda rc
+       sta mlpcnd
+       jsr mult
+       sta dvdnd+1
+       lda prod
+       sta dvdnd
+       lda r0
+       sta dvsor
+       jsr sdiv
+       sec
+       lda cnty
+       sbc quot
+       sta yshd
+       lda #$00
+       sta hvflag
+       sbc quot+1
+       sta yshd+1
+       jsr ptplot
+       lda #$80
+       sta hvflag
+       jsr ptplot
+       lda cnty
+       cmp max
+       beq ddny1
+       inc cnty
+       jmp llpy1
+ddny1  lda cntx
+       cmp xmax
+       beq duntor
+       inc cntx
+       jmp llpx1
+duntor rts
+;
+;*****************************************
+;
+; draw "inside view" toroids
+;
+; 'basic subroutine' equivalent
+;
+; 'spool'  gosub 'tparm'
+;          for cntx=0 to rt
+;          xrel=cntx:xshd=cntx
+;          max=rc-sqr(rs-cntx*cntx)
+;          for cnty=0 to max
+;          yrel=cnty
+;          yshd=(rc*cnty/max)-cnty
+;          gosub 'ptplot'
+;          next cnty
+;          next cntx
+;          return
+;
+spool  jsr tparm
+llpx2  lda cntx
+       sta xrel
+       sta arg
+       sec
+       lda #$00
+       sbc cntx
+       sta xshd
+       lda #$00
+       sbc #$00
+       sta xshd+1
+       jsr square
+       sec
+       lda rs
+       sbc sqr
+       sta radcnd
+       lda rs+1
+       sbc sqr+1
+       sta radcnd+1
+       jsr sqrt
+       sec
+       lda rc
+       sbc root
+       sta max
+       lda #$00
+       sta cnty
+llpy2  lda cnty
+       sta yrel
+       sta mlpler
+       lda rc
+       sta mlpcnd
+       jsr mult
+       sta dvdnd+1
+       lda prod
+       sta dvdnd
+       lda max
+       sta dvsor
+       jsr sdiv
+       lda quot
+       sec
+       sbc cnty
+       sta yshd
+       lda quot+1
+       sbc #$00
+       sta yshd+1
+       jsr ptplot
+       lda cnty
+       cmp max
+       beq ddny2
+       inc cnty
+       jmp llpy2
+ddny2  lda cntx
+       cmp rt
+       beq dunhsp
+       inc cntx
+       jmp llpx2
+dunhsp rts
+.end
+

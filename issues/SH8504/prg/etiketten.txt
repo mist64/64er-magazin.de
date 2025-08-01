@@ -1,0 +1,628 @@
+
+
+;etiketten.prg ==0801==
+ 1000 goto 2050
+ 1010 rem
+ 1020 rem
+ 1030 rem         etiketten 64
+ 1040 rem         ------------
+ 1050 rem
+ 1060 rem programm zum beschriften von
+ 1070 rem endlos - etiketten der groesse
+ 1080 rem        88.5 * 35.7 mm
+ 1090 rem
+ 1100 rem
+ 1110 rem
+ 1120 rem      1985  by  g. zinner
+ 1130 rem                schmale str.3
+ 1140 rem                4300 essen 11
+ 1150 rem
+ 1160 rem
+ 1170 rem   ---------------------
+ 1180 rem   --- allg. u'progs ---
+ 1190 rem   ---------------------
+ 1200 rem
+ 1210 rem
+ 1220 rem      menuefeld loeschen
+ 1230 rem
+ 1240 print left$(cd$,17)
+ 1250 for i=0 to 6
+ 1260 print le$
+ 1270 next
+ 1280 return
+ 1290 :
+ 1300 rem      cursor setzen
+ 1310 :
+ 1320 if s=29 then s=28
+ 1330 a=1024+((r+3)*40)+s+5
+ 1340 if peek(a)>127 then poke a,peek(a)-128:return
+ 1350 poke a,peek(a)+128:return
+ 1360 :
+ 1370 rem      schreibfeld loeschen
+ 1380 :
+ 1390 print left$(cd$,4)
+ 1400 fori=1 to 11
+ 1410 print left$(cr$,6)left$(le$,28)
+ 1420 next
+ 1430 return
+ 1440 :
+ 1450 rem      string t$ zusammenbauen
+ 1460 :
+ 1470 rv=0:t$=""
+ 1480 for i=l to l+27
+ 1490 a=peek(i)
+ 1500 if rv=0 and a>128 then t$=t$+"{rvon}":rv=1
+ 1510 if rv=1 and a<128 then t$=t$+"{rvof}":rv=0
+ 1520 if a>128 then a=a-128
+ 1530 if a<32 then a=a+64:goto 1560
+ 1540 if a>63 and a<96 then a=a+32:goto 1560
+ 1550 if a>96 then a=a+64
+ 1560 t$=t$+chr$(a)
+ 1570 next
+ 1580 return
+ 1590 :
+ 1600 rem      disketten fehler
+ 1610 :
+ 1620 ue=0
+ 1630 input#15,e,e$,t,t
+ 1640 if e=0 then return
+ 1650 print left$(cd$,25)left$(cr$,2);
+ 1660 :
+ 1670 if e<>63 then 1730
+ 1680 print e;e$;" - aendern (j/n)";
+ 1690 get a$:if a$="" then 1690
+ 1700 if a$<>"j" then 1770
+ 1710 ue=1:goto 1770
+ 1720 :
+ 1730 print e;e$;" - <return>";
+ 1740 get a$
+ 1750 if a$<>chr$(13) then 1740
+ 1760 :
+ 1770 print left$(cd$,25)left$(cr$,2)left$(le$,37);
+ 1780 return
+ 1790 :
+ 1800 rem      dateinamen eingeben
+ 1810 :
+ 1820 r=19:s=-1:en=0:de=0
+ 1830 gosub 1320
+ 1840 get a$:if a$="" then 1840
+ 1850 gosub 1320
+ 1860 if a$=chr$(13) then 1940
+ 1870 if a$=chr$(20) then de=1:goto 1940
+ 1880 if a$=chr$(140)then en=1:goto 1940
+ 1890 if a$<chr$(32) then 1830
+ 1900 if a$>chr$(94) then 1830
+ 1910 s=s+1:if s>m then s=m
+ 1920 print left$(cd$,r+4)left$(cr$,s+4);
+ 1930 print a$;:goto 1830
+ 1940 return
+ 1950 :
+ 1960 :
+ 1970 rem   -------------------
+ 1980 rem   --- arbeitsfeld ---
+ 1990 rem   -------------------
+ 2000 :
+ 2010 :
+ 2020 :
+ 2030 rem      bildschirmfarben
+ 2040 :
+ 2050 poke 53280,0:poke 53281,0:print"{wht}"
+ 2060 :
+ 2070 rem      alle tasten repeat
+ 2080 :
+ 2090 poke 650,128
+ 2100 :
+ 2110 rem      shift+commodore aus
+ 2120 :
+ 2130 print chr$(8)
+ 2140 :
+ 2150 rem      feste variablen
+ 2160 :
+ 2170 cr$="{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}"
+ 2180 cd$="{home}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}"
+ 2190 le$="                                       "
+ 2200 t$="":n=0
+ 2210 :
+ 2220 rem      bildschirm aufbauen
+ 2230 :
+ 2240 print "{clr}   etiketten 64"spc(9)"(w)1985 by gz":print
+ 2250 print " U{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}I"
+ 2260 print " {SHIFT--}   {CBM-A}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{CBM-S}   {SHIFT--}"
+ 2270 for i=1 to 11
+ 2280 print " {SHIFT--}  -{SHIFT--}"spc(28)"{SHIFT--}-  {SHIFT--}"
+ 2290 next i
+ 2300 print " {SHIFT--}   {CBM-Z}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{CBM-X}   {SHIFT--}"
+ 2310 print " J{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}K"
+ 2320 :
+ 2330 gosub 1390
+ 2340 :
+ 2350 rem      menue anzeigen
+ 2360 :
+ 2370 gosub 1240
+ 2380 print left$(cd$,17)
+ 2390 print "   {CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}"
+ 2400 print "   {rvon} menue {rvof}"
+ 2410 print "   {CBM-@}{CBM-@}{CBM-@}{CBM-@}                {CBM-@}{CBM-@}{CBM-@}{CBM-@}"
+ 2420 print "   {rvon} f1 {rvof} editieren      {rvon} f2 {rvof} directory"
+ 2430 print "   {rvon} f3 {rvof} drucken        {rvon} f4 {rvof} disk com."
+ 2440 print "   {rvon} f5 {rvof} speichern      {CBM-@}{CBM-@}{CBM-@}{CBM-@}"
+ 2450 print "   {rvon} f7 {rvof} laden          {rvon} f8 {rvof} ende"
+ 2460 :
+ 2470 get a$:if a$="" then 2470
+ 2480 if a$<"{f1}" or a$>"{f8}" then 2470
+ 2490 :
+ 2500 on asc(a$)-132 goto 2590,6790,3990,4410,4820,5250,2370,6580
+ 2510 goto 2370
+ 2520 :
+ 2530 :
+ 2540 rem   -----------------
+ 2550 rem   --- editieren ---
+ 2560 rem   -----------------
+ 2570 :
+ 2580 :
+ 2590 gosub 1240
+ 2600 print left$(cd$,17)
+ 2610 print "   {CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}"
+ 2620 print "   {rvon} editieren {rvof}"
+ 2630 print "   {CBM-@}{CBM-@}{CBM-@}{CBM-@}"spc(9)"{CBM-@}{CBM-@}{CBM-@}"
+ 2640 print "   {rvon} f1 {rvof} revers >{rvon}aus{rvof}<"
+ 2650 print "   {rvon} f3 {rvof} breite >{rvon}nrm{rvof}<   {CBM-@}{CBM-@}{CBM-@}{CBM-@}"
+ 2660 print "   {rvon} f5 {rvof} zeile loesch   {rvon} f6 {rvof} zeile einf"
+ 2670 print "                       {rvon} f8 {rvof} ende"
+ 2680 br=0:rv=0
+ 2690 :
+ 2700 rem      cursor positionieren
+ 2710 :
+ 2720 r=1:s=1
+ 2730 print left$(cd$,5)left$(cr$,6);
+ 2740 :
+ 2750 gosub 1320
+ 2760 geta$:ifa$="" or a$=chr$(34)then2760
+ 2770 gosub 1320
+ 2780 :
+ 2790 if a$>chr$(31) and a$<chr$(128) then gosub 3840:goto 2750
+ 2800 if a$>chr$(160)then gosub 3840:goto 2750
+ 2810 if a$=chr$(140)then 2370
+ 2820 if a$=chr$(133)then gosub 3460:goto 2750
+ 2830 if a$=chr$(134)then gosub 3520:goto 2750
+ 2840 if a$=chr$(135)then gosub 3580:goto 2750
+ 2850 if a$=chr$(139)then gosub 3710:goto 2750
+ 2860 if a$=chr$(19) then 2720
+ 2870 if a$=chr$(147)then gosub 1390:goto 2720
+ 2880 if a$=chr$(17) then gosub 3000:goto 2750
+ 2890 if a$=chr$(145)then gosub 3050:goto 2750
+ 2900 if a$=chr$(29) then gosub 3100:goto 2750
+ 2910 if a$=chr$(157)then gosub 3150:goto 2750
+ 2920 if a$=chr$(148)then gosub 3260:goto 2750
+ 2930 if a$=chr$(20) then gosub 3360:goto 2750
+ 2940 if a$=chr$(13) then gosub 3200:goto 2750
+ 2950 :
+ 2960 goto 2750
+ 2970 :
+ 2980 rem      cursor down
+ 2990 :
+ 3000 r=r+1:if r>11 then r=1
+ 3010 return
+ 3020 :
+ 3030 rem      cursor up
+ 3040 :
+ 3050 r=r-1:if r<1 then r=11
+ 3060 return
+ 3070 :
+ 3080 rem      cursor right
+ 3090 :
+ 3100 s=s+1:if s>28 then s=1
+ 3110 return
+ 3120 :
+ 3130 rem      cursor left
+ 3140 :
+ 3150 s=s-1:if s<1 then s=28
+ 3160 return
+ 3170 :
+ 3180 rem      return
+ 3190 :
+ 3200 r=r+1:if r>11 then r=1
+ 3210 s=1
+ 3220 return
+ 3230 :
+ 3240 rem      insert
+ 3250 :
+ 3260 if s=28 then return
+ 3270 a=1024+((r+3)*40)+s+6:e=a+27-s
+ 3280 for i=e to a step-1
+ 3290 poke i,peek(i-1)
+ 3300 next
+ 3310 poke i,32
+ 3320 return
+ 3330 :
+ 3340 rem      delete
+ 3350 :
+ 3360 if s=28 then return
+ 3370 a=1024+((r+3)*40)+s+5:e=a+27-s
+ 3380 for i=a to e
+ 3390 poke i,peek(i+1)
+ 3400 next
+ 3410 poke i,32
+ 3420 return
+ 3430 :
+ 3440 rem      revers an / aus
+ 3450 :
+ 3460 print left$(cd$,21)spc(16)"{rvon}";
+ 3470 if rv=0 then print"an {rvof}":rv=1:return
+ 3480 if rv=1 then print"aus{rvof}":rv=0:return
+ 3490 :
+ 3500 rem      breitschrift nrm/dop
+ 3510 :
+ 3520 print left$(cd$,22)spc(16)"{rvon}";
+ 3530 if br=0 then print"dop{rvof}":br=1:return
+ 3540 if br=1 then print"nrm{rvof}":br=0:return
+ 3550 :
+ 3560 rem      zeile loeschen
+ 3570 :
+ 3580 a=1024+((r+3)*40)+s+5:e=a+28-s
+ 3590 if r=11 then j=a:goto 3660
+ 3600 a1=(10-r)*40+a
+ 3610 for j=a to a1 step 40
+ 3620 for i=j to e
+ 3630 poke i,peek(i+40)
+ 3640 next:e=e+40
+ 3650 next
+ 3660 for i=j to e:poke i,32:next
+ 3670 return
+ 3680 :
+ 3690 rem      zeile einfuegen
+ 3700 :
+ 3710 a=1024+((r+3)*40)+s+5+40
+ 3720 if r=11 then return
+ 3730 a1=(10-r)*40+a:e=a1+28-s
+ 3740 for j=a1 to a step -40
+ 3750 for i=j to e
+ 3760 poke i,peek(i-40)
+ 3770 next:e=e-40
+ 3780 next
+ 3790 for i=j to e:poke i,32:next
+ 3800 return
+ 3810 :
+ 3820 rem      zeichen setzen
+ 3830 :
+ 3840 if br=1 then s=s+1
+ 3850 s=s+1:if s>29 then s=29
+ 3860 print left$(cd$,r+4)left$(cr$,s+4);
+ 3870 if rv=1 then print"{rvon}";
+ 3880 if rv=0 then print"{rvof}";
+ 3890 if br=1 then print"{left}_";
+ 3900 print a$;
+ 3910 return
+ 3920 :
+ 3930 :
+ 3940 rem   -----------------
+ 3950 rem   --- speichern ---
+ 3960 rem   -----------------
+ 3970 :
+ 3980 :
+ 3990 gosub 1240
+ 4000 print left$(cd$,17)
+ 4010 print "   {CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}"spc(9)"{CBM-@}{CBM-@}{CBM-@}{CBM-@}"
+ 4020 print "   {rvon} speichern {rvof}"spc(9)"{rvon} f8 {rvof} ende":print
+ 4030 print "   >dateiname eingeben"
+ 4040 print:print "   >               <";
+ 4050 print "{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}";
+ 4060 :
+ 4070 rem      dateinamen eingeben
+ 4080 :
+ 4090 if ue=1 then d$="@:"+d$:goto4220
+ 4100 :
+ 4110 m=14:gosub 1820
+ 4120 if en=1 then 2370
+ 4130 if de=1 then 4000
+ 4140 :
+ 4150 l=1908:gosub 1470
+ 4160 d$=left$(t$,15)+"{CBM-+}"
+ 4170 :
+ 4180 rem      bild abspeichern
+ 4190 :
+ 4200 close 15
+ 4210 :
+ 4220 open 15,8,15:open 8,8,8,d$+",s,w"
+ 4230 gosub 1620:if e<>0 then close8:close15:goto 4090
+ 4240 for l=1190 to 1590 step 40
+ 4250 gosub 1470
+ 4260 :
+ 4270 t$="{CBM-POUND}"+t$
+ 4280 :
+ 4290 print#8,t$
+ 4300 next l
+ 4310 close 8:close 15
+ 4320 :
+ 4330 t$="":goto 2370
+ 4340 :
+ 4350 :
+ 4360 rem   -------------
+ 4370 rem   --- laden ---
+ 4380 rem   -------------
+ 4390 :
+ 4400 :
+ 4410 gosub 1240
+ 4420 print left$(cd$,17)
+ 4430 print "   {CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}"spc(13)"{CBM-@}{CBM-@}{CBM-@}{CBM-@}"
+ 4440 print "   {rvon} laden {rvof}"spc(13)"{rvon} f8 {rvof} ende":print
+ 4450 print "   >dateiname eingeben"
+ 4460 print:print "   >               <";
+ 4470 print "{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}";left$(t$,15)
+ 4480 :
+ 4490 rem      dateinamen eingeben
+ 4500 :
+ 4510 m=14:gosub 1820
+ 4520 if en=1 then 2370
+ 4530 if de=1 then 4420
+ 4540 :
+ 4550 l=1908:gosub 1470
+ 4560 d$=left$(t$,15)+"{CBM-+}"
+ 4570 :
+ 4580 rem      bild holen
+ 4590 :
+ 4600 close 15
+ 4610 :
+ 4620 gosub 1390:r=1
+ 4630 open 15,8,15:open 8,8,8,d$+",s,r"
+ 4640 gosub 1620:if e<>0 then close8:close15:goto 4510
+ 4650 input#8,t$
+ 4660 :
+ 4670 t$=right$(t$,len(t$)-1)
+ 4680 :
+ 4690 print left$(cd$,4+r)left$(cr$,6)t$
+ 4700 r=r+1
+ 4710 if r<12 then 4650
+ 4720 close8:close15
+ 4730 :
+ 4740 t$="":goto 2370
+ 4750 :
+ 4760 :
+ 4770 rem   -----------------
+ 4780 rem   --- directory ---
+ 4790 rem   -----------------
+ 4800 :
+ 4810 :
+ 4820 gosub 1240
+ 4830 print left$(cd$,17)
+ 4840 print "   {CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}"
+ 4850 print "   {rvon} directory {rvof}"
+ 4860 print "   {CBM-@}{CBM-@}{CBM-@}{CBM-@}"spc(15)"{CBM-@}{CBM-@}{CBM-@}{CBM-@}"
+ 4870 print "   {rvon} f1 {rvof} weiter        {rvon} f8 {rvof} ende"
+ 4880 print:print "   >               <";
+ 4890 :
+ 4900 rem  rem bildfiles holen
+ 4910 :
+ 4920 close 15
+ 4930 :
+ 4940 open 15,8,15
+ 4950 open 1,8,0,"$0"
+ 4960 :
+ 4970 gosub 1620:if e<>0 then close 1:close 15:goto 4820
+ 4980 :
+ 4990 get#1,a$,a$,a$,a$,a$,a$
+ 5000 :
+ 5010 t$=""
+ 5020 get#1,a$:if st<>0 then 5150
+ 5030 if a$<>chr$(34) then 5020
+ 5040 get#1,a$:if a$<>chr$(34) then t$=t$+a$:goto 5040
+ 5050 if right$(t$,1)<>chr$(166) then 5120
+ 5060 :
+ 5070 print left$(cd$,23)left$(cr$,4)left$(t$,15)
+ 5080 :
+ 5090 get a$:if a$="" then 5090
+ 5100 if a$=chr$(140) then 5150
+ 5110 :
+ 5120 get#1,a$:if a$<>"" then 5120
+ 5130 if st=0 then 5010
+ 5140 :
+ 5150 close 1:close 15
+ 5160 :
+ 5170 goto 2370
+ 5180 :
+ 5190 :
+ 5200 rem   -------------------
+ 5210 rem   --- diskcomands ---
+ 5220 rem   -------------------
+ 5230 :
+ 5240 :
+ 5250 gosub 1240
+ 5260 print left$(cd$,17)
+ 5270 print "   {CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}"spc(7)"{CBM-@}{CBM-@}{CBM-@}{CBM-@}"
+ 5280 print "   {rvon} disk-comands {rvof}"spc(7)"{rvon} f8 {rvof} ende"
+ 5290 print "   {CBM-@}{CBM-@}{CBM-@}"spc(18)"{CBM-@}{CBM-@}{CBM-@}"
+ 5300 print "   {rvon} n {rvof} new (format.)    {rvon} s {rvof} scratch"
+ 5310 print "   {rvon} v {rvof} validate         {rvon} r {rvof} rename"
+ 5320 print "   {rvon} i {rvof} initialize"
+ 5330 :
+ 5340 close 15
+ 5350 :
+ 5360 get a$:if a$="" then 5360
+ 5370 :
+ 5380 if a$=chr$(140) then 2370
+ 5390 if a$="n" then 5480
+ 5400 if a$="s" then 5850
+ 5410 if a$="v" or a$="i" then 6040
+ 5420 if a$="r" then 6140
+ 5430 :
+ 5440 goto 5360
+ 5450 :
+ 5460 rem      new (formatieren)
+ 5470 :
+ 5480 gosub 1240
+ 5490 print left$(cd$,17)
+ 5500 print "   {CBM-@}{CBM-@}{CBM-@}"
+ 5510 print "   {rvon} n {rvof} new (formatieren)":print
+ 5520 print "   >diskettenname":print
+ 5530 print "   >                <";
+ 5540 print "{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}";
+ 5550 :
+ 5560 m=15:gosub 1820
+ 5570 if en=1 then 2370
+ 5580 if de=1 then 5490
+ 5590 :
+ 5600 l=1908:gosub 1470
+ 5610 if left$(t$,1)=" " then 2370
+ 5620 d$=left$(t$,16)
+ 5630 :
+ 5640 print left$(cd$,21)left$(cr$,25)", id"
+ 5650 print:print spc(26) ">  <"
+ 5660 r=19:s=22:en=0:de=0:m=24
+ 5670 gosub 1830
+ 5680 if en=1 then 2370
+ 5690 if de=1 then 5640
+ 5700 :
+ 5710 l=1931:gosub 1470
+ 5720 if left$(t$,1)=" " then 2370
+ 5730 i$=left$(t$,2)
+ 5740 :
+ 5750 print left$(cd$,20) "   {CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}"
+ 5760 print "   {rvon} neue diskette eingelegt (j/n) {rvon}"
+ 5770 :
+ 5780 get a$:if a$="" then 5780
+ 5790 if a$<>"j" then 2370
+ 5800 :
+ 5810 d$="n0:"+d$+","+i$:goto 6450
+ 5820 :
+ 5830 rem      scratchen
+ 5840 :
+ 5850 gosub 1240
+ 5860 print left$(cd$,17)
+ 5870 print "   {CBM-@}{CBM-@}{CBM-@}"
+ 5880 print "   {rvon} s {rvof} scratch":print
+ 5890 print "   >dateiname eingeben":print
+ 5900 print "   >               <";
+ 5910 print "{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}"left$(t$,15);
+ 5920 :
+ 5930 m=14:gosub 1820
+ 5940 if en=1 then 2370
+ 5950 if de=1 then 5860
+ 5960 :
+ 5970 l=1908:gosub 1470
+ 5980 if left$(t$,1)=" " then 2370
+ 5990 d$="s0:"+left$(t$,15)+"{CBM-+}"
+ 6000 goto 6450
+ 6010 :
+ 6020 rem      validate/initialize
+ 6030 :
+ 6040 gosub 1240
+ 6050 print left$(cd$,17)
+ 6060 print "   {CBM-@}{CBM-@}{CBM-@}"
+ 6070 print "   {rvon} "a$" {rvof} validate / initialize":print
+ 6080 :
+ 6090 d$=a$+"0"
+ 6100 goto 6450
+ 6110 :
+ 6120 rem      rename
+ 6130 :
+ 6140 gosub 1240
+ 6150 print left$(cd$,17)
+ 6160 print "   {CBM-@}{CBM-@}{CBM-@}"
+ 6170 print "   {rvon} r {rvof} rename":print
+ 6180 print "   >alter dateiname":print
+ 6190 print "   >               <";
+ 6200 print "{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}"left$(t$,15);
+ 6210 :
+ 6220 m=14:gosub 1820
+ 6230 if en=1 then 2370
+ 6240 if de=1 then 6150
+ 6250 :
+ 6260 l=1908:gosub 1470
+ 6270 da$=left$(t$,15)+"{CBM-+}"
+ 6280 :
+ 6290 print left$(cd$,19)
+ 6300 print "    {CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}"
+ 6310 print "   >{rvon}neuer{rvof} dateiname":print
+ 6320 print "   >               <";
+ 6330 print "{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}";
+ 6340 m=14:gosub 1820
+ 6350 if en=1 then 2370
+ 6360 if de=1 then 6290
+ 6370 :
+ 6380 l=1908:gosub 1470
+ 6390 d$=left$(t$,15)+"{CBM-+}"
+ 6400 :
+ 6410 d$="r0:"+d$+"="+da$
+ 6420 :
+ 6430 rem      diskbefehl ausfuehren
+ 6440 :
+ 6450 open 15,8,15
+ 6460 gosub 1620:if e<>0 then close 15:goto 2370
+ 6470 print#15,d$
+ 6480 gosub 1620:if e<>0 then close 15
+ 6490 :
+ 6500 t$="":goto 2370
+ 6510 :
+ 6520 :
+ 6530 rem   --------------------
+ 6540 rem   --- prog beenden ---
+ 6550 rem   --------------------
+ 6560 :
+ 6570 :
+ 6580 gosub 1240
+ 6590 print left$(cd$,17)
+ 6600 print "   {CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}"
+ 6610 print "   {rvon} ende {rvof}":print
+ 6620 print "   sind sie sicher (j/n) :"
+ 6630 get a$:if a$="" then 6630
+ 6640 if a$<>"j" then 2370
+ 6650 print "{clr}ok - bis bald!":end
+ 6660 :
+ 6670 :
+ 6680 rem   ----------------------
+ 6690 rem   ---    drucken     ---
+ 6700 rem   ----------------------
+ 6710 rem   - 1526 mit neuem rom -
+ 6720 rem   -      im 1525 modus -
+ 6730 rem   -                    -
+ 6740 rem   - chr$(14)=breit ein -
+ 6750 rem   - chr$(15)=breit aus -
+ 6760 rem   ----------------------
+ 6770 :
+ 6780 :
+ 6790 gosub 1240
+ 6800 print left$(cd$,17)
+ 6810 print "   {CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}"
+ 6820 print "   {rvon} drucken {rvof}"
+ 6830 print:print "   drucker eingeschaltet (j/n) : "
+ 6840 get a$:if a$="" then 6840
+ 6850 if a$<>"j" then goto 2370
+ 6860 :
+ 6870 rem      druckkanal oeffnen
+ 6880 :
+ 6890 open 3,4
+ 6900 :
+ 6910 rem      zeilenabstand = 0
+ 6920 :
+ 6930 open 6,4,6:print#6,chr$(20):close 6
+ 6940 :
+ 6950 rem      zeilen holen
+ 6960 :
+ 6970 for l=1190 to 1590 step 40
+ 6980 gosub 1470
+ 6990 :
+ 7000 rem      druckstring erstellen
+ 7010 :
+ 7020 for j=1 to len(t$)
+ 7030 a$=mid$(t$,j,1)
+ 7040 if a$<>"_" then print#3,a$;:goto7080
+ 7050 print#3,chr$(14);
+ 7060 j=j+1:a$=mid$(t$,j,1)
+ 7070 print#3,a$;chr$(15);
+ 7080 next j
+ 7090 :
+ 7100 rem      string drucken
+ 7110 :
+ 7120 print#3
+ 7130 next l
+ 7140 :
+ 7150 rem      zeilenvorschub
+ 7160 :
+ 7170 for i=1 to 5:print#3:next i
+ 7180 :
+ 7190 :    rem druckkanal schliessen
+ 7200 :
+ 7210 close 3
+ 7220 :
+ 7230 t$="":goto 2370
+

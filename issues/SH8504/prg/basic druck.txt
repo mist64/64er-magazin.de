@@ -1,0 +1,46 @@
+
+
+;basic druck.prg ==0801==
+  100 rem  basicversion der druckroutine
+  110 rem  kann auch als unterroutine in eigene programme eingebaut werden
+  120 rem  anpassung an andere 7-nadel-drucker sicher moeglich
+  130 open4,4:open6,4,6:print#6,chr$(16):close6:poke56,30
+  140 rem  offnet druckkanal und stellt zeilenabstant fuer grafik ein
+  150 for i=319 to-3 step -7
+  160 u$="":u2$="":o$="":o2$=""
+  170 for y=0 to199:c=128:g=128
+  180 for x=i to i-2 step -1
+  190 a=0:gosub1000
+  200 bi=2*(i-x)
+  210 ifa=1then c=c+2^bi+2^(bi+1)
+  220 nextx
+  230 a=0:x=i-3:gosub1000
+  240 if a=1then c=c+64 :g=g+1
+  250 for x=i-4 to i-6 step -1
+  260 a=0:gosub1000
+  270 bi =2*(i-x-4)
+  280 if a=1 then g=g+2^(bi+1)+2^(bi+2)
+  290 nextx
+  300 if y<100theno$=o$+chr$(c)+chr$(c)
+  310 if y>99theno2$=o2$+chr$(c)+chr$(c)
+  320 if y<100thenu$=u$+chr$(g)+chr$(g)
+  330 if y>99thenu2$=u2$+chr$(g)+chr$(g)
+  340 nexty
+  350 print#4,chr$(8)chr$(27)chr$(16)chr$(0)chr$(40);
+  360 print#4,o$o2$chr$(9)
+  370 rem  chr$(8) stellt bit-muster-modus ein
+  380 rem  chr$(27)chr$(16)chr$(0)chr$(40) stellt die druckstartadrsse jeder
+  390 rem  zeile auf 40 punkte nach rechts ein
+  400 rem chr$(9) stellt den bit-muster-modus wieder aus
+  410 print#4,chr$(8)chr$(27)chr$(16)chr$(0)chr$(40);
+  420 print#4,u$u2$chr$(9)
+  430 nexti
+  440 close4:end
+  450 rem  pruefroutine ob der grafikpunkt gesetzt oder nicht gesetzt ist:
+ 1000 ifx<0thena=0:return
+ 1010 by=(xand504)+40*(yand248)+(yand7)
+ 1020 bi=2^(7-(xand7))
+ 1030 s=peek(8192+by)
+ 1040 if(sorbi)=sthena=1
+ 1050 return
+

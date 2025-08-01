@@ -1,0 +1,953 @@
+
+
+;Quellprog..prg ==0801==
+   10 rem ********************************
+   20 rem *        plotter-basic         *
+   30 rem *     (befehlserweiterung)     *
+   40 rem *copyright by:stephan schaefer *
+   50 rem *             burbacherstr.162 *
+   60 rem *jan.1985     5300 bonn 1      *
+   70 rem *             tel.:0228/235567 *
+   80 rem ********************************
+   90 sys 9*4096
+  100 .opt oo
+  110 chrget   = $0073  ; zeichen holen
+  120 chrgot   = $0079
+  130 zeiger   = $0308  ; auf erkennrout.
+  140 intprt   = $a7ae  ; interpreter
+  150 bsout    = $ffd2  ; zeichen ausgeben
+  160 ga       = 6      ; geraete-adresse
+  170 lf       = 99     ; log. filenummer
+  180 puffer   = $c8d7  ; nach progr.ende
+  190 kx       = puffer
+  200 ky       = kx+5
+  210 xrad     = ky+5
+  220 yrad     = xrad+5
+  230 step     = yrad+5
+  240 argu     = step+5
+  250 xr       = kx
+  260 yr       = ky
+  270 zr       = xrad
+  280 xv       = yrad
+  290 yv       = step
+  300 koef     = argu
+  310 wink     = argu+5
+  320 park     = wink+5
+  330 pointer  = $fb    ;inhalt=pufferadr.
+  340 befzeig  = $fd    ;auf befehlstab.
+  350 open     = $ffc0
+  360 close    = $ffc3
+  370 setfls   = $ffba
+  380 setnam   = $ffbd
+  390 ckout    = $ffc9
+  400 clrch    = $ffcc
+  410 chkom    = $aefd  ; test auf komma
+  420 frmevl   = $ad9e  ; ausdruck holen
+  430 frmnum   = $ad8a
+  440 getadr   = $b7f7
+  450 memfac   = $bba2
+  460 facmem   = $bbd4
+  470 verglch  = $bc5b  ; fac mit a/y
+  480 chsgn    = $bfb4  ; fac=-fac
+  490 memmult  = $ba28
+  500 memplus  = $b867
+  510 cos      = $e264
+  520 sin      = $e26b
+  530 facasc   = $bddd
+  540 facvar   = $a9d6  ; fac nach var.
+  550 bytfac   = $b3a2
+  560 print    = $aaa4
+  570 goto     = $a8a3
+  580 ready    = $a474
+  590 varsuch  = $b08b  ; sucht basicvar.
+  600 strout   = $ab1e  ; string ausgeben
+  610 ;
+  620 ;
+  630 *= $c000
+  640 nop ; wird nach start durch rts ersetzt
+  650 jsr system        ; text ausgeben/vektoren aendern
+  660 rts
+  670 ;
+  680 ;
+  690 aus lda hilf
+  700 sta $300    ; warmstart-vektor
+  710 lda hilf+1
+  720 sta $301
+  730 lda jump+1
+  740 sta zeiger  ; alte vektoren
+  750 lda jump+2  ; zuruecksetzen
+  760 sta zeiger+1
+  770 lda #$ea    ; nop-code
+  780 sta $c000   ; restart ermoeglichen
+  790 rts
+  800 ;
+  810 ;
+  820 neu jsr chrget
+  830 cmp #"."
+  840 beq found
+  850 sec
+  860 lda $7a     ;textpointer chrget
+  870 sbc #1      ;erniedrigen
+  880 sta $7a     ;um gleiches zeichen
+  890 lda $7b     ;2 mal zu lesen
+  900 sbc #0
+  910 sta $7b
+  920 jump jmp $0000 ; basic-befehl ausfuehren
+  930 found lda #<puffer:sta pointer
+  940 lda #>puffer:sta pointer+1
+  950 lda #<befehle:sta befzeig
+  960 lda #>befehle:sta befzeig+1
+  970 ;
+  980 jsr chrget
+  990 jsr holen   ;befehl holen
+ 1000 jsr erkenn  ;erkennen+ausfuehren
+ 1010 jmp intprt
+ 1020 ;
+ 1030 ;
+ 1040 holen ldy #0
+ 1050 store sta (pointer),y
+ 1060 iny
+ 1070 jsr chrget
+ 1080 beq null
+ 1090 cmp #","
+ 1100 beq null
+ 1110 cmp #":"
+ 1120 beq null
+ 1130 jmp store
+ 1140 null lda #0
+ 1150 sta (pointer),y
+ 1160 rts
+ 1170 ;
+ 1180 erkenn ldx #0
+ 1190 ldy #0
+ 1200 schleife lda (pointer),y
+ 1210 beq ende
+ 1220 cmp (befzeig),y
+ 1230 bne next
+ 1240 iny
+ 1250 jmp schleife
+ 1260 ende jmp exec
+ 1270 next inx   ;naechster befehl
+ 1280 cpx #35    ;befehlstab. ende
+ 1290 beq syntax
+ 1300 clc
+ 1310 lda #7  ; laenge jedes befehls
+ 1320 adc befzeig
+ 1330 sta befzeig     ; zeiger auf
+ 1340 lda #0          ; befehlstabelle
+ 1350 adc befzeig+1   ; erhoehen
+ 1360 sta befzeig+1
+ 1370 ldy #0
+ 1380 jmp schleife
+ 1390 syntax jmp $af08 ; syntax error
+ 1400 ;
+ 1410 ;
+ 1420 ;
+ 1430 exec txa         ; befehlsnummer
+ 1440 clc              ; =zeiger
+ 1450 asl              ; mal 2
+ 1460 adc #<sprungtab  ; auf
+ 1470 sta pointer      ; sprungtabelle
+ 1480 lda #>sprungtab
+ 1490 adc #0
+ 1500 sta pointer+1
+ 1510 ldy #0
+ 1520 lda (pointer),y  ; lsb bef.adresse
+ 1530 sta befzeig
+ 1540 iny
+ 1550 lda (pointer),y  ; msb bef.adresse
+ 1560 sta befzeig+1
+ 1570 jmp (befzeig)    ; ausfuehrung
+ 1580 ;
+ 1590 ;
+ 1600 ;
+ 1610 befehle .asc "init   "
+ 1620 .asc "move   "
+ 1630 .asc "draw   "
+ 1640 .asc "rmove  "
+ 1650 .asc "rdraw  "
+ 1660 .asc "home   "
+ 1670 .asc "rahmen "
+ 1680 .asc "linie  "
+ 1690 .asc "kreis  "
+ 1700 .asc "radius "
+ 1710 .asc "transm "
+ 1720 .asc "transd "
+ 1730 .asc "transl "
+ 1740 .asc "turn   "
+ 1750 .asc "blau   "
+ 1760 .asc "rot    "
+ 1770 .asc "gruen  "
+ 1780 .asc "schwarz"
+ 1790 .asc "farbe  "
+ 1800 .asc "klein  "
+ 1810 .asc "mittel "
+ 1820 .asc "gross  "
+ 1830 .asc "super  "
+ 1840 .asc "size   "
+ 1850 .asc "dreh   "
+ 1860 .asc "strich "
+ 1870 .asc "gg     "
+ 1880 .asc "gk     "
+ 1890 .asc "prog   "
+ 1900 .asc "text   "
+ 1910 .asc "reset  "
+ 1920 .asc "errjump"
+ 1930 .asc "errout "
+ 1940 .asc "errnum "
+ 1950 .asc "aus    "
+ 1960 ;
+ 1970 sprungtab .word init
+ 1980 .word move
+ 1990 .word draw
+ 2000 .word rmove
+ 2010 .word rdraw
+ 2020 .word home
+ 2030 .word rahmen
+ 2040 .word linie
+ 2050 .word kreis
+ 2060 .word radius
+ 2070 .word transm
+ 2080 .word transd
+ 2090 .word transl
+ 2100 .word turn
+ 2110 .word blau
+ 2120 .word rot
+ 2130 .word gruen
+ 2140 .word schwarz
+ 2150 .word farbe
+ 2160 .word klein
+ 2170 .word mittel
+ 2180 .word gross
+ 2190 .word super
+ 2200 .word size
+ 2210 .word dreh
+ 2220 .word strich
+ 2230 .word gg
+ 2240 .word gk
+ 2250 .word prog
+ 2260 .word text
+ 2270 .word reset
+ 2280 .word errjump
+ 2290 .word errout
+ 2300 .word errnum
+ 2310 .word aus
+ 2320 ;
+ 2330 ; befehle
+ 2340 ;
+ 2350 color ldy #2      ; sekundaer-adr.
+ 2360 bytsend jsr auf   ; kanal oeffnen
+ 2370 lda $ff      ; farbe holen
+ 2380 jsr bsout
+ 2390 jsr zu       ; kanal schliessen
+ 2400 rts
+ 2410 ;
+ 2420 ; kanal oeffnen
+ 2430 ;
+ 2440 auf ldx #ga    ; plotter-adresse
+ 2450 lda #lf        ; file#
+ 2460 jsr setfls
+ 2470 lda #0         ; kein name noetig
+ 2480 jsr setnam
+ 2490 jsr open
+ 2500 ldx #lf
+ 2510 jsr ckout      ; ausgabe nach #lf
+ 2520 rts
+ 2530 ;
+ 2540 ; kanal schliessen
+ 2550 ;
+ 2560 zu jsr clrch
+ 2570 lda #lf
+ 2580 jsr close
+ 2590 rts
+ 2600 ;
+ 2610 ;
+ 2620 blau lda #"1"
+ 2630 sta $ff
+ 2640 jsr color
+ 2650 rts
+ 2660 ;
+ 2670 rot lda #"3"
+ 2680 sta $ff
+ 2690 jsr color
+ 2700 rts
+ 2710 ;
+ 2720 gruen lda #"2"
+ 2730 sta $ff
+ 2740 jsr color
+ 2750 rts
+ 2760 ;
+ 2770 schwarz lda #"0"
+ 2780 sta $ff
+ 2790 jsr color
+ 2800 rts
+ 2810 ;
+ 2820 ;
+ 2830 farbe jsr chkom
+ 2840 ldy #2
+ 2850 jsr auf
+ 2860 jsr frmevl
+ 2870 jsr sender
+ 2880 jsr zu
+ 2890 rts
+ 2900 ;
+ 2910 ;
+ 2920 groesse ldy #3
+ 2930 jsr bytsend
+ 2940 rts
+ 2950 ;
+ 2960 klein lda #"0"
+ 2970 sta $ff
+ 2980 jsr groesse
+ 2990 rts
+ 3000 ;
+ 3010 mittel lda #"1"
+ 3020 sta $ff
+ 3030 jsr groesse
+ 3040 rts
+ 3050 ;
+ 3060 gross lda #"2"
+ 3070 sta $ff
+ 3080 jsr groesse
+ 3090 rts
+ 3100 ;
+ 3110 super lda #"3"
+ 3120 sta $ff
+ 3130 jsr groesse
+ 3140 rts
+ 3150 ;
+ 3160 ;
+ 3170 size jsr chkom
+ 3180 ldy #3
+ 3190 jsr auf
+ 3200 jsr frmevl
+ 3210 jsr sender
+ 3220 jsr zu
+ 3230 rts
+ 3240 ;
+ 3250 zsatz ldy #6
+ 3260 jsr bytsend
+ 3270 rts
+ 3280 ;
+ 3290 gg lda #"0"
+ 3300 sta $ff
+ 3310 jsr zsatz
+ 3320 rts
+ 3330 ;
+ 3340 gk lda #"1"
+ 3350 sta $ff
+ 3360 jsr zsatz
+ 3370 rts
+ 3380 ;
+ 3390 ;
+ 3400 reset ldy #7
+ 3410 lda #0
+ 3420 sta $ff
+ 3430 jsr bytsend
+ 3440 rts
+ 3450 ;
+ 3460 ;
+ 3470 dreh jsr chkom
+ 3480 jsr frmevl
+ 3490 ldy #4
+ 3500 jsr auf
+ 3510 jsr sender
+ 3520 jsr zu
+ 3530 rts
+ 3540 ;
+ 3550 ;
+ 3560 text lda #","   ; auf komma testen
+ 3570 ldy #0
+ 3580 cmp ($7a),y     ; laufendes zeichen
+ 3590 bne leer
+ 3600 jsr $0073
+ 3610 ldy #0
+ 3620 jsr auf
+ 3630 jsr print
+ 3640 jsr zu
+ 3650 rts
+ 3660 leer ldy #0
+ 3670 jsr auf
+ 3680 lda #13      ; nur cr ausgeben
+ 3690 jsr bsout
+ 3700 jsr zu
+ 3710 rts
+ 3720 ;
+ 3730 ;
+ 3740 strich jsr chkom
+ 3750 ldy #5
+ 3760 jsr auf
+ 3770 jsr frmevl
+ 3780 jsr sender
+ 3790 jsr zu
+ 3800 rts
+ 3810 ;
+ 3820 ;
+ 3830 home ldy #1
+ 3840 lda #"h"
+ 3850 sta $ff
+ 3860 jsr bytsend
+ 3870 rts
+ 3880 ;
+ 3890 ;
+ 3900 init ldy #1
+ 3910 lda #"i"
+ 3920 sta $ff
+ 3930 jsr bytsend
+ 3940 rts
+ 3950 ;
+ 3960 ;
+ 3970 move jsr chkom
+ 3980 ldy #1
+ 3990 jsr auf
+ 4000 lda #"m"
+ 4010 dbyte jsr bsout
+ 4020 lda #" "
+ 4030 jsr bsout
+ 4040 jsr frmevl       ; x-koord.
+ 4050 jsr facasc
+ 4060 jsr strout
+ 4070 lda #" "
+ 4080 jsr bsout
+ 4090 jsr chkom
+ 4100 jsr frmevl       ; y-koord.
+ 4110 jsr facasc
+ 4120 jsr strout
+ 4130 jsr zu
+ 4140 rts
+ 4150 ;
+ 4160 ;
+ 4170 draw jsr chkom
+ 4180 ldy #1
+ 4190 jsr auf
+ 4200 lda #"d"
+ 4210 jmp dbyte
+ 4220 ;
+ 4230 ;
+ 4240 rmove jsr chkom
+ 4250 ldy #1
+ 4260 jsr auf
+ 4270 lda #"r"
+ 4280 jmp dbyte
+ 4290 ;
+ 4300 ;
+ 4310 rdraw jsr chkom
+ 4320 ldy #1
+ 4330 jsr auf
+ 4340 lda #"j"
+ 4350 jmp dbyte
+ 4360 ;
+ 4370 ;
+ 4380 linie jsr move
+ 4390 jsr draw
+ 4400 rts
+ 4410 ;
+ 4420 ;
+ 4430 system ldx #255
+ 4440 l1 inx
+ 4450 lda meldung,x
+ 4460 jsr bsout
+ 4470 cpx #81
+ 4480 bne l1
+ 4490 lda $300 : sta hilf    ; alte
+ 4500 lda $301 : sta hilf+1  ; vektoren
+ 4510 clc                    ; retten
+ 4520 lda #3
+ 4530 lda $308 : sta jump+1;sprung nach
+ 4540 lda #0               ;eventueller
+ 4550 lda $309 : sta jump+2;bef.-erweit.
+ 4560 lda #<warm : sta $300    ;neue
+ 4570 lda #>warm : sta $301    ;vektoren
+ 4580 lda #<neu  : sta zeiger  ;setzen
+ 4590 lda #>neu  : sta zeiger+1
+ 4600 lda #$60  ; rts befehl
+ 4610 sta $c000 ; verhindert restart
+ 4620 rts
+ 4630 ;
+ 4640 meldung .asc "{clr}"
+ 4650 .asc "{down}{wht}   **** commodore 1520 basic 1.3 ****"
+ 4660 .byt $0d
+ 4670 .byt $0d
+ 4680 .asc "   (p) jan.1985 =:= (c) by s.schaefer  "
+ 4690 .byt $0d
+ 4700 hilf .byt $00  ; zwischenspeicher
+ 4710 .byt $00  ; fuer warmstart-vektor
+ 4720 ;
+ 4730 ;
+ 4740 sender jsr facasc  ; fac auf
+ 4750 jsr strout         ; drucker-
+ 4760 lda #" "           ; kanal
+ 4770 jsr bsout          ; + space
+ 4780 rts
+ 4790 ;
+ 4800 ;
+ 4810 kreis jsr param
+ 4820 jsr krmit
+ 4830 jsr malen
+ 4840 rts
+ 4850 ;
+ 4860 param jsr chkom
+ 4870 jsr frmevl
+ 4880 ldx #<kx : ldy #>kx
+ 4890 jsr facmem
+ 4900 jsr chkom
+ 4910 jsr frmevl
+ 4920 ldx #<ky : ldy #>ky
+ 4930 jsr facmem
+ 4940 jsr chkom
+ 4950 jsr frmevl
+ 4960 ldx #<xrad : ldy #>xrad
+ 4970 jsr facmem
+ 4980 jsr chkom
+ 4990 jsr frmevl
+ 5000 ldx #<yrad : ldy #>yrad
+ 5010 jsr facmem
+ 5020 rts
+ 5030 ;
+ 5040 krmit lda #<kx : ldy #>kx
+ 5050 jsr memfac
+ 5060 ldy #1
+ 5070 jsr auf
+ 5080 lda #"m" : jsr bsout  ; auf kreismittelpunkt
+ 5090 jsr sender
+ 5100 lda #<ky : ldy #>ky
+ 5110 jsr memfac
+ 5120 jsr sender            ; positionieren
+ 5130 jsr zu
+ 5140 jsr init
+ 5150 rts
+ 5160 ;
+ 5170 malen lda #<xrad : ldy #>xrad
+ 5180 jsr memfac
+ 5190 ldy #1
+ 5200 jsr auf
+ 5210 lda #"r"
+ 5220 jsr bsout
+ 5230 jsr sender
+ 5240 lda #"0"
+ 5250 jsr bsout
+ 5260 jsr zu
+ 5270 ;
+ 5280 lda #0
+ 5290 sta argu:sta argu+1
+ 5300 sta argu+2:sta argu+3:sta argu+4
+ 5310 jmp pl     ; argument erhoehen
+ 5320 loop ldy #1 : jsr auf
+ 5330 jsr cos
+ 5340 lda #<xrad : ldy #>xrad
+ 5350 jsr memmult
+ 5360 lda #"j"
+ 5370 jsr bsout
+ 5380 jsr sender
+ 5390 ;
+ 5400 lda #<argu : ldy #>argu
+ 5410 jsr memfac
+ 5420 jsr sin
+ 5430 lda #<yrad : ldy #>yrad
+ 5440 jsr memmult
+ 5450 jsr sender
+ 5460 jsr zu
+ 5470 ;
+ 5480 pl lda #$6c
+ 5490 ldy #$e3    ; flp 0.19=step
+ 5500 jsr memfac
+ 5510 lda #<argu : ldy #>argu
+ 5520 jsr memplus
+ 5530 ldx #<argu : ldy #>argu
+ 5540 jsr facmem
+ 5550 lda #<grenze : ldy #>grenze
+ 5560 clc
+ 5570 jsr verglch
+ 5580 bcs loop
+ 5590 jsr zu
+ 5600 rts
+ 5610 ;
+ 5620 ;
+ 5630 prog lda #","   ; auf komma testen
+ 5640 ldy #0
+ 5650 cmp ($7a),y     ; aktuelles zeichen
+ 5660 bne alles
+ 5670 jsr $0073
+ 5680 alles ldy #0
+ 5690 jsr auf
+ 5700 dec $7a  ; textpointer erniedrigen
+ 5710 lda #$9b ; list-code
+ 5720 ldx #99 : stx flag  ;list-flag setzen
+ 5730 jsr $a7f7
+ 5740 jsr zu
+ 5750 rts
+ 5760 ;
+ 5770 ;
+ 5780 warm lda flag  ; warmstart routine
+ 5790 cmp #99        ; um nach list den
+ 5800 beq ch         ; druckerkanal zu
+ 5810 jmp (hilf)     ; schliessen und
+ 5820 ch lda #0      ; die ready-meldung
+ 5830 sta flag       ; zu unterdruecken
+ 5840 lda #13  ;cr
+ 5850 jsr bsout
+ 5860 jsr zu
+ 5870 jmp $a474      ; ready-modus
+ 5880 ;
+ 5890 ;
+ 5900 rahmen jsr param
+ 5910 ;
+ 5920 ldy #1
+ 5930 jsr auf
+ 5940 lda #"m"
+ 5950 jsr bsout
+ 5960 lda #" "
+ 5970 jsr bsout
+ 5980 lda #<kx : ldy #>kx  ; bewegung
+ 5990 jsr memfac           ; nach
+ 6000 jsr sender           ; x1/y1
+ 6010 lda #<ky : ldy #>ky
+ 6020 jsr memfac
+ 6030 jsr sender
+ 6040 jsr zu
+ 6050 ;
+ 6060 jsr drauf
+ 6070 lda #<xrad : ldy #>xrad
+ 6080 jsr memfac
+ 6090 jsr sender
+ 6100 lda #<ky   : ldy #>ky
+ 6110 jsr memfac
+ 6120 jsr sender
+ 6130 jsr zu
+ 6140 jsr drauf
+ 6150 lda #<xrad : ldy #>xrad
+ 6160 jsr memfac
+ 6170 jsr sender
+ 6180 lda #<yrad : ldy #>yrad
+ 6190 jsr memfac
+ 6200 jsr sender
+ 6210 jsr zu
+ 6220 jsr drauf
+ 6230 lda #<kx   : ldy #>kx
+ 6240 jsr memfac
+ 6250 jsr sender
+ 6260 lda #<yrad : ldy #>yrad
+ 6270 jsr memfac
+ 6280 jsr sender
+ 6290 jsr zu
+ 6300 jsr drauf
+ 6310 lda #<kx   : ldy #>kx
+ 6320 jsr memfac
+ 6330 jsr sender
+ 6340 lda #<ky   : ldy #>ky
+ 6350 jsr memfac
+ 6360 jsr sender
+ 6370 jsr zu
+ 6380 rts
+ 6390 ;
+ 6400 ;
+ 6410 drauf ldy #1   ;open + draw-befehl
+ 6420 jsr auf
+ 6430 lda #"d"
+ 6440 jsr bsout
+ 6450 lda #" "
+ 6460 jsr bsout
+ 6470 rts
+ 6480 ;
+ 6490 ;
+ 6500 grenze .byt $83  ; 2*~
+ 6510 .byt $55
+ 6520 .byt $dc
+ 6530 .byt $a7
+ 6540 .byt $6e
+ 6550 flag .byt $00    ; list-flag fuer warmstart-routine
+ 6560 faktor .byt $7b  ; ~/180
+ 6570 .byt $0e
+ 6580 .byt $fa
+ 6590 .byt $35
+ 6600 .byt $12
+ 6610 ;
+ 6620 radius jsr param
+ 6630 jsr chkom
+ 6640 jsr frmevl
+ 6650 lda #<faktor : ldy #>faktor
+ 6660 jsr memmult
+ 6670 ldx #<argu : ldy #>argu
+ 6680 jsr facmem
+ 6690 ;
+ 6700 jsr krmit
+ 6710 ;
+ 6720 ldy #1
+ 6730 jsr auf
+ 6740 lda #"j"
+ 6750 jsr bsout
+ 6760 lda #" "
+ 6770 jsr bsout
+ 6780 lda #<argu : ldy #>argu
+ 6790 jsr memfac
+ 6800 jsr cos
+ 6810 lda #<xrad : ldy #>xrad
+ 6820 jsr memmult
+ 6830 jsr sender
+ 6840 lda #<argu : ldy #>argu
+ 6850 jsr memfac
+ 6860 jsr sin
+ 6870 lda #<yrad : ldy #>yrad
+ 6880 jsr memmult
+ 6890 jsr sender
+ 6900 jsr zu
+ 6910 rts
+ 6920 ;
+ 6930 ;
+ 6940 transm jsr allparam ; 7 parameter
+ 6950 trm ldy #1
+ 6960 jsr auf
+ 6970 lda #"m"
+ 6980 rest jsr bsout
+ 6990 lda #" "
+ 7000 jsr bsout
+ 7010 jsr umrechng
+ 7020 rts
+ 7030 ;
+ 7040 ;
+ 7050 transd jsr allparam ; 7 parameter
+ 7060 trd ldy #1
+ 7070 jsr auf
+ 7080 lda #"d"
+ 7090 jmp rest
+ 7100 ;
+ 7110 ;
+ 7120 transl jsr allparam
+ 7130 jsr trm
+ 7140 jsr chkom
+ 7150 jsr frmevl
+ 7160 ldx #<xr : ldy #>xr
+ 7170 jsr facmem
+ 7180 jsr chkom
+ 7190 jsr frmevl
+ 7200 ldx #<yr : ldy #>yr
+ 7210 jsr facmem
+ 7220 jsr chkom
+ 7230 jsr frmevl
+ 7240 ldx #<zr : ldy #>zr
+ 7250 jsr facmem
+ 7260 jmp trd
+ 7270 ;
+ 7280 ;
+ 7290 allparam jsr chkom
+ 7300 jsr frmevl
+ 7310 ldx #<xr : ldy #>xr
+ 7320 jsr facmem
+ 7330 jsr chkom
+ 7340 jsr frmevl
+ 7350 ldx #<yr : ldy #>yr
+ 7360 jsr facmem
+ 7370 jsr chkom
+ 7380 jsr frmevl
+ 7390 ldx #<zr : ldy #>zr
+ 7400 jsr facmem
+ 7410 jsr chkom
+ 7420 jsr frmevl
+ 7430 ldx #<xv : ldy #>xv
+ 7440 jsr facmem
+ 7450 jsr chkom
+ 7460 jsr frmevl
+ 7470 ldx #<yv : ldy #>yv
+ 7480 jsr facmem
+ 7490 jsr chkom
+ 7500 jsr frmevl
+ 7510 ldx #<koef : ldy #>koef
+ 7520 jsr facmem
+ 7530 jsr chkom
+ 7540 jsr frmevl
+ 7550 ldx #<wink : ldy #>wink
+ 7560 jsr facmem
+ 7570 rts
+ 7580 ;
+ 7590 ;
+ 7600 umrechng lda #<wink : ldy #>wink
+ 7610 jsr memfac
+ 7620 lda #<faktor : ldy #>faktor
+ 7630 jsr memmult ; fac nach radiant
+ 7640 jsr cos
+ 7650 lda #<yr : ldy #>yr
+ 7660 jsr memmult
+ 7670 lda #<xr : ldy #>xr
+ 7680 jsr memplus
+ 7690 lda #<koef : ldy #>koef
+ 7700 jsr memmult
+ 7710 lda #<xv : ldy #>xv
+ 7720 jsr memplus
+ 7730 jsr sender
+ 7740 ;
+ 7750 lda #<wink : ldy #>wink
+ 7760 jsr memfac
+ 7770 lda #<faktor : ldy #>faktor
+ 7780 jsr memmult ; fac nach radiant
+ 7790 jsr sin
+ 7800 lda #<yr : ldy #>yr
+ 7810 jsr memmult
+ 7820 lda #<zr : ldy #>zr
+ 7830 jsr memplus
+ 7840 lda #<koef : ldy #>koef
+ 7850 jsr memmult
+ 7860 lda #<yv : ldy #>yv
+ 7870 jsr memplus
+ 7880 jsr sender
+ 7890 jsr zu
+ 7900 rts
+ 7910 ;
+ 7920 ;
+ 7930 par3 jsr chkom
+ 7940 jsr varsuch
+ 7950 sta yrad : sty yrad+1 ;zeiger auf erste variable
+ 7960 jsr chkom
+ 7970 jsr varsuch
+ 7980 sta yrad+2 : sty yrad+3 ;zeiger auf zweite variable
+ 7990 jsr chkom
+ 8000 jsr frmevl
+ 8010 ldx #<wink : ldy #>wink
+ 8020 jsr facmem
+ 8030 rts
+ 8040 ;
+ 8050 radiant lda #<wink : ldy #>wink
+ 8060 jsr memfac
+ 8070 lda #<faktor : ldy #>faktor
+ 8080 jsr memmult
+ 8090 jsr cos
+ 8100 ldx #<step   : ldy #>step
+ 8110 jsr facmem ; step=cos(w)
+ 8120 lda #<wink : ldy #>wink
+ 8130 jsr memfac
+ 8140 lda #<faktor : ldy #>faktor
+ 8150 jsr memmult
+ 8160 jsr sin
+ 8170 ldx #<argu   : ldy #>argu
+ 8180 jsr facmem ; argu=sin(w)
+ 8190 rts
+ 8200 ;
+ 8210 ;
+ 8220 turn jsr par3
+ 8230 jsr radiant
+ 8240 lda yrad : ldy yrad+1
+ 8250 jsr memfac
+ 8260 lda #<step : ldy #>step ;cos(w)
+ 8270 jsr memmult
+ 8280 ldx #<zr : ldy #>zr
+ 8290 jsr facmem                ;merken
+ 8300 lda yrad+2 : ldy yrad+3
+ 8310 jsr memfac
+ 8320 lda #<argu : ldy #>argu ;sin(w)
+ 8330 jsr memmult
+ 8340 lda #<zr : ldy #>zr
+ 8350 jsr memplus
+ 8360 ldx #<park : ldy #>park
+ 8370 jsr facmem                ;merken
+ 8380 ;
+ 8390 lda yrad : ldy yrad+1
+ 8400 jsr memfac
+ 8410 jsr chsgn        ; fac=-fac
+ 8420 lda #<argu : ldy #>argu ;sin(w)
+ 8430 jsr memmult
+ 8440 ldx #<zr : ldy #>zr
+ 8450 jsr facmem                ;merken
+ 8460 lda yrad+2 : ldy yrad+3
+ 8470 jsr memfac
+ 8480 lda #<step : ldy #>step ;cos(w)
+ 8490 jsr memmult
+ 8500 lda #<zr : ldy #>zr
+ 8510 jsr memplus
+ 8520 lda yrad+2 : ldy yrad+3
+ 8530 sta $49  : sty $4a ;zeiger setzen
+ 8540 jsr facvar
+ 8550 lda #<park : ldy #>park
+ 8560 jsr memfac
+ 8570 lda yrad  : ldy yrad+1
+ 8580 sta $49  : sty $4a ;zeiger setzen
+ 8590 jsr facvar
+ 8600 rts
+ 8610 ;
+ 8620 ;
+ 8630 errjump jsr chkom
+ 8640 jsr frmnum
+ 8650 jsr getadr ; zeilennr. nach $14/15
+ 8660 lda $14
+ 8670 ldy $15
+ 8680 sta zeile
+ 8690 sty zeile+1
+ 8700 lda #<ertest ; fehlerbehandlung
+ 8710 sta $300
+ 8720 lda #>ertest ; einschalten
+ 8730 sta $301
+ 8740 ldy #0
+ 8750 lda #","
+ 8760 cmp ($7a),y  ; test auf komma
+ 8770 bne r1
+ 8780 jsr chrget
+ 8790 jsr frmevl
+ 8800 lda #99      ; alle fehler
+ 8810 sta errflag  ; unterdruecken
+ 8820 rts
+ 8830 r1 lda #0   ;nur arithmethische
+ 8840 sta errflag ;fehler unterdruecken
+ 8850 rts
+ 8860 zeile .byt $00
+ 8870 .byt $00
+ 8880 ;
+ 8890 ;
+ 8900 errout lda #<warm ; errjump ab-
+ 8910 ldy #>warm       ; schalten
+ 8920 sta $300
+ 8930 sty $301
+ 8940 rts
+ 8950 ;
+ 8960 ertest cmp #$81  ; test auf
+ 8970 bne noend
+ 8980 cpy #$a3         ; programmende
+ 8990 bne noend
+ 9000 jsr errout ;fehlermeldung ermoegl.
+ 9010 jmp okay  ;ready-modus
+ 9020 noend lda errflag
+ 9030 bne noerr
+ 9040 stx $02   ; fehlernummer merken
+ 9050 txa
+ 9060 bmi okay   ; kein fehler
+ 9070 cpx #14    ; ill. quantity
+ 9080 beq noerr
+ 9090 cpx #15    ; overflow
+ 9100 beq noerr
+ 9110 cpx #16    ; out of memory
+ 9120 beq memory
+ 9130 cpx #20    ; division by zero
+ 9140 beq noerr
+ 9150 tax
+ 9160 jmp (hilf)  ; zum echten warmstart
+ 9170 okay jmp ready  ; ready-modus
+ 9180 noerr stx $02 ;fehlernummer merken
+ 9190 lda zeile
+ 9200 ldy zeile+1
+ 9210 sta $14
+ 9220 sty $15
+ 9230 jsr goto   ;programmzaehler-incr.
+ 9240 jmp intprt
+ 9250 ;
+ 9260 errflag .byt $00
+ 9270 ;
+ 9280 memory pla
+ 9290 tay
+ 9300 pla
+ 9310 ldx #$fa ; stackpointer
+ 9320 txs      ; initialisieren
+ 9330 pha
+ 9340 tya
+ 9350 pha
+ 9360 jmp noerr
+ 9370 ;
+ 9380 ;
+ 9390 errnum jsr chkom
+ 9400 jsr varsuch  ; basicvariable best.
+ 9410 sta yrad : sty yrad+1
+ 9420 ldy $02     ; fehlernummer holen
+ 9430 jsr bytfac  ; und umwandeln
+ 9440 lda yrad : ldy yrad+1
+ 9450 sta $49  : sty $4a
+ 9460 jsr facvar  ; nummer in basicvar.
+ 9470 lda #0
+ 9480 sta $02
+ 9490 rts
+

@@ -1,0 +1,41 @@
+
+
+;bigcopy erzeuger.prg ==0801==
+    5 rem   wichtig !!!
+    6 rem   beim eingeben von bigcopy erzeuger unbedingt die rem-zeilen weglassen.
+   10 rem  bigcopy erzeuger erzeugt das druckprogramm bigcopy 64 auf diskette
+   20 rem  dazu laedt man zuerst bigcopy datas und startet es.
+   30 rem  wenn alles okay ist,laedt man bigcopy erzeuger ein,legt eine freie
+   40 rem  diskette ein und starte das programm mit run1000.
+   50 rem  nach ca. 1 minute steht bigcopy 64 auf diskette und kann jederzeit
+   60 rem  eingelesen und gestartet werden.
+  100 poke55,255:poke56,12:rem maschinenprogramm schuetzen
+  110 print"{clr}":print"       -----bigcopy 64-----"
+  120 print"--fuer commodore mps 801 matrixdrucker--"
+  130 print:print"drucker angeschlossen und eingeschaltet ? (y/n)"
+  140 geta$:ifa$<>"y"then140
+  150 print:print:print"welcher der 7 hires graphikspeicher soll"
+  160 print"mit bigcopy ausgedruckt werden ? (1-7) "
+  170 getb$:a=val(b$):if(a<1)or(a>7)then170
+  180 print:print"es wird bild";a;"ausgedruckt!"
+  190 print:print"jetzt noch ca. 13 minuten geduld!":fort=1to1000:next
+  200 a=a*32:poke3340,a:poke3336,32:rem a=bildadresse
+  210 sys3328:rem bild wird nach $2000 gebracht
+  220 poke53265,59:poke53272,24:print"{clr}":rem bild wird angezeigt
+  230 sys3383:rem druckroutine beginnt
+  240 poke3340,32:poke3336,a
+  250 poke53265,155:poke53272,21
+  260 sys3328:rem bild wird nach a zurueckgebracht
+  270 print"noch ein bild ? (y/n)"
+  280 getz$
+  290 if z$="y"then goto110
+  300 if z$<>"n"then280
+  310 if z$="n"then sys64738
+  400 rem zeilen 1000-1040 erzeugen bigcopy auf diskette
+ 1000 open1,8,1,"bigcopy 64"
+ 1010 print#1,chr$(1);chr$(8);
+ 1020 fort=2049to2687:print#1,chr$(peek(t));:next
+ 1030 fort=2688to3326:print#1,chr$(0);:next
+ 1040 fort=49152to50042:print#1,chr$(peek(t));:next
+ 1050 close1
+

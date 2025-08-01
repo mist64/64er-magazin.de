@@ -1,0 +1,45 @@
+
+
+;Demo (Pl-B).prg ==0801==
+   10 rem ******************
+   20 rem plotter-basic demo
+   30 rem ******************
+   35 .schwarz:.gk:.mittel
+   37 .text,"     Drehung eines 3-D-Koerpers"
+   38 .text,"     =========================="
+   39 .move,0,-70:.text
+   40 xv=240:yv=0:rem verschiebungsvektor
+   41 f=15       :rem vergroesserung
+   42 w=35       :rem betrachtungswinkel
+   43 l=24       :rem anzahl der linien
+   45 dim r(l)   :rem feld der linien
+   50 p=8        :rem anzahl der eckpunkte
+   55 dim x(p):dim y(p):dim z(p)
+   60 rem einlesen der eckpunkte
+   70 for i=1 to p
+   80 read x(i),y(i),z(i)
+   90 next
+  100 rem einlesen der verbindungsfolge
+  110 for i=1 to l
+  120 read r(i)
+  130 next
+  140 rem zeichnung
+  150 for i=1 to l step 2
+  160 .transl,x(r(i)),y(r(i)),z(r(i)),xv,yv,f,w,x(r(i+1)),y(r(i+1)),z(r(i+1))
+  170 next
+  180 rem drehung um 10 grad
+  185 dw=dw+10
+  190 for i=1 to p
+  200 .turn,x(i),y(i),dw:rem drehung um z
+  210 next
+  220 .move,0,-150
+  230 .text             :rem cr senden
+  240 print "{down}commodore-taste druecken!"
+  250 wait 653,2
+  260 print "{up}                         {up}"
+  270 goto 140
+  499 rem eckpunkte
+  500 data -2,-2,0,2,-2,0,2,2,0,-2,2,0,0,0,6,4,0,6,4,4,6,0,4,6
+  599 rem reihenfolge der verbindungen
+  600 data 1,2,2,3,3,4,4,1,1,5,2,6,3,7,4,8,8,5,5,6,6,7,7,8
+

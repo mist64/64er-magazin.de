@@ -77,6 +77,2126 @@
         <p>Sie müssen als erstes die MSE-Listings 8 und 9 eingeben und anschließend natürlich auch abspeichern. Die Listings 1 bis 7 dienen nur zur Dokumentation und brauchen nicht eingegeben werden. Nachdem Sie auch die Demos abgetippt und auf Diskette oder Band gespeichert haben, müssen die einzelnen Programmteile nacheinander in den Speicher geladen werden. Begonnen wird mit GRAPHICS, das mit LOAD-"GRAPHICS",8,1 in den Speicher gelesen werden muß. Nachdem man anschließend NEW eingegeben hat, muß das zweite Maschinenprogramm, wie oben, geladen werden (auch hier das NEW nicht vergessen). Anschließend kann wahlweise eines der beiden Demonstrationsprogramme (Listing 10 oder11) geladen und ganz normal gestartet werden.</p>
 
         <address class="author">(Richard Rylander/Christoph Sauer/ev)</address>
+
+        <figure>
+            <pre>; INTEGER ARITHMETIC ROUTINES
+;
+; RICHARD L. RYLANDER    8/12/84
+;
+; REVISED 10/29/84 TO ADD FULL DOUBLE
+; PRECISION ARGUMENTS IN DIVIDE ROUTINE
+;
+;*****************************************
+;
+; USE PAGE ZERO LOCATIONS WHERE POSSIBLE FOR
+; ITERATIVE PROCEDURE WORK SPACE
+;
+MLPCND =$AC    ; MULTIPLICAND
+MLPLER =$AD    ; MULTIPLIER
+PROD   =$AE    ; PRODUCT
+;
+DVDND  =$FD    ; DIVIDEND/QUOTIENT
+DVSOR  =$FB    ; DIVISOR
+RMNDR  =$B4    ; REMAINDER
+;
+RADCND =$AC    ; RADICAND
+ROOT   =$033C  ; SQUARE ROOT
+;
+TEMP   =$FB
+;
+; SET UP SEED VALUES FOR PSEUDO-RANDOM NUMBERS
+      *=$C000
+RNDM   .BYTE $FF,$55
+RTEMP  .BYTE $00,$00
+;
+;
+;*****************************************
+;
+; MULTIPLY SINGLE PRECISION MULTIPLICAND
+; BY SINGLE PRECISION MULTIPLIER GIVING
+; DOUBLE PRECISION PRODUCT (ENTER AT "MULT")
+;
+; SPECIAL CASE: ENTER AT "SQUARE" TO FIND
+; SQUARE OF SIGNED 8-BIT NUMBER
+;
+SQUARE LDA MLPCND  ; ENTRY TO SQUARE
+       BPL POSITV  ; USE ABSOLUTE VALUE
+       SEC         ; NEGATE IF NEEDED
+       LDA #$00
+       SBC MLPCND
+       STA MLPCND
+POSITV STA MLPLER
+MULT   LDA #$00    ; ENTRY TO MULTIPLY
+       LDX #$08
+MLOOP  LSR MLPLER
+       BCC NOADD
+       CLC
+       ADC MLPCND
+NOADD  ROR A
+       ROR PROD
+       DEX
+       BNE MLOOP
+       STA PROD+1
+       RTS
+;
+;*****************************************
+;
+; DIVIDE DOUBLE PRECISION DIVIDEND
+; BY DOUBLE PRECISION DIVISOR GIVING
+; DOUBLE PRECISION QUOTIENT
+;
+; DIVIDEND IS REPLACED BY QUOTIENT
+; IN THE PROCESS
+;
+; QUOTIENT IS ROUNDED TO NEAREST INTEGER
+;
+DIVIDE LDA #$00
+       STA RMNDR
+       STA RMNDR+1
+       LDX #$10
+DLOOP  ROL DVDND
+       ROL DVDND+1
+       ROL RMNDR
+       ROL RMNDR+1
+       SEC
+       LDA RMNDR
+       SBC DVSOR
+       TAY
+       LDA RMNDR+1
+       SBC DVSOR+1
+       BCC DECCNT
+       STY RMNDR
+       STA RMNDR+1
+DECCNT DEX
+       BNE DLOOP
+       ROL DVDND     ; CHECK IF REMAINDER
+       ROL DVDND+1   ; IS >= 1/2 OF DIVIDEND
+       ASL RMNDR     ; FOR ROUNDING
+       ROL RMNDR+1
+       BCS ROUND
+       SEC
+       LDA DVSOR
+       SBC RMNDR
+       LDA DVSOR+1
+       SBC RMNDR+1
+       BCS NOCHNG
+ROUND  INC DVDND
+       BNE NOCHNG
+       INC DVDND+1
+NOCHNG RTS
+;
+;*****************************************
+;
+; TAKE INTEGER SQUARE ROOT OF A
+; DOUBLE PRECISION RADICAND GIVING
+; SINGLE PRECISION ROOT ( &lt;= REAL ROOT )
+;
+SQRT   LDX #$08
+       LDA #$00
+       STA ROOT
+       STA ROOT+1
+       STA TEMP
+       STA TEMP+1
+SQRT1  ASL ROOT
+       ROL ROOT+1
+       INC ROOT    ; ASSUME CURRENT LSB OF
+       BNE NEXT1   ; ROOT WILL BE 1
+       INC ROOT+1
+NEXT1  ASL RADCND  ; SHIFT RADICAND LEFT
+       ROL RADCND+1 ; TWICE INTO TEMP
+       ROL TEMP
+       ROL TEMP+1
+       ASL RADCND
+       ROL RADCND+1
+       ROL TEMP
+       ROL TEMP+1
+       SEC         ; SUBTRACT ROOT ESTIMATE
+       LDA TEMP    ; FROM TEMP
+       SBC ROOT
+       TAY
+       LDA TEMP+1
+       SBC ROOT+1
+       BCC RESTOR
+       STA TEMP+1  ; SUBTRACTION OK
+       STY TEMP
+       INC ROOT
+       BNE NEXT2
+       INC ROOT+1
+NEXT2  DEX
+       BNE SQRT1
+       JMP FINI
+RESTOR SEC         ; IGNORE SUBTRACTION
+       LDA ROOT    ; AND RESET LSB OF ROOT
+       SBC #$01
+       STA ROOT
+       BCS NEXT3
+       DEC ROOT+1
+NEXT3  DEX
+       BNE SQRT1
+FINI   ROR ROOT+1  ; FINAL /2 TO NORMALIZE
+       ROR ROOT
+       RTS
+;
+;*****************************************
+;
+; GENERATE PSEUDO-RANDOM BYTES
+; EXIT WITH P-R BYTE IN ACCUM.
+;
+RANDOM LDA RNDM
+       STA RTEMP
+       EOR RNDM+1
+       ROL RTEMP+1  ; RTEMP+1 PRESERVES
+       ROR A        ; CARRY BIT FOR CYCLING
+       ROR RTEMP+1  ; RANDOM NUMBERS
+       STA RNDM
+       LDA RTEMP
+       STA RNDM+1
+       RTS
+.END</pre>
+            <figcaption>Listing 1. Assembler-Quelltext der schnellen Integer-Arithmetik</figcaption>
+        </figure>
+        <figure>
+            <pre>; GRAPHICS UTILITIES
+;
+; RICHARD L. RYLANDER   11/4/84
+;
+; LOAD ARITHMETIC UTILITIES FIRST
+;
+RAM=$033E
+ORIGIN=$C0E2
+;
+MLPCND=$AC     ; MULTIPLICAND (S)
+MLPLER=$AD     ; MULTIPLIER (S)
+PROD=$AE      ; PRODUCT (D)
+MULT=$C011    ; CALL FOR MULTIPLY
+;
+RNDM=$C000    ; RANDOM NUMBER
+RANDOM=$C0C8  ; CALL FOR RANDOM
+; NOTE - A CALL TO 'RANDOM' LEAVES A RANDOM BYTE
+; IN THE ACCUMULATOR
+;
+       *=RAM
+PLTFLG *=*+1  ; PLOT/UNPLOT FLAG
+XPLT   *=*+2  ; ABSOLUTE PLOT COORD
+YPLT   *=*+1  ; ABSOLUTE PLOT COORD
+VIC1   *=*+1  ; REGISTER STORAGE
+VIC2   *=*+1  ; REGISTER STORAGE
+VALUE  *=*+2  ; FINAL NORMALIZED SHADE VALUE
+HTORRN *=*+1  ; SHADE FLAG, 1=HALFTONE
+NOSCAL *=*+1  ; SCALE FLAG, 1=NO SCALE
+TEMP   *=*+2  ; TEMPORARY STORAGE
+;
+       *=ORIGIN
+;
+;*****************************************
+;
+; TURN ON BIT MAP GRAPHICS MODE,
+; SAVING REGISTER VALUES FOR
+; RETURN TO TEXT MODE LATER.
+;
+GRFON  LDA $D011
+       ORA #$20
+       STA $D011
+       LDA $DD00
+       STA VIC1
+       AND #$FC
+       ORA #$01
+       STA $DD00
+       LDA $D018
+       STA VIC2
+       LDA #$19
+       STA $D018
+       RTS
+;
+;*****************************************
+;
+; RETURN TO TEXT SCREEN
+;
+GRFOFF LDA $D011
+       AND #$DF
+       STA $D011
+       LDA VIC1
+       STA $DD00
+       LDA VIC2
+       STA $D018
+       RTS
+;
+;*****************************************
+;
+; FILL COLOR MAP FOR BLACK DOTS ON WHITE
+;
+COLOR  LDA #$01    ; POKE NEW COLORS HERE
+       LDX #0
+COL1   STA $8400,X
+       STA $8500,X
+       STA $8600,X
+       STA $8700,X
+       DEX
+       BNE COL1
+       RTS
+;
+;*****************************************
+;
+; CLEAR HI-RES GRAPHICS SCREEN
+;
+CLEAR  LDA #$A0
+       STA $FC
+       LDY #0
+       STY $FB
+       LDA #0      ; CLEAR BYTE
+       LDX #$20
+CLRLP  STA ($FB),Y
+       INY
+       BNE CLRLP
+       INC $FC
+       DEX
+       BNE CLRLP
+       RTS
+;
+;*****************************************
+;
+; PLOT AND UNPLOT POINTS ON HI-RES GRAPHICS
+; SCREEN. ABSOLUTE X AND Y SCREEN COORDINATES
+; ARE POKED INTO XPLT, XPLT+1, AND YPLT
+;
+PLOT   LDA #0
+       .BYTE $2C
+UNPLOT LDA #$80
+       STA PLTFLG
+       LDA $01    ; BASIC ROM OUT
+       AND #$FE
+       STA $01
+       SEC        ; INVERT Y COORDINATE TO
+       LDA #$C7   ; PUT ORIGIN IN LOWER LEFT
+       SBC YPLT   ; CORNER OF SCREEN
+       TAX        ; (199.-YPLT)
+       LSR A
+       LSR A
+       LSR A
+       TAY
+       LDA TABLE1,Y
+       STA $FB
+       LDA TABLE2,Y
+       STA $FC
+       TXA
+       AND #$07
+       CLC
+       ADC $FB
+       STA $FB
+       LDA XPLT
+       AND #$F8
+       ADC $FB
+       STA $FB
+       LDA XPLT+1
+       ADC $FC
+       STA $FC
+       LDA #$A0
+       ADC $FC
+       STA $FC
+       LDA XPLT
+       AND #$07
+       EOR #$07
+       TAX
+       LDA #$01
+PLOTLP DEX
+       BMI PLOT2
+       ASL A
+       BNE PLOTLP
+PLOT2  LDY #0
+       BIT PLTFLG
+       BPL NOPLOT
+       EOR #$FF
+       AND ($FB),Y
+       .BYTE $2C
+NOPLOT ORA ($FB),Y
+       STA ($FB),Y
+       LDA $01     ; BASIC ROM RESTORED
+       ORA #$01
+       STA $01
+       RTS
+;
+TABLE1 .BYTE $00,$40,$80,$C0
+       .BYTE $00,$40,$80,$C0
+       .BYTE $00,$40,$80,$C0
+       .BYTE $00,$40,$80,$C0
+       .BYTE $00,$40,$80,$C0
+       .BYTE $00,$40,$80,$C0,$00
+;
+TABLE2 .BYTE $00,$01,$02,$03
+       .BYTE $05,$06,$07,$08
+       .BYTE $0A,$0B,$0C,$0D
+       .BYTE $0F,$10,$11,$12
+       .BYTE $14,$15,$16,$17
+       .BYTE $19,$1A,$1B,$1C,$1E
+;
+;*****************************************
+;
+; SHADING BY HYBRID DITHER/DOT-GROWTH
+;
+SHADE  LDA XPLT     ; USE BITS -----***
+       AND #$07     ; OF 'X' SCREEN COORD
+       STA TEMP
+       LDA YPLT     ; AND BITS -----***
+       AND #$07     ; OF 'Y' SCREEN COORD
+       ASL A        ; SHIFTED INTO --***---
+       ASL A        ; POSITION TO DETERMINE
+       ASL A        ; 6-BIT OFFSET IN
+       ORA TEMP     ; THRESHOLD TABLE
+       TAX
+       LDA THRESH,X ; SCREEN-POSITION-WEIGHTED
+       CMP VALUE    ; THRESHOLD VALUE
+       BPL GREATR
+       JMP UNPLOT
+GREATR JMP PLOT
+;
+;*****************************************
+;
+; SHADING BY RANDOM HALFTONE
+;
+RSHADE JSR RANDOM
+       LSR A         ; REDUCE RANDOM BYTE
+       LSR A         ; TO 6 BITS FOR SHADE
+       CMP VALUE     ; VALUE COMPARISON
+       BPL MORE
+       JMP UNPLOT
+MORE   JMP PLOT
+;
+;*****************************************
+;
+; PLOT A POINT WEIGHTED BY SHADING SCHEME
+; AND SHADE VALUE
+; CHECK 'NOSCAL' FLAG FOR SCALING OF Y COORD
+; CHECK 'HTORRN' FLAG FOR TYPE OF SHADING
+;
+PLTSHD LDA NOSCAL
+       BEQ NORM
+;
+; SCALE Y FROM 0-239 PSEUDO-COORDINATES
+; TO 0-199 TRUE SCREEN COORDINATES BY
+;     Y = (Y+1)*213/256
+;
+SCALE  LDY YPLT
+       INY
+       STY MLPLER
+       LDA #$D5      ; 213.
+       STA MLPCND
+       JSR MULT      ; RETURN WITH HIGH BYTE
+       STA YPLT      ; IN ACCUMULATOR
+NORM   LDA HTORRN
+       BEQ RPLT
+       JMP SHADE
+RPLT   JMP RSHADE
+;
+;
+;
+THRESH .BYTE $00,$08,$35,$3D
+       .BYTE $02,$0A,$37,$3F
+       .BYTE $10,$18,$25,$2D
+       .BYTE $12,$1A,$27,$2F
+       .BYTE $31,$39,$04,$0C
+       .BYTE $33,$3B,$06,$0E
+       .BYTE $21,$29,$14,$1C
+       .BYTE $23,$2B,$16,$1E
+       .BYTE $03,$0B,$36,$3E
+       .BYTE $01,$09,$34,$3C
+       .BYTE $13,$1B,$26,$2E
+       .BYTE $11,$19,$24,$2C
+       .BYTE $32,$3A,$07,$0F
+       .BYTE $30,$38,$05,$0D
+       .BYTE $22,$2A,$17,$1F
+       .BYTE $20,$28,$15,$1D
+.END</pre>
+            <figcaption>Listing 2. Assembler-Quelltext der Grafik-Utilities</figcaption>
+        </figure>
+        <figure>
+            <pre>; FACET - DRAW SHADED TRIANGULAR FACETS
+; AND STRAIGHT LINES.
+;
+; RICHARD L. RYLANDER   11/4/84
+;
+; LOAD "ARITH.HEX" AND "GRAPH.HEX"
+; BEFORE USING
+;
+ORIGIN = $C26F
+RAM    = $034A
+;
+XPLT   = $033F
+YPLT   = $0341
+NORM   = $C224
+NOSCAL = $0347
+PLOT   = $C143
+UNPLOT = $C146
+;
+MLPCND = $AC
+MLPLER = $AD
+PROD   = $AE
+MULT   = $C011
+;
+DVDND  = $FD
+DVSOR  = $FB
+QUOT   = $FD
+DIVIDE = $C025
+;
+      *=RAM
+;
+XMIN   *=*+2
+YMIN   *=*+1
+XMID   *=*+2
+YMID   *=*+1
+XMAX   *=*+2
+YMAX   *=*+1
+YTOP   *=*+1
+YBOT   *=*+1
+YBASE  *=*+1
+DLTAX1 *=*+2
+DLTAX2 *=*+1
+DLTAX3 *=*+1
+DELTAX *=*+1
+DLTAY1 *=*+1
+DLTAY2 *=*+1
+DLTAY3 *=*+1
+DELTAY *=*+1
+XDIFF  *=*+1
+FLAG1  *=*+1
+FLAG2  *=*+1
+FLAG3  *=*+1
+FLAG   *=*+1
+EDGES  *=*+1
+ERROR  *=*+2
+MODE   *=*+1
+COUNT  *=*+2
+;
+;
+      *=ORIGIN
+;
+;*****************************************
+;
+; SCALE ALL Y COORDINATES FROM 0..239
+; PSUEDO-COORDINATE RANGE TO 0..199
+; TRUE SCREEN COORDINATE RANGE
+;
+SCALE  LDY #6
+       LDA #$D5
+       STA MLPCND
+SCLP   LDA YMIN,Y
+       STA MLPLER
+       JSR MULT
+       STA YMIN,Y
+       DEY
+       DEY
+       DEY
+       BPL SCLP
+       RTS
+;
+;
+;*****************************************
+;
+; EXCHANGE 'MIN' AND 'MID' COORDINATES
+;
+SWAP12 LDY #2
+LOOP1  LDA XMIN,Y
+       PHA
+       LDA XMID,Y
+       STA XMIN,Y
+       PLA
+       STA XMID,Y
+       DEY
+       BPL LOOP1
+       RTS
+;
+;*****************************************
+;
+; EXCHANGE 'MID' AND 'MAX' COORDINATES
+;
+SWAP23 LDY #2
+LOOP2  LDA XMID,Y
+       PHA
+       LDA XMAX,Y
+       STA XMID,Y
+       PLA
+       STA XMAX,Y
+       DEY
+       BPL LOOP2
+       RTS
+;
+;*****************************************
+;
+; SORT COORDINATES ACCORDING TO X COMPONENTS
+;
+SORTX  LDX #2
+SORTLP SEC
+       LDA XMID
+       SBC XMIN
+       LDA XMID+1
+       SBC XMIN+1
+       BCS NOSWP1
+       JSR SWAP12
+NOSWP1 DEX
+       BEQ SORTED
+       SEC
+       LDA XMAX
+       SBC XMID
+       LDA XMAX+1
+       SBC XMID+1
+       BCS SORTLP
+       JSR SWAP23
+       JMP SORTLP
+SORTED RTS
+;
+;*****************************************
+;
+; DRAW A LINE BETWEEN XMIN,YMIN AND XMID,YMID
+; USING FAST DDA (DIGITAL DIFFERENTIAL ANALYZER)
+; TECHNIQUE
+;
+LINE   LDA #2        ; ENSURE XMAX IS
+       STA XMAX+1    ; LARGEST BEFORE
+       JSR SORTX     ; ORDERING 'MIN' AND 'MID'
+       LDA NOSCAL
+       BEQ OUTLN
+       JSR SCALE
+OUTLN  JSR FINDXY    ; ENTRY POINT TO
+       LDA XMIN       ; OUTLINE FACETS
+       STA XPLT
+       LDA XMIN+1
+       STA XPLT+1
+       LDA YMIN
+       STA YPLT
+       LDA DLTAX1+1  ; CHECK FOR DX&gt;DY
+       BNE STEPX
+       SEC
+       LDA DLTAX1
+       SBC DLTAY1
+       BCS STEPX
+STEPY  LDA DLTAY1
+       STA ERROR
+       STA COUNT
+       LSR ERROR
+       SEC
+       LDA DLTAX1
+       SBC ERROR
+       STA ERROR
+       LDA DLTAX1+1
+       SBC #0
+       STA ERROR+1
+       INC COUNT
+LNLP1  LDA MODE      ; 0 = DRAW, 1 = ERASE
+       BNE ERASE1
+       JSR PLOT
+       JMP SK1
+ERASE1 JSR UNPLOT
+SK1    LDA FLAG1     ; 0 = POSITIVE SLOPE
+       BNE NSLOPE
+       INC YPLT
+       BNE SK2     ; ALWAYS BRANCH
+NSLOPE DEC YPLT
+SK2    BIT ERROR+1
+       BMI SK3
+       INC XPLT
+       BNE NOINC1
+       INC XPLT+1
+NOINC1 SEC
+       LDA ERROR
+       SBC DLTAY1
+       STA ERROR
+       LDA ERROR+1
+       SBC #0
+       STA ERROR+1
+SK3    CLC
+       LDA ERROR
+       ADC DLTAX1
+       STA ERROR
+       LDA ERROR+1
+       ADC DLTAX1+1
+       STA ERROR+1
+       DEC COUNT
+       BNE LNLP1
+       RTS
+;
+STEPX  LDA DLTAX1
+       STA ERROR
+       STA COUNT
+       LDA DLTAX1+1
+       STA ERROR+1
+       STA COUNT+1
+       LSR ERROR+1
+       ROR ERROR
+       SEC
+       LDA DLTAY1
+       SBC ERROR
+       STA ERROR
+       LDA #0
+       SBC ERROR+1
+       STA ERROR+1
+LNLP2  LDA MODE
+       BNE ERASE2
+       JSR PLOT
+       JMP SKP1
+ERASE2 JSR UNPLOT
+SKP1   INC XPLT
+       BNE NOINC2
+       INC XPLT+1
+NOINC2 BIT ERROR+1
+       BMI SKP3
+       LDA FLAG1
+       BNE NGSLP
+       INC YPLT
+       BNE SKP2    ; ALWAYS BRANCH
+NGSLP  DEC YPLT
+SKP2   SEC
+       LDA ERROR
+       SBC DLTAX1
+       STA ERROR
+       LDA ERROR+1
+       SBC DLTAX1+1
+       STA ERROR+1
+SKP3   CLC
+       LDA ERROR
+       ADC DLTAY1
+       STA ERROR
+       LDA ERROR+1
+       ADC #0
+       STA ERROR+1
+       SEC
+       LDA COUNT
+       SBC #1
+       STA COUNT
+       BCS TEST
+       DEC COUNT+1
+TEST   BIT COUNT+1
+       BPL LNLP2
+       RTS
+;
+;*****************************************
+; DRAW A SHADED VERTICAL LINE AT
+; XPLT FROM YTOP TO YBOT
+;
+VLINE  SEC         ; MAKE SURE YTOP&gt;YBOT
+       LDA YTOP
+       SBC YBOT
+       BCS DRAW
+       LDA YTOP
+       PHA
+       LDA YBOT
+       STA YTOP
+       PLA
+       STA YBOT
+DRAW   LDA YTOP
+       STA YPLT
+       JSR NORM    ; PLOT A SHADE-WEIGHTED
+       LDA YTOP    ; PIXEL CHECKING ONLY
+       CMP YBOT    ; FOR SHADE STYLE
+       BEQ DONE
+       DEC YTOP
+       JMP DRAW
+DONE   RTS
+;
+;*****************************************
+;
+; FIND ENDPOINTS FOR VERTICAL LINES
+; BETWEEN FACET EDGES
+;
+ENDPTS LDA XDIFF
+       STA MLPCND
+       LDA DELTAY
+       STA MLPLER
+       JSR MULT
+       STA DVDND+1
+       LDA PROD
+       STA DVDND
+       LDA #0
+       STA DVSOR+1
+       LDA DELTAX
+       STA DVSOR
+       JSR DIVIDE
+       LDA FLAG
+       BNE NEGSLP
+       CLC
+       LDA YBASE
+       ADC QUOT
+       BCC SKIP2
+NEGSLP SEC
+       LDA YBASE
+       SBC QUOT
+SKIP2  RTS
+;
+;*****************************************
+;
+; FIND COORDINATE DIFFERENCES
+;
+; ALL "DELTA X" VALUES POSITIVE,
+; SINGLE PRECISION (JUST LOWER BYTE)
+;
+FINDXY SEC
+       LDA XMID
+       SBC XMIN
+       STA DLTAX1
+       LDA XMID+1
+       SBC XMIN+1
+       STA DLTAX1+1
+       SEC
+       LDA XMAX
+       SBC XMID
+       STA DLTAX2
+       SEC
+       LDA XMAX
+       SBC XMIN
+       STA DLTAX3
+;
+; USE ABS(DELTA Y) VALUES,
+; FLAGS INDICATE SLOPE OF LIMIT LINES
+;
+       LDA #$00
+       STA FLAG1
+       STA FLAG2
+       STA FLAG3
+       SEC
+       LDA YMID
+       SBC YMIN
+       BCS STORE1
+       INC FLAG1
+       LDA YMIN
+       SBC YMID
+STORE1 STA DLTAY1
+       SEC
+       LDA YMAX
+       SBC YMID
+       BCS STORE2
+       INC FLAG2
+       LDA YMID
+       SBC YMAX
+STORE2 STA DLTAY2
+       SEC
+       LDA YMAX
+       SBC YMIN
+       BCS STORE3
+       INC FLAG3
+       LDA YMIN
+       SBC YMAX
+STORE3 STA DLTAY3
+       RTS
+;
+;*****************************************
+;
+; DRAW A SHADED TRIANGULAR FACET
+;
+FACET  JSR SORTX
+       LDA NOSCAL
+       BEQ YSOK
+       JSR SCALE
+YSOK   JSR FINDXY
+       LDA XMIN
+       STA XPLT
+       LDA XMIN+1
+       STA XPLT+1
+FCETLP SEC
+       LDA XPLT
+       SBC XMIN
+       STA XDIFF
+       LDA DLTAX1
+       BEQ CONT
+       STA DELTAX
+       LDA DLTAY1
+       STA DELTAY
+       LDA FLAG1
+       STA FLAG
+       LDA YMIN
+       STA YBASE
+       JSR ENDPTS
+       STA YTOP
+       LDA DLTAX3
+       BEQ CONT
+       STA DELTAX
+       LDA DLTAY3
+       STA DELTAY
+       LDA FLAG3
+       STA FLAG
+       JSR ENDPTS
+       STA YBOT
+       JSR VLINE
+       LDA XPLT+1
+       CMP XMID+1
+       BNE NEXTX1
+       LDA XPLT
+       CMP XMID
+       BEQ CONT
+NEXTX1 INC XPLT
+       BNE SKIP3
+       INC XPLT+1
+SKIP3  JMP FCETLP
+CONT   SEC
+       LDA XPLT
+       SBC XMIN
+       STA XDIFF
+       LDA DLTAX3
+       BEQ FINI
+       STA DELTAX
+       LDA DLTAY3
+       STA DELTAY
+       LDA FLAG3
+       STA FLAG
+       LDA YMIN
+       STA YBASE
+       JSR ENDPTS
+       STA YBOT
+       SEC
+       LDA XPLT
+       SBC XMID
+       STA XDIFF
+       LDA DLTAX2
+       BEQ FINI
+       STA DELTAX
+       LDA DLTAY2
+       STA DELTAY
+       LDA FLAG2
+       STA FLAG
+       LDA YMID
+       STA YBASE
+       JSR ENDPTS
+       STA YTOP
+       JSR VLINE
+       LDA XPLT+1
+       CMP XMAX+1
+       BNE NEXTX2
+       LDA XPLT
+       CMP XMAX
+       BEQ FINI
+NEXTX2 INC XPLT
+       BNE SKIP4
+       INC XPLT+1
+SKIP4  JMP CONT
+FINI   LDA EDGES
+       BEQ FINISH
+       JSR OUTLN
+       JSR SWAP23
+       JSR OUTLN
+       JSR SWAP12
+       JSR SWAP23
+       JSR SWAP12
+       JSR OUTLN
+FINISH RTS
+.END</pre>
+            <figcaption>Listing 3. Assembler-Quelltext zum Zeichnen von Linien und Dreiecken</figcaption>
+        </figure>
+        <figure>
+            <pre>; PRIMITIVE SOLID SHAPE DRAWING
+;
+; RICHARD L. RYLANDER   11/7/84
+;
+; LOAD ARITHMETIC AND GRAPHIC UTILITIES FIRST
+;
+;*****************************************
+RAM=$036A
+ORIGIN=$C5EA
+;
+MLPCND=$AC     ; MULTIPLICAND (S)
+MLPLER=$AD     ; MULTIPLIER (S)
+PROD=$AE      ; PRODUCT (D)
+MULT=$C011    ; CALL FOR MULTIPLY
+;
+DVDND=$FD     ; DIVIDEND (D)
+DVSOR=$FB     ; DIVISOR (D)
+QUOT=$FD      ; QUOTIENT (D)
+DIVIDE=$C025  ; CALL FOR DIVIDE
+;
+ARG=$AC       ; ARGUMENT (S)
+SQR=$AE       ; SQUARE OF ARG (D)
+SQUARE=$C004  ; CALL FOR SQUARE
+;
+RADCND=$AC    ; RADICAND (D)
+ROOT=$033C    ; SQUARE ROOT (S)
+SQRT=$C064    ; CALL FOR SQRT
+;
+RNDM=$C000    ; RANDOM NUMBER
+RANDOM=$C0C8  ; CALL FOR RANDOM
+; NOTE - A CALL TO 'RANDOM' LEAVES A RANDOM BYTE
+; IN THE ACCUMULATOR
+;
+XPLT=$033F
+YPLT=$0341
+NORM=$C224
+PLTSHD=$C20F
+VALUE=$0344   ; FINAL NORMALIZED SHADE VALUE
+HTORRN=$0346  ; SHADE FLAG, 1=HALFTONE
+NOSCAL=$0347  ; SCALE FLAG, 1=NO SCALE
+;
+       *=RAM
+XCENT  *=*+2  ; CENTER COORD
+XREL   *=*+1  ; RELATIVE (TO CENTER)
+XSHD   *=*+2  ; USED IN SHADE CALC
+YCENT  *=*+1  ; CENTER COORD
+YREL   *=*+1  ; RELATIVE (TO CENTER)
+YSHD   *=*+2  ; USED IN SHADE CALC
+ZREL   *=*+2  ; RELATIVE (TO CENTER)
+ZWX    *=*+2  ; Z WITH X (+ OR -)
+;
+RADIUS *=*+2  ; LOCAL RADIUS OF SURFACE
+TONE   *=*+2  ; USED IN SHADE CALC
+TNTMP  *=*+2  ; USED IN SHADE CALC
+;
+CLIPL  *=*+1  ; LEFT CLIPPING BOUND
+CLIPR  *=*+1  ; RIGHT CLIPPING BOUND
+CLIPU  *=*+1  ; UP CLIPPING BOUND
+CLIPD  *=*+1  ; DOWN CLIPPING BOUND
+;
+HEMI   *=*+1  ; PLOTTING HEMISPHERE
+;
+BAKLIT *=*+1  ; BACKLIT FLAG
+HVFLAG *=*+1  ; HORIZONTAL/VERTICAL FLAG
+TEMP   *=*+2  ; TEMPORARY STORAGE
+CNTX   *=*+1   ; LOOP COUNTER
+CNTY   *=*+1   ; LOOP COUNTER
+MAX    *=*+1   ; LOOP LIMIT
+;
+HLEN   *=*+1   ; HALF-LENGTH OF CYLINDERS
+RS     *=*+2   ; SQUARE OF TOROID RADIUS
+RT     *=*+1   ; TOROID (RING) RADIUS
+RC     *=*+1   ; CENTER RADIUS OF TOROID
+RO     *=*+1   ; OUTER RADIUS OF TOROID
+RI     *=*+1   ; INNER RADIUS OF TOROID
+XSQR   *=*+2
+XMAX   *=*+1
+;
+R0=HLEN
+;
+       *=ORIGIN
+;*****************************************
+;
+; DIVIDE WITH SINGLE PRECISION DIVISOR
+; (USED OFTEN IN SHAPE ROUTINES)
+;
+SDIV   LDA #0
+       STA DVSOR+1
+       JMP DIVIDE
+;
+;*****************************************
+;
+; CALCULATE SHADE VALUE (0-63) BY
+; MULTIPLYING 'TONE' BY 26 THEN
+; DIVIDE RESULT BY RADIUS OF SURFACE
+;
+GETVAL BIT TONE+1
+       BPL CNTNU   ; IF 'TONE'&lt;0, THEN
+       LDA BAKLIT  ; MAKE VALUE 0 OR ABS(TONE)
+       BNE NEGATE  ; DEPENDING ON BAKLIT FLAG
+       STA VALUE
+       RTS
+NEGATE SEC
+       LDA #$00
+       SBC TONE
+       STA TONE
+CNTNU  LDA TONE
+       STA MLPCND
+       LDA #$1A
+       STA MLPLER
+       JSR MULT
+       STA DVDND+1
+       LDA PROD
+       STA DVDND
+       LDA RADIUS
+       STA DVSOR
+       JSR SDIV
+       LDA QUOT
+       STA VALUE
+       RTS
+;
+;*****************************************
+;
+; POINT PLOTTING BY QUADRANTS USING
+; THE FOUR-FOLD SYMMETRY OF SIMPLE OBJECTS
+;
+; DEPENDING ON STATUS OF 'HVFLAG', EXCHANGE
+; X AND Y COORDINATES TO ROTATE OBJECTS 90 DEG
+; SINGLE SHAPE ROUTINE CAN THEN BE USED TO
+; DRAW 'HORIZONTAL' OR 'VERTICAL' VERSIONS
+; OF AN OBJECT
+;
+; THE FOLOWING IS A 'BASIC SUBROUTINE'
+; EQUIVALENT TO EXPLAIN ITS OPERATION
+;
+; NOTE THAT LABELS ARE USED IN PLACE OF
+; LINE NUMBERS
+;
+; 'PTPLOT' IF HVFLAG&lt;0 THEN GOTO 'NOROT'
+;          (STACK)=XREL:XREL=YREL:YREL=(STACK)
+;          (STACK)=XSHD:XSHD=YSHD:YSHD=(STACK)
+; 'NOROT'  GOSUB 'GETZ'
+;          REM CALCULATE 2*Z FROM X,Y AND RADIUS
+;          HEMI = 1
+;          IF XREL&gt;CLIPL THEN GOTO 'RHEMI'
+;          ZWX=2*Z-XSHD
+;          XPLT=XCENT-XREL:REM LEFT HEMISPHERE
+; 'CHCLUP' IF YREL&gt;CLIPU THEN GOTO 'DHEMI'
+;          TONE=ZWX+YSHD
+;          GOSUB 'GETVAL':REM NORMALIZE SHADE VAL
+;          YPLT=YCENT+YREL
+;          GOSUB 'PLTSHD':REM PLOT OR UNPLOT
+;          REM   POINTS WEIGHTED BY SHADE VALUE
+; 'DHEMI'  IF YREL&gt;CLIPD THEN GOTO 'RHEMI'
+;          TONE=ZWX-YSHD
+;          GOSUB 'GETVAL'
+;          YPLT=YCENT-YREL
+;          GOSUB 'PLTSHD'
+; 'RHEMI'  IF HEMI=0 THEN RETURN
+;          HEMI=0
+;          IF XREL&gt;CLIPR THEN RETURN
+;          ZWX=2*Z+XSHD
+;          XPLT=XCENT+XREL
+;          GOSUB 'CHCLUP'
+;          RETURN
+;
+PTPLOT BIT HVFLAG
+       BPL NOROT
+       LDA XREL
+       PHA
+       PHA
+       LDA YREL
+       STA XREL
+       PLA
+       STA YREL
+       LDA XSHD
+       PHA
+       PHA
+       LDA YSHD
+       STA XSHD
+       PLA
+       STA YSHD
+       LDA XSHD+1
+       PHA
+       PHA
+       LDA YSHD+1
+       STA XSHD+1
+       PLA
+       STA YSHD+1
+NOROT  JSR GETZ
+PTPLT2 LDA #$01
+       STA HEMI
+       SEC
+       LDA CLIPL  ; CHECK LEFT HEMISPHERE
+       CMP XREL
+       BCC RHEMI
+       SEC
+       LDA ROOT
+       SBC XSHD
+       STA ZWX
+       LDA ROOT+1
+       SBC XSHD+1
+       STA ZWX+1
+       SEC
+       LDA XCENT
+       SBC XREL
+       STA XPLT
+       LDA XCENT+1
+       SBC #$00
+       STA XPLT+1
+;
+CHCLUP SEC
+       LDA CLIPU  ; CHECK FOR UP CLIPPING
+       CMP YREL
+       BCC DHEMI
+       CLC
+       LDA ZWX
+       ADC YSHD
+       STA TONE
+       LDA ZWX+1
+       ADC YSHD+1
+       STA TONE+1
+       JSR GETVAL
+       CLC
+       LDA YCENT
+       ADC YREL
+       STA YPLT
+       JSR PLTSHD
+;
+DHEMI  SEC
+       LDA CLIPD  ; CHECK FOR DOWN CLIPPING
+       CMP YREL
+       BCC RHEMI
+       SEC
+       LDA ZWX
+       SBC YSHD
+       STA TONE
+       LDA ZWX+1
+       SBC YSHD+1
+       STA TONE+1
+       JSR GETVAL
+       SEC
+       LDA YCENT
+       SBC YREL
+       STA YPLT
+       JSR PLTSHD
+;
+RHEMI  LDA HEMI
+       BEQ PLDONE
+       DEC HEMI
+       SEC
+       LDA CLIPR  ; CHECK FOR RIGHT CLIPPING
+       CMP XREL
+       BCC PLDONE
+       CLC
+       LDA ROOT
+       ADC XSHD
+       STA ZWX
+       LDA ROOT+1
+       ADC XSHD+1
+       STA ZWX+1
+       CLC
+       LDA XCENT
+       ADC XREL
+       STA XPLT
+       LDA XCENT+1
+       ADC #$00
+       STA XPLT+1
+       JMP CHCLUP
+PLDONE BIT HVFLAG
+       BPL NORSTR
+       LDA XSHD+1    ; RESTORE COORDS
+       STA YSHD+1
+       PLA
+       STA XSHD+1
+       LDA XSHD
+       STA YSHD
+       PLA
+       STA XSHD
+       LDA XREL
+       STA YREL
+       PLA
+       STA XREL
+NORSTR RTS
+;
+;*****************************************
+;
+; CALCULATE Z FROM LOCAL X,Y BY
+; PYTHAGOREAN SUM
+;
+GETZ   LDA RADIUS
+       STA ARG
+       JSR SQUARE
+       STA TNTMP+1
+       LDA SQR
+       STA TNTMP
+       LDA XSHD
+       STA ARG
+       JSR SQUARE
+       SEC
+       LDA TNTMP
+       SBC SQR
+       STA TNTMP
+       LDA TNTMP+1
+       SBC SQR+1
+       STA TNTMP+1
+       LDA YSHD
+       STA ARG
+       JSR SQUARE
+       SEC
+       LDA TNTMP
+       SBC SQR
+       STA RADCND
+       LDA TNTMP+1
+       SBC SQR+1
+       STA RADCND+1
+       BMI ZEROOT
+       JSR SQRT
+       ASL ROOT
+       ROL ROOT+1
+       RTS
+ZEROOT LDA #$00
+       STA ROOT
+       STA ROOT+1
+       RTS
+;
+;*****************************************
+;
+; SET UP PARAMETERS FOR TOROIDS
+;
+; RT=(RO-RI)/2   RS=RT*RT   RC=RT+RI
+;
+TPARM  LDA RO
+       SEC
+       SBC RI
+       LSR A
+       STA RT
+       STA RADIUS
+       CLC
+       ADC RI
+       STA RC
+       LDA RT
+       STA ARG
+       JSR SQUARE
+       LDA SQR
+       STA RS
+       LDA SQR+1
+       STA RS+1
+       LDA #0
+       STA CNTX
+       RTS
+;
+;*****************************************
+;
+; DRAW A SHADED SPHERE
+;
+; 'BASIC SUBROUTINE' EQUIVALENT
+;
+; 'SPHERE' FOR CNTX=0 TO RADIUS/SQR(2)
+;          XREL=CNTX:XSHD=CNTX
+;          FOR CNTY=CNTX TO SQR(RAD*RAD-CNTX*CNTX)
+;          YREL=CNTY:YSHD=CNTY
+;          HVFLAG=0
+;          GOSUB 'PTPLOT'
+;          REM EXCHANGE X & Y TO USE 8-FOLD SYM
+;          HVFLAG=-128
+;
+;          GOSUB 'PTPLOT'
+;          NEXT CNTY
+;          NEXT CNTX
+;          RETURN
+;
+;
+SPHERE LDA RADIUS
+       STA ARG
+       JSR SQUARE
+       ASL SQR
+       ROL SQR+1
+       LDA SQR
+       STA RADCND
+       LDA SQR+1
+       STA RADCND+1
+       JSR SQRT
+       LSR ROOT+1
+       ROR ROOT
+       LDA ROOT
+       STA XMAX
+       LDA #$00
+       STA CNTX
+       STA XSHD+1
+       STA YSHD+1
+       LDA RADIUS
+       STA ARG
+       JSR SQUARE
+       STA TEMP+1
+       LDA SQR
+       STA TEMP
+LOOPX  LDA CNTX
+       STA CNTY
+       STA ARG
+       STA XREL
+       STA XSHD
+       JSR SQUARE
+       SEC
+       LDA TEMP
+       SBC SQR
+       STA RADCND
+       LDA TEMP+1
+       SBC SQR+1
+       STA RADCND+1
+       JSR SQRT
+       LDA ROOT
+       STA MAX
+LOOPY  LDA CNTY
+       STA YREL
+       STA YSHD
+       LDA #0
+       STA HVFLAG
+       JSR PTPLOT
+       LDA #$80
+       STA HVFLAG
+       JSR PTPLOT
+       LDA CNTY
+       CMP MAX
+       BEQ DONEY
+       INC CNTY
+       JMP LOOPY
+DONEY  LDA CNTX
+       CMP XMAX
+       BEQ DONE
+       INC CNTX
+       JMP LOOPX
+DONE   RTS
+;
+;*****************************************
+;
+; DRAW SHADED CYLINDERS
+;
+; 'BASIC SUBROUTINE' EQUIVALENT
+;
+; 'CYLNDR' XSHD=0
+;          FOR YREL=RADIUS TO 0
+;          YSHD=YREL
+;          FOR XREL=HLEN TO 0
+;          GOSUB 'PTPLOT'
+;          NEXT XREL
+;          NEXT YREL
+;          RETURN
+;
+CYLNDR LDA #0
+       STA XSHD
+       STA XSHD+1
+       STA YSHD+1
+       LDA RADIUS
+       STA YREL
+CYLOOP LDA HLEN
+       STA XREL
+       LDA YREL
+       STA YSHD
+CXLOOP JSR PTPLOT
+       DEC XREL
+       BPL CXLOOP
+       DEC YREL
+       BPL CYLOOP
+       RTS
+;
+;*****************************************
+;
+; DRAW EDGE-VIEW TOROIDS
+;
+; 'BASIC SUBROUTINE' EQUIVALENT
+;
+; 'EDGTOR' GOSUB 'TPARM':REM SET UP RADII
+;          FOR CNTX=0 TO RT
+;          XREL=CNTX:XSHD=CNTX
+;          R0=SQR(RT*RT-CNTX*CNTX)
+;          FOR CNTY=0 TO R0+RC
+;          YREL=CNTY
+;          YSHD=(R0*CNTY)/(R0+RC)
+;          GOSUB 'PTPLOT'
+;          NEXT CNTY
+;          NEXT CNTX
+;          RETURN
+;
+EDGTOR JSR TPARM
+       LDA #$00
+       STA XSHD+1
+       STA YSHD+1
+LOOPX4 LDA CNTX
+       STA XREL
+       STA XSHD
+       STA ARG
+       JSR SQUARE
+       SEC
+       LDA RS
+       SBC SQR
+       STA RADCND
+       LDA RS+1
+       SBC SQR+1
+       STA RADCND+1
+       JSR SQRT
+       LDA ROOT
+       STA R0
+       CLC
+       ADC RC
+       STA MAX
+       LDA #$00
+       STA CNTY
+LOOPY4 LDA CNTY
+       STA YREL
+       STA MLPLER
+       LDA R0
+       STA MLPCND
+       JSR MULT
+       STA DVDND+1
+       LDA PROD
+       STA DVDND
+       LDA MAX
+       STA DVSOR
+       JSR SDIV
+       LDA QUOT
+       STA YSHD
+       JSR PTPLOT
+       LDA CNTY
+       CMP MAX
+       BEQ DONE4
+       INC CNTY
+       JMP LOOPY4
+DONE4  LDA CNTX
+       CMP RT
+       BEQ DONEHT
+       INC CNTX
+       JMP LOOPX4
+DONEHT RTS
+;
+;*****************************************
+;
+; DRAW A SHADED, TOP-VIEW TOROID
+;
+; 'BASIC SUBROUTINE' EQUIVALENT
+;
+; 'TOROID' GOSUB 'TPARM'
+;          FOR CNTX=0 TO RO/SQR(2)
+;          REM 8-FOLD SYMMETRY USED
+;          XREL=CNTX
+;          MAX=SQR(RO*RO-CNTX*CNTX)
+;          IF CNTX&gt;RI THEN GOTO 'GRTR'
+;          CNTY=SQR(RI*RI-CNTY*CNTY)
+;          GOTO 'LLPY1'
+; 'GRTR'   CNTY=CNTX
+; 'LLPY1'  YREL=CNTY
+;          R0=SQR(CNTY*CNTY+CNTX*CNTX)
+;          XSHD=CNTX-(CNTX*RC)/R0
+;          YSHD=CNTY-(CNTY*RC)/R0
+;          HVFLAG=0:GOSUB 'PTPLOT'
+;          HVFLAG=-128:GOSUB 'PTPLOT'
+;          IF CNTY=MAX THEN GOTO 'DDNY1'
+;          CNTY=CNTY+1
+;          GOTO 'LLPY1'
+; 'DDNY1'  NEXT CNTX
+;          RETURN
+;
+TOROID JSR TPARM
+       LDA RO
+       STA ARG
+       JSR SQUARE
+       ASL SQR
+       ROL SQR+1
+       LDA SQR
+       STA RADCND
+       LDA SQR+1
+       STA RADCND+1
+       JSR SQRT
+       LSR ROOT+1
+       ROR ROOT
+       LDA ROOT
+       STA XMAX
+LLPX1  LDA CNTX
+       STA XREL
+       STA ARG
+       JSR SQUARE
+       STA XSQR+1
+       LDA SQR
+       STA XSQR
+       LDA RO
+       STA ARG
+       JSR SQUARE
+       SEC
+       LDA SQR
+       SBC XSQR
+       STA RADCND
+       LDA SQR+1
+       SBC XSQR+1
+       STA RADCND+1
+       JSR SQRT
+       LDA ROOT
+       STA MAX
+       SEC
+       LDA RI
+       SBC CNTX
+       BCC GRTR
+       LDA RI
+       STA ARG
+       JSR SQUARE
+       SEC
+       LDA SQR
+       SBC XSQR
+       STA RADCND
+       LDA SQR+1
+       SBC XSQR+1
+       STA RADCND+1
+       JSR SQRT
+       LDA ROOT
+       STA CNTY
+       JMP LLPY1
+GRTR   LDA CNTX
+       STA CNTY
+LLPY1  LDA CNTY
+       STA YREL
+       STA ARG
+       JSR SQUARE
+       CLC
+       LDA SQR
+       ADC XSQR
+       STA RADCND
+       LDA SQR+1
+       ADC XSQR+1
+       STA RADCND+1
+       JSR SQRT
+       LDA ROOT
+       STA R0
+       STA DVSOR
+       LDA CNTX
+       STA MLPLER
+       LDA RC
+       STA MLPCND
+       JSR MULT
+       STA DVDND+1
+       LDA PROD
+       STA DVDND
+       JSR SDIV
+       SEC
+       LDA CNTX
+       SBC QUOT
+       STA XSHD
+       LDA #$00
+       SBC QUOT+1
+       STA XSHD+1
+       LDA CNTY
+       STA MLPLER
+       LDA RC
+       STA MLPCND
+       JSR MULT
+       STA DVDND+1
+       LDA PROD
+       STA DVDND
+       LDA R0
+       STA DVSOR
+       JSR SDIV
+       SEC
+       LDA CNTY
+       SBC QUOT
+       STA YSHD
+       LDA #$00
+       STA HVFLAG
+       SBC QUOT+1
+       STA YSHD+1
+       JSR PTPLOT
+       LDA #$80
+       STA HVFLAG
+       JSR PTPLOT
+       LDA CNTY
+       CMP MAX
+       BEQ DDNY1
+       INC CNTY
+       JMP LLPY1
+DDNY1  LDA CNTX
+       CMP XMAX
+       BEQ DUNTOR
+       INC CNTX
+       JMP LLPX1
+DUNTOR RTS
+;
+;*****************************************
+;
+; DRAW "INSIDE VIEW" TOROIDS
+;
+; 'BASIC SUBROUTINE' EQUIVALENT
+;
+; 'SPOOL'  GOSUB 'TPARM'
+;          FOR CNTX=0 TO RT
+;          XREL=CNTX:XSHD=CNTX
+;          MAX=RC-SQR(RS-CNTX*CNTX)
+;          FOR CNTY=0 TO MAX
+;          YREL=CNTY
+;          YSHD=(RC*CNTY/MAX)-CNTY
+;          GOSUB 'PTPLOT'
+;          NEXT CNTY
+;          NEXT CNTX
+;          RETURN
+;
+SPOOL  JSR TPARM
+LLPX2  LDA CNTX
+       STA XREL
+       STA ARG
+       SEC
+       LDA #$00
+       SBC CNTX
+       STA XSHD
+       LDA #$00
+       SBC #$00
+       STA XSHD+1
+       JSR SQUARE
+       SEC
+       LDA RS
+       SBC SQR
+       STA RADCND
+       LDA RS+1
+       SBC SQR+1
+       STA RADCND+1
+       JSR SQRT
+       SEC
+       LDA RC
+       SBC ROOT
+       STA MAX
+       LDA #$00
+       STA CNTY
+LLPY2  LDA CNTY
+       STA YREL
+       STA MLPLER
+       LDA RC
+       STA MLPCND
+       JSR MULT
+       STA DVDND+1
+       LDA PROD
+       STA DVDND
+       LDA MAX
+       STA DVSOR
+       JSR SDIV
+       LDA QUOT
+       SEC
+       SBC CNTY
+       STA YSHD
+       LDA QUOT+1
+       SBC #$00
+       STA YSHD+1
+       JSR PTPLOT
+       LDA CNTY
+       CMP MAX
+       BEQ DDNY2
+       INC CNTY
+       JMP LLPY2
+DDNY2  LDA CNTX
+       CMP RT
+       BEQ DUNHSP
+       INC CNTX
+       JMP LLPX2
+DUNHSP RTS
+.END</pre>
+            <figcaption>Listing 4. Assembler-Quelltext zum Zeichnen ausgefüllter Flächen, sogenannter Shapes</figcaption>
+        </figure>
+        <figure>
+            <pre>; INTERFACE - EASY PARAMETER SETTING FOR SHAPE
+; DRAWING ROUTINES FROM BASIC.
+;
+; RICHARD L. RYLANDER  11/23/84
+;
+;****************************************
+ORIGIN=$CAC8
+RAM   =$0393
+;
+; PARAMETER LOCATIONS FOR VARIOUS SHAPES
+;
+XCENT =$036A
+YCENT =$036F
+XPLOT =$033F
+YPLOT =$0341
+XMIN  =$034A
+YMIN  =$034C
+XMID  =$034D
+YMID  =$034F
+XMAX  =$0350
+YMAX  =$0352
+RADIUS =$0377
+HLEN  =$0389
+RI    =$038F
+RO    =$038E
+;
+HVFLAG =$0383
+VALUE =$0344
+PLTFLG =$033E
+;
+DEFLAG =$FB
+;
+;****************************************
+;
+; FUNCTION LOCATIONS
+;
+GRFON =$C0E2      ; SWITCH TO GRAPHICS MODE
+GRFOFF =$C103      ; RETURN TO TEXT DISPLAY
+;
+CLEARR=$C12C       ; CLEAR BITMAP
+CLRBYT=$C135       ; CLEAR (FILL) BYTE
+COLORR=$C118       ; LOAD COLOR MAP
+COLBYT=$C119       ; COLOR BYTE
+;
+PLOTR =$C14B      ; POINT PLOT ROUTINE
+LINER =$C2DB       ; DRAW A LINE
+FACETR =$C4E1       ; DRAW A SHADED FACET
+;
+;****************************************
+;
+; SHADED SHAPE DRAWING ROUTINES
+;
+SPHERR=$C7C7       ; SPHERE
+CYLNDR=$C864       ; CYLINDER
+TORUSR=$C90F       ; TOP-VIEW TOROID
+EDGTOR=$C88F       ; EDGE-VIEW TOROID
+SPOOLR=$CA3B       ; INSIDE-VIEW TOROID
+;
+;****************************************
+;
+; BASIC ROM ROUTINES
+;
+CHKCOM=$AEFD       ; CHECK FOR COMMA
+EVAEXP=$AD9E       ; EVALUATE EXPRESSION
+FLTFIX=$B1AA       ; CONVERT TO FIXED
+;
+*=RAM
+LINFAC *=*+1       ; LINE OR FACET FLAG
+;
+*=ORIGIN
+;
+;****************************************
+;
+; GET PARAMETERS FROM BASIC CALLING STATEMENT
+; OF THE FORM:
+; SYS(FNCTN),PARAM1,PARAM2,PARAM3[OPT]
+; WHERE THE THIRD PARAMETER (FOR EXAMPLE)
+; MAY BE OPTIONAL (A DEFAULT VALUE IS USED
+; IF THE PARAMETER IS NOT SPECIFIED)
+;
+GETNUM JSR CHKCOM   ; LOOK FOR COMMA
+       JSR EVAEXP   ; EVALUATE EXPRESSION
+       JSR FLTFIX   ; CHANGE TO INTEGER WITH
+; HIGH BYTE IN "A" AND LOW BYTE IN "Y"
+       RTS
+;
+; CHECK FOR ADDITIONAL (OPTIONAL) PARAMETERS
+;
+PCHECK LDA #$2C     ; "," COMMA
+       LDY #0
+       STY DEFLAG
+       CMP ($7A),Y
+       BNE NOMORE   ; NO COMMA - USE DEFAULT
+       JMP $0073
+NOMORE LDY #$80
+       STY DEFLAG
+       RTS
+;
+; GET TWO ADDITIONAL PARAMETERS FOR TOROIDS
+;
+GETTWO JSR PCHECK
+       BIT DEFLAG
+       BMI DFAULT
+       JSR EVAEXP
+       JSR FLTFIX
+       STY RI
+       JSR GETNUM
+       STY RO
+DFAULT RTS
+;
+;****************************************
+;
+; SET CENTER COORDINATES
+;
+CENTER JSR GETNUM
+       STY XCENT
+       STA XCENT+1
+       JSR GETNUM
+       STY YCENT
+       RTS
+;
+;****************************************
+;
+; CLEAR THE BITMAP, FILLING WITH (OPTIONAL)
+; FILL VALUE SPECIFIED OR WITH (DEFAULT) "0"
+;
+CLEAR2 JSR PCHECK
+       BIT DEFLAG
+       BMI DEFCLR
+       JSR EVAEXP
+       JSR FLTFIX
+       .BYTE $2C
+DEFCLR LDY #0
+       STY CLRBYT
+       JMP CLEARR
+;
+;****************************************
+;
+; FILL COLOR MAP WITH (OPTIONAL) COLOR BYTE
+; SPECIFIED OR WITH (DEFAULT) "$01"
+; (BLACK DOTS ON WHITE BACKGROUND)
+;
+COLOR2 JSR PCHECK
+       BIT DEFLAG
+       BMI DEFCOL
+       JSR EVAEXP
+       JSR FLTFIX
+       .BYTE $2C
+DEFCOL LDY #$01
+       STY COLBYT
+       JMP COLORR
+;
+;****************************************
+;
+; PLOT OR UNPLOT POINTS
+;
+PLOT2  LDA #0
+       .BYTE $2C
+UNPLT2 LDA #$80
+       STA PLTFLG
+       JSR GETNUM
+       STY XPLOT
+       STA XPLOT+1
+       JSR GETNUM
+       STY YPLOT
+       JMP PLOTR
+;
+;****************************************
+;
+; DRAW LINES BETWEEN (X1,Y1) AND (X2,Y2)
+; OR SHADED FACETS BETWEEN THREE POINTS
+; (X1,Y1), (X2,Y2) AND (X3,Y3)
+;
+LINE2  LDA #0
+       .BYTE $2C
+FACET2 LDA #$80
+       STA LINFAC
+       JSR GETNUM
+       STY XMIN
+       STA XMIN+1
+       JSR GETNUM
+       STY YMIN
+       JSR GETNUM
+       STY XMID
+       STA XMID+1
+       JSR GETNUM
+       STY YMID
+       BIT LINFAC
+       BPL LDRAW
+       JSR GETNUM
+       STY XMAX
+       STA XMAX+1
+       JSR GETNUM
+       STY YMAX
+       JSR GETNUM
+       STY VALUE
+       JMP FACETR
+LDRAW  JMP LINER
+;
+;****************************************
+;
+; DRAW A SPHERE CENTERED AT (XCENT,YCENT)
+; DEFAULT RADIUS IS LAST VALUE USED
+;
+SPHER2 JSR CENTER
+       JSR PCHECK
+       BIT DEFLAG
+       BMI SKIP1
+       JSR EVAEXP
+       JSR FLTFIX
+       STY RADIUS
+SKIP1  JMP SPHERR
+;
+;****************************************
+;
+; DRAW A TOP-VIEW TOROID AT (XCENT,YCENT)
+; DEFAULT INNER AND OUTER RADII ARE LAST USED
+;
+TORUS2 JSR CENTER
+       JSR GETTWO
+       JMP TORUSR
+;
+;****************************************
+;
+; DRAW CYLINDERS WITH AXES HORIZONTAL OR
+; VERTICAL.  DEFAULT RADIUS AND "HALF-LENGTH"
+; ARE LAST VALUES USED.
+;
+VCYL2  LDA #$80
+       .BYTE $2C
+HCYL2  LDA #0
+       STA HVFLAG
+       JSR CENTER
+       JSR PCHECK
+       BIT DEFLAG
+       BMI SKIP2
+       JSR EVAEXP
+       JSR FLTFIX
+       STY RADIUS
+       JSR GETNUM
+       STY HLEN
+SKIP2  JMP CYLNDR
+;
+;****************************************
+;
+; DRAW EDGE-VIEW TOROIDS WITH AXES HORIZONTAL
+; OR VERTICAL
+; INNNER AND OUTER RADII ARE OPTIONAL
+;
+VTOR2  LDA #$80
+       .BYTE $2C
+HTOR2  LDA #0
+       STA HVFLAG
+       JSR CENTER
+       JSR GETTWO
+       JMP EDGTOR
+;
+;****************************************
+;
+; DRAW INSIDE-VIEW TOROIDS, "SPOOLS",
+; WITH AXES HORIZONTAL OR VERTICAL
+; INNER AND OUTER RADII ARE OPTIONAL
+;
+VSPL2  LDA #$80
+       .BYTE $2C
+HSPL2  LDA #0
+       STA HVFLAG
+       JSR CENTER
+       JSR GETTWO
+       JMP SPOOLR
+.END</pre>
+            <figcaption>Listing 5. Assembler-Quelltext des »Basic-Interfaces« zum einfachen Ansprechen aller Assembler-Routinen per SYS-Befehl</figcaption>
+        </figure>
+        <figure>
+            <pre>; KEYSORT - RELOCATABLE BUBBLE SORT USING KEY ARRAY
+; POINTING TO INTEGER ARRAY
+;
+;  RICHARD L. RYLANDER    1/12/85
+;
+ORIGIN=$CF59  ; 53081. (FOLLOWING DOS 5.1)
+;
+KB     = $FB  ; 251. POINTER TO KEY ARRAY
+ZB     = $FD  ; 253. POINTER TO DATA ARRAY
+MAX    = $8C  ; 140. POKE WITH MAX ARRAY INDEX
+TOP    = $AC
+TOPDIS = $AD
+FLAG   = $AE
+NXTFLG = $61
+CRRNT  = $62
+REPEAT = $64
+;
+      *=ORIGIN
+;
+INIT   LDY #$FF     ; INITIALIZE KEY ARRAY
+INLOOP INY
+       TYA
+       STA (KB),Y
+       CMP MAX
+       BNE INLOOP
+;
+SORT   STA TOPDIS   ; 'A' HOLDS 'MAX'
+LOOP1  LDA TOPDIS
+       STA TOP
+       LDX #0
+       STX NXTFLG
+       STX FLAG
+LOOP2  STX REPEAT
+;
+; GET BOTH BYTES OF INTEGER POINTED TO BY
+; 'KEY' ELEMENT.  RETURN WITH MSB ON STACK
+; AND LSB IN THE ACCUMULATOR
+;
+GETINT TXA
+       TAY
+       LDA (KB),Y
+       ASL A
+       BCC LOAD
+       DEC NXTFLG
+       INC ZB+1
+LOAD   TAY
+       LDA (ZB),Y
+       PHA
+       INY
+       LDA (ZB),Y
+       BIT NXTFLG
+       BPL NODEC
+       INC NXTFLG
+       DEC ZB+1
+NODEC  CPX REPEAT
+       BNE ORDER
+       STA CRRNT
+       PLA
+       STA CRRNT+1
+       INX
+       BNE GETINT
+;
+; COMPARE INTEGERS OBTAINED THROUGH KEY ARRAY
+; IF 'CURRENT' &lt;= 'NEXT' THEN SWAP KEY
+; ELEMENTS, ELSE CONTINUE
+;
+ORDER  CMP CRRNT
+       PLA
+       SBC CRRNT+1
+       BVC TEST
+       EOR #$80
+TEST   BPL NOSWAP
+SWAP   TXA
+       TAY
+       STX TOPDIS
+       LDA (KB),Y
+       PHA
+       DEY
+       LDA (KB),Y
+       INY
+       STA (KB),Y
+       PLA
+       DEY
+       STA (KB),Y
+       INC FLAG
+NOSWAP CPX TOP
+       BNE LOOP2
+       LDA FLAG
+       BNE LOOP1
+;
+; UNPACK THE BYTE ELEMENTS OF THE 'KEY' ARRAY
+; INTO BASIC'S NORMAL 2-BYTE INTEGER FORMAT
+;
+UNPACK LDX MAX
+       INX
+PKLOOP DEX
+       TXA
+       TAY
+       LDA (KB),Y
+       PHA
+       TXA
+       ASL A     ; MOVE TO 2*I+1
+       ORA #1
+       BCC STORE
+       INC NXTFLG
+       INC KB+1
+STORE  TAY
+       PLA
+       STA (KB),Y
+       LDA #0
+       DEY
+       STA (KB),Y
+       LDA NXTFLG
+       BEQ OK
+       DEC NXTFLG
+       DEC KB+1
+OK     TXA
+       BNE PKLOOP
+DONE   RTS
+.END</pre>
+            <figcaption>Listing 6. Assembler-Quelltext der schnellen Bubble-Sort-Routine</figcaption>
+        </figure>
+        <figure>
+            <pre>;   "WRITE"   RICHARD L. RYLANDER
+;             12/30/84
+; REVISED  1/19/85  - ORIGIN MOVED TO $CFE5 (53221.)
+;
+;  PUT TEXT CHARACTERS ON GRAPHIC SCREEN
+;  (UNDER BASIC ROM) IN VARIOUS STYLES
+;
+*=$CFE5  ; PUT CODE AFTER DOS 5.1
+WRITE  LDA $01     ; SWITCH OUT BASIC ROM
+       AND #$FE
+       STA $01
+       LDY #7
+LOOP   LDA ($FD),Y ; READ CHARACTER BYTE
+       AND ($FB),Y ; MODIFY W/SCREEN BYTE
+       STA ($FB),Y ; STORE IN SCREEN
+;
+; POKE NEW LOGICAL OPERATOR TO REPLACE
+; 'AND' (53231.) FOR DIFFERENT STYLES
+; ORA=17.  BIT (NOP)=36.  AND=49.  EOR=81.
+;
+       DEY
+       BPL LOOP
+       LDA $01     ; RESTORE BASIC ROM
+       ORA #1
+       STA $01
+       RTS
+.END</pre>
+            <figcaption>Listing 7. Assembler-Quelltext der Routine zum Beschreiben des HiRes-Bildschirmes unterhalb des Basic-ROMs</figcaption>
+        </figure>
+
+
+        <figure>
+            <pre data-filename="graphics.prg" data-name="Assembler-Routinen aus Listing 1 bis 5" data-mse=mse1></pre>
+            <figcaption>Listing 8. Assembler-Routinen aus Listing 1 bis 5</figcaption>
+        </figure>
+        <div class="binary_download" data-filename="graphics.prg" data-name="Assembler-Routinen aus Listing 1 bis 5"></div>
+
+        <figure>
+            <pre data-filename="sort_write.prg" data-name="Assembler-Routinen aus Listing 6 und 7" data-mse=mse1></pre>
+            <figcaption>Listing 9. Assembler-Routinen aus Listing 6 und 7</figcaption>
+        </figure>
+        <div class="binary_download" data-filename="sort_write.prg" data-name="Assembler-Routinen aus Listing 6 und 7"></div>
+
+        <figure>
+            <pre data-filename="shapes demo2" data-name="Shapes Demo"></pre>
+            <figcaption>Listing 10. Demo-Programm »Shapes«</figcaption>
+        </figure>
+
+        <figure>
+            <pre data-filename="stellation2" data-name="Stellation Demo"></pre>
+            <figcaption>Listing 11. Demo-Programm »Stellation«</figcaption>
+        </figure>
+
+        <div style="display: none;">
+            <figure>
+                <pre data-filename="view" data-name="View Demo"></pre>
+            </figure>
+            <div class="binary_download" data-filename="images.pic.prg" data-name="Bild für View Demo"></div>
+        </div>
     </article>
 </body>
 

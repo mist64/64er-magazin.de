@@ -1,0 +1,32 @@
+
+
+;listing 1.prg ==0801==
+  100 rem ****************************
+  110 rem *    beispiel fuer die     *
+  120 rem *     kombination von      *
+  130 rem *   graphik und schrift    *
+  140 rem *    in einer hardcopy     *
+  150 rem * mit dem seikosha gp-550a *
+  160 rem ****************************
+  170 rem
+  180 dimt$(25)
+  185 lmax=25:rem maximale textlaenge pro zeile (hier beispielhaft 25)
+  190 rem  text zeilenweise abfragen
+  200 print"{clr}";:fort=0to24
+  210 printt+1chr$(157);
+  220 input". zeile ";t$(t)
+  230 iflen(t$(t))>lmaxthenprint"{up}{up}":goto210
+  240 t$(t)="     "+t$(t): rem abstand schaffen
+  245 nextt
+  250 print"{clr}{down}{down}{down}hardcopy erfolgt !"
+  260 rem zeilenoption einschalten
+  270 poke49531,96
+  280 rem hardcopy starten
+  290 sys49152(1),0,1,0;:rem beispielsweise
+  300 rem zeilen einzeln aus graphik und text zusammensetzen
+  310 fori=1to25
+  320 printt$(i-1):rem text und chr$(13)
+  330 sys49537:rem naechste graphikzeile berechnen
+  340 nexti
+  350 end
+

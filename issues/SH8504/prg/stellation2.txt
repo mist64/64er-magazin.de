@@ -1,0 +1,128 @@
+
+
+;stellation2.prg ==0801==
+   10 rem "stellation"
+   20 rem  by richard l. rylander     12/5/84
+   30 :
+   40 gr=49378    :rem graphik modus
+   50 tx=49411    :rem text modus
+   60 bo=53280    :rem rahmenfarbe
+   70 :
+   80 rem  style parameters
+   90 poke 839,1  :rem skalierung (3:4)
+  100 poke 871,0 :rem facettenraender (0=nachzeichnen, 1=loeschen)
+  110 sh=838     :rem schattierung (0=random, 1=halbton)
+  120 eg=868     :rem randflag (0=normal, 1=linien am rand hinzufuegen)
+  130 :
+  140 rem   funktions adressen
+  150 cl=51979   :rem bitmap loeschen
+  160 co=52001   :rem color map fuellen
+  170 fc=52052   :rem schattierte facetten zeichnen
+  180 ks=53081   :rem sortierroutine
+  190 :
+  200 xc=160:yc=120  :rem zentrierungskoordinaten
+  210 :
+  220 print"{clr}***************************************"
+  230 print"* kleiner sternfoermiger dodekahedron *"
+  240 print"***************************************"
+  250 print"{down}{down} schattierung:"
+  260 print" r=random, h=halbton"
+  270 input"{down} ihre wahl     h{left}{left}{left}";a$
+  280 poke sh,0:if a$="h" then poke sh,1
+  290 print"{down}{down} rand-stil :"
+  300 print"{down} n - normal":print"{down} e - eckenbetonung"
+  310 print"{down} w - drahtgitter"
+  320 input"{down} ihre wahl     n{left}{left}{left}";a$
+  330 poke eg,0:wi=0:if a$="n" then 360
+  340 poke eg,1:if a$="w" then wi=-1
+  350 :
+  360 print"{down} lese scheitel daten"
+  370 vn=32:dim p%(vn-1,2)
+  380 for n=0 to vn-1:read p%(n,0),p%(n,1),p%(n,2):next
+  390 :
+  400 print"{down} geben sie x, y, und z winkel ein"
+  410 print"       (winkel in grad)"
+  420 input x,y,z
+  430 j=3.14159265/180:x=x*j:y=y*j:z=z*j
+  440 x0=cos(y)*cos(z)-sin(x)*sin(y)*sin(z):x1=cos(y)*sin(z)+sin(x)*sin(y)*cos(z)
+  450 x2=-cos(x)*sin(y):y0=-cos(x)*sin(z):y1=cos(x)*cos(a):y2=sin(x)
+  460 z0=sin(y)*cos(z)+sin(x)*cos(y)*sin(z)
+  470 z1=sin(y)*sin(z)-sin(x)*cos(y)*cos(z):z2=cos(x)*cos(y)
+  480 print"{down} rotationsberechnung"
+  490 for n=0 to vn-1
+  500 x=p%(n,0):y=p%(n,1):z=p%(n,2)
+  510 p%(n,0)=x0*x+x1*y+x2*z:p%(n,1)=y0*x+y1*y+y2*z:p%(n,2)=z0*x+z1*y+z2*z:next
+  520 :
+  530 fa=60: rem  anzahl der facetten
+  540 dim f%(fa/2,2),sh(fa/2),z%(fa/2),k%(fa/2)
+  550 print" lese verbindungsdaten              "
+  560 vf=-1: rem  vf = anzahl der sichtbaren facetten
+  570 for n=1 to fa
+  580 vf=vf+1
+  590 for i=0 to 2 :read f%(vf,i):next
+  600 rem  berechnung der normalenvektoren
+  610 z=(p%(f%(vf,2),0)-p%(f%(vf,1),0))*(p%(f%(vf,0),1)-p%(f%(vf,1),1))
+  620 z=z-(p%(f%(vf,0),0)-p%(f%(vf,1),0))*(p%(f%(vf,2),1)-p%(f%(vf,1),1))
+  630 if z=<0 then 720:rem  facette nicht sichtbar
+  640 x=(p%(f%(vf,2),1)-p%(f%(vf,1),1))*(p%(f%(vf,0),2)-p%(f%(vf,1),2))
+  650 x=x-(p%(f%(vf,0),1)-p%(f%(vf,1),1))*(p%(f%(vf,2),2)-p%(f%(vf,1),2))
+  660 y=(p%(f%(vf,2),2)-p%(f%(vf,1),2))*(p%(f%(vf,0),0)-p%(f%(vf,1),0))
+  670 y=y-(p%(f%(vf,0),2)-p%(f%(vf,1),2))*(p%(f%(vf,2),0)-p%(f%(vf,1),0))
+  680 nc=sqr(x*x+y*y+z*z):rem  laenge des normalenvektors
+  690 sh(vf)=26*(2*z+x+y)/nc
+  700 sh(vf)=(sh(vf)+64)*(sh(vf)+64)/256:rem schattierung
+  710 goto 730
+  720 vf=vf-1
+  730 next
+  740 :
+  750 print" berechnung der darstellungsgroesse"
+  760 y=0:for n=0 to vn-1:if abs(p%(n,1))>y then y=abs(p%(n,1))
+  770 next:s=119/y
+  780 for n=0 to vn-1:p%(n,1)=s*p%(n,1)+yc:p%(n,0)=s*p%(n,0)+xc:next
+  790 :
+  800 :
+  810 for n=0 to vf
+  820 z%(n)=(p%(f%(n,0),2)+p%(f%(n,1),2)+p%(f%(n,2),2))/3:next
+  830 :
+  840 print" sortierung der facetten"
+  850 poke 140,vf
+  860 k%(0)=k%(0):poke 251,peek(71):poke 252,peek(72)
+  870 z%(0)=z%(0):poke 253,peek(71):poke 254,peek(72)
+  880 sys(ks)
+  890 :
+  900 rem zeichne facetten
+  910 sys(gr):sys(co):sys(cl):poke bo,1
+  920 for n=0 to vf:fa=k%(n)
+  930 if wi then sh(fa)=64
+  940 x0=p%(f%(fa,0),0):y0=p%(f%(fa,0),1):x1=p%(f%(fa,1),0):y1=p%(f%(fa,1),1)
+  950 x2=p%(f%(fa,2),0):y2=p%(f%(fa,2),1)
+  960 sys(fc),x0,y0,x1,y1,x2,y2,sh(fa)
+  970 next
+  980 poke198,0
+  990 get a$:if a$="" then 990
+ 1000 sys(tx):poke bo,14:end
+ 1010 :
+ 1020 rem    scheiteldaten
+ 1030 data 1000,618,0, 1000,-618,0, -1000,618,0, -1000,-618,0
+ 1040 data 0,1000,618, 0,1000,-618, 0,-1000,618, 0,-1000,-618
+ 1050 data 618,0,1000, -618,0,1000, 618,0,-1000, -618,0,-1000
+ 1060 data 618,0,236, 618,0,-236, -618,0,236, -618,0,-236
+ 1070 data 236,618,0, -236,618,0, 236,-618,0, -236,-618,0
+ 1080 data 0,236,618, 0,-236,618, 0,236,-618, 0,-236,-618
+ 1090 data 382,382,382, 382,382,-382, 382,-382,382, 382,-382,-382
+ 1100 data -382,382,382, -382,382,-382, -382,-382,382, -382,-382,-382
+ 1110 :
+ 1120 rem    verbindungsdaten
+ 1130 data 0,12,13, 0,13,25, 0,25,16, 0,16,24, 0,24,12
+ 1140 data 1,12,26, 1,26,18, 1,18,27, 1,27,13, 1,13,12
+ 1150 data 2,15,14, 2,14,28, 2,28,17, 2,17,29, 2,29,15
+ 1160 data 3,14,15, 3,15,31, 3,31,19, 3,19,30, 3,30,14
+ 1170 data 4,16,17, 4,17,28, 4,28,20, 4,20,24, 4,24,16
+ 1180 data 5,17,16, 5,16,25, 5,25,22, 5,22,29, 5,29,17
+ 1190 data 6,19,18, 6,18,26, 6,26,21, 6,21,30, 6,30,19
+ 1200 data 7,18,19, 7,19,31, 7,31,23, 7,23,27, 7,27,18
+ 1210 data 8,20,21, 8,21,26, 8,26,12, 8,12,24, 8,24,20
+ 1220 data 9,21,20, 9,20,28, 9,28,14, 9,14,30, 9,30,21
+ 1230 data 10,23,22, 10,22,25, 10,25,13, 10,13,27, 10,27,23
+ 1240 data 11,22,23, 11,23,31, 11,31,15, 11,15,29, 11,29,22
+

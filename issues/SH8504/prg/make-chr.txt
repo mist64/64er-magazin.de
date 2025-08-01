@@ -1,0 +1,599 @@
+
+
+;make-chr.prg ==0801==
+    1 goto10
+    2 *************************************
+    3 *                                   *
+    4 *    rainer buesch                  *
+    5 *    reisingerstr.6                 *
+    6 *    8000 muenschen 2               *
+    7 *    tel. 537218                    *
+    8 *                                   *
+    9 *************************************
+   10 poke 650,128 :rem tasten-repeat
+   20 printchr$(142);chr$(8):rem letters blocked
+   30 poke53280,11:poke53281,12:rem farbe
+   40 printchr$(144);
+   50 open3,4,4
+   54 print#3,chr$(7) :rem beep
+   60 print#3,chr$(27);"u";chr$(1);
+   98 goto200
+   99 :
+  200 rem wertzuweisungen ***************
+  202 dim za$(18) :rem read record
+  204 dim za(18)  :rem dito
+  206 dim rc$(256):rem cop-variable
+  208 a=139:rem attribute a
+  210 pa=1348 :rem screenram
+  212 po=1 :rem record position
+  214 n=18 :rem laenge des record
+  220 pc=55620:rem farbram
+  230 xy=pa+x+y*40 :rem screen-pos
+  240 co=pc+x+y*40 :rem color
+  244 for i=0to7:read f(i):next
+  246 data 128,64,32,16,8,4,2,1
+  248 dim p(11):rem out for printer
+  260 as=32              :rem asci-code
+  262 ab=32              :rem asci-anfang
+  264 aa=1               :rem asci-anfang
+  266 ae=254             :rem asci-ende
+  270 ls=12              :rem line-space
+  272 sa=0               :rem schriftart
+  280 ro$=chr$(5)+"rom"+chr$(144)+"/ram"
+  282 ra$="rom/"+chr$(5)+"ram"+chr$(144)
+  284 rm$=ro$:fl=1
+  999 :
+ 1000 rem menue ************************
+ 1010 print"{clr}":gx$=""
+ 1015 printchr$(31);" {rvon}{SHIFT-POUND}U{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}I                      U{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}I{CBM-*}{rvof}";chr$(144)
+ 1020 printchr$(31);" {rvon} *  *  {CBM-Q}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*} make-chr  C{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{CBM-W}  *  * {rvof}";chr$(144)
+ 1025 printchr$(31);" {CBM-*}{rvon}   J{SHIFT-*}{SHIFT-*}K                      J{SHIFT-*}{SHIFT-*}K   {rvof}{SHIFT-POUND}";chr$(144)
+ 1030 print:print
+ 1040 printtab(5);"{down}(1) - erstelle zeichensatz
+ 1050 printtab(5);"{down}(2) - sende zeichensatz zu drucker"
+ 1060 printtab(5);"{down}(3) - drucker-handling "
+ 1070 printtab(5);"{down}(4) - ";chr$(155);"oeffnen einer rel-datei";chr$(144)
+ 1084 printtab(5);"{down}(5) - ";chr$(155);"copy single chr ";chr$(144)
+ 1086 printtab(5);"{down}(6) - ";chr$(155);"copy chr-datei ";chr$(144)
+ 1090 printtab(5);"{down}{down}{down}joystick in port 2 !"
+ 1100 getg$
+ 1101 gz=gz+g
+ 1102 if gz=420theng=-1:print"{home}"spc(14)"{down}{down}by r.buesch"
+ 1104 if gz= 0 theng= 1:print"{home}"spc(14)"{down}{down} make-chr  "
+ 1108 if g$="" goto1100
+ 1110 if g$="1" then 7000
+ 1120 if g$="2" then 6000
+ 1130 if g$="3" then 2000
+ 1140 if g$="4" then 5000
+ 1160 if g$="5" then 10500
+ 1170 if g$="6" then 12000
+ 1190 goto1100
+ 1999 :
+ 2000 rem drucker-handling *************
+ 2020 print"{clr}{down} {rvon} ******* drucker-handling *********** {rvof}"
+ 2030 print:print
+ 2040 printtab(6);"{down}(1) - copy chr rom -> ram"
+ 2042 printtab(6);"{down}(2) - waehle ";rm$
+ 2050 printtab(6);"{down}(3) - waehle line-space"
+ 2054 printtab(6);"{down}(4) - waehle schriftart"
+ 2060 printtab(6);"{down}(5) - ";chr$(155);"teste drucker ";chr$(144)
+ 2100 getg$:ifg$=""then2100
+ 2110 if g$="1" then gosub9100:goto2020
+ 2120 if g$="2" then gosub9120:goto2020
+ 2132 if g$="3" then gosub9160:goto2020
+ 2134 if g$="4" then gosub9180:goto2020
+ 2136 if g$="5" then gosub6500:goto2020
+ 2140 if g$="_" then1000 :rem menue
+ 2160 goto 2000
+ 4999 :
+ 5000 rem oeffne record datei **********
+ 5010 print"{clr}"
+ 5020 print"  name der record datei ?"
+ 5030 print"  {rvon} ";na$;" {rvof} ";chr$(5);
+ 5040 gx$=na$:gosub15000:rem input
+ 5041 if gx$="_" goto1000
+ 5042 na$=gx$:printchr$(144)
+ 5044 nx$=na$
+ 5050 print:printchr$(31);"  {rvon} ";na$;" {rvof} ";chr$(144);"wird erstellt"
+ 5060 gosub 10000
+ 5064 open2,8,15
+ 5070 gosub6700:rem disc-error
+ 5085 close2
+ 5090 goto 1000
+ 5999 :
+ 6000 rem send record to printer *******
+ 6010 print"{clr}{rght}{rght}{down}welcher zeichensatz soll uebertragen
+ 6012 print"  werden  ?
+ 6013 print"{down}  {rvon} ";na$;" {rvof} ";chr$(5);
+ 6020 gx$=na$:gosub15000:rem input
+ 6021 if gx$="_" goto1000
+ 6022 na$=gx$:printchr$(144)
+ 6023 nx$=na$
+ 6024 if left$(na$,3)="big"thenls=8
+ 6025 print"{down}   welche asci-codes ?":print
+ 6026 print"  von  {rvon}";aa;"{left} {rvof} ";chr$(5);
+ 6027 ga=1:gx$=str$(aa):gosub15000:rem input
+ 6028 if gx$="_"goto1000
+ 6029 aa=val(gx$)
+ 6030 if aa>256 goto6027
+ 6032 printchr$(144):print
+ 6040 print"  bis  {rvon}";ae;"{left} {rvof} ";chr$(5);
+ 6042 ga=1:gx$=str$(ae):gosub15000:rem input
+ 6044 if gx$="_"goto1000
+ 6046 ae=val(gx$)
+ 6048 if ae>256 goto6042
+ 6050 printchr$(144):print
+ 6054 open1,8,2,na$
+ 6056 open2,8,15
+ 6058 gosub6700:rem disc-error
+ 6060 as=aa
+ 6070 print#2,"p"+chr$(98)+chr$(as)+chr$(0)+chr$(1)
+ 6075 fori=1to17:ifva=1then goto6180
+ 6080 get#1,rc$:if rc$=""thenrc$=chr$(0)
+ 6120 if i=1 then goto6300:rem teste zeichen
+ 6150 print#3,rc$;
+ 6170 rc$=""
+ 6180 nexti
+ 6182 gosub6700:rem disc-error
+ 6190 printchr$(5);"  asci = {rvon}";as;"{left} {rvof}                  {up}";chr$(144)
+ 6195 rk$="":va=0
+ 6198 as=as+1
+ 6200 ifas<=ae goto6070
+ 6220 close2:close1
+ 6230 gosub9140:rem sel.ram
+ 6240 gosub6500:rem teste printer
+ 6298 goto1000:rem menue
+ 6300 rem teste zeichen ****************
+ 6310 ifrc$=chr$(255)then printspc(17);"record empty{up}":rc$="":va=1:goto6180
+ 6320 goto6150
+ 6499 :
+ 6500 rem test drucker *****************
+ 6505 gosub9194:rem set schrift
+ 6506 gosub9174:rem set line-space
+ 6510 fori=1 to 64 :gosub6540:next:print#3,chr$(10)
+ 6512 fori=128to192:gosub6540:next:print#3,chr$(10)
+ 6514 fori= 65to 96:gosub6540:next:print#3,chr$(10)
+ 6516 fori=193to224:gosub6540:next:print#3,chr$(10)
+ 6518 fori= 97to126:gosub6540:next:print#3,chr$(10)
+ 6520 fori=225to254:gosub6540:next:print#3,chr$(10)
+ 6530 print#3,chr$(13)
+ 6532 return
+ 6540 ifi=7  then i=28
+ 6542 ifi=127then i=128
+ 6544 ifi=135then i=156
+ 6580 print#3,chr$(i);
+ 6590 return
+ 6600 rem beep *************************
+ 6620 for i=1to3
+ 6630 print#3,chr$(7);:for k=1to150:next
+ 6640 nexti
+ 6660 return
+ 6699 :
+ 6700 rem input disc-error *************
+ 6710 input#2,e,e$,e1,e2
+ 6720 if e<>0 thenclose1:close2:goto6800
+ 6730 return
+ 6800 print"{clr}{down}{down}  error on disc: ";chr$(5);e$;chr$(144)
+ 6802 print"{down}{down}  press any key to restart !
+ 6810 getg$:ifg$=""goto6810
+ 6820 run
+ 6999 :
+ 7000 rem erstelle zeichen *************
+ 7010 print"{clr}"
+ 7020 print"  aus welcher datei willst du lesen ?"
+ 7022 print"  {rvon} ";nx$;" {rvof} ";chr$(5);
+ 7030 gx$=nx$:gosub15000:rem input
+ 7031 if gx$="_" goto1000
+ 7032 nx$=gx$:printchr$(144):print:print
+ 7050 if ny$=""then ny$=nx$
+ 7052 print"  in welche datei willst du schreiben ?"
+ 7054 print"  {rvon} ";ny$;" {rvof} ";chr$(5);
+ 7058 gx$=ny$:gosub15000:rem input
+ 7059 if gx$="_" goto1000
+ 7060 ny$=gx$:printchr$(144):print
+ 7070 print"{clr}"
+ 7100 gosub10100:rem zeicheneingabe
+ 7110 if gx$="_" goto1000:rem menu
+ 7199 :
+ 7200 rem abfrage **********************
+ 7210 g$="":getg$
+ 7215 if g$="n" then gosub9900:gosub 8700 :rem loesche & anfangspos
+ 7218 if g$="9" then gosub8500            :rem 9-dots
+ 7220 if g$="_" goto1000:rem menue
+ 7222 if g$="f" then gosub11000:gosub8700:rem fill & anfangspos
+ 7230 if g$=chr$(13) then gosub10100:rem eingabe
+ 7348 if g$=chr$(136)then gosub9400:goto 8800:rem lese nachstes zeichen
+ 7350 if g$=chr$(133)then goto 7400:rem saven
+ 7360 if g$="{up}" then dy=-1:goto8400
+ 7362 if g$="{down}" then dy= 1:goto8400
+ 7364 if g$="{left}" then dx=-1:goto8400
+ 7366 if g$="{rght}" then dx= 1:goto8400
+ 7367 if g$="{SHIFT-*}" then gosub9800
+ 7368 if g$="*" then gosub9800
+ 7390 goto 7500: rem joystick
+ 7399 :
+ 7400 gosub9000 :rem altes feld
+ 7410 gosub8600 :rem write record
+ 7415 a=139:gosub8550:rem reset 9dots
+ 7420 as=as+1:rem increm. asci
+ 7450 goto 7100 :rem neue eingabe
+ 7499 :
+ 7500 rem joystick *********************
+ 7600 p =peek(56320)
+ 7610 ju= pand1
+ 7620 jd= (pand2)/2
+ 7630 jl= (pand4)/4
+ 7640 jr= (pand8)/8
+ 7650 fr= (pand16)/16
+ 7680 fori=1to300:next
+ 7690 :
+ 7720 if ju=0   then dy=-1:goto8400
+ 7730 if jd=0   then dy= 1:goto8400
+ 7740 if jl=0   then dx=-1:goto8400
+ 7750 if jr=0   then dx= 1:goto8400
+ 7755 if fr=1 then fa=1
+ 7760 if fr=0 then gosub8200:rem test-fr
+ 7790 goto7210 :rem abfrage
+ 7799 :
+ 8200 rem test-fr **********************
+ 8210 if fr<>fa then fa=0:gosub9800:return:rem star/blank
+ 8220 if m=0 then gosub9600:return:rem star
+ 8230 gosub9700:return:rem blank
+ 8299 :
+ 8400 rem print*************************
+ 8410 if y+dy>7 then dy=0: goto7210
+ 8415 if y+dy<0 then dy=0: goto7210
+ 8420 if x+dx>10then dx=0: goto7210
+ 8425 if x+dx<0 then dx=0: goto7210
+ 8430 gosub 9400
+ 8432 x=x+dx:y=y+dy
+ 8440 xy=pa+x+y*40
+ 8442 co=pc+x+y*40
+ 8450 gosub 9500
+ 8455 dx=0:dy=0
+ 8460 goto7210
+ 8499 :
+ 8500 rem attribute a ******************
+ 8504 ifa=139thena=11:gosub8550:return
+ 8508 ifa=11thena=139:gosub8550:return
+ 8510 return
+ 8550 if a=139 thendo$="                  "
+ 8560 if a=11  then do$=chr$(5)+"   {rvon} 9dot activ  {rvof}"+chr$(144)
+ 8570 print"{home}{down}{down}{down}{down}{down}";do$
+ 8590 return
+ 8599 :
+ 8600 rem write record *****************
+ 8604 na$=ny$
+ 8610 xr$=chr$(27)+"&"+chr$(0)+chr$(as)+chr$(as)+chr$(a)
+ 8640 fori=0to10:yr$=yr$+chr$(p(i)):next
+ 8645 zr$=xr$+yr$
+ 8660 open1,8,2,na$
+ 8662 open2,8,15
+ 8664 print#2,"p"+chr$(98)+chr$(as)+chr$(0)+chr$(1)
+ 8666 print#1,zr$
+ 8670 gosub6700:rem disc-error
+ 8680 close1:close2
+ 8682 for i=0to10:p(i)=0:next
+ 8684 yr$=""
+ 8690 return
+ 8699 :
+ 8700 rem anfangsposition **************
+ 8710 x=0:y=0
+ 8712 xy=pa+x+y*40
+ 8714 co=pc+x+y*40
+ 8750 gosub 9500:rem neues feld
+ 8760 return
+ 8799 :
+ 8800 rem read & display ***************
+ 8802 na$=nx$
+ 8804 gosub 9900: rem new
+ 8810 open1,8,2,na$
+ 8812 open2,8,15
+ 8820 print#2,"p"+chr$(98)+chr$(as)+chr$(0)+chr$(6)
+ 8830 for i= 0to11
+ 8835 gosub6700:rem disc-error
+ 8840 get#1,za$
+ 8841 za(i)=asc(za$+chr$(0))
+ 8842 if za(0)=139thena=139:gosub8550
+ 8843 if za(0)=11 thena=11 :gosub8550
+ 8844 next
+ 8846 close1:close2
+ 8847 :
+ 8850 for x=0to10
+ 8852 for y=0to7
+ 8854 xy=pa+x+y*40
+ 8856 co=pc+x+y*40
+ 8860 if f(y)=(za(x+1)andf(y)) then pokexy,42:pokeco,1
+ 8864 nexty
+ 8868 nextx
+ 8885 gosub8700:rem anfangspos
+ 8890 goto7100:rem neueingabe
+ 8899 :
+ 9000 rem umrechnung *******************
+ 9004 gosub9400: rem altes feld
+ 9010 for x=0to10
+ 9020 for y=0to7
+ 9022 xy=pa+x+y*40
+ 9030 if peek(xy)=42 then p(x)=p(x)+f(y)
+ 9040 nexty:nextx
+ 9090 return
+ 9100 rem copy chr-rom to ram **********
+ 9104 print#3,chr$(27);":";chr$(0);chr$(0);chr$(0);chr$(7);:return
+ 9120 rem select chr-rom/ram ***********
+ 9124 iffl=1goto9140
+ 9126 rm$=ro$:fl=1
+ 9130 print#3,chr$(27);"%";chr$(0);chr$(0);chr$(7):return
+ 9140 rm$=ra$:fl=0:rem sel.ram
+ 9144 print#3,chr$(27);"%";chr$(1);chr$(0);chr$(7);:return
+ 9160 rem line-space *******************
+ 9164 print"{clr}{down}  welchen zeilenabstand willst du ?
+ 9168 print"{down}  (0-85) {rvon}"ls"{left} {rvof} "chr$(5);
+ 9170 gx$=str$(ls):gosub15000:ls=val(gx$):ifls>85then9160
+ 9172 printchr$(144):print
+ 9174 print#3,chr$(27);"a";chr$(ls);chr$(7);
+ 9178 return
+ 9180 rem schriftart *******************
+ 9182 print"{clr}{down}  welche schriftart willst du ?
+ 9184 print"{down}  (0-64) {rvon}"sa"{left} {rvof} "chr$(5);
+ 9186 gx$=str$(sa):gosub15000:sa=val(gx$):ifsa>64then9180
+ 9188 printchr$(144):print
+ 9194 print#3,chr$(27);"!";chr$(sa);chr$(7);
+ 9198 return
+ 9398 end
+ 9399 :
+ 9400 rem altes feld *******************
+ 9410 if peek(xy)=170 then pokexy,42:pokeco,1
+ 9420 if peek(xy)=160 then pokexy,32:pokeco,1
+ 9450 return
+ 9499 :
+ 9500 rem neues feld *******************
+ 9510 if peek(xy)=42  then pokexy,170:pokeco,1
+ 9520 if peek(xy)=32  then pokexy,160:pokeco,1
+ 9550 return
+ 9599 :
+ 9600 rem print star *******************
+ 9610 pokexy,170:pokepc,1
+ 9650 return
+ 9699 :
+ 9700 rem print blank ******************
+ 9710 pokexy,160:pokepc,1
+ 9750 return
+ 9799 :
+ 9800 rem print blank/star *************
+ 9810 if peek(xy)=170 then pokexy,160:pokeco,1:m=1:return
+ 9820 if peek(xy)=160 then pokexy,170:pokeco,1:m=0:return
+ 9899 :
+ 9900 rem new **************************
+ 9910 for y=0to 7
+ 9915 for x=0to10
+ 9916 xy=pa+x+y*40
+ 9918 co=pc+x+y*40
+ 9920 pokexy,32:pokeco,5
+ 9930 nextx:nexty
+ 9950 return
+ 9999 :
+10000 rem oeffne record datei *********
+10010 open1,8,2,na$+",l,"+chr$(18)
+10020 open2,8,15
+10030 print#2,"p"+chr$(98)+chr$(255)+chr$(0)+chr$(1)
+10040 print#1,chr$(255):rem freigeben
+10050 print#2,"i"
+10060 close1:close2
+10070 return
+10099 :
+10100 rem zeicheneingabe **************
+10104 gosub 9400 :rem altes feld
+10110 print"{home} {rvon} ";nx$;"->";ny$;" {rvof}";tab(25);"{rvon} asci {rvof}";tab(33);"{rvon} chr {rvof}"
+10111 printchr$(5);tab(25);as;"{left}   ";tab(35);
+10112 ifas>32 and as<128 then printchr$(as);:goto10120
+10114 ifas>160and as<256 then printchr$(as);:goto10120
+10116 printtab(34);"  ";
+10120 print:printchr$(144)
+10130 print"  which asci-code         {left}{left}{left}{left}{left}{left}{left}{left}";chr$(5);
+10140 gx$=str$(as):ga=1:gosub15000:rem input
+10142 if gx$="_" thenreturn
+10144 as=val(gx$):printchr$(144)
+10146 if as=0 then 10100
+10150 if as>255 goto 10100
+10160 print"{down}";do$;"{down}"
+10180 print"   UC{CBM-R}C{CBM-R}C{CBM-R}C{CBM-R}C{CBM-R}CI   {rvon}{SHIFT-POUND}                {CBM-*}{rvof}"
+10190 print"   {SHIFT--}";spc(11);"{SHIFT--}   {rvon}  ** make-chr **  {rvof}"
+10200 print"   {SHIFT--}";spc(11);"{SHIFT--}   {CBM-*}{rvon}                {rvof}{SHIFT-POUND}"
+10220 print"   {SHIFT--}";spc(11);"{SHIFT--}
+10230 print"   {SHIFT--}";spc(11);"{SHIFT--}      ret = asci
+10240 print"   {SHIFT--}";spc(11);"{SHIFT--}        _ = menue
+10250 print"   {SHIFT--}";spc(11);"{SHIFT--}        f = fill
+10260 print"   {SHIFT--}";spc(11);"{SHIFT--}        n = new
+10270 print"   {SHIFT--}";spc(11);"{SHIFT--}        9 = 9dots
+10280 print"   JC{CBM-E}C{CBM-E}C{CBM-E}C{CBM-E}C{CBM-E}CK";chr$(5);"       f7";chr$(144);" = read
+10290 printtab(23);chr$(5);"f1";chr$(144);" = save
+10292 print"{down}{down}{down}  print your character
+10294 print"  with";chr$(5);" joystic 2";chr$(144)
+10296 print"  or  ";chr$(5);" crsr/*";chr$(144)
+10310 gosub 8700:rem anfangsposition
+10320 return
+10399 :
+10500 rem copy files ******************
+10550 print"{clr}{rght}{down} aus welcher datei wird copiert ?
+10560 print"  {rvon} ";nx$;" {rvof} ";chr$(5);
+10570 gx$=nx$:gosub15000:rem input
+10571 if gx$="_" goto1000
+10572 nx$=gx$:printchr$(144):print
+10574 ifnx$="_"then1000:rem menue
+10580 print"  von asci {rvon}"aa"{left} {rvof} ";chr$(5);
+10590 ga=1:gx$=str$(aa):gosub15000:rem input
+10592 if gx$="_"goto1000
+10594 aa=val(gx$)
+10596 if aa>256 goto10590
+10598 printchr$(144):print
+10600 print"  bis asci {rvon}"ae"{left} {rvof} ";chr$(5);
+10605 ga=1:gx$=str$(ae):gosub15000:rem input
+10606 if gx$="_"goto1000
+10607 ae=val(gx$)
+10608 if ae>256 goto10605
+10610 printchr$(144):print"{down}{down}{down}"
+10620 print"  in welche datei wird copiert ?"
+10630 print"  {rvon} ";ny$;" {rvof} ";chr$(5);
+10640 gx$=ny$:gosub15000:rem input
+10641 if gx$="_" goto1000
+10642 ny$=gx$:printchr$(144):print
+10644 ifny$="_"then1000:rem menue
+10650 print"  ab  asci {rvon}"ab"{left} {rvof} ";chr$(5);
+10660 ga=1:gx$=str$(ab):gosub15000:rem input
+10661 if gx$="_"goto1000
+10662 ab=val(gx$)
+10666 if ab>256 goto10590
+10668 printchr$(144):print
+10670 printchr$(5);"{down}       **** i'am busy !! ****{down}{down}";chr$(144)
+10699 :
+10700 rem copy ************************
+10730 yr$="":xr$=""
+10740 open2,8,15
+10750 for i=aa to ae
+10760 open1,8,2,nx$
+10762 gosub6700:rem disc-error
+10780 print#2,"p"+chr$(98)+chr$(i)+chr$(0)+chr$(6)
+10784 for k=0to11
+10790 get#1,g$:if g$=""then g$=chr$(0)
+10794 yr$=yr$+g$
+10798 next k
+10800 gosub6700:rem disc-error
+10806 close1
+10808 :
+10810 open1,8,2,ny$
+10812 gosub6700:rem disc-error
+10814 as=ab+i-aa
+10816 xr$=chr$(27)+"&"+chr$(0)+chr$(as)+chr$(as)
+10817 zr$=xr$+yr$
+10818 print"         asci = {rvon}"as"{left} _"i"{left} {rvof}{up}  "
+10820 print#2,"p"+chr$(98)+chr$(as)+chr$(0)+chr$(1)
+10830 print#1,zr$
+10832 gosub6700:rem disc-error
+10840 close1
+10850 xr$="":yr$="":zr$=""
+10890 next i
+10894 close2
+10910 goto1000:rem menue
+10999 :
+11000 rem fill **********************
+11010 for y=0to 7
+11020 for x=0to10 step 2
+11030 xy=pa+x+y*40
+11040 co=pc+x+y*40
+11044 pokexy,42:pokeco,1
+11050 nextx:nexty
+11060 return
+12000 rem copy-datei ******************
+12050 print"{clr}{down}  du kannst jetzt chr-dateien auf eine"
+12060 print"  andere diskette copieren !
+12070 print"{down}{down}  welche datei wird copiert ?"
+12080 print"  {rvon} "nx$;" {rvof} ";chr$(5);
+12090 gx$=nx$:gosub15000:rem input
+12091 if gx$="_" goto1000
+12092 nx$=gx$:printchr$(144):print:print
+12094 if ny$=""thenny$=nx$
+12100 print"  neuer dateiname ?
+12110 print"  {rvon} "ny$;" {rvof} ";chr$(5);
+12120 gx$=ny$:gosub15000:rem input
+12121 if gx$="_" goto1000
+12122 ny$=gx$:printchr$(144):print
+12130 print"{down}{down}          reading {rvon}";chr$(31);nx$;chr$(5)
+12140 print"{down}       **** coffe-break ****{down}";chr$(144)
+12199 :
+12210 open1,8,2,nx$
+12220 open2,8,15
+12222 gosub6700:rem disc-error
+12224 for k=1 to 255
+12228 printspc(12);"asci = ";k;"{left} {up}"
+12230 print#2,"p"+chr$(98)+chr$(k)+chr$(0)+chr$(1)
+12232 for i=0to16
+12240 get#1,g$:if g$=""then g$=chr$(0)
+12244 if i=0 and g$=chr$(255) then rc$=chr$(255):i=16
+12250 rc$(k)=rc$(k)+g$
+12260 next i
+12270 gosub 6700 :rem disc-error
+12280 next k
+12290 close1:close2
+12299 :
+12300 rem write
+12310 gosub 6600:rem beep
+12350 print"{clr}{down}  bitte andere diskette einlegen !{up}"
+12360 td$="diskette{up}"
+12370 print spc(15);td$
+12372 for n=0to 400
+12380 get g$:ifg$<>""then goto12500
+12382 next
+12400 print spc(15);chr$(5);td$;chr$(144)
+12410 for n=0to 400
+12420 get g$:ifg$<>""then goto12500
+12430 next
+12440 goto12370
+12499 :
+12500 rem copy on new disc ************
+12550 printchr$(144)
+12560 print"{clr}{down}          writing {rvon}";chr$(31);" ";ny$;" {rvof}"
+12570 printtab(5);chr$(5);"{down}{down}**** it's tee time now ****";chr$(144);"{down}{down}{down}{down}{down}"
+12580 printtab(10);"creating {rvon} ";ny$;" {up}"
+12582 na$=ny$
+12584 gosub 10000:rem oeffne record datei
+12599 :
+12600 open1,8,2,ny$
+12604 open2,8,15
+12608 gosub 6700:rem disc-error
+12610 for k=1to255
+12612 printtab(10);"   asci =";k;"{left}          {up}"
+12620 print#2,"p"+chr$(98)+chr$(k)+chr$(0)+chr$(1)
+12650 print#1,rc$(k)
+12654 gosub 6700:rem disc-error
+12660 next k
+12670 close1:close2
+12680 gosub 6600:rem beep
+12690 print"{down}{down}{down}             fertig !
+12692 get g$:ifg$=""then12692
+12698 run
+15000 rem get-input *******************
+15010 g$=" ? ":gy$=gx$:gx$="":gz$="{rvon} {rvof}":g=1:print" ";
+15020 print"{left}"g$;gz$;
+15030 get g$
+15032 gz=gz+g
+15033 if gz=0theng=1:gz$="{rvon} {rvof}":printchr$(20);gz$;
+15034 if gz=200 theng=-1:gz$=chr$(144)+"{rvon} {rvof}"+chr$(5):printchr$(20);gz$;
+15035 if g$=""goto15030
+15036 :
+15038 if ga=1 then goto15200
+15040 if g$=chr$(13) goto15180
+15042 if g$="_" thengx$=g$:return
+15050 if g$=chr$(20)  goto15150
+15051 if len(gx$)>9 goto15030
+15053 if g$=chr$(34) goto15030
+15060 if g$="{up}" goto15030
+15070 if g$="{down}" goto15030
+15080 if g$="{clr}" goto15030
+15090 if g$="{home}" goto15030
+15100 if g$=chr$(141) goto15030
+15120 if g$=chr$(148) goto15030
+15130 gx$=gx$+g$
+15140 goto15020
+15150 iflen(gx$)=0theng$="":goto15030
+15160 gx$=left$(gx$,len(gx$)-1)
+15170 goto 15020
+15180 printchr$(20);
+15185 if gx$="" then gx$=gy$
+15190 ga=0:return
+15200 rem eingabe numerisch ?
+15201 ifg$=chr$(13)goto15180
+15202 ifg$="_" then gx$=g$:ga=0:return
+15203 if g$=chr$(20)  goto15150
+15209 if len(gx$)>=3 goto15030
+15210 ifg$="0" goto15130
+15211 ifg$="1" goto15130
+15212 ifg$="2" goto15130
+15213 ifg$="3" goto15130
+15214 ifg$="4" goto15130
+15215 ifg$="5" goto15130
+15216 ifg$="6" goto15130
+15217 ifg$="7" goto15130
+15218 ifg$="8" goto15130
+15219 ifg$="9" goto15130
+15230 goto 15030:rem get
+

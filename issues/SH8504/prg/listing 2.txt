@@ -1,0 +1,27 @@
+
+
+;listing 2.prg ==0801==
+  100 rem *******************************
+  110 rem * beisp.fuer paralellausdruck *
+  120 rem *    zweier graphikseiten     *
+  130 rem * mit dem seikosha gp-550avc  *
+  140 rem * (erweiterbar auf drei       *
+  150 rem *      grafikseiten           *
+  160 rem *******************************
+  165 :
+  170 poke49531,96 : rem zeilenoption einschalten
+  180 pg=7:m3=0 : m4 = pg*2*16 : rem pg = grpahikseitenkennziffer
+  185 sys49152,0,1,0 : rem hardcopy starten
+  190 forz=1to25 : rem 25 zeilen (einfache laenge)
+  200 rem zeiger auf die erste graphikseite zwischenspeichern
+  210 m1=peek(209) : m2=peek(210)
+  220 rem auf zweite graphikseite umschalten
+  230 poke209,m3 : poke210,m4
+  240 sys49398 : rem hardcopy-einsprungadresse
+  250 rem zeiger auf zweite graphikseite zwischenspeichern
+  260 m3 = peek(209) : m4 = peek(210)
+  270 poke209,m1 : poke210,m2 : rem auf erste gr.seite zurueck
+  280 sys49532 : rem ausdrucken
+  290 nextz
+  300 end
+

@@ -1,0 +1,385 @@
+
+
+;3d-2.prg ==0801==
+    1 rem
+    2 rem      3d-supergrafik
+    3 rem      by oliver guenter
+    4 rem      graevingholzstr. 44
+    5 rem      4600 dortmund 16
+    6 rem      tel: 0231/853317
+    7 rem
+    8 rem      fuer c-64 mit vc-1541
+    9 rem
+  100 rem *******************************
+  101 rem *   initialisierung           *
+  102 rem *******************************
+  103 sys50212:sys50182:sys50191,15,15
+  104 v=53248:poke50168,63
+  105 pokev+21,0:pokev+32,15:pokev+33,15
+  106 dimdx(150),dy(150),dz(150)
+  107 dimmx(150),my(150),mz(150)
+  108 dimbx(150),by(150)
+  109 dimwx(120),wy(120),wz(120)
+  110 dimfl(120,8)
+  111 dimpf(120),rf(120)
+  112 rem *******************************
+  113 rem *   hauptmenue                *
+  114 rem *******************************
+  115 fu$="Hauptmenue":gosub124
+  116 printtab(11);"{down}-1- Daten eingeben"
+  117 printtab(11);"{down}-2- Daten laden"
+  118 printtab(11);"{down}-3- Daten speichern"
+  119 printtab(11);"{down}-4- Bild berechnen"
+  120 printtab(11);"{down}-5- Hardcopy"
+  121 getin$:in=val(in$)
+  122 oningoto134,175,201,228,387
+  123 goto121
+  124 rem *******************************
+  125 rem *   titel + funktion          *
+  126 rem *******************************
+  127 print"{clr}{blk}Funktion : ";fu$
+  128 print"{blu}****************************************";
+  129 print"*          {blk}3D-Supergrafik              {blu}*";
+  130 print"*                                      *";
+  131 print"*          {blk}(C) Oliver Guenter          {blu}*";
+  132 print"****************************************{blk}"
+  133 return
+  134 rem *******************************
+  135 rem *   daten eingeben            *
+  136 rem *******************************
+  137 fu$="Daten eingeben":gosub124
+  138 input"{down}Wie viele Punkte   ";ap
+  139 ifap=0thengoto112
+  140 input"{down}Wie viele Flaechen ";af
+  141 ifaf=0thengoto112
+  142 forq=1toap
+  143 fu$="Punkte eingeben":gosub124
+  144 print"{down}Punkt :";q
+  145 input"{down}{down}X-Koordinate ";dx(q)
+  146 input"{down}Y-Koordinate ";dy(q)
+  147 input"{down}Z-Koordinate ";dz(q)
+  148 print"{down}richtig ?"
+  149 poke198,0:wait198,1
+  150 ifpeek(631)=78thenprint"{up}{up}{up}{up}{up}{up}{up}{up}{up}{up}":poke198,0:goto143
+  151 next
+  152 poke198,0
+  153 forq=1toaf
+  154 fu$="Flaechen eingeben":gosub124
+  155 print"{down}Flaeche :";q;"{down}"
+  156 r=0
+  157 forw=1to8
+  158 ifr=1thennext:goto168
+  159 print"Punkt :";w;
+  160 t$=""
+  161 inputt$
+  162 t=val(t$)
+  163 ift<0ort>aporint(t)<>tthenprint"{up}{up}":goto159
+  164 ifright$(t$,1)="l"thent=-t
+  165 fl(q,w)=t
+  166 ift=0thenr=1:pf(q)=w-1:next
+  167 next:pf(q)=8
+  168 print"{down}richtig ?"
+  169 poke198,0:wait198,1
+  170 ifpeek(631)=78thenprint"{home}{down}{down}{down}{down}{down}{down}{down}{down}{down}":poke198,0:goto154
+  171 next
+  172 print"{down}{down}{rvon}< SPACE >{rvof}"
+  173 getin$:ifin$<>" "then173
+  174 goto112
+  175 rem *******************************
+  176 rem *   daten laden               *
+  177 rem *******************************
+  178 fu$="Daten laden ($=Dir)":gosub124
+  179 input"{down}Filename ";fl$
+  180 iffl$="@"thengoto112
+  181 iffl$="$"thenprint:sys50209:goto179
+  182 open15,8,15:open1,8,2,"3d-"+fl$+",s,r"
+  183 gosub423
+  184 ifer=1thenclose1:close15:goto179
+  185 get#1,a$:ap=asc(a$)
+  186 forq=1toap
+  187 input#1,a$:dx(q)=val(a$)
+  188 input#1,a$:dy(q)=val(a$)
+  189 input#1,a$:dz(q)=val(a$)
+  190 next
+  191 get#1,a$:af=asc(a$)
+  192 forq=1toaf
+  193 get#1,a$:pf(q)=asc(a$)
+  194 forw=1topf(q)
+  195 get#1,a$:fl(q,w)=asc(a$)-128
+  196 next
+  197 next
+  198 close1
+  199 close15
+  200 goto112
+  201 rem *******************************
+  202 rem *   daten speichern           *
+  203 rem *******************************
+  204 fu$="Daten speichern ($=Dir)":gosub124
+  205 gosub413:ifer=1thengoto112
+  206 input"{down}Filename ";fl$
+  207 iffl$="@"thengoto112
+  208 iffl$="$"thenprint:sys50209:goto206
+  209 open15,8,15:open1,8,2,"3d-"+fl$+",s,w"
+  210 gosub423
+  211 ifer=1thenclose1:close15:goto206
+  212 print#1,chr$(ap);
+  213 forq=1toap
+  214 print#1,dx(q)
+  215 print#1,dy(q)
+  216 print#1,dz(q)
+  217 next
+  218 print#1,chr$(af);
+  219 forq=1toaf
+  220 print#1,chr$(pf(q));
+  221 forw=1topf(q)
+  222 print#1,chr$(fl(q,w)+128);
+  223 next
+  224 next
+  225 close1
+  226 close15
+  227 goto112
+  228 rem *******************************
+  229 rem *   bild berechnen            *
+  230 rem *******************************
+  231 fu$="Bild berechnen":gosub124
+  232 gosub413:ifer=1thengoto112
+  233 input"{down}X-Drehwinkel ";xd
+  234 input"{down}Y-Drehwinkel ";yd
+  235 input"{down}Z-Drehwinkel ";zd
+  236 input"{down}Hinterschneidung (j/n) ";hi$
+  237 ifhi$="j"thenhi=1:goto240
+  238 ifhi$<>"n"thenprint"{up}{up}{up}":goto236
+  239 hi=0
+  240 input"{down}Fluchtpunkt (j/n) ";f$
+  241 iff$="j"thenf=1:goto245
+  242 iff$<>"n"thenprint"{up}{up}{up}":goto240
+  243 f=0
+  244 goto247
+  245 input"{down}Augpunkt-Koor.   0,0,25{left}{left}{left}{left}{left}{left}{left}{left}";fx,fy,fz
+  246 iffz<=0thenprint"{up}{up}{up}":goto245
+  247 input"{down}Werte ausgeben (j/n)   n{left}{left}{left}";we$
+  248 ifwe$="j"thenwe=1:goto251
+  249 ifwe$<>"n"thenprint"{up}{up}{up}":goto247
+  250 we=0
+  251 print"{down}{down}Drehe Punkte"
+  252 forq=1toap
+  253 wx(q)=dx(q)
+  254 wy(q)=dy(q)
+  255 wz(q)=dz(q)
+  256 next
+  257 ifxd=0thengoto262
+  258 forq=1toap
+  259 wi=xd:xp=wy(q):yp=wz(q):gosub434
+  260 wy(q)=xp:wz(q)=yp
+  261 next
+  262 ifyd=0thengoto267
+  263 forq=1toap
+  264 wi=yd:xp=wz(q):yp=wx(q):gosub434
+  265 wz(q)=xp:wx(q)=yp
+  266 next
+  267 ifyd=0thengoto272
+  268 forq=1toap
+  269 wi=zd:xp=wx(q):yp=wy(q):gosub434
+  270 wx(q)=xp:wy(q)=yp
+  271 next
+  272 iff=1thengoto278
+  273 forq=1toap
+  274 bx(q)=wx(q)
+  275 by(q)=wy(q)
+  276 next
+  277 goto285
+  278 print"{up}Berechne Bildpunkte"
+  279 forq=1toap
+  280 x1=fx:y1=fy:z1=fz
+  281 x2=wx(q):y2=wy(q):z2=wz(q)
+  282 gosub446
+  283 bx(q)=x1:by(q)=y1
+  284 next
+  285 ifhi=0thengoto298
+  286 print"{up}Berechne Mittelpunkte"
+  287 forq=1toaf
+  288 zx=0:zy=0:zz=0
+  289 forw=1topf(q)
+  290 zx=zx+bx(abs(fl(q,w)))
+  291 zy=zy+by(abs(fl(q,w)))
+  292 zz=zz+wz(abs(fl(q,w)))
+  293 next
+  294 mx(q)=zx/pf(q)
+  295 my(q)=zy/pf(q)
+  296 mz(q)=zz/pf(q)
+  297 next
+  298 print"{up}Berechne Achseinheiten"
+  299 px=0:nx=0:py=0:ny=0
+  300 forq=1toap
+  301 zx=bx(q)
+  302 zy=by(q)
+  303 gosub458
+  304 next
+  305 ax=-(px+nx)/2
+  306 ay=-(py+ny)/2
+  307 bx=(abs(px)+abs(nx))/3.2
+  308 by=(abs(py)+abs(ny))/2
+  309 ae=bx
+  310 ifbx<bythenae=by
+  311 ae=ae*100/98
+  312 forq=1toaf
+  313 rf(q)=q
+  314 next
+  315 ifhi=0thengoto325
+  316 print"{up}Berechne Reihenfolge  "
+  317 forq=1toaf-1
+  318 forw=q+1toaf
+  319 ifmz(rf(q))<=mz(rf(w))thengoto323
+  320 a=rf(q)
+  321 rf(q)=rf(w)
+  322 rf(w)=a
+  323 next
+  324 next
+  325 print"{up}Zeichne Bild          "
+  326 sys50185:sys50176
+  327 forq=1toaf
+  328 sys50188
+  329 nf=rf(q)
+  330 forw=1topf(nf)
+  331 zx=bx(abs(fl(nf,w)))
+  332 zy=by(abs(fl(nf,w)))
+  333 gosub466
+  334 e=w+1:ife>pf(nf)thene=1
+  335 x=zx:y=zy
+  336 zx=bx(abs(fl(nf,e)))
+  337 zy=by(abs(fl(nf,e)))
+  338 gosub466
+  339 r=sgn(fl(nf,e))
+  340 lo=0
+  341 ifr=1thengoto344
+  342 ifhi=0thengoto347
+  343 lo=3
+  344 sys50200+lo,x,y,zx,zy
+  345 iflo=3thensys50194,x,y
+  346 iflo=3thensys50194,zx,zy
+  347 next
+  348 ifhi=0thengoto353
+  349 zx=mx(nf)
+  350 zy=my(nf)
+  351 gosub466
+  352 sys50206,zx,zy
+  353 next
+  354 print"{up}{rvon}< SPACE >{rvof}   "
+  355 getin$:ifin$<>" "thengoto355
+  356 sys50182
+  357 input"{up}Bild aendern (j/n) ";ae$
+  358 ifae$="n"thengoto376
+  359 ifae$<>"j"thengoto357
+  360 x=160:y=100:lo=3:sys50176:pokev+21,1
+  361 getin$:ifin$="s"thenlo=0
+  362 ifin$="l"thenlo=3
+  363 ifin$="e"thenpokev+1,0:goto373
+  364 jo=peek(249)
+  365 if(joand1)=0andy>0theny=y-1
+  366 if(joand2)=0andy<199theny=y+1
+  367 if(joand4)=0andx>0thenx=x-1
+  368 if(joand8)=0andx<319thenx=x+1
+  369 if(joand16)=0thensys50194+lo,x,y
+  370 pokev,((x+13)and255):pokev+1,y+40
+  371 pokev+16,((x+13)and256)/256
+  372 goto361
+  373 print"{up}{rvon}< SPACE >{rvof}             "
+  374 sys50182
+  375 getin$:ifin$<>" "thengoto375
+  376 ifwe=0thengoto112
+  377 forq=1toap
+  378 fu$="Werte ausgeben":gosub124
+  379 print"{down}Punkt :";q
+  380 print"{down}{down}X-Koordinate :";bx(q)
+  381 print"{down}Y-Koordinate :";by(q)
+  382 iff=0thenprint"{down}Z-Koordinate :";wz(q)
+  383 print"{down}{down}{rvon}< SPACE{$a0}>{rvof}"
+  384 getin$:ifin$<>" "thengoto384
+  385 next
+  386 goto112
+  387 rem *******************************
+  388 rem *   hardcopy epson rx-80      *
+  389 rem *******************************
+  390 fu$="Hardcopy":gosub124
+  391 input"{down}Ist der Drucker wirklich an ";d$
+  392 ifd$="j"thengoto395
+  393 ifd$<>"n"thenprint"{up}{up}{up}":goto391
+  394 goto112
+  395 open4,4,2:rem ++ gross/klein ++
+  396 print#4
+  397 print#4,"Name             : ";fl$
+  398 print#4,"X-Drehwinkel     :";xd
+  399 print#4,"Y-Drehwinkel     :";yd
+  400 print#4,"Z-Drehwinkel     :";zd
+  401 print#4,"Hinterschneidung : ";hi$
+  402 print#4,"Fluchtpunkt      : ";f$
+  403 iff=1thenprint#4,"Augpunkt         :";fx;",";fy;",";fz
+  404 print#4
+  405 print#4
+  406 close4
+  407 open4,4,1:rem ++ epson mode ++
+  408 sys50215,4
+  409 print#4,chr$(10)
+  410 print#4,chr$(10)
+  411 close4
+  412 goto112
+  413 rem *******************************
+  414 rem *   auf daten testen          *
+  415 rem *******************************
+  416 er=0
+  417 ifap>0thenreturn
+  418 print"{down}{rvon}Keine Daten vorhanden !{rvof}"
+  419 print"{down}{down}{rvon}< SPACE >{rvof}"
+  420 getin$:ifin$<>" "thengoto420
+  421 er=1
+  422 return
+  423 rem *******************************
+  424 rem *   fehlerkanal abfragen      *
+  425 rem *******************************
+  426 er=0
+  427 input#15,fe,fe$,t,s
+  428 iffe=0thenreturn
+  429 print"{down}{rvon}Diskfehler :{rvof} ";fe$
+  430 print"{down}{rvon}Track      :{rvof}";t
+  431 print"{down}{rvon}Sektor     :{rvof}";s
+  432 er=1
+  433 return
+  434 rem *******************************
+  435 rem *   rec->pol + wi pol->rec    *
+  436 rem *******************************
+  437 la=sqr(xp^2+yp^2)
+  438 ifxp=0thenwk=~/2*sgn(yp):goto442
+  439 wk=atn(yp/xp)
+  440 ifsgn(xp)=-1thenwk=wk+~*sgn(yp)
+  441 ifsgn(xp)=-1andsgn(yp)=0thenwk=~
+  442 wk=wk+(wi*~/180)
+  443 xp=cos(wk)*la
+  444 yp=sin(wk)*la
+  445 return
+  446 rem *******************************
+  447 rem *   schnittpt. gerade/ebene   *
+  448 rem *******************************
+  449 ifx2=x1thengoto453
+  450 m=(z2-z1)/(x2-x1)
+  451 b=z1-m*x1
+  452 x1=-b/m
+  453 ify2=y1thengoto457
+  454 n=(z2-z1)/(y2-y1)
+  455 c=z1+n*y1
+  456 y1=-c/n
+  457 return
+  458 rem *******************************
+  459 rem *   ae berechnen              *
+  460 rem *******************************
+  461 ifpx<zxthenpx=zx
+  462 ifnx>zxthennx=zx
+  463 ifpy<zythenpy=zy
+  464 ifny>zythenny=zy
+  465 return
+  466 rem *******************************
+  467 rem *   bildkoor. berechnen       *
+  468 rem *******************************
+  469 zx=160+((zx+ax)*100/ae)
+  470 zy=100-((zy+ay)*100/ae)
+  471 return
+

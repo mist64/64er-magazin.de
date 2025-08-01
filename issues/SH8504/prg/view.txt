@@ -1,0 +1,25 @@
+
+
+;view.prg ==0801==
+   10 rem  "view"   display 'images.pic'
+   20 rem  graphics package need not be
+   30 rem  installed for this program.
+   40 :
+   50 if a=1 then 200
+   60 rem save 'vic' chip registers for
+   70 rem return to text display later.
+   80 :
+   90 v1=peek(53265):v2=peek(53272):v3=peek(56576)
+  100 :
+  110 rem initialize color map bytes for dark gray dots (11) on white (1)
+  120 cb=16*11+1
+  130 for i=33792 to 34791:poke i,cb:next
+  140 :
+  150 rem switch to graphics display and load 'images.pic' from disk
+  160 poke 53265,v1 or 32:poke 53272,25:poke 56576,(v3 and 252)or 1
+  170 poke 53280,1:a=1:load"images.pic",8,1
+  180 :
+  200 rem wait for key to be pressed then return to text screen
+  210 poke 198,0:wait 198,1:poke 198,0
+  220 poke 53265,v1:poke 53272,v2:poke 56576,v3:poke 53280,14
+
