@@ -88,15 +88,15 @@
 
         <p>den Inhalt von Byte 0 des Blocks 547. Wie groß wird nun dieser Wert sein?</p>
 
-        <p>Wie bereits erwähnt, besteht ein Byte aus kleinen Informationseinheiten (Bits). Das Bit kann entweder den Zustand »1« oder den Zustand »0« annehmen. Wenn Sie nun noch einmal Bild 3 betrachten, werden Sie erkennen, daß 8 solcher Bits ein Byte ergeben. Diese Bits werden mit Bit 0 bis Bit 7 von rechts nach links durchnumeriert. Da das Bit nur zwei Schaltzustände annehmen kann, wird zur Berechnung eines Bytes das Binärsystem zugrunde gelegt. Es ist<br />
-            2<sup>7</sup>=128<br />
-            2<sup>6</sup>= 64<br />
-            2<sup>5</sup>= 32<br />
-            2<sup>4</sup>= 16<br />
-            2<sup>3</sup>= 8<br />
-            2<sup>2</sup>= 4<br />
-            2<sup>1</sup>= 2<br />
-            und schließlich<br />
+        <p>Wie bereits erwähnt, besteht ein Byte aus kleinen Informationseinheiten (Bits). Das Bit kann entweder den Zustand »1« oder den Zustand »0« annehmen. Wenn Sie nun noch einmal Bild 3 betrachten, werden Sie erkennen, daß 8 solcher Bits ein Byte ergeben. Diese Bits werden mit Bit 0 bis Bit 7 von rechts nach links durchnumeriert. Da das Bit nur zwei Schaltzustände annehmen kann, wird zur Berechnung eines Bytes das Binärsystem zugrunde gelegt. Es ist<br>
+            2<sup>7</sup>=128<br>
+            2<sup>6</sup>= 64<br>
+            2<sup>5</sup>= 32<br>
+            2<sup>4</sup>= 16<br>
+            2<sup>3</sup>= 8<br>
+            2<sup>2</sup>= 4<br>
+            2<sup>1</sup>= 2<br>
+            und schließlich<br>
             2<sup>0</sup>= 1</p>
 
         <p>Bereits mit diesen Vorüberlegungen läßt sich der Inhalt von Byte 0 berechnen. Wie Sie in Bild 4 sehen, ist nur Bit 5 gesetzt, also ergibt sich als Inhalt von Byte 0 der Wert 2s = 32. Diesen Wert würde auch die Abfrage »PRINT PEEK(12568)« ergeben.</p>
@@ -235,43 +235,43 @@
 
         <p>TODO TABLE</p>
 
-        <p>BSOUT $FFD2 Ausgabe eines Bytes auf aktivem Kanal<br />
-            OPEN $FFCO Eröffnen eines Files auf dem Drucker<br />
-            CKOUT $FFC9 Ausgabe auf definiertem Kanal einleiten<br />
-            CLRCH $FFCC Ausgabe wieder auf Standard zurücksetzen<br />
-            CLOSE $FFC3 Schließen eines Files auf dem Drucker<br />
-            SETPAR $FFBA Setzen der Parameter für OPEN<br />
+        <p>BSOUT $FFD2 Ausgabe eines Bytes auf aktivem Kanal<br>
+            OPEN $FFCO Eröffnen eines Files auf dem Drucker<br>
+            CKOUT $FFC9 Ausgabe auf definiertem Kanal einleiten<br>
+            CLRCH $FFCC Ausgabe wieder auf Standard zurücksetzen<br>
+            CLOSE $FFC3 Schließen eines Files auf dem Drucker<br>
+            SETPAR $FFBA Setzen der Parameter für OPEN<br>
             LAENGE $B7 für die Länge eines Strings bei OPEN</p>
 
         <p>Bevor Sie ein File auf dem Drucker eröffnen, ist dem Computer erst mitzuteilen, welche Filenummer, welche Primäradresse und welche Sekundäradresse für das zu öffnende File zu verwenden sind. Da insbesondere beim Öffnen keine Zeichenkette an den Drucker zu senden ist, muß zunächst einmal das Flag LAENGE auf Null gesetzt werden:</p>
 
         <p>TODO PRE</p>
 
-        <p>LDA #0<br />
+        <p>LDA #0<br>
             STA LAENGE</p>
 
         <p>Daraufhin wird in den Akku die Filenummer, in das X&ndash;Register die Primäradresse des Druckers (normalerweise 4) und in das Y-Register die Sekundäradresse eines Files geladen, das dann später durch OPEN eröffnet wird. Zuerst müssen aber mit der Systemroutine SETPAR die Werte für einen OPEN-Befehl gesetzt werden, bevor die OPEN-Routine angesprungen werden darf.</p>
 
         <p>TODO PRE</p>
 
-        <p>LDA #Filenummer<br />
-            LDX #Primäradresse<br />
-            LDY #Sekundäradresse<br />
-            JSR SETPAR<br />
+        <p>LDA #Filenummer<br>
+            LDX #Primäradresse<br>
+            LDY #Sekundäradresse<br>
+            JSR SETPAR<br>
             JSR OPEN</p>
 
         <p>Damit ist ein Kanal für die Ausgabe auf dem Drucker definiert. Die eigentliche Ausgabe auf dem Drucker wird durch das nochmalige Laden der Filenummer in das X-Register und das Anspringen der Systemroutine CHKOUT eingeleitet.</p>
 
         <p>TODO PRE</p>
 
-        <p>LDX #Filenummer<br />
+        <p>LDX #Filenummer<br>
             JSR CHKOUT</p>
 
         <p>Danach kann man Zeichen, die im Akku stehen, mittels der Routine BSOUT auf dem Drucker ausgeben.</p>
 
         <p>TODO PRE</p>
 
-        <p>LDA #auszugebendes Zeichen<br />
+        <p>LDA #auszugebendes Zeichen<br>
             JSR BSOUT</p>
 
         <p>Durch diese Routine wird die Ausgabe, die mittels der Routine BSOUT normalerweise auf dem Bildschirm erfolgen würde, auf den Drucker umgeleitet. Das heißt unter anderem, daß dann während dieser Umleitung keine Zeichenausgabe auf dem Bildschirm vorgenommen werden kann. Wollen Sie die Umleitung wieder aufheben, so können Sie dies mit Hilfe von CLRCH erreichen:</p>
@@ -286,7 +286,7 @@
 
         <p>TODO PRE</p>
 
-        <p>LDA #Filenummer<br />
+        <p>LDA #Filenummer<br>
             JSR CLOSE</p>
 
         <p>Danach ist das Drucker-File ordnungsgemäß geschlossen. So, damit hätten wir unsere umfangreiche Expedition in das Gebiet der Grafikumsetzung für Druckausgaben abgeschlossen. Ich hoffe, daß Sie Ihnen ein wenig Spaß gemacht und Ihr Interesse an der Problematik geweckt hat. Ich wünsche Ihnen jedenfalls viel Erfolg bei der Programmierung einer eigenen Grafikroutine, sei es nun in Basic oder einer anderen Programmiersprache.</p>
