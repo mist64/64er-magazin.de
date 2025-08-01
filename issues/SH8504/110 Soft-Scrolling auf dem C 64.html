@@ -15,200 +15,201 @@
 <body>
     <article>
         <h1>Soft-Scrolling auf dem C 64</h1>
-<p class="intro">Soft-Scrolling in eigene Programme einzubauen, kann oft zum Problem werden. Wie es gemacht wird, zeigt Ihnen dieser Beitrag.</p>
+        <p class="intro">Soft-Scrolling in eigene Programme einzubauen, kann oft zum Problem werden. Wie es gemacht wird, zeigt Ihnen dieser Beitrag.</p>
 
-<p>Jeder kennt bestimmt Defender oder ähnliche Arcade-Games, bei denen die Hintergrundlandschaft über den Bildschirm zieht. Gemeint ist das sogenannte Smooth- oder Soft-Scrolling. Der Unterschied zwischen normalem und Soft-Scrolling ist, daß der Bildschirm beim Soft-Scrolling in Einerschritten (um ein Pixel) und beim normalen in Achterschritten (immer um acht Pixel gleichzeitig) verschoben wird.</p>
+        <p>Jeder kennt bestimmt Defender oder ähnliche Arcade-Games, bei denen die Hintergrundlandschaft über den Bildschirm zieht. Gemeint ist das sogenannte Smooth- oder Soft-Scrolling. Der Unterschied zwischen normalem und Soft-Scrolling ist, daß der Bildschirm beim Soft-Scrolling in Einerschritten (um ein Pixel) und beim normalen in Achterschritten (immer um acht Pixel gleichzeitig) verschoben wird.</p>
 
-<p>Beim Achterscrolling werden einfach die Speicherstellen des Video-RAMs (ab 1024/$0800) um jeweils eine Stelle nach links, rechts, oben oder unten verschoben.</p>
+        <p>Beim Achterscrolling werden einfach die Speicherstellen des Video-RAMs (ab 1024/$0800) um jeweils eine Stelle nach links, rechts, oben oder unten verschoben.</p>
 
-<p>Zum Achterscrolling ein Beispiel in Basic:</p>
+        <p>Zum Achterscrolling ein Beispiel in Basic:</p>
 
-<p>TODO PRE</p>
+        <p>TODO PRE</p>
 
-<p>10 REM Beispiel Nr. 1<br/>
-20 PRINT CHR$(147);TAB(14);<br/>
-30 PRINT "ABCDEFGHIJKLMNOPQRSTUVWXYZ"<br/>
-40 FOR I=1064 T0 1024 STEP -1<br/>
-50 POKE I,PEEK (I-1)<br/>
-60 NEXT<br/>
-70 G0T0 40</p>
+        <p>10 REM Beispiel Nr. 1<br />
+            20 PRINT CHR$(147);TAB(14);<br />
+            30 PRINT "ABCDEFGHIJKLMNOPQRSTUVWXYZ"<br />
+            40 FOR I=1064 T0 1024 STEP -1<br />
+            50 POKE I,PEEK (I-1)<br />
+            60 NEXT<br />
+            70 G0T0 40</p>
 
-<p>Dieses Programm arbeitet zwar noch relativ schnell, aber wir werden später diese Aufgabe einem Assemblerprogramm übergeben.</p>
+        <p>Dieses Programm arbeitet zwar noch relativ schnell, aber wir werden später diese Aufgabe einem Assemblerprogramm übergeben.</p>
 
-<p>Das Alphabet wird nach dem Eintippen dieses Programms nach rechts herausgeschoben. Dieses Achterscrolling ist aber zu sprunghaft, und falls es schneller läuft, ist die gescrollte Schrift unleserlich.</p>
+        <p>Das Alphabet wird nach dem Eintippen dieses Programms nach rechts herausgeschoben. Dieses Achterscrolling ist aber zu sprunghaft, und falls es schneller läuft, ist die gescrollte Schrift unleserlich.</p>
 
-<p>Das Soft-Scrolling bewirkt, daß die Schrift gleichmäßig fließend und damit leserlich gemacht wird. Wie scrollt man denn nun aber den Bildschirm um nur ein Pixel?</p>
+        <p>Das Soft-Scrolling bewirkt, daß die Schrift gleichmäßig fließend und damit leserlich gemacht wird. Wie scrollt man denn nun aber den Bildschirm um nur ein Pixel?</p>
 
-<p>Die Hauptrolle hierbei spielen die Speicherstellen 53248+17 (53248 = Basisadresse des Video-Chips +17 für das vertikale und 53248+22 für das horizontale Scrolling).</p>
+        <p>Die Hauptrolle hierbei spielen die Speicherstellen 53248+17 (53248 = Basisadresse des Video-Chips +17 für das vertikale und 53248+22 für das horizontale Scrolling).</p>
 
-<p>Befassen wir uns zunächst mit dem horizontalen Scrolling. Die Speicheradresse 53248+22 ist folgendermaßen aufgebaut:</p>
+        <p>Befassen wir uns zunächst mit dem horizontalen Scrolling. Die Speicheradresse 53248+22 ist folgendermaßen aufgebaut:</p>
 
-<p>Bit 7 bis 5 : Sind nicht benutzt</p>
+        <p>Bit 7 bis 5 : Sind nicht benutzt</p>
 
-<p>Bit 4 : Zur Umschaltung auf Multicolor<br/>
-Wichtig sind für unsere Anwendung nur:</p>
+        <p>Bit 4 : Zur Umschaltung auf Multicolor<br />
+            Wichtig sind für unsere Anwendung nur:</p>
 
-<p>Bit 3 : Umschalten von 40 auf 38 Spalten</p>
+        <p>Bit 3 : Umschalten von 40 auf 38 Spalten</p>
 
-<p>Bit 0 bis 2 : Horizontales Scrolling</p>
+        <p>Bit 0 bis 2 : Horizontales Scrolling</p>
 
-<p>Dazu ein Versuch:<br/>
-POKE 53248+22,PEEK (53248+22) AND 248 OR 3</p>
+        <p>Dazu ein Versuch:<br />
+            POKE 53248+22,PEEK (53248+22) AND 248 OR 3</p>
 
-<p>Nun müßte sich der Bildschirm um drei Pixels nach rechts verschoben haben.</p>
+        <p>Nun müßte sich der Bildschirm um drei Pixels nach rechts verschoben haben.</p>
 
-<p>Einige werden sich jetzt fragen, warum die ANDs und ORs?</p>
+        <p>Einige werden sich jetzt fragen, warum die ANDs und ORs?</p>
 
-<p>Nehmen wir einmal an, im Register 22 des VIC würde die Zahl 107 stehen. Diese Zahl wird mit 248 AND-verknüpft. Beide Zahlen müssen binär aufgeschlüsselt werden:</p>
+        <p>Nehmen wir einmal an, im Register 22 des VIC würde die Zahl 107 stehen. Diese Zahl wird mit 248 AND-verknüpft. Beide Zahlen müssen binär aufgeschlüsselt werden:</p>
 
-<p>TODO</p>
+        <p>TODO</p>
 
-<p>107 = 01101011<br/>
-AND 248 = 11111000<br/>
-ergibt 01101000</p>
+        <p>107 = 01101011<br />
+            AND 248 = 11111000<br />
+            ergibt 01101000</p>
 
-<p>Durch diese AND-Funktion werden also die Bits 0 bis 2 gelöscht. Die Bits 3 bis 7 ändern sich nie. Durch die OR-Funktion werden die entsprechenden Bits gesetzt:</p>
+        <p>Durch diese AND-Funktion werden also die Bits 0 bis 2 gelöscht. Die Bits 3 bis 7 ändern sich nie. Durch die OR-Funktion werden die entsprechenden Bits gesetzt:</p>
 
-<p>TODO</p>
+        <p>TODO</p>
 
-<p>01101000<br/>
-OR 3 00000011<br/>
-ergibt 01101011</p>
+        <p>01101000<br />
+            OR 3 00000011<br />
+            ergibt 01101011</p>
 
-<p>Die Bits für das horizontale Scrolling enthalten jetzt den Wert 3. Der höchste mit den Bits 0 bis 2 zu erreichende Wert ist 7, der niedrigste ist 0. Je größer der Wert in diesen drei Bits, desto weiter wird der Bildschirm nach rechts verschoben! Mit dieser Erkenntnis können wir den Bildschirm um sieben Pixels nach rechts rollen!</p>
+        <p>Die Bits für das horizontale Scrolling enthalten jetzt den Wert 3. Der höchste mit den Bits 0 bis 2 zu erreichende Wert ist 7, der niedrigste ist 0. Je größer der Wert in diesen drei Bits, desto weiter wird der Bildschirm nach rechts verschoben! Mit dieser Erkenntnis können wir den Bildschirm um sieben Pixels nach rechts rollen!</p>
 
-<p>TODO PRE</p>
+        <p>TODO PRE</p>
 
-<p>10 REM Beispiel Nr. 2<br/>
-20 FOR 1=0 T0 7<br/>
-30 POKE 53248+22,PEEK (53248+22) AND248 OR I<br/>
-40 FOR T=0 T0 1000:NEXT T<br/>
-50 NEXT I<br/>
-60 RUN</p>
+        <p>10 REM Beispiel Nr. 2<br />
+            20 FOR 1=0 T0 7<br />
+            30 POKE 53248+22,PEEK (53248+22) AND248 OR I<br />
+            40 FOR T=0 T0 1000:NEXT T<br />
+            50 NEXT I<br />
+            60 RUN</p>
 
-<p>Dieses Programm verschiebt den Bildschirm langsam von der normalen Position um sieben Pixel nach rechts. Dann wird er wieder auf die normale Position zurückgesetzt und rollt wieder nach rechts. Wie macht man es nun, daß der Bildschirm über das 7. Pixel hinausscrollt?</p>
+        <p>Dieses Programm verschiebt den Bildschirm langsam von der normalen Position um sieben Pixel nach rechts. Dann wird er wieder auf die normale Position zurückgesetzt und rollt wieder nach rechts. Wie macht man es nun, daß der Bildschirm über das 7. Pixel hinausscrollt?</p>
 
-<p>Dies ist ganz einfach: Nachdem das 7. Pixel erreicht wurde, machen wir ein Achterscrolling, das heißt wir verschieben einen Bildschirmcode um ein Zeichen nach rechts. Gleichzeitig setzen wir das Scrollregister wieder auf Null und haben jetzt das 8. Pixel erreicht.</p>
+        <p>Dies ist ganz einfach: Nachdem das 7. Pixel erreicht wurde, machen wir ein Achterscrolling, das heißt wir verschieben einen Bildschirmcode um ein Zeichen nach rechts. Gleichzeitig setzen wir das Scrollregister wieder auf Null und haben jetzt das 8. Pixel erreicht.</p>
 
-<p>Jetzt können wir die Prozedur wieder von vorne beginnen (dazu ein Flußdiagramm).</p>
+        <p>Jetzt können wir die Prozedur wieder von vorne beginnen (dazu ein Flußdiagramm).</p>
 
-<p>S = SCROLLREGISTER</p>
+        <p>S = SCROLLREGISTER</p>
 
-<p>Dieses Flußdiagramm muß nun noch in ein Programm umgesetzt werden. Würde das gesamte Programm in Basic geschrieben, wäre es ziemlich langsam. Deshalb wird im nachstehenden Listing das Achterscrolling in Assembler realisiert. Es scrollt die erste Zeile in Achterschritten nach rechts. Zuerst die Darstellung in Maschinensprache und dann in DATA-Zeilen:</p>
+        <p>Dieses Flußdiagramm muß nun noch in ein Programm umgesetzt werden. Würde das gesamte Programm in Basic geschrieben, wäre es ziemlich langsam. Deshalb wird im nachstehenden Listing das Achterscrolling in Assembler realisiert. Es scrollt die erste Zeile in Achterschritten nach rechts. Zuerst die Darstellung in Maschinensprache und dann in DATA-Zeilen:</p>
 
-<p>TODO</p>
+        <p>TODO</p>
 
-<p>LDA $0427   ; STA $FB   Speicherstelle 1063 merken<br/>
-LDX #38 ;   Bei Spalte 38 anfangen<br/>
-LDA $0400,X ;   Bildschirmcode laden<br/>
-INX ;   Um 1 erhöhen<br/>
-STA $0400,X ; DEX   Und abspeichern<br/>
-DEX ;   Um 2 erhöhen<br/>
-CPX #$FF ;  Schon fertig ?<br/>
-BNEV<br/>
-LDA $FB ; STA $0400 1063 wieder nach 1024<br/>
-LDA $D016   ;   Scrollregister laden<br/>
-AND #248    ;   Scrollbits löschen<br/>
-STA $D016   ; RTS   Zurückspeichern<br/>
-110</p>
+        <p>LDA $0427 ; STA $FB Speicherstelle 1063 merken<br />
+            LDX #38 ; Bei Spalte 38 anfangen<br />
+            LDA $0400,X ; Bildschirmcode laden<br />
+            INX ; Um 1 erhöhen<br />
+            STA $0400,X ; DEX Und abspeichern<br />
+            DEX ; Um 2 erhöhen<br />
+            CPX #$FF ; Schon fertig ?<br />
+            BNEV<br />
+            LDA $FB ; STA $0400 1063 wieder nach 1024<br />
+            LDA $D016 ; Scrollregister laden<br />
+            AND #248 ; Scrollbits löschen<br />
+            STA $D016 ; RTS Zurückspeichern<br />
+            110</p>
 
-<p>Dieses Maschinenprogramm schiebt die Zeilen, die in der ersten Zeile des Bildschirms stehen, nicht nur nach rechts, sondern macht ein Rundum-Scrolling. Die rechts verschwundene Schrift erscheint also wieder am linken Bildschirmrand. Dies wird durch die ersten und letzten beiden Maschinenprogrammzeilen ermöglicht. Startet man dieses Programm, so ist ab und zu ein leichtes Zucken zu erkennen. Dies liegt daran, daß der Elektronenstrahl, der den Bildschirm 25mal in der Sekunde aufbaut, die erste Zeile schreibt, während sie gescrollt wird. Wie kann man das vermeiden?</p>
+        <p>Dieses Maschinenprogramm schiebt die Zeilen, die in der ersten Zeile des Bildschirms stehen, nicht nur nach rechts, sondern macht ein Rundum-Scrolling. Die rechts verschwundene Schrift erscheint also wieder am linken Bildschirmrand. Dies wird durch die ersten und letzten beiden Maschinenprogrammzeilen ermöglicht. Startet man dieses Programm, so ist ab und zu ein leichtes Zucken zu erkennen. Dies liegt daran, daß der Elektronenstrahl, der den Bildschirm 25mal in der Sekunde aufbaut, die erste Zeile schreibt, während sie gescrollt wird. Wie kann man das vermeiden?</p>
 
-<p>Es ist das Register 53248+18, das benötigt wird. In ihm steht die Zeile, in der sich der Elektronenstrahl befindet (nähere Informationen siehe 64’er, Ausgabe 11/84).</p>
+        <p>Es ist das Register 53248+18, das benötigt wird. In ihm steht die Zeile, in der sich der Elektronenstrahl befindet (nähere Informationen siehe 64’er, Ausgabe 11/84).</p>
 
-<p>Wir brauchen also nur dieses Register auszulesen und die erste Zeile erst dann zu scrollen, nachdem sie vollständig vom Elektronenstrahl aufgebaut wurde.</p>
+        <p>Wir brauchen also nur dieses Register auszulesen und die erste Zeile erst dann zu scrollen, nachdem sie vollständig vom Elektronenstrahl aufgebaut wurde.</p>
 
-<p>Die Abfrage muß in Assembler geschehen, da ein Basic-Programm im Verhältnis zur Geschwindigkeit des Elektronenstrahls zu langsam ist. Der richtige Zeitpunkt für den Beginn des Scrollings ist ungefähr dann gegeben, wenn der Strahl die Rasterzeile 100 erreicht hat.</p>
+        <p>Die Abfrage muß in Assembler geschehen, da ein Basic-Programm im Verhältnis zur Geschwindigkeit des Elektronenstrahls zu langsam ist. Der richtige Zeitpunkt für den Beginn des Scrollings ist ungefähr dann gegeben, wenn der Strahl die Rasterzeile 100 erreicht hat.</p>
 
-<p>Wir müssen das obige Maschinenprogramm also noch etwas erweitern. Ganz am Anfang muß stehen:</p>
+        <p>Wir müssen das obige Maschinenprogramm also noch etwas erweitern. Ganz am Anfang muß stehen:</p>
 
-<p>TODO</p>
+        <p>TODO</p>
 
-<p>X LDA 53248+18 ; Rasterzeile auslesen<br/>
-CMP #160 ; Vergleiche auf 160<br/>
-BMI X ; Wenn kleiner dann nach X<br/>
-CMP #190 ; Vergleiche auf 190<br/>
-BPL X ; Wenn größer dann nach X<br/>
-RTS</p>
+        <p>X LDA 53248+18 ; Rasterzeile auslesen<br />
+            CMP #160 ; Vergleiche auf 160<br />
+            BMI X ; Wenn kleiner dann nach X<br />
+            CMP #190 ; Vergleiche auf 190<br />
+            BPL X ; Wenn größer dann nach X<br />
+            RTS</p>
 
-<p>Und nun das gesamte 1-Zeilen-Soft-Scrolling in Basic: (Das dazugehörige Maschinenprogramm ist so geschrieben, daß es in jeden Bereich ge-POKEt werden kann!)</p>
+        <p>Und nun das gesamte 1-Zeilen-Soft-Scrolling in Basic: (Das dazugehörige Maschinenprogramm ist so geschrieben, daß es in jeden Bereich ge-POKEt werden kann!)</p>
 
-<p>TODO PRE</p>
+        <p>TODO PRE</p>
 
-<p>10  REM Beispiel Nr. 3<br/>
-20  PRINT CHR$(147);GOSUB 100<br/>
-30 PRINT "Beliebiger Text kleiner als 40 Zeichen"<br/>
-40  REM Farbe = schwarz<br/>
-50  FOR I=55296 TO 55296+39:POKE I,0:NEXT<br/>
-60  FOR I=1 TO 7<br/>
-70  POKE 53248+22,PEEK (53248+22) AND 248 OR I<br/>
-80  FOR T=0 TO 5:NEXT<br/>
-90  NEXT I<br/>
-100 FOR T=0 TO 3:NEXT<br/>
-110 SYS32768:REM Achterscrolling<br/>
-120 GOTO 60<br/>
-130 REM Masch.PRG einlesen<br/>
-140 FOR 1=32768 TO 32768+44:REM 44 DATAs<br/>
-150 READ G:S=S+G:POKE I,G:NEXT<br/>
-160 IF S=6044 THEN 180<br/>
-170 PRINT"FEHLERINDATAS!":STOP<br/>
-180 RETURN<br/>
-190 DATA    173,18,208,201,160,48,249,201<br/>
-200 DATA    190,16,245,173,39,4,141,255,207<br/>
-210 DATA    162,38,189,0,4,232,157,0,4,202<br/>
-220 DATA    202,224,255,208,243,173,255,207<br/>
-230 DATA    141,0,4,173,22,208,41,248,9<br/>
-240 DATA    0,141,22,208,96</p>
+        <p>10 REM Beispiel Nr. 3<br />
+            20 PRINT CHR$(147);GOSUB 100<br />
+            30 PRINT "Beliebiger Text kleiner als 40 Zeichen"<br />
+            40 REM Farbe = schwarz<br />
+            50 FOR I=55296 TO 55296+39:POKE I,0:NEXT<br />
+            60 FOR I=1 TO 7<br />
+            70 POKE 53248+22,PEEK (53248+22) AND 248 OR I<br />
+            80 FOR T=0 TO 5:NEXT<br />
+            90 NEXT I<br />
+            100 FOR T=0 TO 3:NEXT<br />
+            110 SYS32768:REM Achterscrolling<br />
+            120 GOTO 60<br />
+            130 REM Masch.PRG einlesen<br />
+            140 FOR 1=32768 TO 32768+44:REM 44 DATAs<br />
+            150 READ G:S=S+G:POKE I,G:NEXT<br />
+            160 IF S=6044 THEN 180<br />
+            170 PRINT"FEHLERINDATAS!":STOP<br />
+            180 RETURN<br />
+            190 DATA 173,18,208,201,160,48,249,201<br />
+            200 DATA 190,16,245,173,39,4,141,255,207<br />
+            210 DATA 162,38,189,0,4,232,157,0,4,202<br />
+            220 DATA 202,224,255,208,243,173,255,207<br />
+            230 DATA 141,0,4,173,22,208,41,248,9<br />
+            240 DATA 0,141,22,208,96</p>
 
-<p>Man stellt fest, daß die Zeichen am rechten Rand langsam herauswandern; aber am linken Rand plötzlich auftauchen. Dies läßt sich verhindern, indem man den Bildschirm seitlich verengt (Bit 3 des Registers 53248+22 löschen). Das kann man mit<br/>
-POKE 53248+22,PEEK(53248+22)AND247 erreichen. Platz dafür wäre zum Beispiel in Zeile 45.</p>
+        <p>Man stellt fest, daß die Zeichen am rechten Rand langsam herauswandern; aber am linken Rand plötzlich auftauchen. Dies läßt sich verhindern, indem man den Bildschirm seitlich verengt (Bit 3 des Registers 53248+22 löschen). Das kann man mit<br />
+            POKE 53248+22,PEEK(53248+22)AND247 erreichen. Platz dafür wäre zum Beispiel in Zeile 45.</p>
 
-<p>Basic reicht nicht aus, um eine angemessene Geschwindigkeit zu erreichen. Deshalb steigen wir nun ganz auf Assembler um! Schreiben wir zunächst die Zeilen 60 bis 90 des Beispiels Nummer 3 in Assembler:</p>
+        <p>Basic reicht nicht aus, um eine angemessene Geschwindigkeit zu erreichen. Deshalb steigen wir nun ganz auf Assembler um! Schreiben wir zunächst die Zeilen 60 bis 90 des Beispiels Nummer 3 in Assembler:</p>
 
-<p>M LDA 53248+22 ; Scrollregister laden<br/>
-AND #7 ; Scrollbits ausfiltern<br/>
-CMP #7 ; Schon 7 ?<br/>
-BNE N ; Wenn nicht dann Einerscrolling<br/>
-JSR ACHTSC ; Achterscrolling<br/>
-JMP M ; Nächste Verschiebung<br/>
-N INC 53248+22 ; Scrollreg. erhöhen<br/>
-LDX #$FF ; Verzögerungsschleife<br/>
-Q LDY #$30<br/>
-A INY<br/>
-BNE A<br/>
-INX<br/>
-BNE Q<br/>
-JMP M ; Nächste Verschiebung</p>
+        <p>M LDA 53248+22 ; Scrollregister laden<br />
+            AND #7 ; Scrollbits ausfiltern<br />
+            CMP #7 ; Schon 7 ?<br />
+            BNE N ; Wenn nicht dann Einerscrolling<br />
+            JSR ACHTSC ; Achterscrolling<br />
+            JMP M ; Nächste Verschiebung<br />
+            N INC 53248+22 ; Scrollreg. erhöhen<br />
+            LDX #$FF ; Verzögerungsschleife<br />
+            Q LDY #$30<br />
+            A INY<br />
+            BNE A<br />
+            INX<br />
+            BNE Q<br />
+            JMP M ; Nächste Verschiebung</p>
 
-<p>Diese Routine müssen wir nur noch in das obige Achterscrolling einbauen. Für die Basic-Fans haben wir einen Basic-Lader dieses Programms am Schluß abgedruckt. Kommen wir nun zum vertikalen Scrolling:</p>
+        <p>Diese Routine müssen wir nur noch in das obige Achterscrolling einbauen. Für die Basic-Fans haben wir einen Basic-Lader dieses Programms am Schluß abgedruckt. Kommen wir nun zum vertikalen Scrolling:</p>
 
-<p>Im Prinzip funktioniert es wie das horizontale, es wird nur ein anderes Register benutzt.</p>
+        <p>Im Prinzip funktioniert es wie das horizontale, es wird nur ein anderes Register benutzt.</p>
 
-<p>Das Register für das vertikale Scrolling ist: 53248+17.</p>
+        <p>Das Register für das vertikale Scrolling ist: 53248+17.</p>
 
-<p>Für das Scrolling sind wie beim horizontalen Scrolling die Bits 0 bis 2 verantwortlich.</p>
+        <p>Für das Scrolling sind wie beim horizontalen Scrolling die Bits 0 bis 2 verantwortlich.</p>
 
-<p>Einzeilen Soft-Scrolling (DATA-Lader):</p>
+        <p>Einzeilen Soft-Scrolling (DATA-Lader):</p>
 
-<p>TODO PRE</p>
+        <p>TODO PRE</p>
 
-<p>0   DATA173,22,208,41,7,201,7,208,6,32,34,128,76,0,<br/>
-128,32,68,128,238,22,208<br/>
-1   DATA162,255,160,160,200,208,253,232,208,248,76,0,   H<br/>
-128,173,39,4,133,251<br/>
-2   DATA162,38,189,0,4,232,157,0,4,202,202,224,255, ■<br/>
-208,243,165,251,141,0<br/>
-3   DATA4,173,22,208,41,248,141,22,208,96,173,18,208,<br/>
-201,160,48,249,201,190<br/>
-4   DATA16,245,96,255<br/>
-10  FOR I=32768 TO 32768+5*16<br/>
-20  READA:POKEI,A<br/>
-30  NEXT<br/>
-40  PRINT"(CLR} HIER KOENNTE EIN TEXT STEHEN.<br/>
-50  SYS32768<br/>
-READY</p>
+        <p>0 DATA173,22,208,41,7,201,7,208,6,32,34,128,76,0,<br />
+            128,32,68,128,238,22,208<br />
+            1 DATA162,255,160,160,200,208,253,232,208,248,76,0, H<br />
+            128,173,39,4,133,251<br />
+            2 DATA162,38,189,0,4,232,157,0,4,202,202,224,255, ■<br />
+            208,243,165,251,141,0<br />
+            3 DATA4,173,22,208,41,248,141,22,208,96,173,18,208,<br />
+            201,160,48,249,201,190<br />
+            4 DATA16,245,96,255<br />
+            10 FOR I=32768 TO 32768+5*16<br />
+            20 READA:POKEI,A<br />
+            30 NEXT<br />
+            40 PRINT"(CLR} HIER KOENNTE EIN TEXT STEHEN.<br />
+            50 SYS32768<br />
+            READY</p>
 
-<address class="author">(Frank Barcikowski + Holger Vocke/ah)</address>
+        <address class="author">(Frank Barcikowski + Holger Vocke/ah)</address>
     </article>
 </body>
+
 </html>

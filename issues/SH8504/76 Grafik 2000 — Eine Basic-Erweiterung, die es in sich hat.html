@@ -16,261 +16,262 @@
 <body>
     <article>
         <h1>Grafik 2000 — Eine Basic-Erweiterung, die es in sich hat</h1>
-<p class="intro">Diese Befehlserweiterung für den C 64 stellt Ihnen 41 neue Basic-Befehle und zwei neue Funktionen zur komfortablen Handhabung der mehrfarbigen HiRes-Grafik zur Verfügung.</p>
+        <p class="intro">Diese Befehlserweiterung für den C 64 stellt Ihnen 41 neue Basic-Befehle und zwei neue Funktionen zur komfortablen Handhabung der mehrfarbigen HiRes-Grafik zur Verfügung.</p>
 
-<p>Die Befehle sind, wie die Befehle des Basic V2, abkürzbar, vollkommen in den Interpreter integriert und werden selbstverständlich als Tokens gespeichert. Selbst nach »THEN« ist kein Doppelpunkt notwendig.</p>
+        <p>Die Befehle sind, wie die Befehle des Basic V2, abkürzbar, vollkommen in den Interpreter integriert und werden selbstverständlich als Tokens gespeichert. Selbst nach »THEN« ist kein Doppelpunkt notwendig.</p>
 
-<p>Da die zwei unabhängigen Grafikschirme und das Programm selbst außerhalb des Basic-Speichers liegen, stehen dem Benutzer weiterhin 38911 Bytes für seine Programme zur Verfügung. Auch Sprites benötigen keinen Basic-Speicherplatz.</p>
+        <p>Da die zwei unabhängigen Grafikschirme und das Programm selbst außerhalb des Basic-Speichers liegen, stehen dem Benutzer weiterhin 38911 Bytes für seine Programme zur Verfügung. Auch Sprites benötigen keinen Basic-Speicherplatz.</p>
 
-<p>v Die Erweiterung selbst arbeitet außerordentlich schnell, da zum Beispiel das Programm zum Errechnen einer Punktadresse weniger als 1/15000 Sekunde benötigt. So dauert beispielsweise das AusFILLen des leeren Bildschirmes weniger als 50 Sekunden! Auch die weiteren Befehle arbeiten ähnlich schnell.</p>
+        <p>v Die Erweiterung selbst arbeitet außerordentlich schnell, da zum Beispiel das Programm zum Errechnen einer Punktadresse weniger als 1/15000 Sekunde benötigt. So dauert beispielsweise das AusFILLen des leeren Bildschirmes weniger als 50 Sekunden! Auch die weiteren Befehle arbeiten ähnlich schnell.</p>
 
-<p>Diese Erweiterung ist zudem sehr sicher, denn selbst grobe Fehleingaben führen nicht zum Systemabsturz und somit Programmverlust (POKEs ausgenommen).</p>
+        <p>Diese Erweiterung ist zudem sehr sicher, denn selbst grobe Fehleingaben führen nicht zum Systemabsturz und somit Programmverlust (POKEs ausgenommen).</p>
 
-<h2>Grundlagen</h2>
+        <h2>Grundlagen</h2>
 
-<p>Grafik 2000 unterstützt die farbige HiRes-Grafik des C64. Diese Grafik ist aus 320 x 200 einzeln ansprechbaren Punkten aufgebaut. Dabei befindet sich der Punkt mit den Koordinaten 0/0 in der linken oberen und der Punkt mit den Koordinaten 319/199 in der rechten unteren Ecke des Bildschirmes.</p>
+        <p>Grafik 2000 unterstützt die farbige HiRes-Grafik des C64. Diese Grafik ist aus 320 x 200 einzeln ansprechbaren Punkten aufgebaut. Dabei befindet sich der Punkt mit den Koordinaten 0/0 in der linken oberen und der Punkt mit den Koordinaten 319/199 in der rechten unteren Ecke des Bildschirmes.</p>
 
-<p>Die Farbinformation fürje 8 x 8 Punkte liegt im sogenannten Video-RAM. Hier steht in den oberen vier Bits die Farbe für einen gesetzten, in den unteren vier Bits die Farbe für einen gelöschten Punkt. Für den Anwender bedeutet dies, daß in einem 8 x 8 Punkte-Kästchen nur zwei verschiedene Farben vorkommen können.</p>
+        <p>Die Farbinformation fürje 8 x 8 Punkte liegt im sogenannten Video-RAM. Hier steht in den oberen vier Bits die Farbe für einen gesetzten, in den unteren vier Bits die Farbe für einen gelöschten Punkt. Für den Anwender bedeutet dies, daß in einem 8 x 8 Punkte-Kästchen nur zwei verschiedene Farben vorkommen können.</p>
 
-<h2>Befehlsbesprechung</h2>
+        <h2>Befehlsbesprechung</h2>
 
-<p>Anmerkung: Hinter dem Befehlsnamen steht die jeweilige Abkürzung, wobei»’« bedeutet, daß der folgende Buchstabe geSHIFTet eingegeben werden muß.</p>
+        <p>Anmerkung: Hinter dem Befehlsnamen steht die jeweilige Abkürzung, wobei»’« bedeutet, daß der folgende Buchstabe geSHIFTet eingegeben werden muß.</p>
 
-<p>TODO</p>
+        <p>TODO</p>
 
-<p>CLEAR   CL’E<br/>
-Löscht den Grafikbildschirm. Die Farbe bleibt unverändert.<br/>
-MODE n  M’O<br/>
-Wenn n=1 ist, wird der Grafikmodus eingeschaltet; ist n=0, wird auf den Textbildschirm geschaltet. Dabei wird der Groß/Grafik-Modus eingeschaltet.<br/>
-COLOR p,h   CO’L<br/>
-Setzt die Farben im Video-RAM. Dabei steht p für die Punktfarbe und h für die Hintergrundfarbe. Es können Werte von 0 bis 15 für die Farben stehen.<br/>
-CHANGE  CH’A<br/>
-CHANGE wechselt zwischen den beiden Grafikschirmen, indem die jeweiligen Punkte ausgetauscht werden.<br/>
-INVERS  IN’V<br/>
-Invertiert die sichtbare Grafik. Das Video-RAM bleibt unverändert.<br/>
-COMB n  CO’M<br/>
-COMB führt eine logische Verknüpfung zwischen den beiden Grafikseiten aus. Das Ergebnis wird in die sichtbare Grafik geschrieben. Die Verknüpfungsart ist mit n wählbar:<br/>
-n=1:    logisch OR<br/>
-n=2:    logisch AND<br/>
-n=3:    logisch EXOR<br/>
-GSAVE a$,dv G’S<br/>
-GSAVE speichert die verdeckte Grafik mit dem Namen a$ an Gerät mit der Nummer dv ab. Die Parameter können entfallen.<br/>
-Beispiel:<br/>
-GASVE "BILD 1",8 Speichert die Grafik BILD 1 auf Diskette<br/>
-GSAVE   Speichert die Grafik ohne Namen auf Kassette ab.<br/>
-CSAVE a$,dv C’S<br/>
-Speichert das Video-RAM, die Farbe der Grafik, ab.<br/>
-Die Parameter sind analog zu GSAVE.<br/>
-GLOAD a$,dv G’L<br/>
-Mit GLOAD kann man die mit GSAVE abgespeicherte Grafik oder das mit CSAVE abgespeicherte Video-RAM laden.</p>
+        <p>CLEAR CL’E<br />
+            Löscht den Grafikbildschirm. Die Farbe bleibt unverändert.<br />
+            MODE n M’O<br />
+            Wenn n=1 ist, wird der Grafikmodus eingeschaltet; ist n=0, wird auf den Textbildschirm geschaltet. Dabei wird der Groß/Grafik-Modus eingeschaltet.<br />
+            COLOR p,h CO’L<br />
+            Setzt die Farben im Video-RAM. Dabei steht p für die Punktfarbe und h für die Hintergrundfarbe. Es können Werte von 0 bis 15 für die Farben stehen.<br />
+            CHANGE CH’A<br />
+            CHANGE wechselt zwischen den beiden Grafikschirmen, indem die jeweiligen Punkte ausgetauscht werden.<br />
+            INVERS IN’V<br />
+            Invertiert die sichtbare Grafik. Das Video-RAM bleibt unverändert.<br />
+            COMB n CO’M<br />
+            COMB führt eine logische Verknüpfung zwischen den beiden Grafikseiten aus. Das Ergebnis wird in die sichtbare Grafik geschrieben. Die Verknüpfungsart ist mit n wählbar:<br />
+            n=1: logisch OR<br />
+            n=2: logisch AND<br />
+            n=3: logisch EXOR<br />
+            GSAVE a$,dv G’S<br />
+            GSAVE speichert die verdeckte Grafik mit dem Namen a$ an Gerät mit der Nummer dv ab. Die Parameter können entfallen.<br />
+            Beispiel:<br />
+            GASVE "BILD 1",8 Speichert die Grafik BILD 1 auf Diskette<br />
+            GSAVE Speichert die Grafik ohne Namen auf Kassette ab.<br />
+            CSAVE a$,dv C’S<br />
+            Speichert das Video-RAM, die Farbe der Grafik, ab.<br />
+            Die Parameter sind analog zu GSAVE.<br />
+            GLOAD a$,dv G’L<br />
+            Mit GLOAD kann man die mit GSAVE abgespeicherte Grafik oder das mit CSAVE abgespeicherte Video-RAM laden.</p>
 
-<p>Da dieser Befehl keine Basic-Zeiger verändert, eignet er sich auch zum Laden von Maschinenprogrammen, auch im Direktmodus.<br/>
-SPOINT x,y  SP’O<br/>
-Setzt einen Punkt an die Stelle x/y in der Grafik.<br/>
-CPOINT x,y  C’P<br/>
-Löscht den Punkt x/y.<br/>
-IPOINT x,y  PS’C<br/>
-Invertiert den Punkt x/y<br/>
-PSCLINE x,y PS’C<br/>
-Setzt den Punkt x/y und löscht ab diesem Punkt eine Linie nach unten bis zum Grafikrand. Der Befehl ist besonders für 3D-Grafiken geeignet.<br/>
-HMARK x,y   H’M<br/>
-Setzt eine waagrechte »Markierung«an den Punktx/y, das heißt, es wird eine 5 Punkte lange Linie gezeichnet, deren Mittelpunkt der Punkt x/y ist.<br/>
-VMARK x,y   V’M<br/>
-Analog HMARK, jedoch wird eine senkrechte Markierung gezeichnet.<br/>
-HLINE y H’L<br/>
-Zeichnet eine durchgehende Horizontale an y.<br/>
-VLINE x V’L<br/>
-Zeichnet eine durchgehende Vertikale an x.<br/>
-Mit den letzten vier Befehlen ist es möglich, schnell und einfach Koordinatensysteme zu zeichnen.<br/>
-SLINE x0,y0,x1,y1   S’L<br/>
-Zeichnet eine Linie von x0/y0 nach x1/y1. Die Richtung beziehungsweise Länge ist beliebig.<br/>
-CLINE x0,y0,x1,y1   CLT<br/>
-Wie SLINE, die Linie wird jedoch gelöscht.<br/>
-ILINE x0,y0,x1,y1   l’L<br/>
-Wie SLINE, die Linie wird jedoch invertiert.<br/>
-SCIRCLE x,y,a,b S’C<br/>
-Zeichnet eine Ellipse mit dem Mittelpunkt x/y und den Radien a und b.<br/>
-CCIRCLE x,y,a,b C’C<br/>
-Wie SCIRCLE, die Ellipse wird jedoch gelöscht.<br/>
-ICIRCLE x,y,a,b I’C<br/>
-Wie SCIRCLE, die Ellipse wird jedoch invertiert.<br/>
-SELLIPSE x,y,a,b,dw,sw,ew,s S’E<br/>
-Zeichnet einen Ellipsenbogen mit dem Mittelpunkt x/y und den Radien a und b.<br/>
-Die weiteren Parameter bedeuten:</p>
+        <p>Da dieser Befehl keine Basic-Zeiger verändert, eignet er sich auch zum Laden von Maschinenprogrammen, auch im Direktmodus.<br />
+            SPOINT x,y SP’O<br />
+            Setzt einen Punkt an die Stelle x/y in der Grafik.<br />
+            CPOINT x,y C’P<br />
+            Löscht den Punkt x/y.<br />
+            IPOINT x,y PS’C<br />
+            Invertiert den Punkt x/y<br />
+            PSCLINE x,y PS’C<br />
+            Setzt den Punkt x/y und löscht ab diesem Punkt eine Linie nach unten bis zum Grafikrand. Der Befehl ist besonders für 3D-Grafiken geeignet.<br />
+            HMARK x,y H’M<br />
+            Setzt eine waagrechte »Markierung«an den Punktx/y, das heißt, es wird eine 5 Punkte lange Linie gezeichnet, deren Mittelpunkt der Punkt x/y ist.<br />
+            VMARK x,y V’M<br />
+            Analog HMARK, jedoch wird eine senkrechte Markierung gezeichnet.<br />
+            HLINE y H’L<br />
+            Zeichnet eine durchgehende Horizontale an y.<br />
+            VLINE x V’L<br />
+            Zeichnet eine durchgehende Vertikale an x.<br />
+            Mit den letzten vier Befehlen ist es möglich, schnell und einfach Koordinatensysteme zu zeichnen.<br />
+            SLINE x0,y0,x1,y1 S’L<br />
+            Zeichnet eine Linie von x0/y0 nach x1/y1. Die Richtung beziehungsweise Länge ist beliebig.<br />
+            CLINE x0,y0,x1,y1 CLT<br />
+            Wie SLINE, die Linie wird jedoch gelöscht.<br />
+            ILINE x0,y0,x1,y1 l’L<br />
+            Wie SLINE, die Linie wird jedoch invertiert.<br />
+            SCIRCLE x,y,a,b S’C<br />
+            Zeichnet eine Ellipse mit dem Mittelpunkt x/y und den Radien a und b.<br />
+            CCIRCLE x,y,a,b C’C<br />
+            Wie SCIRCLE, die Ellipse wird jedoch gelöscht.<br />
+            ICIRCLE x,y,a,b I’C<br />
+            Wie SCIRCLE, die Ellipse wird jedoch invertiert.<br />
+            SELLIPSE x,y,a,b,dw,sw,ew,s S’E<br />
+            Zeichnet einen Ellipsenbogen mit dem Mittelpunkt x/y und den Radien a und b.<br />
+            Die weiteren Parameter bedeuten:</p>
 
-<p>TOD TABLE</p>
+        <p>TOD TABLE</p>
 
-<p>dw Drehwinkel der Hauptachse einer Ellipse um den Mittelpunkt. Die Ellipse wird mit dw im Uhrzeigersinn um den Mittelpunkt x/y gedreht.<br/>
-sw, ew sw und ew geben den Start- und Endwinkel des Ellipsenbogens an.<br/>
-s   gibt den Schrittwinkel an, mit dem die einzelnen Bogenpunkte errechnet werden.</p>
+        <p>dw Drehwinkel der Hauptachse einer Ellipse um den Mittelpunkt. Die Ellipse wird mit dw im Uhrzeigersinn um den Mittelpunkt x/y gedreht.<br />
+            sw, ew sw und ew geben den Start- und Endwinkel des Ellipsenbogens an.<br />
+            s gibt den Schrittwinkel an, mit dem die einzelnen Bogenpunkte errechnet werden.</p>
 
-<p>Der Befehl errechnet einzelne Punkte des Ellipsenbogens, die mit einer Linie verbunden werden. Die Winkel müssen im Bogenmaß angegeben werden. Die Drehungen werden mit dem Uhrzeigersinn ausgeführt.<br/>
-CELLIPSE x,y,a,b,dw,sw,ew,s C’E<br/>
-Wie SELLIPSE, der Bogen wird jedoch gelöscht.<br/>
-IELLIPSE x,y,a,b,dw,sw,ew,s I’E<br/>
-Wie SELLIPSE, der Bogen wird jedoch invertiert.<br/>
-STEXT r,b,h,v,a,x,y,a$  STE’X<br/>
-Schreibt einen Text in den Grafikschirm.<br/>
-Die einzelnen Parameter bedeuten:</p>
+        <p>Der Befehl errechnet einzelne Punkte des Ellipsenbogens, die mit einer Linie verbunden werden. Die Winkel müssen im Bogenmaß angegeben werden. Die Drehungen werden mit dem Uhrzeigersinn ausgeführt.<br />
+            CELLIPSE x,y,a,b,dw,sw,ew,s C’E<br />
+            Wie SELLIPSE, der Bogen wird jedoch gelöscht.<br />
+            IELLIPSE x,y,a,b,dw,sw,ew,s I’E<br />
+            Wie SELLIPSE, der Bogen wird jedoch invertiert.<br />
+            STEXT r,b,h,v,a,x,y,a$ STE’X<br />
+            Schreibt einen Text in den Grafikschirm.<br />
+            Die einzelnen Parameter bedeuten:</p>
 
-<p>TODO</p>
+        <p>TODO</p>
 
-<p>r   Schreibrichtung<br/>
-r = 1 von links nach rechts<br/>
-r = 2 von rechts nach links<br/>
-r = 3 von unten nach oben<br/>
-r = 4 von oben nach unten<br/>
-Die Schrift ist, der Richtung entsprechend, gekippt.<br/>
-b   Breite eines einzelnen Zeichens; von 1 (normal)<br/>
-bis 25 möglich.<br/>
-h   Höhe eines Zeichens (von 1 bis 25).<br/>
-v   Verschiebung (Kursivschrift)<br/>
-v gibt die Verschiebung eines Zeichens von seiner Spitze zum Fuß an.<br/>
-v kann Werte von 0 (normal) bis zum achtfachen (45 Grad Schräge) der Höhe h annehmen.<br/>
-a   Abstand der Zeichen, a kann Werte von 0 bis 199<br/>
-annehmen. Für Normalschrift ist a=8.<br/>
-x und y Geben die Startkoordinaten an.<br/>
-x/y ist die linke obere Ecke des ersten Zeichens eines Strings.<br/>
-a$ String- oder numerischer Ausdruck, der gezeichnet werden soll.<br/>
-Im String kann zwischen den Zeichensätzen umgeschaltet werden: ctrl/9  rvs on<br/>
-ctrl/O  rvs off<br/>
-ctrl/a  Groß/Klein<br/>
-ctrl/b  Klein/Groß<br/>
-Ohne    Umschaltung wird mit dem Groß/Grafik-<br/>
-Zeichensatz in Normalschrift gearbeitet.<br/>
-Hinweis: Wenn ein String außerhalb des Bildschirmes und mit großen Buchstaben gezeichnet wird, kann es vorkommen, daß der Computer bis zu zwei Minuten lang keine Meldung ausgibt. Er ist nicht abgestürzt, sondern fährt anschließend mit der Programmausführung fort.</p>
+        <p>r Schreibrichtung<br />
+            r = 1 von links nach rechts<br />
+            r = 2 von rechts nach links<br />
+            r = 3 von unten nach oben<br />
+            r = 4 von oben nach unten<br />
+            Die Schrift ist, der Richtung entsprechend, gekippt.<br />
+            b Breite eines einzelnen Zeichens; von 1 (normal)<br />
+            bis 25 möglich.<br />
+            h Höhe eines Zeichens (von 1 bis 25).<br />
+            v Verschiebung (Kursivschrift)<br />
+            v gibt die Verschiebung eines Zeichens von seiner Spitze zum Fuß an.<br />
+            v kann Werte von 0 (normal) bis zum achtfachen (45 Grad Schräge) der Höhe h annehmen.<br />
+            a Abstand der Zeichen, a kann Werte von 0 bis 199<br />
+            annehmen. Für Normalschrift ist a=8.<br />
+            x und y Geben die Startkoordinaten an.<br />
+            x/y ist die linke obere Ecke des ersten Zeichens eines Strings.<br />
+            a$ String- oder numerischer Ausdruck, der gezeichnet werden soll.<br />
+            Im String kann zwischen den Zeichensätzen umgeschaltet werden: ctrl/9 rvs on<br />
+            ctrl/O rvs off<br />
+            ctrl/a Groß/Klein<br />
+            ctrl/b Klein/Groß<br />
+            Ohne Umschaltung wird mit dem Groß/Grafik-<br />
+            Zeichensatz in Normalschrift gearbeitet.<br />
+            Hinweis: Wenn ein String außerhalb des Bildschirmes und mit großen Buchstaben gezeichnet wird, kann es vorkommen, daß der Computer bis zu zwei Minuten lang keine Meldung ausgibt. Er ist nicht abgestürzt, sondern fährt anschließend mit der Programmausführung fort.</p>
 
-<p>CTEXT r,b,h,v,a,x,y,a$  C’T<br/>
-Wie STEXT, der Text wird jedoch gelöscht.<br/>
-ITEXT r,b,h,v,a,x,y,a$  I’T<br/>
-Wie STEXT, jedoch wird der Text invertiert.<br/>
-FILL x,y    F’I<br/>
-Malt ein durch Linien oder den Bildschirmrand begrenztes Feld beliebiger Form aus.<br/>
-x/y geben die Startkoordinaten an.<br/>
-DUPLICATE x0,y0,x1,y1,x,y   D’U<br/>
-Kopiert einen Grafikausschnitt.<br/>
-Dabei geben x0/y0 und x1/y1 die Eckpunkte (links oben / rechts unten) eines Rechtecks an, das nun so kopiert wird, daß x/y die Koordinaten der linken oberen Ecke der Kopie angeben.<br/>
-Der Ausschnitt wird so kopiert, daß die Kopie exakt dem Original entspricht. Das Original kann also überschrieben werden.<br/>
-SCROLL r,x0,y0,x1,y1    SC’R<br/>
-Rolliert einen Grafikausschnitt um einen Punkt.<br/>
-Der Ausschnitt wird mit x0/y0 und x1/y1 analog zu DUPLICATE definiert.<br/>
-r bestimmt die Richtung des Rollierens:<br/>
-r1 = nach rechts<br/>
-r2 = nach links<br/>
-r3 = nach oben<br/>
-r4 = nach unten<br/>
-WINDOW y0,y1    W’I<br/>
-WINDOW ermöglicht die gleichzeitige Anzeige von Text und Grafik. Die beiden Übergangszeilen dazu sind frei wählbar.<br/>
-Die Parameter geben die erste (y0) und letzte (y1) Zeile im Grafikmodus an. Der restliche Bildschirm wird im Textmodus ausgegeben. In den Grenzzeilen sollten keine Textzeichen stehen; der VIC kann diese unter Umständen nicht von der Grafik unterscheiden und unsinnige Zeichen anzeigen.<br/>
-WINDOW hat Vorrang vor MODE n.<br/>
-WINDOW y0,y1 wird durch WINDOW ohne Parameter abgeschaltet. Der Groß/Grafik-Textmodus wird eingeschaltet.<br/>
-LOWCOL x,y,p,h  LO’W<br/>
-Mit LOWCOL kann man gezielt ein Byte des Video-RAMs ändern.<br/>
-x/y geben die Koordinaten des entsprechenden Grafikpunktes an, p die Punkt- und h die Hintergrundfarbe.<br/>
-SPRITE n,x,y    SP’R<br/>
-Mit Sprite kann man die Form eines Sprites anhand der Grafik definieren.<br/>
-n gibt die Nummer des Sprites an (0-7) und x/y die Koordinaten der linken oberen Ecke eines Grafikausschnittes, nach dem die Spriteform gebildet wird (siehe auch DUPLICATE). Diese Form wird jedoch nicht einem Sprite zugeordnet; die Nummer n zeigt vielmehr die Blocknummer an, in den die Spriteform abgelegt wird. Dies sind die Blöcke 120 (n=0) bis 127 (n=7).<br/>
-Die Blockzeiger liegen in den Adressen 50168 bis 50175 und müssen mit POKE gesetzt werden.<br/>
-Hinweis: Die Spriteformen gelten nur im Grafikmodus. Im Textmodus gelten die gewohnten Regeln zum Arbeiten mit Sprites von Basic aus.<br/>
-Das bedeutet, daß man mit WINDOW »gemischte« Sprites erzeugen und zwischen den zwei Definitionssätzen umschalten kann.<br/>
-SSAVE n,n$,dv   S’S<br/>
-Speichert einen Spriteblock mit dem Namen n$ auf dv ab. Zur Nummer n (0-7) siehe auch SPRITE.<br/>
-SLOAD n,n$,dv   SL’O<br/>
-Lädt den Spriteblock n. Die Nummer, unter der der Block abgespeichert wurde, ist irrelevant. Siehe auch SPRITE und GLOAD.<br/>
-Grafik 2000 besitzt vier weitere Befehle, die die meisten übrigen Befehle verändern und diese somit auf 140 verschiedene Funktionen erweitern.<br/>
-PSCREEN n   PSC’R</p>
+        <p>CTEXT r,b,h,v,a,x,y,a$ C’T<br />
+            Wie STEXT, der Text wird jedoch gelöscht.<br />
+            ITEXT r,b,h,v,a,x,y,a$ I’T<br />
+            Wie STEXT, jedoch wird der Text invertiert.<br />
+            FILL x,y F’I<br />
+            Malt ein durch Linien oder den Bildschirmrand begrenztes Feld beliebiger Form aus.<br />
+            x/y geben die Startkoordinaten an.<br />
+            DUPLICATE x0,y0,x1,y1,x,y D’U<br />
+            Kopiert einen Grafikausschnitt.<br />
+            Dabei geben x0/y0 und x1/y1 die Eckpunkte (links oben / rechts unten) eines Rechtecks an, das nun so kopiert wird, daß x/y die Koordinaten der linken oberen Ecke der Kopie angeben.<br />
+            Der Ausschnitt wird so kopiert, daß die Kopie exakt dem Original entspricht. Das Original kann also überschrieben werden.<br />
+            SCROLL r,x0,y0,x1,y1 SC’R<br />
+            Rolliert einen Grafikausschnitt um einen Punkt.<br />
+            Der Ausschnitt wird mit x0/y0 und x1/y1 analog zu DUPLICATE definiert.<br />
+            r bestimmt die Richtung des Rollierens:<br />
+            r1 = nach rechts<br />
+            r2 = nach links<br />
+            r3 = nach oben<br />
+            r4 = nach unten<br />
+            WINDOW y0,y1 W’I<br />
+            WINDOW ermöglicht die gleichzeitige Anzeige von Text und Grafik. Die beiden Übergangszeilen dazu sind frei wählbar.<br />
+            Die Parameter geben die erste (y0) und letzte (y1) Zeile im Grafikmodus an. Der restliche Bildschirm wird im Textmodus ausgegeben. In den Grenzzeilen sollten keine Textzeichen stehen; der VIC kann diese unter Umständen nicht von der Grafik unterscheiden und unsinnige Zeichen anzeigen.<br />
+            WINDOW hat Vorrang vor MODE n.<br />
+            WINDOW y0,y1 wird durch WINDOW ohne Parameter abgeschaltet. Der Groß/Grafik-Textmodus wird eingeschaltet.<br />
+            LOWCOL x,y,p,h LO’W<br />
+            Mit LOWCOL kann man gezielt ein Byte des Video-RAMs ändern.<br />
+            x/y geben die Koordinaten des entsprechenden Grafikpunktes an, p die Punkt- und h die Hintergrundfarbe.<br />
+            SPRITE n,x,y SP’R<br />
+            Mit Sprite kann man die Form eines Sprites anhand der Grafik definieren.<br />
+            n gibt die Nummer des Sprites an (0-7) und x/y die Koordinaten der linken oberen Ecke eines Grafikausschnittes, nach dem die Spriteform gebildet wird (siehe auch DUPLICATE). Diese Form wird jedoch nicht einem Sprite zugeordnet; die Nummer n zeigt vielmehr die Blocknummer an, in den die Spriteform abgelegt wird. Dies sind die Blöcke 120 (n=0) bis 127 (n=7).<br />
+            Die Blockzeiger liegen in den Adressen 50168 bis 50175 und müssen mit POKE gesetzt werden.<br />
+            Hinweis: Die Spriteformen gelten nur im Grafikmodus. Im Textmodus gelten die gewohnten Regeln zum Arbeiten mit Sprites von Basic aus.<br />
+            Das bedeutet, daß man mit WINDOW »gemischte« Sprites erzeugen und zwischen den zwei Definitionssätzen umschalten kann.<br />
+            SSAVE n,n$,dv S’S<br />
+            Speichert einen Spriteblock mit dem Namen n$ auf dv ab. Zur Nummer n (0-7) siehe auch SPRITE.<br />
+            SLOAD n,n$,dv SL’O<br />
+            Lädt den Spriteblock n. Die Nummer, unter der der Block abgespeichert wurde, ist irrelevant. Siehe auch SPRITE und GLOAD.<br />
+            Grafik 2000 besitzt vier weitere Befehle, die die meisten übrigen Befehle verändern und diese somit auf 140 verschiedene Funktionen erweitern.<br />
+            PSCREEN n PSC’R</p>
 
-<p>TODO TABLE</p>
+        <p>TODO TABLE</p>
 
-<p>n = 2 Alle Befehle, die die Grafik verändern, wirken nicht mehr auf die sichtbare, sondern auf die unsichtbare, zweite Grafik.<br/>
-(CLEAR,COMBI,HLINE,INVERS,TEXT,LINE, CIRCLE,FILL, etc.)<br/>
-n = 1 Die Befehle wirken wieder auf die sichtbare Grafik.</p>
+        <p>n = 2 Alle Befehle, die die Grafik verändern, wirken nicht mehr auf die sichtbare, sondern auf die unsichtbare, zweite Grafik.<br />
+            (CLEAR,COMBI,HLINE,INVERS,TEXT,LINE, CIRCLE,FILL, etc.)<br />
+            n = 1 Die Befehle wirken wieder auf die sichtbare Grafik.</p>
 
-<p>TSCREEN n   T’S</p>
+        <p>TSCREEN n T’S</p>
 
-<p>TODO TABLE</p>
+        <p>TODO TABLE</p>
 
-<p>n = 2 Die Befehle SPRITE, SCROLL und DUPLICATE sowie die Funktionen TEST und CTEST testen nicht in der sichtbaren, sondern in der unsichtbaren Grafik.<br/>
-Man kann also mit DUPLICATE Ausschnitte der einen in die andere Grafik übertragen.<br/>
-n = 1 schaltet zurück in die sichtbare Grafik.</p>
+        <p>n = 2 Die Befehle SPRITE, SCROLL und DUPLICATE sowie die Funktionen TEST und CTEST testen nicht in der sichtbaren, sondern in der unsichtbaren Grafik.<br />
+            Man kann also mit DUPLICATE Ausschnitte der einen in die andere Grafik übertragen.<br />
+            n = 1 schaltet zurück in die sichtbare Grafik.</p>
 
-<p>COLPLOT p,h COL’P<br/>
-COLPLOT ermöglicht das mehrfarbige Zeichnen in der HiRes-Grafik.</p>
+        <p>COLPLOT p,h COL’P<br />
+            COLPLOT ermöglicht das mehrfarbige Zeichnen in der HiRes-Grafik.</p>
 
-<p>TODO TABLE</p>
+        <p>TODO TABLE</p>
 
-<p>Parameter:<br/>
-p   Punktfarbe (0-15)<br/>
-h   Hintergrundfarbe (0-15)</p>
+        <p>Parameter:<br />
+            p Punktfarbe (0-15)<br />
+            h Hintergrundfarbe (0-15)</p>
 
-<p>COLPLOT p,h bewirkt, daß   die Befehle<br/>
-SPOINT  SUNE    SCIRCLE SELLIPSE<br/>
-STEXT   FILL    SCROLL  DUPLICATE<br/>
-von nun an das Video-RAM mit der Punktfarbe p setzen. Jeder gesetzte Punkt erhält also die Farbe p; die Farbe der nicht gesetzten Punkte bleibt erhalten.<br/>
-COLPLOT bewirkt außerdem, daß die Befehle</p>
+        <p>COLPLOT p,h bewirkt, daß die Befehle<br />
+            SPOINT SUNE SCIRCLE SELLIPSE<br />
+            STEXT FILL SCROLL DUPLICATE<br />
+            von nun an das Video-RAM mit der Punktfarbe p setzen. Jeder gesetzte Punkt erhält also die Farbe p; die Farbe der nicht gesetzten Punkte bleibt erhalten.<br />
+            COLPLOT bewirkt außerdem, daß die Befehle</p>
 
-<p>TODO TABLE</p>
+        <p>TODO TABLE</p>
 
-<p>CPOINT  CLINE   CCIRCLE CELLIPSE<br/>
-CTEXT   SCROLL  DUPLICATE</p>
+        <p>CPOINT CLINE CCIRCLE CELLIPSE<br />
+            CTEXT SCROLL DUPLICATE</p>
 
-<p>das Video-RAM mit der Hintergrundfarbe setzen.<br/>
-Jeder gelöschte Punkt erhält die Farbe h; die Farbe der gesetzten Punkte wird nicht verändert.<br/>
-Die Befehle SCROLL und DUPLICATE setzen sowohl Hintergrund- als auch Punktfarbe, je nachdem, ob ein Punkt gesetzt oder gelöscht wird.<br/>
-Die Option kann mit COLPLOT ohne Parameter abgeschaltet werden.<br/>
-PLOT n  P’L<br/>
-n = 2<br/>
-Die Befehle</p>
+        <p>das Video-RAM mit der Hintergrundfarbe setzen.<br />
+            Jeder gelöschte Punkt erhält die Farbe h; die Farbe der gesetzten Punkte wird nicht verändert.<br />
+            Die Befehle SCROLL und DUPLICATE setzen sowohl Hintergrund- als auch Punktfarbe, je nachdem, ob ein Punkt gesetzt oder gelöscht wird.<br />
+            Die Option kann mit COLPLOT ohne Parameter abgeschaltet werden.<br />
+            PLOT n P’L<br />
+            n = 2<br />
+            Die Befehle</p>
 
-<p>TODO TABLE</p>
+        <p>TODO TABLE</p>
 
-<p>SPOINT  SLINE   SCIRCLE SELLIPSE<br/>
-STEXT   SCROLL  DUPLICATE</p>
+        <p>SPOINT SLINE SCIRCLE SELLIPSE<br />
+            STEXT SCROLL DUPLICATE</p>
 
-<p>arbeiten nicht mehr mit der normalen Punkt-Setzroutine, sondern mit der PSCLINE-Routine.<br/>
-Es wird also unter jedem gezeichnetem Punkt eine Linie bis zum Bildschirmrand gelöscht.<br/>
-Es lassen sich auf einfachste Weise effektvolle 3D-Bilder auf den Bildschirm zaubern.<br/>
-Dieser Befehl arbeitet unabhängig von COLPLOT.<br/>
-Es wird nur die Farbe des gezeichneten Punktes gesetzt; die Löschlinie verändert keinesfalls das Video-RAM.</p>
+        <p>arbeiten nicht mehr mit der normalen Punkt-Setzroutine, sondern mit der PSCLINE-Routine.<br />
+            Es wird also unter jedem gezeichnetem Punkt eine Linie bis zum Bildschirmrand gelöscht.<br />
+            Es lassen sich auf einfachste Weise effektvolle 3D-Bilder auf den Bildschirm zaubern.<br />
+            Dieser Befehl arbeitet unabhängig von COLPLOT.<br />
+            Es wird nur die Farbe des gezeichneten Punktes gesetzt; die Löschlinie verändert keinesfalls das Video-RAM.</p>
 
-<p>TODO TABLE</p>
+        <p>TODO TABLE</p>
 
-<p>n = 1 Schaltet wieder die normale Punktsetzroutine ein.<br/>
-Hinweis: Die invertierten Befehle werden weder von COLPLOT noch von PLOT beeinflußt.</p>
+        <p>n = 1 Schaltet wieder die normale Punktsetzroutine ein.<br />
+            Hinweis: Die invertierten Befehle werden weder von COLPLOT noch von PLOT beeinflußt.</p>
 
-<h3>Testfunktionen</h3>
+        <h3>Testfunktionen</h3>
 
-<p>var = TEST (x,y)    T’E<br/>
-Weist der Variablen var den Wert 1 zu, wenn der Punkt x/y gesetzt ist, ansonsten den Wert 0.<br/>
-var = CTEST (x,y)   CTE’S<br/>
-Weist der Variablen var die sichtbare Farbe des Punktes x/y zu (0 bis 15).<br/>
-Siehe auch TSCREEN.</p>
+        <p>var = TEST (x,y) T’E<br />
+            Weist der Variablen var den Wert 1 zu, wenn der Punkt x/y gesetzt ist, ansonsten den Wert 0.<br />
+            var = CTEST (x,y) CTE’S<br />
+            Weist der Variablen var die sichtbare Farbe des Punktes x/y zu (0 bis 15).<br />
+            Siehe auch TSCREEN.</p>
 
-<h3>Sonstiges</h3>
+        <h3>Sonstiges</h3>
 
-<p>Grafik 2000 stellt dem Benutzer eine verbesserte SQR-Routine zur Verfügung. Sie wurde bereits in den Interpreter eingebunden.</p>
+        <p>Grafik 2000 stellt dem Benutzer eine verbesserte SQR-Routine zur Verfügung. Sie wurde bereits in den Interpreter eingebunden.</p>
 
-<p>Wenn eine Basic-Fehlermeldung ausgegeben wird, schaltet Grafik 2000 den Textmodus ein, und der Befehl WINDOW wird abgeschaltet.</p>
+        <p>Wenn eine Basic-Fehlermeldung ausgegeben wird, schaltet Grafik 2000 den Textmodus ein, und der Befehl WINDOW wird abgeschaltet.</p>
 
-<p>Grafik 2000 verfügt über eine eigenen NMI/BREAK-Routine.</p>
+        <p>Grafik 2000 verfügt über eine eigenen NMI/BREAK-Routine.</p>
 
-<p>Diese schaltet den Textmodus ein, den Befehl WINDOW ab und setzt Rahmen/Hintergrund- und Schriftfarben.</p>
+        <p>Diese schaltet den Textmodus ein, den Befehl WINDOW ab und setzt Rahmen/Hintergrund- und Schriftfarben.</p>
 
-<p>Diese Farbe kann man durch POKE selbst bestimmen:</p>
+        <p>Diese Farbe kann man durch POKE selbst bestimmen:</p>
 
-<p>POKE 51071,Hintergrundfarbe</p>
+        <p>POKE 51071,Hintergrundfarbe</p>
 
-<p>POKE 51079,Schriftfarbe</p>
+        <p>POKE 51079,Schriftfarbe</p>
 
-<p>Die Farben werden bereits beim Drücken der RESTORE-Taste ohne die RUN/STOP-Taste gesetzt.</p>
+        <p>Die Farben werden bereits beim Drücken der RESTORE-Taste ohne die RUN/STOP-Taste gesetzt.</p>
 
-<p>Das Programm wird hierbei nicht unterbrochen.</p>
+        <p>Das Programm wird hierbei nicht unterbrochen.</p>
 
-<p>Während den Zeichenbefehlen (ausgenommen ELLIPSE) kann man den Computer durch nichts in seiner Arbeit stören.</p>
+        <p>Während den Zeichenbefehlen (ausgenommen ELLIPSE) kann man den Computer durch nichts in seiner Arbeit stören.</p>
 
-<p>Auch RUN/STOP-RESTORE ist erst nach dem Ausführen eines solchen Befehls möglich.</p>
+        <p>Auch RUN/STOP-RESTORE ist erst nach dem Ausführen eines solchen Befehls möglich.</p>
 
-<address class="author">(Frank-Rüdiger Brendel/ah)</address>
+        <address class="author">(Frank-Rüdiger Brendel/ah)</address>
     </article>
 </body>
+
 </html>

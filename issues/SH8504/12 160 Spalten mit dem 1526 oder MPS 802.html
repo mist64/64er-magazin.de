@@ -16,47 +16,48 @@
 <body>
     <article>
         <h1>160 Spalten mit dem 1526 oder MPS 802</h1>
-<p class="intro">Dieses Unterprogramm läßt den Commodore 1526-Drucker 128 oder sogar 160 Zeichen pro Zeile drucken. Der Druck von breiten Tabellen wird zum Vergnügen!</p>
+        <p class="intro">Dieses Unterprogramm läßt den Commodore 1526-Drucker 128 oder sogar 160 Zeichen pro Zeile drucken. Der Druck von breiten Tabellen wird zum Vergnügen!</p>
 
-<p>Der 1526 kommt durch dieses Programm an die Leistungen von teuren Druckern mit Kleinschriftmodus nahe heran. Mit 160 Zeichen pro Zeile übertrifft er diese Drucker sogar.</p>
+        <p>Der 1526 kommt durch dieses Programm an die Leistungen von teuren Druckern mit Kleinschriftmodus nahe heran. Mit 160 Zeichen pro Zeile übertrifft er diese Drucker sogar.</p>
 
-<p>Wie Sie wissen ist der 1526 (MPS 802) nur bedingt grafikfähig. Es lassen sich selbstdefinierte Zeichen ausdrucken. Das macht auch dieses Programm. Es setzt zwei zu druckende Buchstaben in ein selbstdefiniertes Zeichen um, das der Drucker zu Papier bringt. Der 1526 druckt also immer zwei Buchstaben gleichzeitig (160 Zeichen pro Zeile). Im 128-Zeichenmodus ist es etwas komplizierter. Hier werden aus acht Buchstaben fünf Druckerzeichen zusammengesetzt (Bild 1). Das Aussehen der Zeichen wird über die DATA-Werte im Programm bestimmt. Acht DATAs für ein Zeichen. Ein DATA-Wert bestimmt, welche Nadeln einer vertikalen Punktreihe angeschlagen werden.</p>
+        <p>Wie Sie wissen ist der 1526 (MPS 802) nur bedingt grafikfähig. Es lassen sich selbstdefinierte Zeichen ausdrucken. Das macht auch dieses Programm. Es setzt zwei zu druckende Buchstaben in ein selbstdefiniertes Zeichen um, das der Drucker zu Papier bringt. Der 1526 druckt also immer zwei Buchstaben gleichzeitig (160 Zeichen pro Zeile). Im 128-Zeichenmodus ist es etwas komplizierter. Hier werden aus acht Buchstaben fünf Druckerzeichen zusammengesetzt (Bild 1). Das Aussehen der Zeichen wird über die DATA-Werte im Programm bestimmt. Acht DATAs für ein Zeichen. Ein DATA-Wert bestimmt, welche Nadeln einer vertikalen Punktreihe angeschlagen werden.</p>
 
-<p>Die einzelnen Nadeln haben die folgenden Wertigkeiten:</p>
+        <p>Die einzelnen Nadeln haben die folgenden Wertigkeiten:</p>
 
-<p>TODO TABLE</p>
+        <p>TODO TABLE</p>
 
-<p>oben . 128<br/>
-. 64<br/>
-. 32<br/>
-. 16<br/>
-. 8<br/>
-. 4<br/>
-• 2<br/>
-unten . 1</p>
+        <p>oben . 128<br />
+            . 64<br />
+            . 32<br />
+            . 16<br />
+            . 8<br />
+            . 4<br />
+            • 2<br />
+            unten . 1</p>
 
-<p>Ein Zeichen ist aus acht solchen Punktreihen zusammengesetzt. Die binären Wertigkeiten der einzelnen Punktspalten werden über die CHR$()-Funktion in einem String addiert und an den 1526 gesandt, der das selbstdefinierte Zeichen druckt.</p>
+        <p>Ein Zeichen ist aus acht solchen Punktreihen zusammengesetzt. Die binären Wertigkeiten der einzelnen Punktspalten werden über die CHR$()-Funktion in einem String addiert und an den 1526 gesandt, der das selbstdefinierte Zeichen druckt.</p>
 
-<p>Das folgende kleine Programm druckt einen senkrechten Strich:<br/>
-10 open5,4,5<br/>
-20 a$=chr$(255): rem eine Punktreihe<br/>
-30 for i=1 to 7 : rem Rest des Zeichens<br/>
-40 a$=a$+chr$(0): rem mit Leerraum<br/>
-50 next i :rem auffüllen<br/>
-60 print#5,a$<br/>
-70 close5</p>
+        <p>Das folgende kleine Programm druckt einen senkrechten Strich:<br />
+            10 open5,4,5<br />
+            20 a$=chr$(255): rem eine Punktreihe<br />
+            30 for i=1 to 7 : rem Rest des Zeichens<br />
+            40 a$=a$+chr$(0): rem mit Leerraum<br />
+            50 next i :rem auffüllen<br />
+            60 print#5,a$<br />
+            70 close5</p>
 
-<h3>Tips zur Benutzung</h3>
+        <h3>Tips zur Benutzung</h3>
 
-<p>Das eigentliche Programm beginnt ab Zeile 60000. Der Teil vorher dient nur zur Demonstration der 128- und der 160-Zeichendarstellung. Ab Zeile 60000 zerlegt das Programm den zu druckenden String (XX$) in seine Einzelteile, baut daraus die selbstdefinierten Zeichen zusammen und schickt diese an den Drucker.</p>
+        <p>Das eigentliche Programm beginnt ab Zeile 60000. Der Teil vorher dient nur zur Demonstration der 128- und der 160-Zeichendarstellung. Ab Zeile 60000 zerlegt das Programm den zu druckenden String (XX$) in seine Einzelteile, baut daraus die selbstdefinierten Zeichen zusammen und schickt diese an den Drucker.</p>
 
-<p>Wenn Sie das Unterprogramm in einem Basic-Programm verwenden, übergeben Sie einfach die zu druckenden Zeichen in der Variablen XX$ an das Unterprogramm. Das Unterprogramm wird, wie üblich, mit einem GOSUB gestartet. GOSUB 60000 bewirkt eine 160-Zeichendarstellung, GOSUB 60810 eine »Druckbreite« von 128 Zeichen.</p>
+        <p>Wenn Sie das Unterprogramm in einem Basic-Programm verwenden, übergeben Sie einfach die zu druckenden Zeichen in der Variablen XX$ an das Unterprogramm. Das Unterprogramm wird, wie üblich, mit einem GOSUB gestartet. GOSUB 60000 bewirkt eine 160-Zeichendarstellung, GOSUB 60810 eine »Druckbreite« von 128 Zeichen.</p>
 
-<p>Beachten Sie bitte, daß vor dem Aufruf des 128-Zeichenmodus erst einmal der 160-Zeichenmodus aktiviert werden muß. Warum? Nun, beim ersten Durchlauf des Programmes werden alle DATAs in Variablenfelder (V1$() und V2$()) eingelesen. Da der READ-Befehl grundsätzlich mit dem ersten Datum im ganzen Programm beginnt, müssen zur 128-Zeichendarstellung die 160-Zeichen-DATAs überlesen werden. Das geschieht mit einem GOSUB 60000. Danach sind beide Variablenfelder definiert. Sie können dann beliebig den 128- oder 160-Zeichenmodus aufrufen. Würde zuerst der 128-Zeichenmodus aufgerufen, würden die falschen DATAs gelesen und den Variablen zugeordnet. Ein reichlich seltsames Aussehen der Zeichen wäre die Folge.</p>
+        <p>Beachten Sie bitte, daß vor dem Aufruf des 128-Zeichenmodus erst einmal der 160-Zeichenmodus aktiviert werden muß. Warum? Nun, beim ersten Durchlauf des Programmes werden alle DATAs in Variablenfelder (V1$() und V2$()) eingelesen. Da der READ-Befehl grundsätzlich mit dem ersten Datum im ganzen Programm beginnt, müssen zur 128-Zeichendarstellung die 160-Zeichen-DATAs überlesen werden. Das geschieht mit einem GOSUB 60000. Danach sind beide Variablenfelder definiert. Sie können dann beliebig den 128- oder 160-Zeichenmodus aufrufen. Würde zuerst der 128-Zeichenmodus aufgerufen, würden die falschen DATAs gelesen und den Variablen zugeordnet. Ein reichlich seltsames Aussehen der Zeichen wäre die Folge.</p>
 
-<p>Eine detaillierte Programmbeschreibung finden Sie in Tabelle 1.</p>
+        <p>Eine detaillierte Programmbeschreibung finden Sie in Tabelle 1.</p>
 
-<address class="author">(Martin Riethmüller/hm)</address>
+        <address class="author">(Martin Riethmüller/hm)</address>
     </article>
 </body>
+
 </html>
