@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>Epson-Support</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="Alexander Del Pino, gk">
+    <meta name="64er.issue" content="Sonderheft 4/85">
+    <meta name="64er.pages" content="26-30">
+    <!-- <meta name="64er.toc_category" content="XXX"> -->
+    <!-- <meta name="64er.toc_title" content="XXX"> -->
+    <meta name="64er.id" content="XXX">
+</head>
+
+<body>
+    <article>
+        <h1>Epson-Support</h1>
+<p class="intro">Epson-Support läßt die Herzen eines jeden FX/RX-80-Besitzers höher schlagen. Mit einfachen Befehlen und kurzen Programmen können Sie jetzt komplizierte Grafiken auf Ihrem Drucker erstellen. Und das mit einer Auflösung, die fast siebenmal so hoch ist wie die des C 64, nämlich bis zu 800 mal 552 Punkten.</p>
+
+<p>Epson-Support ist eine Basic-Erweiterung und belegt den Speicherbereich ab $C000 (49152). Der Programmstart erfolgt durch SYS 49152; jetzt stehen einige leistungsfähige Befehle zur Verfügung, um Grafiken zu erstellen und auf den Epson FX/RX-Druckern auszugeben. Die Grafiken liegen im Speicher des Commodore 64 ab $2000 (8192). Wegen des enormen Speicherplatzbedarfs wird auch das RAM unter dem Basic, dem Betriebssystem und unter dem Zeichen-ROM verwendet. Die Bitmap wird über Koordinaten adressiert, dabei liegt der Punkt (0,0) in der linken Ecke oben wie bei den normalen HiRes-Grafiken auf dem Bildschirm. Die X-Werte laufen von 0 bis 799, die Y-Werte von 0 bis 551, so daß 800x 552 = 441600 Dots adressiert werden können. Die Bitmap ist so organisiert, daß der Ausdruck relativ schnell geht.</p>
+
+<p>Die Ausgabe mit dem Drucker läuft über ein User-Port-Kabel, die nötige Treibersoftware ist im Epson-Support schon enthalten. Der Ausdruck erfolgt in der sogenannten doppelten Zeichendichte, also mit 960 Punkten pro Zeile, aus Speichermangel können aber nur 800 Punkte pro Zeile verwendet werden. Listing 1 und Listing 2 sind zwei Beispielprogramme. Als Ergebnis liefern sie Bild 1 und Bild 2. Bevor Sie diese Beispiele probieren, muß das Listing 3 mit dem MSE (siehe Seite 7) eingegeben werden und mit SYS 49152 initialisiert werden.</p>
+
+<h3>Epson-Support Bedienungsanleitung</h3>
+
+<p>Das Programm Epson-Support wird absolut geladen mit LOAD"EPSON-SUPPORT",8,1 und durch SYS 49152 gestartet. Dem Basic-Programmierer stehen dann einige neue Befehle zur Verfügung, um die grafischen Fähigkeiten des Epson-Druckers besser auszunutzen, denn im Speicher des C 64 wird eine Grafik-Bitmap von 800 x 552 Punkten verwaltet. Die Auflösung ist also wesentlich höher als bei normalen Bildschirm-Grafiken.</p>
+
+<p>Die einzelnen Befehle werden im folgenden erläutert:</p>
+
+<h2>&amp;CLEAR**</h2>
+
+<p>Damit wird die Grafik-Bitmap gelöscht. Dieser Befehl sollte unbedingt am Anfang eines jeden Programms stehen, sonst stehen in der Bitmap wirre Muster.</p>
+
+<p><strong>&amp;DOTX,Y</strong></p>
+
+<p>Dieser Befehl setzt einen Punkt an der Position (X,Y). Der X-Wert liegt zwischen 0 (links) und799 (rechts), der Y-Wert zwischen 0(oben) und551 (unten). Für X und Y kann ein beliebiger numerischer Basic-Ausdruck stehen;</p>
+
+<p><strong>&amp;RESETDOTX,Y</strong></p>
+
+<p>Dieser Befehl löscht einen Punkt an der Position (X,Y). Der X-Wert liegt zwischen 0 (links) und 799 (rechts), der Y-Wert zwischen 0 (oben) und 551 (unten). Für X und Y kann ein beliebiger numerischer Basic-Ausdruck stehen.</p>
+
+<p><strong>&amp;INVDOT X,Y</strong></p>
+
+<p>Dieser Befehl invertiert einen Punkt an der Position (X,Y). Der X-Wert liegt zwischen 0 (links) und 799 (rechts), der Y-Wert zwischen 0 (oben) und 551 (unten). Für X und Y kann ein beliebiger numerischer Basic-Ausdruck stehen.</p>
+
+<p><strong>&amp;LINE X1,Y1,X2,Y2</strong></p>
+
+<p>Dieser Befehl zieht eine Linie zwischen den Punkten (X1 ,Y1) und (X2,Y2). Der Wertebereich der Koordinaten ist der gleiche wie bei den Dot-Befehlen. Für die Parameter können beliebige Basic-Ausdrücke stehen.</p>
+
+<p><strong>&amp;RESETLINE X1,Y1,X2,Y2</strong></p>
+
+<p>Dieser Befehl löscht eine Linie zwischen den Punkten (X1,Y1) und (X2,Y2). Der Wertbereich der Koordination ist der gleiche wie bei den Dot-Befehlen. Für die Parameter können beliebige Basic-Ausdrücke stehen.</p>
+
+<p><strong>&amp;INVLINE X1,Y1,X2,Y2</strong></p>
+
+<p>Dieser Befehl invertiert die Punkte einer Linie zwischen den Punkten (X1,Y1) und (X2,Y2). Der Wertebereich der Koordinaten ist wiederum der gleiche wie bei den Dot-Befehlen. Für die Parameter können beliebige Basic-Ausdrücke stehen.</p>
+
+<p><strong>&amp;SCANLINE X1,Y1,X2,Y2</strong></p>
+
+<p>Dieser Befehl setzt eine Linie zwischen den Punkten (X1,Y1) und (X2,Y2). Falls jedoch auf einen schon gesetzten Punkt auf dem Linienzug getroffen wird, so wird nicht mehr weitergezeichnet. Der Wertebereich der Koordinaten ist der gleiche wie bei den Dot-Befehlen. Für die Parameter können beliebige Basic-Ausdrücke stehen.</p>
+
+<p><strong>&amp;PRINT</strong></p>
+
+<p>Durch diesen Befehl wird die HiRes-Bitmap auf dem Drucker ausgegeben. Das Programm ist für Epson FX/RX-80-Drucker ausgelegt. Bei Verwendung eines anderen Druckers müssen einige Stellen im Assemblerlisting (Listing 4) beim &amp;PRINT-Befehl geändert werden. Siehe dazu auch die Kommentare im Listing bei diesem Befehl.</p>
+
+<p><strong>&amp;EXIT</strong></p>
+
+<p>Führt zum Verlassen von Epson-Support und bewirkt danach einen Basic-Neustart. Basic-Programme sollten vorher unbedingt abgespeichert sein, weil sie sonst gelöscht werden.</p>
+
+<p><strong>&amp;TEXT X,Y,</strong>"blablabla&hellip;"</p>
+
+<p>Dieser Befehl setzt den Text, welcher in Anführungszeichen steht, in die Bitmap an der Position (X,Y). Diese Position gibt die Koordinaten der linken unteren Ecke des ersten Buchstabens an.</p>
+
+<p><strong>&amp;RESETTEXT, X,Y,</strong>"blablabla&hellip;"</p>
+
+<p>Dieser Befehl löscht den Text, welcher in Anführungszeichen steht, in die Bitmap an der Position (X,Y). Diese Position gibt die Koordinaten der linken unteren Ecke des ersten Buchstabens an.</p>
+
+<p><strong>&amp;INVTEXT X,Y,</strong>"blablabla&hellip;"</p>
+
+<p>Dieser Befehl invertiert den Text, welcher in Anführungszeichen steht, in die Bitmap an der Position (X,Y). Diese Position gibt die Koordinaten der linken unteren Ecke des ersten Buchstabens an.</p>
+
+<address class="author">(Alexander Del Pino/gk)</address>
+    </article>
+</body>
+</html>

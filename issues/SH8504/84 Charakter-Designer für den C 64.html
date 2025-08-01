@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>Charakter-Designer für den C 64</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="Matthias Meyer, ah">
+    <meta name="64er.issue" content="Sonderheft 4/85">
+    <meta name="64er.pages" content="84-88">
+    <!-- <meta name="64er.toc_category" content="XXX"> -->
+    <!-- <meta name="64er.toc_title" content="XXX"> -->
+    <meta name="64er.id" content="XXX">
+</head>
+
+<body>
+    <article>
+        <h1>Charakter-Designer für den C 64</h1>
+<p class="intro">Mit diesem Programm passen Sie komfortabel alle darstellbaren Bildschirmzeichen Ihren eigenen Vorstellungen an.</p>
+
+<p>Der Charakter-Designer besteht aus drei Programmteilen. Einem Basic-Lader zum Laden des Hauptprogramms, dem Hauptprogramm selbst, das unbedingt unter dem Namen CHARAKTER-MAIN abgespeichert werden muß und einem Zeichensatz-Lader. Mit ihm können selbstdefinierte Zeichensätze außerhalb des Charakter-Designers geladen werden. Dazu muß der Name des Zeichensatzes eingegeben werden. Ist der Ladevorgang beendet, wird gefragt, ob die Zeichen im Multicolor-Modus ausgegeben werden sollen oder nicht. Wird der Multicolor-Modus gewählt, können nur die Farben, die über die Commodore-Taste erreichbar sind (8 bis 15) genutzt werden. Dadurch lassen sich Multicolor- und normale Zeichen gleichzeitig darstellen.</p>
+
+<p>Der Charakter-Designer ist so aufgebaut, daß während des Programmablaufs eine Bildschirmmaske bestehen bleibt.</p>
+
+<p>Der Bildschirm besteht aus folgenden Feldern:</p>
+
+<ul>
+<li>dem Sketch-Pad:<br>Zeichenfeld, in dem vier Zeichen auf einmal gezeichnet werden können;</li>
+<li>dem Farbfeld:<br>Anzeige der ausgewählten Farben und der aktuellen Farbe, mit der gezeichnet wird;</li>
+<li>einer Anzeige der vier in Arbeit stehenden Zeichen in Originalgröße;</li>
+<li>einer Anzeige der vier in Arbeit stehenden Zeichen in doppelter Größe;</li>
+<li>dem Charakterwahlfeld:<br>Anzeige des gesamten Zeichensatzes;</li>
+<li>der Statuszeile:<br>Ein- und Ausgabezeile für Disketteninhalt, Eingabe der Namen für LOAD und SAVE und zur Ausgabe von Fehlermeldungen;<br/>
+— einer Anzeige der am häufigsten gebrauchten Funktionen. Die Steuerung des Cursorpfeils erfolgt mit dem Joystick (Port 2) oder mit den Cursortasten (Punkt setzen mit Space).</li>
+</ul>
+
+
+<h3>Funktionen:</h3>
+
+<p>Zur Beschreibung der Funktionen einige Erklärungen im voraus:</p>
+
+<p>Der »aktuelle Charakter« ist das Zeichen, über dem sich der Cursorpfeil auf dem Sketch-Pad gerade befindet.</p>
+
+<p>Im »Normalmodus« besteht ein Zeichen aus 64 Grafikpunkten (8x8) und kann eine von 16 Farben annehmen.</p>
+
+<p>Im »Multicolormodus« wird die halbe Auflösung des Charakters genommen (8x4 Punkte). In diesem Modus können vier Farben auf einmal in einem Zeichen verwendet werden, wobei die vierte Farbe der des Hintergrunds entspricht. Leider kann bei der Farbe »1« nur unter acht Farben ausgewählt werden.</p>
+
+<p>TODO TABLE</p>
+
+<p>M (Multi-/Normalcolorumschaltung)<br/>
+Durch diese Funktion kann zwischen Normal- und Multicolormodus gewählt werden.<br/>
+D (Drehen)<br/>
+Durch diese Funktion ist es moglich,ein Zeichen um 90 Grad nach links zu drehen (nur im Normalmodus).<br/>
+SHIFT-D (Drehen)<br/>
+Wie bei D, jedoch wird das ganze Sketch-Pad gedreht.<br/>
+F (Spiegeln)<br/>
+Der aktuelle Charakter erscheint spiegelverkehrt auf dem Bildschirm.<br/>
+SHIFT-F (Spiegeln)<br/>
+Wie bei F, jedoch wird das ganze Sketch-Pad an der Y-Achse gespiegelt.<br/>
+K (Kopfstellen)<br/>
+Der aktuelle Charakter wird an der X-Achse gespiegelt.<br/>
+SHIFT-K (Kopfstellen)<br/>
+Wie bei F, jedoch wird das ganze Sketch-Pad an der X-Achse gespiegelt.<br/>
+G (Groß/Klein)<br/>
+Mit dieser Taste kann zwischen Groß- und Kleinschrift selektiert werden. Wenn der abgespeicherte Charaktersatz später, außerhalb des Programms, geladen wird, ist der Zeichensatz aktiv, der zuletzt im Designer bearbeitet wurde und kann mit SHIFT-Commodore umgeschaltet werden.<br/>
+I (Invers)<br/>
+Diese Funktion bewirkt, daß der aktuelle Charakter invertiert wird. Im Multicolormodus werden die Farben auch entsprechend geändert.<br/>
+SHIFT-1<br/>
+Wie bei I, jedoch wird das ganze Sketch-Pad invers gesetzt.<br/>
+Commodore-Taste (Charakter auswählen)<br/>
+Durch Drücken der Commodore-Taste kann ein neues Zeichen in das aktuelle Feld genommen werden. Der Pfeil springt in die obere linke Ecke des Charakter-Auswahlfeldes. Nun kann man mit dem Pfeil einen Charakter auswählen, der mit Return übernommen wird. C (Copy) — Kopieren eines Zeichens<br/>
+lm Copy-Modus springt der Pfeil in die linke Ecke des Charakterauswahlfeldes. Nun kann das Zeichen ausgewählt werden, das man kopieren will. Nach dem Drücken der RETURN-Taste kann man entscheiden, wo das Zeichen hinkopiert werden soll.<br/>
+L (Laden eines Zeichensatzes)<br/>
+Es erscheint »Name:« in der Statuszeile. Nun kann man den Filenamen über die Tastatur eingeben. Nach Drücken der RETURN-Taste (Eingabe beendet) schaltet der Bildschirm ab und der Zeichensatz wird geladen. Falls ein Diskettenfehler auftritt, erscheint die Meldung »Diskerror« in der Statuszeile. Durch Drücken der SPACE-Taste kann im Programm fortgefahren werden (die ganze Fehlermeldung des Floppy-Laufwerks kann nicht ausgegeben werden, weil die Statuszeile dafür zu klein ist).<br/>
+S (Save)<br/>
+Wie bei L, jedoch wird der Zeichensatz abgelegt.<br/>
+* (Directory lesen)<br/>
+Mit dieser Funktion kann das Inhaltsverzeichnis angezeigt werden. Die einzelnen Namen werden in der Statuszeile angezeigt, wobei der erste Ausdruck der Diskettenname ist. Durch Drücken von SPACE (Leertaste) wird der nächste Filename angezeigt.<br/>
+@ (Initialisieren)<br/>
+Der Original-C 64-Zeichensatz wird aus dem ROM in das RAM übertragen. So können auch kleine Änderungen ohne große Komplikationen durchgeführt werden.<br/>
+Z (Zurück)<br/>
+Mit dieser Funktion kann der zuletzt geladene Zeichensatz zurückgeholt werden.<br/>
+T (Testen)<br/>
+Das Auswahlfeld wird gelöscht und der Pfeil verschwindet. Nun kann man mit dem Zeichensatz schreiben, um zu testen, wie er wirkt. Es können alle Tasten benutzt werden. Nach Drücken der RETURN-Taste erscheint der Zeichensatz wieder und man kann im Programm fortfahren.<br/>
+Q (Quit)<br/>
+Diese Taste muß (aus Sicherheitsgründen) dreimal gedrückt werden, um das Programm zu beenden. Nach erstmaligem Drücken der Taste erscheint der Ausdruck »ACHTUNG RESET« in der Statuszeile. Wenn man eine andere Taste drückt, verschwindet der Ausdruck wieder und man kann weiterzeichnen.<br/>
+CLR/HOME (Löschen eines Zeichens)<br/>
+Die CLR/HOME-Taste hat drei Funktionen:<br/>
+1.  Alleiniges Drücken der Taste bewirkt, daß der Pfeil in die obere linke Ecke des Sketch-Pads springt.<br/>
+2.  Zusammen mit der SHIFT-Taste wird der aktuelle Charakter gelöscht.<br/>
+3.  Zusammen mit der CTRL-Taste wird das gesamte Sketch-Pad gelöscht.<br/>
+Einfügen und Herausnehmen von Zeilen und Spalten:<br/>
+Diese Funktion ist eine Besonderheit des Charakter-Designers. Sie ermöglicht es, Punkte in einer Zeile beziehungsweise Spalte einzufügen und herauszunehmen. Der Pfeil kann an einer beliebigen Stelle des Sketch-Pads positioniert werden.<br/>
+Mit folgenden Tasten wird gearbeitet.<br/>
+INS/DEL-Taste: für zeilenweises Herausnehmen. Durch zusätzliches Drücken der SHIFT-Taste wird eine Zeile eingefügt. Es werden bis zu 255 Zeilen gepuffert, die automatisch wieder ausgegeben werden.<br/>
+Pfund-Taste: wie bei INS/DEL, jedoch wird der jeweils darunter liegende Charakter mit bewegt.<br/>
+= -Taste: für das spaltenweise Herausnehmen von einzelnen Punkten. Mit SHIFT »=« wird ein Punkt eingefügt. Hierbei wird nichts gepuffert, weil es in den meisten Fällen, nur hinderlich wäre.<br/>
+;-Taste: wie bei =, jedoch werden zwei nebeneinander liegende Charaktere bearbeitet.</p>
+
+<h3>Farbgebung:</h3>
+
+<p>Die Farben werden mit den Tasten 1 bis 4 ausgewählt und können durch zusätzliches Drücken der SHIFT-Taste verändert werden.</p>
+
+<p>Im Normalmodus kann man durch Drücken der Taste 1 die Farbe eins zum Zeichnen nehmen. Wenn man Punkte löschen will, muß man die Taste 4 drücken.</p>
+
+<p>Im Multicolormodus sind die Tasten 1 bis 3 mit den verschiedenen Farben belegt, wobei mit der Taste 4 Punkte gelöscht werden können.</p>
+
+<h3>Programmablauf:</h3>
+
+<p>Nach dem Starten (durch Reset oder Restore) werden die Initialisierungsroutinen aufgerufen. Danach werden die einzelnen Unterroutinen in den $COOO-Bereich verschoben und die Bildschirmmaske einschließlich Farbe übertragen. Nun werden die programminternen Initialisierungsroutinen aufgerufen (Rasterzeilen-Interrupt, Sprites für Charakteranzeige und so weiter) und der aktuelle Zeichensatz wird aktiviert. Anschließend befindet sich das Programm in der Tastatur- und Joystick-Abfrage (Hauptschleife).</p>
+
+<address class="author">(Matthias Meyer/ah)</address>
+    </article>
+</body>
+</html>

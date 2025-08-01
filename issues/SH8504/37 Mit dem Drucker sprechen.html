@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>Mit dem Drucker sprechen</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="Peter T. Schmidt, gk">
+    <meta name="64er.issue" content="Sonderheft 4/85">
+    <meta name="64er.pages" content="37-40">
+    <!-- <meta name="64er.toc_category" content="XXX"> -->
+    <!-- <meta name="64er.toc_title" content="XXX"> -->
+    <meta name="64er.id" content="XXX">
+</head>
+
+<body>
+    <article>
+        <h1>Mit dem Drucker sprechen</h1>
+<p class="intro">Mit sinnvollen Kurzbefehlen erleichtert PROS V2.1 nicht nur die Arbeit mit dem Commodore 64 und dem Drucker MPS 802 ganz erheblich, es hält auch noch ein paar andere, ganz besondere Leckerbissen bereit. Und dabei arbeitet es sogar mit dem DOS V5.1 zusammen.</p>
+
+<p>OPEN 1,4,7:CMD 1:LIST und dann PRINT#1:CLOSE 1, das ist es, was der gequälte Druckerbesitzer eingeben muß, bloß um ein paar eingegebene Basic-Programmzeilen schwarz auf weiß in den Händen halten zu können. Und da diese Eingabe nur im Direktmodus ohne weiteres möglich ist, fällt die endlose Tipperei jedesmal von neuem an.</p>
+
+<p>Das hat jetzt ein Ende! Das PROS V2.1 nämlich bietet MPS802-Benutzern für solch umfangreiche Befehlssequenzen sehr einfache Abkürzungen an. Aber auch Besitzer anderer Drucker, besonders des MPS 801, sollten ruhig weiterlesen. Denn wenn das Programm Anklang findet, ist eine baldige Entwicklung eines Zwillings für diese Drucker nicht auszuschließen.</p>
+
+<p>Das Format der PROS-Befehle dürfte Floppy-Besitzern in ähnlicher Form bereits vom DOS V5.1 auf der Demo-Diskette bekannt sein. Sie alle bestehen lediglich aus dem Pfund-Symbol (oben rechts, die dritte Taste) und einem weiteren Zeichen. Das oben genannte Listen sähe mit dem PROS zum Beispiel ganz einfach so aus:</p>
+
+<p>£+ (Pfund) und (Plus)</p>
+
+<p>um die Ausgabe auf den Drucker zu lenken,</p>
+
+<p>LIST</p>
+
+<p>um das Programm zu listen und</p>
+
+<p>£— (Pfund) und (Minus)</p>
+
+<p>um die Ausgabe wieder auf den Bildschirm zu holen.</p>
+
+<p>Dem LIST-Befehl können Sie selbstverständlich auch Zeilenangaben beifügen, ganz wie Sie es bisher gewohnt waren.</p>
+
+<p>Außer der normalen Ausgabeumleitung besteht noch die Möglichkeit, den Ausdruck zu formatieren. In der vorliegenden Version ist ein 40 Zeichen breites Ausgabefeld in Papiermitte eingestellt. Dieses Format ist zum Beispiel beim Ausdruck von Disk-Directories und disassemblierten Maschinenprogrammen sehr nützlich. Wie Sie die entsprechenden Parameter im PROS bereits bei der Eingabe ändern können, lesen Sie bitte weiter hinten.</p>
+
+<p>Die Ausgabebefehle sind natürlich längst noch nicht alles, was das PROS zu bieten hat. Die Befehlsübersicht informiert Sie über die Einsatzmöglichkeiten der restlichen zehn PROS-Befehle.</p>
+
+<p>Doch ich sprach eingangs von einigen besonderen Leckerbissen. Ich habe nämlich bei der Erstellung des Programms die Gelegenheit beim Schopfe ergriffen, noch einige andere Unbequemlichkeiten aus dem Weg zu räumen. So stört es zum Beispiel oft genug, daß beim Commodore 64 auf den Einbau einer Escape-Taste verzichtet wurde. Im PROS wird deshalb die Commodore-Taste zusätzlich mit dieser Funktion belegt, ohne dadurch in sonstigen Funktionen eingeschränkt zu werden.</p>
+
+<p>Außerdem bekamen noch die beiden Funktionstasten F1 und F3 einen Auftrag zugewiesen: die Stop-Funktion. Wenn Sie in Zukunft einen ganz bestimmten Teil Ihres Basic-Programms suchen, sind Sie nicht mehr auf die CTRL-Taste angewiesen, um den LIST-Befehl zu verlangsamen. Sie brauchen nur F1 zu drücken und schon »schläft« der Computer. Erwecken Sie ihn dann mit der F3-Taste zu neuem Leben, so setzt er seine Arbeit genau dort fort, wo er sie zuvor unterbrochen hat.</p>
+
+<p>Die Funktion dieser beiden Routinen beruht auf dem »Verbiegen« des Interrupt-Vektors in der Zeropage (Adresse 788/789). Bei Betätigung der Tasten RUN/STOP-RESTORE wird dieser Vektor jedoch automatisch wieder mit seinen Ursprungswerten versehen, das heißt die beiden Funktionen sind nicht mehr ohne weiteres verfügbar. Um Ihnen nun einen Neuaufruf des PROS (SYS 51555) zu ersparen, kann mit Hilfe von [Pfund] [Pfund] [Return] der entsprechende Programmteil neu aktiviert werden.</p>
+
+<p>Ebenfalls neu aktiviert werden dabei der Kleinschriftmodus und die Repeat-Funktion für alle Tasten. Wollen Sie auf eine der beschriebenen Funktionen von vornherein verzichten, finden Sie auch hier die notwendigen Angaben zur Änderung weiter hinten.</p>
+
+<p>Das Funktionsprinzip der eigentlichen PROS-Befehle basiert auf einer Veränderung des Vektors, der auf den Anfang jener Schleife zeigt, die einen Basic-Befehl holt und ausführt (Speicherstellen 776/777). Wann immer der Computer eine Basic-Zeile liest, im Programm oder im Direktmodus nach Drücken der Return-Taste, wird er nun zunächst prüfen, ob das jeweils gelesene Zeichen ein Pfundzeichen ist. Ist es das nicht, so wird der Prüfvorgang in der normalen Basic-Befehlstabelle fortgesetzt und gegebenenfalls der entsprechende Basic-Befehl ausgeführt. War das Zeichen hingegen tatsächlich ein »Pfund«, so wird jetzt in die PROS-Befehlstabelle gesprungen, um anhand des zweiten Zeichens den richtigen PROS-Befehl herauszusuchen.</p>
+
+<p>Die Arbeitsgeschwindigkeit des Computers wird also kaum verringert, denn zunächst wird ja nur auf ein Zeichen mehr als üblich geprüft. Mit den zusätzlichen Befehlscodes wird erst verglichen, wenn feststeht, daß das PROS tatsächlich angesprochen werden soll.</p>
+
+<p>Für die Abfragetechnik diente mir übrigens der Artikel »Maschinenprogramme auf Tastendruck« von P. Fleig in der 64’er, Ausgabe 12/84, Seite 80, als nützliche Vorlage.</p>
+
+<p>Kommen wir nun zur Speicherbelegung des PROS V2.1. Es belegt die 648 Bytes von $C963 (dez. 51555) bis einschließlich $CBEA (dez. 52202). Daß ich genau diesen Speicherplatz gewählt habe, hat mehrere Gründe:</p>
+
+<p>Erstens läßt das PROS so mehr als dreiviertel des Maschinenspeichers ($C000 - $CFFF) zusammenhängend frei.</p>
+
+<p>Zweitens ist die Startadresse (51555) beim SYS-Aufruf denkbar leicht und entsprechend schnell einzutippen.</p>
+
+<p>Und drittens beträgt der Abstand zum DOS 5.1, das sich ja bei Floppy-Benutzern großer Beliebtheit erfreut, nur genau 22 Bytes. So lassen sich das PROS, das DOS und sogar noch ein weiteres Programm, zum Beispiel das (verschobene) UNNEW (siehe D. Kossmann: Die Ebenen des Absturzes, 64’er, Ausgabe 11/84, Seite 92), mit Hilfe eines Maschinensprachemonitors hintereinander auf Diskette abspeichern und später auch zusammen wieder laden, ohne viel Speicherplatz zu verschwenden.</p>
+
+<p>Um ein solches Kompaktprogramm noch besser nutzen zu können, enthält das PROS noch ein weiteres Extra: Die Speicherstellen $C96D-C96F (MSE-Listing: zweite Zeile, dritte bis fünfte Zahl) enthalten die Werte 4C, 70 und C9. Sie bewirken lediglich einen Sprung in die nächste Speicherstelle. Und doch liegt genau darin der Sinn dieser drei Bytes: Wenn Sie sie nämlich durch die Werte 20, 00 und CC ersetzen, wird beim Aufruf des PROS mit SYS 51555 das DOS (das Sie ja gleich mitgeladen haben) von hier aus mit aufgerufen. Sie sparen sich durch diese kleine Änderung also jedesmal den Aufruf des DOS.</p>
+
+<p>Das PROS besteht aus zwei Teilen. Im ersten Abschnitt, das ist der, welcher beim Aufruf angesprungen wird, werden die erwähnten Vektoren in der notwendigen Weise geändert. Die ebenfalls bereits angesprochenen Interrupt-Routinen werden aktiviert und das Titelbild wird auf den Bildschirm gebracht.</p>
+
+<h2>Automatische Grundeinstellung</h2>
+
+<p>Auch mit diesem Titelbild hat es eine besondere Bewandtnis: Neben dem Namen des Programmierers, ich spreche von mir, enthält es eine Zeile, in der sich bereits einige PROS-Befehle, durch Doppelpunkte voneinander getrennt, befinden. Wenn sich der Computer nun nach dem Aufruf mit »READY« wieder meldet, befindet sich der Cursor genau in dieser Zeile. Sie brauchen also nur noch »RETURN« zu drücken und schon haben Sie ein paar notwendige Grundeinstellungen für den Drucker getroffen.</p>
+
+<p>Diese Grundbefehle sind im einzelnen folgende:</p>
+
+<ol>
+<li>Drucker in Grundstellung setzen</li>
+<li>Fehlermeldungen des Druckers ermöglichen</li>
+<li>zu druckende Zeilen pro Seite festlegen und</li>
+<li>Seitenaufteilung anschalten.</li>
+</ol>
+
+
+<p>Auch hier erhalten Sie weiter unten die notwendigen Informationen, die für eine Änderung beziehungsweise eine Ergänzung der Grundeinstellung notwendig sind.</p>
+
+<p>Der zweite Abschnitt des PROS V2.1 beginnt bei $C974 (dez. 51572). Hier wird zunächst der Befehl geprüft und dann zu der entsprechenden Unterroutine gesprungen.</p>
+
+<p>Das Programmlisting wurde mit Hilfe des MSE erstellt und wird mit ihm eingegeben.</p>
+
+<p>Die Änderungen können mit einem Maschinensprachemonitor, zum Beispiel dem SMON, eingegeben werden.</p>
+
+<h2>Bedienungsanleitung</h2>
+
+<h3>1.  Aufruf</h3>
+
+<p>Das PROS V2.1 muß absolut geladen werden. Danach genügt die folgende Eingabe zum Aufruf:</p>
+
+<p>NEW [Return]</p>
+
+<p>SYS 51555 [Return]</p>
+
+<p>Danach können die Grundeinstellungen durch nochmaliges Drücken der Return-Taste aktiviert werden.</p>
+
+<h3>2.  Sonderfunktionen</h3>
+
+<p>Durch die Inbetriebnahme des PROS werden gleichzeitig einige besondere Funktionen eingeschaltet. Diese Funktionen werden durch die Tastenkombination RUN/STOP-RESTORE desaktiviert, können aber durch [Pfund] [Pfund] [Return] wieder aufgerufen werden.</p>
+
+<p>Die Funktionen sind im einzelnen folgende:</p>
+
+<h3>Stop-Funktion</h3>
+
+<p>Ein Druck auf die Funktionstaste F1 läßt den Computer augenblicklich seine derzeitige Arbeit unterbrechen.</p>
+
+<p>Durch Betätigen der Taste F3 wird der Arbeitsvorgang an der gleichen Stelle fortgesetzt, an der er unterbrochen wurde.</p>
+
+<h3>Escape-Taste</h3>
+
+<p>Die Commodore-Taste bekommt zusätzlich die Funktion einer Escape-Taste zugewiesen. Wird sie gedrückt, so verläßt der Computer den Quote-Modus (Hochkomma-Modus), das heißt, innerhalb von Anführungszeichen werden bei Benutzung der Cursortasten nicht mehr die Steuerzeichen ausgegeben.</p>
+
+<h3>Repeat-Funktion</h3>
+
+<p>Alle Tasten werden mit der Repeat-Funktion ausgestattet. Das einer Taste entsprechende Zeichen wird solange immer wieder ausgegeben, wie diese Taste gedrückt ist.</p>
+
+<h3>Groß-/Kleinschrift</h3>
+
+<p>Der Groß-/Kleinschriftmodus wird eingeschaltet.</p>
+
+<h3>3.  Befehle</h3>
+
+<p>Alle PROS-Befehle beginnen mit dem Pfundzeichen. Dem folgt ein weiteres Zeichen und gegebenenfalls ein Parameter mit Werten zwischen 1 und 127.</p>
+
+<p>Als PROS-Befehle werden anerkannt:<br/>
+<strong>£S</strong>, &lt;Parameter><br/>
+Festlegen des Zeilenabstandes. Drei Schritte entsprechen einer Punktbreite.<br/>
+<strong>£P</strong>, &lt;Parameter><br/>
+Festlegen der zu druckenden Zeilen pro Seite. Europäische Norm für Endlospapier: 66 Zeilen. Amerikanische Norm: 60 Zeilen.</p>
+
+<p>Bei verändertem Zeilenabstand muß auch die Zahl der Zeilen pro Seite geändert werden, um eine saubere Seitenaufteilung zu erreichen. Es bieten sich dabei folgende Kombinationen an:<br/>
+S24 - P102; S27 - P90; S32 - P75<br/>
+S36 - P66 (Grundstellung)<br/>
+S48 - P48; S54 - P42; S72 - P36<br/>
+(bezogen auf die europäische Norm)<br/>
+<strong>£(, £)</strong>, [runde Klammer auf beziehungsweise zu]</p>
+
+<p>Seitenaufteilung an- oder ausschalten. Bei angeschalteter Seitenaufteilung wird die festgelegte Zahl der Zeilen pro Seite gedruckt. Dann erfolgt ein Zeilenvorschub von sechs Zeilen und der Druck wird auf der nächsten Seite fortgesetzt.<br/>
+<strong>£[ ,£ ]</strong> ,[eckige Klammer auf beziehungsweise zu] Fehlermeldungen des Druckers ermöglichen beziehungsweise unterdrücken (Grundstellung).<br/>
+<strong>£+</strong>, [Plus]<br/>
+Ausgabe auf den Drucker lenken. Dieser Befehl entspricht in Basic der Befehlsfolge<br/>
+OPEN 1,4,7:CMD 1<br/>
+<strong>£F</strong></p>
+
+<p>Formatierte Ausgabe auf den Drucker lenken. In der Grundversion des PROS V2.1 ist ein 48 Zeichen breites Ausgabefeld in der Papiermitte, wie es zum Ausdruck von Disk-Direktories und disassemblierten Maschinenprogrammen nützlich ist.</p>
+
+<p>Achtung: Soli der Ausdruck mit Hilfe eines Maschinensprachemonitors erfolgen, empfiehlt es sich, vorher die Ausgabe von Fehlermeldungen zu unterdrücken, da unter Umständen der Ausgabeabschluß nicht korrekt erfolgen kann. Auf die Arbeitsweise mit dem Drucker hat diese Fehlermeldung sonst keine Auswirkungen.<br/>
+<strong>£—</strong>, [Minus]<br/>
+Aufheben des durch £ + oder £ F erreichten Ausgabemodus. Nach diesem Befehl erfolgt die Datenausgabe wieder auf dem Bildschirm.<br/>
+<strong>£#</strong>, (Doppelkreuz)<br/>
+Wiederherstellung der Druckergrundstellung (Einschaltzustand).<br/>
+<strong>££</strong> [Pfund]<br/>
+Wiederaktivieren der PROS-Sonderfunktionen.<br/>
+<strong>£Q</strong><br/>
+Verlassen des PROS V2.1. Nach Eingabe dieses Befehls sind alle PROS-Befehle außer Betrieb. Um wieder mit dem Programm arbeiten zu können, muß es mit SYS 51555 neu aufgerufen werden.<br/>
+Die Sonderfunktionen werden durch diesen Befehl nicht aufgehoben.</p>
+
+<h2>Änderungsvorschläge</h2>
+
+<h3>1.  PROS-Befehlscode [Pfund] ändern</h3>
+
+<p>Sollen die PROS-Befehle mit einem anderen Zeichen als dem »Pfund« beginnen, so muß der ASCII-Code des gewünschten Zeichens in der Speicherstelle $C978 (dez. 51576) stehen. In der Normalversion lautet dieser Wert $5C (dez. 92).</p>
+
+<h3>2.  Änderung beziehungsweise Ergänzung der Grundbefehle in der Titelseite</h3>
+
+<p>Die Grundbefehle befinden sich in den Speicherstellen $CA58 - $CA7c (dez. 51800 - 51836). Die Befehle müssen als hexadezimale ASCII-Codes eingegeben werden. Der Code für das Pfundzeichen lautet $5C (92).</p>
+
+<h3>3.  Ausschalten der Kleinschrift</h3>
+
+<p>Um beim PROS-Aufruf den Großschriftmodus beizubehalten, müssen die Bytes $CA90 - $CA95 mit dem Wert $EA (Befehlscode für NOP) aufgefüllt werden.</p>
+
+<p>Um auch im Ausgabemodus (PROS-Befehl [Pfund] und [Plus]) im Großschriftmodus zu bleiben, muß die Speicherstelle $CBA5 (dez. 52133) statt $07 den Wert $00 erhalten.</p>
+
+<h3>4.  Ausschalten der Repeatfunktion für alle Tasten</h3>
+
+<p>Um diesen Effekt zu vermeiden, sind die Bytes $CA8B -$CA8F mit dem Wert $EA aufzufüllen.</p>
+
+<h3>5.  Ausschalten der Stop-Funktion und der Escape-Taste</h3>
+
+<p>Die entsprechenden Routinen lassen sich umgehen, indem in den Speicherstellen $C9E7 (dez. 51687) und $CB9F (dez. 52127)jeweils der Wert $7F durch $8B ersetzt wird.</p>
+
+<p>Der Bereich $CA7F - $CA8A (dez. 51839 - 51850) wird dadurch übersprungen und kann zum Beispiel für individuelle PROS-Erweiterungen als Speicherplatz dienen.</p>
+
+<h3>6.  Änderung der Tastenbelegung der Stop-Funktion</h3>
+
+<p>Um die Tastenbelegung für die Stop-Funktion (normalerweise F1 und F3) zu ändern, müssen die Tastaturcodes der gewünschten Tasten in die Speicherstellen $CA9A (statt F1-Taste) und $CAB3 (statt F3-Taste) geschrieben werden. Die Dezimalwerte der Adresse: 51866 und 51891.</p>
+
+<h3>7.  Escape-Taste verlegen</h3>
+
+<p>In der PROS V2.1 Normalversion versieht die Commodore-Taste zusätzlich den Dienst einer Escape-Taste. Ersatzweise können auch die Taste [CTRL] oder [Pfeil nach links] mit dieser Aufgabe betraut werden. Dazu muß die Stelle $CABB den Wert $FB (dez. 251) beziehungsweise $FD (dez. 253) bekommen.</p>
+
+<h3>8.  Änderung der Gerätenummer</h3>
+
+<p>Das PROS V2.1 kann der Gerätenummer des benutzten Druckers angepaßt werden, indem der neue Wert in die Stelle $CACE (dez. 51918) geschrieben wird.</p>
+
+<h3>9.  Verändern des formatierten Ausgabefeldes</h3>
+
+<p>Das in der Normalversion festgelegte formatierte Ausgabefeld (40 Zeichen breit in Papiermitte) kann wie folgt verändert werden:</p>
+
+<p>Die gewünschte Breite des linken Randes ist in der Speicherstelle $CBC8 (dez.52168), die des Ausgabefeldes in $CBD2 (dez. 52178) abzulegen.</p>
+
+<p>Hinweis: Auf der Leserservice-Diskette befindet sich einmal das PROS V2.1 selbst und zusätzlich mit integriertem DOS V5.1 und dem Programm UNNEW. Aufruf von UNNEW: SYS 53166.</p>
+
+<address class="author">(Peter T. Schmidt/gk)</address>
+    </article>
+</body>
+</html>
