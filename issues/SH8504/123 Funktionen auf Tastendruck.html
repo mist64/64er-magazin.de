@@ -72,7 +72,114 @@
         <div class="binary_download" data-filename="f-taste_dir.prg" data-name="Directory"></div>
 
         <figure>
-            TODO
+            <pre>8000  0a 80                  ; reset-vektor
+8002  37 80                  ; nmi-vektor
+8004  c3 c2 38 30            ; cbm80 (bewirkt 'modul-start')
+8009  ff
+-----------------------------  reset
+800a  8e 16 d0   stx $d016
+800d  20 a3 fd   jsr $fda3
+8010  20 50 fd   jsr $fd50   ; arbeitsspeicher initialisieren
+8013  20 b7 e4   jsr $e4b7
+8016  20 15 fd   jsr $fd15   ; hardware und i/o vektoren setzen/holen
+8019  20 33 80   jsr $8033   ; initialisierung der f1-taste
+801c  4c fb fc   jmp $fcfb   ; zurueck zum original-reset
+-----------------------------  nmi
+801f  20 bc f6   jsr $f6bc
+8022  20 e1 ff   jsr $ffe1
+8025  d0 09      bne $8030   ; nicht gedrueckt, dann $8030
+8027  20 a3 fd   jsr $fda3   ; i/o initialisieren
+802a  20 18 e5   jsr $e518   ; bildschirm loeschen (i/o initialisieren)
+802d  6c 02 a0   jmp ($a002) ; zum basic-warmstart
+8030  4c 72 fe   jmp $fe72   ; weiter im original nmi
+-----------------------------  initialisierung der f1-taste
+8033  78         sei         ; setzen des interrupt-dissable-bit
+8034  a2 46      ldx #$46
+8036  a0 80      ldy #$80
+8038  8e 14 03   stx $0314   ; interrupt auf adresse
+803b  8c 15 03   sty $0315   ;   $8046 setzen
+803e  58         cli         ; loeschen des interrupt-dissable-bit
+803f  a9 80      lda #$80    ; programm vor ueberschreiben sichern
+8041  85 34      sta $34     ; zeiger fuer stringspeicher auf $8000
+8043  85 38      sta $38     ; zeiger speichergrenze auf $8000
+8045  60         rts
+-----------------------------  erweiterung der interrupts
+8046  a5 cb      lda $cb     ; aktuelle taste holen
+8048  c9 04      cmp #$04    ; = f1-taste ?
+804a  f0 08      beq $8054   ; ja, dann $8054
+804c  a9 ff      lda #$ff    ; flag fuer
+804e  8d 09 80   sta $8009   ; f1-taste loeschen
+8051  4c 31 ea   jmp $ea31   ; zurueck zum interrupt
+8054  ad 09 80   lda $8009   ; f1-taste schon laenger gedrueckt ?
+8057  c9 ff      cmp #$ff
+8059  d0 f6      bne $8051   ; ja, dann zurueck zum interrupt
+805b  a9 00      lda #$00    ; setzt flag
+805d  8d 09 80   sta $8009   ; fuer gedrueckte f1-taste
+8060  ad 20 d0   lda $d020   ; rahmenfarbe lesen
+8063  48         pha         ; farbe auf stapel legen
+8064  ad 21 d0   lda $d021   ; hintergrundfarbe lesen
+8067  8d 20 d0   sta $d020   ; rahmen angleichen;
+806a  20 74 80   jsr $8074   ; beliebige funktion (z.b. directory)
+806d  68         pla         ; rahmenfarbe von stapel holen
+806e  8d 20 d0   sta $d020   ; rahmenfarbe in den originalzustand
+8071  4c 31 ea   jmp $ea31   ; zurueck zum interrupt
+-------------------------------directory (hier kann beliebige funktion
+                                          ausgefuehrt werden.)
+8074  a9 01      lda #$01
+8076  20 c3 ff   jsr $ffc3   ; close 1
+8079  a9 24      lda #$24
+807b  8d f0 03   sta $03f0
+807e  a9 30      lda #$30
+8080  8d f1 03   sta $03f1
+8083  a9 01      lda #$01
+8085  a2 08      ldx #$08
+8087  a0 00      ldy #$00
+8089  20 ba ff   jsr $ffba   ; fileparameter (1,8,0) setzen
+808c  a9 02      lda #$02
+808e  a2 f0      ldx #$f0
+8090  a0 03      ldy #$03
+8092  20 bd ff   jsr $ffbd   ; filenamenparameter (2,5,13)
+8095  20 c0 ff   jsr $ffc0   ; open
+8098  a9 40      lda #$40
+809a  20 90 ff   jsr $ff90   ; status setzen  st=64
+809d  a2 01      ldx #$01
+809f  20 c6 ff   jsr $ffc6   ; eingabegeraet = 1 setzen
+80a2  20 90 ff   jsr $ff90   ; status setzen
+80a5  20 cf ff   jsr $ffcf   ; basin (zeichen holen)
+80a8  20 cf ff   jsr $ffcf   ; basin (zeichen holen)
+80ab  20 cf ff   jsr $ffcf   ; basin (zeichen holen)
+80ae  20 cf ff   jsr $ffcf   ; basin (zeichen holen)
+80b1  c9 00      cmp #$00    ; zeichen = 0 ?
+80b3  f0 31      beq $80e6   ; ja, dann ende
+80b5  a9 01      lda #$01
+80b7  85 cc      sta $cc     ; cursorblinken ausschalten
+80b9  a2 01      ldx #$01
+80bb  20 c6 ff   jsr $ffc6   ; chkin eingabegeraet = 1 setzen
+80be  20 cf ff   jsr $ffcf
+80c1  a8         tay         ; akku ins y-register
+80c2  20 cf ff   jsr $ffcf   ; basin (zeichen holen)
+80c5  48         pha         ; zahl auf stapel legen
+80c6  98         tya         ; y-&gt;akku
+80c7  aa         tax         ; akku-&gt;x
+80c8  68         pla         ; zahl vom stapel holen
+80c9  20 cd bd   jsr $bdcd   ; dezimalzahl ausgeben
+80cc  a9 20      lda #$20
+80ce  20 d2 ff   jsr $ffd2   ; leerzeichen ausgeben
+80d1  20 cf ff   jsr $ffcf   ; basin (zeichen holen)
+80d4  c9 00      cmp #$00    ; zeichen = 0 ?
+80d6  d0 08      bne $80e0   ; nein, dann zur zeichenausgabe
+80d8  a9 0d      lda #$0d
+80da  20 d2 ff   jsr $ffd2   ; zeilenvorschub ausgeben
+80dd  b8         clv
+80de  50 cb      bvc $80ab
+80e0  20 d2 ff   jsr $ffd2   ; zeichenausgabe
+80e3  b8         clv
+80e4  50 eb      bvc $80d1   ; naechstes zeichen holen ($80d1)
+80e6  a9 01      lda #$01
+80e8  20 c3 ff   jsr $ffc3   ; close 1
+80eb  20 cc ff   jsr $ffcc   ; clrch
+80ee  60         rts         ; zurueck zum interrupt</pre>
+            <!-- Eingetippt von goloMAK -->
             <figcaption>Das Quellisting zum Directory auf Tastendruck</figcaption>
         </figure>
     </article>

@@ -220,6 +220,9 @@ Die Eingabe-Ausgaben werden aus `issues` gelesen, die Website wird nach `out` ge
         * [vicjack](https://www.forum64.de/wcf/index.php?user/15999-vicjack/)
     * Abtippen der Listings
         * [Endurion](https://www.forum64.de/wcf/index.php?user/1964-endurion/)
+* Sonderheft 4/1985:
+    * Abtippen der Listings
+        * [goloMAK](https://www.forum64.de/wcf/index.php?user/28439-golomak/)
 
 ![](screenshot1.png)
 
