@@ -25,7 +25,12 @@
 
         <h2>Wie funktioniert eine Modulerkennung?</h2>
 
-        <p>Eine zweite gewichtige Betriebsroutine ist die Modulerkennung. Diese benötigt man, damit die geplante Funktion der F1-Taste »resetfest« wird und zugleich immun gegen die Tastenkombination STOP/RESTORE. Die Kennungs-Routine überprüft, ob sich ein Steckmodul im Expansion-Port befindet. Und zwar an der Codefolge »cbm80« ab Adresse $8004. Diese ASCII-Codefolge entspricht den Hex-Zahlen $C3,$C2,$CD,$38 und $30. Findet der Computer diese fünf Zahlen ab Adresse $8004, werden sowohl bei einem Reset als auch beim Drücken der Restore-Taste nicht mehr die Standardroutinen angesprochen. Der C 64 springt die Adressen an, deren Vektoren in $8000/8001 und $8002/8003 stehen. Der erste Vektor ist der Resetvektor. Der Resetvektor zeigt auf die Adresse, die nach einem Reset angesprungen wird. Nach STOP/RESTORE holt sich der C 64 die Sprungadresse des NMI-Vektors aus den Speicherzellen $8002 und 8003. Ist kein Modul eingesteckt, ist der Adreßbereich ab $8000 als RAM freigegeben. Wenn man nun ab Adresse $8004 die oben genannte Codefolge ablegt, nimmt der C 64 an, daß sich ein Modul im Expansion-Port befindet. Durch diesen Trick kann der Reset- und NMI-(RESTORE-) Vektor verändert werden.</p>
+        <p>Eine zweite gewichtige Betriebsroutine ist die Modulerkennung. Diese benötigt man, damit die geplante Funktion der F1-Taste »resetfest« wird und zugleich immun gegen die Tastenkombination STOP/RESTORE. Die Kennungs-Routine überprüft, ob sich ein Steckmodul im Expansion-Port befindet. Und zwar an der Codefolge »cbm80« ab Adresse $8004. Diese ASCII-Codefolge entspricht den Hex-Zahlen $C3,$C2,$CD,$38 und $30. Findet der Computer diese fünf Zahlen ab Adresse $8004, werden sowohl bei einem Reset als auch beim Drücken der Restore-Taste nicht mehr die Standardroutinen angesprochen. Der C 64 springt die Adressen an, deren Vektoren in $8000/8001 und $8002/8003 stehen. Der erste Vektor ist der Resetvektor. Der Resetvektor zeigt auf die Adresse, die nach einem Reset angesprungen wird. Nach STOP/RESTORE holt sich der C 64 die Sprungadresse des NMI-Vektors aus den Speicherzellen $8002 und 8003. Ist kein Modul eingesteckt, ist der Adreßbereich ab $8000 als RAM freigegeben. Wenn man nun ab Adresse $8004 die oben genannte Codefolge ablegt, nimmt der C 64 an, daß sich ein Modul im Expansion-Port befindet. Durch diesen Trick kann der Reset- und NMI-(RESTORE-)Vektor verändert werden.</p>
+
+        <figure>
+            <img src="123-1.png" alt="">
+            <figcaption>Flußdiagramm zum Interruptprogramm</figcaption>
+        </figure>
 
         <p>Da unser Programm wegen dieses Tricks mitten im Basic-Speicher steht, muß es vor dem Überschreiben durch lange Basic-Programme oder Stringvariablen gesichert werden. Dies erreicht man, wenn man den Zeiger für den Stringspeicher $33-$34 und den Zeiger für die Speichergrenze auf $8000 setzt.</p>
 
@@ -49,6 +54,11 @@
         <h2>Unempfindlich gegen Reset</h2>
 
         <p>Der NMI-Vektor wurde auf die Adresse $801F »verbogen«. Ab dieser Adresse ist der Original-NMI nachgebaut Bis auf den Sprung an die Adresse $FD15, der weggelassen wurde. Dort wird nämlich die Interruptadresse korrigiert und die F1-Taste abgeschaltet, was die ganzen Anstrengungen zunichte machen würde.</p>
+
+        <figure>
+            <img src="123-2.png" alt="">
+            <figcaption>Flußdiagramm zur Initialisierung</figcaption>
+        </figure>
 
         <p>Das Beispielprogramm kann natürlich beliebig erweitert oder geändert werden. Es wäre zum Beispiel möglich, die Buchstabentasten über die CTRL-Taste mit einer vierten Funktion zu belegen. Ähnlich SHIFT/CBM. Ein anderer Einsatz wäre der Aufruf einer Hardcopy. Versuchen Sie einfach mal, eine Hardcopyroutine über ????? aufzurufen, statt die Directory-Funktion. Sie müssen dazu nur den JSR $8074-Befehl ab Adresse $806A so ändern, daß die von Ihnen gewählte Routine abgearbeitet wird. Der Befehl lautet dann vielleicht JSR $C000. Haben Sie keine Angst vor Maschinensprache! Experimentieren Sie doch einfach mit diesem Programm. Eine einfache Übung: Stellen Sie mit der F1-Taste die Farben ein.</p>
 
