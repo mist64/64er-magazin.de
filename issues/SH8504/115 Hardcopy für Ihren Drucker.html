@@ -60,11 +60,30 @@
 
         <p>ln Bild 1 ist zunächst einmal ein HiRes-Bild als solches dargestellt. In Bild 2 wurde über das Bild zusätzlich eine Schraffur gelegt, um die Struktur der Ablage des Bildes zu verdeutlichen. Durch das Rastermuster wird angedeutet, daß die Informationen nicht etwa Reihe für Reihe abgelegt werden, sondern in kleinen Blöcken, von denen in eine Zeile 40 passen, vertikal dagegen nur 25. Der Fachmann wird sich sofort an die Normaldarstellung von Zeichen erinnern. Tatsächlich ist diese Darstellung eng mit der normalen Zeichendarstellung verwandt.</p>
 
+        <figure>
+            <img src="115-1.png" alt="">
+            <figcaption>Bild 1. Beispiel einer HiRes-Darstellung am Commodore 64</figcaption>
+        </figure>
+        <figure>
+            <img src="115-2.png" alt="">
+            <figcaption>Bild 2. Die Rasterung verdeutlicht den Aufbau des HiRes-Bildschirms</figcaption>
+        </figure>
+
         <p>Bild 3 zeigt eine Vergrößerung eines Blocks. Man erkennt, daß ein Block seinerseits aus einer Matrix von 8 x 8 Punkten besteht. Ergo besteht ein Block aus 64 Punkten, und wir wissen, daß 25 x 40 = 1000 dieser Blöcke auf dem Bildschirm Platz haben, wodurch also insgesamt eine Auflösung von 64000 Punkten erreicht wird. So weit, so gut. Aus Bild 3 geht aber noch weiter hervor, daß die Informationen innerhalb eines einzelnen Blocks zeilenweise abgelegt werden; ein Block setzt sich also aus 8 Bytes zusammen, die ihrerseits wieder in kleinste Informationseinheiten, die Bits, zerlegt werden können. Diese Blöcke werden bei der HiRes-Darstellung so lange aneinandergereiht, bis eine Zeile mit Blöcken (weiterhin auch als »Blockzeile« bezeichnet) gefüllt ist. Der nächste Block liegt dann naheliegenderweise unter dem ersten der vorangegangenen Zeile.</p>
+
+        <figure>
+            <img src="115-3.png" alt="">
+            <figcaption>Bild 3. Aufbau einer einzelnen Rasterzeile aus Bild 2</figcaption>
+        </figure>
 
         <p>Damit es etwas anschaulicher wird, wollen wir uns an dieser Stelle mit einem kleinen Beispiel befassen.</p>
 
         <p>Aus Bild 2 ist Block 27 in Zeile 13 vergrößert im Bild 4 wiedergegeben (Blockbereich 0-39, Zeilenbereich 0-24). Weiterhin wird für die Beispielrechnung angenommen, daß das Bild im Computer im Grafikschirm 2 (Basisadresse 8192) abgespeichert ist. Wenn Sie nun die Blöcke zeilenweise auszählen, werden Sie feststellen, daß der besagte Block die Nummer 547 (erster Block entspricht der Nummer 0) trägt.</p>
+
+        <figure>
+            <img src="115-4.png" alt="">
+            <figcaption>Bild 4. Beispiel zur Berechnung der Zeilen-Wertigkeiten innerhalb einer HiRes-Rasterzelle</figcaption>
+        </figure>
 
         <p>Zunächst wollen wir klären, wie der Inhalt gerade dieses Blocks zu ermitteln ist. Dazö berechnen wir beispielsweise die Adresse von Byte 0 innerhalb dieses Blocks nach der Formel</p>
 
@@ -121,6 +140,15 @@
 
         <p>Beim Drucker ist das nicht üblich. Da der Druckkopf im allgemeinen nur aus einer Reihe von vertikal untereinander liegenden Dots (Nadeln) besteht, werden die Daten vertikal aufbereitet erwartet. Wird deshalb im Grafikmodus des Druckers ein Byte gesendet, so werden maximal 8 Punkte vertikal untereinander gedruckt. Wir können vom Computer her jedoch immer nur horizontale Punktreihen per PEEK abfragen. Was benötigt wird, ist eine Routine, die jeweils einen Block aus 8 x 8 Punkten entsprechend umrechnet. Bei unserem Beispiel muß der Block aus Bild 4 entsprechend Bild 5 umgerechnet werden. Bei der Berechnung gehen wir in diesem Fall von der Tatsache aus, daß das höchstwertige Bit der Druckerkopfdots innerhalb der Druckkopfmatrix oben liegt. In Ihrem Handbuch kann aber auch nachzulesen sein, daß das höchstwertige Bit in der Druckmatrix nach unten weist. In diesem Fall würden sich die berechneten Werte gemäß Bild 6 ändern. Wie Sie sehen, ist es durchaus wichtig zu wissen, wie die Dotmatrix Ihres Druckers aufgebaut ist.</p>
 
+        <figure>
+            <img src="115-5.png" alt="">
+            <figcaption>Bild 5. Das gleiche Zeichen wie in Bild 4, aber zur Druckeransteuerung um 90 Grad transformiert</figcaption>
+        </figure>
+        <figure>
+            <img src="115-6.png" alt="">
+            <figcaption>Bild 6. Wie Bild 5, aber für Drucker mit entgegengesetzter Nadelnumerierung (Bit 7 unten)</figcaption>
+        </figure>
+
         <p>Wir gehen davon aus, daß der zuerst beschriebene Fall zutrifft. Wie man relativ einfach die Matrix yon Basic aus umrechnen kann, wird durch das Basic-Progfamm in Listing 2 illustriert. Mit diesem kleinen Programm können Sie jede beliebige Matrix umrechnen lassen. Dazu geben Sie nur die Startadresse Ihres Grafikschirms, die Zeile, in der sich der Block befindet und schließlich die Nummer des Blocks ähnlich wie oben in der Formel erwähnt an. Der Inhalt des betreffenden Blockswird in dem Basic-Programm in Listing 2 in den Zeilen 190 bis 210 in das Feld BYTEeingelesen. Nun müssen die Daten gewandelt werden. Dazu folgende Überlegungen:</p>
 
         <p>Um das erste Bit links oben des ersten vertikalen Bytes zu erhalten, muß von Byte 0 Bit 7 betrachtet werden (siehe Bild 4). Wenn es gesetzt ist, so wird es mit 27 = 128 multipliziert; man erhält so einen ersten Wert. Dann wird von Byte 1 Bit 7 betrachtet und untersucht, ob das Bit gesetzt ist. Falls dies der Fall ist, wird es mit 2e = 64 multipliziert und zum ersten von Byte 2 bis 7 das 7. Bit untersucht und schließlich mit einer absteigenden Potenz von 2 multipliziert und zum jeweils schon erhaltenen Wert (im Listing 2 die Variable OUTPUT) hinzuaddiert. Hat man auf diese Art und Weise das erste vertikale Byte erhalten, kann selbiges an einen Drucker gesendet werden, denn jetzt ist die gewünschte Umwandlung vorgenommen worden, wovon Sie sich durch Nachrechnen überzeugen können.</p>
@@ -138,6 +166,11 @@
         <p>Doch bevor die eigentliche Ausgabe beginnt: der Drucker muß bereit sein! Haben Sie also den Zeilenvorschub korrigiert?</p>
 
         <p>Nun, dann dürfte Ihr Programm dem Struktogramm in Bild 7 entsprechen.</p>
+
+        <figure>
+            <img src="115-7.png" alt="">
+            <figcaption>Bild 7. Struktogramm zur Erstellung einer HiRes-Hardcopy</figcaption>
+        </figure>
 
         <p>Das Struktogramm enthält einen Punkt, über den man sich noch Klarheit verschaffen sollte:</p>
 
@@ -195,9 +228,19 @@
 
         <p>Das gleiche Prinzip läßt sich auch auf dem Drucker verwirklichen. Dabei wählt man unterschiedliche Punktdichten, um so den Eindruck zu vermitteln, daß das Bild aus unterschiedlichen Farben besteht. Für uns reicht es wegen der maximal vier darstellbaren Farben aus, anzunehmen, daß die Farben Weiß (Hintergrundfarbe), Schwarz, und zwei Graustufen bereits das ganze Bild darstellen können. Bild 8 zeigt verschiedene Rastermuster.</p>
 
+        <figure>
+            <img src="115-8.png" alt="">
+            <figcaption>Bild 8. Verschiedene Graustufen für eine Multicolor-Hardcopy</figcaption>
+        </figure>
+
         <h2>So steht ein Multicolor-Bild im Speicher</h2>
 
         <p>Wieder wird über die Grafik ein Raster gelegt, welches das ganze Bild in einzelne Blöcke aufteilt. Eine Blockreihe besteht ebenfalls wieder aus 40 Blöcken. Ein Block ist in Bild 9 vergrößert. Zu erkennen ist die Struktur der Bitpaare, so daß im Prinzip eine Matrix vorliegt, mit der 4 Punkte in X-Richtung und 8 Punkte in Y-Richtung dargestellt werden können. Sie erhalten also eine 4 x 8-Matrix, die dann allerdings auch Informationen zur Farbe der einzelnen Punkte enthält. Zu finden ist nun ein Weg, der wieder Blöcke auswertet und zusätzlich noch Farbinformationen in Form eines Rastermusters mitliefert.</p>
+
+        <figure>
+            <img src="115-9.png" alt="">
+            <figcaption>Bild 9. Die Aufteilung einer Rasterzelle in Bitpaare bei Multicolor</figcaption>
+        </figure>
 
         <p>Wie kann man nun die Informationen, die der Block beinhaltet, verarbeiten?</p>
 
@@ -222,6 +265,11 @@
         <p>Ein Block besteht aus 8 untereinanderliegenden Bytes. Von diesen Blöcken stehen in einer Zeile 40 und ergeben so eine Blockreihe. Wenn wir nach dem oben beschriebenen Prinzip weiter vorgehen wollen, dann muß zunächst Byte 0 von Block 1 berechnet werden. Daraufhin darf man jedoch nicht das zweite Byte des Blocks auswerten, sondern muß Byte 0 des Blocks 2 berechnen, da die nächste Information neben dem Byte 0 des Blocks 1 liegt. Man fährt nach diesem Auswertungsprinzip fort, bis Byte 0 des Blocks 40 einer Blockreihe berechnet ist und führt erst dann einen Zeilenvorschub aus, der aber so bemessen sein muß, daß die folgenden Punkte direkt an die vorhergehenden anschließen.</p>
 
         <p>Genauso wird jeweils Byte 1 bis 7 für alle Blöcke einer Reihe ausgewertet und daraufhin mit der nächsten Blockzeile fortgefahren. Es ergibt sich ein Algorithmus, der vollständig durch das Struktogramm in Bild 10 beschrieben wird. Dieses Struktogramm wurde in Listing 5 in ein Basic-Programm umgesetzt. Wieder werden Sie in wesentlichen Teilen die Übereinstimmungen zum Programm zur Berechnung eines Blocks im Multicolor-Modus erkennen.</p>
+
+        <figure>
+            <img src="115-10.png" alt="">
+            <figcaption>Bild 10. Struktogramm zur Erstellung einer Multicolor-Hardcopy</figcaption>
+        </figure>
 
         <p>Als Ergebnis Ihrer Bemühungen dürften Sie eine Hardcopy Ihres im Computer befindlichen Bildes erhalten, das etwa so wie das Beispiel in Bild 1 aussieht.</p>
 
@@ -294,6 +342,11 @@
         <address class="author">(Frank Lonczewski/ev)</address>
 
         <figure>
+            <img src="115-11.png" alt="">
+            <figcaption>Bild 11. Beispielausdruck in »Multicolor«</figcaption>
+        </figure>
+
+        <figure>
             TODO
             <figcaption>Listing 1. HiRes-Bildverschiebung</figcaption>
         </figure>
@@ -313,6 +366,11 @@
             TODO
             <figcaption>Listing 5. Multicolor-Bildausgabe auf Drucker</figcaption>
         </figure>
+
+        <figure>
+            <img src="115-0.png" alt="">
+        </figure>
+
     </article>
 </body>
 

@@ -26,7 +26,20 @@
 
         <p>Das Programm ist ohne Einschränkung für alle Epson-kompatiblen Drucker anwendbar, die über einen Bitmustermodus verfügen. Dieser Modus wird für die Ausgabe der Commodore-eigenen Grafikzeichen benötigt. Das Programm besteht aus mehreren Programmteilen, von denen die meisten Erweiterungen bestehender Ein-/Ausgaberoutinen des Betriebssystems sind und bei der Initialisierung in diese eingebunden werden. Dadurch können schon bestehende Basic-Befehle wie OPEN und PRINT # zum Drucken benutzt, und Programme müssen nicht umgeschrieben werden. Zur Ansteuerung verschiedener Druckmodi wurden jedoch zusätzliche Gerätenummern definiert, deren Bedeutungen in Tabelle 1 erklärt sind. Gerätenummer 16 realisiert einen sogenannten Direktmodus, mit dem die internen Commodore-Zeichencodes ohne Wandlung an den Drucker gelangen. Der Direktmodus ist zur Ausgabe von Steuerzeichen oder bei der Verwendung des Druckers als Plotter zur Einzelnadelsteuerung beziehungsweise zur Ausgabe von Bitmustern geeignet. Der Textmodus (Groß- und Kleinschreibung) ist unter Gerätenummer 18 und, weil er wohl am häufigsten bei bereits bestehenden Programmen benutzt wird, unter Gerätenummer 4 ansprechbar. Die Gerätenummer 19 realisiert den Großschrift/Grafik-Modus, wie er beim C64 gleich nach dem Einschalten voreingestellt ist Der wichtige Modus zum Listen von Programmen wurde mit Gerätenummer 17 realisiert. Es läßt sich über die Sekundäradresse, wie in den Musterlistings (Bild 1 bis 3) gezeigt, noch zwischen vier Fällen unterscheiden. Einmal kann ausgewählt werden, ob das Listing, wie vom Bildschirm her gewohnt, mit Großbuchstaben und Grafikzeichen oder im Textmodus mit großen und kleinen Buchstaben gedruckt wird. Zum anderen kann man auswählen, ob die Steuerzeichen wie bei der Bildschirmausgabe als inverse Zeichen oder durch Abkürzungen wie &lt;CRD> (Cursor down) im Klartext gedruckt werden. Durch all diese Möglichkeiten kann der Anwender zum einen auf seinem Drucker Ausgaben erzeugen, wie man sie von Commodore-Druckern her gewohnt ist, zum anderen auch alle Möglichkeiten seines Druckers voll nutzen.</p>
 
-        <h2>Commodoreeigene Grafikzeichen</h2>
+        <figure>
+            <img src="22-1.png" alt="">
+            <figcaption>Bild 1. Steuerzeichen werden von dieser Schnittstelle genauso bewältigt wie Grafikzeichen</figcaption>
+        </figure>
+        <figure>
+            <img src="22-2.png" alt="">
+            <figcaption>Bild 2. Steuerzeichen können auch in Klartext übersetzt werden</figcaption>
+        </figure>
+        <figure>
+            <img src="22-3.png" alt="">
+            <figcaption>Bild 3. Musterlisting, erstellt auf einem Epson FX-80</figcaption>
+        </figure>
+
+        <h2>Commodore-eigene Grafikzeichen</h2>
 
         <p>Die Ausgabe von Grafikzeichen erfolgt in der Routine OUTGEN ab Adresse $CAC4. Zu diesem Zweck wird der Zeichengenerator des C 64 ausgelesen. Die Zeichen, die aus einer 8x8- Punktmatrix bestehen, sind dort in je 8 Byte abgelegt. Jedes Byte repräsentiert das Punktmuster einer Zeile der Matrix. Ein Matrixdrucker druckt die Zeichen, indem er sie ebenso als Muster von matrixartig angeordneten Punkten zu Papier bringt. Jedoch gibt er die Punktmatrix nicht wie der Bildschirm zeilenweise, sondern spaltenweise aus. Deshalb wird in OUTGEN die im Zeichengenerator in 8 Zeilenbyte gespeicherte Zeichenmatrix zunächst in 8 Spaltenbyte umorganisiert. Nach Umschalten des Druckers in den sogenannten Bitmustermodus, in dem er jedes ankommende Datenbyte nicht mehr als ASCII-Zeichen, sondern als Musterbyte für eine Matrixspalte interpretiert, gibt OUTGEN die acht geänderten Zeichenbyte an den Drucker aus. Dieser fügt sie wieder zu einem 8x8- Punktmatrixzeichen zusammen. So ist es möglich, auf einem Matrixdrucker exakte Kopien der C 64-Bildschirmzeichen herzustellen, obwohl dieser nicht über den entsprechenden Zeichensatz verfügt.</p>
 
@@ -73,6 +86,10 @@
                 <pre data-filename="eyssele-test" data-name="Eyssele Test"></pre>
             </figure>
         </div>Î
+
+        <figure>
+            <img src="22-0.png" alt="">
+        </figure>
     </article>
 </body>
 
