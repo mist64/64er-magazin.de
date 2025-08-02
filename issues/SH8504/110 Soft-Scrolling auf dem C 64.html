@@ -138,32 +138,30 @@
 
         <p>Und nun das gesamte 1-Zeilen-Soft-Scrolling in Basic: (Das dazugehörige Maschinenprogramm ist so geschrieben, daß es in jeden Bereich ge-POKEt werden kann!)</p>
 
-        <p>TODO PRE</p>
-
-        <p>10 REM Beispiel Nr. 3<br>
-            20 PRINT CHR$(147);GOSUB 100<br>
-            30 PRINT "Beliebiger Text kleiner als 40 Zeichen"<br>
-            40 REM Farbe = schwarz<br>
-            50 FOR I=55296 TO 55296+39:POKE I,0:NEXT<br>
-            60 FOR I=1 TO 7<br>
-            70 POKE 53248+22,PEEK (53248+22) AND 248 OR I<br>
-            80 FOR T=0 TO 5:NEXT<br>
-            90 NEXT I<br>
-            100 FOR T=0 TO 3:NEXT<br>
-            110 SYS32768:REM Achterscrolling<br>
-            120 GOTO 60<br>
-            130 REM Masch.PRG einlesen<br>
-            140 FOR 1=32768 TO 32768+44:REM 44 DATAs<br>
-            150 READ G:S=S+G:POKE I,G:NEXT<br>
-            160 IF S=6044 THEN 180<br>
-            170 PRINT"FEHLERINDATAS!":STOP<br>
-            180 RETURN<br>
-            190 DATA 173,18,208,201,160,48,249,201<br>
-            200 DATA 190,16,245,173,39,4,141,255,207<br>
-            210 DATA 162,38,189,0,4,232,157,0,4,202<br>
-            220 DATA 202,224,255,208,243,173,255,207<br>
-            230 DATA 141,0,4,173,22,208,41,248,9<br>
-            240 DATA 0,141,22,208,96</p>
+        <pre>10 REM Beispiel Nr. 3
+<a href="#fehlerteufelchen" class="fehlerteufelchen_link">20 PRINT CHR$(147);GOSUB 100</a>
+30 PRINT "Beliebiger Text kleiner als 40 Zeichen"
+40 REM Farbe = schwarz
+50 FOR I=55296 TO 55296+39:POKE I,0:NEXT
+60 FOR I=1 TO 7
+70 POKE 53248+22,PEEK (53248+22) AND 248 OR I
+80 FOR T=0 TO 5:NEXT
+90 NEXT I
+100 FOR T=0 TO 3:NEXT
+110 SYS32768:REM Achterscrolling
+120 GOTO 60
+130 REM Masch.PRG einlesen
+140 FOR 1=32768 TO 32768+44:REM 44 DATAs
+150 READ G:S=S+G:POKE I,G:NEXT
+<a href="#fehlerteufelchen" class="fehlerteufelchen_link">160 IF S=6044 THEN 180</a>
+170 PRINT"FEHLERINDATAS!":STOP
+180 RETURN
+190 DATA 173,18,208,201,160,48,249,201
+<a href="#fehlerteufelchen" class="fehlerteufelchen_link">200 DATA 190,16,245,173,39,4,141,255,207
+210 DATA 162,38,189,0,4,232,157,0,4,202
+220 DATA 202,224,255,208,243,173,255,207
+230 DATA 141,0,4,173,22,208,41,248,9
+240 DATA 0,141,22,208,96</a></pre>
 
         <p>Man stellt fest, daß die Zeichen am rechten Rand langsam herauswandern; aber am linken Rand plötzlich auftauchen. Dies läßt sich verhindern, indem man den Bildschirm seitlich verengt (Bit 3 des Registers 53248+22 löschen). Das kann man mit<br>
             POKE 53248+22,PEEK(53248+22)AND247 erreichen. Platz dafür wäre zum Beispiel in Zeile 45.</p>
@@ -219,6 +217,18 @@
             READY</p>
 
         <address class="author">(Frank Barcikowski + Holger Vocke/ah)</address>
+
+        <aside class="fehlerteufelchen" id="fehlerteufelchen">
+            <h2>Fehlerteufelchen</h2>
+            <p>Das Programm »Beispiel Nr. 3« ist so, wie es veröffentlicht wurde, nicht lauffähig. Folgende Zeilen sind zu ändern:<br>
+                20 PRINT CHR$(147);:GOSUB 140<br>
+                160 IF S = 6149 THEN 180<br>
+                200 DATA 190, 16, 245, 173, 39, 4, 133, 251<br>
+                220 DATA 202, 224, 255, 208, 243, 165, 251<br>
+                230 DATA 141, 0, 4, 173, 22, 208, 41, 248<br>
+                240 DATA 141, 22, 208, 96</p>
+            <!-- 64'er 11/1985 -->
+        </aside>
     </article>
 </body>
 
