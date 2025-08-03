@@ -223,6 +223,7 @@ Die Eingabe-Ausgaben werden aus `issues` gelesen, die Website wird nach `out` ge
 * Sonderheft 4/1985:
     * Abtippen der Listings
         * [goloMAK](https://www.forum64.de/wcf/index.php?user/28439-golomak/)
+        * [ClausS](https://www.forum64.de/wcf/index.php?user/28399-clauss/)
 
 ![](screenshot1.png)
 
