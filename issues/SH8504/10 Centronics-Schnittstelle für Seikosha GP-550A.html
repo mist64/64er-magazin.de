@@ -99,7 +99,164 @@
         </figure>
 
         <figure>
-            TODO
+            <pre>930:   cbd2 1b                .byte27      ;grafik-steuersequenz
+932:   cbd3 47                .byte71      ;fuer
+934:   cbd4 30                .bvte"0"     ;grafikzeichen-ausgabe
+936:   cbd5 30                .byte"0"     ;seikosha gp 550 a
+938:   cbd6 38                .byte"8"
+                      ;                       ;
+                      ;-----------------------;
+                      ;  'umdreh'-routine     ;
+                      ; der bit-wetigkeiten   ;
+                      ;der grafikzeichebbytes ;
+                      ;-----------------------;
+                      ;                       ;
+954:   cbd7 a9 80             lda  #$80      ;bit7-wertigkeit
+956:   cbd9 85 97             sta  $97
+958:   cbdb a9 00             lda  #$00
+960:   cbdd a8                tay
+962:   cbde 85 fb             sta  $fb
+964:   cbe0 bd c0 02          lda  $02c0,x   ;das zu drehende
+966:   cbe3 85 fc             sta  $fc       ;byte laden
+                      ;
+970:   cbe5 a5 fc    loop     lda  $fc
+972:   cbe7 25 97             and  $97       ;pruefen , ob
+974:   cbe9 f0 07             beq  $cbf2     ;bit gesetzt
+                      ;
+978:   cbeb a5 fb             lda  $fb       ;byte-zwischenspeicher
+980:   cbed 19 77 cc          ora  $cc77,y
+                      ;wenn das jeweilige bit gesetzt ist,
+                      ;dann dafuer das entsprechende 'umkehr-bit'
+                      ;aus bit-wertigkeits-tabelle holen
+988:   cbf0 85 fb             sta  $fb
+990:   cbf2 c8                iny
+                      ;bit-tabelen-zeiger erhoehen
+                      ;
+996:   cbf3 18                clc
+998:   cbf4 46 97             lsr  $97
+                      ;naechst-niedrigeres bit pruefen
+1002:  cbf6 b0 02             bcs  $cbfa
+                      ;wenn alle bits geprueft
+1006:  cbf8 90 eb             bcc  loop
+                      ;wenn noch nicht alle bits geprueft
+1010:  cbfa a5 fb             lda  $fb
+                      ;fertig 'gedrehtes' byte laden
+1014:  cbfc 4c 20 cb          jmp  $cb20
+                      ;und in eyssele-routine zurueckspringen
+                      ;                    ;
+                      ;--------------------;
+                      ; hardcopy - routine ;
+                      ;--------------------;
+                      ;                    ;
+1028:  cbff a9 1b             lda  #$1b    ;steuersequenz, welche
+1030:  cc01 20 40 c9          jsr  $c940   ;passenden zeilenabstand
+1032:  cc04 a9 39             lda  #$39    ;fuer grafikausdruck
+1034:  cc06 20 40 c9          jsr  $c940   ;(hardopy) festlegt
+                      ;
+1038:  cc09 a9 00             lda  #$00    ;zeiger auf gewuenschten
+1040:  cc0b a0 20             ldy  #$20    ;grafikspeicher
+1042:  cc0d a5 fd             sta  $fd     ;setzen
+1044:  cc0f 84 fe             sty  $fe
+                      ;
+1048:  cc11 a2 19             ldx  #$19
+                      ;anzahl der auszudruckenden
+                      ;hardcopyzeilen steht in x-register
+1054:  cc13 a0 04    zeile    ldy  #$04    ;grafiksteuersequenz fuer
+1056:  cc15 b9 72 cc          lda  $cc72,y ;eine hardcopyzeile
+1058:  cc18 20 40 c9          jsr  $c940   ;an drucker ueber
+1060:  cc1b 88                dey          ;userport senden
+1062:  cc1c 10 f7             bpl  $cc15
+1064:  cc1e a9 28             lda  #$28    ;40 zeichen
+1066:  cc20 85 15             sta  $15     ;pro hardcopyzeile
+                      ;
+1070:  cc22 a9 80    loop1    lda #$80     ;bit7-wertigkeit
+1072:  cc24 85 97             sta  $97
+                      ;speicher des jeweiligen pruef-bits
+                      ;
+1078:  cc26 a9 00    loop2    lda  #$00
+1080:  cc28 85 14             sta  $14
+                      ;zwischenspeicher des spaltenbytes
+                      ;
+1084:  cc2a a0 07             lda  #$07
+                      ;in 8 zeilenbytes pruefen, ob jeweiliges
+                      ;pruef-bit ($97) gesetzt ist
+                      ;
+1092:  cc2c a9 34             lda  #$34    ;ganzen ram einschalten
+1094:  cc2e 78                sei          ;in dem in speicherstelle1
+1096:  cc2f 85 01             sta  $01     ;bit 0,1 geloescht
+                      ;
+                      ;umformung der zeilenbytes des grafikspeichers
+                      ;in spaltenbytes fuer drucker
+1104:  cc31 b1 fd    loop3    lda  ($fd),y
+                      ;zeilenbyte lesen
+1108:  cc33 25 97             and  $97
+                      ;in $97 steht jeweils das bit, auf weches
+                      ;die 8 zeilenbytes qeprueft werden
+1114:  cc35 f0 07             beq  $cc3e
+1116:  cc37 a5 14             lda  $14
+1118:  cc39 19 77 cc          ora  $cc77,y
+1120:  cc3c 85 14             sta  $14
+                      ;entsprechendes bit aus tabelle holen
+                      ;und im spaltenbyte-zwischenspeicher setzen
+1126:  cc3e 88                dey
+                      ;jeweiliges bit in allen 8 zeilenbytes
+                      ;pruefen, ob gesetzt
+1132:  cc3f 10 f0             bpl  loop3
+1134:  cc41 a9 02             lda  #$02
+1136:  cc43 85 fb             sta  $fb
+                      ;'zaehler' fuer zweimalige ausgabe
+1140:  cc45 a9 f4             lda  #$ff
+1142:  cc47 38                sec
+1144:  cc48 e5 14             sbc  $14
+                      ;spaltenbyte (=byte fuer drucker)
+                      ;invertieren
+1150:  cc4a a0 37             ldy  #$37    ;rom wieder
+1152:  cc4c 84 01             sty  $01     ;einschalten
+1154:  cc4e 58                cli
+1156:  cc4f 20 40 c9          jsr  $c940
+                      ;spaltenbyte an drucker
+1160:  cc52 18                clc
+1162:  ce53 46 fb             lsr  $fb
+1164:  cc55 90 ee             bcc  $cc45
+                      ;zweimal spaltenbyte an drucker ausgeben,
+                      ;wodurch hardcopy doppelt so breit wird
+1170:  cc57 46 97             lsr  $97
+                      ;naechst-niedrigeres bit
+                      ;der 8 zeilenbytes pruefen
+1176:  cc59 90 cb             bcc  loop2
+1178:  cc5b a5 fd             lda  $fd     ;grafikspeicherzeiger
+1180:  ec5d 69 07             adc  #$07    ;um 8 bytes erhoehen
+1182:  ccSf 85 fd             sta  $fd     ;erforderlichenfalls
+1184:  cc61 90 02             bcc  $cc65   ;highbyte des
+1186:  cc63 e6 fe             inc  $fe     ;zeigers erhoehen
+1188:  cc65 c6 15             dec  $15     ;pruefen, ob
+1190:  cc67 d0 b9             bne  loop1   ;hardcopyzeile fertig.
+1192:  cc69 a9 0a             lda  #$0a    ;line-feed an
+1194:  cc6b 20 40 c9          jsr  $c940   ;drucker senden
+1196:  cc6e ca                dex
+1198:  cc6f d0 a2             bne  zeile
+                      ;pruefen, ob alle hardcopyzeilen
+                      ;ausgegeben sind, also ob hardcopy
+                      ;fertig ist
+1206:  cc71 60                rts
+                      ;ende der hardcopy-routine,
+                      ;ruecksprung in programm
+                      ;bzw. direktmodus
+                      ;
+1216:  cc72 30                .byte"0"     ;grafiksteuersequenz
+1218:  cc73 34                .byte"4"     ;fuer eine
+1220:  cc74 36                .byte"6"     ;hardcopyzeile
+1222:  cr75 47                .byte71
+1224:  cc76 1b                .byte27
+
+1228:  ce77 01                .byte1       ;bit-wertigkeits-
+1230:  cc78 02                .byte2       ;tabelle
+1232:  cc79 04                .byte4
+1234:  cc7a 08                .byte8
+1236:  cc7b 10                .byte16
+1238:  cc7c 20                .byte32
+1240:  cc7d 40                .byte64
+1242:  cc7e 80                .byte128</pre>
             <figcaption>Bild 1. Die wichtigsten Teile des Centronics-Interface als Source-Code</figcaption>
         </figure>
 
