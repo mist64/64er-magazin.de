@@ -43,6 +43,34 @@
 
         <p>Wo liegen nun diese 63 Speicherstellen? Hier haben wir, wollen wir nicht mit Unmengen von Tricks und noch mehr POKEs arbeiten, nur vier Möglichkeiten. Diese sind in Tabelle 1 aufgeführt.</p>
 
+        <figure>
+            <table>
+                <tbody>
+                    <tr>
+                        <th>Speicherbereich</th>
+                        <th>Codezahl</th>
+                    </tr>
+                    <tr>
+                        <td>704 — 766</td>
+                        <td>11</td>
+                    </tr>
+                    <tr>
+                        <td>832 — 894</td>
+                        <td>13</td>
+                    </tr>
+                    <tr>
+                        <td>896 — 958</td>
+                        <td>14</td>
+                    </tr>
+                    <tr>
+                        <td>960 — 1022</td>
+                        <td>15</td>
+                    </tr>
+                </tbody>
+            </table>
+            <figcaption>Tabelle 1: Speicherbereiche, in denen Spritedaten abgelegt werden können.</figcaption>
+        </figure>
+
         <p>Und wie bekomme ich nun mein Sprite da rein, werden Sie jetzt vielleicht fragen? Nun, schauen wir uns nochmal das Entwurfsblatt an. Jetzt sollen die Zahlen entschlüsselt werden: Wie gesagt, es wird eine Zeilejeweils durch drei Zahlen verschlüsselt. Die drei dicken Striche geben an, welcher Zeilenbereich durch eine Zahl verschlüsselt wird.</p>
 
         <p>Angenommen wir möchten in der ersten Reihe die Punkte 1, 3 und 5 setzen. Diese liegen alle in der ersten Spaltengruppe. Um den Zahlenwert zu errechnen, müssen Sie nun einfach die Zahlen addieren, die über den gesetzten Punkten stehen. In unserem Beispiel wären das die 128, die 32 und die 8. Das Ergebnis, 158, tragen Sie dann in das erste Kästchen mit der Überschrift »Zahlencodes« ein. Genauso verfahren Sie dann mit der zweiten und dritten Spaltengruppe und den weiteren 20 Zeilen. Schon haben Sie die 63 Zahlenwerte, die das Sprite codieren, ausgerechnet. Übrigens: Daß jede zweite Spaltentrennung gestrichelt gezeichnet ist, hat noch praktische Gründe, wie wir bei mehrfarbigen Sprites sehen werden.</p>
@@ -81,13 +109,138 @@
 
         <p>Beim Errechnen der 63 Zahlen für das Sprite geht man dann so vor: Anstelle einer 1 fürjeden gesetzten Punkt müssen Sie nun zwei Ziffern in das Sprite-Entwurfsblatt einsetzen, eine in das linke, eine in das rechte Kästchen eines Punktes. Welche Ziffern das sind, ist von der Farbe abhängig und steht in Tabelle 2. Ab dann verläuft das Ausrechnen der Zahlenwerte des Sprites genauso wie bei den einfarbigen Sprites. Allerdings kommen noch drei zusätzliche POKEs hinzu: In die Speicherstelle 53276 muß eine 1, damit der Video-Chip weiß, daß es sich jetzt um ein Multicolor-Sprite handelt. In die Speicherstelle 53285 kommt dann die Farbe 2, in die Speicherstelle 53286 die Farbe 3. Die Farbe 1 haben wir vorher schon in der Speicherstelle 53287 festgelegt. Schon schimmert uns ein schönes mehrfarbiges Sprite entgegen, das wir dann genauso wie ein einfarbiges behandeln können.</p>
 
+        <figure>
+            <table>
+                <tbody>
+                    <tr>
+                        <th>Bitkombination</th>
+                        <th>Farbe</th>
+                    </tr>
+                    <tr>
+                        <td>00</td>
+                        <td>Durchsichtig</td>
+                    </tr>
+                    <tr>
+                        <td>11</td>
+                        <td>Farbe 1</td>
+                    </tr>
+                    <tr>
+                        <td>01</td>
+                        <td>Farbe 2</td>
+                    </tr>
+                    <tr>
+                        <td>10</td>
+                        <td>Farbe 3</td>
+                    </tr>
+                </tbody>
+            </table>
+            <figcaption>Tabelle 2: Zusammenhang zwischen Ziffernkombinationen und
+                Farbe bei Multicolor-Sprites.</figcaption>
+        </figure>
+
         <h2>Ein Sprite kommt selten allein</h2>
 
         <p>Schließlich steht ja im Commodore-Handbuch was von acht verschiedenen Sprites gleichzeitig. Also ohne viel Tricks kriegen wir nur vier_verschiedene Sprites auf den Bildschirm, denn wir können ja nur vier Sprites in die Speicherstellen aus Tabelle 1 POKEn. Dafür haben wir die Möglichkeit, ein Sprite doppelt, dreifach oder sogar achtfach gleichzeitig auf den Bildschirm zu bringen. Mit acht Sprites ist dann allerdings auch die Kapazität unseres Video-Chips erschöpft.</p>
 
         <p>Wie kann man nun über die sieben zusätzlichen Sprites verfügen? Diese Sprites haben praktischerweise die Nummern 1 bis 7. Für ihre Position, Farbe und ihre Codezahl haben sie ihre eigenen Speicherstellen, die in Tabelle 3 aufgeführt sind.</p>
 
+        <figure>
+            <table>
+                <tbody>
+                    <tr>
+                        <td></td>
+                        <th>Sprite 0</th>
+                        <th>1</th>
+                        <th>2</th>
+                        <th>3</th>
+                        <th>4</th>
+                        <th>5</th>
+                        <th>6</th>
+                        <th>7</th>
+                    </tr>
+                    <tr>
+                        <th>Codezahl-Speicher</th>
+                        <td>2040</td>
+                        <td>2041</td>
+                        <td>2042</td>
+                        <td>2043</td>
+                        <td>2044</td>
+                        <td>2045</td>
+                        <td>2046</td>
+                        <td>2047</td>
+                    </tr>
+                    <tr>
+                        <th>Spritefarbe (1)</th>
+                        <td>53287</td>
+                        <td>53288</td>
+                        <td>53289</td>
+                        <td>53290</td>
+                        <td>53291</td>
+                        <td>53292</td>
+                        <td>53293</td>
+                        <td>53294</td>
+                    </tr>
+                    <tr>
+                        <th>X-Position</th>
+                        <td>53248</td>
+                        <td>53250</td>
+                        <td>53252</td>
+                        <td>53254</td>
+                        <td>53256</td>
+                        <td>53258</td>
+                        <td>53260</td>
+                        <td>53262</td>
+                    </tr>
+                    <tr>
+                        <th>Y-Position</th>
+                        <td>53249</td>
+                        <td>53251</td>
+                        <td>53253</td>
+                        <td>53255</td>
+                        <td>53257</td>
+                        <td>53259</td>
+                        <td>53261</td>
+                        <td>53263</td>
+                    </tr>
+                </tbody>
+            </table>
+            <figcaption>Tabelle 3: Speicherstellen, die einzelne Sprites betreffen.</figcaption>
+        </figure>
+
         <p>Komplizierter wird es da schon bei den anderen Speicherstellen, die in Tabelle 4 aufgelistet wurden. Jede dieser Speicherstellen hat Kontrolle über alle acht Sprites. Wenn Sie genauer hinschauen, bemerken Sie, daß alle diese Speicherstellen nur An-/Aus-Funktion haben, sie sind sozusagen Schalter. Nun können aber in einer Speicherstelle, wie wir wissen, acht An-/Aus-Informationen gespeichert werden, also für jedes Sprite genau eine. Jetzt folgen zwei Routinen, deren Wirkung ich Ihnen gerne erkläre, nicht aber die Funktionsweise. Dazu müßte ich längere Vorträge über Binärarithmetik, logische Funktionen und ähnliches halten und damit den Rahmen dieses Artikels sprengen.</p>
+
+        <figure>
+            <table>
+                <tbody>
+                    <tr>
+                        <td>Einschalten</td>
+                        <td>53269</td>
+                    </tr>
+                    <tr>
+                        <td>Übertrag X-Position</td>
+                        <td>53264</td>
+                    </tr>
+                    <tr>
+                        <td>Vergrößern X</td>
+                        <td>53277</td>
+                    </tr>
+                    <tr>
+                        <td>Vergrößern Y</td>
+                        <td>53271</td>
+                    </tr>
+                    <tr>
+                        <td>Multicolor einsch.</td>
+                        <td>53276</td>
+                    </tr>
+                    <tr>
+                        <td>Priorität-Hintergrund</td>
+                        <td>53275</td>
+                    </tr>
+                </tbody>
+            </table>
+            <figcaption>Tabelle 4: Speicherstellen, die jeweils acht Schalter 0© Sprite einen)
+                enthalten.</figcaption>
+        </figure>
 
         <p>TODO PRE</p>
 
@@ -102,6 +255,22 @@
         <p>stellt den entsprechenden Schalter wieder auf »Aus« um, ohne die anderen zu beinflussen.</p>
 
         <p>Wichtig sind die beiden Adressen in der Tabelle 5: Sie sind uns schon bekannt, und legen die Farben 2 und 3 für <strong>alle</strong> Sprites verbindlich fest. Zwei Sprites im Multicolormodus, die gleichzeitig erscheinen, können sich also nur in der Farbe 1 unterscheiden.</p>
+
+        <figure>
+            <table>
+                <tbody>
+                    <tr>
+                        <td>Farbe 2</td>
+                        <td>53285</td>
+                    </tr>
+                    <tr>
+                        <td>Farbe 3</td>
+                        <td>53286</td>
+                    </tr>
+                </tbody>
+            </table>
+            <figcaption>Tabelle 5: Speicherstellen, die auf alle acht Sprites gleichzeitig wirken</figcaption>
+        </figure>
 
         <p>Damit ist das Wichtigste über Sprites gesagt. In Basic sollte man sich auf stehende Sprites beschränken. Sich bewegende Sprites sind relativ langsam, wenn das Basic-Programm auch andere Funktionen nebenbei erfüllen muß.</p>
 
