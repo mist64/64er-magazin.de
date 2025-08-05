@@ -2,7 +2,7 @@
 
 import re
 
-with open("8508.tables", "r") as f:
+with open("/Users/mist/Desktop/SH8504_tables.html", "r") as f:
     content = f.read()
 
 # Apply all the sed transformations:
@@ -30,5 +30,5 @@ content = re.sub(r'<li>(.*?)</li>', r'\1<br>', content)
 # 4. Remove closing </ol> tag
 content = re.sub(r'\s*</ol>\s*', '', content)
 
-with open("8508_clean.tables", "w") as f:
+with open("SH8504_clean.tables", "w") as f:
     f.write(content)
