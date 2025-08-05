@@ -55,6 +55,93 @@
 
         <p>Ferner wurden noch zwei Schattierungsroutinen »SHADE« und »RSHADE« implementiert. »SHADE« arbeitet im Prinzip ganz einfach: Man definiert eine 8 x 8 Graustufenmatrix, in der Werte von 0 bis 63 enthalten sind (Tabelle 1). Mit Hilfe dieser Daten wird nun ein — ebenfalls 8 x 8 Pixel großes — Feld erstellt, daß dann an einer bestimmten Stelle in den HiRes-Bildschirm kopiert wird. Um eine gleichmäßige Grauschattierung zu erreichen, müssen die Pixels auch möglichst einen gleichmäßigen Abstand voneinander haben. Wenn das Programm nun einen Grauwert in die Grafik setzen will, so übergibt es einfach einen Wert zwischen 0 und 63 an diese Unterroutine. Nun werden innerhalb dieser Matrix die einzelnen Punkte der Reihe nach gesetzt, also zuerst der Punkt mit der Nummer 0 (oben links), dann 1 (4. von links und 4. von oben) und so weiter. Also, je größer die Zahl ist, desto mehr Punkte werden gesetzt (und um so dunkler wird das Ganze). Durch diese festgelegte Reihenfolge wird sichergestellt, daß die Schattierung gleichmäßig ist. Die RSHADE-Unterroutine hat genau die gleiche Aufgabe, sorgt aber für etwas ungleichmäßigere — durch den Zufallsgenerator gesteuerte — Grauwerte.</p>
 
+        <figure>
+            <table>
+                <tbody>
+                    <tr>
+                        <td>0</td>
+                        <td>8</td>
+                        <td>53</td>
+                        <td>61</td>
+                        <td>2</td>
+                        <td>10</td>
+                        <td>55</td>
+                        <td>63</td>
+                    </tr>
+                    <tr>
+                        <td>16</td>
+                        <td>24</td>
+                        <td>37</td>
+                        <td>45</td>
+                        <td>18</td>
+                        <td>26</td>
+                        <td>39</td>
+                        <td>47</td>
+                    </tr>
+                    <tr>
+                        <td>49</td>
+                        <td>57</td>
+                        <td>4</td>
+                        <td>12</td>
+                        <td>51</td>
+                        <td>59</td>
+                        <td>6</td>
+                        <td>14</td>
+                    </tr>
+                    <tr>
+                        <td>33</td>
+                        <td>41</td>
+                        <td>20</td>
+                        <td>28</td>
+                        <td>35</td>
+                        <td>43</td>
+                        <td>22</td>
+                        <td>30</td>
+                    </tr>
+                    <tr>
+                        <td>3</td>
+                        <td>11</td>
+                        <td>54</td>
+                        <td>62</td>
+                        <td>1</td>
+                        <td>9</td>
+                        <td>52</td>
+                        <td>60</td>
+                    </tr>
+                    <tr>
+                        <td>19</td>
+                        <td>27</td>
+                        <td>38</td>
+                        <td>46</td>
+                        <td>17</td>
+                        <td>25</td>
+                        <td>36</td>
+                        <td>44</td>
+                    </tr>
+                    <tr>
+                        <td>50</td>
+                        <td>58</td>
+                        <td>7</td>
+                        <td>15</td>
+                        <td>48</td>
+                        <td>56</td>
+                        <td>5</td>
+                        <td>13</td>
+                    </tr>
+                    <tr>
+                        <td>34</td>
+                        <td>42</td>
+                        <td>23</td>
+                        <td>31</td>
+                        <td>32</td>
+                        <td>40</td>
+                        <td>21</td>
+                        <td>29</td>
+                    </tr>
+                </tbody>
+            </table>
+            <figcaption>Tabelle 1. Matrix der Grauwerte</figcaption>
+        </figure>
         <p>Ein weiteres zu lösendes Problem ist das etwas merkwürdige rechteckige Bildschirmformat des C 64. Die Auflösung von 320 x 200 Punkten entspricht einem Teilungsverhältnis von 8:5, wodurch es bei einem normalen Bildschirm — mit einem Verhältnis von 4:3 — zu einer horizontalen Verzerrung kommen kann (eine Kugel würde dann etwa wie ein plattgedrückter Ball aussehen). Die Unterroutine »SCALE« (in Listing 2) sorgt für diese darstellungs- und maßstabsgerechte Aufbereitung der Koordinaten.</p>
 
         <h3>Linien und Facettenzeichnen</h3>
@@ -81,6 +168,132 @@
 
         <p>Listing 4 beinhaltet eine Sammlung von Routinen, die die acht Grundshapes (siehe Bild 4) zeichnen. Da dieses Unterprogramm auf die — an den C 64 angepaßten — Lower-Level-Routinen der Grafik-Utilities (Listing 2) zugreift, ist es selbst nicht vom jeweiligen Computer abhängig. Zusammen mit dem, in Listing 5 abgebildeten Programm, wird der Kontakt zum Basic hergestellt. Die Übergabe der Parameter geschieht mittels »SYS«-Befehl:<br>
             SYS &lt;KOMMANDO>, &lt;PARAM. 1,>, &lt;PARAM. 2>, &hellip;, wobei &lt;KOMMANDO> die Adresse des jeweiligen Grafikbefehls ist (Tabelle 2 zeigt die komplette Befehlsübersicht dieses Grafikprogramms). Über &lt;PARAMETER 1> und &lt;PARAMETER 2> müssen die Koordinaten des Shapes angegeben werden, wobei zu beachten ist, daß der Ursprung (dort wo die X- und Y-Koordinate null ist) in der linken unteren Bildschirmecke liegt. Die einzusetzenden Werte gehen in der Horizontalen von 0 bis 255, in der Vertikalen von 0 bis 239.</p>
+
+        TODO FORMAT
+
+        <figure>
+            <table>
+                <tbody>
+                    <tr>
+                        <td colspan="2">Grafikspeicher: 40960-48959<br>Farbspeicher. 33792-34791</td>
+                    </tr>
+                    <tr>
+                        <td colspan="2">Shape-Fenster</td>
+                    </tr>
+                    <tr>
+                        <td>893:</td>
+                        <td>Linker Rand</td>
+                    </tr>
+                    <tr>
+                        <td>894:</td>
+                        <td>Rechter Rand</td>
+                    </tr>
+                    <tr>
+                        <td>895;</td>
+                        <td>Unterer Rand</td>
+                    </tr>
+                    <tr>
+                        <td>896:</td>
+                        <td>Oberer Rand</td>
+                    </tr>
+                    <tr>
+                        <td>Style Flags</td>
+                    </tr>
+                    <tr>
+                        <td>838:</td>
+                        <td>Schattierungsart (0 = zufällig, 1 = Halbton)</td>
+                    </tr>
+                    <tr>
+                        <td>839:</td>
+                        <td>Skalierungsflag (0 = normal 1:1, 1 = skaliert 4:3)</td>
+                    </tr>
+                    <tr>
+                        <td>868:</td>
+                        <td>Eck Flag bei Polygonen (0 = Normal, 1 = zeichnet Linien an den Ecken)</td>
+                    </tr>
+                    <tr>
+                        <td>871:</td>
+                        <td>Eckenmodus (0 = zeichnet Linie, 1 = löscht Rand)</td>
+                    </tr>
+                    <tr>
+                        <td>898:</td>
+                        <td>Beleuchtungsflag (0 = von vorne, 1 = von hinten)</td>
+                    </tr>
+                    <tr>
+                        <td>Funktionsadressen</td>
+                    </tr>
+                    <tr>
+                        <td>49378:</td>
+                        <td>Auf den Grafikmodus umschalten</td>
+                    </tr>
+                    <tr>
+                        <td>49411:</td>
+                        <td>Zurück zum Textbildschirm</td>
+                    </tr>
+                    <tr>
+                        <td>51979:</td>
+                        <td>Bitmap löschen</td>
+                    </tr>
+                    <tr>
+                        <td>52001:</td>
+                        <td>Bitmap färben</td>
+                    </tr>
+                    <tr>
+                        <td>52023:</td>
+                        <td>PLOT (Parameter X,Y) setzt einen Punkt</td>
+                    </tr>
+                    <tr>
+                        <td>52026:</td>
+                        <td>UNPLOT löscht einen Punkt mit den Koordinaten X und Y</td>
+                    </tr>
+                    <tr>
+                        <td>52049:</td>
+                        <td>LINE (Parameter X1,Y1,X2,X2) zieht Linie von / bis</td>
+                    </tr>
+                    <tr>
+                        <td>52052:</td>
+                        <td>FACET X1,Y1,X2,Y2,X3,Y3,SA zeichnet dreieckige Facetten mit den Koordinaten X1,Y1, X2,... und schattiert sie (SA: 0 = schwarz, 64 = weiß)</td>
+                    </tr>
+                    <tr>
+                        <td>Shapes</td>
+                        <td><br></td>
+                    </tr>
+                    <tr>
+                        <td>52119:</td>
+                        <td>Kugel</td>
+                    </tr>
+                    <tr>
+                        <td>52141:</td>
+                        <td>Ring</td>
+                    </tr>
+                    <tr>
+                        <td>52150:</td>
+                        <td>vertikaler Zylinder</td>
+                    </tr>
+                    <tr>
+                        <td>52153:</td>
+                        <td>horizontaler Zylinder</td>
+                    </tr>
+                    <tr>
+                        <td>52186:</td>
+                        <td>vertikaler Ring</td>
+                    </tr>
+                    <tr>
+                        <td>52189:</td>
+                        <td>horizontaler Ring</td>
+                    </tr>
+                    <tr>
+                        <td>52203:</td>
+                        <td>vertikale Rolle</td>
+                    </tr>
+                    <tr>
+                        <td>52206:</td>
+                        <td>horizontale Rolle</td>
+                    </tr>
+                </tbody>
+            </table>
+            <figcaption>Tabelle 2. Befehlsübersicht</figcaption>
+        </figure>
 
         <p>Alle Shapes, mit Ausnahme der Kugel, können durch die Eingabe von insgesamt vier Parametern in ihrer Position und Form beeinflußt werden. Die ersten zwei bestimmen, wie oben erläutert, die Koordinaten des Figurmittelpunktes. Mit dem dritten und vierten Paramter kann man die Verzerrung in X- und Y-Richtung einstellen. Doch hier ist Vorsicht geboten, denn der X-Wert sollte hierbei immer größer als der Y-Wert sein, sonst zeichnet das Programm unerwünschte Figuren.</p>
 
