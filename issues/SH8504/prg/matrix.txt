@@ -1,0 +1,19 @@
+;matrix.prg ==0801==
+;Eingetippt von ClausS
+  100 rem *******************************
+  110 rem *                             *
+  120 rem * matrix- umrechnungsprogramm *
+  130 rem *                             *
+  140 rem *******************************
+  150 input"basis (x*8192) ";basis
+  160 input"zeile (0-24)   ";zeile
+  170 input"block (0-39)   ";block
+  180 dim byte(7)
+  190 for i=0 to 7
+  200 byte(i)=peek(basis+zeile*320+block*8+i)
+  210 next i:print:print"ausgabe der berechneten werte: ":print
+  220 for i=0 to 7 :rem 7 bytes vertikal
+  230 output=0:for i0=0 to 7
+  240 output=output-((byte(i0)and 2^(7-i))>0)*2^(7-i0):next i0
+  250 print output:next i
+

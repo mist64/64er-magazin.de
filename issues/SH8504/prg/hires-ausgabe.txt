@@ -1,0 +1,27 @@
+;hires-ausgabe.prg ==0801==
+;Eingetippt von ClausS
+  100 rem********************************
+  110 rem*                              *
+  120 rem* hiresbildausgabe auf drucker *
+  130 rem*                              *
+  140 rem********************************
+  150 input"basis (x*8192) ";basis:rem eingabe der basis
+  160 open 1,4,4:rem eroeffnen des druckersmit linearkanal =>sekundaeradresse 4
+  170 print#1,chr$(27);"3";chr$(24);:rem zeilenvorschub auf 24/216"
+  180 dim byte(7)
+  185 for j=0 to 24:rem zeilen 1-25
+  186 print#1,chr$(27);"k";chr$(64);chr$(1);:rem senden des codes fuer hires ein
+  187 for k=0 to 39:rem bloecke 1-39
+  190 for i=0 to 7:rem aktueller block umrechnen
+  200 byte(i)=peek(basis+j*320+k*8+i)
+  210 next i
+  220 for i=0 to 7:rem 7 bytes vertikal
+  230 output=0:for i0=0 to 7
+  240 output=output-((byte(i0)and 2^(7-i))>0)*2^(7-i0):next i0
+  250 print#1,chr$(output);:next i:rem blockausgeben, ende blockumrechnung
+  260 next k:rem ende bloecke einer reihe
+  270 print#1,chr$(10):rem zeilenvorschub
+  280 next j:rem ende schleife einer reihe
+  290 print#1 ,chr$(27)"2": rem zeilenvorschubwieder auf 1/6" bringen
+  300 close 1:rem schliessen druckerkanal
+
