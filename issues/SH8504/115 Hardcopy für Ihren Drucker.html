@@ -88,23 +88,17 @@
 
         <p>Zunächst wollen wir klären, wie der Inhalt gerade dieses Blocks zu ermitteln ist. Dazö berechnen wir beispielsweise die Adresse von Byte 0 innerhalb dieses Blocks nach der Formel</p>
 
-        <p>TODO PRE</p>
-
-        <p>Byte 0 = Basisadresse+Blockzeilen*320+Blocknummer*8</p>
+        <pre>Byte 0 = Basisadresse+Blockzeilen*320+Blocknummer*8</pre>
 
         <p>Wie läßt sich die Formel erklären?</p>
 
         <p>Zunächst einmal ist es verständlich, daß die Basisadresse des Grafikschirms der Positionsberechnung zugrunde liegen muß. Weiterhin faßt eine Blockzeile 40 Blöcke zu je 8 Byte; eine Blockzeile besteht also aus 320 Byte. Nun muß man sich noch innerhalb der aktuellen Zeile zu dem Block bewegen, dessen Inhalt untersucht werden soll. Hierzu multipliziert man einfach die Anzahl der Blöcke mit 8, da sich ein Blockaus 8 Byte zusammensetzt. Beachten Sie bitte bei der Berechnung, daß die Blockzeilen im Bereich 0 bis 24 liegen, die Blocknummern dagegen im Bereich 0 bis 39. So ergibt sich zum Beispiel als Startadresse für den 27. Block in der 13. Zeile:</p>
 
-        <p>TODO PRE</p>
-
-        <p>Byte 0 = 8192 + 13 * 320 + 27 * 8 = 12568</p>
+        <pre>Byte 0 = 8192 + 13 * 320 + 27 * 8 = 12568</pre>
 
         <p>Bei dem Block in unserem Beispiel ergibt also der Basic-Befehl</p>
 
-        <p>TODO PRE</p>
-
-        <p>PRINT PEEK(12568)</p>
+        <pre>PRINT PEEK(12568)</pre>
 
         <p>den Inhalt von Byte 0 des Blocks 547. Wie groß wird nun dieser Wert sein?</p>
 
@@ -187,21 +181,15 @@
 
         <p>Da 40 Blöcke zu je 8 Byte gesendet werden sollen, muß dem Drucker mitgeteilt werden, daß 320 Zeichendaten folgen. Üblicherweise wird dazu zur Einschaltung des BI-Mode ESC-L beziehungsweise ESC-K verwendet. Da die Vorgehensweise bei beiden Steuerbefehlen gleich ist und sie sich nur bezüglich Ihrer Punktdichten unterscheiden, betrachten wir nur ESC-L. Sie werden in Ihrem Druckerhandbuch finden, daß nach dem Einschalten von ESC-L noch definiert werden muß, wieviele Zeichendaten gesendet werden, bevor der Drucker wieder in seinen normalen Modus zurückschaltet. Würde nämlich keine solche Definition vorhanden sein, so würde der Druckerjedes gesendete Byte nach Einschaltung des BI-Mode als Grafikzeichen interpretieren und dann wäre zum Beispiel ein kontrollierter Zeilenvorschub unmöglich zu realisieren. Da Sie inzwischen wissen, daß sich eine Blockzeile im Computer und deshalb entsprechend auch später aufdem Druckeraus 320 Byteszusammensetzt, müssen Sie vor der eigentlichen Ausgabe der Blockzeile dem Drucker die nachfolgende Anzahl von Zeichendaten mitteilen. Dazu werden üblicherweise zwei Zahlen n1 und n2 nach den Formeln</p>
 
-        <p>TODO PRE</p>
-
-        <p>n1 = Zahl der Daten - INT(Zahl der Daten/256) * 256</p>
+        <pre>n1 = Zahl der Daten - INT(Zahl der Daten/256) * 256</pre>
 
         <p>und</p>
 
-        <p>TODO PRE</p>
-
-        <p>n2 = INT(Zahl der Daten/256)</p>
+        <pre>n2 = INT(Zahl der Daten/256)</pre>
 
         <p>berechnet. In unserem Beispiel wären also n1 = 64 und n2 = 1. An den Drucker würde man also eine Steuersequenz senden, die folgendermaßen aussieht:</p>
 
-        <p>TODO PRE</p>
-
-        <p>CHR$(27);"K";CHR$(64);CHR$(1);</p>
+        <pre>CHR$(27);"K";CHR$(64);CHR$(1);</pre>
 
         <p>Danach ist dann der Drucker im BI-Mode und erwartet 320 Zeichendaten, um dann wieder auf Normalbetrieb zurückzuschalten.</p>
 
@@ -322,49 +310,37 @@
 
         <p>Bevor Sie ein File auf dem Drucker eröffnen, ist dem Computer erst mitzuteilen, welche Filenummer, welche Primäradresse und welche Sekundäradresse für das zu öffnende File zu verwenden sind. Da insbesondere beim Öffnen keine Zeichenkette an den Drucker zu senden ist, muß zunächst einmal das Flag LAENGE auf Null gesetzt werden:</p>
 
-        <p>TODO PRE</p>
-
-        <p>LDA #0<br>
-            STA LAENGE</p>
+        <pre>LDA #0
+STA LAENGE</pre>
 
         <p>Daraufhin wird in den Akku die Filenummer, in das X&ndash;Register die Primäradresse des Druckers (normalerweise 4) und in das Y-Register die Sekundäradresse eines Files geladen, das dann später durch OPEN eröffnet wird. Zuerst müssen aber mit der Systemroutine SETPAR die Werte für einen OPEN-Befehl gesetzt werden, bevor die OPEN-Routine angesprungen werden darf.</p>
 
-        <p>TODO PRE</p>
-
-        <p>LDA #Filenummer<br>
-            LDX #Primäradresse<br>
-            LDY #Sekundäradresse<br>
-            JSR SETPAR<br>
-            JSR OPEN</p>
+        <pre>LDA #Filenummer
+LDX #Primäradresse
+LDY #Sekundäradresse
+JSR SETPAR
+JSR OPEN</pre>
 
         <p>Damit ist ein Kanal für die Ausgabe auf dem Drucker definiert. Die eigentliche Ausgabe auf dem Drucker wird durch das nochmalige Laden der Filenummer in das X-Register und das Anspringen der Systemroutine CHKOUT eingeleitet.</p>
 
-        <p>TODO PRE</p>
-
-        <p>LDX #Filenummer<br>
-            JSR CHKOUT</p>
+        <pre>LDX #Filenummer
+JSR CHKOUT</pre>
 
         <p>Danach kann man Zeichen, die im Akku stehen, mittels der Routine BSOUT auf dem Drucker ausgeben.</p>
 
-        <p>TODO PRE</p>
-
-        <p>LDA #auszugebendes Zeichen<br>
-            JSR BSOUT</p>
+        <pre>LDA #auszugebendes Zeichen
+JSR BSOUT</pre>
 
         <p>Durch diese Routine wird die Ausgabe, die mittels der Routine BSOUT normalerweise auf dem Bildschirm erfolgen würde, auf den Drucker umgeleitet. Das heißt unter anderem, daß dann während dieser Umleitung keine Zeichenausgabe auf dem Bildschirm vorgenommen werden kann. Wollen Sie die Umleitung wieder aufheben, so können Sie dies mit Hilfe von CLRCH erreichen:</p>
 
-        <p>TODO PRE</p>
-
-        <p>JSR CLRCH</p>
+        <pre>JSR CLRCH</pre>
 
         <p>Diese Systemroutine setzt die Ausgabe auf den Bildschirm (und die Eingabe auf die Tastatur) zurück. Beachten Sie bitte, daß das Druckerfile noch nicht geschlossen ist und Sie jederzeit wieder mit der beschriebenen Syntax bei der Systemroutine CHKOUT die Ausgabe erneut umleiten können.</p>
 
         <p>Das Druckerfile schließen können Sie mit der Routine CLOSE. Dazu laden Sie die Filenummer in den Akku:</p>
 
-        <p>TODO PRE</p>
-
-        <p>LDA #Filenummer<br>
-            JSR CLOSE</p>
+        <pre>LDA #Filenummer
+JSR CLOSE</pre>
 
         <p>Danach ist das Drucker-File ordnungsgemäß geschlossen. So, damit hätten wir unsere umfangreiche Expedition in das Gebiet der Grafikumsetzung für Druckausgaben abgeschlossen. Ich hoffe, daß Sie Ihnen ein wenig Spaß gemacht und Ihr Interesse an der Problematik geweckt hat. Ich wünsche Ihnen jedenfalls viel Erfolg bei der Programmierung einer eigenen Grafikroutine, sei es nun in Basic oder einer anderen Programmiersprache.</p>
 
