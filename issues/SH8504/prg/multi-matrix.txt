@@ -1,0 +1,36 @@
+;multi-matrix.prg ==0801==
+;Eingetippt von ClausS
+  100 rem *****************************
+  110 rem *                           *
+  120 rem *    multicolormatrix       *
+  130 rem *   umrechnungsprogramm     *
+  140 rem *                           *
+  150 rem *****************************
+  160 data 0,0,0,0,0,0,0,0:rem rastermusterbitpaar (00)
+  170 data 2,2,1,1,2,2,1,1:rem rastermusterbitpaar (01)
+  180 data 2,2,0,0,1,1,0,0:rem rastermusterbitpaar (10)
+  190 data 3,3,3,3,3,3,3,3:rem rastermusterbitpaar (11)
+  200 dim druckmatrix(3,7):rem drei rastermuster mit jeweils 7 daten
+  210 for i=0 to 3
+  220 for i0=0 to 7
+  230 read druckmatrix(i,i0)
+  240 next i0,i
+  250 input"basis (x*8192) ";basis
+  251 input"zeile (0-24)   ";zeile
+  252 input"block (0-39)   ";block
+  260 open 1,4,4:rem eroeffnen des druckersmit linearkanal =>sekundaeradresse 4
+  270 print#1,chr$(27);"3";chr$(5);:rem zeilenvorschub auf 6/216"
+  290 for reihe=0 to 7 :rem reihen eines blocks
+  300 print#1,chr$(27);"z";chr$(32);chr$(0);
+  310 rem bimode 4-fache dichte ein (max 1920 punkte)
+  330 byte=peek(basis+zeile*320+block*8+reihe)
+  340 for i=6 to 0 step-2:rem 4 bitpaare auszuwerten
+  350 raster=-((byte and 2^(i+1))>0)*2-((byte and 2^i)>0)
+  360 for i0=0 to 7
+  370 print#1,chr$(druckmatrix(raster,i0));:rem druckmatrix ausgeben
+  380 next i0,i:rem auswertung ende
+  400 print#1,chr$(10):rem zeilenvorschub um 6/216"
+  410 next reihe:rem naechste des blocks bearbeiten
+  420 print#1,chr$(27);"2":rem zeilenvorschub wieder auf 1/6" bringen
+  430 close 1
+
