@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>Klangprogrammierung ohne Ballast</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="Thomas Krätzig, ev">
+    <meta name="64er.issue" content="9/85">
+    <meta name="64er.pages" content="19-23">
+    <!-- <meta name="64er.toc_category" content="XXX"> -->
+    <!-- <meta name="64er.toc_title" content="XXX"> -->
+    <meta name="64er.id" content="XXX">
+</head>
+
+<body>
+    <article>
+        <h1>Klangprogrammierung ohne Ballast</h1>
+<blockquote><p>Für viele C 64-Besitzer ist die Sound-Programmierung immer noch ein Buch mit sieben Siegeln. Wir zeigen hier, wie&rsquo;s funktioniert — ohne theoretischen Ballast.</p></blockquote>
+
+<p>Der im C 64 eingebaute Sound-Chip 6581 sorgt immerwieder für neue klangliche Überraschungen, wie viele Spiele und Synthesizerprogramme zeigen. Für sich allein ist dieser Chip allerdings noch kein Synthesizer, sondern er entfaltet seine klanglichen Fähigkeiten erst unter der Kontrolle eines Programms. Wenn man nun selbst mit Klangeffekten und Melodien experimentieren will, hat man prinzipiell zwei Möglichkeiten:</p>
+
+<h3>Fertige Programme</h3>
+
+<p>Man verwendet eines der mittlerweile sehr guten Synthesizer- oder Musikprogramme. Mit diesen Programmen kann man meistens alle für den Klang relevanten Werte (Parameter) komfortabel einstellen. Darüber hinaus kann man bei einigen Programmen ganze Musikstücke Note für Note eingeben und ähnlich wie bei einem Textprogramm editieren. Ein so erarbeitetes Werk kann man dann zwar samt Klang-Parametersatz auf Diskette abspeichern und wieder laden, man kann diese Melodien und Klänge normalerweise aber nicht in eigene Programme einbauen. In dem Kurs »Dem Klang auf der Spur«, die seit einiger Zeit im 64’er-Magazin erscheint, wird ein solches Programm Schritt für Schritt aufgebaut. Dieses Programm wird m seiner endgültigen Ausbaustufe den zuletzt genannten Nachteil nicht haben.</p>
+
+<h3>Selber programmieren</h3>
+
+<p>Wenn man in einem eigenen Programm nur einen Signalton (zum Beispiel einen Gong) oder einen anderen einfachen Klangeffekt benötigt, kann man ihn mit einigen POKE-Befehlen leicht selber programmieren. Dieser Artikel soll demjenigen, der sich nur am Rande mit der Klangprogrammierung beschäftigen will, zeigen, wie es geht.</p>
+
+<h2>Der erste Schritt</h2>
+
+<p>Man führe einmal folgende Befehlsfolge direkt am Bildschirm aus:</p>
+
+<p>TODO</p>
+
+<p>Lautstärke einstellen: POKE 54296,15<br/>
+Frequenz einstellen: POKE 54272,0<br/>
+POKE 54273,40<br/>
+Hüllkurve wählen: POKE 64277,0<br/>
+POKE 54278,240<br/>
+Ton an: POKE 54276,33<br/>
+Ton aus:    POKE 54276,32</p>
+
+<p>Nach dem vorletzten Befehl sollte ein Dauerton hörbar werden, der nach dem letzten Befehl wieder verschwindet. Der SID (Sound Interface Device) wird über sogenannte Register programmiert. Diese Register belegen 29 Byte Speicherplatz im C 64 und zwar den Bereich 54272 bis 54300 (hexadezimal $D400 bis $D41C). Über den Inhalt dieser Register werden alle Funktionen des SID gesteuert (Tabelle 1). Der SID verfügt über drei voneinander unabhängige Stimmen, die jeweils durch sieben Register gesteuert werden. Wir befassen uns zunächst mit Stimme 1:</p>
+
+<h3>Frequenz (Register 54272 und 54273)</h3>
+
+<p>Diese beiden Register enthalten zusammen einen 16-Wert in der Folge Low-Byte, High-Byte. Man kann ihn wie folgt ermitteln:<br/>
+F=PEEK(54272) + 256*PEEK(54273)</p>
+
+<p>Wenn man F durch 17,0284 dividiert, erhält man die tatsächliche Frequenz in Hz. Normalerweise möchte man aber Stimme 1 auf eine vorgegebene Frequenz programmieren, zum Beispiel 440 Hz. Den Wert F erhält man dann so:<br/>
+F = 440*17.0284</p>
+
+<p>Diesen Wert zerlegt man in ein höher- und ein niederwertiges Byte (Low- und High-Byte) und POKEt diese in die beiden Frequenz-Register:<br/>
+HI = INT(F/256)<br/>
+LO = F-256*HI<br/>
+POKE 54272,LO<br/>
+POKE 54273,HI</p>
+
+<p>Tabelle 2 enthält die Frequenzen der 12 Halbtöne einer Tonleiter zusammen mit den zugehörigen POKE-Werten. Um zu höheren oder tieferen Oktaven zu gelangen, muß man die Frequenzen lediglich verdoppeln (vervierfachen etc.) beziehungsweise halbieren (vierteln etc.). Die POKE-Werte müssen dann natürlich neu berechnet werden. Werden diese Frequenzen in einem Programm verwendet, so sollten die POKE-Werte aller benötigten Töne in zwei Feldern (einem für die Low-und einem für die High-Bytes) abgespeichert sein, damit das Programm keine Zeit mit der Berechnung dieser Werte verliert.</p>
+
+<h3>Das Steuerregister 54276</h3>
+
+<p>Über dieses Register wird der Ton ein- und ausgeschaltet. Man sollte vielleicht besser sagen: »angeschlagen« und »losgelassen«, da über die Hüllkurvensteuerung eine dynamische Beeinflussung der Lautstärke möglich ist. Darauf kommen wir später noch zurück. Im Steuerregister ist für das Ein- und Ausschalten Bit 0, das sogenannte GATE-Bit verantwortlich. Eine 1 im GATE-Bit schaltet die Stimme ein. Das Steuerregister legt auch die Kurvenform fest, die für das Klangbild der Stimme entscheidend ist. Eine Kurvenform wird ausgewählt, indem man eines der Bits 4 bis 7 setzt. Hier zunächst eine Tabelle mit den wichtigsten POKE-Werten für das Steuerregister:</p>
+
+<p>TODO</p>
+
+<p>Kurvenform  Bit Ton an  Ton aus<br/>
+Dreieck 4   17  16<br/>
+Sägezahn   5   33  32<br/>
+Rechteck    6   65  64<br/>
+Rauschen    7   129 128</p>
+
+<p>Die Werte sollte man gleich einmal ausprobieren. Um einen Rechteckklang zu erzeugen, sind allerdings noch weitere Maßnahmen notwendig (siehe unten). Das <strong>Dreieck</strong> klingt weich, dumpf und leiser als die anderen Kurvenformen. Es eignet sich für flötenähnliche Töne, aber auch für einen dezenten Signal-Gong. Der <strong>Sägezahn</strong> hat einen großen Obertongehalt und klingt damit sehr hell. Sägezahn ist die Standard-Kurvenform für die meisten musikalischen Anwendungen. Um eine <strong>Rechteck</strong>-Kurve zum Klingen zu bringen, muß man im SID zusätzlich die sogenannte <strong>Pulsweite</strong> einstellen. Dieser Wert steuert das Zeitverhältnis der beiden Pegel, zwischen denen die Rechteck-Kurve hin- und herspringt. Die Register 54274 und 54275 (Low- und High-Byte) sind für die Pulsweite maßgeblich. Es werden allerdings nur 12 Bit berücksichtigt, was einem Bereich von 0 bis 4095 entspricht. Der Wert 2048 (Bereichsmitte) entspricht dabei einer symmetrischen Rechteckkurve, das heißt einer mit einem Zeitverhältnis 1:1. Diese Einstellung erreicht man durch:<br/>
+POKE 54274,0 :REM LOW-BYTE<br/>
+POKE 54275,8 :REM HIGH-BYTE<br/>
+Jetzt sollte nach:<br/>
+POKE 54276,65<br/>
+ein Rechteckton hörbar sein. Das Rechteck klingt im Vergleich zum Sägezahn hohl und erinnert daher ein wenig an eine Klarinette. Über die Pulsweitensteuerung ist das Klangbild des Rechtecks allerdings sehr variabel.</p>
+
+<h2>Klangvielfalt durch Hüllkurven</h2>
+
+<p>Töne natürlicher Instrumente haben selten einen konstanten Lautstärkeverlauf, wenn man einmal von der Orgel absieht. Töne von Blasinstrumenten brauchen eine gewisse Zeit, bis sie vom Ansatz zur vollen Lautstärke anschwellen. Ein angeschlagener Klavierton setzt zwar unmittelbar ein, aber klingt dann beim Halten der Taste erst schnell und dann langsamer aus. Auch beim Loslassen der Taste reißt der Ton nicht schlagartig ab, sondern verklingt innerhalb einiger Sekundenbruchteile. Diese Dynamik kann man auch mit dem SID erzeugen. Sobald das GATE-Bit im Kontrollregister gesetzt ist, folgt die Lautstärke der Stimme einer Kurve, deren Verlauf durch die Register 54277 und 54278 gesteuert wird. In dem Beispiel »Der erste Schritt« wurde eine einfache rechteckförmige Hüllkurve eingestellt (Orgelcharakter). Vor dem systematischen Teil zunächst einige Experimente:</p>
+
+<p>Man führe die POKEs aus »Der erste Schritt« aus, damit die Befehle alle zusammen auf dem Bildschirm stehen. Nun kann man die POKEs für die Hüllkurve ändern und sich den Effekt über »Ton an« und »Ton aus« anhören:<br/>
+Längeres Ausklingen:<br/>
+POKE 54278,250<br/>
+Klavierartiger Anschlag:<br/>
+POKE 54277,6<br/>
+POKE 54278,250<br/>
+Anschwellen wie bei Bläsern:<br/>
+POKE 54277,96<br/>
+POKE 54278,247</p>
+
+<h2>A D S R — Hüllkurven</h2>
+
+<p>Die SID-Hüllkurve (Bild 1) gliedert sich zeitlich in vier Phasen. Jede Phase kann dabei unabhängig in 16 Stufen gesteuert werden.</p>
+
+<h3>Attack</h3>
+
+<p>Beim Setzen des GATE-Bits schwillt der Ton von Null bis zur maximalen Lautstärke an. Die Zeit, in der das geschieht, steuert der A-Pa-rameter. Diese Zeit reicht von 2 ms (A = 0, unhörbar kurz) bis 8 s (A = 15).</p>
+
+<h3>Decay</h3>
+
+<p>Nach Erreichen des Maximalpegels fällt die Lautstärke wieder ab, sofern ein Haltepegel (Sustain) kleiner als 15 eingestellt ist. Die Decay-Zeit wird über den D-Parameter gesteuert. Sie reicht von 6 ms (D = 0) bis 24s(D = 15).</p>
+
+<h3>Sustain</h3>
+
+<p>Nach der Decay-Phase bleibt der Ton auf einem konstanten Haltepegel (Sustain) stehen. Im Falle S = 15 (Maximalpegel) kann von einer Decay-Phase nicht gesprochen werden. In diesem Fall steigt die Lautstärke in der Attack-Phase auf Maximalpegel um dort zu bleiben. Im Falle S = 0 klingt der Ton in der Decay-Phase vollständig aus. (das heißt bis auf Null).</p>
+
+<h3>Release</h3>
+
+<p>Die Sustain-Phase dauert so lange, wie das GATE-Bit gesetzt ist. (Auf diese Weise kann man einen Dauerton erzeugen). Durch das Rücksetzen des GATE-Bit wird die Release-Phase eingeleitet. Der Ton klingt vom momentanen Pegel (falls dieser nicht schon Null ist) aufNull aus. Diese Ausklingzeit ist durch den R-Parameter im Bereich 6 ms (R = 0) bis 24 s (R = 15) steuerbar. Die Release-Phase kann übrigens jederzeit durch Zurücksetzen des GATE-Bits eingeleitet werden, auch wenn sich die Hüllkurve noch in der Attack-, oder der Decay-Phase befindet. Der Ton klingt dann sofort vom momentanen Pegel in der eingestellten Zeit auf Null ab. Man spricht dann auch von einer ADR- oder einer AR-Hüllkurve.</p>
+
+<h3>Die Hüllkurvenregister 54277 und 54278</h3>
+
+<p>Jedes dieser Register muß man sich in zwei 4-Bit-Hälften aufgeteilt denken, von denen jede einen der Parameter enthält:</p>
+
+<p>TODO</p>
+
+<p>Parameter   Bits    Register<br/>
+Ä  7-4 54277<br/>
+D   3-0 54277<br/>
+S   7-4 54278<br/>
+R   3-0 54278</p>
+
+<p>Die Parameter A und D beziehungsweise S und R können immer nur zusammen in ihre Register geschrieben werden. Die Parameterwerte auf den Bitpositionen 3-0 kann man dabei direkt übernehmen, während man die Werte auf den Positionen 7-4 um vier Bitpositionen nach links schreiben muß, was man in Basic durch Multiplikation mit 16 erreicht:<br/>
+POKE 54277, 16*A + D<br/>
+POKE 54278, 16*S + R</p>
+
+<p>Tabelle 3 zeigt einige Beispiel-Hüllkurven mit den dazugehörenden POKE-Werten. Auch diese Hüllkurven sollte man einmal ausprobieren. Damit sind die wichtigsten Register, die für die Erzeugung einfacher Klänge benötigt werden, bekannt. Die Steuerung der Stimmen 2 und 3 erfolgt analog zu Stimme 1 über je sieben Register.</p>
+
+<p>TODO</p>
+
+<p>Stimme  1   2   _3<br/>
+Frequenz    54272   54279   54286<br/>
+    54273   54280   54287<br/>
+Pulsweite   54274   54281   54288<br/>
+    54275   54282   54289<br/>
+Steuerregister  54276   54283   54290<br/>
+AD  54277   54284   54291<br/>
+SR  54278   54285   54292</p>
+
+<h2>Spezialeffekte</h2>
+
+<p>Wir wenden uns nun den Spezialeffekten zu. Dazu gehören Synchronisation, Ringmodulation und Filterung. Wir betreten damit bereits das Gebiet der fortgeschrittenen Sound-Programmierung. Notgedrungen wird es auch etwas komplizierter.</p>
+
+<h3>Synchronisation</h3>
+
+<p>Wenn man Bit 1 des Steuerregisters von Stimme 1 setzt, wird das Ausgangssignal von Stimme 1 durch das Signal von Stimme 3 synchronisiert, <strong>das heißt</strong> phasenstarr gekoppelt. Resultat ist ein mit Worten schwer zu beschreibender, in hohem Maße »elektronischer« Klang. Auch die Stimmen 2 und 3 lassen sich durch Setzen von Bit 1 derjewei-ligen Steuerregister synchronisieren. Dabei wird Stimme 2 von Stimme 1 synchronisiert und synchronisiert ihrerseits Stimme 3.</p>
+
+<h3>Ringmodulation</h3>
+
+<p>Durch Setzen von Bit 2 des Steuerregisters von Stimme 1 entsteht ein Ringmodulator-Produkt der Dreieckskurven der Stimmen 1 und 3. Hörbar wird es nur dann, wenn Stimme 1 zusätzlich auf Dreieck eingestellt ist (Bit 4 gesetzt). Bei der Ringmodulation werden zwei Signale multiplikativ überlagert. Das Resultat sind meistens metallische Klänge, die sich für Glocken und Gongs eignen. Auch die Ringmodulation ist in jeder Stimme möglich. Wie bei der Synchronisation modulieren sich die Stimmen nach dem Schema:</p>
+
+<p>TODO</p>
+
+<h3>Mehrere Kurvenformen gleichzeitig</h3>
+
+<p>Weitere Kurvenformen kann man noch dadurch erhalten, in dem man von der Kurvenform Bit 4 bis 7 mehrere zugleich setzt. Dabei werden allerdings nicht mehrere Formen zugleich hörbar, sondern es entstehen neue Kurvenformen.Erfahrungsge-mäß bringen nur die Kombinationen:<br/>
+Rechteck — Sägezahn (Bit 6 und 5) sowie:<br/>
+Rechteck — Dreieck (Bit 6 und 4)<br/>
+brauchbare Resultate. Bei diesen Kombinationen hat auch die Pulsweiteneinstellung einen Einfluß auf den Klang.</p>
+
+<h3>Setzen und Rücksetzen einzelner Bits</h3>
+
+<p>Bei der Programmierung des Steuerregisters will man oft einzelne Bits setzen oder zurücksetzen, ohne daß man dabei die anderen Bits verändern möchte. Diese Aufgabe erledigt man am besten mit Hilfe zweier Sätze von jeweils acht sogenannten »Masken«. Der erste Satz besteht aus Bytes, bei denen immer genau ein Bit gesetzt ist, der zweite besteht aus Bytes, bei denen immer genau ein Byte 0 ist. Diese 16 Masken kann man sich wie folgt definieren:</p>
+
+<p>TODO</p>
+
+<p>Basic <br/>
+DIM ON%(7),OF%(7)<br/>
+FORI = 0 TO 7:ON%(I)=2↑I:OF%(I)=255-2↑I<br/>
+NEXT I</p>
+
+<p>Assembler<br/>
+ON  .BYT %00000001<br/>
+    .BYT %00000010<br/>
+    .BYT %00000100<br/>
+    .BYT %00001000<br/>
+    .BYT %00010000<br/>
+    .BYT %00100000<br/>
+    .BYT %01000000<br/>
+    .BYT %10000000<br/>
+OF  .BYT %11111110<br/>
+    .BYT %11111101<br/>
+    .BYT %11111011<br/>
+    .BYT %11110111<br/>
+    .BYT %11101111<br/>
+    .BYT %10111111<br/>
+    .BYT %01111111</p>
+
+<p>Nun kann man Bit N im Steuerregister sehr einfach setzen:</p>
+
+<p>TODO</p>
+
+<p>Basic<br/>
+SR = 54276<br/>
+POKE SR, PEEK(SR) OR ON%(N)</p>
+
+<p>Assembler<br/>
+LDX N<br/>
+LDA $D404<br/>
+ORA ON,X<br/>
+STA $D404</p>
+
+<p>Das Löschen von Bit N geschieht ganz ähnlich:</p>
+
+<p>TODO</p>
+
+<p>Basic<br/>
+SR = 54276<br/>
+POKE SR, PEEK(SR) AND OF%(N)</p>
+
+<p>Assembler<br/>
+LDX N<br/>
+LDA $D404<br/>
+AND OF,X<br/>
+STA $D404</p>
+
+<h2>Filterung</h2>
+
+<p>Das im SID vorhandene Filter ist vergleichbar mit dem Klangregler einer Audio-Anlage. Gegenüber dem bekannten Einstellsystem für Höhen und Bässe bestehen aber auch Unterschiede. Beim SID-Filter ist eine Grenzfrequenz einstellbar, oberhalb oder unterhalb der eine Absenkung der Frequenzanteile des zu filternden Signals erfolgen soll. Das Filter kennt drei Betriebsarten:</p>
+
+<h3>Tiefpaß</h3>
+
+<p>Nur Frequenzanteile unterhalb der Grenzfrequenz werden durchgelassen. Anteile oberhalb der Grenzfrequenz werden mit zunehmendem Abstand von dieser zunehmend unterdrückt.</p>
+
+<h3>Hochpaß</h3>
+
+<p>Frequenzanteile oberhalb der Grenzfrequenz werden durchgelassen. Anteile unterhalb der Grenzfrequenz werden unterdrückt. Die Hochpaß-Betriebsart erzeugt beim SID meistens einen leisen dünnen Klang.</p>
+
+<h3>Bandpaß</h3>
+
+<p>Es werden nur die Frequenzanteile in der Umgebung der Mittenfrequenz (»Grenzfrequenz« wäre hier unzutreffend) durchgelassen. Darüber hinaus kann man die Filterbetriebsarten auch kombinieren. Ein Beispiel dafür ist die</p>
+
+<h3>Bandsperre</h3>
+
+<p>Diesen Modus erhält man, wenn man die Betriebsarten Hochpaß und Tiefpaß zugleich anwählt. Es werden Frequenzen in der Umgebung der Mittenfrequenz abgeschwächt. Eingestellt werden die Filterbetriebsarten durch die Bits 6, 5 und 4 des Registers 54296, dem gleichen Register, mit dem auch die Gesamtlautstärke des SID gesteuert wird (Bits 3 bis 0)<br/>
+Bit 6 = 1 Hochpaß<br/>
+Bit 5 = 1 Bandpaß<br/>
+Bit 4 = 1 Tiefpaß</p>
+
+<p>Über die Bits 2 bis 0 des Registers 54295 kann man steuern, welche der einzelnen Stimmen gefiltert werden sollen. Eine 1 bedeutet dabei Filterung.<br/>
+Bit 0 entspricht Stimme 1<br/>
+Bit 1 entspricht Stimme 2<br/>
+Bit 2 entspricht Stimme 3</p>
+
+<p>Eine 0 besagt, daß die Stimme ungefiltert an den Ausgang gelangen soll.</p>
+
+<p>Die Bits 4 bis 7 des gleichen Registers 54295 enthalten einen 4-Bit-Wert, über den man die Resonanz des Filters (in der Elektrotechnik auch »Güte« genannt) steuern kann. Eine hohe Resonanz (der Maximalwert ist 15) bewirkt eine zusätzliche Verstärkung der Frequenzanteile in der Nähe der Grenz- beziehungsweise Mittenfrequenz. Diese Verstärkung kann beim SID auch zu klanglich interessanten Verzerrungen führen (E-Gitarre). Unerwähnt ist bis hierher die Einstellung der Grenz- beziehungsweise Mittenfrequenz geblieben. Sie wird über das Register 54294 eingestellt (volle 8 Bit). Es besteht zudem die Möglichkeit einer Feineinstellung über die Bits 0-2 des Registers 54293. Eine solche Feineinstellung bleibt aber erfahrungsgemäß unhörbar. Man kann also Register 54293 getrost unberücksichtigt lassen.</p>
+
+<h3>Eine kleine Anleitung zum Experimentieren mit dem Filter</h3>
+
+<p>Man stelle Stimme 1 auf Dauerton ein (zum Beispiel mit der POKE-Folge ganz am Anfang dieses Artikels). Man fahre so fort: Tiefpaßeinstellung,<br/>
+Lautstärke = 15: POKE 54296,31<br/>
+Resonanz=15, Stimme 1 über das Filter schicken: POKE 54295,241</p>
+
+<p>Jetzt ist vermutlich nichts mehr oder kaum noch etwas zu hören, weil die Grenzfrequenz mit 0 voreingestellt ist. Mit der Grenzfrequenz kann man jetzt experimentieren:<br/>
+POKE 54294,20 (40,60,80&hellip;)</p>
+
+<p>Das Klangbild von Stimme 1 müßte jetzt zunehmend heller werden. Zum Abschluß folgen in Tabelle 4 noch einige Einstellbeispiele für Stimme 1. Die Einstellungen, bei denen das Filter benutzt wird, sind mit Vorsicht zu genießen, da Filtereinstellungen schlecht reproduzierbar sind. In diesem Punkt weisen die einzelnen SID-Bausteine beachtliche Streuungen auf.</p>
+
+<p>Wer sich weitergehend mit der Klang- und Musikprogrammierung beschäftigen will, der sei auf die schon erwähnte Reihe »Dem Klang auf der Spur« verwiesen. In Ausgabe 2/85 des 64’er-Magazins findet man mehrere kleine Beispielprogramme zur SID-Programmierung. In Ausgabe 7/85 wird ein größeres Programm beschrieben, mit dem man unter anderem alle Parameter des SID interaktiv und komfortabel beeinflussen kann. In Ausgabe 10/85 wird ein Sequenzer-Programm erscheinen, das dreistimmige Melodien zeitexakt spielen kann, während nebenbei auch noch ein anderes Programm läuft.</p>
+
+<address class="author">(Thomas Krätzig/ev)</address>
+    </article>
+</body>
+</html>

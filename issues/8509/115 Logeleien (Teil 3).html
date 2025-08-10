@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>Logeleien (Teil 3)</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="Der Vollständigkeit halber sei noch angemerkt, daß wir im C 64 anstelle von EOR »&lt;>« verwenden können. Der C 128 kennt diesen Befehl als XOR., Heimo Ponnath, gk">
+    <meta name="64er.issue" content="9/85">
+    <meta name="64er.pages" content="115-118">
+    <!-- <meta name="64er.toc_category" content="XXX"> -->
+    <!-- <meta name="64er.toc_title" content="XXX"> -->
+    <meta name="64er.id" content="XXX">
+</head>
+
+<body>
+    <article>
+        <h1>Logeleien (Teil 3)</h1>
+<blockquote><p>Diese letze Folge der Logeleien wird zum krönenden Abschluß unseren Commodore 64 als »Schlußfolgerungs-Maschine« vorstellen und den Zusammenhang mit der sogenannten Künstlichen Intelligenz beleuchten.</p></blockquote>
+
+<p>Das Aschenputtel unseres Basic-Sprachvorrates, den WAIT-Befehl, hatten wir in der letzten Folge untersucht. Dabei kam heraus, daß er — mit nur einem Argument versehen — testet, ob in einer spezifizierten Speicherstelle ein bestimmtes Bit gesetzt ist. Im Gegensatz dazu prüft WAIT mit zwei Argumenten, ob ein bestimmtes Bit gelöscht ist.</p>
+
+<h3>16. Nochmal WAIT: Diesmal mit zwei Argumenten.</h3>
+
+<p>Wie funktioniert das? Gehen wir aus vom Befehl<br/>
+WAIT C,A,B</p>
+
+<p>Dabei ist C die abzufragende Speicherstelle, A eine AND-Maske und B eine EOR-Maske. Sogar im Programmers Reference Guide findet man eine falsche Funktionsbeschreibung. Tatsächlich geschieht folgendes:<br/>
+1)  Der Wert der Speicherstelle C wird gelesen.<br/>
+2)  Dieser Wert wird mit B als EOR-Maske exklusiv-oder-verknüpft<br/>
+3)  Das Ergebnis davon wird mit A als AND-Maske verknüpft.</p>
+
+<p>Anhand eines Beispiels wollen wir uns ansehen, was passiert. Der Befehl<br/>
+WAIT 1,32,32<br/>
+hält ein Programm an, bis eine Datasettentaste gedrückt wird (H. Hauck, 64’er, Ausgabe 11/ 1984, Seite 135). Bit 4 der Speicherstelle 1 ist in dem Fall nämlich Null. Der normale Inhalt dieses Registers ist 55 (binär 0011 0111), also Bit 4 = 1. Die Zahl 32 lautet binär<br/>
+0001 0000</p>
+
+<p>Mit WAIT1,32,32 geschieht folgendes:<br/>
+keine Taste:</p>
+
+<p>TODO</p>
+
+<p>00110111    55<br/>
+0001 0000   32<br/>
+<strong><strong><strong><strong><em> EOR<br/>
+0010 0111<br/>
+0001 0000   32<br/>
+</em></strong></strong></strong></strong>AND<br/>
+0000 0000   0</p>
+
+<p>Das Ergebnis ist Null, der Computer wartet weiter.<br/>
+Taste gedrückt:</p>
+
+<p>TODO</p>
+
+<p>0010 0111   39<br/>
+0001 0000   32<br/>
+<strong><strong><strong><strong><strong><em> EOR<br/>
+0011 0111<br/>
+0001 0000   32<br/>
+</em></strong></strong></strong></strong></strong>AND<br/>
+0001 0000   32</p>
+
+<p>Das Ergebnis ist ungleich Null, der Computer geht im Programm weiter.</p>
+
+<p>Im Programmers Reference Guide steht es genau umgekehrt: Danach soll erst die AND und dann die EOR-Operation stattfinden. Lassen Sie uns diese Variante ebenfalls einmal durchspielen:<br/>
+keine Taste:</p>
+
+<p>TODO</p>
+
+<p>00110111    55<br/>
+0010 0000   32<br/>
+<strong><strong><strong><strong><strong><em>AND<br/>
+0010 0000<br/>
+0010 0000   32<br/>
+</em></strong></strong></strong></strong></strong> EOR<br/>
+0000 0000   0</p>
+
+<p>Ergebnis also wieder Null. Der Computer wartet weiter.<br/>
+Taste gedrückt:</p>
+
+<p>TODO</p>
+
+<p>0010 0111   39<br/>
+0010 0000   32<br/>
+<strong><strong><strong><strong><em>_AND<br/>
+0010 0000<br/>
+0010 0000   32<br/>
+</em></strong></strong></strong></strong> EOR<br/>
+0000 0000   0!</p>
+
+<p>Auch wenn eine Taste gedrückt ist, würde bei dieser Funktionweise der Computer weiter warten bis zum jüngsten Gericht.</p>
+
+<p>Wir sollten uns das merken: Es kommt bei mehreren logischen Verknüpfungen auch auf die Reihenfolge an.</p>
+
+<p>Daß der WAIT-Befehl so selten benutzt wird, hängt zum einen sicherlich mit seiner relativ komplexen Handhabung zusammen, zum anderen aber auch damit, daß meist ein äußeres Ereignis eintreten muß, um den zu überprüfenden Bit-Wert zu verändern. Dafür kommen Kontrollregister in Frage, die für Ein-/Aus-gabe-Operationen jeglicher Art eine Rolle spielen, einige VIC-II-Chip-Register und auch Speicherstellen des SID-Chip. Die beiden letzteren sind allerdings von der Firmware her ohnehin auf allerlei Ereignisse hin programmiert, so daß eine Behandlung mittels des WAIT-Befehls lediglich manchmal als Alternative gesehen werden kann. Bleiben also die CIA-Register, deren komplexe Funktion aber meist eher zur Bearbeitung in Assembler zwingt als in Basic.</p>
+
+<p>Ein Anwendungsbeispiel soll aber noch vorgestellt werden. Es stammt von H. Kohlen und wurde im 64’er, Ausgabe 10/ 1984, Seite 92 abgedruckt. Es handelt sich um eine Joystickabfrage (Port 2), die allerdings immer nur eine Joystickbewegung erfaßt:<br/>
+WAIT56320,16,16 wartet auf Feuerknopf<br/>
+WAIT56320,4,4 wartet auf Linksbewegung<br/>
+WAIT56320,1,1 wartet auf Hochbewegung<br/>
+WAIT56320,2,2 wartet auf Abwärtsbewegung<br/>
+WAIT56320,8,8 wartet auf Rechtsbewegung</p>
+
+<p>Das gleiche mit der Speicherstelle 56321 bezieht sich dann aufdenJoystickport 1. Wennalso ein Programmabschnitt warten soll, bis der Feuerknopf gedrückt wird, ist WAIT56320,16,16 sicher eine Möglichkeit, so etwas zu programmieren.</p>
+
+<h3>17. Logische Sätze</h3>
+
+<p>Im Grunde haben wir bisher lediglich das logische Handwerkszeug kennengelernt. Zwar erbrachte das auch einige direkte Anwendungen, aber richtig logische Probleme zu lösen, dazu bedarf es noch einiger Überlegungen. Genau das wollen wir versuchen: Kann ein Computer verzwickte logische Aufgabenstellungen befriedigend lösen?</p>
+
+<p>Die meisten logischen Fragestellungen bestehen nicht nur aus der Anwendung einer einzigen Verknüpfungsart, sondern — wie schon der WAIT-Befehl mit zwei Argumenten — aus mehreren verkoppelten Aussagen. Wie stellt man die Wahrheitswerte solcher Kombinationen her?</p>
+
+<p>Zunächst ein Beispiel für solch einen logischen SATZ (so nennt man diese verkoppelten Aussagen auch häufig):<br/>
+NOT(A AND (NOTB))</p>
+
+<p>Zum Ergebnis gelangt man wieder über eine Wahrheitstabelle. Abhängig von der Anzahl der Variablen (hier also zwei: A,B) muß eine Anzahl von Zeilen vorgesehen werden, die alle möglichen W/F-Kombinationen enthält. Bei zwei Variablen sind das dann vier Zeilen, allgemein aber bei N Variablen 2N Zeilen. Die Anzahl der Spalten ergibt sich aus der Menge der Variablen und der vorzunehmenden Verknüpfungen. In Bild 1 sehen Sie die Wahrheitstabelle für unser Beispiel.</p>
+
+<p>Links finden Sie die Kombinationen der Wahrheitswerte der Variablen A und B. Daneben wurde NOTB entwickelt, dann (wie bei algebraischen Rechnungen Schritt für Schritt) die AND-Verknüpfung und schließlich die Verneinung der Spalte davor. Diese letzte Spalte ist auch eine Zusammenstellung der Ergebnisse.</p>
+
+<p>Das kann auch unser C 64 für uns rechnen. Das Programm »Logelei-1« erledigt das in der Weise, daß es erst nach der logischen Funktion fragt, deren Wahrheitstabelle berechnet werden soll, sich dann selbst verändert (Zeilen 100-130) und schließlich die Berechnungen durchführt.</p>
+
+<p>Zu beachten ist, daß »Logelei-1« nur die normalerweise in unserem Basic-Sprachvorrat enthaltenen logischen Operatoren kennt.</p>
+
+<p>Zwei Sonderfälle von logischen Sätzen sollen Sie kennenlernen. Zunächst die sogenannte »Tautologie« (hochdeutsch: Gleichbedeutung). Davon spricht man, wenn sämtliche Wahrheitswerte des Ergebnisses W (wahr) sind (beziehungsweise 1). Das ist der Fall in Hamlets berühmten Satz (wenn er damit ein inklusiv-Oder gemeint hat) »sein oder nicht sein«. Probieren Sie mal aus:<br/>
+A OR (NOT A)</p>
+
+<p>(Das Programm Logelei-1 ist übrigens darauf nicht eingerichtet). Das Gegenteil der Tautologie ist die »Kontradiktion« (zu hochdeutsch: Widerspruch). Sämtliche Wahrheitswerte des Ergebnisses sind F (falsch oder 0). Das findet man zum Beispiel bei:<br/>
+A AND (NOT A)</p>
+
+<p>Als Beispiel sei A die Aussage »es regnet«. Dann ist es eine Kontradiktion zu behaupten: »Es regnet und es regnet nicht«.</p>
+
+<p>Bisher fehlen uns aber noch einige entscheidende Werkzeuge: Wir können noch keine Schlußfolgerungen ziehen. Das steuern wir nun an.</p>
+
+<p>Es gibt in einigen Basic-Dia-lekten den Operator EQV. Das kommt von »äquivalent«, also »gleich«. Wir dürfen in unserem C 64 getrost dafür das Gleichheitszeichen (=) verwenden. Äquivalenz zweier logischer Sätze liegt vor, wenn die Wahrheitswerte der Ergebnisse gleich sind. Probieren Sie mal mittels unseres Programmes:<br/>
+a) NOT (A AND B)<br/>
+b) (NOT A) OR (NOT B)</p>
+
+<p>Beide Sätze sind äquivalent, weil die Ergebnisse gleiche Wahrheitswerte besitzen. Nebenbei: Das ist eines der sogenannten Gesetze von DeMor-gan. Das Programm Logelei-1 zeigt sich — wie Sie nun sehen werden — auch schon als »Beweismaschine«. Bei der Frage nach der Funktion geben Sie doch mal dieses DeMorgan-Ge-setz ein:<br/>
+(NOT(AANDB)) = ((NOTA)OR(NOTB))</p>
+
+<p>Das Ergebnis zeigt lauter -1, also W. Für alle Variablenkombi-nationen ist dieser Satz also richtig. Vielleicht ahnen Sie jetzt schon, was ein Computer in Fragen Logik zu leisten imstande ist. Probieren Sie doch mal selbst einfach ein paar Äquivalenzen aus. So können Sie selbst noch zum Entdecker werden.</p>
+
+<h3>18. Bedingungen</h3>
+
+<p>Auf dem Weg zum Computer als »Schlußfolgerungs-Maschine« fehlt uns noch etwas Wichtiges: Bedingungen. Das sind Verknüpfungen der Form »Wenn&hellip; dann&hellip;«. Man nennt diese Verknüpfungen »Implikationen« und findet in manchen Basic-Dialek-ten dafür den Operator IMP. Wir dürfen statt dessen > = verwenden.</p>
+
+<address class="author">(Der Vollständigkeit halber sei noch angemerkt, daß wir im C 64 anstelle von EOR »&lt;>« verwenden können. Der C 128 kennt diesen Befehl als XOR.)</address>
+
+<p>Im weiteren soll für diese Wenn-/Dann-Verknüpfung immer IMP verwendet werden. Sie können dann in einem Programm leicht > = dafür einsetzen. Für eine Aussagen-Opera-tion der Form A IMP B gibt es wieder genaue Vorschriften, wie die einzelnen Wahrheitswerte miteinander verrechnet werden. Bild 2 zeigt Ihnen die Wahrheitstabelle der IMP-Ope-ration:</p>
+
+<p>Nur dann also, wenn A richtig und B falsch ist, ist auch A IMP B falsch. Diese Wahrheitstabelle erstellt Ihnen auch ohne weiteres Logelei-1. Wenn Sie schon am Probieren sind, dann geben Sie doch noch mal diese Äquivalenz ein:<br/>
+(A>=B) = ((NOTA)ORB)</p>
+
+<p>Das Ergebnis zeigt: Anstelle von A IMP B kann auch (NOTA) ORB verwendet werden. Solche Äquivalenzen sind sehr brauchbar. Deshalb werden wir uns noch eine weitere IMP-Opera-tion ansehen. Überprüfen Sie doch mal mittels Logelei-1 die Wahrheitswerte dieses Satzes:<br/>
+(NOTB) IMP (NOTA)</p>
+
+<p>Sie sehen, daß genau dieselben Wahrheitswerte herauskommen wie für A IMP B. Auch diese Sätze sind demnach äquivalent. Man nennt den letzteren »Kontraposition« von A IMP B. Als Beispiel für eine Anwendung dieser Erkenntnis wollen wir einen Beweis führen:</p>
+
+<p>Der Satz »Wenn x<sup>2</sup> ungerade ist, dann ist x ungerade« soll bewiesen werden. Wenn wir für A einsetzen »x<sup>2</sup> ungerade« und für B .»x ungerade«, dann ist also zu beweisen AIMP B. Die Kontraposition davon wäre dann der Satz: »Wenn x gerade ist, dann ist auch x<sup>2</sup> gerade«. Das zu zeigen, ist relativ einfach. Eine gerade Zahl x ist auszudrücken durch 2n: x = 2n. Dann ist für x<sup>2</sup> zu schreiben:<br/>
+x<sup>2</sup> = (2n) (2n) = 2 (2n<sup>2</sup>),<br/>
+was wieder eine gerade Zahl ist. Damit haben wir die Kontraposi-tion bewiesen. Weil aber die Kontraposition äquivalent ist zu unserem Ausgangssatz, ist so auch dieser bewiesen.</p>
+
+<p>Was damit zu zeigen war, ist die Tatsache, daß man zu Beweisen häufig nur einen geeigneten äquivalenten Satz beweisen muß, was unter Umständen sehr viel leichter sein kann.</p>
+
+<h3>19. Argumente, Schlußfolgerungen</h3>
+
+<p>Wenn jemand in einer Diskussionsrunde einen anderen Teilnehmer abbügelt, indem er behauptet, dieser habe keine gültigen Argumente, dann kommt er dem, was ein Logiker unter diesem Begriff versteht, schon ziemlich nahe. Für diesen ist ein Argument eine Beziehung zwischen logischen Sätzen, die er »Prämissen« (Voraussetzungen) nennt und einem Satz, der »logischer Schluß« heißt. Solche Argumente können dann »gültig« sein oder »irrig« (also ungültig).</p>
+
+<p>Gültigkeit liegt nur dann vor, wenn alle Prämissen den Wahrheitswert W aufweisen und außerdem gleichzeitig auch der logische Schluß den Wahrheitswert W hat. Das ist vielleicht so trocken etwas unverständlich. Wir sehen uns daher ein Beispiel an.</p>
+
+<p>Unser Beispiel beinhaltet ein grundlegendes Gesetz, das Gesetz der logischen Schlußfolgerung (Gesetz der Syllogistik, aufgestellt von Aristoteles). Man kann es so ausdrücken: »Aus A folgt B. Aus B folgt C. Dann folgt auch aus A die Aussage C.« Die beiden ersten Sätze sind die Prämissen. Der letzte Satz ist der logische Schluß. In Formeln:<br/>
+Prämissen: A IMP B<br/>
+B IMP C<br/>
+Schluß: A IMP C</p>
+
+<p>Das Ganze ist ein Argument, und wir müssen nun nachprüfen, ob es gültig ist. Dazu bauen wir uns eine Wahrheitstabelle, die nun (weil drei Variable vorhanden sind) 23 = 8 Zeilen enthalten muß. Außerdem soll jedem Satz und jeder Variablen eine Spalte zugeordnet sein. In Bild 3 ist diese Wahrheitstabelle zu sehen.</p>
+
+<p>Links finden Sie alle möglichen Kombinationen der Varia-blen-Wahrheitswerte, rechts daneben dann die Werte, die bei den drei Sätzen herauskommen. In den markierten Zeilen sind die Werte beider Prämissen W und — wie Sie unschwer feststellen werden — auch der Wahrheitswert des Schlusses ist dort W. Damit ist dieses Argument gültig.</p>
+
+<p>Eine andere, etwas computergerechtere Form, lernen wir nun noch kennen. Dabei verknüpft man alle Prämissen durch die AND-Operation und dies so entstandene Gebilde wird durch die IMP-Operation mit dem Schluß verkoppelt. Das Ergebnis ist eine Tautologie, wenn das Argument gültig ist. Unser Beispiel lautet in dieser Form dann:<br/>
+((A IMP B)AND(B IMP C)) IMP (A IMP C)</p>
+
+<p>Unser Computer wird also eine »Schlußfolgerungs-Maschine«, wenn wir das Programm Logelei-1 etwas erweitern und umbauen. Als »Logelei-2« sehen Sie diese Schlußfolgerungsmaschine hier abgedruckt.</p>
+
+<p>Im Grunde genommen tut dieses Programm nichts anderes als Logelei-1, nur sind jetzt unterschiedliche Variablen-Anzahlen zugelassen (von einer bis zu vier Variablen). Ebenso wie vorhin wird hier auch nach Anzeigen der vorhandenen Funktion gefragt, ob eine andere gewünscht sei. Danach muß die Anzahl der Variablen eingegeben werden und unter Umständen die neue Funktion. Wenn eine Schlußfolgerung zu untersuchen ist, wird sie in der eben erklärten Form (Prämissen AND-verknüpft etc.) eingegeben. Ansonsten verfahren Sie wie bei Logelei-1. Der Computer erstellt nun eine Wahrheitstabelle. Liegt eine Tautologie vor, dann sind alle Ergebnis-Wahrheitswerte gleich -1 und damit das Argument gültig, die Schlußfolgerung also richtig. Um das Programm überschaubar zu halten, sind einige Eleganzen nicht verwendet worden. Aber vielleicht reizt Sie das ja zum Erweitern, Verfeinern, etc.</p>
+
+<p>Versuchen Sie es mal mit dem obigen Beispiel. Sie sehen, wir können mit Logelei-2 ein logisches Gesetz beweisen. Natürlich kann man diese Schlußfolgerungsmaschine auch im alltäglichen Bereich einsetzen. Das soll das folgende einfache Beispiel zeigen:</p>
+
+<p>Ein Student erzählt seine Situation: »Wenn ich jobbe, dann kann ich nicht gleichzeitig studieren. Wenn ich studiere, dann schaffe ich das Examen. Wenn ich nicht jobbe, dann muß ich am Hungertuch nagen. Ich habe mich entschlossen, trotzdem zu studieren. Dann habe ich mein Examen und nage am Hungertuch.« Das sind 4 Sätze mit 4 Variablen:<br/>
+A = ich jobbe<br/>
+B = ich studiere<br/>
+C = ich schaffe das Examen<br/>
+D = ich nage am Hungertuch</p>
+
+<p>In der verkürzten Form lautet die Äußerung des Studenten dann:<br/>
+Prämissen: A IMP NOTB<br/>
+B IMP C<br/>
+NOTA IMP D<br/>
+B
+Schluß: C AND D</p>
+
+<p>Nach dem Starten der Schlußfolgerungs-Maschine geben Sie also ein:<br/>
+((A IMP (NOTB)) AND (B IMP C) AND ((NOTA) IMP C) AND B) IMP (C AND D)</p>
+
+<p>Anstelle von IMP verwenden Sie die oben genannten Zeichen. Die Zwischenräume können wegbleiben, denn sie sind nur der Deutlichkeit halber eingefügt. Außerdem sagen Sie bitte dem Computer, daß er es mit vier Variablen zu tun hat. Das Ergebnis zeigt, daß die Schlußfolgerung richtig ist: Lauter -1 treten auf.</p>
+
+<p>So, nun können Sie dieses Programm auf eigene Probleme anwenden. Ein paar nette Beispiele finden Sie in einem Artikel von D. Herrmann in der Zeitschrift computer colleg, Ausgabe 2/ 1985, Seite 26. Wenn Sie öfters versuchen, Schlüsse auf diese Weise per Computer zu überprüfen, werden Sie feststellen, daß der schwierigste Schritt die Umwandlung von Sätzen in die mathematische Kurzform darstellt. Das kennen Sie vielleicht schon von Textaufgaben in der Mathematik her.</p>
+
+<h3>20. Künstliche Intelligenz?</h3>
+
+<p>Wenn Sie diese Folge bis hierher gelesen und vielleicht einige Schlüsse selbst ausprobiert haben, ist bei Ihnen möglicherweise der Eindruck entstanden, daß Sie hier so etwas wie den Keim der Künstlichen Intelligenz (auch mit dem Kürzel KI bedacht) vorliegen haben. Ein Programm, das in der Lage ist, mehr Variable — vielleicht sogar Hunderte — zu verarbeiten, welches die Schlüsse aus allen möglichen Variablenkombinationen selbst erstellt und mittels der Tautologien überprüft auf Richtigkeit, solch ein Programm wäre im Prinzip auf der gleichen Basis wie »Logelei-2« zu erstellen, also relativ einfach. Zwar hätte es ziemlich große Ausmaße und es bedürfte sicherlich eines wesentlich schnelleren Prozessors, um in absehbaren Zeiten zu Resultaten zu kommen, aber es wäre technisch realisierbar. Ist das Künstliche Intelligenz, und — diese etwas utopisch anmutende Zusatzfrage stellt sich zwangsläufig — wäre das Programm nicht in der Lage, Firmen, Gesellschaften, ja auch dem Staat eine wichtige Hilfe bei Entscheidungen zu sein?</p>
+
+<p>Versuchen wir zunächst, die Frage nach KI zu beantworten, dann erkennen wir sehr schnell, daß eine Antwort nicht möglich ist. Noch gibt es keine allgemein anerkannte Definition, was Intelligenz eigentlich sei. Dann kann auch kein Begriff einen sinnvollen Inhalt haben, der daraus abgeleitet ist.</p>
+
+<p>Die zweite Frage ist nicht ganz so leicht zu klären. Solch eine »Super-Schlußfolgerungs-Ma-schine« wäre sicherlich in einigen Anwendungsbereichen sehr nützlich. Aber vielleicht ist Ihnen schon bei der Formulierung von Problemstellungen für unser Programm »Logelei-2« aufgefallen, daß es da manchmal Schwierigkeiten gibt. Irgendwie fällt es ab und zu schwer, einen Satz, in dem Adjektive oder Adverbien eine große Rolle spielen, in die Kurzform umzusetzen. Nun haben Sie recht, wenn Sie sagen, daß das sicher eine Frage der Feinheit der Methode sei. Wie haben hier ja auch nur einen kleinen Zipfel der Logik zu fassen bekommen. Aber trotzdem bleiben Probleme. Im täglichen Leben werden Sie höchst selten Situationen vor sich haben, die mitJA oder NEIN (Wahr oder Falsch) zu bewältigen sind. Da gibt es zum Beispiel noch ein JA,ABER oder ein VIELLEICHT oder ein JEIN etc. Die zweiwertige Logik, auf der all das fußt, was wir in diesen drei Folgen behandelt haben, spielt in der Realität nur eine untergeordnete Rolle! Sie ist deshalb auch nur höchst selten und jedesmal mit einer gehörigen Portion Skepsis auf reale Problemstellungen anwendbar.</p>
+
+<p>Allen, die neugierig auf dieses Thema geworden sind, möchte ich zwei Bücher ans Herz legen, die ebenso unterschiedlich wie nützlich sind:</p>
+
+<p>1)  Seymour Lipschutz: »Essential Computer Mathematics«. McGraw-Hill 1982. ISBN 0-07-037990-4. Das ist einer der Bände der Serie »Schaum’s Outline Series«, der auch noch andere mathematische Themen anpackt und das alles mit vielen Beispielen würzt.</p>
+
+<p>2)  Douglas R. Hofstadter: »Gödel, Escher, Bach ein Endloses Geflochtenes Band«. Klett-Cotta 1985. ISBN 3-608-93037-X. Das ist fürjeden, der sich für Computer, Logik, KI und das Denken an sich interessiert, eine Art Bibel.</p>
+
+<address class="author">(Heimo Ponnath/gk)</address>
+    </article>
+</body>
+</html>
