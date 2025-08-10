@@ -10,6 +10,7 @@
     <meta name="64er.pages" content="110-111">
     <meta name="64er.toc_category" content="Grundlagen">
     <meta name="64er.id" content="scrolling">
+    <meta name="64er.head1" content="Grundlagen">
 </head>
 
 <body>
@@ -23,13 +24,15 @@
 
         <p>Zum Achterscrolling ein Beispiel in Basic:</p>
 
-        <pre>10 REM Beispiel Nr. 1
-20 PRINT CHR$(147);TAB(14);
-30 PRINT "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-40 FOR I=1064 T0 1024 STEP -1
-50 POKE I,PEEK (I-1)
-60 NEXT
-70 GOT0 40</pre>
+        <p>TODO PRE</p>
+
+        <p>10 REM Beispiel Nr. 1<br>
+            20 PRINT CHR$(147);TAB(14);<br>
+            30 PRINT "ABCDEFGHIJKLMNOPQRSTUVWXYZ"<br>
+            40 FOR I=1064 T0 1024 STEP -1<br>
+            50 POKE I,PEEK (I-1)<br>
+            60 NEXT<br>
+            70 G0T0 40</p>
 
         <p>Dieses Programm arbeitet zwar noch relativ schnell, aber wir werden später diese Aufgabe einem Assemblerprogramm übergeben.</p>
 
@@ -59,46 +62,30 @@
 
         <p>Nehmen wir einmal an, im Register 22 des VIC würde die Zahl 107 stehen. Diese Zahl wird mit 248 AND-verknüpft. Beide Zahlen müssen binär aufgeschlüsselt werden:</p>
 
-        <table class="plain">
-            <tr>
-                <td style="text-align:right;">107 =</td>
-                <td>01101011</td>
-            </tr>
-            <tr>
-                <td style="text-align:right;">AND 248 =</td>
-                <td>11111000</td>
-            </tr>
-            <tr>
-                <td style="text-align:right; border-top:1px solid black;">ergibt</td>
-                <td style="border-top:1px solid black;">01101000</td>
-            </tr>
-        </table>
+        <p>TODO</p>
+
+        <p>107 = 01101011<br>
+            AND 248 = 11111000<br>
+            ergibt 01101000</p>
 
         <p>Durch diese AND-Funktion werden also die Bits 0 bis 2 gelöscht. Die Bits 3 bis 7 ändern sich nie. Durch die OR-Funktion werden die entsprechenden Bits gesetzt:</p>
 
-        <table class="plain">
-            <tr>
-                <td></td>
-                <td style="text-align:right;">01101000</td>
-            </tr>
-            <tr>
-                <td>OR 3</td>
-                <td style="text-align:right;">00000011</td>
-            </tr>
-            <tr>
-                <td style="border-top:2px solid;">ergibt</td>
-                <td style="text-align:right; border-top:2px solid;">01101011</td>
-            </tr>
-        </table>
+        <p>TODO</p>
+
+        <p>01101000<br>
+            OR 3 00000011<br>
+            ergibt 01101011</p>
 
         <p>Die Bits für das horizontale Scrolling enthalten jetzt den Wert 3. Der höchste mit den Bits 0 bis 2 zu erreichende Wert ist 7, der niedrigste ist 0. Je größer der Wert in diesen drei Bits, desto weiter wird der Bildschirm nach rechts verschoben! Mit dieser Erkenntnis können wir den Bildschirm um sieben Pixels nach rechts rollen!</p>
 
-        <pre>10 REM Beispiel Nr. 2
-20 FOR 1=0 T0 7
-30 POKE 53248+22,PEEK (53248+22) AND248 OR I
-40 FOR T=0 T0 1000:NEXT T
-50 NEXT I
-60 RUN</pre>
+        <p>TODO PRE</p>
+
+        <p>10 REM Beispiel Nr. 2<br>
+            20 FOR 1=0 T0 7<br>
+            30 POKE 53248+22,PEEK (53248+22) AND248 OR I<br>
+            40 FOR T=0 T0 1000:NEXT T<br>
+            50 NEXT I<br>
+            60 RUN</p>
 
         <p>Dieses Programm verschiebt den Bildschirm langsam von der normalen Position um sieben Pixel nach rechts. Dann wird er wieder auf die normale Position zurückgesetzt und rollt wieder nach rechts. Wie macht man es nun, daß der Bildschirm über das 7. Pixel hinausscrollt?</p>
 
@@ -115,67 +102,21 @@
 
         <p>Dieses Flußdiagramm muß nun noch in ein Programm umgesetzt werden. Würde das gesamte Programm in Basic geschrieben, wäre es ziemlich langsam. Deshalb wird im nachstehenden Listing das Achterscrolling in Assembler realisiert. Es scrollt die erste Zeile in Achterschritten nach rechts. Zuerst die Darstellung in Maschinensprache und dann in DATA-Zeilen:</p>
 
-        <table class="plain">
-            <tr>
-                <td></td>
-                <td>LDA $0427</td>
-                <td>; STA $FB Speicherstelle 1063 merken</td>
-            </tr>
-            <tr>
-                <td></td>
-                <td>LDX #38</td>
-                <td>; Bei Spalte 38 anfangen</td>
-            </tr>
-            <tr>
-                <td>V</td>
-                <td>LDA $0400,X</td>
-                <td>; Bildschirmcode laden</td>
-            </tr>
-            <tr>
-                <td></td>
-                <td>INX</td>
-                <td>; Um 1 erhöhen</td>
-            </tr>
-            <tr>
-                <td></td>
-                <td>STA $0400,X</td>
-                <td>; DEX Und abspeichern</td>
-            </tr>
-            <tr>
-                <td></td>
-                <td>DEX</td>
-                <td>; Um 2 erhöhen</td>
-            </tr>
-            <tr>
-                <td></td>
-                <td>CPX #$FF</td>
-                <td>; Schon fertig ?</td>
-            </tr>
-            <tr>
-                <td></td>
-                <td>BNE V</td>
-            </tr>
-            <tr>
-                <td></td>
-                <td>LDA $FB</td>
-                <td>; STA $0400 1063 wieder nach 1024</td>
-            </tr>
-            <tr>
-                <td></td>
-                <td>LDA $D016</td>
-                <td>; Scrollregister laden</td>
-            </tr>
-            <tr>
-                <td></td>
-                <td>AND #248</td>
-                <td>; Scrollbits löschen</td>
-            </tr>
-            <tr>
-                <td></td>
-                <td>STA $D016</td>
-                <td>; RTS Zurückspeichern</td>
-            </tr>
-        </table>
+        <p>TODO</p>
+
+        <p>LDA $0427 ; STA $FB Speicherstelle 1063 merken<br>
+            LDX #38 ; Bei Spalte 38 anfangen<br>
+            LDA $0400,X ; Bildschirmcode laden<br>
+            INX ; Um 1 erhöhen<br>
+            STA $0400,X ; DEX Und abspeichern<br>
+            DEX ; Um 2 erhöhen<br>
+            CPX #$FF ; Schon fertig ?<br>
+            BNEV<br>
+            LDA $FB ; STA $0400 1063 wieder nach 1024<br>
+            LDA $D016 ; Scrollregister laden<br>
+            AND #248 ; Scrollbits löschen<br>
+            STA $D016 ; RTS Zurückspeichern<br>
+            110</p>
 
         <p>Dieses Maschinenprogramm schiebt die Zeilen, die in der ersten Zeile des Bildschirms stehen, nicht nur nach rechts, sondern macht ein Rundum-Scrolling. Die rechts verschwundene Schrift erscheint also wieder am linken Bildschirmrand. Dies wird durch die ersten und letzten beiden Maschinenprogrammzeilen ermöglicht. Startet man dieses Programm, so ist ab und zu ein leichtes Zucken zu erkennen. Dies liegt daran, daß der Elektronenstrahl, der den Bildschirm 25mal in der Sekunde aufbaut, die erste Zeile schreibt, während sie gescrollt wird. Wie kann man das vermeiden?</p>
 
@@ -187,37 +128,14 @@
 
         <p>Wir müssen das obige Maschinenprogramm also noch etwas erweitern. Ganz am Anfang muß stehen:</p>
 
-        <table class="plain">
-            <tr>
-                <td>X</td>
-                <td>LDA 53248+18</td>
-                <td>; Rasterzeile auslesen</td>
-            </tr>
-            <tr>
-                <td></td>
-                <td>CMP #160</td>
-                <td>; Vergleiche auf 160</td>
-            </tr>
-            <tr>
-                <td></td>
-                <td>BMI X</td>
-                <td>; Wenn kleiner dann nach X</td>
-            </tr>
-            <tr>
-                <td></td>
-                <td>CMP #190</td>
-                <td>; Vergleiche auf 190</td>
-            </tr>
-            <tr>
-                <td></td>
-                <td>BPL X</td>
-                <td>; Wenn größer dann nach X</td>
-            </tr>
-            <tr>
-                <td></td>
-                <td>RTS</td>
-            </tr>
-        </table>
+        <p>TODO</p>
+
+        <p>X LDA 53248+18 ; Rasterzeile auslesen<br>
+            CMP #160 ; Vergleiche auf 160<br>
+            BMI X ; Wenn kleiner dann nach X<br>
+            CMP #190 ; Vergleiche auf 190<br>
+            BPL X ; Wenn größer dann nach X<br>
+            RTS</p>
 
         <p>Und nun das gesamte 1-Zeilen-Soft-Scrolling in Basic: (Das dazugehörige Maschinenprogramm ist so geschrieben, daß es in jeden Bereich ge-POKEt werden kann!)</p>
 
@@ -256,73 +174,20 @@
 
         <p>Basic reicht nicht aus, um eine angemessene Geschwindigkeit zu erreichen. Deshalb steigen wir nun ganz auf Assembler um! Schreiben wir zunächst die Zeilen 60 bis 90 des Beispiels Nummer 3 in Assembler:</p>
 
-        <table class="plain">
-            <tr>
-                <td>M</td>
-                <td>LDA 53248+22</td>
-                <td>; Scrollregister laden</td>
-            </tr>
-            <tr>
-                <td></td>
-                <td>AND #7</td>
-                <td>; Scrollbits ausfiltern</td>
-            </tr>
-            <tr>
-                <td></td>
-                <td>CMP #7</td>
-                <td>; Schon 7 ?</td>
-            </tr>
-            <tr>
-                <td></td>
-                <td>BNE N</td>
-                <td>; Wenn nicht dann Einerscrolling</td>
-            </tr>
-            <tr>
-                <td></td>
-                <td>JSR ACHTSC</td>
-                <td>; Achterscrolling</td>
-            </tr>
-            <tr>
-                <td></td>
-                <td>JMP M</td>
-                <td>; Nächste Verschiebung</td>
-            </tr>
-            <tr>
-                <td>N</td>
-                <td>INC 53248+22</td>
-                <td>; Scrollreg. erhöhen</td>
-            </tr>
-            <tr>
-                <td></td>
-                <td>LDX #$FF</td>
-                <td>; Verzögerungsschleife</td>
-            </tr>
-            <tr>
-                <td>Q</td>
-                <td>LDY #$30</td>
-            </tr>
-            <tr>
-                <td>A</td>
-                <td>INY</td>
-            </tr>
-            <tr>
-                <td></td>
-                <td>BNE A</td>
-            </tr>
-            <tr>
-                <td></td>
-                <td>INX</td>
-            </tr>
-            <tr>
-                <td></td>
-                <td>BNE Q</td>
-            </tr>
-            <tr>
-                <td></td>
-                <td>JMP M</td>
-                <td>; Nächste Verschiebung</td>
-            </tr>
-        </table>
+        <p>M LDA 53248+22 ; Scrollregister laden<br>
+            AND #7 ; Scrollbits ausfiltern<br>
+            CMP #7 ; Schon 7 ?<br>
+            BNE N ; Wenn nicht dann Einerscrolling<br>
+            JSR ACHTSC ; Achterscrolling<br>
+            JMP M ; Nächste Verschiebung<br>
+            N INC 53248+22 ; Scrollreg. erhöhen<br>
+            LDX #$FF ; Verzögerungsschleife<br>
+            Q LDY #$30<br>
+            A INY<br>
+            BNE A<br>
+            INX<br>
+            BNE Q<br>
+            JMP M ; Nächste Verschiebung</p>
 
         <p>Diese Routine müssen wir nur noch in das obige Achterscrolling einbauen. Für die Basic-Fans haben wir einen Basic-Lader dieses Programms am Schluß abgedruckt. Kommen wir nun zum vertikalen Scrolling:</p>
 
@@ -334,17 +199,23 @@
 
         <p>Einzeilen Soft-Scrolling (DATA-Lader):</p>
 
-        <pre>0 DATA173,22,208,41,7,201,7,208,6,32,34,128,76,0,128,32,68,128,238,22,208
-1 DATA162,255,160,160,200,208,253,232,208,248,76,0,128,173,39,4,133,251
-2 DATA162,38,189,0,4,232,157,0,4,202,202,224,255,208,243,165,251,141,0
-3 DATA4,173,22,208,41,248,141,22,208,96,173,18,208,201,160,48,249,201,190
-4 DATA16,245,96,255
-10 FOR I=32768 TO 32768+5*16
-20 READA:POKEI,A
-30 NEXT
-40 PRINT"(CLR} HIER KOENNTE EIN TEXT STEHEN.
-50 SYS32768
-READY</pre>
+        <p>TODO PRE</p>
+
+        <p>0 DATA173,22,208,41,7,201,7,208,6,32,34,128,76,0,<br>
+            128,32,68,128,238,22,208<br>
+            1 DATA162,255,160,160,200,208,253,232,208,248,76,0, H<br>
+            128,173,39,4,133,251<br>
+            2 DATA162,38,189,0,4,232,157,0,4,202,202,224,255, ■<br>
+            208,243,165,251,141,0<br>
+            3 DATA4,173,22,208,41,248,141,22,208,96,173,18,208,<br>
+            201,160,48,249,201,190<br>
+            4 DATA16,245,96,255<br>
+            10 FOR I=32768 TO 32768+5*16<br>
+            20 READA:POKEI,A<br>
+            30 NEXT<br>
+            40 PRINT"(CLR} HIER KOENNTE EIN TEXT STEHEN.<br>
+            50 SYS32768<br>
+            READY</p>
 
         <address class="author">(Frank Barcikowski + Holger Vocke/ah)</address>
 
