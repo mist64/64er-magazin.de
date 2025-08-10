@@ -28,7 +28,7 @@
 
 <p>Achten Sie bitte darauf, daß Sie nach dem Eintippen des Programmes abspeichern und — natürlich — daß die SMON-Version ab $C000 im Speicher vorliegt. Mit SYS 24576 starten Sie unser Programm, in dem durch diesen SYS-Befehl zunächst nach $8000/1 die Startadresse einer neuen RESET-Serviceroutine geschrieben wird und nach $8002/3 die der neuen NMI-Routine. Außerdem wird die Modulkennung in die vorgeschriebenen Speicherplätze eingetragen. Wenn Sie nun mal die RESTORE-Taste — oder RUN/STOP und RESTORE — drücken, passiert offensichtlich nichts. Das liegt daran, daß unser Programm lediglich die auf den Stapel gelegten Register wieder zurückholt und aus der Unterbrechung mit RTI ins normale Geschehen zurückkehrt.</p>
 
-<p>Haben Sie einen RESET-Taster eingebaut? Dann drücken Sie doch mal drauf. Zunächst erkennen Sie den normalen RESET-Verlauf. Dann meldet sich aber nicht wie gewohnt die Nachricht CBM-Ba-sic&hellip;, sondern der SMON mit einer Registeranzeige. Das RESET-Pro-gramm ab $602E folgt dem Firmware-Programm. Lediglich der letzte Sprungbefehl ist anders und führt statt ins Basic in den SMON. Der SMON wird fehlerfrei funktionieren&hellip; solange Sie nicht versuchen, mit dem X-Kommando wieder ins Basic zurückzukehren. Dann wird Unsinn passieren, denn auf einen Start mittels RESET ist der SMON nicht gefaßt gewesen und in den Speicherstellen, die sonst eine Rückkehradresse enthalten, befindet sich nichts Sinnvolles. Es ist daher auch nicht möglich, den SMON wieder zu verlassen — außer durch Speicherstellenmanipulationen oder die Notbremse: Aus- und wieder Einschalten. Auf diese Weise (und mittels eines AUTOSTART) sichern sich Softwarehäuser manchmal gegen unbefugtes Kopieren ihrer Programme.</p>
+<p>Haben Sie einen RESET-Taster eingebaut? Dann drücken Sie doch mal drauf. Zunächst erkennen Sie den normalen RESET-Verlauf. Dann meldet sich aber nicht wie gewohnt die Nachricht CBM-Basic&hellip;, sondern der SMON mit einer Registeranzeige. Das RESET-Programm ab $602E folgt dem Firmware-Programm. Lediglich der letzte Sprungbefehl ist anders und führt statt ins Basic in den SMON. Der SMON wird fehlerfrei funktionieren&hellip; solange Sie nicht versuchen, mit dem X-Kommando wieder ins Basic zurückzukehren. Dann wird Unsinn passieren, denn auf einen Start mittels RESET ist der SMON nicht gefaßt gewesen und in den Speicherstellen, die sonst eine Rückkehradresse enthalten, befindet sich nichts Sinnvolles. Es ist daher auch nicht möglich, den SMON wieder zu verlassen — außer durch Speicherstellenmanipulationen oder die Notbremse: Aus- und wieder Einschalten. Auf diese Weise (und mittels eines AUTOSTART) sichern sich Softwarehäuser manchmal gegen unbefugtes Kopieren ihrer Programme.</p>
 
 <h2>Nutzung der Unterbrechungen</h2>
 
@@ -49,7 +49,7 @@
 </ul>
 
 
-<p>Da können wir uns auf den Rasterzeileninterrupt, die Spri-te/Hintergrund- oder die Sprite/Sprite-Kollision stützen.</p>
+<p>Da können wir uns auf den Rasterzeileninterrupt, die Sprite/Hintergrund- oder die Sprite/Sprite-Kollision stützen.</p>
 
 <ul>
 <li>oder mit Hilfe des CIA1</li>
@@ -76,7 +76,7 @@
 
 <p>Bei mehreren gleichartigen Unterbrechungsanforderungen (zum Beispiel IRQs) muß noch ein Weg gefunden werden, wie zwischen den dann vielleicht anfallenden unterschiedlichen Service-Routinen differenziert werden kann. Denkbar wären beispielsweise Aufgabenstellungen wie:</p>
 
-<p>Jeder 3. Timer-IRQ soll denJoystick abfragen, oder RESTORE + h soll den Hilfsbildschirm zeigen, RESTORE + z soll den aktuellen Bildschirm wieder restaurieren, etc.</p>
+<p>Jeder 3. Timer-IRQ soll den Joystick abfragen, oder RESTORE + h soll den Hilfsbildschirm zeigen, RESTORE + z soll den aktuellen Bildschirm wieder restaurieren, etc.</p>
 
 <p>Sie sehen, eine große Menge Arbeit wartet auf uns. Nicht zu allen Möglichkeiten werde ich hier Beispielprogramme zeigen. Außerdem dürfen die dann auch nicht zu undurchsichtig sein und man sollte möglichst den Erfolg eines solchen Demo-Programmes auf dem Bildschirm erkennen können. Trotzdem hoffe ich, daß die nachfolgend und noch in der nächsten Folge gezeigten Programmlösungen ausreichen, Ihnen die Unterbrechungs-Behandlung mit eigenen Routinen durchschaubar zu machen. Ich will Ihnen aber nicht verschweigen, daß auch mir noch längst nicht alle Geheimnisse der Unterbrechungsprogrammierung offenbar geworden sind. Oft finde ich mich unversehens in Programm-Sackgassen wieder. Das soll Ihnen als kleiner Trost dienen, wenn Sie mal nach dem 1001. Absturz müde und mit rauchendem Kopf vor Ihrem Commodore-Ungeheuer sitzen.</p>
 
@@ -105,7 +105,7 @@ $D011 (53265)</p>
 
 <p>Damit wären alle Vorbereitungen getroffen. Der Rest liegt nun ganz bei uns — beziehungsweise bei dem von uns zu schreibenden Service-Programm. Als Bild 8 finden Sie ein Flußdiagramm unseres Beispielprogrammes 2.</p>
 
-<p>Gehen wir nun an die Realisierung. Zunächst also die Initialisierung, die wir bei $6000 (also durch SYS 24576zu starten) beginnen lassen:</p>
+<p>Gehen wir nun an die Realisierung. Zunächst also die Initialisierung, die wir bei $6000 (also durch SYS 24576 zu starten) beginnen lassen:</p>
 
 <p>TODO</p>
 
@@ -118,17 +118,17 @@ Schritt 3:<br/>
 Schritt 1:<br/>
 600B    LDA #$F8    Rasterzeile, bei der das Textfenster endet. Von da an soll der Rahmen schwarz sein.<br/>
 600D    STA D012    in Rasterzeilen-Register (LSB) schreiben.<br/>
-6010    LDA D0l1    Register mit dem msb des Rasterzeilenzählers<br/>
+6010    LDA D011    Register mit dem msb des Rasterzeilenzählers<br/>
 6013    AND #$7F    0111 1111 löscht das Bit7<br/>
 6015    STA D011    Zurückschreiben. Damit ist die Rasterzeile, die den IRQ auslösen soll, festgelegt.<br/>
 Schritt 2:<br/>
 6018    LDA #$81    1000 0001 wird nun<br/>
-601A    STA DOlA    ins IRQ-enable-Register geschrieben, um den Rasterzeilen-IRQ zuzulassen.<br/>
+601A    STA D01A    ins IRQ-enable-Register geschrieben, um den Rasterzeilen-IRQ zuzulassen.<br/>
 Festlegen einiger Startwerte:<br/>
 601D    LDA #$00    Farbe schwarz<br/>
 601F    STA D020    in Rahmen schreiben<br/>
 6022    LDA #$04    Streifenbreite in<br/>
-6024    STAO2   Merkregister schreiben.<br/>
+6024    STA 02   Merkregister schreiben.<br/>
 6026    CLI IRQ freigeben<br/>
 6027    RTS Ende der Initialisierung.<br/>
 Von nun an laufen alle IRQs über unsere eigene Routine, die bei $6028 beginnt.<br/>
@@ -137,8 +137,8 @@ Zunächst müssen wir prüfen, ob die Unterbrechung vom VIC-II-Chip kommt oder v
 602B    STA D019    Zurückschreiben<br/>
 602E    BMI 6037    Sprung, falls VIC-IRQ, sonst CIA-IRQ.<br/>
 Bearbeiten eines CIA-IRQ:<br/>
-6030    LDA DCOD    Löschen des CIA1 Unterbrechungs-Kontrollregisters.<br/>
-6033    CLI IRQ zulassen. Damit können innerhalb eines CIA- IRQ auch unsere VIC-IRQs geschehen.<br/>
+6030    LDA DC0D    Löschen des CIA1 Unterbrechungs-Kontrollregisters.<br/>
+6033    CLI IRQ zulassen. Damit können innerhalb eines CIA-IRQ auch unsere VIC-IRQs geschehen.<br/>
 6034    JMP EA31    Bearbeitung des CIA-IRQ durch die normale Routine.<br/>
 Unser Programm für VIC-II-IRQs:<br/>
 6037    LDA D012    Rasterzeilen-Register laden um festzustellen, welche Zeile den IRQ auslöste.<br/>
@@ -163,7 +163,7 @@ Damit ist der Rahmen in Höhe des Textfensters behandelt. Es schließt sich nun 
 6051    STA D020    in Rahmenfarb-Register.<br/>
 6054    LDA #$32    Rasterzeile, bei der oben das Textfenster beginnt.<br/>
 6056    STA D012    In Rasterzeilen-Register schreiben<br/>
-6059    JMP EA81    Abschluß durch Sprung zum Ende der normalen IRQ- Routine.<br/>
+6059    JMP EA81    Abschluß durch Sprung zum Ende der normalen IRQ-Routine.<br/>
 Damit ist festgelegt, daß ober- und unterhalb des Textfensters die<br/>
 Rahmenfarbe schwarz wird.<br/>
 Unsere eigene Routine ist jetzt abgeschlossen. Zum guten Ton gehört es, dem Benutzer auch die Möglichkeit zu öffnen, diese Routine wieder abzuschalten. Das erfolgt im letzten Programmteil, der mittels SYS24688 aktiviert werden kann:<br/>
@@ -181,7 +181,7 @@ Unsere eigene Routine ist jetzt abgeschlossen. Zum guten Ton gehört es, dem Ben
 
 <p>Unser Programm ist komplett. Speichern Sie es bitte vor dem Starten ab. Nach dem SYS 24576 finden Sie einen hübschen bunten Rahmen vor, oberhalb und unterhalb des Textfensters ist er schwarz. Besonders gut — finde ich — sieht das Ganze aus, wenn man die Hintergrundfarbe des Textfensters auch auf Schwarz setzt. Das Programm erlaubt noch einige Experimente:</p>
 
-<p>Durch POKE-Kommandos in die Speicherstelle 2 kann die aktuelle Streifenbreite variiert werden, durch POKEs in die Zelle 24645 der Startwert der Verzögerungsschleife. Probieren Sie’s doch mal aus. Eine Erkenntnis werden Sie gewinnen: In der Unterbrechungs-Programmie-rung spielt die Zeit eine wichtige Rolle. Das zeigt sich auch, wenn man zum Beispiel Cursorbewegungen durchführt: Die Streifen fangen an zu wandern.</p>
+<p>Durch POKE-Kommandos in die Speicherstelle 2 kann die aktuelle Streifenbreite variiert werden, durch POKEs in die Zelle 24645 der Startwert der Verzögerungsschleife. Probieren Sie’s doch mal aus. Eine Erkenntnis werden Sie gewinnen: In der Unterbrechungs-Programmierung spielt die Zeit eine wichtige Rolle. Das zeigt sich auch, wenn man zum Beispiel Cursorbewegungen durchführt: Die Streifen fangen an zu wandern.</p>
 
 <p>Weitere Möglichkeiten zum Experimentieren sind gegeben, wenn Sie die Rasterzeilen verändern, die den oberen und unteren Rand des Textfensters markieren:</p>
 

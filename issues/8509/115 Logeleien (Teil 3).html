@@ -32,7 +32,7 @@ WAIT C,A,B</p>
 
 <p>Anhand eines Beispiels wollen wir uns ansehen, was passiert. Der Befehl<br/>
 WAIT 1,32,32<br/>
-hält ein Programm an, bis eine Datasettentaste gedrückt wird (H. Hauck, 64’er, Ausgabe 11/ 1984, Seite 135). Bit 4 der Speicherstelle 1 ist in dem Fall nämlich Null. Der normale Inhalt dieses Registers ist 55 (binär 0011 0111), also Bit 4 = 1. Die Zahl 32 lautet binär<br/>
+hält ein Programm an, bis eine Datasettentaste gedrückt wird (H. Hauck, 64’er, Ausgabe 11/1984, Seite 135). Bit 4 der Speicherstelle 1 ist in dem Fall nämlich Null. Der normale Inhalt dieses Registers ist 55 (binär 0011 0111), also Bit 4 = 1. Die Zahl 32 lautet binär<br/>
 0001 0000</p>
 
 <p>Mit WAIT1,32,32 geschieht folgendes:<br/>
@@ -93,7 +93,7 @@ Taste gedrückt:</p>
 
 <p>Wir sollten uns das merken: Es kommt bei mehreren logischen Verknüpfungen auch auf die Reihenfolge an.</p>
 
-<p>Daß der WAIT-Befehl so selten benutzt wird, hängt zum einen sicherlich mit seiner relativ komplexen Handhabung zusammen, zum anderen aber auch damit, daß meist ein äußeres Ereignis eintreten muß, um den zu überprüfenden Bit-Wert zu verändern. Dafür kommen Kontrollregister in Frage, die für Ein-/Aus-gabe-Operationen jeglicher Art eine Rolle spielen, einige VIC-II-Chip-Register und auch Speicherstellen des SID-Chip. Die beiden letzteren sind allerdings von der Firmware her ohnehin auf allerlei Ereignisse hin programmiert, so daß eine Behandlung mittels des WAIT-Befehls lediglich manchmal als Alternative gesehen werden kann. Bleiben also die CIA-Register, deren komplexe Funktion aber meist eher zur Bearbeitung in Assembler zwingt als in Basic.</p>
+<p>Daß der WAIT-Befehl so selten benutzt wird, hängt zum einen sicherlich mit seiner relativ komplexen Handhabung zusammen, zum anderen aber auch damit, daß meist ein äußeres Ereignis eintreten muß, um den zu überprüfenden Bit-Wert zu verändern. Dafür kommen Kontrollregister in Frage, die für Ein-/Ausgabe-Operationen jeglicher Art eine Rolle spielen, einige VIC-II-Chip-Register und auch Speicherstellen des SID-Chip. Die beiden letzteren sind allerdings von der Firmware her ohnehin auf allerlei Ereignisse hin programmiert, so daß eine Behandlung mittels des WAIT-Befehls lediglich manchmal als Alternative gesehen werden kann. Bleiben also die CIA-Register, deren komplexe Funktion aber meist eher zur Bearbeitung in Assembler zwingt als in Basic.</p>
 
 <p>Ein Anwendungsbeispiel soll aber noch vorgestellt werden. Es stammt von H. Kohlen und wurde im 64’er, Ausgabe 10/ 1984, Seite 92 abgedruckt. Es handelt sich um eine Joystickabfrage (Port 2), die allerdings immer nur eine Joystickbewegung erfaßt:<br/>
 WAIT56320,16,16 wartet auf Feuerknopf<br/>
@@ -102,7 +102,7 @@ WAIT56320,1,1 wartet auf Hochbewegung<br/>
 WAIT56320,2,2 wartet auf Abwärtsbewegung<br/>
 WAIT56320,8,8 wartet auf Rechtsbewegung</p>
 
-<p>Das gleiche mit der Speicherstelle 56321 bezieht sich dann aufdenJoystickport 1. Wennalso ein Programmabschnitt warten soll, bis der Feuerknopf gedrückt wird, ist WAIT56320,16,16 sicher eine Möglichkeit, so etwas zu programmieren.</p>
+<p>Das gleiche mit der Speicherstelle 56321 bezieht sich dann auf den Joystickport 1. Wenn also ein Programmabschnitt warten soll, bis der Feuerknopf gedrückt wird, ist WAIT 56320,16,16 sicher eine Möglichkeit, so etwas zu programmieren.</p>
 
 <h3>17. Logische Sätze</h3>
 
@@ -113,7 +113,7 @@ WAIT56320,8,8 wartet auf Rechtsbewegung</p>
 <p>Zunächst ein Beispiel für solch einen logischen SATZ (so nennt man diese verkoppelten Aussagen auch häufig):<br/>
 NOT(A AND (NOTB))</p>
 
-<p>Zum Ergebnis gelangt man wieder über eine Wahrheitstabelle. Abhängig von der Anzahl der Variablen (hier also zwei: A,B) muß eine Anzahl von Zeilen vorgesehen werden, die alle möglichen W/F-Kombinationen enthält. Bei zwei Variablen sind das dann vier Zeilen, allgemein aber bei N Variablen 2N Zeilen. Die Anzahl der Spalten ergibt sich aus der Menge der Variablen und der vorzunehmenden Verknüpfungen. In Bild 1 sehen Sie die Wahrheitstabelle für unser Beispiel.</p>
+<p>Zum Ergebnis gelangt man wieder über eine Wahrheitstabelle. Abhängig von der Anzahl der Variablen (hier also zwei: A,B) muß eine Anzahl von Zeilen vorgesehen werden, die alle möglichen W/F-Kombinationen enthält. Bei zwei Variablen sind das dann vier Zeilen, allgemein aber bei N Variablen 2<sup>N</sup> Zeilen. Die Anzahl der Spalten ergibt sich aus der Menge der Variablen und der vorzunehmenden Verknüpfungen. In Bild 1 sehen Sie die Wahrheitstabelle für unser Beispiel.</p>
 
 <p>Links finden Sie die Kombinationen der Wahrheitswerte der Variablen A und B. Daneben wurde NOTB entwickelt, dann (wie bei algebraischen Rechnungen Schritt für Schritt) die AND-Verknüpfung und schließlich die Verneinung der Spalte davor. Diese letzte Spalte ist auch eine Zusammenstellung der Ergebnisse.</p>
 
@@ -131,14 +131,14 @@ A AND (NOT A)</p>
 
 <p>Bisher fehlen uns aber noch einige entscheidende Werkzeuge: Wir können noch keine Schlußfolgerungen ziehen. Das steuern wir nun an.</p>
 
-<p>Es gibt in einigen Basic-Dia-lekten den Operator EQV. Das kommt von »äquivalent«, also »gleich«. Wir dürfen in unserem C 64 getrost dafür das Gleichheitszeichen (=) verwenden. Äquivalenz zweier logischer Sätze liegt vor, wenn die Wahrheitswerte der Ergebnisse gleich sind. Probieren Sie mal mittels unseres Programmes:<br/>
+<p>Es gibt in einigen Basic-Dialekten den Operator EQV. Das kommt von »äquivalent«, also »gleich«. Wir dürfen in unserem C 64 getrost dafür das Gleichheitszeichen (=) verwenden. Äquivalenz zweier logischer Sätze liegt vor, wenn die Wahrheitswerte der Ergebnisse gleich sind. Probieren Sie mal mittels unseres Programmes:<br/>
 a) NOT (A AND B)<br/>
 b) (NOT A) OR (NOT B)</p>
 
-<p>Beide Sätze sind äquivalent, weil die Ergebnisse gleiche Wahrheitswerte besitzen. Nebenbei: Das ist eines der sogenannten Gesetze von DeMor-gan. Das Programm Logelei-1 zeigt sich — wie Sie nun sehen werden — auch schon als »Beweismaschine«. Bei der Frage nach der Funktion geben Sie doch mal dieses DeMorgan-Ge-setz ein:<br/>
+<p>Beide Sätze sind äquivalent, weil die Ergebnisse gleiche Wahrheitswerte besitzen. Nebenbei: Das ist eines der sogenannten Gesetze von DeMorgan. Das Programm Logelei-1 zeigt sich — wie Sie nun sehen werden — auch schon als »Beweismaschine«. Bei der Frage nach der Funktion geben Sie doch mal dieses DeMorgan-Gesetz ein:<br/>
 (NOT(AANDB)) = ((NOTA)OR(NOTB))</p>
 
-<p>Das Ergebnis zeigt lauter -1, also W. Für alle Variablenkombi-nationen ist dieser Satz also richtig. Vielleicht ahnen Sie jetzt schon, was ein Computer in Fragen Logik zu leisten imstande ist. Probieren Sie doch mal selbst einfach ein paar Äquivalenzen aus. So können Sie selbst noch zum Entdecker werden.</p>
+<p>Das Ergebnis zeigt lauter -1, also W. Für alle Variablenkombinationen ist dieser Satz also richtig. Vielleicht ahnen Sie jetzt schon, was ein Computer in Fragen Logik zu leisten imstande ist. Probieren Sie doch mal selbst einfach ein paar Äquivalenzen aus. So können Sie selbst noch zum Entdecker werden.</p>
 
 <h3>18. Bedingungen</h3>
 
@@ -156,7 +156,7 @@ b) (NOT A) OR (NOT B)</p>
 
 <p>Sie sehen, daß genau dieselben Wahrheitswerte herauskommen wie für A IMP B. Auch diese Sätze sind demnach äquivalent. Man nennt den letzteren »Kontraposition« von A IMP B. Als Beispiel für eine Anwendung dieser Erkenntnis wollen wir einen Beweis führen:</p>
 
-<p>Der Satz »Wenn x<sup>2</sup> ungerade ist, dann ist x ungerade« soll bewiesen werden. Wenn wir für A einsetzen »x<sup>2</sup> ungerade« und für B .»x ungerade«, dann ist also zu beweisen AIMP B. Die Kontraposition davon wäre dann der Satz: »Wenn x gerade ist, dann ist auch x<sup>2</sup> gerade«. Das zu zeigen, ist relativ einfach. Eine gerade Zahl x ist auszudrücken durch 2n: x = 2n. Dann ist für x<sup>2</sup> zu schreiben:<br/>
+<p>Der Satz »Wenn x<sup>2</sup> ungerade ist, dann ist x ungerade« soll bewiesen werden. Wenn wir für A einsetzen »x<sup>2</sup> ungerade« und für B »x ungerade«, dann ist also zu beweisen A IMP B. Die Kontraposition davon wäre dann der Satz: »Wenn x gerade ist, dann ist auch x<sup>2</sup> gerade«. Das zu zeigen, ist relativ einfach. Eine gerade Zahl x ist auszudrücken durch 2n: x = 2n. Dann ist für x<sup>2</sup> zu schreiben:<br/>
 x<sup>2</sup> = (2n) (2n) = 2 (2n<sup>2</sup>),<br/>
 was wieder eine gerade Zahl ist. Damit haben wir die Kontraposi-tion bewiesen. Weil aber die Kontraposition äquivalent ist zu unserem Ausgangssatz, ist so auch dieser bewiesen.</p>
 
@@ -212,7 +212,7 @@ Schluß: C AND D</p>
 
 <p>Versuchen wir zunächst, die Frage nach KI zu beantworten, dann erkennen wir sehr schnell, daß eine Antwort nicht möglich ist. Noch gibt es keine allgemein anerkannte Definition, was Intelligenz eigentlich sei. Dann kann auch kein Begriff einen sinnvollen Inhalt haben, der daraus abgeleitet ist.</p>
 
-<p>Die zweite Frage ist nicht ganz so leicht zu klären. Solch eine »Super-Schlußfolgerungs-Ma-schine« wäre sicherlich in einigen Anwendungsbereichen sehr nützlich. Aber vielleicht ist Ihnen schon bei der Formulierung von Problemstellungen für unser Programm »Logelei-2« aufgefallen, daß es da manchmal Schwierigkeiten gibt. Irgendwie fällt es ab und zu schwer, einen Satz, in dem Adjektive oder Adverbien eine große Rolle spielen, in die Kurzform umzusetzen. Nun haben Sie recht, wenn Sie sagen, daß das sicher eine Frage der Feinheit der Methode sei. Wie haben hier ja auch nur einen kleinen Zipfel der Logik zu fassen bekommen. Aber trotzdem bleiben Probleme. Im täglichen Leben werden Sie höchst selten Situationen vor sich haben, die mitJA oder NEIN (Wahr oder Falsch) zu bewältigen sind. Da gibt es zum Beispiel noch ein JA,ABER oder ein VIELLEICHT oder ein JEIN etc. Die zweiwertige Logik, auf der all das fußt, was wir in diesen drei Folgen behandelt haben, spielt in der Realität nur eine untergeordnete Rolle! Sie ist deshalb auch nur höchst selten und jedesmal mit einer gehörigen Portion Skepsis auf reale Problemstellungen anwendbar.</p>
+<p>Die zweite Frage ist nicht ganz so leicht zu klären. Solch eine »Super-Schlußfolgerungs-Ma-schine« wäre sicherlich in einigen Anwendungsbereichen sehr nützlich. Aber vielleicht ist Ihnen schon bei der Formulierung von Problemstellungen für unser Programm »Logelei-2« aufgefallen, daß es da manchmal Schwierigkeiten gibt. Irgendwie fällt es ab und zu schwer, einen Satz, in dem Adjektive oder Adverbien eine große Rolle spielen, in die Kurzform umzusetzen. Nun haben Sie recht, wenn Sie sagen, daß das sicher eine Frage der Feinheit der Methode sei. Wie haben hier ja auch nur einen kleinen Zipfel der Logik zu fassen bekommen. Aber trotzdem bleiben Probleme. Im täglichen Leben werden Sie höchst selten Situationen vor sich haben, die mit JA oder NEIN (Wahr oder Falsch) zu bewältigen sind. Da gibt es zum Beispiel noch ein JA,ABER oder ein VIELLEICHT oder ein JEIN etc. Die zweiwertige Logik, auf der all das fußt, was wir in diesen drei Folgen behandelt haben, spielt in der Realität nur eine untergeordnete Rolle! Sie ist deshalb auch nur höchst selten und jedesmal mit einer gehörigen Portion Skepsis auf reale Problemstellungen anwendbar.</p>
 
 <p>Allen, die neugierig auf dieses Thema geworden sind, möchte ich zwei Bücher ans Herz legen, die ebenso unterschiedlich wie nützlich sind:</p>
 

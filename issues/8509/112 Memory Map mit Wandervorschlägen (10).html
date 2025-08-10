@@ -18,7 +18,7 @@
         <h1>Memory Map mit Wandervorschlägen (10)</h1>
 <blockquote><p>Diesmal geht es weiter mit den Speicherzellen 158 bis 182. Behandelt werden dabei die interne Uhr, Kassettenoperationen und die RS232-Schnittstelle.</p></blockquote>
 
-<p>In der Ausgabe 6/85 habe ich unter anderem auch die Speicherzelle 144 behandelt. In einem separaten Texteinschub »ST-ATUS« bin ich näher auf die Status-Variable ST eingegangen.</p>
+<p>In der Ausgabe 6/85 habe ich unter anderem auch die Speicherzelle 144 behandelt. In einem separaten Texteinschub »STATUS« bin ich näher auf die Status-Variable ST eingegangen.</p>
 
 <p>Ganz am Schluß, nach der Besprechung der Floppy-Operationen, habe ich noch den Wert ST=128 (DEVICE NOT PRESENT) behandelt.</p>
 
@@ -44,7 +44,7 @@
 
 <p>Normalerweise steht in 768 die Zahl 139 (VC 20: 58), in 769 die Zahl 227.</p>
 
-<p>Verbogen wird der Zeiger durch eine 61 (185 geht auch), beim VC 20 durch 52. Dadurch zeigt die Adresse auf eine Speicherzelle des Betriebssystems, in welcher der Assembler-Be-fehl »RTS«, das bedeutet Rücksprung, steht. Jetzt können wir ungestört den STatus abfragen, wir müssen allerdings den negativen Wert von ST, also —128 nehmen.</p>
+<p>Verbogen wird der Zeiger durch eine 61 (185 geht auch), beim VC 20 durch 52. Dadurch zeigt die Adresse auf eine Speicherzelle des Betriebssystems, in welcher der Assembler-Befehl »RTS«, das bedeutet Rücksprung, steht. Jetzt können wir ungestört den STatus abfragen, wir müssen allerdings den negativen Wert von ST, also —128 nehmen.</p>
 
 <p><strong>Für die Floppy sieht die Abfrage fast gleich aus.</strong></p>
 
@@ -70,7 +70,7 @@
 70 PRINT" FORTSETZUNG"  Weiter im Programm<br/>
 80 END  Ende der DEMO<br/>
 100 PRINT" GERAET EINSCHALTEN"<br/>
-110 GET A$:IF A$ = &ldquo;"THEN 110   Warteschleife<br/>
+110 GET A$:IF A$ = "" THEN 110   Warteschleife<br/>
 120 GOTO 10 neuer Versuch</p>
 
 <h2>Adresse 158 und 159 ($9E und $9F)</h2>
@@ -85,11 +85,11 @@
 
 <p>Das Basic der Commodore-Computer kennt neben der Variablen ST (siehe Speicherzelle 144) noch zwei weitere »reservierte« Variable, nämlich TI und TI$. Beide bieten eine interne Uhr, welche aus dem Inhalt der Speicherzellen 160 bis 162 abgeleitet wird. Diese drei Zellen funktionieren wie der Kilometerzähler eines Autos, halt nur mit drei Stellen.</p>
 
-<p>Die hinterste Stelle ist die Zelle 162. Ihr Inhalt wird beim Einschalten des Computers auf 0 gesetzt, dann aber 60mal in der Sekunde um 1 erhöht. Das erfolgt durch die automatische Interrupt-Routine, welche auch die STOP-Taste abfragt und noch andere Hausaufgaben 60mal in der Sekunde ausführt. Da %0 = 0,01667 ist, zählt also die Zelle 162 in 0,01667 Sekunden um 1 weiter. Sie kann wie alle Speicherzellen maximal nur die Zahl 255 enthalten, danach kommt wieder eine 0. Das heißt aber, daß sie nach 256 * 0,01667 = 4,267 Sekunden einmal durchgelaufen ist.</p>
+<p>Die hinterste Stelle ist die Zelle 162. Ihr Inhalt wird beim Einschalten des Computers auf 0 gesetzt, dann aber 60mal in der Sekunde um 1 erhöht. Das erfolgt durch die automatische Interrupt-Routine, welche auch die STOP-Taste abfragt und noch andere Hausaufgaben 60mal in der Sekunde ausführt. Da 1/60 = 0,01667 ist, zählt also die Zelle 162 in 0,01667 Sekunden um 1 weiter. Sie kann wie alle Speicherzellen maximal nur die Zahl 255 enthalten, danach kommt wieder eine 0. Das heißt aber, daß sie nach 256 * 0,01667 = 4,267 Sekunden einmal durchgelaufen ist.</p>
 
 <p>Nach jedem Durchlauf wird die davorliegende Speicherzelle 161 um 1 erhöht. Sie zählt also in 4,267 Sekunden um 1 weiter und ist nach 256 * 4,067 = 1092,26 Sekunden oder besser nach 18,2044 Minuten einmal durchgelaufen. Nach dem Kilometerzähler-Prinzip wird nach jedem Durchlauf von 161 der Inhalt der davorliegenden Zelle 160 um 1 erhöht.</p>
 
-<p>Die Zelle 160 zählt also in 18,2044 Minuten um 1 weiter und ist nach 256 * 18, 2044 = 4 660,34 Minuten, das sind 77,67 Stunden, einmal durchgelaufen.</p>
+<p>Die Zelle 160 zählt also in 18,2044 Minuten um 1 weiter und ist nach 256 * 18,2044 = 4660,34 Minuten, das sind 77,67 Stunden, einmal durchgelaufen.</p>
 
 <p>Diese Stundenzahl wird allerdings niemals erreicht, da das Betriebssystem nach Erreichen des Wertes für 24 Stunden alle drei Zellen wieder auf 0 zurücksetzt. Wir werden das gleich nachprüfen.</p>
 
@@ -100,7 +100,7 @@
 <p>Nach RUN sehen wir den Inhalt der drei Zellen sich entsprechend der oben angegebenen Zeiten verändern. Die Zahlen sind nicht vorherbestimmbar, denn der Zähler ist ja nach dem Einschalten des Computers schon losgelaufen. Er kann aber auf 0 gesetzt werden durch Einfügen der Zeile 5:<br/>
 5 POKE 160,0:POKE 161,0:POKE 162,0</p>
 
-<p>Jetzt beginnt der Zähler immer ab 0. Ich habe gerade gesagt, daß der Zähler auf 0 gesetzt wird, wenn er 24 Stunden lang gelaufen ist. Der Inhalt in den drei Speicherzellen, der 24 Stunden entspricht, ist nach der oben angegebenen Umrechnungsart 79-26-0. Diesen Wert, oder besser noch ein Wert kurz davor, in die Zellen 160 bis 162 gePOKEt, zeigt uns den Nullsetzvorgang. Ersetzen Sie bitte die obige Zeile 5 durch eine neue Zeile:<br/>
+<p>Jetzt beginnt der Zähler immer ab 0. Ich habe gerade gesagt, daß der Zähler auf 0 gesetzt wird, wenn er 24 Stunden lang gelaufen ist. Der Inhalt in den drei Speicherzellen, der 24 Stunden entspricht, ist nach der oben angegebenen Umrechnungsart 79-26-0. Diesen Wert, oder besser noch ein Wert kurz davor, in die Zellen 160 bis 162 gepoket, zeigt uns den Nullsetzvorgang. Ersetzen Sie bitte die obige Zeile 5 durch eine neue Zeile:<br/>
 5 POKE 160,79:POKE 161,25: POKE 162,0</p>
 
 <p>Nach vier Sekunden Laufzeit schalten alle drei Zellen in der Tat auf 0 zurück.</p>
@@ -133,7 +133,7 @@
 
 <p>. Die meisten der nächsten 20 Speicherzellen werden bei Operationen mit der RS232-Schnittstelle, die über den User-Port den Computer mit anderen Geräten verbindet, eingesetzt. Da die Programmierung der RS232-Schnittstelle nicht zu den üblichen Programmierarbeiten zählt, sondern nur von wenigen Spezialisten verwendet wird, gehe ich auf diese RS232-Adressen nicht im Detail ein. Dies sollte einem eigenen Spezialkurs vorbehalten sein.</p>
 
-<p>Adresse 167 ($A7) Zwischenspeicher für Kassetten-Opera-tionen und für Eingabe über die RS232-Schnittstelle</p>
+<p>Adresse 167 ($A7) Zwischenspeicher für Kassetten-Operationen und für Eingabe über die RS232-Schnittstelle</p>
 
 <p>Diese Speicherzelle wird verwendet, um jedes Bit, welches von einem RS232-Kanal über den User-Port eingelesen wird, zwischenzuspeichern.</p>
 
@@ -169,7 +169,7 @@
 
 <h2>Adresse 172 und 173 ($AC und $AD)</h2>
 
-<h3>Zeiger auf die Anfangsadresse für Ein-/ Ausgabe, Zwischenspeicher für den Bildschirmeditor</h3>
+<h3>Zeiger auf die Anfangsadresse für Ein-/Ausgabe, Zwischenspeicher für den Bildschirmeditor</h3>
 
 <p>In den Speicherzellen 193/194 steht ein Zeiger, der auf die Adresse im Programmspeicher zeigt, wo das Programm beginnt beziehungsweise beginnen soll, welches abgespeichert beziehungsweise geladen werden soll.</p>
 
@@ -181,7 +181,7 @@
 
 <h2>Adresse 174 und 175 ($AE und $AF)</h2>
 
-<h3>Zeiger auf die Endadresse für Ein-/Aus-gabe, Zwischenspeicher für den Bildschirmeditor</h3>
+<h3>Zeiger auf die Endadresse für Ein-/Ausgabe, Zwischenspeicher für den Bildschirmeditor</h3>
 
 <p>Dieser Zeiger ist der Zwilling zu 172/173, nur zeigt er seinerseits auf die letzte Adresse des zu bewegenden Programms (siehe oben).</p>
 
@@ -201,7 +201,7 @@
 
 <h3>RS232-Bit-Zähler und -Zwischenspeicher für Kassetten-Operationen</h3>
 
-<p>Die RS232-Routinen verwenden die Speicherzelle 180, um die Zahl der übertragenen Bits zu zählen, außerdem für Parity-Berechnung (siehe Texteinschub 3) und Stop-Bit-Bearbei-tung. Die Lade-Routinen für Kassettenbetrieb benutzen diese Zelle als Flagge, die angibt, ob der Computer bereit ist, Daten zu übernehmen.</p>
+<p>Die RS232-Routinen verwenden die Speicherzelle 180, um die Zahl der übertragenen Bits zu zählen, außerdem für Parity-Berechnung (siehe Texteinschub 3) und Stop-Bit-Bearbeitung. Die Lade-Routinen für Kassettenbetrieb benutzen diese Zelle als Flagge, die angibt, ob der Computer bereit ist, Daten zu übernehmen.</p>
 
 <h2>Adresse 181 ($B5)</h2>
 
@@ -249,13 +249,13 @@ Zeile 10 rechnet TI in Sekunden um. Damit die Zeile nicht mit vielen Dezimalstel
 
 <p>Das erste, was beim Ablauf des Programms auffällt, ist die gleichzeitige Umschaltung beider Zahlenreihen. Die Umrechnung von TI$ nach TI geht am besten »zu Fuß«. Stoppen Sie den Lauf mit der STOP-Taste. Nehmen Sie dann den letzten Wert von TI$ (rechts). Die ersten beiden Ziffern sind die Stunden, ihr Wert wird mit 3600 multipliziert, um sie in Sekunden umzurechnen. Addieren Sie dazu den Wert der mittleren beiden Ziffern (Minuten) multipliziert mit 60, und addieren Sie zu diesem Zwischenergebnis die Sekunden (Ziffern ganz rechts). Das Resultat ist identisch mit dem letzten Wert von TI.</p>
 
-<p>Wenn Sie übrigens den Ausdruck für TI$ optisch verbessern wollen, dann setzen Sie zwischen die Stunden, Minuten und Sekunden einen Doppelpunkt. Das wird durch eine String-Manipu-lation erreicht:</p>
+<p>Wenn Sie übrigens den Ausdruck für TI$ optisch verbessern wollen, dann setzen Sie zwischen die Stunden, Minuten und Sekunden einen Doppelpunkt. Das wird durch eine String-Manipulation erreicht:</p>
 
-<p>Print LEFT$(TI$,2)&ldquo;:"MID$(TI$,3,2)&rdquo;:&ldquo;RIGHT$(TI$,2)</p>
+<p>Print LEFT$(TI$,2)":"MID$(TI$,3,2)":"RIGHT$(TI$,2)</p>
 
 <p>Eine gute Uhr muß sich stellen lassen — bei TI$ erreichen wir das einfach mit Zuweisen des gewünschten Wertes an die Variable TI$. Zum Beispiel stellt</p>
 
-<p>TI$ = &ldquo;153000&rdquo;<br/>
+<p>TI$ = "153000"<br/>
 die Uhr auf 15 Uhr 30. Man kann sie dementsprechend auch auf 0 zurücksetzen, was bei einem Stoppuhr-Betrieb notwendig wird.</p>
 
 <p>TI kann direkt nicht beeinflußt werden, nur über POKEn von neuen Werten in die Speicherzellen 160 bis 162 oder durch die Zuweisung von Werten an TI$.</p>
@@ -274,19 +274,19 @@ und die Uhr startet von Null an.</p>
 <p>Die erste Zeile setzt die Uhr auf 0, das kennen wir schon.</p>
 
 <p>Die zweite Zeile druckt am Ende des Programms die abgelaufene Zeit aus.<br/>
-10 TI$ = &ldquo;000000&rdquo;<br/>
-10000 PRINT TI/60 &ldquo;SEKUNDEN&rdquo;</p>
+10 TI$ = "000000"<br/>
+10000 PRINT TI/60 "SEKUNDEN"</p>
 
 <p>Das zu messende Programm steht zwischen diesen beiden Zeilen.</p>
 
 <p>Das zweite Beispiel betrifft eine Uhr, die nach einer vorgegebenen Zeit ein Programm (Spiel) abbricht. Davon zeige ich zwei Versionen. Die eine Version ist nach allen Erklärungen von oben beinahe trivial:<br/>
-10 TI$ = &ldquo;000000&rdquo;<br/>
-1000 IF TI$ >&ldquo;000700&rdquo; THEN STOP</p>
+10 TI$ = "000000"<br/>
+1000 IF TI$ >"000700" THEN STOP</p>
 
 <p>Diese beiden Zeilen setzen die Uhr auf 0 und brechen ein Programm nach genau 7 Minuten ab.</p>
 
 <p>Etwas kniffliger ist der Abbruch (oder Start) mit einer Count-Down Uhr.<br/>
-10 TI$ = &ldquo;000000&rdquo;<br/>
+10 TI$ = "000000"<br/>
 20 ZEIT = 300<br/>
 30 IF ZEIT-VAL(TI$) &lt;= 0 THEN STOP<br/>
 40 weiteres Programm</p>
@@ -310,7 +310,7 @@ und die Uhr startet von Null an.</p>
 <p>Zuerst wollen wir die Funktionsweise von 166 erproben. Dazu laden wir eine simple Datei auf ein leeres Band, und zwar mit folgendem Programm:<br/>
 Programm # 1<br/>
 10 OPEN 1,1,1<br/>
-20 FORI = lOOTOlSO<br/>
+20 FOR I = 100 TO 150<br/>
 30 PRINT #1,1<br/>
 40 NEXT<br/>
 50 CLOSE 1</p>
@@ -319,7 +319,8 @@ Programm # 1<br/>
 
 <p>Den Zusammenhang zwischen den Datei-Zahlen und dem Zähler in 166 zeigt uns das folgende Ausleseprogramm:<br/>
 Programm # 2<br/>
-10 OPEN 1,1,0 20 GET #l,X$<br/>
+10 OPEN 1,1,0<br/>
+20 GET #1,X$<br/>
 30 Print X$;<br/>
 40 PRINT CHR$(28)PEEK(166)CHR$(154);<br/>
 50 GOTO 20</p>
@@ -347,7 +348,7 @@ Programm # 2<br/>
 <p>Dieses Abfragen und Abändern der Speicherzelle 166 geht natürlich auch in der anderen Richtung, nämlich beim Abspeichern von Zahlen. Nehmen Sie bitte nochmal das Programm # 1 her und ändern Sie es wie folgt ab:<br/>
 Programm # 1.a<br/>
 10 OPEN 1,1,1<br/>
-20 FORI = 100TG300<br/>
+20 FOR I = 100 TO 300<br/>
 30 PRINT#1,1<br/>
 35 IF PEEK(166)=18 THEN POKE 166,191<br/>
 40 NEXT<br/>
