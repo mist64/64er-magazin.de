@@ -16,71 +16,72 @@
 <body>
     <article>
         <h1>Hardcopy leicht gemacht</h1>
-<blockquote><p>Hardcopy-Programme konnten wir Ihnen schon viele vorstellen. Allerdings meist in Form von undurchsichtigen Maschinenroutinen. Hier zeigen wir Ihnen, wie man ein Hardcopy-Programm in Basic schreibt.</p></blockquote>
+        <p class="intro">Hardcopy-Programme konnten wir Ihnen schon viele vorstellen. Allerdings meist in Form von undurchsichtigen Maschinenroutinen. Hier zeigen wir Ihnen, wie man ein Hardcopy-Programm in Basic schreibt.</p>
 
-<p>Eine Hardcopy ist die Kopie dessen, was auf dem Bildschirm zu sehen ist, auf Papier. Dazu wird Zeichen für Zeichen aus dem Bildschirmspeicher geholt und an den Drucker gesandt, sofern ein Textbildschirm kopiert werden soll. Der C 64 kennt zwei verschiedene Arten der Bildschirmdarstellung, die nicht ohne weiteres miteinander gemischt werden können: Text und hochauflösende Grafik.</p>
+        <p>Eine Hardcopy ist die Kopie dessen, was auf dem Bildschirm zu sehen ist, auf Papier. Dazu wird Zeichen für Zeichen aus dem Bildschirmspeicher geholt und an den Drucker gesandt, sofern ein Textbildschirm kopiert werden soll. Der C 64 kennt zwei verschiedene Arten der Bildschirmdarstellung, die nicht ohne weiteres miteinander gemischt werden können: Text und hochauflösende Grafik.</p>
 
-<p>Im folgenden soll die Hardcopy des Textbildschirmes näher betrachtet werden. Dazu soll ein einfaches Basic-Listing (Listing 1, Bild 1) dienen, das auf jedem Drucker den momentan am Bildschirm stehenden Text ausdruckt. Vielleicht kennen Sie das Listing in ähnlicher Form aus dem Handbuch zum Commodore MPS801. Es ist nicht ganz perfekt, aber einfach zu verstehen. Damit das Programm auch mit anderen Druckern arbeitet, müssen Sie die jeweils angegebenen Änderungen daran vornehmen.</p>
+        <p>Im folgenden soll die Hardcopy des Textbildschirmes näher betrachtet werden. Dazu soll ein einfaches Basic-Listing (Listing 1, Bild 1) dienen, das auf jedem Drucker den momentan am Bildschirm stehenden Text ausdruckt. Vielleicht kennen Sie das Listing in ähnlicher Form aus dem Handbuch zum Commodore MPS801. Es ist nicht ganz perfekt, aber einfach zu verstehen. Damit das Programm auch mit anderen Druckern arbeitet, müssen Sie die jeweils angegebenen Änderungen daran vornehmen.</p>
 
-<p>Doch vor der Praxis etwas Theorie über die Organisation des Textbildschirmes des C 64. Der C 64 kann höchstens 1000 Zeichen am Bildschirm darstellen. Und zwar in 25 Zeilen zu je 40 Spalten. Für die 1000 Zeichen besitzt der C 64 einen reservierten Schreib-/Lese-Speicher-bereich, den Bildschirmspeicher. Der Bildschirmspeicher liegt zwischen den Speicheradressen 1024 und 2023. Probieren Sie mal POKE 1024,1 aus: Ein »A« erscheint links oben am Bildschirm. POKE 1025,2 läßt ein »B« um eine Stelle nach rechts versetzt erscheinen. Mit dem Befehl PRINT PEEK(1024) erhalten Sie als Ergebnis »1«. »1« ist der Bildschirmcode des Zeichens »A«. Wenn Sie 129 anstelle von 1 in die Speicherzelle 1024 POKEn, erscheint ein reverses »A« an der ersten Bildschirmstelle. Mit den Codes 0 bis 127 können Sie alle normalen Zeichen des C 64 darstellen, mit den Codes 128 bis 255 die reversen. Diese Codes werden als »Bildschirmcodes« bezeichnet. Das folgende kleine Programm erzeugt den gesamten C 64-Zeichensatz am Bildschirm.</p>
+        <p>Doch vor der Praxis etwas Theorie über die Organisation des Textbildschirmes des C 64. Der C 64 kann höchstens 1000 Zeichen am Bildschirm darstellen. Und zwar in 25 Zeilen zu je 40 Spalten. Für die 1000 Zeichen besitzt der C 64 einen reservierten Schreib-/Lese-Speicher-bereich, den Bildschirmspeicher. Der Bildschirmspeicher liegt zwischen den Speicheradressen 1024 und 2023. Probieren Sie mal POKE 1024,1 aus: Ein »A« erscheint links oben am Bildschirm. POKE 1025,2 läßt ein »B« um eine Stelle nach rechts versetzt erscheinen. Mit dem Befehl PRINT PEEK(1024) erhalten Sie als Ergebnis »1«. »1« ist der Bildschirmcode des Zeichens »A«. Wenn Sie 129 anstelle von 1 in die Speicherzelle 1024 POKEn, erscheint ein reverses »A« an der ersten Bildschirmstelle. Mit den Codes 0 bis 127 können Sie alle normalen Zeichen des C 64 darstellen, mit den Codes 128 bis 255 die reversen. Diese Codes werden als »Bildschirmcodes« bezeichnet. Das folgende kleine Programm erzeugt den gesamten C 64-Zeichensatz am Bildschirm.</p>
 
-<p>10 print chr$(147)<br/>
-20 for i = 0 to 255<br/>
-30 poke 1024 + i,i<br/>
-40 next i</p>
+        <p>10 print chr$(147)<br>
+            20 for i = 0 to 255<br>
+            30 poke 1024 + i,i<br>
+            40 next i</p>
 
-<p>Die Bildschirmcodes dürfen nicht mit den ASCII-Codes verwechselt werden. Die ASCII-Codes gelten nämlich nur für den CHR$(x)-Befehl, mit dem Sie Zeichen über die PRINT-Anweisung drucken können. So kann das gleiche »A«, das Sie mit POKE 1024,1 auf den Bildschirm gebracht haben, auch durch PRINT CHR$(64) gedruckt werden. Nicht aber mit CHR$(1). Vergleichen Sie dazu einmal die Bildschirm- und ASCII-Tabelle im C 64-Handbuch. Sie werden feststellen, daß nicht nur die Codes verschieden sind, sondern auch, daß die ASCII-Tabelle keine Reverszeichen kennt.</p>
+        <p>Die Bildschirmcodes dürfen nicht mit den ASCII-Codes verwechselt werden. Die ASCII-Codes gelten nämlich nur für den CHR$(x)-Befehl, mit dem Sie Zeichen über die PRINT-Anweisung drucken können. So kann das gleiche »A«, das Sie mit POKE 1024,1 auf den Bildschirm gebracht haben, auch durch PRINT CHR$(64) gedruckt werden. Nicht aber mit CHR$(1). Vergleichen Sie dazu einmal die Bildschirm- und ASCII-Tabelle im C 64-Handbuch. Sie werden feststellen, daß nicht nur die Codes verschieden sind, sondern auch, daß die ASCII-Tabelle keine Reverszeichen kennt.</p>
 
-<h2>Prinzip der Hardcopy</h2>
+        <h2>Prinzip der Hardcopy</h2>
 
-<p>Eine Hardcopy macht im Prinzip nun nichts weiter, als ab Adresse 1024 nachemeinder alle Zeichen aus dem Bildschirmspeicher zu lesen und in der gleichen Reihenfolge an den Drucker zu schicken. Da aber der Drucker keine Bildschirmcodes versteht, müssen Sie ins ASCII-Format übersetzt werden. Die Vorschrift für eine Bildschirmcode-ASCII-Wandlung:</p>
+        <p>Eine Hardcopy macht im Prinzip nun nichts weiter, als ab Adresse 1024 nachemeinder alle Zeichen aus dem Bildschirmspeicher zu lesen und in der gleichen Reihenfolge an den Drucker zu schicken. Da aber der Drucker keine Bildschirmcodes versteht, müssen Sie ins ASCII-Format übersetzt werden. Die Vorschrift für eine Bildschirmcode-ASCII-Wandlung:</p>
 
-<p>TODO</p>
+        <p>TODO</p>
 
-<p>Bildschirmcode  ASCII-Korrekturfaktor<br/>
-0 &hellip; 31    + 64<br/>
-32 &hellip; 63   ±0<br/>
-64 &hellip; 95   + 32<br/>
-96 &hellip; 127  + 64<br/>
-128&hellip; 255  1. -128<br/>
-2. danach nochmalige Wandlung und Zeichen revers drucken</p>
+        <p>Bildschirmcode ASCII-Korrekturfaktor<br>
+            0 &hellip; 31 + 64<br>
+            32 &hellip; 63 ±0<br>
+            64 &hellip; 95 + 32<br>
+            96 &hellip; 127 + 64<br>
+            128&hellip; 255 1. -128<br>
+            2. danach nochmalige Wandlung und Zeichen revers drucken</p>
 
-<p>Um Bildschirmcode in ASCII-Code zu wandeln, müssen Sie die angegebenen Korrekturfaktoren zu den Bildschirmcodes addieren. Bildschirmcodes über 127 müssen erst um 128 verringert und dann ins ASCII-Format übersetzt werden. Aus den Bildschirmcodes der reversen Zeichen werden nämlich erst die Codes der entsprechenden »normalen« Zeichen gemacht. Die reversen Zeichen wurden normal gedruckt. Aber mit einem kleinen Trick schafft man auch die reverse Darstellung. Vorausgesetzt man hat einen Commodore MPS801 oder einen anderen Drucker, bei dem CHR$(18) und CHR$(146) den Reversdruck ein- und ausschalten. Ein reverses »A«, zum Beispiel, wird bei diesen Druckern über die Kommandofolge: PRINT CHR$(18)+&ldquo;A&rdquo; + CHR$(146) ausgegeben.</p>
+        <p>Um Bildschirmcode in ASCII-Code zu wandeln, müssen Sie die angegebenen Korrekturfaktoren zu den Bildschirmcodes addieren. Bildschirmcodes über 127 müssen erst um 128 verringert und dann ins ASCII-Format übersetzt werden. Aus den Bildschirmcodes der reversen Zeichen werden nämlich erst die Codes der entsprechenden »normalen« Zeichen gemacht. Die reversen Zeichen wurden normal gedruckt. Aber mit einem kleinen Trick schafft man auch die reverse Darstellung. Vorausgesetzt man hat einen Commodore MPS801 oder einen anderen Drucker, bei dem CHR$(18) und CHR$(146) den Reversdruck ein- und ausschalten. Ein reverses »A«, zum Beispiel, wird bei diesen Druckern über die Kommandofolge: PRINT CHR$(18)+"A" + CHR$(146) ausgegeben.</p>
 
-<p>Das ganze Problem der Bild-schirmcode-/ASCII-Wandlung kann nur mit Maschinensprache vollends gelöst oderbesserumgangen werden, indem man den Textbildschirm wie einen Grafikbildschirm behandelt. Wie das geht, erfahren Sie in der nächsten Ausgabe, in der wir Ihnen ein Maschinenprogramm vorstellen, das auf Tastendruck eine Hardcopy vom Textbildschirm druckt. Daß man nicht auf Maschinensprache verzichten kann, liegt einfach daran, daß Basic-Befehle nur auf festgelegte Speicherebenen zugreifen können.</p>
+        <p>Das ganze Problem der Bild-schirmcode-/ASCII-Wandlung kann nur mit Maschinensprache vollends gelöst oderbesserumgangen werden, indem man den Textbildschirm wie einen Grafikbildschirm behandelt. Wie das geht, erfahren Sie in der nächsten Ausgabe, in der wir Ihnen ein Maschinenprogramm vorstellen, das auf Tastendruck eine Hardcopy vom Textbildschirm druckt. Daß man nicht auf Maschinensprache verzichten kann, liegt einfach daran, daß Basic-Befehle nur auf festgelegte Speicherebenen zugreifen können.</p>
 
-<p>Doch nun zurück zu der kleinen Basic-Routine, die eine Hardcopy eines Textbildschirmes druckt. In Zeile 60010 wird die Adresse des VIC-Registers 24 berechnet, das für die Schriftart verantwortlich ist: Groß-/ Grafik- oder der GroB-/Kleinmodus. Die Adresse des Registers wird an die Variable MO (Modus) übergeben um mit dem PEEK-Befehl das Register auszulesen. Der Registerin-halt entscheidet in Zeile 60070 darüber, welche Sekundäradresse für den Drucker ausgewählt wird. Entweder keine Sekundäradresse für Groß/Grafik (Zeile 60080) oder »7« für Klein/Groß (60100). Ist Bit 2 und 3 von MO gesetzt, dann liegt Groß-/ Kleinmodus vor.</p>
+        <p>Doch nun zurück zu der kleinen Basic-Routine, die eine Hardcopy eines Textbildschirmes druckt. In Zeile 60010 wird die Adresse des VIC-Registers 24 berechnet, das für die Schriftart verantwortlich ist: Groß-/ Grafik- oder der GroB-/Kleinmodus. Die Adresse des Registers wird an die Variable MO (Modus) übergeben um mit dem PEEK-Befehl das Register auszulesen. Der Registerin-halt entscheidet in Zeile 60070 darüber, welche Sekundäradresse für den Drucker ausgewählt wird. Entweder keine Sekundäradresse für Groß/Grafik (Zeile 60080) oder »7« für Klein/Groß (60100). Ist Bit 2 und 3 von MO gesetzt, dann liegt Groß-/ Kleinmodus vor.</p>
 
-<p>In den Zeilen 60050 und 60060 werden einige bestimmte Steuercodes für den Drucker Variablen zugeordnet. Im Einzelnen:<br/>
-QU$ = CHR$(34): ASCII-Codes eines Anführungszeichen<br/>
-RV$ = CHR$(18): reverse Schrift ein-schalten<br/>
-RO$ = CHR$(146): reverse Schrift ausschalten</p>
+        <p>In den Zeilen 60050 und 60060 werden einige bestimmte Steuercodes für den Drucker Variablen zugeordnet. Im Einzelnen:<br>
+            QU$ = CHR$(34): ASCII-Codes eines Anführungszeichen<br>
+            RV$ = CHR$(18): reverse Schrift ein-schalten<br>
+            RO$ = CHR$(146): reverse Schrift ausschalten</p>
 
-<p>Wie Sie sehen, sind die genannten Steuercodes für den Commodore Drucker MPS 801 mit denen des C 64 identisch. Haben Sie keinen MPS 801-kompatiblen Drucker, entnehmen Sie bitte die Steuercodes Ihres Druckers dem Drucker- oder Interface-Handbuch. Sollte Ihr Drucker keine Reverszeichen druk-ken können, bleibt Ihnen nichts weiter übrig, als reverse Zeichen in normaler Darstellung ausgeben zu lassen. Definieren Sie dazu RO$ und RV$ als CHR$(0) oder als einen anderen ASCII-Code, den Ihr Drucker ignoriert. Auf diese Weise ersparen Sie sich das Durchsuchen des Listings nach Steuercodes und deren Entfernung.</p>
+        <p>Wie Sie sehen, sind die genannten Steuercodes für den Commodore Drucker MPS 801 mit denen des C 64 identisch. Haben Sie keinen MPS 801-kompatiblen Drucker, entnehmen Sie bitte die Steuercodes Ihres Druckers dem Drucker- oder Interface-Handbuch. Sollte Ihr Drucker keine Reverszeichen druk-ken können, bleibt Ihnen nichts weiter übrig, als reverse Zeichen in normaler Darstellung ausgeben zu lassen. Definieren Sie dazu RO$ und RV$ als CHR$(0) oder als einen anderen ASCII-Code, den Ihr Drucker ignoriert. Auf diese Weise ersparen Sie sich das Durchsuchen des Listings nach Steuercodes und deren Entfernung.</p>
 
-<p>In Zeile 60050 stellt das Programm die Bildschirm-Anfangsadresse fest, die nicht grundsätzlich immer bei 1024 liegen muß. Das High-Byte dieser Adresse steht in der Speicherzelle 648, es muß mit 256 multipliziert werden. Ein Low-Byte existiert nicht, da der Bildschirm nur um ganze KByte verschoben sein kann. In Zeile 60080 wird schließlich der Druckerkanal für Groß-/Grafik-modus geöffnet, entsprechend in Zeile 60100 für GroB-/Kleinmodus. Diese Sekundäradressen müssen Sie, so wie die Steuercodes, auch auf Ihren Drucker anpassen.</p>
+        <p>In Zeile 60050 stellt das Programm die Bildschirm-Anfangsadresse fest, die nicht grundsätzlich immer bei 1024 liegen muß. Das High-Byte dieser Adresse steht in der Speicherzelle 648, es muß mit 256 multipliziert werden. Ein Low-Byte existiert nicht, da der Bildschirm nur um ganze KByte verschoben sein kann. In Zeile 60080 wird schließlich der Druckerkanal für Groß-/Grafik-modus geöffnet, entsprechend in Zeile 60100 für GroB-/Kleinmodus. Diese Sekundäradressen müssen Sie, so wie die Steuercodes, auch auf Ihren Drucker anpassen.</p>
 
-<h2>Hardcopy in Basic</h2>
+        <h2>Hardcopy in Basic</h2>
 
-<p>Ab Zeile 60110 beginnt schließlich die eigentliche Hardcopy. Die ganze Routine besteht im Prinzip aus zwei FOR-NEXT-Schleifen, die jede Zeile spaltenweise »abtasten«. Die erste Schleife (60120&hellip;60340) erhöht die Zeilenzahl (Variable Z), die zweite (60150&hellip;60310) die Spaltenzahl (Variable S). Vor Eintritt in die Spaltenschleife wird die später zu druckende Variable A$ gelöscht. Denn wenn nichts in einer Zeile steht, soll auch nichts gedruckt werden. Ebenso wird QE die Flag-Variable für den Quote-Modus, zurückgesetzt.</p>
+        <p>Ab Zeile 60110 beginnt schließlich die eigentliche Hardcopy. Die ganze Routine besteht im Prinzip aus zwei FOR-NEXT-Schleifen, die jede Zeile spaltenweise »abtasten«. Die erste Schleife (60120&hellip;60340) erhöht die Zeilenzahl (Variable Z), die zweite (60150&hellip;60310) die Spaltenzahl (Variable S). Vor Eintritt in die Spaltenschleife wird die später zu druckende Variable A$ gelöscht. Denn wenn nichts in einer Zeile steht, soll auch nichts gedruckt werden. Ebenso wird QE die Flag-Variable für den Quote-Modus, zurückgesetzt.</p>
 
-<p>Quote-Modus bedeutet, daß alle folgenden Zeichen innerhalb von Anführungszeichen stehen. Diese Flagge wird auf »1« gesetzt, sobald ein Anführungszeichen gedruckt werden soll. Nach dem zweiten Anführungszeichen wird QF wieder auf »0« gesetzt. Innerhalb von zwei Anführungszeichen bedeutet beispielsweise CHR$(18) ein reverses »R«, sonst aber, daß alle folgenden Zeichen revers gedruckt werden. Drücken Sie mal »Cursor rechts«. Der Cursor bewegt sich nach rechts über den Bildschirm. Drücken Sie dann die»" «-Taste und dann »Cursor rechts«. Es erscheinen lauter reverse eckige Klammern, die Steuerzeichen für Cursor rechts. Sie befinden sich im Quote-Modus. Es ist sehr wichtig zwischen dem normalen und dem Quote-Modus zu unterscheiden. Auf den Code CHR$(18) hin druckt auch der Drucker alle folgenden Zeichen revers, während die Sequenz Anführungszeichen, CHR$(18) nur ein reverses »R« erzeugt, genauso wie am Bildschirm.</p>
+        <p>Quote-Modus bedeutet, daß alle folgenden Zeichen innerhalb von Anführungszeichen stehen. Diese Flagge wird auf »1« gesetzt, sobald ein Anführungszeichen gedruckt werden soll. Nach dem zweiten Anführungszeichen wird QF wieder auf »0« gesetzt. Innerhalb von zwei Anführungszeichen bedeutet beispielsweise CHR$(18) ein reverses »R«, sonst aber, daß alle folgenden Zeichen revers gedruckt werden. Drücken Sie mal »Cursor rechts«. Der Cursor bewegt sich nach rechts über den Bildschirm. Drücken Sie dann die»" «-Taste und dann »Cursor rechts«. Es erscheinen lauter reverse eckige Klammern, die Steuerzeichen für Cursor rechts. Sie befinden sich im Quote-Modus. Es ist sehr wichtig zwischen dem normalen und dem Quote-Modus zu unterscheiden. Auf den Code CHR$(18) hin druckt auch der Drucker alle folgenden Zeichen revers, während die Sequenz Anführungszeichen, CHR$(18) nur ein reverses »R« erzeugt, genauso wie am Bildschirm.</p>
 
-<p>In Zeile 60170 werden die Zeichencodes aus dem Bildschirmspeicher mit PEEK geholt. Die Zeichenadresse berechnet sich aus der Startadresse BA + 40*Zeile + Spalte. Danach wird als erstes untersucht, ob der gelesene Code ein Anführungszeichen ist. Wenn ja, wird, wie schon erwähnt, das Quoteflag QF gesetzt. Ist BC der Code für ein reverses Anführungszeichen (Bildschirmcode 162), wird BC der Code für einen reversen Apostroph zugewiesen. Diese »Umgehung« ist nötig, weil ein reverses Anführungszeichen nicht ohne weiteres gedruckt werden kann.</p>
+        <p>In Zeile 60170 werden die Zeichencodes aus dem Bildschirmspeicher mit PEEK geholt. Die Zeichenadresse berechnet sich aus der Startadresse BA + 40*Zeile + Spalte. Danach wird als erstes untersucht, ob der gelesene Code ein Anführungszeichen ist. Wenn ja, wird, wie schon erwähnt, das Quoteflag QF gesetzt. Ist BC der Code für ein reverses Anführungszeichen (Bildschirmcode 162), wird BC der Code für einen reversen Apostroph zugewiesen. Diese »Umgehung« ist nötig, weil ein reverses Anführungszeichen nicht ohne weiteres gedruckt werden kann.</p>
 
-<h2>Bildschirmcode-/ASCII-Wandlung mit Tricks</h2>
+        <h2>Bildschirmcode-/ASCII-Wandlung mit Tricks</h2>
 
-<p>Die Bildschirmcodes werden ab Zeile 60220 in ASCII-Format gewandelt. Eine besondere Erklärung bedarf die Zeile 60250. Da alle Bildschirmcodes größer als 127 die reversen Darstellungen der Codes 0 bis 127 sind, werden diese Codes um 128 verringert und das Reversflag RF gesetzt. Ist RF = 1, dann wird vor dem eigentlichen Zeichen ein CHR$(18) (Revers ein) an den Drucker geschickt und im Anschluß an das Zeichen ein CHR$(146) (Revers aus). In Zeile 60290 werden schließlich die ASCII-Codes einer ganzen Bildschirmzeile zusammengesetzt, komplett mit allen Druckersteuerzeichen. Wurden alle Spalten einer Zeile »abgetastet« und die ASCII-Codes in A$ addiert, wird A$ an den Drucker geschickt. Der Druck einer Zeile erfolgt schließlich in 60320 oder 60330 (wenn QF gesetzt ist, also im Quotemodus gedruckt wurde). Am Ende der Hardcopy wird in Zeile 60330 der Druckerkanal geschlossen.</p>
+        <p>Die Bildschirmcodes werden ab Zeile 60220 in ASCII-Format gewandelt. Eine besondere Erklärung bedarf die Zeile 60250. Da alle Bildschirmcodes größer als 127 die reversen Darstellungen der Codes 0 bis 127 sind, werden diese Codes um 128 verringert und das Reversflag RF gesetzt. Ist RF = 1, dann wird vor dem eigentlichen Zeichen ein CHR$(18) (Revers ein) an den Drucker geschickt und im Anschluß an das Zeichen ein CHR$(146) (Revers aus). In Zeile 60290 werden schließlich die ASCII-Codes einer ganzen Bildschirmzeile zusammengesetzt, komplett mit allen Druckersteuerzeichen. Wurden alle Spalten einer Zeile »abgetastet« und die ASCII-Codes in A$ addiert, wird A$ an den Drucker geschickt. Der Druck einer Zeile erfolgt schließlich in 60320 oder 60330 (wenn QF gesetzt ist, also im Quotemodus gedruckt wurde). Am Ende der Hardcopy wird in Zeile 60330 der Druckerkanal geschlossen.</p>
 
-<p>Diese Basic-Hardcopy-Routine können Sie eigenen Programmen anhängen und mit GOSUB 60000 aufrufen. Vergessen Sie dann aber nicht in Zeile 60340 ein RETURN einzugeben.</p>
+        <p>Diese Basic-Hardcopy-Routine können Sie eigenen Programmen anhängen und mit GOSUB 60000 aufrufen. Vergessen Sie dann aber nicht in Zeile 60340 ein RETURN einzugeben.</p>
 
-<p>TODO ASIDE</p>
+        <p>TODO ASIDE</p>
 
-<p>In den nächsten Ausgaben des 64'er Magazins setzen wir diesen Artikel fort. Da erfahren Sie, wie man in Maschinensprache eine Textbildschirm-Hardcopy-Routi-ne programmiert. Diese Routine druckt auf Tastendruck hin eine Text-Hardcopy. Mit allen Zeichen die der C 64 darstellen kann.</p>
+        <p>In den nächsten Ausgaben des 64'er Magazins setzen wir diesen Artikel fort. Da erfahren Sie, wie man in Maschinensprache eine Textbildschirm-Hardcopy-Routi-ne programmiert. Diese Routine druckt auf Tastendruck hin eine Text-Hardcopy. Mit allen Zeichen die der C 64 darstellen kann.</p>
 
-<p>Wir zeigen Ihnen dann auch, wie man eine Hardcopy des Grafikbildschirms zu Papier bringt.</p>
+        <p>Wir zeigen Ihnen dann auch, wie man eine Hardcopy des Grafikbildschirms zu Papier bringt.</p>
 
-<address class="author">(hm)</address>
+        <address class="author">(hm)</address>
     </article>
 </body>
+
 </html>
