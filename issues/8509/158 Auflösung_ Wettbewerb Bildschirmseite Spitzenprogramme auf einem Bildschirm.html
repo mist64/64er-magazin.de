@@ -83,6 +83,208 @@
         <p>Schließlich wurden noch der POKE- und der PEEK-Befehle angepaßt, so daß sich jetzt auch alle Parameter des SID mit PEEK auslesen lassen.</p>
 
         <address class="author">(Rüdiger Wemski/Martin Wernecke/bs)</address>
+
+        <figure>
+            <table>
+                <tr>
+                    <td>A</td>
+                    <td>Laufvarariable für Titelgrafik</td>
+                </tr>
+                <tr>
+                    <td>P</td>
+                    <td>Für Farbwechsel in der Titelgrafik</td>
+                </tr>
+                <tr>
+                    <td>X</td>
+                    <td>X-Koordinate vom Ball +1024 (Startadresse des Bildschirms)</td>
+                </tr>
+                <tr>
+                    <td>Y</td>
+                    <td>Y-Koordinate vom Ball</td>
+                </tr>
+                <tr>
+                    <td>V</td>
+                    <td>Vektor zur Berechnung der neuen X-Koordinate</td>
+                </tr>
+                <tr>
+                    <td>W</td>
+                    <td>Vektor zur Berechnung der neuen Y-Koordinate</td>
+                </tr>
+                <tr>
+                    <td>T</td>
+                    <td>Startadresse des SID +1</td>
+                </tr>
+                <tr>
+                    <td>G</td>
+                    <td>Zur Berechnung der Tonhöhe</td>
+                </tr>
+                <tr>
+                    <td>H</td>
+                    <td>Punkte-Rekord (Hi-score)</td>
+                </tr>
+                <tr>
+                    <td>P</td>
+                    <td>Punkte +1 (bei 150 – neue Mauer)</td>
+                </tr>
+                <tr>
+                    <td>S</td>
+                    <td>Anzahl der gespielten Bälle (für jede fertiggestellte Mauer –3)</td>
+                </tr>
+                <tr>
+                    <td>F</td>
+                    <td>Hilfsvariable zur Ballsteuerung innerhalb der Mauer</td>
+                </tr>
+                <tr>
+                    <td>A$</td>
+                    <td>Für Bildschirmaufbau der Mauer</td>
+                </tr>
+            </table>
+            <figcaption>Variablenliste »Block Busters«</figcaption>
+        </figure>
+
+        <figure>
+            <table>
+                <tr>
+                    <th>Zeile</th>
+                    <th>Bedeutung</th>
+                </tr>
+                <tr>
+                    <td>0</td>
+                    <td>Titelgrafik</td>
+                </tr>
+                <tr>
+                    <td>1</td>
+                    <td>Titelgrafik; Initialisierung des SID (Lautstärke)</td>
+                </tr>
+                <tr>
+                    <td>2</td>
+                    <td>Initialisierung der Variablen</td>
+                </tr>
+                <tr>
+                    <td>4</td>
+                    <td>Bildschirm löschen und Aufbau der Mauer</td>
+                </tr>
+                <tr>
+                    <td>6</td>
+                    <td>Löschen und Setzen der Ballposition</td>
+                </tr>
+                <tr>
+                    <td>8</td>
+                    <td>Berechnung der nächsten Ballposition; Tonerzeugung; Abfrage ob Ball kollidiert.</td>
+                </tr>
+                <tr>
+                    <td>10</td>
+                    <td>Berechnung der neuen Richtung des Balles innerhalb der Mauer</td>
+                </tr>
+                <tr>
+                    <td>14</td>
+                    <td>Bei erreichen von 150 Punkten (oder ein Vielfaches davon) erhält man 3 Bälle extra; Aufbau einer neuen Mauer</td>
+                </tr>
+                <tr>
+                    <td>16</td>
+                    <td>Richtungsänderung bei Kollision von Ball und Rahmen</td>
+                </tr>
+                <tr>
+                    <td>18</td>
+                    <td>Hochschnellen des Balles von der Grundlinie bei Betätigung des Feuerknopfes</td>
+                </tr>
+                <tr>
+                    <td>20</td>
+                    <td>Abfrage, ob die maximale Anzahl der gespielten Bälle schon erreicht ist</td>
+                </tr>
+                <tr>
+                    <td>22</td>
+                    <td>Ausgabe der erreichten Punkte und des Rekords; Behandlung derselben</td>
+                </tr>
+            </table>
+            <figcaption>Programmbeschreibung »Block Busters«</figcaption>
+        </figure>
+
+        <figure>
+            <table>
+  <tr>
+    <th>Zeile</th>
+    <th></th>
+    <th></th>
+  </tr>
+  <tr>
+    <td>0</td>
+    <td>POKE53281,0</td>
+    <td>Farbe Schwarz für Hintergrund</td>
+  </tr>
+  <tr>
+    <td>1</td>
+    <td>T=54273</td>
+    <td>Tongenerator Frequenz HI</td>
+  </tr>
+  <tr>
+    <td>1</td>
+    <td>POKET+23</td>
+    <td>Lautstärke 15</td>
+  </tr>
+  <tr>
+    <td>2</td>
+    <td>POKE53280,14</td>
+    <td>Farbe Hellblau des Rahmens</td>
+  </tr>
+  <tr>
+    <td>2</td>
+    <td>X=1034</td>
+    <td>Startadresse des Bildschirms + 10</td>
+  </tr>
+  <tr>
+    <td>2</td>
+    <td>POKET+4,51</td>
+    <td>Tongen. Anschlag 3; Abschwellen 3</td>
+  </tr>
+  <tr>
+    <td>26;2</td>
+    <td>WAIT56320,16,240</td>
+    <td>Warten auf Loslassen des Feuerknopfes (2)</td>
+  </tr>
+  <tr>
+    <td>6;8</td>
+    <td>Zahl 40</td>
+    <td>ist die Anzahl der Spalten</td>
+  </tr>
+  <tr>
+    <td>12</td>
+    <td>2 POKEs</td>
+    <td>Ton ausschalten; Ton einschalten</td>
+  </tr>
+  <tr>
+    <td>14</td>
+    <td>Zahl 1025</td>
+    <td>Bildschirmadr. 1</td>
+  </tr>
+  <tr>
+    <td>16</td>
+    <td>Zahl 1062</td>
+    <td>Bildschirmadr. -1 + Spaltenzahl</td>
+  </tr>
+  <tr>
+    <td>20;18</td>
+    <td>Zahl 23</td>
+    <td>Zeilenzahl -1</td>
+  </tr>
+  <tr>
+    <td>18</td>
+    <td>Zahl 24</td>
+    <td>Zeilenzahl</td>
+  </tr>
+  <tr>
+    <td>20</td>
+    <td>PEEK(56320)=111</td>
+    <td>Port 2 Feuerknopf gedrückt</td>
+  </tr>
+  <tr>
+    <td>24</td>
+    <td>WAIT56320,16</td>
+    <td>Warten auf Feuerknopf gedrückt</td>
+  </tr>
+</table>
+            <figcaption>Hinweise zu »Block Busters« für VC 2O-Besitzer</figcaption>
+        </figure>
     </article>
 </body>
 

@@ -42,11 +42,118 @@
 
         <address class="author">(Fred Behringer/ev)</address>
 
-        <p>TODO ASIDE "Beschreibung des Programms zum Endloslisten nach Listing 2 (kurze Form, ohne Rückwärtslisten)."</p>
+        <figure>
+            <table>
+                <tr>
+                    <th>Zeile</th>
+                    <th></th>
+                </tr>
+                <tr>
+                    <td>510-570</td>
+                    <td>Aufbau des Maschinenprogramms im Kassettenpuffer durch Aneinanderreihung von Teilen des Betriebssystems und leichte Ergänzungen und Abänderungen.</td>
+                </tr>
+                <tr>
+                    <td>510</td>
+                    <td>Übergabe der X/A-Register (dort steht die Nummer der zu listenden Basic-Zeile) an $0014/$0015 (20/21).</td>
+                </tr>
+                <tr>
+                    <td>520</td>
+                    <td>$C163-$C636 (50707-50742). Startadresse einer Basic-Programmzeile berechnen. Zeilennummer in $0014/$0015 (20/21) steht.</td>
+                </tr>
+                <tr>
+                    <td>530</td>
+                    <td>$X708-$C711 (50952-50961). Festhalten der jeweils erreichten Zeilennummer in der Suchschleife und Ablegen nach $00FD/$00FE (6253/254). Nach Erreichen der Adresse der gesuchten Zeilennummer in $0014/$0015 (20/21) steht in $00FD/$00FE (253/254) die Nummer der vorhergehenden Zeile. Ist die Nummer in $0014/$0015 (20/21) nicht größer als die erste Zeile des zu listenden Programms, dann wird $C708-$C711 übersprungen und $00FD/$00FE (253/254) behält seinen alten Wert bei.</td>
+                </tr>
+                <tr>
+                    <td>540</td>
+                    <td>$C637-$C63F (50743-50751). Weiter in der Suchschleife zur Berechnung der Adresse derjenigen Zeile, deren Nummer in $0014/$0015 (20/21) steht. Die Adresse wird an $005F/$0060 (95/96) ausgegeben. Existiert diese Zeile nicht, dann erscheint die Adresse der nächstfolgenden Zeile. In den X5A-Registern steht jeweils die Nummer (Low-Byte, High-Byte) derjenigen Zeile, welche auf die Zeile folgt, deren Adresse in $005F/$0060 (95/96) gelegt wurde. Ist die in $0014/$0015 (20/21) eingegebene Zeilennummer nicht kleiner als die Nummer der größten Zeile des zu listenden Programms, dann werden X/A mit (für unsere Zwecke) unbrauchbaren Werten belegt; jedoch erhält dann (und nur dann) das Y-Register den Wert 1 (siehe unten Zeile 780). Das Basic-Rahmenprogramm erhält die jeweiligen A-, X-, Y-werte über $030C-$030E (780-782).</td>
+                </tr>
+                <tr>
+                    <td>550</td>
+                    <td>$C6C9-$C741 (50896-51009). Eigentliches Programm zum Auflisten der gewünschten Zeile. Normalerweise Zeilenvorschub, der in 790 (siehe unten) korrigiert wird. Bei Erreichen der letzten Zeile Austritt ohne Zeilenvorschub, was in Zeile 780 (siehe unten) steht.</td>
+                </tr>
+                <tr>
+                    <td>560</td>
+                    <td>Abänderungen von Sprungadressen und Korrektur der Zeilennummer, so daß bei der letzten Zeile in $00FD/$00FE (253/254) abgelegt wird (siehe unten Zeile 530).</td>
+                </tr>
+                <tr>
+                    <td>570</td>
+                    <td>Ergänzung um einen DEY-Befehl $0088 (136). Abänderung zweier Sprungadressen. Sorge dafür, daß nach LISTen der betreffenden Zeile nicht zum Basic-Warmstart gesprungen wird, sondern an die SYS-Rücksprungadresse des aufrufenden Basic-Programms. Das wird durch Überschreiben des Inhalts von $C714 (50964) (natürlich in der Kassettenpuffer-Kopie) mit dem RTS-Befehl $0060 (96) erreicht.</td>
+                </tr>
+                <tr>
+                    <td>580</td>
+                    <td>Listen, solange nicht *.</td>
+                </tr>
+                <tr>
+                    <td>590-600</td>
+                    <td>Sonst: Wenn {Cursor down}, dann eine Zeile listen.</td>
+                </tr>
+                <tr>
+                    <td>610</td>
+                    <td>Wenn wieder *, dann listen, solange nicht abermals *.</td>
+                </tr>
+                <tr>
+                    <td>620-630</td>
+                    <td>Wenn {Cursor right}, dann Sprung um 1024.</td>
+                </tr>
+                <tr>
+                    <td>640</td>
+                    <td>Wenn {Return}, dann zurück.</td>
+                </tr>
+                <tr>
+                    <td>650</td>
+                    <td>Wenn nicht {Cursor up}, dann Neubeginn der Eingabeschleife.</td>
+                </tr>
+                <tr>
+                    <td>660</td>
+                    <td>Nummer der vorhergehenden Zeile in X/Y.</td>
+                </tr>
+                <tr>
+                    <td>670-680</td>
+                    <td>Wenn größer, dann Korrektur für Null und fünf Zeilen listen.</td>
+                </tr>
+                <tr>
+                    <td>690</td>
+                    <td>Neubeginn der Eingabeschleife.</td>
+                </tr>
+                <tr>
+                    <td>700-720</td>
+                    <td>Wenn nicht {Cursor up}, dann Korrektur für Nulldurchgang und fünf Zeilen listen.</td>
+                </tr>
+                <tr>
+                    <td>740</td>
+                    <td>Abermaliger Beginn der Eingabeschleife.</td>
+                </tr>
+                <tr>
+                    <td>750-760</td>
+                    <td>Wenn {Cursor up}, dann Vorgänger der Zeile, deren Nummer in X/Y liegt (Anfangszeile des angegebenen Fünferblocks) als Anfangszeile des neuen Fünferblocks nehmen und fünf Zeilen ausgeben.</td>
+                </tr>
+                <tr>
+                    <td>770</td>
+                    <td>Ausgabe von fünf aufeinanderfolgenden Zeilen.</td>
+                </tr>
+                <tr>
+                    <td>780-800</td>
+                    <td>Ausgabe einer Zeile</td>
+                </tr>
+                <tr>
+                    <td>790</td>
+                    <td>und Korrektur für Programme.</td>
+                </tr>
+            </table>
+            <figcaption>Beschreibung des Programms zum Endloslisten nach
+                Listing 1 (»lange Form«, mit Rückwärtslisten).</figcaption>
+        </figure>
 
-        <p>Das Programm Listing 2 ist eine verkürzte Form des Programms nach Listing 1. In Zeile 920 von Listing 2 werden die Zeilen 520 bis 540 von Listing 1 zusammengefaßt. Die Einschubzeile 530 in Listing 1, die die Nummer der jeweils vorhergehenden Zeile zwischenspeichert, wird in Listing 2 nicht benötigt. Die Zeilen 650 bis 760 in Listing 1 organisieren das Rückwärtslisten und werden im Programm nach Listing 2 nicht benötigt.</p>
+
+        <figure>
+            Das Programm Listing 2 ist eine verkürzte Form des Programms nach Listing 1. In Zeile 920 von Listing 2 werden die Zeilen 520 bis 540 von Listing 1 zusammengefaßt. Die Einschubzeile 530 in Listing 1, die die Nummer der jeweils vorhergehenden Zeile zwischenspeichert, wird in Listing 2 nicht benötigt. Die Zeilen 650 bis 760 in Listing 1 organisieren das Rückwärtslisten und werden im Programm nach Listing 2 nicht benötigt.
+            <figcaption>Beschreibung des Programms zum Endloslisten nach Listing 2 (kurze Form, ohne Rückwärtslisten).</figcaption>
+        </figure>
 
         <p>TODO /ASIDE</p>
+
+
     </article>
 </body>
 
