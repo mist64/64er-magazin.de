@@ -64,6 +64,40 @@
 
         <p>Tabelle 2 enthält die Frequenzen der 12 Halbtöne einer Tonleiter zusammen mit den zugehörigen POKE-Werten. Um zu höheren oder tieferen Oktaven zu gelangen, muß man die Frequenzen lediglich verdoppeln (vervierfachen etc.) beziehungsweise halbieren (vierteln etc.). Die POKE-Werte müssen dann natürlich neu berechnet werden. Werden diese Frequenzen in einem Programm verwendet, so sollten die POKE-Werte aller benötigten Töne in zwei Feldern (einem für die Low-und einem für die High-Bytes) abgespeichert sein, damit das Programm keine Zeit mit der Berechnung dieser Werte verliert.</p>
 
+        <figure>
+            <table>
+    <tr>
+        <th>Note</th>
+        <th>Frequenz</th>
+        <th>SID-Low-Byte</th>
+        <th>SID-High-Byte</th>
+    </tr>
+    <tr><td>c<sup>1</sup></td><td>261,63</td><td>103</td><td>17</td></tr>
+    <tr><td>cis<sup>1</sup></td><td>277,18</td><td>112</td><td>18</td></tr>
+    <tr><td>d<sup>1</sup></td><td>293,66</td><td>137</td><td>19</td></tr>
+    <tr><td>dis<sup>1</sup></td><td>311,13</td><td>178</td><td>20</td></tr>
+    <tr><td>e<sup>1</sup></td><td>329,63</td><td>237</td><td>21</td></tr>
+    <tr><td>f<sup>1</sup></td><td>349,23</td><td>59</td><td>23</td></tr>
+    <tr><td>fis<sup>1</sup></td><td>369,99</td><td>156</td><td>24</td></tr>
+    <tr><td>g<sup>1</sup></td><td>392,00</td><td>19</td><td>26</td></tr>
+    <tr><td>gis<sup>1</sup></td><td>415,30</td><td>160</td><td>27</td></tr>
+    <tr><td>a<sup>1</sup></td><td>440,00</td><td>68</td><td>29</td></tr>
+    <tr><td>ais<sup>1</sup></td><td>466,16</td><td>2</td><td>31</td></tr>
+    <tr><td>h<sup>1</sup></td><td>493,88</td><td>218</td><td>32</td></tr>
+</table>
+
+<p>Dieses kleine Programm liefert die Tabelle:<br>
+10 FOR I = 0 TO 11<br>
+20 : F = 440*(2^((I-9)/12))<br>
+30 : FS = INT(F*17.0284 + .5)<br>
+40 : HI = INT(FS/256)<br>
+50 : LO = FS - 256*HI<br>
+60 : PRINT F, LO, HI<br>
+70 : NEXT I
+</p>
+<figcaption>Tabelle 2. Frequenz der 12 Halbtöne einer Tonleiter (»eingestrichene Oktave«)</figcaption>
+        </figure>
+
         <h3>Das Steuerregister 54276</h3>
 
         <p>Über dieses Register wird der Ton ein- und ausgeschaltet. Man sollte vielleicht besser sagen: »angeschlagen« und »losgelassen«, da über die Hüllkurvensteuerung eine dynamische Beeinflussung der Lautstärke möglich ist. Darauf kommen wir später noch zurück. Im Steuerregister ist für das Ein- und Ausschalten Bit 0, das sogenannte GATE-Bit verantwortlich. Eine 1 im GATE-Bit schaltet die Stimme ein. Das Steuerregister legt auch die Kurvenform fest, die für das Klangbild der Stimme entscheidend ist. Eine Kurvenform wird ausgewählt, indem man eines der Bits 4 bis 7 setzt. Hier zunächst eine Tabelle mit den wichtigsten POKE-Werten für das Steuerregister:</p>
@@ -265,6 +299,44 @@
             POKE 54294,20 (40,60,80&hellip;)</p>
 
         <p>Das Klangbild von Stimme 1 müßte jetzt zunehmend heller werden. Zum Abschluß folgen in Tabelle 4 noch einige Einstellbeispiele für Stimme 1. Die Einstellungen, bei denen das Filter benutzt wird, sind mit Vorsicht zu genießen, da Filtereinstellungen schlecht reproduzierbar sind. In diesem Punkt weisen die einzelnen SID-Bausteine beachtliche Streuungen auf.</p>
+
+        <figure>
+            <table border="1" cellspacing="0" cellpadding="4">
+    <tr>
+        <th></th>
+        <th>F high</th>
+        <th>PW low</th>
+        <th>PW high</th>
+        <th>Steuer-reg.</th>
+        <th>AD</th>
+        <th>SR</th>
+        <th>F</th>
+        <th>Filter Resonanz</th>
+        <th>Modus/Laut</th>
+    </tr>
+    <tr>
+        <th></th>
+        <th>54273</th>
+        <th>54274</th>
+        <th>54275</th>
+        <th>54276</th>
+        <th>54277</th>
+        <th>54278</th>
+        <th>54294</th>
+        <th>54295</th>
+        <th>54296</th>
+    </tr>
+    <tr><td>Signalton</td><td>60</td><td>X</td><td>X</td><td>17/16</td><td>10</td><td>10</td><td>X</td><td>0</td><td>15</td></tr>
+    <tr><td>Klarinette</td><td>20</td><td>0</td><td>8</td><td>65/64</td><td>106</td><td>135</td><td>X</td><td>0</td><td>15</td></tr>
+    <tr><td>Flöte</td><td>40</td><td>X</td><td>X</td><td>17/16</td><td>128</td><td>248</td><td>X</td><td>0</td><td>15</td></tr>
+    <tr><td>Oboe/Fagott</td><td>30/10</td><td>250</td><td>0</td><td>65/64</td><td>73</td><td>248</td><td>X</td><td>0</td><td>15</td></tr>
+    <tr><td>Schnarre</td><td>5</td><td>0</td><td>8</td><td>81/80</td><td>73</td><td>248</td><td>X</td><td>0</td><td>11</td></tr>
+    <tr><td>Banjo</td><td>30</td><td>X</td><td>X</td><td>32/32</td><td>8</td><td>8</td><td>50</td><td>241</td><td>11</td></tr>
+    <tr><td>Schuß</td><td>200</td><td>X</td><td>X</td><td>129/128</td><td>9</td><td>9</td><td>X</td><td>0</td><td>15</td></tr>
+    <tr><td>Explosion</td><td>1</td><td>X</td><td>X</td><td>129/128</td><td>13</td><td>93</td><td>20</td><td>241</td><td>31</td></tr>
+</table>
+            <figcaption>Tabelle 4. Einstellbeispiele für Stimme 1</figcaption>
+        </figure>
 
         <p>Wer sich weitergehend mit der Klang- und Musikprogrammierung beschäftigen will, der sei auf die schon erwähnte Reihe »Dem Klang auf der Spur« verwiesen. In Ausgabe 2/85 des 64’er-Magazins findet man mehrere kleine Beispielprogramme zur SID-Programmierung. In Ausgabe 7/85 wird ein größeres Programm beschrieben, mit dem man unter anderem alle Parameter des SID interaktiv und komfortabel beeinflussen kann. In Ausgabe 10/85 wird ein Sequenzer-Programm erscheinen, das dreistimmige Melodien zeitexakt spielen kann, während nebenbei auch noch ein anderes Programm läuft.</p>
 
