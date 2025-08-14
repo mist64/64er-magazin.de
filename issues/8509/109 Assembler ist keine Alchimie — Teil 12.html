@@ -38,43 +38,36 @@
 
         <p>Sowohl was die Hardware als auch die Firmware für die Unterbrechungsbehandlung angeht, haben wir nun einen guten Überblick gewonnen. Es ist jetzt an der Zeit, daß wir uns ansehen, auf welche Weise man dieses Reservoir an vielfältigen Möglichkeiten für sich nutzen kann. Dazu soll uns ein Überblick dienen:</p>
 
-        <p>I) Auslösung der Unterbrechung durch Hardware-Einwirkungen.</p>
-
-        <p>Da hätten wir beispielsweise den Userport oder den Expansion-Port, über die wir per CIAs Unterbrechungen anfordern können. Um es gleich zu sagen: Damit werden wir uns nicht auseinandersetzen. Meine Kenntnisse auf diesem Gebiet sind zu dünn. Aber vielleicht verstehen Sie das auch mal als Aufforderung, Ihre Versuche dazu anderen zu offenbaren? Also: Schreiben Sie doch mal!</p>
-
-        <p>II) Unterbrechungsauslösung per Software:</p>
-
-        <p>Damit haben wir immer noch ein weites Feld von Möglichkeiten vor uns:</p>
-
-        <p>IIa) Vorgesehene Nutzungen des IRQ</p>
-
-        <ul>
-            <li>mittels des VIC-II-Chips.</li>
-        </ul>
-
-
-        <p>Da können wir uns auf den Rasterzeileninterrupt, die Sprite/Hintergrund- oder die Sprite/Sprite-Kollision stützen.</p>
-
-        <ul>
-            <li>oder mit Hilfe des CIA1</li>
-        </ul>
-
-
-        <p>Da ist es vor allem der 60mal pro Sekunde auftretende Timer A-Unterlauf, der uns interessieren soll.</p>
-
-        <p>IIb) Vorgesehene Nutzungen des NMI</p>
-
-        <ul>
-            <li>CIA2: Läßt man die RS232C-Schnittstellenbehandlung außer acht, dann gibt es keine vorgesehene Nutzung.</li>
-            <li>RESTORE: Zusammen mit der RUN/STOP-Taste kann man die vorgegebene Routine verändern, wie wir es schon in einigen Beispielen gezeigt haben.</li>
-        </ul>
-
-
-        <p>Wir können außerdem noch unterscheiden zwischen Nutzungen, die periodisch stattfinden sollen (zum Beispiel eine spezielle Tastaturabfrage) und solchen, die stochastisch (= zufallsabhängig) oder willkürlich erfolgen (zum Beispiel Drücken der RESTORE-Taste). Beides ist auch durchführbar bei:</p>
-
-        <p>IIc) Nicht vorgesehene Nutzung der Unterbrechungen.</p>
-
-        <p>Da bietet sich vor allem der meistens völlig brach liegende CIA2 an mit seinen beiden Timern und der Alarmfunktion.</p>
+        <ol type="I">
+            <li>Auslösung der Unterbrechung durch Hardware-Einwirkungen.
+                <p>Da hätten wir beispielsweise den Userport oder den Expansion-Port, über die wir per CIAs Unterbrechungen anfordern können. Um es gleich zu sagen: Damit werden wir uns nicht auseinandersetzen. Meine Kenntnisse auf diesem Gebiet sind zu dünn. Aber vielleicht verstehen Sie das auch mal als Aufforderung, Ihre Versuche dazu anderen zu offenbaren? Also: Schreiben Sie doch mal!</p>
+            </li>
+            <li>Unterbrechungsauslösung per Software:
+                <p>Damit haben wir immer noch ein weites Feld von Möglichkeiten vor uns:</p>
+                <ol type="a">
+                    <li>Vorgesehene Nutzungen des IRQ
+                        <ul>
+                            <li>mittels des VIC-II-Chips.
+                                <p>Da können wir uns auf den Rasterzeileninterrupt, die Sprite/Hintergrund- oder die Sprite/Sprite-Kollision stützen.</p>
+                            </li>
+                            <li>oder mit Hilfe des CIA1
+                                <p>Da ist es vor allem der 60mal pro Sekunde auftretende Timer A-Unterlauf, der uns interessieren soll.</p>
+                            </li>
+                        </ul>
+                    </li>
+                    <li>Vorgesehene Nutzungen des NMI
+                        <ul>
+                            <li>CIA2: Läßt man die RS232C-Schnittstellenbehandlung außer acht, dann gibt es keine vorgesehene Nutzung.</li>
+                            <li>RESTORE: Zusammen mit der RUN/STOP-Taste kann man die vorgegebene Routine verändern, wie wir es schon in einigen Beispielen gezeigt haben.</li>
+                        </ul>
+                        <p>Wir können außerdem noch unterscheiden zwischen Nutzungen, die periodisch stattfinden sollen (zum Beispiel eine spezielle Tastaturabfrage) und solchen, die stochastisch (= zufallsabhängig) oder willkürlich erfolgen (zum Beispiel Drücken der RESTORE-Taste). Beides ist auch durchführbar bei:</p>
+                    </li>
+                    <li>Nicht vorgesehene Nutzung der Unterbrechungen.
+                        <p>Da bietet sich vor allem der meistens völlig brach liegende CIA2 an mit seinen beiden Timern und der Alarmfunktion.</p>
+                    </li>
+                </ol>
+            </li>
+        </ol>
 
         <p>Wenn Sie aber erst einmal vertraut sind mit der Unterbrechungs-Programmierung und auch etwas Zeit zum Tüfteln investieren, finden Sie bestimmt noch eine ganze Menge weiterer Möglichkeiten.</p>
 
@@ -90,8 +83,10 @@
 
         <p>Leser der Grafikserie werden diese Möglichkeit des VIC-II-Chip schon kennen: Man kann dem Kathodenstrahl, der über den Monitor huscht, um das Bild zu erzeugen, über zwei Register folgen, die Rasterregister, wo jede Rasterzeile mitgezählt wird. Ohne an dieser Stelle allzusehr in die Einzelheiten einzugehen, soll hier nur bemerkt werden, daß die Numerierung dabei etwa von 0 bis 280 geht, weil auch der Rahmen und nicht sichtbare Teile des Bildschirmes vom Strahl überstrichen werden. Wo das Textfeld anfängt, ist von Monitor zu Monitor (oder Fernseher) etwas unterschiedlich. Bei mir beginnt es oben in Rasterzeile 50 und endet unten bei Zeile 248. Sollten die im Beispielprogramm 2 (Listing 2) nachher voreingestellten Randwerte bei Ihnen also anders sein, können Sie sie durch einige später noch angegebenen POKEs ändern. Die beiden Rasterzeilenregister sind:</p>
 
-        <p>$D012 (53266)<br>
-            $D011 (53265)</p>
+        <p style="text-align: center"><code>$D012 (53266)
+                $D011 (53265)
+            </code>
+        </p>
 
         <p>Von $D011 allerdings ist nur das Bit 7 als msb der Rasterzeilenzahl für uns von Bedeutung. Bild 7 soll diese Belegung deutlich machen:</p>
 
@@ -99,89 +94,87 @@
 
         <p>Damit kann also unsere primäre Unterbrechungsquelle (der VIC-II-Chip) programmiert werden. Halten wir die zwei Schritte dazu nochmal fest:</p>
 
-        <p>1) Rasterzeile festlegen, bei der ein IRQ ausgelöst werden soll, durch Einschreiben in die Register $D012 und Bit 7 von $D011.</p>
-
-        <p>2) Freigeben des Rasterzeileninterrupts durch Einschreiben von 1000 0001 in das Interrupt-enable-Register $D01A.</p>
-
-        <p>Der nächste Schritt betrifft die Bearbeitung des IRQ durch die CPU. Wie wir vorhin sahen, springt das Programm beim IRQ mittels eines indirekten Sprunges, der auf den Vektor 788/9 ($314/5) zugreift. Dieser Vektor muß nun auf die eigene Routine verbogen werden, also:</p>
-
-        <p>3) Vektor $314/5 auf die IRQ-Service-Routine richten.</p>
+        <ol>
+            <li>Rasterzeile festlegen, bei der ein IRQ ausgelöst werden soll, durch Einschreiben in die Register $D012 und Bit 7 von $D011.</li>
+            <li>Freigeben des Rasterzeileninterrupts durch Einschreiben von 1000 0001 in das Interrupt-enable-Register $D01A.
+                <p>Der nächste Schritt betrifft die Bearbeitung des IRQ durch die CPU. Wie wir vorhin sahen, springt das Programm beim IRQ mittels eines indirekten Sprunges, der auf den Vektor 788/9 ($314/5) zugreift. Dieser Vektor muß nun auf die eigene Routine verbogen werden, also:</p>
+            </li>
+            <li>Vektor $314/5 auf die IRQ-Service-Routine richten.</li>
+        </ol>
 
         <p>Damit wären alle Vorbereitungen getroffen. Der Rest liegt nun ganz bei uns — beziehungsweise bei dem von uns zu schreibenden Service-Programm. Als Bild 8 finden Sie ein Flußdiagramm unseres Beispielprogrammes 2.</p>
 
         <p>Gehen wir nun an die Realisierung. Zunächst also die Initialisierung, die wir bei $6000 (also durch SYS 24576 zu starten) beginnen lassen:</p>
 
-        <p>TODO</p>
-
-        <p>6000 SEI Sperren von IRQs<br>
-            Schritt 3:<br>
-            6001 LDA #$28 LSB der IRQ-Routine<br>
-            6003 STA 0314 in IRQ-Vektor-LSB<br>
-            6006 LDA #$60 MSB der IRQ-Routine<br>
-            6008 STA 0315 in IRQ-Vektor-MSB<br>
-            Schritt 1:<br>
-            600B LDA #$F8 Rasterzeile, bei der das Textfenster endet. Von da an soll der Rahmen schwarz sein.<br>
-            600D STA D012 in Rasterzeilen-Register (LSB) schreiben.<br>
-            6010 LDA D011 Register mit dem msb des Rasterzeilenzählers<br>
-            6013 AND #$7F 0111 1111 löscht das Bit7<br>
-            6015 STA D011 Zurückschreiben. Damit ist die Rasterzeile, die den IRQ auslösen soll, festgelegt.<br>
-            Schritt 2:<br>
-            6018 LDA #$81 1000 0001 wird nun<br>
-            601A STA D01A ins IRQ-enable-Register geschrieben, um den Rasterzeilen-IRQ zuzulassen.<br>
-            Festlegen einiger Startwerte:<br>
-            601D LDA #$00 Farbe schwarz<br>
-            601F STA D020 in Rahmen schreiben<br>
-            6022 LDA #$04 Streifenbreite in<br>
-            6024 STA 02 Merkregister schreiben.<br>
-            6026 CLI IRQ freigeben<br>
-            6027 RTS Ende der Initialisierung.<br>
-            Von nun an laufen alle IRQs über unsere eigene Routine, die bei $6028 beginnt.<br>
-            Zunächst müssen wir prüfen, ob die Unterbrechung vom VIC-II-Chip kommt oder vom CIA1:<br>
-            6028 LDA D019 IRQ-Request-Register des VIC-II-Chip (siehe letzte Folge). Dort ist Bit 7 gesetzt, wenn die Anforderung vom VIC-II-Chip kam.<br>
-            602B STA D019 Zurückschreiben<br>
-            602E BMI 6037 Sprung, falls VIC-IRQ, sonst CIA-IRQ.<br>
-            Bearbeiten eines CIA-IRQ:<br>
-            6030 LDA DC0D Löschen des CIA1 Unterbrechungs-Kontrollregisters.<br>
-            6033 CLI IRQ zulassen. Damit können innerhalb eines CIA-IRQ auch unsere VIC-IRQs geschehen.<br>
-            6034 JMP EA31 Bearbeitung des CIA-IRQ durch die normale Routine.<br>
-            Unser Programm für VIC-II-IRQs:<br>
-            6037 LDA D012 Rasterzeilen-Register laden um festzustellen, welche Zeile den IRQ auslöste.<br>
-            603A CMP #$F8 Vergleich mit Ende des Textfensters.<br>
-            603C BCS 604F Wenn unterhalb des Textfensters,<br>
-            Sprung.<br>
-            Der folgende Programmteil ist wirksam, wenn der IRQ-Auslöser eine Zeile in Höhe des Textfensters war:<br>
-            603E CLC Addition vorbereiten.<br>
-            603F ADC 02 Streifenbreite aus dem Merkregister addieren.<br>
-            6041 STA D012 Neuen Wert in Rasterzeilen-Register schreiben.<br>
-            Damit wird eine neue Rasterzeile als IRQ-Auslöser festgelegt, die um die Streifenbreite tiefer liegt als die vorhergegangene.<br>
-            Es folgt eine kleine Verzögerungsschleife, die aber nur zum Experimentieren eingebaut wurde:<br>
-            6044 LDY #$03 Schleifen-Startwert<br>
-            6046 DEY Herunterzählen<br>
-            6047 BNE 6046 NEXT Y, bis Y= 0.<br>
-            Ändern der Rahmenfarbe bis zum nächsten Raster-IRQ:<br>
-            6049 INC D020 Farbcode + 1. Wenn Code im Rahmenfarbregister größer als 15 wird, fängt wieder Farbcode 0 an, weil die Bits 5-7 keine Funktion haben.<br>
-            Abschließend erfolgt der Rücksprung in den Rest der normalen IRQ-Routine:<br>
-            604C JMP EA81 Siehe unsere Untersuchung der IRQ-Firmware.<br>
-            Damit ist der Rahmen in Höhe des Textfensters behandelt. Es schließt sich nun der Teil an, der die Rahmenbereiche unter- und oberhalb bearbeitet:<br>
-            604F LDA #$00 Farbcode schwarz<br>
-            6051 STA D020 in Rahmenfarb-Register.<br>
-            6054 LDA #$32 Rasterzeile, bei der oben das Textfenster beginnt.<br>
-            6056 STA D012 In Rasterzeilen-Register schreiben<br>
-            6059 JMP EA81 Abschluß durch Sprung zum Ende der normalen IRQ-Routine.<br>
-            Damit ist festgelegt, daß ober- und unterhalb des Textfensters die<br>
-            Rahmenfarbe schwarz wird.<br>
-            Unsere eigene Routine ist jetzt abgeschlossen. Zum guten Ton gehört es, dem Benutzer auch die Möglichkeit zu öffnen, diese Routine wieder abzuschalten. Das erfolgt im letzten Programmteil, der mittels SYS24688 aktiviert werden kann:<br>
-            605C SEI IRQ sperren<br>
-            605D LDA #$00 Raster-IRQ<br>
-            605F STA D01A abschalten<br>
-            6062 LDA #$31 IRQ-Vektor<br>
-            6064 STA 0314 restaurieren<br>
-            6067 LDA #$EA<br>
-            6069 STA 0315<br>
-            606C LDA #$0E<br>
-            606E STA D020<br>
-            6071 CLI<br>
-            6072 RTS</p>
+        <table class="plain">
+            <tr><td><b>6000</b></td><td><b>SEI</b></td><td>Sperren von IRQs</td></tr>
+            <tr><td colspan="3">Schritt 3:</td></tr>
+            <tr><td><b>6001</b></td><td><b>LDA #$28</b></td><td>LSB der IRQ-Routine</td></tr>
+            <tr><td><b>6003</b></td><td><b>STA 0314</b></td><td>in IRQ-Vektor-LSB</td></tr>
+            <tr><td><b>6006</b></td><td><b>LDA #$60</b></td><td>MSB der IRQ-Routine</td></tr>
+            <tr><td><b>6008</b></td><td><b>STA 0315</b></td><td>in IRQ-Vektor-MSB</td></tr>
+            <tr><td colspan="3">Schritt 1:</td></tr>
+            <tr><td><b>600B</b></td><td><b>LDA #$F8</b></td><td>Rasterzeile, bei der das Textfenster endet. Von da an soll der Rahmen schwarz sein.</td></tr>
+            <tr><td><b>600D</b></td><td><b>STA D012</b></td><td>in Rasterzeilen-Register (LSB) schreiben.</td></tr>
+            <tr><td><b>6010</b></td><td><b>LDA D011</b></td><td>Register mit dem msb des Rasterzeilenzählers</td></tr>
+            <tr><td><b>6013</b></td><td><b>AND #$7F</b></td><td>0111 1111 löscht das Bit7</td></tr>
+            <tr><td><b>6015</b></td><td><b>STA D011</b></td><td>Zurückschreiben. Damit ist die Rasterzeile, die den IRQ auslösen soll, festgelegt.</td></tr>
+            <tr><td colspan="3">Schritt 2:</td></tr>
+            <tr><td><b>6018</b></td><td><b>LDA #$81</b></td><td>1000 0001 wird nun</td></tr>
+            <tr><td><b>601A</b></td><td><b>STA D01A</b></td><td>ins IRQ-enable-Register geschrieben, um den Rasterzeilen-IRQ zuzulassen.</td></tr>
+            <tr><td colspan="3">Festlegen einiger Startwerte:</td></tr>
+            <tr><td><b>601D</b></td><td><b>LDA #$00</b></td><td>Farbe schwarz</td></tr>
+            <tr><td><b>601F</b></td><td><b>STA D020</b></td><td>in Rahmen schreiben</td></tr>
+            <tr><td><b>6022</b></td><td><b>LDA #$04</b></td><td>Streifenbreite in</td></tr>
+            <tr><td><b>6024</b></td><td><b>STA 02</b></td><td>Merkregister schreiben.</td></tr>
+            <tr><td><b>6026</b></td><td><b>CLI</b></td><td>IRQ freigeben</td></tr>
+            <tr><td><b>6027</b></td><td><b>RTS</b></td><td>Ende der Initialisierung.</td></tr>
+            <tr><td colspan="3"><p>Von nun an laufen alle IRQs über unsere eigene Routine, die bei $6028 beginnt.</p></td></tr>
+            <tr><td colspan="3"><p>Zunächst müssen wir prüfen, ob die Unterbrechung vom VIC-II-Chip kommt oder vom CIA1:</p></td></tr>
+            <tr><td><b>6028</b></td><td><b>LDA D019</b></td><td>IRQ-Request-Register des VIC-II-Chip (siehe letzte Folge). Dort ist Bit 7 gesetzt, wenn die Anforderung vom VIC-II-Chip kam.</td></tr>
+            <tr><td><b>602B</b></td><td><b>STA D019</b></td><td>Zurückschreiben</td></tr>
+            <tr><td><b>602E</b></td><td><b>BMI 6037</b></td><td>Sprung, falls VIC-IRQ, sonst CIA-IRQ.</td></tr>
+            <tr><td colspan="3">Bearbeiten eines CIA-IRQ:</td></tr>
+            <tr><td><b>6030</b></td><td><b>LDA DC0D</b></td><td>Löschen des CIA1 Unterbrechungs-Kontrollregisters.</td></tr>
+            <tr><td><b>6033</b></td><td><b>CLI</b></td><td>IRQ zulassen. Damit können innerhalb eines CIA-IRQ auch unsere VIC-IRQs geschehen.</td></tr>
+            <tr><td><b>6034</b></td><td><b>JMP EA31</b></td><td>Bearbeitung des CIA-IRQ durch die normale Routine.</td></tr>
+            <tr><td colspan="3">Unser Programm für VIC-II-IRQs:</td></tr>
+            <tr><td><b>6037</b></td><td><b>LDA D012</b></td><td>Rasterzeilen-Register laden um festzustellen, welche Zeile den IRQ auslöste.</td></tr>
+            <tr><td><b>603A</b></td><td><b>CMP #$F8</b></td><td>Vergleich mit Ende des Textfensters.</td></tr>
+            <tr><td><b>603C</b></td><td><b>BCS 604F</b></td><td>Wenn unterhalb des Textfensters, Sprung.</td></tr>
+            <tr><td colspan="3"><p>Der folgende Programmteil ist wirksam, wenn der IRQ-Auslöser eine Zeile in Höhe des Textfensters war:</p></td></tr>
+            <tr><td><b>603E</b></td><td><b>CLC</b></td><td>Addition vorbereiten.</td></tr>
+            <tr><td><b>603F</b></td><td><b>ADC 02</b></td><td>Streifenbreite aus dem Merkregister addieren.</td></tr>
+            <tr><td><b>6041</b></td><td><b>STA D012</b></td><td>Neuen Wert in Rasterzeilen-Register schreiben.</td></tr>
+            <tr><td colspan="3"><p>Damit wird eine neue Rasterzeile als IRQ-Auslöser festgelegt, die um die Streifenbreite tiefer liegt als die vorhergegangene.</p></td></tr>
+            <tr><td colspan="3"><p>Es folgt eine kleine Verzögerungsschleife, die aber nur zum Experimentieren eingebaut wurde:</p></td></tr>
+            <tr><td><b>6044</b></td><td><b>LDY #$03</b></td><td>Schleifen-Startwert</td></tr>
+            <tr><td><b>6046</b></td><td><b>DEY</b></td><td>Herunterzählen</td></tr>
+            <tr><td><b>6047</b></td><td><b>BNE 6046</b></td><td>NEXT Y, bis Y= 0.</td></tr>
+            <tr><td colspan="3">Ändern der Rahmenfarbe bis zum nächsten Raster-IRQ:</td></tr>
+            <tr><td><b>6049</b></td><td><b>INC D020</b></td><td>Farbcode+1. Wenn Code im Rahmenfarbregister größer als 15 wird, fängt wieder Farbcode 0 an, weil die Bits 5-7 keine Funktion haben.</td></tr>
+            <tr><td colspan="3"><p>Abschließend erfolgt der Rücksprung in den Rest der normalen IRQ-Routine:</p></td></tr>
+            <tr><td><b>604C</b></td><td><b>JMP EA81</b></td><td>Siehe unsere Untersuchung der IRQ-Firmware.</td></tr>
+            <tr><td colspan="3"><p>Damit ist der Rahmen in Höhe des Textfensters behandelt. Es schließt sich nun der Teil an, der die Rahmenbereiche unter- und oberhalb bearbeitet:</p></td></tr>
+            <tr><td><b>604F</b></td><td><b>LDA #$00</b></td><td>Farbcode schwarz</td></tr>
+            <tr><td><b>6051</b></td><td><b>STA D020</b></td><td>in Rahmenfarb-Register.</td></tr>
+            <tr><td><b>6054</b></td><td><b>LDA #$32</b></td><td>Rasterzeile, bei der oben das Textfenster beginnt.</td></tr>
+            <tr><td><b>6056</b></td><td><b>STA D012</b></td><td>In Rasterzeilen-Register schreiben</td></tr>
+            <tr><td><b>6059</b></td><td><b>JMP EA81</b></td><td>Abschluß durch Sprung zum Ende der normalen IRQ-Routine.</td></tr>
+            <tr><td colspan="3"><p>Damit ist festgelegt, daß ober- und unterhalb des Textfensters die Rahmenfarbe schwarz wird.</p></td></tr>
+            <tr><td colspan="3"><p>Unsere eigene Routine ist jetzt abgeschlossen. Zum guten Ton gehört es, dem Benutzer auch die Möglichkeit zu öffnen, diese Routine wieder abzuschalten. Das erfolgt im letzten Programmteil, der mittels SYS24688 aktiviert werden kann:</p></td></tr>
+            <tr><td><b>605C</b></td><td><b>SEI</b></td><td>IRQ sperren</td></tr>
+            <tr><td><b>605D</b></td><td><b>LDA #$00</b></td><td>Raster-IRQ</td></tr>
+            <tr><td><b>605F</b></td><td><b>STA D01A</b></td><td>abschalten</td></tr>
+            <tr><td><b>6062</b></td><td><b>LDA #$31</b></td><td>IRQ-Vektor</td></tr>
+            <tr><td><b>6064</b></td><td><b>STA 0314</b></td><td>restaurieren</td></tr>
+            <tr><td><b>6067</b></td><td><b>LDA #$EA</b></td><td></td></tr>
+            <tr><td><b>6069</b></td><td><b>STA 0315</b></td><td></td></tr>
+            <tr><td><b>606C</b></td><td><b>LDA #$0E</b></td><td></td></tr>
+            <tr><td><b>606E</b></td><td><b>STA D020</b></td><td></td></tr>
+            <tr><td><b>6071</b></td><td><b>CLI</b></td><td></td></tr>
+            <tr><td><b>6072</b></td><td><b>RTS</b></td><td></td></tr>
+        </table>
 
         <p>Unser Programm ist komplett. Speichern Sie es bitte vor dem Starten ab. Nach dem SYS 24576 finden Sie einen hübschen bunten Rahmen vor, oberhalb und unterhalb des Textfensters ist er schwarz. Besonders gut — finde ich — sieht das Ganze aus, wenn man die Hintergrundfarbe des Textfensters auch auf Schwarz setzt. Das Programm erlaubt noch einige Experimente:</p>
 
@@ -191,7 +184,7 @@
 
         <p>Durch POKE 24661,Zahl verschieben Sie die obere, durch POKE 24635,X:POKE 24588,X die untere Rasterzeile, von der an alles schwarz ist. Wie schon vorhin erwähnt, habe ich im Programm diese Werte auf 50 beziehungsweise 248 fixiert, weil genau dort auf meinem Monitor das Textfenster liegt.</p>
 
-        <p>Mit diesem Beispiel und dem aus der Grafikserie sollte es Ihnen nun möglich sein, auch andere Unterbrechungsprogramme zu schreiben, die sich der Rasterzeilen-Unterbrechung per VIC-II-Chip bedienen. Eine Bemerkung sollte ich Ihnen noch auf den Weg Ihrer eigenen Versuche mitgeben: Der Elektronenstrahl, der über den Bildschirm saust und beim Erreichen des von uns bestimmten Rasterzeilenwertes zum Auslösen des IRQ führt, ist enorm schnell. Die Serviceprogramme dürfen deshalb nicht zu lang sein, sonst steht der nächste IRQ schon wieder an, bevor der ’vorangegangene bearbeitet ist.</p>
+        <p>Mit diesem Beispiel und dem aus der Grafikserie sollte es Ihnen nun möglich sein, auch andere Unterbrechungsprogramme zu schreiben, die sich der Rasterzeilen-Unterbrechung per VIC-II-Chip bedienen. Eine Bemerkung sollte ich Ihnen noch auf den Weg Ihrer eigenen Versuche mitgeben: Der Elektronenstrahl, der über den Bildschirm saust und beim Erreichen des von uns bestimmten Rasterzeilenwertes zum Auslösen des IRQ führt, ist enorm schnell. Die Serviceprogramme dürfen deshalb nicht zu lang sein, sonst steht der nächste IRQ schon wieder an, bevor der vorangegangene bearbeitet ist.</p>
 
         <p>In der kommenden Folge sollen Beispiele für andere Unterbrechungsformen vorgestellt werden, die durch die CIAs und die RESTORE-Taste angesprochen werden. Danach soll es um die Anwendung des bisher Gelernten gehen, wobei wir uns wieder mehr den Interpreter-Routinen und auch den Kernal-Möglichkeiten zuwenden wollen.</p>
 
