@@ -1,0 +1,253 @@
+
+
+;disk designer.prg ==1001==
+   10 rem***************
+   20 rem*             *
+   30 rem* christian   *
+   40 rem* quirin      *
+   50 rem* spitzner    *
+   60 rem* gruberstr.53*
+   70 rem* 8011 poing  *
+   80 rem*             *
+   90 rem***************
+  100 poke53280,246
+  110 print"{blk}"
+  120 gosub 2150
+  130 print"{rght}{rght}{down}dieses programm kann  das directory"
+  140 print"{rght}{rght}{down}ihrer diskette je  nach  wunsch und"
+  150 print"{rght}{rght}{down}geschmack nach vier  kriterien ver-"
+  160 print"{rght}{rght}{down}schoenern :
+  170 print"{rght}{rght}{down}1) disk  wird alphabetisch sortiert"
+  180 print"{rght}{rght}{down}2) file- namen  koennen mit belieb-"
+  190 print"{rght}{rght}{down}   igen zeichen aufgefuellt werden:"
+  200 print"{rght}{rght}{down}   z.b. aus  {rvon}disk-designer{rvof}"
+  210 print"{rght}{rght}{down}        wird {rvon}disk-designer...{rvof}"
+  220 gosub 2310
+  230 gosub 2150
+  240 print"{rght}{rght}{down}3) files  koennen  mit loeschschutz"
+  250 print"{rght}{rght}{down}   versehen werden. d.h. dem  file-"
+  260 print"{rght}{rght}{down}   typ im directory wird  ein  '<'-"
+  270 print"{rght}{rght}{down}   zeichen angehaengt :"
+  280 print"{rght}{rght}{down}   z.b ohne loschschutz : prg  seq "
+  290 print"{rght}{rght}{down}        mit loschschutz : prg< seq<{down}{down}{down}{down}{down}{down}"
+  300 gosub 2310
+  310 gosub 2150
+  320 print"{rght}{rght}{down}4) files  koennen  mit  einer lade-"
+  330 print"{rght}{rght}{down}   hilfe versehen werden. d.h.  der"
+  340 print"{rght}{rght}{down}   filename wird auf 12 zeichen ge-"
+  350 print"{rght}{rght}{down}   gekuerzt und dem 2. '"chr$(34)"'- zeichen"
+  360 print"{rght}{rght}{down}   die zeichenfolge {rvon},8:{rvof} angehaengt."
+  370 print"{rght}{rght}{down}   so braucht man  nur noch  'load'"
+  380 print"{rght}{rght}{down}   vor den programmnamen zu schrei-"
+  390 print"{rght}{rght}{down}   und 'return' zu druecken um  ein"
+  400 print"{rght}{rght}{down}   programm zu laden.
+  410 gosub 2310
+  420 gosub 2150
+  430 g$="ja"
+  440 e$="ja"
+  450 i$="ja"
+  460 f$="."
+  470 j$="    {left}{left}{left}{left}"
+  480 print"{home}{down}{down}{down}{down}{down}{down}{rght}{rght}     {rvon} f1 {rvof} = start
+  485 print"{rght}{rght}{down}     {rvon} f2 {rvof} = ende
+  490 print"{rght}{rght}{down}     {rvon} f3 {rvof} = loeschschutz    :";j$;g$
+  500 print"{rght}{rght}{down}     {rvon} f5 {rvof} = ladehilfe       :";j$;e$
+  510 print"{rght}{rght}{down}     {rvon} f7 {rvof} = file auffuellen :";j$;i$
+  520 print"{rght}{rght}{down}     {rvon} f8 {rvof} = zeichen         :{SHIFT--}{up}{left}U{SHIFT-*}I{down}{left}{SHIFT--}{down}{left}{left}{left}J{SHIFT-*}K{up}{left}{left}";f$;"{left}";
+  530 get d$
+  540 if d$=""then 530
+  550 e=asc(d$)
+  560 if e=133 then 700
+  570 if e=134 and g$="ja" then g$="nein":goto 480
+  580 if e=134 and g$="nein" then g$="ja":goto 480
+  590 if e=135 and e$="ja" then e$="nein":goto 480
+  600 if e=135 and e$="nein" then e$="ja":goto 480
+  610 if e=136 and i$="ja" then i$="nein":goto 480
+  620 if e=136 and i$="nein" then i$="ja":goto 480
+  625 if e=137 then print"{clr}" : end
+  630 if e<>140 then 530
+  640 poke204,0
+  650 get f$:if f$="" then 650
+  660 d=asc(f$)
+  670 if d<32 or (d>127 and d<160)then 650
+  680 poke204,1
+  690 goto 480
+  700 gosub 2150
+  710 if i$="nein" then f$=chr$(160)
+  720 dim progr$(224),n(29),m(29)
+  730 h=0
+  740 o=0
+  750 p=1
+  760 g=0
+  770 n=18
+  780 m=1
+  790 k$=chr$(160)+",8:"
+  800 :
+  810 :
+  820 :
+  830 rem  ***   directory lesen   ***
+  840 :
+  850 :
+  860 :
+  870 print"{down}{down}{rght}       directory wird gelesen"
+  880 print"{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{rght}         U{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}I"
+  890 print"{rght}         {SHIFT--}                {SHIFT--}"
+  900 print"{rght}         J{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}K"
+  910 open 15,8,15,"i0"
+  920 gosub 2420
+  930 open 2,8,2,"#"
+  940 gosub 2420
+  950 print#15,"u1";2;0;n;m
+  960 n(o)=n
+  970 m(o)=m
+  980 get#2,eg$
+  990 if eg$="" then eg$=chr$(0)
+ 1000 n=asc(eg$)
+ 1010 get#2,eg$
+ 1020 if eg$="" then eg$=chr$(0)
+ 1030 m=asc(eg$)
+ 1040 l=2
+ 1050 print#15,"b-p";2;l
+ 1060 h=h+1
+ 1070 for i=1 to 30
+ 1080 :  get#2,eg$
+ 1090 :  if eg$="" then eg$=chr$(0)
+ 1100 :  progr$(h) = progr$(h) + eg$
+ 1110 next i
+ 1120 print"{home}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}";tab(11);mid$(progr$(h),4,16)
+ 1130 if asc(left$(progr$(h),1))<>0then1180
+ 1140 progr$(h)=""
+ 1150 h=h-1
+ 1160 g=g+1
+ 1170 p=0
+ 1180 ifl-226thenl=l+32:goto1050
+ 1190 if n then l=2 : o=o+1 : goto 950
+ 1200 :
+ 1210 :
+ 1220 :
+ 1230 rem ***   files bearbeiten  ***
+ 1240 :
+ 1250 :
+ 1260 :
+ 1270 for j=1 to h
+ 1280 print"{home}{down}{down}{down}{down}{down}{down}{down}{down}{rght}{rght}      {rvon}files werden bearbeitet"
+ 1290 for j=1 to h
+ 1300 :  c$=mid$(progr$(j),17,1)
+ 1310 :  for i=4 to 20
+ 1320 :     a$=mid$(progr$(j),i,1)
+ 1330 :     if a$=chr$(160) and e$="ja" then a$=f$ : goto 1370
+ 1340 :     if a$=chr$(160) and c$<>"," then a$=f$ : goto 1370
+ 1350 :     if a$=chr$(32) and i$="nein" then a$=chr$(32) : goto 1370
+ 1360 :     if a$=chr$(32) and i$="ja" then a$=f$
+ 1370 :     progr$(j)=left$(progr$(j),i-1)+a$+right$(progr$(j),30-i)
+ 1380 :  next i
+ 1390 :  f=asc(left$(progr$(j),1))
+ 1400 :  iff<150andg$="nein"then1460
+ 1410 :  iff>150andg$="ja"then1460
+ 1420 :  ifg$="ja"thenf=f+64:goto1440
+ 1430 :  ifg$="nein"thenf=f-64
+ 1440 :  progr$(j)=chr$(f)+right$(progr$(j),29)
+ 1450 :  if f >< 130 and f >< 194 then1470
+ 1460 :  ife$="ja"thenprogr$(j)=left$(progr$(j),15)+k$+right$(progr$(j),11)
+ 1470 print"{home}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{rvon}";tab(11);mid$(progr$(j),4,16)
+ 1480 next j
+ 1490 :
+ 1500 :
+ 1510 :
+ 1520 rem *** directory sortieren ***
+ 1530 :
+ 1540 :
+ 1550 :
+ 1560 print"{home}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{rght}{rght}      files werden sortiert"
+ 1570 for j=1 to h-1
+ 1580 :  for i=j+1 to h
+ 1590 :     ifmid$(progr$(i),4,16)>mid$(progr$(j),4,16)then1640
+ 1600 :     h$=progr$(i)
+ 1610 :     progr$(i)=progr$(j)
+ 1620 :     progr$(j)=h$
+ 1630 :     p=0
+ 1640 :  next i
+ 1650 :  print"{home}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}";tab(11);mid$(progr$(j),4,16)
+ 1660 next j
+ 1670 if p then 2050
+ 1680 h$=""
+ 1690 if g=0 then 1830
+ 1700 for j=1 to 30
+ 1710 :  h$=h$+chr$(0)
+ 1720 next j
+ 1730 for j=1 to g
+ 1740 :  progr$(h+j)=h$
+ 1750 next j
+ 1760 :
+ 1770 :
+ 1780 :
+ 1790 rem *** directory schreiben ***
+ 1800 :
+ 1810 :
+ 1820 :
+ 1830 print"{home}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{rght}{rght}      {rvon}directory wird geschrieben"
+ 1840 k=1
+ 1850 for j=0 to o
+ 1860 :  print#15,"b-p";2;0
+ 1870 :  print#2,chr$(n(j+1));chr$(m(j+1))
+ 1880 :  l=2
+ 1890 :  for i=1 to 8
+ 1900 :     print#15,"b-p";2;l
+ 1910 :     print#2,progr$(k);
+ 1920 :     print"{home}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{rvon}";tab(11);mid$(progr$(k),4,16)
+ 1930 :     k=k+1
+ 1940 :     l=l+32
+ 1950 :  next i
+ 1960 :  print#15,"u2";2;0;n(j);m(j)
+ 1970 next j
+ 1980 :
+ 1990 :
+ 2000 :
+ 2010 rem ***      neustart       ***
+ 2020 :
+ 2030 :
+ 2040 :
+ 2050 close 2
+ 2060 close 15
+ 2070 run 420
+ 2080 :
+ 2090 :
+ 2100 :
+ 2110 rem ***       rahmen        ***
+ 2120 :
+ 2130 :
+ 2140 :
+ 2150 print"{clr}U{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}I"
+ 2160 for i=1 to 23
+ 2170 :  print"{SHIFT--}                                     {SHIFT--}"
+ 2180 next i
+ 2190 print"J{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}K{home}"
+ 2200 print"{rght}{rght}{rght}{rght}{rght}U{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}I"
+ 2210 print"{rght}{rght}{rght}{rght}{rght}{SHIFT--}{rvon} * * * disk-designer * * * {rvof}{SHIFT--}"
+ 2220 print"{rght}{rght}{rght}{rght}{rght}J{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}K"
+ 2230 return
+ 2240 :
+ 2250 :
+ 2260 :
+ 2270 rem *** wartet [return] ab  ***
+ 2280 :
+ 2290 :
+ 2300 :
+ 2310 print"{rght}{rght}{down}druecke [{rvon}return{rvof}]
+ 2320 get retur$
+ 2330 if retur$ <> chr$(13) then 2320
+ 2340 return
+ 2350 :
+ 2360 :
+ 2370 :
+ 2380 rem ***     disk error      ***
+ 2390 :
+ 2400 :
+ 2410 :
+ 2420 input#15,a,b$,b,c
+ 2430 if a=0 then return
+ 2440 gosub 2150
+ 2450 print"{down}{down}{down}{rght}     {rvon}disk-error :"
+ 2460 print"{down}{rght}    ";a;b$;b;c
+ 2470 goto2050
+

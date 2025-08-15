@@ -1,0 +1,455 @@
+
+
+;pruefungsfragen.prg ==0801==
+   10 rem programmierte fragen
+   20 poke 53280,12:poke53281,0
+  100 print chr$(147)
+  101 if a=0 then a=1:load"print obj",8,1
+  102 if a=1 then a=2:load"in21 obj",8,1
+  103 if a=2 then a=3:load"bildschirm obj",8,1
+  104 if a=3 then a=4:load"read10 obj",8,1
+  105 if a=4 then a=5:load"drucker obj",8,1
+  110 pr=12*16^3   : dr=pr+6*16^2
+  111 in=pr+1*16^2 : bi=pr+3*16^2
+  112 wr=pr+5*16^2 : re=wr+13*16+10
+  113 dim l(99,2),m$(15),sp(15),ze(15)
+  114 printchr$(14):poke 657,128
+  118 au=0:ko$="Pruefungsfragen":gosub 11000:rem kopf
+  119 sys pr,01,01,"H. Goelker / 28.03.84{lblu}"
+  125 m$(1)= " Druck.einst. ":sp(1)=0:ze(1)=24
+  130 m$(2)= " Beschreibung ":sp(2)=16:ze(2)=24
+  135 m$(3)= " Start ":sp(3)=32:ze(3)=24:nn=3:j=2:gosub14010
+  140 if x$=chr$(136) then 118
+  145 if j=3 then 156
+  150 on j gosub 15000,16000
+  151 goto 118
+  156 ko$="Pruefungsfragen":gosub11000
+  158 gosub 13000
+  159 if x$=chr$(136) then 118
+  160 gosub10700:ko$="Pruefungsfragen":gosub 11000
+  162 m$(1)=" lernen ":sp(1)=7:ze(1)=24
+  164 m$(2)=" bearbeiten ":sp(2)=22:ze(2)=24 :nn=2
+  166 gosub 14000
+  168 if x$=chr$(136) then 118
+  170 on j gosub 200,800
+  180 goto 160
+  190 :
+  200 rem aufgaben lernen ***************
+  210 ko$="Aufgaben lernen":gosub11000
+  230 gosub 12500
+  240 if x$=chr$(136)then return
+  245 if f=0 then gosub 10000
+  250 if n>0  then 300
+  255 gosub 11400
+  260 sys pr,07,24,"Keine Aufgaben gespeichert"chr$(145)
+  270 get x$:if x$=""then 270
+  280 sa$="":return
+  300 for i=1 to n:l(i,1)=i:l(i,2)=0:next
+  310 max=n
+  320 t=int(rnd(1)*max)+1:r=l(t,1)
+  330 if l(t,2)=0 then fr=fr+1
+  340 gosub17000:gosub10600:remkopf/frage
+  350 sys pr,00,24,"Deine Antwort   ?";
+  360 sys in,18,24,21,1,er$
+  365 if peek(828)=136 then 700
+  370 if er$<>aw$ then 500
+  380 if l(t,2)=0 then ri=ri+1
+  390 l(t,1)=l(max,1):l(t,2)=l(max,2)
+  400 max=max-1
+  410 gosub11400:rem fusszeilen loeschen
+  420 sys pr,12,23," ** richtig ** "
+  440 getx$:if x$<>chr$(13)andx$<>chr$(136)then 440
+  450 if x$=chr$(136) or max=0 then 700
+  460 goto 320
+  470 :
+  500 rem falsche antwort
+  510 l(t,2)=1
+  520 gosub 12000 :rem falsche antwort
+  530 gosub11400
+  540 sys pr,00,24,"Deine Antwort   ?";
+  550 sys in,18,24,21,1,er$
+  560 if er$=aw$ then fa=0:goto410
+  570 gosub 12000:fa=fa+1:if fa<2 then 530
+  580 gosub 11400:gosub13200
+  581 sys pr,(40-l)/2,23," * richtig ist :"aw$" * "
+  600 fa=0: goto 440
+  610 :
+  700 gosub 11000:rem kopf
+  710 sys pr,2,12,"Anzahl der Fragen :";fr
+  720 sys pr,2,14,"richtige Antworten:";ri
+  730 fa=0:ri=0:fr=0:sa$=""
+  740 get x$:if x$="" then 740
+  750 return
+  760 :
+  800 rem aufgaben bearbeiten ***********
+  810 if s$="001  "then 890
+  820 ko$="Aufgaben bearbeiten":gosub11000
+  830 sys pr,01,05,"Bitte Code-Nr. eingeben:"
+  840 sys in,01,07,5,1,s$
+  850 if s$="001  "then 890
+  860 sys pr,01,24,"Code-Nr. unbekannt / weiter mit RETURN"chr$(145)
+  870 getx$:ifx$<>chr$(13) then 870
+  880 goto 800
+  890 gosub 11000:rem kopf
+  900 gosub 12200:if a=136 then sa$="": return
+  980 :
+ 1000 rem aufgaben bearbeiten teil 2 ---
+ 1010 ko$="Aufgaben bearbeiten":gosub 11000:rem kopf
+ 1020 m$(1)=" Eingabe ":sp(1)=6:ze(1)=24
+ 1030 m$(2)=" Ausgabe ":sp(2)=24:ze(2)=24
+ 1090 nn=2:gosub14000
+ 1095 if x$=chr$(136) then sa$="":return
+ 1100 onj gosub 1140,3000,1090:goto 1000
+ 1110 :
+ 1140 rem eingabe ----------------------
+ 1145 ko$="Aufgaben eingeben":aw$=""
+ 1146 if n+1<99 then 1150
+ 1147 gosub11400:syspr,5,23,"{rvon}Keine Eingabe mehr moeglich{rvof}":gosub11100:goto 1280
+ 1150 r=n+1:gosub 11000:rem kopf
+ 1160 sys pr,10,24,"f1=Text uebernehmen"chr$(145)
+ 1170 sys bi,0,3,39,20
+ 1180 a=peek(828)
+ 1195 if a=136 then 1280
+ 1200 gosub 11400:rem zeile 24 loeschen
+ 1205 poke781,21:sys 59903
+ 1210 sys pr,0,24,"richtige Antwort: "aw$;chr$(145)
+ 1220 sys in,18,24,21,1,aw$
+ 1225 a=peek(828)
+ 1226 if a=136 then 1280
+ 1230 a=peek(828):if a=17 or a=145 or aw$="                     "then1220
+ 1240 if ko=0 then n=n+1:r=n
+ 1260 gosub 10500:rem aufgaben write
+ 1270 gosub 10200:rem status write
+ 1280 r=0:return
+ 1290 :
+ 3000 rem ausgabe
+ 3010 r=0: ko$="Ausgabe/Korrektur":ifn<1 then 3700
+ 3015 goto 3200
+ 3020 gosub11000
+ 3100 gosub10600
+ 3102 gosub13200:sys pr,(52-l)/2,21," -- "aw$" -- "
+ 3105 gosub11400
+ 3110 m$(1)=" weiter ":sp(1)=1:ze(1)=23
+ 3111 m$(2)=" zurueck  ":sp(2)=13:ze(2)=23
+ 3112 m$(3)=" Aufg.Nr.  ":sp(3)=27:ze(3)=23
+ 3120 m$(4)=" drucken ":sp(4)=1:ze(4)=24
+ 3121 m$(5)=" loeschen ":sp(5)=13:ze(5)=24
+ 3122 m$(6)=" Korrektur ":sp(6)=27:ze(6)=24
+ 3130 nn=6:gosub 14000
+ 3135 if x$=chr$(136) then 3800
+ 3140 on j goto 3200,3300,3400,5000,4000,3600
+ 3150 :
+ 3200 rem weiter -----------------------
+ 3210 r=r+1:if r<=n then 3020
+ 3220 gosub 11400
+ 3230 sys pr,8,24,"Ende des Aufgabensatzes"chr$(145)
+ 3240 get x$:if x$=""then 3240
+ 3250 goto 3800
+ 3260 :
+ 3300 rem zurueck ----------------------
+ 3310 r=r-1:if r>=1 then 3020
+ 3320 goto 3220
+ 3330 :
+ 3400 rem nummer eingeben --------------
+ 3410 r=0:gosub 11000
+ 3420 sys pr,1,24,"Aufgaben-Nummer ?"chr$(145)
+ 3430 sys in,19,24,3,0,b$:b=int(val(b$))
+ 3435 if peek(828)=136 then 3020
+ 3440 if b>n or b<1  then sys pr,1,23,"ungueltige Nummer":goto 3420
+ 3450 r=b:goto 3020
+ 3460 :
+ 3600 rem korrektur --------------------
+ 3610 gosub11400:rem fusszeilen loeschen
+ 3615 sys pr,09,23,"Gib die Korrektur ein !"
+ 3620 ko=r:gosub 1160:r=ko:ko=0
+ 3630 if a=136 then return
+ 3640 goto 3105
+ 3650 :
+ 3700 gosub11000:sys pr,8,24,"Keine Aufgabe gespeichert "chr$(145)
+ 3710 get x$:if x$=""then 3710
+ 3800 r=0:return
+ 3810 :
+ 4000 rem loeschen ---------------------
+ 4100 gosub 11400
+ 4110 sys pr,4,24,"Aufgabe wirklich loeschen (j/n) ?"chr$(145)
+ 4120 getx$:ifx$<>"j" and x$<>"n" then 4120
+ 4130 if x$="n" then 3105
+ 4135 gosub 11400:sys pr,5,24,"... Aufgabe wird geloescht ..."chr$(145)
+ 4140 if n=1 or n=r then 4570
+ 4500 open 15,8,15
+ 4510 print#15,"s:"str$(r)+sa$
+ 4520 print#15,"r:"str$(r)+sa$"="str$(n)+sa$
+ 4530 close15
+ 4570 n=n-1
+ 4580 gosub10200:rem statusdatei
+ 4590 goto 3800
+ 4600 :
+ 5000 rem drucken **********************
+ 5001 gosub 11400
+ 5002 poke2,4:sys dr
+ 5003 if peek(2)=0 then au=au+1:goto5008
+ 5004 sys pr,07,24,"Drucker nicht eingeschaltet"chr$(145)
+ 5005 get x$:if x$=""then 5005
+ 5006 goto 3105
+ 5007 :
+ 5008 on d goto 5009,5100
+ 5009 rem epson drucker ----------------
+ 5010 open2,4,0:cmd2
+ 5020 print chr$(27);"3";chr$(22);:print chr$(15);
+ 5026 print chr$(27);"l";chr$(5);
+ 5027 print   "Aufg.";au
+ 5028 print chr$(27);"l";chr$(15);
+ 5030 sys wr:close2
+ 5070 goto 3105
+ 5080 :
+ 5100 rem vc 1526 drucker --------------
+ 5102 open2,4,7:print#2,"Aufg.";au
+ 5103 print#2,left$("{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}{CBM-Y}",5+len(str$(au)))
+ 5105 open6,4,6:print#6,chr$(16);
+ 5130 sys wr
+ 5140 print#2:close2:close6: goto 3105
+10000 rem dateien *********************
+10010 :
+10020 rem statusdatei read ------------
+10100 n=0:r=0:open15,8,15
+10110 open2,8,2,sa$+"/s,s,r"
+10120 input#15,f:if f<>0 then 10140
+10130 input#2,n:rem anzahl aufgaben
+10140 close 2:close15:return
+10195 :
+10200 rem statusdatei anlegen ---------
+10230 open2,8,2,"@:"+sa$+"/s,s,w"
+10240 print#2,n
+10250 close2:return
+10260 :
+10300 rem sachgebiete write -----------
+10310 if ii>0 then 10350
+10320 open15,8,15,"s:Sachgebiete"
+10325 sa$(1)=""
+10330 close15:return
+10340 :
+10350 open2,8,2,"@:Sachgebiete,s,w"
+10360 for i=1 to ii:print#2,sa$(i):next
+10370 close2:close15:return
+10500 rem aufgaben write --------------
+10504 gosub 11400:rem zeile 24 loeschen
+10505 sys pr,08,24,"... bitte warten ..."chr$(145)
+10510 sys pr,00,3,"";
+10520 open3,3
+10530 open2,8,2,"@:"+str$(r)+sa$+",s,w"
+10540 sys wr
+10565 print#2,aw$
+10570 close2:close3
+10580 return
+10590 :
+10600 rem aufgaben read ---------------
+10610 open2,8,2,str$(r)+sa$+",s,r"
+10620 sys re
+10630 input#2,aw$
+10660 close2:return
+10700 rem sachgebiete pruefen/einlesen
+10705 ii=0
+10710 open 15,8,15
+10720 open 2,8,2,"Sachgebiete,s,r"
+10730 input#15,f
+10740 if f<>0 then 10780
+10750 ii=ii+1
+10760 input#2,sa$(ii)
+10770 if st<>64 then 10750
+10780 close2:close15:return
+10790 :
+11000 rem kopf ------------------------
+11010 print chr$(147);:print tab(1)ko$
+11015 if sa$="" then 11020
+11016 sys pr,1,1,sa$
+11017 sys pr,28,0,"Aufg.Nr.:"r
+11018 sys pr,28,1,"Anzahl  :"n
+11020 sys pr,00,02,"{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}"chr$(145)
+11021 sys pr,27,0,"{CBM-N}"
+11022 sys pr,27,1,"{CBM-N}"
+11030 sys pr,00,22,"{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}"chr$(145)
+11040 sys pr,00,03,"";
+11050 return
+11060 :
+11100 rem weiter mit return -----------
+11110 sys pr,10,24,"Weiter mit RETURN"chr$(145)
+11120 getx$:ifx$<>chr$(13) then 11120
+11130 a=136:return
+11140 :
+11400 rem zeile 24 loeschen -----------
+11410 poke781,23:sys 59903
+11420 poke781,24:sys 59903:return
+11430 :
+11580 :
+12000 rem falsche antwort -------------
+12010 for j=1 to 5
+12020 sys pr,25,24,"** FALSCH **";
+12030 for jj=1 to 60:next
+12040 sys pr,25,24,"{rvon}** FALSCH **{rvof}";
+12050 for jj=1 to 60:next:next
+12060 return
+12070 :
+12200 rem sachgebiet waehlen/anlegen --
+12205 n=0:sa$="":a=0
+12210 if ii=0 then 12320
+12215 sys pr,05,4,"Sachgebiete"
+12216 sys pr,05,5,"{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}"
+12220 for i=1 to ii
+12230 m$(i)=sa$(i):sp(i)=5:ze(i)=i+5
+12240 next
+12245 m$(ii+1)="neues Sachgebiet anlegen ":sp(ii+1)=5:ze(ii+1)=18
+12246 m$(ii+2)="Sachgebiet loeschen      ":sp(ii+2)=5:ze(ii+2)=19
+12260 nn=ii+2:gosub 14500
+12270 if x$=chr$(136) then a=136:return
+12280 if j=ii+1 then 12320
+12290 if j=ii+2 then 12700
+12310 sa$=sa$(j):gosub 10000:goto 12430
+12320 gosub 11400:rem statuszeile loeschen
+12322 if ii<10 then 12330
+12324 sys pr,08,23,"{rvon} ** nicht moeglich ** {rvof}":gosub 11100:return
+12330 sys pr,00,24,"Neues Sachgebiet eingeben: "chr$(145)
+12340 sys in,27,24,12,1,sa$
+12344 a=peek(828):if a=136 thensa$="":return
+12345 if a=145 or a=17 or sa$="            "then 12340
+12350 for i=1 to ii
+12360 if sa$=sa$(i) then syspr,00,23,"-- Name existiert schon --":goto 12330
+12370 next
+12380 ii=ii+1:sa$(ii)=sa$
+12390 gosub 10300:rem sachgebiete write
+12420 gosub 10200:rem statusdatei anlegen
+12430 return
+12440 :
+12500 rem sachgebiete waehlen ---------
+12510 n=0:sa$="":f=0:a=0
+12520 if ii=0 then f=1:return
+12530 if ii=1 then sa$=sa$(1):return
+12534 sys pr,05,4,"Sachgebiete"
+12535 sys pr,05,5,"{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}"
+12536 for i=1 to ii
+12537 m$(i)=sa$(i):sp(i)=5:ze(i)=i+5
+12538 next:nn=ii
+12540 gosub 14500
+12545 if x$=chr$(136) then return
+12550 sa$=m$(j):return
+12630 :
+12700 rem sachgebiet loeschen ---------
+12710 ko$="{rvon}Sachgebiet loeschen{rvof}":gosub11000:gosub12500
+12720 if a=136 then return
+12725 a=j:if ii=1 thena=1
+12730 gosub 11400:sys pr,1,23,"zu loeschendes Sachgebiet:"sa$(a)
+12740 sys pr,10,24,"sicher (j/n)?"chr$(145)
+12750 getx$:if x$<>"j"and x$<>"n" then 12750
+12760 if x$="n" then a=136:return
+12765 gosub 11400:sys pr,3,24,"... "sa$(a)" wird geloescht ..."chr$(145)
+;
+;Fehlerteufelchen 64'er 1/1986
+;"Das in diesem Listing enthaltene Löschen von Sachgebieten funktioniert nicht. Die abgedruckte Fassung löscht statt des gewünschten Sachgebiets das benachbarte. Deshalb folgender Änderungsvorschlag:"
+12766 open15,8,15,"s:"+sa$(a)+"/s":close15
+12767 open15,8,15,"s:?"+sa$(a):close15
+12768 open15,8,15,"s:??”+sa$(a):close15
+;
+12770 if a=ii then 12810
+12780 for i=a to ii-1
+12790 sa$(i)=sa$(i+1)
+12800 next
+12810 ii=ii-1
+12820 gosub10300:rem  sachgebiete write
+;
+;Fehlerteufelchen 64'er 1/1986
+;"Die Zeilen 12830 bis 12832 sind ersatzlos zu streichen."
+;12830 open15,8,15,"s:"+sa$(a)+"*":close15
+;12831 open15,8,15,"s:??"+sa$(a)+"*":close15
+;12832 open15,8,15,"s:???"+sa$(a)+"*":close15
+;
+12840 close15:a=136:return
+12850 :
+13000 rem "Aufgabendiskette einlegen"
+13010 sys pr,6,23," Aufgabendiskette einlegen "
+13020 for j=1 to 80:next
+13030 get x$:if x$<>""then 13070
+13040 sys pr,6,23,"{rvon} Aufgabendiskette einlegen {rvof}"
+13050 for j=1 to 80:next
+13060 goto 13010
+13070 gosub11400:return
+13080 :
+13200 rem ausgabe richtige antwort
+13210 jj=0:for j=0 to len(aw$)
+13220 if mid$(aw$,len(aw$)-j,1)<>" "then 13240
+13230 jj=jj+1:next
+13240 aw$=left$(aw$,len(aw$)-jj)
+13250 l=len(aw$)+19
+13270 return
+13280 :
+14000 rem menue ***********************
+14005 j=1
+14010 gosub 14100:syspr,sp(j),ze(j),"{rvon}"m$(j)chr$(145)
+14015 get x$
+14017 if x$=chr$(13) then 14060
+14020 if x$=chr$(133)orx$=chr$(29)orx$=chr$(157)orx$=chr$(136)then14025
+14022 if x$<>chr$(17)andx$<>chr$(145)then 14015
+14025 if x$=chr$(17)andze(j)=23andj+3<=nn then j=j+3
+14026 if x$=chr$(145)andze(j)=24andnn>4then j=j-3
+14030 if x$=chr$(133)or x$=chr$(136)then 14060
+14040 if x$=chr$(157)then j=j-1:if j=0 then j=nn
+14045 if x$=chr$(29)then j=j+1:if j=nn+1 then j=1
+14050 goto 14010
+14060 return
+14070 :
+14100 for i=1 to nn
+14110 sys pr,sp(i),ze(i),m$(i)chr$(145)
+14120 next:return
+14500 rem menue ***********************
+14505 j=1
+14510 gosub 14100:syspr,sp(j),ze(j),"{rvon}"m$(j)chr$(145)
+14515 get x$
+14518 if x$=chr$(13) then 14560
+14520 if x$<>chr$(133)andx$<>chr$(17)andx$<>chr$(145)andx$<>chr$(136)then 14515
+14530 if x$=chr$(133)or x$=chr$(136) then 14560
+14540 if x$=chr$(145)then j=j-1:if j=0 then j=nn
+14545 if x$=chr$(17)then j=j+1:if j=nn+1 then j=1
+14550 goto 14510
+14560 return
+15000 rem druckeranpassung ************
+15010 gosub11400
+15020 m$(1)=" EPSON ":sp(1)=5:ze(1)=24
+15030 m$(2)=" MPS 801 ":sp(2)=23:ze(2)=24:nn=2:gosub14000
+15040 d=j:return
+16000 rem programmbeschreibung ********
+16010 print chr$(147)
+16020 print " Mit diesem Programm kann man"
+16030 print " {CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}"
+16040 print "  - Pruefungsfragen lernen
+16050 print "  - Pruefungsfragen eingeben / aendern"
+16060 print "  - Pruefungsfragen ausdrucken
+16070 print
+16080 print " Es ist besonders fuer programmierte     Fragen geeignet.
+16090 print:print
+16100 print " Folgendende Tasten werden benutzt:"
+16110 print " {CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}":print
+16120 print " f1 / RETURN zur Uebernahme von Werten
+16130 print "             und Menuepunkten":print
+16140 print" f7          zur Rueckkehr zum vorher-               gehenden Pro";:
+16150 print "grammteil":print
+16160 print " Cursorsteu- zur Anwahl der einzelnen"
+16170 print " ertasten    Menuepunkte"
+16180 syspr,12,24,"{yel}Zurueck mit f7{lblu}"chr$(145)
+16190 get x$:ifx$<>chr$(136)then16190
+16200 return
+17000 rem kopf ------------------------
+17010 print chr$(147);:print tab(1)ko$
+17015 if sa$="" then 11020
+17016 sys pr,1,1,sa$
+17017 sys pr,28,0,"Aufg.Nr.:"n-max+1
+17018 sys pr,28,1,"Anzahl  :"n
+17020 sys pr,00,02,"{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}"chr$(145)
+17021 sys pr,27,0,"{CBM-N}"
+17022 sys pr,27,1,"{CBM-N}"
+17030 sys pr,00,22,"{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}"chr$(145)
+17040 sys pr,00,03,"";
+17050 return
+17060 :
+30000 open 15,8,15
+30010 input#15,a,a$
+30020 print a,a$
+30030 close 15
+

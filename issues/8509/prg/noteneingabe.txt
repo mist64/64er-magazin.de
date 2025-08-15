@@ -1,0 +1,248 @@
+
+
+;noteneingabe.prg ==0801==
+  100 rem *******************************
+  110 rem * + -    noteneingabe     - + *
+  120 rem * zum programm 'sound-machine'*
+  130 rem * fuer den c64                *
+  140 rem * von:   arno muhr            *
+  150 rem *        unterstr. 32         *
+  160 rem *        5176 inden-frenz     *
+  170 rem *******************************
+  180 poke 53280,9:poke 53281,5:print"{blk}"
+  190 print"{clr}{dish}{down}{swlc}{rght}bitte ca. 13  sekunden warten"
+  200 na=49152:for i=na to na+3000:pokei,0:next
+  210 dim nw(5,203),t(5,203):gosub 320
+  220 input"{clr}{down}{rght}zeit fuer 1/4 note (1-120):";gt
+  230 gt=int(gt):gt=gt/120*32:if gt<=0 or gt>32 then 220
+  240 print chr$(147)
+  250 print chr$(19);c/3+1"{left} . note : ":n$=""
+  260 input "note  : ";n$
+  270 goto 610
+  280 w=1
+  290 for i=1 to 98:if n$=n$(i) then w=w(i)
+  300 next
+  310 return
+  320 rem *** notenwerte einlesen ***
+  330 dim n$(98),w(98)
+  340 for i=1 to 98:read n$
+  350 n$(i)=n$:next
+  360 for i=1 to 98:read w
+  370 w(i)=w:next
+  380 return
+  390 rem *** notendatas ***
+  400 data c0,c#0,d0,d#0,e0,f0,f#0,g0,g#0,a0,a#0,h0
+  410 data c1,c#1,d1,d#1,e1,f1,f#1,g1,g#1,a1,a#1,h1
+  420 data c2,c#2,d2,d#2,e2,f2,f#2,g2,g#2,a2,a#2,h2
+  430 data c3,c#3,d3,d#3,e3,f3,f#3,g3,g#3,a3,a#3,h3
+  440 data c4,c#4,d4,d#4,e4,f4,f#4,g4,g#4,a4,a#4,h4
+  450 data c5,c#5,d5,d#5,e5,f5,f#5,g5,g#5,a5,a#5,h5
+  460 data c6,c#6,d6,d#6,e6,f6,f#6,g6,g#6,a6,a#6,h6
+  470 data c7,c#7,d7,d#7,e7,f7,f#7,g7,g#7,a7,a#7,h7
+  480 data pause,p
+  490 data 268,284,301,318,337,358,379,401,425,451,477,506,536,568,602,637,675
+  500 data 716,758,803,851,902,955,1012,1072,1136,1204,1275,1351,1432,1517,1607
+  510 data 1703,1804,1911,2025,2145,2273,2408,2551,2703,2864,3034,3215,3406,3608
+  520 data 3823,4050,4291,4547,4817,5103,5407,5728,6069,6430,6812,7217,7647,8101
+  530 data 8583,9094,9634,10207,10814,11457,12139,12860,13625,14435,15294,16203
+  540 data 17167,18188,19269,20415,21629,22915,24278,25721,27251,28871,30588
+  550 data 32407,34334,36376,38539,40830,43258,45830,48556,51443,54502,57743
+  560 data 61176,64814,0,0
+  570 :
+  580 rem   ******************
+  590 rem   *+- funktionen -+*
+  600 rem   ******************
+  610 :
+  620 if n$="-" and c=>3 then c=c-3:goto 250
+  630 if n$="-"      then print "erste note !  ":goto 250
+  640 if n$="+"      then c=c+3:goto 250
+  650 if n$="save"   then 1120
+  660 if n$="load"   then 1870
+  670 if n$="def."   then 1280
+  680 if n$="copy"   then 1650
+  690 if n$="insert" then 1470
+  700 if n$="quit"   then 1040
+  710 if n$="on"     then sys 53004:goto 250
+  720 if n$="off"    then sys 53027:goto 250
+  730 if n$="new"    then c=0:goto 240
+  740 if n$="clear"  then run
+  750 if n$="set end"then 1060
+  760 gosub 280
+  770 input "zeit  : ";t$:t$=t$+"  "
+  780 print "                          {left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}";
+  790 if w=1 then print "noten fehler!":if zz<>1 goto 250
+  800 if w=1 then return
+  810 hb=int(w/256):lb=w-256*hb
+  820 a=val(t$):aa=3:if a>9 then aa=4
+  830 a$=mid$(t$,aa,2):t=0
+  840 a1=val(a$)
+  850 if a1=64 then t=2
+  860 if a1=32 then t=4
+  870 if a1=16 then t=8
+  880 if a1=08 then t=16
+  890 if a1=04 then t=32
+  900 if a1=02 then t=64
+  910 if a1=01 then t=127
+  920 if t=0 then print" zeit fehler!":if zz<>1 then goto 250
+  930 if t=0 then return
+  940 t=t/32*gt:t=t*a
+  950 if t>255 then print " zeit zu lang !":if zz<>1 goto 250
+  960 if t>255 then return
+  970 if zz=1 then return
+  980 poke 49152+c,lb
+  990 poke 49153+c,hb
+ 1000 poke 49154+c,t
+ 1010 c=c+3
+ 1020 goto 250
+ 1030 :
+ 1040 for i=0 to 9:poke 49152+c+i,0:next
+ 1050 end
+ 1060 rem *** set end ***
+ 1070 rem -ende des stueckes makieren
+ 1080 poke na+c,0
+ 1090 poke na+c+1,0
+ 1100 poke na+c+2,0
+ 1110 goto 250
+ 1120 rem *** save ***
+ 1130 rem -abspeichern von musikstuecken
+;
+;Fehlerfeufelchen 64'er 10/1985
+; "Im Listing 2, Noteneingabe, muß die Zeile 1140 »SYS53027« lauten. Wird dies nicht korrigiert, stürzt der Computer beim Befehl »Save« ab."
+; 1140 sys 53tan27
+ 1140 sys 53027
+;
+ 1150 i=0:print "{clr}{down}{rght}abspeichern "
+ 1160 input "{clr}{down}{rght}titel ";a$
+ 1170 if len(a$)>16 then 1150
+ 1180 if a$="^" then 240
+ 1190 open 1,8,1,a$
+ 1200 print#1,chr$(0);chr$(192);
+ 1210 :np=peek(49152+i)
+ 1220 :print#1,chr$(np);
+ 1230 :i=i+1:if i<=c then 1210
+ 1240 print#1,chr$(0);chr$(0);chr$(0)
+ 1250 close 1:gosub 2380
+ 1260 print"{down}{rght}";e;z$:print"{down}{rght}taste druecken "
+ 1270 poke 198,0:wait 198,1:poke198,0:goto 240
+ 1280 rem *** def. ***
+ 1290 rem -definieren einer notenfolge
+ 1300 print "{clr}":nn=0
+ 1310 if ns>5 then print"es bestehen schon 6 ":fori=0to999:next:print"{clr}":goto250
+ 1320 print"{home}{down}{rght}definitionfile nr.";ns:print nn+1;"{left} . note"
+ 1330 input "{down}note  : ";n$
+ 1340 if n$="end" then 1430
+ 1350 if n$="^" then 240
+ 1360 if n$="-" then nn=nn-1:goto 1320
+ 1370 if n$="+" then nn=nn+1:goto 1320
+ 1380 gosub 280:zz=1:gosub 770:zz=0
+ 1390 if t=0 or t>255 or w=1 then 1320
+ 1400 nw(ns,nn)=w:t(ns,nn)=t
+ 1410 nn=nn+1:if nn<201 then 1320
+ 1420 print "definitionfile is voll!"
+ 1430 w=0:t=0:for i=1 to 2:nn=nn+1:nw(ns,nn)=0:t(ns,nn)=0:next
+ 1440 for i=1 to 999:next:print"{clr}"
+ 1450 ns=ns+1:goto 250
+ 1460 :
+ 1470 rem *** insert ***
+ 1480 rem -einfuegen einer definition
+ 1490 :
+ 1500 print "{clr}{down}{rght}definitionfile einfuegen"
+ 1510 print "{down}{rght}nr. 0-5 oder ^"
+ 1520 poke 198,0:wait 198,1:get a$
+ 1530 if a$="^" then 1630
+ 1540 if a$<"0" or a$>"5" then 1520
+ 1550 ni=val(a$):a=0
+ 1560 if ni>ns then 1630
+ 1570 :p2=int(nw(ni,a)/256):p1=nw(ni,a)-256*p2:p3=t(ni,a)
+ 1580 :poke 49152+c,p1
+ 1590 :poke 49153+c,p2
+ 1600 :poke 49154+c,255-p3
+ 1610 a=a+1:c=c+3:if p3<>0 then 1570
+ 1620 c=c-3
+ 1630 print "{clr}":goto 250
+ 1640 :
+ 1650 rem *** copy ***
+ 1660 rem -kopieren von notenreihen
+ 1670 :
+ 1680 print "{clr}{down}{rght}copy"
+ 1690 input "{down}{rght}erste note  :";a$
+ 1700 a=val (a$)
+ 1710 input "{rght}letzte note :";b
+ 1720 a=int(a):b=int(b)
+ 1730 if a<1 or b<1 then 240
+ 1740 x=1:if a>b then x=-1
+ 1750 if a>c/3 or b>c/3 then 240
+ 1760 if a<b then a=a-x:b=b-x
+ 1770 if a>b then a=a+x:b=b+x
+ 1780 :
+ 1790 for i=a to b step x
+ 1800 :poke 49152+c,peek(49152+i*3)
+ 1810 :poke 49153+c,peek(49153+i*3)
+ 1820 :poke 49154+c,peek(49154+i*3)
+ 1830 :c=c+3
+ 1840 next
+ 1850 goto 240
+ 1860 :
+ 1870 rem *** load ***
+ 1880 rem -laden von musikstuecken und $
+;
+;Fehlerfeufelchen 64'er 10/1985
+; "Die Zeile 1890 muß ebenfalls »SYS 53027« heißen, der REM-Befehl entfällt."
+; 1890 rem sys 53027
+ 1890 sys 53027
+;
+ 1900 print "{clr}{down}{rght}load song oder directory"
+ 1910 input "{down}{rght}titel :";a$
+ 1920 if a$="$" then 2150
+ 1930 if a$="^" then 240
+ 1940 input "{down}{rght}anhaengen (j/n) :";b$
+ 1950 if b$="^" then 240
+ 1960 open 1,8,0,a$:gosub 2380:if e<>0 then 2120
+ 1970 open 1,8,0,a$
+ 1980 get#1,c$,c$
+ 1990 if b$<>"j" and b$<>"ja" then c=0
+ 2000 a=1
+ 2010 :get#1,c$
+ 2020 :a2=a1:a1=a
+ 2030 :if c$<=chr$(0) then a=0:goto 2050
+ 2040 :a=asc(c$)
+ 2050 :poke 49152+c,a
+ 2060 :c=c+1
+ 2070 :if a=0 and a1=a and a2=a then 2090
+ 2080 :goto 2010
+ 2090 c=c-3
+ 2100 close 1
+ 2110 gosub 2380
+ 2120 print"{down}{rght}";e;z$:print"{down}{rght}taste druecken "
+ 2130 poke 198,0:wait 198,1:poke198,0:goto 240
+ 2140 :
+ 2150 rem --- directory anzeigen ---
+ 2160 :
+ 2170 open 1,8,0,"$":kv=0
+ 2180 for i=0 to 30:get#1,a$:b$=b$+a$:next
+ 2190 print"  ";b$
+ 2200 get#1,a$,b$,e$,f$,g$:for i=0 to 26:get#1,d$:c$=c$+d$:next
+ 2210 if f$<=chr$(0) then a=0:goto 2230
+ 2220 a=asc(f$)
+ 2230 if g$<=chr$(0) then b=0:goto 2250
+ 2240 b=asc(g$)
+ 2250 d=a+256*b
+ 2260 if c$="GGGGGGGGGGGGGGGGGGGGGGGGGGG" then c$="":goto 2340: rem -27 shift g-
+ 2270 print d;c$:c$=""
+ 2280 kv=kv+1:if kv=22 then 2300
+ 2290 goto 2200
+ 2300 kv=0:print "{down}{rght}taste druecken"
+ 2310 poke 198,0:wait 198,1
+ 2320 print"{up}                    ":print"{up}{up}{up}"
+ 2330 goto 2200
+ 2340 kv=0:print "{down}{rght}taste druecken"
+ 2350 poke 198,0:wait 198,1
+ 2360 close 1:poke 198,0:goto 1870
+ 2370 :
+ 2380 rem +++ fehlerkanal abfragen +++
+ 2390 open 2,8,15
+ 2400 input#2,e,z$,t,s
+ 2410 close 1
+ 2420 close 2
+ 2430 return
+

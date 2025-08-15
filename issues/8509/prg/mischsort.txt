@@ -1,0 +1,92 @@
+
+
+;mischsort.prg ==0801==
+   10 rem erstellen eines feldes zum
+   20 rem sortieren.
+   30 rem das erstellen kann zufaellig
+   40 rem oder geziehlt (durch eingabe)
+   50 rem erfolgen.
+   60 rem
+   70 rem sortieralgorithmen erhalten die
+   80 rem zeilennummern von 10000 bis 50000
+   90 rem sie benoetigen jeweils diesen
+   99 rem vorspann zur ausfuehrung.
+  100 rem herstellung eines arrays:
+  110 rem arrayvariable      - a$
+  120 rem schleifenvariablen - x, y, z
+  130 rem hilfsvariablen     - b$, c$, d$
+  140 rem dreiecktausch mit  - s$
+  150 print"{clr}":clr
+  160 print"soll von {rvon}h{rvof}and oder {rvon}z{rvof}ufaellig erstellt":print
+  170 input"werden ";x$
+  180 ifx$<>"h"andx$<>"z"then150
+  190 ifx$="h"thengosub220:gosub1000:goto210
+  200 gosub220:gosub2000
+  210 goto4000: rem weitermachen
+  220 rem anzahl der elemente bestimmen
+  230 print:input"anzahl der elemente ";a
+  240 if a>10000thenprint:print"zu viele elemente":goto230
+  250 ifa<10thenprint:print"zu wenige elemente":goto230
+  255 dim a$(a)
+  260 input"{down}{down}{rvon}d{rvof}rucker oder {rvon}b{rvof}ildschirm ";y$
+  270 ify$<>"d"andy$<>"b"then260
+  280 ify$="d"thend=4:goto300
+  290 d=3
+  300 return
+ 1000 rem eingabe von hand
+ 1010 print"{clr}vorwaerts oder rueckwaerts";
+ 1020 inputx$:ifx$<>"r"andx$<>"v"then1020
+ 1030 r=1:x1=1:x2=a
+ 1040 ifx$="r"thenr=-1:x1=a:x2=1
+ 1050 y=0:forx=x1tox2stepr
+ 1060 y=y+1:a$(y)=str$(x+99)
+ 1070 nextx
+ 1080 return
+ 2000 rem zufaellige eingabe
+ 2010 print"{clr}"
+ 2020 print:print"es werden jetzt"a" elemente zufaellig":print:print"ausgewaehlt"
+ 2030 print:print"jedes element besteht aus 3 zeichen.":print:print
+ 2040 forx=1toa
+ 2050 a$(x)=""
+ 2060 fory=1to3:a$(x)=a$(x)+chr$(int(rnd(ti)*25)+65):nexty
+ 2070 nextx
+ 2080 return
+ 3000 rem zwischenausgabe der elemente
+ 3010 for i=1toa-9step10
+ 3020 for j=itoi+9:print#1,a$(j)" ";:nextj
+ 3030 print#1:nexti
+ 3040 return
+ 4000 rem weitermachen
+ 4005 open1,d
+ 4010 print"{clr}ausgabe des erstellten feldes"
+ 4020 print
+ 4030 gosub3000
+ 4040 rem sortierung startet
+ 4050 rem
+10040 ti$="000000"
+10050 zf=int(a/2+.5):dimtv$(zf)
+10060 forx=2toastep2
+10070 ifa$(x-1)>a$(x)thentv$(0)=a$(x-1):a$(x-1)=a$(x):a$(x)=tv$(0)
+10080 nextx:ifa<3then 50000
+10090 lf=1:formz=1toint(log(a-1)/log(2))
+10100 zf=int(zf/2+.5):lf=2*lf
+10110 forfz=1tozf:a1=1+2*lf*(fz-1):a2=a1+lf:e1=a2-1:e2=e1+lf
+10120 ife2<=athenet=lf:goto10150
+10130 ifa<a2then10230
+10140 e2=a:et=a+1-a2
+10150 forx=1toet:tv$(x)=a$(x+e1):next
+10160 forx=e2toa1step-1
+10170 ifa$(e1)<tv$(et)then10200
+10180 a$(x)=a$(e1):e1=e1-1:ife1>=a1then10220
+10190 fory=x-1toa1step-1:a$(y)=tv$(et):et=et-1:nexty:goto10210
+10200 a$(x)=tv$(et):et=et-1:ifet>=1then10220
+10210 x=a1
+10220 nextx
+10230 nextfz,mz
+50000 t$=ti$:rem endebehandlung
+50010 print#1
+50020 gosub 3000
+50030 print#1,a;" elemente"
+50040 print#1:print#1:print#1,t$:close1
+50050 end
+
