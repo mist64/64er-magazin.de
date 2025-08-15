@@ -26,9 +26,48 @@
 
         <p>Sowohl beim RESET als auch beim NMI haben wir festgestellt, daß der Modulstart-Bereich ab $8000 eine besondere Rolle spielt. In Bild 5 finden Sie nochmal zusammengefaßt, was sich dort findet wenn ein Modul vorhanden ist.</p>
 
+        <figure>
+            <table>
+                <tr>
+                    <th>Speicherplatz ($)</th>
+                    <th>8000</th>
+                    <th>8001</th>
+                    <th>8002</th>
+                    <th>8003</th>
+                    <th>8004</th>
+                    <th>8005</th>
+                    <th>8006</th>
+                    <th>8007</th>
+                    <th>8008</th>
+                </tr>
+                <tr>
+                    <td rowspan="2">Inhalt</td>
+                    <td>LSB</td>
+                    <td>MSB</td>
+                    <td>LSB</td>
+                    <td>MSB</td>
+                    <td rowspan="2">C</td>
+                    <td rowspan="2">B</td>
+                    <td rowspan="2">M</td>
+                    <td rowspan="2">8</td>
+                    <td rowspan="2">0</td>
+                </tr>
+                <tr>
+                    <td colspan="2">RESET-Vektor</td>
+                    <td colspan="2">NMI-Vektor</td>
+                </tr>
+            </table>
+            <figcaption>Bild 5. Diesen Inhalt müssen die Speicherstellen $8000 bis $8008 haben, damit ein Modulstart stattfindet</figcaption>
+        </figure>
+
         <p>Wir wollen im folgenden Beispielprogramm (Listing 1) ein Modul simulieren, indem wir den SMON mittels des RESET anspringen. Der NMI — also die RUN/STOP-RESTORE-Tastenkombination — soll dabei wirkungslos gemacht werden.</p>
 
         <p>Bild 6 zeigt ein Flußdiagramm dieses Beispielprogrammes:</p>
+
+        <figure>
+            <img src="109-6.png" alt="">
+            <figcaption>Bild 6. Flußdiagramm zum Listing 1, Modulsimulation</figcaption>
+        </figure>
 
         <p>Achten Sie bitte darauf, daß Sie nach dem Eintippen des Programmes abspeichern und — natürlich — daß die SMON-Version ab $C000 im Speicher vorliegt. Mit SYS 24576 starten Sie unser Programm, in dem durch diesen SYS-Befehl zunächst nach $8000/1 die Startadresse einer neuen RESET-Serviceroutine geschrieben wird und nach $8002/3 die der neuen NMI-Routine. Außerdem wird die Modulkennung in die vorgeschriebenen Speicherplätze eingetragen. Wenn Sie nun mal die RESTORE-Taste — oder RUN/STOP und RESTORE — drücken, passiert offensichtlich nichts. Das liegt daran, daß unser Programm lediglich die auf den Stapel gelegten Register wieder zurückholt und aus der Unterbrechung mit RTI ins normale Geschehen zurückkehrt.</p>
 
@@ -90,6 +129,11 @@
 
         <p>Von $D011 allerdings ist nur das Bit 7 als msb der Rasterzeilenzahl für uns von Bedeutung. Bild 7 soll diese Belegung deutlich machen:</p>
 
+        <figure>
+            <img src="109-7.png" alt="">
+            <figcaption>Bild 7. So sieht das 9-Bit-Register im VIC-II-Chip aus, welches die Rasterzeilen mitzählt</figcaption>
+        </figure>
+
         <p>Das Interessante an diesen Registern ist nun, daß man auch in sie schreiben kann. Die auf diese Weise festgelegte Rasterzeile ist dann der Auslöser des IRQ, falls dieser im Interrupt-enable-Register $D01A freigegeben wurde (das kennen wir noch aus der letzten Folge).</p>
 
         <p>Damit kann also unsere primäre Unterbrechungsquelle (der VIC-II-Chip) programmiert werden. Halten wir die zwei Schritte dazu nochmal fest:</p>
@@ -104,76 +148,335 @@
 
         <p>Damit wären alle Vorbereitungen getroffen. Der Rest liegt nun ganz bei uns — beziehungsweise bei dem von uns zu schreibenden Service-Programm. Als Bild 8 finden Sie ein Flußdiagramm unseres Beispielprogrammes 2.</p>
 
+        <figure>
+            <img src="109-8.png" alt="">
+            <figcaption>Bild 8. Flußdiagramm zum im Text vorgestellten Listing 2. Ein bunter Rahmen wird erzeugt.</figcaption>
+        </figure>
+
         <p>Gehen wir nun an die Realisierung. Zunächst also die Initialisierung, die wir bei $6000 (also durch SYS 24576 zu starten) beginnen lassen:</p>
 
         <table class="plain">
-            <tr><td><b>6000</b></td><td><b>SEI</b></td><td>Sperren von IRQs</td></tr>
-            <tr><td colspan="3">Schritt 3:</td></tr>
-            <tr><td><b>6001</b></td><td><b>LDA #$28</b></td><td>LSB der IRQ-Routine</td></tr>
-            <tr><td><b>6003</b></td><td><b>STA 0314</b></td><td>in IRQ-Vektor-LSB</td></tr>
-            <tr><td><b>6006</b></td><td><b>LDA #$60</b></td><td>MSB der IRQ-Routine</td></tr>
-            <tr><td><b>6008</b></td><td><b>STA 0315</b></td><td>in IRQ-Vektor-MSB</td></tr>
-            <tr><td colspan="3">Schritt 1:</td></tr>
-            <tr><td><b>600B</b></td><td><b>LDA #$F8</b></td><td>Rasterzeile, bei der das Textfenster endet. Von da an soll der Rahmen schwarz sein.</td></tr>
-            <tr><td><b>600D</b></td><td><b>STA D012</b></td><td>in Rasterzeilen-Register (LSB) schreiben.</td></tr>
-            <tr><td><b>6010</b></td><td><b>LDA D011</b></td><td>Register mit dem msb des Rasterzeilenzählers</td></tr>
-            <tr><td><b>6013</b></td><td><b>AND #$7F</b></td><td>0111 1111 löscht das Bit7</td></tr>
-            <tr><td><b>6015</b></td><td><b>STA D011</b></td><td>Zurückschreiben. Damit ist die Rasterzeile, die den IRQ auslösen soll, festgelegt.</td></tr>
-            <tr><td colspan="3">Schritt 2:</td></tr>
-            <tr><td><b>6018</b></td><td><b>LDA #$81</b></td><td>1000 0001 wird nun</td></tr>
-            <tr><td><b>601A</b></td><td><b>STA D01A</b></td><td>ins IRQ-enable-Register geschrieben, um den Rasterzeilen-IRQ zuzulassen.</td></tr>
-            <tr><td colspan="3">Festlegen einiger Startwerte:</td></tr>
-            <tr><td><b>601D</b></td><td><b>LDA #$00</b></td><td>Farbe schwarz</td></tr>
-            <tr><td><b>601F</b></td><td><b>STA D020</b></td><td>in Rahmen schreiben</td></tr>
-            <tr><td><b>6022</b></td><td><b>LDA #$04</b></td><td>Streifenbreite in</td></tr>
-            <tr><td><b>6024</b></td><td><b>STA 02</b></td><td>Merkregister schreiben.</td></tr>
-            <tr><td><b>6026</b></td><td><b>CLI</b></td><td>IRQ freigeben</td></tr>
-            <tr><td><b>6027</b></td><td><b>RTS</b></td><td>Ende der Initialisierung.</td></tr>
-            <tr><td colspan="3"><p>Von nun an laufen alle IRQs über unsere eigene Routine, die bei $6028 beginnt.</p></td></tr>
-            <tr><td colspan="3"><p>Zunächst müssen wir prüfen, ob die Unterbrechung vom VIC-II-Chip kommt oder vom CIA1:</p></td></tr>
-            <tr><td><b>6028</b></td><td><b>LDA D019</b></td><td>IRQ-Request-Register des VIC-II-Chip (siehe letzte Folge). Dort ist Bit 7 gesetzt, wenn die Anforderung vom VIC-II-Chip kam.</td></tr>
-            <tr><td><b>602B</b></td><td><b>STA D019</b></td><td>Zurückschreiben</td></tr>
-            <tr><td><b>602E</b></td><td><b>BMI 6037</b></td><td>Sprung, falls VIC-IRQ, sonst CIA-IRQ.</td></tr>
-            <tr><td colspan="3">Bearbeiten eines CIA-IRQ:</td></tr>
-            <tr><td><b>6030</b></td><td><b>LDA DC0D</b></td><td>Löschen des CIA1 Unterbrechungs-Kontrollregisters.</td></tr>
-            <tr><td><b>6033</b></td><td><b>CLI</b></td><td>IRQ zulassen. Damit können innerhalb eines CIA-IRQ auch unsere VIC-IRQs geschehen.</td></tr>
-            <tr><td><b>6034</b></td><td><b>JMP EA31</b></td><td>Bearbeitung des CIA-IRQ durch die normale Routine.</td></tr>
-            <tr><td colspan="3">Unser Programm für VIC-II-IRQs:</td></tr>
-            <tr><td><b>6037</b></td><td><b>LDA D012</b></td><td>Rasterzeilen-Register laden um festzustellen, welche Zeile den IRQ auslöste.</td></tr>
-            <tr><td><b>603A</b></td><td><b>CMP #$F8</b></td><td>Vergleich mit Ende des Textfensters.</td></tr>
-            <tr><td><b>603C</b></td><td><b>BCS 604F</b></td><td>Wenn unterhalb des Textfensters, Sprung.</td></tr>
-            <tr><td colspan="3"><p>Der folgende Programmteil ist wirksam, wenn der IRQ-Auslöser eine Zeile in Höhe des Textfensters war:</p></td></tr>
-            <tr><td><b>603E</b></td><td><b>CLC</b></td><td>Addition vorbereiten.</td></tr>
-            <tr><td><b>603F</b></td><td><b>ADC 02</b></td><td>Streifenbreite aus dem Merkregister addieren.</td></tr>
-            <tr><td><b>6041</b></td><td><b>STA D012</b></td><td>Neuen Wert in Rasterzeilen-Register schreiben.</td></tr>
-            <tr><td colspan="3"><p>Damit wird eine neue Rasterzeile als IRQ-Auslöser festgelegt, die um die Streifenbreite tiefer liegt als die vorhergegangene.</p></td></tr>
-            <tr><td colspan="3"><p>Es folgt eine kleine Verzögerungsschleife, die aber nur zum Experimentieren eingebaut wurde:</p></td></tr>
-            <tr><td><b>6044</b></td><td><b>LDY #$03</b></td><td>Schleifen-Startwert</td></tr>
-            <tr><td><b>6046</b></td><td><b>DEY</b></td><td>Herunterzählen</td></tr>
-            <tr><td><b>6047</b></td><td><b>BNE 6046</b></td><td>NEXT Y, bis Y= 0.</td></tr>
-            <tr><td colspan="3">Ändern der Rahmenfarbe bis zum nächsten Raster-IRQ:</td></tr>
-            <tr><td><b>6049</b></td><td><b>INC D020</b></td><td>Farbcode+1. Wenn Code im Rahmenfarbregister größer als 15 wird, fängt wieder Farbcode 0 an, weil die Bits 5-7 keine Funktion haben.</td></tr>
-            <tr><td colspan="3"><p>Abschließend erfolgt der Rücksprung in den Rest der normalen IRQ-Routine:</p></td></tr>
-            <tr><td><b>604C</b></td><td><b>JMP EA81</b></td><td>Siehe unsere Untersuchung der IRQ-Firmware.</td></tr>
-            <tr><td colspan="3"><p>Damit ist der Rahmen in Höhe des Textfensters behandelt. Es schließt sich nun der Teil an, der die Rahmenbereiche unter- und oberhalb bearbeitet:</p></td></tr>
-            <tr><td><b>604F</b></td><td><b>LDA #$00</b></td><td>Farbcode schwarz</td></tr>
-            <tr><td><b>6051</b></td><td><b>STA D020</b></td><td>in Rahmenfarb-Register.</td></tr>
-            <tr><td><b>6054</b></td><td><b>LDA #$32</b></td><td>Rasterzeile, bei der oben das Textfenster beginnt.</td></tr>
-            <tr><td><b>6056</b></td><td><b>STA D012</b></td><td>In Rasterzeilen-Register schreiben</td></tr>
-            <tr><td><b>6059</b></td><td><b>JMP EA81</b></td><td>Abschluß durch Sprung zum Ende der normalen IRQ-Routine.</td></tr>
-            <tr><td colspan="3"><p>Damit ist festgelegt, daß ober- und unterhalb des Textfensters die Rahmenfarbe schwarz wird.</p></td></tr>
-            <tr><td colspan="3"><p>Unsere eigene Routine ist jetzt abgeschlossen. Zum guten Ton gehört es, dem Benutzer auch die Möglichkeit zu öffnen, diese Routine wieder abzuschalten. Das erfolgt im letzten Programmteil, der mittels SYS24688 aktiviert werden kann:</p></td></tr>
-            <tr><td><b>605C</b></td><td><b>SEI</b></td><td>IRQ sperren</td></tr>
-            <tr><td><b>605D</b></td><td><b>LDA #$00</b></td><td>Raster-IRQ</td></tr>
-            <tr><td><b>605F</b></td><td><b>STA D01A</b></td><td>abschalten</td></tr>
-            <tr><td><b>6062</b></td><td><b>LDA #$31</b></td><td>IRQ-Vektor</td></tr>
-            <tr><td><b>6064</b></td><td><b>STA 0314</b></td><td>restaurieren</td></tr>
-            <tr><td><b>6067</b></td><td><b>LDA #$EA</b></td><td></td></tr>
-            <tr><td><b>6069</b></td><td><b>STA 0315</b></td><td></td></tr>
-            <tr><td><b>606C</b></td><td><b>LDA #$0E</b></td><td></td></tr>
-            <tr><td><b>606E</b></td><td><b>STA D020</b></td><td></td></tr>
-            <tr><td><b>6071</b></td><td><b>CLI</b></td><td></td></tr>
-            <tr><td><b>6072</b></td><td><b>RTS</b></td><td></td></tr>
+            <tr>
+                <td><b>6000</b></td>
+                <td><b>SEI</b></td>
+                <td>Sperren von IRQs</td>
+            </tr>
+            <tr>
+                <td colspan="3">Schritt 3:</td>
+            </tr>
+            <tr>
+                <td><b>6001</b></td>
+                <td><b>LDA #$28</b></td>
+                <td>LSB der IRQ-Routine</td>
+            </tr>
+            <tr>
+                <td><b>6003</b></td>
+                <td><b>STA 0314</b></td>
+                <td>in IRQ-Vektor-LSB</td>
+            </tr>
+            <tr>
+                <td><b>6006</b></td>
+                <td><b>LDA #$60</b></td>
+                <td>MSB der IRQ-Routine</td>
+            </tr>
+            <tr>
+                <td><b>6008</b></td>
+                <td><b>STA 0315</b></td>
+                <td>in IRQ-Vektor-MSB</td>
+            </tr>
+            <tr>
+                <td colspan="3">Schritt 1:</td>
+            </tr>
+            <tr>
+                <td><b>600B</b></td>
+                <td><b>LDA #$F8</b></td>
+                <td>Rasterzeile, bei der das Textfenster endet. Von da an soll der Rahmen schwarz sein.</td>
+            </tr>
+            <tr>
+                <td><b>600D</b></td>
+                <td><b>STA D012</b></td>
+                <td>in Rasterzeilen-Register (LSB) schreiben.</td>
+            </tr>
+            <tr>
+                <td><b>6010</b></td>
+                <td><b>LDA D011</b></td>
+                <td>Register mit dem msb des Rasterzeilenzählers</td>
+            </tr>
+            <tr>
+                <td><b>6013</b></td>
+                <td><b>AND #$7F</b></td>
+                <td>0111 1111 löscht das Bit7</td>
+            </tr>
+            <tr>
+                <td><b>6015</b></td>
+                <td><b>STA D011</b></td>
+                <td>Zurückschreiben. Damit ist die Rasterzeile, die den IRQ auslösen soll, festgelegt.</td>
+            </tr>
+            <tr>
+                <td colspan="3">Schritt 2:</td>
+            </tr>
+            <tr>
+                <td><b>6018</b></td>
+                <td><b>LDA #$81</b></td>
+                <td>1000 0001 wird nun</td>
+            </tr>
+            <tr>
+                <td><b>601A</b></td>
+                <td><b>STA D01A</b></td>
+                <td>ins IRQ-enable-Register geschrieben, um den Rasterzeilen-IRQ zuzulassen.</td>
+            </tr>
+            <tr>
+                <td colspan="3">Festlegen einiger Startwerte:</td>
+            </tr>
+            <tr>
+                <td><b>601D</b></td>
+                <td><b>LDA #$00</b></td>
+                <td>Farbe schwarz</td>
+            </tr>
+            <tr>
+                <td><b>601F</b></td>
+                <td><b>STA D020</b></td>
+                <td>in Rahmen schreiben</td>
+            </tr>
+            <tr>
+                <td><b>6022</b></td>
+                <td><b>LDA #$04</b></td>
+                <td>Streifenbreite in</td>
+            </tr>
+            <tr>
+                <td><b>6024</b></td>
+                <td><b>STA 02</b></td>
+                <td>Merkregister schreiben.</td>
+            </tr>
+            <tr>
+                <td><b>6026</b></td>
+                <td><b>CLI</b></td>
+                <td>IRQ freigeben</td>
+            </tr>
+            <tr>
+                <td><b>6027</b></td>
+                <td><b>RTS</b></td>
+                <td>Ende der Initialisierung.</td>
+            </tr>
+            <tr>
+                <td colspan="3">
+                    <p>Von nun an laufen alle IRQs über unsere eigene Routine, die bei $6028 beginnt.</p>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="3">
+                    <p>Zunächst müssen wir prüfen, ob die Unterbrechung vom VIC-II-Chip kommt oder vom CIA1:</p>
+                </td>
+            </tr>
+            <tr>
+                <td><b>6028</b></td>
+                <td><b>LDA D019</b></td>
+                <td>IRQ-Request-Register des VIC-II-Chip (siehe letzte Folge). Dort ist Bit 7 gesetzt, wenn die Anforderung vom VIC-II-Chip kam.</td>
+            </tr>
+            <tr>
+                <td><b>602B</b></td>
+                <td><b>STA D019</b></td>
+                <td>Zurückschreiben</td>
+            </tr>
+            <tr>
+                <td><b>602E</b></td>
+                <td><b>BMI 6037</b></td>
+                <td>Sprung, falls VIC-IRQ, sonst CIA-IRQ.</td>
+            </tr>
+            <tr>
+                <td colspan="3">Bearbeiten eines CIA-IRQ:</td>
+            </tr>
+            <tr>
+                <td><b>6030</b></td>
+                <td><b>LDA DC0D</b></td>
+                <td>Löschen des CIA1 Unterbrechungs-Kontrollregisters.</td>
+            </tr>
+            <tr>
+                <td><b>6033</b></td>
+                <td><b>CLI</b></td>
+                <td>IRQ zulassen. Damit können innerhalb eines CIA-IRQ auch unsere VIC-IRQs geschehen.</td>
+            </tr>
+            <tr>
+                <td><b>6034</b></td>
+                <td><b>JMP EA31</b></td>
+                <td>Bearbeitung des CIA-IRQ durch die normale Routine.</td>
+            </tr>
+            <tr>
+                <td colspan="3">Unser Programm für VIC-II-IRQs:</td>
+            </tr>
+            <tr>
+                <td><b>6037</b></td>
+                <td><b>LDA D012</b></td>
+                <td>Rasterzeilen-Register laden um festzustellen, welche Zeile den IRQ auslöste.</td>
+            </tr>
+            <tr>
+                <td><b>603A</b></td>
+                <td><b>CMP #$F8</b></td>
+                <td>Vergleich mit Ende des Textfensters.</td>
+            </tr>
+            <tr>
+                <td><b>603C</b></td>
+                <td><b>BCS 604F</b></td>
+                <td>Wenn unterhalb des Textfensters, Sprung.</td>
+            </tr>
+            <tr>
+                <td colspan="3">
+                    <p>Der folgende Programmteil ist wirksam, wenn der IRQ-Auslöser eine Zeile in Höhe des Textfensters war:</p>
+                </td>
+            </tr>
+            <tr>
+                <td><b>603E</b></td>
+                <td><b>CLC</b></td>
+                <td>Addition vorbereiten.</td>
+            </tr>
+            <tr>
+                <td><b>603F</b></td>
+                <td><b>ADC 02</b></td>
+                <td>Streifenbreite aus dem Merkregister addieren.</td>
+            </tr>
+            <tr>
+                <td><b>6041</b></td>
+                <td><b>STA D012</b></td>
+                <td>Neuen Wert in Rasterzeilen-Register schreiben.</td>
+            </tr>
+            <tr>
+                <td colspan="3">
+                    <p>Damit wird eine neue Rasterzeile als IRQ-Auslöser festgelegt, die um die Streifenbreite tiefer liegt als die vorhergegangene.</p>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="3">
+                    <p>Es folgt eine kleine Verzögerungsschleife, die aber nur zum Experimentieren eingebaut wurde:</p>
+                </td>
+            </tr>
+            <tr>
+                <td><b>6044</b></td>
+                <td><b>LDY #$03</b></td>
+                <td>Schleifen-Startwert</td>
+            </tr>
+            <tr>
+                <td><b>6046</b></td>
+                <td><b>DEY</b></td>
+                <td>Herunterzählen</td>
+            </tr>
+            <tr>
+                <td><b>6047</b></td>
+                <td><b>BNE 6046</b></td>
+                <td>NEXT Y, bis Y= 0.</td>
+            </tr>
+            <tr>
+                <td colspan="3">Ändern der Rahmenfarbe bis zum nächsten Raster-IRQ:</td>
+            </tr>
+            <tr>
+                <td><b>6049</b></td>
+                <td><b>INC D020</b></td>
+                <td>Farbcode+1. Wenn Code im Rahmenfarbregister größer als 15 wird, fängt wieder Farbcode 0 an, weil die Bits 5-7 keine Funktion haben.</td>
+            </tr>
+            <tr>
+                <td colspan="3">
+                    <p>Abschließend erfolgt der Rücksprung in den Rest der normalen IRQ-Routine:</p>
+                </td>
+            </tr>
+            <tr>
+                <td><b>604C</b></td>
+                <td><b>JMP EA81</b></td>
+                <td>Siehe unsere Untersuchung der IRQ-Firmware.</td>
+            </tr>
+            <tr>
+                <td colspan="3">
+                    <p>Damit ist der Rahmen in Höhe des Textfensters behandelt. Es schließt sich nun der Teil an, der die Rahmenbereiche unter- und oberhalb bearbeitet:</p>
+                </td>
+            </tr>
+            <tr>
+                <td><b>604F</b></td>
+                <td><b>LDA #$00</b></td>
+                <td>Farbcode schwarz</td>
+            </tr>
+            <tr>
+                <td><b>6051</b></td>
+                <td><b>STA D020</b></td>
+                <td>in Rahmenfarb-Register.</td>
+            </tr>
+            <tr>
+                <td><b>6054</b></td>
+                <td><b>LDA #$32</b></td>
+                <td>Rasterzeile, bei der oben das Textfenster beginnt.</td>
+            </tr>
+            <tr>
+                <td><b>6056</b></td>
+                <td><b>STA D012</b></td>
+                <td>In Rasterzeilen-Register schreiben</td>
+            </tr>
+            <tr>
+                <td><b>6059</b></td>
+                <td><b>JMP EA81</b></td>
+                <td>Abschluß durch Sprung zum Ende der normalen IRQ-Routine.</td>
+            </tr>
+            <tr>
+                <td colspan="3">
+                    <p>Damit ist festgelegt, daß ober- und unterhalb des Textfensters die Rahmenfarbe schwarz wird.</p>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="3">
+                    <p>Unsere eigene Routine ist jetzt abgeschlossen. Zum guten Ton gehört es, dem Benutzer auch die Möglichkeit zu öffnen, diese Routine wieder abzuschalten. Das erfolgt im letzten Programmteil, der mittels SYS24688 aktiviert werden kann:</p>
+                </td>
+            </tr>
+            <tr>
+                <td><b>605C</b></td>
+                <td><b>SEI</b></td>
+                <td>IRQ sperren</td>
+            </tr>
+            <tr>
+                <td><b>605D</b></td>
+                <td><b>LDA #$00</b></td>
+                <td>Raster-IRQ</td>
+            </tr>
+            <tr>
+                <td><b>605F</b></td>
+                <td><b>STA D01A</b></td>
+                <td>abschalten</td>
+            </tr>
+            <tr>
+                <td><b>6062</b></td>
+                <td><b>LDA #$31</b></td>
+                <td>IRQ-Vektor</td>
+            </tr>
+            <tr>
+                <td><b>6064</b></td>
+                <td><b>STA 0314</b></td>
+                <td>restaurieren</td>
+            </tr>
+            <tr>
+                <td><b>6067</b></td>
+                <td><b>LDA #$EA</b></td>
+                <td></td>
+            </tr>
+            <tr>
+                <td><b>6069</b></td>
+                <td><b>STA 0315</b></td>
+                <td></td>
+            </tr>
+            <tr>
+                <td><b>606C</b></td>
+                <td><b>LDA #$0E</b></td>
+                <td></td>
+            </tr>
+            <tr>
+                <td><b>606E</b></td>
+                <td><b>STA D020</b></td>
+                <td></td>
+            </tr>
+            <tr>
+                <td><b>6071</b></td>
+                <td><b>CLI</b></td>
+                <td></td>
+            </tr>
+            <tr>
+                <td><b>6072</b></td>
+                <td><b>RTS</b></td>
+                <td></td>
+            </tr>
         </table>
 
         <p>Unser Programm ist komplett. Speichern Sie es bitte vor dem Starten ab. Nach dem SYS 24576 finden Sie einen hübschen bunten Rahmen vor, oberhalb und unterhalb des Textfensters ist er schwarz. Besonders gut — finde ich — sieht das Ganze aus, wenn man die Hintergrundfarbe des Textfensters auch auf Schwarz setzt. Das Programm erlaubt noch einige Experimente:</p>

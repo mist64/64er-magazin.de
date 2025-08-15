@@ -33,6 +33,11 @@
             <li>Die Eingabe erfolgt als Bilder, die Ausgabe als Daten. Diesen Weg nennt man Bildanalyse und das ist ein aufstrebender Zweig beispielsweise der militärischen Satellitenerkundung. Dabei liegt die Aufgabenstellung darin, die Unzahl an Bildinformationen per Computer zu untersuchen auf bestimmte Objektklassen, zum Beispiel Schiffe oder ähnliches. Es ergeben sich sodann Daten, die weiterverarbeitet werden. Wie diese drei Gebiete zusammenhängen, zeigt Bild 1.</li>
         </ol>
 
+        <figure>
+            <img src="106-1.png" alt="">
+            <figcaption>Bild 1. Das ist »Computergrafik«</figcaption>
+        </figure>
+
         <p>Es gibt viel Gemeinsames der drei Bereiche: Datenstrukturen, Speichern und Darstellen der Bilder erzeugen Aufgabenstellungen oder Lösungen, die identisch sein können. Ein Beispiel: In der Bildverarbeitung stellt sich häufig die Aufgabe, Konturen nachzuzeichnen. Andererseits erfordert die Grafik oft das Ausfüllen von umrandeten Flächen. Beide Problemstellungen sind entgegengesetzte Aspekte eines Problems und es läßt sich leicht verstehen, daß ein gemeinsames theoretisches Gerüst zur Lösung verwendet wird.</p>
 
         <p>Nachdem wir diese grundsätzliche Unterteilung getroffen haben, können wir uns auf die Grafik selbst konzentrieren. Pavlidis [1] hat eine Unterscheidung von Bildern getroffen, die weniger mit dem Augenschein als vielmehr mit der Programmierung und Darstellungstechnik zu tun hat. Er teilt die Bilder in vier Klassen ein:</p>
@@ -60,6 +65,11 @@
         <p>Hardwaremäßig ist der Commodore 64 auf Bilder der Klassen 1 und 2 zugeschnitten. Kurvenplots, die eigentlich Klasse 3-Bilder sind, müssen als Klasse 2-Abbildungen umschrieben werden. (Dazu kommen wir gleich noch)</p>
 
         <p>Transformationen sind Übergänge zwischen verschiedenen Bezugssystemen. Ein Beispiel wäre die Transformation, die in Bild 2 anhand eines Überganges von einem Koordinatensystem zu einem anderen gezeigt wird.</p>
+
+        <figure>
+            <img src="106-2.png" alt="">
+            <figcaption>Bild 2. Beispiele für Transformationen</figcaption>
+        </figure>
 
         <p>Auch zwischen den vier Klassen gibt es Möglichkeiten der Transformation, die in der grafischen Datenverarbeitung mit bestimmten Namen versehen sind:</p>
 
@@ -114,6 +124,11 @@
 
         <p>Man unterscheidet nämlich grundsätzlich zwei Verfahren der Bildwiedergabe per CRT-Gerät: Die Raster- und die Vektor-Methode. Sehen wir uns zunächst mal die Vektormethode an. Sie ist speziell für Bilder der Klassen 3 und 4 geeignet. Der Elektronenstrahl wird hier genau zum Punkt geführt, der durch die X- und Y-Koordinaten charakterisiert ist und an dieser Stelle dann einen Leuchtpunkt der gewünschten Intensität erzeugt. Alle anderen möglichen Bildschirmpositionen bleiben unberücksichtigt. Nehmen wir mal an, eine Abbildung setze sich zusammen aus der Punktfolge P1, P2, P3, &hellip;. Pn (siehe auch Bild 3).</p>
 
+        <figure>
+            <img src="106-3.png" alt="">
+            <figcaption>Bild 3. Bildschirmaufbau bei Vektorgrafik und Rastergrafik</figcaption>
+        </figure>
+
         <p>Als Programm könnte man die Arbeit der Bildwiederholung dann etwa so schreiben:</p>
 
         <ul class="plain">
@@ -128,6 +143,11 @@
 
         <p>Bild 4 zeigt einen Programmablaufplan dieser Routine. Was man gut erkennen kann: Der Elektronenstrahl durchläuft nur die Punktfolge. Will man einen Punkt entfernen oder ändern oder dazupacken, ist das ohne weitere Berücksichtigung aller anderen Punkte möglich. Die Bildwiederholung kann sehr schnell geschehen und ist abhängig von der Anzahl der zu bearbeitenden Punkte. Da sieht man dann auch gleich den Nachteil dieser Methode: Wenn die Abbildung sehr komplex wird, also beispielsweise ein Bild der Klasse 1 oder 2 auf diese Weise erzeugt werden soll, dann wird die Reihe der Punkte P(I) ziemlich lang und es kann in Grenzfällen zum Flackern des Bildes kommen. Der Vorzug dieses Verfahrens liegt darin, daß die Auflösung praktisch nur von den gerätetechnischen Details des Bildschirmgerätes abhängt. Übliche Auflösungen liegen bei etwa 4096x4096 Bildpunkten.</p>
 
+        <figure>
+            <img src="106-4.png" alt="">
+            <figcaption>Bild 4. Flußdiagramm eines »Vektorgrafik-Programmes«</figcaption>
+        </figure>
+
         <p>Was ist nun Rastergrafik? Jedem Ort auf dem Bildschirm entspricht hier ein Ort im Speicher des Computers. Besonders geeignet ist dieses Verfahren zur Darstellung von Bildern der Klassen 1 und 2. Aus der Speicheradresse folgt der Bildschirmort, aus dem Inhalt einer solchen Adresse der Grauwert, den der Kathodenstrahl an diesem Ort realisieren soll. Bei jeder Bildwiederholung wird der gesamte für diesen Zweck reservierte Speicher abgetastet und sein Inhalt an das Bildschirmgerät gesandt. Nehmen wir mal an, der Bildschirmspeicher sei 8000 Byte groß (N = 8000), dann könnte man hier ebenfalls ein Programm schreiben zur Bildwiederholung (siehe auch Bild 3).</p>
 
         <ul class="plain">
@@ -141,13 +161,19 @@
 
         <p>Auch hier wieder ein Programm-Ablaufplan (Bild 5):</p>
 
+        <figure>
+            <img src="106-5.png" alt="">
+            <figcaption>Bild 5. Bildschirmaufbau bei Rastergrafik</figcaption>
+        </figure>
+
         <p>Es ist gleichgültig, ob nur ein einziger Punkt zu setzen ist oder alle: Jedesmal wird der gesamte Speicherinhalt übertragen, die Ausführungszeit ist also konstant und nur von der Auflösung — hier also der Speichergröße N — abhängig.</p>
 
         <p>Der Umgang mit Rastergrafik ist komplizierter als der mit Vektorgrafik. Wenn sich beispielsweise zwei Abbildungsbereiche überlappen, darf man beim Rasterverfahren nicht einfach einen davon löschen, denn damit wirkt man auch auf die an derselben Stelle liegenden Teile des zweiten Bereiches ein. Die Vektorgrafik nimmt einfach die Punkte aus dem Auffrischungszyklus heraus, die zu löschen sind. Weil bei dem Rasterverfahren zwischen Bildschirm und Speicher ein 1:1-Verhältnis besteht, kommt man ziemlich schnell an die Grenzen der möglichen Auflösung. Schon eine Auflösung von 1024*1024 Pixels erfordert bei Klasse 2-Bildern (also mit einer Bit-Map) 128 KBytes Speicherraum. Nun werden Sie sagen, daß Speicherraum ja immer preiswerter zu haben ist und man deshalb ohne weiteres zu guten Auflösungen, die denen des Vektorverfahrens gleichkommen, gelangen könnte. Dabei wird aber übersehen, daß zum Beispiel diese ganzen 128 KByte innerhalb einer 30stel Sekunde durchgeblättert werden müssen. Nimmt man aber nur mal einen Lese- und Schreibvorgang — ohne auf die Feinheiten zu achten — wie zum Beispiel:
             <code>LDA (Adresse 1),Y
                 STA (Adresse 2),Y
             </code>
-            und sieht sich an, wieviel Zeit diese Sequenz braucht (nämlich etwa 11 Taktzyklen für ein Byte an Informationen), dann dauert das Lesen und Übertragen der ganzen 128 KByte immerhin schon 1&thinsp;441&thinsp;792 Taktzyklen und das muß auch noch mindestens 30mal in der Sekunde passieren! Außer einem großen Speicher ist somit auch ein sehr schneller Mikroprozessor vonnöten und genau da liegen die Grenzen dieses Verfahrens.</p>
+            und sieht sich an, wieviel Zeit diese Sequenz braucht (nämlich etwa 11 Taktzyklen für ein Byte an Informationen), dann dauert das Lesen und Übertragen der ganzen 128 KByte immerhin schon 1&thinsp;441&thinsp;792 Taktzyklen und das muß auch noch mindestens 30mal in der Sekunde passieren! Außer einem großen Speicher ist somit auch ein sehr schneller Mikroprozessor vonnöten und genau da liegen die Grenzen dieses Verfahrens.
+        </p>
 
         <h3>4. Standortbestimmungen</h3>
 
