@@ -37,14 +37,34 @@
         <p>Man führe einmal folgende Befehlsfolge direkt am Bildschirm aus:</p>
 
         <table class="plain strong">
-            <tr><td>Lautstärke einstellen:</td><td>POKE 54296,15</td></tr>
-            <tr><td>Frequenz einstellen:</td><td>POKE 54272,0<br>POKE 54273,40</td></tr>
-            <tr><td>Hüllkurve wählen:</td><td>POKE 64277,0<br>POKE 54278,240</td></tr>
-            <tr><td>Ton an:</td><td>POKE 54276,33</td></tr>
-            <tr><td>Ton aus:</td><td>POKE 54276,32</td></tr>
+            <tr>
+                <td>Lautstärke einstellen:</td>
+                <td>POKE 54296,15</td>
+            </tr>
+            <tr>
+                <td>Frequenz einstellen:</td>
+                <td>POKE 54272,0<br>POKE 54273,40</td>
+            </tr>
+            <tr>
+                <td>Hüllkurve wählen:</td>
+                <td>POKE 64277,0<br>POKE 54278,240</td>
+            </tr>
+            <tr>
+                <td>Ton an:</td>
+                <td>POKE 54276,33</td>
+            </tr>
+            <tr>
+                <td>Ton aus:</td>
+                <td>POKE 54276,32</td>
+            </tr>
         </table>
 
         <p>Nach dem vorletzten Befehl sollte ein Dauerton hörbar werden, der nach dem letzten Befehl wieder verschwindet. Der SID (Sound Interface Device) wird über sogenannte Register programmiert. Diese Register belegen 29 Byte Speicherplatz im C 64 und zwar den Bereich 54272 bis 54300 (hexadezimal $D400 bis $D41C). Über den Inhalt dieser Register werden alle Funktionen des SID gesteuert (Tabelle 1). Der SID verfügt über drei voneinander unabhängige Stimmen, die jeweils durch sieben Register gesteuert werden. Wir befassen uns zunächst mit Stimme 1:</p>
+
+        <figure>
+            <img src="19-t1.png" alt="">
+            <figcaption>Tabelle 1. Übersicht über die SID-Register</figcaption>
+        </figure>
 
         <h3>Frequenz (Register 54272 und 54273)</h3>
 
@@ -96,9 +116,9 @@
                     50 : LO = FS - 256*HI
                     60 : PRINT F, LO, HI
                     70 : NEXT I
-                </code>            
+                </code>
             </p>
-            
+
             <figcaption>Tabelle 2. Frequenz der 12 Halbtöne einer Tonleiter (»eingestrichene Oktave«)</figcaption>
         </figure>
 
@@ -107,11 +127,36 @@
         <p>Über dieses Register wird der Ton ein- und ausgeschaltet. Man sollte vielleicht besser sagen: »angeschlagen« und »losgelassen«, da über die Hüllkurvensteuerung eine dynamische Beeinflussung der Lautstärke möglich ist. Darauf kommen wir später noch zurück. Im Steuerregister ist für das Ein- und Ausschalten Bit 0, das sogenannte GATE-Bit verantwortlich. Eine 1 im GATE-Bit schaltet die Stimme ein. Das Steuerregister legt auch die Kurvenform fest, die für das Klangbild der Stimme entscheidend ist. Eine Kurvenform wird ausgewählt, indem man eines der Bits 4 bis 7 setzt. Hier zunächst eine Tabelle mit den wichtigsten POKE-Werten für das Steuerregister:</p>
 
         <table class="plain center1 right2 right3">
-            <tr class="separator strong"><td>Kurvenform</td><td>Bit</td><td>Ton an</td><td>Ton aus</td></tr>
-            <tr><td>Dreieck</td><td>4</td><td>17</td><td>16</td></tr>
-            <tr><td>Sägezahn</td><td>5</td><td>33</td><td>32</td></tr>
-            <tr><td>Rechteck</td><td>6</td><td>65</td><td>64</td></tr>
-            <tr><td>Rauschen</td><td>7</td><td>129</td><td>128</td></tr>
+            <tr class="separator strong">
+                <td>Kurvenform</td>
+                <td>Bit</td>
+                <td>Ton an</td>
+                <td>Ton aus</td>
+            </tr>
+            <tr>
+                <td>Dreieck</td>
+                <td>4</td>
+                <td>17</td>
+                <td>16</td>
+            </tr>
+            <tr>
+                <td>Sägezahn</td>
+                <td>5</td>
+                <td>33</td>
+                <td>32</td>
+            </tr>
+            <tr>
+                <td>Rechteck</td>
+                <td>6</td>
+                <td>65</td>
+                <td>64</td>
+            </tr>
+            <tr>
+                <td>Rauschen</td>
+                <td>7</td>
+                <td>129</td>
+                <td>128</td>
+            </tr>
         </table>
 
         <p>Die Werte sollte man gleich einmal ausprobieren. Um einen Rechteckklang zu erzeugen, sind allerdings noch weitere Maßnahmen notwendig (siehe unten). Das <strong>Dreieck</strong> klingt weich, dumpf und leiser als die anderen Kurvenformen. Es eignet sich für flötenähnliche Töne, aber auch für einen dezenten Signal-Gong. Der <strong>Sägezahn</strong> hat einen großen Obertongehalt und klingt damit sehr hell. Sägezahn ist die Standard-Kurvenform für die meisten musikalischen Anwendungen. Um eine <strong>Rechteck</strong>-Kurve zum Klingen zu bringen, muß man im SID zusätzlich die sogenannte <strong>Pulsweite</strong> einstellen. Dieser Wert steuert das Zeitverhältnis der beiden Pegel, zwischen denen die Rechteck-Kurve hin- und herspringt. Die Register 54274 und 54275 (Low- und High-Byte) sind für die Pulsweite maßgeblich. Es werden allerdings nur 12 Bit berücksichtigt, was einem Bereich von 0 bis 4095 entspricht. Der Wert 2048 (Bereichsmitte) entspricht dabei einer symmetrischen Rechteckkurve, das heißt einer mit einem Zeitverhältnis 1:1. Diese Einstellung erreicht man durch:
@@ -139,6 +184,11 @@
 
         <p>Die SID-Hüllkurve (Bild 1) gliedert sich zeitlich in vier Phasen. Jede Phase kann dabei unabhängig in 16 Stufen gesteuert werden.</p>
 
+        <figure>
+            <img src="19-1.png" alt="">
+            <figcaption>Bild 1. ADSR-Hüllkurve</figcaption>
+        </figure>
+
         <h3>Attack</h3>
 
         <p>Beim Setzen des GATE-Bits schwillt der Ton von Null bis zur maximalen Lautstärke an. Die Zeit, in der das geschieht, steuert der A-Parameter. Diese Zeit reicht von 2 ms (A = 0, unhörbar kurz) bis 8 s (A = 15).</p>
@@ -160,13 +210,33 @@
         <p>Jedes dieser Register muß man sich in zwei 4-Bit-Hälften aufgeteilt denken, von denen jede einen der Parameter enthält:</p>
 
         <table class="plain center0 center1 strong">
-            <tr class="separator"><td>Parameter</td><td>Bits</td><td>Register</td></tr>
-            <tr><td>A</td><td>7-4</td><td>54277</td></tr>
-            <tr><td>D</td><td>3-0</td><td>54277</td></tr>
-            <tr><td>S</td><td>7-4</td><td>54278</td></tr>
-            <tr><td>R</td><td>3-0</td><td>54278</td></tr>
+            <tr class="separator">
+                <td>Parameter</td>
+                <td>Bits</td>
+                <td>Register</td>
+            </tr>
+            <tr>
+                <td>A</td>
+                <td>7-4</td>
+                <td>54277</td>
+            </tr>
+            <tr>
+                <td>D</td>
+                <td>3-0</td>
+                <td>54277</td>
+            </tr>
+            <tr>
+                <td>S</td>
+                <td>7-4</td>
+                <td>54278</td>
+            </tr>
+            <tr>
+                <td>R</td>
+                <td>3-0</td>
+                <td>54278</td>
+            </tr>
         </table>
-        
+
         <p>Die Parameter A und D beziehungsweise S und R können immer nur zusammen in ihre Register geschrieben werden. Die Parameterwerte auf den Bitpositionen 3-0 kann man dabei direkt übernehmen, während man die Werte auf den Positionen 7-4 um vier Bitpositionen nach links schreiben muß, was man in Basic durch Multiplikation mit 16 erreicht:
             <code>POKE 54277, 16*A + D
                 POKE 54278, 16*S + R
@@ -175,13 +245,48 @@
 
         <p>Tabelle 3 zeigt einige Beispiel-Hüllkurven mit den dazugehörenden POKE-Werten. Auch diese Hüllkurven sollte man einmal ausprobieren. Damit sind die wichtigsten Register, die für die Erzeugung einfacher Klänge benötigt werden, bekannt. Die Steuerung der Stimmen 2 und 3 erfolgt analog zu Stimme 1 über je sieben Register.</p>
 
+        <figure>
+            <img src="19-t3.png" alt="">
+            <figcaption>Tabelle 3. Hüllkurven-Beispiele</figcaption>
+        </figure>
+
         <table class="plain">
-            <tr class="separator strong"><td>Stimme</td><td>1</td><td>2</td><td>3</td></tr>
-            <tr><td>Frequenz</td><td>54272<br>54273</td><td>54279<br>54280</td><td>54286<br>54287</td></tr>
-            <tr><td>Pulsweite</td><td>54274<br>54275</td><td>54281<br>54282</td><td>54288<br>54289</td></tr>
-            <tr><td>Steuerregister</td><td>54276</td><td>54283</td><td>54290</td></tr>
-            <tr><td>AD</td><td>54277</td><td>54284</td><td>54291</td></tr>
-            <tr><td>SR</td><td>54278</td><td>54285</td><td>54292</td></tr>
+            <tr class="separator strong">
+                <td>Stimme</td>
+                <td>1</td>
+                <td>2</td>
+                <td>3</td>
+            </tr>
+            <tr>
+                <td>Frequenz</td>
+                <td>54272<br>54273</td>
+                <td>54279<br>54280</td>
+                <td>54286<br>54287</td>
+            </tr>
+            <tr>
+                <td>Pulsweite</td>
+                <td>54274<br>54275</td>
+                <td>54281<br>54282</td>
+                <td>54288<br>54289</td>
+            </tr>
+            <tr>
+                <td>Steuerregister</td>
+                <td>54276</td>
+                <td>54283</td>
+                <td>54290</td>
+            </tr>
+            <tr>
+                <td>AD</td>
+                <td>54277</td>
+                <td>54284</td>
+                <td>54291</td>
+            </tr>
+            <tr>
+                <td>SR</td>
+                <td>54278</td>
+                <td>54285</td>
+                <td>54292</td>
+            </tr>
         </table>
 
         <h2>Spezialeffekte</h2>
@@ -196,7 +301,7 @@
 
         <p>Durch Setzen von Bit 2 des Steuerregisters von Stimme 1 entsteht ein Ringmodulator-Produkt der Dreieckskurven der Stimmen 1 und 3. Hörbar wird es nur dann, wenn Stimme 1 zusätzlich auf Dreieck eingestellt ist (Bit 4 gesetzt). Bei der Ringmodulation werden zwei Signale multiplikativ überlagert. Das Resultat sind meistens metallische Klänge, die sich für Glocken und Gongs eignen. Auch die Ringmodulation ist in jeder Stimme möglich. Wie bei der Synchronisation modulieren sich die Stimmen nach dem Schema:</p>
 
-        <p>TODO</p>
+        <img src="19-x.png" width="71" alt="">
 
         <h3>Mehrere Kurvenformen gleichzeitig</h3>
 
@@ -210,36 +315,109 @@
         <p>Bei der Programmierung des Steuerregisters will man oft einzelne Bits setzen oder zurücksetzen, ohne daß man dabei die anderen Bits verändern möchte. Diese Aufgabe erledigt man am besten mit Hilfe zweier Sätze von jeweils acht sogenannten »Masken«. Der erste Satz besteht aus Bytes, bei denen immer genau ein Bit gesetzt ist, der zweite besteht aus Bytes, bei denen immer genau ein Byte 0 ist. Diese 16 Masken kann man sich wie folgt definieren:</p>
 
         <table class="plain">
-            <tr class="separator strong"><td>Basic</td><td colspan="2">Assembler</td></tr>
-            <tr><td rowspan="3">DIM ON%(7),OF%(7)<br>FORI = 0 TO 7:ON%(I)=2↑I:OF%(I)=255-2↑I<br>NEXT I</td><td>ON</td><td>.BYT %00000001</td></tr>
-            <tr><td></td><td>.BYT %00000010</td></tr>
-            <tr><td></td><td>.BYT %00000100</td></tr>
-            <tr><td></td><td></td><td>.BYT %00001000</td></tr>
-            <tr><td></td><td></td><td>.BYT %00010000</td></tr>
-            <tr><td></td><td></td><td>.BYT %00100000</td></tr>
-            <tr><td></td><td></td><td>.BYT %01000000</td></tr>
-            <tr><td></td><td></td><td>.BYT %10000000</td></tr>
-            <tr><td></td><td>OF</td><td>.BYT %11111110</td></tr>
-            <tr><td></td><td></td><td>.BYT %11111101</td></tr>
-            <tr><td></td><td></td><td>.BYT %11111011</td></tr>
-            <tr><td></td><td></td><td>.BYT %11110111</td></tr>
-            <tr><td></td><td></td><td>.BYT %11101111</td></tr>
-            <tr><td></td><td></td><td>.BYT %10111111</td></tr>
-            <tr><td></td><td></td><td>.BYT %01111111</td></tr>
+            <tr class="separator strong">
+                <td>Basic</td>
+                <td colspan="2">Assembler</td>
+            </tr>
+            <tr>
+                <td rowspan="3">DIM ON%(7),OF%(7)<br>FORI = 0 TO 7:ON%(I)=2↑I:OF%(I)=255-2↑I<br>NEXT I</td>
+                <td>ON</td>
+                <td>.BYT %00000001</td>
+            </tr>
+            <tr>
+                <td></td>
+                <td>.BYT %00000010</td>
+            </tr>
+            <tr>
+                <td></td>
+                <td>.BYT %00000100</td>
+            </tr>
+            <tr>
+                <td></td>
+                <td></td>
+                <td>.BYT %00001000</td>
+            </tr>
+            <tr>
+                <td></td>
+                <td></td>
+                <td>.BYT %00010000</td>
+            </tr>
+            <tr>
+                <td></td>
+                <td></td>
+                <td>.BYT %00100000</td>
+            </tr>
+            <tr>
+                <td></td>
+                <td></td>
+                <td>.BYT %01000000</td>
+            </tr>
+            <tr>
+                <td></td>
+                <td></td>
+                <td>.BYT %10000000</td>
+            </tr>
+            <tr>
+                <td></td>
+                <td>OF</td>
+                <td>.BYT %11111110</td>
+            </tr>
+            <tr>
+                <td></td>
+                <td></td>
+                <td>.BYT %11111101</td>
+            </tr>
+            <tr>
+                <td></td>
+                <td></td>
+                <td>.BYT %11111011</td>
+            </tr>
+            <tr>
+                <td></td>
+                <td></td>
+                <td>.BYT %11110111</td>
+            </tr>
+            <tr>
+                <td></td>
+                <td></td>
+                <td>.BYT %11101111</td>
+            </tr>
+            <tr>
+                <td></td>
+                <td></td>
+                <td>.BYT %10111111</td>
+            </tr>
+            <tr>
+                <td></td>
+                <td></td>
+                <td>.BYT %01111111</td>
+            </tr>
         </table>
 
         <p>Nun kann man Bit N im Steuerregister sehr einfach setzen:</p>
 
         <table class="plain">
-            <tr class="separator strong"><td>Basic</td><td>Assembler</td></tr>
-            <tr><td>SR = 54276<br>POKE SR, PEEK(SR) OR ON%(N)</td><td>LDX N<br>LDA $D404<br>ORA ON,X<br>STA $D404</td></tr>
+            <tr class="separator strong">
+                <td>Basic</td>
+                <td>Assembler</td>
+            </tr>
+            <tr>
+                <td>SR = 54276<br>POKE SR, PEEK(SR) OR ON%(N)</td>
+                <td>LDX N<br>LDA $D404<br>ORA ON,X<br>STA $D404</td>
+            </tr>
         </table>
 
         <p>Das Löschen von Bit N geschieht ganz ähnlich:</p>
 
         <table class="plain">
-            <tr class="separator strong"><td>Basic</td><td>Assembler</td></tr>
-            <tr><td>SR = 54276<br>POKE SR, PEEK(SR) AND OF%(N)</td><td>LDX N<br>LDA $D404<br>AND OF,X<br>STA $D404</td></tr>
+            <tr class="separator strong">
+                <td>Basic</td>
+                <td>Assembler</td>
+            </tr>
+            <tr>
+                <td>SR = 54276<br>POKE SR, PEEK(SR) AND OF%(N)</td>
+                <td>LDX N<br>LDA $D404<br>AND OF,X<br>STA $D404</td>
+            </tr>
         </table>
 
         <h2>Filterung</h2>

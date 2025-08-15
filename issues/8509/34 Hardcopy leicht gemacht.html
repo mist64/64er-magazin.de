@@ -21,9 +21,18 @@
         <h1>Hardcopy leicht gemacht</h1>
         <p class="intro">Hardcopy-Programme konnten wir Ihnen schon viele vorstellen. Allerdings meist in Form von undurchsichtigen Maschinenroutinen. Hier zeigen wir Ihnen, wie man ein Hardcopy-Programm in Basic schreibt.</p>
 
+        <figure>
+            <img src="34-0.png" alt="">
+        </figure>
+
         <p>Eine Hardcopy ist die Kopie dessen, was auf dem Bildschirm zu sehen ist, auf Papier. Dazu wird Zeichen für Zeichen aus dem Bildschirmspeicher geholt und an den Drucker gesandt, sofern ein Textbildschirm kopiert werden soll. Der C 64 kennt zwei verschiedene Arten der Bildschirmdarstellung, die nicht ohne weiteres miteinander gemischt werden können: Text und hochauflösende Grafik.</p>
 
         <p>Im folgenden soll die Hardcopy des Textbildschirmes näher betrachtet werden. Dazu soll ein einfaches Basic-Listing (Listing 1, Bild 1) dienen, das auf jedem Drucker den momentan am Bildschirm stehenden Text ausdruckt. Vielleicht kennen Sie das Listing in ähnlicher Form aus dem Handbuch zum Commodore MPS801. Es ist nicht ganz perfekt, aber einfach zu verstehen. Damit das Programm auch mit anderen Druckern arbeitet, müssen Sie die jeweils angegebenen Änderungen daran vornehmen.</p>
+
+        <figure>
+            <img src="34-1.png" alt="">
+            <figcaption>Bild 1. Flußdiagramm des Hardcopy-Programms</figcaption>
+        </figure>
 
         <p>Doch vor der Praxis etwas Theorie über die Organisation des Textbildschirmes des C 64. Der C 64 kann höchstens 1000 Zeichen am Bildschirm darstellen. Und zwar in 25 Zeilen zu je 40 Spalten. Für die 1000 Zeichen besitzt der C 64 einen reservierten Schreib-/Lese-Speicherbereich, den Bildschirmspeicher. Der Bildschirmspeicher liegt zwischen den Speicheradressen 1024 und 2023. Probieren Sie mal POKE 1024,1 aus: Ein »A« erscheint links oben am Bildschirm. POKE 1025,2 läßt ein »B« um eine Stelle nach rechts versetzt erscheinen. Mit dem Befehl PRINT PEEK(1024) erhalten Sie als Ergebnis »1«. »1« ist der Bildschirmcode des Zeichens »A«. Wenn Sie 129 anstelle von 1 in die Speicherzelle 1024 POKEn, erscheint ein reverses »A« an der ersten Bildschirmstelle. Mit den Codes 0 bis 127 können Sie alle normalen Zeichen des C 64 darstellen, mit den Codes 128 bis 255 die reversen. Diese Codes werden als »Bildschirmcodes« bezeichnet. Das folgende kleine Programm erzeugt den gesamten C 64-Zeichensatz am Bildschirm.
             <code>10 print chr$(147)
@@ -40,12 +49,30 @@
         <p>Eine Hardcopy macht im Prinzip nun nichts weiter, als ab Adresse 1024 nachemeinder alle Zeichen aus dem Bildschirmspeicher zu lesen und in der gleichen Reihenfolge an den Drucker zu schicken. Da aber der Drucker keine Bildschirmcodes versteht, müssen Sie ins ASCII-Format übersetzt werden. Die Vorschrift für eine Bildschirmcode-ASCII-Wandlung:</p>
 
         <table class="plain">
-            <tr><td>Bildschirmcode</td><td>ASCII-Korrekturfaktor</td></tr>
-            <tr><td>0 &hellip;  31</td><td>+64</td></tr>
-            <tr><td>32 &hellip; 63</td><td>±0</td></tr>
-            <tr><td>64 &hellip; 95</td><td>+32</td></tr>
-            <tr><td>96 &hellip; 127</td><td>+64</td></tr>
-            <tr><td>128 &hellip; 255</td><td>1. -128 2. danach nochmalige Wandlung und Zeichen revers drucken</td></tr>
+            <tr>
+                <td>Bildschirmcode</td>
+                <td>ASCII-Korrekturfaktor</td>
+            </tr>
+            <tr>
+                <td>0 &hellip; 31</td>
+                <td>+64</td>
+            </tr>
+            <tr>
+                <td>32 &hellip; 63</td>
+                <td>±0</td>
+            </tr>
+            <tr>
+                <td>64 &hellip; 95</td>
+                <td>+32</td>
+            </tr>
+            <tr>
+                <td>96 &hellip; 127</td>
+                <td>+64</td>
+            </tr>
+            <tr>
+                <td>128 &hellip; 255</td>
+                <td>1. -128 2. danach nochmalige Wandlung und Zeichen revers drucken</td>
+            </tr>
         </table>
 
         <p>Um Bildschirmcode in ASCII-Code zu wandeln, müssen Sie die angegebenen Korrekturfaktoren zu den Bildschirmcodes addieren. Bildschirmcodes über 127 müssen erst um 128 verringert und dann ins ASCII-Format übersetzt werden. Aus den Bildschirmcodes der reversen Zeichen werden nämlich erst die Codes der entsprechenden »normalen« Zeichen gemacht. Die reversen Zeichen wurden normal gedruckt. Aber mit einem kleinen Trick schafft man auch die reverse Darstellung. Vorausgesetzt man hat einen Commodore MPS801 oder einen anderen Drucker, bei dem CHR$(18) und CHR$(146) den Reversdruck ein- und ausschalten. Ein reverses »A«, zum Beispiel, wird bei diesen Druckern über die Kommandofolge: PRINT CHR$(18)+"A" + CHR$(146) ausgegeben.</p>
