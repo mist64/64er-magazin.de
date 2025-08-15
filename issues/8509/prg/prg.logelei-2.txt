@@ -1,0 +1,67 @@
+
+
+;prg.logelei-2.prg ==0801==
+    1 rem *********************************
+    2 rem *                               *
+    3 rem * die schlussfolgerungsmaschine *
+    4 rem *       bis zu 4 variable       *
+    5 rem *                               *
+    6 rem *  heimo ponnath  hamburg 1985  *
+    7 rem *                               *
+    8 rem *********************************
+    9 rem
+   10 printchr$(147):poke53280,0:poke53281,0:poke646,5:goto30
+   15 rem **** up cursor setzen ****
+   20 poke211,s:poke214,z:sys58640:return
+   25 rem **** hp-1: funktioneneingabe ***
+   30 s=7:z=5:gosub20:poke646,7:print"schlusfolgerungsmaschine
+   35 s=10:z=6:gosub20:poke646,2:print"bis zu 4 variable"
+   40 s=6:z=9:gosub20:poke646,5:print"im programm ist die funktion:"
+   45 k=1:gosub100:k=0:s=0:z=12:gosub20:print"y="l$
+   46 z=14:gosub20:print"mit "n" variablen"
+   50 s=6:z=16:gosub20
+   55 printchr$(18)"a"chr$(146)"lte oder "chr$(18)"n"chr$(146)"eue funktion ?"
+   60 geta$:ifa$<>"a"anda$<>"n"then60
+   62 z=17:gosub20:print"wieviele variable (max 4)";:inputb$
+   63 n=val(b$):ifn<1orn>4then62
+   65 ifa$="a"then95
+   70 s=0:z=19:gosub20:print"y(a,b,..)=";:inputl$:poke781,19:sys59903
+   75 gosub20:print"y="l$:fori=0to500:next:poke646,0
+   80 printchr$(147)chr$(17):print"100l$="chr$(34)l$chr$(34)
+   85 print"110deffnl("chr$(64+n)")="l$:print"120n="n:print"run95"chr$(19);
+   90 poke631,13:poke632,13:poke633,13:poke634,13:poke198,4:end
+   94 rem **** hp-2: berechnungen ****
+   95 poke646,5:printchr$(147)
+  100 l$="((a>=b)and(b>=c)and(c>=d))>=(a>=d)"
+  110 deffnl(d)=((a>=b)and(b>=c)and(c>=d))>=(a>=d)
+  120 n= 4
+  125 c$="    --------------------------------"
+  130 ifk=1thenreturn
+  140 s=2:z=0:gosub20:poke646,2:print"hier ist die wahrheitstabelle von:"
+  145 s=0:z=2:gosub20:print"y="l$:poke646,1:print:printc$:poke646,5
+  150 onngosub200,300,400,500:print:poke646,1:printc$:poke646,5:print
+  155 print"wenn alle ergebnisse -1 lauten, dann"
+  160 print"ist der schluss richtig ! (taste)":poke198,0:wait198,1
+  190 end
+  195 rem ***** 1 variable *****
+  200 printtab(15)"a"tab(30)"ergibt":poke646,1:printc$:print:poke646,5
+  205 fora=-1to0:printtab(15)atab(30)fnl(a)
+  210 nexta:return
+  295 rem ***** 2 variable *****
+  300 printtab(5)"a"tab(10)"b"tab(30)"ergibt":poke646,1:printc$:print:poke646,5
+  305 fora=-1to0:forb=-1to0
+  310 printtab(5)atab(10)btab(30)fnl(b)
+  315 nextb:nexta:return
+  395 rem ***** 3 variable *****
+  400 printtab(5)"a"tab(10)"b"tab(15)"c"tab(30)"ergibt"
+  405 poke646,1:printc$:print:poke646,5
+  410 fora=-1to0:forb=-1to0:forc=-1to0
+  415 printtab(5)atab(10)btab(15)ctab(30)fnl(c)
+  420 nextc:nextb:nexta:return
+  495 rem ***** 4 variable *****
+  500 printtab(5)"a"tab(10)"b"tab(15)"c"tab(20)"d"tab(30)"ergibt"
+  505 poke646,1:printc$:print:poke646,5
+  510 fora=-1to0:forb=-1to0:forc=-1to0:ford=-1to0
+  515 printtab(5)atab(10)btab(15)ctab(20)dtab(30)fnl(d)
+  520 nextd:nextc:nextb:nexta:return
+

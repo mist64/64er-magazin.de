@@ -1,0 +1,75 @@
+
+
+;lichtgr.2.prg ==0801==
+  100 rem *******************************
+  110 rem *                             *
+  120 rem *   t o n g e b e r   m i t   *
+  130 rem *   -----------------------   *
+  140 rem *                             *
+  150 rem *   l i c h t g r i f f e l   *
+  160 rem *   -----------------------   *
+  170 rem *                             *
+  180 rem *  by   tobias        nicol   *
+  190 rem *                             *
+  200 rem *       neuwiesenstrasse 20   *
+  210 rem *                             *
+  220 rem *       6000  frankfurt  71   *
+  230 rem *                             *
+  240 rem *******************************
+  250  
+  260 rem ****** bildschirmaufbau  ******
+  270 poke 53281,1 : poke 53280,3
+  280 print "{clr}{down}  bitte waehlen sie!"
+  290 print "  ------------------{down}"
+  300 for i = 1 to 3
+  310 print "  {CBM-A}{SHIFT-*}{CBM-S}"
+  320 print "  B B tongenerator";i
+  330 print "  {CBM-Z}{SHIFT-*}{CBM-X}{down}{down}"
+  340 next i
+  350  
+  360 rem ***** sid-chip einstellen *****
+  370 t1 = 4 : si = 54272
+  380 for i = 1 to 10
+  390 read a,b
+  400 poke si+a,b
+  410 next i
+  420 data 24,15, 0,207, 1,50, 7,207
+  430 data 8,100, 14,207, 15,150, 6,240
+  440 data 13,240, 20,240
+  450  
+  460 rem ** lightpenposition abfragen **
+  470 y = peek (53268)
+  480  
+  490 rem ***** position auswerten  *****
+  500 if y >  79 and y <  91 then t2 =  4
+  510 if y > 119 and y < 131 then t2 = 11
+  520 if y > 159 and y < 171 then t2 = 18
+  530  
+  540 rem **** tongenerator tauschen ****
+  550 if t2 = t1 then 460
+  560 poke si+t1,0
+  570 poke si+t2,17
+  580  
+  590 rem ** neue werte & ruecksprung  **
+  600 t1=t2
+  610 goto 460
+  620  
+  630  
+  640  
+  650 rem *******************************
+  660 rem *** aenderungen fuer vc-20  ***
+  670 rem *******************************
+  680 rem
+  690 rem loeschen sie 370-440!
+  700 rem
+  710 rem geben sie ein:
+  720 rem
+  730 rem 270 poke 36879,27
+  740 rem 370 t2 = 36874 : poke 36878,15
+  750 rem 470 y = peek (36871)
+  760 rem 500 ify< 63thent2=36874:goto540
+  770 rem 510 ify< 85thent2=36875:goto540
+  780 rem 520 ify<103thent2=36876:goto540
+  790 rem 560 poke t1,0
+  800 rem 570 poke t2,(t2-36871)*50
+

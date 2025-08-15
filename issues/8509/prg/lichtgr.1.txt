@@ -1,0 +1,80 @@
+
+
+;lichtgr.1.prg ==0801==
+  100 rem *******************************
+  110 rem *                             *
+  120 rem *       d e m o   z u m       *
+  130 rem *       ---------------       *
+  140 rem *                             *
+  150 rem *   l i c h t g r i f f e l   *
+  160 rem *   -----------------------   *
+  170 rem *                             *
+  180 rem *  by   tobias        nicol   *
+  190 rem *                             *
+  200 rem *       neuwiesenstrasse 20   *
+  210 rem *                             *
+  220 rem *       6000  frankfurt  71   *
+  230 rem *                             *
+  240 rem *******************************
+  250  
+  260 rem ********* information *********
+  270 print "{clr}{down}{down}{down}{down}soll der punkt jeweils
+  280 print "{down}wieder geloescht werden?{down}
+  290 print "bitte 'j' oder 'n' eingeben!
+  300 get a$ : if a$ = "" then 300
+  310 if a$ = "n" then l = 1
+  320  
+  330 rem ******* initialisierung *******
+  340 poke 53280,0 : poke 53281,1
+  350 print "{clr}" : a = 1024 : b = 40
+  360 c = 24 : d = 53267
+  370  
+  380 rem ***** farbspeicher setzen *****
+  390 for i = 55296 to 56295
+  400 poke i,0 : next i
+  410  
+  420 rem ******  werte  einlesen  ******
+  430 rem ****** und stabilisieren ******
+  440 for i = 1 to 5
+  450 x = x + peek (d)
+  460 y = y + peek (d+1)
+  470 next i
+  480 x = int (x/5) : y = int (y/5)
+  490  
+  500 rem ** in koordinaten umwandeln  **
+  510 kx = int ((x-50)/180*(b-1))
+  520 ky = int ((y-45)/190*c)
+  530  
+  540 rem ** koordinaten kontrollieren **
+  550 if kx < 0 then kx = 0
+  560 if ky < 0 then ky = 0
+  570 if kx > b-1 then kx = b-1
+  580 if ky > c then ky = c
+  590  
+  600 rem **** punkt setzen/loeschen ****
+  610 if l=0 then poke a+xa+ya*b,32
+  620 poke a+kx+ky*b,160
+  630  
+  640 rem ** neue werte & ruecksprung  **
+  650 xa = kx : ya = ky : x = 0 : y = 0
+  660 goto 420
+  670  
+  680  
+  690  
+  700 rem *******************************
+  710 rem *** aenderungen fuer vc-20  ***
+  720 rem *******************************
+  730 rem
+  740 rem setzen sie diese zeilen ein:
+  750 rem
+  760 rem 340 poke 36879,24
+  770 rem 350 print "{clr}" : a=7680 : b=22
+  780 rem 360 c=22 : d=36870
+  790 rem 390 for i = 38400 to 38905
+  800 rem 510 kx = int ((x-55)/95*(b-1))
+  810 rem 520 ky = int ((y-38)/89*(c))
+  820 rem
+  830 rem wenn sie das programm abspei-
+  840 rem chern wollen, sollten sie noch
+  850 rem die zeilen 270-290 anpassen.
+
