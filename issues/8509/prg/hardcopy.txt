@@ -1,0 +1,39 @@
+;hardcopy.prg ==0801==
+;Eingetippt von Endurion
+60000 rem textbildschirm-hardcopy
+60010 vic=13*4096:mo=vic+24
+60020 rem anfuerungsz. def.
+60030 qu$=chr$(34): rem anfuerungsz.
+60040 rem revers on,revers off
+60050 rv$=chr$(18):ro$=chr$(146)
+60060 ba=peek(648)*256
+60070 if(peek(mo)and 6)=6 then 60100
+60080 open 4,4:print#4:rem gross/grafik
+60090 goto 60110
+60100 open 4,4,7:print4:rem gross/klein
+60110 rem hardcopy
+60120 for z=0 to 24 : rem zeilen 1-25
+60130 qf=0  : rem noch kein >>"<<
+60140 a$="" : rem a$ loeschen
+60150 for s=0 to 39 : rem spalten 1-40
+60160 rem bildschirmcode holen
+60170 bc=peek(ba+40*z+s)
+60180 rem 1. oder 2. anfuehrungszeichen
+60190 if bc=34 then qf=1-qf
+60200 rem reverses anfuehrungszeichen durch reverses >'< ersetzen
+60210 if bc=162 then bc=167
+60220 rem bildschirmcode/ascii-wandlung
+60230 rem fuer commodore mps 801
+60240 if qf=1 and(sc>=128)then ba=ba-128:            goto 60260
+60250 if bc>127 then bc=bc-128:rf=1:a$=a$+rv$:rem reversmodus ein
+60260 if bc<32 or bc>95 then as=bc+64:goto 60290
+60270 if bc>31 and bc<64 then as=bc:goto 60290
+60280 if bc>63 and bc<96 then as=bc+32
+60290 a$=a$+chr$(as)
+60300 if rf=1 then a$=a$+ro$:rf=0:rem reversmodus ende
+60310 next s
+60320 if qf=0 then print#4,a$:goto 60340
+60330 print#4,a$qu$
+60340 next z
+60350 close 4
+
