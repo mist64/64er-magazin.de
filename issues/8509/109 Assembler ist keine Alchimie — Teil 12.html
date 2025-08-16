@@ -63,7 +63,42 @@
         <p>Wir wollen im folgenden Beispielprogramm (Listing 1) ein Modul simulieren, indem wir den SMON mittels des RESET anspringen. Der NMI — also die RUN/STOP-RESTORE-Tastenkombination — soll dabei wirkungslos gemacht werden.</p>
 
         <figure>
-            TODO
+            <pre>PROGRAMM 1
+
+,6000  A9 2E     LDA #2E
+,6002  8D 00 80  STA 8000
+,6005  A9 60     LDA #60
+,6007  8D 01 80  STA 8001
+,600A  A9 41     LDA #41
+,600C  8D 02 80  STA 8002
+,600F  A9 60     LDA #60
+,6011  8D 03 80  STA 8003
+,6014  A9 C3     LDA #C3
+,6016  A2 C2     LDX #C2
+,6018  A0 CD     LDY #CD
+,601A  8D 04 80  STA 8004
+,601D  8E 05 80  STX 8005
+,6020  8C 06 80  STY 8006
+,6023  A9 38     LDA #38
+,6025  A2 30     LDX #30
+,6027  8D 07 80  STA 8007
+,602A  8E 08 80  STX 8008
+,602D  60        RTS
+-------------------------
+,602E  8E 16 D0  STX D016
+,6031  20 A3 FD  JSR FDA3
+,6034  20 50 FD  JSR FD50
+,6037  20 8A FF  JSR FF8A
+,603A  20 5B FF  JSR FF5B
+,603D  58        CLI
+,603E  4C 00 C0  JMP C000
+-------------------------
+,6041  68        PLA
+,6042  A8        TAY
+,6043  68        PLA
+,6044  AA        TAX
+,6045  68        PLA
+,6046  40        RTI</pre>
             <figcaption>Programm 1. Simulation eines Moduls</figcaption>
         </figure>
 
@@ -128,7 +163,65 @@
         <p>Leser der Grafikserie werden diese Möglichkeit des VIC-II-Chip schon kennen: Man kann dem Kathodenstrahl, der über den Monitor huscht, um das Bild zu erzeugen, über zwei Register folgen, die Rasterregister, wo jede Rasterzeile mitgezählt wird. Ohne an dieser Stelle allzusehr in die Einzelheiten einzugehen, soll hier nur bemerkt werden, daß die Numerierung dabei etwa von 0 bis 280 geht, weil auch der Rahmen und nicht sichtbare Teile des Bildschirmes vom Strahl überstrichen werden. Wo das Textfeld anfängt, ist von Monitor zu Monitor (oder Fernseher) etwas unterschiedlich. Bei mir beginnt es oben in Rasterzeile 50 und endet unten bei Zeile 248. Sollten die im Beispielprogramm 2 (Listing 2) nachher voreingestellten Randwerte bei Ihnen also anders sein, können Sie sie durch einige später noch angegebenen POKEs ändern. Die beiden Rasterzeilenregister sind:</p>
 
         <figure>
-            TODO
+            <pre>PROGRAMM 2
+
+,6000  78        SEI
+,6001  A9 28     LDA #28
+,6003  8D 14 03  STA 0314
+,6006  A9 60     LDA #60
+,6008  8D 15 03  STA 0315
+,600B  A9 F8     LDA #F8
+,600D  8D 12 D0  STA D012
+,6010  AD 11 D0  LDA D011
+,6013  29 7F     AND #7F
+,6015  8D 11 D0  STA D011
+,6018  A9 81     LDA #81
+,601A  8D 1A D0  STA D01A
+,601D  A9 00     LDA #00
+,601F  8D 20 D0  STA D020
+,6022  A9 04     LDA #04
+,6024  85 02     STA 02
+,6026  58        CLI
+,6027  60        RTS
+-----------------------------
+,6029  AD 19 D0  LDA D019
+,602B  8D 19 D0  STA D019
+,602E  30 07     BMI 6037
+,6030  AD 0D DC  LDA DC0D
+,6033  58        CLI
+,6034  4C 31 EA  JMP EA31
+-----------------------------
+,6037  AD 12 D0  LDA D012
+,603A  C9 F8     CMP #F8
+,603C  B0 11     BCS 604F
+,603E  18        CLC
+,603F  65 02     ADC 02
+,6041  8D 12 D0  STA D012
+,6044  A0 03     LDY #03
+,6046  88        DEY
+,6047  D0 FD     BNE 6046
+,6049  EE 20 D0  INC D020
+,604C  4C 81 EA  JMP EA81
+-----------------------------
+,604F  A9 00     LDA #00
+,6051  8D 20 D0  STA D020
+,6054  A9 32     LDA #32
+,6056  8D 12 D0  STA D012
+,6059  4C 81 EA  JMP EA81
+,605C  78        SEI
+-----------------------------
+,605D  A9 00     LDA #00
+,605F  8D 1A D0  STA D01A
+,6062  A9 31     LDA #31
+,6064  8D 14 03  STA 0314
+,6067  A9 EA     LDA #EA
+,6069  8D 15 03  STA 0315
+,606C  A9 0E     LDA #0E
+,606E  8D 20 D0  STA D020
+,6071  58        CLI
+,6072  60        RTS
+-----------------------------
+</pre>
             <figcaption>Listing 2. Das im Artikel entwickelte Programm auf einen Blick</figcaption>
         </figure>
 
