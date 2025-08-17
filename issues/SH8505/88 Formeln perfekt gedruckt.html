@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>Formeln perfekt gedruckt</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="Patrick Bödeker, rg">
+    <meta name="64er.issue" content="Sonderheft 5/85">
+    <meta name="64er.pages" content="88-92">
+    <!-- <meta name="64er.toc_category" content="XXX"> -->
+    <!-- <meta name="64er.toc_title" content="XXX"> -->
+    <meta name="64er.id" content="XXX">
+</head>
+
+<body>
+    <article>
+        <h1>Formeln perfekt gedruckt</h1>
+        <p class="intro">Endlich ist es möglich, mit dem Epson FX-80 mathematische Sonderzeichen zu drucken.</p>
+
+        <p>Mit diesem Programm können mathematische Formeln in korrekter Schreibweise zu Papier gebracht werden. Es ist lauffähig auf dem Commodore 64 mit Epson-Drucker FX-80 und Görlitz-Interface.</p>
+
+        <p>Das Programm beinhaltet folgende Funktionen:</p>
+
+        <ol>
+            <li>Umwandlung des Basic-Zeichens »/«in einen echten Bruch (siehe Bild 1, Beispiel 1).</li>
+            <li>Umwandlung des Basic-Zeichens »t« in echte Potenzschreibweise (siehe Bild 1, Beispiel 2).</li>
+            <li>Umwandlung der Basic-Funktion »EXP(X)« in echte Expo-nentialschreibweise (siehe Bild 1, Beispiel 3).</li>
+            <li>Umwandlung der Basic-Funktion »SQR(X)« in echte Wurzelschreibweise (siehe Bild 1, Beispiel 4).</li>
+            <li>Mischung von Bruch-, Wurzel-, Exponential- und Potenzschreibweise (siehe Bild 1, Beispiel 5 bis 18).</li>
+            <li>Beachtung der Klammerregeln (siehe Bild 1, Beispiel 8 bis 12).</li>
+            <li>Ausgabe des Bruchstrichs exakt auf der Höhe der ganzrationalen Funktionsterme.</li>
+            <li>Einbindung in andere Programme ohne weiteres möglich, es muß nur die Funktion und die Druckposition übergeben werden.</li>
+            <li>Nach Ende des Druckvorgangs befindetsich der Druckkopf auf der gleichen Höhe wie zu Beginn, genau hinter der ausgedruckten Funktion. Es können also in einer Reihe ohne Probleme mehrere Funktionen ausgegeben werden.</li>
+        </ol>
+
+
+        <p>Soweit eine kurze Übersicht über die Fähigkeiten des Programms. Kommen wir nun zu einer Beschreibung des Programmaufbaus (Tabelle 1).</p>
+
+        <p>In den Zeilen 120 bis 1150 befindet sich ein Beispielprogramm. Es bewirkt einen Ausdruck der Beispiele aus Bild 1.</p>
+
+        <p>Die Funktionen werden definiert und in G$(1) bis G$(18) festgehalten. In der sich anschließenden Schleife (Zeilen 1040 bis 1130) werden nun nacheinander die Funktionen einmal in Basic-Schreibweise und durch den Aufruf des Unterprogramms (Zeile 1120) in exakter Schreibweise ausgegeben. Vor dem Aufruf des Unterprogramms werden in den beiden Variablen BB und F$ die zu übergebenden Informationen definiert (siehe Tabelle 2). Zum einen ist das der Abstand vom linken Rand (hier 55) und zum anderen die Funktion selber (hier von G$(1)bis G$(18)).</p>
+
+        <p>Das Beispielprogramm soll nur einen kurzen Überblick über die vielfältigen Möglichkeiten von »Formel-Druck« geben und demonstrieren, wie die vom Programm benötigten Informationen zu übergeben sind. Wichtig ist in diesem Fall auch Zeile 120. In F$(..) werden im Programm späterdie einzelnen Terme der zu druckenden Funktion abgelegt. Ist eine Funktion sehr lang, kann es leicht zu einer größeren Anzahl an Einzeltermen als 11 kommen. Um allen Eventualitäten vorzubeugen, ist es besser, F$ gleich genügend groß zu dimensionieren. Hier wurde der Wert 50 gewählt, aber auch eine kleinere Zahl reicht meistens aus und kann vom Anwender nach eigenem Willen eingesetzt werden.</p>
+
+        <p>Ab Zeile 50000 beginnt nun das eigentliche Programm, die Routine zum Umwandeln der Basic-Funktionen mit sich anschließendem Ausdruck.</p>
+
+        <p>In Zeile 50170 ist zunächst einmal das sehr häufig benutzte Unterprogramm zum Auslesen eines Zeichens (in T$) aus der Funktion (FU$) angelegt. In den Zeilen bis 50400 werden nun die nötigen Anfangsbedingungen eingestellt. Das ist erstens in Zeile 50180 die Festlegung des Zeichensatzes für den Drucker (Groß-/Kleinschrift mit Zeilenabstand von sieben Punkten), in der für das Görlitz-Interface typischen Form. Zweitens die Definition der Sonderzeichen zum Wurzelausdruck (das »&amp;« wird zum Strich über den Zeichen und das »%« zum Wurzelzeichen). Schließlich werden noch die benötigten Variablen festgelegt und der Fettdruck eingeschaltet.</p>
+
+        <p>In den Zeilen 50420 bis 50720 werden die beiden Basic-Befehlsworte EXP und SQR aus der Funktion eliminiert und durch für das Programm später verständliche Befehle ersetzt (Zeile 50550 und 50710). Durch die Verminderung von L wird die sich verkürzende Funktionslänge berücksichtigt.</p>
+
+        <p>Anschließend folgt der Test auf gebrochenrationale Funktion (Zeile 50780 bis 50850). Trittin derzu druckenden Funktion ein Divisionszeichen auf, wird in Zeile 50980 verzweigt und die Funktion in ganzrationale und gebrochenrationale Terme zerlegt. Zu diesem Zweck werden zum einen die vor dem Bruchstrich (Zeile 50980 bis 51070) und zum anderen die hinter dem Bruchstrich (Zeile 51080 bis 51180) auftretenden Zeichen betrachtet. Als Abbruchkriterium giltjeweils das erste »+«,»—« oder »*«-Zeichen, das nicht mehr zum Zähler oder Nenner gehört. In den Zeilen 51190 bis 51260 findet dann die Zuweisung der entsprechenden Einzelelemente in F$(SC) statt. Hierbei wird SC bei jedem neu hinzukommenden Term um eins erhöht. Nun wird in Zeile 51260 wieder nach 50780 zurückgesprungen und der restliche Funktionsteil untersucht. Das geschieht so lange, bis alle Divisionszeichen abgearbeitet sind. Dann wird der restliche Teil in F$(SC) abgelegt und zur Hauptschleife des Programms zurückgekehrt (Zeile 50910 bis 50920).</p>
+
+        <p>Diese Schleife beginnt in Zeile 51320. Mitjedem Durchlauf der Schleife wird ein in F$(SC) abgelegter Term aufgerufen, die jeweilige Druckposition festgelegt und der Fettdruck gesetzt.</p>
+
+        <p>Jeder einzelne Term wird in den Zeilen 51450 bis 51530 auf gebrochenrationale Funktion geprüft. Liegt eine vor, muß diese in den Zeilen 51650 bis 51720 in Zähler und Nenner zerlegt werden. Während dieser Prozedur werden auch gleich die überflüssigen Klammern entfernt (Zeile 51680 und Zeile 51720). Handelt es sich um einen ganzrationalen Funktionsteil, wird dieser in Zeile 51590 im Zähler abgelegt und der Nenner für spätere Kontrollen mit einem Leerstring belegt.</p>
+
+        <p>Um hinterher beim Ausdruck ein exaktes Druckbild zu erhalten (Bruchstrich mit der richtigen Länge und Zähler und Nenner zentriert übereinander) muß die Verkürzung des Druckbildes durch Potenzausdruck und Wegfall von einigen Zeichen durch die Eliminierung von SQR berücksichtigt werden. Das Ausmaß der Verkürzung wird in den Zeilen 51780 bis 52020 berechnet. Bei jeder auftretenden Potenz verkürzt sich die Länge des Ausdrucks um 0,5 und durch Wegfall des Zeichens »t« um eine Druckposition. Dies wird jeweils für Zähler und Nenner getrennt in Zeile 51970 beziehungsweise 51980 festgehalten.</p>
+
+        <p>Die Verkürzung durch den Wegfall der Klammern beim Wurzelausdruck wird jeweils in Zeile 52010 beziehungsweise 52020 berücksichtigt.</p>
+
+        <p>Die erhaltene Gesamtverkürzung ist in WO beziehungsweise WU enthalten. Diese wird beim Umwandeln von Zähler und Nenner auf die gleiche Länge (Zeile 52030 bis 52050) mit einberechnet. Dadurch wird eine ordentliche Bruchschreibweise gewährleistet.</p>
+
+        <p>Ab Zeile 52110 beginnt die Druckroutine. Als erstes wird der Zähler jedes einzelnen Terms ausgegeben. Hierbei wird ein ganzrationaler Funktionsteil als Zähler mit dem Nenner als Leerstring betrachtet. Handelt es sich um einen gebrochenrationalen Funktionsteil, wird in Zeile 52130 das Papier um eine Position rückwärts transportiert, um später den Bruchstrich auf Höhe der ganzrationalen Funktion ausgeben zu können. Zum Ausdruck wird jedes Zeichen des Zählers untersucht, ob es sich um ein Potenz- oder Wurzelsymbol handelt. Ist dies der Fall, werden die entsprechenden Routinen zum Potenz- beziehungsweise Wurzelausdruck ausgeführt. Alle anderen Zeichen werden sofort gedruckt.</p>
+
+        <p>Handelt es sich beim ausgegebenen Term um eine ganzrationale Funktion, wird ein Rückwärtstransport des Papiers von einer Zeile durchgeführt und das Ende des Terms in BB festgehalten, damit die nächsten Funktionsteile direkt im Anschluß gedruckt werden können.</p>
+
+        <p>Ansonsten kommt es zur Ausgabe des Bruchstrichs (Zeile 52280 bis 52360). Die Länge des Bruchstrichs wird in AA festgehalten und aus den oben genannten Verkürzungswerten WO und WU und der Länge des Zählers und Nenners berechnet (Zeile 52300 bis 52310).</p>
+
+        <p>Als letztes wird dann der Nenner ausgedruckt. Dies erfolgt auf die gleiche Weise wie beim Zähler. Auch hier wird am Ende ein Rücktransport des Papiers durchgeführt. Das Ende eines gebrochenrationalen Funktionsteils ergibt sich aus der Länge des Bruchstrichs und wird in BB gespeichert.</p>
+
+        <p>In den Zeilen 52580 bis 53090 stehen die beiden Unterprogramme zum Potenz- beziehungsweise Wurzelausdruck. Die Potenzausdruckroutine beginnt in Zeile 52580. Es wird die Superscript- und die Schmalschrift eingestellt. Dann wird jedes dem Potenzsymbol folgende Zeichen überprüft, ob es noch im Exponenten steht oder nicht. Als Abbruchkriterium gelten die gängigen mathematischen Kriterien (Zeilen 52650 bis 52705). In den Zeilen 52720 bis 52750 wird überprüft, ob die Potenz unter der Wurzel steht, in diesem Fall ist WW = 1, und der entsprechende Wurzelstrich wird ausgegeben. Nach Abarbeitung aller in Frage kommenden Zeichen wird wieder die Normalschrift und der Fettdruck eingeschaltet und zurück ins Hauptprogramm gesprungen (Zeile 52810 bis 52850). Die Variable M (Zeile 52760) dient zur Berechnung der Verkürzung des Terms durch den Potenzausdruck und wird bei ganzrationalen Funktionen berücksichtigt.</p>
+
+        <p>In der Wurzelausdruckroutine läuft im Prinzip das gleiche ab. Sie beginnt in Zeile 52910 und druckt zuerst das Wurzelsymbol und über alle folgenden Zeichen den Wurzelstrich. Zur Ausgabe dieses Strichs wird der Druckkopfjeweils um ein Zeichen zurück und einen Matrixpunkt nach oben bewegt und anschließend das Sonderzeichen ausgegeben (Zeile 53020 bis 53060).</p>
+
+        <p>Den Abschluß des Programms bilden die Zeilen 53150 bis 53170. Hier wird der Drucker normiert, das heißt in den Einschaltzustand zurückversetzt, alle offenen Kanäle geschlossen und der Epson-Modus mit automatischem Zeilenvorschub eingestellt.</p>
+
+        <address class="author">(Patrick Bödeker/rg)</address>
+    </article>
+</body>
+
+</html>

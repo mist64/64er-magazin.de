@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>Schreiben Sie Ihre eigenen Fehlermeldungen</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="Andreas Knipp, tr">
+    <meta name="64er.issue" content="Sonderheft 5/85">
+    <meta name="64er.pages" content="92-93">
+    <!-- <meta name="64er.toc_category" content="XXX"> -->
+    <!-- <meta name="64er.toc_title" content="XXX"> -->
+    <meta name="64er.id" content="XXX">
+</head>
+
+<body>
+    <article>
+        <h1>Schreiben Sie Ihre eigenen Fehlermeldungen</h1>
+        <p class="intro">Wer die öden Meldungen des Betriebssystems wie »READY« oder »SYNTAX ERROR« satt hat, kann mit dem »ErrorChanger« alle Fehlerausgaben ändern und auf Diskette speichern.</p>
+
+        <p>Denken Sie einmal an klassisches Basic-Programmieren: Drei Zeilen eintippen, Probelauf, Fehlermeldung, Korrektur, Probelauf&hellip; und so weiter. Und bei jedem Fehler erscheinen die sattsam bekannten, äußerst langweiligen Einheitsfehlermeldungen.</p>
+
+        <p>Mit dem hier vorgestellten Programm »Error-Changer« ist es endlich möglich, den Wortlaut der Fehlermeldungen frei zu wählen (Bild 1 und 2). Nun, das ist immer noch nichts so Besonderes. Besonderes ist, daß der neue Textjeder Fehlermeldung bis zu 80 (achtzig) Zeichen lang sein kann.</p>
+
+        <p>Ob Sie den »UNDEFD STATEMENT ERROR« mit »QUO VA-DIS« oder mit »WOHIN, MEIN FREUND??« übersetzen, bleibt Ihrer Phantasie überlassen. Es schaut auch besser aus, wenn statt dem faden »READY«, zum Beispiel das warmstartsichere »ANDYS SOFTWARE IST IMMER EIN GEWINN« erscheint. Individualität ist Trumpf, Einheits-ROM ist out.</p>
+
+        <p>Das Programm ist kinderleicht zu bedienen: Error-Changer (siehe Listing) laden und starten.</p>
+
+        <p>Es erscheint der Text der alten, englischen Fehlermeldung. Sollte sie nicht geändert werden, so wird sie normal mit der RETURN-Taste übernommen. Ansonsten wird der neue Text eingetippt. Die Länge des neuen Textes kann frei gewählt werden und ist nur durch die 80 Zeichen des INPUT-Befehls begrenzt. Sollte der neue Text kürzer sein als der alte, so ist der Rest mit Leerzeichen zu überschreiben. Es kann auch die Abbruchmeldung BREAK und die READY-Meldung geändert werden. Jedoch erscheint, bedingt durch das Betriebssystem, nicht immer der geänderte Text.</p>
+
+        <p>Nach Beendigung schaltet das Programm automatisch auf die neuen Fehlermeldungen um. Diese können auf Kassette oder auf Disk gespeichert werden, um die kreativen Ergüsse für die Nachwelt zu erhalten.</p>
+
+        <p>Die neuen Fehlermeldungen werden mit<br>
+            LOAD ”FEHLER.OBJ”,8,1 (für Datasette ,1,1)<br>
+            geladen, mit SYS 49152 ein- und mit SYS 49226 ausgeschaltet. Nach dem Laden sollten Sie unbedingt NEW eingeben.</p>
+
+        <p>Nun zum Programmtechnischen.</p>
+
+        <p>Es wird der »Vektor auf Fehlermeldungen« $0300-$0301 (dezimal 768-769) auf das neue Programm »umgebogen«. Tritt ein Fehler auf (Fehlernummer größer 0), so stellt das Programm normale Ein- und Ausgabeverhältnisse her (Bildschirm, Tastatur). Die Fehlernummer bildet einen Vektor auf die Adresse des ersten Buchstabens der entsprechenden Fehlermeldung. Die Tdxte der Fehlermeldungen werden hintereinander gespeichert. Als Trennzeichen fungiert das siebte Bit des letzten Buchstabens. Ist es gesetzt, so weiß das Betriebssystem, daß dieser Buchstabe der letzte ist. Somit ist der erste Buchstabe (Zeiger im Steuerprogramm) und der letzte definiert (siebtes Bit gesetzt). Jetzt muß die Meldung nur noch geschrieben werden. (Das Ganze kann mit dem K-Befehl des SMON angeschaut werden. Nicht vergessen: Auf Kleinschriftmodus umschalten!)</p>
+
+        <p>Um Speicherplatz zu sparen, wurden im Programm die Fehlermeldungen ohne das Wort »ERROR« gespeichert, da dieses bei allen Meldungen gleich ist. Bei den neuen Meldungen muß der ganze Wortlaut angegeben werden, da bei manchen Scherzfehlermeldungen das Wort »ERROR« oder »FEHLER« stören würde.</p>
+
+        <p>Beschreibung der wichtigsten Variablen:</p>
+
+        <p>T$(I) =Text der alten und nach dem Überschreiben der neuen Fehlermeldung.<br>
+            LV = Lesevektor. Liest alte Meldung aus dem ROM.<br>
+            SA = Schreibvektor. Schreibt neuen Text in das RAM.<br>
+            VA = Schreibvektor auf Lo/Hi-Adressen des ersten Buchstabens der neuen Meldung.<br>
+            SA und EA = Start- und Endadresse als Parameter für den SAVE-Befehl<br>
+            FZ = Fehlerzähler (identisch mit der betriebssysteminternen Fehlernummer!)</p>
+
+        <address class="author">(Andreas Knipp/tr)</address>
+    </article>
+</body>
+
+</html>

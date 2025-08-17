@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>Disk-Füller</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="U. Gerlach, bs">
+    <meta name="64er.issue" content="Sonderheft 5/85">
+    <meta name="64er.pages" content="74-75">
+    <!-- <meta name="64er.toc_category" content="XXX"> -->
+    <!-- <meta name="64er.toc_title" content="XXX"> -->
+    <meta name="64er.id" content="XXX">
+</head>
+
+<body>
+    <article>
+        <h1>Disk-Füller</h1>
+        <p class="intro">Ab und zu passiert es, daß auf einer Diskette nur ein paar Blöcke fehlen. Mit dem Disk-Füller können in Notfällen bis zu 17 zusätzliche Blöcke auf der Diskette genutzt werden.</p>
+
+        <p>Das Problem ist wohl jedem bekannt, der eine gut sortierte Programmsammlung hat: alle thematisch gleichen Programme bis auf eines passen auf eine Diskettenseite. Und gerade dieses letzte Programm benötigt nur einige wenige Blöcke. Aber hier kann in Notfällen Abhilfe geschaffen werden. Auf der Spur 18, auf der sich unter anderem das Directory befindet, sind meist noch ein paar Blöcke frei, die das DOS der 1541 aber nicht zur Verfügung stellt. Mit dem Programm Disk-Füller können diese freien Blöcke ausgenutzt werden. Zu diesem Zweck werden Blöcke von schon auf der Diskette befindlichen Programmen auf die freien Blöcke der Spur 18 umkopiert und die Blockzeiger angepaßt. Die ursprünglichen Programmblöcke stehen dann zur freien Verfügung.</p>
+
+        <p>Das Programm ist weitgehend selbsterklärend, hier aber einige wichtige Hinweise: Nach dem Laden darf das Programm erst mit »RUN« gestartet werden, wenn die zu behandelnde Diskette im Laufwerk liegt. Außerdem dürfen nur Disketten behandelt werden, deren BAM einwandfrei in Ordnung ist. Im Zweifelsfalle sollte vorher ein Validate mit »OPEN 15,8,15,”V”« durchgeführt werden.</p>
+
+        <p>Hier ist die genaue Funktionsweise des Programms beschrieben:</p>
+
+        <p>Nach einer kurzen Erläuterung für den Benutzer werden in den Zeilen 1050 und 1060 (Listing) zwei Kanäle zum Laufwerk geöffnet. Gleichzeitig wird die eingelegte Diskette initialisiert. In Zeile 2000 werden drei Variablenfelder dimensioniert. Sie dienen zum Ablegen der Zeiger auf den jeweils nächsten Directoryblock sowie der Anzahl der Einträge in diesem Block. Mit Zeile 2010 beginnt dann eine Schleife, die alle Directory-Blöcke verfolgt, ihre Lage auf der Diskette in den dimensionierten Feldern speichert und ihre Anzahl in der Variablen B festhält. Ab Zeile 2500 wird die Anzahl der freien Einträge im letzten Directory-Block bestimmt. Dazu wird jeweils das Filetyp-Byte abgefragt. Hat es den Wert Null, ist dieser Eintrag noch frei. Sollte der Benutzer die Frage, ob der angezeigte Platz genügt, negativ beantworten, wird ein Block für weitere acht Einträge freigehalten.</p>
+
+        <p>Als nächstes wird überprüft, welche Blöcke der Spur 18 noch frei sind. Dazu werden die entsprechenden Bytes der BAM in den Computerspeicher geholt und analysiert (Zeile 3120 bis 3230).</p>
+
+        <p>In Zeile 4000 beginnt das Verschieben schon belegter Blöcke in die Spur 18. Dazu werden in einer großen Schleife (bis Zeile 4680) alle Directory-Einträge abgearbeitet. Dies geschieht folgendermaßen: Der Zeiger auf den ersten Block des ersten Eintrags wird in den Variablen AS und AT zwischengespeichert, der zugehörige Block eingelesen und der Zeiger auf den Fortsetzungsblock ebenfalls gespeichert. Dann wird ein freier Block der Spur 18 gesucht und der alte Zeiger auf diesen umgelenkt. Der Computer gibt nun eine Protokollzeile aus. Dieser Block wird nun als belegt und der alte als frei gekennzeichnet. Als letztes wird endlich der Inhalt des zu verschiebenden Blocks auf den Block der Spur 18 geschrieben. Sollte nach dem ersten Eintrag immer noch Platz auf der Spur 18 sein, fährt das Programm mit dem zweiten Eintrag fort, bis die Spur 18 komplett belegt ist.</p>
+
+        <address class="author">(U. Gerlach/bs)</address>
+    </article>
+</body>
+
+</html>

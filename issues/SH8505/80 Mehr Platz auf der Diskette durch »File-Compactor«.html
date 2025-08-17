@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>Mehr Platz auf der Diskette durch »File-Compactor«</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="Arndt Brenschede, ev">
+    <meta name="64er.issue" content="Sonderheft 5/85">
+    <meta name="64er.pages" content="80-81">
+    <!-- <meta name="64er.toc_category" content="XXX"> -->
+    <!-- <meta name="64er.toc_title" content="XXX"> -->
+    <meta name="64er.id" content="XXX">
+</head>
+
+<body>
+    <article>
+        <h1>Mehr Platz auf der Diskette durch »File-Compactor«</h1>
+        <p class="intro">Die Zeit, in der man aus Platzgründen nur ein oder zwei Programme auf einer Diskette unterbringen kann, ist vorbei. Mit diesem neuartigen File-Compactor sind Sie in der Lage, nicht nur Grafiken, sondern sogar beliebige Programme um bis zu 55 Prozent zu kürzen.</p>
+
+        <p>Das Problem, Programme zu packen, um so Platz auf Disket-tenzusparen, istmiteinem einfachen File-Compactor, dersich darauf beschränkt, Folgen gleicher Bytes zu erkennen und zu vereinfachen, noch langenichtbeseitigt EinsolcherCompac-tor (zum Beispiel der File-Compactor aus dem 64’er, Ausgabe 7/85) kann mit Maschinensprache-Routinen wenig anfangen, da dort selten mehr als zweimal das gleiche Byte hintereinander vorkommt. Ein guter Programm-Compactor muß daher anders arbeiten.</p>
+
+        <h2>Ein neuartiges Computerverfahren</h2>
+
+        <p>Hier ist nun ein Compactor, der sich die geringe Unordnung in Programmen zunutze macht. Dadurch wird wirklich jedes Programm (miteiner Längevon mindestens 25 Blocks) erheblich gekürzt. Es gibt praktisch kein Programm, in dem die verschiedenen Zeichen gleich häufig vorkommen. In Basic-Pro-grammen wird das besonders deutlich, weil dort Leerzeichen, Doppelpunkte, das $OO-Byte oder auch einzelne Buchstaben (wie zum Beispiel das »e«) besonders oftzu finden sind. Es gibt aber auch Zeichen, die in einem Programm nur ganz selten oder überhaupt nicht vorkommen. Diese Tatsache kann man sich zunutze machen, indem man beispielsweise für häufig vorkommende Zeichen, einen 3 Bit langen Code definiert. Jeder kann sich vorstellen, was das für eine Platzersparnis mit sich bringt. Je mehr in dem Programm einige wenige Zeichen dominieren, desto geringer ist der durchschnittliche Informationswert und desto stärker läßt es sich kürzen. Natürlich müssen dabei für die weniger oft vorkommenden Zeichen längere Codes (mit einer Länge von 8 Bit und länger) definiert werden, damit die Codierung eindeutig bleibt.</p>
+
+        <p>Zusätzlich wurde in diesem Compactor das Verfahren aus Ausgabe 7/85 (Zählen gleicher Bytefolgen) angewandt, da es besonders bei Spielen mit viel Grafik sehr effizient arbeitet.</p>
+
+        <p>Däs Programm, das gekürzt werden soll, muß ab dem Basic-Start (Adresse $0801) in den Speicher geladen werden (also laden mit »LOAD"Name",8«) und darf nicht längerals 48639 Bytes sein. Nach dem Kürzen steht eine SYS-Zeile am Anfang, die den Entpacker startet. Dieser wandelt den komprimierten Code wieder in ein lesbares Programm. Auch Basic-Programme können auf diese Weise von dem Computer bearbeitet werden. Mit »RUN« wird dann zuerst der Entpacker gestartet, der dann nach abgeschlossener Umwandlung das eigentliche Basic-Programm ausführt.</p>
+
+        <h2>Beispiele zur Benutzung</h2>
+
+        <p>Das Spiel »Fort Apocalypse«, das gerne als Maßstab für die Güte eines Compactors herangezogen wird, belegt normalerweise 153 Blocks auf der Diskette. Nach der Behandlung schrumpft der Platzbedarf auf 74 Blocks. Doch vor allem bei Basic-Programmen zeigt sich die Stärke des Packers: Sie schrumpfen im Schnitt um zirka 20 Prozent, auch wenn sie überhaupt keine Folgen gleicher Bytes enthalten.</p>
+
+        <ol>
+            <li>Eingabe des Listings »File-Compactor« mit dem MSE.</li>
+            <li>Den Verdichter mit »LOAD".. &ldquo;,8« laden und mit »RUN« starten. Der Verschiebelader befördert die Routine automatisch in den richtigen Speicherbereich.</li>
+            <li>Jetzt kann man das zu kürzende Programm nachladen.</li>
+            <li>Den Compactor mit »SYS 51000« aufrufen. Nach getaner Arbeit zeigt er den Grad der Verdichtung (in Prozent) an.</li>
+            <li>Sofern man der Meinung ist, daß sich der Aufwand lohnt, kann man das Programm danach wieder mit »SAVE"..&ldquo; ,8« abspeichern.</li>
+        </ol>
+
+
+        <h2>Modifizierte SAVE-Routine</h2>
+
+        <p>Wenn Programme gekürzt werden sollen, die nicht in den Basic-Speicher passen und sich bis unter das ROM erstrecken, dann gibt es allerdings Probleme mit dem Abspeichern. Für diesen Fall wurde eine modifizierte SAVE-Routine implementiert. Statt »SAVE &ldquo;..&rdquo; ,8« gibt man in diesem Fall »SYS 50965 &ldquo;.."« ein; die Geräteadresse 8 wird in diesem Fall automatisch gesetzt.</p>
+
+        <address class="author">(Arndt Brenschede/ev)</address>
+    </article>
+</body>
+
+</html>

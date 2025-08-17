@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>Record-Befehl für den C 64</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="Bernward Bretthauer, rg">
+    <meta name="64er.issue" content="Sonderheft 5/85">
+    <meta name="64er.pages" content="20-21">
+    <!-- <meta name="64er.toc_category" content="XXX"> -->
+    <!-- <meta name="64er.toc_title" content="XXX"> -->
+    <meta name="64er.id" content="XXX">
+</head>
+
+<body>
+    <article>
+        <h1>Record-Befehl für den C 64</h1>
+        <p class="intro">Dieses Programm erleichtet Ihnen den Umgang mit relativen Files.</p>
+
+        <p>Bei relativen Files kann auf jeden Satz des Files direkt zugegriffen werden, ohne die vorherigen Sätze lesen zu müssen. Außerdem kann ein eröffnetes File nach Belieben beschrieben und gelesen werden, es ist also zum Beispiel möglich, Satz 12 zu beschreiben, auch wenn bereits höhere Sätze existieren. Ein relatives File wird durch folgenden OPEN-Befehl eingerichtet:</p>
+
+        <p>OPEN lfn,ga,sa,”filename,l,”+chr$(sl). Dabei bedeutet:<br>
+            <strong>lfn</strong> = logische Filenummer.<br>
+            <strong>ga</strong> = Geräteadresse (normalerweise 8)<br>
+            <strong>sa</strong> = Sekundäradresse (mindestens 2, höchstens 14)<br>
+            <strong>sl</strong> = maximale Satzlänge des relativen Files (mindestens 1, höchstens 254). Diese Angabe ist entscheidend für den späteren Diskettenplatzverbrauch des Files, da auch Sätze, die nicht mit voller Satzlänge beschrieben werden, den gesamten durch sl reservierten Platz verbrauchen. Ist ein relatives File erst einmal eingerichtet, so kann die Satzlänge nicht mehr verändert werden. Es genügt dann der folgende OPEN-Befehl:<br>
+            OPEN lfn,ga,sa,”filename”
+        </p>
+
+        <p>Selbstverständlich muß ein relatives File auch mit CLOSE lfn geschlossen werden. Auf die einzelnen Sätze eines relativen Files wird normal mit PRINT #lfn, INPUT#lfn oder GET#lfn zugegriffen, allerdings muß vor jedem Zugriff auf den gewünschten Satz positioniert werden. Dies übernimmt die vorliegende Basic-Erweiterung.</p>
+
+        <p>Durch <strong>RECORD#lfn,sn,(,p)</strong> wird auf den Satz mit der Nummer sn positioniert, wird zusätzlich noch p angegeben, so wird innerhalb des Satzes das p-te Zeichen angewählt. Der neue Befehl muß von THEN durch einen Doppelpunkt abgetrennt werden. Es können folgende Basic-Fehlermeldungen auftreten:<br>
+            ?SYNTAX ERROR: Schreibfehler im Befehl oder die Erweiterung war nicht eingeschaltet.<br>
+            ?ILLEGAL QUANTITY ERROR: Ein Argument lag außerhalb des erlaubten Bereichs.<br>
+            ?FILE NOT OPEN ERROR: Das File mit der logischen Filenummer lfn war nicht eröffnet.<br>
+            ?ILLEGAL DEVICE NUMBER ERROR: Dem File mit der Nummer lfn ist ein Gerät mit einer Adresse kleiner als 8 oder größer als 15 zugeordnet.<br>
+            Es können außerdem folgende Floppy-Fehlermeldungen auftreten (Sie müssen durch den Fehlerkanal ausgelesen werden):<br>
+            50,RECORD NOT PRESENT: Der Satz, auf den positioniert wurde, existiert nicht. Diese Meldung kann ignoriert werden, wenn der Satz beschrieben werden soll, denn durch das Beschreiben wird er eingerichtet. (Und alle nicht existierende Sätze mit kleinerer Nummer ebenfalls.) Aus Geschwindigkeitsgründen empfiehlt es sich, bei der Einrichtung eines Files den höchsten Satz zuerst zu beschreiben.<br>
+            51,OVERFLOW IN RECORD: Die maximale Satzlänge sl wurde beim Schreiben überschritten. Zu beachten ist, daß das Carriage Return am Ende des Satzes mitzählt.<br>
+            52,FILE TOO LARGE: Die Diskette ist voll, der letzte Schreibzugriff kann nicht durchgeführt werden.</p>
+
+        <h3>Aufbau des Programms</h3>
+
+        <p>Der Basic-Interpreter besitzt einen Zeiger (Adresse $0308, im Listing »decod« genannt), derauf die Routine zur Befehlsinterpretation zeigt. Dieser Vektor wird nach dem Aufruf der Erweiterung zuerst gemerkt und danach auf eine eigene Routine zur Befehlsinterpretation gesetzt. Vor dem Merken wird noch geprüft, ob der Vektor schon auf die eigene Routine zeigt. Damit wird verhindert, daß der Computer bei einem versehentlichen Doppelaufruf abstürzt. Die eigene Routine rettet zunächst den Zeiger, der auf das augenblickliche Zeichen im Basic-Text zeigt, und ruft dann die CHRGET-Routine (Befehlscodierung siehe Bild 1, Symboltabelle Bild 2) auf. Diese Routine holt das nächste Zeichen aus dem Basic-Text. Sie überliest automatisch Leerzeichen. Wenn das Ende einer Zeile oder ein Doppelpunkt erreicht wird, so wird die Z-Flag des Prozessors gesetzt. Ein Problem ergibtsich dadurch, daß in »RECORD#« der Simons Basic-Befehl »REC« vorkommt. Er wird bei Verwendung von Simons Basic also in eine interne Darstellung beginnend mit $64 umgewandelt. Das Programm testet daher, ob $64 vorliegt und verzweigt bei positiver Antwort. In beiden Fällen wird nun getestet, ob der Befehl »RECORD#«vorliegt. Unter dem Namen tab 1 (beziehungsweise tab 2 für Simons Basic) steht (rückwärts) die interne Darstellung des Befehls »RECORD«. Dabei ist zu beachten, daß »OR« wiederum nicht im ASCII-Code abgelegt ist, sondern als Token. Wird nur eine Abweichung gefunden, so wird der gemerkte CHRGET-Zeiger zurückgeholt und zur normalen Interpreterroutine gesprungen, anderenfalls tritt eine eigene Routine in Funktion (sie beginnt beim Label OK). Sie holt die Satznummer und, wenn angegeben, die Position im Satz aus dem Basic-Text und sendet die Informationen an die Floppy über die Sekundäradresse 15 (Kommandokanal). Die Floppy erwartet die Werte in folgender Form: »p« als Zeichen, das positioniert werden soll; die Sekundäradresse, mit der das relative File eröffnet wurde; die Satznummer in der Reihenfolge niederwertiges — höherwertiges Byte und, falls angegeben, die Position im Satz. Es werden folgende Routinen des Interpreters und des Betriebssystems verwendet:</p>
+
+        <p>TODO TABLE</p>
+
+        <p>getbyt : Holt einen beliebigen Ausdruck in das x-Register.<br>
+            search : Sucht nach der logischen Filenummer in x.<br>
+            parset : Holt logische Filenummer, Geräteadresse und Sekundäradresse in die Speicherzellen $b8,$ba und $b9<br>
+            listen : Teilt dem angesprochenen Gerät mit, daß es Daten empfangen soll.<br>
+            seclis : Sendet die Sekundäradresse zum angesprochenen Gerät.<br>
+            iecout : Sendet den Wert im Akkumulator zum angesprochenen Gerät.<br>
+            chkcom : Prüft auf Komma im Basic-Text.<br>
+            getrec : Holt einen numerischen Ausdruck in den Fließkomma-Akkumulator.<br>
+            fac16 : Wandelt den Wert im Fließkomma-Akkumulator in eine 16-Bit-Zahl und speichert sie in $14 und $15.<br>
+            comget : =chkcom + getbyte.<br>
+            unlist : Beendet die Übertragung an die Floppy.</p>
+
+        <p>Das Programm wurde mit dem Assembler »ASSI« übersetzt, eine Übernahme auf andere Assembler dürfte nicht schwierig sein. Der Basic-Lader (Listing 1, Source-Code: Listing 2) legt das Programm ab der Adresse 49152 ($C000) ab, schaltet die Erweiterung ein und löscht sich dann selbst, er muß also vorher auf Diskette abgespeichert werden. Die Erweiterung wird durch SYS49152 ein- und durch SYS49155 ausgeschaltet. STOP/RESTORE schaltet die Erweiterung nicht ab.</p>
+
+        <address class="author">(Bernward Bretthauer/rg)</address>
+    </article>
+</body>
+
+</html>

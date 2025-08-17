@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>Linker 64 — Schluß mit dem Nachladen</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="Andreas Knipp, tr">
+    <meta name="64er.issue" content="Sonderheft 5/85">
+    <meta name="64er.pages" content="96-98">
+    <!-- <meta name="64er.toc_category" content="XXX"> -->
+    <!-- <meta name="64er.toc_title" content="XXX"> -->
+    <meta name="64er.id" content="XXX">
+</head>
+
+<body>
+    <article>
+        <h1>Linker 64 — Schluß mit dem Nachladen</h1>
+        <p class="intro">Wenn Sie öfters mehrere Maschinenprogramme gleichzeitig im Speicher haben wollen und es leid sind, jedes Programm einzeln nachzuladen, dann ist der Linker das ideale Arbeitswerkzeug für Sie.</p>
+
+        <p>Seine Anwendungen sind vielfältig: vom einfachen Basic-Start-Generator für Maschinenprogramme bis zum Verketter (= Linker) von mehrteiligen Spielen. Das Endprodukt, also das generierte Programm, kann dann ganz einfach auch von der Datasette geladen werden, was bisher an den Diskettenlade-routinen der Programme scheiterte. Diese Laderoutinen müssen natürlich vorher entfernt werden.</p>
+
+        <p>Die Bedienung ist denkbar einfach: Diskette mit den einzelnen Programmen nehmen, Linker 64 (siehe Listing) starten und bedienen. Es wird eine lauffähige Version generiert, die man mit LOAD und RUN starten kann.</p>
+
+        <p>Die einzige Denkarbeit besteht in der Überlegung, in welcher Reihenfolge die Programme wieder an ihre ursprünglichen Adressen verschoben werden sollen. Das ist wichtig, da sonst während des Verschiebevorgangs bereits verschobene Programmteile, die noch nicht verschobenen überschreiben könnten. Im allgemeinen wird man zuerst die Maschinenroutinen verschieben, die an die höchste Adresse geschrieben werden sollen.</p>
+
+        <h3>Die Arbeitsweise des Linkers</h3>
+
+        <p>Der Linker generiert drei Programmteile, die am Ende verkettet werden: Teil »S« besteht aus der Basic-Zeilennummer, dem SYS-Befehl und dem anschließenden Text, gleich einer REM-Zeile. Teil »V« besteht aus dem generierten Verschiebeprogramm. Für Interessierte sei gesagt, daß bei einer Verschiebung nach oben die betriebssysteminterne Blockverschieberoutine ($a3bf) angesprungen wird. Bei Transfer nach unten kommt eine »handgestrickte« Routine zur Anwendung. Teil »P« enthält schließlich die aneinandergehängten Maschinenprogramme.</p>
+
+        <p>Der Linker kennt zwei Betriebsarten: entweder Verschiebeteil vor oder nach den gelinkten Programmen. Im Modus »0« ist die Reihenfolge der drei Teile S-V-P, im Modus »1« ist sie S-P-V. Der Modus »0« (LoMem-Modus) wird fast immer benutzt, da nursehrselten Programmteile im Basic-Startbereich (2049 = $0801) laufen. Sollte dies aber doch der Fall sein, oder sollen Basic-Programme mit Maschinenprogrammen zusammengelinkt werden, so muß Modus »1« (HiMem-Modus) verwendet werden. Die Verschieberoutine würde sich sonst selbst überschreiben.</p>
+
+        <h3>Anwendung des Linkers</h3>
+
+        <p>Beispiel: Wir wollen aus dem SMON $c000, einer RENEW-Routine mit der Startadresse 36 000 und einem Assembler ASS $9000 ein einziges Programm machen. Dieses sollte nach dem Laden die einzelnen Teile gleich an die richtigen Adressen im Speicher versetzen und mit »RUN« zu starten sein. Weiterhin soll danach gleich der SMON starten:</p>
+
+        <p>(Alle drei Programme müssen sich auf der gleichen Diskette befinden.) Zuerst lädt man den Linker und startet ihn. Dann gibt man die Zeilennummer, in der später der SYS-Befehl stehen soll, einen erklärenden REM-Text und den Namen ein, den das fertige Programm erhalten soll. Als Betriebsart wählen wir »0«, da der Basic-Startbereich von unseren Programmen nicht berührt wird. Die Frage nach der Anzahl der Programme beantworten wir mir »3«. Nun werdendie Namen der einzelnen Programme eingegeben, woraufhin der Linker deren Startadressen berechnet und ausgibt. Diese könnten jetzt noch geändert werden, was aber nicht sehr ratsam ist. Maschinenprogramme haben im allgemeinen nämlich die Eigenschaft, nur in dem Speicherbereich zu laufen, für den sie geschrieben wurden. In unserem Fall übernehmen wir also die Startadressen mit der RETURN-Taste.</p>
+
+        <p>Jetzt fragt der Linker nach der Reihenfolge, in der später die Programme verschoben werden sollen (ist in unserem Fall egal, da sich unsere Beispielprogramme nicht im geringsten gegenseitig stören). Der Linker meldet sich mit:</p>
+
+        <p>TODO TABLE</p>
+
+        <p>1 = SMON $c000<br>
+            2 = ASS $9000<br>
+            3 = RENEW<br>
+            4 = ENDE</p>
+
+        <p>Wir tippen zum Beispiel »2« für die Verschiebung des Assemblers. Nun wird für ihn die Einsprungsart verlangt: EINSPRUNG: O = KEINER, 1=JSR, 2=JMP</p>
+
+        <p>Da nach der Verschiebung des Assemblers dieser nicht gleich gestartet werden soll, geben wir eine »0« ein. Es erscheint am Bildschirm:</p>
+
+        <p>TODO</p>
+
+        <p>1 = SMON $c000<br>
+            2 =<br>
+            3 = RENEW<br>
+            4 = ENDE</p>
+
+        <p>Sie sehen, der Assembler ist »verschwunden«. Der Linker wartet auf dasnächste Kommando. Wir geben »3« für die RENEW-Routine ein. Da diese ebenfalls nicht gleich gestartet werden soll, beantworten wir die nachfolgende Frage mit »0«. Dann verschieben wir mit »1« den SMON. Wir haben vorher gesagt, daß das fertige Programm diesen gleich starten sollte. Also Einsprungsart »2«. Die Einsprungsadresse, die der Linker daraufhin verlangt, ist 49152 (SMON).</p>
+
+        <p>Es wird noch einmal nach der Einsprungsart gefragt, da bei der Eingabe von »1« (JSR) noch weitere Einsprünge erfolgen könnten. Wir quittieren das Ganze mit »0« und das Abenteuer ist für uns erledigt.</p>
+
+        <p>Jetzt wirft der Linker die DOS-interne Copy-Routine an, die die vorher generierten Teile »V« und »S« auf der Diskette direkt aneinanderhängt. Nach einiger Zeit meldet sich der Computer mit READY, und der Link-Vorgang ist beendet. Auf der Diskette befindet sich jetzt das fertige Programm, das mit LOAD"na-me”,8 geladen und mit »RUN« gestartet werden kann. Es werden zuerst die gelinkten Programme in der festgelegten Reihenfolge an ihren Platz im Speicher verschoben und die durch JMP oder JSR definierten Adressen angesprungen. Achtung: Vor einem erneuten Start durch »RUN« sollte das Programm erst noch einmal geladen werden, ebenso sollte es nach dem Verschieben nicht mehr gespeichert werden.</p>
+
+        <p>Die wichtigsten Unterprogramme des Linkers sind in der Tabelle beschrieben. Die Röutine »Test auf Vorhandensein von Programmen auf Disk« eignet sich gut zum Einbau in eigene Programme.</p>
+
+        <address class="author">(Andreas Knipp/tr)</address>
+    </article>
+</body>
+
+</html>

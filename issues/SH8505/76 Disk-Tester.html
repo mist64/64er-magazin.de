@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>Disk-Tester</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="Ulrich Langler, ev">
+    <meta name="64er.issue" content="Sonderheft 5/85">
+    <meta name="64er.pages" content="76-77">
+    <!-- <meta name="64er.toc_category" content="XXX"> -->
+    <!-- <meta name="64er.toc_title" content="XXX"> -->
+    <meta name="64er.id" content="XXX">
+</head>
+
+<body>
+    <article>
+        <h1>Disk-Tester</h1>
+        <p class="intro">Mit diesem Programm lassen sich Disketten schneller, komfortabler und schonender auf defekte Sektoren untersuchen, als das mit dem entsprechenden Programm auf der Test/De-modiskette der Fall ist.</p>
+
+        <p>Das Programm ist insbesondere bei Verwendung älterer Disketten oder bei Nutzung der Disketten-Rückseite zu empfehlen. Es überprüft in knapp 10 Minuten die gesamte Diskette auf schadhafte Stellen und markiert die eventuell gefundenen unbrauchbaren Sektoren als belegt, so daß sie von der 1541 nicht mehr zur Datenspeicherung verwendet werden. So ist es möglich, auch teilweise beschädigte Disketten noch zur Datenspeicherung heranzuziehen, ohne daß es zu WRITE- oder READ-ERRORS kommt.</p>
+
+        <h3>Programmbeschreibung:</h3>
+
+        <p>Nach dem Starten des Programms (siehe Listing) muß man entscheiden, ob man nur die vollen Blocks (durch Lesen) oder alle Blocks (durch Lesen und Beschreiben) testen will, oder ob man die schon bei vorherigen Tests als fehlerhaft erkannten Blocks nach einem VALIDATE wieder belegen will. Danach wird gefragt, ob der Befehl »VALIDATE« an die Floppy gesendet werden soll. Dies ist nur bei Disketten sinnvoll, auf denen die Daten öfters geändert werden und die keine relativen Dateien, ISAM-Dateien oder ähnliche, im Direktzugriff arbeitenden Speicherformate, enthalten. Bei Disketten mit den oben genannten Dateien, von denen man nicht sicher weiß, ob die beschriebenen Blöcke auch in der BAM (Block Availability Map, Sektorbelegungstabelle) als belegt gekennzeichnetsind, sollte die Option »Leere Blocks testen« auf keinen Fall angewandt werden, da sonst Daten verlorengehen können.</p>
+
+        <p>Es folgt nach kurzer Lese- und Decodierzeit die symbolische Belegung der Diskette auf dem Bildschirm, auf der die belegten Sektoren als »-« und die nicht belegten als »*« gekennzeichnet sind. Wie kommt es dazu? Nun, jede Spur belegt in der BAM (Spur 18, Block 0, Positionen 4-143) 4 Byte. Zuerst kommt die Anzahl der freien Blöcke auf der Spur, im Programm bezeichnet mit FR$. Dann kommt nacheinander die Belegung der Sektoren 7-0, 15-8 und 23-16. Ein 1-Bit kennzeichnet dabei einen freien Block, ein O-Bit einen besetzten. Dies wird nun in der Routine »Analysieren der BAM«aufgelöst und in B%(T,S) festgehalten, wobei T die Spur und S den Sektor enthält. Die darauffolgende Testroutine beschränkt sich jetzt nur darauf, die Spuren und Sektoren einzeln durchzuzählen und in Abhängigkeit von B%(T,S) und der Variable TS (0, wenn alle, 1, wenn nur volle Blocks getestet werden sollen) entweder den Block zu lesen, oder ihn mit dem einmal aufgefüllten Puffer zu beschreiben. Danach wird der Fehlerkanal auf die Fehlernummer abgefragt, da dies schneller geht, als immer die ganze Fehlermeldung zu holen. Tritt ein Fehler auf, so wird dieser angezeigt und auf dem Monitor als roter Punkt in der BAM markiert. Gleichzeitig wird die Variable FE erhöht. Tritt kein Fehlerauf, so wird die Kennzeichnung für den gerade getesteten Block auf dem Monitor gelöscht. Sind alle Blocks getestet, werden die eventuell vorhandenen defekten Blocks auf der Diskette belegt und in dem Format »Spur,chr$(13),Block,chr$(13)« in dem USR-File ».DISKFEHLER« gespeichert. Das erste Byte entspricht in diesem Fall der Anzahl aller gefundenen Fehler.</p>
+
+        <p>Die Routine »Kaputte Blocks belegen« hat nun nichts weiter zu tun, als dieses File zu lesen und die Blocks zu belegen.</p>
+
+        <h2>Änderungen für andere Computer</h2>
+
+        <p>Für einen der »großen« CBMs muß die Zeile 135 und sämtliche POKEs in den Zeilen 150 und 470 gelöscht werden, da sie keine Farbdarstellungen besitzen. Die Zeile 140 muß so geändert werden:<br>
+            140 BI=32768</p>
+
+        <p>Für einen VC 20 mit 40-Zeichen-Bildschirm müssen nur die farbgebenden POKEs in Zeile 150, die Strings in Zeile 135 und die Variablen in Zeile 140 angepaßt werden. Für die Besitzer eines VC 20 mit 22-Zeichen-Bildschirm sind größere Änderungen erforderlich, da die BAM nicht angezeigt werden kann und sie sich somit mit einer numerischen Darstellung des Testablaufs zufrieden geben müssen. Es werden die freien und die belegten Blocks sowie der zuletzt getestete Sektor angezeigt. Die Zeilen 140, 470 und 635 ff. müssen vollständig gelöscht werden. Folgende Zeilen müssen geändert werden:<br>
+            355 PRINTL$T$&ldquo; BESETZTE BLOCKS:&rdquo; O$683-FR:-PRINTT$&ldquo; FREIE BLOCKS&rdquo;: &ldquo;O$FR;D$D$<br>
+            450 INPUT#15,F:IFF\&lt;20GOT0480<br>
+            480 PRINTG$&rdquo; T: &ldquo; T;Z$"S;Z$&rdquo; &ldquo;U</p>
+
+        <p>Zehn Minuten für das Überprüfen einer Diskette mögen zwar immer noch recht lang anmuten, wenn man jedoch bedenkt, wieviel Ärger (READ-ERROR, WRITE-ERROR) ein fehlerhafter Sektor verursachen kann, dann rentiert es sich bestimmt, diese Zeit zu investieren.</p>
+
+        <address class="author">(Ulrich Langler/ev)</address>
+    </article>
+</body>
+
+</html>

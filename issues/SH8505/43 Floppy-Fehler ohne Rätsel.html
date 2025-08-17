@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>Floppy-Fehler ohne Rätsel</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="Georg Kramer, aw">
+    <meta name="64er.issue" content="Sonderheft 5/85">
+    <meta name="64er.pages" content="43">
+    <!-- <meta name="64er.toc_category" content="XXX"> -->
+    <!-- <meta name="64er.toc_title" content="XXX"> -->
+    <meta name="64er.id" content="XXX">
+</head>
+
+<body>
+    <article>
+        <h1>Floppy-Fehler ohne Rätsel</h1>
+        <p>Wer kennt ihn nicht, den bekannten Vierzeiler, mit dem der Fehlerkanal des Disketten-Laufwerks abgefragt wird? Mit diesem Programm zeigt der Computer automatisch an, welcher Fehler aufgetreten ist.</p>
+
+        <p>Das Eintippen jenes berühmten Vierzeilers ist zwar ein einfaches, aber zeitraubendes Verfahren:<br>
+            10 OPEN15,8,15<br>
+            20 INPUT # 15,A1,A2$,A3,A4<br>
+            30 PRINTA1,A2$,A3,A4<br>
+            40 END</p>
+
+        <p>Immerhin sind ungefähr 56 Tasten zu drücken. Meistens vergißt der Anwender außerdem die Zeilen wieder zu löschen. Eine Alternative besteht darin, das DOS 5.1 der Demodiskette zu laden. Doch stellte auch dies keine befriedigende Lösung dar. Es sind immer noch einige Tasten zu drücken. Eine bessere Lösung ist ein entsprechendes Maschinenprogramm (Listing). Der Fehlerkanal der Floppy wird selbständig vom Computer überwacht und bei Bedarf vollautomatisch eine Fehlermeldung ausgegeben.</p>
+
+        <p>Das Programm ist ganz in Maschinensprache geschrieben. Nach dem Betätigen einer beliebigen Taste werden Sie aufgefordert, die Startadresse einzugeben. Das Programm ist frei verschiebbar, die entsprechenden Änderungen werden vom Programm selbst durchgeführt. Zunächst werden Sie noch nichts bemerken, außer, daß sich der Computer mit einem READY wiedermeldet. Versuchen Sie aber nun einmal eine Fehlermeldung der Floppy zu erzeugen. Als Beispiel können Sie ein Programm von der Diskette laden, das es nicht gibt. Auf dem Bildschirm erhalten Sie sofort die entsprechende Fehlermeldung und die Aufforderung, eine Taste zu drücken. Die Funktionen des Computers sind um eine wichtige und nützliche Fähigkeit erweitert worden. Außerdem arbeitet das Programm innerhalb von Basic-Programmen ebenfalls zuverlässig. Bei einem Fehler wird ein Programm nicht unterbrochen. Als weitere Besonderheit ist zu erwähnen, daß das Programm auch mit anderen Hilfsprogrammen zusammenarbeitet. Sie können zum Beispiel Hypra-Load oder das DOS 5.1 weiterhin benutzen. Das Programm wird durch Drücken der Run-Stop/ Restore-Taste unterbrochen. Ein erneuter Start istjederzeit mit SYS (Startadresse) möglich.</p>
+
+        <h3>Funktionsweise des Programmes</h3>
+
+        <p>Zuerst werden die IRQ-Vektoren geändert. DerComputerar-beitet dann bei jedem Interrupt das Programm ab. Dann findet eine Verzögerung statt, damit der Fehlerkanal nicht bei jedem Interrupt abgefragt wird. Danach wird geprüft, ob die Diskettenstation arbeitet und wenn ja, wird die Routine verlassen. Als nächstes wird der Fehlerkanal abgefragt und geprüft, ob ein Fehler vorliegt. Ist dies der Fall, dann wird die augenblickliche Cursorposition zwischengespeichert und der Computer merkt sich den Inhalt der oberen drei Zeilen. Diese Zeilen werden dann gelöscht, der Cursor abgeschaltet, eine neue Schriftfarbe gewählt und die Fehlermeldung in reverser Schrift ausgegeben.</p>
+
+        <p>Anschließend wird die Aufforderung, eine Taste zu drücken, aufden Bildschirm geschrieben. DerComputerwartetdann so lange, bis eine Taste gedrückt wird. Dann wird der ursprüngliche Bildschirminhalt wieder hergestellt, die alte Bildschirmfarbe ins Register gePOKEt und der Cursor auf den alten Platz gebracht. Das Programm benutzt insgesamt elf Unterroutinen des Betriebssystems. Die Farbe, in der die Fehlermeldung ausgegeben werden soll, ist durch den Befehl POKE Startadresse+123, Farbcode veränderbar. Dem Programmierer ist mit diesem Programm ein sehr gutes Hilfsmittel in die Hand gegeben.</p>
+
+        <address class="author">(Georg Kramer/aw)</address>
+    </article>
+</body>
+
+</html>

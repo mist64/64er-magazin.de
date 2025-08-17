@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>Disk-Basic 64</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="Alexander Frink, bs">
+    <meta name="64er.issue" content="Sonderheft 5/85">
+    <meta name="64er.pages" content="32,34-36">
+    <!-- <meta name="64er.toc_category" content="XXX"> -->
+    <!-- <meta name="64er.toc_title" content="XXX"> -->
+    <meta name="64er.id" content="XXX">
+</head>
+
+<body>
+    <article>
+        <h1>Disk-Basic 64</h1>
+        <p class="intro">Disk-Basic 64 ist eine besonders leistungsfähige diskettenorientierte Ba-sic-Erweiterung, die mit fast 50 neuen Befehlen das Arbeiten mit dem Diskettenlaufwerk enorm erleichtert.</p>
+
+        <p>Wer kennt sie nicht, die unzähligen OPENs und PRINTs, die notwendig sind, wenn man Befehle an das 1541-Laufwerk senden will. Auch beim Laden und Speichern ist das normale Commodore-Basic nicht gerade komfortabel. Abhilfe schafft die Basic-Erweiterung »Disk-Basic 64«. Sie enthält unteranderem fast alle diskettenorientierten Befehle des Basic 4.0 von Commodore, das der C 128 ebenfalls kennt. Viele Funktionen die sich bisher nur mit Spezialprogrammen oder einem Diskmonitor realisieren ließen, werden nun auf einen Basic-Befehl hin ausgeführt und sind somit auch programmierbar.</p>
+
+        <p>Zur Eingabe von »Disk-Basic 64« verwenden Sie bitte den MSE. Nach dem Speichern kann die Basic-Erweiterung dann jederzeit mit »LOAD &ldquo; DISK-BASIC &rdquo;,8« geladen und mit »RUN« gestartet werden. Danach steht »Disk-Basic 64« im Speicherbereich von $9200 bis $9DFF. Dieser Bereich wird für Basic automatisch gesperrt, so daß nur noch 35327 Bytes, also 3584 Bytes weniger, für Basic-Programme zurVerfügung stehen. Der $C-Bereich bleibt für eigene Maschinenprogramme oder einen Monitor frei.</p>
+
+        <p>Doch jetzt zur Beschreibung der neuen Befehle:</p>
+
+        <h3>DLOAD"name"</h3>
+
+        <p>Das Programm »name« wird von der Diskette an den Basic-Anfang geladen. Entspricht»LOAD"name",8«.</p>
+
+        <h3>DSAVE"name"</h3>
+
+        <p>Das momentan im Speicher befindliche Basic-Programm wird auf der Diskette gespeichert. Entspricht »SAVE" name &ldquo;,8«.</p>
+
+        <h3>DVERFIY"name"</h3>
+
+        <p>Das momentan im Speicher befindliche Basic-Programm wird mit dem auf Diskette gespeicherten Programm »name« verglichen. Entspricht »VERIFY &ldquo;name &rdquo;,8«.</p>
+
+        <h3>REPLACE"name"</h3>
+
+        <p>Ersetzt das Programm »name« auf der Diskette durch das im Speicher befindliche. Entspricht dem Basic-Befehl »SAVE" @:name",8«</p>
+
+        <h3>SCRATCH"name"</h3>
+
+        <p>Das File »name« wird gelöscht. Im Namen dürfen auch die Jokerzeichen »?« und »*« verwendet werden. Es werden dann sämtliche Files, die dem Namen entsprechen, gelöscht. Entspricht dem Floppy-Befehl »S:«.</p>
+
+        <h3>RENAME &ldquo;altname&rdquo; TO &ldquo;neuname&rdquo;</h3>
+
+        <p>Das File mit dem Namen »altname« wird in »neuname« umbenannt. Entspricht dem Floppy-Befehl »R:«.</p>
+
+        <h3>COPY"altfile"TO"neufile"</h3>
+
+        <p>Das File »altfile« wird auf dieselbe Diskette als »neufile« kopiert. So können Sicherheitskopien von Files hergestellt werden. Mit diesem Befehl kann nicht von einer Diskette auf eine andere kopiert werden. Entspricht dem Floppy-Befehl »C:«.</p>
+
+        <h3>HEADER"name,id"</h3>
+
+        <p>Die im Laufwerk befindliche Diskette wird mit dem Namen »name« und der ID »id« formatiert. Wird »,id« weggelassen, so wird die Diskette nur gelöscht. Entspricht dem Floppy-Befehl »N:«</p>
+
+        <h3>COLLECT</h3>
+
+        <p>Die Diskette wird aufgeräumt, das heißt, daß alle Blöcke, die nicht von Files belegt sind, freigegeben werden und sämtliche nicht ordnungsgemäß geschlossenen Files gelöscht werden. Entspricht dem Floppy-Befehl »V«.</p>
+
+        <h3>INIT</h3>
+
+        <p>Die Diskette wird initialisiert. Entspricht dem Floppy-Befehl »I«.</p>
+
+        <h3>CHECK</h3>
+
+        <p>Der Fehlerkanal des Laufwerks wird auf dem Bildschirm ausgegeben (siehe auch DS$).</p>
+
+        <h3>CATALOG</h3>
+
+        <p>Das vollständige Directory wird auf dem Bildschirm ausgegeben. Dabei verlangsamt die CTRL-Taste den Ausdruck, die Commodore-Taste hält die Ausgabe an und die Stop-Taste beendet den Befehl.</p>
+
+        <h3>DIR"$:auswahl"</h3>
+
+        <p>Die dem Ausdruck entsprechenden Teile des Directory werden auf dem Bildschirm ausgegeben. »DIR"$:*=P"« druckt beispielsweise nur die Programme, »DIR"$:?=R"« alle einbuchstabigen, relativen Files. Ansonsten gelten die Kontrollmöglichkeiten von CATALOG.</p>
+
+        <h3>BSAVE"name",start,ende+l</h3>
+
+        <p>Mit diesem Befehl kann der Speicherbereich von start bis ende auf Diskette gespeichert werden. Dies können Maschinenprogramme, Grafikbilder oder sonstiges sein.</p>
+
+        <h3>BLOAD"name" \&lt;,adr ></h3>
+
+        <p>Das File »name« wird an die angegebene Speicheradresse geladen. Wird keine Adresse angegeben, so wird das File an die Adresse geladen, an der es beim Speichern stand. Da keine Basic-Vektoren verändert werden, tritt kein »OUT OF MEMORY ERROR« mehr auf, wenn in den $C-Bereich geladen wurde. Ebenso wird bei einem BLOAD in einem Basic-Programm das Programm nicht neu gestartet, wie bei LOAD, sondern direkt hinter dem BLOAD fortgesetzt.</p>
+
+        <h3>CHAIN"name" \&lt;,zn ></h3>
+
+        <p>Das Basic-Programm »name« wird geladen und bei der Zeilennummer zn gestartet. Fehlt die Zeilennummer, so wird bei der ersten Zeile gestartet. Wird eine nicht existierende Zeilennummer angegeben, so gibt der Computer einen »UNDEF’D STATEMENT ERROR«aus. Achtung! Bei CHAIN gehen die Inhalte der Variablen wie bei LOAD verloren! Dies muß man beachten, wenn man CHAIN zum Nachladen von Programmteilen in Basic-Programmen einsetzen will.</p>
+
+        <h3>PASS"kommando"</h3>
+
+        <p>Mit diesem Befehl lassen sich Kommandos an das Laufwerk senden, die nicht direkt von Disk-Basic unterstützt werden, so zum Beispiel die »U«- oder »B«-Kommandos.</p>
+
+        <h3>DPOKE adresse,wert</h3>
+
+        <p>Dieser Befehl entspricht dem normalen POKE mit der Ausnahme, daß der Wert in der Adresse des Laufwerk-RAMs gespeichert wird. Er ist nur im Adressenbereich von 0 bis 2047 sinnvoll.</p>
+
+        <h3>DPEEK(adresse)</h3>
+
+        <p>Diese Funktion entspricht dem PEEK. Der Inhalt einer Speicherstelle des Laufwerkes kann mit »?DPEEK(adresse)« ausgedruckt oder mit »variable = DPEEK(adresse)« in eine Variable übergeben werden.</p>
+
+        <h3>DSYS(adresse)</h3>
+
+        <p>Mit diesem Befehl können Maschinenprogramme im Laufwerk gestartet werden. Entspricht dem Basic-Befehl SYS. Ein Beispiel: DSYS (60064) löst in dem angeschlossenen Floppy-Laufwerk einen Reset aus.</p>
+
+        <h3>NAME"nome"</h3>
+
+        <p>Der 16 Zeichen lange Name einer Diskette wird umgeändert Hat der Stringname mehr als 16 Zeichen, wird ein »STRING TOO LONG ERROR« ausgegeben.</p>
+
+        <h3>ID"id"</h3>
+
+        <p>Mit diesem Befehl kann die ld sowie das Formatkennzeichen in der ersten Zeile des Directory geändert werden. Der String »id« kann maximal 5 Buchstaben haben und überschreibt dann die ID, das Fbrmatkennzeichen (normalerweise »2A«) und das Leerzeichen zwischen den beiden. Achtung! Diese Änderungen beziehen sich nur auf das Directory. Die tatsächliche ID und Fbrmatkennzeichen werden nicht verändert.</p>
+
+        <h3>PROTECT &lt; &ldquo;name&rdquo; ></h3>
+
+        <p>Mit dem Befehl PROTECT wird eine ganze Diskette schreibgeschützt, indem das echte Fbrmatkennzeichen von »A« auf »X« geändert wird. Es sind dann keinerlei Schreibzugriffe mehr auf diese Diskette möglich.</p>
+
+        <p>Wird beim PROTECT-Befehl ein Name angegeben, so wird nur das File mit diesem Namen gegen Löschen und Überschreiben geschützt. Der Schreibschutz ist am Kleinerzeichen hinter dem Filetyp im Directory erkennbar. Es dürfen keine Joker im Namen angegeben werden.</p>
+
+        <h3>REPROTECT\&lt;&ldquo;name&rdquo;></h3>
+
+        <p>Mit diesem Befehl lassen sich der Disketten- und File-Schreibschutz wieder rückgängig machen. Siehe PROTECT.</p>
+
+        <h3>CHANGE dev.alt TO dev.neu</h3>
+
+        <p>Hiermit lassen sich softwaremäßig die Gerätenummern des 1541-Laufwerks verändern. So ändert »CHANGE 8 TO 9« die Gerätenummer des gerade eingeschalteten Laufwerkes auf 9. So lassen sich mehrere Laufwerke gleichzeitig betreiben.</p>
+
+        <h3>DEVICE dev</h3>
+
+        <p>Mit diesem Befehl läßt sich einstellen, auf welche Gerätenummer sich die Befehle des Disk-Basics beziehen. Nach »DEVICE 9« werden sämtliche Befehle am Laufwerk unter der Gerätenummer 9 ausgeführt. Dieser Wert wird in der Speicherstelle 2 gespeichert.</p>
+
+        <h3>RESET d</h3>
+
+        <p>Das Laufwerk mit der Gerätenummer d wird in den Einschaltzustand versetzt. Aus Sicherheitsgründen muß immer die Gerätenummer angegeben werden. Bitte warten Sie einige Sekunden bevor Sie dieses Laufwerk wieder ansprechen.</p>
+
+        <h3>MERGE"name"</h3>
+
+        <p>Das Programm »name« wird von der Diskette geladen und an das im Speicher befindliche angehängt. Achten Sie darauf, daß das zweite Programm höhere Zeilennummern als das erste hat.</p>
+
+        <h3>CONCAT &ldquo;altfilel&rdquo; &amp; &ldquo;aMile2&rdquo; TO &ldquo;neufile&rdquo;</h3>
+
+        <p>Mit diesem Befehl können zwei sequentielle Files zu einem verkettet werden. Dies funktioniert nicht mit Programmen!</p>
+
+        <h3>DS$ und DS</h3>
+
+        <p>In diesen beiden Variablen ist stets die aktuelle Fehlermeldung (DS$) beziehungsweise die aktuelle Fehlernummer (DS) des Laufwerkes. Sie dürfen deswegen nicht in Zuweisungen wie »DS$= &ldquo;HALLO"« verwendet werden.</p>
+
+        <h3>DOPEN# lfn,&ldquo;name&rdquo;,p1,p2</h3>
+
+        <p>Mit DOPEN lassen sich alle Arten von Files auf dem Laufwerk eröffnen. Die Filenummer darf von 2 bis 255 gehen. Empfehlenswert sind Nummern von 2 bis 14, da die Sekundäradresse des Files immer gleich der Filenummer logisch »UND«-verknüpft mit 15 ist, also immer im Bereich von 0 bis 15 liegt. Für den Fileparameter p1 sind die Buchstaben »S«, »U«, »P« und »L« erlaubt. Die ersten drei stehen für sequentielle, User- und Programm-Files. Der Parameter p2 ist dann entweder »W« oder »R« für Schreiben oder Lesen.</p>
+
+        <p>Lautet der erste Parameter »L« so wird ein relatives File zum Schreib/Lese-Zugriff eröffnet. Die Länge eines Datensatzes (Record) wird direkt an das »L« angehängt. Der zweite Parameter entfällt. Ein Beispiel: »DOPEN 2, &ldquo;name&rdquo;,L40« eröffnet ein relatives File mit der Record-Länge 40.</p>
+
+        <h3>DCLOSE\&lt;#lfn></h3>
+
+        <p>Dieser Befehl schließt das File mit der Nummer lfn. Wird keine Filenummer angegeben, werden alle geöffneten Files ordnungsgemäß geschlossen.</p>
+
+        <h3>APPEND#lfn/&ldquo;name&rdquo;</h3>
+
+        <p>Ein sequentielles File wird zum Erweitern (Anhängen von Datensätzen) geöffnet. Die Sekundäradresse errechnet sich wie bei DOPEN.</p>
+
+        <h3>FETCH#lfn,len,xx$</h3>
+
+        <p>Mit diesem Befehl werden aus dem File mit der Nummer lfn eine festgelegte Anzahl (len) von Zeichen in eine beliebige Stringvariable (xx$) übertragen. Die Vorteile gegenüber dem INPUT #-Befehl sind: Datensätze sind nicht mehr auf 88 Zeichen beschränkt, sondern dürfen bis zu 255 Zeichen haben. Es werden auch Kommata und Doppelpunkte übernommen. Der Befehl kann auch im Direktmodus eingesetzt werden.</p>
+
+        <h3>RECORD # lfn,rec &lt; ,pos ></h3>
+
+        <p>Mit diesem Befehl wird die Bearbeitung von relativen Dateien zum Kinderspiel. Der Zeiger auf die Datei mit der Filenummer lfn wird auf den Datensatz mit der Nummer rec positioniert. Zusätzlich kann noch die Position des Datei-Zeigers innerhalb dieses Datensatzes angegeben werden. Wird dieser Parameter weggelassen, wird immerauf das erste Zeichen positioniert. Dies entspricht der Befehlsfolge: »PRINT#15,&ldquo;P&rdquo;;CHR$(lfn);CHR$(reclo);CHR$(rechi); CHR$(pos)«.</p>
+
+        <h3>LIST"name" \&lt;,start-ende ></h3>
+
+        <p>Der LIST-Befehl wurde erweitert, so daß bei Angabe eines Namens das Listing im ASCII-Code als sequentielles File auf der Diskette abgelegt wird. Sollen nur Teile abgespeichert werden, so kann die normale LIST-Syntax für Bereichsmarkierungen angehängt werden. Basic-Programme können somit in Textverarbeitungsprogramme übernommen werden.</p>
+
+        <h3>ENTER"name"</h3>
+
+        <p>Mit ENTER kann ein auf Diskette gelistetes Programm wieder in den Speicher übernommen werden. Die Zeichen, die gerade gelesen werden, werden zusätzlich auf dem Bildschirm ausgegeben. Eine Anwendungsmöglichkeit ist ein »echtes« MERGE, bei dem das zweite Programm nicht einfach angehängt, sondern die beiden entsprechend der Zeilennummern zusammengemischt werden. Achtung! Es dürfen keine doppelten Zeilennummern vorkommen!</p>
+
+        <h3>BLOCKS</h3>
+
+        <p>Dies ist eine weitere Basic-Funktion. Mit ihr erhält man die Anzahl der freien Blöcke einer Diskette. Diese Funktion kann wahlweise in PRINT-Befehlen oder Wertzuweisungen verwendet werden.</p>
+
+        <h3>START(&ldquo;name&rdquo;)</h3>
+
+        <p>Mit dieser Funktion läßt sich die Startadresse des Programms »name« ermitteln. Auch diese Funktion kann in PRINT-Befehlen und Wertzuweisungen verwendet werden. Ist dieses Programm nicht vorhanden, wird als Startadresse der Wert 51143 ermittelt.</p>
+
+        <h3>SIZE(&ldquo;name&rdquo;)</h3>
+
+        <p>Mit dieser Funktion läßt sich die Länge eines Files in Blocks ermitteln. Hier gilt dasselbe wie bei den beiden anderen beschriebenen Funktionen.</p>
+
+        <h3>RESCUE"name",ft</h3>
+
+        <p>Mit diesem Befehl kann ein soeben gelöschtes File wieder gerettet werden beziehungsweise der Filetyp eines Files geändert werden. Für den Parameter ft sind die Zahlen 1 bis 4 erlaubt. Sie bedeuten:<br>
+            0 = DELeted<br>
+            1 = SEQuential<br>
+            2 = PRoGram<br>
+            3 = USeR<br>
+            4 = RELative</p>
+
+        <p>Der Filetyp im Directory wird angepaßt und anschließend ein VALIDATE ausgeführt, um die Blöcke dieses Files wieder zu belegen. Achtung! Wurde zwischen dem Löschen und dem Rettungsversuch auf die Diskette geschrieben (SAVE oder ähnliches), dann läßt sich mit hoher Wahrscheinlichkeit das gelöschte Programm nicht mehr retten!</p>
+
+        <h3>ENTRY$(&ldquo;name&rdquo;)</h3>
+
+        <p>Mit dieser Funktion lassen sich die kompletten 30 Bytes eines Directory-Eintrags in einen String ablegen: »xx$= ENTRY$(&ldquo;name&rdquo;)«. Die Verwendung im PRINT-Befehl ist zwar möglich aber sinnlos. Achtung! An den 30 Byte langen Fileeintrag werden drei Bytes angehängt, die Spur, Sektor und Position des gelesenen Eintrages darstellen. Diese drei Bytes dürfen nicht verändert werden, da sonst beim Zurückschreiben mit WRITE das Directory zerstört wird!</p>
+
+        <h3>WRITE xx$</h3>
+
+        <p>Mit diesem Befehl kann ein manipulierter Directory-Eintrag zurückgeschrieben werden. Zusammen mit der ENTRY$-Funktion läßt sich beispielsweise ein Directory-Sortierpro-gramm aufbauen. Siehe ENTRY$.</p>
+
+        <h3>DESTROY n</h3>
+
+        <p>Der Track mit der Nummer n wird endgültig zerstört. Beim Zugriff auf diesen Track erhält man nur den 21 READ ERROR. Die Diskette kann nur noch durch komplettes Neuformatieren normalisiert werden. Nach der Ausführung dieses Befehls muß das Laufwerk kurz ausgeschaltet werden.</p>
+
+        <h3>QUIT</h3>
+
+        <p>Mit QUIT wird Disk-Basic verlassen, ohne daß das im Speicher befindliche Basic-Programm gelöscht wird. Allerdings gehen die Variablen-Inhalte verloren.</p>
+
+        <h3>COMMANDS</h3>
+
+        <p>Auf dieses Kommando hin werden alle zusätzlichen Befehle von Disk-Basic auf dem Bildschirm ausgegeben.</p>
+
+        <p>Noch einige kleine Anmerkungen: Anders als bei vielen Basic-Erweiterungen muß zwischen dem THEN-Befehl und einem Disk-Basic-Kommandp kein Doppelpunkt stehen! Bei allen Befehlen wird, ist das durch DEVICE festgelegte Laufwerk nicht angeschlossen, ein »DEVICE NOT PRESENT ER-ROR« gemeldet. Bei fehlendem Filenamen gibt es einen »MIS-SING FILENAME ERROR«.</p>
+
+        <address class="author">(Alexander Frink/bs)</address>
+    </article>
+</body>
+
+</html>

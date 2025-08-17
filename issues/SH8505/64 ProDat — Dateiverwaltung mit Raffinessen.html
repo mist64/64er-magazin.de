@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>ProDat — Dateiverwaltung mit Raffinessen</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="Wolfgang Hahn, tr">
+    <meta name="64er.issue" content="Sonderheft 5/85">
+    <meta name="64er.pages" content="64-69">
+    <!-- <meta name="64er.toc_category" content="XXX"> -->
+    <!-- <meta name="64er.toc_title" content="XXX"> -->
+    <meta name="64er.id" content="XXX">
+</head>
+
+<body>
+    <article>
+        <h1>ProDat — Dateiverwaltung mit Raffinessen</h1>
+        <p class="intro">Das Besondere an »ProDat« ist, daß man die Eingabemaske wie bei den teuren kommerziellen Programmen selbst definieren kann. Außerdem ist »ProDat« durch verschiedene Maschinenprogramme besonders schnell und einfach zu bedienen.</p>
+
+        <p>Wenn man das Listing vollständig und fehlerfrei eingetippt hat, darf man erst mal aufatmen. Elf KByte Basic sind schließlich kein Honiglecken. Im Bereich von $0334 (820) bis $03cf (1020) stehen verschiedene Maschinenprogramme. Da dies aber der Kassettenpuffer ist, läßt sich »ProDat« nicht ohne weiteres für Datasette verwenden.</p>
+
+        <p>Die Daten werden von Maschinenroutinen geladen und gespeichert. Auch das Kopieren der Bildschirmmaske deraktuel-len Datei in den Bildschirmspeicher geschieht in Maschinensprache. Da die INPUT-Routine des Betriebssystems geringfügig geändert wurde, bereitet bei der Maskenerstellung auch die Eingabe von Anführungszeichen, Doppelpunkten oder Kommata keinerlei Schwierigkeiten. Um bei der Verarbeitung der Daten der gefürchteten Garbage-Collection aus dem Weg zu gehen, wurde eine etwas geänderte Version des Stringver-tauschers von Boris Schneider aus der 64’er, Ausgabe 1/85 verwendet. FürInteressiertezeigtTabelle 1 einedokumentier-te Liste der wichtigsten im Programm verwendeten Variablen.</p>
+
+        <h3>Hinweise zum Abtippen:</h3>
+
+        <p>Manche Zeilen haben Überlänge, das heißt, sie sind länger als die vom Basic-Interpreter erlaubten 80 Zeichen. Diese Zeilen können Sie nur mit den im Anhang D des Commodore-Handbuchs vermerkten Abkürzungen der Basic-Befehle eingeben. Das gilt zum Beispiel für die Zeile 360. Leerzeichen vor und nach den einzelnen Basic-Befehlen dienen nur der Übersichtlichkeit und können beim Eintippen ersatzlos weggelassen werden.</p>
+
+        <h3>Programmbeschreibung:</h3>
+
+        <h3>Menü 1, Hauptmenü</h3>
+
+        <p><strong>1</strong> — Aufruf Menü 2<br>
+            <strong>2</strong> — Neue Datei definieren
+        </p>
+
+        <p>Zuerst muß die Eingabemaske definiert werden. Wie das aussehen kann, zeigt Bild 1. Sie können frei mit den Cursor-Tasten auf dem Bildschirm umherwandern und Ihr persönliches Eingabeformular erstellen. Dabei sind alle Tasten und Zeichen erlaubt. (VorsichtvorSHIFT-CLR!) Zahlen zum Beachten: Maximale Felderanzahl (in der Sprache der Dateiverwaltung wird jede Stelle in der Maske, an der Sie später eine Eingabe machen, als Feld bezeichnet): 1 500 pro Datei, 40 pro Datensatz (ein Datensatz ist eine mit Daten gefüllte Eingabemaske). Maximale Feldlänge: 80 Zeichen.</p>
+
+        <p>Wie das Beispiel Bild 1 zeigt, werden Felder mit Hochpfeilen markiert. Wird derabschließende Pfeil weggelassen, so nimmt das Programm hierfür die maximale Feldlänge von 80 Zeichen. Wird später bei der Eingabe der Schlußpfeil erreicht, so springt der Cursor automatisch zum nächsten Feld weiter. Die Pfeile selbst tauchen später nicht mit in der Eingabemaske auf (siehe Bild 2). Mit dem Pfeil nach links können Sie eine Datensatznummeranzeige programmieren. Das heißt, daß an dieser Stelle später die Nummer des Datensatzes innerhalb der Datei ausgedruckt wird. Weiterhin istwichtig, daß Sie die letzte Bildschirmzeile nichtverwenden dürfen. Ein Feld in dervorletzten Zeile darf also nur 40 Zeichen lang sein! Nachdem die Eingabemaske definiert ist, müssen noch die Druckparameter eingegeben werden (siehe nächster Menüpunkt).<br>
+            <strong>3</strong> — Druckparameter festlegen/ändern<br>
+            Nun müssen Sie festlegen, welche Felder in welcher Reihenfolge später auf dem Drucker ausgedruckt werden sollen. Ein Feld wird mit der »eckigen Klammer auf« markiert (siehe Bild 3). Sie können natürlich auch erklärenden Text oder ähnliches ausdrucken lassen. Alles, was zwischen den »eckigen Klammern zu«steht, wird später im Breitschrift-Modus gedruckt. Durch Änderung der Zeilen 2 570 und 2 580 hat man auch andere Möglichkeiten, zum Beispiel Kursiv-Druck oder dergleichen. Es können maximal 60 Druckzeilen definiertwer-den. Zu beachten ist, daß ein angesprochenes Feld auch wirklich vorhanden ist, da dies nicht überprüft wird. Sie können ein Feld auch mehrmals ausgeben lassen, das liegt ganz bei Ihnen. Eine Druckzeile kann maximal 80 Zeichen fassen, wodurch beispielsweise auch kleinere Formbriefe möglich sind. 4 — Directory laden 5 — File löschen<br>
+            <strong>6</strong> — Validate<br>
+            <strong>7</strong> — Disk formatieren<br>
+            <strong>8</strong> — File umbenennen
+        </p>
+
+        <p>Die Menüpunkte 4 bis 8 erklären sich von selbst, beziehungsweise sind im Floppy-Handbuch genauer erklärt.</p>
+
+        <h3>Menü 2, Datei verwalten</h3>
+
+        <p><strong>1</strong> — Datei laden</p>
+
+        <p>Sollte eine erweiterte oder geänderte Datei noch im Speicher stehen, so wird sicherheitshalber erst gefragt, ob Sie nicht erst speichern möchten. Die vorhandene Datei wird sonst gelöscht.<br>
+            <strong>2</strong> — Datei pflegen/ändern/ergänzen
+        </p>
+
+        <p>Nach Wahl dieses Punktes sind Sie zunächst im Anzeigemodus, der wie Bild 4 aussehen könnte. In diesem Modus sind einige Tasten mit Sonderfunktionen belegt. (Siehe Tabellen 2 und 3)<br>
+            <strong>3</strong> — Datei abspeichern<br>
+            <strong>4</strong> — Datei sortieren
+        </p>
+
+        <p>Es besteht jetzt die Möglichkeit, entweder alphabetisch nach einem bestimmten Feld zu sortieren, oder man läßt sich bestimmte Daten heraussuchen, zum Beispiel alle Adressen eines bestimmten Postleitzahlbereichs. Die kann man auf dem Drucker ausgeben lassen, oder speichert sie gleich in einer neuen Datei ab.<br>
+            <strong>5</strong> — Alle angegebenen Felder der Datei können aufaddiert werden, zum Beispiel bei einer Haushaltsbuchhaltung alle Ausgaben für Essen, etc.<br>
+            <strong>6</strong> — Aufruf Menü 3
+        </p>
+
+        <h3>Menü 3, Druckermenü</h3>
+
+        <p><strong>1</strong> — Alle Datensätze mit den vorher definierten Druckparametern auf dem Drucker ausgeben.<br>
+            <strong>2</strong> — Gesamte Datei ausdrucken.<br>
+            <strong>3</strong> — Entspricht Punkt 1, aber nur in Verbindung mit der Sortierroutine.<br>
+            <strong>4</strong> — Entspricht Punkt 2, aber nur in Verbindung mit der Sortierroutine.
+        </p>
+
+        <h3>Allgemeine Hinweise:</h3>
+
+        <p>Sollte der Cursor einmal an einer Stelle stehenbleiben, und auch keine Taste mehr annehmen, so ist das kein Grund zur Panik. Der Computer braucht ab einer gewissen Datenmenge einfach Zeit, um das Eingegebene sinnvoll im Speicher unterzubringen. Wenn Sie »ProDat« als Textverarbeitungsprogramm verwenden wollen, so definieren Sie die Eingabefelder einfach über den gesamten Bildschirm und lassen die Datensatz-Nummeranzeige als zum Beispiel Seitennummer des Textes arbeiten.</p>
+
+        <address class="author">(Wolfgang Hahn/tr)</address>
+    </article>
+</body>
+
+</html>

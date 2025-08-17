@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>Betriebssystem selbst gemacht</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="Richard Diezmann, rg">
+    <meta name="64er.issue" content="Sonderheft 5/85">
+    <meta name="64er.pages" content="78-80">
+    <!-- <meta name="64er.toc_category" content="XXX"> -->
+    <!-- <meta name="64er.toc_title" content="XXX"> -->
+    <meta name="64er.id" content="XXX">
+</head>
+
+<body>
+    <article>
+        <h1>Betriebssystem selbst gemacht</h1>
+        <p class="intro">Ein eigenes Betriebssystem zu schreiben, ist nicht jedermanns Sache. Aber warum soll man nicht das vorhandene für sich abändern?</p>
+
+        <p>Wie schön wäre es doch, sein eigenes, kleines Betriebssystem für den C 64 zu schreiben. Doch gewiß ist das nicht gerade jedermanns Sache. Daraus könnte sich schnell ein »Fulltime-Job« mit Beschäftigung bis ins hohe Rentenalter entwickeln. Es liegt viel näher, das vorhandene Betriebssystem einfach so lange abzuändern, bis ein eigenes, den Bedürfnissen angepaßtes Kernal entsteht. Beste Beispiele sind das Hypra-Kernal und Hypra-Perfekt (64’er, Ausgaben 12/84, 1/85 und 4/85). Bestimmt hat so mancher inzwischen schon eine kleine Kernal-Sammlung auf Diskette oder EPROM.</p>
+
+        <p>Ganz interessant wäre es dann, auf einfache Weise diese Systeme weiter abzuändern. Ihnen beispielsweise einen deutschen Basic-Interpreter zu verpassen, mit deutschen System-und Fehlermeldungen.</p>
+
+        <p>Gesagt, getan: Vorliegendes Programm erledigt dies alles. Es ist abgestimmt auf die Kernal-Version aus der 64’er-Ausgabe 1/85 sowie auf das Hypra-Perfekt-Kernal aus Ausgabe 4/85, arbeitet jedoch auch mit vielen anderen Betriebssystemen. Probieren geht hier über Studieren.</p>
+
+        <p>Im Gegensatz zu den oben genannten EPROM-Versionen, erzeugt dieses Programm ein lauf- und damit testfähiges Betriebssystem im freien RAM-Bereich unter dem Kernal-ROM ab $E000. Nichtjeder wird wohl gleich ein EPROM programmieren, sondern lieber zuerst etwas experimentieren wollen. Zuerst werden Basic und Kernal ins RAM kopiert (lnit-Routine ab 190). Erstdann kann geändert werden. Das Programm (siehe Listing) erlaubt auch (falls vorhanden) ein Betriebssystem von Diskette zu laden (Zeile 23, siehe Tabelle 1 und 2). Danach kann die Farbkombination beim Warm- und Kaltstart ausgetestet werden. Der SYS-Befehl in Zeile 201 löst einen Reset des Bildschirms innerhalb der geänderten Kernalroutine aus, so daß die Kombination sofort beurteilt werden kann. Erst nach Bestätigen verzweigt das Programm nach Zeile 213. Dort kann eine OLD-Routine aktiviert werden. Beginn ist ab Adresse 64608. Dies gilt es zu beachten, wenn ein Kernal abgeändert werden soll, das eventuell diesen Bereich benutzt. Es handelt sich dabei um einen Teil der normalerweise überschriebenen Kassettenroutinen des Betriebssystems. Hat man ein Betriebssystem geladen, das mit der OLD-Routine kollidiert, muß letztere verschoben werden.</p>
+
+        <p>Die genannten Hypra-Kernal sind diesbezüglich unkritisch. Beachtet werden muß lediglich, daß sich deren Adressen für Funktionstasten-Belegung unterscheiden. Soll OLD also auch auf Funktionstaste gelegt werden, fragt das Programm selbst nach der verwendeten Version (Zeile 218). Bei anderen Kernal-Versionen kommt es auf das berühmte Experiment an. Betriebssysteme ohne eine Belegung der Funktionstasten können selbstverständlich auch nicht den OLD-Befehl per Funktionstaste unterstützen. Es fehlen ganz einfach die nötigen Routinen (siehe Original Kernal V2.0)!</p>
+
+        <p>Hier bleibt ja immer noch der SYS-Befehl zum Aufruf von OLD, den man sich eben merken muß. Für ganz zerstreute Freaks ist die nachfolgende Routine am idealsten. OLD als gewöhnlicher Basic-Direktbefehl (also auch abkürzbar mit »O SHIFT L«): Zeile 224 sorgt für die entsprechende Programmierung. Da hier, wie nachher auch bei den Fehlermeldungen in deutscher Sprache, das Basic mitverändert wird, muß natürlich auch das Basic-ROM (beziehungsweise -RAM) abgespeichert werden. Wie, das wird zum Schluß erklärt.</p>
+
+        <p>Wurden alle Eingaben gemacht, startet das Programm die Initialisierungs-Routine, die Kernal und Basic mit deutschen System- und Fehlermeldungen versieht. Zu guter Letzt wird das neue Betriebssystem aktiviert (Zeile 133). Jetzt können ruhig mal alle Neuheiten durchgespielt werden. Gar nicht so einfach, alle Fehler-Meldungen zu »provozieren«.</p>
+
+        <p>Und dabei gibt es immer noch Programmierer, die sich bei Meldungen wie »Syntax Error« die Haare raufen. Aufjeden Fall: einen »Syntax Error« wird es für jene jetzt wohl kaum mehr geben.</p>
+
+        <p>Jetzt noch kurz zu den Änderungen gegenüber den EPROM-Versionen. Um ein EPROM zu brennen, muß das Programm in einem Bereich liegen, auf den das EPROM-Pro-grammiergerät zugreifen kann. Daher liegen die Hypra-Kernal ab $6 000 im Speicher. Die Adressen bleiben unkorrigiert, so daß als EPROM ein lauffähiges Betriebssystem im Originalbereich ab $E000 entsteht. Ausgetestet werden kann aber nur, wenn das Betriebssystem wieder an seinen Ursprung verschoben wird. Das kann am komfortabelsten mit einem Monitorprogramm durchgeführt werden.</p>
+
+        <p>Ohne Monitor muß mit einer Basic-PEEK/POKE-Schleife der Speicherbereich $6000 bis $7FFF auf die Adressen ab $E000 verschoben werden:<br>
+            forx=24576to49151:fory=57344to65535<br>
+            pokey,peek(x):nexty:nextx</p>
+
+        <p>Zuvor muß sichergestellt sein, daß das RAM unter dem ROM ab $E000 aktiviert wurde (wie durch die Routine ab Zeile 193). Am besten, man speichert sich diese Basic-Routine separat als Programm, da sie beim Einlesen eines Betriebssystems immer wieder benötigt wird. Aus Zeitgründen wäre eine solche Routine in Maschinen-Code auch nicht zu verachten.</p>
+
+        <p>Der verschobene Speicherbereich muß nun lediglich noch auf Disk abgespeichert werden. Ohne Monitor kann dazu zum Beispiel das kleine Programm im 64’er, Ausgabe 2/85, Seite 91 verwendet werden.</p>
+
+        <p>Mit einem Maschinensprache-Monitor geht’s einfacher:<br>
+            Verschieben: .T6000,7FFF,E000-<br>
+            Save Kernal: .S »K-Name«,08,E000,FFFF<br>
+            Save Basic: .S »B-Name«,08,A000,BFFF</p>
+
+        <p>Beim SMON hat der Verschiebe-Befehl den Buchstaben »W«, und Komma, Minuszeichen und Geräteadresse entfallen.</p>
+
+        <p>Übrigens kann auch das ROM ins RAM mittels Monitor kopiert werden. Die Befehle dazu lauten<br>
+            Kernal:TE000, FFFF, E000-Basic:TA000,BFFF,A000- (danach POKE 1,53).</p>
+
+        <p>Auf der Diskette hat man jetzt ein Betriebssystem, das nur mehr vom Programm nachgeladen zu werden braucht. Es kann aber auch schon vorher ein Betriebssystem im RAM aktiv sein. Das Bearbeitungsprogramm erkennt automatisch, ob das Original oder ein neues Kernal aktiv ist (Adresse 1 gleich 55 oder 53, Zeile 100/101)! Andernfalls wird immer das Original-Betriebssystem bearbeitet.</p>
+
+        <p>Grundsätzlich muß vor jedem Laden einer Kernal- oder Basic-Version von ROM auf RAM umgePOKEt werden.</p>
+
+        <p>Arbeiten mit dem neuen Betriebssystem:</p>
+
+        <ol>
+            <li>ROM auf RAM umPOKEn</li>
+            <li>Zeropage-Adresse 1 mit POKE 1,53 umschalten</li>
+            <li>Kernal laden mit »LOAD ”Name”,8,1«</li>
+            <li>Basic laden mit »LOAD ”Name”,8,1«</li>
+        </ol>
+
+
+        <p>Zur Kontrolle, daß tatsächlich das neue System läuft, kann mit SYS 58648, SYS 58260 in den Warmstart gesprungen werden. Ein SYS 64738 schaltet immer auf das Original-ROM zurück und sollte vermieden werden. Falls er doch einmal ausgelöst wird (zum Beispiel Run-Stop/Restore), kann mit POKE 1,53 jederzeit wieder ins RAM geschaltet werden.</p>
+
+        <p>Da das Bearbeitungsprogramm auch das Basic-ROM ändert, muß auch immer Basic von Disk geladen werden. Andernfalls hat man englische Fehlermeldungen und OLD nur als SYS-Befehl.</p>
+
+        <p>Zum Abschluß muß noch erwähnt werden, daß der OLD-Befehl den Basic-Befehl END eliminiert. Bei Fremdprogrammen sollte im Hinblick auf Syntax-Fehler daran gedacht werden. Eine Verlängerung der Basic-Befehlsliste ist aus Platzgründen in dieser Programmversion nicht realisiert worden.</p>
+
+        <address class="author">(Richard Diezmann/rg)</address>
+    </article>
+</body>
+
+</html>
