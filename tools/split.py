@@ -16,12 +16,16 @@ def sanitize_filename(name):
     """Sanitize the filename by replacing invalid characters."""
     return re.sub(r'[<>:"/\\|?*+]', '_', name)
 
+def remove_id_attributes(html_content):
+    """Remove all id= attributes from HTML tags."""
+    return re.sub(r'\s+id=["\'][^"\']*["\']', '', html_content)
+
 def split_html(input_file, issue):
     with open(input_file, 'r', encoding='utf-8') as file:
         content = file.read()
 
     # Split the content by <h1> to identify sections
-    sections = re.split(r'(<h1>.*?</h1>)', content, flags=re.DOTALL)
+    sections = re.split(r'(<h1[^>]*>.*?</h1>)', content, flags=re.DOTALL)
     if len(sections) < 3:
         print("No <h1> tags found or content is improperly formatted.")
         return
@@ -55,7 +59,7 @@ def split_html(input_file, issue):
         body = sections[i + 1] if i + 1 < len(sections) else ""
 
         # Extract the page numbers and remove them from the <h1>
-        h1_text = re.search(r'<h1>(.*?)</h1>', h1, re.DOTALL).group(1).strip()
+        h1_text = re.search(r'<h1[^>]*>(.*?)</h1>', h1, re.DOTALL).group(1).strip()
         page_match = re.search(r'\[(.*?)\]$', h1_text)
         if not page_match:
             print(f"Warning: No page specification found in <h1>: {h1_text}")
@@ -87,7 +91,9 @@ def split_html(input_file, issue):
 
         # Add content after <h1>, or a placeholder if none exists
         if body.strip():
-            output_html += body.strip()
+            # Remove id attributes from the body content
+            clean_body = remove_id_attributes(body.strip())
+            output_html += clean_body
         else:
             output_html += "        <p>No additional content.</p>\n"
 
