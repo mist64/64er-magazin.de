@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>FMON 1541 — das Werkzeug für werdende Floppy-Spezialisten</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="M. Köhler, P. Baumann, aw">
+    <meta name="64er.issue" content="Sonderheft 5/85">
+    <meta name="64er.pages" content="50-53">
+    <!-- <meta name="64er.toc_category" content="XXX"> -->
+    <!-- <meta name="64er.toc_title" content="XXX"> -->
+    <meta name="64er.id" content="XXX">
+</head>
+
+<body>
+    <article>
+        <h1>FMON 1541 — das Werkzeug für werdende Floppy-Spezialisten</h1>
+        <p class="intro">Zur Programmierung des 1541-Floppy-Laufwerks braucht man gutes Werkzeug. Mit dem FMON 1541 können Sie Programme für das Floppy-Laufwerk schreiben oder sich einfach ein wenig im Speicher umsehen.</p>
+
+        <p>FMON 1541 ist eine große Hilfe für alle, die Ihr 1541-Laufwerk programmieren wollen. Er erlaubt einfaches Assemblieren und Disassemblieren. Außerdem sind noch viele andere Sonderfunktionen eingebaut. In der folgenden Anleitung werden wir Ihnen die Funktionen und Befehle des FMON 1541 erläutern.</p>
+
+        <p>Tippen Sie zunächst den FMON 1541 (Listing 1) mit dem MSE ab und speichern Sie ihn. Nach dem Laden mit LOAD &ldquo;FMON 154T,8,1 wird der Monitor mit SYS 32768 oder SYS 8 * 4096 gestartet. Folgende Befehle bietet Ihnen der FMON 1541:</p>
+
+        <p><strong>A</strong> Direktassembler<br>
+            Format :A aaaa bbb ccccc<br>
+            Der Befehl bbb mit dem Operanden ccccc wird an die Adresse aaaa geschrieben (6502-Schreibweise). Alle Angaben erfolgen hexadezimal. Ein $ muß nicht vorgestellt werden. Bei der Art Immediate sind achtstellige Binärzahlen (% vorgestellt) und ASCII-Angaben (in ” (CHR$(34)) erlaubt. Beispiel: AND #%10101100 oder LDA #”A”, wobei der zweite Anführungsstrich weggelassen werden kann (LDA #”A). Bei Accu-Befehlen kann das nachfolgende A weggelassen werden. Einzelne Bytes können mit einem ».« eingegeben werden (.A9). Bei Branch-Befehlen wird die Zieladresse in Form einer zweistelligen Hexzahl angegeben. Und jetzt eine »Spezialität« des FMON 1541: Alle undefinierten Opcodes (vorgestelltim 64’er, Ausgabe 3/85) werden verarbeitet! (Tabelle 1)<br>
+            <strong>D</strong> Disassemblieren von Speicherbereichen<br>
+            Format: D aaaa, bbbb<br>
+            Disassembliert den Speicherbereich aaaa bis bbbb. Wenn bbbb fehlt, wird ab der Adresse aaaa disassembliert. Wenn beide Adressen fehlen, dann wird ab 0300 disassembliert. Ändern von Bytes ist möglich. Fahren Sie an die Stelle und ändern Sie die oder das Byte und drücken »RETURN«.<br>
+            <strong>X</strong> Exit<br>
+            Springt ins Basic zurück<br>
+            <strong>Z</strong> Exit II<br>
+            Springt ins Basic zurück (wie RUN-STOP / RESTORE)<br>
+            <strong>G</strong> GO<br>
+            Format: G aaaa<br>
+            Springt zur Speicheradresse aaaa. Das Programm muß mit RTS enden.<br>
+            <strong>M</strong> Memory Dump<br>
+            Format: M aaaa, bbbb<br>
+            Gibt den Speicherbereich aaaa bis bbbb mitacht Byte pro Zeile und ASCII-Ausgabe aus. Wenn bbbb fehlt, wird wie beim D-Befehl gehandelt. Wenn aaaa fehlt, dann wird der Bereich $ 0300 bis 03FF gelistet. Ändern von Byte möglich.<br>
+            # Ändern der Floppyadresse.<br>
+            zum Beispiel: #9. Alle Befehle wirken auf das Floppy-Laufwerk mit der Geräteadresse 9.<br>
+            > Ändern der Druckeradresse<br>
+            zum Beispiel: >5<br>
+            Das Floppy-Laufwerk ist auf acht und der Drucker auf vier voreingestellt.<br>
+            @ Senden von Befehlen in den Befehls-Kanal<br>
+            Format: @a: bbbbbb<br>
+            Sendet den Befehl a mit dem Text bbbbbb an das Floppy-Laufwerk.<br>
+            * Liest Fehlerkanal aus.<br>
+            <strong>$</strong> Listet Directory.<br>
+            <strong>C</strong> Kaltstart des Floppy-Laufwerks. Alle Puffer werden gelöscht!.<br>
+            <strong>I</strong> Initialisieren des Floppy-Laufwerks.<br>
+            <strong>R</strong> Lesen eines Blocks.<br>
+            Format: R tt ss<br>
+            Liest den Track tt, Sector ss in Puffer Null ($0300 bis 03FF). Mit M kann er angezeigt und verändert werden.<br>
+            <strong>W</strong> Schreiben eines Blocks auf Diskette ($0300 bis 03FF). Format: Wie bei Read.<br>
+            Read und Write werden mit Jobbefehlen gehandhabt. Ein eventuell auftretender Fehler steht in Adresse $0000 (Fehlermeldungen siehe Tabelle 2). Meiden Sie ILLEGAL BLOCK OR SECTOR!<br>
+            <strong>J</strong> Senden eines Jobbefehls für Puffer Null.<br>
+            Format: J aa, bb cc<br>
+            Der Jobbefehl aa wird mit den Parametern bb und cc in Speicheradresse $0000, 0006/0007 geschrieben.<br>
+            <strong>P</strong> ASCII-Text an eine bestimmte Stelle schreiben.<br>
+            Format: P aaaa, ttttttttt<br>
+            Der Text ttttttttt wird an die Adresse aaaa und folgende gesetzt.<br>
+            <strong>S</strong> Sichern von Speicherbereichen.<br>
+            Format: S ’’ttttttttt“, aaaa, bbbb<br>
+            Der Bereich aaaa bis bbbb wird in die sequentielle Datei ttttttttt zwischengespeichert. Da sequentielle Daten Puffer benutzen, wird der Speicherbereich aaaa bis bbbb erst in den Bereich ab $C000 im Computer zwischengespeichert, dann erst in die sequentielle Datei geschrieben. Dieses Verfahren dauert seine Zeit (der FMON ist nicht abgestürzt!). Wenn Sie Ihr Programm nach dem Speichern starten wollen, müssen Sie es erst mit »L« neu laden, da die Puffer benutzt werden.<br>
+            <strong>L</strong> Laden von Speicherbereichen.<br>
+            Format L ’’ttttttttt“<br>
+            Das Programm ttttttttt wird in die Floppy geladen. Auch der L-Befehl braucht seine Zeit!<br>
+            Sichern und laden Siekeine Speicherbereiche, die länger als 4 KByte sind (ist ja auch gar nicht notwendig).<br>
+            <strong>F</strong> Füllen von Bereichen.<br>
+            Format F aaaa, bbbb, cc<br>
+            Der Bereich aaaa bis bbbb wird mit dem Byte cc vollgeschrieben.<br>
+            <strong>Q</strong> Beschleunigen des Schreib-Lesekopfs (64’er Ausgabe 4/85).<br>
+            Format: Q oder Qaa<br>
+            Nur »Q« beschleunigt und »Qaa« schaltet wieder auf normal um, wobei aa ein beliebiges Zeichen sein kann.<br>
+            <strong>N</strong> Druckt eine Datei.<br>
+            Format: N ’’ttttttttt, X“<br>
+            Druckt die Datei ttttttttt (Dateityp X).
+        </p>
+
+        <address class="author">(M. Köhler/P. Baumann/aw)</address>
+
+        <p>TODO TABLE</p>
+
+        <p>Absturzbefehle werden durch ABS gekennzeichnet<br>
+            No operation (1 Byte) werden bis auf NOP mit NO1 gekennzeichnet<br>
+            No operation (2 Byte) werden mit NO2 bezeichnet.<br>
+            No operation (3 Byte) werden mit NO3 angezeigt.<br>
+            Wenn man diese Befehle beim A-Befehl benutzt, wird der erste jeweils mögliche Befehl genommen (bei ABS: 02).<br>
+            Besondere Schreibweisen:</p>
+
+        <p>TODO TABLE</p>
+
+        <p>ASL:ORA ASO<br>
+            ROL:AND RAN<br>
+            LSR:EOR LSE<br>
+            ROR:ADC RAD<br>
+            DEC:CMP DEM<br>
+            INC:SBC INB</p>
+
+        <p>Ansonsten wird die übliche 6502-Schreibweise benutzt.<br>
+            Hinter den Opcodes steht der Name des Befehls und danach die Adressierungsart: ZO = ZEROPAGE; ZOX = ZEROPAGE, X; ZOY = ZEROPAGE, Y; IMM = IMMEDIATE; INX = INDIRECT, X; INY = INDIRECT, Y; ABS = ABSOLUT; ABSX = ABSOLUT, X; ABSY = ABSOLUT, Y;</p>
+
+        <p>TODO TABLE</p>
+
+        <p>OB =ANN (ZO)<br>
+            2B =ANN (ZO)<br>
+            4B ==ANL (IMM)<br>
+            6B = DAR (IMM)<br>
+            83 =AXX (INX)<br>
+            87 =AXR (ZO)<br>
+            8B =TAN (IMM)<br>
+            8F =AAX (ABS)<br>
+            93 =AXY (INY)<br>
+            97 =AXI (ZOX)<br>
+            9B =AXS (ABSY)<br>
+            9C =YXA (ABSX)<br>
+            9E =XYA (ABSY)<br>
+            9F =AYY (ABSY)<br>
+            A3 =LDT (INX)<br>
+            A7 =LTA (ZO)<br>
+            AB =??? (Wirkung noch nicht ermittelt)<br>
+            AF =LTX (ABS)<br>
+            B3 =LYT (INY)<br>
+            B7 =LAX (ZOY)<br>
+            BB =TSA (ABSY)<br>
+            BF =LYX (ABSY)<br>
+            CB =XAS (IMM)<br>
+            EB =SBC (IMM (wie der normale Befehl SBC))</p>
+
+        <p>Tabelle 1. Eingabehinweise und besondere Schreibweisen des FMON 1541</p>
+
+        <p>TODO TABLE</p>
+
+        <p>Rückmeldungen in der Adresse 0000 bei R/W/J (Fehlermeldungen)<br>
+            $01 = Fehlerfreie Durchführung (00, OK)<br>
+            $02 = Blockheader nicht gefunden (20, Read Error)<br>
+            $03 = Sync-Markierung nicht gefunden (21, Read Error)<br>
+            $04 = Datenblock nicht gefunden (22, Read Error)<br>
+            $05 = Datenprüfsumme ist falsch (23, Read Error)<br>
+            $07 = Fehler nach einem Verify (25, Write Error)<br>
+            $08 — Diskette ist schreibgeschützt (26, Write Protect on)<br>
+            $09 = Prüfsumme im Header falsch (27, Read Error)<br>
+            $0A = Datenblock auf Diskette zu lang (28, Write Error)<br>
+            $0B — Falsche ID im Block Header (29, Disk ID Mismatch)<br>
+            $0F = Keine Diskette im Laufwerk (74, Drive not Ready)<br>
+            $10 = Fehler bei Decodierung (24, Read Error)</p>
+
+        <p>Tabelle 2. Die Fehlermeldungen in der Adresse 0000 werden mit dieser Tabelle entschlüsselt</p>
+    </article>
+</body>
+
+</html>

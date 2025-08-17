@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>Daten komprimieren — Sparen Sie Speicherplatz und Ladezeit!</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="Joachim Matzner, gk">
+    <meta name="64er.issue" content="Sonderheft 5/85">
+    <meta name="64er.pages" content="100-101">
+    <!-- <meta name="64er.toc_category" content="XXX"> -->
+    <!-- <meta name="64er.toc_title" content="XXX"> -->
+    <meta name="64er.id" content="XXX">
+</head>
+
+<body>
+    <article>
+        <h1>Daten komprimieren — Sparen Sie Speicherplatz und Ladezeit!</h1>
+        <p class="intro">Schreiben Sie öfter Programme, bei denen Sie größere Datenmengen verwalten müssen? Mit dem »Daten-Packer« wird der Aufwand an Ladezeit und Speicherplatz auf Diskette um 25 Prozent reduziert.</p>
+
+        <p>Dieses Programm kürzt Strings auf % der normalen Länge. Wenn man zum Beispiel einen String mit 12 Zeichen Inhalt hat, und den »Daten-Packer« darauf losläßt, ist der String nur noch neun Zeichen lang, bei gleichem Inhalt!</p>
+
+        <p>Um ihn sich änsehen zu können, muß er natürlich erstwieder in eine lesbare Form gebracht, also »entpackt« werden.</p>
+
+        <p>Bei selbstgeschriebenen Adressenverwaltungen läßt sich das gut anwenden:</p>
+
+        <p>Bevor man die Adressen, die ja meist in Strings enthalten sind, auf der Diskette abspeichert, »packt« man sie mit dem Daten-Packer, und speichert sie dann. So spart man eine Menge wertvollen Diskettenplatz und Ladezeit.</p>
+
+        <p>Nach dem Einladen müssen die Adressen wieder »entpackt« werden, bevor man mit ihnen weiterarbeiten kann.</p>
+
+        <p>Das Programm (siehe Listing) wird mit dem MSE eingegeben und ist dann sofort einsatzbereit.</p>
+
+        <h3>Umgang mit dem Daten-Packer</h3>
+
+        <p>Packen: SYS 49152, A$, B$</p>
+
+        <p>In A$ muß der zu packende String stehen. Danach enthält B$ die gepackte Version.</p>
+
+        <p>Entpacken: SYS 49339, C$, D$</p>
+
+        <p>In C$ muß der gepackte String stehen. In D$ ist dann der entpackte String zur Weiterverarbeitung bereit.</p>
+
+        <p>Natürlich kann an Stelle von A$, B$, und D$ jede andere Stringvariable stehen.</p>
+
+        <p>Das geht doch nicht mit rechten Dingen zu, wird der eine oder andere Leser jetzt vielleicht denken.</p>
+
+        <p>Nun, dieses Programm kürzt 4 Byte auf 3 Byte. Ein Byte hat bekannterweise 8 Bit, gebraucht werden aber nur 6 Bit, um die ASCII-Werte darzustellen, aus denen Datenstrings ja bestehen.</p>
+
+        <p>Mit diesen 6 Bit kann man alle alphanumerischen Zeichen und einige Sonderzeichen darstellen. Der Alogrithmus des Programms besteht nun darin, vom ASCII-Wert des zu packenden Byte 32 abzuziehen, um eine Darstellung mit 6 Bit zu ermöglichen. Dann wird jedes vierte Byte auf die vorhergehenden 3 Byte verteilt, bei denen die letzten 2 Bit nach unserer Subtraktion nun nicht mehr gebraucht werden. »Überhang-Bytes«, also die letzten Zeichen eines Strings, die keine vollen 4 Byte mehr ergeben, werden nicht gepackt, sondern nur an den gepackten String angehängt.</p>
+
+        <p>Beim Entpacken läuft der Vorgang in umgekehrter Reihenfolge ab.</p>
+
+        <address class="author">(Joachim Matzner/gk)</address>
+    </article>
+</body>
+
+</html>

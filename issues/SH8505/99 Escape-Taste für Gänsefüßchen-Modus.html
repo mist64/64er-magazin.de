@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>Escape-Taste für Gänsefüßchen-Modus</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="Christian Spörri, aw">
+    <meta name="64er.issue" content="Sonderheft 5/85">
+    <meta name="64er.pages" content="99-100">
+    <!-- <meta name="64er.toc_category" content="XXX"> -->
+    <!-- <meta name="64er.toc_title" content="XXX"> -->
+    <meta name="64er.id" content="XXX">
+</head>
+
+<body>
+    <article>
+        <h1>Escape-Taste für Gänsefüßchen-Modus</h1>
+        <p class="intro">Beim Editieren geschieht es oft, daß man anstelle einer Cursorbewegung ein reverses Feld erhält, auch wenn man das gar nicht wünscht. Der einzige Weg zurück zur normalen Cursorkontrolle führte bis jetzt über das Drücken der RETURN-Taste. Mit dieser Routine kommen Sie durch einfachen Druck auf die »F7«-Taste aus dem »Gänsefüßchen-Modus« heraus.</p>
+
+        <p>Vielleicht haben Sie sich auch schon über die etwas exotisch klingenden Ausdrücke im Titel gewundert, aber sie beziehen sich auf eine typische Eigenschaft des Commodore Basic-Editors. Wenn man Anführungszeichen oder die INSERTTaste getippt hat, wird jedes Drücken einer Cursortaste nicht durch eine direkte Bewegung des Cursors, sondern durch ein reverses Steuerzeichen quittiert. Nebenbei: dasselbe geschieht beim Drücken der Funktions-, der CLR/HOME- oder der CTRL-Taste zusammen mit den Farbentasten. Dieser Modus, in dem sich der Editor dann befindet, wird Quote-Modus, zu deutsch »Gänsefüßchen-Modus« oder programmierter Cursor genannt.</p>
+
+        <p>Manchmal ist das sehr erwünscht, wenn man zum Beispiel die Cursor- oder Farbsteuersequenzen ins Programm einbinden möchte. Oft ist es aber auch unerwünscht, und man überschreibt durch Unachtsamkeit eine halbe Programmzeile mit reversen »Q« oder sonstigen Steuerzeichen. Aus dem »Gänsefüßchen-Modus« heraus gelangt man nur, indem man noch einmal die Taste für Anführungsstriche oder RETURN drückt. Wie gut wäre es, wenn man mit einem einfachen Tastendruck aus dem störenden Quote-Modus herausgelangen könnte, ohne irgendein Zeichen überschreiben zu müssen.</p>
+
+        <p>Die Escape-Routine realisiert diese Möglichkeit vollständig. Durch simplen Druck auf die Funktionstaste »F7« werden alle Bits gelöscht, die verhindern, daß sich der Cursor normal steuern läßt. »F7«ermöglichtalsodas Entkommen (englisch: escape) aus diesem Modus.</p>
+
+        <p>Damit Sie auch immer genau wissen, wann welcher Modus aktiv ist, stehen in der rechten oberen Bildschirmecke die entsprechenden Buchstaben in weißer Farbe. Haben Sie Anführungsstriche geschrieben, dann erscheint ein »Q« als Zeichen dafür, daß der Quote-Modus eingschaltet ist. Das »Q« steht dort so lange, bis der Modus ausgeschaltet wird, das heißt, bis entweder RETURN, Schlußzeichen oder »F7« gedrückt wurde. Wollen Sie etwas in reverser Schrift erscheinen lassen, dann müssen Sie CTRL/RVS ON drücken und schon erscheint ein weißes »R« als Abkürzung für Revers-Modus in der Bildschirmecke. Als drittes Zeichen kann noch das »I« vorkommen, nämlich dann, wenn die INSERT-Taste benutzt wurde. Im lnsert-Modus kann man nicht einmal ein falsch eingetipptes Zeichen mit der DEL-Taste löschen, da nur reverse »T«s erzeugt werden, aber ein Druck auf »F7« genügt, und das Problem ist behoben.</p>
+
+        <p>Das Programm wird dann mit SYS49152 aufgerufen, und ab sofort ist die Routine »Escape-Taste« in den Systeminterrupt eingebunden. Das allerdings nur solange bis RUN/STOP-RESTORE gedrückt wird, dann wird der lnterruptvektorwieder direkt auf die normale Interruptroutine gelenkt und die neue Routine wird so lange übergangen, bis das Programm neu gestartet wird.</p>
+
+        <p>Da diese Routine für den Einsatz beim Programmieren gedacht ist, sollten dabei keine Probleme entstehen.</p>
+
+        <p>Als einzige Einschränkung muß gesagt werden, daß die Benutzer von Kassettengeräten bei einem Zugriff auf die Data-sette die Routine mit RUN/STOP-RESTORE ausschalten sollten, da Kassettenoperationen den Interruptvektor auf spezielle Kassettenroutinen umschreiben und sich ein schon verstellter IRQ-Vektor negativ auswirkt.</p>
+
+        <address class="author">(Christian Spörri/aw)</address>
+
+        <h3>Eingabehinweise</h3>
+
+        <p>Wer im Besitz eines Assembler ist, kann das Assemblerprogramm (Listing 1) abtippen, alle anderen verwenden bitte den Weg über den MSE (Listing 2).</p>
+
+        <p>Die Startadresse des Programmes liegt bei $C000 gleich 49152 dezimal, die Endadresse bei $C08F oder 49295.</p>
+
+        <p>Das Programm wird natürlich nach dem Abtippen und Speichern wieder mit der Sekundäradresse 1, das heißt absolut geladen. Nach dem Laden muß »NEW« eingegeben werden, damit die Basic-Zeiger, die in den Bereich $C000-$CFFF verstellt wurden, wieder »zurechtgebogen« werden.</p>
+    </article>
+</body>
+
+</html>

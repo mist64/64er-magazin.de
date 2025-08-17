@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>Variable Funktionen</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="Jens Weber, og">
+    <meta name="64er.issue" content="Sonderheft 5/85">
+    <meta name="64er.pages" content="109-110">
+    <!-- <meta name="64er.toc_category" content="XXX"> -->
+    <!-- <meta name="64er.toc_title" content="XXX"> -->
+    <meta name="64er.id" content="XXX">
+</head>
+
+<body>
+    <article>
+        <h1>Variable Funktionen</h1>
+        <p class="intro">Normalerweise werden Formeln in Programmen fest definiert. Mit dieser kleinen Basic-Erweiterung können Sie Funktionen auch während des Programmablaufs eingeben und ändern.</p>
+
+        <p>Um in einem Basic-Programm Formeln zu definieren hatte man bislang nureine Möglichkeit: die Formel mitdem DEF FN-Befehl in einer Basic-Zeile zu definieren. Vom laufenden Programm aus war das nicht möglich. Dabei wird der Funktionswert zum Beispiel mit A=FNA(X) oder mit PRINT FNB(Y) aufgerufen.</p>
+
+        <p>Es geht aber auch anders, nämlich mit diesem kurzen Maschinenprogramm (Listing 1), das mit dem MSE einzugeben ist. Den Quell-Code dazu finden Sie in Listing 2. Das Programm wird mit LOAD"VARFUNKT",8,1 und nachfolgendem NEW geladen, sofern es nicht von einem anderen Programm nachgeladen wird. Das Einbinden in die Interpreter-Routine (=Initialisierung) wird mit SYS(49351) vorgenommen.</p>
+
+        <h3>Aufruf aus dem Programm</h3>
+
+        <p>Die Übergabe der Variablen erfolgt in der denkbar einfachsten Art: die Formel steht in einer String-Variablen wie zum Beispiel X$. DaX$ ein normalerString ist, kann man die Formel natürlich auch über den INPUT-Befehl oder eine GET-Schleife eingeben, wobei man bei INPUT nicht über 80 Zeichen kommt undGET eine programmbedingte Längenbegrenzung von 127 Zeichen hat. Die Syntax ist dabei die des normalen Basic mit sämtlichen Basic-Funktionen. Das heißt, daß man zum Beispiel die Formel »5 SIN X« als »5 * SIN(X)« eingibt. Dabei bedeutet X wiederum eine Variable. Natürlich kann die Formel beliebig viele Variablen, beziehungsweise beliebig verschachtelte Basic-Funktionen enthalten.</p>
+
+        <p>Die Syntax des neuen Befehls ist</p>
+
+        <p>↑ Y=B$<br>
+            Hier wird der Variablen Y der Wert des berechneten Strings X$ zugewiesen.</p>
+
+        <p>Hierzu noch ein Beispielprogramm, das das Programm »Var-funkt« auf Diskette erwartet:</p>
+
+        <p>10 IFA=0THENA=1 :PRINT"[home]&ldquo; :LOAD"VARFUNKT&rdquo;,8,1<br>
+            20 SYS 49351<br>
+            30 INPUT &ldquo; pown] FUNKTION UEBER X &rdquo; ;X$<br>
+            40 INPUT &ldquo; WERT FUER X &rdquo; ;X<br>
+            50 t Y=X$<br>
+            60 PRINT &ldquo; FUNKTIONSWERT = &rdquo; ;Y<br>
+            70 GOTO 30</p>
+
+        <p>In Zeile 10 wird beim Start die Maschinenroutine »Varfunkt« nachgeladen. Die IF-Abfrage ist nötig, da der Interpreter nach einem LOAD-Befehl das Programm erneut startet.</p>
+
+        <p>Der SYS-Aufruf in 20 bindet das nachgeladene Programm in das Betriebssystem ein.</p>
+
+        <p>In den Zeilen 30 und 40 werden Funktion und Wert für die Funktion eingegeben.</p>
+
+        <p>Zeile 50 schließlich übergibt den berechneten Wert aus X$ an die Variable Y, die in 60 ausgegeben wird.</p>
+
+        <p>Zeile 70schließt das Beispielprogramm ab, indem wieder in Zeile 30 zur Funktionseingabe gesprungen wird.</p>
+
+        <address class="author">(Jens Weber/og)</address>
+    </article>
+</body>
+
+</html>

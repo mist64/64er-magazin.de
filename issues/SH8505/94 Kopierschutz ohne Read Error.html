@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>Kopierschutz ohne Read Error</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="Michael Dietz, ah">
+    <meta name="64er.issue" content="Sonderheft 5/85">
+    <meta name="64er.pages" content="94">
+    <!-- <meta name="64er.toc_category" content="XXX"> -->
+    <!-- <meta name="64er.toc_title" content="XXX"> -->
+    <meta name="64er.id" content="XXX">
+</head>
+
+<body>
+    <article>
+        <h1>Kopierschutz ohne Read Error</h1>
+        <p class="intro">Read Errors sind für die meisten Ko-pierprogramme kein Problem, deshalb wird hier ein anderer Weg beschritten. Basic- und Maschinen-Programme sind nur dann lauffähig, wenn vor dem Start ein Paßwort eingegeben wird.</p>
+
+        <p>Das Programm ist in Maschinensprache geschrieben und belegt den Speicherbereich von $CFOO bis $CF46. Der bereich von $CF47 bis $CFFF istfür ein Paßwort reserviert, das eingegeben werden muß, nachdem der zuvor abgetippte Lader (siehe Listing) mit RUN gestartet wurde. Von nun an werden alle Programme, die auf Diskette gespeichert werden, beim Speichern codiert. Solange der Computer eingeschaltet bleibt, können Programme, die mit dem eingegebenen Paßwort gespeichert wurden, ganz normal geladen werden. Programme, die unter einem anderen Paßwort gespeichert wurden lassen sich zwar auch noch Laden, sind aber nicht mehr lauffähig. Sollen solche Programme gestartet werden, muß dem Computer vor dem Laden das neue Paßwort übermittelt werden. Dies geschieht mit einem kleinen Basic-Programm:<br>
+            10 INPUT C$ : C=LEN(C$)<br>
+            20 FORI=1TOC<br>
+            30 POKE 53072+I,ASC(MID$ (C$,I,1))<br>
+            40 NEXT<br>
+            50 POKE 13*16T3-1,C<br>
+            60 END</p>
+
+        <p>Soll ein normales, also uncodiertes, Programm geladen oder gespeichert werden, so muß man den Codierer mit POKE 1,55 ausschalten. Mit POKE 1,53 läßt er sich wieder einschalten.</p>
+
+        <address class="author">(Michael Dietz/ah)</address>
+    </article>
+</body>
+
+</html>

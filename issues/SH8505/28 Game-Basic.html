@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>Game-Basic</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="Ronald Mayer, tr">
+    <meta name="64er.issue" content="Sonderheft 5/85">
+    <meta name="64er.pages" content="28-31">
+    <!-- <meta name="64er.toc_category" content="XXX"> -->
+    <!-- <meta name="64er.toc_title" content="XXX"> -->
+    <meta name="64er.id" content="XXX">
+</head>
+
+<body>
+    <article>
+        <h1>Game-Basic</h1>
+        <p class="intro">Mit dieser Befehlserweiterung lassen sich mit wenig Aufwand sehr effektvolle Spiele schreiben. Es wird dabei der Umgang mit Sprites und Sonderzeichen und die Bildschirmverwaltung (Scrolling) unterstützt.</p>
+
+        <p>Da ich einen Großteil meiner eigenen Programme in Basic schreibe und mir dabei die nicht sehr komfortable »POKE«-erei auf die Nerven geht, habe ich nun eine Basic-Erweiterung geschrieben die, wie ich meine, diese Vorgänge um Einiges erleichtert.</p>
+
+        <p>Eingabe des Programms<br>
+            1) Das Programm »Game-Basic-C000« mitdem MSE-V 1.0 eingeben (siehe Listing 1) und speichern.<br>
+            2) Programm mit »SYS 49152« starten. Das Programm kopiert sich nun selbständig an den Basic-Start ab $0800.<br>
+            3) Das Programm nun mit SAVE ”GAME-BASIC”,8 (oder bei Kassette: ,1)speichern.</p>
+
+        <p>Das Game-Basic kann nun ganz normal geladen und mit »RUN« gestartet werden.</p>
+
+        <h2>Die Speicherbelegung</h2>
+
+        <p>Alle wichtigen Adressen (Bildschirm, Farbspeicher, Sprites, SID, Timer etc.) bleiben unverändert. Der Bereich $0800-$OFFF ist für 32 Sprites reserviert, die dort abgelegt werden. Die Erweiterungselbstliegtim Bereich $1000-$17B0. Der Bereich $17B1-$1FFF bleibtfrei und kann füreigene Maschinenprogramme genutzt werden. Ab der Adresse $2000 bis $27FF liegt ein frei definierbarer Zeichensatz. Ab $2800 beginnt der Basic-Speicher(!). Dieser dehnt sich wie gewohnt bis zurAdresse $9FFF. Das RAM im Bereich $A000-$CFFF und von $E000-$FFFF bleibtfrei und kann für eigene Zwecke verwendet werden.</p>
+
+        <h2>Die Befehle</h2>
+
+        <p>Der Befehl »RESET« bewirkt einen Neustart der Basic-Erweiterung, wobei ein vorhandenes Basic-Programm nicht gelöscht wird.</p>
+
+        <p>Da es gerade bei Basic-Erweiterungen leicht vorkommen kann, daß man einzelne Befehle vergißt und nicht immer eine Anleitung zur Hand hat, habe ich den Befehl HELP mit eingebaut. Er listet alle zusätzlichen Kommandos auf.</p>
+
+        <p>Auf HiRes-Befehle habe ich grundsätzlich verzichtet, da meine Erweiterung ja hauptsächlich für die Verwendung im Spiele-Bereich vorgesehen ist. Normalerweise ist es nicht üblich, ein Spielprogramm in HiRes-Grafik zu erstellen (außer Lo-derunner und ein paar anderen), sondern mit Hilfe von Sonderzeichen. Außerdem wäre das Programm dann um einiges länger. (Es genügen schon zwei KByte, wenn man sie abtippen muß.)</p>
+
+        <p>Alle reinen Basic-Programme laufen natürlich auch mit der Erweiterung. Will man die Erweiterung trotzdem abschalten, ohne den Computer ausschalten zu müssen, so kann man das mittels des Befehls »BASIC« tun. Die Erweiterung kann dann mit SYS 4096 wieder aktiviert werden, falls sie nicht aus irgendeinem Grund überschrieben wurde.</p>
+
+        <p>Wer hat sich nicht auch schon über das lästige POKE 53281,xx:POKE 53280,xx:POKE 646,xx&hellip; geärgert? Mit dem Befehl »COLOR« lassen sich Bild-, Rahmen- und Zeichenfarbe ganz einfach einstellen. Zum Beispiel blauer Rahmen, weißer Hintergrund und grüne Schrift: COLOR6,1,5</p>
+
+        <h2>Steuerzeichen entfallen</h2>
+
+        <p>Damit wären wir auch schon bei den Befehlen, die den Bildschirm betreffen. Der Befehl »SCROFF« schaltet den Bildschirm aus; zum Beispiel während vom Programm ein Bild aufgebaut wird. Mit »SCRON« wird er wieder eingeschaltet. Die komplizierte »POKE«-erei im VIC hat nun ein Ende.</p>
+
+        <p>Mit »PAINT« wird der Farbspeicher für den Bildschirm mit der angegebenen Farbe gefüllt. Ein beschriebener Bildschirm kann natürlichauch nachträglich umgefärbt werden. Man kann damit ganz hübsche Effekte erzielen.</p>
+
+        <p>»REVERS« invertiert den Bildschirminhalt.</p>
+
+        <p>Auch die lästigen Steuerzeichen entfallen mit der Erweiterung bis auf RVSON und RVSOFF. (Aber auch die kann man durch POKE 199,1 beziehungsweise POKE 199,0 umgehen.) Der Bildschirm wird nicht mehr mit PRINTCHR$(147),sondern einfach mit »CLS« gelöscht.</p>
+
+        <p>Mit dem Befehl »CLEAR« kann man sogar einzelne Zeilen beziehungsweise Zeilenblöcke löschen. Zum Beispiel »CLEAR 12,24« löscht den Bildschirm ab der 13. Zeile (die erste Zeile ist Zeile 0).</p>
+
+        <p>Das Editieren von Programmen wird mit meiner Erweiterung fast nicht unterstützt, da die Aufgabe der Expansion ja darin liegen soll, Spielprogramme in Basic schneller ablaufen zu lassen. Mit dem Befehl »TAB« kann man zumindest die Übersicht in einem Listing etwas erhöhen. Es wird jeder Befehl in eine eigene Zeile geschrieben, was, die Übersicht betreffend, auch nicht zu verachten ist. Bevor man dann eine Zeile wieder ändern will, muß unbedingt durch einen erneuten >TAB«-Befehl diese Darstellung wieder abgeschaltet werden.</p>
+
+        <p>Die Befehle INC und DEC, also Inkrement (Erhöhen) und Dekrement (Erniedrigen) sind eine Abwandlung des POKE-Befehls. Es wird nicht wie bei POKE eine Zahl in eine Adresse geschrieben, sondern eine in einer Adresse vorhandene Zahl um den angegebenen Wert erhöht beziehungsweise erniedrigt.</p>
+
+        <p>Sollte ein Programm für eine Sekunde anhalten, mußte man bisher eine umständliche Zeitschleife verwenden (FOR T = 1 TO 1000: NEXT). Diese wird nun durch den Befehl PAUSE ersetzt. 1 Sekunde Wartezeit = PAUSE 500.</p>
+
+        <h2>Zeichensatz verändern</h2>
+
+        <p>Jedes professionelle Spiel kommt nicht ohne Sonderzeichen aus. Daher war es von vornherein klar, daß meine Erweiterung Befehle zur Erstellung eines eigenen Zeichensatzes enthalten sollte. Dabei ist die Darstellungsweise in Form von DATA-Zeichen die übersichtlichste. Ich habe dazu den Befehl »CODE« gewählt (siehe Beispiel »0« im folgenden Text).</p>
+
+        <p>In meiner Erweiterung gibt es den Befehl COPY: Er kopiert den Zeichensatz ins RAM, wo er dann mittels CREATE und CODE verändert werden kann. Mit CREATE wird das zu verändernde Zeichen festgelegt. Wir wollen zum Beispiel aus dem 0 einen Umlaut Ö machen. So schreiben wir folgendes: CREATE 1,15.</p>
+
+        <p>Die 1 bewirkt, daß wir ein Zeichen (0 wäre für Sprites) verändern und die 15 ist der POKE-Code für den Buchstaben 0. Der Befehl CODE bestimmt nun das Bitmuster für das mit CREATE ausgewählte Zeichen. Unser Ö würde nun im Programm so aussehen:</p>
+
+        <p>TODO</p>
+
+        <p>10 CREATE 1 ,1 5 oder 10 CREATE 1 ,15<br>
+            20 CODE . 11 . . 11. 20 CODE .11 . . 11.<br>
+            30 CODE 30 CODE . . 1 1 1 1 . .<br>
+            40 CODE . .1111 .. 40 CODE <br>
+            50 CODE .11 . .11. 50 FORI = 1TO4
+            60 CODE . 11 . . 11. 60 CODE .11 . .11.<br>
+            70 CODE .11 . .11. 70 NEXT I<br>
+            80 CODE .11 . .11. 80 CODE . . 1 1 1 1 ..<br>
+            90 CODE . . 1111 ..</p>
+
+        <p>Es würde auch schon folgendes genügen, da die restlichen Bitmuster mit dem 0 übereinstimmen:</p>
+
+        <p>10 CREATE 1 , 1 5<br>
+            20 CODE .11 . . 11.<br>
+            30 CODE &hellip;&hellip;&hellip;&hellip;<br>
+            40 CODE . . 1 1 1 1 ..</p>
+
+        <p>Der Zeichensatz kann natürlich auch durch die altbewährte POKE-Methode verändert werden, da er jetzt »mitten« im RAM-Bereich liegt (ab $2000 dez. 8192).</p>
+
+        <p>Auch der Multicolor-Modus wird in meiner Erweiterung sowohl für Zeichen als auch für Sprites voll unterstützt:</p>
+
+        <p>Aktiviert wird dieser mit dem Befehl MULTI 1 beziehungsweise ausgeschaltet mit MULTI 0. Die Multicolor-Zusatzfarben (zwei an der Zahl) bestimmt man ebenfalls mit MULTI.</p>
+
+        <p>»MULTI 2, 5, 2, 6, 7« bedeutet zum Beispiel, daß ab jetzt Zeichen in den Farben Grün (5) und Rot (2), Sprites in den Farben Blau (6) und Gelb (7) dargestellt werden. MULTI 2,&hellip; bedeutet: Multicolor-Modus mit den folgenden Farben einschalten. Bei den Bitmustern ändern sichjetztallerdings die Codes: 1 = Zusatzfarbe 1,2 == Zusatzfarbe 2, 3 = normale Zusatzfarbe, . = leer</p>
+
+        <p>Die bunte Version unseres Ö sähe nun so aus:</p>
+
+        <p>TODO</p>
+
+        <p>CODE . . 1 1 . . 11 <br>
+            CODE . .11 . .11 entspricht grün<br>
+            CODE . <br>
+            CODE . .222222
+            CODE . .22..22
+            CODE . .22..22 entspricht rot<br>
+            CODE . .33..33
+            CODE . .333333 entspricht aktueller Zeichenfarbe</p>
+
+        <p>Es ist darauf zu achten, daß die Zahlen der CODEs immer paarweise angegeben werden (Multicolor). Bei der Erstellung von Sprites wird genauso vorgegangen, bis auf folgende Änderungen:<br>
+            1) »CREATE 0, Spriteblock (32-63)«. Statt dem Zeichensatz wird der gewählte Block angegeben (32-63). Die 0 teilt dem Computer mit, daß ein Sprite und kein Zeichen verändert beziehungsweise erstellt werden soll.<br>
+            2) Das Bitmuster beim CODE-Befehl hat jetzt 24 Stellen anstatt acht bei Zeichen.</p>
+
+        <h2>Bildschirmverwaltung</h2>
+
+        <p>Der Befehl SET ist ein erweiterter PRINT-Befehl. Der Unterschied zum PRINT-Befehl liegt darin, daß die Steuerzeichen entfallen (wie anfangs erwähnt).</p>
+
+        <p>Zum Beispiel SET 18,12,1,”TEXT”</p>
+
+        <p>Dieser Befehl schreibt das Wort TEXT in die zwölfte Zeile ab der 18. Spalte in weißen Zeichen. Mit dem normalen PRINT-Befehl würde man dazu eine Unmenge Steuerzeichen benötigen; außerdem ist der SET-Befehl schneller.</p>
+
+        <p>Der Befehl SCROLL verschiebt beziehungsweise verändert beliebige Bildschirmbereiche. Eine genauere Erklärung möchte ich an dieser Stelle unterlassen, da man die Möglichkeiten durch eigene Versuche am besten sehen kann.</p>
+
+        <p>Die restlichen sechs der insgesamt 26 Befehle meiner Erweiterung unterstützen ausschließlich den Umgang mit Sprites. Mit SON wird ein Sprite ein- beziehungsweise mit SOFF wieder ausgeschaltet.</p>
+
+        <p>SSET positioniert ein Sprite an eine beliebige Stelle im (oder außerhalb vom) Bildschirm. Das achte Bit im VIC-Register 16 für die Sprite X-Position braucht dabei nicht beachtet zu werden. Mit SPRITE wird ein Sprite definiert. Folgende Parameter werden hier angegeben:</p>
+
+        <p>Spritenummer, Block (Aussehen des Sprites — 32-63), Y-Expanded (ja oder nein), X-Expanded üa oder nein), vor oder hinter Bildschirmzeichen, Multicolor (ja oder nein), Grundfarbe.</p>
+
+        <p>Ein ganz spezieller Befehl ist SRUN. Mit SRUN kann ein beliebiges Sprite (oder auch mehrere) in eine von acht möglichen Richtungen bewegt werden. Das Programm wird dadurch aber nicht aufgehalten, da die Sprites vom Interrupt gesteuert wer-</p>
+
+        <p>den. Dadurch ist es zum Beispiel möglich, daß ein Sprite, während es bewegt wird, seine Gestalt verändern oder sogar das Programm gelistet werden kann. Man kann sich so zum Beispiel ein Sprite in Bewegung ansehen, während man es editiert. Aber auch hier sind natürlich eigenen Versuchen keine Grenzen gesetzt. Der letzte Befehl SSTOP ist der Gegensatz zu SRUN, das heißt er stoppt die mit SRUN gestarteten Sprites. Die Positionen der Sprites können wie bisher mit dem normalen PEEK ausgelesen werden.</p>
+
+        <p>Eine Befehlsübersicht gibt Tabelle 1. Das Beispielprogramm (Listing 2) zeigt, wie man innerhalb von Spielen diese neuen Befehle einsetzt. Bitte zur Eingabe von Listing 2 nicht den Checksummer verwenden, da dieser nicht mit Basic-Erwei-terungen zusammenarbeitet.</p>
+
+        <address class="author">(Ronald Mayer/tr)</address>
+
+        <p>TODO ASIDE</p>
+
+        <h2>Alle neuen Befehle auf einen Blick</h2>
+
+        <p><strong>RESET</strong> Neustart der Erweiterung; bereits vorhandene Basic-Programme werden nicht gelöscht.<br>
+            <strong>HELP</strong> Auflistung aller Befehle von Game-Basic.<br>
+            <strong>BASIC</strong> Abschalten der Erweiterung; auch hier werden Programme nicht gelöscht<br>
+            <strong>COLOR rf,hf,zf</strong> Rahmen- {rf), Hintergrund- (hf) und Zeichenfarbe (zf) setzen.<br>
+            <strong>REVERS</strong> Invertiert den gesamten Bildschirminhalt.<br>
+            <strong>PAINT f</strong> Färbt Bildschirminhalt mit Farbe f.<br>
+            <strong>CLS</strong> Bildschirm löschen.<br>
+            <strong>SCROFF</strong> Bildschirm ausschalten.<br>
+            <strong>SCRON</strong> Bildschirm wieder einschalten.<br>
+            <strong>CLEAR an,en</strong> Bildschirm wird von Zeile an bis Zeile en gelöscht.<br>
+            <strong>COPY</strong> Zeichensatz ins RAM kopieren.<br>
+            <strong>TAB</strong> Formatierten LIST-Modus ein- beziehungsweise ausschalten.<br>
+            <strong>PAUSE t</strong> Das Programm wird t*0,002 Sekunden lang angehalten. INC ad,eh Addiert eh zum Inhalt der Adresse ad.<br>
+            <strong>DEC ad,eh</strong> Subtrahiert eh vom Inhalt der Adresse ad.<br>
+            <strong>SET s,z,f,”text”</strong> Schreibt »text« in die Zeile z, Spalte s mit der Farbe f.<br>
+            <strong>SCROLL az,ez,s,z,f,r</strong> Scrollt Bildschirmbereich von Anfangszeile az bis Endzeile ez in Richtung r (O=nach rechts, 1-nach links). Dabei werden Zeichen mit dem Code z in der Farbe f nachgescrollt.<br>
+            <strong>SON s</strong> Schaltet Sprite Nummer s ein.<br>
+            <strong>SOFF s</strong> Schaltet Sprite Nummer s aus.<br>
+            <strong>SPRITE s,bl,ye,xe,pr,mc,f</strong><br>
+            Bestimmt Sprite Nummer s:<br>
+            bl = Block (32-64)<br>
+            ye = doppelte Höhe (O=nein, 1=ja)<br>
+            xe = doppelte Breite (O=nein, 1=ja)<br>
+            pr = Priorität vor (=0) oder hinter (=1) Bildschirmzeichen<br>
+            mc = Multicolor an (=1) oder aus (=0)<br>
+            f = Farbe des Sprites<br>
+            <strong>SSET s,x,y</strong> Setzt Sprite Nummer s an Position x (0-511!), y (0-255).<br>
+            <strong>SRUN s,ri</strong> Sprite s bewegt sich in angegebene Richtung:<br>
+            0 7 6 5 4 3 2 1<br>
+            <strong>SSTOP s</strong> Sprite s hält wieder an.<br>
+            <strong>MULTI c,z1,z2,s1,s2</strong> Multicolor-Mode ein- und ausschalten: c = 0 = Multicolor für Zeichen an<br>
+            1 = Multicolor für Zeichen aus<br>
+            2 = Angabe von Zusatzfarben<br>
+            Bei Verwendung von 0 oder 1 brauchen die Zusatzfarben nicht mit angegeben werden.<br>
+            z1 = Zusatzfarbe 1 für Zeichen<br>
+            z2 = Zusatzfarbe 2 für Zeichen<br>
+            s1 = Zusatzfarbe 1 für Sprites<br>
+            s2 = Zusatzfarbe 2 für Sprites<br>
+            <strong>CREATE m,b1</strong> Erstellen eines neuen Zeichens/Sprites:<br>
+            m = Mode (O=Sprite, 1=Zeichen)<br>
+            b1 = Spriteblock oder Zeichencode<br>
+            <strong>CODE bits</strong> Nur in Zusammenhang mit dem CREATE-Befehl.<br>
+            Bei Sprites 24 Bits, bei Zeichen 8 Bits.<br>
+            . = Hintergrundfarbe.<br>
+            1 = Farbedes Zeichens/Sprites (bei Multicolor-Mode Zusatzfarbe 1) 2 = Zusatzfarbe 2<br>
+            3 = Farbe des Zeichens/Sprites bei Multicolor-Mode
+        </p>
+    </article>
+</body>
+
+</html>

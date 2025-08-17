@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>Disk-Basic – programmieren Sie Ihre eigene Datenverwaltung!</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="Harald Großauer, aw">
+    <meta name="64er.issue" content="Sonderheft 5/85">
+    <meta name="64er.pages" content="10-15,18-19">
+    <!-- <meta name="64er.toc_category" content="XXX"> -->
+    <!-- <meta name="64er.toc_title" content="XXX"> -->
+    <meta name="64er.id" content="XXX">
+</head>
+
+<body>
+    <article>
+        <h1>Disk-Basic – programmieren Sie Ihre eigene Datenverwaltung!</h1>
+        <p class="intro">Disk-Basic ergänzt das magere Basic V 2.0 um einige Befehle zum komfortablen Programmieren von sequentiellen und relativen Dateien.</p>
+
+        <p>Disk-Basic ist entstanden, um beispielsweise eine leistungsfähige Dateiverwaltung miteinfachen Befehlen zu programmieren. Das ist natürlich nur eines der denkbaren Anwendungsgebiete von Disk-Basic, denn sein umfangreicher Befehlsvorrat erleichtert generell das Arbeiten mit dem 1541-Floppy-Laufwerk. Disk-Basic hatdasZiel, nichtmehrmitspektakulären Kommandokombinationen die Laufwerke zum Arbeiten zu animieren, sondern mit Klartextbefehlen. Damit trägt es dem Prinzip einer Hochsprache wie Basic, komfortabel Daten zu verarbeiten, Rechnung.</p>
+
+        <p>Nach dem fehlerfreien Eingeben (verwenden Sie bitte den MSE) und Abspeichern des Programms (siehe Listing) kann Disk-Basic mit SYS 49152 gestartet werden. Die Befehlssyntax aller neuen Befehle richtet sich nach der altbewährten Methode: Sonderzeichenerkennung — Befehlsidentifizierung — Ausführung. Bevor nun die Wirkung der einzelnen Befehle erläutert wird, noch einige andere allgemeine Hinweise.</p>
+
+        <ul>
+            <li>Da, zumindest in Deutschland, das englische Pfund-Zeichen relativ wenig verwendet wird, wurde es als Einleitungszeichen für die neuen Befehle gewählt.</li>
+            <li>Beim Start oder bei der Initialisierung werden zwei Kommandokanäle geöffnet:<br>
+                OPEN 15,8,15 und OPEN 16,9,15</li>
+        </ul>
+
+
+        <p>Es ist dabei ohne Belang, ob die Floppy-Laufwerke eingeschaltet sind oder nicht. Da der Befehl RUN alle Kanäle schließt, muß am Programmanfang immer mit INIT initialisiert werden. Der Grund für diese Forderung ist, daß während des Arbeitens mit relativen Dateien an den Zuständen der Kanäle nichts verändert werden darf.</p>
+
+        <ul>
+            <li>Um auch bei den Sekundäradressen Ordnung zu schaffen, wird beim Öffnen einer Datei die Sekundäradresse gleich der Kanalnummer gesetzt (zum Beispiel OPEN 2,8,2). Aus diesem Grund darf die Kanalnummer nur zwischen 2 und 14 liegen.</li>
+            <li>Das zweite Floppy-Laufwerk (nicht unbedingt notwendig) sollte die Geräteadresse 9 haben. Ist es bereits fest auf eine höhere Nummer eingestellt, muß das Programm geringfügig verändertwerden. Ansonsten stehtzurVeränderung derGerä-teadresse ein gesonderter Befehl zur Verfügung.</li>
+        </ul>
+
+
+        <p>Die 38 Befehle des Disk-Basic unterteilen sich in zwei Gruppen:</p>
+
+        <p>Die eigentlichen DOS-Befehle und allerlei Hilfsbefehle, zum Beispiel zur Aufbereitung von Datensätzen.</p>
+
+        <p>Folgendes zur Erklärung:</p>
+
+        <p>Steht »dr« in Klammern, so bedeutet das, daß die Geräte-Nummer weggelassen werden kann. Dabei wird angenommen, daß es sich um Gerät 8, das Floppy-Laufwerk handelt.</p>
+
+        <p>”&hellip;” bedeutet, daß weitere Parameterkombinationen angehängt werden können.</p>
+
+        <h3>Befehle für die Laufwerksbedienung</h3>
+
+        <p>£CATALOG (.’’Parameter”) (,dr)<br>
+            Ausgabe des Directorys. Als Parameter sind Standardjoker (siehe 1541-Handbuch Seite 11) einsetzbar.<br>
+            £COLLECT (,dr)</p>
+
+        <p>»Aufräumen« führt eine Disk-Garbage-Collection durch (entspricht dem Validate.<br>
+            £COPY,”neufile=altfile,&hellip;” (,dr)<br>
+            Kopieren von Files<br>
+            £CLALL</p>
+
+        <p>schließt alle Kanäle und öffnet die Kommandokanäle sofort wieder<br>
+            £OPEN,fn,”filename,x,y”<br>
+            öffnet Kanal fn.</p>
+
+        <p>TODO</p>
+
+        <p>x = s sequential<br>
+            p program<br>
+            u user<br>
+            y = w write<br>
+            r read<br>
+            a append<br>
+            m Lesen einer nicht gechlossenen Datei</p>
+
+        <p>fn muß zwischen 2 und 14 liegen<br>
+            £ERROR,dr,ds (,ds$) (,tr) (,se)<br>
+            dr muß angegeben werden. Fehlerkanal wird gelesen £FORMAT,”diskname,id” (,dr) formatieren einer Disk<br>
+            £RENAME,”neuname=altname” (,dr)<br>
+            umbenennen von Dateien<br>
+            £SCRATCH,”filename,&hellip;” (,dr)<br>
+            löschen von Dateien<br>
+            £CHANGE,neue nr, alte nr<br>
+            Die Gerätenummer des »alten« Floppy-Laufwerks wird umgeändert.<br>
+            £INIT (,dr)<br>
+            Das betreffende Laufwerk wird initialisiert<br>
+            £CHAIN,”Programmname” (,dr)<br>
+            Aneinanderhängen von Programmen mit Variablenschutz; darf nur bei fertig entwickelten Programmen verwendet werden, da das Programm im Speicher nach Ende oder Abbruch nicht mehr ordnungsgemäß zu listen und zu starten ist. £SYSTEM,”Programmname” (,dr) die Erweiterung wird gespeichert<br>
+            £FETCH,fn,az,er$,&hellip;<br>
+            vom File fn werden az Zeichen in er$ eingelesen<br>
+            £TRANS, Sendedatei-Nr., Empfangsdatei-Nr.<br>
+            beide Dateien müssen geöffnet sein. Die Daten können zwischen allen Peripheriegeräten ausgetauscht werden.<br>
+            £RANDOM,fn,”Name”,le,az (,dr)<br>
+            fn = Kanalnummer<br>
+            le = Länge eines Records<br>
+            az = die Anzahl derfreigemachten Records (record az wird mit CHR$(255) beschrieben)<br>
+            £CLEAR<br>
+            löscht den Datenpuffer für relative Dateien<br>
+            £PUT,fn,rn,az (,dr)<br>
+            schreibt az Byte des Puffers in den Record rn<br>
+            £GET,fn,rn,az (,dr)<br>
+            liest az Byte des Records rn in den Puffer<br>
+            £WRITE,pos,x$,az,&hellip;<br>
+            schreibt az Zeichen des Strings x$ ab pos (Position) in den Puffer.<br>
+            Ist der String zu kurz, wird mit CHR$(O) aufgefüllt.<br>
+            £READ,Pos,az,x$&hellip; liestab Pos (Position) az: Zeichen des Puffers in x$</p>
+
+        <h3>Andere Befehle:</h3>
+
+        <p>£COMRa,a$,&hellip;<br>
+            wandelt die Zahl a (integer oder real) in den äquivalenten String. Real 5 Zeichen, Integer 2 Zeichen.<br>
+            £RECOMP,a$,a,&hellip;<br>
+            Umkehrung von COMP<br>
+            £BEEP<br>
+            Ausgabe eines Signaltones<br>
+            £CSET,x,y<br>
+            Cursorpositionierung<br>
+            x = Zeile, y = Spalte<br>
+            £CREAD,x,y<br>
+            Cursorabfrage<br>
+            gibt aktuelle Cursorposition aus (x = Zeile, y = Spalte)<br>
+            £RESTORE, Ausdruck<br>
+            Positioniert den Lesezeiger für Daten auf Zeile »Ausdruck«<br>
+            £INSTR$,a$,b$,Pos,erg,&hellip;<br>
+            durchsucht a$ ab Pos nach b$. Ist erg = 0, dann nicht vorhanden<br>
+            £STORE,adresse,”XXYYXXYYXXYY&hellip;” &hellip;<br>
+            speichert Hexbytes ab Adresse (ideal für Sprites)<br>
+            £STR$,”XXYYXXYYXXYY”,a$&hellip;<br>
+            wandelt Hexbytes in ASCII-Zeichen und speichert sie in a$<br>
+            £STRING,a Zeichen,er$ &hellip;<br>
+            erzeugt einen a Zeichen langen String aus<br>
+            £COLOUR,f1,f2<br>
+            verändert die Bildschirmfarben<br>
+            £GOTO,Ausdruck<br>
+            GOTO wird »berechenbar«<br>
+            £HEX,z,h$&hellip;<br>
+            wandelt z in h$ (hexadezmalzahl) um<br>
+            £DEZ,h$,z&hellip;<br>
+            wandelt h$ (hexadezimal) in z (dezimal) um<br>
+            £LINPUT,a$<br>
+            Übernimmt eine ganze Zeile mit allen Zeichen<br>
+            £SYS,adresse,akku,xreg,yreg&hellip;<br>
+            SYS mit Parameterübergabe der 6510-Register<br>
+            akku = Akkumulator<br>
+            xveg = X-Register<br>
+            yveg = y-Register<br>
+            £QUIT<br>
+            verlassen des Interpreters</p>
+
+        <address class="author">(Harald Großauer/aw)</address>
+    </article>
+</body>
+
+</html>

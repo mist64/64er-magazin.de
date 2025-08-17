@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>Übersichtliches Listing</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="Frank Barcikowski, ev">
+    <meta name="64er.issue" content="Sonderheft 5/85">
+    <meta name="64er.pages" content="104">
+    <!-- <meta name="64er.toc_category" content="XXX"> -->
+    <!-- <meta name="64er.toc_title" content="XXX"> -->
+    <meta name="64er.id" content="XXX">
+</head>
+
+<body>
+    <article>
+        <h1>Übersichtliches Listing</h1>
+        <p class="intro">Diese kleine Erweiterung spaltet beim Listen eine Programmzeile in mehrere Zeilen auf. Dadurch wird die Analyse auch komplizierter Programmteile zum Kinderspiel.</p>
+
+        <p>Die Idee zu dieser Erweiterung kam durch den Einzeiler-Wettbewerb im 64’er-Magazin, bei dem die abgedruckten Programme durch ihre gedrängte Darstellung schlecht lesbar waren. Damit ist nun Schluß. Wenn in einer Programmzeile ein Doppelpunkt vorkommt, so wird der darauf folgende Befehl in die nächste Zeile geschrieben.<br>
+            Beispiel:<br>
+            Aus<br>
+            10 A=53280:POKE A,I:POKE A+1,I+1:I=PEEK(53248+ 18):GOTO 10<br>
+            wird<br>
+            10A= 53280<br>
+            POKE A,I<br>
+            POKEA+1,I+1<br>
+            I=PEEK(53248+18)<br>
+            GOTO 10</p>
+
+        <p>Die Erweiterung liegt in dem Bereich von 49152 bis 49239, nimmt also keinen Basic-Speicherplatz in Anspruch. Sie läßt sich aber beliebig verschieben, damit sie auch bei Basic-Erweiterungen funktioniert, die den Bereich ab 49152 benutzen (man muß nur den Wert der Variablen ADRESSE in Zeile 0 ändern). Die 87 Byte lange Erweiterung läßtsich mit POKE 2,0 einschalten und mit POKE 2,1 wieder ausschalten.</p>
+
+        <h2>So arbeitet die Routine</h2>
+
+        <p>Das Maschinenprogramm liegt als Basic-Lader (Listing 1) und als Source-Code (Listing 2) vor. Zuerst wird der LIST-Vektor auf die neue Routine gePOKEt, dann erfolgt ein Rücksprung zum Basic. In der neuen LIST-Routine wird abgefragt, ob es sich bei dem zu listenden Zeichen um einen Befehl handelt. Ist dies der Fall, so wird zu der Routine gesprungen, die den Befehl ausgibt.</p>
+
+        <p>Anschließend erfolgt eine Überprüfung auf einen Doppelpunkt. Handelt es sich nicht um dieses Zeichen, so wird normal weitergelistet. Andernfalls findet eine Überprüfung der Speicherstelle 2 statt. Ist sie nicht 0, so wird der Doppelpunkt ausgegeben und mit dem normalen Listing weitergemacht. Steht in der Speicherstelle 2 eine 0, so wird ein CHR$(13) ausgegeben.</p>
+
+        <p>Im darauffolgenden Teil werden die untereinanderstehenden Teilprogrammzeilen linksbündig gemacht und ausgegeben. Danach wird wieder zum »normalen« Listing gesprungen.</p>
+
+        <p>Die Routine »Übersichtliches Listing« ist in erster Linie natürlich für das Arbeiten mit einem Drucker gedacht, denn eine Bildschirmausgabe mit einem Basic-Befehl pro Zeile würde den Vorteil der erhöhten Übersicht wohl bald zunichte machen, jedenfalls bei längeren Programmen. Der Einsatzschwerpunkt dieser Routine liegt damit bei der Analyse fremder, unübersichtlicher Programme mittels eines Druckers.</p>
+
+        <address class="author">(Frank Barcikowski/ev)</address>
+    </article>
+</body>
+
+</html>

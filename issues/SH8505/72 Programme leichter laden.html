@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>Programme leichter laden</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="Holger Weihe, ev">
+    <meta name="64er.issue" content="Sonderheft 5/85">
+    <meta name="64er.pages" content="72-73">
+    <!-- <meta name="64er.toc_category" content="XXX"> -->
+    <!-- <meta name="64er.toc_title" content="XXX"> -->
+    <meta name="64er.id" content="XXX">
+</head>
+
+<body>
+    <article>
+        <h1>Programme leichter laden</h1>
+        <p class="intro">Dieses Programm vereinfacht das Laden von Programmen durch direkte Auswahl aus dem Directory.</p>
+
+        <p>Programme werden häufig nach dem Listen des Directorys durch Voranstellen eines »LOAD« und Ergänzung durch ”,8:“ oder ”8,1“ geladen. Oftmals vergißt man dabei allerdings das Eintippen des Doppelpunktes oder man macht andere kleine Fehler, worauf sich der Computer mit einem »SYNTAX ER-ROR« meldet.</p>
+
+        <p>Mit »Directory-Lader« (Listing) kann das Directory einer Diskette nun so manipuliert werden, daß wahlweise ein »,8:« oder ein »,8,1« an den Filenamen angehängt wird. Das vereinfacht den Ladevorgang um einiges: Nur noch das Directory listen, mit dem Cursor in die gewünschte Zeile fahren, »LOAD« eingeben und schon geht’s los.</p>
+
+        <h2>So funktioniert der »Directory-Lader«</h2>
+
+        <p>Jedes Programm auf einer Diskette ist in einem Directoryblock verzeichnet. Dort belegt der Name des Programmes 16 Byte. Ist der Name kürzer als 16 Byte, wird er durch ein »SHIFT Space« (CHR$ 160) ergänzt. Dadurch wird auch das Ende eines Namens vom DOS erkannt.</p>
+
+        <p>Beim Listen des Directorys werden nun alle 16 Byte des Namens auf dem Bildschirm angezeigt. Das zu lösende Problem besteht also darin, den gewünschten Zusatz ebenfalls hinter dem Programm anzuzeigen.</p>
+
+        <p>Dazu wird zuerst der erste Block des Directorys eingelesen. Der Bufferpointer wird auf den ersten Namen des Blocks gesetzt und der Name ausgelesen. Hierbei werden alle 16 Byte des Namens verwendet. Durch Betätigen entsprechender Tasten wird nun der Name wie folgt bearbeitet:<br>
+            @ Löschen des Zusatzes<br>
+            ↑ Überspringen des Namens ohne Änderung<br>
+            <strong>M</strong> Schreiben des Zusatzes»,8,1«<br>
+            <strong>B</strong> Schreiben des Zusatzes »,8:«
+        </p>
+
+        <p>Beim Schreiben des Zusatzes wird der Name des Programms von hinten durch den Zusatz ergänzt. Dabei werden Programmnamen, die längerals 11 Zeichen bei Maschinenprogrammen oder länger als 12 Zeichen bei Basic-Programmen sind, entsprechend verkürzt.</p>
+
+        <p>In dieser Weise werden sämtliche Namen eines Directory-Blocks bearbeitet.</p>
+
+        <p>Da der Bufferpointer jedesmal weitergesetzt wird, kann es vorkommen, daß auch bereits gelöschte Programme bearbeitet werden. Das hat jedoch keinen weiteren Einfluß.</p>
+
+        <p>Nach der Bearbeitung eines Blocks wird dieser zurückgeschrieben, und das Programm fährt mit dem nächsten Block fort.</p>
+
+        <p>Tabelle 1 zeigt die verwendeten Variablen, Tabelle 2 die einzelnen Routinen des Programms.</p>
+
+        <p>Während der Bearbeitung wird ständig der nächste zu bearbeitende Block angezeigt. Erscheinen die Werte 0 und 255, so ist der letzte Block erreicht. Man hatjetzt eine Diskette mit modifiziertem Directory und damit einfach zu ladenden Programmen vorliegen (Bild 1).</p>
+
+        <address class="author">(Holger Weihe/ev)</address>
+    </article>
+</body>
+
+</html>

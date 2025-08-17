@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>Schnell kopiert mit Hypra-Copy</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="Burkhard Graves, ev">
+    <meta name="64er.issue" content="Sonderheft 5/85">
+    <meta name="64er.pages" content="69-71">
+    <!-- <meta name="64er.toc_category" content="XXX"> -->
+    <!-- <meta name="64er.toc_title" content="XXX"> -->
+    <meta name="64er.id" content="XXX">
+</head>
+
+<body>
+    <article>
+        <h1>Schnell kopiert mit Hypra-Copy</h1>
+        <p class="intro">Hypra-Copy ist ein schnelles und komfortables Filecopy-Programm für den C 64. Das Kopieren wird um das Vierbis Fünffache beschleunigt.</p>
+
+        <p>Trotz deraufwendigen Lade- und Speicherroutinen ist es gelungen, das Programm insgesamt recht kurz zu halten; Hypra-Copy belegt, gespeichert auf der Diskette, nur ganze 15 Blöcke. Somit ist der verfügbare Arbeitsspeicher sehr groß: Hypra-Copy kann sich bis zu 30 Filenamen »merken«, und in einem Ladegang können maximal 232 Blöcke eingelesen werden. Hat man das Programm (siehe Listing) mit dem MSE abgetippt und gespeichert, kann es später ganz normal mit »LOAD ”HYPRA-COPY”,8« geladen und mit »RUN« gestartet werden.<br>
+            Es erscheint dann das Hauptmenü:<br>
+            <strong>HYPRA-COPY</strong><br>
+            :C: Copy Files<br>
+            :S: Scratch Files<br>
+            :D: Directory<br>
+            :O: Order Disk
+        </p>
+
+        <p>Die Bedienung ergibt sich damit eigentlich schon von selbst. Drückt man die Taste »O«, erscheint auf dem Bildschirm eine eckige Klammer mit einem blinkenden Cursor dahinter.</p>
+
+        <p>Nun kann man den Befehl eingeben, der zur Floppy geschickt werden soll. Reagiert die Floppy mit einer Fehlermeldung, so wird diese auf dem Bildschirm ausgegeben.</p>
+
+        <p>Bei Betätigung der Taste »D« erscheint das Directory. Der Ausdruck kann durch die CTRL-Taste angehalten werden. Durch Drücken der »S«-Taste gelangt man in den Scratch-Modus (löschen von Files). Um Verwechslungen mit dem Copy-Modus auszuschließen, wird erst einmal mit einer dicken, reversen Balkenüberschrift darauf aufmerksam gemacht, daß man sich tatsächlich im Scratch-Modus befindet. Danach erscheintdas Directory, jedoch erscheinthinterjedem Filenamen ein »(Y/N)«; relative Files sowie Files, deren Länge gleich 0 oder größer als 232 Blöcke ist, werden bei dieser Befragung übergangen, denn diese Routine wird auch beim Kopieren gebraucht und Files mit diesen Eigenschaften kann Hypra-Copy nicht kopieren.</p>
+
+        <p>Files, die sich Hypra-Copy merken soll, müssen mit »Y« markiert werden. Ist man versehentlich im Scratch-Modus gelandet, so kann man diesen Modus mit der STOP-Taste verlassen (ansonsten dient die STOP-Taste dazu, Hypra-Copy zu beenden; man kann es dann aber wieder mit »RUN« starten).</p>
+
+        <p>So werden nach und nach alle Files der Directory durchgegangen. Will man nur einige wenige Files am Anfang einer ellenlangen Directory löschen (oder kopieren), so braucht man die restlichen Files nicht mehr mit »N« zu bearbeiten, es genügt ein Druck auf die »t «Taste, und man gelangt zum Ende des Directory. Hier wird dann gefragt, ob man nun auch sicher ist, daß diese Files gelöscht werden sollen. Beantwortet man diese Frage mit »N«, gelangt man zurück in das Hauptmenü, andernfalls werden die markierten Files gelöscht.</p>
+
+        <p>Damit man weiß, wie weit das Programm mit dem Löschen ist, wird immer der Name des Files ausgegeben, das gerade gelöscht wird. Am Ende des Löschvorgangs gelangt man automatisch wieder in das Hauptmenü.</p>
+
+        <h2>Der Copy-Modus</h2>
+
+        <p>So, nun zum Copy-Modus, in den man mit der »C«-Taste kommt. Zuerst werden wieder, genau wie beim Löschen, die Namen der zu kopierenden Files eingelesen.</p>
+
+        <p>Danach wird gefragt, ob man die Files einzeln oder gesammelt kopieren will und ob beim Speichern ein »VERIFY« durchgeführt werden soll. Verzichtet man auf dieses Verify, so wird etwas schneller kopiert. Um den Bedienungskomfort zu erhöhen, werden die Antworten auf diese Fragen, wie auch auf die »SURE?«-Frage (sure = Sind Sie sicher?) im Scratch-Modus und die »SAVE BUFFER AGAIN?«-Frage (Soll das gleiche noch einmal gespeichert werden?), nicht per GET ($ffe4), sondern per BASIN ($ffcf) eingelesen, wobei die wohl gebräuchlichere Antwort schon vorgegeben ist; man braucht also nur noch RETURN drücken; natürlich kann diese vorgegebene Antwort aber auch überschrieben werden.</p>
+
+        <p>Nun werden die Programme geladen. Ist die Summe der Blöcke der einzelnen Files kleiner als 233, können sogar alle auf einmal eingelesen werden; andernfalls wird ein erneuter Ladeanlauf nötig.</p>
+
+        <p>Sind die Files geladen, wird man aufgefordert, die Ziel-Disk einzulegen; außerdem wird noch die Anzahl der zu speichernden Blocks angegeben, und ein Untermenü erscheint.</p>
+
+        <p>Es besteht jetzt noch die Möglichkeit, diverse Directories anzusehen oder Befehle zur Floppy zu schicken.</p>
+
+        <p>Man kann also in aller Ruhe eine passende Diskette aussuchen. Ist man gewillt fortzufahren, so drückt man einfach die Funktionstaste F7, dann beginnt nämlich das Speichern. Anschließend wird man gefragt, ob man eben diese Files noch einmal auf eine andere Diskette schreiben will. Beantwortet man diese Frage mit »Y«, beginnt der komplette SAVE-Vorgang von neuem. Andernfalls wird normal fortgefahren und, wie schon erwähnt, können erneute Ladeanläufe erforderlich werden.</p>
+
+        <p>Wurden alle Files kopiert, so wird in das Hauptmenü zurückgekehrt.</p>
+
+        <p>Nun zur Fehlerbehandlung: Mit »Fehlern« sind nicht Fehler gemeint, die in der Programmstruktur von Hypra-Copy liegen, sondern Fehler, die von der Floppy signalisiert werden; sei es, daß man einen unkorrekten Befehl an die Floppy schickt, man beim Kopieren die falsche Diskette einlegt oder Write- oder Read-Errors auftreten.</p>
+
+        <h2>Erste Hilfe bei Fehlern</h2>
+
+        <p>ln solchen oder ähnlichen Fällen besteht immer die Möglichkeit, den Vorgang, bei dem der Fehler aufgetreten ist, zu wiederholen beziehungsweise zu übergehen. Treten Fehler beim Öffnen eines Files auf, so kann man sogar nochmals Directories ansehen und Befehle an die Floppy schicken. War es nicht möglich, ein File korrekt zu laden und wurde es übergangen, so wird dies bei der Angabe der zu speichernden Blöcke, wie auch beim Speichern selbst, berücksichtigt. Können Files aus irgendeinem Grund nicht korrekt gespeichert werden, so kann man diese auch überspringen.</p>
+
+        <address class="author">(Burkhard Graves/ev)</address>
+    </article>
+</body>
+
+</html>

@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>Cross-Ref 64 — Basic-Pro-gramme unter der Lupe</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="Peter Rüschhoff-Nadermann, hm">
+    <meta name="64er.issue" content="Sonderheft 5/85">
+    <meta name="64er.pages" content="111-116,118-121">
+    <!-- <meta name="64er.toc_category" content="XXX"> -->
+    <!-- <meta name="64er.toc_title" content="XXX"> -->
+    <meta name="64er.id" content="XXX">
+</head>
+
+<body>
+    <article>
+        <h1>Cross-Ref 64 — Basic-Pro-gramme unter der Lupe</h1>
+        <p class="intro">Wenn man zu einem Basic-Programm eine Liste aller Sprungadressen, Schleifen und Variablen hat, ist das eine sehr gute Hilfe Nicht nur während des Programmierens, sondern auch zur nachträglichen Dokumentation. Eine solche Liste erstellt dieses Maschi-nen-Programm.</p>
+
+        <p>Cross-Ref 64 durchsucht in zwei Durchgängen (Passes) ein Basic-Programm nach Sprungbefehlen und Variablen. Sämtliche Sprungziele und Variablennamen werden dann auf einem Drucker in Form einer Tabelle ausgegeben. Eine solche Tabelle nennt man Cross-Reference-List.</p>
+
+        <p>Das Basic-Programm kann dazu übrigens irgendwo im Basic-Speicher liegen. Es muß nicht bei Adresse $0801 beginnen. Das ist wichtig, denn häufig wird der untere Basic-Speicherteil für Sprites reserviert.</p>
+
+        <h3>1. Durchgang</h3>
+
+        <p>Im ersten Durchlauf (Pass) werden Sprunganweisungen und FOR-NEXT-Schleifen gesucht und alle Zeilennummern der Zeilen ausgegeben, die eine Sprunganweisung enthalten oder angesprungen werden. Dabei werden alle Sprünge berücksichtigt, die das C 64-Basic 2.0 bietet. FOR-NEXT-Schleifen werden durch die Laufvariable gekennzeichnet. Eventuell vorhandene, noch nicht zu Ende geschriebene FOR-NEXT-Schleifen werden mit einem »*« markiert.</p>
+
+        <h3>2. Durchgang</h3>
+
+        <p>Hier werden alle Variablen eines Basic-Programms gesucht und ausgegeben.</p>
+
+        <p>Die Ausgabe der Cross-Reference-Liste kann in beiden Durchgängen entweder auf Bildschirm oder Drucker erfolgen. Bei Bildschirmausgabe allerdings auch im Druckerformat mit 80 Zeichen/Zeile. Das bedeutet, daß zwei Bildschirmzeilen immer eine Druckerzeile darstellen. Doch wie sinnvoll ist überhaupt eine Dokumentation auf dem Bildschirm? Das Programm ist auf einen Epson-Drucker mit Görlitz-Interface angepaßt. Es kann aber leicht so verändert werden, daß es auch für andere Drucker geeignet ist. Es müssen nur vier Speicherzellen mit POKE-Befehlen verändert werden.</p>
+
+        <p>Einstellung der Geräteadresse:<br>
+            POKE 50517, GA : POKE 50519, GA<br>
+            Einstellung der Sekundäradresse:<br>
+            POKE 50521, SA+96 : POKE 50529, SA+96</p>
+
+        <p>Mit einem Monitor wie dem SMON oder dem Einzeiler »Maschinenprogramme speichern« (Ausgabe 11/84) können Sie die auf Ihren Drucker angepaßte Programmversion speichern:</p>
+
+        <p>SYS57812a$,x:POKE193,ls:P0KE194,hs:P0KE174,le:POKE 175,he:SYS62957</p>
+
+        <p>Dadurch ersparen Sie sich die lästigen POKE-Befehle nach jedem Laden von Cross-Ref 64. Das Programm belegt den Speicherbereich von $C000 (49152) bis $CAB6 (51894). Um Ihnen eventuelle Berechnungen zu ersparen: Das Highbyte (hs) von 49152 ist 192 das Lowbyte (ls) 0. Das Highbyte von 51894 (he) ist 202, das Lowbyte (le) 182.</p>
+
+        <h2>Übersichtliches Ausgabeformat</h2>
+
+        <p>Wie schon erwähnt, werden alle Zeilen, in denen ein Sprung erfolgt, ausgegeben. Die gezeigte Tabelle (Tabelle 1) bezieht sich auf das Beispielprogramm (Listing 1). Man kann sich auch eine Liste aller Sprungziele drucken lassen (Tabelle 2). Die Ausgabe erfolgt mit 80 Zeichen pro Zeile, dem üblichen Druckerformat.</p>
+
+        <p>Sollten offene FOR-NEXT-Schleifen (ohne NEXT) vorhanden sein, wird nach einem »*« die Anzahl der fehlenden NEXT-Befehle angezeigt. Sollte die Anzahl 255 betragen, heißt das, daß ein NEXT zuviel gefunden wurde.</p>
+
+        <p>Sollten in einer Basic-Zeile mehrere Sprünge auftreten, wird die mehrmalige Ausgabe der Zeilennummer unterdrückt.</p>
+
+        <p>Bei Sprungbefehlen der Form ON X GOSUB wird das Argument nach ON durch »—« ersetzt, da auch ganze Basic-Funk-tionen als Argument erlaubt sind. Um diese Funktionen zu berücksichtigen, wäre ein zu großer Programmieraufwand nötig. Treten nach einem THEN mehrere Sprünge auf, wird jedem Sprungziel ein THEN vorangestellt. Eine solche Befehlsfolge ist beispielsweise<br>
+            IF X=1 THEN GOSUB 100:GOSUB 200:GOSUB 300.<br>
+            Bei FOR-NEXT-Schleifen wird der ganze Variablenname angegeben.</p>
+
+        <p>Die Variablennamen werden in einer eigenen Tabelle ausgegeben (Tabelle 3). Hier werden die Namen allerdings auf zwei Zeichen gekürzt. In der Tabelle steht nach dem Namen der Variable der Variablentyp (Real, Integer oder String). Zwei Klammern »()« zeigen an, daß es sich um eine indizierte Variable handelt. Da eine Variable in einem Programmbereich sehr häufig benutzt werden kann, werden bei Mehrfachnennung einer Variablen nur noch die Zeilennummern angegeben; so lange, bis eine andere Variable aufgerufen wird. Wird einer Variablen ein anderer Wert zugeordnet (A=A+1), wird die Zeilennummer mit einem Stern »*« gekennzeichnet. Bei der sortierten Variablenausgabe (Tabelle 4), werden nach dem Variablenna-men alle Zeilen aufgeschlüsselt, in denen die Variable vorkommt. Das Sortieren geschieht nach den folgenden Kriterien:</p>
+
+        <ol>
+            <li>Typ: Real, integer, Strings, Felder</li>
+            <li>Name alphabetisch</li>
+            <li>Zeilennummern in aufsteigender Reihenfolge.</li>
+        </ol>
+
+
+        <p>Die Ausgabe kann jederzeit durch Tastendruck gestoppt werden. Eine begonnene Druckzeile wird zu Ende gedruckt. Bei einem weiteren Tastendruck fährt das Programm fort. Mit RUN/STOP kann die Ausgabe abgebrochen werden.</p>
+
+        <h3>Tips zu Eingabe und Benutzung</h3>
+
+        <p>Das Maschinen-Programm (Listing 2) sollten Sie mit dem MSE eingeben. Es wird durch »SYS 49152, Parameterliste, Bereich« gestartet. Die »Parameterliste« muß aus genau fünf Zeichen bestehen (Leerzeichen nicht mitgerechnet). Folgende Zeichen sind erlaubt:</p>
+
+        <ol>
+            <li>Steife: P — Ausgabe auf Drucker</li>
+            <li>Stelle: S — Ausgabe der Zeilen mit Sprungbefehlen (Tabelle 1)</li>
+            <li>Stelle: J — Ausgabe der angesprungenen Zeilen (nur zusammen mit »S« an zweiter Stelle möglich (Tabelle 2)</li>
+            <li>Stelle: V — Ausgabe der benutzten Variablen in der Reihen-<br>
+                folge des Auftretens (Tabelle 3)</li>
+            <li>Stelle: J — Ausgabe der benutzten Variablen in sortierter Reihenfolge (Tabelle 4)</li>
+        </ol>
+
+
+        <p>Werden andere Zeichen an der entsprechenden Stelle angegeben, dann wird der Programmpunkt nicht ausgeführt.</p>
+
+        <p>Die Bereichsangabe ist optional und hat die gleiche Syntax wie beim LIST-Befehl. Falls ein Zeilenbereich angegeben wird, analysiert das Programm auch nur den entsprechenden Abschnitt. Ein Beispiel:</p>
+
+        <p>Es sollen alle Sprungbefehle und alle Variablen im Zeilenbereich 100-200 gesucht werden. Die Ausgabe soll auf dem Drucker erfolgen. Der entsprechende SYS-Aufruf lautet dann: SYS 49152, PS..J,100-200</p>
+
+        <p>Anstelle der Punkte kann dabei jedes beliebige andere Zeichen mit Ausnahme des Kommas angegeben werden.</p>
+
+        <p>Zum Sortieren der Variablen und für die Ausgabe der angesprungenen Zeilen wird das »Bubblesort«-Verfahren verwendet, da es besonders einfach in Assembler (Listing 3, Quellcode) programmiert werden kann. Die Variablen- und Sprungtabelle wird im Bereich $A000 bis $BFFF, also »unter« dem Basic-ROM, abgelegt. Falls also eine Basic-Erweiterung verwendet wird, darf dieser Speicherbereich dadurch nicht verändert werden.</p>
+
+        <address class="author">(Peter Rüschhoff-Nadermann/hm)</address>
+    </article>
+</body>
+
+</html>
