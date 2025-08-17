@@ -61,6 +61,283 @@
         <p>Das Programm wurde mit dem Assembler »ASSI« übersetzt, eine Übernahme auf andere Assembler dürfte nicht schwierig sein. Der Basic-Lader (Listing 1, Source-Code: Listing 2) legt das Programm ab der Adresse 49152 ($C000) ab, schaltet die Erweiterung ein und löscht sich dann selbst, er muß also vorher auf Diskette abgespeichert werden. Die Erweiterung wird durch SYS49152 ein- und durch SYS49155 ausgeschaltet. STOP/RESTORE schaltet die Erweiterung nicht ab.</p>
 
         <address class="author">(Bernward Bretthauer/rg)</address>
+
+        <figure>
+            * = 49152
+            <table class="plain">
+                <tr>
+                    <td>chrget</td>
+                    <td>= $73</td>
+                    <td>; holt nächstes Zeichen</td>
+                </tr>
+                <tr>
+                    <td>chrgot</td>
+                    <td>= $79</td>
+                    <td>; holt letztes Zeichen</td>
+                </tr>
+                <tr>
+                    <td>chrvek</td>
+                    <td>= $7a</td>
+                    <td>; Chrgetzeiger</td>
+                </tr>
+                <tr>
+                    <td>decod</td>
+                    <td>= $0308</td>
+                    <td>; Vektor für Befehlsdec.</td>
+                </tr>
+                <tr>
+                    <td>error</td>
+                    <td>= $4a37</td>
+                    <td>; Fehlermeldung ausgeben</td>
+                </tr>
+                <tr>
+                    <td>schleife</td>
+                    <td>= $a7ae</td>
+                    <td>; Interpreterschleife</td>
+                </tr>
+                <tr>
+                    <td>getrec</td>
+                    <td>= $b083</td>
+                    <td>; Recordnummer holen</td>
+                </tr>
+                <tr>
+                    <td>chkcom</td>
+                    <td>= $aefd</td>
+                    <td>; prüft auf Komma</td>
+                </tr>
+                <tr>
+                    <td>getbyt</td>
+                    <td>= $b79b</td>
+                    <td>; holt Byte in x</td>
+                </tr>
+                <tr>
+                    <td>comget</td>
+                    <td>= $b711</td>
+                    <td>; chkcom + getbyt</td>
+                </tr>
+                <tr>
+                    <td>fac16</td>
+                    <td>= $b77c</td>
+                    <td>; FAC nach 16-Bit wandeln</td>
+                </tr>
+                <tr>
+                    <td>search</td>
+                    <td>= $f30f</td>
+                    <td>; sucht logische Filenr.</td>
+                </tr>
+                <tr>
+                    <td>parset</td>
+                    <td>= $f30c</td>
+                    <td>; setzt Fileparameter</td>
+                </tr>
+                <tr>
+                    <td>listen</td>
+                    <td>= $ffb1</td>
+                    <td>; LISTEN senden</td>
+                </tr>
+                <tr>
+                    <td>seclis</td>
+                    <td>= $ff93</td>
+                    <td>; Sekundärad. nach LISTEN</td>
+                </tr>
+                <tr>
+                    <td>iecou t</td>
+                    <td>= $ffa8</td>
+                    <td>; Ausgabe auf IEC-bus</td>
+                </tr>
+                <tr>
+                    <td>unlist</td>
+                    <td>= $ffae</td>
+                    <td>; UNLISTEN senden</td>
+                </tr>
+                <tr>
+                    <td>integ</td>
+                    <td>= $14</td>
+                    <td>; Integer Wert</td>
+                </tr>
+                <tr>
+                    <td>filenr</td>
+                    <td>= $b8</td>
+                    <td>; logische Filenummer</td>
+                </tr>
+                <tr>
+                    <td>secadr</td>
+                    <td>= $b9</td>
+                    <td>; Sekundäradresse</td>
+                </tr>
+                <tr>
+                    <td>ga</td>
+                    <td>= $ba</td>
+                    <td>; Gerätenummer</td>
+                </tr>
+            </table>
+
+            <figcaption>Bild 1. Befehlscodierung</figcaption>
+        </figure>
+
+        <figure>
+            <table>
+                <tr>
+                    <td>0073</td>
+                    <td>chrget</td>
+                </tr>
+                <tr>
+                    <td>0079</td>
+                    <td>chrgot</td>
+                </tr>
+                <tr>
+                    <td>007a</td>
+                    <td>chrvek</td>
+                </tr>
+                <tr>
+                    <td>0308</td>
+                    <td>decod</td>
+                </tr>
+                <tr>
+                    <td>a437</td>
+                    <td>error</td>
+                </tr>
+                <tr>
+                    <td>a7ae</td>
+                    <td>schleife</td>
+                </tr>
+                <tr>
+                    <td>ad8a</td>
+                    <td>getrec</td>
+                </tr>
+                <tr>
+                    <td>aefd</td>
+                    <td>chkcom</td>
+                </tr>
+                <tr>
+                    <td>b79e</td>
+                    <td>getbyt</td>
+                </tr>
+                <tr>
+                    <td>b7f1</td>
+                    <td>comget</td>
+                </tr>
+                <tr>
+                    <td>b7f7</td>
+                    <td>fac16</td>
+                </tr>
+                <tr>
+                    <td>f30f</td>
+                    <td>search</td>
+                </tr>
+                <tr>
+                    <td>f31f</td>
+                    <td>parset</td>
+                </tr>
+
+                <tr>
+                    <td>ffb1</td>
+                    <td>listen</td>
+                </tr>
+                <tr>
+                    <td>ff93</td>
+                    <td>seclis</td>
+                </tr>
+                <tr>
+                    <td>ffa8</td>
+                    <td>iecout</td>
+                </tr>
+                <tr>
+                    <td>ffae</td>
+                    <td>unlist</td>
+                </tr>
+                <tr>
+                    <td>0014</td>
+                    <td>integ</td>
+                </tr>
+                <tr>
+                    <td>00b8</td>
+                    <td>filenr</td>
+                </tr>
+                <tr>
+                    <td>00b9</td>
+                    <td>secadr</td>
+                </tr>
+                <tr>
+                    <td>00ba</td>
+                    <td>ga</td>
+                </tr>
+                <tr>
+                    <td>c019</td>
+                    <td>endoff</td>
+                </tr>
+                <tr>
+                    <td>c01a</td>
+                    <td>vekt</td>
+                </tr>
+                <tr>
+                    <td>c01c</td>
+                    <td>flag</td>
+                </tr>
+                <tr>
+                    <td>c01d</td>
+                    <td>on</td>
+                </tr>
+                <tr>
+                    <td>c02c</td>
+                    <td>l1</td>
+                </tr>
+
+                <tr>
+                    <td>c036</td>
+                    <td>l2</td>
+                </tr>
+                <tr>
+                    <td>c041</td>
+                    <td>tab1</td>
+                </tr>
+                <tr>
+                    <td>c047</td>
+                    <td>tab2</td>
+                </tr>
+                <tr>
+                    <td>c04b</td>
+                    <td>record</td>
+                </tr>
+                <tr>
+                    <td>c05a</td>
+                    <td>13</td>
+                </tr>
+                <tr>
+                    <td>c067</td>
+                    <td>simon</td>
+                </tr>
+                <tr>
+                    <td>c06c</td>
+                    <td>13s</td>
+                </tr>
+                <tr>
+                    <td>c079</td>
+                    <td>out</td>
+                </tr>
+                <tr>
+                    <td>c082</td>
+                    <td>ok</td>
+                </tr>
+                <tr>
+                    <td>c091</td>
+                    <td>14</td>
+                </tr>
+                <tr>
+                    <td>c09f</td>
+                    <td>illdev</td>
+                </tr>
+                <tr>
+                    <td>c0a4</td>
+                    <td>15</td>
+                </tr>
+                <tr>
+                    <td>c0da</td>
+                    <td>ende</td>
+                </tr>
+            </table>
+            <figcaption>Bild 2. Symbol-Tabelle</figcaption>
+        </figure>
     </article>
 </body>
 
