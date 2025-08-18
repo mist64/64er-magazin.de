@@ -26,6 +26,47 @@
 
         <p>Im Gegensatz zu den oben genannten EPROM-Versionen, erzeugt dieses Programm ein lauf- und damit testfähiges Betriebssystem im freien RAM-Bereich unter dem Kernal-ROM ab $E000. Nichtjeder wird wohl gleich ein EPROM programmieren, sondern lieber zuerst etwas experimentieren wollen. Zuerst werden Basic und Kernal ins RAM kopiert (lnit-Routine ab 190). Erstdann kann geändert werden. Das Programm (siehe Listing) erlaubt auch (falls vorhanden) ein Betriebssystem von Diskette zu laden (Zeile 23, siehe Tabelle 1 und 2). Danach kann die Farbkombination beim Warm- und Kaltstart ausgetestet werden. Der SYS-Befehl in Zeile 201 löst einen Reset des Bildschirms innerhalb der geänderten Kernalroutine aus, so daß die Kombination sofort beurteilt werden kann. Erst nach Bestätigen verzweigt das Programm nach Zeile 213. Dort kann eine OLD-Routine aktiviert werden. Beginn ist ab Adresse 64608. Dies gilt es zu beachten, wenn ein Kernal abgeändert werden soll, das eventuell diesen Bereich benutzt. Es handelt sich dabei um einen Teil der normalerweise überschriebenen Kassettenroutinen des Betriebssystems. Hat man ein Betriebssystem geladen, das mit der OLD-Routine kollidiert, muß letztere verschoben werden.</p>
 
+<figure>
+  <table class="plain">
+    <tbody>
+      <tr><td>100-101</td><td>Feststellen ob ROM/RAM aktiv<br>Feststellen ob Kernal nachgeladen</td></tr>
+      <tr><td>102</td><td>RAM aktivieren</td></tr>
+      <tr><td>103</td><td>Routine zum Data-Einlesen</td></tr>
+      <tr><td>123-127</td><td>Anfangs- und Endadressen der POKE-Schleifen</td></tr>
+      <tr><td>128-132</td><td>Variablenübergabe an DATA-Einleseroutine und<br>Prüfsummen der Datenblöcke</td></tr>
+      <tr><td>133</td><td>Aktivieren des neuen Kernal/Basic</td></tr>
+      <tr><td>134-154</td><td>Datenblock 1 Fehlermeldungen</td></tr>
+      <tr><td>155-159</td><td>Datenblock 2 Interpreter-Meldungen</td></tr>
+      <tr><td>160-166</td><td>Datenblock 3 Startkennung</td></tr>
+      <tr><td>167-175</td><td>Datenblock 4 System-Meldungen Kernal</td></tr>
+      <tr><td>176-182</td><td>Datenblock 5 Old-Routine</td></tr>
+      <tr><td>183-189</td><td>Prüfsummen-Statement</td></tr>
+      <tr><td>190-197</td><td>ROM-RAM Kopierroutine</td></tr>
+      <tr><td>198-209</td><td>Austesten der Farbgebung</td></tr>
+      <tr><td>210-230</td><td>Old-Routine anpassen</td></tr>
+      <tr><td>231-239</td><td>Nachladen eines Betriebssystems</td></tr>
+    </tbody>
+  </table>
+  <figcaption>Tabelle 1. Programmbeschreibung</figcaption>
+</figure>
+
+<figure>
+  <table class="plain">
+    <tbody>
+      <tr><td>N$</td><td>Filename des nachgeladenen Kernals</td></tr>
+      <tr><td>P</td><td>Zeropage-Adresse 1 auf ROM oder RAM</td></tr>
+      <tr><td>A</td><td>Anfangsadresse der DATA-Schleifen</td></tr>
+      <tr><td>B</td><td>Endadresse der DATA-Schleifen</td></tr>
+      <tr><td>S</td><td>Prüfsumme</td></tr>
+      <tr><td>Z</td><td>Zeichenfarbe</td></tr>
+      <tr><td>R</td><td>Rahmenfarbe</td></tr>
+      <tr><td>H</td><td>Hintergrundfarbe</td></tr>
+      <tr><td>K</td><td>verwendete Kernalversion</td></tr>
+    </tbody>
+  </table>
+  <figcaption>Tabelle 2. Die wichtigsten Variablen</figcaption>
+</figure>
+
         <p>Die genannten Hypra-Kernal sind diesbezüglich unkritisch. Beachtet werden muß lediglich, daß sich deren Adressen für Funktionstasten-Belegung unterscheiden. Soll OLD also auch auf Funktionstaste gelegt werden, fragt das Programm selbst nach der verwendeten Version (Zeile 218). Bei anderen Kernal-Versionen kommt es auf das berühmte Experiment an. Betriebssysteme ohne eine Belegung der Funktionstasten können selbstverständlich auch nicht den OLD-Befehl per Funktionstaste unterstützen. Es fehlen ganz einfach die nötigen Routinen (siehe Original Kernal V2.0)!</p>
 
         <p>Hier bleibt ja immer noch der SYS-Befehl zum Aufruf von OLD, den man sich eben merken muß. Für ganz zerstreute Freaks ist die nachfolgende Routine am idealsten. OLD als gewöhnlicher Basic-Direktbefehl (also auch abkürzbar mit »O SHIFT L«): Zeile 224 sorgt für die entsprechende Programmierung. Da hier, wie nachher auch bei den Fehlermeldungen in deutscher Sprache, das Basic mitverändert wird, muß natürlich auch das Basic-ROM (beziehungsweise -RAM) abgespeichert werden. Wie, das wird zum Schluß erklärt.</p>
