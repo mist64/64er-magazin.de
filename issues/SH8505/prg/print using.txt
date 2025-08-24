@@ -1,0 +1,75 @@
+
+
+;print using.prg ==0801==
+   10 rem ************************************************************************
+   11 rem *                 f o r m a t r o u t i n e                            *
+   12 rem ************************************************************************
+   13 rem * copyright:                                                           *
+   14 rem *  dr.m.irskens                                                        *
+   15 rem *  leveser allee 13                                                    *
+   16 rem *  3061 hespe                                                          *
+   17 rem ************************************************************************
+   18 rem *                                                                      *
+   19 rem * aufruf:                                                              *
+   20 rem *  usr(x),fl,nk                                                        *
+   21 rem *    x  = zu formatierender numerischer wert                           *
+   22 rem *    fl = feldlaenge der formatierten zahl                             *
+   23 rem *    nk = anzahl nachkommastellen der formatierten zahl                *
+   24 rem *  das ergebnis der usr-funktion ist der formatierte string. dieser    *
+   25 rem *  kann einer stringvariablen zugewiesen oder ausgedruckt werden.      *
+   26 rem * beispiele:                                                           *
+   27 rem *  a$=(usr(xy),10,2)+""                                                *
+   28 rem *  print usr(xy),10,2;" dm"                                            *
+   29 rem *                                                                      *
+   30 rem * besonderheiten:                                                      *
+   31 rem *  wenn nachkommastellen durch das formatieren abgeschnitten werden,   *
+   32 rem *  so wird die zahl gerundet.                                          *
+   33 rem *  zahlendarstellungen im e-format werden ebenfalls verarbeitet.       *
+   34 rem *  wenn die zahl in der angegebenen feldlaenge nicht dargestellt       *
+   35 rem *  werden kann, dann wird die zahl in der notwendigen feldlaenge dar-  *
+   36 rem *  gestellt, um einen zifferverlust zu vermeiden.                      *
+   37 rem *                                                                      *
+   38 rem * vor aufruf der funktion muessen folgende befehle einmalig durchge-   *
+   39 rem * fuehrt werden:                                                       *
+   40 rem *   poke 785,0   : low-byte der startadresse                           *
+   41 rem *   poke 786,192 : high-byte der startadresse = 49152                  *
+   42 rem *                                                                      *
+   43 rem * die routine ist voll verschieblich und kann daher an jeder stelle im *
+   44 rem * speicher liegen. die adressen der usr-funktion sind dann entsprechend*
+   45 rem * anzupassen.                                                          *
+   46 rem *                                                                      *
+   47 rem ************************************************************************
+  100 s=0:input "startadresse";b
+  110 for i=b to b+335
+  120 read a
+  130 s=s+a:poke i,a
+  140 next i
+  150 if s<>36986 then print "{rvon} fehler in den datazeilen {rvof}":stop
+  160 poke 785,b-256*int(b/256):poke 786,b/256
+  170 print " alles ok. "
+  199 rem testbeispiele
+  200 for e=0 to 9
+  210 f=~*10^e
+  220 a$=(usr(f),11,0)+""
+  230 print a$;usr(f),13,1;usr(f),14,2
+  240 next e
+  250 end
+  299 rem datazeilen
+  300 data32,141,173,32,221,189,32,253,174,32,158,183,134,88,32,253,174,32
+  301 data158,183,134,87,104,104,162,255,160,0,232,189,0,1,240,117,201,69,240
+  302 data8,201,46,208,242,138,168,208,238,173,2,1,201,46,208,12,202,160,1
+  303 data200,185,1,1,153,0,1,208,247,189,2,1,41,15,10,133,2,10,10,101,2,125
+  304 data3,1,233,47,188,1,1,192,45,240,23,105,3,134,2,229,2,168,169,48,157
+  305 data0,1,232,136,208,249,169,0,157,0,1,240,168,133,2,169,0,157,0,1,138
+  306 data24,101,2,168,189,0,1,240,8,201,48,176,4,169,48,208,1,202,153,0,1
+  307 data136,208,236,169,46,141,1,1,208,129,152,240,18,165,87,208,7,152,170
+  308 data189,1,1,208,119,169,44,153,0,1,208,12,196,87,240,40,169,44,157,0
+  309 data1,232,208,16,132,2,56,138,229,2,56,233,1,197,87,240,19,176,72,168
+  310 data169,48,157,0,1,232,200,196,87,208,247,169,0,157,0,1,173,1,1,201,48
+  311 data176,17,232,138,168,185,255,0,153,0,1,136,208,247,169,48,141,1,1,228
+  312 data88,176,20,164,88,189,0,1,153,0,1,136,202,16,246,169,32,153,0,1,136
+  313 data16,250,169,0,160,1,76,135,180,56,229,87,133,2,138,56,229,2,170,189
+  314 data0,1,201,53,144,179,138,168,136,240,24,185,0,1,201,48,144,246,24,105
+  315 data1,201,58,153,0,1,208,157,169,48,153,0,1,208,229,138,168,185,0,1,153
+  316 data1,1,136,208,247,169,49,141,1,1,232,208,131
+

@@ -1,0 +1,371 @@
+
+
+;formel-druck.prg ==0801==
+   10 rem ********************************
+   20 rem *                              *
+   30 rem *        formel-druck          *
+   40 rem *                              *
+   50 rem *     1985 by patrick boedeker *
+   60 rem *             neustr. 11       *
+   70 rem *        4350 recklinghausen   *
+   80 rem *                              *
+   90 rem ********************************
+  100 :
+  110 :
+  120 dimf$(50)
+  130 dimg$(18)
+  140 g$(1)="1/x"
+  150 g$(2)="x^2"
+  160 g$(3)="exp(x)"
+  170 g$(4)="sqr(x)"
+  180 g$(5)="sqr(exp(x))"
+  190 g$(6)="exp(sqr(x))"
+  200 g$(7)="sqr(x^(3*x+4))"
+  210 g$(8)="1/(7*x^6+3*x^2)"
+  220 g$(9)="(3*x^2-2*x+4)/(5*x^3+2*x-12)"
+  230 g$(10)="3*x^2-2*x+4/(5*x^3+2*x-12)"
+  240 g$(11)="(3*x^2-2*x+4)/5*x^3+2*x-12"
+  250 g$(12)="3*x^2-2*x+4/5*x^3+2*x-12"
+  260 g$(13)="(3*x^(7*x+4))/(2*x^2-7*x+2)"
+  270 g$(14)="exp(x)+sqr(x^4+x^3+x^2)/7*x^3+14"
+  280 g$(15)="(x^sqr(3*x+4)+sqr(x^4+3))/7"
+  290 g$(16)="exp(x)/sqr(x^3+4*x)+sqr(3*x)-1/x^2"
+  300 g$(17)="3/4*(7*x^2-3*x)+(7*x^2)/(14*x^3)"
+  310 g$(18)="sqr(x^23-4)+1/(3+x)-sqr(2*x^3)+1/x"
+ 1000 open1,4,8
+ 1010 print#1,"                              basic                    ";
+ 1020 print#1,"    formel-druck"
+ 1030 print#1:close1
+ 1040 fora=1to18
+ 1050 open1,4
+ 1060 print#1:print#1
+ 1070 print#1,chr$(27)" t"
+ 1080 print#1,"  Beispiel";a;" :   ";
+ 1090 print#1,chr$(27)" g";
+ 1100 print#1,g$(a);
+ 1110 close1
+ 1120 bb=55:f$=g$(a):gosub50000
+ 1130 nexta
+ 1140 open1,4,4:print#1,chr$(12):close1
+ 1150 end
+ 1160 :
+ 1170 :
+50000 rem *****************************
+50010 rem *                           *
+50020 rem *  ausgabe von mathemati-   *
+50030 rem *  schen formeln in bruch-, *
+50040 rem *  wurzel- und potenz-      *
+50050 rem *  schreibweise auf den     *
+50060 rem *  drucker fx-80 mit        *
+50070 rem *  goerlitz interface.      *
+50080 rem *                           *
+50090 rem *  die funktion muss in f$, *
+50100 rem *  der abstand vom linken   *
+50110 rem *  rand in bb uebergeben    *
+50120 rem *  werden                   *
+50130 rem *****************************
+50140 :
+50150 :
+50160 goto50180
+50170 t$=mid$(fu$,t,1):return
+50180 open1,4:open2,4,10,"7"
+50230 :
+50240 rem *********************
+50250 rem * zeichendefinition *
+50260 rem *********************
+50270 :
+50280 print#1,chr$(27);":";chr$(0);chr$(0);chr$(0);
+50290 print#1,chr$(27);"&";chr$(0);"%%";chr$(139);
+50300 print#1,chr$(0);chr$(4);chr$(4);chr$(3);chr$(2);chr$(4);
+50310 print#1,chr$(8);chr$(16);chr$(32);chr$(64);chr$(128);chr$(0);
+50320 print#1,chr$(27);"&";chr$(0);"&&";chr$(139);
+50330 print#1,chr$(128);chr$(128);chr$(128);chr$(128);chr$(128);chr$(128);
+50340 print#1,chr$(128);chr$(128);chr$(128);chr$(128);chr$(128);chr$(0);
+50350 print#1,chr$(27);"%";chr$(1);chr$(0);
+50360 fu$=f$
+50370 sc=0:y=0
+50390 print#1,chr$(27);"e";
+50400 l=len(fu$)
+50410 :
+50420 rem ***********************
+50430 rem * exponentialfunktion *
+50440 rem ***********************
+50450 :
+50460 i=1
+50470 t=i:gosub50170
+50480 ift$="e"then50520
+50490 i=i+1
+50500 ifi<=lthen50470
+50510 goto50620
+50520 forr=itoi+2
+50530 t=r:gosub50170
+50540 e$=e$+t$:nextr
+50550 ife$="exp"thenfu$=left$(fu$,i-1)+"e^"+right$(fu$,l-i-2):l=l-1
+50560 e$="":goto50490
+50570 :
+50580 rem ******************
+50590 rem * wurzelfunktion *
+50600 rem ******************
+50610 :
+50620 i=1
+50630 t=i:gosub50170
+50640 ift$="s"then50680
+50650 i=i+1
+50660 ifi<=lthen50630
+50670 goto50780
+50680 forr=itoi+2
+50690 t=r:gosub50170
+50700 e$=e$+t$:nextr
+50710 ife$="sqr"thenfu$=left$(fu$,i-1)+"%"+right$(fu$,l-i-2):l=l-2
+50720 e$="":goto50650
+50730 :
+50740 rem *****************************
+50750 rem *gebrochenrationale funktion*
+50760 rem *****************************
+50770 :
+50780 i=1:kl=0
+50790 t=i:gosub50170
+50800 ift$="("thenkl=kl+1
+50810 ift$=")"thenkl=kl-1
+50820 ift$="/"andkl>0then50840
+50830 ift$="/"then50980
+50840 i=i+1
+50850 ifi<=lthen50790
+50860 :
+50870 rem **************************
+50880 rem * ganzrationale funktion *
+50890 rem **************************
+50900 :
+50910 sc=sc+1:f$(sc)=fu$
+50920 goto51320
+50930 :
+50940 rem *******************
+50950 rem * faktorzerlegung *
+50960 rem *******************
+50970 :
+50980 wr=i:kl=0
+50990 wr=wr-1:t=wr:gosub50170
+51000 ift$=")"thenkl=kl+1
+51010 ift$="("thenkl=kl-1
+51020 ift$="+"andkl=0then51070
+51030 ift$="-"andkl=0then51070
+51040 ift$="*"andkl=0then51070
+51050 ifwr=1thenwr=0:goto51070
+51060 goto50990
+51070 wr=i-wr-1
+51080 wv=i
+51090 wv=wv+1:t=wv:gosub50170
+51100 ift$="("thenkl=kl+1
+51110 ift$=")"thenkl=kl-1
+51120 ift$="+"andkl=0thenwv=wv-1:goto51170
+51130 ift$="-"andkl=0thenwv=wv-1:goto51170
+51140 ift$="*"andkl=0thenwv=wv-1:goto51170
+51150 ifwv=lthen51170
+51160 goto51090
+51170 wv=wv-i
+51180 ifkl<0thenwv=wv-1
+51190 sc=sc+1
+51200 f$(sc)=left$(fu$,i-1-wr)
+51210 fu$=right$(fu$,l-i+wr+1)
+51220 sc=sc+1
+51230 f$(sc)=left$(fu$,wr+wv+1)
+51240 f$(sc+1)=right$(fu$,l-i-wv)
+51250 fu$=right$(fu$,l-i-wv):l=len(fu$)
+51260 goto50780
+51270 :
+51280 rem ************
+51290 rem * schleife *
+51300 rem ************
+51310 :
+51320 y=y+1
+51330 ify>scthen53150
+51340 iff$(y)=""then51320
+51350 fu$=f$(y)
+51360 close4:open4,4,4
+51370 print#4,chr$(27);chr$(108);chr$(bb);
+51380 print#4,chr$(27);"e";
+51390 close2:open2,4,10,"7"
+51400 :
+51410 rem ***********
+51420 rem * bruch ? *
+51430 rem ***********
+51440 :
+51450 l=len(fu$)
+51460 i=1:kl=0
+51470 t=i:gosub50170
+51480 ift$="("thenkl=kl+1
+51490 ift$=")"thenkl=kl-1
+51500 ift$="/"andkl>0then51520
+51510 ift$="/"then51650
+51520 i=i+1
+51530 ifi<=lthen51470
+51540 :
+51550 rem **************
+51560 rem * kein bruch *
+51570 rem **************
+51580 :
+51590 ob$=fu$:ub$="":lo=l:bb=bb+l:goto52110
+51600 :
+51610 rem *************
+51620 rem * zerlegung *
+51630 rem *************
+51640 :
+51650 ob$=""
+51660 forj=1toi-1:t=j:gosub50170
+51670 ob$=ob$+t$:nextj:lo=len(ob$)
+51680 ifleft$(ob$,1)="("andright$(ob$,1)=")"thenob$=mid$(ob$,2,len(ob$)-2):lo=lo-2
+51690 ub$=""
+51700 forj=i+1tol:t=j:gosub50170
+51710 ub$=ub$+t$:nextj:lu=len(ub$)
+51720 ifleft$(ub$,1)="("andright$(ub$,1)=")"thenub$=mid$(ub$,2,len(ub$)-2):lu=lu-2
+51730 :
+51740 rem ****************
+51750 rem * potenzanzahl *
+51760 rem ****************
+51770 :
+51780 z=0:wo=0:wu=0
+51790 i=0:kl=0:z=z+1
+51800 i=i+1
+51810 ifz=1thent$=mid$(ob$,i,1)
+51820 ifz=2thent$=mid$(ub$,i,1)
+51830 ift$="^"then51870
+51831 ifz=1andt$="%"thenwo=wo+2
+51832 ifz=2andt$="%"thenwu=wu+2
+51840 ifz=1andi<lothen51800
+51850 ifz=2andi<luthen51800
+51860 goto52000
+51870 ifz=1thent$=mid$(ob$,i,1)
+51880 ifz=2thent$=mid$(ub$,i,1)
+51890 ift$="("thenkl=kl+1
+51900 ift$=")"andkl=0then51800
+51910 ift$=")"andkl>0thenkl=kl-1
+51920 ift$="+"andkl=0then51800
+51930 ift$="-"andkl=0then51800
+51940 ift$="*"andkl=0then51800
+51945 ift$="/"andkl=0then51800
+51950 i=i+1
+51960 ift$=""then52000
+51970 ifz=1thenwo=wo+.5:ift$="^"thenwo=wo+.5
+51980 ifz=2thenwu=wu+.5:ift$="^"thenwu=wu+.5
+51990 goto51870
+52000 ifz=1then51790
+52030 iflo-wo+1.5<lu-wuthenob$=" "+ob$+" ":lo=lo+2:d=1:goto52030
+52040 ifd=1thend=0:goto52060
+52050 iflu-wu+1.5<lo-wothenub$=" "+ub$+" ":lu=lu+2:goto52050
+52060 :
+52070 rem *******************
+52080 rem * zaehler drucken *
+52090 rem *******************
+52100 :
+52110 m=0
+52120 print#1,chr$(27);"e";
+52130 ifub$<>""thenprint#4,chr$(27);chr$(106);chr$(22);:close3:open3,4,10,"7"
+52140 o=1:z=1
+52150 t=o:t$=mid$(ob$,t,1)
+52160 ift$="^"thene=o:gosub52580:o=e:m=m+1
+52170 ift$="%"thenq=o:gosub52910:o=q
+52180 ifs=1thens=0:goto52200
+52190 print#1,t$;
+52200 o=o+1
+52210 ifo<=lothen52150
+52220 ifub$=""thenprint#1:print#4,chr$(27);chr$(106);chr$(21):close3:open3,4,10,"7"
+52225 ifub$=""thenbb=bb-int(m-.5):goto51320
+52230 :
+52240 rem ***************
+52250 rem * bruchstrich *
+52260 rem ***************
+52270 :
+52280 close3:open3,4,9,"7"
+52290 print#3
+52300 iflo-wo<=lu-wuthenaa=lu-wu+.5
+52310 iflo-wo>=lu-wuthenaa=lo-wo+.5
+52320 fori=1toint(aa)
+52330 print#3,"{SHIFT-*}";:nexti
+52340 print#3
+52350 close3:open3,4,10,"7"
+52360 bb=bb+int(aa+1)
+52370 :
+52380 rem ******************
+52390 rem * nenner drucken *
+52400 rem ******************
+52410 :
+52420 u=1:z=2
+52430 t=u:t$=mid$(ub$,t,1)
+52440 ift$="^"thene=u:gosub52580:u=e
+52450 ift$="%"thenq=u:gosub52910:u=q
+52460 ifs=1thens=0:goto52480
+52470 print#1,t$;
+52480 u=u+1
+52490 ifu<=luthen52430
+52500 print#1
+52510 print#4,chr$(27);chr$(106);chr$(40);
+52520 goto51320
+52530 :
+52540 rem ******************
+52550 rem * potenzausdruck *
+52560 rem ******************
+52570 :
+52580 close3:open3,4,9,"7"
+52590 print#1,chr$(27);"f";
+52600 print#1,chr$(27);"s";chr$(0);chr$(15);
+52610 e=e+1
+52620 t=e
+52630 ifz=1thent$=mid$(ob$,t,1):ao=ao+.5
+52640 ifz=2thent$=mid$(ub$,t,1):au=au+.5
+52645 ift$="%"thenq=e:pp=0:gosub52910:e=q:m=m+pp
+52650 ift$="("thenek=ek+1
+52660 ift$=")"andek=0then52810
+52670 ift$=")"andek>0thenek=ek-1
+52680 ift$="+"andek=0then52810
+52690 ift$="-"andek=0then52810
+52700 ift$="*"andek=0then52810
+52705 ift$="/"andek=0then52810
+52710 print#1,t$;
+52720 ifww=1thenprint#4,chr$(27);chr$(106);chr$(3);:close3:open3,4,10,"7"
+52730 ifww=1thenprint#1,chr$(8);
+52740 ifww=1thenprint#1,"&";
+52750 ifww=1thenprint#4,chr$(27);chr$(74);chr$(3);:close3:open3,4,9,"7"
+52760 m=m+.5
+52770 ifz=1ande=lothens=1:goto52810
+52780 ifz=2ande=luthens=1:goto52810
+52790 e=e+1
+52800 goto52620
+52810 print#4,chr$(27);chr$(84);chr$(18);
+52820 ek=0
+52830 print#1,chr$(27);"e";
+52840 close3:open3,4,10,"7"
+52850 return
+52860 :
+52870 rem ******************
+52880 rem * wurzelausdruck *
+52890 rem ******************
+52900 :
+52910 print#1,"%";:kl=1:q=q+1:ww=1:wm=0
+52920 q=q+1
+52930 t=q
+52940 ifz=1thent$=mid$(ob$,t,1)
+52950 ifz=2thent$=mid$(ub$,t,1)
+52960 ift$="^"thene=q:gosub52580:q=e:wm=wm+1
+52970 ifs=1thens=0:goto52920
+52980 ift$="("thenkl=kl+1
+52990 ift$=")"thenkl=kl-1
+53000 ift$=")"andkl=0thens=1:goto53070
+53010 print#1,t$;
+53015 pp=pp+.5
+53020 print#4,chr$(27);chr$(106);chr$(3);:close3:open3,4,10,"7"
+53030 print#1,chr$(8);
+53040 print#1,"&";
+53050 print#4,chr$(27);chr$(74);chr$(3);:close3:open3,4,10,"7"
+53060 goto52920
+53070 ww=0
+53080 m=m+wm+2
+53090 return
+53100 :
+53110 rem ********
+53120 rem * ende *
+53130 rem ********
+53140 :
+53150 print#4,chr$(27);"@";:close1:close2:close3:close4
+53160 open3,4,8,"12":close3
+53170 return
+

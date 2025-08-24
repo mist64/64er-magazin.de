@@ -1,0 +1,95 @@
+
+
+;autostart c64 pl.prg ==0801==
+    1 rem *********************************
+    2 rem *********************************
+    3 rem **     autostart c64  plus     **
+    4 rem **-----------------------------**
+    5 rem **  written 1984 by jan kusch  **
+    6 rem **     (c) by sps-software     **
+    7 rem *********************************
+    8 rem *********************************
+    9 rem
+  100 poke643,peek(45):poke55,peek(45):poke644,peek(46)+3:poke56,peek(46)+3:clr
+  101 print"{ensh}{swlc}{dish}{clr}{rvon}{down}  *  *  *  Autostart C64 Plus  *  *  *  "
+  102 c$="                                      ":o$=chr$(0)
+  103 print"Datachecking{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}";:             gosub142
+  104 restore:open15,8,15:forx=0to112:reada:poke828+x,a:next
+  105 a$="Enter Sourcefilename":gosub133:sf$=t$
+  106 a$="Enter Targetfilename":gosub133:tf$=t$
+  107 print"{down}":a$="Basicprogramm ":gosub138:ba$=t$
+  108 ifba$="j"thenprint"{down}"c$:printc$:sa=42926:nf$="n":goto111
+  109 print:a$="Startadresse ":gosub140:sa=t:ifsa>65535thenprint"{up}{up}{up}":goto109
+  110 a$="Newflag":gosub138:nf$=t$
+  111 print:a$="Restoreprotect":gosub138:rs$=t$
+  112 a$="Stopprotect   ":gosub138:ss$=t$
+  113 print"Codeword            ";:cw$="":inputcw$
+  114 iflen(cw$)>10thenprint"{up}{up}":goto113
+  115 print"{down}":a$="Entery correct":gosub138:ift$="n"thenprint"{home}{down}{down}":goto105
+  116 print:forx=1to40:print"-";:next:input"Insert Source-Disk";t$
+  117 print"{up}"c$:print"{up}Loading:";:open1,8,2,sf$+",p,r":get#1,l1$,l2$
+  118 gosub135:sys831:gosub135:close1:input"{rvof}Insert Target-Disk";t$
+  119 print"{up}"c$:print"{up}Saving :";:open1,8,2,"@:"+tf$+",p,w":gosub135
+  120 forx=0to257:reada:print#1,chr$(a);:next
+  121 s1=int(sa/256):s2=sa-s1*256:print#1,chr$(s2);chr$(s1);
+  122 a0=asc(l1$+o$)+asc(l2$+o$)*256:a1=peek(251)+peek(252)*256
+  123 a2=1+peek(643)+peek(644)*256:a3=(a1-a2)+a0:p1=int(a3/256):p2=a3-p1*256
+  124 print#1,chr$(p2);chr$(p1);
+  125 a=237:ifrs$="j"thena=225
+  126 print#1,chr$(a);:a=49:ifss$="j"thena=52
+  127 print#1,chr$(a);:a=0:ifnf$="j"thena=1
+  128 print#1,chr$(a);:ifcw$=""thenprint#1,chr$(0)"1234567890";:goto130
+  129 print#1,cw$chr$(0);:iflen(cw$)<10thenprint#1,left$(c$,10-len(cw$));
+  130 sys828:gosub135:close1:print:a$="{down}Restart Programm":gosub138:close15
+  131 ift$="j"thenrun
+  132 sys64738
+  133 t$="":printa$;:inputt$:ift$=""orlen(t$)>16thenprint"{up}{up}":goto133
+  134 return
+  135 input#15,a,b$,c,d:print"{rvon}"a;b$;c;d,
+  136 ifa<2thenreturn
+  137 forx=1to15:close1:next:print:print"?Disk-Error";:forx=1to5000:next:run
+  138 t$="":printa$" (j/n)";:inputt$:ift$<>"j"andt$<>"n"thenprint"{up}{up}":goto138
+  139 return
+  140 t$="":printa$;:inputt$:t=val(t$):ift$=""ort=0thenprint"{up}{up}":goto140
+  141 return
+  142 p1=15862:s=0:forx=0to112:reada:s=s+a:next:ifs<>p1then144
+  143 p2=32966:p=1:s=0:forx=0to257:reada:s=s+a:next:ifs=p2thenreturn
+  144 print"?dataerror"p+1,"pruefsumme:"s
+  145 data 76, 121, 3, 173, 131, 2, 24, 105, 1
+  146 data 133, 251, 173, 132, 2, 105, 0, 133, 252, 162, 1
+  147 data 32, 198, 255, 169, 253, 37, 144, 133, 144, 32, 225
+  148 data 255, 32, 207, 255, 160, 48, 120, 132, 1, 160, 0
+  149 data 145, 251, 160, 55, 132, 1, 88, 36, 144, 112, 57
+  150 data 230, 251, 208, 222, 230, 252, 208, 218, 162, 1, 32
+  151 data 201, 255, 160, 48, 120, 132, 1, 160, 0, 177, 251
+  152 data 160, 55, 132, 1, 88, 73, 255, 32, 210, 255, 32
+  153 data 225, 255, 165, 251, 208, 2, 198, 252, 198, 251, 165
+  154 data 251, 205, 131, 2, 208, 219, 165, 252, 205, 132, 2
+  155 data 208, 212, 76, 204, 255
+  156 rem
+  157 rem
+  158 data 168, 2, 238, 32, 208, 76, 168, 2, 174, 170, 3
+  159 data 134, 174, 172, 171, 3, 132, 175, 134, 45, 132, 46
+  160 data 32, 112, 3, 144, 251, 32, 239, 237, 32, 66, 246
+  161 data 169, 0, 141, 6, 128, 32, 21, 253, 32, 83, 228
+  162 data 173, 173, 3, 141, 20, 3, 173, 172, 3, 141, 40
+  163 data 3, 173, 174, 3, 240, 3, 32, 68, 166, 169, 0
+  164 data 76, 152, 3, 3, 255, 165, 174, 201, 186, 240, 65
+  165 data 96, 83, 80, 83, 32, 83, 79, 70, 84, 87, 65
+  166 data 82, 69, 139, 227, 131, 164, 124, 165, 26, 167, 228
+  167 data 167, 134, 174, 1, 2, 3, 50, 76, 72, 178, 0
+  168 data 49, 234, 102, 254, 168, 2, 74, 243, 145, 242, 14
+  169 data 242, 80, 242, 51, 243, 87, 241, 202, 241, 237, 2
+  170 data 62, 241, 47, 243, 102, 254, 165, 244, 237, 245, 162
+  171 data 10, 189, 143, 3, 157, 0, 128, 202, 208, 247, 169
+  172 data 0, 133, 153, 170, 134, 198, 134, 251, 189, 175, 3
+  173 data 240, 17, 32, 62, 241, 240, 251, 166, 251, 221, 175
+  174 data 3, 208, 230, 232, 230, 251, 208, 234, 170, 160, 245
+  175 data 238, 32, 208, 238, 33, 208, 232, 208, 247, 200, 208
+  176 data 244, 76, 174, 2, 169, 253, 37, 144, 133, 144, 32
+  177 data 19, 238, 73, 255, 160, 0, 145, 174, 165, 174, 208
+  178 data 2, 198, 175, 198, 174, 36, 144, 80, 2, 56, 36
+  179 data 24, 96, 168, 2, 168, 2, 195, 194, 205, 56, 48
+  180 data 141, 0, 8, 32, 113, 168, 32, 51, 165, 32, 167
+  181 data 3, 76, 84, 168, 76
+

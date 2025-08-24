@@ -1,0 +1,149 @@
+
+
+;linker 64.prg ==0801==
+   10 rem *********************
+   20 rem *    linker 64      *
+   30 rem * (c) andreas knipp *
+   40 rem *********************
+   50 poke53280,4:poke53281,5
+   60 u$="{clr}{orng}{rvon}                                        {rvof}"+chr$(13)
+   70 u$=u$+"{wht}           l i n k e r   6 4"+chr$(13)
+   80 u$=u$+"      {down}programmed by andreas knipp"+chr$(13)
+   90 printu$
+  100 open15,8,15,"i":gosub960
+  110 z=0:a$="":ll$="                                     "+chr$(13)+"{up}"
+  120 input"{home}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}zeilennummer ";zn
+  130 input"{down}text         ";t$
+  140 printll$zn;"sysRRRRR "t$
+  150 input"{down}name des generierten prg";na$:x$=na$:gosub950
+  160 ifc1=0thenprint"{up}"na$"  bereits vorhanden        ":goto120
+  170 input"{down}wieviele prg werden verkettet ";k
+  180 print"{down}verschiebeprg vor (=0)"
+  190 input"oder nach (=1) programmblock";lh
+  200 input"{down}alles richtig j/n";ar$
+  210 ifar$<>"j"then120
+  220 dimna(20),ne(20),s(20),e(20),n$(20),n1$(20)
+  230 z=2064+len(t$)
+  240 iflh=0thense=z:z=z+k*40:pa=z
+  250 iflhthenz=z+2
+  260 printu$
+  270 foru=1tok
+  280 print"name des"u"{left}.prg":inputn$(u):n1$(u)=n$(u)
+  290 x$=n$(u):gosub950
+  300 ifc1thenprint"dises prg gibt es nicht":goto280
+  310 nextu
+  320 foru=1tok
+  330 f$=n$(u):gosub1120
+  340 print"{down}{down}startadresse von  "n$(u):print"{rght}"sa:input"{up}";sa
+  350 ea=sa+v
+  360 na(u)=sa:ne(u)=ea:s(u)=z
+  370 e(u)=s(u)+v:z=e(u)+2
+  380 nextu
+  390 iflh=0thenz=se
+  400 iflh=1thenz=z-2:se=z
+  410 open3,8,3,"@:+v,p,w"
+  420 printu$"{down}{down}{down}{down}{down}"
+  430 fori=1tok:printi,n$(i):next:printk+1,"ende":n$(k+1)="~"
+  440 input"naechste prg-nummer";u:ifu>k+1orn$(u)=""then440
+  450 ifu=k+1then800
+  460 n$(u)=""
+  470 ife(u)=ne(u)goto740
+  480 ife(u)>ne(u)goto590
+  490 a=s(u):gosub940
+  500 print#3,chr$(169)chr$(al)chr$(133)chr$(95)chr$(169);
+  510 print#3,chr$(ah)chr$(133)chr$(96);
+  520 a=e(u)+1:gosub940
+  530 print#3,chr$(169)chr$(al)chr$(133)chr$(90)chr$(169);
+  540 print#3,chr$(ah)chr$(133)chr$(91);
+  550 a=ne(u)+1:gosub940
+  560 print#3,chr$(169)chr$(al)chr$(133)chr$(88)chr$(169);
+  570 print#3,chr$(ah)chr$(133)chr$(89);
+  580 print#3,chr$(32)chr$(191)chr$(163);:z=z+27:goto740
+  590 a=s(u):gosub940:a1=z+4
+  600 print#3,chr$(160)chr$(0)chr$(185)chr$(al)chr$(ah)chr$(153);
+  610 z=z+6:a=na(u):gosub940:a2=z+1
+  620 print#3,chr$(al)chr$(ah)chr$(200)+chr$(192);:a=ne(u)+1-al
+  630 gosub940:z=z+4
+  640 a3=ah
+  650 print#3,chr$(al)chr$(240)chr$(12)chr$(152)chr$(208);
+  660 print#3,chr$(242)chr$(238);
+  670 z=z+7:a=a1:gosub940
+  680 print#3,chr$(al)chr$(ah)chr$(238);
+  690 z=z+3:a=a2:gosub940
+  700 print#3,chr$(al)chr$(ah)chr$(24)chr$(144)chr$(233);
+  710 print#3,chr$(173)chr$(al)chr$(ah);
+  720 z=z+8
+  730 print#3,chr$(201)chr$(a3)chr$(144)chr$(237);:z=z+4
+  740 input"einsprung: 0=keiner,1=jsr,2=jmp";e:ife<0ore>2then740
+  750 ife=1ore=2theninput"einsprung";a:gosub940:ifint(ah/256)goto750
+  760 ife=2thenprint#3,chr$(76)chr$(al)chr$(ah);:z=z+3
+  770 ife=1thenprint#3,chr$(32)chr$(al)chr$(ah);:z=z+3
+  780 ife<>0then740
+  790 goto420
+  800 iflh=0thenforu=(z+1)to(pa-2):print#3,chr$(rnd(u)*255);:next
+  810 close3
+  820 sa$=mid$(str$(se)+"     ",2,5)
+  830 open2,8,2,"@:+s,p,w":gosub960
+  840 a=zn:gosub940
+  850 print#2,chr$(1)chr$(8)chr$(13+len(t$))chr$(8);
+  860 print#2,chr$(al);
+  870 print#2,chr$(ah);
+  880 print#2,chr$(158);
+  890 print#2,sa$+" "+t$;
+  900 fori=1to4
+  910 print#2,chr$(0);:next:close2
+  920 iflhthenprint#15,"r:Q=+s":gosub960:goto1000
+  930 print#15,"c:Q=+s,+v":gosub960:goto1000
+  940 ah=int(a/256):al=a-ah*256:return
+  950 open6,8,6,x$:close6
+  960 input#15,c1,c$,c2,c3:ifc1=0orc1=62thenreturn
+  970 printc1,c$,c2,c3
+  980 print"programmabbruch!!!!"
+  990 close15:sys65511:open1,8,15,"s:+?":close1:end
+ 1000 fori=1tok:n$(i)=n1$(i)
+ 1010 n1$(i)="+"+right$(str$(i),1):print#15,"r:"+n1$(i)+"="+n$(i):next
+ 1020 bs$="c:W=Q,"
+ 1030 fori=1tok
+ 1040 bs$=bs$+n1$(i)
+ 1050 ifi=kthen1070
+ 1060 bs$=bs$+","
+ 1070 next
+ 1080 iflhthenbs$=bs$+",+v"
+ 1090 print#15,bs$:gosub960:print#15,"s:Q"
+ 1100 fori=1tok:print#15,"r:"+n$(i)+"="+n1$(i):next
+ 1110 print#15,"r:"+na$+"=W":goto990
+ 1120 open2,8,2,"#"
+ 1130 t=18:s=1
+ 1140 print#15,"u1";2;0;t;s
+ 1150 print#15,"b-p";2;0
+ 1160 gosub1440:t=a
+ 1170 gosub1440:s=a
+ 1180 forx=0to7
+ 1190 print#15,"b-p";2;x*32+3
+ 1200 gosub1440:t1=a
+ 1210 gosub1440:s1=a
+ 1220 ff$=""
+ 1230 fory=1to16
+ 1240 gosub1440
+ 1250 ifff$=f$then1310
+ 1260 ff$=ff$+a$
+ 1270 ifa$<>mid$(f$,y,1)theny=16
+ 1280 nexty
+ 1290 nextx
+ 1300 goto1140
+ 1310 printu$"{down}{down}{down}in verarbeitung:{rvon}"+f$+"{rvof}"
+ 1320 t=t1:s=s1
+ 1330 print#15,"u1";2;0;t;s:printll$;t,s:print"{up}";
+ 1340 print#15,"b-p";2;0
+ 1350 gosub1440:t=a
+ 1360 gosub1440:s=a
+ 1370 ifq=0thenq=1:gosub1440:sl=a:gosub1440:sh=a:sa=sl+sh*256
+ 1380 ift=0thenea=sa+pz*254+s-3:v=ea-sa:goto1400
+ 1390 pz=pz+1:goto1330
+ 1400 print"{down}startadresse:"sa
+ 1410 print"endadresse  :"ea
+ 1420 print"verbrauch   :"v
+ 1430 close2:q=0:pz=0:return
+ 1440 get#2,a$:ifa$=""thena$=chr$(0)
+ 1450 a=asc(a$):return
+

@@ -1,0 +1,52 @@
+
+
+;test.prg ==0801==
+   15 rem----- schreiben der records ----
+   20 \init
+   25 print" Daten eingeben Abbruch mit *"
+   30 \random,2,"test1",30,50
+   40 input"vorname";vo$:ifvo$="*"then120
+   50 input"familienname";fa$
+   60 input"recordnr";rn
+   70 \clear
+   80 \write,0,vo$,10,10,fa$,20
+  100 \put,2,rn,30
+  110 goto40
+  120 close2
+  130 rem------ lesen der records ------
+  135 print"{down} Daten lesen abbruch mit 100{down}{down}"
+  140 \random,2,"test1",30,50
+  150 input"recordnr";rn:ifrn>50then220
+  160 \clear
+  170 \get,2,rn,30
+  180 \read,0,10,vo$,10,20,fa$
+  200 print vo$,fa$
+  210 goto150
+  220 close2
+  300 rem------ normale files ---------
+  310 print" demonstration von trans und fetch"
+  320 \open,3,"@:test2,s,w"
+  330 fora=0to100:print#3,a:next
+  340 close3
+  350 \open,3,"test2,s,r"
+  360 open1,3  :rem bildschirm
+  370 \trans,3,1
+  380 \clall
+  390 \open,3,"test2,s,r"
+  400 \fetch,3,150,a$
+  410 print a$
+  420 close3
+  440 rem------ binaer-files -----------
+  450 print" schreiben von 1000 zufallszahlen
+  460 \open,3,"@:test3,s,w":ti$="000000"
+  470 fora=1to1000
+  480 z=rnd(1):\comp,z,z$
+  490 print#3,z$;
+  500 next:close3:printti$" sec"
+  510 print" lesen von 1000 zufallszahlen
+  520 \open,3,"test3,s,r":ti$="000000"
+  530 fora=1to1000
+  540 \fetch,3,5,z$ :rem  5=laenge eines real-'strings'
+  550 \recomp,z$,z
+  560 next:close3:printti$" sec"
+

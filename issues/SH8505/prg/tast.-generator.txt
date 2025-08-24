@@ -1,0 +1,86 @@
+
+
+;tast.-generator.prg ==0801==
+ 1000 rem    tastatur-generator
+ 1010 rem
+ 1020 rem 1985 von markus stecher
+ 1030 rem
+ 1040 poke53280,0
+ 1050 poke53281,0
+ 1060 sys49152
+ 1070 sys49152+3
+ 1080 dimb$(255)
+ 1090 gosub1700:gosub1740
+ 1100 print"{clr}{rvon}           tastatur-generator           ";chr$(8)
+ 1110 poke1,53
+ 1120 print"welche taste ? ";
+ 1130 z$=""
+ 1140 geta$:ifa$=""then1140
+ 1150 ifa$=chr$(13)then1180
+ 1160 z$=z$+a$
+ 1170 goto1140
+ 1180 z=val(z$)
+ 1190 printchr$(34);chr$(20);chr$(z)
+ 1200 b$=b$(z):cr=0
+ 1210 l=len(b$(z))
+ 1220 ifright$(b$,1)=chr$(13)thenb$=left$(b$,l-1):cr=1
+ 1230 print"{down}alte belegung: ";chr$(34);b$;chr$(34);
+ 1240 ifcrthenprint"+chr$(13)";
+ 1250 print:print"{down}neue belegung: {SHIFT--}           {SHIFT--}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}{left}";chr$(34);chr$(20);
+ 1260 poke1,55
+ 1270 f$=""
+ 1280 geta$:ifa$=""then1280
+ 1290 ifa$=chr$(20)thenprint:print"{up}{up}{up}{up}":goto1250
+ 1300 ifa$=chr$(13)then1370
+ 1310 ifa$=chr$(141)then1360
+ 1320 iflen(f$)=10then1280
+ 1330 printa$;
+ 1340 f$=f$+a$
+ 1350 goto1280
+ 1360 f$=f$+chr$(13)
+ 1370 iff$=""thenf$=b$(z)
+ 1380 al$=b$(z)
+ 1390 b$(z)=f$
+ 1400 print
+ 1410 print"{down}{down}bitte waehlen:"
+ 1420 print"{down}naechste eingabe.............1"
+ 1430 print"{down}letzte eingabe loeschen......2"
+ 1440 print"{down}tastaturbelegung speichern...3"
+ 1450 print"{down}alte belegung herstellen.....4"
+ 1460 print"{down}ende.........................5{down}{down}"
+ 1470 geta$:ifa$<"1"ora$>"5"then1470
+ 1480 onval(a$)goto1490,1500,1520,1610,1660
+ 1490 goto1100
+ 1500 b$(z)=al$
+ 1510 goto1100
+ 1520 input"{clr}{down}{down}name ";n$
+ 1530 print"{down}{down}<d>isk oder <t>ape ? ";
+ 1540 getg$:ifg$<>"d"andg$<>"t"then1540
+ 1550 ga=1
+ 1560 ifg$="d"thenga=8
+ 1570 print"{down}{down}bitte warten"
+ 1580 gosub1780
+ 1590 sys49152+12,n$,ga
+ 1600 goto1100
+ 1610 print"{clr}{down}{down}soll wirklich die alte belegung"
+ 1620 print"{down}hergestellt werden (j/n) ?"
+ 1630 geta$:ifa$=<>"j"anda$<>"n"then1630
+ 1640 ifa$="j"thensys49152+9
+ 1650 goto1100
+ 1660 print"{clr}{down}{down} auf wiedersehen !"
+ 1670 gosub1780
+ 1680 poke1,53
+ 1690 end
+ 1700 fori=0to255
+ 1710 #i,str$(i)+chr$(13)
+ 1720 nexti
+ 1730 return
+ 1740 fori=0to255
+ 1750 b$(i)=chr$(i)
+ 1760 nexti
+ 1770 return
+ 1780 fori=0to255
+ 1790 #i,b$(i)
+ 1800 nexti
+ 1810 return
+

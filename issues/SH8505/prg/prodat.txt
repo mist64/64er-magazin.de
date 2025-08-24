@@ -1,0 +1,404 @@
+
+
+;prodat.prg ==0801==
+   10 rem ************************
+   20 rem *                      *
+   30 rem * p  r  o  d  a  t     *
+   40 rem *                      *
+   50 rem * autor: wolfgang hahn *
+   60 rem * an der stadtmauer 12 *
+   70 rem * 8687 weissenstadt    *
+   80 rem * telefon: 09253/1744  *
+   90 rem *                      *
+  100 rem ************************
+  110 :
+  120 printchr$(14):gosub2980:print"{down}{down}{down}{down}{down}{down}4 sek.":gosub3820
+  130 poke90,0:poke91,192:poke88,0:poke89,192:poke780,0:poke781,160:sys820
+  140 poke90,0:poke91,0:poke88,0:poke89,0:poke780,0:poke781,224:sys820:poke1,53
+  150 s=44136:fori=stos+8step4:pokei,0:next:s=43991:pokes,3:pokes+1,172:s=42349
+  160 pokes,228:pokes+1,180:fori=s+4tos+8:pokei,234:next:poke59012,96
+  170 poke1,55:clr:gosub3980
+  180 rem  h a u p t m e n u e
+  190 gosub2980:print"-1- Definierte Datei benutzen"
+  200 print"{down}-2- Neue Datei definieren"
+  210 print"{down}-3- Druckparameter aendern"
+  220 e=2:gosub2970
+  230 print"-4- Directory laden"
+  240 print"{down}-5- File loeschen"
+  250 print"{down}-6- Validate"
+  260 print"{down}-7- Disk formatieren"
+  270 print"{down}-8- File umbenennen"
+  280 gosub3010:ife<1ore>8then280
+  290 onegosub690,330,320,3200,3420,3500,3550,3610
+  300 goto190
+  310 rem  n e u e  d a t e i  d e f .
+  320 x=-1:ifd=0thenreturn
+  330 gosub2950:print"{home}{down}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght} Neue Datei definieren {down}{down}":ifx=-1goto540
+  340 print"{down}Mit Hardcopy (j/n/^=zurueck)":gosub3010:ife$="^"thenreturn
+  350 print"{clr}"
+  360 print"{home}";:poke1,53:poke58879,133:poke59639,24:poke780,0:sys58826:poke1,55:sys895
+  370 ife$<>"j"then390
+  380 gosub2670:sys932:ifl=2goto380
+  390 clr:gosub3980:f=1:a1%=-1
+  400 fori=1024to1983:ifpeek(i)<>30goto450
+  410 a%(f,y)=(i-1024)/40:pokei,32:forz=0to79:ifpeek(i+z)<>30thennextz
+  420 y=y+1:a%(f,y)=i-(a%(f,y-1)*40+1024):y=y+1:a%(f,y)=z:y=0:i=i+z:ifz=80theni=i-1
+  430 ifz<80thenpokei,32
+  440 f=f+1:iff=40goto490
+  450 ifpeek(i)=31thena1%=(i-1024)/40:a2%=i-(a1%*40+1025):pokei,32
+  460 nexti:iff=1thenf=40:goto490
+  470 fori=1984to2023:ifpeek(i)=30orpeek(i)=31thenpokei,32
+  480 next:ifa%(f-1,0)=23anda%(f-1,2)>40thena%(f-1,2)=40
+  490 f=f-1:iff=39thenprint"{clr}{down}{down}Felderanzahl pruefen!!{down}",,t$:gosub3010:sys932:goto360
+  500 sys895:ifa2%<0thena2%=0
+  510 gosub2950:print"{home}{down}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght} Neue Datei definieren {down}{down}"
+  520 ifx=-1goto540
+  530 input"Name der Datei";na$:ifright$(na$,1)="*"goto530
+  540 print"Druckparameter eingeben!":poke180,81:poke129,1:poke1,53:poke58879,13
+  550 fori=0to59:printi+1"{left}. Druckzeile: ":e$=""
+  560 inpute$
+  570 ife$=""thenpz$(i)="0":goto600
+  580 pz$(i)=e$
+  590 ife$="_"goto610
+  600 next:pz$(60)="_"
+  610 poke129,32:poke1,55:input"alles richtig (j/n)";e$:ud=1
+  620 ife$="n"goto510
+  630 y=0:df=i:e$="m/"+left$(na$,14)
+  640 ifx=-1thenx=0:return
+  650 gosub3060
+  660 d$="0":d=0:gosub1650:iff1<>0theny=y+1:ify<2goto650
+  670 goto190
+  680 rem  h i l f s m e n u e
+  690 gosub2980:print"{down}{down}-1- Datei laden"
+  700 print"{down}-2- Datei pflegen"
+  710 print"{down}-3- Datei abspeichern"
+  720 print"{down}-4- Sortierroutine"
+  730 print"{down}-5- Additionsroutine"
+  740 print"{down}-6- Drucker-Menue"
+  750 print"{down}-^- Zurueck"
+  760 gosub3010:ife$="^"thenreturn
+  770 ife<1ore>6goto760
+  780 onegosub870,1110,1640,2070,3090,2790
+  790 goto690
+  800 rem  t e s t  f l o p p y
+  810 poke768,61:open1,8,15,"i":close1
+  820 ifst<>-128thenpoke768,139:return
+  830 gosub840:goto810
+  840 print"{clr}{down}{down}{down}{down}{down}":e=1:gosub2970:print"     Peripherie einschalten!!":printt$
+  850 gosub2970:gosub3010:return
+  860 rem  l o a d  f i l e
+  870 gosub2950:print"{home}{down}"spc(13)" Datei laden "
+  880 ifud=1andd<>0thenprint"{down}{down}{down}{down} Datei abspeichern?! (j/n){down}":printt$:gosub3010:ife$<>"n"thenreturn
+  890 clr:gosub3980
+  900 e$="":print"{home}{down}{down}{down}{down}{down}"a$"{down}Mit welcher Datei wollen Sie":input"arbeiten";e$
+  910 ifright$(e$,1)="*"goto870
+  920 ife$="^"goto1090
+  930 ife$=""then900
+  940 na$=e$
+  950 ud=0
+  960 e$="m/"+left$(na$,14):sys827(e$)e$:e=peek(141)*256+peek(140):poke139,peek(e)
+  970 poke140,peek(e+1):poke141,peek(e+2):gosub810:sys969:gosub3710:iff1goto870
+  980 open2,8,2,na$+",s,r":poke180,81
+  990 input#2,f:input#2,a1%:input#2,a2%
+ 1000 fori=1tof:forx=0to2:input#2,a%(i,x):nextx,i
+ 1010 input#2,df:poke1,54:fori=0todf:input#2,pz$(i):ifpz$(i)="_"goto1030
+ 1020 next
+ 1030 input#2,d
+ 1040 ifd=0goto1080
+ 1050 poke129,255:fori=1tod
+ 1060 input#2,fe$(i)
+ 1070 nexti:poke129,32
+ 1080 poke1,55:gosub3710:close2:iff1goto870
+ 1090 e=1:goto290
+ 1100 rem  a n z e i g e
+ 1110 ifud=3thenreturn
+ 1120 ds=0:ifd=0goto1340
+ 1130 fl=7:l=0:ifds<0ords=dgoto3040
+ 1140 print"{clr}";:fori=1to24:print"{lblu}                                        ";:next
+ 1150 print"{lblu}                                       {home}";
+ 1160 sys932:ifa1%<>-1thengosub1320
+ 1170 fori=1tof:gosub1310:printfe$(i+ds);:next
+ 1180 ifl=2thengosub2680
+ 1190 iffl=8goto2040
+ 1200 gosub3010
+ 1210 ife$="+"andds<dthends=ds+f:goto1130
+ 1220 ife$="-"andds>=0thends=ds-f:goto1130
+ 1230 ife$="{f1}"andfl<>9theny=0:gosub2460:goto1130
+ 1240 ife$="{f3}"andfl<>9thengosub2670:ifl=2goto1160
+ 1250 ife$="l"andfl<>9goto1800
+ 1260 ife$="s"andfl<>9goto1890
+ 1270 ife$="a"andfl<>9goto1350
+ 1280 ife$="e"thends=d:fl=0:goto1340
+ 1290 ife$="^"thenreturn
+ 1300 goto1200
+ 1310 poke214,a%(i,0):poke211,a%(i,1):sys58640:return
+ 1320 poke214,a1%:poke211,a2%:sys58640:printds/f+1:return
+ 1330 rem  i n p u t - r o u t .
+ 1340 print"{clr}":sys932
+ 1350 open3,3:poke204,0:ud=1
+ 1360 ifa1%<>-1thengosub1320
+ 1370 ifds+f>1499thengosub2420:goto1460
+ 1380 fori=1tof:poke1,53
+ 1390 y=0:x=len(fe$(ds+i)):gosub1310
+ 1400 sys861
+ 1410 gosub3010
+ 1420 ife$=chr$(13)thenprinte$;:goto1540
+ 1430 ife$="{f1}"andi>1theni=i-2:goto1570
+ 1440 ife$="{f3}"thenx=0:y=0:gosub1310:printleft$(a$,a%(i,2));:gosub1310:goto1400
+ 1450 ife$="{f5}"goto1860
+ 1460 ife$="{f7}"goto1600
+ 1470 ife$="{down}"andy<40anda%(i,2)>y+39theny=y+39:goto1500
+ 1480 ife$="{up}"andy>39theny=y-41:goto1500
+ 1490 ife$="{rvon}"ore$="{rvof}"ore$="{del}"ore$="{up}"ore$="{down}"ore$=chr$(148)ore$="{home}"ore$="{clr}"goto1410
+ 1500 y=y+1:ifx<ythenx=y
+ 1510 ife$="{left}"theny=y-2:ify<0theny=0:goto1410
+ 1520 printe$;:ify=a%(i,2)goto1540
+ 1530 goto1400
+ 1540 gosub1310:poke180,x
+ 1550 fe$(ds+i)="":poke213,80:poke129,255:input#3,fe$(ds+i):poke129,32:poke1,55
+ 1560 ifright$(fe$(ds+i),1)<>chr$(32)thenfe$(ds+i)=fe$(ds+i)+chr$(154)
+ 1570 nexti
+ 1580 ifflgoto1620
+ 1590 ds=ds+f:sys932:goto1360
+ 1600 ifflgoto1620
+ 1610 d=ds:ds=0
+ 1620 poke1,55:poke207,0:poke204,1:print#3,;:close3:x=0:goto1130
+ 1630 rem  s p e i c h e r n
+ 1640 ifd=0thenreturn
+ 1650 gosub2950:print"{home}{down}"spc(10)" Datei abspeichern "
+ 1660 print"{down}{down}{down}"w$
+ 1670 gosub810:ud=0
+ 1680 open2,8,2,"@:"+na$+",s,w"
+ 1690 print#2,f:print#2,a1%:print#2,a2%
+ 1700 fori=1tof:forx=0to2:print#2,a%(i,x):nextx,i
+ 1710 print#2,df:fori=0todf:print#2,pz$(i):ifpz$(i)="_"goto1730
+ 1720 next
+ 1730 print#2,d:ifd=0goto1770
+ 1740 fori=1tod
+ 1750 print#2,fe$(i)
+ 1760 nexti
+ 1770 close2:gosub3710
+ 1780 return
+ 1790 rem  d s  l o e s c h e n
+ 1800 poke214,24:poke211,0:sys58640:print"{rvon}Sind Sie Sicher? (j/n){rvof}";:gosub3010
+ 1810 ife$<>"j"ande$<>"J"goto1130
+ 1820 d=d-f:poke857,f*3:ifds=dthends=ds-f:goto1840
+ 1830 sys932:fori=ds+1todstepf:sys827fe$(i)fe$(i+f):next
+ 1840 goto1130
+ 1850 rem  b y t e s  f r e i
+ 1860 f1=peek(214):f2=peek(211):poke214,24:poke211,0:sys58640:sys861
+ 1870 print"[Frei:      ]{left}{left}{left}{left}{left}{left}{left}"fre(0);:poke214,f1:poke211,f2:sys58640:goto1410
+ 1880 rem  s u c h e n
+ 1890 gosub2950:print"{home}{down}"spc(12)" Suchen "
+ 1900 e$="":input"{down}{down}Feldnummer";e$:l=1
+ 1910 poke180,80:v=val(e$):ifv>fthenprint"{up}{up}";:goto1900
+ 1920 s$="":z=1:y=1:poke1,53:poke129,1:input"{down}{down}Suchwort: ";s$:poke1,55:poke129,32
+ 1930 ifs$=""goto1130
+ 1940 le=len(s$):p=f:ifv=0thenp=1:v=1
+ 1950 print"{clr}{down}{down}Anzahl Felder:"d:print"{down}      -stes Feld abgesucht"
+ 1960 forx=vtodstepp:print"{up}"x:e=len(fe$(x))-1:f1=e-l:ifle>egoto1990
+ 1970 fory=0toe:ify<=f1thenforz=1tole:ifmid$(s$,z,1)=mid$(fe$(x),y+z,1)thennext:goto2030
+ 1980 nexty
+ 1990 nextx
+ 2000 iffl=8goto1130
+ 2010 print"{down}'"s$"' nicht gefunden!!";
+ 2020 gosub3010:goto1160
+ 2030 ds=f*int((x-1)/f):fl=8:l=0:goto1160
+ 2040 gosub3010:ife$<>"j"goto1130
+ 2050 v=x+p:goto1950
+ 2060 rem  s o r t
+ 2070 ifd<f*2ord=0thenreturn
+ 2080 gosub2950:print"{home}{down}"spc(10)" Sortier-Routine "
+ 2090 print"{down}{down}-1- Alles alphabetisch sortieren"
+ 2100 print"{down}-2- Bestimmte Gruppen heraussortieren{down}":gosub2970:poke857,f*3
+ 2110 gosub3010:ife>2ore<1goto2110
+ 2120 ud=1:ife=2goto2230
+ 2130 poke1,54
+ 2140 print"{down}Geben Sie die Feldnummer ein nach der":input"sortiert werden soll: ";e$
+ 2150 y=val(e$):poke1,55:ify<1ory>fthenpoke214,11:sys58640:goto2130
+ 2160 print"{down}{down}":z=d/f:print"max."z"Durchgaenge{down}{down}":s=d-f:l=0
+ 2170 print"Durchgang: 1"
+ 2180 fore=1toz:l=0
+ 2190 fori=ytosstepf:iffe$(i)>fe$(i+f)thenl=1:x=i-y+1:sys827fe$(x+f)fe$(x)
+ 2200 nexti:iflthenprint,"{up}"e:nexte
+ 2210 goto1120
+ 2220 rem  s o r t  b e s t .  k r i t .
+ 2230 input"{down}Nach welchem Feld soll sort. werden";s$:s=val(s$):ifs>fgoto2230
+ 2240 poke180,80:poke129,1:poke1,53:input"{down}Sortierkriterium untere Grenze: ";x$
+ 2250 input"{down}Sortierkriterium obere Grenze: ";y$:poke1,55:poke129,32
+ 2260 print"{down}<1>Neue Datei od. Ausgabe auf <2>Drucker";
+ 2270 inpute$:fl=val(e$):iffl<1orfl>2goto2270
+ 2280 iffl=2thengosub2790:goto2320
+ 2290 input"{down}Name der Datei";n$:ifn$="^"thenreturn
+ 2300 e$="m/"+n$:gosub3060:iff1goto2380
+ 2310 na$=n$
+ 2320 ife$="^"thenreturn
+ 2330 ds=0:e=0:forl=stodstepf:e$=left$(fe$(l),len(y$)):ife$<x$ore$>y$goto2350
+ 2340 ds=l-s:onflgosub2400,2340,2470,2730
+ 2350 nextl
+ 2360 iffl=1thend=e:ds=d
+ 2370 iffl<>1thenopen4,4,7:print#4:close4:ud=0
+ 2380 return
+ 2390 rem  e i n s o r t i e r e n
+ 2400 sys827fe$(e+1)fe$(ds+1):e=e+f:return
+ 2410 rem  d a t e i  v o l l
+ 2420 poke207,0:poke204,1
+ 2430 print"{clr}{down}{down}{down}{down}":e=1:gosub2970:printspc(10)"Datei voll!!":printt$:gosub2970
+ 2440 gosub3010:e$="{f7}":return
+ 2450 rem  d r u c k 1
+ 2460 y=-1:gosub2860
+ 2470 open4,4,7
+ 2480 x=0:y=0:ife<>1goto2500
+ 2490 fords=0tod-fstepf
+ 2500 fori=0todf-1
+ 2510 ifpz$(i)="0"goto2610
+ 2520 f1=len(pz$(i)):forz=1tof1
+ 2530 e$=mid$(pz$(i),z,1)
+ 2540 ife$<>"["goto2570
+ 2550 print#4,fe$(ds+val(mid$(pz$(i),z+1,2)));
+ 2560 z=z+2:goto2600
+ 2570 ife$="]"andx=1thenx=0:e$=chr$(15):goto2590
+ 2580 ife$="]"thene$=chr$(14):x=1
+ 2590 print#4,e$;
+ 2600 nextz
+ 2610 print#4
+ 2620 nexti
+ 2630 ife=1thennextds
+ 2640 iffl<>3thenprint#4
+ 2650 close4:return
+ 2660 rem  h a r d c o p y
+ 2670 y=-1:gosub2860:open4,4,7:ifl=2thenreturn
+ 2680 print"{home}";:open5,3:l=1024:poke1,53
+ 2690 fori=ltol+39:poke1024,peek(i):print"{home}";:get#5,e$:print#4,e$;:next:print#4:l=i
+ 2700 ifi<>2024goto2690
+ 2710 x=0:close4:close5:poke1,55:return
+ 2720 rem  d r u c k 2
+ 2730 open4,4,7:ife<>2goto2750
+ 2740 fords=0tod-fstepf
+ 2750 fori=1tof:print#4,fe$(i+ds):nexti:ife=2thennextds
+ 2760 iffl<>4thenprint#4
+ 2770 close4:return
+ 2780 rem  d r u c k e r - m e n u e
+ 2790 ifd=0thenreturn
+ 2800 gosub2980:print"{down}{down}-1- Gesamte Datenbank mit definierten       Feldern drucken
+ 2810 print"{down}-2- Gesamte Datenbank drucken":y=0
+ 2820 print"{down}-3- Datensaetze aus Sortierroutine mit      definierten Feldern drucken
+ 2830 print"{down}-4- Ganze Datensaetze aus Sortierroutine    drucken
+ 2840 print"{down}-^- Zurueck"
+ 2850 gosub3010:ife$="^"thenreturn
+ 2860 l=1
+ 2870 poke768,61:open4,4,7:print#4:ifst=-128thengosub840:l=2:goto2870
+ 2880 close4:poke768,139:ify=-1thenreturn
+ 2890 ifl=2goto2790
+ 2900 ife<1ore>4goto2850
+ 2910 ife>2thenfl=e:return
+ 2920 iffl=2goto2850
+ 2930 onegoto2470,2730
+ 2940 rem
+ 2950 e=3
+ 2960 print"{clr}";
+ 2970 fori=1toe:print"{blk}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{lblu}";:next:return
+ 2980 gosub2950:print"{home}{down}"spc(10)" ProDat ":print"{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}":gosub2970
+ 2990 print,"{up}{up} By Wolfgang Hahn {home}{down}{down}{down}":return
+ 3000 rem  g e t  a l l g .
+ 3010 gete$:e=val(e$):ife$=""goto3010
+ 3020 return
+ 3030 rem  d a t e i  z u e n d e
+ 3040 fl=9:e=1:print"{clr}{down}{down}{down}":gosub2970:printspc(10)"Datei zuende":gosub2970:goto1200
+ 3050 rem  s a v e  m a s k e
+ 3060 sys827(e$)e$:e=peek(141)*256+peek(140):poke139,peek(e):poke140,peek(e+1)
+ 3070 poke141,peek(e+2):poke176,0:poke177,204:gosub810:sys995:gosub3710:return
+ 3080 rem  a d d i t i o n
+ 3090 ifd=0ord<f*2thenreturn
+ 3100 gosub2950:print"{home}{down}"spc(11)" Additionsroutine "
+ 3110 input"{down}{down}{down}Welche Felder sollen addiert werden";e$:e=val(e$):y=0
+ 3120 ife<1ore>fgoto3110
+ 3130 input"{down}{down}Datensatz fuer Ergebnis anlegen";e$
+ 3140 fori=etodstepf:y=y+val(fe$(i)):nexti:y=int(y*100+.5)/100
+ 3150 ife$<>"j"goto3180
+ 3160 fori=1tof:fe$(i+d)=chr$(250):ifi=ethenfe$(i+d)="{left}"+str$(y)
+ 3170 nexti:ds=d:d=d+i-1:ud=1:goto1130
+ 3180 print"{down}{down}Gesamtsumme Felder-Nr."e"= "y:print"{down}{down}"t$:gosub3010:return
+ 3190 rem  d i r e c t o r y
+ 3200 gosub810:y=0
+ 3210 gosub2950:print"{home}{down}{rght}{rght}{rght} Directory "
+ 3220 ify=1thenreturn
+ 3230 open3,8,0,"$":get#3,e$,e$
+ 3240 print:get#3,e$,e$,s$,e$
+ 3250 e=asc(s$+chr$(0))+asc(e$+chr$(0))*256
+ 3260 printmid$(str$(e)+"    ",2,4);
+ 3270 gete$:ife$<>""thenclose3:return
+ 3280 get#3,e$:ifstgoto3360
+ 3290 ife$<>chr$(34)goto3280
+ 3300 get#3,e$:ife$<>chr$(34)thenprinte$;:goto3300
+ 3310 get#3,e$:ife$=" "goto3310
+ 3320 printtab(21);
+ 3330 printe$;:get#3,e$:ife$<>""goto3330
+ 3340 ifpeek(214)>20thenprint:print"{down}"t$;:gosub3010:y=1:gosub3210
+ 3350 goto3240
+ 3360 print"Bloecke frei"
+ 3370 close3
+ 3380 gosub3710
+ 3390 print:printt$:gosub3010
+ 3400 return
+ 3410 rem  s c r a t c h
+ 3420 e=4:gosub2960:print"{home}{down}"spc(3)" File loeschen "
+ 3430 printspc(21)" ^d = Directory "
+ 3440 input"{down}{down}Filename";e$
+ 3450 ife$="^d"thengosub3200:goto3420
+ 3460 ife$="^"thenreturn
+ 3470 gosub810:open1,8,15,"s:"+e$+",m/"+e$:gosub3730
+ 3480 goto3420
+ 3490 rem  v a l i d a t e
+ 3500 gosub2950:print"{home}{down}"spc(13)" Validate {down}{down}{down}{down}"
+ 3510 printw$
+ 3520 gosub810:open1,8,15,"v":gosub3730
+ 3530 return
+ 3540 rem  d i s k  f o r m a t .
+ 3550 gosub2950:print"{home}{down}"spc(10)" Disk formatieren "
+ 3560 input"{down}{down}{down}Disk-Name";e$:ife$="^"thenreturn
+ 3570 input"{down}Disk-Nummer";y$:ify$="^"thenreturn
+ 3580 print"{down}{down}"w$:gosub810:open1,8,15,"n:"+e$+","+y$:gosub3730
+ 3590 return
+ 3600 rem  r e n a m e
+ 3610 gosub2950:print"{home}{down}"spc(9)" File umbenennen "
+ 3620 input"{down}{down}{down}{down}Alter Name";y$
+ 3630 ify$="^"thenreturn
+ 3640 input"{down}{down}Neuer Name";e$
+ 3650 ife$="^"thenreturn
+ 3660 gosub810:open1,8,15,"r:"+e$+"="+y$
+ 3670 print#1,"r:m/"+e$+"=m/"+y$:gosub3730
+ 3680 iff1<>0goto3610
+ 3690 goto3200
+ 3700 rem  d i s k - e r r o r
+ 3710 close1
+ 3720 open1,8,15:poke1,55
+ 3730 input#1,f1,s$,f2,f3
+ 3740 close1
+ 3750 iff1=0thenreturn
+ 3760 print:e=1:gosub2970
+ 3770 printspc(6)f1;s$;f2;f3
+ 3780 printt$
+ 3790 gosub2970:gosub3010
+ 3800 return
+ 3810 rem  m a p r o ' s
+ 3820 forz=820to1020:readx:pokez,x:s=s+x:next
+ 3830 data133,095,134,096,076,191,163,032,158,173,165,100,133,140,165,101,133
+ 3840 data141,032,158,173,160,000,177,140,133,139,177,100,145,140,165,139,145
+ 3850 data100,200,192,003,208,239,096,169,000,133,139,169,004,133,140,160,000
+ 3860 data177,139,056,233,128,048,002,145,139,192,255,200,208,242,165,140,201
+ 3870 data007,240,103,230,140,208,230,169,000,133,139,133,172,169,004,133,140
+ 3880 data169,204,133,173,160,000,177,139,145,172,192,255,200,208,247,165,140
+ 3890 data201,007,240,068,230,140,230,173,208,233,169,000,133,139,133,172,169
+ 3900 data204,133,140,169,004,133,173,160,000,177,139,145,172,192,255,200,208
+ 3910 data247,165,140,201,207,240,031,230,140,230,173,208,233,160,000,162,008
+ 3920 data032,186,255,166,140,164,141,165,139,032,189,255,162,000,160,204,169
+ 3930 data000,032,213,255,096,160,001,162,008,032,186,255,166,140,164,141,165
+ 3940 data139,032,189,255,162,255,160,207,169,176,032,216,255,096
+ 3950 ifs<>29538thenprint"fehler in datas!!":stop
+ 3960 return
+ 3970 rem  i n i t i a l i s i e r e n
+ 3980 t$="         Taste druecken!":dimfe$(1500),pz$(60),a%(40,2):poke650,128:e=1
+ 3990 a$="                                        ":a$=a$+a$:y=0:l=0:ud=3
+ 4000 w$="Bitte warten...":return
+

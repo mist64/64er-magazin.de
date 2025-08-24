@@ -1,0 +1,176 @@
+
+
+;cop.prg ==0801==
+   10 dim ti$(30):dim pp$(30):dim t1$(30)
+   20 q=0:t1$=ti$
+   30 print chr$(147):poke 53280,0:poke 53281,0
+   40 rem ******* menue ******************
+   50 printtab(8)chr$(18)" cassetten - directory ";chr$(146)
+   60 print:print:print:print:print:print"auswahlmoeglichkeiten:"
+   70 print:print:print:print"1 - anfaenge     ermitteln - 1"
+   80 print:print"2 - programm        suchen - 2"
+   90 print:print"3 - zeiten     abspeichern - 3"
+  100 print:print"4 - zeiten        einladen - 4"
+  110 print:print"5 - verzeichnis ausdrucken - 5"
+  120 print:print:print:print"bitte taste druecken !"
+  130 geta$:ifa$=""then130
+  140 onval(a$)goto1000,2000,3000,4000,5000
+  150 goto130
+  200 rem *** unterprogramme ************
+  210 rem * tastatur zeichnen *
+  220 print "
+  230 print"{clr} {CBM-A}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{CBM-S}"
+  240 forq=1to13
+  250 print" {SHIFT--}                                    {SHIFT--}"
+  260 nextq
+  270 print" {CBM-Q}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{CBM-R}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{CBM-R}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{CBM-R}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{CBM-R}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{CBM-R}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{CBM-W}"
+  280 print" {SHIFT--} record{SHIFT--}play{SHIFT--}rewind{SHIFT--}ffwd{SHIFT--}stop{SHIFT--}eject {SHIFT--}
+  290 print" {CBM-Q}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-+}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-+}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-+}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-+}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-+}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{CBM-W}"
+  300 forq=1to4
+  310 print" {SHIFT--}       {SHIFT--}    {SHIFT--}      {SHIFT--}    {SHIFT--}    {SHIFT--}      {SHIFT--}
+  320 nextq
+  330 print" {CBM-Z}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{CBM-E}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{CBM-E}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{CBM-E}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{CBM-E}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{CBM-E}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{CBM-X}"
+  340 r$="{home}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{rght}{rght}{rght}^^^^^^"
+  350 r1$="{home}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{rght}{rght}{rght}      "
+  360 p$="{home}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}^^^^"
+  370 p1$="{home}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}    "
+  374 z$="{home}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}^^^^^^"
+  376 z1$="{home}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}      "
+  380 f$="{home}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}^^^^"
+  390 f1$="{home}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}    "
+  400 s$="{home}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}^^^^"
+  410 s1$="{home}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}    "
+  420 print"{home}{down}{down}{rght}{rght}{rght}cassette:";c$
+  430 print"{home}{down}{down}{down}{rght}{rght}{rght}   seite:";cs$
+  440 pr$="{home}{down}{down}{down}{down}{down}{down}{rght}{rght}{rght}programm:"
+  445 pl$="{home}{down}{down}{down}{down}{down}{down}{rght}{rght}{rght}                                   "
+  450 return
+  460 rem unterprogramm zeit
+  470 ti$=t1$
+  480 return
+  500 t1$=ti$
+  510 return
+ 1000 rem *** anfaenge ermitteln *******
+ 1010 printchr$(18)"{clr} anfaenge ermitteln ";chr$(146)
+ 1020 print:print:print:input"welche cassette ";c$
+ 1030 input"welche    seite ";cs$
+ 1040 print:print"bitte geben sie die programme ein:"
+ 1050 q=q+1
+ 1060 print"programm";q;"=";:inputpp$(q)
+ 1070 ifpp$(q)="*"then1090
+ 1080 goto1050
+ 1090 rem *** zeit ermitteln ***********
+ 1200 print"{clr}":q1=q-1
+ 1210 gosub 200
+ 1220 if(peek(1)and16)=16then1250
+ 1230 if(peek(1)and16)=0thenprints$
+ 1240 wait 1,16,255-16:prints1$
+ 1250 for q=1toq1
+ 1260 printpl$:printpr$;pp$(q)
+ 1270 printf$
+ 1275 geta$
+ 1280 if(peek(1)and16)=0thengoto1290
+ 1285 ifa$=""then1275
+ 1290 ifq=1thenti$="000000":ifq=1thent1$="000000"
+ 1291 gosub460
+ 1292 printf1$:prints$
+ 1295 geta$
+ 1300 if(peek(1)and16)=16then1310
+ 1305 ifa$=""then1295
+ 1310 gosub500
+ 1315 ti$(q)=t1$
+ 1320 prints1$:nextq
+ 1330 printz$:printpl$:printpr$;"ende"
+ 1340 geta$
+ 1350 if(peek(1)and16)=0thengoto1365
+ 1360 ifa$=""then1340
+ 1365 printz1$:prints$
+ 1370 geta$
+ 1380 if(peek(1)and16)=16then1400
+ 1390 ifa$=""then1370
+ 1400 goto30
+ 2000 rem *** programm suchen **********
+ 2010 gosub200:q=0
+ 2020 q=q+1:ifq=q1+1then2075
+ 2030 printpl$:printpr$;pp$(q)
+ 2040 geta$:ifa$=""then2040
+ 2050 ifa$=chr$(32)then2020
+ 2060 ifa$=chr$(13)then2080
+ 2070 goto2040
+ 2075 q=0:goto2020
+ 2080 printf$
+ 2090 geta$
+ 2100 if(peek(1)and16)=0then2115
+ 2110 ifa$=""then2090
+ 2115 t1$(q)=ti$(q)
+ 2120 ti$="000000":printf1$
+ 2130 ift1$(q)<>ti$then2130
+ 2150 poke192,1:poke1,peek(1)or32
+ 2160 prints$
+ 2170 geta$
+ 2180 if(peek(1)and16)=16then2200
+ 2190 ifa$=""then2170
+ 2200 printchr$(147):poke198,1:poke631,131:end
+ 3000 rem *** zeiten abspeichern *******
+ 3010 gosub200
+ 3020 printr$:printk$
+ 3030 printp$
+ 3040 print:print:q=0:q2=q1+1
+ 3050 open1,1,1,"directory"
+ 3055 print#1,c$:print#1,cs$:print#1,q2:print#1,q1
+ 3060 forq=q+1toq2
+ 3070 print#1,pp$(q)
+ 3080 print#1,ti$(q)
+ 3090 nextq
+ 3100 close1
+ 3110 prints$:printp1$:printr1$
+ 3120 geta$
+ 3130 if(peek(1)and16)=16then3150
+ 3140 ifa$=""then3120
+ 3150 goto 30
+ 4000 rem *** zeiten einladen **********
+ 4010 gosub200
+ 4030 printp$
+ 4040 print:q=0
+ 4050 open1,1,0,"directory"
+ 4055 input#1,c$:input#1,cs$:input#1,q2:input#1,q1
+ 4060 q=q+1
+ 4065 ifq=q2then4100
+ 4070 input#1,pp$(q)
+ 4080 input#1,ti$(q)
+ 4090 goto4060
+ 4100 close1
+ 4110 prints$:printp1$
+ 4120 geta$
+ 4130 if(peek(1)and16)=16then4150
+ 4140 ifa$=""then4120
+ 4150 goto 30
+ 5000 rem *** verzeichnis ausdrucken ***
+ 5010 printchr$(147):q=0
+ 5020 printtab(10)chr$(18)" programmverzeichnis ";chr$(146)
+ 5030 print:print"cassette: ";c$
+ 5040 print"   seite: ";cs$:print
+ 5050 q=q+1:ifq=q1+1then5100
+ 5055 ifq=15thengoto5080
+ 5060 print"programm ";q;"=";pp$(q)
+ 5070 goto5050
+ 5080 geta$:ifa$=""then5080
+ 5090 ifa$=chr$(32)thenprintchr$(19):print:print:print:print:print:q=15:goto5060
+ 5100 print"***************************************"
+ 5110 print"a = ausdruck      m = menue"
+ 5120 geta$:ifa$=""then5120
+ 5130 ifa$="m"then30
+ 5140 ifa$="a"then5160
+ 5150 goto5120
+ 5160 open1,6
+ 5170 print#1,"******** v e r z e i c h n i s ********"
+ 5180 q=0:print#1:print#1
+ 5190 print#1,"cassette: ";c$
+ 5200 print#1,"   seite: ";cs$
+ 5210 print#1
+ 5220 q=q+1:ifq=q1+1then5250
+ 5230 print#1,"programm ";q;"=";pp$(q)
+ 5240 goto5220
+ 5250 close1
+ 5260 goto30
+

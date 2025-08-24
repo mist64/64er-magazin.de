@@ -1,0 +1,131 @@
+
+
+;disktester.prg ==0801==
+  100 rem*disktester
+  105 rem*uli lang*
+  110 rem*talstr.10*
+  115 rem*8609 bischberg*
+  120 rem*tel.0951/67389*
+  125 :
+  130 l$="{clr}":d$="{down}":u$="{up}":z$="{left}":rem*loeschen,crsr down,crsr up,crsr back*
+  135 g$="{grn}":o$="{orng}":b$="{lblu}":t$="{cyn}":r$="{lred}":rem*gruen,orange,hellblau,tuerkis,rot*
+  140 farbspeicher=55296:bildschirmspeicher=1024
+  145 dimt%(100),s%(100):rem*fehlerhafte blocks*
+  150 printl$g$d$spc(15)"disktester"d$:poke53280,0:poke53281,0:rem*scwarz*
+  155 printo$d$"<"b$"a"o$"> alle    blocks testen"
+  160 printd$"<"b$"b"o$"> belegte blocks testen"
+  165 printd$"<"b$"k"o$"> kaputte blocks belegen"
+  170 geta$
+  175 ifa$="a"thents=1:goto210
+  180 ifa$="b"thents=0:goto210
+  185 ifa$="k"then575
+  190 goto170
+  195 rem*****************
+  200 rem*diskette testen*
+  205 rem*****************
+  210 dimb%(35,23),f$(8):k$=",":n$=chr$(0):fr=0:fe=0:ft=0
+  215 fori=0to8:readf$(i):next:rem*fehlermeldungen*
+  220 gosub610:rem*auf space warten*
+  225 open15,8,15,"i"
+  230 printl$"validate? "b$"j/n"
+  235 geta$
+  240 ifa$="n"then255
+  245 ifa$="j"thenprintl$t$d$"validating...":print#15,"v":goto255
+  250 goto235
+  255 open3,8,3,"#":iftsthenopen5,8,5,"#"
+  260 printl$t$"bam wird gelesen         "u$
+  265 print#15,"u1:"3;0;18;0:get#3,a$,a$,a$
+  270 ifa$<>chr$(65)thenprintd$"kein dos 2.6 oder 2.5!":goto550
+  275 get#3,a$
+  280 rem***********************
+  285 rem*analysieren der bam  *
+  287 rem*aufgeloest in b%(t,s)*
+  290 rem***********************
+  295 fort=1to35
+  300   rem*freie blocks,sektor 7-0,sektor 15-8,sektor 23-16*
+  305   get#3,fr$:fr=fr+asc(fr$+n$):s=0
+  310   iffrthen320:rem*nicht alle blocks belegt*
+  315   fors=0to23:b%(t,s)=0:nexts:goto345
+  320   a=1:get#3,ba$:ba=asc(ba$+n$)
+  325   fors=stos+7
+  330     b%(t,s)=(baanda)/a:a=a+a:ft=ft+b%(t,s)
+  335   nexts
+  340   ifs<23then320
+  345 nextt
+  350 iffr<>ftthenprintl$r$tab(14)"!bam-fehler!":goto550
+  355 gosub635
+  360 rem***********************
+  365 rem*start der testroutine*
+  370 rem***********************
+  375 ifts=0thenfr=683-fr:rem*volle blocks*
+  380 ifts=0then400
+  385 rem*170=%10101010 , 85=%01010101*
+  390 print#15,"b-p:"5;1:fori=1to128:print#5,chr$(170)chr$(85);:next
+  395 rem*puffer braucht nur einmal gefuellt zu werden*
+  400 fort=1to35:rem*spurzaehler*
+  405   ift<18thenms=20:goto425
+  410   ift<25thenms=18:goto425
+  415   ift<31thenms=17:goto425
+  420   ms=16
+  425   fors=0toms:rem*blockzaehler*
+  430     onts*2+b%(t,s)goto485,435,440
+  435     print#15,"u1:"3;0;t;s:goto445:rem*block lesen*
+  440     print#15,"b-w:"5;0;t;s:rem*buffer auf disk schreiben*
+  445     ao=40*(20-s)+t+3:rem*adressoffset*
+  450     input#15,f:iff<20thenp=32:goto480
+  455     iff<29thenf$=f$(f-20):goto465
+  460     f$=""
+  465     printr$f;f$" t:"t;z$" s:"s;z$" "u$
+  470     pokefa+ao,10:p=81+6*b%(t,s):rem*rotes"Q,W"
+  475     t%(fe)=t:s%(fe)=s:fe=fe+b%(t,s)
+  480     pokebi+ao,p
+  485   nexts
+  490 nextt:close5:close3
+  495 iffe=0thenprint"      !keine zu belegenden fehler!";:goto550
+  500 rem*****************************
+  505 rem*belegen der kaputten blocks*
+  510 rem*****************************
+  515 printl$t$" test zuende, belegen und kennzeichnen"
+  520 printtab(8)"der fehlerhaften blocks"
+  525 fori=0tofe-1
+  530   print#15,"b-a:"0;t%(i);s%(i):rem*in bam belegen*
+  535 next
+  540 open3,8,3,"@:.diskfehler,u,w":print#3,chr$(fe-1);
+  545 fori=0tofe-1:print#15,t%(i)chr$(13)s%(i):next
+  550 close3:close15:end
+  555 :
+  560 rem******************************
+  565 rem*wiederbelegung nach validate*
+  570 rem******************************
+  575 gosub610
+  580 printl$t$"wiederbelegen der schadhaften blocks"
+  585 open15,8,15,"i":open5,8,5,".diskfehler,u,r"
+  590 get#5,a$:fe=asc(a$)
+  595 fori=0tofe:input#5,t%(i),s%(i):printr$"t:"t%(i),"s:"s%(i):next:close5
+  600 fori=0tofe:print#15,"b-a:"0;t%(i);s%(i):next:close15:end
+  605 :
+  610 printl$tab(9)o$"testdiskette  einlegen":printtab(17)"<"b$"space"o$">"
+  615 geta$:ifa$<>" "then615
+  620 return
+  625 :
+  630 rem*bam darstellen*
+  635 printl$;
+  640 fors=20to0step-1
+  645 printo$s;tab(4);
+  650   fort=1to35
+  655     ift<18thenms=20:goto675
+  660     ift<25thenms=18:goto675
+  665     ift<31thenms=17:goto675
+  670     ms=16
+  675     ifs>msthen690
+  680     ifb%(t,s)=0thenprintb$"-";:goto690
+  685     printg$"*";
+  690   nextt:print
+  695 nexts:printtab(4);
+  700 fort=1to35:printright$(str$(t),1);:next
+  705 print:return
+  710 rem*fehlermeldungen*
+  715 data"kein header      ","kein sync char   ","kein block vorh. "
+  720 data"pruefsumme daten ","bitmusterfehler  ","schreibfehler    "
+  725 data"schreibschutz    ","pruefsumme header","block zu lang    "
+

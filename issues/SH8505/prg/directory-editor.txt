@@ -1,0 +1,295 @@
+
+
+;directory-editor.prg ==0801==
+ 1000 rem" *** di-di-editor v2.8 *** "
+ 1010 rem dieter temme,   -03.01.1985-
+ 1020 rem freiherrenstr. 15
+ 1030 rem 5100 aachen
+ 1040 rem tel. 0241/13415
+ 1050 rem ----------------------------
+ 1060 fd=8:rem >> floppy device <<
+ 1070 ft$="del seq prg usr rel":rem filetypen
+ 1080 lb=256:b2=128:sc=64:bt=7:c$=chr$(13):de$=chr$(20):ze$=chr$(0):tw$=chr$(2)
+ 1090 br$="ua 2 ":bw$="ub 2 ":te$="u0":mr$="m-r":mw$="m-w"
+ 1100 ch$="{home}":cc$="{clr}":cr$="{rght}":cl$="{left}":cd$="{down}":cu$="{up}":rv$="{rvon}":ro$="{rvof}"
+ 1110 be$=chr$(7):pp=59468:le=0:printch$ch$cc$chr$(142)chr$(8)"bitte warten!"
+ 1120 d$=ch$:fori=1to25:d$=d$+cd$:s$=s$+"  ":z$=z$+cl$+cl$:fr=fre(0):next
+ 1130 z$=be$+left$(s$,36)+left$(z$,36):u$=chr$(160):t$=u$
+ 1140 open1,fd,15,te$
+ 1150 gosub7000:bf$=chr$(bf):dr$=chr$(dr+48)
+ 1160 gosub7500:t$=t$+left$(s$,(wi-40)/2):t=len(t$)+1
+ 1170 readr$:ifr$<>">s"goto1170
+ 1180 dimm$(18),b$(14):fori=1to18:readm$(i):next:printcc$;
+ 1190 fori=1to9:printt$m$(i):next
+ 1200 fori=1to11:printt$m$(10):next
+ 1210 fori=11to15:printt$m$(i):next
+ 1220 iferthenprintleft$(d$,24)tab(t)rv$z$er$ch$cd$cd$cd$:ifer<3thenend
+ 1230 iferthenclose1:open1,fd,15:rem re-init
+ 1240 printleft$(d$,6)tab(t+11)dr$tab(t+13)ct$tab(t+23)f$
+ 1250 bz$=t$+m$(14):ifc9thenpokec9,128
+ 2000 rem $$$ eingabe $$$
+ 2010 pr$=">":gosub8060:g$=k$:pr$="<"
+ 2020 ifbzthenln=peek(c7):printleft$(d$,24)bz$:gosub8080:bz=0
+ 2030 ifg$="a"org$=" "thengosub3000
+ 2040 ifg$="l"thengosub2800
+ 2050 ifg$="x"theng$="e":ex=1
+ 2060 ifop=0goto2220
+ 2070 ifg$="b"thengb=1:g$=c$:ifgz=1thengz=0:gb=0:g$="e":en=1
+ 2080 ifg$="n"org$=cr$thenprinttab(t+5);:il=16:gosub8000:n$=ix$:printcu$;
+ 2090 ifg$="*"org$=":"thenifftthenifpt$>""thenifcandft<>4thengosub2500:pr=1
+ 2100 ifg$="+"org$=";"org$="-"thenifty>1thens=-(g$<>"-")*sc:pr=1
+ 2110 ifg$="^"org$="@"thenifzz>0thenprinttab(t)" "cu$:ng=ng+2:zr=1:zz=zz-2:g$="_
+ 2120 ifg$="_"org$=c$org$="="thenif(enorer)=0thengosub5000:ifgbthenifzz<7goto2120
+ 2130 ifen=1andgb=1thengz=1:pt$=" ":printcu$tab(t)">"cu$:ifzzthenzz=zz-1:en=0
+ 2140 ifgz=1thengb=0:ifer=0goto2000
+ 2150 ifen=1goto2250
+ 2160 ifg$="v"thenln=peek(c7):va=1:vo=1:printleft$(d$,22)tab(t+1)"+":gosub8080
+ 2170 ifg$="e"thenen=1:gosub5000:goto2250
+ 2180 ifpt$=""goto2210
+ 2190 fori=0todt-1:ifg$=mid$(ft$,i*4+1,1)thenft=i:i=dt:c=oc:pr=1:ifft=0thenc=b2
+ 2200 next
+ 2210 :
+ 2220 ifop=1goto2260
+ 2230 ifg$="i"thengosub4000:on-(er=0)gosub5240:ifergoto1220
+ 2240 ifg$="f"thengosub3500
+ 2250 ifg$="0"org$="1"thenifval(g$)<=drthendr$=g$:printleft$(d$,6)tab(t+11)g$
+ 2260 ifenthengosub6000
+ 2270 ifpr=1thengosub5190:pr=0
+ 2280 ifex=1thener=2:er$=">>> programmende
+ 2290 ifergoto1220
+ 2300 gb=0:goto2000
+ 2500 rem $$$ file schliessen $$$
+ 2510 print#1,mr$chr$(k+1)bf$tw$:get#1,h$,i$:ifh$=""orft=4thenreturn
+ 2520 printtab(t)"*"cu$:open3,fd,3,"#1":bg$=chr$(bf+1):bk=0
+ 2530 rt=asc(h$):rs=asc(i$+ze$):print#1,"ua"3;dr$rt;rs:bk=bk+1
+ 2540 print#1,mr$chr$(3)bg$tw$:get#1,h$,i$:ifh$<chr$(at)andh$>""goto2530
+ 2550 print#1,mw$chr$(k+28)bg$tw$chr$((bk-32768)and(lb-1))chr$(bk/lb)
+ 2560 ifh$>""thenprint#1,mw$ze$bg$tw$ze$ze$:print#1,"ub"3;dr$rt;rs
+ 2570 va=1:c=0:oc=c:close3:fr=fre(0):return
+ 2800 rem $$$ letter on/off $$$
+ 2810 ifright$(ct$,3)="001"thenpokepp,(peek(pp)and253)or(2-le)
+ 2820 ifright$(ct$,3)<>"001"thenprintchr$(14-128*(le>0));
+ 2830 le=2-le:return
+ 3000 rem $$$ anleitung $$$
+ 3010 ln=peek(c7):printleft$(d$,7):open3,3:fori=0to14:input#3,b$(i):printcl$
+ 3020 next:printleft$(d$,7)t$m$(16):fori=0to14:printt$m$(17):next:printt$m$(18)
+ 3030 ifan=1thenrestore:printleft$(d$,8)tab(t)rv$z$tab(t+12)"bitte warten
+ 3040 readr$:ifr$<>">a"goto3040
+ 3050 printleft$(d$,7):fori=0to4:readb$:printtab(t)z$b$:next
+ 3060 printleft$(d$,12):fori=0to9:readb$:printtab(t)z$b$:next:gosub8060
+ 3070 readb$:ifb$<>"*"goto3060
+ 3080 printleft$(d$,7)t$m$(7):fori=0to14:printb$(i):next
+ 3090 printt$m$(13):gosub8080
+ 3100 an=1:pokec0,0:fori=0to14:b$(i)="":next:fr=fre(0):close3:return
+ 3500 rem $$$ disk-kommando $$$
+ 3510 printleft$(d$,24)t$m$(17)cu$c$tab(t)"@";:il=35:ij=1:gosub8000:ij=0:bz=1
+ 3520 ifleft$(ix$,1)<>"u"thenprint#1,ix$:goto8050
+ 3530 return
+ 4000 rem $$$ start $$$
+ 4010 br$=left$(br$,5)+dr$+",":bw$=left$(bw$,5)+dr$+","
+ 4020 printleft$(d$,8)t$m$(8)cd$:fori=1to11:printt$m$(10):next:printcd$t$m$(12)
+ 4030 printleft$(d$,24)tab(t)rv$z$"      bitte diskette einlegen":gosub8060
+ 4040 print#1,"i"+dr$:va=0:x1=10:x2=20:gosub8050:iferthenreturn
+ 4050 printcu$bz$:open2,fd,2,"#0":print#1,br$tt;ts:gosub8050:iferthenreturn
+ 4060 print#1,mr$tw$bf$chr$(1):get#1,do$:ifdo$<>dm$goto4200
+ 4070 print#1,mr$chr$(nb)bf$chr$(16):gosub8030:printleft$(d$,8)tab(t+6);
+ 4080 gosub8070:printc$cu$tab(t+6);:il=16:gosub8000:n$=ix$
+ 4090 print#1,mr$chr$(nb+18)bf$chr$(5+(ty=1)):gosub8030:printcu$tab(t+30);
+ 4100 gosub8070:printc$cu$tab(t+30);:il=5+(ty=1):gosub8000:print
+ 4110 print#1,mw$chr$(nb)bf$chr$(23+(ty=1))n$"--"ix$:print#1,bw$tt;ts:zz=0:op=1
+ 4120 zb=0:va=0:vo=0:ln=peek(c7):printleft$(d$,22)tab(t+1)"-":zt=td:zs=sd
+ 4130 il=16:goto8080
+ 4200 er=3:er$=">>> falsches disk-format":return
+ 5000 rem $$$ naechster eintrag $$$
+ 5010 ifen=1goto5080
+ 5020 printtab(t)" ":print#1,mw$chr$(k+3)bf$chr$(16)n$:ifzrthenprintcu$cu$;:zr=0
+ 5030 print#1,mw$chr$(k)bf$chr$(1)chr$(sor(b2-c)orft)
+ 5040 if(of=0andft>0)or(of>0andft=0)thenva=1:ln=peek(c7)
+ 5050 ifvo=0andva=1thenln=peek(c7):printleft$(d$,22)tab(t+1)"+":gosub8080:vo=1
+ 5060 ifzz<7thenprint#1,mr$chr$(zz*32+39)bf$chr$(1):get#1,nf$
+ 5070 if(nt>0or(i<7andnf$>""))thengosub8040
+ 5080 ifen=1thenzz=7
+ 5090 zz=zz+1:ifzz>7goto5220
+ 5100 k=zz*32+2:print#1,mr$chr$(k+3)bf$chr$(16):gosub8030:ifh$=""thenen=1:return
+ 5110 n$=i$:print#1,mr$chr$(k)bf$chr$(1):get#1,i$:ft=asc(i$+ze$)
+ 5120 s=scandft:c=b2-(b2andft):ft=(bt)andft:of=ft:oc=c:ifft=0thenoc=0
+ 5130 printtab(t+5);:ifng=0theni$=n$:gosub8070
+ 5140 print#1,mr$chr$(k+28)bf$tw$:get#1,k$,l$:bk=asc(k$+ze$)+lb*asc(l$+ze$)
+ 5150 ifng=0thenifft<>0thenzb=zb+bk
+ 5160 printc$cu$tab(t)">"right$(str$(1000+bk),3);:ifngthenng=ng-1
+ 5170 print#1,mr$chr$(k+1)bf$tw$:get#1,pt$,k$:printtab(t+31);
+ 5180 printright$(str$(100+asc(pt$+ze$)),2)cr$right$(str$(100+asc(k$+ze$)),2);
+ 5190 printc$cu$tab(t+25)" ";:ifcthenifftthenprintcl$"*";
+ 5200 printmid$(ft$,ft*4+1,3)" ";:ifs>0andty>1thenprintcl$"<";
+ 5210 printc$cu$;:fr=fre(0):return
+ 5220 print#1,bw$zt;zs:ifen=0thenzs=asc(bl$+ze$):zt=nt:ifzt=0thenen=1
+ 5230 ifen=1thenreturn
+ 5240 print#1,br$zt;zs:print#1,mr$ze$bf$tw$:get#1,tr$,bl$:nt=asc(tr$+ze$):zz=0
+ 5250 goto5100
+ 6000 rem $$$ ende $$$
+ 6010 printleft$(d$,24);:ifva=0goto6040
+ 6020 printtab(t)z$"     ueberpruefe blockbelegung"cu$:print#1,"v"dr$:gosub8050
+ 6030 iferthenreturn
+ 6040 printbz$c$cu$cu$cu$tab(t+17)right$(str$(1000+zb),3);
+ 6050 printtab(t+27)right$(str$(1000+fb-zb),3)cr$cr$;
+ 6060 close2:open2,fd,0,"$"+dr$+":"+ze$:get#2,b$,b$,b$,b$,b$,b$
+ 6070 get#2,b$:ifb$>""goto6070
+ 6080 get#2,b$,b$,k$,l$
+ 6090 printright$(str$(1000+asc(k$+ze$)+lb*asc(l$+ze$)),3)
+ 6100 close2:op=0:en=0:fr=fre(0):return
+ 7000 rem $$$ floppy-typ $$$
+ 7001 readn:dimf%(n):fori=0ton:readx:print#1,mr$chr$((x-32768)and255)chr$(x/256)
+ 7002 get#1,i$:f%(i)=asc(i$+ze$):next:er=0:ty=0:print#1,te$
+ 7003 j=0:fori=0ton:readx:ifx>-1thenifx<>f%(i)thenj=1
+ 7004 next:readf$:iff$<>"***"thenreaddr,bf,ty:ifjgoto7003
+ 7005 iff$="***"thener=1:er$=">>> floppy-typ unbekannt":return
+ 7006 readr$:ifr$<>">t"goto7006
+ 7007 readj,fb,dm$,tt,ts,td,sd,nb,at,dt:ifj<>tygoto7007
+ 7099 ifty>1thenreturn
+ 7100 readr$:ifr$<>">m"goto7100
+ 7101 mr$="uc:":dm$=chr$(1):i$=chr$(19)+chr$(1):readj
+ 7102 fori=0toj:readj:print#1,mw$chr$(i)i$chr$(j):next:return
+ 7200 rem +++ data: floppy-typen +++
+ 7201 data 2,65535,16618,16556:rem fpeeks
+ 7202 rem  f%0,f%1,f%2,"name      dos",dr,bf,ty
+ 7203 data 226,-99,-99,"2040/3040v1.0",1,017,1
+ 7204 data 213,-99,-99,"4040     v2.1",1,017,2
+ 7205 data 242,-99,-99,"8050     v2.5",1,017,3
+ 7206 data 254,-99,-99,"1541/2031v2.6",0,003,2
+ 7207 data 198,000,-99,"4040     v2.7",1,017,2
+ 7208 data 198,001,001,"8050     v2.7",1,017,3
+ 7209 data 198,001,002,"8250     v2.7",1,017,4
+ 7298 data -99,-99,-99,"***"
+ 7299 data">t":rem erkennung
+ 7300 rem +++ data: typen-auswahl +++
+ 7301 rem typ,blks,dos,name ,direc,nby,at,dt,dos
+ 7302 data 1 , 670,-1-,18,00,18,01,144,37, 4
+ 7303 data 2 , 664,"a",18,00,18,01,144,37, 5
+ 7304 data 3 ,2052,"c",39,00,39,01,  6,78, 5
+ 7305 data 4 ,4133,"c",39,00,39,01,  6,78, 5
+ 7399 data">m":rem erkennung
+ 7400 rem +++ data: 2040/3040 m-r +++
+ 7401 data 37,104,104,160,0,177,3,141,180,66,141,224,16,177,3,153,180,67,200,196
+ 7402 data 5,144,246,169,13,153,180,67,200,32,153,231,169,181,133,93,76,7,253
+ 7500 rem $$$ computer-typ $$$
+ 7501 readr$:ifr$<>">c"goto7501
+ 7502 readn:dimc%(n):fori=0ton:readx:c%(i)=peek(x):next
+ 7503 j=0:fori=0ton:readx:ifx<>c%(i)thenj=1
+ 7504 next:readct$:ifct$="***"thenprintcd$"?unbekannter computer";:end
+ 7505 readwi,c0,c1,c2,c3,c4,c5,c6,c7,c8,c9:ifjgoto7503
+ 7520 ifct$="c=64"thenpoke53280,0:poke53281,0:rem border&ground=schwarz
+ 7521 ifright$(ct$,3)="001"thenpokepp,12:rem gross/graphik
+ 7522 ifright$(ct$,3)<>"001"thenprintchr$(158);:rem cursor=gelb
+ 7598 return
+ 7599 data">c":rem erkennung
+ 7600 rem +++ data: computer-typen +++
+ 7601 data 0,58453:rem cpeeks
+ 7602 rem  c%0,name      , wi, c0, c1, c2, c3, c4, c5, c6, c7, c8, c9
+ 7603 data 136,"cbm 2001", 40,525,532,533,224,226,234,242,245,251,0
+ 7604 data 152,"cbm 3001", 40,158,167,168,196,198,205,213,216,220,0
+ 7605 data 032,"cbm 4001", 40,158,167,168,196,198,205,213,216,220,0
+ 7606 data 032,"cbm 8001", 80,158,167,168,196,198,205,213,216,220,228
+ 7607 data 189,"c=64"    , 40,198,204,205,209,211,212,213,214,216,650
+ 7608 data -99,"***"
+ 8000 rem $$$ input routine $$$
+ 8001 rem il=max. laenge,ix$=eing. string
+ 8002 ix=pos(0)+il-1:iy=peek(c3)+peek(c3+1)*lb+ix:open4,0:pokec6,ix+1
+ 8003 ip=peek(iy-ix+pos(0)):pokec8,0:pokec5,0:pokec2,1:pokec1,0
+ 8004 waitc0,15:getiy$:pokec1,1:pokeiy-ix+pos(0),ip:ifpeek(iy)=96thenpokeiy,32
+ 8005 if(asc(iy$+ze$)and127)<32goto8008
+ 8006 ifpos(0)>ixgoto8003
+ 8007 printiy$;:goto8003
+ 8008 ifiy$=chr$(148)thenifpeek(iy)=32goto8006
+ 8009 ifiy$=chr$(141)thenforiz=iy-ix+pos(0)toiy:pokeiz,32:next:iy$=c$
+ 8010 ifiy$=c$goto8017
+ 8011 ifiy$=rv$oriy$=ro$goto8007
+ 8012 ifiy$=cr$goto8006
+ 8013 ifiy$=cc$thenforiz=iy-il+1toiy:pokeiz,32:next:iy$=ch$
+ 8014 ifiy$=ch$thenpokec4,ix-il+1:goto8003
+ 8015 ifiy$<>de$andiy$<>cl$goto8003
+ 8016 on(pos(0)>ix-il+1)+2goto8007,8003
+ 8017 deffnas(x)=(xand63)or((xand64)*2)or(((xand160)=0)*-64):ix$="":ix=0
+ 8018 foriz=iytoiy-il+1step-1:iy=fnas(peek(iz))
+ 8019 ifixor(iyand127)-32thenix$=chr$(iy)+ix$:ix=255
+ 8020 next
+ 8021 ifij=0theniflen(ix$)<ilthenix$=ix$+u$:goto8021
+ 8022 pokec6,wi-1:print:close4:return
+ 8030 rem $$$ inget $$$
+ 8031 i$="":get#1,h$:ifh$theninput#1,i$
+ 8032 i$=h$+i$:return
+ 8040 rem $$$ scroll up $$$
+ 8041 sr=0:ifpeek(c7)<x2thenreturn
+ 8042 printleft$(d$,x1+1);:open3,3
+ 8043 input#3,x$:printcl$
+ 8044 printcu$cu$x$cd$
+ 8045 ifpeek(c7)<x2goto8043
+ 8046 printcu$t$m$(10)cu$
+ 8047 close3:sr=1:return
+ 8050 rem $$$ disk-fehler? $$$
+ 8051 input#1,er,er$,tr,bl:ifer=0thenreturn
+ 8052 er$="***"+str$(er)+":"+er$+" "
+ 8053 iftrorblthener$=er$+"in "+right$(str$(100+tr),2)+","+right$(str$(100+bl),2)
+ 8054 bz=1:op=0:er=4:return
+ 8060 rem $$$ taste $$$
+ 8061 l2=ln:ln=peek(c7):po=pos(0):printleft$(d$,6)tab(t+5)pr$" "cl$;
+ 8062 pokec1,0:pokec0,-(peek(c0)>0):waitc0,15:getk$:pokec1,1
+ 8063 k$=chr$(asc(k$+ze$)and127):pokepeek(c3)+peek(c3+1)*lb+pos(0),141
+ 8064 ifk$<>c$thenpokec8,1:printk$
+ 8065 gosub8080:printtab(po);:ln=l2:return
+ 8070 rem $$$ print mit steuerzeichen $$$
+ 8071 pokec8,len(i$):foriz=1tolen(i$):ix=asc(mid$(i$,iz))
+ 8072 if(ixand127)<>13thenprintmid$(i$,iz,1);:goto8074
+ 8073 print" ";:pokepeek(c3)+peek(c3+1)*lb+pos(0)-1,13-(ixand128)*64
+ 8074 next:return
+ 8080 rem $$$ in die richtige zeile $$$
+ 8081 printleft$(d$,ln+1);:return
+ 8999 data">s":rem erkennung
+ 9000 rem +++ data: schirmbild +++
+ 9001 data"{CBM-A}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{CBM-R}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{CBM-S}
+ 9002 data"{SHIFT--}{rvon}{CBM-R}{SHIFT-*}{CBM-S}{CBM-R}  {CBM-R}{SHIFT-*}{CBM-S}{CBM-R}  {CBM-A}{SHIFT-*}{CBM-S}{CBM-R}{SHIFT-*}{CBM-S}{CBM-R}{CBM-A}{CBM-R}{CBM-S}{CBM-A}{SHIFT-*}{CBM-S}{CBM-R}{SHIFT-*}{CBM-S}{rvof}{SHIFT--}(c)1984{SHIFT--}
+ 9003 data"{SHIFT--}{rvon}{SHIFT--} {SHIFT--}{SHIFT--}{SHIFT-*}{SHIFT-*}{SHIFT--} {SHIFT--}{SHIFT--}{SHIFT-*}{SHIFT-*}{CBM-Q}{SHIFT-*} {SHIFT--} {SHIFT--}{SHIFT--} {SHIFT--} {SHIFT--} {SHIFT--}{CBM-Q}{CBM-R}{CBM-X}{rvof}{SHIFT--}  by   {SHIFT--}
+ 9004 data"{SHIFT--}{rvon}{CBM-Z}{SHIFT-*}{CBM-X}{CBM-E}  {CBM-Z}{SHIFT-*}{CBM-X}{CBM-E}  {CBM-Z}{SHIFT-*}{CBM-X}{CBM-Z}{SHIFT-*}{CBM-X}{CBM-E} {CBM-E} {CBM-Z}{SHIFT-*}{CBM-X}{CBM-E}{CBM-Z}{CBM-X}{rvof}{SHIFT--}d.temme{SHIFT--}
+ 9005 data"{CBM-Z}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{CBM-R}{SHIFT-*}{SHIFT-*}{CBM-R}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{CBM-R}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{CBM-R}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{CBM-E}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{CBM-W}
+ 9006 data" v2.8{SHIFT--}> {SHIFT--}dr# {SHIFT--}         {SHIFT--}             {SHIFT--}
+ 9007 data"{CBM-A}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{CBM-E}{SHIFT-*}{SHIFT-*}{CBM-E}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{CBM-E}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{CBM-E}{SHIFT-*}{SHIFT-*}{CBM-R}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{CBM-W}
+ 9008 data"{SHIFT--}name=                    {SHIFT--}id=       {SHIFT--}
+ 9009 data"{CBM-Q}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{CBM-R}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{CBM-R}{CBM-E}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{CBM-R}{SHIFT-*}{SHIFT-*}{CBM-R}{SHIFT-*}{SHIFT-*}{CBM-W}
+ 9010 data"{SHIFT--}    {SHIFT--}                   {SHIFT--}     {SHIFT--}  {SHIFT--}  {SHIFT--}
+ 9011 data"{CBM-Q}{SHIFT-*}{SHIFT-*}{CBM-R}{SHIFT-*}{CBM-E}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{CBM-R}{SHIFT-*}{SHIFT-*}{SHIFT-*}{CBM-E}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{CBM-E}{SHIFT-*}{SHIFT-*}{CBM-E}{SHIFT-*}{SHIFT-*}{CBM-W}
+ 9012 data"{SHIFT--}v-{SHIFT--}blks benutzt=    {SHIFT--}frei=     (   ){SHIFT--}
+ 9013 data"{CBM-Q}{SHIFT-*}{SHIFT-*}{CBM-E}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{CBM-E}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{CBM-W}
+ 9014 data"{SHIFT--}a/l/x,i/f/01,n/d/spur/*/+-/_/b/^/v/e{SHIFT--}
+ 9015 data"{CBM-Z}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{CBM-X}{home}
+ 9100 rem +++ data: rahmen (anl) +++
+ 9101 data"{CBM-A}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{CBM-E}{SHIFT-*}{SHIFT-*}{CBM-E}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{CBM-E}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{CBM-E}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{CBM-W}
+ 9102 data"{SHIFT--}                                    {SHIFT--}
+ 9103 data"{CBM-Q}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{CBM-W}
+ 9499 data">a":rem erkennung
+ 9500 rem +++ data: anleitung +++
+ 9501 data"{CBM-A}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{CBM-S}
+ 9502 data"{SHIFT--}      disk-directory-editor       {SHIFT--}
+ 9503 data"{SHIFT--}    k u r z a n l e i t u n g     {SHIFT--}
+ 9504 data"{CBM-Z}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{CBM-X}
+ 9505 data"
+ 9506 data"<a/spc>   ausgabe dieser anleitung
+ 9507 data"<l>       gross- oder kleinschrift
+ 9508 data"<i>       start des editors
+ 9509 data"<f>       eingabe floppy-kommando
+ 9510 data"<0/1>     laufwerks-nummer festlegen
+ 9511 data"           (falls doppel-laufwerk)
+ 9512 data"<n/right> neuen namen eingeben
+ 9513 data"<s/p/u/r> filetyp neu festlegen
+ 9514 data"<d>       file loeschen
+ 9515 data,+
+ 9516 data"<*>       offenes file schliessen
+ 9517 data"<+/->     fileschutz setzen/aufheben
+ 9518 data"<_/=/ret> eintrag weitergehen
+ 9519 data"<b>       block weitergehen
+ 9520 data"<^/@>     eintrag zurueckgehen
+ 9521 data"<v>       spaeter 'validate'
+ 9522 data"<e>       ausstieg aus editor
+ 9523 data"<x>       beenden des programms
+ 9524 data,,*
+10000 open3,8,0,"$:$$
+10001 get#3,a$:printasc(a$+chr$(0))a$:goto10001
+

@@ -1,0 +1,144 @@
+
+
+;betr.sys.-ed..prg ==0801==
+  100 ifn$=""thenp=peek(1):ifp<>53then191
+  101 ifn$=""thenp=peek(1):ifp=53then232
+  102 poke1,53:goto201
+  103 fori=atob:readd:pokei,d:s=s+d:nexti
+  104 return
+  105 rem*****************************
+  106 rem*                           *
+  107 rem*   betriebssystem-editor   *
+  108 rem*                           *
+  109 rem*       commodore 64        *
+  110 rem*     kernal und basic      *
+  111 rem*                           *
+  112 rem*        1985 by ridi       *
+  113 rem*   ---------------------   *
+  114 rem*     richard diezmann      *
+  115 rem*     loisachstrasse 5      *
+  116 rem*     8400 regensburg       *
+  117 rem*                           *
+  118 rem*     tel.(0941)49542       *
+  119 rem*                           *
+  120 rem*****************************
+  121 poke53280,1:poke53281,1:printchr$(147)chr$(152)
+  122 print"deutsches betriebssystem wird";:printchr$(13)"initialisiert !"
+  123 a1=41374:e1=41767
+  124 a2=41828:e2=41865
+  125 a3=58463:e3=58540
+  126 a4=61629:e4=61738
+  127 a5=64608:e5=64667
+  128 a=a1:b=e1:gosub103:ifs<>29905then183
+  129 a=a2:b=e2:s=0:gosub103:ifs<>1919then183
+  130 a=a3:b=e3:s=0:gosub103:ifs<>4464then183
+  131 a=a4:b=e4:s=0:gosub103:ifs<>7664then183
+  132 a=a5:b=e5:s=0:gosub103:ifs<>6755then183
+  133 poke41812,219:sys58648:sys58260
+  134 rem datenblock 1                            basic-fehlermeldungen
+  135 rem --------------------------------
+  136 data90,85,32,86,73,69,76,69,32,70,73,76,69,211,79,70,70,69,78,161,32
+  137 data32,32,78,73,67,72,84,32,79,70,70,69,78,161,32,78,73,67,72,84,32,71
+  138 data69,70,85,78,68,69,206,71,69,82,65,69,84,32,65,85,83,32,186,32,32
+  139 data32,32,32,32,75,69,73,78,32,69,73,78,71,46,70,73,76,197,75,69,73,78
+  140 data32,65,85,83,71,65,46,70,73,76,197,70,73,76,69,78,65,77,69,32,70,69
+  141 data72,76,84,161,32,32,73,76,76,69,71,65,76,69,32,71,69,82,65,69,84,78
+  142 data85,77,77,69,210,78,69,88,84,32,79,72,78,69,32,70,79,210,32,32,32
+  143 data83,80,82,65,67,200,82,69,84,85,82,78,32,79,72,78,69,32,71,79,83,85
+  144 data194,32,32,32,68,65,84,69,78,90,69,73,76,69,206,70,65,76,83,67,72
+  145 data69,32,90,65,72,76,186,32,32,32,90,65,72,76,32,90,85,190,75,69,73
+  146 data78,32,82,65,77,32,77,69,72,210,90,69,73,76,69,32,78,73,67,72,84,32
+  147 data68,65,32,161,32,78,73,67,72,84,32,73,78,32,68,73,77,161,82,69,68
+  148 data73,77,32,65,82,82,65,89,32,173,68,73,86,73,83,73,79,78,32,68,85,82
+  149 data67,72,32,176,78,85,82,32,80,82,71,46,77,79,68,85,83,161,90,65,72
+  150 data76,32,83,84,65,84,84,32,83,84,82,73,78,71,161,32,90,85,32,76,65,78
+  151 data71,161,32,70,73,76,69,32,68,65,84,193,83,84,82,73,78,71,32,90,85
+  152 data32,75,79,77,80,76,69,88,161,32,75,65,78,78,32,78,73,67,72,84,161
+  153 data32,32,32,85,78,68,69,70,46,32,70,85,78,75,84,73,79,78,161,80,82,85
+  154 data69,70,197,76,65,68,197
+  155 rem
+  156 rem datenblock 2                            meldungen des interpreters
+  157 rem -------------------------------
+  158 data13,79,75,13,0,32,70,69,72,76,69,82,0,32,73,78,32,0,13,10,66,69,82
+  159 data69,73,84,13,10,0,13,10,80,65,85,83,69,0,160
+  160 rem
+  161 rem datenblock 3                            startkennung betriebssystem
+  162 rem -------------------------------
+  163 data0,32,66,89,84,69,83,32,70,65,83,84,76,79,65,68,73,78,71,0,147,13
+  164 data32,32,32,32,32,32,42,32,67,79,77,77,79,68,79,82,69,32,54,52,32,75
+  165 data69,82,78,65,76,32,86,50,46,48,32,42,32,13,13,40,67,41,49,57,56,53
+  166 data32,66,89,32,82,73,68,73,46,32,0,129
+  167 rem
+  168 rem datenblock 4                            systemmeldungen kernal
+  169 rem -------------------------------
+  170 data13,69,47,65,32,70,69,72,76,69,82,186,13,83,85,67,72,69,32,78,65,67
+  171 data72,13,32,32,32,160,68,82,85,69,67,75,69,32,80,76,65,89,84,65,83,84
+  172 data69,160,68,82,85,69,67,75,69,32,82,69,67,79,82,68,43,80,76,65,89,84
+  173 data65,83,84,197,32,32,32,13,13,76,65,68,69,160,32,32,13,13,83,65,86
+  174 data69,160,32,13,13,80,82,85,69,70,69,160,13,70,65,78,68,160,32,13,79
+  175 data75,141
+  176 rem
+  177 rem datenblock 5                            kernal-oldroutine
+  178 rem -------------------------------
+  179 data165,43,164,44,133,34,132,35,160,3,200,177,34,208,251,200,152,24,101
+  180 data34,160,0,145,43,165,35,105,0,200,145,43,136,162,3,230,34,208,2,230
+  181 data35,177,34,208,244,202,208,243,165,34,105,2,133,45,165,35,105,0,133
+  182 data46,96
+  183 print"fehler in der daten-summe "
+  184 ifa=a1thenprint"in block 1!"
+  185 ifa=a2thenprint"in block 2!"
+  186 ifa=a3thenprint"in block 3!"
+  187 ifa=a4thenprint"in block 4!"
+  188 ifa=a5thenprint"in block 5!"
+  189 print"bitte ueberpruefen.":end
+  190 rem
+  191 rem init-routine rom-ram
+  192 rem -------------------------------
+  193 poke53280,0:poke53281,0:printchr$(147)chr$(152)
+  194 print"ram wird aktiviert, bitte 60 sec warten!"
+  195 forx=40960to49152:pokex,peek(x):next
+  196 forx=57344to65535:pokex,peek(x):next
+  197 goto234
+  198 rem
+  199 rem farbzusammenstellung
+  200 rem -------------------------------
+  201 sys58648
+  202 print"farben beibehalten ?"
+  203 getf$:iff$=""then203
+  204 iff$="j"then213
+  205 input"zeichenfarbe ... ";z
+  206 input"rahmenfarbe .... ";r
+  207 input"hintergrundfarbe ";h
+  208 poke58677,z:poke60633,r:poke60634,h
+  209 sys58648:goto202
+  210 rem
+  211 rem old-befehl einrichten
+  212 rem -------------------------------
+  213 printchr$(147)"soll die funktionstaste f8 mit dem "
+  214 print"old-befehl belegt werden (j/n)"
+  215 getf$:iff$=""then215
+  216 iff$="j"then218
+  217 goto224
+  218 input"kernal standard/hypra 1                 kernal hypra-perfect  2  ";k
+  219 onkgoto220,221
+  220 poke64346,54:poke64347,48:goto224
+  221 poke64469,83:poke64470,121:poke64471,54:poke64472,52:poke64473,54
+  222 poke64474,48:poke64475,56:poke64476,13:poke64477,136:poke64778,255
+  223 poke64479,255
+  224 printchr$(147)"soll der old-befehl als basic-direkt-"
+  225 print"befehl verwendet werden (j/n)"
+  226 getf$:iff$=""then226
+  227 iff$="j"then229
+  228 goto121
+  229 poke40972,95:poke40973,252
+  230 poke41118,79:poke41119,76:poke41120,196:goto121
+  231 rem
+  232 rem laden eines vorhandenen kernals
+  233 rem -------------------------------
+  234 poke1,55:printchr$(147)"soll ein bestehendes betriebssystem von"
+  235 print"disk geladen werden ?"
+  236 getf$:iff$=""then236
+  237 iff$="n"thenpoke1,53:goto201
+  238 input"filename ";n$
+  239 loadn$,8,1
+
