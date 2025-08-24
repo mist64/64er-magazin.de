@@ -1,0 +1,42 @@
+
+
+;schreibschutz.prg ==0801==
+    1 rem ********************************
+    2 rem **                            **
+    3 rem **       schreibschutz        **
+    4 rem **                            **
+    5 rem ** (c)'85 by                  **
+    6 rem ** manfred lins               **
+    7 rem ** reitacker 1                **
+    8 rem ** 6492 sinntal-zuentersbach  **
+    9 rem ********************************
+   10 printchr$(147):rem clear/home
+   20 x=7:y=2:gosub510
+   30 print"d i s k  -  s c h u t z"
+   40 x=2:y=6:gosub510
+   50 print"altes formatkennzeichen :";
+   60 open1,8,15,"i":open2,8,2,"#"
+   70 print#1,"u1 2 0 18 0"
+   80 print#1,"b-p 2 2"
+   90 get#2,af$: rem altes formatkennz.
+  100 printaf$
+  110 x=2:y=9:gosub510
+  120 print"wird geaendert in   ";
+  130 ifaf$="a"thenprint"x":goto150
+  140 print"a"
+  150 x=20:y=9:gosub510
+  160 inputnf$
+  170 print#1,"m-w"chr$(1)chr$(1)chr$(1)chr$(65)
+  180 print#1,"b-p 2 2"
+  190 print#2,nf$:rem neues formatkennz.
+  200 print#1,"u2 2 0 18 0"
+  210 close2:close1
+  220 ifnf$="a"thend$="{rvon}  kein schreibschutz !  ":goto240
+  230 d$="{rvon}  schreibschutz aktiviert !  "
+  240 x=6:y=14:gosub510
+  250 printd$
+  260 end
+  500 rem routine zum cursorsetzen
+  510 poke211,x:poke214,y:sys58640:return
+  520 rem unterprogrammende
+

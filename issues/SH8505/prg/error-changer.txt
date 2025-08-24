@@ -1,0 +1,68 @@
+
+
+;error-changer.prg ==0801==
+  110 rem *****************************
+  130 rem *                           *
+  140 rem * e r r o r - c h a n g e r *
+  150 rem *                           *
+  151 rem *          c 64             *
+  152 rem *                           *
+  160 rem *     by andreas knipp      *
+  170 rem *                           *
+  180 rem *****************************
+  190 rem
+  200 poke53280,4:poke53281,6:goto 250
+  250 print"{clr}{wht}waehlbare fehlermeldungen by a.knipp kps":dimt$(40):fz=1
+  260 t$(30)="break error"
+  270 t$(31)="ready.":hi=256
+  280 fori=49152to49232
+  300 readx:pokei,x:next
+  310 poke768,139:poke769,227:rem fehlermeldungen auf rom  stellen.
+  320 lv=41372:sv=49293:va=49233
+  330 forlv=41373to41767:rem einlesen der alten fehlermeldungen
+  340 t$(fz)=t$(fz)+chr$(peek(lv)and127):ifpeek(lv)<127then370
+  350 t$(fz)=t$(fz)+" error":printt$(fz)
+  360 fz=fz+1
+  370 nextlv:fz=fz+1:rem platz fuer readymeldung
+  380 fori=1tofz:rem moeglichkeit der aenderung
+  390 print"{rght}{rght}"t$(i)chr$(13)"{up}";:inputt$(i)
+  400 iflen(t$(i))<2then390
+  410 nexti
+  420 input"alles richtig j/n";ar$:ifar$<>"j"then380
+  430 forj=1tofz-1:rem neue fm in den speicher schreiben
+  440 fori=1tolen(t$(j))-1
+  450 pokesv+i-1,asc(mid$(t$(j),i,1))
+  460 nexti
+  470 pokesv+i-1,asc(mid$(t$(j),i,1))+128
+  480 a=sv:gosub690:pokeva+1,ah%:pokeva,al%
+  490 va=va+2:sv=sv+i:nextj
+  500 pokesv,13
+  510 forj=1tolen(t$(31)):pokesv+j,asc(mid$(t$(31),j,1)):next:rem ready
+  520 pokesv+j,13:a=sv:gosub690:poke49220,al%:poke49222,ah%:pokesv+j+1,0
+  530 sys 49152
+  540 input"speicherung j/n";s$:ifs$="n"thenend
+  550 ifs$<>"j"then540
+  560 sa=49152:ae=sv+j+2
+  570 print"geraetenummer";
+  580 print"   floppy = z.b.  8                        datasette =    1";
+  590 input dn
+  600 a$="@:fehler.obj":a%=len(a$)
+  610 a=681:gosub690:poke183,a%:poke187,al%:poke188,ah%
+  620 fori=1toa%:poke680+i,asc(mid$(a$,i)):next:rem filename
+  630 a=sa:gosub690:poke251,al%:poke252,ah%:rem startadresse
+  640 a=ae:gosub690:poke781,al%:poke782,ah%:rem endadresse
+  650 poke186,dn:poke780,251:sys65496:rem save:dn = devicenummer
+  660 print"{wht}speicherung erfolgte unter "chr$(34)"fehler.obj"chr$(34)
+  670 print"absolut laden und mit sys 49152 starten"
+  680 end
+  690 ah%=a/hi:al%=a-ah%*hi
+  700 return
+  710 data169,11,160,192,141,0,3,140,1,3,96,138
+  720 data16,3,76,67,192,10,170,189,79,192,133,34
+  730 data189,80,192,133,35,32,204,255,169,0,133,19
+  740 data32,215,170,32,69,171,160,0,177,34,72,41
+  750 data127,32,71,171,200,104,16,244,32,122,166,164
+  760 data58,200,240,3,32,194,189,169,187,160,194,76
+  770 data 120,164
+  780 data169,139,160,227,76,4,192
+

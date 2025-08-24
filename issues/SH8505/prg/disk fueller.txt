@@ -1,0 +1,153 @@
+
+
+;disk fueller.prg ==0801==
+  100 rem   **************************
+  110 rem   *                        *
+  120 rem   *                        *
+  130 rem   *     disk   fueller     *
+  140 rem   *                        *
+  150 rem   *                        *
+  160 rem   *                        *
+  170 rem   *    von  uwe  gerlach   *
+  180 rem   *                        *
+  190 rem   *      bruehlstr. 23     *
+  200 rem   *                        *
+  210 rem   *                        *
+  220 rem   *      6440  bebra 1     *
+  230 rem   *                        *
+  240 rem   *                        *
+  250 rem   *                        *
+  260 rem   *                        *
+  270 rem   *      im april 1985     *
+  280 rem   *                        *
+  290 rem   *                        *
+  300 rem   **************************
+  400 :
+  500 :
+ 1000 poke53280,0: poke53281,0: rem farbe
+ 1010 print chr$(14);"{clr}{gry2}  VC 1541    D i s k   F u e l l e r":print:print:print
+ 1015 print"Dieses Programm wurde geschrieben von:":print:print
+ 1020 print,"{lblu}  Uwe Gerlach": print,"  Bruehlstr. 23": print: print,"  6440 Bebra 1{gry2}"
+ 1025 print:print:print"Es schafft auf vollen Disketten noch"
+ 1030 print"etwas Platz, indem es die eigentlich"
+ 1035 print"fuer das Directory vorgesehene Spur 18"
+ 1040 print"belegt.":print:print
+ 1045 :
+ 1050 open 1,8,15,"i": rem  fuer befehle
+ 1060 open 2,8,2,"#" : rem  pufferkanal
+ 1090 :
+ 1100 rem  *****************************
+ 1110 rem    directorylaenge ermitteln
+ 1120 rem  *****************************
+ 1130 :
+ 2000 dim t(25): dim s(25): dim e(25)
+ 2010 print# 1, "u1:"2;0;18;0: rem  bam
+ 2020 get# 2,t$,s$: rem  zeiger auf dir.
+ 2030 t(0)=asc(t$+chr$(0)): rem  track
+ 2040 s(0)=asc(s$+chr$(0)): rem  sector
+ 2050 t=t(0): rem  track  dir. anfang
+ 2060 s=s(0): rem  sector dir. anfang
+ 2070 b=1: rem  blockzaehler
+ 2100 print# 1, "u1:"2;0;t;s
+ 2110 get# 2,t$,s$: rem  zeiger
+ 2120 t=asc(t$+chr$(0))
+ 2130 s=asc(s$+chr$(0))
+ 2140 if t=0 or t>35 or s>20 or b=25 then 2400:  rem  letzter directory-block
+ 2150 t(b)=t: s(b)=s: rem  zeiger merken
+ 2155 e(b-1)=8: rem  eintraege im block
+ 2160 b=b+1: rem  zaehler erhoehen
+ 2190 goto 2100 : rem  naechster block
+ 2400 m=b: rem  dir. blockzahl
+ 2500 f=0: rem  zaehler freie eintraege
+ 2510 for i=2 to 226 step 32
+ 2520 : print# 1, "b-p:"2,i: rem zeiger
+ 2530 : get# 2,w$: rem  filetyp
+ 2540 : if w$="" then f=f+1: rem  frei
+ 2590 next i: rem  alle eintr. im block
+ 2600 e(b-1)=8-f: rem  eintraege/block
+ 2610 if f=8 and m=1 then 7800: rem leer
+ 2700 print "Genuegen";f;"freie Directory-Plaetze ? ";
+ 2750 get a$: if a$="" then 2750
+ 2760 if a$<>"n" then a$="j"
+ 2770 print a$: print: print: print
+ 2790 :
+ 3000 rem  *****************************
+ 3010 rem    leere dir. bloecke festst.
+ 3020 rem  *****************************
+ 3030 :
+ 3050 print# 1, "u1:"2;0;18;0: rem  bam
+ 3060 print# 1, "b-p:"2,73: rem  spur 18
+ 3100 b=0 : rem  blockzaehler
+ 3110 l=19: rem  zahl leere dir-bloecke
+ 3120 dim z(25): rem  zustand der blocks
+ 3130 for i=1 to 3: rem  bytes spur 18
+ 3140 : get# 2, w$: rem  belegungscode
+ 3150 : w=asc(w$+chr$(0))
+ 3160 : for j=1 to 8: rem  dualstellen
+ 3170 :  w=w/2
+ 3180 :  if w=int(w) then z(b)=1
+ 3190 :  if z(b)=0 and a$="n" then a$="": z(b)=1: rem  einen block freihalten
+ 3195 :  if z(b)=1 and b<19 then l=l-1
+ 3200 :  b=b+1
+ 3085 :  w=int(w)
+ 3220 : next j
+ 3230 next i
+ 3310 if l<1 then 8000
+ 3390 print: print: print "Es werden nun";l;" Bloecke freigestellt !": print
+ 3990 :
+ 4000 rem  *****************************
+ 4010 rem    fuellen der dir.- bloecke
+ 4020 rem  *****************************
+ 4021 :
+ 4025 b=0: rem  blockzaehler, siehe oben
+ 4027 for e=0 to e(b)-1: rem eintr/block
+ 4030 at=t(b): rem  alter dir-track
+ 4035 as=s(b): ns=as: rem  alter sector
+ 4040 if at=0 and as=0 then 7050
+ 4050 i=0
+ 4060 z=e*32+3: rem  stelle des zeigers
+ 4100 r=0: rem  marke dir.-block aendern
+ 4150 print# 1, "u1:"2;0;at;as: rem  alt
+ 4160 print# 1, "b-p:"2,z: rem  zeiger
+ 4170 get# 2, t$,s$: rem  zeiger forts.
+ 4180 t=asc(t$+chr$(0))
+ 4190 s=asc(s$+chr$(0))
+ 4191 if t=18 then 4670: rem  bearbeitet
+ 4192 if t=0 or t>35 or s>20 then z=1: goto 4520: rem  fileende
+ 4200 for i=0 to 18 step 10: rem  suche nach freiem sector im sectorabstand
+ 4210 : if z(i)=0 then 4500: rem  leer
+ 4212 : if i=9 then goto 4230
+ 4215 : if i>8 then i=i-9: goto 4210
+ 4220 next i
+ 4230 z=-1: rem  marke: spur 18 voll
+ 4300 goto 4520: rem  rueck ohne aender.
+ 4500 print# 1, "b-p:"2,z: rem  zeiger
+ 4510 print# 2, chr$(18);chr$(i);: rem   zeiger verbiegen
+ 4515 if at=18 and as=ns then r=1: rem   in den block, aus dem gelesen wurde
+ 4520 print "      Block";right$("  "+str$(at),3);","right$("  "+str$(as),3);
+ 4525 if r=1 then print"  Zeiger";e+1;"geaendert": goto 4570
+ 4530 print "  -->  18,";right$("  "+str$(ns),3)
+ 4550 print# 1, "b-a:"0,18,ns:rem in bam
+ 4560 print# 1, "b-f:"0,at,as: rem  alten block freigeben
+ 4570 z(i)=1: rem block in liste belegen
+ 4580 print# 1, "u2:"2;0;18;ns:rem ruec{rvon}
+ 4650 at=t: as=s: ns=i: rem  norm. block
+ 4655 if z=-1 then goto 9000: rem  ok
+ 4660 if z<>1 then z=0: goto 4100
+ 4670 next e: rem  neuer dir.-eintrag
+ 4680 b=b+1: goto 4027: rem  weiter mit naechstem directoryblock
+ 6990 :
+ 7000 rem  *****************************
+ 7010 rem         fehlermeldungen
+ 7020 rem  *****************************
+ 7030 :
+ 7050 print: print "Es waren nicht genug belegte Blocks da."
+ 7060 print " Spur 18 ist immernoch teilweise frei!"
+ 7090 goto 9000
+ 7800 print:print:print"Die Diskette ist leer!"
+ 7810 goto 9000
+ 8000 print "Tut mir leid, da ist nichts zu machen."
+ 8010 print "Die gesamte Spur 18 ist voll belegt !"
+ 9000 print
+ 9010 close 1: close 2: end
+

@@ -1,0 +1,56 @@
+
+
+;fehlermeldung.prg ==0801==
+    0 rem *********************************
+    1 rem **  automatische fehlermeldung **
+    2 rem **   von der floppy disk 1541  **
+    3 rem **-----------------------------**
+    4 rem **   written by georg kramer   **
+    5 rem **      auf dem moore 15       **
+    6 rem **       4783 anroechte        **
+    7 rem **      tel.: 02947/3511       **
+    8 rem **       (c) juni 1985         **
+    9 rem *********************************
+   10 :
+   20 printchr$(147)
+   30 printspc(81)"UCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCI"
+   40 print" B auto. fehlermeldung von der floppy B"
+   50 print" JCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCK"
+   60 printspc(88)"written by georg kramer"
+   70 printspc(93)"(c) juni 1985":print
+   80 fori=1to40:print"-";:next
+   90 printspc(44)"{rvon} achtung: {rvof} floppy einschalten !"
+  100 printspc(94)"<< taste >>"
+  110 poke198,0
+  120 geta$:ifa$=""then120
+  130 :
+  140 printchr$(147):print:print
+  150 input "  {rvon}startadresse : {rvof} 49152{left}{left}{left}{left}{left}{left}{left}";s
+  160 fori=0to247:reada:x=x+a
+  170 pokes+i,a:next
+  180 ifx<>32204thenprint"daten-fehler !":end
+  185 rem *** programm anpassen ***
+  190 pokes+7,(s+13)/256
+  200 pokes+2,(s+13)-peek(s+7)*256
+  202 pokes+154,(s+218)/256
+  204 pokes+153,(s+218)-peek(s+154)*256
+  210 sys(s)
+  220 printchr$(147):printspc(8)"{rvon}   programm aktiviert    "
+  230 printspc(8)"{rvon} start:   sys"s"{left}      "
+  240 printspc(8)"{rvon} ende : run-stop/restore "
+  250 end
+ 1000 rem *** maschinenprogramm ***
+ 1001 data120,169,13,141,20,3,169,192,141,21,3,88,96,230,182,240,3,76,49,234
+ 1002 data165,144,201,66,240,8,165,144,201,128,240,2,208,239,169,255,162,8
+ 1003 data160,15,32,186,255,169,0,32,189,255,32,192,255,162,255,32,198,255
+ 1004 data32,207,255,201,48,208,7,32,47,243,88,76,49,234,72,165,211,141,168
+ 1005 data2,165,214,141,178,2,162,0,189,0,4,157,132,3,232,224,120,208,245,162
+ 1006 data0,169,32,157,0,4,232,224,120,208,246,32,102,229,169,207,240,252,169
+ 1007 data1,133,204,173,134,2,133,189,169,1,141,134,2,169,1,133,199,104,32
+ 1008 data210,255,32,207,255,32,210,255,165,144,201,64,208,244,32,47,243,162
+ 1009 data0,189,218,192,32,210,255,232,224,30,208,245,32,135,234,165,203,201
+ 1010 data64,240,247,165,189,141,134,2,162,0,162,0,189,132,3,157,0,4,232,224
+ 1011 data120,208,245,165,189,157,0,216,232,224,120,208,246,173,168,2,133,211
+ 1012 data173,178,2,133,214,32,16,229,76,49,234,18,32,60,60,32,66,73,84,84
+ 1013 data69,32,84,65,83,84,69,32,68,82,85,69,67,75,69,78,32,62,62,32,146
+

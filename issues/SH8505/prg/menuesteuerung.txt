@@ -1,0 +1,77 @@
+
+
+;menuesteuerung.prg ==0801==
+    2 rem   ****** menue-demo ******
+    4 poke53280,0:poke53281,0:printchr$(147)
+    5 rem * * * menue-worte einlesen * * *
+    6 am=12:dimd$(am+1):dimaa(am+1):rem am=max. anzahl der worte
+    7 i=1
+    8 readd$(i):d$(i)=chr$(32)+d$(i)+chr$(32):ifd$(i)<>" _ "theni=i+1:goto8
+    9 datastart,help,goto,renum,list
+   10 dataold,find,ctrl,clr,new,run,ende,_
+   13 rem * * * * * * * * * * * * * * * *
+   14 poke214,15:print:printtab(10)"<= crsr =>  und return"
+   15 rem beispiel
+   16 an=1:az=5:gosub1000:rem 1.menue
+   17 onkkgosub27,27,27,27,27
+   18 :
+   19 an=6:az=7:gosub1000:rem 2.menue
+   20 onkkgosub27,27,27,27,27,27,30
+   22 goto16
+   25 :
+   26 rem anzeige
+   27 poke214,15:print:printtab(18)"               "
+   28 poke214,15:print:printtab(10)"gewaehlt:";d$(an+kk-1);"(";kk;")":return
+   29 :
+   30 printchr$(147):end
+   32 :
+ 1000 rem ******************************
+ 1010 rem **** menue unterprogramm  ****
+ 1020 rem ******************************
+ 1030 rem ****  (c) mario schacht   ****
+ 1040 rem ****      (030)4968872    ****
+ 1050 rem ******************************
+ 1060 rem **** aufruf (beispiel)    ****
+ 1070 rem **** an=1:az=4:gosub1000  ****
+ 1080 rem **** on kk gosub11,22,... ****
+ 1090 rem ****- - - - - - - - - - - ****
+ 1100 rem **** an: anfang mit an-ten****
+ 1110 rem ****     string           ****
+ 1120 rem **** az: anzahl der menue-****
+ 1130 rem ****     punkte           ****
+ 1140 rem **** kk: 1 bis az wird    ****
+ 1150 rem ****     uebergeben       ****
+ 1160 rem ******************************
+ 1170 rem **** verwendete variablen ****
+ 1180 rem **** d$(am);aa(am);a$     ****
+ 1190 rem **** am;az;an;al;di;ay;kk ****
+ 1200 rem ****                      ****
+ 1210 rem ******************************
+ 1220 al=0
+ 1230 fori=anto(an+az-1):al=al+len(d$(i)):next:rem al=gesamtlaenge
+ 1240 ifal>38+azthenpoke214,22:print:print" menue-worte kuerzen !":return
+ 1250 ifal<39then1290
+ 1260 rem worte kuerzen
+ 1270 di=al-39:fori=anto(an+di):d$(i)=left$(d$(i),len(d$(i))-1):next:al=38
+ 1280 rem menue darstellen
+ 1290 poke214,22:print:printtab((40-al)/2)
+ 1300 fori=anto(an+az-1)
+ 1310 printchr$(18)chr$(30);d$(i);:next
+ 1330 rem anzeige
+ 1340 aa(an)=(40-al)/2:rem erste stelle
+ 1350 fori=anto(an+az-2)
+ 1360 aa(i+1)=aa(i)+len(d$(i)):next
+ 1380 rem startposition
+ 1390 kk=int(az/2):fl=0:fr=158:gosub1550
+ 1400 rem abfrage
+ 1410 geta$:ifa$=""then1410
+ 1420 ifa$<>chr$(29)anda$<>chr$(157)anda$<>chr$(13)then1410
+ 1430 ifa$=chr$(29)thenkk=kk+1:fl=-1:fr=30:gosub1550:ifkk=azthenkk=0
+ 1440 ifa$=chr$(157)thenkk=kk-1:fl=1:fr=30:gosub1550:ifkk<0thenkk=az-1
+ 1450 fl=0:fr=158:gosub1550
+ 1460 ifa$<>chr$(13)then1410
+ 1470 poke214,22:print:print"                                       ":rem menue loeschen
+ 1500 kk=kk+1:return:rem ruecksprung mit parameter kk
+ 1540 rem anzeige gelb
+ 1550 poke214,22:print:printtab(aa(kk+an+fl))chr$(18)chr$(fr);d$(kk+an+fl):return
+

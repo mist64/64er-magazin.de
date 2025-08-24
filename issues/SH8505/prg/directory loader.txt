@@ -1,0 +1,173 @@
+
+
+;directory loader.prg ==0801==
+   10 rem ***************************
+   20 rem **     direktory loader
+   30 rem **
+   40 rem **     by holger weihe
+   50 rem **        am silberberg 1
+   60 rem **        3344 boerssum
+   70 rem **
+   80 rem **  tel.  05334/6589
+   90 rem **
+  100 rem ***************************
+  110 rem ^ = pfeil nach oben
+  120 rem @ = klammeraffe
+  130 rem ***************************
+  140 rem **  direktory routine
+  150 rem ***************************
+  160 rem
+  170 rem
+  180 data169,36,133,251,169,251,133,187,169,0,133,188,169,1,133,183,169,8
+  190 data133,186,169,96,133,185,32,213,243,165,186,32,180,255,165,185,32,150
+  200 data255,169,0,133,144,160,3,132,251,32,165,255,133,252,164,144,208,47
+  210 data32,165,255,164,144,208,40,164,251,136,208,233,166,252,32,205,189
+  220 data169,32,32,210,255,32,165,255,166,144,208,18,170,240,6,32,210,255
+  230 data76,76,192,169,13,32,210,255,160,2,208,198,32,66,246,96,234
+  240 for i=49152 to 49152+105:readd:pokei,d:o=o+d:next
+  250 if o<>15577 then poke199,1:print"  fehler in datas  ":stop
+  260 rem
+  270 rem
+  280 rem ****************************
+  290 rem ** titel
+  300 rem ****************************
+  310 rem
+  320 rem
+  330 poke53280,0:poke53281,0:printchr$(152)
+  340 printchr$(14):printchr$(147)
+  350 print"     {CBM-O}{CBM-O}{CBM-O}{CBM-O}{CBM-O}{CBM-O}{CBM-O}{CBM-O}{CBM-O}{CBM-O}{CBM-O}{CBM-O}{CBM-O}{CBM-O}{CBM-O}{CBM-O}{CBM-O}{CBM-O}{CBM-O}{CBM-O}{CBM-O}{CBM-O}{CBM-O}{CBM-O}{CBM-O}{CBM-O}{CBM-O}{CBM-O}{CBM-O}"
+  360 print"     {CBM-J}                           {CBM-L}"
+  370 print"     {CBM-J}     Direktory Loader      {CBM-L}"
+  380 print"     {CBM-J}                           {CBM-L}"
+  390 print"     {CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}{CBM-U}"
+  400 print
+  410 print"
+  420 print"     ";chr$(18);" Bitte auswaehlen ";chr$(146):print:print
+  430 print"        ";chr$(18);"1";chr$(146);"   Direktory anzeigen":print
+  440 print"        ";chr$(18);"2";chr$(146);"   Direktory bearbeiten":print
+  450 print"        ";chr$(18);"3";chr$(146);"   Quit":print
+  470 get x$:if x$="" then 470
+  480 k=val(x$):if k<1 or k>3 then 470
+  490 on k goto 510,660,1740
+  500 goto 330
+  510 rem
+  520 rem
+  530 rem *******************************
+  540 rem **   direktory anzeigen
+  550 rem *******************************
+  560 rem
+  570 rem
+  580 printchr$(147):print:print:poke199,1:print" Bitte Disk einlegen und Taste druecken "
+  590 get x$:if x$="" then 590
+  600 printchr$(147) :sys 49152
+  610 print:print:poke199,1:print" Taste druecken "
+  620 get x$:if x$="" then 620
+  630 goto 330
+  640 rem
+  650 rem
+  660 rem ***************************
+  670 rem ***  komma achter
+  680 rem ***************************
+  690 rem
+  700 rem
+  710 t=18:s=1:z=5
+  720 open 1,8,15
+  730 open 2,8,2,"#"
+  740 print#1,"u1";2;0;t;s
+  750 get#2,t$,s$
+  760 p=t:q=s
+  770 if t$="" then t=0:s=255:goto800
+  780 t=asc(t$):s=asc(s$):
+  790 print#1,"b-p";2;1
+  800 print#1,"b-p";2;z:
+  810 for i=1 to 16
+  820 get#2,n$
+  830 d$=d$+n$
+  840 next i
+  850 print#1,"b-p";2;z
+  860 if d$="" then 1510
+  870 printchr$(147):print:print:print"   Next Direktory Block :"
+  880 print:print"   Track :";t;" Sektor :";s
+  890 print:print:print:print:print"   Programm :";d$
+  900 print:print
+  915 print"   ";chr$(18);"B";chr$(146);"asic oder ";chr$(18);"M";chr$(146);"aschinenprogramm"
+  920 print
+  930 print:print:print:print:poke199,1:print"    <^> Weiter   <@> Loeschen      "
+  940 get x$:if x$="" then 940
+  950 if x$="b"then 1070
+  960 if x$="m"then 1160
+  970 if x$="^"then 1300
+  980 if x$="@" then 1420
+  990 goto 940
+ 1000 rem
+ 1010 rem
+ 1020 rem **************************
+ 1030 rem ** basicprogramm
+ 1040 rem **************************
+ 1050 rem
+ 1060 rem
+ 1070 d$=left$(d$,12)
+ 1080 ne$=d$+chr$(160)+",8:"
+ 1100 print#2,ne$
+ 1110 ne$="":d$="":z=z+32
+ 1120 if z>256 then z=5:goto 1510
+ 1130 goto 800
+ 1140 rem
+ 1150 rem
+ 1160 rem **************************
+ 1170 rem ** maschprogramm
+ 1180 rem **************************
+ 1190 rem
+ 1200 rem
+ 1210 d$=left$(d$,11)
+ 1220 ne$=d$+chr$(160)+",8,1"
+ 1240 print#2,ne$
+ 1250 ne$="":d$="":z=z+32
+ 1260 if z>256 thenz=5:goto 1510
+ 1270 goto 800
+ 1280 rem
+ 1290 rem
+ 1300 rem ****************************
+ 1310 rem ** keine aenderung
+ 1320 rem ****************************
+ 1330 rem
+ 1340 rem
+ 1350 print#2,d$:d$=""
+ 1360 z=z+32
+ 1370 if z>256 thenz=5:goto 1510
+ 1380 goto 800
+ 1390 rem
+ 1400 rem
+ 1410 rem ****************************
+ 1420 rem ** loeschen des anhangs
+ 1430 rem ****************************
+ 1440 rem
+ 1450 rem
+ 1460 d$=left$(d$,12)+chr$(160)+chr$(160)+chr$(160)+chr$(160)
+ 1470 print#2,d$:d$=""
+ 1480 z=z+32
+ 1490 if z>256 then z=5:goto 1510
+ 1500 goto 800
+ 1510 rem
+ 1520 rem
+ 1530 rem ****************************
+ 1540 rem ** rueckschreiben
+ 1550 rem ****************************
+ 1560 rem
+ 1570 rem
+ 1580 if t=0 and s=255 then print#1,"u2";2;0;p;q:goto 1690
+ 1590 print#1,"u2";2;0;p,q
+ 1600 p=t:q=s:close2:close1:goto720
+ 1610 rem
+ 1620 rem
+ 1630 rem
+ 1640 rem ****************************
+ 1650 rem ** ende
+ 1660 rem ****************************
+ 1670 rem
+ 1680 rem
+ 1690 print:print:poke199,1:print"           Taste Druecken          "
+ 1720 get x$:if x$="" then 1720
+ 1730 close2:close1:goto 330
+ 1740 sys 64738
+
