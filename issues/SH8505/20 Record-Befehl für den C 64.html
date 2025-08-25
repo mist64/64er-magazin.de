@@ -345,7 +345,116 @@
         </figure>
 
         <figure>
-            TODO
+            <pre>     * = 49152 ;Startadresse
+
+       jmp on       ;zum Einbinden       c000 4c 1d c0
+
+;******* Erweiterung abschalten *******
+       lda flag     ;schon abgeschaltet? c003 ad 1c c0
+       beq endoff                        c006 f0 11
+       lda vekt     ;Vektor wieder her-  c008 ad 1a c0
+       sta decod    ;stellen             c00b 8d 08 03
+       lda vekt+1                        c00e ad 1b c0
+       sta decod+1                       c011 8d 09 03
+       lda #0       ;Flag fuer Abge-     c014 a9 00
+       sta flag     ;schaltet setzen     c016 8d 1c c0
+endoff rts                               c019 60
+vekt   .word $a7e4                       c01a e4 a7
+flag   .byte $00                         c01c 00
+
+;******* Erweiterung einschalten ******
+on     lda #$ff     ;Flag fuer Einge-    c01d a9 ff
+       sta flag     ;schaltet setzen     c01f 8d 1c c0
+       lda decod                         c022 ad 08 03
+       cmp #&lt;record                      c025 c9 4b
+       beq l1                            c027 f0 03
+       sta vekt                          c029 8d 1a c0
+l1     lda decod+1                       c02c ad 09 03
+       cmp #>record                      c02f c9 c0
+       beq l2                            c031 f0 03
+       sta vekt+1                        c033 8d 1b c0
+l2     lda #&lt;record                      c036 a9 4b
+       sta decod                         c038 8d 08 03
+       lda #>record                      c03b a9 c0
+       sta decod+1                       c03d 8d 09 03
+
+       rts                               c040 60
+;****** Interpreterdarstellung von ****
+;****** RECORD#                    ****
+tab1   .byte $23,$44,$b0,$43,$45,$52     c041 23 44 b0 43 45 52
+tab2   .byte $23,$44,$b0,$08             c047 23 44 b0 08
+
+;****** Test auf RECORD#           ****
+record
+       lda chrvek      ;Chrgetzeiger     c04b a5 7a
+       pha             ;retten           c04d 48
+       lda chrvek+1                      c04e a5 7b
+       pha                               c050 48
+       jsr chrget                        c051 20 73 00
+       cmp #$64        ;Simon´s Basic    c054 c9 64
+       beq simon       ;TOKEN            c056 f0 0f
+       ldy #6                            c058 a0 06
+l3     cmp tab1-1,y                      c05a d9 40 c0
+       bne out                           c05d d0 1a
+       jsr chrget                        c05f 20 73 00
+       dey                               c062 88
+       bne l3                            c063 d0 f5
+       beq ok                            c065 f0 1b
+simon  jsr chrget                        c067 20 73 00
+       ldy #4                            c06a a0 04
+l3s    cmp tab2-1,y                      c06c d9 46 c0
+       bne out                           c06f d0 08
+       jsr chrget                        c071 20 73 00
+       dey                               c074 88
+       bne l3s                           c075 d0 f5
+       beq ok                            c077 f0 09
+;****** Weiter mit normalem Basic  ****
+out    pla                               c079 68
+       sta chrvek+1                      c07a 85 7b
+       pla                               c07c 68
+       sta chrvek                        c07d 85 7a
+       jmp (vekt)                        c07f 6c 1a c0
+;****** eigentlicher RECORD#-Befehl ***
+ok     pla         ;Zeiger von Stack     c082 68
+       pla                               c083 68
+       jsr getbyt  ;holt Byte nach x     c084 20 9e b7
+       jsr search  ;sucht log. Filenr.   c087 20 0f f3
+       beq l4      ;gefunden             c08a f0 05
+       ldx #3      ;file not open        c08c a2 03
+       jmp error   ;ausgeben             c08e 4c 37 a4
+l4     jsr parset  ;Fileparameter setzen c091 20 1a f0
+       lda secadr  ;Sekundaeradresse     c094 a5 b9
+       and #$0f                          c096 29 0f
+       pha         ; = Kanalnummer       c098 48
+       lda ga                            c099 a5 ba
+       cmp #16                           c09b c9 10
+       bcc l5      ;ga &lt; 16              c09d 90 05
+illdev ldx #9      ;illegal device nr.   c09f a2 09
+       jmp error                         c0a1 4c 37 a4
+l5     cmp #8                            c0a4 c9 08
+       bcc illdev  ;ga &lt; 8               c0a6 90 f7
+       jsr listen                        c0a8 20 b1 ff
+       lda #$6f    ;15 and $60           c0ab a9 6f
+       sta secadr                        c0ad 85 b9
+       jsr seclis                        c0af 20 93 ff
+       lda #'p     ;positionieren        c0b2 a9 50
+       jsr iecout  ;senden               c0b4 20 a8 ff
+       jsr chkcom                        c0b7 20 fd ae
+       jsr getrec  ;Recordnummer holen   c0ba 20 44 b9
+       jsr fac16   ;FAC nach 16-Bit      c0bd 20 f7 b7
+       pla         ;Kanalnummer          c0c0 68
+       jsr iecout                        c0c1 20 a8 ff
+       lda integ   ;Recordnr. lo         c0c4 a5 14
+       jsr iecout                        c0c6 20 a8 ff
+       lda integ+1 ;Recordnr. hi         c0c9 a5 15
+       jsr iecout                        c0cb 20 a8 ff
+       jsr chrgot  ;letztes Zeichen      c0ce 20 79 00
+       beq ende    ;kein dritter Param.? c0d1 f0 07
+       jsr comget  ;Komma und Parameter  c0d3 20 7d b7
+       txa                               c0d6 8a
+       jsr iecout  ;Position in Record   c0d7 20 a8 ff
+ende   jsr unlist                        c0da 20 ae a7
+       jmp schleife;zur Interpreterschl. c0dd 4c ae a7</pre>
             <figcaption>Listing 2. Source-Code von »Record-Befehl«</figcaption>
         </figure>
     </article>
