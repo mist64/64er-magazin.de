@@ -43,7 +43,136 @@
         <p>Das Programm wird natürlich nach dem Abtippen und Speichern wieder mit der Sekundäradresse 1, das heißt absolut geladen. Nach dem Laden muß »NEW« eingegeben werden, damit die Basic-Zeiger, die in den Bereich $C000-$CFFF verstellt wurden, wieder »zurechtgebogen« werden.</p>
 
         <figure>
-            TODO
+            <pre>10 SYS9*4096
+15 .OPT P,OO
+20 ;
+25 ;****************************************
+30 ;===== ESCAPE-TASTE FUER QUOTE-MODE =====
+35 ;*              AUF COMMODORE 64        *
+40 ;****************************************
+45 ;*                                      *
+50 ;*            CHRISTIAN SPOERRI         *
+55 ;*              LANGWEID 9              *
+60 ;*     CH-8045 ZUERICH/SCHWEIZ          *
+65 ;*                                      *
+70 ;*        TEL.00411/463 65 94           *
+75 ;*                                      *
+80 ;****************************************
+85 ;
+90 ;
+95 ;
+100 ;
+105 ;
+110 COUNT   =$FB   ;VERZOEGERUNGSZAEHLER
+115 DELAY   =$02   ;ANZAHL DURCHLAEUFE BIS
+120 :              ;ZUR ABFRAGE
+125 LASTKEY =$D7   ;ASCII-CODE DER LETZTEN
+130 :              ;GEDRUECKTEN TASTE
+135 QUOTE   =$D4   ;FLAGGE FUER QUOTE-MODE
+140 :              ;(GAENSEFUESSCHEN-MODUS)
+145 INVERS  =$C7   ;RVS FLAG FUER BILDSCHIRM
+150 NINSERT =$DB   ;ANZAHL FAELLIGER INSERTS
+155 FLAG    =$FC   ;FLAGGE, OB ZEICHEN GE-
+160 :              ;LOESCHT WERDEN MUSS
+165 BSPALTE =$D3   ;ZEIGER AUF BILDSCHIRM-
+170 :              ;SPALTE
+175 ZEILE   =$D1   ;VEKTOR, ZEIGT AUF ZEILENBE-
+180 :              ;GINN IM BILDSCHIRMSPEICHER
+185 CHCURSOR=$CE   ;ZEICHEN UNTER CURSOR
+190 NOKEYS  =$C6   ;ANZAHL ZEICHEN IM TASTATUR-
+195 :              ;PUFFER
+200 KBBUFFER=$277  ;BEGINN DES TASTATURPUFFERS
+205 F7      =$88   ;ASCII-CODE DER FUNKTIONS-
+210 :              ;TASTE 'F7'
+215 QSCODE  =$11   ;BILDSCHIRMCODE VON "Q"
+220 RSCODE  =$12   ;BILDSCHIRMCODE VON "R"
+225 ISCODE  =$09   ;BILDSCHIRMCODE VON "I"
+230 NORMIRQ =$EA31 ;EINSPRUNGADRESSE FUER NOR-
+235 :              ;MALE INTERRUPTROUTINE
+240 IRQVCT  =$314  ;ADRESSE DES INTERRUPTVECTOR
+245 COLOR   =$01   ;FARBE DER INDIKATORBUCH-
+250 :              ;STABEN (WEISS)
+255 SCREEN  =$427  ;SPEICHERPLATZ IM BILD-
+260 :              ;SCHIRMSPEICHER
+265 CLRTBL  =$D827 ;SPEICHERPLATZ IN DER
+270 :              ;COLORTABELLE
+275 ;
+280 ;
+285 *= $C000
+290 ;
+300 ;
+305          SEI           ;INTERRUPT VERHINDERN
+310          LDA #&lt;START   ;STARTADRESSE DER NEU-
+315          LDX #>START   ;EN ROUTINE LADEN
+316          STA IRQVCT    ;IRQ-VEKTOR AUF NEUE
+317          STX IRQVCT+1  ;ROUTINE STELLEN
+318          CLI           ;INTERRUPT ERLAUBEN
+320          LDA #DELAY    ;VERZOEGERUNGS-
+325          STA COUNT     ;ZAEHLER SETZEN
+335          RTS           ;ZURUECK INS BASIC
+340 ;
+345 START    DEC COUNT     ;VERZ. ZAEHLER-1
+350          BEQ CHANGE    ;GENUEGEND UEBERSPR.
+355          JMP NORMIRQ   ;NEIN, NORMALER IRQ
+360 CHANGE   LDA #DELAY    ;JA,NEUE ROUTINE
+365          STA COUNT     ;ZAEHLER HOCHSETZEN
+370          LDA #$00
+375          STA FLAG      ;FLAGGE LOESCHEN
+380          LDA QUOTE     ;EDITOR IM QUOTEMODE
+385          BEQ NOTQUOTE  ;NEIN, UEBERSPRINGEN
+390          LDA #$FF
+395          STA FLAG      ;FLAGGE SETZEN
+400          LDA #QSCODE   ;LADE "Q"
+405          STA SCREEN    ;BRINGE AUF BILDSCHIRM
+410          LDA #COLOR    ;SETZE FARBE INS
+415          STA CLRTBL    ;FARBRAUM
+420          JMP REVERS    ;NAECHSTE ABFRAGE
+425 NOTQUOTE LDA #" "      ;LEERZEICHEN AN STELLE
+430          STA SCREEN    ;DES "Q" SCHREIBEN
+435 REVERS   LDA INVERS    ;EDITOR IM REVERSMODE
+440          BEQ NOREVERS  ;NEIN, UEBERSPRINGE
+445          LDA #RSCODE   ;LADE "R", PRINTE EINE
+450          STA SCREEN-1  ;STELLE LINKS VON "Q"
+455          LDA #COLOR    ;FARBE
+460          STA CLRTBL-1  ;SETZEN
+465          JMP INSERT    ;NAECHSTE ABFRAGE
+470 NOREVERS LDA #" "      ;LEERZEICHEN AN STELLE
+475          STA SCREEN-1  ;DES "R" SCHREIBEN
+480 INSERT   LDA NINSERT   ;WURDE 'INSERT'
+485 :                      ;GEDRUECKT
+490          BEQ NOINSERT  ;NEIN, UEBERSPRINGE
+495          LDA #$FF
+500          STA FLAG      ;FLAGGE SETZEN
+505          LDA #ISCODE   ;"I" LINKS VON "R"
+510          STA SCREEN-2  ;HINSCHREIBEN
+515          LDA #COLOR    ;FARBE
+520          STA CLRTBL-2  ;SETZEN
+525          JMP KEYTEST   ;ZUR ABFRAGE VON ´F7´
+530 NOINSERT LDA #" "      ;BLANK AN STELLE
+535          STA SCREEN-2  ;DES "I" SCHREIBEN
+540 KEYTEST  LDA LASTKEY   ;LETZTE GEDRUECKTE
+545          CMP #F7       ;TASTE GLEICH ´F7´
+550          BNE END       ;NEIN, ZUM ENDE
+555          LDX #$00      ;JA
+560          STX QUOTE     ;QUOTE-MODE LOESCHEN
+565          STX INVERS    ;REVERS-FLAGGE AUS
+570          STX NINSERT   ;INSERT-MODUS AUS
+575          LDA FLAG      ;WENN FLAGGE GLEICH
+580          BEQ END       ;NULL, DANN ZEICHEN
+585 :                      ;NICHT LOESCHEN
+590          INX           ;JETZT 1 IM X-REG
+595          STX NOKEYS    ;TASTATURPUFFER ENT-
+600 :                      ;HAELT EIN ZEICHEN
+605          LDY BSPALTE   ;CURSOR EINE STELLE
+610          DEY           ;ZURUECKBEWEGEN
+615          LDA CHCURSOR  ;CHAR. UNTER CURSOR
+620          STA (ZEILE),Y ;AUF BILDSCHIRM
+625          LDA #$9D      ;ASCII-CODE FUER
+630 :                      ;CURSOR ZURUECK
+635          STA KBBUFFER  ;IN TASTATURPUFFER
+640 END      JMP NORMIRQ   ;ENDE, GEHE ZUR NOR-
+645 :                      ;MALEN IRQ-ROUTINE
+READY.</pre>
             <figcaption>Listing 1. Das Assemblerlisting zum Programm »Escape-Taste«</figcaption>
         </figure>
 
