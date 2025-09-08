@@ -16,44 +16,45 @@
 <body>
     <article>
         <h1>Programm-Generator für den C 64</h1>
-<blockquote><p>Diese Routine kann Basic-Zeilen innerhalb eines Basic-Programms erzeugen, löschen und in einen String einlesen, ohne Variablen zu zerstören.</p></blockquote>
+        <p class="intro">Diese Routine kann Basic-Zeilen innerhalb eines Basic-Programms erzeugen, löschen und in einen String einlesen, ohne Variablen zu zerstören.</p>
 
-<p>Das Programm (Listing 1) ist vollständig in Maschinensprache geschrieben und belegt den Speicherbereich von $C800 bis $CA70. Nach dem Laden ist eine Initialisierung nicht notwendig. Um die Basic-Zeiger zurückzusetzen, ist nur ein NEW &lt;RETURN> einzugeben.</p>
+        <p>Das Programm (Listing 1) ist vollständig in Maschinensprache geschrieben und belegt den Speicherbereich von $C800 bis $CA70. Nach dem Laden ist eine Initialisierung nicht notwendig. Um die Basic-Zeiger zurückzusetzen, ist nur ein NEW &lt;RETURN> einzugeben.</p>
 
-<p>Zum Erzeugen einer Basic-Zeile ist die Zeile selbst in einem String abzulegen. Anschließend kann dieser String mit<br/>
-SYS51200, String<br/>
-in das Basic-Programm eingebunden werden. Zum Beispiel:<br/>
-A$=&ldquo;100 S=SQR (2):PRINTS,S+100&rdquo;:SYS 51200,A$</p>
+        <p>Zum Erzeugen einer Basic-Zeile ist die Zeile selbst in einem String abzulegen. Anschließend kann dieser String mit<br />
+            SYS51200, String<br />
+            in das Basic-Programm eingebunden werden. Zum Beispiel:<br />
+            A$=&ldquo;100 S=SQR (2):PRINTS,S+100&rdquo;:SYS 51200,A$</p>
 
-<p>Mit dem Befehl SYS 51442, Zeilennummer, läßt sich eine Basic-Zeile innerhalb eines Basic-Programms löschen.</p>
+        <p>Mit dem Befehl SYS 51442, Zeilennummer, läßt sich eine Basic-Zeile innerhalb eines Basic-Programms löschen.</p>
 
-<p>Der Befehl<br/>
-SYS 51442,100<br/>
-löscht zum Beispiel die Zeile 100. Beim Generieren oder Löschen ergeben sich folgende Einschränkungen:<br/>
-1. Der Aufruf (SYS 51200,A$ oder SYS 51442,100) darf nicht innerhalb einer FOR-NEXT-Schleife stehen.<br/>
-2. SYS 51200,A$ oder SYS51442,100 darf nicht in einem Unterprogramm stehen, falls sich die neue oder die zu löschende Zeile vor diesem Unterprogramm befindet.</p>
+        <p>Der Befehl<br />
+            SYS 51442,100<br />
+            löscht zum Beispiel die Zeile 100. Beim Generieren oder Löschen ergeben sich folgende Einschränkungen:<br />
+            1. Der Aufruf (SYS 51200,A$ oder SYS 51442,100) darf nicht innerhalb einer FOR-NEXT-Schleife stehen.<br />
+            2. SYS 51200,A$ oder SYS51442,100 darf nicht in einem Unterprogramm stehen, falls sich die neue oder die zu löschende Zeile vor diesem Unterprogramm befindet.</p>
 
-<p>Auch kann der Programm-Generator Zeilen in einen String einlesen. Dazu muß der String vorher jedoch mit beliebigen Zeichen gefüllt werden. Dabei gilt: Anzahl der Zeichen > = Anzahl der Zeichen in der zu erwartenden Zeile.</p>
+        <p>Auch kann der Programm-Generator Zeilen in einen String einlesen. Dazu muß der String vorher jedoch mit beliebigen Zeichen gefüllt werden. Dabei gilt: Anzahl der Zeichen > = Anzahl der Zeichen in der zu erwartenden Zeile.</p>
 
-<p>Es bietet sich natürlich an, den String mit Leerzeichen (CHR$(32)) zu belegen.</p>
+        <p>Es bietet sich natürlich an, den String mit Leerzeichen (CHR$(32)) zu belegen.</p>
 
-<p>Anschließend kann die Zeile mit<br/>
-SYS 51642, String, Zeilennummer eingelesen werden.<br/>
-Beispiel:<br/>
-100 S=SQR(2):PRINTS,S + 100<br/>
-110 A$=”<br/>
-120 SYS51642,A$,100<br/>
-130 PRINT A$</p>
+        <p>Anschließend kann die Zeile mit<br />
+            SYS 51642, String, Zeilennummer eingelesen werden.<br />
+            Beispiel:<br />
+            100 S=SQR(2):PRINTS,S + 100<br />
+            110 A$=”<br />
+            120 SYS51642,A$,100<br />
+            130 PRINT A$</p>
 
-<p>Nach dem Start dieses Beispiels mit RUN &lt;RETURN> erscheint auf dem Bildschirm die Zeile 100:<br/>
-S=SQR(2): PRINT S, S+100<br/>
-READY.</p>
+        <p>Nach dem Start dieses Beispiels mit RUN &lt;RETURN> erscheint auf dem Bildschirm die Zeile 100:<br />
+            S=SQR(2): PRINT S, S+100<br />
+            READY.</p>
 
-<p>Für dieses Programm gibt es nun eine Anzahl von Anwendungsmöglichkeiten. Es läßt sich zum Beispiel ein nur acht Zeilen langes Basic-Programm schreiben, das ein Maschinenprogramm in DATA-Zeilen ablegt (Listing 2).</p>
+        <p>Für dieses Programm gibt es nun eine Anzahl von Anwendungsmöglichkeiten. Es läßt sich zum Beispiel ein nur acht Zeilen langes Basic-Programm schreiben, das ein Maschinenprogramm in DATA-Zeilen ablegt (Listing 2).</p>
 
-<p>Dabei wird etwa die Geschwindigkeit erreicht, die die entsprechende Routine im SMON hat. Außerdem wäre ein »intelligentes« Programm vorstellbar, das sich selbst verändert. Typische Maschinenroutinen wie RENUMBER, FIND und AUTO sind natürlich auch denkbar. Sie sehen, die Möglichkeiten dieses Programm-Generators sind nahezu unbegrenzt.</p>
+        <p>Dabei wird etwa die Geschwindigkeit erreicht, die die entsprechende Routine im SMON hat. Außerdem wäre ein »intelligentes« Programm vorstellbar, das sich selbst verändert. Typische Maschinenroutinen wie RENUMBER, FIND und AUTO sind natürlich auch denkbar. Sie sehen, die Möglichkeiten dieses Programm-Generators sind nahezu unbegrenzt.</p>
 
-<address class="author">(Michael Dietz/ah)</address>
+        <address class="author">(Michael Dietz/ah)</address>
     </article>
 </body>
+
 </html>
