@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>EPROMs im Expansion-Port</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="Markus Braun, aw">
+    <meta name="64er.issue" content="10/85">
+    <meta name="64er.pages" content="46-48">
+    <!-- <meta name="64er.toc_category" content="XXX"> -->
+    <!-- <meta name="64er.toc_title" content="XXX"> -->
+    <meta name="64er.id" content="XXX">
+</head>
+
+<body>
+    <article>
+        <h1>EPROMs im Expansion-Port</h1>
+<blockquote><p>Es gibt kaum ein Speichermedium, von dem Daten so schnell geladen werden können wie von EPROMs. Bauen Sie sich selbst eine Erweiterungsplatine mit wahlweise 8 oder 16 KByte Speicher!</p></blockquote>
+
+<p>TODO Überstriche im gesamten Artikel!</p>
+
+<p>Das Laden von Programmen dauert, selbst wenn man Hypra-Load verwendet, doch immer noch eine geraume Zeit. Viel praktischer sind die Ihnen sicher schon bekannten EPROMs. Der Anschluß von EPROMs stellt beim C 64 kein allzu großes Problem dar. Am Expansion-Port befinden sich alle für diesen Zweck wichtigen Adreß-, Daten- und Steuerleitungen. Analog dazu verfügt auch ein EPROM über Adreß-, Daten- und einige Steueranschlüsse. Letztere unterteilen sich in Pins für die Stromversorgung (0 V, + 5 V), Pins zur Programmierung und Pins zur letztendlich gewünschten Verbindung mit dem Bus-System des C 64. Da man nach einer Programmierung des EPROMs die Anschlüsse für die Programmiersteuerung (PGM) nicht mehr benötigt, diese aber im Betrieb einen definierten Zustand haben müssen, werden beide auf logisch High (+5V) gelegt. Der Anschluß »Chip Enable« (CE = Chipauswahl) teilt dem EPROM mit, daß es angesprochen ist, und »Output Enable« (OE = Ausgabe möglich) fordert das EPROM auf, die Daten an den Datenbus zu legen. Danach stehen die Daten genauso zur Verfügung, als ob der Computer sie aus dem RAM lesen würde.</p>
+
+<h2>Zwei Platinen zur Wahl</h2>
+
+<p>Zum Aufbau der Schaltung ist es am besten, eine Platine anzufertigen, die in den Expansion-Port paßt. Dabei haben wir uns für zwei verschiedene Auführungen, eine mit 8 KByte für kleinere Programme und eine mit 16 KByte Speicherplatz entschieden. Es können wahlweise EPROMs vom Typ 2732 (4KByte) oder 2764 (8 KByte), verwendet werden. Zusätzlich bietet die 16 KByte-Platine mehrere Betriebsmodi, die im einzelnen noch beschrieben werden. DochzurückzumAnschluß der EPROMs an den C 64. Da ein EPROM maximal 8 KByte Speicherplatz hat und damit sicherlich nicht den ganzen Adreßraum des 6510-Prozessors ausfüllt, muß der C 64 den Speicherbereich für das EPROM festlegen. Für diesen Zweck sind zwei Leitungen vorgesehen: ROML und ROMH. Beide sind »aktiv-low«, das heißt sie wirken erst, wenn sie vom Zustand »1« in den Zustand »0« übergehen, beziehungsweise wenn sie ein Potential von 0 Volt gegenüber Masse haben. Diese Leitungen werden mit den Anschlüssen CE und OE (beide ebenfalls aktiv-low) des EPROMs verbunden. ROML wählt den Speicherbereich ab $8000, ROMH den Bereich ab $A000:</p>
+
+<p>TODO</p>
+
+<p>$8000:ROML OE<br/>
+$A000: ROMH CE</p>
+
+<p>Jetzt sollte man dem Computer noch mitteilen, daß er auf die EPROMs und nicht, wie gewohnt, auf sein internes RAM zugreift, denn die Leitungen ROML und ROMH können nicht direkt beeinflußt werden. Erst die Verwendung von zwei weiteren Leitungen bringt das gewünschte Ergebis. Diese Leitungen heißen EXROM und GAME. Sobald eine dieser Leitungen auf Masse gelegt wird, teilt sie der PLA (Programmable Logic Array = Adreßmanager) mit, daß die Daten im Bereich $8000, beziehungsweise $A000 vom Expansion-Port geholt werden sollen.</p>
+
+<p>Damit sind die wesentlichen Funktionen der 8-KByte-Platine beschrieben. Sie ist so konzipiert, daß sie ein EPROM in den Bereich von $8000 bis $9FFF einblendet. Mit den vier Lötbrücken auf der Oberseite der Platine kann allerdings auch eine andere Speicheraufteilung eingestellt werden. Bei Bedarf trennen sie die beiden geschlossenen Lötbrücken auf und verbinden die beiden geöffneten. Damit wird der Speicherbereich von $A000 bis $BFFF für die EPROMs selektiert. Dies ist jedoch eine sehr ausgefallene Konfiguration, die Sie in der Praxis wahrscheinlich selten brauchen werden.</p>
+
+<h3>Mehrere Betriebsarten</h3>
+
+<p>Bei der 16-KByte-Platine wird zwischen mehreren Betriebsarten unterschieden. Im einfachsten Fall wird das rechte EPROM A (vom Expansion-Port gesehen) in den Bereich ab $8000 und das linke in Bereich ab $A000 eingeblendet. Aus den einleitenden Betrachtungen wissen wir, daß für den Bereich ab $8000 EXROM auf »Low« und für den Bereich »$A000 GAME auf »low« gelegt (mit der Masse Leitung verbunden) werden müssen. Dies geschieht mit den Schaltern S4 (EXROM) beziehungsweise S3 (GAME). Weiterhin erfolgt über den Schalter S5 eine Verbindung von ROML mit CE/OE des rechten EPROMs und über den Schalter S1 ein Kontakt zwischen ROMH und CE/OE des linken EPROMs.</p>
+
+<p>Als nächstes soll die Schaltung so verändert werden, daß beide EPROMs im Bereich ab $8000 stehen, besser gesagt, daß sich immer nur eines in Betrieb befindet und zwischen beiden EPROMs umgeschaltet werden kann. Dazu benötigt man eine kleine Logikschaltung mit einem JK-Flip-Flop und zwei OR-Gattern (Bild 1). Beim JK-Flip-Flop werden die Eingänge J und K auf + 5 V gelegt und bei jedem Wechsel von »High« nach »Low« an T (Takt) wir das Flip-Flop umgeschaltet. Der Ausgang Q wechselt dann von »0« nach »1«, »Q« wechselt von »1« nach »0«. Man braucht noch eine Leitung, die vom Computer aus kontrolliert, beziehungsweise geschaltet werden kann und die mit dem Takt-Eingang des Flip-Flop verbunden wird. Zu diesem Zweck gibt es zwei I/O-Leitungen im C 64, nämlich 1/01 und 1/02, denen zwei Register im Computer entsprechen. Diese Register (1/01: $DE00; 1/02: $DF00) kann man zum Beispiel mit POKE 57088,X oder STA $DE00 ansprechen. Dabei wechselt ihr Zustand kurzzeitig von »high« nach »low« und es entsteht gerade das Schaltverhalten, das man für das Flip-Flop benötigt. Die Zusammenhänge beim Schalten gehen am besten aus einer Logiktabelle hervor. Es darf dabei immer nur ein EPROM an den Pins CE/OE ein Signal »low« bekommen.</p>
+
+<p>Einschalten (Hardware-Reset) beziehungsweise Zustand 1:<br/>
+Q = L,Q = H</p>
+
+<p>TODO Table</p>
+
+<p>Q1 = L: EPROM A angewählt<br/>
+Q2 = H: EPROM B nicht angewählt</p>
+
+<p>Sobald der Takt-Eingang für kurze Zeit von »High« auf »Low« geht, erhöht man den anderen Zustand des Flip-Flops.</p>
+
+<p>Umschalten beziehungsweise Zustand 2: Q = H,Q = L</p>
+
+<p>TODO Table</p>
+
+<p>Q1 = H: EPROM A nicht angewählt<br/>
+Q2 = L: EPROM B angewählt</p>
+
+<p>Die letzte Verwendungsmöglichkeit der Platine erlaubt das Ein- und Ausschalten von wahlweise einem 8-KByte-, oder 16-KByte-Bereich. Mit dem Schalter X5 wird zunächst ROML mit dem rechten EPROM verbunden ($8000). Für ein 16-KByte-Modul wird zusätzlich der Schalter S1 geschlossen und damit das linke EPROM im Bereich $A000 selektiert. Doch wie bereits beschrieben, greift der Computer immer noch nicht auf die EPROMs zu. Darum müssen die Leitung EXROM (zusätzlich GAME bei 16 KByte) mit Masse verbunden werden. Setzt man in diese Verbindung nun das schon verwendete Flip-Flop, so können die Leitungen, je nach Zustand, von 1/02 auf Masse gelegt werden oder nicht. Das Ein- und Ausschalten erfolgt jetzt mit dem schon erwähnten Ansprechen von 1/02 ($DF00). Zu erwähnen ist noch, daß das Flip-Flop nach einem Hardware-Reset in den Grundzustand (Q = L, Q = H) geht, da sein Reset-Eingang R mit dem Anschluß RESET des Expansion-Port verbunden ist. Dann ist im zweiten Fall das rechte EPROM selektiert und im letzten Fall das Modul eingeschaltet. Bei einem Software-Reset (SYS 64738) bleibt der Zustand des Flip-Flops, und damit der Platine, erhalten.</p>
+
+<p>Bei der Eigenherstellung ist zu beachten, daß sich auf den Platinen einige Durchkontaktierungen (Bild 2 und 3) befinden. Außerdem sollten Sie darauf achten, ob die Bauteile mit der Platinenoberseite oder Unterseite verlötet werden müssen. Bestücken Sie die Platinen zuerst mit den Kondensatoren, und danach mit den Fassungen und Bauteilen (Bild 4). Achten Sie bei den Kondensatoren auf die richtige Polung. Bei der Verwendung von EPROMs des Typs 2732, die vier Pins weniger als ein 2764 haben, werden diese nicht bündig mit der Kerbe in die Fassung gesetzt. Die zwei Pins auf beiden Seiten der Kerbe bleiben frei.</p>
+
+<address class="author">(Markus Braun/aw)</address>
+    </article>
+</body>
+</html>
