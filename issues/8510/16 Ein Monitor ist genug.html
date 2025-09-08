@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>Ein Monitor ist genug</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="hm">
+    <meta name="64er.issue" content="10/85">
+    <meta name="64er.pages" content="16-17">
+    <!-- <meta name="64er.toc_category" content="XXX"> -->
+    <!-- <meta name="64er.toc_title" content="XXX"> -->
+    <meta name="64er.id" content="XXX">
+</head>
+
+<body>
+    <article>
+        <h1>Ein Monitor ist genug</h1>
+<blockquote><p>Der C 128 benötigt eigentlich zwei Monitore: einen mit RGB- und einen mit Composite-Eingang. Mit dieser Bauanleitung für eine automatische Signalumschaltung reicht allerdings ein Monitor aus, wenn Sie im 80-Zeichen-Modus auf Farbe verzichten können.</p></blockquote>
+
+<p>Kaum hatten wir die ersten C 128 in der Redaktion stehen, ärgerten wir uns über das lästige Umstecken des SW-Monitors. Composite-Ausgang im 40-Zeichenmodus, RGB im 80-Zeichenmodus. »So nicht!«, dachten wir und überlegten uns eine Schaltung, die Ihnen und uns in Zukunft die ewige Stöpselei erspart.</p>
+
+<p>Schaut man sich die Belegung der beiden Video-Ausgänge des C 128 genauer an, fällt auf, daß beide Buchsen einen Luminanz(Helligkeits)-Ausgang haben. Beim RGB-Ausgang wird das Luminanz(Helligkeits)-Signal im Handbuch nur als Monochromsignal bezeichnet.</p>
+
+<p>Mit einem Luminanzsignal kann jeder gebräuchliche SW-Monitor angesteuert werden. Auch der 1701/1702-Monitor von Commodore hat einen Luminanzeingang. Bei den letzteren kann auch der FBAS-Eingang an der Frontseite mit einem Luminanzsignal beschältet werden. Man muß dann nur den Farbregler auf Schwarz-weiß drehen.</p>
+
+<p>Die einfachste Methode, ein und denselben Monitor sowohl an den RGB- als auch an den Composite-Ausgang anzuschließen, ist die Verwendung eines Adaptersteckers. Dazu wird an den RGB-Ausgang ein kurzes Zwischenkabel mit RGB-Stecker und Composite-Buchse angeschlossen. Bei der 80-Zeichendarstellung muß der Monitor an das</p>
+
+<p>Zwischenkabel angeschlossen werden, bei 40-Zeichendarstellung und C 64-Modus an den Composite-Ausgang des C 128.</p>
+
+<p>Das bringt allerdings einige Probleme mit sich. Erstens wird das Umstecken schnell lästig und zweitens ist der Kontaktverschleiß an den Steckern und Buchsen sehr hoch. Es muß also eine automatische, verschleißfreie Umschaltung her.</p>
+
+<p>Automatische Umschaltung, aber wie? Über dieses Problem haben wir uns Gedanken gemacht. Wir wollten Ihnen eine optimale Lösung anbieten, die einfach nachgebaut werden kann. Nach einigen Ideen wie User-Port-Schaltungen oder Logik-Bausteinen an der MMU und den beiden Videoteilen kamen uns der richtige Einfall: die 40/80-Taste. Diese Taste, die direkt auf den Betriebsmodus Einfluß nimmt, müßte doch für die Umschaltung verwendbar sein. Tatsächlich wirkt diese Taste, ein lxEIN-Schalter (kein Taster), auf den Pin 48 der MMU. Dies ist der Eingang, über den die MMU den 40- oder 80-Zeichen-Modus nach dem Einschalten oder nach einem Reset initialisiert. Im Grundzustand hat dieser Eingang logischen High-Pegel.</p>
+
+<p>Ist der 40/80-Zeichen-Eingang der MMU unbeschaltet, wird beim Initialisieren der 40-Zeichen-Modus aktiviert, andernfalls der 80-Zeichen-Modus. Die 40/80-Taste schaltet den MMU-Eingang auf Masse, wenn der 80-Zeichen-Modus aktiviert werden soll. Man braucht also nur die Leitung vom Schalter zur MMU anzapfen, und schon ist man anhand des Logikpegels über den Darstellungsmodus nach dem Einschalten oder einem Reset informiert. 0V bedeutet 80-Zeichen-Modus, +5V zeigt die 40-Zeichendarstellung an. Da die Anschlüsse des 40/80-Schalters aus der Grundplatte herausragen, ist das »Anzapfen« ein leichtes: Das Schaltkabel für die Umschaltelektronik muß nur an den Pin des 40/80-Zeichenschalters angelötet werden, der der C 128-Rückseite zugewandt ist.</p>
+
+<h2>Automatische Umschaltung</h2>
+
+<p>Die Umschaltung der Luminanzsignale vom RGB- und Composite-Ausgang erfolgt einfach über ein kleines Reed-Relais (1xUM) in einem DIL-Gehäuse. Diese Relais brauchen bei 5V Schaltspannung einen Schaltstrom von etwa 10 bis 20 mA. Zuviel für eine direkte Ansteuerung mit dem MMU-Eingang. Der Pegel vom MMU-Eingang muß also verstärkt werden. Ein TTL-LS-Hex-Inverter ist billig und besitzt eine ausreichende »Verstärkung«. Der Low-Power-Schottky-Typ sollte nicht durch einen normalen TTL-Baustein ersetzt werden, da der mehr Versorgungsstrom benötigt und einen kleineren Eingangswiderstand besitzt.</p>
+
+<p>Die Umschaltplatine wird über Pin 2 des Kassetten-Ports mit +5V versorgt (siehe Handbuch). Es sind also nur zwei Drähte anzulöten. Verwenden Sie dazu am besten Schaltlitze, die knickfester als Draht ist. Der Lötkolben sollte eine Leistung von 16 Watt haben und gut vorgeheizt sein. Als Lötzinn eignet sich nur sogenanntes Elektroniklot.</p>
+
+<p>Die Schaltung umfaßt nur wenige Teile (Schaltplan, Bild 1). Der Aufbau sollte deshalb nicht zu schwer sein. Haben Sie die Schaltung fertig aufgebaut (Bild 2), sollten Sie diese vor dem Anschluß an den Computer mit einer 4,5 Volt Batterie überprüfen. Schließen Sie dazu Masse an den Minuspol der Batterie und + 5V an den Pluspol der Batterie an. Wenn Sie nun die Steuerleitung an den Minuspol der Batterie legen, sollten Sie ein leises Klicken des DIL-Relais hören. Haben Sie nur einen Ersatztyp des angegebenen Relais bekommen, lassen Sie sich unbedingt die Anschlußbelegung davon zeigen. Der Diodentyp ist unkritisch. Die Diode dient nur zum Abfangen der Induktionsspannung, die beim Abschalten des Relais auftritt. Die Polung der Induktionsspannung ist der angelegten Spannung entgegengesetzt.</p>
+
+<p>Ist die Schaltung soweit in Ordnung, können Sie die Stecker anschließen. Verwenden Sie dazu einadriges, abgeschirmtes Kabel. Die Abschirmung wird nur mit Pin 2 des Composite-Steckers verbunden und nicht mit dem Steckergehäuse. Entsprechend mit Pin 1 des RGB-Steckers. Die Steckerbelegungen im Schaltplan zeigen die Lötseiten. Hier die genaue Belegung der Videobuchsen des C 128:</p>
+
+<p>TODO TABLE</p>
+
+<p>RGB-Ausgang<br/>
+Pin Signal  Pegel Impedanz<br/>
+1   Masse   0V  —<br/>
+2   Masse   ov  —<br/>
+3   Rot 0/5V    75 Ohm<br/>
+4   Grün   0/5V    75 Ohm<br/>
+5   Blau    0/5V    75 Ohm<br/>
+6   Intensität 0/5V    75 Ohm<br/>
+7   Luminanz    0-3VS£ • 75 Ohm<br/>
+8   Horiz. Synch.   0/5V    75 Ohm<br/>
+9   Vert. Synch.    0/5V    75 Ohm<br/>
+Composite-Ausgang<br/>
+Pin Signal  Pegel Impedanz<br/>
+1   Lumin./Synch. lVss      75 Ohm<br/>
+2   Masse   0V  —<br/>
+3   Äudio-Ausg.    lVss    —<br/>
+4   Composite   lVss    75 Ohm<br/>
+5   Audio-Eing.     —<br/>
+6   Chrominanz  lVss    75 Ohm</p>
+
+<p>Für den Monitoranschluß ist eine Cinch-Buchse zum Aufbau vorgesehen. Die Buchse wird einfach auf der Platine angelötet. Der Außenkontakt wird mit Masse verbunden, der Innenleiter mit dem Signal.</p>
+
+<p>Vor der Inbetriebnahme sollten Sie noch einmal alle Anschlüsse genau überprüfen. Ist alles in Ordnung, schließen Sie das Steuerkabel und die Spannungsversorgung an den C 128 an. Verbinden Sie den SW-Monitor mit der Cinchbuchse und die beiden Videostecker mit dem C 128. Dann können Sie den Computer endlich einschalten. Wenn Sie alles richtig angeschlossen haben, erscheint die Einschaltmeldung auf dem Bildschirm. Entweder im 40- oder 80-Zeichen-Modus, je nachdem, wie die 40/80-Taste geschaltet ist. Erscheint im 80-Zeichenmodus kein Bild, drehen Sie das Trimmpoti und den Helligkeitsregler des Monitors voll auf.</p>
+
+<p>Der Trimmer dient zur Abschwächung des Luminanzsignals vom RGB-Ausgang, da dieses Signal stärker als das des Chrominanz-Ausgangs ist. Der Abgleich ist sehr einfach:</p>
+
+<ol>
+<li>C 128 einschalten</li>
+<li>Mit ESC X den 40-Zeichenmodus einschalten (40/80-Taste entrasten) 3. Am Monitor Helligkeit und Kontrast für 40-Zeichen-Modus einstellen</li>
+<li>Mit ESC X 80-Zeichenmodus einschalten und 40/80-Taste drücken</li>
+<li>Mit dem Trimmpoti die Helligkeit auf den 40-Zeichenmodus anpassen.</li>
+</ol>
+
+
+<p>In der gleichen Weise können Sie die Helligkeit des 80-Zeichenmodus an die des C 64-Modus anpassen. Sie müssen nur immer die 40/80-Zeichentaste umschalten, wenn softwaremäßig zwischen 80 und 40 Zeichen pro Zeile umgeschaltet wird.</p>
+
+<h2>Farbe ist auch möglich!</h2>
+
+<p>Der Composite-Ausgang bietet neben dem Luminanz- und Chrominanzsignal noch ein komplettes Video-Signal an (FBAS, gemischtes Farb- und Helligkeitssignal). Mit diesem Signal kann jeder Farbmonitor mit Videoeingang angesteuert werden. Beim Commodore-Monitor 1701/1702 ist dieser Eingang an der Frontseite und kann mit einem Schalter an der Rückseite aktiviert werden. An diesen Eingang können Sie beim 1701/1702 übrigens auch das Luminanzsignal des RGB-Ausgang legen. Eventuelle Farbverschiebungen lassen sich beseitigen, indem man den Farbregler einfach auf SW dreht.</p>
+
+<p>Um das FBAS-Signal auszunutzen, schließen Sie den automatischen Umschalter nicht an Pin 1 der Composite-Buchse an, sondern an Pin 4 (unterhalb Pin 1). Wenn Sie dann den Fronteingang (Einschalten!) des 1701/1702-Monitors mit der Cinchbuchse verbinden, erfolgt die 40-Zeichendarstellung (C 128, C 64) in Farbe. Der 80-Zeichen-Modus bleibt Schwarz-weiß. Der Nachteil dieser Lösung liegt in der schlechten Auflösung des 1701/1702. 80 Zeichen pro Zeile sind kaum noch zu entziffern.</p>
+
+<p>Für die meisten SW-Monitore ist das FBAS-Signal nicht geeignet. Häufig stören dann Bildstreifen die Lesbarkeit.</p>
+
+<p>Für welche der beiden Lösungen Sie sich auch entscheiden, bauen Sie auf jeden Fall die Schaltung in ein kleines Gehäuse ein. Nur so ist gesichert, daß kein Kurzschluß durch herumliegende Metallteile entsteht.</p>
+
+<address class="author">(hm)</address>
+    </article>
+</body>
+</html>

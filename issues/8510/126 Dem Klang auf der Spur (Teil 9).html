@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>Dem Klang auf der Spur (Teil 9)</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="../style.css">
+    <meta name="author" content="Thomas Krätzig, tr">
+    <meta name="64er.issue" content="10/85">
+    <meta name="64er.pages" content="126-129">
+    <!-- <meta name="64er.toc_category" content="XXX"> -->
+    <!-- <meta name="64er.toc_title" content="XXX"> -->
+    <meta name="64er.id" content="XXX">
+</head>
+
+<body>
+    <article>
+        <h1>Dem Klang auf der Spur (Teil 9)</h1>
+<blockquote><p>In diesem Teil wird gezeigt, wie man dreistimmige Musikstücke programmgesteuert, schnell und zeit exakt auf aem C 64 wiedergeben kann. So ganz nebenbei erfahren Sie eine Menge über die Interrupttechnik.</p></blockquote>
+
+<p>Zunächst einige Grundlagen zum Sequenzer. Unter einem Sequenzer versteht man ein Gerät oder Programm, das einen Synthesizer mit einer vorprogrammierten Tonfolge ansteuert. Die zentrale Rolle spielt dabei das genaue Einhalten eines programmierbaren Zeitmaßes.</p>
+
+<p>Musikstücke werden üblicherweise in Takte von etwa 1 bis 4 Sekunden Länge eingeteilt. Am gebräuchlichsten ist der %-Takt, der die Länge einer ganzen Note hat. Andere gebräuchliche Taktarten sind 2/4, 3/4, 6/8, 4/4, 5/4, 3/2. Diese Angaben betreffen allerdings nur die Zählweise der Takte und nicht das Tempo eines Musikstücks. So sind zum Beispiel 3/4- und 6/8-Takt bis auf die Zählweise vollkommen identisch.</p>
+
+<p>Die Notenlängen werden in Bruchteilen der ganzen Note angegeben:</p>
+
+<p>TODO</p>
+
+<p>Es kommen auch ungeradzahlige Vielfache dieser Notenlängen vor. Durch Punktierung kennzeichnet man die Verlängerung einer Note um die Hälfte ihrer ursprünglichen Länge:</p>
+
+<p>TODO</p>
+
+<p>Alle diese Notenlängen passen in ein Raster, welches eine ganze Note in 16 oder 32 gleiche Zeitabschnitte teilt. Es werden aber häufig auch sogenannte Triolen (Drittelnoten) eingesetzt. Zum Beispiel Achteltriolen,</p>
+
+<p>TODO</p>
+
+<p>das sind drei gleichlange Noten mit der Länge einer Viertelnote. Aus diesem Grund sollte das Zeitraster (die Anzahl der Zeitabschnitte, in die der Sequenzer eine ganze Note einteilt) auch den Faktor 3 enthalten. Ein sinnvolles Zeitraster ist zum Beispiel 96( = 3x32).</p>
+
+<p>Das Tempo wird in der Musik in Schlägen pro Minute (beats per minute: bpm) gemessen. Ein Schlag entspricht dabei einer Viertelnote. Der sinnvolle Bereich für dieses Maß liegt bei etwa 40 bis 240 bpm. Beim schnellen Tempo 240 bpm dauert eine ganze Note genau eine Sekunde. Der Sequenzer muß dann 96 Schritte pro Sekunde ausführen.</p>
+
+<h3>Programmtechnik</h3>
+
+<p>Ein Sequenzer ist von der zu erbringenden Funktion her eigentlich ein sehr einfaches Programm. Seine Leistungen sind schnell aufgezählt:</p>
+
+<ul>
+<li>Tonhöhen steuern</li>
+<li>Triggerung der einzelnen Stimmen (GATE ON und GATE OFF)</li>
+</ul>
+
+
+<p>Diese Steuerungen müssen zeitgenau und unabhängig voneinander für drei Stimmen erfolgen. Darüber hinaus wären einige Zusatzfunktionen sinnvoll: — programmierbare Tempoänderungen</p>
+
+<ul>
+<li>programmierbare Soundwechsel</li>
+<li>programmierbare Änderung der Inhalte beliebiger Speicherplätze (Parameter-Änderung)</li>
+</ul>
+
+
+<p>Es soll zunächst ein einfacher Basis-Sequenzer entwickelt werden, der sich dann leicht um die genannten Zusatzfunktionen erweitern läßt. Die Erweiterungen sollen über Vektoren, also ohne Änderung des Grundprogramms, an dieses angeschlossen werden können.</p>
+
+<p>Ein Sequenzer ist, ähnlich wie der in dieser Reihe veröffentlichte Modulator, ein Programm, das in regelmäßigen Zeitabständen eine Leistung erbringen muß. Der Aufruf per Interrupt, ausgelöst durch einen Zeitgeber, bietet sich also auch hier an. Jeder CIA (Complex Interface Adapter) ist mit zwei 16-Bit-Timern ausgestattet, die sich für diese Aufgabe eignen. Timer A in CIA1 wird bereits für den Systeminterrupt eingesetzt. Ein Systeminterrupt findet konstant 60-mal pro Sekunde statt und kann mit dem Aufruf eines Modulatorschritts gekoppelt werden.</p>
+
+<h2>Musik per Interrupt</h2>
+
+<p>Die Aufruffrequenz der Sequenzer-Schritte soll dagegen im Bereich von zirka 20-100 Hz, abhängig vom Tempo des Musikstücks, variabel sein. (Man erinnere sich: 240 bpm entsprechen 96 Hz bei einem Zeitraster von 96 Schritten pro ganzer Note.) Das legt den Einsatz eines weiteren unabhängigen Timers nahe. In Frage kommen dafür:<br/>
+Timer B in CIA1 (IRQ)<br/>
+Timer A in CIA2 (NMI)<br/>
+Timer B in CIA2 (NMI)</p>
+
+<p>Die Auswahl des Timers ist willkürlich. Im vorliegenden Programm wird Timer B in CIA1 eingesetzt. Dadurch bleiben die Timer in CIA 2 noch vollkommen frei für Zwecke, die nichts mit der Musikprogrammierung zu tun haben müssen. Da nun Timer A und Timer B beide unabhängig voneinander Interrupts auslösen können, muß die angesprungene Interrupt-Service-routine die Interrupt-Quelle ermitteln, also feststellen, welcher Timer den Interrupt ausgelöst hat und abhängig davon weiterverzweigen. Zu diesem Zweck wird im sogenannten Interrupt-Control-Register (ICR) $DCOD bei einem Timer-A-Interrupt Bit 0 und bei einem Timer-B-Interrupt Bit 1 gesetzt.</p>
+
+<h3>Programmierung des CIA</h3>
+
+<p>Zur Steuerung von CIA-Interrupts dient das schon erwähnte Interrupt-Control-Register (ICR) $DC0D. Dieses Register hat zwei Funktionen, je nachdem, ob schreibend oder lesend darauf zugegriffen wird. Bei Lesezugriff zeigt es an, ob, und wenn ja, woher ein Interrupt ausgelöst wurde. Zugleich wird das Register gelöscht und die Interrupt-Anforderung zurückgenommen (Die IRQ-Leitung geht von low auf high). Die Bits 0-4 sind dabei verschiedenen Interruptquellen zugeordnet. Uns interessieren hier nur die Bits 0 und 1, welche zu den Timer-Interrupts gehören. Durch einen Schreibzugriff wird dagegen ein Masken-Register angesprochen. Damit lassen sich die Interruptquellen einzeln freigeben oder sperren. Die Bits 0-4 kann man einzeln setzen oder zurücksetzen. Ist im geschriebenen Byte Bit 7 gesetzt, wird jedes mit einer 1 beschriebene Bit gesetzt, während die anderen Bits unverändert bleiben. Ist Bit 7 rückgesetzt, so wird jedes mit einer 1 beschriebene Bit zurückgesetzt, während die anderen Bits wieder unverändert bleiben. Gesetzte Bits ermöglichen eine Interrupterzeugung durch die jeweilige Quelle. Die Freigabe der Interrupterzeugung durch Timer B sieht also so aus:<br/>
+LDA #%10000010<br/>
+STA $DD0D ;ICR Bit 1 setzen</p>
+
+<p>Der Timer selbst wird durch drei Register gesteuert.</p>
+
+<p>Das Registerpaar TIMER B ($DC06/$DC07) liefert bei Lesezugriff den aktuellen 16-Bit-Zählerstand. Dieser Wert wird kontinuierlich heruntergezählt. Bei Erreichen von Null stoppt der Timer entweder (One-Shot-Mode) oder lädt einen Wert aus einem Timer-Latch (Latch = Zwischenspeicher) nach und zählt von neuem herunter (Continous Mode). Bei diesem Timer-Unterlauf wird ein Interrupt erzeugt, wenn Bit 1 im ICR gesetzt ist. Ein Schreibzugriff auf TIMERA bezieht sich dagegen auf das 16-Bit-Latch. Mit dem Latch-Wert kann man die Zeit zwischen zwei Interrupts im Bereich von 1 bis 65535 Mikrosekunden steuern.</p>
+
+<p>Das Register CRB (Control Register B, $DC0F) steuert die Betriebsart des Timers (Start/Stop, One Shot/Continous, u.a.)<br/>
+Durch LDA #%00010001<br/>
+STA $DD0E<br/>
+wird der Zählerstand mit dem Latch-Wert geladen und der Timer gestartet.</p>
+
+<h3>Die Interrupt-Service-Routine</h3>
+
+<p>Sie fragt zunächst ab, ob der Interrupt von Timer A (Systeminterrupt, Modulatorschritt) oder von Timer B (Sequenzerschritt) kommt. Bei einer möglichen gleichzeitigen Interruptanforderung durch beide Timer, wird der Timer-B-Interrupt bevorzugt behandelt. Das hat folgende Gründe:</p>
+
+<ul>
+<li>Für ein exaktes Sequenzer-Timing sollten anzuspielende Noten möglichst wenig verzögert werden.</li>
+<li>Die Abarbeitung eines Sequenzer-Schritts benötigt viel weniger Rechenzeit als ein Modulatorschritt (zeitaufwendige Multiplikationen) oder eine Systeminterrupt-Behandlung.</li>
+<li>Die Aufruffrequenz kann bei den Sequenzer-Schritten sehr hoch sein (96 Hz bei 240 bpm, aber auch über 200 Hz sind technisch leicht möglich).</li>
+</ul>
+
+
+<p>Da das ICR beim Lesen gelöscht wird, muß sein Inhalt zwischengespeichert werden, damit beim Auftreten von zwei Interrupts die Behandlung des niedriger priorisierten Timer-A-Interrupts nachgeholt werden kann.</p>
+
+<p>Bei Auftreten eines Interrupts wird immer das Interrupt-Bit im CPU-Statusregister gesetzt, damit die CPU nicht gleich wieder unterbrochen werden kann. Da die IRQ-Leitung so lange auf Low-Pegel bleibt, bis die CPU durch Auslesen des CIA-ICR die Interruptanforderung löscht, würde sich das System ohne gesetztes Interrupt-Bit durch einen Dauerinterrupt aufhängen. Es steht dem Programmierer allerdings frei, nach dem Auslesen des ICR das Interrupt-Bit durch den Befehl CLI (Clear Interrupt-Flag) zurückzusetzen, um damit das Programm wieder unterbrechbar zu machen. Beim vorliegenden Programm bleibt bei einem Sequenzer-Schritt das Interrupt-Bit gesetzt, während es zur Abarbeitung eines Timer-A-Interrupts rückgesetzt wird. Dadurch kann die CPU auch dann durch einen Timer-B-Interrupt unterbrochen werden.</p>
+
+<p>Das Betriebssystem und das Programm Modulator machen beide intensiven Gebrauch von der Zero-Page. Die Inhalte der Zero-Page-Speicherplätze dürfen von einem interruptgetriebenen Programm nicht verändert werden. Das Sequenzer-Programm belegt daher nur zwei Zero-Page-Speicherplätze C$FE,$FF). Ihre Inhalte werden bei Programmbeginn zwischengespeichert und bei Programmende restauriert.</p>
+
+<h3>Die verwendeten Datenstrukturen</h3>
+
+<p>Um ein Musikstück in eine computergerechte Form zu bringen, muß man im wesentlichen die Tonhöhe und die Länge der einzelnen Noten codieren. Beim Einsatz mehrerer, verschieden klingender Stimmen, muß man außerdem jede Note eindeutig einer Stimme zuordnen. Die hier verwendete Datenstruktur (Bild 1) verfolgt mit ihrem etwas komplizierten Aufbau zwei Ziele:</p>
+
+<ul>
+<li>Sparsamer Umgang mit dem Speicher</li>
+<li>Gute Editiermöglichkeiten. (Ein Editorprogramm in. Basic folgt in der nächsten Ausgabe)</li>
+</ul>
+
+
+<h3>Tracks</h3>
+
+<p>Die Steueranweisungen werden für die drei Stimmen getrennt in drei sogenannten. Tracks (Tonspuren) gespeichert. Ein Track ist eine zusammenhängende Folge von 1-Byte-Kommandos. Das häufigste Kommando dürfte das Ton-Kommando sein. Die Tonhöhe wird aus einer Oktav-Nummer und einer Tonnummer (siehe Bild 2), die in den beiden Nibbles (=Halbbytes) eines Bytes stehen, ermittelt. Das Programm benötigt dazu lediglich eine Tabelle der Frequenzen der höchsten Oktave. Die Frequenzen der niedrigeren Oktaven werden durch Teilung durch Zweierpotenzen errechnet. Eine Division durch 2 wird durch einen einfachen Rechts-Shift realisiert. Die Dauer des Tones ist nicht Bestandteil des Ton-Kommandos. Sie wird durch das Zeit-Kommando voreingestellt. Da häufig mehrere Töne mit gleicher Länge aufeinanderfolgen, genügt ein einziges Zeit-Kommando (ein oder zwei Bytes), um die Tonlänge (siehe Bild 3) einzustellen. Dabei wird zwischen einer GATE-ON- und einer GATE-OFF-Phase unterschieden, deren Längen zusammengenommen die gewünschte Tonlänge ergeben.<br/>
+Beispiel: GATE-ON-Zeit = 5<br/>
+GATE-OFF-Zeit = 7<br/>
+Gesamtzeit = 12</p>
+
+<p>Das entspricht einer kurz angeschlagenen Achtelnote (bei 96 Zeitschritten pro ganzer Note). Die GATE-ON-Zeit ist im Bereich 1-96, die GATE-OFF-Zeit im Bereich 0-30 einstellbar. Der Sequenzer setzt nach Ablauf der GATE-ON-Zeit das GATE-Bit der entsprechenden Stimme im SID zurück und wartet dann die GATE-OFF-Zeit ab. Ist diese 0, so wird natürlich sofort der nächste Ton gespielt. Man kann aber auch explizit Pausen programmieren (Code $EF). Ihre Länge ist die Summe aus GATE-ON- und GATE-OFF-Zeit.</p>
+
+<p>Der Code $00 ist zur Kennzeichnung für das Track-Ende vorgesehen. Die Codes $F8 bis $FF sind für Sonderfunktionen reserviert, die für eine spätere Erweiterung des Sequenzers gedacht sind. Angesprungen werden sie über eine Tabelle von Vektoren, die im Moment nur in den Programmteil zur Ausführung des nächsten Kommandos führen, also nichts bewirken. Sinnvolle Sonderfunktionen sind:</p>
+
+<ul>
+<li>Änderung von Soundparametern</li>
+<li>Wahl eines ganzen Parametersatzes (Soundwechsel) im Zusammenhang mit dem Programm Modulator</li>
+<li>Tempowechsel</li>
+</ul>
+
+
+<p>Diese Sonderfunktionen werden den Sequenzer in der nächsten Folge ergänzen.</p>
+
+<h2>Sequenzen</h2>
+
+<p>Für jede der drei Stimmen gibt es eine Folge von Kommandos, einen Track. Die drei Tracks werden zu einer Sequenz zusammengefaßt. Eine Sequenz ist hier ein zusammenhängender Abschnitt eines Musikstücks, der einen einzigen Ton, einen Takt oder auch das ganze Stück umfassen kann. Den drei Tracks gehen drei Zeiger auf die Track-Startadressen voran. Obwohl es sich aus Gründen der Übersichtlichkeit empfiehlt, die Sequenzen wie in Bild 1 zusammenhängend in der Folge Zeiger-Track 1, -Track 2, -Track 3 zu speichern, besteht dazu kein Zwang. Es müssen lediglich die drei Track-Zeiger einer Sequenz und die Tracks in sich zusammenhängen.</p>
+
+<h3>Sequenzfolge-Liste</h3>
+
+<p>Um eine Sequenz zu wiederholen, muß man sie nicht zweimal programmieren, sondern kann sie wie ein Unterprogramm mehrmals aufrufen. Die Sequenzfolge-Liste enthält dazu die Startadressen der Sequenzen in der Reihenfolge, in der diese gespielt werden sollen. Dabei können die gleichen Adressen natürlich mehrfach auftreten. Unter der Startadresse einer Sequenz wird hier die Adresse des Zeigers auf Track 1 verstanden. Die Sequenzfolge-Liste enthält für jede Sequenz außer dem Zeiger noch ein drittes Byte, das für spätere Erweiterungen vorgesehen ist. Drei Nullen schließen die Liste ab.</p>
+
+<h2>Flexibilität durch Steuerflags und Vektoren</h2>
+
+<p>Im Normalfall wird man die drei Tracks einer Sequenz gleich lang programmieren. Macht man dagegen die Tracks unterschiedlich lang, so wiederholt das Programm die kürzeren Tracks so lange, bis der längste Track zu Ende gespielt ist. Erst dann geht das Programm zur nächsten Sequenz über. Dieses Verhalten kann bei manchen Musikstücken nützlich sein. Das MSE-Listing 2 enthält einen Musik-Datensatz, bei dem in der zweiten Sequenz der dritte Track aus nur vier Tönen besteht, die fortlaufend wiederholt werden.</p>
+
+<p>Normalerweise hält der Sequenzer an, wenn alle Sequenzen gemäß Sequenzfolge-Liste durchgespielt sind. Nach dem Anhalten wird auch der Interruptvektor auf seinen ursprünglichen Wert zurückgestellt. Eine 1 im Flag REPMODUS bewirkt, daß das ganze Stück endlos wiederholt wird.</p>
+
+<p>Eine 1 im Flag SEQMODUS bewirkt, daß die aktuelle Sequenz endlos wiederholt wird. Auch hier ist der längste Track der Sequenz maßgeblich.</p>
+
+<p>Eine 1 im Flag LEGATO bewirkt, daß die GATE-Bits in den SID-Steuerregister nicht zurückgesetzt werden. Dadurch klingen die Töne gebunden. Dazu muß allerdings ein Sustain-Pegel ungleich Null eingestellt sein, sonst ist überhaupt nichts hörbar.</p>
+
+<p>An allen wichtigen Stellen des Sequenzers wird der Programmfluß über Vektoren weitergeleitet. Damit soll die Möglichkeit, das Programm nachträglich leicht zu erweitern, offengehalten werden. Die Vektoren für die acht Sonderfunktionen wurden schon erwähnt. Außer diesen acht gibt es noch drei weitere Vektoren: TONVEKTOR</p>
+
+<p>Er führt das Programm weiter, nachdem die Frequenz für einen Ton-an-Befehl ermittelt wurde. Im vorliegenden Programm wird der Frequenzwert direkt in den SID geschrieben. Bei einem Einsatz zusammen mit dem Modulator muß die Frequenz dagegen in ein Modulator-Register geschrieben werden.<br/>
+EXTRAVEKTOR</p>
+
+<p>Über diesen Vektor kann man weitere Aktionen an einen Sequenzer-Schritt anhängen. Denkbar wäre zum Beispiel die Anzeige der gespielten Noten auf dem Bildschirm in Realtime.<br/>
+IRQAVEKTOR</p>
+
+<p>Führt zum Systeminterrupt $EA31. Dieser Vektor muß beim Einsatz mit dem Modulator auf die Startadresse des Modulatorschrittes zeigen.</p>
+
+<p>Das vorliegende Sequenzerprogramm (Listing 1) belegt den Speicherbereich $C480-$C778. $C480 = 50304 ist gleichzeitig auch die Startadresse (SYS. 50304). Tabelle 1 faßt die wichtigsten Routinen, Variablen und Vektoren des Sequenzer-Programms zusammen.</p>
+
+<p>Das Programmieren von Musikstücken mit Hilfe der Tabelle 2 ist noch etwas mühsam. Ein Editor in der nächsten Ausgabe wird diese Arbeit erleichtern. Mit dem Datensatz aus Listing 2 (»Kobold« aus den »Lyrischen Stücken« von Edvard Grieg) kann man den Sequenzer testen.</p>
+
+<p>Die Verschmelzung des Sequenzers und des Modulators zu einer funktionellen Einheit wird in der nächsten Folge behandelt.</p>
+
+<address class="author">(Thomas Krätzig/tr)</address>
+    </article>
+</body>
+</html>
