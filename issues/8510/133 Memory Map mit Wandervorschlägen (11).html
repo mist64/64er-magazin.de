@@ -50,7 +50,7 @@
 
         <p>Hinter jedem OPEN-Befehl steht eine Zahl, die der durch diesen Befehl angefangenen Datei zugeordnet wird. Diese Datei- oder File-Nummer gilt als Referenz für alle anderen Ein- und Ausgabebefehle derselben Datei. Nähere Angaben dazu können Sie dem nebenstehenden Texteinschub Nr. 1 »Files-Geräte-Namen-Nummern« entnehmen.</p>
 
-        <p>Ein OPEN-Befehl ruft die entsprechende Routine des Betriebssystems auf, welche die File-Nummer in die Speicherzelle 184 schreibt. Vor dort kann sie mit PEEK(184) ausgelesen werden. Geben Sie die folgende Zeile direkt ein:<br />
+        <p>Ein OPEN-Befehl ruft die entsprechende Routine des Betriebssystems auf, welche die File-Nummer in die Speicherzelle 184 schreibt. Vor dort kann sie mit PEEK(184) ausgelesen werden. Geben Sie die folgende Zeile direkt ein:<br>
             A = 30:OPEN A,3:PRINT PEEK (184):CLOSE A</p>
 
         <p>Um verschiedene File-Nummern auszuprobieren, definieren wir sie als Variable A. Nach dem »A« des OPEN-Befehls steht die Zahl 3. Damit wird der Bildschirm angewählt (siehe »Sekundär-Adresse« im schon erwähnten Texteinschub). Das Anwählen des Bildschirms vermeidet eine störende Meldung des Betriebssystems.</p>
@@ -63,7 +63,7 @@
 
         <p>Die Sekundär-Adresse steht als dritte Angabe hinter den Ein- und Ausgabe-Befehlen LOAD, SAVE, VERIFY und OPEN. Sie hat bei den verschiedenen Peripheriegeräten spezielle Funktionen. Diese Funktionen sind im nebenstehenden Texteinschub näher erläutert.</p>
 
-        <p>Der jeweilige Wert der Sekundär-Adresse steht in der Speicherzelle 185, allerdings um 96 erhöht. Für Sekundär-Adressen stehen, über die Standardwerte der einzelnen Peripheriegeräte hinaus, die Zahlen von 0 bis 31 zur Verfügung. Ab 32 fängt in Zelle 185 wieder der Zyklus ab 0 an. Das können wir uns anschauen. Ich wähle zur Eröffnung einer Datei wieder den Bildschirm als »nichtstörendes« Empfangsgerät.<br />
+        <p>Der jeweilige Wert der Sekundär-Adresse steht in der Speicherzelle 185, allerdings um 96 erhöht. Für Sekundär-Adressen stehen, über die Standardwerte der einzelnen Peripheriegeräte hinaus, die Zahlen von 0 bis 31 zur Verfügung. Ab 32 fängt in Zelle 185 wieder der Zyklus ab 0 an. Das können wir uns anschauen. Ich wähle zur Eröffnung einer Datei wieder den Bildschirm als »nichtstörendes« Empfangsgerät.<br>
             A = 15:OPEN 1,3,A:PRINT PEEK(185)-96:CLOSE 1</p>
 
         <p>Durch Verändern des Wertes von A können Sie alle Möglichkeiten durchspielen.</p>
@@ -78,15 +78,15 @@
 
         <p>TODO TABLE</p>
 
-        <p>Geräte-Nummer angesprochenes Gerät<br />
-            0 Tastatur<br />
-            1 Datasette<br />
-            2 RS232- (User-Port) Schnittstelle<br />
-            3 Bildschirm<br />
-            4 Drucker (normal)<br />
-            5 Drucker (zusätzlich)<br />
-            8 Disketten- Laufwerk Nr. 0<br />
-            9 Disketten- Laufwerk Nr. 1<br />
+        <p>Geräte-Nummer angesprochenes Gerät<br>
+            0 Tastatur<br>
+            1 Datasette<br>
+            2 RS232- (User-Port) Schnittstelle<br>
+            3 Bildschirm<br>
+            4 Drucker (normal)<br>
+            5 Drucker (zusätzlich)<br>
+            8 Disketten- Laufwerk Nr. 0<br>
+            9 Disketten- Laufwerk Nr. 1<br>
             10, 11 weitere Disketten-Laufwerke</p>
 
         <p>Die normale Geräte-Nummer eines Druckers ist 4, die eines Disketten-Laufwerks 8. Die zusätzlichen Nummern müssen gesondert am betreffenden Gerät eingestellt werden.</p>
@@ -133,26 +133,26 @@
 
         <p>Wie Sie sich vielleicht noch erinnern, wird die Speicherzelle 1 beim VC 20 nicht für die Steuerung der Ein- und Ausgänge des Mikroprozessors verwendet. Diese Rolle wird beim VC 20 durch zwei Register des »Versatile Interface Adapter« (VIA 6522-A) ausgefüllt.</p>
 
-        <p>Für die Abfrage der Datasetten-Tasten ist das sechste Bit des VIA-Registers 37151 zuständig. Bei gedrückter Taste steht es auf 1, sonst auf 0. Ein kleines Programm zeigt es Ihnen:<br />
-            10 X = PEEK(37151)<br />
-            20 PRINT X<br />
-            30 IF X = 62 THEN 50<br />
-            40 GOTO 10<br />
+        <p>Für die Abfrage der Datasetten-Tasten ist das sechste Bit des VIA-Registers 37151 zuständig. Bei gedrückter Taste steht es auf 1, sonst auf 0. Ein kleines Programm zeigt es Ihnen:<br>
+            10 X = PEEK(37151)<br>
+            20 PRINT X<br>
+            30 IF X = 62 THEN 50<br>
+            40 GOTO 10<br>
             50 PRINT”TASTE GEDRÜCKT”</p>
 
         <p>Wenn keine Taste gedrückt ist, läuft ein Zahlenband mit 126 ab. Die entsprechende Darstellung als Dualzahl lautet 1111 1110. Bei einer gedrückten Taste steht in 37151 die Zahl 62, als Dualzahl 0011 1110. Wichtig, wie gesagt ist nur das zweithöchste Bit.</p>
 
         <p>Mit der Abfrage der Zeile 30 springt beim Drücken einer Taste das Programm auf die Zeile 50 und druckt den Text aus.</p>
 
-        <p>Den Motor der Datasette können wir mit Hilfe des Registers 37184 schalten. Wie beim C 64 gilt auch jetzt, daß dazu die hier angesprochene Speicherzelle 192, auch Interlock-Register genannt, eine Zahl größer als 0 enthält und daß außerdem eine Taste der Datasette gedrückt ist. Drücken Sie auf PLAY und geben Sie direkt ein:<br />
-            POKE 192,255<br />
-            POKE 37148,251: der Motor bleibt stehen.<br />
+        <p>Den Motor der Datasette können wir mit Hilfe des Registers 37184 schalten. Wie beim C 64 gilt auch jetzt, daß dazu die hier angesprochene Speicherzelle 192, auch Interlock-Register genannt, eine Zahl größer als 0 enthält und daß außerdem eine Taste der Datasette gedrückt ist. Drücken Sie auf PLAY und geben Sie direkt ein:<br>
+            POKE 192,255<br>
+            POKE 37148,251: der Motor bleibt stehen.<br>
             POKE 37148,252: der Motor läuft los.</p>
 
         <p>Bestimmend sind hier Bit 2, 3 und 4.</p>
 
-        <p>Zum Ausschalten muß lediglich Bit 2 auf 1 stehen, zum Einschalten die drei Bits auf 110. Jede Zahl, die als Dualzahl diese Bedingungen erfüllt, kann dafür hergenommen werden. Um unabhängig von den anderen Bits des Registers 37148 zu bleiben, die ja auch ganz bestimmte andere Funktionen haben, empfiehlt es sich, über Boole’sche Verknüpfungen nur die wichtigen drei Bits zu verändern. Die beiden POKE-Befehle sehen dann so aus:<br />
-            Ausschalten: POKE 37148,PEEK (37148) OR 2<br />
+        <p>Zum Ausschalten muß lediglich Bit 2 auf 1 stehen, zum Einschalten die drei Bits auf 110. Jede Zahl, die als Dualzahl diese Bedingungen erfüllt, kann dafür hergenommen werden. Um unabhängig von den anderen Bits des Registers 37148 zu bleiben, die ja auch ganz bestimmte andere Funktionen haben, empfiehlt es sich, über Boole’sche Verknüpfungen nur die wichtigen drei Bits zu verändern. Die beiden POKE-Befehle sehen dann so aus:<br>
+            Ausschalten: POKE 37148,PEEK (37148) OR 2<br>
             Einschalten: POKE 37148,PEEK (37148) AND 12</p>
 
         <h2>Adresse 193 bis 194 ($C1 bis $C2)</h2>
@@ -185,9 +185,9 @@
 
         <p>In dieser Speicherzelle steht die jeweilige Anzahl der Zeichen, die im Tastaturpuffer gespeichert sind und darauf warten, weiterverarbeitet zu werden.</p>
 
-        <p>Das folgende kleine Programm zeigt es.<br />
-            10 GET A$<br />
-            20 PRINT PEEK (198);A$ 30 FORJ=1 3000:NEXTJ<br />
+        <p>Das folgende kleine Programm zeigt es.<br>
+            10 GET A$<br>
+            20 PRINT PEEK (198);A$ 30 FORJ=1 3000:NEXTJ<br>
             40 GOTO 10</p>
 
         <p>Der GET-Befehl holt ein Zeichen aus dem Tastaturpuffer — sofern eines dort zu finden ist. Die Zeile 20 druckt die Anzahl der Zeichen im Puffer aus, daneben das erste dieser Zeichen. Dann folgt eine Warteschleife, die uns erlaubt, ganz schnell ein paar Tasten zu drücken. Danach springt das Programm an den Anfang zurück und arbeitet diese eingegebenen Zeichen ab. Es ist dabei deutlich zu sehen, wie durch den GET-Befehl bereits ein Zeichen aus dem Puffer genommen und dadurch der Inhalt der Zelle 198 sofort um 1 reduziert wird.</p>
@@ -196,7 +196,7 @@
 
         <p>Eine sinnvolle Anwendung dieser Beeinflussung erlaubt der nicht gerade sehr populäre WAIT-Befehl.</p>
 
-        <p>Ersetzen Sie bitte im obigen Programm die Warteschleife der Zeile 30 durch:<br />
+        <p>Ersetzen Sie bitte im obigen Programm die Warteschleife der Zeile 30 durch:<br>
             30 POKE 198,0: WAIT 198,1</p>
 
         <p>Zuerst wird dem Computer vorgegaukelt, daß der Tastaturpuffer leer sei. Durch den WAIT-Befehl wartet das Programm danach so lange, bis ein Zeichen im Tastaturpuffer erscheint und springt erst dann auf die nächste Zeile 40.</p>
@@ -247,7 +247,7 @@
 
         <p>Da in 187/188 die Adresse angegeben ist, ab der der Programm- beziehungsweise Datei-Name im Speicher steht, können wir ihn dort ansehen.</p>
 
-        <p>Geben Sie direkt ein<br />
+        <p>Geben Sie direkt ein<br>
             LOAD ”1234”</p>
 
         <p>Nach der RETURN-Taste kommt die übliche Aufforderung der Datasette, die wir aber mit der STOP-Taste abwürgen. In 187/188 steht jetzt die Anfangsadresse »A«des gespeicherten Namens: A = PEEK(187) + 256*PEEK (188):PRINT PEEK(A)</p>
@@ -322,24 +322,24 @@
 
         <p>Jetzt wollen wir das alles mit einem kleinen Experiment überprüfen.</p>
 
-        <p>Schreiben Sie bitte ein kleines Programm, es braucht nicht sehr sinnvoll zu sein, wie zum Beispiel:<br />
-            10 REM TAPE HEADER<br />
+        <p>Schreiben Sie bitte ein kleines Programm, es braucht nicht sehr sinnvoll zu sein, wie zum Beispiel:<br>
+            10 REM TAPE HEADER<br>
             20 REM TEST PROGRAMM</p>
 
-        <p>Nehmen Sie ein leeres Band und laden das Programm mit einem Namen, der länger sein soll als 16 Zeichen, zum Beispiel:<br />
+        <p>Nehmen Sie ein leeres Band und laden das Programm mit einem Namen, der länger sein soll als 16 Zeichen, zum Beispiel:<br>
             SAVE ”TEST PROGRAMM FUER INHALT TAPE HEADER"</p>
 
-        <p>Nach Drücken der RECORD- und PLAY-Tasten der Datasette meldet der Computer:<br />
+        <p>Nach Drücken der RECORD- und PLAY-Tasten der Datasette meldet der Computer:<br>
             FOUND TEST PROGRAMM FU</p>
 
         <p>Es werden also nur 16 Zeichen inklusive Leerzeichen gedruckt. Sobald das Programm geladen ist, schauen wir im Kassettenpuffer nach, was in den ersten fünf Bytes steht, danach lesen wir die restlichen Bytes des Puffers.</p>
 
-        <p>Geben Sie direkt, ohne Zeilennummer, ein:<br />
+        <p>Geben Sie direkt, ohne Zeilennummer, ein:<br>
             FOR I = 0 TO 4: PRINT PEEK (828 + I);: NEXT,</p>
 
         <p>Sie erhalten die Zahlen 1 1 8 41 8 (beim VC 20 mit 3-K-Speichererweiterung 1 1 4 41 4)</p>
 
-        <p>Danach geben wir wiederum direkt ein:<br />
+        <p>Danach geben wir wiederum direkt ein:<br>
             FOR I = 5 TO 192: PRINT CHR$(PEEK(828 + I));: NEXT</p>
 
         <p>Beim VC 20 geben Sie in der FOR&hellip;NEXT-Schleife eine kleine Zahl ein, da der Bildschirmspeicher beim VC 20 kleiner ist als beim C 64.</p>
