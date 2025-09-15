@@ -1,0 +1,98 @@
+
+
+;codeschloss.prg ==0801==
+  100 rem *******************************
+  110 rem *                             *
+  120 rem *    c o d e s c h l o s s    *
+  130 rem *    ---------------------    *
+  140 rem *                             *
+  150 rem *       by tobias nicol       *
+  160 rem *                             *
+  170 rem *     neuwiesenstrasse 20     *
+  180 rem *                             *
+  190 rem *      6000 frankfurt 71      *
+  200 rem *                             *
+  210 rem *******************************
+  220  
+  230 rem ******* initialisierung *******
+  240 r = 56577 : poke 56579,1 : poke r,0
+  250 t = 54296 : i = 1 : cl = 6
+  260 c1$ = "123456" : c2$ = ""
+  270  
+  280 rem ***** sid-chip einstellen *****
+  290 si = 54272
+  300 poke si+ 7,207 : poke si+ 8,200
+  310 poke si+13,240 : poke si+11,17
+  320  
+  330 rem ***** bildschirm aufbauen *****
+  340 print "{clr}{down}{rght}{rght}{rght}{rght}{rght}{blk}codeschloss"
+  350 print "{rght}{rght}{rght}{rght}{rght}-----------{cyn}"
+  360 print "{down}{down}geben sie bitte den{down}"
+  370 print "code ein. jeder kon-{down}"
+  380 print "takt wird mit einem{down}"
+  390 print "ton bestaetigt."
+  400 print "{down}{down}(reset: kontakt 2)"
+  410  
+  420 rem ***** kontakt betaetigt?  *****
+  430 pr = (( peek (r) and 254 ))
+  440 if ( pr and 254 ) = 254 then 420
+  450  
+  460 rem *** kontaktnummer errechnen ***
+  470 x = log ( 254 - pr ) / log (2) - 1
+  480  
+  490 rem ***** werte kontrollieren *****
+  500 if ( x < 0 ) or ( x > 6 ) then 420
+  510 if x <> int (x) then 420
+  520  
+  530 rem *********** reset?  ***********
+  540 if x = 0 then run
+  550  
+  560 rem * einzugebenden code aufbauen *
+  570 c2$ = c2$ + right$ ( str$ (x) , 1 )
+  580  
+  590 rem ***** signalton ausgeben  *****
+  600 poke t,15
+  610 for a = 1 to 30 : next a
+  620 poke t,0
+  630  
+  640 rem **** sind schon cl zahlen  ****
+  650 rem ****  eingegeben worden?   ****
+  660 i = i + 1
+  670 if i = cl + 1 then 720
+  680  
+  690 rem ********* ruecksprung *********
+  700 goto 420
+  710  
+  720 rem * eingegebener code richtig?  *
+  730 if c1$ = c2$ then 790
+  740  
+  750 rem *** code ist nicht richtig! ***
+  760 print "{down}{down}{grn}fehler!!!{cyn}"
+  770 for a = 1 to 2000 : next a : run
+  780  
+  790 rem ****** code ist richtig! ******
+  800 print "{down}{down}{grn}richtig!!!{cyn}"
+  810 print "{down}bitte mit kontakt 2"
+  820 print "{down}loeschen!"
+  830  
+  840 rem *** user-port-signal setzen ***
+  850 poke r , ( peek (r) ) or 1
+  860  
+  870 rem **** auf den reset warten  ****
+  880 if (( peek (r)) and 2) = 2 then 870
+  890 run
+  900  
+  910  
+  920  
+  930  rem ******************************
+  940  rem *** aenderungen fuer vc-20 ***
+  950  rem ******************************
+  960  rem
+  970  rem loeschen sie  : zeilen 290-310
+  980  rem
+  990  rem geben sie ein :
+ 1000 rem
+ 1010 rem 240 r=37136:poke 37138,1
+ 1020 rem 250 poke r,0:t=36878:i=1:cl=6
+ 1030 rem 290 poke 36876,220
+

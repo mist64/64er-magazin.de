@@ -1,0 +1,76 @@
+
+
+;alarmanlage.prg ==0801==
+  100 rem *******************************
+  110 rem *                             *
+  120 rem *    a l a r m a n l a g e    *
+  130 rem *    ---------------------    *
+  140 rem *                             *
+  150 rem *       by tobias nicol       *
+  160 rem *                             *
+  170 rem *     neuwiesenstrasse 20     *
+  180 rem *                             *
+  190 rem *      6000 frankfurt 71      *
+  200 rem *                             *
+  210 rem *******************************
+  220  
+  230 rem ******* initialisierung *******
+  240 r = 56577 : poke 56579,1 : poke r,0
+  250  
+  260 rem ***** sid-chip einstellen *****
+  270 t = 54296 : si = 54272
+  280 poke si+ 7,207 : poke si+ 8,200
+  290 poke si+13,240 : poke si+11,17
+  300  
+  310 rem ***** bildschirm aufbauen *****
+  320 print "{clr}{down}{down}{rght}{rght}{rght}{rght}{rght}alarmanlage"
+  330 print "{rght}{rght}{rght}{rght}{rght}==========={down}{down}{down}"
+  340 for a = 1 to 7
+  350 print"kontakt"a": o. k.{down}"
+  360 next a
+  370  
+  380 rem *********** alarm? ************
+  390 if ((peek(r))and254) = 254 then 390
+  400  
+  410 rem *********** alarm! ************
+  420 ir = peek (r)
+  430 poke 53280,2
+  440 poke r , peek ( r ) or 1
+  450 poke t,15
+  460  
+  470 rem **** kontaktplan ausgeben  ****
+  480 print "{home}{down}{down}{down}{down}{down}{down}"
+  490 for a = 1 to 7
+  500 if (ir and (2^a)) = 0 then 530
+  510 print "{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}o. k. {down}"
+  520 goto 540
+  530 print "{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}{rght}alarm!{down}"
+  540 next a
+  550  
+  560 rem ****** immer noch alarm? ******
+  570 ir = peek ( r )
+  580 if ( ir and 254 ) <> 254 then 470
+  590  
+  600 rem ** alarmanzeiger ausschalten **
+  610 poke 53280,254
+  620 poke r , peek ( r ) and 254
+  630 poke t,0
+  640  
+  650 rem ********* ruecksprung *********
+  660 goto 310
+  670  
+  680  
+  690  
+  700 rem *******************************
+  710 rem *** aenderungen fuer vc-20  ***
+  720 rem *******************************
+  730 rem
+  740 rem loeschen sie  : zeilen 270-290.
+  750 rem
+  760 rem geben sie ein :
+  770 rem
+  780 rem 240 r=37136:poke37138,1:poker,0
+  790 rem 270 t=36878 : poke36875,200
+  800 rem 430 poke 36879,26
+  810 rem 610 poke 36879,27
+

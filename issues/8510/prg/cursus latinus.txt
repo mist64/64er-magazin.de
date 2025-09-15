@@ -1,0 +1,622 @@
+
+
+;cursus latinus.prg ==0801==
+   10 dimmn$(12),wo$(99,6),wo(99),wt$(10,10)
+  100 rem ************************
+  110 rem *                      *
+  120 rem *  - cursus latinus -  *
+  130 rem *                      *
+  140 rem *    (c) maerz 1985    *
+  150 rem *                      *
+  160 rem *  bernd kraus         *
+  170 rem *  am waldschwimmbad 2 *
+  180 rem *  6909 walldorf/bd.   *
+  190 rem *  tel.: 06227/2982    *
+  200 rem *                      *
+  210 rem *  fuer c=64 + c=1541  *
+  220 rem *  evtl. mps 801       *
+  230 rem *                      *
+  240 rem ************************
+  250 :
+  260 rem **
+  270 rem ** variablen
+  280 rem **
+  290 :
+  300 print"{clr}{wht}{swlc}{dish}";:poke53280,6:poke53281,6
+  310 t1$="{CBM-A}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{CBM-S}"
+  320 t2$="{CBM-Z}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}"
+  330 t3$="{SHIFT--}{CBM-A}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{CBM-S}{SHIFT--}"
+  340 t4$="{SHIFT--}{CBM-Z}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{CBM-X}{SHIFT--}"
+  350 t5$="{SHIFT--}{SHIFT--}                                    {SHIFT--}{SHIFT--}"
+  360 t6$="{SHIFT--}{CBM-A}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{CBM-S}{CBM-A}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{CBM-S}{CBM-A}{SHIFT-*}{SHIFT-*}{CBM-S}{CBM-A}{SHIFT-*}{SHIFT-*}{CBM-R}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{CBM-S}{SHIFT--}"
+  370 t7$="{SHIFT--}{SHIFT--}{$a0}{$a0}{$a0}{$a0}{$a0}{$a0}{$a0}{$a0}{$a0}{$a0}{$a0}{SHIFT--}{SHIFT--}{$a0}{$a0}{$a0}{$a0}{$a0}{$a0}{$a0}{$a0}{SHIFT--}{SHIFT--}{$a0}{$a0}{SHIFT--}{SHIFT--}{$a0}{$a0}{SHIFT--}{$a0}{$a0}{$a0}{$a0}{$a0}{$a0}{SHIFT--}{SHIFT--}"
+  380 t8$="{SHIFT--}{CBM-Z}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{CBM-X}{CBM-Z}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{CBM-X}{CBM-Z}{SHIFT-*}{SHIFT-*}{CBM-X}{CBM-Z}{SHIFT-*}{SHIFT-*}{CBM-E}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{CBM-X}{SHIFT--}"
+  390 t9$="{SHIFT--}{CBM-A}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{CBM-S}{CBM-A}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{CBM-S}{SHIFT--}"
+  400 ta$="{SHIFT--}{SHIFT--}{$a0}{$a0}{$a0}{$a0}{$a0}{$a0}{$a0}{$a0}{$a0}{$a0}{$a0}{SHIFT--}{SHIFT--}{$a0}{$a0}{$a0}{$a0}{$a0}{$a0}{$a0}{$a0}{$a0}{$a0}{$a0}{$a0}{$a0}{$a0}{$a0}{$a0}{$a0}{$a0}{$a0}{$a0}{$a0}{$a0}{$a0}{SHIFT--}{SHIFT--}"
+  410 tb$="{SHIFT--}{CBM-Z}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{CBM-X}{CBM-Z}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{CBM-X}{SHIFT--}"
+  420 tc$="{SHIFT--}{CBM-A}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{CBM-R}{SHIFT-*}{SHIFT-*}{SHIFT-*}{CBM-S}{CBM-A}{SHIFT-*}{SHIFT-*}{SHIFT-*}{CBM-R}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{CBM-S}{SHIFT--}"
+  430 td$="{SHIFT--}{SHIFT--}   {gry3}richtig{wht}   {SHIFT--}   {SHIFT--}{SHIFT--}   {SHIFT--}   {gry3}falsch{wht}    {SHIFT--}{SHIFT--}"
+  440 te$="{SHIFT--}{CBM-Z}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{CBM-E}{SHIFT-*}{SHIFT-*}{SHIFT-*}{CBM-X}{CBM-Z}{SHIFT-*}{SHIFT-*}{SHIFT-*}{CBM-E}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{CBM-X}{SHIFT--}"
+  450 tf$="{SHIFT--}{CBM-A}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{CBM-S}{CBM-A}{SHIFT-*}{SHIFT-*}{SHIFT-*}{CBM-R}{SHIFT-*}{SHIFT-*}{SHIFT-*}{CBM-R}{SHIFT-*}{SHIFT-*}{SHIFT-*}{CBM-R}{SHIFT-*}{SHIFT-*}{SHIFT-*}{CBM-R}{SHIFT-*}{SHIFT-*}{SHIFT-*}{CBM-R}{SHIFT-*}{SHIFT-*}{SHIFT-*}{CBM-S}{SHIFT--}"
+  460 tg$="{SHIFT--}{SHIFT--}{gry3}Wortart    {wht}{SHIFT--}{SHIFT--}{lblu}Nom{wht}{SHIFT--}{lblu}Adj{wht}{SHIFT--}{lblu}Adv{wht}{SHIFT--}{lblu}Ver{wht}{SHIFT--}{lblu}Dep{wht}{SHIFT--}{lblu}Sem{wht}{SHIFT--}{SHIFT--}"
+  470 th$="{SHIFT--}{CBM-Z}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{CBM-X}{CBM-Z}{SHIFT-*}{SHIFT-*}{SHIFT-*}{CBM-E}{SHIFT-*}{SHIFT-*}{SHIFT-*}{CBM-E}{SHIFT-*}{SHIFT-*}{SHIFT-*}{CBM-E}{SHIFT-*}{SHIFT-*}{SHIFT-*}{CBM-E}{SHIFT-*}{SHIFT-*}{SHIFT-*}{CBM-E}{SHIFT-*}{SHIFT-*}{SHIFT-*}{CBM-X}{SHIFT--}"
+  480 tj$="{SHIFT--}{CBM-A}{SHIFT-*}{SHIFT-*}{CBM-S}{CBM-A}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{CBM-S}{SHIFT--}"
+  490 tk$="{SHIFT--}{SHIFT--}{$a0}{$a0}{SHIFT--}{SHIFT--}{$a0}{$a0}{$a0}{$a0}{$a0}{$a0}{$a0}{$a0}{$a0}{$a0}{$a0}{$a0}{$a0}{$a0}{$a0}{$a0}{$a0}{$a0}{$a0}{$a0}{$a0}{$a0}{$a0}{$a0}{$a0}{$a0}{$a0}{$a0}{$a0}{$a0}{$a0}{$a0}{SHIFT--}{SHIFT--}"
+  500 tl$="{SHIFT--}{CBM-Z}{SHIFT-*}{SHIFT-*}{CBM-X}{CBM-Z}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{CBM-X}{SHIFT--}"
+  510 tm$="{SHIFT--}                                      {SHIFT--}"
+  520 tn$="{SHIFT--}{CBM-Q}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{CBM-W}{CBM-Q}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{CBM-W}{SHIFT--}"
+  530 tu$="{SHIFT--}{CBM-A}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{CBM-S}             {CBM-A}{SHIFT-*}{SHIFT-*}{SHIFT-*}{CBM-S}{CBM-A}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{CBM-S}{SHIFT--}"
+  540 tp$="{SHIFT--}{SHIFT--}{$a0}{$a0}{gry3}richtig{wht}{$a0}{$a0}{SHIFT--}{$a0}{$a0}{$a0}{$a0}{$a0}{$a0}{$a0}{$a0}{$a0}{$a0}{$a0}{$a0}{$a0}{SHIFT--}{$a0}{$a0}{$a0}{SHIFT--}{SHIFT--}{$a0}{$a0}{$a0}{$a0}{$a0}{SHIFT--}{SHIFT--}"
+  550 tq$="{SHIFT--}{SHIFT--}  {gry3}falsch{wht}   {SHIFT--}{$a0}{$a0}{$a0}{$a0}{$a0}{$a0}{$a0}{$a0}{$a0}{$a0}{$a0}{$a0}{$a0}{SHIFT--}{$a0}{$a0}{$a0}{SHIFT--}{SHIFT--}{$a0}{$a0}{$a0}{$a0}{$a0}{SHIFT--}{SHIFT--}"
+  560 tr$="{SHIFT--}{CBM-Z}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{CBM-X}{$a0}{$a0}{$a0}{$a0}{$a0}{$a0}{$a0}{$a0}{$a0}{$a0}{$a0}{$a0}{$a0}{CBM-Z}{SHIFT-*}{SHIFT-*}{SHIFT-*}{CBM-X}{CBM-Z}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{SHIFT-*}{CBM-X}{SHIFT--}"
+  570 tt$="{SHIFT--}{SHIFT--}{gry3}Abfragen                    Ergebnis{wht}{SHIFT--}{SHIFT--}"
+  580 wt$(1,0)="Nomen":wt$(1,1)="Wort":wt$(1,2)="Genetiv":wt$(1,3)="Genus"
+  590 wt$(1,4)="Bedeutung 1":wt$(1,5)="Bedeutung 2":wt$(1,6)="Bedeutung 3"
+  600 wt$(2,0)="Adjektiv":wt$(2,1)="Wort":wt$(2,2)="Feminin":wt$(2,3)="Neutrum"
+  610 wt$(3,0)="Adverb":wt$(3,1)="Wort"
+  620 wt$(4,0)="Verb":wt$(4,1)="Wort":wt$(4,2)="Stammform 1"
+  630 wt$(4,3)="Stammform 2":wt$(4,4)="Stammform 3":wt$(4,5)=wt$(1,4)
+  640 wt$(4,6)=wt$(1,5):wt$(5,0)="Deponens":wt$(5,1)="Wort":wt$(5,2)=wt$(4,2)
+  650 wt$(5,3)=wt$(4,3):wt$(6,0)="Semidep.":fori=1to3:wt$(6,i)=wt$(5,i):next
+  660 fori=2to6:ifi=4then680
+  670 wt$(i,4)=wt$(1,4):wt$(i,5)=wt$(1,5):wt$(i,6)=wt$(1,6)
+  680 next
+  700 mn$(1)="HAUPTMENUE":mn$(2)="Editieren":mn$(3)="Abfragen":mn$(4)="Diskette"
+  710 mn$(5)="Drucken":mn$(6)="Ende":mn$(7)="Eingabe":mn$(8)="Verbessern"
+  720 mn$(9)="Loeschen":mn$(10)="Einfuegen":mn$(11)="Laden":mn$(12)="Speichern"
+  730 dd$="{home}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}{down}"
+  740 ff$(0)="  ":ff$(1)="{lblu}f1{gry3}":ff$(2)="{lblu}f3{gry3}":ff$(3)="{lblu}f5{gry3}":ff$(4)="{lblu}f7{gry3}"
+  750 ff$(5)="{lblu}f8{gry3}":nr=0:nr$="00":in$="00"
+  760 ll$="{home}{down}{down}{rght}{rght}":fori=1to36:ll$=ll$+" ":next:ll$=ll$+"{rght}{rght}{rght}{rght}":fori=1to36
+  770 ll$=ll$+" ":next:ba=53265:si=54272:pokesi+24,15
+  780 wa$(1)="(Nom.)":wa$(2)="(Adj.)":wa$(3)="(Adv.)":wa$(4)="(Verb)"
+  790 wa$(5)="(Dep.)":wa$(6)="(Sem.)"
+  800 fori=1to80:sp$=sp$+"{SHIFT-*}":next
+  810 :
+  820 :
+  830 rem **
+  840 rem ** hauptmenue
+  850 rem **
+  860 :
+  870 pokeba,11
+  880 print"{wht}{clr}";t1$t3$t5$t5$t4$t3$t5$t4$;:fori=1to5:printtj$tk$tl$;:next
+  890 printtm$t2$;:poke2023,125
+  900 print"{gry3}";:fori=1to6
+  910 printleft$(dd$,4+i*3);
+  920 printspc(2);ff$(i-1);spc(34-len(mn$(i)));mn$(i);:next
+  930 print"{home}{down}{down}{rght}{rght}{wht}           CURSUS{$a0}LATINUS"
+  940 print"{up}{rght}{rght}{gry3}      von Bernd Kraus (C) 1985":pokeba,27
+  950 geta$:ifa$=""then950
+  960 ifa$="{f1}"then1040
+  970 ifa$="{f3}"then2490
+  980 ifa$="{f5}"then3760
+  990 ifa$="{f7}"then4670
+ 1000 ifa$="{f8}"thenprint"{clr}";:end
+ 1010 goto940
+ 1020 :
+ 1030 :
+ 1040 rem **
+ 1050 rem ** editieren
+ 1060 rem **
+ 1070 :
+ 1080 pokeba,11
+ 1090 print"{wht}{clr}";t1$t3$t5$t5$t4$t6$t7$t8$t9$;:fori=1to5:printta$tn$;:next
+ 1100 printta$tb$tf$tg$th$t2$;:poke2023,125:wx=nr:gosub5440:nr$=wx$:print"{gry3}";
+ 1110 printleft$(dd$,7)"{rght}{rght}"mn$(2)"  "tab(25)nr$tab(29)in$tab(32)wo$(nr,0)
+ 1120 printleft$(dd$,7)spc(15)wt$(wo(nr),0):fori=1to6
+ 1130 printleft$(dd$,8+2*i)"{rght}{rght}"wt$(wo(nr),i):printleft$(dd$,8+2*i)spc(16);
+ 1140 printwo$(nr,i):next
+ 1150 print"{home}{down}{down}{rght}{rght}{lblu}{rvon} 1 {rvof}{gry3} Eingabe   {lblu}{rvon} 2 {rvof}{gry3} Verbessern   {rvon}{lblu} f8 {rvof}{gry3}"
+ 1160 print"{home}{down}{down}{down}{rght}{rght}{rvon}{lblu} 3 {rvof}{gry3} Loeschen  {lblu}{rvon} 4 {gry3}{rvof} Einfuegen    Info"
+ 1170 pokeba,27
+ 1180 geta$:ifa$=""then1180
+ 1190 ifa$="1"then1320
+ 1200 ifa$="2"then1550
+ 1210 ifa$="3"then1640
+ 1220 ifa$="4"then1780
+ 1230 ifa$="{f1}"then1920
+ 1240 ifa$="{f3}"then2020
+ 1250 ifa$="{f5}"then1870
+ 1260 ifa$="{f7}"then1970
+ 1270 ifa$="+"ora$="-"then2070
+ 1280 ifa$="{f8}"then2160
+ 1290 ifa$="_"then830
+ 1300 goto1180
+ 1310 :
+ 1320 rem ** eingabe
+ 1330 ifq1>99then2400
+ 1340 goto1510
+ 1350 printll$"{home}{down}{down}{rght}{rght}Wortart mit {rvon}{lblu} < {rvof}{gry3} und {rvon}{lblu} > {rvof}{gry3} waehlen"
+ 1360 print"{home}{down}{down}{down}{rght}{rght}{rvon}{lblu} Return {rvof}{gry3}: Ende der Eingabe"
+ 1370 ifet=1thenprintleft$(dd$,7)"{rght}{rght}"mn$(8):goto1590
+ 1380 ifet=2thenprintleft$(dd$,7)"{rght}{rght}"mn$(10)"  ":goto1400
+ 1390 printleft$(dd$,7)"{rght}{rght}"mn$(7)"    "
+ 1400 gosub5480
+ 1410 printleft$(dd$,7)spc(15)wt$(aw,0)
+ 1420 fori=1to6:printleft$(dd$,8+2*i)"{rght}{rght}"wt$(aw,i):next:wo(q1)=aw
+ 1430 printll$"{home}{down}{down}{rght}{rght}Wort eingeben"
+ 1440 gosub5590
+ 1450 remifet=1thenreturn
+ 1460 ifet=0thenq1=q1+1
+ 1470 fori=1to6:zz$(i)="":zz(i)=0:next
+ 1480 ifet<>0thenreturn
+ 1490 nr=q1-1:goto1040
+ 1500 :
+ 1510 print"{wht}"left$(dd$,7)t7$;:fori=1to6:printleft$(dd$,8+2*i)ta$;:next
+ 1520 printleft$(dd$,7)spc(25);:wx=q1:gosub5440:print"{gry3}"wx$;"{wht}{rght}{rght}{gry3}"in$
+ 1530 goto1350
+ 1540 :
+ 1550 rem ** verbessern
+ 1560 ifq1=0then1180
+ 1570 et=1:q2=q1:q1=nr:gosub1320
+ 1580 q1=q2:nr=q1-1:et=0:goto1040
+ 1590 zz$(0)=wo$(q1,0):zz(0)=len(zz$(0)):printleft$(dd$,7)spc(32)zz$(0);
+ 1600 fori=1to6:zz$(i)=wo$(q1,i):zz(i)=len(zz$(i)):printleft$(dd$,8+2*i);
+ 1610 printspc(16)zz$(i);:next
+ 1620 goto1400
+ 1630 :
+ 1640 rem ** loeschen
+ 1650 ifq1=0then1180
+ 1660 printleft$(dd$,7)"{rght}{rght}"mn$(9)"   "
+ 1670 printll$"{home}{down}{down}{rght}{rght}Datensatz wird geloescht."
+ 1680 ifnr=q1-1then1740
+ 1690 fori=nrtoq1-2:forj=0to6
+ 1700 wo$(i,j)=wo$(i+1,j):next:wo(i+1)=wo(i):next
+ 1710 q1=q1-1:ifq1=-1thenq1=0
+ 1720 nr=nr-1:ifnr=-1thennr=0
+ 1730 goto1040
+ 1740 fori=0to6:wo$(nr,i)="":next:wo(nr)=0
+ 1750 q1=q1-1:nr=nr-1:ifnr=-1thennr=0
+ 1760 goto1040
+ 1770 :
+ 1780 rem ** einfuegen
+ 1790 ifq1>99then2400
+ 1800 ifq1=0then1180
+ 1810 printleft$(dd$,7)"{rght}{rght}"mn$(10)"  "
+ 1820 fori=q1tonr+1step-1:forj=0to6
+ 1830 wo$(i,j)=wo$(i-1,j):next:wo(i)=wo(i-1):next
+ 1840 q2=q1:q1=nr:et=2:gosub1320:et=0:nr=q1:q1=q2:q1=q1+1
+ 1850 goto1040
+ 1860 :
+ 1870 rem ** blaettern vor
+ 1880 ifq1=0then1040
+ 1890 nr=nr+1:ifnr>q1-1ornr>99thennr=0:goto1040
+ 1900 goto1040
+ 1910 :
+ 1920 rem ** blaettern 10 vor
+ 1930 ifq1<10then1040
+ 1940 nr=nr+10:ifnr>q1-1ornr>99thennr=0:goto1040
+ 1950 goto1040
+ 1960 :
+ 1970 rem ** blaettern zurueck
+ 1980 ifq1=0then1040
+ 1990 nr=nr-1:ifnr<0thennr=q1-1:goto1040
+ 2000 goto1040
+ 2010 :
+ 2020 rem ** blaettern 10 zurueck
+ 2030 ifq1<10then1040
+ 2040 nr=nr-10:ifnr<0thennr=q1-1:goto1040
+ 2050 goto1040
+ 2060 :
+ 2070 rem ** gesammtindex
+ 2080 i1=val(left$(in$,1)):i2=val(right$(in$,1))
+ 2090 ifa$="+"theni1=i1+1:ifi1>9theni1=0
+ 2100 ifa$="-"theni2=i2+1:ifi2>9theni2=0
+ 2110 wx=i1*10+i2:gosub5440:in$=wx$
+ 2120 printleft$(dd$,7)spc(29)in$
+ 2130 ifes=1thengoto6130
+ 2140 goto1180
+ 2150 :
+ 2160 rem ** info **
+ 2170 gosub6180
+ 2180 print"{home}{down}{down}{rght}{rght}{gry3}*  Informationen zum Programmteil  *"
+ 2190 print"{up}{rght}{rght}{wht}             EDITIEREN{gry3}"
+ 2200 printleft$(dd$,7)"{rght}{rght} {lblu} _ {gry3} Hauptmenue"
+ 2210 printleft$(dd$,8)"{rght}{rght}{lblu} f1 {gry3} Blaettern 1O Einheiten vor"
+ 2220 printleft$(dd$,9)"{rght}{rght}{lblu} f3 {gry3} Blaettern 1O Einheiten zurueck"
+ 2230 printleft$(dd$,10)"{rght}{rght}{lblu} f5 {gry3} Blaettern 1 Einheit vor"
+ 2240 printleft$(dd$,11)"{rght}{rght}{lblu} f7 {gry3} Blaettern 1 Einheit zurueck"
+ 2250 printleft$(dd$,12)"{rght}{rght} {lblu} + {gry3} Hauptindex um 1O erhoehen"
+ 2260 printleft$(dd$,13)"{rght}{rght} {lblu} - {gry3} Hauptindex um 1 erhoehen"
+ 2270 printleft$(dd$,14)"{rght}{rght} {wht}{SHIFT--}{gry3}Beim Loeschen/Einfuegen wird die{wht}{SHIFT--}{gry3}"
+ 2280 printleft$(dd$,15)"{rght}{rght} {wht}{SHIFT--}{gry3}angewaehlte Nummer gel./eingef.{$a0}{wht}{SHIFT--}{gry3}"
+ 2290 printleft$(dd$,17)"{rght}{rght}{wht}Eingabe/Verbessern:{gry3}"
+ 2300 printleft$(dd$,18)"{rght}{rght}{lblu} f1 {gry3}     Eingabe beendet"
+ 2310 printleft$(dd$,19)"{rght}{rght}{lblu} f3 {gry3}     Alle Zeilen loeschen"
+ 2320 printleft$(dd$,20)"{rght}{rght}{lblu} Home {gry3}   Zeile loeschen"
+ 2330 printleft$(dd$,21)"{rght}{rght}{lblu} Ret {gry3}    Zeile weiter"
+ 2340 printleft$(dd$,22)"{rght}{rght}{lblu} Sf-Ret {gry3} Zeile hoch"
+ 2350 printleft$(dd$,23)"{rght}{rght}                    <Taste druecken>"
+ 2360 pokeba,27
+ 2370 geta$:ifa$=""then2370
+ 2380 goto1040
+ 2390 :
+ 2400 rem ** ueberlauf
+ 2410 printll$"{home}{down}{down}{rght}{rght}Zu viele Daten im Speicher!"
+ 2420 print"{up}{rght}{rght} < Taste druecken >"
+ 2430 tt=12:gosub6250
+ 2440 geta$:ifa$=""then2440
+ 2450 pokesi+4,0
+ 2460 goto1040
+ 2470 :
+ 2480 :
+ 2490 rem **
+ 2500 rem ** abfragen
+ 2510 rem **
+ 2520 :
+ 2530 pokeba,11:zf=0:r0=0:f0=0:r1=0:f1=0
+ 2540 print"{wht}{clr}";t1$t3$t5$t5$t4$t6$t7$t8$t9$;:fori=i=1to4:printta$tn$;:next
+ 2550 printta$tb$tc$td$te$t2$;:poke2023,125
+ 2560 printleft$(dd$,7)"{gry3}{rght}{rght}"mn$(3)"   "
+ 2570 pokeba,27
+ 2580 ifq1=0then3450
+ 2590 ifer<>1thenuw$=""
+ 2600 ifer=1thener=0:zf=2:zf$=uw$:uw$="":goto2700
+ 2610 print"{home}{down}{down}{rght}{rght}{rvon}{lblu} 1 {rvof}{gry3} Abfragen in der Reihenfolge {rvon}{lblu} f8 "
+ 2620 print"{up}{rght}{rght}{rvon} 2 {rvof}{gry3} Zufaellige Reihenfolge      Info"
+ 2630 geta$:ifa$=""then2630
+ 2640 ifa$="1"thenzf=1:goto2690
+ 2650 ifa$="2"thenzf=2:goto2690
+ 2660 ifa$="_"then830
+ 2670 ifa$="{f8}"then3540
+ 2680 goto2630
+ 2690 zf$="":fori=0toq1-1:zf$=zf$+chr$(i+32):next
+ 2700 forhs=0tolen(zf$)-1:printll$:rf=0:r0=0:f0=0
+ 2710 ifzf=1thennr=hs:goto2760
+ 2720 rd%=rnd(1)*(len(zf$)-1)+1
+ 2730 nr=asc(mid$(zf$,rd%))-32
+ 2740 ifrd%=1thenzf$=right$(zf$,len(zf$)-rd%):goto2760
+ 2750 zf$=left$(zf$,rd%-1)+right$(zf$,len(zf$)-rd%)
+ 2760 printleft$(dd$,7)spc(15)"        ":wx=nr:gosub5440:nr$=wx$
+ 2770 printleft$(dd$,7)spc(15)wt$(wo(nr),0):printleft$(dd$,7)spc(25)nr$
+ 2780 forj=1to6:aa$=left$(dd$,8+2*j):printaa$"{rght}{rght}           "
+ 2790 printaa$"{rght}{rght}"wt$(wo(nr),j);
+ 2800 printaa$spc(15)"                     "
+ 2810 next
+ 2820 printleft$(dd$,10)spc(16)"{wht}"wo$(nr,1)"{gry3}"
+ 2830 printleft$(dd$,23)"{rght}{rght}   richtig   "tab(25)"   falsch    "
+ 2840 es=2:gosub5590:es=0
+ 2850 ifwo(nr)=3then2930
+ 2860 er=0:ifwo(nr)=2thener=1
+ 2870 forj=2to3+er
+ 2880 ifwo$(nr,j)=""then2920
+ 2890 ifzz$(j)=wo$(nr,j)thenr0=r0+1:goto2910
+ 2900 f0=f0+1
+ 2910 rf=rf+1
+ 2920 next
+ 2930 ifer=1then3200
+ 2940 mx=3:forj=4to6
+ 2950 m(j)=0:w$=wo$(nr,j):ifw$=""thenmx=mx-1:goto2980
+ 2960 ifw$=zz$(4)orw$=zz$(5)orw$=zz$(6)thenm(j)=1
+ 2970 rf=rf+1
+ 2980 next
+ 2990 r2=m(4)+m(5)+m(6):f0=f0+mx-r2:r0=r0+r2
+ 3000 ifrf<>r0thenuw$=uw$+chr$(nr+32)
+ 3010 ifr0=0thenprintll$"{home}{down}{down}{rght}{rght}Wort nicht gewusst.":goto3050
+ 3020 ifrf<>r0thenprintll$"{home}{down}{down}{rght}{rght}Wort unvollstaendig gewusst.":goto3050
+ 3030 printll$"{home}{down}{down}{rght}{rght}Wort gewusst.":printleft$(dd$,23)"{rght}{rght}{rvon}   richtig   {rvof}";
+ 3040 tt=35:gosub6250:r1=r1+r0:goto3120
+ 3050 printleft$(dd$,23)tab(25)"{rvon}   falsch    {rvof}";:gosub6270
+ 3060 fork=1to300:next
+ 3070 printll$"{home}{down}{down}{rght}{rght}Richtig lautet es:"
+ 3080 forj=2to6:printleft$(dd$,8+2*j)spc(15)"                     "
+ 3090 printleft$(dd$,8+2*j)spc(16)wo$(nr,j)
+ 3100 next
+ 3110 r1=r1+r0:f1=f1+f0
+ 3120 wx=r1:gosub5400:r1$=wx$:wx=f1:gosub5400:f1$=wx$
+ 3130 printleft$(dd$,23)tab(16)"{wht}"r1$tab(21)f1$"{gry3}"
+ 3140 print"{home}{down}{down}{down}{rght}{rght} < Taste druecken >"
+ 3150 geta$:ifa$=""then3150
+ 3160 pokesi+4,0
+ 3170 ifa$="_"thenfori=0to6:zz$(i)="":zz(i)=0:next:goto830
+ 3180 forj=2to6:zz$(j)="":zz(j)=0:next
+ 3190 next:goto3280
+ 3200 mx=2:forj=5to6
+ 3210 m(j)=0::w$=wo$(nr,j):ifw$=""thenmx=mx-1:goto3240
+ 3220 ifw$=zz$(5)orw$=zz$(6)thenm(j)=1
+ 3230 rf=rf+1
+ 3240 next
+ 3250 r2=m(5)+m(6):f0=f0+mx-r2:r0=r0+r2
+ 3260 goto3000
+ 3270 :
+ 3280 rem ** ergebnis
+ 3290 pokeba,11
+ 3300 print"{wht}{clr}"t1$t3$t5$t5$t4$t3$tt$t4$tm$tm$tm$tu$tp$tr$tu$tq$tr$;
+ 3310 printtm$tm$tm$tm$t3$t5$t4$t2$;:poke2023,125
+ 3320 print"{home}{down}{down}{rght}{rght}{lblu}{rvon} 1 {rvof}{gry3} alle nicht gew. Vok. wiederholen"
+ 3330 print"{up}{rght}{rght}{rvon}{lblu} 2 {rvof}{gry3} alle Vok. wiederholen  {rvon}{lblu} _ {rvof}{gry3} Menue"
+ 3340 rf=r1+f1:rr=int(r1/rf*100+.5):ff=100-rr
+ 3350 wx=rr:gosub5400:rr$=wx$:wx=ff:gosub5400:ff$=wx$
+ 3360 printleft$(dd$,13)spc(28)r1$"{rght}{rght}"rr$" %"
+ 3370 printleft$(dd$,16)spc(28)f1$"{rght}{rght}"ff$"{$a0}%"
+ 3380 pokeba,27
+ 3390 geta$:ifa$=""then3390
+ 3400 ifa$="_"then830
+ 3410 ifa$="1"theniff1<>0thener=1:goto2530
+ 3420 ifa$="2"then2530
+ 3430 goto3390
+ 3440 :
+ 3450 rem ** keine vokabeln
+ 3460 printll$"{home}{down}{down}{rght}{rght}Keine Vokabeln im Speicher."
+ 3470 print"{up}{rght}{rght}{rght}< Taste druecken >"
+ 3480 tt=12:gosub6250
+ 3490 geta$:ifa$=""then3490
+ 3500 pokesi+4,0
+ 3510 goto830
+ 3520 :
+ 3530 rem ** info
+ 3540 gosub6180
+ 3550 print"{home}{down}{down}{rght}{rght}{gry3}*  Informationen zum Programmteil  *"
+ 3560 print"{up}{rght}{rght}{wht}              ABFRAGEN{gry3}"
+ 3570 printleft$(dd$,8)"{rght}{rght}{wht}Eingabe{gry3}"
+ 3580 printleft$(dd$,9)"{rght}{rght}{lblu} f1 {gry3}     Eingabe beendet"
+ 3590 printleft$(dd$,10)"{rght}{rght}{lblu} f3 {gry3}     Alle Zeilen loeschen"
+ 3600 printleft$(dd$,11)"{rght}{rght}{lblu} Home {gry3}   Zeile loeschen"
+ 3610 printleft$(dd$,12)"{rght}{rght}{lblu} Ret {gry3}    Zeile weiter"
+ 3620 printleft$(dd$,13)"{rght}{rght}{lblu} Sf-Ret {gry3} Zeile hoch"
+ 3630 printleft$(dd$,14)"{rght}{rght}{lblu} _ {gry3}      Abfrage beenden"
+ 3640 printleft$(dd$,16)"{rght}{rght}{wht}Auswahl{gry3}"
+ 3650 printleft$(dd$,17)"{rght}{rght}{lblu} 1 {gry3} Fraegt alle Vokabeln der Reihen-"
+ 3660 printleft$(dd$,18)"{rght}{rght}    folge nach ab."
+ 3670 printleft$(dd$,19)"{rght}{rght}{lblu} 2 {gry3} Waehlt eine zufaellige Reihen-"
+ 3680 printleft$(dd$,20)"{rght}{rght}    folge."
+ 3690 printleft$(dd$,21)"{rght}{rght}{lblu} _ {gry3} Hauptmenue"
+ 3700 printleft$(dd$,23)"{rght}{rght}                    <Taste druecken>"
+ 3710 pokeba,27
+ 3720 geta$:ifa$=""then3720
+ 3730 goto2490
+ 3740 :
+ 3750 :
+ 3760 rem **
+ 3770 rem ** diskette
+ 3780 rem **
+ 3790 :
+ 3800 pokeba,11
+ 3810 print"{wht}{clr}"t1$t3$t5$t5$t4$t6$t7$t8$t9$ta$tb$;:fori=1to10:printtm$;:next
+ 3820 printt3$t5$t4$t2$;:poke2023,125
+ 3830 printleft$(dd$,7)"{rght}{rght}{gry3}"mn$(4)"   "tab(29)in$
+ 3840 printleft$(dd$,10)"{rght}{rght}Filename:{rght}{rght}{rght}{rght}{rght}"fl$
+ 3850 printleft$(dd$,23)"{rght}{rght}00, ok,00,00"
+ 3860 printll$"{home}{down}{down}{rght}{rght}{rvon}{lblu} 1 {gry3}{rvof} Laden   {rvon}{lblu} 2 {gry3}{rvof} Speichern       {rvon}{lblu} _ {gry3}{rvof}"
+ 3870 print"{home}{down}{down}{down}{rght}{rght}{rvon}{lblu} 3 {gry3}{rvof} Laden naechster Index      Menue"
+ 3880 pokeba,27
+ 3890 geta$:ifa$=""then3890
+ 3900 ifa$="_"then830
+ 3910 ifa$="1"then3960
+ 3920 ifa$="2"then4200
+ 3930 ifa$="3"then4440
+ 3940 goto3890
+ 3950 :
+ 3960 rem ** laden
+ 3970 gosub6070
+ 3980 iffl$=""then3800
+ 3990 open1,8,2,fl$+"."+in$+",s,r"
+ 4000 open2,8,15
+ 4010 input#1,q1
+ 4020 ifst=66then4550
+ 4030 fori=0toq1-1
+ 4040 forj=0to6
+ 4050 input#1,wo$(i,j)
+ 4060 ifwo$(i,j)="{CBM-+}"thenwo$(i,j)=""
+ 4070 ifst=66then4550
+ 4080 next
+ 4090 input#1,wo(i)
+ 4100 ifst=66then4550
+ 4110 next
+ 4120 close2:close1
+ 4130 printll$"{home}{down}{down}{rght}{rght}Daten sind geladen."
+ 4140 tt=45:gosub6250
+ 4150 print"{up}{rght}{rght} < Taste druecken >"
+ 4160 geta$:ifa$=""then4160
+ 4170 pokesi+4,0
+ 4180 goto830
+ 4190 :
+ 4200 rem ** speichern
+ 4210 ifq1=0then3450
+ 4220 gosub6070:iffl$=""then3800
+ 4230 open1,8,2,fl$+"."+in$+",s,w"
+ 4240 open2,8,15
+ 4250 print#1,q1
+ 4260 ifst=66then4550
+ 4270 fori=0toq1-1
+ 4280 forj=0to6
+ 4290 ifwo$(i,j)=""thenprint#1,"{CBM-+}":goto4310
+ 4300 print#1,wo$(i,j)
+ 4310 ifst=66then4550
+ 4320 next
+ 4330 print#1,wo(i)
+ 4340 ifst=66then4550
+ 4350 next
+ 4360 close2:close1
+ 4370 printll$"{home}{down}{down}{rght}{rght}Daten sind abgespeichert."
+ 4380 print"{up}{rght}{rght} < Taste druecken >"
+ 4390 tt=45:gosub6250
+ 4400 geta$:ifa$=""then4400
+ 4410 pokesi+4,0
+ 4420 goto830
+ 4430 :
+ 4440 rem ** laden naechster index
+ 4450 iffl$<>""then4510
+ 4460 printll$"{home}{down}{down}{rght}{rght}Keine Grunddatei vorhanden."
+ 4470 print"{up}{rght}{rght}{rght}< Taste druecken >"
+ 4480 tt=12:gosub6250
+ 4490 geta$:ifa$=""then4490
+ 4500 pokesi+4,0:goto3860
+ 4510 in=val(in$):in=in+1:ifin>99thenin=0
+ 4520 wx=in:gosub5440:in$=wx$
+ 4530 printleft$(dd$,7)spc(29)in$:goto3990
+ 4540 :
+ 4550 rem ** diskerror
+ 4560 ds$=""
+ 4570 get#2,a$:ds$=ds$+a$:ifst<>64then4570
+ 4580 printleft$(dd$,23)"{rght}{rght}";:fori=1to36:print" ";:next
+ 4590 printleft$(dd$,23)"{rght}{rght}"ds$;
+ 4600 close2:close1
+ 4610 printll$"{home}{down}{down}{rght}{rght}Diskerror"
+ 4620 print"{up}{rght}{rght}{$a0}< Taste druecken >"
+ 4630 geta$:ifa$=""then4630
+ 4640 goto3800
+ 4650 :
+ 4660 :
+ 4670 rem **
+ 4680 rem ** drucken
+ 4690 rem **
+ 4700 :
+ 4710 pokeba,11
+ 4720 print"{wht}{clr}"t1$t3$t5$t5$t4$t6$t7$t8$t9$ta$tb$;:fori=1to10:printtm$;:next
+ 4730 printt3$t5$t4$t2$;:poke2023,125
+ 4740 printleft$(dd$,7)"{gry3}{rght}{rght}"mn$(5)"    ";
+ 4750 printleft$(dd$,10)"{rght}{rght}Drucktitel:"
+ 4760 print"{home}{down}{down}{rght}{rght}{lblu}{rvon} 1 {rvof}{gry3} Drucken"
+ 4770 print"{up}{rght}{rght}{lblu}{rvon} _ {rvof}{gry3} Menue"
+ 4780 pokeba,27
+ 4790 ifq1=0then3450
+ 4800 geta$:ifa$=""then4800
+ 4810 ifa$="_"then830
+ 4820 ifa$="1"then4840
+ 4830 goto4800
+ 4840 printll$"{home}{down}{down}{rght}{rght}{gry3}Drucktitel eingeben."
+ 4850 es=7:gosub5920:es=0
+ 4860 iffl$=""then830
+ 4870 printll$"{home}{down}{down}{rght}{rght}{gry3}Abbruch mit {lblu}{rvon} Shift Lock {rvof}{gry3}"
+ 4880 open1,4,7
+ 4890 print#1,chr$(14)fl$chr$(15)
+ 4900 print#1,sp$:print#1
+ 4910 i=-1
+ 4920 i=i+1:ifi=q1then5090
+ 4930 wx=i:gosub5440:ii$=wx$
+ 4940 print#1,ii$;" ";wo$(i,0)+left$("      ",6-len(wo$(i,0)));" ";
+ 4950 print#1,wo$(i,1);
+ 4960 ifwo(i)=4then5110
+ 4970 ifwo(i)=5orwo(i)=6then5180
+ 4980 ifwo$(i,2)<>""thenprint#1,"; "wo$(i,2);
+ 4990 ifwo$(i,3)<>""thenprint#1,"; "wo$(i,3);
+ 5000 print#1
+ 5010 print#1,"  ";wa$(wo(i));"  ";
+ 5020 print#1,wo$(i,4);
+ 5030 ifwo$(i,5)<>""thenprint#1,"; "wo$(i,5);
+ 5040 ifwo$(i,6)<>""thenprint#1,"; "wo$(i,6);
+ 5050 print#1
+ 5060 print#1
+ 5070 ifpeek(653)=0then4920
+ 5080 goto5230
+ 5090 print#1:print#1:close1
+ 5100 goto5280
+ 5110 print#1
+ 5120 print#1,"  "wa$(4)"  ";
+ 5130 print#1,wo$(i,2);"; "wo$(i,3)"; "wo$(i,4);
+ 5140 print#1
+ 5150 print#1,spc(10);wo$(i,5);
+ 5160 ifwo$(i,6)<>""thenprint#1,"; "wo$(i,6);
+ 5170 goto5050
+ 5180 print#1
+ 5190 print#1,"  ";wa$(wo(i));"  ";
+ 5200 print#1,wo$(i,2);
+ 5210 ifwo$(i,3)<>""thenprint#1,"; ";wo$(i,3);
+ 5220 print#1:print#1,spc(10);:goto5020
+ 5230 printll$"{home}{down}{down}{rght}{rght}{gry3}Abbruch":print"{up}{rght}{rght}{rght}< Taste druecken{$a0}>"
+ 5240 tt=12:gosub6250
+ 5250 geta$:ifa$=""then5250
+ 5260 pokesi+4,0
+ 5270 goto4670
+ 5280 printll$"{home}{down}{down}{rght}{rght}Fertig."
+ 5290 print"{up}{rght}{rght}{rght}< Taste druecken >"
+ 5300 tt=45:gosub6250
+ 5310 geta$:ifa$=""then5310
+ 5320 pokesi+4,0
+ 5330 goto4670
+ 5340 :
+ 5350 :
+ 5360 rem **
+ 5370 rem ** unterprogramme
+ 5380 rem **
+ 5390 :
+ 5400 rem ** umrechnung zahl-using(3)
+ 5410 wx$=str$(wx):lw=len(wx$):wx$=right$(wx$,lw-1):wx$=left$("  ",4-lw)+wx$
+ 5420 return
+ 5430 :
+ 5440 rem ** umrechnung zahl-using(2)
+ 5450 wx$=str$(wx):lw=len(wx$):wx$=right$(wx$,lw-1):wx$=left$("0",3-lw)+wx$
+ 5460 return
+ 5470 :
+ 5480 rem ** wahl der wortart
+ 5490 ps=56187:aw=1
+ 5500 pa=ps+aw*4:pokepa,1:pokepa+1,1:pokepa+2,1
+ 5510 geta$:ifa$=""then5510
+ 5520 ifa$<>","anda$<>"."anda$<>chr$(13)then5510
+ 5530 pokepa,14:pokepa+1,14:pokepa+2,14
+ 5540 ifa$=chr$(13)thenreturn
+ 5550 ifa$=","thenaw=aw-1:ifaw=0thenaw=6
+ 5560 ifa$="."thenaw=aw+1:ifaw=7thenaw=1
+ 5570 goto5500
+ 5580 :
+ 5590 rem ** eingabe: index & woerter
+ 5600 zz=es
+ 5610 ifzz=0thenprintleft$(dd$,7)spc(32)zz$(0);:goto5630
+ 5620 printleft$(dd$,8+2*zz)spc(16)zz$(zz);
+ 5630 print"{CBM-@}";
+ 5640 geta$:ifa$=""then5640
+ 5650 ifa$=chr$(13)then5760
+ 5660 ifa$=chr$(20)then5840
+ 5670 ifa$=chr$(19)then5800
+ 5680 ifa$=chr$(141)then5780
+ 5690 ifa$=chr$(133)then5890
+ 5700 ifa$=chr$(134)then5860
+ 5710 ifa$<" "ora$>"Z"then5640
+ 5720 ifa$>chr$(122)anda$<chr$(192)then5640
+ 5730 ifzz(zz)=20then5640
+ 5740 ifzz(zz)=5andzz=0then5640
+ 5750 zz$(zz)=zz$(zz)+a$:zz(zz)=zz(zz)+1:print"{left}"a$"{CBM-@}";:goto5640
+ 5760 zz=zz+1:ifzz=7thenzz=0+es
+ 5770 print"{left} ":goto5610
+ 5780 zz=zz-1:ifzz=-1+esthenzz=6
+ 5790 print"{left} ":goto5610
+ 5800 zz$(zz)="":zz(zz)=0
+ 5810 ifzz=0thenprintleft$(dd$,7)spc(32)"{CBM-@}     ";:goto5610
+ 5820 printleft$(dd$,8+2*zz)spc(16)"{CBM-@}                    ";:goto5610
+ 5830 goto5640
+ 5840 ifzz(zz)=0then5610
+ 5850 zz$(zz)=left$(zz$(zz),zz(zz)-1):zz(zz)=zz(zz)-1:print"{left} ":goto5610
+ 5860 ifes=2thenet=1
+ 5870 fori=1+etto6:zz$(i)="":zz(i)=0:printleft$(dd$,8+2*i)spc(16);
+ 5880 print"                    ":next:zz=0+es:et=0:goto5610
+ 5890 ifes=1thenreturn
+ 5900 fori=0to6:wo$(q1,i)=zz$(i):next:return
+ 5910 :
+ 5920 rem ** eingabe filename
+ 5930 fl$="":printleft$(dd$,10)spc(16)"                     "
+ 5940 printleft$(dd$,10)spc(16)fl$"{CBM-@}";
+ 5950 geta$:ifa$=""then5950
+ 5960 ifa$=chr$(19)then5930
+ 5970 ifa$=chr$(20)then6040
+ 5980 ifa$=chr$(13)thenprint"{left} ":return
+ 5990 ifa$=chr$(34)then5950
+ 6000 ifa$<" "ora$>"Z"then5950
+ 6010 ifa$>"_"anda$<"A"then5950
+ 6020 iflen(fl$)=13+esthen5950
+ 6030 fl$=fl$+a$:goto5940
+ 6040 fl=len(fl$):iffl<2then5930
+ 6050 fl$=left$(fl$,fl-1):print"{left}{$a0}";:goto5940
+ 6060 :
+ 6070 rem ** eingabe kontrolle
+ 6080 printll$"{home}{down}{down}{rght}{rght}Filename eingeben."
+ 6090 gosub5920
+ 6100 iffl$=""thenreturn
+ 6110 printll$"{home}{down}{down}{rght}{rght}Index eingeben."
+ 6120 print"{up}{rght}{rght}{rvon}{lblu} + {rvof}{gry3} 10 Einh. vor"tab(60)"{rvon}{lblu} - {rvof}{gry3} 1 Einh. vor"
+ 6130 geta$:ifa$=""then6130
+ 6140 ifa$="+"ora$="-"thenes=1:goto2070:es=0
+ 6150 ifa$=chr$(13)thenprintll$:return
+ 6160 goto6130
+ 6170 :
+ 6180 rem ** info-maske
+ 6190 pokeba,11
+ 6200 print"{wht}{clr}"t1$t3$t5$t5$t4$t3$;:fori=1to17:printt5$;:next:printt4$t2$;
+ 6210 poke2023,125
+ 6220 return
+ 6230 :
+ 6240 rem ** sound
+ 6250 pokesi+24,15:pokesi+5,11:pokesi+6,0:pokesi,0:pokesi+1,tt:pokesi+4,17
+ 6260 return
+ 6270 pokesi+24,15:pokesi+5,28:pokesi+6,0:pokesi,0:pokesi+1,2:pokesi+4,33:return
+
