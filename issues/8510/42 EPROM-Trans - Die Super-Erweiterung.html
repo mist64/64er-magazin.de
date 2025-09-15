@@ -53,6 +53,119 @@
 
         <p>Das IC 74LS139 besteht aus zwei 1 auf 4 Demultiplexer DM1 und DM2. Je nach Codierung der Eingangsadresse (A0 und A1) wird der Eingang E auf den entsprechenden Ausgang D0 bis D3 gelegt (Tabelle 1), ansonsten haben die Ausgänge High-Potential.</p>
 
+        <figure>
+            <table>
+                <tr>
+                    <th rowspan="2">Taster</th>
+                    <th colspan="2">DMI</th>
+                    <th rowspan="2">Basic</th>
+                    <th rowspan="2">A12</th>
+                    <th rowspan="2">Basic-ROM</th>
+                    <th rowspan="2">EPROM-Trans</th>
+                    <th rowspan="2">EPROM 1</th>
+                    <th rowspan="2">EPROM 2</th>
+                    <th rowspan="2">EPROM 3</th>
+                </tr>
+                <tr>
+                    <th>A0</th>
+                    <th>A1</th>
+                </tr>
+                <tr>
+                    <td rowspan="2">kein Taster gedrückt</td>
+                    <td>0</td>
+                    <td>0</td>
+                    <td>0</td>
+                    <td>0</td>
+                    <td>0</td>
+                    <td>1</td>
+                    <td>1</td>
+                    <td>1</td>
+                    <td>1</td>
+                </tr>
+                <tr>
+                    <td>0</td>
+                    <td>0</td>
+                    <td>0</td>
+                    <td>1</td>
+                    <td>0</td>
+                    <td>1</td>
+                    <td>1</td>
+                    <td>1</td>
+                    <td>1</td>
+                </tr>
+                <tr>
+                    <td rowspan="2">Taster T1 gedrückt</td>
+                    <td>1</td>
+                    <td>0</td>
+                    <td>0</td>
+                    <td>0</td>
+                    <td>1</td>
+                    <td>0</td>
+                    <td>1</td>
+                    <td>1</td>
+                    <td>1</td>
+                </tr>
+                <tr>
+                    <td>1</td>
+                    <td>0</td>
+                    <td>0</td>
+                    <td>1</td>
+                    <td>1</td>
+                    <td>1</td>
+                    <td>0</td>
+                    <td>1</td>
+                    <td>1</td>
+                </tr>
+                <tr>
+                    <td rowspan="2">Taster T2 gedrückt</td>
+                    <td>0</td>
+                    <td>1</td>
+                    <td>0</td>
+                    <td>0</td>
+                    <td>1</td>
+                    <td>0</td>
+                    <td>1</td>
+                    <td>1</td>
+                    <td>1</td>
+                </tr>
+                <tr>
+                    <td>0</td>
+                    <td>1</td>
+                    <td>0</td>
+                    <td>1</td>
+                    <td>1</td>
+                    <td>1</td>
+                    <td>1</td>
+                    <td>0</td>
+                    <td>1</td>
+                </tr>
+                <tr>
+                    <td rowspan="2">Taster T3 gedrückt</td>
+                    <td>1</td>
+                    <td>1</td>
+                    <td>0</td>
+                    <td>0</td>
+                    <td>1</td>
+                    <td>0</td>
+                    <td>1</td>
+                    <td>1</td>
+                    <td>1</td>
+                </tr>
+                <tr>
+                    <td>1</td>
+                    <td>1</td>
+                    <td>0</td>
+                    <td>1</td>
+                    <td>1</td>
+                    <td>1</td>
+                    <td>1</td>
+                    <td>1</td>
+                    <td>0</td>
+                </tr>
+            </table>
+        <p>0 ≙ LOW-Potential / 1 ≙ HIGH-Potential</p>
+            <figcaption>Tabelle 1. Codierung des Demultiplexers (H=High)</figcaption>
+        </figure>
         <h2>Realisierung der Hardware</h2>
 
         <p>Mit DM1 erfolgt die eigentliche Selektierung der EPROMs. Es bestehen vier Möglichkeiten: Basic-ROM und EPROM 1 bis 3. Der Adreßcode ist abhängig von den Schaltzuständen der Taster T1 bis T3. Aktiviert werden alle EPROMs mit »Active Low« (Low-Potential). BASIC ist die Leitung, die normalerweise das Basic-ROM aktiviert, also dann Low-Pegel hat, wenn im Bereich $A000 bis $BFFF gelesen wird. Dieses Signal ist an die Eingänge E der Demultiplexer DM1 und DM2 geführt. Liegt BASIC auf, kann kein Baustein aktiviert werden, denn die Ausgänge D0 bis D3 von DM1 und DM2 sind high oder entsprechend dem Pegel an E (hier dann auch high). Am CE-Eingang vom Basic-ROM steht folglich ein High-Pegel, entsprechendes gilt für EPROM-Trans. Die Ausgänge D1 bis D3 von DM1 werden invertiert, so daß an den betreffenden Eingängen der NAND-Gatter Low-Potential liegt Bekanntlich ist aber der Ausgang eines NAND-Gatters nur dann low, wenn beide Eingänge high sind. Folglich werden EPROM 1 bis 3 nicht aktiviert. Kommen wir jetzt zum interessanteren Teil: Basic für LOW. Als erstes wollen wir prüfen, ob der Computer »normal« arbeitet, wenn keine Taste gedrückt ist:<br>
