@@ -8,13 +8,9 @@
     <meta name="author" content="Heimo Ponnath, gk">
     <meta name="64er.issue" content="10/85">
     <meta name="64er.pages" content="143-146,148">
-    <meta name="64er.head1" content="Assembler-Kurs">
-    <meta name="64er.head2" content="C 64">
-    <meta name="64er.toc_title" content="Assembler ist keine Alchimie (Teil 13)">
-    <meta name="64er.toc_category" content="Kurse">
-    <meta name="64er.index_title" content="Assembler ist keine Alchimie (Teil 13; Schluß)">
-    <meta name="64er.index_category" content="Kurse|Assembler">
-    <meta name="64er.id" content="assembler">
+    <!-- <meta name="64er.toc_category" content="XXX"> -->
+    <!-- <meta name="64er.toc_title" content="XXX"> -->
+    <meta name="64er.id" content="XXX">
 </head>
 
 <body>
@@ -36,54 +32,63 @@
 
         <p>TODO TABLE</p>
 
-        <p>56324 dezimal 37 LSB<br />
+        <p>56324 dezimal 37 LSB<br>
             56325 dezimal 64 MSB</p>
 
-        <p>Das entspricht einem Startwert von 16421. Im PAL-System hat der Quarz, der die Taktfrequenz bestimmt, eine Frequenz von 17.734472 MHz. Die Prozessorfrequenz errechnet sich daraus mittels Division durch 18 zu 985248.4 Hz (also etwas weniger als 1 MHz, was den europäischen C 64 langsamer macht als den amerikanischen, der etwas mehr als 1 MHz verwendet). Wenn mit dieser Geschwindigkeit der Timer heruntergezählt wird, erhält man genau einen Unterlauf alle 1/60 Sekunden. Das ist der Weg, eine kontrollierte Zeitspanne durch den Timer zählen zu lassen. Sei X der gesuchte Startwert, der zu einer Spanne von T Sekunden führt, dann kann man X berechnen mittels:<br />
+        <p>Das entspricht einem Startwert von 16421. Im PAL-System hat der Quarz, der die Taktfrequenz bestimmt, eine Frequenz von 17.734472 MHz. Die Prozessorfrequenz errechnet sich daraus mittels Division durch 18 zu 985248.4 Hz (also etwas weniger als 1 MHz, was den europäischen C 64 langsamer macht als den amerikanischen, der etwas mehr als 1 MHz verwendet). Wenn mit dieser Geschwindigkeit der Timer heruntergezählt wird, erhält man genau einen Unterlauf alle 1/60 Sekunden. Das ist der Weg, eine kontrollierte Zeitspanne durch den Timer zählen zu lassen. Sei X der gesuchte Startwert, der zu einer Spanne von T Sekunden führt, dann kann man X berechnen mittels:<br>
             X = 985248.4 * T</p>
 
-        <p>Der Integerwert von X ist dann in ein LSB und ein MSB zu teilen und in die Timer-Register einzutragen. Allerdings ergibt sich so eine natürliche Grenze. Die höchste durch 2 Bytes darstellbare Zahl ist ja 65535. Wenn wir diesen Wert in den Timer schreiben, dann ist er alle 1/15 Sekunden auf 0 heruntergezählt. Für längere Zeiten ist aber vorgesorgt. Die beiden Timer A und B sind kombinierbar (wie, dazu kommen wir gleich noch) zu einem 32-Bit-Register. Die höchste Zahl X ist dann:<br />
+        <p>Der Integerwert von X ist dann in ein LSB und ein MSB zu teilen und in die Timer-Register einzutragen. Allerdings ergibt sich so eine natürliche Grenze. Die höchste durch 2 Bytes darstellbare Zahl ist ja 65535. Wenn wir diesen Wert in den Timer schreiben, dann ist er alle 1/15 Sekunden auf 0 heruntergezählt. Für längere Zeiten ist aber vorgesorgt. Die beiden Timer A und B sind kombinierbar (wie, dazu kommen wir gleich noch) zu einem 32-Bit-Register. Die höchste Zahl X ist dann:<br>
             4 294 967 296 = 2<sup>32</sup></p>
 
         <p>Damit kann im Extremfall eine Herabzählzeit von 1 Stunde, 12 Minuten und zirka 40 Sekunden eingeplant werden, was für die meisten Zwecke ausreichen dürfte.</p>
 
         <p>Möchten Sie also genau eine Sekunde Spielraum haben beim Herunterzählen, dann muß die Zahl 985248 als 4-Byte-Integer-Wert in die Speicher von Timer A und Timer B gebracht werden. Das führt dann zu den Werten 0, 15, 8, 160 (weil 985248 = 0*16777216 + 15*65536 + 8*256 + 160). 0 und 15 gelangen als MSB beziehungsweise LSB in Timer B (also Register 07 und 06), 8 und 160 sind MSB und LSB für den Timer A (Register 05 und 04). Sehen wir uns nun an, wie wir dem Computer sagen, was mit diesen Startwerten in den Timer-Registern geschehen soll. Die beiden Kontrollregister CRA und CRB beziehen sich weitgehend auf die gleichnamigen Timer. Im Bild 1 finden Sie das Register $0E, also CRA und in Bild 2 das andere Kontrollregister CRB ($0F):</p>
 
-        <p>Die Bedeutung der Bits 0 bis 4 ist — jeweils für den dazugehörigen Timer — identisch:<br />
-            Bit 0<br />
-            an dieser Stelle führt zum sofortigen Anhalten des Timers. 1 in diesem Bit startet das Herunterzählen.<br />
+        <p>Die Bedeutung der Bits 0 bis 4 ist — jeweils für den dazugehörigen Timer — identisch:<br>
+            Bit 0<br>
+            an dieser Stelle führt zum sofortigen Anhalten des Timers. 1 in diesem Bit startet das Herunterzählen.<br>
             Bits 1 und 2</p>
 
-        <p>Diese beiden Bits hängen mit dem externen Signalverkehr zusammen und sollen für uns außer acht bleiben.<br />
+        <figure>
+            <img src="143-1.png" alt="">
+            <figcaption>Bild 1. Das Kontrollregister des Timer A</figcaption>
+        </figure>
+        <figure>
+            <img src="143-2.png" alt="">
+            <figcaption>Bild 2. Dasselbe für den Timer B</figcaption>
+        </figure>
+
+        <p>Diese beiden Bits hängen mit dem externen Signalverkehr zusammen und sollen für uns außer acht bleiben.<br>
             Bit 3</p>
 
         <p>Ist dieses Bit = 1, dann ist der sogenannte »One Shot«-Betrieb des Timers aktiv. Das bedeutet, daß vom Startwert an heruntergezählt wird bis auf Null. Es findet nun das programmierte Ereignis statt (zum Beispiel ein IRQ). Anschließend wird der Startwert wieder eingeladen und der Timer gestoppt.</p>
 
-        <p>Im Gegensatz dazu läuft der »Continuous«-Betrieb, wenn das Bit den Wert 0 enthält. Dabei geschieht zunächst dasselbe wie beim One Shot Modus, der Timer wird aber nicht angehalten, sondern der ganze Vorgang wiederholt sich in einer Endlosschleife.<br />
+        <p>Im Gegensatz dazu läuft der »Continuous«-Betrieb, wenn das Bit den Wert 0 enthält. Dabei geschieht zunächst dasselbe wie beim One Shot Modus, der Timer wird aber nicht angehalten, sondern der ganze Vorgang wiederholt sich in einer Endlosschleife.<br>
             Bit 4</p>
 
         <p>Ein Hineinschreiben einer 1 in dieses Bit erzeugt ein sofortiges Neuladen der Timer-Register mit dem Startwert. Dabei ist es gleichgültig, ob der Timer gerade läuft oder nicht. Schreibt man eine Null ein, hat das keine Wirkung.</p>
 
         <p>Beim Lesen des Registers ist dieses Bit immer 0.</p>
 
-        <p>Zu diesem Bit und seiner Wirkung ist noch etwas zu sagen. Das Neuladen des Timers geschieht<br />
-            - immer dann, wenn ein Unterlauf stattgefunden hat oder<br />
+        <p>Zu diesem Bit und seiner Wirkung ist noch etwas zu sagen. Das Neuladen des Timers geschieht<br>
+            - immer dann, wenn ein Unterlauf stattgefunden hat oder<br>
             - falls der Timer steht und in die Register ein Startwert geschrieben wird. Dabei ist der CIA so konstruiert, daß man kein zwangsweises Laden (also mit Bit 4 = 1) braucht, wenn man den Startwert in der Reihenfolge LSB MSB in die Register bringt.</p>
 
-        <p>Die Bits 5 bis 7 haben nun unterschiedliche Bedeutung im CRA und im CRB:<br />
-            Register CRA ($0E)<br />
+        <p>Die Bits 5 bis 7 haben nun unterschiedliche Bedeutung im CRA und im CRB:<br>
+            Register CRA ($0E)<br>
             Bit 5:</p>
 
-        <p>Ist dieses Bit gleich Null, dann wird im Systemtakt gezählt. Den hatten wir vorhin zur Zeitberechnung schon verwendet. Wenn das Bit auf 1 gesetzt ist, zählt der Timer externe Signale.<br />
+        <p>Ist dieses Bit gleich Null, dann wird im Systemtakt gezählt. Den hatten wir vorhin zur Zeitberechnung schon verwendet. Wenn das Bit auf 1 gesetzt ist, zählt der Timer externe Signale.<br>
             Bit 6:</p>
 
-        <p>Spielt für den Signalverkehr über den seriellen Port eine Rolle und soll uns hier nicht weiter beschäftigen.<br />
+        <p>Spielt für den Signalverkehr über den seriellen Port eine Rolle und soll uns hier nicht weiter beschäftigen.<br>
             Bit 7:</p>
 
-        <p>Damit steuert man nicht den Timer A, sondern dieses Bit bezieht sich auf die gleich noch zu behandelnde Echtzeituhr.<br />
+        <p>Damit steuert man nicht den Timer A, sondern dieses Bit bezieht sich auf die gleich noch zu behandelnde Echtzeituhr.<br>
             Register CRB ($0F)</p>
 
-        <p>Die Bits 5 und 6 sind hier im Zusammenhang von Bedeutung. Es gibt vier Kombinationsmöglichkeiten:<br />
+        <p>Die Bits 5 und 6 sind hier im Zusammenhang von Bedeutung. Es gibt vier Kombinationsmöglichkeiten:<br>
             Bit 6 — Bit 5</p>
 
         <p>0 - 0</p>
@@ -100,20 +105,20 @@
 
         <p>1 - 1</p>
 
-        <p>Auch in diesem Fall zählt Timer B die Unterläufe von Timer A. Er tut das aber nur, wenn ein bestimmtes externes Signal vorhanden ist.<br />
+        <p>Auch in diesem Fall zählt Timer B die Unterläufe von Timer A. Er tut das aber nur, wenn ein bestimmtes externes Signal vorhanden ist.<br>
             Bit 7:</p>
 
         <p>Auch beim Register CRB steuert dieses Bit bestimmte Möglichkeiten der Echtzeituhr. Deshalb haben Sie noch ein wenig Geduld, bis wir diese Uhr behandeln.</p>
 
-        <p>Wir kennen uns nun ganz gut aus, wie wir mit den Timern umzugehen haben. Unser Wissen soll in einem kleinen Test erprobt werden. Dazu bedienen wir uns des y6o Sekunden IRQ. Wir verändern diese regelmäßige Unterbrechung derart, daß sie nur noch einmal in der Sekunde geschieht. Welche Zahlen dazu in ein 32-Bit-Register gepackt werden müssen, haben wir schon vorhin berechnet. Jeweils in der Reihenfolge LSB/ MSB müssen wir sie einschreiben und vorher die Timer anhalten, indem die Bits 0 der Kontrollregister CRA und CRB auf 0 gesetzt werden. Nach dem Einschreiben und Starten der beiden Timer müssen folgende Bitmuster in CRA und CRB stehen:<br />
-            CRA<br />
-            Bit 0 = 1 Start Timer A<br />
-            Bit 3 = 0 Dauerlauf<br />
-            Bit 5 = 0 Systemtakt<br />
-            CRB<br />
-            Bit 0 = 1 Start Timer B<br />
-            Bit 3 = 0 Dauerlauf<br />
-            Bit 5 = 0<br />
+        <p>Wir kennen uns nun ganz gut aus, wie wir mit den Timern umzugehen haben. Unser Wissen soll in einem kleinen Test erprobt werden. Dazu bedienen wir uns des y6o Sekunden IRQ. Wir verändern diese regelmäßige Unterbrechung derart, daß sie nur noch einmal in der Sekunde geschieht. Welche Zahlen dazu in ein 32-Bit-Register gepackt werden müssen, haben wir schon vorhin berechnet. Jeweils in der Reihenfolge LSB/ MSB müssen wir sie einschreiben und vorher die Timer anhalten, indem die Bits 0 der Kontrollregister CRA und CRB auf 0 gesetzt werden. Nach dem Einschreiben und Starten der beiden Timer müssen folgende Bitmuster in CRA und CRB stehen:<br>
+            CRA<br>
+            Bit 0 = 1 Start Timer A<br>
+            Bit 3 = 0 Dauerlauf<br>
+            Bit 5 = 0 Systemtakt<br>
+            CRB<br>
+            Bit 0 = 1 Start Timer B<br>
+            Bit 3 = 0 Dauerlauf<br>
+            Bit 5 = 0<br>
             Bit 6 = 1 Timer B zählt Unterläufe von Timer A.</p>
 
         <p>Bevor wir die Timer starten, muß auch noch das Interrupt-Kontrollregister verändert werden (das hatten wir uns in der 10. Folge genauer angesehen). Bislang erzeugt ein Unterlauf des Timer A eine Unterbrechung. Wir möchten aber, daß der Timer B (damit wir das 32-Bit-Register voll ausnutzen) der Auslöser ist. Dazu muß Bit 0 des ICR gelöscht und statt dessen Bit 1 gesetzt werden.</p>
@@ -130,29 +135,34 @@
 
         <p>Jeder der beiden CIAs verfügt über solch eine Uhr, die direkt von der Netzfrequenz getaktet wird. Die Zählung der Zeit geschieht in vier Registern (Register $08 bis $0B), die in Bild 3 gezeigt sind.</p>
 
+        <figure>
+            <img src="143-3.png" alt="">
+            <figcaption>Bild 3. Die Register der Echtzeituhren</figcaption>
+        </figure>
+
         <p>Vielleicht fällt Ihnen etwas auf, wenn Sie sich diese vier Bytes mal genauer ansehen: Die Speicherung geschieht in Form von Einer- und Zehnerstellen. Das kann also weder im Binärformat noch als ASCII-Zeichen funktionieren. Hier werden die Ziffern als BCD-Zahlen abgelegt. In der 3.Folge dieser Serie wurde dieses »binary coded decimal«-Format erklärt. Das ist lange her (64’er, Ausgabe 11/84) und soll deshalb hier nochmal vorgestellt werden, damit alle wissen, wovon die Rede ist.</p>
 
         <p>In dieser Zahlendarstellung wird jede Dezimalstelle einer Zahl gesondert in eine Binärzahl umgewandelt. Dann ergibt sich der folgende Zusammenhang:</p>
 
         <p>TODO TABLE</p>
 
-        <p>Binär Dezimal<br />
-            0000 0<br />
-            0001 1<br />
-            0010 2<br />
-            0011 3<br />
-            0100 4<br />
-            0101 5<br />
-            0110 6<br />
-            0111 7<br />
-            1000 8<br />
+        <p>Binär Dezimal<br>
+            0000 0<br>
+            0001 1<br>
+            0010 2<br>
+            0011 3<br>
+            0100 4<br>
+            0101 5<br>
+            0110 6<br>
+            0111 7<br>
+            1000 8<br>
             1001 9</p>
 
         <p>Das war’s! Die anderen möglichen Binärkombinationen (also zum Beispiel 1010 etc.) werden nicht benutzt. Die Zahl 25 beispielsweise lautet im BCD-Format:</p>
 
         <p>TODO TABLE</p>
 
-        <p>0010 0101<br />
+        <p>0010 0101<br>
             2 5</p>
 
         <p>Jetzt ist es Ihnen sicherlich verständlich, warum für die Sekunden- und Minuten-Zehnerstellen nicht mehr als drei Bits reserviert wurden: größer als 6 wird die Zehnerstelle nicht.</p>

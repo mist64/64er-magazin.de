@@ -45,6 +45,11 @@
 
         <p>Als nächstes soll die Schaltung so verändert werden, daß beide EPROMs im Bereich ab $8000 stehen, besser gesagt, daß sich immer nur eines in Betrieb befindet und zwischen beiden EPROMs umgeschaltet werden kann. Dazu benötigt man eine kleine Logikschaltung mit einem JK-Flip-Flop und zwei OR-Gattern (Bild 1). Beim JK-Flip-Flop werden die Eingänge J und K auf + 5 V gelegt und bei jedem Wechsel von »High« nach »Low« an T (Takt) wir das Flip-Flop umgeschaltet. Der Ausgang Q wechselt dann von »0« nach »1«, »Q« wechselt von »1« nach »0«. Man braucht noch eine Leitung, die vom Computer aus kontrolliert, beziehungsweise geschaltet werden kann und die mit dem Takt-Eingang des Flip-Flop verbunden wird. Zu diesem Zweck gibt es zwei I/O-Leitungen im C 64, nämlich 1/01 und 1/02, denen zwei Register im Computer entsprechen. Diese Register (1/01: $DE00; 1/02: $DF00) kann man zum Beispiel mit POKE 57088,X oder STA $DE00 ansprechen. Dabei wechselt ihr Zustand kurzzeitig von »high« nach »low« und es entsteht gerade das Schaltverhalten, das man für das Flip-Flop benötigt. Die Zusammenhänge beim Schalten gehen am besten aus einer Logiktabelle hervor. Es darf dabei immer nur ein EPROM an den Pins CE/OE ein Signal »low« bekommen.</p>
 
+        <figure>
+            <img src="46-1.png" alt="">
+            <figcaption>Bild 1. Schaltbild der 16-KByte-Platine</figcaption>
+        </figure>
+
         <p>Einschalten (Hardware-Reset) beziehungsweise Zustand 1:<br>
             Q = L,Q = H</p>
 
@@ -65,6 +70,19 @@
         <p>Die letzte Verwendungsmöglichkeit der Platine erlaubt das Ein- und Ausschalten von wahlweise einem 8-KByte-, oder 16-KByte-Bereich. Mit dem Schalter X5 wird zunächst ROML mit dem rechten EPROM verbunden ($8000). Für ein 16-KByte-Modul wird zusätzlich der Schalter S1 geschlossen und damit das linke EPROM im Bereich $A000 selektiert. Doch wie bereits beschrieben, greift der Computer immer noch nicht auf die EPROMs zu. Darum müssen die Leitung EXROM (zusätzlich GAME bei 16 KByte) mit Masse verbunden werden. Setzt man in diese Verbindung nun das schon verwendete Flip-Flop, so können die Leitungen, je nach Zustand, von 1/02 auf Masse gelegt werden oder nicht. Das Ein- und Ausschalten erfolgt jetzt mit dem schon erwähnten Ansprechen von 1/02 ($DF00). Zu erwähnen ist noch, daß das Flip-Flop nach einem Hardware-Reset in den Grundzustand (Q = L, Q = H) geht, da sein Reset-Eingang R mit dem Anschluß RESET des Expansion-Port verbunden ist. Dann ist im zweiten Fall das rechte EPROM selektiert und im letzten Fall das Modul eingeschaltet. Bei einem Software-Reset (SYS 64738) bleibt der Zustand des Flip-Flops, und damit der Platine, erhalten.</p>
 
         <p>Bei der Eigenherstellung ist zu beachten, daß sich auf den Platinen einige Durchkontaktierungen (Bild 2 und 3) befinden. Außerdem sollten Sie darauf achten, ob die Bauteile mit der Platinenoberseite oder Unterseite verlötet werden müssen. Bestücken Sie die Platinen zuerst mit den Kondensatoren, und danach mit den Fassungen und Bauteilen (Bild 4). Achten Sie bei den Kondensatoren auf die richtige Polung. Bei der Verwendung von EPROMs des Typs 2732, die vier Pins weniger als ein 2764 haben, werden diese nicht bündig mit der Kerbe in die Fassung gesetzt. Die zwei Pins auf beiden Seiten der Kerbe bleiben frei.</p>
+
+        <figure>
+            <img src="46-2.png" alt="">
+            <figcaption>Bild 2. Das 1:1-Platinenlayout der 16-KByte-Platine</figcaption>
+        </figure>
+        <figure>
+            <img src="46-3.png" alt="">
+            <figcaption>Bild 3. Das 1:1-Platinenlayout der 8-KByte-Platine (Vorder- und Rückseite)</figcaption>
+        </figure>
+        <figure>
+            <img src="46-4.png" alt="">
+            <figcaption>Bild 4. Bestückungsplan der Platinen</figcaption>
+        </figure>
 
         <address class="author">(Markus Braun/aw)</address>
     </article>

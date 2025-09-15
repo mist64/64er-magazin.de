@@ -8,19 +8,20 @@
     <meta name="author" content="Peter Rausche, aw">
     <meta name="64er.issue" content="10/85">
     <meta name="64er.pages" content="42-45,140">
-    <meta name="64er.head1" content="Hardware">
-    <meta name="64er.head2" content="C 64">
-    <meta name="64er.toc_title" content="<b>Geld sparen durch Selbstbau: ROM-Erweiterung EPROM-Trans</b>">
-    <meta name="64er.toc_category" content="Hardware">
-    <meta name="64er.index_title" content="Eprom-Trans – Die Super-Erweiterung">
-    <meta name="64er.index_category" content="Hardware-Tips und Bauanleitungen|Eprom">
-    <meta name="64er.id" content="eprom_trans">
+    <!-- <meta name="64er.toc_category" content="XXX"> -->
+    <!-- <meta name="64er.toc_title" content="XXX"> -->
+    <meta name="64er.id" content="XXX">
 </head>
 
 <body>
     <article>
         <h1>EPROM-Trans - Die Super-Erweiterung</h1>
         <p class="intro">Der ROM-Speicher des C 64 ließ sich bislang nur mit Steckplatinen im Expansion-Port vergrößern. Mit einem raffinierten Trick geht es auch intern.</p>
+
+        <figure>
+            <img src="42-6.png" alt="">
+            <figcaption>Bild 6. So wird EPROM-Trans in den C 64 eingebaut</figcaption>
+        </figure>
 
         <p>Wen hat es nicht schon geärgert, daß die Grundversion des C 64 kein Monitorprogramm aufweist, das nach dem Einschalten des Computers sofort zur Verfügung steht? Deshalb wurde eine Möglichkeit gesucht (und gefunden), mit der man Maschinenprogramme von einem festinstalliertem EPROM in den Bereich $C000 bis $CFFF transformieren kann, ohne für das EPROM vorhandenen Speicherplatz in Anspruch zu nehmen.</p>
 
@@ -30,7 +31,17 @@
 
         <p>Wie aus Bild 1 ersichtlich, wurde dieser Bereich ($A000 bis $BFFF) benutzt. Über diesem ROM-Bereich liegt zum einen das »EPROM-Trans« ($A000 bis $AFFF) und zum anderen die EPROMs 1 bis 3 ($B000 bis $BFFF). In letzteren steht jeweils ein beliebiges Programm (bis 4 KByte), welches in den Bereich $C000 bis $CFFF transformiert werden soll. Ich habe zum Beispiel in EPROM 1 den »SMON« und in EPROM 2 »Fast Tape« abgelegt, EPROM 3 ist noch unbenutzt. Das Maschinenprogramm in EPROM-Trans (siehe Listing) soll den Inhalt des jeweils selektierten EPROMs 1 bis 3 von dem Bereich $B000 bis $BFFF in den Bereich $C000 bis $CFFF transformieren.</p>
 
+        <figure>
+            <img src="42-1.png" alt="">
+            <figcaption>Bild 1. Speicherorganisation mit Zusatzschaltung</figcaption>
+        </figure>
+
         <p>Wie kann dies jedoch funktionieren, wenn in diesem Bereich wie oben erwähnt, beim Lesen immer das Basic-ROM aktiviert ist? Für die Speichertransformation wird der Inhalt des Basic-ROMs nicht benötigt. Drückt man nun einen der drei Taster (Bild 2), wird die CE-Leitung des Basic-ROMs auf die Zusatzschaltung umgeleitet. Ist folglich ein Taster gedrückt, dann ist das Basic-ROM nicht mehr ansprechbar; kein Taster gedrückt entspricht dem Normalzustand des Computers.</p>
+
+        <figure>
+            <img src="42-2.png" alt="">
+            <figcaption>Bild 2. Zusatzschaltung zur Steuerung der verschiedenen EPROMs und dem Basic-ROM</figcaption>
+        </figure>
 
         <p>Wie aus dem Listing ersichtlich, liegt bei der Adresse $0560 (= $A560) des Maschinenprogramms beim EPROM-Trans ein Sprungbefehl zur Adresse $A000, wo dann die Speichertransformation startet und mit einem Sprungbefehl nach $C000 endet. Will man diese Speichertransformation starten, muß der Computer zur Adresse $A560 oder $A000 springen. Wie oben schon erwähnt, wird die Adresse $A560 automatisch beim Drücken der »RETURN«-Taste angesprungen. Wird zum Beispiel EPROM 1 durch Betätigen von Taster 1 selektiert und dann »RETURN« gedrückt, startet das Maschinenprogramm in EPROM-Trans. Nun wird mit Adreßbit A12 zwischen den Bereichen $Axxx und $Bxxx hin- und hergeschaltet und so der komplette Inhalt von EPROM 1 nach $C000 bis $CFFF kopiert. Am Ende der Transformation wird das Programm durch den JMP-Befehl gestartet, so daß sich zum Beispiel der SMON gleich mit seiner Registeranzeige meldet. Nach Loslassen des Tasters steht auch das Basic-ROM wieder zur Verfügung.</p>
 
@@ -44,15 +55,15 @@
 
         <h2>Realisierung der Hardware</h2>
 
-        <p>Mit DM1 erfolgt die eigentliche Selektierung der EPROMs. Es bestehen vier Möglichkeiten: Basic-ROM und EPROM 1 bis 3. Der Adreßcode ist abhängig von den Schaltzuständen der Taster T1 bis T3. Aktiviert werden alle EPROMs mit »Active Low« (Low-Potential). BASIC ist die Leitung, die normalerweise das Basic-ROM aktiviert, also dann Low-Pegel hat, wenn im Bereich $A000 bis $BFFF gelesen wird. Dieses Signal ist an die Eingänge E der Demultiplexer DM1 und DM2 geführt. Liegt BASIC auf, kann kein Baustein aktiviert werden, denn die Ausgänge D0 bis D3 von DM1 und DM2 sind high oder entsprechend dem Pegel an E (hier dann auch high). Am CE-Eingang vom Basic-ROM steht folglich ein High-Pegel, entsprechendes gilt für EPROM-Trans. Die Ausgänge D1 bis D3 von DM1 werden invertiert, so daß an den betreffenden Eingängen der NAND-Gatter Low-Potential liegt Bekanntlich ist aber der Ausgang eines NAND-Gatters nur dann low, wenn beide Eingänge high sind. Folglich werden EPROM 1 bis 3 nicht aktiviert. Kommen wir jetzt zum interessanteren Teil: Basic für LOW. Als erstes wollen wir prüfen, ob der Computer »normal« arbeitet, wenn keine Taste gedrückt ist:<br />
+        <p>Mit DM1 erfolgt die eigentliche Selektierung der EPROMs. Es bestehen vier Möglichkeiten: Basic-ROM und EPROM 1 bis 3. Der Adreßcode ist abhängig von den Schaltzuständen der Taster T1 bis T3. Aktiviert werden alle EPROMs mit »Active Low« (Low-Potential). BASIC ist die Leitung, die normalerweise das Basic-ROM aktiviert, also dann Low-Pegel hat, wenn im Bereich $A000 bis $BFFF gelesen wird. Dieses Signal ist an die Eingänge E der Demultiplexer DM1 und DM2 geführt. Liegt BASIC auf, kann kein Baustein aktiviert werden, denn die Ausgänge D0 bis D3 von DM1 und DM2 sind high oder entsprechend dem Pegel an E (hier dann auch high). Am CE-Eingang vom Basic-ROM steht folglich ein High-Pegel, entsprechendes gilt für EPROM-Trans. Die Ausgänge D1 bis D3 von DM1 werden invertiert, so daß an den betreffenden Eingängen der NAND-Gatter Low-Potential liegt Bekanntlich ist aber der Ausgang eines NAND-Gatters nur dann low, wenn beide Eingänge high sind. Folglich werden EPROM 1 bis 3 nicht aktiviert. Kommen wir jetzt zum interessanteren Teil: Basic für LOW. Als erstes wollen wir prüfen, ob der Computer »normal« arbeitet, wenn keine Taste gedrückt ist:<br>
             a) keine Taste gedrückt:</p>
 
-        <p>Wenn BASIC low ist, muß in diesem Fall das Basic-ROM aktiviert werden. Durch die Tasterstellungen liegt an den Eingängen A0, A1 von DM1 Low-Potential. Dies bedeutet, die Information an E (BASIC = low) wird zum Ausgang D0 (vergleiche Tabelle 1) übertragen. Das Basic-ROM wird also aktiviert (unabhängig von A12). EPROM 1 bis 3 können nicht aktiviert werden, da die Ausgänge D1 bis D3 von DM1 High-Potential führen (siehe oben). Aber was ist mit EPROM-Trans? Hier (DM2) wird das Eingangssignal E auf den Ausgang D2 übertragen, wenn A0 low und A1 high ist. A1 ist aber abhängig vom CE-Signal des Basic-ROMs. Ist dieses aktiviert (low), kann EPROM-Trans nicht aktiviert werden. Der Computer arbeitet in diesem Fall also völlig normal.<br />
+        <p>Wenn BASIC low ist, muß in diesem Fall das Basic-ROM aktiviert werden. Durch die Tasterstellungen liegt an den Eingängen A0, A1 von DM1 Low-Potential. Dies bedeutet, die Information an E (BASIC = low) wird zum Ausgang D0 (vergleiche Tabelle 1) übertragen. Das Basic-ROM wird also aktiviert (unabhängig von A12). EPROM 1 bis 3 können nicht aktiviert werden, da die Ausgänge D1 bis D3 von DM1 High-Potential führen (siehe oben). Aber was ist mit EPROM-Trans? Hier (DM2) wird das Eingangssignal E auf den Ausgang D2 übertragen, wenn A0 low und A1 high ist. A1 ist aber abhängig vom CE-Signal des Basic-ROMs. Ist dieses aktiviert (low), kann EPROM-Trans nicht aktiviert werden. Der Computer arbeitet in diesem Fall also völlig normal.<br>
             b) Taster T1 wird gedrückt</p>
 
         <p>Wird Taster T1 gedrückt, liegt an A0 von DM1 über den Pull-up-Widerstand (1,5 kOhm) high, A1 bleibt über T2 und T3 auf low. Diese Adreßcodierung bedeutet, daß die Information an E auf den Ausgang D1 übertragen wird. Durch den Inverter liegt also am NAND-Gatter (Pin 1) high.</p>
 
-        <p>Als Adresse an DM2 liegt an A1 jetzt high, da das Basic-ROM nicht aktiviert wird. A0 ist abhängig vom Adreßbit A12. Wie erwähnt ist A12 für den Bereich $Axxx low. Die Eingangsinformation (low) wird auf D2 gelegt und EPROM-Trans wird aktiviert. An Pin 2 vom NAND-Gatter liegt Low-Potential (high von D3 invertiert), weshalb EPROM 1 nicht aktiviert wird. Wechselt Adreßbit A12 seinen Zustand (von $Axxx — $Bxxx) wird Eingang E von DM2 mit Ausgang D3 zusammengeschaltet, denn A0=0 und A1=1. EPROM-Trans wird nicht mehr aktiviert (D2 — High). An D3 liegt nun aber Low-Potential welches über einen Inverter auf das NAND-Gatter (Pin 2) geführt wird. An Pin 1 und 2 dieses Gatters liegt folglich high und am Ausgang liegt Low-Pegel. EPROM 1 wird aktiviert.<br />
+        <p>Als Adresse an DM2 liegt an A1 jetzt high, da das Basic-ROM nicht aktiviert wird. A0 ist abhängig vom Adreßbit A12. Wie erwähnt ist A12 für den Bereich $Axxx low. Die Eingangsinformation (low) wird auf D2 gelegt und EPROM-Trans wird aktiviert. An Pin 2 vom NAND-Gatter liegt Low-Potential (high von D3 invertiert), weshalb EPROM 1 nicht aktiviert wird. Wechselt Adreßbit A12 seinen Zustand (von $Axxx — $Bxxx) wird Eingang E von DM2 mit Ausgang D3 zusammengeschaltet, denn A0=0 und A1=1. EPROM-Trans wird nicht mehr aktiviert (D2 — High). An D3 liegt nun aber Low-Potential welches über einen Inverter auf das NAND-Gatter (Pin 2) geführt wird. An Pin 1 und 2 dieses Gatters liegt folglich high und am Ausgang liegt Low-Pegel. EPROM 1 wird aktiviert.<br>
             c) Taster T2/T3 wird gedrückt</p>
 
         <p>Das Prinzip ist das gleiche wie eben beschrieben. Es ändert sich nur die Adreßcodierung von DM1.</p>
@@ -63,15 +74,31 @@
 
         <p>Um ein Kabelgewirr zu vermeiden »zapft« man am besten ein ROM im Computer an, das heißt man erstellt eine Adapterplatine, auf der sämtliche zusätzliche EPROMs sowie das entwendete ROM Platz finden und Adreß- und Datenbus parallel verbunden werden. Diese Platine wird dann in den Steckplatz des herausgenommenen ROMs wie ein einzelnes IC gesteckt, wobei die Anschlüsse des ROMs direkt verbunden sind, während die zusätzlichen Anschlüsse der EPROMs (± , CE, OE, &hellip;) extern herausgeführt werden. Welches ROM man verwendet, hängt von den ganz individuellen Wünschen ab. Ich habe mich für das Kernal entschieden, da ich so für ein geändertes Betriebssystem gleich einen EPROM-Steckplatz mit vorgesehen habe, so daß zum Beispiel diejenigen, die eine Betriebssystem-Erweiterung benutzen, ohne Änderungen die Adapterplatine nach dem Layout Bild 3 oben verwenden können. Dieser zusätzliche Steckplatz »Kernal neu« (EPROM vom Typ 2764) ist 100%ig zum Kernal verdrahtet, das heißt man kann nur einen der beiden Kernalplätze besetzen. Die folgende Beschreibung bezieht sich auf das Entfernen des Kernal-ROMs.</p>
 
+        <figure>
+            <img src="42-3a.png" alt="">
+            <img src="42-3b.png" alt="">
+            <figcaption>Bild 3. Layout der Adapterplatine (oben); Layout der Zusatzplatine (unten)</figcaption>
+        </figure>
+
         <p>Man erstellt sich zunächst die beiden Platinen nach den Layouts in Bild 3. Nachdem die angedeuteten Löcher für Bauteile und Drahtbrücken gebohrt (1 mm) sind, beginnt das Bestücken, wobei es ratsam ist, mit den von den Abmessungen niedrigsten Bauteilen zu beginnen. So ergibt sich folgende Reihenfolge: Drahtbrücken, Widerstände, Fassungen. DerAdaptersockelwird unter die IC-Fassung des auf dieser Platine vorgesehenen Platzes für das Kernal festgelötet, da er ja quasi nur eine Verlängerung der Kernal-Pins ist. Dies muß so durchgeführt werden, daß der Adaptersockel möglichst rechtwinklig zur Platine steht und in eine 24polige IC-Fassung paßt. Am einfachsten kann dieses realisiert werden, wenn man den Adaptersockel in eine 24polige Fassung steckt, und dann anlötet und ausrichtet.</p>
 
         <p>Zwischen Zusatzplatine und Adapterplatine werden sieben Verbindungskabel gezogen, wobei die zugehörigen Anschlußpunkte den Bestückungsplänen Bild 4 zu entnehmen sind. Auf der Adapterplatine kann man hierbei eine Steckverbindung (10polig) vorsehen (zum Beispiel: Typ MS-25-10; Völkner-Elektronik, Postfach 5330, 33 Braunschweig; Preis 3,25 Mark), damit die beiden Platinen nicht starr miteinander verbunden sind.</p>
+
+        <figure>
+            <img src="42-4.png" alt="">
+            <figcaption>Bild 4. Bestückungspläne: Adapterplatine (oben); Zusatzplatine (unten). Die Kerben auf den ICs zeigen immer nach unten. Abgebildet ist die jeweilige Lötseite der Platinen.</figcaption>
+        </figure>
 
         <p>Die Taster T1 bis T3 werden als letztes — eventuell erst nach dem Einbau — nach Bild 4 unten angeschlossen. Die Qualität der Taster ist unbedeutend, da der Faktor des Prellens keine Rolle spielt.</p>
 
         <p>TODO Strich über CE, OE, PRG</p>
 
         <p>Verwendet man das hier abgebildete Platinenlayout, so müssen EPROM 1 bis 3 vom Typ 2532 sein, EPROM-Trans vom Typ 2716. Hier sollten wir noch einmal einen Blick auf Bild 5 werfen: Bis auf die CE-Anschlüsse, die zur Zusatzplatine geführt werden, sind die Leitungen fest mit den des Kernal-ROMs verdrahtet (also Adreß- und Datenbus). Die restlichen epromspezifischen Anschlüsse (OE, V<sub>pp</sub>, PRG) werden je nach Typ für EPROM-Lesen fest auflow oder high gelegt. Die Stromversorgung liegt beim Kernal an den Pins 12 (Masse) und 24 (V<sub>cc</sub> = 5V); A12 entspricht Pin 21.</p>
+
+        <figure>
+            <img src="42-5.png" alt="">
+            <figcaption>Bild 5. Komplettes Blockschaltbild zum Anschluß der Zusatzplatine</figcaption>
+        </figure>
 
         <h2>Einbau in den Computer</h2>
 
@@ -86,6 +113,11 @@
         <p>TODO Strich über BASIC (2x), CE.</p>
 
         <p>Um die Leitungen BASIC und Basic-ROM zu erhalten, ist im Computer die Leiterbahn nach Bild 7 aufzutrennen. Hierzu nimmt man einen kleinen Schraubenzieher und unterbricht die Leiterbahn durch vorsichtiges Kratzen. Die grüne Schutzschicht auf der Leiterbahn wird an beiden Seiten (rechts und links von der Unterbrechung) entfernt, so daß das Kupfer sichtbar wird. Nun wird an diesen Stellen jeweils ein flexibles Kabel mit etwas Fingerspitzengefühl angelötet. Die eine Leitung entspricht dann BASIC (vom PLA), die andere Basic-ROM (zu CE dieses ROMs) und sind als solche bezeichnet auf der Zusatzplatine zu finden und entsprechend zu verdrahten (eventuell mit Steckverbindung auf der Zusatzplatine).</p>
+
+        <figure>
+            <img src="42-7.png" alt="">
+            <figcaption>Bild 7. Plan zum Trennen der Leiterbahn</figcaption>
+        </figure>
 
         <p>TODO Strich über BASIC</p>
 
