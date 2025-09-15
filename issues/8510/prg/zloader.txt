@@ -1,0 +1,95 @@
+
+
+;zloader.prg ==0801==
+    0 data169,240,32,71,3,169,160,32,71,3,96,133,89,120,169,51,133,1,169,0
+    1 data169,0,133,88,133,90,133,95,169,224,133,91,169,208,133,96,32,191,163
+    2 data169,160,169,55,133,1,88,96
+ 1000 fort=0to46:readx:poket+828,x:next
+ 1010 sys828
+ 1060 poke53272,8:poke56576,peek(56576)and252:poke648,192:print"{clr}"
+ 1100 fort=1to128:reada$,x:poke1026+t,x:ifa$<>"end"thennext
+ 1110 print1027+t
+ 2000 goto5000
+ 3000 z1=36864+t*8+x+20472+7
+ 3040 pokez1,x(x)
+ 3050 pokez1+256*8,x(x)
+ 3051 pokez1+128*8,255-x(x)
+ 3052 pokez1+384*8,255-x(x)
+ 3060 z1=z1-5*16^3
+ 3070 pokez1,x(x)
+ 3080 pokez1+256*8,x(x)
+ 3081 pokez1+128*8,255-x(x)
+ 3082 pokez1+384*8,255-x(x)
+ 3999 return
+ 4000 rem
+ 4010 forx=1to8
+ 4020 gosub3000:next
+ 4030 print"{down}{down}{down}":goto5030
+ 4900 rem ******************************
+ 4901 rem *                            *
+ 4902 rem * drucker steuercodes        *
+ 4903 rem * 1=sonderz. an              *
+ 4904 rem * 2=sonderz. aus schmal      *
+ 4905 rem * 3=sonderz. aus breit       *
+ 4906 rem *                            *
+ 4907 rem *      1          2       =>3*
+ 4909 rem ******************************
+ 5000 xx=1200:poke1024,8:poke1025,15:poke1026,14
+ 5030 reada$:a$(1)=a$:ifa$="end"then10000
+ 5040 fort=1to8:readx(t):ifx(1)=999then5042
+ 5041 next
+ 5042 fort=1to8:ready(t):next
+ 5050 gosub6500
+ 5055 ifx(1)=999then5030
+ 5060 goto6000:goto5030
+ 6000 print"{clr}";a$(1):printpeek(49152)
+ 6010 t=peek(49152):goto4000
+ 6500 rem ** druckercode **
+ 6510 as=asc(a$):as=as-160
+ 6520 as=(as*8)+1200:fort=1to8:d(t)=y(t):next
+ 6540 fort=1to8:pokeas+t,d(t):next
+ 6550 return
+ 7000 rem ******************************
+ 7001 rem *                            *
+ 7002 rem * druckercodes fuer die      *
+ 7003 rem * cbm codes 1-126            *
+ 7004 rem * (keine sonderzeichen       *
+ 7005 rem * sondern alpha ...)         *
+ 7006 rem *                            *
+ 7007 rem *                            *
+ 7008 rem *                            *
+ 7009 rem ******************************
+ 8499 data "end",0
+ 9999 data"end",0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,,0,0,0,0,,0,0,0,0,0,0,0
+10000 print"{clr}":goto12000
+12000 gosub40000
+13000 print"{clr}{down}{down}{down}{down}das programm wird gespeichert":poke46,38
+13001 print"{down}  - bitte warten -  "
+13003 save"@:loader din 2.1",8
+13004 verify"loader din 2.1",8
+13005 print"das programm ist gespeichert":end
+20000 x= 160 :l= 8500
+20001 ifx>191then30000
+20010 print"{clr}{down}{down}":print"20000 x=";x+1;":l=";l+2
+20020 printl;"data"+chr$(34)+chr$(x)+chr$(34);",999,";x;",0,0,0,0,0,0,0"
+20030 print"goto20000{home}"
+20040 poke198,5:fort=631to631+5:poket,13:next:end
+30000 x= 1:l= 8000
+30001 ifx>127 thenprint"{clr}fertig":end
+30010 print"{clr}{down}{down}":print"30000 x=";x+1;":l=";l+2
+30019 ifx=34thenprintl;"data"+chr$(34)+"''"+chr$(34);",";x:goto30030
+30020 ifx>31thenprintl;"data"+chr$(34)+chr$(x)+chr$(34);",";x
+30021 ifx<32thenprintl;"data"+chr$(34)+"."+chr$(34);",";x
+30030 print"goto30000{home}"
+30040 poke198,5:fort=631to631+5:poket,13:next:end
+40000 rem *** save file ***
+40001 open 2,8,1,"@:zeichen ddin"
+40010 print#2,chr$(0);chr$(4);
+40020 fort=4*16^2to2048:print#2,chr$(peek(t));:next
+40030 close2
+40040 open2,8,1,"@:zeichen din"
+40050 print#2,chr$(0);chr$(14*16);
+40060 fort=9*16^3to9*16^3+4096
+40070 print#2,chr$(peek(t));:next
+40080 close2:return
+

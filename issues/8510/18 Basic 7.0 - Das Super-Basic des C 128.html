@@ -68,6 +68,19 @@
             <img src="18-1.png" alt="">
             <figcaption>Bild 1: Dank der neuen Befehle kann man solche Figuren ohne viel Aufwand zeichnen</figcaption>
         </figure>
+        <figure>
+<pre>100 REM *************************************
+110 REM ***    HYPERBOLISCHES PARABOLID   ***
+130 REM *************************************
+140 REM
+145 GRAPHIC1,1
+150 SCALE 1,1023,1023
+155 COLOR 1,2
+160 A= 800:B= 300:C= 200:D= 700:X= 15
+170 FOR T= 0 TO X: DRAW 1,B/X*T,C/X*T+D/X*(X-T) TO A+B/X*T,(C+D)/X*T: NEXT
+180 FOR T= 0 TO X: DRAW 1,A/X*T,D/X*(X-T) TO B+A/X*T,C+D/X*T: NEXT</pre>
+            <figcaption>Listing 1. Das Basic-Programm zu Bild 1</figcaption>
+        </figure>
 
         <p>Wirklich neu sind hingegen die Kommandos für die Verwaltung von Sprites. Beginnen wir mit der Definition eines solchen beweglichen Objekts. Sehr hilfreich ist da der eingebaute Sprite-Editor, der entweder vom Programm aus oder direkt mit »SPRDEF« aufgerufen werden kann (Bild 2). Hierin wird man zunächst einmal nach der Nummer des Sprites gefragt. Hat man diese Zahl zwischen 1 und 8 eingegeben, so kann es mit dem eigentlichen Sprite-Entwurf losgehen. Dazu bewegt man den Zeichenzeiger mit den normalen Cursortasten auf dem 24 x 21 großen Feld hin und her. Das Löschen beziehungsweise Setzen von einzelnen Pixels erfolgt dann mittels der Tasten 1 und 2 (bei Multicolor-sprites auch noch die 3 und 4). Ist der künstlerische Entwurf geglückt, dann kann man mit SHIFT-RETURN die Definition beenden.</p>
 
@@ -77,6 +90,27 @@
         </figure>
 
         <p>Mit dem Editieren allein ist es natürlich nicht getan. Darum werden vom 7.0-Basic auch Befehle für das Setzen und Bewegen von Sprites zur Verfügung gestellt. Das Beispiel in Listing 2 soll hier wiederum die neuen Kommandos verstehen helfen. Hier hat der Benutzer zunächst einmal die Möglichkeit, sich zwei Sprites zu erstellen. Dazu wird der eingebaute Editor zweimal aufgerufen.</p>
+
+        <figure>
+<pre>
+10 PRINT"HABEN SIE IHRE SPRITES SCHON DEFINIERT ?": GETKEY A$
+20 IF A$= "J" THEN 50
+30 PRINT"SPRITE #1": SLEEP 1: SPRDEF
+40 PRINT"SPRITE #2": SLEEP 1: SPRDEF
+50 COLLISION 1,1000
+60 SCNCLR
+70 SPRITE 1,1,1,0,1,1,1
+80 SPRITE 2,1,2,1,1,1,1
+90 MOVSPR 1,300,100
+100 MOVSPR 2,0,100
+110 MOVSPR 2,200,44
+115 DO
+120 IF BUMB (1)=0 THEN SCNCLR
+130 LOOP
+1000 SCNCLR: CHAR 1,10,20,"BOOOOOOMMM"
+1010 RETURN</pre>
+            <figcaption>Listing 2. So einfach ist der Umgang mit Sprites in Basic 7.0</figcaption>
+        </figure>
 
         <p>Der nächste neue Befehl COLLISION legt eine Programmzeile fest, in die das Basic verzweigen soll, wenn sich zwei Objekte treffen. Besonders positiv ist, daß sich der Benutzer nicht mehr explizit um die Ab-</p>
 

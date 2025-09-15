@@ -1,0 +1,79 @@
+
+
+;floppy-adjust.prg ==0801==
+  100 rem ******  floppy - adjust ******  :
+  120 print"{clr}{swlc}{wht}":poke53280,12:poke53281,0:poke198,0
+  140 g=1:mg=3:r1=10:r0=3:rv=0:a$="          "
+  150 cu=214:rem cursorzeile
+  160 print"{home}{down}{down}"a$"FLOPPY-EINSTELLHILFE"
+  170 print:printa$"<c> by M.Austermeier{down}{down}"
+  180 print"{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}{CBM-@}";
+  190 ifc/r1=int(c/r1)thenrv=notrv
+  192 ifrvthenprint"{rvon}";
+  195 print"{lblu}        Bitte mit 'CRSR' waehlen        ";
+  196 print"        dann  'RETURN'  druecken        {wht}";:poke199,0
+  197 print"{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}{CBM-T}"
+  200 x=1:w$="Grobeinstellung":gosub400
+  220 w$="Feineinstellung":gosub400
+  240 w$="    ENDE       ":gosub400
+  280 getg$:ifg$=chr$(13)then360
+  300 ifg$="{down}"theng=g+1:ifg>mgtheng=1
+  320 ifg$="{up}"theng=g-1:ifg<1theng=mg
+  330 poke198,peek(198)and1
+  340 goto160
+  360 onggosub445,445:onggoto460,500,450
+  380 goto280
+  400 print:printa$;:ifx=gthenprint"{rvon}";
+  420 printw$"{rvof}  ";
+  430 ifx=gthenc=c+1and15:ifc/r0=int(c/r0)thenprint"{left}_";
+  440 print:x=x+1:return
+  445 pokecu,24:print:forf=1to11:print:next:pokecu,10:print
+  446 poke768,174:poke769,167:poke144,0:open1,8,15:close1:rem test device present
+  447 poke768,139:poke769,227
+  448 ifst=0thenreturn
+  449 e$="Floppy nicht eingeschaltet":goto1340
+  450 close2:close1:print"{clr} Bye.":end
+  460 rem grob
+  480 t1=18:t2=18:goto560
+  500 rem fein
+  520 print"Lesen von Spur ";:input" 1{left}{left}{left}";t1
+  540 print"Lesen bis Spur ";:input" 35{left}{left}{left}{left}";t2
+  560 input "Max. Zeit fuer 1 Block   0.5 sec{left}{left}{left}{left}{left}{left}{left}{left}{left}";g$:mt=val(g$)
+  570 fb=0:input"Randfarbwechsel gewuenscht<j/n>  n{left}{left}{left}";g$:ifg$="j"thenfb=1
+  580 print"{clr}Bitte korrekt formatierte Diskette"
+  600 print"einlegen.(Daten werden {rvon}nicht{rvof} zerstoert)"
+  610 print:print"Nach dieser Diskette kann die Floppy":print"eingestellt werden"
+  620 print:print"Fertig ? Dann Taste druecken"
+  640 poke198,0:wait198,1:getg$
+  680 zl=10:sp=12:rem pos. f.balken
+  700 dl=59903:rem adr.delete line
+  720 xr=781:rem x-reg.sys
+  740 lb=20:b$="{rvon}":forf=1tolb:b$=b$+" ":next
+  780 deffnt(x)=int(peek(x)/16)*10+peek(x)-int(peek(x)/16)*16
+  800 z=56328:s=z+1:pokes,0:pokez,0
+  820 print"{clr}  ****  Floppy-Adjust  ****  V25.2.85"
+  840 print "  *** <c> M.Austermeier ***"
+  860 pokecu,5:print:print" Disk wird initialisiert"
+  880 open1,8,15,"i":open2,8,2,"#"
+  900 pokecu,zl:print
+  920 printtab(sp)" ^ max."spc(lb-13)"min. ^"
+  940 t=t1:rem track
+  960 pokes,0:pokez,0
+  980 print#1,"u1:"2;0;t;1
+ 1000 input#1,e,e$,et,es:ifethen1340
+ 1040 tm=fnt(s)+fnt(z)/10-d
+ 1060 fl=notfl:ifflandfbthenpoke53280,(peek(53280)+1)and1:rem alle farben-and15
+ 1080 tb=lb-lb*(tm/mt):iftb<0thentb=0
+ 1100 pokexr,zl:sysdl
+ 1120 print"Zeit :"tm"s"tab(sp)left$(b$,tb+1)
+ 1140 pokecu,5:print:print"{rvon}{lblu}Einstellung  o.k     {rvof}{wht}";
+ 1160 print"Spur : "t"{left}  "
+ 1180 iftm>mtthenprint"{rvon}{up}{red}falsche Einstellung !{rvof}{wht}"
+ 1200 tx=t:t=t+1:ift>t2thent=t1
+ 1220 d=abs(t-tx)/100:rem fuer tracktransport zeit zugeben
+ 1240 getg$:ifg$<>""then1380
+ 1260 goto960
+ 1340 print"{clr}{rvon}Floppy - Fehler{rvof} !{down}{down}{down}{down}{down}":printe;"{rvon}"e$"{rvof}";et;es
+ 1360 print:print"Bitte Taste druecken.":poke198,0:wait198,1
+ 1380 close2:close1:run
+
