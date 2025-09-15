@@ -176,8 +176,95 @@
 
         <p>Das vorliegende Sequenzerprogramm (Listing 1) belegt den Speicherbereich $C480-$C778. $C480 = 50304 ist gleichzeitig auch die Startadresse (SYS. 50304). Tabelle 1 faßt die wichtigsten Routinen, Variablen und Vektoren des Sequenzer-Programms zusammen.</p>
 
+        <figure>
+            <h4>Routinen, Variablen, Vektoren</h3>
+                <table class="plain">
+                    <tr>
+                        <td>$C480</td>
+                        <td>JMP TEST</td>
+                        <td>Teststart, Zeiger initialisieren, die wichtigsten SID-Parameter setzen, Sequenzer starten.</td>
+                    </tr>
+                    <tr>
+                        <td>$C49E</td>
+                        <td>SIDCR (3 Byte)</td>
+                        <td>SID-Control-Register-Bytes mit zurückgesetztem GATE-Bit</td>
+                    </tr>
+                    <tr>
+                        <td>$C4A8</td>
+                        <td>LEGATO (0 Byte)</td>
+                        <td>Flag 0 = normaler Betrieb<br>Flag 1 = kein GATE-OFF</td>
+                    </tr>
+                    <tr>
+                        <td>$C4A9</td>
+                        <td>SEQMODUS (1 Byte)</td>
+                        <td>Flag 0 = ganzes Stück spielen<br>Flag 1 = Sequenze wiederholen</td>
+                    </tr>
+                    <tr>
+                        <td>$C4AA</td>
+                        <td>REPMODUS (1 Byte)</td>
+                        <td>Flag 0 = Stück einmal wieder spielen<br>Flag 1 = Stück immer wieder spielen</td>
+                    </tr>
+                    <tr>
+                        <td>$C4C3</td>
+                        <td>FUNCTION (8*2 Byte)</td>
+                        <td>Vektoren für Sonderfunktionen</td>
+                    </tr>
+                    <tr>
+                        <td>$C4D3</td>
+                        <td>TONVEKTOR (2 Byte)</td>
+                        <td>Vektor zur Weiterverarbeitung der Frequenz bei Ton an</td>
+                    </tr>
+                    <tr>
+                        <td>$C4D5</td>
+                        <td>EXTRAVEKTOR (2 Byte)</td>
+                        <td>Vektor für Zusatzaktion bei jedem Sequenzer-Schritt</td>
+                    </tr>
+                    <tr>
+                        <td>$C4D7</td>
+                        <td>IRQAVEKTOR (2 Byte)</td>
+                        <td>Vektor für Timer-A-Interrupt</td>
+                    </tr>
+                    <tr>
+                        <td>$C4D9</td>
+                        <td>START</td>
+                        <td>Sequenzer starten (Es werden keine Zeiger initialisiert).</td>
+                    </tr>
+                    <tr>
+                        <td>$C51E</td>
+                        <td>IRQSERVICE</td>
+                        <td>Anlaufpunkt für alle IRQ-Interrupts.</td>
+                    </tr>
+                    <tr>
+                        <td>$C67D</td>
+                        <td>NEXTAKT</td>
+                        <td>Dorthin sollten alle Sonderfunktionen zurückspringen</td>
+                    </tr>
+                    <tr>
+                        <td>$C716</td>
+                        <td>STOP</td>
+                        <td>Sequenzer unterbrechen/ausschalten. Er kann mit START jederzeit neu gestartet werden.</td>
+                    </tr>
+                    <tr>
+                        <td>$C739</td>
+                        <td>TEST</td>
+                        <td>siehe $C480</td>
+                    </tr>
+                </table>
+                <figcaption>Tabelle 1. Die wichtigsten Routinen, Varianten und Vektoren des Sequenzers.</figcaption>
+        </figure>
         <p>Das Programmieren von Musikstücken mit Hilfe der Tabelle 2 ist noch etwas mühsam. Ein Editor in der nächsten Ausgabe wird diese Arbeit erleichtern. Mit dem Datensatz aus Listing 2 (»Kobold« aus den »Lyrischen Stücken« von Edvard Grieg) kann man den Sequenzer testen.</p>
 
+<figure>
+  <table class="plain">
+    <tr><th>Kommando</th><th>Interpretation</th><th></th></tr>
+    <tr><td>%0000 0000</td><td>Track-Ende</td><td></td></tr>
+    <tr><td>%0ttt tttt</td><td>Zeitvorgabe</td><td>t = 1...96 GATE-ON-Zeit: t=m<br>t = 97...127 GATE-OFF-Zeit: t-97</td></tr>
+    <tr><td>%1mmm nnnn</td><td>nächster Ton</td><td>m = 0...6 Oktave<br>n = 0...11 Tonnummer<br>n = 12...15 Pause</td></tr>
+    <tr><td>%1110 1111</td><td>Pause</td><td>(Standardcode $EF)</td></tr>
+    <tr><td>%1111 1fff</td><td>Sonderfunktion</td><td>f = 0...7 Funktionsnummer</td></tr>
+  </table>
+  <figcaption>Tabelle 2. So programmiert man einen »Track«.</figcaption>
+</figure>
         <p>Die Verschmelzung des Sequenzers und des Modulators zu einer funktionellen Einheit wird in der nächsten Folge behandelt.</p>
 
         <address class="author">(Thomas Krätzig/tr)</address>
