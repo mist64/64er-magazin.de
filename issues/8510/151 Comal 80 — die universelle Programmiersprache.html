@@ -53,27 +53,24 @@
 
         <p>Die von Basic her bekannte, vergleichsweise primitive IF-THEN-Abfrage ist in Comal dahingehend erweitert worden, daß ganze Programmteile bedingt ausgeführt werden können. Hierzu wird die IF-Anweisung in der Form IF-THEN-ENDIF verwendet, wobei zwischen THEN und ENDIF ein beliebig umfangreicher Programmteil stehen kann, der nur ausgeführt wird, wenn die Bedingung nach IF wahr ist. Im Falle zweier alternativer Möglichkeiten kann die IF-Anweisung durch ELSE zur Form IF-THEN-ELSE-ENDIF ergänzt werden. Weitere Alternativen lassen sich durch zusätzliche Abfragen mittels ELIF (eine Wortbildung aus ELSE IF) leicht abfragen. Der folgende Programmteil druckt einen Wetterbericht in Abhängigkeit vom Inhalt der Variablen »WETTER«:</p>
 
-        <p>TODO PRE</p>
-
-        <p>100 IF WETTER = -1<br>
-            110 PRINT "schlechtes Wetter"<br>
-            120 ELIF WETTER = 1<br>
-            130 PRINT "gutes Wetter"<br>
-            140 ELSE<br>
-            150 PRINT "veraenderlich"<br>
-            160 ENDIF</p>
+        <pre>100 IF WETTER = -1
+110     PRINT "schlechtes Wetter"
+120   ELIF WETTER = 1
+130     PRINT "gutes Wetter"
+140   ELSE
+150     PRINT "veraenderlich"
+160 ENDIF</pre>
 
         <p>Falls mehrere Bedingungen zu prüfen sind, ist die CASE-Konstruktion allerdings meist übersichtlicher. Der gleiche Wetterbericht mittels CASE-Anweisung formuliert, sieht so aus:</p>
 
-        <p>TODO PRE</p>
-
-        <p>100 CASE WETTER<br>
-            110 WHEN -1<br>
-            120 PRINT "schlechtes Wetter" 130 WHEN 1<br>
-            140 PRINT "gutes Wetter"<br>
-            150 OTHERWISE<br>
-            160 PRINT "veraenderlich"<br>
-            170 ENDCASE</p>
+        <pre>100 CASE WETTER
+110   WHEN -1
+120     PRINT "schlechtes Wetter"
+130   WHEN 1
+140     PRINT "gutes Wetter"
+150   OTHERWISE
+160     PRINT "veraenderlich"
+170 ENDCASE</pre>
 
         <p>Für die Programmierung von Schleifen stehen neben der bereits angesprochenen FOR-ENDFOR-Schleife (entspricht FOR-NEXT in Basic) drei weitere Schleifen-Konstruktionen zur Verfügung:</p>
 
@@ -97,23 +94,21 @@
 
         <p>Um eine möglichst weitgehende Benutzerfreundlichkeit zu realisieren und die Programmierung zu vereinfachen, wurde Comal mit komfortablen Möglichkeiten zur Behandlung von Fehlern versehen. Diese beschränken sich nicht nur auf das Abfangen aller möglichen Fehlerarten, sondern es sind auch automatische Korrekturen und die Weitergabe von Meldungen an übergeordnete Programm-Strukturen möglich. Dabei können sogar bewußt Fehler erzeugt oder übertragen werden. Die Fehlerbehandlung stellt selbst eine Programmstruktur dar. Der Teil des Programms, in dem Fehler abgefangen werden sollen, wird durch TRAP und ENDTRAP eingeklammert. Dieser Programmteil enthält auch die Fehlerbehandlungs-Routine RANDLER), die im Fehlerfall aufgerufen wird. Ein Beispiel:</p>
 
-        <p>TODO PRE</p>
-
-        <p>10 // Quadratwurzel<br>
-            15 PRINT "bitte Zahl eingeben:"<br>
-            20 TRAP<br>
-            25 INPUT ZAHL<br>
-            30 PRINT SQR(ZAHL)<br>
-            35 HANDLER<br>
-            40 CASE ERR 0F<br>
-            45 WHEN 206<br>
-            50 PRINT "nur Zahl eingeben !"<br>
-            55 WHEN 1<br>
-            60 PRINT "negative Zahl nicht erlaubt ! "<br>
-            65 OTHERWISE<br>
-            70 PRINT ERR, ERRTEXT$<br>
-            75 ENDCASE<br>
-            80 ENDTRAP</p>
+        <pre>10 // Quadratwurzel
+15 PRINT "bitte Zahl eingeben:"
+20 TRAP
+25   INPUT ZAHL
+30   PRINT SQR(ZAHL)
+35  HANDLER
+40   CASE ERR 0F
+45     WHEN 206
+50      PRINT "nur Zahl eingeben !"
+55     WHEN 1
+60      PRINT "negative Zahl nicht erlaubt ! "
+65     OTHERWISE
+70      PRINT ERR, ERRTEXT$
+75   ENDCASE
+80 ENDTRAP</pre>
 
         <p>Dieses Programm wartet auf die Eingabe einer Zahl und berechnet danach die Quadratwurzel aus dieser Zahl. Zwei Fehlermöglichkeiten sind dabei offensichtlich: Zum einen kann der Benutzer irrtümlich irgendwelche Buchstaben mit eingeben (Fehler 206, »numeric constant expected«), zum anderen darf das Argument der Quadratwurzel-Funktion nicht negativ werden (Fehler 1, »Argument Error«), Durch den TRAP-HANDLER werden diese beiden Fehler abgefangen und mit entsprechenden Meldungen quittiert. Falls wider Erwarten irgendein anderer Fehler auftreten sollte, so wird in Zeile 70 einfach die Fehlernummer samt dazugehörigem Fehlertext übergeben. Wenn Sie sich an den englischen Fehlermeldungen stören sollten — Comal ermöglicht es Ihnen, alle Fehlermeldungen neu zu formulieren und abzuspeichern.</p>
 
