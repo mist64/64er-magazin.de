@@ -213,6 +213,11 @@ Die Eingabe-Ausgaben werden aus `issues` gelesen, die Website wird nach `out` ge
     * Abtippen der Listings
         * [Endurion](https://www.forum64.de/wcf/index.php?user/1964-endurion/)
         * [pgeorgi](https://www.forum64.de/wcf/index.php?user/28405-pgeorgi/)
+* Ausgabe 10/85:
+    * Formatierung, Metadaten, OCR-Fixes
+        * [thierer](https://www.forum64.de/wcf/index.php?user/26370-thierer/)
+    * Abtippen der Listings
+        * [Endurion](https://www.forum64.de/wcf/index.php?user/1964-endurion/)
 
 * Sonderheft 1/1985:
     * Abtippen der Listings
@@ -236,6 +241,9 @@ Die Eingabe-Ausgaben werden aus `issues` gelesen, die Website wird nach `out` ge
     * Abtippen der Listings
         * [goloMAK](https://www.forum64.de/wcf/index.php?user/28439-golomak/)
         * [ClausS](https://www.forum64.de/wcf/index.php?user/28399-clauss/)
+* Sonderheft 5/1985:
+    * Abtippen der Listings
+        * [hiTCH-HiKER](https://www.forum64.de/wcf/index.php?user/30694-hitch-hiker/)
 
 ![](screenshot1.png)
 
