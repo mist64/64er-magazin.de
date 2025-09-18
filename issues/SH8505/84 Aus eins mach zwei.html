@@ -45,7 +45,122 @@
         <div class="binary_download" data-filename="multiprogramming.prg" data-name="Aus eins mach zwei"></div>
 
         <figure>
-            TODO
+            <pre>Daten für das Programm:
+49152    xxx   ;y-Register
+49153    xxx   ;x-Register
+49154    xxx   ;Akkumulator
+49155     33   ;Statusregister
+49156    xxx   ;Startadresse 2. Programm (Lo und Hi)
+49157    xxx
+49158    xxx   ;Startadresse 1. Programm (Lo und Hi)
+49159    xxx
+49160    xxx   ;Stapelzeiger 1. Programm
+49161    249   ;Stapelzeiger 2. Programm
+
+Aktivierungsroutine:
+49168    SEI           120
+49169    JSR  49191    32,39,192
+49172    LDA  #53      169,53       ;RAM-Konfiguration
+49174    LDY  #98      160,98
+49176    LDX  #192     162,192
+49178    STA  1        133,1
+49180    STY  65534    140,254,255
+49183    STX  65535    142,255,255
+49186    CLI           88
+49187    JMP  (49158)  108,6,192    ;Sprung zum 1. Programm
+
+Hier werden die Zeiger auf die eigene Interruptroutine gesetzt. Danach
+wird das erste Programm angesprungen.
+
+49191    LDY  #0       160,0        ;Werte setzen zum Basic-ROM kopieren
+49193    STY  38       132,38
+49195    DEY           136
+49196    STY  39       132,39
+49198    JSR  49212    32,60,192    ;Basic-ROM kopieren
+49201    LDY  #191     160,191      ;Werte setzen zum Kernal-ROM kopieren
+49203    STY  39       132,39
+49205    JSR  49212    32,60,192    ;Kernal-ROM kopieren
+49208    JSR  49231    32,79,192    ;Daten setzen
+49211    RTS           96
+
+49212    LDX  #32      162,32       ;32 Pages kopieren
+49214    LDY  #0       160,0
+49216    DEY           136
+49217    LDA  (38),Y   177,38
+49219    STA  (38),Y   145,38
+49221    CPY  #0       192,0
+49223    BNE  49216    208,247
+49225    DEC  39       198,39
+49227    DEX           202
+49228    BNE  49214    208,240
+49230    RTS           96
+
+Diese Routine kopiert das Betriebssystem und den Basic-Interpreter in
+das darunter liegende RAM.
+
+49231    LDA  #0       169,0        ;Entscheidungsfaktor
+49233    STA  2        133,2
+49235    LDY  #5       160,5        ;Daten für späteren Interruptrücksprung in Page 194 setzen
+49237    LDA  49152,Y  185,0,192
+49240    STA  49914,Y  153,250,194
+49243    DEY           136
+49244    BPL  49237    16,247
+49246    RTS           96
+
+Interruptroutine:
+49250    PHA           72           ;x-,y-Register und Akku auf den Stack retten
+49251    TXA           138
+49252    PHA           72
+49253    TYA           152
+49254    PHA           72
+49255    LDA  2        165,2
+49257    BNE  49298    208,39
+
+49259    LDY  #255     160,255      ;Stack in Page 193 kopieren
+49261    LDA  256,Y    185,0,1
+49264    STA  49408,Y  153,0,193
+49267    DEY           136
+49268    CPY  #255     192,255
+49270    BNE  49261    208,245
+
+49272    LDA  49664,Y  185,0,194    ;Page 194 in den Stack kopieren
+49275    STA  256,Y    153,0,1
+49278    DEY           136
+49279    CPY  #255     192,255
+49281    BNE  49272    208,245
+49283    TSX           186          ;Stapelzeiger vertauschen
+49284    STX  49160    142,8,192
+49287    LDX  49161    174,9,192
+49290    TXS           154
+49291    LDY  #1       169,1        ;Entscheidungsfakten ändern
+49293    STA  2        133,2
+49295    JMP  49334    76,182,192
+
+49298    LDY  #255     160,255      ;Stack in Page 194 kopieren
+49300    LDA  256,Y    185,0,1
+49303    STA  49664,Y  153,0,194
+49306    DEY           136
+49307    CPY  #255     192,255
+49309    BNE  49300    208,254
+49311    LDA  49408,Y  185,0,193    ;Page 193 in den Stack kopieren
+49314    STA  256,Y    153,0,1
+49317    DEY           136
+49318    CPY  #255     192,255
+49320    BNE  49311    208,245
+49322    TSX           186          ;Stapelzeiger ver tauschen
+49323    STX  49161    142,9,192
+49326    LDX  49160    174,8,192
+49329    TXS           154
+49330    LDA  #0       169,0        ;Entscheidungs Faktor ändern
+49332    STA  2        133,2
+
+49334    PLA           104          ;x,y-Register und
+49335    TAY           168          ;Akku vom Stack holen
+49336    PLA           104
+49337    TAX           170
+49338    PLA           104
+49339    JMP  65352    76,72,255</pre>
+<!-- Eingetippt von hiTCH-HiKER -->
             <figcaption>Listing 2. Source-Code des Programms »Aus eins mach zwei«.</figcaption>
         </figure>
     </article>
