@@ -54,8 +54,9 @@
 
         <p>Hinter jedem OPEN-Befehl steht eine Zahl, die der durch diesen Befehl angefangenen Datei zugeordnet wird. Diese Datei- oder File-Nummer gilt als Referenz für alle anderen Ein- und Ausgabebefehle derselben Datei. Nähere Angaben dazu können Sie dem nebenstehenden Texteinschub Nr. 1 »Files-Geräte-Namen-Nummern« entnehmen.</p>
 
-        <p>Ein OPEN-Befehl ruft die entsprechende Routine des Betriebssystems auf, welche die File-Nummer in die Speicherzelle 184 schreibt. Vor dort kann sie mit PEEK(184) ausgelesen werden. Geben Sie die folgende Zeile direkt ein:<br>
-            A = 30:OPEN A,3:PRINT PEEK (184):CLOSE A</p>
+        <p>Ein OPEN-Befehl ruft die entsprechende Routine des Betriebssystems auf, welche die File-Nummer in die Speicherzelle 184 schreibt. Vor dort kann sie mit PEEK(184) ausgelesen werden. Geben Sie die folgende Zeile direkt ein:
+            <code>A = 30:OPEN A,3:PRINT PEEK (184):CLOSE A</code>
+        </p>
 
         <p>Um verschiedene File-Nummern auszuprobieren, definieren wir sie als Variable A. Nach dem »A« des OPEN-Befehls steht die Zahl 3. Damit wird der Bildschirm angewählt (siehe »Sekundär-Adresse« im schon erwähnten Texteinschub). Das Anwählen des Bildschirms vermeidet eine störende Meldung des Betriebssystems.</p>
 
@@ -67,8 +68,9 @@
 
         <p>Die Sekundär-Adresse steht als dritte Angabe hinter den Ein- und Ausgabe-Befehlen LOAD, SAVE, VERIFY und OPEN. Sie hat bei den verschiedenen Peripheriegeräten spezielle Funktionen. Diese Funktionen sind im nebenstehenden Texteinschub näher erläutert.</p>
 
-        <p>Der jeweilige Wert der Sekundär-Adresse steht in der Speicherzelle 185, allerdings um 96 erhöht. Für Sekundär-Adressen stehen, über die Standardwerte der einzelnen Peripheriegeräte hinaus, die Zahlen von 0 bis 31 zur Verfügung. Ab 32 fängt in Zelle 185 wieder der Zyklus ab 0 an. Das können wir uns anschauen. Ich wähle zur Eröffnung einer Datei wieder den Bildschirm als »nichtstörendes« Empfangsgerät.<br>
-            A = 15:OPEN 1,3,A:PRINT PEEK(185)-96:CLOSE 1</p>
+        <p>Der jeweilige Wert der Sekundär-Adresse steht in der Speicherzelle 185, allerdings um 96 erhöht. Für Sekundär-Adressen stehen, über die Standardwerte der einzelnen Peripheriegeräte hinaus, die Zahlen von 0 bis 31 zur Verfügung. Ab 32 fängt in Zelle 185 wieder der Zyklus ab 0 an. Das können wir uns anschauen. Ich wähle zur Eröffnung einer Datei wieder den Bildschirm als »nichtstörendes« Empfangsgerät.
+            <code>A = 15:OPEN 1,3,A:PRINT PEEK(185)-96:CLOSE 1</code>
+        </p>
 
         <p>Durch Verändern des Wertes von A können Sie alle Möglichkeiten durchspielen.</p>
 
@@ -81,9 +83,9 @@
         <p>Alle von Commodore vorgegebenen Geräte-Nummern sind in der folgenden Tabelle aufgelistet.</p>
 
         <table class="plain">
-            <tr>
-                <th>Geräte-Nummer</th>
-                <th>angesprochenes Gerät</th>
+            <tr class="separator strong">
+                <td>Geräte-Nummer</td>
+                <td>angesprochenes Gerät</td>
             </tr>
             <tr>
                 <td>0</td>
@@ -111,11 +113,11 @@
             </tr>
             <tr>
                 <td>8</td>
-                <td>Disketten- Laufwerk Nr. 0</td>
+                <td>Disketten-Laufwerk Nr. 0</td>
             </tr>
             <tr>
                 <td>9</td>
-                <td>Disketten- Laufwerk Nr. 1</td>
+                <td>Disketten-Laufwerk Nr. 1</td>
             </tr>
             <tr>
                 <td>10, 11</td>
@@ -167,27 +169,33 @@
 
         <p>Wie Sie sich vielleicht noch erinnern, wird die Speicherzelle 1 beim VC 20 nicht für die Steuerung der Ein- und Ausgänge des Mikroprozessors verwendet. Diese Rolle wird beim VC 20 durch zwei Register des »Versatile Interface Adapter« (VIA 6522-A) ausgefüllt.</p>
 
-        <p>Für die Abfrage der Datasetten-Tasten ist das sechste Bit des VIA-Registers 37151 zuständig. Bei gedrückter Taste steht es auf 1, sonst auf 0. Ein kleines Programm zeigt es Ihnen:<br>
-            10 X = PEEK(37151)<br>
-            20 PRINT X<br>
-            30 IF X = 62 THEN 50<br>
-            40 GOTO 10<br>
-            50 PRINT”TASTE GEDRÜCKT”</p>
+        <p>Für die Abfrage der Datasetten-Tasten ist das sechste Bit des VIA-Registers 37151 zuständig. Bei gedrückter Taste steht es auf 1, sonst auf 0. Ein kleines Programm zeigt es Ihnen:
+            <code>10 X = PEEK(37151)
+                20 PRINT X
+                30 IF X = 62 THEN 50
+                40 GOTO 10
+                50 PRINT”TASTE GEDRÜCKT”
+            </code>
+        </p>
 
-        <p>Wenn keine Taste gedrückt ist, läuft ein Zahlenband mit 126 ab. Die entsprechende Darstellung als Dualzahl lautet 1111 1110. Bei einer gedrückten Taste steht in 37151 die Zahl 62, als Dualzahl 0011 1110. Wichtig, wie gesagt ist nur das zweithöchste Bit.</p>
+        <p>Wenn keine Taste gedrückt ist, läuft ein Zahlenband mit 126 ab. Die entsprechende Darstellung als Dualzahl lautet 1111&thinsp;1110. Bei einer gedrückten Taste steht in 37151 die Zahl 62, als Dualzahl 0011&thinsp;110. Wichtig, wie gesagt ist nur das zweithöchste Bit.</p>
 
         <p>Mit der Abfrage der Zeile 30 springt beim Drücken einer Taste das Programm auf die Zeile 50 und druckt den Text aus.</p>
 
-        <p>Den Motor der Datasette können wir mit Hilfe des Registers 37184 schalten. Wie beim C 64 gilt auch jetzt, daß dazu die hier angesprochene Speicherzelle 192, auch Interlock-Register genannt, eine Zahl größer als 0 enthält und daß außerdem eine Taste der Datasette gedrückt ist. Drücken Sie auf PLAY und geben Sie direkt ein:<br>
-            POKE 192,255<br>
-            POKE 37148,251: der Motor bleibt stehen.<br>
-            POKE 37148,252: der Motor läuft los.</p>
+        <p>Den Motor der Datasette können wir mit Hilfe des Registers 37184 schalten. Wie beim C 64 gilt auch jetzt, daß dazu die hier angesprochene Speicherzelle 192, auch Interlock-Register genannt, eine Zahl größer als 0 enthält und daß außerdem eine Taste der Datasette gedrückt ist. Drücken Sie auf PLAY und geben Sie direkt ein:
+            <code>POKE 192,255
+                POKE 37148,251: der Motor bleibt stehen.
+                POKE 37148,252: der Motor läuft los.
+            </code>
+        </p>
 
         <p>Bestimmend sind hier Bit 2, 3 und 4.</p>
 
-        <p>Zum Ausschalten muß lediglich Bit 2 auf 1 stehen, zum Einschalten die drei Bits auf 110. Jede Zahl, die als Dualzahl diese Bedingungen erfüllt, kann dafür hergenommen werden. Um unabhängig von den anderen Bits des Registers 37148 zu bleiben, die ja auch ganz bestimmte andere Funktionen haben, empfiehlt es sich, über Boole’sche Verknüpfungen nur die wichtigen drei Bits zu verändern. Die beiden POKE-Befehle sehen dann so aus:<br>
-            Ausschalten: POKE 37148,PEEK (37148) OR 2<br>
-            Einschalten: POKE 37148,PEEK (37148) AND 12</p>
+        <p>Zum Ausschalten muß lediglich Bit 2 auf 1 stehen, zum Einschalten die drei Bits auf 110. Jede Zahl, die als Dualzahl diese Bedingungen erfüllt, kann dafür hergenommen werden. Um unabhängig von den anderen Bits des Registers 37148 zu bleiben, die ja auch ganz bestimmte andere Funktionen haben, empfiehlt es sich, über Boole’sche Verknüpfungen nur die wichtigen drei Bits zu verändern. Die beiden POKE-Befehle sehen dann so aus:
+            <code>Ausschalten: POKE 37148,PEEK (37148) OR 2
+                Einschalten: POKE 37148,PEEK (37148) AND 12
+            </code>
+        </p>
 
         <h2>Adresse 193 bis 194 ($C1 bis $C2)</h2>
 
@@ -197,7 +205,7 @@
 
         <p>Bei LOAD und SAVE auf Band steht hier die Anfangsadresse des Bandpuffers (828). Im Bandpuffer steht allerdings nur der sogenannte Bandvorspann (auf englisch »Tape Header«), während der Hauptteil des Programms im Programmspeicher ab einer Adresse steht, auf die der Zeiger in den Speicherzellen 195/196 hinweist.</p>
 
-        <h2>Adresse 195 bis 196 ($G bis $C4)</h2>
+        <h2>Adresse 195 bis 196 ($C3 bis $C4)</h2>
 
         <h3>Zeiger auf den Anfang des Programms hinter dem Tape Header</h3>
 
@@ -219,10 +227,12 @@
 
         <p>In dieser Speicherzelle steht die jeweilige Anzahl der Zeichen, die im Tastaturpuffer gespeichert sind und darauf warten, weiterverarbeitet zu werden.</p>
 
-        <p>Das folgende kleine Programm zeigt es.<br>
-            10 GET A$<br>
-            20 PRINT PEEK (198);A$ 30 FORJ=1 3000:NEXTJ<br>
-            40 GOTO 10</p>
+        <p>Das folgende kleine Programm zeigt es.
+            <code>10 GET A$
+                20 PRINT PEEK (198);A$ 30 FORJ=1 3000:NEXTJ
+                40 GOTO 10
+            </code>
+        </p>
 
         <p>Der GET-Befehl holt ein Zeichen aus dem Tastaturpuffer — sofern eines dort zu finden ist. Die Zeile 20 druckt die Anzahl der Zeichen im Puffer aus, daneben das erste dieser Zeichen. Dann folgt eine Warteschleife, die uns erlaubt, ganz schnell ein paar Tasten zu drücken. Danach springt das Programm an den Anfang zurück und arbeitet diese eingegebenen Zeichen ab. Es ist dabei deutlich zu sehen, wie durch den GET-Befehl bereits ein Zeichen aus dem Puffer genommen und dadurch der Inhalt der Zelle 198 sofort um 1 reduziert wird.</p>
 
@@ -230,8 +240,9 @@
 
         <p>Eine sinnvolle Anwendung dieser Beeinflussung erlaubt der nicht gerade sehr populäre WAIT-Befehl.</p>
 
-        <p>Ersetzen Sie bitte im obigen Programm die Warteschleife der Zeile 30 durch:<br>
-            30 POKE 198,0: WAIT 198,1</p>
+        <p>Ersetzen Sie bitte im obigen Programm die Warteschleife der Zeile 30 durch:
+            <code>30 POKE 198,0: WAIT 198,1</code>
+        </p>
 
         <p>Zuerst wird dem Computer vorgegaukelt, daß der Tastaturpuffer leer sei. Durch den WAIT-Befehl wartet das Programm danach so lange, bis ein Zeichen im Tastaturpuffer erscheint und springt erst dann auf die nächste Zeile 40.</p>
 
@@ -260,10 +271,12 @@
             <p>Als erstes gebe ich die Bezeichnungen der Befehle aus einem Commodore-Buch wieder, bevor die einzelnen Angaben im Detail diskutiert werden.</p>
 
             <ul>
-                <li>LOAD Tile-Name”, Geräte-Nr., Speicheradressen-Flag -SAVE ”File-Name”, Geräte-Nr., EOT-Flag</li>
+                <li>LOAD ”File-Name”, Geräte-Nr., Speicheradressen-Flag</li>
+                <li>SAVE ”File-Name”, Geräte-Nr., EOT-Flag</li>
                 <li>VERIFY ”File-Name”, Geräte-Nr., Speicheradressen-Flag</li>
                 <li>OPEN File-Nr., Geräte-Nr., Sekundär-Adresse, "File-Name, Typ, Modus”</li>
-                <li>INPUT# File-Nr., Variable — GET# File-Nr., Variable</li>
+                <li>INPUT# File-Nr., Variable</li>
+                <li>GET# File-Nr., Variable</li>
                 <li>CMD File-Nr.</li>
                 <li>CLOSE File-Nr.</li>
             </ul>
@@ -281,22 +294,35 @@
 
             <p>Da in 187/188 die Adresse angegeben ist, ab der der Programm- beziehungsweise Datei-Name im Speicher steht, können wir ihn dort ansehen.</p>
 
-            <p>Geben Sie direkt ein<br>
-                LOAD ”1234”</p>
+            <p>Geben Sie direkt ein
+                <code>LOAD ”1234”</code>
+            </p>
 
-            <p>Nach der RETURN-Taste kommt die übliche Aufforderung der Datasette, die wir aber mit der STOP-Taste abwürgen. In 187/188 steht jetzt die Anfangsadresse »A«des gespeicherten Namens: A = PEEK(187) + 256*PEEK (188):PRINT PEEK(A)</p>
+            <p>Nach der RETURN-Taste kommt die übliche Aufforderung der Datasette, die wir aber mit der STOP-Taste abwürgen. In 187/188 steht jetzt die Anfangsadresse »A« des gespeicherten Namens:
+                <code>A = PEEK(187) + 256*PEEK (188):PRINT PEEK(A)</code>
+            </p>
 
             <p>Wir erhalten die Zahl 49, das ist der ASCII-Codewert der Ziffer »1«. Durch Erhöhen der Anfangsadresse »A« im PRINT-Befehl um jeweils 1, kommen auch die übrigen Zeichen des Namens zum Vorschein.</p>
 
             <p>Die VC 20-Besitzer kennen sicher den Effekt, der entsteht, wenn beim SAVE-Befehl vor dem File-Namen, aber innerhalb der Gänsefüßchen, eine Farbtaste eingegeben wird. Die FOUND-Meldung druckt nämlich den File-Namen in der gewählten Farbe aus, was besonders bei Kassetten-Operationen sehr eindrucksvoll ist.</p>
 
-            <p>Das Disketten-Laufwerk bietet eine andere Überraschung. Die geSHIFTete SPACE-Taste innerhalb des File-Namens, erzeugt das zweite Gänsefüßchen. SAVE”SPIEL 2 (SHIFT-SPACE) SYS 16000",8 erscheint in der Directory als: "SPIEL 2” SYS 16000 und kann mit LOAD"SPIEL 2”,8 geladen werden.</p>
+            <p>Das Disketten-Laufwerk bietet eine andere Überraschung. Die geSHIFTete SPACE-Taste innerhalb des File-Namens, erzeugt das zweite Gänsefüßchen. 
+                <code>SAVE”SPIEL 2(SHIFT-SPACE) SYS 16000",8</code> 
+                erscheint in der Directory als: "SPIEL 2” SYS 16000 und kann mit LOAD"SPIEL 2”,8 geladen werden.
+            </p>
 
             <h3>Geräte-Nummer</h3>
 
             <p>Alle an den Computer anschließbaren Peripheriegeräte haben eine eigene Nummer, unter welcher sie »angesprochen« werden können. Es handelt sich eigentlich um eine Adresse, und in der Tat sprechen manche Autoren von der »Primär-Adresse«. In der Beschreibung der Speicherzelle 184 sind sie alle zusammengestellt.</p>
 
-            <p>Bei den Befehlen LOAD, SAVE, VERIFY und OPEN steht diese Geräte-Nummer als zweite Angabe, vor der ersten Angabe durch ein Komma getrennt: LOAD”NAME”,1&hellip;&hellip;bedeutet "Laden von Datasette” LOAD”NAME”,8&hellip;&hellip;bedeutet "Laden von Diskette” OPEN 12,4&hellip;&hellip;&hellip;bedeutet ”An den Drucker”</p>
+            <p>Bei den Befehlen LOAD, SAVE, VERIFY und OPEN steht diese Geräte-Nummer als zweite Angabe, vor der ersten Angabe durch ein Komma getrennt:</p>
+            
+            <ul class="plain">
+                <li>LOAD”NAME”,1&hellip;&hellip;bedeutet "Laden von Datasette”</li>
+                <li>LOAD”NAME”,8&hellip;&hellip;bedeutet "Laden von Diskette”</li>
+                <li>OPEN 12,4&hellip;&hellip;&hellip;bedeutet ”An den Drucker”</li>
+            </ul>
+              </p>
 
             <p>(Die 12 hinter dem OPEN-Befehl ist eine »File-Nummer«. Sie kommt weiter unten an die Reihe.)</p>
 
@@ -329,73 +355,82 @@
             <p>Wir werden uns also noch einmal mit dieser Sache befassen, wenn wir bei dem entsprechenden Adressen angekommen sind.</p>
 
             <figure>
-                <table>
-                    <tr>
-                        <th>Befehl</th>
-                        <th>Sekundär<br>Adresse</th>
-                        <th>Funktion</th>
+                <table class="plain">
+                    <tr class="separator strong">
+                        <td>Befehl</td>
+                        <td>Sekundär Adresse</td>
+                        <td>Funktion</td>
                     </tr>
 
                     <!-- LOAD -->
                     <tr>
-                        <td rowspan="2">LOAD</td>
+                        <td>LOAD</td>
                         <td>0</td>
                         <td>lädt Programm an den Anfang des Programmspeichers</td>
                     </tr>
-                    <tr>
+                    <tr class="separator">
+                        <td></td>
                         <td>1</td>
                         <td>lädt ein Programm absolut, also an die Adresse, von der ab es gespeichert wurde</td>
                     </tr>
 
                     <!-- SAVE -->
                     <tr>
-                        <td rowspan="4">SAVE</td>
+                        <td>SAVE</td>
                         <td>0</td>
                         <td>Normales SAVE, Programm wird bei späterem LOAD an den Anfang des Programmspeichers geladen (Basic-Programme)</td>
                     </tr>
                     <tr>
+                        <td></td>
                         <td>1</td>
                         <td>erzwingt bei späterem LOAD des Programms die Speicherung ab der Adresse, wo es zur Zeit steht (Maschinen-Programme)</td>
                     </tr>
                     <tr>
+                        <td></td>
                         <td>2</td>
                         <td>setzt am Programmende auf der Kassette eine »Band-Ende«-Markierung, die beim Überlesen des Band mit der Fehlermeldung »DEVICE NOT PRESENT« stoppt</td>
                     </tr>
-                    <tr>
+                    <tr class="separator">
+                        <td></td>
                         <td>3</td>
                         <td>Kombination von 1 und 2</td>
                     </tr>
 
                     <!-- OPEN bei Kassette -->
                     <tr>
-                        <td rowspan="3">OPEN<br>bei Kassette</td>
+                        <td>OPEN</td>
                         <td>0</td>
                         <td>Daten lesen</td>
                     </tr>
                     <tr>
+                        <td>bei Kassette</td>
                         <td>1</td>
                         <td>Daten schreiben</td>
                     </tr>
-                    <tr>
+                    <tr class="separator">
+                        <td></td>
                         <td>2</td>
                         <td>Daten schreiben mit »Bandende«-Markierung</td>
                     </tr>
 
                     <!-- OPEN bei Diskette -->
                     <tr>
-                        <td rowspan="4">OPEN<br>bei Diskette</td>
+                        <td>OPEN<br>bei Diskette</td>
                         <td>0</td>
                         <td>vom Betriebssystem der Floppy für »Laden« reserviert</td>
                     </tr>
                     <tr>
+                        <td>bei Diskette</td>
                         <td>1</td>
                         <td>vom Betriebssystem der Floppy für »Speichern« reserviert</td>
                     </tr>
                     <tr>
+                        <td></td>
                         <td>2–14</td>
                         <td>reserviert nummerierten Daten-Kanal, bis zu drei gleichzeitig</td>
                     </tr>
-                    <tr>
+                    <tr class="separator">
+                        <td></td>
                         <td>15</td>
                         <td>reserviert Kommando-Kanal (nähere Angaben zu diesen Sekundär-Adressen siehe Floppy-Handbuch)</td>
                     </tr>
@@ -430,7 +465,7 @@
 
             <p>In Verbindung mit der Bedeutung der Sekundär-Adresse kann man den Zusammenhang wie Tabelle 1 zeigt darstellen:</p>
 
-            <p>In <strong>Byte 2 und 3</strong> steht in Low/ High-Darstellung die Adresse, ab der das Programm im Speicher des Computers stand, als es gespeichert wurde.</p>
+            <p>In <strong>Byte 2 und 3</strong> steht in Low/High-Darstellung die Adresse, ab der das Programm im Speicher des Computers stand, als es gespeichert wurde.</p>
 
             <p>In <strong>Byte 4 und 5</strong> steht die entsprechende End-Adresse des Programms.</p>
 
@@ -438,25 +473,31 @@
 
             <p>Jetzt wollen wir das alles mit einem kleinen Experiment überprüfen.</p>
 
-            <p>Schreiben Sie bitte ein kleines Programm, es braucht nicht sehr sinnvoll zu sein, wie zum Beispiel:<br>
-                10 REM TAPE HEADER<br>
-                20 REM TEST PROGRAMM</p>
+            <p>Schreiben Sie bitte ein kleines Programm, es braucht nicht sehr sinnvoll zu sein, wie zum Beispiel:
+                <code>10 REM TAPE HEADER
+                    20 REM TEST PROGRAMM
+                </code>
+            </p>
 
-            <p>Nehmen Sie ein leeres Band und laden das Programm mit einem Namen, der länger sein soll als 16 Zeichen, zum Beispiel:<br>
-                SAVE ”TEST PROGRAMM FUER INHALT TAPE HEADER"</p>
+            <p>Nehmen Sie ein leeres Band und laden das Programm mit einem Namen, der länger sein soll als 16 Zeichen, zum Beispiel:
+                <code>SAVE ”TEST PROGRAMM FUER INHALT TAPE HEADER"</code>
+            </p>
 
-            <p>Nach Drücken der RECORD- und PLAY-Tasten der Datasette meldet der Computer:<br>
-                FOUND TEST PROGRAMM FU</p>
+            <p>Nach Drücken der RECORD- und PLAY-Tasten der Datasette meldet der Computer:
+                <code>FOUND TEST PROGRAMM FU</code>
+            </p>
 
             <p>Es werden also nur 16 Zeichen inklusive Leerzeichen gedruckt. Sobald das Programm geladen ist, schauen wir im Kassettenpuffer nach, was in den ersten fünf Bytes steht, danach lesen wir die restlichen Bytes des Puffers.</p>
 
-            <p>Geben Sie direkt, ohne Zeilennummer, ein:<br>
-                FOR I = 0 TO 4: PRINT PEEK (828 + I);: NEXT,</p>
+            <p>Geben Sie direkt, ohne Zeilennummer, ein:
+                <code>FOR I = 0 TO 4: PRINT PEEK (828 + I);: NEXT,</code>
+            </p>
 
             <p>Sie erhalten die Zahlen 1 1 8 41 8 (beim VC 20 mit 3-K-Speichererweiterung 1 1 4 41 4)</p>
 
-            <p>Danach geben wir wiederum direkt ein:<br>
-                FOR I = 5 TO 192: PRINT CHR$(PEEK(828 + I));: NEXT</p>
+            <p>Danach geben wir wiederum direkt ein:
+                <code>FOR I = 5 TO 192: PRINT CHR$(PEEK(828 + I));: NEXT</code>
+            </p>
 
             <p>Beim VC 20 geben Sie in der FOR&hellip;NEXT-Schleife eine kleine Zahl ein, da der Bildschirmspeicher beim VC 20 kleiner ist als beim C 64.</p>
 
@@ -473,11 +514,11 @@
             <p>Das Problem des LOAD oder SAVE mit geänderten Adressen ist aber zu umfangreich für einen Texteinschub innerhalb dieses Kurses. Es wäre eigentlich einen eigenen kleinen Beitrag wert.</p>
 
             <figure>
-                <table>
-                    <tr>
-                        <th>Sekundär<br>Adresse</th>
-                        <th>Kennzahl</th>
-                        <th>Bedeutung</th>
+                <table class="plain center0 center1">
+                    <tr class="separator strong">
+                        <td>Sekundär Adresse</td>
+                        <td>Kennzahl</td>
+                        <td>Bedeutung</td>
                     </tr>
                     <tr>
                         <td>0 oder leer</td>
@@ -503,17 +544,17 @@
                 <figcaption>Tabelle 1</figcaption>
             </figure>
             <figure>
-  <table>
-    <tr>
-      <th>Adresse</th>
-      <th>828</th>
-      <th>829</th>
-      <th>830</th>
-      <th>831</th>
-      <th>832</th>
-      <th>833 etc.</th>
+  <table class="plain center1 center2 center3 center4 center5 center6">
+    <tr class="separator strong">
+      <td>Adresse</td>
+      <td>828</td>
+      <td>829</td>
+      <td>830</td>
+      <td>831</td>
+      <td>832</td>
+      <td>833 etc.</td>
     </tr>
-    <tr>
+    <tr class="separator strong">
       <td>Byte Nr.</td>
       <td>1</td>
       <td>2</td>
@@ -522,7 +563,7 @@
       <td>5</td>
       <td>6 etc.</td>
     </tr>
-    <tr>
+    <tr class="separator strong">
       <td>Bedeutung</td>
       <td>Kennzahl</td>
       <td>Low Byte</td>
@@ -532,36 +573,38 @@
       <td>Namen in ASCII-Code</td>
     </tr>
     <tr>
-      <td rowspan="2">Resultat<br>bei C 64</td>
+      <td class="strong">Resultat</td>
       <td>1</td>
-      <td>1</td>
-      <td>8</td>
+      <td class="separator">1</td>
+      <td class="separator">8</td>
       <td>41</td>
       <td>8</td>
-      <td>T etc.</td>
+      <td class="separator">T etc.</td>
     </tr>
-    <tr>
-      <td></td>
+    <tr class="separator">
+      <td class="strong">bei C 64</td>
+      <td>1</td>
       <td colspan="2">(2089)</td>
       <td></td>
       <td></td>
-      <td>2049</td>
+      <td>(2049)</td>
     </tr>
     <tr>
-      <td rowspan="2">Resultat<br>bei VC 20</td>
+      <td class="strong">Resultat</td>
       <td>1</td>
-      <td>1</td>
-      <td>4</td>
+      <td class="separator">1</td>
+      <td class="separator">4</td>
       <td>41</td>
       <td>4</td>
-      <td>T etc.</td>
+      <td class="separator">T etc.</td>
     </tr>
     <tr>
+      <td class="strong">bei VC 20</td>
       <td></td>
       <td colspan="2">(1065)</td>
       <td></td>
       <td></td>
-      <td>1025</td>
+      <td>(1025)</td>
     </tr>
   </table>
 

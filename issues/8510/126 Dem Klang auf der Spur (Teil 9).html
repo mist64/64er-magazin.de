@@ -16,7 +16,7 @@
 <body>
     <article>
         <h1>Dem Klang auf der Spur (Teil 9)</h1>
-        <p class="intro">In diesem Teil wird gezeigt, wie man dreistimmige Musikstücke programmgesteuert, schnell und zeit exakt auf dem C 64 wiedergeben kann. So ganz nebenbei erfahren Sie eine Menge über die Interrupttechnik.</p>
+        <p class="intro">In diesem Teil wird gezeigt, wie man dreistimmige Musikstücke programmgesteuert, schnell und zeitexakt auf dem C 64 wiedergeben kann. So ganz nebenbei erfahren Sie eine Menge über die Interrupttechnik.</p>
 
         <p>Zunächst einige Grundlagen zum Sequenzer. Unter einem Sequenzer versteht man ein Gerät oder Programm, das einen Synthesizer mit einer vorprogrammierten Tonfolge ansteuert. Die zentrale Rolle spielt dabei das genaue Einhalten eines programmierbaren Zeitmaßes.</p>
 
@@ -40,7 +40,7 @@
             <img src="126-x3.png" alt="">
         </figure>
 
-        <p>das sind drei gleichlange Noten mit der Länge einer Viertelnote. Aus diesem Grund sollte das Zeitraster (die Anzahl der Zeitabschnitte, in die der Sequenzer eine ganze Note einteilt) auch den Faktor 3 enthalten. Ein sinnvolles Zeitraster ist zum Beispiel 96( = 3x32).</p>
+        <p class="noindent">das sind drei gleichlange Noten mit der Länge einer Viertelnote. Aus diesem Grund sollte das Zeitraster (die Anzahl der Zeitabschnitte, in die der Sequenzer eine ganze Note einteilt) auch den Faktor 3 enthalten. Ein sinnvolles Zeitraster ist zum Beispiel 96 (= 3x32).</p>
 
         <p>Das Tempo wird in der Musik in Schlägen pro Minute (beats per minute: bpm) gemessen. Ein Schlag entspricht dabei einer Viertelnote. Der sinnvolle Bereich für dieses Maß liegt bei etwa 40 bis 240 bpm. Beim schnellen Tempo 240 bpm dauert eine ganze Note genau eine Sekunde. Der Sequenzer muß dann 96 Schritte pro Sekunde ausführen.</p>
 
@@ -54,9 +54,10 @@
         </ul>
 
 
-        <p>Diese Steuerungen müssen zeitgenau und unabhängig voneinander für drei Stimmen erfolgen. Darüber hinaus wären einige Zusatzfunktionen sinnvoll: — programmierbare Tempoänderungen</p>
+        <p>Diese Steuerungen müssen zeitgenau und unabhängig voneinander für drei Stimmen erfolgen. Darüber hinaus wären einige Zusatzfunktionen sinnvoll:</p>
 
         <ul>
+            <li>programmierbare Tempoänderungen</li>
             <li>programmierbare Soundwechsel</li>
             <li>programmierbare Änderung der Inhalte beliebiger Speicherplätze (Parameter-Änderung)</li>
         </ul>
@@ -68,27 +69,35 @@
 
         <h2>Musik per Interrupt</h2>
 
-        <p>Die Aufruffrequenz der Sequenzer-Schritte soll dagegen im Bereich von zirka 20-100 Hz, abhängig vom Tempo des Musikstücks, variabel sein. (Man erinnere sich: 240 bpm entsprechen 96 Hz bei einem Zeitraster von 96 Schritten pro ganzer Note.) Das legt den Einsatz eines weiteren unabhängigen Timers nahe. In Frage kommen dafür:<br>
-            Timer B in CIA1 (IRQ)<br>
-            Timer A in CIA2 (NMI)<br>
-            Timer B in CIA2 (NMI)</p>
+        <p>Die Aufruffrequenz der Sequenzer-Schritte soll dagegen im Bereich von zirka 20-100 Hz, abhängig vom Tempo des Musikstücks, variabel sein. (Man erinnere sich: 240 bpm entsprechen 96 Hz bei einem Zeitraster von 96 Schritten pro ganzer Note.) Das legt den Einsatz eines weiteren unabhängigen Timers nahe. In Frage kommen dafür:
+            <ul class="plain">
+                <li>Timer B in CIA1 (IRQ)</li>
+                <li>Timer A in CIA2 (NMI)</li>
+                <li>Timer B in CIA2 (NMI)</li>
+            </ul>
 
-        <p>Die Auswahl des Timers ist willkürlich. Im vorliegenden Programm wird Timer B in CIA1 eingesetzt. Dadurch bleiben die Timer in CIA 2 noch vollkommen frei für Zwecke, die nichts mit der Musikprogrammierung zu tun haben müssen. Da nun Timer A und Timer B beide unabhängig voneinander Interrupts auslösen können, muß die angesprungene Interrupt-Service-routine die Interrupt-Quelle ermitteln, also feststellen, welcher Timer den Interrupt ausgelöst hat und abhängig davon weiterverzweigen. Zu diesem Zweck wird im sogenannten Interrupt-Control-Register (ICR) $DC0D bei einem Timer-A-Interrupt Bit 0 und bei einem Timer-B-Interrupt Bit 1 gesetzt.</p>
+        <p>Die Auswahl des Timers ist willkürlich. Im vorliegenden Programm wird Timer B in CIA1 eingesetzt. Dadurch bleiben die Timer in CIA 2 noch vollkommen frei für Zwecke, die nichts mit der Musikprogrammierung zu tun haben müssen. Da nun Timer A und Timer B beide unabhängig voneinander Interrupts auslösen können, muß die angesprungene Interrupt-Serviceroutine die Interrupt-Quelle ermitteln, also feststellen, welcher Timer den Interrupt ausgelöst hat und abhängig davon weiterverzweigen. Zu diesem Zweck wird im sogenannten Interrupt-Control-Register (ICR) $DC0D bei einem Timer-A-Interrupt Bit 0 und bei einem Timer-B-Interrupt Bit 1 gesetzt.</p>
 
         <h3>Programmierung des CIA</h3>
 
-        <p>Zur Steuerung von CIA-Interrupts dient das schon erwähnte Interrupt-Control-Register (ICR) $DC0D. Dieses Register hat zwei Funktionen, je nachdem, ob schreibend oder lesend darauf zugegriffen wird. Bei Lesezugriff zeigt es an, ob, und wenn ja, woher ein Interrupt ausgelöst wurde. Zugleich wird das Register gelöscht und die Interrupt-Anforderung zurückgenommen (Die IRQ-Leitung geht von low auf high). Die Bits 0-4 sind dabei verschiedenen Interruptquellen zugeordnet. Uns interessieren hier nur die Bits 0 und 1, welche zu den Timer-Interrupts gehören. Durch einen Schreibzugriff wird dagegen ein Masken-Register angesprochen. Damit lassen sich die Interruptquellen einzeln freigeben oder sperren. Die Bits 0-4 kann man einzeln setzen oder zurücksetzen. Ist im geschriebenen Byte Bit 7 gesetzt, wird jedes mit einer 1 beschriebene Bit gesetzt, während die anderen Bits unverändert bleiben. Ist Bit 7 rückgesetzt, so wird jedes mit einer 1 beschriebene Bit zurückgesetzt, während die anderen Bits wieder unverändert bleiben. Gesetzte Bits ermöglichen eine Interrupterzeugung durch die jeweilige Quelle. Die Freigabe der Interrupterzeugung durch Timer B sieht also so aus:<br>
-            LDA #%10000010<br>
-            STA $DD0D ;ICR Bit 1 setzen</p>
+        <p>Zur Steuerung von CIA-Interrupts dient das schon erwähnte Interrupt-Control-Register (ICR) $DC0D. Dieses Register hat zwei Funktionen, je nachdem, ob schreibend oder lesend darauf zugegriffen wird. Bei Lesezugriff zeigt es an, ob, und wenn ja, woher ein Interrupt ausgelöst wurde. Zugleich wird das Register gelöscht und die Interrupt-Anforderung zurückgenommen (Die IRQ-Leitung geht von low auf high). Die Bits 0-4 sind dabei verschiedenen Interruptquellen zugeordnet. Uns interessieren hier nur die Bits 0 und 1, welche zu den Timer-Interrupts gehören. Durch einen Schreibzugriff wird dagegen ein Masken-Register angesprochen. Damit lassen sich die Interruptquellen einzeln freigeben oder sperren. Die Bits 0-4 kann man einzeln setzen oder zurücksetzen. Ist im geschriebenen Byte Bit 7 gesetzt, wird jedes mit einer 1 beschriebene Bit gesetzt, während die anderen Bits unverändert bleiben. Ist Bit 7 rückgesetzt, so wird jedes mit einer 1 beschriebene Bit zurückgesetzt, während die anderen Bits wieder unverändert bleiben. Gesetzte Bits ermöglichen eine Interrupterzeugung durch die jeweilige Quelle. Die Freigabe der Interrupterzeugung durch Timer B sieht also so aus:
+            <code>LDA #%10000010
+                STA $DD0D ;ICR Bit 1 setzen
+            </code>
+        </p>
 
         <p>Der Timer selbst wird durch drei Register gesteuert.</p>
 
         <p>Das Registerpaar TIMER B ($DC06/$DC07) liefert bei Lesezugriff den aktuellen 16-Bit-Zählerstand. Dieser Wert wird kontinuierlich heruntergezählt. Bei Erreichen von Null stoppt der Timer entweder (One-Shot-Mode) oder lädt einen Wert aus einem Timer-Latch (Latch = Zwischenspeicher) nach und zählt von neuem herunter (Continous Mode). Bei diesem Timer-Unterlauf wird ein Interrupt erzeugt, wenn Bit 1 im ICR gesetzt ist. Ein Schreibzugriff auf TIMERA bezieht sich dagegen auf das 16-Bit-Latch. Mit dem Latch-Wert kann man die Zeit zwischen zwei Interrupts im Bereich von 1 bis 65535 Mikrosekunden steuern.</p>
 
-        <p>Das Register CRB (Control Register B, $DC0F) steuert die Betriebsart des Timers (Start/Stop, One Shot/Continous, u.a.)<br>
-            Durch LDA #%00010001<br>
-            STA $DD0E<br>
-            wird der Zählerstand mit dem Latch-Wert geladen und der Timer gestartet.</p>
+        <p>Das Register CRB (Control Register B, $DC0F) steuert die Betriebsart des Timers (Start/Stop, One Shot/Continous, u.a.)</p>
+
+        <p class="noindent">Durch
+            <code>LDA #%00010001
+                STA $DD0E
+            </code>
+            wird der Zählerstand mit dem Latch-Wert geladen und der Timer gestartet.
+        </p>
 
         <h3>Die Interrupt-Service-Routine</h3>
 
@@ -105,7 +114,7 @@
 
         <p>Bei Auftreten eines Interrupts wird immer das Interrupt-Bit im CPU-Statusregister gesetzt, damit die CPU nicht gleich wieder unterbrochen werden kann. Da die IRQ-Leitung so lange auf Low-Pegel bleibt, bis die CPU durch Auslesen des CIA-ICR die Interruptanforderung löscht, würde sich das System ohne gesetztes Interrupt-Bit durch einen Dauerinterrupt aufhängen. Es steht dem Programmierer allerdings frei, nach dem Auslesen des ICR das Interrupt-Bit durch den Befehl CLI (Clear Interrupt-Flag) zurückzusetzen, um damit das Programm wieder unterbrechbar zu machen. Beim vorliegenden Programm bleibt bei einem Sequenzer-Schritt das Interrupt-Bit gesetzt, während es zur Abarbeitung eines Timer-A-Interrupts rückgesetzt wird. Dadurch kann die CPU auch dann durch einen Timer-B-Interrupt unterbrochen werden.</p>
 
-        <p>Das Betriebssystem und das Programm Modulator machen beide intensiven Gebrauch von der Zero-Page. Die Inhalte der Zero-Page-Speicherplätze dürfen von einem interruptgetriebenen Programm nicht verändert werden. Das Sequenzer-Programm belegt daher nur zwei Zero-Page-Speicherplätze C$FE,$FF). Ihre Inhalte werden bei Programmbeginn zwischengespeichert und bei Programmende restauriert.</p>
+        <p>Das Betriebssystem und das Programm Modulator machen beide intensiven Gebrauch von der Zero-Page. Die Inhalte der Zero-Page-Speicherplätze dürfen von einem interruptgetriebenen Programm nicht verändert werden. Das Sequenzer-Programm belegt daher nur zwei Zero-Page-Speicherplätze ($FE,$FF). Ihre Inhalte werden bei Programmbeginn zwischengespeichert und bei Programmende restauriert.</p>
 
         <h3>Die verwendeten Datenstrukturen</h3>
 
@@ -123,10 +132,14 @@
 
         <h3>Tracks</h3>
 
-        <p>Die Steueranweisungen werden für die drei Stimmen getrennt in drei sogenannten. Tracks (Tonspuren) gespeichert. Ein Track ist eine zusammenhängende Folge von 1-Byte-Kommandos. Das häufigste Kommando dürfte das Ton-Kommando sein. Die Tonhöhe wird aus einer Oktav-Nummer und einer Tonnummer (siehe Bild 2), die in den beiden Nibbles (=Halbbytes) eines Bytes stehen, ermittelt. Das Programm benötigt dazu lediglich eine Tabelle der Frequenzen der höchsten Oktave. Die Frequenzen der niedrigeren Oktaven werden durch Teilung durch Zweierpotenzen errechnet. Eine Division durch 2 wird durch einen einfachen Rechts-Shift realisiert. Die Dauer des Tones ist nicht Bestandteil des Ton-Kommandos. Sie wird durch das Zeit-Kommando voreingestellt. Da häufig mehrere Töne mit gleicher Länge aufeinanderfolgen, genügt ein einziges Zeit-Kommando (ein oder zwei Bytes), um die Tonlänge (siehe Bild 3) einzustellen. Dabei wird zwischen einer GATE-ON- und einer GATE-OFF-Phase unterschieden, deren Längen zusammengenommen die gewünschte Tonlänge ergeben.<br>
-            Beispiel: GATE-ON-Zeit = 5<br>
-            GATE-OFF-Zeit = 7<br>
-            Gesamtzeit = 12</p>
+        <p>Die Steueranweisungen werden für die drei Stimmen getrennt in drei sogenannten Tracks (Tonspuren) gespeichert. Ein Track ist eine zusammenhängende Folge von 1-Byte-Kommandos. Das häufigste Kommando dürfte das Ton-Kommando sein. Die Tonhöhe wird aus einer Oktav-Nummer und einer Tonnummer (siehe Bild 2), die in den beiden Nibbles (=Halbbytes) eines Bytes stehen, ermittelt. Das Programm benötigt dazu lediglich eine Tabelle der Frequenzen der höchsten Oktave. Die Frequenzen der niedrigeren Oktaven werden durch Teilung durch Zweierpotenzen errechnet. Eine Division durch 2 wird durch einen einfachen Rechts-Shift realisiert. Die Dauer des Tones ist nicht Bestandteil des Ton-Kommandos. Sie wird durch das Zeit-Kommando voreingestellt. Da häufig mehrere Töne mit gleicher Länge aufeinanderfolgen, genügt ein einziges Zeit-Kommando (ein oder zwei Bytes), um die Tonlänge (siehe Bild 3) einzustellen. Dabei wird zwischen einer GATE-ON- und einer GATE-OFF-Phase unterschieden, deren Längen zusammengenommen die gewünschte Tonlänge ergeben.</p>
+
+        <p class="noindent">Beispiel:</p>
+        <ul class="plain">
+            <li>GATE-ON-Zeit = 5</li>
+            <li>GATE-OFF-Zeit = 7</li>
+            <li>Gesamtzeit = 12</li>
+        </ul>
 
         <figure>
             <img src="126-3.png" alt="">
@@ -164,20 +177,24 @@
 
         <p>Eine 1 im Flag LEGATO bewirkt, daß die GATE-Bits in den SID-Steuerregister nicht zurückgesetzt werden. Dadurch klingen die Töne gebunden. Dazu muß allerdings ein Sustain-Pegel ungleich Null eingestellt sein, sonst ist überhaupt nichts hörbar.</p>
 
-        <p>An allen wichtigen Stellen des Sequenzers wird der Programmfluß über Vektoren weitergeleitet. Damit soll die Möglichkeit, das Programm nachträglich leicht zu erweitern, offengehalten werden. Die Vektoren für die acht Sonderfunktionen wurden schon erwähnt. Außer diesen acht gibt es noch drei weitere Vektoren: TONVEKTOR</p>
+        <p>An allen wichtigen Stellen des Sequenzers wird der Programmfluß über Vektoren weitergeleitet. Damit soll die Möglichkeit, das Programm nachträglich leicht zu erweitern, offengehalten werden. Die Vektoren für die acht Sonderfunktionen wurden schon erwähnt. Außer diesen acht gibt es noch drei weitere Vektoren:</p>
 
-        <p>Er führt das Programm weiter, nachdem die Frequenz für einen Ton-an-Befehl ermittelt wurde. Im vorliegenden Programm wird der Frequenzwert direkt in den SID geschrieben. Bei einem Einsatz zusammen mit dem Modulator muß die Frequenz dagegen in ein Modulator-Register geschrieben werden.<br>
-            EXTRAVEKTOR</p>
+        <ul class="plain">
+            <li>TONVEKTOR
+                <p>Er führt das Programm weiter, nachdem die Frequenz für einen Ton-an-Befehl ermittelt wurde. Im vorliegenden Programm wird der Frequenzwert direkt in den SID geschrieben. Bei einem Einsatz zusammen mit dem Modulator muß die Frequenz dagegen in ein Modulator-Register geschrieben werden.</p>
+            </li>
+            <li>EXTRAVEKTOR
+                <p>Über diesen Vektor kann man weitere Aktionen an einen Sequenzer-Schritt anhängen. Denkbar wäre zum Beispiel die Anzeige der gespielten Noten auf dem Bildschirm in Realtime.</p>
+            </li>
+            <li>IRQAVEKTOR
+                <p>Führt zum Systeminterrupt $EA31. Dieser Vektor muß beim Einsatz mit dem Modulator auf die Startadresse des Modulatorschrittes zeigen.</p>
+            </li>
+        </ul>
 
-        <p>Über diesen Vektor kann man weitere Aktionen an einen Sequenzer-Schritt anhängen. Denkbar wäre zum Beispiel die Anzeige der gespielten Noten auf dem Bildschirm in Realtime.<br>
-            IRQAVEKTOR</p>
-
-        <p>Führt zum Systeminterrupt $EA31. Dieser Vektor muß beim Einsatz mit dem Modulator auf die Startadresse des Modulatorschrittes zeigen.</p>
-
-        <p>Das vorliegende Sequenzerprogramm (Listing 1) belegt den Speicherbereich $C480-$C778. $C480 = 50304 ist gleichzeitig auch die Startadresse (SYS. 50304). Tabelle 1 faßt die wichtigsten Routinen, Variablen und Vektoren des Sequenzer-Programms zusammen.</p>
+        <p>Das vorliegende Sequenzerprogramm (Listing 1) belegt den Speicherbereich $C480-$C778. $C480 = 50304 ist gleichzeitig auch die Startadresse (SYS 50304). Tabelle 1 faßt die wichtigsten Routinen, Variablen und Vektoren des Sequenzer-Programms zusammen.</p>
 
         <figure>
-            <h4>Routinen, Variablen, Vektoren</h3>
+            <h4>Routinen, Variablen, Vektoren</h4>
                 <table class="plain">
                     <tr>
                         <td>$C480</td>
@@ -197,7 +214,7 @@
                     <tr>
                         <td>$C4A9</td>
                         <td>SEQMODUS (1 Byte)</td>
-                        <td>Flag 0 = ganzes Stück spielen<br>Flag 1 = Sequenze wiederholen</td>
+                        <td>Flag 0 = ganzes Stück spielen<br>Flag 1 = Sequenz wiederholen</td>
                     </tr>
                     <tr>
                         <td>$C4AA</td>
@@ -255,11 +272,12 @@
         <p>Das Programmieren von Musikstücken mit Hilfe der Tabelle 2 ist noch etwas mühsam. Ein Editor in der nächsten Ausgabe wird diese Arbeit erleichtern. Mit dem Datensatz aus Listing 2 (»Kobold« aus den »Lyrischen Stücken« von Edvard Grieg) kann man den Sequenzer testen.</p>
 
         <figure>
+            <h4>Kommandoformate innerhalb der Tracks</h4>
             <table class="plain">
-                <tr>
-                    <th>Kommando</th>
-                    <th>Interpretation</th>
-                    <th></th>
+                <tr class="separator strong">
+                    <td>Kommando</td>
+                    <td>Interpretation</td>
+                    <td></td>
                 </tr>
                 <tr>
                     <td>%0000 0000</td>
