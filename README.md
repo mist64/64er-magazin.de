@@ -245,6 +245,8 @@ Die Eingabe-Ausgaben werden aus `issues` gelesen, die Website wird nach `out` ge
 * Sonderheft 5/1985:
     * Abtippen der Listings
         * [hiTCH-HiKER](https://www.forum64.de/wcf/index.php?user/30694-hitch-hiker/)
+        * [64erGrufti](https://www.forum64.de/wcf/index.php?user/30650-64ergrufti/)
+        * [pgeorgi](https://www.forum64.de/wcf/index.php?user/28405-pgeorgi/)
 
 ![](screenshot1.png)
 
