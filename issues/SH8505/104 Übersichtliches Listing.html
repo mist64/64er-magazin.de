@@ -49,7 +49,62 @@
         </figure>
 
         <figure>
-            TODO
+            <pre>2
+20:    3000                   .opt p1
+25:    3000          list     =    $0306
+26:    3000          altlist  =    $a71c
+30:    3000                   *=   $3000
+40:    3000 a9 0b             lda  #&lt;nlist
+50:    3002 8d 06 03          sta  list    ;listvektor verbiegen
+60:    3005 a9 30             lda  #>nlist
+70:    3007 8d 07 03          sta  list +1
+80:    300a 60                rts          ;wieder zu basic
+                      ;--------- neue listroutine -------
+90:    300b 10 03    nlist    bpl  nint    ;pruefung auf inter—
+100:   300d 4c 1c a7          jmp  altlist ;pretercode (>$80)
+110:   3010 c9 3a    nint     cmp  #$3a    ;code fuer
+110:   3012
+120:   3012 f0 03             beq  doppelp ;code gefunden
+130:   3014 4c f3 a6          jmp  $a6f3   ;weiterlisten
+                      ;------- doppelpunkt gefunden —---
+137:   3017 a6 02    doppelp  ldx  2       ;2 laden
+138:   3019 f0 03             beq  ok      ;wenn 0 dann newlist
+139:   301b 4c f3 a6          jmp  $a6f3   ;sonst altlist
+140:   301e a9 0d    ok       lda  #13     ;return
+150:   3020 20 d2 ff          jsr  $ffd2   ;printen
+160:   3023 98                tya          ;y zwischenspeichern
+170:   3024 48                pha          ;fuer spaeter
+                      ;
+                      ;----- berechnung der zu ---------
+                      ;----- printenden spaces  ---------
+210:   3025 a0 02             ldy  #2
+220:   3027 b1 5f             lda  ($5f),y ;zeilennr. lo
+230:   3029 aa                tax          ;merken
+240:   302a c8                iny          ;zeiger erhoehen
+250:   302b b1 5f             lda  ($5f),y ;zeilennr. hi
+260:   302d 85 62             sta  $62
+270:   302f 86 63             stx  $63
+280:   3031 a2 90             ldx  #$90
+290:   3033 38                sec
+300:   3034 20 49 bc          jsr  $bc49   ;zeilennr. in fac
+310:   3037 20 df bd          jsr  $bddf   ;fac nach ascii und $0100
+                      ;              ;nach $0100
+330:   303a a2 00             ldx  #0
+340:   303c bd 00 01 loop     lda  $100,x
+350:   303f f0 03             beq  endloop ;0 = stringende
+360:   3041 e8                inx          ;zaehler fur space
+370:   3042 d0 f8             bne  loop
+                      ;----- space x mal printen-------
+380:   3044 a9 20    endloop  lda  #32     ;space laden
+400:   3046 20 d2 ff prin     jsr  $ffd2   ;printen
+410:   3049 ca                dex
+420:   304a d0 fa             bne  prin    ;schon fertig
+430:   304c 68                pla          ;y wiederholen
+435:   304d a8                tay
+440:   304e a9 20             lda  #32     ;space in accu
+450:   3050 4c f3 a6          jmp  $a6f3   ;accu printen
+                      ;und weiterlisten</pre>
+            <!-- Eingetippt von pgeorgi -->
             <figcaption>Listing 2. Assembler-Listing zu »Übersichtliches Listing«. Es dient nur zur Dokumentation, braucht also nicht eingegeben zu werden.</figcaption>
         </figure>
     </article>

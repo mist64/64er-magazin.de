@@ -62,7 +62,148 @@
     </article>
 
     <figure>
-        TODO
+        <pre>ASSEMBLERLISTING (ASSEMBLER:PROFI-ASS)
+
+NUMERISCHER WERT EINES STRINGS
+
+2
+100:   C010                   .OPT P2,00
+105:   C010                   *=   $C010
+110:   C010          CHRGET   = $73
+115:   C010          CHRGOT   = $79
+120:   C010          FRMEVL   = $AD9E
+130:   C010          H1       = 139
+140:   C010          H2       = 140
+150:   C010          H3       = $C002
+160:   C010          H4       = $C003
+170:   C010          H5       = $C004
+180:   C010          H6       = $C005
+                      ;
+                      ; NUMERISCHER WERT EINES STRINGS
+                      ;
+212:   C010 A5 9D    WERT     LDA  157
+214:   C012 F0 05             BEQ  RUN        ;KEIN DIREKT-MODUS
+216:   C014 A2 15             LDX  #21     ;ILLEGAL DIRECT ERROR
+218:   C016 4C 37 A4          JMP  $A437
+220:   C019 A5 7A    RUN      LDA  $7A     ;PROGRAMMZEIGER SPEICHERN
+230:   C01B 85 8B             STA  H1
+240:   C01D A5 7B             LDA  $7B
+250:   C01F 85 8C             STA  H2
+260:   C021 A0 00             LDY  #0
+270:   C023 B1 7A    X        LDA  ($7A),Y  ;1. ZEICHEH NACH DEM BEFEHL EINLADEN
+280:   C025 F0 0D             BEQ  SYNERR     ;KEIN ZEICHEN DA
+290:   C027 C9 B2             CMP  #$B2
+300:   C029 F0 0E             BEQ  PROGR     ;ZEICHEN EIN '='
+310:   C02B E6 7A             INC  $7A       ;NEIN,DANN NAECHSTES ZEICHEN HOLEN
+320:   C02D D0 F4             BNE  X
+330:   C02F E6 7B             INC  $7B
+340:   C031 4C 23 C0          JMP  X         ;ZURUECK ZUM 'CHECK'
+360:   C034 A2 0B    SYNERR   LDX  #$0B    ;"SYNTAX-ERROR"
+370:   C036 4C 37 A4          JMP  $A437
+                      ;
+390:   C039 20 73 00 PROGR    JSR  CHRGET  ;NAECHSTES ZEICHEN IN AKKU
+400:   C03C 20 9E AD          JSR  FRMEVL   ;AUSWERTEN DES TERMES HINTER '='
+410:   C03F A5 7A             LDA  $7A     ;PROGRAMM-U.ZEILENZEIGER SPEICHERN
+420:   C041 8D 02 C0          STA  H3
+430:   C044 A5 7B             LDA  $7B
+440:   C046 8D 03 C0          STA  H4
+450:   C049 A5 39             LDA  $39
+460:   C04B 8B 04 C0          STA  H5
+470:   C04E A5 3A             LDA  $3A
+480:   C050 8D 05 C0          STA  H6
+490:   C053 A0 00             LDY  #0
+500:   C055 B1 64             LDA  ($64),Y  ;$64/$65 SIND ZEIGER AUF DEN STRINGDESCRIPTOR
+510:   C057 85 61             STA  $61     ;DESCRIPTOR NACH $61-$63 HOLEN
+512:   C059 D0 05             BNE  RI
+514:   C05B A2 0E             LDX  #14
+516:   C05D 4C 37 A4          JMP  $A437   ;FEHLER,WEIL STRING LEER
+520:   C060 C8       RI       INY
+530:   C061 B1 64             LDA  ($64),Y
+540:   C063 85 62             STA  $62
+550:   C065 C8                INY
+560:   C066 B1 64             LDA  ($64),Y
+570:   C068 85 63             STA  $63
+580:   C06A A0 00             LDY  #0
+590:   C06C B1 8B    Z        LDA  (H1),Y  ;1.TEIL DES TERMS IN EINGABEPUFFER
+600:   C06E 99 00 02          STA  $0200,Y
+610:   C071 C8                INY
+620:   C072 C9 B2             CMP  #$B2    ;(Bis zu '=')
+630:   C074 D0 F6             BNE  Z
+635:   C076 A9 3D             LDA  #$3D
+637:   C078 99 FF 01          STA  $01FF,Y  ;'=' IN STRINGCODE WANDELN
+640:   C07B A2 00             LDX  #0
+650:   C07D A1 62    LY       LDA  ($62),X   ;2. TEIL DES TERMS UEBERTRAGEN
+660:   C07F 99 00 02          STA  $0200,Y
+670:   C082 C8                INY
+680:   C083 E6 62             INC  $62
+690:   C085 D0 02             BNE  LZ
+700:   C087 E6 63             INC  $63
+710:   C089 C6 61    LZ       DEC  $61
+720:   C08B D0 F0             BNE  LY
+730:   C08D 8A                TXA
+740:   C08E 99 00 02          STA  $0200,Y    ;LETZTES ZEICHEN = 0
+750:   C091 A9 FF             LDA  #$FF    ;DIREKTMODUS SIMULIEREN
+760:   C093 85 7A             STA  $7A
+770:   C095 A9 01             LDA  #$01
+780:   C097 85 7B             STA  $7B
+790:   C099 A9 80             LDA  #$80
+800:   C09B 20 18 FE          JSR  $FE18
+810:   C09E 20 73 00          JSR  CHRGET   ;1.ZEICHEN AUS EINGABEPUFFER IN AKKU
+820:   C0A1 A2 FF             LDX  #$FF
+830:   C0A3 86 3A             STX  $3A
+840:   C0A5 20 79 A5          JSR  $A579   ;TERM IN INTERPRETERCODE WANDELN
+850:   C0A8 20 73 00          JSR  CHRGET
+860:   C0AB 20 ED A7          JSR  $A7ED   ;BEFEHL AUSFUEHREN
+870:   C0AE AD 02 C0          LDA  H3      ;ZEIGER ZURUECKHOLEN
+880:   C0B1 85 7A             STA  $7A
+890:   C0B3 AD 03 C0          LDA  H4
+900:   C0B6 85 7B             STA  $7B
+910:   C0B8 AD 04 C0          LDA  H5
+920:   C0BB 85 39             STA  $39
+930:   C0BD AD 05 C0          LDA  H6
+940:   C0C0 85 3A             STA  $3A
+950:   C0C2 A9 00             LDA  #0      ;RUN-MODUS WIEDERHERSTELLEN
+960:   C0C4 85 9D             STA  157
+970:   C0C6 60                RTS          ;ZUR INTERPRETERSCHLEIFE
+1000:  C0C7 A9 D2             LDA  #&lt;AUS    ;VEKTOR NEU BESTIMMEN
+1010:  C0C9 8D 08 03          STA  $0308
+1020:  C0CC A9 C0             LDA  #>AUS
+1030:  C0CE 8D 09 03          STA  $0309
+1040:  C0D1 60                RTS
+1050:  C0D2 20 73 00 AUS      JSR  CHRGET   ;BEFEHL "^ ?"
+1060:  C0D5 C9 AE             CMP  #$AE
+1070:  C0D7 F0 0A             BEQ  S
+1072:  C0D9 C9 8B             CMP  #$8B
+1074:  C0DB F0 0C             BEQ  T       ;IF-STRUKTUR
+1080:  C0DD 20 79 00 ST       JSR  CHRGOT
+1090:  C0E0 4C E7 A7          JMP  $A7E7    ;NEIN
+1100:  C0E3 20 10 C0 S        JSR  WERT     ;NEUEN BEFEHL AUSFUEHREN
+1110:  C0E6 4C AE A7          JMP  $A7AE    ;ZUR INTERPRETERSCHLEIFE
+1120:  C0E9 20 F2 C0 T        JSR  IF      ;IF-BEFEHL AUSFUEHREN
+1130:  C0EC 4C AE A7          JMP  $A7AE   ;ZUR INTERPRETERSCHLEIFE
+1140:  C0EF 4C FB A8 R        JMP  $A8FB
+1200:  C0F2 20 73 00 IF       JSR  CHRGET
+1200:  C0F5 20 9E AD          JSR  $AD9E
+1210:  C0F8 20 79 00          JSR  CHRGOT
+1220:  C0FB C9 89             CMP  #$89
+1230:  C0FD F0 05             BEQ  U
+1240:  C0FF A9 A7             LDA  #$A7
+1250:  C101 20 FF AE          JSR  $AEFF
+1260:  C104 A5 61    U        LDA  $61
+1270:  C106 D0 05             BNE  V
+1280:  C108 20 09 A9          JSR  $A909
+1290:  C10B F0 E2             BEQ  R
+1300:  C10D 20 79 00 V        JSR  CHRGOT
+1310:  C110 B0 03             BCS  W
+1320:  C112 4C A0 A8          JMP  $A8A0
+1330:  C115 C9 AE    W        CMP  #$AE
+1340:  C117 F0 06             BEQ  WE
+1350:  C119 C9 8B             CMP  #$8B
+1360:  C11B F0 05             BEQ  IF2
+1370:  C11D D0 BE             BNE  ST
+1380:  C11F 4C 10 C0 WE       JMP  WERT    ;JMP,WEIL NOCH INNERHALB DER IF-STRUKTUR
+1390:  C122 4C F2 C0 IF2      JMP  IF</pre>
+        <!-- Eingetippt von pgeorgi -->
         <figcaption>Listing 2. Assembler-Quell-Listing zu »Variable Funktionen«.</figcaption>
     </figure>
 </body>
