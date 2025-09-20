@@ -26,7 +26,7 @@
 
         <p>Ein ganz wichtiger Punkt ist die Tatsache, daß »E« (ASCII-Code=69) nach Ziffern oder nach einem Punkt keine Variable ist. Dieses wird in Zeile 855 in Verbindung mit Zeile 90 (X2=ASCII-Code des vorausgehenden Zeichens) untersucht. Längere Variablennamen, die im Commodore-Basic vorkommen können, werden in der Programmversion falsch interpretiert. Durch die neue Zeile 952 werden maximal zwei Zeichen und/oder »$,%H,(« (Zeilen 870 beziehungsweise 880) zugelassen. Da das nachfolgende Zeichen bereits in Zeile 870 gelesen werden mußte, sorgt das Flag »Y3« dafür, daß in Zeile 750 dieses Zeichen nicht übersprungen wird (letzteres gilt auch für die Zeile 965 beim Auftreten eines Anführungszeichens).</p>
 
-        <p>Damit die Zeilensprünge in der richtigen Reihenfolge ausgegeben werden, sollten die Sortier-Routine (Zeilen 520 bis 540) und die Ausgabezeilen 650 und 660 entsprechend der Variablen-Ausgabe (siehe Zeilen 990 und 1 140) geändert werden.</p>
+        <p>Damit die Zeilensprünge in der richtigen Reihenfolge ausgegeben werden, sollten die Sortier-Routine (Zeilen 520 bis 540) und die Ausgabezeilen 650 und 660 entsprechend der Variablen-Ausgabe (siehe Zeilen 990 und 1&thinsp;140) geändert werden.</p>
 
         <p>Einige der angesprochenen Punkte werden durch das beiliegende Testprogramm (Listing 2) deutlich. Nach Eingabe der zusätzlichen beziehungsweise geänderten Zeilen dürfte einer guten Programmdokumentation nichts mehr im Wege stehen.</p>
 
@@ -36,57 +36,86 @@
 
         <p>Zuerst einmal ein dickes Lob an Stefan Becker, den Autor der Dokumentationshilfe in der 64’er, Ausgabe 6/85, für sein hervorragendes Programm. Aber auch hier gilt: Kein Programm, das nicht noch besser werden könnte.</p>
 
-        <p>Als erstes fiel mir auf, daß eine Dokumentation von Simons-Basic-Programmen nicht möglich war. Hier die vorläufige Lösung: Folgende Zeilen müssen eingefügt werden:<br>
-            495 ifx=100 then 330<br>
-            805 ifx=34 then y=2<br>
-            806 if x=100 then y=3<br>
-            835 if y=3 and (x=49 or x=50 or x=51) then y=0<br>
-            836 if y=3 goto 750<br>
-            Folgende Zeilen müssen geändert werden:<br>
-            770 if x=34 <u>or x=100</u> or x=131 or x=143 <u>then z=0</u>: goto 800<br>
-            820 if x=34 <u>and y=2</u> goto 750<br>
-            920 &hellip;:va$(i)=<u>v1$</u>+” :”</p>
+        <p>Als erstes fiel mir auf, daß eine Dokumentation von Simons-Basic-Programmen nicht möglich war. Hier die vorläufige Lösung: Folgende Zeilen müssen eingefügt werden:
+            <code>495 if x=100 then 330
+                805 if x=34 then y=2
+                806 if x=100 then y=3
+                835 if y=3 and (x=49 or x=50 or x=51) then y=0
+                836 if y=3 goto 750
+            </code>
+        </p>
 
-        <p>Des weiteren empfand ich es als einigermaßen lästig, bei vielen Variablen ständig die Frage »Wollen Sie Bemerkungen eingeben?« beantworten zu müssen. Nach folgenden Änderungen kann man die Variablen beliebig durchsuchen und mit Text versehen, um danach durch Eingabe von »E« wie Ende zur Ausgabe zu gelangen. Außerdem kann man nun bei Variablen, die sich über mehrere Druckzeilen erstrecken, seine Bemerkungen auf alle zugehörigen Zeilen verteilen. Folgende Zeilen sind einzufügen:<br>
-            1105 if a$ =”e” goto 1180<br>
-            1135 print ”{home}{9down}”le$<br>
-            Folgende Zeilen müssen geändert werden:<br>
-            1080 &hellip;a$&lt;>chr$(13) <u>and a$&lt;>”e”</u> goto 1080<br>
-            1020 open 1,0<br>
-            1160 &hellip;: goto <u>1070</u><br>
-            Die folgenden Zeilen sind zu löschen:<br>
-            1140<br>
-            1150<br>
-            1170</p>
+        <p class="noindent">Folgende Zeilen müssen geändert werden:
+            <code>770 if x=34 <u>or x=100</u> or x=131 or x=143 <u>then z=0</u>: goto 800
+                820 if x=34 <u>and y=2</u> goto 750
+                920 &hellip;:va$(i)=<u>v1$</u>+" :"
+            </code>
+        </p>
 
-        <p>Bei der Ausgabe ohne Zeilennummer genügt es im allgemeinen, wenn eine Variable, auch wenn sie sich über mehrere Zeilen erstreckt, nur einmal ausgegeben wird. Die folgende Lösung berücksichtigt dabei die Bemerkungen, die sich über mehrere Zeilen erstrecken. Es sind folgende Zeilen zu ändern:<br>
-            1272 &hellip;:goto 1275<br>
-            1273 if left$(va$(i+1),4)=left$(va$(i),4) then 1275<br>
-            1274 print#1,left$(va$(i), 8)<br>
-            1275 next i</p>
+        <p>Des weiteren empfand ich es als einigermaßen lästig, bei vielen Variablen ständig die Frage »Wollen Sie Bemerkungen eingeben?« beantworten zu müssen. Nach folgenden Änderungen kann man die Variablen beliebig durchsuchen und mit Text versehen, um danach durch Eingabe von »E« wie Ende zur Ausgabe zu gelangen. Außerdem kann man nun bei Variablen, die sich über mehrere Druckzeilen erstrecken, seine Bemerkungen auf alle zugehörigen Zeilen verteilen. Folgende Zeilen sind einzufügen:
+            <code>1105 if a$ =”e” goto 1180
+                1135 print ”{home}{9down}”le$
+            </code>
+        </p>
 
-        <p>Die Abfrage »Nochmal/Weiter« läßt sich bei einer Ausgabe auf den Drucker durch Einfügen folgender Zeilen vermeiden:<br>
-            685 if dv=4 then 712<br>
-            1245 if dv=4 then 1269</p>
+        <p class="noindent">Folgende Zeilen müssen geändert werden:
+            <code>1080 &hellip;a$&lt;>chr$(13) <u>and a$&lt;>”e”</u> goto 1080
+                1020 open 1,0
+                1160 &hellip;: goto <u>1070</u>
+            </code>
+        </p>
 
-        <p>Meine letzte Anmerkung betrifft die leidige Garbage-Collection (siehe hierzu auch den Kurs »Effektives Programmieren«, 64’er, Ausgabe 1/85), die der Computer durchführt, wenn sein Stringspeicher voll ist, und er weiteren Platz braucht. Bei meinen längeren Programmen lag der Computer spätestens bei der Eingabe von Bemerkungen für längere Zeit stumm und schweigend vor mir. Folgende Änderungen können hier Verbesserung schaffen:<br>
-            1) Die Variable OB in Zeile 150 verkleinern. Sie gibt die Größe der Stringfelder an. Die Dauer der Garbage-Collection hängt aber in etwa vom Quadrat der Variablenzahl ab. Ich halte eine Angabe von QB=200 im Normalfall für völlig ausreichend. Ansonsten erscheint während des Programmlaufs eine entsprechende Fehlermeldung.<br>
-            2) Das Ersetzen der speicherplatzverschwendenden Sortierprozedur durch die SWAP-Routine aus der 64’er, Ausgabe 1/85, Seite 123. Hierzu<br>
-            1) Zeile 550 ersetzen durch:<br>
-            550 sys 6000(ps$(i), ps$(j))<br>
-            2) Zeile 1000 ersetzen durch:<br>
-            1000 sys 6000(va$(i),va$(j))<br>
-            3) Eingabe im Direktmodus:<br>
-            print (peek(45)+256*peek(46))<br>
-            Den erhaltenen Wert aufschreiben!<br>
-            4) In den Zeilen 550 und 1000 den Wert 6000 durch den aufgeschriebenen Wert ersetzen.<br>
-            5) Das Programm mit SAVE”XREF1.0”,8 abspeichern.<br>
-            6) Den Basic-Lader der SWAP-Routine laden und starten.<br>
-            7) Auf die Frage nach der Startadresse den aufgeschriebenen Wert eingeben.<br>
-            8) Das Dokumentationsprogramm mit LOAD”XREF1.0”,8 laden.<br>
-            9) Im Direktmodus eingeben (für »W« dabei den aufgeschriebenen Wert einsetzen):<br>
-            POKE 45,(W+50)AND255:POKE 46,(W+50)/256<br>
-            POKE174,(W+50)AND255:POKE175,(W+50)/256</p>
+        <p class="noindent">Die folgenden Zeilen sind zu löschen:
+            <code>1140
+                1150
+                1170
+            </code>
+        </p>
+
+        <p>Bei der Ausgabe ohne Zeilennummer genügt es im allgemeinen, wenn eine Variable, auch wenn sie sich über mehrere Zeilen erstreckt, nur einmal ausgegeben wird. Die folgende Lösung berücksichtigt dabei die Bemerkungen, die sich über mehrere Zeilen erstrecken. Es sind folgende Zeilen zu ändern:
+            <code>1272 &hellip;:goto 1275
+                1273 if left$(va$(i+1),4)=left$(va$(i),4) then 1275
+                1274 print#1,left$(va$(i), 8)
+                1275 next i
+            </code>
+        </p>
+
+        <p>Die Abfrage »Nochmal/Weiter« läßt sich bei einer Ausgabe auf den Drucker durch Einfügen folgender Zeilen vermeiden:
+            <code>685 if dv=4 then 712
+                1245 if dv=4 then 1269
+            </code>
+        </p>
+
+        <p>Meine letzte Anmerkung betrifft die leidige Garbage-Collection (siehe hierzu auch den Kurs »Effektives Programmieren«, 64’er, Ausgabe 1/85), die der Computer durchführt, wenn sein Stringspeicher voll ist, und er weiteren Platz braucht. Bei meinen längeren Programmen lag der Computer spätestens bei der Eingabe von Bemerkungen für längere Zeit stumm und schweigend vor mir. Folgende Änderungen können hier Verbesserung schaffen:</p>
+
+        <ol>
+            <li>Die Variable OB in Zeile 150 verkleinern. Sie gibt die Größe der Stringfelder an. Die Dauer der Garbage-Collection hängt aber in etwa vom Quadrat der Variablenzahl ab. Ich halte eine Angabe von QB=200 im Normalfall für völlig ausreichend. Ansonsten erscheint während des Programmlaufs eine entsprechende Fehlermeldung.</li>
+            <li>Das Ersetzen der speicherplatzverschwendenden Sortierprozedur durch die SWAP-Routine aus der 64’er, Ausgabe 1/85, Seite 123. Hierzu
+
+                <ol>
+                    <li>Zeile 550 ersetzen durch:
+                        <code>550 sys 6000(ps$(i), ps$(j))</code>
+                    </li>
+                    <li>Zeile 1000 ersetzen durch:
+                        <code>1000 sys 6000(va$(i),va$(j))</code>
+                    </li>
+                    <li>Eingabe im Direktmodus:
+                        <code>print (peek(45)+256*peek(46))</code>
+                        Den erhaltenen Wert aufschreiben!
+                    </li>
+                    <li>In den Zeilen 550 und 1000 den Wert 6000 durch den aufgeschriebenen Wert ersetzen.</li>
+                    <li>Das Programm mit SAVE”XREF1.0”,8 abspeichern.</li>
+                    <li>Den Basic-Lader der SWAP-Routine laden und starten.</li>
+                    <li>Auf die Frage nach der Startadresse den aufgeschriebenen Wert eingeben.</li>
+                    <li>Das Dokumentationsprogramm mit LOAD”XREF1.0”,8 laden.</li>
+                    <li>Im Direktmodus eingeben (für »W« dabei den aufgeschriebenen Wert einsetzen):
+                        <code>POKE 45,(W+50)AND255:POKE 46,(W+50)/256
+                            POKE174,(W+50)AND255:POKE175,(W+50)/256
+                        </code>
+                    </li>
+                </ol>
+            </li>
+        </ol>
 
         <p>Das Programm kann nun mit SAVE”XREF2.0”,8 abgespeichert werden.</p>
 
@@ -100,24 +129,29 @@
 
         <p>Um Cross-Ref trotzdem auch für unsere Datasettenbesitzer zugänglich zu machen, ist folgendes zu beachten:</p>
 
-        <p>Das zu bearbeitende Programm muß in einem »Pseudo-Floppy-Format« gespeichert werden. Dazu das Programm laden und mit folgenden Befehlen im Direktmodus (also ohne Zeilennummern) neu aufs Band schreiben.<br>
-            OPEN 1,1,1,”name” [RETURN]<br>
-            PRINT#1,CHR$(PEEK(43));CHR$(PEEK(44) [RETURN]<br>
-            FORI = PEEK(43) + 256*PEEK(44)TOPEEK(45) + 256*PEEK(46):PRINT#1,CHR$(PEEK(I));:NEXT [RETURN]<br>
-            CLOSE1 [RETURN]</p>
+        <p>Das zu bearbeitende Programm muß in einem »Pseudo-Floppy-Format« gespeichert werden. Dazu das Programm laden und mit folgenden Befehlen im Direktmodus (also ohne Zeilennummern) neu aufs Band schreiben.
+            <code>OPEN 1,1,1,”name” [RETURN]
+                PRINT#1,CHR$(PEEK(43));CHR$(PEEK(44) [RETURN]
+                FORI = PEEK(43) + 256*PEEK(44)TOPEEK(45) + 256*PEEK(46):PRINT#1,CHR$(PEEK(I));:NEXT [RETURN]
+                CLOSE1 [RETURN]
+            </code>
+        </p>
 
-        <p>Das File hat zwar jetzt das richtige Format, aber die Statusabfrage in Zeile 90 ergibt immer noch falsche Werte. Auf Diskette zeigt ein ST=64 nämlich das Ende eines Files an, auf Kassette dagegen bedeutet ST=64, daß ein CHR$(0) folgt! Die folgenden Änderungen berücksichtigen dies:<br>
-            90 GET#1,A$ : X=ASC(A$+N$) : IF X &lt;>0 THEN XX=0 : RETURN<br>
-            95 XX=XX+1 : IF XX&lt;3 THEN RETURN<br>
-            290 OPEN 1,1,0,NA$ : GOSUB 120 : IF X=2049 THEN 310<br>
-            730 OPEN 1,1,0,NA$ : GOSUB 120</p>
+        <p>Das File hat zwar jetzt das richtige Format, aber die Statusabfrage in Zeile 90 ergibt immer noch falsche Werte. Auf Diskette zeigt ein ST=64 nämlich das Ende eines Files an, auf Kassette dagegen bedeutet ST=64, daß ein CHR$(0) folgt! Die folgenden Änderungen berücksichtigen dies:
+            <code>90 GET#1,A$ : X=ASC(A$+N$) : IF X &lt;>0 THEN XX=0 : RETURN
+                95 XX=XX+1 : IF XX&lt;3 THEN RETURN
+                290 OPEN 1,1,0,NA$ : GOSUB 120 : IF X=2049 THEN 310
+                730 OPEN 1,1,0,NA$ : GOSUB 120
+            </code>
+        </p>
 
         <p>Die Zeilen 1290 bis 1310 entfallen.</p>
 
         <address class="author">(Stefan Becker/tr)</address>
 
-        <p>Anmerkung der Redaktion:<br>
-            Auf der Leserservice-Diskette dieser Ausgabe befindet sich »Cross-Ref« in der verbesserten Version von Gerhard Löber und die Simons Basic-Version von Lutz Kleinostendarp. Auch ist die Löber-Version zusätzlich compiliert worden. Diese Version können wir allen Lesern wegen der gewaltigen Geschwindigkeitsvorteile nur empfehlen.</p>
+        <p class="noindent">Anmerkung der Redaktion:</p>
+
+        <p>Auf der Leserservice-Diskette dieser Ausgabe befindet sich »Cross-Ref« in der verbesserten Version von Gerhard Löber und die Simons Basic-Version von Lutz Kleinostendarp. Auch ist die Löber-Version zusätzlich compiliert worden. Diese Version können wir allen Lesern wegen der gewaltigen Geschwindigkeitsvorteile nur empfehlen.</p>
     </article>
 
     <div style="display: none">
