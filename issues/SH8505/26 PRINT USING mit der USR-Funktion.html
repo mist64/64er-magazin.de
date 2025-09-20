@@ -35,7 +35,233 @@
         </figure>
 
         <figure>
-            TODO
+            <pre>1000                ; f o r m a t r o u t i n e
+1010                ; -------------------------
+1020                ;
+1030                ;            dr.m.irskens
+1040                ;            leveser allee 13
+1050                ;            3061 hespe
+1060                ;
+1070                ;
+1080 space          equ 32    ; ' '
+1090 komma          equ 44    ; ','
+1100 e              equ 69    ; 'e'
+1110 punkt          equ 46    ; '.'
+1120 null           equ 48    ; '0'
+1130 minus          equ 45    ; '-'
+1140 ckcom          equ $aefd ; prueft auf komma
+1150 getstr         equ $b487 ; string aus stringpuffer in stringbereich
+1160 numtest        equ $ad8d ; ergebnis auf numerisch pruefen
+1170 facstr         equ $bddd ; fac in string wandeln
+1180 getbyt         equ $b79e ; byte holen
+1190 string         equ $100  ; string-puffer
+1200 temp           equ $02   ; temporaerer speicher
+1210 nk             equ $57   ; fliesskomma-akku#3
+1220 flen           equ $58
+1230                *equ $c000 ;startadresse
+1240 fo10           jsr numtest ;auf numerisch pruefen
+1250                jsr facstr ;umwandeln numerisch->alpha
+1260                jsr ckcom  ;auf komma pruefen
+1270                jsr getbyt ;feldlaenge holen
+1280                stx flen
+1290                jsr ckcom  ;auf komma pruefen
+1300                jsr getbyt ;nachkommastellenzahl holen
+1310                stx nk
+1320                pla        ; ruecksprungadresse vom stack entfernen,
+1330                pla        ; damit kein numtest durchgefuehrt wird
+1340                ;
+1350                ; pruefen auf darstellung im e-format
+1360                ; x-register equ stringlaenge
+1370                ; y-register equ anzahl vorkommastellen
+1380                ; y-register equ 0, wenn keine nachkommastellen gefunden
+1390 fo19           ldx #$ff
+1400                ldy #0
+1410 fo20           inx
+1420                lda string,x ;zeichen aus puffer laden
+1430                beq fo30   ;0->stringende
+1440                cmp #e     ;vergleich auf 'e'
+1450                beq fo201  ;e-format umwandeln
+1460                cmp #punkt  ;vergleich auf '.'
+1470                bne fo20
+1480                txa
+1490                tay         ;anzahl vorkommastellen in y-register
+1500                bne fo20
+1510                ;
+1520                ; umwandeln e-format
+1530                ;
+1540 fo201          lda string+2
+1550                cmp #punkt
+1560                bne fo22
+1570                ;
+1580                ; dezimalpunkt entfernen
+1590                ;
+1600                dex
+1610                ldy #1
+1620 fo21           iny
+1630                lda string+1,y
+1640                sta string,y
+1650                bne fo21
+1660                ;
+1670                ; stellenverschiebung errechnen
+1680                ;
+1690 fo22           lda string+2,x ; zehnerstelle exponent
+1700                and #$0f   ; ziffer errechnen
+1710                asl a      ; *2
+1720                sta temp
+1730                asl a      ; *4
+1740                asl a      ; *8
+1750                adc temp   ; 8* + 2* equ 10*
+1760                adc string+3,x; +einerstelle ascii
+1770                sbc #47    ; ascii 0 abziehen
+1780                ldy string+1,x ; vorzeichen exponent
+1790                cpy #minus
+1800                beq fo24
+1810                adc #3
+1820                stx temp
+1830                sbc temp
+1840                tay
+1850                lda #null
+1860 fo23           sta string,x ; string mit nullen erweitern fuer + exponent
+1870                inx
+1880                dey
+1890                bne fo23
+1900                lda #0
+1910                sta string,x ; neues stringende
+1920                beq fo19
+1930                ;
+1940                ; exponent&lt;0: vornullen ergaenzen
+1950                ; string um a-reg.+1 stellen verschieben
+1960 fo24           sta temp
+1970                lda #0
+1980                sta string,x ; "e" durch 0 ersetzen
+1990                txa
+2000                clc
+2010                adc temp
+2020                tay
+2030 fo25           lda string,x
+2040                beq fo26   ; stringende uebertragen
+2050                cmp #$30   ; vergleich auf ziffer
+2060                bcs fo26   ; ziffer
+2070                lda #null
+2080                bne f027
+2090 fo26           dex
+2100 fo27           sta string,y
+2110                dey
+2120                bne fo25
+2130                lda #punkt
+2140                sta string+1
+2150                bne fo19
+2160                ;
+2170                ; dezimalpunkt durch komma ersetzen
+2180                ; y-register: anzahl vorkommazeichen
+2190                ;
+2200 fo30           tya
+2210                beq fo50   ;nachkommastellen ergaenzen
+2220                lda nk
+2230                bne fo45  ; nachkommastellen
+2240                tya
+2250                tax
+2260                lda string+1,x
+2270                bne fo901 ; keine nachkommastellen, aber runden
+2280 fo45           lda #komma ; '.' gefunden
+2290                sta string,y ;durch ',' ersetzen
+2300                bne fo71
+2310 fo50           cpy nk     ;nachkommastellen ergaenzen
+2320                beq fo100
+2330                lda #komma
+2340                sta string,x
+2350                inx
+2360                bne fo79
+2370 fo71           sty temp   ;anzahl nachkommastellen errechnen
+2380                sec
+2390                txa
+2400                sbc temp
+2410                sec
+2420                sbc #1    ;1 abziehen fuer dezimalpunkt
+2430                cmp nk    ;vergleichen mit sollanzahl
+2440                beq fo100 ;anzahl gleich
+2450                bcs fo90  ;anzahl > soll
+2460                tay       ;anzahl &lt; soll
+2470 fo79           lda #null
+2480 fo80           sta string,x ;string mit nullen ergaenzen
+2490                inx
+2500                iny
+2510                cpy nk
+2520                bne fo80
+2530 fo85           lda #0
+2540                sta string,x
+2550                ;
+2560                ; nachkommastellen aufbereitet
+2570                ; gesamtfeldlaenge korrigieren
+2580                ;
+2590                ; x-reg feldlaenge aktuell
+2600                ; flen gesamtlaenge soll
+2610 fo100          lda string+1
+2620                cmp #$30
+2630                bcs fo109    ; 1.zeichen ist eine ziffer
+2640                inx
+2650                txa
+2660                tay
+2670 fo105          lda string-1,y
+2680                sta string,y
+2690                dey
+2700                bne fo105
+2710                lda #null  ; null vor komma ergaenzen
+2720                sta string+1
+2730 fo109          cpx flen
+2740                bcs fo130 ;feldueberlauf oder feldlaenge gleich
+2750                ldy flen
+2760 fo110          lda string,x;string verschieben
+2770                sta string,y
+2780                dey
+2790                dex
+2800                bpl fo110
+2810                lda #space ;leerzeichen
+2820 fo120          sta string,y ;rest mit leerzeichen fuellen
+2830                dey
+2840                bpl fo120
+2850 fo130          lda #&lt;string ;startadresse string laden in a/y
+2860                ldy #>string
+2870                jmp getstr
+2880 fo90           sec
+2890                sbc nk
+2900                sta temp  ;anzahl ueberfluessiger nachkommastellen
+2910                txa
+2920                sec
+2930                sbc temp  ;neue stringlaenge
+2940                tax
+2950                ;
+2960                ; beim abschneiden von nachkommastellen runden
+2970                ;
+2980                lda string,x
+2990 fo901          cmp #$35
+3000                bcc fo85
+3010                txa
+3020                tay         ; index letztes zeichen
+3030 fo91           dey
+3040                beq fo92  ; string eine 1 voranstellen
+3050                lda string,y
+3060                cmp #$30   ; vergl &lt; "0"
+3070                bcc fo91
+3080                clc
+3090                adc #1     ; ziffer um eins erhoehen
+3100                cmp #$3a   ; ueberlauf abfragen
+3110                sta string,y ; veraendertes zeichen speichern
+3120                bne fo85   ; kein uebertrag
+3130                lda #null  ; null laden
+3140                sta string,y
+3150                bne fo91   ; naechste ziffer erhoehen
+3160 fo92           txa        ; string um eine stelle verschieben fuer "1"
+3170                tay
+3180 fo94           lda string,y
+3190                sta string+1,y
+3200                dey
+3210                bne fo94
+3220                lda #$31   ; "1" laden
+3230                sta string+1
+3240                inx      ; feldlaenge erhoehen
+3250                bne fo85</string>
+            <!-- Eingetippt von Endurion und goloMAK -->
             <figcaption>Listing 1. PRINT USING-Quellprogramm</figcaption>
         </figure>
         <figure>
