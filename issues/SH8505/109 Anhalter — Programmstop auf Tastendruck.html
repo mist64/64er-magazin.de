@@ -38,7 +38,34 @@
         </figure>
 
         <figure>
-            TODO
+            <pre>,C000    7B          SEI            ;Interrupt abschalten
+,C001    A9  0D      LDA    #$0D    ;Interrupt auf C00D
+,C003    8D  14  03  STA    $0314   ;setzen
+,C006    A9  C0      LDA    #$C0    ;
+,C008    8D  15  03  STA    $0315   ;
+,C00B    58          CLI            ;Interrupt zulassen
+,C00C    60          RTS            ;Rückkehr zum Basic
+,C00D    A5  CB      LDA    $CB     ;hole Wert der letzten
+                                    gedrückten Taste
+,C00F    C9  04      CMP    #$04    ;vergleiche mit Wert
+                                    für F1-Taste
+,C011    F0  03      BEQ    $C016   ;verzweige:ja
+                                    =eig.Routine,
+                                    nein=norm.IRQ
+,C013    4C  31  EA  JMP    $EA31   ;verlasse
+                                    Routine zum normalen
+                                    IRQ
+,C016    20  87  EA  JSR    $EA87   ;springe zur normalen
+                                    Tastaturabfrage
+,C019    A5  CB      LDA    $CB     ;hole Wert der letzten
+                                    gedrückten Taste
+,C01B    C9  40      CMP    #$40    ;vergleiche mit $40
+                                    (#64) = keine Taste
+,C01D    F0  F7      BEQ    $C016   ;wenn keine Taste,
+                                    dann zur Tastaturabf.
+,C01F    4C  31  EA  JMP    $EA31   ;wenn Taste gedrückt,
+                                    dann norm. IRQ</pre>
+            <!-- Eingetippt von goloMAK -->
             <figcaption>Listing 2. Schnell eingegeben und leicht zu verstehen — der Source-Code von »Anhalter«</figcaption>
         </figure>
     </article>
