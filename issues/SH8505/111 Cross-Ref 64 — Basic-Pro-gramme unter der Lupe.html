@@ -137,7 +137,1305 @@
         <div class="binary_download" data-filename="cross-ref 64.prg" data-name="Cross-Ref 64"></div>
 
         <figure>
-            TODO
+            <pre>        * = $C000
+AKOPADR   = $F7
+NKOPADR   = $F9
+CHRGET    = $0073
+CHRGOT    = $0079
+GETZEIL   = $A96B
+TABENDL   = $57
+TABENDH   = $58
+ZEI1L     = $FB
+ZEI1H     = $FC
+ZEI2L     = $FD
+ZEI2H     = $FE
+LAENGE    = $B6
+TEMP      = $BD
+;***************************************
+         JMP SCONTROL
+VAR      JSR VSTART  ; SUCHT VARIABLEN
+         JSR DRVAR   ; AUSGABE V. KOPF
+         JSR VAROUT  ;    "    DER VAR.
+         JMP CARET2  ; ZEILENVORSCHUB
+VAR2     LDA SYSTAT   ; VAR. IN REIHENF.
+         LSR A        ;
+         LSR A        ;
+         BCS VAR3     ;
+         JSR VSTART    ; NEIN: SUCHEN
+VAR3     JSR INTEND  ; TAB. UM 1 KUERZ.
+         JSR INIT     ; INITIALISIEREN
+         JSR TESTTAB ; TABELLE LEER?
+         BCS LVAR2
+         RTS         ; JA: RTS
+LVAR2    JSR SORT     ; TAB. SORTIEREN
+         JSR DECTEND
+         JSR DRVAR
+         JSR VAROUT
+         JMP CARET2
+SPR      JSR SPRUNG  ; SPRUENGE SUCHEN
+         JSR CARET2  ; UND AUSGEBEN
+         JMP INTEND
+AN       JSR INIT    ; ANGESPRUNGENE
+         JSR TESTTAB ; ZEILEN AUSGEBEN
+         BCS LAN1
+         RTS
+LAN1     JSR SORT
+         JSR DECTEND
+         JSR DRAN
+         JSR ZIELE
+         JMP CARET2
+         ;
+VSTART   LDA #$6     ; = ZNR+CODE+ZNR
+         STA LAENGE
+         JSR SETTAB
+         JSR SETBER
+         JMP VZEILE2
+VZEILE   JSR NEXTLINE
+VZEILE2  LDA #%10000000
+         STA DBSTAT
+         LDA TEMP    ; KODE FUER ENDE?
+         CMP #$FF    ; NEIN: WEITER
+         BNE VARLOOP ; JA: ENDE
+         RTS
+VARLOOP  JSR NXTCHR
+         CMP #$20
+         BEQ VARLOOP
+         CMP #0      ; ZEILENENDE ?
+         BEQ VZEILE
+         CMP #$22    ; =" ODER = REM?
+         BEQ VARSUCH ; DANN BIS " O.
+         CMP #$8F    ; NEUE ZEILE
+         BEQ VZEILE  ; WEITER
+         CMP #$A7    ; THEN
+         BEQ SETDB
+         CMP #$88    ; LET
+         BEQ SETDB
+         CMP #':     ; STATEMENT
+         BEQ SETDB
+         CMP #$81    ; FOR
+         BEQ SETDB
+         JSR CHKALPH
+         BCC LTEST1
+         JSR VARGET
+         JSR INZEI1
+         JSR OVFLOW
+LTEST1   LDX #%00000000
+         STX DBSTAT
+         JMP VARLOOP
+SETDB    LDX #%10000000
+         STX DBSTAT
+         JMP VARLOOP
+VARSUCH  JSR NXTCHR
+         CMP #$22
+         BEQ LWS1
+         CMP #0
+         BEQ LWS2
+         JMP VARSUCH
+LWS1     JMP VARLOOP
+LWS2     JSR NEXTLINE
+         JMP VARLOOP
+         ;
+SPRUNG   LDA #5      ; = ZNR+CODE+ZNR
+         STA LAENGE
+         STA LINES   ; LF NACH 5 ZEILEN
+         JSR SETTAB
+         JSR SETBER
+         LDA TEMP
+         CMP #$FF
+         BEQ SZEILE2
+         JSR DRSPR
+         LDA #0
+         STA ZLANG
+         JMP SZEILE1
+SZEILE   JSR NEXTLINE
+SZEILE1  LDA TEMP    ; KODE FUER ENDE?
+         CMP #$FF
+         BNE SZEILE2
+         RTS
+SZEILE2  LDA #%00000001 ; STATUS FUER
+         STA THSTAT     ; 5 LEERZEICHEN
+SPRLOOP  JSR NXTCHR
+         CMP #0         ; ZEILENENDE ?
+         BEQ SZEILE
+         CMP #$22      ; =" ODER = REM?
+         BEQ SPRSUCH    ; DANN BIS " O.
+         CMP #$8F       ; NEUE ZEILE
+         BEQ SZEILE     ; WEITER
+         CMP #$89       ; GOTO ?
+         BEQ CGOTO
+         CMP #$8D       ; GOSUB ?
+         BEQ CGOSUB
+         CMP #$A7       ; THEN ?
+         BEQ CTHEN
+         CMP #$8A       ; RUN ?
+         BEQ CRUN
+         CMP #$91       ; ON ?
+         BEQ CON
+         CMP #$81       ; FOR ?
+         BEQ CFOR
+         CMP #$82       ; NEXT ?
+         BEQ CNEXT
+         JMP SPRLOOP
+CGOTO    JMP GOTO
+CGOSUB   JMP GOSUB
+CTHEN    JMP THEN
+CRUN     JMP RUN
+CON      JMP ON
+CFOR     JMP FOR
+CNEXT    JMP NEXT
+         JMP SPRLOOP
+SPRSUCH  JSR NXTCHR
+         CMP #$22
+         BEQ LSS1
+         CMP #0
+         BEQ LSS2
+         JMP SPRSUCH
+LSS1     JMP SPRLOOP
+LSS2     JSR NEXTLINE
+         JMP SPRLOOP
+         ;
+GOTO     JSR ZEILOUT
+         LDA #%00000010
+         JMP AUSGABE
+         ;
+GOSUB    JSR ZEILOUT
+         LDA #%00000100
+         JMP AUSGABE
+         ;
+RUN      JSR CHKSPC   ; NAE. ZCHN NUM.?
+         JSR CHKNUM   ; JA: AUSGABE
+         BCC LRUN1    ; NEIN: WEITER
+         JSR ZEILOUT
+         DEC POINTER  ; DA CHKSPC AUF N.
+         LDY POINTER  ; ZCHN STELLT
+         LDA #%00010000
+         JMP AUSGABE
+LRUN1    JMP SPRLOOP
+         ;
+FOR      JSR ZEILOUT
+         INC FANZ    ; OFFENE FOR+1
+         LDA #%01000000
+         STA TSTAT
+         JSR TEXTAUS
+LFOR1    JSR CHKSPC  ; TEXT BIS '=' AUS-
+         CMP #$B2    ; GEBEN ('=':$B2)
+         BEQ LFOR2   ;
+         JSR CHROUT  ; GEBEN
+         JMP LFOR1
+LFOR2    JSR LINEFEED
+         JMP SPRLOOP
+         ;
+NEXT     LDA POINTER
+         PHA
+NEXT1    DEC FANZ
+NEXT2    JSR NXTCHR
+         JSR TRZCHN
+         BEQ NEXT3
+         CMP #',
+         BEQ NEXT1
+         JMP NEXT2
+NEXT3    PLA
+         STA POINTER
+         JSR ZEILOUT
+         LDA #%00100000
+         STA TSTAT
+         JSR TEXTAUS
+LNEXT1   JSR CHKSPC
+         JSR TRZCHN  ; SOLANGE ZCHN
+         BEQ LNEXT3  ; AUSG. BIS Z.ENDE
+         JSR CHROUT
+         JMP LNEXT1
+LNEXT3   JSR LINEFEED
+         JMP SPRLOOP
+         ;
+ON       JSR ZEILOUT
+LON1     JSR CHKSPC
+         CMP #$89        ; GOTO ?
+         BEQ ONTO
+         CMP #$8D        ; GOSUB?
+         BEQ ONSUB
+         JMP LON1
+ONTO     LDA #%00001010
+         JMP LON2
+ONSUB    LDA #%00001100
+LON2     JSR SORCOD
+         LDA TSTAT
+         AND #%11111110
+         STA TEMP
+         STA TSTAT
+         LDX #0
+         JSR TEXTAUS
+         JSR TABS
+         JSR CHKSPC
+         DEC POINTER
+         JSR SETGET
+LON3     LDA TEMP
+         JSR TSPRUNG ; SPR.ART, ZNR U.
+         JSR GETSPR2 ; ZIEL IN TABELLE
+         JSR CHRGOT  ; ENDE STATEMENT?
+         BEQ LON4    ; JA: LINEFEED
+         CMP #',     ; WEITERE ZEILENNR.
+         BNE LON3    ; NEIN: LINEFEED
+         JSR CHROUT
+         LDA ZLANG
+         CMP #75
+         BCC LON3
+         JSR CARET     ; LINEFEED
+         JSR TABS
+         JSR TABS
+         JSR TABS
+         JMP LON3
+LON4     JSR FUNFLIN
+         JSR CARET
+         JMP SPRLOOP
+         ;
+TSPRUNG  LDY #2
+         STA (ZEI1L),Y
+         JSR ZNR      ; ZNR AUS $14/$15
+         LDY #3       ; IN TABELLE
+         LDA $62
+         STA (ZEI1L),Y
+         INY
+         LDA $63
+         STA (ZEI1L),Y
+         RTS
+         ;
+THEN     JSR CHKSPC
+         JSR CHKNUM  ; ZIFFER?
+         BCC THENDE  ;
+         JSR ZEILOUT ; THEN MIT ZEILE
+         LDA #%10000000
+         JSR SORCOD
+         DEC POINTER ; EIN ZCHN ZURUECK,
+         LDY POINTER ; DA CHKNUM ZU WEIT
+         JMP AUSGABE
+THENDE   DEC POINTER ; TH-BIT SETZEN
+         LDA #%10000000
+         STA THSTAT
+         JMP SPRLOOP
+         ;
+AUSGABE  STA TSTAT
+         JSR SORCOD
+         JSR TEXTAUS
+         JSR TABS
+         JSR GETSPR  ; ZIEL IN TABELLE
+         JSR LINEFEED ; UND AUSGEBEN
+         JMP SPRLOOP
+         ;
+
+;***************************************
+;         UNTERROUTINEN
+;***************************************
+INIT     JSR ROMOFF
+         LDA #0
+         STA ZSTAT
+         STA ZLANG
+         STA FANZ
+         STA TSTAT
+         STA TEMP
+         STA DBSTAT
+         STA TABENDL
+         LDA #$A0
+         STA TABENDH
+         LDA #$F9
+         STA TABSTRTL
+         STA ZEI1L    ; ANFANG DER TAB-
+         LDA #$BF     ; BELLE AB $BFF9
+         STA TABSTRTH
+         STA ZEI1H
+         JMP BASTRT
+         ;
+NEXTLINE LDY #0
+         LDA (NKOPADR),Y
+         BNE LNL1
+         INY
+         LDA (NKOPADR),Y
+         BEQ NLENDE
+LNL1     LDA NKOPADR
+         STA AKOPADR
+         LDA NKOPADR +1
+         STA AKOPADR +1
+         JSR CKBEN ; ENDE BEREICH?
+         BEQ LNL2  ; NEIN
+         BCC LNL2  ;
+         ;
+NLENDE   LDA ZEI1L  ; SETZT TABELLEN-
+         STA TENDL  ; ENDE AUF ZEI1
+         LDA ZEI1H
+         STA TENDH
+         LDA #$FF       ; KODE FUER
+         STA TEMP       ; ENDE TESTLOOP
+         RTS
+         ;
+LNL2     LDA ZSTAT
+         AND #%1110     ; ZNR FLAG LOE.
+         STA ZSTAT
+         LDY #3         ; ZEIGT AUF 0.
+         STY POINTER    ; BASIC-ZEICHEN
+         LDY #0
+         LDA (AKOPADR),Y   ; ZEIGER AUF
+         STA NKOPADR       ; NAECHSTE B.
+         INY               ; ZEILE HOLEN
+         LDA (AKOPADR),Y
+         STA NKOPADR +1
+         RTS
+         ;
+;=======================================
+;  HOLT SYSTEM-PARAMETER (SYSTAT)
+;   SETZT DRUCKER
+;   HOLT BEREICH (IN BERST/EN)
+;=======================================
+SYSGET   LDA #0
+         STA SYSTAT
+         STA BERSTL
+         STA BERSTH
+         LDA #$FF
+         STA BERENL
+         STA BERENH
+         JSR CHRGOT
+         CMP #',
+         BEQ LSYS0
+         LDX #$0B
+         JMP $A437     ; FEHLER: SYNTAX
+LSYS0    JSR CHRGET    ; DRUCKER
+         CMP #'P
+         BNE LSYS1
+         JSR SETPRT
+LSYS1    JSR CHRGET
+         CMP #'S
+         BNE LSYS2
+         LDA #%01000
+         JSR SETSYS
+LSYS2    JSR CHRGET  ; ANGESPR. ZEILEN?
+         CMP #'J
+         BNE LSYS3
+         LDA #%00100
+         JSR SETSYS
+LSYS3    JSR CHRGET  ; VARIABLEN ?
+         CMP #'V
+         BNE LSYS4
+         LDA #%00010
+         JSR SETSYS
+LSYS4    JSR CHRGET  ; VARIABLEN SORT.?
+         CMP #'J
+         BNE LSYS5
+         LDA #%00001
+         JSR SETSYS
+LSYS5    JSR CHRGET  ; KOMMENTAR ?
+         CMP #'K
+         BNE LSYS6
+         LDA #%10000
+         JSR SETSYS
+         JSR CHRGET
+LSYS6    CMP #',     ; FOLGEN ZNRS?
+         BNE LSYS8   ; NEIN: RTS
+         CMP #$AB    ; "-"
+         BEQ LSYS7
+         JSR CHRGET
+         JSR GETZEIL
+         LDA $14
+         STA BERSTL
+         LDA $15
+         STA BERSTH
+         JSR CHRGOT
+         CMP #$AB     ; "-"
+         BNE LSYS8    ; NEIN: ENDE
+LSYS7    JSR CHRGET
+         JSR GETZEIL
+         LDA $14
+         STA BERENL
+         LDA $15
+         STA BERENH
+LSYS8    RTS
+         ;
+SETSYS   ORA SYSTAT   ; &lt;AC> MIT SYSTAT
+         STA SYSTAT   ; VERKNUEPFEN
+         RTS
+         ;
+;***************************************
+CKBST    JSR ZNR    ; TEST, OB AKT. ZNR
+         CPX BERSTH ; GROESSER ODER
+         BNE LBST1  ; GLEICH BER. ANF
+         CMP BERSTL
+LBST1    RTS
+         ;
+CKBEN    JSR ZNR    ; TEST, OB AKT. ZNR
+         CPX BERENH ; GROESSER ODER
+         BNE LBEN1  ; GLEICH BER. ENDE
+         CMP BERENL
+LBEN1    RTS
+         ;
+SETTAB   LDA #$A0
+         STA TABENDH
+         LDA #$00
+         STA TABENDL
+         RTS
+         ;
+SETBER   JSR INIT
+LBER1    JSR NEXTLINE
+         LDA TEMP
+         CMP #$FF
+         BNE LBER2
+         JSR SYSOFF
+         JMP $A7AE
+LBER2    JSR CKBST
+         BCC LBER1
+         RTS
+         ;
+BASTRT   LDA $2B     ; ADDRESSE DER
+         STA NKOPADR ; ERSTEN BASIC
+         LDA $2C     ; ZEILE HOLEN
+         STA NKOPADR +1
+         RTS
+         ;
+PREVCHR  DEC POINTER ; HOLT VORIGES
+         JSR AKTCHR  ; ZCHN, OHNE
+         INC POINTER ; ZEIGER ZU
+         RTS         ; VERSTELLEN
+         ;
+NXTCHR   INC POINTER ; HOLT NAECHSTES
+         ;           ; ZEICHEN
+AKTCHR   LDY POINTER
+         LDA (AKOPADR), Y
+         RTS
+         ;
+GET      JSR ROMON
+         JSR $F13E
+         JMP ROMOFF
+         ;
+CHROUT   INC ZLANG
+         JSR ROMON
+         JSR $FFD2
+         ;
+ROMOFF   PHA
+         LDA 1
+         AND #%11111110
+         STA 1
+         PLA
+         RTS
+         ;
+ROMON    PHA
+         LDA #$37
+         STA 1
+         PLA
+         RTS
+         ;
+CHKALPH  JSR ROMON ; TEST, OB AKKU ALPHA
+         JSR $B113  ; C=1, WENN BUCHST.
+         JMP ROMOFF ; C=0, WENN ANDERS
+         ;
+CHKNUM   CMP #$3A ; GROESSER ALS '9'?
+         BPL LCN1
+         CMP #$30 ; KLEINER ALS '0'?
+         BMI LCN1 ; JA: C=0
+         SEC      ; NEIN: C=1
+         RTS
+LCN1     CLC
+         RTS
+         ;
+CHKSPC   JSR NXTCHR
+         CMP #$20
+         BEQ CHKSPC
+         RTS
+         ;
+TRZCHN   CMP #0    ; TESTET AUF NULL
+         BEQ LTZ1  ; UND ':'
+         CMP #':   ; JA:   Z=1
+         BEQ LTZ1  ; NEIN: Z=0
+LTZ1     RTS
+         ;
+TESTTAB  LDA TABSTRTH
+         CMP TENDH
+         BNE LTETA
+         LDA TABSTRTL
+         CMP TENDL
+LTETA    RTS
+         ;
+OVFLOW   JSR TESTEND
+         BCS LOVF
+         JSR SYSOFF
+         LDA #&lt;TOVER
+         LDX #>TOVER
+         JSR MASKE
+         JMP $A7AE
+LOVF     RTS
+         ;
+ZEILOUT  JSR ZNR   ; ZNR NACH $62/$63
+         LDY #4        ; ZNR IN TAB
+         STA (ZEI1L),Y
+         DEY
+         TXA
+         STA (ZEI1L),Y
+         LDA #0
+         STA TEMP
+         LDA ZSTAT   ; BEI 1 KEINE ZNR
+         LSR A
+         BCS LZO1
+         LDA ZSTAT   ; ZNR-FLAG =1
+         ORA #%0001
+         STA ZSTAT
+         JSR ZAUSGABE
+         LDX #39
+         LDY #2
+         JMP LZO2
+LZO1     LDX #34
+         LDY #7
+LZO2     LDA FANZ  ; FOR OFFEN?
+         STA $63
+         BEQ LZO3  ; NEIN: RTS
+         STA TEMP
+         JSR LTA2
+         LDA #0
+         STA $62
+         JSR ZAUSGABE
+LZO3     LDA #0
+         STA TEMP
+         JMP TABS
+         ;
+ZNR      LDY #3           ; HOLT NR. DER
+         LDA (AKOPADR), Y ; AKT. ZEILE
+         TAX              ; NACH $62/$63
+         DEY              ; UND A,X
+         LDA (AKOPADR), Y
+         STX $62
+         STA $63
+         RTS
+         ;
+ZAUSGABE JSR ROMON
+         LDX #$90  ;$62/$63 WIRD ALS
+         SEC       ;INTEGERZAHL IM
+         JSR $BC49 ;16-BIT ADDRESS-
+         JSR $BDDF ;FORMAT AUSGEGEBEN
+         JSR STROUT ; $AB1E
+         JMP ROMOFF
+         ;
+RECBUN   EOR #$FF
+         ADC #6
+         TAY
+LREC1    BEQ LREC2
+         LDA #$20
+         JSR CHROUT
+         DEY
+         JMP LREC1
+LREC2    RTS
+         ;
+LINEFEED LDA ZSTAT
+         LSR A     ; BEI BIT 1=0
+         LSR A     ; KEIN LF
+         BCC LLF1
+         JSR FUNFLIN
+         JMP CARET
+LLF1     LDX ZLANG ; KEIN LF, DANN
+         CPX #40   ; BIS POS. 40
+         BCS LLF2  ; AUFFUELLEN
+         LDA #$20
+         JSR CHROUT
+         JMP LLF1
+LLF2     LDA ZSTAT
+         ORA #%0010 ; LF-FLAG SETZEN
+         STA ZSTAT
+         RTS
+         ;
+CARET    LDA ZSTAT ; LF-FLAG LOESCHEN
+         AND #%1101
+         STA ZSTAT
+CARET2   LDA #$0D
+         JSR CHROUT
+         LDA #0      ; ZEILENLAENGE:=0
+         STA ZLANG
+CARET3   JSR GET     ; TASTE GEDRUECKT?
+         BEQ LCAR4   ; NEIN: RTS
+LCAR1    CMP #3      ; RUN/STOP?
+         BNE LCAR3
+LCAR2    JSR SYSOFF  ; JA
+         LDA #&lt;TBREAK
+         LDX #>TBREAK
+         JSR MASKE
+         JMP $A7AE
+LCAR3    JSR GET     ; 2. TASTE
+         BEQ LCAR3   ; FUER CONT.
+         CMP #3
+         BEQ LCAR2
+LCAR4    RTS
+         ;
+FUNFLIN  DEC LINES
+         BNE LFUNF1
+         LDA #5
+         STA LINES
+         JSR CARET
+LFUNF1   RTS
+         ;
+TABS     LDA ZLANG ; ZEILENLAENGE HOL.
+         SEC
+LTAB1    SBC #10   ; SOLANGE POSITIV
+         BCS LTAB1 ; 10 ADDIEREN
+         EOR #$FF  ; ERGEBNIS INVERT.
+         ADC #1
+         TAX
+         INX
+LTAB2    DEX
+         BEQ LTAB3
+         LDA #$20
+         JSR CHROUT
+         JMP LTAB2
+LTAB3    RTS
+         ;
+SETPRT   LDA #4
+         LDX #4
+         LDY #$68  ; SEK 8 + $60
+         JSR $FFBA ; FILPAR
+         JSR $FFB1 ; LISTEN
+         LDA #$68  ; SEKADR
+         JSR $FF93 ; SEKLST
+         LDA #4
+         STA $9A
+         RTS
+         ;
+SYSOFF   LDA PROPORT
+         CMP #$35
+         BNE GETRES
+         LDA #$37  ; ROM AN,
+         STA 1     ; $A000 KOPIERT WIRD
+         LDA #$A0
+         STA 4
+         LDY #0
+LROMK    LDA (3),Y
+         STA (3),Y
+         INY
+         BNE LROMK
+         INC 4
+         LDA 4
+         CMP #$C0
+         BNE LROMK
+         ;
+GETRES   LDA GETSP
+         STA $7A
+         LDA GETSP +1
+         STA $7B
+PRTOFF   LDA #4
+         JSR $FFAE ; UNLIST
+         JSR $FFC3 ; SCHLIESSEN
+         LDA #3
+         STA $9A
+         LDA PROPORT
+         STA 1
+         RTS
+         ;
+STROUT   JSR ROMON
+         JSR $B487 ; STRINGPARAM. HOL.
+         JSR $B6A6 ; FRESTRING
+         PHA
+         LDX TEMP
+         BNE LSTR0
+         JSR RECBUN
+LSTR0    PLA
+         TAX       ; STR.LAENGE
+         LDY #0
+         INX
+LSTR1    DEX
+         BEQ LSTR2
+         LDA ($22),Y
+         JSR CHROUT ; DRUCKEN
+         INY
+         CMP #$0D
+         BNE LSTR1
+         JSR $AAE5
+         JMP LSTR1
+LSTR2    JMP ROMOFF
+         ;
+TEXTAUS  LDX #0
+         LDA THSTAT
+         ORA TSTAT
+         STA TSTAT
+LTA1     ASL TSTAT
+         BCS FUENFAUS
+         INX
+         INX      ; SETZE X AUF DEN
+         INX      ; NAECHSTEN TEXTAB-
+         INX      ; SCHNITT
+         INX
+         JMP LTA1
+FUENFAUS LDY #5
+LTA2     LDA TEXT,X
+         JSR CHROUT
+         INX
+         DEY
+         BNE LTA2
+         LDA TSTAT
+         BNE LTA1
+         RTS
+         ;
+;=======================================
+;   AUSGABE ALLER VARIABLEN IN DER TAB
+;=======================================
+VAROUT   LDA TABSTRTL  ; ZEIGER AUF
+         STA ZEI1L     ; ANFANG DER
+         LDA TABSTRTH  ; TABELLE SETZEN
+         STA ZEI1H
+         LDA TENDL
+         STA TABENDL
+         LDA TENDH
+         STA TABENDH
+         LDA #5       ; STARTWERT 3
+         STA LINES    ; FUER ABSAETZ
+         JSR CARET2   ; ZLANG:=0 U.
+LVARO1   JSR TESTEND   ; TABELLE ENDE?
+         BEQ LVARO9    ; JA: RTS
+LVARO2   JSR SETVANZ
+         LDY #1         ; 1. ZEICHEN
+         LDA (ZEI1L),Y  ; AUSGEBEN
+         JSR CHROUT
+         INY            ; 2. ZEICHEN
+         LDA (ZEI1L),Y  ; AUSGEBEN,
+         CMP #$20       ; WENN &lt;>LEER
+         BEQ LVARO3
+         JSR CHROUT
+LVARO3   JSR STATOUT
+         JSR TABS
+LVARO4   LDY #3        ; ZNR HOLEN
+         LDA (ZEI1L),Y ; UND NACH
+         STA $62       ; $62/$63
+         INY
+         LDA (ZEI1L),Y
+         STA $63
+         LDA #0
+         STA TEMP
+         JSR ZAUSGABE
+         LDY #5        ;"*" HINTER ZNR
+         LDA (ZEI1L),Y ;WENN DEF
+         ASL A         ;SONST WEITER
+         BCC LVARO5
+         LDA #'*
+         JSR CHROUT
+LVARO5   JSR TABS
+         INC VANZ
+         JSR VARVERG ;ALTVAR=NEUVAR?
+         PHP         ; JA: NUR ZNR
+         JSR INZEI1  ; NEIN: UND NAM
+         JSR TESTEND  ; ENDE DER TAB?
+         BEQ LVARO8   ; JA: ENDE
+         PLP         ; AUSGEBEN
+         BEQ LVARO4  ; (NUR ZNR)
+         LDA VANZ     ; MEHR ALS 7
+         CMP #8       ; VAR AUSGEG.?
+         BCC LVARO6   ; JA: LF,
+         JSR CARET    ;  VANZ:=0
+         JSR FUNFLIN
+         JSR SETVANZ
+         JMP LVARO7
+LVARO6   CMP #4      ; 4 VAR?: LF
+         BCC LVARO7  ; WENIGER: WEITER
+         JSR LLF2
+LVARO7   JSR LINEFEED
+         JMP LVARO2
+LVARO8   PLP
+LVARO9   JMP CARET2
+         ;
+SETVANZ  LDA #0
+         STA VANZ
+         RTS
+         ;
+;=======================================
+;   HOLEN EINER VARIABLEN AUS BASIC TEXT
+;=======================================
+VARGET   LDY #1        ;ZEICHEN IN TAB.
+         STA (ZEI1L),Y
+         JSR NXTCHR    ;NAECHSTES ZCHN
+         LDY #2
+         JSR CHKALPH   ;BUCHSTABE?
+         BCS LVARGET1  ;JA: IN TAB.
+         JSR CHKNUM    ;ZIFFER?
+         BCS LVARGET1  ;JA: IN TAB
+         TAX           ;NEIN: AC SICHERN
+         LDA #$20      ;  LEER IN TAB.
+         STA (ZEI1L),Y
+         JMP LVARGET2
+LVARGET1 STA (ZEI1L),Y
+         JSR NXTCHR
+         TAX
+LVARGET2 LDA #%01000000
+         CPX #'$       ; STRING?
+         BEQ LVARGET4
+         CPX #'%       ; INTEGER?
+         BEQ LVARGET3
+         LSR A         ; REAL
+         LSR A
+         JMP LVARGET5
+LVARGET3 LSR A         ; INTEGER
+LVARGET4 PHA           ; AC SICHERN
+         JSR NXTCHR
+         TAX
+         PLA
+LVARGET5 CPX #'(       ; DIMENSIONIERT?
+         BNE LVARGET6  ; NEIN
+         ORA #%10000000 ; JA!
+LVARGET6 LDY #0        ; STATUS AN 5.
+         STA (ZEI1L),Y ; STELLE IN TAB.
+         JSR ZNR        ;ZNR IN TAB.
+         LDY #4         ;AN 4./5. STELLE
+         STA (ZEI1L),Y
+         DEY
+         TXA
+         STA (ZEI1L),Y
+         LDA DBSTAT    ; DEF/BEN AN 5.
+         LDY #5        ; STELLE
+         STA (ZEI1L),Y
+         RTS
+         ;
+;=======================================
+;   PRUEFT STATUSBYTE DER VARIABLEN
+;   UND GIBT TYP - $, %, () - AUS
+;=======================================
+STATOUT  LDY #0
+         LDA (ZEI1L),Y
+         LSR A
+         LSR A     ; BITS 0-3
+         LSR A     ; UEBERLESEN
+         LSR A
+         LSR A     ; REAL?
+         BCS LSTAT2
+         LDX #'%   ; INTEGER?
+         LSR A
+         BCS LSTAT1
+         DEX       ;STRING!
+LSTAT1   TXA
+         JSR CHROUT
+LSTAT2   LDA (ZEI1L),Y ; FELD?
+         ASL A
+         BCC LSTAT3    ; NEIN: RTS
+         LDA #'(
+         JSR CHROUT
+         LDA #')
+         JSR CHROUT
+LSTAT3   RTS
+         ;
+;=======================================
+;   SORTIEREN VON FELDERN NACH
+;       "BUBBLESORT"
+;   UEBERGABE:
+;      "LAENGE" DES FELDES
+;      "TABSTRT"    ANFANG DES FELDES
+;      "TABEND"     ENDE
+;=======================================
+;=======================================
+;   ERHOEHE ZEIGER1 UM LAENGE
+;=======================================
+INZEI1   SEC
+         LDA ZEI1L
+         SBC LAENGE
+         STA ZEI1L
+         BCS LINZ1
+         DEC ZEI1H
+LINZ1    RTS
+         ;
+;=======================================
+;   ROUTINE BESTIMMT ZEIGER AUF I+1-TES
+;   ELEMENT; PARAMETER: LAENGE, ZEI1
+;=======================================
+IZEIG2   LDA ZEI1H
+         STA ZEI2H
+         SEC
+         LDA ZEI1L
+         SBC LAENGE
+         STA ZEI2L
+         BCS LADD1
+         DEC ZEI2H
+LADD1    RTS
+         ;
+;=======================================
+;   VERGLEICH DER DURCH ZEI1, ZEI2 UND
+;   LAENGE BESTIMMTEN FELDER
+;    C=1, WENN A(I)>A(I+1)
+;    Z=1, WENN A(I)=A(I+1) (Y=LAENGE)
+;=======================================
+VERGL    LDY #0
+LV1      CLC
+         LDA (ZEI1L),Y
+         CMP (ZEI2L),Y
+         BEQ LV2     ; GLEICH
+         BCS LV3     ; GROESSER
+         BCC LV3     ; KLEINER
+LV2      INY         ; NEIN: NAECHSTES
+         CPY LAENGE  ; X=LAENGE?
+         BEQ LV3     ; JA: ENDE
+         JMP LV1     ;  ELEMENT TESTEN
+LV3      RTS
+         ;
+;=======================================
+;   VERGLEICH ZWEIER VARIABLEN
+;     Z=1, WENN NAME UND STATUS GLEICH
+;=======================================
+VARVERG  JSR IZEIG2
+         LDA #3      ; NUR 3 BYTE
+         STA LAENGE  ; (STAT, NAME)
+         JSR VERGL   ; VERGLEICHE
+         PHP         ; LAENGE WIEDER
+         LDA #6      ; 6
+         STA LAENGE
+         PLP
+         RTS
+         ;
+;=======================================
+;   TAUSCHE ZWEI FELDER, DIE DURCH ZEI1L
+;   ZEI2L UND LAENGE BESTIMMT SIND
+;=======================================
+EXCHANGE LDY #0
+LEXCH1   CPY LAENGE    ; SOLANGE Y&lt;LAE.
+         BEQ LEXCH2
+         LDA (ZEI1L),Y ; VERTAUSCHE
+         PHA           ; ZWEI BYTES
+         LDA (ZEI2L),Y
+         STA (ZEI1L),Y
+         PLA
+         STA (ZEI2L),Y
+         INY
+         JMP LEXCH1
+LEXCH2   RTS
+         ;
+;=======================================
+;   ENDE DER TABENDLLE ERREICHT?
+;    (ZEI1 = TABEND= ==> Z=1)
+;=======================================
+TESTEND  LDA ZEI1H
+         CMP TABENDH
+         BNE LTEND1
+         LDA ZEI1L
+         CMP TABENDL
+LTEND1   RTS
+         ;
+;=======================================
+;   TABEND UM EIN ELEMENT ERNIED
+;=======================================
+DECTAB   CLC
+         LDA TABENDL
+         ADC LAENGE
+         STA TABENDL
+         BCC LDECTAB
+         INC TABENDH
+LDECTAB  RTS
+         ;
+;=======================================
+;   TEND UM EIN ELEMENT VERRINGERN
+;=======================================
+INTEND   CLC
+         LDA TENDL
+         ADC LAENGE
+         STA TENDL
+         BCC LINTEN1
+         INC TENDH
+LINTEN1  RTS
+         ;
+;=======================================
+;   TEND UM EIN ELEMENT ERHOEHEN
+;=======================================
+DECTEND  SEC
+         LDA TENDL
+         SBC LAENGE
+         STA TENDL
+         BCS LDETEN1
+         DEC TENDH
+LDETEN1  RTS
+         ;
+;=======================================
+;   SORTIEREN
+;=======================================
+SORT     LDA TENDL   ; TABEND SETZEN,
+         STA TABENDL ; GEHT BEI SORT
+         LDA TENDH   ; VERLOREN
+         STA TABENDH
+LSORT1   LDA TABSTRTL  ; ZEIGER1 AUF
+         STA ZEI1L     ; TABSTRT
+         CMP TABENDL
+         PHP           ; UND
+         LDA TABSTRTH  ; TEST, OB
+         STA ZEI1H     ; ENDE DER
+         CMP TABENDH   ; TABELLE
+         BNE LSORTY    ; ERREICHT
+         PLP           ; JA: ENDE
+         BEQ LSORTW
+
+LSORTY   JSR IZEIG2
+         JSR VERGL     ; VERGLEICHEN
+         BCC LSORT3    ; GROESSER, DANN
+         JSR EXCHANGE  ; TAUSCHEN
+LSORT3   JSR INZEI1      ; NAECHSTES
+         JSR TESTEND   ; ENDE ERREICHT?
+         BNE LSORTY    ; NEIN: WEITER
+         JSR DECTAB    ; JA: NAECHSTER
+         JMP LSORT1
+
+LSORTW   RTS
+         ;
+;=======================================
+;  SETZT CHRGET - ZEIGER AUF AKT. ZEICH.
+;=======================================
+SETGET   LDA POINTER
+         CLC
+         ADC AKOPADR
+         STA $7A
+         PHP
+         LDA AKOPADR + 1
+         STA $7B
+         PLP
+         BCC LSET1
+         INC $7B
+LSET1    RTS
+         ;
+;=======================================
+;   HOLT SPRUNGZIEL NACH TABELLENENDE
+;=======================================
+GETSPR   JSR SETGET
+GETSPR2  JSR ROMON
+         JSR CHRGET
+         JSR GETZEIL
+         LDY #0
+         LDA $15
+         STA (ZEI1L),Y
+         STA $62
+         INY
+         LDA $14
+         STA (ZEI1L),Y
+         STA $63
+         JSR INZEI1
+         JSR ZAUSGABE
+         JMP OVFLOW
+         ;
+;=======================================
+;   SETZT BIT FUER SPRUNG NACH ON, THEN
+;=======================================
+SORCOD    LDY #2
+          ORA THSTAT
+          STA TSTAT
+          STA (ZEI1L),Y
+          RTS
+          ;
+;=======================================
+;   AUSGABE DER ANGESPRUNGENEN ZEILEN
+;   IN DER TABELLE: H,L DES SPRUNGZIELS,
+;                   CODE DER SPRUNGART,
+;                  L,H  DER AUFRUF-ZEILE
+;=======================================
+ZIELE    LDA TENDL   ; ZEIGER AUF ENDE
+         STA TABENDL ; TEND WURDE NICHT
+         LDA TENDH   ; GEAENDERT
+         STA TABENDH
+         LDA TABSTRTL  ; ZEIGER AUF
+         STA ZEI1L     ; ANFANG
+         LDA TABSTRTH
+         STA ZEI1H
+         LDA #0
+         STA ZSTAT
+         STA ZLANG
+         LDA #5
+         STA LINES
+         LDA #%11110110
+         STA FANZ
+LZIEL1   JSR TESTEND ; TABELLE LEER?
+         BEQ STPZIEL ; JA: BEENDEN
+         LDY #0        ; HIGH, LOW-BYTE
+         STY TEMP   ; F. RECBUN
+         LDA (ZEI1L),Y ; DES ZIELS
+         STA $62       ; HOLEN
+         INY
+         LDA (ZEI1L),Y
+         STA $63
+         JSR ZAUSGABE
+         JSR TABS
+         LDY #2        ; SPRUNGART HOLEN
+         LDA (ZEI1L),Y
+         BIT FANZ
+         BNE LZIEL2
+         AND #%11111110
+LZIEL2   STA TSTAT
+         LDX #0
+         STX TEMP   ; F. RECBUN
+         JSR LTA1      ; TEXTAUSGABE
+         LDY #3        ; LOW,HIGH-BYTE
+         LDA (ZEI1L),Y ; DER AUFRUFENDEN
+         STA $62       ; ZEILE
+         INY
+         LDA (ZEI1L),Y
+         STA $63
+         JSR TABS
+         JSR ZAUSGABE
+         JSR LINEFEED
+         JSR INZEI1
+         JMP LZIEL1
+STPZIEL  RTS
+         ;
+;=======================================
+;   AUSGEBEN VON TEXT
+;=======================================
+MASKE    STA ADRE+1
+         STX ADRE+2
+         LDX #0
+         STX ZLANG
+ADRE     LDA $FFFF
+         BEQ MASKE3
+         CMP #255
+         BEQ MASKE4
+         JSR CHROUT
+MASKE1   INC ADRE+1
+         BNE MASKE2
+         INC ADRE+2
+MASKE2   JMP ADRE
+MASKE3   RTS
+MASKE4   JSR TABS
+         JMP MASKE1
+         ;
+;=======================================
+;  AUSGABE DER "MASKEN" FUER SPR U. VAR
+;=======================================
+DRAN     LDA #&lt;TSPRK
+         LDX #>TSPRK
+         JSR MASKE
+         LDY #2
+LDRAN1   LDA #&lt;TANR
+         LDX #>TANR
+         JSR MASKE
+         DEY
+         BNE LDRAN1
+         JMP DRSPR1
+DRSPR    LDA #&lt;TSPRK
+         LDX #>TSPRK
+         JSR MASKE
+         LDY #2
+LDSP1    LDA #&lt;TSPRR
+         LDX #>TSPRR
+         JSR MASKE
+         DEY
+         BNE LDSP1
+DRSPR1   LDY #2
+LDSP2    LDA #&lt;TSPRU
+         LDX #>TSPRU
+         JSR MASKE
+         DEY
+         BNE LDSP2
+         RTS
+         ;
+DRVAR    LDA #&lt;TVARK
+         LDX #>TVARK
+         JSR MASKE
+         LDY #2
+DRVAR1   LDA #&lt;TVARR
+         LDX #>TVARR
+         JSR MASKE
+         DEY
+         BNE DRVAR1
+         LDY #8
+DRVAR2   LDA #&lt;TVARU
+         LDX #>TVARU
+         JSR MASKE
+         DEY
+         BNE DRVAR2
+         RTS
+         ;
+;=======================================
+;=======================================
+;   STEUERROUTINE
+;     RUFT DIE ROUTINEN ENTSPRECHEND
+;     DER PARAMETER AUF
+;=======================================
+;=======================================
+SCONTROL JSR SYSGET  ; PARAMETER HOLEN
+         LDA $7A     ; GET-ZEIGER RETTEN
+         STA GETSP   ;
+         LDA $7B     ;
+         STA GETSP +1
+         LDA 1       ; PROZESSORPORT
+         STA PROPORT ; RETTEN
+         JSR ROMOFF   ; ROM AUSSCHALTEN
+         LDA SYSTAT  ; ABFRAGE DER
+         LSR A       ; PARAMETER
+         LSR A
+         LSR A
+         LSR A
+         BCC LCON1
+         JSR SPR
+         LDA SYSTAT
+         LSR A
+         LSR A
+         LSR A
+         BCC LCON1
+         JSR AN
+LCON1    LDA SYSTAT
+         LSR A
+         LSR A
+         BCC LCON2
+         JSR VAR
+LCON2    LDA SYSTAT
+         LSR A
+         BCC LCON3
+         JSR VAR2
+LCON3    JMP SYSOFF  ; STARTZUSTAND
+                     ; WIEDERHERSTELLEN
+         ;
+;=======================================
+; TEXTE
+;=======================================
+TSPRK  .BYTE 13,255,255,255
+       .TEXT "    SPRUNGBEFEHLE"
+       .BYTE 13,255,255,255,255
+       .TEXT " ============="
+       .BYTE 13,0
+TSPRR  .TEXT " IN ZEILE    SPRUNG DURCH"
+       .BYTE 255
+       .TEXT "  NACH"
+       .TEXT 255,0
+TSPRU  .TEXT "*========*============"
+       .TEXT "=======*=========*"
+       .BYTE 0
+
+TANK   .BYTE 255,255,255
+       .TEXT "ANGESPRUNGENE ZEILEN"
+       .BYTE 13,255,255,255
+       .TEXT " ===================="
+       .BYTE 13,0
+TANR
+  .TEXT "*  ZIEL  *   SPRUNG DURCH    *"
+  .TEXT "   IN    *"
+  .BYTE 0
+
+TVARK  .BYTE 13,255,255,255
+       .TEXT "      VARIABLEN"
+       .BYTE 13,255,255,255,255
+       .TEXT " ========="
+       .BYTE 13,0
+TVARR  .TEXT " VARIABLE   ZEILEN"
+       .BYTE 255,255,255,0
+TVARU  .TEXT "*========*"
+       .BYTE 0
+TOVER  .BYTE 13
+       .TEXT "SPEICHER VOLL !!"
+       .BYTE 13,0
+TBREAK .BYTE 13
+       .TEXT "ABBRUCH !!"
+       .BYTE 13,0
+TEXT     .TEXT "THEN FOR  NEXT "
+         .TEXT "RUN  ON - GSUB "
+         .TEXT "GOTO      *"
+TSTAT    .BYTE 0
+POINTER  .BYTE 0
+ZLANG    .BYTE 0
+FANZ     .BYTE 0
+ZSTAT    .BYTE 0
+THSTAT   .BYTE 0
+TABSTRTL .BYTE $F9
+TABSTRTH .BYTE $BF
+TENDL    .BYTE 0
+TENDH    .BYTE 0
+DBSTAT   .BYTE 0
+LINES    .BYTE 5
+VANZ     .BYTE 0
+SYSTAT   .BYTE 0
+BERSTL   .BYTE 0
+BERSTH   .BYTE 0
+BERENL   .BYTE 0
+BERENH   .BYTE 0
+PROPORT  .BYTE 0
+GETSP    .BYTE 0,0
+         .END</pre>
+         <!-- Eingetippt von 64erGrufti und goloMAK -->
             <figcaption>Listing 3. Der Source-Code von »Cross-Ref 64«.</figcaption>
         </figure>
     </article>
