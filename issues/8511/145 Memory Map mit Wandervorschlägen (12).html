@@ -30,10 +30,10 @@
 
         <p>Den reversen Modus können wir bekanntlich direkt mit der Kombination der CTRL- und der RVS-ON-Taste oder aber mit PRINT CHR$(18) herstellen. Wenn Sie aber versuchen sollten, das direkt einzugeben, um dann wieder mit PRINT PEEK (199) nachzuschauen, was jetzt in der Speicherzelle 199 steht, dann werden Sie Schiffbruch erleiden. Das Betriebssystem setzt den Inhalt der Zelle 199 nach einem »Wagenrücklauf«, hervorgerufen zum Beispiel durch die RETURN-Taste oder nach einem PRINT-Befehl, der nicht mit einem Komma oder Semikolon abgeschlossen ist, sogleich auf 0 zurück. Natürlich erfolgt das auch durch Drücken der CTRL- und RVS-0FF-Taste.</p>
 
-        <p>Wir vermeiden die Rücksetzung durch einen Einzeiler:<br />
+        <p>Wir vermeiden die Rücksetzung durch einen Einzeiler:<br>
             PRINT CHR$(18) ”AAA“ PEEK (199)</p>
 
-        <p>Wir erhalten drei reverse As und als Inhalt der Zelle 199 auch die Zahl 18. Dasselbe Ergebnis erhalten wir durch POKE einer Zahl größer als 0 in die Zelle 199:<br />
+        <p>Wir erhalten drei reverse As und als Inhalt der Zelle 199 auch die Zahl 18. Dasselbe Ergebnis erhalten wir durch POKE einer Zahl größer als 0 in die Zelle 199:<br>
             POKE 199,4: PRINT"XX" PEEK (199)</p>
 
         <p>Das Ergebnis beweist, daß diese Adresse sehr nützlich sein kann, zumal ihre Abfrage beziehungsweise Beeinflussung auch innerhalb eines Programms erfolgen kann.</p>
@@ -46,7 +46,7 @@
 
         <p>Eine Zeile mit Anweisungen darf beim C 64 insgesamt 80 Zeichen, beim VC 20 sogar 88 Zeichen enthalten. Diese »verlängerte« Programmzeile nennt man »logische Zeile«.</p>
 
-        <p>Der Zeiger in Speicherzelle 200 gibt dem Betriebssystem an, auf welcher Position das letzte Zeichen einer eingegebenen 1o-&lt;gischen Zeile sitzt. Löschen Sie den Bildschirm und geben Sie direkt irgendwo auf dem Bildschirm den Befehl ein:<br />
+        <p>Der Zeiger in Speicherzelle 200 gibt dem Betriebssystem an, auf welcher Position das letzte Zeichen einer eingegebenen 1o-&lt;gischen Zeile sitzt. Löschen Sie den Bildschirm und geben Sie direkt irgendwo auf dem Bildschirm den Befehl ein:<br>
             PRINT PEEK(200)</p>
 
         <p>Sie erhalten die Zahl der Spalte des letzten Zeichens dieses Direkt-Befehls.</p>
@@ -69,13 +69,13 @@
 
         <p>In Ausgabe 6/85 auf Seite 123 habe ich beschrieben, wie die Tasten des Computers abgefragt werden. Die dabei für jede der 64 Tasten (mit Ausnahme der RESTORE- und der SHIFT-LOCK-Tasten) entstehende Dualzahl wird in eine Dezimalzahl (0 bis 63) umgewandelt und in der Speicherzelle 203 gespeichert, einige auch in der Zelle 653. Diese Zahl steht auch in Speicherzelle 197, um sie mit der vorher gedrückten Taste vergleichen zu können.</p>
 
-        <p>Die Codezahlen jeder Taste lassen sich mit folgendem Programm abfragen:<br />
-            10 PRINT PEEK (203)<br />
+        <p>Die Codezahlen jeder Taste lassen sich mit folgendem Programm abfragen:<br>
+            10 PRINT PEEK (203)<br>
             20 GOT0 10</p>
 
         <p>Nach RUN sehen wir ein laufendes Zahlenband, zuerst mit der Zahl 64. Das ist die Codezahl für »keine Taste gedrückt«. Die X-Taste ergibt 23, (26 beim VC 20), die W-Taste ergibt 9. Auch die Funktionstasten haben ihren Tastencode. F1 ergibt 4 (39 beim VC 20) und so weiter.</p>
 
-        <p>Nur die Steuertasten CTRL, SHIFT, und C= (Commodore-Taste) zeigen keine Reaktion. Deren Tastencode steht nämlich in Speicherzelle 653. Den Grund für diesen Separatismus erfahren Sie bei der Besprechung dieser Zelle. Hier ist nur interessant, daß nicht nur jede einzelne dieser drei Tasten einen eigenen Code hat, sondern auch alle machbaren Kombinationen von gleichzeitig gedrückten Steuertasten. Um das zu sehen, ändern Sie bitte die Zeile 10 so ab:<br />
+        <p>Nur die Steuertasten CTRL, SHIFT, und C= (Commodore-Taste) zeigen keine Reaktion. Deren Tastencode steht nämlich in Speicherzelle 653. Den Grund für diesen Separatismus erfahren Sie bei der Besprechung dieser Zelle. Hier ist nur interessant, daß nicht nur jede einzelne dieser drei Tasten einen eigenen Code hat, sondern auch alle machbaren Kombinationen von gleichzeitig gedrückten Steuertasten. Um das zu sehen, ändern Sie bitte die Zeile 10 so ab:<br>
             10 PRINT PEEK (203), PEEK(653)</p>
 
         <p>Tabelle 1 gibt Ihnen die volle Übersicht. Wenn Sie sich die Mühe machen, die Zahlenreihen der Zelle 203 auf Vollständigkeit zu prüfen, dann werden Sie feststellen, daß vier Zahlen fehlen. Es sind die Werte, die eigentlich den vier Steuertasten CTRL, C = , rechte und linke SHIFT-Taste zugewiesen sind. Aber wie gesagt, sie werden gleich nach 653 umgeleitet, wobei allerdings kein Unterschied mehr zwischen der linken und rechten SHIFT-Taste gemacht wird.</p>
@@ -90,10 +90,10 @@
 
         <p>Ein Wert größer 0 in dieser Speicherzelle schaltet das Blinken des Cursors ab. Diese Abschaltung erfolgt durch das Betriebssystem immer dann, wenn sich Zeichen im Tastaturpuffer befinden und wenn ein Programm ausgeführt wird.</p>
 
-        <p>Im folgenden Beispiel einer Eingabe mit dem GET-Befehl, bei dem bekannterweise der Cursor nicht blinkt, wird demonstriert, daß durch POKE 204,0 der Cursor trotzdem blinkt. Das kann für selbstgeschriebene Eingabe-Routinen interessant sein.<br />
-            10 PRINT"JA/NEIN? “;<br />
-            20 POKE 204,0<br />
-            30 GET A$: IF A$ = ”“THEN 30<br />
+        <p>Im folgenden Beispiel einer Eingabe mit dem GET-Befehl, bei dem bekannterweise der Cursor nicht blinkt, wird demonstriert, daß durch POKE 204,0 der Cursor trotzdem blinkt. Das kann für selbstgeschriebene Eingabe-Routinen interessant sein.<br>
+            10 PRINT"JA/NEIN? “;<br>
+            20 POKE 204,0<br>
+            30 GET A$: IF A$ = ”“THEN 30<br>
             40 PRINT A$</p>
 
         <p>Umgekehrt kann man durch POKE 204,1 das Blinken des Cursors abschalten. Es bleibt dabei allerdings dem Zufall überlassen, ob er in der Ein- oder Ausphase abgeschaltet wird. Wenn Sie Pech haben, dann bleibt der Cursor bewegungslos stehen. Dieser Schönheitsfehler kann mit Hilfe der Speicherzelle 207 beseitigt werden.</p>
@@ -110,7 +110,7 @@
 
         <h3>Bildschirmcode des Zeichens unter dem Cursor</h3>
 
-        <p>Im Prinzip ist der Cursor nichts anderes als das wiederholte Drucken eines Zeichens in reverser Form, das gerade unter dem Cursor steht. Normalerweise ist dies das Leerzeichen, deshalb sehen wir meistens das ausgefüllte Viereck. Fahren Sie aber mit dem Cursor auf einen Buchstaben, dann erscheint dieser wechselweise normal und revers. In Speicherzelle 206 steht jeweils der Bildschirmcode des Zeichens unter dem Cursor. Geben Sie die folgende Anweisung direkt ein, fahren aber noch vor dem Drücken der RETURN-Taste mit dem Cursor zurück auf eines der Zeichen, zum Beispiel auf ein P:<br />
+        <p>Im Prinzip ist der Cursor nichts anderes als das wiederholte Drucken eines Zeichens in reverser Form, das gerade unter dem Cursor steht. Normalerweise ist dies das Leerzeichen, deshalb sehen wir meistens das ausgefüllte Viereck. Fahren Sie aber mit dem Cursor auf einen Buchstaben, dann erscheint dieser wechselweise normal und revers. In Speicherzelle 206 steht jeweils der Bildschirmcode des Zeichens unter dem Cursor. Geben Sie die folgende Anweisung direkt ein, fahren aber noch vor dem Drücken der RETURN-Taste mit dem Cursor zurück auf eines der Zeichen, zum Beispiel auf ein P:<br>
             PRINT PEEK(206)</p>
 
         <p>Nach RETURN erscheint die Zahl 16. Das ist also der Bildschirmcode des Zeichens, auf dem der Cursor saß, als die</p>
@@ -147,48 +147,48 @@
 
         <p>Als Codewerte werden normalerweise nur die ASCII-Codes genannt.</p>
 
-        <p>Die schon erwähnte Tabelle zeigt jedoch, daß die Funktionstasten auch Tastencodes haben. Allerdings gibt uns das nur vier Möglichkeiten, entsprechend der Aufschrift für die ungeraden Funktionstasten-Zahlen. Um auch F2 bis F8 zu erhalten, drücken wir ja immer gleichzeitig die SHIFT-Taste. Das können wir bei der Abfrage der Tastencodes natürlich auch machen, indem wir uns den Inhalt der Zelle 203 und 653 ansehen. Das folgende kleine Programm überprüft, über den Tastaturcode, ob eine der acht Funktionstasten gedrückt wurde.<br />
-            10 A = PEEK(203)<br />
-            20 B = PEEK(653)<br />
-            30 IF A = 4 AND B = 0THEN PRINT"F1"<br />
-            40 IF A = 5AND B = 0THEN PRINT"F3"<br />
-            50 IF A = 6AND B = 0THEN PRINT”F5“<br />
-            60 IF A = 3AND B = 0THEN PRINT”F7“<br />
-            70 IF A = 4 AND B = 1 THEN PRINT”F2“<br />
-            80 IF A = 5AND B = 1 THEN PRINT”F4“<br />
-            90 IF A = 6AND B = 1 THEN PRINT”F6“<br />
-            100 IF A = 3 AND B = 1 THEN PRINT”F8“<br />
+        <p>Die schon erwähnte Tabelle zeigt jedoch, daß die Funktionstasten auch Tastencodes haben. Allerdings gibt uns das nur vier Möglichkeiten, entsprechend der Aufschrift für die ungeraden Funktionstasten-Zahlen. Um auch F2 bis F8 zu erhalten, drücken wir ja immer gleichzeitig die SHIFT-Taste. Das können wir bei der Abfrage der Tastencodes natürlich auch machen, indem wir uns den Inhalt der Zelle 203 und 653 ansehen. Das folgende kleine Programm überprüft, über den Tastaturcode, ob eine der acht Funktionstasten gedrückt wurde.<br>
+            10 A = PEEK(203)<br>
+            20 B = PEEK(653)<br>
+            30 IF A = 4 AND B = 0THEN PRINT"F1"<br>
+            40 IF A = 5AND B = 0THEN PRINT"F3"<br>
+            50 IF A = 6AND B = 0THEN PRINT”F5“<br>
+            60 IF A = 3AND B = 0THEN PRINT”F7“<br>
+            70 IF A = 4 AND B = 1 THEN PRINT”F2“<br>
+            80 IF A = 5AND B = 1 THEN PRINT”F4“<br>
+            90 IF A = 6AND B = 1 THEN PRINT”F6“<br>
+            100 IF A = 3 AND B = 1 THEN PRINT”F8“<br>
             110 GOT0 10</p>
 
         <p>Die Codezahlen gelten für den C 64, für den VC 20 müssen aus der Tabelle die entsprechenden Werte eingesetzt werden.</p>
 
         <p>Wenn Sie sich anschauen, was in der Speicherzelle 653 alles passiert, dann werden Sie sicher sehen, wie willkürlich die Definition der geraden Funktionstasten ist. Statt der Kombination der Funktionstasten mit der SHIFT-Taste können wir genauso gut die CTRL-Taste nehmen, oder die Commodore-Taste oder alle zwei oder&hellip;oder&hellip;!</p>
 
-        <p>Mit den acht Codewerten in Zelle 653 (0 bis 7) der acht möglichen Kombinationen der drei Steuertasten kann jede Funktionstaste acht Funktionen haben. Das ergibt insgesamt 32 Funktionstasten, und nicht acht, wie die Aufschrift vermuten läßt. Einige davon werden in dem kleinen Demo(nstrations)-Programm eingesetzt. Zweck des Programms soll das Umschalten auf verschiedene Rahmen- und Hintergrundfarben sein. Für den C 64 gilt:<br />
-            10 PRINT CHR$(147)<br />
-            20 A = PEEK(203)<br />
-            30 B = PEEK(653)<br />
-            40 IF A = 4 AND B = 2 THEN POKE 53280,6:POKE 53281,7<br />
-            50 IF A = 5AND B = 2 THEN POKE 53280,5:POKE 53281,2<br />
-            60 IF A = 6AND B = 2 THEN POKE 53280,1:POKE 53281,1<br />
-            70 IF A = 1 AND B = 7 THEN POKE 53280,3:POKE 53281,1<br />
+        <p>Mit den acht Codewerten in Zelle 653 (0 bis 7) der acht möglichen Kombinationen der drei Steuertasten kann jede Funktionstaste acht Funktionen haben. Das ergibt insgesamt 32 Funktionstasten, und nicht acht, wie die Aufschrift vermuten läßt. Einige davon werden in dem kleinen Demo(nstrations)-Programm eingesetzt. Zweck des Programms soll das Umschalten auf verschiedene Rahmen- und Hintergrundfarben sein. Für den C 64 gilt:<br>
+            10 PRINT CHR$(147)<br>
+            20 A = PEEK(203)<br>
+            30 B = PEEK(653)<br>
+            40 IF A = 4 AND B = 2 THEN POKE 53280,6:POKE 53281,7<br>
+            50 IF A = 5AND B = 2 THEN POKE 53280,5:POKE 53281,2<br>
+            60 IF A = 6AND B = 2 THEN POKE 53280,1:POKE 53281,1<br>
+            70 IF A = 1 AND B = 7 THEN POKE 53280,3:POKE 53281,1<br>
             80 GOT0 20</p>
 
-        <p>Für den VC 20 gilt:<br />
-            10 PRINT CHR$(147)<br />
-            20 A = PEEK(203) 30B = PEEK(653)<br />
-            40 IF A = 4 AND B = 2 THEN POKE 36879,126<br />
-            50 IF A = 5AND B = 2 THEN POKE 36879,45<br />
-            60 IF A = 6AND B = 2 THEN POKE 36879,25<br />
-            70 IF A = 1 AND B = 7 THEN POKE 36879,27<br />
-            80 GOT0 20<br />
-            Zeile 40 schaltet mit F1 und C = die Farbkombination BLAU/GELB ein.<br />
-            Zeile 50 schaltet mit F3 und C = die Farbkombination ROT/GRÜN ein.<br />
+        <p>Für den VC 20 gilt:<br>
+            10 PRINT CHR$(147)<br>
+            20 A = PEEK(203) 30B = PEEK(653)<br>
+            40 IF A = 4 AND B = 2 THEN POKE 36879,126<br>
+            50 IF A = 5AND B = 2 THEN POKE 36879,45<br>
+            60 IF A = 6AND B = 2 THEN POKE 36879,25<br>
+            70 IF A = 1 AND B = 7 THEN POKE 36879,27<br>
+            80 GOT0 20<br>
+            Zeile 40 schaltet mit F1 und C = die Farbkombination BLAU/GELB ein.<br>
+            Zeile 50 schaltet mit F3 und C = die Farbkombination ROT/GRÜN ein.<br>
             Zeile 60 schaltet mit F5 und C = die Farbe Weiß ein.</p>
 
         <p>Als Spezialität schaltet Zeile 70 in den Normalzustand zurück, allerdings mit der seltenen Tastenkombination — (Pfeil links) und alle drei Steuertasten (CTRL, SHIFT, C=) gleichzeitig gedrückt.</p>
 
-        <p>Jetzt aber kommt es noch ganz dick!<br />
+        <p>Jetzt aber kommt es noch ganz dick!<br>
             Ich habe oben gesagt, daß wir nicht acht, sondern 32 Funktionstasten haben. Die Verwendung der vier Funktionstasten in Kombination mit den acht Steuertastencodes in 653 macht es möglich. Dasselbe gilt natürlich für jede andere Taste auch! Zeile 70 im Demo-Programm beweist es.</p>
 
         <p>Da uns insgesamt 60 Tasten zur Verfügung stehen, können wir theoretisch 480 Funktionstasten erzeugen — theoretisch, weil ja auch die STOP-Taste eine gültige Taste ist. Diese Taste steht uns allerdings nur in den Kombinationen mit der SHIFT-Taste zur Verfügung. Ohne SHIFT tut sie ihre Pflicht — sie stoppt. Mit SHIFT aber stoppt sie nicht, so daß wir insgesamt 472 mögliche Kombinationen haben — sicher mehr, als Sie je brauchen werden.</p>
@@ -213,15 +213,15 @@
 
         <h3>- veränderbares Blinken des Cursors</h3>
 
-        <p>10 POKE 211,0<br />
-            20 POKE 207,0:POKE 204,0:POKE 205,5<br />
-            30 FORI = 1T0 40:NEXT<br />
-            40 GET A$<br />
-            50 IF A$ = CHR$(13) THEN 100<br />
-            60 PRINT A$;<br />
-            70 X$ = X$ + A$<br />
-            80 GOT0 20<br />
-            100 POKE 207,0:POKE 204,0:POKE 211,0<br />
+        <p>10 POKE 211,0<br>
+            20 POKE 207,0:POKE 204,0:POKE 205,5<br>
+            30 FORI = 1T0 40:NEXT<br>
+            40 GET A$<br>
+            50 IF A$ = CHR$(13) THEN 100<br>
+            60 PRINT A$;<br>
+            70 X$ = X$ + A$<br>
+            80 GOT0 20<br>
+            100 POKE 207,0:POKE 204,0:POKE 211,0<br>
             120 PRINT X$:PRINT:GOT0 20</p>
 
         <p>Zeile 10 verwendet im Vorgriff auf das nächste Mal die Speicherzelle 211. Dieser Befehl, auch in Zeile 100, setzt den Cursor auf den Anfang der logischen Zeile zurück. Zeile 20 müßte eigentlich klar sein. Der Wert des POKE-Befehls für 205 ist interessant. Durch ihn kann die Blinkfrequenz des Cursors verändert werden. Bei diesem Programm ergibt der Wert 5 zusammen mit der Warteschleife in Zeile 30 eine mäßige Blinkfrequenz. Der Wert 1 läßt den Cursor eifrig zappeln.</p>
