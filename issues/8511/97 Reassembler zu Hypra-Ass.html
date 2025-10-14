@@ -18,9 +18,9 @@
         <h1>Reassembler zu Hypra-Ass</h1>
         <p class="intro">Passend zum Assembler Hypra-Ass stellen wir Ihnen jetzt auch einen professionellen Reassembler vor, der aus einem Maschinenprogramm Quelltext erzeugt.</p>
 
-        <p>Der Reassembler (siehe Listing) ist vollständig in Maschinensprache geschrieben. Er belegt den Speicherplatz von $C000 bis $CB00, kann aber mit dem SMON in jeden anderen Bereich verschoben werden. Neben dem eigentlichen Reassembler stehen noch einige Basic-Befehle zur Verfügung, mit denen zum Beispiel Einsprungpunkte im Quelltext durch ein Label markiert werden können. Es läßt sich auch vorherbestimmen, ob der Reassembler selbständig nach Tabellen suchen soll oder nicht. Weiterhin läßt sich der Aufbau des Quelltextes in einigen Punkten mitbestimmen. Alle dazu nötigen Informationen werden dem Reassembler in einem kleinen Basic-Informationsprogramm mitgeteilt. Es stehen dafür drei neue Basic-Befehle zu Verfügung:<br />
-            <strong>←P adresse</strong>: Mit diesem Befehl lassen sich Einsprungpunkte im Quelltext durch ein Label markieren. So sind Adressen, die mit SYS angesprungen werden, im Quelltext leichter auffindbar.<br />
-            <strong>←T adresse, adresse</strong>: Mit diesem Befehl teilen Sie dem Reassembler die Lage von Tabellen mit. Die erste Adresse zeigt auf das erste und die zweite Adresse auf das letzte Byte der Tabelle. Tabellen werden vom Reassembler nicht reassembliert, sondern erscheinen im Quelltext in Form eines Hex-Dumps (siehe Bild 1; Zeile 190 und Bild 2 Zeile 230 bis 310).<br />
+        <p>Der Reassembler (siehe Listing) ist vollständig in Maschinensprache geschrieben. Er belegt den Speicherplatz von $C000 bis $CB00, kann aber mit dem SMON in jeden anderen Bereich verschoben werden. Neben dem eigentlichen Reassembler stehen noch einige Basic-Befehle zur Verfügung, mit denen zum Beispiel Einsprungpunkte im Quelltext durch ein Label markiert werden können. Es läßt sich auch vorherbestimmen, ob der Reassembler selbständig nach Tabellen suchen soll oder nicht. Weiterhin läßt sich der Aufbau des Quelltextes in einigen Punkten mitbestimmen. Alle dazu nötigen Informationen werden dem Reassembler in einem kleinen Basic-Informationsprogramm mitgeteilt. Es stehen dafür drei neue Basic-Befehle zu Verfügung:<br>
+            <strong>←P adresse</strong>: Mit diesem Befehl lassen sich Einsprungpunkte im Quelltext durch ein Label markieren. So sind Adressen, die mit SYS angesprungen werden, im Quelltext leichter auffindbar.<br>
+            <strong>←T adresse, adresse</strong>: Mit diesem Befehl teilen Sie dem Reassembler die Lage von Tabellen mit. Die erste Adresse zeigt auf das erste und die zweite Adresse auf das letzte Byte der Tabelle. Tabellen werden vom Reassembler nicht reassembliert, sondern erscheinen im Quelltext in Form eines Hex-Dumps (siehe Bild 1; Zeile 190 und Bild 2 Zeile 230 bis 310).<br>
             <strong>←E (byte)</strong>: Der »E«-Befehl startet den Reassembler und steht am Ende des Informationsprogramms. Es wird nun aus einem Maschinenprogramm ein Quelltext erzeugt, der im Basic-Speicher abgelegt und anschließend wie ein normales Basic-Programm gespeichert oder editiert und mit Hypra-Ass assembliert werden kann.
         </p>
 
@@ -28,23 +28,23 @@
 
         <p>TODO</p>
 
-        <p>Informations-Byte: o o o o o o o o<br />
-            Bit: 7 6 5 4 3 2 1 0<br />
-            Wertigkeit: 128 064 032 016 008 004 002 001<br />
-            Um zum Beispiel Bit 1 und Bit 6 auf 1 zu setzen, sind die Wertigkeiten der einzelnen Bits zu addieren. In diesem Fall 2 + 64 = 66<br />
-            <strong>Bit 0 gesetzt</strong>: Alle Zeropage-Adressen (Adressen von $00 bis $FF) werden durch ein Label mit nur drei Buchstaben (normal fünf) markiert.<br />
-            <strong>Bit 1 gesetzt</strong>: Nach den Befehlen RT8, RTI, BRK und JMP wird eine Kommentarzeile in den Quelltext eingefügt (Zeile 220 in Bild 2). Dadurch wird der Quelltext übersichtlicher.<br />
-            <strong>Bit 2 gesetzt</strong>: Bei allen Befehlen mit unmittelbarer Adressierung (zum Beispiel LDA # $41) wird der Operand zusätzlich im ASCII-Formatausgegeben (LDY #$00 ;”. ’’ — Zeile 140 und 160 in Bild 2), vorausgesetzt, er liegt zwischen 32 und 96 oder zwischen 160 und 224. Für den Fall, daß er außerhalb dieses Zahlenbereichs liegt, wird nur ein Punkt ausgegeben.<br />
-            <strong>Bit 3 gesetzt</strong>: Zwischen je zwei Tabellenzeilen wird eine Kommentarzeile eingefügt (Zeile 240, 260, 280, 300 in Bild 2). Dieses erhöht die Übersichtlichkeit.<br />
-            <strong>Bit 4 gesetzt</strong>: Der ASCII-Ausdruck wird bei Tabellen unterdrückt.<br />
-            <strong>Bit 5 gesetzt</strong>: Ist dieses Bit gesetzt, werden externe Label und Tabellenlabel speziell gekennzeichnet (Zeile 100 und 230 in Bild 2). Tabellen wird ein »T« vorangestellt (zum Beispiel TLCOOO) und externen Label (Label die außerhalb des zu reassemblierenden Bereichs liegen) ein »E« (zum Beispiel ELCOOO).<br />
-            <strong>Bit 6 gesetzt</strong>: Ist das Bit 6 gesetzt, sucht der Reassembler selbständig nach Tabellen. Es wird kein Quelltext, sondern ein Basic-Informationsprogramm generiert, das die Start- und Endadressen aller gefundenen Tabellen enthält. Dieses kann mit LIST oder—wenn Hypra-Ass geladen wurde — mit /E geLISTet und geändert werden.<br />
+        <p>Informations-Byte: o o o o o o o o<br>
+            Bit: 7 6 5 4 3 2 1 0<br>
+            Wertigkeit: 128 064 032 016 008 004 002 001<br>
+            Um zum Beispiel Bit 1 und Bit 6 auf 1 zu setzen, sind die Wertigkeiten der einzelnen Bits zu addieren. In diesem Fall 2 + 64 = 66<br>
+            <strong>Bit 0 gesetzt</strong>: Alle Zeropage-Adressen (Adressen von $00 bis $FF) werden durch ein Label mit nur drei Buchstaben (normal fünf) markiert.<br>
+            <strong>Bit 1 gesetzt</strong>: Nach den Befehlen RT8, RTI, BRK und JMP wird eine Kommentarzeile in den Quelltext eingefügt (Zeile 220 in Bild 2). Dadurch wird der Quelltext übersichtlicher.<br>
+            <strong>Bit 2 gesetzt</strong>: Bei allen Befehlen mit unmittelbarer Adressierung (zum Beispiel LDA # $41) wird der Operand zusätzlich im ASCII-Formatausgegeben (LDY #$00 ;”. ’’ — Zeile 140 und 160 in Bild 2), vorausgesetzt, er liegt zwischen 32 und 96 oder zwischen 160 und 224. Für den Fall, daß er außerhalb dieses Zahlenbereichs liegt, wird nur ein Punkt ausgegeben.<br>
+            <strong>Bit 3 gesetzt</strong>: Zwischen je zwei Tabellenzeilen wird eine Kommentarzeile eingefügt (Zeile 240, 260, 280, 300 in Bild 2). Dieses erhöht die Übersichtlichkeit.<br>
+            <strong>Bit 4 gesetzt</strong>: Der ASCII-Ausdruck wird bei Tabellen unterdrückt.<br>
+            <strong>Bit 5 gesetzt</strong>: Ist dieses Bit gesetzt, werden externe Label und Tabellenlabel speziell gekennzeichnet (Zeile 100 und 230 in Bild 2). Tabellen wird ein »T« vorangestellt (zum Beispiel TLCOOO) und externen Label (Label die außerhalb des zu reassemblierenden Bereichs liegen) ein »E« (zum Beispiel ELCOOO).<br>
+            <strong>Bit 6 gesetzt</strong>: Ist das Bit 6 gesetzt, sucht der Reassembler selbständig nach Tabellen. Es wird kein Quelltext, sondern ein Basic-Informationsprogramm generiert, das die Start- und Endadressen aller gefundenen Tabellen enthält. Dieses kann mit LIST oder—wenn Hypra-Ass geladen wurde — mit /E geLISTet und geändert werden.<br>
             <strong>Bit 7 gesetzt</strong>: Der Reassembler reassembliert die Speicherinhalte, die sich unter dem ROM im RAM befinden. Dadurch ist es möglich, Programme zu reassemblieren, die sich unter dem Basic-Interpreteroder Betriebssystem befinden.
         </p>
 
-        <p>Aus den drei neuen Basic-Befehlen setzt sich jedes Informationsprogramm zusammen. Es wird mit folgender Befehls-Sequenz im Direktmodus gestartet:<br />
-            SYS 49152, anfadr, endadr+1:RUN<br />
-            anfadr = Anfangsadresse des Maschinenprogramms, das reassembliert werden soll.<br />
+        <p>Aus den drei neuen Basic-Befehlen setzt sich jedes Informationsprogramm zusammen. Es wird mit folgender Befehls-Sequenz im Direktmodus gestartet:<br>
+            SYS 49152, anfadr, endadr+1:RUN<br>
+            anfadr = Anfangsadresse des Maschinenprogramms, das reassembliert werden soll.<br>
             endadr = Endadresse des Maschinenprogramms, das reassembliert werden soll.</p>
 
         <p>Um zum Beispiel den Reassembler durch sich selbst reassemblieren zu lassen, gehen Sie wie folgt vor:</p>
@@ -65,20 +65,20 @@
 
         <h3>Besonderheiten</h3>
 
-        <p>1 . Der Reassembler arbeitet ausgezeichnet mit Hypra-Ass zusammen Dabei ist es jedoch übersichtlicher, das Informationsprogramm ohne Leerzeichen einzugeben, weil Hypra-Ass nach dem ersten Leerzeichen einen Tabulator einfügt. Das Aussehen des Quelltextes würde dadurch verunstaltet. Gestartet wird das Informationsprogramm wie gewohnt mit RUN. (Vergessen Sie nicht den Minusstrich vor jeder Zeile, wenn Hypra-Ass geladen ist.)<br />
-            2 Aus programmtechnischen Gründen kann es vorkommen, daß der Reassembler im ersten Pass ein Maschinenprogramm anders reassembliert als im zweiten. Dadurch können in Pass 2 Sprungadressen im Maschinenprogramm auftauchen, die in Pass 1 nicht gefunden wurden und deshalb auch im Quelltext nicht durch ein Label markiert werden. Der Reassembler ersetzt in diesem Fall die Sprungadresse nicht durch ein Label, sondern stellt sie als Hex-Zahl im Quelltext dar. An die entsprechende Zeile werden 3 Fragezeichen angehängt.<br />
-            3. 3-Byte-Befehle, die bei der Assemblierung als 2-Byte-Befehle interpretiert werden (BIT $A9 $00 = .BY $2C LDA #$00), werden nicht reassembliert. Statt dessen werden die 3 Byte mit vorangestelltem .BY-Pseudoopcode in den Quelltext eingefügt Der reassemblierte Befehl wird aber als Kommentar an die entsprechende Zeile angefügt.<br />
+        <p>1 . Der Reassembler arbeitet ausgezeichnet mit Hypra-Ass zusammen Dabei ist es jedoch übersichtlicher, das Informationsprogramm ohne Leerzeichen einzugeben, weil Hypra-Ass nach dem ersten Leerzeichen einen Tabulator einfügt. Das Aussehen des Quelltextes würde dadurch verunstaltet. Gestartet wird das Informationsprogramm wie gewohnt mit RUN. (Vergessen Sie nicht den Minusstrich vor jeder Zeile, wenn Hypra-Ass geladen ist.)<br>
+            2 Aus programmtechnischen Gründen kann es vorkommen, daß der Reassembler im ersten Pass ein Maschinenprogramm anders reassembliert als im zweiten. Dadurch können in Pass 2 Sprungadressen im Maschinenprogramm auftauchen, die in Pass 1 nicht gefunden wurden und deshalb auch im Quelltext nicht durch ein Label markiert werden. Der Reassembler ersetzt in diesem Fall die Sprungadresse nicht durch ein Label, sondern stellt sie als Hex-Zahl im Quelltext dar. An die entsprechende Zeile werden 3 Fragezeichen angehängt.<br>
+            3. 3-Byte-Befehle, die bei der Assemblierung als 2-Byte-Befehle interpretiert werden (BIT $A9 $00 = .BY $2C LDA #$00), werden nicht reassembliert. Statt dessen werden die 3 Byte mit vorangestelltem .BY-Pseudoopcode in den Quelltext eingefügt Der reassemblierte Befehl wird aber als Kommentar an die entsprechende Zeile angefügt.<br>
             4. Es ist möglich, ein Programm so zu reassemblieren, als ob es in einem anderen Bereich läge. Dazu ist an den SYS-Befehl eine weitere Adresse anzuhängen: SYS 49152, anfadr, endadr, get</p>
 
         <p>anfadr und endadr geben die Anfangs- und Endadresse des Bereichs an, in dem das Maschinenprogramm liegen soll, get gibt die Anfangsadresse des Bereichs an, in dem das Programm tatsächlich liegt.</p>
 
-        <p>So kann man zum Beispiel die Kopie der CHRGET-Routine ab $E3A2 reassemblieren, als ob sie im Bereich von $0073 bis $008A liegen würde. Dazu ist im Direktmodus folgende Zeile einzugeben:<br />
+        <p>So kann man zum Beispiel die Kopie der CHRGET-Routine ab $E3A2 reassemblieren, als ob sie im Bereich von $0073 bis $008A liegen würde. Dazu ist im Direktmodus folgende Zeile einzugeben:<br>
             SYS 49152, $0073, $008A, $E3A2:←E</p>
 
         <p>Da keine Tabellen in diesem Bereich liegen, kann auf ein Informationsprogramm verzichtet werden.</p>
 
         <ol>
-            <li>Es ist möglich, während der Reassemblierung den erzeugten Quelltext auf Diskette zu schreiben. Dadurch bleibt der Basic-Speicher für andere Programme frei. Dazu ist vor dem SYS-Befehl, mit dem die Start- und Endadresse übergeben wird, ein Programmfile zu öffnen. Mit dem Befehl CMD wird die Ausgabe auf das entsprechende Gerät umgeleitet. Das könnte wie folgt aussehen:<br />
+            <li>Es ist möglich, während der Reassemblierung den erzeugten Quelltext auf Diskette zu schreiben. Dadurch bleibt der Basic-Speicher für andere Programme frei. Dazu ist vor dem SYS-Befehl, mit dem die Start- und Endadresse übergeben wird, ein Programmfile zu öffnen. Mit dem Befehl CMD wird die Ausgabe auf das entsprechende Gerät umgeleitet. Das könnte wie folgt aussehen:<br>
                 OPEN 1,8,1,”NAME,P,W”:CMD 1:SYS 49152,$C000, $CB00:←E 64</li>
         </ol>
 
@@ -89,9 +89,9 @@
 
         <h3>Fehlermeldungen</h3>
 
-        <p><strong>SYNTAX ERROR</strong>: Ein Basic-Befehl wurde falsch eingegeben oder eine Hex-Zahl besteht aus weniger als 4 Hex-Ziffern.<br />
-            <strong>OUT 0F MEMORY</strong>: Es steht zu wenig Speicherplatz für den Quelltext zur Verfügung oder im Maschinenprogramm kommen mehr als 2700 verschiedene Label vor.<br />
-            <strong>ILLEGAL QUANTITY</strong>: Vor einer Hex-Zahl fehlt das Dollar-Zeichen ($) oder das Tabellenende liegt vor dem Tabellenanfang oder die Tabellen überschneiden sich oder die angegebene Adresse liegt nicht im Maschinenprogramm.<br />
+        <p><strong>SYNTAX ERROR</strong>: Ein Basic-Befehl wurde falsch eingegeben oder eine Hex-Zahl besteht aus weniger als 4 Hex-Ziffern.<br>
+            <strong>OUT 0F MEMORY</strong>: Es steht zu wenig Speicherplatz für den Quelltext zur Verfügung oder im Maschinenprogramm kommen mehr als 2700 verschiedene Label vor.<br>
+            <strong>ILLEGAL QUANTITY</strong>: Vor einer Hex-Zahl fehlt das Dollar-Zeichen ($) oder das Tabellenende liegt vor dem Tabellenanfang oder die Tabellen überschneiden sich oder die angegebene Adresse liegt nicht im Maschinenprogramm.<br>
             <strong>TYPE MISMATCH</strong>: In einer Hex-Zahl stehen falsche Hex-Ziffern.
         </p>
 
@@ -101,15 +101,15 @@
 
         <p>Der Reassembler benutzt in der Zeropage verschiedene Speicherzellen als Kurzzeitspeicher. Der Langzeitspeicher dagegen liegt unter dem Betriebssystem ($E000 bis $FFFF). Dort befindet sich auch ab Adresse $E028 die Label-Tabelle. In den Langzeitspeicher sollte nicht hineingePOKEt werden.</p>
 
-        <p>Der Reassembler kann mit SMON ohne Schwierigkeiten im Speicher verschoben werden. Um den Reassembler nach $9000 zu verschieben, sind folgende SMON-Befehle einzugeben:<br />
-            W C000 CB00 9000<br />
+        <p>Der Reassembler kann mit SMON ohne Schwierigkeiten im Speicher verschoben werden. Um den Reassembler nach $9000 zu verschieben, sind folgende SMON-Befehle einzugeben:<br>
+            W C000 CB00 9000<br>
             V C000 CB00 9000 9000 9813</p>
 
         <h3>Beispiel zu den Basic-Erweiterungen</h3>
 
-        <p>Laden Sie Hypra-Ass, starten Sie ihn und laden anschließend den Reassembler. Geben Sie NEW und danach im Direktmodus<br />
-            SYS 49152,$1000,$1FD7:←E 64 <RETURN><br />
-                ein. Der Reassembler bekommt durch den SYS-Befehl die Start- und Endadresse des Maschinenprogramms mitgeteilt. Der »E«-Befehl setzt Bit 6 des Informations-Bytes und startet den Reassembler. Das gesetzte Bit 6 bewirkt, daß kein Quelltext, sondern ein Informationsprogramm erstellt wird. LISTen Sie das Programm mit /E. Sie sehen eine Reihe von »T«-Befehlen und zum Schluß einen »E«-Befehl. Schreiben Sie hinter diesen Befehl die Zahl 32, drücken die RETURN-Taste und geben folgende Zeile im Direktmodus ein:<br />
+        <p>Laden Sie Hypra-Ass, starten Sie ihn und laden anschließend den Reassembler. Geben Sie NEW und danach im Direktmodus<br>
+            SYS 49152,$1000,$1FD7:←E 64 <RETURN><br>
+                ein. Der Reassembler bekommt durch den SYS-Befehl die Start- und Endadresse des Maschinenprogramms mitgeteilt. Der »E«-Befehl setzt Bit 6 des Informations-Bytes und startet den Reassembler. Das gesetzte Bit 6 bewirkt, daß kein Quelltext, sondern ein Informationsprogramm erstellt wird. LISTen Sie das Programm mit /E. Sie sehen eine Reihe von »T«-Befehlen und zum Schluß einen »E«-Befehl. Schreiben Sie hinter diesen Befehl die Zahl 32, drücken die RETURN-Taste und geben folgende Zeile im Direktmodus ein:<br>
                 OPEN 1,8,1,&ldquo;REASS DEMO,P,W&rdquo;:CMD 1:SYS 49152,$1000,$1FD7:GOT0 100 <RETURN>
         </p>
 

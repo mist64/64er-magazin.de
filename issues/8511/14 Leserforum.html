@@ -94,12 +94,12 @@
 
         <p>TODO</p>
 
-        <p>0011 0111 55<br />
-            0010 0000 32<br />
-            &mdash;&mdash;&mdash;-EOR&mdash;-<br />
-            0001 0111 23<br />
-            0010 0000 32<br />
-            &mdash;&mdash;&mdash;-AND&mdash;-<br />
+        <p>0011 0111 55<br>
+            0010 0000 32<br>
+            &mdash;&mdash;&mdash;-EOR&mdash;-<br>
+            0001 0111 23<br>
+            0010 0000 32<br>
+            &mdash;&mdash;&mdash;-AND&mdash;-<br>
             0000 0000 0</p>
 
         <p>Ergebnis Null, der Computer wartet.</p>
@@ -108,12 +108,12 @@
 
         <p>TODO</p>
 
-        <p>0010 0111 39<br />
-            0010 0000 32<br />
-            &mdash;&mdash;&mdash;-EOR&mdash;-<br />
-            0000 0111 7<br />
-            0010 0000 32<br />
-            &mdash;&mdash;&mdash;-AND&mdash;-<br />
+        <p>0010 0111 39<br>
+            0010 0000 32<br>
+            &mdash;&mdash;&mdash;-EOR&mdash;-<br>
+            0000 0111 7<br>
+            0010 0000 32<br>
+            &mdash;&mdash;&mdash;-AND&mdash;-<br>
             0000 0000 0</p>
 
         <p>Siehe da — das Ergebnis ist ebenfalls Null. Der Computer wartet also bis in alle Ewigkeit.</p>
@@ -124,12 +124,12 @@
 
         <p>TODO</p>
 
-        <p>0000 0111 7<br />
-            0010 0000 32<br />
-            &mdash;&mdash;&mdash;-EOR&mdash;-<br />
-            0010 0111 39<br />
-            0010 0000 32<br />
-            &mdash;&mdash;&mdash;-AND&mdash;-<br />
+        <p>0000 0111 7<br>
+            0010 0000 32<br>
+            &mdash;&mdash;&mdash;-EOR&mdash;-<br>
+            0010 0111 39<br>
+            0010 0000 32<br>
+            &mdash;&mdash;&mdash;-AND&mdash;-<br>
             0010 0000 32</p>
 
         <p>Damit haben wir einen Wert ungleich Null als Ergebnis, und der WAIT-Befehl wird beendet. Übrigens kann man leicht nachrechnen, daß die Reihenfolge der Operationen EOR und AND keine Rolle für das Ergebnis spielt. Die Angaben im »Programers Reference Guide« sind also genauso richtig (wenn man die richtigen Zahlen einsetzt). Die hier angegebene Reihenfolge (erst EOR, dann AND) entspricht aber der Reihenfolge, in der diese Operationen vom Betriebssystem tatsächlich durchgeführt werden.</p>
@@ -203,9 +203,9 @@
         <p>Beim Nachladen von Programmen innerhalb eines anderen Programms werden die Zeiger, die auf das Programmende zeigen, nicht ordnungsgemäß nachgestellt. Falls das nachgeladene Programm länger ist als das erste Programm, dann kann es Probleme geben. Werden nämlich Variablen definiert, dann überschreiben sie das Programm. Es gibt nun zwei Möglichkeiten, dies zu verhindern:</p>
 
         <ol>
-            <li>Man lädt das Programm im Direktmodus. Dazu wird einfach eine Eingabe simuliert. Das geht folgendermaßen:<br />
-                10 PRINT ” [CLR,3DOWN, 4SPACE]” ; CHR$(34); ” NAME” ; CHR$(34); ” ,8”<br />
-                20 PRINT ” [HOME]”<br />
+            <li>Man lädt das Programm im Direktmodus. Dazu wird einfach eine Eingabe simuliert. Das geht folgendermaßen:<br>
+                10 PRINT ” [CLR,3DOWN, 4SPACE]” ; CHR$(34); ” NAME” ; CHR$(34); ” ,8”<br>
+                20 PRINT ” [HOME]”<br>
                 30 POKE 631,131 : POKE 198,1</li>
         </ol>
 
@@ -213,7 +213,7 @@
         <p>Zeile 30 simuliert die Eingabe der Tastenkombination SHIFT-RUN/STOP. Um zu vermeiden, daß man den Text auf dem Bildschirm lesen kann, muß nur die gleiche Farbe für Schrift und Hintergrund gewählt werden: 5 POKE 646,PEEK(53281)</p>
 
         <ol>
-            <li>Laden vom laufenden Programm aus mit Neusetzen der Zeiger. Die Zero-Page-Adressen 174 und 175 werden beim Laden eines Programms vom Betriebssystem benutzt und enthalten nach dem Laden die Endadresse des Programms. Wichtig für den Basic-Interpreter sind aber die Adressen 45,46. Sie zeigen ebenfalls auf das Programmende und auf den Start der Variablen. Am Anfang des nachgeladenen Programms sollte also stehen:<br />
+            <li>Laden vom laufenden Programm aus mit Neusetzen der Zeiger. Die Zero-Page-Adressen 174 und 175 werden beim Laden eines Programms vom Betriebssystem benutzt und enthalten nach dem Laden die Endadresse des Programms. Wichtig für den Basic-Interpreter sind aber die Adressen 45,46. Sie zeigen ebenfalls auf das Programmende und auf den Start der Variablen. Am Anfang des nachgeladenen Programms sollte also stehen:<br>
                 0 POKE 45, PEEK(174) : POKE 46, PEEK(175) : CLR</li>
         </ol>
 
@@ -282,21 +282,21 @@
 
         <p>Dann sagt man dem C 64 mit »POKE 198,1«, daß eine Taste gedrückt wurde. Bei einem anschließenden INPUT wird jetzt als erstes ein Anführungszeichen ausgegeben, danach kann ein beliebiger Text folgen, der auch Komma, Doppelpunkt oder Semikolon enthalten darf.</p>
 
-        <p>Bei sequentiellen Dateien geht man im Prinzip genauso vor. Setzen Sie den Text, den Sie in eine sequentielle Datei schreiben wollen, einfach in Anführungszeichen. Beim anschließenden Lesen mit INPUT # wird dann der gesamte Text einschließlich Sonderzeichen, allerdings ohne Anführungszeichen, wieder von Diskette gelesen. Hier ein Beispielprogramm, das eine komplette Eingabezeile von der Tastatur holt, die Zeile in eine sequentielle Datei schreibt und anschließend wieder liest:<br />
-            10 OPEN 1,8,8,” TEST,S,W"<br />
-            20 POKE 631,34 : POKE 198,1<br />
-            30 INPUT A$<br />
-            40 PRINT#1,CHR$(34)+A$+ CHR$(34)<br />
-            50 CLOSE 1<br />
-            60 PRINT ” JETZT LESEN&hellip;”<br />
-            70 OPEN 1,8,8,” TEST,S,R"<br />
-            80 INPUT#1,A$ : PRINT A$<br />
+        <p>Bei sequentiellen Dateien geht man im Prinzip genauso vor. Setzen Sie den Text, den Sie in eine sequentielle Datei schreiben wollen, einfach in Anführungszeichen. Beim anschließenden Lesen mit INPUT # wird dann der gesamte Text einschließlich Sonderzeichen, allerdings ohne Anführungszeichen, wieder von Diskette gelesen. Hier ein Beispielprogramm, das eine komplette Eingabezeile von der Tastatur holt, die Zeile in eine sequentielle Datei schreibt und anschließend wieder liest:<br>
+            10 OPEN 1,8,8,” TEST,S,W"<br>
+            20 POKE 631,34 : POKE 198,1<br>
+            30 INPUT A$<br>
+            40 PRINT#1,CHR$(34)+A$+ CHR$(34)<br>
+            50 CLOSE 1<br>
+            60 PRINT ” JETZT LESEN&hellip;”<br>
+            70 OPEN 1,8,8,” TEST,S,R"<br>
+            80 INPUT#1,A$ : PRINT A$<br>
             90 CLOSE 1</p>
 
-        <p>Wer sich an dem Anführungszeichen zu Beginn jeder Eingabe stört, der kann noch etwas trickreicher vorgehen: Man kann nämlich nicht nur ein Anführungszeichen in den Tastaturpuffer POKE, sondern zusätzlich auch die Codes für das Setzen der Zeichenfarbe. Wenn man dann zuerst die Zeichenfarbe auf Hintergrundfarbe setzt, anschließend das Anführungszeichen ausgibt und schließlich wieder die normale Schreibfarbe einstellt, dann ist das Anführungszeichen unsichtbar, tut aber gleichwohl seine Wirkung. Sei beispielsweise die Hintergrundfarbe Blau und die Zeichenfarbe Weiß. Ein Blick in die ASCII-Code-Tabelle im Handbuch ergibt die Codes 31 für Blau und 5 für Weiß. Für ein unsichtbares Anführungszeichen ersetzt man also im obigen Beispiel die Zeile 20 durch:<br />
-            20 POKE 631,31 : REM BLAU<br />
-            21 POKE 632,34 : REM ANFUEHRUNG<br />
-            22 POKE 633,5 : REM WEISS<br />
+        <p>Wer sich an dem Anführungszeichen zu Beginn jeder Eingabe stört, der kann noch etwas trickreicher vorgehen: Man kann nämlich nicht nur ein Anführungszeichen in den Tastaturpuffer POKE, sondern zusätzlich auch die Codes für das Setzen der Zeichenfarbe. Wenn man dann zuerst die Zeichenfarbe auf Hintergrundfarbe setzt, anschließend das Anführungszeichen ausgibt und schließlich wieder die normale Schreibfarbe einstellt, dann ist das Anführungszeichen unsichtbar, tut aber gleichwohl seine Wirkung. Sei beispielsweise die Hintergrundfarbe Blau und die Zeichenfarbe Weiß. Ein Blick in die ASCII-Code-Tabelle im Handbuch ergibt die Codes 31 für Blau und 5 für Weiß. Für ein unsichtbares Anführungszeichen ersetzt man also im obigen Beispiel die Zeile 20 durch:<br>
+            20 POKE 631,31 : REM BLAU<br>
+            21 POKE 632,34 : REM ANFUEHRUNG<br>
+            22 POKE 633,5 : REM WEISS<br>
             23 POKE 198,3 : REM 3 TASTEN</p>
 
         <p>So erreicht man eine doch recht brauchbare Eingaberoutine, ohne ein spezielles Maschinenprogramm zur Erweiterung des INPUT-Befehls schreiben zu müssen.</p>
@@ -325,9 +325,9 @@
 
         <h2>VC 20-Hilferuf</h2>
 
-        <p>Eigentlich bin ich (vielleicht zu Unrecht) etwas enttäuscht vom 64’er-Magazin. Steht doch da auf der Titelseite der Ausgabe 8 »Tips &amp; Tricks für C 64, VC 20, C 16«, so findet man beim Durchblättern nur einen einzigen Artikel zum VC 20. Meinen Sie nicht auch, daß einer der meistverkauften Rechner etwas mehr Beachtung verdient?<br />
-            Wurden früher wenigstens noch C 64-Maschinenprogramme als Assembler-Listings oder in disassemblierter Form abgedruckt, muß ein VC 20-Freund sich heutzutage durch DATAs und MSE-Codes wühlen, um am Ende jeglichen Überblick zu verlieren und damit auch die Hoffnung, ein solches Programm auf dem VC 20 zum Laufen zu bekommen.<br />
-            Könnten die Programmautoren ihre Listings nicht besser dokumentieren und die Kniffe offenlegen, die sie programmiert haben? Der Dank der VC 20er-Schar würde ihnen gewiß ewig nachschleichen.<br />
+        <p>Eigentlich bin ich (vielleicht zu Unrecht) etwas enttäuscht vom 64’er-Magazin. Steht doch da auf der Titelseite der Ausgabe 8 »Tips &amp; Tricks für C 64, VC 20, C 16«, so findet man beim Durchblättern nur einen einzigen Artikel zum VC 20. Meinen Sie nicht auch, daß einer der meistverkauften Rechner etwas mehr Beachtung verdient?<br>
+            Wurden früher wenigstens noch C 64-Maschinenprogramme als Assembler-Listings oder in disassemblierter Form abgedruckt, muß ein VC 20-Freund sich heutzutage durch DATAs und MSE-Codes wühlen, um am Ende jeglichen Überblick zu verlieren und damit auch die Hoffnung, ein solches Programm auf dem VC 20 zum Laufen zu bekommen.<br>
+            Könnten die Programmautoren ihre Listings nicht besser dokumentieren und die Kniffe offenlegen, die sie programmiert haben? Der Dank der VC 20er-Schar würde ihnen gewiß ewig nachschleichen.<br>
             Im übrigen würde es mich sehr freuen, wenn Ihre Zeitschrift in Zukunft diese Art der Diskriminierung des VC 20 unterlassen würde.</p>
 
         <p>Michael Weblau</p>
