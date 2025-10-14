@@ -16,191 +16,192 @@
 <body>
     <article>
         <h1>Tips &amp; Tricks für Anfänger und Profis</h1>
-<blockquote><p>In der Rubrik Tips &amp; Tricks können wir Ihnen diesmal einige Routinen anbieten, die sich besonders zum Einbau in eigene Programme eignen.</p></blockquote>
+        <p class="intro">In der Rubrik Tips &amp; Tricks können wir Ihnen diesmal einige Routinen anbieten, die sich besonders zum Einbau in eigene Programme eignen.</p>
 
-<h2>Screen-Dump</h2>
+        <h2>Screen-Dump</h2>
 
-<p>Eine Bildschirmmaske kann auf viele verschiedene Arten auf den Bildschirm gebracht werden. Die einfachste ist wohl:<br/>
-FOR I = 0 T0 999 : POKE 1024 + I, PEEK (STADR + I) : NEXTI<br/>
-wobei STADR die Startadresse der Maske ist. Doch das ist zu langsam und eintönig. Das gleiche Programm in Assembler ist zirka 200 mal schneller, aber immer noch eintönig.</p>
+        <p>Eine Bildschirmmaske kann auf viele verschiedene Arten auf den Bildschirm gebracht werden. Die einfachste ist wohl:<br />
+            FOR I = 0 T0 999 : POKE 1024 + I, PEEK (STADR + I) : NEXTI<br />
+            wobei STADR die Startadresse der Maske ist. Doch das ist zu langsam und eintönig. Das gleiche Programm in Assembler ist zirka 200 mal schneller, aber immer noch eintönig.</p>
 
-<p>Das Programm »Screen-Dump« (siehe Listing 1) hilft dem ab. Auf über 100 verschiedene Arten kann hiermit das oben genannte Programm ablaufen (das heißt 100 verschiedene Reihenfolgen), von denen einige verblüffen, fast alle aber besser »aussehen« als dieses Programm. Auch die verstellbare Geschwindigkeit ermöglicht interessante Veränderungen.</p>
+        <p>Das Programm »Screen-Dump« (siehe Listing 1) hilft dem ab. Auf über 100 verschiedene Arten kann hiermit das oben genannte Programm ablaufen (das heißt 100 verschiedene Reihenfolgen), von denen einige verblüffen, fast alle aber besser »aussehen« als dieses Programm. Auch die verstellbare Geschwindigkeit ermöglicht interessante Veränderungen.</p>
 
-<p>Die Handhabung ist denkbar einfach:<br/>
-SYS 680, Art, Stadr., Geschwindigkeit<br/>
-Art: Eine Zahl zwischen 0 und 127<br/>
-Stadr: Die Startadresse der Maske geteilt durch 256 (Highbyte).<br/>
-Geschwindigkeit: zwischen 1 und 255 verstellbar.</p>
+        <p>Die Handhabung ist denkbar einfach:<br />
+            SYS 680, Art, Stadr., Geschwindigkeit<br />
+            Art: Eine Zahl zwischen 0 und 127<br />
+            Stadr: Die Startadresse der Maske geteilt durch 256 (Highbyte).<br />
+            Geschwindigkeit: zwischen 1 und 255 verstellbar.</p>
 
-<p>Also SYS680, 20, 64, 8kopiert den Bereich von 16384bis 17383 auf sehr originelle Weise in den Bildschirm.</p>
+        <p>Also SYS680, 20, 64, 8kopiert den Bereich von 16384bis 17383 auf sehr originelle Weise in den Bildschirm.</p>
 
-<p>Andere »schöne Versionen« sind:</p>
+        <p>Andere »schöne Versionen« sind:</p>
 
-<p>TODO TABLE</p>
+        <p>TODO TABLE</p>
 
-<p>Art Geschw. Art Geschw.<br/>
-2   1   6   4<br/>
-9   4   13  8<br/>
-19  2   20  8<br/>
-28  8   33  4<br/>
-36  10  44  4<br/>
-46  20  61  20<br/>
-64  4   65  10<br/>
-66  4   84  4<br/>
-88  2   98  8<br/>
-104 4   106 2<br/>
-120 20  125 20</p>
+        <p>Art Geschw. Art Geschw.<br />
+            2 1 6 4<br />
+            9 4 13 8<br />
+            19 2 20 8<br />
+            28 8 33 4<br />
+            36 10 44 4<br />
+            46 20 61 20<br />
+            64 4 65 10<br />
+            66 4 84 4<br />
+            88 2 98 8<br />
+            104 4 106 2<br />
+            120 20 125 20</p>
 
-<h3>Funktionsweise</h3>
+        <h3>Funktionsweise</h3>
 
-<p>Wie funktioniert Screen-Dump, wo es doch nur 100 Byte lang ist? Am besten ist das an folgendem Beispiel zu erkennen: Wir nehmen eine Gruppe von zwölf Elementen. Wie greift man nun nacheinander auf alle zwölf Elemente zu, so daß keine Reihenfolge erkennbar wird? Ganz einfach:</p>
+        <p>Wie funktioniert Screen-Dump, wo es doch nur 100 Byte lang ist? Am besten ist das an folgendem Beispiel zu erkennen: Wir nehmen eine Gruppe von zwölf Elementen. Wie greift man nun nacheinander auf alle zwölf Elemente zu, so daß keine Reihenfolge erkennbar wird? Ganz einfach:</p>
 
-<p>Wir nehmen eine Zahl, die mit 12 keinen gemeinsamen Teiler hat, zum Beispiel 5. Jetzt beginnen wir bei 0 und zählen 5 hinzu. Diese Zahl nehmen wir heraus. Dann zählen wir wieder 5 hinzu. Ergebnis 10. Unser zweites Element. Dann wieder + 5 = 15. Element 15 ist nicht vorhanden, also ziehen wir die Gesamtanzahl der Elemente ab. 15—12=3 und so weiter. Es ergibt sich die Reihenfolge: 5 10 3 8 1 6 11 4 9 2 7 12. Augenscheinlich völlig wahllos. Es funktioniert immer, wenn folgende Voraussetzungen erfüllt sind:</p>
+        <p>Wir nehmen eine Zahl, die mit 12 keinen gemeinsamen Teiler hat, zum Beispiel 5. Jetzt beginnen wir bei 0 und zählen 5 hinzu. Diese Zahl nehmen wir heraus. Dann zählen wir wieder 5 hinzu. Ergebnis 10. Unser zweites Element. Dann wieder + 5 = 15. Element 15 ist nicht vorhanden, also ziehen wir die Gesamtanzahl der Elemente ab. 15—12=3 und so weiter. Es ergibt sich die Reihenfolge: 5 10 3 8 1 6 11 4 9 2 7 12. Augenscheinlich völlig wahllos. Es funktioniert immer, wenn folgende Voraussetzungen erfüllt sind:</p>
 
-<ol>
-<li>Die Additionszahl (hier: 5) muß kleiner sein als die Gesamtzahl der Menge.</li>
-<li>Die Additionszahl darf mit der Gesamtzahl keinen gemeinsamen Teiler haben.</li>
-</ol>
+        <ol>
+            <li>Die Additionszahl (hier: 5) muß kleiner sein als die Gesamtzahl der Menge.</li>
+            <li>Die Additionszahl darf mit der Gesamtzahl keinen gemeinsamen Teiler haben.</li>
+        </ol>
 
 
-<p>Im Screen-Dump wird dieses System mit einer Menge von 1 024 Elementen angewandt. Die möglichen Additionszahlen sind somit alle ungeraden Zahlen zwischen 0 und 255.</p>
+        <p>Im Screen-Dump wird dieses System mit einer Menge von 1 024 Elementen angewandt. Die möglichen Additionszahlen sind somit alle ungeraden Zahlen zwischen 0 und 255.</p>
 
-<address class="author">(Michael Schmidt/tr)</address>
+        <address class="author">(Michael Schmidt/tr)</address>
 
-<h2>Pseudo-Interrupt</h2>
+        <h2>Pseudo-Interrupt</h2>
 
-<p>Diese Befehlserweiterung erlaubt es, ein Basic-Programm zu jedem beliebigen Zeitpunkt per Tastendruck durch die F1-Taste unterbrechen zu lassen. Es kann dann in eine vorher definierte Basic-Routine gesprungen werden. Diese könnte zum Beispiel den noch freien Speicherplatz oder die Uhrzeit anzeigen.</p>
+        <p>Diese Befehlserweiterung erlaubt es, ein Basic-Programm zu jedem beliebigen Zeitpunkt per Tastendruck durch die F1-Taste unterbrechen zu lassen. Es kann dann in eine vorher definierte Basic-Routine gesprungen werden. Diese könnte zum Beispiel den noch freien Speicherplatz oder die Uhrzeit anzeigen.</p>
 
-<p>Das Programm (Listing 2) bitte mit dem MSE eingeben. Es liegt dann im Speicherbereich von 40499 bis 40768. Geladen wird es absolut mit LOAD &ldquo;PSEUDO-IRQ&rdquo;,8,1. Da das Programm im Bereich für die Basic-Variablen steht, muß es durch POKE 56,158:CLR vor Überschreiben geschützt werden. Nach dem Start durch »SYS 40541« stehen die neuen Befehle zur Verfügung:<br/>
-!FlJUMP <Zeilennummer> legtfest, inwelcheZeileim Falle einer Unterbrechung durch die F1-Taste gesprungen werden soll. Tritt der Befehl mehrmals auf, so gilt die zuletzt angegebene Zeilennummer.<br/>
-!JBACK bewirkt die Fortsetzung des Basic-Programms ab der Stelle, an der unterbrochen wurde.<br/>
-!SF1 verhindert Unterbrechungen. Dies kann zum Beispiel beim Aufbau einer Grafik oder bei Arbeiten mit der Diskettenstation wichtig sein.<br/>
-!CFl läßt gesperrte Unterbrechungen wieder zu.</p>
+        <p>Das Programm (Listing 2) bitte mit dem MSE eingeben. Es liegt dann im Speicherbereich von 40499 bis 40768. Geladen wird es absolut mit LOAD &ldquo;PSEUDO-IRQ&rdquo;,8,1. Da das Programm im Bereich für die Basic-Variablen steht, muß es durch POKE 56,158:CLR vor Überschreiben geschützt werden. Nach dem Start durch »SYS 40541« stehen die neuen Befehle zur Verfügung:<br />
+            !FlJUMP <Zeilennummer> legtfest, inwelcheZeileim Falle einer Unterbrechung durch die F1-Taste gesprungen werden soll. Tritt der Befehl mehrmals auf, so gilt die zuletzt angegebene Zeilennummer.<br />
+                !JBACK bewirkt die Fortsetzung des Basic-Programms ab der Stelle, an der unterbrochen wurde.<br />
+                !SF1 verhindert Unterbrechungen. Dies kann zum Beispiel beim Aufbau einer Grafik oder bei Arbeiten mit der Diskettenstation wichtig sein.<br />
+                !CFl läßt gesperrte Unterbrechungen wieder zu.</p>
 
-<address class="author">(Guido Schuhmacher/tr)</address>
+        <address class="author">(Guido Schuhmacher/tr)</address>
 
-<h2>List-Schutz für Basic-Programme</h2>
+        <h2>List-Schutz für Basic-Programme</h2>
 
-<p>Dieser List-Schutz ist für Nichteingeweihte sehr verblüffend. Die Grundidee dazu stammt aus dem Bericht Disketten-Manipulationen aus 64’er, Ausgabe 6/85. Er wurde jedoch etwas ausgebaut, so daß hier beim Listen alle Steuercodes aktiv werden. Dies wird dadurch erreicht, daß man in eine Speicherstelle vor den Codes die Zahl 141 schreibt. Um nun ein Programm zu schützen, lädt man es und gibt folgende zwei Zeilen ein:</p>
+        <p>Dieser List-Schutz ist für Nichteingeweihte sehr verblüffend. Die Grundidee dazu stammt aus dem Bericht Disketten-Manipulationen aus 64’er, Ausgabe 6/85. Er wurde jedoch etwas ausgebaut, so daß hier beim Listen alle Steuercodes aktiv werden. Dies wird dadurch erreicht, daß man in eine Speicherstelle vor den Codes die Zahl 141 schreibt. Um nun ein Programm zu schützen, lädt man es und gibt folgende zwei Zeilen ein:</p>
 
-<p>TODO</p>
+        <p>TODO</p>
 
-<p>Danach gibt man im Direktmodus POKE 2067,71 : POKE 2073,141 : POKE 2118,0 : POKE 2119,0 ein und speichert das Programm.</p>
+        <p>Danach gibt man im Direktmodus POKE 2067,71 : POKE 2073,141 : POKE 2118,0 : POKE 2119,0 ein und speichert das Programm.</p>
 
-<p>Listet man nun das Programm, so wird der Bildschirm gelöscht und der Text in der REM-Zeile ausgegeben. Durch das künstlich erzeugte Basic-Programm-Ende-Zeichen (drei Nullen) wird das Listen abgebrochen. Wird im Programm dann auch noch durch POKE 788,52 die RUN-STOP-, und durch POKE 792,193 die RESTORE-Taste ausgeschaltet, kann keiner mehr an das Programm. Aufheben läßt sich dieser List-Schutz nur mit einem Monitor und mit der Kenntnis der Funktionsweise des Schutzes.</p>
+        <p>Listet man nun das Programm, so wird der Bildschirm gelöscht und der Text in der REM-Zeile ausgegeben. Durch das künstlich erzeugte Basic-Programm-Ende-Zeichen (drei Nullen) wird das Listen abgebrochen. Wird im Programm dann auch noch durch POKE 788,52 die RUN-STOP-, und durch POKE 792,193 die RESTORE-Taste ausgeschaltet, kann keiner mehr an das Programm. Aufheben läßt sich dieser List-Schutz nur mit einem Monitor und mit der Kenntnis der Funktionsweise des Schutzes.</p>
 
-<address class="author">(Thomas Uttendorfer/tr)</address>
+        <address class="author">(Thomas Uttendorfer/tr)</address>
 
-<h2>Sichere INPUT-Routine in Basic</h2>
+        <h2>Sichere INPUT-Routine in Basic</h2>
 
-<p>Ich habe bisher immer eine leistungsfähige INPUT-Routine in Basic vermißt. Das ging anscheinend nicht nur mir so, denn in einigen abgedruckten Programmen (zum Beispiel Ligatab, Listing des Monats, 3/85) fehlt eine solche Routine, was zu chaotischen Ergebnissen führen kann. (Wenn man zum Beispiel aus Versehen an Stelle der Shift-Taste die Crsr-Down-Taste gedrückt hat, so nützt es dem Anwender wenig, wenn er mit der Crsr-Up-Taste wieder in das Eingabefeld zurückkehrt, weil jetzt der INPUT-Befehl die ganze Zeile als Eingabe ansieht.) Deshalb hier eine INPUT-Routine, die folgende Vorteile hat:<br/>
-a) Da die Routine (Listing 3) in Basic geschrieben ist, ist sie für jeden Programmierer leicht verständlich und abänderbar,<br/>
-b) Der Programmierer kann beim Aufruf der Routine gleich Ort, mini- und maximale Länge und die zulässigen Zeichen der Eingabe festlegen.<br/>
-c)  Jedes Zeichen wird gleich bei der Eingabe auf seine »Richtigkeit« überprüft.<br/>
-d)  Es wird nur die tatsächliche Eingabe als Eingabe übernommen (und nicht noch eventuell Teile der Maske).<br/>
-e)  Es funktionieren noch sämtliche Sonderfunktionstasten (inst, del, home, clr und so weiter).<br/>
-f)  Der Anwender kann das Eingabefeld nicht verlassen.<br/>
-g)  Die Routine ist mit 1,5 KByte relativ kurz.</p>
+        <p>Ich habe bisher immer eine leistungsfähige INPUT-Routine in Basic vermißt. Das ging anscheinend nicht nur mir so, denn in einigen abgedruckten Programmen (zum Beispiel Ligatab, Listing des Monats, 3/85) fehlt eine solche Routine, was zu chaotischen Ergebnissen führen kann. (Wenn man zum Beispiel aus Versehen an Stelle der Shift-Taste die Crsr-Down-Taste gedrückt hat, so nützt es dem Anwender wenig, wenn er mit der Crsr-Up-Taste wieder in das Eingabefeld zurückkehrt, weil jetzt der INPUT-Befehl die ganze Zeile als Eingabe ansieht.) Deshalb hier eine INPUT-Routine, die folgende Vorteile hat:<br />
+            a) Da die Routine (Listing 3) in Basic geschrieben ist, ist sie für jeden Programmierer leicht verständlich und abänderbar,<br />
+            b) Der Programmierer kann beim Aufruf der Routine gleich Ort, mini- und maximale Länge und die zulässigen Zeichen der Eingabe festlegen.<br />
+            c) Jedes Zeichen wird gleich bei der Eingabe auf seine »Richtigkeit« überprüft.<br />
+            d) Es wird nur die tatsächliche Eingabe als Eingabe übernommen (und nicht noch eventuell Teile der Maske).<br />
+            e) Es funktionieren noch sämtliche Sonderfunktionstasten (inst, del, home, clr und so weiter).<br />
+            f) Der Anwender kann das Eingabefeld nicht verlassen.<br />
+            g) Die Routine ist mit 1,5 KByte relativ kurz.</p>
 
-<p>Benutzung der Routine:<br/>
-a)  Setzen des Parameterstrings<br/>
-b)  Aufruf mit gosub 60000<br/>
-c)  Übergabe von in$ an gewünschte Variable</p>
+        <p>Benutzung der Routine:<br />
+            a) Setzen des Parameterstrings<br />
+            b) Aufruf mit gosub 60000<br />
+            c) Übergabe von in$ an gewünschte Variable</p>
 
-<p>Der Parameterstring:</p>
+        <p>Der Parameterstring:</p>
 
-<p>Er setzt sich zusammen aus:</p>
+        <p>Er setzt sich zusammen aus:</p>
 
-<p>TODO TABLE</p>
+        <p>TODO TABLE</p>
 
-<p>Stelle 1,2  : Zeile der Eingabe<br/>
-Stelle 3,4  : Spalte der Eingabe<br/>
-Stelle 5,6  : minimale Länge der Eingabe<br/>
-Stelle 7,8  : maximale Länge der Eingabe<br/>
-Stelle 9    : Code (siehe weiter unten)</p>
+        <p>Stelle 1,2 : Zeile der Eingabe<br />
+            Stelle 3,4 : Spalte der Eingabe<br />
+            Stelle 5,6 : minimale Länge der Eingabe<br />
+            Stelle 7,8 : maximale Länge der Eingabe<br />
+            Stelle 9 : Code (siehe weiter unten)</p>
 
-<p>Es ist darauf zu achten, daß einstellige Angaben (zum Beispiel: 3. Zeile) mit 03 angegeben werden, da sonst keine klare Trennung der einzelnen Parameter vorgenommen werden kann.</p>
+        <p>Es ist darauf zu achten, daß einstellige Angaben (zum Beispiel: 3. Zeile) mit 03 angegeben werden, da sonst keine klare Trennung der einzelnen Parameter vorgenommen werden kann.</p>
 
-<p>Die Routine sieht Standardwerte für die minimale und maximale Länge und für den Code der Eingabe vor (Zeile 60200). Diese können natürlich frei nach eigenem Bedarf eingerichtet werden. Entspricht die geforderte Eingabe den Standardwerten, so braucht der Programmierer beim Setzen des Parameterstrings diese Werte nicht anzugeben, sondern nur noch Zeile und Spalte. Dies führt natürlich zu einer weiteren Vereinfachung (Beispiel: pa$ = &ldquo;0510&rdquo;, das heißt Eingabe in Zeile 5 ab Spalte 10 mit den Standardwerten).<br/>
-Code &copy;</p>
+        <p>Die Routine sieht Standardwerte für die minimale und maximale Länge und für den Code der Eingabe vor (Zeile 60200). Diese können natürlich frei nach eigenem Bedarf eingerichtet werden. Entspricht die geforderte Eingabe den Standardwerten, so braucht der Programmierer beim Setzen des Parameterstrings diese Werte nicht anzugeben, sondern nur noch Zeile und Spalte. Dies führt natürlich zu einer weiteren Vereinfachung (Beispiel: pa$ = &ldquo;0510&rdquo;, das heißt Eingabe in Zeile 5 ab Spalte 10 mit den Standardwerten).<br />
+            Code &copy;</p>
 
-<p>Der Code dient dazu, die eingegebenen Zeichen sofort zu überprüfen. Selbstverständlich kann auch er frei programmiert werden. In Zeile 60490 wird entsprechend dem Code in die Unterprogramme verzweigt. Dort wird die gedrückte Taste überprüft. Entspricht sie nicht dem Code, wird fl auf 1 gesetzt.</p>
+        <p>Der Code dient dazu, die eingegebenen Zeichen sofort zu überprüfen. Selbstverständlich kann auch er frei programmiert werden. In Zeile 60490 wird entsprechend dem Code in die Unterprogramme verzweigt. Dort wird die gedrückte Taste überprüft. Entspricht sie nicht dem Code, wird fl auf 1 gesetzt.</p>
 
-<p>In der vorliegenden Routine sind Code 1 bis 4 schon programmiert, wobei<br/>
-1 bedeutet, daß nur Zahlen<br/>
-2 bedeutet, daß nur Buchstaben<br/>
-3 bedeutet, daß alles<br/>
-4 bedeutet, daß nur Kleinbuchstaben<br/>
-zulässig sind.</p>
+        <p>In der vorliegenden Routine sind Code 1 bis 4 schon programmiert, wobei<br />
+            1 bedeutet, daß nur Zahlen<br />
+            2 bedeutet, daß nur Buchstaben<br />
+            3 bedeutet, daß alles<br />
+            4 bedeutet, daß nur Kleinbuchstaben<br />
+            zulässig sind.</p>
 
-<p>Diese Codes oder auch neue Codes können spielend leicht geändert oder neu programmiert werden.</p>
+        <p>Diese Codes oder auch neue Codes können spielend leicht geändert oder neu programmiert werden.</p>
 
-<p>Funktionen der Sondertasten:</p>
+        <p>Funktionen der Sondertasten:</p>
 
-<p>TODO TABLE</p>
+        <p>TODO TABLE</p>
 
-<p>CRSR UP,CRSR DOWN<br/>
-INST,DEL<br/>
-HOME<br/>
-CLR<br/>
-CRSR LEFT,RIGHT<br/>
-sind abgeschaltet<br/>
-funktionieren innerhalb des Eingabefensters wie gewohnt (Rest der Maske wird nicht berührt)<br/>
-springt an Anfang des Eingabefensters löscht Eingabefenster und springt an den Anfang desselben<br/>
-funktionieren wie gewohnt, nur Eingabefeld kann nicht verlassen werden.</p>
+        <p>CRSR UP,CRSR DOWN<br />
+            INST,DEL<br />
+            HOME<br />
+            CLR<br />
+            CRSR LEFT,RIGHT<br />
+            sind abgeschaltet<br />
+            funktionieren innerhalb des Eingabefensters wie gewohnt (Rest der Maske wird nicht berührt)<br />
+            springt an Anfang des Eingabefensters löscht Eingabefenster und springt an den Anfang desselben<br />
+            funktionieren wie gewohnt, nur Eingabefeld kann nicht verlassen werden.</p>
 
-<address class="author">(Karlheinz Boss/tr)</address>
+        <address class="author">(Karlheinz Boss/tr)</address>
 
-<h2>Synthetische Melodien</h2>
+        <h2>Synthetische Melodien</h2>
 
-<p>Das wahrscheinlich kürzeste und erstaunlichste Musiksynthesizer-Sequencer-Programm, das je veröffentlicht wurde. Es handelt sich um ein 47 Byte langes Assemblerprogramm, das im Listing 4, in Form eines DATA-Laders vorliegt. Die Melodie und die Klangfarbe kann man über die Speicherstellen 1022 und 1023einstellen. Dabei kommt es allerdings nur auf die Differenz der beiden Byte an. Es empfiehlt sich also, die Speicherstelle 1022 mit 0 zu belegen und für 1023 alle Werte von 0 bis 128 auszuprobieren.</p>
+        <p>Das wahrscheinlich kürzeste und erstaunlichste Musiksynthesizer-Sequencer-Programm, das je veröffentlicht wurde. Es handelt sich um ein 47 Byte langes Assemblerprogramm, das im Listing 4, in Form eines DATA-Laders vorliegt. Die Melodie und die Klangfarbe kann man über die Speicherstellen 1022 und 1023einstellen. Dabei kommt es allerdings nur auf die Differenz der beiden Byte an. Es empfiehlt sich also, die Speicherstelle 1022 mit 0 zu belegen und für 1023 alle Werte von 0 bis 128 auszuprobieren.</p>
 
-<p>Melodische Tonfolgen erreicht man mit POKE 1023,7 + 8*n, wobei n eine ganze Zahl zwischen 0 und 16 sein darf. Effektvolle Klänge erreicht man zum Beispiel über folgende Werte (POKE 1023,&hellip;): 11, 28, 62, 96, 130.</p>
+        <p>Melodische Tonfolgen erreicht man mit POKE 1023,7 + 8*n, wobei n eine ganze Zahl zwischen 0 und 16 sein darf. Effektvolle Klänge erreicht man zum Beispiel über folgende Werte (POKE 1023,&hellip;): 11, 28, 62, 96, 130.</p>
 
-<h3>Funktionsweise</h3>
+        <h3>Funktionsweise</h3>
 
-<p>Zuerst werden Kurven- und Wellenform festgelegt. Die beiden Speicherinhalte von 1022 und 1023 werden erhöht beziehungsweise erniedrigt. Dann werden sie miteinander durch die AND-Funktion verknüpft. Das Ergebnis kommt ins High-Byte des Tonhöhenregisters. Eine kleine Warteschleife macht die Komposition hörbar.</p>
+        <p>Zuerst werden Kurven- und Wellenform festgelegt. Die beiden Speicherinhalte von 1022 und 1023 werden erhöht beziehungsweise erniedrigt. Dann werden sie miteinander durch die AND-Funktion verknüpft. Das Ergebnis kommt ins High-Byte des Tonhöhenregisters. Eine kleine Warteschleife macht die Komposition hörbar.</p>
 
-<address class="author">(Wolfgang Horak/tr)</address>
+        <address class="author">(Wolfgang Horak/tr)</address>
 
-<h2>Die Super-POKEs</h2>
+        <h2>Die Super-POKEs</h2>
 
-<p>POKE 792,226: POKE 793,252</p>
+        <p>POKE 792,226: POKE 793,252</p>
 
-<p>Sobald die RESTORE-Taste gedrückt wird, wird ein Reset ausgelöst.<br/>
-POKE 774,226: POKE 775,252</p>
+        <p>Sobald die RESTORE-Taste gedrückt wird, wird ein Reset ausgelöst.<br />
+            POKE 774,226: POKE 775,252</p>
 
-<p>Sobald der LIST-Befehl eingetippt wird, wird ein Reset ausgelöst.<br/>
-POKE 818,226: POKE 819,252</p>
+        <p>Sobald der LIST-Befehl eingetippt wird, wird ein Reset ausgelöst.<br />
+            POKE 818,226: POKE 819,252</p>
 
-<p>Sobald der SAVE-Befehl eingetippt wird, wird ein RESET ausgelöst.</p>
+        <p>Sobald der SAVE-Befehl eingetippt wird, wird ein RESET ausgelöst.</p>
 
-<address class="author">(tr)</address>
+        <address class="author">(tr)</address>
 
-<h2>Tips &amp; Tricks — Mischmasch</h2>
+        <h2>Tips &amp; Tricks — Mischmasch</h2>
 
-<p>Und hier noch ein paar Kleinigkeiten für die Tips &amp; Tricks-Sammlung:<br/>
-— Neustart eines Basic-Programms nach Drücken von RUN-STOP-RESTORE:<br/>
-1   DATA 169, 49, 141, 20, 3, 76, 113, 168<br/>
-2   FOR I=700 T0 707: READ A: POKE I,A: NEXT<br/>
-3   POKE 770,188: POKE 771,2</p>
+        <p>Und hier noch ein paar Kleinigkeiten für die Tips &amp; Tricks-Sammlung:<br />
+            — Neustart eines Basic-Programms nach Drücken von RUN-STOP-RESTORE:<br />
+            1 DATA 169, 49, 141, 20, 3, 76, 113, 168<br />
+            2 FOR I=700 T0 707: READ A: POKE I,A: NEXT<br />
+            3 POKE 770,188: POKE 771,2</p>
 
-<p>Einzige Bedingung ist, daß Ihr Programm eine Zeile 0 enthält, da der Interpreter einen RUN 0-Befehl ausführt.</p>
+        <p>Einzige Bedingung ist, daß Ihr Programm eine Zeile 0 enthält, da der Interpreter einen RUN 0-Befehl ausführt.</p>
 
-<p>— Nachladen von Datasette mit Autostart:<br/>
-POKE 56335,2</p>
+        <p>— Nachladen von Datasette mit Autostart:<br />
+            POKE 56335,2</p>
 
-<p>Dem Betriebssystem wird vorgegaukelt, daß SHIFT-RUN-STOP gedrückt wäre.</p>
+        <p>Dem Betriebssystem wird vorgegaukelt, daß SHIFT-RUN-STOP gedrückt wäre.</p>
 
-<p>— Nützliche SYS-Adressen:</p>
+        <p>— Nützliche SYS-Adressen:</p>
 
-<p>43121: entspricht dem Befehl RUN 0</p>
+        <p>43121: entspricht dem Befehl RUN 0</p>
 
-<p>42039: Ausgabe von Fehlermeldungen. Im X-Register des Prozessors muß die Fehlernummer stehen (Speicherstelle Nummer 781).</p>
+        <p>42039: Ausgabe von Fehlermeldungen. Im X-Register des Prozessors muß die Fehlernummer stehen (Speicherstelle Nummer 781).</p>
 
-<p>64763: RESET, ohne Initialisierung der Vektoren (IRQ etc.).</p>
+        <p>64763: RESET, ohne Initialisierung der Vektoren (IRQ etc.).</p>
 
-<address class="author">(tr)</address>
+        <address class="author">(tr)</address>
     </article>
 </body>
+
 </html>
